@@ -399,6 +399,36 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	vertexDate[5].texcoord = { 1.0f,1.0f };
 
 
+	ID3D12Resource* vertexResourceSprite = CreateBufferResource(device, sizeof(VertexData) * 6);
+	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite{};
+	vertexBufferViewSprite.BufferLocation = vertexResourceSprite->GetGPUVirtualAddress();
+	vertexBufferViewSprite.SizeInBytes = sizeof(VertexData) * 6;
+	vertexBufferViewSprite.StrideInBytes = sizeof(VertexData);
+
+	VertexData* vertexDataSprite = nullptr;
+	vertexResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSprite));
+	
+	vertexDataSprite[0].position = { 0.0f,360.0f,0.0f,1.0f };
+	vertexDataSprite[0].texcoord = { 0.0f,1.0f };
+	vertexDataSprite[1].position = { 0.0f,0.0f,0.0f,1.0f };
+	vertexDataSprite[1].texcoord = { 0.0f,0.0f };
+	vertexDataSprite[2].position = { 640.0f,360.0f,0.0f,1.0f };
+	vertexDataSprite[2].texcoord = { 1.0f,1.0f };
+
+	vertexDataSprite[3].position = { 0.0f,0.0f,0.0f,1.0f };
+	vertexDataSprite[3].texcoord = { 0.0f,0.0f };
+	vertexDataSprite[4].position = { 640.0f,0.0f,0.0f,1.0f };
+	vertexDataSprite[4].texcoord = { 1.0f,0.0f };
+	vertexDataSprite[5].position = { 640.0f,360.0f,0.0f,1.0f };
+	vertexDataSprite[5].texcoord = { 1.0f,1.0f };
+
+	ID3D12Resource* transformationMatResourceSprite = CreateBufferResource(device, sizeof(Matrix4x4));
+	Matrix4x4* transformationMatDataSprite = nullptr;
+	transformationMatResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatDataSprite));
+	*transformationMatDataSprite = MakeIdentity4x4();
+	Trans transSprite{ {1.0f,1.0f,1.0f,},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+
+
 	ID3D12Resource* materialResource = CreateBufferResource(device, sizeof(Vector4));
 	Vector4* materialDate = nullptr;
 	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialDate));
@@ -472,6 +502,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::SliderFloat("trans x", &transform.translate.x, -1.0f, 1.0f);
 		ImGui::SliderFloat("trans y", &transform.translate.y, -1.0f, 1.0f);
 		ImGui::SliderFloat("trans z", &transform.translate.z, -1.0f, 1.0f);
+		ImGui::SliderFloat("transSprite x", &transSprite.translate.x, 0.0f, 700.0f);
+		ImGui::SliderFloat("transSprite y", &transSprite.translate.y, 0.0f, 500.0f);
+		ImGui::SliderFloat("transSprite z", &transSprite.translate.z, -100.0f, 100.0f);
 		ImGui::End();
 
 		transform.rotate.y += 0.03f;
@@ -484,6 +517,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		*wvpDate = worldViewProjectionMatrix;
 
+
+		Matrix4x4 worldMatSprite = MakeAffineMatrix(transSprite.scale, transSprite.rotate, transSprite.translate);
+		Matrix4x4 viewMatSprite = MakeIdentity4x4();
+		Matrix4x4 projectMatSprite = MakeOrthographicMatrix(0.0f, 0.0f, float(MyWin::kWindowWidth), float(MyWin::kWindowHeight), 0.0f, 100.0f);
+		Matrix4x4 worldViewProMatSprite = Multiply(viewMatSprite, projectMatSprite);
+		worldViewProMatSprite = Multiply(worldMatSprite, worldViewProMatSprite);
+		*transformationMatDataSprite = worldViewProMatSprite;
 
 		ImGui::ShowDemoWindow();
 
@@ -527,6 +567,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
 
+		commandList->DrawInstanced(6, 1, 0, 0);
+
+
+		commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
+		commandList->SetGraphicsRootConstantBufferView(1, transformationMatResourceSprite->GetGPUVirtualAddress());
 		commandList->DrawInstanced(6, 1, 0, 0);
 
 
@@ -578,6 +623,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	depthStencilResource->Release();
 	dsvDescriptorHeap->Release();
 	vertexResource->Release();
+	vertexResourceSprite->Release();
+	transformationMatResourceSprite->Release();
 	depthStencilResource->Release();
 	materialResource->Release();
 	textureResource->Release();

@@ -391,3 +391,31 @@ Matrix4x4 MakePerspectiveFovMatrix(float fovy, float aspectRation, float nearCli
 
 	return result;
 }
+
+Matrix4x4 MakeOrthographicMatrix(float left, float top, float right, float bottom, float nearClip, float farClip)
+{
+	Matrix4x4 result = MakeIdentity4x4();
+
+	result.m[0][0] = 2.0f / (right - left);
+	result.m[1][1] = 2.0f / (top - bottom);
+	result.m[2][2] = 1.0f / (farClip - nearClip);
+	result.m[3][0] = (left + right) / (left - right);
+	result.m[3][1] = (top + bottom) / (bottom - top);
+	result.m[3][2] = nearClip / (nearClip - farClip);
+
+	return result;
+}
+
+Matrix4x4 MakeViewportMat(float left, float top, float width, float height, float minDepth, float maxDepth)
+{
+	Matrix4x4 result = MakeIdentity4x4();
+
+	result.m[0][0] = width / 2;
+	result.m[1][1] = -(height / 2);
+	result.m[2][2] = maxDepth - minDepth;
+	result.m[3][0] = left + width / 2;
+	result.m[3][1] = top + height / 2;
+	result.m[3][2] = minDepth;
+
+	return result;
+}
