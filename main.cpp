@@ -42,6 +42,11 @@ struct VertexData
 	MyVec2 texcoord;
 };
 
+struct Sphere
+{
+	MyVec3 center;
+	float radius;
+};
 
 void Log(const std::string& message);
 std::wstring ConvertString(const std::string& str);
@@ -72,6 +77,10 @@ ID3D12Resource* UploadTextureData(ID3D12Resource* texture, const DirectX::Scratc
 ID3D12Resource* CreateDepthStencilTextureResource(ID3D12Device* device, int32_t width, int32_t height);
 
 bool DepthFunc(float currZ, float prevZ);
+
+D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(ID3D12DescriptorHeap* descriptorHeap, uint32_t descriptorSize, uint32_t index);
+
+D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(ID3D12DescriptorHeap* descriptorHeap, uint32_t descriptorSize, uint32_t index);
 
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
@@ -371,16 +380,90 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 
-	ID3D12Resource* vertexResource = CreateBufferResource(device, sizeof(VertexData) * 6);
+	ID3D12Resource* vertexResource = CreateBufferResource(device, sizeof(VertexData) * 1536);
 
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
 	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
-	vertexBufferView.SizeInBytes = sizeof(VertexData) * 6;
+	vertexBufferView.SizeInBytes = sizeof(VertexData) * 1536;
 	vertexBufferView.StrideInBytes = sizeof(VertexData);
 
 	VertexData* vertexDate = nullptr;
 	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexDate));
-	vertexDate[0].position = { -0.5f,-0.5f,0.0f,1.0f };
+
+
+	const float pi = 3.1415926535f;
+	const uint32_t kSubdivision = 16;
+	const float kLonEvery = (pi * 2.0f) / static_cast<float>(kSubdivision);
+	const float kLatEvery = (pi) / static_cast<float>(kSubdivision);
+
+	for (uint32_t latIndex = 0; latIndex < kSubdivision; latIndex++)
+	{
+		float lat = pi / 2.0f + kLatEvery * latIndex;
+		for (uint32_t lonIndex = 0; lonIndex < kSubdivision; lonIndex++)
+		{
+			float lon = lonIndex * kLonEvery;
+			uint32_t startIndex = (latIndex * kSubdivision + lonIndex) * 6;
+
+			float u = float(lonIndex) / float(kSubdivision);
+			float v = float(latIndex) / float(kSubdivision);
+
+			vertexDate[startIndex].position.X = cosf(lat) * cosf(lon);
+			vertexDate[startIndex].position.Y = sinf(lat);
+			vertexDate[startIndex].position.Z = cosf(lat) * sinf(lon);
+			vertexDate[startIndex].position.W = 1.0f;
+			vertexDate[startIndex].texcoord = { u,v };
+
+			u = float(lonIndex) / float(kSubdivision);
+			v = float(latIndex+1) / float(kSubdivision);
+
+			vertexDate[startIndex+1].position.X = cosf(lat+kLatEvery) * cosf(lon);
+			vertexDate[startIndex+1].position.Y = sinf(lat+kLatEvery);
+			vertexDate[startIndex+1].position.Z = cosf(lat+kLatEvery) * sinf(lon);
+			vertexDate[startIndex+1].position.W = 1.0f;
+			vertexDate[startIndex+1].texcoord = { u,v };
+
+			u = float(lonIndex+1) / float(kSubdivision);
+			v = float(latIndex) / float(kSubdivision);
+
+			vertexDate[startIndex+2].position.X = cosf(lat) * cosf(lon+kLonEvery);
+			vertexDate[startIndex+2].position.Y = sinf(lat);
+			vertexDate[startIndex+2].position.Z = cosf(lat) * sinf(lon+kLonEvery);
+			vertexDate[startIndex+2].position.W = 1.0f;
+			vertexDate[startIndex+2].texcoord = { u,v };
+
+			u = float(lonIndex) / float(kSubdivision);
+			v = float(latIndex + 1) / float(kSubdivision);
+
+			vertexDate[startIndex+3].position.X = cosf(lat+kLatEvery) * cosf(lon);
+			vertexDate[startIndex+3].position.Y = sinf(lat+kLatEvery);
+			vertexDate[startIndex+3].position.Z = cosf(lat+kLatEvery) * sinf(lon);
+			vertexDate[startIndex+3].position.W = 1.0f;
+			vertexDate[startIndex+3].texcoord = { u,v };
+
+			u = float(lonIndex+1) / float(kSubdivision);
+			v = float(latIndex + 1) / float(kSubdivision);
+
+			vertexDate[startIndex+4].position.X = cosf(lat+kLatEvery) * cosf(lon+kLonEvery);
+			vertexDate[startIndex+4].position.Y = sinf(lat+kLatEvery);
+			vertexDate[startIndex+4].position.Z = cosf(lat+kLatEvery) * sinf(lon+kLonEvery);
+			vertexDate[startIndex+4].position.W = 1.0f;
+			vertexDate[startIndex+4].texcoord = { u,v };
+
+			u = float(lonIndex+1) / float(kSubdivision);
+			v = float(latIndex) / float(kSubdivision);
+
+			vertexDate[startIndex+5].position.X = cosf(lat) * cosf(lon+kLonEvery);
+			vertexDate[startIndex+5].position.Y = sinf(lat);
+			vertexDate[startIndex+5].position.Z = cosf(lat) * sinf(lon+kLonEvery);
+			vertexDate[startIndex+5].position.W = 1.0f;
+			vertexDate[startIndex+5].texcoord = { u,v };
+
+
+		}
+	}
+
+
+	/*vertexDate[0].position = { -0.5f,-0.5f,0.0f,1.0f };
 	vertexDate[0].texcoord = { 0.0f,1.0f };
 
 	vertexDate[1].position = { 0.0f,0.5f,0.0f,1.0f };
@@ -396,8 +479,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	vertexDate[4].texcoord = { 0.5f,0.0f };
 
 	vertexDate[5].position = { 0.5f,-0.5f,-0.5f,1.0f };
-	vertexDate[5].texcoord = { 1.0f,1.0f };
-
+	vertexDate[5].texcoord = { 1.0f,1.0f };*/
 
 	ID3D12Resource* vertexResourceSprite = CreateBufferResource(device, sizeof(VertexData) * 6);
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite{};
@@ -441,12 +523,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	wvpResource->Map(0, nullptr, reinterpret_cast<void**>(&wvpDate));
 	*wvpDate = MakeIdentity4x4();
 
+	const uint32_t descriptorSizeSRV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	//const uint32_t descriptorSizeRTV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	//const uint32_t descriptorSizeDSV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+
 
 	DirectX::ScratchImage mipImages = LoadTexture("resource/uvChecker.png");
 	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
 	ID3D12Resource* textureResource = CreateTextureResource(device, metadata);
 	ID3D12Resource* intermediateResource = UploadTextureData(textureResource, mipImages, device, commandList);
-
 
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
 	srvDesc.Format = metadata.format;
@@ -454,16 +539,31 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
 
-	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU = srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
-	textureSrvHandleCPU.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-	textureSrvHandleGPU.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	DirectX::ScratchImage mipImages2 = LoadTexture("resource/monsterBall.png");
+	const DirectX::TexMetadata& metadata2 = mipImages2.GetMetadata();
+	ID3D12Resource* textureResource2 = CreateTextureResource(device, metadata2);
+	ID3D12Resource* intermediateResource2 = UploadTextureData(textureResource2, mipImages2, device, commandList);
+
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc2{};
+	srvDesc2.Format = metadata2.format;
+	srvDesc2.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc2.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srvDesc2.Texture2D.MipLevels = UINT(metadata2.mipLevels);
+
+	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = GetCPUDescriptorHandle(srvDescriptorHeap, descriptorSizeSRV, 1);
+	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU = GetGPUDescriptorHandle(srvDescriptorHeap, descriptorSizeSRV, 1);
 
 	device->CreateShaderResourceView(textureResource, &srvDesc, textureSrvHandleCPU);
 
 
+	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU2 = GetCPUDescriptorHandle(srvDescriptorHeap, descriptorSizeSRV, 2);
+	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU2 = GetGPUDescriptorHandle(srvDescriptorHeap, descriptorSizeSRV, 2);
+
+	device->CreateShaderResourceView(textureResource2, &srvDesc2, textureSrvHandleCPU2);
+
+
 	Trans transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
-	Trans cameraTrans{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-5.0f} };
+	Trans cameraTrans{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} };
 
 
 	D3D12_VIEWPORT viewport{};
@@ -488,8 +588,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	ImGui_ImplDX12_Init(device, swapChainDesc.BufferCount, rtvDesc.Format, srvDescriptorHeap,
 		srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
 
-
-
+	Sphere sphere = { {0.0f,0.0f,0.0f},1.0f };
+	bool useMonsterBall = true;
 
 	//ウィンドウのxボタンが押されるまでループ
 	while (My::ProcessMessage() == 0)
@@ -505,6 +605,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::SliderFloat("transSprite x", &transSprite.translate.x, 0.0f, 700.0f);
 		ImGui::SliderFloat("transSprite y", &transSprite.translate.y, 0.0f, 500.0f);
 		ImGui::SliderFloat("transSprite z", &transSprite.translate.z, -100.0f, 100.0f);
+		ImGui::Checkbox("useMonsterBall", &useMonsterBall);
 		ImGui::End();
 
 		transform.rotate.y += 0.03f;
@@ -524,6 +625,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Matrix4x4 worldViewProMatSprite = Multiply(viewMatSprite, projectMatSprite);
 		worldViewProMatSprite = Multiply(worldMatSprite, worldViewProMatSprite);
 		*transformationMatDataSprite = worldViewProMatSprite;
+
+
+		
+
+
+
 
 		ImGui::ShowDemoWindow();
 
@@ -565,13 +672,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		commandList->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());
 
-		commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
+		commandList->SetGraphicsRootDescriptorTable(2, useMonsterBall ? textureSrvHandleGPU2 : textureSrvHandleGPU);
 
-		commandList->DrawInstanced(6, 1, 0, 0);
+		commandList->DrawInstanced(1536, 1, 0, 0);
 
 
 		commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
 		commandList->SetGraphicsRootConstantBufferView(1, transformationMatResourceSprite->GetGPUVirtualAddress());
+		commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
 		commandList->DrawInstanced(6, 1, 0, 0);
 
 
@@ -629,6 +737,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	materialResource->Release();
 	textureResource->Release();
 	intermediateResource->Release();
+	textureResource2->Release();
+	intermediateResource2->Release();
 	wvpResource->Release();
 	graphicsPipelineState->Release();
 	signatureBlob->Release();
@@ -913,4 +1023,18 @@ ID3D12Resource* CreateDepthStencilTextureResource(ID3D12Device* device, int32_t 
 bool DepthFunc(float currZ, float prevZ)
 {
 	return currZ <= prevZ;
+}
+
+D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(ID3D12DescriptorHeap* descriptorHeap, uint32_t descriptorSize, uint32_t index)
+{
+	D3D12_CPU_DESCRIPTOR_HANDLE handleCPU = descriptorHeap->GetCPUDescriptorHandleForHeapStart();
+	handleCPU.ptr += (descriptorSize * index);
+	return handleCPU;
+}
+
+D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(ID3D12DescriptorHeap* descriptorHeap, uint32_t descriptorSize, uint32_t index)
+{
+	D3D12_GPU_DESCRIPTOR_HANDLE handleGPU = descriptorHeap->GetGPUDescriptorHandleForHeapStart();
+	handleGPU.ptr += (descriptorSize * index);
+	return handleGPU;
 }

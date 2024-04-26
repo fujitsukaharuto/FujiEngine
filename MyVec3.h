@@ -23,5 +23,8 @@ public:
 		z = v.z;
 		return *this;
 	}
+	
+	MyVec3 operator*(float k) const { return MyVec3(x * k, y * k, z * k); }
+	float operator*(const MyVec3& v) const { return (x * v.x) + (y * v.y) + (z * v.z); }
 
 };
