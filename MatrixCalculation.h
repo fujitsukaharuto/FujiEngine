@@ -3,20 +3,20 @@
 #include <cmath>
 #include <assert.h>
 
-#include "MyVec2.h"
-#include "MyVec3.h"
+#include "Vector2.h"
+#include "Vector3.h"
 #include "Vector2Matrix.h"
 
 
 /// <summary>
 /// 2次元ベクトルのスカラー倍を求める
 /// </summary>
-MyVec2 Multiply(const MyVec2& vec, const float& num);
+Vector2 Multiply(const Vector2& vec, const float& num);
 
 /// <summary>
 /// アフィン行列
 /// </summary>
-Matrix3x3 MakeAffineMat(MyVec2 scale, float rotate, MyVec2 translate);
+Matrix3x3 MakeAffineMat(Vector2 scale, float rotate, Vector2 translate);
 
 /// <summary>
 /// 3x3行列の積
@@ -26,7 +26,7 @@ Matrix3x3 Multiply(Matrix3x3 matrix1, Matrix3x3 matrix2);
 /// <summary>
 /// ベクトルと2x2行列の積
 /// </summary>
-MyVec2 Multiply(MyVec2 vector, Matrix2x2 matrix);
+Vector2 Multiply(Vector2 vector, Matrix2x2 matrix);
 
 /// <summary>
 /// 2x2行列の逆行列
@@ -56,9 +56,9 @@ Matrix3x3 MakeWvpVpMat(const Matrix3x3& world, const Matrix3x3& view, const Matr
 /// <summary>
 /// ワールド座標に変える
 /// </summary>
-MyVec2 Transform(const MyVec2& vector, const Matrix3x3& matrix);
+Vector2 Transform(const Vector2& vector, const Matrix3x3& matrix);
 
-MyVec3 Transform(const MyVec3& vector, const Matrix4x4& matrix);
+Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix);
 
 Matrix4x4 Multiply(Matrix4x4& matrix1, Matrix4x4& matrix2);
 
@@ -68,9 +68,9 @@ Matrix4x4 Inverse(const Matrix4x4& matrix);
 
 Matrix4x4 MakeIdentity4x4();
 
-Matrix4x4 MakeTranslateMatrix(const MyVec3& translate);
+Matrix4x4 MakeTranslateMatrix(const Vector3& translate);
 
-Matrix4x4 MakeScaleMatrix(const MyVec3& scale);
+Matrix4x4 MakeScaleMatrix(const Vector3& scale);
 
 Matrix4x4 MakeRotateXMatrix(float rad);
 
@@ -78,9 +78,9 @@ Matrix4x4 MakeRotateYMatrix(float rad);
 
 Matrix4x4 MakeRotateZMatrix(float rad);
 
-Matrix4x4 MakeRotateXYZMatrix(const MyVec3& rota);
+Matrix4x4 MakeRotateXYZMatrix(const Vector3& rota);
 
-Matrix4x4 MakeAffineMatrix(const MyVec3& scale, const MyVec3& rotate, const MyVec3& translate);
+Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Vector3& translate);
 
 Matrix4x4 MakePerspectiveFovMatrix(float fovy, float aspectRation, float nearClip, float farClip);
 

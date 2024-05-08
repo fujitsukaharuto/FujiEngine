@@ -122,7 +122,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="MyVec2.h" />
     <ClInclude Include="MyVec3.h" />
     <ClInclude Include="MyWindow.h" />
+    <ClInclude Include="Vector2.h" />
     <ClInclude Include="Vector2Matrix.h" />
+    <ClInclude Include="Vector3.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Object3d.PS.hlsl">

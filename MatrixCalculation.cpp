@@ -1,11 +1,11 @@
 #include "MatrixCalculation.h"
 
-MyVec2 Multiply(const MyVec2& vec, const float& num)
+Vector2 Multiply(const Vector2& vec, const float& num)
 {
 	return { vec.x * num,vec.y * num };
 }
 
-Matrix3x3 MakeAffineMat(MyVec2 scale, float rotate, MyVec2 translate) {
+Matrix3x3 MakeAffineMat(Vector2 scale, float rotate, Vector2 translate) {
 	Matrix3x3 result{};
 	for (int y = 0; y < 2; y++)
 	{
@@ -36,8 +36,8 @@ Matrix3x3 Multiply(Matrix3x3 matrix1, Matrix3x3 matrix2) {
 	return result;
 }
 
-MyVec2 Multiply(MyVec2 vector, Matrix2x2 matrix) {
-	MyVec2 result{};
+Vector2 Multiply(Vector2 vector, Matrix2x2 matrix) {
+	Vector2 result{};
 
 	result.x = vector.x * matrix.m[0][0] + vector.y * matrix.m[1][0];
 	result.y = vector.x * matrix.m[0][1] + vector.y * matrix.m[1][1];
@@ -137,9 +137,9 @@ Matrix3x3 MakeWvpVpMat(const Matrix3x3& world, const Matrix3x3& view, const Matr
 	return result;
 }
 
-MyVec2 Transform(const MyVec2& vector, const Matrix3x3& matrix) {
+Vector2 Transform(const Vector2& vector, const Matrix3x3& matrix) {
 
-	MyVec2 result{};
+	Vector2 result{};
 	result.x = vector.x * matrix.m[0][0] + vector.y * matrix.m[1][0] + matrix.m[2][0];
 	result.y = vector.x * matrix.m[0][1] + vector.y * matrix.m[1][1] + matrix.m[2][1];
 	float w = vector.x * matrix.m[0][2] + vector.y * matrix.m[1][2] + matrix.m[2][2];
@@ -150,9 +150,9 @@ MyVec2 Transform(const MyVec2& vector, const Matrix3x3& matrix) {
 	return result;
 }
 
-MyVec3 Transform(const MyVec3& vector, const Matrix4x4& matrix)
+Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix)
 {
-	MyVec3 result{};
+	Vector3 result{};
 	result.x = vector.x * matrix.m[0][0] + vector.y * matrix.m[1][0] + vector.z * matrix.m[2][0] + matrix.m[3][0];
 	result.y = vector.x * matrix.m[0][1] + vector.y * matrix.m[1][1] + vector.z * matrix.m[2][1] + matrix.m[3][1];
 	result.z = vector.x * matrix.m[0][2] + vector.y * matrix.m[1][2] + vector.z * matrix.m[2][2] + matrix.m[3][2];
@@ -287,7 +287,7 @@ Matrix4x4 MakeIdentity4x4()
 	return result;
 }
 
-Matrix4x4 MakeTranslateMatrix(const MyVec3& translate)
+Matrix4x4 MakeTranslateMatrix(const Vector3& translate)
 {
 	Matrix4x4 result=MakeIdentity4x4();
 
@@ -298,7 +298,7 @@ Matrix4x4 MakeTranslateMatrix(const MyVec3& translate)
 	return result;
 }
 
-Matrix4x4 MakeScaleMatrix(const MyVec3& scale)
+Matrix4x4 MakeScaleMatrix(const Vector3& scale)
 {
 	Matrix4x4 result = MakeIdentity4x4();
 
@@ -345,7 +345,7 @@ Matrix4x4 MakeRotateZMatrix(float rad)
 	return result;
 }
 
-Matrix4x4 MakeRotateXYZMatrix(const MyVec3& rota)
+Matrix4x4 MakeRotateXYZMatrix(const Vector3& rota)
 {
 
 	Matrix4x4 result = MakeIdentity4x4();
@@ -358,7 +358,7 @@ Matrix4x4 MakeRotateXYZMatrix(const MyVec3& rota)
 	return result;
 }
 
-Matrix4x4 MakeAffineMatrix(const MyVec3& scale, const MyVec3& rotate, const MyVec3& translate)
+Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Vector3& translate)
 {
 	Matrix4x4 result = MakeIdentity4x4();
 	Matrix4x4 S = MakeScaleMatrix(scale);

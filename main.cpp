@@ -31,16 +31,16 @@ struct Vector4
 
 struct Trans
 {
-	MyVec3 scale;
-	MyVec3 rotate;
-	MyVec3 translate;
+	Vector3 scale;
+	Vector3 rotate;
+	Vector3 translate;
 };
 
 struct VertexData
 {
 	Vector4 position;
-	MyVec2 texcoord;
-	MyVec3 normal;
+	Vector2 texcoord;
+	Vector3 normal;
 };
 
 struct TransformationMatrix
@@ -59,14 +59,14 @@ struct DirectionalLight
 {
 
 	Vector4 color;
-	MyVec3 direction;
+	Vector3 direction;
 	float intensity;
 
 };
 
 struct Sphere
 {
-	MyVec3 center;
+	Vector3 center;
 	float radius;
 };
 

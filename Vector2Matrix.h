@@ -1,5 +1,5 @@
-﻿#pragma once
-#include "MyVec2.h"
+#pragma once
+#include "Vector2.h"
 
 /// <summary>
 /// 2x2Matrixベクトル
@@ -27,8 +27,8 @@ struct Matrix4x4 final
 
 struct Quad final
 {
-	MyVec2 lt;
-	MyVec2 rt;
-	MyVec2 lb;
-	MyVec2 rb;
+	Vector2 lt;
+	Vector2 rt;
+	Vector2 lb;
+	Vector2 rb;
 };
