@@ -73,6 +73,8 @@ void MyWin::CreatGWindow(const wchar_t* title, int32_t clientWidth, int32_t clie
 
 void MyWin::CreatWind()
 {
+	CoInitializeEx(0, COINIT_MULTITHREADED);
+
 	//ウィンドウプロシージャ
 	wc_.lpfnWndProc = (WNDPROC)WindowProc;
 	//ウィンドウクラス名

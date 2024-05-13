@@ -17,10 +17,7 @@
 
 #include "MatrixCalculation.h"
 
-#pragma comment(lib,"d3d12.lib")
-#pragma comment(lib,"dxgi.lib")
-#pragma comment(lib,"dxguid.lib")
-#pragma comment(lib,"dxcompiler.lib")
+
 
 
 
@@ -61,7 +58,7 @@ public:
 
 	void SetWVPData(const Matrix4x4& world, const Matrix4x4& wvp);
 
-	void Release();
+	void ReleaseData();
 
 	void Log(const std::string& message);
 	std::wstring ConvertString(const std::string& str);
@@ -100,10 +97,10 @@ private:
 	DXCom() = default;
 	~DXCom() = default;
 
-	IDXGIFactory7* dxgiFactory_ = nullptr;
-	IDXGIAdapter4* useAdapter_ = nullptr;
+	IDXGIFactory7* dxgiFactory_;
+	IDXGIAdapter4* useAdapter_;
 	DXGI_ADAPTER_DESC3 adapterDesc_{};
-	ID3D12Device* device_ = nullptr;
+	ID3D12Device* device_;
 	ID3D12CommandQueue* commandQueue_ = nullptr;
 	D3D12_COMMAND_QUEUE_DESC commandQueueDesc_{};
 	ID3D12CommandAllocator* commandAllocator_ = nullptr;
@@ -151,6 +148,16 @@ private:
 
 	ID3D12Resource* materialResourceSprite_ = nullptr;
 	Material* materialDateSprite_ = nullptr;
+
+
+	DirectX::ScratchImage mipImages_;
+	DirectX::ScratchImage mipImages2_;
+
+	ID3D12Resource* textureResource_;
+	ID3D12Resource* textureResource2_;
+
+	ID3D12Resource* intermediateResource1;
+	ID3D12Resource* intermediateResource2;
 
 	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU;
 	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU;

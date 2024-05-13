@@ -2,6 +2,16 @@
 #include "Fuji.h"
 #include "MyWindow.h"
 
+#include <d3d12.h>
+#include <dxgi1_6.h>
+#include <dxcapi.h>
+#include <dxgidebug.h>
+
+#pragma comment(lib,"d3d12.lib")
+#pragma comment(lib,"dxgi.lib")
+#pragma comment(lib,"dxguid.lib")
+#pragma comment(lib,"dxcompiler.lib")
+
 DXCom* DXCom::GetInstance()
 {
 	static DXCom instance;
@@ -10,6 +20,8 @@ DXCom* DXCom::GetInstance()
 
 void DXCom::InitDX()
 {
+	Fuji::CreatWind();
+
 	CreateDXGI();
 	SettingAdapter();
 	SettingDevice();
@@ -33,7 +45,6 @@ void DXCom::InitDX()
 
 void DXCom::CreateDXGI()
 {
-	CoInitializeEx(0, COINIT_MULTITHREADED);
 
 #ifdef _DEBUG
 	debugController_ = nullptr;
@@ -45,11 +56,8 @@ void DXCom::CreateDXGI()
 #endif // _DEBUG
 
 
-	Fuji::CreatWind();
-
-
 	//DXGIファクトリーの作成
-	 dxgiFactory_ = nullptr;
+	dxgiFactory_ = nullptr;
 	//HRESULTはWindows系のエラーコードで、関数が成功したかどうかをマクロで判断できる
 	HRESULT hr = CreateDXGIFactory(IID_PPV_ARGS(&dxgiFactory_));
 	//初期化の根本的な部分でエラーが出た場合は間違えているか、どうにもできない場合が多いのでassertにしておく
@@ -355,10 +363,10 @@ void DXCom::SettingGraphicPipeline()
 
 void DXCom::SettingVertex()
 {
-	vertexResource_ = CreateBufferResource(device_, sizeof(VertexData) * 5000);
+	vertexResource_ = CreateBufferResource(device_, sizeof(VertexData) * 2000);
 
 	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
-	vertexBufferView_.SizeInBytes = sizeof(VertexData) * 5000;
+	vertexBufferView_.SizeInBytes = sizeof(VertexData) * 2000;
 	vertexBufferView_.StrideInBytes = sizeof(VertexData);
 
 	vertexDate_ = nullptr;
@@ -509,7 +517,7 @@ void DXCom::SettingResource()
 	directionalLightData_ = nullptr;
 	directionalLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData_));
 	directionalLightData_->color = { 1.0f,1.0f,1.0f,1.0f };
-	directionalLightData_->direction = { 0.0f,-1.0f,0.0f };
+	directionalLightData_->direction = { 1.0f,0.0f,0.0f };
 	directionalLightData_->intensity = 1.0f;
 }
 
@@ -538,10 +546,10 @@ void DXCom::SettingTexture()
 	//const uint32_t descriptorSizeDSV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
 
-	DirectX::ScratchImage mipImages = LoadTexture("resource/uvChecker.png");
-	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
-	ID3D12Resource* textureResource = CreateTextureResource(device_, metadata);
-	//ID3D12Resource* intermediateResource = UploadTextureData(textureResource, mipImages, device_, commandList_);
+	mipImages_ = LoadTexture("resource/uvChecker.png");
+	const DirectX::TexMetadata& metadata = mipImages_.GetMetadata();
+	textureResource_ = CreateTextureResource(device_, metadata);
+	
 
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
 	srvDesc.Format = metadata.format;
@@ -549,10 +557,11 @@ void DXCom::SettingTexture()
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
 
-	DirectX::ScratchImage mipImages2 = LoadTexture("resource/monsterBall.png");
-	const DirectX::TexMetadata& metadata2 = mipImages2.GetMetadata();
-	ID3D12Resource* textureResource2 = CreateTextureResource(device_, metadata2);
-	//ID3D12Resource* intermediateResource2 = UploadTextureData(textureResource2, mipImages2, device_, commandList_);
+	mipImages2_ = LoadTexture("resource/monsterBall.png");
+	const DirectX::TexMetadata& metadata2 = mipImages2_.GetMetadata();
+	textureResource2_ = CreateTextureResource(device_, metadata2);
+	
+	intermediateResource1 = UploadTextureData(textureResource_, mipImages_, device_, commandList_);
 
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc2{};
 	srvDesc2.Format = metadata2.format;
@@ -563,13 +572,15 @@ void DXCom::SettingTexture()
 	textureSrvHandleCPU = GetCPUDescriptorHandle(srvDescriptorHeap_, descriptorSizeSRV, 1);
 	textureSrvHandleGPU = GetGPUDescriptorHandle(srvDescriptorHeap_, descriptorSizeSRV, 1);
 
-	device_->CreateShaderResourceView(textureResource, &srvDesc, textureSrvHandleCPU);
+	device_->CreateShaderResourceView(textureResource_, &srvDesc, textureSrvHandleCPU);
 
+	intermediateResource2 = UploadTextureData(textureResource2_, mipImages2_, device_, commandList_);
 
 	textureSrvHandleCPU2 = GetCPUDescriptorHandle(srvDescriptorHeap_, descriptorSizeSRV, 2);
 	textureSrvHandleGPU2 = GetGPUDescriptorHandle(srvDescriptorHeap_, descriptorSizeSRV, 2);
 
-	device_->CreateShaderResourceView(textureResource2, &srvDesc2, textureSrvHandleCPU2);
+	device_->CreateShaderResourceView(textureResource2_, &srvDesc2, textureSrvHandleCPU2);
+
 }
 
 void DXCom::SettingImgui()
@@ -591,7 +602,6 @@ void DXCom::FirstFrame()
 
 void DXCom::SetBarrier()
 {
-	ImGui::Render();
 
 	UINT backBufferIndex = swapChain_->GetCurrentBackBufferIndex();
 
@@ -622,6 +632,7 @@ void DXCom::ClearRTV()
 
 void DXCom::Command()
 {
+	ImGui::Render();
 	D3D12_VIEWPORT viewport{};
 	viewport.Width = MyWin::kWindowWidth;
 	viewport.Height = MyWin::kWindowHeight;
@@ -674,6 +685,7 @@ void DXCom::LastFrame()
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
 	commandList_->ResourceBarrier(1, &barrier);
+	
 
 	HRESULT hr = commandList_->Close();
 	assert(SUCCEEDED(hr));
@@ -698,6 +710,9 @@ void DXCom::LastFrame()
 	assert(SUCCEEDED(hr));
 	hr = commandList_->Reset(commandAllocator_, nullptr);
 	assert(SUCCEEDED(hr));
+
+
+
 }
 
 void DXCom::SetWVPData(const Matrix4x4& world, const Matrix4x4& wvp)
@@ -706,8 +721,10 @@ void DXCom::SetWVPData(const Matrix4x4& world, const Matrix4x4& wvp)
 	wvpDate_->WVP = wvp;
 }
 
-void DXCom::Release()
+void DXCom::ReleaseData()
 {
+	intermediateResource1->Release();
+	intermediateResource2->Release();
 	fence_->Release();
 	materialResourceSprite_->Release();
 	transformationMatResourceSprite_->Release();
