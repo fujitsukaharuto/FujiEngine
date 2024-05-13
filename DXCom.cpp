@@ -730,6 +730,8 @@ void DXCom::ReleaseData()
 {
 	intermediateResource1->Release();
 	intermediateResource2->Release();
+	textureResource_->Release();
+	textureResource2_->Release();
 	fence_->Release();
 	materialResourceSprite_->Release();
 	transformationMatResourceSprite_->Release();
