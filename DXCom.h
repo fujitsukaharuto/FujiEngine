@@ -57,6 +57,7 @@ public:
 	void LastFrame();
 
 	void SetWVPData(const Matrix4x4& world, const Matrix4x4& wvp);
+	void SetSpriteWVPData(const Matrix4x4& world, const Matrix4x4& wvp);
 
 	void ReleaseData();
 
@@ -144,7 +145,6 @@ private:
 
 	ID3D12Resource* transformationMatResourceSprite_ = nullptr;
 	TransformationMatrix* transformationMatDataSprite_ = nullptr;
-	Trans transSprite_{};
 
 	ID3D12Resource* materialResourceSprite_ = nullptr;
 	Material* materialDateSprite_ = nullptr;

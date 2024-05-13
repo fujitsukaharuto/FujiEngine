@@ -528,7 +528,6 @@ void DXCom::SettingSpriteResource()
 	transformationMatResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatDataSprite_));
 	transformationMatDataSprite_->WVP = MakeIdentity4x4();
 	transformationMatDataSprite_->World = MakeIdentity4x4();
-	transSprite_ = { {1.0f,1.0f,1.0f,},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 
 
 	materialResourceSprite_ = CreateBufferResource(device_, sizeof(Material));
@@ -719,6 +718,12 @@ void DXCom::SetWVPData(const Matrix4x4& world, const Matrix4x4& wvp)
 {
 	wvpDate_->World = world;
 	wvpDate_->WVP = wvp;
+}
+
+void DXCom::SetSpriteWVPData(const Matrix4x4& world, const Matrix4x4& wvp)
+{
+	transformationMatDataSprite_->World = world;
+	transformationMatDataSprite_->WVP = wvp;
 }
 
 void DXCom::ReleaseData()

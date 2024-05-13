@@ -58,3 +58,8 @@ void Fuji::SetWVP(const Matrix4x4& world, const Matrix4x4& wvp)
 {
 	dxcom_->SetWVPData(world, wvp);
 }
+
+void Fuji::SetSpriteWVP(const Matrix4x4& world, const Matrix4x4& wvp)
+{
+	dxcom_->SetSpriteWVPData(world, wvp);
+}

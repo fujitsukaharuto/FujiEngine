@@ -17,7 +17,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Trans transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 	Trans cameraTrans{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} };
 
-
+	Trans transSprite = { {1.0f,1.0f,1.0f,},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 
 	Sphere sphere = { {0.0f,0.0f,0.0f},1.0f };
 	bool useMonsterBall = true;
@@ -52,16 +52,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Fuji::SetWVP(worldMatrix, worldViewProjectionMatrix);
 
 
-		/*Matrix4x4 worldMatSprite = MakeAffineMatrix(transSprite.scale, transSprite.rotate, transSprite.translate);
+		Matrix4x4 worldMatSprite = MakeAffineMatrix(transSprite.scale, transSprite.rotate, transSprite.translate);
 
-		transformationMatDataSprite->World = worldMatSprite;
 
 		Matrix4x4 viewMatSprite = MakeIdentity4x4();
-		Matrix4x4 projectMatSprite = MakeOrthographicMatrix(0.0f, 0.0f, float(MyWin::kWindowWidth), float(MyWin::kWindowHeight), 0.0f, 100.0f);
+		Matrix4x4 projectMatSprite = MakeOrthographicMatrix(0.0f, 0.0f, float(Fuji::GetkWindowWidth()), float(Fuji::GetkWindowHeight()), 0.0f, 100.0f);
 		Matrix4x4 worldViewProMatSprite = Multiply(viewMatSprite, projectMatSprite);
 		worldViewProMatSprite = Multiply(worldMatSprite, worldViewProMatSprite);
-		transformationMatDataSprite->WVP = worldViewProMatSprite;*/
 
+
+		Fuji::SetSpriteWVP(worldMatSprite, worldViewProMatSprite);
 
 
 		Fuji::EndFrame();
