@@ -7,6 +7,55 @@
 #include "Vector3.h"
 #include "Vector2Matrix.h"
 
+struct Vector4
+{
+	float X;
+	float Y;
+	float Z;
+	float W;
+};
+
+struct Trans
+{
+	Vector3 scale;
+	Vector3 rotate;
+	Vector3 translate;
+};
+
+struct VertexData
+{
+	Vector4 position;
+	Vector2 texcoord;
+	Vector3 normal;
+};
+
+struct TransformationMatrix
+{
+	Matrix4x4 WVP;
+	Matrix4x4 World;
+};
+
+struct Material
+{
+	Vector4 color;
+	int enableLighting;
+};
+
+struct DirectionalLight
+{
+
+	Vector4 color;
+	Vector3 direction;
+	float intensity;
+
+};
+
+struct Sphere
+{
+	Vector3 center;
+	float radius;
+};
+
 
 /// <summary>
 /// 2次元ベクトルのスカラー倍を求める

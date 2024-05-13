@@ -1,9 +1,4 @@
 #pragma once
-#include "MyWindow.h"
-
-namespace {
-	MyWin* mywin_ = nullptr;
-}
 
 class Fuji
 {
@@ -13,6 +8,11 @@ public:
 
 	static int ProcessMessage();
 	static void CreatWind();
+
+	static void InitDX();
+	static void StartFrame();
+	static void EndFrame();
+	static void End();
 
 private:
 

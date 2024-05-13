@@ -21,54 +21,6 @@
 #pragma comment(lib,"dxcompiler.lib")
 
 
-struct Vector4
-{
-	float X;
-	float Y;
-	float Z;
-	float W;
-};
-
-struct Trans
-{
-	Vector3 scale;
-	Vector3 rotate;
-	Vector3 translate;
-};
-
-struct VertexData
-{
-	Vector4 position;
-	Vector2 texcoord;
-	Vector3 normal;
-};
-
-struct TransformationMatrix
-{
-	Matrix4x4 WVP;
-	Matrix4x4 World;
-};
-
-struct Material
-{
-	Vector4 color;
-	int enableLighting;
-};
-
-struct DirectionalLight
-{
-
-	Vector4 color;
-	Vector3 direction;
-	float intensity;
-
-};
-
-struct Sphere
-{
-	Vector3 center;
-	float radius;
-};
 
 void Log(const std::string& message);
 std::wstring ConvertString(const std::string& str);
@@ -412,11 +364,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 
-	ID3D12Resource* vertexResource = CreateBufferResource(device, sizeof(VertexData) * 1536);
+	ID3D12Resource* vertexResource = CreateBufferResource(device, sizeof(VertexData) * 1600);
 
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
 	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
-	vertexBufferView.SizeInBytes = sizeof(VertexData) * 1536;
+	vertexBufferView.SizeInBytes = sizeof(VertexData) * 1600;
 	vertexBufferView.StrideInBytes = sizeof(VertexData);
 
 	VertexData* vertexDate = nullptr;
@@ -680,6 +632,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::SliderFloat("transSprite x", &transSprite.translate.x, 0.0f, 700.0f);
 		ImGui::SliderFloat("transSprite y", &transSprite.translate.y, 0.0f, 500.0f);
 		ImGui::SliderFloat("transSprite z", &transSprite.translate.z, -100.0f, 100.0f);
+		ImGui::SliderFloat4("colorSprite", &materialDateSprite->color.X, -2.0f, 2.0f);
 		ImGui::Checkbox("useMonsterBall", &useMonsterBall);
 		ImGui::End();
 
@@ -842,8 +795,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	roootSignature->Release();
 	pixelShaderBlob->Release();
 	vertexShaderBlob->Release();
-
-
+	useAdapter->Release();
+	dxgiFactory->Release();
 #ifdef _DEBUG
 	debugController->Release();
 #endif // _DEBUG
