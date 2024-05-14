@@ -19,7 +19,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	Trans transSprite = { {1.0f,1.0f,1.0f,},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 
-	Sphere sphere = { {0.0f,0.0f,0.0f},1.0f };
 	bool useMonsterBall = true;
 
 	//ウィンドウのxボタンが押されるまでループ
