@@ -13,10 +13,13 @@ public:
 	static int ProcessMessage();
 	static void CreatWind();
 
+
 	static void InitDX();
 	static void StartFrame();
 	static void EndFrame();
 	static void End();
+
+
 
 	static void SetWVP(const Matrix4x4& world, const Matrix4x4& wvp);
 	static void SetSpriteWVP(const Matrix4x4& world, const Matrix4x4& wvp);
