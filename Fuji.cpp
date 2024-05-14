@@ -54,6 +54,12 @@ void Fuji::End()
 	dxcom_->ReleaseData();
 }
 
+DXCom* Fuji::GetDXComInstance()
+{
+	DXCom* instance = dxcom_->GetInstance();
+	return instance;
+}
+
 void Fuji::SetWVP(const Matrix4x4& world, const Matrix4x4& wvp)
 {
 	dxcom_->SetWVPData(world, wvp);

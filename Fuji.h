@@ -1,4 +1,5 @@
 #pragma once
+#include "DXCom.h"
 #include "Vector2Matrix.h"
 
 class Fuji
@@ -19,7 +20,7 @@ public:
 	static void EndFrame();
 	static void End();
 
-
+	static DXCom* GetDXComInstance();
 
 	static void SetWVP(const Matrix4x4& world, const Matrix4x4& wvp);
 	static void SetSpriteWVP(const Matrix4x4& world, const Matrix4x4& wvp);

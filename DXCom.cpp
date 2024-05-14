@@ -361,6 +361,10 @@ void DXCom::SettingGraphicPipeline()
 	assert(SUCCEEDED(hr));
 }
 
+
+//---------------↓↓↓↓↓↓↓↓改善しなきゃ↓↓↓↓↓↓↓↓--------------------------------------
+
+
 void DXCom::SettingVertex()
 {
 	vertexResource_ = CreateBufferResource(device_, sizeof(VertexData) * 2000);
@@ -724,6 +728,16 @@ void DXCom::SetSpriteWVPData(const Matrix4x4& world, const Matrix4x4& wvp)
 {
 	transformationMatDataSprite_->World = world;
 	transformationMatDataSprite_->WVP = wvp;
+}
+
+void DXCom::SetVertexData(const uint32_t index, const Vector4& position, const Vector2& texcord, const Vector3& normal)
+{
+	//改善点
+	//indexをcommonでかってにやってくれるように
+
+	vertexDate_[index].position = position;
+	vertexDate_[index].texcoord = texcord;
+	vertexDate_[index].normal = normal;
 }
 
 void DXCom::ReleaseData()
