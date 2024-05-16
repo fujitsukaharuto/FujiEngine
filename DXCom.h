@@ -62,6 +62,9 @@ public:
 
 	void SetVertexData(const uint32_t index, const Vector4& position, const Vector2& texcord, const Vector3& normal);
 
+	//仕方なくcommon内でupdate用。後からこんなのなくさなきゃ
+	void UpDate();
+
 
 	void ReleaseData();
 
@@ -139,6 +142,19 @@ private:
 	ID3D12Resource* vertexResourceSprite_ = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite_{};
 	VertexData* vertexDataSprite_ = nullptr;
+
+	ID3D12Resource* indexResoureceSprite = nullptr;
+	D3D12_INDEX_BUFFER_VIEW indexBufferViewSprite{};
+	uint32_t* indexDataSprite = nullptr;
+
+	Trans transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	Trans cameraTrans{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} };
+	Trans transSprite = { {1.0f,1.0f,1.0f,},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	Trans uvTransSprite{
+		{1.0f,1.0f,1.0f},
+		{0.0f,0.0f,0.0f},
+		{0.0f,0.0f,0.0f},
+	};
 
 	ID3D12Resource* wvpResource_ = nullptr;
 	TransformationMatrix* wvpDate_ = nullptr;

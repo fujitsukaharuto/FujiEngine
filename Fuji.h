@@ -22,8 +22,7 @@ public:
 
 	static DXCom* GetDXComInstance();
 
-	static void SetWVP(const Matrix4x4& world, const Matrix4x4& wvp);
-	static void SetSpriteWVP(const Matrix4x4& world, const Matrix4x4& wvp);
+	static void UpDateDxc();
 
 private:
 

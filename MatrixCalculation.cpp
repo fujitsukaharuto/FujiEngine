@@ -165,7 +165,7 @@ Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix)
 	return result;
 }
 
-Matrix4x4 Multiply(Matrix4x4& matrix1, Matrix4x4& matrix2)
+Matrix4x4 Multiply(const Matrix4x4& matrix1, const Matrix4x4& matrix2)
 {
 	Matrix4x4 result{};
 

@@ -464,10 +464,10 @@ void DXCom::SettingVertex()
 
 void DXCom::SettingSpriteVertex()
 {
-	vertexResourceSprite_ = CreateBufferResource(device_, sizeof(VertexData) * 6);
+	vertexResourceSprite_ = CreateBufferResource(device_, sizeof(VertexData) * 4);
 	
 	vertexBufferViewSprite_.BufferLocation = vertexResourceSprite_->GetGPUVirtualAddress();
-	vertexBufferViewSprite_.SizeInBytes = sizeof(VertexData) * 6;
+	vertexBufferViewSprite_.SizeInBytes = sizeof(VertexData) * 4;
 	vertexBufferViewSprite_.StrideInBytes = sizeof(VertexData);
 
 	vertexDataSprite_ = nullptr;
@@ -486,17 +486,25 @@ void DXCom::SettingSpriteVertex()
 	vertexDataSprite_[2].normal = { 0.0f,0.0f,-1.0f };
 
 
-	vertexDataSprite_[3].position = { 0.0f,0.0f,0.0f,1.0f };
-	vertexDataSprite_[3].texcoord = { 0.0f,0.0f };
+	vertexDataSprite_[3].position = { 640.0f,0.0f,0.0f,1.0f };
+	vertexDataSprite_[3].texcoord = { 1.0f,0.0f };
 	vertexDataSprite_[3].normal = { 0.0f,0.0f,-1.0f };
 
-	vertexDataSprite_[4].position = { 640.0f,0.0f,0.0f,1.0f };
-	vertexDataSprite_[4].texcoord = { 1.0f,0.0f };
-	vertexDataSprite_[4].normal = { 0.0f,0.0f,-1.0f };
 
-	vertexDataSprite_[5].position = { 640.0f,360.0f,0.0f,1.0f };
-	vertexDataSprite_[5].texcoord = { 1.0f,1.0f };
-	vertexDataSprite_[5].normal = { 0.0f,0.0f,-1.0f };
+	indexResoureceSprite = CreateBufferResource(device_, sizeof(uint32_t) * 6);
+	indexBufferViewSprite.BufferLocation = indexResoureceSprite->GetGPUVirtualAddress();
+	indexBufferViewSprite.SizeInBytes = sizeof(uint32_t) * 6;
+	indexBufferViewSprite.Format = DXGI_FORMAT_R32_UINT;
+
+	indexResoureceSprite->Map(0, nullptr, reinterpret_cast<void**>(&indexDataSprite));
+	indexDataSprite[0] = 0;
+	indexDataSprite[1] = 1;
+	indexDataSprite[2] = 2;
+
+	indexDataSprite[3] = 1;
+	indexDataSprite[4] = 3;
+	indexDataSprite[5] = 2;
+
 }
 
 void DXCom::SettingResource()
@@ -515,6 +523,7 @@ void DXCom::SettingResource()
 	//色変えるやつ（Resource）
 	materialDate_->color = { 1.0f,1.0f,1.0f,1.0f };
 	materialDate_->enableLighting = true;
+	materialDate_->uvTransform = MakeIdentity4x4();
 
 
 	directionalLightResource_ = CreateBufferResource(device_, sizeof(DirectionalLight));
@@ -540,6 +549,7 @@ void DXCom::SettingSpriteResource()
 	//色変えるやつ（Resource）
 	materialDateSprite_->color = { 1.0f,1.0f,1.0f,1.0f };
 	materialDateSprite_->enableLighting = false;
+	materialDateSprite_->uvTransform = MakeIdentity4x4();
 }
 
 void DXCom::SettingTexture()
@@ -656,24 +666,21 @@ void DXCom::Command()
 	commandList_->SetPipelineState(graphicsPipelineState_);
 	commandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
 	commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
-
 	commandList_->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
-
 	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
-
 	commandList_->SetGraphicsRootDescriptorTable(2, useMonsterBall ? textureSrvHandleGPU2 : textureSrvHandleGPU);
-
 	commandList_->DrawInstanced(1536, 1, 0, 0);
 
 
+	commandList_->IASetIndexBuffer(&indexBufferViewSprite);
 	commandList_->IASetVertexBuffers(0, 1, &vertexBufferViewSprite_);
 	commandList_->SetGraphicsRootConstantBufferView(0, materialResourceSprite_->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootConstantBufferView(1, transformationMatResourceSprite_->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
-	commandList_->DrawInstanced(6, 1, 0, 0);
+	commandList_->DrawIndexedInstanced(6, 1, 0, 0, 0);
+	/*commandList_->DrawInstanced(6, 1, 0, 0);*/
 }
 
 void DXCom::LastFrame()
@@ -740,12 +747,62 @@ void DXCom::SetVertexData(const uint32_t index, const Vector4& position, const V
 	vertexDate_[index].normal = normal;
 }
 
+void DXCom::UpDate()
+{
+
+	ImGui::Begin("debug");
+	ImGui::ColorEdit3("color", &materialDate_->color.X);
+	ImGui::SliderFloat3("trans", &transform.translate.x, -1.0f, 1.0f);
+	ImGui::SliderFloat3("rotate", &transform.rotate.x, -1.0f, 1.0f);
+	ImGui::SliderFloat3("scale", &transform.scale.x, 0.0f, 4.0f);
+	ImGui::Checkbox("useMonsterBall", &useMonsterBall);
+	ImGui::Text("Sprite");
+	ImGui::SliderFloat3("trans", &transSprite.translate.x, 0.0f, 1280.0f);
+	ImGui::SliderFloat3("rotate", &transSprite.rotate.x, -1.0f, 1.0f);
+	ImGui::SliderFloat3("sclae", &transSprite.scale.x, 0.0f, 3.0f);
+	ImGui::SliderFloat2("uvtrans", &uvTransSprite.translate.x, 0.0f, 1280.0f);
+	ImGui::SliderFloat("uvrotate", &uvTransSprite.rotate.z, -1.0f, 1.0f);
+	ImGui::SliderFloat2("uvsclae", &uvTransSprite.scale.x, 0.0f, 3.0f);
+	ImGui::Text("light");
+	ImGui::SliderFloat3("color", &directionalLightData_->color.X, 0.0f, 1.0f);
+	ImGui::SliderFloat3("direction", &directionalLightData_->direction.x, -1.0f, 1.0f);
+	ImGui::End();
+
+	transform.rotate.y += 0.03f;
+	Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
+	Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTrans.scale, cameraTrans.rotate, cameraTrans.translate);
+	Matrix4x4 viewMatrix = Inverse(cameraMatrix);
+	Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(Fuji::GetkWindowWidth()) / float(Fuji::GetkWindowHeight()), 0.1f, 100.0f);
+	Matrix4x4 worldViewProjectionMatrix = Multiply(viewMatrix, projectionMatrix);
+	worldViewProjectionMatrix = Multiply(worldMatrix, worldViewProjectionMatrix);
+
+	wvpDate_->World = worldMatrix;
+	wvpDate_->WVP = worldViewProjectionMatrix;
+
+	Matrix4x4 worldMatSprite = MakeAffineMatrix(transSprite.scale, transSprite.rotate, transSprite.translate);
+	Matrix4x4 viewMatSprite = MakeIdentity4x4();
+	Matrix4x4 projectMatSprite = MakeOrthographicMatrix(0.0f, 0.0f, float(Fuji::GetkWindowWidth()), float(Fuji::GetkWindowHeight()), 0.0f, 100.0f);
+	Matrix4x4 worldViewProMatSprite = Multiply(viewMatSprite, projectMatSprite);
+	worldViewProMatSprite = Multiply(worldMatSprite, worldViewProMatSprite);
+
+
+	transformationMatDataSprite_->World = worldMatSprite;
+	transformationMatDataSprite_->WVP = worldViewProMatSprite;
+
+	Matrix4x4 uvtrasform = MakeScaleMatrix(uvTransSprite.scale);
+	uvtrasform = Multiply(uvtrasform, MakeRotateZMatrix(uvTransSprite.rotate.z));
+	uvtrasform = Multiply(uvtrasform, MakeTranslateMatrix(uvTransSprite.translate));
+	materialDateSprite_->uvTransform = uvtrasform;
+
+}
+
 void DXCom::ReleaseData()
 {
 	intermediateResource1->Release();
 	intermediateResource2->Release();
 	textureResource_->Release();
 	textureResource2_->Release();
+	indexResoureceSprite->Release();
 	fence_->Release();
 	materialResourceSprite_->Release();
 	transformationMatResourceSprite_->Release();
