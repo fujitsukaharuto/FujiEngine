@@ -548,6 +548,29 @@ void DXCom::SettingTexture()
 
 	device_->CreateShaderResourceView(textureResource2_, &srvDesc2, textureSrvHandleCPU2);
 
+
+	HRESULT hr = commandList_->Close();
+	assert(SUCCEEDED(hr));
+
+	ID3D12CommandList* commandLists[] = { commandList_ };
+	commandQueue_->ExecuteCommandLists(1, commandLists);
+
+	fenceValue_++;
+	commandQueue_->Signal(fence_, fenceValue_);
+	if (fence_->GetCompletedValue() < fenceValue_)
+	{
+		HANDLE fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+		assert(fenceEvent != nullptr);
+		fence_->SetEventOnCompletion(fenceValue_, fenceEvent);
+		WaitForSingleObject(fenceEvent, INFINITE);
+		CloseHandle(fenceEvent);
+	}
+
+	hr = commandAllocator_->Reset();
+	assert(SUCCEEDED(hr));
+	hr = commandList_->Reset(commandAllocator_, nullptr);
+	assert(SUCCEEDED(hr));
+
 }
 
 void DXCom::SettingImgui()
