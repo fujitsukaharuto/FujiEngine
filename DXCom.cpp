@@ -367,98 +367,32 @@ void DXCom::SettingGraphicPipeline()
 
 void DXCom::SettingVertex()
 {
-	vertexResource_ = CreateBufferResource(device_, sizeof(VertexData) * 2000);
+	vertexResource_ = CreateBufferResource(device_, sizeof(VertexData) * 3);
 
 	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
-	vertexBufferView_.SizeInBytes = sizeof(VertexData) * 2000;
+	vertexBufferView_.SizeInBytes = sizeof(VertexData) * 3;
 	vertexBufferView_.StrideInBytes = sizeof(VertexData);
 
 	vertexDate_ = nullptr;
 	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDate_));
 
-	const float pi = 3.1415926535f;
-	const uint32_t kSubdivision = 16;
-	const float kLonEvery = (pi * 2.0f) / static_cast<float>(kSubdivision);
-	const float kLatEvery = (pi) / static_cast<float>(kSubdivision);
-
-	for (uint32_t latIndex = 0; latIndex < kSubdivision; latIndex++)
-	{
-		float lat = -pi / 2.0f + kLatEvery * latIndex;
-		for (uint32_t lonIndex = 0; lonIndex < kSubdivision; lonIndex++)
-		{
-			float lon = lonIndex * kLonEvery;
-			uint32_t startIndex = (latIndex * kSubdivision + lonIndex) * 6;
-
-			float u = float(lonIndex) / float(kSubdivision);
-			float v = 1.0f - float(latIndex) / float(kSubdivision);
-
-			vertexDate_[startIndex].position.X = cosf(lat) * cosf(lon);
-			vertexDate_[startIndex].position.Y = sinf(lat);
-			vertexDate_[startIndex].position.Z = cosf(lat) * sinf(lon);
-			vertexDate_[startIndex].position.W = 1.0f;
-			vertexDate_[startIndex].texcoord = { u,v };
-
-			vertexDate_[startIndex].normal.x = vertexDate_[startIndex].position.X;
-			vertexDate_[startIndex].normal.y = vertexDate_[startIndex].position.Y;
-			vertexDate_[startIndex].normal.z = vertexDate_[startIndex].position.Z;
+	vertexDate_[0] = { { -0.5f,-0.5f,0.0f,1.0f }, { 0.0f,1.0f }, { 0.0f,0.0f,-1.0f } };
+	vertexDate_[1] = { { 0.0f,0.5f,0.0f,1.0f }, { 0.5f,0.0f }, { 0.0f,0.0f,-1.0f } };
+	vertexDate_[2] = { { 0.5f,-0.5f,0.0f,1.0f }, { 1.0f,1.0f }, { 0.0f,0.0f,-1.0f } };
 
 
-			vertexDate_[startIndex + 1].position.X = cosf(lat + kLatEvery) * cosf(lon);
-			vertexDate_[startIndex + 1].position.Y = sinf(lat + kLatEvery);
-			vertexDate_[startIndex + 1].position.Z = cosf(lat + kLatEvery) * sinf(lon);
-			vertexDate_[startIndex + 1].position.W = 1.0f;
-			vertexDate_[startIndex + 1].texcoord = { u,v - (float(1.0f) / float(kSubdivision)) };
+	vertexResource2_ = CreateBufferResource(device_, sizeof(VertexData) * 3);
 
-			vertexDate_[startIndex + 1].normal.x = vertexDate_[startIndex + 1].position.X;
-			vertexDate_[startIndex + 1].normal.y = vertexDate_[startIndex + 1].position.Y;
-			vertexDate_[startIndex + 1].normal.z = vertexDate_[startIndex + 1].position.Z;
+	vertexBufferView2_.BufferLocation = vertexResource2_->GetGPUVirtualAddress();
+	vertexBufferView2_.SizeInBytes = sizeof(VertexData) * 3;
+	vertexBufferView2_.StrideInBytes = sizeof(VertexData);
 
+	vertexDate2_ = nullptr;
+	vertexResource2_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDate2_));
 
-			vertexDate_[startIndex + 2].position.X = cosf(lat) * cosf(lon + kLonEvery);
-			vertexDate_[startIndex + 2].position.Y = sinf(lat);
-			vertexDate_[startIndex + 2].position.Z = cosf(lat) * sinf(lon + kLonEvery);
-			vertexDate_[startIndex + 2].position.W = 1.0f;
-			vertexDate_[startIndex + 2].texcoord = { u + (float(1.0f) / float(kSubdivision)),v };
-
-			vertexDate_[startIndex + 2].normal.x = vertexDate_[startIndex + 2].position.X;
-			vertexDate_[startIndex + 2].normal.y = vertexDate_[startIndex + 2].position.Y;
-			vertexDate_[startIndex + 2].normal.z = vertexDate_[startIndex + 2].position.Z;
-
-
-			vertexDate_[startIndex + 3].position.X = cosf(lat + kLatEvery) * cosf(lon);
-			vertexDate_[startIndex + 3].position.Y = sinf(lat + kLatEvery);
-			vertexDate_[startIndex + 3].position.Z = cosf(lat + kLatEvery) * sinf(lon);
-			vertexDate_[startIndex + 3].position.W = 1.0f;
-			vertexDate_[startIndex + 3].texcoord = { u,v - (float(1.0f) / float(kSubdivision)) };
-
-			vertexDate_[startIndex + 3].normal.x = vertexDate_[startIndex + 3].position.X;
-			vertexDate_[startIndex + 3].normal.y = vertexDate_[startIndex + 3].position.Y;
-			vertexDate_[startIndex + 3].normal.z = vertexDate_[startIndex + 3].position.Z;
-
-
-			vertexDate_[startIndex + 4].position.X = cosf(lat + kLatEvery) * cosf(lon + kLonEvery);
-			vertexDate_[startIndex + 4].position.Y = sinf(lat + kLatEvery);
-			vertexDate_[startIndex + 4].position.Z = cosf(lat + kLatEvery) * sinf(lon + kLonEvery);
-			vertexDate_[startIndex + 4].position.W = 1.0f;
-			vertexDate_[startIndex + 4].texcoord = { u + (float(1.0f) / float(kSubdivision)),v - (float(1.0f) / float(kSubdivision)) };
-
-			vertexDate_[startIndex + 4].normal.x = vertexDate_[startIndex + 4].position.X;
-			vertexDate_[startIndex + 4].normal.y = vertexDate_[startIndex + 4].position.Y;
-			vertexDate_[startIndex + 4].normal.z = vertexDate_[startIndex + 4].position.Z;
-
-
-			vertexDate_[startIndex + 5].position.X = cosf(lat) * cosf(lon + kLonEvery);
-			vertexDate_[startIndex + 5].position.Y = sinf(lat);
-			vertexDate_[startIndex + 5].position.Z = cosf(lat) * sinf(lon + kLonEvery);
-			vertexDate_[startIndex + 5].position.W = 1.0f;
-			vertexDate_[startIndex + 5].texcoord = { u + (float(1.0f) / float(kSubdivision)),v };
-
-			vertexDate_[startIndex + 5].normal.x = vertexDate_[startIndex + 5].position.X;
-			vertexDate_[startIndex + 5].normal.y = vertexDate_[startIndex + 5].position.Y;
-			vertexDate_[startIndex + 5].normal.z = vertexDate_[startIndex + 5].position.Z;
-
-		}
-	}
+	vertexDate2_[0] = { { -0.5f,-0.5f,0.5f,1.0f }, { 0.0f,1.0f }, { 0.0f,0.0f,-1.0f } };
+	vertexDate2_[1] = { { 0.0f,0.0f,0.0f,1.0f }, { 0.5f,0.0f }, { 0.0f,0.0f,-1.0f } };
+	vertexDate2_[2] = { { 0.5f,-0.5f,-0.5f,1.0f }, { 1.0f,1.0f }, { 0.0f,0.0f,-1.0f } };
 
 }
 
@@ -515,16 +449,13 @@ void DXCom::SettingResource()
 	wvpDate_->WVP = MakeIdentity4x4();
 	wvpDate_->World = MakeIdentity4x4();
 
-
-
 	materialResource_ = CreateBufferResource(device_, sizeof(Material));
 	materialDate_ = nullptr;
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialDate_));
 	//色変えるやつ（Resource）
 	materialDate_->color = { 1.0f,1.0f,1.0f,1.0f };
-	materialDate_->enableLighting = true;
+	materialDate_->enableLighting = false;
 	materialDate_->uvTransform = MakeIdentity4x4();
-
 
 	directionalLightResource_ = CreateBufferResource(device_, sizeof(DirectionalLight));
 	directionalLightData_ = nullptr;
@@ -532,6 +463,29 @@ void DXCom::SettingResource()
 	directionalLightData_->color = { 1.0f,1.0f,1.0f,1.0f };
 	directionalLightData_->direction = { 1.0f,0.0f,0.0f };
 	directionalLightData_->intensity = 1.0f;
+
+
+	wvpResource2_ = CreateBufferResource(device_, sizeof(TransformationMatrix));
+	wvpDate2_ = nullptr;
+	wvpResource2_->Map(0, nullptr, reinterpret_cast<void**>(&wvpDate2_));
+	wvpDate2_->WVP = MakeIdentity4x4();
+	wvpDate2_->World = MakeIdentity4x4();
+
+	materialResource2_ = CreateBufferResource(device_, sizeof(Material));
+	materialDate2_ = nullptr;
+	materialResource2_->Map(0, nullptr, reinterpret_cast<void**>(&materialDate2_));
+	//色変えるやつ（Resource）
+	materialDate2_->color = { 1.0f,1.0f,1.0f,1.0f };
+	materialDate2_->enableLighting = false;
+	materialDate2_->uvTransform = MakeIdentity4x4();
+
+	directionalLightResource2_ = CreateBufferResource(device_, sizeof(DirectionalLight));
+	directionalLightData2_ = nullptr;
+	directionalLightResource2_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData2_));
+	directionalLightData2_->color = { 1.0f,1.0f,1.0f,1.0f };
+	directionalLightData2_->direction = { 1.0f,0.0f,0.0f };
+	directionalLightData2_->intensity = 1.0f;
+
 }
 
 void DXCom::SettingSpriteResource()
@@ -660,6 +614,7 @@ void DXCom::Command()
 	scissorRect.top = 0;
 	scissorRect.bottom = MyWin::kWindowHeight;
 
+	//三角形１
 	commandList_->RSSetViewports(1, &viewport);
 	commandList_->RSSetScissorRects(1, &scissorRect);
 	commandList_->SetGraphicsRootSignature(roootSignature_);
@@ -670,7 +625,21 @@ void DXCom::Command()
 	commandList_->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootDescriptorTable(2, useMonsterBall ? textureSrvHandleGPU2 : textureSrvHandleGPU);
-	commandList_->DrawInstanced(1536, 1, 0, 0);
+	commandList_->DrawInstanced(3, 1, 0, 0);
+
+
+	//三角形２
+	commandList_->RSSetViewports(1, &viewport);
+	commandList_->RSSetScissorRects(1, &scissorRect);
+	commandList_->SetGraphicsRootSignature(roootSignature_);
+	commandList_->SetPipelineState(graphicsPipelineState_);
+	commandList_->IASetVertexBuffers(0, 1, &vertexBufferView2_);
+	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	commandList_->SetGraphicsRootConstantBufferView(0, materialResource2_->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootConstantBufferView(1, wvpResource2_->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource2_->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootDescriptorTable(2, useMonsterBall2 ? textureSrvHandleGPU2 : textureSrvHandleGPU);
+	commandList_->DrawInstanced(3, 1, 0, 0);
 
 
 	commandList_->IASetIndexBuffer(&indexBufferViewSprite);
@@ -737,38 +706,37 @@ void DXCom::SetSpriteWVPData(const Matrix4x4& world, const Matrix4x4& wvp)
 	transformationMatDataSprite_->WVP = wvp;
 }
 
-void DXCom::SetVertexData(const uint32_t index, const Vector4& position, const Vector2& texcord, const Vector3& normal)
-{
-	//改善点
-	//indexをcommonでかってにやってくれるように
-
-	vertexDate_[index].position = position;
-	vertexDate_[index].texcoord = texcord;
-	vertexDate_[index].normal = normal;
-}
-
 void DXCom::UpDate()
 {
 
 	ImGui::Begin("debug");
+	ImGui::Text("Triangle1");
 	ImGui::ColorEdit3("color", &materialDate_->color.X);
-	ImGui::SliderFloat3("trans", &transform.translate.x, -1.0f, 1.0f);
-	ImGui::SliderFloat3("rotate", &transform.rotate.x, -1.0f, 1.0f);
-	ImGui::SliderFloat3("scale", &transform.scale.x, 0.0f, 4.0f);
+	ImGui::DragFloat3("trans", &transform.translate.x, 0.01f, -2.0f, 2.0f);
+	ImGui::DragFloat3("rotate", &transform.rotate.x, 0.01f, -2.0f, 2.0f);
+	ImGui::DragFloat3("scale", &transform.scale.x, 0.01f, 0.0f, 6.0f);
 	ImGui::Checkbox("useMonsterBall", &useMonsterBall);
+
+	ImGui::Text("Triangle2");
+	ImGui::ColorEdit3("color2", &materialDate2_->color.X);
+	ImGui::DragFloat3("trans2", &transform2.translate.x, 0.01f, -2.0f, 2.0f);
+	ImGui::DragFloat3("rotate2", &transform2.rotate.x, 0.01f, -2.0f, 2.0f);
+	ImGui::DragFloat3("scale2", &transform2.scale.x, 0.01f, 0.0f, 6.0f);
+	ImGui::Checkbox("useMonsterBall2", &useMonsterBall2);
+
 	ImGui::Text("Sprite");
-	ImGui::SliderFloat3("trans", &transSprite.translate.x, 0.0f, 1280.0f);
-	ImGui::SliderFloat3("rotate", &transSprite.rotate.x, -1.0f, 1.0f);
-	ImGui::SliderFloat3("sclae", &transSprite.scale.x, 0.0f, 3.0f);
-	ImGui::SliderFloat2("uvtrans", &uvTransSprite.translate.x, 0.0f, 1280.0f);
-	ImGui::SliderFloat("uvrotate", &uvTransSprite.rotate.z, -1.0f, 1.0f);
-	ImGui::SliderFloat2("uvsclae", &uvTransSprite.scale.x, 0.0f, 3.0f);
+	ImGui::DragFloat3("Sprite trans", &transSprite.translate.x, 1.0f, -1280.0f, 1280.0f);
+	ImGui::DragFloat3("Sprite rotate", &transSprite.rotate.x, 0.01f, -2.0f, 2.0f);
+	ImGui::DragFloat3("Sprite sclae", &transSprite.scale.x, 0.01f, 0.0f, 6.0f);
+	ImGui::DragFloat2("uvtrans", &uvTransSprite.translate.x, 0.1f, -1280.0f, 1280.0f);
+	ImGui::DragFloat("uvrotate", &uvTransSprite.rotate.z, 0.01f, -2.0f, 2.0f);
+	ImGui::DragFloat2("uvsclae", &uvTransSprite.scale.x, 0.01f, 0.0f, 6.0f);
 	ImGui::Text("light");
-	ImGui::SliderFloat3("color", &directionalLightData_->color.X, 0.0f, 1.0f);
-	ImGui::SliderFloat3("direction", &directionalLightData_->direction.x, -1.0f, 1.0f);
+	ImGui::SliderFloat3("light color", &directionalLightData_->color.X, 0.0f, 1.0f);
+	ImGui::SliderFloat3("light direction", &directionalLightData_->direction.x, -1.0f, 1.0f);
 	ImGui::End();
 
-	transform.rotate.y += 0.03f;
+
 	Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 	Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTrans.scale, cameraTrans.rotate, cameraTrans.translate);
 	Matrix4x4 viewMatrix = Inverse(cameraMatrix);
@@ -778,6 +746,13 @@ void DXCom::UpDate()
 
 	wvpDate_->World = worldMatrix;
 	wvpDate_->WVP = worldViewProjectionMatrix;
+
+	Matrix4x4 worldMatrix2 = MakeAffineMatrix(transform2.scale, transform2.rotate, transform2.translate);
+	Matrix4x4 worldViewProjectionMatrix2 = Multiply(viewMatrix, projectionMatrix);
+	worldViewProjectionMatrix2 = Multiply(worldMatrix2, worldViewProjectionMatrix2);
+
+	wvpDate2_->World = worldMatrix2;
+	wvpDate2_->WVP = worldViewProjectionMatrix2;
 
 	Matrix4x4 worldMatSprite = MakeAffineMatrix(transSprite.scale, transSprite.rotate, transSprite.translate);
 	Matrix4x4 viewMatSprite = MakeIdentity4x4();
@@ -806,6 +781,10 @@ void DXCom::ReleaseData()
 	fence_->Release();
 	materialResourceSprite_->Release();
 	transformationMatResourceSprite_->Release();
+	directionalLightResource2_->Release();
+	materialResource2_->Release();
+	wvpResource2_->Release();
+	vertexResource2_->Release();
 	directionalLightResource_->Release();
 	materialResource_->Release();
 	wvpResource_->Release();

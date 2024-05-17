@@ -60,7 +60,6 @@ public:
 	void SetSpriteWVPData(const Matrix4x4& world, const Matrix4x4& wvp);
 
 
-	void SetVertexData(const uint32_t index, const Vector4& position, const Vector2& texcord, const Vector3& normal);
 
 	//仕方なくcommon内でupdate用。後からこんなのなくさなきゃ
 	void UpDate();
@@ -136,9 +135,33 @@ private:
 	IDxcBlob* pixelShaderBlob_ = nullptr;
 	ID3D12PipelineState* graphicsPipelineState_ = nullptr;
 
+	//三角形１
 	ID3D12Resource* vertexResource_ = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
 	VertexData* vertexDate_ = nullptr;
+
+	ID3D12Resource* wvpResource_ = nullptr;
+	TransformationMatrix* wvpDate_ = nullptr;
+	ID3D12Resource* materialResource_ = nullptr;
+	Material* materialDate_ = nullptr;
+	ID3D12Resource* directionalLightResource_ = nullptr;
+	DirectionalLight* directionalLightData_ = nullptr;
+	bool useMonsterBall = true;
+
+	//三角形2
+	ID3D12Resource* vertexResource2_ = nullptr;
+	D3D12_VERTEX_BUFFER_VIEW vertexBufferView2_{};
+	VertexData* vertexDate2_ = nullptr;
+
+	ID3D12Resource* wvpResource2_ = nullptr;
+	TransformationMatrix* wvpDate2_ = nullptr;
+	ID3D12Resource* materialResource2_ = nullptr;
+	Material* materialDate2_ = nullptr;
+	ID3D12Resource* directionalLightResource2_ = nullptr;
+	DirectionalLight* directionalLightData2_ = nullptr;
+	bool useMonsterBall2 = true;
+
+
 	ID3D12Resource* vertexResourceSprite_ = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite_{};
 	VertexData* vertexDataSprite_ = nullptr;
@@ -147,7 +170,15 @@ private:
 	D3D12_INDEX_BUFFER_VIEW indexBufferViewSprite{};
 	uint32_t* indexDataSprite = nullptr;
 
+	ID3D12Resource* transformationMatResourceSprite_ = nullptr;
+	TransformationMatrix* transformationMatDataSprite_ = nullptr;
+
+	ID3D12Resource* materialResourceSprite_ = nullptr;
+	Material* materialDateSprite_ = nullptr;
+
+
 	Trans transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	Trans transform2{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 	Trans cameraTrans{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} };
 	Trans transSprite = { {1.0f,1.0f,1.0f,},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 	Trans uvTransSprite{
@@ -155,19 +186,6 @@ private:
 		{0.0f,0.0f,0.0f},
 		{0.0f,0.0f,0.0f},
 	};
-
-	ID3D12Resource* wvpResource_ = nullptr;
-	TransformationMatrix* wvpDate_ = nullptr;
-	ID3D12Resource* materialResource_ = nullptr;
-	Material* materialDate_ = nullptr;
-	ID3D12Resource* directionalLightResource_ = nullptr;
-	DirectionalLight* directionalLightData_ = nullptr;
-
-	ID3D12Resource* transformationMatResourceSprite_ = nullptr;
-	TransformationMatrix* transformationMatDataSprite_ = nullptr;
-
-	ID3D12Resource* materialResourceSprite_ = nullptr;
-	Material* materialDateSprite_ = nullptr;
 
 
 	DirectX::ScratchImage mipImages_;
@@ -184,7 +202,7 @@ private:
 
 	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU2;
 	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU2;
-	bool useMonsterBall = true;
+
 
 #ifdef _DEBUG
 	ID3D12Debug1* debugController_ = nullptr;
