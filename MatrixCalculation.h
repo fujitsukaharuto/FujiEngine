@@ -1,6 +1,7 @@
 #pragma once
 #define _USE_MATH_DEFINES
 #include <cmath>
+#include <vector>
 #include <assert.h>
 
 #include "Vector2.h"
@@ -58,6 +59,10 @@ struct Sphere
 	float radius;
 };
 
+struct ModelData
+{
+	std::vector<VertexData> vertices;
+};
 
 /// <summary>
 /// 2次元ベクトルのスカラー倍を求める

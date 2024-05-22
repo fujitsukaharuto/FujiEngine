@@ -99,6 +99,8 @@ public:
 	ID3D12Resource* UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages,
 		ID3D12Device* device, ID3D12GraphicsCommandList* commandList);
 
+	ModelData LoadObjFile(const std::string& directoryPath, const std::string& filename);
+
 private:
 
 	DXCom() = default;
@@ -161,6 +163,18 @@ private:
 	DirectionalLight* directionalLightData2_ = nullptr;
 	bool useMonsterBall2 = true;
 
+	//modelData
+	ModelData modelData_;
+	ID3D12Resource* vertexModelResource_ = nullptr;
+	D3D12_VERTEX_BUFFER_VIEW vertexModelBufferView_{};
+	VertexData* vertexDataModel_ = nullptr;
+	ID3D12Resource* wvpResourceModel_ = nullptr;
+	TransformationMatrix* wvpDateModel_ = nullptr;
+	ID3D12Resource* materialResourceModel_ = nullptr;
+	Material* materialDateModel_ = nullptr;
+	ID3D12Resource* directionalLightResourceModel_ = nullptr;
+	DirectionalLight* directionalLightDataModel_ = nullptr;
+
 
 	ID3D12Resource* vertexResourceSprite_ = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite_{};
@@ -186,7 +200,7 @@ private:
 		{0.0f,0.0f,0.0f},
 		{0.0f,0.0f,0.0f},
 	};
-
+	Trans transformModel{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 
 	DirectX::ScratchImage mipImages_;
 	DirectX::ScratchImage mipImages2_;

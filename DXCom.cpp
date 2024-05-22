@@ -6,6 +6,8 @@
 #include <dxgi1_6.h>
 #include <dxcapi.h>
 #include <dxgidebug.h>
+#include <fstream>
+#include <sstream>
 
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
@@ -314,7 +316,7 @@ void DXCom::SettingGraphicPipeline()
 		D3D12_COLOR_WRITE_ENABLE_ALL;
 
 	D3D12_RASTERIZER_DESC rasterizerDesc{};
-	rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
+	rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
 	rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
 
 	vertexShaderBlob_ = CompileShader(L"Object3d.VS.hlsl",
@@ -438,6 +440,37 @@ void DXCom::SettingSpriteVertex()
 	indexDataSprite[3] = 1;
 	indexDataSprite[4] = 3;
 	indexDataSprite[5] = 2;
+
+	//model
+	modelData_ = LoadObjFile("resource", "plane.obj");
+	vertexModelResource_ = CreateBufferResource(device_, sizeof(VertexData) * modelData_.vertices.size());
+	vertexModelBufferView_.BufferLocation = vertexModelResource_->GetGPUVirtualAddress();
+	vertexModelBufferView_.SizeInBytes = UINT(sizeof(VertexData) * modelData_.vertices.size());
+	vertexModelBufferView_.StrideInBytes = sizeof(VertexData);
+
+	vertexModelResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataModel_));
+	std::memcpy(vertexDataModel_, modelData_.vertices.data(), sizeof(VertexData) * modelData_.vertices.size());
+
+	wvpResourceModel_ = CreateBufferResource(device_, sizeof(TransformationMatrix));
+	wvpDateModel_ = nullptr;
+	wvpResourceModel_->Map(0, nullptr, reinterpret_cast<void**>(&wvpDateModel_));
+	wvpDateModel_->WVP = MakeIdentity4x4();
+	wvpDateModel_->World = MakeIdentity4x4();
+
+	materialResourceModel_ = CreateBufferResource(device_, sizeof(Material));
+	materialDateModel_ = nullptr;
+	materialResourceModel_->Map(0, nullptr, reinterpret_cast<void**>(&materialDateModel_));
+	//色変えるやつ（Resource）
+	materialDateModel_->color = { 1.0f,1.0f,1.0f,1.0f };
+	materialDateModel_->enableLighting = false;
+	materialDateModel_->uvTransform = MakeIdentity4x4();
+
+	directionalLightResourceModel_ = CreateBufferResource(device_, sizeof(DirectionalLight));
+	directionalLightDataModel_ = nullptr;
+	directionalLightResourceModel_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightDataModel_));
+	directionalLightDataModel_->color = { 1.0f,1.0f,1.0f,1.0f };
+	directionalLightDataModel_->direction = { 1.0f,0.0f,0.0f };
+	directionalLightDataModel_->intensity = 1.0f;
 
 }
 
@@ -637,42 +670,58 @@ void DXCom::Command()
 	scissorRect.top = 0;
 	scissorRect.bottom = MyWin::kWindowHeight;
 
-	//三角形１
-	commandList_->RSSetViewports(1, &viewport);
-	commandList_->RSSetScissorRects(1, &scissorRect);
-	commandList_->SetGraphicsRootSignature(roootSignature_);
-	commandList_->SetPipelineState(graphicsPipelineState_);
-	commandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);
-	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
-	commandList_->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
-	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
-	commandList_->SetGraphicsRootDescriptorTable(2, useMonsterBall ? textureSrvHandleGPU2 : textureSrvHandleGPU);
-	commandList_->DrawInstanced(3, 1, 0, 0);
+	////三角形１
+	//commandList_->RSSetViewports(1, &viewport);
+	//commandList_->RSSetScissorRects(1, &scissorRect);
+	//commandList_->SetGraphicsRootSignature(roootSignature_);
+	//commandList_->SetPipelineState(graphicsPipelineState_);
+	//commandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);
+	//commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	//commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
+	//commandList_->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
+	//commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
+	//commandList_->SetGraphicsRootDescriptorTable(2, useMonsterBall ? textureSrvHandleGPU2 : textureSrvHandleGPU);
+	//commandList_->DrawInstanced(3, 1, 0, 0);
 
 
-	//三角形２
-	commandList_->RSSetViewports(1, &viewport);
-	commandList_->RSSetScissorRects(1, &scissorRect);
-	commandList_->SetGraphicsRootSignature(roootSignature_);
-	commandList_->SetPipelineState(graphicsPipelineState_);
-	commandList_->IASetVertexBuffers(0, 1, &vertexBufferView2_);
-	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	commandList_->SetGraphicsRootConstantBufferView(0, materialResource2_->GetGPUVirtualAddress());
-	commandList_->SetGraphicsRootConstantBufferView(1, wvpResource2_->GetGPUVirtualAddress());
-	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource2_->GetGPUVirtualAddress());
-	commandList_->SetGraphicsRootDescriptorTable(2, useMonsterBall2 ? textureSrvHandleGPU2 : textureSrvHandleGPU);
-	commandList_->DrawInstanced(3, 1, 0, 0);
+	////三角形２
+	//commandList_->RSSetViewports(1, &viewport);
+	//commandList_->RSSetScissorRects(1, &scissorRect);
+	//commandList_->SetGraphicsRootSignature(roootSignature_);
+	//commandList_->SetPipelineState(graphicsPipelineState_);
+	//commandList_->IASetVertexBuffers(0, 1, &vertexBufferView2_);
+	//commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	//commandList_->SetGraphicsRootConstantBufferView(0, materialResource2_->GetGPUVirtualAddress());
+	//commandList_->SetGraphicsRootConstantBufferView(1, wvpResource2_->GetGPUVirtualAddress());
+	//commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource2_->GetGPUVirtualAddress());
+	//commandList_->SetGraphicsRootDescriptorTable(2, useMonsterBall2 ? textureSrvHandleGPU2 : textureSrvHandleGPU);
+	//commandList_->DrawInstanced(3, 1, 0, 0);
 
 
-	commandList_->IASetIndexBuffer(&indexBufferViewSprite);
+	/*commandList_->IASetIndexBuffer(&indexBufferViewSprite);
 	commandList_->IASetVertexBuffers(0, 1, &vertexBufferViewSprite_);
 	commandList_->SetGraphicsRootConstantBufferView(0, materialResourceSprite_->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootConstantBufferView(1, transformationMatResourceSprite_->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
-	commandList_->DrawIndexedInstanced(6, 1, 0, 0, 0);
+	commandList_->DrawIndexedInstanced(6, 1, 0, 0, 0);*/
 	/*commandList_->DrawInstanced(6, 1, 0, 0);*/
+
+
+	//model
+	commandList_->RSSetViewports(1, &viewport);
+	commandList_->RSSetScissorRects(1, &scissorRect);
+	commandList_->SetGraphicsRootSignature(roootSignature_);
+	commandList_->SetPipelineState(graphicsPipelineState_);
+	commandList_->IASetVertexBuffers(0, 1, &vertexModelBufferView_);
+	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	commandList_->SetGraphicsRootConstantBufferView(0, materialResourceModel_->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootConstantBufferView(1, wvpResourceModel_->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResourceModel_->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
+	commandList_->DrawInstanced(UINT(modelData_.vertices.size()), 1, 0, 0);
+
+
 }
 
 void DXCom::LastFrame()
@@ -733,27 +782,46 @@ void DXCom::UpDate()
 {
 
 	ImGui::Begin("debug");
-	ImGui::Text("Triangle1");
-	ImGui::ColorEdit3("color", &materialDate_->color.X);
-	ImGui::DragFloat3("trans", &transform.translate.x, 0.01f, -2.0f, 2.0f);
-	ImGui::DragFloat3("rotate", &transform.rotate.x, 0.01f, -2.0f, 2.0f);
-	ImGui::DragFloat3("scale", &transform.scale.x, 0.01f, 0.0f, 6.0f);
-	ImGui::Checkbox("useMonsterBall", &useMonsterBall);
+	if (ImGui::TreeNode("Triangle1"))
+	{
+		ImGui::ColorEdit3("color", &materialDate_->color.X);
+		ImGui::DragFloat3("trans", &transform.translate.x, 0.01f, -2.0f, 2.0f);
+		ImGui::DragFloat3("rotate", &transform.rotate.x, 0.01f, -4.0f, 4.0f);
+		ImGui::DragFloat3("scale", &transform.scale.x, 0.01f, 0.0f, 6.0f);
+		ImGui::Checkbox("useMonsterBall", &useMonsterBall);
+		ImGui::TreePop();
+	}
+	
+	if (ImGui::TreeNode("Triangle2"))
+	{
+		ImGui::ColorEdit3("color2", &materialDate2_->color.X);
+		ImGui::DragFloat3("trans2", &transform2.translate.x, 0.01f, -2.0f, 2.0f);
+		ImGui::DragFloat3("rotate2", &transform2.rotate.x, 0.01f, -4.0f, 4.0f);
+		ImGui::DragFloat3("scale2", &transform2.scale.x, 0.01f, 0.0f, 6.0f);
+		ImGui::Checkbox("useMonsterBall2", &useMonsterBall2);
+		ImGui::TreePop();
+	}
+	
+	if (ImGui::TreeNode("Sprite"))
+	{
+		ImGui::DragFloat3("Sprite trans", &transSprite.translate.x, 1.0f, -1280.0f, 1280.0f);
+		ImGui::DragFloat3("Sprite rotate", &transSprite.rotate.x, 0.01f, -4.0f, 4.0f);
+		ImGui::DragFloat3("Sprite sclae", &transSprite.scale.x, 0.01f, 0.0f, 6.0f);
+		ImGui::DragFloat2("uvtrans", &uvTransSprite.translate.x, 0.1f, -1280.0f, 1280.0f);
+		ImGui::DragFloat("uvrotate", &uvTransSprite.rotate.z, 0.01f, -4.0f, 4.0f);
+		ImGui::DragFloat2("uvsclae", &uvTransSprite.scale.x, 0.01f, 0.0f, 6.0f);
+		ImGui::TreePop();
+	}
 
-	ImGui::Text("Triangle2");
-	ImGui::ColorEdit3("color2", &materialDate2_->color.X);
-	ImGui::DragFloat3("trans2", &transform2.translate.x, 0.01f, -2.0f, 2.0f);
-	ImGui::DragFloat3("rotate2", &transform2.rotate.x, 0.01f, -2.0f, 2.0f);
-	ImGui::DragFloat3("scale2", &transform2.scale.x, 0.01f, 0.0f, 6.0f);
-	ImGui::Checkbox("useMonsterBall2", &useMonsterBall2);
-
-	ImGui::Text("Sprite");
-	ImGui::DragFloat3("Sprite trans", &transSprite.translate.x, 1.0f, -1280.0f, 1280.0f);
-	ImGui::DragFloat3("Sprite rotate", &transSprite.rotate.x, 0.01f, -2.0f, 2.0f);
-	ImGui::DragFloat3("Sprite sclae", &transSprite.scale.x, 0.01f, 0.0f, 6.0f);
-	ImGui::DragFloat2("uvtrans", &uvTransSprite.translate.x, 0.1f, -1280.0f, 1280.0f);
-	ImGui::DragFloat("uvrotate", &uvTransSprite.rotate.z, 0.01f, -2.0f, 2.0f);
-	ImGui::DragFloat2("uvsclae", &uvTransSprite.scale.x, 0.01f, 0.0f, 6.0f);
+	if (ImGui::TreeNode("PlaneModel"))
+	{
+		ImGui::ColorEdit3("Modelcolor", &materialDateModel_->color.X);
+		ImGui::DragFloat3("Modeltrans", &transformModel.translate.x, 0.01f, -2.0f, 2.0f);
+		ImGui::DragFloat3("Modelrotate", &transformModel.rotate.x, 0.01f, -4.0f, 4.0f);
+		ImGui::DragFloat3("Modelscale", &transformModel.scale.x, 0.01f, 0.0f, 6.0f);
+		ImGui::TreePop();
+	}
+	
 	ImGui::Text("light");
 	ImGui::SliderFloat3("light color", &directionalLightData_->color.X, 0.0f, 1.0f);
 	ImGui::SliderFloat3("light direction", &directionalLightData_->direction.x, -1.0f, 1.0f);
@@ -792,6 +860,15 @@ void DXCom::UpDate()
 	uvtrasform = Multiply(uvtrasform, MakeTranslateMatrix(uvTransSprite.translate));
 	materialDateSprite_->uvTransform = uvtrasform;
 
+
+	Matrix4x4 worldMatrixModel = MakeAffineMatrix(transformModel.scale, transformModel.rotate, transformModel.translate);
+	Matrix4x4 worldViewProjectionMatrixModel = Multiply(viewMatrix, projectionMatrix);
+	worldViewProjectionMatrixModel = Multiply(worldMatrixModel, worldViewProjectionMatrixModel);
+
+	wvpDateModel_->World = worldMatrixModel;
+	wvpDateModel_->WVP = worldViewProjectionMatrixModel;
+
+
 }
 
 void DXCom::ReleaseData()
@@ -800,6 +877,12 @@ void DXCom::ReleaseData()
 	intermediateResource2->Release();
 	textureResource_->Release();
 	textureResource2_->Release();
+
+	directionalLightResourceModel_->Release();
+	materialResourceModel_->Release();
+	wvpResourceModel_->Release();
+	vertexModelResource_->Release();
+
 	indexResoureceSprite->Release();
 	fence_->Release();
 	materialResourceSprite_->Release();
@@ -1104,4 +1187,77 @@ ID3D12Resource* DXCom::UploadTextureData(ID3D12Resource* texture, const DirectX:
 	commandList->ResourceBarrier(1, &barrier);
 
 	return intermediateResource;
+}
+
+ModelData DXCom::LoadObjFile(const std::string& directoryPath, const std::string& filename)
+{
+	ModelData modeldata;
+	std::vector<Vector4> positions;
+	std::vector<Vector3> normals;
+	std::vector<Vector2> texcords;
+	std::string line;
+
+	std::ifstream file(directoryPath + "/" + filename);
+	assert(file.is_open());
+
+	while (std::getline(file, line))
+	{
+		std::string identifier;
+		std::istringstream s(line);
+
+		s >> identifier;
+
+		if (identifier == "v")
+		{
+			Vector4 position;
+			s >> position.X >> position.Y >> position.Z;
+			position.W = 1.0f;
+
+			positions.push_back(position);
+		}
+		else if (identifier == "vt")
+		{
+			Vector2 texcoord;
+			s >> texcoord.x >> texcoord.y;
+			texcords.push_back(texcoord);
+		}
+		else if (identifier == "vn")
+		{
+			Vector3 normal;
+			s >> normal.x >> normal.y >> normal.z;
+			normals.push_back(normal);
+		}
+		else if (identifier == "f")
+		{
+			VertexData triangle[3];
+			for (int32_t faceVertex = 0; faceVertex < 3; faceVertex++)
+			{
+				std::string vertexDefinition;
+				s >> vertexDefinition;
+				//頂点の要素へのindexは　位置/uv/法線　で格納されているので、分解してindex取得
+				std::istringstream v(vertexDefinition);
+				uint32_t elementIndices[3];
+				for (int32_t element = 0; element < 3; element++)
+				{
+					std::string index;
+					std::getline(v, index, '/');
+					elementIndices[element] = std::stoi(index);
+				}
+				Vector4 position = positions[elementIndices[0] - 1];
+				position.X *= -1.0f;
+				Vector2 texcoord = texcords[elementIndices[1] - 1];
+				Vector3 normal = normals[elementIndices[2] - 1];
+				normal.x *= -1.0f;
+				triangle[faceVertex]= { position,texcoord,normal };
+				/*VertexData vertex= { position,texcoord,normal };
+				modeldata.vertices.push_back(vertex);*/
+			}
+			modeldata.vertices.push_back(triangle[2]);
+			modeldata.vertices.push_back(triangle[1]);
+			modeldata.vertices.push_back(triangle[0]);
+		}
+	}
+
+
+	return modeldata;
 }
