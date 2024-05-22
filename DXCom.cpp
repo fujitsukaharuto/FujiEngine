@@ -442,7 +442,7 @@ void DXCom::SettingSpriteVertex()
 	indexDataSprite[5] = 2;
 
 	//model
-	modelData_ = LoadObjFile("resource", "plane.obj");
+	modelData_ = LoadObjFile("resource", "axis.obj");
 	vertexModelResource_ = CreateBufferResource(device_, sizeof(VertexData) * modelData_.vertices.size());
 	vertexModelBufferView_.BufferLocation = vertexModelResource_->GetGPUVirtualAddress();
 	vertexModelBufferView_.SizeInBytes = UINT(sizeof(VertexData) * modelData_.vertices.size());
@@ -546,7 +546,7 @@ void DXCom::SettingTexture()
 	//const uint32_t descriptorSizeDSV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
 
-	mipImages_ = LoadTexture("resource/uvChecker.png");
+	mipImages_ = LoadTexture("resource/monsterBall.png");
 	const DirectX::TexMetadata& metadata = mipImages_.GetMetadata();
 	textureResource_ = CreateTextureResource(device_, metadata);
 	
@@ -557,7 +557,7 @@ void DXCom::SettingTexture()
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
 
-	mipImages2_ = LoadTexture("resource/monsterBall.png");
+	mipImages2_ = LoadTexture(modelData_.material.textureFilePath);
 	const DirectX::TexMetadata& metadata2 = mipImages2_.GetMetadata();
 	textureResource2_ = CreateTextureResource(device_, metadata2);
 	
@@ -718,7 +718,7 @@ void DXCom::Command()
 	commandList_->SetGraphicsRootConstantBufferView(0, materialResourceModel_->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootConstantBufferView(1, wvpResourceModel_->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResourceModel_->GetGPUVirtualAddress());
-	commandList_->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
+	commandList_->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU2);
 	commandList_->DrawInstanced(UINT(modelData_.vertices.size()), 1, 0, 0);
 
 
@@ -1246,6 +1246,7 @@ ModelData DXCom::LoadObjFile(const std::string& directoryPath, const std::string
 				Vector4 position = positions[elementIndices[0] - 1];
 				position.X *= -1.0f;
 				Vector2 texcoord = texcords[elementIndices[1] - 1];
+				texcoord.y = 1.0f - texcoord.y;
 				Vector3 normal = normals[elementIndices[2] - 1];
 				normal.x *= -1.0f;
 				triangle[faceVertex]= { position,texcoord,normal };
@@ -1256,8 +1257,37 @@ ModelData DXCom::LoadObjFile(const std::string& directoryPath, const std::string
 			modeldata.vertices.push_back(triangle[1]);
 			modeldata.vertices.push_back(triangle[0]);
 		}
+		else if (identifier == "mtllib")
+		{
+			std::string materialFilename;
+			s >> materialFilename;
+			modeldata.material = LoadMaterialTemplateFile(directoryPath, materialFilename);
+		}
 	}
 
-
 	return modeldata;
+}
+
+MaterialData DXCom::LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename)
+{
+	MaterialData materialData;
+	std::string line;
+	std::ifstream file(directoryPath + "/" + filename);
+	assert(file.is_open());
+
+	while (std::getline(file,line))
+	{
+		std::string identifier;
+		std::istringstream s(line);
+		s >> identifier;
+
+		if (identifier == "map_Kd")
+		{
+			std::string textureFilename;
+			s >> textureFilename;
+			materialData.textureFilePath = directoryPath + "/" + textureFilename;
+		}
+	}
+
+	return materialData;
 }

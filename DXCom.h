@@ -100,6 +100,7 @@ public:
 		ID3D12Device* device, ID3D12GraphicsCommandList* commandList);
 
 	ModelData LoadObjFile(const std::string& directoryPath, const std::string& filename);
+	MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename);
 
 private:
 

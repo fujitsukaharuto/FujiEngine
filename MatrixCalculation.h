@@ -2,6 +2,7 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include <vector>
+#include <string>
 #include <assert.h>
 
 #include "Vector2.h"
@@ -59,9 +60,15 @@ struct Sphere
 	float radius;
 };
 
+struct MaterialData
+{
+	std::string textureFilePath;
+};
+
 struct ModelData
 {
 	std::vector<VertexData> vertices;
+	MaterialData material;
 };
 
 /// <summary>
