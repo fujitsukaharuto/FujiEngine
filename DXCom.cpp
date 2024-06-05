@@ -8,6 +8,7 @@
 #include <dxgidebug.h>
 #include <fstream>
 #include <sstream>
+#include <random>
 
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
@@ -312,11 +313,23 @@ void DXCom::SettingGraphicPipeline()
 	inputLayoutDesc.NumElements = _countof(inputElementDescs);
 
 	D3D12_BLEND_DESC blendDesc{};
-	blendDesc.RenderTarget[0].RenderTargetWriteMask =
-		D3D12_COLOR_WRITE_ENABLE_ALL;
+	blendDesc.AlphaToCoverageEnable = false;
+	blendDesc.IndependentBlendEnable = false;
+
+	D3D12_RENDER_TARGET_BLEND_DESC rtb{};
+	rtb.BlendEnable = true;
+	rtb.SrcBlend = D3D12_BLEND_SRC_ALPHA;
+	rtb.DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+	rtb.BlendOp = D3D12_BLEND_OP_ADD;
+	rtb.SrcBlendAlpha = D3D12_BLEND_ONE;
+	rtb.DestBlendAlpha = D3D12_BLEND_ZERO;
+	rtb.BlendOpAlpha = D3D12_BLEND_OP_ADD;
+	rtb.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+
+	blendDesc.RenderTarget[0] = rtb;
 
 	D3D12_RASTERIZER_DESC rasterizerDesc{};
-	rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
+	rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
 	rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
 
 	vertexShaderBlob_ = CompileShader(L"Object3d.VS.hlsl",
@@ -396,6 +409,58 @@ void DXCom::SettingVertex()
 	vertexDate2_[1] = { { 0.0f,0.0f,0.0f,1.0f }, { 0.5f,0.0f }, { 0.0f,0.0f,-1.0f } };
 	vertexDate2_[2] = { { 0.5f,-0.5f,-0.5f,1.0f }, { 1.0f,1.0f }, { 0.0f,0.0f,-1.0f } };
 
+	std::random_device seed;
+	std::mt19937 random(seed());
+	std::uniform_real_distribution<> number(-3.5, 3.5);
+	std::uniform_real_distribution<> velXZNumber(-0.05f, 0.05f);
+	std::uniform_real_distribution<> velYNumber(0.01f, 0.06f);
+	std::uniform_real_distribution<> rotNumber(-0.1f, 0.1f);
+
+	for (int i = 0; i < particleIndex; i++)
+	{
+		vertexParticleResource_[i] = CreateBufferResource(device_, sizeof(VertexData) * 3);
+
+		vertexParticleBufferView_[i].BufferLocation = vertexParticleResource_[i]->GetGPUVirtualAddress();
+		vertexParticleBufferView_[i].SizeInBytes = sizeof(VertexData) * 3;
+		vertexParticleBufferView_[i].StrideInBytes = sizeof(VertexData);
+
+		vertexParticleDate_[i] = nullptr;
+		vertexParticleResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&vertexParticleDate_[i]));
+
+		vertexParticleDate_[i][0] = { { -0.3f,-0.3f,0.0f,1.0f }, { 0.0f,1.0f }, { 0.0f,0.0f,-1.0f } };
+		vertexParticleDate_[i][1] = { { 0.0f,0.3f,0.0f,1.0f }, { 0.5f,0.0f }, { 0.0f,0.0f,-1.0f } };
+		vertexParticleDate_[i][2] = { { 0.3f,-0.3f,0.0f,1.0f }, { 1.0f,1.0f }, { 0.0f,0.0f,-1.0f } };
+
+
+		wvpParticleResource_[i] = CreateBufferResource(device_, sizeof(TransformationMatrix));
+		wvpParticleDate_[i] = nullptr;
+		wvpParticleResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&wvpParticleDate_[i]));
+		wvpParticleDate_[i]->WVP = MakeIdentity4x4();
+		wvpParticleDate_[i]->World = MakeIdentity4x4();
+
+		materialParticleResource_[i] = CreateBufferResource(device_, sizeof(Material));
+		materialParticleDate_[i] = nullptr;
+		materialParticleResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&materialParticleDate_[i]));
+		materialParticleDate_[i]->color = particleColor;
+		materialParticleDate_[i]->enableLighting = false;
+		materialParticleDate_[i]->uvTransform = MakeIdentity4x4();
+
+		float randomx = float(number(random));
+		float randomz = float(number(random));
+
+		transformParticle[i] = { {0.5f,0.5f,0.5f},{0.0f,0.0f,0.0f},{randomx,-2.5f,randomz} };
+
+		float randomvelx = float(velXZNumber(random));
+		float randomvely = float(velYNumber(random));
+		float randomvelz = float(velXZNumber(random));
+
+		float randomRotx = float(rotNumber(random));
+		float randomRoty = float(rotNumber(random));
+		float randomRotz = float(rotNumber(random));
+
+		particleVel[i] = { randomvelx,randomvely,randomvelz };
+		particleRot[i] = { randomRotx,randomRoty,randomRotz };
+	}
 }
 
 void DXCom::SettingSpriteVertex()
@@ -546,7 +611,7 @@ void DXCom::SettingTexture()
 	//const uint32_t descriptorSizeDSV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
 
-	mipImages_ = LoadTexture("resource/monsterBall.png");
+	mipImages_ = LoadTexture("resource/white2x2.png");
 	const DirectX::TexMetadata& metadata = mipImages_.GetMetadata();
 	textureResource_ = CreateTextureResource(device_, metadata);
 	
@@ -645,7 +710,7 @@ void DXCom::ClearRTV()
 	commandList_->OMSetRenderTargets(1, &rtvHandles_[backBufferIndex], false, &dsvHandle);
 	commandList_->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
-	float clearColor[] = { 0.1f,0.25f,0.5f,1.0f };
+	float clearColor[] = { 0.0f,0.0f,0.0f,1.0f };
 	commandList_->ClearRenderTargetView(rtvHandles_[backBufferIndex], clearColor, 0, nullptr);
 
 
@@ -671,31 +736,68 @@ void DXCom::Command()
 	scissorRect.bottom = MyWin::kWindowHeight;
 
 	////三角形１
-	//commandList_->RSSetViewports(1, &viewport);
-	//commandList_->RSSetScissorRects(1, &scissorRect);
-	//commandList_->SetGraphicsRootSignature(roootSignature_);
-	//commandList_->SetPipelineState(graphicsPipelineState_);
-	//commandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);
-	//commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	//commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
-	//commandList_->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
-	//commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
-	//commandList_->SetGraphicsRootDescriptorTable(2, useMonsterBall ? textureSrvHandleGPU2 : textureSrvHandleGPU);
-	//commandList_->DrawInstanced(3, 1, 0, 0);
+	if (isTriangleDraw_)
+	{
+		commandList_->RSSetViewports(1, &viewport);
+		commandList_->RSSetScissorRects(1, &scissorRect);
+		commandList_->SetGraphicsRootSignature(roootSignature_);
+		commandList_->SetPipelineState(graphicsPipelineState_);
+		commandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);
+		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootDescriptorTable(2, useMonsterBall ? textureSrvHandleGPU2 : textureSrvHandleGPU);
+		commandList_->DrawInstanced(3, 1, 0, 0);
+	}
 
 
 	////三角形２
-	//commandList_->RSSetViewports(1, &viewport);
-	//commandList_->RSSetScissorRects(1, &scissorRect);
-	//commandList_->SetGraphicsRootSignature(roootSignature_);
-	//commandList_->SetPipelineState(graphicsPipelineState_);
-	//commandList_->IASetVertexBuffers(0, 1, &vertexBufferView2_);
-	//commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	//commandList_->SetGraphicsRootConstantBufferView(0, materialResource2_->GetGPUVirtualAddress());
-	//commandList_->SetGraphicsRootConstantBufferView(1, wvpResource2_->GetGPUVirtualAddress());
-	//commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource2_->GetGPUVirtualAddress());
-	//commandList_->SetGraphicsRootDescriptorTable(2, useMonsterBall2 ? textureSrvHandleGPU2 : textureSrvHandleGPU);
-	//commandList_->DrawInstanced(3, 1, 0, 0);
+	/*commandList_->RSSetViewports(1, &viewport);
+	commandList_->RSSetScissorRects(1, &scissorRect);
+	commandList_->SetGraphicsRootSignature(roootSignature_);
+	commandList_->SetPipelineState(graphicsPipelineState_);
+	commandList_->IASetVertexBuffers(0, 1, &vertexBufferView2_);
+	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	commandList_->SetGraphicsRootConstantBufferView(0, materialResource2_->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootConstantBufferView(1, wvpResource2_->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource2_->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootDescriptorTable(2, useMonsterBall2 ? textureSrvHandleGPU2 : textureSrvHandleGPU);
+	commandList_->DrawInstanced(3, 1, 0, 0);*/
+
+	//パーティクル
+	for (int i = 0; i < particleIndex; i++)
+	{
+		if (isParticleLive[i])
+		{
+			commandList_->RSSetViewports(1, &viewport);
+			commandList_->RSSetScissorRects(1, &scissorRect);
+			commandList_->SetGraphicsRootSignature(roootSignature_);
+			commandList_->SetPipelineState(graphicsPipelineState_);
+			commandList_->IASetVertexBuffers(0, 1, &vertexParticleBufferView_[i]);
+			commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			commandList_->SetGraphicsRootConstantBufferView(0, materialParticleResource_[i]->GetGPUVirtualAddress());
+			commandList_->SetGraphicsRootConstantBufferView(1, wvpParticleResource_[i]->GetGPUVirtualAddress());
+			commandList_->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
+			commandList_->DrawInstanced(3, 1, 0, 0);
+		}
+	}
+
+
+
+	//model
+	/*commandList_->RSSetViewports(1, &viewport);
+	commandList_->RSSetScissorRects(1, &scissorRect);
+	commandList_->SetGraphicsRootSignature(roootSignature_);
+	commandList_->SetPipelineState(graphicsPipelineState_);
+	commandList_->IASetVertexBuffers(0, 1, &vertexModelBufferView_);
+	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	commandList_->SetGraphicsRootConstantBufferView(0, materialResourceModel_->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootConstantBufferView(1, wvpResourceModel_->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResourceModel_->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU2);
+	commandList_->DrawInstanced(UINT(modelData_.vertices.size()), 1, 0, 0);*/
+
 
 
 	/*commandList_->IASetIndexBuffer(&indexBufferViewSprite);
@@ -706,22 +808,6 @@ void DXCom::Command()
 	commandList_->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
 	commandList_->DrawIndexedInstanced(6, 1, 0, 0, 0);*/
 	/*commandList_->DrawInstanced(6, 1, 0, 0);*/
-
-
-	//model
-	commandList_->RSSetViewports(1, &viewport);
-	commandList_->RSSetScissorRects(1, &scissorRect);
-	commandList_->SetGraphicsRootSignature(roootSignature_);
-	commandList_->SetPipelineState(graphicsPipelineState_);
-	commandList_->IASetVertexBuffers(0, 1, &vertexModelBufferView_);
-	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	commandList_->SetGraphicsRootConstantBufferView(0, materialResourceModel_->GetGPUVirtualAddress());
-	commandList_->SetGraphicsRootConstantBufferView(1, wvpResourceModel_->GetGPUVirtualAddress());
-	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResourceModel_->GetGPUVirtualAddress());
-	commandList_->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU2);
-	commandList_->DrawInstanced(UINT(modelData_.vertices.size()), 1, 0, 0);
-
-
 }
 
 void DXCom::LastFrame()
@@ -780,19 +866,21 @@ void DXCom::SetSpriteWVPData(const Matrix4x4& world, const Matrix4x4& wvp)
 
 void DXCom::UpDate()
 {
+	/*Tick();*/
 
 	ImGui::Begin("debug");
 	if (ImGui::TreeNode("Triangle1"))
 	{
+		ImGui::Checkbox("drawTriangle", &isTriangleDraw_);
 		ImGui::ColorEdit3("color", &materialDate_->color.X);
-		ImGui::DragFloat3("trans", &transform.translate.x, 0.01f, -2.0f, 2.0f);
+		ImGui::DragFloat3("trans", &transform.translate.x, 0.01f, -2.0f, 5.0f);
 		ImGui::DragFloat3("rotate", &transform.rotate.x, 0.01f, -4.0f, 4.0f);
 		ImGui::DragFloat3("scale", &transform.scale.x, 0.01f, 0.0f, 6.0f);
-		ImGui::Checkbox("useMonsterBall", &useMonsterBall);
+		ImGui::Checkbox("whiteTexture or uvChecker", &useMonsterBall);
 		ImGui::TreePop();
 	}
 	
-	if (ImGui::TreeNode("Triangle2"))
+	/*if (ImGui::TreeNode("Triangle2"))
 	{
 		ImGui::ColorEdit3("color2", &materialDate2_->color.X);
 		ImGui::DragFloat3("trans2", &transform2.translate.x, 0.01f, -2.0f, 2.0f);
@@ -800,9 +888,9 @@ void DXCom::UpDate()
 		ImGui::DragFloat3("scale2", &transform2.scale.x, 0.01f, 0.0f, 6.0f);
 		ImGui::Checkbox("useMonsterBall2", &useMonsterBall2);
 		ImGui::TreePop();
-	}
+	}*/
 	
-	if (ImGui::TreeNode("Sprite"))
+	/*if (ImGui::TreeNode("Sprite"))
 	{
 		ImGui::DragFloat3("Sprite trans", &transSprite.translate.x, 1.0f, -1280.0f, 1280.0f);
 		ImGui::DragFloat3("Sprite rotate", &transSprite.rotate.x, 0.01f, -4.0f, 4.0f);
@@ -811,20 +899,26 @@ void DXCom::UpDate()
 		ImGui::DragFloat("uvrotate", &uvTransSprite.rotate.z, 0.01f, -4.0f, 4.0f);
 		ImGui::DragFloat2("uvsclae", &uvTransSprite.scale.x, 0.01f, 0.0f, 6.0f);
 		ImGui::TreePop();
-	}
+	}*/
 
-	if (ImGui::TreeNode("PlaneModel"))
+	/*if (ImGui::TreeNode("PlaneModel"))
 	{
 		ImGui::ColorEdit3("Modelcolor", &materialDateModel_->color.X);
 		ImGui::DragFloat3("Modeltrans", &transformModel.translate.x, 0.01f, -2.0f, 2.0f);
 		ImGui::DragFloat3("Modelrotate", &transformModel.rotate.x, 0.01f, -4.0f, 4.0f);
 		ImGui::DragFloat3("Modelscale", &transformModel.scale.x, 0.01f, 0.0f, 6.0f);
 		ImGui::TreePop();
-	}
+	}*/
 	
-	ImGui::Text("light");
+	if (ImGui::TreeNode("Particle"))
+	{
+		ImGui::ColorEdit3("Particlecolor", &particleColor.X);
+		ImGui::TreePop();
+	}
+
+	/*ImGui::Text("light");
 	ImGui::SliderFloat3("light color", &directionalLightData_->color.X, 0.0f, 1.0f);
-	ImGui::SliderFloat3("light direction", &directionalLightData_->direction.x, -1.0f, 1.0f);
+	ImGui::SliderFloat3("light direction", &directionalLightData_->direction.x, -1.0f, 1.0f);*/
 	ImGui::End();
 
 
@@ -832,13 +926,12 @@ void DXCom::UpDate()
 	Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTrans.scale, cameraTrans.rotate, cameraTrans.translate);
 	Matrix4x4 viewMatrix = Inverse(cameraMatrix);
 	Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(Fuji::GetkWindowWidth()) / float(Fuji::GetkWindowHeight()), 0.1f, 100.0f);
-	Matrix4x4 worldViewProjectionMatrix = Multiply(viewMatrix, projectionMatrix);
-	worldViewProjectionMatrix = Multiply(worldMatrix, worldViewProjectionMatrix);
+	Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
 
 	wvpDate_->World = worldMatrix;
 	wvpDate_->WVP = worldViewProjectionMatrix;
 
-	Matrix4x4 worldMatrix2 = MakeAffineMatrix(transform2.scale, transform2.rotate, transform2.translate);
+	/*Matrix4x4 worldMatrix2 = MakeAffineMatrix(transform2.scale, transform2.rotate, transform2.translate);
 	Matrix4x4 worldViewProjectionMatrix2 = Multiply(viewMatrix, projectionMatrix);
 	worldViewProjectionMatrix2 = Multiply(worldMatrix2, worldViewProjectionMatrix2);
 
@@ -866,8 +959,76 @@ void DXCom::UpDate()
 	worldViewProjectionMatrixModel = Multiply(worldMatrixModel, worldViewProjectionMatrixModel);
 
 	wvpDateModel_->World = worldMatrixModel;
-	wvpDateModel_->WVP = worldViewProjectionMatrixModel;
+	wvpDateModel_->WVP = worldViewProjectionMatrixModel;*/
 
+	std::mt19937 random(repopSeed());
+	std::uniform_real_distribution<> number(-3.5, 3.5);
+	/*std::uniform_real_distribution<> velXZNumber(-0.05f, 0.05f);
+	std::uniform_real_distribution<> velYNumber(0.008f, 0.06f);
+	std::uniform_real_distribution<> rotNumber(-0.1f, 0.1f);*/
+	std::uniform_real_distribution<> alphaRandom(0.4f, 1.0f);
+
+	for (int i = 0; i < particleIndex; i++)
+	{
+		if (isParticleLive[i])
+		{
+			transformParticle[i].translate = transformParticle[i].translate + particleVel[i];
+			transformParticle[i].rotate = transformParticle[i].rotate + particleRot[i];
+			materialParticleDate_[i]->color.W -= 0.01f;
+			if (materialParticleDate_[i]->color.W <= 0.0f)
+			{
+				materialParticleDate_[i]->color.W = 0.0f;
+				isParticleLive[i] = false;
+			}
+
+			Matrix4x4 worldMatrixParticle = MakeAffineMatrix(transformParticle[i].scale, transformParticle[i].rotate, transformParticle[i].translate);
+			Matrix4x4 worldViewProjectionMatrixParticle = Multiply(worldMatrixParticle, Multiply(viewMatrix, projectionMatrix));
+			wvpParticleDate_[i]->World = worldMatrixParticle;
+			wvpParticleDate_[i]->WVP = worldViewProjectionMatrixParticle;
+		}
+		else
+		{
+
+			float randomx = float(number(random));
+			float randomz = float(number(random));
+
+			transformParticle[i] = { {0.5f,0.5f,0.5f},{0.0f,0.0f,0.0f},{randomx,-2.6f,randomz} };
+
+			//float randomvelx = float(velXZNumber(random));
+			//float randomvely = float(velYNumber(random));
+			//float randomvelz = float(velXZNumber(random));
+
+			//float randomRotx = float(rotNumber(random));
+			//float randomRoty = float(rotNumber(random));
+			//float randomRotz = float(rotNumber(random));
+
+			//particleVel[i] = { randomvelx,randomvely,randomvelz };
+			//particleRot[i] = { randomRotx,randomRoty,randomRotz };
+
+			materialParticleDate_[i]->color = particleColor;
+			float alphacolor = float(alphaRandom(random));
+			materialParticleDate_[i]->color.W = alphacolor;
+
+			colorRandomAdd += 0.002f;
+			if (colorRandomAdd>0.235f)
+			{
+				colorRandomAdd = 0;
+			}
+			materialParticleDate_[i]->color.Y += colorRandomAdd;
+
+			Matrix4x4 worldMatrixParticle = MakeAffineMatrix(transformParticle[i].scale, transformParticle[i].rotate, transformParticle[i].translate);
+			Matrix4x4 worldViewProjectionMatrixParticle = Multiply(worldMatrixParticle, Multiply(viewMatrix, projectionMatrix));
+			wvpParticleDate_[i]->World = worldMatrixParticle;
+			wvpParticleDate_[i]->WVP = worldViewProjectionMatrixParticle;
+			isParticleLive[i] = true;
+
+
+		}
+	}
+	
+	/*ImGui::Begin("Frame");
+	ImGui::Text("%d", frameRate);
+	ImGui::End();*/
 
 }
 
@@ -882,6 +1043,13 @@ void DXCom::ReleaseData()
 	materialResourceModel_->Release();
 	wvpResourceModel_->Release();
 	vertexModelResource_->Release();
+
+	for (int i = 0; i < particleIndex; i++)
+	{
+		vertexParticleResource_[i]->Release();
+		wvpParticleResource_[i]->Release();
+		materialParticleResource_[i]->Release();
+	}
 
 	indexResoureceSprite->Release();
 	fence_->Release();
@@ -1291,3 +1459,19 @@ MaterialData DXCom::LoadMaterialTemplateFile(const std::string& directoryPath, c
 
 	return materialData;
 }
+
+//void DXCom::Tick()
+//{
+//	auto currentTime = std::chrono::high_resolution_clock::now();
+//	deltaTime = std::chrono::duration<float>(currentTime - lastTime).count();
+//	lastTime = currentTime;
+//
+//	elapsedTime += deltaTime;
+//	frameCount++;
+//
+//	if (elapsedTime >= 1.0f) {
+//		frameRate = frameCount;
+//		frameCount = 0;
+//		elapsedTime = 0;
+//	}
+//}

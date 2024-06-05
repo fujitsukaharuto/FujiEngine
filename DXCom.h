@@ -8,6 +8,9 @@
 #include <dxgidebug.h>
 #include <vector>
 #include <cassert>
+#include <chrono>
+#include <random>
+
 #include "externals/imgui/imgui.h"
 #include "externals/imgui/imgui_impl_dx12.h"
 #include "externals/imgui/imgui_impl_win32.h"
@@ -18,8 +21,7 @@
 #include "MatrixCalculation.h"
 
 
-
-
+const int particleIndex = 650;
 
 class DXCom
 {
@@ -102,6 +104,8 @@ public:
 	ModelData LoadObjFile(const std::string& directoryPath, const std::string& filename);
 	MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename);
 
+	/*void Tick();*/
+
 private:
 
 	DXCom() = default;
@@ -150,6 +154,7 @@ private:
 	ID3D12Resource* directionalLightResource_ = nullptr;
 	DirectionalLight* directionalLightData_ = nullptr;
 	bool useMonsterBall = true;
+	bool isTriangleDraw_ = false;
 
 	//三角形2
 	ID3D12Resource* vertexResource2_ = nullptr;
@@ -163,6 +168,17 @@ private:
 	ID3D12Resource* directionalLightResource2_ = nullptr;
 	DirectionalLight* directionalLightData2_ = nullptr;
 	bool useMonsterBall2 = true;
+
+	//パーティクル用三角
+	ID3D12Resource* vertexParticleResource_[particleIndex]{};
+	D3D12_VERTEX_BUFFER_VIEW vertexParticleBufferView_[particleIndex]{};
+	VertexData* vertexParticleDate_[particleIndex]{};
+	ID3D12Resource* wvpParticleResource_[particleIndex] = { nullptr };
+	
+	TransformationMatrix* wvpParticleDate_[particleIndex] = { nullptr };
+	ID3D12Resource* materialParticleResource_[particleIndex] = { nullptr };
+	Material* materialParticleDate_[particleIndex] = { nullptr };
+
 
 	//modelData
 	ModelData modelData_;
@@ -203,6 +219,15 @@ private:
 	};
 	Trans transformModel{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 
+
+	Trans transformParticle[particleIndex]{};
+	Vector3 particleVel[particleIndex]{};
+	Vector3 particleRot[particleIndex]{};
+	bool isParticleLive[particleIndex]{ false };
+	Vector4 particleColor = { 1.0f,0.0f,0.0f,1.0f };
+	float colorRandomAdd = 0;
+	std::random_device repopSeed;
+
 	DirectX::ScratchImage mipImages_;
 	DirectX::ScratchImage mipImages2_;
 
@@ -218,6 +243,11 @@ private:
 	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU2;
 	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU2;
 
+	/*std::chrono::high_resolution_clock::time_point lastTime;
+	float deltaTime;
+	float elapsedTime;
+	int frameCount;
+	int frameRate;*/
 
 #ifdef _DEBUG
 	ID3D12Debug1* debugController_ = nullptr;
