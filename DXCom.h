@@ -36,6 +36,19 @@ struct D3DResourceLeakChecker
 	}
 };
 
+
+struct Particle
+{
+	Particle(float x_, float y_) :pos(x_, y_, 0), vel(0, 0, 0), force(0, 0, 0), density(0), pressure(0) {}
+
+	Vector3 pos;
+	Vector3 vel;
+	Vector3 force;
+	float density;//密度
+	float pressure;//圧力
+};
+
+
 class DXCom
 {
 public:
@@ -182,56 +195,94 @@ private:
 	bool useMonsterBall = true;
 	bool isTriangleDraw_ = true;
 
-	//三角形2
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource2_ = nullptr;
-	D3D12_VERTEX_BUFFER_VIEW vertexBufferView2_{};
-	VertexData* vertexDate2_ = nullptr;
+	////三角形2
+	//Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource2_ = nullptr;
+	//D3D12_VERTEX_BUFFER_VIEW vertexBufferView2_{};
+	//VertexData* vertexDate2_ = nullptr;
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource2_ = nullptr;
-	TransformationMatrix* wvpDate2_ = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource2_ = nullptr;
-	Material* materialDate2_ = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource2_ = nullptr;
-	DirectionalLight* directionalLightData2_ = nullptr;
-	bool useMonsterBall2 = true;
+	//Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource2_ = nullptr;
+	//TransformationMatrix* wvpDate2_ = nullptr;
+	//Microsoft::WRL::ComPtr<ID3D12Resource> materialResource2_ = nullptr;
+	//Material* materialDate2_ = nullptr;
+	//Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource2_ = nullptr;
+	//DirectionalLight* directionalLightData2_ = nullptr;
+	//bool useMonsterBall2 = true;
 
-	//パーティクル用三角
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertexParticleResource_[particleIndex]{};
-	D3D12_VERTEX_BUFFER_VIEW vertexParticleBufferView_[particleIndex]{};
-	VertexData* vertexParticleDate_[particleIndex]{};
-	Microsoft::WRL::ComPtr<ID3D12Resource> wvpParticleResource_[particleIndex] = { nullptr };
-	
-	TransformationMatrix* wvpParticleDate_[particleIndex] = { nullptr };
-	Microsoft::WRL::ComPtr<ID3D12Resource> materialParticleResource_[particleIndex] = { nullptr };
-	Material* materialParticleDate_[particleIndex] = { nullptr };
-
-
-	//modelData
-	ModelData modelData_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertexModelResource_ = nullptr;
-	D3D12_VERTEX_BUFFER_VIEW vertexModelBufferView_{};
-	VertexData* vertexDataModel_ = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12Resource> wvpResourceModel_ = nullptr;
-	TransformationMatrix* wvpDateModel_ = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12Resource> materialResourceModel_ = nullptr;
-	Material* materialDateModel_ = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResourceModel_ = nullptr;
-	DirectionalLight* directionalLightDataModel_ = nullptr;
+	////パーティクル用三角
+	//Microsoft::WRL::ComPtr<ID3D12Resource> vertexParticleResource_[particleIndex]{};
+	//D3D12_VERTEX_BUFFER_VIEW vertexParticleBufferView_[particleIndex]{};
+	//VertexData* vertexParticleDate_[particleIndex]{};
+	//Microsoft::WRL::ComPtr<ID3D12Resource> wvpParticleResource_[particleIndex] = { nullptr };
+	//
+	//TransformationMatrix* wvpParticleDate_[particleIndex] = { nullptr };
+	//Microsoft::WRL::ComPtr<ID3D12Resource> materialParticleResource_[particleIndex] = { nullptr };
+	//Material* materialParticleDate_[particleIndex] = { nullptr };
 
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourceSprite_ = nullptr;
-	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite_{};
-	VertexData* vertexDataSprite_ = nullptr;
+	////modelData
+	//ModelData modelData_;
+	//Microsoft::WRL::ComPtr<ID3D12Resource> vertexModelResource_ = nullptr;
+	//D3D12_VERTEX_BUFFER_VIEW vertexModelBufferView_{};
+	//VertexData* vertexDataModel_ = nullptr;
+	//Microsoft::WRL::ComPtr<ID3D12Resource> wvpResourceModel_ = nullptr;
+	//TransformationMatrix* wvpDateModel_ = nullptr;
+	//Microsoft::WRL::ComPtr<ID3D12Resource> materialResourceModel_ = nullptr;
+	//Material* materialDateModel_ = nullptr;
+	//Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResourceModel_ = nullptr;
+	//DirectionalLight* directionalLightDataModel_ = nullptr;
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> indexResoureceSprite = nullptr;
-	D3D12_INDEX_BUFFER_VIEW indexBufferViewSprite{};
-	uint32_t* indexDataSprite = nullptr;
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatResourceSprite_ = nullptr;
-	TransformationMatrix* transformationMatDataSprite_ = nullptr;
+	//Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourceSprite_ = nullptr;
+	//D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite_{};
+	//VertexData* vertexDataSprite_ = nullptr;
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> materialResourceSprite_ = nullptr;
-	Material* materialDateSprite_ = nullptr;
+	//Microsoft::WRL::ComPtr<ID3D12Resource> indexResoureceSprite = nullptr;
+	//D3D12_INDEX_BUFFER_VIEW indexBufferViewSprite{};
+	//uint32_t* indexDataSprite = nullptr;
+
+	//Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatResourceSprite_ = nullptr;
+	//TransformationMatrix* transformationMatDataSprite_ = nullptr;
+
+	//Microsoft::WRL::ComPtr<ID3D12Resource> materialResourceSprite_ = nullptr;
+	//Material* materialDateSprite_ = nullptr;
+
+	//パーティクルflow
+	Microsoft::WRL::ComPtr<ID3D12Resource> vertexFlowResource_[particleIndex]{};
+	VertexData* vertexFlowDate_[particleIndex]{};
+	Microsoft::WRL::ComPtr<ID3D12Resource> wvpFlowResource_[particleIndex] = { nullptr };
+	TransformationMatrix* wvpFlowDate_[particleIndex] = { nullptr };
+	D3D12_VERTEX_BUFFER_VIEW vertexFlowBufferView_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> materialFlowResource_;
+	Material* materialFlowDate_;
+
+	std::vector<Particle> particles;
+
+	Vector3 G_ = { 0.0f,9.8f,0.0f };
+	float mpi_ = 3.14159274f;
+
+	float restDens = 300.0f;//静止状態の密度
+	float gasConst = 2000.0f;
+	float h_ = 16.0f;
+	float halfH_ = h_ * 0.5f;
+	float h2_ = h_ * h_;
+	float mass_ = 2.5f;//質量
+	float visc = 150.0f;//粘度
+	float poly6 = 4.0f / (mpi_ * powf(h_, 8));
+	float spikyGrad = -30.0f / (mpi_ * powf(h_, 5));
+	float viscLap = 20.0f / (3 * mpi_ * powf(h_, 5));
+
+	float restDens2 = 300.0f;//静止状態の密度
+	float mass2_ = 2.0f;//質量
+	float visc2 = 150.0f;//粘度
+
+	float dt = 0.0007f;
+
+	int texture_;
+
+	float eps = h_;
+	float boundDamping = -0.3f;
+
+
 
 
 	Trans transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
