@@ -164,6 +164,13 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap_ = nullptr;
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc_{};
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles_[2];
+
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> OffscreenrtvDescriptorHeap_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> offscreenrt_;
+	D3D12_RENDER_TARGET_VIEW_DESC offscreenrtvDesc_{};
+	D3D12_CPU_DESCRIPTOR_HANDLE offscreenrtvHandles_;
+
+
 	Microsoft::WRL::ComPtr<ID3D12Resource> swapChainResources_[2] = { nullptr };
 	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap_ = nullptr;
@@ -180,6 +187,23 @@ private:
 	IDxcBlob* vertexShaderBlob_ = nullptr;
 	IDxcBlob* pixelShaderBlob_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState_ = nullptr;
+
+
+	ID3DBlob* signatureGrayBlob_ = nullptr;
+	ID3DBlob* errorGrayBlob_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignatureGrayscale_ = nullptr;
+	IDxcBlob* vertexShaderGrayBlob_ = nullptr;
+	IDxcBlob* pixelShaderGrayBlob_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineStateGary_ = nullptr;
+	bool isGrayscale_ = true;
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> vertexGrayResource_ = nullptr;
+	D3D12_VERTEX_BUFFER_VIEW vertexGrayBufferView_{};
+	GrayscaleVertex* grayVertexDate_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> indexGrayResourece_ = nullptr;
+	D3D12_INDEX_BUFFER_VIEW indexGrayBufferView_{};
+	uint32_t* indexGrayData_ = nullptr;
+
 
 	//三角形１
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_ = nullptr;
@@ -257,12 +281,12 @@ private:
 
 	std::vector<Particle> particles;
 
-	Vector3 G_ = { 0.0f,9.8f,0.0f };
+	Vector2 G_ = { 0.0f,9.8f };
 	float mpi_ = 3.14159274f;
 
 	float restDens = 300.0f;//静止状態の密度
 	float gasConst = 2000.0f;
-	float h_ = 16.0f;
+	float h_ = 8.0f;
 	float halfH_ = h_ * 0.5f;
 	float h2_ = h_ * h_;
 	float mass_ = 2.5f;//質量

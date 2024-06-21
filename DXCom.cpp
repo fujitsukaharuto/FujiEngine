@@ -188,6 +188,13 @@ void DXCom::CreateRenderTargets()
 	device_->CreateRenderTargetView(swapChainResources_[0].Get(), &rtvDesc_, rtvHandles_[0]);
 	rtvHandles_[1].ptr = rtvHandles_[0].ptr + device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	device_->CreateRenderTargetView(swapChainResources_[1].Get(), &rtvDesc_, rtvHandles_[1]);
+
+
+
+
+
+
+
 }
 
 void DXCom::CreateDepthBuffer()
@@ -298,6 +305,55 @@ void DXCom::SettingRootSignature()
 	hr = device_->CreateRootSignature(0, signatureBlob_->GetBufferPointer(),
 		signatureBlob_->GetBufferSize(), IID_PPV_ARGS(&rootSignature_));
 	assert(SUCCEEDED(hr));
+
+	if (isGrayscale_)
+	{
+		D3D12_ROOT_SIGNATURE_DESC rootSignatureGrayDesc;
+		rootSignatureGrayDesc.Flags =
+			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+
+		CD3DX12_DESCRIPTOR_RANGE rangeGray[1] = {};
+		rangeGray[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
+
+		D3D12_ROOT_PARAMETER rootParametersGray[1] = {};
+		rootParametersGray[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+		rootParametersGray[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+		rootParametersGray[0].DescriptorTable.pDescriptorRanges = rangeGray;
+		rootParametersGray[0].DescriptorTable.NumDescriptorRanges = _countof(rangeGray);
+	
+		D3D12_STATIC_SAMPLER_DESC samplersGray[1] = {};
+		samplersGray[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+		samplersGray[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+		samplersGray[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+		samplersGray[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+		samplersGray[0].MipLODBias = 0;
+		samplersGray[0].ComparisonFunc = D3D12_COMPARISON_FUNC_ALWAYS;
+		samplersGray[0].MaxLOD = D3D12_FLOAT32_MAX;
+		samplersGray[0].ShaderRegister = 0;
+		samplersGray[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+
+		rootSignatureGrayDesc.pParameters = rootParametersGray;
+		rootSignatureGrayDesc.NumParameters = _countof(rootParametersGray);
+		rootSignatureGrayDesc.pStaticSamplers = samplersGray;
+		rootSignatureGrayDesc.NumStaticSamplers = _countof(samplersGray);
+
+		signatureGrayBlob_ = nullptr;
+		errorGrayBlob_ = nullptr;
+		hr = D3D12SerializeRootSignature(&rootSignatureGrayDesc,
+			D3D_ROOT_SIGNATURE_VERSION_1, &signatureGrayBlob_, &errorGrayBlob_);
+
+		if (FAILED(hr))
+		{
+			Log(reinterpret_cast<char*>(errorGrayBlob_->GetBufferPointer()));
+			assert(false);
+		}
+
+		hr = device_->CreateRootSignature(0, signatureGrayBlob_->GetBufferPointer(),
+			signatureGrayBlob_->GetBufferSize(), IID_PPV_ARGS(&rootSignatureGrayscale_));
+
+		assert(SUCCEEDED(hr));
+	}
+
 }
 
 void DXCom::SettingGraphicPipeline()
@@ -388,6 +444,90 @@ void DXCom::SettingGraphicPipeline()
 	HRESULT hr = device_->CreateGraphicsPipelineState(&graphicPipelineStateDesc,
 		IID_PPV_ARGS(&graphicsPipelineState_));
 	assert(SUCCEEDED(hr));
+
+
+	if (isGrayscale_)
+	{
+		D3D12_INPUT_ELEMENT_DESC inputLayoutGray[2] = {};
+		inputLayoutGray[0].SemanticName = "POSITION";
+		inputLayoutGray[0].SemanticIndex = 0;
+		inputLayoutGray[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+		inputLayoutGray[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+		
+		inputLayoutGray[1].SemanticName = "TEXCOORD";
+		inputLayoutGray[1].SemanticIndex = 0;
+		inputLayoutGray[1].Format = DXGI_FORMAT_R32G32_FLOAT;
+		inputLayoutGray[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+		D3D12_INPUT_LAYOUT_DESC inputLayoutGrayDesc{};
+		inputLayoutGrayDesc.pInputElementDescs = inputLayoutGray;
+		inputLayoutGrayDesc.NumElements = _countof(inputLayoutGray);
+
+		vertexShaderGrayBlob_ = CompileShader(L"SimpleGrayscale.VS.hlsl",
+			L"vs_6_0", dxcUtils_, dxcCompiler_, includeHandler_);
+		assert(vertexShaderGrayBlob_ != nullptr);
+
+		pixelShaderGrayBlob_ = CompileShader(L"SimpleGrayscale.PS.hlsl",
+			L"ps_6_0", dxcUtils_, dxcCompiler_, includeHandler_);
+		assert(pixelShaderGrayBlob_ != nullptr);
+
+
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC psoGrayDesc = {};
+		psoGrayDesc.InputLayout = inputLayoutGrayDesc;
+		psoGrayDesc.pRootSignature = rootSignatureGrayscale_.Get();
+		psoGrayDesc.VS = { vertexShaderGrayBlob_->GetBufferPointer(),
+		vertexShaderGrayBlob_->GetBufferSize() };
+		psoGrayDesc.PS = { pixelShaderGrayBlob_->GetBufferPointer(),
+		pixelShaderGrayBlob_->GetBufferSize() };
+		psoGrayDesc.DepthStencilState.DepthEnable = FALSE;
+		psoGrayDesc.DepthStencilState.StencilEnable = FALSE;
+		psoGrayDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+		psoGrayDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+		psoGrayDesc.SampleMask = UINT_MAX;
+		psoGrayDesc.PrimitiveTopologyType =
+			D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+		psoGrayDesc.NumRenderTargets = 1;
+		psoGrayDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+		psoGrayDesc.SampleDesc.Count = 1;
+
+		graphicsPipelineStateGary_ = nullptr;
+		hr = device_->CreateGraphicsPipelineState(&psoGrayDesc,
+			IID_PPV_ARGS(&graphicsPipelineStateGary_));
+		assert(SUCCEEDED(hr));
+
+
+
+		vertexGrayResource_ = CreateBufferResource(device_.Get(), sizeof(GrayscaleVertex) * 6);
+
+		vertexGrayBufferView_.BufferLocation = vertexGrayResource_->GetGPUVirtualAddress();
+		vertexGrayBufferView_.SizeInBytes = sizeof(GrayscaleVertex) * 6;
+		vertexGrayBufferView_.StrideInBytes = sizeof(GrayscaleVertex);
+
+		grayVertexDate_ = nullptr;
+		vertexGrayResource_->Map(0, nullptr, reinterpret_cast<void**>(&grayVertexDate_));
+
+		grayVertexDate_[0] = { Vector4(-1.0f,-1.0f,0.0f,1.0f),Vector2(0.0f,1.0f) };
+		grayVertexDate_[1] = { Vector4(-1.0f,1.0f,0.0f,1.0f),Vector2(0.0f,0.0f) };
+		grayVertexDate_[2] = { Vector4(1.0f,1.0f,0.0f,1.0f),Vector2(1.0f,0.0f) };
+		grayVertexDate_[3] = { Vector4(1.0f,-1.0f,0.0f,1.0f),Vector2(1.0f,1.0f) };
+
+
+		indexGrayResourece_=CreateBufferResource(device_.Get(), sizeof(uint32_t) * 6);
+		
+		indexGrayBufferView_.BufferLocation = indexGrayResourece_->GetGPUVirtualAddress();
+		indexGrayBufferView_.SizeInBytes = sizeof(uint32_t) * 6;
+		indexGrayBufferView_.Format = DXGI_FORMAT_R32_UINT;
+
+		indexGrayResourece_->Map(0, nullptr, reinterpret_cast<void**>(&indexGrayData_));
+
+		indexGrayData_[0] = 0;
+		indexGrayData_[1] = 1;
+		indexGrayData_[2] = 2;
+		indexGrayData_[3] = 0;
+		indexGrayData_[4] = 2;
+		indexGrayData_[5] = 3;
+
+	}
+
 }
 
 
@@ -562,10 +702,14 @@ void DXCom::SettingVertex()
 		{
 			if (particles.size() > particleIndex)
 			{
-				return;
+				
 			}
-			float jit = static_cast<float>(6 * rand()) / static_cast<float>(RAND_MAX);
-			particles.emplace_back(Particle((j)+jit, i));
+			else
+			{
+				float jit = static_cast<float>(6 * rand()) / static_cast<float>(RAND_MAX);
+				particles.emplace_back(Particle((j)+jit, i));
+			}
+			
 	
 			j += h_;
 		}
@@ -573,7 +717,7 @@ void DXCom::SettingVertex()
 	}
 
 
-	for (int i = 0; i < particles.size(); i++)
+	for (int i = 0; i < particles.size()-1; i++)
 	{
 		vertexFlowResource_[i] = CreateBufferResource(device_, sizeof(VertexData) * 3);
 
@@ -583,7 +727,7 @@ void DXCom::SettingVertex()
 	vertexFlowBufferView_.SizeInBytes = sizeof(VertexData) * 3;
 	vertexFlowBufferView_.StrideInBytes = sizeof(VertexData);
 
-	for (int i = 0; i < particles.size(); i++)
+	for (int i = 0; i < particles.size()-1; i++)
 	{
 		vertexFlowDate_[i] = nullptr;
 		vertexFlowResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&vertexFlowDate_[i]));
@@ -948,7 +1092,7 @@ void DXCom::Command()
 
 
 
-	for (int i = 0; i < particles.size(); i++)
+	for (int i = 0; i < particles.size()-1; i++)
 	{
 		
 		commandList_->IASetVertexBuffers(0, 1, &vertexFlowBufferView_);
@@ -1070,6 +1214,14 @@ void DXCom::UpDate()
 		ImGui::ColorEdit3("Particlecolor", &particleColor.X);
 		ImGui::TreePop();
 	}*/
+	ImGui::DragFloat("mass", &mass_, 0.1f, 0.0f, 100.0f);
+	ImGui::DragFloat("h", &h_, 0.01f, 0.0f, 64.0f);
+	h2_ = h_ * h_;
+	poly6 = 4.0f / (mpi_ * powf(h_, 8));
+	spikyGrad = -10.0f / (mpi_ * powf(h_, 5));
+	viscLap = 40.0f / (mpi_ * powf(h_, 5));
+	eps = h_;
+	halfH_ = h_ * 0.5f;
 
 	ImGui::Text("light");
 	ImGui::SliderFloat3("light color", &directionalLightData_->color.X, 0.0f, 1.0f);
@@ -1087,7 +1239,8 @@ void DXCom::UpDate()
 		{
 
 			Vector3 rij = pj.pos - pi.pos;
-			float r2 = rij * rij;
+			Vector2 rijv2 = { rij.x,rij.y };
+			float r2 = rijv2 * rijv2;
 
 			if (r2 < h2_)
 			{
@@ -1099,8 +1252,8 @@ void DXCom::UpDate()
 	}
 	for (auto& pi : particles)
 	{
-		Vector3 fpress(0, 0, 0);
-		Vector3 fvisc(0, 0, 0);
+		Vector2 fpress(0, 0);
+		Vector2 fvisc(0, 0);
 		
 			for (auto& pj : particles)
 			{
@@ -1109,18 +1262,22 @@ void DXCom::UpDate()
 					continue;
 				}
 				Vector3 rij = pj.pos - pi.pos;
-				float r = rij.Lenght();
+				Vector2 rijv2 = { rij.x,rij.y };
+				float r = rijv2.Lenght();
 
 				if (r < h_)
 				{
 					float c = h_ - r;
 
-					fpress += (rij.Normalize()*(-1.0f)) * mass_ * (pi.pressure + pj.pressure) / (2.0f * pj.density) * spikyGrad * powf(c, 3);
-					fvisc += (pj.vel - pi.vel) * visc * mass_ / pj.density * viscLap * c;
+					fpress += (rijv2.NormaliZe()*(-1.0f)) * mass_ * (pi.pressure + pj.pressure) / (2.0f * pj.density) * spikyGrad * powf(c, 3);
+					Vector2 pjv2Vel = { pj.vel.x,pj.vel.y };
+					Vector2 piv2Vel = { pi.vel.x,pi.vel.y };
+					fvisc += (pjv2Vel - piv2Vel) * visc * mass_ / pj.density * viscLap * c;
 				}
 			}
-			Vector3 fgrav = G_ * mass_ / pi.density;
-			pi.force = fpress + fvisc + fgrav;
+			Vector2 fgrav = G_ * mass_ / pi.density;
+			Vector2 fff = (fpress + fvisc + fgrav);
+			pi.force = { fff.x,fff.y,0.0f };
 	}
 
 	for (auto& p : particles)
@@ -1260,7 +1417,7 @@ void DXCom::UpDate()
 	ImGui::Text("%d", frameRate);
 	ImGui::End();*/
 
-	for (size_t i = 0; i < particles.size(); i++)
+	for (size_t i = 0; i < particles.size()-1; i++)
 	{
 		Matrix4x4 worldMatSprite = MakeAffineMatrix(Vector3(1.0f, 1.0f, 1.0f), Vector3(0.0f, 0.0f, 0.0f), particles[i].pos);
 		Matrix4x4 viewMatSprite = MakeIdentity4x4();
@@ -1289,6 +1446,7 @@ void DXCom::ReleaseData()
 		materialParticleResource_[i]->Release();
 	}*/
 
+	particles.clear();
 	pixelShaderBlob_->Release();
 	vertexShaderBlob_->Release();
 	if (errorBlob_)
@@ -1296,6 +1454,22 @@ void DXCom::ReleaseData()
 		errorBlob_->Release();
 	}
 	signatureBlob_->Release();
+	if (errorGrayBlob_)
+	{
+		errorGrayBlob_->Release();
+	}
+	if (signatureGrayBlob_)
+	{
+		signatureGrayBlob_->Release();
+	}
+	if (vertexShaderGrayBlob_)
+	{
+		vertexShaderGrayBlob_->Release();
+	}
+	if (pixelShaderGrayBlob_)
+	{
+		pixelShaderGrayBlob_->Release();
+	}
 
 #ifdef _DEBUG
 

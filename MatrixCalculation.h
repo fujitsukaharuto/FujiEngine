@@ -54,6 +54,12 @@ struct DirectionalLight
 
 };
 
+struct GrayscaleVertex
+{
+	Vector4 position;
+	Vector2 texcoord;
+};
+
 struct Sphere
 {
 	Vector3 center;
