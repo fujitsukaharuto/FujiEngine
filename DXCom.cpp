@@ -173,7 +173,7 @@ void DXCom::CreateSwapChain()
 
 void DXCom::CreateRenderTargets()
 {
-	rtvDescriptorHeap_ = CreateDescriptorHeap(device_.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
+	rtvDescriptorHeap_ = CreateDescriptorHeap(device_.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 3, false);
 
 	HRESULT hr = swapChain_->GetBuffer(0, IID_PPV_ARGS(&swapChainResources_[0]));
 	assert(SUCCEEDED(hr));
@@ -189,11 +189,20 @@ void DXCom::CreateRenderTargets()
 	rtvHandles_[1].ptr = rtvHandles_[0].ptr + device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	device_->CreateRenderTargetView(swapChainResources_[1].Get(), &rtvDesc_, rtvHandles_[1]);
 
+	rtvHandles_[2].ptr= rtvHandles_[1].ptr + device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	offscreenrtvDesc_.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	offscreenrtvDesc_.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 
-	//device_->CreateRenderTargetView(offscreenrt_.Get(), &offscreenrtvDesc_, rtvHandles_[2]);
+	clearColorValue.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	clearColorValue.Color[0] = 0.0f;
+	clearColorValue.Color[1] = 0.0f;
+	clearColorValue.Color[2] = 0.0f;
+	clearColorValue.Color[3] = 1.0f;
 
+	device_->CreateRenderTargetView(offscreenrt_.Get(), &offscreenrtvDesc_, rtvHandles_[2]);
 
-
+	offscreenrt_ = CreateOffscreenTextureResource(
+		device_.Get(), MyWin::kWindowWidth, MyWin::kWindowHeight, clearColorValue);
 
 }
 
@@ -970,7 +979,7 @@ void DXCom::FirstFrame()
 void DXCom::SetBarrier()
 {
 
-	UINT backBufferIndex = swapChain_->GetCurrentBackBufferIndex();
+	/*UINT backBufferIndex = swapChain_->GetCurrentBackBufferIndex();
 
 	D3D12_RESOURCE_BARRIER barrier{};
 	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
@@ -978,20 +987,36 @@ void DXCom::SetBarrier()
 	barrier.Transition.pResource = swapChainResources_[backBufferIndex].Get();
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	commandList_->ResourceBarrier(1, &barrier);
+	commandList_->ResourceBarrier(1, &barrier);*/
+
+
+
+	D3D12_RESOURCE_BARRIER offbarrier{};
+	offbarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	offbarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	offbarrier.Transition.pResource = offscreenrt_.Get();
+	offbarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+	offbarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	commandList_->ResourceBarrier(1, &offbarrier);
+
+
 }
 
 void DXCom::ClearRTV()
 {
 	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
-	UINT backBufferIndex = swapChain_->GetCurrentBackBufferIndex();
+	//UINT backBufferIndex = swapChain_->GetCurrentBackBufferIndex();
 
-	commandList_->OMSetRenderTargets(1, &rtvHandles_[backBufferIndex], false, &dsvHandle);
+	//commandList_->OMSetRenderTargets(1, &rtvHandles_[backBufferIndex], false, &dsvHandle);
+	//commandList_->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+
+	/*float clearColor[] = { 0.1f,0.25f,0.5f,1.0f };
+	commandList_->ClearRenderTargetView(rtvHandles_[backBufferIndex], clearColor, 0, nullptr);*/
+
+	commandList_->OMSetRenderTargets(1, &rtvHandles_[2], false, &dsvHandle);
 	commandList_->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
-	float clearColor[] = { 0.1f,0.25f,0.5f,1.0f };
-	commandList_->ClearRenderTargetView(rtvHandles_[backBufferIndex], clearColor, 0, nullptr);
-
+	commandList_->ClearRenderTargetView(rtvHandles_[2], clearColorValue.Color, 0, nullptr);
 }
 
 void DXCom::Command()
@@ -1110,12 +1135,52 @@ void DXCom::Command()
 
 void DXCom::LastFrame()
 {
+	D3D12_RESOURCE_BARRIER offbarrier{};
+	offbarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	offbarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	offbarrier.Transition.pResource = offscreenrt_.Get();
+	offbarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+	offbarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+	commandList_->ResourceBarrier(1, &offbarrier);
+
 
 	UINT backBufferIndex = swapChain_->GetCurrentBackBufferIndex();
+
 	D3D12_RESOURCE_BARRIER barrier{};
 	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 	barrier.Transition.pResource = swapChainResources_[backBufferIndex].Get();
+	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	commandList_->ResourceBarrier(1, &barrier);
+
+	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
+	commandList_->OMSetRenderTargets(1, &rtvHandles_[backBufferIndex], false, &dsvHandle);
+	commandList_->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+
+	float clearColor[] = { 0.1f,0.25f,0.5f,1.0f };
+	commandList_->ClearRenderTargetView(rtvHandles_[backBufferIndex], clearColor, 0, nullptr);
+
+	D3D12_VIEWPORT viewport{};
+	viewport.Width = MyWin::kWindowWidth;
+	viewport.Height = MyWin::kWindowHeight;
+	viewport.TopLeftX = 0;
+	viewport.TopLeftY = 0;
+	viewport.MinDepth = 0.0f;
+	viewport.MaxDepth = 1.0f;
+
+	D3D12_RECT scissorRect{};
+	scissorRect.left = 0;
+	scissorRect.right = MyWin::kWindowWidth;
+	scissorRect.top = 0;
+	scissorRect.bottom = MyWin::kWindowHeight;
+
+	commandList_->RSSetViewports(1, &viewport);
+	commandList_->RSSetScissorRects(1, &scissorRect);
+	commandList_->SetGraphicsRootSignature(rootSignatureGrayscale_.Get());
+	commandList_->SetPipelineState(graphicsPipelineStateGary_.Get());
+
+	
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
 	commandList_->ResourceBarrier(1, &barrier);
@@ -1631,6 +1696,31 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DXCom::CreateDepthStencilTextureResource(
 	HRESULT hr = device->CreateCommittedResource(&heapProperties,
 		D3D12_HEAP_FLAG_NONE, &resourceDesc,
 		D3D12_RESOURCE_STATE_DEPTH_WRITE, &depthClearValue,
+		IID_PPV_ARGS(&resource));
+	assert(SUCCEEDED(hr));
+
+	return resource;
+}
+
+Microsoft::WRL::ComPtr<ID3D12Resource> DXCom::CreateOffscreenTextureResource(Microsoft::WRL::ComPtr<ID3D12Device> device, int32_t width, int32_t height, D3D12_CLEAR_VALUE color)
+{
+	D3D12_RESOURCE_DESC resourceDesc{};
+	resourceDesc.Width = width;
+	resourceDesc.Height = height;
+	resourceDesc.MipLevels = 1;
+	resourceDesc.DepthOrArraySize = 1;
+	resourceDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	resourceDesc.SampleDesc.Count = 1;
+	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+	resourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+
+	D3D12_HEAP_PROPERTIES heapProperties{};
+	heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> resource = nullptr;
+	HRESULT hr = device->CreateCommittedResource(&heapProperties,
+		D3D12_HEAP_FLAG_NONE, &resourceDesc,
+		D3D12_RESOURCE_STATE_RENDER_TARGET, &color,
 		IID_PPV_ARGS(&resource));
 	assert(SUCCEEDED(hr));
 
