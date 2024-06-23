@@ -190,7 +190,7 @@ void DXCom::CreateRenderTargets()
 	device_->CreateRenderTargetView(swapChainResources_[1].Get(), &rtvDesc_, rtvHandles_[1]);
 
 
-
+	//device_->CreateRenderTargetView(offscreenrt_.Get(), &offscreenrtvDesc_, rtvHandles_[2]);
 
 
 
