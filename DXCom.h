@@ -20,7 +20,7 @@
 #include "MyWindow.h"
 
 
-const int particleIndex = 650;
+const int particleIndex = 450;
 
 struct D3DResourceLeakChecker
 {
@@ -170,6 +170,8 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> offscreenrt_ = nullptr;
 	D3D12_RENDER_TARGET_VIEW_DESC offscreenrtvDesc_{};
 	D3D12_CLEAR_VALUE clearColorValue{};
+	D3D12_GPU_DESCRIPTOR_HANDLE offTextureHandle_;
+	D3D12_CPU_DESCRIPTOR_HANDLE offTextureHandleCPU_;
 
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> swapChainResources_[2] = { nullptr };
@@ -287,7 +289,7 @@ private:
 
 	float restDens = 300.0f;//静止状態の密度
 	float gasConst = 2000.0f;
-	float h_ = 8.0f;
+	float h_ = 16.0f;
 	float halfH_ = h_ * 0.5f;
 	float h2_ = h_ * h_;
 	float mass_ = 2.5f;//質量

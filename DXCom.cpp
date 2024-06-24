@@ -193,16 +193,16 @@ void DXCom::CreateRenderTargets()
 	offscreenrtvDesc_.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 	offscreenrtvDesc_.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 
-	clearColorValue.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	clearColorValue.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 	clearColorValue.Color[0] = 0.0f;
 	clearColorValue.Color[1] = 0.0f;
 	clearColorValue.Color[2] = 0.0f;
 	clearColorValue.Color[3] = 1.0f;
 
-	device_->CreateRenderTargetView(offscreenrt_.Get(), &offscreenrtvDesc_, rtvHandles_[2]);
-
 	offscreenrt_ = CreateOffscreenTextureResource(
 		device_.Get(), MyWin::kWindowWidth, MyWin::kWindowHeight, clearColorValue);
+
+	device_->CreateRenderTargetView(offscreenrt_.Get(), &offscreenrtvDesc_, rtvHandles_[2]);
 
 }
 
@@ -946,6 +946,17 @@ void DXCom::SettingTexture()
 	device_->CreateShaderResourceView(textureResource2_.Get(), &srvDesc2, textureSrvHandleCPU2);*/
 	
 
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDescOff{};
+	srvDescOff.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	srvDescOff.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDescOff.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srvDescOff.Texture2D.MipLevels = 1;
+	offTextureHandleCPU_ = GetCPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, 3);
+	offTextureHandle_ = GetGPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, 3);
+	device_->CreateShaderResourceView(offscreenrt_.Get(), &srvDescOff, offTextureHandleCPU_);
+
+
+
 	HRESULT hr = commandList_->Close();
 	assert(SUCCEEDED(hr));
 
@@ -995,7 +1006,7 @@ void DXCom::SetBarrier()
 	offbarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	offbarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 	offbarrier.Transition.pResource = offscreenrt_.Get();
-	offbarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+	offbarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_GENERIC_READ;
 	offbarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	commandList_->ResourceBarrier(1, &offbarrier);
 
@@ -1139,8 +1150,8 @@ void DXCom::LastFrame()
 	offbarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	offbarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 	offbarrier.Transition.pResource = offscreenrt_.Get();
-	offbarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
-	offbarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+	offbarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	offbarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
 	commandList_->ResourceBarrier(1, &offbarrier);
 
 
@@ -1180,7 +1191,12 @@ void DXCom::LastFrame()
 	commandList_->SetGraphicsRootSignature(rootSignatureGrayscale_.Get());
 	commandList_->SetPipelineState(graphicsPipelineStateGary_.Get());
 
-	
+	commandList_->IASetIndexBuffer(&indexGrayBufferView_);
+	commandList_->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
+	commandList_->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
+	commandList_->DrawIndexedInstanced(6, 1, 0, 0, 0);
+
+
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
 	commandList_->ResourceBarrier(1, &barrier);
@@ -1287,6 +1303,7 @@ void DXCom::UpDate()
 	viscLap = 40.0f / (mpi_ * powf(h_, 5));
 	eps = h_;
 	halfH_ = h_ * 0.5f;
+	ImGui::SliderFloat("dt", &dt, 0.000001f, 0.001f);
 
 	ImGui::Text("light");
 	ImGui::SliderFloat3("light color", &directionalLightData_->color.X, 0.0f, 1.0f);
@@ -1709,10 +1726,13 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DXCom::CreateOffscreenTextureResource(Mic
 	resourceDesc.Height = height;
 	resourceDesc.MipLevels = 1;
 	resourceDesc.DepthOrArraySize = 1;
-	resourceDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	resourceDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 	resourceDesc.SampleDesc.Count = 1;
+	resourceDesc.SampleDesc.Quality = 0;
 	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 	resourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+	//resourceDesc.Flags = D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE;
+	resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
 
 	D3D12_HEAP_PROPERTIES heapProperties{};
 	heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
@@ -1720,7 +1740,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DXCom::CreateOffscreenTextureResource(Mic
 	Microsoft::WRL::ComPtr<ID3D12Resource> resource = nullptr;
 	HRESULT hr = device->CreateCommittedResource(&heapProperties,
 		D3D12_HEAP_FLAG_NONE, &resourceDesc,
-		D3D12_RESOURCE_STATE_RENDER_TARGET, &color,
+		D3D12_RESOURCE_STATE_GENERIC_READ, &color,
 		IID_PPV_ARGS(&resource));
 	assert(SUCCEEDED(hr));
 
