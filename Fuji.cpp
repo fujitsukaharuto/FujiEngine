@@ -55,6 +55,7 @@ void Fuji::EndFrame()
 {
 	imguiManager_->End();
 	dxcom_->Command();
+	dxcom_->PostEffect();
 	imguiManager_->Draw();
 	dxcom_->LastFrame();
 }

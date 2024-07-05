@@ -137,6 +137,8 @@
     <FxCompile Include="Object3d.PS.hlsl" />
     <FxCompile Include="SimpleGrayscale.VS.hlsl" />
     <FxCompile Include="SimpleGrayscale.PS.hlsl" />
+    <FxCompile Include="MetaBall.VS.hlsl" />
+    <FxCompile Include="MetaBall.PS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt">

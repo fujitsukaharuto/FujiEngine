@@ -20,7 +20,7 @@
 #include "MyWindow.h"
 
 
-const int particleIndex = 450;
+const int particleIndex = 400;
 
 struct D3DResourceLeakChecker
 {
@@ -64,6 +64,7 @@ public:
 	void SetBarrier();
 	void ClearRTV();
 	void Command();
+	void PostEffect();
 	void LastFrame();
 
 	void SetWVPData(const Matrix4x4& world, const Matrix4x4& wvp);
@@ -198,7 +199,21 @@ private:
 	IDxcBlob* vertexShaderGrayBlob_ = nullptr;
 	IDxcBlob* pixelShaderGrayBlob_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineStateGary_ = nullptr;
-	bool isGrayscale_ = true;
+	
+
+	ID3DBlob* signatureMetaBlob_ = nullptr;
+	ID3DBlob* errorMetaBlob_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignatureMetaBall_ = nullptr;
+	IDxcBlob* vertexShaderMetaBlob_ = nullptr;
+	IDxcBlob* pixelShaderMetaBlob_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineStateMeta_ = nullptr;
+
+
+
+	bool isGrayscale_ = false;
+	bool isNonePost_ = false;
+	bool isMetaBall_ = true;
+
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexGrayResource_ = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexGrayBufferView_{};
@@ -220,7 +235,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_ = nullptr;
 	DirectionalLight* directionalLightData_ = nullptr;
 	bool useMonsterBall = true;
-	bool isTriangleDraw_ = true;
+	bool isTriangleDraw_ = false;
 
 	////三角形2
 	//Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource2_ = nullptr;
@@ -276,6 +291,9 @@ private:
 	//パーティクルflow
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexFlowResource_[particleIndex]{};
 	VertexData* vertexFlowDate_[particleIndex]{};
+	Microsoft::WRL::ComPtr<ID3D12Resource> indexFlowResource_[particleIndex]{};
+	D3D12_INDEX_BUFFER_VIEW indexFlowBufferView_{};
+	uint32_t* indexFlowData_[particleIndex]{};
 	Microsoft::WRL::ComPtr<ID3D12Resource> wvpFlowResource_[particleIndex] = { nullptr };
 	TransformationMatrix* wvpFlowDate_[particleIndex] = { nullptr };
 	D3D12_VERTEX_BUFFER_VIEW vertexFlowBufferView_;
@@ -283,6 +301,8 @@ private:
 	Material* materialFlowDate_;
 
 	std::vector<Particle> particles;
+	ParticleDate* particleDate_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> particleDateResource_ = nullptr;
 
 	Vector2 G_ = { 0.0f,9.8f };
 	float mpi_ = 3.14159274f;
@@ -328,7 +348,7 @@ private:
 	Vector3 particleVel[particleIndex]{};
 	Vector3 particleRot[particleIndex]{};
 	bool isParticleLive[particleIndex]{ false };
-	Vector4 particleColor = { 1.0f,0.0f,0.0f,1.0f };
+	Vector4 particleColor = { 0.0f,0.0f,1.0f,1.0f };
 	float colorRandomAdd = 0;
 	std::random_device repopSeed;
 

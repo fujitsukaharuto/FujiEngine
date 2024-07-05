@@ -194,9 +194,9 @@ void DXCom::CreateRenderTargets()
 	offscreenrtvDesc_.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 
 	clearColorValue.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-	clearColorValue.Color[0] = 0.0f;
-	clearColorValue.Color[1] = 0.0f;
-	clearColorValue.Color[2] = 0.0f;
+	clearColorValue.Color[0] = 0.1f;
+	clearColorValue.Color[1] = 0.25f;
+	clearColorValue.Color[2] = 0.5f;
 	clearColorValue.Color[3] = 1.0f;
 
 	offscreenrt_ = CreateOffscreenTextureResource(
@@ -329,7 +329,7 @@ void DXCom::SettingRootSignature()
 		rootParametersGray[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 		rootParametersGray[0].DescriptorTable.pDescriptorRanges = rangeGray;
 		rootParametersGray[0].DescriptorTable.NumDescriptorRanges = _countof(rangeGray);
-	
+
 		D3D12_STATIC_SAMPLER_DESC samplersGray[1] = {};
 		samplersGray[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
 		samplersGray[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
@@ -359,6 +359,58 @@ void DXCom::SettingRootSignature()
 
 		hr = device_->CreateRootSignature(0, signatureGrayBlob_->GetBufferPointer(),
 			signatureGrayBlob_->GetBufferSize(), IID_PPV_ARGS(&rootSignatureGrayscale_));
+
+		assert(SUCCEEDED(hr));
+	}
+
+	if (isMetaBall_)
+	{
+		D3D12_ROOT_SIGNATURE_DESC rootSignatureMetaDesc;
+		rootSignatureMetaDesc.Flags =
+			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+
+		CD3DX12_DESCRIPTOR_RANGE rangeMeta[1] = {};
+		rangeMeta[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
+
+		D3D12_ROOT_PARAMETER rootParametersMeta[2] = {};
+		rootParametersMeta[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+		rootParametersMeta[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+		rootParametersMeta[0].DescriptorTable.pDescriptorRanges = rangeMeta;
+		rootParametersMeta[0].DescriptorTable.NumDescriptorRanges = _countof(rangeMeta);
+
+		rootParametersMeta[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+		rootParametersMeta[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+		rootParametersMeta[1].Descriptor.ShaderRegister = 0;
+
+		D3D12_STATIC_SAMPLER_DESC samplersMeta[1] = {};
+		samplersMeta[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+		samplersMeta[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+		samplersMeta[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+		samplersMeta[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+		samplersMeta[0].MipLODBias = 0;
+		samplersMeta[0].ComparisonFunc = D3D12_COMPARISON_FUNC_ALWAYS;
+		samplersMeta[0].MaxLOD = D3D12_FLOAT32_MAX;
+		samplersMeta[0].ShaderRegister = 0;
+		samplersMeta[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+
+		rootSignatureMetaDesc.pParameters = rootParametersMeta;
+		rootSignatureMetaDesc.NumParameters = _countof(rootParametersMeta);
+		rootSignatureMetaDesc.pStaticSamplers = samplersMeta;
+		rootSignatureMetaDesc.NumStaticSamplers = _countof(samplersMeta);
+
+		signatureMetaBlob_ = nullptr;
+		errorMetaBlob_ = nullptr;
+		hr = D3D12SerializeRootSignature(&rootSignatureMetaDesc,
+			D3D_ROOT_SIGNATURE_VERSION_1, &signatureMetaBlob_, &errorMetaBlob_);
+
+		if (FAILED(hr))
+		{
+			Log(reinterpret_cast<char*>(errorMetaBlob_->GetBufferPointer()));
+			assert(false);
+		}
+
+		hr = device_->CreateRootSignature(0, signatureMetaBlob_->GetBufferPointer(),
+			signatureMetaBlob_->GetBufferSize(), IID_PPV_ARGS(&rootSignatureMetaBall_));
 
 		assert(SUCCEEDED(hr));
 	}
@@ -404,7 +456,14 @@ void DXCom::SettingGraphicPipeline()
 	blendDesc.RenderTarget[0] = rtb;*/
 
 	D3D12_BLEND_DESC blendDesc{};
-	blendDesc.RenderTarget->RenderTargetWriteMask= D3D12_COLOR_WRITE_ENABLE_ALL;
+	blendDesc.RenderTarget[0].RenderTargetWriteMask= D3D12_COLOR_WRITE_ENABLE_ALL;
+	blendDesc.RenderTarget[0].BlendEnable = TRUE;
+	blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
+	blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
+	blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
 
 
 	D3D12_RASTERIZER_DESC rasterizerDesc{};
@@ -502,40 +561,88 @@ void DXCom::SettingGraphicPipeline()
 		hr = device_->CreateGraphicsPipelineState(&psoGrayDesc,
 			IID_PPV_ARGS(&graphicsPipelineStateGary_));
 		assert(SUCCEEDED(hr));
-
-
-
-		vertexGrayResource_ = CreateBufferResource(device_.Get(), sizeof(GrayscaleVertex) * 6);
-
-		vertexGrayBufferView_.BufferLocation = vertexGrayResource_->GetGPUVirtualAddress();
-		vertexGrayBufferView_.SizeInBytes = sizeof(GrayscaleVertex) * 6;
-		vertexGrayBufferView_.StrideInBytes = sizeof(GrayscaleVertex);
-
-		grayVertexDate_ = nullptr;
-		vertexGrayResource_->Map(0, nullptr, reinterpret_cast<void**>(&grayVertexDate_));
-
-		grayVertexDate_[0] = { Vector4(-1.0f,-1.0f,0.0f,1.0f),Vector2(0.0f,1.0f) };
-		grayVertexDate_[1] = { Vector4(-1.0f,1.0f,0.0f,1.0f),Vector2(0.0f,0.0f) };
-		grayVertexDate_[2] = { Vector4(1.0f,1.0f,0.0f,1.0f),Vector2(1.0f,0.0f) };
-		grayVertexDate_[3] = { Vector4(1.0f,-1.0f,0.0f,1.0f),Vector2(1.0f,1.0f) };
-
-
-		indexGrayResourece_=CreateBufferResource(device_.Get(), sizeof(uint32_t) * 6);
-		
-		indexGrayBufferView_.BufferLocation = indexGrayResourece_->GetGPUVirtualAddress();
-		indexGrayBufferView_.SizeInBytes = sizeof(uint32_t) * 6;
-		indexGrayBufferView_.Format = DXGI_FORMAT_R32_UINT;
-
-		indexGrayResourece_->Map(0, nullptr, reinterpret_cast<void**>(&indexGrayData_));
-
-		indexGrayData_[0] = 0;
-		indexGrayData_[1] = 1;
-		indexGrayData_[2] = 2;
-		indexGrayData_[3] = 0;
-		indexGrayData_[4] = 2;
-		indexGrayData_[5] = 3;
-
 	}
+
+
+	if (isMetaBall_)
+	{
+		D3D12_INPUT_ELEMENT_DESC inputLayoutMeta[2] = {};
+		inputLayoutMeta[0].SemanticName = "POSITION";
+		inputLayoutMeta[0].SemanticIndex = 0;
+		inputLayoutMeta[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+		inputLayoutMeta[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+
+		inputLayoutMeta[1].SemanticName = "TEXCOORD";
+		inputLayoutMeta[1].SemanticIndex = 0;
+		inputLayoutMeta[1].Format = DXGI_FORMAT_R32G32_FLOAT;
+		inputLayoutMeta[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+		D3D12_INPUT_LAYOUT_DESC inputLayoutMetaDesc{};
+		inputLayoutMetaDesc.pInputElementDescs = inputLayoutMeta;
+		inputLayoutMetaDesc.NumElements = _countof(inputLayoutMeta);
+
+		vertexShaderMetaBlob_ = CompileShader(L"MetaBall.VS.hlsl",
+			L"vs_6_0", dxcUtils_, dxcCompiler_, includeHandler_);
+		assert(vertexShaderMetaBlob_ != nullptr);
+
+		pixelShaderMetaBlob_ = CompileShader(L"MetaBall.PS.hlsl",
+			L"ps_6_0", dxcUtils_, dxcCompiler_, includeHandler_);
+		assert(pixelShaderMetaBlob_ != nullptr);
+
+
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC psoMetaDesc = {};
+		psoMetaDesc.InputLayout = inputLayoutMetaDesc;
+		psoMetaDesc.pRootSignature = rootSignatureMetaBall_.Get();
+		psoMetaDesc.VS = { vertexShaderMetaBlob_->GetBufferPointer(),
+		vertexShaderMetaBlob_->GetBufferSize() };
+		psoMetaDesc.PS = { pixelShaderMetaBlob_->GetBufferPointer(),
+		pixelShaderMetaBlob_->GetBufferSize() };
+		psoMetaDesc.DepthStencilState.DepthEnable = FALSE;
+		psoMetaDesc.DepthStencilState.StencilEnable = FALSE;
+		psoMetaDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+		psoMetaDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+		psoMetaDesc.SampleMask = UINT_MAX;
+		psoMetaDesc.PrimitiveTopologyType =
+			D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+		psoMetaDesc.NumRenderTargets = 1;
+		psoMetaDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+		psoMetaDesc.SampleDesc.Count = 1;
+
+		graphicsPipelineStateMeta_ = nullptr;
+		hr = device_->CreateGraphicsPipelineState(&psoMetaDesc,
+			IID_PPV_ARGS(&graphicsPipelineStateMeta_));
+		assert(SUCCEEDED(hr));
+	}
+
+	vertexGrayResource_ = CreateBufferResource(device_.Get(), sizeof(GrayscaleVertex) * 6);
+
+	vertexGrayBufferView_.BufferLocation = vertexGrayResource_->GetGPUVirtualAddress();
+	vertexGrayBufferView_.SizeInBytes = sizeof(GrayscaleVertex) * 6;
+	vertexGrayBufferView_.StrideInBytes = sizeof(GrayscaleVertex);
+
+	grayVertexDate_ = nullptr;
+	vertexGrayResource_->Map(0, nullptr, reinterpret_cast<void**>(&grayVertexDate_));
+
+	grayVertexDate_[0] = { Vector4(-1.0f,-1.0f,0.0f,1.0f),Vector2(0.0f,1.0f) };
+	grayVertexDate_[1] = { Vector4(-1.0f,1.0f,0.0f,1.0f),Vector2(0.0f,0.0f) };
+	grayVertexDate_[2] = { Vector4(1.0f,1.0f,0.0f,1.0f),Vector2(1.0f,0.0f) };
+	grayVertexDate_[3] = { Vector4(1.0f,-1.0f,0.0f,1.0f),Vector2(1.0f,1.0f) };
+
+
+	indexGrayResourece_ = CreateBufferResource(device_.Get(), sizeof(uint32_t) * 6);
+
+	indexGrayBufferView_.BufferLocation = indexGrayResourece_->GetGPUVirtualAddress();
+	indexGrayBufferView_.SizeInBytes = sizeof(uint32_t) * 6;
+	indexGrayBufferView_.Format = DXGI_FORMAT_R32_UINT;
+
+	indexGrayResourece_->Map(0, nullptr, reinterpret_cast<void**>(&indexGrayData_));
+
+	indexGrayData_[0] = 0;
+	indexGrayData_[1] = 1;
+	indexGrayData_[2] = 2;
+	indexGrayData_[3] = 0;
+	indexGrayData_[4] = 2;
+	indexGrayData_[5] = 3;
+
 
 }
 
@@ -728,22 +835,38 @@ void DXCom::SettingVertex()
 
 	for (int i = 0; i < particles.size()-1; i++)
 	{
-		vertexFlowResource_[i] = CreateBufferResource(device_, sizeof(VertexData) * 3);
-
+		vertexFlowResource_[i] = CreateBufferResource(device_, sizeof(VertexData) * 4);
+		indexFlowResource_[i] = CreateBufferResource(device_, sizeof(uint32_t) * 6);
 	}
 
 	vertexFlowBufferView_.BufferLocation = vertexFlowResource_[0]->GetGPUVirtualAddress();
-	vertexFlowBufferView_.SizeInBytes = sizeof(VertexData) * 3;
+	vertexFlowBufferView_.SizeInBytes = sizeof(VertexData) * 4;
 	vertexFlowBufferView_.StrideInBytes = sizeof(VertexData);
+
+	indexFlowBufferView_.BufferLocation = indexFlowResource_[0]->GetGPUVirtualAddress();
+	indexFlowBufferView_.SizeInBytes = sizeof(uint32_t) * 6;
+	indexFlowBufferView_.Format = DXGI_FORMAT_R32_UINT;
 
 	for (int i = 0; i < particles.size()-1; i++)
 	{
 		vertexFlowDate_[i] = nullptr;
 		vertexFlowResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&vertexFlowDate_[i]));
 
-		vertexFlowDate_[i][0] = { { 0.0f,16.0f,0.0f,1.0f }, { 0.0f,1.0f }, { 0.0f,0.0f,-1.0f } };
-		vertexFlowDate_[i][1] = { { 0.0f,0.0f,0.0f,1.0f }, { 0.5f,0.0f }, { 0.0f,0.0f,-1.0f } };
-		vertexFlowDate_[i][2] = { { 16.0f,0.0f,0.0f,1.0f }, { 1.0f,1.0f }, { 0.0f,0.0f,-1.0f } };
+		vertexFlowDate_[i][0] = { { -6.0f,6.0f,0.0f,1.0f }, { 0.0f,1.0f }, { 0.0f,0.0f,-1.0f } };
+		vertexFlowDate_[i][1] = { { -6.0f,-6.0f,0.0f,1.0f }, { 0.0f,0.0f }, { 0.0f,0.0f,-1.0f } };
+		vertexFlowDate_[i][2] = { { 6.0f,6.0f,0.0f,1.0f }, { 1.0f,1.0f }, { 0.0f,0.0f,-1.0f } };
+		vertexFlowDate_[i][3] = { { 6.0f,-6.0f,0.0f,1.0f }, { 1.0f,0.0f }, { 0.0f,0.0f,-1.0f } };
+
+
+		indexFlowResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&indexFlowData_[i]));
+		indexFlowData_[i][0] = 0;
+		indexFlowData_[i][1] = 1;
+		indexFlowData_[i][2] = 2;
+
+		indexFlowData_[i][3] = 1;
+		indexFlowData_[i][4] = 3;
+		indexFlowData_[i][5] = 2;
+
 
 		wvpFlowResource_[i] = CreateBufferResource(device_, sizeof(TransformationMatrix));
 		wvpFlowDate_[i] = nullptr;
@@ -758,8 +881,18 @@ void DXCom::SettingVertex()
 	materialFlowDate_->enableLighting = false;
 	materialFlowDate_->uvTransform = MakeIdentity4x4();
 
-	
+	particleDateResource_ = CreateBufferResource(device_, sizeof(ParticleDate));
+	particleDate_ = nullptr;
+	particleDateResource_->Map(0, nullptr, reinterpret_cast<void**>(&particleDate_));
+	particleDate_->radius = 6.0f;
+	particleDate_->particleCount = int(particles.size() - 1);
+	particleDate_->threshold = 1.0f;
+	for (int i = 0; i < particleDate_->particleCount; i++)
+	{
+		particleDate_->center[i] = { 0.0f,0.0f,0.0f,0.0f };
+	}
 
+	particleDate_->padding[0] = 0;
 }
 
 void DXCom::SettingSpriteVertex()
@@ -910,7 +1043,7 @@ void DXCom::SettingTexture()
 	//const uint32_t descriptorSizeDSV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
 
-	mipImages_ = LoadTexture("resource/white2x2.png");
+	mipImages_ = LoadTexture("resource/boal16x16.png");
 	const DirectX::TexMetadata& metadata = mipImages_.GetMetadata();
 	textureResource_ = CreateTextureResource(device_.Get(), metadata);
 	
@@ -1046,26 +1179,24 @@ void DXCom::Command()
 	scissorRect.top = 0;
 	scissorRect.bottom = MyWin::kWindowHeight;
 	
+	
 	commandList_->RSSetViewports(1, &viewport);
 	commandList_->RSSetScissorRects(1, &scissorRect);
 	commandList_->SetGraphicsRootSignature(rootSignature_.Get());
 	commandList_->SetPipelineState(graphicsPipelineState_.Get());
 
 	////三角形１
-	/*if (isTriangleDraw_)
-	{
-		commandList_->RSSetViewports(1, &viewport);
-		commandList_->RSSetScissorRects(1, &scissorRect);
-		commandList_->SetGraphicsRootSignature(rootSignature_.Get());
-		commandList_->SetPipelineState(graphicsPipelineState_.Get());
-		commandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);
-		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
-		commandList_->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
-		commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
-		commandList_->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
-		commandList_->DrawInstanced(1536, 1, 0, 0);
-	}*/
+	//if (isTriangleDraw_)
+	//{
+	//	
+	//	commandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);
+	//	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	//	commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
+	//	commandList_->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
+	//	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
+	//	commandList_->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
+	//	commandList_->DrawInstanced(1536, 1, 0, 0);
+	//}
 
 
 	////三角形２
@@ -1128,23 +1259,25 @@ void DXCom::Command()
 
 
 
-	for (int i = 0; i < particles.size()-1; i++)
-	{
-		
-		commandList_->IASetVertexBuffers(0, 1, &vertexFlowBufferView_);
-		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		commandList_->SetGraphicsRootConstantBufferView(0, materialFlowResource_->GetGPUVirtualAddress());
-		commandList_->SetGraphicsRootConstantBufferView(1, wvpFlowResource_[i]->GetGPUVirtualAddress());
-		commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
-		commandList_->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
-		commandList_->DrawInstanced(3, 1, 0, 0);
+	//for (int i = 0; i < particles.size()-1; i++)
+	//{
+	//	
+	//	commandList_->IASetIndexBuffer(&indexFlowBufferView_);
+	//	commandList_->IASetVertexBuffers(0, 1, &vertexFlowBufferView_);
+	//	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	//	commandList_->SetGraphicsRootConstantBufferView(0, materialFlowResource_->GetGPUVirtualAddress());
+	//	commandList_->SetGraphicsRootConstantBufferView(1, wvpFlowResource_[i]->GetGPUVirtualAddress());
+	//	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
+	//	commandList_->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
+	//	commandList_->DrawIndexedInstanced(6, 1, 0, 0, 0);
 
-	}
+	//	/*commandList_->DrawInstanced(3, 1, 0, 0);*/
+	//}
 
 
 }
 
-void DXCom::LastFrame()
+void DXCom::PostEffect()
 {
 	D3D12_RESOURCE_BARRIER offbarrier{};
 	offbarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
@@ -1186,15 +1319,48 @@ void DXCom::LastFrame()
 	scissorRect.top = 0;
 	scissorRect.bottom = MyWin::kWindowHeight;
 
-	commandList_->RSSetViewports(1, &viewport);
-	commandList_->RSSetScissorRects(1, &scissorRect);
-	commandList_->SetGraphicsRootSignature(rootSignatureGrayscale_.Get());
-	commandList_->SetPipelineState(graphicsPipelineStateGary_.Get());
 
-	commandList_->IASetIndexBuffer(&indexGrayBufferView_);
-	commandList_->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
-	commandList_->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
-	commandList_->DrawIndexedInstanced(6, 1, 0, 0, 0);
+	if (isGrayscale_)
+	{
+		commandList_->RSSetViewports(1, &viewport);
+		commandList_->RSSetScissorRects(1, &scissorRect);
+		commandList_->SetGraphicsRootSignature(rootSignatureGrayscale_.Get());
+		commandList_->SetPipelineState(graphicsPipelineStateGary_.Get());
+
+		commandList_->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		commandList_->IASetIndexBuffer(&indexGrayBufferView_);
+		commandList_->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
+		commandList_->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
+		commandList_->DrawIndexedInstanced(6, 1, 0, 0, 0);
+	}
+	
+	if (isMetaBall_)
+	{
+		commandList_->RSSetViewports(1, &viewport);
+		commandList_->RSSetScissorRects(1, &scissorRect);
+		commandList_->SetGraphicsRootSignature(rootSignatureMetaBall_.Get());
+		commandList_->SetPipelineState(graphicsPipelineStateMeta_.Get());
+
+		commandList_->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		commandList_->IASetIndexBuffer(&indexGrayBufferView_);
+		commandList_->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
+		commandList_->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
+		commandList_->SetGraphicsRootConstantBufferView(1, particleDateResource_->GetGPUVirtualAddress());
+		commandList_->DrawIndexedInstanced(6, 1, 0, 0, 0);
+	}
+
+}
+
+void DXCom::LastFrame()
+{
+	UINT backBufferIndex = swapChain_->GetCurrentBackBufferIndex();
+
+	D3D12_RESOURCE_BARRIER barrier{};
+	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	barrier.Transition.pResource = swapChainResources_[backBufferIndex].Get();
+
+	
 
 
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
@@ -1296,6 +1462,7 @@ void DXCom::UpDate()
 		ImGui::TreePop();
 	}*/
 	ImGui::DragFloat("mass", &mass_, 0.1f, 0.0f, 100.0f);
+	ImGui::SliderFloat2("gravity", &G_.x, -10.0f, 10.0f);
 	ImGui::DragFloat("h", &h_, 0.01f, 0.0f, 64.0f);
 	h2_ = h_ * h_;
 	poly6 = 4.0f / (mpi_ * powf(h_, 8));
@@ -1303,7 +1470,7 @@ void DXCom::UpDate()
 	viscLap = 40.0f / (mpi_ * powf(h_, 5));
 	eps = h_;
 	halfH_ = h_ * 0.5f;
-	ImGui::SliderFloat("dt", &dt, 0.000001f, 0.001f);
+	ImGui::DragFloat("dt", &dt, 0.00001f, 0.0001f,0.001f);
 
 	ImGui::Text("light");
 	ImGui::SliderFloat3("light color", &directionalLightData_->color.X, 0.0f, 1.0f);
@@ -1390,7 +1557,7 @@ void DXCom::UpDate()
 		}
 	}
 
-	transform.rotate.y += 0.05f;
+	/*transform.rotate.y += 0.05f;*/
 	Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 	Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTrans.scale, cameraTrans.rotate, cameraTrans.translate);
 	Matrix4x4 viewMatrix = Inverse(cameraMatrix);
@@ -1499,18 +1666,21 @@ void DXCom::UpDate()
 	ImGui::Text("%d", frameRate);
 	ImGui::End();*/
 
+
+	Matrix4x4 viewMatSprite = MakeIdentity4x4();
+	Matrix4x4 projectMatSprite = MakeOrthographicMatrix(0.0f, 0.0f, float(Fuji::GetkWindowWidth()), float(Fuji::GetkWindowHeight()), 0.0f, 100.0f);
+	Matrix4x4 worldViewProMatSpriteOrigine = Multiply(viewMatSprite, projectMatSprite);
+	Matrix4x4 worldViewProMatSprite = worldViewProMatSpriteOrigine;
 	for (size_t i = 0; i < particles.size()-1; i++)
 	{
 		Matrix4x4 worldMatSprite = MakeAffineMatrix(Vector3(1.0f, 1.0f, 1.0f), Vector3(0.0f, 0.0f, 0.0f), particles[i].pos);
-		Matrix4x4 viewMatSprite = MakeIdentity4x4();
-		Matrix4x4 projectMatSprite = MakeOrthographicMatrix(0.0f, 0.0f, float(Fuji::GetkWindowWidth()), float(Fuji::GetkWindowHeight()), 0.0f, 100.0f);
-		Matrix4x4 worldViewProMatSprite = Multiply(viewMatSprite, projectMatSprite);
+		worldViewProMatSprite = worldViewProMatSpriteOrigine;
 		worldViewProMatSprite = Multiply(worldMatSprite, worldViewProMatSprite);
-
 
 		wvpFlowDate_[i]->World = worldMatSprite;
 		wvpFlowDate_[i]->WVP = worldViewProMatSprite;
 
+		particleDate_->center[i] = { worldMatSprite.m[3][0],worldMatSprite.m[3][1],0.0f,0.0f };
 
 		/*Matrix4x4 worldMatrixParticle = MakeAffineMatrix(Vector3(1.0f, 1.0f, 1.0f), Vector3(0.0f, 0.0f, 0.0f), particles[i].pos);
 		Matrix4x4 worldViewProjectionMatrixParticle = Multiply(worldMatrixParticle, Multiply(viewMatrix, projectionMatrix));
@@ -1528,7 +1698,7 @@ void DXCom::ReleaseData()
 		materialParticleResource_[i]->Release();
 	}*/
 
-	particles.clear();
+	/*particles.clear();*/
 	pixelShaderBlob_->Release();
 	vertexShaderBlob_->Release();
 	if (errorBlob_)

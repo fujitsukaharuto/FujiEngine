@@ -77,6 +77,15 @@ struct ModelData
 	MaterialData material;
 };
 
+struct ParticleDate
+{
+	Vector4 center[400];
+	float radius;
+	int particleCount;
+	float threshold;
+	float padding[1];
+};
+
 /// <summary>
 /// 2次元ベクトルのスカラー倍を求める
 /// </summary>
