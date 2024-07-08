@@ -415,6 +415,103 @@ void DXCom::SettingRootSignature()
 		assert(SUCCEEDED(hr));
 	}
 
+	if (isGaussian_)
+	{
+		D3D12_ROOT_SIGNATURE_DESC rootSignatureGaussDesc;
+		rootSignatureGaussDesc.Flags =
+			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+
+		CD3DX12_DESCRIPTOR_RANGE rangeGauss[1] = {};
+		rangeGauss[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
+
+		D3D12_ROOT_PARAMETER rootParametersGauss[1] = {};
+		rootParametersGauss[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+		rootParametersGauss[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+		rootParametersGauss[0].DescriptorTable.pDescriptorRanges = rangeGauss;
+		rootParametersGauss[0].DescriptorTable.NumDescriptorRanges = _countof(rangeGauss);
+
+		D3D12_STATIC_SAMPLER_DESC samplersGauss[1] = {};
+		samplersGauss[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+		samplersGauss[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+		samplersGauss[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+		samplersGauss[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+		samplersGauss[0].MipLODBias = 0;
+		samplersGauss[0].ComparisonFunc = D3D12_COMPARISON_FUNC_ALWAYS;
+		samplersGauss[0].MaxLOD = D3D12_FLOAT32_MAX;
+		samplersGauss[0].ShaderRegister = 0;
+		samplersGauss[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+
+		rootSignatureGaussDesc.pParameters = rootParametersGauss;
+		rootSignatureGaussDesc.NumParameters = _countof(rootParametersGauss);
+		rootSignatureGaussDesc.pStaticSamplers = samplersGauss;
+		rootSignatureGaussDesc.NumStaticSamplers = _countof(samplersGauss);
+
+		signatureGaussBlob_ = nullptr;
+		errorGaussBlob_ = nullptr;
+		hr = D3D12SerializeRootSignature(&rootSignatureGaussDesc,
+			D3D_ROOT_SIGNATURE_VERSION_1, &signatureGaussBlob_, &errorGaussBlob_);
+
+		if (FAILED(hr))
+		{
+			Log(reinterpret_cast<char*>(errorGaussBlob_->GetBufferPointer()));
+			assert(false);
+		}
+
+		hr = device_->CreateRootSignature(0, signatureGaussBlob_->GetBufferPointer(),
+			signatureGaussBlob_->GetBufferSize(), IID_PPV_ARGS(&rootSignatureGauss_));
+
+		assert(SUCCEEDED(hr));
+	}
+
+
+	if (isNonePost_)
+	{
+		D3D12_ROOT_SIGNATURE_DESC rootSignatureNoneDesc;
+		rootSignatureNoneDesc.Flags =
+			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+
+		CD3DX12_DESCRIPTOR_RANGE rangeNone[1] = {};
+		rangeNone[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
+
+		D3D12_ROOT_PARAMETER rootParametersNone[1] = {};
+		rootParametersNone[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+		rootParametersNone[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+		rootParametersNone[0].DescriptorTable.pDescriptorRanges = rangeNone;
+		rootParametersNone[0].DescriptorTable.NumDescriptorRanges = _countof(rangeNone);
+
+		D3D12_STATIC_SAMPLER_DESC samplersNone[1] = {};
+		samplersNone[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+		samplersNone[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+		samplersNone[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+		samplersNone[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+		samplersNone[0].MipLODBias = 0;
+		samplersNone[0].ComparisonFunc = D3D12_COMPARISON_FUNC_ALWAYS;
+		samplersNone[0].MaxLOD = D3D12_FLOAT32_MAX;
+		samplersNone[0].ShaderRegister = 0;
+		samplersNone[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+
+		rootSignatureNoneDesc.pParameters = rootParametersNone;
+		rootSignatureNoneDesc.NumParameters = _countof(rootParametersNone);
+		rootSignatureNoneDesc.pStaticSamplers = samplersNone;
+		rootSignatureNoneDesc.NumStaticSamplers = _countof(samplersNone);
+
+		signatureNoneBlob_ = nullptr;
+		errorNoneBlob_ = nullptr;
+		hr = D3D12SerializeRootSignature(&rootSignatureNoneDesc,
+			D3D_ROOT_SIGNATURE_VERSION_1, &signatureNoneBlob_, &errorNoneBlob_);
+
+		if (FAILED(hr))
+		{
+			Log(reinterpret_cast<char*>(errorNoneBlob_->GetBufferPointer()));
+			assert(false);
+		}
+
+		hr = device_->CreateRootSignature(0, signatureNoneBlob_->GetBufferPointer(),
+			signatureNoneBlob_->GetBufferSize(), IID_PPV_ARGS(&rootSignatureNone_));
+
+		assert(SUCCEEDED(hr));
+	}
+
 }
 
 void DXCom::SettingGraphicPipeline()
@@ -613,6 +710,107 @@ void DXCom::SettingGraphicPipeline()
 		assert(SUCCEEDED(hr));
 	}
 
+
+	if (isGaussian_)
+	{
+		D3D12_INPUT_ELEMENT_DESC inputLayoutGauss[2] = {};
+		inputLayoutGauss[0].SemanticName = "POSITION";
+		inputLayoutGauss[0].SemanticIndex = 0;
+		inputLayoutGauss[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+		inputLayoutGauss[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+
+		inputLayoutGauss[1].SemanticName = "TEXCOORD";
+		inputLayoutGauss[1].SemanticIndex = 0;
+		inputLayoutGauss[1].Format = DXGI_FORMAT_R32G32_FLOAT;
+		inputLayoutGauss[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+		D3D12_INPUT_LAYOUT_DESC inputLayoutGaussDesc{};
+		inputLayoutGaussDesc.pInputElementDescs = inputLayoutGauss;
+		inputLayoutGaussDesc.NumElements = _countof(inputLayoutGauss);
+
+		vertexShaderGaussBlob_ = CompileShader(L"GaussianBlur.VS.hlsl",
+			L"vs_6_0", dxcUtils_, dxcCompiler_, includeHandler_);
+		assert(vertexShaderGaussBlob_ != nullptr);
+
+		pixelShaderGaussBlob_ = CompileShader(L"GaussianBlur.PS.hlsl",
+			L"ps_6_0", dxcUtils_, dxcCompiler_, includeHandler_);
+		assert(pixelShaderGaussBlob_ != nullptr);
+
+
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC psoGaussDesc = {};
+		psoGaussDesc.InputLayout = inputLayoutGaussDesc;
+		psoGaussDesc.pRootSignature = rootSignatureGauss_.Get();
+		psoGaussDesc.VS = { vertexShaderGaussBlob_->GetBufferPointer(),
+		vertexShaderGaussBlob_->GetBufferSize() };
+		psoGaussDesc.PS = { pixelShaderGaussBlob_->GetBufferPointer(),
+		pixelShaderGaussBlob_->GetBufferSize() };
+		psoGaussDesc.DepthStencilState.DepthEnable = FALSE;
+		psoGaussDesc.DepthStencilState.StencilEnable = FALSE;
+		psoGaussDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+		psoGaussDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+		psoGaussDesc.SampleMask = UINT_MAX;
+		psoGaussDesc.PrimitiveTopologyType =
+			D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+		psoGaussDesc.NumRenderTargets = 1;
+		psoGaussDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+		psoGaussDesc.SampleDesc.Count = 1;
+
+		graphicsPipelineStateGauss_ = nullptr;
+		hr = device_->CreateGraphicsPipelineState(&psoGaussDesc,
+			IID_PPV_ARGS(&graphicsPipelineStateGauss_));
+		assert(SUCCEEDED(hr));
+	}
+
+
+	if (isNonePost_)
+	{
+		D3D12_INPUT_ELEMENT_DESC inputLayoutNone[2] = {};
+		inputLayoutNone[0].SemanticName = "POSITION";
+		inputLayoutNone[0].SemanticIndex = 0;
+		inputLayoutNone[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+		inputLayoutNone[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+
+		inputLayoutNone[1].SemanticName = "TEXCOORD";
+		inputLayoutNone[1].SemanticIndex = 0;
+		inputLayoutNone[1].Format = DXGI_FORMAT_R32G32_FLOAT;
+		inputLayoutNone[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+		D3D12_INPUT_LAYOUT_DESC inputLayoutNoneDesc{};
+		inputLayoutNoneDesc.pInputElementDescs = inputLayoutNone;
+		inputLayoutNoneDesc.NumElements = _countof(inputLayoutNone);
+
+		vertexShaderNoneBlob_ = CompileShader(L"NonePost.VS.hlsl",
+			L"vs_6_0", dxcUtils_, dxcCompiler_, includeHandler_);
+		assert(vertexShaderNoneBlob_ != nullptr);
+
+		pixelShaderNoneBlob_ = CompileShader(L"NonePost.PS.hlsl",
+			L"ps_6_0", dxcUtils_, dxcCompiler_, includeHandler_);
+		assert(pixelShaderNoneBlob_ != nullptr);
+
+
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC psoNoneDesc = {};
+		psoNoneDesc.InputLayout = inputLayoutNoneDesc;
+		psoNoneDesc.pRootSignature = rootSignatureNone_.Get();
+		psoNoneDesc.VS = { vertexShaderNoneBlob_->GetBufferPointer(),
+		vertexShaderNoneBlob_->GetBufferSize() };
+		psoNoneDesc.PS = { pixelShaderNoneBlob_->GetBufferPointer(),
+		pixelShaderNoneBlob_->GetBufferSize() };
+		psoNoneDesc.DepthStencilState.DepthEnable = FALSE;
+		psoNoneDesc.DepthStencilState.StencilEnable = FALSE;
+		psoNoneDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+		psoNoneDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+		psoNoneDesc.SampleMask = UINT_MAX;
+		psoNoneDesc.PrimitiveTopologyType =
+			D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+		psoNoneDesc.NumRenderTargets = 1;
+		psoNoneDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+		psoNoneDesc.SampleDesc.Count = 1;
+
+		graphicsPipelineStateNone_ = nullptr;
+		hr = device_->CreateGraphicsPipelineState(&psoNoneDesc,
+			IID_PPV_ARGS(&graphicsPipelineStateNone_));
+		assert(SUCCEEDED(hr));
+	}
+
+
 	vertexGrayResource_ = CreateBufferResource(device_.Get(), sizeof(GrayscaleVertex) * 6);
 
 	vertexGrayBufferView_.BufferLocation = vertexGrayResource_->GetGPUVirtualAddress();
@@ -643,6 +841,10 @@ void DXCom::SettingGraphicPipeline()
 	indexGrayData_[4] = 2;
 	indexGrayData_[5] = 3;
 
+	isGrayscale_ = false;
+	isNonePost_ = true;
+	isMetaBall_ = false;
+	isGaussian_ = false;
 
 }
 
@@ -652,7 +854,7 @@ void DXCom::SettingGraphicPipeline()
 
 void DXCom::SettingVertex()
 {
-	/*vertexResource_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * 2000);
+	vertexResource_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * 2000);
 
 	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
 	vertexBufferView_.SizeInBytes = sizeof(VertexData) * 2000;
@@ -743,7 +945,7 @@ void DXCom::SettingVertex()
 			vertexDate_[startIndex + 5].normal.z = vertexDate_[startIndex + 5].position.Z;
 
 		}
-	}*/
+	}
 
 	/*vertexResource2_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * 3);
 
@@ -886,7 +1088,7 @@ void DXCom::SettingVertex()
 	particleDateResource_->Map(0, nullptr, reinterpret_cast<void**>(&particleDate_));
 	particleDate_->radius = 6.0f;
 	particleDate_->particleCount = int(particles.size() - 1);
-	particleDate_->threshold = 1.0f;
+	particleDate_->threshold = 1.6f;
 	for (int i = 0; i < particleDate_->particleCount; i++)
 	{
 		particleDate_->center[i] = { 0.0f,0.0f,0.0f,0.0f };
@@ -973,19 +1175,19 @@ void DXCom::SettingSpriteVertex()
 
 void DXCom::SettingResource()
 {
-	//wvpResource_ = CreateBufferResource(device_.Get(), sizeof(TransformationMatrix));
-	//wvpDate_ = nullptr;
-	//wvpResource_->Map(0, nullptr, reinterpret_cast<void**>(&wvpDate_));
-	//wvpDate_->WVP = MakeIdentity4x4();
-	//wvpDate_->World = MakeIdentity4x4();
+	wvpResource_ = CreateBufferResource(device_.Get(), sizeof(TransformationMatrix));
+	wvpDate_ = nullptr;
+	wvpResource_->Map(0, nullptr, reinterpret_cast<void**>(&wvpDate_));
+	wvpDate_->WVP = MakeIdentity4x4();
+	wvpDate_->World = MakeIdentity4x4();
 
-	//materialResource_ = CreateBufferResource(device_.Get(), sizeof(Material));
-	//materialDate_ = nullptr;
-	//materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialDate_));
-	////色変えるやつ（Resource）
-	//materialDate_->color = { 1.0f,1.0f,1.0f,1.0f };
-	//materialDate_->enableLighting = true;
-	//materialDate_->uvTransform = MakeIdentity4x4();
+	materialResource_ = CreateBufferResource(device_.Get(), sizeof(Material));
+	materialDate_ = nullptr;
+	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialDate_));
+	//色変えるやつ（Resource）
+	materialDate_->color = { 1.0f,1.0f,1.0f,1.0f };
+	materialDate_->enableLighting = true;
+	materialDate_->uvTransform = MakeIdentity4x4();
 
 	directionalLightResource_ = CreateBufferResource(device_.Get(), sizeof(DirectionalLight));
 	directionalLightData_ = nullptr;
@@ -1043,7 +1245,7 @@ void DXCom::SettingTexture()
 	//const uint32_t descriptorSizeDSV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
 
-	mipImages_ = LoadTexture("resource/boal16x16.png");
+	mipImages_ = LoadTexture("resource/uvChecker.png");
 	const DirectX::TexMetadata& metadata = mipImages_.GetMetadata();
 	textureResource_ = CreateTextureResource(device_.Get(), metadata);
 	
@@ -1077,7 +1279,7 @@ void DXCom::SettingTexture()
 	textureSrvHandleGPU2 = GetGPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, 3);
 
 	device_->CreateShaderResourceView(textureResource2_.Get(), &srvDesc2, textureSrvHandleCPU2);*/
-	
+
 
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDescOff{};
 	srvDescOff.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
@@ -1185,18 +1387,18 @@ void DXCom::Command()
 	commandList_->SetGraphicsRootSignature(rootSignature_.Get());
 	commandList_->SetPipelineState(graphicsPipelineState_.Get());
 
-	////三角形１
-	//if (isTriangleDraw_)
-	//{
-	//	
-	//	commandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);
-	//	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	//	commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
-	//	commandList_->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
-	//	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
-	//	commandList_->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
-	//	commandList_->DrawInstanced(1536, 1, 0, 0);
-	//}
+	//三角形１
+	if (isTriangleDraw_)
+	{
+		
+		commandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);
+		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
+		commandList_->DrawInstanced(1536, 1, 0, 0);
+	}
 
 
 	////三角形２
@@ -1259,20 +1461,20 @@ void DXCom::Command()
 
 
 
-	//for (int i = 0; i < particles.size()-1; i++)
-	//{
-	//	
-	//	commandList_->IASetIndexBuffer(&indexFlowBufferView_);
-	//	commandList_->IASetVertexBuffers(0, 1, &vertexFlowBufferView_);
-	//	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	//	commandList_->SetGraphicsRootConstantBufferView(0, materialFlowResource_->GetGPUVirtualAddress());
-	//	commandList_->SetGraphicsRootConstantBufferView(1, wvpFlowResource_[i]->GetGPUVirtualAddress());
-	//	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
-	//	commandList_->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
-	//	commandList_->DrawIndexedInstanced(6, 1, 0, 0, 0);
+	for (int i = 0; i < particles.size()-1; i++)
+	{
+		
+		commandList_->IASetIndexBuffer(&indexFlowBufferView_);
+		commandList_->IASetVertexBuffers(0, 1, &vertexFlowBufferView_);
+		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		commandList_->SetGraphicsRootConstantBufferView(0, materialFlowResource_->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootConstantBufferView(1, wvpFlowResource_[i]->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
+		commandList_->DrawIndexedInstanced(6, 1, 0, 0, 0);
 
-	//	/*commandList_->DrawInstanced(3, 1, 0, 0);*/
-	//}
+		/*commandList_->DrawInstanced(3, 1, 0, 0);*/
+	}
 
 
 }
@@ -1346,6 +1548,34 @@ void DXCom::PostEffect()
 		commandList_->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
 		commandList_->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
 		commandList_->SetGraphicsRootConstantBufferView(1, particleDateResource_->GetGPUVirtualAddress());
+		commandList_->DrawIndexedInstanced(6, 1, 0, 0, 0);
+	}
+
+	if (isGaussian_)
+	{
+		commandList_->RSSetViewports(1, &viewport);
+		commandList_->RSSetScissorRects(1, &scissorRect);
+		commandList_->SetGraphicsRootSignature(rootSignatureGauss_.Get());
+		commandList_->SetPipelineState(graphicsPipelineStateGauss_.Get());
+
+		commandList_->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		commandList_->IASetIndexBuffer(&indexGrayBufferView_);
+		commandList_->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
+		commandList_->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
+		commandList_->DrawIndexedInstanced(6, 1, 0, 0, 0);
+	}
+
+	if (isNonePost_)
+	{
+		commandList_->RSSetViewports(1, &viewport);
+		commandList_->RSSetScissorRects(1, &scissorRect);
+		commandList_->SetGraphicsRootSignature(rootSignatureNone_.Get());
+		commandList_->SetPipelineState(graphicsPipelineStateNone_.Get());
+
+		commandList_->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		commandList_->IASetIndexBuffer(&indexGrayBufferView_);
+		commandList_->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
+		commandList_->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
 		commandList_->DrawIndexedInstanced(6, 1, 0, 0, 0);
 	}
 
@@ -1461,8 +1691,13 @@ void DXCom::UpDate()
 		ImGui::ColorEdit3("Particlecolor", &particleColor.X);
 		ImGui::TreePop();
 	}*/
+
+	ImGui::Checkbox("Gray", &isGrayscale_);
+	ImGui::Checkbox("None", &isNonePost_);
+	ImGui::Checkbox("Meta", &isMetaBall_);
+	ImGui::Checkbox("Blur", &isGaussian_);
+
 	ImGui::DragFloat("mass", &mass_, 0.1f, 0.0f, 100.0f);
-	ImGui::SliderFloat2("gravity", &G_.x, -10.0f, 10.0f);
 	ImGui::DragFloat("h", &h_, 0.01f, 0.0f, 64.0f);
 	h2_ = h_ * h_;
 	poly6 = 4.0f / (mpi_ * powf(h_, 8));
@@ -1557,6 +1792,28 @@ void DXCom::UpDate()
 		}
 	}
 
+	gravityChangeTime_++;
+	if (gravityChangeTime_ >= 0 && gravityChangeTime_ < 400)
+	{
+		G_= { 0.0f,9.8f };
+	}
+	if (gravityChangeTime_ >= 400 && gravityChangeTime_ < 800)
+	{
+		G_ = { 0.0f,-9.8f };
+	}
+	if (gravityChangeTime_ >= 800 && gravityChangeTime_ < 1200)
+	{
+		G_ = { 9.8f,0.0f };
+	}
+	if (gravityChangeTime_ >= 1200 && gravityChangeTime_ < 1600)
+	{
+		G_ = { -9.8f,0.0f };
+	}
+	if (gravityChangeTime_ >= 1600)
+	{
+		gravityChangeTime_ = 0;
+	}
+
 	/*transform.rotate.y += 0.05f;*/
 	Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 	Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTrans.scale, cameraTrans.rotate, cameraTrans.translate);
@@ -1564,8 +1821,8 @@ void DXCom::UpDate()
 	Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(Fuji::GetkWindowWidth()) / float(Fuji::GetkWindowHeight()), 0.1f, 100.0f);
 	Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
 
-	/*wvpDate_->World = worldMatrix;
-	wvpDate_->WVP = worldViewProjectionMatrix;*/
+	wvpDate_->World = worldMatrix;
+	wvpDate_->WVP = worldViewProjectionMatrix;
 
 	/*Matrix4x4 worldMatrix2 = MakeAffineMatrix(transform2.scale, transform2.rotate, transform2.translate);
 	Matrix4x4 worldViewProjectionMatrix2 = Multiply(viewMatrix, projectionMatrix);

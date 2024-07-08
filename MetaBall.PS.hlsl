@@ -19,6 +19,10 @@ float4 main(PSInput input) : SV_TARGET
 {
     float2 pixelPos = input.position.xy;
     float4 color = g_InputTexture.Sample(g_Sampler, input.texcoord);
+    //if (pixelPos.x > 600.0 || pixelPos.y > 600.0)
+    //{
+    //    return color;
+    //}
     float field = 0.0;
     for (int i = 0; i < g_Particle.particleCount; ++i)
     {

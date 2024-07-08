@@ -209,11 +209,26 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineStateMeta_ = nullptr;
 
 
+	ID3DBlob* signatureGaussBlob_ = nullptr;
+	ID3DBlob* errorGaussBlob_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignatureGauss_ = nullptr;
+	IDxcBlob* vertexShaderGaussBlob_ = nullptr;
+	IDxcBlob* pixelShaderGaussBlob_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineStateGauss_ = nullptr;
 
-	bool isGrayscale_ = false;
-	bool isNonePost_ = false;
+
+	ID3DBlob* signatureNoneBlob_ = nullptr;
+	ID3DBlob* errorNoneBlob_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignatureNone_ = nullptr;
+	IDxcBlob* vertexShaderNoneBlob_ = nullptr;
+	IDxcBlob* pixelShaderNoneBlob_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineStateNone_ = nullptr;
+
+
+	bool isGrayscale_ = true;
+	bool isNonePost_ = true;
 	bool isMetaBall_ = true;
-
+	bool isGaussian_ = true;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexGrayResource_ = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexGrayBufferView_{};
@@ -235,7 +250,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_ = nullptr;
 	DirectionalLight* directionalLightData_ = nullptr;
 	bool useMonsterBall = true;
-	bool isTriangleDraw_ = false;
+	bool isTriangleDraw_ = true;
 
 	////三角形2
 	//Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource2_ = nullptr;
@@ -305,6 +320,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> particleDateResource_ = nullptr;
 
 	Vector2 G_ = { 0.0f,9.8f };
+	int gravityChangeTime_ = 0;
 	float mpi_ = 3.14159274f;
 
 	float restDens = 300.0f;//静止状態の密度

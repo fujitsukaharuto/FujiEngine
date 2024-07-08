@@ -139,6 +139,10 @@
     <FxCompile Include="SimpleGrayscale.PS.hlsl" />
     <FxCompile Include="MetaBall.VS.hlsl" />
     <FxCompile Include="MetaBall.PS.hlsl" />
+    <FxCompile Include="GaussianBlur.VS.hlsl" />
+    <FxCompile Include="GaussianBlur.PS.hlsl" />
+    <FxCompile Include="NonePost.VS.hlsl" />
+    <FxCompile Include="NonePost.PS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt">
