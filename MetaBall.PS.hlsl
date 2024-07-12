@@ -1,7 +1,7 @@
 struct ParticleDateBuffer
 {
     float4 particles[400]; // 最大100個の粒子
-    float radius; // 粒子ごとの影響範囲
+    float4 radius[400]; // 粒子ごとの影響範囲
     int particleCount; // 粒子の数
     float threshold; // しきい値
 };
@@ -24,10 +24,10 @@ float4 main(PSInput input) : SV_TARGET
     //    return color;
     //}
     float field = 0.0;
-    for (int i = 0; i < g_Particle.particleCount; ++i)
+    for (int i = 0; i <= g_Particle.particleCount; ++i)
     {
         float2 diff = pixelPos - g_Particle.particles[i].xy;
-        field += g_Particle.radius * g_Particle.radius / dot(diff, diff);
+        field += g_Particle.radius[i].x * g_Particle.radius[i].x / dot(diff, diff);
     }
 
     if (field > g_Particle.threshold)

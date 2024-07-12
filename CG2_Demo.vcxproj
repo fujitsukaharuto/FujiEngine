@@ -103,6 +103,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Fuji.cpp" />
     <ClCompile Include="ImGuiManager.cpp" />
+    <ClCompile Include="Input.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MatrixCalculation.cpp" />
     <ClCompile Include="My.cpp" />
@@ -123,6 +124,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="externals\imgui\imstb_truetype.h" />
     <ClInclude Include="Fuji.h" />
     <ClInclude Include="ImGuiManager.h" />
+    <ClInclude Include="Input.h" />
     <ClInclude Include="MatrixCalculation.h" />
     <ClInclude Include="My.h" />
     <ClInclude Include="MyVec2.h" />

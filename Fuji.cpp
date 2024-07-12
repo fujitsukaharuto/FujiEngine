@@ -3,11 +3,13 @@
 #include "MyWindow.h"
 #include "DXCom.h"
 #include "ImGuiManager.h"
+#include "Input.h"
 
 namespace {
 	MyWin* mywin_ = nullptr;
 	DXCom* dxcom_ = nullptr;
 	ImGuiManager* imguiManager_ = nullptr;
+	Input* input_ = nullptr;
 }
 
 float Fuji::GetkWindowWidth()
@@ -37,15 +39,17 @@ void Fuji::InitDX()
 	mywin_->CreatWind();
 	dxcom_ = dxcom_->GetInstance();
 	dxcom_->InitDX(mywin_);
+	input_ = Input::GetInstance();
+	input_->Initialize();
 	imguiManager_ = imguiManager_->GetInstance();
 	imguiManager_->Init(mywin_, dxcom_);
 	dxcom_->SettingTexture();
-
 
 }
 
 void Fuji::StartFrame()
 {
+	input_->Update();
 	imguiManager_->Begin();
 	dxcom_->SetBarrier();
 	dxcom_->ClearRTV();

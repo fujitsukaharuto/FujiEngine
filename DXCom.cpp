@@ -1,6 +1,7 @@
 #include "DXCom.h"
 #include "Fuji.h"
 #include "ImGuiManager.h"
+#include "Input.h"
 
 #include <d3d12.h>
 #include <dxgi1_6.h>
@@ -842,8 +843,8 @@ void DXCom::SettingGraphicPipeline()
 	indexGrayData_[5] = 3;
 
 	isGrayscale_ = false;
-	isNonePost_ = true;
-	isMetaBall_ = false;
+	isNonePost_ = false;
+	isMetaBall_ = true;
 	isGaussian_ = false;
 
 }
@@ -1018,7 +1019,7 @@ void DXCom::SettingVertex()
 	{
 		for (float j = 600 / 15; j <= 600 / 2; j++)
 		{
-			if (particles.size() > particleIndex)
+			if (particles.size() >= particleIndex)
 			{
 				
 			}
@@ -1034,8 +1035,9 @@ void DXCom::SettingVertex()
 		i += h_;
 	}
 
+	/*particles.emplace_back(Particle(0.0f, 0.0f));*/
 
-	for (int i = 0; i < particles.size()-1; i++)
+	for (int i = 0; i <= particles.size()-1; i++)
 	{
 		vertexFlowResource_[i] = CreateBufferResource(device_, sizeof(VertexData) * 4);
 		indexFlowResource_[i] = CreateBufferResource(device_, sizeof(uint32_t) * 6);
@@ -1049,7 +1051,7 @@ void DXCom::SettingVertex()
 	indexFlowBufferView_.SizeInBytes = sizeof(uint32_t) * 6;
 	indexFlowBufferView_.Format = DXGI_FORMAT_R32_UINT;
 
-	for (int i = 0; i < particles.size()-1; i++)
+	for (int i = 0; i <= particles.size()-1; i++)
 	{
 		vertexFlowDate_[i] = nullptr;
 		vertexFlowResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&vertexFlowDate_[i]));
@@ -1086,15 +1088,33 @@ void DXCom::SettingVertex()
 	particleDateResource_ = CreateBufferResource(device_, sizeof(ParticleDate));
 	particleDate_ = nullptr;
 	particleDateResource_->Map(0, nullptr, reinterpret_cast<void**>(&particleDate_));
-	particleDate_->radius = 6.0f;
+	/*particleDate_->radius[0] = { 6.0f,0.0f,0.0f,0.0f };*/
 	particleDate_->particleCount = int(particles.size() - 1);
 	particleDate_->threshold = 1.6f;
 	for (int i = 0; i < particleDate_->particleCount; i++)
 	{
 		particleDate_->center[i] = { 0.0f,0.0f,0.0f,0.0f };
+		particleDate_->radius[i] = { 6.0f,0.0f,0.0f,0.0f };
 	}
 
 	particleDate_->padding[0] = 0;
+	particleDate_->padding[1] = 0;
+
+	Matrix4x4 viewMatSprite = MakeIdentity4x4();
+	Matrix4x4 projectMatSprite = MakeOrthographicMatrix(0.0f, 0.0f, float(Fuji::GetkWindowWidth()), float(Fuji::GetkWindowHeight()), 0.0f, 100.0f);
+	Matrix4x4 worldViewProMatSpriteOrigine = Multiply(viewMatSprite, projectMatSprite);
+	Matrix4x4 worldViewProMatSprite = worldViewProMatSpriteOrigine;
+	for (size_t i = 0; i <= particles.size() - 1; i++)
+	{
+		Matrix4x4 worldMatSprite = MakeAffineMatrix(Vector3(1.0f, 1.0f, 1.0f), Vector3(0.0f, 0.0f, 0.0f), particles[i].pos);
+		worldViewProMatSprite = worldViewProMatSpriteOrigine;
+		worldViewProMatSprite = Multiply(worldMatSprite, worldViewProMatSprite);
+
+		wvpFlowDate_[i]->World = worldMatSprite;
+		wvpFlowDate_[i]->WVP = worldViewProMatSprite;
+
+		particleDate_->center[i] = { worldMatSprite.m[3][0],worldMatSprite.m[3][1],0.0f,0.0f };
+	}
 }
 
 void DXCom::SettingSpriteVertex()
@@ -1245,7 +1265,7 @@ void DXCom::SettingTexture()
 	//const uint32_t descriptorSizeDSV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
 
-	mipImages_ = LoadTexture("resource/uvChecker.png");
+	mipImages_ = LoadTexture("resource/boal16x16.png");
 	const DirectX::TexMetadata& metadata = mipImages_.GetMetadata();
 	textureResource_ = CreateTextureResource(device_.Get(), metadata);
 	
@@ -1388,7 +1408,7 @@ void DXCom::Command()
 	commandList_->SetPipelineState(graphicsPipelineState_.Get());
 
 	//三角形１
-	if (isTriangleDraw_)
+	/*if (isTriangleDraw_)
 	{
 		
 		commandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);
@@ -1398,7 +1418,7 @@ void DXCom::Command()
 		commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
 		commandList_->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
 		commandList_->DrawInstanced(1536, 1, 0, 0);
-	}
+	}*/
 
 
 	////三角形２
@@ -1706,6 +1726,7 @@ void DXCom::UpDate()
 	eps = h_;
 	halfH_ = h_ * 0.5f;
 	ImGui::DragFloat("dt", &dt, 0.00001f, 0.0001f,0.001f);
+	ImGui::SliderFloat("Setradius", &setradius_, 3.0f, 100.0f);
 
 	ImGui::Text("light");
 	ImGui::SliderFloat3("light color", &directionalLightData_->color.X, 0.0f, 1.0f);
@@ -1714,6 +1735,71 @@ void DXCom::UpDate()
 
 	directionalLightData_->direction = directionalLightData_->direction.Normalize();
 
+	/*if (Input::GetInstance()->Input::IsTriggerMouse(0))
+	{
+		if (particleDate_->particleCount < 399)
+		{
+			Vector2 xy = Input::GetInstance()->Input::GetMousePosition();
+
+			particles.emplace_back(Particle(xy.x, xy.y));
+			particleDate_->particleCount = int(particles.size() - 1);
+			int count = particleDate_->particleCount;
+
+
+			vertexFlowResource_[count] = CreateBufferResource(device_, sizeof(VertexData) * 4);
+			indexFlowResource_[count] = CreateBufferResource(device_, sizeof(uint32_t) * 6);
+
+
+			vertexFlowDate_[count] = nullptr;
+			vertexFlowResource_[count]->Map(0, nullptr, reinterpret_cast<void**>(&vertexFlowDate_[count]));
+
+			vertexFlowDate_[count][0] = { { -6.0f,6.0f,0.0f,1.0f }, { 0.0f,1.0f }, { 0.0f,0.0f,-1.0f } };
+			vertexFlowDate_[count][1] = { { -6.0f,-6.0f,0.0f,1.0f }, { 0.0f,0.0f }, { 0.0f,0.0f,-1.0f } };
+			vertexFlowDate_[count][2] = { { 6.0f,6.0f,0.0f,1.0f }, { 1.0f,1.0f }, { 0.0f,0.0f,-1.0f } };
+			vertexFlowDate_[count][3] = { { 6.0f,-6.0f,0.0f,1.0f }, { 1.0f,0.0f }, { 0.0f,0.0f,-1.0f } };
+
+
+			indexFlowResource_[count]->Map(0, nullptr, reinterpret_cast<void**>(&indexFlowData_[count]));
+			indexFlowData_[count][0] = 0;
+			indexFlowData_[count][1] = 1;
+			indexFlowData_[count][2] = 2;
+
+			indexFlowData_[count][3] = 1;
+			indexFlowData_[count][4] = 3;
+			indexFlowData_[count][5] = 2;
+
+
+			wvpFlowResource_[count] = CreateBufferResource(device_, sizeof(TransformationMatrix));
+			wvpFlowDate_[count] = nullptr;
+			wvpFlowResource_[count]->Map(0, nullptr, reinterpret_cast<void**>(&wvpFlowDate_[count]));
+
+			particleDate_->radius[count] = { setradius_,0.0f,0.0f,0.0f };
+
+
+			Matrix4x4 viewMatSprite = MakeIdentity4x4();
+			Matrix4x4 projectMatSprite = MakeOrthographicMatrix(0.0f, 0.0f, float(Fuji::GetkWindowWidth()), float(Fuji::GetkWindowHeight()), 0.0f, 100.0f);
+			Matrix4x4 worldViewProMatSpriteOrigine = Multiply(viewMatSprite, projectMatSprite);
+			Matrix4x4 worldViewProMatSprite = worldViewProMatSpriteOrigine;
+
+			Matrix4x4 worldMatSprite = MakeAffineMatrix(Vector3(1.0f, 1.0f, 1.0f), Vector3(0.0f, 0.0f, 0.0f), particles[count].pos);
+			worldViewProMatSprite = worldViewProMatSpriteOrigine;
+			worldViewProMatSprite = Multiply(worldMatSprite, worldViewProMatSprite);
+
+			wvpFlowDate_[count]->World = worldMatSprite;
+			wvpFlowDate_[count]->WVP = worldViewProMatSprite;
+
+			particleDate_->center[count] = { worldMatSprite.m[3][0],worldMatSprite.m[3][1],0.0f,0.0f };
+		}
+	}
+
+	if (Input::GetInstance()->Input::IsPressMouse(1))
+	{
+		if (particleDate_->particleCount > 0)
+		{
+			particles.pop_back();
+			particleDate_->particleCount = int(particles.size() - 1);
+		}
+	}*/
 
 	for (auto& pi : particles)
 	{

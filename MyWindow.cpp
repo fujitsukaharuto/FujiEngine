@@ -33,6 +33,11 @@ LRESULT MyWin::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 	return DefWindowProc(hwnd, msg, wparam, lparam);
 }
 
+HWND MyWin::GetHwnd() const
+{
+	return hwnd_;
+}
+
 void MyWin::CreatGWindow(const wchar_t* title, int32_t clientWidth, int32_t clientHeight)
 {
 	//ウィンドウプロシージャ

@@ -80,10 +80,10 @@ struct ModelData
 struct ParticleDate
 {
 	Vector4 center[400];
-	float radius;
+	Vector4 radius[400];
 	int particleCount;
 	float threshold;
-	float padding[1];
+	float padding[2];
 };
 
 /// <summary>

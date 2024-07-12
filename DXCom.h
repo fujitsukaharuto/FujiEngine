@@ -318,6 +318,7 @@ private:
 	std::vector<Particle> particles;
 	ParticleDate* particleDate_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> particleDateResource_ = nullptr;
+	float setradius_ = 6.0f;
 
 	Vector2 G_ = { 0.0f,9.8f };
 	int gravityChangeTime_ = 0;

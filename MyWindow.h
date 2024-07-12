@@ -13,7 +13,7 @@ public:
 	static MyWin* GetInstance();
 	static LRESULT WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 
-	HWND GetHwnd() const { return hwnd_; }
+	HWND GetHwnd() const;
 
 public:
 
