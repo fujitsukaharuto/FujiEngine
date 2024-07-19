@@ -49,10 +49,26 @@ struct Particle
 };
 
 
+enum BlendMode
+{
+	// ブレンド無し
+	kBlendModeNone,
+	// 通常αブレンド
+	kBlendModeNormal,
+	// 加算
+	kBlendModeAdd,
+	// 現在
+	kBlendModeSubtract,
+	// 乗算
+	kBlendModeMultiply,
+	// スクリーン
+	kBlendModeScreen,
+};
+
+
 class DXCom
 {
 public:
-	
 
 	static DXCom* GetInstance();
 
@@ -289,6 +305,19 @@ private:
 	//DirectionalLight* directionalLightDataModel_ = nullptr;
 
 
+	//FenceModelData
+	ModelData fenceModelData_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> vertexFenceModelResource_ = nullptr;
+	D3D12_VERTEX_BUFFER_VIEW vertexFenceModelBufferView_{};
+	VertexData* vertexDataFenceModel_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> wvpResourceFenceModel_ = nullptr;
+	TransformationMatrix* wvpDateFenceModel_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> materialResourceFenceModel_ = nullptr;
+	Material* materialDateFenceModel_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResourceFenceModel_ = nullptr;
+	DirectionalLight* directionalLightDataFenceModel_ = nullptr;
+
+
 	//Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourceSprite_ = nullptr;
 	//D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite_{};
 	//VertexData* vertexDataSprite_ = nullptr;
@@ -316,9 +345,11 @@ private:
 	Material* materialFlowDate_;
 
 	std::vector<Particle> particles;
-	ParticleDate* particleDate_;
+	ParticleDate* particleDate_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> particleDateResource_ = nullptr;
 	float setradius_ = 6.0f;
+
+	bool isFluidMode_ = false;
 
 	Vector2 G_ = { 0.0f,9.8f };
 	int gravityChangeTime_ = 0;
@@ -332,8 +363,8 @@ private:
 	float mass_ = 2.5f;//質量
 	float visc = 150.0f;//粘度
 	float poly6 = 4.0f / (mpi_ * powf(h_, 8));
-	float spikyGrad = -30.0f / (mpi_ * powf(h_, 5));
-	float viscLap = 20.0f / (3 * mpi_ * powf(h_, 5));
+	float spikyGrad = -10.0f / (mpi_ * powf(h_, 5));
+	float viscLap = 40.0f / (mpi_ * powf(h_, 5));
 
 	float restDens2 = 300.0f;//静止状態の密度
 	float mass2_ = 2.0f;//質量
@@ -359,6 +390,7 @@ private:
 		{0.0f,0.0f,0.0f},
 	};
 	Trans transformModel{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	Trans transformFenceModel_{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 
 
 	Trans transformParticle[particleIndex]{};
@@ -371,18 +403,24 @@ private:
 
 	DirectX::ScratchImage mipImages_;
 	DirectX::ScratchImage mipImages2_;
+	DirectX::ScratchImage fenceMipImages_;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> textureResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> textureResource2_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> fenceTextureResource_;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource1;
 	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource2;
+	Microsoft::WRL::ComPtr<ID3D12Resource> fenceIntermediateResource_;
 
 	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU;
 	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU;
 
 	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU2;
 	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU2;
+
+	D3D12_CPU_DESCRIPTOR_HANDLE fenceTextureSrvHandleCPU_;
+	D3D12_GPU_DESCRIPTOR_HANDLE fenceTextureSrvHandleGPU_;
 
 	/*std::chrono::high_resolution_clock::time_point lastTime;
 	float deltaTime;

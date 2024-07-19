@@ -1,3 +1,4 @@
+
 struct ParticleDateBuffer
 {
     float4 particles[400]; // 最大100個の粒子
@@ -5,6 +6,7 @@ struct ParticleDateBuffer
     int particleCount; // 粒子の数
     float threshold; // しきい値
 };
+
 Texture2D g_InputTexture : register(t0);
 SamplerState g_Sampler : register(s0);
 ConstantBuffer<ParticleDateBuffer> g_Particle : register(b0);

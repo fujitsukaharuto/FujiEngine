@@ -190,7 +190,7 @@ void DXCom::CreateRenderTargets()
 	rtvHandles_[1].ptr = rtvHandles_[0].ptr + device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	device_->CreateRenderTargetView(swapChainResources_[1].Get(), &rtvDesc_, rtvHandles_[1]);
 
-	rtvHandles_[2].ptr= rtvHandles_[1].ptr + device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	rtvHandles_[2].ptr = rtvHandles_[1].ptr + device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	offscreenrtvDesc_.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 	offscreenrtvDesc_.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 
@@ -554,7 +554,7 @@ void DXCom::SettingGraphicPipeline()
 	blendDesc.RenderTarget[0] = rtb;*/
 
 	D3D12_BLEND_DESC blendDesc{};
-	blendDesc.RenderTarget[0].RenderTargetWriteMask= D3D12_COLOR_WRITE_ENABLE_ALL;
+	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
 	blendDesc.RenderTarget[0].BlendEnable = TRUE;
 	blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
 	blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
@@ -602,7 +602,7 @@ void DXCom::SettingGraphicPipeline()
 
 	graphicPipelineStateDesc.PrimitiveTopologyType =
 		D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-	
+
 	graphicPipelineStateDesc.SampleDesc.Count = 1;
 	graphicPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 
@@ -619,7 +619,7 @@ void DXCom::SettingGraphicPipeline()
 		inputLayoutGray[0].SemanticIndex = 0;
 		inputLayoutGray[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
 		inputLayoutGray[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-		
+
 		inputLayoutGray[1].SemanticName = "TEXCOORD";
 		inputLayoutGray[1].SemanticIndex = 0;
 		inputLayoutGray[1].Format = DXGI_FORMAT_R32G32_FLOAT;
@@ -843,8 +843,8 @@ void DXCom::SettingGraphicPipeline()
 	indexGrayData_[5] = 3;
 
 	isGrayscale_ = false;
-	isNonePost_ = false;
-	isMetaBall_ = true;
+	isNonePost_ = true;
+	isMetaBall_ = false;
 	isGaussian_ = false;
 
 }
@@ -1015,29 +1015,34 @@ void DXCom::SettingVertex()
 	}*/
 
 	particles.clear();
-	for (float i = eps; i < 600 - eps * 2; i++)
+	if (isFluidMode_)
 	{
-		for (float j = 600 / 15; j <= 600 / 2; j++)
+		for (float i = eps; i < 600 - eps * 2; i++)
 		{
-			if (particles.size() >= particleIndex)
+			for (float j = 600 / 15; j <= 600 / 2; j++)
 			{
-				
+				if (particles.size() >= particleIndex)
+				{
+
+				}
+				else
+				{
+					float jit = static_cast<float>(6 * rand()) / static_cast<float>(RAND_MAX);
+					particles.emplace_back(Particle((j)+jit, i));
+				}
+
+
+				j += h_;
 			}
-			else
-			{
-				float jit = static_cast<float>(6 * rand()) / static_cast<float>(RAND_MAX);
-				particles.emplace_back(Particle((j)+jit, i));
-			}
-			
-	
-			j += h_;
+			i += h_;
 		}
-		i += h_;
+	}
+	else
+	{
+		particles.emplace_back(Particle(0.0f, 0.0f));
 	}
 
-	/*particles.emplace_back(Particle(0.0f, 0.0f));*/
-
-	for (int i = 0; i <= particles.size()-1; i++)
+	for (int i = 0; i <= particles.size() - 1; i++)
 	{
 		vertexFlowResource_[i] = CreateBufferResource(device_, sizeof(VertexData) * 4);
 		indexFlowResource_[i] = CreateBufferResource(device_, sizeof(uint32_t) * 6);
@@ -1051,7 +1056,7 @@ void DXCom::SettingVertex()
 	indexFlowBufferView_.SizeInBytes = sizeof(uint32_t) * 6;
 	indexFlowBufferView_.Format = DXGI_FORMAT_R32_UINT;
 
-	for (int i = 0; i <= particles.size()-1; i++)
+	for (int i = 0; i <= particles.size() - 1; i++)
 	{
 		vertexFlowDate_[i] = nullptr;
 		vertexFlowResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&vertexFlowDate_[i]));
@@ -1088,7 +1093,6 @@ void DXCom::SettingVertex()
 	particleDateResource_ = CreateBufferResource(device_, sizeof(ParticleDate));
 	particleDate_ = nullptr;
 	particleDateResource_->Map(0, nullptr, reinterpret_cast<void**>(&particleDate_));
-	/*particleDate_->radius[0] = { 6.0f,0.0f,0.0f,0.0f };*/
 	particleDate_->particleCount = int(particles.size() - 1);
 	particleDate_->threshold = 1.6f;
 	for (int i = 0; i < particleDate_->particleCount; i++)
@@ -1120,7 +1124,7 @@ void DXCom::SettingVertex()
 void DXCom::SettingSpriteVertex()
 {
 	/*vertexResourceSprite_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * 4);
-	
+
 	vertexBufferViewSprite_.BufferLocation = vertexResourceSprite_->GetGPUVirtualAddress();
 	vertexBufferViewSprite_.SizeInBytes = sizeof(VertexData) * 4;
 	vertexBufferViewSprite_.StrideInBytes = sizeof(VertexData);
@@ -1190,6 +1194,38 @@ void DXCom::SettingSpriteVertex()
 	directionalLightDataModel_->color = { 1.0f,1.0f,1.0f,1.0f };
 	directionalLightDataModel_->direction = { 1.0f,0.0f,0.0f };
 	directionalLightDataModel_->intensity = 1.0f;*/
+
+
+	//FenceModel
+	fenceModelData_ = LoadObjFile("resource", "fence.obj");
+	vertexFenceModelResource_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * fenceModelData_.vertices.size());
+	vertexFenceModelBufferView_.BufferLocation = vertexFenceModelResource_->GetGPUVirtualAddress();
+	vertexFenceModelBufferView_.SizeInBytes = UINT(sizeof(VertexData) * fenceModelData_.vertices.size());
+	vertexFenceModelBufferView_.StrideInBytes = sizeof(VertexData);
+
+	vertexFenceModelResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataFenceModel_));
+	std::memcpy(vertexDataFenceModel_, fenceModelData_.vertices.data(), sizeof(VertexData) * fenceModelData_.vertices.size());
+
+	wvpResourceFenceModel_ = CreateBufferResource(device_.Get(), sizeof(TransformationMatrix));
+	wvpDateFenceModel_ = nullptr;
+	wvpResourceFenceModel_->Map(0, nullptr, reinterpret_cast<void**>(&wvpDateFenceModel_));
+	wvpDateFenceModel_->WVP = MakeIdentity4x4();
+	wvpDateFenceModel_->World = MakeIdentity4x4();
+
+	materialResourceFenceModel_ = CreateBufferResource(device_.Get(), sizeof(Material));
+	materialDateFenceModel_ = nullptr;
+	materialResourceFenceModel_->Map(0, nullptr, reinterpret_cast<void**>(&materialDateFenceModel_));
+	//色変えるやつ（Resource）
+	materialDateFenceModel_->color = { 1.0f,1.0f,1.0f,1.0f };
+	materialDateFenceModel_->enableLighting = false;
+	materialDateFenceModel_->uvTransform = MakeIdentity4x4();
+
+	directionalLightResourceFenceModel_ = CreateBufferResource(device_.Get(), sizeof(DirectionalLight));
+	directionalLightDataFenceModel_ = nullptr;
+	directionalLightResourceFenceModel_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightDataFenceModel_));
+	directionalLightDataFenceModel_->color = { 1.0f,1.0f,1.0f,1.0f };
+	directionalLightDataFenceModel_->direction = { 1.0f,0.0f,0.0f };
+	directionalLightDataFenceModel_->intensity = 1.0f;
 
 }
 
@@ -1268,7 +1304,6 @@ void DXCom::SettingTexture()
 	mipImages_ = LoadTexture("resource/boal16x16.png");
 	const DirectX::TexMetadata& metadata = mipImages_.GetMetadata();
 	textureResource_ = CreateTextureResource(device_.Get(), metadata);
-	
 
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
 	srvDesc.Format = metadata.format;
@@ -1277,6 +1312,12 @@ void DXCom::SettingTexture()
 	srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
 
 	intermediateResource1 = UploadTextureData(textureResource_, mipImages_, device_.Get(), commandList_);
+	textureSrvHandleCPU = GetCPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, 2);
+	textureSrvHandleGPU = GetGPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, 2);
+
+	device_->CreateShaderResourceView(textureResource_.Get(), &srvDesc, textureSrvHandleCPU);
+
+
 
 	/*mipImages2_ = LoadTexture(modelData_.material.textureFilePath);
 	const DirectX::TexMetadata& metadata2 = mipImages2_.GetMetadata();
@@ -1288,17 +1329,12 @@ void DXCom::SettingTexture()
 	srvDesc2.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 	srvDesc2.Texture2D.MipLevels = UINT(metadata2.mipLevels);*/
 
-	textureSrvHandleCPU = GetCPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, 2);
-	textureSrvHandleGPU = GetGPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, 2);
-
-	device_->CreateShaderResourceView(textureResource_.Get(), &srvDesc, textureSrvHandleCPU);
-
 	/*intermediateResource2 = UploadTextureData(textureResource2_, mipImages2_, device_.Get(), commandList_);
-	
 	textureSrvHandleCPU2 = GetCPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, 3);
 	textureSrvHandleGPU2 = GetGPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, 3);
 
 	device_->CreateShaderResourceView(textureResource2_.Get(), &srvDesc2, textureSrvHandleCPU2);*/
+
 
 
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDescOff{};
@@ -1309,6 +1345,25 @@ void DXCom::SettingTexture()
 	offTextureHandleCPU_ = GetCPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, 3);
 	offTextureHandle_ = GetGPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, 3);
 	device_->CreateShaderResourceView(offscreenrt_.Get(), &srvDescOff, offTextureHandleCPU_);
+
+
+
+	//FenceModelSpriteData
+	fenceMipImages_ = LoadTexture(fenceModelData_.material.textureFilePath);
+	const DirectX::TexMetadata& fenceMetadata = fenceMipImages_.GetMetadata();
+	fenceTextureResource_ = CreateTextureResource(device_.Get(), fenceMetadata);
+
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDescFence{};
+	srvDescFence.Format = fenceMetadata.format;
+	srvDescFence.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDescFence.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srvDescFence.Texture2D.MipLevels = UINT(fenceMetadata.mipLevels);
+
+	fenceIntermediateResource_ = UploadTextureData(fenceTextureResource_, fenceMipImages_, device_.Get(), commandList_);
+	fenceTextureSrvHandleCPU_ = GetCPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, 4);
+	fenceTextureSrvHandleGPU_ = GetGPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, 4);
+
+	device_->CreateShaderResourceView(fenceTextureResource_.Get(), &srvDescFence, fenceTextureSrvHandleCPU_);
 
 
 
@@ -1400,8 +1455,8 @@ void DXCom::Command()
 	scissorRect.right = MyWin::kWindowWidth;
 	scissorRect.top = 0;
 	scissorRect.bottom = MyWin::kWindowHeight;
-	
-	
+
+
 	commandList_->RSSetViewports(1, &viewport);
 	commandList_->RSSetScissorRects(1, &scissorRect);
 	commandList_->SetGraphicsRootSignature(rootSignature_.Get());
@@ -1410,7 +1465,7 @@ void DXCom::Command()
 	//三角形１
 	/*if (isTriangleDraw_)
 	{
-		
+
 		commandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);
 		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
@@ -1453,7 +1508,7 @@ void DXCom::Command()
 	}*/
 
 
-	
+
 	//model
 	/*commandList_->RSSetViewports(1, &viewport);
 	commandList_->RSSetScissorRects(1, &scissorRect);
@@ -1469,6 +1524,21 @@ void DXCom::Command()
 
 
 
+	//FenceModel
+	commandList_->RSSetViewports(1, &viewport);
+	commandList_->RSSetScissorRects(1, &scissorRect);
+	commandList_->SetGraphicsRootSignature(rootSignature_.Get());
+	commandList_->SetPipelineState(graphicsPipelineState_.Get());
+	commandList_->IASetVertexBuffers(0, 1, &vertexFenceModelBufferView_);
+	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	commandList_->SetGraphicsRootConstantBufferView(0, materialResourceFenceModel_->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootConstantBufferView(1, wvpResourceFenceModel_->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResourceFenceModel_->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootDescriptorTable(2, fenceTextureSrvHandleGPU_);
+	commandList_->DrawInstanced(UINT(fenceModelData_.vertices.size()), 1, 0, 0);
+
+
+
 	/*commandList_->IASetIndexBuffer(&indexBufferViewSprite);
 	commandList_->IASetVertexBuffers(0, 1, &vertexBufferViewSprite_);
 	commandList_->SetGraphicsRootConstantBufferView(0, materialResourceSprite_->GetGPUVirtualAddress());
@@ -1477,23 +1547,25 @@ void DXCom::Command()
 	commandList_->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
 	commandList_->DrawIndexedInstanced(6, 1, 0, 0, 0);*/
 	/*commandList_->DrawInstanced(6, 1, 0, 0);*/
-	
 
 
 
-	for (int i = 0; i < particles.size()-1; i++)
+	if (isFluidMode_)
 	{
-		
-		commandList_->IASetIndexBuffer(&indexFlowBufferView_);
-		commandList_->IASetVertexBuffers(0, 1, &vertexFlowBufferView_);
-		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		commandList_->SetGraphicsRootConstantBufferView(0, materialFlowResource_->GetGPUVirtualAddress());
-		commandList_->SetGraphicsRootConstantBufferView(1, wvpFlowResource_[i]->GetGPUVirtualAddress());
-		commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
-		commandList_->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
-		commandList_->DrawIndexedInstanced(6, 1, 0, 0, 0);
+		for (int i = 0; i < particles.size() - 1; i++)
+		{
 
-		/*commandList_->DrawInstanced(3, 1, 0, 0);*/
+			commandList_->IASetIndexBuffer(&indexFlowBufferView_);
+			commandList_->IASetVertexBuffers(0, 1, &vertexFlowBufferView_);
+			commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			commandList_->SetGraphicsRootConstantBufferView(0, materialFlowResource_->GetGPUVirtualAddress());
+			commandList_->SetGraphicsRootConstantBufferView(1, wvpFlowResource_[i]->GetGPUVirtualAddress());
+			commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
+			commandList_->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
+			commandList_->DrawIndexedInstanced(6, 1, 0, 0, 0);
+
+			/*commandList_->DrawInstanced(3, 1, 0, 0);*/
+		}
 	}
 
 
@@ -1555,7 +1627,7 @@ void DXCom::PostEffect()
 		commandList_->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
 		commandList_->DrawIndexedInstanced(6, 1, 0, 0, 0);
 	}
-	
+
 	if (isMetaBall_)
 	{
 		commandList_->RSSetViewports(1, &viewport);
@@ -1610,13 +1682,13 @@ void DXCom::LastFrame()
 	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 	barrier.Transition.pResource = swapChainResources_[backBufferIndex].Get();
 
-	
+
 
 
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
 	commandList_->ResourceBarrier(1, &barrier);
-	
+
 
 	HRESULT hr = commandList_->Close();
 	assert(SUCCEEDED(hr));
@@ -1664,6 +1736,7 @@ void DXCom::UpDate()
 {
 	/*Tick();*/
 
+#ifdef _DEBUG
 	ImGui::Begin("debug");
 	/*if (ImGui::TreeNode("Triangle1"))
 	{
@@ -1675,7 +1748,7 @@ void DXCom::UpDate()
 		ImGui::Checkbox("whiteTexture or uvChecker", &useMonsterBall);
 		ImGui::TreePop();
 	}*/
-	
+
 	/*if (ImGui::TreeNode("Triangle2"))
 	{
 		ImGui::ColorEdit3("color2", &materialDate2_->color.X);
@@ -1685,7 +1758,7 @@ void DXCom::UpDate()
 		ImGui::Checkbox("useMonsterBall2", &useMonsterBall2);
 		ImGui::TreePop();
 	}
-	
+
 	if (ImGui::TreeNode("Sprite"))
 	{
 		ImGui::DragFloat3("Sprite trans", &transSprite.translate.x, 1.0f, -1280.0f, 1280.0f);
@@ -1705,7 +1778,7 @@ void DXCom::UpDate()
 		ImGui::DragFloat3("Modelscale", &transformModel.scale.x, 0.01f, 0.0f, 6.0f);
 		ImGui::TreePop();
 	}
-	
+
 	if (ImGui::TreeNode("Particle"))
 	{
 		ImGui::ColorEdit3("Particlecolor", &particleColor.X);
@@ -1717,114 +1790,130 @@ void DXCom::UpDate()
 	ImGui::Checkbox("Meta", &isMetaBall_);
 	ImGui::Checkbox("Blur", &isGaussian_);
 
-	ImGui::DragFloat("mass", &mass_, 0.1f, 0.0f, 100.0f);
-	ImGui::DragFloat("h", &h_, 0.01f, 0.0f, 64.0f);
-	h2_ = h_ * h_;
-	poly6 = 4.0f / (mpi_ * powf(h_, 8));
-	spikyGrad = -10.0f / (mpi_ * powf(h_, 5));
-	viscLap = 40.0f / (mpi_ * powf(h_, 5));
-	eps = h_;
-	halfH_ = h_ * 0.5f;
-	ImGui::DragFloat("dt", &dt, 0.00001f, 0.0001f,0.001f);
-	ImGui::SliderFloat("Setradius", &setradius_, 3.0f, 100.0f);
+	if (isFluidMode_)
+	{
+		ImGui::DragFloat("mass", &mass_, 0.1f, 0.0f, 100.0f);
+		ImGui::DragFloat("h", &h_, 0.01f, 0.0f, 64.0f);
+		h2_ = h_ * h_;
+		poly6 = 4.0f / (mpi_ * powf(h_, 8));
+		spikyGrad = -10.0f / (mpi_ * powf(h_, 5));
+		viscLap = 40.0f / (mpi_ * powf(h_, 5));
+		eps = h_;
+		halfH_ = h_ * 0.5f;
+		ImGui::DragFloat("dt", &dt, 0.00001f, 0.0001f, 0.001f);
+	}
+	else
+	{
+		ImGui::SliderFloat("Setradius", &setradius_, 3.0f, 100.0f);
+	}
+
+	if (ImGui::TreeNode("FenceModel"))
+	{
+		ImGui::ColorEdit3("Modelcolor", &materialDateFenceModel_->color.X);
+		ImGui::DragFloat3("Modeltrans", &transformFenceModel_.translate.x, 0.01f, -2.0f, 2.0f);
+		ImGui::DragFloat3("Modelrotate", &transformFenceModel_.rotate.x, 0.01f, -4.0f, 4.0f);
+		ImGui::DragFloat3("Modelscale", &transformFenceModel_.scale.x, 0.01f, 0.0f, 6.0f);
+		ImGui::TreePop();
+	}
 
 	ImGui::Text("light");
 	ImGui::SliderFloat3("light color", &directionalLightData_->color.X, 0.0f, 1.0f);
 	ImGui::SliderFloat3("light direction", &directionalLightData_->direction.x, -1.0f, 1.0f);
 	ImGui::End();
 
+#endif // _DEBUG
+
 	directionalLightData_->direction = directionalLightData_->direction.Normalize();
 
-	/*if (Input::GetInstance()->Input::IsTriggerMouse(0))
+	if (!isFluidMode_)
 	{
-		if (particleDate_->particleCount < 399)
+		if (Input::GetInstance()->Input::IsTriggerMouse(0))
 		{
-			Vector2 xy = Input::GetInstance()->Input::GetMousePosition();
-
-			particles.emplace_back(Particle(xy.x, xy.y));
-			particleDate_->particleCount = int(particles.size() - 1);
-			int count = particleDate_->particleCount;
-
-
-			vertexFlowResource_[count] = CreateBufferResource(device_, sizeof(VertexData) * 4);
-			indexFlowResource_[count] = CreateBufferResource(device_, sizeof(uint32_t) * 6);
-
-
-			vertexFlowDate_[count] = nullptr;
-			vertexFlowResource_[count]->Map(0, nullptr, reinterpret_cast<void**>(&vertexFlowDate_[count]));
-
-			vertexFlowDate_[count][0] = { { -6.0f,6.0f,0.0f,1.0f }, { 0.0f,1.0f }, { 0.0f,0.0f,-1.0f } };
-			vertexFlowDate_[count][1] = { { -6.0f,-6.0f,0.0f,1.0f }, { 0.0f,0.0f }, { 0.0f,0.0f,-1.0f } };
-			vertexFlowDate_[count][2] = { { 6.0f,6.0f,0.0f,1.0f }, { 1.0f,1.0f }, { 0.0f,0.0f,-1.0f } };
-			vertexFlowDate_[count][3] = { { 6.0f,-6.0f,0.0f,1.0f }, { 1.0f,0.0f }, { 0.0f,0.0f,-1.0f } };
-
-
-			indexFlowResource_[count]->Map(0, nullptr, reinterpret_cast<void**>(&indexFlowData_[count]));
-			indexFlowData_[count][0] = 0;
-			indexFlowData_[count][1] = 1;
-			indexFlowData_[count][2] = 2;
-
-			indexFlowData_[count][3] = 1;
-			indexFlowData_[count][4] = 3;
-			indexFlowData_[count][5] = 2;
-
-
-			wvpFlowResource_[count] = CreateBufferResource(device_, sizeof(TransformationMatrix));
-			wvpFlowDate_[count] = nullptr;
-			wvpFlowResource_[count]->Map(0, nullptr, reinterpret_cast<void**>(&wvpFlowDate_[count]));
-
-			particleDate_->radius[count] = { setradius_,0.0f,0.0f,0.0f };
-
-
-			Matrix4x4 viewMatSprite = MakeIdentity4x4();
-			Matrix4x4 projectMatSprite = MakeOrthographicMatrix(0.0f, 0.0f, float(Fuji::GetkWindowWidth()), float(Fuji::GetkWindowHeight()), 0.0f, 100.0f);
-			Matrix4x4 worldViewProMatSpriteOrigine = Multiply(viewMatSprite, projectMatSprite);
-			Matrix4x4 worldViewProMatSprite = worldViewProMatSpriteOrigine;
-
-			Matrix4x4 worldMatSprite = MakeAffineMatrix(Vector3(1.0f, 1.0f, 1.0f), Vector3(0.0f, 0.0f, 0.0f), particles[count].pos);
-			worldViewProMatSprite = worldViewProMatSpriteOrigine;
-			worldViewProMatSprite = Multiply(worldMatSprite, worldViewProMatSprite);
-
-			wvpFlowDate_[count]->World = worldMatSprite;
-			wvpFlowDate_[count]->WVP = worldViewProMatSprite;
-
-			particleDate_->center[count] = { worldMatSprite.m[3][0],worldMatSprite.m[3][1],0.0f,0.0f };
-		}
-	}
-
-	if (Input::GetInstance()->Input::IsPressMouse(1))
-	{
-		if (particleDate_->particleCount > 0)
-		{
-			particles.pop_back();
-			particleDate_->particleCount = int(particles.size() - 1);
-		}
-	}*/
-
-	for (auto& pi : particles)
-	{
-		pi.density = 0.00001f;
-
-		for (auto& pj : particles)
-		{
-
-			Vector3 rij = pj.pos - pi.pos;
-			Vector2 rijv2 = { rij.x,rij.y };
-			float r2 = rijv2 * rijv2;
-
-			if (r2 < h2_)
+			if (particleDate_->particleCount < 399)
 			{
-				float c = h2_ - r2;
-				pi.density += mass_ * poly6 * powf(c, 3);
+				Vector2 xy = Input::GetInstance()->Input::GetMousePosition();
+
+				particles.emplace_back(Particle(xy.x, xy.y));
+				particleDate_->particleCount = int(particles.size() - 1);
+				int count = particleDate_->particleCount;
+
+
+				vertexFlowResource_[count] = CreateBufferResource(device_, sizeof(VertexData) * 4);
+				indexFlowResource_[count] = CreateBufferResource(device_, sizeof(uint32_t) * 6);
+
+
+				vertexFlowDate_[count] = nullptr;
+				vertexFlowResource_[count]->Map(0, nullptr, reinterpret_cast<void**>(&vertexFlowDate_[count]));
+				vertexFlowDate_[count][0] = { { -6.0f,6.0f,0.0f,1.0f }, { 0.0f,1.0f }, { 0.0f,0.0f,-1.0f } };
+				vertexFlowDate_[count][1] = { { -6.0f,-6.0f,0.0f,1.0f }, { 0.0f,0.0f }, { 0.0f,0.0f,-1.0f } };
+				vertexFlowDate_[count][2] = { { 6.0f,6.0f,0.0f,1.0f }, { 1.0f,1.0f }, { 0.0f,0.0f,-1.0f } };
+				vertexFlowDate_[count][3] = { { 6.0f,-6.0f,0.0f,1.0f }, { 1.0f,0.0f }, { 0.0f,0.0f,-1.0f } };
+
+
+				indexFlowResource_[count]->Map(0, nullptr, reinterpret_cast<void**>(&indexFlowData_[count]));
+				indexFlowData_[count][0] = 0;
+				indexFlowData_[count][1] = 1;
+				indexFlowData_[count][2] = 2;
+
+				indexFlowData_[count][3] = 1;
+				indexFlowData_[count][4] = 3;
+				indexFlowData_[count][5] = 2;
+
+
+				wvpFlowResource_[count] = CreateBufferResource(device_, sizeof(TransformationMatrix));
+				wvpFlowDate_[count] = nullptr;
+				wvpFlowResource_[count]->Map(0, nullptr, reinterpret_cast<void**>(&wvpFlowDate_[count]));
+				particleDate_->radius[count] = { setradius_,0.0f,0.0f,0.0f };
+
+
+				Matrix4x4 viewMatSprite = MakeIdentity4x4();
+				Matrix4x4 projectMatSprite = MakeOrthographicMatrix(0.0f, 0.0f, float(Fuji::GetkWindowWidth()), float(Fuji::GetkWindowHeight()), 0.0f, 100.0f);
+				Matrix4x4 worldViewProMatSpriteOrigine = Multiply(viewMatSprite, projectMatSprite);
+				Matrix4x4 worldViewProMatSprite = worldViewProMatSpriteOrigine;
+
+				Matrix4x4 worldMatSprite = MakeAffineMatrix(Vector3(1.0f, 1.0f, 1.0f), Vector3(0.0f, 0.0f, 0.0f), particles[count].pos);
+				worldViewProMatSprite = worldViewProMatSpriteOrigine;
+				worldViewProMatSprite = Multiply(worldMatSprite, worldViewProMatSprite);
+
+				wvpFlowDate_[count]->World = worldMatSprite;
+				wvpFlowDate_[count]->WVP = worldViewProMatSprite;
+
+				particleDate_->center[count] = { worldMatSprite.m[3][0],worldMatSprite.m[3][1],0.0f,0.0f };
 			}
 		}
-		pi.pressure = gasConst * (pi.density - restDens);
+		if (Input::GetInstance()->Input::IsTriggerMouse(1))
+		{
+			if (particleDate_->particleCount > 0)
+			{
+				particles.pop_back();
+				particleDate_->particleCount = int(particles.size() - 1);
+			}
+		}
 	}
-	for (auto& pi : particles)
+	else
 	{
-		Vector2 fpress(0, 0);
-		Vector2 fvisc(0, 0);
-		
+		for (auto& pi : particles)
+		{
+			pi.density = 0.00001f;
+			for (auto& pj : particles)
+			{
+				Vector3 rij = pj.pos - pi.pos;
+				Vector2 rijv2 = { rij.x,rij.y };
+				float r2 = rijv2 * rijv2;
+
+				if (r2 < h2_)
+				{
+					float c = h2_ - r2;
+					pi.density += mass_ * poly6 * powf(c, 3);
+				}
+			}
+			pi.pressure = gasConst * (pi.density - restDens);
+		}
+		for (auto& pi : particles)
+		{
+			Vector2 fpress(0, 0);
+			Vector2 fvisc(0, 0);
+
 			for (auto& pj : particles)
 			{
 				if (&pi == &pj)
@@ -1839,7 +1928,7 @@ void DXCom::UpDate()
 				{
 					float c = h_ - r;
 
-					fpress += (rijv2.NormaliZe()*(-1.0f)) * mass_ * (pi.pressure + pj.pressure) / (2.0f * pj.density) * spikyGrad * powf(c, 3);
+					fpress += (rijv2.NormaliZe() * (-1.0f)) * mass_ * (pi.pressure + pj.pressure) / (2.0f * pj.density) * spikyGrad * powf(c, 3);
 					Vector2 pjv2Vel = { pj.vel.x,pj.vel.y };
 					Vector2 piv2Vel = { pi.vel.x,pi.vel.y };
 					fvisc += (pjv2Vel - piv2Vel) * visc * mass_ / pj.density * viscLap * c;
@@ -1848,57 +1937,59 @@ void DXCom::UpDate()
 			Vector2 fgrav = G_ * mass_ / pi.density;
 			Vector2 fff = (fpress + fvisc + fgrav);
 			pi.force = { fff.x,fff.y,0.0f };
+		}
+
+		for (auto& p : particles)
+		{
+			p.vel += p.force * dt / p.density;
+			p.pos += p.vel * dt;
+
+			if (p.pos.x - eps < 0)
+			{
+				p.vel.x *= boundDamping;
+				p.pos.x = eps;
+			}
+			if (p.pos.x + eps > 600)
+			{
+				p.vel.x *= boundDamping;
+				p.pos.x = 600 - eps;
+			}
+			if (p.pos.y - eps < 0)
+			{
+				p.vel.y *= boundDamping;
+				p.pos.y = eps;
+			}
+			if (p.pos.y + eps > 600)
+			{
+				p.vel.y *= boundDamping;
+				p.pos.y = 600 - eps;
+			}
+		}
+
+		gravityChangeTime_++;
+		if (gravityChangeTime_ >= 0 && gravityChangeTime_ < 400)
+		{
+			G_ = { 0.0f,9.8f };
+		}
+		if (gravityChangeTime_ >= 400 && gravityChangeTime_ < 800)
+		{
+			G_ = { 0.0f,-9.8f };
+		}
+		if (gravityChangeTime_ >= 800 && gravityChangeTime_ < 1200)
+		{
+			G_ = { 9.8f,0.0f };
+		}
+		if (gravityChangeTime_ >= 1200 && gravityChangeTime_ < 1600)
+		{
+			G_ = { -9.8f,0.0f };
+		}
+		if (gravityChangeTime_ >= 1600)
+		{
+			gravityChangeTime_ = 0;
+		}
 	}
 
-	for (auto& p : particles)
-	{
 
-		p.vel += p.force * dt / p.density;
-		p.pos += p.vel * dt;
-
-		if (p.pos.x - eps < 0)
-		{
-			p.vel.x *= boundDamping;
-			p.pos.x = eps;
-		}
-		if (p.pos.x + eps > 600)
-		{
-			p.vel.x *= boundDamping;
-			p.pos.x = 600 - eps;
-		}
-		if (p.pos.y - eps < 0)
-		{
-			p.vel.y *= boundDamping;
-			p.pos.y = eps;
-		}
-		if (p.pos.y + eps > 600)
-		{
-			p.vel.y *= boundDamping;
-			p.pos.y = 600 - eps;
-		}
-	}
-
-	gravityChangeTime_++;
-	if (gravityChangeTime_ >= 0 && gravityChangeTime_ < 400)
-	{
-		G_= { 0.0f,9.8f };
-	}
-	if (gravityChangeTime_ >= 400 && gravityChangeTime_ < 800)
-	{
-		G_ = { 0.0f,-9.8f };
-	}
-	if (gravityChangeTime_ >= 800 && gravityChangeTime_ < 1200)
-	{
-		G_ = { 9.8f,0.0f };
-	}
-	if (gravityChangeTime_ >= 1200 && gravityChangeTime_ < 1600)
-	{
-		G_ = { -9.8f,0.0f };
-	}
-	if (gravityChangeTime_ >= 1600)
-	{
-		gravityChangeTime_ = 0;
-	}
 
 	/*transform.rotate.y += 0.05f;*/
 	Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
@@ -1909,6 +2000,16 @@ void DXCom::UpDate()
 
 	wvpDate_->World = worldMatrix;
 	wvpDate_->WVP = worldViewProjectionMatrix;
+
+
+	Matrix4x4 worldMatrixFenceModel = MakeAffineMatrix(transformFenceModel_.scale, transformFenceModel_.rotate, transformFenceModel_.translate);
+	Matrix4x4 worldViewProjectionMatrixFenceModel = Multiply(viewMatrix, projectionMatrix);
+	worldViewProjectionMatrixFenceModel = Multiply(worldMatrixFenceModel, worldViewProjectionMatrixFenceModel);
+
+	wvpDateFenceModel_->World = worldMatrixFenceModel;
+	wvpDateFenceModel_->WVP = worldViewProjectionMatrixFenceModel;
+
+
 
 	/*Matrix4x4 worldMatrix2 = MakeAffineMatrix(transform2.scale, transform2.rotate, transform2.translate);
 	Matrix4x4 worldViewProjectionMatrix2 = Multiply(viewMatrix, projectionMatrix);
@@ -2003,32 +2104,30 @@ void DXCom::UpDate()
 
 
 	//	}
-	//}
-	
-	/*ImGui::Begin("Frame");
-	ImGui::Text("%d", frameRate);
-	ImGui::End();*/
+	//}*/
 
-
-	Matrix4x4 viewMatSprite = MakeIdentity4x4();
-	Matrix4x4 projectMatSprite = MakeOrthographicMatrix(0.0f, 0.0f, float(Fuji::GetkWindowWidth()), float(Fuji::GetkWindowHeight()), 0.0f, 100.0f);
-	Matrix4x4 worldViewProMatSpriteOrigine = Multiply(viewMatSprite, projectMatSprite);
-	Matrix4x4 worldViewProMatSprite = worldViewProMatSpriteOrigine;
-	for (size_t i = 0; i < particles.size()-1; i++)
+	if (isFluidMode_)
 	{
-		Matrix4x4 worldMatSprite = MakeAffineMatrix(Vector3(1.0f, 1.0f, 1.0f), Vector3(0.0f, 0.0f, 0.0f), particles[i].pos);
-		worldViewProMatSprite = worldViewProMatSpriteOrigine;
-		worldViewProMatSprite = Multiply(worldMatSprite, worldViewProMatSprite);
+		Matrix4x4 viewMatSprite = MakeIdentity4x4();
+		Matrix4x4 projectMatSprite = MakeOrthographicMatrix(0.0f, 0.0f, float(Fuji::GetkWindowWidth()), float(Fuji::GetkWindowHeight()), 0.0f, 100.0f);
+		Matrix4x4 worldViewProMatSpriteOrigine = Multiply(viewMatSprite, projectMatSprite);
+		Matrix4x4 worldViewProMatSprite = worldViewProMatSpriteOrigine;
+		for (size_t i = 0; i < particles.size() - 1; i++)
+		{
+			Matrix4x4 worldMatSprite = MakeAffineMatrix(Vector3(1.0f, 1.0f, 1.0f), Vector3(0.0f, 0.0f, 0.0f), particles[i].pos);
+			worldViewProMatSprite = worldViewProMatSpriteOrigine;
+			worldViewProMatSprite = Multiply(worldMatSprite, worldViewProMatSprite);
 
-		wvpFlowDate_[i]->World = worldMatSprite;
-		wvpFlowDate_[i]->WVP = worldViewProMatSprite;
+			wvpFlowDate_[i]->World = worldMatSprite;
+			wvpFlowDate_[i]->WVP = worldViewProMatSprite;
 
-		particleDate_->center[i] = { worldMatSprite.m[3][0],worldMatSprite.m[3][1],0.0f,0.0f };
+			particleDate_->center[i] = { worldMatSprite.m[3][0],worldMatSprite.m[3][1],0.0f,0.0f };
 
-		/*Matrix4x4 worldMatrixParticle = MakeAffineMatrix(Vector3(1.0f, 1.0f, 1.0f), Vector3(0.0f, 0.0f, 0.0f), particles[i].pos);
-		Matrix4x4 worldViewProjectionMatrixParticle = Multiply(worldMatrixParticle, Multiply(viewMatrix, projectionMatrix));
-		wvpFlowDate_[i]->World = worldMatrixParticle;
-		wvpFlowDate_[i]->WVP = worldViewProjectionMatrixParticle;*/
+			/*Matrix4x4 worldMatrixParticle = MakeAffineMatrix(Vector3(1.0f, 1.0f, 1.0f), Vector3(0.0f, 0.0f, 0.0f), particles[i].pos);
+			Matrix4x4 worldViewProjectionMatrixParticle = Multiply(worldMatrixParticle, Multiply(viewMatrix, projectionMatrix));
+			wvpFlowDate_[i]->World = worldMatrixParticle;
+			wvpFlowDate_[i]->WVP = worldViewProjectionMatrixParticle;*/
+		}
 	}
 }
 
@@ -2411,7 +2510,7 @@ ModelData DXCom::LoadObjFile(const std::string& directoryPath, const std::string
 				texcoord.y = 1.0f - texcoord.y;
 				Vector3 normal = normals[elementIndices[2] - 1];
 				normal.x *= -1.0f;
-				triangle[faceVertex]= { position,texcoord,normal };
+				triangle[faceVertex] = { position,texcoord,normal };
 				/*VertexData vertex= { position,texcoord,normal };
 				modeldata.vertices.push_back(vertex);*/
 			}
@@ -2437,7 +2536,7 @@ MaterialData DXCom::LoadMaterialTemplateFile(const std::string& directoryPath, c
 	std::ifstream file(directoryPath + "/" + filename);
 	assert(file.is_open());
 
-	while (std::getline(file,line))
+	while (std::getline(file, line))
 	{
 		std::string identifier;
 		std::istringstream s(line);
