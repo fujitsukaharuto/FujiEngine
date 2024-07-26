@@ -306,7 +306,7 @@ private:
 
 
 	//FenceModelData
-	ModelData fenceModelData_;
+	/*ModelData fenceModelData_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexFenceModelResource_ = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexFenceModelBufferView_{};
 	VertexData* vertexDataFenceModel_ = nullptr;
@@ -315,7 +315,20 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResourceFenceModel_ = nullptr;
 	Material* materialDateFenceModel_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResourceFenceModel_ = nullptr;
-	DirectionalLight* directionalLightDataFenceModel_ = nullptr;
+	DirectionalLight* directionalLightDataFenceModel_ = nullptr;*/
+
+
+	//PlaneModel
+	ModelData planeModelData_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> vertexPlaneModelResource_ = nullptr;
+	D3D12_VERTEX_BUFFER_VIEW vertexPlaneModelBufferView_{};
+	VertexData* vertexDataPlaneModel_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> wvpResourcePlaneModel_ = nullptr;
+	TransformationMatrix* wvpDatePlaneModel_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> materialResourcePlaneModel_ = nullptr;
+	Material* materialDatePlaneModel_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResourcePlaneModel_ = nullptr;
+	DirectionalLight* directionalLightDataPlaneModel_ = nullptr;
 
 
 	//Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourceSprite_ = nullptr;
@@ -390,7 +403,9 @@ private:
 		{0.0f,0.0f,0.0f},
 	};
 	Trans transformModel{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	
 	Trans transformFenceModel_{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	Trans transformPlaneModel_{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 
 
 	Trans transformParticle[particleIndex]{};
@@ -404,14 +419,18 @@ private:
 	DirectX::ScratchImage mipImages_;
 	DirectX::ScratchImage mipImages2_;
 	DirectX::ScratchImage fenceMipImages_;
+	DirectX::ScratchImage planeMipImages_;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> textureResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> textureResource2_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> fenceTextureResource_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> planeTextureResource_;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource1;
 	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource2;
 	Microsoft::WRL::ComPtr<ID3D12Resource> fenceIntermediateResource_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> planeIntermediateResource_;
+
 
 	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU;
 	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU;
@@ -421,6 +440,9 @@ private:
 
 	D3D12_CPU_DESCRIPTOR_HANDLE fenceTextureSrvHandleCPU_;
 	D3D12_GPU_DESCRIPTOR_HANDLE fenceTextureSrvHandleGPU_;
+
+	D3D12_CPU_DESCRIPTOR_HANDLE planeTextureSrvHandleCPU_;
+	D3D12_GPU_DESCRIPTOR_HANDLE planeTextureSrvHandleGPU_;
 
 	/*std::chrono::high_resolution_clock::time_point lastTime;
 	float deltaTime;

@@ -1197,35 +1197,66 @@ void DXCom::SettingSpriteVertex()
 
 
 	//FenceModel
-	fenceModelData_ = LoadObjFile("resource", "fence.obj");
-	vertexFenceModelResource_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * fenceModelData_.vertices.size());
-	vertexFenceModelBufferView_.BufferLocation = vertexFenceModelResource_->GetGPUVirtualAddress();
-	vertexFenceModelBufferView_.SizeInBytes = UINT(sizeof(VertexData) * fenceModelData_.vertices.size());
-	vertexFenceModelBufferView_.StrideInBytes = sizeof(VertexData);
+	//fenceModelData_ = LoadObjFile("resource", "fence.obj");
+	//vertexFenceModelResource_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * fenceModelData_.vertices.size());
+	//vertexFenceModelBufferView_.BufferLocation = vertexFenceModelResource_->GetGPUVirtualAddress();
+	//vertexFenceModelBufferView_.SizeInBytes = UINT(sizeof(VertexData) * fenceModelData_.vertices.size());
+	//vertexFenceModelBufferView_.StrideInBytes = sizeof(VertexData);
 
-	vertexFenceModelResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataFenceModel_));
-	std::memcpy(vertexDataFenceModel_, fenceModelData_.vertices.data(), sizeof(VertexData) * fenceModelData_.vertices.size());
+	//vertexFenceModelResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataFenceModel_));
+	//std::memcpy(vertexDataFenceModel_, fenceModelData_.vertices.data(), sizeof(VertexData) * fenceModelData_.vertices.size());
 
-	wvpResourceFenceModel_ = CreateBufferResource(device_.Get(), sizeof(TransformationMatrix));
-	wvpDateFenceModel_ = nullptr;
-	wvpResourceFenceModel_->Map(0, nullptr, reinterpret_cast<void**>(&wvpDateFenceModel_));
-	wvpDateFenceModel_->WVP = MakeIdentity4x4();
-	wvpDateFenceModel_->World = MakeIdentity4x4();
+	//wvpResourceFenceModel_ = CreateBufferResource(device_.Get(), sizeof(TransformationMatrix));
+	//wvpDateFenceModel_ = nullptr;
+	//wvpResourceFenceModel_->Map(0, nullptr, reinterpret_cast<void**>(&wvpDateFenceModel_));
+	//wvpDateFenceModel_->WVP = MakeIdentity4x4();
+	//wvpDateFenceModel_->World = MakeIdentity4x4();
 
-	materialResourceFenceModel_ = CreateBufferResource(device_.Get(), sizeof(Material));
-	materialDateFenceModel_ = nullptr;
-	materialResourceFenceModel_->Map(0, nullptr, reinterpret_cast<void**>(&materialDateFenceModel_));
+	//materialResourceFenceModel_ = CreateBufferResource(device_.Get(), sizeof(Material));
+	//materialDateFenceModel_ = nullptr;
+	//materialResourceFenceModel_->Map(0, nullptr, reinterpret_cast<void**>(&materialDateFenceModel_));
+	////色変えるやつ（Resource）
+	//materialDateFenceModel_->color = { 1.0f,1.0f,1.0f,1.0f };
+	//materialDateFenceModel_->enableLighting = false;
+	//materialDateFenceModel_->uvTransform = MakeIdentity4x4();
+
+	//directionalLightResourceFenceModel_ = CreateBufferResource(device_.Get(), sizeof(DirectionalLight));
+	//directionalLightDataFenceModel_ = nullptr;
+	//directionalLightResourceFenceModel_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightDataFenceModel_));
+	//directionalLightDataFenceModel_->color = { 1.0f,1.0f,1.0f,1.0f };
+	//directionalLightDataFenceModel_->direction = { 1.0f,0.0f,0.0f };
+	//directionalLightDataFenceModel_->intensity = 1.0f;
+
+	//PlaneModel
+	planeModelData_ = LoadObjFile("resource", "plane.obj");
+	vertexPlaneModelResource_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * planeModelData_.vertices.size());
+	vertexPlaneModelBufferView_.BufferLocation = vertexPlaneModelResource_->GetGPUVirtualAddress();
+	vertexPlaneModelBufferView_.SizeInBytes = UINT(sizeof(VertexData) * planeModelData_.vertices.size());
+	vertexPlaneModelBufferView_.StrideInBytes = sizeof(VertexData);
+
+	vertexPlaneModelResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataPlaneModel_));
+	std::memcpy(vertexDataPlaneModel_, planeModelData_.vertices.data(), sizeof(VertexData) * planeModelData_.vertices.size());
+
+	wvpResourcePlaneModel_ = CreateBufferResource(device_.Get(), sizeof(TransformationMatrix));
+	wvpDatePlaneModel_ = nullptr;
+	wvpResourcePlaneModel_->Map(0, nullptr, reinterpret_cast<void**>(&wvpDatePlaneModel_));
+	wvpDatePlaneModel_->WVP = MakeIdentity4x4();
+	wvpDatePlaneModel_->World = MakeIdentity4x4();
+
+	materialResourcePlaneModel_ = CreateBufferResource(device_.Get(), sizeof(Material));
+	materialDatePlaneModel_ = nullptr;
+	materialResourcePlaneModel_->Map(0, nullptr, reinterpret_cast<void**>(&materialDatePlaneModel_));
 	//色変えるやつ（Resource）
-	materialDateFenceModel_->color = { 1.0f,1.0f,1.0f,1.0f };
-	materialDateFenceModel_->enableLighting = false;
-	materialDateFenceModel_->uvTransform = MakeIdentity4x4();
+	materialDatePlaneModel_->color = { 1.0f,1.0f,1.0f,1.0f };
+	materialDatePlaneModel_->enableLighting = false;
+	materialDatePlaneModel_->uvTransform = MakeIdentity4x4();
 
-	directionalLightResourceFenceModel_ = CreateBufferResource(device_.Get(), sizeof(DirectionalLight));
-	directionalLightDataFenceModel_ = nullptr;
-	directionalLightResourceFenceModel_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightDataFenceModel_));
-	directionalLightDataFenceModel_->color = { 1.0f,1.0f,1.0f,1.0f };
-	directionalLightDataFenceModel_->direction = { 1.0f,0.0f,0.0f };
-	directionalLightDataFenceModel_->intensity = 1.0f;
+	directionalLightResourcePlaneModel_ = CreateBufferResource(device_.Get(), sizeof(DirectionalLight));
+	directionalLightDataPlaneModel_ = nullptr;
+	directionalLightResourcePlaneModel_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightDataPlaneModel_));
+	directionalLightDataPlaneModel_->color = { 1.0f,1.0f,1.0f,1.0f };
+	directionalLightDataPlaneModel_->direction = { 1.0f,0.0f,0.0f };
+	directionalLightDataPlaneModel_->intensity = 1.0f;
 
 }
 
@@ -1349,7 +1380,7 @@ void DXCom::SettingTexture()
 
 
 	//FenceModelSpriteData
-	fenceMipImages_ = LoadTexture(fenceModelData_.material.textureFilePath);
+	/*fenceMipImages_ = LoadTexture(fenceModelData_.material.textureFilePath);
 	const DirectX::TexMetadata& fenceMetadata = fenceMipImages_.GetMetadata();
 	fenceTextureResource_ = CreateTextureResource(device_.Get(), fenceMetadata);
 
@@ -1363,8 +1394,25 @@ void DXCom::SettingTexture()
 	fenceTextureSrvHandleCPU_ = GetCPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, 4);
 	fenceTextureSrvHandleGPU_ = GetGPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, 4);
 
-	device_->CreateShaderResourceView(fenceTextureResource_.Get(), &srvDescFence, fenceTextureSrvHandleCPU_);
+	device_->CreateShaderResourceView(fenceTextureResource_.Get(), &srvDescFence, fenceTextureSrvHandleCPU_);*/
 
+
+	//PlaneModelSpriteData
+	planeMipImages_ = LoadTexture(planeModelData_.material.textureFilePath);
+	const DirectX::TexMetadata& planeMetadata = planeMipImages_.GetMetadata();
+	planeTextureResource_ = CreateTextureResource(device_.Get(), planeMetadata);
+
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDescPlane{};
+	srvDescPlane.Format = planeMetadata.format;
+	srvDescPlane.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDescPlane.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srvDescPlane.Texture2D.MipLevels = UINT(planeMetadata.mipLevels);
+
+	planeIntermediateResource_ = UploadTextureData(planeTextureResource_, planeMipImages_, device_.Get(), commandList_);
+	planeTextureSrvHandleCPU_ = GetCPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, 4);
+	planeTextureSrvHandleGPU_ = GetGPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, 4);
+
+	device_->CreateShaderResourceView(planeTextureResource_.Get(), &srvDescPlane, planeTextureSrvHandleCPU_);
 
 
 	HRESULT hr = commandList_->Close();
@@ -1525,7 +1573,7 @@ void DXCom::Command()
 
 
 	//FenceModel
-	commandList_->RSSetViewports(1, &viewport);
+	/*commandList_->RSSetViewports(1, &viewport);
 	commandList_->RSSetScissorRects(1, &scissorRect);
 	commandList_->SetGraphicsRootSignature(rootSignature_.Get());
 	commandList_->SetPipelineState(graphicsPipelineState_.Get());
@@ -1535,8 +1583,21 @@ void DXCom::Command()
 	commandList_->SetGraphicsRootConstantBufferView(1, wvpResourceFenceModel_->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResourceFenceModel_->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootDescriptorTable(2, fenceTextureSrvHandleGPU_);
-	commandList_->DrawInstanced(UINT(fenceModelData_.vertices.size()), 1, 0, 0);
+	commandList_->DrawInstanced(UINT(fenceModelData_.vertices.size()), 1, 0, 0);*/
 
+
+	//PlaneModel
+	commandList_->RSSetViewports(1, &viewport);
+	commandList_->RSSetScissorRects(1, &scissorRect);
+	commandList_->SetGraphicsRootSignature(rootSignature_.Get());
+	commandList_->SetPipelineState(graphicsPipelineState_.Get());
+	commandList_->IASetVertexBuffers(0, 1, &vertexPlaneModelBufferView_);
+	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	commandList_->SetGraphicsRootConstantBufferView(0, materialResourcePlaneModel_->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootConstantBufferView(1, wvpResourcePlaneModel_->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResourcePlaneModel_->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootDescriptorTable(2, planeTextureSrvHandleGPU_);
+	commandList_->DrawInstanced(UINT(planeModelData_.vertices.size()), 1, 0, 0);
 
 
 	/*commandList_->IASetIndexBuffer(&indexBufferViewSprite);
@@ -1807,12 +1868,21 @@ void DXCom::UpDate()
 		ImGui::SliderFloat("Setradius", &setradius_, 3.0f, 100.0f);
 	}
 
-	if (ImGui::TreeNode("FenceModel"))
+	/*if (ImGui::TreeNode("FenceModel"))
 	{
 		ImGui::ColorEdit3("Modelcolor", &materialDateFenceModel_->color.X);
 		ImGui::DragFloat3("Modeltrans", &transformFenceModel_.translate.x, 0.01f, -2.0f, 2.0f);
 		ImGui::DragFloat3("Modelrotate", &transformFenceModel_.rotate.x, 0.01f, -4.0f, 4.0f);
 		ImGui::DragFloat3("Modelscale", &transformFenceModel_.scale.x, 0.01f, 0.0f, 6.0f);
+		ImGui::TreePop();
+	}*/
+
+	if (ImGui::TreeNode("PlaneModel"))
+	{
+		ImGui::ColorEdit3("Modelcolor", &materialDatePlaneModel_->color.X);
+		ImGui::DragFloat3("Modeltrans", &transformPlaneModel_.translate.x, 0.01f, -2.0f, 2.0f);
+		ImGui::DragFloat3("Modelrotate", &transformPlaneModel_.rotate.x, 0.01f, -4.0f, 4.0f);
+		ImGui::DragFloat3("Modelscale", &transformPlaneModel_.scale.x, 0.01f, 0.0f, 6.0f);
 		ImGui::TreePop();
 	}
 
@@ -2001,14 +2071,22 @@ void DXCom::UpDate()
 	wvpDate_->World = worldMatrix;
 	wvpDate_->WVP = worldViewProjectionMatrix;
 
-
-	Matrix4x4 worldMatrixFenceModel = MakeAffineMatrix(transformFenceModel_.scale, transformFenceModel_.rotate, transformFenceModel_.translate);
+	//Fence
+	/*Matrix4x4 worldMatrixFenceModel = MakeAffineMatrix(transformFenceModel_.scale, transformFenceModel_.rotate, transformFenceModel_.translate);
 	Matrix4x4 worldViewProjectionMatrixFenceModel = Multiply(viewMatrix, projectionMatrix);
 	worldViewProjectionMatrixFenceModel = Multiply(worldMatrixFenceModel, worldViewProjectionMatrixFenceModel);
 
 	wvpDateFenceModel_->World = worldMatrixFenceModel;
-	wvpDateFenceModel_->WVP = worldViewProjectionMatrixFenceModel;
+	wvpDateFenceModel_->WVP = worldViewProjectionMatrixFenceModel;*/
 
+
+	//Plane
+	Matrix4x4 worldMatrixPlaneModel = MakeAffineMatrix(transformPlaneModel_.scale, transformPlaneModel_.rotate, transformPlaneModel_.translate);
+	Matrix4x4 worldViewProjectionMatrixPlaneModel = Multiply(viewMatrix, projectionMatrix);
+	worldViewProjectionMatrixPlaneModel = Multiply(worldMatrixPlaneModel, worldViewProjectionMatrixPlaneModel);
+
+	wvpDatePlaneModel_->World = worldMatrixPlaneModel;
+	wvpDatePlaneModel_->WVP = worldViewProjectionMatrixPlaneModel;
 
 
 	/*Matrix4x4 worldMatrix2 = MakeAffineMatrix(transform2.scale, transform2.rotate, transform2.translate);
