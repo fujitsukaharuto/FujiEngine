@@ -316,6 +316,81 @@ void DXCom::SettingRootSignature()
 		signatureBlob_->GetBufferSize(), IID_PPV_ARGS(&rootSignature_));
 	assert(SUCCEEDED(hr));
 
+
+
+	D3D12_ROOT_SIGNATURE_DESC rootSignatureParticleDesc{};
+	rootSignatureParticleDesc.Flags =
+		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+
+	D3D12_DESCRIPTOR_RANGE rangeParticle[1] = {};
+	rangeParticle[0].BaseShaderRegister = 0;
+	rangeParticle[0].NumDescriptors = 1;
+	rangeParticle[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	rangeParticle[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+	D3D12_ROOT_PARAMETER rootParametersParticle[4] = {};
+	rootParametersParticle[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParametersParticle[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParametersParticle[0].Descriptor.ShaderRegister = 0;
+
+	rootParametersParticle[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParametersParticle[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+	rootParametersParticle[1].DescriptorTable.pDescriptorRanges = rangeParticle;
+	rootParametersParticle[1].DescriptorTable.NumDescriptorRanges = _countof(rangeParticle);
+
+	rootParametersParticle[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParametersParticle[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParametersParticle[2].DescriptorTable.pDescriptorRanges = rangeParticle;
+	rootParametersParticle[2].DescriptorTable.NumDescriptorRanges = _countof(rangeParticle);
+
+	rootParametersParticle[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParametersParticle[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParametersParticle[3].Descriptor.ShaderRegister = 1;
+
+	rootSignatureParticleDesc.pParameters = rootParametersParticle;
+	rootSignatureParticleDesc.NumParameters = _countof(rootParametersParticle);
+
+
+	D3D12_STATIC_SAMPLER_DESC samplersParticle[1] = {};
+	samplersParticle[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+	samplersParticle[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	samplersParticle[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	samplersParticle[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	samplersParticle[0].ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
+	samplersParticle[0].MaxLOD = D3D12_FLOAT32_MAX;
+	samplersParticle[0].ShaderRegister = 0;
+	samplersParticle[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootSignatureParticleDesc.pStaticSamplers = samplersParticle;
+	rootSignatureParticleDesc.NumStaticSamplers = _countof(samplersParticle);
+
+
+	signatureParticleBlob_ = nullptr;
+	errorParticleBlob_ = nullptr;
+	hr = D3D12SerializeRootSignature(&rootSignatureParticleDesc,
+		D3D_ROOT_SIGNATURE_VERSION_1, &signatureParticleBlob_, &errorParticleBlob_);
+	if (FAILED(hr))
+	{
+		Log(reinterpret_cast<char*>(errorParticleBlob_->GetBufferPointer()));
+		assert(false);
+	}
+
+
+	rootSignatureParticle_ = nullptr;
+	hr = device_->CreateRootSignature(0, signatureParticleBlob_->GetBufferPointer(),
+		signatureParticleBlob_->GetBufferSize(), IID_PPV_ARGS(&rootSignatureParticle_));
+	assert(SUCCEEDED(hr));
+
+	const uint32_t kNumInstance = instanceCount_;
+	instancingResource =
+		CreateBufferResource(device_, sizeof(TransformationMatrix) * kNumInstance);
+	instancingResource->Map(0, nullptr, reinterpret_cast<void**>(&instancingData));
+	for (uint32_t index = 0; index < kNumInstance; ++index)
+	{
+		instancingData[index].WVP = MakeIdentity4x4();
+		instancingData[index].World = MakeIdentity4x4();
+	}
+
+
 	if (isGrayscale_)
 	{
 		D3D12_ROOT_SIGNATURE_DESC rootSignatureGrayDesc;
@@ -611,6 +686,93 @@ void DXCom::SettingGraphicPipeline()
 		IID_PPV_ARGS(&graphicsPipelineState_));
 	assert(SUCCEEDED(hr));
 
+
+
+	D3D12_INPUT_ELEMENT_DESC inputElementDescsParticle[3] = {};
+	inputElementDescsParticle[0].SemanticName = "POSITION";
+	inputElementDescsParticle[0].SemanticIndex = 0;
+	inputElementDescsParticle[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	inputElementDescsParticle[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+
+	inputElementDescsParticle[1].SemanticName = "TEXCOORD";
+	inputElementDescsParticle[1].SemanticIndex = 0;
+	inputElementDescsParticle[1].Format = DXGI_FORMAT_R32G32_FLOAT;
+	inputElementDescsParticle[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+
+	inputElementDescsParticle[2].SemanticName = "NORMAL";
+	inputElementDescsParticle[2].SemanticIndex = 0;
+	inputElementDescsParticle[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+	inputElementDescsParticle[2].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+
+	D3D12_INPUT_LAYOUT_DESC inputLayoutDescParticle{};
+	inputLayoutDescParticle.pInputElementDescs = inputElementDescsParticle;
+	inputLayoutDescParticle.NumElements = _countof(inputElementDescsParticle);
+
+
+	D3D12_BLEND_DESC blendDescParticle{};
+	blendDescParticle.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	blendDescParticle.RenderTarget[0].BlendEnable = TRUE;
+	blendDescParticle.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
+	blendDescParticle.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+	blendDescParticle.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+	blendDescParticle.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
+	blendDescParticle.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
+	blendDescParticle.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
+
+
+	D3D12_RASTERIZER_DESC rasterizerDescParticle{};
+	rasterizerDescParticle.CullMode = D3D12_CULL_MODE_NONE;
+	rasterizerDescParticle.FillMode = D3D12_FILL_MODE_SOLID;
+
+	vertexShaderParticleBlob_ = CompileShader(L"Particle.VS.hlsl",
+		L"vs_6_0", dxcUtils_, dxcCompiler_, includeHandler_);
+	assert(vertexShaderParticleBlob_ != nullptr);
+
+	pixelShaderParticleBlob_ = CompileShader(L"Particle.PS.hlsl",
+		L"ps_6_0", dxcUtils_, dxcCompiler_, includeHandler_);
+	assert(pixelShaderParticleBlob_ != nullptr);
+
+
+	D3D12_DEPTH_STENCIL_DESC depthStencilDescParticle{};
+	depthStencilDescParticle.DepthEnable = true;
+	depthStencilDescParticle.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+	depthStencilDescParticle.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+
+
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicPipelineStateDescParticle{};
+	graphicPipelineStateDescParticle.pRootSignature = rootSignatureParticle_.Get();
+	graphicPipelineStateDescParticle.InputLayout = inputLayoutDescParticle;
+	graphicPipelineStateDescParticle.VS = { vertexShaderParticleBlob_->GetBufferPointer(),
+	vertexShaderParticleBlob_->GetBufferSize() };
+	graphicPipelineStateDescParticle.PS = { pixelShaderParticleBlob_->GetBufferPointer(),
+	pixelShaderParticleBlob_->GetBufferSize() };
+
+	graphicPipelineStateDescParticle.DepthStencilState = depthStencilDescParticle;
+	graphicPipelineStateDescParticle.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+
+	graphicPipelineStateDescParticle.BlendState = blendDescParticle;
+	graphicPipelineStateDescParticle.RasterizerState = rasterizerDescParticle;
+
+	graphicPipelineStateDescParticle.NumRenderTargets = 1;
+	graphicPipelineStateDescParticle.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+
+	graphicPipelineStateDescParticle.PrimitiveTopologyType =
+		D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+
+	graphicPipelineStateDescParticle.SampleDesc.Count = 1;
+	graphicPipelineStateDescParticle.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
+
+	graphicsPipelineStateParticle_ = nullptr;
+	hr = device_->CreateGraphicsPipelineState(&graphicPipelineStateDescParticle,
+		IID_PPV_ARGS(&graphicsPipelineStateParticle_));
+	assert(SUCCEEDED(hr));
+
+	for (uint32_t index = 0; index < instanceCount_; ++index)
+	{
+		transforms[index].scale = { 1.0f,1.0f,1.0f };
+		transforms[index].rotate = { 0.0f,0.0f,0.0f };
+		transforms[index].translate = { index * 0.1f,index * 0.1f,index * 0.1f };
+	}
 
 	if (isGrayscale_)
 	{
@@ -1415,6 +1577,20 @@ void DXCom::SettingTexture()
 	device_->CreateShaderResourceView(planeTextureResource_.Get(), &srvDescPlane, planeTextureSrvHandleCPU_);
 
 
+	D3D12_SHADER_RESOURCE_VIEW_DESC instancingSrvDesc{};
+	instancingSrvDesc.Format = DXGI_FORMAT_UNKNOWN;
+	instancingSrvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	instancingSrvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+	instancingSrvDesc.Buffer.FirstElement = 0;
+	instancingSrvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
+	instancingSrvDesc.Buffer.NumElements = instanceCount_;
+	instancingSrvDesc.Buffer.StructureByteStride = sizeof(TransformationMatrix);
+
+	instancingSrvHandleCPU_ = GetCPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, 5);
+	instancingSrvHandleGPU_ = GetGPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, 5);
+	device_->CreateShaderResourceView(instancingResource.Get(), &instancingSrvDesc, instancingSrvHandleCPU_);
+
+
 	HRESULT hr = commandList_->Close();
 	assert(SUCCEEDED(hr));
 
@@ -1587,7 +1763,7 @@ void DXCom::Command()
 
 
 	//PlaneModel
-	commandList_->RSSetViewports(1, &viewport);
+	/*commandList_->RSSetViewports(1, &viewport);
 	commandList_->RSSetScissorRects(1, &scissorRect);
 	commandList_->SetGraphicsRootSignature(rootSignature_.Get());
 	commandList_->SetPipelineState(graphicsPipelineState_.Get());
@@ -1597,7 +1773,20 @@ void DXCom::Command()
 	commandList_->SetGraphicsRootConstantBufferView(1, wvpResourcePlaneModel_->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResourcePlaneModel_->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootDescriptorTable(2, planeTextureSrvHandleGPU_);
-	commandList_->DrawInstanced(UINT(planeModelData_.vertices.size()), 1, 0, 0);
+	commandList_->DrawInstanced(UINT(planeModelData_.vertices.size()), instanceCount_, 0, 0);*/
+
+
+	commandList_->RSSetViewports(1, &viewport);
+	commandList_->RSSetScissorRects(1, &scissorRect);
+	commandList_->SetGraphicsRootSignature(rootSignatureParticle_.Get());
+	commandList_->SetPipelineState(graphicsPipelineStateParticle_.Get());
+	commandList_->IASetVertexBuffers(0, 1, &vertexPlaneModelBufferView_);
+	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	commandList_->SetGraphicsRootConstantBufferView(0, materialResourcePlaneModel_->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootDescriptorTable(1, instancingSrvHandleGPU_);
+	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResourcePlaneModel_->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootDescriptorTable(2, planeTextureSrvHandleGPU_);
+	commandList_->DrawInstanced(UINT(planeModelData_.vertices.size()), instanceCount_, 0, 0);
 
 
 	/*commandList_->IASetIndexBuffer(&indexBufferViewSprite);
@@ -1877,12 +2066,21 @@ void DXCom::UpDate()
 		ImGui::TreePop();
 	}*/
 
-	if (ImGui::TreeNode("PlaneModel"))
+	/*if (ImGui::TreeNode("PlaneModel"))
 	{
 		ImGui::ColorEdit3("Modelcolor", &materialDatePlaneModel_->color.X);
 		ImGui::DragFloat3("Modeltrans", &transformPlaneModel_.translate.x, 0.01f, -2.0f, 2.0f);
 		ImGui::DragFloat3("Modelrotate", &transformPlaneModel_.rotate.x, 0.01f, -4.0f, 4.0f);
 		ImGui::DragFloat3("Modelscale", &transformPlaneModel_.scale.x, 0.01f, 0.0f, 6.0f);
+		ImGui::TreePop();
+	}*/
+
+	if (ImGui::TreeNode("PlaneModel"))
+	{
+		ImGui::ColorEdit3("Modelcolor", &materialDatePlaneModel_->color.X);
+		ImGui::DragFloat3("Modeltrans", &transforms[0].translate.x, 0.01f, -2.0f, 2.0f);
+		ImGui::DragFloat3("Modelrotate", &transforms[0].rotate.x, 0.01f, -4.0f, 4.0f);
+		ImGui::DragFloat3("Modelscale", &transforms[0].scale.x, 0.01f, 0.0f, 6.0f);
 		ImGui::TreePop();
 	}
 
@@ -2087,6 +2285,17 @@ void DXCom::UpDate()
 
 	wvpDatePlaneModel_->World = worldMatrixPlaneModel;
 	wvpDatePlaneModel_->WVP = worldViewProjectionMatrixPlaneModel;
+
+
+	for (uint32_t index = 0; index < instanceCount_; ++index)
+	{
+		Matrix4x4 worldMatrixInstanc = MakeAffineMatrix(transforms[index].scale, transforms[index].rotate, transforms[index].translate);
+		Matrix4x4 worldViewProjectionMatrixInstanc = Multiply(viewMatrix, projectionMatrix);
+		worldViewProjectionMatrixInstanc = Multiply(worldMatrixInstanc, worldViewProjectionMatrixInstanc);
+
+		instancingData[index].World = worldMatrixInstanc;
+		instancingData[index].WVP = worldViewProjectionMatrixInstanc;
+	}
 
 
 	/*Matrix4x4 worldMatrix2 = MakeAffineMatrix(transform2.scale, transform2.rotate, transform2.translate);

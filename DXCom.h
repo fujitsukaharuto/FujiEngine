@@ -21,6 +21,7 @@
 
 
 const int particleIndex = 400;
+const UINT instanceCount_ = 10;
 
 struct D3DResourceLeakChecker
 {
@@ -207,6 +208,18 @@ private:
 	IDxcBlob* vertexShaderBlob_ = nullptr;
 	IDxcBlob* pixelShaderBlob_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState_ = nullptr;
+
+
+	ID3DBlob* signatureParticleBlob_ = nullptr;
+	ID3DBlob* errorParticleBlob_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignatureParticle_ = nullptr;
+	IDxcBlob* vertexShaderParticleBlob_ = nullptr;
+	IDxcBlob* pixelShaderParticleBlob_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineStateParticle_ = nullptr;
+
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> instancingResource = nullptr;
+	TransformationMatrix* instancingData = nullptr;
 
 
 	ID3DBlob* signatureGrayBlob_ = nullptr;
@@ -407,6 +420,7 @@ private:
 	Trans transformFenceModel_{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 	Trans transformPlaneModel_{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 
+	Trans transforms[instanceCount_];
 
 	Trans transformParticle[particleIndex]{};
 	Vector3 particleVel[particleIndex]{};
@@ -443,6 +457,9 @@ private:
 
 	D3D12_CPU_DESCRIPTOR_HANDLE planeTextureSrvHandleCPU_;
 	D3D12_GPU_DESCRIPTOR_HANDLE planeTextureSrvHandleGPU_;
+
+	D3D12_CPU_DESCRIPTOR_HANDLE instancingSrvHandleCPU_;
+	D3D12_GPU_DESCRIPTOR_HANDLE instancingSrvHandleGPU_;
 
 	/*std::chrono::high_resolution_clock::time_point lastTime;
 	float deltaTime;
