@@ -40,4 +40,13 @@ float4 main(PSInput input) : SV_TARGET
     {
         return color; // それ以外の部分
     }
+    
+    //if (field > g_Particle.threshold)
+    //{
+    //    return color; // メタボールの部分を白で描画
+    //}
+    //else
+    //{
+    //    return float4(0.0, 0.0, 0.0, 1.0);; // それ以外の部分
+    //}
 }
