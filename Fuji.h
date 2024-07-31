@@ -1,6 +1,11 @@
 #pragma once
 #include "DXCom.h"
 #include "Vector2Matrix.h"
+#include "Audio.h"
+
+#define DIRECTINPUT_VERSION 0x0800 // DirectInputのバージョン指定
+#include <dinput.h>
+
 
 class Fuji
 {
@@ -23,6 +28,11 @@ public:
 	static DXCom* GetDXComInstance();
 
 	static void UpDateDxc();
+	static void GetKeyStateAll(BYTE* key);
+
+	static SoundData SoundLoadWave(const char* filename);
+	static void SoundUnload(SoundData* soundData);
+	static void SoundPlayWave(const SoundData& soundData);
 
 private:
 

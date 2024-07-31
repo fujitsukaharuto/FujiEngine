@@ -4,12 +4,15 @@
 #include "DXCom.h"
 #include "ImGuiManager.h"
 #include "Input.h"
+#include "DebugCamera.h"
 
 namespace {
 	MyWin* mywin_ = nullptr;
 	DXCom* dxcom_ = nullptr;
 	ImGuiManager* imguiManager_ = nullptr;
 	Input* input_ = nullptr;
+	Audio* audio_ = nullptr;
+	DebugCamera* debugCamera_ = nullptr;
 }
 
 float Fuji::GetkWindowWidth()
@@ -37,8 +40,13 @@ void Fuji::InitDX()
 {
 	mywin_ = MyWin::GetInstance();
 	mywin_->CreatWind();
+	debugCamera_ = DebugCamera::GetInstance();
+	debugCamera_->Initialize();
 	dxcom_ = dxcom_->GetInstance();
 	dxcom_->InitDX(mywin_);
+	dxcom_->SetDebugCamera(debugCamera_);
+	audio_ = Audio::GetInstance();
+	audio_->Initialize();
 	input_ = Input::GetInstance();
 	input_->Initialize();
 	imguiManager_ = imguiManager_->GetInstance();
@@ -78,5 +86,28 @@ DXCom* Fuji::GetDXComInstance()
 
 void Fuji::UpDateDxc()
 {
+	debugCamera_->Update();
 	dxcom_->UpDate();
+}
+
+void Fuji::GetKeyStateAll(BYTE* key)
+{
+	assert(key);
+	const std::array<BYTE, 256>& keys = input_->GetAllKey();
+	memcpy(key, keys.data(), sizeof(keys));
+}
+
+SoundData Fuji::SoundLoadWave(const char* filename)
+{
+	return audio_->SoundLoadWave(filename);
+}
+
+void Fuji::SoundUnload(SoundData* soundData)
+{
+	audio_->SoundUnload(soundData);
+}
+
+void Fuji::SoundPlayWave(const SoundData& soundData)
+{
+	audio_->SoundPlayWave(soundData);
 }

@@ -92,6 +92,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Audio.cpp" />
+    <ClCompile Include="DebugCamera.cpp" />
     <ClCompile Include="DirectXCom.cpp" />
     <ClCompile Include="DXCom.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp" />
@@ -112,6 +114,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="MyWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Audio.h" />
+    <ClInclude Include="DebugCamera.h" />
     <ClInclude Include="DirectXCom.h" />
     <ClInclude Include="DXCom.h" />
     <ClInclude Include="externals\imgui\imconfig.h" />

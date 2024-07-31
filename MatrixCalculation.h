@@ -165,3 +165,5 @@ Matrix4x4 MakePerspectiveFovMatrix(float fovy, float aspectRation, float nearCli
 Matrix4x4 MakeOrthographicMatrix(float left, float top, float right, float bottom, float nearClip, float farClip);
 
 Matrix4x4 MakeViewportMat(float left, float top, float width, float height, float minDepth, float maxDepth);
+
+Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m);

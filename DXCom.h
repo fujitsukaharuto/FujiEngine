@@ -67,6 +67,9 @@ enum BlendMode
 };
 
 
+class DebugCamera;//今だけ、後から消す
+
+
 class DXCom
 {
 public:
@@ -138,6 +141,8 @@ public:
 	MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename);
 
 	/*void Tick();*/
+
+	void SetDebugCamera(DebugCamera* instanse);//今だけ、後から消す
 
 private:
 
@@ -343,20 +348,21 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResourcePlaneModel_ = nullptr;
 	DirectionalLight* directionalLightDataPlaneModel_ = nullptr;
 
+	
+	//Sprite 
+	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourceSprite_ = nullptr;
+	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite_{};
+	VertexData* vertexDataSprite_ = nullptr;
 
-	//Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourceSprite_ = nullptr;
-	//D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite_{};
-	//VertexData* vertexDataSprite_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> indexResoureceSprite = nullptr;
+	D3D12_INDEX_BUFFER_VIEW indexBufferViewSprite{};
+	uint32_t* indexDataSprite = nullptr;
 
-	//Microsoft::WRL::ComPtr<ID3D12Resource> indexResoureceSprite = nullptr;
-	//D3D12_INDEX_BUFFER_VIEW indexBufferViewSprite{};
-	//uint32_t* indexDataSprite = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatResourceSprite_ = nullptr;
+	TransformationMatrix* transformationMatDataSprite_ = nullptr;
 
-	//Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatResourceSprite_ = nullptr;
-	//TransformationMatrix* transformationMatDataSprite_ = nullptr;
-
-	//Microsoft::WRL::ComPtr<ID3D12Resource> materialResourceSprite_ = nullptr;
-	//Material* materialDateSprite_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> materialResourceSprite_ = nullptr;
+	Material* materialDateSprite_ = nullptr;
 
 	//パーティクルflow
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexFlowResource_[particleIndex]{};
@@ -404,7 +410,7 @@ private:
 	float boundDamping = -0.3f;
 
 
-
+	DebugCamera* debugCamera_ = nullptr;//今だけ、後から消す
 
 	Trans transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 	Trans transform2{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };

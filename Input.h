@@ -19,6 +19,10 @@ public:
 
 	void Update();
 
+	void MouseUpdate();
+
+	void KeyboardUpdate();
+
 	static Input* GetInstance();
 
 	const DIMOUSESTATE2& GetAllMouse() const;
@@ -29,16 +33,25 @@ public:
 
 	const Vector2& GetMousePosition() const;
 
+	const std::array<BYTE, 256>& GetAllKey();
+
+	bool PushKey(uint8_t keyNumber) const;
+
+	bool TriggerKey(uint8_t keyNumber) const;
+
 private:
 	Input() = default;
 	~Input() = default;
 	Input(const Input&) = delete;
 	const Input& operator=(const Input&) = delete;
 
-	Microsoft::WRL::ComPtr<IDirectInput8> directInput;
-	Microsoft::WRL::ComPtr<IDirectInputDevice8> devMouse_;
+	Microsoft::WRL::ComPtr<IDirectInput8> directInput_ = nullptr;
+	Microsoft::WRL::ComPtr<IDirectInputDevice8> devMouse_ = nullptr;
+	Microsoft::WRL::ComPtr<IDirectInputDevice8> keyboard_ = nullptr;
 	DIMOUSESTATE2 mouse_;
 	DIMOUSESTATE2 mousePre_;
+	std::array<BYTE, 256> key_;
+	std::array<BYTE, 256> keyPre_;
 	HWND hwnd_;
 	Vector2 mousePosition_;
 };
