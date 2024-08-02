@@ -2378,6 +2378,9 @@ void DXCom::UpDate()
 			ImGui::TreePop();
 		}
 	}
+
+	ImGui::Text("\nPlay Sound:Key 0");
+
 	ImGui::End();
 
 //#endif // _DEBUG
