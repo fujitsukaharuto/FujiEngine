@@ -2069,7 +2069,7 @@ void DXCom::UpDate()
 {
 	/*Tick();*/
 
-#ifdef _DEBUG
+//#ifdef _DEBUG
 	ImGui::Begin("debug");
 	/*if (ImGui::TreeNode("Triangle1"))
 	{
@@ -2380,7 +2380,7 @@ void DXCom::UpDate()
 	}
 	ImGui::End();
 
-#endif // _DEBUG
+//#endif // _DEBUG
 
 	directionalLightData_->direction = directionalLightData_->direction.Normalize();
 
