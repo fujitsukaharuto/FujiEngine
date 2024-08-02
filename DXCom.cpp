@@ -2118,6 +2118,10 @@ void DXCom::UpDate()
 		ImGui::TreePop();
 	}*/
 
+	bool preIsGrayscale_ = isGrayscale_;
+	bool preIsNonePost_ = isNonePost_;
+	bool preIsMetaBall_ = isMetaBall_;
+	bool preIsGaussian_ = isGaussian_;
 
 	if (ImGui::TreeNode("OffScreen ShaderPath"))
 	{
@@ -2127,7 +2131,30 @@ void DXCom::UpDate()
 		ImGui::Checkbox("Blur", &isGaussian_);
 		ImGui::TreePop();
 	}
-
+	if (isGrayscale_&& !(preIsGrayscale_))
+	{
+		isNonePost_ = false;
+		isMetaBall_ = false;
+		isGaussian_ = false;
+	}
+	if (isNonePost_ && !(preIsNonePost_))
+	{
+		isGrayscale_ = false;
+		isMetaBall_ = false;
+		isGaussian_ = false;
+	}
+	if (isMetaBall_ && !(preIsMetaBall_))
+	{
+		isGrayscale_ = false;
+		isNonePost_ = false;
+		isGaussian_ = false;
+	}
+	if (isGaussian_ && !(preIsGaussian_))
+	{
+		isGrayscale_ = false;
+		isNonePost_ = false;
+		isMetaBall_ = false;
+	}
 
 	/*if (isFluidMode_)
 	{
@@ -2351,8 +2378,6 @@ void DXCom::UpDate()
 			ImGui::TreePop();
 		}
 	}
-
-
 	ImGui::End();
 
 #endif // _DEBUG
