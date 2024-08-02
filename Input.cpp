@@ -47,6 +47,10 @@ void Input::Initialize()
 
 	// デバイスの取得
 	devMouse_->Acquire();
+
+	ZeroMemory(&gamepadState_, sizeof(XINPUT_STATE));
+	ZeroMemory(&gamepadStatePrevious_, sizeof(XINPUT_STATE));
+
 }
 
 void Input::Update()
@@ -54,6 +58,8 @@ void Input::Update()
 	KeyboardUpdate();
 
 	MouseUpdate();
+
+	GamepadUpdate();
 }
 
 void Input::MouseUpdate()
@@ -90,6 +96,12 @@ void Input::KeyboardUpdate()
 			hr = keyboard_->Acquire();
 		}
 	}
+}
+
+void Input::GamepadUpdate()
+{
+	gamepadStatePrevious_ = gamepadState_;
+	XInputGetState(0, &gamepadState_);
 }
 
 Input* Input::GetInstance()
@@ -131,4 +143,21 @@ bool Input::PushKey(uint8_t keyNumber) const
 bool Input::TriggerKey(uint8_t keyNumber) const
 {
 	return (key_[keyNumber] & 0x80) && !(keyPre_[keyNumber] & 0x80);
+}
+
+XINPUT_STATE Input::GetGamepadState() const
+{
+	return gamepadState_;
+}
+
+bool Input::GetGamepadState(XINPUT_STATE& out) const
+{
+	out = gamepadState_;
+	return true;
+}
+
+bool Input::GetGamepadStatePrevious(XINPUT_STATE& out) const
+{
+	out = gamepadStatePrevious_;
+	return true;
 }

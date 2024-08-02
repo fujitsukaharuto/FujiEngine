@@ -11,6 +11,7 @@
 
 #pragma comment(lib, "dinput8.lib")
 #pragma comment(lib, "dxguid.lib")
+#pragma comment(lib, "xinput.lib")
 
 class Input
 {
@@ -22,6 +23,8 @@ public:
 	void MouseUpdate();
 
 	void KeyboardUpdate();
+
+	void GamepadUpdate();
 
 	static Input* GetInstance();
 
@@ -39,6 +42,12 @@ public:
 
 	bool TriggerKey(uint8_t keyNumber) const;
 
+	XINPUT_STATE GetGamepadState() const;
+
+	bool GetGamepadState(XINPUT_STATE& out)const;
+
+	bool GetGamepadStatePrevious(XINPUT_STATE& out)const;
+
 private:
 	Input() = default;
 	~Input() = default;
@@ -54,4 +63,7 @@ private:
 	std::array<BYTE, 256> keyPre_;
 	HWND hwnd_;
 	Vector2 mousePosition_;
+	XINPUT_STATE gamepadState_;
+	XINPUT_STATE gamepadStatePrevious_;
+
 };

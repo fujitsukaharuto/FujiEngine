@@ -2,6 +2,7 @@
 #include "DXCom.h"
 #include "Vector2Matrix.h"
 #include "Audio.h"
+#include "Input.h"
 
 #define DIRECTINPUT_VERSION 0x0800 // DirectInputのバージョン指定
 #include <dinput.h>

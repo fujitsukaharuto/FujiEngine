@@ -28,8 +28,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Fuji::StartFrame();
 		memcpy(preKeys, keys, 256);
 		Fuji::GetKeyStateAll(keys);
+		XINPUT_STATE pad;
+		XINPUT_STATE padPre;
 
-		if (keys[DIK_0]&&!(preKeys[DIK_0]))
+		if (Input::GetInstance()->GetGamepadState(pad)&& Input::GetInstance()->GetGamepadStatePrevious(padPre))
+		{
+			if ((pad.Gamepad.wButtons& XINPUT_GAMEPAD_A)&&!((padPre.Gamepad.wButtons & XINPUT_GAMEPAD_A)))
+			{
+				Fuji::SoundPlayWave(soundData1);
+			}
+		}
+
+		if ((keys[DIK_0]&&!(preKeys[DIK_0])))
 		{
 			OutputDebugStringA("Hit 0\n");
 			Fuji::SoundPlayWave(soundData1);

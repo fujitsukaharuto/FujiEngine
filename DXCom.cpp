@@ -2379,7 +2379,7 @@ void DXCom::UpDate()
 		}
 	}
 
-	ImGui::Text("\nPlay Sound:Key 0");
+	ImGui::Text("\nPlay Sound:Key 0, Gamepad A Button");
 
 	ImGui::End();
 
