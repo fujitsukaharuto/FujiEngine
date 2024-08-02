@@ -39,14 +39,26 @@ PixelShaderOutput main(VertxShaderOutput input)
     }
     if (gMaterial.enableLighting != 0)
     {
-        float NdotL = dot(normalize(input.normal), -gDirectionnalLight.direction);
-        float cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
-        //float cos = saturate(dot(normalize(input.normal), -gDirectionnalLight.direction));
-        output.color.rgb = gMaterial.color.rgb * textureColor.rgb * gDirectionnalLight.color.rgb * cos * gDirectionnalLight.intensity;
-        output.color.a = gMaterial.color.a * textureColor.a;
-        if(output.color.a == 0.0)
+        if (gMaterial.enableLighting == 1)
         {
-            discard;
+            float NdotL = dot(normalize(input.normal), -gDirectionnalLight.direction);
+            float cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
+            output.color.rgb = gMaterial.color.rgb * textureColor.rgb * gDirectionnalLight.color.rgb * cos * gDirectionnalLight.intensity;
+            output.color.a = gMaterial.color.a * textureColor.a;
+            if (output.color.a == 0.0)
+            {
+                discard;
+            }
+        }
+        if (gMaterial.enableLighting == 2)
+        {
+            float cos = saturate(dot(normalize(input.normal), -gDirectionnalLight.direction));
+            output.color.rgb = gMaterial.color.rgb * textureColor.rgb * gDirectionnalLight.color.rgb * cos * gDirectionnalLight.intensity;
+            output.color.a = gMaterial.color.a * textureColor.a;
+            if (output.color.a == 0.0)
+            {
+                discard;
+            }
         }
     }
     else

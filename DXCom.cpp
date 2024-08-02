@@ -11,6 +11,7 @@
 #include <fstream>
 #include <sstream>
 #include <random>
+#include <string>
 
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
@@ -1363,35 +1364,68 @@ void DXCom::SettingSpriteVertex()
 
 
 	//FenceModel
-	//fenceModelData_ = LoadObjFile("resource", "fence.obj");
-	//vertexFenceModelResource_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * fenceModelData_.vertices.size());
-	//vertexFenceModelBufferView_.BufferLocation = vertexFenceModelResource_->GetGPUVirtualAddress();
-	//vertexFenceModelBufferView_.SizeInBytes = UINT(sizeof(VertexData) * fenceModelData_.vertices.size());
-	//vertexFenceModelBufferView_.StrideInBytes = sizeof(VertexData);
+	fenceModelData_ = LoadObjFile("resource", "fence.obj");
+	vertexFenceModelResource_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * fenceModelData_.vertices.size());
+	vertexFenceModelBufferView_.BufferLocation = vertexFenceModelResource_->GetGPUVirtualAddress();
+	vertexFenceModelBufferView_.SizeInBytes = UINT(sizeof(VertexData) * fenceModelData_.vertices.size());
+	vertexFenceModelBufferView_.StrideInBytes = sizeof(VertexData);
 
-	//vertexFenceModelResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataFenceModel_));
-	//std::memcpy(vertexDataFenceModel_, fenceModelData_.vertices.data(), sizeof(VertexData) * fenceModelData_.vertices.size());
+	vertexFenceModelResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataFenceModel_));
+	std::memcpy(vertexDataFenceModel_, fenceModelData_.vertices.data(), sizeof(VertexData) * fenceModelData_.vertices.size());
 
-	//wvpResourceFenceModel_ = CreateBufferResource(device_.Get(), sizeof(TransformationMatrix));
-	//wvpDateFenceModel_ = nullptr;
-	//wvpResourceFenceModel_->Map(0, nullptr, reinterpret_cast<void**>(&wvpDateFenceModel_));
-	//wvpDateFenceModel_->WVP = MakeIdentity4x4();
-	//wvpDateFenceModel_->World = MakeIdentity4x4();
+	wvpResourceFenceModel_ = CreateBufferResource(device_.Get(), sizeof(TransformationMatrix));
+	wvpDateFenceModel_ = nullptr;
+	wvpResourceFenceModel_->Map(0, nullptr, reinterpret_cast<void**>(&wvpDateFenceModel_));
+	wvpDateFenceModel_->WVP = MakeIdentity4x4();
+	wvpDateFenceModel_->World = MakeIdentity4x4();
 
-	//materialResourceFenceModel_ = CreateBufferResource(device_.Get(), sizeof(Material));
-	//materialDateFenceModel_ = nullptr;
-	//materialResourceFenceModel_->Map(0, nullptr, reinterpret_cast<void**>(&materialDateFenceModel_));
-	////色変えるやつ（Resource）
-	//materialDateFenceModel_->color = { 1.0f,1.0f,1.0f,1.0f };
-	//materialDateFenceModel_->enableLighting = false;
-	//materialDateFenceModel_->uvTransform = MakeIdentity4x4();
+	materialResourceFenceModel_ = CreateBufferResource(device_.Get(), sizeof(Material));
+	materialDateFenceModel_ = nullptr;
+	materialResourceFenceModel_->Map(0, nullptr, reinterpret_cast<void**>(&materialDateFenceModel_));
+	//色変えるやつ（Resource）
+	materialDateFenceModel_->color = { 1.0f,1.0f,1.0f,1.0f };
+	materialDateFenceModel_->enableLighting = LightMode::kLightNone;
+	materialDateFenceModel_->uvTransform = MakeIdentity4x4();
 
-	//directionalLightResourceFenceModel_ = CreateBufferResource(device_.Get(), sizeof(DirectionalLight));
-	//directionalLightDataFenceModel_ = nullptr;
-	//directionalLightResourceFenceModel_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightDataFenceModel_));
-	//directionalLightDataFenceModel_->color = { 1.0f,1.0f,1.0f,1.0f };
-	//directionalLightDataFenceModel_->direction = { 1.0f,0.0f,0.0f };
-	//directionalLightDataFenceModel_->intensity = 1.0f;
+	directionalLightResourceFenceModel_ = CreateBufferResource(device_.Get(), sizeof(DirectionalLight));
+	directionalLightDataFenceModel_ = nullptr;
+	directionalLightResourceFenceModel_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightDataFenceModel_));
+	directionalLightDataFenceModel_->color = { 1.0f,1.0f,1.0f,1.0f };
+	directionalLightDataFenceModel_->direction = { 1.0f,0.0f,0.0f };
+	directionalLightDataFenceModel_->intensity = 1.0f;
+
+
+	//SuzanneModel
+	suzanneModelData_ = LoadObjFile("resource", "suzanne.obj");
+	vertexSuzanneModelResource_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * suzanneModelData_.vertices.size());
+	vertexSuzanneModelBufferView_.BufferLocation = vertexSuzanneModelResource_->GetGPUVirtualAddress();
+	vertexSuzanneModelBufferView_.SizeInBytes = UINT(sizeof(VertexData) * suzanneModelData_.vertices.size());
+	vertexSuzanneModelBufferView_.StrideInBytes = sizeof(VertexData);
+
+	vertexSuzanneModelResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSuzanneModel_));
+	std::memcpy(vertexDataSuzanneModel_, suzanneModelData_.vertices.data(), sizeof(VertexData) * suzanneModelData_.vertices.size());
+
+	wvpResourceSuzanneModel_ = CreateBufferResource(device_.Get(), sizeof(TransformationMatrix));
+	wvpDateSuzanneModel_ = nullptr;
+	wvpResourceSuzanneModel_->Map(0, nullptr, reinterpret_cast<void**>(&wvpDateSuzanneModel_));
+	wvpDateSuzanneModel_->WVP = MakeIdentity4x4();
+	wvpDateSuzanneModel_->World = MakeIdentity4x4();
+
+	materialResourceSuzanneModel_ = CreateBufferResource(device_.Get(), sizeof(Material));
+	materialDateSuzanneModel_ = nullptr;
+	materialResourceSuzanneModel_->Map(0, nullptr, reinterpret_cast<void**>(&materialDateSuzanneModel_));
+	//色変えるやつ（Resource）
+	materialDateSuzanneModel_->color = { 1.0f,1.0f,1.0f,1.0f };
+	materialDateSuzanneModel_->enableLighting = LightMode::kLightHalfLambert;
+	materialDateSuzanneModel_->uvTransform = MakeIdentity4x4();
+
+	directionalLightResourceSuzanneModel_ = CreateBufferResource(device_.Get(), sizeof(DirectionalLight));
+	directionalLightDataSuzanneModel_ = nullptr;
+	directionalLightResourceSuzanneModel_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightDataSuzanneModel_));
+	directionalLightDataSuzanneModel_->color = { 1.0f,1.0f,1.0f,1.0f };
+	directionalLightDataSuzanneModel_->direction = { 1.0f,0.0f,0.0f };
+	directionalLightDataSuzanneModel_->intensity = 1.0f;
+
 
 	//PlaneModel
 	planeModelData_ = LoadObjFile("resource", "plane.obj");
@@ -1414,7 +1448,7 @@ void DXCom::SettingSpriteVertex()
 	materialResourcePlaneModel_->Map(0, nullptr, reinterpret_cast<void**>(&materialDatePlaneModel_));
 	//色変えるやつ（Resource）
 	materialDatePlaneModel_->color = { 1.0f,1.0f,1.0f,1.0f };
-	materialDatePlaneModel_->enableLighting = false;
+	materialDatePlaneModel_->enableLighting = LightMode::kLightNone;
 	materialDatePlaneModel_->uvTransform = MakeIdentity4x4();
 
 	directionalLightResourcePlaneModel_ = CreateBufferResource(device_.Get(), sizeof(DirectionalLight));
@@ -1439,7 +1473,7 @@ void DXCom::SettingResource()
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialDate_));
 	//色変えるやつ（Resource）
 	materialDate_->color = { 1.0f,1.0f,1.0f,1.0f };
-	materialDate_->enableLighting = true;
+	materialDate_->enableLighting = LightMode::kLightHalfLambert;
 	materialDate_->uvTransform = MakeIdentity4x4();
 
 	directionalLightResource_ = CreateBufferResource(device_.Get(), sizeof(DirectionalLight));
@@ -1487,7 +1521,7 @@ void DXCom::SettingSpriteResource()
 	materialResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&materialDateSprite_));
 	//色変えるやつ（Resource）
 	materialDateSprite_->color = { 1.0f,1.0f,1.0f,1.0f };
-	materialDateSprite_->enableLighting = false;
+	materialDateSprite_->enableLighting = LightMode::kLightNone;
 	materialDateSprite_->uvTransform = MakeIdentity4x4();
 }
 
@@ -1546,7 +1580,7 @@ void DXCom::SettingTexture()
 
 
 	//FenceModelSpriteData
-	/*fenceMipImages_ = LoadTexture(fenceModelData_.material.textureFilePath);
+	fenceMipImages_ = LoadTexture(fenceModelData_.material.textureFilePath);
 	const DirectX::TexMetadata& fenceMetadata = fenceMipImages_.GetMetadata();
 	fenceTextureResource_ = CreateTextureResource(device_.Get(), fenceMetadata);
 
@@ -1560,7 +1594,25 @@ void DXCom::SettingTexture()
 	fenceTextureSrvHandleCPU_ = GetCPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, 4);
 	fenceTextureSrvHandleGPU_ = GetGPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, 4);
 
-	device_->CreateShaderResourceView(fenceTextureResource_.Get(), &srvDescFence, fenceTextureSrvHandleCPU_);*/
+	device_->CreateShaderResourceView(fenceTextureResource_.Get(), &srvDescFence, fenceTextureSrvHandleCPU_);
+
+
+	//SuzanneModelSprite
+	suzanneMipImages_ = LoadTexture(suzanneModelData_.material.textureFilePath);
+	const DirectX::TexMetadata& suzanneMetadata = suzanneMipImages_.GetMetadata();
+	suzanneTextureResource_ = CreateTextureResource(device_.Get(), suzanneMetadata);
+
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDescSuzanne{};
+	srvDescSuzanne.Format = suzanneMetadata.format;
+	srvDescSuzanne.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDescSuzanne.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srvDescSuzanne.Texture2D.MipLevels = UINT(suzanneMetadata.mipLevels);
+
+	suzanneIntermediateResource_ = UploadTextureData(suzanneTextureResource_, suzanneMipImages_, device_.Get(), commandList_);
+	suzanneTextureSrvHandleCPU_ = GetCPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, 5);
+	suzanneTextureSrvHandleGPU_ = GetGPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, 5);
+
+	device_->CreateShaderResourceView(suzanneTextureResource_.Get(), &srvDescSuzanne, suzanneTextureSrvHandleCPU_);
 
 
 	//PlaneModelSpriteData
@@ -1575,8 +1627,8 @@ void DXCom::SettingTexture()
 	srvDescPlane.Texture2D.MipLevels = UINT(planeMetadata.mipLevels);
 
 	planeIntermediateResource_ = UploadTextureData(planeTextureResource_, planeMipImages_, device_.Get(), commandList_);
-	planeTextureSrvHandleCPU_ = GetCPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, 4);
-	planeTextureSrvHandleGPU_ = GetGPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, 4);
+	planeTextureSrvHandleCPU_ = GetCPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, 6);
+	planeTextureSrvHandleGPU_ = GetGPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, 6);
 
 	device_->CreateShaderResourceView(planeTextureResource_.Get(), &srvDescPlane, planeTextureSrvHandleCPU_);
 
@@ -1590,8 +1642,8 @@ void DXCom::SettingTexture()
 	instancingSrvDesc.Buffer.NumElements = instanceCount_;
 	instancingSrvDesc.Buffer.StructureByteStride = sizeof(TransformationMatrix);
 
-	instancingSrvHandleCPU_ = GetCPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, 5);
-	instancingSrvHandleGPU_ = GetGPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, 5);
+	instancingSrvHandleCPU_ = GetCPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, 7);
+	instancingSrvHandleGPU_ = GetGPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, 7);
 	device_->CreateShaderResourceView(instancingResource.Get(), &instancingSrvDesc, instancingSrvHandleCPU_);
 
 
@@ -1691,9 +1743,8 @@ void DXCom::Command()
 	commandList_->SetPipelineState(graphicsPipelineState_.Get());
 
 	//三角形１
-	/*if (isTriangleDraw_)
+	if (isSphere_)
 	{
-
 		commandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);
 		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
@@ -1701,7 +1752,7 @@ void DXCom::Command()
 		commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
 		commandList_->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
 		commandList_->DrawInstanced(1536, 1, 0, 0);
-	}*/
+	}
 
 
 	////三角形２
@@ -1753,55 +1804,83 @@ void DXCom::Command()
 
 
 	//FenceModel
-	/*commandList_->RSSetViewports(1, &viewport);
-	commandList_->RSSetScissorRects(1, &scissorRect);
-	commandList_->SetGraphicsRootSignature(rootSignature_.Get());
-	commandList_->SetPipelineState(graphicsPipelineState_.Get());
-	commandList_->IASetVertexBuffers(0, 1, &vertexFenceModelBufferView_);
-	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	commandList_->SetGraphicsRootConstantBufferView(0, materialResourceFenceModel_->GetGPUVirtualAddress());
-	commandList_->SetGraphicsRootConstantBufferView(1, wvpResourceFenceModel_->GetGPUVirtualAddress());
-	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResourceFenceModel_->GetGPUVirtualAddress());
-	commandList_->SetGraphicsRootDescriptorTable(2, fenceTextureSrvHandleGPU_);
-	commandList_->DrawInstanced(UINT(fenceModelData_.vertices.size()), 1, 0, 0);*/
+	if (isFenceModel_)
+	{
+		commandList_->RSSetViewports(1, &viewport);
+		commandList_->RSSetScissorRects(1, &scissorRect);
+		commandList_->SetGraphicsRootSignature(rootSignature_.Get());
+		commandList_->SetPipelineState(graphicsPipelineState_.Get());
+		commandList_->IASetVertexBuffers(0, 1, &vertexFenceModelBufferView_);
+		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		commandList_->SetGraphicsRootConstantBufferView(0, materialResourceFenceModel_->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootConstantBufferView(1, wvpResourceFenceModel_->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResourceFenceModel_->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootDescriptorTable(2, fenceTextureSrvHandleGPU_);
+		commandList_->DrawInstanced(UINT(fenceModelData_.vertices.size()), 1, 0, 0);
+	}
 
 
-	//PlaneModel
-	commandList_->RSSetViewports(1, &viewport);
-	commandList_->RSSetScissorRects(1, &scissorRect);
-	commandList_->SetGraphicsRootSignature(rootSignature_.Get());
-	commandList_->SetPipelineState(graphicsPipelineState_.Get());
-	commandList_->IASetVertexBuffers(0, 1, &vertexPlaneModelBufferView_);
-	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	commandList_->SetGraphicsRootConstantBufferView(0, materialResourcePlaneModel_->GetGPUVirtualAddress());
-	commandList_->SetGraphicsRootConstantBufferView(1, wvpResourcePlaneModel_->GetGPUVirtualAddress());
-	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResourcePlaneModel_->GetGPUVirtualAddress());
-	commandList_->SetGraphicsRootDescriptorTable(2, planeTextureSrvHandleGPU_);
-	commandList_->DrawInstanced(UINT(planeModelData_.vertices.size()), instanceCount_, 0, 0);
+	if (isSuzanneModel_)
+	{
+		commandList_->RSSetViewports(1, &viewport);
+		commandList_->RSSetScissorRects(1, &scissorRect);
+		commandList_->SetGraphicsRootSignature(rootSignature_.Get());
+		commandList_->SetPipelineState(graphicsPipelineState_.Get());
+		commandList_->IASetVertexBuffers(0, 1, &vertexSuzanneModelBufferView_);
+		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		commandList_->SetGraphicsRootConstantBufferView(0, materialResourceSuzanneModel_->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootConstantBufferView(1, wvpResourceSuzanneModel_->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResourceSuzanneModel_->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootDescriptorTable(2, suzanneTextureSrvHandleGPU_);
+		commandList_->DrawInstanced(UINT(suzanneModelData_.vertices.size()), 1, 0, 0);
+	}
 
 
-	/*commandList_->RSSetViewports(1, &viewport);
-	commandList_->RSSetScissorRects(1, &scissorRect);
-	commandList_->SetGraphicsRootSignature(rootSignatureParticle_.Get());
-	commandList_->SetPipelineState(graphicsPipelineStateParticle_.Get());
-	commandList_->IASetVertexBuffers(0, 1, &vertexPlaneModelBufferView_);
-	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	commandList_->SetGraphicsRootConstantBufferView(0, materialResourcePlaneModel_->GetGPUVirtualAddress());
-	commandList_->SetGraphicsRootDescriptorTable(1, instancingSrvHandleGPU_);
-	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResourcePlaneModel_->GetGPUVirtualAddress());
-	commandList_->SetGraphicsRootDescriptorTable(2, planeTextureSrvHandleGPU_);
-	commandList_->DrawInstanced(UINT(planeModelData_.vertices.size()), instanceCount_, 0, 0);*/
+	// Plane Particle
+	if (isPlaneParticle_)
+	{
+		commandList_->RSSetViewports(1, &viewport);
+		commandList_->RSSetScissorRects(1, &scissorRect);
+		commandList_->SetGraphicsRootSignature(rootSignatureParticle_.Get());
+		commandList_->SetPipelineState(graphicsPipelineStateParticle_.Get());
+		commandList_->IASetVertexBuffers(0, 1, &vertexPlaneModelBufferView_);
+		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		commandList_->SetGraphicsRootConstantBufferView(0, materialResourcePlaneModel_->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootDescriptorTable(1, instancingSrvHandleGPU_);
+		commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResourcePlaneModel_->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootDescriptorTable(2, planeTextureSrvHandleGPU_);
+		commandList_->DrawInstanced(UINT(planeModelData_.vertices.size()), instanceCount_, 0, 0);
+	}
 
 
-	commandList_->IASetIndexBuffer(&indexBufferViewSprite);
-	commandList_->IASetVertexBuffers(0, 1, &vertexBufferViewSprite_);
-	commandList_->SetGraphicsRootConstantBufferView(0, materialResourceSprite_->GetGPUVirtualAddress());
-	commandList_->SetGraphicsRootConstantBufferView(1, transformationMatResourceSprite_->GetGPUVirtualAddress());
-	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
-	commandList_->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
-	commandList_->DrawIndexedInstanced(6, 1, 0, 0, 0);
-	/*commandList_->DrawInstanced(6, 1, 0, 0);*/
+	if (isPlaneAndSprite_)
+	{
+		// PlaneModel
+		commandList_->RSSetViewports(1, &viewport);
+		commandList_->RSSetScissorRects(1, &scissorRect);
+		commandList_->SetGraphicsRootSignature(rootSignature_.Get());
+		commandList_->SetPipelineState(graphicsPipelineState_.Get());
+		commandList_->IASetVertexBuffers(0, 1, &vertexPlaneModelBufferView_);
+		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		commandList_->SetGraphicsRootConstantBufferView(0, materialResourcePlaneModel_->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootConstantBufferView(1, wvpResourcePlaneModel_->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResourcePlaneModel_->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootDescriptorTable(2, planeTextureSrvHandleGPU_);
+		commandList_->DrawInstanced(UINT(planeModelData_.vertices.size()), instanceCount_, 0, 0);
 
+
+		// Sprite
+		commandList_->SetGraphicsRootSignature(rootSignature_.Get());
+		commandList_->SetPipelineState(graphicsPipelineState_.Get());
+		commandList_->IASetIndexBuffer(&indexBufferViewSprite);
+		commandList_->IASetVertexBuffers(0, 1, &vertexBufferViewSprite_);
+		commandList_->SetGraphicsRootConstantBufferView(0, materialResourceSprite_->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootConstantBufferView(1, transformationMatResourceSprite_->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
+		commandList_->DrawIndexedInstanced(6, 1, 0, 0, 0);
+		/*commandList_->DrawInstanced(6, 1, 0, 0);*/
+	}
 
 
 	//if (isFluidMode_)
@@ -2039,10 +2118,16 @@ void DXCom::UpDate()
 		ImGui::TreePop();
 	}*/
 
-	ImGui::Checkbox("Gray", &isGrayscale_);
-	ImGui::Checkbox("None", &isNonePost_);
-	ImGui::Checkbox("Meta", &isMetaBall_);
-	ImGui::Checkbox("Blur", &isGaussian_);
+
+	if (ImGui::TreeNode("OffScreen ShaderPath"))
+	{
+		ImGui::Checkbox("Gray", &isGrayscale_);
+		ImGui::Checkbox("None", &isNonePost_);
+		ImGui::Checkbox("Meta", &isMetaBall_);
+		ImGui::Checkbox("Blur", &isGaussian_);
+		ImGui::TreePop();
+	}
+
 
 	/*if (isFluidMode_)
 	{
@@ -2061,54 +2146,219 @@ void DXCom::UpDate()
 		ImGui::SliderFloat("Setradius", &setradius_, 3.0f, 100.0f);
 	}*/
 
-	ImGui::SliderFloat("Setradius", &setradius_, 3.0f, 100.0f);
 
-	/*if (ImGui::TreeNode("FenceModel"))
+	if (ImGui::TreeNode("MetaBall"))
 	{
-		ImGui::ColorEdit3("Modelcolor", &materialDateFenceModel_->color.X);
-		ImGui::DragFloat3("Modeltrans", &transformFenceModel_.translate.x, 0.01f, -2.0f, 2.0f);
-		ImGui::DragFloat3("Modelrotate", &transformFenceModel_.rotate.x, 0.01f, -4.0f, 4.0f);
-		ImGui::DragFloat3("Modelscale", &transformFenceModel_.scale.x, 0.01f, 0.0f, 6.0f);
-		ImGui::TreePop();
-	}*/
-
-	if (ImGui::TreeNode("PlaneModel"))
-	{
-		ImGui::ColorEdit3("Modelcolor", &materialDatePlaneModel_->color.X);
-		ImGui::DragFloat3("Modeltrans", &transformPlaneModel_.translate.x, 0.01f, -2.0f, 2.0f);
-		ImGui::DragFloat3("Modelrotate", &transformPlaneModel_.rotate.x, 0.01f, -4.0f, 4.0f);
-		ImGui::DragFloat3("Modelscale", &transformPlaneModel_.scale.x, 0.01f, 0.0f, 6.0f);
+		ImGui::SliderFloat("Setradius", &setradius_, 5.0f, 200.0f);
 		ImGui::TreePop();
 	}
 
-	/*if (ImGui::TreeNode("PlaneModel"))
-	{
-		ImGui::ColorEdit3("Modelcolor", &materialDatePlaneModel_->color.X);
-		ImGui::DragFloat3("Modeltrans", &transforms[0].translate.x, 0.01f, -2.0f, 2.0f);
-		ImGui::DragFloat3("Modelrotate", &transforms[0].rotate.x, 0.01f, -4.0f, 4.0f);
-		ImGui::DragFloat3("Modelscale", &transforms[0].scale.x, 0.01f, 0.0f, 6.0f);
-		ImGui::TreePop();
-	}*/
 
-	if (ImGui::TreeNode("Sprite"))
+	if (ImGui::TreeNode("What to draw"))
 	{
-		ImGui::DragFloat3("Sprite trans", &transSprite.translate.x, 1.0f, -1280.0f, 1280.0f);
-		ImGui::DragFloat3("Sprite rotate", &transSprite.rotate.x, 0.01f, -4.0f, 4.0f);
-		ImGui::DragFloat3("Sprite sclae", &transSprite.scale.x, 0.01f, 0.0f, 6.0f);
-		ImGui::DragFloat2("uvtrans", &uvTransSprite.translate.x, 0.1f, -1280.0f, 1280.0f);
-		ImGui::DragFloat("uvrotate", &uvTransSprite.rotate.z, 0.01f, -4.0f, 4.0f);
-		ImGui::DragFloat2("uvsclae", &uvTransSprite.scale.x, 0.01f, 0.0f, 6.0f);
+		ImGui::Checkbox("Draw plane and sprite", &isPlaneAndSprite_);
+		ImGui::Checkbox("Draw plane in particle mode", &isPlaneParticle_);
+		ImGui::Checkbox("Draw sphere", &isSphere_);
+		ImGui::Checkbox("Draw Fence", &isFenceModel_);
+		ImGui::Checkbox("Draw Suzanne", &isSuzanneModel_);
 		ImGui::TreePop();
 	}
 
-	ImGui::Text("light");
-	ImGui::SliderFloat3("light color", &directionalLightData_->color.X, 0.0f, 1.0f);
-	ImGui::SliderFloat3("light direction", &directionalLightData_->direction.x, -1.0f, 1.0f);
+
+	if (isSphere_)
+	{
+		if (ImGui::TreeNode("Sphere"))
+		{
+			ImGui::ColorEdit3("Modelcolor", &materialDate_->color.X);
+			ImGui::DragFloat3("Modeltrans", &transform.translate.x, 0.01f, -5.0f, 5.0f);
+			ImGui::DragFloat3("Modelrotate", &transform.rotate.x, 0.01f, -4.0f, 4.0f);
+			ImGui::DragFloat3("Modelscale", &transform.scale.x, 0.01f, 0.0f, 6.0f);
+			if (ImGui::TreeNode("light"))
+			{
+				if (ImGui::Button("LightNone"))
+				{
+					materialDate_->enableLighting = LightMode::kLightNone;
+				}
+				ImGui::SameLine();
+				if (ImGui::Button("LightLambert"))
+				{
+					materialDate_->enableLighting = LightMode::kLightLambert;
+				}
+				ImGui::SameLine();
+				if (ImGui::Button("LightHalfLambert"))
+				{
+					materialDate_->enableLighting = LightMode::kLightHalfLambert;
+				}
+
+				ImGui::SliderFloat3("light color", &directionalLightData_->color.X, 0.0f, 1.0f);
+				ImGui::SliderFloat3("light direction", &directionalLightData_->direction.x, -1.0f, 1.0f);
+				ImGui::TreePop();
+			}
+			ImGui::TreePop();
+		}
+	}
+
+
+	if (isFenceModel_)
+	{
+		if (ImGui::TreeNode("FenceModel"))
+		{
+			ImGui::ColorEdit3("Modelcolor", &materialDateFenceModel_->color.X);
+			ImGui::DragFloat3("Modeltrans", &transformFenceModel_.translate.x, 0.01f, -5.0f, 5.0f);
+			ImGui::DragFloat3("Modelrotate", &transformFenceModel_.rotate.x, 0.01f, -4.0f, 4.0f);
+			ImGui::DragFloat3("Modelscale", &transformFenceModel_.scale.x, 0.01f, 0.0f, 6.0f);
+			if (ImGui::TreeNode("light"))
+			{
+				if (ImGui::Button("LightNone"))
+				{
+					materialDateFenceModel_->enableLighting = LightMode::kLightNone;
+				}
+				ImGui::SameLine();
+				if (ImGui::Button("LightLambert"))
+				{
+					materialDateFenceModel_->enableLighting = LightMode::kLightLambert;
+				}
+				ImGui::SameLine();
+				if (ImGui::Button("LightHalfLambert"))
+				{
+					materialDateFenceModel_->enableLighting = LightMode::kLightHalfLambert;
+				}
+				ImGui::SliderFloat3("light color", &directionalLightDataFenceModel_->color.X, 0.0f, 1.0f);
+				ImGui::SliderFloat3("light direction", &directionalLightDataFenceModel_->direction.x, -1.0f, 1.0f);
+				ImGui::TreePop();
+			}
+			ImGui::TreePop();
+		}
+		directionalLightDataFenceModel_->direction = directionalLightDataFenceModel_->direction.Normalize();
+	}
+
+
+	if (isSuzanneModel_)
+	{
+		if (ImGui::TreeNode("SuzanneModel"))
+		{
+			ImGui::ColorEdit3("Modelcolor", &materialDateSuzanneModel_->color.X);
+			ImGui::DragFloat3("Modeltrans", &transformSuzanneModel_.translate.x, 0.01f, -5.0f, 5.0f);
+			ImGui::DragFloat3("Modelrotate", &transformSuzanneModel_.rotate.x, 0.01f, -4.0f, 4.0f);
+			ImGui::DragFloat3("Modelscale", &transformSuzanneModel_.scale.x, 0.01f, 0.0f, 6.0f);
+			if (ImGui::TreeNode("light"))
+			{
+				if (ImGui::Button("LightNone"))
+				{
+					materialDateSuzanneModel_->enableLighting = LightMode::kLightNone;
+				}
+				ImGui::SameLine();
+				if (ImGui::Button("LightLambert"))
+				{
+					materialDateSuzanneModel_->enableLighting = LightMode::kLightLambert;
+				}
+				ImGui::SameLine();
+				if (ImGui::Button("LightHalfLambert"))
+				{
+					materialDateSuzanneModel_->enableLighting = LightMode::kLightHalfLambert;
+				}
+
+				ImGui::SliderFloat3("light color", &directionalLightDataSuzanneModel_->color.X, 0.0f, 1.0f);
+				ImGui::SliderFloat3("light direction", &directionalLightDataSuzanneModel_->direction.x, -1.0f, 1.0f);
+				ImGui::TreePop();
+			}
+			ImGui::TreePop();
+		}
+		directionalLightDataSuzanneModel_->direction = directionalLightDataSuzanneModel_->direction.Normalize();
+	}
+
+
+	if (isPlaneParticle_)
+	{
+		for (uint32_t index = 0; index < instanceCount_; ++index)
+		{
+			std::string indexStr = std::to_string(index);
+			if (ImGui::TreeNode(("PlaneModel:" + indexStr).c_str()))
+			{
+				ImGui::ColorEdit3(("Modelcolor:" + indexStr).c_str(), &materialDatePlaneModel_->color.X);
+				ImGui::DragFloat3(("Modeltrans:" + indexStr).c_str(), &transforms[index].translate.x, 0.01f, -5.0f, 5.0f);
+				ImGui::DragFloat3(("Modelrotate:" + indexStr).c_str(), &transforms[index].rotate.x, 0.01f, -4.0f, 4.0f);
+				ImGui::DragFloat3(("Modelscale:" + indexStr).c_str(), &transforms[index].scale.x, 0.01f, 0.0f, 6.0f);
+				if (ImGui::TreeNode("light"))
+				{
+					if (ImGui::Button("LightNone"))
+					{
+						materialDatePlaneModel_->enableLighting = LightMode::kLightNone;
+					}
+					ImGui::SameLine();
+					if (ImGui::Button("LightLambert"))
+					{
+						materialDatePlaneModel_->enableLighting = LightMode::kLightLambert;
+					}
+					ImGui::SameLine();
+					if (ImGui::Button("LightHalfLambert"))
+					{
+						materialDatePlaneModel_->enableLighting = LightMode::kLightHalfLambert;
+					}
+
+					ImGui::SliderFloat3("light color", &directionalLightDataPlaneModel_->color.X, 0.0f, 1.0f);
+					ImGui::SliderFloat3("light direction", &directionalLightDataPlaneModel_->direction.x, -1.0f, 1.0f);
+					ImGui::TreePop();
+				}
+				ImGui::TreePop();
+			}
+		}
+		directionalLightDataPlaneModel_->direction = directionalLightDataPlaneModel_->direction.Normalize();
+	}
+
+
+	if (isPlaneAndSprite_)
+	{
+		if (ImGui::TreeNode("PlaneModel"))
+		{
+			ImGui::ColorEdit3("Modelcolor", &materialDatePlaneModel_->color.X);
+			ImGui::DragFloat3("Modeltrans", &transformPlaneModel_.translate.x, 0.01f, -5.0f, 5.0f);
+			ImGui::DragFloat3("Modelrotate", &transformPlaneModel_.rotate.x, 0.01f, -4.0f, 4.0f);
+			ImGui::DragFloat3("Modelscale", &transformPlaneModel_.scale.x, 0.01f, 0.0f, 6.0f);
+			if (ImGui::TreeNode("light"))
+			{
+				if (ImGui::Button("LightNone"))
+				{
+					materialDatePlaneModel_->enableLighting = LightMode::kLightNone;
+				}
+				ImGui::SameLine();
+				if (ImGui::Button("LightLambert"))
+				{
+					materialDatePlaneModel_->enableLighting = LightMode::kLightLambert;
+				}
+				ImGui::SameLine();
+				if (ImGui::Button("LightHalfLambert"))
+				{
+					materialDatePlaneModel_->enableLighting = LightMode::kLightHalfLambert;
+				}
+
+				ImGui::SliderFloat3("light color", &directionalLightDataPlaneModel_->color.X, 0.0f, 1.0f);
+				ImGui::SliderFloat3("light direction", &directionalLightDataPlaneModel_->direction.x, -1.0f, 1.0f);
+				ImGui::TreePop();
+			}
+			ImGui::TreePop();
+		}
+		directionalLightDataPlaneModel_->direction = directionalLightDataPlaneModel_->direction.Normalize();
+
+		if (ImGui::TreeNode("Sprite"))
+		{
+			ImGui::DragFloat3("Sprite trans", &transSprite.translate.x, 1.0f, -1280.0f, 1280.0f);
+			ImGui::DragFloat3("Sprite rotate", &transSprite.rotate.x, 0.01f, -4.0f, 4.0f);
+			ImGui::DragFloat3("Sprite sclae", &transSprite.scale.x, 0.01f, 0.0f, 6.0f);
+			ImGui::DragFloat2("uvtrans", &uvTransSprite.translate.x, 0.1f, -1280.0f, 1280.0f);
+			ImGui::DragFloat("uvrotate", &uvTransSprite.rotate.z, 0.01f, -4.0f, 4.0f);
+			ImGui::DragFloat2("uvsclae", &uvTransSprite.scale.x, 0.01f, 0.0f, 6.0f);
+			ImGui::TreePop();
+		}
+	}
+
+
 	ImGui::End();
 
 #endif // _DEBUG
 
 	directionalLightData_->direction = directionalLightData_->direction.Normalize();
+
 
 	if (!isFluidMode_)
 	{
@@ -2276,60 +2526,86 @@ void DXCom::UpDate()
 
 
 
-	/*transform.rotate.y += 0.05f;*/
+	transform.rotate.y += 0.05f;
 	Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 	Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTrans.scale, cameraTrans.rotate, cameraTrans.translate);
-	/*Matrix4x4 viewMatrix = Inverse(cameraMatrix);*/
-	Matrix4x4 viewMatrix = debugCamera_->GetViewMatrix();
+	Matrix4x4 viewMatrix = Inverse(cameraMatrix);
+	if (isDebugCamera_)
+	{
+		viewMatrix = debugCamera_->GetViewMatrix();
+	}
 	Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(Fuji::GetkWindowWidth()) / float(Fuji::GetkWindowHeight()), 0.1f, 100.0f);
 	Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
 
 	wvpDate_->World = worldMatrix;
 	wvpDate_->WVP = worldViewProjectionMatrix;
 
+
 	//Fence
-	/*Matrix4x4 worldMatrixFenceModel = MakeAffineMatrix(transformFenceModel_.scale, transformFenceModel_.rotate, transformFenceModel_.translate);
-	Matrix4x4 worldViewProjectionMatrixFenceModel = Multiply(viewMatrix, projectionMatrix);
-	worldViewProjectionMatrixFenceModel = Multiply(worldMatrixFenceModel, worldViewProjectionMatrixFenceModel);
-
-	wvpDateFenceModel_->World = worldMatrixFenceModel;
-	wvpDateFenceModel_->WVP = worldViewProjectionMatrixFenceModel;*/
-
-
-	//Plane
-	Matrix4x4 worldMatrixPlaneModel = MakeAffineMatrix(transformPlaneModel_.scale, transformPlaneModel_.rotate, transformPlaneModel_.translate);
-	Matrix4x4 worldViewProjectionMatrixPlaneModel = Multiply(viewMatrix, projectionMatrix);
-	worldViewProjectionMatrixPlaneModel = Multiply(worldMatrixPlaneModel, worldViewProjectionMatrixPlaneModel);
-
-	wvpDatePlaneModel_->World = worldMatrixPlaneModel;
-	wvpDatePlaneModel_->WVP = worldViewProjectionMatrixPlaneModel;
-
-
-	for (uint32_t index = 0; index < instanceCount_; ++index)
+	if (isFenceModel_)
 	{
-		Matrix4x4 worldMatrixInstanc = MakeAffineMatrix(transforms[index].scale, transforms[index].rotate, transforms[index].translate);
-		Matrix4x4 worldViewProjectionMatrixInstanc = Multiply(viewMatrix, projectionMatrix);
-		worldViewProjectionMatrixInstanc = Multiply(worldMatrixInstanc, worldViewProjectionMatrixInstanc);
+		Matrix4x4 worldMatrixFenceModel = MakeAffineMatrix(transformFenceModel_.scale, transformFenceModel_.rotate, transformFenceModel_.translate);
+		Matrix4x4 worldViewProjectionMatrixFenceModel = Multiply(viewMatrix, projectionMatrix);
+		worldViewProjectionMatrixFenceModel = Multiply(worldMatrixFenceModel, worldViewProjectionMatrixFenceModel);
 
-		instancingData[index].World = worldMatrixInstanc;
-		instancingData[index].WVP = worldViewProjectionMatrixInstanc;
+		wvpDateFenceModel_->World = worldMatrixFenceModel;
+		wvpDateFenceModel_->WVP = worldViewProjectionMatrixFenceModel;
 	}
 
 
-	Matrix4x4 spriteWorldMat = MakeAffineMatrix(transSprite.scale, transSprite.rotate, transSprite.translate);
-	Matrix4x4 spriteViewMat = MakeIdentity4x4();
-	Matrix4x4 spriteProjectMat = MakeOrthographicMatrix(0.0f, 0.0f, float(Fuji::GetkWindowWidth()), float(Fuji::GetkWindowHeight()), 0.0f, 100.0f);
-	Matrix4x4 spriteWorldViewProMat = Multiply(spriteViewMat, spriteProjectMat);
-	spriteWorldViewProMat = Multiply(spriteWorldMat, spriteWorldViewProMat);
+	//Suzanne
+	if (isSuzanneModel_)
+	{
+		Matrix4x4 worldMatrixSuzanneModel = MakeAffineMatrix(transformSuzanneModel_.scale, transformSuzanneModel_.rotate, transformSuzanneModel_.translate);
+		Matrix4x4 worldViewProjectionMatrixSuzanneModel = Multiply(viewMatrix, projectionMatrix);
+		worldViewProjectionMatrixSuzanneModel = Multiply(worldMatrixSuzanneModel, worldViewProjectionMatrixSuzanneModel);
+
+		wvpDateSuzanneModel_->World = worldMatrixSuzanneModel;
+		wvpDateSuzanneModel_->WVP = worldViewProjectionMatrixSuzanneModel;
+	}
 
 
-	transformationMatDataSprite_->World = spriteWorldMat;
-	transformationMatDataSprite_->WVP = spriteWorldViewProMat;
+	if (isPlaneParticle_)
+	{
+		for (uint32_t index = 0; index < instanceCount_; ++index)
+		{
+			Matrix4x4 worldMatrixInstanc = MakeAffineMatrix(transforms[index].scale, transforms[index].rotate, transforms[index].translate);
+			Matrix4x4 worldViewProjectionMatrixInstanc = Multiply(viewMatrix, projectionMatrix);
+			worldViewProjectionMatrixInstanc = Multiply(worldMatrixInstanc, worldViewProjectionMatrixInstanc);
 
-	Matrix4x4 uvtrasform = MakeScaleMatrix(uvTransSprite.scale);
-	uvtrasform = Multiply(uvtrasform, MakeRotateZMatrix(uvTransSprite.rotate.z));
-	uvtrasform = Multiply(uvtrasform, MakeTranslateMatrix(uvTransSprite.translate));
-	materialDateSprite_->uvTransform = uvtrasform;
+			instancingData[index].World = worldMatrixInstanc;
+			instancingData[index].WVP = worldViewProjectionMatrixInstanc;
+		}
+	}
+
+
+	if (isPlaneAndSprite_)
+	{
+		//Plane
+
+		Matrix4x4 worldMatrixPlaneModel = MakeAffineMatrix(transformPlaneModel_.scale, transformPlaneModel_.rotate, transformPlaneModel_.translate);
+		Matrix4x4 worldViewProjectionMatrixPlaneModel = Multiply(viewMatrix, projectionMatrix);
+		worldViewProjectionMatrixPlaneModel = Multiply(worldMatrixPlaneModel, worldViewProjectionMatrixPlaneModel);
+
+		wvpDatePlaneModel_->World = worldMatrixPlaneModel;
+		wvpDatePlaneModel_->WVP = worldViewProjectionMatrixPlaneModel;
+
+
+		Matrix4x4 spriteWorldMat = MakeAffineMatrix(transSprite.scale, transSprite.rotate, transSprite.translate);
+		Matrix4x4 spriteViewMat = MakeIdentity4x4();
+		Matrix4x4 spriteProjectMat = MakeOrthographicMatrix(0.0f, 0.0f, float(Fuji::GetkWindowWidth()), float(Fuji::GetkWindowHeight()), 0.0f, 100.0f);
+		Matrix4x4 spriteWorldViewProMat = Multiply(spriteViewMat, spriteProjectMat);
+		spriteWorldViewProMat = Multiply(spriteWorldMat, spriteWorldViewProMat);
+
+		transformationMatDataSprite_->World = spriteWorldMat;
+		transformationMatDataSprite_->WVP = spriteWorldViewProMat;
+
+
+		Matrix4x4 uvtrasform = MakeScaleMatrix(uvTransSprite.scale);
+		uvtrasform = Multiply(uvtrasform, MakeRotateZMatrix(uvTransSprite.rotate.z));
+		uvtrasform = Multiply(uvtrasform, MakeTranslateMatrix(uvTransSprite.translate));
+		materialDateSprite_->uvTransform = uvtrasform;
+	}
 
 
 	/*Matrix4x4 worldMatrix2 = MakeAffineMatrix(transform2.scale, transform2.rotate, transform2.translate);
@@ -2818,17 +3094,25 @@ ModelData DXCom::LoadObjFile(const std::string& directoryPath, const std::string
 				s >> vertexDefinition;
 				//頂点の要素へのindexは　位置/uv/法線　で格納されているので、分解してindex取得
 				std::istringstream v(vertexDefinition);
-				uint32_t elementIndices[3];
-				for (int32_t element = 0; element < 3; element++)
+				std::string index;
+				uint32_t elementIndices[3] = { 0,0,0 };
+				int32_t element = 0;
+				while (std::getline(v, index, '/'))
 				{
-					std::string index;
-					std::getline(v, index, '/');
-					elementIndices[element] = std::stoi(index);
+					if (!index.empty())
+					{
+						elementIndices[element] = std::stoi(index);
+					}
+					element++;
 				}
 				Vector4 position = positions[elementIndices[0] - 1];
 				position.X *= -1.0f;
-				Vector2 texcoord = texcords[elementIndices[1] - 1];
-				texcoord.y = 1.0f - texcoord.y;
+				Vector2 texcoord = { 0.0f,0.0f };
+				if (elementIndices[1] > 0)
+				{
+					texcoord = texcords[elementIndices[1] - 1];
+					texcoord.y = 1.0f - texcoord.y;
+				}
 				Vector3 normal = normals[elementIndices[2] - 1];
 				normal.x *= -1.0f;
 				triangle[faceVertex] = { position,texcoord,normal };
@@ -2869,6 +3153,12 @@ MaterialData DXCom::LoadMaterialTemplateFile(const std::string& directoryPath, c
 			s >> textureFilename;
 			materialData.textureFilePath = directoryPath + "/" + textureFilename;
 		}
+	}
+
+	if (materialData.textureFilePath.empty())
+	{
+		std::string whiteTexture = "white2x2.png";
+		materialData.textureFilePath = directoryPath + "/" + whiteTexture;
 	}
 
 	return materialData;

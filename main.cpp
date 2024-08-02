@@ -32,7 +32,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		if (keys[DIK_0]&&!(preKeys[DIK_0]))
 		{
 			OutputDebugStringA("Hit 0\n");
-			//Fuji::SoundPlayWave(soundData1);
+			Fuji::SoundPlayWave(soundData1);
 		}
 
 		Fuji::UpDateDxc();

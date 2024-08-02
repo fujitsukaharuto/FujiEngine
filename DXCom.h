@@ -67,6 +67,14 @@ enum BlendMode
 };
 
 
+enum LightMode
+{
+	kLightNone,
+	kLightHalfLambert,
+	kLightLambert,
+};
+
+
 class DebugCamera;//今だけ、後から消す
 
 
@@ -283,8 +291,8 @@ private:
 	Material* materialDate_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_ = nullptr;
 	DirectionalLight* directionalLightData_ = nullptr;
-	bool useMonsterBall = true;
-	bool isTriangleDraw_ = true;
+	//bool useMonsterBall = true;
+	//bool isTriangleDraw_ = true;
 
 	////三角形2
 	//Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource2_ = nullptr;
@@ -324,7 +332,7 @@ private:
 
 
 	//FenceModelData
-	/*ModelData fenceModelData_;
+	ModelData fenceModelData_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexFenceModelResource_ = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexFenceModelBufferView_{};
 	VertexData* vertexDataFenceModel_ = nullptr;
@@ -333,7 +341,20 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResourceFenceModel_ = nullptr;
 	Material* materialDateFenceModel_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResourceFenceModel_ = nullptr;
-	DirectionalLight* directionalLightDataFenceModel_ = nullptr;*/
+	DirectionalLight* directionalLightDataFenceModel_ = nullptr;
+
+
+	//SuzanneModel
+	ModelData suzanneModelData_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> vertexSuzanneModelResource_ = nullptr;
+	D3D12_VERTEX_BUFFER_VIEW vertexSuzanneModelBufferView_{};
+	VertexData* vertexDataSuzanneModel_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> wvpResourceSuzanneModel_ = nullptr;
+	TransformationMatrix* wvpDateSuzanneModel_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> materialResourceSuzanneModel_ = nullptr;
+	Material* materialDateSuzanneModel_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResourceSuzanneModel_ = nullptr;
+	DirectionalLight* directionalLightDataSuzanneModel_ = nullptr;
 
 
 	//PlaneModel
@@ -410,6 +431,16 @@ private:
 	float boundDamping = -0.3f;
 
 
+	bool isPlaneAndSprite_ = true;
+	bool isPlaneParticle_ = false;
+	bool isSphere_ = false;
+	bool isFenceModel_ = false;
+	bool isSuzanneModel_ = false;
+
+
+	bool isDebugCamera_ = false;
+
+
 	DebugCamera* debugCamera_ = nullptr;//今だけ、後から消す
 
 	Trans transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
@@ -424,8 +455,10 @@ private:
 	Trans transformModel{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 	
 	Trans transformFenceModel_{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
-	Trans transformPlaneModel_{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 
+	Trans transformSuzanneModel_{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+
+	Trans transformPlaneModel_{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 	Trans transforms[instanceCount_];
 
 	Trans transformParticle[particleIndex]{};
@@ -439,16 +472,19 @@ private:
 	DirectX::ScratchImage mipImages_;
 	DirectX::ScratchImage mipImages2_;
 	DirectX::ScratchImage fenceMipImages_;
+	DirectX::ScratchImage suzanneMipImages_;
 	DirectX::ScratchImage planeMipImages_;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> textureResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> textureResource2_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> fenceTextureResource_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> suzanneTextureResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> planeTextureResource_;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource1;
 	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource2;
 	Microsoft::WRL::ComPtr<ID3D12Resource> fenceIntermediateResource_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> suzanneIntermediateResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> planeIntermediateResource_;
 
 
@@ -460,6 +496,9 @@ private:
 
 	D3D12_CPU_DESCRIPTOR_HANDLE fenceTextureSrvHandleCPU_;
 	D3D12_GPU_DESCRIPTOR_HANDLE fenceTextureSrvHandleGPU_;
+
+	D3D12_CPU_DESCRIPTOR_HANDLE suzanneTextureSrvHandleCPU_;
+	D3D12_GPU_DESCRIPTOR_HANDLE suzanneTextureSrvHandleGPU_;
 
 	D3D12_CPU_DESCRIPTOR_HANDLE planeTextureSrvHandleCPU_;
 	D3D12_GPU_DESCRIPTOR_HANDLE planeTextureSrvHandleGPU_;
