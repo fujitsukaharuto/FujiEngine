@@ -50,6 +50,13 @@ struct Particle
 };
 
 
+struct Grain
+{
+	Trans transform;
+	Vector3 velocity;
+};
+
+
 enum BlendMode
 {
 	// ブレンド無し
@@ -357,6 +364,19 @@ private:
 	DirectionalLight* directionalLightDataSuzanneModel_ = nullptr;
 
 
+	//MMeshModel
+	ModelData mMeshModelData_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> vertexMMeshModelResource_ = nullptr;
+	D3D12_VERTEX_BUFFER_VIEW vertexMMeshModelBufferView_{};
+	VertexData* vertexDataMMeshModel_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> wvpResourceMMeshModel_ = nullptr;
+	TransformationMatrix* wvpDateMMeshModel_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> materialResourceMMeshModel_ = nullptr;
+	Material* materialDateMMeshModel_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResourceMMeshModel_ = nullptr;
+	DirectionalLight* directionalLightDataMMeshModel_ = nullptr;
+
+
 	//PlaneModel
 	ModelData planeModelData_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexPlaneModelResource_ = nullptr;
@@ -431,11 +451,12 @@ private:
 	float boundDamping = -0.3f;
 
 
-	bool isPlaneAndSprite_ = true;
-	bool isPlaneParticle_ = false;
+	bool isPlaneAndSprite_ = false;
+	bool isPlaneParticle_ = true;
 	bool isSphere_ = false;
 	bool isFenceModel_ = false;
 	bool isSuzanneModel_ = false;
+	bool isMMesh_ = false;
 
 
 	bool isDebugCamera_ = false;
@@ -458,8 +479,11 @@ private:
 
 	Trans transformSuzanneModel_{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 
+	Trans transformMMeshModel_{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+
 	Trans transformPlaneModel_{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
-	Trans transforms[instanceCount_];
+	Grain particles_[instanceCount_];
+	const float kDeltatime = 1.0f / 60.0f;
 
 	Trans transformParticle[particleIndex]{};
 	Vector3 particleVel[particleIndex]{};
@@ -474,18 +498,21 @@ private:
 	DirectX::ScratchImage fenceMipImages_;
 	DirectX::ScratchImage suzanneMipImages_;
 	DirectX::ScratchImage planeMipImages_;
+	DirectX::ScratchImage mMeshMipImages_;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> textureResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> textureResource2_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> fenceTextureResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> suzanneTextureResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> planeTextureResource_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> mMeshTextureResource_;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource1;
 	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource2;
 	Microsoft::WRL::ComPtr<ID3D12Resource> fenceIntermediateResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> suzanneIntermediateResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> planeIntermediateResource_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> mMeshIntermediateResource_;
 
 
 	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU;
@@ -499,6 +526,9 @@ private:
 
 	D3D12_CPU_DESCRIPTOR_HANDLE suzanneTextureSrvHandleCPU_;
 	D3D12_GPU_DESCRIPTOR_HANDLE suzanneTextureSrvHandleGPU_;
+
+	D3D12_CPU_DESCRIPTOR_HANDLE mMeshTextureSrvHandleCPU_;
+	D3D12_GPU_DESCRIPTOR_HANDLE mMeshTextureSrvHandleGPU_;
 
 	D3D12_CPU_DESCRIPTOR_HANDLE planeTextureSrvHandleCPU_;
 	D3D12_GPU_DESCRIPTOR_HANDLE planeTextureSrvHandleGPU_;

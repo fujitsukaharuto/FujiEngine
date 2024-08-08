@@ -771,9 +771,11 @@ void DXCom::SettingGraphicPipeline()
 
 	for (uint32_t index = 0; index < instanceCount_; ++index)
 	{
-		transforms[index].scale = { 1.0f,1.0f,1.0f };
-		transforms[index].rotate = { 0.0f,0.0f,0.0f };
-		transforms[index].translate = { index * 0.1f,index * 0.1f,index * 0.1f };
+		particles_[index].transform.scale = { 1.0f,1.0f,1.0f };
+		particles_[index].transform.rotate = { 0.0f,0.0f,0.0f };
+		particles_[index].transform.translate = { index * 0.1f,index * 0.1f,index * 0.1f };
+
+		particles_[index].velocity = { 0.0f,1.0f,0.0f };
 	}
 
 	if (isGrayscale_)
@@ -1427,6 +1429,38 @@ void DXCom::SettingSpriteVertex()
 	directionalLightDataSuzanneModel_->intensity = 1.0f;
 
 
+	//MMeshModel
+	mMeshModelData_ = LoadObjFile("resource", "multiMesh.obj");
+	vertexMMeshModelResource_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * mMeshModelData_.vertices.size());
+	vertexMMeshModelBufferView_.BufferLocation = vertexMMeshModelResource_->GetGPUVirtualAddress();
+	vertexMMeshModelBufferView_.SizeInBytes = UINT(sizeof(VertexData) * mMeshModelData_.vertices.size());
+	vertexMMeshModelBufferView_.StrideInBytes = sizeof(VertexData);
+
+	vertexMMeshModelResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataMMeshModel_));
+	std::memcpy(vertexDataMMeshModel_, mMeshModelData_.vertices.data(), sizeof(VertexData)* mMeshModelData_.vertices.size());
+
+	wvpResourceMMeshModel_ = CreateBufferResource(device_.Get(), sizeof(TransformationMatrix));
+	wvpDateMMeshModel_ = nullptr;
+	wvpResourceMMeshModel_->Map(0, nullptr, reinterpret_cast<void**>(&wvpDateMMeshModel_));
+	wvpDateMMeshModel_->WVP = MakeIdentity4x4();
+	wvpDateMMeshModel_->World = MakeIdentity4x4();
+
+	materialResourceMMeshModel_ = CreateBufferResource(device_.Get(), sizeof(Material));
+	materialDateMMeshModel_ = nullptr;
+	materialResourceMMeshModel_->Map(0, nullptr, reinterpret_cast<void**>(&materialDateMMeshModel_));
+	//色変えるやつ（Resource）
+	materialDateMMeshModel_->color = { 1.0f,1.0f,1.0f,1.0f };
+	materialDateMMeshModel_->enableLighting = LightMode::kLightNone;
+	materialDateMMeshModel_->uvTransform = MakeIdentity4x4();
+
+	directionalLightResourceMMeshModel_ = CreateBufferResource(device_.Get(), sizeof(DirectionalLight));
+	directionalLightDataMMeshModel_ = nullptr;
+	directionalLightResourceMMeshModel_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightDataMMeshModel_));
+	directionalLightDataMMeshModel_->color = { 1.0f,1.0f,1.0f,1.0f };
+	directionalLightDataMMeshModel_->direction = { 1.0f,0.0f,0.0f };
+	directionalLightDataMMeshModel_->intensity = 1.0f;
+
+
 	//PlaneModel
 	planeModelData_ = LoadObjFile("resource", "plane.obj");
 	vertexPlaneModelResource_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * planeModelData_.vertices.size());
@@ -1633,6 +1667,24 @@ void DXCom::SettingTexture()
 	device_->CreateShaderResourceView(planeTextureResource_.Get(), &srvDescPlane, planeTextureSrvHandleCPU_);
 
 
+	//MMesh
+	mMeshMipImages_ = LoadTexture(mMeshModelData_.material.textureFilePath);
+	const DirectX::TexMetadata& mMeshMetadata = mMeshMipImages_.GetMetadata();
+	mMeshTextureResource_ = CreateTextureResource(device_.Get(), mMeshMetadata);
+
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDescMMesh{};
+	srvDescMMesh.Format = mMeshMetadata.format;
+	srvDescMMesh.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDescMMesh.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srvDescMMesh.Texture2D.MipLevels = UINT(mMeshMetadata.mipLevels);
+
+	mMeshIntermediateResource_ = UploadTextureData(mMeshTextureResource_, mMeshMipImages_, device_.Get(), commandList_);
+	mMeshTextureSrvHandleCPU_ = GetCPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, 6);
+	mMeshTextureSrvHandleGPU_ = GetGPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, 6);
+
+	device_->CreateShaderResourceView(mMeshTextureResource_.Get(), &srvDescMMesh, mMeshTextureSrvHandleCPU_);
+
+
 	D3D12_SHADER_RESOURCE_VIEW_DESC instancingSrvDesc{};
 	instancingSrvDesc.Format = DXGI_FORMAT_UNKNOWN;
 	instancingSrvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -1833,6 +1885,23 @@ void DXCom::Command()
 		commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResourceSuzanneModel_->GetGPUVirtualAddress());
 		commandList_->SetGraphicsRootDescriptorTable(2, suzanneTextureSrvHandleGPU_);
 		commandList_->DrawInstanced(UINT(suzanneModelData_.vertices.size()), 1, 0, 0);
+	}
+
+
+	if (isMMesh_)
+	{
+		// MMeshModel
+		commandList_->RSSetViewports(1, &viewport);
+		commandList_->RSSetScissorRects(1, &scissorRect);
+		commandList_->SetGraphicsRootSignature(rootSignature_.Get());
+		commandList_->SetPipelineState(graphicsPipelineState_.Get());
+		commandList_->IASetVertexBuffers(0, 1, &vertexMMeshModelBufferView_);
+		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		commandList_->SetGraphicsRootConstantBufferView(0, materialResourceMMeshModel_->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootConstantBufferView(1, wvpResourceMMeshModel_->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResourceMMeshModel_->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootDescriptorTable(2, mMeshTextureSrvHandleGPU_);
+		commandList_->DrawInstanced(UINT(mMeshModelData_.vertices.size()), instanceCount_, 0, 0);
 	}
 
 
@@ -2069,7 +2138,7 @@ void DXCom::UpDate()
 {
 	/*Tick();*/
 
-//#ifdef _DEBUG
+#ifdef _DEBUG
 	ImGui::Begin("debug");
 	/*if (ImGui::TreeNode("Triangle1"))
 	{
@@ -2188,6 +2257,7 @@ void DXCom::UpDate()
 		ImGui::Checkbox("Draw sphere", &isSphere_);
 		ImGui::Checkbox("Draw Fence", &isFenceModel_);
 		ImGui::Checkbox("Draw Suzanne", &isSuzanneModel_);
+		ImGui::Checkbox("Draw MultiMesh", &isMMesh_);
 		ImGui::TreePop();
 	}
 
@@ -2303,9 +2373,9 @@ void DXCom::UpDate()
 			if (ImGui::TreeNode(("PlaneModel:" + indexStr).c_str()))
 			{
 				ImGui::ColorEdit3(("Modelcolor:" + indexStr).c_str(), &materialDatePlaneModel_->color.X);
-				ImGui::DragFloat3(("Modeltrans:" + indexStr).c_str(), &transforms[index].translate.x, 0.01f, -5.0f, 5.0f);
-				ImGui::DragFloat3(("Modelrotate:" + indexStr).c_str(), &transforms[index].rotate.x, 0.01f, -4.0f, 4.0f);
-				ImGui::DragFloat3(("Modelscale:" + indexStr).c_str(), &transforms[index].scale.x, 0.01f, 0.0f, 6.0f);
+				ImGui::DragFloat3(("Modeltrans:" + indexStr).c_str(), &particles_[index].transform.translate.x, 0.01f, -5.0f, 5.0f);
+				ImGui::DragFloat3(("Modelrotate:" + indexStr).c_str(), &particles_[index].transform.rotate.x, 0.01f, -4.0f, 4.0f);
+				ImGui::DragFloat3(("Modelscale:" + indexStr).c_str(), &particles_[index].transform.scale.x, 0.01f, 0.0f, 6.0f);
 				if (ImGui::TreeNode("light"))
 				{
 					if (ImGui::Button("LightNone"))
@@ -2338,7 +2408,7 @@ void DXCom::UpDate()
 	{
 		if (ImGui::TreeNode("PlaneModel"))
 		{
-			ImGui::ColorEdit3("Modelcolor", &materialDatePlaneModel_->color.X);
+			ImGui::ColorEdit4("Modelcolor", &materialDatePlaneModel_->color.X);
 			ImGui::DragFloat3("Modeltrans", &transformPlaneModel_.translate.x, 0.01f, -5.0f, 5.0f);
 			ImGui::DragFloat3("Modelrotate", &transformPlaneModel_.rotate.x, 0.01f, -4.0f, 4.0f);
 			ImGui::DragFloat3("Modelscale", &transformPlaneModel_.scale.x, 0.01f, 0.0f, 6.0f);
@@ -2379,11 +2449,46 @@ void DXCom::UpDate()
 		}
 	}
 
+	if (isMMesh_)
+	{
+		if (ImGui::TreeNode("MMeshModel"))
+		{
+			ImGui::ColorEdit4("Modelcolor", &materialDateMMeshModel_->color.X);
+			ImGui::DragFloat3("Modeltrans", &transformMMeshModel_.translate.x, 0.01f, -5.0f, 5.0f);
+			ImGui::DragFloat3("Modelrotate", &transformMMeshModel_.rotate.x, 0.01f, -4.0f, 4.0f);
+			ImGui::DragFloat3("Modelscale", &transformMMeshModel_.scale.x, 0.01f, 0.0f, 6.0f);
+			if (ImGui::TreeNode("light"))
+			{
+				if (ImGui::Button("LightNone"))
+				{
+					materialDateMMeshModel_->enableLighting = LightMode::kLightNone;
+				}
+				ImGui::SameLine();
+				if (ImGui::Button("LightLambert"))
+				{
+					materialDateMMeshModel_->enableLighting = LightMode::kLightLambert;
+				}
+				ImGui::SameLine();
+				if (ImGui::Button("LightHalfLambert"))
+				{
+					materialDateMMeshModel_->enableLighting = LightMode::kLightHalfLambert;
+				}
+
+				ImGui::SliderFloat3("light color", &directionalLightDataMMeshModel_->color.X, 0.0f, 1.0f);
+				ImGui::SliderFloat3("light direction", &directionalLightDataMMeshModel_->direction.x, -1.0f, 1.0f);
+				ImGui::TreePop();
+			}
+			ImGui::TreePop();
+		}
+		directionalLightDataMMeshModel_->direction = directionalLightDataMMeshModel_->direction.Normalize();
+	}
+
+
 	ImGui::Text("\nPlay Sound:Key 0, Gamepad A Button");
 
 	ImGui::End();
 
-//#endif // _DEBUG
+#endif // _DEBUG
 
 	directionalLightData_->direction = directionalLightData_->direction.Normalize();
 
@@ -2597,7 +2702,8 @@ void DXCom::UpDate()
 	{
 		for (uint32_t index = 0; index < instanceCount_; ++index)
 		{
-			Matrix4x4 worldMatrixInstanc = MakeAffineMatrix(transforms[index].scale, transforms[index].rotate, transforms[index].translate);
+			particles_[index].transform.translate += particles_[index].velocity * kDeltatime;
+			Matrix4x4 worldMatrixInstanc = MakeAffineMatrix(particles_[index].transform.scale, particles_[index].transform.rotate, particles_[index].transform.translate);
 			Matrix4x4 worldViewProjectionMatrixInstanc = Multiply(viewMatrix, projectionMatrix);
 			worldViewProjectionMatrixInstanc = Multiply(worldMatrixInstanc, worldViewProjectionMatrixInstanc);
 
@@ -2633,6 +2739,17 @@ void DXCom::UpDate()
 		uvtrasform = Multiply(uvtrasform, MakeRotateZMatrix(uvTransSprite.rotate.z));
 		uvtrasform = Multiply(uvtrasform, MakeTranslateMatrix(uvTransSprite.translate));
 		materialDateSprite_->uvTransform = uvtrasform;
+	}
+
+
+	if (isMMesh_)
+	{
+		Matrix4x4 worldMatrixMMeshModel = MakeAffineMatrix(transformMMeshModel_.scale, transformMMeshModel_.rotate, transformMMeshModel_.translate);
+		Matrix4x4 worldViewProjectionMatrixMMeshModel = Multiply(viewMatrix, projectionMatrix);
+		worldViewProjectionMatrixMMeshModel = Multiply(worldMatrixMMeshModel, worldViewProjectionMatrixMMeshModel);
+
+		wvpDateMMeshModel_->World = worldMatrixMMeshModel;
+		wvpDateMMeshModel_->WVP = worldViewProjectionMatrixMMeshModel;
 	}
 
 

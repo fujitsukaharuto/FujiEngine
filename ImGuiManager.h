@@ -2,9 +2,9 @@
 
 #include <d3d12.h>
 #include <wrl.h>
-//#ifdef _DEBUG
+#ifdef _DEBUG
 #include "externals/imgui/imgui.h"
-//#endif // _DEBUG
+#endif // _DEBUG
 
 class MyWin;
 class DXCom;
