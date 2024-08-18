@@ -1021,11 +1021,11 @@ void DXCom::SettingGraphicPipeline()
 
 void DXCom::SettingVertex()
 {
-	vertexResource_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * 2000);
+	vertexResource_ = CreateBufferResource(device_.Get(), sizeof(VertexDate) * 2000);
 
 	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
-	vertexBufferView_.SizeInBytes = sizeof(VertexData) * 2000;
-	vertexBufferView_.StrideInBytes = sizeof(VertexData);
+	vertexBufferView_.SizeInBytes = sizeof(VertexDate) * 2000;
+	vertexBufferView_.StrideInBytes = sizeof(VertexDate);
 
 	vertexDate_ = nullptr;
 	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDate_));
@@ -1212,13 +1212,13 @@ void DXCom::SettingVertex()
 
 	for (int i = 0; i <= particles.size() - 1; i++)
 	{
-		vertexFlowResource_[i] = CreateBufferResource(device_, sizeof(VertexData) * 4);
+		vertexFlowResource_[i] = CreateBufferResource(device_, sizeof(VertexDate) * 4);
 		indexFlowResource_[i] = CreateBufferResource(device_, sizeof(uint32_t) * 6);
 	}
 
 	vertexFlowBufferView_.BufferLocation = vertexFlowResource_[0]->GetGPUVirtualAddress();
-	vertexFlowBufferView_.SizeInBytes = sizeof(VertexData) * 4;
-	vertexFlowBufferView_.StrideInBytes = sizeof(VertexData);
+	vertexFlowBufferView_.SizeInBytes = sizeof(VertexDate) * 4;
+	vertexFlowBufferView_.StrideInBytes = sizeof(VertexDate);
 
 	indexFlowBufferView_.BufferLocation = indexFlowResource_[0]->GetGPUVirtualAddress();
 	indexFlowBufferView_.SizeInBytes = sizeof(uint32_t) * 6;
@@ -1251,7 +1251,7 @@ void DXCom::SettingVertex()
 		wvpFlowDate_[i]->WVP = MakeIdentity4x4();
 		wvpFlowDate_[i]->World = MakeIdentity4x4();
 	}
-	materialFlowResource_ = CreateBufferResource(device_, sizeof(Material));
+	materialFlowResource_ = CreateBufferResource(device_, sizeof(Materials));
 	materialFlowDate_ = nullptr;
 	materialFlowResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialFlowDate_));
 	materialFlowDate_->color = particleColor;
@@ -1292,11 +1292,11 @@ void DXCom::SettingVertex()
 void DXCom::SettingSpriteVertex()
 {
 	// Sprite
-	vertexResourceSprite_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * 4);
+	vertexResourceSprite_ = CreateBufferResource(device_.Get(), sizeof(VertexDate) * 4);
 
 	vertexBufferViewSprite_.BufferLocation = vertexResourceSprite_->GetGPUVirtualAddress();
-	vertexBufferViewSprite_.SizeInBytes = sizeof(VertexData) * 4;
-	vertexBufferViewSprite_.StrideInBytes = sizeof(VertexData);
+	vertexBufferViewSprite_.SizeInBytes = sizeof(VertexDate) * 4;
+	vertexBufferViewSprite_.StrideInBytes = sizeof(VertexDate);
 
 	vertexDataSprite_ = nullptr;
 	vertexResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSprite_));
@@ -1367,13 +1367,13 @@ void DXCom::SettingSpriteVertex()
 
 	//FenceModel
 	fenceModelData_ = LoadObjFile("resource", "fence.obj");
-	vertexFenceModelResource_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * fenceModelData_.vertices.size());
+	vertexFenceModelResource_ = CreateBufferResource(device_.Get(), sizeof(VertexDate) * fenceModelData_.vertices.size());
 	vertexFenceModelBufferView_.BufferLocation = vertexFenceModelResource_->GetGPUVirtualAddress();
-	vertexFenceModelBufferView_.SizeInBytes = UINT(sizeof(VertexData) * fenceModelData_.vertices.size());
-	vertexFenceModelBufferView_.StrideInBytes = sizeof(VertexData);
+	vertexFenceModelBufferView_.SizeInBytes = UINT(sizeof(VertexDate) * fenceModelData_.vertices.size());
+	vertexFenceModelBufferView_.StrideInBytes = sizeof(VertexDate);
 
 	vertexFenceModelResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataFenceModel_));
-	std::memcpy(vertexDataFenceModel_, fenceModelData_.vertices.data(), sizeof(VertexData) * fenceModelData_.vertices.size());
+	std::memcpy(vertexDataFenceModel_, fenceModelData_.vertices.data(), sizeof(VertexDate) * fenceModelData_.vertices.size());
 
 	wvpResourceFenceModel_ = CreateBufferResource(device_.Get(), sizeof(TransformationMatrix));
 	wvpDateFenceModel_ = nullptr;
@@ -1381,7 +1381,7 @@ void DXCom::SettingSpriteVertex()
 	wvpDateFenceModel_->WVP = MakeIdentity4x4();
 	wvpDateFenceModel_->World = MakeIdentity4x4();
 
-	materialResourceFenceModel_ = CreateBufferResource(device_.Get(), sizeof(Material));
+	materialResourceFenceModel_ = CreateBufferResource(device_.Get(), sizeof(Materials));
 	materialDateFenceModel_ = nullptr;
 	materialResourceFenceModel_->Map(0, nullptr, reinterpret_cast<void**>(&materialDateFenceModel_));
 	//色変えるやつ（Resource）
@@ -1399,13 +1399,13 @@ void DXCom::SettingSpriteVertex()
 
 	//SuzanneModel
 	suzanneModelData_ = LoadObjFile("resource", "suzanne.obj");
-	vertexSuzanneModelResource_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * suzanneModelData_.vertices.size());
+	vertexSuzanneModelResource_ = CreateBufferResource(device_.Get(), sizeof(VertexDate) * suzanneModelData_.vertices.size());
 	vertexSuzanneModelBufferView_.BufferLocation = vertexSuzanneModelResource_->GetGPUVirtualAddress();
-	vertexSuzanneModelBufferView_.SizeInBytes = UINT(sizeof(VertexData) * suzanneModelData_.vertices.size());
-	vertexSuzanneModelBufferView_.StrideInBytes = sizeof(VertexData);
+	vertexSuzanneModelBufferView_.SizeInBytes = UINT(sizeof(VertexDate) * suzanneModelData_.vertices.size());
+	vertexSuzanneModelBufferView_.StrideInBytes = sizeof(VertexDate);
 
 	vertexSuzanneModelResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSuzanneModel_));
-	std::memcpy(vertexDataSuzanneModel_, suzanneModelData_.vertices.data(), sizeof(VertexData) * suzanneModelData_.vertices.size());
+	std::memcpy(vertexDataSuzanneModel_, suzanneModelData_.vertices.data(), sizeof(VertexDate) * suzanneModelData_.vertices.size());
 
 	wvpResourceSuzanneModel_ = CreateBufferResource(device_.Get(), sizeof(TransformationMatrix));
 	wvpDateSuzanneModel_ = nullptr;
@@ -1413,7 +1413,7 @@ void DXCom::SettingSpriteVertex()
 	wvpDateSuzanneModel_->WVP = MakeIdentity4x4();
 	wvpDateSuzanneModel_->World = MakeIdentity4x4();
 
-	materialResourceSuzanneModel_ = CreateBufferResource(device_.Get(), sizeof(Material));
+	materialResourceSuzanneModel_ = CreateBufferResource(device_.Get(), sizeof(Materials));
 	materialDateSuzanneModel_ = nullptr;
 	materialResourceSuzanneModel_->Map(0, nullptr, reinterpret_cast<void**>(&materialDateSuzanneModel_));
 	//色変えるやつ（Resource）
@@ -1431,13 +1431,13 @@ void DXCom::SettingSpriteVertex()
 
 	//MMeshModel
 	mMeshModelData_ = LoadObjFile("resource", "multiMesh.obj");
-	vertexMMeshModelResource_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * mMeshModelData_.vertices.size());
+	vertexMMeshModelResource_ = CreateBufferResource(device_.Get(), sizeof(VertexDate) * mMeshModelData_.vertices.size());
 	vertexMMeshModelBufferView_.BufferLocation = vertexMMeshModelResource_->GetGPUVirtualAddress();
-	vertexMMeshModelBufferView_.SizeInBytes = UINT(sizeof(VertexData) * mMeshModelData_.vertices.size());
-	vertexMMeshModelBufferView_.StrideInBytes = sizeof(VertexData);
+	vertexMMeshModelBufferView_.SizeInBytes = UINT(sizeof(VertexDate) * mMeshModelData_.vertices.size());
+	vertexMMeshModelBufferView_.StrideInBytes = sizeof(VertexDate);
 
 	vertexMMeshModelResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataMMeshModel_));
-	std::memcpy(vertexDataMMeshModel_, mMeshModelData_.vertices.data(), sizeof(VertexData)* mMeshModelData_.vertices.size());
+	std::memcpy(vertexDataMMeshModel_, mMeshModelData_.vertices.data(), sizeof(VertexDate) * mMeshModelData_.vertices.size());
 
 	wvpResourceMMeshModel_ = CreateBufferResource(device_.Get(), sizeof(TransformationMatrix));
 	wvpDateMMeshModel_ = nullptr;
@@ -1445,7 +1445,7 @@ void DXCom::SettingSpriteVertex()
 	wvpDateMMeshModel_->WVP = MakeIdentity4x4();
 	wvpDateMMeshModel_->World = MakeIdentity4x4();
 
-	materialResourceMMeshModel_ = CreateBufferResource(device_.Get(), sizeof(Material));
+	materialResourceMMeshModel_ = CreateBufferResource(device_.Get(), sizeof(Materials));
 	materialDateMMeshModel_ = nullptr;
 	materialResourceMMeshModel_->Map(0, nullptr, reinterpret_cast<void**>(&materialDateMMeshModel_));
 	//色変えるやつ（Resource）
@@ -1463,13 +1463,13 @@ void DXCom::SettingSpriteVertex()
 
 	//PlaneModel
 	planeModelData_ = LoadObjFile("resource", "plane.obj");
-	vertexPlaneModelResource_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * planeModelData_.vertices.size());
+	vertexPlaneModelResource_ = CreateBufferResource(device_.Get(), sizeof(VertexDate) * planeModelData_.vertices.size());
 	vertexPlaneModelBufferView_.BufferLocation = vertexPlaneModelResource_->GetGPUVirtualAddress();
-	vertexPlaneModelBufferView_.SizeInBytes = UINT(sizeof(VertexData) * planeModelData_.vertices.size());
-	vertexPlaneModelBufferView_.StrideInBytes = sizeof(VertexData);
+	vertexPlaneModelBufferView_.SizeInBytes = UINT(sizeof(VertexDate) * planeModelData_.vertices.size());
+	vertexPlaneModelBufferView_.StrideInBytes = sizeof(VertexDate);
 
 	vertexPlaneModelResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataPlaneModel_));
-	std::memcpy(vertexDataPlaneModel_, planeModelData_.vertices.data(), sizeof(VertexData) * planeModelData_.vertices.size());
+	std::memcpy(vertexDataPlaneModel_, planeModelData_.vertices.data(), sizeof(VertexDate) * planeModelData_.vertices.size());
 
 	wvpResourcePlaneModel_ = CreateBufferResource(device_.Get(), sizeof(TransformationMatrix));
 	wvpDatePlaneModel_ = nullptr;
@@ -1477,7 +1477,7 @@ void DXCom::SettingSpriteVertex()
 	wvpDatePlaneModel_->WVP = MakeIdentity4x4();
 	wvpDatePlaneModel_->World = MakeIdentity4x4();
 
-	materialResourcePlaneModel_ = CreateBufferResource(device_.Get(), sizeof(Material));
+	materialResourcePlaneModel_ = CreateBufferResource(device_.Get(), sizeof(Materials));
 	materialDatePlaneModel_ = nullptr;
 	materialResourcePlaneModel_->Map(0, nullptr, reinterpret_cast<void**>(&materialDatePlaneModel_));
 	//色変えるやつ（Resource）
@@ -1502,7 +1502,7 @@ void DXCom::SettingResource()
 	wvpDate_->WVP = MakeIdentity4x4();
 	wvpDate_->World = MakeIdentity4x4();
 
-	materialResource_ = CreateBufferResource(device_.Get(), sizeof(Material));
+	materialResource_ = CreateBufferResource(device_.Get(), sizeof(Materials));
 	materialDate_ = nullptr;
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialDate_));
 	//色変えるやつ（Resource）
@@ -1550,7 +1550,7 @@ void DXCom::SettingSpriteResource()
 	transformationMatDataSprite_->World = MakeIdentity4x4();
 
 
-	materialResourceSprite_ = CreateBufferResource(device_.Get(), sizeof(Material));
+	materialResourceSprite_ = CreateBufferResource(device_.Get(), sizeof(Materials));
 	materialDateSprite_ = nullptr;
 	materialResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&materialDateSprite_));
 	//色変えるやつ（Resource）
@@ -1565,6 +1565,7 @@ void DXCom::SettingTexture()
 	//const uint32_t descriptorSizeRTV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	//const uint32_t descriptorSizeDSV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
+	IncreaseDescriptorIndex();
 
 	mipImages_ = LoadTexture("resource/uvChecker.png");
 	const DirectX::TexMetadata& metadata = mipImages_.GetMetadata();
@@ -1577,10 +1578,11 @@ void DXCom::SettingTexture()
 	srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
 
 	intermediateResource1 = UploadTextureData(textureResource_, mipImages_, device_.Get(), commandList_);
-	textureSrvHandleCPU = GetCPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, 2);
-	textureSrvHandleGPU = GetGPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, 2);
+	textureSrvHandleCPU = GetCPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, descriptorIndex_);
+	textureSrvHandleGPU = GetGPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, descriptorIndex_);
 
 	device_->CreateShaderResourceView(textureResource_.Get(), &srvDesc, textureSrvHandleCPU);
+	IncreaseDescriptorIndex();
 
 
 
@@ -1607,9 +1609,10 @@ void DXCom::SettingTexture()
 	srvDescOff.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 	srvDescOff.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 	srvDescOff.Texture2D.MipLevels = 1;
-	offTextureHandleCPU_ = GetCPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, 3);
-	offTextureHandle_ = GetGPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, 3);
+	offTextureHandleCPU_ = GetCPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, descriptorIndex_);
+	offTextureHandle_ = GetGPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, descriptorIndex_);
 	device_->CreateShaderResourceView(offscreenrt_.Get(), &srvDescOff, offTextureHandleCPU_);
+	IncreaseDescriptorIndex();
 
 
 
@@ -1625,10 +1628,11 @@ void DXCom::SettingTexture()
 	srvDescFence.Texture2D.MipLevels = UINT(fenceMetadata.mipLevels);
 
 	fenceIntermediateResource_ = UploadTextureData(fenceTextureResource_, fenceMipImages_, device_.Get(), commandList_);
-	fenceTextureSrvHandleCPU_ = GetCPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, 4);
-	fenceTextureSrvHandleGPU_ = GetGPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, 4);
+	fenceTextureSrvHandleCPU_ = GetCPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, descriptorIndex_);
+	fenceTextureSrvHandleGPU_ = GetGPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, descriptorIndex_);
 
 	device_->CreateShaderResourceView(fenceTextureResource_.Get(), &srvDescFence, fenceTextureSrvHandleCPU_);
+	IncreaseDescriptorIndex();
 
 
 	//SuzanneModelSprite
@@ -1643,10 +1647,11 @@ void DXCom::SettingTexture()
 	srvDescSuzanne.Texture2D.MipLevels = UINT(suzanneMetadata.mipLevels);
 
 	suzanneIntermediateResource_ = UploadTextureData(suzanneTextureResource_, suzanneMipImages_, device_.Get(), commandList_);
-	suzanneTextureSrvHandleCPU_ = GetCPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, 5);
-	suzanneTextureSrvHandleGPU_ = GetGPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, 5);
+	suzanneTextureSrvHandleCPU_ = GetCPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, descriptorIndex_);
+	suzanneTextureSrvHandleGPU_ = GetGPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, descriptorIndex_);
 
 	device_->CreateShaderResourceView(suzanneTextureResource_.Get(), &srvDescSuzanne, suzanneTextureSrvHandleCPU_);
+	IncreaseDescriptorIndex();
 
 
 	//PlaneModelSpriteData
@@ -1661,10 +1666,11 @@ void DXCom::SettingTexture()
 	srvDescPlane.Texture2D.MipLevels = UINT(planeMetadata.mipLevels);
 
 	planeIntermediateResource_ = UploadTextureData(planeTextureResource_, planeMipImages_, device_.Get(), commandList_);
-	planeTextureSrvHandleCPU_ = GetCPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, 6);
-	planeTextureSrvHandleGPU_ = GetGPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, 6);
+	planeTextureSrvHandleCPU_ = GetCPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, descriptorIndex_);
+	planeTextureSrvHandleGPU_ = GetGPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, descriptorIndex_);
 
 	device_->CreateShaderResourceView(planeTextureResource_.Get(), &srvDescPlane, planeTextureSrvHandleCPU_);
+	IncreaseDescriptorIndex();
 
 
 	//MMesh
@@ -1679,10 +1685,11 @@ void DXCom::SettingTexture()
 	srvDescMMesh.Texture2D.MipLevels = UINT(mMeshMetadata.mipLevels);
 
 	mMeshIntermediateResource_ = UploadTextureData(mMeshTextureResource_, mMeshMipImages_, device_.Get(), commandList_);
-	mMeshTextureSrvHandleCPU_ = GetCPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, 6);
-	mMeshTextureSrvHandleGPU_ = GetGPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, 6);
+	mMeshTextureSrvHandleCPU_ = GetCPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, descriptorIndex_);
+	mMeshTextureSrvHandleGPU_ = GetGPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, descriptorIndex_);
 
 	device_->CreateShaderResourceView(mMeshTextureResource_.Get(), &srvDescMMesh, mMeshTextureSrvHandleCPU_);
+	IncreaseDescriptorIndex();
 
 
 	D3D12_SHADER_RESOURCE_VIEW_DESC instancingSrvDesc{};
@@ -1694,9 +1701,10 @@ void DXCom::SettingTexture()
 	instancingSrvDesc.Buffer.NumElements = instanceCount_;
 	instancingSrvDesc.Buffer.StructureByteStride = sizeof(TransformationMatrix);
 
-	instancingSrvHandleCPU_ = GetCPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, 7);
-	instancingSrvHandleGPU_ = GetGPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, 7);
+	instancingSrvHandleCPU_ = GetCPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, descriptorIndex_);
+	instancingSrvHandleGPU_ = GetGPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, descriptorIndex_);
 	device_->CreateShaderResourceView(instancingResource.Get(), &instancingSrvDesc, instancingSrvHandleCPU_);
+	IncreaseDescriptorIndex();
 
 
 	HRESULT hr = commandList_->Close();
@@ -1729,21 +1737,8 @@ void DXCom::FirstFrame()
 
 }
 
-void DXCom::SetBarrier()
+void DXCom::PreDraw()
 {
-
-	/*UINT backBufferIndex = swapChain_->GetCurrentBackBufferIndex();
-
-	D3D12_RESOURCE_BARRIER barrier{};
-	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	barrier.Transition.pResource = swapChainResources_[backBufferIndex].Get();
-	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
-	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	commandList_->ResourceBarrier(1, &barrier);*/
-
-
-
 	D3D12_RESOURCE_BARRIER offbarrier{};
 	offbarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	offbarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
@@ -1753,23 +1748,11 @@ void DXCom::SetBarrier()
 	commandList_->ResourceBarrier(1, &offbarrier);
 
 
-}
+	SetRenderTargets();
 
-void DXCom::ClearRTV()
-{
-	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
-	//UINT backBufferIndex = swapChain_->GetCurrentBackBufferIndex();
+	ClearRenderTarget();
 
-	//commandList_->OMSetRenderTargets(1, &rtvHandles_[backBufferIndex], false, &dsvHandle);
-	//commandList_->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
-
-	/*float clearColor[] = { 0.1f,0.25f,0.5f,1.0f };
-	commandList_->ClearRenderTargetView(rtvHandles_[backBufferIndex], clearColor, 0, nullptr);*/
-
-	commandList_->OMSetRenderTargets(1, &rtvHandles_[2], false, &dsvHandle);
-	commandList_->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
-
-	commandList_->ClearRenderTargetView(rtvHandles_[2], clearColorValue.Color, 0, nullptr);
+	ClearDepthBuffer();
 }
 
 void DXCom::Command()
@@ -2075,30 +2058,77 @@ void DXCom::PostEffect()
 
 }
 
-void DXCom::LastFrame()
-{
+void DXCom::PostDraw() {
+
 	UINT backBufferIndex = swapChain_->GetCurrentBackBufferIndex();
 
 	D3D12_RESOURCE_BARRIER barrier{};
 	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 	barrier.Transition.pResource = swapChainResources_[backBufferIndex].Get();
-
-
-
-
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
 	commandList_->ResourceBarrier(1, &barrier);
 
-
+	// 命令のクローズ
 	HRESULT hr = commandList_->Close();
 	assert(SUCCEEDED(hr));
 
+	// コマンドリストの実行
+	Microsoft::WRL::ComPtr<ID3D12CommandList> commandLists[] = { commandList_.Get() };
+	commandQueue_->ExecuteCommandLists(1, commandLists->GetAddressOf());
+
+
+	swapChain_->Present(1, 0);
+
+	// コマンドリストの実行完了を待つ
+	fenceValue_++;
+	commandQueue_->Signal(fence_.Get(), fenceValue_);
+	if (fence_->GetCompletedValue() < fenceValue_) {
+
+		HANDLE fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+		assert(fenceEvent != nullptr);
+		fence_->SetEventOnCompletion(fenceValue_, fenceEvent);
+		WaitForSingleObject(fenceEvent, INFINITE);
+		CloseHandle(fenceEvent);
+	}
+
+	hr = commandAllocator_->Reset();
+	assert(SUCCEEDED(hr));
+	hr = commandList_->Reset(commandAllocator_.Get(), nullptr);
+	assert(SUCCEEDED(hr));
+}
+
+void DXCom::PreModelDraw()
+{
+
+	D3D12_VIEWPORT viewport{};
+	viewport.Width = MyWin::kWindowWidth;
+	viewport.Height = MyWin::kWindowHeight;
+	viewport.TopLeftX = 0;
+	viewport.TopLeftY = 0;
+	viewport.MinDepth = 0.0f;
+	viewport.MaxDepth = 1.0f;
+
+	D3D12_RECT scissorRect{};
+	scissorRect.left = 0;
+	scissorRect.right = MyWin::kWindowWidth;
+	scissorRect.top = 0;
+	scissorRect.bottom = MyWin::kWindowHeight;
+
+
+	commandList_->RSSetViewports(1, &viewport);
+	commandList_->RSSetScissorRects(1, &scissorRect);
+	commandList_->SetGraphicsRootSignature(rootSignature_.Get());
+	commandList_->SetPipelineState(graphicsPipelineState_.Get());
+}
+
+void DXCom::CommandExecution() {
+	HRESULT hr = commandList_->Close();
+	assert(SUCCEEDED(hr));
 
 	Microsoft::WRL::ComPtr<ID3D12CommandList> commandLists[] = { commandList_.Get() };
 	commandQueue_->ExecuteCommandLists(1, commandLists->GetAddressOf());
-	swapChain_->Present(1, 0);
 
 	fenceValue_++;
 	commandQueue_->Signal(fence_.Get(), fenceValue_);
@@ -2115,23 +2145,31 @@ void DXCom::LastFrame()
 	assert(SUCCEEDED(hr));
 	hr = commandList_->Reset(commandAllocator_.Get(), nullptr);
 	assert(SUCCEEDED(hr));
-
-
-
 }
 
-void DXCom::SetWVPData(const Matrix4x4& world, const Matrix4x4& wvp)
-{
-	wvpDate_->World = world;
-	wvpDate_->WVP = wvp;
+void DXCom::IncreaseDescriptorIndex() {
+	descriptorIndex_++;
 }
 
-void DXCom::SetSpriteWVPData(const Matrix4x4& world, const Matrix4x4& wvp)
-{
-	world;
-	wvp;
-	/*transformationMatDataSprite_->World = world;
-	transformationMatDataSprite_->WVP = wvp;*/
+uint32_t DXCom::GetDescriptorIndex() const {
+	return descriptorIndex_;
+}
+
+void DXCom::SetRenderTargets() {
+
+	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
+	commandList_->OMSetRenderTargets(1, &rtvHandles_[2], false, &dsvHandle);
+}
+
+void DXCom::ClearRenderTarget() {
+
+	commandList_->ClearRenderTargetView(rtvHandles_[2], clearColorValue.Color, 0, nullptr);
+}
+
+void DXCom::ClearDepthBuffer() {
+
+	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
+	commandList_->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 }
 
 void DXCom::UpDate()
@@ -2200,7 +2238,7 @@ void DXCom::UpDate()
 		ImGui::Checkbox("Blur", &isGaussian_);
 		ImGui::TreePop();
 	}
-	if (isGrayscale_&& !(preIsGrayscale_))
+	if (isGrayscale_ && !(preIsGrayscale_))
 	{
 		isNonePost_ = false;
 		isMetaBall_ = false;
@@ -2506,7 +2544,7 @@ void DXCom::UpDate()
 				int count = particleDate_->particleCount;
 
 
-				vertexFlowResource_[count] = CreateBufferResource(device_, sizeof(VertexData) * 4);
+				vertexFlowResource_[count] = CreateBufferResource(device_, sizeof(VertexDate) * 4);
 				indexFlowResource_[count] = CreateBufferResource(device_, sizeof(uint32_t) * 6);
 
 
@@ -2917,6 +2955,18 @@ void DXCom::ReleaseData()
 
 }
 
+Matrix4x4 DXCom::GetView()
+{
+	Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTrans.scale, cameraTrans.rotate, cameraTrans.translate);
+	Matrix4x4 viewMatrix = Inverse(cameraMatrix);
+	return viewMatrix;
+}
+
+float DXCom::GetAspect()
+{
+	return float(Fuji::GetkWindowWidth()) / float(Fuji::GetkWindowHeight());
+}
+
 
 
 
@@ -3232,7 +3282,7 @@ ModelData DXCom::LoadObjFile(const std::string& directoryPath, const std::string
 		}
 		else if (identifier == "f")
 		{
-			VertexData triangle[3];
+			VertexDate triangle[3];
 			for (int32_t faceVertex = 0; faceVertex < 3; faceVertex++)
 			{
 				std::string vertexDefinition;
@@ -3279,9 +3329,9 @@ ModelData DXCom::LoadObjFile(const std::string& directoryPath, const std::string
 	return modeldata;
 }
 
-MaterialData DXCom::LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename)
+MaterialDataPath DXCom::LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename)
 {
-	MaterialData materialData;
+	MaterialDataPath materialData;
 	std::string line;
 	std::ifstream file(directoryPath + "/" + filename);
 	assert(file.is_open());

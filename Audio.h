@@ -47,6 +47,8 @@ public:
 
 	void Initialize();
 
+	void Finalize();
+
 	static Audio* GetInstance();
 
 	SoundData SoundLoadWave(const char* filename);

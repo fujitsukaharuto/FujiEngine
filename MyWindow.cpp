@@ -76,7 +76,7 @@ void MyWin::CreatGWindow(const wchar_t* title, int32_t clientWidth, int32_t clie
 	ShowWindow(hwnd_, SW_SHOW);
 }
 
-void MyWin::CreatWind()
+void MyWin::CreatWind(const wchar_t* name)
 {
 	CoInitializeEx(0, COINIT_MULTITHREADED);
 
@@ -104,7 +104,7 @@ void MyWin::CreatWind()
 
 	hwnd_ = CreateWindow(
 		wc_.lpszClassName,
-		L"CG2",
+		name,
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,

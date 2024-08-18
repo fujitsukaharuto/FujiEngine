@@ -1,62 +1,102 @@
-#include "Fuji.h"
-#include <Windows.h>
-#include "externals/imgui/imgui.h"
-#include "externals/imgui/imgui_impl_dx12.h"
-#include "externals/imgui/imgui_impl_win32.h"
-
-
-#include "MatrixCalculation.h"
+#include "Audio.h"
+#include "DXCom.h"
+#include "GameScene.h"
+#include "TextureManager.h"
+#include "ImGuiManager.h"
+#include "MyWindow.h"
 
 
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
+	MyWin* win = nullptr;
+	DXCom* dxCommon = nullptr;
+	// 汎用
+	Input* input = nullptr;
+	Audio* audio = nullptr;
+	GameScene* gameScene = nullptr;
+	TextureManager* textureManager = nullptr;
 
-	Fuji::InitDX();
+	// ゲームウィンドウの作成
+	win = MyWin::GetInstance();
+	win->CreatWind(L"FUJI");
+
+	// DirectX初期化
+	dxCommon = DXCom::GetInstance();
+	dxCommon->InitDX(win);
 
 
+#pragma region 汎用機能初期化
+	// ImGuiの初期化
+	ImGuiManager* imguiManager = ImGuiManager::GetInstance();
+	imguiManager->Init(win,dxCommon);
 
-	SoundData soundData1 = Fuji::SoundLoadWave("resource/Alarm01.wav");
+	// 入力の初期化
+	input = Input::GetInstance();
+	input->Initialize();
+
+	// オーディオの初期化
+	audio = Audio::GetInstance();
+	audio->Initialize();
+
+	textureManager->GetInstance();
+
+#pragma endregion
+
+	dxCommon->SettingTexture();
 
 
+	gameScene = new GameScene();
+	gameScene->Initialize();
 
-	BYTE keys[256] = { 0 };
-	BYTE preKeys[256] = { 0 };
+
+	//BYTE keys[256] = { 0 };
+	//BYTE preKeys[256] = { 0 };
 
 	//ウィンドウのxボタンが押されるまでループ
-	while (Fuji::ProcessMessage() == 0)
+	while (true)
 	{
-		Fuji::StartFrame();
-		memcpy(preKeys, keys, 256);
-		Fuji::GetKeyStateAll(keys);
-		XINPUT_STATE pad;
-		XINPUT_STATE padPre;
-
-		if (Input::GetInstance()->GetGamepadState(pad)&& Input::GetInstance()->GetGamepadStatePrevious(padPre))
+		if (win->ProcessMessage())
 		{
-			if ((pad.Gamepad.wButtons& XINPUT_GAMEPAD_A)&&!((padPre.Gamepad.wButtons & XINPUT_GAMEPAD_A)))
-			{
-				Fuji::SoundPlayWave(soundData1);
-			}
+			break;
 		}
 
-		if ((keys[DIK_0]&&!(preKeys[DIK_0])))
-		{
-			OutputDebugStringA("Hit 0\n");
-			Fuji::SoundPlayWave(soundData1);
-		}
+#ifdef _DEBUG
+		// ImGui受付
+		imguiManager->Begin();
+#endif // _DEBUG
 
-		Fuji::UpDateDxc();
+		// 入力関連の毎フレーム処理
+		input->Update();
+		// ゲームシーンの毎フレーム処理
+		gameScene->Update();
 
+#ifdef _DEBUG
 
-		Fuji::EndFrame();
+#endif // _DEBUG
+
+		// ImGui受付
+		imguiManager->End();
+
+		// 描画開始
+		dxCommon->PreDraw();
+		// ゲームシーンの描画
+		gameScene->Draw();
+		// ImGuiの描画
+		imguiManager->Draw();
+		// 描画終了
+		dxCommon->PostDraw();
 	}
 
-	//OutputDebugStringA("Hello,DirectX!\n");
-	//Log(ConvertString(std::format(L"WSTRING{}\n", wstringValue)));
+	// 解放
+	delete gameScene;
+	
+	audio->Finalize();
+	imguiManager->Fin();
+	textureManager->Finalize();
 
-	Fuji::SoundUnload(&soundData1);
+	// ゲームウィンドウの破棄
+	win->ThrowAwayWindow();
 
-	Fuji::End();
 	return 0;
 }
 

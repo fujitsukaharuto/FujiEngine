@@ -18,7 +18,7 @@ public:
 public:
 
 	void CreatGWindow(const wchar_t* title, int32_t clientWidth = kWindowWidth, int32_t clientHeight = kWindowHeight);
-	void CreatWind();
+	void CreatWind(const wchar_t* name);
 	bool ProcessMessage();
 	void ThrowAwayWindow();
 

@@ -32,13 +32,13 @@ int Fuji::ProcessMessage()
 void Fuji::CreatWind()
 {
 	mywin_ = MyWin::GetInstance();
-	mywin_->CreatWind();
+	mywin_->CreatWind(L"name");
 }
 
 void Fuji::InitDX()
 {
 	mywin_ = MyWin::GetInstance();
-	mywin_->CreatWind();
+	mywin_->CreatWind(L"name");
 	debugCamera_ = DebugCamera::GetInstance();
 	debugCamera_->Initialize();
 	dxcom_ = dxcom_->GetInstance();
@@ -58,17 +58,14 @@ void Fuji::StartFrame()
 {
 	input_->Update();
 	imguiManager_->Begin();
-	dxcom_->SetBarrier();
-	dxcom_->ClearRTV();
+	dxcom_->PreDraw();
 }
 
 void Fuji::EndFrame()
 {
 	imguiManager_->End();
-	dxcom_->Command();
-	dxcom_->PostEffect();
 	imguiManager_->Draw();
-	dxcom_->LastFrame();
+	dxcom_->PostDraw();
 }
 
 void Fuji::End()

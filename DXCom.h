@@ -96,14 +96,20 @@ public:
 	void SettingTexture();
 
 	void FirstFrame();
-	void SetBarrier();
-	void ClearRTV();
+	void PreDraw();
 	void Command();
 	void PostEffect();
-	void LastFrame();
+	void PostDraw();
 
-	void SetWVPData(const Matrix4x4& world, const Matrix4x4& wvp);
-	void SetSpriteWVPData(const Matrix4x4& world, const Matrix4x4& wvp);
+	void PreModelDraw();
+
+	void CommandExecution();
+	void IncreaseDescriptorIndex();
+	uint32_t GetDescriptorIndex() const;
+
+	void SetRenderTargets();
+	void ClearRenderTarget();
+	void ClearDepthBuffer();
 
 
 	ID3D12Device* GetDevice() const { return device_.Get(); }
@@ -112,11 +118,13 @@ public:
 
 	ID3D12GraphicsCommandList* GetCommandList() const { return commandList_.Get(); }
 
-	//仕方なくcommon内でupdate用。後からこんなのなくさなきゃ
 	void UpDate();
 
-
 	void ReleaseData();
+
+	Matrix4x4 GetView();
+
+	float GetAspect();
 
 	void Log(const std::string& message);
 	std::wstring ConvertString(const std::string& str);
@@ -153,7 +161,7 @@ public:
 		Microsoft::WRL::ComPtr<ID3D12Device> device, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList);
 
 	ModelData LoadObjFile(const std::string& directoryPath, const std::string& filename);
-	MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename);
+	MaterialDataPath LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename);
 
 	/*void Tick();*/
 
@@ -287,15 +295,17 @@ private:
 	uint32_t* indexGrayData_ = nullptr;
 
 
+	uint32_t descriptorIndex_ = 1;
+
 	//三角形１
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_ = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
-	VertexData* vertexDate_ = nullptr;
+	VertexDate* vertexDate_ = nullptr;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource_ = nullptr;
 	TransformationMatrix* wvpDate_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_ = nullptr;
-	Material* materialDate_ = nullptr;
+	Materials* materialDate_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_ = nullptr;
 	DirectionalLight* directionalLightData_ = nullptr;
 	//bool useMonsterBall = true;
@@ -342,11 +352,11 @@ private:
 	ModelData fenceModelData_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexFenceModelResource_ = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexFenceModelBufferView_{};
-	VertexData* vertexDataFenceModel_ = nullptr;
+	VertexDate* vertexDataFenceModel_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> wvpResourceFenceModel_ = nullptr;
 	TransformationMatrix* wvpDateFenceModel_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResourceFenceModel_ = nullptr;
-	Material* materialDateFenceModel_ = nullptr;
+	Materials* materialDateFenceModel_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResourceFenceModel_ = nullptr;
 	DirectionalLight* directionalLightDataFenceModel_ = nullptr;
 
@@ -355,11 +365,11 @@ private:
 	ModelData suzanneModelData_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexSuzanneModelResource_ = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexSuzanneModelBufferView_{};
-	VertexData* vertexDataSuzanneModel_ = nullptr;
+	VertexDate* vertexDataSuzanneModel_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> wvpResourceSuzanneModel_ = nullptr;
 	TransformationMatrix* wvpDateSuzanneModel_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResourceSuzanneModel_ = nullptr;
-	Material* materialDateSuzanneModel_ = nullptr;
+	Materials* materialDateSuzanneModel_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResourceSuzanneModel_ = nullptr;
 	DirectionalLight* directionalLightDataSuzanneModel_ = nullptr;
 
@@ -368,11 +378,11 @@ private:
 	ModelData mMeshModelData_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexMMeshModelResource_ = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexMMeshModelBufferView_{};
-	VertexData* vertexDataMMeshModel_ = nullptr;
+	VertexDate* vertexDataMMeshModel_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> wvpResourceMMeshModel_ = nullptr;
 	TransformationMatrix* wvpDateMMeshModel_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResourceMMeshModel_ = nullptr;
-	Material* materialDateMMeshModel_ = nullptr;
+	Materials* materialDateMMeshModel_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResourceMMeshModel_ = nullptr;
 	DirectionalLight* directionalLightDataMMeshModel_ = nullptr;
 
@@ -381,11 +391,11 @@ private:
 	ModelData planeModelData_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexPlaneModelResource_ = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexPlaneModelBufferView_{};
-	VertexData* vertexDataPlaneModel_ = nullptr;
+	VertexDate* vertexDataPlaneModel_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> wvpResourcePlaneModel_ = nullptr;
 	TransformationMatrix* wvpDatePlaneModel_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResourcePlaneModel_ = nullptr;
-	Material* materialDatePlaneModel_ = nullptr;
+	Materials* materialDatePlaneModel_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResourcePlaneModel_ = nullptr;
 	DirectionalLight* directionalLightDataPlaneModel_ = nullptr;
 
@@ -393,7 +403,7 @@ private:
 	//Sprite 
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourceSprite_ = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite_{};
-	VertexData* vertexDataSprite_ = nullptr;
+	VertexDate* vertexDataSprite_ = nullptr;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResoureceSprite = nullptr;
 	D3D12_INDEX_BUFFER_VIEW indexBufferViewSprite{};
@@ -403,11 +413,11 @@ private:
 	TransformationMatrix* transformationMatDataSprite_ = nullptr;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResourceSprite_ = nullptr;
-	Material* materialDateSprite_ = nullptr;
+	Materials* materialDateSprite_ = nullptr;
 
 	//パーティクルflow
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexFlowResource_[particleIndex]{};
-	VertexData* vertexFlowDate_[particleIndex]{};
+	VertexDate* vertexFlowDate_[particleIndex]{};
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexFlowResource_[particleIndex]{};
 	D3D12_INDEX_BUFFER_VIEW indexFlowBufferView_{};
 	uint32_t* indexFlowData_[particleIndex]{};
@@ -415,7 +425,7 @@ private:
 	TransformationMatrix* wvpFlowDate_[particleIndex] = { nullptr };
 	D3D12_VERTEX_BUFFER_VIEW vertexFlowBufferView_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialFlowResource_;
-	Material* materialFlowDate_;
+	Materials* materialFlowDate_;
 
 	std::vector<Particle> particles;
 	ParticleDate* particleDate_ = nullptr;
@@ -451,8 +461,8 @@ private:
 	float boundDamping = -0.3f;
 
 
-	bool isPlaneAndSprite_ = false;
-	bool isPlaneParticle_ = true;
+	bool isPlaneAndSprite_ = true;
+	bool isPlaneParticle_ = false;
 	bool isSphere_ = false;
 	bool isFenceModel_ = false;
 	bool isSuzanneModel_ = false;

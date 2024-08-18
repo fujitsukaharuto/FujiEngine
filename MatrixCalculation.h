@@ -24,7 +24,7 @@ struct Trans
 	Vector3 translate;
 };
 
-struct VertexData
+struct VertexDate
 {
 	Vector4 position;
 	Vector2 texcoord;
@@ -37,7 +37,7 @@ struct TransformationMatrix
 	Matrix4x4 World;
 };
 
-struct Material
+struct Materials
 {
 	Vector4 color;
 	int32_t enableLighting;
@@ -66,15 +66,15 @@ struct Sphere
 	float radius;
 };
 
-struct MaterialData
+struct MaterialDataPath
 {
 	std::string textureFilePath;
 };
 
 struct ModelData
 {
-	std::vector<VertexData> vertices;
-	MaterialData material;
+	std::vector<VertexDate> vertices;
+	MaterialDataPath material;
 };
 
 struct ParticleDate
