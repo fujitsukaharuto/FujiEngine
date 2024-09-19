@@ -165,6 +165,8 @@ public:
 
 	/*void Tick();*/
 
+	void SetIsDebugCamera(const bool cameraMode) { isDebugCamera_ = cameraMode; }
+
 	void SetDebugCamera(DebugCamera* instanse);//今だけ、後から消す
 
 private:

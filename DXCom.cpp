@@ -2959,6 +2959,10 @@ Matrix4x4 DXCom::GetView()
 {
 	Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTrans.scale, cameraTrans.rotate, cameraTrans.translate);
 	Matrix4x4 viewMatrix = Inverse(cameraMatrix);
+	if (isDebugCamera_)
+	{
+		viewMatrix = debugCamera_->GetViewMatrix();
+	}
 	return viewMatrix;
 }
 

@@ -26,6 +26,8 @@ public:
 
 	ID3D12Resource* GetDirectionLight();
 
+	void SetTextureNamePath(const std::string& pathName);
+
 private:
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_ = nullptr;
@@ -33,4 +35,5 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_ = nullptr;
 	DirectionalLight* directionalLightData_ = nullptr;
 	Texture* texture_ = nullptr;
+	MaterialDataPath textureNamePath_;
 };

@@ -1,6 +1,7 @@
 #pragma once
 #include "MatrixCalculation.h"
 #include <d3d12.h>
+#include <string>
 #include <wrl.h>
 #include "Mesh.h"
 #include "Material.h"
@@ -14,12 +15,18 @@ public:
 	Model();
 	~Model();
 
+	Model* CreateOBJ(const std::string& filename);
 
 	static Model* CreateSphere();
 
 	void Draw();
 
 	void SetWVP();
+
+
+private:
+
+	MaterialDataPath LoadMaterialFile(const std::string& filename);
 
 private:
 
@@ -31,4 +38,5 @@ private:
 	std::vector<Material> material_;
 	std::vector<Mesh> mesh_;
 
+	const std::string kDirectoryPath_ = "resource/";
 };

@@ -30,7 +30,16 @@ void Material::CreateMaterial()
 	directionalLightData_->direction = { 1.0f,0.0f,0.0f };
 	directionalLightData_->intensity = 1.0f;
 
-	texture_ = TextureManager::GetInstance()->LoadTexture("uvChecker.png");
+	if (textureNamePath_.textureFilePath.empty())
+	{
+		texture_ = TextureManager::GetInstance()->LoadTexture("uvChecker.png");
+
+	}
+	else
+	{
+		texture_ = TextureManager::GetInstance()->LoadTexture(textureNamePath_.textureFilePath);
+
+	}
 
 }
 
@@ -47,4 +56,9 @@ ID3D12Resource* Material::GetMaterialResource()
 ID3D12Resource* Material::GetDirectionLight()
 {
 	return directionalLightResource_.Get();
+}
+
+void Material::SetTextureNamePath(const std::string& pathName)
+{
+	textureNamePath_.textureFilePath = pathName;
 }

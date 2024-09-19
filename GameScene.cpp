@@ -4,6 +4,7 @@ GameScene::GameScene() {}
 
 GameScene::~GameScene() {
 	delete sphere;
+	delete suzunne;
 }
 
 void GameScene::Initialize() {
@@ -15,6 +16,9 @@ void GameScene::Initialize() {
 
 	sphere = new Model();
 	sphere = Model::CreateSphere();
+
+	suzunne = new Model();
+	suzunne = suzunne->CreateOBJ("suzanne.obj");
 
 }
 
@@ -29,6 +33,13 @@ void GameScene::Update() {
 			isDebugCameraMode_ = true;
 		}
 	}
+
+	if (isDebugCameraMode_)
+	{
+		debugCamera_->Update();
+	}
+
+
 #endif // _DEBUG
 
 	dxCommon_->UpDate();
