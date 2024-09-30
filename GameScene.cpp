@@ -43,6 +43,10 @@ void GameScene::Update() {
 #endif // _DEBUG
 
 	dxCommon_->UpDate();
+	suzunne->transform.translate.x = 3.0f;
+	suzunne->transform.rotate.x += 0.01f;
+	suzunne->SetWVP();
+	sphere->transform.rotate.y += 0.01f;
 	sphere->SetWVP();
 
 }
@@ -59,6 +63,7 @@ void GameScene::Draw() {
 #pragma region 3Dオブジェクト
 	dxCommon_->PreModelDraw();
 	sphere->Draw();
+	suzunne->Draw();
 
 #pragma endregion
 

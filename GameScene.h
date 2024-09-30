@@ -27,6 +27,7 @@ private:
 	Model* sphere = nullptr;
 	Model* suzunne = nullptr;
 
+
 	std::unique_ptr<DebugCamera> debugCamera_ = nullptr;
 	bool isDebugCameraMode_ = false;
 

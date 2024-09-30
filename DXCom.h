@@ -299,17 +299,18 @@ private:
 
 	uint32_t descriptorIndex_ = 1;
 
-	//三角形１
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_ = nullptr;
-	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
-	VertexDate* vertexDate_ = nullptr;
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource_ = nullptr;
-	TransformationMatrix* wvpDate_ = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_ = nullptr;
-	Materials* materialDate_ = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_ = nullptr;
-	DirectionalLight* directionalLightData_ = nullptr;
+	////三角形１
+	//Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_ = nullptr;
+	//D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
+	//VertexDate* vertexDate_ = nullptr;
+
+	//Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource_ = nullptr;
+	//TransformationMatrix* wvpDate_ = nullptr;
+	//Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_ = nullptr;
+	//Materials* materialDate_ = nullptr;
+	//Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_ = nullptr;
+	//DirectionalLight* directionalLightData_ = nullptr;
 	//bool useMonsterBall = true;
 	//bool isTriangleDraw_ = true;
 
@@ -351,7 +352,7 @@ private:
 
 
 	//FenceModelData
-	ModelData fenceModelData_;
+	/*ModelData fenceModelData_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexFenceModelResource_ = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexFenceModelBufferView_{};
 	VertexDate* vertexDataFenceModel_ = nullptr;
@@ -360,11 +361,11 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResourceFenceModel_ = nullptr;
 	Materials* materialDateFenceModel_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResourceFenceModel_ = nullptr;
-	DirectionalLight* directionalLightDataFenceModel_ = nullptr;
+	DirectionalLight* directionalLightDataFenceModel_ = nullptr;*/
 
 
 	//SuzanneModel
-	ModelData suzanneModelData_;
+	/*ModelData suzanneModelData_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexSuzanneModelResource_ = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexSuzanneModelBufferView_{};
 	VertexDate* vertexDataSuzanneModel_ = nullptr;
@@ -373,11 +374,11 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResourceSuzanneModel_ = nullptr;
 	Materials* materialDateSuzanneModel_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResourceSuzanneModel_ = nullptr;
-	DirectionalLight* directionalLightDataSuzanneModel_ = nullptr;
+	DirectionalLight* directionalLightDataSuzanneModel_ = nullptr;*/
 
 
 	//MMeshModel
-	ModelData mMeshModelData_;
+	/*ModelData mMeshModelData_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexMMeshModelResource_ = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexMMeshModelBufferView_{};
 	VertexDate* vertexDataMMeshModel_ = nullptr;
@@ -386,11 +387,11 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResourceMMeshModel_ = nullptr;
 	Materials* materialDateMMeshModel_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResourceMMeshModel_ = nullptr;
-	DirectionalLight* directionalLightDataMMeshModel_ = nullptr;
+	DirectionalLight* directionalLightDataMMeshModel_ = nullptr;*/
 
 
 	//PlaneModel
-	ModelData planeModelData_;
+	/*ModelData planeModelData_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexPlaneModelResource_ = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexPlaneModelBufferView_{};
 	VertexDate* vertexDataPlaneModel_ = nullptr;
@@ -399,11 +400,11 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResourcePlaneModel_ = nullptr;
 	Materials* materialDatePlaneModel_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResourcePlaneModel_ = nullptr;
-	DirectionalLight* directionalLightDataPlaneModel_ = nullptr;
+	DirectionalLight* directionalLightDataPlaneModel_ = nullptr;*/
 
 	
 	//Sprite 
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourceSprite_ = nullptr;
+	/*Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourceSprite_ = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite_{};
 	VertexDate* vertexDataSprite_ = nullptr;
 
@@ -415,10 +416,10 @@ private:
 	TransformationMatrix* transformationMatDataSprite_ = nullptr;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResourceSprite_ = nullptr;
-	Materials* materialDateSprite_ = nullptr;
+	Materials* materialDateSprite_ = nullptr;*/
 
 	//パーティクルflow
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertexFlowResource_[particleIndex]{};
+	/*Microsoft::WRL::ComPtr<ID3D12Resource> vertexFlowResource_[particleIndex]{};
 	VertexDate* vertexFlowDate_[particleIndex]{};
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexFlowResource_[particleIndex]{};
 	D3D12_INDEX_BUFFER_VIEW indexFlowBufferView_{};
@@ -432,35 +433,35 @@ private:
 	std::vector<Particle> particles;
 	ParticleDate* particleDate_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> particleDateResource_ = nullptr;
-	float setradius_ = 6.0f;
+	float setradius_ = 6.0f;*/
 
-	bool isFluidMode_ = false;
+	//bool isFluidMode_ = false;
 
-	Vector2 G_ = { 0.0f,9.8f };
-	int gravityChangeTime_ = 0;
-	float mpi_ = 3.14159274f;
+	//Vector2 G_ = { 0.0f,9.8f };
+	//int gravityChangeTime_ = 0;
+	//float mpi_ = 3.14159274f;
 
-	float restDens = 300.0f;//静止状態の密度
-	float gasConst = 2000.0f;
-	float h_ = 16.0f;
-	float halfH_ = h_ * 0.5f;
-	float h2_ = h_ * h_;
-	float mass_ = 2.5f;//質量
-	float visc = 150.0f;//粘度
-	float poly6 = 4.0f / (mpi_ * powf(h_, 8));
-	float spikyGrad = -10.0f / (mpi_ * powf(h_, 5));
-	float viscLap = 40.0f / (mpi_ * powf(h_, 5));
+	//float restDens = 300.0f;//静止状態の密度
+	//float gasConst = 2000.0f;
+	//float h_ = 16.0f;
+	//float halfH_ = h_ * 0.5f;
+	//float h2_ = h_ * h_;
+	//float mass_ = 2.5f;//質量
+	//float visc = 150.0f;//粘度
+	//float poly6 = 4.0f / (mpi_ * powf(h_, 8));
+	//float spikyGrad = -10.0f / (mpi_ * powf(h_, 5));
+	//float viscLap = 40.0f / (mpi_ * powf(h_, 5));
 
-	float restDens2 = 300.0f;//静止状態の密度
-	float mass2_ = 2.0f;//質量
-	float visc2 = 150.0f;//粘度
+	//float restDens2 = 300.0f;//静止状態の密度
+	//float mass2_ = 2.0f;//質量
+	//float visc2 = 150.0f;//粘度
 
-	float dt = 0.0007f;
+	//float dt = 0.0007f;
 
 	int texture_;
 
-	float eps = h_;
-	float boundDamping = -0.3f;
+	/*float eps = h_;
+	float boundDamping = -0.3f;*/
 
 
 	bool isPlaneAndSprite_ = true;
@@ -476,10 +477,10 @@ private:
 
 	DebugCamera* debugCamera_ = nullptr;//今だけ、後から消す
 
-	Trans transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
-	Trans transform2{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	/*Trans transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	Trans transform2{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };*/
 	Trans cameraTrans{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} };
-	Trans transSprite = { {1.0f,1.0f,1.0f,},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	/*Trans transSprite = {{1.0f,1.0f,1.0f,},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f}};
 	Trans uvTransSprite{
 		{1.0f,1.0f,1.0f},
 		{0.0f,0.0f,0.0f},
@@ -493,7 +494,7 @@ private:
 
 	Trans transformMMeshModel_{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 
-	Trans transformPlaneModel_{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	Trans transformPlaneModel_{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };*/
 	Grain particles_[instanceCount_];
 	const float kDeltatime = 1.0f / 60.0f;
 
@@ -505,7 +506,7 @@ private:
 	float colorRandomAdd = 0;
 	std::random_device repopSeed;
 
-	DirectX::ScratchImage mipImages_;
+	/*DirectX::ScratchImage mipImages_;
 	DirectX::ScratchImage mipImages2_;
 	DirectX::ScratchImage fenceMipImages_;
 	DirectX::ScratchImage suzanneMipImages_;
@@ -543,7 +544,7 @@ private:
 	D3D12_GPU_DESCRIPTOR_HANDLE mMeshTextureSrvHandleGPU_;
 
 	D3D12_CPU_DESCRIPTOR_HANDLE planeTextureSrvHandleCPU_;
-	D3D12_GPU_DESCRIPTOR_HANDLE planeTextureSrvHandleGPU_;
+	D3D12_GPU_DESCRIPTOR_HANDLE planeTextureSrvHandleGPU_;*/
 
 	D3D12_CPU_DESCRIPTOR_HANDLE instancingSrvHandleCPU_;
 	D3D12_GPU_DESCRIPTOR_HANDLE instancingSrvHandleGPU_;

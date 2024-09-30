@@ -1021,7 +1021,7 @@ void DXCom::SettingGraphicPipeline()
 
 void DXCom::SettingVertex()
 {
-	vertexResource_ = CreateBufferResource(device_.Get(), sizeof(VertexDate) * 2000);
+	/*vertexResource_ = CreateBufferResource(device_.Get(), sizeof(VertexDate) * 2000);
 
 	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
 	vertexBufferView_.SizeInBytes = sizeof(VertexDate) * 2000;
@@ -1112,7 +1112,7 @@ void DXCom::SettingVertex()
 			vertexDate_[startIndex + 5].normal.z = vertexDate_[startIndex + 5].position.Z;
 
 		}
-	}
+	}*/
 
 	/*vertexResource2_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * 3);
 
@@ -1180,7 +1180,7 @@ void DXCom::SettingVertex()
 		particleRot[i] = { randomRotx,randomRoty,randomRotz };
 	}*/
 
-	particles.clear();
+	/*particles.clear();*/
 	/*if (isFluidMode_)
 	{
 		for (float i = eps; i < 600 - eps * 2; i++)
@@ -1208,7 +1208,7 @@ void DXCom::SettingVertex()
 		particles.emplace_back(Particle(0.0f, 0.0f));
 	}*/
 
-	particles.emplace_back(Particle(0.0f, 0.0f));
+	/*particles.emplace_back(Particle(0.0f, 0.0f));
 
 	for (int i = 0; i <= particles.size() - 1; i++)
 	{
@@ -1286,13 +1286,13 @@ void DXCom::SettingVertex()
 		wvpFlowDate_[i]->WVP = worldViewProMatSprite;
 
 		particleDate_->center[i] = { worldMatSprite.m[3][0],worldMatSprite.m[3][1],0.0f,0.0f };
-	}
+	}*/
 }
 
 void DXCom::SettingSpriteVertex()
 {
 	// Sprite
-	vertexResourceSprite_ = CreateBufferResource(device_.Get(), sizeof(VertexDate) * 4);
+	/*vertexResourceSprite_ = CreateBufferResource(device_.Get(), sizeof(VertexDate) * 4);
 
 	vertexBufferViewSprite_.BufferLocation = vertexResourceSprite_->GetGPUVirtualAddress();
 	vertexBufferViewSprite_.SizeInBytes = sizeof(VertexDate) * 4;
@@ -1331,7 +1331,7 @@ void DXCom::SettingSpriteVertex()
 
 	indexDataSprite[3] = 1;
 	indexDataSprite[4] = 3;
-	indexDataSprite[5] = 2;
+	indexDataSprite[5] = 2;*/
 
 	////model
 	//modelData_ = LoadObjFile("resource", "axis.obj");
@@ -1366,156 +1366,156 @@ void DXCom::SettingSpriteVertex()
 
 
 	//FenceModel
-	fenceModelData_ = LoadObjFile("resource", "fence.obj");
-	vertexFenceModelResource_ = CreateBufferResource(device_.Get(), sizeof(VertexDate) * fenceModelData_.vertices.size());
-	vertexFenceModelBufferView_.BufferLocation = vertexFenceModelResource_->GetGPUVirtualAddress();
-	vertexFenceModelBufferView_.SizeInBytes = UINT(sizeof(VertexDate) * fenceModelData_.vertices.size());
-	vertexFenceModelBufferView_.StrideInBytes = sizeof(VertexDate);
+	//fenceModelData_ = LoadObjFile("resource", "fence.obj");
+	//vertexFenceModelResource_ = CreateBufferResource(device_.Get(), sizeof(VertexDate) * fenceModelData_.vertices.size());
+	//vertexFenceModelBufferView_.BufferLocation = vertexFenceModelResource_->GetGPUVirtualAddress();
+	//vertexFenceModelBufferView_.SizeInBytes = UINT(sizeof(VertexDate) * fenceModelData_.vertices.size());
+	//vertexFenceModelBufferView_.StrideInBytes = sizeof(VertexDate);
 
-	vertexFenceModelResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataFenceModel_));
-	std::memcpy(vertexDataFenceModel_, fenceModelData_.vertices.data(), sizeof(VertexDate) * fenceModelData_.vertices.size());
+	//vertexFenceModelResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataFenceModel_));
+	//std::memcpy(vertexDataFenceModel_, fenceModelData_.vertices.data(), sizeof(VertexDate) * fenceModelData_.vertices.size());
 
-	wvpResourceFenceModel_ = CreateBufferResource(device_.Get(), sizeof(TransformationMatrix));
-	wvpDateFenceModel_ = nullptr;
-	wvpResourceFenceModel_->Map(0, nullptr, reinterpret_cast<void**>(&wvpDateFenceModel_));
-	wvpDateFenceModel_->WVP = MakeIdentity4x4();
-	wvpDateFenceModel_->World = MakeIdentity4x4();
+	//wvpResourceFenceModel_ = CreateBufferResource(device_.Get(), sizeof(TransformationMatrix));
+	//wvpDateFenceModel_ = nullptr;
+	//wvpResourceFenceModel_->Map(0, nullptr, reinterpret_cast<void**>(&wvpDateFenceModel_));
+	//wvpDateFenceModel_->WVP = MakeIdentity4x4();
+	//wvpDateFenceModel_->World = MakeIdentity4x4();
 
-	materialResourceFenceModel_ = CreateBufferResource(device_.Get(), sizeof(Materials));
-	materialDateFenceModel_ = nullptr;
-	materialResourceFenceModel_->Map(0, nullptr, reinterpret_cast<void**>(&materialDateFenceModel_));
-	//色変えるやつ（Resource）
-	materialDateFenceModel_->color = { 1.0f,1.0f,1.0f,1.0f };
-	materialDateFenceModel_->enableLighting = LightMode::kLightNone;
-	materialDateFenceModel_->uvTransform = MakeIdentity4x4();
+	//materialResourceFenceModel_ = CreateBufferResource(device_.Get(), sizeof(Materials));
+	//materialDateFenceModel_ = nullptr;
+	//materialResourceFenceModel_->Map(0, nullptr, reinterpret_cast<void**>(&materialDateFenceModel_));
+	////色変えるやつ（Resource）
+	//materialDateFenceModel_->color = { 1.0f,1.0f,1.0f,1.0f };
+	//materialDateFenceModel_->enableLighting = LightMode::kLightNone;
+	//materialDateFenceModel_->uvTransform = MakeIdentity4x4();
 
-	directionalLightResourceFenceModel_ = CreateBufferResource(device_.Get(), sizeof(DirectionalLight));
-	directionalLightDataFenceModel_ = nullptr;
-	directionalLightResourceFenceModel_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightDataFenceModel_));
-	directionalLightDataFenceModel_->color = { 1.0f,1.0f,1.0f,1.0f };
-	directionalLightDataFenceModel_->direction = { 1.0f,0.0f,0.0f };
-	directionalLightDataFenceModel_->intensity = 1.0f;
-
-
-	//SuzanneModel
-	suzanneModelData_ = LoadObjFile("resource", "suzanne.obj");
-	vertexSuzanneModelResource_ = CreateBufferResource(device_.Get(), sizeof(VertexDate) * suzanneModelData_.vertices.size());
-	vertexSuzanneModelBufferView_.BufferLocation = vertexSuzanneModelResource_->GetGPUVirtualAddress();
-	vertexSuzanneModelBufferView_.SizeInBytes = UINT(sizeof(VertexDate) * suzanneModelData_.vertices.size());
-	vertexSuzanneModelBufferView_.StrideInBytes = sizeof(VertexDate);
-
-	vertexSuzanneModelResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSuzanneModel_));
-	std::memcpy(vertexDataSuzanneModel_, suzanneModelData_.vertices.data(), sizeof(VertexDate) * suzanneModelData_.vertices.size());
-
-	wvpResourceSuzanneModel_ = CreateBufferResource(device_.Get(), sizeof(TransformationMatrix));
-	wvpDateSuzanneModel_ = nullptr;
-	wvpResourceSuzanneModel_->Map(0, nullptr, reinterpret_cast<void**>(&wvpDateSuzanneModel_));
-	wvpDateSuzanneModel_->WVP = MakeIdentity4x4();
-	wvpDateSuzanneModel_->World = MakeIdentity4x4();
-
-	materialResourceSuzanneModel_ = CreateBufferResource(device_.Get(), sizeof(Materials));
-	materialDateSuzanneModel_ = nullptr;
-	materialResourceSuzanneModel_->Map(0, nullptr, reinterpret_cast<void**>(&materialDateSuzanneModel_));
-	//色変えるやつ（Resource）
-	materialDateSuzanneModel_->color = { 1.0f,1.0f,1.0f,1.0f };
-	materialDateSuzanneModel_->enableLighting = LightMode::kLightHalfLambert;
-	materialDateSuzanneModel_->uvTransform = MakeIdentity4x4();
-
-	directionalLightResourceSuzanneModel_ = CreateBufferResource(device_.Get(), sizeof(DirectionalLight));
-	directionalLightDataSuzanneModel_ = nullptr;
-	directionalLightResourceSuzanneModel_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightDataSuzanneModel_));
-	directionalLightDataSuzanneModel_->color = { 1.0f,1.0f,1.0f,1.0f };
-	directionalLightDataSuzanneModel_->direction = { 1.0f,0.0f,0.0f };
-	directionalLightDataSuzanneModel_->intensity = 1.0f;
+	//directionalLightResourceFenceModel_ = CreateBufferResource(device_.Get(), sizeof(DirectionalLight));
+	//directionalLightDataFenceModel_ = nullptr;
+	//directionalLightResourceFenceModel_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightDataFenceModel_));
+	//directionalLightDataFenceModel_->color = { 1.0f,1.0f,1.0f,1.0f };
+	//directionalLightDataFenceModel_->direction = { 1.0f,0.0f,0.0f };
+	//directionalLightDataFenceModel_->intensity = 1.0f;
 
 
-	//MMeshModel
-	mMeshModelData_ = LoadObjFile("resource", "multiMesh.obj");
-	vertexMMeshModelResource_ = CreateBufferResource(device_.Get(), sizeof(VertexDate) * mMeshModelData_.vertices.size());
-	vertexMMeshModelBufferView_.BufferLocation = vertexMMeshModelResource_->GetGPUVirtualAddress();
-	vertexMMeshModelBufferView_.SizeInBytes = UINT(sizeof(VertexDate) * mMeshModelData_.vertices.size());
-	vertexMMeshModelBufferView_.StrideInBytes = sizeof(VertexDate);
+	////SuzanneModel
+	//suzanneModelData_ = LoadObjFile("resource", "suzanne.obj");
+	//vertexSuzanneModelResource_ = CreateBufferResource(device_.Get(), sizeof(VertexDate) * suzanneModelData_.vertices.size());
+	//vertexSuzanneModelBufferView_.BufferLocation = vertexSuzanneModelResource_->GetGPUVirtualAddress();
+	//vertexSuzanneModelBufferView_.SizeInBytes = UINT(sizeof(VertexDate) * suzanneModelData_.vertices.size());
+	//vertexSuzanneModelBufferView_.StrideInBytes = sizeof(VertexDate);
 
-	vertexMMeshModelResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataMMeshModel_));
-	std::memcpy(vertexDataMMeshModel_, mMeshModelData_.vertices.data(), sizeof(VertexDate) * mMeshModelData_.vertices.size());
+	//vertexSuzanneModelResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSuzanneModel_));
+	//std::memcpy(vertexDataSuzanneModel_, suzanneModelData_.vertices.data(), sizeof(VertexDate) * suzanneModelData_.vertices.size());
 
-	wvpResourceMMeshModel_ = CreateBufferResource(device_.Get(), sizeof(TransformationMatrix));
-	wvpDateMMeshModel_ = nullptr;
-	wvpResourceMMeshModel_->Map(0, nullptr, reinterpret_cast<void**>(&wvpDateMMeshModel_));
-	wvpDateMMeshModel_->WVP = MakeIdentity4x4();
-	wvpDateMMeshModel_->World = MakeIdentity4x4();
+	//wvpResourceSuzanneModel_ = CreateBufferResource(device_.Get(), sizeof(TransformationMatrix));
+	//wvpDateSuzanneModel_ = nullptr;
+	//wvpResourceSuzanneModel_->Map(0, nullptr, reinterpret_cast<void**>(&wvpDateSuzanneModel_));
+	//wvpDateSuzanneModel_->WVP = MakeIdentity4x4();
+	//wvpDateSuzanneModel_->World = MakeIdentity4x4();
 
-	materialResourceMMeshModel_ = CreateBufferResource(device_.Get(), sizeof(Materials));
-	materialDateMMeshModel_ = nullptr;
-	materialResourceMMeshModel_->Map(0, nullptr, reinterpret_cast<void**>(&materialDateMMeshModel_));
-	//色変えるやつ（Resource）
-	materialDateMMeshModel_->color = { 1.0f,1.0f,1.0f,1.0f };
-	materialDateMMeshModel_->enableLighting = LightMode::kLightNone;
-	materialDateMMeshModel_->uvTransform = MakeIdentity4x4();
+	//materialResourceSuzanneModel_ = CreateBufferResource(device_.Get(), sizeof(Materials));
+	//materialDateSuzanneModel_ = nullptr;
+	//materialResourceSuzanneModel_->Map(0, nullptr, reinterpret_cast<void**>(&materialDateSuzanneModel_));
+	////色変えるやつ（Resource）
+	//materialDateSuzanneModel_->color = { 1.0f,1.0f,1.0f,1.0f };
+	//materialDateSuzanneModel_->enableLighting = LightMode::kLightHalfLambert;
+	//materialDateSuzanneModel_->uvTransform = MakeIdentity4x4();
 
-	directionalLightResourceMMeshModel_ = CreateBufferResource(device_.Get(), sizeof(DirectionalLight));
-	directionalLightDataMMeshModel_ = nullptr;
-	directionalLightResourceMMeshModel_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightDataMMeshModel_));
-	directionalLightDataMMeshModel_->color = { 1.0f,1.0f,1.0f,1.0f };
-	directionalLightDataMMeshModel_->direction = { 1.0f,0.0f,0.0f };
-	directionalLightDataMMeshModel_->intensity = 1.0f;
+	//directionalLightResourceSuzanneModel_ = CreateBufferResource(device_.Get(), sizeof(DirectionalLight));
+	//directionalLightDataSuzanneModel_ = nullptr;
+	//directionalLightResourceSuzanneModel_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightDataSuzanneModel_));
+	//directionalLightDataSuzanneModel_->color = { 1.0f,1.0f,1.0f,1.0f };
+	//directionalLightDataSuzanneModel_->direction = { 1.0f,0.0f,0.0f };
+	//directionalLightDataSuzanneModel_->intensity = 1.0f;
 
 
-	//PlaneModel
-	planeModelData_ = LoadObjFile("resource", "plane.obj");
-	vertexPlaneModelResource_ = CreateBufferResource(device_.Get(), sizeof(VertexDate) * planeModelData_.vertices.size());
-	vertexPlaneModelBufferView_.BufferLocation = vertexPlaneModelResource_->GetGPUVirtualAddress();
-	vertexPlaneModelBufferView_.SizeInBytes = UINT(sizeof(VertexDate) * planeModelData_.vertices.size());
-	vertexPlaneModelBufferView_.StrideInBytes = sizeof(VertexDate);
+	////MMeshModel
+	//mMeshModelData_ = LoadObjFile("resource", "multiMesh.obj");
+	//vertexMMeshModelResource_ = CreateBufferResource(device_.Get(), sizeof(VertexDate) * mMeshModelData_.vertices.size());
+	//vertexMMeshModelBufferView_.BufferLocation = vertexMMeshModelResource_->GetGPUVirtualAddress();
+	//vertexMMeshModelBufferView_.SizeInBytes = UINT(sizeof(VertexDate) * mMeshModelData_.vertices.size());
+	//vertexMMeshModelBufferView_.StrideInBytes = sizeof(VertexDate);
 
-	vertexPlaneModelResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataPlaneModel_));
-	std::memcpy(vertexDataPlaneModel_, planeModelData_.vertices.data(), sizeof(VertexDate) * planeModelData_.vertices.size());
+	//vertexMMeshModelResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataMMeshModel_));
+	//std::memcpy(vertexDataMMeshModel_, mMeshModelData_.vertices.data(), sizeof(VertexDate) * mMeshModelData_.vertices.size());
 
-	wvpResourcePlaneModel_ = CreateBufferResource(device_.Get(), sizeof(TransformationMatrix));
-	wvpDatePlaneModel_ = nullptr;
-	wvpResourcePlaneModel_->Map(0, nullptr, reinterpret_cast<void**>(&wvpDatePlaneModel_));
-	wvpDatePlaneModel_->WVP = MakeIdentity4x4();
-	wvpDatePlaneModel_->World = MakeIdentity4x4();
+	//wvpResourceMMeshModel_ = CreateBufferResource(device_.Get(), sizeof(TransformationMatrix));
+	//wvpDateMMeshModel_ = nullptr;
+	//wvpResourceMMeshModel_->Map(0, nullptr, reinterpret_cast<void**>(&wvpDateMMeshModel_));
+	//wvpDateMMeshModel_->WVP = MakeIdentity4x4();
+	//wvpDateMMeshModel_->World = MakeIdentity4x4();
 
-	materialResourcePlaneModel_ = CreateBufferResource(device_.Get(), sizeof(Materials));
-	materialDatePlaneModel_ = nullptr;
-	materialResourcePlaneModel_->Map(0, nullptr, reinterpret_cast<void**>(&materialDatePlaneModel_));
-	//色変えるやつ（Resource）
-	materialDatePlaneModel_->color = { 1.0f,1.0f,1.0f,1.0f };
-	materialDatePlaneModel_->enableLighting = LightMode::kLightNone;
-	materialDatePlaneModel_->uvTransform = MakeIdentity4x4();
+	//materialResourceMMeshModel_ = CreateBufferResource(device_.Get(), sizeof(Materials));
+	//materialDateMMeshModel_ = nullptr;
+	//materialResourceMMeshModel_->Map(0, nullptr, reinterpret_cast<void**>(&materialDateMMeshModel_));
+	////色変えるやつ（Resource）
+	//materialDateMMeshModel_->color = { 1.0f,1.0f,1.0f,1.0f };
+	//materialDateMMeshModel_->enableLighting = LightMode::kLightNone;
+	//materialDateMMeshModel_->uvTransform = MakeIdentity4x4();
 
-	directionalLightResourcePlaneModel_ = CreateBufferResource(device_.Get(), sizeof(DirectionalLight));
-	directionalLightDataPlaneModel_ = nullptr;
-	directionalLightResourcePlaneModel_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightDataPlaneModel_));
-	directionalLightDataPlaneModel_->color = { 1.0f,1.0f,1.0f,1.0f };
-	directionalLightDataPlaneModel_->direction = { 1.0f,0.0f,0.0f };
-	directionalLightDataPlaneModel_->intensity = 1.0f;
+	//directionalLightResourceMMeshModel_ = CreateBufferResource(device_.Get(), sizeof(DirectionalLight));
+	//directionalLightDataMMeshModel_ = nullptr;
+	//directionalLightResourceMMeshModel_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightDataMMeshModel_));
+	//directionalLightDataMMeshModel_->color = { 1.0f,1.0f,1.0f,1.0f };
+	//directionalLightDataMMeshModel_->direction = { 1.0f,0.0f,0.0f };
+	//directionalLightDataMMeshModel_->intensity = 1.0f;
+
+
+	////PlaneModel
+	//planeModelData_ = LoadObjFile("resource", "plane.obj");
+	//vertexPlaneModelResource_ = CreateBufferResource(device_.Get(), sizeof(VertexDate) * planeModelData_.vertices.size());
+	//vertexPlaneModelBufferView_.BufferLocation = vertexPlaneModelResource_->GetGPUVirtualAddress();
+	//vertexPlaneModelBufferView_.SizeInBytes = UINT(sizeof(VertexDate) * planeModelData_.vertices.size());
+	//vertexPlaneModelBufferView_.StrideInBytes = sizeof(VertexDate);
+
+	//vertexPlaneModelResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataPlaneModel_));
+	//std::memcpy(vertexDataPlaneModel_, planeModelData_.vertices.data(), sizeof(VertexDate) * planeModelData_.vertices.size());
+
+	//wvpResourcePlaneModel_ = CreateBufferResource(device_.Get(), sizeof(TransformationMatrix));
+	//wvpDatePlaneModel_ = nullptr;
+	//wvpResourcePlaneModel_->Map(0, nullptr, reinterpret_cast<void**>(&wvpDatePlaneModel_));
+	//wvpDatePlaneModel_->WVP = MakeIdentity4x4();
+	//wvpDatePlaneModel_->World = MakeIdentity4x4();
+
+	//materialResourcePlaneModel_ = CreateBufferResource(device_.Get(), sizeof(Materials));
+	//materialDatePlaneModel_ = nullptr;
+	//materialResourcePlaneModel_->Map(0, nullptr, reinterpret_cast<void**>(&materialDatePlaneModel_));
+	////色変えるやつ（Resource）
+	//materialDatePlaneModel_->color = { 1.0f,1.0f,1.0f,1.0f };
+	//materialDatePlaneModel_->enableLighting = LightMode::kLightNone;
+	//materialDatePlaneModel_->uvTransform = MakeIdentity4x4();
+
+	//directionalLightResourcePlaneModel_ = CreateBufferResource(device_.Get(), sizeof(DirectionalLight));
+	//directionalLightDataPlaneModel_ = nullptr;
+	//directionalLightResourcePlaneModel_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightDataPlaneModel_));
+	//directionalLightDataPlaneModel_->color = { 1.0f,1.0f,1.0f,1.0f };
+	//directionalLightDataPlaneModel_->direction = { 1.0f,0.0f,0.0f };
+	//directionalLightDataPlaneModel_->intensity = 1.0f;
 
 }
 
 void DXCom::SettingResource()
 {
-	wvpResource_ = CreateBufferResource(device_.Get(), sizeof(TransformationMatrix));
-	wvpDate_ = nullptr;
-	wvpResource_->Map(0, nullptr, reinterpret_cast<void**>(&wvpDate_));
-	wvpDate_->WVP = MakeIdentity4x4();
-	wvpDate_->World = MakeIdentity4x4();
+	//wvpResource_ = CreateBufferResource(device_.Get(), sizeof(TransformationMatrix));
+	//wvpDate_ = nullptr;
+	//wvpResource_->Map(0, nullptr, reinterpret_cast<void**>(&wvpDate_));
+	//wvpDate_->WVP = MakeIdentity4x4();
+	//wvpDate_->World = MakeIdentity4x4();
 
-	materialResource_ = CreateBufferResource(device_.Get(), sizeof(Materials));
-	materialDate_ = nullptr;
-	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialDate_));
-	//色変えるやつ（Resource）
-	materialDate_->color = { 1.0f,1.0f,1.0f,1.0f };
-	materialDate_->enableLighting = LightMode::kLightHalfLambert;
-	materialDate_->uvTransform = MakeIdentity4x4();
+	//materialResource_ = CreateBufferResource(device_.Get(), sizeof(Materials));
+	//materialDate_ = nullptr;
+	//materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialDate_));
+	////色変えるやつ（Resource）
+	//materialDate_->color = { 1.0f,1.0f,1.0f,1.0f };
+	//materialDate_->enableLighting = LightMode::kLightHalfLambert;
+	//materialDate_->uvTransform = MakeIdentity4x4();
 
-	directionalLightResource_ = CreateBufferResource(device_.Get(), sizeof(DirectionalLight));
-	directionalLightData_ = nullptr;
-	directionalLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData_));
-	directionalLightData_->color = { 1.0f,1.0f,1.0f,1.0f };
-	directionalLightData_->direction = { 1.0f,0.0f,0.0f };
-	directionalLightData_->intensity = 1.0f;
+	//directionalLightResource_ = CreateBufferResource(device_.Get(), sizeof(DirectionalLight));
+	//directionalLightData_ = nullptr;
+	//directionalLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData_));
+	//directionalLightData_->color = { 1.0f,1.0f,1.0f,1.0f };
+	//directionalLightData_->direction = { 1.0f,0.0f,0.0f };
+	//directionalLightData_->intensity = 1.0f;
 
 
 	//wvpResource2_ = CreateBufferResource(device_.Get(), sizeof(TransformationMatrix));
@@ -1543,20 +1543,20 @@ void DXCom::SettingResource()
 
 void DXCom::SettingSpriteResource()
 {
-	transformationMatResourceSprite_ = CreateBufferResource(device_.Get(), sizeof(TransformationMatrix));
-	transformationMatDataSprite_ = nullptr;
-	transformationMatResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatDataSprite_));
-	transformationMatDataSprite_->WVP = MakeIdentity4x4();
-	transformationMatDataSprite_->World = MakeIdentity4x4();
+	//transformationMatResourceSprite_ = CreateBufferResource(device_.Get(), sizeof(TransformationMatrix));
+	//transformationMatDataSprite_ = nullptr;
+	//transformationMatResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatDataSprite_));
+	//transformationMatDataSprite_->WVP = MakeIdentity4x4();
+	//transformationMatDataSprite_->World = MakeIdentity4x4();
 
 
-	materialResourceSprite_ = CreateBufferResource(device_.Get(), sizeof(Materials));
-	materialDateSprite_ = nullptr;
-	materialResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&materialDateSprite_));
-	//色変えるやつ（Resource）
-	materialDateSprite_->color = { 1.0f,1.0f,1.0f,1.0f };
-	materialDateSprite_->enableLighting = LightMode::kLightNone;
-	materialDateSprite_->uvTransform = MakeIdentity4x4();
+	//materialResourceSprite_ = CreateBufferResource(device_.Get(), sizeof(Materials));
+	//materialDateSprite_ = nullptr;
+	//materialResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&materialDateSprite_));
+	////色変えるやつ（Resource）
+	//materialDateSprite_->color = { 1.0f,1.0f,1.0f,1.0f };
+	//materialDateSprite_->enableLighting = LightMode::kLightNone;
+	//materialDateSprite_->uvTransform = MakeIdentity4x4();
 }
 
 void DXCom::SettingTexture()
@@ -1567,7 +1567,7 @@ void DXCom::SettingTexture()
 
 	IncreaseDescriptorIndex();
 
-	mipImages_ = LoadTexture("resource/uvChecker.png");
+	/*mipImages_ = LoadTexture("resource/uvChecker.png");
 	const DirectX::TexMetadata& metadata = mipImages_.GetMetadata();
 	textureResource_ = CreateTextureResource(device_.Get(), metadata);
 
@@ -1582,7 +1582,7 @@ void DXCom::SettingTexture()
 	textureSrvHandleGPU = GetGPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, descriptorIndex_);
 
 	device_->CreateShaderResourceView(textureResource_.Get(), &srvDesc, textureSrvHandleCPU);
-	IncreaseDescriptorIndex();
+	IncreaseDescriptorIndex();*/
 
 
 
@@ -1617,79 +1617,79 @@ void DXCom::SettingTexture()
 
 
 	//FenceModelSpriteData
-	fenceMipImages_ = LoadTexture(fenceModelData_.material.textureFilePath);
-	const DirectX::TexMetadata& fenceMetadata = fenceMipImages_.GetMetadata();
-	fenceTextureResource_ = CreateTextureResource(device_.Get(), fenceMetadata);
+	//fenceMipImages_ = LoadTexture(fenceModelData_.material.textureFilePath);
+	//const DirectX::TexMetadata& fenceMetadata = fenceMipImages_.GetMetadata();
+	//fenceTextureResource_ = CreateTextureResource(device_.Get(), fenceMetadata);
 
-	D3D12_SHADER_RESOURCE_VIEW_DESC srvDescFence{};
-	srvDescFence.Format = fenceMetadata.format;
-	srvDescFence.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	srvDescFence.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-	srvDescFence.Texture2D.MipLevels = UINT(fenceMetadata.mipLevels);
+	//D3D12_SHADER_RESOURCE_VIEW_DESC srvDescFence{};
+	//srvDescFence.Format = fenceMetadata.format;
+	//srvDescFence.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	//srvDescFence.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	//srvDescFence.Texture2D.MipLevels = UINT(fenceMetadata.mipLevels);
 
-	fenceIntermediateResource_ = UploadTextureData(fenceTextureResource_, fenceMipImages_, device_.Get(), commandList_);
-	fenceTextureSrvHandleCPU_ = GetCPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, descriptorIndex_);
-	fenceTextureSrvHandleGPU_ = GetGPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, descriptorIndex_);
+	//fenceIntermediateResource_ = UploadTextureData(fenceTextureResource_, fenceMipImages_, device_.Get(), commandList_);
+	//fenceTextureSrvHandleCPU_ = GetCPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, descriptorIndex_);
+	//fenceTextureSrvHandleGPU_ = GetGPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, descriptorIndex_);
 
-	device_->CreateShaderResourceView(fenceTextureResource_.Get(), &srvDescFence, fenceTextureSrvHandleCPU_);
-	IncreaseDescriptorIndex();
-
-
-	//SuzanneModelSprite
-	suzanneMipImages_ = LoadTexture(suzanneModelData_.material.textureFilePath);
-	const DirectX::TexMetadata& suzanneMetadata = suzanneMipImages_.GetMetadata();
-	suzanneTextureResource_ = CreateTextureResource(device_.Get(), suzanneMetadata);
-
-	D3D12_SHADER_RESOURCE_VIEW_DESC srvDescSuzanne{};
-	srvDescSuzanne.Format = suzanneMetadata.format;
-	srvDescSuzanne.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	srvDescSuzanne.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-	srvDescSuzanne.Texture2D.MipLevels = UINT(suzanneMetadata.mipLevels);
-
-	suzanneIntermediateResource_ = UploadTextureData(suzanneTextureResource_, suzanneMipImages_, device_.Get(), commandList_);
-	suzanneTextureSrvHandleCPU_ = GetCPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, descriptorIndex_);
-	suzanneTextureSrvHandleGPU_ = GetGPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, descriptorIndex_);
-
-	device_->CreateShaderResourceView(suzanneTextureResource_.Get(), &srvDescSuzanne, suzanneTextureSrvHandleCPU_);
-	IncreaseDescriptorIndex();
+	//device_->CreateShaderResourceView(fenceTextureResource_.Get(), &srvDescFence, fenceTextureSrvHandleCPU_);
+	//IncreaseDescriptorIndex();
 
 
-	//PlaneModelSpriteData
-	planeMipImages_ = LoadTexture(planeModelData_.material.textureFilePath);
-	const DirectX::TexMetadata& planeMetadata = planeMipImages_.GetMetadata();
-	planeTextureResource_ = CreateTextureResource(device_.Get(), planeMetadata);
+	////SuzanneModelSprite
+	//suzanneMipImages_ = LoadTexture(suzanneModelData_.material.textureFilePath);
+	//const DirectX::TexMetadata& suzanneMetadata = suzanneMipImages_.GetMetadata();
+	//suzanneTextureResource_ = CreateTextureResource(device_.Get(), suzanneMetadata);
 
-	D3D12_SHADER_RESOURCE_VIEW_DESC srvDescPlane{};
-	srvDescPlane.Format = planeMetadata.format;
-	srvDescPlane.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	srvDescPlane.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-	srvDescPlane.Texture2D.MipLevels = UINT(planeMetadata.mipLevels);
+	//D3D12_SHADER_RESOURCE_VIEW_DESC srvDescSuzanne{};
+	//srvDescSuzanne.Format = suzanneMetadata.format;
+	//srvDescSuzanne.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	//srvDescSuzanne.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	//srvDescSuzanne.Texture2D.MipLevels = UINT(suzanneMetadata.mipLevels);
 
-	planeIntermediateResource_ = UploadTextureData(planeTextureResource_, planeMipImages_, device_.Get(), commandList_);
-	planeTextureSrvHandleCPU_ = GetCPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, descriptorIndex_);
-	planeTextureSrvHandleGPU_ = GetGPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, descriptorIndex_);
+	//suzanneIntermediateResource_ = UploadTextureData(suzanneTextureResource_, suzanneMipImages_, device_.Get(), commandList_);
+	//suzanneTextureSrvHandleCPU_ = GetCPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, descriptorIndex_);
+	//suzanneTextureSrvHandleGPU_ = GetGPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, descriptorIndex_);
 
-	device_->CreateShaderResourceView(planeTextureResource_.Get(), &srvDescPlane, planeTextureSrvHandleCPU_);
-	IncreaseDescriptorIndex();
+	//device_->CreateShaderResourceView(suzanneTextureResource_.Get(), &srvDescSuzanne, suzanneTextureSrvHandleCPU_);
+	//IncreaseDescriptorIndex();
 
 
-	//MMesh
-	mMeshMipImages_ = LoadTexture(mMeshModelData_.material.textureFilePath);
-	const DirectX::TexMetadata& mMeshMetadata = mMeshMipImages_.GetMetadata();
-	mMeshTextureResource_ = CreateTextureResource(device_.Get(), mMeshMetadata);
+	////PlaneModelSpriteData
+	//planeMipImages_ = LoadTexture(planeModelData_.material.textureFilePath);
+	//const DirectX::TexMetadata& planeMetadata = planeMipImages_.GetMetadata();
+	//planeTextureResource_ = CreateTextureResource(device_.Get(), planeMetadata);
 
-	D3D12_SHADER_RESOURCE_VIEW_DESC srvDescMMesh{};
-	srvDescMMesh.Format = mMeshMetadata.format;
-	srvDescMMesh.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	srvDescMMesh.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-	srvDescMMesh.Texture2D.MipLevels = UINT(mMeshMetadata.mipLevels);
+	//D3D12_SHADER_RESOURCE_VIEW_DESC srvDescPlane{};
+	//srvDescPlane.Format = planeMetadata.format;
+	//srvDescPlane.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	//srvDescPlane.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	//srvDescPlane.Texture2D.MipLevels = UINT(planeMetadata.mipLevels);
 
-	mMeshIntermediateResource_ = UploadTextureData(mMeshTextureResource_, mMeshMipImages_, device_.Get(), commandList_);
-	mMeshTextureSrvHandleCPU_ = GetCPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, descriptorIndex_);
-	mMeshTextureSrvHandleGPU_ = GetGPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, descriptorIndex_);
+	//planeIntermediateResource_ = UploadTextureData(planeTextureResource_, planeMipImages_, device_.Get(), commandList_);
+	//planeTextureSrvHandleCPU_ = GetCPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, descriptorIndex_);
+	//planeTextureSrvHandleGPU_ = GetGPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, descriptorIndex_);
 
-	device_->CreateShaderResourceView(mMeshTextureResource_.Get(), &srvDescMMesh, mMeshTextureSrvHandleCPU_);
-	IncreaseDescriptorIndex();
+	//device_->CreateShaderResourceView(planeTextureResource_.Get(), &srvDescPlane, planeTextureSrvHandleCPU_);
+	//IncreaseDescriptorIndex();
+
+
+	////MMesh
+	//mMeshMipImages_ = LoadTexture(mMeshModelData_.material.textureFilePath);
+	//const DirectX::TexMetadata& mMeshMetadata = mMeshMipImages_.GetMetadata();
+	//mMeshTextureResource_ = CreateTextureResource(device_.Get(), mMeshMetadata);
+
+	//D3D12_SHADER_RESOURCE_VIEW_DESC srvDescMMesh{};
+	//srvDescMMesh.Format = mMeshMetadata.format;
+	//srvDescMMesh.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	//srvDescMMesh.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	//srvDescMMesh.Texture2D.MipLevels = UINT(mMeshMetadata.mipLevels);
+
+	//mMeshIntermediateResource_ = UploadTextureData(mMeshTextureResource_, mMeshMipImages_, device_.Get(), commandList_);
+	//mMeshTextureSrvHandleCPU_ = GetCPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, descriptorIndex_);
+	//mMeshTextureSrvHandleGPU_ = GetGPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, descriptorIndex_);
+
+	//device_->CreateShaderResourceView(mMeshTextureResource_.Get(), &srvDescMMesh, mMeshTextureSrvHandleCPU_);
+	//IncreaseDescriptorIndex();
 
 
 	D3D12_SHADER_RESOURCE_VIEW_DESC instancingSrvDesc{};
@@ -1780,13 +1780,13 @@ void DXCom::Command()
 	//三角形１
 	if (isSphere_)
 	{
-		commandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);
+		/*commandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);
 		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 		commandList_->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
 		commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
 		commandList_->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
-		commandList_->DrawInstanced(1536, 1, 0, 0);
+		commandList_->DrawInstanced(1536, 1, 0, 0);*/
 	}
 
 
@@ -1841,7 +1841,7 @@ void DXCom::Command()
 	//FenceModel
 	if (isFenceModel_)
 	{
-		commandList_->RSSetViewports(1, &viewport);
+		/*commandList_->RSSetViewports(1, &viewport);
 		commandList_->RSSetScissorRects(1, &scissorRect);
 		commandList_->SetGraphicsRootSignature(rootSignature_.Get());
 		commandList_->SetPipelineState(graphicsPipelineState_.Get());
@@ -1851,13 +1851,13 @@ void DXCom::Command()
 		commandList_->SetGraphicsRootConstantBufferView(1, wvpResourceFenceModel_->GetGPUVirtualAddress());
 		commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResourceFenceModel_->GetGPUVirtualAddress());
 		commandList_->SetGraphicsRootDescriptorTable(2, fenceTextureSrvHandleGPU_);
-		commandList_->DrawInstanced(UINT(fenceModelData_.vertices.size()), 1, 0, 0);
+		commandList_->DrawInstanced(UINT(fenceModelData_.vertices.size()), 1, 0, 0);*/
 	}
 
 
 	if (isSuzanneModel_)
 	{
-		commandList_->RSSetViewports(1, &viewport);
+		/*commandList_->RSSetViewports(1, &viewport);
 		commandList_->RSSetScissorRects(1, &scissorRect);
 		commandList_->SetGraphicsRootSignature(rootSignature_.Get());
 		commandList_->SetPipelineState(graphicsPipelineState_.Get());
@@ -1867,14 +1867,14 @@ void DXCom::Command()
 		commandList_->SetGraphicsRootConstantBufferView(1, wvpResourceSuzanneModel_->GetGPUVirtualAddress());
 		commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResourceSuzanneModel_->GetGPUVirtualAddress());
 		commandList_->SetGraphicsRootDescriptorTable(2, suzanneTextureSrvHandleGPU_);
-		commandList_->DrawInstanced(UINT(suzanneModelData_.vertices.size()), 1, 0, 0);
+		commandList_->DrawInstanced(UINT(suzanneModelData_.vertices.size()), 1, 0, 0);*/
 	}
 
 
 	if (isMMesh_)
 	{
 		// MMeshModel
-		commandList_->RSSetViewports(1, &viewport);
+		/*commandList_->RSSetViewports(1, &viewport);
 		commandList_->RSSetScissorRects(1, &scissorRect);
 		commandList_->SetGraphicsRootSignature(rootSignature_.Get());
 		commandList_->SetPipelineState(graphicsPipelineState_.Get());
@@ -1884,14 +1884,14 @@ void DXCom::Command()
 		commandList_->SetGraphicsRootConstantBufferView(1, wvpResourceMMeshModel_->GetGPUVirtualAddress());
 		commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResourceMMeshModel_->GetGPUVirtualAddress());
 		commandList_->SetGraphicsRootDescriptorTable(2, mMeshTextureSrvHandleGPU_);
-		commandList_->DrawInstanced(UINT(mMeshModelData_.vertices.size()), instanceCount_, 0, 0);
+		commandList_->DrawInstanced(UINT(mMeshModelData_.vertices.size()), instanceCount_, 0, 0);*/
 	}
 
 
 	// Plane Particle
 	if (isPlaneParticle_)
 	{
-		commandList_->RSSetViewports(1, &viewport);
+		/*commandList_->RSSetViewports(1, &viewport);
 		commandList_->RSSetScissorRects(1, &scissorRect);
 		commandList_->SetGraphicsRootSignature(rootSignatureParticle_.Get());
 		commandList_->SetPipelineState(graphicsPipelineStateParticle_.Get());
@@ -1901,14 +1901,14 @@ void DXCom::Command()
 		commandList_->SetGraphicsRootDescriptorTable(1, instancingSrvHandleGPU_);
 		commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResourcePlaneModel_->GetGPUVirtualAddress());
 		commandList_->SetGraphicsRootDescriptorTable(2, planeTextureSrvHandleGPU_);
-		commandList_->DrawInstanced(UINT(planeModelData_.vertices.size()), instanceCount_, 0, 0);
+		commandList_->DrawInstanced(UINT(planeModelData_.vertices.size()), instanceCount_, 0, 0);*/
 	}
 
 
 	if (isPlaneAndSprite_)
 	{
 		// PlaneModel
-		commandList_->RSSetViewports(1, &viewport);
+		/*commandList_->RSSetViewports(1, &viewport);
 		commandList_->RSSetScissorRects(1, &scissorRect);
 		commandList_->SetGraphicsRootSignature(rootSignature_.Get());
 		commandList_->SetPipelineState(graphicsPipelineState_.Get());
@@ -1918,11 +1918,11 @@ void DXCom::Command()
 		commandList_->SetGraphicsRootConstantBufferView(1, wvpResourcePlaneModel_->GetGPUVirtualAddress());
 		commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResourcePlaneModel_->GetGPUVirtualAddress());
 		commandList_->SetGraphicsRootDescriptorTable(2, planeTextureSrvHandleGPU_);
-		commandList_->DrawInstanced(UINT(planeModelData_.vertices.size()), instanceCount_, 0, 0);
+		commandList_->DrawInstanced(UINT(planeModelData_.vertices.size()), instanceCount_, 0, 0);*/
 
 
 		// Sprite
-		commandList_->SetGraphicsRootSignature(rootSignature_.Get());
+		/*commandList_->SetGraphicsRootSignature(rootSignature_.Get());
 		commandList_->SetPipelineState(graphicsPipelineState_.Get());
 		commandList_->IASetIndexBuffer(&indexBufferViewSprite);
 		commandList_->IASetVertexBuffers(0, 1, &vertexBufferViewSprite_);
@@ -1930,7 +1930,7 @@ void DXCom::Command()
 		commandList_->SetGraphicsRootConstantBufferView(1, transformationMatResourceSprite_->GetGPUVirtualAddress());
 		commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
 		commandList_->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
-		commandList_->DrawIndexedInstanced(6, 1, 0, 0, 0);
+		commandList_->DrawIndexedInstanced(6, 1, 0, 0, 0);*/
 		/*commandList_->DrawInstanced(6, 1, 0, 0);*/
 	}
 
@@ -2013,7 +2013,7 @@ void DXCom::PostEffect()
 		commandList_->DrawIndexedInstanced(6, 1, 0, 0, 0);
 	}
 
-	if (isMetaBall_)
+	/*if (isMetaBall_)
 	{
 		commandList_->RSSetViewports(1, &viewport);
 		commandList_->RSSetScissorRects(1, &scissorRect);
@@ -2026,7 +2026,7 @@ void DXCom::PostEffect()
 		commandList_->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
 		commandList_->SetGraphicsRootConstantBufferView(1, particleDateResource_->GetGPUVirtualAddress());
 		commandList_->DrawIndexedInstanced(6, 1, 0, 0, 0);
-	}
+	}*/
 
 	if (isGaussian_)
 	{
@@ -2042,7 +2042,7 @@ void DXCom::PostEffect()
 		commandList_->DrawIndexedInstanced(6, 1, 0, 0, 0);
 	}
 
-	if (isNonePost_)
+	if (isNonePost_||isMetaBall_)
 	{
 		commandList_->RSSetViewports(1, &viewport);
 		commandList_->RSSetScissorRects(1, &scissorRect);
@@ -2281,11 +2281,11 @@ void DXCom::UpDate()
 	}*/
 
 
-	if (ImGui::TreeNode("MetaBall"))
+	/*if (ImGui::TreeNode("MetaBall"))
 	{
 		ImGui::SliderFloat("Setradius", &setradius_, 5.0f, 200.0f);
 		ImGui::TreePop();
-	}
+	}*/
 
 
 	if (ImGui::TreeNode("What to draw"))
@@ -2302,7 +2302,7 @@ void DXCom::UpDate()
 
 	if (isSphere_)
 	{
-		if (ImGui::TreeNode("Sphere"))
+		/*if (ImGui::TreeNode("Sphere"))
 		{
 			ImGui::ColorEdit3("Modelcolor", &materialDate_->color.X);
 			ImGui::DragFloat3("Modeltrans", &transform.translate.x, 0.01f, -5.0f, 5.0f);
@@ -2330,13 +2330,13 @@ void DXCom::UpDate()
 				ImGui::TreePop();
 			}
 			ImGui::TreePop();
-		}
+		}*/
 	}
 
 
 	if (isFenceModel_)
 	{
-		if (ImGui::TreeNode("FenceModel"))
+		/*if (ImGui::TreeNode("FenceModel"))
 		{
 			ImGui::ColorEdit3("Modelcolor", &materialDateFenceModel_->color.X);
 			ImGui::DragFloat3("Modeltrans", &transformFenceModel_.translate.x, 0.01f, -5.0f, 5.0f);
@@ -2364,13 +2364,13 @@ void DXCom::UpDate()
 			}
 			ImGui::TreePop();
 		}
-		directionalLightDataFenceModel_->direction = directionalLightDataFenceModel_->direction.Normalize();
+		directionalLightDataFenceModel_->direction = directionalLightDataFenceModel_->direction.Normalize();*/
 	}
 
 
 	if (isSuzanneModel_)
 	{
-		if (ImGui::TreeNode("SuzanneModel"))
+		/*if (ImGui::TreeNode("SuzanneModel"))
 		{
 			ImGui::ColorEdit3("Modelcolor", &materialDateSuzanneModel_->color.X);
 			ImGui::DragFloat3("Modeltrans", &transformSuzanneModel_.translate.x, 0.01f, -5.0f, 5.0f);
@@ -2399,13 +2399,13 @@ void DXCom::UpDate()
 			}
 			ImGui::TreePop();
 		}
-		directionalLightDataSuzanneModel_->direction = directionalLightDataSuzanneModel_->direction.Normalize();
+		directionalLightDataSuzanneModel_->direction = directionalLightDataSuzanneModel_->direction.Normalize();*/
 	}
 
 
 	if (isPlaneParticle_)
 	{
-		for (uint32_t index = 0; index < instanceCount_; ++index)
+		/*for (uint32_t index = 0; index < instanceCount_; ++index)
 		{
 			std::string indexStr = std::to_string(index);
 			if (ImGui::TreeNode(("PlaneModel:" + indexStr).c_str()))
@@ -2438,13 +2438,13 @@ void DXCom::UpDate()
 				ImGui::TreePop();
 			}
 		}
-		directionalLightDataPlaneModel_->direction = directionalLightDataPlaneModel_->direction.Normalize();
+		directionalLightDataPlaneModel_->direction = directionalLightDataPlaneModel_->direction.Normalize();*/
 	}
 
 
 	if (isPlaneAndSprite_)
 	{
-		if (ImGui::TreeNode("PlaneModel"))
+		/*if (ImGui::TreeNode("PlaneModel"))
 		{
 			ImGui::ColorEdit4("Modelcolor", &materialDatePlaneModel_->color.X);
 			ImGui::DragFloat3("Modeltrans", &transformPlaneModel_.translate.x, 0.01f, -5.0f, 5.0f);
@@ -2518,7 +2518,7 @@ void DXCom::UpDate()
 			}
 			ImGui::TreePop();
 		}
-		directionalLightDataMMeshModel_->direction = directionalLightDataMMeshModel_->direction.Normalize();
+		directionalLightDataMMeshModel_->direction = directionalLightDataMMeshModel_->direction.Normalize();*/
 	}
 
 
@@ -2528,177 +2528,177 @@ void DXCom::UpDate()
 
 #endif // _DEBUG
 
-	directionalLightData_->direction = directionalLightData_->direction.Normalize();
+	/*directionalLightData_->direction = directionalLightData_->direction.Normalize();*/
 
 
-	if (!isFluidMode_)
-	{
-		if (Input::GetInstance()->Input::IsTriggerMouse(0))
-		{
-			if (particleDate_->particleCount < 399)
-			{
-				Vector2 xy = Input::GetInstance()->Input::GetMousePosition();
+	//if (!isFluidMode_)
+	//{
+	//	if (Input::GetInstance()->Input::IsTriggerMouse(0))
+	//	{
+	//		if (particleDate_->particleCount < 399)
+	//		{
+	//			Vector2 xy = Input::GetInstance()->Input::GetMousePosition();
 
-				particles.emplace_back(Particle(xy.x, xy.y));
-				particleDate_->particleCount = int(particles.size() - 1);
-				int count = particleDate_->particleCount;
-
-
-				vertexFlowResource_[count] = CreateBufferResource(device_, sizeof(VertexDate) * 4);
-				indexFlowResource_[count] = CreateBufferResource(device_, sizeof(uint32_t) * 6);
+	//			particles.emplace_back(Particle(xy.x, xy.y));
+	//			particleDate_->particleCount = int(particles.size() - 1);
+	//			int count = particleDate_->particleCount;
 
 
-				vertexFlowDate_[count] = nullptr;
-				vertexFlowResource_[count]->Map(0, nullptr, reinterpret_cast<void**>(&vertexFlowDate_[count]));
-				vertexFlowDate_[count][0] = { { -6.0f,6.0f,0.0f,1.0f }, { 0.0f,1.0f }, { 0.0f,0.0f,-1.0f } };
-				vertexFlowDate_[count][1] = { { -6.0f,-6.0f,0.0f,1.0f }, { 0.0f,0.0f }, { 0.0f,0.0f,-1.0f } };
-				vertexFlowDate_[count][2] = { { 6.0f,6.0f,0.0f,1.0f }, { 1.0f,1.0f }, { 0.0f,0.0f,-1.0f } };
-				vertexFlowDate_[count][3] = { { 6.0f,-6.0f,0.0f,1.0f }, { 1.0f,0.0f }, { 0.0f,0.0f,-1.0f } };
+	//			vertexFlowResource_[count] = CreateBufferResource(device_, sizeof(VertexDate) * 4);
+	//			indexFlowResource_[count] = CreateBufferResource(device_, sizeof(uint32_t) * 6);
 
 
-				indexFlowResource_[count]->Map(0, nullptr, reinterpret_cast<void**>(&indexFlowData_[count]));
-				indexFlowData_[count][0] = 0;
-				indexFlowData_[count][1] = 1;
-				indexFlowData_[count][2] = 2;
-
-				indexFlowData_[count][3] = 1;
-				indexFlowData_[count][4] = 3;
-				indexFlowData_[count][5] = 2;
+	//			vertexFlowDate_[count] = nullptr;
+	//			vertexFlowResource_[count]->Map(0, nullptr, reinterpret_cast<void**>(&vertexFlowDate_[count]));
+	//			vertexFlowDate_[count][0] = { { -6.0f,6.0f,0.0f,1.0f }, { 0.0f,1.0f }, { 0.0f,0.0f,-1.0f } };
+	//			vertexFlowDate_[count][1] = { { -6.0f,-6.0f,0.0f,1.0f }, { 0.0f,0.0f }, { 0.0f,0.0f,-1.0f } };
+	//			vertexFlowDate_[count][2] = { { 6.0f,6.0f,0.0f,1.0f }, { 1.0f,1.0f }, { 0.0f,0.0f,-1.0f } };
+	//			vertexFlowDate_[count][3] = { { 6.0f,-6.0f,0.0f,1.0f }, { 1.0f,0.0f }, { 0.0f,0.0f,-1.0f } };
 
 
-				wvpFlowResource_[count] = CreateBufferResource(device_, sizeof(TransformationMatrix));
-				wvpFlowDate_[count] = nullptr;
-				wvpFlowResource_[count]->Map(0, nullptr, reinterpret_cast<void**>(&wvpFlowDate_[count]));
-				particleDate_->radius[count] = { setradius_,0.0f,0.0f,0.0f };
+	//			indexFlowResource_[count]->Map(0, nullptr, reinterpret_cast<void**>(&indexFlowData_[count]));
+	//			indexFlowData_[count][0] = 0;
+	//			indexFlowData_[count][1] = 1;
+	//			indexFlowData_[count][2] = 2;
+
+	//			indexFlowData_[count][3] = 1;
+	//			indexFlowData_[count][4] = 3;
+	//			indexFlowData_[count][5] = 2;
 
 
-				Matrix4x4 viewMatSprite = MakeIdentity4x4();
-				Matrix4x4 projectMatSprite = MakeOrthographicMatrix(0.0f, 0.0f, float(Fuji::GetkWindowWidth()), float(Fuji::GetkWindowHeight()), 0.0f, 100.0f);
-				Matrix4x4 worldViewProMatSpriteOrigine = Multiply(viewMatSprite, projectMatSprite);
-				Matrix4x4 worldViewProMatSprite = worldViewProMatSpriteOrigine;
-
-				Matrix4x4 worldMatSprite = MakeAffineMatrix(Vector3(1.0f, 1.0f, 1.0f), Vector3(0.0f, 0.0f, 0.0f), particles[count].pos);
-				worldViewProMatSprite = worldViewProMatSpriteOrigine;
-				worldViewProMatSprite = Multiply(worldMatSprite, worldViewProMatSprite);
-
-				wvpFlowDate_[count]->World = worldMatSprite;
-				wvpFlowDate_[count]->WVP = worldViewProMatSprite;
-
-				particleDate_->center[count] = { worldMatSprite.m[3][0],worldMatSprite.m[3][1],0.0f,0.0f };
-			}
-		}
-		if (Input::GetInstance()->Input::IsTriggerMouse(1))
-		{
-			if (particleDate_->particleCount > 0)
-			{
-				particles.pop_back();
-				particleDate_->particleCount = int(particles.size() - 1);
-			}
-		}
-	}
-	else
-	{
-		/*for (auto& pi : particles)
-		{
-			pi.density = 0.00001f;
-			for (auto& pj : particles)
-			{
-				Vector3 rij = pj.pos - pi.pos;
-				Vector2 rijv2 = { rij.x,rij.y };
-				float r2 = rijv2 * rijv2;
-
-				if (r2 < h2_)
-				{
-					float c = h2_ - r2;
-					pi.density += mass_ * poly6 * powf(c, 3);
-				}
-			}
-			pi.pressure = gasConst * (pi.density - restDens);
-		}
-		for (auto& pi : particles)
-		{
-			Vector2 fpress(0, 0);
-			Vector2 fvisc(0, 0);
-
-			for (auto& pj : particles)
-			{
-				if (&pi == &pj)
-				{
-					continue;
-				}
-				Vector3 rij = pj.pos - pi.pos;
-				Vector2 rijv2 = { rij.x,rij.y };
-				float r = rijv2.Lenght();
-
-				if (r < h_)
-				{
-					float c = h_ - r;
-
-					fpress += (rijv2.NormaliZe() * (-1.0f)) * mass_ * (pi.pressure + pj.pressure) / (2.0f * pj.density) * spikyGrad * powf(c, 3);
-					Vector2 pjv2Vel = { pj.vel.x,pj.vel.y };
-					Vector2 piv2Vel = { pi.vel.x,pi.vel.y };
-					fvisc += (pjv2Vel - piv2Vel) * visc * mass_ / pj.density * viscLap * c;
-				}
-			}
-			Vector2 fgrav = G_ * mass_ / pi.density;
-			Vector2 fff = (fpress + fvisc + fgrav);
-			pi.force = { fff.x,fff.y,0.0f };
-		}
-
-		for (auto& p : particles)
-		{
-			p.vel += p.force * dt / p.density;
-			p.pos += p.vel * dt;
-
-			if (p.pos.x - eps < 0)
-			{
-				p.vel.x *= boundDamping;
-				p.pos.x = eps;
-			}
-			if (p.pos.x + eps > 600)
-			{
-				p.vel.x *= boundDamping;
-				p.pos.x = 600 - eps;
-			}
-			if (p.pos.y - eps < 0)
-			{
-				p.vel.y *= boundDamping;
-				p.pos.y = eps;
-			}
-			if (p.pos.y + eps > 600)
-			{
-				p.vel.y *= boundDamping;
-				p.pos.y = 600 - eps;
-			}
-		}
-
-		gravityChangeTime_++;
-		if (gravityChangeTime_ >= 0 && gravityChangeTime_ < 400)
-		{
-			G_ = { 0.0f,9.8f };
-		}
-		if (gravityChangeTime_ >= 400 && gravityChangeTime_ < 800)
-		{
-			G_ = { 0.0f,-9.8f };
-		}
-		if (gravityChangeTime_ >= 800 && gravityChangeTime_ < 1200)
-		{
-			G_ = { 9.8f,0.0f };
-		}
-		if (gravityChangeTime_ >= 1200 && gravityChangeTime_ < 1600)
-		{
-			G_ = { -9.8f,0.0f };
-		}
-		if (gravityChangeTime_ >= 1600)
-		{
-			gravityChangeTime_ = 0;
-		}*/
-	}
+	//			wvpFlowResource_[count] = CreateBufferResource(device_, sizeof(TransformationMatrix));
+	//			wvpFlowDate_[count] = nullptr;
+	//			wvpFlowResource_[count]->Map(0, nullptr, reinterpret_cast<void**>(&wvpFlowDate_[count]));
+	//			particleDate_->radius[count] = { setradius_,0.0f,0.0f,0.0f };
 
 
+	//			Matrix4x4 viewMatSprite = MakeIdentity4x4();
+	//			Matrix4x4 projectMatSprite = MakeOrthographicMatrix(0.0f, 0.0f, float(Fuji::GetkWindowWidth()), float(Fuji::GetkWindowHeight()), 0.0f, 100.0f);
+	//			Matrix4x4 worldViewProMatSpriteOrigine = Multiply(viewMatSprite, projectMatSprite);
+	//			Matrix4x4 worldViewProMatSprite = worldViewProMatSpriteOrigine;
 
-	transform.rotate.y += 0.05f;
-	Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
+	//			Matrix4x4 worldMatSprite = MakeAffineMatrix(Vector3(1.0f, 1.0f, 1.0f), Vector3(0.0f, 0.0f, 0.0f), particles[count].pos);
+	//			worldViewProMatSprite = worldViewProMatSpriteOrigine;
+	//			worldViewProMatSprite = Multiply(worldMatSprite, worldViewProMatSprite);
+
+	//			wvpFlowDate_[count]->World = worldMatSprite;
+	//			wvpFlowDate_[count]->WVP = worldViewProMatSprite;
+
+	//			particleDate_->center[count] = { worldMatSprite.m[3][0],worldMatSprite.m[3][1],0.0f,0.0f };
+	//		}
+	//	}
+	//	if (Input::GetInstance()->Input::IsTriggerMouse(1))
+	//	{
+	//		if (particleDate_->particleCount > 0)
+	//		{
+	//			particles.pop_back();
+	//			particleDate_->particleCount = int(particles.size() - 1);
+	//		}
+	//	}
+	//}
+	//else
+	//{
+	//	/*for (auto& pi : particles)
+	//	{
+	//		pi.density = 0.00001f;
+	//		for (auto& pj : particles)
+	//		{
+	//			Vector3 rij = pj.pos - pi.pos;
+	//			Vector2 rijv2 = { rij.x,rij.y };
+	//			float r2 = rijv2 * rijv2;
+
+	//			if (r2 < h2_)
+	//			{
+	//				float c = h2_ - r2;
+	//				pi.density += mass_ * poly6 * powf(c, 3);
+	//			}
+	//		}
+	//		pi.pressure = gasConst * (pi.density - restDens);
+	//	}
+	//	for (auto& pi : particles)
+	//	{
+	//		Vector2 fpress(0, 0);
+	//		Vector2 fvisc(0, 0);
+
+	//		for (auto& pj : particles)
+	//		{
+	//			if (&pi == &pj)
+	//			{
+	//				continue;
+	//			}
+	//			Vector3 rij = pj.pos - pi.pos;
+	//			Vector2 rijv2 = { rij.x,rij.y };
+	//			float r = rijv2.Lenght();
+
+	//			if (r < h_)
+	//			{
+	//				float c = h_ - r;
+
+	//				fpress += (rijv2.NormaliZe() * (-1.0f)) * mass_ * (pi.pressure + pj.pressure) / (2.0f * pj.density) * spikyGrad * powf(c, 3);
+	//				Vector2 pjv2Vel = { pj.vel.x,pj.vel.y };
+	//				Vector2 piv2Vel = { pi.vel.x,pi.vel.y };
+	//				fvisc += (pjv2Vel - piv2Vel) * visc * mass_ / pj.density * viscLap * c;
+	//			}
+	//		}
+	//		Vector2 fgrav = G_ * mass_ / pi.density;
+	//		Vector2 fff = (fpress + fvisc + fgrav);
+	//		pi.force = { fff.x,fff.y,0.0f };
+	//	}
+
+	//	for (auto& p : particles)
+	//	{
+	//		p.vel += p.force * dt / p.density;
+	//		p.pos += p.vel * dt;
+
+	//		if (p.pos.x - eps < 0)
+	//		{
+	//			p.vel.x *= boundDamping;
+	//			p.pos.x = eps;
+	//		}
+	//		if (p.pos.x + eps > 600)
+	//		{
+	//			p.vel.x *= boundDamping;
+	//			p.pos.x = 600 - eps;
+	//		}
+	//		if (p.pos.y - eps < 0)
+	//		{
+	//			p.vel.y *= boundDamping;
+	//			p.pos.y = eps;
+	//		}
+	//		if (p.pos.y + eps > 600)
+	//		{
+	//			p.vel.y *= boundDamping;
+	//			p.pos.y = 600 - eps;
+	//		}
+	//	}
+
+	//	gravityChangeTime_++;
+	//	if (gravityChangeTime_ >= 0 && gravityChangeTime_ < 400)
+	//	{
+	//		G_ = { 0.0f,9.8f };
+	//	}
+	//	if (gravityChangeTime_ >= 400 && gravityChangeTime_ < 800)
+	//	{
+	//		G_ = { 0.0f,-9.8f };
+	//	}
+	//	if (gravityChangeTime_ >= 800 && gravityChangeTime_ < 1200)
+	//	{
+	//		G_ = { 9.8f,0.0f };
+	//	}
+	//	if (gravityChangeTime_ >= 1200 && gravityChangeTime_ < 1600)
+	//	{
+	//		G_ = { -9.8f,0.0f };
+	//	}
+	//	if (gravityChangeTime_ >= 1600)
+	//	{
+	//		gravityChangeTime_ = 0;
+	//	}*/
+	//}
+
+
+
+	/*transform.rotate.y += 0.05f;*/
+	/*Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);*/
 	Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTrans.scale, cameraTrans.rotate, cameraTrans.translate);
 	Matrix4x4 viewMatrix = Inverse(cameraMatrix);
 	if (isDebugCamera_)
@@ -2706,14 +2706,14 @@ void DXCom::UpDate()
 		viewMatrix = debugCamera_->GetViewMatrix();
 	}
 	Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(Fuji::GetkWindowWidth()) / float(Fuji::GetkWindowHeight()), 0.1f, 100.0f);
-	Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
+	/*Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));*/
 
-	wvpDate_->World = worldMatrix;
-	wvpDate_->WVP = worldViewProjectionMatrix;
+	/*wvpDate_->World = worldMatrix;
+	wvpDate_->WVP = worldViewProjectionMatrix;*/
 
 
 	//Fence
-	if (isFenceModel_)
+	/*if (isFenceModel_)
 	{
 		Matrix4x4 worldMatrixFenceModel = MakeAffineMatrix(transformFenceModel_.scale, transformFenceModel_.rotate, transformFenceModel_.translate);
 		Matrix4x4 worldViewProjectionMatrixFenceModel = Multiply(viewMatrix, projectionMatrix);
@@ -2721,11 +2721,11 @@ void DXCom::UpDate()
 
 		wvpDateFenceModel_->World = worldMatrixFenceModel;
 		wvpDateFenceModel_->WVP = worldViewProjectionMatrixFenceModel;
-	}
+	}*/
 
 
 	//Suzanne
-	if (isSuzanneModel_)
+	/*if (isSuzanneModel_)
 	{
 		Matrix4x4 worldMatrixSuzanneModel = MakeAffineMatrix(transformSuzanneModel_.scale, transformSuzanneModel_.rotate, transformSuzanneModel_.translate);
 		Matrix4x4 worldViewProjectionMatrixSuzanneModel = Multiply(viewMatrix, projectionMatrix);
@@ -2733,12 +2733,12 @@ void DXCom::UpDate()
 
 		wvpDateSuzanneModel_->World = worldMatrixSuzanneModel;
 		wvpDateSuzanneModel_->WVP = worldViewProjectionMatrixSuzanneModel;
-	}
+	}*/
 
 
 	if (isPlaneParticle_)
 	{
-		for (uint32_t index = 0; index < instanceCount_; ++index)
+		/*for (uint32_t index = 0; index < instanceCount_; ++index)
 		{
 			particles_[index].transform.translate += particles_[index].velocity * kDeltatime;
 			Matrix4x4 worldMatrixInstanc = MakeAffineMatrix(particles_[index].transform.scale, particles_[index].transform.rotate, particles_[index].transform.translate);
@@ -2747,40 +2747,40 @@ void DXCom::UpDate()
 
 			instancingData[index].World = worldMatrixInstanc;
 			instancingData[index].WVP = worldViewProjectionMatrixInstanc;
-		}
+		}*/
 	}
 
 
-	if (isPlaneAndSprite_)
-	{
-		//Plane
+	//if (isPlaneAndSprite_)
+	//{
+	//	//Plane
 
-		Matrix4x4 worldMatrixPlaneModel = MakeAffineMatrix(transformPlaneModel_.scale, transformPlaneModel_.rotate, transformPlaneModel_.translate);
-		Matrix4x4 worldViewProjectionMatrixPlaneModel = Multiply(viewMatrix, projectionMatrix);
-		worldViewProjectionMatrixPlaneModel = Multiply(worldMatrixPlaneModel, worldViewProjectionMatrixPlaneModel);
+	//	Matrix4x4 worldMatrixPlaneModel = MakeAffineMatrix(transformPlaneModel_.scale, transformPlaneModel_.rotate, transformPlaneModel_.translate);
+	//	Matrix4x4 worldViewProjectionMatrixPlaneModel = Multiply(viewMatrix, projectionMatrix);
+	//	worldViewProjectionMatrixPlaneModel = Multiply(worldMatrixPlaneModel, worldViewProjectionMatrixPlaneModel);
 
-		wvpDatePlaneModel_->World = worldMatrixPlaneModel;
-		wvpDatePlaneModel_->WVP = worldViewProjectionMatrixPlaneModel;
-
-
-		Matrix4x4 spriteWorldMat = MakeAffineMatrix(transSprite.scale, transSprite.rotate, transSprite.translate);
-		Matrix4x4 spriteViewMat = MakeIdentity4x4();
-		Matrix4x4 spriteProjectMat = MakeOrthographicMatrix(0.0f, 0.0f, float(Fuji::GetkWindowWidth()), float(Fuji::GetkWindowHeight()), 0.0f, 100.0f);
-		Matrix4x4 spriteWorldViewProMat = Multiply(spriteViewMat, spriteProjectMat);
-		spriteWorldViewProMat = Multiply(spriteWorldMat, spriteWorldViewProMat);
-
-		transformationMatDataSprite_->World = spriteWorldMat;
-		transformationMatDataSprite_->WVP = spriteWorldViewProMat;
+	//	wvpDatePlaneModel_->World = worldMatrixPlaneModel;
+	//	wvpDatePlaneModel_->WVP = worldViewProjectionMatrixPlaneModel;
 
 
-		Matrix4x4 uvtrasform = MakeScaleMatrix(uvTransSprite.scale);
-		uvtrasform = Multiply(uvtrasform, MakeRotateZMatrix(uvTransSprite.rotate.z));
-		uvtrasform = Multiply(uvtrasform, MakeTranslateMatrix(uvTransSprite.translate));
-		materialDateSprite_->uvTransform = uvtrasform;
-	}
+	//	Matrix4x4 spriteWorldMat = MakeAffineMatrix(transSprite.scale, transSprite.rotate, transSprite.translate);
+	//	Matrix4x4 spriteViewMat = MakeIdentity4x4();
+	//	Matrix4x4 spriteProjectMat = MakeOrthographicMatrix(0.0f, 0.0f, float(Fuji::GetkWindowWidth()), float(Fuji::GetkWindowHeight()), 0.0f, 100.0f);
+	//	Matrix4x4 spriteWorldViewProMat = Multiply(spriteViewMat, spriteProjectMat);
+	//	spriteWorldViewProMat = Multiply(spriteWorldMat, spriteWorldViewProMat);
+
+	//	transformationMatDataSprite_->World = spriteWorldMat;
+	//	transformationMatDataSprite_->WVP = spriteWorldViewProMat;
 
 
-	if (isMMesh_)
+	//	Matrix4x4 uvtrasform = MakeScaleMatrix(uvTransSprite.scale);
+	//	uvtrasform = Multiply(uvtrasform, MakeRotateZMatrix(uvTransSprite.rotate.z));
+	//	uvtrasform = Multiply(uvtrasform, MakeTranslateMatrix(uvTransSprite.translate));
+	//	materialDateSprite_->uvTransform = uvtrasform;
+	//}
+
+
+	/*if (isMMesh_)
 	{
 		Matrix4x4 worldMatrixMMeshModel = MakeAffineMatrix(transformMMeshModel_.scale, transformMMeshModel_.rotate, transformMMeshModel_.translate);
 		Matrix4x4 worldViewProjectionMatrixMMeshModel = Multiply(viewMatrix, projectionMatrix);
@@ -2788,7 +2788,7 @@ void DXCom::UpDate()
 
 		wvpDateMMeshModel_->World = worldMatrixMMeshModel;
 		wvpDateMMeshModel_->WVP = worldViewProjectionMatrixMMeshModel;
-	}
+	}*/
 
 
 	/*Matrix4x4 worldMatrix2 = MakeAffineMatrix(transform2.scale, transform2.rotate, transform2.translate);
