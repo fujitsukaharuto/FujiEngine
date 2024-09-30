@@ -2288,7 +2288,7 @@ void DXCom::UpDate()
 	}*/
 
 
-	if (ImGui::TreeNode("What to draw"))
+	/*if (ImGui::TreeNode("What to draw"))
 	{
 		ImGui::Checkbox("Draw plane and sprite", &isPlaneAndSprite_);
 		ImGui::Checkbox("Draw plane in particle mode", &isPlaneParticle_);
@@ -2297,7 +2297,7 @@ void DXCom::UpDate()
 		ImGui::Checkbox("Draw Suzanne", &isSuzanneModel_);
 		ImGui::Checkbox("Draw MultiMesh", &isMMesh_);
 		ImGui::TreePop();
-	}
+	}*/
 
 
 	if (isSphere_)
@@ -2521,8 +2521,6 @@ void DXCom::UpDate()
 		directionalLightDataMMeshModel_->direction = directionalLightDataMMeshModel_->direction.Normalize();*/
 	}
 
-
-	ImGui::Text("\nPlay Sound:Key 0, Gamepad A Button");
 
 	ImGui::End();
 

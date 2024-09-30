@@ -42,8 +42,22 @@ void GameScene::Update() {
 
 #endif // _DEBUG
 
+	if (input_->PushKey(DIK_LEFT)) {
+		suzunne->transform.translate.x -= 0.05f;
+	}
+	if (input_->PushKey(DIK_RIGHT)) {
+		suzunne->transform.translate.x += 0.05f;
+	}
+	if (input_->PushKey(DIK_UP)) {
+		suzunne->transform.translate.y += 0.05f;
+	}
+	if (input_->PushKey(DIK_DOWN)) {
+		suzunne->transform.translate.y -= 0.05f;
+	}
+
+
+
 	dxCommon_->UpDate();
-	suzunne->transform.translate.x = 3.0f;
 	suzunne->transform.rotate.y = 3.14f;
 	suzunne->transform.rotate.x += 0.01f;
 	suzunne->SetWVP();

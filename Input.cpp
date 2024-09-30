@@ -3,6 +3,14 @@
 
 #include "MyWindow.h"
 
+
+
+Input* Input::GetInstance() {
+	static Input instance;
+	return &instance;
+}
+
+
 void Input::Initialize()
 {
 
@@ -53,6 +61,7 @@ void Input::Initialize()
 
 }
 
+
 void Input::Update()
 {
 	KeyboardUpdate();
@@ -62,8 +71,56 @@ void Input::Update()
 	GamepadUpdate();
 }
 
-void Input::MouseUpdate()
+
+
+/// Mouse-------------------------------------
+
+bool Input::IsPressMouse(int32_t mouseNumber) const
 {
+	return (mouse_.rgbButtons[mouseNumber] & 0x80) != 0;
+}
+
+bool Input::IsTriggerMouse(int32_t buttonNumber) const
+{
+	return (mouse_.rgbButtons[buttonNumber] & 0x80) != 0 && (mousePre_.rgbButtons[buttonNumber] & 0x80) == 0;
+}
+
+
+
+/// Key---------------------------------------
+
+bool Input::PushKey(uint8_t keyNumber) const
+{
+	return key_[keyNumber] & 0x80;
+}
+
+bool Input::TriggerKey(uint8_t keyNumber) const
+{
+	return (key_[keyNumber] & 0x80) && !(keyPre_[keyNumber] & 0x80);
+}
+
+
+
+/// GamePad-----------------------------------
+
+bool Input::GetGamepadState(XINPUT_STATE& out) const
+{
+	out = gamepadState_;
+	return true;
+}
+
+bool Input::GetGamepadStatePrevious(XINPUT_STATE& out) const
+{
+	out = gamepadStatePrevious_;
+	return true;
+}
+
+
+
+
+
+
+void Input::MouseUpdate() {
 	mousePre_ = mouse_;
 	// 現在のマウス状態を取得
 	HRESULT hr = devMouse_->GetDeviceState(sizeof(DIMOUSESTATE2), &mouse_);
@@ -82,82 +139,20 @@ void Input::MouseUpdate()
 	mousePosition_.y = float(p.y);
 }
 
-void Input::KeyboardUpdate()
-{
+void Input::KeyboardUpdate() {
 	keyPre_ = key_;
 	// キーボードの入力情報取得
 	HRESULT hr = keyboard_->GetDeviceState(sizeof(key_), key_.data());
-	if (FAILED(hr))
-	{
+	if (FAILED(hr)) {
 		// 失敗の時再取得
 		hr = keyboard_->Acquire();
-		while (hr == DIERR_INPUTLOST)
-		{
+		while (hr == DIERR_INPUTLOST) {
 			hr = keyboard_->Acquire();
 		}
 	}
 }
 
-void Input::GamepadUpdate()
-{
+void Input::GamepadUpdate() {
 	gamepadStatePrevious_ = gamepadState_;
 	XInputGetState(0, &gamepadState_);
-}
-
-Input* Input::GetInstance()
-{
-	static Input instance;
-	return &instance;
-}
-
-const DIMOUSESTATE2& Input::GetAllMouse() const
-{
-	return mouse_;
-}
-
-bool Input::IsPressMouse(int32_t mouseNumber) const
-{
-	return (mouse_.rgbButtons[mouseNumber] & 0x80) != 0;
-}
-
-bool Input::IsTriggerMouse(int32_t buttonNumber) const
-{
-	return (mouse_.rgbButtons[buttonNumber] & 0x80) != 0 && (mousePre_.rgbButtons[buttonNumber] & 0x80) == 0;
-}
-
-const Vector2& Input::GetMousePosition() const
-{
-	return mousePosition_;
-}
-
-const std::array<BYTE, 256>& Input::GetAllKey()
-{
-	return key_;
-}
-
-bool Input::PushKey(uint8_t keyNumber) const
-{
-	return key_[keyNumber] & 0x80;
-}
-
-bool Input::TriggerKey(uint8_t keyNumber) const
-{
-	return (key_[keyNumber] & 0x80) && !(keyPre_[keyNumber] & 0x80);
-}
-
-XINPUT_STATE Input::GetGamepadState() const
-{
-	return gamepadState_;
-}
-
-bool Input::GetGamepadState(XINPUT_STATE& out) const
-{
-	out = gamepadState_;
-	return true;
-}
-
-bool Input::GetGamepadStatePrevious(XINPUT_STATE& out) const
-{
-	out = gamepadStatePrevious_;
-	return true;
 }

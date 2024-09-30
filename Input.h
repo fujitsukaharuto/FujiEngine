@@ -6,19 +6,67 @@
 #include <wrl.h>
 
 #include <XInput.h>
-#define DIRECTINPUT_VERSION 0x0800 // DirectInputのバージョン指定
+#define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
 
 #pragma comment(lib, "dinput8.lib")
 #pragma comment(lib, "dxguid.lib")
 #pragma comment(lib, "xinput.lib")
 
-class Input
-{
+
+
+class Input {
 public:
+
+	Input() = default;
+	~Input() = default;
+
+public:
+
+	static Input* GetInstance();
+
 	void Initialize();
 
 	void Update();
+
+
+
+
+	/// Mouse-------------------------------------
+
+	bool IsPressMouse(int32_t mouseNumber) const;
+
+	bool IsTriggerMouse(int32_t buttonNumber) const;
+
+	const DIMOUSESTATE2& GetAllMouse() const { return mouse_; }
+
+	const Vector2& GetMousePosition() const { return mousePosition_; }
+
+
+
+
+	/// Key---------------------------------------
+
+	bool PushKey(uint8_t keyNumber) const;
+
+	bool TriggerKey(uint8_t keyNumber) const;
+
+	const std::array<BYTE, 256>& GetAllKey() { return key_; }
+
+
+
+
+	/// GamePad-----------------------------------
+
+	XINPUT_STATE GetGamepadState() const { return gamepadState_; }
+
+	bool GetGamepadState(XINPUT_STATE& out)const;
+
+	bool GetGamepadStatePrevious(XINPUT_STATE& out)const;
+
+
+
+private:
 
 	void MouseUpdate();
 
@@ -26,33 +74,12 @@ public:
 
 	void GamepadUpdate();
 
-	static Input* GetInstance();
-
-	const DIMOUSESTATE2& GetAllMouse() const;
-
-	bool IsPressMouse(int32_t mouseNumber) const;
-
-	bool IsTriggerMouse(int32_t buttonNumber) const;
-
-	const Vector2& GetMousePosition() const;
-
-	const std::array<BYTE, 256>& GetAllKey();
-
-	bool PushKey(uint8_t keyNumber) const;
-
-	bool TriggerKey(uint8_t keyNumber) const;
-
-	XINPUT_STATE GetGamepadState() const;
-
-	bool GetGamepadState(XINPUT_STATE& out)const;
-
-	bool GetGamepadStatePrevious(XINPUT_STATE& out)const;
-
 private:
-	Input() = default;
-	~Input() = default;
+
 	Input(const Input&) = delete;
 	const Input& operator=(const Input&) = delete;
+
+private:
 
 	Microsoft::WRL::ComPtr<IDirectInput8> directInput_ = nullptr;
 	Microsoft::WRL::ComPtr<IDirectInputDevice8> devMouse_ = nullptr;
@@ -65,5 +92,6 @@ private:
 	Vector2 mousePosition_;
 	XINPUT_STATE gamepadState_;
 	XINPUT_STATE gamepadStatePrevious_;
+
 
 };
