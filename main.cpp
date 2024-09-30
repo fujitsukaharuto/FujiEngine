@@ -18,7 +18,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	// ゲームウィンドウの作成
 	win = MyWin::GetInstance();
-	win->CreatWind(L"FUJI");
+	win->Initialize();
 
 	// DirectX初期化
 	dxCommon = DXCom::GetInstance();
@@ -95,7 +95,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	textureManager->Finalize();
 
 	// ゲームウィンドウの破棄
-	win->ThrowAwayWindow();
+	win->Finalize();
 
 	return 0;
 }

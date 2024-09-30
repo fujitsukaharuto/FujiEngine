@@ -44,6 +44,7 @@ void GameScene::Update() {
 
 	dxCommon_->UpDate();
 	suzunne->transform.translate.x = 3.0f;
+	suzunne->transform.rotate.y = 3.14f;
 	suzunne->transform.rotate.x += 0.01f;
 	suzunne->SetWVP();
 	sphere->transform.rotate.y += 0.01f;

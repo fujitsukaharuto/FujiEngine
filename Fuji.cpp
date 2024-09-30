@@ -32,13 +32,13 @@ int Fuji::ProcessMessage()
 void Fuji::CreatWind()
 {
 	mywin_ = MyWin::GetInstance();
-	mywin_->CreatWind(L"name");
+
 }
 
 void Fuji::InitDX()
 {
 	mywin_ = MyWin::GetInstance();
-	mywin_->CreatWind(L"name");
+	mywin_->Initialize();
 	debugCamera_ = DebugCamera::GetInstance();
 	debugCamera_->Initialize();
 	dxcom_ = dxcom_->GetInstance();
