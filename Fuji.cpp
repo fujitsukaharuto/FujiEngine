@@ -42,7 +42,7 @@ void Fuji::InitDX()
 	debugCamera_ = DebugCamera::GetInstance();
 	debugCamera_->Initialize();
 	dxcom_ = dxcom_->GetInstance();
-	dxcom_->InitDX(mywin_);
+	dxcom_->Initialize(mywin_);
 	dxcom_->SetDebugCamera(debugCamera_);
 	audio_ = Audio::GetInstance();
 	audio_->Initialize();

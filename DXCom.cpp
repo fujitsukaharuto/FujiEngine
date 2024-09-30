@@ -1,4 +1,5 @@
 #include "DXCom.h"
+#include "Logger.h"
 #include "Fuji.h"
 #include "ImGuiManager.h"
 #include "Input.h"
@@ -24,34 +25,29 @@ DXCom* DXCom::GetInstance()
 	return &instance;
 }
 
-void DXCom::InitDX(MyWin* myWin)
+void DXCom::Initialize(MyWin* myWin)
 {
 	assert(myWin);
-
 	myWin_ = myWin;
 
 
-	CreateDXGI();
-	InitializeCommand();
+	CreateDevice();
+	CreateCommand();
 	CreateSwapChain();
 	CreateRenderTargets();
 	CreateDepthBuffer();
-	CreateFence();
 
 
 	SettingDxcUtil();
 	SettingIncludeHandle();
 	SettingRootSignature();
 	SettingGraphicPipeline();
-	SettingVertex();
-	SettingSpriteVertex();
-	SettingResource();
-	SettingSpriteResource();
+
 	//SettingTexture();
 	//SettingImgui();
 }
 
-void DXCom::CreateDXGI()
+void DXCom::CreateDevice()
 {
 
 #ifdef _DEBUG
@@ -82,7 +78,7 @@ void DXCom::CreateDXGI()
 		assert(SUCCEEDED(hr));
 		if (!(adapterDesc.Flags & DXGI_ADAPTER_FLAG3_SOFTWARE))
 		{
-			Log(ConvertString(std::format(L"Use Adapter:{}\n", adapterDesc.Description)));
+			Logger::Log((std::format(L"Use Adapter:{}\n", adapterDesc.Description)));
 			break;
 		}
 		useAdapter_ = nullptr;//ソフトウェアタブの場合見つからなかったことに
@@ -101,12 +97,12 @@ void DXCom::CreateDXGI()
 		hr = D3D12CreateDevice(useAdapter_.Get(), featureLevels[i], IID_PPV_ARGS(&device_));
 		if (SUCCEEDED(hr))
 		{
-			Log(std::format("FeatureLevel : {}\n", featureLevelStrings[i]));
+			Logger::Log(std::format("FeatureLevel : {}\n", featureLevelStrings[i]));
 			break;
 		}
 	}
 	assert(device_ != nullptr);
-	Log("Complete creat D3D12Device!!\n");
+	Logger::Log("Complete creat D3D12Device!!\n");
 
 #ifdef _DEBUG
 	ID3D12InfoQueue* infoQueue = nullptr;
@@ -133,25 +129,11 @@ void DXCom::CreateDXGI()
 
 }
 
-void DXCom::InitializeCommand()
+void DXCom::CreateCommand()
 {
 
-	commandQueue_ = nullptr;
-	HRESULT hr = device_->CreateCommandQueue(&commandQueueDesc_,
-		IID_PPV_ARGS(&commandQueue_));
-	assert(SUCCEEDED(hr));
-
-	commandAllocator_ = nullptr;
-	hr = device_->CreateCommandAllocator(
-		D3D12_COMMAND_LIST_TYPE_DIRECT,
-		IID_PPV_ARGS(&commandAllocator_));
-	assert(SUCCEEDED(hr));
-
-	commandList_ = nullptr;
-	hr = device_->CreateCommandList(
-		0, D3D12_COMMAND_LIST_TYPE_DIRECT,
-		commandAllocator_.Get(), nullptr, IID_PPV_ARGS(&commandList_));
-	assert(SUCCEEDED(hr));
+	command_.reset(new DXCommand());
+	command_->Initialize(device_.Get());
 
 }
 
@@ -167,7 +149,7 @@ void DXCom::CreateSwapChain()
 	swapChainDesc_.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 
 	HRESULT hr = dxgiFactory_->CreateSwapChainForHwnd(
-		commandQueue_.Get(), myWin_->GetHwnd(), &swapChainDesc_,
+		command_->GetQueue(), myWin_->GetHwnd(), &swapChainDesc_,
 		nullptr, nullptr, reinterpret_cast<IDXGISwapChain1**>(swapChain_.GetAddressOf()));
 	assert(SUCCEEDED(hr));
 
@@ -176,6 +158,7 @@ void DXCom::CreateSwapChain()
 
 void DXCom::CreateRenderTargets()
 {
+
 	rtvDescriptorHeap_ = CreateDescriptorHeap(device_.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 3, false);
 
 	HRESULT hr = swapChain_->GetBuffer(0, IID_PPV_ARGS(&swapChainResources_[0]));
@@ -225,17 +208,6 @@ void DXCom::CreateDepthBuffer()
 
 }
 
-void DXCom::CreateFence()
-{
-	fence_ = nullptr;
-	fenceValue_ = 0;
-	HRESULT hr = device_->CreateFence(fenceValue_, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence_));
-	assert(SUCCEEDED(hr));
-
-	HANDLE fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-	assert(fenceEvent != nullptr);
-
-}
 
 
 void DXCom::SettingDxcUtil()
@@ -308,7 +280,7 @@ void DXCom::SettingRootSignature()
 		D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob_, &errorBlob_);
 	if (FAILED(hr))
 	{
-		Log(reinterpret_cast<char*>(errorBlob_->GetBufferPointer()));
+		Logger::Log(reinterpret_cast<char*>(errorBlob_->GetBufferPointer()));
 		assert(false);
 	}
 
@@ -372,7 +344,7 @@ void DXCom::SettingRootSignature()
 		D3D_ROOT_SIGNATURE_VERSION_1, &signatureParticleBlob_, &errorParticleBlob_);
 	if (FAILED(hr))
 	{
-		Log(reinterpret_cast<char*>(errorParticleBlob_->GetBufferPointer()));
+		Logger::Log(reinterpret_cast<char*>(errorParticleBlob_->GetBufferPointer()));
 		assert(false);
 	}
 
@@ -431,7 +403,7 @@ void DXCom::SettingRootSignature()
 
 		if (FAILED(hr))
 		{
-			Log(reinterpret_cast<char*>(errorGrayBlob_->GetBufferPointer()));
+			Logger::Log(reinterpret_cast<char*>(errorGrayBlob_->GetBufferPointer()));
 			assert(false);
 		}
 
@@ -483,7 +455,7 @@ void DXCom::SettingRootSignature()
 
 		if (FAILED(hr))
 		{
-			Log(reinterpret_cast<char*>(errorMetaBlob_->GetBufferPointer()));
+			Logger::Log(reinterpret_cast<char*>(errorMetaBlob_->GetBufferPointer()));
 			assert(false);
 		}
 
@@ -531,7 +503,7 @@ void DXCom::SettingRootSignature()
 
 		if (FAILED(hr))
 		{
-			Log(reinterpret_cast<char*>(errorGaussBlob_->GetBufferPointer()));
+			Logger::Log(reinterpret_cast<char*>(errorGaussBlob_->GetBufferPointer()));
 			assert(false);
 		}
 
@@ -580,7 +552,7 @@ void DXCom::SettingRootSignature()
 
 		if (FAILED(hr))
 		{
-			Log(reinterpret_cast<char*>(errorNoneBlob_->GetBufferPointer()));
+			Logger::Log(reinterpret_cast<char*>(errorNoneBlob_->GetBufferPointer()));
 			assert(false);
 		}
 
@@ -769,14 +741,14 @@ void DXCom::SettingGraphicPipeline()
 		IID_PPV_ARGS(&graphicsPipelineStateParticle_));
 	assert(SUCCEEDED(hr));
 
-	for (uint32_t index = 0; index < instanceCount_; ++index)
+	/*for (uint32_t index = 0; index < instanceCount_; ++index)
 	{
 		particles_[index].transform.scale = { 1.0f,1.0f,1.0f };
 		particles_[index].transform.rotate = { 0.0f,0.0f,0.0f };
 		particles_[index].transform.translate = { index * 0.1f,index * 0.1f,index * 0.1f };
 
 		particles_[index].velocity = { 0.0f,1.0f,0.0f };
-	}
+	}*/
 
 	if (isGrayscale_)
 	{
@@ -1019,545 +991,545 @@ void DXCom::SettingGraphicPipeline()
 //---------------↓↓↓↓↓↓↓↓改善しなきゃ↓↓↓↓↓↓↓↓--------------------------------------
 
 
-void DXCom::SettingVertex()
-{
-	/*vertexResource_ = CreateBufferResource(device_.Get(), sizeof(VertexDate) * 2000);
-
-	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
-	vertexBufferView_.SizeInBytes = sizeof(VertexDate) * 2000;
-	vertexBufferView_.StrideInBytes = sizeof(VertexDate);
-
-	vertexDate_ = nullptr;
-	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDate_));
-
-	const float pi = 3.1415926535f;
-	const uint32_t kSubdivision = 16;
-	const float kLonEvery = (pi * 2.0f) / static_cast<float>(kSubdivision);
-	const float kLatEvery = (pi) / static_cast<float>(kSubdivision);
-
-	for (uint32_t latIndex = 0; latIndex < kSubdivision; latIndex++)
-	{
-		float lat = -pi / 2.0f + kLatEvery * latIndex;
-		for (uint32_t lonIndex = 0; lonIndex < kSubdivision; lonIndex++)
-		{
-			float lon = lonIndex * kLonEvery;
-			uint32_t startIndex = (latIndex * kSubdivision + lonIndex) * 6;
-
-			float u = float(lonIndex) / float(kSubdivision);
-			float v = 1.0f - float(latIndex) / float(kSubdivision);
-
-			vertexDate_[startIndex].position.X = cosf(lat) * cosf(lon);
-			vertexDate_[startIndex].position.Y = sinf(lat);
-			vertexDate_[startIndex].position.Z = cosf(lat) * sinf(lon);
-			vertexDate_[startIndex].position.W = 1.0f;
-			vertexDate_[startIndex].texcoord = { u,v };
-
-			vertexDate_[startIndex].normal.x = vertexDate_[startIndex].position.X;
-			vertexDate_[startIndex].normal.y = vertexDate_[startIndex].position.Y;
-			vertexDate_[startIndex].normal.z = vertexDate_[startIndex].position.Z;
-
-
-			vertexDate_[startIndex + 1].position.X = cosf(lat + kLatEvery) * cosf(lon);
-			vertexDate_[startIndex + 1].position.Y = sinf(lat + kLatEvery);
-			vertexDate_[startIndex + 1].position.Z = cosf(lat + kLatEvery) * sinf(lon);
-			vertexDate_[startIndex + 1].position.W = 1.0f;
-			vertexDate_[startIndex + 1].texcoord = { u,v - (float(1.0f) / float(kSubdivision)) };
-
-			vertexDate_[startIndex + 1].normal.x = vertexDate_[startIndex + 1].position.X;
-			vertexDate_[startIndex + 1].normal.y = vertexDate_[startIndex + 1].position.Y;
-			vertexDate_[startIndex + 1].normal.z = vertexDate_[startIndex + 1].position.Z;
-
-
-			vertexDate_[startIndex + 2].position.X = cosf(lat) * cosf(lon + kLonEvery);
-			vertexDate_[startIndex + 2].position.Y = sinf(lat);
-			vertexDate_[startIndex + 2].position.Z = cosf(lat) * sinf(lon + kLonEvery);
-			vertexDate_[startIndex + 2].position.W = 1.0f;
-			vertexDate_[startIndex + 2].texcoord = { u + (float(1.0f) / float(kSubdivision)),v };
-
-			vertexDate_[startIndex + 2].normal.x = vertexDate_[startIndex + 2].position.X;
-			vertexDate_[startIndex + 2].normal.y = vertexDate_[startIndex + 2].position.Y;
-			vertexDate_[startIndex + 2].normal.z = vertexDate_[startIndex + 2].position.Z;
-
-
-			vertexDate_[startIndex + 3].position.X = cosf(lat + kLatEvery) * cosf(lon);
-			vertexDate_[startIndex + 3].position.Y = sinf(lat + kLatEvery);
-			vertexDate_[startIndex + 3].position.Z = cosf(lat + kLatEvery) * sinf(lon);
-			vertexDate_[startIndex + 3].position.W = 1.0f;
-			vertexDate_[startIndex + 3].texcoord = { u,v - (float(1.0f) / float(kSubdivision)) };
-
-			vertexDate_[startIndex + 3].normal.x = vertexDate_[startIndex + 3].position.X;
-			vertexDate_[startIndex + 3].normal.y = vertexDate_[startIndex + 3].position.Y;
-			vertexDate_[startIndex + 3].normal.z = vertexDate_[startIndex + 3].position.Z;
-
-
-			vertexDate_[startIndex + 4].position.X = cosf(lat + kLatEvery) * cosf(lon + kLonEvery);
-			vertexDate_[startIndex + 4].position.Y = sinf(lat + kLatEvery);
-			vertexDate_[startIndex + 4].position.Z = cosf(lat + kLatEvery) * sinf(lon + kLonEvery);
-			vertexDate_[startIndex + 4].position.W = 1.0f;
-			vertexDate_[startIndex + 4].texcoord = { u + (float(1.0f) / float(kSubdivision)),v - (float(1.0f) / float(kSubdivision)) };
-
-			vertexDate_[startIndex + 4].normal.x = vertexDate_[startIndex + 4].position.X;
-			vertexDate_[startIndex + 4].normal.y = vertexDate_[startIndex + 4].position.Y;
-			vertexDate_[startIndex + 4].normal.z = vertexDate_[startIndex + 4].position.Z;
-
-
-			vertexDate_[startIndex + 5].position.X = cosf(lat) * cosf(lon + kLonEvery);
-			vertexDate_[startIndex + 5].position.Y = sinf(lat);
-			vertexDate_[startIndex + 5].position.Z = cosf(lat) * sinf(lon + kLonEvery);
-			vertexDate_[startIndex + 5].position.W = 1.0f;
-			vertexDate_[startIndex + 5].texcoord = { u + (float(1.0f) / float(kSubdivision)),v };
-
-			vertexDate_[startIndex + 5].normal.x = vertexDate_[startIndex + 5].position.X;
-			vertexDate_[startIndex + 5].normal.y = vertexDate_[startIndex + 5].position.Y;
-			vertexDate_[startIndex + 5].normal.z = vertexDate_[startIndex + 5].position.Z;
-
-		}
-	}*/
-
-	/*vertexResource2_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * 3);
-
-	vertexBufferView2_.BufferLocation = vertexResource2_->GetGPUVirtualAddress();
-	vertexBufferView2_.SizeInBytes = sizeof(VertexData) * 3;
-	vertexBufferView2_.StrideInBytes = sizeof(VertexData);
-
-	vertexDate2_ = nullptr;
-	vertexResource2_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDate2_));
-
-	vertexDate2_[0] = { { -0.5f,-0.5f,0.5f,1.0f }, { 0.0f,1.0f }, { 0.0f,0.0f,-1.0f } };
-	vertexDate2_[1] = { { 0.0f,0.0f,0.0f,1.0f }, { 0.5f,0.0f }, { 0.0f,0.0f,-1.0f } };
-	vertexDate2_[2] = { { 0.5f,-0.5f,-0.5f,1.0f }, { 1.0f,1.0f }, { 0.0f,0.0f,-1.0f } };*/
-
-	/*std::random_device seed;
-	std::mt19937 random(seed());
-	std::uniform_real_distribution<> number(-3.5, 3.5);
-	std::uniform_real_distribution<> velXZNumber(-0.05f, 0.05f);
-	std::uniform_real_distribution<> velYNumber(0.01f, 0.06f);
-	std::uniform_real_distribution<> rotNumber(-0.1f, 0.1f);
-
-	for (int i = 0; i < particleIndex; i++)
-	{
-		vertexParticleResource_[i] = CreateBufferResource(device_, sizeof(VertexData) * 3);
-
-		vertexParticleBufferView_[i].BufferLocation = vertexParticleResource_[i]->GetGPUVirtualAddress();
-		vertexParticleBufferView_[i].SizeInBytes = sizeof(VertexData) * 3;
-		vertexParticleBufferView_[i].StrideInBytes = sizeof(VertexData);
-
-		vertexParticleDate_[i] = nullptr;
-		vertexParticleResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&vertexParticleDate_[i]));
-
-		vertexParticleDate_[i][0] = { { -0.3f,-0.3f,0.0f,1.0f }, { 0.0f,1.0f }, { 0.0f,0.0f,-1.0f } };
-		vertexParticleDate_[i][1] = { { 0.0f,0.3f,0.0f,1.0f }, { 0.5f,0.0f }, { 0.0f,0.0f,-1.0f } };
-		vertexParticleDate_[i][2] = { { 0.3f,-0.3f,0.0f,1.0f }, { 1.0f,1.0f }, { 0.0f,0.0f,-1.0f } };
-
-
-		wvpParticleResource_[i] = CreateBufferResource(device_, sizeof(TransformationMatrix));
-		wvpParticleDate_[i] = nullptr;
-		wvpParticleResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&wvpParticleDate_[i]));
-		wvpParticleDate_[i]->WVP = MakeIdentity4x4();
-		wvpParticleDate_[i]->World = MakeIdentity4x4();
-
-		materialParticleResource_[i] = CreateBufferResource(device_, sizeof(Material));
-		materialParticleDate_[i] = nullptr;
-		materialParticleResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&materialParticleDate_[i]));
-		materialParticleDate_[i]->color = particleColor;
-		materialParticleDate_[i]->enableLighting = false;
-		materialParticleDate_[i]->uvTransform = MakeIdentity4x4();
-
-		float randomx = float(number(random));
-		float randomz = float(number(random));
-
-		transformParticle[i] = { {0.5f,0.5f,0.5f},{0.0f,0.0f,0.0f},{randomx,-2.5f,randomz} };
-
-		float randomvelx = float(velXZNumber(random));
-		float randomvely = float(velYNumber(random));
-		float randomvelz = float(velXZNumber(random));
-
-		float randomRotx = float(rotNumber(random));
-		float randomRoty = float(rotNumber(random));
-		float randomRotz = float(rotNumber(random));
-
-		particleVel[i] = { randomvelx,randomvely,randomvelz };
-		particleRot[i] = { randomRotx,randomRoty,randomRotz };
-	}*/
-
-	/*particles.clear();*/
-	/*if (isFluidMode_)
-	{
-		for (float i = eps; i < 600 - eps * 2; i++)
-		{
-			for (float j = 600 / 15; j <= 600 / 2; j++)
-			{
-				if (particles.size() >= particleIndex)
-				{
-
-				}
-				else
-				{
-					float jit = static_cast<float>(6 * rand()) / static_cast<float>(RAND_MAX);
-					particles.emplace_back(Particle((j)+jit, i));
-				}
-
-
-				j += h_;
-			}
-			i += h_;
-		}
-	}
-	else
-	{
-		particles.emplace_back(Particle(0.0f, 0.0f));
-	}*/
-
-	/*particles.emplace_back(Particle(0.0f, 0.0f));
-
-	for (int i = 0; i <= particles.size() - 1; i++)
-	{
-		vertexFlowResource_[i] = CreateBufferResource(device_, sizeof(VertexDate) * 4);
-		indexFlowResource_[i] = CreateBufferResource(device_, sizeof(uint32_t) * 6);
-	}
-
-	vertexFlowBufferView_.BufferLocation = vertexFlowResource_[0]->GetGPUVirtualAddress();
-	vertexFlowBufferView_.SizeInBytes = sizeof(VertexDate) * 4;
-	vertexFlowBufferView_.StrideInBytes = sizeof(VertexDate);
-
-	indexFlowBufferView_.BufferLocation = indexFlowResource_[0]->GetGPUVirtualAddress();
-	indexFlowBufferView_.SizeInBytes = sizeof(uint32_t) * 6;
-	indexFlowBufferView_.Format = DXGI_FORMAT_R32_UINT;
-
-	for (int i = 0; i <= particles.size() - 1; i++)
-	{
-		vertexFlowDate_[i] = nullptr;
-		vertexFlowResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&vertexFlowDate_[i]));
-
-		vertexFlowDate_[i][0] = { { -6.0f,6.0f,0.0f,1.0f }, { 0.0f,1.0f }, { 0.0f,0.0f,-1.0f } };
-		vertexFlowDate_[i][1] = { { -6.0f,-6.0f,0.0f,1.0f }, { 0.0f,0.0f }, { 0.0f,0.0f,-1.0f } };
-		vertexFlowDate_[i][2] = { { 6.0f,6.0f,0.0f,1.0f }, { 1.0f,1.0f }, { 0.0f,0.0f,-1.0f } };
-		vertexFlowDate_[i][3] = { { 6.0f,-6.0f,0.0f,1.0f }, { 1.0f,0.0f }, { 0.0f,0.0f,-1.0f } };
-
-
-		indexFlowResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&indexFlowData_[i]));
-		indexFlowData_[i][0] = 0;
-		indexFlowData_[i][1] = 1;
-		indexFlowData_[i][2] = 2;
-
-		indexFlowData_[i][3] = 1;
-		indexFlowData_[i][4] = 3;
-		indexFlowData_[i][5] = 2;
-
-
-		wvpFlowResource_[i] = CreateBufferResource(device_, sizeof(TransformationMatrix));
-		wvpFlowDate_[i] = nullptr;
-		wvpFlowResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&wvpFlowDate_[i]));
-		wvpFlowDate_[i]->WVP = MakeIdentity4x4();
-		wvpFlowDate_[i]->World = MakeIdentity4x4();
-	}
-	materialFlowResource_ = CreateBufferResource(device_, sizeof(Materials));
-	materialFlowDate_ = nullptr;
-	materialFlowResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialFlowDate_));
-	materialFlowDate_->color = particleColor;
-	materialFlowDate_->enableLighting = false;
-	materialFlowDate_->uvTransform = MakeIdentity4x4();
-
-	particleDateResource_ = CreateBufferResource(device_, sizeof(ParticleDate));
-	particleDate_ = nullptr;
-	particleDateResource_->Map(0, nullptr, reinterpret_cast<void**>(&particleDate_));
-	particleDate_->particleCount = int(particles.size() - 1);
-	particleDate_->threshold = 1.6f;
-	for (int i = 0; i < particleDate_->particleCount; i++)
-	{
-		particleDate_->center[i] = { 0.0f,0.0f,0.0f,0.0f };
-		particleDate_->radius[i] = { 6.0f,0.0f,0.0f,0.0f };
-	}
-
-	particleDate_->padding[0] = 0;
-	particleDate_->padding[1] = 0;
-
-	Matrix4x4 viewMatSprite = MakeIdentity4x4();
-	Matrix4x4 projectMatSprite = MakeOrthographicMatrix(0.0f, 0.0f, float(Fuji::GetkWindowWidth()), float(Fuji::GetkWindowHeight()), 0.0f, 100.0f);
-	Matrix4x4 worldViewProMatSpriteOrigine = Multiply(viewMatSprite, projectMatSprite);
-	Matrix4x4 worldViewProMatSprite = worldViewProMatSpriteOrigine;
-	for (size_t i = 0; i <= particles.size() - 1; i++)
-	{
-		Matrix4x4 worldMatSprite = MakeAffineMatrix(Vector3(1.0f, 1.0f, 1.0f), Vector3(0.0f, 0.0f, 0.0f), particles[i].pos);
-		worldViewProMatSprite = worldViewProMatSpriteOrigine;
-		worldViewProMatSprite = Multiply(worldMatSprite, worldViewProMatSprite);
-
-		wvpFlowDate_[i]->World = worldMatSprite;
-		wvpFlowDate_[i]->WVP = worldViewProMatSprite;
-
-		particleDate_->center[i] = { worldMatSprite.m[3][0],worldMatSprite.m[3][1],0.0f,0.0f };
-	}*/
-}
-
-void DXCom::SettingSpriteVertex()
-{
-	// Sprite
-	/*vertexResourceSprite_ = CreateBufferResource(device_.Get(), sizeof(VertexDate) * 4);
-
-	vertexBufferViewSprite_.BufferLocation = vertexResourceSprite_->GetGPUVirtualAddress();
-	vertexBufferViewSprite_.SizeInBytes = sizeof(VertexDate) * 4;
-	vertexBufferViewSprite_.StrideInBytes = sizeof(VertexDate);
-
-	vertexDataSprite_ = nullptr;
-	vertexResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSprite_));
-
-	vertexDataSprite_[0].position = { 0.0f,360.0f,0.0f,1.0f };
-	vertexDataSprite_[0].texcoord = { 0.0f,1.0f };
-	vertexDataSprite_[0].normal = { 0.0f,0.0f,-1.0f };
-
-	vertexDataSprite_[1].position = { 0.0f,0.0f,0.0f,1.0f };
-	vertexDataSprite_[1].texcoord = { 0.0f,0.0f };
-	vertexDataSprite_[1].normal = { 0.0f,0.0f,-1.0f };
-
-	vertexDataSprite_[2].position = { 640.0f,360.0f,0.0f,1.0f };
-	vertexDataSprite_[2].texcoord = { 1.0f,1.0f };
-	vertexDataSprite_[2].normal = { 0.0f,0.0f,-1.0f };
-
-
-	vertexDataSprite_[3].position = { 640.0f,0.0f,0.0f,1.0f };
-	vertexDataSprite_[3].texcoord = { 1.0f,0.0f };
-	vertexDataSprite_[3].normal = { 0.0f,0.0f,-1.0f };
-
-
-	indexResoureceSprite = CreateBufferResource(device_.Get(), sizeof(uint32_t) * 6);
-	indexBufferViewSprite.BufferLocation = indexResoureceSprite->GetGPUVirtualAddress();
-	indexBufferViewSprite.SizeInBytes = sizeof(uint32_t) * 6;
-	indexBufferViewSprite.Format = DXGI_FORMAT_R32_UINT;
-
-	indexResoureceSprite->Map(0, nullptr, reinterpret_cast<void**>(&indexDataSprite));
-	indexDataSprite[0] = 0;
-	indexDataSprite[1] = 1;
-	indexDataSprite[2] = 2;
-
-	indexDataSprite[3] = 1;
-	indexDataSprite[4] = 3;
-	indexDataSprite[5] = 2;*/
-
-	////model
-	//modelData_ = LoadObjFile("resource", "axis.obj");
-	//vertexModelResource_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * modelData_.vertices.size());
-	//vertexModelBufferView_.BufferLocation = vertexModelResource_->GetGPUVirtualAddress();
-	//vertexModelBufferView_.SizeInBytes = UINT(sizeof(VertexData) * modelData_.vertices.size());
-	//vertexModelBufferView_.StrideInBytes = sizeof(VertexData);
-
-	//vertexModelResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataModel_));
-	//std::memcpy(vertexDataModel_, modelData_.vertices.data(), sizeof(VertexData) * modelData_.vertices.size());
-
-	//wvpResourceModel_ = CreateBufferResource(device_.Get(), sizeof(TransformationMatrix));
-	//wvpDateModel_ = nullptr;
-	//wvpResourceModel_->Map(0, nullptr, reinterpret_cast<void**>(&wvpDateModel_));
-	//wvpDateModel_->WVP = MakeIdentity4x4();
-	//wvpDateModel_->World = MakeIdentity4x4();
-
-	//materialResourceModel_ = CreateBufferResource(device_.Get(), sizeof(Material));
-	//materialDateModel_ = nullptr;
-	//materialResourceModel_->Map(0, nullptr, reinterpret_cast<void**>(&materialDateModel_));
-	////色変えるやつ（Resource）
-	//materialDateModel_->color = { 1.0f,1.0f,1.0f,1.0f };
-	//materialDateModel_->enableLighting = false;
-	//materialDateModel_->uvTransform = MakeIdentity4x4();
-
-	/*directionalLightResourceModel_ = CreateBufferResource(device_.Get(), sizeof(DirectionalLight));
-	directionalLightDataModel_ = nullptr;
-	directionalLightResourceModel_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightDataModel_));
-	directionalLightDataModel_->color = { 1.0f,1.0f,1.0f,1.0f };
-	directionalLightDataModel_->direction = { 1.0f,0.0f,0.0f };
-	directionalLightDataModel_->intensity = 1.0f;*/
-
-
-	//FenceModel
-	//fenceModelData_ = LoadObjFile("resource", "fence.obj");
-	//vertexFenceModelResource_ = CreateBufferResource(device_.Get(), sizeof(VertexDate) * fenceModelData_.vertices.size());
-	//vertexFenceModelBufferView_.BufferLocation = vertexFenceModelResource_->GetGPUVirtualAddress();
-	//vertexFenceModelBufferView_.SizeInBytes = UINT(sizeof(VertexDate) * fenceModelData_.vertices.size());
-	//vertexFenceModelBufferView_.StrideInBytes = sizeof(VertexDate);
-
-	//vertexFenceModelResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataFenceModel_));
-	//std::memcpy(vertexDataFenceModel_, fenceModelData_.vertices.data(), sizeof(VertexDate) * fenceModelData_.vertices.size());
-
-	//wvpResourceFenceModel_ = CreateBufferResource(device_.Get(), sizeof(TransformationMatrix));
-	//wvpDateFenceModel_ = nullptr;
-	//wvpResourceFenceModel_->Map(0, nullptr, reinterpret_cast<void**>(&wvpDateFenceModel_));
-	//wvpDateFenceModel_->WVP = MakeIdentity4x4();
-	//wvpDateFenceModel_->World = MakeIdentity4x4();
-
-	//materialResourceFenceModel_ = CreateBufferResource(device_.Get(), sizeof(Materials));
-	//materialDateFenceModel_ = nullptr;
-	//materialResourceFenceModel_->Map(0, nullptr, reinterpret_cast<void**>(&materialDateFenceModel_));
-	////色変えるやつ（Resource）
-	//materialDateFenceModel_->color = { 1.0f,1.0f,1.0f,1.0f };
-	//materialDateFenceModel_->enableLighting = LightMode::kLightNone;
-	//materialDateFenceModel_->uvTransform = MakeIdentity4x4();
-
-	//directionalLightResourceFenceModel_ = CreateBufferResource(device_.Get(), sizeof(DirectionalLight));
-	//directionalLightDataFenceModel_ = nullptr;
-	//directionalLightResourceFenceModel_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightDataFenceModel_));
-	//directionalLightDataFenceModel_->color = { 1.0f,1.0f,1.0f,1.0f };
-	//directionalLightDataFenceModel_->direction = { 1.0f,0.0f,0.0f };
-	//directionalLightDataFenceModel_->intensity = 1.0f;
-
-
-	////SuzanneModel
-	//suzanneModelData_ = LoadObjFile("resource", "suzanne.obj");
-	//vertexSuzanneModelResource_ = CreateBufferResource(device_.Get(), sizeof(VertexDate) * suzanneModelData_.vertices.size());
-	//vertexSuzanneModelBufferView_.BufferLocation = vertexSuzanneModelResource_->GetGPUVirtualAddress();
-	//vertexSuzanneModelBufferView_.SizeInBytes = UINT(sizeof(VertexDate) * suzanneModelData_.vertices.size());
-	//vertexSuzanneModelBufferView_.StrideInBytes = sizeof(VertexDate);
-
-	//vertexSuzanneModelResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSuzanneModel_));
-	//std::memcpy(vertexDataSuzanneModel_, suzanneModelData_.vertices.data(), sizeof(VertexDate) * suzanneModelData_.vertices.size());
-
-	//wvpResourceSuzanneModel_ = CreateBufferResource(device_.Get(), sizeof(TransformationMatrix));
-	//wvpDateSuzanneModel_ = nullptr;
-	//wvpResourceSuzanneModel_->Map(0, nullptr, reinterpret_cast<void**>(&wvpDateSuzanneModel_));
-	//wvpDateSuzanneModel_->WVP = MakeIdentity4x4();
-	//wvpDateSuzanneModel_->World = MakeIdentity4x4();
-
-	//materialResourceSuzanneModel_ = CreateBufferResource(device_.Get(), sizeof(Materials));
-	//materialDateSuzanneModel_ = nullptr;
-	//materialResourceSuzanneModel_->Map(0, nullptr, reinterpret_cast<void**>(&materialDateSuzanneModel_));
-	////色変えるやつ（Resource）
-	//materialDateSuzanneModel_->color = { 1.0f,1.0f,1.0f,1.0f };
-	//materialDateSuzanneModel_->enableLighting = LightMode::kLightHalfLambert;
-	//materialDateSuzanneModel_->uvTransform = MakeIdentity4x4();
-
-	//directionalLightResourceSuzanneModel_ = CreateBufferResource(device_.Get(), sizeof(DirectionalLight));
-	//directionalLightDataSuzanneModel_ = nullptr;
-	//directionalLightResourceSuzanneModel_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightDataSuzanneModel_));
-	//directionalLightDataSuzanneModel_->color = { 1.0f,1.0f,1.0f,1.0f };
-	//directionalLightDataSuzanneModel_->direction = { 1.0f,0.0f,0.0f };
-	//directionalLightDataSuzanneModel_->intensity = 1.0f;
-
-
-	////MMeshModel
-	//mMeshModelData_ = LoadObjFile("resource", "multiMesh.obj");
-	//vertexMMeshModelResource_ = CreateBufferResource(device_.Get(), sizeof(VertexDate) * mMeshModelData_.vertices.size());
-	//vertexMMeshModelBufferView_.BufferLocation = vertexMMeshModelResource_->GetGPUVirtualAddress();
-	//vertexMMeshModelBufferView_.SizeInBytes = UINT(sizeof(VertexDate) * mMeshModelData_.vertices.size());
-	//vertexMMeshModelBufferView_.StrideInBytes = sizeof(VertexDate);
-
-	//vertexMMeshModelResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataMMeshModel_));
-	//std::memcpy(vertexDataMMeshModel_, mMeshModelData_.vertices.data(), sizeof(VertexDate) * mMeshModelData_.vertices.size());
-
-	//wvpResourceMMeshModel_ = CreateBufferResource(device_.Get(), sizeof(TransformationMatrix));
-	//wvpDateMMeshModel_ = nullptr;
-	//wvpResourceMMeshModel_->Map(0, nullptr, reinterpret_cast<void**>(&wvpDateMMeshModel_));
-	//wvpDateMMeshModel_->WVP = MakeIdentity4x4();
-	//wvpDateMMeshModel_->World = MakeIdentity4x4();
-
-	//materialResourceMMeshModel_ = CreateBufferResource(device_.Get(), sizeof(Materials));
-	//materialDateMMeshModel_ = nullptr;
-	//materialResourceMMeshModel_->Map(0, nullptr, reinterpret_cast<void**>(&materialDateMMeshModel_));
-	////色変えるやつ（Resource）
-	//materialDateMMeshModel_->color = { 1.0f,1.0f,1.0f,1.0f };
-	//materialDateMMeshModel_->enableLighting = LightMode::kLightNone;
-	//materialDateMMeshModel_->uvTransform = MakeIdentity4x4();
-
-	//directionalLightResourceMMeshModel_ = CreateBufferResource(device_.Get(), sizeof(DirectionalLight));
-	//directionalLightDataMMeshModel_ = nullptr;
-	//directionalLightResourceMMeshModel_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightDataMMeshModel_));
-	//directionalLightDataMMeshModel_->color = { 1.0f,1.0f,1.0f,1.0f };
-	//directionalLightDataMMeshModel_->direction = { 1.0f,0.0f,0.0f };
-	//directionalLightDataMMeshModel_->intensity = 1.0f;
-
-
-	////PlaneModel
-	//planeModelData_ = LoadObjFile("resource", "plane.obj");
-	//vertexPlaneModelResource_ = CreateBufferResource(device_.Get(), sizeof(VertexDate) * planeModelData_.vertices.size());
-	//vertexPlaneModelBufferView_.BufferLocation = vertexPlaneModelResource_->GetGPUVirtualAddress();
-	//vertexPlaneModelBufferView_.SizeInBytes = UINT(sizeof(VertexDate) * planeModelData_.vertices.size());
-	//vertexPlaneModelBufferView_.StrideInBytes = sizeof(VertexDate);
-
-	//vertexPlaneModelResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataPlaneModel_));
-	//std::memcpy(vertexDataPlaneModel_, planeModelData_.vertices.data(), sizeof(VertexDate) * planeModelData_.vertices.size());
-
-	//wvpResourcePlaneModel_ = CreateBufferResource(device_.Get(), sizeof(TransformationMatrix));
-	//wvpDatePlaneModel_ = nullptr;
-	//wvpResourcePlaneModel_->Map(0, nullptr, reinterpret_cast<void**>(&wvpDatePlaneModel_));
-	//wvpDatePlaneModel_->WVP = MakeIdentity4x4();
-	//wvpDatePlaneModel_->World = MakeIdentity4x4();
-
-	//materialResourcePlaneModel_ = CreateBufferResource(device_.Get(), sizeof(Materials));
-	//materialDatePlaneModel_ = nullptr;
-	//materialResourcePlaneModel_->Map(0, nullptr, reinterpret_cast<void**>(&materialDatePlaneModel_));
-	////色変えるやつ（Resource）
-	//materialDatePlaneModel_->color = { 1.0f,1.0f,1.0f,1.0f };
-	//materialDatePlaneModel_->enableLighting = LightMode::kLightNone;
-	//materialDatePlaneModel_->uvTransform = MakeIdentity4x4();
-
-	//directionalLightResourcePlaneModel_ = CreateBufferResource(device_.Get(), sizeof(DirectionalLight));
-	//directionalLightDataPlaneModel_ = nullptr;
-	//directionalLightResourcePlaneModel_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightDataPlaneModel_));
-	//directionalLightDataPlaneModel_->color = { 1.0f,1.0f,1.0f,1.0f };
-	//directionalLightDataPlaneModel_->direction = { 1.0f,0.0f,0.0f };
-	//directionalLightDataPlaneModel_->intensity = 1.0f;
-
-}
-
-void DXCom::SettingResource()
-{
-	//wvpResource_ = CreateBufferResource(device_.Get(), sizeof(TransformationMatrix));
-	//wvpDate_ = nullptr;
-	//wvpResource_->Map(0, nullptr, reinterpret_cast<void**>(&wvpDate_));
-	//wvpDate_->WVP = MakeIdentity4x4();
-	//wvpDate_->World = MakeIdentity4x4();
-
-	//materialResource_ = CreateBufferResource(device_.Get(), sizeof(Materials));
-	//materialDate_ = nullptr;
-	//materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialDate_));
-	////色変えるやつ（Resource）
-	//materialDate_->color = { 1.0f,1.0f,1.0f,1.0f };
-	//materialDate_->enableLighting = LightMode::kLightHalfLambert;
-	//materialDate_->uvTransform = MakeIdentity4x4();
-
-	//directionalLightResource_ = CreateBufferResource(device_.Get(), sizeof(DirectionalLight));
-	//directionalLightData_ = nullptr;
-	//directionalLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData_));
-	//directionalLightData_->color = { 1.0f,1.0f,1.0f,1.0f };
-	//directionalLightData_->direction = { 1.0f,0.0f,0.0f };
-	//directionalLightData_->intensity = 1.0f;
-
-
-	//wvpResource2_ = CreateBufferResource(device_.Get(), sizeof(TransformationMatrix));
-	//wvpDate2_ = nullptr;
-	//wvpResource2_->Map(0, nullptr, reinterpret_cast<void**>(&wvpDate2_));
-	//wvpDate2_->WVP = MakeIdentity4x4();
-	//wvpDate2_->World = MakeIdentity4x4();
-
-	//materialResource2_ = CreateBufferResource(device_.Get(), sizeof(Material));
-	//materialDate2_ = nullptr;
-	//materialResource2_->Map(0, nullptr, reinterpret_cast<void**>(&materialDate2_));
-	////色変えるやつ（Resource）
-	//materialDate2_->color = { 1.0f,1.0f,1.0f,1.0f };
-	//materialDate2_->enableLighting = false;
-	//materialDate2_->uvTransform = MakeIdentity4x4();
-
-	//directionalLightResource2_ = CreateBufferResource(device_.Get(), sizeof(DirectionalLight));
-	//directionalLightData2_ = nullptr;
-	//directionalLightResource2_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData2_));
-	//directionalLightData2_->color = { 1.0f,1.0f,1.0f,1.0f };
-	//directionalLightData2_->direction = { 1.0f,0.0f,0.0f };
-	//directionalLightData2_->intensity = 1.0f;
-
-}
-
-void DXCom::SettingSpriteResource()
-{
-	//transformationMatResourceSprite_ = CreateBufferResource(device_.Get(), sizeof(TransformationMatrix));
-	//transformationMatDataSprite_ = nullptr;
-	//transformationMatResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatDataSprite_));
-	//transformationMatDataSprite_->WVP = MakeIdentity4x4();
-	//transformationMatDataSprite_->World = MakeIdentity4x4();
-
-
-	//materialResourceSprite_ = CreateBufferResource(device_.Get(), sizeof(Materials));
-	//materialDateSprite_ = nullptr;
-	//materialResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&materialDateSprite_));
-	////色変えるやつ（Resource）
-	//materialDateSprite_->color = { 1.0f,1.0f,1.0f,1.0f };
-	//materialDateSprite_->enableLighting = LightMode::kLightNone;
-	//materialDateSprite_->uvTransform = MakeIdentity4x4();
-}
+//void DXCom::SettingVertex()
+//{
+//	/*vertexResource_ = CreateBufferResource(device_.Get(), sizeof(VertexDate) * 2000);
+//
+//	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
+//	vertexBufferView_.SizeInBytes = sizeof(VertexDate) * 2000;
+//	vertexBufferView_.StrideInBytes = sizeof(VertexDate);
+//
+//	vertexDate_ = nullptr;
+//	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDate_));
+//
+//	const float pi = 3.1415926535f;
+//	const uint32_t kSubdivision = 16;
+//	const float kLonEvery = (pi * 2.0f) / static_cast<float>(kSubdivision);
+//	const float kLatEvery = (pi) / static_cast<float>(kSubdivision);
+//
+//	for (uint32_t latIndex = 0; latIndex < kSubdivision; latIndex++)
+//	{
+//		float lat = -pi / 2.0f + kLatEvery * latIndex;
+//		for (uint32_t lonIndex = 0; lonIndex < kSubdivision; lonIndex++)
+//		{
+//			float lon = lonIndex * kLonEvery;
+//			uint32_t startIndex = (latIndex * kSubdivision + lonIndex) * 6;
+//
+//			float u = float(lonIndex) / float(kSubdivision);
+//			float v = 1.0f - float(latIndex) / float(kSubdivision);
+//
+//			vertexDate_[startIndex].position.X = cosf(lat) * cosf(lon);
+//			vertexDate_[startIndex].position.Y = sinf(lat);
+//			vertexDate_[startIndex].position.Z = cosf(lat) * sinf(lon);
+//			vertexDate_[startIndex].position.W = 1.0f;
+//			vertexDate_[startIndex].texcoord = { u,v };
+//
+//			vertexDate_[startIndex].normal.x = vertexDate_[startIndex].position.X;
+//			vertexDate_[startIndex].normal.y = vertexDate_[startIndex].position.Y;
+//			vertexDate_[startIndex].normal.z = vertexDate_[startIndex].position.Z;
+//
+//
+//			vertexDate_[startIndex + 1].position.X = cosf(lat + kLatEvery) * cosf(lon);
+//			vertexDate_[startIndex + 1].position.Y = sinf(lat + kLatEvery);
+//			vertexDate_[startIndex + 1].position.Z = cosf(lat + kLatEvery) * sinf(lon);
+//			vertexDate_[startIndex + 1].position.W = 1.0f;
+//			vertexDate_[startIndex + 1].texcoord = { u,v - (float(1.0f) / float(kSubdivision)) };
+//
+//			vertexDate_[startIndex + 1].normal.x = vertexDate_[startIndex + 1].position.X;
+//			vertexDate_[startIndex + 1].normal.y = vertexDate_[startIndex + 1].position.Y;
+//			vertexDate_[startIndex + 1].normal.z = vertexDate_[startIndex + 1].position.Z;
+//
+//
+//			vertexDate_[startIndex + 2].position.X = cosf(lat) * cosf(lon + kLonEvery);
+//			vertexDate_[startIndex + 2].position.Y = sinf(lat);
+//			vertexDate_[startIndex + 2].position.Z = cosf(lat) * sinf(lon + kLonEvery);
+//			vertexDate_[startIndex + 2].position.W = 1.0f;
+//			vertexDate_[startIndex + 2].texcoord = { u + (float(1.0f) / float(kSubdivision)),v };
+//
+//			vertexDate_[startIndex + 2].normal.x = vertexDate_[startIndex + 2].position.X;
+//			vertexDate_[startIndex + 2].normal.y = vertexDate_[startIndex + 2].position.Y;
+//			vertexDate_[startIndex + 2].normal.z = vertexDate_[startIndex + 2].position.Z;
+//
+//
+//			vertexDate_[startIndex + 3].position.X = cosf(lat + kLatEvery) * cosf(lon);
+//			vertexDate_[startIndex + 3].position.Y = sinf(lat + kLatEvery);
+//			vertexDate_[startIndex + 3].position.Z = cosf(lat + kLatEvery) * sinf(lon);
+//			vertexDate_[startIndex + 3].position.W = 1.0f;
+//			vertexDate_[startIndex + 3].texcoord = { u,v - (float(1.0f) / float(kSubdivision)) };
+//
+//			vertexDate_[startIndex + 3].normal.x = vertexDate_[startIndex + 3].position.X;
+//			vertexDate_[startIndex + 3].normal.y = vertexDate_[startIndex + 3].position.Y;
+//			vertexDate_[startIndex + 3].normal.z = vertexDate_[startIndex + 3].position.Z;
+//
+//
+//			vertexDate_[startIndex + 4].position.X = cosf(lat + kLatEvery) * cosf(lon + kLonEvery);
+//			vertexDate_[startIndex + 4].position.Y = sinf(lat + kLatEvery);
+//			vertexDate_[startIndex + 4].position.Z = cosf(lat + kLatEvery) * sinf(lon + kLonEvery);
+//			vertexDate_[startIndex + 4].position.W = 1.0f;
+//			vertexDate_[startIndex + 4].texcoord = { u + (float(1.0f) / float(kSubdivision)),v - (float(1.0f) / float(kSubdivision)) };
+//
+//			vertexDate_[startIndex + 4].normal.x = vertexDate_[startIndex + 4].position.X;
+//			vertexDate_[startIndex + 4].normal.y = vertexDate_[startIndex + 4].position.Y;
+//			vertexDate_[startIndex + 4].normal.z = vertexDate_[startIndex + 4].position.Z;
+//
+//
+//			vertexDate_[startIndex + 5].position.X = cosf(lat) * cosf(lon + kLonEvery);
+//			vertexDate_[startIndex + 5].position.Y = sinf(lat);
+//			vertexDate_[startIndex + 5].position.Z = cosf(lat) * sinf(lon + kLonEvery);
+//			vertexDate_[startIndex + 5].position.W = 1.0f;
+//			vertexDate_[startIndex + 5].texcoord = { u + (float(1.0f) / float(kSubdivision)),v };
+//
+//			vertexDate_[startIndex + 5].normal.x = vertexDate_[startIndex + 5].position.X;
+//			vertexDate_[startIndex + 5].normal.y = vertexDate_[startIndex + 5].position.Y;
+//			vertexDate_[startIndex + 5].normal.z = vertexDate_[startIndex + 5].position.Z;
+//
+//		}
+//	}*/
+//
+//	/*vertexResource2_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * 3);
+//
+//	vertexBufferView2_.BufferLocation = vertexResource2_->GetGPUVirtualAddress();
+//	vertexBufferView2_.SizeInBytes = sizeof(VertexData) * 3;
+//	vertexBufferView2_.StrideInBytes = sizeof(VertexData);
+//
+//	vertexDate2_ = nullptr;
+//	vertexResource2_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDate2_));
+//
+//	vertexDate2_[0] = { { -0.5f,-0.5f,0.5f,1.0f }, { 0.0f,1.0f }, { 0.0f,0.0f,-1.0f } };
+//	vertexDate2_[1] = { { 0.0f,0.0f,0.0f,1.0f }, { 0.5f,0.0f }, { 0.0f,0.0f,-1.0f } };
+//	vertexDate2_[2] = { { 0.5f,-0.5f,-0.5f,1.0f }, { 1.0f,1.0f }, { 0.0f,0.0f,-1.0f } };*/
+//
+//	/*std::random_device seed;
+//	std::mt19937 random(seed());
+//	std::uniform_real_distribution<> number(-3.5, 3.5);
+//	std::uniform_real_distribution<> velXZNumber(-0.05f, 0.05f);
+//	std::uniform_real_distribution<> velYNumber(0.01f, 0.06f);
+//	std::uniform_real_distribution<> rotNumber(-0.1f, 0.1f);
+//
+//	for (int i = 0; i < particleIndex; i++)
+//	{
+//		vertexParticleResource_[i] = CreateBufferResource(device_, sizeof(VertexData) * 3);
+//
+//		vertexParticleBufferView_[i].BufferLocation = vertexParticleResource_[i]->GetGPUVirtualAddress();
+//		vertexParticleBufferView_[i].SizeInBytes = sizeof(VertexData) * 3;
+//		vertexParticleBufferView_[i].StrideInBytes = sizeof(VertexData);
+//
+//		vertexParticleDate_[i] = nullptr;
+//		vertexParticleResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&vertexParticleDate_[i]));
+//
+//		vertexParticleDate_[i][0] = { { -0.3f,-0.3f,0.0f,1.0f }, { 0.0f,1.0f }, { 0.0f,0.0f,-1.0f } };
+//		vertexParticleDate_[i][1] = { { 0.0f,0.3f,0.0f,1.0f }, { 0.5f,0.0f }, { 0.0f,0.0f,-1.0f } };
+//		vertexParticleDate_[i][2] = { { 0.3f,-0.3f,0.0f,1.0f }, { 1.0f,1.0f }, { 0.0f,0.0f,-1.0f } };
+//
+//
+//		wvpParticleResource_[i] = CreateBufferResource(device_, sizeof(TransformationMatrix));
+//		wvpParticleDate_[i] = nullptr;
+//		wvpParticleResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&wvpParticleDate_[i]));
+//		wvpParticleDate_[i]->WVP = MakeIdentity4x4();
+//		wvpParticleDate_[i]->World = MakeIdentity4x4();
+//
+//		materialParticleResource_[i] = CreateBufferResource(device_, sizeof(Material));
+//		materialParticleDate_[i] = nullptr;
+//		materialParticleResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&materialParticleDate_[i]));
+//		materialParticleDate_[i]->color = particleColor;
+//		materialParticleDate_[i]->enableLighting = false;
+//		materialParticleDate_[i]->uvTransform = MakeIdentity4x4();
+//
+//		float randomx = float(number(random));
+//		float randomz = float(number(random));
+//
+//		transformParticle[i] = { {0.5f,0.5f,0.5f},{0.0f,0.0f,0.0f},{randomx,-2.5f,randomz} };
+//
+//		float randomvelx = float(velXZNumber(random));
+//		float randomvely = float(velYNumber(random));
+//		float randomvelz = float(velXZNumber(random));
+//
+//		float randomRotx = float(rotNumber(random));
+//		float randomRoty = float(rotNumber(random));
+//		float randomRotz = float(rotNumber(random));
+//
+//		particleVel[i] = { randomvelx,randomvely,randomvelz };
+//		particleRot[i] = { randomRotx,randomRoty,randomRotz };
+//	}*/
+//
+//	/*particles.clear();*/
+//	/*if (isFluidMode_)
+//	{
+//		for (float i = eps; i < 600 - eps * 2; i++)
+//		{
+//			for (float j = 600 / 15; j <= 600 / 2; j++)
+//			{
+//				if (particles.size() >= particleIndex)
+//				{
+//
+//				}
+//				else
+//				{
+//					float jit = static_cast<float>(6 * rand()) / static_cast<float>(RAND_MAX);
+//					particles.emplace_back(Particle((j)+jit, i));
+//				}
+//
+//
+//				j += h_;
+//			}
+//			i += h_;
+//		}
+//	}
+//	else
+//	{
+//		particles.emplace_back(Particle(0.0f, 0.0f));
+//	}*/
+//
+//	/*particles.emplace_back(Particle(0.0f, 0.0f));
+//
+//	for (int i = 0; i <= particles.size() - 1; i++)
+//	{
+//		vertexFlowResource_[i] = CreateBufferResource(device_, sizeof(VertexDate) * 4);
+//		indexFlowResource_[i] = CreateBufferResource(device_, sizeof(uint32_t) * 6);
+//	}
+//
+//	vertexFlowBufferView_.BufferLocation = vertexFlowResource_[0]->GetGPUVirtualAddress();
+//	vertexFlowBufferView_.SizeInBytes = sizeof(VertexDate) * 4;
+//	vertexFlowBufferView_.StrideInBytes = sizeof(VertexDate);
+//
+//	indexFlowBufferView_.BufferLocation = indexFlowResource_[0]->GetGPUVirtualAddress();
+//	indexFlowBufferView_.SizeInBytes = sizeof(uint32_t) * 6;
+//	indexFlowBufferView_.Format = DXGI_FORMAT_R32_UINT;
+//
+//	for (int i = 0; i <= particles.size() - 1; i++)
+//	{
+//		vertexFlowDate_[i] = nullptr;
+//		vertexFlowResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&vertexFlowDate_[i]));
+//
+//		vertexFlowDate_[i][0] = { { -6.0f,6.0f,0.0f,1.0f }, { 0.0f,1.0f }, { 0.0f,0.0f,-1.0f } };
+//		vertexFlowDate_[i][1] = { { -6.0f,-6.0f,0.0f,1.0f }, { 0.0f,0.0f }, { 0.0f,0.0f,-1.0f } };
+//		vertexFlowDate_[i][2] = { { 6.0f,6.0f,0.0f,1.0f }, { 1.0f,1.0f }, { 0.0f,0.0f,-1.0f } };
+//		vertexFlowDate_[i][3] = { { 6.0f,-6.0f,0.0f,1.0f }, { 1.0f,0.0f }, { 0.0f,0.0f,-1.0f } };
+//
+//
+//		indexFlowResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&indexFlowData_[i]));
+//		indexFlowData_[i][0] = 0;
+//		indexFlowData_[i][1] = 1;
+//		indexFlowData_[i][2] = 2;
+//
+//		indexFlowData_[i][3] = 1;
+//		indexFlowData_[i][4] = 3;
+//		indexFlowData_[i][5] = 2;
+//
+//
+//		wvpFlowResource_[i] = CreateBufferResource(device_, sizeof(TransformationMatrix));
+//		wvpFlowDate_[i] = nullptr;
+//		wvpFlowResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&wvpFlowDate_[i]));
+//		wvpFlowDate_[i]->WVP = MakeIdentity4x4();
+//		wvpFlowDate_[i]->World = MakeIdentity4x4();
+//	}
+//	materialFlowResource_ = CreateBufferResource(device_, sizeof(Materials));
+//	materialFlowDate_ = nullptr;
+//	materialFlowResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialFlowDate_));
+//	materialFlowDate_->color = particleColor;
+//	materialFlowDate_->enableLighting = false;
+//	materialFlowDate_->uvTransform = MakeIdentity4x4();
+//
+//	particleDateResource_ = CreateBufferResource(device_, sizeof(ParticleDate));
+//	particleDate_ = nullptr;
+//	particleDateResource_->Map(0, nullptr, reinterpret_cast<void**>(&particleDate_));
+//	particleDate_->particleCount = int(particles.size() - 1);
+//	particleDate_->threshold = 1.6f;
+//	for (int i = 0; i < particleDate_->particleCount; i++)
+//	{
+//		particleDate_->center[i] = { 0.0f,0.0f,0.0f,0.0f };
+//		particleDate_->radius[i] = { 6.0f,0.0f,0.0f,0.0f };
+//	}
+//
+//	particleDate_->padding[0] = 0;
+//	particleDate_->padding[1] = 0;
+//
+//	Matrix4x4 viewMatSprite = MakeIdentity4x4();
+//	Matrix4x4 projectMatSprite = MakeOrthographicMatrix(0.0f, 0.0f, float(Fuji::GetkWindowWidth()), float(Fuji::GetkWindowHeight()), 0.0f, 100.0f);
+//	Matrix4x4 worldViewProMatSpriteOrigine = Multiply(viewMatSprite, projectMatSprite);
+//	Matrix4x4 worldViewProMatSprite = worldViewProMatSpriteOrigine;
+//	for (size_t i = 0; i <= particles.size() - 1; i++)
+//	{
+//		Matrix4x4 worldMatSprite = MakeAffineMatrix(Vector3(1.0f, 1.0f, 1.0f), Vector3(0.0f, 0.0f, 0.0f), particles[i].pos);
+//		worldViewProMatSprite = worldViewProMatSpriteOrigine;
+//		worldViewProMatSprite = Multiply(worldMatSprite, worldViewProMatSprite);
+//
+//		wvpFlowDate_[i]->World = worldMatSprite;
+//		wvpFlowDate_[i]->WVP = worldViewProMatSprite;
+//
+//		particleDate_->center[i] = { worldMatSprite.m[3][0],worldMatSprite.m[3][1],0.0f,0.0f };
+//	}*/
+//}
+
+//void DXCom::SettingSpriteVertex()
+//{
+//	// Sprite
+//	/*vertexResourceSprite_ = CreateBufferResource(device_.Get(), sizeof(VertexDate) * 4);
+//
+//	vertexBufferViewSprite_.BufferLocation = vertexResourceSprite_->GetGPUVirtualAddress();
+//	vertexBufferViewSprite_.SizeInBytes = sizeof(VertexDate) * 4;
+//	vertexBufferViewSprite_.StrideInBytes = sizeof(VertexDate);
+//
+//	vertexDataSprite_ = nullptr;
+//	vertexResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSprite_));
+//
+//	vertexDataSprite_[0].position = { 0.0f,360.0f,0.0f,1.0f };
+//	vertexDataSprite_[0].texcoord = { 0.0f,1.0f };
+//	vertexDataSprite_[0].normal = { 0.0f,0.0f,-1.0f };
+//
+//	vertexDataSprite_[1].position = { 0.0f,0.0f,0.0f,1.0f };
+//	vertexDataSprite_[1].texcoord = { 0.0f,0.0f };
+//	vertexDataSprite_[1].normal = { 0.0f,0.0f,-1.0f };
+//
+//	vertexDataSprite_[2].position = { 640.0f,360.0f,0.0f,1.0f };
+//	vertexDataSprite_[2].texcoord = { 1.0f,1.0f };
+//	vertexDataSprite_[2].normal = { 0.0f,0.0f,-1.0f };
+//
+//
+//	vertexDataSprite_[3].position = { 640.0f,0.0f,0.0f,1.0f };
+//	vertexDataSprite_[3].texcoord = { 1.0f,0.0f };
+//	vertexDataSprite_[3].normal = { 0.0f,0.0f,-1.0f };
+//
+//
+//	indexResoureceSprite = CreateBufferResource(device_.Get(), sizeof(uint32_t) * 6);
+//	indexBufferViewSprite.BufferLocation = indexResoureceSprite->GetGPUVirtualAddress();
+//	indexBufferViewSprite.SizeInBytes = sizeof(uint32_t) * 6;
+//	indexBufferViewSprite.Format = DXGI_FORMAT_R32_UINT;
+//
+//	indexResoureceSprite->Map(0, nullptr, reinterpret_cast<void**>(&indexDataSprite));
+//	indexDataSprite[0] = 0;
+//	indexDataSprite[1] = 1;
+//	indexDataSprite[2] = 2;
+//
+//	indexDataSprite[3] = 1;
+//	indexDataSprite[4] = 3;
+//	indexDataSprite[5] = 2;*/
+//
+//	////model
+//	//modelData_ = LoadObjFile("resource", "axis.obj");
+//	//vertexModelResource_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * modelData_.vertices.size());
+//	//vertexModelBufferView_.BufferLocation = vertexModelResource_->GetGPUVirtualAddress();
+//	//vertexModelBufferView_.SizeInBytes = UINT(sizeof(VertexData) * modelData_.vertices.size());
+//	//vertexModelBufferView_.StrideInBytes = sizeof(VertexData);
+//
+//	//vertexModelResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataModel_));
+//	//std::memcpy(vertexDataModel_, modelData_.vertices.data(), sizeof(VertexData) * modelData_.vertices.size());
+//
+//	//wvpResourceModel_ = CreateBufferResource(device_.Get(), sizeof(TransformationMatrix));
+//	//wvpDateModel_ = nullptr;
+//	//wvpResourceModel_->Map(0, nullptr, reinterpret_cast<void**>(&wvpDateModel_));
+//	//wvpDateModel_->WVP = MakeIdentity4x4();
+//	//wvpDateModel_->World = MakeIdentity4x4();
+//
+//	//materialResourceModel_ = CreateBufferResource(device_.Get(), sizeof(Material));
+//	//materialDateModel_ = nullptr;
+//	//materialResourceModel_->Map(0, nullptr, reinterpret_cast<void**>(&materialDateModel_));
+//	////色変えるやつ（Resource）
+//	//materialDateModel_->color = { 1.0f,1.0f,1.0f,1.0f };
+//	//materialDateModel_->enableLighting = false;
+//	//materialDateModel_->uvTransform = MakeIdentity4x4();
+//
+//	/*directionalLightResourceModel_ = CreateBufferResource(device_.Get(), sizeof(DirectionalLight));
+//	directionalLightDataModel_ = nullptr;
+//	directionalLightResourceModel_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightDataModel_));
+//	directionalLightDataModel_->color = { 1.0f,1.0f,1.0f,1.0f };
+//	directionalLightDataModel_->direction = { 1.0f,0.0f,0.0f };
+//	directionalLightDataModel_->intensity = 1.0f;*/
+//
+//
+//	//FenceModel
+//	//fenceModelData_ = LoadObjFile("resource", "fence.obj");
+//	//vertexFenceModelResource_ = CreateBufferResource(device_.Get(), sizeof(VertexDate) * fenceModelData_.vertices.size());
+//	//vertexFenceModelBufferView_.BufferLocation = vertexFenceModelResource_->GetGPUVirtualAddress();
+//	//vertexFenceModelBufferView_.SizeInBytes = UINT(sizeof(VertexDate) * fenceModelData_.vertices.size());
+//	//vertexFenceModelBufferView_.StrideInBytes = sizeof(VertexDate);
+//
+//	//vertexFenceModelResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataFenceModel_));
+//	//std::memcpy(vertexDataFenceModel_, fenceModelData_.vertices.data(), sizeof(VertexDate) * fenceModelData_.vertices.size());
+//
+//	//wvpResourceFenceModel_ = CreateBufferResource(device_.Get(), sizeof(TransformationMatrix));
+//	//wvpDateFenceModel_ = nullptr;
+//	//wvpResourceFenceModel_->Map(0, nullptr, reinterpret_cast<void**>(&wvpDateFenceModel_));
+//	//wvpDateFenceModel_->WVP = MakeIdentity4x4();
+//	//wvpDateFenceModel_->World = MakeIdentity4x4();
+//
+//	//materialResourceFenceModel_ = CreateBufferResource(device_.Get(), sizeof(Materials));
+//	//materialDateFenceModel_ = nullptr;
+//	//materialResourceFenceModel_->Map(0, nullptr, reinterpret_cast<void**>(&materialDateFenceModel_));
+//	////色変えるやつ（Resource）
+//	//materialDateFenceModel_->color = { 1.0f,1.0f,1.0f,1.0f };
+//	//materialDateFenceModel_->enableLighting = LightMode::kLightNone;
+//	//materialDateFenceModel_->uvTransform = MakeIdentity4x4();
+//
+//	//directionalLightResourceFenceModel_ = CreateBufferResource(device_.Get(), sizeof(DirectionalLight));
+//	//directionalLightDataFenceModel_ = nullptr;
+//	//directionalLightResourceFenceModel_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightDataFenceModel_));
+//	//directionalLightDataFenceModel_->color = { 1.0f,1.0f,1.0f,1.0f };
+//	//directionalLightDataFenceModel_->direction = { 1.0f,0.0f,0.0f };
+//	//directionalLightDataFenceModel_->intensity = 1.0f;
+//
+//
+//	////SuzanneModel
+//	//suzanneModelData_ = LoadObjFile("resource", "suzanne.obj");
+//	//vertexSuzanneModelResource_ = CreateBufferResource(device_.Get(), sizeof(VertexDate) * suzanneModelData_.vertices.size());
+//	//vertexSuzanneModelBufferView_.BufferLocation = vertexSuzanneModelResource_->GetGPUVirtualAddress();
+//	//vertexSuzanneModelBufferView_.SizeInBytes = UINT(sizeof(VertexDate) * suzanneModelData_.vertices.size());
+//	//vertexSuzanneModelBufferView_.StrideInBytes = sizeof(VertexDate);
+//
+//	//vertexSuzanneModelResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSuzanneModel_));
+//	//std::memcpy(vertexDataSuzanneModel_, suzanneModelData_.vertices.data(), sizeof(VertexDate) * suzanneModelData_.vertices.size());
+//
+//	//wvpResourceSuzanneModel_ = CreateBufferResource(device_.Get(), sizeof(TransformationMatrix));
+//	//wvpDateSuzanneModel_ = nullptr;
+//	//wvpResourceSuzanneModel_->Map(0, nullptr, reinterpret_cast<void**>(&wvpDateSuzanneModel_));
+//	//wvpDateSuzanneModel_->WVP = MakeIdentity4x4();
+//	//wvpDateSuzanneModel_->World = MakeIdentity4x4();
+//
+//	//materialResourceSuzanneModel_ = CreateBufferResource(device_.Get(), sizeof(Materials));
+//	//materialDateSuzanneModel_ = nullptr;
+//	//materialResourceSuzanneModel_->Map(0, nullptr, reinterpret_cast<void**>(&materialDateSuzanneModel_));
+//	////色変えるやつ（Resource）
+//	//materialDateSuzanneModel_->color = { 1.0f,1.0f,1.0f,1.0f };
+//	//materialDateSuzanneModel_->enableLighting = LightMode::kLightHalfLambert;
+//	//materialDateSuzanneModel_->uvTransform = MakeIdentity4x4();
+//
+//	//directionalLightResourceSuzanneModel_ = CreateBufferResource(device_.Get(), sizeof(DirectionalLight));
+//	//directionalLightDataSuzanneModel_ = nullptr;
+//	//directionalLightResourceSuzanneModel_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightDataSuzanneModel_));
+//	//directionalLightDataSuzanneModel_->color = { 1.0f,1.0f,1.0f,1.0f };
+//	//directionalLightDataSuzanneModel_->direction = { 1.0f,0.0f,0.0f };
+//	//directionalLightDataSuzanneModel_->intensity = 1.0f;
+//
+//
+//	////MMeshModel
+//	//mMeshModelData_ = LoadObjFile("resource", "multiMesh.obj");
+//	//vertexMMeshModelResource_ = CreateBufferResource(device_.Get(), sizeof(VertexDate) * mMeshModelData_.vertices.size());
+//	//vertexMMeshModelBufferView_.BufferLocation = vertexMMeshModelResource_->GetGPUVirtualAddress();
+//	//vertexMMeshModelBufferView_.SizeInBytes = UINT(sizeof(VertexDate) * mMeshModelData_.vertices.size());
+//	//vertexMMeshModelBufferView_.StrideInBytes = sizeof(VertexDate);
+//
+//	//vertexMMeshModelResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataMMeshModel_));
+//	//std::memcpy(vertexDataMMeshModel_, mMeshModelData_.vertices.data(), sizeof(VertexDate) * mMeshModelData_.vertices.size());
+//
+//	//wvpResourceMMeshModel_ = CreateBufferResource(device_.Get(), sizeof(TransformationMatrix));
+//	//wvpDateMMeshModel_ = nullptr;
+//	//wvpResourceMMeshModel_->Map(0, nullptr, reinterpret_cast<void**>(&wvpDateMMeshModel_));
+//	//wvpDateMMeshModel_->WVP = MakeIdentity4x4();
+//	//wvpDateMMeshModel_->World = MakeIdentity4x4();
+//
+//	//materialResourceMMeshModel_ = CreateBufferResource(device_.Get(), sizeof(Materials));
+//	//materialDateMMeshModel_ = nullptr;
+//	//materialResourceMMeshModel_->Map(0, nullptr, reinterpret_cast<void**>(&materialDateMMeshModel_));
+//	////色変えるやつ（Resource）
+//	//materialDateMMeshModel_->color = { 1.0f,1.0f,1.0f,1.0f };
+//	//materialDateMMeshModel_->enableLighting = LightMode::kLightNone;
+//	//materialDateMMeshModel_->uvTransform = MakeIdentity4x4();
+//
+//	//directionalLightResourceMMeshModel_ = CreateBufferResource(device_.Get(), sizeof(DirectionalLight));
+//	//directionalLightDataMMeshModel_ = nullptr;
+//	//directionalLightResourceMMeshModel_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightDataMMeshModel_));
+//	//directionalLightDataMMeshModel_->color = { 1.0f,1.0f,1.0f,1.0f };
+//	//directionalLightDataMMeshModel_->direction = { 1.0f,0.0f,0.0f };
+//	//directionalLightDataMMeshModel_->intensity = 1.0f;
+//
+//
+//	////PlaneModel
+//	//planeModelData_ = LoadObjFile("resource", "plane.obj");
+//	//vertexPlaneModelResource_ = CreateBufferResource(device_.Get(), sizeof(VertexDate) * planeModelData_.vertices.size());
+//	//vertexPlaneModelBufferView_.BufferLocation = vertexPlaneModelResource_->GetGPUVirtualAddress();
+//	//vertexPlaneModelBufferView_.SizeInBytes = UINT(sizeof(VertexDate) * planeModelData_.vertices.size());
+//	//vertexPlaneModelBufferView_.StrideInBytes = sizeof(VertexDate);
+//
+//	//vertexPlaneModelResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataPlaneModel_));
+//	//std::memcpy(vertexDataPlaneModel_, planeModelData_.vertices.data(), sizeof(VertexDate) * planeModelData_.vertices.size());
+//
+//	//wvpResourcePlaneModel_ = CreateBufferResource(device_.Get(), sizeof(TransformationMatrix));
+//	//wvpDatePlaneModel_ = nullptr;
+//	//wvpResourcePlaneModel_->Map(0, nullptr, reinterpret_cast<void**>(&wvpDatePlaneModel_));
+//	//wvpDatePlaneModel_->WVP = MakeIdentity4x4();
+//	//wvpDatePlaneModel_->World = MakeIdentity4x4();
+//
+//	//materialResourcePlaneModel_ = CreateBufferResource(device_.Get(), sizeof(Materials));
+//	//materialDatePlaneModel_ = nullptr;
+//	//materialResourcePlaneModel_->Map(0, nullptr, reinterpret_cast<void**>(&materialDatePlaneModel_));
+//	////色変えるやつ（Resource）
+//	//materialDatePlaneModel_->color = { 1.0f,1.0f,1.0f,1.0f };
+//	//materialDatePlaneModel_->enableLighting = LightMode::kLightNone;
+//	//materialDatePlaneModel_->uvTransform = MakeIdentity4x4();
+//
+//	//directionalLightResourcePlaneModel_ = CreateBufferResource(device_.Get(), sizeof(DirectionalLight));
+//	//directionalLightDataPlaneModel_ = nullptr;
+//	//directionalLightResourcePlaneModel_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightDataPlaneModel_));
+//	//directionalLightDataPlaneModel_->color = { 1.0f,1.0f,1.0f,1.0f };
+//	//directionalLightDataPlaneModel_->direction = { 1.0f,0.0f,0.0f };
+//	//directionalLightDataPlaneModel_->intensity = 1.0f;
+//
+//}
+
+//void DXCom::SettingResource()
+//{
+//	//wvpResource_ = CreateBufferResource(device_.Get(), sizeof(TransformationMatrix));
+//	//wvpDate_ = nullptr;
+//	//wvpResource_->Map(0, nullptr, reinterpret_cast<void**>(&wvpDate_));
+//	//wvpDate_->WVP = MakeIdentity4x4();
+//	//wvpDate_->World = MakeIdentity4x4();
+//
+//	//materialResource_ = CreateBufferResource(device_.Get(), sizeof(Materials));
+//	//materialDate_ = nullptr;
+//	//materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialDate_));
+//	////色変えるやつ（Resource）
+//	//materialDate_->color = { 1.0f,1.0f,1.0f,1.0f };
+//	//materialDate_->enableLighting = LightMode::kLightHalfLambert;
+//	//materialDate_->uvTransform = MakeIdentity4x4();
+//
+//	//directionalLightResource_ = CreateBufferResource(device_.Get(), sizeof(DirectionalLight));
+//	//directionalLightData_ = nullptr;
+//	//directionalLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData_));
+//	//directionalLightData_->color = { 1.0f,1.0f,1.0f,1.0f };
+//	//directionalLightData_->direction = { 1.0f,0.0f,0.0f };
+//	//directionalLightData_->intensity = 1.0f;
+//
+//
+//	//wvpResource2_ = CreateBufferResource(device_.Get(), sizeof(TransformationMatrix));
+//	//wvpDate2_ = nullptr;
+//	//wvpResource2_->Map(0, nullptr, reinterpret_cast<void**>(&wvpDate2_));
+//	//wvpDate2_->WVP = MakeIdentity4x4();
+//	//wvpDate2_->World = MakeIdentity4x4();
+//
+//	//materialResource2_ = CreateBufferResource(device_.Get(), sizeof(Material));
+//	//materialDate2_ = nullptr;
+//	//materialResource2_->Map(0, nullptr, reinterpret_cast<void**>(&materialDate2_));
+//	////色変えるやつ（Resource）
+//	//materialDate2_->color = { 1.0f,1.0f,1.0f,1.0f };
+//	//materialDate2_->enableLighting = false;
+//	//materialDate2_->uvTransform = MakeIdentity4x4();
+//
+//	//directionalLightResource2_ = CreateBufferResource(device_.Get(), sizeof(DirectionalLight));
+//	//directionalLightData2_ = nullptr;
+//	//directionalLightResource2_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData2_));
+//	//directionalLightData2_->color = { 1.0f,1.0f,1.0f,1.0f };
+//	//directionalLightData2_->direction = { 1.0f,0.0f,0.0f };
+//	//directionalLightData2_->intensity = 1.0f;
+//
+//}
+
+//void DXCom::SettingSpriteResource()
+//{
+//	//transformationMatResourceSprite_ = CreateBufferResource(device_.Get(), sizeof(TransformationMatrix));
+//	//transformationMatDataSprite_ = nullptr;
+//	//transformationMatResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatDataSprite_));
+//	//transformationMatDataSprite_->WVP = MakeIdentity4x4();
+//	//transformationMatDataSprite_->World = MakeIdentity4x4();
+//
+//
+//	//materialResourceSprite_ = CreateBufferResource(device_.Get(), sizeof(Materials));
+//	//materialDateSprite_ = nullptr;
+//	//materialResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&materialDateSprite_));
+//	////色変えるやつ（Resource）
+//	//materialDateSprite_->color = { 1.0f,1.0f,1.0f,1.0f };
+//	//materialDateSprite_->enableLighting = LightMode::kLightNone;
+//	//materialDateSprite_->uvTransform = MakeIdentity4x4();
+//}
 
 void DXCom::SettingTexture()
 {
@@ -1692,7 +1664,7 @@ void DXCom::SettingTexture()
 	//IncreaseDescriptorIndex();
 
 
-	D3D12_SHADER_RESOURCE_VIEW_DESC instancingSrvDesc{};
+	/*D3D12_SHADER_RESOURCE_VIEW_DESC instancingSrvDesc{};
 	instancingSrvDesc.Format = DXGI_FORMAT_UNKNOWN;
 	instancingSrvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 	instancingSrvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
@@ -1704,38 +1676,17 @@ void DXCom::SettingTexture()
 	instancingSrvHandleCPU_ = GetCPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, descriptorIndex_);
 	instancingSrvHandleGPU_ = GetGPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, descriptorIndex_);
 	device_->CreateShaderResourceView(instancingResource.Get(), &instancingSrvDesc, instancingSrvHandleCPU_);
-	IncreaseDescriptorIndex();
+	IncreaseDescriptorIndex();*/
 
 
-	HRESULT hr = commandList_->Close();
-	assert(SUCCEEDED(hr));
+	command_->Close();
 
-	Microsoft::WRL::ComPtr<ID3D12CommandList> commandLists[] = { commandList_.Get() };
-	commandQueue_->ExecuteCommandLists(1, commandLists->GetAddressOf());
+	command_->Execution();
 
-	fenceValue_++;
-	commandQueue_->Signal(fence_.Get(), fenceValue_);
-	if (fence_->GetCompletedValue() < fenceValue_)
-	{
-		HANDLE fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-		assert(fenceEvent != nullptr);
-		fence_->SetEventOnCompletion(fenceValue_, fenceEvent);
-		WaitForSingleObject(fenceEvent, INFINITE);
-		CloseHandle(fenceEvent);
-	}
-
-	hr = commandAllocator_->Reset();
-	assert(SUCCEEDED(hr));
-	hr = commandList_->Reset(commandAllocator_.Get(), nullptr);
-	assert(SUCCEEDED(hr));
+	command_->Reset();
 
 }
 
-
-void DXCom::FirstFrame()
-{
-
-}
 
 void DXCom::PreDraw()
 {
@@ -1745,7 +1696,7 @@ void DXCom::PreDraw()
 	offbarrier.Transition.pResource = offscreenrt_.Get();
 	offbarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_GENERIC_READ;
 	offbarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	commandList_->ResourceBarrier(1, &offbarrier);
+	command_->GetList()->ResourceBarrier(1, &offbarrier);
 
 
 	SetRenderTargets();
@@ -1757,25 +1708,12 @@ void DXCom::PreDraw()
 
 void DXCom::Command()
 {
-	D3D12_VIEWPORT viewport{};
-	viewport.Width = MyWin::kWindowWidth;
-	viewport.Height = MyWin::kWindowHeight;
-	viewport.TopLeftX = 0;
-	viewport.TopLeftY = 0;
-	viewport.MinDepth = 0.0f;
-	viewport.MaxDepth = 1.0f;
-
-	D3D12_RECT scissorRect{};
-	scissorRect.left = 0;
-	scissorRect.right = MyWin::kWindowWidth;
-	scissorRect.top = 0;
-	scissorRect.bottom = MyWin::kWindowHeight;
+	ID3D12GraphicsCommandList* commandList = command_->GetList();
 
 
-	commandList_->RSSetViewports(1, &viewport);
-	commandList_->RSSetScissorRects(1, &scissorRect);
-	commandList_->SetGraphicsRootSignature(rootSignature_.Get());
-	commandList_->SetPipelineState(graphicsPipelineState_.Get());
+	command_->SetViewAndscissor();
+	commandList->SetGraphicsRootSignature(rootSignature_.Get());
+	commandList->SetPipelineState(graphicsPipelineState_.Get());
 
 	//三角形１
 	if (isSphere_)
@@ -1958,13 +1896,16 @@ void DXCom::Command()
 
 void DXCom::PostEffect()
 {
+
+	ID3D12GraphicsCommandList* commandList = command_->GetList();
+
 	D3D12_RESOURCE_BARRIER offbarrier{};
 	offbarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	offbarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 	offbarrier.Transition.pResource = offscreenrt_.Get();
 	offbarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	offbarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
-	commandList_->ResourceBarrier(1, &offbarrier);
+	commandList->ResourceBarrier(1, &offbarrier);
 
 
 	UINT backBufferIndex = swapChain_->GetCurrentBackBufferIndex();
@@ -1975,14 +1916,14 @@ void DXCom::PostEffect()
 	barrier.Transition.pResource = swapChainResources_[backBufferIndex].Get();
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	commandList_->ResourceBarrier(1, &barrier);
+	commandList->ResourceBarrier(1, &barrier);
 
 	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
-	commandList_->OMSetRenderTargets(1, &rtvHandles_[backBufferIndex], false, &dsvHandle);
-	commandList_->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+	commandList->OMSetRenderTargets(1, &rtvHandles_[backBufferIndex], false, &dsvHandle);
+	commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
 	float clearColor[] = { 0.1f,0.25f,0.5f,1.0f };
-	commandList_->ClearRenderTargetView(rtvHandles_[backBufferIndex], clearColor, 0, nullptr);
+	commandList->ClearRenderTargetView(rtvHandles_[backBufferIndex], clearColor, 0, nullptr);
 
 	D3D12_VIEWPORT viewport{};
 	viewport.Width = MyWin::kWindowWidth;
@@ -2001,16 +1942,16 @@ void DXCom::PostEffect()
 
 	if (isGrayscale_)
 	{
-		commandList_->RSSetViewports(1, &viewport);
-		commandList_->RSSetScissorRects(1, &scissorRect);
-		commandList_->SetGraphicsRootSignature(rootSignatureGrayscale_.Get());
-		commandList_->SetPipelineState(graphicsPipelineStateGary_.Get());
+		commandList->RSSetViewports(1, &viewport);
+		commandList->RSSetScissorRects(1, &scissorRect);
+		commandList->SetGraphicsRootSignature(rootSignatureGrayscale_.Get());
+		commandList->SetPipelineState(graphicsPipelineStateGary_.Get());
 
-		commandList_->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		commandList_->IASetIndexBuffer(&indexGrayBufferView_);
-		commandList_->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
-		commandList_->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
-		commandList_->DrawIndexedInstanced(6, 1, 0, 0, 0);
+		commandList->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		commandList->IASetIndexBuffer(&indexGrayBufferView_);
+		commandList->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
+		commandList->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
+		commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
 	}
 
 	/*if (isMetaBall_)
@@ -2030,35 +1971,37 @@ void DXCom::PostEffect()
 
 	if (isGaussian_)
 	{
-		commandList_->RSSetViewports(1, &viewport);
-		commandList_->RSSetScissorRects(1, &scissorRect);
-		commandList_->SetGraphicsRootSignature(rootSignatureGauss_.Get());
-		commandList_->SetPipelineState(graphicsPipelineStateGauss_.Get());
+		commandList->RSSetViewports(1, &viewport);
+		commandList->RSSetScissorRects(1, &scissorRect);
+		commandList->SetGraphicsRootSignature(rootSignatureGauss_.Get());
+		commandList->SetPipelineState(graphicsPipelineStateGauss_.Get());
 
-		commandList_->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		commandList_->IASetIndexBuffer(&indexGrayBufferView_);
-		commandList_->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
-		commandList_->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
-		commandList_->DrawIndexedInstanced(6, 1, 0, 0, 0);
+		commandList->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		commandList->IASetIndexBuffer(&indexGrayBufferView_);
+		commandList->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
+		commandList->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
+		commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
 	}
 
 	if (isNonePost_||isMetaBall_)
 	{
-		commandList_->RSSetViewports(1, &viewport);
-		commandList_->RSSetScissorRects(1, &scissorRect);
-		commandList_->SetGraphicsRootSignature(rootSignatureNone_.Get());
-		commandList_->SetPipelineState(graphicsPipelineStateNone_.Get());
+		commandList->RSSetViewports(1, &viewport);
+		commandList->RSSetScissorRects(1, &scissorRect);
+		commandList->SetGraphicsRootSignature(rootSignatureNone_.Get());
+		commandList->SetPipelineState(graphicsPipelineStateNone_.Get());
 
-		commandList_->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		commandList_->IASetIndexBuffer(&indexGrayBufferView_);
-		commandList_->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
-		commandList_->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
-		commandList_->DrawIndexedInstanced(6, 1, 0, 0, 0);
+		commandList->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		commandList->IASetIndexBuffer(&indexGrayBufferView_);
+		commandList->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
+		commandList->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
+		commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
 	}
 
 }
 
 void DXCom::PostDraw() {
+
+	ID3D12GraphicsCommandList* commandList = command_->GetList();
 
 	UINT backBufferIndex = swapChain_->GetCurrentBackBufferIndex();
 
@@ -2068,39 +2011,25 @@ void DXCom::PostDraw() {
 	barrier.Transition.pResource = swapChainResources_[backBufferIndex].Get();
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
-	commandList_->ResourceBarrier(1, &barrier);
+	commandList->ResourceBarrier(1, &barrier);
 
 	// 命令のクローズ
-	HRESULT hr = commandList_->Close();
-	assert(SUCCEEDED(hr));
+	command_->Close();
 
 	// コマンドリストの実行
-	Microsoft::WRL::ComPtr<ID3D12CommandList> commandLists[] = { commandList_.Get() };
-	commandQueue_->ExecuteCommandLists(1, commandLists->GetAddressOf());
+	command_->Execution();
 
 
 	swapChain_->Present(1, 0);
 
-	// コマンドリストの実行完了を待つ
-	fenceValue_++;
-	commandQueue_->Signal(fence_.Get(), fenceValue_);
-	if (fence_->GetCompletedValue() < fenceValue_) {
 
-		HANDLE fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-		assert(fenceEvent != nullptr);
-		fence_->SetEventOnCompletion(fenceValue_, fenceEvent);
-		WaitForSingleObject(fenceEvent, INFINITE);
-		CloseHandle(fenceEvent);
-	}
-
-	hr = commandAllocator_->Reset();
-	assert(SUCCEEDED(hr));
-	hr = commandList_->Reset(commandAllocator_.Get(), nullptr);
-	assert(SUCCEEDED(hr));
+	command_->Reset();
 }
 
 void DXCom::PreModelDraw()
 {
+
+	ID3D12GraphicsCommandList* commandList = command_->GetList();
 
 	D3D12_VIEWPORT viewport{};
 	viewport.Width = MyWin::kWindowWidth;
@@ -2117,34 +2046,18 @@ void DXCom::PreModelDraw()
 	scissorRect.bottom = MyWin::kWindowHeight;
 
 
-	commandList_->RSSetViewports(1, &viewport);
-	commandList_->RSSetScissorRects(1, &scissorRect);
-	commandList_->SetGraphicsRootSignature(rootSignature_.Get());
-	commandList_->SetPipelineState(graphicsPipelineState_.Get());
+	commandList->RSSetViewports(1, &viewport);
+	commandList->RSSetScissorRects(1, &scissorRect);
+	commandList->SetGraphicsRootSignature(rootSignature_.Get());
+	commandList->SetPipelineState(graphicsPipelineState_.Get());
 }
 
 void DXCom::CommandExecution() {
-	HRESULT hr = commandList_->Close();
-	assert(SUCCEEDED(hr));
+	command_->Close();
 
-	Microsoft::WRL::ComPtr<ID3D12CommandList> commandLists[] = { commandList_.Get() };
-	commandQueue_->ExecuteCommandLists(1, commandLists->GetAddressOf());
+	command_->Execution();
 
-	fenceValue_++;
-	commandQueue_->Signal(fence_.Get(), fenceValue_);
-	if (fence_->GetCompletedValue() < fenceValue_)
-	{
-		HANDLE fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-		assert(fenceEvent != nullptr);
-		fence_->SetEventOnCompletion(fenceValue_, fenceEvent);
-		WaitForSingleObject(fenceEvent, INFINITE);
-		CloseHandle(fenceEvent);
-	}
-
-	hr = commandAllocator_->Reset();
-	assert(SUCCEEDED(hr));
-	hr = commandList_->Reset(commandAllocator_.Get(), nullptr);
-	assert(SUCCEEDED(hr));
+	command_->Reset();
 }
 
 void DXCom::IncreaseDescriptorIndex() {
@@ -2158,18 +2071,18 @@ uint32_t DXCom::GetDescriptorIndex() const {
 void DXCom::SetRenderTargets() {
 
 	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
-	commandList_->OMSetRenderTargets(1, &rtvHandles_[2], false, &dsvHandle);
+	command_->GetList()->OMSetRenderTargets(1, &rtvHandles_[2], false, &dsvHandle);
 }
 
 void DXCom::ClearRenderTarget() {
 
-	commandList_->ClearRenderTargetView(rtvHandles_[2], clearColorValue.Color, 0, nullptr);
+	command_->GetList()->ClearRenderTargetView(rtvHandles_[2], clearColorValue.Color, 0, nullptr);
 }
 
 void DXCom::ClearDepthBuffer() {
 
 	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
-	commandList_->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+	command_->GetList()->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 }
 
 void DXCom::UpDate()
@@ -2974,44 +2887,44 @@ float DXCom::GetAspect()
 
 
 
-void DXCom::Log(const std::string& message)
-{
-	OutputDebugStringA(message.c_str());
-}
-
-std::wstring DXCom::ConvertString(const std::string& str)
-{
-	if (str.empty()) {
-		return std::wstring();
-	}
-
-	auto sizeNeeded = MultiByteToWideChar(CP_UTF8, 0, reinterpret_cast<const char*>(&str[0]), static_cast<int>(str.size()), NULL, 0);
-	if (sizeNeeded == 0) {
-		return std::wstring();
-	}
-	std::wstring result(sizeNeeded, 0);
-	MultiByteToWideChar(CP_UTF8, 0, reinterpret_cast<const char*>(&str[0]), static_cast<int>(str.size()), &result[0], sizeNeeded);
-	return result;
-}
-
-std::string DXCom::ConvertString(const std::wstring& str)
-{
-	if (str.empty()) {
-		return std::string();
-	}
-
-	auto sizeNeeded = WideCharToMultiByte(CP_UTF8, 0, str.data(), static_cast<int>(str.size()), NULL, 0, NULL, NULL);
-	if (sizeNeeded == 0) {
-		return std::string();
-	}
-	std::string result(sizeNeeded, 0);
-	WideCharToMultiByte(CP_UTF8, 0, str.data(), static_cast<int>(str.size()), result.data(), sizeNeeded, NULL, NULL);
-	return result;
-}
+//void DXCom::Log(const std::string& message)
+//{
+//	OutputDebugStringA(message.c_str());
+//}
+//
+//std::wstring DXCom::ConvertString(const std::string& str)
+//{
+//	if (str.empty()) {
+//		return std::wstring();
+//	}
+//
+//	auto sizeNeeded = MultiByteToWideChar(CP_UTF8, 0, reinterpret_cast<const char*>(&str[0]), static_cast<int>(str.size()), NULL, 0);
+//	if (sizeNeeded == 0) {
+//		return std::wstring();
+//	}
+//	std::wstring result(sizeNeeded, 0);
+//	MultiByteToWideChar(CP_UTF8, 0, reinterpret_cast<const char*>(&str[0]), static_cast<int>(str.size()), &result[0], sizeNeeded);
+//	return result;
+//}
+//
+//std::string DXCom::ConvertString(const std::wstring& str)
+//{
+//	if (str.empty()) {
+//		return std::string();
+//	}
+//
+//	auto sizeNeeded = WideCharToMultiByte(CP_UTF8, 0, str.data(), static_cast<int>(str.size()), NULL, 0, NULL, NULL);
+//	if (sizeNeeded == 0) {
+//		return std::string();
+//	}
+//	std::string result(sizeNeeded, 0);
+//	WideCharToMultiByte(CP_UTF8, 0, str.data(), static_cast<int>(str.size()), result.data(), sizeNeeded, NULL, NULL);
+//	return result;
+//}
 
 IDxcBlob* DXCom::CompileShader(const std::wstring& filePath, const wchar_t* profile, IDxcUtils* dxcUtils, IDxcCompiler3* dxcCompiler, IDxcIncludeHandler* includeHandler)
 {
-	Log(ConvertString(std::format(L"Begin CompileShader, path:{},profile:{}\n", filePath, profile)));
+	Logger::Log((std::format(L"Begin CompileShader, path:{},profile:{}\n", filePath, profile)));
 	IDxcBlobEncoding* shaderSource = nullptr;
 	HRESULT hr = dxcUtils->LoadFile(filePath.c_str(), nullptr, &shaderSource);
 	assert(SUCCEEDED(hr));
@@ -3045,7 +2958,7 @@ IDxcBlob* DXCom::CompileShader(const std::wstring& filePath, const wchar_t* prof
 	shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), nullptr);
 	if (shaderError != nullptr && shaderError->GetStringLength() != 0)
 	{
-		Log(shaderError->GetStringPointer());
+		Logger::Log(shaderError->GetStringPointer());
 		assert(false);
 	}
 
@@ -3053,7 +2966,7 @@ IDxcBlob* DXCom::CompileShader(const std::wstring& filePath, const wchar_t* prof
 	IDxcBlob* shaderBlob = nullptr;
 	hr = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
 	assert(SUCCEEDED(hr));
-	Log(ConvertString(std::format(L"Compile Succeeded, path:{}, profile:{}\n", filePath, profile)));
+	Logger::Log((std::format(L"Compile Succeeded, path:{}, profile:{}\n", filePath, profile)));
 	shaderSource->Release();
 	shaderResult->Release();
 	return shaderBlob;
@@ -3167,21 +3080,21 @@ D3D12_GPU_DESCRIPTOR_HANDLE DXCom::GetGPUDescriptorHandle(Microsoft::WRL::ComPtr
 	return handleGPU;
 }
 
-DirectX::ScratchImage DXCom::LoadTexture(const std::string& filePath)
-{
-	DirectX::ScratchImage image{};
-	std::wstring filePathw = ConvertString(filePath);
-	HRESULT hr = DirectX::LoadFromWICFile(filePathw.c_str(), DirectX::WIC_FLAGS_FORCE_SRGB, nullptr, image);
-	assert(SUCCEEDED(hr));
-
-	DirectX::ScratchImage mipImages{};
-	hr = DirectX::GenerateMipMaps(image.GetImages(), image.GetImageCount(), image.GetMetadata(),
-		DirectX::TEX_FILTER_SRGB, 0, mipImages);
-	assert(SUCCEEDED(hr));
-
-
-	return mipImages;
-}
+//DirectX::ScratchImage DXCom::LoadTexture(const std::string& filePath)
+//{
+//	DirectX::ScratchImage image{};
+//	std::wstring filePathw = Logger::ConvertString(filePath);
+//	HRESULT hr = DirectX::LoadFromWICFile(filePathw.c_str(), DirectX::WIC_FLAGS_FORCE_SRGB, nullptr, image);
+//	assert(SUCCEEDED(hr));
+//
+//	DirectX::ScratchImage mipImages{};
+//	hr = DirectX::GenerateMipMaps(image.GetImages(), image.GetImageCount(), image.GetMetadata(),
+//		DirectX::TEX_FILTER_SRGB, 0, mipImages);
+//	assert(SUCCEEDED(hr));
+//
+//
+//	return mipImages;
+//}
 
 Microsoft::WRL::ComPtr<ID3D12Resource> DXCom::CreateTextureResource(Microsoft::WRL::ComPtr<ID3D12Device> device, const DirectX::TexMetadata& metadata)
 {

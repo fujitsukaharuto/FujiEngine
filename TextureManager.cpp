@@ -1,5 +1,6 @@
 #include "TextureManager.h"
 #include "DXCom.h"
+#include "Logger.h"
 #include "ImGuiManager.h"
 
 #include "externals/DirectXTex/DirectXTex.h"
@@ -10,7 +11,7 @@ namespace {
 
 	DirectX::ScratchImage LoadTextureFile(const std::string& filePath) {
 		DirectX::ScratchImage image{};
-		std::wstring filePathw = DXCom::GetInstance()->ConvertString(filePath);
+		std::wstring filePathw = Logger::ConvertString(filePath);
 		HRESULT hr = DirectX::LoadFromWICFile(filePathw.c_str(), DirectX::WIC_FLAGS_FORCE_SRGB, nullptr, image);
 		assert(SUCCEEDED(hr));
 

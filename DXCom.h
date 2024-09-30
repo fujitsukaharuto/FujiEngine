@@ -18,6 +18,7 @@
 
 #include "MatrixCalculation.h"
 #include "MyWindow.h"
+#include "DXCommand.h"
 
 
 const int particleIndex = 400;
@@ -91,11 +92,11 @@ public:
 
 	static DXCom* GetInstance();
 
-	void InitDX(MyWin* myWin);
+	void Initialize(MyWin* myWin);
 
 	void SettingTexture();
 
-	void FirstFrame();
+
 	void PreDraw();
 	void Command();
 	void PostEffect();
@@ -116,7 +117,7 @@ public:
 
 	size_t GetBackBufferCount() const { return swapChainDesc_.BufferCount; }
 
-	ID3D12GraphicsCommandList* GetCommandList() const { return commandList_.Get(); }
+	ID3D12GraphicsCommandList* GetCommandList() const { return command_->GetList(); }
 
 	void UpDate();
 
@@ -125,10 +126,6 @@ public:
 	Matrix4x4 GetView();
 
 	float GetAspect();
-
-	void Log(const std::string& message);
-	std::wstring ConvertString(const std::string& str);
-	std::string ConvertString(const std::wstring& str);
 
 	IDxcBlob* CompileShader(const std::wstring& filePath,
 		const wchar_t* profile,
@@ -150,7 +147,6 @@ public:
 
 	D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap, uint32_t descriptorSize, uint32_t index);
 
-	DirectX::ScratchImage LoadTexture(const std::string& filePath);
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResource(Microsoft::WRL::ComPtr<ID3D12Device> device, const DirectX::TexMetadata& metadata);
 
@@ -171,9 +167,9 @@ public:
 
 private:
 
-	void CreateDXGI();
+	void CreateDevice();
 
-	void InitializeCommand();
+	void CreateCommand();
 
 	void CreateSwapChain();
 
@@ -181,16 +177,11 @@ private:
 
 	void CreateDepthBuffer();
 
-	void CreateFence();
-
 	void SettingDxcUtil();
 	void SettingIncludeHandle();
 	void SettingRootSignature();
 	void SettingGraphicPipeline();
-	void SettingVertex();
-	void SettingSpriteVertex();
-	void SettingResource();
-	void SettingSpriteResource();
+
 
 private:
 
@@ -201,14 +192,21 @@ private:
 
 	MyWin* myWin_;
 
+
+#ifdef _DEBUG
+	Microsoft::WRL::ComPtr<ID3D12Debug1> debugController_ = nullptr;
+#endif // _DEBUG
+
+
 	Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory_ = nullptr;
 	Microsoft::WRL::ComPtr<IDXGIAdapter4> useAdapter_;
 	DXGI_ADAPTER_DESC3 adapterDesc_{};
 	Microsoft::WRL::ComPtr<ID3D12Device> device_;
-	Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue_ = nullptr;
-	D3D12_COMMAND_QUEUE_DESC commandQueueDesc_{};
-	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator_ = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList_ = nullptr;
+
+
+	std::unique_ptr<DXCommand> command_ = nullptr;
+
+
 	Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain_ = nullptr;
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc_{};
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap_ = nullptr;
@@ -226,8 +224,9 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap_ = nullptr;
 	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc_{};
-	Microsoft::WRL::ComPtr<ID3D12Fence> fence_ = nullptr;
-	uint64_t fenceValue_ = 0;
+
+
+
 	IDxcUtils* dxcUtils_ = nullptr;
 	IDxcCompiler3* dxcCompiler_ = nullptr;
 	IDxcIncludeHandler* includeHandler_ = nullptr;
@@ -458,7 +457,7 @@ private:
 
 	//float dt = 0.0007f;
 
-	int texture_;
+	//int texture_;
 
 	/*float eps = h_;
 	float boundDamping = -0.3f;*/
@@ -495,7 +494,7 @@ private:
 	Trans transformMMeshModel_{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 
 	Trans transformPlaneModel_{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };*/
-	Grain particles_[instanceCount_];
+	/*Grain particles_[instanceCount_];
 	const float kDeltatime = 1.0f / 60.0f;
 
 	Trans transformParticle[particleIndex]{};
@@ -504,7 +503,7 @@ private:
 	bool isParticleLive[particleIndex]{ false };
 	Vector4 particleColor = { 0.0f,0.0f,1.0f,1.0f };
 	float colorRandomAdd = 0;
-	std::random_device repopSeed;
+	std::random_device repopSeed;*/
 
 	/*DirectX::ScratchImage mipImages_;
 	DirectX::ScratchImage mipImages2_;
@@ -546,8 +545,8 @@ private:
 	D3D12_CPU_DESCRIPTOR_HANDLE planeTextureSrvHandleCPU_;
 	D3D12_GPU_DESCRIPTOR_HANDLE planeTextureSrvHandleGPU_;*/
 
-	D3D12_CPU_DESCRIPTOR_HANDLE instancingSrvHandleCPU_;
-	D3D12_GPU_DESCRIPTOR_HANDLE instancingSrvHandleGPU_;
+	//D3D12_CPU_DESCRIPTOR_HANDLE instancingSrvHandleCPU_;
+	//D3D12_GPU_DESCRIPTOR_HANDLE instancingSrvHandleGPU_;
 
 	/*std::chrono::high_resolution_clock::time_point lastTime;
 	float deltaTime;
@@ -555,9 +554,7 @@ private:
 	int frameCount;
 	int frameRate;*/
 
-#ifdef _DEBUG
-	Microsoft::WRL::ComPtr<ID3D12Debug1> debugController_ = nullptr;
-#endif // _DEBUG
+
 
 
 };

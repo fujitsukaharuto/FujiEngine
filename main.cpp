@@ -22,7 +22,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	// DirectX初期化
 	dxCommon = DXCom::GetInstance();
-	dxCommon->InitDX(win);
+	dxCommon->Initialize(win);
 
 
 #pragma region 汎用機能初期化

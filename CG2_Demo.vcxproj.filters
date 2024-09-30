@@ -91,6 +91,8 @@
     <ClCompile Include="ImGuiManager.cpp">
       <Filter>Externals</Filter>
     </ClCompile>
+    <ClCompile Include="Logger.cpp" />
+    <ClCompile Include="DXCommand.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -177,6 +179,8 @@
     <ClInclude Include="ImGuiManager.h">
       <Filter>Externals</Filter>
     </ClInclude>
+    <ClInclude Include="Logger.h" />
+    <ClInclude Include="DXCommand.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="GaussianBlur.PS.hlsl">
