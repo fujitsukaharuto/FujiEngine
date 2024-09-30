@@ -59,9 +59,9 @@ void GameScene::Update() {
 
 	dxCommon_->UpDate();
 	suzunne->transform.rotate.y = 3.14f;
-	suzunne->transform.rotate.x += 0.01f;
+	suzunne->transform.rotate.x += 0.2f;
 	suzunne->SetWVP();
-	sphere->transform.rotate.y += 0.01f;
+	sphere->transform.rotate.y += 0.02f;
 	sphere->SetWVP();
 
 }

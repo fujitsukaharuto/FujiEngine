@@ -53,12 +53,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//BYTE preKeys[256] = { 0 };
 
 	//ウィンドウのxボタンが押されるまでループ
-	while (true)
+	while (!win->ProcessMessage())
 	{
-		if (win->ProcessMessage())
-		{
-			break;
-		}
 
 #ifdef _DEBUG
 		// ImGui受付
