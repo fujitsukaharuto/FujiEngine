@@ -28,7 +28,6 @@ private:
 	Model* suzunne = nullptr;
 	Model* fence = nullptr;
 
-	std::unique_ptr<DebugCamera> debugCamera_ = nullptr;
 	bool isDebugCameraMode_ = false;
 
 };

@@ -37,11 +37,11 @@ void DebugCamera::InputUpdate()
 {
 	moveTrans_ = { 0.0f,0.0f,0.0f };
 	// 前後
-	if (Input::GetInstance()->GetAllKey()[DIK_UP])
+	if (Input::GetInstance()->GetAllKey()[DIK_W])
 	{
 		moveTrans_.z++;
 	}
-	if (Input::GetInstance()->GetAllKey()[DIK_DOWN])
+	if (Input::GetInstance()->GetAllKey()[DIK_S])
 	{
 		moveTrans_.z--;
 	}
@@ -55,14 +55,14 @@ void DebugCamera::InputUpdate()
 	{
 		moveTrans_.x++;
 	}
-	if (Input::GetInstance()->GetAllKey()[DIK_S])
+	/*if (Input::GetInstance()->GetAllKey()[DIK_S])
 	{
 		moveTrans_.y--;
 	}
 	if (Input::GetInstance()->GetAllKey()[DIK_W])
 	{
 		moveTrans_.y++;
-	}
+	}*/
 
 	pitch_ = 0.0f;
 	yaw_ = 0.0f;

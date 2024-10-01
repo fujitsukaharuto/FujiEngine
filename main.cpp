@@ -24,6 +24,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	dxCommon = DXCom::GetInstance();
 	dxCommon->Initialize(win);
 
+	DebugCamera* camera = nullptr;
+	camera = DebugCamera::GetInstance();
+	camera->Initialize();
+	dxCommon->SetDebugCamera(camera);
+
 
 #pragma region 汎用機能初期化
 	// ImGuiの初期化

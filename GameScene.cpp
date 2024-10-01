@@ -13,7 +13,6 @@ void GameScene::Initialize() {
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
 
-	debugCamera_ = std::make_unique<DebugCamera>();
 
 	sphere = new Model();
 	sphere = Model::CreateSphere();
@@ -33,14 +32,16 @@ void GameScene::Update() {
 	if (input_->TriggerKey(DIK_F12)) {
 		if (isDebugCameraMode_) {
 			isDebugCameraMode_ = false;
+			dxCommon_->SetIsDebugCamera(false);
 		} else {
 			isDebugCameraMode_ = true;
+			dxCommon_->SetIsDebugCamera(true);
 		}
 	}
 
 	if (isDebugCameraMode_)
 	{
-		debugCamera_->Update();
+		DebugCamera::GetInstance()->Update();
 	}
 
 
