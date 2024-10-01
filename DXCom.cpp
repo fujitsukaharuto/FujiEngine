@@ -1715,117 +1715,6 @@ void DXCom::Command()
 	commandList->SetGraphicsRootSignature(rootSignature_.Get());
 	commandList->SetPipelineState(graphicsPipelineState_.Get());
 
-	//三角形１
-	if (isSphere_)
-	{
-		/*commandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);
-		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
-		commandList_->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
-		commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
-		commandList_->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
-		commandList_->DrawInstanced(1536, 1, 0, 0);*/
-	}
-
-
-	////三角形２
-	/*commandList_->RSSetViewports(1, &viewport);
-	commandList_->RSSetScissorRects(1, &scissorRect);
-	commandList_->SetGraphicsRootSignature(roootSignature_);
-	commandList_->SetPipelineState(graphicsPipelineState_);
-	commandList_->IASetVertexBuffers(0, 1, &vertexBufferView2_);
-	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	commandList_->SetGraphicsRootConstantBufferView(0, materialResource2_->GetGPUVirtualAddress());
-	commandList_->SetGraphicsRootConstantBufferView(1, wvpResource2_->GetGPUVirtualAddress());
-	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource2_->GetGPUVirtualAddress());
-	commandList_->SetGraphicsRootDescriptorTable(2, useMonsterBall2 ? textureSrvHandleGPU2 : textureSrvHandleGPU);
-	commandList_->DrawInstanced(3, 1, 0, 0);*/
-
-	//パーティクル
-	/*for (int i = 0; i < particleIndex; i++)
-	{
-		if (isParticleLive[i])
-		{
-			commandList_->RSSetViewports(1, &viewport);
-			commandList_->RSSetScissorRects(1, &scissorRect);
-			commandList_->SetGraphicsRootSignature(roootSignature_);
-			commandList_->SetPipelineState(graphicsPipelineState_);
-			commandList_->IASetVertexBuffers(0, 1, &vertexParticleBufferView_[i]);
-			commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-			commandList_->SetGraphicsRootConstantBufferView(0, materialParticleResource_[i]->GetGPUVirtualAddress());
-			commandList_->SetGraphicsRootConstantBufferView(1, wvpParticleResource_[i]->GetGPUVirtualAddress());
-			commandList_->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
-			commandList_->DrawInstanced(3, 1, 0, 0);
-		}
-	}*/
-
-
-
-	//model
-	/*commandList_->RSSetViewports(1, &viewport);
-	commandList_->RSSetScissorRects(1, &scissorRect);
-	commandList_->SetGraphicsRootSignature(roootSignature_);
-	commandList_->SetPipelineState(graphicsPipelineState_);
-	commandList_->IASetVertexBuffers(0, 1, &vertexModelBufferView_);
-	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	commandList_->SetGraphicsRootConstantBufferView(0, materialResourceModel_->GetGPUVirtualAddress());
-	commandList_->SetGraphicsRootConstantBufferView(1, wvpResourceModel_->GetGPUVirtualAddress());
-	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResourceModel_->GetGPUVirtualAddress());
-	commandList_->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU2);
-	commandList_->DrawInstanced(UINT(modelData_.vertices.size()), 1, 0, 0);*/
-
-
-
-	//FenceModel
-	if (isFenceModel_)
-	{
-		/*commandList_->RSSetViewports(1, &viewport);
-		commandList_->RSSetScissorRects(1, &scissorRect);
-		commandList_->SetGraphicsRootSignature(rootSignature_.Get());
-		commandList_->SetPipelineState(graphicsPipelineState_.Get());
-		commandList_->IASetVertexBuffers(0, 1, &vertexFenceModelBufferView_);
-		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		commandList_->SetGraphicsRootConstantBufferView(0, materialResourceFenceModel_->GetGPUVirtualAddress());
-		commandList_->SetGraphicsRootConstantBufferView(1, wvpResourceFenceModel_->GetGPUVirtualAddress());
-		commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResourceFenceModel_->GetGPUVirtualAddress());
-		commandList_->SetGraphicsRootDescriptorTable(2, fenceTextureSrvHandleGPU_);
-		commandList_->DrawInstanced(UINT(fenceModelData_.vertices.size()), 1, 0, 0);*/
-	}
-
-
-	if (isSuzanneModel_)
-	{
-		/*commandList_->RSSetViewports(1, &viewport);
-		commandList_->RSSetScissorRects(1, &scissorRect);
-		commandList_->SetGraphicsRootSignature(rootSignature_.Get());
-		commandList_->SetPipelineState(graphicsPipelineState_.Get());
-		commandList_->IASetVertexBuffers(0, 1, &vertexSuzanneModelBufferView_);
-		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		commandList_->SetGraphicsRootConstantBufferView(0, materialResourceSuzanneModel_->GetGPUVirtualAddress());
-		commandList_->SetGraphicsRootConstantBufferView(1, wvpResourceSuzanneModel_->GetGPUVirtualAddress());
-		commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResourceSuzanneModel_->GetGPUVirtualAddress());
-		commandList_->SetGraphicsRootDescriptorTable(2, suzanneTextureSrvHandleGPU_);
-		commandList_->DrawInstanced(UINT(suzanneModelData_.vertices.size()), 1, 0, 0);*/
-	}
-
-
-	if (isMMesh_)
-	{
-		// MMeshModel
-		/*commandList_->RSSetViewports(1, &viewport);
-		commandList_->RSSetScissorRects(1, &scissorRect);
-		commandList_->SetGraphicsRootSignature(rootSignature_.Get());
-		commandList_->SetPipelineState(graphicsPipelineState_.Get());
-		commandList_->IASetVertexBuffers(0, 1, &vertexMMeshModelBufferView_);
-		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		commandList_->SetGraphicsRootConstantBufferView(0, materialResourceMMeshModel_->GetGPUVirtualAddress());
-		commandList_->SetGraphicsRootConstantBufferView(1, wvpResourceMMeshModel_->GetGPUVirtualAddress());
-		commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResourceMMeshModel_->GetGPUVirtualAddress());
-		commandList_->SetGraphicsRootDescriptorTable(2, mMeshTextureSrvHandleGPU_);
-		commandList_->DrawInstanced(UINT(mMeshModelData_.vertices.size()), instanceCount_, 0, 0);*/
-	}
-
-
 	// Plane Particle
 	if (isPlaneParticle_)
 	{
@@ -1871,26 +1760,6 @@ void DXCom::Command()
 		commandList_->DrawIndexedInstanced(6, 1, 0, 0, 0);*/
 		/*commandList_->DrawInstanced(6, 1, 0, 0);*/
 	}
-
-
-	//if (isFluidMode_)
-	//{
-	//	for (int i = 0; i < particles.size() - 1; i++)
-	//	{
-
-	//		commandList_->IASetIndexBuffer(&indexFlowBufferView_);
-	//		commandList_->IASetVertexBuffers(0, 1, &vertexFlowBufferView_);
-	//		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	//		commandList_->SetGraphicsRootConstantBufferView(0, materialFlowResource_->GetGPUVirtualAddress());
-	//		commandList_->SetGraphicsRootConstantBufferView(1, wvpFlowResource_[i]->GetGPUVirtualAddress());
-	//		commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
-	//		commandList_->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
-	//		commandList_->DrawIndexedInstanced(6, 1, 0, 0, 0);
-
-	//		/*commandList_->DrawInstanced(3, 1, 0, 0);*/
-	//	}
-	//}
-
 
 }
 
@@ -2091,28 +1960,9 @@ void DXCom::UpDate()
 
 #ifdef _DEBUG
 	ImGui::Begin("debug");
-	/*if (ImGui::TreeNode("Triangle1"))
-	{
-		ImGui::Checkbox("drawTriangle", &isTriangleDraw_);
-		ImGui::ColorEdit3("color", &materialDate_->color.X);
-		ImGui::DragFloat3("trans", &transform.translate.x, 0.01f, -2.0f, 5.0f);
-		ImGui::DragFloat3("rotate", &transform.rotate.x, 0.01f, -4.0f, 4.0f);
-		ImGui::DragFloat3("scale", &transform.scale.x, 0.01f, 0.0f, 6.0f);
-		ImGui::Checkbox("whiteTexture or uvChecker", &useMonsterBall);
-		ImGui::TreePop();
-	}*/
 
-	/*if (ImGui::TreeNode("Triangle2"))
-	{
-		ImGui::ColorEdit3("color2", &materialDate2_->color.X);
-		ImGui::DragFloat3("trans2", &transform2.translate.x, 0.01f, -2.0f, 2.0f);
-		ImGui::DragFloat3("rotate2", &transform2.rotate.x, 0.01f, -4.0f, 4.0f);
-		ImGui::DragFloat3("scale2", &transform2.scale.x, 0.01f, 0.0f, 6.0f);
-		ImGui::Checkbox("useMonsterBall2", &useMonsterBall2);
-		ImGui::TreePop();
-	}
 
-	if (ImGui::TreeNode("Sprite"))
+	/*if (ImGui::TreeNode("Sprite"))
 	{
 		ImGui::DragFloat3("Sprite trans", &transSprite.translate.x, 1.0f, -1280.0f, 1280.0f);
 		ImGui::DragFloat3("Sprite rotate", &transSprite.rotate.x, 0.01f, -4.0f, 4.0f);
@@ -2121,22 +1971,8 @@ void DXCom::UpDate()
 		ImGui::DragFloat("uvrotate", &uvTransSprite.rotate.z, 0.01f, -4.0f, 4.0f);
 		ImGui::DragFloat2("uvsclae", &uvTransSprite.scale.x, 0.01f, 0.0f, 6.0f);
 		ImGui::TreePop();
-	}
-
-	if (ImGui::TreeNode("PlaneModel"))
-	{
-		ImGui::ColorEdit3("Modelcolor", &materialDateModel_->color.X);
-		ImGui::DragFloat3("Modeltrans", &transformModel.translate.x, 0.01f, -2.0f, 2.0f);
-		ImGui::DragFloat3("Modelrotate", &transformModel.rotate.x, 0.01f, -4.0f, 4.0f);
-		ImGui::DragFloat3("Modelscale", &transformModel.scale.x, 0.01f, 0.0f, 6.0f);
-		ImGui::TreePop();
-	}
-
-	if (ImGui::TreeNode("Particle"))
-	{
-		ImGui::ColorEdit3("Particlecolor", &particleColor.X);
-		ImGui::TreePop();
 	}*/
+
 
 	bool preIsGrayscale_ = isGrayscale_;
 	bool preIsNonePost_ = isNonePost_;
@@ -2176,144 +2012,6 @@ void DXCom::UpDate()
 		isMetaBall_ = false;
 	}
 
-	/*if (isFluidMode_)
-	{
-		ImGui::DragFloat("mass", &mass_, 0.1f, 0.0f, 100.0f);
-		ImGui::DragFloat("h", &h_, 0.01f, 0.0f, 64.0f);
-		h2_ = h_ * h_;
-		poly6 = 4.0f / (mpi_ * powf(h_, 8));
-		spikyGrad = -10.0f / (mpi_ * powf(h_, 5));
-		viscLap = 40.0f / (mpi_ * powf(h_, 5));
-		eps = h_;
-		halfH_ = h_ * 0.5f;
-		ImGui::DragFloat("dt", &dt, 0.00001f, 0.0001f, 0.001f);
-	}
-	else
-	{
-		ImGui::SliderFloat("Setradius", &setradius_, 3.0f, 100.0f);
-	}*/
-
-
-	/*if (ImGui::TreeNode("MetaBall"))
-	{
-		ImGui::SliderFloat("Setradius", &setradius_, 5.0f, 200.0f);
-		ImGui::TreePop();
-	}*/
-
-
-	/*if (ImGui::TreeNode("What to draw"))
-	{
-		ImGui::Checkbox("Draw plane and sprite", &isPlaneAndSprite_);
-		ImGui::Checkbox("Draw plane in particle mode", &isPlaneParticle_);
-		ImGui::Checkbox("Draw sphere", &isSphere_);
-		ImGui::Checkbox("Draw Fence", &isFenceModel_);
-		ImGui::Checkbox("Draw Suzanne", &isSuzanneModel_);
-		ImGui::Checkbox("Draw MultiMesh", &isMMesh_);
-		ImGui::TreePop();
-	}*/
-
-
-	if (isSphere_)
-	{
-		/*if (ImGui::TreeNode("Sphere"))
-		{
-			ImGui::ColorEdit3("Modelcolor", &materialDate_->color.X);
-			ImGui::DragFloat3("Modeltrans", &transform.translate.x, 0.01f, -5.0f, 5.0f);
-			ImGui::DragFloat3("Modelrotate", &transform.rotate.x, 0.01f, -4.0f, 4.0f);
-			ImGui::DragFloat3("Modelscale", &transform.scale.x, 0.01f, 0.0f, 6.0f);
-			if (ImGui::TreeNode("light"))
-			{
-				if (ImGui::Button("LightNone"))
-				{
-					materialDate_->enableLighting = LightMode::kLightNone;
-				}
-				ImGui::SameLine();
-				if (ImGui::Button("LightLambert"))
-				{
-					materialDate_->enableLighting = LightMode::kLightLambert;
-				}
-				ImGui::SameLine();
-				if (ImGui::Button("LightHalfLambert"))
-				{
-					materialDate_->enableLighting = LightMode::kLightHalfLambert;
-				}
-
-				ImGui::SliderFloat3("light color", &directionalLightData_->color.X, 0.0f, 1.0f);
-				ImGui::SliderFloat3("light direction", &directionalLightData_->direction.x, -1.0f, 1.0f);
-				ImGui::TreePop();
-			}
-			ImGui::TreePop();
-		}*/
-	}
-
-
-	if (isFenceModel_)
-	{
-		/*if (ImGui::TreeNode("FenceModel"))
-		{
-			ImGui::ColorEdit3("Modelcolor", &materialDateFenceModel_->color.X);
-			ImGui::DragFloat3("Modeltrans", &transformFenceModel_.translate.x, 0.01f, -5.0f, 5.0f);
-			ImGui::DragFloat3("Modelrotate", &transformFenceModel_.rotate.x, 0.01f, -4.0f, 4.0f);
-			ImGui::DragFloat3("Modelscale", &transformFenceModel_.scale.x, 0.01f, 0.0f, 6.0f);
-			if (ImGui::TreeNode("light"))
-			{
-				if (ImGui::Button("LightNone"))
-				{
-					materialDateFenceModel_->enableLighting = LightMode::kLightNone;
-				}
-				ImGui::SameLine();
-				if (ImGui::Button("LightLambert"))
-				{
-					materialDateFenceModel_->enableLighting = LightMode::kLightLambert;
-				}
-				ImGui::SameLine();
-				if (ImGui::Button("LightHalfLambert"))
-				{
-					materialDateFenceModel_->enableLighting = LightMode::kLightHalfLambert;
-				}
-				ImGui::SliderFloat3("light color", &directionalLightDataFenceModel_->color.X, 0.0f, 1.0f);
-				ImGui::SliderFloat3("light direction", &directionalLightDataFenceModel_->direction.x, -1.0f, 1.0f);
-				ImGui::TreePop();
-			}
-			ImGui::TreePop();
-		}
-		directionalLightDataFenceModel_->direction = directionalLightDataFenceModel_->direction.Normalize();*/
-	}
-
-
-	if (isSuzanneModel_)
-	{
-		/*if (ImGui::TreeNode("SuzanneModel"))
-		{
-			ImGui::ColorEdit3("Modelcolor", &materialDateSuzanneModel_->color.X);
-			ImGui::DragFloat3("Modeltrans", &transformSuzanneModel_.translate.x, 0.01f, -5.0f, 5.0f);
-			ImGui::DragFloat3("Modelrotate", &transformSuzanneModel_.rotate.x, 0.01f, -4.0f, 4.0f);
-			ImGui::DragFloat3("Modelscale", &transformSuzanneModel_.scale.x, 0.01f, 0.0f, 6.0f);
-			if (ImGui::TreeNode("light"))
-			{
-				if (ImGui::Button("LightNone"))
-				{
-					materialDateSuzanneModel_->enableLighting = LightMode::kLightNone;
-				}
-				ImGui::SameLine();
-				if (ImGui::Button("LightLambert"))
-				{
-					materialDateSuzanneModel_->enableLighting = LightMode::kLightLambert;
-				}
-				ImGui::SameLine();
-				if (ImGui::Button("LightHalfLambert"))
-				{
-					materialDateSuzanneModel_->enableLighting = LightMode::kLightHalfLambert;
-				}
-
-				ImGui::SliderFloat3("light color", &directionalLightDataSuzanneModel_->color.X, 0.0f, 1.0f);
-				ImGui::SliderFloat3("light direction", &directionalLightDataSuzanneModel_->direction.x, -1.0f, 1.0f);
-				ImGui::TreePop();
-			}
-			ImGui::TreePop();
-		}
-		directionalLightDataSuzanneModel_->direction = directionalLightDataSuzanneModel_->direction.Normalize();*/
-	}
 
 
 	if (isPlaneParticle_)
@@ -2439,173 +2137,6 @@ void DXCom::UpDate()
 
 #endif // _DEBUG
 
-	/*directionalLightData_->direction = directionalLightData_->direction.Normalize();*/
-
-
-	//if (!isFluidMode_)
-	//{
-	//	if (Input::GetInstance()->Input::IsTriggerMouse(0))
-	//	{
-	//		if (particleDate_->particleCount < 399)
-	//		{
-	//			Vector2 xy = Input::GetInstance()->Input::GetMousePosition();
-
-	//			particles.emplace_back(Particle(xy.x, xy.y));
-	//			particleDate_->particleCount = int(particles.size() - 1);
-	//			int count = particleDate_->particleCount;
-
-
-	//			vertexFlowResource_[count] = CreateBufferResource(device_, sizeof(VertexDate) * 4);
-	//			indexFlowResource_[count] = CreateBufferResource(device_, sizeof(uint32_t) * 6);
-
-
-	//			vertexFlowDate_[count] = nullptr;
-	//			vertexFlowResource_[count]->Map(0, nullptr, reinterpret_cast<void**>(&vertexFlowDate_[count]));
-	//			vertexFlowDate_[count][0] = { { -6.0f,6.0f,0.0f,1.0f }, { 0.0f,1.0f }, { 0.0f,0.0f,-1.0f } };
-	//			vertexFlowDate_[count][1] = { { -6.0f,-6.0f,0.0f,1.0f }, { 0.0f,0.0f }, { 0.0f,0.0f,-1.0f } };
-	//			vertexFlowDate_[count][2] = { { 6.0f,6.0f,0.0f,1.0f }, { 1.0f,1.0f }, { 0.0f,0.0f,-1.0f } };
-	//			vertexFlowDate_[count][3] = { { 6.0f,-6.0f,0.0f,1.0f }, { 1.0f,0.0f }, { 0.0f,0.0f,-1.0f } };
-
-
-	//			indexFlowResource_[count]->Map(0, nullptr, reinterpret_cast<void**>(&indexFlowData_[count]));
-	//			indexFlowData_[count][0] = 0;
-	//			indexFlowData_[count][1] = 1;
-	//			indexFlowData_[count][2] = 2;
-
-	//			indexFlowData_[count][3] = 1;
-	//			indexFlowData_[count][4] = 3;
-	//			indexFlowData_[count][5] = 2;
-
-
-	//			wvpFlowResource_[count] = CreateBufferResource(device_, sizeof(TransformationMatrix));
-	//			wvpFlowDate_[count] = nullptr;
-	//			wvpFlowResource_[count]->Map(0, nullptr, reinterpret_cast<void**>(&wvpFlowDate_[count]));
-	//			particleDate_->radius[count] = { setradius_,0.0f,0.0f,0.0f };
-
-
-	//			Matrix4x4 viewMatSprite = MakeIdentity4x4();
-	//			Matrix4x4 projectMatSprite = MakeOrthographicMatrix(0.0f, 0.0f, float(Fuji::GetkWindowWidth()), float(Fuji::GetkWindowHeight()), 0.0f, 100.0f);
-	//			Matrix4x4 worldViewProMatSpriteOrigine = Multiply(viewMatSprite, projectMatSprite);
-	//			Matrix4x4 worldViewProMatSprite = worldViewProMatSpriteOrigine;
-
-	//			Matrix4x4 worldMatSprite = MakeAffineMatrix(Vector3(1.0f, 1.0f, 1.0f), Vector3(0.0f, 0.0f, 0.0f), particles[count].pos);
-	//			worldViewProMatSprite = worldViewProMatSpriteOrigine;
-	//			worldViewProMatSprite = Multiply(worldMatSprite, worldViewProMatSprite);
-
-	//			wvpFlowDate_[count]->World = worldMatSprite;
-	//			wvpFlowDate_[count]->WVP = worldViewProMatSprite;
-
-	//			particleDate_->center[count] = { worldMatSprite.m[3][0],worldMatSprite.m[3][1],0.0f,0.0f };
-	//		}
-	//	}
-	//	if (Input::GetInstance()->Input::IsTriggerMouse(1))
-	//	{
-	//		if (particleDate_->particleCount > 0)
-	//		{
-	//			particles.pop_back();
-	//			particleDate_->particleCount = int(particles.size() - 1);
-	//		}
-	//	}
-	//}
-	//else
-	//{
-	//	/*for (auto& pi : particles)
-	//	{
-	//		pi.density = 0.00001f;
-	//		for (auto& pj : particles)
-	//		{
-	//			Vector3 rij = pj.pos - pi.pos;
-	//			Vector2 rijv2 = { rij.x,rij.y };
-	//			float r2 = rijv2 * rijv2;
-
-	//			if (r2 < h2_)
-	//			{
-	//				float c = h2_ - r2;
-	//				pi.density += mass_ * poly6 * powf(c, 3);
-	//			}
-	//		}
-	//		pi.pressure = gasConst * (pi.density - restDens);
-	//	}
-	//	for (auto& pi : particles)
-	//	{
-	//		Vector2 fpress(0, 0);
-	//		Vector2 fvisc(0, 0);
-
-	//		for (auto& pj : particles)
-	//		{
-	//			if (&pi == &pj)
-	//			{
-	//				continue;
-	//			}
-	//			Vector3 rij = pj.pos - pi.pos;
-	//			Vector2 rijv2 = { rij.x,rij.y };
-	//			float r = rijv2.Lenght();
-
-	//			if (r < h_)
-	//			{
-	//				float c = h_ - r;
-
-	//				fpress += (rijv2.NormaliZe() * (-1.0f)) * mass_ * (pi.pressure + pj.pressure) / (2.0f * pj.density) * spikyGrad * powf(c, 3);
-	//				Vector2 pjv2Vel = { pj.vel.x,pj.vel.y };
-	//				Vector2 piv2Vel = { pi.vel.x,pi.vel.y };
-	//				fvisc += (pjv2Vel - piv2Vel) * visc * mass_ / pj.density * viscLap * c;
-	//			}
-	//		}
-	//		Vector2 fgrav = G_ * mass_ / pi.density;
-	//		Vector2 fff = (fpress + fvisc + fgrav);
-	//		pi.force = { fff.x,fff.y,0.0f };
-	//	}
-
-	//	for (auto& p : particles)
-	//	{
-	//		p.vel += p.force * dt / p.density;
-	//		p.pos += p.vel * dt;
-
-	//		if (p.pos.x - eps < 0)
-	//		{
-	//			p.vel.x *= boundDamping;
-	//			p.pos.x = eps;
-	//		}
-	//		if (p.pos.x + eps > 600)
-	//		{
-	//			p.vel.x *= boundDamping;
-	//			p.pos.x = 600 - eps;
-	//		}
-	//		if (p.pos.y - eps < 0)
-	//		{
-	//			p.vel.y *= boundDamping;
-	//			p.pos.y = eps;
-	//		}
-	//		if (p.pos.y + eps > 600)
-	//		{
-	//			p.vel.y *= boundDamping;
-	//			p.pos.y = 600 - eps;
-	//		}
-	//	}
-
-	//	gravityChangeTime_++;
-	//	if (gravityChangeTime_ >= 0 && gravityChangeTime_ < 400)
-	//	{
-	//		G_ = { 0.0f,9.8f };
-	//	}
-	//	if (gravityChangeTime_ >= 400 && gravityChangeTime_ < 800)
-	//	{
-	//		G_ = { 0.0f,-9.8f };
-	//	}
-	//	if (gravityChangeTime_ >= 800 && gravityChangeTime_ < 1200)
-	//	{
-	//		G_ = { 9.8f,0.0f };
-	//	}
-	//	if (gravityChangeTime_ >= 1200 && gravityChangeTime_ < 1600)
-	//	{
-	//		G_ = { -9.8f,0.0f };
-	//	}
-	//	if (gravityChangeTime_ >= 1600)
-	//	{
-	//		gravityChangeTime_ = 0;
-	//	}*/
-	//}
-
 
 
 	/*transform.rotate.y += 0.05f;*/
@@ -2623,29 +2154,6 @@ void DXCom::UpDate()
 	wvpDate_->WVP = worldViewProjectionMatrix;*/
 
 
-	//Fence
-	/*if (isFenceModel_)
-	{
-		Matrix4x4 worldMatrixFenceModel = MakeAffineMatrix(transformFenceModel_.scale, transformFenceModel_.rotate, transformFenceModel_.translate);
-		Matrix4x4 worldViewProjectionMatrixFenceModel = Multiply(viewMatrix, projectionMatrix);
-		worldViewProjectionMatrixFenceModel = Multiply(worldMatrixFenceModel, worldViewProjectionMatrixFenceModel);
-
-		wvpDateFenceModel_->World = worldMatrixFenceModel;
-		wvpDateFenceModel_->WVP = worldViewProjectionMatrixFenceModel;
-	}*/
-
-
-	//Suzanne
-	/*if (isSuzanneModel_)
-	{
-		Matrix4x4 worldMatrixSuzanneModel = MakeAffineMatrix(transformSuzanneModel_.scale, transformSuzanneModel_.rotate, transformSuzanneModel_.translate);
-		Matrix4x4 worldViewProjectionMatrixSuzanneModel = Multiply(viewMatrix, projectionMatrix);
-		worldViewProjectionMatrixSuzanneModel = Multiply(worldMatrixSuzanneModel, worldViewProjectionMatrixSuzanneModel);
-
-		wvpDateSuzanneModel_->World = worldMatrixSuzanneModel;
-		wvpDateSuzanneModel_->WVP = worldViewProjectionMatrixSuzanneModel;
-	}*/
-
 
 	if (isPlaneParticle_)
 	{
@@ -2662,164 +2170,9 @@ void DXCom::UpDate()
 	}
 
 
-	//if (isPlaneAndSprite_)
-	//{
-	//	//Plane
-
-	//	Matrix4x4 worldMatrixPlaneModel = MakeAffineMatrix(transformPlaneModel_.scale, transformPlaneModel_.rotate, transformPlaneModel_.translate);
-	//	Matrix4x4 worldViewProjectionMatrixPlaneModel = Multiply(viewMatrix, projectionMatrix);
-	//	worldViewProjectionMatrixPlaneModel = Multiply(worldMatrixPlaneModel, worldViewProjectionMatrixPlaneModel);
-
-	//	wvpDatePlaneModel_->World = worldMatrixPlaneModel;
-	//	wvpDatePlaneModel_->WVP = worldViewProjectionMatrixPlaneModel;
 
 
-	//	Matrix4x4 spriteWorldMat = MakeAffineMatrix(transSprite.scale, transSprite.rotate, transSprite.translate);
-	//	Matrix4x4 spriteViewMat = MakeIdentity4x4();
-	//	Matrix4x4 spriteProjectMat = MakeOrthographicMatrix(0.0f, 0.0f, float(Fuji::GetkWindowWidth()), float(Fuji::GetkWindowHeight()), 0.0f, 100.0f);
-	//	Matrix4x4 spriteWorldViewProMat = Multiply(spriteViewMat, spriteProjectMat);
-	//	spriteWorldViewProMat = Multiply(spriteWorldMat, spriteWorldViewProMat);
-
-	//	transformationMatDataSprite_->World = spriteWorldMat;
-	//	transformationMatDataSprite_->WVP = spriteWorldViewProMat;
-
-
-	//	Matrix4x4 uvtrasform = MakeScaleMatrix(uvTransSprite.scale);
-	//	uvtrasform = Multiply(uvtrasform, MakeRotateZMatrix(uvTransSprite.rotate.z));
-	//	uvtrasform = Multiply(uvtrasform, MakeTranslateMatrix(uvTransSprite.translate));
-	//	materialDateSprite_->uvTransform = uvtrasform;
-	//}
-
-
-	/*if (isMMesh_)
-	{
-		Matrix4x4 worldMatrixMMeshModel = MakeAffineMatrix(transformMMeshModel_.scale, transformMMeshModel_.rotate, transformMMeshModel_.translate);
-		Matrix4x4 worldViewProjectionMatrixMMeshModel = Multiply(viewMatrix, projectionMatrix);
-		worldViewProjectionMatrixMMeshModel = Multiply(worldMatrixMMeshModel, worldViewProjectionMatrixMMeshModel);
-
-		wvpDateMMeshModel_->World = worldMatrixMMeshModel;
-		wvpDateMMeshModel_->WVP = worldViewProjectionMatrixMMeshModel;
-	}*/
-
-
-	/*Matrix4x4 worldMatrix2 = MakeAffineMatrix(transform2.scale, transform2.rotate, transform2.translate);
-	Matrix4x4 worldViewProjectionMatrix2 = Multiply(viewMatrix, projectionMatrix);
-	worldViewProjectionMatrix2 = Multiply(worldMatrix2, worldViewProjectionMatrix2);
-
-	wvpDate2_->World = worldMatrix2;
-	wvpDate2_->WVP = worldViewProjectionMatrix2;
-
-	Matrix4x4 worldMatSprite = MakeAffineMatrix(transSprite.scale, transSprite.rotate, transSprite.translate);
-	Matrix4x4 viewMatSprite = MakeIdentity4x4();
-	Matrix4x4 projectMatSprite = MakeOrthographicMatrix(0.0f, 0.0f, float(Fuji::GetkWindowWidth()), float(Fuji::GetkWindowHeight()), 0.0f, 100.0f);
-	Matrix4x4 worldViewProMatSprite = Multiply(viewMatSprite, projectMatSprite);
-	worldViewProMatSprite = Multiply(worldMatSprite, worldViewProMatSprite);
-
-
-	transformationMatDataSprite_->World = worldMatSprite;
-	transformationMatDataSprite_->WVP = worldViewProMatSprite;
-
-	Matrix4x4 uvtrasform = MakeScaleMatrix(uvTransSprite.scale);
-	uvtrasform = Multiply(uvtrasform, MakeRotateZMatrix(uvTransSprite.rotate.z));
-	uvtrasform = Multiply(uvtrasform, MakeTranslateMatrix(uvTransSprite.translate));
-	materialDateSprite_->uvTransform = uvtrasform;
-
-
-	Matrix4x4 worldMatrixModel = MakeAffineMatrix(transformModel.scale, transformModel.rotate, transformModel.translate);
-	Matrix4x4 worldViewProjectionMatrixModel = Multiply(viewMatrix, projectionMatrix);
-	worldViewProjectionMatrixModel = Multiply(worldMatrixModel, worldViewProjectionMatrixModel);
-
-	wvpDateModel_->World = worldMatrixModel;
-	wvpDateModel_->WVP = worldViewProjectionMatrixModel;*/
-
-	/*std::mt19937 random(repopSeed());
-	std::uniform_real_distribution<> number(-3.5, 3.5)
-	//std::uniform_real_distribution<> velXZNumber(-0.05f, 0.05f);
-	//std::uniform_real_distribution<> velYNumber(0.008f, 0.06f);
-	//std::uniform_real_distribution<> rotNumber(-0.1f, 0.1f);
-	std::uniform_real_distribution<> alphaRandom(0.4f, 1.0f);*/
-
-	/*//for (int i = 0; i < particleIndex; i++)
-	//{
-	//	if (isParticleLive[i])
-	//	{
-	//		transformParticle[i].translate = transformParticle[i].translate + particleVel[i];
-	//		transformParticle[i].rotate = transformParticle[i].rotate + particleRot[i];
-	//		materialParticleDate_[i]->color.W -= 0.01f;
-	//		if (materialParticleDate_[i]->color.W <= 0.0f)
-	//		{
-	//			materialParticleDate_[i]->color.W = 0.0f;
-	//			isParticleLive[i] = false;
-	//		}
-
-	//		Matrix4x4 worldMatrixParticle = MakeAffineMatrix(transformParticle[i].scale, transformParticle[i].rotate, transformParticle[i].translate);
-	//		Matrix4x4 worldViewProjectionMatrixParticle = Multiply(worldMatrixParticle, Multiply(viewMatrix, projectionMatrix));
-	//		wvpParticleDate_[i]->World = worldMatrixParticle;
-	//		wvpParticleDate_[i]->WVP = worldViewProjectionMatrixParticle;
-	//	}
-	//	else
-	//	{
-
-	//		float randomx = float(number(random));
-	//		float randomz = float(number(random));
-
-	//		transformParticle[i] = { {0.5f,0.5f,0.5f},{0.0f,0.0f,0.0f},{randomx,-2.6f,randomz} };
-
-	//		//float randomvelx = float(velXZNumber(random));
-	//		//float randomvely = float(velYNumber(random));
-	//		//float randomvelz = float(velXZNumber(random));
-
-	//		//float randomRotx = float(rotNumber(random));
-	//		//float randomRoty = float(rotNumber(random));
-	//		//float randomRotz = float(rotNumber(random));
-
-	//		//particleVel[i] = { randomvelx,randomvely,randomvelz };
-	//		//particleRot[i] = { randomRotx,randomRoty,randomRotz };
-
-	//		materialParticleDate_[i]->color = particleColor;
-	//		float alphacolor = float(alphaRandom(random));
-	//		materialParticleDate_[i]->color.W = alphacolor;
-
-	//		colorRandomAdd += 0.002f;
-	//		if (colorRandomAdd>0.235f)
-	//		{
-	//			colorRandomAdd = 0;
-	//		}
-	//		materialParticleDate_[i]->color.Y += colorRandomAdd;
-
-	//		Matrix4x4 worldMatrixParticle = MakeAffineMatrix(transformParticle[i].scale, transformParticle[i].rotate, transformParticle[i].translate);
-	//		Matrix4x4 worldViewProjectionMatrixParticle = Multiply(worldMatrixParticle, Multiply(viewMatrix, projectionMatrix));
-	//		wvpParticleDate_[i]->World = worldMatrixParticle;
-	//		wvpParticleDate_[i]->WVP = worldViewProjectionMatrixParticle;
-	//		isParticleLive[i] = true;
-
-
-	//	}
-	//}*/
-
-	//if (isFluidMode_)
-	//{
-	//	Matrix4x4 viewMatSprite = MakeIdentity4x4();
-	//	Matrix4x4 projectMatSprite = MakeOrthographicMatrix(0.0f, 0.0f, float(Fuji::GetkWindowWidth()), float(Fuji::GetkWindowHeight()), 0.0f, 100.0f);
-	//	Matrix4x4 worldViewProMatSpriteOrigine = Multiply(viewMatSprite, projectMatSprite);
-	//	Matrix4x4 worldViewProMatSprite = worldViewProMatSpriteOrigine;
-	//	for (size_t i = 0; i < particles.size() - 1; i++)
-	//	{
-	//		Matrix4x4 worldMatSprite = MakeAffineMatrix(Vector3(1.0f, 1.0f, 1.0f), Vector3(0.0f, 0.0f, 0.0f), particles[i].pos);
-	//		worldViewProMatSprite = worldViewProMatSpriteOrigine;
-	//		worldViewProMatSprite = Multiply(worldMatSprite, worldViewProMatSprite);
-
-	//		wvpFlowDate_[i]->World = worldMatSprite;
-	//		wvpFlowDate_[i]->WVP = worldViewProMatSprite;
-
-	//		particleDate_->center[i] = { worldMatSprite.m[3][0],worldMatSprite.m[3][1],0.0f,0.0f };
-
-	//		/*Matrix4x4 worldMatrixParticle = MakeAffineMatrix(Vector3(1.0f, 1.0f, 1.0f), Vector3(0.0f, 0.0f, 0.0f), particles[i].pos);
-	//		Matrix4x4 worldViewProjectionMatrixParticle = Multiply(worldMatrixParticle, Multiply(viewMatrix, projectionMatrix));
-	//		wvpFlowDate_[i]->World = worldMatrixParticle;
-	//		wvpFlowDate_[i]->WVP = worldViewProjectionMatrixParticle;*/
-	//	}
-	//}
+	
 }
 
 void DXCom::ReleaseData()
@@ -2859,10 +2212,6 @@ void DXCom::ReleaseData()
 #ifdef _DEBUG
 
 #endif // _DEBUG
-
-
-	CloseWindow(MyWin::GetInstance()->GetHwnd());
-	CoUninitialize();
 
 }
 
@@ -3096,183 +2445,150 @@ D3D12_GPU_DESCRIPTOR_HANDLE DXCom::GetGPUDescriptorHandle(Microsoft::WRL::ComPtr
 //	return mipImages;
 //}
 
-Microsoft::WRL::ComPtr<ID3D12Resource> DXCom::CreateTextureResource(Microsoft::WRL::ComPtr<ID3D12Device> device, const DirectX::TexMetadata& metadata)
-{
-	D3D12_RESOURCE_DESC resourceDesc{};
-	resourceDesc.Width = UINT(metadata.width);
-	resourceDesc.Height = UINT(metadata.height);
-	resourceDesc.MipLevels = UINT16(metadata.mipLevels);
-	resourceDesc.DepthOrArraySize = UINT16(metadata.arraySize);
-	resourceDesc.Format = metadata.format;
-	resourceDesc.SampleDesc.Count = 1;
-	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION(metadata.dimension);
+//Microsoft::WRL::ComPtr<ID3D12Resource> DXCom::CreateTextureResource(Microsoft::WRL::ComPtr<ID3D12Device> device, const DirectX::TexMetadata& metadata)
+//{
+//	D3D12_RESOURCE_DESC resourceDesc{};
+//	resourceDesc.Width = UINT(metadata.width);
+//	resourceDesc.Height = UINT(metadata.height);
+//	resourceDesc.MipLevels = UINT16(metadata.mipLevels);
+//	resourceDesc.DepthOrArraySize = UINT16(metadata.arraySize);
+//	resourceDesc.Format = metadata.format;
+//	resourceDesc.SampleDesc.Count = 1;
+//	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION(metadata.dimension);
+//
+//	D3D12_HEAP_PROPERTIES heapProperties{};
+//	heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
+//	//heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_WRITE_BACK;
+//	//heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_L0;
+//
+//
+//	Microsoft::WRL::ComPtr<ID3D12Resource> resource = nullptr;
+//	HRESULT hr = device->CreateCommittedResource(&heapProperties,
+//		D3D12_HEAP_FLAG_NONE, &resourceDesc,
+//		D3D12_RESOURCE_STATE_COPY_DEST, nullptr,
+//		IID_PPV_ARGS(&resource));
+//	assert(SUCCEEDED(hr));
+//
+//	return resource;
+//}
 
-	D3D12_HEAP_PROPERTIES heapProperties{};
-	heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
-	//heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_WRITE_BACK;
-	//heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_L0;
 
-
-	Microsoft::WRL::ComPtr<ID3D12Resource> resource = nullptr;
-	HRESULT hr = device->CreateCommittedResource(&heapProperties,
-		D3D12_HEAP_FLAG_NONE, &resourceDesc,
-		D3D12_RESOURCE_STATE_COPY_DEST, nullptr,
-		IID_PPV_ARGS(&resource));
-	assert(SUCCEEDED(hr));
-
-	return resource;
-}
-
-void DXCom::UploadTextureData(Microsoft::WRL::ComPtr<ID3D12Resource> texture, const DirectX::ScratchImage& mipImages)
-{
-	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
-	for (size_t mipLevel = 0; mipLevel < metadata.mipLevels; mipLevel++)
-	{
-		const DirectX::Image* img = mipImages.GetImage(mipLevel, 0, 0);
-		HRESULT hr = texture->WriteToSubresource(UINT(mipLevel), nullptr, img->pixels,
-			UINT(img->rowPitch), UINT(img->slicePitch));
-		assert(SUCCEEDED(hr));
-	}
-}
-
-[[nodiscard]]
-Microsoft::WRL::ComPtr<ID3D12Resource> DXCom::UploadTextureData(Microsoft::WRL::ComPtr<ID3D12Resource> texture, const DirectX::ScratchImage& mipImages, Microsoft::WRL::ComPtr<ID3D12Device> device, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList)
-{
-	std::vector<D3D12_SUBRESOURCE_DATA> subresources;
-	DirectX::PrepareUpload(device.Get(), mipImages.GetImages(), mipImages.GetImageCount(), mipImages.GetMetadata(),
-		subresources);
-	uint64_t intermediateSize = GetRequiredIntermediateSize(texture.Get(), 0, UINT(subresources.size()));
-	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource = CreateBufferResource(device, intermediateSize);
-	UpdateSubresources(commandList.Get(), texture.Get(), intermediateResource.Get(), 0, 0, UINT(subresources.size()), subresources.data());
-
-	D3D12_RESOURCE_BARRIER barrier{};
-	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	barrier.Transition.pResource = texture.Get();
-	barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
-	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
-	commandList->ResourceBarrier(1, &barrier);
-
-	return intermediateResource;
-}
-
-ModelData DXCom::LoadObjFile(const std::string& directoryPath, const std::string& filename)
-{
-	ModelData modeldata;
-	std::vector<Vector4> positions;
-	std::vector<Vector3> normals;
-	std::vector<Vector2> texcords;
-	std::string line;
-
-	std::ifstream file(directoryPath + "/" + filename);
-	assert(file.is_open());
-
-	while (std::getline(file, line))
-	{
-		std::string identifier;
-		std::istringstream s(line);
-
-		s >> identifier;
-
-		if (identifier == "v")
-		{
-			Vector4 position;
-			s >> position.X >> position.Y >> position.Z;
-			position.W = 1.0f;
-
-			positions.push_back(position);
-		}
-		else if (identifier == "vt")
-		{
-			Vector2 texcoord;
-			s >> texcoord.x >> texcoord.y;
-			texcords.push_back(texcoord);
-		}
-		else if (identifier == "vn")
-		{
-			Vector3 normal;
-			s >> normal.x >> normal.y >> normal.z;
-			normals.push_back(normal);
-		}
-		else if (identifier == "f")
-		{
-			VertexDate triangle[3];
-			for (int32_t faceVertex = 0; faceVertex < 3; faceVertex++)
-			{
-				std::string vertexDefinition;
-				s >> vertexDefinition;
-				//頂点の要素へのindexは　位置/uv/法線　で格納されているので、分解してindex取得
-				std::istringstream v(vertexDefinition);
-				std::string index;
-				uint32_t elementIndices[3] = { 0,0,0 };
-				int32_t element = 0;
-				while (std::getline(v, index, '/'))
-				{
-					if (!index.empty())
-					{
-						elementIndices[element] = std::stoi(index);
-					}
-					element++;
-				}
-				Vector4 position = positions[elementIndices[0] - 1];
-				position.X *= -1.0f;
-				Vector2 texcoord = { 0.0f,0.0f };
-				if (elementIndices[1] > 0)
-				{
-					texcoord = texcords[elementIndices[1] - 1];
-					texcoord.y = 1.0f - texcoord.y;
-				}
-				Vector3 normal = normals[elementIndices[2] - 1];
-				normal.x *= -1.0f;
-				triangle[faceVertex] = { position,texcoord,normal };
-				/*VertexData vertex= { position,texcoord,normal };
-				modeldata.vertices.push_back(vertex);*/
-			}
-			modeldata.vertices.push_back(triangle[2]);
-			modeldata.vertices.push_back(triangle[1]);
-			modeldata.vertices.push_back(triangle[0]);
-		}
-		else if (identifier == "mtllib")
-		{
-			std::string materialFilename;
-			s >> materialFilename;
-			modeldata.material = LoadMaterialTemplateFile(directoryPath, materialFilename);
-		}
-	}
-
-	return modeldata;
-}
-
-MaterialDataPath DXCom::LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename)
-{
-	MaterialDataPath materialData;
-	std::string line;
-	std::ifstream file(directoryPath + "/" + filename);
-	assert(file.is_open());
-
-	while (std::getline(file, line))
-	{
-		std::string identifier;
-		std::istringstream s(line);
-		s >> identifier;
-
-		if (identifier == "map_Kd")
-		{
-			std::string textureFilename;
-			s >> textureFilename;
-			materialData.textureFilePath = directoryPath + "/" + textureFilename;
-		}
-	}
-
-	if (materialData.textureFilePath.empty())
-	{
-		std::string whiteTexture = "white2x2.png";
-		materialData.textureFilePath = directoryPath + "/" + whiteTexture;
-	}
-
-	return materialData;
-}
+//ModelData DXCom::LoadObjFile(const std::string& directoryPath, const std::string& filename)
+//{
+//	ModelData modeldata;
+//	std::vector<Vector4> positions;
+//	std::vector<Vector3> normals;
+//	std::vector<Vector2> texcords;
+//	std::string line;
+//
+//	std::ifstream file(directoryPath + "/" + filename);
+//	assert(file.is_open());
+//
+//	while (std::getline(file, line))
+//	{
+//		std::string identifier;
+//		std::istringstream s(line);
+//
+//		s >> identifier;
+//
+//		if (identifier == "v")
+//		{
+//			Vector4 position;
+//			s >> position.X >> position.Y >> position.Z;
+//			position.W = 1.0f;
+//
+//			positions.push_back(position);
+//		}
+//		else if (identifier == "vt")
+//		{
+//			Vector2 texcoord;
+//			s >> texcoord.x >> texcoord.y;
+//			texcords.push_back(texcoord);
+//		}
+//		else if (identifier == "vn")
+//		{
+//			Vector3 normal;
+//			s >> normal.x >> normal.y >> normal.z;
+//			normals.push_back(normal);
+//		}
+//		else if (identifier == "f")
+//		{
+//			VertexDate triangle[3];
+//			for (int32_t faceVertex = 0; faceVertex < 3; faceVertex++)
+//			{
+//				std::string vertexDefinition;
+//				s >> vertexDefinition;
+//				//頂点の要素へのindexは　位置/uv/法線　で格納されているので、分解してindex取得
+//				std::istringstream v(vertexDefinition);
+//				std::string index;
+//				uint32_t elementIndices[3] = { 0,0,0 };
+//				int32_t element = 0;
+//				while (std::getline(v, index, '/'))
+//				{
+//					if (!index.empty())
+//					{
+//						elementIndices[element] = std::stoi(index);
+//					}
+//					element++;
+//				}
+//				Vector4 position = positions[elementIndices[0] - 1];
+//				position.X *= -1.0f;
+//				Vector2 texcoord = { 0.0f,0.0f };
+//				if (elementIndices[1] > 0)
+//				{
+//					texcoord = texcords[elementIndices[1] - 1];
+//					texcoord.y = 1.0f - texcoord.y;
+//				}
+//				Vector3 normal = normals[elementIndices[2] - 1];
+//				normal.x *= -1.0f;
+//				triangle[faceVertex] = { position,texcoord,normal };
+//				/*VertexData vertex= { position,texcoord,normal };
+//				modeldata.vertices.push_back(vertex);*/
+//			}
+//			modeldata.vertices.push_back(triangle[2]);
+//			modeldata.vertices.push_back(triangle[1]);
+//			modeldata.vertices.push_back(triangle[0]);
+//		}
+//		else if (identifier == "mtllib")
+//		{
+//			std::string materialFilename;
+//			s >> materialFilename;
+//			modeldata.material = LoadMaterialTemplateFile(directoryPath, materialFilename);
+//		}
+//	}
+//
+//	return modeldata;
+//}
+//
+//MaterialDataPath DXCom::LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename)
+//{
+//	MaterialDataPath materialData;
+//	std::string line;
+//	std::ifstream file(directoryPath + "/" + filename);
+//	assert(file.is_open());
+//
+//	while (std::getline(file, line))
+//	{
+//		std::string identifier;
+//		std::istringstream s(line);
+//		s >> identifier;
+//
+//		if (identifier == "map_Kd")
+//		{
+//			std::string textureFilename;
+//			s >> textureFilename;
+//			materialData.textureFilePath = directoryPath + "/" + textureFilename;
+//		}
+//	}
+//
+//	if (materialData.textureFilePath.empty())
+//	{
+//		std::string whiteTexture = "white2x2.png";
+//		materialData.textureFilePath = directoryPath + "/" + whiteTexture;
+//	}
+//
+//	return materialData;
+//}
 
 void DXCom::SetDebugCamera(DebugCamera* instanse)
 {

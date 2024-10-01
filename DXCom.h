@@ -39,24 +39,6 @@ struct D3DResourceLeakChecker
 };
 
 
-struct Particle
-{
-	Particle(float x_, float y_) :pos(x_, y_, 0), vel(0, 0, 0), force(0, 0, 0), density(0), pressure(0) {}
-
-	Vector3 pos;
-	Vector3 vel;
-	Vector3 force;
-	float density;//密度
-	float pressure;//圧力
-};
-
-
-struct Grain
-{
-	Trans transform;
-	Vector3 velocity;
-};
-
 
 enum BlendMode
 {
@@ -148,17 +130,6 @@ public:
 	D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap, uint32_t descriptorSize, uint32_t index);
 
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResource(Microsoft::WRL::ComPtr<ID3D12Device> device, const DirectX::TexMetadata& metadata);
-
-	void UploadTextureData(Microsoft::WRL::ComPtr<ID3D12Resource> texture, const DirectX::ScratchImage& mipImages);
-
-	[[nodiscard]]
-	Microsoft::WRL::ComPtr<ID3D12Resource> UploadTextureData(Microsoft::WRL::ComPtr<ID3D12Resource> texture, const DirectX::ScratchImage& mipImages,
-		Microsoft::WRL::ComPtr<ID3D12Device> device, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList);
-
-	ModelData LoadObjFile(const std::string& directoryPath, const std::string& filename);
-	MaterialDataPath LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename);
-
 	/*void Tick();*/
 
 	void SetIsDebugCamera(const bool cameraMode) { isDebugCamera_ = cameraMode; }
@@ -200,7 +171,6 @@ private:
 
 	Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory_ = nullptr;
 	Microsoft::WRL::ComPtr<IDXGIAdapter4> useAdapter_;
-	DXGI_ADAPTER_DESC3 adapterDesc_{};
 	Microsoft::WRL::ComPtr<ID3D12Device> device_;
 
 

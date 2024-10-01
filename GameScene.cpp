@@ -5,6 +5,7 @@ GameScene::GameScene() {}
 GameScene::~GameScene() {
 	delete sphere;
 	delete suzunne;
+	delete fence;
 }
 
 void GameScene::Initialize() {
@@ -19,6 +20,9 @@ void GameScene::Initialize() {
 
 	suzunne = new Model();
 	suzunne = suzunne->CreateOBJ("suzanne.obj");
+
+	fence = new Model();
+	fence = fence->CreateOBJ("fence.obj");
 
 }
 
@@ -63,6 +67,9 @@ void GameScene::Update() {
 	suzunne->SetWVP();
 	sphere->transform.rotate.y += 0.02f;
 	sphere->SetWVP();
+	fence->transform.translate.x = -3.0f;
+	fence->transform.rotate.x = 0.5f;
+	fence->SetWVP();
 
 }
 
@@ -79,6 +86,7 @@ void GameScene::Draw() {
 	dxCommon_->PreModelDraw();
 	sphere->Draw();
 	suzunne->Draw();
+	fence->Draw();
 
 #pragma endregion
 
