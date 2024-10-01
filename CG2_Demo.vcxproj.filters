@@ -45,9 +45,6 @@
     <ClCompile Include="DebugCamera.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
-    <ClCompile Include="DirectXCom.cpp">
-      <Filter>Engine</Filter>
-    </ClCompile>
     <ClCompile Include="DXCom.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
@@ -93,6 +90,14 @@
     </ClCompile>
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="DXCommand.cpp" />
+    <ClCompile Include="DXCompil.cpp" />
+    <ClCompile Include="Pipeline.cpp" />
+    <ClCompile Include="BasePipeline.cpp" />
+    <ClCompile Include="ParticlePipeline.cpp" />
+    <ClCompile Include="GrayPipeline.cpp" />
+    <ClCompile Include="MetaBallPipeline.cpp" />
+    <ClCompile Include="GaussPipeline.cpp" />
+    <ClCompile Include="NonePipeline.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -123,9 +128,6 @@
       <Filter>Engine</Filter>
     </ClInclude>
     <ClInclude Include="DebugCamera.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="DirectXCom.h">
       <Filter>Engine</Filter>
     </ClInclude>
     <ClInclude Include="DXCom.h">
@@ -181,6 +183,14 @@
     </ClInclude>
     <ClInclude Include="Logger.h" />
     <ClInclude Include="DXCommand.h" />
+    <ClInclude Include="DXCompil.h" />
+    <ClInclude Include="Pipeline.h" />
+    <ClInclude Include="BasePipeline.h" />
+    <ClInclude Include="ParticlePipeline.h" />
+    <ClInclude Include="GrayPipeline.h" />
+    <ClInclude Include="MetaBallPipeline.h" />
+    <ClInclude Include="GaussPipeline.h" />
+    <ClInclude Include="NonePipeline.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="GaussianBlur.PS.hlsl">

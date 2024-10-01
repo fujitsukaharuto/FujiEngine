@@ -93,10 +93,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Audio.cpp" />
+    <ClCompile Include="BasePipeline.cpp" />
     <ClCompile Include="DebugCamera.cpp" />
-    <ClCompile Include="DirectXCom.cpp" />
     <ClCompile Include="DXCom.cpp" />
     <ClCompile Include="DXCommand.cpp" />
+    <ClCompile Include="DXCompil.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp" />
     <ClCompile Include="externals\imgui\imgui_demo.cpp" />
     <ClCompile Include="externals\imgui\imgui_draw.cpp" />
@@ -106,6 +107,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Fuji.cpp" />
     <ClCompile Include="GameScene.cpp" />
+    <ClCompile Include="GaussPipeline.cpp" />
+    <ClCompile Include="GrayPipeline.cpp" />
     <ClCompile Include="ImGuiManager.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Logger.cpp" />
@@ -113,19 +116,24 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="MatrixCalculation.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="MetaBallPipeline.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="My.cpp" />
     <ClCompile Include="MyVec2.cpp" />
     <ClCompile Include="MyVec3.cpp" />
     <ClCompile Include="MyWindow.cpp" />
+    <ClCompile Include="NonePipeline.cpp" />
+    <ClCompile Include="ParticlePipeline.cpp" />
+    <ClCompile Include="Pipeline.cpp" />
     <ClCompile Include="TextureManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Audio.h" />
+    <ClInclude Include="BasePipeline.h" />
     <ClInclude Include="DebugCamera.h" />
-    <ClInclude Include="DirectXCom.h" />
     <ClInclude Include="DXCom.h" />
     <ClInclude Include="DXCommand.h" />
+    <ClInclude Include="DXCompil.h" />
     <ClInclude Include="externals\imgui\imconfig.h" />
     <ClInclude Include="externals\imgui\imgui.h" />
     <ClInclude Include="externals\imgui\imgui_impl_dx12.h" />
@@ -136,17 +144,23 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="externals\imgui\imstb_truetype.h" />
     <ClInclude Include="Fuji.h" />
     <ClInclude Include="GameScene.h" />
+    <ClInclude Include="GaussPipeline.h" />
+    <ClInclude Include="GrayPipeline.h" />
     <ClInclude Include="ImGuiManager.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Logger.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="MatrixCalculation.h" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="MetaBallPipeline.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="My.h" />
     <ClInclude Include="MyVec2.h" />
     <ClInclude Include="MyVec3.h" />
     <ClInclude Include="MyWindow.h" />
+    <ClInclude Include="NonePipeline.h" />
+    <ClInclude Include="ParticlePipeline.h" />
+    <ClInclude Include="Pipeline.h" />
     <ClInclude Include="TextureManager.h" />
     <ClInclude Include="Vector2.h" />
     <ClInclude Include="Vector2Matrix.h" />
