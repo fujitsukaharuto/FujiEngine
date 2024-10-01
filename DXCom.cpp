@@ -312,6 +312,16 @@ void DXCom::SettingGraphicPipeline()
 
 }
 
+void DXCom::CreateBarrier(D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after) {
+	D3D12_RESOURCE_BARRIER barrier{};
+	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	barrier.Transition.pResource = swapChainResources_[swapChain_->GetCurrentBackBufferIndex()].Get();
+	barrier.Transition.StateBefore = before;
+	barrier.Transition.StateAfter = after;
+	command_->GetList()->ResourceBarrier(1, &barrier);
+}
+
 
 
 
@@ -338,11 +348,7 @@ void DXCom::SettingTexture()
 
 
 
-	command_->Close();
-
-	command_->Execution();
-
-	command_->Reset();
+	CommandExecution();
 
 }
 
@@ -359,9 +365,7 @@ void DXCom::PreDraw()
 
 
 	SetRenderTargets();
-
 	ClearRenderTarget();
-
 	ClearDepthBuffer();
 }
 
@@ -391,13 +395,7 @@ void DXCom::PostEffect()
 
 	UINT backBufferIndex = swapChain_->GetCurrentBackBufferIndex();
 
-	D3D12_RESOURCE_BARRIER barrier{};
-	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	barrier.Transition.pResource = swapChainResources_[backBufferIndex].Get();
-	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
-	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	commandList->ResourceBarrier(1, &barrier);
+	CreateBarrier(D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
 	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
 	commandList->OMSetRenderTargets(1, &rtvHandles_[backBufferIndex], false, &dsvHandle);
@@ -406,25 +404,12 @@ void DXCom::PostEffect()
 	float clearColor[] = { 0.1f,0.25f,0.5f,1.0f };
 	commandList->ClearRenderTargetView(rtvHandles_[backBufferIndex], clearColor, 0, nullptr);
 
-	D3D12_VIEWPORT viewport{};
-	viewport.Width = MyWin::kWindowWidth;
-	viewport.Height = MyWin::kWindowHeight;
-	viewport.TopLeftX = 0;
-	viewport.TopLeftY = 0;
-	viewport.MinDepth = 0.0f;
-	viewport.MaxDepth = 1.0f;
 
-	D3D12_RECT scissorRect{};
-	scissorRect.left = 0;
-	scissorRect.right = MyWin::kWindowWidth;
-	scissorRect.top = 0;
-	scissorRect.bottom = MyWin::kWindowHeight;
 
 
 	if (isGrayscale_)
 	{
-		commandList->RSSetViewports(1, &viewport);
-		commandList->RSSetScissorRects(1, &scissorRect);
+		command_->SetViewAndscissor();
 		grayPipeline_->SetPipelineState();
 
 		commandList->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -437,8 +422,7 @@ void DXCom::PostEffect()
 
 	if (isGaussian_)
 	{
-		commandList->RSSetViewports(1, &viewport);
-		commandList->RSSetScissorRects(1, &scissorRect);
+		command_->SetViewAndscissor();
 		gaussPipeline_->SetPipelineState();
 
 		commandList->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -450,8 +434,7 @@ void DXCom::PostEffect()
 
 	if (isNonePost_||isMetaBall_)
 	{
-		commandList->RSSetViewports(1, &viewport);
-		commandList->RSSetScissorRects(1, &scissorRect);
+		command_->SetViewAndscissor();
 		nonePipeline_->SetPipelineState();
 
 		commandList->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -465,53 +448,20 @@ void DXCom::PostEffect()
 
 void DXCom::PostDraw() {
 
-	ID3D12GraphicsCommandList* commandList = command_->GetList();
 
-	UINT backBufferIndex = swapChain_->GetCurrentBackBufferIndex();
-
-	D3D12_RESOURCE_BARRIER barrier{};
-	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	barrier.Transition.pResource = swapChainResources_[backBufferIndex].Get();
-	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
-	commandList->ResourceBarrier(1, &barrier);
+	CreateBarrier(D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 
 	// 命令のクローズ
 	command_->Close();
-
 	// コマンドリストの実行
 	command_->Execution();
-
-
 	swapChain_->Present(1, 0);
-
-
 	command_->Reset();
 }
 
 void DXCom::PreModelDraw()
 {
-
-	ID3D12GraphicsCommandList* commandList = command_->GetList();
-
-	D3D12_VIEWPORT viewport{};
-	viewport.Width = MyWin::kWindowWidth;
-	viewport.Height = MyWin::kWindowHeight;
-	viewport.TopLeftX = 0;
-	viewport.TopLeftY = 0;
-	viewport.MinDepth = 0.0f;
-	viewport.MaxDepth = 1.0f;
-
-	D3D12_RECT scissorRect{};
-	scissorRect.left = 0;
-	scissorRect.right = MyWin::kWindowWidth;
-	scissorRect.top = 0;
-	scissorRect.bottom = MyWin::kWindowHeight;
-
-
-	commandList->RSSetViewports(1, &viewport);
-	commandList->RSSetScissorRects(1, &scissorRect);
+	command_->SetViewAndscissor();
 	pipline_->SetPipelineState();
 }
 

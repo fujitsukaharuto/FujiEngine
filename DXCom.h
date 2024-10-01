@@ -160,6 +160,13 @@ private:
 	void SettingRootSignature();
 	void SettingGraphicPipeline();
 
+	/// <summary>
+	/// swapchainのバリア
+	/// </summary>
+	/// <param name="before"></param>
+	/// <param name="after"></param>
+	void CreateBarrier(D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after);
+
 
 private:
 

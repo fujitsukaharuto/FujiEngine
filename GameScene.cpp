@@ -88,6 +88,7 @@ void GameScene::Draw() {
 	suzunne->Draw();
 	fence->Draw();
 
+
 #pragma endregion
 
 

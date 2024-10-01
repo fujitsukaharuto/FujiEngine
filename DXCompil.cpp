@@ -30,7 +30,7 @@ void DXCompil::Initialize() {
 
 ComPtr<IDxcBlob> DXCompil::CompileShader(const std::wstring& filePath, const wchar_t* profile) {
 
-	Logger::Log((std::format(L"Begin CompileShader, path:{},profile:{}\n", filePath, profile)));
+	Logger::Log((std::format(L"Begin CompileShader, path:{},profile:{}", filePath, profile)));
 	IDxcBlobEncoding* shaderSource = nullptr;
 	HRESULT hr = dxcUtils_->LoadFile(filePath.c_str(), nullptr, &shaderSource);
 	assert(SUCCEEDED(hr));
