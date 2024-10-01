@@ -98,6 +98,7 @@
     <ClCompile Include="MetaBallPipeline.cpp" />
     <ClCompile Include="GaussPipeline.cpp" />
     <ClCompile Include="NonePipeline.cpp" />
+    <ClCompile Include="Game\Field\MapChipField.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -191,6 +192,7 @@
     <ClInclude Include="MetaBallPipeline.h" />
     <ClInclude Include="GaussPipeline.h" />
     <ClInclude Include="NonePipeline.h" />
+    <ClInclude Include="Game\Field\MapChipField.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="GaussianBlur.PS.hlsl">
