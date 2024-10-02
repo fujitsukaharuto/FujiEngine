@@ -13,6 +13,7 @@ class Model
 {
 public:
 	Model();
+	Model(const Model& other);
 	~Model();
 
 
@@ -25,6 +26,7 @@ public:
 	void Draw();
 
 	void SetWVP();
+
 
 private:
 

@@ -7,6 +7,18 @@
 
 Model::Model() {}
 
+Model::Model(const Model& other) {
+
+	mesh_ = other.mesh_;
+	material_ = other.material_;
+	wvpResource_ = DXCom::GetInstance()->CreateBufferResource(DXCom::GetInstance()->GetDevice(), sizeof(TransformationMatrix));
+	wvpDate_ = nullptr;
+	wvpResource_->Map(0, nullptr, reinterpret_cast<void**>(&wvpDate_));
+	wvpDate_->WVP = MakeIdentity4x4();
+	wvpDate_->World = MakeIdentity4x4();
+
+}
+
 Model::~Model() {}
 
 Model* Model::CreateOBJ(const std::string& filename)
