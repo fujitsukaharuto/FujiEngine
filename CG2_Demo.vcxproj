@@ -54,7 +54,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <TreatWarningAsError>true</TreatWarningAsError>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir)externals;$(ProjectDir)Game;$(ProjectDir)Engine;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)externals;$(ProjectDir)Game;$(ProjectDir)Engine/WinApp;$(ProjectDir)Engine/Model;$(ProjectDir)Engine/Math;$(ProjectDir)Engine/Logger;$(ProjectDir)Engine/Input;$(ProjectDir)Engine/ImGuiManager;$(ProjectDir)Engine/GraphicPipeline;$(ProjectDir)Engine/DX;$(ProjectDir)Engine/DebugCamera;$(ProjectDir)Engine/Audio;$(ProjectDir)Engine;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -79,7 +79,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir)externals;$(ProjectDir)Game;$(ProjectDir)Engine;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)externals;$(ProjectDir)Game;$(ProjectDir)Engine/WinApp;$(ProjectDir)Engine/Model;$(ProjectDir)Engine/Math;$(ProjectDir)Engine/Logger;$(ProjectDir)Engine/Input;$(ProjectDir)Engine/ImGuiManager;$(ProjectDir)Engine/GraphicPipeline;$(ProjectDir)Engine/DX;$(ProjectDir)Engine/DebugCamera;$(ProjectDir)Engine/Audio;$(ProjectDir)Engine;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -94,12 +94,29 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Audio.cpp" />
-    <ClCompile Include="BasePipeline.cpp" />
-    <ClCompile Include="DebugCamera.cpp" />
-    <ClCompile Include="DXCom.cpp" />
-    <ClCompile Include="DXCommand.cpp" />
-    <ClCompile Include="DXCompil.cpp" />
+    <ClCompile Include="Engine\Audio\Audio.cpp" />
+    <ClCompile Include="Engine\DebugCamera\DebugCamera.cpp" />
+    <ClCompile Include="Engine\DX\DXCom.cpp" />
+    <ClCompile Include="Engine\DX\DXCommand.cpp" />
+    <ClCompile Include="Engine\DX\DXCompil.cpp" />
+    <ClCompile Include="Engine\GraphicPipeline\BasePipeline.cpp" />
+    <ClCompile Include="Engine\GraphicPipeline\GaussPipeline.cpp" />
+    <ClCompile Include="Engine\GraphicPipeline\GrayPipeline.cpp" />
+    <ClCompile Include="Engine\GraphicPipeline\MetaBallPipeline.cpp" />
+    <ClCompile Include="Engine\GraphicPipeline\NonePipeline.cpp" />
+    <ClCompile Include="Engine\GraphicPipeline\ParticlePipeline.cpp" />
+    <ClCompile Include="Engine\GraphicPipeline\Pipeline.cpp" />
+    <ClCompile Include="Engine\ImGuiManager\ImGuiManager.cpp" />
+    <ClCompile Include="Engine\Input\Input.cpp" />
+    <ClCompile Include="Engine\Logger\Logger.cpp" />
+    <ClCompile Include="Engine\Math\MatrixCalculation.cpp" />
+    <ClCompile Include="Engine\Math\MyVec2.cpp" />
+    <ClCompile Include="Engine\Math\MyVec3.cpp" />
+    <ClCompile Include="Engine\Model\Material.cpp" />
+    <ClCompile Include="Engine\Model\Mesh.cpp" />
+    <ClCompile Include="Engine\Model\Model.cpp" />
+    <ClCompile Include="Engine\Model\TextureManager.cpp" />
+    <ClCompile Include="Engine\WinApp\MyWindow.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp" />
     <ClCompile Include="externals\imgui\imgui_demo.cpp" />
     <ClCompile Include="externals\imgui\imgui_draw.cpp" />
@@ -107,35 +124,37 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="externals\imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="externals\imgui\imgui_tables.cpp" />
     <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="Fuji.cpp" />
-    <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="Game\Field\MapChipField.cpp" />
-    <ClCompile Include="GaussPipeline.cpp" />
-    <ClCompile Include="GrayPipeline.cpp" />
-    <ClCompile Include="ImGuiManager.cpp" />
-    <ClCompile Include="Input.cpp" />
-    <ClCompile Include="Logger.cpp" />
+    <ClCompile Include="Game\GameScene.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Material.cpp" />
-    <ClCompile Include="MatrixCalculation.cpp" />
-    <ClCompile Include="Mesh.cpp" />
-    <ClCompile Include="MetaBallPipeline.cpp" />
-    <ClCompile Include="Model.cpp" />
-    <ClCompile Include="MyVec2.cpp" />
-    <ClCompile Include="MyVec3.cpp" />
-    <ClCompile Include="MyWindow.cpp" />
-    <ClCompile Include="NonePipeline.cpp" />
-    <ClCompile Include="ParticlePipeline.cpp" />
-    <ClCompile Include="Pipeline.cpp" />
-    <ClCompile Include="TextureManager.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Audio.h" />
-    <ClInclude Include="BasePipeline.h" />
-    <ClInclude Include="DebugCamera.h" />
-    <ClInclude Include="DXCom.h" />
-    <ClInclude Include="DXCommand.h" />
-    <ClInclude Include="DXCompil.h" />
+    <ClInclude Include="Engine\Audio\Audio.h" />
+    <ClInclude Include="Engine\DebugCamera\DebugCamera.h" />
+    <ClInclude Include="Engine\DX\DXCom.h" />
+    <ClInclude Include="Engine\DX\DXCommand.h" />
+    <ClInclude Include="Engine\DX\DXCompil.h" />
+    <ClInclude Include="Engine\GraphicPipeline\BasePipeline.h" />
+    <ClInclude Include="Engine\GraphicPipeline\GaussPipeline.h" />
+    <ClInclude Include="Engine\GraphicPipeline\GrayPipeline.h" />
+    <ClInclude Include="Engine\GraphicPipeline\MetaBallPipeline.h" />
+    <ClInclude Include="Engine\GraphicPipeline\NonePipeline.h" />
+    <ClInclude Include="Engine\GraphicPipeline\ParticlePipeline.h" />
+    <ClInclude Include="Engine\GraphicPipeline\Pipeline.h" />
+    <ClInclude Include="Engine\ImGuiManager\ImGuiManager.h" />
+    <ClInclude Include="Engine\Input\Input.h" />
+    <ClInclude Include="Engine\Logger\Logger.h" />
+    <ClInclude Include="Engine\Math\MatrixCalculation.h" />
+    <ClInclude Include="Engine\Math\MyVec2.h" />
+    <ClInclude Include="Engine\Math\MyVec3.h" />
+    <ClInclude Include="Engine\Math\Vector2.h" />
+    <ClInclude Include="Engine\Math\Vector2Matrix.h" />
+    <ClInclude Include="Engine\Math\Vector3.h" />
+    <ClInclude Include="Engine\Model\Material.h" />
+    <ClInclude Include="Engine\Model\Mesh.h" />
+    <ClInclude Include="Engine\Model\Model.h" />
+    <ClInclude Include="Engine\Model\TextureManager.h" />
+    <ClInclude Include="Engine\WinApp\MyWindow.h" />
     <ClInclude Include="externals\imgui\imconfig.h" />
     <ClInclude Include="externals\imgui\imgui.h" />
     <ClInclude Include="externals\imgui\imgui_impl_dx12.h" />
@@ -144,29 +163,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="externals\imgui\imstb_rectpack.h" />
     <ClInclude Include="externals\imgui\imstb_textedit.h" />
     <ClInclude Include="externals\imgui\imstb_truetype.h" />
-    <ClInclude Include="Fuji.h" />
-    <ClInclude Include="GameScene.h" />
     <ClInclude Include="Game\Field\MapChipField.h" />
-    <ClInclude Include="GaussPipeline.h" />
-    <ClInclude Include="GrayPipeline.h" />
-    <ClInclude Include="ImGuiManager.h" />
-    <ClInclude Include="Input.h" />
-    <ClInclude Include="Logger.h" />
-    <ClInclude Include="Material.h" />
-    <ClInclude Include="MatrixCalculation.h" />
-    <ClInclude Include="Mesh.h" />
-    <ClInclude Include="MetaBallPipeline.h" />
-    <ClInclude Include="Model.h" />
-    <ClInclude Include="MyVec2.h" />
-    <ClInclude Include="MyVec3.h" />
-    <ClInclude Include="MyWindow.h" />
-    <ClInclude Include="NonePipeline.h" />
-    <ClInclude Include="ParticlePipeline.h" />
-    <ClInclude Include="Pipeline.h" />
-    <ClInclude Include="TextureManager.h" />
-    <ClInclude Include="Vector2.h" />
-    <ClInclude Include="Vector2Matrix.h" />
-    <ClInclude Include="Vector3.h" />
+    <ClInclude Include="Game\GameScene.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="GaussianBlur.PS.hlsl">

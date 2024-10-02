@@ -1,9 +1,8 @@
 #include "DXCom.h"
 #include "Logger.h"
-#include "Fuji.h"
 #include "ImGuiManager.h"
 #include "Input.h"
-#include "DebugCamera.h"
+#include <DebugCamera.h>
 
 #include <d3d12.h>
 #include <dxgi1_6.h>
@@ -559,7 +558,7 @@ void DXCom::UpDate()
 	{
 		viewMatrix = debugCamera_->GetViewMatrix();
 	}
-	Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(Fuji::GetkWindowWidth()) / float(Fuji::GetkWindowHeight()), 0.1f, 100.0f);
+	Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(MyWin::kWindowWidth) / float(MyWin::kWindowHeight), 0.1f, 100.0f);
 	/*Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));*/
 
 	/*wvpDate_->World = worldMatrix;
@@ -597,7 +596,7 @@ Matrix4x4 DXCom::GetView()
 
 float DXCom::GetAspect()
 {
-	return float(Fuji::GetkWindowWidth()) / float(Fuji::GetkWindowHeight());
+	return float(MyWin::kWindowWidth) / float(MyWin::kWindowHeight);
 }
 
 
