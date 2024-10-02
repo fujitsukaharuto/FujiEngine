@@ -33,4 +33,6 @@ protected:
 	ComPtr<IDxcBlob> vs = nullptr;
 	ComPtr<IDxcBlob> ps = nullptr;
 
+	const std::wstring kDirectoryPath_ = L"./resource/Shaders/";
+
 };

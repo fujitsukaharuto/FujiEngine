@@ -1,44 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <FxCompile Include="GaussianBlur.PS.hlsl">
-      <Filter>resource</Filter>
-    </FxCompile>
-    <FxCompile Include="GaussianBlur.VS.hlsl">
-      <Filter>resource</Filter>
-    </FxCompile>
-    <FxCompile Include="MetaBall.PS.hlsl">
-      <Filter>resource</Filter>
-    </FxCompile>
-    <FxCompile Include="MetaBall.VS.hlsl">
-      <Filter>resource</Filter>
-    </FxCompile>
-    <FxCompile Include="NonePost.PS.hlsl">
-      <Filter>resource</Filter>
-    </FxCompile>
-    <FxCompile Include="NonePost.VS.hlsl">
-      <Filter>resource</Filter>
-    </FxCompile>
-    <FxCompile Include="Object3d.PS.hlsl">
-      <Filter>resource</Filter>
-    </FxCompile>
-    <FxCompile Include="Object3d.VS.hlsl">
-      <Filter>resource</Filter>
-    </FxCompile>
-    <FxCompile Include="Particle.PS.hlsl">
-      <Filter>resource</Filter>
-    </FxCompile>
-    <FxCompile Include="Particle.VS.hlsl">
-      <Filter>resource</Filter>
-    </FxCompile>
-    <FxCompile Include="SimpleGrayscale.PS.hlsl">
-      <Filter>resource</Filter>
-    </FxCompile>
-    <FxCompile Include="SimpleGrayscale.VS.hlsl">
-      <Filter>resource</Filter>
-    </FxCompile>
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp">
       <Filter>Externals\Imgui</Filter>
@@ -248,14 +210,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Object3d.hlsli">
-      <Filter>resource</Filter>
-    </None>
-    <None Include="Particle.hlsli">
-      <Filter>resource</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <Filter Include="Engine">
       <UniqueIdentifier>{73eddf69-5416-4ecf-b2ba-3d701407fe67}</UniqueIdentifier>
     </Filter>
@@ -304,10 +258,59 @@
     <Filter Include="Game\Field">
       <UniqueIdentifier>{474c6061-5ccc-4a22-b89f-a7917901b616}</UniqueIdentifier>
     </Filter>
+    <Filter Include="resource\Shaders">
+      <UniqueIdentifier>{721d04ed-0430-462c-a558-1b345031cb69}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt">
       <Filter>Externals\Imgui</Filter>
     </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="resource\Shaders\GaussianBlur.PS.hlsl">
+      <Filter>resource\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\GaussianBlur.VS.hlsl">
+      <Filter>resource\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\MetaBall.PS.hlsl">
+      <Filter>resource\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\MetaBall.VS.hlsl">
+      <Filter>resource\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\NonePost.PS.hlsl">
+      <Filter>resource\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\NonePost.VS.hlsl">
+      <Filter>resource\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\Object3d.PS.hlsl">
+      <Filter>resource\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\Object3d.VS.hlsl">
+      <Filter>resource\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\Particle.PS.hlsl">
+      <Filter>resource\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\Particle.VS.hlsl">
+      <Filter>resource\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\SimpleGrayscale.PS.hlsl">
+      <Filter>resource\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\SimpleGrayscale.VS.hlsl">
+      <Filter>resource\Shaders</Filter>
+    </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="resource\Shaders\Object3d.hlsli">
+      <Filter>resource\Shaders</Filter>
+    </None>
+    <None Include="resource\Shaders\Particle.hlsli">
+      <Filter>resource\Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

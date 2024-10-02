@@ -84,9 +84,9 @@ void MetaBallPipeline::CreatePSO(ID3D12Device* device) {
 	layout.NumElements = _countof(element);
 
 
-	vs = DXCom::GetInstance()->GetDXCompil()->CompileShader(L"MetaBall.VS.hlsl", L"vs_6_0");
+	vs = DXCom::GetInstance()->GetDXCompil()->CompileShader(kDirectoryPath_ + L"MetaBall.VS.hlsl", L"vs_6_0");
 	assert(vs != nullptr);
-	ps = DXCom::GetInstance()->GetDXCompil()->CompileShader(L"MetaBall.PS.hlsl", L"ps_6_0");
+	ps = DXCom::GetInstance()->GetDXCompil()->CompileShader(kDirectoryPath_ + L"MetaBall.PS.hlsl", L"ps_6_0");
 	assert(ps != nullptr);
 
 
