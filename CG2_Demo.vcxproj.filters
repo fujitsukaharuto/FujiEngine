@@ -100,9 +100,6 @@
     <ClCompile Include="Logger.cpp">
       <Filter>Engine\Logger</Filter>
     </ClCompile>
-    <ClCompile Include="Game\Field\MapChipField.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
     <ClCompile Include="MatrixCalculation.cpp">
       <Filter>Engine\Math</Filter>
     </ClCompile>
@@ -138,6 +135,9 @@
     </ClCompile>
     <ClCompile Include="TextureManager.cpp">
       <Filter>Engine\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Field\MapChipField.cpp">
+      <Filter>Game\Field</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -204,9 +204,6 @@
     <ClInclude Include="Logger.h">
       <Filter>Engine\Logger</Filter>
     </ClInclude>
-    <ClInclude Include="Game\Field\MapChipField.h">
-      <Filter>Game</Filter>
-    </ClInclude>
     <ClInclude Include="MatrixCalculation.h">
       <Filter>Engine\Math</Filter>
     </ClInclude>
@@ -251,6 +248,9 @@
     </ClInclude>
     <ClInclude Include="Vector3.h">
       <Filter>Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Field\MapChipField.h">
+      <Filter>Game\Field</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -306,6 +306,9 @@
     </Filter>
     <Filter Include="Engine\GraphicPipeline">
       <UniqueIdentifier>{a7aec92a-a6ed-4e8d-b70e-d00475873d04}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Field">
+      <UniqueIdentifier>{474c6061-5ccc-4a22-b89f-a7917901b616}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
