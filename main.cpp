@@ -4,6 +4,7 @@
 #include "TextureManager.h"
 #include "ImGuiManager.h"
 #include "MyWindow.h"
+#include "Rendering/PrimitiveDrawer.h"
 
 
 
@@ -23,6 +24,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Audio* audio = nullptr;
 	GameScene* gameScene = nullptr;
 	TextureManager* textureManager = nullptr;
+	PrimitiveDrawer* primitiveDrawer = nullptr;
 
 	// ゲームウィンドウの作成
 	win = MyWin::GetInstance();
@@ -52,6 +54,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	audio->Initialize();
 
 	textureManager->GetInstance();
+
+	primitiveDrawer = PrimitiveDrawer::GetInstance();
 
 #pragma endregion
 
@@ -98,6 +102,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	// 解放
 	delete gameScene;
+
+	primitiveDrawer->Finalize();
 	
 	audio->Finalize();
 	imguiManager->Fin();

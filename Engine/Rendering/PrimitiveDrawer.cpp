@@ -131,7 +131,18 @@ void PrimitiveDrawer::Render(){
     commandList_->DrawInstanced(indexLine_ * 2, 1, 0, 0);
 
     // `indexLine_`をリセット
+    Reset();
+}
+
+void PrimitiveDrawer::Reset(){
+    // 頂点インデックスのリセット
     indexLine_ = 0;
+
+    //// 必要に応じて他のリセット処理を追加
+    //if (line_ && line_->vertMap){
+    //    // バッファ内容をクリアするなど
+    //    memset(line_->vertMap, 0, sizeof(VertexPosColor) * kMaxLineCount * kVertexCountLine);
+    //}
 }
 
 void PrimitiveDrawer::CreateMatrixBuffer(){

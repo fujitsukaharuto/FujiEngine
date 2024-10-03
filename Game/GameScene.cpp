@@ -6,7 +6,6 @@ GameScene::~GameScene() {
 	delete sphere;
 	delete suzunne;
 	delete fence;
-	PrimitiveDrawer::GetInstance()->Finalize();
 }
 
 void GameScene::Initialize() {
@@ -103,9 +102,8 @@ void GameScene::Draw() {
 	fence->Draw();
 
 
-	PrimitiveDrawer* primitiveDrawer = PrimitiveDrawer::GetInstance();
-	//線の描画
-	primitiveDrawer->Render();
+	PrimitiveDrawer::GetInstance()->DrawLine3d(Vector3{-2.0f,0.0f,5.0f}, Vector3 {2.0f,0.0f,-4.0f},{1.0f,0.0f,0.0f,1.0f});
+	PrimitiveDrawer::GetInstance()->Render();
 #pragma endregion
 
 
