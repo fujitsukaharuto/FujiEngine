@@ -112,6 +112,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\GraphicPipeline\NonePipeline.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\ParticlePipeline.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\Pipeline.cpp" />
+    <ClCompile Include="Engine\GraphicPipeline\PrimitivePipeline.cpp" />
     <ClCompile Include="Engine\ImGuiManager\ImGuiManager.cpp" />
     <ClCompile Include="Engine\Input\Input.cpp" />
     <ClCompile Include="Engine\Logger\Logger.cpp" />
@@ -122,6 +123,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Model\Mesh.cpp" />
     <ClCompile Include="Engine\Model\Model.cpp" />
     <ClCompile Include="Engine\Model\TextureManager.cpp" />
+    <ClCompile Include="Engine\Rendering\PrimitiveDrawer.cpp" />
     <ClCompile Include="Engine\WinApp\MyWindow.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp" />
     <ClCompile Include="externals\imgui\imgui_demo.cpp" />
@@ -149,6 +151,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\GraphicPipeline\NonePipeline.h" />
     <ClInclude Include="Engine\GraphicPipeline\ParticlePipeline.h" />
     <ClInclude Include="Engine\GraphicPipeline\Pipeline.h" />
+    <ClInclude Include="Engine\GraphicPipeline\PrimitivePipeline.h" />
     <ClInclude Include="Engine\ImGuiManager\ImGuiManager.h" />
     <ClInclude Include="Engine\Input\Input.h" />
     <ClInclude Include="Engine\Logger\Logger.h" />
@@ -158,10 +161,12 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Math\Vector2.h" />
     <ClInclude Include="Engine\Math\Vector2Matrix.h" />
     <ClInclude Include="Engine\Math\Vector3.h" />
+    <ClInclude Include="Engine\Math\Vector4.h" />
     <ClInclude Include="Engine\Model\Material.h" />
     <ClInclude Include="Engine\Model\Mesh.h" />
     <ClInclude Include="Engine\Model\Model.h" />
     <ClInclude Include="Engine\Model\TextureManager.h" />
+    <ClInclude Include="Engine\Rendering\PrimitiveDrawer.h" />
     <ClInclude Include="Engine\WinApp\MyWindow.h" />
     <ClInclude Include="externals\imgui\imconfig.h" />
     <ClInclude Include="externals\imgui\imgui.h" />
@@ -225,6 +230,14 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
+    <FxCompile Include="resource\Shaders\Primitive.PS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\Primitive.VS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="resource\Shaders\SimpleGrayscale.PS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -240,6 +253,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </None>
     <None Include="resource\Shaders\Particle.hlsli">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
+    <None Include="resource\Shaders\Primitive.hlsli">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </None>

@@ -98,6 +98,8 @@
     <ClCompile Include="Engine\WinApp\MyWindow.cpp">
       <Filter>Engine\WinApp</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Rendering\PrimitiveDrawer.cpp" />
+    <ClCompile Include="Engine\GraphicPipeline\PrimitivePipeline.cpp" />
     <ClCompile Include="ModelManager.cpp">
       <Filter>Engine\Model</Filter>
     </ClCompile>
@@ -220,6 +222,9 @@
     <ClInclude Include="PipelineManager.h">
       <Filter>Engine\GraphicPipeline</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Rendering\PrimitiveDrawer.h" />
+    <ClInclude Include="Engine\Math\Vector4.h" />
+    <ClInclude Include="Engine\GraphicPipeline\PrimitivePipeline.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -316,6 +321,8 @@
     <FxCompile Include="resource\Shaders\SimpleGrayscale.VS.hlsl">
       <Filter>resource\Shaders</Filter>
     </FxCompile>
+    <FxCompile Include="resource\Shaders\Primitive.PS.hlsl" />
+    <FxCompile Include="resource\Shaders\Primitive.VS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resource\Shaders\Object3d.hlsli">
@@ -324,5 +331,6 @@
     <None Include="resource\Shaders\Particle.hlsli">
       <Filter>resource\Shaders</Filter>
     </None>
+    <None Include="resource\Shaders\Primitive.hlsli" />
   </ItemGroup>
 </Project>
