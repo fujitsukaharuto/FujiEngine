@@ -98,13 +98,17 @@
     <ClCompile Include="Engine\WinApp\MyWindow.cpp">
       <Filter>Engine\WinApp</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Rendering\PrimitiveDrawer.cpp" />
-    <ClCompile Include="Engine\GraphicPipeline\PrimitivePipeline.cpp" />
     <ClCompile Include="ModelManager.cpp">
       <Filter>Engine\Model</Filter>
     </ClCompile>
     <ClCompile Include="PipelineManager.cpp">
       <Filter>Engine\GraphicPipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\GraphicPipeline\PrimitivePipeline.cpp">
+      <Filter>Engine\GraphicPipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Rendering\PrimitiveDrawer.cpp">
+      <Filter>Engine\Drawer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -222,9 +226,12 @@
     <ClInclude Include="PipelineManager.h">
       <Filter>Engine\GraphicPipeline</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Rendering\PrimitiveDrawer.h" />
-    <ClInclude Include="Engine\Math\Vector4.h" />
-    <ClInclude Include="Engine\GraphicPipeline\PrimitivePipeline.h" />
+    <ClInclude Include="Engine\GraphicPipeline\PrimitivePipeline.h">
+      <Filter>Engine\GraphicPipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Rendering\PrimitiveDrawer.h">
+      <Filter>Engine\Drawer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -278,6 +285,9 @@
     <Filter Include="resource\Shaders">
       <UniqueIdentifier>{721d04ed-0430-462c-a558-1b345031cb69}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\Drawer">
+      <UniqueIdentifier>{a4a09fc7-a74d-4acd-a2b5-a9b46ce6febd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt">
@@ -321,8 +331,12 @@
     <FxCompile Include="resource\Shaders\SimpleGrayscale.VS.hlsl">
       <Filter>resource\Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\Primitive.PS.hlsl" />
-    <FxCompile Include="resource\Shaders\Primitive.VS.hlsl" />
+    <FxCompile Include="resource\Shaders\Primitive.PS.hlsl">
+      <Filter>resource\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\Primitive.VS.hlsl">
+      <Filter>resource\Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="resource\Shaders\Object3d.hlsli">
@@ -331,6 +345,8 @@
     <None Include="resource\Shaders\Particle.hlsli">
       <Filter>resource\Shaders</Filter>
     </None>
-    <None Include="resource\Shaders\Primitive.hlsli" />
+    <None Include="resource\Shaders\Primitive.hlsli">
+      <Filter>resource\Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
