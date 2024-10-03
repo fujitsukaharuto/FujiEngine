@@ -55,7 +55,7 @@ public:
 
 	void SoundUnload(SoundData* soundData);
 
-	void SoundPlayWave(const SoundData& soundData);
+	void SoundPlayWave(const SoundData& soundData, float volume = 0.2f);
 
 private:
 

@@ -116,7 +116,7 @@ void Audio::SoundUnload(SoundData* soundData)
 	soundData->wfex = {};
 }
 
-void Audio::SoundPlayWave(const SoundData& soundData)
+void Audio::SoundPlayWave(const SoundData& soundData, float volume)
 {
 
 	HRESULT result;
@@ -125,6 +125,8 @@ void Audio::SoundPlayWave(const SoundData& soundData)
 	result = xAudio2_->CreateSourceVoice(&pSourceVoice, &soundData.wfex);
 	assert(SUCCEEDED(result));
 
+	result = pSourceVoice->SetVolume(volume);
+	assert(SUCCEEDED(result));
 
 	XAUDIO2_BUFFER buf{};
 	buf.pAudioData = soundData.pBuffer;
