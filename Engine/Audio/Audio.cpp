@@ -55,35 +55,49 @@ SoundData Audio::SoundLoadWave(const char* filename)
 		assert(0);
 	}
 
-
 	FormatChunk format = {};
-	file.read((char*)&format, sizeof(ChunkHeader));
-	if (strncmp(format.chunk.id, "fmt ", 4) != 0)
-	{
-		assert(0);
-	}
-
-	assert(format.chunk.size <= sizeof(format.fmt));
-	file.read((char*)&format.fmt, format.chunk.size);
-
-
 	ChunkHeader data;
-	file.read((char*)&data, sizeof(data));
-	if (strncmp(data.id, "JUNK", 4) == 4)
-	{
-		file.seekg(data.size, std::ios_base::cur);
-		file.read((char*)&data, sizeof(data));
+
+	bool formatFound = false;
+	bool dataFound = false;
+	char* pBuffer = nullptr;
+
+	while (file.read((char*)&data, sizeof(data))) {
+
+		if (strncmp(data.id, "fmt ", 4) == 0) {
+			assert(data.size >= 16);
+			file.read((char*)&format.fmt, 16);
+
+
+			if (data.size > 16) {
+				BYTE* extraBytes = new BYTE[data.size - 16];
+				file.read((char*)extraBytes, data.size - 16);
+				delete[] extraBytes;
+			}
+
+
+			formatFound = true;
+		}
+		else if (strncmp(data.id, "data", 4) == 0) {
+
+			pBuffer = new char[data.size];
+			file.read(pBuffer, data.size);
+			dataFound = true;
+
+		}
+		else {
+			file.seekg(data.size, std::ios_base::cur);
+		}
+
+		if (formatFound && dataFound) {
+			break;
+		}
+
 	}
 
 
-	if (strncmp(data.id, "data", 4) != 0)
-	{
-		assert(0);
-	}
-	char* pBuffer = new char[data.size];
-	file.read(pBuffer, data.size);
 	file.close();
-
+	assert(formatFound && dataFound);
 
 	SoundData soundData = {};
 	soundData.wfex = format.fmt;

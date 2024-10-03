@@ -23,6 +23,9 @@ void GameScene::Initialize() {
 	fence = new Model();
 	fence = fence->CreateOBJ("fence.obj");
 
+	soundData1 = audio_->SoundLoadWave("resource/Alarm01.wav");
+	soundData2 = audio_->SoundLoadWave("resource/mokugyo.wav");
+
 }
 
 void GameScene::Update() {
@@ -61,6 +64,12 @@ void GameScene::Update() {
 	}
 
 
+	if (input_->TriggerKey(DIK_8)) {
+		audio_->SoundPlayWave(soundData1);
+	}
+	if (input_->TriggerKey(DIK_7)) {
+		audio_->SoundPlayWave(soundData2);
+	}
 
 	dxCommon_->UpDate();
 	suzunne->transform.rotate.y = 3.14f;
