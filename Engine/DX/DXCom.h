@@ -21,12 +21,7 @@
 #include "DXCompil.h"
 
 
-#include "Pipeline.h"
-#include "ParticlePipeline.h"
-#include "GrayPipeline.h"
-#include "MetaBallPipeline.h"
-#include "GaussPipeline.h"
-#include "NonePipeline.h"
+#include "PipelineManager.h"
 
 
 
@@ -214,12 +209,7 @@ private:
 	std::unique_ptr<DXCompil> compiler_ = nullptr;
 
 
-	std::unique_ptr<Pipeline> pipline_ = nullptr;
-	std::unique_ptr<ParticlePipeline> particlePipline_ = nullptr;
-	std::unique_ptr<GrayPipeline> grayPipeline_ = nullptr;
-	std::unique_ptr<MetaBallPipeline> metaballPipeline_ = nullptr;
-	std::unique_ptr<GaussPipeline> gaussPipeline_ = nullptr;
-	std::unique_ptr<NonePipeline> nonePipeline_ = nullptr;
+	PipelineManager* pipeManager_;
 
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> instancingResource = nullptr;

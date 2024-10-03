@@ -28,7 +28,7 @@ void DXCom::Initialize(MyWin* myWin)
 {
 	assert(myWin);
 	myWin_ = myWin;
-
+	pipeManager_ = PipelineManager::GetInstance();
 
 	CreateDevice();
 	CreateCommand();
@@ -216,12 +216,8 @@ void DXCom::CreateCompiler() {
 
 void DXCom::SettingRootSignature()
 {
-	pipline_.reset(new Pipeline());
-	pipline_->Initialize();
-
-	particlePipline_.reset(new ParticlePipeline());
-	particlePipline_->Initialize();
-
+	
+	pipeManager_->CreatePipeline();
 
 	const uint32_t kNumInstance = instanceCount_;
 	instancingResource =
@@ -231,32 +227,6 @@ void DXCom::SettingRootSignature()
 	{
 		instancingData[index].WVP = MakeIdentity4x4();
 		instancingData[index].World = MakeIdentity4x4();
-	}
-
-
-	if (isGrayscale_)
-	{
-		grayPipeline_.reset(new GrayPipeline());
-		grayPipeline_->Initialize();
-	}
-
-	if (isMetaBall_)
-	{
-		metaballPipeline_.reset(new MetaBallPipeline());
-		metaballPipeline_->Initialize();
-	}
-
-	if (isGaussian_)
-	{
-		gaussPipeline_.reset(new GaussPipeline());
-		gaussPipeline_->Initialize();
-	}
-
-
-	if (isNonePost_)
-	{
-		nonePipeline_.reset(new NonePipeline());
-		nonePipeline_->Initialize();
 	}
 
 }
@@ -373,7 +343,7 @@ void DXCom::Command()
 
 
 	command_->SetViewAndscissor();
-	pipline_->SetPipelineState();
+	pipeManager_->SetPipeline(Pipe::Normal);
 
 
 }
@@ -409,7 +379,7 @@ void DXCom::PostEffect()
 	if (isGrayscale_)
 	{
 		command_->SetViewAndscissor();
-		grayPipeline_->SetPipelineState();
+		pipeManager_->SetPipeline(Pipe::Gray);
 
 		commandList->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		commandList->IASetIndexBuffer(&indexGrayBufferView_);
@@ -422,7 +392,7 @@ void DXCom::PostEffect()
 	if (isGaussian_)
 	{
 		command_->SetViewAndscissor();
-		gaussPipeline_->SetPipelineState();
+		pipeManager_->SetPipeline(Pipe::Gauss);
 
 		commandList->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		commandList->IASetIndexBuffer(&indexGrayBufferView_);
@@ -434,7 +404,7 @@ void DXCom::PostEffect()
 	if (isNonePost_||isMetaBall_)
 	{
 		command_->SetViewAndscissor();
-		nonePipeline_->SetPipelineState();
+		pipeManager_->SetPipeline(Pipe::None);
 
 		commandList->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		commandList->IASetIndexBuffer(&indexGrayBufferView_);
@@ -461,7 +431,7 @@ void DXCom::PostDraw() {
 void DXCom::PreModelDraw()
 {
 	command_->SetViewAndscissor();
-	pipline_->SetPipelineState();
+	pipeManager_->SetPipeline(Pipe::Normal);
 }
 
 void DXCom::CommandExecution() {

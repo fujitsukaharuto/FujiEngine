@@ -23,7 +23,7 @@ void GameScene::Initialize() {
 	fence = new Model();
 	fence = fence->CreateOBJ("fence.obj");
 
-	soundData1 = audio_->SoundLoadWave("resource/Alarm01.wav");
+	soundData1 = audio_->SoundLoadWave("resource/xxx.wav");
 	soundData2 = audio_->SoundLoadWave("resource/mokugyo.wav");
 
 }

@@ -98,6 +98,12 @@
     <ClCompile Include="Engine\WinApp\MyWindow.cpp">
       <Filter>Engine\WinApp</Filter>
     </ClCompile>
+    <ClCompile Include="ModelManager.cpp">
+      <Filter>Engine\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="PipelineManager.cpp">
+      <Filter>Engine\GraphicPipeline</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -207,6 +213,12 @@
     </ClInclude>
     <ClInclude Include="Engine\WinApp\MyWindow.h">
       <Filter>Engine\WinApp</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelManager.h">
+      <Filter>Engine\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="PipelineManager.h">
+      <Filter>Engine\GraphicPipeline</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
