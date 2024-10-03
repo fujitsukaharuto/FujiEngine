@@ -4,7 +4,6 @@
 #include "Input.h"
 #include "DebugCamera.h"
 #include "Model.h"
-#include "Rendering/PrimitiveDrawer.h"
 
 #include<memory>
 
@@ -30,7 +29,6 @@ private:
 	Model* suzunne = nullptr;
 	Model* fence = nullptr;
 
-	std::unique_ptr<PrimitiveDrawer> primitiveDrawer_ = nullptr;
 
 	bool isDebugCameraMode_ = false;
 

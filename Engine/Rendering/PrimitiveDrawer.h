@@ -1,7 +1,7 @@
 #pragma once
 
-#include"MatrixCalculation.h"
-#include"PrimitivePipeline.h"
+#include "MatrixCalculation.h"
+#include "PrimitivePipeline.h"
 
 #include <array>
 #include <cstdint>
@@ -11,88 +11,49 @@
 #include <wrl.h>
 using Microsoft::WRL::ComPtr;
 
-// 基本プリミティブ描画
-class PrimitiveDrawer{
-
-public:
-    // 線分の最大数
+class PrimitiveDrawer {
+private:
     static const UINT kMaxLineCount = 4096;
-    // 線分の頂点数
     static const UINT kVertexCountLine = 2;
-    // 線分のインデックス数
     static const UINT kIndexCountLine = 0;
 
-    // 頂点データ構造体
     struct VertexPosColor{
-        Vector3 pos;   // xyz座標
-        Vector4 color; // RGBA
+        Vector3 pos;
+        Vector4 color;
     };
 
-    // メッシュ
     struct Mesh{
-        // 頂点バッファ
         ComPtr<ID3D12Resource> vertBuff;
-        // インデックスバッファ
         ComPtr<ID3D12Resource> indexBuff;
-        // 頂点バッファビュー
         D3D12_VERTEX_BUFFER_VIEW vbView {};
-        // インデックスバッファビュー
         D3D12_INDEX_BUFFER_VIEW ibView {};
-        // 頂点バッファマップ
         VertexPosColor* vertMap = nullptr;
-        // インデックスバッファマップ
         uint16_t* indexMap = nullptr;
     };
 
-    struct PipelineSet{
-        ComPtr<ID3D12PipelineState>pipelineState_;
-        ComPtr<ID3D12RootSignature>rootSignature_;
-    };
 
-    /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    PrimitiveDrawer();
-
-    /// <summary>
-    /// デストラクタ
-    /// </summary>
+public:
+    // シングルトンインスタンスの取得
+    static PrimitiveDrawer* GetInstance();
+    // デストラクタ
     ~PrimitiveDrawer() = default;
 
-    /// <summary>
-    /// メッシュ生成
-    /// </summary>
-    /// <param name="vertexCount">頂点数</param>
-    /// <param name="indexCount">インデックス数</param>
-    /// <returns></returns>
+    // メッシュ生成
     std::unique_ptr<Mesh> CreateMesh(UINT vertexCount, UINT indexCount);
 
-    /// <summary>
-    /// 初期化
-    /// </summary>
+    // 初期化
     void Initialize();
 
-    /// <summary>
-    /// 終了処理
-    /// </summary>
+    // 終了処理
     void Finalize();
 
-    /// <summary>
-    /// 3D線分の描画
-    /// </summary>
-    /// <param name="p1">始点座標</param>
-    /// <param name="p2">終点座標</param>
-    /// <param name="color">色(RGBA)</param>
+    // 3D線分の描画
     void DrawLine3d(const Vector3& p1, const Vector3& p2, const Vector4& color);
 
-    /// <summary>
-    /// 実際に描画
-    /// </summary>
+    // 実際に描画
     void Render();
 
-    /// <summary>
-    /// リセット
-    /// </summary>
+    // リセット
     void Reset();
 
     // wvpリソース
@@ -100,30 +61,30 @@ public:
     void UpdateMatrixBuffer();
 
 private:
+    // コンストラクタ（プライベート化して外部からのインスタンス化を防ぐ）
+    PrimitiveDrawer();
+
+    // コピーコンストラクタと代入演算子を削除
     PrimitiveDrawer(const PrimitiveDrawer&) = delete;
     PrimitiveDrawer& operator=(const PrimitiveDrawer&) = delete;
 
-    /// <summary>
-    /// 各種メッシュ生成
-    /// </summary>
+    // 各種メッシュ生成
     void CreateMeshes();
 
+    // リソース作成
     ComPtr<ID3D12Resource> CreateResource(ComPtr<ID3D12Device> device, size_t sizeInBytes);
+
 private:
 
-    // 線分
+    // メッシュ
     std::unique_ptr<Mesh> line_;
-    // 線分の使用インデックス
     uint32_t indexLine_ = 0;
 
-    // Graphics settings
     ComPtr<ID3D12Device> device_ = nullptr;
     ComPtr<ID3D12GraphicsCommandList> commandList_ = nullptr;
 
-    std::unique_ptr<PrimitivePipeline>pipeline_ = nullptr;
+    std::unique_ptr<PrimitivePipeline> pipeline_ = nullptr;
 
-    // wvp用リソース
     ComPtr<ID3D12Resource> wvpResource_ = nullptr;
-    TransformationMatrix* matrixData_ = nullptr; // マッピングされたバッファのデータ
-
+    TransformationMatrix* matrixData_ = nullptr;
 };

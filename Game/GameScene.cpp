@@ -1,12 +1,12 @@
 #include "GameScene.h"
-
+#include "Rendering/PrimitiveDrawer.h"
 GameScene::GameScene() {}
 
 GameScene::~GameScene() {
 	delete sphere;
 	delete suzunne;
 	delete fence;
-	primitiveDrawer_.reset();
+	PrimitiveDrawer::GetInstance()->Finalize();
 }
 
 void GameScene::Initialize() {
@@ -23,9 +23,6 @@ void GameScene::Initialize() {
 
 	fence = new Model();
 	fence = fence->CreateOBJ("fence.obj");
-
-	primitiveDrawer_ = std::make_unique<PrimitiveDrawer>();
-	primitiveDrawer_->Initialize();
 
 	soundData1 = audio_->SoundLoadWave("resource/Alarm01.wav");
 	soundData2 = audio_->SoundLoadWave("resource/mokugyo.wav");
@@ -105,10 +102,10 @@ void GameScene::Draw() {
 	suzunne->Draw();
 	fence->Draw();
 
-	primitiveDrawer_->Render();
-	primitiveDrawer_->DrawLine3d(Vector3 {-4.0f,0.0f,0.0f}, Vector3 {5.0f,0.0f,10.0f}, Vector4 {1.0f,0.0f,0.0f,1.0f});
 
-
+	PrimitiveDrawer* primitiveDrawer = PrimitiveDrawer::GetInstance();
+	//線の描画
+	primitiveDrawer->Render();
 #pragma endregion
 
 

@@ -7,6 +7,8 @@ PrimitiveDrawer::PrimitiveDrawer(){
 
     device_ = DXCom::GetInstance()->GetDevice();
     commandList_ = DXCom::GetInstance()->GetCommandList();
+
+    Initialize();
 }
 
 void PrimitiveDrawer::Initialize(){
@@ -51,6 +53,11 @@ ComPtr<ID3D12Resource> PrimitiveDrawer::CreateResource(ComPtr<ID3D12Device> devi
     assert(SUCCEEDED(hr));
 
     return resource;
+}
+
+PrimitiveDrawer* PrimitiveDrawer::GetInstance(){
+    static PrimitiveDrawer instance;
+    return &instance;
 }
 
 std::unique_ptr<PrimitiveDrawer::Mesh> PrimitiveDrawer::CreateMesh(UINT vertexCount, UINT indexCount){
