@@ -116,7 +116,7 @@ void Audio::SoundUnload(SoundData* soundData)
 	soundData->wfex = {};
 }
 
-void Audio::SoundPlayWave(const SoundData& soundData, float volume)
+void Audio::SoundPlayWave(SoundData& soundData, float volume)
 {
 
 	HRESULT result;
@@ -135,4 +135,18 @@ void Audio::SoundPlayWave(const SoundData& soundData, float volume)
 
 	result = pSourceVoice->SubmitSourceBuffer(&buf);
 	result = pSourceVoice->Start();
+
+	soundData.pSourceVoices.push_back(pSourceVoice);
+}
+
+void Audio::SoundStopWave(SoundData& soundData) {
+
+	for (auto& voice : soundData.pSourceVoices) {
+		if (voice) {
+			voice->Stop();
+			voice->FlushSourceBuffers();
+			voice->DestroyVoice();
+		}
+	}
+	soundData.pSourceVoices.clear();
 }

@@ -67,6 +67,9 @@ void GameScene::Update() {
 	if (input_->TriggerKey(DIK_8)) {
 		audio_->SoundPlayWave(soundData1);
 	}
+	if (input_->TriggerKey(DIK_9)) {
+		audio_->SoundStopWave(soundData1);
+	}
 	if (input_->TriggerKey(DIK_7)) {
 		audio_->SoundPlayWave(soundData2);
 	}
