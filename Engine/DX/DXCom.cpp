@@ -222,7 +222,6 @@ void DXCom::SettingRootSignature()
 	particlePipline_.reset(new ParticlePipeline());
 	particlePipline_->Initialize();
 
-
 	const uint32_t kNumInstance = instanceCount_;
 	instancingResource =
 		CreateBufferResource(device_, sizeof(TransformationMatrix) * kNumInstance);

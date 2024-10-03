@@ -23,6 +23,7 @@
 
 #include "Pipeline.h"
 #include "ParticlePipeline.h"
+#include "PrimitivePipeline.h"
 #include "GrayPipeline.h"
 #include "MetaBallPipeline.h"
 #include "GaussPipeline.h"
@@ -216,6 +217,7 @@ private:
 
 	std::unique_ptr<Pipeline> pipline_ = nullptr;
 	std::unique_ptr<ParticlePipeline> particlePipline_ = nullptr;
+	std::unique_ptr<PrimitivePipeline> primitivePipeline_ = nullptr;
 	std::unique_ptr<GrayPipeline> grayPipeline_ = nullptr;
 	std::unique_ptr<MetaBallPipeline> metaballPipeline_ = nullptr;
 	std::unique_ptr<GaussPipeline> gaussPipeline_ = nullptr;
