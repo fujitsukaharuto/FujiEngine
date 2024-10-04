@@ -20,6 +20,8 @@ public:
 
 private:
 
+	void ApplyGlobalVariables();//値読み込みテスト用今度Objectクラス作って継承で使えるようにする
+
 	DXCom* dxCommon_ = nullptr;
 	Input* input_ = nullptr;
 	Audio* audio_ = nullptr;
@@ -29,6 +31,13 @@ private:
 	Model* fence = nullptr;
 
 	std::vector<Model*> suzunnes;
+
+
+	float spherePara = 10;
+	Vector3 spherevec = { 0.0f,1.0f,0.0f };
+
+	float fencePara = 10;
+	Vector3 fencevec = { -2.0f,-1.0f,1.0f };
 
 	bool isDebugCameraMode_ = false;
 

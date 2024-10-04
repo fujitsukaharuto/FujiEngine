@@ -4,6 +4,7 @@
 #include "TextureManager.h"
 #include "ImGuiManager.h"
 #include "MyWindow.h"
+#include "GlobalVariables.h"
 
 
 
@@ -57,6 +58,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	dxCommon->SettingTexture();
 
+	GlobalVariables::GetInstance()->LoadFiles();
 
 	gameScene = new GameScene();
 	gameScene->Initialize();
@@ -76,6 +78,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		// 入力関連の毎フレーム処理
 		input->Update();
+
+		GlobalVariables::GetInstance()->Update();
+
 		// ゲームシーンの毎フレーム処理
 		gameScene->Update();
 

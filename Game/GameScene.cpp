@@ -1,4 +1,5 @@
 #include "GameScene.h"
+#include "GlobalVariables.h"
 
 GameScene::GameScene() {}
 
@@ -15,6 +16,18 @@ void GameScene::Initialize() {
 	dxCommon_ = DXCom::GetInstance();
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
+
+	GlobalVariables* globalvariables = GlobalVariables::GetInstance();
+	const char* groupName = "Sphere";
+	const char* groupName2 = "Fence";
+
+	globalvariables->CreateGroup(groupName);
+	globalvariables->AddItem(groupName, "parametar", spherePara);
+	globalvariables->AddItem(groupName, "Position", spherevec);
+
+	globalvariables->CreateGroup(groupName2);
+	globalvariables->AddItem(groupName2, "parametar", fencePara);
+	globalvariables->AddItem(groupName2, "Position", fencevec);
 
 
 	sphere = new Model();
@@ -42,6 +55,8 @@ void GameScene::Initialize() {
 	soundData1 = audio_->SoundLoadWave("resource/xxx.wav");
 	soundData2 = audio_->SoundLoadWave("resource/mokugyo.wav");
 
+	ApplyGlobalVariables();
+
 }
 
 void GameScene::Update() {
@@ -63,6 +78,7 @@ void GameScene::Update() {
 		DebugCamera::GetInstance()->Update();
 	}
 
+	ApplyGlobalVariables();
 
 #endif // _DEBUG
 
@@ -103,9 +119,10 @@ void GameScene::Update() {
 	}
 
 
+	sphere->transform.translate = spherevec;
 	sphere->transform.rotate.y += 0.02f;
 	sphere->SetWVP();
-	fence->transform.translate.x = -3.0f;
+	fence->transform.translate = fencevec;
 	fence->transform.rotate.x = 0.5f;
 	fence->SetWVP();
 
@@ -139,5 +156,18 @@ void GameScene::Draw() {
 	dxCommon_->Command();
 	dxCommon_->PostEffect();
 
+
+}
+
+void GameScene::ApplyGlobalVariables() {
+	GlobalVariables* globalVariables = GlobalVariables::GetInstance();
+	const char* groupName = "Sphere";
+	const char* groupName2 = "Fence";
+
+	spherePara = globalVariables->GetFloatValue(groupName, "parametar");
+	spherevec = globalVariables->GetVector3Value(groupName, "Position");
+
+	fencePara = globalVariables->GetFloatValue(groupName2, "parametar");
+	fencevec = globalVariables->GetVector3Value(groupName2, "Position");
 
 }
