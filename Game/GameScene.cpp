@@ -6,6 +6,9 @@ GameScene::~GameScene() {
 	delete sphere;
 	delete suzunne;
 	delete fence;
+	for (auto suzunneModel : suzunnes) {
+		delete suzunneModel;
+	}
 }
 
 void GameScene::Initialize() {
@@ -19,6 +22,19 @@ void GameScene::Initialize() {
 
 	suzunne = new Model();
 	suzunne = suzunne->CreateOBJ("suzanne.obj");
+
+	float addDis = 1.0f;
+	for (int i = 0; i < 3; i++) {
+
+		Model* newModel = new Model(*suzunne);
+		newModel->transform.translate.x += addDis;
+		newModel->transform.translate.z += addDis;
+		newModel->transform.rotate.y = 3.14f;
+		newModel->SetWVP();
+		suzunnes.push_back(newModel);
+		addDis += 0.5f;
+
+	}
 
 	fence = new Model();
 	fence = fence->CreateOBJ("fence.obj");
@@ -76,8 +92,17 @@ void GameScene::Update() {
 
 	dxCommon_->UpDate();
 	suzunne->transform.rotate.y = 3.14f;
-	suzunne->transform.rotate.x += 0.2f;
+	suzunne->transform.rotate.x += 0.05f;
 	suzunne->SetWVP();
+
+	float rotaSpeed = 0.1f;
+	for (auto suzunneModel : suzunnes) {
+		suzunneModel->transform.rotate.x += rotaSpeed;
+		suzunneModel->SetWVP();
+		rotaSpeed += 0.05f;
+	}
+
+
 	sphere->transform.rotate.y += 0.02f;
 	sphere->SetWVP();
 	fence->transform.translate.x = -3.0f;
@@ -100,7 +125,9 @@ void GameScene::Draw() {
 	sphere->Draw();
 	suzunne->Draw();
 	fence->Draw();
-
+	for (auto suzunneModel : suzunnes) {
+		suzunneModel->Draw();
+	}
 
 #pragma endregion
 

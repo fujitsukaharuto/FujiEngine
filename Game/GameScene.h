@@ -28,6 +28,8 @@ private:
 	Model* suzunne = nullptr;
 	Model* fence = nullptr;
 
+	std::vector<Model*> suzunnes;
+
 	bool isDebugCameraMode_ = false;
 
 
