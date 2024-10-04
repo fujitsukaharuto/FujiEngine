@@ -4,11 +4,11 @@
 #include "Input.h"
 #include "DebugCamera.h"
 #include "Model.h"
+#include "Object/Player.h"
 
 #include<memory>
 
-class GameScene
-{
+class GameScene{
 public:
 	GameScene();
 	~GameScene();
@@ -31,8 +31,14 @@ private:
 	Model* sphere = nullptr;
 	Model* suzunne = nullptr;
 	Model* fence = nullptr;
-
 	Model* ground = nullptr;
+
+	std::vector<Model*> playerModels_ {};
+
+	/*======================
+		プレイヤー
+	=======================*/
+	std::unique_ptr<Player>player_ = nullptr;
 
 	bool isDebugCameraMode_ = false;
 

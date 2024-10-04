@@ -110,6 +110,12 @@
     <ClCompile Include="Engine\Rendering\PrimitiveDrawer.cpp">
       <Filter>Engine\Drawer</Filter>
     </ClCompile>
+    <ClCompile Include="Game\Object\Character.cpp">
+      <Filter>Game\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Object\Player.cpp">
+      <Filter>Game\Object</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -232,6 +238,12 @@
     <ClInclude Include="Engine\Rendering\PrimitiveDrawer.h">
       <Filter>Engine\Drawer</Filter>
     </ClInclude>
+    <ClInclude Include="Game\Object\Character.h">
+      <Filter>Game\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Object\Player.h">
+      <Filter>Game\Object</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -287,6 +299,9 @@
     </Filter>
     <Filter Include="Engine\Drawer">
       <UniqueIdentifier>{a4a09fc7-a74d-4acd-a2b5-a9b46ce6febd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Object">
+      <UniqueIdentifier>{54e85b16-3ae0-4f9c-8e77-1e91cc6bdcec}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

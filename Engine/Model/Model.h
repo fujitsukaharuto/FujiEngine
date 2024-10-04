@@ -9,8 +9,7 @@
 #include "externals/DirectXTex/DirectXTex.h"
 #include "externals/DirectXTex/d3dx12.h"
 
-class Model
-{
+class Model{
 public:
 	Model();
 	~Model();
@@ -23,7 +22,6 @@ public:
 	static Model* CreateSphere();
 
 	void Draw();
-
 	void SetWVP();
 
 private:

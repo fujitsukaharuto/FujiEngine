@@ -10,6 +10,7 @@ GameScene::~GameScene() {
 	delete fence;
 	===================================================*/
 	delete ground;
+	playerModels_.clear();
 }
 
 void GameScene::Initialize() {
@@ -37,6 +38,11 @@ void GameScene::Initialize() {
 	ground = new Model();
 	ground = ground->CreateOBJ("ground.obj");
 	ground->transform.translate = Vector3{-2.5f,0.0f,0.0f};
+
+	playerModels_.resize(1);
+	playerModels_[0] = playerModels_[0]->CreateOBJ("cube.obj");
+	player_->Initialize(playerModels_);
+
 
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	/*                                        サウンド                                             */
