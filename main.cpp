@@ -5,7 +5,7 @@
 #include "ImGuiManager.h"
 #include "MyWindow.h"
 #include "GlobalVariables.h"
-
+#include "ModelManager.h"
 
 
 // やること
@@ -24,6 +24,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Audio* audio = nullptr;
 	GameScene* gameScene = nullptr;
 	TextureManager* textureManager = nullptr;
+	ModelManager* modelManager = nullptr;
 
 	// ゲームウィンドウの作成
 	win = MyWin::GetInstance();
@@ -53,6 +54,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	audio->Initialize();
 
 	textureManager->GetInstance();
+	modelManager->GetInstance();
 
 #pragma endregion
 
@@ -107,6 +109,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	audio->Finalize();
 	imguiManager->Fin();
 	textureManager->Finalize();
+	modelManager->Finalize();
 
 	// ゲームウィンドウの破棄
 	win->Finalize();

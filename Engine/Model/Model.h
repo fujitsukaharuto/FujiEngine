@@ -19,17 +19,16 @@ public:
 
 	Trans transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 
-	Model* CreateOBJ(const std::string& filename);
-
-	static Model* CreateSphere();
-
 	void Draw();
 
 	void SetWVP();
 
+	void AddMaterial(const Material& material);
+
+	void AddMesh(const Mesh& mesh);
+
 private:
 
-	MaterialDataPath LoadMaterialFile(const std::string& filename);
 
 private:
 

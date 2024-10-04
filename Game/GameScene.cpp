@@ -1,4 +1,5 @@
 #include "GameScene.h"
+#include "ModelManager.h"
 #include "GlobalVariables.h"
 
 GameScene::GameScene() {}
@@ -30,16 +31,14 @@ void GameScene::Initialize() {
 	globalvariables->AddItem(groupName2, "Position", fencevec);
 
 
-	sphere = new Model();
-	sphere = Model::CreateSphere();
+	sphere = ModelManager::CreateSphere();
 
-	suzunne = new Model();
-	suzunne = suzunne->CreateOBJ("suzanne.obj");
+	suzunne = ModelManager::LoadOBJ("suzanne.obj");
 
 	float addDis = 1.0f;
 	for (int i = 0; i < 3; i++) {
 
-		Model* newModel = new Model(*suzunne);
+		Model* newModel = ModelManager::LoadOBJ("suzanne.obj");
 		newModel->transform.translate.x += addDis;
 		newModel->transform.translate.z += addDis;
 		newModel->transform.rotate.y = 3.14f;
@@ -49,8 +48,7 @@ void GameScene::Initialize() {
 
 	}
 
-	fence = new Model();
-	fence = fence->CreateOBJ("fence.obj");
+	fence = ModelManager::LoadOBJ("Fence.obj");
 
 	soundData1 = audio_->SoundLoadWave("resource/xxx.wav");
 	soundData2 = audio_->SoundLoadWave("resource/mokugyo.wav");
