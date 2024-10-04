@@ -39,6 +39,12 @@ void ImGuiManager::Init(
 		srvHeap_->GetCPUDescriptorHandleForHeapStart(),
 		srvHeap_->GetGPUDescriptorHandleForHeapStart());
 
+	ImGuiPlatformIO& platform_io = ImGui::GetPlatformIO();
+	platform_io;
+	ImGuiIO& io = ImGui::GetIO();
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;  // Dockingを有効化
+
+
 #endif // _DEBUG
 
 }

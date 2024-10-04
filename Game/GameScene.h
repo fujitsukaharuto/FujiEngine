@@ -40,6 +40,8 @@ private:
 	=======================*/
 	std::unique_ptr<Player>player_ = nullptr;
 
+	std::vector<Model*> suzunnes;
+
 	bool isDebugCameraMode_ = false;
 
 

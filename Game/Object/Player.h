@@ -9,12 +9,34 @@ public:
 	Player() = default;
 	virtual ~Player() override = default;
 
+	/// <summary>
+	/// 初期化
+	/// </summary>
+	/// <param name="models"></param>
 	void Initialize(std::vector<Model*> models)override;
 
+	/// <summary>
+	/// 更新
+	/// </summary>
 	void Update()override;
 
+	/// <summary>
+	/// 描画
+	/// </summary>
 	void Draw()override;
 
 private:
+	/// <summary>
+	/// 移動
+	/// </summary>
+	void Move();
 
+	/// <summary>
+	/// ジャンプ
+	/// </summary>
+	void Jump();
+
+private:
+
+	Vector3 velocity_ {};
 };

@@ -1,8 +1,11 @@
 #include "GameScene.h"
 #include "Rendering/PrimitiveDrawer.h"
-GameScene::GameScene() {}
 
-GameScene::~GameScene() {
+GameScene::GameScene(){
+	playerModels_.clear();
+}
+
+GameScene::~GameScene(){
 	/*===============================================
 	ゲーム画面を作成するので一時的にコメントアウト
 	delete sphere;
@@ -10,22 +13,34 @@ GameScene::~GameScene() {
 	delete fence;
 	===================================================*/
 	delete ground;
-	playerModels_.clear();
 }
 
-void GameScene::Initialize() {
+void GameScene::Initialize(){
 	dxCommon_ = DXCom::GetInstance();
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
 
 	/*===============================================
 	ゲーム画面を作成するので一時的にコメントアウト
-	
+
 	sphere = new Model();
 	sphere = Model::CreateSphere();
 
 	suzunne = new Model();
 	suzunne = suzunne->CreateOBJ("suzanne.obj");
+
+	float addDis = 1.0f;
+	for (int i = 0; i < 3; i++) {
+
+		Model* newModel = new Model(*suzunne);
+		newModel->transform.translate.x += addDis;
+		newModel->transform.translate.z += addDis;
+		newModel->transform.rotate.y = 3.14f;
+		newModel->SetWVP();
+		suzunnes.push_back(newModel);
+		addDis += 0.5f;
+
+	}
 
 	fence = new Model();
 	fence = fence->CreateOBJ("fence.obj");
@@ -37,10 +52,14 @@ void GameScene::Initialize() {
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	ground = new Model();
 	ground = ground->CreateOBJ("ground.obj");
-	ground->transform.translate = Vector3{-2.5f,0.0f,0.0f};
+	ground->transform.translate = Vector3 {-2.5f,0.0f,0.0f};
 
-	playerModels_.resize(1);
-	playerModels_[0] = playerModels_[0]->CreateOBJ("cube.obj");
+
+	Model* playerModel = new Model();
+	playerModel = playerModel->CreateOBJ("debugCube.obj");
+
+	playerModels_.push_back(playerModel);
+	player_ = std::make_unique<Player>();
 	player_->Initialize(playerModels_);
 
 
@@ -52,54 +71,53 @@ void GameScene::Initialize() {
 
 }
 
-void GameScene::Update() {
+void GameScene::Update(){
 
 
 #ifdef _DEBUG
-	if (input_->TriggerKey(DIK_F12)) {
-		if (isDebugCameraMode_) {
+	if (input_->TriggerKey(DIK_F12)){
+		if (isDebugCameraMode_){
 			isDebugCameraMode_ = false;
 			dxCommon_->SetIsDebugCamera(false);
-		} else {
+		} else{
 			isDebugCameraMode_ = true;
 			dxCommon_->SetIsDebugCamera(true);
 		}
 	}
 
-	if (isDebugCameraMode_)
-	{
+	if (isDebugCameraMode_){
 		DebugCamera::GetInstance()->Update();
 	}
 
 
 #endif // _DEBUG
 
-	if (input_->PushKey(DIK_LEFT)) {
+	if (input_->PushKey(DIK_LEFT)){
 		ground->transform.translate.x -= 0.05f;
 	}
-	if (input_->PushKey(DIK_RIGHT)) {
+	if (input_->PushKey(DIK_RIGHT)){
 		ground->transform.translate.x += 0.05f;
 	}
-	if (input_->PushKey(DIK_UP)) {
+	if (input_->PushKey(DIK_UP)){
 		ground->transform.translate.y += 0.05f;
 	}
-	if (input_->PushKey(DIK_DOWN)) {
+	if (input_->PushKey(DIK_DOWN)){
 		ground->transform.translate.y -= 0.05f;
 	}
 
 
-	if (input_->TriggerKey(DIK_8)) {
+	if (input_->TriggerKey(DIK_8)){
 		audio_->SoundPlayWave(soundData1);
 	}
-	if (input_->TriggerKey(DIK_9)) {
+	if (input_->TriggerKey(DIK_9)){
 		audio_->SoundStopWave(soundData1);
 	}
-	if (input_->TriggerKey(DIK_7)) {
+	if (input_->TriggerKey(DIK_7)){
 		audio_->SoundPlayWave(soundData2);
 	}
 
 	dxCommon_->UpDate();
-	
+
 	/*===============================================
 	ゲーム画面を作成するので一時的にコメントアウト
 	suzunne->transform.rotate.y = 3.14f;
@@ -113,9 +131,12 @@ void GameScene::Update() {
 	================================================*/
 	ground->SetWVP();
 
+	//プレイヤーの更新
+	player_->Update();
+
 }
 
-void GameScene::Draw() {
+void GameScene::Draw(){
 
 #pragma region 背景描画
 
@@ -134,6 +155,9 @@ void GameScene::Draw() {
 	fence->Draw();
 	================================================*/
 	ground->Draw();
+
+	//プレイヤーの描画
+	player_->Draw();
 
 
 	//描画コマンドを積んでます
