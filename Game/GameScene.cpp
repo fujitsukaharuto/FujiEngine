@@ -3,9 +3,13 @@
 GameScene::GameScene() {}
 
 GameScene::~GameScene() {
+	/*===============================================
+	ゲーム画面を作成するので一時的にコメントアウト
 	delete sphere;
 	delete suzunne;
 	delete fence;
+	===================================================*/
+	delete ground;
 }
 
 void GameScene::Initialize() {
@@ -13,7 +17,9 @@ void GameScene::Initialize() {
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
 
-
+	/*===============================================
+	ゲーム画面を作成するので一時的にコメントアウト
+	
 	sphere = new Model();
 	sphere = Model::CreateSphere();
 
@@ -23,6 +29,18 @@ void GameScene::Initialize() {
 	fence = new Model();
 	fence = fence->CreateOBJ("fence.obj");
 
+	===================================================*/
+
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	/*                                        3dモデル                                             */
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	ground = new Model();
+	ground = ground->CreateOBJ("ground.obj");
+	ground->transform.translate = Vector3{-2.5f,0.0f,0.0f};
+
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	/*                                        サウンド                                             */
+	////////////////////////////////////////////////////////////////////////////////////////////////
 	soundData1 = audio_->SoundLoadWave("resource/Alarm01.wav");
 	soundData2 = audio_->SoundLoadWave("resource/mokugyo.wav");
 
@@ -51,16 +69,16 @@ void GameScene::Update() {
 #endif // _DEBUG
 
 	if (input_->PushKey(DIK_LEFT)) {
-		suzunne->transform.translate.x -= 0.05f;
+		ground->transform.translate.x -= 0.05f;
 	}
 	if (input_->PushKey(DIK_RIGHT)) {
-		suzunne->transform.translate.x += 0.05f;
+		ground->transform.translate.x += 0.05f;
 	}
 	if (input_->PushKey(DIK_UP)) {
-		suzunne->transform.translate.y += 0.05f;
+		ground->transform.translate.y += 0.05f;
 	}
 	if (input_->PushKey(DIK_DOWN)) {
-		suzunne->transform.translate.y -= 0.05f;
+		ground->transform.translate.y -= 0.05f;
 	}
 
 
@@ -75,6 +93,9 @@ void GameScene::Update() {
 	}
 
 	dxCommon_->UpDate();
+	
+	/*===============================================
+	ゲーム画面を作成するので一時的にコメントアウト
 	suzunne->transform.rotate.y = 3.14f;
 	suzunne->transform.rotate.x += 0.2f;
 	suzunne->SetWVP();
@@ -83,6 +104,8 @@ void GameScene::Update() {
 	fence->transform.translate.x = -3.0f;
 	fence->transform.rotate.x = 0.5f;
 	fence->SetWVP();
+	================================================*/
+	ground->SetWVP();
 
 }
 
@@ -97,12 +120,17 @@ void GameScene::Draw() {
 
 #pragma region 3Dオブジェクト
 	dxCommon_->PreModelDraw();
+
+	/*===============================================
+	ゲーム画面を作成するので一時的にコメントアウト
 	sphere->Draw();
 	suzunne->Draw();
 	fence->Draw();
+	================================================*/
+	ground->Draw();
 
 
-	PrimitiveDrawer::GetInstance()->DrawLine3d(Vector3{-2.0f,0.0f,5.0f}, Vector3 {2.0f,0.0f,-4.0f},{1.0f,0.0f,0.0f,1.0f});
+	//描画コマンドを積んでます
 	PrimitiveDrawer::GetInstance()->Render();
 #pragma endregion
 

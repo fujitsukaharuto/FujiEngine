@@ -25,10 +25,14 @@ private:
 	Input* input_ = nullptr;
 	Audio* audio_ = nullptr;
 
+	/*======================
+		3dモデル
+	=======================*/
 	Model* sphere = nullptr;
 	Model* suzunne = nullptr;
 	Model* fence = nullptr;
 
+	Model* ground = nullptr;
 
 	bool isDebugCameraMode_ = false;
 
