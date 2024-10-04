@@ -14,7 +14,7 @@ public:
 	/// コンストラクタ/デストラクタ
 	/// </summary>
 	Character() = default;
-	virtual ~Character() = default;
+	virtual ~Character();
 
 	/// <summary>
 	/// 初期化
@@ -31,7 +31,7 @@ public:
 	/// </summary>
 	virtual void Draw();
 
-private:
+protected:
 	//描画用モデル
 	std::vector<Model*> models_ {};
 

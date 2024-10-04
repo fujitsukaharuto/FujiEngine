@@ -38,5 +38,7 @@ private:
 
 private:
 
-	Vector3 velocity_ {};
+	Vector3 velocity_ {0.0f,0.0f,0.0f};
+
+	bool isJumping_ = false;
 };

@@ -1,5 +1,6 @@
 #include "GameScene.h"
-#include "Rendering/PrimitiveDrawer.h"
+#include "ModelManager.h"
+#include "GlobalVariables.h"
 
 GameScene::GameScene(){
 	playerModels_.clear();
@@ -13,6 +14,7 @@ GameScene::~GameScene(){
 	delete fence;
 	===================================================*/
 	delete ground;
+	player_.reset();
 }
 
 void GameScene::Initialize(){
@@ -20,19 +22,31 @@ void GameScene::Initialize(){
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
 
+	/*GlobalVariables* globalvariables = GlobalVariables::GetInstance();
+	const char* groupName = "Sphere";
+	const char* groupName2 = "Fence";*/
+
+
 	/*===============================================
 	ゲーム画面を作成するので一時的にコメントアウト
 
-	sphere = new Model();
-	sphere = Model::CreateSphere();
+	globalvariables->CreateGroup(groupName);
+	globalvariables->AddItem(groupName, "parametar", spherePara);
+	globalvariables->AddItem(groupName, "Position", spherevec);
 
-	suzunne = new Model();
-	suzunne = suzunne->CreateOBJ("suzanne.obj");
+	globalvariables->CreateGroup(groupName2);
+	globalvariables->AddItem(groupName2, "parametar", fencePara);
+	globalvariables->AddItem(groupName2, "Position", fencevec);
+
+
+	sphere = ModelManager::CreateSphere();
+
+	suzunne = ModelManager::LoadOBJ("suzanne.obj");
 
 	float addDis = 1.0f;
 	for (int i = 0; i < 3; i++) {
 
-		Model* newModel = new Model(*suzunne);
+		Model* newModel = ModelManager::LoadOBJ("suzanne.obj");
 		newModel->transform.translate.x += addDis;
 		newModel->transform.translate.z += addDis;
 		newModel->transform.rotate.y = 3.14f;
@@ -42,21 +56,18 @@ void GameScene::Initialize(){
 
 	}
 
-	fence = new Model();
-	fence = fence->CreateOBJ("fence.obj");
+	fence = ModelManager::LoadOBJ("Fence.obj");
 
 	===================================================*/
 
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	/*                                        3dモデル                                             */
 	////////////////////////////////////////////////////////////////////////////////////////////////
-	ground = new Model();
-	ground = ground->CreateOBJ("ground.obj");
+	ground = ModelManager::LoadOBJ("ground.obj");
 	ground->transform.translate = Vector3 {-2.5f,0.0f,0.0f};
 
 
-	Model* playerModel = new Model();
-	playerModel = playerModel->CreateOBJ("debugCube.obj");
+	Model* playerModel = ModelManager::LoadOBJ("debugCube.obj");
 
 	playerModels_.push_back(playerModel);
 	player_ = std::make_unique<Player>();
@@ -68,6 +79,8 @@ void GameScene::Initialize(){
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	soundData1 = audio_->SoundLoadWave("resource/Alarm01.wav");
 	soundData2 = audio_->SoundLoadWave("resource/mokugyo.wav");
+
+	//ApplyGlobalVariables();
 
 }
 
@@ -89,6 +102,7 @@ void GameScene::Update(){
 		DebugCamera::GetInstance()->Update();
 	}
 
+	//ApplyGlobalVariables();
 
 #endif // _DEBUG
 
@@ -123,9 +137,19 @@ void GameScene::Update(){
 	suzunne->transform.rotate.y = 3.14f;
 	suzunne->transform.rotate.x += 0.2f;
 	suzunne->SetWVP();
+
+	float rotaSpeed = 0.1f;
+	for (auto suzunneModel : suzunnes) {
+		suzunneModel->transform.rotate.x += rotaSpeed;
+		suzunneModel->SetWVP();
+		rotaSpeed += 0.05f;
+	}
+
+
+	sphere->transform.translate = spherevec;
 	sphere->transform.rotate.y += 0.02f;
 	sphere->SetWVP();
-	fence->transform.translate.x = -3.0f;
+	fence->transform.translate = fencevec;
 	fence->transform.rotate.x = 0.5f;
 	fence->SetWVP();
 	================================================*/
@@ -161,7 +185,6 @@ void GameScene::Draw(){
 
 
 	//描画コマンドを積んでます
-	PrimitiveDrawer::GetInstance()->Render();
 #pragma endregion
 
 
@@ -172,5 +195,18 @@ void GameScene::Draw(){
 	dxCommon_->Command();
 	dxCommon_->PostEffect();
 
+
+}
+
+void GameScene::ApplyGlobalVariables() {
+	GlobalVariables* globalVariables = GlobalVariables::GetInstance();
+	const char* groupName = "Sphere";
+	const char* groupName2 = "Fence";
+
+	spherePara = globalVariables->GetFloatValue(groupName, "parametar");
+	spherevec = globalVariables->GetVector3Value(groupName, "Position");
+
+	fencePara = globalVariables->GetFloatValue(groupName2, "parametar");
+	fencevec = globalVariables->GetVector3Value(groupName2, "Position");
 
 }
