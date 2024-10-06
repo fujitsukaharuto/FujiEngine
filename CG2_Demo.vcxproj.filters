@@ -107,6 +107,9 @@
     <ClCompile Include="GlobalVariables.cpp">
       <Filter>Engine\GlobalVariables</Filter>
     </ClCompile>
+    <ClCompile Include="Sprite.cpp">
+      <Filter>Engine\Model</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -225,6 +228,9 @@
     </ClInclude>
     <ClInclude Include="GlobalVariables.h">
       <Filter>Engine\GlobalVariables</Filter>
+    </ClInclude>
+    <ClInclude Include="Sprite.h">
+      <Filter>Engine\Model</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
