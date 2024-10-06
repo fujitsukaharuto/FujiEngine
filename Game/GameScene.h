@@ -4,6 +4,7 @@
 #include "Input.h"
 #include "DebugCamera.h"
 #include "Model.h"
+#include "Sprite.h"
 
 
 class GameScene
@@ -31,6 +32,9 @@ private:
 	Model* fence = nullptr;
 
 	std::vector<Model*> suzunnes;
+
+
+	Sprite* test = nullptr;
 
 
 	float spherePara = 10;

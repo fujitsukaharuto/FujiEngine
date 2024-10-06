@@ -110,6 +110,9 @@
     <ClCompile Include="Sprite.cpp">
       <Filter>Engine\Model</Filter>
     </ClCompile>
+    <ClCompile Include="DirectionLight.cpp">
+      <Filter>Engine\Light</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -232,6 +235,9 @@
     <ClInclude Include="Sprite.h">
       <Filter>Engine\Model</Filter>
     </ClInclude>
+    <ClInclude Include="DirectionLight.h">
+      <Filter>Engine\Light</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -287,6 +293,9 @@
     </Filter>
     <Filter Include="Engine\GlobalVariables">
       <UniqueIdentifier>{dee81627-0be4-4b1e-bd00-7dfcde087c80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Light">
+      <UniqueIdentifier>{bbaf8ed5-8934-40c2-981e-ec659d17c094}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

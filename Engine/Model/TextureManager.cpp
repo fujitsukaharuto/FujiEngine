@@ -114,11 +114,12 @@ Texture* TextureManager::LoadTexture(const std::string& filename) {
 	intermediateResource = UploadTextureData(texture->textureResource, mipImages, DXCom::GetInstance()->GetDevice(), DXCom::GetInstance()->GetCommandList());
 	texture->cpuHandle = DXCom::GetInstance()->GetCPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, DXCom::GetInstance()->GetDescriptorIndex());
 	texture->gpuHandle = DXCom::GetInstance()->GetGPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, DXCom::GetInstance()->GetDescriptorIndex());
+
+	DXCom::GetInstance()->GetDevice()->CreateShaderResourceView(texture->textureResource.Get(), &srvDesc, texture->cpuHandle);
+
 	DXCom::GetInstance()->IncreaseDescriptorIndex();
 
 	DXCom::GetInstance()->CommandExecution();
-
-	DXCom::GetInstance()->GetDevice()->CreateShaderResourceView(texture->textureResource.Get(), &srvDesc, texture->cpuHandle);
 
 	m_textureCache[filename] = std::move(texture);
 

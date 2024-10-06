@@ -11,6 +11,7 @@ GameScene::~GameScene() {
 	for (auto suzunneModel : suzunnes) {
 		delete suzunneModel;
 	}
+	delete test;
 }
 
 void GameScene::Initialize() {
@@ -49,6 +50,9 @@ void GameScene::Initialize() {
 	}
 
 	fence = ModelManager::LoadOBJ("Fence.obj");
+
+	test = new Sprite();
+	test->Load("uvChecker.png");
 
 	soundData1 = audio_->SoundLoadWave("resource/xxx.wav");
 	soundData2 = audio_->SoundLoadWave("resource/mokugyo.wav");
@@ -148,6 +152,9 @@ void GameScene::Draw() {
 
 
 #pragma region 前景スプライト
+
+	dxCommon_->PreSpriteDraw();
+	test->Draw();
 
 #pragma endregion
 
