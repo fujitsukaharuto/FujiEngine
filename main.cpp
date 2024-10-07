@@ -8,6 +8,7 @@
 #include "ModelManager.h"
 
 
+
 // やること
 // オフスクリーンのかんり
 // モデルマネージャー、スプライトマネージャー
@@ -25,6 +26,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	GameScene* gameScene = nullptr;
 	TextureManager* textureManager = nullptr;
 	ModelManager* modelManager = nullptr;
+
 
 	// ゲームウィンドウの作成
 	win = MyWin::GetInstance();
@@ -55,6 +57,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	textureManager->GetInstance();
 	modelManager->GetInstance();
+
 
 #pragma endregion
 

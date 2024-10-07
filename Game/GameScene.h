@@ -3,7 +3,7 @@
 #include "DXCom.h"
 #include "Input.h"
 #include "DebugCamera.h"
-#include "Model.h"
+#include "Object3d.h"
 #include "Sprite.h"
 
 
@@ -27,15 +27,15 @@ private:
 	Input* input_ = nullptr;
 	Audio* audio_ = nullptr;
 
-	Model* sphere = nullptr;
-	Model* suzunne = nullptr;
-	Model* fence = nullptr;
+	Object3d* sphere = nullptr;
+	Object3d* suzunne = nullptr;
+	Object3d* fence = nullptr;
 
-	std::vector<Model*> suzunnes;
+	std::vector<Object3d*> suzunnes;
 
 
 	Sprite* test = nullptr;
-
+	Vector4 color_ = { 1.0f,1.0f,1.0f,1.0f };
 
 	float spherePara = 10;
 	Vector3 spherevec = { 0.0f,1.0f,0.0f };

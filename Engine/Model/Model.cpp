@@ -1,63 +1,44 @@
 #include "Model.h"
-#include "DXCom.h"
 
 #include <fstream>
 #include <sstream>
 
 
 Model::Model() {}
-
 Model::Model(const Model& other) {
 
 	mesh_ = other.mesh_;
-	material_ = other.material_;
-	wvpResource_ = DXCom::GetInstance()->CreateBufferResource(DXCom::GetInstance()->GetDevice(), sizeof(TransformationMatrix));
-	wvpDate_ = nullptr;
-	wvpResource_->Map(0, nullptr, reinterpret_cast<void**>(&wvpDate_));
-	wvpDate_->WVP = MakeIdentity4x4();
-	wvpDate_->World = MakeIdentity4x4();
-
-}
-
-Model::~Model() {}
-
-void Model::Draw()
-{
-
-	ID3D12GraphicsCommandList* cList = DXCom::GetInstance()->GetCommandList();
-
-	for (uint32_t index = 0; index < mesh_.size(); ++index) {
-		cList->SetGraphicsRootConstantBufferView(0, material_[index].GetMaterialResource()->GetGPUVirtualAddress());
-		cList->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
-		cList->SetGraphicsRootConstantBufferView(3, material_[index].GetDirectionLight()->GetGPUVirtualAddress());
-		cList->SetGraphicsRootDescriptorTable(2, material_[index].GetTexture()->gpuHandle);
-		mesh_[index].Draw(cList);
+	for (uint32_t index = 0; index < other.material_.size(); ++index) {
+		Material newMaterial{};
+		newMaterial.SetTextureNamePath(other.material_[index].GetPathName());
+		newMaterial.CreateMaterial();
+		material_.push_back(newMaterial);
 	}
 
 }
+Model::~Model() {}
 
-void Model::SetWVP()
+void Model::Draw(ID3D12GraphicsCommandList* commandList)
 {
-	Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
-	Matrix4x4 viewMatrix = DXCom::GetInstance()->GetView();
-
-	Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, DXCom::GetInstance()->GetAspect(), 0.1f, 100.0f);
-	Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
-
-	wvpDate_->World = worldMatrix;
-	wvpDate_->WVP = worldViewProjectionMatrix;
+	for (uint32_t index = 0; index < mesh_.size(); ++index) {
+		commandList->SetGraphicsRootConstantBufferView(0, material_[index].GetMaterialResource()->GetGPUVirtualAddress());
+		commandList->SetGraphicsRootDescriptorTable(2, material_[index].GetTexture()->gpuHandle);
+		mesh_[index].Draw(commandList);
+	}
 }
+
 
 void Model::AddMaterial(const Material& material) {
 	material_.push_back(material);
 }
 
-void Model::AddMesh(const Mesh& mesh) {
-	wvpResource_ = DXCom::GetInstance()->CreateBufferResource(DXCom::GetInstance()->GetDevice(), sizeof(TransformationMatrix));
-	wvpDate_ = nullptr;
-	wvpResource_->Map(0, nullptr, reinterpret_cast<void**>(&wvpDate_));
-	wvpDate_->WVP = MakeIdentity4x4();
-	wvpDate_->World = MakeIdentity4x4();
 
+void Model::AddMesh(const Mesh& mesh) {
 	mesh_.push_back(mesh);
+}
+
+void Model::SetColor(const Vector4& color) {
+	for (Material material : material_) {
+		material.SetColor(color);
+	}
 }

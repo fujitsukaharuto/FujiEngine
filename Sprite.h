@@ -46,6 +46,8 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource_ = nullptr;
 	TransformationMatrix* wvpData_;
 
+	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_ = nullptr;
+	DirectionalLight* directionalLightData_ = nullptr;
 
 	Material material_;
 

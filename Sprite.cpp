@@ -16,7 +16,7 @@ void Sprite::Draw() {
 	cList->IASetIndexBuffer(&indexBufferView_);
 	cList->SetGraphicsRootConstantBufferView(0, material_.GetMaterialResource()->GetGPUVirtualAddress());
 	cList->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
-	cList->SetGraphicsRootConstantBufferView(3, material_.GetDirectionLight()->GetGPUVirtualAddress());
+	cList->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
 	cList->SetGraphicsRootDescriptorTable(2, material_.GetTexture()->gpuHandle);
 	cList->DrawIndexedInstanced(6, 1, 0, 0, 0);
 
@@ -77,6 +77,13 @@ void Sprite::InitializeBuffer() {
 	wvpData_ = nullptr;
 	wvpResource_->Map(0, nullptr, reinterpret_cast<void**>(&wvpData_));
 	SetWvp();
+
+	directionalLightResource_ = DXCom::GetInstance()->CreateBufferResource(DXCom::GetInstance()->GetDevice(), sizeof(DirectionalLight));
+	directionalLightData_ = nullptr;
+	directionalLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData_));
+	directionalLightData_->color = { 1.0f,1.0f,1.0f,1.0f };
+	directionalLightData_->direction = { 1.0f,0.0f,0.0f };
+	directionalLightData_->intensity = 1.0f;
 
 }
 

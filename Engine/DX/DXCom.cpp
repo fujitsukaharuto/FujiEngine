@@ -432,6 +432,7 @@ void DXCom::PreModelDraw()
 {
 	command_->SetViewAndscissor();
 	pipeManager_->SetPipeline(Pipe::Normal);
+	command_->GetList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 
 void DXCom::PreSpriteDraw() {

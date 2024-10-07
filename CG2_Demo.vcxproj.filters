@@ -113,6 +113,15 @@
     <ClCompile Include="DirectionLight.cpp">
       <Filter>Engine\Light</Filter>
     </ClCompile>
+    <ClCompile Include="Object3dCommon.cpp">
+      <Filter>Engine\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Object3d.cpp">
+      <Filter>Engine\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="ModelCommon.cpp">
+      <Filter>Engine\Model</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -237,6 +246,15 @@
     </ClInclude>
     <ClInclude Include="DirectionLight.h">
       <Filter>Engine\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="Object3dCommon.h">
+      <Filter>Engine\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Object3d.h">
+      <Filter>Engine\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelCommon.h">
+      <Filter>Engine\Model</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

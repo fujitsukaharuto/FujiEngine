@@ -24,16 +24,16 @@ public:
 
 	ID3D12Resource* GetMaterialResource();
 
-	ID3D12Resource* GetDirectionLight();
+	std::string GetPathName() const { return textureNamePath_.textureFilePath; }
 
 	void SetTextureNamePath(const std::string& pathName);
+
+	void SetColor(const Vector4& color) { materialDate_->color = color; }
 
 private:
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_ = nullptr;
 	MaterialDate* materialDate_ = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_ = nullptr;
-	DirectionalLight* directionalLightData_ = nullptr;
 	Texture* texture_ = nullptr;
 	MaterialDataPath textureNamePath_;
 };

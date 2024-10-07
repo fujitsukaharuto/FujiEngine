@@ -1,4 +1,5 @@
 #include "GameScene.h"
+#include "ImGuiManager.h"
 #include "ModelManager.h"
 #include "GlobalVariables.h"
 
@@ -32,24 +33,27 @@ void GameScene::Initialize() {
 	globalvariables->AddItem(groupName2, "Position", fencevec);
 
 
-	sphere = ModelManager::CreateSphere();
+	sphere = new Object3d();
+	sphere->CreateSphere();
 
-	suzunne = ModelManager::LoadOBJ("suzanne.obj");
+	suzunne = new Object3d();
+	suzunne->Create("suzanne.obj");
 
 	float addDis = 1.0f;
 	for (int i = 0; i < 3; i++) {
 
-		Model* newModel = ModelManager::LoadOBJ("suzanne.obj");
+		Object3d* newModel = new Object3d();
+		newModel->Create("suzanne.obj");
 		newModel->transform.translate.x += addDis;
 		newModel->transform.translate.z += addDis;
 		newModel->transform.rotate.y = 3.14f;
-		newModel->SetWVP();
 		suzunnes.push_back(newModel);
 		addDis += 0.5f;
 
 	}
 
-	fence = ModelManager::LoadOBJ("Fence.obj");
+	fence = new Object3d();
+	fence->Create("Fence.obj");
 
 	test = new Sprite();
 	test->Load("uvChecker.png");
@@ -82,6 +86,12 @@ void GameScene::Update() {
 
 	ApplyGlobalVariables();
 
+	ImGui::Begin("suzunne");
+
+	ImGui::ColorEdit4("color", &color_.X);
+	suzunne->SetColor(color_);
+	ImGui::End();
+
 #endif // _DEBUG
 
 	if (input_->PushKey(DIK_LEFT)) {
@@ -111,22 +121,22 @@ void GameScene::Update() {
 	dxCommon_->UpDate();
 	suzunne->transform.rotate.y = 3.14f;
 	suzunne->transform.rotate.x += 0.05f;
-	suzunne->SetWVP();
+
 
 	float rotaSpeed = 0.1f;
 	for (auto suzunneModel : suzunnes) {
 		suzunneModel->transform.rotate.x += rotaSpeed;
-		suzunneModel->SetWVP();
+
 		rotaSpeed += 0.05f;
 	}
 
 
 	sphere->transform.translate = spherevec;
 	sphere->transform.rotate.y += 0.02f;
-	sphere->SetWVP();
+
 	fence->transform.translate = fencevec;
 	fence->transform.rotate.x = 0.5f;
-	fence->SetWVP();
+
 
 }
 

@@ -133,6 +133,8 @@ public:
 
 	DXCompil* GetDXCompil() const { return compiler_.get(); }
 
+	PipelineManager* GetPipelineManager()const { return pipeManager_; }
+
 	/*void Tick();*/
 
 	void SetIsDebugCamera(const bool cameraMode) { isDebugCamera_ = cameraMode; }

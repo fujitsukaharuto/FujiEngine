@@ -135,7 +135,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\GameScene.cpp" />
     <ClCompile Include="GlobalVariables.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="ModelCommon.cpp" />
     <ClCompile Include="ModelManager.cpp" />
+    <ClCompile Include="Object3d.cpp" />
+    <ClCompile Include="Object3dCommon.cpp" />
     <ClCompile Include="PipelineManager.cpp" />
     <ClCompile Include="Sprite.cpp" />
   </ItemGroup>
@@ -178,7 +181,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Game\Field\MapChipField.h" />
     <ClInclude Include="Game\GameScene.h" />
     <ClInclude Include="GlobalVariables.h" />
+    <ClInclude Include="ModelCommon.h" />
     <ClInclude Include="ModelManager.h" />
+    <ClInclude Include="Object3d.h" />
+    <ClInclude Include="Object3dCommon.h" />
     <ClInclude Include="PipelineManager.h" />
     <ClInclude Include="Sprite.h" />
   </ItemGroup>

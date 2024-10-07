@@ -27,11 +27,11 @@ public:
 
 	void Finalize();
 
-	static Model* LoadOBJ(const std::string& filename);
+	static void LoadOBJ(const std::string& filename);
 
 	static Model* FindModel(const std::string& filename);
 
-	static Model* CreateSphere();
+	static void CreateSphere();
 
 	void AddModel(const std::string& filename, Model* model);
 
