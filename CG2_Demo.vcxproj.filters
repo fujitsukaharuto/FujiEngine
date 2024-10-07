@@ -125,7 +125,9 @@
     <ClCompile Include="DirectionLight.cpp">
       <Filter>Engine\Light</Filter>
     </ClCompile>
-    <ClCompile Include="Game\Object\Boss.cpp" />
+    <ClCompile Include="Game\Object\Boss.cpp">
+      <Filter>Game\Object</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -257,12 +259,14 @@
     <ClInclude Include="GlobalVariables.h">
       <Filter>Engine\GlobalVariables</Filter>
     </ClInclude>
-    <ClInclude Include="Game\Object\Boss.h" />
     <ClInclude Include="Sprite.h">
       <Filter>Engine\Model</Filter>
     </ClInclude>
     <ClInclude Include="DirectionLight.h">
       <Filter>Engine\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Object\Boss.h">
+      <Filter>Game\Object</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
