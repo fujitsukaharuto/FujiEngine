@@ -4,6 +4,7 @@
 
 GameScene::GameScene(){
 	playerModels_.clear();
+	bossModels_.clear();
 }
 
 GameScene::~GameScene(){
@@ -14,7 +15,12 @@ GameScene::~GameScene(){
 	delete fence;
 	===================================================*/
 	delete ground;
+
 	player_.reset();
+	playerModels_.clear();
+
+	boss_.reset();
+	bossModels_.clear();
 }
 
 void GameScene::Initialize(){
@@ -67,11 +73,22 @@ void GameScene::Initialize(){
 	ground->transform.translate = Vector3 {-2.5f,0.0f,0.0f};
 
 
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	/*                                        プレイやー                                            */
+	////////////////////////////////////////////////////////////////////////////////////////////////
 	Model* playerModel = ModelManager::LoadOBJ("debugCube.obj");
-
-	playerModels_.push_back(playerModel);
+	playerModels_.emplace_back(playerModel);
 	player_ = std::make_unique<Player>();
 	player_->Initialize(playerModels_);
+
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	/*                                          敵関連                                             */
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	Model* bossModel = ModelManager::LoadOBJ("debugCube.obj");
+	bossModels_.emplace_back(bossModel);
+	boss_ = std::make_unique<Boss>();
+	boss_->Initialize(bossModels_);
+	boss_->SetTranslate(Vector3 {-4.0f,-1.0f,0.0f});
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////
@@ -81,7 +98,7 @@ void GameScene::Initialize(){
 	soundData2 = audio_->SoundLoadWave("resource/mokugyo.wav");
 
 	//ApplyGlobalVariables();
-
+	
 }
 
 void GameScene::Update(){
@@ -158,6 +175,9 @@ void GameScene::Update(){
 	//プレイヤーの更新
 	player_->Update();
 
+	//ボスの更新
+	boss_->Update();
+
 }
 
 void GameScene::Draw(){
@@ -182,6 +202,9 @@ void GameScene::Draw(){
 
 	//プレイヤーの描画
 	player_->Draw();
+
+	//ボスの描画
+	boss_->Draw();
 
 
 	//描画コマンドを積んでます

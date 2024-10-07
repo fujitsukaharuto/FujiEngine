@@ -37,8 +37,10 @@ private:
 	void Jump();
 
 private:
+	float moveSpeed_;
 
 	Vector3 velocity_ {0.0f,0.0f,0.0f};
 
 	bool isJumping_ = false;
+
 };

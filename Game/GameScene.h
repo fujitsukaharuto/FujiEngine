@@ -5,6 +5,7 @@
 #include "DebugCamera.h"
 #include "Model.h"
 #include "Object/Player.h"
+#include "Object/Boss.h"
 
 #include<memory>
 
@@ -36,11 +37,18 @@ private:
 	Model* ground = nullptr;
 
 	std::vector<Model*> playerModels_ {};
-
+	std::vector<Model*> bossModels_ {};
 	/*======================
 		プレイヤー
 	=======================*/
 	std::unique_ptr<Player>player_ = nullptr;
+
+	/*======================
+		敵
+	=======================*/
+	//ボス
+	std::unique_ptr<Boss> boss_ = nullptr;
+
 
 	std::vector<Model*> suzunnes;
 

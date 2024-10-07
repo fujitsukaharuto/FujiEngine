@@ -31,6 +31,14 @@ public:
 	/// </summary>
 	virtual void Draw();
 
+
+	/////////////////////////////////////////////////////////////////////////////////////////
+	//			アクセッサ
+	/////////////////////////////////////////////////////////////////////////////////////////
+	void SetTranslate(const Vector3& pos,uint32_t modelNum =0);
+	void SetRotate(const Vector3& rotate, uint32_t modelNum = 0);
+	void SetScale(const Vector3& scale, uint32_t modelNum = 0);
+
 protected:
 	//描画用モデル
 	std::vector<Model*> models_ {};
