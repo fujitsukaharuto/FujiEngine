@@ -100,6 +100,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="DirectionLight.cpp" />
     <ClCompile Include="Game\Object\Boss.cpp" />
     <ClCompile Include="Engine\Audio\Audio.cpp" />
     <ClCompile Include="Engine\DebugCamera\DebugCamera.cpp" />
@@ -141,8 +142,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ModelManager.cpp" />
     <ClCompile Include="PipelineManager.cpp" />
+    <ClCompile Include="Sprite.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DirectionLight.h" />
     <ClInclude Include="Game\Object\Boss.h" />
     <ClInclude Include="Engine\Audio\Audio.h" />
     <ClInclude Include="Engine\DebugCamera\DebugCamera.h" />
@@ -187,6 +190,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Game\Object\Player.h" />
     <ClInclude Include="ModelManager.h" />
     <ClInclude Include="PipelineManager.h" />
+    <ClInclude Include="Sprite.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

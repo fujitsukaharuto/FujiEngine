@@ -213,6 +213,8 @@ void GameScene::Draw(){
 
 #pragma region 前景スプライト
 
+	dxCommon_->PreSpriteDraw();
+
 #pragma endregion
 
 	dxCommon_->Command();

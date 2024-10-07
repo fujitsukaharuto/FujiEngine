@@ -90,6 +90,7 @@ public:
 	void PostDraw();
 
 	void PreModelDraw();
+	void PreSpriteDraw();
 
 	void CommandExecution();
 	void IncreaseDescriptorIndex();
