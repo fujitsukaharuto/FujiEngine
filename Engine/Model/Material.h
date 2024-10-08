@@ -2,6 +2,17 @@
 #include "MatrixCalculation.h"
 #include "TextureManager.h"
 
+enum LightMode {
+	kLightNone,
+	kLightHalfLambert,
+	kLightLambert,
+	kPhongReflect,
+	kBlinnPhongReflection,
+	kPointLightON,
+	kSpotLightON,
+};
+
+
 class Material
 {
 public:
@@ -11,6 +22,7 @@ public:
 		int32_t enableLighting;
 		float padding[3];
 		Matrix4x4 uvTransform;
+		float shininess;
 	};
 
 public:
@@ -24,16 +36,16 @@ public:
 
 	ID3D12Resource* GetMaterialResource();
 
-	ID3D12Resource* GetDirectionLight();
+	std::string GetPathName() const { return textureNamePath_.textureFilePath; }
 
 	void SetTextureNamePath(const std::string& pathName);
+
+	void SetColor(const Vector4& color) { materialDate_->color = color; }
 
 private:
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_ = nullptr;
 	MaterialDate* materialDate_ = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_ = nullptr;
-	DirectionalLight* directionalLightData_ = nullptr;
 	Texture* texture_ = nullptr;
 	MaterialDataPath textureNamePath_;
 };

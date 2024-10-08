@@ -35,6 +35,7 @@ struct TransformationMatrix
 {
 	Matrix4x4 WVP;
 	Matrix4x4 World;
+	Matrix4x4 WorldInverseTransPose;
 };
 
 struct Materials
@@ -52,6 +53,10 @@ struct DirectionalLight
 	Vector3 direction;
 	float intensity;
 
+};
+
+struct CameraForGPU {
+	Vector3 worldPosition;
 };
 
 struct GrayscaleVertex

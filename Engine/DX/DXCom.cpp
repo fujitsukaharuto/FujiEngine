@@ -28,7 +28,7 @@ void DXCom::Initialize(MyWin* myWin)
 {
 	assert(myWin);
 	myWin_ = myWin;
-
+	pipeManager_ = PipelineManager::GetInstance();
 
 	CreateDevice();
 	CreateCommand();
@@ -43,6 +43,7 @@ void DXCom::Initialize(MyWin* myWin)
 
 	//SettingTexture();
 	//SettingImgui();
+
 }
 
 void DXCom::CreateDevice()
@@ -216,12 +217,8 @@ void DXCom::CreateCompiler() {
 
 void DXCom::SettingRootSignature()
 {
-	pipline_.reset(new Pipeline());
-	pipline_->Initialize();
-
-	particlePipline_.reset(new ParticlePipeline());
-	particlePipline_->Initialize();
-
+	
+	pipeManager_->CreatePipeline();
 
 	const uint32_t kNumInstance = instanceCount_;
 	instancingResource =
@@ -231,32 +228,6 @@ void DXCom::SettingRootSignature()
 	{
 		instancingData[index].WVP = MakeIdentity4x4();
 		instancingData[index].World = MakeIdentity4x4();
-	}
-
-
-	if (isGrayscale_)
-	{
-		grayPipeline_.reset(new GrayPipeline());
-		grayPipeline_->Initialize();
-	}
-
-	if (isMetaBall_)
-	{
-		metaballPipeline_.reset(new MetaBallPipeline());
-		metaballPipeline_->Initialize();
-	}
-
-	if (isGaussian_)
-	{
-		gaussPipeline_.reset(new GaussPipeline());
-		gaussPipeline_->Initialize();
-	}
-
-
-	if (isNonePost_)
-	{
-		nonePipeline_.reset(new NonePipeline());
-		nonePipeline_->Initialize();
 	}
 
 }
@@ -373,7 +344,7 @@ void DXCom::Command()
 
 
 	command_->SetViewAndscissor();
-	pipline_->SetPipelineState();
+	pipeManager_->SetPipeline(Pipe::Normal);
 
 
 }
@@ -409,7 +380,7 @@ void DXCom::PostEffect()
 	if (isGrayscale_)
 	{
 		command_->SetViewAndscissor();
-		grayPipeline_->SetPipelineState();
+		pipeManager_->SetPipeline(Pipe::Gray);
 
 		commandList->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		commandList->IASetIndexBuffer(&indexGrayBufferView_);
@@ -422,7 +393,7 @@ void DXCom::PostEffect()
 	if (isGaussian_)
 	{
 		command_->SetViewAndscissor();
-		gaussPipeline_->SetPipelineState();
+		pipeManager_->SetPipeline(Pipe::Gauss);
 
 		commandList->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		commandList->IASetIndexBuffer(&indexGrayBufferView_);
@@ -434,7 +405,7 @@ void DXCom::PostEffect()
 	if (isNonePost_||isMetaBall_)
 	{
 		command_->SetViewAndscissor();
-		nonePipeline_->SetPipelineState();
+		pipeManager_->SetPipeline(Pipe::None);
 
 		commandList->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		commandList->IASetIndexBuffer(&indexGrayBufferView_);
@@ -458,10 +429,11 @@ void DXCom::PostDraw() {
 	command_->Reset();
 }
 
-void DXCom::PreModelDraw()
-{
+
+void DXCom::PreSpriteDraw() {
 	command_->SetViewAndscissor();
-	pipline_->SetPipelineState();
+	pipeManager_->SetPipeline(Pipe::Normal);
+	command_->GetList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 
 void DXCom::CommandExecution() {
@@ -552,13 +524,6 @@ void DXCom::UpDate()
 
 	/*transform.rotate.y += 0.05f;*/
 	/*Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);*/
-	Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTrans.scale, cameraTrans.rotate, cameraTrans.translate);
-	Matrix4x4 viewMatrix = Inverse(cameraMatrix);
-	if (isDebugCamera_)
-	{
-		viewMatrix = debugCamera_->GetViewMatrix();
-	}
-	Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(MyWin::kWindowWidth) / float(MyWin::kWindowHeight), 0.1f, 100.0f);
 	/*Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));*/
 
 	/*wvpDate_->World = worldMatrix;
@@ -583,21 +548,6 @@ void DXCom::ReleaseData()
 
 }
 
-Matrix4x4 DXCom::GetView()
-{
-	Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTrans.scale, cameraTrans.rotate, cameraTrans.translate);
-	Matrix4x4 viewMatrix = Inverse(cameraMatrix);
-	if (isDebugCamera_)
-	{
-		viewMatrix = debugCamera_->GetViewMatrix();
-	}
-	return viewMatrix;
-}
-
-float DXCom::GetAspect()
-{
-	return float(MyWin::kWindowWidth) / float(MyWin::kWindowHeight);
-}
 
 
 Microsoft::WRL::ComPtr<ID3D12Resource> DXCom::CreateBufferResource(Microsoft::WRL::ComPtr<ID3D12Device> device, size_t sizeInBytes)
@@ -706,10 +656,4 @@ D3D12_GPU_DESCRIPTOR_HANDLE DXCom::GetGPUDescriptorHandle(Microsoft::WRL::ComPtr
 	D3D12_GPU_DESCRIPTOR_HANDLE handleGPU = descriptorHeap->GetGPUDescriptorHandleForHeapStart();
 	handleGPU.ptr += (descriptorSize * index);
 	return handleGPU;
-}
-
-
-void DXCom::SetDebugCamera(DebugCamera* instanse)
-{
-	debugCamera_ = instanse;
 }

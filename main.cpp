@@ -4,6 +4,16 @@
 #include "TextureManager.h"
 #include "ImGuiManager.h"
 #include "MyWindow.h"
+#include "GlobalVariables.h"
+#include "ModelManager.h"
+#include "PointLightManager.h"
+
+
+// やること
+// オフスクリーンのかんり
+// モデルマネージャー、スプライトマネージャー
+// wave対応
+// クラス分け
 
 
 
@@ -15,6 +25,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Audio* audio = nullptr;
 	GameScene* gameScene = nullptr;
 	TextureManager* textureManager = nullptr;
+	ModelManager* modelManager = nullptr;
+
+	PointLightManager* pointLightManager = nullptr;
+
 
 	// ゲームウィンドウの作成
 	win = MyWin::GetInstance();
@@ -27,7 +41,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	DebugCamera* camera = nullptr;
 	camera = DebugCamera::GetInstance();
 	camera->Initialize();
-	dxCommon->SetDebugCamera(camera);
 
 
 #pragma region 汎用機能初期化
@@ -43,12 +56,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	audio = Audio::GetInstance();
 	audio->Initialize();
 
-	textureManager->GetInstance();
+	textureManager = TextureManager::GetInstance();
+	modelManager = ModelManager::GetInstance();
+
+	pointLightManager = PointLightManager::GetInstance();
+	pointLightManager->AddPointLight();
+	pointLightManager->AddSpotLight();
 
 #pragma endregion
 
 	dxCommon->SettingTexture();
 
+	GlobalVariables::GetInstance()->LoadFiles();
 
 	gameScene = new GameScene();
 	gameScene->Initialize();
@@ -68,6 +87,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		// 入力関連の毎フレーム処理
 		input->Update();
+
+		GlobalVariables::GetInstance()->Update();
+
 		// ゲームシーンの毎フレーム処理
 		gameScene->Update();
 
@@ -94,6 +116,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	audio->Finalize();
 	imguiManager->Fin();
 	textureManager->Finalize();
+	modelManager->Finalize();
 
 	// ゲームウィンドウの破棄
 	win->Finalize();

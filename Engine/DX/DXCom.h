@@ -21,13 +21,8 @@
 #include "DXCompil.h"
 
 
-#include "Pipeline.h"
-#include "ParticlePipeline.h"
-#include "GrayPipeline.h"
-#include "MetaBallPipeline.h"
-#include "GaussPipeline.h"
-#include "NonePipeline.h"
-
+#include "PipelineManager.h"
+#include "Camera.h"
 
 
 
@@ -67,12 +62,6 @@ enum BlendMode
 };
 
 
-enum LightMode
-{
-	kLightNone,
-	kLightHalfLambert,
-	kLightLambert,
-};
 
 
 class DebugCamera;//今だけ、後から消す
@@ -94,7 +83,7 @@ public:
 	void PostEffect();
 	void PostDraw();
 
-	void PreModelDraw();
+	void PreSpriteDraw();
 
 	void CommandExecution();
 	void IncreaseDescriptorIndex();
@@ -115,10 +104,6 @@ public:
 
 	void ReleaseData();
 
-	Matrix4x4 GetView();
-
-	float GetAspect();
-
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(Microsoft::WRL::ComPtr<ID3D12Device> device, size_t sizeInBytes);
 
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(
@@ -137,11 +122,9 @@ public:
 
 	DXCompil* GetDXCompil() const { return compiler_.get(); }
 
+	PipelineManager* GetPipelineManager()const { return pipeManager_; }
+
 	/*void Tick();*/
-
-	void SetIsDebugCamera(const bool cameraMode) { isDebugCamera_ = cameraMode; }
-
-	void SetDebugCamera(DebugCamera* instanse);//今だけ、後から消す
 
 private:
 
@@ -214,12 +197,7 @@ private:
 	std::unique_ptr<DXCompil> compiler_ = nullptr;
 
 
-	std::unique_ptr<Pipeline> pipline_ = nullptr;
-	std::unique_ptr<ParticlePipeline> particlePipline_ = nullptr;
-	std::unique_ptr<GrayPipeline> grayPipeline_ = nullptr;
-	std::unique_ptr<MetaBallPipeline> metaballPipeline_ = nullptr;
-	std::unique_ptr<GaussPipeline> gaussPipeline_ = nullptr;
-	std::unique_ptr<NonePipeline> nonePipeline_ = nullptr;
+	PipelineManager* pipeManager_;
 
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> instancingResource = nullptr;
@@ -248,14 +226,6 @@ private:
 	bool isFenceModel_ = false;
 	bool isSuzanneModel_ = false;
 	bool isMMesh_ = false;
-
-
-	bool isDebugCamera_ = false;
-
-	DebugCamera* debugCamera_ = nullptr;//今だけ、後から消す
-
-
-	Trans cameraTrans{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} };
 
 
 };

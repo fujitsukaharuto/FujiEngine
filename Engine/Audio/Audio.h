@@ -2,6 +2,7 @@
 #include <fstream>
 #include <cassert>
 #include <xaudio2.h>
+#include <vector>
 #include <wrl.h>
 
 
@@ -35,6 +36,7 @@ struct SoundData
 	// バッファの先頭アドレス
 	BYTE* pBuffer;
 	unsigned int bufferSize;
+	std::vector<IXAudio2SourceVoice*> pSourceVoices;
 };
 
 
@@ -55,7 +57,9 @@ public:
 
 	void SoundUnload(SoundData* soundData);
 
-	void SoundPlayWave(const SoundData& soundData);
+	void SoundPlayWave(SoundData& soundData, float volume = 0.2f);
+
+	void SoundStopWave(SoundData& soundData);
 
 private:
 

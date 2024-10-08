@@ -3,6 +3,7 @@
 #include <d3d12.h>
 #include <string>
 #include <wrl.h>
+#include "DXCom.h"
 #include "Mesh.h"
 #include "Material.h"
 
@@ -16,30 +17,22 @@ public:
 	Model(const Model& other);
 	~Model();
 
+	void Draw(ID3D12GraphicsCommandList* commandList);
 
-	Trans transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	void AddMaterial(const Material& material);
 
-	Model* CreateOBJ(const std::string& filename);
+	void AddMesh(const Mesh& mesh);
 
-	static Model* CreateSphere();
-
-	void Draw();
-
-	void SetWVP();
+	void SetColor(const Vector4& color);
 
 
 private:
 
-	MaterialDataPath LoadMaterialFile(const std::string& filename);
 
 private:
-
-	Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource_ = nullptr;
-	TransformationMatrix* wvpDate_ = nullptr;
 
 
 	std::vector<Material> material_;
 	std::vector<Mesh> mesh_;
 
-	const std::string kDirectoryPath_ = "resource/";
 };
