@@ -6,7 +6,7 @@
 #include "MyWindow.h"
 #include "GlobalVariables.h"
 #include "ModelManager.h"
-
+#include "PointLightManager.h"
 
 
 // やること
@@ -26,6 +26,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	GameScene* gameScene = nullptr;
 	TextureManager* textureManager = nullptr;
 	ModelManager* modelManager = nullptr;
+
+	PointLightManager* pointLightManager = nullptr;
 
 
 	// ゲームウィンドウの作成
@@ -55,9 +57,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	audio = Audio::GetInstance();
 	audio->Initialize();
 
-	textureManager->GetInstance();
-	modelManager->GetInstance();
+	textureManager = TextureManager::GetInstance();
+	modelManager = ModelManager::GetInstance();
 
+	pointLightManager = PointLightManager::GetInstance();
+	pointLightManager->AddPointLight();
+	pointLightManager->AddSpotLight();
 
 #pragma endregion
 

@@ -26,9 +26,9 @@ public:
 
 	void SetAngle(float rotate);
 
-	void SetPointLight(PointLight* light) { pointLight_ = light; }
+	/*void SetPointLight(PointLight* light) { pointLight_ = light; }
 
-	void SetSpotLight(SpotLight* light) { spotLight_ = light; }
+	void SetSpotLight(SpotLight* light) { spotLight_ = light; }*/
 
 private:
 
@@ -38,8 +38,6 @@ private:
 
 private:
 
-	PointLight* pointLight_;
-	SpotLight* spotLight_;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_ = nullptr;

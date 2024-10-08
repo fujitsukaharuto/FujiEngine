@@ -2,6 +2,7 @@
 #include "DXCom.h"
 #include "PointLight.h"
 #include "SpotLight.h"
+#include "PointLightManager.h"
 
 
 void Sprite::Load(const std::string& fileName) {
@@ -21,8 +22,7 @@ void Sprite::Draw() {
 	cList->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
 	cList->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
 	cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_->GetGPUVirtualAddress());
-	pointLight_->SetLightCommand(cList);
-	spotLight_->SetLightCommand(cList);
+	PointLightManager::GetInstance()->SetLightCommand(cList);
 	cList->SetGraphicsRootDescriptorTable(2, material_.GetTexture()->gpuHandle);
 	cList->DrawIndexedInstanced(6, 1, 0, 0, 0);
 

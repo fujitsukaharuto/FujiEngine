@@ -29,8 +29,6 @@ private:
 	Input* input_ = nullptr;
 	Audio* audio_ = nullptr;
 
-	PointLight* pointLight = nullptr;
-	SpotLight* spotLight = nullptr;
 
 	Object3d* sphere = nullptr;
 	Object3d* suzunne = nullptr;

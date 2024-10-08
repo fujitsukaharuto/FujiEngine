@@ -24,9 +24,9 @@ public:
 
 	void SetRightDir(const Vector3& right) { directionalLightData_->direction = right; }
 
-	void SetPointLight(PointLight* light) { pointLight_ = light; }
+	/*void SetPointLight(PointLight* light) { pointLight_ = light; }
 
-	void SetSpotLight(SpotLight* light) { spotLight_ = light; }
+	void SetSpotLight(SpotLight* light) { spotLight_ = light; }*/
 
 	Trans transform{};
 
