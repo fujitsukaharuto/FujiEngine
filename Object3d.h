@@ -3,6 +3,7 @@
 #include <string>
 #include "Model.h"
 #include "Camera.h"
+#include "Object3dCommon.h"
 
 
 class PointLight;
@@ -15,9 +16,9 @@ public:
 
 public:
 
-	void Create(const std::string& fileName);
+	void Create(const std::string& fileName, Object3dCommon* common);
 
-	void CreateSphere();
+	void CreateSphere(Object3dCommon* common);
 
 	void Draw();
 
@@ -42,6 +43,7 @@ private:
 	void SetWVP();
 
 private:
+	Object3dCommon* common_;
 	Model* model_ = nullptr;
 	PointLight* pointLight_;
 	SpotLight* spotLight_;

@@ -3,6 +3,7 @@
 #include "DXCom.h"
 #include "Input.h"
 #include "DebugCamera.h"
+#include "Object3dCommon.h"
 #include "Object3d.h"
 #include "Sprite.h"
 #include "Camera.h"
@@ -28,6 +29,7 @@ private:
 	Input* input_ = nullptr;
 	Audio* audio_ = nullptr;
 	
+	std::unique_ptr<Object3dCommon> obj3dCommon = nullptr;
 	std::unique_ptr<Camera> camera = nullptr;
 
 	Object3d* sphere = nullptr;

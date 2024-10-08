@@ -83,7 +83,6 @@ public:
 	void PostEffect();
 	void PostDraw();
 
-	void PreModelDraw();
 	void PreSpriteDraw();
 
 	void CommandExecution();

@@ -35,20 +35,20 @@ void GameScene::Initialize() {
 
 	camera.reset(new Camera());
 
+	obj3dCommon.reset(new Object3dCommon());
+	obj3dCommon->Initialize(camera.get());
+
 	sphere = new Object3d();
-	sphere->SetCamera(camera.get());
-	sphere->CreateSphere();
+	sphere->CreateSphere(obj3dCommon.get());
 
 	suzunne = new Object3d();
-	suzunne->SetCamera(camera.get());
-	suzunne->Create("suzanne.obj");
+	suzunne->Create("suzanne.obj", obj3dCommon.get());
 
 	float addDis = 1.0f;
 	for (int i = 0; i < 3; i++) {
 
 		Object3d* newModel = new Object3d();
-		newModel->SetCamera(camera.get());
-		newModel->Create("suzanne.obj");
+		newModel->Create("suzanne.obj",obj3dCommon.get());
 		newModel->transform.translate.x += addDis;
 		newModel->transform.translate.z += addDis;
 		newModel->transform.rotate.y = 3.14f;
@@ -58,12 +58,11 @@ void GameScene::Initialize() {
 	}
 
 	fence = new Object3d();
-	fence->SetCamera(camera.get());
-	fence->Create("Fence.obj");
+	fence->Create("Fence.obj", obj3dCommon.get());
 
 	terrain = new Object3d();
-	terrain->SetCamera(camera.get());
-	terrain->Create("terrain.obj");
+	terrain->Create("terrain.obj", obj3dCommon.get());
+
 
 	test = new Sprite();
 	test->Load("uvChecker.png");
@@ -171,7 +170,7 @@ void GameScene::Draw() {
 
 
 #pragma region 3Dオブジェクト
-	dxCommon_->PreModelDraw();
+	obj3dCommon->PreDraw();
 	sphere->Draw();
 	suzunne->Draw();
 	fence->Draw();

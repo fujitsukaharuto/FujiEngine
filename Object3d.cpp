@@ -10,8 +10,10 @@ Object3d::~Object3d() {
 	delete model_;
 }
 
-void Object3d::Create(const std::string& fileName) {
+void Object3d::Create(const std::string& fileName, Object3dCommon* common) {
 
+	this->common_ = common;
+	this->camera_ = common->GetDefaultCamera();
 	ModelManager::GetInstance()->LoadOBJ(fileName);
 	SetModel(fileName);
 	transform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
@@ -19,7 +21,9 @@ void Object3d::Create(const std::string& fileName) {
 
 }
 
-void Object3d::CreateSphere() {
+void Object3d::CreateSphere(Object3dCommon* common) {
+	this->common_ = common;
+	this->camera_ = common->GetDefaultCamera();
 	ModelManager::GetInstance()->CreateSphere();
 	SetModel("Sphere");
 	transform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
@@ -79,10 +83,15 @@ void Object3d::CreateWVP() {
 void Object3d::SetWVP() {
 
 	Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
-	Matrix4x4 viewMatrix = camera_->GetViewMatrix();
+	Matrix4x4 worldViewProjectionMatrix;
 
-	Matrix4x4 projectionMatrix = camera_->GetProjectionMatrix();
-	Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
+	if (camera_) {
+		const Matrix4x4& viewProjectionMatrix = camera_->GetViewProjectionMatrix();
+		worldViewProjectionMatrix= Multiply(worldMatrix, viewProjectionMatrix);
+	}
+	else {
+		worldViewProjectionMatrix = worldMatrix;
+	}
 
 	wvpDate_->World = worldMatrix;
 	wvpDate_->WVP = worldViewProjectionMatrix;
