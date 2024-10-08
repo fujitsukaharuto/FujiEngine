@@ -98,13 +98,13 @@ void Sprite::InitializeBuffer() {
 	cameraPosResource_ = DXCom::GetInstance()->CreateBufferResource(DXCom::GetInstance()->GetDevice(), sizeof(DirectionalLight));
 	cameraPosData_ = nullptr;
 	cameraPosResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraPosData_));
-	cameraPosData_->worldPosition = { 0.0f,4.0f,-20.0f };
+	cameraPosData_->worldPosition = { 0.0f,0.0f,0.0f };
 
 }
 
 void Sprite::SetWvp() {
 	Matrix4x4 worldMatrix = Multiply(Multiply(MakeScaleMatrix({ size_.x,size_.y,1.0f }), MakeRotateZMatrix(rotate_)), MakeTranslateMatrix(position_));
-	Matrix4x4 viewMatrix = DXCom::GetInstance()->GetView();
+	Matrix4x4 viewMatrix = MakeIdentity4x4();
 
 	Matrix4x4 projectionMatrix = MakeOrthographicMatrix(0.0f, 0.0f, float(MyWin::kWindowWidth), float(MyWin::kWindowHeight), 0.0f, 100.0f);
 	Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));

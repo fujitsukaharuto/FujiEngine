@@ -71,7 +71,7 @@ void Object3d::CreateWVP() {
 	cameraPosResource_ = DXCom::GetInstance()->CreateBufferResource(DXCom::GetInstance()->GetDevice(), sizeof(DirectionalLight));
 	cameraPosData_ = nullptr;
 	cameraPosResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraPosData_));
-	cameraPosData_->worldPosition = { 0.0f,4.0f,-20.0f };
+	cameraPosData_->worldPosition = camera_->transform.translate;
 
 
 }
@@ -79,13 +79,15 @@ void Object3d::CreateWVP() {
 void Object3d::SetWVP() {
 
 	Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
-	Matrix4x4 viewMatrix = DXCom::GetInstance()->GetView();
+	Matrix4x4 viewMatrix = camera_->GetViewMatrix();
 
-	Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, DXCom::GetInstance()->GetAspect(), 0.1f, 100.0f);
+	Matrix4x4 projectionMatrix = camera_->GetProjectionMatrix();
 	Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
 
 	wvpDate_->World = worldMatrix;
 	wvpDate_->WVP = worldViewProjectionMatrix;
 	wvpDate_->WorldInverseTransPose = Transpose(Inverse(wvpDate_->World));
+
+	cameraPosData_->worldPosition = camera_->transform.translate;
 
 }

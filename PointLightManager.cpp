@@ -5,6 +5,17 @@ PointLightManager* PointLightManager::GetInstance() {
 	return &instance;
 }
 
+void PointLightManager::Update() {
+
+#ifdef _DEBUG
+
+
+
+#endif // _DEBUG
+
+
+}
+
 void PointLightManager::AddPointLight() {
 	std::unique_ptr<PointLight> newPoint;
 	newPoint.reset(new PointLight());

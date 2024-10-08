@@ -13,6 +13,8 @@ public:
 
 	static PointLightManager* GetInstance();
 
+	void Update();
+
 	void AddPointLight();
 	void AddSpotLight();
 

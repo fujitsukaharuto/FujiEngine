@@ -2,6 +2,7 @@
 #include <wrl/client.h>
 #include <string>
 #include "Model.h"
+#include "Camera.h"
 
 
 class PointLight;
@@ -24,6 +25,8 @@ public:
 
 	void SetRightDir(const Vector3& right) { directionalLightData_->direction = right; }
 
+	void SetCamera(Camera* camera) { this->camera_ = camera; }
+
 	/*void SetPointLight(PointLight* light) { pointLight_ = light; }
 
 	void SetSpotLight(SpotLight* light) { spotLight_ = light; }*/
@@ -42,6 +45,8 @@ private:
 	Model* model_ = nullptr;
 	PointLight* pointLight_;
 	SpotLight* spotLight_;
+	Camera* camera_;
+
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource_ = nullptr;
 	TransformationMatrix* wvpDate_ = nullptr;

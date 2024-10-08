@@ -5,8 +5,7 @@
 #include "DebugCamera.h"
 #include "Object3d.h"
 #include "Sprite.h"
-#include "PointLight.h"
-#include "SpotLight.h"
+#include "Camera.h"
 
 
 class GameScene
@@ -28,7 +27,8 @@ private:
 	DXCom* dxCommon_ = nullptr;
 	Input* input_ = nullptr;
 	Audio* audio_ = nullptr;
-
+	
+	std::unique_ptr<Camera> camera = nullptr;
 
 	Object3d* sphere = nullptr;
 	Object3d* suzunne = nullptr;

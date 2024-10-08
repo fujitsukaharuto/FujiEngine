@@ -33,17 +33,21 @@ void GameScene::Initialize() {
 	globalvariables->AddItem(groupName2, "parametar", fencePara);
 	globalvariables->AddItem(groupName2, "Position", fencevec);
 
+	camera.reset(new Camera());
 
 	sphere = new Object3d();
+	sphere->SetCamera(camera.get());
 	sphere->CreateSphere();
 
 	suzunne = new Object3d();
+	suzunne->SetCamera(camera.get());
 	suzunne->Create("suzanne.obj");
 
 	float addDis = 1.0f;
 	for (int i = 0; i < 3; i++) {
 
 		Object3d* newModel = new Object3d();
+		newModel->SetCamera(camera.get());
 		newModel->Create("suzanne.obj");
 		newModel->transform.translate.x += addDis;
 		newModel->transform.translate.z += addDis;
@@ -54,9 +58,11 @@ void GameScene::Initialize() {
 	}
 
 	fence = new Object3d();
+	fence->SetCamera(camera.get());
 	fence->Create("Fence.obj");
 
 	terrain = new Object3d();
+	terrain->SetCamera(camera.get());
 	terrain->Create("terrain.obj");
 
 	test = new Sprite();
@@ -71,15 +77,16 @@ void GameScene::Initialize() {
 
 void GameScene::Update() {
 
+	camera->Update();
 
 #ifdef _DEBUG
 	if (input_->TriggerKey(DIK_F12)) {
 		if (isDebugCameraMode_) {
 			isDebugCameraMode_ = false;
-			dxCommon_->SetIsDebugCamera(false);
+
 		} else {
 			isDebugCameraMode_ = true;
-			dxCommon_->SetIsDebugCamera(true);
+
 		}
 	}
 

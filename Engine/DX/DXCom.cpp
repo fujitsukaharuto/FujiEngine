@@ -43,6 +43,7 @@ void DXCom::Initialize(MyWin* myWin)
 
 	//SettingTexture();
 	//SettingImgui();
+
 }
 
 void DXCom::CreateDevice()
@@ -529,13 +530,6 @@ void DXCom::UpDate()
 
 	/*transform.rotate.y += 0.05f;*/
 	/*Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);*/
-	Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTrans.scale, cameraTrans.rotate, cameraTrans.translate);
-	Matrix4x4 viewMatrix = Inverse(cameraMatrix);
-	if (isDebugCamera_)
-	{
-		viewMatrix = debugCamera_->GetViewMatrix();
-	}
-	Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(MyWin::kWindowWidth) / float(MyWin::kWindowHeight), 0.1f, 100.0f);
 	/*Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));*/
 
 	/*wvpDate_->World = worldMatrix;
@@ -560,21 +554,6 @@ void DXCom::ReleaseData()
 
 }
 
-Matrix4x4 DXCom::GetView()
-{
-	Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTrans.scale, cameraTrans.rotate, cameraTrans.translate);
-	Matrix4x4 viewMatrix = Inverse(cameraMatrix);
-	if (isDebugCamera_)
-	{
-		viewMatrix = debugCamera_->GetViewMatrix();
-	}
-	return viewMatrix;
-}
-
-float DXCom::GetAspect()
-{
-	return float(MyWin::kWindowWidth) / float(MyWin::kWindowHeight);
-}
 
 
 Microsoft::WRL::ComPtr<ID3D12Resource> DXCom::CreateBufferResource(Microsoft::WRL::ComPtr<ID3D12Device> device, size_t sizeInBytes)
@@ -683,10 +662,4 @@ D3D12_GPU_DESCRIPTOR_HANDLE DXCom::GetGPUDescriptorHandle(Microsoft::WRL::ComPtr
 	D3D12_GPU_DESCRIPTOR_HANDLE handleGPU = descriptorHeap->GetGPUDescriptorHandleForHeapStart();
 	handleGPU.ptr += (descriptorSize * index);
 	return handleGPU;
-}
-
-
-void DXCom::SetDebugCamera(DebugCamera* instanse)
-{
-	debugCamera_ = instanse;
 }

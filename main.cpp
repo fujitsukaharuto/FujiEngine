@@ -41,7 +41,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	DebugCamera* camera = nullptr;
 	camera = DebugCamera::GetInstance();
 	camera->Initialize();
-	dxCommon->SetDebugCamera(camera);
 
 
 #pragma region 汎用機能初期化

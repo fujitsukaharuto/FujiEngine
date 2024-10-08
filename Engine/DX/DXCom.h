@@ -22,7 +22,7 @@
 
 
 #include "PipelineManager.h"
-
+#include "Camera.h"
 
 
 
@@ -105,10 +105,6 @@ public:
 
 	void ReleaseData();
 
-	Matrix4x4 GetView();
-
-	float GetAspect();
-
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(Microsoft::WRL::ComPtr<ID3D12Device> device, size_t sizeInBytes);
 
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(
@@ -130,10 +126,6 @@ public:
 	PipelineManager* GetPipelineManager()const { return pipeManager_; }
 
 	/*void Tick();*/
-
-	void SetIsDebugCamera(const bool cameraMode) { isDebugCamera_ = cameraMode; }
-
-	void SetDebugCamera(DebugCamera* instanse);//今だけ、後から消す
 
 private:
 
@@ -235,12 +227,6 @@ private:
 	bool isFenceModel_ = false;
 	bool isSuzanneModel_ = false;
 	bool isMMesh_ = false;
-
-
-	bool isDebugCamera_ = false;
-
-	DebugCamera* debugCamera_ = nullptr;//今だけ、後から消す
-	Trans cameraTrans{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,4.0f,-20.0f} };
 
 
 };

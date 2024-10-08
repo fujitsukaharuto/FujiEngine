@@ -131,6 +131,9 @@
     <ClCompile Include="PointLightManager.cpp">
       <Filter>Engine\Light</Filter>
     </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Engine\DebugCamera</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -273,6 +276,9 @@
     </ClInclude>
     <ClInclude Include="SpotLight.h">
       <Filter>Engine\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Engine\DebugCamera</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
