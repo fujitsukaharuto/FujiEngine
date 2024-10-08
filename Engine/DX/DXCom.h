@@ -62,12 +62,6 @@ enum BlendMode
 };
 
 
-enum LightMode
-{
-	kLightNone,
-	kLightHalfLambert,
-	kLightLambert,
-};
 
 
 class DebugCamera;//今だけ、後から消す

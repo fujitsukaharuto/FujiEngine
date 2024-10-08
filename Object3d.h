@@ -19,6 +19,8 @@ public:
 
 	void SetColor(const Vector4& color);
 
+	void SetRightDir(const Vector3& right) { directionalLightData_->direction = right; }
+
 	Trans transform{};
 
 private:
@@ -38,5 +40,8 @@ private:
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_ = nullptr;
 	DirectionalLight* directionalLightData_ = nullptr;
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> cameraPosResource_ = nullptr;
+	CameraForGPU* cameraPosData_ = nullptr;
 
 };

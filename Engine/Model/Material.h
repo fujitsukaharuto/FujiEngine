@@ -2,6 +2,15 @@
 #include "MatrixCalculation.h"
 #include "TextureManager.h"
 
+enum LightMode {
+	kLightNone,
+	kLightHalfLambert,
+	kLightLambert,
+	kPhongReflect,
+	kBlinnPhongReflection,
+};
+
+
 class Material
 {
 public:
@@ -11,6 +20,7 @@ public:
 		int32_t enableLighting;
 		float padding[3];
 		Matrix4x4 uvTransform;
+		float shininess;
 	};
 
 public:

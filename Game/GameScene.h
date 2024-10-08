@@ -36,6 +36,7 @@ private:
 
 	Sprite* test = nullptr;
 	Vector4 color_ = { 1.0f,1.0f,1.0f,1.0f };
+	Vector3 rightDir = { 1.0f,0.0f,0.0f };
 
 	float spherePara = 10;
 	Vector3 spherevec = { 0.0f,1.0f,0.0f };

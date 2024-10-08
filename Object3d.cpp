@@ -30,6 +30,7 @@ void Object3d::Draw() {
 	ID3D12GraphicsCommandList* cList = DXCom::GetInstance()->GetCommandList();
 	cList->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
 	cList->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
+	cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_->GetGPUVirtualAddress());
 
 	if (model_) {
 		model_->Draw(cList);
@@ -52,6 +53,7 @@ void Object3d::CreateWVP() {
 	wvpResource_->Map(0, nullptr, reinterpret_cast<void**>(&wvpDate_));
 	wvpDate_->WVP = MakeIdentity4x4();
 	wvpDate_->World = MakeIdentity4x4();
+	wvpDate_->WorldInverseTransPose = Transpose(Inverse(wvpDate_->World));
 
 
 	directionalLightResource_ = DXCom::GetInstance()->CreateBufferResource(DXCom::GetInstance()->GetDevice(), sizeof(DirectionalLight));
@@ -60,6 +62,13 @@ void Object3d::CreateWVP() {
 	directionalLightData_->color = { 1.0f,1.0f,1.0f,1.0f };
 	directionalLightData_->direction = { 1.0f,0.0f,0.0f };
 	directionalLightData_->intensity = 1.0f;
+
+
+	cameraPosResource_ = DXCom::GetInstance()->CreateBufferResource(DXCom::GetInstance()->GetDevice(), sizeof(DirectionalLight));
+	cameraPosData_ = nullptr;
+	cameraPosResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraPosData_));
+	cameraPosData_->worldPosition = { 0.0f,0.0f,-10.0f };
+
 
 }
 
@@ -73,5 +82,6 @@ void Object3d::SetWVP() {
 
 	wvpDate_->World = worldMatrix;
 	wvpDate_->WVP = worldViewProjectionMatrix;
+	wvpDate_->WorldInverseTransPose = Transpose(Inverse(wvpDate_->World));
 
 }

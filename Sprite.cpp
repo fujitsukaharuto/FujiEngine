@@ -17,6 +17,7 @@ void Sprite::Draw() {
 	cList->SetGraphicsRootConstantBufferView(0, material_.GetMaterialResource()->GetGPUVirtualAddress());
 	cList->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
 	cList->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
+	cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_->GetGPUVirtualAddress());
 	cList->SetGraphicsRootDescriptorTable(2, material_.GetTexture()->gpuHandle);
 	cList->DrawIndexedInstanced(6, 1, 0, 0, 0);
 
@@ -24,14 +25,17 @@ void Sprite::Draw() {
 
 void Sprite::SetPos(const Vector3& pos) {
 	position_ = pos;
+	SetWvp();
 }
 
 void Sprite::SetSize(const Vector2& size) {
 	size_ = size;
+	SetWvp();
 }
 
 void Sprite::SetAngle(float rotate) {
 	rotate_ = rotate;
+	SetWvp();
 }
 
 void Sprite::InitializeBuffer() {
@@ -85,6 +89,12 @@ void Sprite::InitializeBuffer() {
 	directionalLightData_->direction = { 1.0f,0.0f,0.0f };
 	directionalLightData_->intensity = 1.0f;
 
+
+	cameraPosResource_ = DXCom::GetInstance()->CreateBufferResource(DXCom::GetInstance()->GetDevice(), sizeof(DirectionalLight));
+	cameraPosData_ = nullptr;
+	cameraPosResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraPosData_));
+	cameraPosData_->worldPosition = { 0.0f,0.0f,-10.0f };
+
 }
 
 void Sprite::SetWvp() {
@@ -96,5 +106,6 @@ void Sprite::SetWvp() {
 
 	wvpData_->World = worldMatrix;
 	wvpData_->WVP = worldViewProjectionMatrix;
+	wvpData_->WorldInverseTransPose = Transpose(Inverse(wvpData_->World));
 
 }
