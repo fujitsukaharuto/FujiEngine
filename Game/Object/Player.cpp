@@ -1,8 +1,8 @@
 #include"Object/Player.h"
 #include"Input.h"
 
-void Player::Initialize(std::vector<Model*> models){
-	Character::Initialize(models);
+void Player::Initialize(std::vector<Object3d*> Object3ds){
+	Character::Initialize(Object3ds);
 
 }
 
@@ -11,8 +11,6 @@ void Player::Update(){
     this->Move();
 
     models_[0]->transform.translate += velocity_;
-
-	Character::Update();
 }
 
 void Player::Draw(){

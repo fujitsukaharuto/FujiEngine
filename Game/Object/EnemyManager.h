@@ -2,6 +2,8 @@
 
 #include "Object/NoteEnemy.h"
 #include "Field/Field.h"
+#include "Object3d.h"
+#include "Object3dCommon.h"
 
 #include <fstream>
 #include<sstream>
@@ -18,6 +20,8 @@ public:
 	void Draw();
 
 	void SetField(const Field* field){ pField_ = field; }
+
+	void SetObject3dCommon(Object3dCommon* ptr){ pObject3dCommon_ = ptr; }
 
 private:
 	/// <summary>
@@ -38,6 +42,7 @@ private:
 private:
 
 	const Field* pField_ = nullptr;
+	Object3dCommon* pObject3dCommon_ = nullptr;
 
 	std::vector<std::unique_ptr<NoteEnemy>>noteEnemies_ {};
 

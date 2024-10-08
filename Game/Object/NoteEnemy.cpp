@@ -1,7 +1,7 @@
 #include"Object/NoteEnemy.h"
 #include "Object/NoteEnemyState/NoteEnemyState_Enemy.h"
 
-void NoteEnemy::Initialize(Model* model){
+void NoteEnemy::Initialize(Object3d* model){
 	Character::Initialize(model);
 	moveSpeed_ = 1.0f;
 
@@ -9,7 +9,7 @@ void NoteEnemy::Initialize(Model* model){
 	currentState_ = std::make_unique<NoteEnemyState_Enemy>(this);
 }
 
-void NoteEnemy::Initialize(std::vector<Model*> models, const Vector3& initPos){
+void NoteEnemy::Initialize(std::vector<Object3d*> models, const Vector3& initPos){
 	Character::Initialize(models);
 	models_[0]->transform.translate = initPos;
 
@@ -25,8 +25,6 @@ void NoteEnemy::Update(){
 	if (currentState_){
 		currentState_->Update();
 	}
-
-	Character::Update();
 }
 
 void NoteEnemy::Draw(){

@@ -1,4 +1,5 @@
 #include "GameScene.h"
+#include "ImGuiManager.h"
 #include "ModelManager.h"
 #include "GlobalVariables.h"
 #include "Rendering/PrimitiveDrawer.h"
@@ -17,8 +18,6 @@ GameScene::~GameScene(){
 	delete suzunne;
 	delete fence;
 	===================================================*/
-	delete ground;
-
 	player_.reset();
 	playerModels_.clear();
 
@@ -26,12 +25,24 @@ GameScene::~GameScene(){
 	bossModels_.clear();
 
 	field_.reset();
+
+	/*for (auto suzunneModel : suzunnes){
+		delete suzunneModel;
+	}
+	delete terrain;
+	delete test;*/
 }
+	
 
 void GameScene::Initialize(){
 	dxCommon_ = DXCom::GetInstance();
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
+
+	camera.reset(new Camera());
+
+	obj3dCommon.reset(new Object3dCommon());
+	obj3dCommon->Initialize(camera.get());
 
 	/*GlobalVariables* globalvariables = GlobalVariables::GetInstance();
 	const char* groupName = "Sphere";
@@ -49,36 +60,45 @@ void GameScene::Initialize(){
 	globalvariables->AddItem(groupName2, "parametar", fencePara);
 	globalvariables->AddItem(groupName2, "Position", fencevec);
 
+	sphere = new Object3d();
+	sphere->CreateSphere(obj3dCommon.get());
 
-	sphere = ModelManager::CreateSphere();
-
-	suzunne = ModelManager::LoadOBJ("suzanne.obj");
+	suzunne = new Object3d();
+	suzunne->Create("suzanne.obj", obj3dCommon.get());
 
 	float addDis = 1.0f;
 	for (int i = 0; i < 3; i++) {
 
-		Model* newModel = ModelManager::LoadOBJ("suzanne.obj");
+		Object3d* newModel = new Object3d();
+		newModel->Create("suzanne.obj",obj3dCommon.get());
 		newModel->transform.translate.x += addDis;
 		newModel->transform.translate.z += addDis;
 		newModel->transform.rotate.y = 3.14f;
-		newModel->SetWVP();
 		suzunnes.push_back(newModel);
 		addDis += 0.5f;
 
 	}
 
-	fence = ModelManager::LoadOBJ("Fence.obj");
+	fence = new Object3d();
+	fence->Create("Fence.obj", obj3dCommon.get());
 
-	===================================================*/
+	terrain = new Object3d();
+	terrain->Create("terrain.obj", obj3dCommon.get());
+
+
+	test = new Sprite();
+	test->Load("uvChecker.png");
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	/*                                   フィールド (五線譜)                                        */
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	for (Model*& fieldModel : fieldModels_){
-		fieldModel = ModelManager::LoadOBJ("ground.obj");
+	for (Object3d*& fieldModel : fieldModels_){
+		fieldModel = new Object3d;
+		fieldModel->Create("ground.obj", obj3dCommon.get());
 	}
+
 
 	field_ = std::make_unique<Field>();
 	field_->Initialize(fieldModels_);
@@ -87,7 +107,8 @@ void GameScene::Initialize(){
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	/*                                        プレイやー                                            */
 	////////////////////////////////////////////////////////////////////////////////////////////////
-	Model* playerModel = ModelManager::LoadOBJ("debugCube.obj");
+	Object3d* playerModel = new Object3d();
+	playerModel->Create("debugCube.obj",obj3dCommon.get());
 	playerModels_.emplace_back(playerModel);
 	player_ = std::make_unique<Player>();
 	player_->Initialize(playerModels_);
@@ -98,7 +119,8 @@ void GameScene::Initialize(){
 
 	//=======================================================================================
 	//↓boss
-	Model* bossModel = ModelManager::LoadOBJ("debugCube.obj");
+	Object3d* bossModel = new Object3d(); 
+	bossModel->Create("debugCube.obj",obj3dCommon.get());
 	bossModels_.emplace_back(bossModel);
 	boss_ = std::make_unique<Boss>();
 	boss_->Initialize(bossModels_);
@@ -107,6 +129,7 @@ void GameScene::Initialize(){
 	enemyManager_ = std::make_unique<EnemyManager>();
 	enemyManager_->Initialize();
 	enemyManager_->SetField(field_.get());
+	enemyManager_->SetObject3dCommon(obj3dCommon.get());
 
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	/*                                        サウンド                                             */
@@ -120,15 +143,16 @@ void GameScene::Initialize(){
 
 void GameScene::Update(){
 
+	camera->Update();
 
 #ifdef _DEBUG
 	if (input_->TriggerKey(DIK_F12)){
 		if (isDebugCameraMode_){
 			isDebugCameraMode_ = false;
-			dxCommon_->SetIsDebugCamera(false);
-		} else{
+
+		} else {
 			isDebugCameraMode_ = true;
-			dxCommon_->SetIsDebugCamera(true);
+
 		}
 	}
 
@@ -137,6 +161,22 @@ void GameScene::Update(){
 	}
 
 	//ApplyGlobalVariables();
+
+	//ImGui::Begin("suzunne");
+
+	//ImGui::ColorEdit4("color", &color_.X);
+	////suzunne->SetColor(color_);
+	//ImGui::End();
+
+	//ImGui::Begin("Sphere");
+
+	//ImGui::DragFloat3("scale", &sphere->transform.scale.x, 0.01f);
+	//ImGui::DragFloat3("rotate", &sphere->transform.rotate.x, 0.01f);
+	//ImGui::DragFloat3("right", &rightDir.x,0.01f);
+	//rightDir = rightDir.Normalize();
+	//sphere->SetRightDir(rightDir);
+	//ImGui::End();
+
 
 #endif // _DEBUG
 
@@ -165,20 +205,20 @@ void GameScene::Update(){
 	/*===============================================
 	ゲーム画面を作成するので一時的にコメントアウト
 	suzunne->transform.rotate.y = 3.14f;
-	suzunne->transform.rotate.x += 0.2f;
-	suzunne->SetWVP();
+	suzunne->transform.rotate.x += 0.05f;
+
 
 	float rotaSpeed = 0.1f;
 	for (auto suzunneModel : suzunnes) {
 		suzunneModel->transform.rotate.x += rotaSpeed;
-		suzunneModel->SetWVP();
+
 		rotaSpeed += 0.05f;
 	}
 
 
 	sphere->transform.translate = spherevec;
 	sphere->transform.rotate.y += 0.02f;
-	sphere->SetWVP();
+
 	fence->transform.translate = fencevec;
 	fence->transform.rotate.x = 0.5f;
 	fence->SetWVP();
@@ -206,14 +246,10 @@ void GameScene::Draw(){
 
 
 #pragma region 3Dオブジェクト
-	dxCommon_->PreModelDraw();
-
-	/*===============================================
-	ゲーム画面を作成するので一時的にコメントアウト
-	sphere->Draw();
+	obj3dCommon->PreDraw();
+	/*sphere->Draw();
 	suzunne->Draw();
-	fence->Draw();
-	================================================*/
+	fence->Draw();*/
 	field_->Draw();
 
 	//プレイヤーの描画
@@ -227,6 +263,11 @@ void GameScene::Draw(){
 
 	//描画コマンドを積んでます
 	
+	//for (auto suzunneModel : suzunnes) {
+	//	suzunneModel->Draw();
+	//}
+	//terrain->Draw();
+
 #pragma endregion
 
 

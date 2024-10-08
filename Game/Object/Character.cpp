@@ -6,7 +6,7 @@ Character::~Character(){
 	}
 }
 
-void Character::Initialize(std::vector<Model*> models){
+void Character::Initialize(std::vector<Object3d*> models){
 	models_.resize(models.size());
 
 	for (size_t i = 0; i < models.size(); i++){
@@ -14,15 +14,11 @@ void Character::Initialize(std::vector<Model*> models){
 	}
 }
 
-void Character::Initialize(Model* model){
+void Character::Initialize(Object3d* model){
 	models_.emplace_back(model);
 }
 
-void Character::Update(){
-	for (auto model : models_){
-		model->SetWVP();
-	}
-}
+void Character::Update(){}
 
 void Character::Draw(){
 	for (auto model : models_){

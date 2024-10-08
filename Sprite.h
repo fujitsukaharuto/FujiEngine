@@ -6,6 +6,8 @@
 
 
 
+class PointLight;
+class SpotLight;
 
 class Sprite {
 public:
@@ -23,6 +25,10 @@ public:
 	void SetSize(const Vector2& size);
 
 	void SetAngle(float rotate);
+
+	/*void SetPointLight(PointLight* light) { pointLight_ = light; }
+
+	void SetSpotLight(SpotLight* light) { spotLight_ = light; }*/
 
 private:
 
@@ -46,6 +52,11 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource_ = nullptr;
 	TransformationMatrix* wvpData_;
 
+	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_ = nullptr;
+	DirectionalLight* directionalLightData_ = nullptr;
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> cameraPosResource_ = nullptr;
+	CameraForGPU* cameraPosData_ = nullptr;
 
 	Material material_;
 

@@ -151,14 +151,14 @@ void PrimitiveDrawer::CreateMatrixBuffer(){
 }
 
 void PrimitiveDrawer::UpdateMatrixBuffer(){
-    // ワールド行列（必要に応じて設定）
-    Matrix4x4 worldMatrix = MakeIdentity4x4();
-    Matrix4x4 viewMatrix = DXCom::GetInstance()->GetView();
+    //// ワールド行列（必要に応じて設定）
+    //Matrix4x4 worldMatrix = MakeIdentity4x4();
+    //Matrix4x4 viewMatrix = DXCom::GetInstance()->GetView();
 
-    Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, DXCom::GetInstance()->GetAspect(), 0.1f, 100.0f);
-    Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
+    //Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, DXCom::GetInstance()->GetAspect(), 0.1f, 100.0f);
+    //Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
 
-    // 定数バッファの更新
-    matrixData_->World = worldMatrix;
-    matrixData_->WVP = worldViewProjectionMatrix;
+    //// 定数バッファの更新
+    //matrixData_->World = worldMatrix;
+    //matrixData_->WVP = worldViewProjectionMatrix;
 }

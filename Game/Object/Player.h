@@ -13,7 +13,7 @@ public:
 	/// 初期化
 	/// </summary>
 	/// <param name="models"></param>
-	void Initialize(std::vector<Model*> models)override;
+	void Initialize(std::vector<Object3d*> models)override;
 
 	/// <summary>
 	/// 更新

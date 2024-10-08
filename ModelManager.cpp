@@ -24,16 +24,17 @@ void ModelManager::Finalize() {
 }
 
 
-Model* ModelManager::LoadOBJ(const std::string& filename) {
+void ModelManager::LoadOBJ(const std::string& filename) {
 	ModelManager* instance = GetInstance();
 
 	auto iterator = instance->models_.find(filename);
 	if (iterator != instance->models_.end()) {
-		return new Model(*(*iterator).second.get());
+		return;
 	}
 
 
-	Model* model = new Model();
+	std::unique_ptr<Model> model;
+	model.reset(new Model());
 	Mesh mesh{};
 	Material material{};
 
@@ -122,9 +123,7 @@ Model* ModelManager::LoadOBJ(const std::string& filename) {
 
 	model->AddMesh(mesh);
 
-	instance->AddModel(filename, model);
-
-	return model;
+	instance->models_.insert(std::make_pair(filename, std::move(model)));
 }
 
 
@@ -138,17 +137,18 @@ Model* ModelManager::FindModel(const std::string& filename) {
 }
 
 
-Model* ModelManager::CreateSphere() {
+void ModelManager::CreateSphere() {
 
 	ModelManager* instance = GetInstance();
 
 	auto iterator = instance->models_.find("Sphere");
 	if (iterator != instance->models_.end()) {
-		return new Model(*(*iterator).second.get());
+		return;
 	}
 
 
-	Model* model = new Model();
+	std::unique_ptr<Model> model;
+	model.reset(new Model());
 	Mesh mesh{};
 	Material material{};
 
@@ -206,8 +206,7 @@ Model* ModelManager::CreateSphere() {
 	model->AddMesh(mesh);
 	model->AddMaterial(material);
 
-	instance->AddModel("Sphere", model);
-	return model;
+	instance->models_.insert(std::make_pair("Sphere", std::move(model)));
 }
 
 

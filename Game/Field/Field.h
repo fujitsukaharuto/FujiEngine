@@ -1,6 +1,7 @@
 #pragma once
 
 #include"Model.h"
+#include"Object3d.h"
 
 #include <array>
 
@@ -12,7 +13,7 @@ public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Initialize(const std::array<Model*, 5>& models);
+	void Initialize(const std::array<Object3d*, 5>& models);
 
 	/// <summary>
 	/// 更新
@@ -29,7 +30,7 @@ public:
 private:
 
 	//五線譜のモデル(仮)
-	std::array<Model*, 5>staffNotation_ {};
+	std::array<Object3d*, 5>staffNotation_ {};
 	//移動してくるオブジェクトのスピードに対する影響力
 	std::array<float, 5>influenceOnSpeed_ {};
 

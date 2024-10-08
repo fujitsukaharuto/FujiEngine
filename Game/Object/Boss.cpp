@@ -2,7 +2,7 @@
 
 Boss::~Boss(){}
 
-void Boss::Initialize(std::vector<Model*> models){
+void Boss::Initialize(std::vector<Object3d*> models){
 	Character::Initialize(models);
 }
 

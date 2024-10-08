@@ -8,7 +8,7 @@ public:
     Boss() = default;
     ~Boss()override;
 
-    void Initialize(std::vector<Model*>models);
+    void Initialize(std::vector<Object3d*>models);
 
     void Update()override;
 

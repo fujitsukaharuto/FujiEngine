@@ -6,7 +6,7 @@ Field::~Field(){
 	}
 }
 
-void Field::Initialize(const std::array<Model*, 5>& models){
+void Field::Initialize(const std::array<Object3d*, 5>& models){
 	staffNotation_ = models;
 
 	//一番下の線の座標
@@ -16,20 +16,15 @@ void Field::Initialize(const std::array<Model*, 5>& models){
 		Vector3 initializePosition = Vector3 {-2.5f,0.0f + (kLineSpace_ * i),0.0f};
 
 		staffNotation_[i]->transform.translate = initializePosition;
-		staffNotation_[i]->SetWVP();
 
 		influenceOnSpeed_[i] = 1.0f + (0.1f * i);
 	}
 }
 
-void Field::Update(){
-	for (Model*& field:staffNotation_){
-		field->SetWVP();
-	}
-}
+void Field::Update(){}
 
 void Field::Draw(){
-	for (Model*& model: staffNotation_){
+	for (Object3d*& model: staffNotation_){
 		model->Draw();
 	}
 }

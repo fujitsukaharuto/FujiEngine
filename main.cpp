@@ -6,6 +6,7 @@
 #include "MyWindow.h"
 #include "GlobalVariables.h"
 #include "ModelManager.h"
+#include "PointLightManager.h"
 #include "Rendering/PrimitiveDrawer.h"
 
 
@@ -28,6 +29,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	PrimitiveDrawer* primitiveDrawer = nullptr;
 	ModelManager* modelManager = nullptr;
 
+	PointLightManager* pointLightManager = nullptr;
+
+
 	// ゲームウィンドウの作成
 	win = MyWin::GetInstance();
 	win->Initialize();
@@ -39,7 +43,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	DebugCamera* camera = nullptr;
 	camera = DebugCamera::GetInstance();
 	camera->Initialize();
-	dxCommon->SetDebugCamera(camera);
 
 
 #pragma region 汎用機能初期化
@@ -55,8 +58,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	audio = Audio::GetInstance();
 	audio->Initialize();
 
-	textureManager->GetInstance();
-	modelManager->GetInstance();
+	textureManager = TextureManager::GetInstance();
+	modelManager = ModelManager::GetInstance();
+
+	pointLightManager = PointLightManager::GetInstance();
+	pointLightManager->AddPointLight();
+	pointLightManager->AddSpotLight();
 
 	primitiveDrawer = PrimitiveDrawer::GetInstance();
 

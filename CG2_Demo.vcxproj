@@ -100,6 +100,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="DirectionLight.cpp" />
     <ClCompile Include="Game\Field\Field.cpp" />
     <ClCompile Include="Game\Object\Boss.cpp" />
@@ -145,11 +146,18 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\Object\Character.cpp" />
     <ClCompile Include="Game\Object\Player.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="ModelCommon.cpp" />
     <ClCompile Include="ModelManager.cpp" />
+    <ClCompile Include="Object3d.cpp" />
+    <ClCompile Include="Object3dCommon.cpp" />
     <ClCompile Include="PipelineManager.cpp" />
+    <ClCompile Include="PointLight.cpp" />
+    <ClCompile Include="PointLightManager.cpp" />
+    <ClCompile Include="SpotLight.cpp" />
     <ClCompile Include="Sprite.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="DirectionLight.h" />
     <ClInclude Include="Game\Field\Field.h" />
     <ClInclude Include="Game\Object\Boss.h" />
@@ -196,10 +204,16 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Game\Object\NoteEnemyState\NoteEnemyState_Base.h" />
     <ClInclude Include="Game\Object\NoteEnemyState\NoteEnemyState_Enemy.h" />
     <ClInclude Include="GlobalVariables.h" />
+    <ClInclude Include="ModelCommon.h" />
     <ClInclude Include="Game\Object\Character.h" />
     <ClInclude Include="Game\Object\Player.h" />
     <ClInclude Include="ModelManager.h" />
+    <ClInclude Include="Object3d.h" />
+    <ClInclude Include="Object3dCommon.h" />
     <ClInclude Include="PipelineManager.h" />
+    <ClInclude Include="PointLight.h" />
+    <ClInclude Include="PointLightManager.h" />
+    <ClInclude Include="SpotLight.h" />
     <ClInclude Include="Sprite.h" />
   </ItemGroup>
   <ItemGroup>

@@ -87,7 +87,9 @@ void EnemyManager::UpdatePopData(){
 
                 // 敵を生成しリストに追加
                 std::unique_ptr<NoteEnemy> noteEnemy = std::make_unique<NoteEnemy>();
-                Model* noteEnemyModel = ModelManager::LoadOBJ("debugCube.obj");
+                Object3d* noteEnemyModel = new Object3d;
+
+                noteEnemyModel->Create("debugCube.obj",pObject3dCommon_);
 
                 noteEnemy->Initialize(noteEnemyModel);
                 noteEnemy->SetTranslate(Vector3 {20.0f, spawnPosY, 0.0f});

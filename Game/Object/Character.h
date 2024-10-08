@@ -1,5 +1,5 @@
 #pragma once
-#include"Model.h"
+#include "Object3d.h"
 #include"Vector3.h"
 
 //local
@@ -19,8 +19,8 @@ public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	virtual void Initialize(std::vector<Model*> models);
-	virtual void Initialize(Model* model);
+	virtual void Initialize(std::vector<Object3d*> models);
+	virtual void Initialize(Object3d* model);
 
 	/// <summary>
 	/// 更新処理
@@ -44,6 +44,6 @@ public:
 
 protected:
 	//描画用モデル
-	std::vector<Model*> models_ {};
+	std::vector<Object3d*> models_ {};
 
 };

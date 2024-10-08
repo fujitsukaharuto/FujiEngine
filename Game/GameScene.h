@@ -3,6 +3,10 @@
 #include "DXCom.h"
 #include "Input.h"
 #include "DebugCamera.h"
+#include "Object3dCommon.h"
+#include "Object3d.h"
+#include "Sprite.h"
+#include "Camera.h"
 
 //local
 #include "Object/Player.h"
@@ -41,22 +45,31 @@ private:
 	DXCom* dxCommon_ = nullptr;
 	Input* input_ = nullptr;
 	Audio* audio_ = nullptr;
+	
+	std::unique_ptr<Object3dCommon> obj3dCommon = nullptr;
+	std::unique_ptr<Camera> camera = nullptr;
+
+	Object3d* sphere = nullptr;
+	Object3d* suzunne = nullptr;
+	Object3d* fence = nullptr;
+	Object3d* terrain = nullptr;
 
 	/*======================
 		3dモデル
 	=======================*/
-	Model* sphere = nullptr;
-	Model* suzunne = nullptr;
-	Model* fence = nullptr;
-	Model* ground = nullptr;
+	//Model* sphere = nullptr;
+	//Model* suzunne = nullptr;
+	//Model* fence = nullptr;
+	//Model* ground = nullptr;
 
-	std::vector<Model*> playerModels_ {};
-	std::vector<Model*> bossModels_ {};
+	std::vector<Object3d*> playerModels_ {};
+	std::vector<Object3d*> bossModels_ {};
 	/*======================
 		プレイヤー
 	=======================*/
 	std::unique_ptr<Player>player_ = nullptr;
 
+	std::vector<Object3d*> suzunnes;
 	/*======================
 		敵
 	=======================*/
@@ -67,11 +80,12 @@ private:
 	/*======================
 		フィールド(五線譜)
 	=======================*/
-	std::array<Model*, 5> fieldModels_;
+	std::array<Object3d*, 5> fieldModels_;
 	std::unique_ptr<Field> field_ = nullptr;
 
-	std::vector<Model*> suzunnes;
-
+	Sprite* test = nullptr;
+	Vector4 color_ = { 1.0f,1.0f,1.0f,1.0f };
+	Vector3 rightDir = { 1.0f,0.0f,0.0f };
 
 	float spherePara = 10;
 	Vector3 spherevec = {0.0f,1.0f,0.0f};
