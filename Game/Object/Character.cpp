@@ -7,7 +7,15 @@ Character::~Character(){
 }
 
 void Character::Initialize(std::vector<Model*> models){
-	models_ = models;
+	models_.resize(models.size());
+
+	for (size_t i = 0; i < models.size(); i++){
+		models_[i] = models[i];
+	}
+}
+
+void Character::Initialize(Model* model){
+	models_.emplace_back(model);
 }
 
 void Character::Update(){

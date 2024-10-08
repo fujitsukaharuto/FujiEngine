@@ -3,9 +3,13 @@
 #include "DXCom.h"
 #include "Input.h"
 #include "DebugCamera.h"
-#include "Model.h"
+
+//local
 #include "Object/Player.h"
+#include "Object/NoteEnemy.h"
 #include "Object/Boss.h"
+#include "Field/Field.h"
+#include "Object/EnemyManager.h"
 
 #include<memory>
 
@@ -21,6 +25,16 @@ public:
 	void Draw();
 
 private:
+
+	/// <summary>
+	/// 敵のポップデータ読み込み
+	/// </summary>
+	void LoadEnemyPopData();
+
+	/// <summary>
+	/// 敵のポップ
+	/// </summary>
+	void UpdateEnemyPopData();
 
 	void ApplyGlobalVariables();//値読み込みテスト用今度Objectクラス作って継承で使えるようにする
 
@@ -48,7 +62,13 @@ private:
 	=======================*/
 	//ボス
 	std::unique_ptr<Boss> boss_ = nullptr;
+	std::unique_ptr<EnemyManager> enemyManager_ = nullptr;
 
+	/*======================
+		フィールド(五線譜)
+	=======================*/
+	std::array<Model*, 5> fieldModels_;
+	std::unique_ptr<Field> field_ = nullptr;
 
 	std::vector<Model*> suzunnes;
 

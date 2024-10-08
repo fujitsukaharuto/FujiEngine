@@ -101,6 +101,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="DirectionLight.cpp" />
+    <ClCompile Include="Game\Field\Field.cpp" />
     <ClCompile Include="Game\Object\Boss.cpp" />
     <ClCompile Include="Engine\Audio\Audio.cpp" />
     <ClCompile Include="Engine\DebugCamera\DebugCamera.cpp" />
@@ -136,6 +137,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Game\Field\MapChipField.cpp" />
     <ClCompile Include="Game\GameScene.cpp" />
+    <ClCompile Include="Game\Object\EnemyManager.cpp" />
+    <ClCompile Include="Game\Object\NoteEnemy.cpp" />
+    <ClCompile Include="Game\Object\NoteEnemyState\NoteEnemyState_Base.cpp" />
+    <ClCompile Include="Game\Object\NoteEnemyState\NoteEnemyState_Enemy.cpp" />
     <ClCompile Include="GlobalVariables.cpp" />
     <ClCompile Include="Game\Object\Character.cpp" />
     <ClCompile Include="Game\Object\Player.cpp" />
@@ -146,6 +151,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DirectionLight.h" />
+    <ClInclude Include="Game\Field\Field.h" />
     <ClInclude Include="Game\Object\Boss.h" />
     <ClInclude Include="Engine\Audio\Audio.h" />
     <ClInclude Include="Engine\DebugCamera\DebugCamera.h" />
@@ -185,6 +191,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="externals\imgui\imstb_truetype.h" />
     <ClInclude Include="Game\Field\MapChipField.h" />
     <ClInclude Include="Game\GameScene.h" />
+    <ClInclude Include="Game\Object\EnemyManager.h" />
+    <ClInclude Include="Game\Object\NoteEnemy.h" />
+    <ClInclude Include="Game\Object\NoteEnemyState\NoteEnemyState_Base.h" />
+    <ClInclude Include="Game\Object\NoteEnemyState\NoteEnemyState_Enemy.h" />
     <ClInclude Include="GlobalVariables.h" />
     <ClInclude Include="Game\Object\Character.h" />
     <ClInclude Include="Game\Object\Player.h" />

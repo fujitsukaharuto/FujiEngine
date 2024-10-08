@@ -16,7 +16,6 @@ Model::Model(const Model& other) {
 	wvpResource_->Map(0, nullptr, reinterpret_cast<void**>(&wvpDate_));
 	wvpDate_->WVP = MakeIdentity4x4();
 	wvpDate_->World = MakeIdentity4x4();
-
 }
 
 Model::~Model() {}

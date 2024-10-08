@@ -1,6 +1,9 @@
 #include "GameScene.h"
 #include "ModelManager.h"
 #include "GlobalVariables.h"
+#include "Rendering/PrimitiveDrawer.h"
+
+#include <array>
 
 GameScene::GameScene(){
 	playerModels_.clear();
@@ -21,6 +24,8 @@ GameScene::~GameScene(){
 
 	boss_.reset();
 	bossModels_.clear();
+
+	field_.reset();
 }
 
 void GameScene::Initialize(){
@@ -66,11 +71,17 @@ void GameScene::Initialize(){
 
 	===================================================*/
 
+
 	////////////////////////////////////////////////////////////////////////////////////////////////
-	/*                                        3dモデル                                             */
+	/*                                   フィールド (五線譜)                                        */
 	////////////////////////////////////////////////////////////////////////////////////////////////
-	ground = ModelManager::LoadOBJ("ground.obj");
-	ground->transform.translate = Vector3 {-2.5f,0.0f,0.0f};
+	
+	for (Model*& fieldModel : fieldModels_){
+		fieldModel = ModelManager::LoadOBJ("ground.obj");
+	}
+
+	field_ = std::make_unique<Field>();
+	field_->Initialize(fieldModels_);
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////
@@ -84,12 +95,18 @@ void GameScene::Initialize(){
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	/*                                          敵関連                                             */
 	////////////////////////////////////////////////////////////////////////////////////////////////
+
+	//=======================================================================================
+	//↓boss
 	Model* bossModel = ModelManager::LoadOBJ("debugCube.obj");
 	bossModels_.emplace_back(bossModel);
 	boss_ = std::make_unique<Boss>();
 	boss_->Initialize(bossModels_);
 	boss_->SetTranslate(Vector3 {-4.0f,-1.0f,0.0f});
-
+	
+	enemyManager_ = std::make_unique<EnemyManager>();
+	enemyManager_->Initialize();
+	enemyManager_->SetField(field_.get());
 
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	/*                                        サウンド                                             */
@@ -124,16 +141,12 @@ void GameScene::Update(){
 #endif // _DEBUG
 
 	if (input_->PushKey(DIK_LEFT)){
-		ground->transform.translate.x -= 0.05f;
 	}
 	if (input_->PushKey(DIK_RIGHT)){
-		ground->transform.translate.x += 0.05f;
 	}
 	if (input_->PushKey(DIK_UP)){
-		ground->transform.translate.y += 0.05f;
 	}
 	if (input_->PushKey(DIK_DOWN)){
-		ground->transform.translate.y -= 0.05f;
 	}
 
 
@@ -170,13 +183,16 @@ void GameScene::Update(){
 	fence->transform.rotate.x = 0.5f;
 	fence->SetWVP();
 	================================================*/
-	ground->SetWVP();
+	field_->Update();
 
 	//プレイヤーの更新
 	player_->Update();
 
 	//ボスの更新
 	boss_->Update();
+
+
+	enemyManager_->Update();
 
 }
 
@@ -198,7 +214,7 @@ void GameScene::Draw(){
 	suzunne->Draw();
 	fence->Draw();
 	================================================*/
-	ground->Draw();
+	field_->Draw();
 
 	//プレイヤーの描画
 	player_->Draw();
@@ -206,8 +222,11 @@ void GameScene::Draw(){
 	//ボスの描画
 	boss_->Draw();
 
+	enemyManager_->Draw();
+
 
 	//描画コマンドを積んでます
+	
 #pragma endregion
 
 
@@ -220,6 +239,10 @@ void GameScene::Draw(){
 	dxCommon_->Command();
 	dxCommon_->PostEffect();
 
+
+}
+
+void GameScene::LoadEnemyPopData(){
 
 }
 
