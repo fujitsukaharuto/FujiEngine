@@ -8,6 +8,8 @@ enum LightMode {
 	kLightLambert,
 	kPhongReflect,
 	kBlinnPhongReflection,
+	kPointLightON,
+	kSpotLightON,
 };
 
 

@@ -240,7 +240,7 @@ private:
 	bool isDebugCamera_ = false;
 
 	DebugCamera* debugCamera_ = nullptr;//今だけ、後から消す
-	Trans cameraTrans{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} };
+	Trans cameraTrans{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,4.0f,-20.0f} };
 
 
 };

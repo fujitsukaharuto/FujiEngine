@@ -122,6 +122,12 @@
     <ClCompile Include="ModelCommon.cpp">
       <Filter>Engine\Model</Filter>
     </ClCompile>
+    <ClCompile Include="PointLight.cpp">
+      <Filter>Engine\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="SpotLight.cpp">
+      <Filter>Engine\Light</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -255,6 +261,15 @@
     </ClInclude>
     <ClInclude Include="ModelCommon.h">
       <Filter>Engine\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="PointLight.h">
+      <Filter>Engine\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="PointLightManager.h">
+      <Filter>Engine\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="SpotLight.h">
+      <Filter>Engine\Light</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

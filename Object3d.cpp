@@ -1,7 +1,8 @@
 #include "Object3d.h"
 #include "ModelManager.h"
 #include "DXCom.h"
-
+#include "PointLight.h"
+#include "SpotLight.h"
 
 Object3d::~Object3d() {
 	delete model_;
@@ -31,6 +32,8 @@ void Object3d::Draw() {
 	cList->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
 	cList->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
 	cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_->GetGPUVirtualAddress());
+	pointLight_->SetLightCommand(cList);
+	spotLight_->SetLightCommand(cList);
 
 	if (model_) {
 		model_->Draw(cList);
@@ -61,13 +64,13 @@ void Object3d::CreateWVP() {
 	directionalLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData_));
 	directionalLightData_->color = { 1.0f,1.0f,1.0f,1.0f };
 	directionalLightData_->direction = { 1.0f,0.0f,0.0f };
-	directionalLightData_->intensity = 1.0f;
+	directionalLightData_->intensity = 0.0f;
 
 
 	cameraPosResource_ = DXCom::GetInstance()->CreateBufferResource(DXCom::GetInstance()->GetDevice(), sizeof(DirectionalLight));
 	cameraPosData_ = nullptr;
 	cameraPosResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraPosData_));
-	cameraPosData_->worldPosition = { 0.0f,0.0f,-10.0f };
+	cameraPosData_->worldPosition = { 0.0f,4.0f,-20.0f };
 
 
 }

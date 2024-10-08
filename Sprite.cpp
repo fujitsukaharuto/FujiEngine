@@ -1,5 +1,8 @@
 #include "Sprite.h"
 #include "DXCom.h"
+#include "PointLight.h"
+#include "SpotLight.h"
+
 
 void Sprite::Load(const std::string& fileName) {
 
@@ -18,6 +21,8 @@ void Sprite::Draw() {
 	cList->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
 	cList->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
 	cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_->GetGPUVirtualAddress());
+	pointLight_->SetLightCommand(cList);
+	spotLight_->SetLightCommand(cList);
 	cList->SetGraphicsRootDescriptorTable(2, material_.GetTexture()->gpuHandle);
 	cList->DrawIndexedInstanced(6, 1, 0, 0, 0);
 
@@ -93,7 +98,7 @@ void Sprite::InitializeBuffer() {
 	cameraPosResource_ = DXCom::GetInstance()->CreateBufferResource(DXCom::GetInstance()->GetDevice(), sizeof(DirectionalLight));
 	cameraPosData_ = nullptr;
 	cameraPosResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraPosData_));
-	cameraPosData_->worldPosition = { 0.0f,0.0f,-10.0f };
+	cameraPosData_->worldPosition = { 0.0f,4.0f,-20.0f };
 
 }
 

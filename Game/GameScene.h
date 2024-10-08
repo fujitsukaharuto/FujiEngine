@@ -5,6 +5,8 @@
 #include "DebugCamera.h"
 #include "Object3d.h"
 #include "Sprite.h"
+#include "PointLight.h"
+#include "SpotLight.h"
 
 
 class GameScene
@@ -27,9 +29,13 @@ private:
 	Input* input_ = nullptr;
 	Audio* audio_ = nullptr;
 
+	PointLight* pointLight = nullptr;
+	SpotLight* spotLight = nullptr;
+
 	Object3d* sphere = nullptr;
 	Object3d* suzunne = nullptr;
 	Object3d* fence = nullptr;
+	Object3d* terrain = nullptr;
 
 	std::vector<Object3d*> suzunnes;
 

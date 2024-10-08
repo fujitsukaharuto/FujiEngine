@@ -4,6 +4,9 @@
 #include "Model.h"
 
 
+class PointLight;
+class SpotLight;
+
 class Object3d {
 public:
 	Object3d() = default;
@@ -21,6 +24,10 @@ public:
 
 	void SetRightDir(const Vector3& right) { directionalLightData_->direction = right; }
 
+	void SetPointLight(PointLight* light) { pointLight_ = light; }
+
+	void SetSpotLight(SpotLight* light) { spotLight_ = light; }
+
 	Trans transform{};
 
 private:
@@ -33,7 +40,8 @@ private:
 
 private:
 	Model* model_ = nullptr;
-
+	PointLight* pointLight_;
+	SpotLight* spotLight_;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource_ = nullptr;
 	TransformationMatrix* wvpDate_ = nullptr;
