@@ -1,6 +1,7 @@
 #include "Object/EnemyManager.h"
 
 #include "ModelManager.h"
+#include "Collision/CollisionManager.h"
 
 EnemyManager::EnemyManager(){
 	noteEnemies_.clear();
@@ -19,6 +20,7 @@ void EnemyManager::Update(){
         (*it)->Update();
 
         if ((*it)->GetTranslate().x <= -2.0f){
+            CollisionManager::GetInstance()->RemoveCollider((*it).get());
             it = noteEnemies_.erase(it);
         } else{
             ++it;

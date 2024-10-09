@@ -6,7 +6,7 @@
 class Player:public Character{
 public:
 
-	Player() = default;
+	Player();
 	virtual ~Player() override = default;
 
 	/// <summary>
@@ -37,7 +37,7 @@ private:
 	void Jump();
 
 private:
-	float moveSpeed_;
+	float moveSpeed_= 0.1f;
 
 	Vector3 velocity_ {0.0f,0.0f,0.0f};
 

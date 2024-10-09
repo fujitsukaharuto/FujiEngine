@@ -1,12 +1,23 @@
 #include"Object/NoteEnemy.h"
 #include "Object/NoteEnemyState/NoteEnemyState_Enemy.h"
 
+#include "Collision/BoxCollider.h"
+#include "Collision/CollisionManager.h"
+
+NoteEnemy::NoteEnemy() : Character(std::make_unique<BoxCollider>()){
+	
+	collider_->Update({30.0f,0.0f,0.0f}, size_);
+	CollisionManager::GetInstance()->AddCollider(this);
+}
+
 void NoteEnemy::Initialize(Object3d* model){
 	Character::Initialize(model);
 	moveSpeed_ = 1.0f;
 
 	//最初の状態をセット
 	currentState_ = std::make_unique<NoteEnemyState_Enemy>(this);
+
+	
 }
 
 void NoteEnemy::Initialize(std::vector<Object3d*> models, const Vector3& initPos){
@@ -21,10 +32,13 @@ void NoteEnemy::Initialize(std::vector<Object3d*> models, const Vector3& initPos
 
 
 void NoteEnemy::Update(){
+	collider_->Update(GetWorldPosition(), size_);
+
 	//状態の更新
 	if (currentState_){
 		currentState_->Update();
 	}
+
 }
 
 void NoteEnemy::Draw(){

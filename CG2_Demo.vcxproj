@@ -102,6 +102,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="DirectionLight.cpp" />
+    <ClCompile Include="Game\Collision\BoxCollider.cpp" />
+    <ClCompile Include="Game\Collision\Collider.cpp" />
+    <ClCompile Include="Game\Collision\CollisionManager.cpp" />
+    <ClCompile Include="Game\Collision\SphereCollider.cpp" />
     <ClCompile Include="Game\Field\Field.cpp" />
     <ClCompile Include="Game\Object\Boss.cpp" />
     <ClCompile Include="Engine\Audio\Audio.cpp" />
@@ -159,6 +163,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="DirectionLight.h" />
+    <ClInclude Include="Game\Collision\BoxCollider.h" />
+    <ClInclude Include="Game\Collision\Collider.h" />
+    <ClInclude Include="Game\Collision\CollisionManager.h" />
+    <ClInclude Include="Game\Collision\SphereCollider.h" />
     <ClInclude Include="Game\Field\Field.h" />
     <ClInclude Include="Game\Object\Boss.h" />
     <ClInclude Include="Engine\Audio\Audio.h" />

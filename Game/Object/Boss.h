@@ -5,7 +5,7 @@
 class Boss final:
     public Character{
 public:
-    Boss() = default;
+    Boss();
     ~Boss()override;
 
     void Initialize(std::vector<Object3d*>models);

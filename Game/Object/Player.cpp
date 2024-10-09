@@ -1,12 +1,25 @@
 #include"Object/Player.h"
 #include"Input.h"
 
+#include "Collision/CollisionManager.h"
+#include "Collision/SphereCollider.h"
+
+Player::Player() : Character(std::make_unique<SphereCollider>()){
+    SphereCollider* sphereCollider = dynamic_cast< SphereCollider* >(collider_.get());
+    if (sphereCollider){
+        sphereCollider->radius_ = 0.5f;
+    }
+    CollisionManager::GetInstance()->AddCollider(this);
+}
+
 void Player::Initialize(std::vector<Object3d*> Object3ds){
 	Character::Initialize(Object3ds);
 
 }
 
 void Player::Update(){
+    collider_->Update(GetWorldPosition());
+
     this->Jump();
     this->Move();
 

@@ -3,6 +3,7 @@
 #include "ModelManager.h"
 #include "GlobalVariables.h"
 #include "Rendering/PrimitiveDrawer.h"
+#include "Collision/CollisionManager.h"
 
 #include <array>
 
@@ -25,6 +26,8 @@ GameScene::~GameScene(){
 	bossModels_.clear();
 
 	field_.reset();
+
+	CollisionManager::GetInstance()->Reset();
 
 	/*for (auto suzunneModel : suzunnes){
 		delete suzunneModel;
@@ -234,6 +237,8 @@ void GameScene::Update(){
 
 	enemyManager_->Update();
 
+	//衝突判定
+	CollisionManager::GetInstance()->CheckAllCollidion();
 }
 
 void GameScene::Draw(){

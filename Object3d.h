@@ -32,6 +32,8 @@ public:
 
 	void SetSpotLight(SpotLight* light) { spotLight_ = light; }*/
 
+	const Matrix4x4& GetMatWorld()const{ return worldMatrix_; }
+
 	Trans transform{};
 
 private:
@@ -48,6 +50,8 @@ private:
 	PointLight* pointLight_;
 	SpotLight* spotLight_;
 	Camera* camera_;
+
+	Matrix4x4 worldMatrix_;
 
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource_ = nullptr;

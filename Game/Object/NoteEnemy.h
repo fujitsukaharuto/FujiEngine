@@ -8,7 +8,7 @@
 class NoteEnemy
 	:public Character{
 public:
-	NoteEnemy() = default;
+	NoteEnemy();
 	~NoteEnemy()override = default;
 
 	/// <summary>
@@ -47,6 +47,8 @@ private:
 
 	//移動速度
 	float moveSpeed_;
+
+	Vector3 size_ = {1.0f,1.0f,1.0f};
 
 	//現在の状態
 	std::unique_ptr<NoteEnemyState_Base> currentState_ = nullptr;

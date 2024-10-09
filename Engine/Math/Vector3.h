@@ -46,4 +46,8 @@ public:
 		return leng == 0 ? *this : *this / leng;
 	}
 
+	float LengthSquared() const{
+		return x * x + y * y + z * z;
+	}
+
 };

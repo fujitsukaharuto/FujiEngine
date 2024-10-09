@@ -82,18 +82,18 @@ void Object3d::CreateWVP() {
 
 void Object3d::SetWVP() {
 
-	Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
+	worldMatrix_ = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 	Matrix4x4 worldViewProjectionMatrix;
 
 	if (camera_) {
 		const Matrix4x4& viewProjectionMatrix = camera_->GetViewProjectionMatrix();
-		worldViewProjectionMatrix= Multiply(worldMatrix, viewProjectionMatrix);
+		worldViewProjectionMatrix= Multiply(worldMatrix_, viewProjectionMatrix);
 	}
 	else {
-		worldViewProjectionMatrix = worldMatrix;
+		worldViewProjectionMatrix = worldMatrix_;
 	}
 
-	wvpDate_->World = worldMatrix;
+	wvpDate_->World = worldMatrix_;
 	wvpDate_->WVP = worldViewProjectionMatrix;
 	wvpDate_->WorldInverseTransPose = Transpose(Inverse(wvpDate_->World));
 
