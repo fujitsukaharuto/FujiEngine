@@ -2,6 +2,7 @@
 #include "ImGuiManager.h"
 #include "ModelManager.h"
 #include "GlobalVariables.h"
+#include "CameraManager.h"
 #include "Rendering/PrimitiveDrawer.h"
 #include "Collision/CollisionManager.h"
 
@@ -45,7 +46,7 @@ void GameScene::Initialize(){
 	camera.reset(new Camera());
 
 	obj3dCommon.reset(new Object3dCommon());
-	obj3dCommon->Initialize(camera.get());
+	obj3dCommon->Initialize();
 
 	/*GlobalVariables* globalvariables = GlobalVariables::GetInstance();
 	const char* groupName = "Sphere";
@@ -63,6 +64,9 @@ void GameScene::Initialize(){
 	globalvariables->AddItem(groupName2, "parametar", fencePara);
 	globalvariables->AddItem(groupName2, "Position", fencevec);
 
+	obj3dCommon.reset(new Object3dCommon());
+	obj3dCommon->Initialize();
+
 	sphere = new Object3d();
 	sphere->CreateSphere(obj3dCommon.get());
 
@@ -73,7 +77,7 @@ void GameScene::Initialize(){
 	for (int i = 0; i < 3; i++) {
 
 		Object3d* newModel = new Object3d();
-		newModel->Create("suzanne.obj",obj3dCommon.get());
+		newModel->Create("suzanne.obj");
 		newModel->transform.translate.x += addDis;
 		newModel->transform.translate.z += addDis;
 		newModel->transform.rotate.y = 3.14f;
@@ -83,10 +87,10 @@ void GameScene::Initialize(){
 	}
 
 	fence = new Object3d();
-	fence->Create("Fence.obj", obj3dCommon.get());
+	fence->Create("Fence.obj");
 
 	terrain = new Object3d();
-	terrain->Create("terrain.obj", obj3dCommon.get());
+	terrain->Create("terrain.obj");
 
 
 	test = new Sprite();
@@ -99,7 +103,7 @@ void GameScene::Initialize(){
 	
 	for (Object3d*& fieldModel : fieldModels_){
 		fieldModel = new Object3d;
-		fieldModel->Create("ground.obj", obj3dCommon.get());
+		fieldModel->Create("ground.obj");
 	}
 
 
@@ -111,10 +115,11 @@ void GameScene::Initialize(){
 	/*                                        プレイやー                                            */
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	Object3d* playerModel = new Object3d();
-	playerModel->Create("debugCube.obj",obj3dCommon.get());
+	playerModel->Create("debugCube.obj");
 	playerModels_.emplace_back(playerModel);
 	player_ = std::make_unique<Player>();
 	player_->Initialize(playerModels_);
+	player_->SetTranslate({2.0f,0.0f,0.0f});
 
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	/*                                          敵関連                                             */
@@ -123,7 +128,7 @@ void GameScene::Initialize(){
 	//=======================================================================================
 	//↓boss
 	Object3d* bossModel = new Object3d(); 
-	bossModel->Create("debugCube.obj",obj3dCommon.get());
+	bossModel->Create("debugCube.obj");
 	bossModels_.emplace_back(bossModel);
 	boss_ = std::make_unique<Boss>();
 	boss_->Initialize(bossModels_);
@@ -146,22 +151,7 @@ void GameScene::Initialize(){
 
 void GameScene::Update(){
 
-	camera->Update();
-
 #ifdef _DEBUG
-	if (input_->TriggerKey(DIK_F12)){
-		if (isDebugCameraMode_){
-			isDebugCameraMode_ = false;
-
-		} else {
-			isDebugCameraMode_ = true;
-
-		}
-	}
-
-	if (isDebugCameraMode_){
-		DebugCamera::GetInstance()->Update();
-	}
 
 	//ApplyGlobalVariables();
 
@@ -266,12 +256,16 @@ void GameScene::Draw(){
 	enemyManager_->Draw();
 
 
-	//描画コマンドを積んでます
+
+	PrimitiveDrawer::GetInstance()->DrawLine3d({0.0f,12.0f,0.0f} ,{ 0.0f, 0.0f, 0.0f }, {0.0f,0.0f,0.0f,1.0f});
 	
 	//for (auto suzunneModel : suzunnes) {
 	//	suzunneModel->Draw();
 	//}
 	//terrain->Draw();
+
+	//描画コマンドを積んでます
+	PrimitiveDrawer::GetInstance()->Render();
 
 #pragma endregion
 

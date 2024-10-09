@@ -26,7 +26,7 @@ void EnemyManager::Update(){
         }
 
         //音符に変わっていない状態で削除ラインまで行くと消える
-        else if (!(*it)->GetIsChangedNote() && (*it)->GetTranslate().x <= -2.0f){
+        else if (!(*it)->GetIsChangedNote() && (*it)->GetTranslate().x <= 0.0f){
             CollisionManager::GetInstance()->RemoveCollider((*it).get());
             it = noteEnemies_.erase(it);  // 安全に削除
         } else{
@@ -105,7 +105,7 @@ void EnemyManager::UpdatePopData(){
                 std::unique_ptr<NoteEnemy> noteEnemy = std::make_unique<NoteEnemy>();
                 Object3d* noteEnemyModel = new Object3d;
 
-                noteEnemyModel->Create("debugCube.obj",pObject3dCommon_);
+                noteEnemyModel->Create("debugCube.obj");
 
                 noteEnemy->SetFieldIndex(popIndex - 1);
                 noteEnemy->Initialize(noteEnemyModel);

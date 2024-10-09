@@ -2,6 +2,7 @@
 
 #include "MatrixCalculation.h"
 #include "PrimitivePipeline.h"
+#include "Camera.h"
 
 #include <array>
 #include <cstdint>
@@ -75,6 +76,7 @@ private:
     ComPtr<ID3D12Resource> CreateResource(ComPtr<ID3D12Device> device, size_t sizeInBytes);
 
 private:
+    Camera* camera_;
 
     // メッシュ
     std::unique_ptr<Mesh> line_;

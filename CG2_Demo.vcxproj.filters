@@ -154,6 +154,9 @@
     <ClCompile Include="Camera.cpp">
       <Filter>Engine\DebugCamera</Filter>
     </ClCompile>
+    <ClCompile Include="CameraManager.cpp">
+      <Filter>Engine\DebugCamera</Filter>
+    </ClCompile>
     <ClCompile Include="Game\Collision\Collider.cpp" />
     <ClCompile Include="Game\Collision\CollisionManager.cpp" />
     <ClCompile Include="Game\Collision\BoxCollider.cpp" />
@@ -314,6 +317,9 @@
       <Filter>Engine\Light</Filter>
     </ClInclude>
     <ClInclude Include="Camera.h">
+      <Filter>Engine\DebugCamera</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraManager.h">
       <Filter>Engine\DebugCamera</Filter>
     </ClInclude>
     <ClInclude Include="Game\Object\Boss.h">

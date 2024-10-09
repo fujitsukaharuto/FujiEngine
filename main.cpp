@@ -7,6 +7,7 @@
 #include "GlobalVariables.h"
 #include "ModelManager.h"
 #include "PointLightManager.h"
+#include "CameraManager.h"
 #include "Rendering/PrimitiveDrawer.h"
 
 
@@ -43,6 +44,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	DebugCamera* camera = nullptr;
 	camera = DebugCamera::GetInstance();
 	camera->Initialize();
+
+	CameraManager* cameraManager = nullptr;
+	cameraManager = CameraManager::GetInstance();
+	cameraManager->Initialize();
 
 
 #pragma region 汎用機能初期化
@@ -92,14 +97,24 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		// 入力関連の毎フレーム処理
 		input->Update();
 
+		cameraManager->Update();
+#ifdef _DEBUG
+		if (input->TriggerKey(DIK_F12)) {
+			if (cameraManager->GetDebugMode()) {
+				cameraManager->SetDebugMode(false);
+
+			}
+			else {
+				cameraManager->SetDebugMode(true);
+
+			}
+		}
+#endif // _DEBUG
+
 		GlobalVariables::GetInstance()->Update();
 
 		// ゲームシーンの毎フレーム処理
 		gameScene->Update();
-
-#ifdef _DEBUG
-
-#endif // _DEBUG
 
 		// ImGui受付
 		imguiManager->End();

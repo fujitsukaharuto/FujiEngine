@@ -6,7 +6,6 @@
 #include "Object3dCommon.h"
 #include "Object3d.h"
 #include "Sprite.h"
-#include "Camera.h"
 
 //local
 #include "Object/Player.h"

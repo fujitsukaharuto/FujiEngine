@@ -1,12 +1,14 @@
 #include"Rendering/PrimitiveDrawer.h"
 #include"DXCom.h"
-
+#include "CameraManager.h"
 PrimitiveDrawer::PrimitiveDrawer(){
     pipeline_ = std::make_unique<PrimitivePipeline>();
     pipeline_->Initialize();
 
     device_ = DXCom::GetInstance()->GetDevice();
     commandList_ = DXCom::GetInstance()->GetCommandList();
+
+    camera_ = CameraManager::GetInstance()->GetCamera();
 
     Initialize();
 }
@@ -151,14 +153,14 @@ void PrimitiveDrawer::CreateMatrixBuffer(){
 }
 
 void PrimitiveDrawer::UpdateMatrixBuffer(){
-    //// ワールド行列（必要に応じて設定）
-    //Matrix4x4 worldMatrix = MakeIdentity4x4();
-    //Matrix4x4 viewMatrix = DXCom::GetInstance()->GetView();
+    // ワールド行列（必要に応じて設定）
+    Matrix4x4 worldMatrix = MakeIdentity4x4();
+    const Matrix4x4& viewProjectionMatrix = camera_->GetViewProjectionMatrix();
+    Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, viewProjectionMatrix);
 
-    //Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, DXCom::GetInstance()->GetAspect(), 0.1f, 100.0f);
-    //Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
 
     //// 定数バッファの更新
-    //matrixData_->World = worldMatrix;
-    //matrixData_->WVP = worldViewProjectionMatrix;
+    matrixData_->World = worldMatrix;
+    matrixData_->WVP = worldViewProjectionMatrix;
+
 }
