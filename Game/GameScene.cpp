@@ -2,6 +2,7 @@
 #include "ImGuiManager.h"
 #include "ModelManager.h"
 #include "GlobalVariables.h"
+#include "CameraManager.h"
 
 GameScene::GameScene() {}
 
@@ -33,10 +34,8 @@ void GameScene::Initialize() {
 	globalvariables->AddItem(groupName2, "parametar", fencePara);
 	globalvariables->AddItem(groupName2, "Position", fencevec);
 
-	camera.reset(new Camera());
-
 	obj3dCommon.reset(new Object3dCommon());
-	obj3dCommon->Initialize(camera.get());
+	obj3dCommon->Initialize();
 
 	sphere = new Object3d();
 	sphere->CreateSphere(obj3dCommon.get());
@@ -76,23 +75,7 @@ void GameScene::Initialize() {
 
 void GameScene::Update() {
 
-	camera->Update();
-
 #ifdef _DEBUG
-	if (input_->TriggerKey(DIK_F12)) {
-		if (isDebugCameraMode_) {
-			isDebugCameraMode_ = false;
-
-		} else {
-			isDebugCameraMode_ = true;
-
-		}
-	}
-
-	if (isDebugCameraMode_)
-	{
-		DebugCamera::GetInstance()->Update();
-	}
 
 	ApplyGlobalVariables();
 

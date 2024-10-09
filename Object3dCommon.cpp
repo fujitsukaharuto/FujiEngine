@@ -1,9 +1,8 @@
 #include "Object3dCommon.h"
 
-void Object3dCommon::Initialize(Camera* camera) {
+void Object3dCommon::Initialize() {
 
 	dxCommon_ = DXCom::GetInstance();
-	this->defaultCamera_ = camera;
 
 }
 

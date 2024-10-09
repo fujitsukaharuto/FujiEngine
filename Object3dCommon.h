@@ -1,6 +1,5 @@
 #pragma once
 #include "DXCom.h"
-#include "Camera.h"
 
 class Object3dCommon {
 public:
@@ -9,11 +8,10 @@ public:
 
 public:
 
-	void Initialize(Camera* camera);
+	void Initialize();
 
 	void PreDraw();
 
-	Camera* GetDefaultCamera() const { return defaultCamera_; }
 
 private:
 
@@ -22,7 +20,5 @@ private:
 private:
 
 	DXCom* dxCommon_ = nullptr;
-	Camera* defaultCamera_ = nullptr;
-
 
 };

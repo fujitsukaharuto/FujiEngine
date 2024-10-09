@@ -134,6 +134,9 @@
     <ClCompile Include="Camera.cpp">
       <Filter>Engine\DebugCamera</Filter>
     </ClCompile>
+    <ClCompile Include="CameraManager.cpp">
+      <Filter>Engine\DebugCamera</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -278,6 +281,9 @@
       <Filter>Engine\Light</Filter>
     </ClInclude>
     <ClInclude Include="Camera.h">
+      <Filter>Engine\DebugCamera</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraManager.h">
       <Filter>Engine\DebugCamera</Filter>
     </ClInclude>
   </ItemGroup>
