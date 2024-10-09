@@ -100,6 +100,7 @@ void GameScene::Update() {
 
 	ImGui::ColorEdit4("color", &color_.X);
 	suzunne->SetColor(color_);
+	ImGui::DragFloat3("scale", &suzunne->transform.scale.x, 0.01f);
 	ImGui::End();
 
 	ImGui::Begin("Sphere");

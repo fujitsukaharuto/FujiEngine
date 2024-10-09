@@ -140,6 +140,9 @@
     <ClCompile Include="RailEditor.cpp">
       <Filter>Game</Filter>
     </ClCompile>
+    <ClCompile Include="Line3dDrawer.cpp">
+      <Filter>Engine\Line</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -292,6 +295,9 @@
     <ClInclude Include="RailEditor.h">
       <Filter>Game</Filter>
     </ClInclude>
+    <ClInclude Include="Line3dDrawer.h">
+      <Filter>Engine\Line</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -351,6 +357,9 @@
     <Filter Include="Engine\Light">
       <UniqueIdentifier>{bbaf8ed5-8934-40c2-981e-ec659d17c094}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\Line">
+      <UniqueIdentifier>{a1d52421-6086-48de-85d0-dc6cec0ed281}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt">
@@ -394,21 +403,12 @@
     <FxCompile Include="resource\Shaders\SimpleGrayscale.VS.hlsl">
       <Filter>resource\Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="LineDraw3d.VS.hlsl">
-      <Filter>resource\Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="LineDraw3d.PS.hlsl">
-      <Filter>resource\Shaders</Filter>
-    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="resource\Shaders\Object3d.hlsli">
       <Filter>resource\Shaders</Filter>
     </None>
     <None Include="resource\Shaders\Particle.hlsli">
-      <Filter>resource\Shaders</Filter>
-    </None>
-    <None Include="LineDraw3d.hlsli">
       <Filter>resource\Shaders</Filter>
     </None>
   </ItemGroup>
