@@ -134,6 +134,12 @@
     <ClCompile Include="Camera.cpp">
       <Filter>Engine\DebugCamera</Filter>
     </ClCompile>
+    <ClCompile Include="RailCamera.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="RailEditor.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -280,6 +286,12 @@
     <ClInclude Include="Camera.h">
       <Filter>Engine\DebugCamera</Filter>
     </ClInclude>
+    <ClInclude Include="RailCamera.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="RailEditor.h">
+      <Filter>Game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -382,12 +394,21 @@
     <FxCompile Include="resource\Shaders\SimpleGrayscale.VS.hlsl">
       <Filter>resource\Shaders</Filter>
     </FxCompile>
+    <FxCompile Include="LineDraw3d.VS.hlsl">
+      <Filter>resource\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="LineDraw3d.PS.hlsl">
+      <Filter>resource\Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="resource\Shaders\Object3d.hlsli">
       <Filter>resource\Shaders</Filter>
     </None>
     <None Include="resource\Shaders\Particle.hlsli">
+      <Filter>resource\Shaders</Filter>
+    </None>
+    <None Include="LineDraw3d.hlsli">
       <Filter>resource\Shaders</Filter>
     </None>
   </ItemGroup>
