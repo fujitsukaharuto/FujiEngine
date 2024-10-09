@@ -16,9 +16,9 @@ public:
 
 public:
 
-	void Create(const std::string& fileName, Object3dCommon* common);
+	void Create(const std::string& fileName);
 
-	void CreateSphere(Object3dCommon* common);
+	void CreateSphere();
 
 	void Draw();
 

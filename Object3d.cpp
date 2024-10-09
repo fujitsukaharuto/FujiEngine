@@ -10,9 +10,8 @@ Object3d::~Object3d() {
 	delete model_;
 }
 
-void Object3d::Create(const std::string& fileName, Object3dCommon* common) {
+void Object3d::Create(const std::string& fileName) {
 
-	this->common_ = common;
 	this->camera_ = CameraManager::GetInstance()->GetCamera();
 	ModelManager::GetInstance()->LoadOBJ(fileName);
 	SetModel(fileName);
@@ -21,8 +20,8 @@ void Object3d::Create(const std::string& fileName, Object3dCommon* common) {
 
 }
 
-void Object3d::CreateSphere(Object3dCommon* common) {
-	this->common_ = common;
+void Object3d::CreateSphere() {
+
 	this->camera_ = CameraManager::GetInstance()->GetCamera();
 	ModelManager::GetInstance()->CreateSphere();
 	SetModel("Sphere");
