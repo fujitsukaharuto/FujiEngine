@@ -17,7 +17,6 @@ public:
 	void SetNearClip(float clip) { nearClip_ = clip; }
 	void SetFarClip(float clip) { farClip_ = clip; }
 
-
 	const Matrix4x4& GetWorldMatrix() const { return worldMatrix_; }
 	const Matrix4x4& GetViewMatrix() const { return viewMatrix_; }
 	const Matrix4x4& GetProjectionMatrix() const { return projectionMatrix_; }

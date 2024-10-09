@@ -143,6 +143,9 @@
     <ClCompile Include="Line3dDrawer.cpp">
       <Filter>Engine\Line</Filter>
     </ClCompile>
+    <ClCompile Include="CameraManager.cpp">
+      <Filter>Engine\DebugCamera</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -297,6 +300,9 @@
     </ClInclude>
     <ClInclude Include="Line3dDrawer.h">
       <Filter>Engine\Line</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraManager.h">
+      <Filter>Engine\DebugCamera</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

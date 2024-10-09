@@ -4,16 +4,15 @@
 #include "PointLight.h"
 #include "SpotLight.h"
 #include "PointLightManager.h"
-
+#include "CameraManager.h"
 
 Object3d::~Object3d() {
 	delete model_;
 }
 
-void Object3d::Create(const std::string& fileName, Object3dCommon* common) {
+void Object3d::Create(const std::string& fileName) {
 
-	this->common_ = common;
-	this->camera_ = common->GetDefaultCamera();
+	this->camera_ = CameraManager::GetInstance()->GetCamera();
 	ModelManager::GetInstance()->LoadOBJ(fileName);
 	SetModel(fileName);
 	transform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
@@ -21,9 +20,9 @@ void Object3d::Create(const std::string& fileName, Object3dCommon* common) {
 
 }
 
-void Object3d::CreateSphere(Object3dCommon* common) {
-	this->common_ = common;
-	this->camera_ = common->GetDefaultCamera();
+void Object3d::CreateSphere() {
+
+	this->camera_ = CameraManager::GetInstance()->GetCamera();
 	ModelManager::GetInstance()->CreateSphere();
 	SetModel("Sphere");
 	transform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };

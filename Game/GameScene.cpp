@@ -2,6 +2,7 @@
 #include "ImGuiManager.h"
 #include "ModelManager.h"
 #include "GlobalVariables.h"
+#include "CameraManager.h"
 
 GameScene::GameScene() {}
 
@@ -33,22 +34,20 @@ void GameScene::Initialize() {
 	globalvariables->AddItem(groupName2, "parametar", fencePara);
 	globalvariables->AddItem(groupName2, "Position", fencevec);
 
-	camera.reset(new Camera());
-
 	obj3dCommon.reset(new Object3dCommon());
-	obj3dCommon->Initialize(camera.get());
+	obj3dCommon->Initialize();
 
 	sphere = new Object3d();
-	sphere->CreateSphere(obj3dCommon.get());
+	sphere->CreateSphere();
 
 	suzunne = new Object3d();
-	suzunne->Create("suzanne.obj", obj3dCommon.get());
+	suzunne->Create("suzanne.obj");
 
 	float addDis = 1.0f;
 	for (int i = 0; i < 3; i++) {
 
 		Object3d* newModel = new Object3d();
-		newModel->Create("suzanne.obj",obj3dCommon.get());
+		newModel->Create("suzanne.obj");
 		newModel->transform.translate.x += addDis;
 		newModel->transform.translate.z += addDis;
 		newModel->transform.rotate.y = 3.14f;
@@ -58,10 +57,10 @@ void GameScene::Initialize() {
 	}
 
 	fence = new Object3d();
-	fence->Create("Fence.obj", obj3dCommon.get());
+	fence->Create("Fence.obj");
 
 	terrain = new Object3d();
-	terrain->Create("terrain.obj", obj3dCommon.get());
+	terrain->Create("terrain.obj");
 
 
 	test = new Sprite();
@@ -76,23 +75,7 @@ void GameScene::Initialize() {
 
 void GameScene::Update() {
 
-	camera->Update();
-
 #ifdef _DEBUG
-	if (input_->TriggerKey(DIK_F12)) {
-		if (isDebugCameraMode_) {
-			isDebugCameraMode_ = false;
-
-		} else {
-			isDebugCameraMode_ = true;
-
-		}
-	}
-
-	if (isDebugCameraMode_)
-	{
-		DebugCamera::GetInstance()->Update();
-	}
 
 	ApplyGlobalVariables();
 

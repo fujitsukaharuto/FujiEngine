@@ -1,5 +1,6 @@
 #include "Camera.h"
 #include "DXCom.h"
+#include "CameraManager.h"
 #include "ImGuiManager.h"
 
 Camera::Camera() :transform({ { 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, { 0.0f,3.5f,-20.0f } })
@@ -13,7 +14,7 @@ Camera::Camera() :transform({ { 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, { 0.0f,3.5
 void Camera::Update() {
 
 #ifdef _DEBUG
-	
+
 	ImGui::Begin("Camera");
 
 	ImGui::DragFloat3("pos", &transform.translate.x, 0.01f);
@@ -23,9 +24,18 @@ void Camera::Update() {
 
 #endif // _DEBUG
 
-
 	worldMatrix_ = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 	viewMatrix_ = Inverse(worldMatrix_);
+
+#ifdef _DEBUG
+
+	if (CameraManager::GetInstance()->GetDebugMode()) {
+
+		viewMatrix_ = DebugCamera::GetInstance()->GetViewMatrix();
+
+	}
+
+#endif // _DEBUG
 
 	projectionMatrix_ = MakePerspectiveFovMatrix(fovY_, aspect_, nearClip_, farClip_);
 	viewProjectionMatrix_ = Multiply(viewMatrix_, projectionMatrix_);
