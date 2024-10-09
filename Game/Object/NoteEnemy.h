@@ -29,6 +29,12 @@ public:
 	void Draw()override;
 
 	/// <summary>
+	/// 衝突時の応答
+	/// </summary>
+	/// <param name="other"></param>
+	void OnCollision([[maybe_unused]] Character* other)override;
+
+	/// <summary>
 	/// 状態を遷移
 	/// </summary>
 	/// <param name="newState"></param>
@@ -39,17 +45,36 @@ public:
 	/// </summary>
 	void Move();
 	
+	/// <summary>
+	/// 音符に変わったか
+	/// </summary>
+	/// <returns></returns>
+	bool GetIsChangedNote()const{ return isChangedNote_; }
 
+	void MarkForRemoval(){isRemoved_ = true;}
+
+	bool GetIsRemoved(){ return isRemoved_; }
+
+	void SetFieldIndex(const uint32_t index){ fieldIndex_ = index; }
 
 private:
+	//音符用モデル
+	Object3d* noteModel_ = nullptr;
+
 	//音符に変わったかどうか
 	bool isChangedNote_;
 
 	//移動速度
-	float moveSpeed_;
+	float moveSpeed_ = 1.0f;
 
+	uint32_t fieldIndex_;
+
+	//判定用aabbのサイズ
 	Vector3 size_ = {1.0f,1.0f,1.0f};
 
 	//現在の状態
 	std::unique_ptr<NoteEnemyState_Base> currentState_ = nullptr;
+
+	//リストから削除フラグ
+	bool isRemoved_ = false;
 };

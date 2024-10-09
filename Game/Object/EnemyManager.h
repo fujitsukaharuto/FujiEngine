@@ -7,6 +7,7 @@
 
 #include <fstream>
 #include<sstream>
+#include <list>
 
 class EnemyManager{
 public:
@@ -18,6 +19,8 @@ public:
 	void Update();
 
 	void Draw();
+
+	void RemoveEnemey(Character* enemy);
 
 	void SetField(const Field* field){ pField_ = field; }
 
@@ -44,7 +47,7 @@ private:
 	const Field* pField_ = nullptr;
 	Object3dCommon* pObject3dCommon_ = nullptr;
 
-	std::vector<std::unique_ptr<NoteEnemy>>noteEnemies_ {};
+	std::list<std::unique_ptr<NoteEnemy>>noteEnemies_ {};
 
 	//===============
 	//敵発生コマンド

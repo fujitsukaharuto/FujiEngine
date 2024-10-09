@@ -8,6 +8,7 @@ Boss::Boss() : Character(std::make_unique<SphereCollider>()){
         sphereCollider->radius_ = 1.0f;
     }
 
+    sphereCollider->SetTypeID(static_cast< uint32_t >(CollisionTypeIdDef::kBoss));
     CollisionManager::GetInstance()->AddCollider(this);
 }
 
@@ -18,6 +19,7 @@ void Boss::Initialize(std::vector<Object3d*> models){
 }
 
 void Boss::Update(){
+    //コライダー用のポジションを更新
     collider_->Update(GetWorldPosition());
 
 	Character::Update();

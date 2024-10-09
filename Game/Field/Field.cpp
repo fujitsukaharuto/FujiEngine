@@ -1,5 +1,9 @@
 #include "Field/Field.h"
 
+
+std::array<float, 5> Field::influenceOnSpeed_ {};
+std::array<Object3d*, 5> Field::staffNotation_ {};
+
 Field::~Field(){
 	for (auto model : staffNotation_){
 		delete model;
@@ -17,7 +21,7 @@ void Field::Initialize(const std::array<Object3d*, 5>& models){
 
 		staffNotation_[i]->transform.translate = initializePosition;
 
-		influenceOnSpeed_[i] = 1.0f + (0.1f * i);
+		influenceOnSpeed_[i] = 1.0f + (0.3f * i);
 	}
 }
 

@@ -328,6 +328,7 @@
     <ClInclude Include="Game\Collision\CollisionManager.h" />
     <ClInclude Include="Game\Collision\BoxCollider.h" />
     <ClInclude Include="Game\Collision\SphereCollider.h" />
+    <ClInclude Include="Game\Collision\CollisionType.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">

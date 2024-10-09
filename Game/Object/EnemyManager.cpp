@@ -15,15 +15,22 @@ void EnemyManager::Initialize(){
 }
 
 void EnemyManager::Update(){
-    //敵の更新　一定位置まで行くと解放
-    for (auto it = noteEnemies_.begin(); it != noteEnemies_.end(); ){
+    // 敵の更新、一定位置まで行くと解放
+    for (auto it = noteEnemies_.begin(); it != noteEnemies_.end();){
         (*it)->Update();
 
-        if ((*it)->GetTranslate().x <= -2.0f){
+        //削除フラグがtrueなら消す
+        if ((*it)->GetIsRemoved()){
             CollisionManager::GetInstance()->RemoveCollider((*it).get());
-            it = noteEnemies_.erase(it);
+            it = noteEnemies_.erase(it);  // 安全に削除
+        }
+
+        //音符に変わっていない状態で削除ラインまで行くと消える
+        else if (!(*it)->GetIsChangedNote() && (*it)->GetTranslate().x <= -2.0f){
+            CollisionManager::GetInstance()->RemoveCollider((*it).get());
+            it = noteEnemies_.erase(it);  // 安全に削除
         } else{
-            ++it;
+            ++it;  // 削除されなかった場合イテレータを進める
         }
     }
 
@@ -34,6 +41,13 @@ void EnemyManager::Draw(){
     for (auto& enemy : noteEnemies_){
         enemy->Draw();
     }
+}
+
+void EnemyManager::RemoveEnemey(Character* enemy){
+    //リストから削除
+    noteEnemies_.remove_if([enemy] (const std::unique_ptr<NoteEnemy>& noteEnemyPtr){
+        return noteEnemyPtr.get() == enemy;
+                           });
 }
 
 void EnemyManager::LoadPopFile(){
@@ -93,8 +107,9 @@ void EnemyManager::UpdatePopData(){
 
                 noteEnemyModel->Create("debugCube.obj",pObject3dCommon_);
 
+                noteEnemy->SetFieldIndex(popIndex - 1);
                 noteEnemy->Initialize(noteEnemyModel);
-                noteEnemy->SetTranslate(Vector3 {20.0f, spawnPosY, 0.0f});
+                noteEnemy->SetTranslate(Vector3 {30.0f, spawnPosY, 0.0f});
 
                 noteEnemies_.emplace_back(std::move(noteEnemy));
 

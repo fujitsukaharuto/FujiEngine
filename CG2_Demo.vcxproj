@@ -166,6 +166,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Game\Collision\BoxCollider.h" />
     <ClInclude Include="Game\Collision\Collider.h" />
     <ClInclude Include="Game\Collision\CollisionManager.h" />
+    <ClInclude Include="Game\Collision\CollisionType.h" />
     <ClInclude Include="Game\Collision\SphereCollider.h" />
     <ClInclude Include="Game\Field\Field.h" />
     <ClInclude Include="Game\Object\Boss.h" />

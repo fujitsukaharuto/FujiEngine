@@ -127,7 +127,7 @@ void GameScene::Initialize(){
 	bossModels_.emplace_back(bossModel);
 	boss_ = std::make_unique<Boss>();
 	boss_->Initialize(bossModels_);
-	boss_->SetTranslate(Vector3 {-4.0f,-1.0f,0.0f});
+	boss_->SetTranslate(Vector3 {-6.0f,5.0f,0.0f});//五線譜の真ん中に合わせる
 	
 	enemyManager_ = std::make_unique<EnemyManager>();
 	enemyManager_->Initialize();

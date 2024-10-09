@@ -27,12 +27,12 @@ public:
 
 	Vector3 GetPos(uint32_t index)const { return staffNotation_[index]->transform.translate; }
 
-private:
+public:
 
 	//五線譜のモデル(仮)
-	std::array<Object3d*, 5>staffNotation_ {};
+	static std::array<Object3d*, 5>staffNotation_;
 	//移動してくるオブジェクトのスピードに対する影響力
-	std::array<float, 5>influenceOnSpeed_ {};
+	static std::array<float, 5>influenceOnSpeed_ ;
 
 	//線の幅(仮)
 	const float kLineSpace_ = 3.0f;
