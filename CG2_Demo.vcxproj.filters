@@ -104,6 +104,18 @@
     <ClCompile Include="PipelineManager.cpp">
       <Filter>Engine\GraphicPipeline</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\GraphicPipeline\PrimitivePipeline.cpp">
+      <Filter>Engine\GraphicPipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Rendering\PrimitiveDrawer.cpp">
+      <Filter>Engine\Drawer</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Object\Character.cpp">
+      <Filter>Game\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Object\Player.cpp">
+      <Filter>Game\Object</Filter>
+    </ClCompile>
     <ClCompile Include="GlobalVariables.cpp">
       <Filter>Engine\GlobalVariables</Filter>
     </ClCompile>
@@ -113,6 +125,14 @@
     <ClCompile Include="DirectionLight.cpp">
       <Filter>Engine\Light</Filter>
     </ClCompile>
+    <ClCompile Include="Game\Object\Boss.cpp">
+      <Filter>Game\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Field\Field.cpp" />
+    <ClCompile Include="Game\Object\NoteEnemy.cpp" />
+    <ClCompile Include="Game\Object\NoteEnemyState\NoteEnemyState_Base.cpp" />
+    <ClCompile Include="Game\Object\NoteEnemyState\NoteEnemyState_Enemy.cpp" />
+    <ClCompile Include="Game\Object\EnemyManager.cpp" />
     <ClCompile Include="Object3dCommon.cpp">
       <Filter>Engine\Model</Filter>
     </ClCompile>
@@ -134,6 +154,13 @@
     <ClCompile Include="Camera.cpp">
       <Filter>Engine\DebugCamera</Filter>
     </ClCompile>
+    <ClCompile Include="CameraManager.cpp">
+      <Filter>Engine\DebugCamera</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Collision\Collider.cpp" />
+    <ClCompile Include="Game\Collision\CollisionManager.cpp" />
+    <ClCompile Include="Game\Collision\BoxCollider.cpp" />
+    <ClCompile Include="Game\Collision\SphereCollider.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -250,6 +277,18 @@
     <ClInclude Include="PipelineManager.h">
       <Filter>Engine\GraphicPipeline</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\GraphicPipeline\PrimitivePipeline.h">
+      <Filter>Engine\GraphicPipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Rendering\PrimitiveDrawer.h">
+      <Filter>Engine\Drawer</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Object\Character.h">
+      <Filter>Game\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Object\Player.h">
+      <Filter>Game\Object</Filter>
+    </ClInclude>
     <ClInclude Include="GlobalVariables.h">
       <Filter>Engine\GlobalVariables</Filter>
     </ClInclude>
@@ -280,6 +319,22 @@
     <ClInclude Include="Camera.h">
       <Filter>Engine\DebugCamera</Filter>
     </ClInclude>
+    <ClInclude Include="CameraManager.h">
+      <Filter>Engine\DebugCamera</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Object\Boss.h">
+      <Filter>Game\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Field\Field.h" />
+    <ClInclude Include="Game\Object\NoteEnemy.h" />
+    <ClInclude Include="Game\Object\NoteEnemyState\NoteEnemyState_Base.h" />
+    <ClInclude Include="Game\Object\NoteEnemyState\NoteEnemyState_Enemy.h" />
+    <ClInclude Include="Game\Object\EnemyManager.h" />
+    <ClInclude Include="Game\Collision\Collider.h" />
+    <ClInclude Include="Game\Collision\CollisionManager.h" />
+    <ClInclude Include="Game\Collision\BoxCollider.h" />
+    <ClInclude Include="Game\Collision\SphereCollider.h" />
+    <ClInclude Include="Game\Collision\CollisionType.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -333,6 +388,12 @@
     <Filter Include="resource\Shaders">
       <UniqueIdentifier>{721d04ed-0430-462c-a558-1b345031cb69}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\Drawer">
+      <UniqueIdentifier>{a4a09fc7-a74d-4acd-a2b5-a9b46ce6febd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Object">
+      <UniqueIdentifier>{54e85b16-3ae0-4f9c-8e77-1e91cc6bdcec}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Engine\GlobalVariables">
       <UniqueIdentifier>{dee81627-0be4-4b1e-bd00-7dfcde087c80}</UniqueIdentifier>
     </Filter>
@@ -382,12 +443,21 @@
     <FxCompile Include="resource\Shaders\SimpleGrayscale.VS.hlsl">
       <Filter>resource\Shaders</Filter>
     </FxCompile>
+    <FxCompile Include="resource\Shaders\Primitive.PS.hlsl">
+      <Filter>resource\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\Primitive.VS.hlsl">
+      <Filter>resource\Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="resource\Shaders\Object3d.hlsli">
       <Filter>resource\Shaders</Filter>
     </None>
     <None Include="resource\Shaders\Particle.hlsli">
+      <Filter>resource\Shaders</Filter>
+    </None>
+    <None Include="resource\Shaders\Primitive.hlsli">
       <Filter>resource\Shaders</Filter>
     </None>
   </ItemGroup>

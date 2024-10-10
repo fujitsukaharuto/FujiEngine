@@ -4,16 +4,15 @@
 #include "PointLight.h"
 #include "SpotLight.h"
 #include "PointLightManager.h"
-
+#include "CameraManager.h"
 
 Object3d::~Object3d() {
 	delete model_;
 }
 
-void Object3d::Create(const std::string& fileName, Object3dCommon* common) {
+void Object3d::Create(const std::string& fileName) {
 
-	this->common_ = common;
-	this->camera_ = common->GetDefaultCamera();
+	this->camera_ = CameraManager::GetInstance()->GetCamera();
 	ModelManager::GetInstance()->LoadOBJ(fileName);
 	SetModel(fileName);
 	transform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
@@ -21,9 +20,9 @@ void Object3d::Create(const std::string& fileName, Object3dCommon* common) {
 
 }
 
-void Object3d::CreateSphere(Object3dCommon* common) {
-	this->common_ = common;
-	this->camera_ = common->GetDefaultCamera();
+void Object3d::CreateSphere() {
+
+	this->camera_ = CameraManager::GetInstance()->GetCamera();
 	ModelManager::GetInstance()->CreateSphere();
 	SetModel("Sphere");
 	transform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
@@ -82,18 +81,18 @@ void Object3d::CreateWVP() {
 
 void Object3d::SetWVP() {
 
-	Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
+	worldMatrix_ = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 	Matrix4x4 worldViewProjectionMatrix;
 
 	if (camera_) {
 		const Matrix4x4& viewProjectionMatrix = camera_->GetViewProjectionMatrix();
-		worldViewProjectionMatrix= Multiply(worldMatrix, viewProjectionMatrix);
+		worldViewProjectionMatrix= Multiply(worldMatrix_, viewProjectionMatrix);
 	}
 	else {
-		worldViewProjectionMatrix = worldMatrix;
+		worldViewProjectionMatrix = worldMatrix_;
 	}
 
-	wvpDate_->World = worldMatrix;
+	wvpDate_->World = worldMatrix_;
 	wvpDate_->WVP = worldViewProjectionMatrix;
 	wvpDate_->WorldInverseTransPose = Transpose(Inverse(wvpDate_->World));
 

@@ -1,0 +1,11 @@
+//コマンド,x,y,z
+WAIT,120,,
+POP,1
+WAIT,120,,
+POP,2
+WAIT,120,,
+POP,3
+WAIT,120,,
+POP,4
+WAIT,120,,
+POP,5

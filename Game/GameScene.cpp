@@ -2,28 +2,64 @@
 #include "ImGuiManager.h"
 #include "ModelManager.h"
 #include "GlobalVariables.h"
+#include "CameraManager.h"
+#include "Rendering/PrimitiveDrawer.h"
+#include "Collision/CollisionManager.h"
 
-GameScene::GameScene() {}
+#include <array>
 
-GameScene::~GameScene() {
+GameScene::GameScene(){
+	playerModels_.clear();
+	bossModels_.clear();
+}
+
+GameScene::~GameScene(){
+	/*===============================================
+	ゲーム画面を作成するので一時的にコメントアウト
 	delete sphere;
 	delete suzunne;
 	delete fence;
-	for (auto suzunneModel : suzunnes) {
+	===================================================*/
+	player_.reset();
+	playerModels_.clear();
+
+	boss_.reset();
+	bossModels_.clear();
+
+	field_.reset();
+
+	CollisionManager::GetInstance()->Reset();
+
+	/*for (auto suzunneModel : suzunnes){
 		delete suzunneModel;
 	}
 	delete terrain;
-	delete test;
+	delete test;*/
 }
 
-void GameScene::Initialize() {
+
+void GameScene::Initialize(){
 	dxCommon_ = DXCom::GetInstance();
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
 
-	GlobalVariables* globalvariables = GlobalVariables::GetInstance();
+
+	Vector3 cameraInitializePos = {-11.5f,5.6f,-63.5f};
+	Vector3 cameraInitializeRotate = {0.0f, 0.37f, 0.0f};
+	CameraManager::GetInstance()->GetCamera()->transform.translate = cameraInitializePos;
+	CameraManager::GetInstance()->GetCamera()->transform.rotate = cameraInitializeRotate;
+
+
+	obj3dCommon.reset(new Object3dCommon());
+	obj3dCommon->Initialize();
+
+	/*GlobalVariables* globalvariables = GlobalVariables::GetInstance();
 	const char* groupName = "Sphere";
-	const char* groupName2 = "Fence";
+	const char* groupName2 = "Fence";*/
+
+
+	/*===============================================
+	ゲーム画面を作成するので一時的にコメントアウト
 
 	globalvariables->CreateGroup(groupName);
 	globalvariables->AddItem(groupName, "parametar", spherePara);
@@ -33,10 +69,8 @@ void GameScene::Initialize() {
 	globalvariables->AddItem(groupName2, "parametar", fencePara);
 	globalvariables->AddItem(groupName2, "Position", fencevec);
 
-	camera.reset(new Camera());
-
 	obj3dCommon.reset(new Object3dCommon());
-	obj3dCommon->Initialize(camera.get());
+	obj3dCommon->Initialize();
 
 	sphere = new Object3d();
 	sphere->CreateSphere(obj3dCommon.get());
@@ -48,7 +82,7 @@ void GameScene::Initialize() {
 	for (int i = 0; i < 3; i++) {
 
 		Object3d* newModel = new Object3d();
-		newModel->Create("suzanne.obj",obj3dCommon.get());
+		newModel->Create("suzanne.obj");
 		newModel->transform.translate.x += addDis;
 		newModel->transform.translate.z += addDis;
 		newModel->transform.rotate.y = 3.14f;
@@ -58,87 +92,122 @@ void GameScene::Initialize() {
 	}
 
 	fence = new Object3d();
-	fence->Create("Fence.obj", obj3dCommon.get());
+	fence->Create("Fence.obj");
 
 	terrain = new Object3d();
-	terrain->Create("terrain.obj", obj3dCommon.get());
+	terrain->Create("terrain.obj");
 
 
 	test = new Sprite();
 	test->Load("uvChecker.png");
 
-	soundData1 = audio_->SoundLoadWave("resource/xxx.wav");
+
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	/*                                   フィールド (五線譜)                                        */
+	////////////////////////////////////////////////////////////////////////////////////////////////
+
+	for (Object3d*& fieldModel : fieldModels_){
+		fieldModel = new Object3d;
+		fieldModel->Create("ground.obj");
+	}
+
+
+	field_ = std::make_unique<Field>();
+	field_->Initialize(fieldModels_);
+
+
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	/*                                        プレイやー                                            */
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	Object3d* playerModel = new Object3d();
+	playerModel->Create("debugCube.obj");
+	playerModels_.emplace_back(playerModel);
+
+	Vector3 playerInitPosition = {field_->fieldEndPosX,0.0f,0.0f};
+	player_ = std::make_unique<Player>();
+	player_->Initialize(playerModels_);
+	player_->SetTranslate(playerInitPosition);
+
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	/*                                          敵関連                                             */
+	////////////////////////////////////////////////////////////////////////////////////////////////
+
+	//=======================================================================================
+	//↓boss
+	Object3d* bossModel = new Object3d();
+	bossModel->Create("debugSphere.obj");
+	bossModels_.emplace_back(bossModel);
+
+	boss_ = std::make_unique<Boss>();
+	boss_->Initialize(bossModels_);
+	boss_->SetTranslate(Vector3 {-8.0f,6.0f,0.0f});//五線譜の真ん中に合わせる
+	boss_->SetScale(Vector3 {7.0f,7.0f,7.0f});
+
+	//=======================================================================================
+	//↓音符になる敵(管理クラス)
+	enemyManager_ = std::make_unique<EnemyManager>();
+	enemyManager_->Initialize();
+	enemyManager_->SetField(field_.get());
+	enemyManager_->SetObject3dCommon(obj3dCommon.get());
+
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	/*                                        サウンド                                             */
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	soundData1 = audio_->SoundLoadWave("resource/Alarm01.wav");
 	soundData2 = audio_->SoundLoadWave("resource/mokugyo.wav");
 
-	ApplyGlobalVariables();
+	//ApplyGlobalVariables();
 
 }
 
-void GameScene::Update() {
-
-	camera->Update();
+void GameScene::Update(){
 
 #ifdef _DEBUG
-	if (input_->TriggerKey(DIK_F12)) {
-		if (isDebugCameraMode_) {
-			isDebugCameraMode_ = false;
 
-		} else {
-			isDebugCameraMode_ = true;
+	//ApplyGlobalVariables();
 
-		}
-	}
+	//ImGui::Begin("suzunne");
 
-	if (isDebugCameraMode_)
-	{
-		DebugCamera::GetInstance()->Update();
-	}
+	//ImGui::ColorEdit4("color", &color_.X);
+	////suzunne->SetColor(color_);
+	//ImGui::End();
 
-	ApplyGlobalVariables();
+	//ImGui::Begin("Sphere");
 
-	ImGui::Begin("suzunne");
-
-	ImGui::ColorEdit4("color", &color_.X);
-	suzunne->SetColor(color_);
-	ImGui::End();
-
-	ImGui::Begin("Sphere");
-
-	ImGui::DragFloat3("scale", &sphere->transform.scale.x, 0.01f);
-	ImGui::DragFloat3("rotate", &sphere->transform.rotate.x, 0.01f);
-	ImGui::DragFloat3("right", &rightDir.x,0.01f);
-	rightDir = rightDir.Normalize();
-	sphere->SetRightDir(rightDir);
-	ImGui::End();
+	//ImGui::DragFloat3("scale", &sphere->transform.scale.x, 0.01f);
+	//ImGui::DragFloat3("rotate", &sphere->transform.rotate.x, 0.01f);
+	//ImGui::DragFloat3("right", &rightDir.x,0.01f);
+	//rightDir = rightDir.Normalize();
+	//sphere->SetRightDir(rightDir);
+	//ImGui::End();
 
 
 #endif // _DEBUG
 
-	if (input_->PushKey(DIK_LEFT)) {
-		suzunne->transform.translate.x -= 0.05f;
+	if (input_->PushKey(DIK_LEFT)){
 	}
-	if (input_->PushKey(DIK_RIGHT)) {
-		suzunne->transform.translate.x += 0.05f;
+	if (input_->PushKey(DIK_RIGHT)){
 	}
-	if (input_->PushKey(DIK_UP)) {
-		suzunne->transform.translate.y += 0.05f;
+	if (input_->PushKey(DIK_UP)){
 	}
-	if (input_->PushKey(DIK_DOWN)) {
-		suzunne->transform.translate.y -= 0.05f;
+	if (input_->PushKey(DIK_DOWN)){
 	}
 
 
-	if (input_->TriggerKey(DIK_8)) {
+	if (input_->TriggerKey(DIK_8)){
 		audio_->SoundPlayWave(soundData1);
 	}
-	if (input_->TriggerKey(DIK_9)) {
+	if (input_->TriggerKey(DIK_9)){
 		audio_->SoundStopWave(soundData1);
 	}
-	if (input_->TriggerKey(DIK_7)) {
+	if (input_->TriggerKey(DIK_7)){
 		audio_->SoundPlayWave(soundData2);
 	}
 
 	dxCommon_->UpDate();
+
+	/*===============================================
+	ゲーム画面を作成するので一時的にコメントアウト
 	suzunne->transform.rotate.y = 3.14f;
 	suzunne->transform.rotate.x += 0.05f;
 
@@ -156,11 +225,24 @@ void GameScene::Update() {
 
 	fence->transform.translate = fencevec;
 	fence->transform.rotate.x = 0.5f;
+	fence->SetWVP();
+	================================================*/
+	field_->Update();
+
+	//プレイヤーの更新
+	player_->Update();
+
+	//ボスの更新
+	boss_->Update();
 
 
+	enemyManager_->Update();
+
+	//衝突判定
+	CollisionManager::GetInstance()->CheckAllCollidion();
 }
 
-void GameScene::Draw() {
+void GameScene::Draw(){
 
 #pragma region 背景描画
 
@@ -171,13 +253,29 @@ void GameScene::Draw() {
 
 #pragma region 3Dオブジェクト
 	obj3dCommon->PreDraw();
-	sphere->Draw();
+	/*sphere->Draw();
 	suzunne->Draw();
-	fence->Draw();
-	for (auto suzunneModel : suzunnes) {
-		suzunneModel->Draw();
-	}
-	terrain->Draw();
+	fence->Draw();*/
+	field_->Draw();
+
+	//プレイヤーの描画
+	player_->Draw();
+
+	//ボスの描画
+	boss_->Draw();
+
+	enemyManager_->Draw();
+
+
+
+
+	//for (auto suzunneModel : suzunnes) {
+	//	suzunneModel->Draw();
+	//}
+	//terrain->Draw();
+
+	//描画コマンドを積んでます
+	PrimitiveDrawer::GetInstance()->Render();
 
 #pragma endregion
 
@@ -185,7 +283,6 @@ void GameScene::Draw() {
 #pragma region 前景スプライト
 
 	dxCommon_->PreSpriteDraw();
-	test->Draw();
 
 #pragma endregion
 
@@ -195,7 +292,11 @@ void GameScene::Draw() {
 
 }
 
-void GameScene::ApplyGlobalVariables() {
+void GameScene::LoadEnemyPopData(){
+
+}
+
+void GameScene::ApplyGlobalVariables(){
 	GlobalVariables* globalVariables = GlobalVariables::GetInstance();
 	const char* groupName = "Sphere";
 	const char* groupName2 = "Fence";

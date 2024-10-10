@@ -10,8 +10,7 @@
 #include "externals/DirectXTex/DirectXTex.h"
 #include "externals/DirectXTex/d3dx12.h"
 
-class Model
-{
+class Model{
 public:
 	Model();
 	Model(const Model& other);

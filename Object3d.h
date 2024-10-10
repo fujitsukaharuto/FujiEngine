@@ -16,9 +16,9 @@ public:
 
 public:
 
-	void Create(const std::string& fileName, Object3dCommon* common);
+	void Create(const std::string& fileName);
 
-	void CreateSphere(Object3dCommon* common);
+	void CreateSphere();
 
 	void Draw();
 
@@ -31,6 +31,8 @@ public:
 	/*void SetPointLight(PointLight* light) { pointLight_ = light; }
 
 	void SetSpotLight(SpotLight* light) { spotLight_ = light; }*/
+
+	const Matrix4x4& GetMatWorld()const{ return worldMatrix_; }
 
 	Trans transform{};
 
@@ -48,6 +50,8 @@ private:
 	PointLight* pointLight_;
 	SpotLight* spotLight_;
 	Camera* camera_;
+
+	Matrix4x4 worldMatrix_;
 
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource_ = nullptr;
