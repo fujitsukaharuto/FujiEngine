@@ -37,10 +37,11 @@ private:
 	void Jump();
 
 private:
+	//移動スピード
 	float moveSpeed_= 0.1f;
-
+	//速度
 	Vector3 velocity_ {0.0f,0.0f,0.0f};
-
+	//ジャンプ中
 	bool isJumping_ = false;
 
 };

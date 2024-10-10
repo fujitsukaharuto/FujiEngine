@@ -65,11 +65,6 @@ void NoteEnemy::OnCollision(Character* other){
 	}
 
 	else if (collisionType == static_cast< uint32_t >(CollisionTypeIdDef::kPlayer)){
-		// 敵の状態でプレイヤーに当たったら音符に変わる
-		if (!isChangedNote_){
-			isChangedNote_ = true;
-		}
-
 		// プレイヤーの位置を取得
 		const Vector3& playerPos = other->GetWorldPosition();
 
@@ -78,27 +73,37 @@ void NoteEnemy::OnCollision(Character* other){
 		float enemyMinY = collider->min_.y;
 		float enemyMaxY = collider->max_.y;
 
-		// 下の面に当たっていたら上にあげて、上の面に当たっていたら下に下げる
-		if (fieldIndex_ >= 0 && fieldIndex_ < Field::staffNotation_.size()){
-			if (playerPos.y <= enemyMinY){
-				if (fieldIndex_ < Field::staffNotation_.size() - 1){
-					fieldIndex_++;  // 上の段に移動（上限を超えないようにする）
-				}
-			} else if (playerPos.y >= enemyMaxY){
-				if (fieldIndex_ > 0){
-					fieldIndex_--;  // 下の段に移動（下限を下回らないようにする）
-				}
-			}
+		bool movedToNewField = false;  // 段が移動したかどうかを確認
 
-			// 移動先のフィールドの Y 座標に NoteEnemy を移動させる
+		// 下の面に当たっていたら上にあげる
+		if (playerPos.y <= enemyMinY){
+			if (fieldIndex_ < Field::staffNotation_.size() - 1){
+				fieldIndex_++;  // 上の段に移動
+			}
+			movedToNewField = true;  // 下の面に当たった場合、段が変わるか変わらないかにかかわらずフラグを立てる
+		}
+		// 上の面に当たっていたら下に下げる
+		else if (playerPos.y >= enemyMaxY){
+			if (fieldIndex_ > 0){
+				fieldIndex_--;  // 下の段に移動
+			}
+			movedToNewField = true;  // 上の面に当たった場合、段が変わるか変わらないかにかかわらずフラグを立てる
+		}
+
+		// 移動先のフィールドの Y 座標に NoteEnemy を移動させる
+		if (movedToNewField){
 			Vector3 movedPos = {
 				GetWorldPosition().x,
 				Field::staffNotation_[fieldIndex_]->transform.translate.y,
 				GetWorldPosition().z
 			};
 			SetTranslate(movedPos);
+
+			// 段が移動した、または上下の面に触れた場合に音符に変わる
+			isChangedNote_ = true;
 		}
 	}
+
 
 
 	//衝突相手がbossなら消去する

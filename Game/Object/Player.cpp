@@ -4,6 +4,7 @@
 #include "Collision/CollisionManager.h"
 #include "Collision/SphereCollider.h"
 
+
 Player::Player() : Character(std::make_unique<SphereCollider>()){
     SphereCollider* sphereCollider = dynamic_cast< SphereCollider* >(collider_.get());
     if (sphereCollider){
@@ -13,6 +14,7 @@ Player::Player() : Character(std::make_unique<SphereCollider>()){
     sphereCollider->SetTypeID(static_cast< uint32_t >(CollisionTypeIdDef::kPlayer));
 
     CollisionManager::GetInstance()->AddCollider(this);
+
 }
 
 void Player::Initialize(std::vector<Object3d*> Object3ds){

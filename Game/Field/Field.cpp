@@ -1,8 +1,10 @@
 #include "Field/Field.h"
 
+#include "Rendering/PrimitiveDrawer.h"
 
 std::array<float, 5> Field::influenceOnSpeed_ {};
 std::array<Object3d*, 5> Field::staffNotation_ {};
+float Field::fieldEndPosX = 2.0f;
 
 Field::~Field(){
 	for (auto model : staffNotation_){
@@ -17,7 +19,7 @@ void Field::Initialize(const std::array<Object3d*, 5>& models){
 
 	//0.1ずつ増加するとして初期化
 	for (size_t i = 0; i < 5; i++){
-		Vector3 initializePosition = Vector3 {-2.5f,0.0f + (kLineSpace_ * i),0.0f};
+		Vector3 initializePosition = Vector3 {-5.0f,0.0f + (kLineSpace_ * i),0.0f};
 
 		staffNotation_[i]->transform.translate = initializePosition;
 
@@ -31,4 +33,8 @@ void Field::Draw(){
 	for (Object3d*& model: staffNotation_){
 		model->Draw();
 	}
+
+	//フィールドの終了線
+	PrimitiveDrawer::GetInstance()->DrawLine3d({fieldEndPosX,12.0f,0.0f}, {fieldEndPosX, 0.0f, 0.0f}, {0.0f,0.0f,0.0f,1.0f});
+
 }

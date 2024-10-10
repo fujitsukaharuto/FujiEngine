@@ -26,7 +26,7 @@ void EnemyManager::Update(){
         }
 
         //音符に変わっていない状態で削除ラインまで行くと消える
-        else if (!(*it)->GetIsChangedNote() && (*it)->GetTranslate().x <= 0.0f){
+        else if (!(*it)->GetIsChangedNote() && (*it)->GetTranslate().x <= Field::fieldEndPosX){
             CollisionManager::GetInstance()->RemoveCollider((*it).get());
             it = noteEnemies_.erase(it);  // 安全に削除
         } else{
@@ -109,7 +109,7 @@ void EnemyManager::UpdatePopData(){
 
                 noteEnemy->SetFieldIndex(popIndex - 1);
                 noteEnemy->Initialize(noteEnemyModel);
-                noteEnemy->SetTranslate(Vector3 {30.0f, spawnPosY, 0.0f});
+                noteEnemy->SetTranslate(Vector3 {50.0f, spawnPosY, 0.0f});
 
                 noteEnemies_.emplace_back(std::move(noteEnemy));
 

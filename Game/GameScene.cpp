@@ -36,14 +36,19 @@ GameScene::~GameScene(){
 	delete terrain;
 	delete test;*/
 }
-	
+
 
 void GameScene::Initialize(){
 	dxCommon_ = DXCom::GetInstance();
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
 
-	camera.reset(new Camera());
+
+	Vector3 cameraInitializePos = {-11.5f,5.6f,-63.5f};
+	Vector3 cameraInitializeRotate = {0.0f, 0.37f, 0.0f};
+	CameraManager::GetInstance()->GetCamera()->transform.translate = cameraInitializePos;
+	CameraManager::GetInstance()->GetCamera()->transform.rotate = cameraInitializeRotate;
+
 
 	obj3dCommon.reset(new Object3dCommon());
 	obj3dCommon->Initialize();
@@ -100,7 +105,7 @@ void GameScene::Initialize(){
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	/*                                   フィールド (五線譜)                                        */
 	////////////////////////////////////////////////////////////////////////////////////////////////
-	
+
 	for (Object3d*& fieldModel : fieldModels_){
 		fieldModel = new Object3d;
 		fieldModel->Create("ground.obj");
@@ -117,9 +122,11 @@ void GameScene::Initialize(){
 	Object3d* playerModel = new Object3d();
 	playerModel->Create("debugCube.obj");
 	playerModels_.emplace_back(playerModel);
+
+	Vector3 playerInitPosition = {field_->fieldEndPosX,0.0f,0.0f};
 	player_ = std::make_unique<Player>();
 	player_->Initialize(playerModels_);
-	player_->SetTranslate({2.0f,0.0f,0.0f});
+	player_->SetTranslate(playerInitPosition);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	/*                                          敵関連                                             */
@@ -127,13 +134,17 @@ void GameScene::Initialize(){
 
 	//=======================================================================================
 	//↓boss
-	Object3d* bossModel = new Object3d(); 
-	bossModel->Create("debugCube.obj");
+	Object3d* bossModel = new Object3d();
+	bossModel->Create("debugSphere.obj");
 	bossModels_.emplace_back(bossModel);
+
 	boss_ = std::make_unique<Boss>();
 	boss_->Initialize(bossModels_);
-	boss_->SetTranslate(Vector3 {-6.0f,5.0f,0.0f});//五線譜の真ん中に合わせる
-	
+	boss_->SetTranslate(Vector3 {-8.0f,6.0f,0.0f});//五線譜の真ん中に合わせる
+	boss_->SetScale(Vector3 {7.0f,7.0f,7.0f});
+
+	//=======================================================================================
+	//↓音符になる敵(管理クラス)
 	enemyManager_ = std::make_unique<EnemyManager>();
 	enemyManager_->Initialize();
 	enemyManager_->SetField(field_.get());
@@ -146,7 +157,7 @@ void GameScene::Initialize(){
 	soundData2 = audio_->SoundLoadWave("resource/mokugyo.wav");
 
 	//ApplyGlobalVariables();
-	
+
 }
 
 void GameScene::Update(){
@@ -257,8 +268,7 @@ void GameScene::Draw(){
 
 
 
-	PrimitiveDrawer::GetInstance()->DrawLine3d({0.0f,12.0f,0.0f} ,{ 0.0f, 0.0f, 0.0f }, {0.0f,0.0f,0.0f,1.0f});
-	
+
 	//for (auto suzunneModel : suzunnes) {
 	//	suzunneModel->Draw();
 	//}
@@ -286,7 +296,7 @@ void GameScene::LoadEnemyPopData(){
 
 }
 
-void GameScene::ApplyGlobalVariables() {
+void GameScene::ApplyGlobalVariables(){
 	GlobalVariables* globalVariables = GlobalVariables::GetInstance();
 	const char* groupName = "Sphere";
 	const char* groupName2 = "Fence";

@@ -33,6 +33,8 @@ public:
 	static std::array<Object3d*, 5>staffNotation_;
 	//移動してくるオブジェクトのスピードに対する影響力
 	static std::array<float, 5>influenceOnSpeed_ ;
+	//敵が消えるライン(x座標)
+	static float fieldEndPosX;
 
 	//線の幅(仮)
 	const float kLineSpace_ = 3.0f;

@@ -5,7 +5,7 @@
 Boss::Boss() : Character(std::make_unique<SphereCollider>()){
     SphereCollider* sphereCollider = dynamic_cast< SphereCollider* >(collider_.get());
     if (sphereCollider){
-        sphereCollider->radius_ = 1.0f;
+        sphereCollider->radius_ =   7.0f;
     }
 
     sphereCollider->SetTypeID(static_cast< uint32_t >(CollisionTypeIdDef::kBoss));
