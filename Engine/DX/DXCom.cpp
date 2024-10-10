@@ -38,6 +38,7 @@ void DXCom::Initialize(MyWin* myWin)
 
 
 	CreateCompiler();
+	InitializeFPSKeeper();
 	SettingRootSignature();
 	SettingGraphicPipeline();
 
@@ -212,6 +213,11 @@ void DXCom::CreateCompiler() {
 	compiler_.reset(new DXCompil());
 	compiler_->Initialize();
 
+}
+
+void DXCom::InitializeFPSKeeper() {
+	fpsKeeper_.reset(new FPSKeeper());
+	fpsKeeper_->Initialize();
 }
 
 
@@ -425,6 +431,7 @@ void DXCom::PostDraw() {
 	command_->Close();
 	// コマンドリストの実行
 	command_->Execution();
+	fpsKeeper_->FixFPS();
 	swapChain_->Present(1, 0);
 	command_->Reset();
 }

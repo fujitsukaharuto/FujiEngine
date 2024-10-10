@@ -20,7 +20,7 @@
 #include "DXCommand.h"
 #include "DXCompil.h"
 
-
+#include "FPSKeeper.h"
 #include "PipelineManager.h"
 #include "Camera.h"
 
@@ -140,6 +140,8 @@ private:
 
 	void CreateCompiler();
 
+	void InitializeFPSKeeper();
+
 	void SettingRootSignature();
 	void SettingGraphicPipeline();
 
@@ -196,6 +198,8 @@ private:
 
 	std::unique_ptr<DXCompil> compiler_ = nullptr;
 
+
+	std::unique_ptr<FPSKeeper> fpsKeeper_ = nullptr;
 
 	PipelineManager* pipeManager_;
 
