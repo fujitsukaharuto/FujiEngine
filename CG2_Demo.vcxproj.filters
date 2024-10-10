@@ -137,6 +137,9 @@
     <ClCompile Include="CameraManager.cpp">
       <Filter>Engine\DebugCamera</Filter>
     </ClCompile>
+    <ClCompile Include="FPSKeeper.cpp">
+      <Filter>Engine\DX</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -285,6 +288,9 @@
     </ClInclude>
     <ClInclude Include="CameraManager.h">
       <Filter>Engine\DebugCamera</Filter>
+    </ClInclude>
+    <ClInclude Include="FPSKeeper.h">
+      <Filter>Engine\DX</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

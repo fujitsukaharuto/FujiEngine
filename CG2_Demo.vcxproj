@@ -133,6 +133,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="externals\imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="externals\imgui\imgui_tables.cpp" />
     <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="FPSKeeper.cpp" />
     <ClCompile Include="Game\Field\MapChipField.cpp" />
     <ClCompile Include="Game\GameScene.cpp" />
     <ClCompile Include="GlobalVariables.cpp" />
@@ -185,6 +186,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="externals\imgui\imstb_rectpack.h" />
     <ClInclude Include="externals\imgui\imstb_textedit.h" />
     <ClInclude Include="externals\imgui\imstb_truetype.h" />
+    <ClInclude Include="FPSKeeper.h" />
     <ClInclude Include="Game\Field\MapChipField.h" />
     <ClInclude Include="Game\GameScene.h" />
     <ClInclude Include="GlobalVariables.h" />
