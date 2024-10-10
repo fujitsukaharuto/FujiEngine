@@ -25,6 +25,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// 汎用
 	Input* input = nullptr;
 	Audio* audio = nullptr;
+	FPSKeeper* fpsKeeper = nullptr;
 	GameScene* gameScene = nullptr;
 	TextureManager* textureManager = nullptr;
 	PrimitiveDrawer* primitiveDrawer = nullptr;
@@ -40,6 +41,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// DirectX初期化
 	dxCommon = DXCom::GetInstance();
 	dxCommon->Initialize(win);
+
+	fpsKeeper = FPSKeeper::GetInstance();
+	fpsKeeper->Initialize();
 
 	DebugCamera* camera = nullptr;
 	camera = DebugCamera::GetInstance();
@@ -88,6 +92,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//ウィンドウのxボタンが押されるまでループ
 	while (!win->ProcessMessage())
 	{
+
+		fpsKeeper->Update();
 
 #ifdef _DEBUG
 		// ImGui受付
