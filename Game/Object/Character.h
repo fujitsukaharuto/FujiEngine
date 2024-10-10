@@ -51,6 +51,8 @@ public:
 
 	Vector3 GetWorldPosition()const;
 
+	virtual Vector3 GetCenterPos()const;
+
 	const Vector3& GetTranslate(){ return models_[0]->transform.translate; }
 
 	Collider* GetCollider() const{ return collider_.get(); }

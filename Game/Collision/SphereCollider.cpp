@@ -9,6 +9,7 @@ bool SphereCollider::Intersects(const Collider& other) const{
     if (const SphereCollider* sphere = dynamic_cast< const SphereCollider* >(&other)){
         return IntersectsSphere(*sphere);
     }
+    
     return false; // 未知のCollider型
 }
 

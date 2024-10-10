@@ -15,6 +15,9 @@ void EnemyManager::Initialize(){
 }
 
 void EnemyManager::Update(){
+    UpdatePopData();
+
+
     // 敵の更新、一定位置まで行くと解放
     for (auto it = noteEnemies_.begin(); it != noteEnemies_.end();){
         (*it)->Update();
@@ -34,11 +37,26 @@ void EnemyManager::Update(){
         }
     }
 
-    UpdatePopData();
+    // ChainEnemy の更新
+    for (auto it = chainEnemies_.begin(); it != chainEnemies_.end();){
+        (*it)->Update();
+
+        // ChainEnemy 内の全ての NoteEnemy が削除された場合には ChainEnemy 自体も削除する
+        if ((*it)->IsAllRemove()){
+            it = chainEnemies_.erase(it);  // ChainEnemy 自体を削除
+        } else{
+            ++it;
+        }
+    }
+
 }
 
 void EnemyManager::Draw(){
     for (auto& enemy : noteEnemies_){
+        enemy->Draw();
+    }
+
+    for (auto& enemy : chainEnemies_){
         enemy->Draw();
     }
 }
@@ -95,23 +113,23 @@ void EnemyManager::UpdatePopData(){
             // POPに続く数字を取得
             getline(line_stream, word, ',');
 
-            int popIndex = std::atoi(word.c_str());
+            int fieldIndex = std::atoi(word.c_str());
 
             // 数字が1～5の範囲内であれば、その座標を使って敵を生成
-            if (popIndex >= 1 && popIndex <= 5){
-                float spawnPosY = pField_->GetPos(popIndex - 1).y;
+            if (fieldIndex >= 1 && fieldIndex <= 5){
+                
 
-                // 敵を生成しリストに追加
-                std::unique_ptr<NoteEnemy> noteEnemy = std::make_unique<NoteEnemy>();
-                Object3d* noteEnemyModel = new Object3d;
+                //生成する敵の種類を判別
+                getline(line_stream, word, ',');
+                int popType = std::atoi(word.c_str());
 
-                noteEnemyModel->Create("debugCube.obj");
-
-                noteEnemy->SetFieldIndex(popIndex - 1);
-                noteEnemy->Initialize(noteEnemyModel);
-                noteEnemy->SetTranslate(Vector3 {50.0f, spawnPosY, 0.0f});
-
-                noteEnemies_.emplace_back(std::move(noteEnemy));
+                //連鎖してる敵を生成
+                if (popType == static_cast<int>(EnemyType::CHAIN_ENEMY)){
+                    CreateChainEnemy(fieldIndex);
+                } else{ //連鎖している敵以外の番号の場合連鎖していない敵を生成
+                    CreateUnChainEnemy(fieldIndex);
+                }
+               
 
                 return;  // 次のフレームで次の行を処理
             }
@@ -144,4 +162,47 @@ void EnemyManager::ResetPopData(){
     // ストリームの位置を先頭に戻す
     enemyPopCommands_.clear();  // エラー状態をクリア
     enemyPopCommands_.seekg(0, std::ios::beg);  // ストリームを先頭に移動
+}
+
+void EnemyManager::CreateChainEnemy(int fieldIndex){
+    // チェーンエネミーを生成
+    std::unique_ptr<ChainEnemy> chainEnemy = std::make_unique<ChainEnemy>();
+
+    // モデルを格納する配列を用意
+    std::array<Object3d*, 2> models;
+
+    // 敵モデルを生成
+    for (int i = 0; i < 2; i++){
+        models[i] = new Object3d;
+        models[i]->Create("debugCube.obj"); // モデルの作成
+    }
+
+    // 敵の出現位置を決定
+    float spawnPosY = pField_->GetPos(fieldIndex - 1).y;
+    Vector3 spawnPos {50.0f, spawnPosY, 0.0f};
+
+    // ChainEnemyを初期化
+    chainEnemy->Initialize(models, spawnPos);
+
+    // フィールドインデックスを設定
+    chainEnemy->SetFieldIndex(fieldIndex - 1);
+
+    // chainEnemies_ に追加
+    chainEnemies_.emplace_back(std::move(chainEnemy));
+}
+
+
+void EnemyManager::CreateUnChainEnemy(int fieldIndex){
+    // 敵を生成しリストに追加
+    std::unique_ptr<NoteEnemy> noteEnemy = std::make_unique<NoteEnemy>();
+    Object3d* noteEnemyModel = new Object3d;
+
+    noteEnemyModel->Create("debugCube.obj");
+
+    noteEnemy->SetFieldIndex(fieldIndex - 1);
+    noteEnemy->Initialize(noteEnemyModel);
+    float spawnPosY = pField_->GetPos(fieldIndex - 1).y;
+    noteEnemy->SetTranslate(Vector3 {50.0f, spawnPosY, 0.0f});
+
+    noteEnemies_.emplace_back(std::move(noteEnemy));
 }

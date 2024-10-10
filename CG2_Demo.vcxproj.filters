@@ -161,6 +161,7 @@
     <ClCompile Include="Game\Collision\CollisionManager.cpp" />
     <ClCompile Include="Game\Collision\BoxCollider.cpp" />
     <ClCompile Include="Game\Collision\SphereCollider.cpp" />
+    <ClCompile Include="Game\Object\ChainEnemy.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -335,6 +336,7 @@
     <ClInclude Include="Game\Collision\BoxCollider.h" />
     <ClInclude Include="Game\Collision\SphereCollider.h" />
     <ClInclude Include="Game\Collision\CollisionType.h" />
+    <ClInclude Include="Game\Object\ChainEnemy.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
