@@ -119,7 +119,7 @@ void Line3dPipe::CreatePSO(ID3D12Device* device) {
 	stateDesc.NumRenderTargets = 1;
 	stateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 
-	stateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+	stateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
 
 	stateDesc.SampleDesc.Count = 1;
 	stateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
