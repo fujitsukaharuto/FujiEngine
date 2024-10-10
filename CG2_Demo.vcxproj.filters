@@ -226,6 +226,14 @@
     <ClCompile Include="Engine\GraphicPipeline\PrimitivePipeline.cpp">
       <Filter>Engine\GraphicPipeline</Filter>
     </ClCompile>
+    <ClCompile Include="CameraManager.cpp">
+      <Filter>Engine\DebugCamera</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Collision\Collider.cpp" />
+    <ClCompile Include="Game\Collision\CollisionManager.cpp" />
+    <ClCompile Include="Game\Collision\BoxCollider.cpp" />
+    <ClCompile Include="Game\Collision\SphereCollider.cpp" />
+    <ClCompile Include="Game\Object\ChainEnemy.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -434,6 +442,17 @@
     <None Include="resource\Shaders\Primitive.hlsli">
       <Filter>resource\Shaders</Filter>
     </None>
+    <ClInclude Include="Game\Field\Field.h" />
+    <ClInclude Include="Game\Object\NoteEnemy.h" />
+    <ClInclude Include="Game\Object\NoteEnemyState\NoteEnemyState_Base.h" />
+    <ClInclude Include="Game\Object\NoteEnemyState\NoteEnemyState_Enemy.h" />
+    <ClInclude Include="Game\Object\EnemyManager.h" />
+    <ClInclude Include="Game\Collision\Collider.h" />
+    <ClInclude Include="Game\Collision\CollisionManager.h" />
+    <ClInclude Include="Game\Collision\BoxCollider.h" />
+    <ClInclude Include="Game\Collision\SphereCollider.h" />
+    <ClInclude Include="Game\Collision\CollisionType.h" />
+    <ClInclude Include="Game\Object\ChainEnemy.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="resource">

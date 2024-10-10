@@ -4,10 +4,16 @@
 #include "Field/Field.h"
 #include "Object3d.h"
 #include "Object3dCommon.h"
+#include "Object/ChainEnemy.h"
 
 #include <fstream>
 #include<sstream>
 #include <list>
+
+enum EnemyType{
+	UNCHAIN_ENEMY,	//連鎖していない敵
+	CHAIN_ENEMY,	//連鎖している敵
+};
 
 class EnemyManager{
 public:
@@ -42,12 +48,23 @@ private:
 	/// </summary>
 	void ResetPopData();
 
+	/// <summary>
+	/// 連鎖している敵を生成
+	/// </summary>
+	void CreateChainEnemy(int fieldIndex);
+
+	/// <summary>
+	/// 連鎖していない敵を生成
+	/// </summary>
+	void CreateUnChainEnemy(int fieldIndex);
+
 private:
 
 	const Field* pField_ = nullptr;
 	Object3dCommon* pObject3dCommon_ = nullptr;
 
 	std::list<std::unique_ptr<NoteEnemy>>noteEnemies_ {};
+	std::list<std::unique_ptr<ChainEnemy>> chainEnemies_ {};
 
 	//===============
 	//敵発生コマンド

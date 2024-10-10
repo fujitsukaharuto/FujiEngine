@@ -22,6 +22,8 @@ public:
 
 	void Draw();
 
+	void UpdateWorldMat();
+
 	void SetColor(const Vector4& color);
 
 	void SetRightDir(const Vector3& right) { directionalLightData_->direction = right; }

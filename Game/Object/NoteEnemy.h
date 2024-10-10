@@ -55,6 +55,10 @@ public:
 
 	bool GetIsRemoved(){ return isRemoved_; }
 
+	Vector3 GetCenterPos()const override;
+
+	Object3d* GetObject3d()const{ return models_[0]; }
+
 	void SetFieldIndex(const uint32_t index){ fieldIndex_ = index; }
 
 private:

@@ -129,4 +129,10 @@ void NoteEnemy::Move(){
 	models_[0]->transform.translate.x -= moveSpeed_ * kDeltaTime;
 }
 
+Vector3 NoteEnemy::GetCenterPos() const{
+	Vector3 offset = {0.0f, 0.5f, 0.0f};
+	Vector3 worldPos = Transform(offset, models_[0]->GetMatWorld());
+	return worldPos;
+}
+
 

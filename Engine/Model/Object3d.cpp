@@ -45,6 +45,11 @@ void Object3d::Draw() {
 
 }
 
+void Object3d::UpdateWorldMat(){
+	worldMatrix_ = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
+	wvpDate_->World = worldMatrix_;
+}
+
 void Object3d::SetColor(const Vector4& color) {
 	model_->SetColor(color);
 }
@@ -80,8 +85,7 @@ void Object3d::CreateWVP() {
 }
 
 void Object3d::SetWVP() {
-
-	worldMatrix_ = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
+	UpdateWorldMat();
 	Matrix4x4 worldViewProjectionMatrix;
 
 	if (camera_) {
@@ -92,7 +96,6 @@ void Object3d::SetWVP() {
 		worldViewProjectionMatrix = worldMatrix_;
 	}
 
-	wvpDate_->World = worldMatrix_;
 	wvpDate_->WVP = worldViewProjectionMatrix;
 	wvpDate_->WorldInverseTransPose = Transpose(Inverse(wvpDate_->World));
 
