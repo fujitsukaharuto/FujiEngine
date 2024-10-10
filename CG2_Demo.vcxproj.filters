@@ -226,6 +226,9 @@
     <ClCompile Include="Engine\GraphicPipeline\PrimitivePipeline.cpp">
       <Filter>Engine\GraphicPipeline</Filter>
     </ClCompile>
+    <ClCompile Include="Random.cpp">
+      <Filter>Engine\Math</Filter>
+    </ClCompile>
     <ClCompile Include="CameraManager.cpp">
       <Filter>Engine\DebugCamera</Filter>
     </ClCompile>
@@ -430,6 +433,9 @@
     </ClInclude>
     <ClInclude Include="Engine\GraphicPipeline\PrimitivePipeline.h">
       <Filter>Engine\GraphicPipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="Random.h">
+      <Filter>Engine\Math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

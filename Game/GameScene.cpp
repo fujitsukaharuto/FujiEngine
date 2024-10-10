@@ -6,6 +6,7 @@
 #include "Rendering/PrimitiveDrawer.h"
 #include "Collision/CollisionManager.h"
 #include "FPSKeeper.h"
+#include "Random.h"
 
 #include <array>
 
@@ -216,7 +217,7 @@ void GameScene::Update(){
 	float rotaSpeed = 0.1f;
 	for (auto suzunneModel : suzunnes) {
 		suzunneModel->transform.rotate.x += rotaSpeed * FPSKeeper::DeltaTime();
-
+		suzunneModel->transform.translate = Random::GetVector3({ -4.0f,4.0f }, { -4.0f,4.0f }, { -4.0f,4.0f });
 		rotaSpeed += 0.05f;
 	}
 
