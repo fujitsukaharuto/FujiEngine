@@ -3,6 +3,8 @@
 #include "ModelManager.h"
 #include "GlobalVariables.h"
 #include "CameraManager.h"
+#include "FPSKeeper.h"
+
 
 GameScene::GameScene() {}
 
@@ -123,12 +125,12 @@ void GameScene::Update() {
 
 	dxCommon_->UpDate();
 	suzunne->transform.rotate.y = 3.14f;
-	suzunne->transform.rotate.x += 0.05f;
+	suzunne->transform.rotate.x += (0.05f) * FPSKeeper::DeltaTime();
 
 
 	float rotaSpeed = 0.1f;
 	for (auto suzunneModel : suzunnes) {
-		suzunneModel->transform.rotate.x += rotaSpeed;
+		suzunneModel->transform.rotate.x += rotaSpeed * FPSKeeper::DeltaTime();
 
 		rotaSpeed += 0.05f;
 	}

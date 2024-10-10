@@ -199,7 +199,7 @@ private:
 	std::unique_ptr<DXCompil> compiler_ = nullptr;
 
 
-	std::unique_ptr<FPSKeeper> fpsKeeper_ = nullptr;
+	FPSKeeper* fpsKeeper_ = nullptr;
 
 	PipelineManager* pipeManager_;
 

@@ -216,8 +216,7 @@ void DXCom::CreateCompiler() {
 }
 
 void DXCom::InitializeFPSKeeper() {
-	fpsKeeper_.reset(new FPSKeeper());
-	fpsKeeper_->Initialize();
+	fpsKeeper_ = FPSKeeper::GetInstance();
 }
 
 
