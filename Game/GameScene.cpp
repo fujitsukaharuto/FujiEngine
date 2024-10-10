@@ -3,6 +3,7 @@
 #include "ModelManager.h"
 #include "GlobalVariables.h"
 #include "CameraManager.h"
+#include "Line3dDrawer.h"
 
 GameScene::GameScene() {}
 

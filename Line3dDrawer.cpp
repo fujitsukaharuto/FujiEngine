@@ -47,6 +47,7 @@ std::unique_ptr<Line3dDrawer::LineData> Line3dDrawer::CreateMesh(UINT vertexCoun
 void Line3dDrawer::Initialize() {
 
 	CreateMeshes();
+	CreateResource();
 
 }
 
@@ -75,14 +76,17 @@ void Line3dDrawer::Render() {
 
 	ID3D12GraphicsCommandList* cList = DXCom::GetInstance()->GetCommandList();
 
+	cBufferData_->viewProject = camera_->GetViewProjectionMatrix();
+
 	DXCom::GetInstance()->GetPipelineManager()->SetPipeline(Pipe::Line3d);
 	cList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
 
 	D3D12_VERTEX_BUFFER_VIEW vbView = line_->vbView;
 	cList->IASetVertexBuffers(0, 1, &vbView);
+	cList->SetGraphicsRootConstantBufferView(0, cBufferResource_->GetGPUVirtualAddress());
+	cList->DrawInstanced(indexLine_ * 2, 1, 0, 0);
 
-
-
+	Reset();
 
 }
 
@@ -97,4 +101,15 @@ void Line3dDrawer::CreateMeshes() {
 	const UINT maxIndices = 20;
 
 	line_ = CreateMesh(maxVertex, maxIndices);
+}
+
+void Line3dDrawer::CreateResource() {
+
+	DXCom* dxCommon = DXCom::GetInstance();
+
+	cBufferResource_ = dxCommon->CreateBufferResource(dxCommon->GetDevice(), sizeof(CBuffer));
+	cBufferData_ = nullptr;
+	cBufferResource_->Map(0, nullptr, reinterpret_cast<void**>(&cBufferData_));
+	cBufferData_->viewProject = MakeIdentity4x4();
+
 }

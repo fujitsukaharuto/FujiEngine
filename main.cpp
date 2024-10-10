@@ -8,6 +8,7 @@
 #include "ModelManager.h"
 #include "PointLightManager.h"
 #include "CameraManager.h"
+#include "Line3dDrawer.h"
 
 
 // やること
@@ -29,6 +30,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	ModelManager* modelManager = nullptr;
 
 	PointLightManager* pointLightManager = nullptr;
+	CameraManager* cameraManager = nullptr;
+	DebugCamera* camera = nullptr;
+	Line3dDrawer* line3dDrawer = nullptr;
 
 
 	// ゲームウィンドウの作成
@@ -39,13 +43,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	dxCommon = DXCom::GetInstance();
 	dxCommon->Initialize(win);
 
-	DebugCamera* camera = nullptr;
+
 	camera = DebugCamera::GetInstance();
 	camera->Initialize();
 
-	CameraManager* cameraManager = nullptr;
+
 	cameraManager = CameraManager::GetInstance();
 	cameraManager->Initialize();
+
+
+	line3dDrawer = Line3dDrawer::GetInstance();
+	line3dDrawer->Initialize();
+	line3dDrawer->SetCamera(cameraManager->GetCamera());
 
 
 #pragma region 汎用機能初期化

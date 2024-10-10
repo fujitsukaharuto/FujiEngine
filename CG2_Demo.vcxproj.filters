@@ -415,10 +415,10 @@
     <FxCompile Include="resource\Shaders\SimpleGrayscale.VS.hlsl">
       <Filter>resource\Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Line3d.VS.hlsl">
+    <FxCompile Include="resource\Shaders\Line3d.PS.hlsl">
       <Filter>resource\Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Line3d.PS.hlsl">
+    <FxCompile Include="resource\Shaders\Line3d.VS.hlsl">
       <Filter>resource\Shaders</Filter>
     </FxCompile>
   </ItemGroup>
@@ -429,7 +429,7 @@
     <None Include="resource\Shaders\Particle.hlsli">
       <Filter>resource\Shaders</Filter>
     </None>
-    <None Include="Line3d.hlsli">
+    <None Include="resource\Shaders\Line3d.hlsli">
       <Filter>resource\Shaders</Filter>
     </None>
   </ItemGroup>

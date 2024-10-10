@@ -6,6 +6,9 @@
 #include <cassert>
 
 
+Line3dPipe::~Line3dPipe() {
+}
+
 void Line3dPipe::CreateRootSignature(ID3D12Device* device) {
 
 	HRESULT hr;
@@ -91,9 +94,9 @@ void Line3dPipe::CreatePSO(ID3D12Device* device) {
 	rasterizer.CullMode = D3D12_CULL_MODE_NONE;
 	rasterizer.FillMode = D3D12_FILL_MODE_SOLID;
 
-	vs = DXCom::GetInstance()->GetDXCompil()->CompileShader(kDirectoryPath_ + L"Object3d.VS.hlsl", L"vs_6_0");
+	vs = DXCom::GetInstance()->GetDXCompil()->CompileShader(kDirectoryPath_ + L"Line3d.VS.hlsl", L"vs_6_0");
 	assert(vs != nullptr);
-	ps = DXCom::GetInstance()->GetDXCompil()->CompileShader(kDirectoryPath_ + L"Object3d.PS.hlsl", L"ps_6_0");
+	ps = DXCom::GetInstance()->GetDXCompil()->CompileShader(kDirectoryPath_ + L"Line3d.PS.hlsl", L"ps_6_0");
 	assert(ps != nullptr);
 
 

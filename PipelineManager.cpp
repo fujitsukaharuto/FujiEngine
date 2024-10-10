@@ -6,6 +6,7 @@
 #include "MetaBallPipeline.h"
 #include "GaussPipeline.h"
 #include "NonePipeline.h"
+#include "Line3dPipe.h"
 
 
 
@@ -33,7 +34,7 @@ void PipelineManager::CreatePipeline() {
 	std::unique_ptr<MetaBallPipeline> metaballPipeline = nullptr;
 	std::unique_ptr<GaussPipeline> gaussPipeline = nullptr;
 	std::unique_ptr<NonePipeline> nonePipeline = nullptr;
-
+	std::unique_ptr<Line3dPipe> line3dPipe = nullptr;
 
 
 	nonePipeline.reset(new NonePipeline());
@@ -64,6 +65,11 @@ void PipelineManager::CreatePipeline() {
 	metaballPipeline.reset(new MetaBallPipeline());
 	metaballPipeline->Initialize();
 	pipelines_.push_back(std::move(metaballPipeline));
+
+
+	line3dPipe.reset(new Line3dPipe());
+	line3dPipe->Initialize();
+	pipelines_.push_back(std::move(line3dPipe));
 
 }
 

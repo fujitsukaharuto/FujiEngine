@@ -58,6 +58,7 @@ private:
 
 	void CreateMeshes();
 
+	void CreateResource();
 
 private:
 
@@ -67,7 +68,11 @@ private:
 
 	Camera* camera_ = nullptr;
 
+	struct CBuffer {
+		Matrix4x4 viewProject;
+	};
 
-
+	ComPtr<ID3D12Resource> cBufferResource_ = nullptr;
+	CBuffer* cBufferData_ = nullptr;
 
 };
