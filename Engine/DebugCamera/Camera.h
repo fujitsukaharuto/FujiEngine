@@ -17,6 +17,8 @@ public:
 	void SetNearClip(float clip) { nearClip_ = clip; }
 	void SetFarClip(float clip) { farClip_ = clip; }
 
+	void SetShakeTime(float time) { shakeTime_ = time; }
+
 	const Matrix4x4& GetWorldMatrix() const { return worldMatrix_; }
 	const Matrix4x4& GetViewMatrix() const { return viewMatrix_; }
 	const Matrix4x4& GetProjectionMatrix() const { return projectionMatrix_; }
@@ -43,5 +45,7 @@ private:
 
 	Matrix4x4 viewProjectionMatrix_;
 
+	float shakeTime_;
+	float shakeStrength_;
 
 };
