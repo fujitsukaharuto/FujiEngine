@@ -165,6 +165,7 @@ void GameScene::Initialize(){
 void GameScene::Update(){
 
 #ifdef _DEBUG
+	field_->ShowImgui();
 
 	//ApplyGlobalVariables();
 
