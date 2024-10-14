@@ -26,6 +26,10 @@ void SRVManager::Initialize() {
 
 }
 
+void SRVManager::Finalize() {
+	descriptorHeap.Reset();
+}
+
 
 void SRVManager::CreateTextureSRV(uint32_t srvIndex, ID3D12Resource* resource, DXGI_FORMAT format, UINT mipLevels) {
 

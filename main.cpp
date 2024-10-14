@@ -143,6 +143,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	imguiManager->Fin();
 	textureManager->Finalize();
 	modelManager->Finalize();
+	srvManager->Finalize();
 
 	// ゲームウィンドウの破棄
 	win->Finalize();
