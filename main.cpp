@@ -3,6 +3,7 @@
 #include "GameScene.h"
 #include "TextureManager.h"
 #include "ImGuiManager.h"
+#include "SRVManager.h"
 #include "MyWindow.h"
 #include "GlobalVariables.h"
 #include "ModelManager.h"
@@ -21,6 +22,7 @@
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	MyWin* win = nullptr;
 	DXCom* dxCommon = nullptr;
+	SRVManager* srvManager = nullptr;
 	// 汎用
 	Input* input = nullptr;
 	Audio* audio = nullptr;
@@ -39,6 +41,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// DirectX初期化
 	dxCommon = DXCom::GetInstance();
 	dxCommon->Initialize(win);
+
+	srvManager = SRVManager::GetInstance();
+	srvManager->Initialize();
 
 	fpsKeeper = FPSKeeper::GetInstance();
 	fpsKeeper->Initialize();

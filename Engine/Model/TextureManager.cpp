@@ -1,6 +1,7 @@
 #include "TextureManager.h"
 #include "DXCom.h"
 #include "Logger.h"
+#include "SRVManager.h"
 #include "ImGuiManager.h"
 
 #include "externals/DirectXTex/DirectXTex.h"
@@ -94,6 +95,8 @@ Texture* TextureManager::LoadTexture(const std::string& filename) {
 		return m_textureCache[filename].get();
 	}
 
+	SRVManager* srvManager = SRVManager::GetInstance();
+
 	DirectX::ScratchImage mipImages = LoadTextureFile(directoryPath_ + filename);
 	std::unique_ptr<Texture> texture = std::make_unique<Texture>();
 	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
@@ -103,20 +106,12 @@ Texture* TextureManager::LoadTexture(const std::string& filename) {
 	intermediateResource.Reset();
 	intermediateResource = UploadTextureData(texture->textureResource, mipImages, DXCom::GetInstance()->GetDevice(), DXCom::GetInstance()->GetCommandList());
 
-	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
-	srvDesc.Format = metadata.format;
-	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-	srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
+	texture->srvIndex = srvManager->Allocate();
 
-	const uint32_t descriptorSizeSRV = DXCom::GetInstance()->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	srvManager->CreateTextureSRV(texture->srvIndex, texture->textureResource.Get(), metadata.format, UINT(metadata.mipLevels));
 
-	texture->cpuHandle = DXCom::GetInstance()->GetCPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, DXCom::GetInstance()->GetDescriptorIndex());
-	texture->gpuHandle = DXCom::GetInstance()->GetGPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, DXCom::GetInstance()->GetDescriptorIndex());
-
-	DXCom::GetInstance()->GetDevice()->CreateShaderResourceView(texture->textureResource.Get(), &srvDesc, texture->cpuHandle);
-
-	DXCom::GetInstance()->IncreaseDescriptorIndex();
+	texture->cpuHandle = srvManager->GetCPUDescriptorHandle(texture->srvIndex);
+	texture->gpuHandle = srvManager->GetGPUDescriptorHandle(texture->srvIndex);
 
 	DXCom::GetInstance()->CommandExecution();
 

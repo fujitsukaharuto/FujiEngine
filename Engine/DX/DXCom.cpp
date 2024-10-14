@@ -1,5 +1,6 @@
 #include "DXCom.h"
 #include "Logger.h"
+#include "SRVManager.h"
 #include "ImGuiManager.h"
 #include "Input.h"
 #include <DebugCamera.h>
@@ -301,29 +302,21 @@ void DXCom::CreateBarrier(D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES af
 
 void DXCom::SettingTexture()
 {
-	const uint32_t descriptorSizeSRV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	//const uint32_t descriptorSizeSRV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	//const uint32_t descriptorSizeRTV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	//const uint32_t descriptorSizeDSV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
-	IncreaseDescriptorIndex();
 
+	SRVManager* srvManager = SRVManager::GetInstance();
+	offscreenSRVIndex_ = srvManager->Allocate();
 
+	srvManager->CreateTextureSRV(offscreenSRVIndex_, offscreenrt_.Get(), DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, 1);
 
-
-	D3D12_SHADER_RESOURCE_VIEW_DESC srvDescOff{};
-	srvDescOff.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-	srvDescOff.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	srvDescOff.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-	srvDescOff.Texture2D.MipLevels = 1;
-	offTextureHandleCPU_ = GetCPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, descriptorIndex_);
-	offTextureHandle_ = GetGPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, descriptorIndex_);
-	device_->CreateShaderResourceView(offscreenrt_.Get(), &srvDescOff, offTextureHandleCPU_);
-	IncreaseDescriptorIndex();
-
+	offTextureHandleCPU_ = srvManager->GetCPUDescriptorHandle(offscreenSRVIndex_);
+	offTextureHandle_ = srvManager->GetGPUDescriptorHandle(offscreenSRVIndex_);
 
 
 	CommandExecution();
-
 }
 
 
@@ -337,6 +330,7 @@ void DXCom::PreDraw()
 	offbarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	command_->GetList()->ResourceBarrier(1, &offbarrier);
 
+	SRVManager::GetInstance()->SetDescriptorHeap();
 
 	SetRenderTargets();
 	ClearRenderTarget();
@@ -447,14 +441,6 @@ void DXCom::CommandExecution() {
 	command_->Execution();
 
 	command_->Reset();
-}
-
-void DXCom::IncreaseDescriptorIndex() {
-	descriptorIndex_++;
-}
-
-uint32_t DXCom::GetDescriptorIndex() const {
-	return descriptorIndex_;
 }
 
 void DXCom::SetRenderTargets() {
