@@ -2,6 +2,7 @@
 #include "GlobalVariables.h"
 
 #include "Rendering/PrimitiveDrawer.h"
+#include "Object/Boss.h"
 
 std::array<float, 5> Field::influenceOnSpeed_ {};
 std::array<Object3d*, 5> Field::staffNotation_ {};
@@ -36,6 +37,8 @@ void Field::Initialize(const std::array<Object3d*, 5>& models){
 }
 
 void Field::Update(){
+	Field::scrollX_ += pBoss_->GetMoveSpeed() * FPSKeeper::DeltaTime();
+
 }
 
 void Field::Draw(){
@@ -43,8 +46,7 @@ void Field::Draw(){
 		model->Draw();
 	}
 
-	//フィールドの終了線
-	PrimitiveDrawer::GetInstance()->DrawLine3d({fieldEndPosX+scrollX_,12.0f,0.0f}, {fieldEndPosX + scrollX_, 0.0f, 0.0f}, {0.0f,0.0f,0.0f,1.0f});
+	
 
 }
 

@@ -29,7 +29,7 @@ void EnemyManager::Update(){
         }
 
         //音符に変わっていない状態で削除ラインまで行くと消える
-        else if (!(*it)->GetIsChangedNote() && (*it)->GetTranslate().x <= Field::fieldEndPosX + Field::scrollX_ + (*it)->GetScale().x*0.5f){
+        else if (!(*it)->GetIsChangedNote() && (*it)->GetTranslate().x <= Field::fieldEndPosX + Field::scrollX_ + (*it)->GetScale().x * 0.5f){
             CollisionManager::GetInstance()->RemoveCollider((*it).get());
             it = noteEnemies_.erase(it);  // 安全に削除
         } else{

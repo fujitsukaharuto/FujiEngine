@@ -55,9 +55,12 @@ void GameScene::Initialize(){
 	obj3dCommon.reset(new Object3dCommon());
 	obj3dCommon->Initialize();
 
-	/*GlobalVariables* globalvariables = GlobalVariables::GetInstance();
-	const char* groupName = "Sphere";
+	GlobalVariables* globalvariables = GlobalVariables::GetInstance();
+	/*const char* groupName = "Sphere";
 	const char* groupName2 = "Fence";*/
+	const char* groupName = "camera";
+	globalvariables->CreateGroup(groupName);
+	globalvariables->AddItem(groupName, "cameraSpeed", cameraMoveSpeed_);
 
 
 	/*===============================================
@@ -146,6 +149,8 @@ void GameScene::Initialize(){
 	boss_->SetTranslate(Vector3 {-8.0f,6.0f,0.0f});//五線譜の真ん中に合わせる
 	boss_->SetScale(Vector3 {7.0f,7.0f,7.0f});
 
+	//ポインタをフィールドに渡す
+	field_->SetBoss(boss_.get());
 	//=======================================================================================
 	//↓音符になる敵(管理クラス)
 	enemyManager_ = std::make_unique<EnemyManager>();
@@ -164,20 +169,15 @@ void GameScene::Initialize(){
 }
 
 void GameScene::Update(){
-	// カメラの移動量はボスの移動速度と同期する
-	float cameraMoveSpeed = boss_->GetMoveSpeed() * FPSKeeper::DeltaTime();
-
-	// 現在のカメラ位置を取得
-	Vector3 currentCameraPos = CameraManager::GetInstance()->GetCamera()->transform.translate;
 
 	// ボスの移動量に応じてカメラを同じだけ移動させる
-	CameraManager::GetInstance()->GetCamera()->transform.translate.x = currentCameraPos.x + cameraMoveSpeed;
+	CameraManager::GetInstance()->GetCamera()->transform.translate.x += cameraMoveSpeed_ * FPSKeeper::DeltaTime();
 
 
 	#ifdef _DEBUG
 		field_->ShowImgui();
 
-	//ApplyGlobalVariables();
+	ApplyGlobalVariables();
 
 	//ImGui::Begin("suzunne");
 
@@ -311,13 +311,17 @@ void GameScene::LoadEnemyPopData(){
 
 void GameScene::ApplyGlobalVariables(){
 	GlobalVariables* globalVariables = GlobalVariables::GetInstance();
-	const char* groupName = "Sphere";
+	/*const char* groupName = "Sphere";
 	const char* groupName2 = "Fence";
 
 	spherePara = globalVariables->GetFloatValue(groupName, "parametar");
 	spherevec = globalVariables->GetVector3Value(groupName, "Position");
 
 	fencePara = globalVariables->GetFloatValue(groupName2, "parametar");
-	fencevec = globalVariables->GetVector3Value(groupName2, "Position");
+	fencevec = globalVariables->GetVector3Value(groupName2, "Position");*/
+
+	const char* groupName = "camera";
+	cameraMoveSpeed_ = globalVariables->GetFloatValue(groupName, "cameraSpeed");
+
 
 }
