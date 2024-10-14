@@ -4,10 +4,11 @@
 #include"Object3d.h"
 
 #include <array>
+#include <DirectXMath.h>
 
 class Field{
 public:
-	Field() = default;
+	Field();
 	~Field();
 
 	/// <summary>
@@ -25,6 +26,8 @@ public:
 	/// </summary>
 	void Draw();
 
+	void ShowImgui();
+
 	Vector3 GetPos(uint32_t index)const { return staffNotation_[index]->transform.translate; }
 
 public:
@@ -35,6 +38,8 @@ public:
 	static std::array<float, 5>influenceOnSpeed_ ;
 	//敵が消えるライン(x座標)
 	static float fieldEndPosX;
+
+	float magnification_ = 0.3f;
 
 	//線の幅(仮)
 	const float kLineSpace_ = 3.0f;
