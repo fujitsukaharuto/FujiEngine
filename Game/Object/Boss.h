@@ -14,6 +14,8 @@ public:
 
     void Draw()override;
 
+    float GetMoveSpeed()const;
+
 private:
     void Move();
 

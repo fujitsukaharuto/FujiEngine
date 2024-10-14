@@ -111,7 +111,7 @@ void NoteEnemy::OnCollision(Character* other){
 
 		//音符に代わっているときにボスと衝突したら消す
 		if (isChangedNote_){
-			MarkForRemoval();
+			isRemoved_ = true;
 		}
 
 	}

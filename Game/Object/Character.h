@@ -48,6 +48,7 @@ public:
 	void SetTranslate(const Vector3& pos,uint32_t modelNum =0);
 	void SetRotate(const Vector3& rotate, uint32_t modelNum = 0);
 	void SetScale(const Vector3& scale, uint32_t modelNum = 0);
+	const Vector3& GetScale(uint32_t modelNum = 0)const{ return models_[modelNum]->transform.scale; }
 
 	Vector3 GetWorldPosition()const;
 

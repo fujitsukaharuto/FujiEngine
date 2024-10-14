@@ -126,7 +126,7 @@ void GameScene::Initialize(){
 	playerModels_.emplace_back(playerModel);
 
 	float playerInitiOffset = 10.0f;
-	Vector3 playerInitPosition = {field_->fieldEndPosX+playerInitiOffset,0.0f,0.0f};
+	Vector3 playerInitPosition = {field_->fieldEndPosX + playerInitiOffset,0.0f,0.0f};
 	player_ = std::make_unique<Player>();
 	player_->Initialize(playerModels_);
 	player_->SetTranslate(playerInitPosition);
@@ -164,9 +164,18 @@ void GameScene::Initialize(){
 }
 
 void GameScene::Update(){
+	// カメラの移動量はボスの移動速度と同期する
+	float cameraMoveSpeed = boss_->GetMoveSpeed() * FPSKeeper::DeltaTime();
 
-#ifdef _DEBUG
-	field_->ShowImgui();
+	// 現在のカメラ位置を取得
+	Vector3 currentCameraPos = CameraManager::GetInstance()->GetCamera()->transform.translate;
+
+	// ボスの移動量に応じてカメラを同じだけ移動させる
+	CameraManager::GetInstance()->GetCamera()->transform.translate.x = currentCameraPos.x + cameraMoveSpeed;
+
+
+	#ifdef _DEBUG
+		field_->ShowImgui();
 
 	//ApplyGlobalVariables();
 

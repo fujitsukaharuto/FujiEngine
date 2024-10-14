@@ -34,9 +34,15 @@ void Boss::Draw(){
 	Character::Draw();
 }
 
+
 void Boss::Move(){
 
 	Field::scrollX_ += moveSpeed_ * FPSKeeper::DeltaTime();
 
 	models_[0]->transform.translate.x += moveSpeed_ * FPSKeeper::DeltaTime();
+}
+
+
+float Boss::GetMoveSpeed() const{
+	return moveSpeed_;
 }
