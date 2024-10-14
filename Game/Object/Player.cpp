@@ -5,7 +5,10 @@
 #include "Collision/SphereCollider.h"
 #include "Collision/BoxCollider.h"
 
+#include "Field/Field.h"
+
 #include<algorithm>
+#undef max            // マクロ版のmaxを無効化dddaada
 
 Player::Player() : Character(std::make_unique<SphereCollider>()){
 	SphereCollider* sphereCollider = dynamic_cast< SphereCollider* >(collider_.get());
@@ -31,6 +34,11 @@ void Player::Update(){
 	this->Move();
 
 	models_[0]->transform.translate += velocity_;
+
+	float moveEndPosX = Field::fieldEndPosX + Field::scrollX_ + models_[0]->transform.scale.x * 0.5f;
+
+	// フィールドの左端に行かないようにstd::maxを使用
+	models_[0]->transform.translate.x = std::max(models_[0]->transform.translate.x, moveEndPosX);
 }
 
 void Player::Draw(){
@@ -50,6 +58,9 @@ void Player::Move(){
 	}
 
 	velocity_.x = moveSpeed_;
+
+
+
 }
 
 void Player::Jump(){

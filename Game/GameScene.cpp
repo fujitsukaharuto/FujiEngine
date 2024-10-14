@@ -125,7 +125,8 @@ void GameScene::Initialize(){
 	playerModel->Create("debugCube.obj");
 	playerModels_.emplace_back(playerModel);
 
-	Vector3 playerInitPosition = {field_->fieldEndPosX,0.0f,0.0f};
+	float playerInitiOffset = 10.0f;
+	Vector3 playerInitPosition = {field_->fieldEndPosX+playerInitiOffset,0.0f,0.0f};
 	player_ = std::make_unique<Player>();
 	player_->Initialize(playerModels_);
 	player_->SetTranslate(playerInitPosition);

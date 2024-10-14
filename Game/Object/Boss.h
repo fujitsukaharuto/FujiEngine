@@ -13,6 +13,12 @@ public:
     void Update()override;
 
     void Draw()override;
-    
+
+private:
+    void Move();
+
+private:
+
+    float moveSpeed_ = 0.01f;
 };
 

@@ -39,6 +39,8 @@ public:
 	//敵が消えるライン(x座標)
 	static float fieldEndPosX;
 
+	static float scrollX_;
+
 	float magnification_ = 0.3f;
 
 	//線の幅(仮)

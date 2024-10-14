@@ -6,6 +6,7 @@
 std::array<float, 5> Field::influenceOnSpeed_ {};
 std::array<Object3d*, 5> Field::staffNotation_ {};
 float Field::fieldEndPosX = 2.0f;
+float Field::scrollX_ = 0.0f;
 
 Field::Field(){
 	const char* groupName = "field";
@@ -43,7 +44,7 @@ void Field::Draw(){
 	}
 
 	//フィールドの終了線
-	PrimitiveDrawer::GetInstance()->DrawLine3d({fieldEndPosX,12.0f,0.0f}, {fieldEndPosX, 0.0f, 0.0f}, {0.0f,0.0f,0.0f,1.0f});
+	PrimitiveDrawer::GetInstance()->DrawLine3d({fieldEndPosX+scrollX_,12.0f,0.0f}, {fieldEndPosX + scrollX_, 0.0f, 0.0f}, {0.0f,0.0f,0.0f,1.0f});
 
 }
 
