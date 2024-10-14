@@ -1,6 +1,7 @@
 #include "Collision/SphereCollider.h"
 #include "Collision/BoxCollider.h"
 
+#include <algorithm>
 
 bool SphereCollider::Intersects(const Collider& other) const{
     if (const BoxCollider* box = dynamic_cast< const BoxCollider* >(&other)){
@@ -26,8 +27,19 @@ bool SphereCollider::IntersectsSphere(const SphereCollider& other) const{
     return distanceSquared <= (radiusSum * radiusSum);
 }
 
-bool SphereCollider::IntersectsBox(const BoxCollider& other) const{
-    // Sphere vs Box の衝突判定
-    return other.IntersectsSphere(*this);
+bool SphereCollider::IntersectsBox(const BoxCollider& aabb) const{
+    // AABBの近い点を計算して、球の中心からの距離を求める
+    Vector3 closestPoint(
+        std::max(aabb.min_.x, std::min(position_.x, aabb.max_.x)),
+        std::max(aabb.min_.y, std::min(position_.y, aabb.max_.y)),
+        std::max(aabb.min_.z, std::min(position_.z, aabb.max_.z))
+    );
 
+    // 球の中心と最も近い点との距離の2乗を計算
+    Vector3 diff = position_ - closestPoint;
+    float distanceSquared = diff.LengthSquared();
+    collisionNormal_ = diff.Normalize();
+
+    // 距離の2乗が半径の2乗より小さければ衝突
+    return distanceSquared < (radius_ * radius_);
 }
