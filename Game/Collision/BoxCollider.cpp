@@ -15,19 +15,7 @@ bool BoxCollider::Intersects(const Collider& other) const{
 }
 
 bool BoxCollider::IntersectsSphere(const SphereCollider& sphere) const{
-    // AABBの近い点を計算して、球の中心からの距離を求める
-    Vector3 closestPoint(
-        std::max(min_.x, std::min(sphere.GetPosition().x, max_.x)),
-        std::max(min_.y, std::min(sphere.GetPosition().y, max_.y)),
-        std::max(min_.z, std::min(sphere.GetPosition().z, max_.z))
-    );
-
-    // 球の中心と最も近い点との距離の2乗を計算
-    Vector3 diff = sphere.GetPosition() - closestPoint;
-    float distanceSquared = diff.LengthSquared();
-
-    // 距離の2乗が半径の2乗より小さければ衝突
-    return distanceSquared < (sphere.GetRadius() * sphere.GetRadius());
+    return sphere.IntersectsBox(*this);
 }
 
 bool BoxCollider::IntersectsBox(const BoxCollider& other) const{

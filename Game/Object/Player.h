@@ -25,6 +25,12 @@ public:
 	/// </summary>
 	void Draw()override;
 
+	/// <summary>
+	/// 衝突時反応
+	/// </summary>
+	/// <param name="other"></param>
+	void OnCollision([[maybe_unused]] Character* other);
+
 private:
 	/// <summary>
 	/// 移動
@@ -36,6 +42,7 @@ private:
 	/// </summary>
 	void Jump();
 
+	Vector3 CalculateNormal(const Vector3& spherePosition, const Vector3& aabbMin, const Vector3& aabbMax);
 private:
 	//移動スピード
 	float moveSpeed_= 0.1f;

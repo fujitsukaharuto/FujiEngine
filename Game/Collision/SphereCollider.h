@@ -25,6 +25,7 @@ public:
     // Sphere vs AABB の衝突判定
     bool IntersectsBox(const BoxCollider& other) const override;
 
+public:
     /////////////////////////////////////////////////////////////////////////////////////////
     //				アクセッサ
     /////////////////////////////////////////////////////////////////////////////////////////
@@ -34,8 +35,13 @@ public:
     const Vector3& GetPosition()const{ return position_; }
     void SetPosition(const Vector3& position){ position_ = position; }
 
+    const Vector3& GetCollisionNormal()const{ return collisionNormal_; }
+    void SetCollisionNormal(const Vector3& normal){ collisionNormal_ = normal; }
+
 public:
     float radius_;
 
     Vector3 position_;
+
+    mutable Vector3 collisionNormal_; // mutableを使用して、constメソッド内でも変更可能に
 };

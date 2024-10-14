@@ -38,7 +38,7 @@ public:
 	/// <param name="sphere"></param>
 	/// <returns></returns>
 	virtual bool IntersectsSphere(const SphereCollider& sphere) const = 0;
-	virtual bool IntersectsBox(const BoxCollider& box) const = 0;
+	virtual bool IntersectsBox(const BoxCollider& box)const = 0;
 
 	/////////////////////////////////////////////////////////////////////////////////////////
 	//				アクセッサ
