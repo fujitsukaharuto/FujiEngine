@@ -32,10 +32,9 @@ public:
 
 	void Update();
 
+	void Draw();
+
 	static void CreateParticleGroup(const std::string name, const std::string fileName);
-
-
-
 
 private:
 

@@ -9,6 +9,7 @@
 #include "ModelManager.h"
 #include "PointLightManager.h"
 #include "CameraManager.h"
+#include "ParticleManager.h"
 
 
 // やること
@@ -32,6 +33,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	ModelManager* modelManager = nullptr;
 
 	PointLightManager* pointLightManager = nullptr;
+	ParticleManager* pManager = nullptr;
 
 
 	// ゲームウィンドウの作成
@@ -72,6 +74,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	textureManager = TextureManager::GetInstance();
 	modelManager = ModelManager::GetInstance();
+
+
+	pManager = ParticleManager::GetInstance();
+	pManager->Initialize(dxCommon, srvManager);
+	pManager->CreateParticleGroup("test", "uvChecker.png");
+
 
 	pointLightManager = PointLightManager::GetInstance();
 	pointLightManager->AddPointLight();

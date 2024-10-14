@@ -6,6 +6,8 @@
 #include "FPSKeeper.h"
 #include "Random.h"
 
+#include "ParticleManager.h"
+
 
 GameScene::GameScene() {}
 
@@ -144,6 +146,8 @@ void GameScene::Update() {
 	fence->transform.rotate.x = 0.5f;
 
 
+	ParticleManager::GetInstance()->Update();
+
 }
 
 void GameScene::Draw() {
@@ -164,6 +168,8 @@ void GameScene::Draw() {
 		suzunneModel->Draw();
 	}
 	terrain->Draw();
+
+	ParticleManager::GetInstance()->Draw();
 
 #pragma endregion
 
