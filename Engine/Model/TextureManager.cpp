@@ -101,7 +101,7 @@ Texture* TextureManager::LoadTexture(const std::string& filename) {
 	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource;
 
 	intermediateResource.Reset();
-
+	intermediateResource = UploadTextureData(texture->textureResource, mipImages, DXCom::GetInstance()->GetDevice(), DXCom::GetInstance()->GetCommandList());
 
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
 	srvDesc.Format = metadata.format;
@@ -111,7 +111,6 @@ Texture* TextureManager::LoadTexture(const std::string& filename) {
 
 	const uint32_t descriptorSizeSRV = DXCom::GetInstance()->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-	intermediateResource = UploadTextureData(texture->textureResource, mipImages, DXCom::GetInstance()->GetDevice(), DXCom::GetInstance()->GetCommandList());
 	texture->cpuHandle = DXCom::GetInstance()->GetCPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, DXCom::GetInstance()->GetDescriptorIndex());
 	texture->gpuHandle = DXCom::GetInstance()->GetGPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, DXCom::GetInstance()->GetDescriptorIndex());
 

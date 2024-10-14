@@ -143,6 +143,15 @@
     <ClCompile Include="Random.cpp">
       <Filter>Engine\Math</Filter>
     </ClCompile>
+    <ClCompile Include="ParticleManager.cpp">
+      <Filter>Engine\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="Particle.cpp">
+      <Filter>Engine\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="SRVManager.cpp">
+      <Filter>Engine\DX</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -298,6 +307,15 @@
     <ClInclude Include="Random.h">
       <Filter>Engine\Math</Filter>
     </ClInclude>
+    <ClInclude Include="ParticleManager.h">
+      <Filter>Engine\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="Particle.h">
+      <Filter>Engine\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="SRVManager.h">
+      <Filter>Engine\DX</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -356,6 +374,9 @@
     </Filter>
     <Filter Include="Engine\Light">
       <UniqueIdentifier>{bbaf8ed5-8934-40c2-981e-ec659d17c094}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Particle">
+      <UniqueIdentifier>{3102e485-29ad-45b9-aa83-d99616131e4c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
