@@ -183,12 +183,11 @@ void EnemyManager::CreateChainEnemy(int fieldIndex){
 
 void EnemyManager::CreateUnChainEnemy(int fieldIndex){
     // 敵を生成しリストに追加
-    std::unique_ptr<NoteEnemy> noteEnemy = std::make_unique<NoteEnemy>();
+    NoteEnemy* noteEnemy = new NoteEnemy();
     Object3d* noteEnemyModel = CreateSingleEnemyModel();
 
-    noteEnemy->Initialize(noteEnemyModel);
+    noteEnemy->Initialize(noteEnemyModel, GetSpawnPosition(fieldIndex));
     noteEnemy->SetFieldIndex(fieldIndex - 1);
-    noteEnemy->SetTranslate(GetSpawnPosition(fieldIndex));
 
     noteEnemies_.emplace_back(std::move(noteEnemy));
 }

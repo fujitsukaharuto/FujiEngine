@@ -28,7 +28,7 @@ void ChainEnemy::Initialize(std::array<Object3d*, 2> models){
 void ChainEnemy::Initialize(std::array<Object3d*, 2> models, const Vector3& pos){
 	for (size_t i = 0; i < 2; i++){
 		connectedEnemies_[i] = std::make_unique<NoteEnemy>();
-		connectedEnemies_[i]->Initialize(models[i]);
+		connectedEnemies_[i]->Initialize(models[i],pos);
 	}
 
 	// 一つ目の敵の位置を設定

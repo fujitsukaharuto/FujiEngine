@@ -34,6 +34,8 @@ public:
     /// <returns></returns>
     float GetMoveSpeed()const;
 
+    void OnCollision(Character* other)override;
+
 private:
     void Move();
 
@@ -42,10 +44,17 @@ private:
     /// </summary>
     void ApplyGlobalVariables();
 
+    /// <summary>
+    /// 衝突したときに一時的に止める
+    /// </summary>
+    void StopMoveForCollision(uint32_t time);
+
 private:
     /// <summary>
     /// 移動測度
     /// </summary>
-    float moveSpeed_ = 0.02f;
+    float moveSpeed_ = 0.02f;            // 移動速度
+    const float originalSpeed_ = moveSpeed_;        // 元の移動速度を保存するための変数
+    int32_t stopMoveTimer_;      // 移動停止時間のカウンター
 };
 

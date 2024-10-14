@@ -18,6 +18,8 @@ public:
 	void Initialize(Object3d* model)override;
 	void Initialize(std::vector<Object3d*> models, const Vector3& initPos);
 
+	void Initialize(Object3d* model, const Vector3& initPos);
+
 	/// <summary>
 	/// 更新
 	/// </summary>
