@@ -1,5 +1,6 @@
 #pragma once
 #include <wrl/client.h>
+#include <map>
 #include "Model.h"
 #include "MatrixCalculation.h"
 
@@ -29,6 +30,8 @@ public:
 
 	void Initialize(DXCom* dxcom, SRVManager* srvManager);
 
+	void Update();
+
 	static void CreateParticleGroup(const std::string name, const std::string fileName);
 
 
@@ -42,6 +45,7 @@ private:
 
 	DXCom* dxCommon_;
 	SRVManager* srvManager_;
+	Camera* camera_;
 
 	std::unordered_map<std::string, ParticleGroup> particleGroups_;
 

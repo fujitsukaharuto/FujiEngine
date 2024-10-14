@@ -1,6 +1,7 @@
 #include "ParticleManager.h"
 #include "DXCom.h"
 #include "SRVManager.h"
+#include "CameraManager.h"
 #include "Particle.h"
 
 
@@ -21,7 +22,7 @@ void ParticleManager::Initialize(DXCom* dxcom, SRVManager* srvManager) {
 
 	dxCommon_ = dxcom;
 	srvManager_ = srvManager;
-
+	this->camera_ = CameraManager::GetInstance()->GetCamera();
 
 	vertex_.push_back({ {-1.0f,-1.0f,0.0f,1.0f},{0.0f,0.0f},{0.0f,0.0f,-1.0f} });
 	vertex_.push_back({ {-1.0f,1.0f,0.0f,1.0f},{0.0f,1.0f},{0.0f,0.0f,-1.0f} });
@@ -62,6 +63,22 @@ void ParticleManager::Initialize(DXCom* dxcom, SRVManager* srvManager) {
 
 }
 
+void ParticleManager::Update() {
+
+
+	for (auto& group : particleGroups_) {
+		for (auto& particle : group.second.particles_) {
+
+			if (particle.lifeTime_ <= 0) {
+				particle.isLive_ = false;
+			}
+
+
+		}
+	}
+
+}
+
 void ParticleManager::CreateParticleGroup(const std::string name, const std::string fileName) {
 
 	ParticleManager* instance = GetInstance();
@@ -72,21 +89,23 @@ void ParticleManager::CreateParticleGroup(const std::string name, const std::str
 	}
 
 
-
 	ParticleGroup newGroup;
 	newGroup.material_ = new Material();
 	newGroup.material_->SetTextureNamePath(fileName);
 	newGroup.material_->CreateMaterial();
 
 
-	newGroup.srvIndex_ = instance->srvManager_->Allocate();
-
 	newGroup.insstanceCount_ = 20;
 	newGroup.instancing_ = instance->dxCommon_->CreateBufferResource(instance->dxCommon_->GetDevice(), sizeof(TransformationParticleMatrix) * newGroup.insstanceCount_);
 
 
+	newGroup.srvIndex_ = instance->srvManager_->Allocate();
+	instance->srvManager_->CreateStructuredSRV(newGroup.srvIndex_, newGroup.instancing_.Get(), newGroup.insstanceCount_, sizeof(TransformationParticleMatrix));
+
+	//ここでパーティクルをあらかじめ作る
 
 
 
+	instance->particleGroups_.insert(std::make_pair(name, newGroup));
 
 }
