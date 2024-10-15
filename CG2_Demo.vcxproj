@@ -136,7 +136,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\Field\MapChipField.cpp" />
     <ClCompile Include="Game\GameScene.cpp" />
     <ClCompile Include="GlobalVariables.cpp" />
-    <ClCompile Include="Line3dDrawer.cpp" />
     <ClCompile Include="Line3dPipe.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ModelCommon.cpp" />
@@ -146,8 +145,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="PipelineManager.cpp" />
     <ClCompile Include="PointLight.cpp" />
     <ClCompile Include="PointLightManager.cpp" />
-    <ClCompile Include="RailCamera.cpp" />
-    <ClCompile Include="RailEditor.cpp" />
     <ClCompile Include="SpotLight.cpp" />
     <ClCompile Include="Sprite.cpp" />
   </ItemGroup>
@@ -192,7 +189,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Game\Field\MapChipField.h" />
     <ClInclude Include="Game\GameScene.h" />
     <ClInclude Include="GlobalVariables.h" />
-    <ClInclude Include="Line3dDrawer.h" />
     <ClInclude Include="Line3dPipe.h" />
     <ClInclude Include="ModelCommon.h" />
     <ClInclude Include="ModelManager.h" />
@@ -201,8 +197,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="PipelineManager.h" />
     <ClInclude Include="PointLight.h" />
     <ClInclude Include="PointLightManager.h" />
-    <ClInclude Include="RailCamera.h" />
-    <ClInclude Include="RailEditor.h" />
     <ClInclude Include="SpotLight.h" />
     <ClInclude Include="Sprite.h" />
   </ItemGroup>
