@@ -12,6 +12,8 @@ public:
 
 	void Emit();
 
+	void Burst();
+
 	void RandomSpeed(const Vector2& x, const Vector2& y, const Vector2& z);
 	void RandomTranslate(const Vector2& x, const Vector2& y, const Vector2& z);
 

@@ -44,6 +44,14 @@ void NoteEnemy::Initialize(Object3d* model, const Vector3& initPos){
 
 	//最初の状態をセット
 	currentState_ = std::make_unique<NoteEnemyState_Enemy>(this);
+
+
+	emit.name = "noteChange";
+	emit.count = 3;
+	emit.grain.lifeTime_ = 20;
+	emit.RandomSpeed({ -0.07f,0.07f }, { -0.00f,0.04f }, { -0.001f,0.000f });
+	emit.RandomTranslate({ -0.1f,0.1f }, { -0.1f,0.1f }, { -0.5f,0.0f });
+	emit.grain.transform.scale = { 3.0f,3.0f,1.0f };
 }
 
 void NoteEnemy::Update(){
@@ -55,6 +63,11 @@ void NoteEnemy::Update(){
 	//音符に変わったらモデルを変える(一時的に色を変えている)
 	if (isChangedNote_){
 		models_[0]->SetColor({0.0f,0.0f,0.0f,1.0f});
+		if (isChanegeEffect_) {
+			emit.pos = GetCenterPos();
+			emit.Burst();
+			isChanegeEffect_ = false;
+		}
 	}
 
 	//状態の更新

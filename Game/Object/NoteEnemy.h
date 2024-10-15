@@ -1,5 +1,6 @@
 #pragma once
 #include "Character.h"
+#include "ParticleEmitter.h"
 #include "Object/NoteEnemyState/NoteEnemyState_Base.h"
 
 /// <summary>
@@ -70,6 +71,9 @@ private:
 	//音符に変わったかどうか
 	bool isChangedNote_;
 
+	// effect
+	bool isChanegeEffect_ = true;
+
 	//移動速度
 	float moveSpeed_ = 1.0f;
 
@@ -83,4 +87,6 @@ private:
 
 	//リストから削除フラグ
 	bool isRemoved_ = false;
+
+	ParticleEmitter emit;
 };
