@@ -21,9 +21,9 @@ public:
 		Material material_;
 		std::list<Particle> particles_;
 		uint32_t srvIndex_;
-		ComPtr<ID3D12Resource> instancing_;
+		ComPtr<ID3D12Resource> instancing_ = nullptr;
 		uint32_t insstanceCount_;
-		TransformationParticleMatrix* instancingData_;
+		TransformationParticleMatrix* instancingData_ = nullptr;
 	};
 
 	static ParticleManager* GetInstance();

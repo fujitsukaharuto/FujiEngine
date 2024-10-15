@@ -52,7 +52,7 @@ void SRVManager::CreateStructuredSRV(uint32_t srvIndex, ID3D12Resource* resource
 	instancingSrvDesc.Buffer.FirstElement = 0;
 	instancingSrvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
 	instancingSrvDesc.Buffer.NumElements = numElements;
-	instancingSrvDesc.Buffer.StructureByteStride = sizeof(structureByteStride);
+	instancingSrvDesc.Buffer.StructureByteStride = structureByteStride;
 
 	dxcommon_->GetDevice()->CreateShaderResourceView(resource, &instancingSrvDesc, GetCPUDescriptorHandle(srvIndex));
 
