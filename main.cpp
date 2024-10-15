@@ -149,6 +149,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	
 	audio->Finalize();
 	imguiManager->Fin();
+	pManager->Finalize();
 	textureManager->Finalize();
 	modelManager->Finalize();
 	srvManager->Finalize();

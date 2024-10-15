@@ -63,23 +63,33 @@ void ParticleManager::Initialize(DXCom* dxcom, SRVManager* srvManager) {
 
 }
 
+void ParticleManager::Finalize() {
+	for (auto& groupPair : particleGroups_) {
+
+		delete groupPair.second;
+
+	}
+	particleGroups_.clear();
+}
+
 void ParticleManager::Update() {
 
 
-	for (auto& group : particleGroups_) {
+	for (auto& groupPair : particleGroups_) {
+
+		ParticleGroup* group = groupPair.second;
 
 		int particleCount = 0;
-		float addpos = 0.01f;
-		for (auto& particle : group.second.particles_) {
+		float addpos = 1.5f;
+		for (auto& particle : group->particles_) {
 
 			if (particle.lifeTime_ <= 0) {
 				particle.isLive_ = false;
 			}
 
-			particle.transform.translate.x += addpos;
-			particle.transform.translate.y += addpos;
+			particle.transform.translate.y = addpos;
 
-			addpos += 0.002f;
+			addpos += 0.05f;
 
 			Matrix4x4 worldMatrix = MakeAffineMatrix(particle.transform.scale, particle.transform.rotate, particle.transform.translate);
 			Matrix4x4 worldViewProjectionMatrix;
@@ -92,9 +102,10 @@ void ParticleManager::Update() {
 				worldViewProjectionMatrix = worldMatrix;
 			}
 
-			group.second.instancingData_[particleCount].World = worldMatrix;
-			group.second.instancingData_[particleCount].WVP = worldViewProjectionMatrix;
+			group->instancingData_[particleCount].World = worldMatrix;
+			group->instancingData_[particleCount].WVP = worldViewProjectionMatrix;
 
+			particleCount++;
 		}
 	}
 
@@ -109,12 +120,14 @@ void ParticleManager::Draw() {
 	dxCommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vbView);
 	dxCommon_->GetCommandList()->IASetIndexBuffer(&ibView);
 
-	for (auto& group : particleGroups_) {
-		dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, group.second.material_->GetMaterialResource()->GetGPUVirtualAddress());
-		dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group.second.srvIndex_));
-		dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, group.second.material_->GetTexture()->gpuHandle);
+	for (auto& groupPair : particleGroups_) {
+		ParticleGroup* group = groupPair.second;
 
-		dxCommon_->GetCommandList()->DrawIndexedInstanced(6, group.second.insstanceCount_, 0, 0, 0);
+		dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, group->material_.GetMaterialResource()->GetGPUVirtualAddress());
+		dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group->srvIndex_));
+		dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, group->material_.GetTexture()->gpuHandle);
+
+		dxCommon_->GetCommandList()->DrawIndexedInstanced(6, group->insstanceCount_, 0, 0, 0);
 	}
 
 }
@@ -129,25 +142,33 @@ void ParticleManager::CreateParticleGroup(const std::string name, const std::str
 	}
 
 
-	ParticleGroup newGroup;
-	newGroup.material_ = new Material();
-	newGroup.material_->SetTextureNamePath(fileName);
-	newGroup.material_->CreateMaterial();
+	ParticleGroup* newGroup = new ParticleGroup();
+	newGroup->material_.SetTextureNamePath(fileName);
+	newGroup->material_.CreateMaterial();
 
 
-	newGroup.insstanceCount_ = 20;
-	newGroup.instancing_ = instance->dxCommon_->CreateBufferResource(instance->dxCommon_->GetDevice(), sizeof(TransformationParticleMatrix) * newGroup.insstanceCount_);
+	newGroup->insstanceCount_ = 20;
+	newGroup->instancing_ = instance->dxCommon_->CreateBufferResource(instance->dxCommon_->GetDevice(), (sizeof(TransformationParticleMatrix) * newGroup->insstanceCount_));
+	newGroup->instancing_->Map(0, nullptr, reinterpret_cast<void**>(&newGroup->instancingData_));
+	uint32_t max = newGroup->insstanceCount_;
+	for (uint32_t index = 0; index < max; ++index) {
+		newGroup->instancingData_[index].WVP = MakeIdentity4x4();
+		newGroup->instancingData_[index].World = MakeIdentity4x4();
+	}
 
+	newGroup->srvIndex_ = instance->srvManager_->Allocate();
+	instance->srvManager_->CreateStructuredSRV(newGroup->srvIndex_, newGroup->instancing_.Get(), newGroup->insstanceCount_, sizeof(TransformationParticleMatrix));
 
-	newGroup.srvIndex_ = instance->srvManager_->Allocate();
-	instance->srvManager_->CreateStructuredSRV(newGroup.srvIndex_, newGroup.instancing_.Get(), newGroup.insstanceCount_, sizeof(TransformationParticleMatrix));
-
-	int max= newGroup.insstanceCount_;
 
 	//ここでパーティクルをあらかじめ作る
-	for (int i = 0; i < max; i++) {
+	float add = 0.1f;
+	for (int i = 0; i < int(max); i++) {
 		Particle p{};
-		newGroup.particles_.push_back(p);
+		p.transform.scale = { 1.0f,1.0f,1.0f };
+		p.transform.translate.x += add;
+		p.transform.translate.y += add;
+		newGroup->particles_.push_back(p);
+		add += 0.1f;
 	}
 
 

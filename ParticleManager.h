@@ -18,7 +18,7 @@ public:
 public:
 
 	struct ParticleGroup {
-		Material* material_;
+		Material material_;
 		std::list<Particle> particles_;
 		uint32_t srvIndex_;
 		ComPtr<ID3D12Resource> instancing_;
@@ -29,6 +29,8 @@ public:
 	static ParticleManager* GetInstance();
 
 	void Initialize(DXCom* dxcom, SRVManager* srvManager);
+
+	void Finalize();
 
 	void Update();
 
@@ -46,7 +48,7 @@ private:
 	SRVManager* srvManager_;
 	Camera* camera_;
 
-	std::unordered_map<std::string, ParticleGroup> particleGroups_;
+	std::unordered_map<std::string, ParticleGroup*> particleGroups_;
 
 
 	ComPtr<ID3D12Resource> vBuffer_;
