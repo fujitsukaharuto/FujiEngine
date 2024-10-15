@@ -3,12 +3,14 @@
 #include "GameScene.h"
 #include "TextureManager.h"
 #include "ImGuiManager.h"
+#include "SRVManager.h"
 #include "MyWindow.h"
 #include "GlobalVariables.h"
 #include "ModelManager.h"
 #include "PointLightManager.h"
 #include "CameraManager.h"
 #include "Line3dDrawer.h"
+#include "ParticleManager.h"
 
 
 // やること
@@ -22,9 +24,11 @@
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	MyWin* win = nullptr;
 	DXCom* dxCommon = nullptr;
+	SRVManager* srvManager = nullptr;
 	// 汎用
 	Input* input = nullptr;
 	Audio* audio = nullptr;
+	FPSKeeper* fpsKeeper = nullptr;
 	GameScene* gameScene = nullptr;
 	TextureManager* textureManager = nullptr;
 	ModelManager* modelManager = nullptr;
@@ -33,6 +37,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	CameraManager* cameraManager = nullptr;
 	DebugCamera* camera = nullptr;
 	Line3dDrawer* line3dDrawer = nullptr;
+	ParticleManager* pManager = nullptr;
 
 
 	// ゲームウィンドウの作成
@@ -43,7 +48,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	dxCommon = DXCom::GetInstance();
 	dxCommon->Initialize(win);
 
+	srvManager = SRVManager::GetInstance();
+	srvManager->Initialize();
 
+	fpsKeeper = FPSKeeper::GetInstance();
+	fpsKeeper->Initialize();
+
+	DebugCamera* camera = nullptr;
 	camera = DebugCamera::GetInstance();
 	camera->Initialize();
 
@@ -73,6 +84,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	textureManager = TextureManager::GetInstance();
 	modelManager = ModelManager::GetInstance();
 
+
+	pManager = ParticleManager::GetInstance();
+	pManager->Initialize(dxCommon, srvManager);
+	pManager->CreateParticleGroup("test", "uvChecker.png");
+
+
 	pointLightManager = PointLightManager::GetInstance();
 	pointLightManager->AddPointLight();
 	pointLightManager->AddSpotLight();
@@ -93,6 +110,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//ウィンドウのxボタンが押されるまでループ
 	while (!win->ProcessMessage())
 	{
+
+		fpsKeeper->Update();
 
 #ifdef _DEBUG
 		// ImGui受付
@@ -139,8 +158,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	
 	audio->Finalize();
 	imguiManager->Fin();
+	pManager->Finalize();
 	textureManager->Finalize();
 	modelManager->Finalize();
+	srvManager->Finalize();
 
 	// ゲームウィンドウの破棄
 	win->Finalize();

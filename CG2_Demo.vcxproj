@@ -60,7 +60,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <TreatWarningAsError>true</TreatWarningAsError>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir)externals;$(ProjectDir)Game;$(ProjectDir)Engine/WinApp;$(ProjectDir)Engine/Model;$(ProjectDir)Engine/Math;$(ProjectDir)Engine/Logger;$(ProjectDir)Engine/Input;$(ProjectDir)Engine/ImGuiManager;$(ProjectDir)Engine/GraphicPipeline;$(ProjectDir)Engine/DX;$(ProjectDir)Engine/DebugCamera;$(ProjectDir)Engine/Audio;$(ProjectDir)Engine;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)externals;$(ProjectDir)Game;$(ProjectDir)Engine/WinApp;$(ProjectDir)Engine/Model;$(ProjectDir)Engine/Math;$(ProjectDir)Engine/Logger;$(ProjectDir)Engine/Light;$(ProjectDir)Engine/Input;$(ProjectDir)Engine/ImGuiManager;$(ProjectDir)Engine/GraphicPipeline;$(ProjectDir)Engine/GlobalVariables;$(ProjectDir)Engine/DX;$(ProjectDir)Engine/DebugCamera;$(ProjectDir)Engine/Audio;$(ProjectDir)Engine;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -85,7 +85,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir)externals;$(ProjectDir)Game;$(ProjectDir)Engine/WinApp;$(ProjectDir)Engine/Model;$(ProjectDir)Engine/Math;$(ProjectDir)Engine/Logger;$(ProjectDir)Engine/Input;$(ProjectDir)Engine/ImGuiManager;$(ProjectDir)Engine/GraphicPipeline;$(ProjectDir)Engine/DX;$(ProjectDir)Engine/DebugCamera;$(ProjectDir)Engine/Audio;$(ProjectDir)Engine;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)externals;$(ProjectDir)Game;$(ProjectDir)Engine/WinApp;$(ProjectDir)Engine/Model;$(ProjectDir)Engine/Math;$(ProjectDir)Engine/Logger;$(ProjectDir)Engine/Light;$(ProjectDir)Engine/Input;$(ProjectDir)Engine/ImGuiManager;$(ProjectDir)Engine/GraphicPipeline;$(ProjectDir)Engine/GlobalVariables;$(ProjectDir)Engine/DX;$(ProjectDir)Engine/DebugCamera;$(ProjectDir)Engine/Audio;$(ProjectDir)Engine;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -100,14 +100,15 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="CameraManager.cpp" />
-    <ClCompile Include="DirectionLight.cpp" />
     <ClCompile Include="Engine\Audio\Audio.cpp" />
+    <ClCompile Include="Engine\DebugCamera\Camera.cpp" />
+    <ClCompile Include="Engine\DebugCamera\CameraManager.cpp" />
     <ClCompile Include="Engine\DebugCamera\DebugCamera.cpp" />
     <ClCompile Include="Engine\DX\DXCom.cpp" />
     <ClCompile Include="Engine\DX\DXCommand.cpp" />
     <ClCompile Include="Engine\DX\DXCompil.cpp" />
+    <ClCompile Include="Engine\DX\FPSKeeper.cpp" />
+    <ClCompile Include="Engine\GlobalVariables\GlobalVariables.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\BasePipeline.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\GaussPipeline.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\GrayPipeline.cpp" />
@@ -115,8 +116,13 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\GraphicPipeline\NonePipeline.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\ParticlePipeline.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\Pipeline.cpp" />
+    <ClCompile Include="Engine\GraphicPipeline\PipelineManager.cpp" />
     <ClCompile Include="Engine\ImGuiManager\ImGuiManager.cpp" />
     <ClCompile Include="Engine\Input\Input.cpp" />
+    <ClCompile Include="Engine\Light\DirectionLight.cpp" />
+    <ClCompile Include="Engine\Light\PointLight.cpp" />
+    <ClCompile Include="Engine\Light\PointLightManager.cpp" />
+    <ClCompile Include="Engine\Light\SpotLight.cpp" />
     <ClCompile Include="Engine\Logger\Logger.cpp" />
     <ClCompile Include="Engine\Math\MatrixCalculation.cpp" />
     <ClCompile Include="Engine\Math\MyVec2.cpp" />
@@ -124,6 +130,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Model\Material.cpp" />
     <ClCompile Include="Engine\Model\Mesh.cpp" />
     <ClCompile Include="Engine\Model\Model.cpp" />
+    <ClCompile Include="Engine\Model\ModelCommon.cpp" />
+    <ClCompile Include="Engine\Model\ModelManager.cpp" />
+    <ClCompile Include="Engine\Model\Object3d.cpp" />
+    <ClCompile Include="Engine\Model\Object3dCommon.cpp" />
+    <ClCompile Include="Engine\Model\Sprite.cpp" />
     <ClCompile Include="Engine\Model\TextureManager.cpp" />
     <ClCompile Include="Engine\WinApp\MyWindow.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp" />
@@ -150,16 +161,22 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="RailEditor.cpp" />
     <ClCompile Include="SpotLight.cpp" />
     <ClCompile Include="Sprite.cpp" />
+    <ClCompile Include="Particle.cpp" />
+    <ClCompile Include="ParticleEmitter.cpp" />
+    <ClCompile Include="ParticleManager.cpp" />
+    <ClCompile Include="Random.cpp" />
+    <ClCompile Include="SRVManager.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Camera.h" />
-    <ClInclude Include="CameraManager.h" />
-    <ClInclude Include="DirectionLight.h" />
     <ClInclude Include="Engine\Audio\Audio.h" />
+    <ClInclude Include="Engine\DebugCamera\Camera.h" />
+    <ClInclude Include="Engine\DebugCamera\CameraManager.h" />
     <ClInclude Include="Engine\DebugCamera\DebugCamera.h" />
     <ClInclude Include="Engine\DX\DXCom.h" />
     <ClInclude Include="Engine\DX\DXCommand.h" />
     <ClInclude Include="Engine\DX\DXCompil.h" />
+    <ClInclude Include="Engine\DX\FPSKeeper.h" />
+    <ClInclude Include="Engine\GlobalVariables\GlobalVariables.h" />
     <ClInclude Include="Engine\GraphicPipeline\BasePipeline.h" />
     <ClInclude Include="Engine\GraphicPipeline\GaussPipeline.h" />
     <ClInclude Include="Engine\GraphicPipeline\GrayPipeline.h" />
@@ -167,8 +184,13 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\GraphicPipeline\NonePipeline.h" />
     <ClInclude Include="Engine\GraphicPipeline\ParticlePipeline.h" />
     <ClInclude Include="Engine\GraphicPipeline\Pipeline.h" />
+    <ClInclude Include="Engine\GraphicPipeline\PipelineManager.h" />
     <ClInclude Include="Engine\ImGuiManager\ImGuiManager.h" />
     <ClInclude Include="Engine\Input\Input.h" />
+    <ClInclude Include="Engine\Light\DirectionLight.h" />
+    <ClInclude Include="Engine\Light\PointLight.h" />
+    <ClInclude Include="Engine\Light\PointLightManager.h" />
+    <ClInclude Include="Engine\Light\SpotLight.h" />
     <ClInclude Include="Engine\Logger\Logger.h" />
     <ClInclude Include="Engine\Math\MatrixCalculation.h" />
     <ClInclude Include="Engine\Math\MyVec2.h" />
@@ -179,6 +201,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Model\Material.h" />
     <ClInclude Include="Engine\Model\Mesh.h" />
     <ClInclude Include="Engine\Model\Model.h" />
+    <ClInclude Include="Engine\Model\ModelCommon.h" />
+    <ClInclude Include="Engine\Model\ModelManager.h" />
+    <ClInclude Include="Engine\Model\Object3d.h" />
+    <ClInclude Include="Engine\Model\Object3dCommon.h" />
+    <ClInclude Include="Engine\Model\Sprite.h" />
     <ClInclude Include="Engine\Model\TextureManager.h" />
     <ClInclude Include="Engine\WinApp\MyWindow.h" />
     <ClInclude Include="externals\imgui\imconfig.h" />
@@ -205,6 +232,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="RailEditor.h" />
     <ClInclude Include="SpotLight.h" />
     <ClInclude Include="Sprite.h" />
+    <ClInclude Include="Particle.h" />
+    <ClInclude Include="ParticleEmitter.h" />
+    <ClInclude Include="ParticleManager.h" />
+    <ClInclude Include="Random.h" />
+    <ClInclude Include="SRVManager.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

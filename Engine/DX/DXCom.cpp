@@ -1,5 +1,6 @@
 #include "DXCom.h"
 #include "Logger.h"
+#include "SRVManager.h"
 #include "ImGuiManager.h"
 #include "Input.h"
 #include <DebugCamera.h>
@@ -38,6 +39,7 @@ void DXCom::Initialize(MyWin* myWin)
 
 
 	CreateCompiler();
+	InitializeFPSKeeper();
 	SettingRootSignature();
 	SettingGraphicPipeline();
 
@@ -158,7 +160,7 @@ void DXCom::CreateSwapChain()
 void DXCom::CreateRenderTargets()
 {
 
-	rtvDescriptorHeap_ = CreateDescriptorHeap(device_.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 3, false);
+	rtvDescriptorHeap_ = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 3, false);
 
 	HRESULT hr = swapChain_->GetBuffer(0, IID_PPV_ARGS(&swapChainResources_[0]));
 	assert(SUCCEEDED(hr));
@@ -197,8 +199,7 @@ void DXCom::CreateDepthBuffer()
 	depthStencilResource_ = CreateDepthStencilTextureResource(
 		device_.Get(), MyWin::kWindowWidth, MyWin::kWindowHeight);
 
-	dsvDescriptorHeap_ = CreateDescriptorHeap(
-		device_.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
+	dsvDescriptorHeap_ = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
 
 	dsvDesc_.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	dsvDesc_.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
@@ -214,21 +215,16 @@ void DXCom::CreateCompiler() {
 
 }
 
+void DXCom::InitializeFPSKeeper() {
+	fpsKeeper_ = FPSKeeper::GetInstance();
+}
+
 
 void DXCom::SettingRootSignature()
 {
 	
 	pipeManager_->CreatePipeline();
 
-	const uint32_t kNumInstance = instanceCount_;
-	instancingResource =
-		CreateBufferResource(device_, sizeof(TransformationMatrix) * kNumInstance);
-	instancingResource->Map(0, nullptr, reinterpret_cast<void**>(&instancingData));
-	for (uint32_t index = 0; index < kNumInstance; ++index)
-	{
-		instancingData[index].WVP = MakeIdentity4x4();
-		instancingData[index].World = MakeIdentity4x4();
-	}
 
 }
 
@@ -297,29 +293,21 @@ void DXCom::CreateBarrier(D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES af
 
 void DXCom::SettingTexture()
 {
-	const uint32_t descriptorSizeSRV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	//const uint32_t descriptorSizeSRV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	//const uint32_t descriptorSizeRTV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	//const uint32_t descriptorSizeDSV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
-	IncreaseDescriptorIndex();
 
+	SRVManager* srvManager = SRVManager::GetInstance();
+	offscreenSRVIndex_ = srvManager->Allocate();
 
+	srvManager->CreateTextureSRV(offscreenSRVIndex_, offscreenrt_.Get(), DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, 1);
 
-
-	D3D12_SHADER_RESOURCE_VIEW_DESC srvDescOff{};
-	srvDescOff.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-	srvDescOff.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	srvDescOff.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-	srvDescOff.Texture2D.MipLevels = 1;
-	offTextureHandleCPU_ = GetCPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, descriptorIndex_);
-	offTextureHandle_ = GetGPUDescriptorHandle(ImGuiManager::GetInstance()->GetsrvHeap(), descriptorSizeSRV, descriptorIndex_);
-	device_->CreateShaderResourceView(offscreenrt_.Get(), &srvDescOff, offTextureHandleCPU_);
-	IncreaseDescriptorIndex();
-
+	offTextureHandleCPU_ = srvManager->GetCPUDescriptorHandle(offscreenSRVIndex_);
+	offTextureHandle_ = srvManager->GetGPUDescriptorHandle(offscreenSRVIndex_);
 
 
 	CommandExecution();
-
 }
 
 
@@ -333,6 +321,7 @@ void DXCom::PreDraw()
 	offbarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	command_->GetList()->ResourceBarrier(1, &offbarrier);
 
+	SRVManager::GetInstance()->SetDescriptorHeap();
 
 	SetRenderTargets();
 	ClearRenderTarget();
@@ -425,6 +414,7 @@ void DXCom::PostDraw() {
 	command_->Close();
 	// コマンドリストの実行
 	command_->Execution();
+	fpsKeeper_->FixFPS();
 	swapChain_->Present(1, 0);
 	command_->Reset();
 }
@@ -442,14 +432,6 @@ void DXCom::CommandExecution() {
 	command_->Execution();
 
 	command_->Reset();
-}
-
-void DXCom::IncreaseDescriptorIndex() {
-	descriptorIndex_++;
-}
-
-uint32_t DXCom::GetDescriptorIndex() const {
-	return descriptorIndex_;
 }
 
 void DXCom::SetRenderTargets() {
@@ -574,14 +556,14 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DXCom::CreateBufferResource(Microsoft::WR
 	return resource;
 }
 
-Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> DXCom::CreateDescriptorHeap(Microsoft::WRL::ComPtr<ID3D12Device> device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible)
+Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> DXCom::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible)
 {
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap = nullptr;
 	D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc{};
 	descriptorHeapDesc.Type = heapType;
 	descriptorHeapDesc.NumDescriptors = numDescriptors;
 	descriptorHeapDesc.Flags = shaderVisible ? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-	HRESULT hr = device->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(&descriptorHeap));
+	HRESULT hr = device_->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(&descriptorHeap));
 	assert(SUCCEEDED(hr));
 
 	return descriptorHeap;

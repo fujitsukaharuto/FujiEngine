@@ -4,6 +4,12 @@
 #include "GlobalVariables.h"
 #include "CameraManager.h"
 #include "Line3dDrawer.h"
+#include "FPSKeeper.h"
+#include "Random.h"
+
+#include "ParticleManager.h"
+
+
 
 GameScene::GameScene() {}
 
@@ -72,6 +78,14 @@ void GameScene::Initialize() {
 
 	ApplyGlobalVariables();
 
+	emit.count = 3;
+	emit.frequencyTime = 20.0f;
+	emit.name = "test";
+	emit.pos = { 0.0f,2.0f,0.0f };
+	emit.grain.lifeTime_ = 20;
+	emit.RandomSpeed({ -0.1f,0.1f }, { -0.1f,0.1f }, { -0.1f,0.1f });
+	emit.RandomTranslate({ -0.1f,0.1f }, { -0.1f,0.1f }, { -0.1f,0.1f });
+	emit.grain.transform.scale = { 1.0f,1.0f,1.0f };
 }
 
 void GameScene::Update() {
@@ -125,13 +139,13 @@ void GameScene::Update() {
 
 	dxCommon_->UpDate();
 	suzunne->transform.rotate.y = 3.14f;
-	suzunne->transform.rotate.x += 0.05f;
+	suzunne->transform.rotate.x += (0.05f) * FPSKeeper::DeltaTime();
 
 
 	float rotaSpeed = 0.1f;
 	for (auto suzunneModel : suzunnes) {
-		suzunneModel->transform.rotate.x += rotaSpeed;
-
+		suzunneModel->transform.rotate.x += rotaSpeed * FPSKeeper::DeltaTime();
+		//suzunneModel->transform.translate = Random::GetVector3({ -4.0f,4.0f }, { -4.0f,4.0f }, { -4.0f,4.0f });
 		rotaSpeed += 0.05f;
 	}
 
@@ -142,6 +156,8 @@ void GameScene::Update() {
 	fence->transform.translate = fencevec;
 	fence->transform.rotate.x = 0.5f;
 
+	emit.Emit();
+	ParticleManager::GetInstance()->Update();
 
 }
 
@@ -163,6 +179,8 @@ void GameScene::Draw() {
 		suzunneModel->Draw();
 	}
 	terrain->Draw();
+
+	ParticleManager::GetInstance()->Draw();
 
 	Line3dDrawer::GetInstance()->Line3dDrawer::DrawLine3d({ -4.0f,3.0f,8.0f }, { 10.0f,5.0f,-1.0f }, { 1.0f,1.0f,0.0f,1.0f });
 	Line3dDrawer::GetInstance()->Render();

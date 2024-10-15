@@ -98,44 +98,62 @@
     <ClCompile Include="Engine\WinApp\MyWindow.cpp">
       <Filter>Engine\WinApp</Filter>
     </ClCompile>
-    <ClCompile Include="ModelManager.cpp">
-      <Filter>Engine\Model</Filter>
+    <ClCompile Include="Engine\DebugCamera\Camera.cpp">
+      <Filter>Engine\DebugCamera</Filter>
     </ClCompile>
-    <ClCompile Include="PipelineManager.cpp">
-      <Filter>Engine\GraphicPipeline</Filter>
+    <ClCompile Include="Engine\DebugCamera\CameraManager.cpp">
+      <Filter>Engine\DebugCamera</Filter>
     </ClCompile>
-    <ClCompile Include="GlobalVariables.cpp">
+    <ClCompile Include="Engine\Light\DirectionLight.cpp">
+      <Filter>Engine\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Light\PointLight.cpp">
+      <Filter>Engine\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Light\PointLightManager.cpp">
+      <Filter>Engine\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Light\SpotLight.cpp">
+      <Filter>Engine\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\DX\FPSKeeper.cpp">
+      <Filter>Engine\DX</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\GlobalVariables\GlobalVariables.cpp">
       <Filter>Engine\GlobalVariables</Filter>
     </ClCompile>
-    <ClCompile Include="Sprite.cpp">
+    <ClCompile Include="Engine\Model\ModelCommon.cpp">
       <Filter>Engine\Model</Filter>
     </ClCompile>
-    <ClCompile Include="DirectionLight.cpp">
-      <Filter>Engine\Light</Filter>
-    </ClCompile>
-    <ClCompile Include="Object3dCommon.cpp">
+    <ClCompile Include="Engine\Model\ModelManager.cpp">
       <Filter>Engine\Model</Filter>
     </ClCompile>
-    <ClCompile Include="Object3d.cpp">
+    <ClCompile Include="Engine\Model\Object3d.cpp">
       <Filter>Engine\Model</Filter>
     </ClCompile>
-    <ClCompile Include="ModelCommon.cpp">
+    <ClCompile Include="Engine\Model\Object3dCommon.cpp">
       <Filter>Engine\Model</Filter>
     </ClCompile>
-    <ClCompile Include="PointLight.cpp">
-      <Filter>Engine\Light</Filter>
+    <ClCompile Include="Engine\Model\Sprite.cpp">
+      <Filter>Engine\Model</Filter>
     </ClCompile>
-    <ClCompile Include="SpotLight.cpp">
-      <Filter>Engine\Light</Filter>
+    <ClCompile Include="Engine\GraphicPipeline\PipelineManager.cpp">
+      <Filter>Engine\GraphicPipeline</Filter>
     </ClCompile>
-    <ClCompile Include="PointLightManager.cpp">
-      <Filter>Engine\Light</Filter>
+    <ClCompile Include="Random.cpp">
+      <Filter>Engine\Math</Filter>
     </ClCompile>
-    <ClCompile Include="Camera.cpp">
-      <Filter>Engine\DebugCamera</Filter>
+    <ClCompile Include="ParticleManager.cpp">
+      <Filter>Engine\Particle</Filter>
     </ClCompile>
-    <ClCompile Include="CameraManager.cpp">
-      <Filter>Engine\DebugCamera</Filter>
+    <ClCompile Include="Particle.cpp">
+      <Filter>Engine\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="SRVManager.cpp">
+      <Filter>Engine\DX</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleEmitter.cpp">
+      <Filter>Engine\Particle</Filter>
     </ClCompile>
     <ClCompile Include="Line3dPipe.cpp">
       <Filter>Engine\GraphicPipeline</Filter>
@@ -259,44 +277,62 @@
     <ClInclude Include="Engine\WinApp\MyWindow.h">
       <Filter>Engine\WinApp</Filter>
     </ClInclude>
-    <ClInclude Include="ModelManager.h">
-      <Filter>Engine\Model</Filter>
+    <ClInclude Include="Engine\DebugCamera\Camera.h">
+      <Filter>Engine\DebugCamera</Filter>
     </ClInclude>
-    <ClInclude Include="PipelineManager.h">
-      <Filter>Engine\GraphicPipeline</Filter>
+    <ClInclude Include="Engine\DebugCamera\CameraManager.h">
+      <Filter>Engine\DebugCamera</Filter>
     </ClInclude>
-    <ClInclude Include="GlobalVariables.h">
+    <ClInclude Include="Engine\Light\DirectionLight.h">
+      <Filter>Engine\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Light\PointLight.h">
+      <Filter>Engine\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Light\PointLightManager.h">
+      <Filter>Engine\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Light\SpotLight.h">
+      <Filter>Engine\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\DX\FPSKeeper.h">
+      <Filter>Engine\DX</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\GlobalVariables\GlobalVariables.h">
       <Filter>Engine\GlobalVariables</Filter>
     </ClInclude>
-    <ClInclude Include="Sprite.h">
+    <ClInclude Include="Engine\Model\ModelCommon.h">
       <Filter>Engine\Model</Filter>
     </ClInclude>
-    <ClInclude Include="DirectionLight.h">
-      <Filter>Engine\Light</Filter>
-    </ClInclude>
-    <ClInclude Include="Object3dCommon.h">
+    <ClInclude Include="Engine\Model\ModelManager.h">
       <Filter>Engine\Model</Filter>
     </ClInclude>
-    <ClInclude Include="Object3d.h">
+    <ClInclude Include="Engine\Model\Object3d.h">
       <Filter>Engine\Model</Filter>
     </ClInclude>
-    <ClInclude Include="ModelCommon.h">
+    <ClInclude Include="Engine\Model\Object3dCommon.h">
       <Filter>Engine\Model</Filter>
     </ClInclude>
-    <ClInclude Include="PointLight.h">
-      <Filter>Engine\Light</Filter>
+    <ClInclude Include="Engine\Model\Sprite.h">
+      <Filter>Engine\Model</Filter>
     </ClInclude>
-    <ClInclude Include="PointLightManager.h">
-      <Filter>Engine\Light</Filter>
+    <ClInclude Include="Engine\GraphicPipeline\PipelineManager.h">
+      <Filter>Engine\GraphicPipeline</Filter>
     </ClInclude>
-    <ClInclude Include="SpotLight.h">
-      <Filter>Engine\Light</Filter>
+    <ClInclude Include="Random.h">
+      <Filter>Engine\Math</Filter>
     </ClInclude>
-    <ClInclude Include="Camera.h">
-      <Filter>Engine\DebugCamera</Filter>
+    <ClInclude Include="ParticleManager.h">
+      <Filter>Engine\Particle</Filter>
     </ClInclude>
-    <ClInclude Include="CameraManager.h">
-      <Filter>Engine\DebugCamera</Filter>
+    <ClInclude Include="Particle.h">
+      <Filter>Engine\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="SRVManager.h">
+      <Filter>Engine\DX</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleEmitter.h">
+      <Filter>Engine\Particle</Filter>
     </ClInclude>
     <ClInclude Include="Line3dPipe.h">
       <Filter>Engine\GraphicPipeline</Filter>
@@ -371,6 +407,9 @@
     </Filter>
     <Filter Include="Engine\Line">
       <UniqueIdentifier>{a1d52421-6086-48de-85d0-dc6cec0ed281}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Particle">
+      <UniqueIdentifier>{3102e485-29ad-45b9-aa83-d99616131e4c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

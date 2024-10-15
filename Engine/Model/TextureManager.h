@@ -10,6 +10,7 @@
 
 struct Texture {
 	Microsoft::WRL::ComPtr<ID3D12Resource> textureResource; // テクスチャリソース
+	uint32_t srvIndex;
 	D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle;  // CPUハンドル
 	D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle;  // GPUハンドル
 };
