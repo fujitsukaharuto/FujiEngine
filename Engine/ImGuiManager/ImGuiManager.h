@@ -2,6 +2,7 @@
 
 #include <d3d12.h>
 #include <wrl.h>
+#include <cstdint>
 #ifdef _DEBUG
 #include "externals/imgui/imgui.h"
 #endif // _DEBUG
@@ -38,11 +39,10 @@ public:
 	/// </summary>
 	void Draw();
 
-	ID3D12DescriptorHeap* GetsrvHeap() { return srvHeap_.Get(); }
-
+	
 private:
 	DXCom* dxCommon_ = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvHeap_;
+	uint32_t srvIndex;
 private:
 	ImGuiManager() = default;
 	~ImGuiManager() = default;

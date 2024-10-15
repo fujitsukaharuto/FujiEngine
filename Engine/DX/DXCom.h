@@ -86,8 +86,6 @@ public:
 	void PreSpriteDraw();
 
 	void CommandExecution();
-	void IncreaseDescriptorIndex();
-	uint32_t GetDescriptorIndex() const;
 
 	void SetRenderTargets();
 	void ClearRenderTarget();
@@ -106,9 +104,7 @@ public:
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(Microsoft::WRL::ComPtr<ID3D12Device> device, size_t sizeInBytes);
 
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(
-		Microsoft::WRL::ComPtr<ID3D12Device> device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible
-	);
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateDepthStencilTextureResource(Microsoft::WRL::ComPtr<ID3D12Device> device, int32_t width, int32_t height);
 
@@ -185,6 +181,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> offscreenrt_ = nullptr;
 	D3D12_RENDER_TARGET_VIEW_DESC offscreenrtvDesc_{};
 	D3D12_CLEAR_VALUE clearColorValue{};
+	uint32_t offscreenSRVIndex_;
 	D3D12_GPU_DESCRIPTOR_HANDLE offTextureHandle_;
 	D3D12_CPU_DESCRIPTOR_HANDLE offTextureHandleCPU_;
 
@@ -204,8 +201,7 @@ private:
 	PipelineManager* pipeManager_;
 
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> instancingResource = nullptr;
-	TransformationMatrix* instancingData = nullptr;
+
 
 
 	bool isGrayscale_ = true;
@@ -219,9 +215,6 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexGrayResourece_ = nullptr;
 	D3D12_INDEX_BUFFER_VIEW indexGrayBufferView_{};
 	uint32_t* indexGrayData_ = nullptr;
-
-
-	uint32_t descriptorIndex_ = 1;
 
 
 	bool isPlaneAndSprite_ = true;

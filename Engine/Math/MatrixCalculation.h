@@ -38,6 +38,11 @@ struct TransformationMatrix
 	Matrix4x4 WorldInverseTransPose;
 };
 
+struct TransformationParticleMatrix {
+	Matrix4x4 WVP;
+	Matrix4x4 World;
+};
+
 struct Materials
 {
 	Vector4 color;
