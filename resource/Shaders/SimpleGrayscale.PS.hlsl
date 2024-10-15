@@ -40,5 +40,6 @@ float4 main(PSInput input) : SV_TARGET
     
     float4 color = g_InputTexture.Sample(g_Sampler, input.texcoord);
     float gray = dot(color.rgb, float3(0.299, 0.587, 0.114));
-    return float4(gray, gray, gray, 1.0);
+    float3 result = lerp(color.rgb, float3(gray, gray, gray), 0.7);
+    return float4(result, 1.0);
 }
