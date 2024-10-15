@@ -47,11 +47,11 @@ void NoteEnemy::Initialize(Object3d* model, const Vector3& initPos){
 
 
 	emit.name = "noteChange";
-	emit.count = 4;
+	emit.count = 2;
 	emit.grain.lifeTime_ = 20;
 	emit.RandomSpeed({ -0.07f,0.07f }, { -0.00f,0.04f }, { -0.002f,0.000f });
-	emit.RandomTranslate({ -0.1f,0.1f }, { -0.1f,0.1f }, { -1.0f,0.0f });
-	emit.grain.transform.scale = { 3.0f,3.0f,1.0f };
+	emit.RandomTranslate({ -0.1f,0.1f }, { -0.1f,0.1f }, { -1.5f,-1.0f });
+	emit.grain.transform.scale = { 2.5f,2.5f,1.0f };
 }
 
 void NoteEnemy::Update(){
