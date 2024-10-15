@@ -94,6 +94,25 @@ void ParticleManager::Update() {
 			particle.transform.translate += particle.speed * FPSKeeper::DeltaTime();
 			Matrix4x4 worldMatrix = MakeAffineMatrix(particle.transform.scale, particle.transform.rotate, particle.transform.translate);
 			Matrix4x4 worldViewProjectionMatrix;
+			Matrix4x4 billboardMatrix = MakeIdentity4x4();
+
+			if (camera_) {
+				const Matrix4x4& viewMatrix = camera_->GetViewMatrix();
+
+				billboardMatrix.m[0][0] = viewMatrix.m[0][0];
+				billboardMatrix.m[0][1] = viewMatrix.m[1][0];
+				billboardMatrix.m[0][2] = viewMatrix.m[2][0];
+
+				billboardMatrix.m[1][0] = viewMatrix.m[0][1];
+				billboardMatrix.m[1][1] = viewMatrix.m[1][1];
+				billboardMatrix.m[1][2] = viewMatrix.m[2][1];
+
+				billboardMatrix.m[2][0] = viewMatrix.m[0][2];
+				billboardMatrix.m[2][1] = viewMatrix.m[1][2];
+				billboardMatrix.m[2][2] = viewMatrix.m[2][2];
+			}
+			worldMatrix = Multiply(worldMatrix, billboardMatrix);
+
 
 			if (camera_) {
 				const Matrix4x4& viewProjectionMatrix = camera_->GetViewProjectionMatrix();
