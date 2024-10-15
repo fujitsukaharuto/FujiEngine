@@ -54,7 +54,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	fpsKeeper = FPSKeeper::GetInstance();
 	fpsKeeper->Initialize();
 
-	DebugCamera* camera = nullptr;
 	camera = DebugCamera::GetInstance();
 	camera->Initialize();
 
