@@ -140,6 +140,15 @@
     <ClCompile Include="Line3dPipe.cpp">
       <Filter>Engine\GraphicPipeline</Filter>
     </ClCompile>
+    <ClCompile Include="Line3dDrawer.cpp">
+      <Filter>Engine\Line</Filter>
+    </ClCompile>
+    <ClCompile Include="RailCamera.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="RailEditor.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -291,6 +300,15 @@
     </ClInclude>
     <ClInclude Include="Line3dPipe.h">
       <Filter>Engine\GraphicPipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="Line3dDrawer.h">
+      <Filter>Engine\Line</Filter>
+    </ClInclude>
+    <ClInclude Include="RailCamera.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="RailEditor.h">
+      <Filter>Game</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
