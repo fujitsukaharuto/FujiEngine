@@ -24,10 +24,10 @@ void ParticleManager::Initialize(DXCom* dxcom, SRVManager* srvManager) {
 	srvManager_ = srvManager;
 	this->camera_ = CameraManager::GetInstance()->GetCamera();
 
-	vertex_.push_back({ {-1.0f,-1.0f,0.0f,1.0f},{0.0f,0.0f},{0.0f,0.0f,-1.0f} });
-	vertex_.push_back({ {-1.0f,1.0f,0.0f,1.0f},{0.0f,1.0f},{0.0f,0.0f,-1.0f} });
-	vertex_.push_back({ {1.0f,1.0f,0.0f,1.0f},{1.0f,1.0f},{0.0f,0.0f,-1.0f} });
-	vertex_.push_back({ {1.0f,-1.0f,0.0f,1.0f},{1.0f,0.0f},{0.0f,0.0f,-1.0f} });
+	vertex_.push_back({ {-1.0f,1.0f,0.0f,1.0f},{0.0f,0.0f},{0.0f,0.0f,-1.0f} });
+	vertex_.push_back({ {-1.0f,-1.0f,0.0f,1.0f},{0.0f,1.0f},{0.0f,0.0f,-1.0f} });
+	vertex_.push_back({ {1.0f,-1.0f,0.0f,1.0f},{1.0f,1.0f},{0.0f,0.0f,-1.0f} });
+	vertex_.push_back({ {1.0f,1.0f,0.0f,1.0f},{1.0f,0.0f},{0.0f,0.0f,-1.0f} });
 
 	index_.push_back(0);
 	index_.push_back(3);
