@@ -9,11 +9,7 @@
 
 NoteEnemy::NoteEnemy() : Character(std::make_unique<BoxCollider>()){
 
-	//座標を設定
-	collider_->Update({30.0f,0.0f,0.0f}, size_);
-
-	collider_->SetTypeID(static_cast< uint32_t >(CollisionTypeIdDef::kNoteEnemy));
-	CollisionManager::GetInstance()->AddCollider(this);
+	
 }
 
 void NoteEnemy::Initialize(Object3d* model){
@@ -27,6 +23,22 @@ void NoteEnemy::Initialize(Object3d* model){
 void NoteEnemy::Initialize(std::vector<Object3d*> models, const Vector3& initPos){
 	Character::Initialize(models);
 	models_[0]->transform.translate = initPos;
+
+	moveSpeed_ = moveSpeed_ * Field::influenceOnSpeed_[fieldIndex_];
+
+	//最初の状態をセット
+	currentState_ = std::make_unique<NoteEnemyState_Enemy>(this);
+}
+
+void NoteEnemy::Initialize(Object3d* model, const Vector3& initPos){
+	Character::Initialize(model);
+	models_[0]->transform.translate = initPos;
+	models_[0]->UpdateWorldMat();
+
+	//座標を設定
+	collider_->Update({300.0f,0.0f,0.0f}, size_);
+	collider_->SetTypeID(static_cast< uint32_t >(CollisionTypeIdDef::kNoteEnemy));
+	CollisionManager::GetInstance()->AddCollider(this);
 
 	moveSpeed_ = moveSpeed_ * Field::influenceOnSpeed_[fieldIndex_];
 

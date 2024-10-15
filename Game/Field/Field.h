@@ -6,6 +6,8 @@
 #include <array>
 #include <DirectXMath.h>
 
+class Boss;
+
 class Field{
 public:
 	Field();
@@ -30,6 +32,9 @@ public:
 
 	Vector3 GetPos(uint32_t index)const { return staffNotation_[index]->transform.translate; }
 
+	const Boss* GetBoss()const{ return pBoss_; }
+	void SetBoss(const Boss* bossPtr){ pBoss_ = bossPtr; }
+
 public:
 
 	//五線譜のモデル(仮)
@@ -41,8 +46,13 @@ public:
 
 	static float scrollX_;
 
+	//画面スクロール速度
+	float scrollSpeed_ = 0.01f;
+	//影響力の倍率
 	float magnification_ = 0.3f;
 
 	//線の幅(仮)
 	const float kLineSpace_ = 3.0f;
+
+	const Boss* pBoss_ = nullptr;
 };

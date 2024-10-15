@@ -54,6 +54,12 @@ private:
 	Object3d* terrain = nullptr;
 
 	/*======================
+		カメラ
+	=======================*/
+	float cameraMoveSpeed_ = 0.01f;
+
+
+	/*======================
 		3dモデル
 	=======================*/
 	//Model* sphere = nullptr;

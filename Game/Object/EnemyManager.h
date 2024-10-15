@@ -58,6 +58,32 @@ private:
 	/// </summary>
 	void CreateUnChainEnemy(int fieldIndex);
 
+	/// <summary>
+	/// 連鎖敵の生成
+	/// </summary>
+	/// <param name="count"></param>
+	/// <returns></returns>
+	std::array<Object3d*, 2> CreateEnemyModels(int count){
+		std::array<Object3d*, 2> models;
+		for (int i = 0; i < count; i++){
+			models[i] = new Object3d;
+			models[i]->Create("debugCube.obj"); // モデルの作成
+		}
+		return models;
+	}
+
+	/// <summary>
+	/// 単体敵の生成
+	/// </summary>
+	/// <returns></returns>
+	Object3d* CreateSingleEnemyModel(){
+		Object3d* model = new Object3d;
+		model->Create("debugCube.obj");
+		return model;
+	}
+
+	Vector3 GetSpawnPosition(int fieldIndex);
+
 private:
 
 	const Field* pField_ = nullptr;

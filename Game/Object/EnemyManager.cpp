@@ -29,7 +29,7 @@ void EnemyManager::Update(){
         }
 
         //音符に変わっていない状態で削除ラインまで行くと消える
-        else if (!(*it)->GetIsChangedNote() && (*it)->GetTranslate().x <= Field::fieldEndPosX + Field::scrollX_ + (*it)->GetScale().x*0.5f){
+        else if (!(*it)->GetIsChangedNote() && (*it)->GetTranslate().x <= Field::fieldEndPosX + Field::scrollX_ + (*it)->GetScale().x * 0.5f){
             CollisionManager::GetInstance()->RemoveCollider((*it).get());
             it = noteEnemies_.erase(it);  // 安全に削除
         } else{
@@ -168,21 +168,9 @@ void EnemyManager::CreateChainEnemy(int fieldIndex){
     // チェーンエネミーを生成
     std::unique_ptr<ChainEnemy> chainEnemy = std::make_unique<ChainEnemy>();
 
-    // モデルを格納する配列を用意
-    std::array<Object3d*, 2> models;
-
-    // 敵モデルを生成
-    for (int i = 0; i < 2; i++){
-        models[i] = new Object3d;
-        models[i]->Create("debugCube.obj"); // モデルの作成
-    }
-
-    // 敵の出現位置を決定
-    float spawnPosY = pField_->GetPos(fieldIndex - 1).y;
-    Vector3 spawnPos {50.0f, spawnPosY, 0.0f};
-
-    // ChainEnemyを初期化
-    chainEnemy->Initialize(models, spawnPos);
+    // モデルを作成し、ChainEnemyを初期化
+    std::array<Object3d*, 2> models = CreateEnemyModels(2);
+    chainEnemy->Initialize(models, GetSpawnPosition(fieldIndex));
 
     // フィールドインデックスを設定
     chainEnemy->SetFieldIndex(fieldIndex - 1);
@@ -192,17 +180,20 @@ void EnemyManager::CreateChainEnemy(int fieldIndex){
 }
 
 
+
 void EnemyManager::CreateUnChainEnemy(int fieldIndex){
     // 敵を生成しリストに追加
-    std::unique_ptr<NoteEnemy> noteEnemy = std::make_unique<NoteEnemy>();
-    Object3d* noteEnemyModel = new Object3d;
+    NoteEnemy* noteEnemy = new NoteEnemy();
+    Object3d* noteEnemyModel = CreateSingleEnemyModel();
 
-    noteEnemyModel->Create("debugCube.obj");
-
+    noteEnemy->Initialize(noteEnemyModel, GetSpawnPosition(fieldIndex));
     noteEnemy->SetFieldIndex(fieldIndex - 1);
-    noteEnemy->Initialize(noteEnemyModel);
-    float spawnPosY = pField_->GetPos(fieldIndex - 1).y;
-    noteEnemy->SetTranslate(Vector3 {50.0f, spawnPosY, 0.0f});
 
     noteEnemies_.emplace_back(std::move(noteEnemy));
+}
+
+Vector3 EnemyManager::GetSpawnPosition(int fieldIndex){
+    float spawnPosY = pField_->GetPos(fieldIndex - 1).y;
+    float spawnPosX = Field::scrollX_ + Field::fieldEndPosX + 45.0f;
+    return Vector3 {spawnPosX, spawnPosY, 0.0f};
 }
