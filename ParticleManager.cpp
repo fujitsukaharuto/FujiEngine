@@ -92,26 +92,33 @@ void ParticleManager::Update() {
 			particle.lifeTime_--;
 
 			particle.transform.translate += particle.speed * FPSKeeper::DeltaTime();
-			Matrix4x4 worldMatrix = MakeAffineMatrix(particle.transform.scale, particle.transform.rotate, particle.transform.translate);
 			Matrix4x4 worldViewProjectionMatrix;
-			Matrix4x4 billboardMatrix = MakeIdentity4x4();
-
-			if (camera_) {
-				const Matrix4x4& viewMatrix = camera_->GetViewMatrix();
-
-				billboardMatrix.m[0][0] = viewMatrix.m[0][0];
-				billboardMatrix.m[0][1] = viewMatrix.m[1][0];
-				billboardMatrix.m[0][2] = viewMatrix.m[2][0];
-
-				billboardMatrix.m[1][0] = viewMatrix.m[0][1];
-				billboardMatrix.m[1][1] = viewMatrix.m[1][1];
-				billboardMatrix.m[1][2] = viewMatrix.m[2][1];
-
-				billboardMatrix.m[2][0] = viewMatrix.m[0][2];
-				billboardMatrix.m[2][1] = viewMatrix.m[1][2];
-				billboardMatrix.m[2][2] = viewMatrix.m[2][2];
+			Matrix4x4 worldMatrix = MakeIdentity4x4();
+			if (!isBillBoard_) {
+				worldMatrix = MakeAffineMatrix(particle.transform.scale, particle.transform.rotate, particle.transform.translate);
 			}
-			worldMatrix = Multiply(worldMatrix, billboardMatrix);
+			if (isBillBoard_) {
+				worldMatrix = Multiply(MakeScaleMatrix(particle.transform.scale), MakeRotateXYZMatrix(particle.transform.rotate));
+				Matrix4x4 billboardMatrix = MakeIdentity4x4();
+
+				if (camera_) {
+					const Matrix4x4& viewMatrix = camera_->GetViewMatrix();
+
+					billboardMatrix.m[0][0] = viewMatrix.m[0][0];
+					billboardMatrix.m[0][1] = viewMatrix.m[1][0];
+					billboardMatrix.m[0][2] = viewMatrix.m[2][0];
+
+					billboardMatrix.m[1][0] = viewMatrix.m[0][1];
+					billboardMatrix.m[1][1] = viewMatrix.m[1][1];
+					billboardMatrix.m[1][2] = viewMatrix.m[2][1];
+
+					billboardMatrix.m[2][0] = viewMatrix.m[0][2];
+					billboardMatrix.m[2][1] = viewMatrix.m[1][2];
+					billboardMatrix.m[2][2] = viewMatrix.m[2][2];
+				}
+				worldMatrix = Multiply(worldMatrix, billboardMatrix);
+				worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform.translate));
+			}
 
 
 			if (camera_) {
