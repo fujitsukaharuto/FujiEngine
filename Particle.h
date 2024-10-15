@@ -9,7 +9,7 @@ public:
 
 public:
 
-	int lifeTime_ = 600;
+	int lifeTime_ = 0;
 	bool isLive_ = false;
 	Vector3 accele{};
 	Vector3 speed{};

@@ -6,6 +6,18 @@
 
 using namespace Microsoft::WRL;
 
+
+struct RandomParametor {
+	Vector2 speedx;
+	Vector2 speedy;
+	Vector2 speedz;
+
+	Vector2 transx;
+	Vector2 transy;
+	Vector2 transz;
+};
+
+
 class DXCom;
 class SRVManager;
 class Particle;
@@ -24,7 +36,9 @@ public:
 		ComPtr<ID3D12Resource> instancing_ = nullptr;
 		uint32_t insstanceCount_;
 		TransformationParticleMatrix* instancingData_ = nullptr;
+		uint32_t drawCount_;
 	};
+
 
 	static ParticleManager* GetInstance();
 
@@ -37,6 +51,8 @@ public:
 	void Draw();
 
 	static void CreateParticleGroup(const std::string name, const std::string fileName);
+
+	static void Emit(const std::string& name, const Vector3& pos, const Particle& grain, const RandomParametor& para, uint32_t count);
 
 private:
 

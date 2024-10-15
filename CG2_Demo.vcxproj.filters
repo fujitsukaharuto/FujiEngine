@@ -152,6 +152,9 @@
     <ClCompile Include="SRVManager.cpp">
       <Filter>Engine\DX</Filter>
     </ClCompile>
+    <ClCompile Include="ParticleEmitter.cpp">
+      <Filter>Engine\Particle</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -315,6 +318,9 @@
     </ClInclude>
     <ClInclude Include="SRVManager.h">
       <Filter>Engine\DX</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleEmitter.h">
+      <Filter>Engine\Particle</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

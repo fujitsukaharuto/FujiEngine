@@ -9,6 +9,7 @@
 #include "ParticleManager.h"
 
 
+
 GameScene::GameScene() {}
 
 GameScene::~GameScene() {
@@ -76,6 +77,14 @@ void GameScene::Initialize() {
 
 	ApplyGlobalVariables();
 
+	emit.count = 3;
+	emit.frequencyTime = 20.0f;
+	emit.name = "test";
+	emit.pos = { 0.0f,2.0f,0.0f };
+	emit.grain.lifeTime_ = 20;
+	emit.RandomSpeed({ -0.1f,0.1f }, { -0.1f,0.1f }, { -0.1f,0.1f });
+	emit.RandomTranslate({ -0.1f,0.1f }, { -0.1f,0.1f }, { -0.1f,0.1f });
+	emit.grain.transform.scale = { 1.0f,1.0f,1.0f };
 }
 
 void GameScene::Update() {
@@ -145,7 +154,7 @@ void GameScene::Update() {
 	fence->transform.translate = fencevec;
 	fence->transform.rotate.x = 0.5f;
 
-
+	emit.Emit();
 	ParticleManager::GetInstance()->Update();
 
 }

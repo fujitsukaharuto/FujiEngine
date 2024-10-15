@@ -3,7 +3,8 @@
 #include "SRVManager.h"
 #include "CameraManager.h"
 #include "Particle.h"
-
+#include "Random.h"
+#include "FPSKeeper.h"
 
 
 
@@ -80,7 +81,7 @@ void ParticleManager::Update() {
 		ParticleGroup* group = groupPair.second;
 
 		int particleCount = 0;
-		float addpos = 1.5f;
+		group->drawCount_ = 0;
 		for (auto& particle : group->particles_) {
 
 			if (particle.lifeTime_ <= 0) {
@@ -88,10 +89,9 @@ void ParticleManager::Update() {
 				continue;
 			}
 
-			particle.transform.translate.y = addpos;
+			particle.lifeTime_--;
 
-			addpos += 0.05f;
-
+			particle.transform.translate += particle.speed * FPSKeeper::DeltaTime();
 			Matrix4x4 worldMatrix = MakeAffineMatrix(particle.transform.scale, particle.transform.rotate, particle.transform.translate);
 			Matrix4x4 worldViewProjectionMatrix;
 
@@ -107,6 +107,7 @@ void ParticleManager::Update() {
 			group->instancingData_[particleCount].WVP = worldViewProjectionMatrix;
 
 			particleCount++;
+			group->drawCount_++;
 		}
 	}
 
@@ -128,7 +129,7 @@ void ParticleManager::Draw() {
 		dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group->srvIndex_));
 		dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, group->material_.GetTexture()->gpuHandle);
 
-		dxCommon_->GetCommandList()->DrawIndexedInstanced(6, group->insstanceCount_, 0, 0, 0);
+		dxCommon_->GetCommandList()->DrawIndexedInstanced(6, group->drawCount_, 0, 0, 0);
 	}
 
 }
@@ -174,5 +175,39 @@ void ParticleManager::CreateParticleGroup(const std::string name, const std::str
 
 
 	instance->particleGroups_.insert(std::make_pair(name, newGroup));
+
+}
+
+void ParticleManager::Emit(const std::string& name, const Vector3& pos, const Particle& grain, const RandomParametor& para, uint32_t count) {
+
+	ParticleManager* instance = GetInstance();
+
+	auto iterator = instance->particleGroups_.find(name);
+	if (iterator != instance->particleGroups_.end()) {
+		uint32_t newCount = 0;
+
+		ParticleGroup* group = iterator->second;
+		for (auto& particle : group->particles_) {
+
+			if (particle.isLive_ == false) {
+				particle.transform = grain.transform;
+				particle.transform.translate = Random::GetVector3(para.transx, para.transy, para.transz);
+				particle.transform.translate += pos;
+				particle.speed = Random::GetVector3(para.speedx, para.speedy, para.speedz);
+				particle.lifeTime_ = grain.lifeTime_;
+				particle.accele = grain.accele;
+
+				particle.isLive_ = true;
+			}
+			newCount++;
+			if (newCount == count) {
+				return;
+			}
+		}
+	}
+	else {
+		return;
+	}
+
 
 }
