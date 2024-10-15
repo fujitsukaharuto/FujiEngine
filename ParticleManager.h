@@ -75,4 +75,5 @@ private:
 	std::vector<VertexDate> vertex_;
 	std::vector<uint32_t> index_;
 
+	bool isBillBoard_ = true;
 };
