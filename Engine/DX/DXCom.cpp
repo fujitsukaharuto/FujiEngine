@@ -225,15 +225,6 @@ void DXCom::SettingRootSignature()
 	
 	pipeManager_->CreatePipeline();
 
-	const uint32_t kNumInstance = instanceCount_;
-	instancingResource =
-		CreateBufferResource(device_, sizeof(TransformationMatrix) * kNumInstance);
-	instancingResource->Map(0, nullptr, reinterpret_cast<void**>(&instancingData));
-	for (uint32_t index = 0; index < kNumInstance; ++index)
-	{
-		instancingData[index].WVP = MakeIdentity4x4();
-		instancingData[index].World = MakeIdentity4x4();
-	}
 
 }
 

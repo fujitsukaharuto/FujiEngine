@@ -201,8 +201,7 @@ private:
 	PipelineManager* pipeManager_;
 
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> instancingResource = nullptr;
-	TransformationMatrix* instancingData = nullptr;
+
 
 
 	bool isGrayscale_ = true;

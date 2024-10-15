@@ -85,6 +85,7 @@ void ParticleManager::Update() {
 
 			if (particle.lifeTime_ <= 0) {
 				particle.isLive_ = false;
+				continue;
 			}
 
 			particle.transform.translate.y = addpos;
@@ -116,7 +117,7 @@ void ParticleManager::Draw() {
 
 	dxCommon_->GetDXCommand()->SetViewAndscissor();
 	dxCommon_->GetPipelineManager()->SetPipeline(Pipe::particle);
-	dxCommon_->GetDXCommand()->GetList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	dxCommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vbView);
 	dxCommon_->GetCommandList()->IASetIndexBuffer(&ibView);
 
