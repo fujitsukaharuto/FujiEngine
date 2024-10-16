@@ -5,6 +5,7 @@
 #include "Object3d.h"
 #include "Object3dCommon.h"
 #include "Object/ChainEnemy.h"
+#include "Object/Obstacle.h"
 
 #include <fstream>
 #include<sstream>
@@ -31,6 +32,11 @@ public:
 	void SetField(const Field* field){ pField_ = field; }
 
 	void SetObject3dCommon(Object3dCommon* ptr){ pObject3dCommon_ = ptr; }
+
+	/// <summary>
+	/// 障害物の生成
+	/// </summary>
+	void PopObstacle();
 
 private:
 	/// <summary>
@@ -63,26 +69,35 @@ private:
 	/// </summary>
 	/// <param name="count"></param>
 	/// <returns></returns>
-	std::array<Object3d*, 2> CreateEnemyModels(int count){
-		std::array<Object3d*, 2> models;
-		for (int i = 0; i < count; i++){
-			models[i] = new Object3d;
-			models[i]->Create("debugCube.obj"); // モデルの作成
-		}
-		return models;
-	}
+	std::array<Object3d*, 2> CreateEnemyModels(int count);
 
 	/// <summary>
 	/// 単体敵の生成
 	/// </summary>
 	/// <returns></returns>
-	Object3d* CreateSingleEnemyModel(){
-		Object3d* model = new Object3d;
-		model->Create("debugCube.obj");
-		return model;
-	}
+	Object3d* CreateSingleEnemyModel();
 
+	/// <summary>
+	/// 障害物の生成
+	/// </summary>
+	/// <returns></returns>
+	Object3d* CreateObstacleModel();
+
+	
+
+	/// <summary>
+	/// スポーン座標
+	/// </summary>
+	/// <param name="fieldIndex"></param>
+	/// <returns></returns>
 	Vector3 GetSpawnPosition(int fieldIndex);
+
+	/// <summary>
+	/// 障害物の生成座標
+	/// </summary>
+	/// <param name="fieldIndex"></param>
+	/// <returns></returns>
+	Vector3 GetObstacleSpawnPosition(int fieldIndex);
 
 private:
 
@@ -91,6 +106,7 @@ private:
 
 	std::list<std::unique_ptr<NoteEnemy>>noteEnemies_ {};
 	std::list<std::unique_ptr<ChainEnemy>> chainEnemies_ {};
+	std::list<std::unique_ptr<Obstacle>>obstacles_ {};
 
 	//===============
 	//敵発生コマンド

@@ -8,6 +8,7 @@ std::array<float, 5> Field::influenceOnSpeed_ {};
 std::array<Object3d*, 5> Field::staffNotation_ {};
 float Field::fieldEndPosX = 2.0f;
 float Field::scrollX_ = 0.0f;
+float Field::cameraScrollX_ = 0.0f;
 
 Field::Field(){
 	const char* groupName = "field";
@@ -38,7 +39,7 @@ void Field::Initialize(const std::array<Object3d*, 5>& models){
 
 void Field::Update(){
 	Field::scrollX_ += pBoss_->GetMoveSpeed() * FPSKeeper::DeltaTime();
-
+	Field::cameraScrollX_ += scrollSpeed_ * FPSKeeper::DeltaTime();
 }
 
 void Field::Draw(){

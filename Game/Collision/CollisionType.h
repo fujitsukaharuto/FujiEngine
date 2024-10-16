@@ -8,4 +8,5 @@ enum class CollisionTypeIdDef :uint32_t{
 	kPlayer,
 	kNoteEnemy,
 	kBoss,
+	kObstacle
 };

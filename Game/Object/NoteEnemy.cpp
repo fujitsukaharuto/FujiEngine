@@ -7,10 +7,7 @@
 #include "Object/EnemyManager.h"
 #include "Field/Field.h"
 
-NoteEnemy::NoteEnemy() : Character(std::make_unique<BoxCollider>()){
-
-	
-}
+NoteEnemy::NoteEnemy() : Character(std::make_unique<BoxCollider>()){}
 
 void NoteEnemy::Initialize(Object3d* model){
 	Character::Initialize(model);
@@ -36,7 +33,7 @@ void NoteEnemy::Initialize(Object3d* model, const Vector3& initPos){
 	models_[0]->UpdateWorldMat();
 
 	//座標を設定
-	collider_->Update({300.0f,0.0f,0.0f}, size_);
+	collider_->Update(GetWorldPosition(), size_);
 	collider_->SetTypeID(static_cast< uint32_t >(CollisionTypeIdDef::kNoteEnemy));
 	CollisionManager::GetInstance()->AddCollider(this);
 

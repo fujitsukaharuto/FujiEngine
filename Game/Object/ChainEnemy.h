@@ -6,6 +6,8 @@
 //lib
 #include<array>
 
+class EnemyManager;
+
 /// <summary>
 /// つながっている敵
 /// </summary>
@@ -26,6 +28,7 @@ public:
 
 	void SetFieldIndex(const int fieldIndex);
 
+	void SetEnemyManager(EnemyManager* manager){ pEnemyManager_ = manager; }
 
 private:
 	const int kMaxEnemy = 2;
@@ -35,4 +38,6 @@ private:
 	int removeCount_ = 0;
 	//chainの長さ
 	Vector3 chainOffset = {5.0f,0.0f,0.0f};
+
+	EnemyManager* pEnemyManager_;
 };

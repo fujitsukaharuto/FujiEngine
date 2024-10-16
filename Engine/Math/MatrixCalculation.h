@@ -143,6 +143,8 @@ Vector2 Transform(const Vector2& vector, const Matrix3x3& matrix);
 
 Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix);
 
+Vector4 Transform(const Vector4& vector, const Matrix4x4& matrix);
+
 Matrix4x4 Multiply(const Matrix4x4& matrix1,const Matrix4x4& matrix2);
 
 Matrix4x4 Transpose(const Matrix4x4& m);
@@ -172,3 +174,5 @@ Matrix4x4 MakeOrthographicMatrix(float left, float top, float right, float botto
 Matrix4x4 MakeViewportMat(float left, float top, float width, float height, float minDepth, float maxDepth);
 
 Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m);
+
+Vector3 ScreenToWorld(const Vector3& screenPos, const Matrix4x4& viewMatrix, const Matrix4x4& projectionMatrix, int screenWidth, int screenHeight);

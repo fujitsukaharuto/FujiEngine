@@ -45,6 +45,7 @@ public:
 	static float fieldEndPosX;
 
 	static float scrollX_;
+	static float cameraScrollX_;
 
 	//画面スクロール速度
 	float scrollSpeed_ = 0.01f;

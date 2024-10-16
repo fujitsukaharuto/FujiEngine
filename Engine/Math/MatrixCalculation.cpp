@@ -165,6 +165,24 @@ Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix)
 	return result;
 }
 
+Vector4 Transform(const Vector4& vector, const Matrix4x4& matrix){
+	Vector4 result {};
+	result.X = vector.X * matrix.m[0][0] + vector.Y * matrix.m[1][0] + vector.Z * matrix.m[2][0] + vector.W * matrix.m[3][0];
+	result.Y = vector.X * matrix.m[0][1] + vector.Y * matrix.m[1][1] + vector.Z * matrix.m[2][1] + vector.W * matrix.m[3][1];
+	result.Z = vector.X * matrix.m[0][2] + vector.Y * matrix.m[1][2] + vector.Z * matrix.m[2][2] + vector.W * matrix.m[3][2];
+	result.W = vector.X * matrix.m[0][3] + vector.Y * matrix.m[1][3] + vector.Z * matrix.m[2][3] + vector.W * matrix.m[3][3];
+
+	assert(result.W != 0.0f); // wが0でないことを確認
+
+	// w成分で正規化（透視投影用）
+	result.X /= result.W;
+	result.X /= result.W;
+	result.Y /= result.W;
+
+	return result;
+}
+
+
 Matrix4x4 Multiply(const Matrix4x4& matrix1, const Matrix4x4& matrix2)
 {
 	Matrix4x4 result{};
@@ -425,4 +443,26 @@ Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m)
 	Vector3 result{ v.x * m.m[0][0] + v.y * m.m[1][0] + v.z * m.m[2][0], v.x * m.m[0][1] + v.y * m.m[1][1] + v.z * m.m[2][1], v.x * m.m[0][2] + v.y * m.m[1][2] + v.z * m.m[2][2] };
 
 	return result;
+}
+
+Vector3 ScreenToWorld(const Vector3& screenPos, const Matrix4x4& viewMatrix, const Matrix4x4& projectionMatrix, int screenWidth, int screenHeight){
+	// スクリーン座標をNDC座標に変換 (スクリーン座標 (0, screenWidth/Height) -> NDC座標 (-1, 1))
+	Vector4 ndcPos;
+	ndcPos.X = (2.0f * screenPos.x) / screenWidth - 1.0f;
+	ndcPos.Y = 1.0f - (2.0f * screenPos.y) / screenHeight;  // Y座標は上下逆
+	ndcPos.Z = screenPos.z;
+	ndcPos.W = 1.0f;
+
+	// ビュー行列とプロジェクション行列の逆行列を取得
+	Matrix4x4 invViewProjMatrix = Inverse(Multiply(viewMatrix, projectionMatrix));
+
+	// NDC座標をワールド座標に変換
+	Vector4 worldPos = Transform(ndcPos, invViewProjMatrix);
+
+	// wで正規化してワールド座標を取得
+	worldPos.X /= worldPos.W;
+	worldPos.Y /= worldPos.W;
+	worldPos.Z /= worldPos.W;
+
+	return Vector3(worldPos.X, worldPos.Y, worldPos.Z);
 }

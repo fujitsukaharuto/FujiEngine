@@ -229,14 +229,12 @@
     <ClCompile Include="Random.cpp">
       <Filter>Engine\Math</Filter>
     </ClCompile>
-    <ClCompile Include="CameraManager.cpp">
-      <Filter>Engine\DebugCamera</Filter>
-    </ClCompile>
     <ClCompile Include="Game\Collision\Collider.cpp" />
     <ClCompile Include="Game\Collision\CollisionManager.cpp" />
     <ClCompile Include="Game\Collision\BoxCollider.cpp" />
     <ClCompile Include="Game\Collision\SphereCollider.cpp" />
     <ClCompile Include="Game\Object\ChainEnemy.cpp" />
+    <ClCompile Include="Game\Object\Obstacle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -437,6 +435,7 @@
     <ClInclude Include="Random.h">
       <Filter>Engine\Math</Filter>
     </ClInclude>
+    <ClInclude Include="Game\Object\Obstacle.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resource\Shaders\Object3d.hlsli">

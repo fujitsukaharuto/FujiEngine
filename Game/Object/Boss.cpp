@@ -5,6 +5,7 @@
 #include "Field/Field.h"
 #include "Rendering/PrimitiveDrawer.h"
 #include "GlobalVariables/GlobalVariables.h"
+#include "CameraManager.h"
 
 #include <thread>
 
