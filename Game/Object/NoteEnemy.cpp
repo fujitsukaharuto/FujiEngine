@@ -9,6 +9,8 @@
 #include "Object/EnemyManager.h"
 #include "Field/Field.h"
 
+#include "GlobalVariables/GlobalVariables.h"
+
 NoteEnemy::NoteEnemy() : Character(std::make_unique<SphereCollider>()){}
 
 void NoteEnemy::Initialize(Object3d* model){
@@ -51,9 +53,18 @@ void NoteEnemy::Initialize(Object3d* model, const Vector3& initPos){
 	emit.RandomSpeed({-0.07f,0.07f}, {-0.00f,0.04f}, {-0.002f,0.000f});
 	emit.RandomTranslate({-0.1f,0.1f}, {-0.1f,0.1f}, {-1.5f,-1.0f});
 	emit.grain.transform.scale = {2.5f,2.5f,1.0f};
+
+	const char* groupName = "noteEnemy";
+	GlobalVariables::GetInstance()->CreateGroup(groupName);
+	GlobalVariables::GetInstance()->AddItem(groupName, "noteSpeedMagnification", noteSpeedMagnification_);
 }
 
 void NoteEnemy::Update(){
+#ifdef _DEBUG
+	ApplyGlobalVariabls();
+#endif // _DEBUG
+
+
 	collider_->Update(GetWorldPosition());
 
 	//移動速度の更新
@@ -148,13 +159,23 @@ void NoteEnemy::ChangeState(std::unique_ptr<NoteEnemyState_Base> newState){
 
 void NoteEnemy::Move(){
 	const float kDeltaTime = 0.017f;
-	models_[0]->transform.translate.x -= moveSpeed_ * kDeltaTime;
+	if (isChangedNote_){
+		models_[0]->transform.translate.x -= moveSpeed_ * noteSpeedMagnification_ * kDeltaTime;
+	} else{
+		models_[0]->transform.translate.x -= moveSpeed_  * kDeltaTime;
+	}
 }
 
 Vector3 NoteEnemy::GetCenterPos() const{
 	Vector3 offset = {0.0f, 0.5f, 0.0f};
 	Vector3 worldPos = Transform(offset, models_[0]->GetMatWorld());
 	return worldPos;
+}
+
+void NoteEnemy::ApplyGlobalVariabls(){
+	const char* groupName = "noteEnemy";
+	noteSpeedMagnification_ = GlobalVariables::GetInstance()->GetFloatValue(groupName, "noteSpeedMagnification");
+
 }
 
 

@@ -64,6 +64,8 @@ public:
 
 	void SetFieldIndex(const uint32_t index){ fieldIndex_ = index; }
 
+	void ApplyGlobalVariabls();
+
 private:
 	//音符用モデル
 	Object3d* noteModel_ = nullptr;
@@ -76,6 +78,9 @@ private:
 
 	//移動速度
 	float moveSpeed_ = 1.0f;
+
+	//音符になったときのスピード(移動速度*倍率)
+	float noteSpeedMagnification_ = 1.3f;
 
 	uint32_t fieldIndex_;
 
