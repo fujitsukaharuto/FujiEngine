@@ -126,7 +126,7 @@ void GameScene::Initialize(){
 	/*                                        プレイやー                                            */
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	Object3d* playerModel = new Object3d();
-	playerModel->Create("debugCube.obj");
+	playerModel->Create("player.obj");
 	playerModels_.emplace_back(playerModel);
 
 	float playerInitiOffset = 10.0f;
