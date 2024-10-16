@@ -428,6 +428,20 @@ Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m)
 	return result;
 }
 
+Vector3 Lerp(const Vector3& v1, const Vector3& v2, float t) {
+	Vector3 result;
+	result = v1 + (v2 - v1) * t;
+	return result;
+}
+
+Vector3 Cross(const Vector3& a, const Vector3& b) {
+	return Vector3(
+		a.y * b.z - a.z * b.y,  // X成分
+		a.z * b.x - a.x * b.z,  // Y成分
+		a.x * b.y - a.y * b.x   // Z成分
+	);
+}
+
 float Clamp(float x, float min, float max) {
 	return x < min ? min : (x > max ? max : x);
 }

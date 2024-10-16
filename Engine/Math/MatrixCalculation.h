@@ -178,6 +178,9 @@ Matrix4x4 MakeViewportMat(float left, float top, float width, float height, floa
 
 Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m);
 
+Vector3 Lerp(const Vector3& v1, const Vector3& v2, float t);
+
+Vector3 Cross(const Vector3& a, const Vector3& b);
 
 float Clamp(float x, float min, float max);
 

@@ -30,8 +30,6 @@ public:
 
 private:
 
-
-
 private:
 
 	Matrix4x4 worldMatrix_;

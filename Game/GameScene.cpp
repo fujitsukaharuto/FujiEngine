@@ -22,6 +22,7 @@ GameScene::~GameScene() {
 	}
 	delete terrain;
 	delete test;
+	delete player_;
 }
 
 void GameScene::Initialize() {
@@ -88,6 +89,10 @@ void GameScene::Initialize() {
 	emit.grain.transform.scale = { 1.0f,1.0f,1.0f };
 
 	editor.Initialize();
+
+	player_ = new Player();
+	player_->Initialize();
+
 }
 
 void GameScene::Update() {
@@ -160,6 +165,10 @@ void GameScene::Update() {
 	fence->transform.translate = fencevec;
 	fence->transform.rotate.x = 0.5f;
 
+
+	player_->Update();
+
+
 	/*emit.Emit();*/
 	ParticleManager::GetInstance()->Update();
 
@@ -179,6 +188,9 @@ void GameScene::Draw() {
 	sphere->Draw();
 	suzunne->Draw();
 	fence->Draw();
+
+	player_->Draw();
+
 	for (auto suzunneModel : suzunnes) {
 		suzunneModel->Draw();
 	}

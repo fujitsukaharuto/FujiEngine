@@ -167,6 +167,9 @@
     <ClCompile Include="RailEditor.cpp">
       <Filter>Game</Filter>
     </ClCompile>
+    <ClCompile Include="player.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -344,6 +347,9 @@
       <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="RailEditor.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
       <Filter>Game</Filter>
     </ClInclude>
   </ItemGroup>

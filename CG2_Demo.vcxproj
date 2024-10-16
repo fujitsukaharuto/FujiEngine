@@ -149,6 +149,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Line3dDrawer.cpp" />
     <ClCompile Include="Line3dPipe.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="player.cpp" />
     <ClCompile Include="RailCamera.cpp" />
     <ClCompile Include="RailEditor.cpp" />
     <ClCompile Include="Particle.cpp" />
@@ -210,6 +211,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Game\GameScene.h" />
     <ClInclude Include="Line3dDrawer.h" />
     <ClInclude Include="Line3dPipe.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="RailCamera.h" />
     <ClInclude Include="RailEditor.h" />
     <ClInclude Include="Particle.h" />

@@ -10,6 +10,9 @@
 #include "RailEditor.h"
 
 
+#include "Player.h"
+
+
 class GameScene
 {
 public:
@@ -59,4 +62,10 @@ private:
 	ParticleEmitter emit;
 
 	RailEditor editor;
+
+
+
+	Player* player_;
+
+
 };

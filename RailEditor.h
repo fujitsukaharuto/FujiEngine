@@ -6,6 +6,7 @@
 #include <json.hpp>
 #include "ImGuiManager.h"
 #include "MatrixCalculation.h"
+#include "ModelManager.h"
 
 using json = nlohmann::json;
 
@@ -39,4 +40,11 @@ private:
 
 	int pointIndex_ = 1;
 
+	Trans trans{};
+
+	bool isCamera = false;
+	float time_ = 0;
+	Vector3 previousUp = Vector3(0.0f, 1.0f, 0.0f);
+
+	Model* dir;
 };
