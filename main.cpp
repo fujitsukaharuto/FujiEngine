@@ -3,12 +3,14 @@
 #include "GameScene.h"
 #include "TextureManager.h"
 #include "ImGuiManager.h"
+#include "SRVManager.h"
 #include "MyWindow.h"
 #include "GlobalVariables.h"
 #include "ModelManager.h"
 #include "PointLightManager.h"
 #include "CameraManager.h"
 #include "Rendering/PrimitiveDrawer.h"
+#include "ParticleManager.h"
 
 
 // やること
@@ -22,6 +24,7 @@
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	MyWin* win = nullptr;
 	DXCom* dxCommon = nullptr;
+	SRVManager* srvManager = nullptr;
 	// 汎用
 	Input* input = nullptr;
 	Audio* audio = nullptr;
@@ -32,6 +35,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	ModelManager* modelManager = nullptr;
 
 	PointLightManager* pointLightManager = nullptr;
+	ParticleManager* pManager = nullptr;
 
 
 	// ゲームウィンドウの作成
@@ -41,6 +45,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// DirectX初期化
 	dxCommon = DXCom::GetInstance();
 	dxCommon->Initialize(win);
+
+	srvManager = SRVManager::GetInstance();
+	srvManager->Initialize();
 
 	fpsKeeper = FPSKeeper::GetInstance();
 	fpsKeeper->Initialize();
@@ -69,6 +76,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	textureManager = TextureManager::GetInstance();
 	modelManager = ModelManager::GetInstance();
+
+
+	pManager = ParticleManager::GetInstance();
+	pManager->Initialize(dxCommon, srvManager);
+	pManager->CreateParticleGroup("test", "uvChecker.png");
+	pManager->CreateParticleGroup("noteChange", "bakuha.png");
 
 	pointLightManager = PointLightManager::GetInstance();
 	pointLightManager->AddPointLight();
@@ -142,8 +155,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	
 	audio->Finalize();
 	imguiManager->Fin();
+	pManager->Finalize();
 	textureManager->Finalize();
 	modelManager->Finalize();
+	srvManager->Finalize();
 
 	// ゲームウィンドウの破棄
 	win->Finalize();

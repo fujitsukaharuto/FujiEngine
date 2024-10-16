@@ -6,6 +6,7 @@
 #include "Object3dCommon.h"
 #include "Object3d.h"
 #include "Sprite.h"
+#include "ParticleEmitter.h"
 
 //local
 #include "Object/Player.h"
@@ -103,5 +104,7 @@ private:
 
 	SoundData soundData1;
 	SoundData soundData2;
+
+	ParticleEmitter emit;
 
 };

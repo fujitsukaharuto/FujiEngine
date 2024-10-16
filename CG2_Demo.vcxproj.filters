@@ -234,6 +234,18 @@
     <ClCompile Include="Game\Collision\BoxCollider.cpp" />
     <ClCompile Include="Game\Collision\SphereCollider.cpp" />
     <ClCompile Include="Game\Object\ChainEnemy.cpp" />
+    <ClCompile Include="ParticleManager.cpp">
+      <Filter>Engine\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="Particle.cpp">
+      <Filter>Engine\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="SRVManager.cpp">
+      <Filter>Engine\DX</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleEmitter.cpp">
+      <Filter>Engine\Particle</Filter>
+    </ClCompile>
     <ClCompile Include="Game\Object\Obstacle.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -435,6 +447,18 @@
     <ClInclude Include="Random.h">
       <Filter>Engine\Math</Filter>
     </ClInclude>
+    <ClInclude Include="ParticleManager.h">
+      <Filter>Engine\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="Particle.h">
+      <Filter>Engine\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="SRVManager.h">
+      <Filter>Engine\DX</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleEmitter.h">
+      <Filter>Engine\Particle</Filter>
+    </ClInclude>
     <ClInclude Include="Game\Object\Obstacle.h" />
   </ItemGroup>
   <ItemGroup>
@@ -528,6 +552,9 @@
     </Filter>
     <Filter Include="Game\Object\NoteEnemyState">
       <UniqueIdentifier>{a6a326e3-622c-431c-a3f2-2bd3932c8bd2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Particle">
+      <UniqueIdentifier>{3102e485-29ad-45b9-aa83-d99616131e4c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
