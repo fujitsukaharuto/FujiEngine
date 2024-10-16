@@ -82,6 +82,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	pManager->Initialize(dxCommon, srvManager);
 	pManager->CreateParticleGroup("test", "uvChecker.png");
 	pManager->CreateParticleGroup("noteChange", "bakuha.png");
+	pManager->CreateParticleGroup("bossHit", "bakuha.png");
+
 
 	pointLightManager = PointLightManager::GetInstance();
 	pointLightManager->AddPointLight();

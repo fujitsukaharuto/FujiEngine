@@ -91,6 +91,27 @@ void ParticleManager::Update() {
 
 			particle.lifeTime_--;
 
+			SizeType sizeType = SizeType(particle.type);
+			float t = (1.0f - float(float(particle.lifeTime_) / float(particle.startLifeTime_)));
+			switch (sizeType) {
+			case kNormal:
+				break;
+			case kReduction:
+
+				particle.transform.scale.x = Lerp(particle.startSize.x, particle.endSize.x, t);
+				particle.transform.scale.y = Lerp(particle.startSize.y, particle.endSize.y, t);
+
+				break;
+			case kExpantion:
+
+				particle.transform.scale.x = Lerp(particle.startSize.x, particle.endSize.x, t);
+				particle.transform.scale.y = Lerp(particle.startSize.y, particle.endSize.y, t);
+
+				break;
+			}
+
+			particle.speed += particle.accele * FPSKeeper::DeltaTime();
+
 			particle.transform.translate += particle.speed * FPSKeeper::DeltaTime();
 			Matrix4x4 worldViewProjectionMatrix;
 			Matrix4x4 worldMatrix= MakeIdentity4x4();
@@ -221,7 +242,24 @@ void ParticleManager::Emit(const std::string& name, const Vector3& pos, const Pa
 				particle.transform.translate += pos;
 				particle.speed = Random::GetVector3(para.speedx, para.speedy, para.speedz);
 				particle.lifeTime_ = grain.lifeTime_;
-				particle.accele = grain.accele;
+				particle.startLifeTime_ = particle.lifeTime_;
+
+				SpeedType type = SpeedType(grain.speedType);
+				switch (type) {
+				case kConstancy:
+					particle.accele = grain.accele;
+					break;
+				case kDecele:
+					particle.accele = (particle.speed) * -0.05f;
+					break;
+				case kAccele:
+					particle.accele = (particle.speed) * 0.05f;
+					break;
+				}
+
+				particle.type = grain.type;
+				particle.startSize = grain.startSize;
+				particle.endSize = grain.endSize;
 
 				particle.isLive_ = true;
 			}

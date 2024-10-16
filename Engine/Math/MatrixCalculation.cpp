@@ -172,9 +172,9 @@ Vector4 Transform(const Vector4& vector, const Matrix4x4& matrix){
 	result.Z = vector.X * matrix.m[0][2] + vector.Y * matrix.m[1][2] + vector.Z * matrix.m[2][2] + vector.W * matrix.m[3][2];
 	result.W = vector.X * matrix.m[0][3] + vector.Y * matrix.m[1][3] + vector.Z * matrix.m[2][3] + vector.W * matrix.m[3][3];
 
-	assert(result.W != 0.0f); // wが0でないことを確認
+	assert(result.W != 0.0f); // w��0�łȂ����Ƃ�m�F
 
-	// w成分で正規化（透視投影用）
+	// w�����Ő��K���i�������e�p�j
 	result.X /= result.W;
 	result.X /= result.W;
 	result.Y /= result.W;
@@ -466,3 +466,5 @@ Vector3 ScreenToWorld(const Vector3& screenPos, const Matrix4x4& viewMatrix, con
 
 	return Vector3(worldPos.X, worldPos.Y, worldPos.Z);
 }
+
+float Lerp(float v1, float v2, float t) { return (1.0f - t) * v1 + t * v2; }

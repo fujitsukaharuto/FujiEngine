@@ -28,6 +28,16 @@ Boss::~Boss(){}
 
 void Boss::Initialize(std::vector<Object3d*> models){
 	Character::Initialize(models);
+
+	emit.name = "bossHit";
+	emit.count = 4;
+	emit.grain.lifeTime_ = 20;
+	emit.RandomSpeed({ -0.08f,0.08f }, { -0.08f,0.08f }, { -0.001f,0.001f });
+	emit.RandomTranslate({ -0.1f,0.1f }, { -0.1f,0.1f }, { -1.5f,-1.0f });
+	emit.grain.startSize = { 2.0f,2.0f };
+	emit.grain.endSize = { 1.0f,1.0f };
+	emit.grain.type = SizeType::kReduction;
+	emit.grain.speedType = SpeedType::kDecele;
 }
 
 void Boss::Update(){
@@ -89,5 +99,7 @@ void Boss::OnCollision(Character* other){
 
 	if (collisionType == static_cast< uint32_t >(CollisionTypeIdDef::kNoteEnemy)){
 		StopMoveForCollision(120);
+		emit.pos = other->GetCenterPos();
+		emit.Burst();
 	}
 }
