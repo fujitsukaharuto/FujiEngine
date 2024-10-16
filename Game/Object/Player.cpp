@@ -13,7 +13,7 @@
 Player::Player() : Character(std::make_unique<SphereCollider>()){
 	SphereCollider* sphereCollider = dynamic_cast< SphereCollider* >(collider_.get());
 	if (sphereCollider){
-		sphereCollider->radius_ = 0.5f;
+		sphereCollider->radius_ = 1.0f;
 	}
 	//識別id
 	sphereCollider->SetTypeID(static_cast< uint32_t >(CollisionTypeIdDef::kPlayer));
@@ -135,18 +135,37 @@ Vector3 Player::CalculateNormal(const Vector3& spherePosition, const Vector3& aa
 void Player::OnCollision(Character* other){
 	uint32_t collisionType = other->GetCollider()->GetTypeID();
 
-	//音符に変わる敵と衝突したとき
+	// 音符に変わる敵と衝突したとき
 	if (collisionType == static_cast< uint32_t >(CollisionTypeIdDef::kNoteEnemy)){
-		SphereCollider* collider = static_cast< SphereCollider* >(collider_.get());
-		BoxCollider* boxCollider = static_cast< BoxCollider* >(other->GetCollider());
+		SphereCollider* enemyCollider = static_cast< SphereCollider* >(other->GetCollider());
+		SphereCollider* playerCollider = static_cast< SphereCollider* >(this->GetCollider());
 
-		Vector3 normal = CalculateNormal(collider->position_, boxCollider->min_, boxCollider->max_);
+		// プレイヤーと敵の位置と半径を取得
+		Vector3 playerPos = playerCollider->GetPosition();
+		Vector3 enemyPos = enemyCollider->GetPosition();
+		float playerRadius = playerCollider->GetRadius();
+		float enemyRadius = enemyCollider->GetRadius();
 
-		// 内積の計算
-		float dotProduct = velocity_ * normal;
+		if (enemyPos.y > 0.5f){
+			Vector3 collisionNormal = playerPos - enemyPos;
+			float distance = collisionNormal.Lenght();
 
-		// 反射ベクトルの計算
-		velocity_ = velocity_ - (normal * dotProduct) * 2.0f;
+			// 正規化された法線ベクトルを計算
+			collisionNormal.Normalize();
+
+
+			// 速度ベクトルを取得し、反射させる
+			Vector3 playerVelocity = velocity_;
+			Vector3 reflectedVelocity = playerVelocity - 2 * collisionNormal * playerVelocity.Dot(collisionNormal);
+
+			// プレイヤーの速度を更新
+			velocity_ = reflectedVelocity;
+			// プレイヤーを敵から少し離れた位置に移動させてめり込みを防止
+			float penetrationDepth = (playerRadius + enemyRadius) - distance;
+			playerPos += collisionNormal * penetrationDepth;
+			playerCollider->SetPosition(playerPos);
+		}
 	}
-
 }
+
+

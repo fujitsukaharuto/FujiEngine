@@ -2,12 +2,14 @@
 #include "Object/NoteEnemyState/NoteEnemyState_Enemy.h"
 
 #include "Collision/BoxCollider.h"
+#include "Collision/SphereCollider.h"
+
 #include "Collision/CollisionManager.h"
 #include "Object/Boss.h"
 #include "Object/EnemyManager.h"
 #include "Field/Field.h"
 
-NoteEnemy::NoteEnemy() : Character(std::make_unique<BoxCollider>()){}
+NoteEnemy::NoteEnemy() : Character(std::make_unique<SphereCollider>()){}
 
 void NoteEnemy::Initialize(Object3d* model){
 	Character::Initialize(model);
@@ -33,7 +35,7 @@ void NoteEnemy::Initialize(Object3d* model, const Vector3& initPos){
 	models_[0]->UpdateWorldMat();
 
 	//座標を設定
-	collider_->Update(GetWorldPosition(), size_);
+	collider_->Update(GetWorldPosition());
 	collider_->SetTypeID(static_cast< uint32_t >(CollisionTypeIdDef::kNoteEnemy));
 	CollisionManager::GetInstance()->AddCollider(this);
 
@@ -46,13 +48,13 @@ void NoteEnemy::Initialize(Object3d* model, const Vector3& initPos){
 	emit.name = "noteChange";
 	emit.count = 2;
 	emit.grain.lifeTime_ = 20;
-	emit.RandomSpeed({ -0.07f,0.07f }, { -0.00f,0.04f }, { -0.002f,0.000f });
-	emit.RandomTranslate({ -0.1f,0.1f }, { -0.1f,0.1f }, { -1.5f,-1.0f });
-	emit.grain.transform.scale = { 2.5f,2.5f,1.0f };
+	emit.RandomSpeed({-0.07f,0.07f}, {-0.00f,0.04f}, {-0.002f,0.000f});
+	emit.RandomTranslate({-0.1f,0.1f}, {-0.1f,0.1f}, {-1.5f,-1.0f});
+	emit.grain.transform.scale = {2.5f,2.5f,1.0f};
 }
 
 void NoteEnemy::Update(){
-	collider_->Update(GetWorldPosition(), size_);
+	collider_->Update(GetWorldPosition());
 
 	//移動速度の更新
 	moveSpeed_ = Field::influenceOnSpeed_[fieldIndex_];
@@ -60,7 +62,7 @@ void NoteEnemy::Update(){
 	//音符に変わったらモデルを変える(一時的に色を変えている)
 	if (isChangedNote_){
 		models_[0]->SetColor({0.0f,0.0f,0.0f,1.0f});
-		if (isChanegeEffect_) {
+		if (isChanegeEffect_){
 			emit.pos = GetCenterPos();
 			emit.Burst();
 			isChanegeEffect_ = false;
@@ -81,43 +83,43 @@ void NoteEnemy::Draw(){
 void NoteEnemy::OnCollision(Character* other){
 	uint32_t collisionType = other->GetCollider()->GetTypeID();
 
-	//衝突相手がnoteEnemyなら早期return
+	// 衝突相手がnoteEnemyなら早期return
 	if (collisionType == static_cast< uint32_t >(CollisionTypeIdDef::kNoteEnemy)){
 		return;
 	}
 
 	else if (collisionType == static_cast< uint32_t >(CollisionTypeIdDef::kPlayer)){
-		// プレイヤーの位置を取得
-		const Vector3& playerPos = other->GetWorldPosition();
+		// プレイヤーのスフィアコライダーを取得
+		SphereCollider* player = static_cast< SphereCollider* >(other->GetCollider());
+		// プレイヤーと敵の位置
+		Vector3 playerPos = player->GetPosition();
 
-		BoxCollider* collider = static_cast< BoxCollider* >(collider_.get());
-		// NoteEnemy の AABB の上面と下面の y 座標
-		float enemyMinY = collider->min_.y;
-		float enemyMaxY = collider->max_.y;
+		SphereCollider* enemy = static_cast< SphereCollider* >(collider_.get());
+		Vector3 enemyPos = enemy->GetPosition();
 
-		bool movedToNewField = false;  // 段が移動したかどうかを確認
+		bool movedToNewField = false; // 段が移動したかどうかを確認
 
-		// 下の面に当たっていたら上にあげる
-		if (playerPos.y <= enemyMinY){
-			if (fieldIndex_ < Field::staffNotation_.size() - 1){
-				fieldIndex_++;  // 上の段に移動
-			}
-			movedToNewField = true;  // 下の面に当たった場合、段が変わるか変わらないかにかかわらずフラグを立てる
-		}
-		// 上の面に当たっていたら下に下げる
-		else if (playerPos.y >= enemyMaxY){
+		// プレイヤーが敵の上にある場合（敵を踏んだ場合）
+		if (playerPos.y > enemyPos.y){
 			if (fieldIndex_ > 0){
 				fieldIndex_--;  // 下の段に移動
 			}
-			movedToNewField = true;  // 上の面に当たった場合、段が変わるか変わらないかにかかわらずフラグを立てる
+			movedToNewField = true;
+		}
+		// プレイヤーが敵の下にある場合（下から当たった場合）
+		else if (playerPos.y < enemyPos.y){
+			if (fieldIndex_ < Field::staffNotation_.size() - 1 && fieldIndex_ != 0){
+				fieldIndex_++;  // 上の段に移動
+			}
+			movedToNewField = true;
 		}
 
-		// 移動先のフィールドの Y 座標に NoteEnemy を移動させる
+		// 段が移動した場合、敵を新しい段に移動
 		if (movedToNewField){
 			Vector3 movedPos = {
-				GetWorldPosition().x,
+				enemyPos.x,
 				Field::staffNotation_[fieldIndex_]->transform.translate.y,
-				GetWorldPosition().z
+				enemyPos.z
 			};
 			SetTranslate(movedPos);
 
@@ -127,17 +129,15 @@ void NoteEnemy::OnCollision(Character* other){
 	}
 
 
-
-	//衝突相手がbossなら消去する
+	// 衝突相手がbossなら消去する
 	else if (collisionType == static_cast< uint32_t >(CollisionTypeIdDef::kBoss)){
-
-		//音符に代わっているときにボスと衝突したら消す
+		// 音符に代わっているときにボスと衝突したら消す
 		if (isChangedNote_){
 			isRemoved_ = true;
 		}
-
 	}
 }
+
 
 void NoteEnemy::ChangeState(std::unique_ptr<NoteEnemyState_Base> newState){
 	currentState_ = std::move(newState);
