@@ -11,6 +11,7 @@ void Character::Initialize(std::vector<Object3d*> models){
 
 	for (size_t i = 0; i < models.size(); i++){
 		models_[i] = models[i];
+		models[i]->UpdateWorldMat();
 	}
 }
 

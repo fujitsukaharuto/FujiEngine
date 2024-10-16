@@ -45,15 +45,24 @@ public:
 	
 	Vector3 operator*(float k) const { return Vector3(x * k, y * k, z * k); }
 	float operator*(const Vector3& v) const { return (x * v.x) + (y * v.y) + (z * v.z); }
-	
+	Vector3 operator*=(const float& scalar){
+		x *= scalar;
+		y *= scalar;
+		z *= scalar;
+		return Vector3(x, y, z);
+	}
+
 	Vector3 operator/(float k) const { return Vector3(x / k, y / k, z / k); }
 
+	static float StaticLength(const Vector3& v);
 
 	float Lenght() const { return std::sqrtf((*this) * (*this)); }
 	Vector3 Normalize() const {
 		const float leng = Lenght();
 		return leng == 0 ? *this : *this / leng;
 	}
+
+	float Dot(const Vector3& other);
 
 	float LengthSquared() const{
 		return x * x + y * y + z * z;
