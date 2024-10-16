@@ -262,8 +262,8 @@ void ParticleManager::Emit(const std::string& name, const Vector3& pos, const Pa
 				particle.endSize = grain.endSize;
 
 				particle.isLive_ = true;
+				newCount++;
 			}
-			newCount++;
 			if (newCount == count) {
 				return;
 			}
