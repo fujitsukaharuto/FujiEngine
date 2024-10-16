@@ -86,6 +86,8 @@ void GameScene::Initialize() {
 	emit.RandomSpeed({ -0.1f,0.1f }, { -0.1f,0.1f }, { -0.1f,0.1f });
 	emit.RandomTranslate({ -0.1f,0.1f }, { -0.1f,0.1f }, { -0.1f,0.1f });
 	emit.grain.transform.scale = { 1.0f,1.0f,1.0f };
+
+	editor.Initialize();
 }
 
 void GameScene::Update() {
@@ -93,6 +95,8 @@ void GameScene::Update() {
 #ifdef _DEBUG
 
 	ApplyGlobalVariables();
+
+	editor.Update();
 
 	ImGui::Begin("suzunne");
 
@@ -156,7 +160,7 @@ void GameScene::Update() {
 	fence->transform.translate = fencevec;
 	fence->transform.rotate.x = 0.5f;
 
-	emit.Emit();
+	/*emit.Emit();*/
 	ParticleManager::GetInstance()->Update();
 
 }
@@ -183,6 +187,7 @@ void GameScene::Draw() {
 	ParticleManager::GetInstance()->Draw();
 
 	Line3dDrawer::GetInstance()->Line3dDrawer::DrawLine3d({ -4.0f,3.0f,8.0f }, { 10.0f,5.0f,-1.0f }, { 1.0f,1.0f,0.0f,1.0f });
+	editor.Draw();
 	Line3dDrawer::GetInstance()->Render();
 
 #pragma endregion

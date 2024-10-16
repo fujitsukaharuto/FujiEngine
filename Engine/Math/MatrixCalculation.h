@@ -177,3 +177,10 @@ Matrix4x4 MakeOrthographicMatrix(float left, float top, float right, float botto
 Matrix4x4 MakeViewportMat(float left, float top, float width, float height, float minDepth, float maxDepth);
 
 Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m);
+
+
+float Clamp(float x, float min, float max);
+
+Vector3 CatmullRomPoint(const Vector3& p0, const Vector3& p1, const Vector3& p2, const Vector3& p3, float t);
+
+Vector3 CatmullRom(const std::vector<Vector3>& control, float t);

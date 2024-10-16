@@ -7,6 +7,8 @@
 #include "Object3d.h"
 #include "Sprite.h"
 #include "ParticleEmitter.h"
+#include "RailEditor.h"
+
 
 class GameScene
 {
@@ -56,4 +58,5 @@ private:
 
 	ParticleEmitter emit;
 
+	RailEditor editor;
 };

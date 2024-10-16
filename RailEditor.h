@@ -21,6 +21,8 @@ public:
 
 	void Update();
 
+	void Draw();
+
 	void AddControlPoint(const Vector3& point);
 
 

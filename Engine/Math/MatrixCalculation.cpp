@@ -1,4 +1,5 @@
 #include "MatrixCalculation.h"
+#include <algorithm>
 
 Vector2 Multiply(const Vector2& vec, const float& num)
 {
@@ -425,4 +426,53 @@ Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m)
 	Vector3 result{ v.x * m.m[0][0] + v.y * m.m[1][0] + v.z * m.m[2][0], v.x * m.m[0][1] + v.y * m.m[1][1] + v.z * m.m[2][1], v.x * m.m[0][2] + v.y * m.m[1][2] + v.z * m.m[2][2] };
 
 	return result;
+}
+
+float Clamp(float x, float min, float max) {
+	return x < min ? min : (x > max ? max : x);
+}
+
+Vector3 CatmullRomPoint(const Vector3& p0, const Vector3& p1, const Vector3& p2, const Vector3& p3, float t) {
+
+	const float s = 0.5f;
+
+	float t2 = t * t;
+	float t3 = t2 * t;
+
+	Vector3 e3 = (p0 * (-1)) + (p1 * 3) - (p2 * 3) + p3;
+	Vector3 e2 = p0 * 2 - (p1 * 5) + p2 * 4 + (p3 * (-1));
+	Vector3 e1 = (p0 * (-1)) + p2;
+	Vector3 e0 = p1 * 2;
+
+	return (e3 * t3 + e2 * t2 + e1 * t + e0) * s;
+}
+
+Vector3 CatmullRom(const std::vector<Vector3>& control, float t) {
+	assert(control.size() >= 4 && "制御点が4以下");
+
+	size_t division = control.size() - 1;
+	float areaWidth = 1.0f / division;
+
+	float t_2 = std::fmod(t, areaWidth) * division;
+	t_2 = Clamp(t_2, 0.0f, 1.0f);
+
+	size_t index = static_cast<size_t>(t / areaWidth);
+	index = std::min(index, control.size() - 2);
+
+	size_t index0 = index - 1;
+	size_t index1 = index;
+	size_t index2 = index + 1;
+	size_t index3 = index + 2;
+
+	if (index == 0) {
+		index0 = index1;
+	}
+	if (index3 >= control.size()) {
+		index3 = index2;
+	}
+	const Vector3& p0 = control[index0];
+	const Vector3& p1 = control[index1];
+	const Vector3& p2 = control[index2];
+	const Vector3& p3 = control[index3];
+	return CatmullRomPoint(p0, p1, p2, p3, t_2);
 }
