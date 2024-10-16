@@ -133,6 +133,7 @@ void GameScene::Initialize(){
 	Vector3 playerInitPosition = {field_->fieldEndPosX + playerInitiOffset,0.0f,0.0f};
 	player_ = std::make_unique<Player>();
 	player_->Initialize(playerModels_);
+	player_->SetRotate({ 0.0f,3.14f,0.0f });
 	player_->SetTranslate(playerInitPosition);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////
