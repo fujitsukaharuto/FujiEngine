@@ -31,11 +31,17 @@ public:
 	void SetEnemyManager(EnemyManager* manager){ pEnemyManager_ = manager; }
 
 private:
+	//連結している
+	bool isChain_ =true;
+
 	const int kMaxEnemy = 2;
+
 	//つながっている敵
 	std::array<std::unique_ptr<NoteEnemy>, 2 > connectedEnemies_;
+	
 	//removeされた数
 	int removeCount_ = 0;
+	
 	//chainの長さ
 	Vector3 chainOffset = {5.0f,0.0f,0.0f};
 
