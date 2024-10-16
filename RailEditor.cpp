@@ -45,39 +45,6 @@ void RailEditor::Update() {
 	if (isCamera) {
 		Camera* camera = CameraManager::GetInstance()->GetCamera();
 
-		//const float timelimitt = 2500.0f;
-		//if (time_ < timelimitt) {
-		//	time_++;
-		//}
-		//else {
-		//	time_ = 0;
-		//}
-
-		//float t = 1.0f / timelimitt * time_;
-		//Vector3 eye = CatmullRom(controlPoints_, t);
-
-		//float t2 = 1.0f / timelimitt * (time_ + 20);
-		//Vector3 target = CatmullRom(controlPoints_, t2);
-
-		//// カメラの位置を設定
-		//trans.translate = eye;
-
-		//// forwardベクトルを正規化
-		//Vector3 forward = target - eye;
-		//forward = forward.Normalize();
-
-		//// upベクトルを基にZ軸回転（ロール）を計算
-		//Vector3 up(0.0f, 1.0f, 0.0f);
-		//Vector3 right = Cross(up, forward);
-		//right = right.Normalize();
-		//trans.rotate.z = std::atan2(right.y, right.x);
-
-		//// Y軸の回転を計算 (水平方向)
-		//trans.rotate.y = std::atan2(forward.x, forward.z);
-
-		//// X軸の回転を計算 (垂直方向)
-		//trans.rotate.x = std::atan2(-forward.y, std::sqrt(forward.x * forward.x + forward.z * forward.z));
-
 
 		const float timelimitt = 2500.0f;
 		if (time_ < timelimitt) {
@@ -105,8 +72,8 @@ void RailEditor::Update() {
 		Vector3 right = Cross(previousUp, forward);
 		right = right.Normalize();
 
-		// Z軸の回転を計算
-		trans.rotate.z = std::atan2(right.y, right.x);
+		//// Z軸の回転を計算
+		//trans.rotate.z = std::atan2(right.y, right.x);
 
 		// 新しいupベクトルを計算 (forwardとrightベクトルの外積)
 		Vector3 newUp = Cross(forward, right);
