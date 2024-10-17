@@ -114,9 +114,8 @@ void ParticleManager::Update() {
 
 			particle.transform.translate += particle.speed * FPSKeeper::DeltaTime();
 			Matrix4x4 worldViewProjectionMatrix;
-			Matrix4x4 worldMatrix= MakeIdentity4x4();
-			if (!isBillBoard_)
-			{
+			Matrix4x4 worldMatrix = MakeIdentity4x4();
+			if (!isBillBoard_) {
 				worldMatrix = MakeAffineMatrix(particle.transform.scale, particle.transform.rotate, particle.transform.translate);
 			}
 			if (isBillBoard_) {

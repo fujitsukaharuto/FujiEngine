@@ -1,12 +1,5 @@
 #pragma once
-#include "Audio.h"
-#include "DXCom.h"
-#include "Input.h"
-#include "DebugCamera.h"
-#include "Object3dCommon.h"
-#include "Object3d.h"
-#include "Sprite.h"
-#include "ParticleEmitter.h"
+#include "BaseScene.h"
 
 //local
 #include "Object/Player.h"
@@ -17,16 +10,18 @@
 
 #include<memory>
 
-class GameScene{
+
+class GameScene :public BaseScene
+{
 public:
 	GameScene();
 	~GameScene();
 
-	void Initialize();
+	void Initialize()override;
 
-	void Update();
+	void Update()override;
 
-	void Draw();
+	void Draw()override;
 
 private:
 
@@ -42,10 +37,6 @@ private:
 
 	void ApplyGlobalVariables();//値読み込みテスト用今度Objectクラス作って継承で使えるようにする
 
-	DXCom* dxCommon_ = nullptr;
-	Input* input_ = nullptr;
-	Audio* audio_ = nullptr;
-	
 	std::unique_ptr<Object3dCommon> obj3dCommon = nullptr;
 	std::unique_ptr<Camera> camera = nullptr;
 

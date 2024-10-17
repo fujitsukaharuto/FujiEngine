@@ -40,11 +40,8 @@ GameScene::~GameScene(){
 	delete test;*/
 }
 
-
-void GameScene::Initialize(){
-	dxCommon_ = DXCom::GetInstance();
-	input_ = Input::GetInstance();
-	audio_ = Audio::GetInstance();
+void GameScene::Initialize() {
+	Init();
 
 
 	Vector3 cameraInitializePos = {-11.5f,5.6f,-63.5f};
