@@ -468,5 +468,3 @@ Vector3 ScreenToWorld(const Vector3& screenPos, const Matrix4x4& viewMatrix, con
 }
 
 float Lerp(float v1, float v2, float t) { return (1.0f - t) * v1 + t * v2; }
-
-float Lerp(float v1, float v2, float t) { return (1.0f - t) * v1 + t * v2; }
