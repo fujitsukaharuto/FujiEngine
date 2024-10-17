@@ -4,6 +4,7 @@
 
 //local
 #include "Collision/Collider.h"
+#include "Collision/ContactRecord.h"
 
 //lib
 #include<vector>
@@ -58,8 +59,11 @@ public:
 
 	Collider* GetCollider() const{ return collider_.get(); }
 
+
+
 protected:
 	//描画用モデル
 	std::vector<Object3d*> models_ {};
 
+	
 };

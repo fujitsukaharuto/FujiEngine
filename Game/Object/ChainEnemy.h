@@ -31,6 +31,14 @@ public:
 	void SetEnemyManager(EnemyManager* manager){ pEnemyManager_ = manager; }
 
 private:
+	void HandleChainBreak(size_t i);
+	bool ShouldBreakChain(size_t i, size_t j) const;
+	bool ShouldRemoveConnectedEnemy(size_t i) const;
+	void RemoveConnectedEnemy(size_t i);
+	void RemoveColliders(size_t i, size_t j);
+
+
+private:
 	//連結している
 	bool isChain_ =true;
 

@@ -10,3 +10,4 @@ enum class CollisionTypeIdDef :uint32_t{
 	kBoss,
 	kObstacle
 };
+

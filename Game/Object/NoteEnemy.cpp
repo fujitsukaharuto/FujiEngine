@@ -11,7 +11,12 @@
 
 #include "GlobalVariables/GlobalVariables.h"
 
-NoteEnemy::NoteEnemy() : Character(std::make_unique<SphereCollider>()){}
+uint32_t NoteEnemy::nextSerialNumber = 0;
+
+NoteEnemy::NoteEnemy() : Character(std::make_unique<SphereCollider>()){
+	serialNumber_ = nextSerialNumber;
+	++nextSerialNumber;
+}
 
 void NoteEnemy::Initialize(Object3d* model){
 	Character::Initialize(model);
@@ -143,10 +148,21 @@ void NoteEnemy::OnCollision(Character* other){
 
 	// 衝突相手がbossなら消去する
 	else if (collisionType == static_cast< uint32_t >(CollisionTypeIdDef::kBoss)){
+
 		// 音符に代わっているときにボスと衝突したら消す
 		if (isChangedNote_){
 			isRemoved_ = true;
+
+			//bossの中心で止まるようにする(つながっている敵用)
+			if (GetWorldPosition().x <= other->GetCenterPos().x){
+				moveSpeed_ = 0.0f;
+
+				//敵のx座標で止める
+				SetTranslate({other->GetWorldPosition().x,this->GetWorldPosition().y,0.0f});
+			}
+
 		}
+
 	}
 }
 

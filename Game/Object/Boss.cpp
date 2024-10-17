@@ -4,6 +4,7 @@
 #include "FPSKeeper.h"
 #include "Field/Field.h"
 #include "Rendering/PrimitiveDrawer.h"
+#include "Object/NoteEnemy.h"
 #include "GlobalVariables/GlobalVariables.h"
 #include "CameraManager.h"
 
@@ -97,6 +98,17 @@ void Boss::OnCollision(Character* other){
 	uint32_t collisionType = other->GetCollider()->GetTypeID();
 
 	if (collisionType == static_cast< uint32_t >(CollisionTypeIdDef::kNoteEnemy)){
+		NoteEnemy* enemy = static_cast< NoteEnemy* >(other);
+		uint32_t serialNum = enemy->GetSerialNumber();
+
+		if (record_.CheckRecord(serialNum)){
+			return;
+		}
+
+		//履歴に登録
+		record_.AddRecord(serialNum);
+
+		//エフェクトを描画
 		StopMoveForCollision(120);
 		emit.pos = other->GetCenterPos();
 		emit.Burst();
