@@ -39,7 +39,7 @@ Audio* Audio::GetInstance()
 SoundData Audio::SoundLoadWave(const char* filename)
 {
 	std::ifstream file;
-	file.open(filename, std::ios_base::binary);
+	file.open((kDirectoryPath_ + filename), std::ios_base::binary);
 	assert(file.is_open());
 
 

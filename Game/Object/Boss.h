@@ -1,5 +1,6 @@
 #pragma once
 #include "ParticleEmitter.h"
+#include "Audio.h"
 #include "Object/Character.h"
 
 
@@ -59,7 +60,7 @@ private:
     int32_t stopMoveTimer_;      // 移動停止時間のカウンター
 
     ParticleEmitter emit;
-
+    SoundData testLong;
     //接触履歴
     ContactRecord record_;
 };

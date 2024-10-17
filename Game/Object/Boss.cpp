@@ -30,6 +30,8 @@ Boss::~Boss(){}
 void Boss::Initialize(std::vector<Object3d*> models){
 	Character::Initialize(models);
 
+	testLong= Audio::GetInstance()->SoundLoadWave("testLongBGM.wav");
+
 	emit.name = "bossHit";
 	emit.count = 1;
 	emit.grain.lifeTime_ = 20;
@@ -50,6 +52,7 @@ void Boss::Update(){
 		stopMoveTimer_--;  // タイマーをデクリメント
 		if (stopMoveTimer_ == 0){
 			moveSpeed_ = originalSpeed_;  // タイマーが0になったら元の速度に戻す
+			Audio::GetInstance()->SoundStopWave(testLong);
 		}
 	}
 
@@ -113,5 +116,7 @@ void Boss::OnCollision(Character* other){
 		emit.pos = other->GetCenterPos();
 		emit.Burst();
 		CameraManager::GetInstance()->GetCamera()->SetShakeTime(40.0f);
+
+		Audio::GetInstance()->SoundPlayWave(testLong);
 	}
 }

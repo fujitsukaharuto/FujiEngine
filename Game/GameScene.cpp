@@ -166,8 +166,8 @@ void GameScene::Initialize() {
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	/*                                        サウンド                                             */
 	////////////////////////////////////////////////////////////////////////////////////////////////
-	soundData1 = audio_->SoundLoadWave("resource/Alarm01.wav");
-	soundData2 = audio_->SoundLoadWave("resource/mokugyo.wav");
+	soundData1 = audio_->SoundLoadWave("Alarm01.wav");
+	soundData2 = audio_->SoundLoadWave("mokugyo.wav");
 
 	//ApplyGlobalVariables();
 
