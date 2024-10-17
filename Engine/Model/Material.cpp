@@ -20,7 +20,7 @@ void Material::CreateMaterial()
 
 	if (textureNamePath_.textureFilePath.empty())
 	{
-		texture_ = TextureManager::GetInstance()->LoadTexture("uvChecker.png");
+		texture_ = TextureManager::GetInstance()->LoadTexture("white2x2.png");
 	}
 	else
 	{

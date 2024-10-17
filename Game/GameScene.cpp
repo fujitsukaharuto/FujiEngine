@@ -145,7 +145,7 @@ void GameScene::Initialize() {
 	//=======================================================================================
 	//↓boss
 	Object3d* bossModel = new Object3d();
-	bossModel->Create("debugSphere.obj");
+	bossModel->CreateSphere();
 	bossModels_.emplace_back(bossModel);
 
 	boss_ = std::make_unique<Boss>();
