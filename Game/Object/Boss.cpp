@@ -32,11 +32,11 @@ void Boss::Initialize(std::vector<Object3d*> models){
 
 	emit.name = "bossHit";
 	emit.count = 1;
-	emit.grain.lifeTime_ = 10;
+	emit.grain.lifeTime_ = 20;
 	emit.RandomSpeed({ -0.0f,0.0f }, { -0.0f,0.0f }, { -0.0f,0.0f });
 	emit.RandomTranslate({ -0.0f,0.0f }, { -0.0f,0.0f }, { -5.5f,-5.0f });
 	emit.grain.startSize = { 4.0f,4.0f };
-	emit.grain.endSize = { 1.0f,1.0f };
+	emit.grain.endSize = { 0.2f,0.2f };
 	emit.grain.type = SizeType::kReduction;
 }
 

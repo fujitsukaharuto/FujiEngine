@@ -98,6 +98,7 @@ void ParticleManager::Update() {
 				break;
 			case kReduction:
 
+				t = 1 - powf(1 - t, 4);
 				particle.transform.scale.x = Lerp(particle.startSize.x, particle.endSize.x, t);
 				particle.transform.scale.y = Lerp(particle.startSize.y, particle.endSize.y, t);
 
