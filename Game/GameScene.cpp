@@ -38,13 +38,11 @@ GameScene::~GameScene(){
 	}
 	delete terrain;
 	delete test;*/
+	curtain_.reset();
 }
 
-
-void GameScene::Initialize(){
-	dxCommon_ = DXCom::GetInstance();
-	input_ = Input::GetInstance();
-	audio_ = Audio::GetInstance();
+void GameScene::Initialize() {
+	Init();
 
 
 	Vector3 cameraInitializePos = {-11.5f,5.6f,-63.5f};
@@ -121,6 +119,10 @@ void GameScene::Initialize(){
 	field_ = std::make_unique<Field>();
 	field_->Initialize(fieldModels_);
 
+	curtain_.reset(new Sprite());
+	curtain_->Load("curtain.png");
+	curtain_->SetPos({ 640,360,0.0f });
+	curtain_->SetSize({ 1280.0f,720.0f });
 
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	/*                                        プレイやー                                            */
@@ -155,6 +157,7 @@ void GameScene::Initialize(){
 	field_->SetBoss(boss_.get());
 	//=======================================================================================
 	//↓音符になる敵(管理クラス)
+	ModelManager::GetInstance()->LoadOBJ("enemy.obj");
 	enemyManager_ = std::make_unique<EnemyManager>();
 	enemyManager_->Initialize();
 	enemyManager_->SetField(field_.get());
@@ -168,14 +171,6 @@ void GameScene::Initialize(){
 
 	//ApplyGlobalVariables();
 
-	emit.count = 3;
-	emit.frequencyTime = 20.0f;
-	emit.name = "test";
-	emit.pos = { 0.0f,2.0f,0.0f };
-	emit.grain.lifeTime_ = 20;
-	emit.RandomSpeed({ -0.1f,0.1f }, { -0.1f,0.1f }, { -0.1f,0.1f });
-	emit.RandomTranslate({ -0.1f,0.1f }, { -0.1f,0.1f }, { -0.1f,0.1f });
-	emit.grain.transform.scale = { 1.0f,1.0f,1.0f };
 }
 
 void GameScene::Update(){
@@ -260,7 +255,7 @@ void GameScene::Update(){
 
 
 	enemyManager_->Update();
-	emit.Emit();
+
 	ParticleManager::GetInstance()->Update();
 
 	//衝突判定
@@ -310,6 +305,8 @@ void GameScene::Draw(){
 #pragma region 前景スプライト
 
 	dxCommon_->PreSpriteDraw();
+
+	curtain_->Draw();
 
 #pragma endregion
 

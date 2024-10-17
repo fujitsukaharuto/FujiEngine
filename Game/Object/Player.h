@@ -2,6 +2,7 @@
 
 //Local
 #include"Character.h"
+#include "ParticleEmitter.h"
 
 class Player:public Character{
 public:
@@ -51,4 +52,7 @@ private:
 	//ジャンプ中
 	bool isJumping_ = false;
 
+
+	ParticleEmitter emit;
+	ParticleEmitter starEmit;
 };
