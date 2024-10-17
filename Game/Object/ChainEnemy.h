@@ -22,6 +22,14 @@ public:
 
 	void Update();
 
+	void HandleNoteAndEnemy(size_t noteIndex, size_t enemyIndex);
+
+	void HandleNoteAndNote();
+
+	void HandleEnemyAndEnemy();
+
+	void RemoveSingleEnemy(size_t i);
+
 	void Draw();
 
 	bool IsAllRemove(){ return removeCount_ >= 2; }

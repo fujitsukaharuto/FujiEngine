@@ -66,6 +66,8 @@ public:
 
 	void ApplyGlobalVariabls();
 
+	void SetIsRemoved(bool flag){ isRemoved_ = flag; }
+
 
 	/// <summary>
 	/// シリアルナンバーの取得
