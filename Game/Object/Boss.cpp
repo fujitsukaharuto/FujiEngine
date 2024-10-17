@@ -101,5 +101,6 @@ void Boss::OnCollision(Character* other){
 		StopMoveForCollision(120);
 		emit.pos = other->GetCenterPos();
 		emit.Burst();
+		CameraManager::GetInstance()->GetCamera()->SetShakeTime(40.0f);
 	}
 }

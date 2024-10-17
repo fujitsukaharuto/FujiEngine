@@ -12,7 +12,7 @@ Camera::Camera() :transform({ { 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, { 0.0f,3.5
 ,viewMatrix_(Inverse(worldMatrix_))
 ,projectionMatrix_(MakePerspectiveFovMatrix(fovY_,aspect_,nearClip_,farClip_))
 ,viewProjectionMatrix_(Multiply(viewMatrix_,projectionMatrix_))
-,shakeTime_(0.0f),shakeStrength_(0.1f)
+,shakeTime_(0.0f),shakeStrength_(0.3f)
 {}
 
 void Camera::Update() {
