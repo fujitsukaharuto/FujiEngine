@@ -86,6 +86,9 @@
     <ClCompile Include="Random.cpp" />
     <ClCompile Include="SRVManager.cpp" />
     <ClCompile Include="Engine\Math\Vector3.cpp" />
+    <ClCompile Include="BaseScene.cpp" />
+    <ClCompile Include="ResultScene.cpp" />
+    <ClCompile Include="TitleScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Collision\BoxCollider.h" />
@@ -160,6 +163,9 @@
     <ClInclude Include="ParticleManager.h" />
     <ClInclude Include="Random.h" />
     <ClInclude Include="SRVManager.h" />
+    <ClInclude Include="BaseScene.h" />
+    <ClInclude Include="ResultScene.h" />
+    <ClInclude Include="TitleScene.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resource\Shaders\Object3d.hlsli" />
@@ -168,5 +174,13 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Engine">
+      <UniqueIdentifier>{7b2269e1-2f71-4b4a-87c9-31fac652ff2a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Externals">
+      <UniqueIdentifier>{ef65b491-a643-4abd-a3d4-2fe9bd0a40a2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>
