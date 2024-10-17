@@ -60,6 +60,9 @@ private:
     const float originalSpeed_ = moveSpeed_;        // 元の移動速度を保存するための変数
     int32_t stopMoveTimer_;      // 移動停止時間のカウンター
 
+    std::vector<Object3d*> choruth;
+    bool isChorusu = false;
+
     ParticleEmitter emit;
     SoundData testLong;
     //接触履歴

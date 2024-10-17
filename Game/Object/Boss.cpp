@@ -25,12 +25,33 @@ Boss::Boss() : Character(std::make_unique<SphereCollider>()), stopMoveTimer_(0){
 	GlobalVariables::GetInstance()->AddItem(groupName, "moveSpeed", moveSpeed_);
 }
 
-Boss::~Boss(){}
+Boss::~Boss(){
+	for (int i = 0; i < 6; i++) {
+		delete choruth[i];
+	}
+}
 
 void Boss::Initialize(std::vector<Object3d*> models){
 	Character::Initialize(models);
 
 	testLong= Audio::GetInstance()->SoundLoadWave("testLongBGM.wav");
+
+	for (int i = 0; i < 3; i++) {
+		Object3d* newCho = new Object3d();
+		newCho->Create("testChorus.obj");
+		newCho->transform.translate.x = 0.5f-i * 1.0f;
+		newCho->transform.translate.y = -4.0f;
+		newCho->transform.translate.z = -45.0f + i * 0.5f;
+		choruth.push_back(newCho);
+	}
+	for (int i = 0; i < 3; i++) {
+		Object3d* newCho = new Object3d();
+		newCho->Create("testChorus.obj");
+		newCho->transform.translate.x = -7.0f - i * 1.0f;
+		newCho->transform.translate.y = -4.0f;
+		newCho->transform.translate.z = -41.0f + i * 0.5f;
+		choruth.push_back(newCho);
+	}
 
 	emit.name = "bossHit";
 	emit.count = 1;
@@ -53,11 +74,20 @@ void Boss::Update(){
 		if (stopMoveTimer_ == 0){
 			moveSpeed_ = originalSpeed_;  // タイマーが0になったら元の速度に戻す
 			Audio::GetInstance()->SoundStopWave(testLong);
+			isChorusu = false;
 		}
 	}
 
 	Move();
-
+	for (int i = 0; i < 6; i++) {
+		choruth[i]->transform.translate.x += 0.01f * FPSKeeper::DeltaTime();
+		if (isChorusu) {
+			choruth[i]->transform.translate.y = Lerp(choruth[i]->transform.translate.y, 0.0f, 0.3f);
+		}
+		else {
+			choruth[i]->transform.translate.y = Lerp(choruth[i]->transform.translate.y, -4.0f, 0.3f);
+		}
+	}
 	//コライダー用のポジションを更新
 	collider_->Update(GetWorldPosition());
 
@@ -67,7 +97,9 @@ void Boss::Update(){
 void Boss::Draw(){
 	//モデルの描画
 	Character::Draw();
-
+	for (int i = 0; i < 6; i++) {
+		choruth[i]->Draw();
+	}
 	float offset = 10.0f;
 	float linePosX = models_[0]->transform.translate.x + offset;
 	//フィールドの終了線
@@ -117,6 +149,7 @@ void Boss::OnCollision(Character* other){
 		emit.Burst();
 		CameraManager::GetInstance()->GetCamera()->SetShakeTime(40.0f);
 
+		isChorusu = true;
 		Audio::GetInstance()->SoundPlayWave(testLong);
 	}
 }
