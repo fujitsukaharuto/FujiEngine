@@ -15,9 +15,11 @@ Player::Player() : Character(std::make_unique<SphereCollider>()){
 	if (sphereCollider){
 		sphereCollider->radius_ = 1.0f;
 	}
+
+	
+
 	//識別id
 	sphereCollider->SetTypeID(static_cast< uint32_t >(CollisionTypeIdDef::kPlayer));
-
 	CollisionManager::GetInstance()->AddCollider(this);
 
 }

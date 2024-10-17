@@ -8,9 +8,13 @@
 #include "Field/Field.h"
 #include "Object/EnemyManager.h"
 
-ChainEnemy::ChainEnemy(){}
+ChainEnemy::ChainEnemy(){
+}
 
-ChainEnemy::~ChainEnemy(){}
+ChainEnemy::~ChainEnemy(){
+	connectedEnemies_[0].reset();
+	connectedEnemies_[1].reset();
+}
 
 void ChainEnemy::Initialize(std::array<Object3d*, 2> models){
 	for (size_t i = 0; i < 2; i++){
@@ -42,60 +46,85 @@ void ChainEnemy::Initialize(std::array<Object3d*, 2> models, const Vector3& pos)
 }
 
 void ChainEnemy::Update(){
-	for (size_t i = 0; i < connectedEnemies_.size(); ++i){
-		if (connectedEnemies_[i]){
+    for (size_t i = 0; i < connectedEnemies_.size(); ++i){
+        if (!connectedEnemies_[i]){
+            continue;
+        }
 
+        // 連結解除の処理
+        HandleChainBreak(i);
 
-			/////////////////////////////////////////////////////////////////////////////////////////
-			/*                                     連結が切れるときの処理    　                        */
-			/////////////////////////////////////////////////////////////////////////////////////////
+        // 音符に変わっていない場合、Field::EndPosXを超えたら削除
+        if (ShouldRemoveConnectedEnemy(i)){
+            RemoveConnectedEnemy(i);
+        } else{
+            // 通常の更新
+            connectedEnemies_[i]->Update();
+        }
+    }
+}
 
-			//距離を比べてxが小さいほうに処理
-			for (size_t j = 0; j < connectedEnemies_.size(); ++j){
-				if (connectedEnemies_[j] && j != i){
+void ChainEnemy::HandleChainBreak(size_t i){
+    for (size_t j = 0; j < connectedEnemies_.size(); ++j){
+        if (!connectedEnemies_[j] || j == i){
+            continue;
+        }
 
-					// X 座標が小さい敵に特定の処理を行う
-					if (connectedEnemies_[j]->GetWorldPosition().x < connectedEnemies_[i]->GetWorldPosition().x){
+        if (ShouldBreakChain(i, j)){
+            isChain_ = false;
+        }
 
-						//先頭の敵が音符になっていて後ろの敵が音符になっていない場合、
-						if (connectedEnemies_[j]->GetIsChangedNote() && !connectedEnemies_[i]->GetIsChangedNote()){
+        // 両方削除フラグが立っている場合の処理
+        if (connectedEnemies_[j]->GetIsRemoved() && connectedEnemies_[i]->GetIsRemoved()){
+            RemoveColliders(i, j);
+            removeCount_ = 2; // 両方削除されたときカウント更新
+        }
+    }
+}
 
-							//先頭の敵が線にたどり着いたら連結を解除する
-							if (connectedEnemies_[j]->GetWorldPosition().x <= Field::fieldEndPosX + Field::scrollX_){
-								isChain_ = false;
-							}
+bool ChainEnemy::ShouldBreakChain(size_t i, size_t j) const{
+    const auto& posI = connectedEnemies_[i]->GetWorldPosition();
+    const auto& posJ = connectedEnemies_[j]->GetWorldPosition();
 
-						}
+    // X 座標が小さい方に処理
+    if (posJ.x < posI.x){
+        // 先頭の敵が音符で後ろが音符ではない場合
+        if (connectedEnemies_[j]->GetIsChangedNote() && !connectedEnemies_[i]->GetIsChangedNote()){
+            return (posJ.x <= Field::fieldEndPosX + Field::scrollX_);
+        }
+    } else{
+        // 後ろの敵が音符で先頭が音符ではない場合
+        if (connectedEnemies_[i]->GetIsChangedNote() && !connectedEnemies_[j]->GetIsChangedNote()){
+            return (posI.x <= Field::fieldEndPosX + Field::scrollX_);
+        }
+    }
+    return false;
+}
 
-					}
+bool ChainEnemy::ShouldRemoveConnectedEnemy(size_t i) const{
+    return !connectedEnemies_[i]->GetIsChangedNote() &&
+        connectedEnemies_[i]->GetWorldPosition().x < Field::fieldEndPosX + Field::scrollX_ + connectedEnemies_[i]->GetScale().x * 0.5f;
+}
 
-				}
-			}
+void ChainEnemy::RemoveConnectedEnemy(size_t i){
+    if (connectedEnemies_[i]){
+        CollisionManager::GetInstance()->RemoveCollider(connectedEnemies_[i].get());
+        connectedEnemies_[i].reset();  // ポインタを解放して nullptr に設定
+        pEnemyManager_->PopObstacle();
+        isChain_ = false;
+        removeCount_++;
+    }
+}
 
-			// 音符に変わっていない場合、Field::EndPosXを超えたら削除
-			if (!connectedEnemies_[i]->GetIsChangedNote() && connectedEnemies_[i]->GetWorldPosition().x < Field::fieldEndPosX + Field::scrollX_ + connectedEnemies_[i]->GetScale().x * 0.5f){
-				CollisionManager::GetInstance()->RemoveCollider(connectedEnemies_[i].get());
-				//障害物の生成
-				pEnemyManager_->PopObstacle();
-				connectedEnemies_[i].reset();  // 安全に削除
-				isChain_ = false;
-				removeCount_++;
-
-			} else if (connectedEnemies_[i]->GetIsRemoved()){
-				// 削除フラグが立っている場合
-				CollisionManager::GetInstance()->RemoveCollider(connectedEnemies_[i].get());
-				
-				connectedEnemies_[i].reset();  // 安全に削
-				isChain_ = false;
-				removeCount_++;
-
-			} else{
-				// 通常の更新
-				connectedEnemies_[i]->Update();
-			}
-
-		}
-	}
+void ChainEnemy::RemoveColliders(size_t i, size_t j){
+    if (connectedEnemies_[i]){
+        CollisionManager::GetInstance()->RemoveCollider(connectedEnemies_[i].get());
+        connectedEnemies_[i].reset();  // nullptr に設定
+    }
+    if (connectedEnemies_[j]){
+        CollisionManager::GetInstance()->RemoveCollider(connectedEnemies_[j].get());
+        connectedEnemies_[j].reset();  // nullptr に設定
+    }
 }
 
 void ChainEnemy::Draw(){
@@ -124,5 +153,3 @@ void ChainEnemy::SetFieldIndex(const int fieldIndex){
 		enemy->SetFieldIndex(fieldIndex);
 	}
 }
-
-

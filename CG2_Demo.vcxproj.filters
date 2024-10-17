@@ -86,6 +86,7 @@
     <ClCompile Include="Random.cpp" />
     <ClCompile Include="SRVManager.cpp" />
     <ClCompile Include="Engine\Math\Vector3.cpp" />
+    <ClCompile Include="Game\Collision\ContactRecord.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Collision\BoxCollider.h" />
@@ -160,6 +161,7 @@
     <ClInclude Include="ParticleManager.h" />
     <ClInclude Include="Random.h" />
     <ClInclude Include="SRVManager.h" />
+    <ClInclude Include="Game\Collision\ContactRecord.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resource\Shaders\Object3d.hlsli" />

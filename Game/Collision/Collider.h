@@ -51,12 +51,6 @@ public:
 	//識別IDの取得
 	uint32_t GetTypeID()const{ return typeID_; }
 	void SetTypeID(uint32_t typeID){ typeID_ = typeID; }
-private:
-
-	//衝突属性
-	uint32_t collisionAttribute_ = 0xffffffff;
-	//衝突マスク(相手)
-	uint32_t collisionMask_ = 0xffffffff;
-
+protected:
 	uint32_t typeID_ = 0u;
 };

@@ -59,5 +59,8 @@ private:
     int32_t stopMoveTimer_;      // 移動停止時間のカウンター
 
     ParticleEmitter emit;
+
+    //接触履歴
+    ContactRecord record_;
 };
 

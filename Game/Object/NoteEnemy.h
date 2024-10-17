@@ -66,6 +66,13 @@ public:
 
 	void ApplyGlobalVariabls();
 
+
+	/// <summary>
+	/// シリアルナンバーの取得
+	/// </summary>
+	/// <returns></returns>
+	uint32_t GetSerialNumber()const{ return serialNumber_; }
+
 private:
 	//音符用モデル
 	Object3d* noteModel_ = nullptr;
@@ -93,5 +100,9 @@ private:
 	//リストから削除フラグ
 	bool isRemoved_ = false;
 
+
+	//シリアルナンバー
+	uint32_t serialNumber_ = 0;
+	static uint32_t nextSerialNumber;
 	ParticleEmitter emit;
 };
