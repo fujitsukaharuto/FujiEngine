@@ -34,7 +34,7 @@ void Sprite::SetPos(const Vector3& pos) {
 }
 
 void Sprite::SetSize(const Vector2& size) {
-	size_ = size;
+	size_ = size / 2.0f;
 	SetWvp();
 }
 

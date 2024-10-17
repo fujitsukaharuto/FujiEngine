@@ -38,6 +38,7 @@ GameScene::~GameScene(){
 	}
 	delete terrain;
 	delete test;*/
+	curtain_.reset();
 }
 
 void GameScene::Initialize() {
@@ -118,6 +119,10 @@ void GameScene::Initialize() {
 	field_ = std::make_unique<Field>();
 	field_->Initialize(fieldModels_);
 
+	curtain_.reset(new Sprite());
+	curtain_->Load("curtain.png");
+	curtain_->SetPos({ 640,360,0.0f });
+	curtain_->SetSize({ 1280.0f,720.0f });
 
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	/*                                        プレイやー                                            */
@@ -300,6 +305,8 @@ void GameScene::Draw(){
 #pragma region 前景スプライト
 
 	dxCommon_->PreSpriteDraw();
+
+	curtain_->Draw();
 
 #pragma endregion
 
