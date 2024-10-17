@@ -43,7 +43,7 @@ void Boss::Initialize(std::vector<Object3d*> models){
 void Boss::Update(){
 #ifdef _DEBUG
 	//調整項目の適用
-	//ApplyGlobalVariables();
+	ApplyGlobalVariables();
 #endif // _DEBUG
 
 	if (stopMoveTimer_ > 0){

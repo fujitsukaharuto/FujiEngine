@@ -7,7 +7,7 @@
 
 
 WAIT,120,,
-POP,1,2
+POP,1,1
 WAIT,400,,
 POP,2,2
 WAIT,400,,
