@@ -426,3 +426,5 @@ Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m)
 
 	return result;
 }
+
+float Lerp(float v1, float v2, float t) { return (1.0f - t) * v1 + t * v2; }
