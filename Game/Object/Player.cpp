@@ -35,13 +35,13 @@ void Player::Initialize(std::vector<Object3d*> Object3ds){
 	emit.grain.type = SizeType::kExpantion;
 
 
-	emit.name = "playerHit";
-	emit.count = 4;
-	emit.grain.lifeTime_ = 20;
-	emit.RandomSpeed({ -0.08f,0.08f }, { -0.08f,0.08f }, { 0.0f,0.0f });
-	emit.RandomTranslate({ 0.0f,0.0f }, { 0.0f,0.0f }, { 0.0f,0.0f });
-	emit.grain.startSize = { 0.7f,0.7f };
-	emit.grain.endSize = { 1.0f,1.0f };
+	starEmit.name = "playerHit";
+	starEmit.count = 4;
+	starEmit.grain.lifeTime_ = 20;
+	starEmit.RandomSpeed({ -0.08f,0.08f }, { -0.08f,0.08f }, { 0.0f,0.0f });
+	starEmit.RandomTranslate({ 0.0f,0.0f }, { 0.0f,0.0f }, { 0.0f,0.0f });
+	starEmit.grain.startSize = { 0.7f,0.7f };
+	starEmit.grain.endSize = { 1.0f,1.0f };
 
 
 }
