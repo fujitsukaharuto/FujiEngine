@@ -25,6 +25,25 @@ Player::Player() : Character(std::make_unique<SphereCollider>()){
 void Player::Initialize(std::vector<Object3d*> Object3ds){
 	Character::Initialize(Object3ds);
 
+	emit.name = "playerHit";
+	emit.count = 1;
+	emit.grain.lifeTime_ = 20;
+	emit.RandomSpeed({ -0.00f,0.00f }, { -0.00f,0.00f }, { 0.0f,0.0f });
+	emit.RandomTranslate({ 0.0f,0.0f }, { 0.0f,0.0f }, { 0.0f,0.0f });
+	emit.grain.startSize = { 0.3f,0.3f };
+	emit.grain.endSize = { 5.0f,5.0f };
+	emit.grain.type = SizeType::kExpantion;
+
+
+	emit.name = "playerHit";
+	emit.count = 4;
+	emit.grain.lifeTime_ = 20;
+	emit.RandomSpeed({ -0.08f,0.08f }, { -0.08f,0.08f }, { 0.0f,0.0f });
+	emit.RandomTranslate({ 0.0f,0.0f }, { 0.0f,0.0f }, { 0.0f,0.0f });
+	emit.grain.startSize = { 0.7f,0.7f };
+	emit.grain.endSize = { 1.0f,1.0f };
+
+
 }
 
 void Player::Update(){

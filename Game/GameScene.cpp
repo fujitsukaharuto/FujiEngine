@@ -152,6 +152,7 @@ void GameScene::Initialize() {
 	field_->SetBoss(boss_.get());
 	//=======================================================================================
 	//↓音符になる敵(管理クラス)
+	ModelManager::GetInstance()->LoadOBJ("enemy.obj");
 	enemyManager_ = std::make_unique<EnemyManager>();
 	enemyManager_->Initialize();
 	enemyManager_->SetField(field_.get());
