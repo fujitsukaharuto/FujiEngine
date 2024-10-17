@@ -166,14 +166,6 @@ void GameScene::Initialize() {
 
 	//ApplyGlobalVariables();
 
-	emit.count = 3;
-	emit.frequencyTime = 20.0f;
-	emit.name = "test";
-	emit.pos = { 0.0f,2.0f,0.0f };
-	emit.grain.lifeTime_ = 20;
-	emit.RandomSpeed({ -0.1f,0.1f }, { -0.1f,0.1f }, { -0.1f,0.1f });
-	emit.RandomTranslate({ -0.1f,0.1f }, { -0.1f,0.1f }, { -0.1f,0.1f });
-	emit.grain.transform.scale = { 1.0f,1.0f,1.0f };
 }
 
 void GameScene::Update(){
@@ -258,7 +250,7 @@ void GameScene::Update(){
 
 
 	enemyManager_->Update();
-	emit.Emit();
+
 	ParticleManager::GetInstance()->Update();
 
 	//衝突判定
