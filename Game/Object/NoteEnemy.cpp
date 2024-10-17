@@ -34,6 +34,7 @@ void NoteEnemy::Initialize(std::vector<Object3d*> models, const Vector3& initPos
 void NoteEnemy::Initialize(Object3d* model, const Vector3& initPos){
 	Character::Initialize(model);
 	models_[0]->transform.translate = initPos;
+	models_[0]->transform.rotate = { -1.57f,1.57f,0.0f };
 	models_[0]->UpdateWorldMat();
 
 	//座標を設定

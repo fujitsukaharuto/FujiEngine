@@ -254,14 +254,14 @@ std::array<Object3d*, 2> EnemyManager::CreateEnemyModels(int count){
 	std::array<Object3d*, 2> models {};
 	for (int i = 0; i < count; i++){
 		models[i] = new Object3d;
-		models[i]->Create("debugCube.obj");
+		models[i]->Create("enemy.obj");
 	}
 	return models;
 }
 
 Object3d* EnemyManager::CreateSingleEnemyModel(){
 	Object3d* model = new Object3d;
-	model->Create("debugCube.obj");
+	model->Create("enemy.obj");
 	return model;
 }
 
