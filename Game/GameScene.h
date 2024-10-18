@@ -2,6 +2,7 @@
 #include "BaseScene.h"
 
 
+#include "RailEditor.h"
 #include "Player.h"
 
 
