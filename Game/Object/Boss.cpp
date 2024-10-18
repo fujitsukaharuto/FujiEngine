@@ -9,6 +9,7 @@
 #include "CameraManager.h"
 
 #include <thread>
+#include <numbers>
 
 Boss::Boss() : Character(std::make_unique<SphereCollider>()), stopMoveTimer_(0){
 	SphereCollider* sphereCollider = dynamic_cast< SphereCollider* >(collider_.get());
@@ -83,23 +84,37 @@ void Boss::Update(){
 	Move();
 	for (int i = 0; i < 6; i++) {
 		if (isChorusu) {
-			choruth[i]->transform.translate.y = Lerp(choruth[i]->transform.translate.y, -5.5f, 0.3f);
-			if (choruth[i]->transform.translate.y > -5.6f) {
+			choruth[i]->transform.translate.y = Lerp(choruth[i]->transform.translate.y, -5.6f, 0.3f);
+			if (choruth[i]->transform.translate.y > -5.75f) {
 				choruthTime += FPSKeeper::DeltaTime();
-			}
-			if (i >= 3) {
-				float angle = amplitude * sin(frequency * choruthTime);
-				choruth[i]->transform.rotate.z = angle;
-			}
-			else {
-				float angle = amplitude * sin(frequency * -choruthTime);
-				choruth[i]->transform.rotate.z = angle;
+
+				float sinVal = 0.0f;
+				if (i >= 3) {
+					sinVal = sin(frequency * choruthTime);
+					float angle = amplitude * sinVal;
+					choruth[i]->transform.rotate.z = angle;
+				}
+				else {
+					sinVal = sin(frequency * -choruthTime);
+					float angle = amplitude * sinVal;
+					choruth[i]->transform.rotate.z = angle;
+				}
+
+				// サイズの変化を計算 (cos波でサイズを変える)
+				float scaleMin = 0.7f;     // 最小サイズ
+				float scaleMax = 1.2f;     // 最大サイズ
+				float scaleRange = scaleMax - scaleMin;
+
+				// sinが0のときにcosが最大サイズを返すように調整 (位相シフト)
+				float scale = scaleMin + (scaleRange * fabs(sinVal));
+				choruth[i]->transform.scale.y = scale;
 			}
 		}
 		else {
 			choruth[i]->transform.translate.y = Lerp(choruth[i]->transform.translate.y, -8.0f, 0.3f);
 			choruthTime = 0.0f;
 			choruth[i]->transform.rotate.z = 0.0f;
+			choruth[i]->transform.scale.y = 1.0f;
 		}
 	}
 	//コライダー用のポジションを更新
