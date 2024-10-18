@@ -39,17 +39,19 @@ void Boss::Initialize(std::vector<Object3d*> models){
 	for (int i = 0; i < 3; i++) {
 		Object3d* newCho = new Object3d();
 		newCho->Create("testChorus.obj");
-		newCho->transform.translate.x = 0.5f-i * 1.0f;
-		newCho->transform.translate.y = -4.0f;
-		newCho->transform.translate.z = -45.0f + i * 0.5f;
+		newCho->SetCameraParent(true);
+		newCho->transform.translate.x = 2.0f + 1.5f * i;
+		newCho->transform.translate.y = -8.0f;
+		newCho->transform.translate.z = 20.0f;
 		choruth.push_back(newCho);
 	}
 	for (int i = 0; i < 3; i++) {
 		Object3d* newCho = new Object3d();
 		newCho->Create("testChorus.obj");
-		newCho->transform.translate.x = -7.0f - i * 1.0f;
-		newCho->transform.translate.y = -4.0f;
-		newCho->transform.translate.z = -41.0f + i * 0.5f;
+		newCho->SetCameraParent(true);
+		newCho->transform.translate.x = -2.0f + -1.5f * i;
+		newCho->transform.translate.y = -8.0f;
+		newCho->transform.translate.z = 20.0f;
 		choruth.push_back(newCho);
 	}
 
@@ -80,12 +82,24 @@ void Boss::Update(){
 
 	Move();
 	for (int i = 0; i < 6; i++) {
-		choruth[i]->transform.translate.x += 0.01f * FPSKeeper::DeltaTime();
 		if (isChorusu) {
-			choruth[i]->transform.translate.y = Lerp(choruth[i]->transform.translate.y, 0.0f, 0.3f);
+			choruth[i]->transform.translate.y = Lerp(choruth[i]->transform.translate.y, -5.5f, 0.3f);
+			if (choruth[i]->transform.translate.y > -5.6f) {
+				choruthTime += FPSKeeper::DeltaTime();
+			}
+			if (i >= 3) {
+				float angle = amplitude * sin(frequency * choruthTime);
+				choruth[i]->transform.rotate.z = angle;
+			}
+			else {
+				float angle = amplitude * sin(frequency * -choruthTime);
+				choruth[i]->transform.rotate.z = angle;
+			}
 		}
 		else {
-			choruth[i]->transform.translate.y = Lerp(choruth[i]->transform.translate.y, -4.0f, 0.3f);
+			choruth[i]->transform.translate.y = Lerp(choruth[i]->transform.translate.y, -8.0f, 0.3f);
+			choruthTime = 0.0f;
+			choruth[i]->transform.rotate.z = 0.0f;
 		}
 	}
 	//コライダー用のポジションを更新
