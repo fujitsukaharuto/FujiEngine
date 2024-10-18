@@ -45,6 +45,23 @@ void Object3d::Draw() {
 
 }
 
+Matrix4x4 Object3d::GetWorldMat() const {
+	Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
+
+	if (parent_) {
+		const Matrix4x4& parentWorldMatrix = parent_->GetWorldMat();
+		worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
+	}
+	else if (isCameraParent_) {
+		const Matrix4x4& parentWorldMatrix = camera_->GetWorldMatrix();
+		worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
+	}
+
+	return worldMatrix;
+}
+
+
+
 void Object3d::SetColor(const Vector4& color) {
 	model_->SetColor(color);
 }
@@ -83,6 +100,17 @@ void Object3d::SetWVP() {
 
 	Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 	Matrix4x4 worldViewProjectionMatrix;
+
+
+	if (parent_) {
+		const Matrix4x4& parentWorldMatrix = parent_->GetWorldMat();
+		worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
+	}
+	else if (isCameraParent_) {
+		const Matrix4x4& parentWorldMatrix = camera_->GetWorldMatrix();
+		worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
+	}
+
 
 	if (camera_) {
 		const Matrix4x4& viewProjectionMatrix = camera_->GetViewProjectionMatrix();

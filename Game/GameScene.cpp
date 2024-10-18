@@ -26,9 +26,7 @@ GameScene::~GameScene() {
 }
 
 void GameScene::Initialize() {
-	dxCommon_ = DXCom::GetInstance();
-	input_ = Input::GetInstance();
-	audio_ = Audio::GetInstance();
+	Init();
 
 	GlobalVariables* globalvariables = GlobalVariables::GetInstance();
 	const char* groupName = "Sphere";
