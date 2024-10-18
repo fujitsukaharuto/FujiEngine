@@ -22,6 +22,8 @@ public:
 
 	void Draw();
 
+	Matrix4x4 GetWorldMat() const;
+
 	void UpdateWorldMat();
 
 	void SetColor(const Vector4& color);
@@ -29,6 +31,10 @@ public:
 	void SetRightDir(const Vector3& right) { directionalLightData_->direction = right; }
 
 	void SetCamera(Camera* camera) { this->camera_ = camera; }
+
+	void SetParent(Object3d* parent) { parent_ = parent; }
+
+	void SetCameraParent(bool is) { isCameraParent_ = is; }
 
 	/*void SetPointLight(PointLight* light) { pointLight_ = light; }
 
@@ -52,7 +58,9 @@ private:
 	PointLight* pointLight_;
 	SpotLight* spotLight_;
 	Camera* camera_;
+	Object3d* parent_ = nullptr;
 
+	bool isCameraParent_ = false;
 	Matrix4x4 worldMatrix_;
 
 
