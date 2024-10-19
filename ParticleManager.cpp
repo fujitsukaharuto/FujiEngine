@@ -322,7 +322,7 @@ void ParticleManager::CreateAnimeGroup(const std::string& name, const std::strin
 	AnimeGroup* newGroup = new AnimeGroup();
 
 	newGroup->farst = fileName;
-
+	TextureManager::GetInstance()->LoadTexture(fileName);
 	for (int i = 0; i < 6; i++) {
 		Object3d* newobj = new Object3d();
 		newobj->Create("plane.obj");
@@ -456,7 +456,7 @@ void ParticleManager::AddAnime(const std::string& name, const std::string& fileN
 	if (iterator != instance->animeGroups_.end()) {
 
 		AnimeGroup* group = iterator->second;
-
+		TextureManager::GetInstance()->LoadTexture(fileName);
 		group->anime_.insert(std::make_pair(fileName, animeChangeTime));
 
 	}
