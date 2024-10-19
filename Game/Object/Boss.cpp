@@ -39,7 +39,7 @@ void Boss::Initialize(std::vector<Object3d*> models){
 
 	for (int i = 0; i < 3; i++) {
 		Object3d* newCho = new Object3d();
-		newCho->Create("testChorus.obj");
+		newCho->Create("chorus.obj");
 		newCho->SetCameraParent(true);
 		newCho->transform.translate.x = 2.0f + 1.5f * i;
 		newCho->transform.translate.y = -8.0f;
@@ -48,7 +48,7 @@ void Boss::Initialize(std::vector<Object3d*> models){
 	}
 	for (int i = 0; i < 3; i++) {
 		Object3d* newCho = new Object3d();
-		newCho->Create("testChorus.obj");
+		newCho->Create("chorus.obj");
 		newCho->SetCameraParent(true);
 		newCho->transform.translate.x = -2.0f + -1.5f * i;
 		newCho->transform.translate.y = -8.0f;

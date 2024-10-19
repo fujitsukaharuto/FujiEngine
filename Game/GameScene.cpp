@@ -145,13 +145,13 @@ void GameScene::Initialize() {
 	//=======================================================================================
 	//↓boss
 	Object3d* bossModel = new Object3d();
-	bossModel->CreateSphere();
+	bossModel->Create("boss.obj");
 	bossModels_.emplace_back(bossModel);
 
 	boss_ = std::make_unique<Boss>();
 	boss_->Initialize(bossModels_);
 	boss_->SetTranslate(Vector3 {-8.0f,6.0f,0.0f});//五線譜の真ん中に合わせる
-	boss_->SetScale(Vector3 {7.0f,7.0f,7.0f});
+	boss_->SetScale(Vector3 {1.0f,1.0f,1.0f});
 
 	//ポインタをフィールドに渡す
 	field_->SetBoss(boss_.get());
