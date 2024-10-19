@@ -150,8 +150,9 @@ void GameScene::Initialize() {
 
 	boss_ = std::make_unique<Boss>();
 	boss_->Initialize(bossModels_);
-	boss_->SetTranslate(Vector3 {-8.0f,6.0f,0.0f});//五線譜の真ん中に合わせる
+	boss_->SetTranslate(Vector3 {-8.0f,3.0f,-1.8f});//五線譜の真ん中に合わせる
 	boss_->SetScale(Vector3 {1.0f,1.0f,1.0f});
+	boss_->SetRotate(Vector3{ 0.0f,3.14f,0.0f });
 
 	//ポインタをフィールドに渡す
 	field_->SetBoss(boss_.get());

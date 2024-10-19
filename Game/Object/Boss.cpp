@@ -14,7 +14,7 @@
 Boss::Boss() : Character(std::make_unique<SphereCollider>()), stopMoveTimer_(0){
 	SphereCollider* sphereCollider = dynamic_cast< SphereCollider* >(collider_.get());
 	if (sphereCollider){
-		sphereCollider->radius_ = 7.0f;
+		sphereCollider->radius_ = 7.75f;
 	}
 
 	sphereCollider->SetTypeID(static_cast< uint32_t >(CollisionTypeIdDef::kBoss));
@@ -120,7 +120,7 @@ void Boss::Update(){
 		}
 	}
 	//コライダー用のポジションを更新
-	collider_->Update(GetWorldPosition());
+	collider_->Update(GetCenterPos());
 
 	Character::Update();
 }
@@ -183,4 +183,10 @@ void Boss::OnCollision(Character* other){
 		isChorusu = true;
 		Audio::GetInstance()->SoundPlayWave(testLong);
 	}
+}
+
+Vector3 Boss::GetCenterPos() const {
+	Vector3 offset = { 0.0f, 3.0f, 1.8f };
+	Vector3 worldPos = Transform(offset, models_[0]->GetMatWorld());
+	return worldPos;
 }

@@ -38,6 +38,8 @@ public:
 
     void OnCollision(Character* other)override;
 
+    Vector3 GetCenterPos()const override;
+
 private:
     void Move();
 
