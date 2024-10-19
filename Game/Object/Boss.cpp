@@ -42,8 +42,9 @@ void Boss::Initialize(std::vector<Object3d*> models){
 		newCho->Create("chorus.obj");
 		newCho->SetCameraParent(true);
 		newCho->transform.translate.x = 2.0f + 1.5f * i;
-		newCho->transform.translate.y = -8.0f;
-		newCho->transform.translate.z = 20.0f;
+		newCho->transform.translate.y = -10.0f;
+		newCho->transform.translate.z = 25.0f;
+		newCho->transform.rotate.y = 3.14f;
 		choruth.push_back(newCho);
 	}
 	for (int i = 0; i < 3; i++) {
@@ -51,8 +52,9 @@ void Boss::Initialize(std::vector<Object3d*> models){
 		newCho->Create("chorus.obj");
 		newCho->SetCameraParent(true);
 		newCho->transform.translate.x = -2.0f + -1.5f * i;
-		newCho->transform.translate.y = -8.0f;
-		newCho->transform.translate.z = 20.0f;
+		newCho->transform.translate.y = -10.0f;
+		newCho->transform.translate.z = 25.0f;
+		newCho->transform.rotate.y = 3.14f;
 		choruth.push_back(newCho);
 	}
 
@@ -84,8 +86,8 @@ void Boss::Update(){
 	Move();
 	for (int i = 0; i < 6; i++) {
 		if (isChorusu) {
-			choruth[i]->transform.translate.y = Lerp(choruth[i]->transform.translate.y, -5.6f, 0.3f);
-			if (choruth[i]->transform.translate.y > -5.75f) {
+			choruth[i]->transform.translate.y = Lerp(choruth[i]->transform.translate.y, -6.3f, 0.3f);
+			if (choruth[i]->transform.translate.y > -6.45f) {
 				choruthTime += FPSKeeper::DeltaTime();
 
 				float sinVal = 0.0f;
@@ -111,7 +113,7 @@ void Boss::Update(){
 			}
 		}
 		else {
-			choruth[i]->transform.translate.y = Lerp(choruth[i]->transform.translate.y, -8.0f, 0.3f);
+			choruth[i]->transform.translate.y = Lerp(choruth[i]->transform.translate.y, -10.0f, 0.3f);
 			choruthTime = 0.0f;
 			choruth[i]->transform.rotate.z = 0.0f;
 			choruth[i]->transform.scale.y = 1.0f;
