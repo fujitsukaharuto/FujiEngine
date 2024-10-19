@@ -74,7 +74,7 @@ void ParticleManager::Finalize() {
 	particleGroups_.clear();
 	for (auto& groupPair : animeGroups_) {
 
-		for (auto& i: groupPair.second->objects_) {
+		for (auto& i : groupPair.second->objects_) {
 			delete i;
 		}
 		groupPair.second->lifeTime.clear();
@@ -133,6 +133,7 @@ void ParticleManager::Update() {
 				break;
 			case kReduction:
 
+				t = 1 - powf(1 - t, 4);
 				particle.transform.scale.x = Lerp(particle.startSize.x, particle.endSize.x, t);
 				particle.transform.scale.y = Lerp(particle.startSize.y, particle.endSize.y, t);
 
@@ -190,7 +191,7 @@ void ParticleManager::Update() {
 
 
 			group->lifeTime[i] -= FPSKeeper::DeltaTime();
-			group->animeTime[i]+= FPSKeeper::DeltaTime();
+			group->animeTime[i] += FPSKeeper::DeltaTime();
 
 			for (auto& animeChange : group->anime_) {
 				if (group->animeTime[i] >= animeChange.second * FPSKeeper::DeltaTime()) {
@@ -321,7 +322,7 @@ void ParticleManager::CreateAnimeGroup(const std::string& name, const std::strin
 	AnimeGroup* newGroup = new AnimeGroup();
 
 	newGroup->farst = fileName;
-
+	TextureManager::GetInstance()->LoadTexture(fileName);
 	for (int i = 0; i < 6; i++) {
 		Object3d* newobj = new Object3d();
 		newobj->Create("plane.obj");
@@ -455,7 +456,7 @@ void ParticleManager::AddAnime(const std::string& name, const std::string& fileN
 	if (iterator != instance->animeGroups_.end()) {
 
 		AnimeGroup* group = iterator->second;
-
+		TextureManager::GetInstance()->LoadTexture(fileName);
 		group->anime_.insert(std::make_pair(fileName, animeChangeTime));
 
 	}
