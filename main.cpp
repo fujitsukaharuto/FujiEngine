@@ -75,15 +75,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	textureManager = TextureManager::GetInstance();
 	modelManager = ModelManager::GetInstance();
 
-
-	pManager = ParticleManager::GetInstance();
-	pManager->Initialize(dxCommon, srvManager);
-	pManager->CreateParticleGroup("test", "uvChecker.png");
-
-
 	pointLightManager = PointLightManager::GetInstance();
 	pointLightManager->AddPointLight();
 	pointLightManager->AddSpotLight();
+
+
+	pManager = ParticleManager::GetInstance();
+	pManager->Initialize(dxCommon, srvManager);
+	pManager->CreateAnimeGroup("animetest", "uvChecker.png");
+	pManager->AddAnime("animetest", "white2x2.png", 10.0f);
 
 #pragma endregion
 

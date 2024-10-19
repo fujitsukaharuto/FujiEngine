@@ -116,6 +116,7 @@ void ModelManager::LoadOBJ(const std::string& filename) {
 			material.SetTextureNamePath(matelialPath.textureFilePath);
 			material.CreateMaterial();
 			model->AddMaterial(material);
+			model->SetTextureName(matelialPath.textureFilePath);
 		}
 	}
 

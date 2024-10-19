@@ -46,3 +46,9 @@ void Material::SetTextureNamePath(const std::string& pathName)
 {
 	textureNamePath_.textureFilePath = pathName;
 }
+
+void Material::SetTexture(const std::string& name) {
+
+	texture_ = TextureManager::GetInstance()->GetTexture(name);
+
+}
