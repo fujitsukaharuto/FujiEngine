@@ -42,6 +42,8 @@ public:
 
 	void SetColor(const Vector4& color) { materialDate_->color = color; }
 
+	void SetTexture(const std::string& name);
+
 private:
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_ = nullptr;

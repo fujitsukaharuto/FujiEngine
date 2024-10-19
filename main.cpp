@@ -77,6 +77,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	textureManager = TextureManager::GetInstance();
 	modelManager = ModelManager::GetInstance();
 
+	pointLightManager = PointLightManager::GetInstance();
+	pointLightManager->AddPointLight();
+	pointLightManager->AddSpotLight();
+
 
 	pManager = ParticleManager::GetInstance();
 	pManager->Initialize(dxCommon, srvManager);
@@ -90,6 +94,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	pointLightManager = PointLightManager::GetInstance();
 	pointLightManager->AddPointLight();
 	pointLightManager->AddSpotLight();
+
+	pManager->CreateAnimeGroup("animetest", "uvChecker.png");
+	pManager->AddAnime("animetest", "white2x2.png", 10.0f);
 
 	primitiveDrawer = PrimitiveDrawer::GetInstance();
 

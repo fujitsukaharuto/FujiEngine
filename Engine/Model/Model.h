@@ -24,6 +24,12 @@ public:
 
 	void SetColor(const Vector4& color);
 
+	void SetTexture(const std::string& name);
+
+	void SetTextureName(const std::string& name);
+
+	std::string GetTextuerName() { return nowTextuer; }
+
 private:
 
 
@@ -32,5 +38,6 @@ private:
 
 	std::vector<Material> material_;
 	std::vector<Mesh> mesh_;
+	std::string nowTextuer;
 
 };

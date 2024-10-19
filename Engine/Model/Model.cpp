@@ -42,3 +42,18 @@ void Model::SetColor(const Vector4& color) {
 		material.SetColor(color);
 	}
 }
+
+void Model::SetTexture(const std::string& name) {
+
+	if (nowTextuer==name) {
+		return;
+	}
+	for (uint32_t index = 0; index < mesh_.size(); ++index) {
+		material_[index].SetTexture(name);
+	}
+	nowTextuer = name;
+}
+
+void Model::SetTextureName(const std::string& name) {
+	nowTextuer = name;
+}
