@@ -1,5 +1,5 @@
-#include"Object/Player.h"
-#include"Input.h"
+#include "Object/Player.h"
+#include "Input.h"
 
 #include "Collision/CollisionManager.h"
 #include "Collision/SphereCollider.h"
@@ -7,178 +7,186 @@
 
 #include "Field/Field.h"
 
-#include<algorithm>
-#undef max            // マクロ版のmaxを無効化dddaada
+#include <algorithm>
+#undef max
+#undef min
 
 Player::Player() : Character(std::make_unique<SphereCollider>()){
-	SphereCollider* sphereCollider = dynamic_cast< SphereCollider* >(collider_.get());
-	if (sphereCollider){
-		sphereCollider->radius_ = 1.0f;
-	}
+    SphereCollider* sphereCollider = dynamic_cast< SphereCollider* >(collider_.get());
+    if (sphereCollider){
+        sphereCollider->radius_ = 0.5f;
+        sphereCollider->position_ = {100.0f, 0.0f, 0.0f};
+    }
 
-	
-
-	//識別id
-	sphereCollider->SetTypeID(static_cast< uint32_t >(CollisionTypeIdDef::kPlayer));
-	CollisionManager::GetInstance()->AddCollider(this);
-
+    //識別id
+    sphereCollider->SetTypeID(static_cast< uint32_t >(CollisionTypeIdDef::kPlayer));
+    CollisionManager::GetInstance()->AddCollider(this);
 }
 
 void Player::Initialize(std::vector<Object3d*> Object3ds){
-	Character::Initialize(Object3ds);
+    Character::Initialize(Object3ds);
 
-	emit.name = "playerHit";
-	emit.count = 1;
-	emit.animeData.lifeTime = 20;
-	emit.RandomSpeed({ -0.00f,0.00f }, { -0.00f,0.00f }, { 0.0f,0.0f });
-	emit.RandomTranslate({ -0.13f,-0.13f }, { 0.0f,0.0f }, { -1.7f,-1.7f });
-	emit.animeData.startSize = { 1.5f,1.5f };
-	emit.animeData.endSize = { 1.5f,1.5f };
-
+    emit.name = "playerHit";
+    emit.count = 1;
+    emit.animeData.lifeTime = 20;
+    emit.RandomSpeed({-0.00f,0.00f}, {-0.00f,0.00f}, {0.0f,0.0f});
+    emit.RandomTranslate({-0.13f,-0.13f}, {0.0f,0.0f}, {-1.7f,-1.7f});
+    emit.animeData.startSize = {1.5f,1.5f};
+    emit.animeData.endSize = {1.5f,1.5f};
 }
 
 void Player::Update(){
-	collider_->Update(GetWorldPosition());
+    collider_->Update(GetCenterPos());
 
-	this->Jump();
-	this->Move();
-	if (Input::GetInstance()->TriggerKey(DIK_4)) {
-		emit.pos = GetCenterPos();
-		emit.BurstAnime();
-	}
-	models_[0]->transform.translate += velocity_;
+    // ノックバック中の処理
+    if (isKnockedBack_){
+        knockbackTimer_ -= 0.016f; // タイマーを減らす (例: 60FPSで1フレーム = 0.016秒)
 
-	float moveEndPosX = Field::fieldEndPosX + Field::scrollX_ + models_[0]->transform.scale.x * 0.5f;
+        // 重力を適用
+        const float kGravity = -1.0f; // 重力の値
+        const float kDeltaTime = 0.016f; // フレーム間の時間 (60FPS想定)
+        velocity_.y += kGravity * kDeltaTime; // 重力をY軸方向に加算
 
-	// フィールドの左端に行かないようにstd::maxを使用
-	models_[0]->transform.translate.x = std::max(models_[0]->transform.translate.x, moveEndPosX);
+        // Z軸の回転を追加 (ノックバック中のみ)
+        const float kRotationSpeed = 0.16f; // Z軸回転の速度
+        models_[0]->transform.rotate.z += kRotationSpeed; // Z軸を回転
+
+        // 地面に着いたらノックバックを終了
+        if (models_[0]->transform.translate.y <= 0.0f && !isKnockedBack_){
+            models_[0]->transform.translate.y = 0.0f;
+            velocity_.y = 0.0f; // Y軸速度をリセットして地面に着いた状態にする
+            isKnockedBack_ = false; // ノックバックを終了
+            models_[0]->transform.rotate.z = 0.0f; // Z軸の回転をリセット
+        }
+
+
+        // ノックバックが終了したら通常状態に戻す
+        if (knockbackTimer_ <= 0.0f){
+            isKnockedBack_ = false;
+            knockbackTimer_ = 0.0f;
+            models_[0]->transform.rotate.z = 0.0f; // Z軸の回転をリセット
+        }
+    } else{
+        // 通常の動作 (ジャンプと移動)
+        this->Jump();
+        this->Move();
+    }
+
+    models_[0]->transform.translate += velocity_;
+
+    //地面より下に行かないように
+    models_[0]->transform.translate.y = std::max(models_[0]->transform.translate.y,0.0f);
 }
+
+
 
 void Player::Draw(){
-
-	Character::Draw();
+    Character::Draw();
 }
 
-
-
 void Player::Move(){
-	if (Input::GetInstance()->PushKey(DIK_A)){
-		moveSpeed_ = -0.2f;
-	} else if (Input::GetInstance()->PushKey(DIK_D)){
-		moveSpeed_ = 0.2f;
-	} else{
-		moveSpeed_ = 0.0f;
-	}
+    if (!isKnockedBack_){  // ノックバック中は通常の移動を無効化
+        if (Input::GetInstance()->PushKey(DIK_A)){
+            moveSpeed_ = -0.2f;
+        } else if (Input::GetInstance()->PushKey(DIK_D)){
+            moveSpeed_ = 0.2f;
+        } else{
+            moveSpeed_ = 0.0f;
+        }
 
-	velocity_.x = moveSpeed_;
-
-
-
+        velocity_.x = moveSpeed_;
+    }
 }
 
 void Player::Jump(){
-	const float kGravity = -1.0f;//要調整
-	const float kDeltaTime = 0.016f;
+    const float kGravity = -1.0f; // 要調整
+    const float kDeltaTime = 0.016f;
 
-	// ジャンプ開始
-	if (Input::GetInstance()->TriggerKey(DIK_SPACE)){
-		isJumping_ = true;
-		velocity_.y = 0.3f;
-	}
+    // ジャンプ開始
+    if (Input::GetInstance()->TriggerKey(DIK_SPACE)){
+        isJumping_ = true;
+        velocity_.y = 0.3f;
+    }
 
-	// ジャンプ中の挙動
-	if (isJumping_){
-		velocity_.y += kGravity * kDeltaTime;
+    // ジャンプ中の挙動
+    if (isJumping_){
+        velocity_.y += kGravity * kDeltaTime;
 
-		// 地面に着いたらジャンプリセット
-		if (models_[0]->transform.translate.y < 0.0f){
-			models_[0]->transform.translate.y = 0.0f;
-			isJumping_ = false;
-			velocity_ = {0.0f, 0.0f, 0.0f};
-		}
-	}
-}
-
-Vector3 ClampVector3(const Vector3& value, const Vector3& min, const Vector3& max){
-	Vector3 clamped;
-	clamped.x = (value.x < min.x) ? min.x : ((value.x > max.x) ? max.x : value.x);
-	clamped.y = (value.y < min.y) ? min.y : ((value.y > max.y) ? max.y : value.y);
-	clamped.z = (value.z < min.z) ? min.z : ((value.z > max.z) ? max.z : value.z);
-	return clamped;
-}
-
-Vector3 Player::CalculateNormal(const Vector3& spherePosition, const Vector3& aabbMin, const Vector3& aabbMax){
-	Vector3 closestPoint = ClampVector3(spherePosition, aabbMin, aabbMax);
-	Vector3 difference = spherePosition - closestPoint;
-
-	// 差分の絶対値を使用してどの面に最も近いかを判定
-	float absX = std::abs(difference.x);
-	float absY = std::abs(difference.y);
-	float absZ = std::abs(difference.z);
-
-	// どの軸に最も近いかを調べる
-	Vector3 normal;
-	if (absX > absY && absX > absZ){
-		// X軸に最も近い
-		if (difference.x > 0){
-			normal = Vector3(1.0f, 0.0f, 0.0f);
-		} else{
-			normal = Vector3(-1.0f, 0.0f, 0.0f);
-		}
-	} else if (absY > absX && absY > absZ){
-		// Y軸に最も近い
-		if (difference.y > 0){
-			normal = Vector3(0.0f, 1.0f, 0.0f);
-		} else{
-			normal = Vector3(0.0f, -1.0f, 0.0f);
-		}
-	} else{
-		// Z軸に最も近い
-		if (difference.z > 0){
-			normal = Vector3(0.0f, 0.0f, 1.0f);
-		} else{
-			normal = Vector3(0.0f, 0.0f, -1.0f);
-		}
-	}
-
-	return normal;
+        // 地面に着いたらジャンプリセット
+        if (models_[0]->transform.translate.y < 0.0f){
+            models_[0]->transform.translate.y = 0.0f;
+            isJumping_ = false;
+            velocity_ = {0.0f, 0.0f, 0.0f};
+        }
+    }
 }
 
 
 void Player::OnCollision(Character* other){
-	uint32_t collisionType = other->GetCollider()->GetTypeID();
+    uint32_t collisionType = other->GetCollider()->GetTypeID();
 
-	// 音符に変わる敵と衝突したとき
-	if (collisionType == static_cast< uint32_t >(CollisionTypeIdDef::kNoteEnemy)){
-		SphereCollider* enemyCollider = static_cast< SphereCollider* >(other->GetCollider());
-		SphereCollider* playerCollider = static_cast< SphereCollider* >(this->GetCollider());
+    // 音符に変わる敵と衝突したとき
+    if (collisionType == static_cast< uint32_t >(CollisionTypeIdDef::kNoteEnemy)){
+        SphereCollider* enemyCollider = static_cast< SphereCollider* >(other->GetCollider());
+        SphereCollider* playerCollider = static_cast< SphereCollider* >(this->GetCollider());
 
-		// プレイヤーと敵の位置と半径を取得
-		Vector3 playerPos = playerCollider->GetPosition();
-		Vector3 enemyPos = enemyCollider->GetPosition();
-		float playerRadius = playerCollider->GetRadius();
-		float enemyRadius = enemyCollider->GetRadius();
+        Vector3 playerPos = playerCollider->GetPosition();
+        Vector3 enemyPos = enemyCollider->GetPosition();
+        float playerRadius = playerCollider->GetRadius();
+        float enemyRadius = enemyCollider->GetRadius();
 
-		if (enemyPos.y > 0.5f){
-			Vector3 collisionNormal = playerPos - enemyPos;
-			float distance = collisionNormal.Lenght();
+        // プレイヤーがまだ空中にいるかどうかのチェック
+        if (isJumping_ && enemyPos.y > 0.5f){
+            Vector3 collisionNormal = playerPos - enemyPos;
+            float distance = collisionNormal.Lenght();
 
-			// 正規化された法線ベクトルを計算
-			collisionNormal.Normalize();
+            collisionNormal.Normalize();
 
+            // 反射時の速度減衰率
+            const float kReflectionDamping = 0.5f;
 
-			// 速度ベクトルを取得し、反射させる
-			Vector3 playerVelocity = velocity_;
-			Vector3 reflectedVelocity = playerVelocity - 2 * collisionNormal * playerVelocity.Dot(collisionNormal);
+            Vector3 playerVelocity = velocity_;
 
-			// プレイヤーの速度を更新
-			velocity_ = reflectedVelocity;
-			// プレイヤーを敵から少し離れた位置に移動させてめり込みを防止
-			float penetrationDepth = (playerRadius + enemyRadius) - distance;
-			playerPos += collisionNormal * penetrationDepth;
-			playerCollider->SetPosition(playerPos);
-		}
-	}
+            // 速度ベクトルを反射し、減衰させる
+            Vector3 reflectedVelocity = playerVelocity - 2 * collisionNormal * playerVelocity.Dot(collisionNormal);
+            reflectedVelocity *= kReflectionDamping;
+
+            // Y軸方向の速度が大きくなりすぎないように上限を設定
+            const float kMaxVelocityY = 0.3f;
+            reflectedVelocity.y = std::min(reflectedVelocity.y, kMaxVelocityY);
+
+            // プレイヤーの速度を更新
+            velocity_ = reflectedVelocity;
+
+            // プレイヤーを敵から少し離れた位置に移動させてめり込みを防止
+            float penetrationDepth = (playerRadius + enemyRadius) - distance;
+            playerPos += collisionNormal * (penetrationDepth * 0.5f);
+            playerCollider->SetPosition(playerPos);
+        }
+    }
+    // ボスと衝突したときは常にノックバック
+    else if (collisionType == static_cast< uint32_t >(CollisionTypeIdDef::kBoss)){
+        SphereCollider* bossCollider = static_cast< SphereCollider* >(other->GetCollider());
+        SphereCollider* playerCollider = static_cast< SphereCollider* >(this->GetCollider());
+
+        Vector3 playerPos = playerCollider->GetPosition();
+        Vector3 bossPos = bossCollider->GetPosition();
+
+        // プレイヤーがボスと衝突した際に右方向（+X方向）に飛ばす
+        const float kBossCollisionXVelocity = 0.2f;  // 右方向に飛ばす速度
+        const float kBossCollisionYVelocity = 0.2f;  // 上方向に飛ばす速度
+
+        // X方向の速度を設定して右に飛ばす
+        velocity_.x = kBossCollisionXVelocity;
+        // Y方向の速度も設定してジャンプさせる
+        velocity_.y = kBossCollisionYVelocity;
+
+        // プレイヤーをボスから少し右に押し出す
+        playerPos.x += 0.5f;  // 右方向に押し出す距離を調整
+        playerCollider->SetPosition(playerPos);
+
+        // ノックバック状態に設定
+        isKnockedBack_ = true;
+        knockbackTimer_ = 0.5f;  // ノックバックの継続時間を設定
+    }
 }
-
-

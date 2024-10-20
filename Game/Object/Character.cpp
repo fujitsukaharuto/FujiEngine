@@ -36,14 +36,17 @@ void Character::Draw(){
 
 void Character::SetTranslate(const Vector3& pos, uint32_t modelNum){
 	models_[modelNum]->transform.translate = pos;
+	models_[modelNum]->UpdateWorldMat();
 }
 
 void Character::SetRotate(const Vector3& rotate, uint32_t modelNum){
 	models_[modelNum]->transform.rotate = rotate;
+	models_[modelNum]->UpdateWorldMat();
 }
 
 void Character::SetScale(const Vector3& scale, uint32_t modelNum){
 	models_[modelNum]->transform.scale = scale;
+	models_[modelNum]->UpdateWorldMat();
 }
 
 Vector3 Character::GetWorldPosition() const{
