@@ -54,12 +54,12 @@ void SceneManager::StartScene(const std::string& sceneName) {
 
 }
 
-void SceneManager::ChangeScene(const std::string& sceneName) {
+void SceneManager::ChangeScene(const std::string& sceneName, float extraTime) {
 
 	assert(nextScene_ == nullptr);
 
 	isChange_ = true;
-	changeExtraTime = 120.0f;
+	changeExtraTime = extraTime;
 
 	nextScene_ = CreateScene(sceneName);
 

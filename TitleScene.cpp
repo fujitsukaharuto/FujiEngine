@@ -43,12 +43,14 @@ void TitleScene::Update() {
 	sphere->SetRightDir(rightDir);
 	ImGui::End();
 
+	ImGui::Begin("Scene");
+	ImGui::SeparatorText("ChangeScene");
+	if (ImGui::Button("GameScene")) {
+		SceneManager::GetInstance()->ChangeScene("GAME", 40.0f);
+	}
+	ImGui::End();
 
 #endif // _DEBUG
-
-	if (input_->TriggerKey(DIK_8)) {
-		SceneManager::GetInstance()->ChangeScene("GAME");
-	}
 
 	dxCommon_->UpDate();
 
