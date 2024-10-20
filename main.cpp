@@ -1,6 +1,6 @@
 #include "Audio.h"
 #include "DXCom.h"
-#include "GameScene.h"
+#include "SceneManager.h"
 #include "TextureManager.h"
 #include "ImGuiManager.h"
 #include "SRVManager.h"
@@ -29,7 +29,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Input* input = nullptr;
 	Audio* audio = nullptr;
 	FPSKeeper* fpsKeeper = nullptr;
-	GameScene* gameScene = nullptr;
+	SceneManager* sceneManager = nullptr;
 	TextureManager* textureManager = nullptr;
 	PrimitiveDrawer* primitiveDrawer = nullptr;
 	ModelManager* modelManager = nullptr;
@@ -107,9 +107,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	GlobalVariables::GetInstance()->LoadFiles();
 
-	gameScene = new GameScene();
-	gameScene->Initialize();
-
+	sceneManager = SceneManager::GetInstance();
+	sceneManager->StartScene("TITLE");
 
 	//BYTE keys[256] = { 0 };
 	//BYTE preKeys[256] = { 0 };
@@ -145,7 +144,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		GlobalVariables::GetInstance()->Update();
 
 		// ゲームシーンの毎フレーム処理
-		gameScene->Update();
+		sceneManager->Update();
 
 		// ImGui受付
 		imguiManager->End();
@@ -153,7 +152,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		// 描画開始
 		dxCommon->PreDraw();
 		// ゲームシーンの描画
-		gameScene->Draw();
+		sceneManager->Draw();
 		// ImGuiの描画
 		imguiManager->Draw();
 		// 描画終了
@@ -161,7 +160,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	}
 
 	// 解放
-	delete gameScene;
+	sceneManager->Finalize();
+
 
 	primitiveDrawer->Finalize();
 	

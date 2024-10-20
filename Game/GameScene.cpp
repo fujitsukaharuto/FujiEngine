@@ -42,7 +42,6 @@ GameScene::~GameScene(){
 }
 
 void GameScene::Initialize() {
-	Init();
 
 
 	Vector3 cameraInitializePos = {-11.5f,5.6f,-63.5f};

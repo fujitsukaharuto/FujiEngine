@@ -260,6 +260,9 @@
     <ClCompile Include="Engine\GlobalVariables\GlobalVariables.cpp">
       <Filter>Externals</Filter>
     </ClCompile>
+    <ClCompile Include="SceneManager.cpp">
+      <Filter>Engine\Manager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <!-- Header files -->
@@ -487,6 +490,9 @@
     </ClInclude>
     <ClInclude Include="Engine\GlobalVariables\GlobalVariables.h">
       <Filter>Externals</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager.h">
+      <Filter>Engine\Manager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

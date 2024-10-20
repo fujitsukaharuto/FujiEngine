@@ -6,6 +6,7 @@
 #include "FPSKeeper.h"
 #include "Random.h"
 
+#include "SceneManager.h"
 #include "ParticleManager.h"
 
 
@@ -45,6 +46,9 @@ void TitleScene::Update() {
 
 #endif // _DEBUG
 
+	if (input_->TriggerKey(DIK_8)) {
+		SceneManager::GetInstance()->ChangeScene("GAME");
+	}
 
 	dxCommon_->UpDate();
 
