@@ -31,9 +31,9 @@ void Player::Initialize(std::vector<Object3d*> Object3ds){
 	emit.count = 1;
 	emit.grain.lifeTime_ = 20;
 	emit.RandomSpeed({ -0.00f,0.00f }, { -0.00f,0.00f }, { 0.0f,0.0f });
-	emit.RandomTranslate({ 0.0f,0.0f }, { 0.0f,0.0f }, { 0.0f,0.0f });
-	emit.grain.startSize = { 0.3f,0.3f };
-	emit.grain.endSize = { 5.0f,5.0f };
+	emit.RandomTranslate({ 0.0f,0.0f }, { 0.0f,0.0f }, { -1.5f,-1.0f });
+	emit.grain.startSize = { 0.1f,0.1f };
+	emit.grain.endSize = { 3.0f,3.0f };
 	emit.grain.type = SizeType::kExpantion;
 
 
@@ -41,7 +41,7 @@ void Player::Initialize(std::vector<Object3d*> Object3ds){
 	starEmit.count = 4;
 	starEmit.grain.lifeTime_ = 20;
 	starEmit.RandomSpeed({ -0.08f,0.08f }, { -0.08f,0.08f }, { 0.0f,0.0f });
-	starEmit.RandomTranslate({ 0.0f,0.0f }, { 0.0f,0.0f }, { 0.0f,0.0f });
+	starEmit.RandomTranslate({ 0.0f,0.0f }, { 0.0f,0.0f }, { -1.5f,-1.0f });
 	starEmit.grain.startSize = { 0.7f,0.7f };
 	starEmit.grain.endSize = { 1.0f,1.0f };
 
