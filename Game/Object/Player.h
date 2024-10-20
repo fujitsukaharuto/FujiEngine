@@ -54,5 +54,5 @@ private:
 
 
 	ParticleEmitter emit;
-	ParticleEmitter starEmit;
+
 };

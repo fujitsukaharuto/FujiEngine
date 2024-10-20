@@ -86,13 +86,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	pManager->Initialize(dxCommon, srvManager);
 	pManager->CreateParticleGroup("test", "uvChecker.png");
 	pManager->CreateParticleGroup("noteChange", "bakuha.png");
-	pManager->CreateParticleGroup("playerHit", "blueParticle.png");
-	pManager->CreateParticleGroup("playerHitStar", "boal16x16.png");
+	
 
 	pManager->CreateAnimeGroup("animetest", "uvChecker.png");
 	pManager->AddAnime("animetest", "white2x2.png", 10.0f);
 	pManager->CreateAnimeGroup("bossHit", "explosion.png");
 	pManager->AddAnime("bossHit", "star.png", 8.0f);
+	pManager->CreateAnimeGroup("playerHit", "playerDamage01.png");
+	pManager->AddAnime("playerHit", "playerDamage02.png", 5.0f);
+	pManager->AddAnime("playerHit", "playerDamage03.png", 10.0f);
+	pManager->AddAnime("playerHit", "playerDamage04.png", 15.0f);
 
 
 	pointLightManager = PointLightManager::GetInstance();
