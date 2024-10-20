@@ -112,6 +112,7 @@ void GameScene::Initialize() {
 	for (Object3d*& fieldModel : fieldModels_){
 		fieldModel = new Object3d;
 		fieldModel->Create("ground.obj");
+		fieldModel->SetColor({ 0.2f,0.2f,0.2f,1.0f });
 	}
 
 
