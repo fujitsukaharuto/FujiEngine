@@ -13,7 +13,12 @@
 #include <algorithm>
 #undef max
 
+
+uint32_t Boss::nextSerialNumber = 0;
+
 Boss::Boss() : Character(std::make_unique<SphereCollider>()), stopMoveTimer_(0){
+	serialNumber_ = nextSerialNumber;
+	++nextSerialNumber;
 	SphereCollider* sphereCollider = dynamic_cast< SphereCollider* >(collider_.get());
 	if (sphereCollider){
 		sphereCollider->radius_ = 7.75f;
@@ -22,10 +27,14 @@ Boss::Boss() : Character(std::make_unique<SphereCollider>()), stopMoveTimer_(0){
 	sphereCollider->SetTypeID(static_cast< uint32_t >(CollisionTypeIdDef::kBoss));
 	CollisionManager::GetInstance()->AddCollider(this);
 
+	//初期値として20
+	life_ = 20;
+
 	//調整項目
 	const char* groupName = "boss";
 	GlobalVariables::GetInstance()->CreateGroup(groupName);
 	GlobalVariables::GetInstance()->AddItem(groupName, "moveSpeed", moveSpeed_);
+	GlobalVariables::GetInstance()->AddItem(groupName, "life", life_);
 }
 
 Boss::~Boss(){
@@ -153,6 +162,7 @@ void Boss::Move(){
 void Boss::ApplyGlobalVariables(){
 	const char* groupName = "boss";
 	moveSpeed_ = GlobalVariables::GetInstance()->GetFloatValue(groupName, "moveSpeed");
+	life_ = GlobalVariables::GetInstance()->GetIntValue(groupName, "life");
 }
 
 void Boss::StopMoveForCollision(uint32_t time){

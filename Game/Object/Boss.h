@@ -40,6 +40,12 @@ public:
 
     Vector3 GetCenterPos()const override;
 
+    /// <summary>
+    /// シリアルナンバーの取得
+    /// </summary>
+    /// <returns></returns>
+    uint32_t GetSerialNumber()const{ return serialNumber_; }
+
 private:
     void Move();
 
@@ -74,7 +80,13 @@ private:
 
     ParticleEmitter emit;
     SoundData testLong;
+
+
+    //シリアルナンバー
+    uint32_t serialNumber_ = 0;
+    static uint32_t nextSerialNumber;
     //接触履歴
     ContactRecord record_;
+    
 };
 

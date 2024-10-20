@@ -4,6 +4,8 @@
 #include "Collision/CollisionManager.h"
 #include "Collision/SphereCollider.h"
 #include "Collision/BoxCollider.h"
+#include "GlobalVariables/GlobalVariables.h"
+#include "Object/Boss.h"
 
 #include "Field/Field.h"
 
@@ -14,13 +16,22 @@
 Player::Player() : Character(std::make_unique<SphereCollider>()){
     SphereCollider* sphereCollider = dynamic_cast< SphereCollider* >(collider_.get());
     if (sphereCollider){
-        sphereCollider->radius_ = 0.5f;
+        sphereCollider->radius_ = 1.0f;
         sphereCollider->position_ = {100.0f, 0.0f, 0.0f};
     }
 
     //識別id
     sphereCollider->SetTypeID(static_cast< uint32_t >(CollisionTypeIdDef::kPlayer));
     CollisionManager::GetInstance()->AddCollider(this);
+
+
+    //初期値として5に設定
+    life_ = 5;
+
+    //調整項目
+    const char* groupName = "player";
+    GlobalVariables::GetInstance()->CreateGroup(groupName);
+    GlobalVariables::GetInstance()->AddItem(groupName, "life", life_);
 }
 
 void Player::Initialize(std::vector<Object3d*> Object3ds){
@@ -33,6 +44,9 @@ void Player::Initialize(std::vector<Object3d*> Object3ds){
     emit.RandomTranslate({-0.13f,-0.13f}, {0.0f,0.0f}, {-1.7f,-1.7f});
     emit.animeData.startSize = {1.5f,1.5f};
     emit.animeData.endSize = {1.5f,1.5f};
+
+    const char* groupName = "player";
+    life_ = GlobalVariables::GetInstance()->GetIntValue(groupName,"life");
 }
 
 void Player::Update(){
@@ -63,6 +77,8 @@ void Player::Update(){
         // ノックバックが終了したら通常状態に戻す
         if (knockbackTimer_ <= 0.0f){
             isKnockedBack_ = false;
+            record_.Clear();//接触履歴をリセット
+
             knockbackTimer_ = 0.0f;
             models_[0]->transform.rotate.z = 0.0f; // Z軸の回転をリセット
         }
@@ -76,12 +92,18 @@ void Player::Update(){
 
     //地面より下に行かないように
     models_[0]->transform.translate.y = std::max(models_[0]->transform.translate.y,0.0f);
+
+    //生存フラグの管理
+    Character::Update();
 }
 
 
 
 void Player::Draw(){
-    Character::Draw();
+
+    if (isAlive_){
+        Character::Draw();
+    }
 }
 
 void Player::Move(){
@@ -119,6 +141,12 @@ void Player::Jump(){
             velocity_ = {0.0f, 0.0f, 0.0f};
         }
     }
+}
+
+Vector3 Player::GetCenterPos() const{
+    Vector3 offset = {0.0f, 0.5f, 0.0f};
+    Vector3 worldPos = Transform(offset, models_[0]->GetMatWorld());
+    return worldPos;
 }
 
 
@@ -164,10 +192,21 @@ void Player::OnCollision(Character* other){
             playerCollider->SetPosition(playerPos);
         }
     }
+
     // ボスと衝突したときは常にノックバック
     else if (collisionType == static_cast< uint32_t >(CollisionTypeIdDef::kBoss)){
+        Boss* boss = static_cast< Boss* >(other);
         SphereCollider* bossCollider = static_cast< SphereCollider* >(other->GetCollider());
         SphereCollider* playerCollider = static_cast< SphereCollider* >(this->GetCollider());
+
+        uint32_t serialNum = boss->GetSerialNumber();
+
+        if (record_.CheckRecord(serialNum)){
+            return;
+        }
+
+        // 履歴に登録
+        record_.AddRecord(serialNum);
 
         Vector3 playerPos = playerCollider->GetPosition();
         Vector3 bossPos = bossCollider->GetPosition();
@@ -188,5 +227,7 @@ void Player::OnCollision(Character* other){
         // ノックバック状態に設定
         isKnockedBack_ = true;
         knockbackTimer_ = 0.5f;  // ノックバックの継続時間を設定
+
+        life_--;
     }
 }

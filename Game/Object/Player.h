@@ -44,6 +44,9 @@ private:
 
     Vector3 CalculateNormal(const Vector3& spherePosition, const Vector3& aabbMin, const Vector3& aabbMax);
 
+
+    virtual Vector3 GetCenterPos()const override;
+
 private:
     //移動スピード
     float moveSpeed_ = 0.1f;
@@ -55,6 +58,9 @@ private:
     bool isKnockedBack_ = false;
     // ノックバックの残り時間
     float knockbackTimer_ = 0.0f;
+
+    //接触履歴
+    ContactRecord record_;
 
 	ParticleEmitter emit;
 
