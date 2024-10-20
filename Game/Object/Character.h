@@ -53,6 +53,7 @@ public:
 
 	Vector3 GetWorldPosition()const;
 
+
 	virtual Vector3 GetCenterPos()const;
 
 	const Vector3& GetTranslate(){ return models_[0]->transform.translate; }
@@ -65,5 +66,8 @@ protected:
 	//描画用モデル
 	std::vector<Object3d*> models_ {};
 
+	int32_t life_;
+
+	bool isAlive_ = true;
 	
 };

@@ -21,6 +21,11 @@ void Character::Initialize(Object3d* model){
 
 void Character::Update(){
 	
+	if (isAlive_){
+		if (life_<=0){
+			isAlive_ = false;
+		}
+	}
 }
 
 void Character::Draw(){
