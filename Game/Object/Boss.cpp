@@ -62,11 +62,11 @@ void Boss::Initialize(std::vector<Object3d*> models){
 
 	emit.name = "bossHit";
 	emit.count = 1;
-	emit.animeData.lifeTime = 20;
-	emit.RandomSpeed({-0.0f,0.0f}, {-0.0f,0.0f}, {-0.0f,0.0f});
-	emit.RandomTranslate({-0.0f,0.0f}, {-0.0f,0.0f}, {-5.5f,-5.0f});
-	emit.animeData.startSize = {4.0f,4.0f};
-	emit.animeData.endSize = {0.2f,0.2f};
+	emit.animeData.lifeTime = 48;
+	emit.RandomSpeed({ -0.0f,0.0f }, { -0.0f,0.0f }, { -0.0f,0.0f });
+	emit.RandomTranslate({ -0.0f,0.0f }, { -0.0f,0.0f }, { -5.5f,-5.0f });
+	emit.animeData.startSize = { 4.0f,4.0f };
+	emit.animeData.endSize = { 1.2f,1.2f };
 	emit.animeData.type = SizeType::kReduction;
 
 #ifdef _DEBUG

@@ -120,6 +120,37 @@ Texture* TextureManager::LoadTexture(const std::string& filename) {
 	return m_textureCache[filename].get();
 }
 
+void TextureManager::Load(const std::string& filename) {
+
+	// 既にロードされているかチェック
+	if (m_textureCache.find(filename) != m_textureCache.end()) {
+		return;
+	}
+
+	SRVManager* srvManager = SRVManager::GetInstance();
+
+	DirectX::ScratchImage mipImages = LoadTextureFile(directoryPath_ + filename);
+	std::unique_ptr<Texture> texture = std::make_unique<Texture>();
+	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
+	texture->textureResource = CreateTextureResource(DXCom::GetInstance()->GetDevice(), metadata);
+	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource;
+
+	intermediateResource.Reset();
+	intermediateResource = UploadTextureData(texture->textureResource, mipImages, DXCom::GetInstance()->GetDevice(), DXCom::GetInstance()->GetCommandList());
+
+	texture->srvIndex = srvManager->Allocate();
+
+	srvManager->CreateTextureSRV(texture->srvIndex, texture->textureResource.Get(), metadata.format, UINT(metadata.mipLevels));
+
+	texture->cpuHandle = srvManager->GetCPUDescriptorHandle(texture->srvIndex);
+	texture->gpuHandle = srvManager->GetGPUDescriptorHandle(texture->srvIndex);
+
+	DXCom::GetInstance()->CommandExecution();
+
+	m_textureCache[filename] = std::move(texture);
+
+}
+
 Texture* TextureManager::GetTexture(const std::string& filename) const {
 	auto it = m_textureCache.find(filename);
 	if (it != m_textureCache.end()) {

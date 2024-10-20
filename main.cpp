@@ -90,8 +90,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	pManager->CreateAnimeGroup("animetest", "uvChecker.png");
 	pManager->AddAnime("animetest", "white2x2.png", 10.0f);
-	pManager->CreateAnimeGroup("bossHit", "explosion.png");
-	pManager->AddAnime("bossHit", "star.png", 8.0f);
+
+	pManager->CreateAnimeGroup("bossHit", "explosion1.png");
+	pManager->AddAnime("bossHit", "explosion2.png", 8.0f);
+	pManager->AddAnime("bossHit", "explosion3.png", 16.0f);
+	pManager->AddAnime("bossHit", "explosion4.png", 24.0f);
+	pManager->AddAnime("bossHit", "explosion5.png", 32.0f);
+	pManager->AddAnime("bossHit", "explosion6.png", 40.0f);
+
 	pManager->CreateAnimeGroup("playerHit", "playerDamage01.png");
 	pManager->AddAnime("playerHit", "playerDamage02.png", 5.0f);
 	pManager->AddAnime("playerHit", "playerDamage03.png", 10.0f);
@@ -112,6 +118,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	sceneManager = SceneManager::GetInstance();
 	sceneManager->StartScene("TITLE");
+
+
+
+	modelManager->LoadOBJ("ground.obj");
+	modelManager->LoadOBJ("player.obj"); 
+	modelManager->LoadOBJ("boss.obj");
+	modelManager->LoadOBJ("enemy.obj");
+
+
+	textureManager->Load("curtain.png");
+
 
 	//BYTE keys[256] = { 0 };
 	//BYTE preKeys[256] = { 0 };
