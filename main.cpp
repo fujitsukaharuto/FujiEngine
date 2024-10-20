@@ -142,9 +142,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 			}
 		}
-#endif // _DEBUG
 
 		GlobalVariables::GetInstance()->Update();
+
+#endif // _DEBUG
+
+		
 
 		// ゲームシーンの毎フレーム処理
 		sceneManager->Update();
