@@ -113,12 +113,12 @@ bool ChainEnemy::ShouldBreakChain(size_t i, size_t j) const{
 	if (posJ.x < posI.x){
 		// 先頭の敵が音符で後ろが音符ではない場合
 		if (connectedEnemies_[j]->GetIsChangedNote() && !connectedEnemies_[i]->GetIsChangedNote()){
-			return (posJ.x <= Field::fieldEndPosX + Field::scrollX_);
+			return (posJ.x <= Field::fieldEndPosX );
 		}
 	} else{
 		// 後ろの敵が音符で先頭が音符ではない場合
 		if (connectedEnemies_[i]->GetIsChangedNote() && !connectedEnemies_[j]->GetIsChangedNote()){
-			return (posI.x <= Field::fieldEndPosX + Field::scrollX_);
+			return (posI.x <= Field::fieldEndPosX );
 		}
 	}
 	return false;
@@ -126,7 +126,7 @@ bool ChainEnemy::ShouldBreakChain(size_t i, size_t j) const{
 
 bool ChainEnemy::ShouldRemoveConnectedEnemy(size_t i) const{
 	return !connectedEnemies_[i]->GetIsChangedNote() &&
-		connectedEnemies_[i]->GetWorldPosition().x < Field::fieldEndPosX + Field::scrollX_ + connectedEnemies_[i]->GetScale().x * 0.5f;
+		connectedEnemies_[i]->GetWorldPosition().x < Field::fieldEndPosX + connectedEnemies_[i]->GetScale().x * 0.5f;
 }
 
 void ChainEnemy::RemoveConnectedEnemy(size_t i){

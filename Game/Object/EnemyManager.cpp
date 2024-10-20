@@ -36,7 +36,7 @@ void EnemyManager::Update(){
 		}
 
 		//音符に変わっていない状態で削除ラインまで行くと消える
-		else if (!(*it)->GetIsChangedNote() && (*it)->GetTranslate().x <= Field::fieldEndPosX + Field::scrollX_ + (*it)->GetScale().x * 0.5f){
+		else if (!(*it)->GetIsChangedNote() && (*it)->GetTranslate().x <= Field::fieldEndPosX + (*it)->GetScale().x * 0.5f){
 			CollisionManager::GetInstance()->RemoveCollider((*it).get());
 			it = noteEnemies_.erase(it);  // 安全に削除
 			PopObstacle();
@@ -233,7 +233,7 @@ void EnemyManager::PopObstacle(){
 
 Vector3 EnemyManager::GetSpawnPosition(int fieldIndex){
 	float spawnPosY = pField_->GetPos(fieldIndex - 1).y;
-	float spawnPosX = Field::scrollX_ + Field::fieldEndPosX + 45.0f;
+	float spawnPosX = Field::cameraScrollX_ + 45.0f;
 	return Vector3 {spawnPosX, spawnPosY, 0.0f};
 }
 
@@ -241,7 +241,7 @@ Vector3 EnemyManager::GetObstacleSpawnPosition(int fieldIndex){
 	float spawnPosY = pField_->GetPos(fieldIndex - 1).y;
 	float swapnPosX = 45.0f;
 	float offset = 10.0f;
-	float fieldEnd = Field::scrollX_ + Field::fieldEndPosX;
+	float fieldEnd = Field::fieldEndPosX;
 	float spawnPosX = Random::GetFloat(fieldEnd + offset, swapnPosX + Field::cameraScrollX_);
 	return Vector3 {spawnPosX, spawnPosY, 0.0f};
 }

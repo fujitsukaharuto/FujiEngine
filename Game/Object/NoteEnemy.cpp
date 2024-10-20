@@ -16,6 +16,14 @@ uint32_t NoteEnemy::nextSerialNumber = 0;
 NoteEnemy::NoteEnemy() : Character(std::make_unique<SphereCollider>()){
 	serialNumber_ = nextSerialNumber;
 	++nextSerialNumber;
+
+	SphereCollider* sphereCollider = dynamic_cast< SphereCollider* >(collider_.get());
+	if (sphereCollider){
+		sphereCollider->radius_ = 1.0f;
+	}
+
+	sphereCollider->SetTypeID(static_cast< uint32_t >(CollisionTypeIdDef::kNoteEnemy));
+	CollisionManager::GetInstance()->AddCollider(this);
 }
 
 void NoteEnemy::Initialize(Object3d* model){
@@ -44,8 +52,6 @@ void NoteEnemy::Initialize(Object3d* model, const Vector3& initPos){
 
 	//座標を設定
 	collider_->Update(GetWorldPosition());
-	collider_->SetTypeID(static_cast< uint32_t >(CollisionTypeIdDef::kNoteEnemy));
-	CollisionManager::GetInstance()->AddCollider(this);
 
 	moveSpeed_ = moveSpeed_ * Field::influenceOnSpeed_[fieldIndex_];
 
