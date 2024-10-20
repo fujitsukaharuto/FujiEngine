@@ -21,7 +21,7 @@ public:
 
 	void StartScene(const std::string& sceneName);
 
-	void ChangeScene(const std::string& sceneName);
+	void ChangeScene(const std::string& sceneName,float extraTime);
 
 	BaseScene* CreateScene(const std::string& sceneName);
 

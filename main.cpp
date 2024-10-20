@@ -111,7 +111,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	GlobalVariables::GetInstance()->LoadFiles();
 
 	sceneManager = SceneManager::GetInstance();
-	sceneManager->StartScene("GAME");
+	sceneManager->StartScene("TITLE");
 
 	//BYTE keys[256] = { 0 };
 	//BYTE preKeys[256] = { 0 };
