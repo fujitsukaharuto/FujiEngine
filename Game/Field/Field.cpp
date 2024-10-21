@@ -29,7 +29,7 @@ void Field::Initialize(const std::array<Object3d*, 5>& models){
 
 	//0.1ずつ増加するとして初期化
 	for (size_t i = 0; i < 5; i++){
-		Vector3 initializePosition = Vector3 {-5.0f,0.0f + (kLineSpace_ * i),0.0f};
+		Vector3 initializePosition = Vector3 {-15.0f,0.0f + (kLineSpace_ * i),0.0f};
 
 		staffNotation_[i]->transform.translate = initializePosition;
 
@@ -38,6 +38,12 @@ void Field::Initialize(const std::array<Object3d*, 5>& models){
 }
 
 void Field::Update(){
+	for (size_t i = 0; i < 5; i++){
+
+		staffNotation_[i]->transform.translate.x += scrollSpeed_ * FPSKeeper::DeltaTime();
+
+	}
+
 	Field::scrollX_ += pBoss_->GetMoveSpeed() * FPSKeeper::DeltaTime();
 	Field::cameraScrollX_ += scrollSpeed_ * FPSKeeper::DeltaTime();
 }
