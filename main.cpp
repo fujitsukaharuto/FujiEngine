@@ -117,6 +117,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	GlobalVariables::GetInstance()->LoadFiles();
 
 	sceneManager = SceneManager::GetInstance();
+	sceneManager->Initialize();
 	sceneManager->StartScene("TITLE");
 
 
