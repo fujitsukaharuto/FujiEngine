@@ -87,8 +87,7 @@ void TitleScene::Draw() {
 
 #pragma endregion
 
-	dxCommon_->Command();
-	dxCommon_->PostEffect();
+
 
 
 }

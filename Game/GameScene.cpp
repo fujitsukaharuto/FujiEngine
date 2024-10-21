@@ -320,8 +320,7 @@ void GameScene::Draw(){
 
 #pragma endregion
 
-	dxCommon_->Command();
-	dxCommon_->PostEffect();
+
 
 
 }

@@ -176,6 +176,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		dxCommon->PreDraw();
 		// ゲームシーンの描画
 		sceneManager->Draw();
+		dxCommon->Command();
+		dxCommon->PostEffect();
 		// ImGuiの描画
 		imguiManager->Draw();
 		// 描画終了
