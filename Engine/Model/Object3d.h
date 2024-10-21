@@ -55,8 +55,6 @@ public:
 
 private:
 
-	void SetModel(const std::string& fileName);
-
 	void CreateWVP();
 
 	void SetWVP();
