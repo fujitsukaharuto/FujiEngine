@@ -164,8 +164,8 @@ void GameScene::Initialize() {
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	/*                                        サウンド                                             */
 	////////////////////////////////////////////////////////////////////////////////////////////////
-	soundData1 = audio_->SoundLoadWave("Alarm01.wav");
-	soundData2 = audio_->SoundLoadWave("mokugyo.wav");
+
+
 
 	//ApplyGlobalVariables();
 
@@ -226,18 +226,6 @@ void GameScene::Update(){
 	if (input_->PushKey(DIK_DOWN)){
 	}
 
-
-	if (input_->TriggerKey(DIK_8)){
-		audio_->SoundPlayWave(soundData1);
-		emit.BurstAnime();
-	}
-	if (input_->TriggerKey(DIK_9)){
-		audio_->SoundStopWave(soundData1);
-
-	}
-	if (input_->TriggerKey(DIK_7)){
-		audio_->SoundPlayWave(soundData2);
-	}
 
 	dxCommon_->UpDate();
 

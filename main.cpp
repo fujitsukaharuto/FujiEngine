@@ -74,6 +74,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	audio = Audio::GetInstance();
 	audio->Initialize();
 
+	audio->LoadWave("testLongBGM.wav");
+
+
+
+	// 描画用リソースの管理の初期化
 	textureManager = TextureManager::GetInstance();
 	modelManager = ModelManager::GetInstance();
 
@@ -81,7 +86,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	pointLightManager->AddPointLight();
 	pointLightManager->AddSpotLight();
 
-
+	// Particle作成
 	pManager = ParticleManager::GetInstance();
 	pManager->Initialize(dxCommon, srvManager);
 	pManager->CreateParticleGroup("test", "uvChecker.png");
@@ -104,9 +109,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	pManager->AddAnime("playerHit", "playerDamage04.png", 15.0f);
 
 
-	pointLightManager = PointLightManager::GetInstance();
-	pointLightManager->AddPointLight();
-	pointLightManager->AddSpotLight();
 
 	primitiveDrawer = PrimitiveDrawer::GetInstance();
 
