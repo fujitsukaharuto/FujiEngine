@@ -80,7 +80,6 @@ private:
 	std::array<Object3d*, 5> fieldModels_;
 	std::unique_ptr<Field> field_ = nullptr;
 
-	std::unique_ptr<Sprite> curtain_;
 
 	Vector4 color_ = { 1.0f,1.0f,1.0f,1.0f };
 	Vector3 rightDir = { 1.0f,0.0f,0.0f };
