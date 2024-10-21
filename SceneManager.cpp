@@ -3,6 +3,7 @@
 #include "FPSKeeper.h"
 #include "TitleScene.h"
 #include "GameScene.h"
+#include "ResultScene.h"
 
 
 
@@ -112,6 +113,9 @@ void SceneManager::StartScene(const std::string& sceneName) {
 	else if (sceneName == "GAME") {
 		scene_ = new GameScene();
 	}
+	else if (sceneName == "RESULT") {
+		scene_ = new ResultScene();
+	}
 	scene_->Init();
 	scene_->Initialize();
 
@@ -142,6 +146,9 @@ BaseScene* SceneManager::CreateScene(const std::string& sceneName) {
 	}
 	else if (sceneName == "GAME") {
 		newScene = new GameScene();
+	}
+	else if (sceneName == "RESULT") {
+		newScene = new ResultScene();
 	}
 
 	return newScene;

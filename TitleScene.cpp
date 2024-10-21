@@ -15,7 +15,6 @@ TitleScene::TitleScene() {}
 
 TitleScene::~TitleScene() {
 	delete sphere;
-	curtain_.reset();
 }
 
 void TitleScene::Initialize() {
@@ -27,12 +26,6 @@ void TitleScene::Initialize() {
 
 	sphere = new Object3d();
 	sphere->CreateSphere();
-
-
-	curtain_.reset(new Sprite());
-	curtain_->Load("curtain.png");
-	curtain_->SetPos({ 640,360,0.0f });
-	curtain_->SetSize({ 1280.0f,720.0f });
 
 }
 
@@ -91,8 +84,6 @@ void TitleScene::Draw() {
 #pragma region 前景スプライト
 
 	dxCommon_->PreSpriteDraw();
-
-	curtain_->Draw();
 
 #pragma endregion
 

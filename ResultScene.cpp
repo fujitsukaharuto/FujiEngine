@@ -6,6 +6,8 @@
 #include "FPSKeeper.h"
 #include "Random.h"
 
+#include "CameraManager.h"
+#include "SceneManager.h"
 #include "ParticleManager.h"
 
 
@@ -27,6 +29,8 @@ void ResultScene::Initialize() {
 	sphere->CreateSphere();
 	sphere->SetColor({ 1.0f,0.0f,0.0f,1.0f });
 
+	CameraManager::GetInstance()->GetCamera()->transform = { { 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, { 0.0f,3.5f,-20.0f } };
+
 }
 
 void ResultScene::Update() {
@@ -41,6 +45,13 @@ void ResultScene::Update() {
 	ImGui::DragFloat3("right", &rightDir.x, 0.01f);
 	rightDir = rightDir.Normalize();
 	sphere->SetRightDir(rightDir);
+	ImGui::End();
+
+	ImGui::Begin("Scene");
+	ImGui::SeparatorText("ChangeScene");
+	if (ImGui::Button("GameScene")) {
+		SceneManager::GetInstance()->ChangeScene("TITLE", 40.0f);
+	}
 	ImGui::End();
 
 
@@ -82,8 +93,7 @@ void ResultScene::Draw() {
 
 #pragma endregion
 
-	dxCommon_->Command();
-	dxCommon_->PostEffect();
+
 
 
 }

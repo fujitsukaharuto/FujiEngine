@@ -8,6 +8,7 @@
 #include "FPSKeeper.h"
 #include "Random.h"
 
+#include "SceneManager.h"
 #include "ParticleManager.h"
 #include <array>
 
@@ -183,8 +184,8 @@ void GameScene::Update(){
 	CameraManager::GetInstance()->GetCamera()->transform.translate.x += cameraMoveSpeed_ * FPSKeeper::DeltaTime();
 
 
-	#ifdef _DEBUG
-		field_->ShowImgui();
+#ifdef _DEBUG
+	field_->ShowImgui();
 
 	ApplyGlobalVariables();
 
@@ -203,6 +204,12 @@ void GameScene::Update(){
 	//sphere->SetRightDir(rightDir);
 	//ImGui::End();
 
+	ImGui::Begin("Scene");
+	ImGui::SeparatorText("ChangeScene");
+	if (ImGui::Button("GameScene")) {
+		SceneManager::GetInstance()->ChangeScene("RESULT", 40.0f);
+	}
+	ImGui::End();
 
 #endif // _DEBUG
 
