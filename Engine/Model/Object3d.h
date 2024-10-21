@@ -42,6 +42,8 @@ public:
 
 	void SetBillboardMat(const Matrix4x4& mat) { billboardMatrix_ = mat; }
 
+	void SetModel(const std::string& fileName);
+
 	/*void SetPointLight(PointLight* light) { pointLight_ = light; }
 
 	void SetSpotLight(SpotLight* light) { spotLight_ = light; }*/
@@ -51,8 +53,6 @@ public:
 	Trans transform{};
 
 private:
-
-	void SetModel(const std::string& fileName);
 
 	void CreateWVP();
 
