@@ -13,6 +13,8 @@ public:
 
 	static SceneManager* GetInstance();
 
+	void Initialize();
+
 	void Finalize();
 
 	void Update();
@@ -36,5 +38,16 @@ private:
 
 	bool isChange_ = false;
 	float changeExtraTime = 0.0f;
+
+	std::unique_ptr<Sprite> curtainFrame_;
+	std::unique_ptr<Sprite> curtainLeft_;
+	std::unique_ptr<Sprite> curtainRight_;
+	bool isCurtain_ = false;
+	bool isDrawCurtain_ = false;
+	float closeCurtain_ = 0.0f;
+	float curtainTime_ = 0.0f;
+	Vector3 curtainLeftPos_{};
+	Vector3 curtainRightPos_{};
+
 
 };
