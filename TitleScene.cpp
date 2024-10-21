@@ -18,7 +18,6 @@ TitleScene::~TitleScene() {
 }
 
 void TitleScene::Initialize() {
-	Init();
 
 
 	obj3dCommon.reset(new Object3dCommon());
@@ -26,6 +25,8 @@ void TitleScene::Initialize() {
 
 	sphere = new Object3d();
 	sphere->CreateSphere();
+
+	CameraManager::GetInstance()->GetCamera()->transform = { { 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, { 0.0f,3.5f,-20.0f } };
 
 }
 

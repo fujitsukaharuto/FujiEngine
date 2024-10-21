@@ -6,7 +6,6 @@
 #include "FPSKeeper.h"
 #include "Random.h"
 
-#include "CameraManager.h"
 #include "SceneManager.h"
 #include "ParticleManager.h"
 
@@ -19,7 +18,6 @@ ResultScene::~ResultScene() {
 }
 
 void ResultScene::Initialize() {
-	Init();
 
 
 	obj3dCommon.reset(new Object3dCommon());
@@ -50,6 +48,9 @@ void ResultScene::Update() {
 	ImGui::Begin("Scene");
 	ImGui::SeparatorText("ChangeScene");
 	if (ImGui::Button("GameScene")) {
+		SceneManager::GetInstance()->ChangeScene("GAME", 40.0f);
+	}
+	if (ImGui::Button("TitleScene")) {
 		SceneManager::GetInstance()->ChangeScene("TITLE", 40.0f);
 	}
 	ImGui::End();

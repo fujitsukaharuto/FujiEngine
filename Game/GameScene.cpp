@@ -206,9 +206,13 @@ void GameScene::Update(){
 
 	ImGui::Begin("Scene");
 	ImGui::SeparatorText("ChangeScene");
-	if (ImGui::Button("GameScene")) {
+	if (ImGui::Button("ResultScene")) {
 		SceneManager::GetInstance()->ChangeScene("RESULT", 40.0f);
 	}
+	if (ImGui::Button("TitleScene")) {
+		SceneManager::GetInstance()->ChangeScene("TITLE", 40.0f);
+	}
+
 	ImGui::End();
 
 #endif // _DEBUG
