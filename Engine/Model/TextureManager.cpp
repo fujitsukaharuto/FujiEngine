@@ -100,6 +100,7 @@ Texture* TextureManager::LoadTexture(const std::string& filename) {
 	DirectX::ScratchImage mipImages = LoadTextureFile(directoryPath_ + filename);
 	std::unique_ptr<Texture> texture = std::make_unique<Texture>();
 	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
+	texture->meta = metadata;
 	texture->textureResource = CreateTextureResource(DXCom::GetInstance()->GetDevice(), metadata);
 	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource;
 
@@ -108,7 +109,7 @@ Texture* TextureManager::LoadTexture(const std::string& filename) {
 
 	texture->srvIndex = srvManager->Allocate();
 
-	srvManager->CreateTextureSRV(texture->srvIndex, texture->textureResource.Get(), metadata.format, UINT(metadata.mipLevels));
+	srvManager->CreateTextureSRV(texture->srvIndex, texture->textureResource.Get(), texture->meta.format, UINT(texture->meta.mipLevels));
 
 	texture->cpuHandle = srvManager->GetCPUDescriptorHandle(texture->srvIndex);
 	texture->gpuHandle = srvManager->GetGPUDescriptorHandle(texture->srvIndex);
@@ -126,6 +127,17 @@ Texture* TextureManager::GetTexture(const std::string& filename) const {
 		return it->second.get();
 	}
 	return nullptr;
+}
+
+const DirectX::TexMetadata& TextureManager::GetMetaData(const std::string& filename) {
+
+	if (m_textureCache.find(filename) != m_textureCache.end()) {
+		return m_textureCache[filename]->meta;
+	}
+	else {
+		throw std::runtime_error("Texture metadata not found for: " + filename);
+	}
+
 }
 
 void TextureManager::ReleaseTexture(const std::string& filename) {
