@@ -26,6 +26,8 @@ NoteEnemy::NoteEnemy() : Character(std::make_unique<SphereCollider>()){
 	CollisionManager::GetInstance()->AddCollider(this);
 }
 
+NoteEnemy::~NoteEnemy(){}
+
 void NoteEnemy::Initialize(Object3d* model){
 	Character::Initialize(model);
 	moveSpeed_ = 1.0f * Field::influenceOnSpeed_[fieldIndex_];
@@ -84,7 +86,12 @@ void NoteEnemy::Update(){
 
 	//音符に変わったらモデルを変える(一時的に色を変えている)
 	if (isChangedNote_){
-		models_[0]->SetColor({0.0f,0.0f,0.0f,1.0f});
+		if (!isChainEnemy_){
+			models_[0]->SetModel("note.obj");
+		}
+		models_[0]->transform.rotate = {0.0f,-1.5f,0.0f};
+
+		
 		if (isChanegeEffect_){
 			emit.pos = GetCenterPos();
 			emit.Burst();
@@ -100,7 +107,7 @@ void NoteEnemy::Update(){
 }
 
 void NoteEnemy::Draw(){
-	Character::Draw();
+		Character::Draw();
 }
 
 void NoteEnemy::OnCollision(Character* other){

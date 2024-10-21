@@ -50,9 +50,11 @@ public:
 
 	Trans transform{};
 
+	void SetModel(const std::string& fileName);
+
+
 private:
 
-	void SetModel(const std::string& fileName);
 
 	void CreateWVP();
 

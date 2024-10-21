@@ -83,6 +83,18 @@ private:
 	/// <returns></returns>
 	Object3d* CreateObstacleModel();
 
+	/*/// <summary>
+	/// 音符のモデル
+	/// </summary>
+	/// <returns></returns>
+	Object3d* CreateNoteModel();
+
+	/// <summary>
+	/// つながった音符の生成
+	/// </summary>
+	/// <param name="count"></param>
+	/// <returns></returns>
+	std::array<Object3d*, 2> CreateChainNoteModels(int count);*/
 	
 
 	/// <summary>

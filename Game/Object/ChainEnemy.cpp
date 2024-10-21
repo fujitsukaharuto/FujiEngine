@@ -36,9 +36,11 @@ void ChainEnemy::Initialize(std::array<Object3d*, 2> models, const Vector3& pos)
 	// 一つ目の敵の位置を設定
 	connectedEnemies_[0]->SetTranslate(pos);
 	connectedEnemies_[0]->GetObject3d()->UpdateWorldMat();
+	connectedEnemies_[0]->SetIsChainEnemy(true);
 	// 二つ目の敵はoffset分ずらす
 	Vector3 position = connectedEnemies_[0]->GetWorldPosition() + chainOffset;
 	connectedEnemies_[1]->SetTranslate(position);
+	connectedEnemies_[1]->SetIsChainEnemy(true);
 
 	// 最後にまとめてワールド行列を更新
 	connectedEnemies_[1]->GetObject3d()->UpdateWorldMat();
@@ -50,7 +52,13 @@ void ChainEnemy::Update(){
 			continue;  // nullptr チェック
 		}
 
+		//つながっている状態
+		if (isChain_){
 
+				if (connectedEnemies_[i]->GetIsChangedNote()){
+					connectedEnemies_[i]->SetModel("chainNote.obj");
+				}
+		}
 
 		// 音符に変わっていない場合、Field::EndPosXを超えたら削除
 		if (ShouldRemoveConnectedEnemy(i)){

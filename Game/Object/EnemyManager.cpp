@@ -199,6 +199,7 @@ void EnemyManager::CreateChainEnemy(int fieldIndex){
 
 	// モデルを作成し、ChainEnemyを初期化
 	std::array<Object3d*, 2> models = CreateEnemyModels(2);
+
 	chainEnemy->Initialize(models, GetSpawnPosition(fieldIndex));
 
 	// フィールドインデックスを設定
@@ -216,6 +217,7 @@ void EnemyManager::CreateUnChainEnemy(int fieldIndex){
 	Object3d* noteEnemyModel = CreateSingleEnemyModel();
 
 	noteEnemy->Initialize(noteEnemyModel, GetSpawnPosition(fieldIndex));
+
 	noteEnemy->SetFieldIndex(fieldIndex - 1);
 
 	noteEnemies_.emplace_back(std::move(noteEnemy));

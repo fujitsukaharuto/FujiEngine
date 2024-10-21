@@ -10,7 +10,7 @@ class NoteEnemy
 	:public Character{
 public:
 	NoteEnemy();
-	~NoteEnemy()override = default;
+	~NoteEnemy()override;
 
 	/// <summary>
 	/// 初期化
@@ -75,15 +75,22 @@ public:
 	/// <returns></returns>
 	uint32_t GetSerialNumber()const{ return serialNumber_; }
 
+	bool GetIsChainEnemy()const{ return isChainEnemy_; }
+
+	void SetIsChainEnemy(bool isChainEnemy){ isChainEnemy_ = isChainEnemy; }
+
+	void SetModel(const std::string& name){ models_[0]->SetModel(name); }
+
+
 private:
-	//音符用モデル
-	Object3d* noteModel_ = nullptr;
 
 	//音符に変わったかどうか
 	bool isChangedNote_;
 
 	// effect
 	bool isChanegeEffect_ = true;
+
+	bool isChainEnemy_ = false;
 
 	//移動速度
 	float moveSpeed_ = 1.0f;

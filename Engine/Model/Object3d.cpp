@@ -104,6 +104,8 @@ void Object3d::SetTexture(const std::string& name) {
 }
 
 void Object3d::SetModel(const std::string& fileName) {
+	delete model_;
+	model_ = nullptr;
 	model_ = new Model(*(ModelManager::FindModel(fileName)));
 }
 
