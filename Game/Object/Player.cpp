@@ -229,5 +229,7 @@ void Player::OnCollision(Character* other){
         knockbackTimer_ = 0.5f;  // ノックバックの継続時間を設定
 
         life_--;
+        emit.pos = GetCenterPos();
+        emit.BurstAnime();
     }
 }

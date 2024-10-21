@@ -52,9 +52,9 @@ void Boss::Initialize(std::vector<Object3d*> models){
 		Object3d* newCho = new Object3d();
 		newCho->Create("chorus.obj");
 		newCho->SetCameraParent(true);
-		newCho->transform.translate.x = 2.0f + 1.5f * i;
+		newCho->transform.translate.x = 2.0f + 2.25f * i;
 		newCho->transform.translate.y = -10.0f;
-		newCho->transform.translate.z = 25.0f;
+		newCho->transform.translate.z = 25.0f - i * 1.0f;
 		newCho->transform.rotate.y = 3.14f;
 		choruth.push_back(newCho);
 	}
@@ -62,9 +62,9 @@ void Boss::Initialize(std::vector<Object3d*> models){
 		Object3d* newCho = new Object3d();
 		newCho->Create("chorus.obj");
 		newCho->SetCameraParent(true);
-		newCho->transform.translate.x = -2.0f + -1.5f * i;
+		newCho->transform.translate.x = -2.0f + -2.25f * i;
 		newCho->transform.translate.y = -10.0f;
-		newCho->transform.translate.z = 25.0f;
+		newCho->transform.translate.z = 25.0f - i * 1.0f;
 		newCho->transform.rotate.y = 3.14f;
 		choruth.push_back(newCho);
 	}
