@@ -85,20 +85,19 @@ void Boss::Initialize(std::vector<Object3d*> models){
 }
 
 void Boss::Update(){
-
-
-
 	// 後退タイマーの処理
 	if (retreatTimer_ > 0){
 		retreatTimer_--;  // タイマーをデクリメント
 		if (retreatTimer_ == 0){
-			moveSpeed_*=-1;  // 後退が終わったら元の速度に戻す
+			moveSpeed_ = fabs(moveSpeed_);  // 後退が終わったら正の速度に戻す
 			Audio::GetInstance()->SoundStopWave(bossDamage);
 			isChorusu = false;
 		}
 	}
 
 	Move();
+
+	// コーラスの更新処理
 	for (int i = 0; i < 6; i++){
 		if (isChorusu){
 			// コーラスの移動とアニメーションの処理
@@ -131,12 +130,13 @@ void Boss::Update(){
 			choruth[i]->transform.scale.y = 1.0f;
 		}
 	}
+
 	// コライダー用のポジションを更新
 	collider_->Update(GetCenterPos());
 
 	Character::Update();
 
-	models_[0]->transform.translate.x = std::max(models_[0]->transform.translate.x,0.0f + Field::scrollX_);
+	models_[0]->transform.translate.x = std::max(models_[0]->transform.translate.x, 0.0f + Field::scrollX_);
 }
 
 

@@ -66,9 +66,9 @@ void ChainEnemy::Initialize(std::array<Object3d*, 2> models, const Vector3& pos)
 
 	horizontalBars_ = new Object3d();
 	horizontalBars_->Create("horizontalBar.obj");
-	
+
 	//二つの敵の間に作る
-	Vector3 betweenPos= (connectedEnemies_[0]->GetWorldPosition() + connectedEnemies_[1]->GetWorldPosition()) * 0.5f;
+	Vector3 betweenPos = (connectedEnemies_[0]->GetWorldPosition() + connectedEnemies_[1]->GetWorldPosition()) * 0.5f;
 	horizontalBars_->transform.translate = betweenPos;
 
 
@@ -79,13 +79,6 @@ void ChainEnemy::Initialize(std::array<Object3d*, 2> models, const Vector3& pos)
 }
 
 void ChainEnemy::Update(){
-
-#ifdef _DEBUG
-	ImGui::Begin("enemy");
-	ImGui::DragFloat("bar.scale.y", &verticalBars_[0]->transform.scale.y);
-	ImGui::End();
-#endif // _DEBUG
-
 
 	for (size_t i = 0; i < connectedEnemies_.size(); ++i){
 		if (!connectedEnemies_[i]){
@@ -111,6 +104,14 @@ void ChainEnemy::Update(){
 
 		}
 
+		if (connectedEnemies_[i]){
+			verticalBars_[i]->UpdateWorldMat();
+			horizontalBars_->UpdateWorldMat();
+
+			SettingVerticalBar();
+		}
+
+
 		// 音符に変わっていない場合、Field::EndPosXを超えたら削除
 		if (ShouldRemoveConnectedEnemy(i)){
 			RemoveConnectedEnemy(i);
@@ -118,12 +119,6 @@ void ChainEnemy::Update(){
 			// 通常の更新
 			connectedEnemies_[i]->Update();
 		}
-
-		verticalBars_[i]->UpdateWorldMat();
-		horizontalBars_->UpdateWorldMat();
-
-		SettingVerticalBar();
-
 
 		// 連結解除の処理
 		HandleChainBreak(i);
@@ -290,26 +285,14 @@ void ChainEnemy::SettingVerticalBar(){
 }
 
 
-
-
-void ChainEnemy::SettingHorizontalBar(){
-	// 2つの敵が有効かを確認
-	if (connectedEnemies_[0] && connectedEnemies_[1]){
-
-		
-
-	}
-}
-
-
 void ChainEnemy::Draw(){
 
 	if (isChain_){
 		//つながっている状態でかつ、両方とも音符になっている
-			verticalBars_[0]->Draw();
-			verticalBars_[1]->Draw();
+		verticalBars_[0]->Draw();
+		verticalBars_[1]->Draw();
 
-			horizontalBars_->Draw();
+		horizontalBars_->Draw();
 	}
 
 
