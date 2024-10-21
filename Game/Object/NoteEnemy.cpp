@@ -107,7 +107,9 @@ void NoteEnemy::Update(){
 }
 
 void NoteEnemy::Draw(){
+	if (!isRemoved_){
 		Character::Draw();
+	}
 }
 
 void NoteEnemy::OnCollision(Character* other){
@@ -157,7 +159,6 @@ void NoteEnemy::OnCollision(Character* other){
 			isChangedNote_ = true;
 		}
 	}
-
 
 	// 衝突相手がbossなら消去する
 	else if (collisionType == static_cast< uint32_t >(CollisionTypeIdDef::kBoss)){
