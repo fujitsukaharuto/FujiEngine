@@ -18,6 +18,9 @@ void Audio::Initialize()
 
 void Audio::Finalize()
 {
+
+	container_.clear();
+
 	if (masterVoice_)
 	{
 		masterVoice_->DestroyVoice();
@@ -36,8 +39,14 @@ Audio* Audio::GetInstance()
 	return &instance;
 }
 
-SoundData Audio::SoundLoadWave(const char* filename)
-{
+void Audio::LoadWave(const std::string& filename) {
+
+	auto it = container_.find(filename);
+	if (it != container_.end()) {
+		return;
+	}
+
+
 	std::ifstream file;
 	file.open((kDirectoryPath_ + filename), std::ios_base::binary);
 	assert(file.is_open());
@@ -46,12 +55,10 @@ SoundData Audio::SoundLoadWave(const char* filename)
 	RiffHeader riff;
 	file.read((char*)&riff, sizeof(riff));
 
-	if (strncmp(riff.chunk.id, "RIFF", 4) != 0)
-	{
+	if (strncmp(riff.chunk.id, "RIFF", 4) != 0) {
 		assert(0);
 	}
-	if (strncmp(riff.type, "WAVE", 4) != 0)
-	{
+	if (strncmp(riff.type, "WAVE", 4) != 0) {
 		assert(0);
 	}
 
@@ -104,7 +111,23 @@ SoundData Audio::SoundLoadWave(const char* filename)
 	soundData.pBuffer = reinterpret_cast<BYTE*>(pBuffer);
 	soundData.bufferSize = data.size;
 
-	return soundData;
+	container_.insert(std::make_pair(filename, soundData));
+
+}
+
+SoundData Audio::SoundLoadWave(const std::string& filename)
+{
+
+	auto it = container_.find(filename);
+	if (it != container_.end()) {
+		return it->second;
+	}
+
+	LoadWave(filename);
+
+	it = container_.find(filename);
+	return it->second;
+
 }
 
 void Audio::SoundUnload(SoundData* soundData)

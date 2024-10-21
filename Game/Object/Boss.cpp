@@ -73,7 +73,7 @@ void Boss::Initialize(std::vector<Object3d*> models){
 	emit.count = 1;
 	emit.animeData.lifeTime = 48;
 	emit.RandomSpeed({ -0.0f,0.0f }, { -0.0f,0.0f }, { -0.0f,0.0f });
-	emit.RandomTranslate({ -0.0f,0.0f }, { -0.0f,0.0f }, { -5.5f,-5.0f });
+	emit.RandomTranslate({ -2.5f,-2.5f }, { -0.0f,0.0f }, { -8.5f,-8.5f });
 	emit.animeData.startSize = { 4.0f,4.0f };
 	emit.animeData.endSize = { 1.2f,1.2f };
 	emit.animeData.type = SizeType::kReduction;
@@ -204,7 +204,7 @@ void Boss::OnCollision(Character* other){
 }
 
 Vector3 Boss::GetCenterPos() const{
-	Vector3 offset = {0.0f, 3.0f, 1.8f};
+	Vector3 offset = {2.0f, 3.0f, 1.8f};
 	Vector3 worldPos = Transform(offset, models_[0]->GetMatWorld());
 	return worldPos;
 }
