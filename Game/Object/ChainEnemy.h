@@ -38,6 +38,8 @@ public:
 
 	void SetEnemyManager(EnemyManager* manager){ pEnemyManager_ = manager; }
 
+
+
 private:
 	void HandleChainBreak(size_t i);
 	bool ShouldBreakChain(size_t i, size_t j) const;
@@ -47,6 +49,7 @@ private:
 
 
 private:
+
 	//連結している
 	bool isChain_ =true;
 
