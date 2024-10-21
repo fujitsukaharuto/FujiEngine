@@ -14,9 +14,21 @@ void RailEditor::Initialize() {
 
 	trans.scale = { 1.0f,1.0f,1.0f };
 
-	for (int i = 0; i < 4; i++) {
-		controlPoints_.push_back({ 5.0f - float(i),2.0f,0.0f });
-	}
+	controlPoints_.push_back({ 5.0f,2.0f,5.0f });
+	controlPoints_.push_back({ 5.0f,2.0f,3.0f });
+	controlPoints_.push_back({ 5.0f,2.0f,2.0f });
+	controlPoints_.push_back({ 4.0f,2.0f,1.0f });
+	controlPoints_.push_back({ 2.5f,2.0f,-1.0f });
+	controlPoints_.push_back({ 0.5f,2.0f,-2.0f });
+	controlPoints_.push_back({ -0.5f,2.0f,-2.0f });
+	controlPoints_.push_back({ -2.5f,2.0f,-1.0f });
+	controlPoints_.push_back({ -4.0f,2.0f,1.0f });
+	controlPoints_.push_back({ -5.0f,2.0f,2.0f });
+	controlPoints_.push_back({ -5.0f,2.0f,3.0f });
+	controlPoints_.push_back({ -5.0f,2.0f,5.0f });
+
+
+
 
 }
 
