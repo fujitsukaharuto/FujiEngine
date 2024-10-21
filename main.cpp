@@ -92,11 +92,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	pManager->AddAnime("animetest", "white2x2.png", 10.0f);
 
 	pManager->CreateAnimeGroup("bossHit", "explosion1.png");
-	pManager->AddAnime("bossHit", "explosion2.png", 8.0f);
-	pManager->AddAnime("bossHit", "explosion3.png", 16.0f);
-	pManager->AddAnime("bossHit", "explosion4.png", 24.0f);
-	pManager->AddAnime("bossHit", "explosion5.png", 32.0f);
-	pManager->AddAnime("bossHit", "explosion6.png", 40.0f);
+	pManager->AddAnime("bossHit", "explosion3.png", 8.0f);
+	pManager->AddAnime("bossHit", "explosion4.png", 16.0f);
+	pManager->AddAnime("bossHit", "explosion5.png", 24.0f);
+	pManager->AddAnime("bossHit", "explosion6.png", 32.0f);
+
 
 	pManager->CreateAnimeGroup("playerHit", "playerDamage01.png");
 	pManager->AddAnime("playerHit", "playerDamage02.png", 5.0f);
