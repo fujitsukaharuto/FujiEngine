@@ -46,7 +46,7 @@ Boss::~Boss(){
 void Boss::Initialize(std::vector<Object3d*> models){
 	Character::Initialize(models);
 	//コライダー用のポジションを更新
-	testLong = Audio::GetInstance()->SoundLoadWave("testLongBGM.wav");
+	bossDamage = Audio::GetInstance()->SoundLoadWave("testLongBGM.wav");
 
 	for (int i = 0; i < 3; i++){
 		Object3d* newCho = new Object3d();
@@ -93,7 +93,7 @@ void Boss::Update(){
 		retreatTimer_--;  // タイマーをデクリメント
 		if (retreatTimer_ == 0){
 			moveSpeed_*=-1;  // 後退が終わったら元の速度に戻す
-			Audio::GetInstance()->SoundStopWave(testLong);
+			Audio::GetInstance()->SoundStopWave(bossDamage);
 			isChorusu = false;
 		}
 	}
@@ -195,7 +195,7 @@ void Boss::OnCollision(Character* other){
 		CameraManager::GetInstance()->GetCamera()->SetShakeTime(40.0f);
 
 		isChorusu = true;
-		Audio::GetInstance()->SoundPlayWave(testLong);
+		Audio::GetInstance()->SoundPlayWave(bossDamage);
 
 		// ボスを後退させる
 		moveSpeed_ *= -1;  // ボスの後退速度を設定 (負の値で後退)

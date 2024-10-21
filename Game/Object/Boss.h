@@ -79,7 +79,7 @@ private:
 
 
     ParticleEmitter emit;
-    SoundData testLong;
+    SoundData bossDamage;
 
 
     //シリアルナンバー
@@ -87,6 +87,7 @@ private:
     static uint32_t nextSerialNumber;
     //接触履歴
     ContactRecord record_;
-    
+
+
 };
 

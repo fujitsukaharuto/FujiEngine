@@ -3,6 +3,7 @@
 //Local
 #include "Character.h"
 #include "ParticleEmitter.h"
+#include "Audio.h"
 
 class Player : public Character{
 public:
@@ -58,6 +59,12 @@ private:
     bool isKnockedBack_ = false;
     // ノックバックの残り時間
     float knockbackTimer_ = 0.0f;
+
+
+    SoundData knockBackSE_;
+    SoundData junpSE_;
+    SoundData damageSE_;
+
 
     //接触履歴
     ContactRecord record_;
