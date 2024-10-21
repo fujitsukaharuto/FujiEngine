@@ -1,6 +1,7 @@
 #pragma once
 #include "Character.h"
 #include "ParticleEmitter.h"
+#include "Audio.h"
 #include "Object/NoteEnemyState/NoteEnemyState_Base.h"
 
 /// <summary>
@@ -108,6 +109,9 @@ private:
 
 	//リストから削除フラグ
 	bool isRemoved_ = false;
+
+
+	SoundData Change_;
 
 
 	//シリアルナンバー

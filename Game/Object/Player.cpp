@@ -42,8 +42,8 @@ void Player::Initialize(std::vector<Object3d*> Object3ds){
     emit.animeData.lifeTime = 20;
     emit.RandomSpeed({-0.00f,0.00f}, {-0.00f,0.00f}, {0.0f,0.0f});
     emit.RandomTranslate({-0.13f,-0.13f}, {0.0f,0.0f}, {-1.7f,-1.7f});
-    emit.animeData.startSize = {1.5f,1.5f};
-    emit.animeData.endSize = {1.5f,1.5f};
+    emit.animeData.startSize = {2.0f,2.0f};
+    emit.animeData.endSize = {2.0f,2.0f};
 
     const char* groupName = "player";
     life_ = GlobalVariables::GetInstance()->GetIntValue(groupName,"life");
