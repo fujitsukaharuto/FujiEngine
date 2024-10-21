@@ -37,6 +37,9 @@ Player::Player() : Character(std::make_unique<SphereCollider>()){
 void Player::Initialize(std::vector<Object3d*> Object3ds){
     Character::Initialize(Object3ds);
 
+    junpSE_ = Audio::GetInstance()->SoundLoadWave("jump.wav");
+    damageSE_ = Audio::GetInstance()->SoundLoadWave("damage.wav");
+
     emit.name = "playerHit";
     emit.count = 1;
     emit.animeData.lifeTime = 20;
@@ -128,6 +131,7 @@ void Player::Jump(){
     if (Input::GetInstance()->TriggerKey(DIK_SPACE)){
         isJumping_ = true;
         velocity_.y = 0.3f;
+        Audio::GetInstance()->SoundPlayWave(junpSE_);
     }
 
     // ジャンプ中の挙動
@@ -229,6 +233,7 @@ void Player::OnCollision(Character* other){
         knockbackTimer_ = 0.5f;  // ノックバックの継続時間を設定
 
         life_--;
+        Audio::GetInstance()->SoundPlayWave(damageSE_);
         emit.pos = GetCenterPos();
         emit.BurstAnime();
     }
