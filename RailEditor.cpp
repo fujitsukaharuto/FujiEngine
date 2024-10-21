@@ -7,6 +7,9 @@ RailEditor::~RailEditor() {
 
 	controlPoints_.clear();
 
+	for (auto& i : rails) {
+		delete i;
+	}
 }
 
 
@@ -18,17 +21,26 @@ void RailEditor::Initialize() {
 	controlPoints_.push_back({ 5.0f,2.0f,3.0f });
 	controlPoints_.push_back({ 5.0f,2.0f,2.0f });
 	controlPoints_.push_back({ 4.0f,2.0f,1.0f });
-	controlPoints_.push_back({ 2.5f,2.0f,-1.0f });
-	controlPoints_.push_back({ 0.5f,2.0f,-2.0f });
-	controlPoints_.push_back({ -0.5f,2.0f,-2.0f });
-	controlPoints_.push_back({ -2.5f,2.0f,-1.0f });
+	controlPoints_.push_back({ 2.5f,1.8f,-1.0f });
+	controlPoints_.push_back({ 0.5f,1.5f,-2.0f });
+	controlPoints_.push_back({ -0.5f,1.5f,-2.0f });
+	controlPoints_.push_back({ -2.5f,1.8f,-1.0f });
 	controlPoints_.push_back({ -4.0f,2.0f,1.0f });
 	controlPoints_.push_back({ -5.0f,2.0f,2.0f });
 	controlPoints_.push_back({ -5.0f,2.0f,3.0f });
 	controlPoints_.push_back({ -5.0f,2.0f,5.0f });
+	controlPoints_.push_back({ -5.0f,2.2f,7.0f });
+	controlPoints_.push_back({ -5.0f,2.4f,9.0f });
+	controlPoints_.push_back({ -5.0f,2.6f,11.0f });
+	controlPoints_.push_back({ -5.0f,2.8f,13.0f });
 
+	for (int i = 0; i < 100; i++) {
+		Object3d* newModel = new Object3d();
+		newModel->Create("rail.obj");
+		rails.push_back(newModel);
+	}
 
-
+	SetRail();
 
 }
 
@@ -50,6 +62,9 @@ void RailEditor::Update() {
 	if (ImGui::Button("AddPoint")) {
 		AddControlPoint(controlPoints_.back());
 	}
+	if (ImGui::Button("SetModel")) {
+		SetRail();
+	}
 	ImGui::Checkbox("CameraSet", &isCamera);
 	ImGui::End();
 #endif // _DEBUG
@@ -67,11 +82,14 @@ void RailEditor::Update() {
 			previousUp = { 0.0f,1.0f,0.0f };
 		}
 
+		Vector3 offset = { 0.0f,0.5f,0.0f };
 		float t = 1.0f / timelimitt * time_;
 		Vector3 eye = CatmullRom(controlPoints_, t);
+		eye += offset;
 
 		float t2 = 1.0f / timelimitt * (time_ + 20);
 		Vector3 target = CatmullRom(controlPoints_, t2);
+		target += offset;
 
 		// カメラの位置を設定
 		trans.translate = eye;
@@ -107,10 +125,16 @@ void RailEditor::Update() {
 
 }
 
+void RailEditor::RailDarw() {
+	for (auto& i : rails) {
+		i->Draw();
+	}
+}
+
 void RailEditor::Draw() {
 
 	std::vector<Vector3> pointsDrawing;
-	const size_t segumentCount = 50;
+	const size_t segumentCount = 100;
 	for (size_t i = 0; i < segumentCount + 1; i++) {
 		float t = 1.0f / segumentCount * i;
 		Vector3 pos = CatmullRom(controlPoints_, t);
@@ -131,4 +155,31 @@ void RailEditor::AddControlPoint([[maybe_unused]]const Vector3& point) {
 
 	controlPoints_.push_back(point);
 
+}
+
+void RailEditor::SetRail() {
+
+
+	std::vector<Vector3> pointsDrawing;
+	const size_t segumentCount = 100;
+	for (size_t i = 0; i < segumentCount + 1; i++) {
+		float t = 1.0f / segumentCount * i;
+		Vector3 pos = CatmullRom(controlPoints_, t);
+		pointsDrawing.push_back(pos);
+	}
+
+	for (int i = 0; i < pointsDrawing.size() - 2; i++) {
+		Vector3 norTarget = (pointsDrawing[i + 1] - pointsDrawing[i]).Normalize();
+
+		Vector3 currentDir = { 0.0f,0.0f,1.0f };
+		Vector3 axis = Cross(currentDir, norTarget);
+		float angle = acos(currentDir * norTarget);
+		rails[i]->transform.rotate = { axis.x * angle, axis.y * angle, 0.0f };
+
+
+		/*float pitch = atan2(norTarget.y, norTarget.z);
+		float yaw = atan2(norTarget.x, sqrt(norTarget.y * norTarget.y + norTarget.z * norTarget.z));
+		rails[i]->transform.rotate = { pitch,yaw,0.0f };*/
+		rails[i]->transform.translate = pointsDrawing[i];
+	}
 }

@@ -6,6 +6,7 @@
 #include <json.hpp>
 #include "ImGuiManager.h"
 #include "MatrixCalculation.h"
+#include "Object3d.h"
 #include "ModelManager.h"
 
 using json = nlohmann::json;
@@ -22,6 +23,8 @@ public:
 
 	void Update();
 
+	void RailDarw();
+
 	void Draw();
 
 	void AddControlPoint(const Vector3& point);
@@ -33,6 +36,7 @@ public:
 
 private:
 
+	void SetRail();
 
 private:
 
@@ -45,6 +49,7 @@ private:
 	bool isCamera = false;
 	float time_ = 0;
 	Vector3 previousUp = Vector3(0.0f, 1.0f, 0.0f);
+	std::vector<Object3d*> rails;
 
 	Model* dir;
 };
