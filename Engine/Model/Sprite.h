@@ -26,6 +26,14 @@ public:
 
 	void SetAngle(float rotate);
 
+	void SetAnchor(const Vector2& anchor);
+
+	void SetFlipX(bool is) { isFlipX_ = is; }
+
+	void SetFlipY(bool is) { isFlipY_ = is; }
+
+	void SetRange(const Vector2& leftTop, const Vector2& size);
+
 	/*void SetPointLight(PointLight* light) { pointLight_ = light; }
 
 	void SetSpotLight(SpotLight* light) { spotLight_ = light; }*/
@@ -34,6 +42,8 @@ private:
 
 	void InitializeBuffer();
 
+	void AdjustTextureSize();
+
 	void SetWvp();
 
 private:
@@ -41,6 +51,8 @@ private:
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_ = nullptr;
+
+	VertexDate* vData;
 
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
 	D3D12_INDEX_BUFFER_VIEW indexBufferView_{};
@@ -59,9 +71,14 @@ private:
 	CameraForGPU* cameraPosData_ = nullptr;
 
 	Material material_;
+	std::string nowtexture;
 
+	Vector2 anchorPoint_{ 0.5f,0.5f };
 	Vector3 position_ = { 0,0,0 };
 	Vector2 size_ = { 200, 200 };
 	float rotate_ = 0.0f;
+
+	bool isFlipX_ = false;
+	bool isFlipY_ = false;
 
 };
