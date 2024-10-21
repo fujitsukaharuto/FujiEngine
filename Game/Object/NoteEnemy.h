@@ -65,9 +65,13 @@ public:
 
 	void SetFieldIndex(const uint32_t index){ fieldIndex_ = index; }
 
+	uint32_t GetFieldIndex()const{ return fieldIndex_; }
+
 	void ApplyGlobalVariabls();
 
 	void SetIsRemoved(bool flag){ isRemoved_ = flag; }
+
+	Object3d* GetModel(){ return models_[0]; }
 
 
 	/// <summary>

@@ -22,12 +22,6 @@ public:
 
 	void Update();
 
-	void HandleNoteAndEnemy(size_t noteIndex, size_t enemyIndex);
-
-	void HandleNoteAndNote();
-
-	void HandleEnemyAndEnemy();
-
 	void RemoveSingleEnemy(size_t i);
 
 	void Draw();
@@ -47,7 +41,11 @@ private:
 	void RemoveConnectedEnemy(size_t i);
 	void RemoveColliders(size_t i, size_t j);
 
+	//つながっているときの音符の線の更新
+	void SettingVerticalBar();
 
+	//横線の更新
+	void SettingHorizontalBar();
 private:
 
 	//連結している
@@ -57,6 +55,11 @@ private:
 
 	//つながっている敵
 	std::array<std::unique_ptr<NoteEnemy>, 2 > connectedEnemies_;
+
+	//上に伸びている線
+	std::array<Object3d*, 2 > verticalBars_;
+
+	Object3d* horizontalBars_;
 	
 	//removeされた数
 	int removeCount_ = 0;

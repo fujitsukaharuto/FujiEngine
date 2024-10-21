@@ -55,6 +55,7 @@ public:
 
 private:
 
+
 	void CreateWVP();
 
 	void SetWVP();

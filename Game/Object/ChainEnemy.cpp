@@ -1,8 +1,13 @@
 #include "Object/ChainEnemy.h"
+#include "CameraManager.h"
 
 //lib
 #include "Rendering/PrimitiveDrawer.h"
 #include "Collision/CollisionManager.h"
+#include "imgui/imgui.h"
+#include <algorithm>
+#undef max
+#undef min
 
 //local
 #include "Field/Field.h"
@@ -13,6 +18,10 @@ ChainEnemy::ChainEnemy(){}
 ChainEnemy::~ChainEnemy(){
 	connectedEnemies_[0].reset();
 	connectedEnemies_[1].reset();
+
+	delete verticalBars_[0];
+	delete verticalBars_[1];
+	delete horizontalBars_;
 }
 
 void ChainEnemy::Initialize(std::array<Object3d*, 2> models){
@@ -44,20 +53,62 @@ void ChainEnemy::Initialize(std::array<Object3d*, 2> models, const Vector3& pos)
 
 	// 最後にまとめてワールド行列を更新
 	connectedEnemies_[1]->GetObject3d()->UpdateWorldMat();
+
+	/////////////////////////////////////////////////////////////////////////////////////////
+	//		つながっている縦線
+	/////////////////////////////////////////////////////////////////////////////////////////
+
+	for (size_t i = 0; i < 2; i++){
+		verticalBars_[i] = new Object3d();
+		verticalBars_[i]->Create("verticalBar.obj");
+		verticalBars_[i]->SetParent(connectedEnemies_[i]->GetModel());
+	}
+
+	horizontalBars_ = new Object3d();
+	horizontalBars_->Create("horizontalBar.obj");
+	
+	//二つの敵の間に作る
+	Vector3 betweenPos= (connectedEnemies_[0]->GetWorldPosition() + connectedEnemies_[1]->GetWorldPosition()) * 0.5f;
+	horizontalBars_->transform.translate = betweenPos;
+
+
+	// 最後にワールド行列を更新
+	horizontalBars_->UpdateWorldMat();
+	verticalBars_[0]->UpdateWorldMat();
+	verticalBars_[1]->UpdateWorldMat();
 }
 
 void ChainEnemy::Update(){
+
+#ifdef _DEBUG
+	ImGui::Begin("enemy");
+	ImGui::DragFloat("bar.scale.y", &verticalBars_[0]->transform.scale.y);
+	ImGui::End();
+#endif // _DEBUG
+
+
 	for (size_t i = 0; i < connectedEnemies_.size(); ++i){
 		if (!connectedEnemies_[i]){
 			continue;  // nullptr チェック
 		}
 
-		//つながっている状態
-		if (isChain_){
+		if (connectedEnemies_[i]->GetIsChangedNote()){
 
-				if (connectedEnemies_[i]->GetIsChangedNote()){
-					connectedEnemies_[i]->SetModel("chainNote.obj");
-				}
+			//つながっている状態でかつ、両方とも音符になっている
+
+			//モデルデータの切り替え
+			if (isChain_ && connectedEnemies_[0]->GetIsChangedNote() && connectedEnemies_[1]->GetIsChangedNote()){
+				connectedEnemies_[i]->SetModel("chainNote.obj");
+			}
+			//片方が音符、片方が敵のままだとnote.obj
+			else if (connectedEnemies_[0]->GetIsChangedNote()){
+				connectedEnemies_[0]->SetModel("note.obj");
+			}
+
+			else if (connectedEnemies_[1]->GetIsChangedNote()){
+				connectedEnemies_[1]->SetModel("note.obj");
+			}
+
 		}
 
 		// 音符に変わっていない場合、Field::EndPosXを超えたら削除
@@ -67,6 +118,12 @@ void ChainEnemy::Update(){
 			// 通常の更新
 			connectedEnemies_[i]->Update();
 		}
+
+		verticalBars_[i]->UpdateWorldMat();
+		horizontalBars_->UpdateWorldMat();
+
+		SettingVerticalBar();
+
 
 		// 連結解除の処理
 		HandleChainBreak(i);
@@ -112,7 +169,6 @@ void ChainEnemy::HandleChainBreak(size_t i){
 	}
 }
 
-
 bool ChainEnemy::ShouldBreakChain(size_t i, size_t j) const{
 	const auto& posI = connectedEnemies_[i]->GetWorldPosition();
 	const auto& posJ = connectedEnemies_[j]->GetWorldPosition();
@@ -121,12 +177,12 @@ bool ChainEnemy::ShouldBreakChain(size_t i, size_t j) const{
 	if (posJ.x < posI.x){
 		// 先頭の敵が音符で後ろが音符ではない場合
 		if (connectedEnemies_[j]->GetIsChangedNote() && !connectedEnemies_[i]->GetIsChangedNote()){
-			return (posJ.x <= Field::fieldEndPosX );
+			return (posJ.x <= Field::fieldEndPosX);
 		}
 	} else{
 		// 後ろの敵が音符で先頭が音符ではない場合
 		if (connectedEnemies_[i]->GetIsChangedNote() && !connectedEnemies_[j]->GetIsChangedNote()){
-			return (posI.x <= Field::fieldEndPosX );
+			return (posI.x <= Field::fieldEndPosX);
 		}
 	}
 	return false;
@@ -166,16 +222,94 @@ void ChainEnemy::RemoveColliders(size_t i, size_t j){
 	}
 }
 
+void ChainEnemy::SettingVerticalBar(){
+	// 2つの敵が有効かを確認
+	if (connectedEnemies_[0] && connectedEnemies_[1]){
+
+		float hiestPosY;
+
+		// 二つの高さが違っているとき
+		if (connectedEnemies_[0]->GetFieldIndex() != connectedEnemies_[1]->GetFieldIndex()){
+			// indexSubの値が負の場合、正に変換
+			int indexSub = connectedEnemies_[0]->GetFieldIndex() - connectedEnemies_[1]->GetFieldIndex();
+			if (indexSub < 0){
+				indexSub = -indexSub; // 絶対値に変換
+			}
+
+			// 低い方の位置を取得し、その縦線のスケールを調整
+			if (connectedEnemies_[0]->GetTranslate().y < connectedEnemies_[1]->GetTranslate().y){
+				// 0番目が低い場合、その縦線のスケールを大きくする
+				float scaleY = 2.0f * indexSub; // 段の幅が1増えるごとにスケール
+				float maxScaleY = 7.0f;  // 最大スケールを設定
+				float minScaleY = 1.0f;  // 最小スケールを設定
+
+				// スケールに制限をかける
+				verticalBars_[0]->transform.scale.y = std::min(maxScaleY, std::max(minScaleY, scaleY));
+				verticalBars_[1]->transform.scale.y = 1.0f; // もう一方はデフォルトスケール
+
+				// 高い方の敵のY座標を利用
+				hiestPosY = connectedEnemies_[1]->GetWorldPosition().y - 1.0f;
+			} else{
+				// 1番目が低い場合、その縦線のスケールを大きくする
+				float scaleY = 2.0f * indexSub; // 段の幅が1増えるごとにスケール
+				float maxScaleY = 7.0f;  // 最大スケールを設定
+				float minScaleY = 1.0f;  // 最小スケールを設定
+
+				// スケールに制限をかける
+				verticalBars_[1]->transform.scale.y = std::min(maxScaleY, std::max(minScaleY, scaleY));
+				verticalBars_[0]->transform.scale.y = 1.0f; // もう一方はデフォルトスケール
+
+				hiestPosY = connectedEnemies_[0]->GetWorldPosition().y - 1.0f;
+			}
+
+
+			// 高い方の敵のY座標を利用
+			horizontalBars_->transform.translate.y = hiestPosY;
+
+		} else{
+			// 同じ高さの場合はデフォルトのスケール
+			verticalBars_[0]->transform.scale.y = 1.0f;
+			verticalBars_[1]->transform.scale.y = 1.0f;
+
+			horizontalBars_->transform.translate.y = connectedEnemies_[0]->GetWorldPosition().y - 1.0f;
+		}
+
+		// 二つの敵のX座標の距離を計算
+		float distanceX = fabs(connectedEnemies_[1]->GetWorldPosition().x - connectedEnemies_[0]->GetWorldPosition().x); // X軸のみの距離を計算
+
+		// horizontalBars_ の Xスケールを距離に合わせて調整
+		float maxScaleX = 5.0f;  // 最大スケールを設定
+		float minScaleX = 0.5f;  // 最小スケールを設定
+		horizontalBars_->transform.scale.x = std::min(maxScaleX, std::max(minScaleX, distanceX * 0.23f));  // 距離に基づいてスケールを調整
+
+		// 二つの間の X 座標を計算
+		Vector3 betweenPos = (connectedEnemies_[0]->GetWorldPosition() + connectedEnemies_[1]->GetWorldPosition()) * 0.5f;
+		horizontalBars_->transform.translate.x = betweenPos.x;
+
+	}
+}
+
+
+
+
+void ChainEnemy::SettingHorizontalBar(){
+	// 2つの敵が有効かを確認
+	if (connectedEnemies_[0] && connectedEnemies_[1]){
+
+		
+
+	}
+}
+
+
 void ChainEnemy::Draw(){
 
 	if (isChain_){
-		if (connectedEnemies_[0] && connectedEnemies_[1]){
-			Vector3 firstEnemyPos = connectedEnemies_[0]->GetCenterPos();
-			Vector3 secondEnemyPos = connectedEnemies_[1]->GetCenterPos();
+		//つながっている状態でかつ、両方とも音符になっている
+			verticalBars_[0]->Draw();
+			verticalBars_[1]->Draw();
 
-			//つながっている敵の間に線を引く
-			PrimitiveDrawer::GetInstance()->DrawLine3d(firstEnemyPos, secondEnemyPos, {0.0f, 0.0f, 0.0f, 1.0f});
-		}
+			horizontalBars_->Draw();
 	}
 
 
