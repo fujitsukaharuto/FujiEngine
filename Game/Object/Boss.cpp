@@ -137,7 +137,7 @@ void Boss::Update(){
 
 	Character::Update();
 
-	models_[0]->transform.translate.x = std::max(models_[0]->transform.translate.x, 0.0f + Field::scrollX_);
+	models_[0]->transform.translate.x = std::max(models_[0]->transform.translate.x, -2.0f + Field::cameraScrollX_);
 }
 
 
