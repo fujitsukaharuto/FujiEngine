@@ -35,13 +35,13 @@ void SceneManager::Initialize() {
 
 	curtainLeft_.reset(new Sprite());
 	curtainLeft_->Load("curtain02.png");
-	curtainLeft_->SetPos({ 640,360,0.0f });
-	curtainLeft_->SetSize({ 1280.0f,745.0f });
+	curtainLeft_->SetPos({ 650,360,0.0f });
+	curtainLeft_->SetSize({ 1380.0f,760.0f });
 
 	curtainRight_.reset(new Sprite());
 	curtainRight_->Load("curtain02.png");
-	curtainRight_->SetPos({ 640,360,0.0f });
-	curtainRight_->SetSize({ 1280.0f,745.0f });
+	curtainRight_->SetPos({ 650,360,0.0f });
+	curtainRight_->SetSize({ 1380.0f,760.0f });
 
 
 	triangleL_.reset(new Sprite());
@@ -63,9 +63,9 @@ void SceneManager::Initialize() {
 	triangleR_->SetColor(darkColorR_);
 
 
-	curtainLeftPos_ = { 30.0f,385.0f,0.0f };
+	curtainLeftPos_ = { -50.0f,375.0f,0.0f };
 	curtainLeft_->SetPos(curtainLeftPos_);
-	curtainRightPos_ = { 1250.0f,385.0f,0.0f };
+	curtainRightPos_ = { 1330.0f,375.0f,0.0f };
 	curtainRight_->SetPos(curtainRightPos_);
 
 
@@ -172,6 +172,7 @@ void SceneManager::ChangeScene(const std::string& sceneName, float extraTime) {
 
 	if (sceneName == "TITLE") {
 		isClose_ = true;
+		isOpen_ = false;
 		if (nowScene == "RESULT") {
 			isCurtain_ = false;
 			isClose_ = false;
@@ -195,7 +196,7 @@ void SceneManager::ChangeScene(const std::string& sceneName, float extraTime) {
 			isClose_ = true;
 			isCutting_ = false;
 			isDark_ = false;
-			changeExtraTime = 0.0f;
+			changeExtraTime = 40.0f;
 			DXCom::GetInstance()->SetCut(false);
 			isBlack_ = false;
 		}
@@ -267,9 +268,9 @@ void SceneManager::CurtainClose() {
 		if (curtainTime_ <= maxCurtainTime_) {
 			curtainTime_ += FPSKeeper::DeltaTime();
 
-			curtainLeftPos_.x = Lerp(curtainLeftPos_.x, 40.0f, (0.075f) * FPSKeeper::DeltaTime());
+			curtainLeftPos_.x = Lerp(curtainLeftPos_.x, -15.0f, (0.075f) * FPSKeeper::DeltaTime());
 			curtainLeft_->SetPos(curtainLeftPos_);
-			curtainRightPos_.x = Lerp(curtainRightPos_.x, 1240.0f, (0.075f) * FPSKeeper::DeltaTime());
+			curtainRightPos_.x = Lerp(curtainRightPos_.x, 1305.0f, (0.075f) * FPSKeeper::DeltaTime());
 			curtainRight_->SetPos(curtainRightPos_);
 		}
 		else {
@@ -294,13 +295,16 @@ void SceneManager::CurtainClose() {
 void SceneManager::CurtainOpen() {
 
 	if (isOpen_) {
-		if (curtainTime_ <= maxCurtainTime_) {
+		if (5.0f <= curtainTime_ && curtainTime_ <= maxCurtainTime_) {
 			curtainTime_ += FPSKeeper::DeltaTime();
 
-			curtainLeftPos_.x = Lerp(curtainLeftPos_.x, -650.0f, (0.075f)*FPSKeeper::DeltaTime());
+			curtainLeftPos_.x = Lerp(curtainLeftPos_.x, -720.0f, (0.075f)*FPSKeeper::DeltaTime());
 			curtainLeft_->SetPos(curtainLeftPos_);
-			curtainRightPos_.x = Lerp(curtainRightPos_.x, 1930.0f, (0.075f) * FPSKeeper::DeltaTime());
+			curtainRightPos_.x = Lerp(curtainRightPos_.x, 2000.0f, (0.075f) * FPSKeeper::DeltaTime());
 			curtainRight_->SetPos(curtainRightPos_);
+		}
+		else if (5.0f > curtainTime_) {
+			curtainTime_ += FPSKeeper::DeltaTime();
 		}
 		else {
 			isOpen_ = false;
@@ -352,9 +356,9 @@ void SceneManager::BlackUpdata() {
 				cut.radius.X = 0.0f;
 				DXCom::GetInstance()->SetCutRadius(cut.radius.X);
 
-				curtainLeftPos_ = { 30.0f,385.0f,0.0f };
+				curtainLeftPos_ = { -50.0f,375.0f,0.0f };
 				curtainLeft_->SetPos(curtainLeftPos_);
-				curtainRightPos_ = { 1250.0f,385.0f,0.0f };
+				curtainRightPos_ = { 1330.0f,375.0f,0.0f };
 				curtainRight_->SetPos(curtainRightPos_);
 			}
 		}

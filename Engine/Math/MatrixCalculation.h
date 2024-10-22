@@ -190,3 +190,5 @@ Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m);
 Vector3 ScreenToWorld(const Vector3& screenPos, const Matrix4x4& viewMatrix, const Matrix4x4& projectionMatrix, int screenWidth, int screenHeight);
 
 float Lerp(float v1, float v2, float t);
+
+float LerpShortAngle(float a, float b, float t);
