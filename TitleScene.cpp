@@ -55,6 +55,9 @@ void TitleScene::Update() {
 
 	dxCommon_->UpDate();
 
+	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
+		SceneManager::GetInstance()->ChangeScene("GAME", 40.0f);
+	}
 
 	sphere->transform.rotate.y += 0.02f;
 
