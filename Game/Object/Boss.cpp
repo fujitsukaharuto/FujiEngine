@@ -14,7 +14,6 @@
 #undef max
 
 
-uint32_t Boss::nextSerialNumber = 0;
 
 Boss::Boss() : Character(std::make_unique<SphereCollider>()), stopMoveTimer_(0){
 	serialNumber_ = nextSerialNumber;

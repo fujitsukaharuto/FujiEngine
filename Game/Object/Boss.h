@@ -84,7 +84,6 @@ private:
 
     //シリアルナンバー
     uint32_t serialNumber_ = 0;
-    static uint32_t nextSerialNumber;
     //接触履歴
     ContactRecord record_;
 

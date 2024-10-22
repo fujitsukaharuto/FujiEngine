@@ -4,7 +4,6 @@
 #include "Collision/SphereCollider.h"
 
 
-uint32_t Obstacle::nextSerialNumber = 0;
 
 Obstacle::Obstacle() : Character(std::make_unique<SphereCollider>()){
 	serialNumber_ = nextSerialNumber;

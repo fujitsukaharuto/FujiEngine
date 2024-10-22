@@ -11,7 +11,6 @@
 
 #include "GlobalVariables/GlobalVariables.h"
 
-uint32_t NoteEnemy::nextSerialNumber = 0;
 
 NoteEnemy::NoteEnemy() : Character(std::make_unique<SphereCollider>()){
 	serialNumber_ = nextSerialNumber;
@@ -79,8 +78,7 @@ void NoteEnemy::Update(){
 	ApplyGlobalVariabls();
 #endif // _DEBUG
 
-
-	collider_->Update(GetWorldPosition());
+	
 
 	//移動速度の更新
 	moveSpeed_ = Field::influenceOnSpeed_[fieldIndex_];
@@ -102,6 +100,9 @@ void NoteEnemy::Update(){
 	if (currentState_){
 		currentState_->Update();
 	}
+
+	models_[0]->UpdateWorldMat();
+	collider_->Update(GetCenterPos());
 
 }
 
@@ -130,15 +131,18 @@ void NoteEnemy::OnCollision(Character* other){
 
 		bool movedToNewField = false; // 段が移動したかどうかを確認
 
+		// 高さの差をチェックして、十分な高さの差がある場合のみ移動を許可
+		const float kHeightDifferenceThreshold = 1.0f; // 十分な高さの差の閾値
+
 		// プレイヤーが敵の上にある場合（敵を踏んだ場合）
-		if (playerPos.y > enemyPos.y){
+		if (playerPos.y > enemyPos.y + kHeightDifferenceThreshold){
 			if (fieldIndex_ > 0){
 				fieldIndex_--;  // 下の段に移動
 			}
 			movedToNewField = true;
 		}
 		// プレイヤーが敵の下にある場合（下から当たった場合）
-		else if (playerPos.y < enemyPos.y){
+		else if (playerPos.y < enemyPos.y - kHeightDifferenceThreshold){
 			if (fieldIndex_ < Field::staffNotation_.size() - 1 && fieldIndex_ != 0){
 				fieldIndex_++;  // 上の段に移動
 			}
@@ -164,6 +168,7 @@ void NoteEnemy::OnCollision(Character* other){
 				models_[0]->SetModel("chainNote.obj");
 			}
 		}
+
 	}
 
 	// 衝突相手が障害物の時音符状態なら敵状態に戻す
