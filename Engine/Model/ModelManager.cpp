@@ -5,7 +5,6 @@
 
 
 ModelManager::~ModelManager() {
-
 }
 
 
@@ -18,10 +17,12 @@ ModelManager* ModelManager::GetInstance() {
 void ModelManager::Initialize() {
 }
 
+
 void ModelManager::Finalize() {
 	ModelManager* instance = GetInstance();
 	instance->models_.clear();
 }
+
 
 void ModelManager::LoadOBJ(const std::string& filename) {
 	ModelManager* instance = GetInstance();

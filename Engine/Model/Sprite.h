@@ -26,8 +26,6 @@ public:
 
 	void SetAngle(float rotate);
 
-	void SetColor(const Vector4& color);
-
 	/*void SetPointLight(PointLight* light) { pointLight_ = light; }
 
 	void SetSpotLight(SpotLight* light) { spotLight_ = light; }*/

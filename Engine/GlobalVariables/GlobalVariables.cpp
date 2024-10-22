@@ -243,9 +243,6 @@ Vector3 GlobalVariables::GetVector3Value(const std::string& groupName, const std
 }
 
 void GlobalVariables::Update() {
-
-#ifdef _DEBUG
-
 	if (!ImGui::Begin("Global Variables", nullptr, ImGuiWindowFlags_MenuBar)) {
 		ImGui::End();
 		return;
@@ -302,6 +299,4 @@ void GlobalVariables::Update() {
 
 	ImGui::EndMenuBar();
 	ImGui::End();
-
-#endif // _DEBUG
 }

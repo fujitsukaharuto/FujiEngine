@@ -6,8 +6,8 @@
 
 
 Input* Input::GetInstance() {
-		static Input instance;
-		return &instance;
+	static Input instance;
+	return &instance;
 }
 
 

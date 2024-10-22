@@ -34,17 +34,13 @@ void Sprite::SetPos(const Vector3& pos) {
 }
 
 void Sprite::SetSize(const Vector2& size) {
-	size_ = size / 2.0f;
+	size_ = size;
 	SetWvp();
 }
 
 void Sprite::SetAngle(float rotate) {
 	rotate_ = rotate;
 	SetWvp();
-}
-
-void Sprite::SetColor(const Vector4& color) {
-	material_.SetColor(color);
 }
 
 void Sprite::InitializeBuffer() {

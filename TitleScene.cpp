@@ -6,7 +6,6 @@
 #include "FPSKeeper.h"
 #include "Random.h"
 
-#include "SceneManager.h"
 #include "ParticleManager.h"
 
 
@@ -18,6 +17,7 @@ TitleScene::~TitleScene() {
 }
 
 void TitleScene::Initialize() {
+	Init();
 
 
 	obj3dCommon.reset(new Object3dCommon());
@@ -25,8 +25,6 @@ void TitleScene::Initialize() {
 
 	sphere = new Object3d();
 	sphere->CreateSphere();
-
-	CameraManager::GetInstance()->GetCamera()->transform = { { 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, { 0.0f,3.5f,-20.0f } };
 
 }
 
@@ -44,20 +42,12 @@ void TitleScene::Update() {
 	sphere->SetRightDir(rightDir);
 	ImGui::End();
 
-	ImGui::Begin("Scene");
-	ImGui::SeparatorText("ChangeScene");
-	if (ImGui::Button("GameScene")) {
-		SceneManager::GetInstance()->ChangeScene("GAME", 40.0f);
-	}
-	ImGui::End();
 
 #endif // _DEBUG
 
+
 	dxCommon_->UpDate();
 
-	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
-		SceneManager::GetInstance()->ChangeScene("GAME", 40.0f);
-	}
 
 	sphere->transform.rotate.y += 0.02f;
 
@@ -91,7 +81,8 @@ void TitleScene::Draw() {
 
 #pragma endregion
 
-
+	dxCommon_->Command();
+	dxCommon_->PostEffect();
 
 
 }
