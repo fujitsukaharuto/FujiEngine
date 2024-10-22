@@ -327,7 +327,7 @@ void ParticleManager::CreateAnimeGroup(const std::string& name, const std::strin
 		Object3d* newobj = new Object3d();
 		newobj->Create("plane.obj");
 		newobj->SetTexture(fileName);
-		newobj->transform.rotate.y = 3.14f;
+
 
 		newGroup->objects_.push_back(newobj);
 		newGroup->lifeTime.push_back(0.0f);
@@ -414,7 +414,6 @@ void ParticleManager::EmitAnime(const std::string& name, const Vector3& pos, con
 			if (!group->isLive_[i]) {
 				group->objects_[i]->transform.translate = Random::GetVector3(para.transx, para.transy, para.transz);
 				group->objects_[i]->transform.translate += pos;
-				group->objects_[i]->transform.scale = { group->startSize.x,group->startSize.y,1.0f };
 				group->speed[i] = Random::GetVector3(para.speedx, para.speedy, para.speedz);
 				group->lifeTime[i] = data.lifeTime;
 				group->startLifeTime_[i] = group->lifeTime[i];

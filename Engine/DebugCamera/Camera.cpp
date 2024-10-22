@@ -4,15 +4,13 @@
 #include "Random.h"
 #include "ImGuiManager.h"
 
-#include "MatrixCalculation.h"
-
 Camera::Camera() :transform({ { 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, { 0.0f,3.5f,-20.0f } })
 ,fovY_(0.45f),aspect_(float(MyWin::kWindowWidth) / float(MyWin::kWindowHeight))
-,nearClip_(0.1f),farClip_(200.0f),worldMatrix_(MakeAffineMatrix(transform.scale,transform.rotate,transform.translate))
+,nearClip_(0.1f),farClip_(100.0f),worldMatrix_(MakeAffineMatrix(transform.scale,transform.rotate,transform.translate))
 ,viewMatrix_(Inverse(worldMatrix_))
 ,projectionMatrix_(MakePerspectiveFovMatrix(fovY_,aspect_,nearClip_,farClip_))
 ,viewProjectionMatrix_(Multiply(viewMatrix_,projectionMatrix_))
-,shakeTime_(0.0f),shakeStrength_(0.3f)
+,shakeTime_(0.0f),shakeStrength_(0.1f)
 {}
 
 void Camera::Update() {
@@ -55,13 +53,3 @@ void Camera::Update() {
 	viewProjectionMatrix_ = Multiply(viewMatrix_, projectionMatrix_);
 
 }
-
-const Vector3 Camera::GetRightEdgeInWorld() const{
-	// スクリーンの右端（X = 1280, Y = 360, Z = 1.0）のスクリーン座標を設定
-	Vector3 screenRightEdge = {1280.0f, 360.0f, 1.0f};  // Y = 360は画面中央
-
-	Vector3 worldRightEdgePos = ScreenToWorld(screenRightEdge, viewMatrix_, projectionMatrix_, 1280, 720);
-	// 右端のスクリーン座標をワールド座標に変換 (カメラの状態を使用)
-	return worldRightEdgePos;
-}
-

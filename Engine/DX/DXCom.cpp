@@ -181,9 +181,9 @@ void DXCom::CreateRenderTargets()
 	offscreenrtvDesc_.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 
 	clearColorValue.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-	clearColorValue.Color[0] = 0.059f;
-	clearColorValue.Color[1] = 0.137f;
-	clearColorValue.Color[2] = 0.314f;
+	clearColorValue.Color[0] = 0.1f;
+	clearColorValue.Color[1] = 0.25f;
+	clearColorValue.Color[2] = 0.5f;
 	clearColorValue.Color[3] = 1.0f;
 
 	offscreenrt_ = CreateOffscreenTextureResource(
@@ -271,8 +271,8 @@ void DXCom::SettingGraphicPipeline()
 	indexGrayData_[4] = 2;
 	indexGrayData_[5] = 3;
 
-	isGrayscale_ = true;
-	isNonePost_ = false;
+	isGrayscale_ = false;
+	isNonePost_ = true;
 	isMetaBall_ = false;
 	isGaussian_ = false;
 

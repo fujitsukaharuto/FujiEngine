@@ -24,14 +24,6 @@ public:
 	const Matrix4x4& GetProjectionMatrix() const { return projectionMatrix_; }
 	const Matrix4x4& GetViewProjectionMatrix() const { return viewProjectionMatrix_; }
 
-	/// <summary>
-	/// 画面右端のワールド座標
-	/// </summary>
-	/// <returns></returns>
-	const Vector3 GetRightEdgeInWorld()const;
-
-	float GetFovY()const{ return fovY_; }
-	float GetAspect()const{ return aspect_; }
 
 
 	Trans transform;

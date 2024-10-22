@@ -78,19 +78,6 @@ Matrix4x4 Object3d::GetWorldMat() const {
 
 
 
-void Object3d::UpdateWorldMat(){
-	worldMatrix_ = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
-	if (parent_) {
-		const Matrix4x4& parentWorldMatrix = parent_->GetWorldMat();
-		worldMatrix_ = Multiply(worldMatrix_, parentWorldMatrix);
-	}
-	else if (isCameraParent_) {
-		const Matrix4x4& parentWorldMatrix = camera_->GetWorldMatrix();
-		worldMatrix_ = Multiply(worldMatrix_, parentWorldMatrix);
-	}
-	wvpDate_->World = worldMatrix_;
-}
-
 void Object3d::SetColor(const Vector4& color) {
 	model_->SetColor(color);
 }
@@ -104,8 +91,6 @@ void Object3d::SetTexture(const std::string& name) {
 }
 
 void Object3d::SetModel(const std::string& fileName) {
-	delete model_;
-	model_ = nullptr;
 	model_ = new Model(*(ModelManager::FindModel(fileName)));
 }
 
@@ -123,7 +108,7 @@ void Object3d::CreateWVP() {
 	directionalLightData_ = nullptr;
 	directionalLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData_));
 	directionalLightData_->color = { 1.0f,1.0f,1.0f,1.0f };
-	directionalLightData_->direction = { 0.0f,0.0f,1.0f };
+	directionalLightData_->direction = { 1.0f,0.0f,0.0f };
 	directionalLightData_->intensity = 1.0f;
 
 
@@ -136,18 +121,30 @@ void Object3d::CreateWVP() {
 }
 
 void Object3d::SetWVP() {
-	UpdateWorldMat();
+
+	Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 	Matrix4x4 worldViewProjectionMatrix;
+
+
+	if (parent_) {
+		const Matrix4x4& parentWorldMatrix = parent_->GetWorldMat();
+		worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
+	}
+	else if (isCameraParent_) {
+		const Matrix4x4& parentWorldMatrix = camera_->GetWorldMatrix();
+		worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
+	}
 
 
 	if (camera_) {
 		const Matrix4x4& viewProjectionMatrix = camera_->GetViewProjectionMatrix();
-		worldViewProjectionMatrix= Multiply(worldMatrix_, viewProjectionMatrix);
+		worldViewProjectionMatrix= Multiply(worldMatrix, viewProjectionMatrix);
 	}
 	else {
-		worldViewProjectionMatrix = worldMatrix_;
+		worldViewProjectionMatrix = worldMatrix;
 	}
 
+	wvpDate_->World = worldMatrix;
 	wvpDate_->WVP = worldViewProjectionMatrix;
 	wvpDate_->WorldInverseTransPose = Transpose(Inverse(wvpDate_->World));
 

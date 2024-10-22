@@ -1,7 +1,5 @@
 #include "MatrixCalculation.h"
 
-#include <numbers>
-
 Vector2 Multiply(const Vector2& vec, const float& num)
 {
 	return { vec.x * num,vec.y * num };
@@ -166,24 +164,6 @@ Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix)
 
 	return result;
 }
-
-Vector4 Transform(const Vector4& vector, const Matrix4x4& matrix){
-	Vector4 result {};
-	result.X = vector.X * matrix.m[0][0] + vector.Y * matrix.m[1][0] + vector.Z * matrix.m[2][0] + vector.W * matrix.m[3][0];
-	result.Y = vector.X * matrix.m[0][1] + vector.Y * matrix.m[1][1] + vector.Z * matrix.m[2][1] + vector.W * matrix.m[3][1];
-	result.Z = vector.X * matrix.m[0][2] + vector.Y * matrix.m[1][2] + vector.Z * matrix.m[2][2] + vector.W * matrix.m[3][2];
-	result.W = vector.X * matrix.m[0][3] + vector.Y * matrix.m[1][3] + vector.Z * matrix.m[2][3] + vector.W * matrix.m[3][3];
-
-	assert(result.W != 0.0f); // w��0�łȂ����Ƃ�m�F
-
-	// w�����Ő��K���i�������e�p�j
-	result.X /= result.W;
-	result.X /= result.W;
-	result.Y /= result.W;
-
-	return result;
-}
-
 
 Matrix4x4 Multiply(const Matrix4x4& matrix1, const Matrix4x4& matrix2)
 {
@@ -447,46 +427,4 @@ Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m)
 	return result;
 }
 
-Vector3 ScreenToWorld(const Vector3& screenPos, const Matrix4x4& viewMatrix, const Matrix4x4& projectionMatrix, int screenWidth, int screenHeight){
-	// スクリーン座標をNDC座標に変換 (スクリーン座標 (0, screenWidth/Height) -> NDC座標 (-1, 1))
-	Vector4 ndcPos;
-	ndcPos.X = (2.0f * screenPos.x) / screenWidth - 1.0f;
-	ndcPos.Y = 1.0f - (2.0f * screenPos.y) / screenHeight;  // Y座標は上下逆
-	ndcPos.Z = screenPos.z;
-	ndcPos.W = 1.0f;
-
-	// ビュー行列とプロジェクション行列の逆行列を取得
-	Matrix4x4 invViewProjMatrix = Inverse(Multiply(viewMatrix, projectionMatrix));
-
-	// NDC座標をワールド座標に変換
-	Vector4 worldPos = Transform(ndcPos, invViewProjMatrix);
-
-	// wで正規化してワールド座標を取得
-	worldPos.X /= worldPos.W;
-	worldPos.Y /= worldPos.W;
-	worldPos.Z /= worldPos.W;
-
-	return Vector3(worldPos.X, worldPos.Y, worldPos.Z);
-}
-
 float Lerp(float v1, float v2, float t) { return (1.0f - t) * v1 + t * v2; }
-
-float LerpShortAngle(float a, float b, float t){
-	const float TWO_PI = 2.0f * ( float ) std::numbers::pi; // 2π (6.283185307179586)
-	const float PI = ( float ) std::numbers::pi;            // π (3.141592653589793)
-
-	// 角度差分を求める
-	float diff = b - a;
-
-	// 角度を[-π, π]に補正する
-	diff = fmod(diff, TWO_PI);
-	if (diff > PI){
-		diff -= TWO_PI;
-	} else if (diff < -PI){
-		diff += TWO_PI;
-	}
-
-	// Lerpを使用して補間
-	return Lerp(a, a + diff, t);
-
-}
