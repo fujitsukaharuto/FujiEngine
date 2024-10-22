@@ -53,7 +53,15 @@ private:
 	std::unique_ptr<Sprite> curtainFrame_;
 	std::unique_ptr<Sprite> curtainLeft_;
 	std::unique_ptr<Sprite> curtainRight_;
-	std::unique_ptr<Sprite> Black_;
+
+	std::unique_ptr<Sprite> triangleL_;
+	std::unique_ptr<Sprite> triangleC_;
+	std::unique_ptr<Sprite> triangleR_;
+
+	Vector4 darkColorL_{};
+	Vector4 darkColorC_{};
+	Vector4 darkColorR_{};
+
 
 	bool isFinifh_ = false;
 	bool isCurtain_ = false;
@@ -66,7 +74,6 @@ private:
 	float maxCurtainTime_ = 0.0f;
 	float curtainTime_ = 0.0f;
 
-	Vector4 darkColor_{};
 
 	Vector3 curtainLeftPos_{};
 	Vector3 curtainRightPos_{};

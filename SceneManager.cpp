@@ -4,7 +4,7 @@
 #include "TitleScene.h"
 #include "GameScene.h"
 #include "ResultScene.h"
-
+#include "ImGuiManager.h"
 
 
 SceneManager::SceneManager() {
@@ -23,7 +23,9 @@ SceneManager* SceneManager::GetInstance() {
 
 void SceneManager::Initialize() {
 
-	darkColor_ = { 0.0f,0.0f,0.0f,0.0f };
+	darkColorL_ = { 1.0f,1.0f,1.0f,0.0f };
+	darkColorC_ = { 1.0f,1.0f,1.0f,0.0f };
+	darkColorR_ = { 1.0f,1.0f,1.0f,0.0f };
 
 	curtainFrame_.reset(new Sprite());
 	curtainFrame_->Load("curtain.png");
@@ -40,11 +42,24 @@ void SceneManager::Initialize() {
 	curtainRight_->SetPos({ 640,360,0.0f });
 	curtainRight_->SetSize({ 1280.0f,745.0f });
 
-	Black_.reset(new Sprite());
-	Black_->Load("white2x2.png");
-	Black_->SetPos({ 640,360,0.0f });
-	Black_->SetSize({ 1280.0f,720.0f });
-	Black_->SetColor(darkColor_);
+
+	triangleL_.reset(new Sprite());
+	triangleL_->Load("triangle.png");
+	triangleL_->SetPos({ 220,100,0.0f });
+	triangleL_->SetSize({ 1000.0f,1500.0f });
+	triangleL_->SetColor(darkColorL_);
+
+	triangleC_.reset(new Sprite());
+	triangleC_->Load("triangle.png");
+	triangleC_->SetPos({ 640,100,0.0f });
+	triangleC_->SetSize({ 1000.0f,1500.0f });
+	triangleC_->SetColor(darkColorC_);
+
+	triangleR_.reset(new Sprite());
+	triangleR_->Load("triangle.png");
+	triangleR_->SetPos({ 1060,100,0.0f });
+	triangleR_->SetSize({ 1000.0f,1500.0f });
+	triangleR_->SetColor(darkColorR_);
 
 
 	curtainLeftPos_ = { 30.0f,385.0f,0.0f };
@@ -59,6 +74,7 @@ void SceneManager::Finalize() {
 }
 
 void SceneManager::Update() {
+
 
 	if (!isChange_) {
 		scene_->Update();
@@ -96,7 +112,10 @@ void SceneManager::Draw() {
 
 	curtainFrame_->Draw();
 
-	Black_->Draw();
+
+	triangleL_->Draw();
+	triangleC_->Draw();
+	triangleR_->Draw();
 
 }
 
@@ -247,28 +266,67 @@ void SceneManager::BlackUpdata() {
 		if (isDark_) {
 			if (curtainTime_ <= maxCurtainTime_) {
 				curtainTime_ += FPSKeeper::DeltaTime();
+				float maxthree = maxCurtainTime_ / 5.0f;
+				
+				if (curtainTime_ >= maxthree) {
+					darkColorL_.W = 1.0f;
+					triangleL_->SetColor(darkColorL_);
+				}
 
-				darkColor_.W = Lerp(darkColor_.W, 1.0f, 0.1f);
-				Black_->SetColor(darkColor_);
+				if (curtainTime_ >= maxthree * 2.0f) {
+					darkColorR_.W = 1.0f;
+					triangleR_->SetColor(darkColorR_);
+				}
+
+				if (curtainTime_ >= maxthree * 3.0f) {
+					darkColorC_.W = 1.0f;
+					triangleC_->SetColor(darkColorC_);
+				}
+
 
 			}
 			else {
 				isDark_ = false;
-				darkColor_.W = 1.0f;
-				Black_->SetColor(darkColor_);
+				darkColorL_.W = 1.0f;
+				triangleL_->SetColor(darkColorL_);
+
+				darkColorC_.W = 1.0f;
+				triangleC_->SetColor(darkColorC_);
+
+				darkColorR_.W = 1.0f;
+				triangleR_->SetColor(darkColorR_);
 			}
 		}
 		else {
 			if (curtainTime_ >= 0.0f) {
 				curtainTime_ -= FPSKeeper::DeltaTime();
+				float maxthree = maxCurtainTime_ / 5.0f;
 
-				darkColor_.W = Lerp(darkColor_.W, 0.0f, 0.1f);
-				Black_->SetColor(darkColor_);
+				if (curtainTime_ <= maxthree * 3.0f) {
+					darkColorC_.W = 0.0f;
+					triangleC_->SetColor(darkColorC_);
+				}
+
+				if (curtainTime_ <= maxthree * 2.0f) {
+					darkColorR_.W = 0.0f;
+					triangleR_->SetColor(darkColorR_);
+				}
+
+				if (curtainTime_ <= maxthree) {
+					darkColorL_.W = 0.0f;
+					triangleL_->SetColor(darkColorL_);
+				}
 
 			}
 			else {
-				darkColor_.W = 0.0f;
-				Black_->SetColor(darkColor_);
+				darkColorL_.W = 0.0f;
+				triangleL_->SetColor(darkColorL_);
+
+				darkColorC_.W = 0.0f;
+				triangleC_->SetColor(darkColorC_);
+
+				darkColorR_.W = 0.0f;
+				triangleR_->SetColor(darkColorR_);
 			}
 		}
 	}
