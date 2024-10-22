@@ -61,6 +61,9 @@ private:
 
 	std::vector<Object3d*> playerModels_ {};
 	std::vector<Object3d*> bossModels_ {};
+	std::unique_ptr<Object3d> skyCube_ = nullptr;
+	std::vector<Object3d*> choruth_ {};
+
 	/*======================
 		プレイヤー
 	=======================*/

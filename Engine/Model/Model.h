@@ -30,6 +30,8 @@ public:
 
 	std::string GetTextuerName() { return nowTextuer; }
 
+	void SetEnableLight(bool is);
+
 private:
 
 
