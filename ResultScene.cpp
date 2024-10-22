@@ -25,7 +25,7 @@ void ResultScene::Initialize() {
 
 	sphere = new Object3d();
 	sphere->CreateSphere();
-	sphere->SetEnableLight(LightMode::kSpotLightON);
+	sphere->SetEnableLight(LightMode::kPointLightON);
 	sphere->SetColor({ 1.0f,0.0f,0.0f,1.0f });
 
 	CameraManager::GetInstance()->GetCamera()->transform = { { 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, { 0.0f,3.5f,-20.0f } };
@@ -42,9 +42,12 @@ void ResultScene::Update() {
 	ImGui::DragFloat3("scale", &sphere->transform.scale.x, 0.01f);
 	ImGui::DragFloat3("rotate", &sphere->transform.rotate.x, 0.01f);
 	ImGui::DragFloat3("right", &rightDir.x, 0.01f);
+	ImGui::DragFloat("ins", &ins, 0.1f);
 	rightDir = rightDir.Normalize();
 	sphere->SetRightDir(rightDir);
 	ImGui::End();
+
+	sphere->SetRightIntensity(ins);
 
 	ImGui::Begin("Scene");
 	ImGui::SeparatorText("ChangeScene");

@@ -11,8 +11,11 @@ void PointLightManager::Update() {
 #ifdef _DEBUG
 
 
-
-
+	ImGui::Begin("point");
+	ImGui::DragFloat3("pos", &pointLights_[0]->pointLightData_->position.x, 0.1f);
+	ImGui::DragFloat("dec", &pointLights_[0]->pointLightData_->decay, 0.1f);
+	ImGui::DragFloat("ins", &pointLights_[0]->pointLightData_->intensity, 0.1f);
+	ImGui::DragFloat("rad", &pointLights_[0]->pointLightData_->radius, 0.1f);
 	ImGui::End();
 
 #endif // _DEBUG

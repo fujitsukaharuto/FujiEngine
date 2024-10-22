@@ -32,6 +32,8 @@ public:
 
 	void SetRightDir(const Vector3& right) { directionalLightData_->direction = right; }
 
+	void SetRightIntensity(float ins) { directionalLightData_->intensity = ins; }
+
 	void SetCamera(Camera* camera) { this->camera_ = camera; }
 
 	void SetParent(Object3d* parent) { parent_ = parent; }

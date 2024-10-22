@@ -21,4 +21,6 @@ private:
 	Object3d* sphere = nullptr;
 	Vector3 rightDir = { 1.0f,0.0f,0.0f };
 
+	float ins = 1.0f;
+
 };

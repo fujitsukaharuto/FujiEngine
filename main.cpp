@@ -179,7 +179,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 #endif // _DEBUG
 
-		
+		pointLightManager->Update();
 
 		// ゲームシーンの毎フレーム処理
 		sceneManager->Update();
