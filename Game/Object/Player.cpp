@@ -67,7 +67,12 @@ void Player::Update(){
 
         // Z軸の回転を追加 (ノックバック中のみ)
         const float kRotationSpeed = 0.16f; // Z軸回転の速度
-        models_[0]->transform.rotate.z += kRotationSpeed; // Z軸を回転
+
+        if (knockbackDirection_>=1){
+            models_[0]->transform.rotate.z -= kRotationSpeed; // Z軸を回転
+        } else{
+            models_[0]->transform.rotate.z += kRotationSpeed; // Z軸を回転
+        }
 
         // 地面に着いたらノックバックを終了
         if (models_[0]->transform.translate.y <= 0.0f && !isKnockedBack_){
@@ -262,9 +267,9 @@ void Player::OnCollision(Character* other){
         float xDifference = playerPos.x - obstaclePos.x;
 
         // ノックバックの方向を決定（右から衝突：右に、左から衝突：左に飛ばす）
-        float direction = (xDifference > 0) ? 1.0f : -1.0f;
+        knockbackDirection_ = (xDifference > 0) ? 1.0f : -1.0f;
 
-        const float kObstacleCollisionXVelocity = 0.2f * direction;  // 水平方向の速度
+        const float kObstacleCollisionXVelocity = 0.2f * knockbackDirection_;  // 水平方向の速度
         const float kObstacleCollisionYVelocity = 0.3f;  // 上方向の速度
 
         // X方向の速度を設定
@@ -273,7 +278,7 @@ void Player::OnCollision(Character* other){
         velocity_.y = kObstacleCollisionYVelocity;
 
         // プレイヤーを障害物から少し押し出す（右方向または左方向）
-        playerPos.x += 0.5f * direction;
+        playerPos.x += 0.5f * knockbackDirection_;
         playerCollider->SetPosition(playerPos);
 
         // ノックバック状態に設定

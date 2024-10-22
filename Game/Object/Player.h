@@ -59,6 +59,8 @@ private:
     bool isKnockedBack_ = false;
     // ノックバックの残り時間
     float knockbackTimer_ = 0.0f;
+    float knockbackDirection_ = 1.0f; 
+
 
 
     SoundData knockBackSE_;
