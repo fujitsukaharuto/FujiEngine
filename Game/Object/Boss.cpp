@@ -205,7 +205,7 @@ void Boss::OnCollision(Character* other){
 }
 
 Vector3 Boss::GetCenterPos() const{
-	Vector3 offset = {2.0f, 3.0f, 1.8f};
+	Vector3 offset = {1.0f, 3.0f, 1.8f};
 	Vector3 worldPos = Transform(offset, models_[0]->GetMatWorld());
 	return worldPos;
 }

@@ -31,14 +31,14 @@ void SceneManager::Initialize() {
 	curtainFrame_->SetSize({ 1280.0f,720.0f });
 
 	curtainLeft_.reset(new Sprite());
-	curtainLeft_->Load("uvChecker.png");
+	curtainLeft_->Load("curtain02.png");
 	curtainLeft_->SetPos({ 640,360,0.0f });
-	curtainLeft_->SetSize({ 1280.0f,720.0f });
+	curtainLeft_->SetSize({ 1280.0f,745.0f });
 
 	curtainRight_.reset(new Sprite());
-	curtainRight_->Load("uvChecker.png");
+	curtainRight_->Load("curtain02.png");
 	curtainRight_->SetPos({ 640,360,0.0f });
-	curtainRight_->SetSize({ 1280.0f,720.0f });
+	curtainRight_->SetSize({ 1280.0f,745.0f });
 
 	Black_.reset(new Sprite());
 	Black_->Load("white2x2.png");
@@ -47,9 +47,9 @@ void SceneManager::Initialize() {
 	Black_->SetColor(darkColor_);
 
 
-	curtainLeftPos_ = { 30.0f,360.0f,0.0f };
+	curtainLeftPos_ = { 30.0f,385.0f,0.0f };
 	curtainLeft_->SetPos(curtainLeftPos_);
-	curtainRightPos_ = { 1250.0f,360.0f,0.0f };
+	curtainRightPos_ = { 1250.0f,385.0f,0.0f };
 	curtainRight_->SetPos(curtainRightPos_);
 
 }

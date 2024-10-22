@@ -141,6 +141,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 	textureManager->Load("curtain.png");
+	textureManager->Load("curtain02.png");
 
 
 	//BYTE keys[256] = { 0 };

@@ -25,6 +25,9 @@ Field::~Field(){
 void Field::Initialize(const std::array<Object3d*, 5>& models){
 	staffNotation_ = models;
 
+	Field::scrollX_ = 0.0f;
+	Field::cameraScrollX_ = 0.0f;
+
 	//一番下の線の座標
 
 	//0.1ずつ増加するとして初期化

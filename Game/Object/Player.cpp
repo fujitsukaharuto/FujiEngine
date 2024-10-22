@@ -41,11 +41,13 @@ void Player::Initialize(std::vector<Object3d*> Object3ds){
     junpSE_ = Audio::GetInstance()->SoundLoadWave("jump.wav");
     damageSE_ = Audio::GetInstance()->SoundLoadWave("damage.wav");
 
+    models_[0]->transform.translate = { 12.0f,0.0f,0.0f };
+
     emit.name = "playerHit";
     emit.count = 1;
     emit.animeData.lifeTime = 20;
     emit.RandomSpeed({-0.00f,0.00f}, {-0.00f,0.00f}, {0.0f,0.0f});
-    emit.RandomTranslate({-0.13f,-0.13f}, {0.0f,0.0f}, {-1.7f,-1.7f});
+    emit.RandomTranslate({-1.5f,-1.5f}, {0.0f,0.0f}, {-8.0f,-8.0f});
     emit.animeData.startSize = {2.0f,2.0f};
     emit.animeData.endSize = {2.0f,2.0f};
 
@@ -240,6 +242,7 @@ void Player::OnCollision(Character* other){
 
         life_--;
         Audio::GetInstance()->SoundPlayWave(damageSE_);
+        emit.RandomTranslate({ -1.5f,-1.5f }, { 0.0f,0.0f }, { -8.0f,-8.0f });
         emit.pos = GetCenterPos();
         emit.BurstAnime();
     }
@@ -287,6 +290,7 @@ void Player::OnCollision(Character* other){
 
         life_--;
         Audio::GetInstance()->SoundPlayWave(damageSE_);
+        emit.RandomTranslate({ -3.5f,-3.5f }, { -0.2f,-0.2f }, { -4.0f,-4.0f });
         emit.pos = GetCenterPos();
         emit.BurstAnime();
     }
