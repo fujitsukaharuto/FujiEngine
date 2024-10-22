@@ -131,8 +131,9 @@ void Boss::Update(){
 		}
 	}
 
+	Vector3 offset {-2.0f,0.0f,0.0f};
 	// コライダー用のポジションを更新
-	collider_->Update(GetCenterPos());
+	collider_->Update(GetCenterPos() + offset);
 
 	Character::Update();
 
