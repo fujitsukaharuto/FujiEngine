@@ -60,6 +60,7 @@ void NoteEnemy::Initialize(Object3d* model, const Vector3& initPos){
 	//最初の状態をセット
 	currentState_ = std::make_unique<NoteEnemyState_Enemy>(this);
 
+	changeSE_ = Audio::GetInstance()->SoundLoadWave("change.wav");
 
 	emit.name = "noteChange";
 	emit.count = 2;
@@ -95,6 +96,7 @@ void NoteEnemy::Update(){
 		if (isChanegeEffect_){
 			emit.pos = GetCenterPos();
 			emit.Burst();
+			Audio::GetInstance()->SoundPlayWave(changeSE_);
 			isChanegeEffect_ = false;
 		}
 	}

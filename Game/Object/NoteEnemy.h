@@ -115,7 +115,7 @@ private:
 	bool isRemoved_ = false;
 
 
-	SoundData Change_;
+	SoundData changeSE_;
 
 
 	//シリアルナンバー

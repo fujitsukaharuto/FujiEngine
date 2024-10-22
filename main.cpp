@@ -77,6 +77,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	audio->LoadWave("testLongBGM.wav");
 	audio->LoadWave("jump.wav");
 	audio->LoadWave("damage.wav");
+	audio->LoadWave("change.wav");
 
 
 
