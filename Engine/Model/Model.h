@@ -10,8 +10,7 @@
 #include "externals/DirectXTex/DirectXTex.h"
 #include "externals/DirectXTex/d3dx12.h"
 
-class Model
-{
+class Model{
 public:
 	Model();
 	Model(const Model& other);
@@ -30,6 +29,8 @@ public:
 	void SetTextureName(const std::string& name);
 
 	std::string GetTextuerName() { return nowTextuer; }
+
+	void SetEnableLight(bool is);
 
 private:
 

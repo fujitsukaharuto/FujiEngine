@@ -1,6 +1,6 @@
 #include "Audio.h"
 #include "DXCom.h"
-#include "GameScene.h"
+#include "SceneManager.h"
 #include "TextureManager.h"
 #include "ImGuiManager.h"
 #include "SRVManager.h"
@@ -9,6 +9,7 @@
 #include "ModelManager.h"
 #include "PointLightManager.h"
 #include "CameraManager.h"
+#include "Rendering/PrimitiveDrawer.h"
 #include "ParticleManager.h"
 
 
@@ -28,8 +29,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Input* input = nullptr;
 	Audio* audio = nullptr;
 	FPSKeeper* fpsKeeper = nullptr;
-	GameScene* gameScene = nullptr;
+	SceneManager* sceneManager = nullptr;
 	TextureManager* textureManager = nullptr;
+	PrimitiveDrawer* primitiveDrawer = nullptr;
 	ModelManager* modelManager = nullptr;
 
 	PointLightManager* pointLightManager = nullptr;
@@ -72,6 +74,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	audio = Audio::GetInstance();
 	audio->Initialize();
 
+	audio->LoadWave("testLongBGM.wav");
+	audio->LoadWave("jump.wav");
+	audio->LoadWave("damage.wav");
+	audio->LoadWave("change.wav");
+
+
+
+
+	// 描画用リソースの管理の初期化
 	textureManager = TextureManager::GetInstance();
 	modelManager = ModelManager::GetInstance();
 
@@ -79,11 +90,31 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	pointLightManager->AddPointLight();
 	pointLightManager->AddSpotLight();
 
-
+	// Particle作成
 	pManager = ParticleManager::GetInstance();
 	pManager->Initialize(dxCommon, srvManager);
+	pManager->CreateParticleGroup("test", "uvChecker.png");
+	pManager->CreateParticleGroup("noteChange", "bakuha.png");
+	
+
 	pManager->CreateAnimeGroup("animetest", "uvChecker.png");
 	pManager->AddAnime("animetest", "white2x2.png", 10.0f);
+
+	pManager->CreateAnimeGroup("bossHit", "explosion1.png");
+	pManager->AddAnime("bossHit", "explosion3.png", 8.0f);
+	pManager->AddAnime("bossHit", "explosion4.png", 16.0f);
+	pManager->AddAnime("bossHit", "explosion5.png", 24.0f);
+	pManager->AddAnime("bossHit", "explosion6.png", 32.0f);
+
+
+	pManager->CreateAnimeGroup("playerHit", "playerDamage01.png");
+	pManager->AddAnime("playerHit", "playerDamage02.png", 5.0f);
+	pManager->AddAnime("playerHit", "playerDamage03.png", 10.0f);
+	pManager->AddAnime("playerHit", "playerDamage04.png", 15.0f);
+
+
+
+	primitiveDrawer = PrimitiveDrawer::GetInstance();
 
 #pragma endregion
 
@@ -91,8 +122,27 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	GlobalVariables::GetInstance()->LoadFiles();
 
-	gameScene = new GameScene();
-	gameScene->Initialize();
+	sceneManager = SceneManager::GetInstance();
+	sceneManager->Initialize();
+	sceneManager->StartScene("TITLE");
+
+
+
+	modelManager->LoadOBJ("ground.obj");
+	modelManager->LoadOBJ("skyCube.obj");
+	modelManager->LoadOBJ("player.obj"); 
+	modelManager->LoadOBJ("boss.obj");
+	modelManager->LoadOBJ("chorus.obj");
+	modelManager->LoadOBJ("enemy.obj");
+	modelManager->LoadOBJ("note.obj");
+	modelManager->LoadOBJ("obstacle.obj");
+	modelManager->LoadOBJ("chainNote.obj");
+	modelManager->LoadOBJ("verticalBar.obj");
+	modelManager->LoadOBJ("horizontalBar.obj");
+
+
+	textureManager->Load("curtain.png");
+	textureManager->Load("curtain02.png");
 
 
 	//BYTE keys[256] = { 0 };
@@ -124,12 +174,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 			}
 		}
-#endif // _DEBUG
 
 		GlobalVariables::GetInstance()->Update();
 
+#endif // _DEBUG
+
+		
+
 		// ゲームシーンの毎フレーム処理
-		gameScene->Update();
+		sceneManager->Update();
 
 		// ImGui受付
 		imguiManager->End();
@@ -137,7 +190,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		// 描画開始
 		dxCommon->PreDraw();
 		// ゲームシーンの描画
-		gameScene->Draw();
+		sceneManager->Draw();
+		dxCommon->Command();
+		dxCommon->PostEffect();
 		// ImGuiの描画
 		imguiManager->Draw();
 		// 描画終了
@@ -145,7 +200,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	}
 
 	// 解放
-	delete gameScene;
+	sceneManager->Finalize();
+
+
+	primitiveDrawer->Finalize();
 	
 	audio->Finalize();
 	imguiManager->Fin();

@@ -3,6 +3,8 @@
 #include <cassert>
 #include <xaudio2.h>
 #include <vector>
+#include <unordered_map>
+#include <memory>
 #include <wrl.h>
 
 
@@ -53,7 +55,9 @@ public:
 
 	static Audio* GetInstance();
 
-	SoundData SoundLoadWave(const char* filename);
+	void LoadWave(const std::string& filename);
+
+	SoundData SoundLoadWave(const std::string& filename);
 
 	void SoundUnload(SoundData* soundData);
 
@@ -65,5 +69,6 @@ private:
 
 	Microsoft::WRL::ComPtr<IXAudio2> xAudio2_;
 	IXAudio2MasteringVoice* masterVoice_;
-
+	std::unordered_map<std::string, SoundData> container_;
+	const std::string kDirectoryPath_ = "resource/";
 };

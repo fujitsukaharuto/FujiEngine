@@ -3,11 +3,17 @@
 std::mt19937 Random::generator_(std::random_device{}());
 
 int Random::GetInt(int min, int max) {
+	if (min > max) {
+		min = max;
+	}
 	std::uniform_int_distribution<int> dist(min, max);
 	return dist(generator_);
 }
 
 float Random::GetFloat(float min, float max) {
+	if (min > max) {
+		min = max;
+	}
 	std::uniform_real_distribution<float> dist(min, max);
 	return dist(generator_);
 }

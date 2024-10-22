@@ -26,6 +26,8 @@ public:
 
 	Matrix4x4 GetWorldMat() const;
 
+	void UpdateWorldMat();
+
 	void SetColor(const Vector4& color);
 
 	void SetRightDir(const Vector3& right) { directionalLightData_->direction = right; }
@@ -44,11 +46,17 @@ public:
 
 	void SetSpotLight(SpotLight* light) { spotLight_ = light; }*/
 
+	const Matrix4x4& GetMatWorld()const{ return worldMatrix_; }
+
 	Trans transform{};
+
+	void SetModel(const std::string& fileName);
+
+	void SetEnableLight(bool is){ model_->SetEnableLight(is); }
+
 
 private:
 
-	void SetModel(const std::string& fileName);
 
 	void CreateWVP();
 
@@ -65,6 +73,8 @@ private:
 	Object3d* parent_ = nullptr;
 
 	bool isCameraParent_ = false;
+	Matrix4x4 worldMatrix_;
+
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource_ = nullptr;
 	TransformationMatrix* wvpDate_ = nullptr;

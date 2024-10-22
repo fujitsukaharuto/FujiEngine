@@ -1,0 +1,74 @@
+#include"Object/Character.h"
+
+uint32_t Character::nextSerialNumber = 0;
+
+
+Character::~Character(){
+	for (auto model : models_){
+		delete model;
+	}
+}
+
+void Character::Initialize(std::vector<Object3d*> models){
+	models_.resize(models.size());
+
+	for (size_t i = 0; i < models.size(); i++){
+		models_[i] = models[i];
+		models[i]->UpdateWorldMat();
+	}
+}
+
+void Character::Initialize(Object3d* model){
+	models_.emplace_back(model);
+}
+
+void Character::Update(){
+	
+	if (isAlive_){
+		if (life_<=0){
+			isAlive_ = false;
+		}
+	}
+}
+
+void Character::Draw(){
+	for (auto model : models_){
+		model->Draw();
+	}
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////////////
+//			アクセッサ
+/////////////////////////////////////////////////////////////////////////////////////////
+
+void Character::SetTranslate(const Vector3& pos, uint32_t modelNum){
+	models_[modelNum]->transform.translate = pos;
+	models_[modelNum]->UpdateWorldMat();
+}
+
+void Character::SetRotate(const Vector3& rotate, uint32_t modelNum){
+	models_[modelNum]->transform.rotate = rotate;
+	models_[modelNum]->UpdateWorldMat();
+}
+
+void Character::SetScale(const Vector3& scale, uint32_t modelNum){
+	models_[modelNum]->transform.scale = scale;
+	models_[modelNum]->UpdateWorldMat();
+}
+
+Vector3 Character::GetWorldPosition() const{
+	Vector3 wPos;
+	// ワールド行列の平行移動成分を取得
+	wPos.x = models_[0]->GetMatWorld().m[3][0];
+	wPos.y = models_[0]->GetMatWorld().m[3][1];
+	wPos.z = models_[0]->GetMatWorld().m[3][2];
+
+	return wPos; // 値をコピーして返す
+}
+
+Vector3 Character::GetCenterPos() const{
+	Vector3 offset = {0.0f, 1.0f, 0.0f};
+	Vector3 worldPos = Transform(offset, models_[0]->GetMatWorld());
+	return worldPos;
+}
