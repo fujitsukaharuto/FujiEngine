@@ -126,6 +126,5 @@ private:
 
 	//シリアルナンバー
 	uint32_t serialNumber_ = 0;
-	static uint32_t nextSerialNumber;
 	ParticleEmitter emit;
 };

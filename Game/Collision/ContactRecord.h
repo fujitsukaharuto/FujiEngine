@@ -26,6 +26,8 @@ public:
 	/// </summary>
 	void Clear();
 
+	void ClearAfterTime(float time);
+
 private:
 	//履歴
 	std::vector<uint32_t> record_;

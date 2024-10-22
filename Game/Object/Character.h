@@ -63,6 +63,9 @@ public:
 
 
 protected:
+	static uint32_t nextSerialNumber;
+
+
 	//描画用モデル
 	std::vector<Object3d*> models_ {};
 

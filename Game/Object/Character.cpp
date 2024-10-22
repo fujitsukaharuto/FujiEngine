@@ -1,5 +1,8 @@
 #include"Object/Character.h"
 
+uint32_t Character::nextSerialNumber = 0;
+
+
 Character::~Character(){
 	for (auto model : models_){
 		delete model;
