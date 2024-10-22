@@ -108,8 +108,6 @@ void Player::Update(){
     Character::Update();
 }
 
-
-
 void Player::Draw(){
 
     if (isAlive_){

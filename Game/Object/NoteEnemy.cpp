@@ -85,14 +85,11 @@ void NoteEnemy::Update(){
 	//移動速度の更新
 	moveSpeed_ = Field::influenceOnSpeed_[fieldIndex_];
 
-	//音符に変わったらモデルを変える(一時的に色を変えている)
+	//音符に変わったらモデルを変える
 	if (isChangedNote_){
-		if (!isChainEnemy_){
-			models_[0]->SetModel("note.obj");
-		}
+		
 		models_[0]->transform.rotate = {0.0f,-1.5f,0.0f};
 
-		
 		if (isChanegeEffect_){
 			emit.pos = GetCenterPos();
 			emit.Burst();
@@ -159,16 +156,24 @@ void NoteEnemy::OnCollision(Character* other){
 
 			// 段が移動した、または上下の面に触れた場合に音符に変わる
 			isChangedNote_ = true;
+
+			if (!isChainEnemy_){
+				models_[0]->SetModel("note.obj");
+			}
 		}
 	}
 
 	// 衝突相手が障害物の時音符状態なら敵状態に戻す
-	else if (collisionType == static_cast< uint32_t >(CollisionTypeIdDef::kBoss)){
-
-		// 音符に代わっているときにボスと衝突したら消す
+	else if (collisionType == static_cast< uint32_t >(CollisionTypeIdDef::kObstacle)){
+		
+		//音符に変わっているときに障害物と衝突したら敵状態に戻る
 		if (isChangedNote_){
 			isChangedNote_ = false;
+			models_[0]->SetModel("enemy.obj");
 
+			emit.pos = GetCenterPos();
+			emit.Burst();
+			Audio::GetInstance()->SoundPlayWave(changeSE_);
 		}
 
 	}
