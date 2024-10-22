@@ -235,6 +235,16 @@ BaseScene* SceneManager::CreateScene(const std::string& sceneName) {
 	return newScene;
 }
 
+void SceneManager::SetClear(bool is) {
+	Clear = is;
+	gameover = !is;
+}
+
+void SceneManager::SetGameOver(bool is) {
+	gameover = is;
+	Clear = !is;
+}
+
 void SceneManager::SceneSet() {
 
 	if (nextScene_) {

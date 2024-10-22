@@ -23,4 +23,6 @@ private:
 
 	float ins = 1.0f;
 
+	Object3d* text = nullptr;
+
 };

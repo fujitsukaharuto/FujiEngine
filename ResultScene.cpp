@@ -15,6 +15,7 @@ ResultScene::ResultScene() {}
 
 ResultScene::~ResultScene() {
 	delete sphere;
+	delete text;
 }
 
 void ResultScene::Initialize() {
@@ -27,6 +28,21 @@ void ResultScene::Initialize() {
 	sphere->CreateSphere();
 	sphere->SetEnableLight(LightMode::kPointLightON);
 	sphere->SetColor({ 1.0f,0.0f,0.0f,1.0f });
+
+
+	if (SceneManager::GetInstance()->GetClear()) {
+		text = new Object3d();
+		text->Create("clear.obj");
+	}
+	if (SceneManager::GetInstance()->GetGameover()) {
+		text = new Object3d();
+		text->Create("gameOver.obj");
+	}
+	text->transform.translate.y = 2.0f;
+	text->transform.rotate.y = -3.14f;
+	text->transform.scale = { 2.0f,2.0f,2.0f };
+	text->UpdateWorldMat();
+
 
 	CameraManager::GetInstance()->GetCamera()->transform = { { 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, { 0.0f,3.5f,-20.0f } };
 
@@ -89,6 +105,7 @@ void ResultScene::Draw() {
 	obj3dCommon->PreDraw();
 	sphere->Draw();
 
+	text->Draw();
 
 	ParticleManager::GetInstance()->Draw();
 
