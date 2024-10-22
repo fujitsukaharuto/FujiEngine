@@ -48,6 +48,28 @@ void DXCom::Initialize(MyWin* myWin)
 
 }
 
+void DXCom::SetCutPos(const Vector4& pos) {
+	cutPos->pos = pos;
+}
+
+void DXCom::SetCutRadius(const float radius) {
+	cutPos->radius.X = radius;
+}
+
+void DXCom::SetCut(bool is) {
+
+	if (is) {
+		isCutting_ = true;
+		isNonePost2_ = false;
+		isGrayscale2_ = false;
+		isGaussian2_ = false;
+	}
+	else {
+		isCutting_ = false;
+		isNonePost2_ = true;
+	}
+}
+
 void DXCom::CreateDevice()
 {
 
@@ -160,7 +182,7 @@ void DXCom::CreateSwapChain()
 void DXCom::CreateRenderTargets()
 {
 
-	rtvDescriptorHeap_ = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 3, false);
+	rtvDescriptorHeap_ = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 4, false);
 
 	HRESULT hr = swapChain_->GetBuffer(0, IID_PPV_ARGS(&swapChainResources_[0]));
 	assert(SUCCEEDED(hr));
@@ -190,6 +212,25 @@ void DXCom::CreateRenderTargets()
 		device_.Get(), MyWin::kWindowWidth, MyWin::kWindowHeight, clearColorValue);
 
 	device_->CreateRenderTargetView(offscreenrt_.Get(), &offscreenrtvDesc_, rtvHandles_[2]);
+
+
+	rtvHandles_[3].ptr = rtvHandles_[2].ptr + device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	offscreen2rtvDesc_.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	offscreen2rtvDesc_.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+
+
+	offscreenrt2_ = CreateOffscreenTextureResource(
+		device_.Get(), MyWin::kWindowWidth, MyWin::kWindowHeight, clearColorValue);
+
+	device_->CreateRenderTargetView(offscreenrt2_.Get(), &offscreen2rtvDesc_, rtvHandles_[3]);
+
+
+	cuttingResource_;
+	cuttingResource_ = CreateBufferResource(device_, sizeof(CuttingPos));
+	cutPos = nullptr;
+	cuttingResource_->Map(0, nullptr, reinterpret_cast<void**>(&cutPos));
+	cutPos->pos = { 300.0f,300.0f,0.0f,0.0f };
+	cutPos->radius = { 0.0f,0.0f,0.0f,0.0f };
 
 }
 
@@ -307,6 +348,15 @@ void DXCom::SettingTexture()
 	offTextureHandle_ = srvManager->GetGPUDescriptorHandle(offscreenSRVIndex_);
 
 
+	offscreen2SRVIndex_ = srvManager->Allocate();
+
+	srvManager->CreateTextureSRV(offscreen2SRVIndex_, offscreenrt2_.Get(), DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, 1);
+
+	offTexture2HandleCPU_ = srvManager->GetCPUDescriptorHandle(offscreen2SRVIndex_);
+	offTexture2Handle_ = srvManager->GetGPUDescriptorHandle(offscreen2SRVIndex_);
+
+
+
 	CommandExecution();
 }
 
@@ -352,6 +402,70 @@ void DXCom::PostEffect()
 	commandList->ResourceBarrier(1, &offbarrier);
 
 
+
+	D3D12_RESOURCE_BARRIER offbarrier2{};
+	offbarrier2.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	offbarrier2.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	offbarrier2.Transition.pResource = offscreenrt2_.Get();
+	offbarrier2.Transition.StateBefore = D3D12_RESOURCE_STATE_GENERIC_READ;
+	offbarrier2.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	command_->GetList()->ResourceBarrier(1, &offbarrier2);
+
+	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle2 = dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
+	commandList->OMSetRenderTargets(1, &rtvHandles_[3], false, &dsvHandle2);
+	commandList->ClearDepthStencilView(dsvHandle2, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+
+	commandList->ClearRenderTargetView(rtvHandles_[3], clearColorValue.Color, 0, nullptr);
+
+
+
+	if (isGrayscale_) {
+		command_->SetViewAndscissor();
+		pipeManager_->SetPipeline(Pipe::Gray);
+
+		commandList->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		commandList->IASetIndexBuffer(&indexGrayBufferView_);
+		commandList->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
+		commandList->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
+		commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
+	}
+
+
+	if (isGaussian_) {
+		command_->SetViewAndscissor();
+		pipeManager_->SetPipeline(Pipe::Gauss);
+
+		commandList->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		commandList->IASetIndexBuffer(&indexGrayBufferView_);
+		commandList->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
+		commandList->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
+		commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
+	}
+
+	if (isNonePost_ || isMetaBall_) {
+		command_->SetViewAndscissor();
+		pipeManager_->SetPipeline(Pipe::None);
+
+		commandList->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		commandList->IASetIndexBuffer(&indexGrayBufferView_);
+		commandList->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
+		commandList->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
+		commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
+	}
+
+
+
+
+	D3D12_RESOURCE_BARRIER offbarrier3{};
+	offbarrier2.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	offbarrier2.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	offbarrier2.Transition.pResource = offscreenrt2_.Get();
+	offbarrier2.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	offbarrier2.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
+	command_->GetList()->ResourceBarrier(1, &offbarrier2);
+
+
+
 	UINT backBufferIndex = swapChain_->GetCurrentBackBufferIndex();
 
 	CreateBarrier(D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
@@ -366,7 +480,7 @@ void DXCom::PostEffect()
 
 
 
-	if (isGrayscale_)
+	if (isGrayscale2_)
 	{
 		command_->SetViewAndscissor();
 		pipeManager_->SetPipeline(Pipe::Gray);
@@ -374,12 +488,12 @@ void DXCom::PostEffect()
 		commandList->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		commandList->IASetIndexBuffer(&indexGrayBufferView_);
 		commandList->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
-		commandList->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
+		commandList->SetGraphicsRootDescriptorTable(0, offTexture2Handle_);
 		commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
 	}
 
 
-	if (isGaussian_)
+	if (isGaussian2_)
 	{
 		command_->SetViewAndscissor();
 		pipeManager_->SetPipeline(Pipe::Gauss);
@@ -387,11 +501,23 @@ void DXCom::PostEffect()
 		commandList->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		commandList->IASetIndexBuffer(&indexGrayBufferView_);
 		commandList->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
-		commandList->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
+		commandList->SetGraphicsRootDescriptorTable(0, offTexture2Handle_);
 		commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
 	}
 
-	if (isNonePost_||isMetaBall_)
+	if (isCutting_) {
+		command_->SetViewAndscissor();
+		pipeManager_->SetPipeline(Pipe::Right);
+
+		commandList->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		commandList->IASetIndexBuffer(&indexGrayBufferView_);
+		commandList->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
+		commandList->SetGraphicsRootDescriptorTable(0, offTexture2Handle_);
+		commandList->SetGraphicsRootConstantBufferView(1, cuttingResource_->GetGPUVirtualAddress());
+		commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
+	}
+
+	if (isNonePost2_)
 	{
 		command_->SetViewAndscissor();
 		pipeManager_->SetPipeline(Pipe::None);
@@ -399,7 +525,7 @@ void DXCom::PostEffect()
 		commandList->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		commandList->IASetIndexBuffer(&indexGrayBufferView_);
 		commandList->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
-		commandList->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
+		commandList->SetGraphicsRootDescriptorTable(0, offTexture2Handle_);
 		commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
 	}
 
@@ -495,6 +621,39 @@ void DXCom::UpDate()
 		isGrayscale_ = false;
 		isNonePost_ = false;
 		isMetaBall_ = false;
+	}
+
+	preIsGrayscale_ = isGrayscale2_;
+	preIsNonePost_ = isNonePost2_;
+	preIsMetaBall_ = isCutting_;
+	preIsGaussian_ = isGaussian2_;
+
+	if (ImGui::TreeNode("OffScreen2 ShaderPath")) {
+		ImGui::Checkbox("Gray", &isGrayscale2_);
+		ImGui::Checkbox("None", &isNonePost2_);
+		ImGui::Checkbox("Blur", &isGaussian2_);
+		ImGui::Checkbox("Cutting", &isCutting_);
+		ImGui::TreePop();
+	}
+	if (isGrayscale2_ && !(preIsGrayscale_)) {
+		isNonePost2_ = false;
+		isGaussian2_ = false;
+		isCutting_ = false;
+	}
+	if (isNonePost2_ && !(preIsNonePost_)) {
+		isGrayscale2_ = false;
+		isGaussian2_ = false;
+		isCutting_ = false;
+	}
+	if (isGaussian2_ && !(preIsGaussian_)) {
+		isGrayscale2_ = false;
+		isNonePost2_ = false;
+		isCutting_ = false;
+	}
+	if (isCutting_ && !(preIsMetaBall_)) {
+		isGrayscale2_ = false;
+		isNonePost2_ = false;
+		isGaussian2_ = false;
 	}
 
 

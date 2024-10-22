@@ -23,9 +23,9 @@ SceneManager* SceneManager::GetInstance() {
 
 void SceneManager::Initialize() {
 
-	darkColorL_ = { 1.0f,1.0f,1.0f,0.0f };
-	darkColorC_ = { 1.0f,1.0f,1.0f,0.0f };
-	darkColorR_ = { 1.0f,1.0f,1.0f,0.0f };
+	darkColorL_ = { 0.175f, 0.175f, 0.175f,0.0f };
+	darkColorC_ = { 0.175f, 0.175f, 0.175f,0.0f };
+	darkColorR_ = { 0.175f, 0.175f, 0.175f,0.0f };
 
 	curtainFrame_.reset(new Sprite());
 	curtainFrame_->Load("curtain.png");
@@ -67,6 +67,11 @@ void SceneManager::Initialize() {
 	curtainRightPos_ = { 1250.0f,385.0f,0.0f };
 	curtainRight_->SetPos(curtainRightPos_);
 
+
+	cut.pos = { 640.0f,360.0f,0.0f,0.0f };
+	cut.radius = { 0.0f,0.0f,0.0f,0.0f };
+
+
 }
 
 void SceneManager::Finalize() {
@@ -84,6 +89,8 @@ void SceneManager::Update() {
 				isCurtain_ = false;
 				isBlack_ = false;
 				isFinifh_ = false;
+				isCutting_ = false;
+				DXCom::GetInstance()->SetCut(false);
 			}
 		}
 	}
@@ -112,10 +119,11 @@ void SceneManager::Draw() {
 
 	curtainFrame_->Draw();
 
-
-	triangleL_->Draw();
-	triangleC_->Draw();
-	triangleR_->Draw();
+	if (isBlack_) {
+		triangleL_->Draw();
+		triangleC_->Draw();
+		triangleR_->Draw();
+	}
 
 }
 
@@ -123,12 +131,21 @@ void SceneManager::StartScene(const std::string& sceneName) {
 
 	if (sceneName == "TITLE") {
 		scene_ = new TitleScene();
+		finishTime = 80.0f;
+		isBlack_ = true;
+		isCutting_ = true;
+		cuttingTime = 10.0f;
+		cutMoveTime = 0.0f;
+		DXCom::GetInstance()->SetCut(true);
+		cut.radius.X = 0.0f;
 	}
 	else if (sceneName == "GAME") {
 		scene_ = new GameScene();
+		finishTime = 80.0f;
 	}
 	else if (sceneName == "RESULT") {
 		scene_ = new ResultScene();
+		finishTime = 80.0f;
 	}
 	scene_->Init();
 	scene_->Initialize();
@@ -142,7 +159,7 @@ void SceneManager::ChangeScene(const std::string& sceneName, float extraTime) {
 	curtainTime_ = 0.0f;
 	isChange_ = true;
 	changeExtraTime = extraTime;
-	finishTime = extraTime * 2.0f;
+	finishTime = extraTime * 4.0f;
 	if (finishTime == 0.0f) {
 		finishTime = 60.0f;
 	}
@@ -155,17 +172,29 @@ void SceneManager::ChangeScene(const std::string& sceneName, float extraTime) {
 	if (sceneName == "TITLE") {
 		isClose_ = true;
 		if (nowScene == "RESULT") {
+			isCurtain_ = false;
 			isClose_ = false;
+			isOpen_ = false;
 			isBlack_ = true;
 			isDark_ = true;
+			cuttingTime = 10.0f;
+			cutMoveTime = 0.0f;
 		}
 	}
 	else if (sceneName == "GAME") {
 		isOpen_ = true;
+		isClose_ = false;
+		isCutting_ = false;
+		isDark_ = false;
 		changeExtraTime = 0.0f;
+		DXCom::GetInstance()->SetCut(false);
+		isBlack_ = false;
 	}
 	else if (sceneName == "RESULT") {
 		isClose_ = true;
+		isOpen_ = false;
+		DXCom::GetInstance()->SetCut(false);
+		isBlack_ = false;
 	}
 
 
@@ -228,14 +257,13 @@ void SceneManager::CurtainClose() {
 		if (curtainTime_ <= maxCurtainTime_) {
 			curtainTime_ += FPSKeeper::DeltaTime();
 
-			curtainLeftPos_.x = Lerp(curtainLeftPos_.x, 40.0f, 0.075f);
+			curtainLeftPos_.x = Lerp(curtainLeftPos_.x, 40.0f, (0.075f) * FPSKeeper::DeltaTime());
 			curtainLeft_->SetPos(curtainLeftPos_);
-			curtainRightPos_.x = Lerp(curtainRightPos_.x, 1240.0f, 0.075f);
+			curtainRightPos_.x = Lerp(curtainRightPos_.x, 1240.0f, (0.075f) * FPSKeeper::DeltaTime());
 			curtainRight_->SetPos(curtainRightPos_);
 		}
 		else {
 			isClose_ = false;
-
 		}
 	}
 
@@ -247,14 +275,13 @@ void SceneManager::CurtainOpen() {
 		if (curtainTime_ <= maxCurtainTime_) {
 			curtainTime_ += FPSKeeper::DeltaTime();
 
-			curtainLeftPos_.x = Lerp(curtainLeftPos_.x, -650.0f, 0.075f);
+			curtainLeftPos_.x = Lerp(curtainLeftPos_.x, -650.0f, (0.075f)*FPSKeeper::DeltaTime());
 			curtainLeft_->SetPos(curtainLeftPos_);
-			curtainRightPos_.x = Lerp(curtainRightPos_.x, 1930.0f, 0.075f);
+			curtainRightPos_.x = Lerp(curtainRightPos_.x, 1930.0f, (0.075f) * FPSKeeper::DeltaTime());
 			curtainRight_->SetPos(curtainRightPos_);
 		}
 		else {
 			isOpen_ = false;
-
 		}
 	}
 
@@ -267,7 +294,7 @@ void SceneManager::BlackUpdata() {
 			if (curtainTime_ <= maxCurtainTime_) {
 				curtainTime_ += FPSKeeper::DeltaTime();
 				float maxthree = maxCurtainTime_ / 5.0f;
-				
+
 				if (curtainTime_ >= maxthree) {
 					darkColorL_.W = 1.0f;
 					triangleL_->SetColor(darkColorL_);
@@ -283,10 +310,14 @@ void SceneManager::BlackUpdata() {
 					triangleC_->SetColor(darkColorC_);
 				}
 
-
+				cuttingTime = 10.0f;
+				cutMoveTime = 0.0f;
+				cut.radius.X = 1000.0f;
+				DXCom::GetInstance()->SetCutRadius(cut.radius.X);
 			}
 			else {
 				isDark_ = false;
+				isCutting_ = true;
 				darkColorL_.W = 1.0f;
 				triangleL_->SetColor(darkColorL_);
 
@@ -295,39 +326,68 @@ void SceneManager::BlackUpdata() {
 
 				darkColorR_.W = 1.0f;
 				triangleR_->SetColor(darkColorR_);
+
+				cut.radius.X = 0.0f;
+				DXCom::GetInstance()->SetCutRadius(cut.radius.X);
+
+				curtainLeftPos_ = { 30.0f,385.0f,0.0f };
+				curtainLeft_->SetPos(curtainLeftPos_);
+				curtainRightPos_ = { 1250.0f,385.0f,0.0f };
+				curtainRight_->SetPos(curtainRightPos_);
 			}
 		}
+
+		CuttingUpdata();
+	}
+
+}
+
+void SceneManager::CuttingUpdata() {
+
+
+	if (isCutting_) {
+
+		if (cuttingTime >= 0.0f) {
+			cuttingTime--;
+			cut.radius.X += 12.0f;
+			DXCom::GetInstance()->SetCutRadius(cut.radius.X);
+			cut.pos = { 640.0f,360.0f,0.0f,0.0f };
+			DXCom::GetInstance()->SetCutPos(cut.pos);
+			DXCom::GetInstance()->SetCut(true);
+
+			curtainTime_ = 0.0f;
+			darkColorL_.W = 0.0f;
+			triangleL_->SetColor(darkColorL_);
+
+			darkColorC_.W = 0.0f;
+			triangleC_->SetColor(darkColorC_);
+
+			darkColorR_.W = 0.0f;
+			triangleR_->SetColor(darkColorR_);
+		}
+		else if (cutMoveTime <= 120.0f) {
+
+			cutMoveTime += FPSKeeper::DeltaTime();
+
+			float A = 320.0f; // 横の大きさ
+			float B = 160.0f; // 縦の大きさ
+
+			float tMove = cutMoveTime / 19.0f;
+			// 時間による位置
+			float x = A * sinf(tMove) + 640.0f;
+			float y = B * sinf(2 * tMove) + 360.0f;
+
+			// 描画する関数に座標を渡す
+			cut.pos.X = x;
+			cut.pos.Y = y;
+			DXCom::GetInstance()->SetCutPos(cut.pos);
+
+		}
 		else {
-			if (curtainTime_ >= 0.0f) {
-				curtainTime_ -= FPSKeeper::DeltaTime();
-				float maxthree = maxCurtainTime_ / 5.0f;
 
-				if (curtainTime_ <= maxthree * 3.0f) {
-					darkColorC_.W = 0.0f;
-					triangleC_->SetColor(darkColorC_);
-				}
-
-				if (curtainTime_ <= maxthree * 2.0f) {
-					darkColorR_.W = 0.0f;
-					triangleR_->SetColor(darkColorR_);
-				}
-
-				if (curtainTime_ <= maxthree) {
-					darkColorL_.W = 0.0f;
-					triangleL_->SetColor(darkColorL_);
-				}
-
-			}
-			else {
-				darkColorL_.W = 0.0f;
-				triangleL_->SetColor(darkColorL_);
-
-				darkColorC_.W = 0.0f;
-				triangleC_->SetColor(darkColorC_);
-
-				darkColorR_.W = 0.0f;
-				triangleR_->SetColor(darkColorR_);
-			}
+			cut.radius.X += FPSKeeper::DeltaTime() * 10.0f;
+			DXCom::GetInstance()->SetCutPos(cut.pos);
+			DXCom::GetInstance()->SetCutRadius(cut.radius.X);
 		}
 	}
 

@@ -43,6 +43,12 @@
     <FxCompile Include="resource\Shaders\SimpleGrayscale.VS.hlsl">
       <Filter>resource\Shaders</Filter>
     </FxCompile>
+    <FxCompile Include="resource\Shaders\Right.PS.hlsl">
+      <Filter>resource\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\Right.VS.hlsl">
+      <Filter>resource\Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <!-- Source files -->
@@ -262,6 +268,9 @@
     </ClCompile>
     <ClCompile Include="SceneManager.cpp">
       <Filter>Engine\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="RightPipe.cpp">
+      <Filter>Engine\DirectX\Pipelines</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -493,6 +502,9 @@
     </ClInclude>
     <ClInclude Include="SceneManager.h">
       <Filter>Engine\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="RightPipe.h">
+      <Filter>Engine\DirectX\Pipelines</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

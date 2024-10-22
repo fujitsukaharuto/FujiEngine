@@ -122,6 +122,10 @@ public:
 
 	/*void Tick();*/
 
+	void SetCutPos(const Vector4& pos);
+	void SetCutRadius(const float radius);
+	void SetCut(bool is);
+
 private:
 
 	void CreateDevice();
@@ -176,7 +180,7 @@ private:
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc_{};
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap_ = nullptr;
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc_{};
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles_[3];
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles_[4];
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> offscreenrt_ = nullptr;
 	D3D12_RENDER_TARGET_VIEW_DESC offscreenrtvDesc_{};
@@ -184,6 +188,12 @@ private:
 	uint32_t offscreenSRVIndex_;
 	D3D12_GPU_DESCRIPTOR_HANDLE offTextureHandle_;
 	D3D12_CPU_DESCRIPTOR_HANDLE offTextureHandleCPU_;
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> offscreenrt2_ = nullptr;
+	D3D12_RENDER_TARGET_VIEW_DESC offscreen2rtvDesc_{};
+	uint32_t offscreen2SRVIndex_;
+	D3D12_GPU_DESCRIPTOR_HANDLE offTexture2Handle_;
+	D3D12_CPU_DESCRIPTOR_HANDLE offTexture2HandleCPU_;
 
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> swapChainResources_[2] = { nullptr };
@@ -201,13 +211,18 @@ private:
 	PipelineManager* pipeManager_;
 
 
-
-
+	Microsoft::WRL::ComPtr<ID3D12Resource> cuttingResource_ = nullptr;
+	CuttingPos* cutPos;
 
 	bool isGrayscale_ = true;
 	bool isNonePost_ = true;
 	bool isMetaBall_ = true;
 	bool isGaussian_ = true;
+
+	bool isGrayscale2_ = false;
+	bool isNonePost2_ = true;
+	bool isGaussian2_ = false;
+	bool isCutting_ = false;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexGrayResource_ = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexGrayBufferView_{};

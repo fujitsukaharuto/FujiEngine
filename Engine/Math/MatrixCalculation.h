@@ -96,6 +96,13 @@ struct ParticleDate
 	float padding[2];
 };
 
+
+struct CuttingPos {
+	Vector4 pos;
+	Vector4 radius;
+};
+
+
 /// <summary>
 /// 2次元ベクトルのスカラー倍を求める
 /// </summary>

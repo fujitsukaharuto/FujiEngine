@@ -170,6 +170,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="ParticleManager.cpp" />
     <ClCompile Include="Random.cpp" />
     <ClCompile Include="ResultScene.cpp" />
+    <ClCompile Include="RightPipe.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="SRVManager.cpp" />
     <ClCompile Include="TitleScene.cpp" />
@@ -248,6 +249,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="ParticleManager.h" />
     <ClInclude Include="Random.h" />
     <ClInclude Include="ResultScene.h" />
+    <ClInclude Include="RightPipe.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="SRVManager.h" />
     <ClInclude Include="TitleScene.h" />
@@ -306,6 +308,14 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="resource\Shaders\Primitive.VS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\Right.PS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\Right.VS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>

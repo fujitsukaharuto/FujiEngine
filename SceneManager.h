@@ -38,6 +38,7 @@ private:
 
 	void BlackUpdata();
 
+	void CuttingUpdata();
 
 private:
 
@@ -62,6 +63,7 @@ private:
 	Vector4 darkColorC_{};
 	Vector4 darkColorR_{};
 
+	CuttingPos cut{};
 
 	bool isFinifh_ = false;
 	bool isCurtain_ = false;
@@ -69,11 +71,16 @@ private:
 	bool isOpen_ = false;
 	bool isBlack_ = false;
 	bool isDark_ = false;
+	bool isCutting_ = true;;
+
 
 	bool isDrawCurtain_ = true;
 	float maxCurtainTime_ = 0.0f;
 	float curtainTime_ = 0.0f;
 
+
+	float cuttingTime = 0.0f;
+	float cutMoveTime = 0.0f;
 
 	Vector3 curtainLeftPos_{};
 	Vector3 curtainRightPos_{};
