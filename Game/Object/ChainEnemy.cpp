@@ -92,8 +92,9 @@ void ChainEnemy::Update(){
 
 			if (connectedEnemies_[i]->GetIsChangedNote()){
 				//モデルデータの切り替え
-				if (!isChain_){
+				if (!isChain_&&!connectedEnemies_[i]->IsModelSet()){
 					connectedEnemies_[i]->SetModel("note.obj");
+					connectedEnemies_[i]->SetModelSet(true); // フラグをセット
 				}
 			}
 

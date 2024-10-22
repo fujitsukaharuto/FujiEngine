@@ -73,6 +73,9 @@ public:
 
 	Object3d* GetModel(){ return models_[0]; }
 
+	bool IsModelSet() const{ return isModelSet_; }
+	void SetModelSet(bool value){ isModelSet_ = value; }
+
 
 	/// <summary>
 	/// シリアルナンバーの取得
@@ -96,6 +99,9 @@ private:
 	bool isChanegeEffect_ = true;
 
 	bool isChainEnemy_ = false;
+
+	// モデルがセットされたかどうかを保持するフラグ
+	bool isModelSet_ = false; 
 
 	//移動速度
 	float moveSpeed_ = 1.0f;
