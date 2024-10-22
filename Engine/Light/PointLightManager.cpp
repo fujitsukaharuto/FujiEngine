@@ -1,4 +1,5 @@
 #include "PointLightManager.h"
+#include "ImGuiManager.h"
 
 PointLightManager* PointLightManager::GetInstance() {
 	static PointLightManager instance;
@@ -10,6 +11,9 @@ void PointLightManager::Update() {
 #ifdef _DEBUG
 
 
+
+
+	ImGui::End();
 
 #endif // _DEBUG
 

@@ -23,6 +23,7 @@ SceneManager* SceneManager::GetInstance() {
 
 void SceneManager::Initialize() {
 
+
 	darkColorL_ = { 0.175f, 0.175f, 0.175f,0.0f };
 	darkColorC_ = { 0.175f, 0.175f, 0.175f,0.0f };
 	darkColorR_ = { 0.175f, 0.175f, 0.175f,0.0f };
@@ -159,7 +160,7 @@ void SceneManager::ChangeScene(const std::string& sceneName, float extraTime) {
 	curtainTime_ = 0.0f;
 	isChange_ = true;
 	changeExtraTime = extraTime;
-	finishTime = extraTime * 4.0f;
+	finishTime = extraTime * 5.0f;
 	if (finishTime == 0.0f) {
 		finishTime = 60.0f;
 	}
@@ -189,6 +190,15 @@ void SceneManager::ChangeScene(const std::string& sceneName, float extraTime) {
 		changeExtraTime = 0.0f;
 		DXCom::GetInstance()->SetCut(false);
 		isBlack_ = false;
+		if (nowScene == "RESULT") {
+			isOpen_ = false;
+			isClose_ = true;
+			isCutting_ = false;
+			isDark_ = false;
+			changeExtraTime = 0.0f;
+			DXCom::GetInstance()->SetCut(false);
+			isBlack_ = false;
+		}
 	}
 	else if (sceneName == "RESULT") {
 		isClose_ = true;
@@ -264,6 +274,18 @@ void SceneManager::CurtainClose() {
 		}
 		else {
 			isClose_ = false;
+			if (nowScene == "RESULT") {
+				isOpen_ = true;
+				isCutting_ = false;
+				isDark_ = false;
+				curtainTime_ = 0.0f;
+			}
+			if (nowScene == "GAME") {
+				isOpen_ = true;
+				isCutting_ = false;
+				isDark_ = false;
+				curtainTime_ = 0.0f;
+			}
 		}
 	}
 

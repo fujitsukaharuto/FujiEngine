@@ -58,7 +58,7 @@ void Model::SetTextureName(const std::string& name) {
 	nowTextuer = name;
 }
 
-void Model::SetEnableLight(bool is){
+void Model::SetEnableLight(LightMode is){
 	for (Material material : material_){
 		material.SetEnableLight(is);
 	}

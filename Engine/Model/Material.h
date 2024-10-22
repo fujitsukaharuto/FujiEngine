@@ -44,7 +44,7 @@ public:
 
 	void SetTexture(const std::string& name);
 
-	void SetEnableLight(bool is) { materialDate_->enableLighting = is; }
+	void SetEnableLight(LightMode is) { materialDate_->enableLighting = is; }
 
 private:
 

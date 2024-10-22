@@ -25,6 +25,7 @@ void ResultScene::Initialize() {
 
 	sphere = new Object3d();
 	sphere->CreateSphere();
+	sphere->SetEnableLight(LightMode::kSpotLightON);
 	sphere->SetColor({ 1.0f,0.0f,0.0f,1.0f });
 
 	CameraManager::GetInstance()->GetCamera()->transform = { { 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, { 0.0f,3.5f,-20.0f } };

@@ -118,7 +118,7 @@ void GameScene::Initialize() {
 	skyCube_->Create("skyCube.obj");
 	skyCube_->transform.scale = {100.0f,100.0f,100.0f};
 	skyCube_->transform.translate = {-20.0f,0.0f,0.0f};
-	skyCube_->SetEnableLight(false);
+	skyCube_->SetEnableLight(LightMode::kLightNone);
 	skyCube_->UpdateWorldMat();
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////
@@ -143,7 +143,7 @@ void GameScene::Initialize() {
 	for (Object3d*& fieldModel : fieldModels_){
 		fieldModel = new Object3d;
 		fieldModel->Create("ground.obj");
-		fieldModel->SetEnableLight(false);
+		fieldModel->SetEnableLight(LightMode::kLightNone);
 		fieldModel->SetColor({0.95f, 0.9f, 0.7f, 1.0f});
 	}
 
@@ -235,16 +235,15 @@ void GameScene::Update(){
 	//sphere->SetRightDir(rightDir);
 	//ImGui::End();
 
-	//ImGui::Begin("Scene");
-	//ImGui::SeparatorText("ChangeScene");
-	//if (ImGui::Button("ResultScene")) {
-	//	SceneManager::GetInstance()->ChangeScene("RESULT", 40.0f);
-	//}
-	//if (ImGui::Button("TitleScene")) {
-	//	SceneManager::GetInstance()->ChangeScene("TITLE", 40.0f);
-	//}
-
-	//ImGui::End();
+	ImGui::Begin("Scene");
+	ImGui::SeparatorText("ChangeScene");
+	if (ImGui::Button("ResultScene")) {
+		SceneManager::GetInstance()->ChangeScene("RESULT", 40.0f);
+	}
+	if (ImGui::Button("TitleScene")) {
+		SceneManager::GetInstance()->ChangeScene("TITLE", 40.0f);
+	}
+	ImGui::End();
 
 	//static Vector3 choruthPos {15.0f,-20.0f,88.0f};
 	//ImGui::Begin("choruth");
