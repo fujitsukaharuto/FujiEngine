@@ -158,7 +158,10 @@ void NoteEnemy::OnCollision(Character* other){
 			isChangedNote_ = true;
 
 			if (!isChainEnemy_){
+				//つながっていない場合単体の音符になる
 				models_[0]->SetModel("note.obj");
+			} else{
+				models_[0]->SetModel("chainNote.obj");
 			}
 		}
 	}

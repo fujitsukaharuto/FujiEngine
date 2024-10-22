@@ -8,7 +8,6 @@
 #include "Object/Boss.h"
 #include "Object/Obstacle.h"
 
-#include "Field/Field.h"
 
 #include <algorithm>
 #undef max

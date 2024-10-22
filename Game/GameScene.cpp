@@ -15,6 +15,7 @@
 GameScene::GameScene(){
 	playerModels_.clear();
 	bossModels_.clear();
+	choruth_.clear();
 }
 
 GameScene::~GameScene(){
@@ -31,6 +32,12 @@ GameScene::~GameScene(){
 	bossModels_.clear();
 
 	field_.reset();
+
+	for (size_t i = 0; i < choruth_.size(); i++){
+		delete choruth_[i];
+	}
+
+	skyCube_.reset();
 
 	CollisionManager::GetInstance()->Reset();
 
@@ -105,6 +112,29 @@ void GameScene::Initialize() {
 	test = new Sprite();
 	test->Load("uvChecker.png");
 
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	/*                                   背景				                                        */
+	skyCube_ = std::make_unique<Object3d>();
+	skyCube_->Create("skyCube.obj");
+	skyCube_->transform.scale = {100.0f,100.0f,100.0f};
+	skyCube_->transform.translate = {-20.0f,0.0f,0.0f};
+	skyCube_->SetEnableLight(false);
+	skyCube_->UpdateWorldMat();
+	
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	/*                                   にぎやかし                                                */
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	for (int i = 0; i < 3; i++){
+		Object3d* newCho = new Object3d();
+		newCho->Create("chorus.obj");
+		newCho->SetCameraParent(true);
+		newCho->transform.translate.x = 13.0f + 2.25f * i;
+		newCho->transform.translate.y = -22.0f;
+		newCho->transform.translate.z = 150.0f - i * 1.0f;
+		newCho->transform.rotate.y = 3.14f;
+		newCho->UpdateWorldMat();
+		choruth_.push_back(newCho);
+	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	/*                                   フィールド (五線譜)                                        */
@@ -113,7 +143,8 @@ void GameScene::Initialize() {
 	for (Object3d*& fieldModel : fieldModels_){
 		fieldModel = new Object3d;
 		fieldModel->Create("ground.obj");
-		fieldModel->SetColor({ 0.2f,0.2f,0.2f,1.0f });
+		fieldModel->SetEnableLight(false);
+		fieldModel->SetColor({0.95f, 0.9f, 0.7f, 1.0f});
 	}
 
 
@@ -204,16 +235,27 @@ void GameScene::Update(){
 	//sphere->SetRightDir(rightDir);
 	//ImGui::End();
 
-	ImGui::Begin("Scene");
-	ImGui::SeparatorText("ChangeScene");
-	if (ImGui::Button("ResultScene")) {
-		SceneManager::GetInstance()->ChangeScene("RESULT", 40.0f);
-	}
-	if (ImGui::Button("TitleScene")) {
-		SceneManager::GetInstance()->ChangeScene("TITLE", 40.0f);
-	}
+	//ImGui::Begin("Scene");
+	//ImGui::SeparatorText("ChangeScene");
+	//if (ImGui::Button("ResultScene")) {
+	//	SceneManager::GetInstance()->ChangeScene("RESULT", 40.0f);
+	//}
+	//if (ImGui::Button("TitleScene")) {
+	//	SceneManager::GetInstance()->ChangeScene("TITLE", 40.0f);
+	//}
 
-	ImGui::End();
+	//ImGui::End();
+
+	//static Vector3 choruthPos {15.0f,-20.0f,88.0f};
+	//ImGui::Begin("choruth");
+	//ImGui::DragFloat3("choruthPos", &choruthPos.x, 0.01f);
+	//ImGui::End();
+
+	//for (int i = 0; i < 3; i++){
+	//	choruth_[i]->transform.translate.x = choruthPos.x + 2.25f * i;
+	//	choruth_[i]->transform.translate.y = choruthPos.y;
+	//	choruth_[i]->transform.translate.z = choruthPos.z - i * 1.0f;
+	//}
 
 #endif // _DEBUG
 
@@ -252,6 +294,12 @@ void GameScene::Update(){
 	================================================*/
 	field_->Update();
 
+	skyCube_->transform.translate.x = Field::cameraScrollX_ ;
+
+	for (auto& choruth:choruth_){
+		choruth->UpdateWorldMat();
+	}
+
 	//プレイヤーの更新
 	player_->Update();
 
@@ -281,7 +329,14 @@ void GameScene::Draw(){
 	/*sphere->Draw();
 	suzunne->Draw();
 	fence->Draw();*/
+
+	//skyCube_->Draw();
+
 	field_->Draw();
+
+	for (auto& choruth : choruth_){
+		choruth->Draw();
+	}
 
 	//プレイヤーの描画
 	player_->Draw();

@@ -52,6 +52,8 @@ public:
 
 	void SetModel(const std::string& fileName);
 
+	void SetEnableLight(bool is){ model_->SetEnableLight(is); }
+
 
 private:
 

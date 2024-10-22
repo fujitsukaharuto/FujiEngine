@@ -92,16 +92,10 @@ void ChainEnemy::Update(){
 
 			if (connectedEnemies_[i]->GetIsChangedNote()){
 				//モデルデータの切り替え
-				if (isChain_ && connectedEnemies_[0]->GetIsChangedNote() && connectedEnemies_[1]->GetIsChangedNote()){
-					connectedEnemies_[i]->SetModel("chainNote.obj");
-				}
-				//片方が音符、片方が敵のままだとnote.obj
-
-				else if (connectedEnemies_[i]->GetIsChangedNote()){
+				if (!isChain_){
 					connectedEnemies_[i]->SetModel("note.obj");
 				}
 			}
-			
 
 		}
 
