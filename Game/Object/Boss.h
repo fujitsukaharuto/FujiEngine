@@ -59,6 +59,9 @@ private:
     /// </summary>
     void StopMoveForCollision(uint32_t time);
 
+    void MovementMotion();
+
+
 private:
     /// <summary>
     /// 移動測度

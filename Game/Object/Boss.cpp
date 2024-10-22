@@ -10,6 +10,7 @@
 
 #include <thread>
 #include <numbers>
+#include <cmath>
 #include <algorithm>
 #undef max
 
@@ -139,7 +140,6 @@ void Boss::Update(){
 	models_[0]->transform.translate.x = std::max(models_[0]->transform.translate.x, -2.0f + Field::cameraScrollX_);
 }
 
-
 void Boss::Draw(){
 	//モデルの描画
 	Character::Draw();
@@ -153,10 +153,22 @@ void Boss::Draw(){
 	PrimitiveDrawer::GetInstance()->DrawLine3d({linePosX,12.0f,0.0f}, {linePosX, 0.0f, 0.0f}, {0.0f,0.0f,0.0f,1.0f});
 }
 
-
 void Boss::Move(){
+
+	//前に進んでいつとき
+	if (moveSpeed_>0){
+		MovementMotion();
+		models_[0]->transform.rotate.x = 0.0f;
+	} else{
+		//攻撃を受けて後ろに下がるときは回転をリセット
+		models_[0]->transform.rotate.z = 0.0f;
+		models_[0]->transform.rotate.x = -0.3f;
+	}
+
 	// 移動速度が0の場合は移動しない（停止中）
 	models_[0]->transform.translate.x += moveSpeed_ * FPSKeeper::DeltaTime();
+
+	models_[0]->UpdateWorldMat();
 }
 
 void Boss::ApplyGlobalVariables(){
@@ -170,6 +182,24 @@ void Boss::StopMoveForCollision(uint32_t time){
 	stopMoveTimer_ = time;        // タイマーを設定
 }
 
+void Boss::MovementMotion(){
+	// ボスの揺れに関連する処理
+	static float localTime = 0.0f;  // ローカルの時間変数を用意
+	float waveFrequency = 0.07f;    // 揺れの周波数
+	//float waveAmplitude = 0.15f;    // 揺れの振れ幅
+
+	float waveAmplitudeScale = 0.2f; // 縦の伸縮の振れ幅
+
+	// ローカル時間を増加させる
+	localTime += FPSKeeper::DeltaTime();
+
+	// 時間に基づいてz軸の揺れをsin関数で計算
+	//float waveValue = waveAmplitude * sin(waveFrequency * localTime);
+	float waveScale = 1.0f + waveAmplitudeScale * sin(waveFrequency * localTime*2.0f); // 1.0fを基準とする
+
+	//models_[0]->transform.rotate.z = waveValue;
+	models_[0]->transform.scale.y = waveScale; // 元のスケールから伸縮するように調整
+}
 
 float Boss::GetMoveSpeed() const{
 	return moveSpeed_;

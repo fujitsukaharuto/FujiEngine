@@ -8,6 +8,7 @@
 #include "Object/Boss.h"
 #include "Object/Obstacle.h"
 #include "Object/NoteEnemy.h"
+#include "MatrixCalculation.h"
 
 #include <algorithm>
 #undef max
@@ -41,6 +42,8 @@ void Player::Initialize(std::vector<Object3d*> Object3ds){
 	damageSE_ = Audio::GetInstance()->SoundLoadWave("damage.wav");
 
 	models_[0]->transform.translate = {12.0f,0.0f,0.0f};
+	models_[0]->transform.rotate = {0.0f,frontRotateY,0.0f};
+	models_[0]->transform.rotate = {0.0f,frontRotateY,0.0f};
 
 	emit.name = "playerHit";
 	emit.count = 1;
@@ -118,18 +121,30 @@ void Player::Draw(){
 }
 
 void Player::Move(){
-	if (!isKnockedBack_){  // ノックバック中は通常の移動を無効化
+	// ノックバック中は通常の移動を無効化
+	if (!isKnockedBack_){
+		float targetRotateY = models_[0]->transform.rotate.y;  // 現在の回転角度を保持
+		float rotationSpeed = 0.1f;  // 回転の補間スピード
+
+		// 移動の方向を決定
 		if (Input::GetInstance()->PushKey(DIK_A)){
+			targetRotateY = backRotateY;
 			moveSpeed_ = -0.2f;
 		} else if (Input::GetInstance()->PushKey(DIK_D)){
+			targetRotateY = frontRotateY;
 			moveSpeed_ = 0.2f;
 		} else{
 			moveSpeed_ = 0.0f;
 		}
 
+		// 現在の回転角度をターゲット角度に向かって補間する
+		models_[0]->transform.rotate.y = LerpShortAngle(models_[0]->transform.rotate.y, targetRotateY, rotationSpeed);
+
+		// 移動速度の設定
 		velocity_.x = moveSpeed_;
 	}
 }
+
 
 void Player::Jump(){
 	const float kGravity = -1.0f; // 要調整
