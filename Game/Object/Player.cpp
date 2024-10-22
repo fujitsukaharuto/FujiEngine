@@ -218,7 +218,7 @@ void Player::OnCollision(Character* other){
 
         // プレイヤーがボスと衝突した際に右方向（+X方向）に飛ばす
         const float kBossCollisionXVelocity = 0.2f;  // 右方向に飛ばす速度
-        const float kBossCollisionYVelocity = 0.2f;  // 上方向に飛ばす速度
+        const float kBossCollisionYVelocity = 0.3f;  // 上方向に飛ばす速度
 
         // X方向の速度を設定して右に飛ばす
         velocity_.x = kBossCollisionXVelocity;
@@ -265,7 +265,7 @@ void Player::OnCollision(Character* other){
         float direction = (xDifference > 0) ? 1.0f : -1.0f;
 
         const float kObstacleCollisionXVelocity = 0.2f * direction;  // 水平方向の速度
-        const float kObstacleCollisionYVelocity = 0.2f;  // 上方向の速度
+        const float kObstacleCollisionYVelocity = 0.3f;  // 上方向の速度
 
         // X方向の速度を設定
         velocity_.x = kObstacleCollisionXVelocity;
