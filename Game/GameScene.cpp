@@ -330,7 +330,7 @@ void GameScene::Draw(){
 	suzunne->Draw();
 	fence->Draw();*/
 
-	skyCube_->Draw();
+	//skyCube_->Draw();
 
 	field_->Draw();
 
