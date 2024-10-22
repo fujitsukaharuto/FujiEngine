@@ -59,7 +59,11 @@ private:
     bool isKnockedBack_ = false;
     // ノックバックの残り時間
     float knockbackTimer_ = 0.0f;
-    float knockbackDirection_ = 1.0f; 
+    float knockbackDirection_ = 1.0f;
+
+    float frontRotateY = 2.3f;
+    float backRotateY = -2.0f;
+    float angle = 0;
 
 
 
