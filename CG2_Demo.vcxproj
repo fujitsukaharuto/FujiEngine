@@ -101,6 +101,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BaseScene.cpp" />
+    <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="Engine\Audio\Audio.cpp" />
     <ClCompile Include="Engine\DebugCamera\Camera.cpp" />
     <ClCompile Include="Engine\DebugCamera\CameraManager.cpp" />
@@ -163,6 +164,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseScene.h" />
+    <ClInclude Include="Enemy.h" />
     <ClInclude Include="Engine\Audio\Audio.h" />
     <ClInclude Include="Engine\DebugCamera\Camera.h" />
     <ClInclude Include="Engine\DebugCamera\CameraManager.h" />

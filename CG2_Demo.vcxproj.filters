@@ -62,9 +62,6 @@
     <ClCompile Include="Engine\GraphicPipeline\Pipeline.cpp">
       <Filter>Engine\GraphicPipeline</Filter>
     </ClCompile>
-    <ClCompile Include="Game\GameScene.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\ImGuiManager\ImGuiManager.cpp">
       <Filter>Engine\ImGuiManager</Filter>
     </ClCompile>
@@ -170,14 +167,20 @@
     <ClCompile Include="player.cpp">
       <Filter>Game</Filter>
     </ClCompile>
-    <ClCompile Include="TitleScene.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
-    <ClCompile Include="ResultScene.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
     <ClCompile Include="BaseScene.cpp">
       <Filter>Engine\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameScene.cpp">
+      <Filter>Game\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="TitleScene.cpp">
+      <Filter>Game\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="ResultScene.cpp">
+      <Filter>Game\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Enemy.cpp">
+      <Filter>Game</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -243,9 +246,6 @@
     </ClInclude>
     <ClInclude Include="Engine\GraphicPipeline\Pipeline.h">
       <Filter>Engine\GraphicPipeline</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\GameScene.h">
-      <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="Engine\ImGuiManager\ImGuiManager.h">
       <Filter>Engine\ImGuiManager</Filter>
@@ -361,14 +361,20 @@
     <ClInclude Include="Player.h">
       <Filter>Game</Filter>
     </ClInclude>
-    <ClInclude Include="TitleScene.h">
-      <Filter>Game</Filter>
-    </ClInclude>
-    <ClInclude Include="ResultScene.h">
-      <Filter>Game</Filter>
-    </ClInclude>
     <ClInclude Include="BaseScene.h">
       <Filter>Engine\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameScene.h">
+      <Filter>Game\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="TitleScene.h">
+      <Filter>Game\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="ResultScene.h">
+      <Filter>Game\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Enemy.h">
+      <Filter>Game</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -437,6 +443,9 @@
     </Filter>
     <Filter Include="Engine\Scene">
       <UniqueIdentifier>{9b2b279b-994d-4704-b28e-0a62df13d1b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Scene">
+      <UniqueIdentifier>{876a42fa-927a-44d8-af82-2c1a3485d66f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
