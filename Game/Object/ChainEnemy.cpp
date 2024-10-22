@@ -89,18 +89,19 @@ void ChainEnemy::Update(){
 
 			//つながっている状態でかつ、両方とも音符になっている
 
-			//モデルデータの切り替え
-			if (isChain_ && connectedEnemies_[0]->GetIsChangedNote() && connectedEnemies_[1]->GetIsChangedNote()){
-				connectedEnemies_[i]->SetModel("chainNote.obj");
-			}
-			//片方が音符、片方が敵のままだとnote.obj
-			else if (connectedEnemies_[0]->GetIsChangedNote()){
-				connectedEnemies_[0]->SetModel("note.obj");
-			}
 
-			else if (connectedEnemies_[1]->GetIsChangedNote()){
-				connectedEnemies_[1]->SetModel("note.obj");
+			if (connectedEnemies_[i]->GetIsChangedNote()){
+				//モデルデータの切り替え
+				if (isChain_ && connectedEnemies_[0]->GetIsChangedNote() && connectedEnemies_[1]->GetIsChangedNote()){
+					connectedEnemies_[i]->SetModel("chainNote.obj");
+				}
+				//片方が音符、片方が敵のままだとnote.obj
+
+				else if (connectedEnemies_[i]->GetIsChangedNote()){
+					connectedEnemies_[i]->SetModel("note.obj");
+				}
 			}
+			
 
 		}
 
