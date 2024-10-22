@@ -43,6 +43,10 @@ void Sprite::SetAngle(float rotate) {
 	SetWvp();
 }
 
+void Sprite::SetColor(const Vector4& color) {
+	material_.SetColor(color);
+}
+
 void Sprite::InitializeBuffer() {
 
 	vertex_.push_back({ {-1.0f,-1.0f,0.0f,1.0f},{0.0f,0.0f},{0.0f,0.0f,-1.0f} });

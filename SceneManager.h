@@ -31,21 +31,43 @@ private:
 
 	void SceneSet();
 
+	void CurtainUpdata();
+
+	void CurtainClose();
+	void CurtainOpen();
+
+	void BlackUpdata();
+
+
 private:
 
 	BaseScene* scene_ = nullptr;
 	BaseScene* nextScene_ = nullptr;
 
+	std::string nowScene;
+
 	bool isChange_ = false;
 	float changeExtraTime = 0.0f;
+	float finishTime = 0.0f;
 
 	std::unique_ptr<Sprite> curtainFrame_;
 	std::unique_ptr<Sprite> curtainLeft_;
 	std::unique_ptr<Sprite> curtainRight_;
+	std::unique_ptr<Sprite> Black_;
+
+	bool isFinifh_ = false;
 	bool isCurtain_ = false;
-	bool isDrawCurtain_ = false;
-	float closeCurtain_ = 0.0f;
+	bool isClose_ = false;
+	bool isOpen_ = false;
+	bool isBlack_ = false;
+	bool isDark_ = false;
+
+	bool isDrawCurtain_ = true;
+	float maxCurtainTime_ = 0.0f;
 	float curtainTime_ = 0.0f;
+
+	Vector4 darkColor_{};
+
 	Vector3 curtainLeftPos_{};
 	Vector3 curtainRightPos_{};
 
