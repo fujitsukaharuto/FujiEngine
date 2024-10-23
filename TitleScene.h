@@ -26,4 +26,6 @@ private:
 	Object3d* title = nullptr;
 	float moveTime = 0.0f;
 
+	float phaseTime = 60.0f;
+	bool phaseChange = false;
 };

@@ -91,12 +91,32 @@ void TitleScene::Update() {
 
 	if (startTime <= 0.0f) {
 		if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
-			SceneManager::GetInstance()->ChangeScene("GAME", 40.0f);
+			phaseChange = true;
+			DXCom::GetInstance()->SetCutRadius(1200.0f);
 		}
 	}
 	else {
 		startTime--;
 	}
+
+	if (phaseChange) {
+		if (phaseTime <= 0.0f) {
+			SceneManager::GetInstance()->ChangeScene("GAME", 40.0f);
+		}
+		else {
+			phaseTime -= FPSKeeper::DeltaTime();
+
+			float t = 1 - (phaseTime / 60.0f);
+			t = powf(t, 3);
+			title->transform.translate.y = Lerp(4.0f, 15.0f, t);
+
+			float y = Lerp(550.0f, -400.0f, t);
+			space->SetPos({ 640.0f,y,0.0f, });
+
+		}
+	}
+
+
 
 
 	sphere->transform.rotate.y += 0.02f;
