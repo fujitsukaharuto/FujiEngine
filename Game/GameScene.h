@@ -104,7 +104,7 @@ private:
 
 	bool isStartGame_ = false;
 	bool isTutorial_ = false;
-
+	bool isClear_ = false;
 
 	ParticleEmitter emit;
 

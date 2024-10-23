@@ -315,12 +315,26 @@ bool Boss::ClearUpdate() {
 		bossBlustTime -= FPSKeeper::DeltaTime();
 
 
-
-		emit.RandomTranslate({ -4.5f,2.5f }, { -2.5f,2.5f }, { -8.5f,-8.5f });
-		emit.pos = GetCenterPos();
-		emit.BurstAnime();
-		CameraManager::GetInstance()->GetCamera()->SetShakeTime(40.0f);
-
+		if (130.0f <= bossBlustTime && 128.0f<= bossBlustTime) {
+			emit.RandomTranslate({ -4.5f,2.5f }, { -2.5f,2.5f }, { -8.5f,-8.5f });
+			emit.pos = GetCenterPos();
+			emit.BurstAnime();
+			CameraManager::GetInstance()->GetCamera()->SetShakeTime(40.0f);
+		}
+		if (80.0f <= bossBlustTime && 78.0f <= bossBlustTime) {
+			emit.RandomTranslate({ -4.5f,2.5f }, { -2.5f,2.5f }, { -8.5f,-8.5f });
+			emit.pos = GetCenterPos();
+			emit.BurstAnime();
+			CameraManager::GetInstance()->GetCamera()->SetShakeTime(40.0f);
+		}if (30.0f <= bossBlustTime && 28.0f <= bossBlustTime) {
+			emit.RandomTranslate({ -4.5f,2.5f }, { -2.5f,2.5f }, { -8.5f,-8.5f });
+			emit.pos = GetCenterPos();
+			emit.BurstAnime();
+			CameraManager::GetInstance()->GetCamera()->SetShakeTime(40.0f);
+		}
+	}
+	else {
+		return false;
 	}
 
 	return true;

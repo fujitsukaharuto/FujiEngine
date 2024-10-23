@@ -217,6 +217,12 @@ void GameScene::Update(){
 		ParticleManager::GetInstance()->Update();
 	}
 	
+	else if (isClear_) {
+		if (!boss_->ClearUpdate()) {
+			SceneManager::GetInstance()->ChangeScene("RESULT", 40.0f);
+		}
+		ParticleManager::GetInstance()->Update();
+	}
 	/////////////////////////////////////////////////////////////////////////////////////////
 	//									ゲームプレイ中の更新
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -360,7 +366,7 @@ void GameScene::Update(){
 			SceneManager::GetInstance()->ChangeScene("RESULT", 40.0f);
 		}
 		if (boss_->GetClear()) {
-			SceneManager::GetInstance()->ChangeScene("RESULT", 40.0f);
+			isClear_ = true;
 		}
 
 	}
