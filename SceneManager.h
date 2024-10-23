@@ -27,6 +27,13 @@ public:
 
 	BaseScene* CreateScene(const std::string& sceneName);
 
+
+	void SetClear(bool is);
+	void SetGameOver(bool is);
+
+	bool GetClear()const { return Clear; }
+	bool GetGameover()const { return gameover; }
+
 private:
 
 	void SceneSet();
@@ -85,5 +92,8 @@ private:
 	Vector3 curtainLeftPos_{};
 	Vector3 curtainRightPos_{};
 
+
+	bool Clear = false;
+	bool gameover = true;
 
 };

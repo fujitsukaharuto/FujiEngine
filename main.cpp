@@ -139,6 +139,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	modelManager->LoadOBJ("chainNote.obj");
 	modelManager->LoadOBJ("verticalBar.obj");
 	modelManager->LoadOBJ("horizontalBar.obj");
+	modelManager->LoadOBJ("clear.obj");
+	modelManager->LoadOBJ("gameOver.obj");
+
 
 
 	textureManager->Load("curtain.png");

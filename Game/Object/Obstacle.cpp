@@ -26,8 +26,8 @@ void Obstacle::Initialize(Object3d* model, const Vector3& initPos){
 	Character::Initialize(model);
 
 	models_[0]->transform.translate = initPos;
+	models_[0]->transform.rotate.y = -3.14f;
 	models_[0]->UpdateWorldMat();
-
 
 }
 
