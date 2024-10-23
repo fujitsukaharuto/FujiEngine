@@ -247,7 +247,7 @@ bool Boss::UpdateBegineGame(){
 		}
 
 		if (motionComplete && !cameraZoomOutComplete){
-			if (CameraManager::GetInstance()->EaseMoveCamera({-11.5f, 5.6f, -63.5f}, deltaTime)){
+			if (CameraManager::GetInstance()->EaseMoveCamera({-11.5f,5.6f,-75.5f}, deltaTime)){
 				cameraZoomOutComplete = true;
 			} else{
 				return true;
