@@ -53,7 +53,7 @@ void GameScene::Initialize() {
 	Field::fieldEndPosX = 2.0f;
 	isStartGame_ = false;
 
-	Vector3 cameraInitializePos = {-11.5f,5.6f,-63.5f};
+	Vector3 cameraInitializePos = {-11.5f,5.6f,-75.5f};
 	Vector3 cameraInitializeRotate = {0.0f, 0.37f, 0.0f};
 	CameraManager::GetInstance()->GetCamera()->transform.translate = cameraInitializePos;
 	CameraManager::GetInstance()->GetCamera()->transform.rotate = cameraInitializeRotate;

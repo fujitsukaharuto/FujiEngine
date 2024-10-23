@@ -10,6 +10,7 @@
 #include "Object/NoteEnemy.h"
 #include "MatrixCalculation.h"
 #include "SceneManager.h"
+#include "Field/Field.h"
 
 #include <algorithm>
 #undef max
@@ -109,6 +110,7 @@ void Player::Update(){
 
 	//地面より下に行かないように
 	models_[0]->transform.translate.y = std::max(models_[0]->transform.translate.y, 0.0f);
+	models_[0]->transform.translate.x = std::min(models_[0]->transform.translate.x, Field::cameraScrollX_ + 45.0f);
 
 	//生存フラグの管理
 	Character::Update();
