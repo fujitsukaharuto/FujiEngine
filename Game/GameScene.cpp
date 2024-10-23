@@ -342,7 +342,7 @@ void GameScene::Draw(){
 	suzunne->Draw();
 	fence->Draw();*/
 
-	//skyCube_->Draw();
+	skyCube_->Draw();
 
 	field_->Draw();
 
@@ -413,7 +413,18 @@ void GameScene::ApplyGlobalVariables(){
 /// ゲームスタート前
 /// </summary>
 void GameScene::UpdateBegine(){
-	if (!boss_->UpdateBegineGame()){
-		isStartGame_ = true;
+
+	//チュートリアル状態じゃない場合の処理
+	if (!isTutorial_){
+		//ボスの登場モーション
+		if (!boss_->UpdateBegineGame()){
+			isStartGame_ = true;
+		}
 	}
+
+	//チュートリアル状態の時の処理
+	else{
+		player_->Update();
+	}
+	
 }
