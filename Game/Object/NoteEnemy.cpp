@@ -72,6 +72,8 @@ void NoteEnemy::Initialize(Object3d* model, const Vector3& initPos){
 	GlobalVariables::GetInstance()->CreateGroup(groupName);
 	GlobalVariables::GetInstance()->AddItem(groupName, "noteSpeedMagnification", noteSpeedMagnification_);
 	GlobalVariables::GetInstance()->AddItem(groupName, "moveSpeed", moveSpeed_);
+
+	ApplyGlobalVariabls();
 }
 
 void NoteEnemy::Update(){

@@ -78,10 +78,9 @@ void Boss::Initialize(std::vector<Object3d*> models){
 	emit.animeData.endSize = { 1.2f,1.2f };
 	emit.animeData.type = SizeType::kReduction;
 
-#ifdef _DEBUG
-	// 調整項目の適用
+
 	ApplyGlobalVariables();
-#endif // _DEBUG
+
 }
 
 void Boss::Update(){

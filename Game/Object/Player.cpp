@@ -9,6 +9,7 @@
 #include "Object/Obstacle.h"
 #include "Object/NoteEnemy.h"
 #include "MatrixCalculation.h"
+#include "SceneManager.h"
 
 #include <algorithm>
 #undef max
@@ -353,5 +354,10 @@ void Player::OnCollision(Character* other){
 		emit.RandomTranslate({-3.5f,-3.5f}, {-0.2f,-0.2f}, {-4.0f,-4.0f});
 		emit.pos = GetCenterPos();
 		emit.BurstAnime();
+	}
+
+	if (life_ == 0) {
+		SceneManager::GetInstance()->SetGameOver(true);
+		SceneManager::GetInstance()->ChangeScene("RESULT", 40.0f);
 	}
 }
