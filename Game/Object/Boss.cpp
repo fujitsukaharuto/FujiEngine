@@ -408,9 +408,7 @@ void Boss::OnCollision(Character* other){
 		}
 
 
-		// ボスを後退させる
-		life_--;
-		moveSpeed_ *= -1;  // ボスの後退速度を設定 (負の値で後退)
+		
 		int32_t lifePareto = kMaxLife_ / 4;
 		// 残り4分の3の時
 		if (lifePareto * 3 == life_) {
@@ -457,6 +455,11 @@ void Boss::OnCollision(Character* other){
 				isDamagePaticle = true;
 			}
 		}
+
+		// ボスを後退させる
+		life_--;
+		moveSpeed_ *= -1;  // ボスの後退速度を設定 (負の値で後退)
+
 		retreatTimer_ = 60;  // 60フレーム（1秒間）後退
 
 		if (!enemy->isFirst_){

@@ -80,6 +80,15 @@ void ChainEnemy::Initialize(std::array<Object3d*, 2> models, const Vector3& pos)
 
 void ChainEnemy::Update(){
 
+
+	if (!connectedEnemies_[0] && connectedEnemies_[1]){
+		// 0がnullで1が有効な場合、1のisFirst_をfalseに設定
+		connectedEnemies_[1]->isFirst_ = true;
+	} else if (connectedEnemies_[0] && !connectedEnemies_[1]){
+		// 1がnullで0が有効な場合、0のisFirst_をfalseに設定
+		connectedEnemies_[0]->isFirst_ = true;
+	}
+
 	for (size_t i = 0; i < connectedEnemies_.size(); ++i){
 		if (!connectedEnemies_[i]){
 			continue;  // nullptr チェック
