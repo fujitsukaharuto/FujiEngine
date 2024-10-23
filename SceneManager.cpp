@@ -310,9 +310,9 @@ void SceneManager::CurtainOpen() {
 		if (5.0f <= curtainTime_ && curtainTime_ <= maxCurtainTime_) {
 			curtainTime_ += FPSKeeper::DeltaTime();
 
-			curtainLeftPos_.x = Lerp(curtainLeftPos_.x, -720.0f, (0.075f)*FPSKeeper::DeltaTime());
+			curtainLeftPos_.x = Lerp(curtainLeftPos_.x, -1620.0f, (0.015f)*FPSKeeper::DeltaTime());
 			curtainLeft_->SetPos(curtainLeftPos_);
-			curtainRightPos_.x = Lerp(curtainRightPos_.x, 2000.0f, (0.075f) * FPSKeeper::DeltaTime());
+			curtainRightPos_.x = Lerp(curtainRightPos_.x, 2900.0f, (0.015f) * FPSKeeper::DeltaTime());
 			curtainRight_->SetPos(curtainRightPos_);
 		}
 		else if (5.0f > curtainTime_) {
