@@ -50,7 +50,8 @@ GameScene::~GameScene(){
 }
 
 void GameScene::Initialize() {
-
+	Field::fieldEndPosX = 2.0f;
+	isStartGame_ = false;
 
 	Vector3 cameraInitializePos = {-11.5f,5.6f,-63.5f};
 	Vector3 cameraInitializeRotate = {0.0f, 0.37f, 0.0f};
@@ -177,7 +178,7 @@ void GameScene::Initialize() {
 
 	boss_ = std::make_unique<Boss>();
 	boss_->Initialize(bossModels_);
-	boss_->SetTranslate(Vector3 {-8.0f,3.0f,-1.8f});//五線譜の真ん中に合わせる
+	boss_->SetTranslate(Vector3 {-5.0f,40.0f,-1.8f});//五線譜の真ん中に合わせる
 	boss_->SetScale(Vector3 {1.0f,1.0f,1.0f});
 	boss_->SetRotate(Vector3{ 0.0f,3.14f,0.0f });
 
@@ -210,107 +211,120 @@ void GameScene::Initialize() {
 
 void GameScene::Update(){
 
-	// ボスの移動量に応じてカメラを同じだけ移動させる
-	CameraManager::GetInstance()->GetCamera()->transform.translate.x += cameraMoveSpeed_ * FPSKeeper::DeltaTime();
+	if (!isStartGame_){
+		//ゲームが始まる前の更新処理
+		UpdateBegine();
 
-
-#ifdef _DEBUG
-	field_->ShowImgui();
-
-	ApplyGlobalVariables();
-
-	//ImGui::Begin("suzunne");
-
-	//ImGui::ColorEdit4("color", &color_.X);
-	////suzunne->SetColor(color_);
-	//ImGui::End();
-
-	//ImGui::Begin("Sphere");
-
-	//ImGui::DragFloat3("scale", &sphere->transform.scale.x, 0.01f);
-	//ImGui::DragFloat3("rotate", &sphere->transform.rotate.x, 0.01f);
-	//ImGui::DragFloat3("right", &rightDir.x,0.01f);
-	//rightDir = rightDir.Normalize();
-	//sphere->SetRightDir(rightDir);
-	//ImGui::End();
-
-	ImGui::Begin("Scene");
-	ImGui::SeparatorText("ChangeScene");
-	if (ImGui::Button("ResultScene")) {
-		SceneManager::GetInstance()->ChangeScene("RESULT", 40.0f);
 	}
-	if (ImGui::Button("TitleScene")) {
-		SceneManager::GetInstance()->ChangeScene("TITLE", 40.0f);
+	
+	/////////////////////////////////////////////////////////////////////////////////////////
+	//									ゲームプレイ中の更新
+	/////////////////////////////////////////////////////////////////////////////////////////
+	
+	else{
+
+		// ボスの移動量に応じてカメラを同じだけ移動させる
+		CameraManager::GetInstance()->GetCamera()->transform.translate.x += cameraMoveSpeed_ * FPSKeeper::DeltaTime();
+
+
+	#ifdef _DEBUG
+		field_->ShowImgui();
+
+		ApplyGlobalVariables();
+
+		//ImGui::Begin("suzunne");
+
+		//ImGui::ColorEdit4("color", &color_.X);
+		////suzunne->SetColor(color_);
+		//ImGui::End();
+
+		//ImGui::Begin("Sphere");
+
+		//ImGui::DragFloat3("scale", &sphere->transform.scale.x, 0.01f);
+		//ImGui::DragFloat3("rotate", &sphere->transform.rotate.x, 0.01f);
+		//ImGui::DragFloat3("right", &rightDir.x,0.01f);
+		//rightDir = rightDir.Normalize();
+		//sphere->SetRightDir(rightDir);
+		//ImGui::End();
+
+		ImGui::Begin("Scene");
+		ImGui::SeparatorText("ChangeScene");
+		if (ImGui::Button("ResultScene")){
+			SceneManager::GetInstance()->ChangeScene("RESULT", 40.0f);
+		}
+		if (ImGui::Button("TitleScene")){
+			SceneManager::GetInstance()->ChangeScene("TITLE", 40.0f);
+		}
+		ImGui::End();
+
+		//static Vector3 choruthPos {15.0f,-20.0f,88.0f};
+		//ImGui::Begin("choruth");
+		//ImGui::DragFloat3("choruthPos", &choruthPos.x, 0.01f);
+		//ImGui::End();
+
+		//for (int i = 0; i < 3; i++){
+		//	choruth_[i]->transform.translate.x = choruthPos.x + 2.25f * i;
+		//	choruth_[i]->transform.translate.y = choruthPos.y;
+		//	choruth_[i]->transform.translate.z = choruthPos.z - i * 1.0f;
+		//}
+
+	#endif // _DEBUG
+
+		if (input_->PushKey(DIK_LEFT)){
+		}
+		if (input_->PushKey(DIK_RIGHT)){
+		}
+		if (input_->PushKey(DIK_UP)){
+		}
+		if (input_->PushKey(DIK_DOWN)){
+		}
+
+
+		dxCommon_->UpDate();
+
+		/*===============================================
+		ゲーム画面を作成するので一時的にコメントアウト
+		suzunne->transform.rotate.y = 3.14f;
+		suzunne->transform.rotate.x += (0.05f) * FPSKeeper::DeltaTime();
+
+
+		float rotaSpeed = 0.1f;
+		for (auto suzunneModel : suzunnes) {
+			suzunneModel->transform.rotate.x += rotaSpeed * FPSKeeper::DeltaTime();
+			//suzunneModel->transform.translate = Random::GetVector3({ -4.0f,4.0f }, { -4.0f,4.0f }, { -4.0f,4.0f });
+			rotaSpeed += 0.05f;
+		}
+
+
+		sphere->transform.translate = spherevec;
+		sphere->transform.rotate.y += 0.02f;
+
+		fence->transform.translate = fencevec;
+		fence->transform.rotate.x = 0.5f;
+		fence->SetWVP();
+		================================================*/
+		field_->Update();
+
+		skyCube_->transform.translate.x = Field::cameraScrollX_;
+
+		for (auto& choruth : choruth_){
+			choruth->UpdateWorldMat();
+		}
+
+		//プレイヤーの更新
+		player_->Update();
+
+		//ボスの更新
+ 		boss_->Update();
+
+
+		enemyManager_->Update();
+
+		ParticleManager::GetInstance()->Update();
+
+		//衝突判定
+		CollisionManager::GetInstance()->CheckAllCollidion();
 	}
-	ImGui::End();
-
-	//static Vector3 choruthPos {15.0f,-20.0f,88.0f};
-	//ImGui::Begin("choruth");
-	//ImGui::DragFloat3("choruthPos", &choruthPos.x, 0.01f);
-	//ImGui::End();
-
-	//for (int i = 0; i < 3; i++){
-	//	choruth_[i]->transform.translate.x = choruthPos.x + 2.25f * i;
-	//	choruth_[i]->transform.translate.y = choruthPos.y;
-	//	choruth_[i]->transform.translate.z = choruthPos.z - i * 1.0f;
-	//}
-
-#endif // _DEBUG
-
-	if (input_->PushKey(DIK_LEFT)){
-	}
-	if (input_->PushKey(DIK_RIGHT)){
-	}
-	if (input_->PushKey(DIK_UP)){
-	}
-	if (input_->PushKey(DIK_DOWN)){
-	}
-
-
-	dxCommon_->UpDate();
-
-	/*===============================================
-	ゲーム画面を作成するので一時的にコメントアウト
-	suzunne->transform.rotate.y = 3.14f;
-	suzunne->transform.rotate.x += (0.05f) * FPSKeeper::DeltaTime();
-
-
-	float rotaSpeed = 0.1f;
-	for (auto suzunneModel : suzunnes) {
-		suzunneModel->transform.rotate.x += rotaSpeed * FPSKeeper::DeltaTime();
-		//suzunneModel->transform.translate = Random::GetVector3({ -4.0f,4.0f }, { -4.0f,4.0f }, { -4.0f,4.0f });
-		rotaSpeed += 0.05f;
-	}
-
-
-	sphere->transform.translate = spherevec;
-	sphere->transform.rotate.y += 0.02f;
-
-	fence->transform.translate = fencevec;
-	fence->transform.rotate.x = 0.5f;
-	fence->SetWVP();
-	================================================*/
-	field_->Update();
-
-	skyCube_->transform.translate.x = Field::cameraScrollX_ ;
-
-	for (auto& choruth:choruth_){
-		choruth->UpdateWorldMat();
-	}
-
-	//プレイヤーの更新
-	player_->Update();
-
-	//ボスの更新
-	boss_->Update();
-
-
-	enemyManager_->Update();
-
-	ParticleManager::GetInstance()->Update();
-
-	//衝突判定
-	CollisionManager::GetInstance()->CheckAllCollidion();
 }
 
 void GameScene::Draw(){
@@ -392,4 +406,14 @@ void GameScene::ApplyGlobalVariables(){
 	cameraMoveSpeed_ = globalVariables->GetFloatValue(groupName, "cameraSpeed");
 
 
+}
+
+
+/// <summary>
+/// ゲームスタート前
+/// </summary>
+void GameScene::UpdateBegine(){
+	if (!boss_->UpdateBegineGame()){
+		isStartGame_ = true;
+	}
 }

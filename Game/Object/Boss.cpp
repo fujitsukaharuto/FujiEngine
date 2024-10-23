@@ -13,6 +13,7 @@
 #include <cmath>
 #include <algorithm>
 #undef max
+#undef min
 
 
 
@@ -72,10 +73,10 @@ void Boss::Initialize(std::vector<Object3d*> models){
 	emit.name = "bossHit";
 	emit.count = 1;
 	emit.animeData.lifeTime = 48;
-	emit.RandomSpeed({ -0.0f,0.0f }, { -0.0f,0.0f }, { -0.0f,0.0f });
-	emit.RandomTranslate({ -2.5f,-2.5f }, { -0.0f,0.0f }, { -8.5f,-8.5f });
-	emit.animeData.startSize = { 4.0f,4.0f };
-	emit.animeData.endSize = { 1.2f,1.2f };
+	emit.RandomSpeed({-0.0f,0.0f}, {-0.0f,0.0f}, {-0.0f,0.0f});
+	emit.RandomTranslate({-2.5f,-2.5f}, {-0.0f,0.0f}, {-8.5f,-8.5f});
+	emit.animeData.startSize = {4.0f,4.0f};
+	emit.animeData.endSize = {1.2f,1.2f};
 	emit.animeData.type = SizeType::kReduction;
 
 #ifdef _DEBUG
@@ -137,8 +138,125 @@ void Boss::Update(){
 
 	Character::Update();
 
-	models_[0]->transform.translate.x = std::max(models_[0]->transform.translate.x, -2.0f + Field::cameraScrollX_);
+	//y軸回転を固定
+	models_[0]->transform.rotate.y = Lerp(models_[0]->transform.rotate.y,3.14f,0.1f);
+
+	models_[0]->transform.translate.x = std::max(models_[0]->transform.translate.x, -5.0f + Field::cameraScrollX_);
 }
+
+bool Boss::UpdateBegineGame(){
+	// ボスの初期位置と目標位置を定義
+	static float initialY = models_[0]->transform.translate.y;
+	float targetY = 3.0f;
+	models_[0]->transform.rotate.y = 4.0f;
+
+	// 落下の状態を保持する変数
+	static float fallSpeed = 8.0f; // 初期の落下速度
+	float gravity = 30.0f; // 重力加速度（調整可能）
+	float deltaTime = 0.0166f;
+
+	// 一度だけ初期位置をセットする
+	if (models_[0]->transform.translate.y == initialY){
+		fallSpeed = 0.0f; // 初期化
+	}
+
+	// 落下の処理
+	if (models_[0]->transform.translate.y > targetY){
+		fallSpeed += gravity * deltaTime;
+		models_[0]->transform.translate.y -= fallSpeed * deltaTime;
+
+		if (models_[0]->transform.translate.y <= targetY){
+			models_[0]->transform.translate.y = targetY;
+			fallSpeed = 0.0f;
+			CameraManager::GetInstance()->GetCamera()->SetShakeTime(60.0f);
+		}
+	}
+
+	// カメラズームイン、モーション、ズームアウト完了を追跡するフラグ
+	static bool cameraZoomInComplete = false;
+	static bool motionComplete = false;
+	static bool cameraZoomOutComplete = false;
+
+	if (models_[0]->transform.translate.y <= targetY){
+		if (!cameraZoomInComplete){
+			if (CameraManager::GetInstance()->EaseMoveCamera({-20.0f, 5.0f, -58.5f}, deltaTime)){
+				cameraZoomInComplete = true;
+			} else{
+				return true;
+			}
+		}
+
+		if (!motionComplete){
+			if (UpdateExpansionAndContraction(deltaTime)){
+				motionComplete = true;
+			} else{
+				return true;
+			}
+		}
+
+		if (motionComplete && !cameraZoomOutComplete){
+			if (CameraManager::GetInstance()->EaseMoveCamera({-11.5f, 5.6f, -63.5f}, deltaTime)){
+				cameraZoomOutComplete = true;
+			} else{
+				return true;
+			}
+		}
+
+		// 全ての処理が終了した際のリセット処理
+		if (cameraZoomOutComplete){
+			// 使用したstatic変数のリセット
+			initialY = models_[0]->transform.translate.y;
+			fallSpeed = 8.0f;
+			cameraZoomInComplete = false;
+			motionComplete = false;
+			cameraZoomOutComplete = false;
+			return false; // 完了
+		}
+	}
+
+	Character::Update();
+	return true;
+}
+
+bool Boss::UpdateExpansionAndContraction(float deltaTime){
+	// 伸縮のアニメーションに使う変数
+	static float animationTime = 0.0f;
+	static int expansionCount = 0; // 伸縮の回数を保持
+	float animationDuration = 1.0f; // アニメーションにかける時間（秒）
+	float frequencyBoss = 1.0f; // 伸縮の速さ（調整可能）
+	float scaleMin = 0.8f;  // 最小スケール
+	float scaleMax = 1.2f;  // 最大スケール
+
+	// アニメーションの進行度を更新
+	animationTime += deltaTime;
+
+	// 1回の伸縮アニメーションが終了した場合
+	if (animationTime >= animationDuration){
+		animationTime = 0.0f; // アニメーション時間をリセット
+		expansionCount++; // 伸縮回数をカウント
+
+		// 2回の伸縮が完了した場合、終了
+		if (expansionCount >= 2){
+			models_[0]->transform.scale.y = 1.0f; // スケールをリセット
+			expansionCount = 0; // カウントをリセット
+			return true; // アニメーションの完了を通知
+		}
+	}
+
+	// 進行度を0〜1の範囲に正規化
+	float normalizedTime = animationTime / animationDuration;
+
+	// 伸縮のアニメーションを計算
+	float sinVal = sin(normalizedTime * frequencyBoss * std::numbers::pi_v<float> *2.0f); // sin波による伸縮
+
+	// スケールを更新
+	float scale = scaleMin + (scaleMax - scaleMin) * (0.5f * (1.0f + sinVal)); // -1 ~ 1を0 ~ 1にマッピング
+	models_[0]->transform.scale.y = scale;
+
+	return false; // アニメーションがまだ完了していない
+}
+
+
 
 void Boss::Draw(){
 	//モデルの描画
@@ -156,7 +274,7 @@ void Boss::Draw(){
 void Boss::Move(){
 
 	//前に進んでいつとき
-	if (moveSpeed_>0){
+	if (moveSpeed_ > 0){
 		MovementMotion();
 		models_[0]->transform.rotate.x = 0.0f;
 	} else{
@@ -195,7 +313,7 @@ void Boss::MovementMotion(){
 
 	// 時間に基づいてz軸の揺れをsin関数で計算
 	//float waveValue = waveAmplitude * sin(waveFrequency * localTime);
-	float waveScale = 1.0f + waveAmplitudeScale * sin(waveFrequency * localTime*2.0f); // 1.0fを基準とする
+	float waveScale = 1.0f + waveAmplitudeScale * sin(waveFrequency * localTime * 2.0f); // 1.0fを基準とする
 
 	//models_[0]->transform.rotate.z = waveValue;
 	models_[0]->transform.scale.y = waveScale; // 元のスケールから伸縮するように調整

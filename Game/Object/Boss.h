@@ -26,6 +26,16 @@ public:
     void Update()override;
 
     /// <summary>
+    /// ゲームスタート前のモーション
+    /// </summary>
+    bool UpdateBegineGame();
+
+    //伸び縮み
+    bool UpdateExpansionAndContraction();
+
+    bool UpdateExpansionAndContraction(float deltaTime);
+
+    /// <summary>
     /// 描画
     /// </summary>
     void Draw()override;
@@ -60,6 +70,11 @@ private:
     void StopMoveForCollision(uint32_t time);
 
     void MovementMotion();
+
+    float EaseInQuad(float t){
+        return t * t;
+    }
+
 
 
 private:

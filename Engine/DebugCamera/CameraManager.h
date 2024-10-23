@@ -25,8 +25,9 @@ public:
 
 	void SetDebugMode(bool is) { debugMode_ = is; }
 
-private:
 
+public:
+	bool EaseMoveCamera(const Vector3& targetPosition, float deltaTime);
 
 
 private:
