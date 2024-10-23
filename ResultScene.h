@@ -24,5 +24,8 @@ private:
 	float ins = 1.0f;
 
 	Object3d* text = nullptr;
+	float defoSize = 1.0f;
+	float moveTime = 0.0f;
+
 
 };

@@ -33,14 +33,15 @@ void ResultScene::Initialize() {
 	if (SceneManager::GetInstance()->GetClear()) {
 		text = new Object3d();
 		text->Create("clear.obj");
+		defoSize = 2.0f;
+		text->transform.scale = { defoSize,defoSize,defoSize };
 	}
 	if (SceneManager::GetInstance()->GetGameover()) {
 		text = new Object3d();
 		text->Create("gameOver.obj");
 	}
-	text->transform.translate.y = 2.0f;
+	text->transform.translate.y = 4.0f;
 	text->transform.rotate.y = -3.14f;
-	text->transform.scale = { 2.0f,2.0f,2.0f };
 	text->UpdateWorldMat();
 
 
@@ -87,6 +88,20 @@ void ResultScene::Update() {
 
 	sphere->transform.rotate.y += 0.02f;
 
+	if (moveTime <= 80.0f) {
+
+		moveTime += FPSKeeper::DeltaTime();
+
+		if (moveTime >= 60.0f && moveTime <= 70.0f) {
+			text->transform.scale.y = Lerp(text->transform.scale.y, defoSize - 0.5f, 0.3f);
+		}
+		else if (moveTime > 70.0f && moveTime <= 80.0f) {
+			text->transform.scale.y = Lerp(text->transform.scale.y, defoSize, 0.25f);
+		}
+	}
+	else {
+		moveTime = 0.0f;
+	}
 
 
 	ParticleManager::GetInstance()->Update();

@@ -93,7 +93,7 @@ private:
 	Vector3 curtainRightPos_{};
 
 
-	bool Clear = true;
-	bool gameover = false;
+	bool Clear = false;
+	bool gameover = true;
 
 };
