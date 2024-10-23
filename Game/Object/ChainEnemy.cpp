@@ -85,20 +85,6 @@ void ChainEnemy::Update(){
 			continue;  // nullptr チェック
 		}
 
-		if (connectedEnemies_[i]->GetIsChangedNote()){
-
-			//つながっている状態でかつ、両方とも音符になっている
-
-
-			if (connectedEnemies_[i]->GetIsChangedNote()){
-				//モデルデータの切り替え
-				if (!isChain_&&!connectedEnemies_[i]->IsModelSet()){
-					connectedEnemies_[i]->SetModel("note.obj");
-					connectedEnemies_[i]->SetModelSet(true); // フラグをセット
-				}
-			}
-
-		}
 
 		if (connectedEnemies_[i]){
 			verticalBars_[i]->UpdateWorldMat();
@@ -119,6 +105,29 @@ void ChainEnemy::Update(){
 		// 連結解除の処理
 		HandleChainBreak(i);
 	}
+
+
+	if (connectedEnemies_[0]&& connectedEnemies_[1]){
+		// x座標が小さい方を`isFirst_`に設定
+		if (connectedEnemies_[0]->GetWorldPosition().x < connectedEnemies_[1]->GetWorldPosition().x){
+			connectedEnemies_[0]->isFirst_ = true;
+			connectedEnemies_[1]->isFirst_ = false;
+		} else{
+			connectedEnemies_[0]->isFirst_ = false;
+			connectedEnemies_[1]->isFirst_ = true;
+		}
+
+		// 両方の敵がchangeNoteになっているかを確認
+		if (connectedEnemies_[0]->GetIsChangedNote() && connectedEnemies_[1]->GetIsChangedNote()){
+			// つながっている状態でかつ、両方とも音符になっている
+			isTwoNote_ = true;
+		} else{
+			isTwoNote_ = false;
+		}
+	}
+
+	
+
 }
 
 void ChainEnemy::HandleChainBreak(size_t i){

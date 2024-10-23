@@ -110,14 +110,26 @@ void Boss::Update(){
 	// 後退タイマーの処理
 	if (retreatTimer_ > 0){
 		retreatTimer_--;  // タイマーをデクリメント
+
+		// タイマーが0になった場合の処理
 		if (retreatTimer_ == 0){
-			moveSpeed_ = fabs(moveSpeed_);  // 後退が終わったら正の速度に戻す
-			Audio::GetInstance()->SoundStopWave(bossDamage);
-			isPlay = false;
-			isChorusu = false;
-			isDamagePaticle = false;
+			// isHitCapsel_がtrueならmoveSpeed_を負の値に設定
+			if (isHitCapsel_){
+				moveSpeed_ = -fabs(moveSpeed_);
+			} else{
+				// それ以外の場合は正の速度に戻す
+				moveSpeed_ = fabs(moveSpeed_);
+
+				// 音声の停止とフラグのリセット
+				Audio::GetInstance()->SoundStopWave(bossDamage);
+				isPlay = false;
+				isChorusu = false;
+			}
+
+
 		}
 	}
+
 
 	Move();
 
@@ -399,7 +411,6 @@ void Boss::OnCollision(Character* other){
 		// ボスを後退させる
 		life_--;
 		moveSpeed_ *= -1;  // ボスの後退速度を設定 (負の値で後退)
-		retreatTimer_ = 90;  // 60フレーム（1秒間）後退
 		int32_t lifePareto = kMaxLife_ / 4;
 		// 残り4分の3の時
 		if (lifePareto * 3 == life_) {
@@ -445,6 +456,12 @@ void Boss::OnCollision(Character* other){
 				}
 				isDamagePaticle = true;
 			}
+		}
+		retreatTimer_ = 60;  // 60フレーム（1秒間）後退
+
+		if (!enemy->isFirst_){
+			retreatTimer_ = 0;
+			isHitCapsel_ = false;
 		}
 	}
 
