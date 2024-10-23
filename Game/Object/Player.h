@@ -32,6 +32,8 @@ public:
     /// <param name="other"></param>
     void OnCollision([[maybe_unused]] Character* other);
 
+    bool GetGameover() { return isGameover; }
+
 private:
     /// <summary>
     /// 移動
@@ -72,6 +74,7 @@ private:
     float angle = 0;
 
 
+    bool isGameover = false;
 
     SoundData knockBackSE_;
     SoundData junpSE_;

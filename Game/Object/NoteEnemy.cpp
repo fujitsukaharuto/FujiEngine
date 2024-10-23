@@ -93,7 +93,7 @@ void NoteEnemy::Update(){
 		if (isChanegeEffect_){
 			emit.pos = GetCenterPos();
 			emit.Burst();
-			Audio::GetInstance()->SoundPlayWave(changeSE_);
+			Audio::GetInstance()->SoundPlayWave(changeSE_,0.08f);
 			isChanegeEffect_ = false;
 		}
 	}
@@ -186,7 +186,7 @@ void NoteEnemy::OnCollision(Character* other){
 
 			emit.pos = GetCenterPos();
 			emit.Burst();
-			Audio::GetInstance()->SoundPlayWave(changeSE_);
+			Audio::GetInstance()->SoundPlayWave(changeSE_, 0.08f);
 		}
 
 	}

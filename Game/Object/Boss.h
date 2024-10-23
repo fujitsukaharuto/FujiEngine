@@ -58,6 +58,8 @@ public:
 
 	void SetIsHit(bool flag){ isHitCapsel_ = flag; }
 
+    bool GetClear() { return isClear; }
+
 private:
 	void Move();
 
@@ -94,6 +96,7 @@ private:
     std::vector<Vector3> particleSpeed;
     bool isDamagePaticle = false;
     int32_t kMaxLife_ = 0;
+    bool isClear = false;
 
     // コーラス
     std::vector<Object3d*> choruth;

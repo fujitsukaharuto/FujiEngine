@@ -196,6 +196,7 @@ void GameScene::Initialize() {
 	/*                                        サウンド                                             */
 	////////////////////////////////////////////////////////////////////////////////////////////////
 
+	bgm = Audio::GetInstance()->SoundLoadWave("04.wav");
 
 
 	//ApplyGlobalVariables();
@@ -222,6 +223,11 @@ void GameScene::Update(){
 	/////////////////////////////////////////////////////////////////////////////////////////
 	
 	else{
+
+		if (!sound) {
+			Audio::GetInstance()->SoundPlayWave(bgm, 0.02f);
+			sound = true;
+		}
 
 		// ボスの移動量に応じてカメラを同じだけ移動させる
 		CameraManager::GetInstance()->GetCamera()->transform.translate.x += cameraMoveSpeed_ * FPSKeeper::DeltaTime();
@@ -355,6 +361,11 @@ void GameScene::Update(){
 
 		//衝突判定
 		CollisionManager::GetInstance()->CheckAllCollidion();
+
+		if (boss_->GetClear()||player_->GetGameover()) {
+			Audio::GetInstance()->SoundStopWave(bgm);
+		}
+
 	}
 }
 

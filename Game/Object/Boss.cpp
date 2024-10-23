@@ -403,7 +403,7 @@ void Boss::OnCollision(Character* other){
 
 		isChorusu = true;
 		if (!isPlay) {
-			Audio::GetInstance()->SoundPlayWave(bossDamage);
+			Audio::GetInstance()->SoundPlayWave(bossDamage, 0.1f);
 			isPlay = true;
 		}
 
@@ -468,6 +468,7 @@ void Boss::OnCollision(Character* other){
 
 	if (life_ == 0) {
 		SceneManager::GetInstance()->SetClear(true);
+		isClear = true;
 		SceneManager::GetInstance()->ChangeScene("RESULT", 40.0f);
 	}
 }

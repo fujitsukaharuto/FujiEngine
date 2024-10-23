@@ -107,5 +107,7 @@ private:
 
 
 	ParticleEmitter emit;
+	SoundData bgm;
+	bool sound = false;
 
 };

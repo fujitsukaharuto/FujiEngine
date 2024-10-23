@@ -78,7 +78,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	audio->LoadWave("jump.wav");
 	audio->LoadWave("damage.wav");
 	audio->LoadWave("change.wav");
-
+	audio->LoadWave("04.wav");
 
 
 

@@ -177,7 +177,7 @@ void Player::Jump(){
 	if (Input::GetInstance()->TriggerKey(DIK_SPACE)){
 		isJumping_ = true;
 		velocity_.y = 0.3f;
-		Audio::GetInstance()->SoundPlayWave(junpSE_);
+		Audio::GetInstance()->SoundPlayWave(junpSE_, 0.07f);
 	}
 
 	// ジャンプ中の挙動
@@ -280,7 +280,7 @@ void Player::OnCollision(Character* other){
 
 				// ダメージを受ける処理
 				life_--;
-				Audio::GetInstance()->SoundPlayWave(damageSE_);
+				Audio::GetInstance()->SoundPlayWave(damageSE_, 0.05f);
 				emit.RandomTranslate({ -3.5f,-3.5f }, { -0.2f,-0.2f }, { -4.0f,-4.0f });
 				emit.pos = GetCenterPos();
 				emit.BurstAnime();
@@ -328,7 +328,7 @@ void Player::OnCollision(Character* other){
 			knockbackTimer_ = 0.5f;  // ノックバックの継続時間を設定
 
 			life_--;
-			Audio::GetInstance()->SoundPlayWave(damageSE_);
+			Audio::GetInstance()->SoundPlayWave(damageSE_, 0.05f);
 			emit.RandomTranslate({-1.5f,-1.5f}, {0.0f,0.0f}, {-8.0f,-8.0f});
 			emit.pos = GetCenterPos();
 			emit.BurstAnime();
@@ -378,7 +378,7 @@ void Player::OnCollision(Character* other){
 			knockbackTimer_ = 0.5f;  // ノックバックの継続時間を設定
 
 			life_--;
-			Audio::GetInstance()->SoundPlayWave(damageSE_);
+			Audio::GetInstance()->SoundPlayWave(damageSE_, 0.05f);
 			emit.RandomTranslate({-3.5f,-3.5f}, {-0.2f,-0.2f}, {-4.0f,-4.0f});
 			emit.pos = GetCenterPos();
 			emit.BurstAnime();
@@ -388,6 +388,7 @@ void Player::OnCollision(Character* other){
 
 	if (life_ == 0) {
 		SceneManager::GetInstance()->SetGameOver(true);
+		isGameover = true;
 		SceneManager::GetInstance()->ChangeScene("RESULT", 40.0f);
 	}
 }
