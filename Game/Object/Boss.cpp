@@ -31,6 +31,7 @@ Boss::Boss() : Character(std::make_unique<SphereCollider>()), stopMoveTimer_(0){
 
 	//初期値として20
 	life_ = 20;
+	kMaxLife_ = life_;
 
 	//調整項目
 	const char* groupName = "boss";
@@ -372,7 +373,18 @@ void Boss::OnCollision(Character* other){
 		life_--;
 		moveSpeed_ *= -1;  // ボスの後退速度を設定 (負の値で後退)
 		retreatTimer_ = 90;  // 60フレーム（1秒間）後退
+		int32_t lifePareto = kMaxLife_ / 4;
+		if (lifePareto * 3 == life_) {
+			models_[0]->SetTexture("boss_state1.png");
+		}
+		if (lifePareto * 2 == life_) {
+			models_[0]->SetTexture("boss_state2.png");
+		}
+		if (lifePareto == life_) {
+			models_[0]->SetTexture("boss_state3.png");
+		}
 	}
+
 
 	if (life_ == 0) {
 		SceneManager::GetInstance()->SetClear(true);

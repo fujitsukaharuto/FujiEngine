@@ -88,6 +88,8 @@ private:
     int32_t retreatTimer_ = 0;
 
 
+    int32_t kMaxLife_ = 0;
+
     // コーラス
     std::vector<Object3d*> choruth;
     bool isChorusu = false;
