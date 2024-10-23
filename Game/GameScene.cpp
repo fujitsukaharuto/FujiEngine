@@ -270,14 +270,6 @@ void GameScene::Update(){
 
 	#endif // _DEBUG
 
-		if (input_->PushKey(DIK_LEFT)){
-		}
-		if (input_->PushKey(DIK_RIGHT)){
-		}
-		if (input_->PushKey(DIK_UP)){
-		}
-		if (input_->PushKey(DIK_DOWN)){
-		}
 
 
 		dxCommon_->UpDate();

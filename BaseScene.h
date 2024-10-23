@@ -40,7 +40,7 @@ protected:
 	Input* input_ = nullptr;
 	Audio* audio_ = nullptr;
 
-
+	float startTime = 5.0f;
 private:
 
 

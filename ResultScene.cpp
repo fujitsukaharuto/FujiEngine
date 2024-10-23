@@ -115,9 +115,15 @@ void ResultScene::Update() {
 
 	dxCommon_->UpDate();
 
-	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
-		SceneManager::GetInstance()->ChangeScene("TITLE", 40.0f);
+	if (startTime <= 0.0f) {
+		if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
+			SceneManager::GetInstance()->ChangeScene("TITLE", 40.0f);
+		}
 	}
+	else {
+		startTime--;
+	}
+
 
 
 
