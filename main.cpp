@@ -74,7 +74,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	audio = Audio::GetInstance();
 	audio->Initialize();
 
-	audio->LoadWave("testLongBGM.wav");
+	audio->LoadWave("mouse01.wav");
 	audio->LoadWave("jump.wav");
 	audio->LoadWave("damage.wav");
 	audio->LoadWave("change.wav");

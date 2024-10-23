@@ -389,6 +389,5 @@ void Player::OnCollision(Character* other){
 	if (life_ == 0) {
 		SceneManager::GetInstance()->SetGameOver(true);
 		isGameover = true;
-		SceneManager::GetInstance()->ChangeScene("RESULT", 40.0f);
 	}
 }

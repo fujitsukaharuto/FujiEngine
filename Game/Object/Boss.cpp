@@ -54,7 +54,7 @@ Boss::~Boss(){
 void Boss::Initialize(std::vector<Object3d*> models){
 	Character::Initialize(models);
 	//コライダー用のポジションを更新
-	bossDamage = Audio::GetInstance()->SoundLoadWave("testLongBGM.wav");
+	bossDamage = Audio::GetInstance()->SoundLoadWave("mouse01.wav");
 
 	for (int i = 0; i < 3; i++){
 		Object3d* newCho = new Object3d();
@@ -311,9 +311,20 @@ bool Boss::UpdateExpansionAndContraction(float deltaTime){
 
 bool Boss::ClearUpdate() {
 
+	if (bossBlustTime >= 0.0f) {
+
+		bossBlustTime -= FPSKeeper::DeltaTime();
 
 
-	return false;
+
+		emit.RandomTranslate({ -4.5f,2.5f }, { -2.5f,2.5f }, { -8.5f,-8.5f });
+		emit.pos = GetCenterPos();
+		emit.BurstAnime();
+		CameraManager::GetInstance()->GetCamera()->SetShakeTime(40.0f);
+
+	}
+
+	return true;
 }
 
 
@@ -480,7 +491,6 @@ void Boss::OnCollision(Character* other){
 	if (life_ == 0) {
 		SceneManager::GetInstance()->SetClear(true);
 		isClear = true;
-		SceneManager::GetInstance()->ChangeScene("RESULT", 40.0f);
 	}
 }
 

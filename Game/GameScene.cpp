@@ -356,6 +356,12 @@ void GameScene::Update(){
 		//衝突判定
 		CollisionManager::GetInstance()->CheckAllCollidion();
 
+		if (player_->GetGameover()) {
+			SceneManager::GetInstance()->ChangeScene("RESULT", 40.0f);
+		}
+		if (boss_->GetClear()) {
+			SceneManager::GetInstance()->ChangeScene("RESULT", 40.0f);
+		}
 
 	}
 }
