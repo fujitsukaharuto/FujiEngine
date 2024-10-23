@@ -81,7 +81,7 @@ void NoteEnemy::Update(){
 	ApplyGlobalVariabls();
 #endif // _DEBUG
 
-	
+	MovingMotion();
 
 	////移動速度の更新
 	//moveSpeed_ = Field::influenceOnSpeed_[fieldIndex_];
@@ -89,7 +89,6 @@ void NoteEnemy::Update(){
 	//音符に変わったらモデルを変える
 	if (isChangedNote_){
 		
-		models_[0]->transform.rotate = {0.0f,-1.5f,0.0f};
 
 		if (isChanegeEffect_){
 			emit.pos = GetCenterPos();
@@ -135,7 +134,7 @@ void NoteEnemy::OnCollision(Character* other){
 		bool movedToNewField = false; // 段が移動したかどうかを確認
 
 		// 高さの差をチェックして、十分な高さの差がある場合のみ移動を許可
-		const float kHeightDifferenceThreshold = 1.0f; // 十分な高さの差の閾値
+		const float kHeightDifferenceThreshold = 0.8f; // 十分な高さの差の閾値
 
 		// プレイヤーが敵の上にある場合（敵を踏んだ場合）
 		if (playerPos.y > enemyPos.y + kHeightDifferenceThreshold){
@@ -163,6 +162,9 @@ void NoteEnemy::OnCollision(Character* other){
 
 			// 段が移動した、または上下の面に触れた場合に音符に変わる
 			isChangedNote_ = true;
+
+			//姿勢をリセット
+			models_[0]->transform.rotate = {0.0f,-1.5f,0.0f};
 
 			if (!isChainEnemy_){
 				//つながっていない場合単体の音符になる
@@ -225,6 +227,45 @@ void NoteEnemy::Move(){
 		models_[0]->transform.translate.x -= moveSpeed_ * noteSpeedMagnification_ * kDeltaTime;
 	} else{
 		models_[0]->transform.translate.x -= moveSpeed_  * kDeltaTime;
+	}
+}
+
+void NoteEnemy::MovingMotion(){
+	//音符の時の移動モーション
+	if (isChangedNote_){
+		static float motionTime = 0.0f; // 時間を保持する変数
+		float swayFrequency = 5.0f;     // 揺れの速さ（調整可能）
+		float swayAmplitude = 0.007f;     // 揺れの幅（調整可能）
+
+		// 時間の経過を加算
+		motionTime += 0.0166f;
+
+		// sin関数で横揺れの変位を計算
+		float swayOffset = swayAmplitude * sin(swayFrequency * motionTime);
+
+		// X座標に揺れのオフセットを適用
+		models_[0]->transform.rotate.z += swayOffset * FPSKeeper::DeltaTime();
+
+	}
+
+	//敵状態の移動モーション
+	else{
+		
+		static float motionTime = 0.0f; // 時間を保持する変数
+		float swayFrequency = 5.0f;     // 揺れの速さ（調整可能）
+		float swayAmplitude = 0.007f;     // 揺れの幅（調整可能）
+
+		// 時間の経過を加算
+		motionTime += 0.0166f;
+
+		// sin関数で横揺れの変位を計算
+		float swayOffset = swayAmplitude * sin(swayFrequency * motionTime);
+
+		// X座標に揺れのオフセットを適用
+		models_[0]->transform.rotate.y += swayOffset * FPSKeeper::DeltaTime();
+		models_[0]->transform.rotate.x += swayOffset * FPSKeeper::DeltaTime();
+
+		models_[0]->transform.scale.y += swayOffset * FPSKeeper::DeltaTime();
 	}
 }
 
