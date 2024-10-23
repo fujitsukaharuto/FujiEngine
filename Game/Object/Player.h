@@ -34,6 +34,8 @@ public:
 
     bool GetGameover() { return isGameover; }
 
+    bool GameOverUpdate();
+
 private:
     /// <summary>
     /// 移動
@@ -75,6 +77,7 @@ private:
 
 
     bool isGameover = false;
+    float gameoverTime = 180.0f;
 
     SoundData knockBackSE_;
     SoundData junpSE_;

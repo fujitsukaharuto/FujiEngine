@@ -11,6 +11,7 @@
 #include "MatrixCalculation.h"
 #include "SceneManager.h"
 #include "Field/Field.h"
+#include "CameraManager.h"
 
 #include <algorithm>
 #undef max
@@ -390,4 +391,36 @@ void Player::OnCollision(Character* other){
 		SceneManager::GetInstance()->SetGameOver(true);
 		isGameover = true;
 	}
+}
+
+bool Player::GameOverUpdate() {
+
+	if (gameoverTime >= 0.0f) {
+
+		gameoverTime -= FPSKeeper::DeltaTime();
+
+
+		if (130.0f <= gameoverTime && 128.0f <= gameoverTime) {
+			emit.RandomTranslate({ -5.5f,1.5f }, { -1.6f,1.6f }, { -4.0f,-4.0f });
+			emit.pos = GetCenterPos();
+			emit.BurstAnime();
+			CameraManager::GetInstance()->GetCamera()->SetShakeTime(40.0f);
+		}
+		if (80.0f <= gameoverTime && 78.0f <= gameoverTime) {
+			emit.RandomTranslate({ -5.5f,1.5f }, { -1.6f,1.6f }, { -4.0f,-4.0f });
+			emit.pos = GetCenterPos();
+			emit.BurstAnime();
+			CameraManager::GetInstance()->GetCamera()->SetShakeTime(40.0f);
+		}if (30.0f <= gameoverTime && 28.0f <= gameoverTime) {
+			emit.RandomTranslate({ -5.5f,1.5f }, { -1.6f,1.6f }, { -4.0f,-4.0f });
+			emit.pos = GetCenterPos();
+			emit.BurstAnime();
+			CameraManager::GetInstance()->GetCamera()->SetShakeTime(40.0f);
+		}
+	}
+	else {
+		return false;
+	}
+
+	return true;
 }

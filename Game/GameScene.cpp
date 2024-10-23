@@ -223,6 +223,13 @@ void GameScene::Update(){
 		}
 		ParticleManager::GetInstance()->Update();
 	}
+
+	else if (isGameover_) {
+		if (!player_->GameOverUpdate()) {
+			SceneManager::GetInstance()->ChangeScene("RESULT", 40.0f);
+		}
+		ParticleManager::GetInstance()->Update();
+	}
 	/////////////////////////////////////////////////////////////////////////////////////////
 	//									ゲームプレイ中の更新
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -363,7 +370,7 @@ void GameScene::Update(){
 		CollisionManager::GetInstance()->CheckAllCollidion();
 
 		if (player_->GetGameover()) {
-			SceneManager::GetInstance()->ChangeScene("RESULT", 40.0f);
+			isGameover_ = true;
 		}
 		if (boss_->GetClear()) {
 			isClear_ = true;
