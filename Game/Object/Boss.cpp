@@ -31,7 +31,7 @@ Boss::Boss() : Character(std::make_unique<SphereCollider>()), stopMoveTimer_(0){
 	CollisionManager::GetInstance()->AddCollider(this);
 
 	//初期値として20
-	life_ = 20;
+	life_ = 32;
 	kMaxLife_ = life_;
 
 	// 調整項目
