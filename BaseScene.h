@@ -23,6 +23,8 @@ public:
 
 	virtual void Draw();
 
+	virtual void SpriteDraw();
+
 	void Init();
 
 

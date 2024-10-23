@@ -38,10 +38,12 @@ void ResultScene::Initialize() {
 
 
 		boss = new Object3d();
-		boss->Create("boss.obj");
+		boss->Create("boss_damage.obj");
 		boss->SetCameraParent(true);
+		boss->transform.translate.x = 3.0f;
+		boss->transform.translate.y = -5.0f;
 		boss->transform.translate.z = 60.0f;
-		boss->transform.rotate.y = 3.7f;
+		boss->transform.rotate.y = 3.74f;
 
 	}
 	if (SceneManager::GetInstance()->GetGameover()) {

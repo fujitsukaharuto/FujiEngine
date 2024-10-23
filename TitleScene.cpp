@@ -15,6 +15,7 @@ TitleScene::TitleScene() {}
 
 TitleScene::~TitleScene() {
 	delete sphere;
+	delete space;
 }
 
 void TitleScene::Initialize() {
@@ -27,6 +28,12 @@ void TitleScene::Initialize() {
 	sphere->CreateSphere();
 
 	CameraManager::GetInstance()->GetCamera()->transform = { { 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, { 0.0f,3.5f,-20.0f } };
+
+	space = new Sprite();
+	space->Load("keyboard_space.png");
+	space->SetPos({ 640.0f,550.0f,0.0f });
+	space->SetSize({ 200.0f,100.0f });
+
 
 }
 
@@ -88,12 +95,17 @@ void TitleScene::Draw() {
 #pragma region 前景スプライト
 
 	dxCommon_->PreSpriteDraw();
+	space->Draw();
 
 #pragma endregion
 
 
 
 
+}
+
+void TitleScene::SpriteDraw() {
+	space->Draw();
 }
 
 void TitleScene::ApplyGlobalVariables() {

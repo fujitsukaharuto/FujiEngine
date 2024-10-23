@@ -126,6 +126,8 @@ void SceneManager::Draw() {
 		triangleR_->Draw();
 	}
 
+	scene_->SpriteDraw();
+
 }
 
 void SceneManager::StartScene(const std::string& sceneName) {
