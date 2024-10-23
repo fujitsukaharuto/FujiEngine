@@ -34,10 +34,11 @@ Boss::Boss() : Character(std::make_unique<SphereCollider>()), stopMoveTimer_(0){
 	life_ = 20;
 	kMaxLife_ = life_;
 
-	//調整項目
+	// 調整項目
 	const char* groupName = "boss";
 	GlobalVariables::GetInstance()->CreateGroup(groupName);
-	GlobalVariables::GetInstance()->AddItem(groupName, "moveSpeed", moveSpeed_);
+	GlobalVariables::GetInstance()->AddItem(groupName, "forwardMoveSpeed", forwardMoveSpeed_);
+	GlobalVariables::GetInstance()->AddItem(groupName, "backwardMoveSpeed", backwardMoveSpeed_);
 	GlobalVariables::GetInstance()->AddItem(groupName, "life", life_);
 }
 
@@ -115,10 +116,10 @@ void Boss::Update(){
 		if (retreatTimer_ == 0){
 			// isHitCapsel_がtrueならmoveSpeed_を負の値に設定
 			if (isHitCapsel_){
-				moveSpeed_ = -fabs(moveSpeed_);
+				//moveSpeed_ = -fabs(moveSpeed_);
 			} else{
 				// それ以外の場合は正の速度に戻す
-				moveSpeed_ = fabs(moveSpeed_);
+				//moveSpeed_ = fabs(moveSpeed_);
 
 				// 音声の停止とフラグのリセット
 				Audio::GetInstance()->SoundStopWave(bossDamage);
@@ -126,8 +127,6 @@ void Boss::Update(){
 				isChorusu = false;
 				isDamagePaticle = false;
 			}
-
-
 		}
 	}
 
@@ -332,26 +331,26 @@ void Boss::Draw(){
 }
 
 void Boss::Move(){
-
-	//前に進んでいつとき
-	if (moveSpeed_ > 0){
+	// 前進時の処理
+	if (retreatTimer_ == 0){
 		MovementMotion();
 		models_[0]->transform.rotate.x = 0.0f;
+		models_[0]->transform.translate.x += forwardMoveSpeed_ * FPSKeeper::DeltaTime();
 	} else{
-		//攻撃を受けて後ろに下がるときは回転をリセット
+		// 後退時の処理
 		models_[0]->transform.rotate.z = 0.0f;
 		models_[0]->transform.rotate.x = -0.3f;
+		models_[0]->transform.translate.x += backwardMoveSpeed_ * FPSKeeper::DeltaTime();
 	}
 
-	// 移動速度が0の場合は移動しない（停止中）
-	models_[0]->transform.translate.x += moveSpeed_ * FPSKeeper::DeltaTime();
-
+	// ワールドマトリックスの更新
 	models_[0]->UpdateWorldMat();
 }
 
 void Boss::ApplyGlobalVariables(){
 	const char* groupName = "boss";
-	moveSpeed_ = GlobalVariables::GetInstance()->GetFloatValue(groupName, "moveSpeed");
+	forwardMoveSpeed_ = GlobalVariables::GetInstance()->GetFloatValue(groupName, "forwardMoveSpeed");
+	backwardMoveSpeed_ = GlobalVariables::GetInstance()->GetFloatValue(groupName, "backwardMoveSpeed");
 	life_ = GlobalVariables::GetInstance()->GetIntValue(groupName, "life");
 }
 
@@ -459,7 +458,7 @@ void Boss::OnCollision(Character* other){
 
 		// ボスを後退させる
 		life_--;
-		moveSpeed_ *= -1;  // ボスの後退速度を設定 (負の値で後退)
+		//moveSpeed_ *= -1;  // ボスの後退速度を設定 (負の値で後退)
 
 		retreatTimer_ = 60;  // 60フレーム（1秒間）後退
 
