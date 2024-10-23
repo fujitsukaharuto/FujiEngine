@@ -48,6 +48,12 @@ private:
 
     virtual Vector3 GetCenterPos()const override;
 
+    /// <summary>
+    /// ノックバック状態を返す
+    /// </summary>
+    /// <returns></returns>
+    bool GetIsKnockback()const{ return isKnockedBack_; }
+
 private:
     //移動スピード
     float moveSpeed_ = 0.1f;

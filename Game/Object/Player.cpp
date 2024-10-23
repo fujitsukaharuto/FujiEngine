@@ -119,8 +119,28 @@ void Player::Update(){
 void Player::Draw(){
 
 	if (isAlive_){
-		Character::Draw();
+		if (!isKnockedBack_){
+			Character::Draw();
+		} else{
+			// ノックバック中はちらちらする処理
+			static float flickerTimer = 0.0f;
+			float flickerDuration = 0.1f; // ちらちらする間隔（秒単位、調整可能）
+
+			flickerTimer += 0.0166f; // deltaTimeは時間の経過を表す変数
+
+			// ちらちらのタイミングで描画
+			if (static_cast< int >(flickerTimer / flickerDuration) % 2 == 0){
+				Character::Draw(); // ちらちらのタイミングでのみ描画する
+			}
+
+			// タイマーをリセットしてループさせる
+			if (flickerTimer >= flickerDuration * 2.0f){
+				flickerTimer = 0.0f;
+			}
+		}
 	}
+
+
 }
 
 void Player::Move(){
@@ -235,8 +255,8 @@ void Player::OnCollision(Character* other){
 		// 同じ高さで衝突した場合の処理
 		if (std::abs(playerPos.y - enemyPos.y) <= 1.0f){
 
-			//音符じゃないときは攻撃を受ける
-			if (!noteEnemy->GetIsChangedNote()){
+			//音符じゃないときかつノックバック中は攻撃を受ける
+			if (!noteEnemy->GetIsChangedNote()&&!isKnockedBack_){
 				// ノックバック処理
 				 // プレイヤーと敵のX座標の差を計算して、ノックバックの方向を決定
 				float xDifference = playerPos.x - enemyPos.x;
@@ -287,28 +307,32 @@ void Player::OnCollision(Character* other){
 		Vector3 playerPos = playerCollider->GetPosition();
 		Vector3 bossPos = bossCollider->GetPosition();
 
-		// プレイヤーがボスと衝突した際に右方向（+X方向）に飛ばす
-		const float kBossCollisionXVelocity = 0.2f;  // 右方向に飛ばす速度
-		const float kBossCollisionYVelocity = 0.3f;  // 上方向に飛ばす速度
+		if (!isKnockedBack_){
 
-		// X方向の速度を設定して右に飛ばす
-		velocity_.x = kBossCollisionXVelocity;
-		// Y方向の速度も設定してジャンプさせる
-		velocity_.y = kBossCollisionYVelocity;
+			// プレイヤーがボスと衝突した際に右方向（+X方向）に飛ばす
+			const float kBossCollisionXVelocity = 0.2f;  // 右方向に飛ばす速度
+			const float kBossCollisionYVelocity = 0.3f;  // 上方向に飛ばす速度
 
-		// プレイヤーをボスから少し右に押し出す
-		playerPos.x += 0.5f;  // 右方向に押し出す距離を調整
-		playerCollider->SetPosition(playerPos);
+			// X方向の速度を設定して右に飛ばす
+			velocity_.x = kBossCollisionXVelocity;
+			// Y方向の速度も設定してジャンプさせる
+			velocity_.y = kBossCollisionYVelocity;
 
-		// ノックバック状態に設定
-		isKnockedBack_ = true;
-		knockbackTimer_ = 0.5f;  // ノックバックの継続時間を設定
+			// プレイヤーをボスから少し右に押し出す
+			playerPos.x += 0.5f;  // 右方向に押し出す距離を調整
+			playerCollider->SetPosition(playerPos);
 
-		life_--;
-		Audio::GetInstance()->SoundPlayWave(damageSE_);
-		emit.RandomTranslate({-1.5f,-1.5f}, {0.0f,0.0f}, {-8.0f,-8.0f});
-		emit.pos = GetCenterPos();
-		emit.BurstAnime();
+			// ノックバック状態に設定
+			isKnockedBack_ = true;
+			knockbackTimer_ = 0.5f;  // ノックバックの継続時間を設定
+
+			life_--;
+			Audio::GetInstance()->SoundPlayWave(damageSE_);
+			emit.RandomTranslate({-1.5f,-1.5f}, {0.0f,0.0f}, {-8.0f,-8.0f});
+			emit.pos = GetCenterPos();
+			emit.BurstAnime();
+		}
+
 	}
 
 	// 障害物と衝突したとき
@@ -326,36 +350,39 @@ void Player::OnCollision(Character* other){
 		// 履歴に登録
 		record_.AddRecord(serialNum);
 
-		Vector3 playerPos = playerCollider->GetPosition();
-		Vector3 obstaclePos = obstacleCollider->GetPosition();
+		if (!isKnockedBack_){
+			Vector3 playerPos = playerCollider->GetPosition();
+			Vector3 obstaclePos = obstacleCollider->GetPosition();
 
-		// プレイヤーと障害物のX座標の差を計算
-		float xDifference = playerPos.x - obstaclePos.x;
+			// プレイヤーと障害物のX座標の差を計算
+			float xDifference = playerPos.x - obstaclePos.x;
 
-		// ノックバックの方向を決定（右から衝突：右に、左から衝突：左に飛ばす）
-		knockbackDirection_ = (xDifference > 0) ? 1.0f : -1.0f;
+			// ノックバックの方向を決定（右から衝突：右に、左から衝突：左に飛ばす）
+			knockbackDirection_ = (xDifference > 0) ? 1.0f : -1.0f;
 
-		const float kObstacleCollisionXVelocity = 0.2f * knockbackDirection_;  // 水平方向の速度
-		const float kObstacleCollisionYVelocity = 0.3f;  // 上方向の速度
+			const float kObstacleCollisionXVelocity = 0.2f * knockbackDirection_;  // 水平方向の速度
+			const float kObstacleCollisionYVelocity = 0.3f;  // 上方向の速度
 
-		// X方向の速度を設定
-		velocity_.x = kObstacleCollisionXVelocity;
-		// Y方向の速度も設定
-		velocity_.y = kObstacleCollisionYVelocity;
+			// X方向の速度を設定
+			velocity_.x = kObstacleCollisionXVelocity;
+			// Y方向の速度も設定
+			velocity_.y = kObstacleCollisionYVelocity;
 
-		// プレイヤーを障害物から少し押し出す（右方向または左方向）
-		playerPos.x += 0.5f * knockbackDirection_;
-		playerCollider->SetPosition(playerPos);
+			// プレイヤーを障害物から少し押し出す（右方向または左方向）
+			playerPos.x += 0.5f * knockbackDirection_;
+			playerCollider->SetPosition(playerPos);
 
-		// ノックバック状態に設定
-		isKnockedBack_ = true;
-		knockbackTimer_ = 0.5f;  // ノックバックの継続時間を設定
+			// ノックバック状態に設定
+			isKnockedBack_ = true;
+			knockbackTimer_ = 0.5f;  // ノックバックの継続時間を設定
 
-		life_--;
-		Audio::GetInstance()->SoundPlayWave(damageSE_);
-		emit.RandomTranslate({-3.5f,-3.5f}, {-0.2f,-0.2f}, {-4.0f,-4.0f});
-		emit.pos = GetCenterPos();
-		emit.BurstAnime();
+			life_--;
+			Audio::GetInstance()->SoundPlayWave(damageSE_);
+			emit.RandomTranslate({-3.5f,-3.5f}, {-0.2f,-0.2f}, {-4.0f,-4.0f});
+			emit.pos = GetCenterPos();
+			emit.BurstAnime();
+
+		}
 	}
 
 	if (life_ == 0) {
