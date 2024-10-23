@@ -124,6 +124,7 @@ void Boss::Update(){
 				Audio::GetInstance()->SoundStopWave(bossDamage);
 				isPlay = false;
 				isChorusu = false;
+				isDamagePaticle = false;
 			}
 
 
