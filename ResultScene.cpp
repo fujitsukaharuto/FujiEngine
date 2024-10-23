@@ -20,6 +20,7 @@ ResultScene::~ResultScene() {
 	}
 	delete boss;
 	delete sky;
+	delete space;
 }
 
 void ResultScene::Initialize() {
@@ -95,6 +96,11 @@ void ResultScene::Initialize() {
 		chorus.push_back(newCho);
 	}
 
+
+	space = new Sprite();
+	space->Load("result_space.png");
+	space->SetPos({ 960.0f,450.0f,0.0f });
+	space->SetSize({ 300.0f,150.0f });
 
 	CameraManager::GetInstance()->GetCamera()->transform = { { 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, { 0.0f,3.5f,-20.0f } };
 
@@ -215,6 +221,7 @@ void ResultScene::Draw() {
 #pragma region 前景スプライト
 
 	dxCommon_->PreSpriteDraw();
+	space->Draw();
 
 #pragma endregion
 

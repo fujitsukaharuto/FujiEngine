@@ -33,4 +33,6 @@ private:
 	float amplitude = 0.15f;
 	float frequency = 0.01f;
 
+	Sprite* space = nullptr;
+
 };
