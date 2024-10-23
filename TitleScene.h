@@ -23,5 +23,6 @@ private:
 	Object3d* sphere = nullptr;
 	Vector3 rightDir = { 1.0f,0.0f,0.0f };
 	Sprite* space = nullptr;
+	Object3d* title = nullptr;
 
 };

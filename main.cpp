@@ -142,12 +142,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	modelManager->LoadOBJ("clear.obj");
 	modelManager->LoadOBJ("gameOver.obj");
 	modelManager->LoadOBJ("boss_damage.obj");
-
+	modelManager->LoadOBJ("Title.obj");
 
 
 	textureManager->Load("curtain.png");
 	textureManager->Load("curtain02.png");
-	textureManager->Load("keyboard_space.png");
+	textureManager->Load("space.png");
 
 
 	//BYTE keys[256] = { 0 };

@@ -27,12 +27,18 @@ void TitleScene::Initialize() {
 	sphere = new Object3d();
 	sphere->CreateSphere();
 
+	title = new Object3d();
+	title->Create("Title.obj");
+	title->transform.rotate.y = 3.14f;
+	title->transform.translate.y = 4.0f;
+	title->transform.scale = { 2.5f,2.5f,2.5f };
+
 	CameraManager::GetInstance()->GetCamera()->transform = { { 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, { 0.0f,3.5f,-20.0f } };
 
 	space = new Sprite();
-	space->Load("keyboard_space.png");
+	space->Load("space.png");
 	space->SetPos({ 640.0f,550.0f,0.0f });
-	space->SetSize({ 200.0f,100.0f });
+	space->SetSize({ 400.0f,200.0f });
 
 
 }
@@ -95,7 +101,7 @@ void TitleScene::Draw() {
 #pragma region 前景スプライト
 
 	dxCommon_->PreSpriteDraw();
-	space->Draw();
+
 
 #pragma endregion
 
@@ -105,6 +111,12 @@ void TitleScene::Draw() {
 }
 
 void TitleScene::SpriteDraw() {
+
+	dxCommon_->ClearDepthBuffer();
+	obj3dCommon->PreDraw();
+	title->Draw();
+
+	dxCommon_->PreSpriteDraw();
 	space->Draw();
 }
 
