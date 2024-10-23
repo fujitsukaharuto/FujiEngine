@@ -71,6 +71,7 @@ void NoteEnemy::Initialize(Object3d* model, const Vector3& initPos){
 	const char* groupName = "noteEnemy";
 	GlobalVariables::GetInstance()->CreateGroup(groupName);
 	GlobalVariables::GetInstance()->AddItem(groupName, "noteSpeedMagnification", noteSpeedMagnification_);
+	GlobalVariables::GetInstance()->AddItem(groupName, "moveSpeed", moveSpeed_);
 }
 
 void NoteEnemy::Update(){
@@ -80,8 +81,8 @@ void NoteEnemy::Update(){
 
 	
 
-	//移動速度の更新
-	moveSpeed_ = Field::influenceOnSpeed_[fieldIndex_];
+	////移動速度の更新
+	//moveSpeed_ = Field::influenceOnSpeed_[fieldIndex_];
 
 	//音符に変わったらモデルを変える
 	if (isChangedNote_){
@@ -234,7 +235,7 @@ Vector3 NoteEnemy::GetCenterPos() const{
 void NoteEnemy::ApplyGlobalVariabls(){
 	const char* groupName = "noteEnemy";
 	noteSpeedMagnification_ = GlobalVariables::GetInstance()->GetFloatValue(groupName, "noteSpeedMagnification");
-
+	moveSpeed_ = GlobalVariables::GetInstance()->GetFloatValue(groupName, "moveSpeed");
 }
 
 

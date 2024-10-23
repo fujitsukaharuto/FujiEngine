@@ -1,5 +1,6 @@
 {
     "noteEnemy": {
-        "noteSpeedMagnification": 2.0829999446868896
+        "moveSpeed": 4.0,
+        "noteSpeedMagnification": 2.0
     }
 }
