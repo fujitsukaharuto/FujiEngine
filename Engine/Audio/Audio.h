@@ -63,6 +63,8 @@ public:
 
 	void SoundPlayWave(SoundData& soundData, float volume = 0.2f);
 
+	void SoundLoop(SoundData& soundData, float volume = 0.2f);
+
 	void SoundStopWave(SoundData& soundData);
 
 private:

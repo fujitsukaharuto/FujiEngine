@@ -80,7 +80,7 @@ void Boss::Initialize(std::vector<Object3d*> models){
 
 	for (int i = 0; i < 10; i++) {
 		Object3d* newDama = new Object3d();
-		newDama->Create("ICO.obj");
+		newDama->Create("star.obj");
 		damage.push_back(newDama);
 	}
 

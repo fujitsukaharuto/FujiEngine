@@ -128,7 +128,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 
-	modelManager->LoadOBJ("ICO.obj");
+	modelManager->LoadOBJ("star.obj");
 	modelManager->LoadOBJ("ground.obj");
 	modelManager->LoadOBJ("skyCube.obj");
 	modelManager->LoadOBJ("player.obj"); 

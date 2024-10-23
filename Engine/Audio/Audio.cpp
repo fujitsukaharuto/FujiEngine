@@ -162,6 +162,29 @@ void Audio::SoundPlayWave(SoundData& soundData, float volume)
 	soundData.pSourceVoices.push_back(pSourceVoice);
 }
 
+void Audio::SoundLoop(SoundData& soundData, float volume) {
+
+	HRESULT result;
+
+	IXAudio2SourceVoice* pSourceVoice = nullptr;
+	result = xAudio2_->CreateSourceVoice(&pSourceVoice, &soundData.wfex);
+	assert(SUCCEEDED(result));
+
+	result = pSourceVoice->SetVolume(volume);
+	assert(SUCCEEDED(result));
+
+	XAUDIO2_BUFFER buf{};
+	buf.pAudioData = soundData.pBuffer;
+	buf.AudioBytes = soundData.bufferSize;
+	buf.Flags = XAUDIO2_END_OF_STREAM;
+	buf.LoopCount = XAUDIO2_LOOP_INFINITE;
+
+	result = pSourceVoice->SubmitSourceBuffer(&buf);
+	result = pSourceVoice->Start();
+
+	soundData.pSourceVoices.push_back(pSourceVoice);
+}
+
 void Audio::SoundStopWave(SoundData& soundData) {
 
 	for (auto& voice : soundData.pSourceVoices) {

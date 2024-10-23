@@ -94,6 +94,9 @@ private:
 	Vector3 curtainRightPos_{};
 
 
+	SoundData bgm;
+	bool isSound = false;
+
 	bool Clear = true;
 	bool gameover = false;
 

@@ -72,7 +72,7 @@ void SceneManager::Initialize() {
 	cut.pos = { 640.0f,360.0f,0.0f,0.0f };
 	cut.radius = { 0.0f,0.0f,0.0f,0.0f };
 
-
+	bgm = Audio::GetInstance()->SoundLoadWave("04.wav");
 }
 
 void SceneManager::Finalize() {
@@ -81,6 +81,10 @@ void SceneManager::Finalize() {
 
 void SceneManager::Update() {
 
+	if (!isSound && nowScene != "RESULT") {
+		Audio::GetInstance()->SoundLoop(bgm, 0.02f);
+		isSound = true;
+	}
 
 	if (!isChange_) {
 		scene_->Update();
@@ -204,6 +208,8 @@ void SceneManager::ChangeScene(const std::string& sceneName, float extraTime) {
 		}
 	}
 	else if (sceneName == "RESULT") {
+		isSound = false;
+		Audio::GetInstance()->SoundStopWave(bgm);
 		isClose_ = true;
 		isOpen_ = false;
 		DXCom::GetInstance()->SetCut(false);
