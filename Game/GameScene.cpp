@@ -304,10 +304,12 @@ void GameScene::Update(){
 		//プレイヤーの更新
 		player_->Update();
 
-		//ボスの更新
- 		boss_->Update();
+	
 
 		enemyManager_->Update();
+
+		//ボスの更新
+		boss_->Update();
 
 		//つながった敵と当たってる時を判定します
 		for (auto chainEnemy : enemyManager_->GetChainEnemyList()){
