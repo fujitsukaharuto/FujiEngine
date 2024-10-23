@@ -144,6 +144,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	modelManager->LoadOBJ("gameOver.obj");
 	modelManager->LoadOBJ("boss_damage.obj");
 	modelManager->LoadOBJ("Title.obj");
+	modelManager->LoadOBJ("result.obj");
 
 
 	textureManager->Load("curtain.png");

@@ -19,6 +19,7 @@ ResultScene::~ResultScene() {
 		delete chorus[i];
 	}
 	delete boss;
+	delete sky;
 }
 
 void ResultScene::Initialize() {
@@ -27,6 +28,11 @@ void ResultScene::Initialize() {
 	obj3dCommon.reset(new Object3dCommon());
 	obj3dCommon->Initialize();
 
+	sky = new Object3d();
+	sky->Create("result.obj");
+	sky->transform.rotate.y = -3.14f;
+	sky->transform.translate = { 0.0f,-0.3f,-18.0f };
+	sky->transform.scale = { 3.4f,6.0f,13.7f };
 
 
 	if (SceneManager::GetInstance()->GetClear()) {
@@ -180,6 +186,11 @@ void ResultScene::Update() {
 void ResultScene::Draw() {
 
 #pragma region 背景描画
+
+	dxCommon_->ClearDepthBuffer();
+	obj3dCommon->PreDraw();
+
+	sky->Draw();
 
 
 	dxCommon_->ClearDepthBuffer();

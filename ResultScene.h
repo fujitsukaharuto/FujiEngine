@@ -26,7 +26,7 @@ private:
 	float defoSize = 1.0f;
 	float moveTime = 0.0f;
 
-
+	Object3d* sky = nullptr;
 	Object3d* boss = nullptr;
 	std::vector<Object3d*> chorus;
 	float chorusTime = 0.0f;
