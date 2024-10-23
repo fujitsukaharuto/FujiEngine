@@ -8,6 +8,7 @@
 #include "GlobalVariables/GlobalVariables.h"
 #include "CameraManager.h"
 #include "SceneManager.h"
+#include "Random.h"
 
 #include <thread>
 #include <numbers>
@@ -45,6 +46,9 @@ Boss::~Boss(){
 	for (int i = 0; i < 6; i++){
 		delete choruth[i];
 	}
+	for (int i = 0; i < 10; i++) {
+		delete damage[i];
+	}
 }
 
 void Boss::Initialize(std::vector<Object3d*> models){
@@ -72,6 +76,14 @@ void Boss::Initialize(std::vector<Object3d*> models){
 		newCho->transform.rotate.y = 3.14f;
 		choruth.push_back(newCho);
 	}
+
+
+	for (int i = 0; i < 10; i++) {
+		Object3d* newDama = new Object3d();
+		newDama->Create("ICO.obj");
+		damage.push_back(newDama);
+	}
+
 
 	emit.name = "bossHit";
 	emit.count = 1;
@@ -103,6 +115,7 @@ void Boss::Update(){
 			Audio::GetInstance()->SoundStopWave(bossDamage);
 			isPlay = false;
 			isChorusu = false;
+			isDamagePaticle = false;
 		}
 	}
 
@@ -139,6 +152,13 @@ void Boss::Update(){
 			choruthTime = 0.0f;
 			choruth[i]->transform.rotate.z = 0.0f;
 			choruth[i]->transform.scale.y = 1.0f;
+		}
+	}
+
+	if (isDamagePaticle) {
+		for (int i = 0; i < 10; i++) {
+			damage[i]->transform.translate += particleSpeed[i] * FPSKeeper::DeltaTime();
+			particleSpeed[i].y -= 0.0175f * FPSKeeper::DeltaTime();
 		}
 	}
 
@@ -284,6 +304,13 @@ void Boss::Draw(){
 	for (int i = 0; i < 6; i++){
 		choruth[i]->Draw();
 	}
+
+	if (isDamagePaticle) {
+		for (int i = 0; i < 10; i++) {
+			damage[i]->Draw();
+		}
+	}
+
 	float offset = 10.0f;
 	float linePosX = models_[0]->transform.translate.x + offset;
 	Field::fieldEndPosX = linePosX;
@@ -374,14 +401,50 @@ void Boss::OnCollision(Character* other){
 		moveSpeed_ *= -1;  // ボスの後退速度を設定 (負の値で後退)
 		retreatTimer_ = 90;  // 60フレーム（1秒間）後退
 		int32_t lifePareto = kMaxLife_ / 4;
+		// 残り4分の3の時
 		if (lifePareto * 3 == life_) {
 			models_[0]->SetTexture("boss_state1.png");
+			// Particleを出す
+			if (!isDamagePaticle) {
+				particleSpeed.clear();
+				for (int i = 0; i < 10; i++) {
+					damage[i]->transform.translate = GetCenterPos();
+					float randSize = Random::GetFloat(0.3f, 0.6f);
+					damage[i]->transform.scale = { randSize,randSize ,randSize };
+					particleSpeed.push_back(Random::GetVector3({ -0.4f,0.2f }, { 0.2f,0.5f }, { -0.3f,-0.2f }));
+				}
+				isDamagePaticle = true;
+			}
 		}
+		// 残り4分の2の時
 		if (lifePareto * 2 == life_) {
 			models_[0]->SetTexture("boss_state2.png");
+			// Particleを出す
+			if (!isDamagePaticle) {
+				particleSpeed.clear();
+				for (int i = 0; i < 10; i++) {
+					damage[i]->transform.translate = GetCenterPos();
+					float randSize = Random::GetFloat(0.3f, 0.6f);
+					damage[i]->transform.scale = { randSize,randSize ,randSize };
+					particleSpeed.push_back(Random::GetVector3({ -0.4f,0.2f }, { 0.2f,0.5f }, { -0.3f,-0.2f }));
+				}
+				isDamagePaticle = true;
+			}
 		}
+		// 残り4分の1の時
 		if (lifePareto == life_) {
 			models_[0]->SetTexture("boss_state3.png");
+			// Particleを出す
+			if (!isDamagePaticle) {
+				particleSpeed.clear();
+				for (int i = 0; i < 10; i++) {
+					damage[i]->transform.translate = GetCenterPos();
+					float randSize = Random::GetFloat(0.3f, 0.6f);
+					damage[i]->transform.scale = { randSize,randSize ,randSize };
+					particleSpeed.push_back(Random::GetVector3({ -0.4f,0.2f }, { 0.2f,0.5f }, { -0.3f,-0.2f }));
+				}
+				isDamagePaticle = true;
+			}
 		}
 	}
 

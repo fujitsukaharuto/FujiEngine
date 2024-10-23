@@ -92,6 +92,7 @@ void TitleScene::Update() {
 	if (startTime <= 0.0f) {
 		if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
 			phaseChange = true;
+			SceneManager::GetInstance()->SetCutting(false);
 			DXCom::GetInstance()->SetCutRadius(1200.0f);
 		}
 	}

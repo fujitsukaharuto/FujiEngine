@@ -27,6 +27,7 @@ public:
 
 	BaseScene* CreateScene(const std::string& sceneName);
 
+	void SetCutting(bool is) { isCutting_ = is; }
 
 	void SetClear(bool is);
 	void SetGameOver(bool is);

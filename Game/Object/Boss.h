@@ -88,6 +88,9 @@ private:
     int32_t retreatTimer_ = 0;
 
 
+    std::vector<Object3d*> damage;
+    std::vector<Vector3> particleSpeed;
+    bool isDamagePaticle = false;
     int32_t kMaxLife_ = 0;
 
     // コーラス
