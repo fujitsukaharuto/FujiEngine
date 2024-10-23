@@ -14,8 +14,11 @@
 ResultScene::ResultScene() {}
 
 ResultScene::~ResultScene() {
-	delete sphere;
 	delete text;
+	for (int i = 0; i < 6; i++) {
+		delete chorus[i];
+	}
+	delete boss;
 }
 
 void ResultScene::Initialize() {
@@ -24,10 +27,6 @@ void ResultScene::Initialize() {
 	obj3dCommon.reset(new Object3dCommon());
 	obj3dCommon->Initialize();
 
-	sphere = new Object3d();
-	sphere->CreateSphere();
-	sphere->SetEnableLight(LightMode::kPointLightON);
-	sphere->SetColor({ 1.0f,0.0f,0.0f,1.0f });
 
 
 	if (SceneManager::GetInstance()->GetClear()) {
@@ -35,14 +34,58 @@ void ResultScene::Initialize() {
 		text->Create("clear.obj");
 		defoSize = 2.0f;
 		text->transform.scale = { defoSize,defoSize,defoSize };
+
+
+
+		boss = new Object3d();
+		boss->Create("boss.obj");
+		boss->SetCameraParent(true);
+		boss->transform.translate.z = 60.0f;
+		boss->transform.rotate.y = 3.7f;
+
 	}
 	if (SceneManager::GetInstance()->GetGameover()) {
 		text = new Object3d();
 		text->Create("gameOver.obj");
+
+
+
+		boss = new Object3d();
+		boss->Create("boss.obj");
+		boss->SetCameraParent(true);
+		boss->transform.translate.x = 3.0f;
+		boss->transform.translate.y = -5.0f;
+		boss->transform.translate.z = 60.0f;
+		boss->transform.rotate.y = 3.74f;
+
 	}
-	text->transform.translate.y = 4.0f;
+	text->SetCameraParent(true);
+	text->transform.translate.y = 1.0f;
+	text->transform.translate.z = 20.0f;
 	text->transform.rotate.y = -3.14f;
 	text->UpdateWorldMat();
+
+
+	for (int i = 0; i < 3; i++) {
+		Object3d* newCho = new Object3d();
+		newCho->Create("chorus.obj");
+		newCho->SetCameraParent(true);
+		newCho->transform.translate.x = 2.0f + 2.25f * i;
+		newCho->transform.translate.y = -6.3f;
+		newCho->transform.translate.z = 25.0f - i * 1.0f;
+		newCho->transform.rotate.y = 3.14f;
+		chorus.push_back(newCho);
+	}
+	for (int i = 0; i < 3; i++) {
+		Object3d* newCho = new Object3d();
+		newCho->Create("chorus.obj");
+		newCho->SetCameraParent(true);
+		newCho->transform.translate.x = -2.0f + -2.25f * i;
+		newCho->transform.translate.y = -6.3f;
+		newCho->transform.translate.z = 25.0f - i * 1.0f;
+		newCho->transform.rotate.y = 3.14f;
+		chorus.push_back(newCho);
+	}
 
 
 	CameraManager::GetInstance()->GetCamera()->transform = { { 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, { 0.0f,3.5f,-20.0f } };
@@ -53,18 +96,6 @@ void ResultScene::Update() {
 
 #ifdef _DEBUG
 
-
-	ImGui::Begin("Sphere");
-
-	ImGui::DragFloat3("scale", &sphere->transform.scale.x, 0.01f);
-	ImGui::DragFloat3("rotate", &sphere->transform.rotate.x, 0.01f);
-	ImGui::DragFloat3("right", &rightDir.x, 0.01f);
-	ImGui::DragFloat("ins", &ins, 0.1f);
-	rightDir = rightDir.Normalize();
-	sphere->SetRightDir(rightDir);
-	ImGui::End();
-
-	sphere->SetRightIntensity(ins);
 
 	ImGui::Begin("Scene");
 	ImGui::SeparatorText("ChangeScene");
@@ -86,7 +117,38 @@ void ResultScene::Update() {
 		SceneManager::GetInstance()->ChangeScene("TITLE", 40.0f);
 	}
 
-	sphere->transform.rotate.y += 0.02f;
+
+
+	for (int i = 0; i < 6; i++) {
+
+		// コーラスの移動とアニメーションの処理
+		if (chorus[i]->transform.translate.y > -6.45f) {
+			chorusTime += FPSKeeper::DeltaTime();
+
+			float sinVal = 0.0f;
+			if (i >= 3) {
+				sinVal = sin(frequency * chorusTime);
+				float angle = amplitude * sinVal;
+				chorus[i]->transform.rotate.z = angle;
+			}
+			else {
+				sinVal = sin(frequency * -chorusTime);
+				float angle = amplitude * sinVal;
+				chorus[i]->transform.rotate.z = angle;
+			}
+
+			float scaleMin = 0.7f;  // 最小サイズ
+			float scaleMax = 1.2f;  // 最大サイズ
+			float scaleRange = scaleMax - scaleMin;
+
+			float scale = scaleMin + (scaleRange * fabs(sinVal));
+			chorus[i]->transform.scale.y = scale;
+		}
+
+	}
+
+
+
 
 	if (moveTime <= 80.0f) {
 
@@ -118,8 +180,12 @@ void ResultScene::Draw() {
 
 #pragma region 3Dオブジェクト
 	obj3dCommon->PreDraw();
-	sphere->Draw();
 
+
+	for (int i = 0; i < 6; i++) {
+		chorus[i]->Draw();
+	}
+	boss->Draw();
 	text->Draw();
 
 	ParticleManager::GetInstance()->Draw();
