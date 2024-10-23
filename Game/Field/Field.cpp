@@ -32,7 +32,7 @@ void Field::Initialize(const std::array<Object3d*, 5>& models){
 
 	//0.1ずつ増加するとして初期化
 	for (size_t i = 0; i < 5; i++){
-		Vector3 initializePosition = Vector3 {-15.0f,0.0f + (kLineSpace_ * i),0.0f};
+		Vector3 initializePosition = Vector3 {-30.0f,0.0f + (kLineSpace_ * i),0.0f};
 
 		staffNotation_[i]->transform.translate = initializePosition;
 

@@ -37,6 +37,13 @@ private:
 
 	void ApplyGlobalVariables();//値読み込みテスト用今度Objectクラス作って継承で使えるようにする
 
+	/// <summary>
+	/// ゲームスタート前
+	/// </summary>
+	void UpdateBegine();
+
+private:
+
 	std::unique_ptr<Object3dCommon> obj3dCommon = nullptr;
 	std::unique_ptr<Camera> camera = nullptr;
 
@@ -95,8 +102,7 @@ private:
 
 	bool isDebugCameraMode_ = false;
 
-
-
+	bool isStartGame_ = false;
 
 	ParticleEmitter emit;
 
