@@ -87,7 +87,7 @@ private:
 	/// <summary>
 	/// 移動測度
 	/// </summary>
-	float moveSpeed_ = 0.012f;            // 移動速度
+	float moveSpeed_ = 0.035f;            // 移動速度
 	float forwardMoveSpeed_ = 0.02f;   // 前進するときの速度
 	float backwardMoveSpeed_ = -0.02f; // 後退するときの速度
 
