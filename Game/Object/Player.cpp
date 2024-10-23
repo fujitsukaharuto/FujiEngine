@@ -29,13 +29,22 @@ Player::Player() : Character(std::make_unique<SphereCollider>()){
 	CollisionManager::GetInstance()->AddCollider(this);
 
 
-	//初期値として5に設定
-	life_ = 5;
+	life_ = 4;
 
 	//調整項目
 	const char* groupName = "player";
 	GlobalVariables::GetInstance()->CreateGroup(groupName);
 	GlobalVariables::GetInstance()->AddItem(groupName, "life", life_);
+}
+
+Player::~Player(){
+
+	for (size_t i = 0; i < 4; i++){
+		if (lifeSprite_[i]){
+			delete lifeSprite_[i];
+
+		}
+	}
 }
 
 void Player::Initialize(std::vector<Object3d*> Object3ds){
@@ -56,8 +65,17 @@ void Player::Initialize(std::vector<Object3d*> Object3ds){
 	emit.animeData.startSize = {2.0f,2.0f};
 	emit.animeData.endSize = {2.0f,2.0f};
 
-	const char* groupName = "player";
-	life_ = GlobalVariables::GetInstance()->GetIntValue(groupName, "life");
+	life_ = 4;
+
+
+	///////////////////////////////////////////////////////////////
+	//スプライトの初期化
+	for (size_t i = 0; i < 4; i++){
+		lifeSprite_[i] = new Sprite();
+		lifeSprite_[i]->Load("heart.png");
+		lifeSprite_[i]->SetPos({1500.0f + (i * 80.0f), 190.0f, 0.0f});
+		lifeSprite_[i]->SetSize({64.0f,64.0f});
+	}
 }
 
 void Player::Update(){
@@ -116,6 +134,54 @@ void Player::Update(){
 	//生存フラグの管理
 	Character::Update();
 }
+
+float EaseOut(float start, float end, float t){
+	t = 1.0f - pow(1.0f - t, 3.0f);  // Ease out
+	return start + (end - start) * t;
+}
+
+void Player::UpdateUi(){
+	// 目標位置
+	Vector3 targetPosBase = {800.0f, 190.0f, 0.0f};
+	float delayBetweenSprites = 5.0f;  // 各スプライトの移動の遅延時間（秒）
+	float duration = 18.0f;  // 移動にかかる時間（秒）
+
+	static float elapsedTime = 0.0f;  // 経過時間を保持
+	static bool animationComplete = false; // アニメーションが完了したかどうかを追跡
+
+	// アニメーションが完了している場合は何もしない
+	if (animationComplete) return;
+
+	// フレーム間の時間を加算
+	elapsedTime += FPSKeeper::DeltaTime();
+
+	for (size_t i = 0; i < lifeSprite_.size(); i++){
+		// 各スプライトごとに、遅延時間を考慮して開始
+		float startTime = i * delayBetweenSprites;
+
+		// スプライトの移動を開始するか確認
+		if (elapsedTime > startTime){
+			// 経過時間から開始時間を引いて補間率を計算
+			float t = (elapsedTime - startTime) / duration;
+			if (t > 1.0f) t = 1.0f;  // tが1を超えないようにする
+
+			// 初期位置を画面外（仮の値 -100.0f）に設定
+			Vector3 initialPos = {1500.0f, targetPosBase.y, targetPosBase.z};
+			Vector3 targetPos = {targetPosBase.x + (i * 80.0f), targetPosBase.y, targetPosBase.z};
+
+			// EaseOut関数でX軸の位置を補間
+			float newX = EaseOut(initialPos.x, targetPos.x, t);
+			lifeSprite_[i]->SetPos({newX, targetPos.y, targetPos.z});
+		}
+	}
+
+	// すべてのスプライトの位置が移動完了したかチェック
+	if (elapsedTime > (lifeSprite_.size() - 1) * delayBetweenSprites + duration){
+		animationComplete = true;
+	}
+}
+
+
 
 void Player::Draw(){
 
@@ -257,7 +323,7 @@ void Player::OnCollision(Character* other){
 		if (std::abs(playerPos.y - enemyPos.y) <= 1.0f){
 
 			//音符じゃないときかつノックバック中は攻撃を受ける
-			if (!noteEnemy->GetIsChangedNote()&&!isKnockedBack_){
+			if (!noteEnemy->GetIsChangedNote() && !isKnockedBack_){
 				// ノックバック処理
 				 // プレイヤーと敵のX座標の差を計算して、ノックバックの方向を決定
 				float xDifference = playerPos.x - enemyPos.x;
@@ -282,7 +348,7 @@ void Player::OnCollision(Character* other){
 				// ダメージを受ける処理
 				life_--;
 				Audio::GetInstance()->SoundPlayWave(damageSE_, 0.05f);
-				emit.RandomTranslate({ -3.5f,-3.5f }, { -0.2f,-0.2f }, { -4.0f,-4.0f });
+				emit.RandomTranslate({-3.5f,-3.5f}, {-0.2f,-0.2f}, {-4.0f,-4.0f});
 				emit.pos = GetCenterPos();
 				emit.BurstAnime();
 			}
@@ -387,40 +453,48 @@ void Player::OnCollision(Character* other){
 		}
 	}
 
-	if (life_ == 0) {
+	if (life_ == 0){
 		SceneManager::GetInstance()->SetGameOver(true);
 		isGameover = true;
 	}
 }
 
-bool Player::GameOverUpdate() {
+bool Player::GameOverUpdate(){
 
-	if (gameoverTime >= 0.0f) {
+	if (gameoverTime >= 0.0f){
 
 		gameoverTime -= FPSKeeper::DeltaTime();
 
 
-		if (130.0f <= gameoverTime && 128.0f <= gameoverTime) {
-			emit.RandomTranslate({ -5.5f,1.5f }, { -1.6f,1.6f }, { -4.0f,-4.0f });
+		if (130.0f <= gameoverTime && 128.0f <= gameoverTime){
+			emit.RandomTranslate({-5.5f,1.5f}, {-1.6f,1.6f}, {-4.0f,-4.0f});
 			emit.pos = GetCenterPos();
 			emit.BurstAnime();
 			CameraManager::GetInstance()->GetCamera()->SetShakeTime(40.0f);
 		}
-		if (80.0f <= gameoverTime && 78.0f <= gameoverTime) {
-			emit.RandomTranslate({ -5.5f,1.5f }, { -1.6f,1.6f }, { -4.0f,-4.0f });
+		if (80.0f <= gameoverTime && 78.0f <= gameoverTime){
+			emit.RandomTranslate({-5.5f,1.5f}, {-1.6f,1.6f}, {-4.0f,-4.0f});
 			emit.pos = GetCenterPos();
 			emit.BurstAnime();
 			CameraManager::GetInstance()->GetCamera()->SetShakeTime(40.0f);
-		}if (30.0f <= gameoverTime && 28.0f <= gameoverTime) {
-			emit.RandomTranslate({ -5.5f,1.5f }, { -1.6f,1.6f }, { -4.0f,-4.0f });
+		}if (30.0f <= gameoverTime && 28.0f <= gameoverTime){
+			emit.RandomTranslate({-5.5f,1.5f}, {-1.6f,1.6f}, {-4.0f,-4.0f});
 			emit.pos = GetCenterPos();
 			emit.BurstAnime();
 			CameraManager::GetInstance()->GetCamera()->SetShakeTime(40.0f);
 		}
-	}
-	else {
+	} else{
 		return false;
 	}
 
 	return true;
+}
+
+void Player::DrawUi(){
+	// 現在のライフ数に基づいてスプライトを描画
+	for (size_t i = 0; i < 4; i++){
+		if (i < life_){  // 現在のライフ数以下のインデックスのスプライトのみ描画
+			lifeSprite_[i]->Draw();
+		}
+	}
 }

@@ -316,7 +316,7 @@ void GameScene::Update(){
 
 		//プレイヤーの更新
 		player_->Update();
-
+		player_->UpdateUi();
 	
 
 		enemyManager_->Update();
@@ -428,7 +428,7 @@ void GameScene::Draw(){
 
 	dxCommon_->PreSpriteDraw();
 
-
+	player_->DrawUi();
 
 #pragma endregion
 

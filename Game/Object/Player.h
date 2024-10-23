@@ -4,11 +4,15 @@
 #include "Character.h"
 #include "ParticleEmitter.h"
 #include "Audio.h"
+#include "Sprite.h"
+
+#include<memory>
+#include<array>
 
 class Player : public Character{
 public:
     Player();
-    virtual ~Player() override = default;
+    virtual ~Player() override;
 
     /// <summary>
     /// 初期化
@@ -20,6 +24,8 @@ public:
     /// 更新
     /// </summary>
     void Update() override;
+
+    void UpdateUi();
 
     /// <summary>
     /// 描画
@@ -35,6 +41,8 @@ public:
     bool GetGameover() { return isGameover; }
 
     bool GameOverUpdate();
+
+    void DrawUi();
 
 private:
     /// <summary>
@@ -75,6 +83,7 @@ private:
     float backRotateY = -2.0f;
     float angle = 0;
 
+    std::array<Sprite*, 4> lifeSprite_;
 
     bool isGameover = false;
     float gameoverTime = 180.0f;
@@ -82,6 +91,7 @@ private:
     SoundData knockBackSE_;
     SoundData junpSE_;
     SoundData damageSE_;
+
 
 
     //接触履歴
