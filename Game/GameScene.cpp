@@ -214,7 +214,7 @@ void GameScene::Update(){
 	if (!isStartGame_){
 		//ゲームが始まる前の更新処理
 		UpdateBegine();
-
+		ParticleManager::GetInstance()->Update();
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////

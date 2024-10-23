@@ -97,6 +97,7 @@ private:
 
 
     ParticleEmitter emit;
+    ParticleEmitter emitCloud;
     SoundData bossDamage;
     bool isPlay = false;
 

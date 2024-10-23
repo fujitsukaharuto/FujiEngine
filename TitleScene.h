@@ -24,5 +24,6 @@ private:
 	Vector3 rightDir = { 1.0f,0.0f,0.0f };
 	Sprite* space = nullptr;
 	Object3d* title = nullptr;
+	float moveTime = 0.0f;
 
 };

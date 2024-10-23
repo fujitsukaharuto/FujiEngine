@@ -81,6 +81,13 @@ void Boss::Initialize(std::vector<Object3d*> models){
 	emit.animeData.endSize = {1.2f,1.2f};
 	emit.animeData.type = SizeType::kReduction;
 
+	emitCloud.name = "noteChange";
+	emitCloud.count = 2;
+	emitCloud.grain.lifeTime_ = 50;
+	emitCloud.RandomSpeed({ 0.00f,0.07f }, { -0.00f,0.04f }, { -0.000f,0.000f });
+	emitCloud.RandomTranslate({ 0.0f,0.0f }, { -0.1f,0.1f }, { -4.0f,-4.0f });
+	emitCloud.grain.transform.scale = { 2.5f,2.5f,1.0f };
+
 
 	ApplyGlobalVariables();
 
@@ -171,6 +178,16 @@ bool Boss::UpdateBegineGame(){
 			models_[0]->transform.translate.y = targetY;
 			fallSpeed = 0.0f;
 			CameraManager::GetInstance()->GetCamera()->SetShakeTime(60.0f);
+			emitCloud.RandomSpeed({ 0.00f,0.07f }, { -0.00f,0.04f }, { -0.000f,0.000f });
+			emitCloud.pos = GetCenterPos();
+			emitCloud.pos.x += 2.0f;
+			emitCloud.pos.y -= 5.0f;
+			emitCloud.Burst();
+			emitCloud.RandomSpeed({ -0.07f,0.00f }, { -0.00f,0.04f }, { -0.000f,0.000f });
+			emitCloud.pos = GetCenterPos();
+			emitCloud.pos.x -= 6.0f;
+			emitCloud.pos.y -= 5.0f;
+			emitCloud.Burst();
 		}
 	}
 

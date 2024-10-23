@@ -16,6 +16,7 @@ TitleScene::TitleScene() {}
 TitleScene::~TitleScene() {
 	delete sphere;
 	delete space;
+	delete title;
 }
 
 void TitleScene::Initialize() {
@@ -67,6 +68,23 @@ void TitleScene::Update() {
 #endif // _DEBUG
 
 	dxCommon_->UpDate();
+
+
+	if (moveTime <= 40.0f) {
+
+		moveTime += FPSKeeper::DeltaTime();
+
+		if (moveTime >= 20.0f && moveTime <= 30.0f) {
+			title->transform.scale.y = Lerp(title->transform.scale.y, 2.0f, 0.3f);
+		}
+		else if (moveTime > 30.0f && moveTime <= 35.0f) {
+			title->transform.scale.y = Lerp(title->transform.scale.y, 2.5f, 0.4f);
+		}
+	}
+	else {
+		moveTime = 0.0f;
+	}
+
 
 	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
 		SceneManager::GetInstance()->ChangeScene("GAME", 40.0f);
