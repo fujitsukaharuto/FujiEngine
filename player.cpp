@@ -35,22 +35,46 @@ void Player::Update() {
 		worldPosReticle = target->transform.translate;
 
 		Vector3 worldPosPlayer = camera->transform.translate;
+		Vector3 offset = { 0.0f,1.0f,0.0f };
+		worldPosPlayer = worldPosPlayer - offset;
 		Vector3 velocity = worldPosReticle - worldPosPlayer;
 		velocity = velocity.Normalize();
 		velocity = velocity * kBulletSpeed;
 		velo_ = velocity;
 
-		Vector3 worldPos = camera->transform.translate;
+		startTime = 0.0f;
+		Vector3 worldPos = worldPosPlayer;
 		bullet->transform.translate = worldPos;
+		/*bullet->transform.scale = { 0.0f,0.0f,0.0f };*/
+		isLive = true;
 	}
 
-	bullet->transform.translate += velo_;
+	if (isLive) {
+		if (startTime <= kStartTime) {
+			startTime += FPSKeeper::DeltaTime();
+			//bullet->transform.scale.x += 0.05f * FPSKeeper::DeltaTime();
+			//bullet->transform.scale.y += 0.05f * FPSKeeper::DeltaTime();
+			//bullet->transform.scale.z += 0.05f * FPSKeeper::DeltaTime();
+		}
+		bullet->transform.translate += velo_;
+	}
 
 }
 
 void Player::Draw() {
 	target->Draw();
-	bullet->Draw();
+	if (isLive) {
+		bullet->Draw();
+	}
+}
+
+
+Vector3 Player::GetCenterBullet() const {
+	return bullet->transform.translate;
+}
+
+float Player::GetBulletScale() const {
+	return bullet->transform.scale.x;
 }
 
 void Player::ReticleCal() {

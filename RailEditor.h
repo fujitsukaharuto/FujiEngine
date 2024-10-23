@@ -2,8 +2,10 @@
 #include <iostream>
 #include <fstream>
 #include <variant>
+#include <tuple>
 #include <map>
 #include <json.hpp>
+
 #include "ImGuiManager.h"
 #include "MatrixCalculation.h"
 #include "Object3d.h"
@@ -37,6 +39,9 @@ public:
 private:
 
 	void SetRail();
+
+	void Save(const std::string& fileName);
+	void Load(const std::string& fileName);
 
 private:
 

@@ -1,5 +1,6 @@
 #pragma once
 #include <cmath>
+#include <json.hpp>
 
 class Vector3
 {

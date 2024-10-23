@@ -15,6 +15,12 @@ public:
 
 	void Draw();
 
+	Vector3 GetCentarPos()const;
+
+	bool GetLive()const { return isLive; }
+
+	void SetLive(bool is) { isLive = is; }
+
 private:
 
 
@@ -23,5 +29,6 @@ private:
 
 
 	Object3d* enemy;
+	bool isLive = true;
 
 };

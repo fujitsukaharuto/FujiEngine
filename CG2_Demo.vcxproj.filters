@@ -182,6 +182,9 @@
     <ClCompile Include="Enemy.cpp">
       <Filter>Game</Filter>
     </ClCompile>
+    <ClCompile Include="BaseObject.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -374,6 +377,9 @@
       <Filter>Game\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Enemy.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseObject.h">
       <Filter>Game</Filter>
     </ClInclude>
   </ItemGroup>

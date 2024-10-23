@@ -23,6 +23,7 @@ GameScene::~GameScene() {
 	delete terrain;
 	delete test;
 	delete player_;
+	delete enemy_;
 }
 
 void GameScene::Initialize() {
@@ -90,6 +91,9 @@ void GameScene::Initialize() {
 
 	player_ = new Player();
 	player_->Initialize();
+
+	enemy_ = new Enemy();
+	enemy_->Initialize();
 
 }
 
@@ -165,6 +169,22 @@ void GameScene::Update() {
 
 
 	player_->Update();
+	enemy_->Update();
+
+	Vector3 bulletPos = player_->GetCenterBullet();
+	float bulletSize = player_->GetBulletScale();
+
+	Vector3 enemypos = enemy_->GetCentarPos();
+
+	Vector3 leng = enemypos - bulletPos;
+	float length = leng.Lenght();
+	if (enemy_->GetLive()&&player_->GetLive()) {
+		if (length <= bulletSize + 1.0f) {
+			enemy_->SetLive(false);
+			player_->SetLive(false);
+		}
+
+	}
 
 
 	/*emit.Emit();*/
@@ -188,6 +208,7 @@ void GameScene::Draw() {
 	fence->Draw();
 
 	player_->Draw();
+	enemy_->Draw();
 
 	for (auto suzunneModel : suzunnes) {
 		suzunneModel->Draw();

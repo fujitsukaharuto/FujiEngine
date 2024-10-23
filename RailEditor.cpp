@@ -2,6 +2,7 @@
 #include "Line3dDrawer.h"
 #include "CameraManager.h"
 #include <numbers>
+#include <variant>
 
 RailEditor::~RailEditor() {
 
@@ -17,28 +18,14 @@ void RailEditor::Initialize() {
 
 	trans.scale = { 1.0f,1.0f,1.0f };
 
-	controlPoints_.push_back({ 5.0f,2.0f,5.0f });
-	controlPoints_.push_back({ 5.0f,2.0f,3.0f });
-	controlPoints_.push_back({ 5.0f,2.0f,2.0f });
-	controlPoints_.push_back({ 4.0f,2.0f,1.0f });
-	controlPoints_.push_back({ 2.5f,1.8f,-1.0f });
-	controlPoints_.push_back({ 0.5f,1.5f,-2.0f });
-	controlPoints_.push_back({ -0.5f,1.5f,-2.0f });
-	controlPoints_.push_back({ -2.5f,1.8f,-1.0f });
-	controlPoints_.push_back({ -4.0f,2.0f,1.0f });
-	controlPoints_.push_back({ -5.0f,2.0f,2.0f });
-	controlPoints_.push_back({ -5.0f,2.0f,3.0f });
-	controlPoints_.push_back({ -5.0f,2.0f,5.0f });
-	controlPoints_.push_back({ -5.0f,2.2f,7.0f });
-	controlPoints_.push_back({ -5.0f,2.4f,9.0f });
-	controlPoints_.push_back({ -5.0f,2.6f,11.0f });
-	controlPoints_.push_back({ -5.0f,2.8f,13.0f });
 
 	for (int i = 0; i < 100; i++) {
 		Object3d* newModel = new Object3d();
 		newModel->Create("rail.obj");
 		rails.push_back(newModel);
 	}
+
+	Load("rails.json");
 
 	SetRail();
 
@@ -62,10 +49,23 @@ void RailEditor::Update() {
 	if (ImGui::Button("AddPoint")) {
 		AddControlPoint(controlPoints_.back());
 	}
+	if (ImGui::Button("DeletePoint")) {
+		controlPoints_.pop_back();
+	}
 	if (ImGui::Button("SetModel")) {
 		SetRail();
 	}
+	if (ImGui::Button("UnsetModel")) {
+		for (int i = 0; i < 100; i++) {
+			
+			rails[i]->transform.rotate = { 0.0f,0.0f,0.0f };
+			rails[i]->transform.translate = { 0.0f,0.0f,0.0f };
+		}
+	}
 	ImGui::Checkbox("CameraSet", &isCamera);
+	if (ImGui::Button("SAVE")) {
+		Save("rails.json");
+	}
 	ImGui::End();
 #endif // _DEBUG
 
@@ -82,12 +82,12 @@ void RailEditor::Update() {
 			previousUp = { 0.0f,1.0f,0.0f };
 		}
 
-		Vector3 offset = { 0.0f,0.5f,0.0f };
+		Vector3 offset = { 0.0f,0.75f,0.0f };
 		float t = 1.0f / timelimitt * time_;
 		Vector3 eye = CatmullRom(controlPoints_, t);
 		eye += offset;
 
-		float t2 = 1.0f / timelimitt * (time_ + 20);
+		float t2 = 1.0f / timelimitt * (time_ + 160);
 		Vector3 target = CatmullRom(controlPoints_, t2);
 		target += offset;
 
@@ -182,4 +182,37 @@ void RailEditor::SetRail() {
 		rails[i]->transform.rotate = { pitch,yaw,0.0f };*/
 		rails[i]->transform.translate = pointsDrawing[i];
 	}
+}
+
+void RailEditor::Save(const std::string& fileName) {
+
+	json j;
+	for (Vector3 point : controlPoints_) {
+		j.push_back(json::array({ point.x,point.y,point.z }));
+	}
+
+	std::ofstream file(kDirectoryPath + fileName);
+	if (file.is_open()) {
+		file << j.dump(4); // インデント4で出力
+		file.close();
+	}
+
+}
+
+void RailEditor::Load(const std::string& fileName) {
+
+	std::ifstream file(kDirectoryPath + fileName);
+	if (file.is_open()) {
+		json j;
+		file >> j;
+
+		controlPoints_.clear(); // 既存のデータをクリア
+		for (const auto& item : j) {
+			Vector3 value = { item.at(0),item.at(1),item.at(2) };
+			controlPoints_.push_back(value);
+		}
+
+		file.close();
+	}
+
 }
