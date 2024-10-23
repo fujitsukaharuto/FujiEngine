@@ -61,11 +61,13 @@ void ChainEnemy::Initialize(std::array<Object3d*, 2> models, const Vector3& pos)
 	for (size_t i = 0; i < 2; i++){
 		verticalBars_[i] = new Object3d();
 		verticalBars_[i]->Create("verticalBar.obj");
+		verticalBars_[i]->SetColor({ 0.2f,0.2f,0.2f,1.0f });
 		verticalBars_[i]->SetParent(connectedEnemies_[i]->GetModel());
 	}
 
 	horizontalBars_ = new Object3d();
 	horizontalBars_->Create("horizontalBar.obj");
+	horizontalBars_->SetColor({ 0.2f,0.2f,0.2f,1.0f });
 
 	//二つの敵の間に作る
 	Vector3 betweenPos = (connectedEnemies_[0]->GetWorldPosition() + connectedEnemies_[1]->GetWorldPosition()) * 0.5f;

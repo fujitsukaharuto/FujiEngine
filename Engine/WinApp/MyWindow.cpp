@@ -16,7 +16,7 @@ MyWin* MyWin::GetInstance()
 
 
 void MyWin::Initialize() {
-	CreateGWindow(L"チューニング", kWindowWidth, kWindowHeight);
+	CreateGWindow(L"2108_チューニング", kWindowWidth, kWindowHeight);
 	timeBeginPeriod(1);
 }
 
