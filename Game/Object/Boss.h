@@ -88,6 +88,8 @@ private:
 	/// 移動測度
 	/// </summary>
 	float moveSpeed_ = 0.012f;            // 移動速度
+	float forwardMoveSpeed_ = 0.02f;   // 前進するときの速度
+	float backwardMoveSpeed_ = -0.02f; // 後退するときの速度
 
 	const float originalSpeed_ = moveSpeed_;        // 元の移動速度を保存するための変数
 	int32_t stopMoveTimer_;      // 移動停止時間のカウンター
