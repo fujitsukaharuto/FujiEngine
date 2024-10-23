@@ -103,6 +103,8 @@ private:
 	bool isDebugCameraMode_ = false;
 
 	bool isStartGame_ = false;
+	bool isTutorial_ = false;
+
 
 	ParticleEmitter emit;
 
