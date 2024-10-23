@@ -39,6 +39,7 @@ Boss::Boss() : Character(std::make_unique<SphereCollider>()), stopMoveTimer_(0){
 }
 
 Boss::~Boss(){
+	Audio::GetInstance()->SoundStopWave(bossDamage);
 	for (int i = 0; i < 6; i++){
 		delete choruth[i];
 	}
@@ -91,6 +92,7 @@ void Boss::Update(){
 		if (retreatTimer_ == 0){
 			moveSpeed_ = fabs(moveSpeed_);  // 後退が終わったら正の速度に戻す
 			Audio::GetInstance()->SoundStopWave(bossDamage);
+			isPlay = false;
 			isChorusu = false;
 		}
 	}
@@ -225,7 +227,11 @@ void Boss::OnCollision(Character* other){
 		CameraManager::GetInstance()->GetCamera()->SetShakeTime(40.0f);
 
 		isChorusu = true;
-		Audio::GetInstance()->SoundPlayWave(bossDamage);
+		if (!isPlay) {
+			Audio::GetInstance()->SoundPlayWave(bossDamage);
+			isPlay = true;
+		}
+
 
 		// ボスを後退させる
 		life_--;

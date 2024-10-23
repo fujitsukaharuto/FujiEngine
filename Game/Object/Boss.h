@@ -83,7 +83,7 @@ private:
 
     ParticleEmitter emit;
     SoundData bossDamage;
-
+    bool isPlay = false;
 
     //シリアルナンバー
     uint32_t serialNumber_ = 0;
