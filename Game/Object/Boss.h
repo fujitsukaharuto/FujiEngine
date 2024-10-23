@@ -35,6 +35,8 @@ public:
 
 	bool UpdateExpansionAndContraction(float deltaTime);
 
+	bool ClearUpdate();
+
 	/// <summary>
 	/// 描画
 	/// </summary>
@@ -97,6 +99,7 @@ private:
     bool isDamagePaticle = false;
     int32_t kMaxLife_ = 0;
     bool isClear = false;
+	float bossBlustTime = 180.0f;
 
     // コーラス
     std::vector<Object3d*> choruth;

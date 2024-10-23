@@ -125,7 +125,7 @@ void GameScene::Initialize() {
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	/*                                   にぎやかし                                                */
 	////////////////////////////////////////////////////////////////////////////////////////////////
-	for (int i = 0; i < 3; i++){
+	/*for (int i = 0; i < 3; i++){
 		Object3d* newCho = new Object3d();
 		newCho->Create("chorus.obj");
 		newCho->SetCameraParent(true);
@@ -135,7 +135,7 @@ void GameScene::Initialize() {
 		newCho->transform.rotate.y = 3.14f;
 		newCho->UpdateWorldMat();
 		choruth_.push_back(newCho);
-	}
+	}*/
 
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	/*                                   フィールド (五線譜)                                        */
@@ -300,9 +300,6 @@ void GameScene::Update(){
 
 		skyCube_->transform.translate.x = Field::cameraScrollX_;
 
-		for (auto& choruth : choruth_){
-			choruth->UpdateWorldMat();
-		}
 
 		//プレイヤーの更新
 		player_->Update();
@@ -380,9 +377,7 @@ void GameScene::Draw(){
 
 	field_->Draw();
 
-	for (auto& choruth : choruth_){
-		choruth->Draw();
-	}
+
 
 	//プレイヤーの描画
 	player_->Draw();

@@ -309,6 +309,13 @@ bool Boss::UpdateExpansionAndContraction(float deltaTime){
 	return false; // アニメーションがまだ完了していない
 }
 
+bool Boss::ClearUpdate() {
+
+
+
+	return false;
+}
+
 
 
 void Boss::Draw(){
