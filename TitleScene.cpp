@@ -75,10 +75,14 @@ void TitleScene::Update() {
 		moveTime += FPSKeeper::DeltaTime();
 
 		if (moveTime >= 20.0f && moveTime <= 30.0f) {
-			title->transform.scale.y = Lerp(title->transform.scale.y, 2.0f, 0.3f);
+			float t = moveTime - 20.0f;
+			t = t / 30.0f;
+			title->transform.scale.y = Lerp(3.5f, 2.0f, 1.0f - powf(1.0f - t, 3));
 		}
 		else if (moveTime > 30.0f && moveTime <= 35.0f) {
-			title->transform.scale.y = Lerp(title->transform.scale.y, 2.5f, 0.4f);
+			float t = moveTime - 30.0f;
+			t = t / 35.0f;
+			title->transform.scale.y = Lerp(2.0f, 3.5f, powf(t, 4));
 		}
 	}
 	else {
