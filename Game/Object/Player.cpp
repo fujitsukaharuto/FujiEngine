@@ -142,27 +142,26 @@ float EaseOut(float start, float end, float t){
 
 void Player::UpdateUi(){
 	// 目標位置
-	Vector3 targetPosBase = {800.0f, 190.0f, 0.0f};
+	Vector3 targetPosBase = {810.0f, 200.0f, 0.0f};
 	float delayBetweenSprites = 5.0f;  // 各スプライトの移動の遅延時間（秒）
-	float duration = 18.0f;  // 移動にかかる時間（秒）
+	float duration = 18.0f;            // 移動にかかる時間（秒）
 
-	static float elapsedTime = 0.0f;  // 経過時間を保持
-	static bool animationComplete = false; // アニメーションが完了したかどうかを追跡
-
-	// アニメーションが完了している場合は何もしない
-	if (animationComplete) return;
+	// アニメーションが完了している場合、一定時間待機
+	if (animationComplete_){
+		return;
+	}
 
 	// フレーム間の時間を加算
-	elapsedTime += FPSKeeper::DeltaTime();
+	elapsedTime_ += FPSKeeper::DeltaTime();
 
 	for (size_t i = 0; i < lifeSprite_.size(); i++){
 		// 各スプライトごとに、遅延時間を考慮して開始
 		float startTime = i * delayBetweenSprites;
 
 		// スプライトの移動を開始するか確認
-		if (elapsedTime > startTime){
+		if (elapsedTime_ > startTime){
 			// 経過時間から開始時間を引いて補間率を計算
-			float t = (elapsedTime - startTime) / duration;
+			float t = (elapsedTime_ - startTime) / duration;
 			if (t > 1.0f) t = 1.0f;  // tが1を超えないようにする
 
 			// 初期位置を画面外（仮の値 -100.0f）に設定
@@ -176,10 +175,11 @@ void Player::UpdateUi(){
 	}
 
 	// すべてのスプライトの位置が移動完了したかチェック
-	if (elapsedTime > (lifeSprite_.size() - 1) * delayBetweenSprites + duration){
-		animationComplete = true;
+	if (elapsedTime_ > (lifeSprite_.size() - 1) * delayBetweenSprites + duration){
+		animationComplete_ = true;
 	}
 }
+
 
 
 
