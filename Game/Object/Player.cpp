@@ -281,6 +281,7 @@ void Player::OnCollision(Character* other){
 				// ダメージを受ける処理
 				life_--;
 				Audio::GetInstance()->SoundPlayWave(damageSE_);
+				emit.RandomTranslate({ -3.5f,-3.5f }, { -0.2f,-0.2f }, { -4.0f,-4.0f });
 				emit.pos = GetCenterPos();
 				emit.BurstAnime();
 			}
