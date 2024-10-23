@@ -48,6 +48,8 @@ public:
 	/// 移動
 	/// </summary>
 	void Move();
+
+	void MovingMotion();
 	
 	/// <summary>
 	/// 音符に変わったか
