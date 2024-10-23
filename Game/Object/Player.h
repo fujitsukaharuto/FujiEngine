@@ -99,4 +99,7 @@ private:
 
 	ParticleEmitter emit;
 
+    float elapsedTime_ = 0.0f;
+    bool animationComplete_ = false;
+
 };

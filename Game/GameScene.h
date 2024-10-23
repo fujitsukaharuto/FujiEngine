@@ -42,6 +42,10 @@ private:
 	/// </summary>
 	void UpdateBegine();
 
+	void UpdateUi();
+
+	float EaseOut(float t);
+
 private:
 
 	std::unique_ptr<Object3dCommon> obj3dCommon = nullptr;
@@ -70,6 +74,11 @@ private:
 	std::vector<Object3d*> bossModels_ {};
 	std::unique_ptr<Object3d> skyCube_ = nullptr;
 	std::vector<Object3d*> choruth_ {};
+
+	/*======================
+		スプライト
+	=======================*/
+	Sprite* announce_ = nullptr;
 
 	/*======================
 		プレイヤー
@@ -106,6 +115,9 @@ private:
 	bool isTutorial_ = false;
 	bool isClear_ = false;
 	bool isGameover_ = false;
+
+	float elapsedTime_ = 0.0f;
+	bool animationComplete_ = false;
 
 	ParticleEmitter emit;
 

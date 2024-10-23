@@ -46,7 +46,7 @@ GameScene::~GameScene(){
 	}
 	delete terrain;
 	delete test;*/
-
+	delete announce_;
 }
 
 void GameScene::Initialize() {
@@ -207,6 +207,53 @@ void GameScene::Initialize() {
 	emit.animeData.lifeTime = 40.0f;
 	emit.RandomSpeed({ -0.1f,0.1f }, { -0.1f,0.1f }, { -0.1f,0.1f });
 	emit.RandomTranslate({ -0.1f,0.1f }, { -0.1f,0.1f }, { -0.1f,0.1f });
+
+
+	announce_ = new Sprite();
+	announce_->Load("rule.png");
+	announce_->SetPos({640.0f, -220.0f, 0.0f});
+	announce_->SetSize({512.0,240.0f});
+
+}
+
+void GameScene::UpdateUi(){
+	// announce_ スプライトの目標位置
+	Vector3 initialPos = {640.0f, -220.0f, 0.0f};
+	Vector3 targetPos = {640.0f, 140.0f, 0.0f};
+	float duration = 20.0f;  // アニメーションの持続時間（秒）
+
+	// アニメーションが完了している場合、一定時間待機
+	if (animationComplete_){
+		return;
+	}
+
+	// 経過時間を加算
+	elapsedTime_ += FPSKeeper::DeltaTime();
+
+	// アニメーションの進行度を計算
+	float t = elapsedTime_ / duration;
+	if (t > 1.0f){
+		t = 1.0f;
+		animationComplete_ = true;
+	}
+
+	// EaseOut関数を使用してY座標を補間
+	float newY = initialPos.y + (targetPos.y - initialPos.y) * EaseOut(t);
+	announce_->SetPos({initialPos.x, newY, initialPos.z});
+}
+
+
+float GameScene::EaseOut(float t){
+	if (t < 0.5f){
+		// 前半の落下部分のイージング（EaseOut効果）
+		return 1.0f - pow(1.0f - 2 * t, 3.0f) / 2.0f;
+	} else{
+		// 後半のバウンド効果
+		t = (t - 0.5f) * 2.0f;
+		float bounceFrequency = 1.5f;  // バウンドの回数
+		float bounceAmplitude = 0.05f; // バウンドの振幅（0.05 = 5% のバウンド）
+		return 1.0f - (1.0f - pow(t, 2.0f)) * sin(t * 3.14f * bounceFrequency) * bounceAmplitude;
+	}
 }
 
 void GameScene::Update(){
@@ -236,6 +283,7 @@ void GameScene::Update(){
 	
 	else{
 
+		UpdateUi();
 
 		// ボスの移動量に応じてカメラを同じだけ移動させる
 		CameraManager::GetInstance()->GetCamera()->transform.translate.x += cameraMoveSpeed_ * FPSKeeper::DeltaTime();
@@ -429,7 +477,7 @@ void GameScene::Draw(){
 	dxCommon_->PreSpriteDraw();
 
 	player_->DrawUi();
-
+	announce_->Draw();
 #pragma endregion
 
 
