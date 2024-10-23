@@ -7,6 +7,7 @@
 #include "Object/NoteEnemy.h"
 #include "GlobalVariables/GlobalVariables.h"
 #include "CameraManager.h"
+#include "SceneManager.h"
 
 #include <thread>
 #include <numbers>
@@ -227,8 +228,14 @@ void Boss::OnCollision(Character* other){
 		Audio::GetInstance()->SoundPlayWave(bossDamage);
 
 		// ボスを後退させる
+		life_--;
 		moveSpeed_ *= -1;  // ボスの後退速度を設定 (負の値で後退)
 		retreatTimer_ = 90;  // 60フレーム（1秒間）後退
+	}
+
+	if (life_ == 0) {
+		SceneManager::GetInstance()->SetClear(true);
+		SceneManager::GetInstance()->ChangeScene("RESULT", 40.0f);
 	}
 }
 
