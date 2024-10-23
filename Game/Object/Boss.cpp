@@ -384,6 +384,7 @@ void Boss::ApplyGlobalVariables(){
 	forwardMoveSpeed_ = GlobalVariables::GetInstance()->GetFloatValue(groupName, "forwardMoveSpeed");
 	backwardMoveSpeed_ = GlobalVariables::GetInstance()->GetFloatValue(groupName, "backwardMoveSpeed");
 	life_ = GlobalVariables::GetInstance()->GetIntValue(groupName, "life");
+	kMaxLife_ = life_;
 }
 
 void Boss::StopMoveForCollision(uint32_t time){
