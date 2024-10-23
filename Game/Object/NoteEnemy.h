@@ -50,14 +50,14 @@ public:
 	void Move();
 
 	void MovingMotion();
-	
+
 	/// <summary>
 	/// 音符に変わったか
 	/// </summary>
 	/// <returns></returns>
 	bool GetIsChangedNote()const{ return isChangedNote_; }
 
-	void MarkForRemoval(){isRemoved_ = true;}
+	void MarkForRemoval(){ isRemoved_ = true; }
 
 	bool GetIsRemoved(){ return isRemoved_; }
 
@@ -103,7 +103,10 @@ private:
 	bool isChainEnemy_ = false;
 
 	// モデルがセットされたかどうかを保持するフラグ
-	bool isModelSet_ = false; 
+	bool isModelSet_ = false;
+
+
+
 
 	//移動速度
 	float moveSpeed_ = 1.0f;
@@ -129,4 +132,12 @@ private:
 	//シリアルナンバー
 	uint32_t serialNumber_ = 0;
 	ParticleEmitter emit;
+
+public:
+
+	//つながっている相手が音符か
+	bool connectedPartiesIsNote_ = false;
+
+	//前にいる敵か
+	bool isFirst_ = true;
 };

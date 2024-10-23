@@ -32,7 +32,9 @@ public:
 
 	void SetEnemyManager(EnemyManager* manager){ pEnemyManager_ = manager; }
 
-
+	std::array<NoteEnemy*, 2> GetConnectedEnemies() const{
+		return {connectedEnemies_[0].get(), connectedEnemies_[1].get()};
+	}
 
 private:
 	void HandleChainBreak(size_t i);
@@ -64,8 +66,10 @@ private:
 	//removeされた数
 	int removeCount_ = 0;
 	
-	//chainの長さ
 	Vector3 chainOffset = {5.0f,0.0f,0.0f};
 
 	EnemyManager* pEnemyManager_;
+
+public:
+	bool isTwoNote_ = false;
 };

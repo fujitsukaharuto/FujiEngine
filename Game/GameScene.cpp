@@ -309,8 +309,47 @@ void GameScene::Update(){
 		//ボスの更新
  		boss_->Update();
 
-
 		enemyManager_->Update();
+
+		//つながった敵と当たってる時を判定します
+		for (auto chainEnemy : enemyManager_->GetChainEnemyList()){
+
+			if (chainEnemy->GetConnectedEnemies()[0]&& chainEnemy->GetConnectedEnemies()[1]){
+
+				//つながっている音符が二つとも音符の状態
+				if (chainEnemy->isTwoNote_){
+					// 2つのNoteEnemyの位置を取得
+					Vector3 enemyPos1 = chainEnemy->GetConnectedEnemies()[0]->GetCenterPos();
+					Vector3 enemyPos2 = chainEnemy->GetConnectedEnemies()[1]->GetCenterPos();
+					float capsuleRadius = 0.4f;  // カプセルの半径
+					Vector3 bossPos = boss_->GetCenterPos();
+					float bossRadius = 7.75f;  // ボスの設定されている半径
+
+					// カプセルの線分（enemyPos1, enemyPos2）とボスの距離を計算
+					Vector3 lineVector = enemyPos2 - enemyPos1;
+					Vector3 bossToEnemy1 = bossPos - enemyPos1;
+
+					// 線分上の最近点を求めるためのt（線分上の割合）を計算
+					float t = (bossToEnemy1.Dot(lineVector)) / lineVector.LengthSquared();
+					t = std::clamp(t, 0.0f, 1.0f);  // tを0から1の範囲にクランプ
+
+					// 線分上の最近点を求める
+					Vector3 closestPoint = enemyPos1 + lineVector * t;
+
+					// 最近点とボスの距離を計算
+					float distance = (bossPos - closestPoint).Lenght();
+
+					// カプセルとボスの半径を考慮した衝突判定
+					if (distance <= (capsuleRadius + bossRadius)){
+						// 衝突していた場合はtrueを返す（処理を終了）
+						boss_->SetIsHit(true);
+					} else{
+						boss_->SetIsHit(false);
+					}
+				}
+
+			}
+		}
 
 		ParticleManager::GetInstance()->Update();
 

@@ -38,6 +38,14 @@ public:
 	/// </summary>
 	void PopObstacle();
 
+	std::list<ChainEnemy*> GetChainEnemyList() const{
+		std::list<ChainEnemy*> rawPointerList;
+		for (const auto& uniquePtr : chainEnemies_){
+			rawPointerList.push_back(uniquePtr.get());
+		}
+		return rawPointerList;
+	}
+
 private:
 	/// <summary>
 	/// popファイルを読む
@@ -95,7 +103,7 @@ private:
 	/// <param name="count"></param>
 	/// <returns></returns>
 	std::array<Object3d*, 2> CreateChainNoteModels(int count);*/
-	
+
 
 	/// <summary>
 	/// スポーン座標
@@ -116,6 +124,7 @@ private:
 	const Field* pField_ = nullptr;
 	Object3dCommon* pObject3dCommon_ = nullptr;
 
+
 	std::list<std::unique_ptr<NoteEnemy>>noteEnemies_ {};
 	std::list<std::unique_ptr<ChainEnemy>> chainEnemies_ {};
 	std::list<std::unique_ptr<Obstacle>>obstacles_ {};
@@ -125,5 +134,6 @@ private:
 	std::stringstream enemyPopCommands_;
 	bool isWaiting = false;
 	int32_t waitTimer = 0;
+
 
 };

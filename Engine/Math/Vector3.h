@@ -57,6 +57,7 @@ public:
 	static float StaticLength(const Vector3& v);
 
 	float Lenght() const { return std::sqrtf((*this) * (*this)); }
+
 	Vector3 Normalize() const {
 		const float leng = Lenght();
 		return leng == 0 ? *this : *this / leng;
