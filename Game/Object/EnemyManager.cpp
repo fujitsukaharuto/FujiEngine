@@ -235,7 +235,7 @@ void EnemyManager::PopObstacle(){
 
 Vector3 EnemyManager::GetSpawnPosition(int fieldIndex){
 	float spawnPosY = pField_->GetPos(fieldIndex - 1).y;
-	float spawnPosX = Field::cameraScrollX_ + 45.0f;
+	float spawnPosX = Field::cameraScrollX_ + 60.0f;
 	return Vector3 {spawnPosX, spawnPosY, 0.0f};
 }
 
