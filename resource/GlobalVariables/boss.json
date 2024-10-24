@@ -2,7 +2,7 @@
     "boss": {
         "backwardMoveSpeed": -0.019999999552965164,
         "forwardMoveSpeed": 0.019999999552965164,
-        "life": 32,
+        "life": 40,
         "moveSpeed": 0.03500000014901161
     }
 }

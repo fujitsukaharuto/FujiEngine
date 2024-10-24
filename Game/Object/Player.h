@@ -93,6 +93,8 @@ private:
     SoundData damageSE_;
 
     Sprite* coment;
+    float commentTime = 240.0f;
+    bool isComment = true;
 
     //接触履歴
     ContactRecord record_;

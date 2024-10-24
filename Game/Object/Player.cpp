@@ -80,12 +80,48 @@ void Player::Initialize(std::vector<Object3d*> Object3ds){
 	coment = new Sprite();
 	coment->Load("comment.png");
 	coment->SetPos({ 1200.0f, 190.0f, 0.0f });
-	coment->SetSize({ 256.0f,512.0f });
+	coment->SetSize({ 0.0f,0.0f });
 
 }
 
 void Player::Update(){
 	collider_->Update(GetCenterPos());
+
+	if (isComment) {
+
+		if (commentTime >= 135.0f && commentTime <= 235.0f) {
+
+			float t = (commentTime - 100.0f) / 135.0f;
+			t = 1.0f - powf(t, 3);
+
+			float x = Lerp(0.0f, 256.0f, t);
+			float y = Lerp(0.0f, 512.0f, t);
+			coment->SetSize({ y,x,});
+			Vector3 posp = Vector3{ 700.0f,420.0f,0.0f };
+			posp.x += y/2.0f;
+			posp.y -= x/2.0f;
+			coment->SetPos(posp);
+
+		}
+		else if (commentTime <= -30.0f) {
+			isComment = false;
+		}
+		else if (commentTime < 0.0f) {
+			float t = (commentTime + 30.0f) / 30.0f;
+			t = 1.0f - powf(t, 3);
+
+			float x = Lerp(256.0f, 0.0f, t);
+			float y = Lerp(512.0f, 0.0f, t);
+			coment->SetSize({ y,x, });
+			Vector3 posp = Vector3{ 700.0f,420.0f,0.0f };
+			posp.x += y / 2.0f;
+			posp.y -= x / 2.0f;
+			coment->SetPos(posp);
+
+		}
+		
+		commentTime -= FPSKeeper::DeltaTime();
+	}
 
 	// ノックバック中の処理
 	if (isKnockedBack_){
@@ -503,4 +539,8 @@ void Player::DrawUi(){
 			lifeSprite_[i]->Draw();
 		}
 	}
+	if (isComment) {
+		coment->Draw();
+	}
+
 }
