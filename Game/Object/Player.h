@@ -92,7 +92,7 @@ private:
     SoundData junpSE_;
     SoundData damageSE_;
 
-
+    Sprite* coment;
 
     //接触履歴
     ContactRecord record_;

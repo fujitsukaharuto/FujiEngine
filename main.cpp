@@ -154,6 +154,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	textureManager->Load("boss_state2.png");
 	textureManager->Load("boss_state3.png");
 	textureManager->Load("result_space.png");
+	textureManager->Load("heart.png");
+	textureManager->Load("comment.png");
 
 
 	//BYTE keys[256] = { 0 };

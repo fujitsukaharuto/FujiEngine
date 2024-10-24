@@ -38,7 +38,7 @@ Player::Player() : Character(std::make_unique<SphereCollider>()){
 }
 
 Player::~Player(){
-
+	delete coment;
 	for (size_t i = 0; i < 4; i++){
 		if (lifeSprite_[i]){
 			delete lifeSprite_[i];
@@ -76,6 +76,12 @@ void Player::Initialize(std::vector<Object3d*> Object3ds){
 		lifeSprite_[i]->SetPos({1500.0f + (i * 80.0f), 190.0f, 0.0f});
 		lifeSprite_[i]->SetSize({64.0f,64.0f});
 	}
+
+	coment = new Sprite();
+	coment->Load("comment.png");
+	coment->SetPos({ 1200.0f, 190.0f, 0.0f });
+	coment->SetSize({ 256.0f,512.0f });
+
 }
 
 void Player::Update(){
