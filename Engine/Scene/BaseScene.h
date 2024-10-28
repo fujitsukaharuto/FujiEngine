@@ -6,7 +6,7 @@
 #include "Object3dCommon.h"
 #include "Object3d.h"
 #include "Sprite.h"
-#include "ParticleEmitter.h"
+#include "Particle/ParticleEmitter.h"
 
 
 

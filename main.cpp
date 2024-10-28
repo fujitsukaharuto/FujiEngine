@@ -9,7 +9,7 @@
 #include "ModelManager.h"
 #include "PointLightManager.h"
 #include "CameraManager.h"
-#include "ParticleManager.h"
+#include "Particle/ParticleManager.h"
 
 
 // やること

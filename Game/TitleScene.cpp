@@ -1,4 +1,4 @@
-#include "ResultScene.h"
+#include "TitleScene.h"
 #include "ImGuiManager.h"
 #include "ModelManager.h"
 #include "GlobalVariables.h"
@@ -6,17 +6,17 @@
 #include "FPSKeeper.h"
 #include "Random.h"
 
-#include "ParticleManager.h"
+#include "Particle/ParticleManager.h"
 
 
 
-ResultScene::ResultScene() {}
+TitleScene::TitleScene() {}
 
-ResultScene::~ResultScene() {
+TitleScene::~TitleScene() {
 	delete sphere;
 }
 
-void ResultScene::Initialize() {
+void TitleScene::Initialize() {
 	Init();
 
 
@@ -25,11 +25,10 @@ void ResultScene::Initialize() {
 
 	sphere = new Object3d();
 	sphere->CreateSphere();
-	sphere->SetColor({ 1.0f,0.0f,0.0f,1.0f });
 
 }
 
-void ResultScene::Update() {
+void TitleScene::Update() {
 
 #ifdef _DEBUG
 
@@ -57,7 +56,7 @@ void ResultScene::Update() {
 	ParticleManager::GetInstance()->Update();
 }
 
-void ResultScene::Draw() {
+void TitleScene::Draw() {
 
 #pragma region 背景描画
 
@@ -69,7 +68,7 @@ void ResultScene::Draw() {
 #pragma region 3Dオブジェクト
 	obj3dCommon->PreDraw();
 	sphere->Draw();
-
+	
 
 	ParticleManager::GetInstance()->Draw();
 
@@ -88,7 +87,7 @@ void ResultScene::Draw() {
 
 }
 
-void ResultScene::ApplyGlobalVariables() {
+void TitleScene::ApplyGlobalVariables() {
 
 
 }
