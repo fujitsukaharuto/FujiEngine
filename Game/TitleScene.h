@@ -1,11 +1,11 @@
 #pragma once
-#include "BaseScene.h"
+#include "Scene/BaseScene.h"
 
 
-class ResultScene :public BaseScene {
+class TitleScene:public BaseScene {
 public:
-	ResultScene();
-	~ResultScene();
+	TitleScene();
+	~TitleScene();
 
 	void Initialize()override;
 

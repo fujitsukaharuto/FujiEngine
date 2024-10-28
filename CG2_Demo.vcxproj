@@ -100,7 +100,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="BaseScene.cpp" />
     <ClCompile Include="Engine\Audio\Audio.cpp" />
     <ClCompile Include="Engine\DebugCamera\Camera.cpp" />
     <ClCompile Include="Engine\DebugCamera\CameraManager.cpp" />
@@ -109,6 +108,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\DX\DXCommand.cpp" />
     <ClCompile Include="Engine\DX\DXCompil.cpp" />
     <ClCompile Include="Engine\DX\FPSKeeper.cpp" />
+    <ClCompile Include="Engine\DX\SRVManager.cpp" />
     <ClCompile Include="Engine\GlobalVariables\GlobalVariables.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\BasePipeline.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\GaussPipeline.cpp" />
@@ -128,6 +128,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Math\MatrixCalculation.cpp" />
     <ClCompile Include="Engine\Math\MyVec2.cpp" />
     <ClCompile Include="Engine\Math\MyVec3.cpp" />
+    <ClCompile Include="Engine\Math\Random.cpp" />
     <ClCompile Include="Engine\Model\Material.cpp" />
     <ClCompile Include="Engine\Model\Mesh.cpp" />
     <ClCompile Include="Engine\Model\Model.cpp" />
@@ -137,20 +138,18 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Model\Object3dCommon.cpp" />
     <ClCompile Include="Engine\Model\Sprite.cpp" />
     <ClCompile Include="Engine\Model\TextureManager.cpp" />
+    <ClCompile Include="Engine\Particle\Particle.cpp" />
+    <ClCompile Include="Engine\Particle\ParticleEmitter.cpp" />
+    <ClCompile Include="Engine\Particle\ParticleManager.cpp" />
+    <ClCompile Include="Engine\Scene\BaseScene.cpp" />
     <ClCompile Include="Engine\WinApp\MyWindow.cpp" />
     <ClCompile Include="Game\Field\MapChipField.cpp" />
     <ClCompile Include="Game\GameScene.cpp" />
+    <ClCompile Include="Game\ResultScene.cpp" />
+    <ClCompile Include="Game\TitleScene.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Particle.cpp" />
-    <ClCompile Include="ParticleEmitter.cpp" />
-    <ClCompile Include="ParticleManager.cpp" />
-    <ClCompile Include="Random.cpp" />
-    <ClCompile Include="ResultScene.cpp" />
-    <ClCompile Include="SRVManager.cpp" />
-    <ClCompile Include="TitleScene.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BaseScene.h" />
     <ClInclude Include="Engine\Audio\Audio.h" />
     <ClInclude Include="Engine\DebugCamera\Camera.h" />
     <ClInclude Include="Engine\DebugCamera\CameraManager.h" />
@@ -159,6 +158,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\DX\DXCommand.h" />
     <ClInclude Include="Engine\DX\DXCompil.h" />
     <ClInclude Include="Engine\DX\FPSKeeper.h" />
+    <ClInclude Include="Engine\DX\SRVManager.h" />
     <ClInclude Include="Engine\GlobalVariables\GlobalVariables.h" />
     <ClInclude Include="Engine\GraphicPipeline\BasePipeline.h" />
     <ClInclude Include="Engine\GraphicPipeline\GaussPipeline.h" />
@@ -178,6 +178,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Math\MatrixCalculation.h" />
     <ClInclude Include="Engine\Math\MyVec2.h" />
     <ClInclude Include="Engine\Math\MyVec3.h" />
+    <ClInclude Include="Engine\Math\Random.h" />
     <ClInclude Include="Engine\Math\Vector2.h" />
     <ClInclude Include="Engine\Math\Vector2Matrix.h" />
     <ClInclude Include="Engine\Math\Vector3.h" />
@@ -190,16 +191,15 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Model\Object3dCommon.h" />
     <ClInclude Include="Engine\Model\Sprite.h" />
     <ClInclude Include="Engine\Model\TextureManager.h" />
+    <ClInclude Include="Engine\Particle\Particle.h" />
+    <ClInclude Include="Engine\Particle\ParticleEmitter.h" />
+    <ClInclude Include="Engine\Particle\ParticleManager.h" />
+    <ClInclude Include="Engine\Scene\BaseScene.h" />
     <ClInclude Include="Engine\WinApp\MyWindow.h" />
     <ClInclude Include="Game\Field\MapChipField.h" />
     <ClInclude Include="Game\GameScene.h" />
-    <ClInclude Include="Particle.h" />
-    <ClInclude Include="ParticleEmitter.h" />
-    <ClInclude Include="ParticleManager.h" />
-    <ClInclude Include="Random.h" />
-    <ClInclude Include="ResultScene.h" />
-    <ClInclude Include="SRVManager.h" />
-    <ClInclude Include="TitleScene.h" />
+    <ClInclude Include="Game\ResultScene.h" />
+    <ClInclude Include="Game\TitleScene.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">

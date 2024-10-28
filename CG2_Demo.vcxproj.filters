@@ -119,29 +119,29 @@
     <ClCompile Include="Engine\GraphicPipeline\PipelineManager.cpp">
       <Filter>Engine\GraphicPipeline</Filter>
     </ClCompile>
-    <ClCompile Include="Random.cpp">
+    <ClCompile Include="Engine\Math\Random.cpp">
       <Filter>Engine\Math</Filter>
     </ClCompile>
-    <ClCompile Include="ParticleManager.cpp">
-      <Filter>Engine\Particle</Filter>
-    </ClCompile>
-    <ClCompile Include="Particle.cpp">
-      <Filter>Engine\Particle</Filter>
-    </ClCompile>
-    <ClCompile Include="SRVManager.cpp">
-      <Filter>Engine\DX</Filter>
-    </ClCompile>
-    <ClCompile Include="ParticleEmitter.cpp">
-      <Filter>Engine\Particle</Filter>
-    </ClCompile>
-    <ClCompile Include="TitleScene.cpp">
+    <ClCompile Include="Game\ResultScene.cpp">
       <Filter>Game</Filter>
     </ClCompile>
-    <ClCompile Include="ResultScene.cpp">
+    <ClCompile Include="Game\TitleScene.cpp">
       <Filter>Game</Filter>
     </ClCompile>
-    <ClCompile Include="BaseScene.cpp">
+    <ClCompile Include="Engine\Scene\BaseScene.cpp">
       <Filter>Engine\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Particle\Particle.cpp">
+      <Filter>Engine\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Particle\ParticleEmitter.cpp">
+      <Filter>Engine\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Particle\ParticleManager.cpp">
+      <Filter>Engine\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\DX\SRVManager.cpp">
+      <Filter>Engine\DX</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -271,29 +271,29 @@
     <ClInclude Include="Engine\GraphicPipeline\PipelineManager.h">
       <Filter>Engine\GraphicPipeline</Filter>
     </ClInclude>
-    <ClInclude Include="Random.h">
+    <ClInclude Include="Engine\Math\Random.h">
       <Filter>Engine\Math</Filter>
     </ClInclude>
-    <ClInclude Include="ParticleManager.h">
-      <Filter>Engine\Particle</Filter>
-    </ClInclude>
-    <ClInclude Include="Particle.h">
-      <Filter>Engine\Particle</Filter>
-    </ClInclude>
-    <ClInclude Include="SRVManager.h">
-      <Filter>Engine\DX</Filter>
-    </ClInclude>
-    <ClInclude Include="ParticleEmitter.h">
-      <Filter>Engine\Particle</Filter>
-    </ClInclude>
-    <ClInclude Include="TitleScene.h">
+    <ClInclude Include="Game\ResultScene.h">
       <Filter>Game</Filter>
     </ClInclude>
-    <ClInclude Include="ResultScene.h">
+    <ClInclude Include="Game\TitleScene.h">
       <Filter>Game</Filter>
     </ClInclude>
-    <ClInclude Include="BaseScene.h">
+    <ClInclude Include="Engine\Scene\BaseScene.h">
       <Filter>Engine\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Particle\Particle.h">
+      <Filter>Engine\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Particle\ParticleEmitter.h">
+      <Filter>Engine\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Particle\ParticleManager.h">
+      <Filter>Engine\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\DX\SRVManager.h">
+      <Filter>Engine\DX</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

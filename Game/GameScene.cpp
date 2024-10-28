@@ -3,7 +3,7 @@
 #include "GlobalVariables.h"
 #include "FPSKeeper.h"
 
-#include "ParticleManager.h"
+#include "Particle/ParticleManager.h"
 
 
 
