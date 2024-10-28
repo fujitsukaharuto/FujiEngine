@@ -4,7 +4,7 @@
 #include <wrl.h>
 #include <cstdint>
 #ifdef _DEBUG
-#include "externals/imgui/imgui.h"
+#include "imgui.h"
 #endif // _DEBUG
 
 class MyWin;

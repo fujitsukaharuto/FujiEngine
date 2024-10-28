@@ -2,27 +2,6 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="externals\imgui\imgui.cpp">
-      <Filter>Externals\Imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_demo.cpp">
-      <Filter>Externals\Imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_draw.cpp">
-      <Filter>Externals\Imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_impl_dx12.cpp">
-      <Filter>Externals\Imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_impl_win32.cpp">
-      <Filter>Externals\Imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_tables.cpp">
-      <Filter>Externals\Imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_widgets.cpp">
-      <Filter>Externals\Imgui</Filter>
-    </ClCompile>
     <ClCompile Include="Game\Field\MapChipField.cpp">
       <Filter>Game\Field</Filter>
     </ClCompile>
@@ -187,30 +166,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="externals\imgui\imconfig.h">
-      <Filter>Externals\Imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imgui.h">
-      <Filter>Externals\Imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imgui_impl_dx12.h">
-      <Filter>Externals\Imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imgui_impl_win32.h">
-      <Filter>Externals\Imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imgui_internal.h">
-      <Filter>Externals\Imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imstb_rectpack.h">
-      <Filter>Externals\Imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imstb_textedit.h">
-      <Filter>Externals\Imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imstb_truetype.h">
-      <Filter>Externals\Imgui</Filter>
-    </ClInclude>
     <ClInclude Include="Game\Field\MapChipField.h">
       <Filter>Game\Field</Filter>
     </ClInclude>
@@ -393,9 +348,6 @@
     <Filter Include="Game">
       <UniqueIdentifier>{a757f108-94e3-4654-a9dd-60e1df2d6d9a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Externals\Imgui">
-      <UniqueIdentifier>{098a6ab1-fdde-4b70-a6b2-7984bc9997d2}</UniqueIdentifier>
-    </Filter>
     <Filter Include="resource">
       <UniqueIdentifier>{d1480a97-446f-40e9-b028-4aef321c7247}</UniqueIdentifier>
     </Filter>
@@ -453,11 +405,6 @@
     <Filter Include="Game\Scene">
       <UniqueIdentifier>{876a42fa-927a-44d8-af82-2c1a3485d66f}</UniqueIdentifier>
     </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="externals\imgui\LICENSE.txt">
-      <Filter>Externals\Imgui</Filter>
-    </Text>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resource\Shaders\GaussianBlur.PS.hlsl">
