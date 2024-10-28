@@ -1,6 +1,5 @@
 #pragma once
 #include <fstream>
-#include <cassert>
 #include <xaudio2.h>
 #include <vector>
 #include <wrl.h>

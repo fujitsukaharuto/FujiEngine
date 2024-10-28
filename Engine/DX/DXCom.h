@@ -4,16 +4,10 @@
 #include <format>
 #include <d3d12.h>
 #include <dxgi1_6.h>
-#include <dxcapi.h>
 #include <dxgidebug.h>
-#include <vector>
 #include <cassert>
-#include <chrono>
-#include <random>
 #include <wrl.h>
 
-#include "externals/DirectXTex/DirectXTex.h"
-#include "externals/DirectXTex/d3dx12.h"
 
 #include "MatrixCalculation.h"
 #include "MyWindow.h"

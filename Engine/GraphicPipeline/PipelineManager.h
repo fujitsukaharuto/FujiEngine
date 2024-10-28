@@ -1,7 +1,7 @@
 #pragma once
 #include "BasePipeline.h"
 #include <memory>
-
+#include <vector>
 
 
 enum class Pipe : int {
