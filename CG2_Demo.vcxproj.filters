@@ -158,15 +158,6 @@
     <ClCompile Include="Line3dDrawer.cpp">
       <Filter>Engine\Line</Filter>
     </ClCompile>
-    <ClCompile Include="RailCamera.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
-    <ClCompile Include="RailEditor.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
-    <ClCompile Include="player.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
     <ClCompile Include="BaseScene.cpp">
       <Filter>Engine\Scene</Filter>
     </ClCompile>
@@ -178,12 +169,6 @@
     </ClCompile>
     <ClCompile Include="ResultScene.cpp">
       <Filter>Game\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="Enemy.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
-    <ClCompile Include="BaseObject.cpp">
-      <Filter>Game</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -355,15 +340,6 @@
     <ClInclude Include="Line3dDrawer.h">
       <Filter>Engine\Line</Filter>
     </ClInclude>
-    <ClInclude Include="RailCamera.h">
-      <Filter>Game</Filter>
-    </ClInclude>
-    <ClInclude Include="RailEditor.h">
-      <Filter>Game</Filter>
-    </ClInclude>
-    <ClInclude Include="Player.h">
-      <Filter>Game</Filter>
-    </ClInclude>
     <ClInclude Include="BaseScene.h">
       <Filter>Engine\Scene</Filter>
     </ClInclude>
@@ -375,12 +351,6 @@
     </ClInclude>
     <ClInclude Include="ResultScene.h">
       <Filter>Game\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Enemy.h">
-      <Filter>Game</Filter>
-    </ClInclude>
-    <ClInclude Include="BaseObject.h">
-      <Filter>Game</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
