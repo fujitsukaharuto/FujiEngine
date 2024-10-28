@@ -155,9 +155,6 @@
     <ClCompile Include="Line3dPipe.cpp">
       <Filter>Engine\GraphicPipeline</Filter>
     </ClCompile>
-    <ClCompile Include="Line3dDrawer.cpp">
-      <Filter>Engine\Line</Filter>
-    </ClCompile>
     <ClCompile Include="BaseScene.cpp">
       <Filter>Engine\Scene</Filter>
     </ClCompile>
@@ -336,9 +333,6 @@
     </ClInclude>
     <ClInclude Include="Line3dPipe.h">
       <Filter>Engine\GraphicPipeline</Filter>
-    </ClInclude>
-    <ClInclude Include="Line3dDrawer.h">
-      <Filter>Engine\Line</Filter>
     </ClInclude>
     <ClInclude Include="BaseScene.h">
       <Filter>Engine\Scene</Filter>
