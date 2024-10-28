@@ -1,4 +1,5 @@
 #pragma once
+#include "TextureManager.h"
 #include "MatrixCalculation.h"
 
 enum SizeType {
@@ -20,8 +21,8 @@ public:
 
 public:
 
-	int lifeTime_ = 0;
-	int startLifeTime_ = 0;
+	float lifeTime_ = 0;
+	float startLifeTime_ = 0;
 	bool isLive_ = false;
 	Vector3 accele{};
 	Vector3 speed{};

@@ -80,9 +80,9 @@ void GameScene::Initialize() {
 
 	emit.count = 3;
 	emit.frequencyTime = 20.0f;
-	emit.name = "test";
+	emit.name = "animetest";
 	emit.pos = { 0.0f,2.0f,0.0f };
-	emit.grain.lifeTime_ = 20;
+	emit.animeData.lifeTime = 40.0f;
 	emit.RandomSpeed({ -0.1f,0.1f }, { -0.1f,0.1f }, { -0.1f,0.1f });
 	emit.RandomTranslate({ -0.1f,0.1f }, { -0.1f,0.1f }, { -0.1f,0.1f });
 	emit.grain.transform.scale = { 1.0f,1.0f,1.0f };
@@ -140,9 +140,11 @@ void GameScene::Update() {
 
 	if (input_->TriggerKey(DIK_8)) {
 		audio_->SoundPlayWave(soundData1);
+		emit.BurstAnime();
 	}
 	if (input_->TriggerKey(DIK_9)) {
 		audio_->SoundStopWave(soundData1);
+
 	}
 	if (input_->TriggerKey(DIK_7)) {
 		audio_->SoundPlayWave(soundData2);

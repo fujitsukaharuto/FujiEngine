@@ -14,6 +14,8 @@ public:
 
 	void Burst();
 
+	void BurstAnime();
+
 	void RandomSpeed(const Vector2& x, const Vector2& y, const Vector2& z);
 	void RandomTranslate(const Vector2& x, const Vector2& y, const Vector2& z);
 
@@ -22,6 +24,7 @@ public:
 	std::string name;
 	Vector3 pos;
 	Particle grain{};
+	AnimeData animeData{};
 	uint32_t count;
 
 private:

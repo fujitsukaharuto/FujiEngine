@@ -148,7 +148,7 @@ void Sprite::InitializeBuffer() {
 
 void Sprite::AdjustTextureSize() {
 	const DirectX::TexMetadata& meta = TextureManager::GetInstance()->GetMetaData(nowtexture);
- 
+
 	size_ = { static_cast<float>(meta.width),static_cast<float>(meta.height) };
 	SetWvp();
 }

@@ -21,8 +21,7 @@ struct Texture {
 };
 
 
-class TextureManager
-{
+class TextureManager {
 public:
 	TextureManager();
 	~TextureManager();

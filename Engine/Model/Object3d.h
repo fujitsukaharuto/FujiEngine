@@ -22,6 +22,8 @@ public:
 
 	void Draw();
 
+	void AnimeDraw();
+
 	Matrix4x4 GetWorldMat() const;
 
 	void SetColor(const Vector4& color);
@@ -33,6 +35,10 @@ public:
 	void SetParent(Object3d* parent) { parent_ = parent; }
 
 	void SetCameraParent(bool is) { isCameraParent_ = is; }
+
+	void SetTexture(const std::string& name);
+
+	void SetBillboardMat(const Matrix4x4& mat) { billboardMatrix_ = mat; }
 
 	/*void SetPointLight(PointLight* light) { pointLight_ = light; }
 
@@ -47,6 +53,8 @@ private:
 	void CreateWVP();
 
 	void SetWVP();
+
+	void SetBillboardWVP();
 
 private:
 	Object3dCommon* common_;
@@ -67,4 +75,6 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> cameraPosResource_ = nullptr;
 	CameraForGPU* cameraPosData_ = nullptr;
 
+	Matrix4x4 billboardMatrix_;
+	std::string nowTextureName;
 };
