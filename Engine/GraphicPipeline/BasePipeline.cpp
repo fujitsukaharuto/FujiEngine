@@ -1,9 +1,7 @@
 #include "BasePipeline.h"
 #include "DXCom.h"
 #include "DXCommand.h"
-#include "DXCompil.h"
-#include "Logger.h"
-#include <cassert>
+
 
 BasePipeline::~BasePipeline() {
 	pso_.Reset();
