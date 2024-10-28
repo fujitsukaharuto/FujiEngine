@@ -1,8 +1,6 @@
 #include "Object3d.h"
 #include "ModelManager.h"
 #include "DXCom.h"
-#include "PointLight.h"
-#include "SpotLight.h"
 #include "PointLightManager.h"
 #include "CameraManager.h"
 

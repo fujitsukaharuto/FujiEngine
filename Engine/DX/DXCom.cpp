@@ -2,22 +2,15 @@
 #include "Logger.h"
 #include "SRVManager.h"
 #include "ImGuiManager.h"
-#include "Input.h"
-#include <DebugCamera.h>
+
 
 #include <d3d12.h>
 #include <dxgi1_6.h>
-#include <dxcapi.h>
-#include <dxgidebug.h>
-#include <fstream>
-#include <sstream>
-#include <random>
 #include <string>
 
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
-#pragma comment(lib,"dxguid.lib")
-#pragma comment(lib,"dxcompiler.lib")
+
 
 DXCom* DXCom::GetInstance()
 {

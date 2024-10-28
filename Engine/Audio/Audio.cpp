@@ -1,4 +1,5 @@
 #include "Audio.h"
+#include <cassert>
 
 Audio::Audio()
 {
