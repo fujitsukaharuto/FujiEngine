@@ -5,7 +5,7 @@
 #include "RailEditor.h"
 #include "Player.h"
 #include "Enemy.h"
-
+#include "EnemyManager.h"
 
 class GameScene :public BaseScene
 {
@@ -56,6 +56,7 @@ private:
 
 
 	Player* player_;
+	EnemyManager* enemyManager_;
 	Enemy* enemy_;
 
 };

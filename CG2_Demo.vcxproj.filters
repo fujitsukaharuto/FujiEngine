@@ -164,6 +164,9 @@
     <ClCompile Include="RailEditor.cpp">
       <Filter>Game</Filter>
     </ClCompile>
+    <ClCompile Include="EnemyManager.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -335,6 +338,9 @@
       <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="RailEditor.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyManager.h">
       <Filter>Game</Filter>
     </ClInclude>
   </ItemGroup>

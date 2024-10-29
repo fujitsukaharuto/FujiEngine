@@ -9,7 +9,7 @@ public:
 
 public:
 
-	void Initialize();
+	void Initialize(Vector3 pos, Vector3 speed);
 
 	void Update();
 
@@ -17,16 +17,22 @@ public:
 
 	Vector3 GetCentarPos()const;
 
+	Vector3 GetVelocity()const { return velocity; }
+
 	bool GetLive()const { return isLive; }
 
 	void SetLive(bool is) { isLive = is; }
 
-private:
-
-
+	void SetPosAndVelo(const Vector3& pos, const Vector3& speed);
 
 private:
 
+
+
+private:
+
+	Trans trans;
+	Vector3 velocity;
 
 	Object3d* enemy;
 	bool isLive = true;

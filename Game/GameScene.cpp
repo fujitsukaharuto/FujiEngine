@@ -20,6 +20,7 @@ GameScene::~GameScene() {
 	delete terrain;
 	delete test;
 	delete player_;
+	delete enemyManager_;
 	delete enemy_;
 }
 
@@ -89,8 +90,11 @@ void GameScene::Initialize() {
 	player_ = new Player();
 	player_->Initialize();
 
+	enemyManager_ = new EnemyManager();
+	enemyManager_->Initialize();
+
 	enemy_ = new Enemy();
-	enemy_->Initialize();
+	enemy_->Initialize({ 2.0f,5.0f,-8.0f }, { 0.0f,0.0f,0.0f });
 
 }
 
@@ -101,6 +105,7 @@ void GameScene::Update() {
 	ApplyGlobalVariables();
 
 	editor.Update();
+	enemyManager_->Update();
 
 	ImGui::Begin("suzunne");
 
@@ -215,6 +220,7 @@ void GameScene::Draw() {
 	terrain->Draw();
 
 	editor.RailDarw();
+	enemyManager_->Draw();
 
 	ParticleManager::GetInstance()->Draw();
 
