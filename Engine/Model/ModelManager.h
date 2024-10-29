@@ -1,12 +1,7 @@
 #pragma once
-#include "MatrixCalculation.h"
-#include <d3d12.h>
 #include <string>
-#include <wrl.h>
 #include <memory>
 #include <map>
-#include "Mesh.h"
-#include "Material.h"
 #include "Model.h"
 
 #include "externals/DirectXTex/DirectXTex.h"

@@ -2,7 +2,6 @@
 #include "MatrixCalculation.h"
 #include <d3d12.h>
 #include <string>
-#include <wrl.h>
 #include "DXCom.h"
 #include "Mesh.h"
 #include "Material.h"
