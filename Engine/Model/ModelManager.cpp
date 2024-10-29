@@ -1,7 +1,8 @@
 #include "ModelManager.h"
 #include <fstream>
-
-
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 
 
 ModelManager::~ModelManager() {
@@ -35,94 +36,87 @@ void ModelManager::LoadOBJ(const std::string& filename) {
 
 	std::unique_ptr<Model> model;
 	model.reset(new Model());
-	Mesh mesh{};
-	Material material{};
+	Mesh newMesh{};
+	Material newMaterial{};
 
 
-	std::vector<Vector4> positions;
-	std::vector<Vector3> normals;
-	std::vector<Vector2> texcords;
-	std::string line;
-
+	Assimp::Importer importer;
 	std::string path = instance->kDirectoryPath_ + "/" + filename;
-	std::ifstream file(path);
-	assert(file.is_open());
+	const aiScene* scene = importer.ReadFile(path.c_str(), aiProcess_FlipWindingOrder | aiProcess_FlipUVs);
+	assert(scene->HasMeshes());
 
-	while (std::getline(file, line)) {
-		std::string identifier;
-		std::istringstream s(line);
 
-		s >> identifier;
+	// Mesh解析
+	for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; meshIndex++) {
 
-		if (identifier == "v") {
-			Vector4 position;
-			s >> position.X >> position.Y >> position.Z;
-			position.W = 1.0f;
+		aiMesh* mesh = scene->mMeshes[meshIndex];
+		assert(mesh->HasNormals());
+		bool hasTexcoord = mesh->HasTextureCoords(0);
 
-			positions.push_back(position);
-		}
-		else if (identifier == "vt") {
-			Vector2 texcoord;
-			s >> texcoord.x >> texcoord.y;
 
-			texcords.push_back(texcoord);
-		}
-		else if (identifier == "vn") {
-			Vector3 normal;
-			s >> normal.x >> normal.y >> normal.z;
+		// Face解析
+		for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; faceIndex++) {
 
-			normals.push_back(normal);
-		}
-		else if (identifier == "f") {
-			VertexDate triangle[3];
-			for (int32_t faceVertex = 0; faceVertex < 3; faceVertex++) {
-				std::string vertexDefinition;
-				s >> vertexDefinition;
-				//頂点の要素へのindexは　位置/uv/法線　で格納されているので、分解してindex取得
-				std::istringstream v(vertexDefinition);
-				std::string index;
-				uint32_t elementIndices[3] = { 0,0,0 };
-				int32_t element = 0;
-				while (std::getline(v, index, '/')) {
-					if (!index.empty()) {
-						elementIndices[element] = std::stoi(index);
-					}
-					element++;
+			aiFace& face = mesh->mFaces[faceIndex];
+			assert(face.mNumIndices == 3);
+
+			// Vertex解析
+			for (uint32_t element = 0; element < face.mNumIndices; element++) {
+
+				uint32_t vertexIndex = face.mIndices[element];
+				aiVector3D& position = mesh->mVertices[vertexIndex];
+				aiVector3D& normal = mesh->mNormals[vertexIndex];
+
+				VertexDate vertex;
+				vertex.position = { position.x,position.y,position.z,1.0f };
+				vertex.normal = { normal.x,normal.y,normal.z };
+
+				if (hasTexcoord) {
+					aiVector3D& texcoord = mesh->mTextureCoords[0][vertexIndex];
+					vertex.texcoord = { texcoord.x,texcoord.y };
 				}
-				Vector4 position = positions[elementIndices[0] - 1];
-				position.X *= -1.0f;
-				Vector2 texcoord = { 0.0f,0.0f };
-				if (elementIndices[1] > 0) {
-					texcoord = texcords[elementIndices[1] - 1];
-					texcoord.y = 1.0f - texcoord.y;
+				else {
+					vertex.texcoord = { 0.0f,0.0f };
 				}
-				Vector3 normal = normals[elementIndices[2] - 1];
-				normal.x *= -1.0f;
-				triangle[faceVertex] = { position,texcoord,normal };
-				/*VertexData vertex= { position,texcoord,normal };
-				modeldata.vertices.push_back(vertex);*/
+
+
+				vertex.position.X *= -1.0f;
+				vertex.normal.x *= -1.0f;
+
+				newMesh.AddVertex({ {vertex.position},{vertex.texcoord},{vertex.normal} });
+
 			}
-			mesh.AddVertex({ {triangle[2].position},{triangle[2].texcoord},{triangle[2].normal} });
-			mesh.AddVertex({ {triangle[1].position},{triangle[1].texcoord},{triangle[1].normal} });
-			mesh.AddVertex({ {triangle[0].position},{triangle[0].texcoord},{triangle[0].normal} });
-		}
-		else if (identifier == "mtllib") {
-			std::string materialFilename;
-			s >> materialFilename;
-
-			MaterialDataPath matelialPath;
-			matelialPath = LoadMaterialFile(materialFilename);
-
-			material.SetTextureNamePath(matelialPath.textureFilePath);
-			material.CreateMaterial();
-			model->AddMaterial(material);
-			model->SetTextureName(matelialPath.textureFilePath);
 		}
 	}
 
-	mesh.CreateMesh();
+	// Material解析
+	for (uint32_t materialIndex = 0; materialIndex < scene->mNumMaterials; materialIndex++) {
 
-	model->AddMesh(mesh);
+		aiMaterial* material = scene->mMaterials[materialIndex];
+
+		if (material->GetTextureCount(aiTextureType_DIFFUSE) != 0) {
+
+			aiString textureFileName;
+			material->GetTexture(aiTextureType_DIFFUSE, 0, &textureFileName);
+			newMaterial.SetTextureNamePath((textureFileName).C_Str());
+			newMaterial.CreateMaterial();
+			model->AddMaterial(newMaterial);
+			model->SetTextureName((textureFileName).C_Str());
+		}
+	}
+
+	if (model->GetTextuerName().empty()) {
+		const std::string defaultTexture = "white2x2.png";
+		newMaterial.SetTextureNamePath(defaultTexture);
+		newMaterial.CreateMaterial();
+		model->AddMaterial(newMaterial);
+		model->SetTextureName(defaultTexture);
+	}
+
+
+	newMesh.CreateMesh();
+
+	model->AddMesh(newMesh);
 
 	instance->models_.insert(std::make_pair(filename, std::move(model)));
 }
