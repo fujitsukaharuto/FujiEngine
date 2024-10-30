@@ -19,35 +19,45 @@ void Player::Initialize() {
 	target->Create("ICO.obj");
 
 	bullet = new Object3d();
-	bullet->Create("ICO.obj");
+	bullet->Create("razer.obj");
+	bullet->transform.scale.z = 82.0f;
 
 }
 
 void Player::Update() {
 
 	ReticleCal();
-	Camera* camera = CameraManager::GetInstance()->GetCamera();
+	//Camera* camera = CameraManager::GetInstance()->GetCamera();
 
-	if (Input::GetInstance()->IsTriggerMouse(0)) {
-		const float kBulletSpeed = 1.0f;
-		Vector3 worldPosReticle;
+	//if (Input::GetInstance()->IsPressMouse(0)) {
+	//	const float kBulletSpeed = 82.0f;
+	//	Vector3 worldPosReticle;
 
-		worldPosReticle = target->transform.translate;
+	//	worldPosReticle = target->transform.translate;
 
-		Vector3 worldPosPlayer = camera->transform.translate;
-		Vector3 offset = { 0.0f,1.0f,0.0f };
-		worldPosPlayer = worldPosPlayer - offset;
-		Vector3 velocity = worldPosReticle - worldPosPlayer;
-		velocity = velocity.Normalize();
-		velocity = velocity * kBulletSpeed;
-		velo_ = velocity;
+	//	Vector3 worldPosPlayer = camera->transform.translate;
+	//	Vector3 offset = { 0.0f,0.5f,0.0f };
+	//	worldPosPlayer = worldPosPlayer - offset;
+	//	Vector3 velocity = worldPosReticle - worldPosPlayer;
+	//	velocity = velocity.Normalize();
+	//	velocity = velocity * kBulletSpeed;
+	//	velo_ = velocity;
 
-		startTime = 0.0f;
-		Vector3 worldPos = worldPosPlayer;
-		bullet->transform.translate = worldPos;
-		/*bullet->transform.scale = { 0.0f,0.0f,0.0f };*/
-		isLive = true;
-	}
+	//	bullet->transform.rotate.y = std::atan2(velocity.x, velocity.z);
+	//	Matrix4x4 yrota = MakeRotateYMatrix(-bullet->transform.rotate.y);
+	//	Vector3 velocityZ = TransformNormal(velocity, yrota);
+	//	bullet->transform.rotate.x = std::atan2(-velocityZ.y, velocityZ.z);
+	//	bullet->transform.rotate.z = 0.0f;
+
+	//	startTime = 0.0f;
+	//	Vector3 worldPos = worldPosPlayer;
+	//	bullet->transform.translate = worldPos;
+	//	/*bullet->transform.scale = { 0.0f,0.0f,0.0f };*/
+	//	isLive = true;
+	//}
+	//else {
+	//	isLive = false;
+	//}
 
 	if (isLive) {
 		if (startTime <= kStartTime) {
@@ -56,7 +66,6 @@ void Player::Update() {
 			//bullet->transform.scale.y += 0.05f * FPSKeeper::DeltaTime();
 			//bullet->transform.scale.z += 0.05f * FPSKeeper::DeltaTime();
 		}
-		bullet->transform.translate += velo_;
 	}
 
 }

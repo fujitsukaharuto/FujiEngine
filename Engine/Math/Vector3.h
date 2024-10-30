@@ -18,6 +18,13 @@ public:
 
 	//Operator
 
+	bool operator==(const Vector3& other) const {
+		const float epsilon = 1e-5f; // 許容誤差の定義
+		return (std::fabs(x - other.x) < epsilon) &&
+			(std::fabs(y - other.y) < epsilon) &&
+			(std::fabs(z - other.z) < epsilon);
+	}
+
 	Vector3& operator = (const Vector3& v) {
 		x = v.x;
 		y = v.y;
@@ -50,9 +57,9 @@ public:
 	Vector3 operator/(float k) const { return Vector3(x / k, y / k, z / k); }
 
 
-	float Lenght() const { return std::sqrtf((*this) * (*this)); }
+	float Length() const { return std::sqrtf((*this) * (*this)); }
 	Vector3 Normalize() const {
-		const float leng = Lenght();
+		const float leng = Length();
 		return leng == 0 ? *this : *this / leng;
 	}
 

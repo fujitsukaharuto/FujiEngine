@@ -189,3 +189,9 @@ float Clamp(float x, float min, float max);
 Vector3 CatmullRomPoint(const Vector3& p0, const Vector3& p1, const Vector3& p2, const Vector3& p3, float t);
 
 Vector3 CatmullRom(const std::vector<Vector3>& control, float t);
+
+Vector3 ExtractEulerAngles(const Matrix4x4& rotationMatrix);
+
+Matrix4x4 MakeLookAtMatrix(const Vector3& forward, const Vector3& up);
+
+Matrix4x4 MakeRotationAxisAngle(const Vector3& axis, float angle);

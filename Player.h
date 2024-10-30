@@ -15,6 +15,7 @@ public:
 	void Draw();
 
 	Vector3 GetCenterBullet()const;
+	Vector3 GetEndBullet()const { return velo_; }
 
 	float GetBulletScale()const;
 

@@ -21,6 +21,8 @@ public:
 
 private:
 
+	bool IsLineCollisionSphere(const Vector3& P1, const Vector3& P2, const Vector3& C, float r);
+
 	void ApplyGlobalVariables();//値読み込みテスト用今度Objectクラス作って継承で使えるようにする
 
 	std::unique_ptr<Object3dCommon> obj3dCommon = nullptr;
@@ -57,6 +59,7 @@ private:
 
 	Player* player_;
 	EnemyManager* enemyManager_;
-	Enemy* enemy_;
+
+	int score = 0;
 
 };

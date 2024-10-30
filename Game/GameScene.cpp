@@ -21,7 +21,7 @@ GameScene::~GameScene() {
 	delete test;
 	delete player_;
 	delete enemyManager_;
-	delete enemy_;
+
 }
 
 void GameScene::Initialize() {
@@ -93,8 +93,6 @@ void GameScene::Initialize() {
 	enemyManager_ = new EnemyManager();
 	enemyManager_->Initialize();
 
-	enemy_ = new Enemy();
-	enemy_->Initialize({ 2.0f,5.0f,-8.0f }, { 0.0f,0.0f,0.0f });
 
 }
 
@@ -173,22 +171,31 @@ void GameScene::Update() {
 
 
 	player_->Update();
-	enemy_->Update();
+	enemyManager_->EnemyUpdate();
+
 
 	Vector3 bulletPos = player_->GetCenterBullet();
-	float bulletSize = player_->GetBulletScale();
+	Vector3 bulletEndPos= player_->GetEndBullet();
 
-	Vector3 enemypos = enemy_->GetCentarPos();
+	for (auto& enemy : enemyManager_->GetEnemyList()) {
+		Vector3 enemypos = enemy->GetCentarPos();
 
-	Vector3 leng = enemypos - bulletPos;
-	float length = leng.Lenght();
-	if (enemy_->GetLive()&&player_->GetLive()) {
-		if (length <= bulletSize + 1.0f) {
-			enemy_->SetLive(false);
-			player_->SetLive(false);
+		if (enemy->GetLive()) {
+			if (IsLineCollisionSphere(bulletPos, bulletEndPos, enemypos, 1.0f)) {
+				enemy->SetLive(false);
+				score += 60;
+			}
 		}
-
 	}
+
+#ifdef _DEBUG
+
+	ImGui::Begin("Score");
+	ImGui::Text("score : %d", score);
+	ImGui::End();
+
+#endif // _DEBUG
+
 
 
 	/*emit.Emit();*/
@@ -212,7 +219,7 @@ void GameScene::Draw() {
 	fence->Draw();
 
 	player_->Draw();
-	enemy_->Draw();
+	enemyManager_->Draw();
 
 	for (auto suzunneModel : suzunnes) {
 		suzunneModel->Draw();
@@ -242,6 +249,26 @@ void GameScene::Draw() {
 	dxCommon_->PostEffect();
 
 
+}
+
+bool GameScene::IsLineCollisionSphere(const Vector3& P1, const Vector3& P2, const Vector3& C, float r) {
+	Vector3 lineVec = P2;
+	Vector3 lineToCenter = C - P1;
+
+	// 内積を使って最近接点を求める
+	float t = (lineToCenter * lineVec) / (lineVec * lineVec);
+
+	// tを0～1の範囲にクランプ（線分内に限定）
+	t = std::clamp(t, 0.0f, 1.0f);
+
+	// 線分上の最近接点を計算
+	Vector3 closestPoint = P1 + lineVec * t;
+
+	// 最近接点と球の中心との距離を計算
+	float distanceToCenter = (closestPoint - C).Length();
+
+	// 距離が半径以下なら衝突と判定
+	return distanceToCenter <= r;
 }
 
 void GameScene::ApplyGlobalVariables() {

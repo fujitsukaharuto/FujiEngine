@@ -10,12 +10,55 @@ EnemyManager::EnemyManager() {
 
 EnemyManager::~EnemyManager() {
 	enemyPoses_.clear();
+	for (auto& i : enemies_) {
+		delete i;
+	}
+
+
+
+	for (auto& i : popPositionSigns_) {
+		delete i;
+	}
+	for (auto& i : enemyPopSigns_) {
+		delete i;
+	}
+
 }
 
 void EnemyManager::Initialize() {
 
 	Load("enemyPosition.json");
 	LoadPop("popData.json");
+
+
+	Enemy* enemy;
+	enemy = new Enemy();
+	enemy->Initialize({ 2.0f,5.0f,-8.0f }, { 0.0f,0.0f,0.0f });
+	enemies_.push_back(enemy);
+
+
+#ifdef _DEBUG
+
+	for (int i = 0; i < 20; i++) {
+
+		Object3d* obj = new Object3d();
+		obj->Create("ICO.obj");
+		obj->SetColor({ 1.0f,0.0f,0.0f,1.0f });
+		obj->transform.scale = { 0.5f,0.5f,0.5f };
+		enemyPopSigns_.push_back(obj);
+	}
+
+	for (int i = 0; i < 20; i++) {
+
+		Object3d* obj = new Object3d();
+		obj->Create("ICO.obj");
+		obj->SetColor({ 0.0f,1.0f,0.0f,1.0f });
+		obj->transform.scale = { 0.5f,0.5f,0.5f };
+		popPositionSigns_.push_back(obj);
+	}
+
+
+#endif // _DEBUG
 
 }
 
@@ -55,24 +98,101 @@ void EnemyManager::Update() {
 	ImGui::End();
 
 	ImGui::Begin("PopPos");
+	for (int i = 0; i < appear_.size(); i++) {
+		std::string indexStr = std::to_string(i);
+		Vector3 pos = appear_[i].first;
+		int popCount = appear_[i].second;
+		if (ImGui::TreeNodeEx(("pop" + indexStr).c_str(), ImGuiTreeNodeFlags_DefaultOpen)) {
+
+			ImGui::DragFloat3("PopPos", &pos.x, 0.01f);
+			ImGui::DragInt("popCount", &popCount, 0, 4);
+
+			ImGui::TreePop();
+		}
+		appear_[i].first = pos;
+		appear_[i].second = popCount;
+	}
+
 	ImGui::SliderInt("enemyCount", &count, 1, 4); ImGui::SameLine();
 	if (ImGui::Button("AddPos")) {
 		appear_.push_back(std::make_pair(CameraManager::GetInstance()->GetCamera()->transform.translate, count));
+	}
+	if (ImGui::Button("DeletePopPos")) {
+		appear_.pop_back();
 	}
 	if (ImGui::Button("SAVE")) {
 		SavePop("popData.json");
 	}
 	ImGui::End();
 
+
+	for (int i = 0; i < appear_.size(); i++) {
+
+		popPositionSigns_[i]->transform.translate = appear_[i].first;
+		popPositionSigns_[i]->transform.translate.y -= 0.5f;
+
+	}
+
+	for (int i = 0; i < enemyPoses_.size(); i++) {
+
+		enemyPopSigns_[i]->transform.translate = enemyPoses_[i].first;
+
+	}
+
+
 #endif // _DEBUG
+
+	EnemyPop();
 
 }
 
+void EnemyManager::EnemyUpdate() {
+
+	for (auto& enemy : enemies_) {
+		enemy->Update();
+	}
+}
+
 void EnemyManager::Draw() {
+	for (auto& enemy : enemies_) {
+		enemy->Draw();
+	}
+
+#ifdef _DEBUG
+
+	for (auto& i : popPositionSigns_) {
+		i->Draw();
+	}
+
+	for (auto& i : enemyPopSigns_) {
+		i->Draw();
+	}
+
+#endif // _DEBUG
+
+
 
 }
 
 void EnemyManager::EnemyPop() {
+
+	if (enemyCount_ == enemyPoses_.size()) {
+		enemyCount_ = 0;
+	}
+
+	Vector3 playerpos = CameraManager::GetInstance()->GetCamera()->transform.translate;
+	for (auto& i : appear_) {
+		Vector3 appearPos = i.first;
+		if (playerpos == appearPos) {
+			for (int popCount = 0; popCount < i.second; popCount++) {
+				Enemy* enemy = new Enemy();
+				enemy->Initialize(enemyPoses_[enemyCount_].first, enemyPoses_[enemyCount_].second);
+				enemyCount_ += 1;
+				enemies_.push_back(enemy);
+			}
+		}
+	}
+
 }
 
 //void EnemyManager::LoadPopDate(const std::string& fileName, std::stringstream& command) {

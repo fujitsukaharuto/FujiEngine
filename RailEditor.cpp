@@ -122,7 +122,7 @@ void RailEditor::Update() {
 
 		camera->transform = trans;
 	}
-
+	SetRail();
 }
 
 void RailEditor::RailDarw() {
@@ -171,15 +171,17 @@ void RailEditor::SetRail() {
 	for (int i = 0; i < pointsDrawing.size() - 2; i++) {
 		Vector3 norTarget = (pointsDrawing[i + 1] - pointsDrawing[i]).Normalize();
 
-		Vector3 currentDir = { 0.0f,0.0f,1.0f };
+		/*Vector3 currentDir = { 0.0f,0.0f,1.0f };
 		Vector3 axis = Cross(currentDir, norTarget);
 		float angle = acos(currentDir * norTarget);
-		rails[i]->transform.rotate = { axis.x * angle, axis.y * angle, 0.0f };
+		rails[i]->transform.rotate = { axis.x * angle, axis.y * angle, 0.0f };*/
 
 
-		/*float pitch = atan2(norTarget.y, norTarget.z);
-		float yaw = atan2(norTarget.x, sqrt(norTarget.y * norTarget.y + norTarget.z * norTarget.z));
-		rails[i]->transform.rotate = { pitch,yaw,0.0f };*/
+		float pitch = asinf(norTarget.y);
+		float yaw = atan2f(norTarget.x, norTarget.z);
+		float roll = 0.0f;
+		rails[i]->transform.rotate = { -pitch,yaw,roll };
+
 		rails[i]->transform.translate = pointsDrawing[i];
 	}
 }

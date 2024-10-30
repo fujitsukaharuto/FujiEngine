@@ -1,5 +1,6 @@
 #include "MatrixCalculation.h"
 #include <algorithm>
+#include <numbers>
 
 Vector2 Multiply(const Vector2& vec, const float& num)
 {
@@ -492,3 +493,71 @@ Vector3 CatmullRom(const std::vector<Vector3>& control, float t) {
 	const Vector3& p3 = control[index3];
 	return CatmullRomPoint(p0, p1, p2, p3, t_2);
 }
+
+Vector3 ExtractEulerAngles(const Matrix4x4& rotationMatrix) {
+	Vector3 eulerAngles;
+
+	if (rotationMatrix.m[2][0] < 1) {
+		if (rotationMatrix.m[2][0] > -1) {
+			eulerAngles.y = asinf(rotationMatrix.m[2][0]);
+			eulerAngles.x = atan2f(-rotationMatrix.m[2][1], rotationMatrix.m[2][2]);
+			eulerAngles.z = atan2f(-rotationMatrix.m[1][0], rotationMatrix.m[0][0]);
+		}
+		else { // rotationMatrix.m[2][0] <= -1
+			eulerAngles.y = -std::numbers::pi_v<float> / 2.0f;
+			eulerAngles.x = -atan2f(rotationMatrix.m[1][2], rotationMatrix.m[1][1]);
+			eulerAngles.z = 0;
+		}
+	}
+	else { // rotationMatrix.m[2][0] >= 1
+		eulerAngles.y = std::numbers::pi_v<float> / 2;
+		eulerAngles.x = atan2f(rotationMatrix.m[1][2], rotationMatrix.m[1][1]);
+		eulerAngles.z = 0;
+	}
+
+	return eulerAngles;
+}
+
+Matrix4x4 MakeLookAtMatrix(const Vector3& forward, const Vector3& up) {
+	Vector3 zAxis = forward.Normalize();  // 視線方向
+	Vector3 xAxis = Cross(up, zAxis).Normalize();  // 右方向
+	Vector3 yAxis = Cross(zAxis, xAxis);  // 上方向
+
+	Matrix4x4 rotationMatrix;
+	rotationMatrix.m[0][0] = xAxis.x;
+	rotationMatrix.m[1][0] = xAxis.y;
+	rotationMatrix.m[2][0] = xAxis.z;
+	rotationMatrix.m[0][1] = yAxis.x;
+	rotationMatrix.m[1][1] = yAxis.y;
+	rotationMatrix.m[2][1] = yAxis.z;
+	rotationMatrix.m[0][2] = zAxis.x;
+	rotationMatrix.m[1][2] = zAxis.y;
+	rotationMatrix.m[2][2] = zAxis.z;
+	rotationMatrix.m[3][3] = 1.0f;
+
+	return rotationMatrix;
+}
+
+Matrix4x4 MakeRotationAxisAngle(const Vector3& axis, float angle) {
+	float cosA = cosf(angle);
+	float sinA = sinf(angle);
+	Vector3 normalizedAxis = axis.Normalize();
+	float x = normalizedAxis.x;
+	float y = normalizedAxis.y;
+	float z = normalizedAxis.z;
+
+	Matrix4x4 rotationMatrix;
+	rotationMatrix.m[0][0] = cosA + x * x * (1 - cosA);
+	rotationMatrix.m[0][1] = x * y * (1 - cosA) - z * sinA;
+	rotationMatrix.m[0][2] = x * z * (1 - cosA) + y * sinA;
+	rotationMatrix.m[1][0] = y * x * (1 - cosA) + z * sinA;
+	rotationMatrix.m[1][1] = cosA + y * y * (1 - cosA);
+	rotationMatrix.m[1][2] = y * z * (1 - cosA) - x * sinA;
+	rotationMatrix.m[2][0] = z * x * (1 - cosA) - y * sinA;
+	rotationMatrix.m[2][1] = z * y * (1 - cosA) + x * sinA;
+	rotationMatrix.m[2][2] = cosA + z * z * (1 - cosA);
+	rotationMatrix.m[3][3] = 1.0f;
+
+	return rotationMatrix;
+}
+
