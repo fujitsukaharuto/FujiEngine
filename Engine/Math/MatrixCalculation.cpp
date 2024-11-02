@@ -1,4 +1,5 @@
 #include "MatrixCalculation.h"
+#include <numbers>
 
 Vector2 Multiply(const Vector2& vec, const float& num)
 {
@@ -428,3 +429,140 @@ Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m)
 }
 
 float Lerp(float v1, float v2, float t) { return (1.0f - t) * v1 + t * v2; }
+
+Vector3 Lerp(const Vector3& v1, const Vector3& v2, float t) {
+	Vector3 result;
+	result = v1 + (v2 - v1) * t;
+	return result;
+}
+
+Vector3 Cross(const Vector3& a, const Vector3& b) {
+	return Vector3(
+		a.y * b.z - a.z * b.y,  // X成分
+		a.z * b.x - a.x * b.z,  // Y成分
+		a.x * b.y - a.y * b.x   // Z成分
+	);
+}
+
+float Clamp(float x, float min, float max) {
+	return x < min ? min : (x > max ? max : x);
+}
+
+Vector3 CatmullRomPoint(const Vector3& p0, const Vector3& p1, const Vector3& p2, const Vector3& p3, float t) {
+
+	const float s = 0.5f;
+
+	float t2 = t * t;
+	float t3 = t2 * t;
+
+	Vector3 e3 = (p0 * (-1)) + (p1 * 3) - (p2 * 3) + p3;
+	Vector3 e2 = p0 * 2 - (p1 * 5) + p2 * 4 + (p3 * (-1));
+	Vector3 e1 = (p0 * (-1)) + p2;
+	Vector3 e0 = p1 * 2;
+
+	return (e3 * t3 + e2 * t2 + e1 * t + e0) * s;
+}
+
+Vector3 CatmullRom(const std::vector<Vector3>& control, float t) {
+	assert(control.size() >= 4 && "制御点が4以下");
+
+	size_t division = control.size() - 1;
+	float areaWidth = 1.0f / division;
+
+	float t_2 = std::fmod(t, areaWidth) * division;
+	t_2 = Clamp(t_2, 0.0f, 1.0f);
+
+	size_t index = static_cast<size_t>(t / areaWidth);
+	index = std::min(index, control.size() - 2);
+
+	size_t index0 = index - 1;
+	size_t index1 = index;
+	size_t index2 = index + 1;
+	size_t index3 = index + 2;
+
+	if (index == 0) {
+		index0 = index1;
+	}
+	if (index3 >= control.size()) {
+		index3 = index2;
+	}
+	const Vector3& p0 = control[index0];
+	const Vector3& p1 = control[index1];
+	const Vector3& p2 = control[index2];
+	const Vector3& p3 = control[index3];
+	return CatmullRomPoint(p0, p1, p2, p3, t_2);
+}
+
+Vector3 ExtractEulerAngles(const Matrix4x4& rotationMatrix) {
+	Vector3 eulerAngles;
+
+	if (rotationMatrix.m[2][0] < 1) {
+		if (rotationMatrix.m[2][0] > -1) {
+			eulerAngles.y = asinf(rotationMatrix.m[2][0]);
+			eulerAngles.x = atan2f(-rotationMatrix.m[2][1], rotationMatrix.m[2][2]);
+			eulerAngles.z = atan2f(-rotationMatrix.m[1][0], rotationMatrix.m[0][0]);
+		}
+		else { // rotationMatrix.m[2][0] <= -1
+			eulerAngles.y = -std::numbers::pi_v<float> / 2.0f;
+			eulerAngles.x = -atan2f(rotationMatrix.m[1][2], rotationMatrix.m[1][1]);
+			eulerAngles.z = 0;
+		}
+	}
+	else { // rotationMatrix.m[2][0] >= 1
+		eulerAngles.y = std::numbers::pi_v<float> / 2;
+		eulerAngles.x = atan2f(rotationMatrix.m[1][2], rotationMatrix.m[1][1]);
+		eulerAngles.z = 0;
+	}
+
+	return eulerAngles;
+}
+
+Matrix4x4 MakeLookAtMatrix(const Vector3& forward, const Vector3& up) {
+	Vector3 zAxis = forward.Normalize();  // 視線方向
+	Vector3 xAxis = Cross(up, zAxis).Normalize();  // 右方向
+	Vector3 yAxis = Cross(zAxis, xAxis);  // 上方向
+
+	Matrix4x4 rotationMatrix;
+	rotationMatrix.m[0][0] = xAxis.x;
+	rotationMatrix.m[1][0] = xAxis.y;
+	rotationMatrix.m[2][0] = xAxis.z;
+	rotationMatrix.m[0][1] = yAxis.x;
+	rotationMatrix.m[1][1] = yAxis.y;
+	rotationMatrix.m[2][1] = yAxis.z;
+	rotationMatrix.m[0][2] = zAxis.x;
+	rotationMatrix.m[1][2] = zAxis.y;
+	rotationMatrix.m[2][2] = zAxis.z;
+	rotationMatrix.m[3][3] = 1.0f;
+
+	return rotationMatrix;
+}
+
+Matrix4x4 MakeRotationAxisAngle(const Vector3& axis, float angle) {
+	float cosA = cosf(angle);
+	float sinA = sinf(angle);
+	Vector3 normalizedAxis = axis.Normalize();
+	float x = normalizedAxis.x;
+	float y = normalizedAxis.y;
+	float z = normalizedAxis.z;
+
+	Matrix4x4 rotationMatrix;
+	rotationMatrix.m[0][0] = cosA + x * x * (1 - cosA);
+	rotationMatrix.m[0][1] = x * y * (1 - cosA) - z * sinA;
+	rotationMatrix.m[0][2] = x * z * (1 - cosA) + y * sinA;
+	rotationMatrix.m[1][0] = y * x * (1 - cosA) + z * sinA;
+	rotationMatrix.m[1][1] = cosA + y * y * (1 - cosA);
+	rotationMatrix.m[1][2] = y * z * (1 - cosA) - x * sinA;
+	rotationMatrix.m[2][0] = z * x * (1 - cosA) - y * sinA;
+	rotationMatrix.m[2][1] = z * y * (1 - cosA) + x * sinA;
+	rotationMatrix.m[2][2] = cosA + z * z * (1 - cosA);
+	rotationMatrix.m[3][3] = 1.0f;
+
+	return rotationMatrix;
+}
+
+bool IsCollision(const AABB& aabb, const Vector3& point) {
+	// 各軸方向でpointがAABBの範囲内にあるかをチェック
+	return (point.x >= aabb.min.x && point.x <= aabb.max.x) &&
+		(point.y >= aabb.min.y && point.y <= aabb.max.y) &&
+		(point.z >= aabb.min.z && point.z <= aabb.max.z);
+}
