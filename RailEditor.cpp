@@ -19,7 +19,7 @@ void RailEditor::Initialize() {
 	trans.scale = { 1.0f,1.0f,1.0f };
 
 
-	for (int i = 0; i < 100; i++) {
+	for (int i = 0; i < (reilCount_/3.0f); i++) {
 		Object3d* newModel = new Object3d();
 		newModel->Create("rail.obj");
 		rails.push_back(newModel);
@@ -56,24 +56,32 @@ void RailEditor::Update() {
 		SetRail();
 	}
 	if (ImGui::Button("UnsetModel")) {
-		for (int i = 0; i < 100; i++) {
+		for (int i = 0; i < (reilCount_ / 3.0f); i++) {
 			
 			rails[i]->transform.rotate = { 0.0f,0.0f,0.0f };
 			rails[i]->transform.translate = { 0.0f,0.0f,0.0f };
 		}
 	}
-	ImGui::Checkbox("CameraSet", &isCamera);
 	if (ImGui::Button("SAVE")) {
 		Save("rails.json");
 	}
 	ImGui::End();
+
+	ImGui::Begin("railcamera");
+	ImGui::Checkbox("CameraSet", &isCamera);
+	if (ImGui::Button("resetCamera")) {
+		time_ = 0.0f;
+	}
+
+	ImGui::End();
+
 #endif // _DEBUG
 
 	if (isCamera) {
 		Camera* camera = CameraManager::GetInstance()->GetCamera();
 
 
-		const float timelimitt = 2500.0f;
+		const float timelimitt = 9000.0f;
 		if (time_ < timelimitt) {
 			time_++;
 		}
@@ -87,7 +95,7 @@ void RailEditor::Update() {
 		Vector3 eye = CatmullRom(controlPoints_, t);
 		eye += offset;
 
-		float t2 = 1.0f / timelimitt * (time_ + 160);
+		float t2 = 1.0f / timelimitt * (time_ + 60);
 		Vector3 target = CatmullRom(controlPoints_, t2);
 		target += offset;
 
@@ -122,19 +130,23 @@ void RailEditor::Update() {
 
 		camera->transform = trans;
 	}
-	SetRail();
+
 }
 
 void RailEditor::RailDarw() {
 	for (auto& i : rails) {
-		i->Draw();
+		if (IsVisibleFromCamera(i->transform.translate, 2.0f, CameraManager::GetInstance()->GetCamera())) {
+			if (i->transform.translate != Vector3{0.0f, 0.0f, 0.0f}) {
+				i->Draw();
+			}
+		}
 	}
 }
 
 void RailEditor::Draw() {
 
 	std::vector<Vector3> pointsDrawing;
-	const size_t segumentCount = 100;
+	const size_t segumentCount = reilCount_;
 	for (size_t i = 0; i < segumentCount + 1; i++) {
 		float t = 1.0f / segumentCount * i;
 		Vector3 pos = CatmullRom(controlPoints_, t);
@@ -161,7 +173,7 @@ void RailEditor::SetRail() {
 
 
 	std::vector<Vector3> pointsDrawing;
-	const size_t segumentCount = 100;
+	const size_t segumentCount = reilCount_;
 	for (size_t i = 0; i < segumentCount + 1; i++) {
 		float t = 1.0f / segumentCount * i;
 		Vector3 pos = CatmullRom(controlPoints_, t);
@@ -180,9 +192,13 @@ void RailEditor::SetRail() {
 		float pitch = asinf(norTarget.y);
 		float yaw = atan2f(norTarget.x, norTarget.z);
 		float roll = 0.0f;
-		rails[i]->transform.rotate = { -pitch,yaw,roll };
+		if (i % 3 == 0) {
 
-		rails[i]->transform.translate = pointsDrawing[i];
+			rails[i/3]->transform.rotate = { -pitch,yaw,roll };
+
+			rails[i/3]->transform.translate = pointsDrawing[i];
+		}
+
 	}
 }
 
@@ -217,4 +233,22 @@ void RailEditor::Load(const std::string& fileName) {
 		file.close();
 	}
 
+}
+
+bool RailEditor::IsVisibleFromCamera(const Vector3& sphereCenter, float sphereRadius, Camera* camera) {
+
+	for (const auto& plane : { camera->frustum.nearPlane, camera->frustum.farPlane, camera->frustum.rightPlane, camera->frustum.leftPlane, camera->frustum.topPlane, camera->frustum.bottomPlane }) {
+		// 球の中心から平面への距離を計算
+		float distance = DistanceToPoint(plane, sphereCenter);
+
+		// 球が完全に平面の外側にあるかどうかチェック
+		if (distance < -sphereRadius) {
+			return false; // 球が平面の外側にあるため描画不要
+		}
+	}
+	return true; // 全ての平面でチェックを通過したので描画対象
+}
+
+float RailEditor::DistanceToPoint(const Plane& plane, const Vector3& point) {
+	return plane.normal * point + plane.distance;
 }

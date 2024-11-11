@@ -43,6 +43,9 @@ private:
 	void Save(const std::string& fileName);
 	void Load(const std::string& fileName);
 
+	bool IsVisibleFromCamera(const Vector3& sphereCenter, float sphereRadius, Camera* camera);
+	float DistanceToPoint(const Plane& plane ,const Vector3& point);
+
 private:
 
 	std::vector<Vector3> controlPoints_;
@@ -51,10 +54,12 @@ private:
 
 	Trans trans{};
 
-	bool isCamera = false;
+	bool isCamera = true;
 	float time_ = 0;
 	Vector3 previousUp = Vector3(0.0f, 1.0f, 0.0f);
 	std::vector<Object3d*> rails;
 
 	Model* dir;
+
+	int reilCount_ = 3000;
 };

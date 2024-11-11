@@ -50,3 +50,7 @@ void FPSKeeper::Update() {
 float FPSKeeper::DeltaTime() {
 	return ((GetInstance()->deltaTime_) * 60.0f);
 }
+
+float FPSKeeper::BaseTime() {
+	return GetInstance()->deltaTime_;
+}

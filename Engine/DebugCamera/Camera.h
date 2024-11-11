@@ -28,6 +28,8 @@ public:
 
 	Trans transform;
 
+	Frustum frustum;
+
 private:
 
 private:

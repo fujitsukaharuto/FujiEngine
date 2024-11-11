@@ -98,12 +98,18 @@ void GameScene::Initialize() {
 
 void GameScene::Update() {
 
-#ifdef _DEBUG
-
 	ApplyGlobalVariables();
 
 	editor.Update();
 	enemyManager_->Update();
+
+#ifdef _DEBUG
+
+
+	ImGui::Begin("fps");
+	float fps = 1.0f / FPSKeeper::BaseTime();
+	ImGui::Text("%f", fps);
+	ImGui::End();
 
 	ImGui::Begin("suzunne");
 

@@ -28,6 +28,7 @@ void Enemy::Update() {
 	ImGui::End();
 #endif // _DEBUG
 
+	enemy->transform.translate += velocity;
 
 }
 

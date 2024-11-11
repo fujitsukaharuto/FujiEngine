@@ -76,6 +76,23 @@ struct Sphere
 	float radius;
 };
 
+
+struct Plane {
+	Vector3 normal;
+	float distance;
+};
+
+
+struct Frustum {
+	Plane nearPlane;
+	Plane farPlane;
+	Plane leftPlane;
+	Plane rightPlane;
+	Plane topPlane;
+	Plane bottomPlane;
+};
+
+
 struct MaterialDataPath
 {
 	std::string textureFilePath;

@@ -27,37 +27,37 @@ void Player::Initialize() {
 void Player::Update() {
 
 	ReticleCal();
-	//Camera* camera = CameraManager::GetInstance()->GetCamera();
+	Camera* camera = CameraManager::GetInstance()->GetCamera();
 
-	//if (Input::GetInstance()->IsPressMouse(0)) {
-	//	const float kBulletSpeed = 82.0f;
-	//	Vector3 worldPosReticle;
+	if (Input::GetInstance()->IsPressMouse(0)) {
+		const float kBulletSpeed = 82.0f;
+		Vector3 worldPosReticle;
 
-	//	worldPosReticle = target->transform.translate;
+		worldPosReticle = target->transform.translate;
 
-	//	Vector3 worldPosPlayer = camera->transform.translate;
-	//	Vector3 offset = { 0.0f,0.5f,0.0f };
-	//	worldPosPlayer = worldPosPlayer - offset;
-	//	Vector3 velocity = worldPosReticle - worldPosPlayer;
-	//	velocity = velocity.Normalize();
-	//	velocity = velocity * kBulletSpeed;
-	//	velo_ = velocity;
+		Vector3 worldPosPlayer = camera->transform.translate;
+		Vector3 offset = { 0.0f,0.5f,0.0f };
+		worldPosPlayer = worldPosPlayer - offset;
+		Vector3 velocity = worldPosReticle - worldPosPlayer;
+		velocity = velocity.Normalize();
+		velocity = velocity * kBulletSpeed;
+		velo_ = velocity;
 
-	//	bullet->transform.rotate.y = std::atan2(velocity.x, velocity.z);
-	//	Matrix4x4 yrota = MakeRotateYMatrix(-bullet->transform.rotate.y);
-	//	Vector3 velocityZ = TransformNormal(velocity, yrota);
-	//	bullet->transform.rotate.x = std::atan2(-velocityZ.y, velocityZ.z);
-	//	bullet->transform.rotate.z = 0.0f;
+		bullet->transform.rotate.y = std::atan2(velocity.x, velocity.z);
+		Matrix4x4 yrota = MakeRotateYMatrix(-bullet->transform.rotate.y);
+		Vector3 velocityZ = TransformNormal(velocity, yrota);
+		bullet->transform.rotate.x = std::atan2(-velocityZ.y, velocityZ.z);
+		bullet->transform.rotate.z = 0.0f;
 
-	//	startTime = 0.0f;
-	//	Vector3 worldPos = worldPosPlayer;
-	//	bullet->transform.translate = worldPos;
-	//	/*bullet->transform.scale = { 0.0f,0.0f,0.0f };*/
-	//	isLive = true;
-	//}
-	//else {
-	//	isLive = false;
-	//}
+		startTime = 0.0f;
+		Vector3 worldPos = worldPosPlayer;
+		bullet->transform.translate = worldPos;
+		/*bullet->transform.scale = { 0.0f,0.0f,0.0f };*/
+		isLive = true;
+	}
+	else {
+		isLive = false;
+	}
 
 	if (isLive) {
 		if (startTime <= kStartTime) {

@@ -39,7 +39,7 @@ void EnemyManager::Initialize() {
 
 #ifdef _DEBUG
 
-	for (int i = 0; i < 20; i++) {
+	for (int i = 0; i < 80; i++) {
 
 		Object3d* obj = new Object3d();
 		obj->Create("ICO.obj");
@@ -48,7 +48,7 @@ void EnemyManager::Initialize() {
 		enemyPopSigns_.push_back(obj);
 	}
 
-	for (int i = 0; i < 20; i++) {
+	for (int i = 0; i < 80; i++) {
 
 		Object3d* obj = new Object3d();
 		obj->Create("ICO.obj");
@@ -84,6 +84,7 @@ void EnemyManager::Update() {
 	if (ImGui::Button("AddEnemy")) {
 		if (enemyPoses_.size() > 0) {
 			enemyPoses_.push_back(enemyPoses_.back());
+			enemyPoses_.back().second = { 0.0f,0.0f,0.0f };
 		}
 		else {
 			enemyPoses_.push_back(std::make_pair(Vector3{ 0.0f,0.0f,0.0f }, Vector3{ 0.0f,0.0f,0.0f }));
@@ -161,11 +162,15 @@ void EnemyManager::Draw() {
 #ifdef _DEBUG
 
 	for (auto& i : popPositionSigns_) {
-		i->Draw();
+		if (i->transform.translate != Vector3{ 0.0f,0.0f,0.0f }) {
+			i->Draw();
+		}
 	}
 
 	for (auto& i : enemyPopSigns_) {
-		i->Draw();
+		if (i->transform.translate != Vector3{ 0.0f,0.0f,0.0f }) {
+			i->Draw();
+		}
 	}
 
 #endif // _DEBUG
