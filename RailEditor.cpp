@@ -19,7 +19,7 @@ void RailEditor::Initialize() {
 	trans.scale = { 1.0f,1.0f,1.0f };
 
 
-	for (int i = 0; i < (reilCount_/3.0f); i++) {
+	for (int i = 0; i < (reilCount_); i++) {
 		Object3d* newModel = new Object3d();
 		newModel->Create("rail.obj");
 		rails.push_back(newModel);
@@ -192,12 +192,12 @@ void RailEditor::SetRail() {
 		float pitch = asinf(norTarget.y);
 		float yaw = atan2f(norTarget.x, norTarget.z);
 		float roll = 0.0f;
-		if (i % 3 == 0) {
 
-			rails[i/3]->transform.rotate = { -pitch,yaw,roll };
 
-			rails[i/3]->transform.translate = pointsDrawing[i];
-		}
+			rails[i]->transform.rotate = { -pitch,yaw,roll };
+
+			rails[i]->transform.translate = pointsDrawing[i];
+		
 
 	}
 }

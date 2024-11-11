@@ -61,5 +61,5 @@ private:
 
 	Model* dir;
 
-	int reilCount_ = 3000;
+	int reilCount_ = 1000;
 };
