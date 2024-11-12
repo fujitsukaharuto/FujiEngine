@@ -50,6 +50,9 @@ void ResultScene::Update() {
 
 	dxCommon_->UpDate();
 
+	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
+		SceneManager::GetInstance()->ChangeScene("TITLE", 30.0f);
+	}
 
 	sphere->transform.rotate.y += 0.02f;
 
@@ -83,8 +86,7 @@ void ResultScene::Draw() {
 
 #pragma endregion
 
-	dxCommon_->Command();
-	dxCommon_->PostEffect();
+
 
 
 }

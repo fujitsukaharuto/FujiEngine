@@ -1,5 +1,6 @@
 #pragma once
 #include "Object3d.h"
+#include "Sprite.h"
 
 class Player {
 public:
@@ -13,6 +14,8 @@ public:
 	void Update();
 
 	void Draw();
+
+	void SpriteDraw();
 
 	Vector3 GetCenterBullet()const;
 	Vector3 GetEndBullet()const { return velo_; }
@@ -38,4 +41,6 @@ private:
 	float startTime = 0.0f;
 	const float kStartTime = 20.0f;
 	Vector3 velo_;
+
+	std::unique_ptr<Sprite> reticle;
 };

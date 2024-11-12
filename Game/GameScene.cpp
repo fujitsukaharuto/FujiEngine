@@ -136,21 +136,55 @@ void GameScene::Update() {
 		Vector3 enemypos = enemy->GetCentarPos();
 
 		if (enemy->GetLive()) {
-			if (IsLineCollisionSphere(bulletPos, bulletEndPos, enemypos, 1.0f)) {
-				enemy->SetLive(false);
-				score += 60;
-				int scoreCount = score;
 
-				for (int i = 0; i < 4; i++) {
-					int scoreNumber = scoreCount % 10;
+			float enemyRad = 1.0f;
+			if (enemy->GetModelNum() == 0) {
+				enemyRad = 0.7f;
+			}
+			
+			if (IsLineCollisionSphere(bulletPos, bulletEndPos, enemypos, enemyRad)) {
+				if (enemy->GetModelNum() != 4) {
+					enemy->SetLive(false);
 
-					std::string str = std::to_string(scoreNumber);
+					score += enemy->GetScore();
+					int scoreCount = score;
 
-					texScore[i]->SetTexture("Sprite/" + str + ".png");
-					scoreCount = scoreCount / 10;
+					for (int i = 0; i < 4; i++) {
+						int scoreNumber = scoreCount % 10;
+
+						std::string str = std::to_string(scoreNumber);
+
+						texScore[i]->SetTexture("Sprite/" + str + ".png");
+						scoreCount = scoreCount / 10;
+					}
+					hitCheack = 80.0f;
+					kurukuru->SetModel(enemy->GetModelName());
+					kurukuru->transform.rotate.y = 0;
 				}
-				hitCheack = 80.0f;
-				kurukuru->SetModel(enemy->GetModelName());
+				else {
+					enemy->life--;
+
+					if (enemy->life <= 0) {
+						score += enemy->GetScore();
+						int scoreCount = score;
+						enemy->SetLive(false);
+
+						for (int i = 0; i < 4; i++) {
+							int scoreNumber = scoreCount % 10;
+
+							std::string str = std::to_string(scoreNumber);
+
+							texScore[i]->SetTexture("Sprite/" + str + ".png");
+							scoreCount = scoreCount / 10;
+						}
+						hitCheack = 80.0f;
+						kurukuru->SetModel(enemy->GetModelName());
+						kurukuru->transform.rotate.y = 0;
+					}
+
+				}
+				
+				
 			}
 		}
 	}
@@ -217,6 +251,7 @@ void GameScene::Draw() {
 #pragma region 前景スプライト
 
 	dxCommon_->PreSpriteDraw();
+	player_->SpriteDraw();
 	scoreArea->Draw();
 	for (int i = 0; i < 4; i++) {
 		texScore[i]->Draw();
@@ -225,8 +260,6 @@ void GameScene::Draw() {
 
 #pragma endregion
 
-	dxCommon_->Command();
-	dxCommon_->PostEffect();
 
 
 }

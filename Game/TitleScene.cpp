@@ -13,7 +13,8 @@
 TitleScene::TitleScene() {}
 
 TitleScene::~TitleScene() {
-	delete sphere;
+	delete nightSky;
+
 }
 
 void TitleScene::Initialize() {
@@ -23,8 +24,12 @@ void TitleScene::Initialize() {
 	obj3dCommon.reset(new Object3dCommon());
 	obj3dCommon->Initialize();
 
-	sphere = new Object3d();
-	sphere->CreateSphere();
+
+	nightSky = new Object3d();
+	nightSky->Create("nightSky.obj");
+	nightSky->transform.scale = { 6.0f,6.0f,6.0f };
+
+
 
 }
 
@@ -33,14 +38,6 @@ void TitleScene::Update() {
 #ifdef _DEBUG
 
 
-	ImGui::Begin("Sphere");
-
-	ImGui::DragFloat3("scale", &sphere->transform.scale.x, 0.01f);
-	ImGui::DragFloat3("rotate", &sphere->transform.rotate.x, 0.01f);
-	ImGui::DragFloat3("right", &rightDir.x, 0.01f);
-	rightDir = rightDir.Normalize();
-	sphere->SetRightDir(rightDir);
-	ImGui::End();
 
 
 #endif // _DEBUG
@@ -50,12 +47,8 @@ void TitleScene::Update() {
 
 
 	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
-		SceneManager::GetInstance()->ChangeScene("GAME", 40.0f);
+		SceneManager::GetInstance()->ChangeScene("GAME", 30.0f);
 	}
-
-
-	sphere->transform.rotate.y += 0.02f;
-
 
 
 	ParticleManager::GetInstance()->Update();
@@ -72,8 +65,9 @@ void TitleScene::Draw() {
 
 #pragma region 3Dオブジェクト
 	obj3dCommon->PreDraw();
-	sphere->Draw();
-	
+
+	nightSky->Draw();
+
 
 	ParticleManager::GetInstance()->Draw();
 
@@ -86,8 +80,7 @@ void TitleScene::Draw() {
 
 #pragma endregion
 
-	dxCommon_->Command();
-	dxCommon_->PostEffect();
+	
 
 
 }

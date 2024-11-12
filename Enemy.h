@@ -9,7 +9,7 @@ public:
 
 public:
 
-	void Initialize(Vector3 pos, Vector3 speed);
+	void Initialize(Vector3 pos, Vector3 speed, int modelNum);
 
 	void Update();
 
@@ -27,6 +27,12 @@ public:
 
 	std::string GetModelName()const;
 
+	int GetModelNum() { return modelN; }
+
+	int GetScore() { return score; }
+
+	int life = 0;
+
 private:
 
 
@@ -38,5 +44,8 @@ private:
 
 	Object3d* enemy;
 	bool isLive = true;
+	float liveTime_ = 900.0f;
 
+	int score = 60;
+	int modelN = 0;
 };

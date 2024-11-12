@@ -29,11 +29,11 @@ void EnemyManager::Initialize() {
 
 	Load("enemyPosition.json");
 	LoadPop("popData.json");
-
+	LoadModelNum("ModelNum.json");
 
 	Enemy* enemy;
 	enemy = new Enemy();
-	enemy->Initialize({ 2.0f,5.0f,-8.0f }, { 0.0f,0.0f,0.0f });
+	enemy->Initialize({ 2.0f,5.0f,-8.0f }, { 0.0f,0.0f,0.0f }, 0);
 	enemies_.push_back(enemy);
 
 
@@ -101,6 +101,23 @@ void EnemyManager::Update() {
 	}
 	ImGui::End();
 
+	ImGui::Begin("EnemyModelNum");
+	for (int i = 0; i < enemyModels_.size(); i++) {
+		std::string indexStr = std::to_string(i);
+		int pos = enemyModels_[i];
+		if (ImGui::TreeNodeEx(("enemy" + indexStr).c_str(), ImGuiTreeNodeFlags_DefaultOpen)) {
+
+			ImGui::DragInt("position", &pos);
+
+			ImGui::TreePop();
+		}
+		enemyModels_[i] = pos;
+	}
+	if (ImGui::Button("SAVE2")) {
+		SaveModelNum("ModelNum.json");
+	}
+	ImGui::End();
+
 	ImGui::Begin("PopPos");
 	for (int i = 0; i < appear_.size(); i++) {
 		std::string indexStr = std::to_string(i);
@@ -153,7 +170,9 @@ void EnemyManager::Update() {
 void EnemyManager::EnemyUpdate() {
 
 	for (auto& enemy : enemies_) {
-		enemy->Update();
+		if (enemy->GetLive()) {
+			enemy->Update();
+		}
 	}
 }
 
@@ -194,7 +213,8 @@ void EnemyManager::EnemyPop() {
 		if (playerpos == appearPos) {
 			for (int popCount = 0; popCount < i.second; popCount++) {
 				Enemy* enemy = new Enemy();
-				enemy->Initialize(enemyPoses_[enemyCount_].first, enemyPoses_[enemyCount_].second);
+				enemy->Initialize(enemyPoses_[enemyCount_].first, enemyPoses_[enemyCount_].second, enemyModels_[enemyCount_]);
+
 				enemyCount_ += 1;
 				enemies_.push_back(enemy);
 			}
@@ -254,7 +274,6 @@ void EnemyManager::Load(const std::string& fileName) {
 			};
 
 			enemyPoses_.push_back(std::make_pair(pos, velo));
-			enemyModels_.push_back(0);
 		}
 
 	}

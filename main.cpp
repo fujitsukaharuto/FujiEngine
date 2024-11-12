@@ -112,12 +112,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	textureManager->Load("Sprite/8.png");
 	textureManager->Load("Sprite/9.png");
 
-
+	modelManager->LoadOBJ("ufo.obj");
+	modelManager->LoadOBJ("airPlane.obj");
+	modelManager->LoadOBJ("balloon.obj");
+	modelManager->LoadOBJ("snowMan.obj");
+	modelManager->LoadOBJ("ice.obj");
+	
 
 
 	sceneManager = SceneManager::GetInstance();
 	sceneManager->Initialize();
-	sceneManager->StartScene("GAME");
+	sceneManager->StartScene("TITLE");
 
 
 
@@ -164,6 +169,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		dxCommon->PreDraw();
 		// ゲームシーンの描画
 		sceneManager->Draw();
+		dxCommon->Command();
+		dxCommon->PostEffect();
 		// ImGuiの描画
 		imguiManager->Draw();
 		// 描画終了

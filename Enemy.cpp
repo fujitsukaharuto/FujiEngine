@@ -8,13 +8,37 @@ Enemy::~Enemy() {
 	delete enemy;
 }
 
-void Enemy::Initialize(Vector3 pos, Vector3 speed) {
+void Enemy::Initialize(Vector3 pos, Vector3 speed,int modelNum) {
+
 
 	enemy = new Object3d();
-	enemy->Create("suzanne.obj");
+	if (modelNum == 0) {
+		enemy->Create("airPlane.obj");
+		score = 60;
+	}
+	if (modelNum == 1) {
+		enemy->Create("balloon.obj");
+		score = 40;
+	}
+	if (modelNum == 2) {
+		enemy->Create("snowMan.obj");
+		score = 80;
+	}
+	if (modelNum == 3) {
+		enemy->Create("ice.obj");
+		score = 70;
+	}if (modelNum == 4) {
+		enemy->Create("ufo.obj");
+		score = 400;
+		liveTime_ = 1800.0f;
+		life = 200;
+	}
+
 	enemy->transform.translate = pos;
 	trans = enemy->transform;
 	velocity = speed;
+
+	modelN = modelNum;
 
 }
 
@@ -30,11 +54,25 @@ void Enemy::Update() {
 
 	enemy->transform.translate += velocity;
 
-	enemy->transform.rotate.y = std::atan2(velocity.x, velocity.z);
-	Matrix4x4 yrota = MakeRotateYMatrix(-enemy->transform.rotate.y);
-	Vector3 velocityZ = TransformNormal(velocity, yrota);
-	enemy->transform.rotate.x = std::atan2(-velocityZ.y, velocityZ.z);
-	enemy->transform.rotate.z = 0.0f;
+	if (liveTime_ > 0) {
+		liveTime_ -= 1.0f * FPSKeeper::DeltaTime();
+	}
+	if (liveTime_ <= 0) {
+		isLive = false;
+	}
+
+	if (modelN == 0) {
+		enemy->transform.rotate.y = std::atan2(velocity.x, velocity.z);
+		Matrix4x4 yrota = MakeRotateYMatrix(-enemy->transform.rotate.y);
+		Vector3 velocityZ = TransformNormal(velocity, yrota);
+		enemy->transform.rotate.x = std::atan2(-velocityZ.y, velocityZ.z);
+		enemy->transform.rotate.z = 0.0f;
+	}
+	if (modelN == 4) {
+		enemy->transform.rotate.y += 0.1f * FPSKeeper::DeltaTime();
+		enemy->transform.translate.z = (-50.99000f) + 2.0f * std::sinf(liveTime_ / 100.0f);
+		
+	}
 
 }
 

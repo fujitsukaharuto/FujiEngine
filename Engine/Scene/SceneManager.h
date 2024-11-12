@@ -53,4 +53,9 @@ private:
 	bool Clear = true;
 	bool gameover = false;
 
+	std::unique_ptr<Sprite> black;
+	float blackXpos = 2560.0f;
+	bool isBlack = false;
+	bool isblackLeft = false;
+
 };

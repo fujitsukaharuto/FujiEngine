@@ -19,6 +19,11 @@ SceneManager* SceneManager::GetInstance() {
 }
 
 void SceneManager::Initialize() {
+	black.reset(new Sprite);
+	black->Load("white2x2.png");
+	black->SetSize({ 2560.0f,720.0f });
+	black->SetPos({ 2560.0f,360.0f,0.0f });
+	black->SetColor({ 0.0f,0.0f,0.0f,1.0f });
 
 }
 
@@ -34,16 +39,30 @@ void SceneManager::Update() {
 		if (isFinifh_) {
 			finishTime -= FPSKeeper::DeltaTime();
 			if (finishTime <= 0.0f) {
-				
+				isBlack = false;
+				blackXpos = 2560.0f;
+				isblackLeft = false;
 			}
 		}
 	}
 	else {
+
 		changeExtraTime -= FPSKeeper::DeltaTime();
 		if (changeExtraTime <= 0.0f) {
 			SceneSet();
-
+			isBlack = false;
 		}
+	}
+
+
+	if (isBlack) {
+
+		blackXpos= Lerp(blackXpos, -10.0f, (0.075f) * FPSKeeper::DeltaTime());
+		black->SetPos({ blackXpos,360.0f ,0.0f });
+	}
+	if (isblackLeft) {
+		blackXpos = Lerp(blackXpos, -2570.0f, (0.075f));
+		black->SetPos({ blackXpos,360.0f ,0.0f });
 	}
 
 }
@@ -51,6 +70,10 @@ void SceneManager::Update() {
 void SceneManager::Draw() {
 
 	scene_->Draw();
+
+	if (isBlack||isblackLeft) {
+		black->Draw();
+	}
 
 }
 
@@ -84,8 +107,9 @@ void SceneManager::ChangeScene(const std::string& sceneName, float extraTime) {
 		finishTime = 60.0f;
 	}
 
-	isFinifh_ = true;;
-
+	isFinifh_ = true;
+	isBlack = true;
+	blackXpos = 2560.0f;
 
 	nextScene_ = CreateScene(sceneName);
 
@@ -135,6 +159,7 @@ void SceneManager::SceneSet() {
 		scene_->Init();
 		scene_->Initialize();
 		isChange_ = false;
+		isblackLeft = true;
 	}
 
 }

@@ -30,6 +30,10 @@ void Sprite::Draw() {
 
 }
 
+void Sprite::SetColor(const Vector4& color) {
+	material_.SetColor(color);
+}
+
 void Sprite::SetPos(const Vector3& pos) {
 	position_ = pos;
 	SetWvp();

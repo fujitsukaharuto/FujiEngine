@@ -20,7 +20,12 @@ void Player::Initialize() {
 
 	bullet = new Object3d();
 	bullet->Create("razer.obj");
-	bullet->transform.scale.z = 82.0f;
+	bullet->transform.scale = { 0.5f,0.5f,82.0f };
+
+
+	reticle.reset(new Sprite);
+	reticle->Load("Sprite/reticle.png");
+	reticle->SetSize({ 100.0f,100.0f });
 
 }
 
@@ -71,10 +76,14 @@ void Player::Update() {
 }
 
 void Player::Draw() {
-	target->Draw();
+
 	if (isLive) {
 		bullet->Draw();
 	}
+}
+
+void Player::SpriteDraw() {
+	reticle->Draw();
 }
 
 
@@ -96,7 +105,8 @@ void Player::ReticleCal() {
 
 	Matrix4x4 matInverseVPV = Inverse(matVPV);
 
-	Vector3 posNear = Vector3(float(Input::GetInstance()->GetMousePosition().x), float(Input::GetInstance()->GetMousePosition().y), 0);
+	Vector3 reticlePos = Vector3(float(Input::GetInstance()->GetMousePosition().x), float(Input::GetInstance()->GetMousePosition().y), 0);
+	Vector3 posNear = reticlePos;
 	Vector3 posFar = Vector3(float(Input::GetInstance()->GetMousePosition().x), float(Input::GetInstance()->GetMousePosition().y), 1);
 
 	posNear = Transform(posNear, matInverseVPV);
@@ -107,6 +117,8 @@ void Player::ReticleCal() {
 
 	const float kDistanceTestObject = 80.0f;
 	target->transform.translate = posNear + (mouseDirection * kDistanceTestObject);
+
+	reticle->SetPos(reticlePos);
 
 }
 

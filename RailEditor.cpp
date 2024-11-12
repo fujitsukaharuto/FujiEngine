@@ -3,6 +3,7 @@
 #include "CameraManager.h"
 #include <numbers>
 #include <variant>
+#include "Scene/SceneManager.h"
 
 RailEditor::~RailEditor() {
 
@@ -88,6 +89,9 @@ void RailEditor::Update() {
 		else {
 			time_ = 0;
 			previousUp = { 0.0f,1.0f,0.0f };
+		}
+		if (time_ >= 8900.0f) {
+			SceneManager::GetInstance()->ChangeScene("RESULT", 30.0f);
 		}
 
 		Vector3 offset = { 0.0f,0.75f,0.0f };
