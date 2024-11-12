@@ -34,6 +34,8 @@ public:
 
 	void SetRange(const Vector2& leftTop, const Vector2& size);
 
+	void SetTexture(const std::string& fileName);
+
 	/*void SetPointLight(PointLight* light) { pointLight_ = light; }
 
 	void SetSpotLight(SpotLight* light) { spotLight_ = light; }*/

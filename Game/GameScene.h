@@ -1,5 +1,5 @@
 #pragma once
-#include "BaseScene.h"
+#include "Scene/BaseScene.h"
 
 
 #include "RailEditor.h"
@@ -31,10 +31,16 @@ private:
 	Object3d* nightWater = nullptr;
 	Object3d* terrain = nullptr;
 
-	std::vector<Object3d*> suzunnes;
+	//std::vector<Object3d*> suzunnes;
+
+	std::unique_ptr<Object3d> kurukuru = nullptr;
+	float hitCheack = 0.0f;
 
 
 	Sprite* scoreArea = nullptr;
+
+	std::unique_ptr<Sprite> texScore[4];
+
 	Vector4 color_ = { 1.0f,1.0f,1.0f,1.0f };
 	Vector3 rightDir = { 1.0f,0.0f,0.0f };
 

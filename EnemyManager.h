@@ -37,6 +37,9 @@ private:
 	void Save(const std::string& fileName);
 	void Load(const std::string& fileName);
 
+	void SaveModelNum(const std::string& fileName);
+	void LoadModelNum(const std::string& fileName);
+
 	void SavePop(const std::string& fileName);
 	void LoadPop(const std::string& fileName);
 
@@ -44,6 +47,7 @@ private:
 
 
 	std::vector<std::pair<Vector3, Vector3>> enemyPoses_;
+	std::vector<int> enemyModels_;
 	std::vector<std::pair<Vector3, int>> appear_;
 	int count = 1;
 

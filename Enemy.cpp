@@ -30,6 +30,12 @@ void Enemy::Update() {
 
 	enemy->transform.translate += velocity;
 
+	enemy->transform.rotate.y = std::atan2(velocity.x, velocity.z);
+	Matrix4x4 yrota = MakeRotateYMatrix(-enemy->transform.rotate.y);
+	Vector3 velocityZ = TransformNormal(velocity, yrota);
+	enemy->transform.rotate.x = std::atan2(-velocityZ.y, velocityZ.z);
+	enemy->transform.rotate.z = 0.0f;
+
 }
 
 void Enemy::Draw() {
@@ -48,4 +54,8 @@ void Enemy::SetPosAndVelo(const Vector3& pos, const Vector3& speed) {
 	trans.translate = pos;
 	enemy->transform = trans;
 	velocity = speed;
+}
+
+std::string Enemy::GetModelName() const {
+	return enemy->GetModelName();
 }

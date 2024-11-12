@@ -13,9 +13,6 @@ GameScene::GameScene() {}
 GameScene::~GameScene() {
 	delete nightSky;
 	delete nightWater;
-	for (auto suzunneModel : suzunnes) {
-		delete suzunneModel;
-	}
 	delete terrain;
 	delete scoreArea;
 	delete player_;
@@ -38,19 +35,6 @@ void GameScene::Initialize() {
 	nightWater->transform.scale = { 600.0f,600.0f,600.0f };
 	nightWater->transform.translate = { 0.0f,-7.0f,0.0f };
 
-	float addDis = 1.0f;
-	for (int i = 0; i < 3; i++) {
-
-		Object3d* newModel = new Object3d();
-		newModel->Create("suzanne.obj");
-		newModel->transform.translate.x += addDis;
-		newModel->transform.translate.z += addDis;
-		newModel->transform.rotate.y = 3.14f;
-		suzunnes.push_back(newModel);
-		addDis += 0.5f;
-
-	}
-
 
 	terrain = new Object3d();
 	terrain->Create("terrain.obj");
@@ -60,6 +44,23 @@ void GameScene::Initialize() {
 	scoreArea->Load("scoreArea.png");
 	scoreArea->SetSize({ 350.0f,200.0f });
 	scoreArea->SetPos({ 1100.0f,650.0f,0.0f });
+
+
+
+	for (int i = 0; i < 4; i++) {
+		texScore[i].reset(new Sprite);
+		texScore[i]->Load("Sprite/0.png");
+		texScore[i]->SetSize({ 75.0f,75.0f });
+		texScore[i]->SetPos({ 1210.0f - i * 75.0f,650.0f,0.0f });
+	}
+
+
+	kurukuru.reset(new Object3d);
+	kurukuru->Create("rail2.obj");
+	kurukuru->transform.scale = { 0.03f,0.03f,0.03f };
+	kurukuru->transform.translate = { 0.08f,-0.02f,0.3f };
+	kurukuru->SetCameraParent(true);
+
 
 	soundData1 = audio_->SoundLoadWave("resource/xxx.wav");
 	soundData2 = audio_->SoundLoadWave("resource/mokugyo.wav");
@@ -98,6 +99,12 @@ void GameScene::Update() {
 	ImGui::End();
 
 
+	ImGui::Begin("kurukuru");
+	ImGui::DragFloat3("scale", &kurukuru->transform.scale.x, 0.1f);
+	ImGui::DragFloat3("position", &kurukuru->transform.translate.x, 0.1f);
+	ImGui::End();
+
+
 #endif // _DEBUG
 
 
@@ -116,13 +123,6 @@ void GameScene::Update() {
 	dxCommon_->UpDate();
 
 
-	float rotaSpeed = 0.1f;
-	for (auto suzunneModel : suzunnes) {
-		suzunneModel->transform.rotate.x += rotaSpeed * FPSKeeper::DeltaTime();
-		//suzunneModel->transform.translate = Random::GetVector3({ -4.0f,4.0f }, { -4.0f,4.0f }, { -4.0f,4.0f });
-		rotaSpeed += 0.05f;
-	}
-
 
 
 	player_->Update();
@@ -139,9 +139,27 @@ void GameScene::Update() {
 			if (IsLineCollisionSphere(bulletPos, bulletEndPos, enemypos, 1.0f)) {
 				enemy->SetLive(false);
 				score += 60;
+				int scoreCount = score;
+
+				for (int i = 0; i < 4; i++) {
+					int scoreNumber = scoreCount % 10;
+
+					std::string str = std::to_string(scoreNumber);
+
+					texScore[i]->SetTexture("Sprite/" + str + ".png");
+					scoreCount = scoreCount / 10;
+				}
+				hitCheack = 80.0f;
+				kurukuru->SetModel(enemy->GetModelName());
 			}
 		}
 	}
+
+	if (hitCheack > 0) {
+		hitCheack -= 1.0f * FPSKeeper::DeltaTime();
+	}
+	kurukuru->transform.rotate.y += 0.1f * FPSKeeper::DeltaTime();
+
 
 #ifdef _DEBUG
 
@@ -175,13 +193,17 @@ void GameScene::Draw() {
 	player_->Draw();
 	enemyManager_->Draw();
 
-	for (auto suzunneModel : suzunnes) {
-		suzunneModel->Draw();
-	}
+
 	terrain->Draw();
 
 	editor.RailDarw();
 	enemyManager_->Draw();
+
+	if (hitCheack > 0) {
+		kurukuru->Draw();
+	}
+
+
 
 	ParticleManager::GetInstance()->Draw();
 
@@ -196,6 +218,10 @@ void GameScene::Draw() {
 
 	dxCommon_->PreSpriteDraw();
 	scoreArea->Draw();
+	for (int i = 0; i < 4; i++) {
+		texScore[i]->Draw();
+	}
+
 
 #pragma endregion
 

@@ -87,6 +87,14 @@ void Sprite::SetRange(const Vector2& leftTop, const Vector2& size) {
 
 }
 
+void Sprite::SetTexture(const std::string& fileName) {
+	if (fileName == nowtexture) {
+		return;
+	}
+	material_.SetTexture(fileName);
+	nowtexture = fileName;
+}
+
 void Sprite::InitializeBuffer() {
 
 	vertex_.push_back({ {0.0f,0.0f,0.0f,1.0f},{0.0f,0.0f},{0.0f,0.0f,-1.0f} });

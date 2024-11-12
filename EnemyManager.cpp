@@ -96,6 +96,9 @@ void EnemyManager::Update() {
 	if (ImGui::Button("SAVE")) {
 		Save("enemyPosition.json");
 	}
+	if (ImGui::Button("SAVE2")) {
+		SaveModelNum("ModelNum.json");
+	}
 	ImGui::End();
 
 	ImGui::Begin("PopPos");
@@ -251,6 +254,49 @@ void EnemyManager::Load(const std::string& fileName) {
 			};
 
 			enemyPoses_.push_back(std::make_pair(pos, velo));
+			enemyModels_.push_back(0);
+		}
+
+	}
+
+}
+
+void EnemyManager::SaveModelNum(const std::string& fileName) {
+
+	json j2;
+	for (auto& enemy : enemyModels_) {
+		int modelNum = enemy;
+		json enemyData2 = {
+			{"ModelNum",{modelNum}}
+		};
+
+		j2.push_back(enemyData2);
+	}
+
+	std::ofstream file2(kDirectoryPath + fileName);
+	if (file2.is_open()) {
+		file2 << j2.dump(4); // インデント4で出力
+		file2.close();
+	}
+
+}
+
+void EnemyManager::LoadModelNum(const std::string& fileName) {
+
+	std::ifstream file(kDirectoryPath + fileName);
+	if (file.is_open()) {
+		json j;
+		file >> j;
+		file.close();
+
+		enemyModels_.clear(); // 既存のデータをクリア
+		for (const auto& item : j) {
+
+			int pos = {
+				item["ModelNum"][0].get<int>()
+			};
+
+			enemyModels_.push_back(pos);
 		}
 
 	}

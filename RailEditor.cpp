@@ -21,7 +21,7 @@ void RailEditor::Initialize() {
 
 	for (int i = 0; i < (reilCount_); i++) {
 		Object3d* newModel = new Object3d();
-		newModel->Create("rail.obj");
+		newModel->Create("rail2.obj");
 		rails.push_back(newModel);
 	}
 
@@ -193,10 +193,16 @@ void RailEditor::SetRail() {
 		float yaw = atan2f(norTarget.x, norTarget.z);
 		float roll = 0.0f;
 
+		if (i != 0) {
+			float length = (rails[i - 1]->transform.translate - pointsDrawing[i]).Length();
+			if (length < 0.5f) {
+				continue;
+			}
+		}
 
-			rails[i]->transform.rotate = { -pitch,yaw,roll };
+		rails[i]->transform.rotate = { -pitch,yaw,roll };
 
-			rails[i]->transform.translate = pointsDrawing[i];
+		rails[i]->transform.translate = pointsDrawing[i];
 		
 
 	}

@@ -36,9 +36,12 @@ public:
 
 	void SetCameraParent(bool is) { isCameraParent_ = is; }
 
+
 	void SetTexture(const std::string& name);
 
 	void SetBillboardMat(const Matrix4x4& mat) { billboardMatrix_ = mat; }
+
+	std::string GetModelName()const { return nowModelName; }
 
 	/*void SetPointLight(PointLight* light) { pointLight_ = light; }
 
@@ -46,9 +49,11 @@ public:
 
 	Trans transform{};
 
-private:
 
 	void SetModel(const std::string& fileName);
+
+
+private:
 
 	void CreateWVP();
 
@@ -76,5 +81,6 @@ private:
 	CameraForGPU* cameraPosData_ = nullptr;
 
 	Matrix4x4 billboardMatrix_;
+	std::string nowModelName;
 	std::string nowTextureName;
 };

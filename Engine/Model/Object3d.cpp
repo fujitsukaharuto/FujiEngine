@@ -16,7 +16,7 @@ void Object3d::Create(const std::string& fileName) {
 	transform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 	nowTextureName = model_->GetTextuerName();
 	CreateWVP();
-
+	nowModelName = fileName;
 }
 
 void Object3d::CreateSphere() {
@@ -26,6 +26,7 @@ void Object3d::CreateSphere() {
 	SetModel("Sphere");
 	transform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 	CreateWVP();
+	nowModelName = "Sphere";
 }
 
 void Object3d::Draw() {
@@ -89,7 +90,13 @@ void Object3d::SetTexture(const std::string& name) {
 }
 
 void Object3d::SetModel(const std::string& fileName) {
+	if (nowModelName == fileName) {
+		return;
+	}
+	delete model_;
+	model_ = nullptr;
 	model_ = new Model(*(ModelManager::FindModel(fileName)));
+	nowModelName = fileName;
 }
 
 void Object3d::CreateWVP() {

@@ -134,16 +134,7 @@
     <ClCompile Include="Line3dPipe.cpp">
       <Filter>Engine\GraphicPipeline</Filter>
     </ClCompile>
-    <ClCompile Include="BaseScene.cpp">
-      <Filter>Engine\Scene</Filter>
-    </ClCompile>
     <ClCompile Include="Game\GameScene.cpp">
-      <Filter>Game\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="TitleScene.cpp">
-      <Filter>Game\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="ResultScene.cpp">
       <Filter>Game\Scene</Filter>
     </ClCompile>
     <ClCompile Include="Line3dDrawer.cpp">
@@ -166,6 +157,18 @@
     </ClCompile>
     <ClCompile Include="EnemyManager.cpp">
       <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Scene\SceneManager.cpp">
+      <Filter>Engine\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Scene\BaseScene.cpp">
+      <Filter>Engine\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\ResultScene.cpp">
+      <Filter>Game\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\TitleScene.cpp">
+      <Filter>Game\Scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -310,16 +313,7 @@
     <ClInclude Include="Line3dPipe.h">
       <Filter>Engine\GraphicPipeline</Filter>
     </ClInclude>
-    <ClInclude Include="BaseScene.h">
-      <Filter>Engine\Scene</Filter>
-    </ClInclude>
     <ClInclude Include="Game\GameScene.h">
-      <Filter>Game\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="TitleScene.h">
-      <Filter>Game\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="ResultScene.h">
       <Filter>Game\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Line3dDrawer.h">
@@ -342,6 +336,18 @@
     </ClInclude>
     <ClInclude Include="EnemyManager.h">
       <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Scene\SceneManager.h">
+      <Filter>Engine\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Scene\BaseScene.h">
+      <Filter>Engine\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\ResultScene.h">
+      <Filter>Game\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\TitleScene.h">
+      <Filter>Game\Scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

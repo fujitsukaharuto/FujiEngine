@@ -101,7 +101,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BaseObject.cpp" />
-    <ClCompile Include="BaseScene.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="EnemyManager.cpp" />
     <ClCompile Include="Engine\Audio\Audio.cpp" />
@@ -140,9 +139,13 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Model\Object3dCommon.cpp" />
     <ClCompile Include="Engine\Model\Sprite.cpp" />
     <ClCompile Include="Engine\Model\TextureManager.cpp" />
+    <ClCompile Include="Engine\Scene\BaseScene.cpp" />
+    <ClCompile Include="Engine\Scene\SceneManager.cpp" />
     <ClCompile Include="Engine\WinApp\MyWindow.cpp" />
     <ClCompile Include="Game\Field\MapChipField.cpp" />
     <ClCompile Include="Game\GameScene.cpp" />
+    <ClCompile Include="Game\ResultScene.cpp" />
+    <ClCompile Include="Game\TitleScene.cpp" />
     <ClCompile Include="Line3dDrawer.cpp" />
     <ClCompile Include="Line3dPipe.cpp" />
     <ClCompile Include="main.cpp" />
@@ -153,13 +156,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="RailCamera.cpp" />
     <ClCompile Include="RailEditor.cpp" />
     <ClCompile Include="Random.cpp" />
-    <ClCompile Include="ResultScene.cpp" />
     <ClCompile Include="SRVManager.cpp" />
-    <ClCompile Include="TitleScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseObject.h" />
-    <ClInclude Include="BaseScene.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="EnemyManager.h" />
     <ClInclude Include="Engine\Audio\Audio.h" />
@@ -201,9 +201,13 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Model\Object3dCommon.h" />
     <ClInclude Include="Engine\Model\Sprite.h" />
     <ClInclude Include="Engine\Model\TextureManager.h" />
+    <ClInclude Include="Engine\Scene\BaseScene.h" />
+    <ClInclude Include="Engine\Scene\SceneManager.h" />
     <ClInclude Include="Engine\WinApp\MyWindow.h" />
     <ClInclude Include="Game\Field\MapChipField.h" />
     <ClInclude Include="Game\GameScene.h" />
+    <ClInclude Include="Game\ResultScene.h" />
+    <ClInclude Include="Game\TitleScene.h" />
     <ClInclude Include="Line3dDrawer.h" />
     <ClInclude Include="Line3dPipe.h" />
     <ClInclude Include="Particle.h" />
@@ -213,9 +217,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="RailCamera.h" />
     <ClInclude Include="RailEditor.h" />
     <ClInclude Include="Random.h" />
-    <ClInclude Include="ResultScene.h" />
     <ClInclude Include="SRVManager.h" />
-    <ClInclude Include="TitleScene.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">

@@ -25,6 +25,8 @@ public:
 
 	void SetPosAndVelo(const Vector3& pos, const Vector3& speed);
 
+	std::string GetModelName()const;
+
 private:
 
 
