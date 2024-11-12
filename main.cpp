@@ -99,6 +99,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	GlobalVariables::GetInstance()->LoadFiles();
 
+
+
+	textureManager->Load("Sprite/0.png");
+	textureManager->Load("Sprite/1.png");
+	textureManager->Load("Sprite/2.png");
+	textureManager->Load("Sprite/3.png");
+	textureManager->Load("Sprite/4.png");
+	textureManager->Load("Sprite/5.png");
+	textureManager->Load("Sprite/6.png");
+	textureManager->Load("Sprite/7.png");
+	textureManager->Load("Sprite/8.png");
+	textureManager->Load("Sprite/9.png");
+
+
+
 	gameScene = new GameScene();
 	gameScene->Initialize();
 

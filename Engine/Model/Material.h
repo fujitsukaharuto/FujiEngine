@@ -44,6 +44,8 @@ public:
 
 	void SetTexture(const std::string& name);
 
+	void SetEnableLight(int32_t is) { materialDate_->enableLighting = is; }
+
 private:
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_ = nullptr;

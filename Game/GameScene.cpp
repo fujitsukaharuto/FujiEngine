@@ -11,14 +11,13 @@
 GameScene::GameScene() {}
 
 GameScene::~GameScene() {
-	delete sphere;
-	delete suzunne;
-	delete fence;
+	delete nightSky;
+	delete nightWater;
 	for (auto suzunneModel : suzunnes) {
 		delete suzunneModel;
 	}
 	delete terrain;
-	delete test;
+	delete scoreArea;
 	delete player_;
 	delete enemyManager_;
 
@@ -27,26 +26,17 @@ GameScene::~GameScene() {
 void GameScene::Initialize() {
 	Init();
 
-	GlobalVariables* globalvariables = GlobalVariables::GetInstance();
-	const char* groupName = "Sphere";
-	const char* groupName2 = "Fence";
-
-	globalvariables->CreateGroup(groupName);
-	globalvariables->AddItem(groupName, "parametar", spherePara);
-	globalvariables->AddItem(groupName, "Position", spherevec);
-
-	globalvariables->CreateGroup(groupName2);
-	globalvariables->AddItem(groupName2, "parametar", fencePara);
-	globalvariables->AddItem(groupName2, "Position", fencevec);
-
 	obj3dCommon.reset(new Object3dCommon());
 	obj3dCommon->Initialize();
 
-	sphere = new Object3d();
-	sphere->CreateSphere();
+	nightSky = new Object3d();
+	nightSky->Create("nightSky.obj");
+	nightSky->transform.scale = { 6.0f,6.0f,6.0f };
 
-	suzunne = new Object3d();
-	suzunne->Create("suzanne.obj");
+	nightWater = new Object3d();
+	nightWater->Create("nightWater.obj");
+	nightWater->transform.scale = { 600.0f,600.0f,600.0f };
+	nightWater->transform.translate = { 0.0f,-7.0f,0.0f };
 
 	float addDis = 1.0f;
 	for (int i = 0; i < 3; i++) {
@@ -61,20 +51,18 @@ void GameScene::Initialize() {
 
 	}
 
-	fence = new Object3d();
-	fence->Create("Fence.obj");
 
 	terrain = new Object3d();
 	terrain->Create("terrain.obj");
 
 
-	test = new Sprite();
-	test->Load("uvChecker.png");
+	scoreArea = new Sprite();
+	scoreArea->Load("scoreArea.png");
+	scoreArea->SetSize({ 350.0f,200.0f });
+	scoreArea->SetPos({ 1100.0f,650.0f,0.0f });
 
 	soundData1 = audio_->SoundLoadWave("resource/xxx.wav");
 	soundData2 = audio_->SoundLoadWave("resource/mokugyo.wav");
-
-	ApplyGlobalVariables();
 
 	emit.count = 3;
 	emit.frequencyTime = 20.0f;
@@ -98,8 +86,6 @@ void GameScene::Initialize() {
 
 void GameScene::Update() {
 
-	ApplyGlobalVariables();
-
 	editor.Update();
 	enemyManager_->Update();
 
@@ -111,37 +97,8 @@ void GameScene::Update() {
 	ImGui::Text("%f", fps);
 	ImGui::End();
 
-	ImGui::Begin("suzunne");
-
-	ImGui::ColorEdit4("color", &color_.X);
-	suzunne->SetColor(color_);
-	ImGui::DragFloat3("scale", &suzunne->transform.scale.x, 0.01f);
-	ImGui::End();
-
-	ImGui::Begin("Sphere");
-
-	ImGui::DragFloat3("scale", &sphere->transform.scale.x, 0.01f);
-	ImGui::DragFloat3("rotate", &sphere->transform.rotate.x, 0.01f);
-	ImGui::DragFloat3("right", &rightDir.x,0.01f);
-	rightDir = rightDir.Normalize();
-	sphere->SetRightDir(rightDir);
-	ImGui::End();
-
 
 #endif // _DEBUG
-
-	if (input_->PushKey(DIK_LEFT)) {
-		suzunne->transform.translate.x -= 0.05f;
-	}
-	if (input_->PushKey(DIK_RIGHT)) {
-		suzunne->transform.translate.x += 0.05f;
-	}
-	if (input_->PushKey(DIK_UP)) {
-		suzunne->transform.translate.y += 0.05f;
-	}
-	if (input_->PushKey(DIK_DOWN)) {
-		suzunne->transform.translate.y -= 0.05f;
-	}
 
 
 	if (input_->TriggerKey(DIK_8)) {
@@ -157,8 +114,6 @@ void GameScene::Update() {
 	}
 
 	dxCommon_->UpDate();
-	suzunne->transform.rotate.y = 3.14f;
-	suzunne->transform.rotate.x += (0.05f) * FPSKeeper::DeltaTime();
 
 
 	float rotaSpeed = 0.1f;
@@ -168,12 +123,6 @@ void GameScene::Update() {
 		rotaSpeed += 0.05f;
 	}
 
-
-	sphere->transform.translate = spherevec;
-	sphere->transform.rotate.y += 0.02f;
-
-	fence->transform.translate = fencevec;
-	fence->transform.rotate.x = 0.5f;
 
 
 	player_->Update();
@@ -220,9 +169,8 @@ void GameScene::Draw() {
 
 #pragma region 3Dオブジェクト
 	obj3dCommon->PreDraw();
-	sphere->Draw();
-	suzunne->Draw();
-	fence->Draw();
+	nightWater->Draw();
+	nightSky->Draw();
 
 	player_->Draw();
 	enemyManager_->Draw();
@@ -247,7 +195,7 @@ void GameScene::Draw() {
 #pragma region 前景スプライト
 
 	dxCommon_->PreSpriteDraw();
-	test->Draw();
+	scoreArea->Draw();
 
 #pragma endregion
 
@@ -278,14 +226,4 @@ bool GameScene::IsLineCollisionSphere(const Vector3& P1, const Vector3& P2, cons
 }
 
 void GameScene::ApplyGlobalVariables() {
-	GlobalVariables* globalVariables = GlobalVariables::GetInstance();
-	const char* groupName = "Sphere";
-	const char* groupName2 = "Fence";
-
-	spherePara = globalVariables->GetFloatValue(groupName, "parametar");
-	spherevec = globalVariables->GetVector3Value(groupName, "Position");
-
-	fencePara = globalVariables->GetFloatValue(groupName2, "parametar");
-	fencevec = globalVariables->GetVector3Value(groupName2, "Position");
-
 }

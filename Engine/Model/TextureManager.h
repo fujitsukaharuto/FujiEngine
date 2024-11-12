@@ -41,6 +41,8 @@ public:
 
 	void ReleaseTexture(const std::string& filename);
 
+	void Load(const std::string& filename);
+
 private:
 
 

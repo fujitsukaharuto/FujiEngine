@@ -124,7 +124,7 @@ void Sprite::InitializeBuffer() {
 
 
 	material_.CreateMaterial();
-
+	material_.SetEnableLight(0);
 
 	wvpResource_ = DXCom::GetInstance()->CreateBufferResource(DXCom::GetInstance()->GetDevice(), sizeof(TransformationMatrix));
 	wvpData_ = nullptr;
