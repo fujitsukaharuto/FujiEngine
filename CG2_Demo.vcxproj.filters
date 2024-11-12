@@ -143,6 +143,9 @@
     <ClCompile Include="Engine\DX\SRVManager.cpp">
       <Filter>Engine\DX</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Scene\SceneManager.cpp">
+      <Filter>Engine\Scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -294,6 +297,9 @@
     </ClInclude>
     <ClInclude Include="Engine\DX\SRVManager.h">
       <Filter>Engine\DX</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Scene\SceneManager.h">
+      <Filter>Engine\Scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
