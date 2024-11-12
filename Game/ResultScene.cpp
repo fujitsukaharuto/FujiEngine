@@ -14,7 +14,7 @@
 ResultScene::ResultScene() {}
 
 ResultScene::~ResultScene() {
-	delete sphere;
+	delete nightSky;
 }
 
 void ResultScene::Initialize() {
@@ -24,9 +24,15 @@ void ResultScene::Initialize() {
 	obj3dCommon.reset(new Object3dCommon());
 	obj3dCommon->Initialize();
 
-	sphere = new Object3d();
-	sphere->CreateSphere();
-	sphere->SetColor({ 1.0f,0.0f,0.0f,1.0f });
+	nightSky = new Object3d();
+	nightSky->Create("nightSky.obj");
+	nightSky->transform.scale = { 6.0f,6.0f,6.0f };
+
+
+	result.reset(new Sprite);
+	result->Load("Sprite/Clear.png");
+	result->SetSize({ 600.0f,400.0f });
+	result->SetPos({ 640.0f,360.0f,0.0f });
 
 }
 
@@ -35,14 +41,7 @@ void ResultScene::Update() {
 #ifdef _DEBUG
 
 
-	ImGui::Begin("Sphere");
 
-	ImGui::DragFloat3("scale", &sphere->transform.scale.x, 0.01f);
-	ImGui::DragFloat3("rotate", &sphere->transform.rotate.x, 0.01f);
-	ImGui::DragFloat3("right", &rightDir.x, 0.01f);
-	rightDir = rightDir.Normalize();
-	sphere->SetRightDir(rightDir);
-	ImGui::End();
 
 
 #endif // _DEBUG
@@ -54,7 +53,6 @@ void ResultScene::Update() {
 		SceneManager::GetInstance()->ChangeScene("TITLE", 30.0f);
 	}
 
-	sphere->transform.rotate.y += 0.02f;
 
 
 
@@ -72,7 +70,7 @@ void ResultScene::Draw() {
 
 #pragma region 3Dオブジェクト
 	obj3dCommon->PreDraw();
-	sphere->Draw();
+	nightSky->Draw();
 
 
 	ParticleManager::GetInstance()->Draw();
@@ -83,6 +81,7 @@ void ResultScene::Draw() {
 #pragma region 前景スプライト
 
 	dxCommon_->PreSpriteDraw();
+	result->Draw();
 
 #pragma endregion
 

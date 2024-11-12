@@ -228,7 +228,6 @@ void GameScene::Draw() {
 	enemyManager_->Draw();
 
 
-	terrain->Draw();
 
 	editor.RailDarw();
 	enemyManager_->Draw();

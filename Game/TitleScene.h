@@ -22,5 +22,5 @@ private:
 
 	Object3d* nightSky = nullptr;
 
-
+	std::unique_ptr<Sprite> titletex;
 };

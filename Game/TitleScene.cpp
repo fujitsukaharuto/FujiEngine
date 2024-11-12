@@ -29,6 +29,10 @@ void TitleScene::Initialize() {
 	nightSky->Create("nightSky.obj");
 	nightSky->transform.scale = { 6.0f,6.0f,6.0f };
 
+	titletex.reset(new Sprite);
+	titletex->Load("Sprite/title.png");
+	titletex->SetSize({ 1280.0f,720.0f });
+	titletex->SetPos({ 640.0f,360.0f,0.0f });
 
 
 }
@@ -77,6 +81,8 @@ void TitleScene::Draw() {
 #pragma region 前景スプライト
 
 	dxCommon_->PreSpriteDraw();
+
+	titletex->Draw();
 
 #pragma endregion
 
