@@ -42,6 +42,8 @@ void SceneManager::Update() {
 				isBlack = false;
 				blackXpos = 2560.0f;
 				isblackLeft = false;
+				finishTime = 0.0f;
+				isFinifh_ = false;
 			}
 		}
 	}

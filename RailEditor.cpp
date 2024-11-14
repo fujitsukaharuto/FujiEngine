@@ -149,6 +149,8 @@ void RailEditor::RailDarw() {
 
 void RailEditor::Draw() {
 
+#ifdef _DEBUG
+
 	std::vector<Vector3> pointsDrawing;
 	const size_t segumentCount = reilCount_;
 	for (size_t i = 0; i < segumentCount + 1; i++) {
@@ -163,6 +165,8 @@ void RailEditor::Draw() {
 		int index2 = i;
 		Line3dDrawer::GetInstance()->DrawLine3d(pointsDrawing[index1], pointsDrawing[index2], Vector4{ 1.0f, 0.0f, 0.0f, 1.0f });
 	}
+
+#endif // _DEBUG
 
 }
 
