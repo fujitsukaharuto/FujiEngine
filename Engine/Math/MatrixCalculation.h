@@ -31,6 +31,11 @@ struct VertexDate
 	Vector3 normal;
 };
 
+struct AABB {
+	Vector3 min;
+	Vector3 max;
+};
+
 struct TransformationMatrix
 {
 	Matrix4x4 WVP;
@@ -95,6 +100,16 @@ struct ParticleDate
 	float threshold;
 	float padding[2];
 };
+
+
+struct ShockWaveData {
+	Vector4 center;
+	float shockTime;
+	float radius;
+	float intensity;// 歪みの強さ
+	float padding;
+};
+
 
 /// <summary>
 /// 2次元ベクトルのスカラー倍を求める
@@ -179,3 +194,21 @@ Matrix4x4 MakeViewportMat(float left, float top, float width, float height, floa
 Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m);
 
 float Lerp(float v1, float v2, float t);
+
+Vector3 Lerp(const Vector3& v1, const Vector3& v2, float t);
+
+Vector3 Cross(const Vector3& a, const Vector3& b);
+
+float Clamp(float x, float min, float max);
+
+Vector3 CatmullRomPoint(const Vector3& p0, const Vector3& p1, const Vector3& p2, const Vector3& p3, float t);
+
+Vector3 CatmullRom(const std::vector<Vector3>& control, float t);
+
+Vector3 ExtractEulerAngles(const Matrix4x4& rotationMatrix);
+
+Matrix4x4 MakeLookAtMatrix(const Vector3& forward, const Vector3& up);
+
+Matrix4x4 MakeRotationAxisAngle(const Vector3& axis, float angle);
+
+bool IsCollision(const AABB& aabb, const Vector3& point);

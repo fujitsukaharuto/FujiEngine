@@ -7,6 +7,7 @@
 #include "Random.h"
 
 #include "Particle/ParticleManager.h"
+#include "Scene/SceneManager.h"
 
 
 

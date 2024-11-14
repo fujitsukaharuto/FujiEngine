@@ -31,6 +31,10 @@ struct AnimeData {
 	Vector2 endSize = { 1.0f,1.0f };
 };
 
+struct AcceleFiled {
+	Vector3 Accele;
+	AABB area;
+};
 
 class DXCom;
 class SRVManager;

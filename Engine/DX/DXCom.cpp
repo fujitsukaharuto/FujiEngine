@@ -184,6 +184,16 @@ void DXCom::CreateRenderTargets()
 
 	device_->CreateRenderTargetView(offscreenrt_.Get(), &offscreenrtvDesc_, rtvHandles_[2]);
 
+
+	shockResource_ = CreateBufferResource(device_, sizeof(ShockWaveData));
+	shockData_ = nullptr;
+	shockResource_->Map(0, nullptr, reinterpret_cast<void**>(&shockData_));
+	shockData_->center = { 0.5f,0.5f,0.0f,0.0f };
+	shockData_->shockTime = 0.0f;
+	shockData_->radius = 1.0f;
+	shockData_->intensity = 0.15f;
+	shockData_->padding = 0.0f;
+
 }
 
 void DXCom::CreateDepthBuffer()
@@ -268,7 +278,7 @@ void DXCom::SettingGraphicPipeline()
 	isNonePost_ = true;
 	isMetaBall_ = false;
 	isGaussian_ = false;
-
+	isShockWave_ = false;
 }
 
 void DXCom::CreateBarrier(D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after) {
@@ -396,6 +406,18 @@ void DXCom::PostEffect()
 		commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
 	}
 
+	if (isShockWave_) {
+		command_->SetViewAndscissor();
+		pipeManager_->SetPipeline(Pipe::ShockWave);
+
+		commandList->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		commandList->IASetIndexBuffer(&indexGrayBufferView_);
+		commandList->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
+		commandList->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
+		commandList->SetGraphicsRootConstantBufferView(1, shockResource_->GetGPUVirtualAddress());
+		commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
+	}
+
 }
 
 void DXCom::PostDraw() {
@@ -456,6 +478,7 @@ void DXCom::UpDate()
 	bool preIsNonePost_ = isNonePost_;
 	bool preIsMetaBall_ = isMetaBall_;
 	bool preIsGaussian_ = isGaussian_;
+	bool preIsShock_ = isShockWave_;
 
 	if (ImGui::TreeNode("OffScreen ShaderPath"))
 	{
@@ -463,6 +486,7 @@ void DXCom::UpDate()
 		ImGui::Checkbox("None", &isNonePost_);
 		ImGui::Checkbox("Meta", &isMetaBall_);
 		ImGui::Checkbox("Blur", &isGaussian_);
+		ImGui::Checkbox("shock", &isShockWave_);
 		ImGui::TreePop();
 	}
 	if (isGrayscale_ && !(preIsGrayscale_))
@@ -470,28 +494,43 @@ void DXCom::UpDate()
 		isNonePost_ = false;
 		isMetaBall_ = false;
 		isGaussian_ = false;
+		isShockWave_ = false;
 	}
 	if (isNonePost_ && !(preIsNonePost_))
 	{
 		isGrayscale_ = false;
 		isMetaBall_ = false;
 		isGaussian_ = false;
+		isShockWave_= false;
 	}
 	if (isMetaBall_ && !(preIsMetaBall_))
 	{
 		isGrayscale_ = false;
 		isNonePost_ = false;
 		isGaussian_ = false;
+		isShockWave_= false;
 	}
 	if (isGaussian_ && !(preIsGaussian_))
 	{
 		isGrayscale_ = false;
 		isNonePost_ = false;
 		isMetaBall_ = false;
+		isShockWave_= false;
+	}
+	if (isShockWave_ && !(preIsShock_)) {
+		isGrayscale_ = false;
+		isNonePost_ = false;
+		isMetaBall_ = false;
+		isGaussian_ = false;
 	}
 
+	if (ImGui::Button("shock")) {
+		shockData_->shockTime = 0.0f;
+	}
 
 	ImGui::End();
+
+	shockData_->shockTime += 0.05f;
 
 #endif // _DEBUG
 
