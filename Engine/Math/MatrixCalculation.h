@@ -101,6 +101,16 @@ struct ParticleDate
 	float padding[2];
 };
 
+
+struct ShockWaveData {
+	Vector4 center;
+	float shockTime;
+	float radius;
+	float intensity;// 歪みの強さ
+	float padding;
+};
+
+
 /// <summary>
 /// 2次元ベクトルのスカラー倍を求める
 /// </summary>

@@ -12,6 +12,7 @@ enum class Pipe : int {
 	Gray,
 	Gauss,
 	MetaBall,
+	ShockWave,
 };
 
 

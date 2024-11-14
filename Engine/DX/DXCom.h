@@ -196,12 +196,14 @@ private:
 
 
 
-
+	Microsoft::WRL::ComPtr<ID3D12Resource> shockResource_ = nullptr;
+	ShockWaveData* shockData_;
 
 	bool isGrayscale_ = true;
 	bool isNonePost_ = true;
 	bool isMetaBall_ = true;
 	bool isGaussian_ = true;
+	bool isShockWave_ = true;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexGrayResource_ = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexGrayBufferView_{};
