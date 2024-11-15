@@ -530,7 +530,7 @@ void DXCom::UpDate()
 
 	ImGui::End();
 
-	shockData_->shockTime += 0.05f;
+	shockData_->shockTime += 0.01f;
 
 #endif // _DEBUG
 

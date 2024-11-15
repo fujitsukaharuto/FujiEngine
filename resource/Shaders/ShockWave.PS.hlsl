@@ -34,9 +34,12 @@ float4 main(PSInput input) : SV_TARGET
     {
         // 距離に基づき、サイン波で周期的な歪みを与える
         float distortion = sin((currentRadius - distance) * 20.0f) * g_Shock.shockIntensity * (1.0f - g_Shock.shockTime);
-        
+
         // サンプリング位置のオフセットを計算
         float2 distortedTexCoord = input.texcoord + normalize(direction) * distortion;
+
+        // UV 座標を [0, 1] の範囲にクランプ
+        distortedTexCoord = clamp(distortedTexCoord, 0.0f, 1.0f);
 
         // 歪みを適用したテクスチャ座標でテクスチャをサンプリング
         return g_InputTexture.Sample(g_Sampler, distortedTexCoord);
