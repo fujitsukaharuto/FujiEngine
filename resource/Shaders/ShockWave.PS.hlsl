@@ -29,11 +29,21 @@ float4 main(PSInput input) : SV_TARGET
     // 衝撃波の到達範囲を計算
     float currentRadius = g_Shock.shockRadius * g_Shock.shockTime;
 
-    // 衝撃波の範囲チェックと減衰計算
-    if (distance < currentRadius && distance > (currentRadius - 0.1f))
+    // 波の位相（繰り返しの波）を加える
+    float phase = (distance - currentRadius) * 10.0f; // 波の周期を調整
+
+    // 衝撃波の範囲内であれば
+    if (distance < currentRadius)
     {
-        // 距離に基づき、サイン波で周期的な歪みを与える
-        float distortion = sin((currentRadius - distance) * 20.0f) * g_Shock.shockIntensity * (1.0f - g_Shock.shockTime);
+        // 歪みの強度の減衰（距離が遠くなるほど歪みが弱くなる）
+        float distanceFactor = 1.0f - (distance / currentRadius);
+        distanceFactor = max(distanceFactor, 0.0f); // 最小値は0
+
+        // サイン波を使って波紋のような歪みを繰り返し与える
+        float distortion = sin(phase) * g_Shock.shockIntensity * distanceFactor;
+
+        // 歪みの最大値を制限（上限設定）
+        distortion = min(distortion, 0.2f);
 
         // サンプリング位置のオフセットを計算
         float2 distortedTexCoord = input.texcoord + normalize(direction) * distortion;
