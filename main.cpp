@@ -111,12 +111,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	textureManager->Load("Sprite/7.png");
 	textureManager->Load("Sprite/8.png");
 	textureManager->Load("Sprite/9.png");
+	textureManager->Load("Sprite/title.png");
+	textureManager->Load("Sprite/clear.png");
+	textureManager->Load("Sprite/energyCase.png");
+	textureManager->Load("Sprite/energy.png");
+	textureManager->Load("Sprite/reticle.png");
+
+
 
 	modelManager->LoadOBJ("ufo.obj");
 	modelManager->LoadOBJ("airPlane.obj");
 	modelManager->LoadOBJ("balloon.obj");
 	modelManager->LoadOBJ("snowMan.obj");
 	modelManager->LoadOBJ("ice.obj");
+	modelManager->LoadOBJ("rail.obj");
+	modelManager->LoadOBJ("rail2.obj");
 	
 
 

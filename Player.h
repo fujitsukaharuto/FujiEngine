@@ -42,5 +42,10 @@ private:
 	const float kStartTime = 20.0f;
 	Vector3 velo_;
 
+	float energy_ = 300.0f;
+
 	std::unique_ptr<Sprite> reticle;
+	std::unique_ptr<Sprite> energyCase;
+	std::unique_ptr<Sprite> energyQuantity;
+
 };

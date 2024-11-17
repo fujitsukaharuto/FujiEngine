@@ -4,6 +4,7 @@
 #include "CameraManager.h"
 #include "Input.h"
 
+
 Player::Player() {
 }
 
@@ -27,6 +28,18 @@ void Player::Initialize() {
 	reticle->Load("Sprite/reticle.png");
 	reticle->SetSize({ 100.0f,100.0f });
 
+	energyCase.reset(new Sprite);
+	energyCase->Load("Sprite/energyCase.png");
+	energyCase->SetPos({ 120.0f,360.0f,0.0f });
+
+
+
+	energyQuantity.reset(new Sprite);
+	energyQuantity->Load("Sprite/energy.png");
+	energyQuantity->SetAnchor({ 0.5f,1.0f });
+	energyQuantity->SetPos({ 120.0f,510.0f,0.0f });
+
+
 }
 
 void Player::Update() {
@@ -37,6 +50,14 @@ void Player::Update() {
 	if (Input::GetInstance()->IsPressMouse(0)) {
 		const float kBulletSpeed = 82.0f;
 		Vector3 worldPosReticle;
+
+		if (0.0f < energy_) {
+			energy_ -= FPSKeeper::DeltaTime();
+		}
+		else {
+			energy_ = 0.0f;
+		}
+		energyQuantity->SetSize({ 60.0f,energy_ });
 
 		worldPosReticle = target->transform.translate;
 
@@ -58,10 +79,24 @@ void Player::Update() {
 		Vector3 worldPos = worldPosPlayer;
 		bullet->transform.translate = worldPos;
 		/*bullet->transform.scale = { 0.0f,0.0f,0.0f };*/
-		isLive = true;
+		if (energy_ > 0.0f) {
+			isLive = true;
+		}
+		else {
+			isLive = false;
+		}
+
 	}
 	else {
 		isLive = false;
+		if (300.0f > energy_) {
+			energy_ += FPSKeeper::DeltaTime() * 2.0f;
+		}
+		else {
+			energy_ = 300.0f;
+		}
+		energyQuantity->SetSize({ 60.0f,energy_ });
+
 	}
 
 	if (isLive) {
@@ -83,7 +118,11 @@ void Player::Draw() {
 }
 
 void Player::SpriteDraw() {
+
+	energyQuantity->Draw();
+	energyCase->Draw();
 	reticle->Draw();
+
 }
 
 
