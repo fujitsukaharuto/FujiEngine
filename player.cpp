@@ -57,8 +57,11 @@ void Player::Initialize() {
 
 void Player::Update() {
 
-	ReticleCal();
 	Camera* camera = CameraManager::GetInstance()->GetCamera();
+	camera->UpdateMatrix();
+
+	ReticleCal();
+	
 
 	if (Input::GetInstance()->IsPressMouse(0)) {
 		const float kBulletSpeed = 82.0f;
@@ -108,7 +111,7 @@ void Player::Update() {
 			left_->transform.rotate.x = std::atan2(-velocityZ.y, velocityZ.z);
 			left_->transform.rotate.z = 0.0f;
 			left_->transform.rotate-= camera->transform.rotate;
-
+			left_->UpdateMatrix();
 
 			worldPosReticle = target->transform.translate;
 			worldPosReticle -= camera->transform.translate;
@@ -122,7 +125,7 @@ void Player::Update() {
 			right_->transform.rotate.x = std::atan2(-velocityZ.y, velocityZ.z);
 			right_->transform.rotate.z = 0.0f;
 			right_->transform.rotate -= camera->transform.rotate;
-
+			right_->UpdateMatrix();
 
 		}
 		else {
