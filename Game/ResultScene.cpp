@@ -4,9 +4,9 @@
 #include "GlobalVariables.h"
 #include "CameraManager.h"
 #include "FPSKeeper.h"
-#include "Random.h"
+#include "Particle/Random.h"
 
-#include "ParticleManager.h"
+#include "Particle/ParticleManager.h"
 #include "Scene/SceneManager.h"
 
 

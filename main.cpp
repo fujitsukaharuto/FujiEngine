@@ -9,8 +9,8 @@
 #include "ModelManager.h"
 #include "PointLightManager.h"
 #include "CameraManager.h"
-#include "Line3dDrawer.h"
-#include "ParticleManager.h"
+#include "Line/Line3dDrawer.h"
+#include "Particle/ParticleManager.h"
 #include "Scene/SceneManager.h"
 
 // やること
@@ -126,7 +126,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	modelManager->LoadOBJ("ice.obj");
 	modelManager->LoadOBJ("rail.obj");
 	modelManager->LoadOBJ("rail2.obj");
-	
+	modelManager->LoadOBJ("track.obj");
 
 
 	sceneManager = SceneManager::GetInstance();

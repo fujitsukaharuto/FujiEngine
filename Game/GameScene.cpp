@@ -1,10 +1,10 @@
 #include "GameScene.h"
 #include "ImGuiManager.h"
 #include "GlobalVariables.h"
-#include "Line3dDrawer.h"
+#include "Line/Line3dDrawer.h"
 #include "FPSKeeper.h"
 
-#include "ParticleManager.h"
+#include "Particle/ParticleManager.h"
 
 
 

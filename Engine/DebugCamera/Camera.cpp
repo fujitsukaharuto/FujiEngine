@@ -1,7 +1,7 @@
 #include "Camera.h"
 #include "DXCom.h"
 #include "CameraManager.h"
-#include "Random.h"
+#include "Particle/Random.h"
 #include "ImGuiManager.h"
 
 Camera::Camera() :transform({ { 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, { 0.0f,3.5f,-20.0f } })

@@ -50,6 +50,8 @@ private:
 
 	std::vector<Vector3> controlPoints_;
 
+	std::unique_ptr<Object3d> track_;
+
 	int pointIndex_ = 1;
 
 	Trans trans{};

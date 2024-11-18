@@ -1,5 +1,5 @@
 #include "RailEditor.h"
-#include "Line3dDrawer.h"
+#include "Line/Line3dDrawer.h"
 #include "CameraManager.h"
 #include <numbers>
 #include <variant>
@@ -27,6 +27,10 @@ void RailEditor::Initialize() {
 	}
 
 	Load("rails.json");
+
+	track_.reset(new Object3d);
+	track_->Create("track.obj");
+	track_->transform.scale.z = 3.5f;
 
 	SetRail();
 
@@ -127,12 +131,49 @@ void RailEditor::Update() {
 		// X軸の回転を計算 (垂直方向)
 		trans.rotate.x = std::atan2(-forward.y, std::sqrt(forward.x * forward.x + forward.z * forward.z));
 
-
 		// 次フレーム用に現在のupベクトルを保存
 		previousUp = newUp;
 
-
 		camera->transform = trans;
+
+
+
+		offset = { 0.0f,0.05f,0.0f };
+		t = 1.0f / timelimitt * (time_+10.0f);
+		eye = CatmullRom(controlPoints_, t);
+		eye += offset;
+
+		t2 = 1.0f / timelimitt * (time_ + 40.0f);
+		target = CatmullRom(controlPoints_, t2);
+		target += offset;
+
+		// カメラの位置を設定
+		track_->transform.translate = eye;
+
+		// forwardベクトルを正規化
+		forward = target - eye;
+		forward = forward.Normalize();
+
+		// 1フレーム前のupベクトルを使って新しいrightベクトルを計算
+		right = Cross(previousUp, forward);
+		right = right.Normalize();
+
+		//// Z軸の回転を計算
+		//trans.rotate.z = std::atan2(right.y, right.x);
+
+		// 新しいupベクトルを計算 (forwardとrightベクトルの外積)
+		newUp = Cross(forward, right);
+		newUp = newUp.Normalize();  // 正規化しておく
+
+		// Y軸の回転を計算 (水平方向)
+		track_->transform.rotate.y = std::atan2(forward.x, forward.z);
+
+		// X軸の回転を計算 (垂直方向)
+		track_->transform.rotate.x = std::atan2(-forward.y, std::sqrt(forward.x * forward.x + forward.z * forward.z));
+
+
+
+
 	}
 
 }
@@ -145,6 +186,7 @@ void RailEditor::RailDarw() {
 			}
 		}
 	}
+	track_->Draw();
 }
 
 void RailEditor::Draw() {
@@ -167,7 +209,7 @@ void RailEditor::Draw() {
 	}
 
 #endif // _DEBUG
-
+	
 }
 
 
