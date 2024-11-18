@@ -23,6 +23,19 @@ void Player::Initialize() {
 	bullet->Create("razer.obj");
 	bullet->transform.scale = { 0.5f,0.5f,82.0f };
 
+	left_.reset(new Object3d);
+	left_->Create("razer.obj");
+	left_->transform.scale = { 0.5f,0.5f,80.0f };
+	left_->transform.translate = { -0.5f,-0.5f,0.0f };
+	left_->SetCameraParent(true);
+
+	right_.reset(new Object3d);
+	right_->Create("razer.obj");
+	right_->transform.scale = { 0.5f,0.5f,80.0f };
+	right_->transform.translate = { 0.5f,-0.5f,0.0f };
+	right_->SetCameraParent(true);
+
+
 
 	reticle.reset(new Sprite);
 	reticle->Load("Sprite/reticle.png");
@@ -81,6 +94,36 @@ void Player::Update() {
 		/*bullet->transform.scale = { 0.0f,0.0f,0.0f };*/
 		if (energy_ > 0.0f) {
 			isLive = true;
+
+
+			worldPosReticle = target->transform.translate;
+			worldPosReticle -= camera->transform.translate;
+			worldPosPlayer = left_->transform.translate;
+			velocity = worldPosReticle - worldPosPlayer;
+			velocity = velocity.Normalize();
+			velocity = velocity * kBulletSpeed;
+			left_->transform.rotate.y = std::atan2(velocity.x, velocity.z);
+			yrota = MakeRotateYMatrix(-left_->transform.rotate.y);
+			velocityZ = TransformNormal(velocity, yrota);
+			left_->transform.rotate.x = std::atan2(-velocityZ.y, velocityZ.z);
+			left_->transform.rotate.z = 0.0f;
+			left_->transform.rotate-= camera->transform.rotate;
+
+
+			worldPosReticle = target->transform.translate;
+			worldPosReticle -= camera->transform.translate;
+			worldPosPlayer = right_->transform.translate;
+			velocity = worldPosReticle - worldPosPlayer;
+			velocity = velocity.Normalize();
+			velocity = velocity * kBulletSpeed;
+			right_->transform.rotate.y = std::atan2(velocity.x, velocity.z);
+			yrota = MakeRotateYMatrix(-right_->transform.rotate.y);
+			velocityZ = TransformNormal(velocity, yrota);
+			right_->transform.rotate.x = std::atan2(-velocityZ.y, velocityZ.z);
+			right_->transform.rotate.z = 0.0f;
+			right_->transform.rotate -= camera->transform.rotate;
+
+
 		}
 		else {
 			isLive = false;
@@ -113,7 +156,9 @@ void Player::Update() {
 void Player::Draw() {
 
 	if (isLive) {
-		bullet->Draw();
+
+		left_->Draw();
+		right_->Draw();
 	}
 }
 

@@ -123,7 +123,7 @@ void GameScene::Update() {
 	dxCommon_->UpDate();
 
 
-
+	
 
 	player_->Update();
 	enemyManager_->EnemyUpdate();

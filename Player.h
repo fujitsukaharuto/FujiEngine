@@ -35,8 +35,12 @@ private:
 
 
 	Object3d* target;
+	std::unique_ptr<Object3d> localTearget;
 
 	Object3d* bullet;
+	std::unique_ptr<Object3d> left_;
+	std::unique_ptr<Object3d> right_;
+
 	bool isLive = false;
 	float startTime = 0.0f;
 	const float kStartTime = 20.0f;

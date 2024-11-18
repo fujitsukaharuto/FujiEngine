@@ -10,7 +10,7 @@ public:
 
 
 	void Update();
-
+	void UpdateMatrix();
 
 	void SetFovY(float fov) { fovY_ = fov; }
 	void SetAspect(float width, float height) { aspect_ = width / height; }
