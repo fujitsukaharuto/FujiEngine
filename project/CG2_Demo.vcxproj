@@ -116,6 +116,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\DX\DXCommand.cpp" />
     <ClCompile Include="Engine\DX\DXCompil.cpp" />
     <ClCompile Include="Engine\DX\FPSKeeper.cpp" />
+    <ClCompile Include="Engine\DX\Framework.cpp" />
     <ClCompile Include="Engine\DX\SRVManager.cpp" />
     <ClCompile Include="Engine\GlobalVariables\GlobalVariables.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\BasePipeline.cpp" />
@@ -154,6 +155,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Scene\SceneManager.cpp" />
     <ClCompile Include="Engine\WinApp\MyWindow.cpp" />
     <ClCompile Include="Game\Field\MapChipField.cpp" />
+    <ClCompile Include="Game\GameRun.cpp" />
     <ClCompile Include="Game\GameScene.cpp" />
     <ClCompile Include="Game\ResultScene.cpp" />
     <ClCompile Include="Game\TitleScene.cpp" />
@@ -168,6 +170,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\DX\DXCommand.h" />
     <ClInclude Include="Engine\DX\DXCompil.h" />
     <ClInclude Include="Engine\DX\FPSKeeper.h" />
+    <ClInclude Include="Engine\DX\Framework.h" />
     <ClInclude Include="Engine\DX\SRVManager.h" />
     <ClInclude Include="Engine\GlobalVariables\GlobalVariables.h" />
     <ClInclude Include="Engine\GraphicPipeline\BasePipeline.h" />
@@ -209,6 +212,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Scene\SceneManager.h" />
     <ClInclude Include="Engine\WinApp\MyWindow.h" />
     <ClInclude Include="Game\Field\MapChipField.h" />
+    <ClInclude Include="Game\GameRun.h" />
     <ClInclude Include="Game\GameScene.h" />
     <ClInclude Include="Game\ResultScene.h" />
     <ClInclude Include="Game\TitleScene.h" />

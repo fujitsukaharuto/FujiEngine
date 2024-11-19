@@ -68,8 +68,9 @@ void GameScene::Initialize() {
 	test = new Sprite();
 	test->Load("uvChecker.png");
 
-	soundData1 = audio_->SoundLoadWave("resource/xxx.wav");
-	soundData2 = audio_->SoundLoadWave("resource/mokugyo.wav");
+
+	soundData1 = audio_->SoundLoadWave("xxx.wav");
+	soundData2 = audio_->SoundLoadWave("mokugyo.wav");
 
 	ApplyGlobalVariables();
 
@@ -119,10 +120,11 @@ void GameScene::Update() {
 		suzunne->transform.translate.y -= 0.05f;
 	}
 
-
+	if (input_->TriggerKey(DIK_5)) {
+		emit.BurstAnime();
+	}
 	if (input_->TriggerKey(DIK_8)) {
 		audio_->SoundPlayWave(soundData1);
-		emit.BurstAnime();
 	}
 	if (input_->TriggerKey(DIK_9)) {
 		audio_->SoundStopWave(soundData1);
@@ -186,10 +188,6 @@ void GameScene::Draw() {
 	test->Draw();
 
 #pragma endregion
-
-	dxCommon_->Command();
-	dxCommon_->PostEffect();
-
 
 }
 

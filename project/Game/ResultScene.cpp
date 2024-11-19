@@ -83,10 +83,6 @@ void ResultScene::Draw() {
 
 #pragma endregion
 
-	dxCommon_->Command();
-	dxCommon_->PostEffect();
-
-
 }
 
 void ResultScene::ApplyGlobalVariables() {
