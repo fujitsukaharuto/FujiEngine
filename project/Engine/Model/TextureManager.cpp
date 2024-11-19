@@ -94,6 +94,18 @@ Texture* TextureManager::LoadTexture(const std::string& filename) {
 		return m_textureCache[filename].get();
 	}
 
+	Load(filename);
+
+	auto it = m_textureCache.find(filename);
+	return it->second.get();
+}
+
+void TextureManager::Load(const std::string& filename) {
+	// 既にロードされているかチェック
+	if (m_textureCache.find(filename) != m_textureCache.end()) {
+		return;
+	}
+
 	SRVManager* srvManager = SRVManager::GetInstance();
 
 	DirectX::ScratchImage mipImages = LoadTextureFile(directoryPath_ + filename);
@@ -116,8 +128,6 @@ Texture* TextureManager::LoadTexture(const std::string& filename) {
 	DXCom::GetInstance()->CommandExecution();
 
 	m_textureCache[filename] = std::move(texture);
-
-	return m_textureCache[filename].get();
 }
 
 Texture* TextureManager::GetTexture(const std::string& filename) const {

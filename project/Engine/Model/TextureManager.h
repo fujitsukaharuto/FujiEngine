@@ -33,6 +33,7 @@ public:
 
 	// テクスチャのロード
 	Texture* LoadTexture(const std::string& filename);
+	void Load(const std::string& filename);
 
 	// テクスチャの取得
 	Texture* GetTexture(const std::string& filename) const;

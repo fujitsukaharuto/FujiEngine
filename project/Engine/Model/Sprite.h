@@ -20,6 +20,8 @@ public:
 
 	void Draw();
 
+	void SetColor(const Vector4& color);
+
 	void SetPos(const Vector3& pos);
 
 	void SetSize(const Vector2& size);

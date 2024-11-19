@@ -6,6 +6,7 @@ CameraManager* CameraManager::GetInstance() {
 }
 
 void CameraManager::Initialize() {
+	DebugCamera::GetInstance()->Initialize();
 	camera_.reset(new Camera());
 }
 

@@ -149,6 +149,12 @@
     <ClCompile Include="Engine\GraphicPipeline\ShockWavePipe.cpp">
       <Filter>Engine\GraphicPipeline</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\DX\Framework.cpp">
+      <Filter>Engine\DX</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameRun.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -306,6 +312,12 @@
     </ClInclude>
     <ClInclude Include="Engine\GraphicPipeline\ShockWavePipe.h">
       <Filter>Engine\GraphicPipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\DX\Framework.h">
+      <Filter>Engine\DX</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameRun.h">
+      <Filter>Game</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
