@@ -9,23 +9,20 @@
 #include "Vector3.h"
 #include "Vector2Matrix.h"
 
-struct Vector4
-{
+struct Vector4 {
 	float X;
 	float Y;
 	float Z;
 	float W;
 };
 
-struct Trans
-{
+struct Trans {
 	Vector3 scale;
 	Vector3 rotate;
 	Vector3 translate;
 };
 
-struct VertexDate
-{
+struct VertexDate {
 	Vector4 position;
 	Vector2 texcoord;
 	Vector3 normal;
@@ -36,8 +33,7 @@ struct AABB {
 	Vector3 max;
 };
 
-struct TransformationMatrix
-{
+struct TransformationMatrix {
 	Matrix4x4 WVP;
 	Matrix4x4 World;
 	Matrix4x4 WorldInverseTransPose;
@@ -48,16 +44,14 @@ struct TransformationParticleMatrix {
 	Matrix4x4 World;
 };
 
-struct Materials
-{
+struct Materials {
 	Vector4 color;
 	int32_t enableLighting;
 	float padding[3];
 	Matrix4x4 uvTransform;
 };
 
-struct DirectionalLight
-{
+struct DirectionalLight {
 
 	Vector4 color;
 	Vector3 direction;
@@ -69,31 +63,26 @@ struct CameraForGPU {
 	Vector3 worldPosition;
 };
 
-struct GrayscaleVertex
-{
+struct GrayscaleVertex {
 	Vector4 position;
 	Vector2 texcoord;
 };
 
-struct Sphere
-{
+struct Sphere {
 	Vector3 center;
 	float radius;
 };
 
-struct MaterialDataPath
-{
+struct MaterialDataPath {
 	std::string textureFilePath;
 };
 
-struct ModelData
-{
+struct ModelData {
 	std::vector<VertexDate> vertices;
 	MaterialDataPath material;
 };
 
-struct ParticleDate
-{
+struct ParticleDate {
 	Vector4 center[400];
 	Vector4 radius[400];
 	int particleCount;
@@ -108,6 +97,21 @@ struct ShockWaveData {
 	float radius;
 	float intensity;// 歪みの強さ
 	float padding;
+};
+
+
+struct FireElement {
+	float animeTime; // アニメーション時間
+	Vector2 resolution; // 画面解像度
+	float distortionStrength; // UVディストーションの強度
+	float highlightStrength; // ハイライトの強度
+	float detailScale; // 細かいノイズのスケール
+	Vector2 rangeMin; // 炎の描画範囲（最小UV）
+	Vector2 rangeMax; // 炎の描画範囲（最大UV）
+	float scale; // Voronoiノイズのスケール
+	float speed; // 炎の揺らぎ速度
+	float noiseSpeed; // 細かいノイズの移動速度
+	float blendStrength;// どれくらい混ぜるか
 };
 
 
@@ -163,7 +167,7 @@ Vector2 Transform(const Vector2& vector, const Matrix3x3& matrix);
 
 Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix);
 
-Matrix4x4 Multiply(const Matrix4x4& matrix1,const Matrix4x4& matrix2);
+Matrix4x4 Multiply(const Matrix4x4& matrix1, const Matrix4x4& matrix2);
 
 Matrix4x4 Transpose(const Matrix4x4& m);
 
