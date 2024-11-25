@@ -14,6 +14,7 @@ enum class Pipe : int {
 	MetaBall,
 	ShockWave,
 	Fire,
+	Thunder,
 };
 
 

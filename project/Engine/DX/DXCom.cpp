@@ -198,6 +198,21 @@ void DXCom::CreateRenderTargets() {
 	fireData_->noiseSpeed = -0.12f;
 	fireData_->blendStrength = 2.0f;
 
+
+	thunderResource_ = CreateBufferResource(device_, sizeof(LightningElement));
+	thunderData_ = nullptr;
+	thunderResource_->Map(0, nullptr, reinterpret_cast<void**>(&thunderData_));
+	thunderData_->time = 0.0f;
+	thunderData_->resolution = { 1280.0f, 720.0f };
+	thunderData_->mainBranchStrength = 20.0f;
+	thunderData_->branchCount = 5.0f;
+	thunderData_->branchFade = 10.0f;
+	thunderData_->highlightStrength = 2.0f;
+	thunderData_->noiseScale = 10.0f;
+	thunderData_->noiseSpeed = 2.0f;
+	thunderData_->rangeMin = { 0.0f,0.0f };
+	thunderData_->rangeMax = { 1.0f,1.0f };
+
 }
 
 void DXCom::CreateDepthBuffer() {
@@ -281,6 +296,7 @@ void DXCom::SettingGraphicPipeline() {
 	isGaussian_ = false;
 	isShockWave_ = false;
 	isFire_ = false;
+	isThunder_ = false;
 }
 
 void DXCom::CreateBarrier(D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after) {
@@ -313,6 +329,7 @@ void DXCom::SettingTexture() {
 	baseTex_ = TextureManager::GetInstance()->LoadTexture("Gradient02.jpg");
 	voronoTex_ = TextureManager::GetInstance()->LoadTexture("T_Noise04.jpg");
 	noiseTex_ = TextureManager::GetInstance()->LoadTexture("T_Noise02-300x300.jpg");
+	noiseDirTex_= TextureManager::GetInstance()->LoadTexture("Noise_Dir.jpg");
 
 
 
@@ -433,6 +450,20 @@ void DXCom::PostEffect() {
 		commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
 	}
 
+
+	if (isThunder_) {
+		command_->SetViewAndscissor();
+		pipeManager_->SetPipeline(Pipe::Thunder);
+
+		commandList->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		commandList->IASetIndexBuffer(&indexGrayBufferView_);
+		commandList->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
+		commandList->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
+		commandList->SetGraphicsRootDescriptorTable(1, noiseDirTex_->gpuHandle);
+		commandList->SetGraphicsRootConstantBufferView(2, thunderResource_->GetGPUVirtualAddress());
+		commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
+	}
+
 }
 
 void DXCom::PostDraw() {
@@ -494,6 +525,7 @@ void DXCom::UpDate() {
 	bool preIsGaussian_ = isGaussian_;
 	bool preIsShock_ = isShockWave_;
 	bool preIsFire_ = isFire_;
+	bool preIsThunder_ = isThunder_;
 
 	if (ImGui::TreeNode("OffScreen ShaderPath")) {
 		ImGui::Checkbox("Gray", &isGrayscale_);
@@ -502,6 +534,7 @@ void DXCom::UpDate() {
 		ImGui::Checkbox("Blur", &isGaussian_);
 		ImGui::Checkbox("shock", &isShockWave_);
 		ImGui::Checkbox("fire", &isFire_);
+		ImGui::Checkbox("thunder", &isThunder_);
 		ImGui::TreePop();
 	}
 	if (isGrayscale_ && !(preIsGrayscale_)) {
@@ -510,6 +543,7 @@ void DXCom::UpDate() {
 		isGaussian_ = false;
 		isShockWave_ = false;
 		isFire_ = false;
+		isThunder_ = false;
 	}
 	if (isNonePost_ && !(preIsNonePost_)) {
 		isGrayscale_ = false;
@@ -517,6 +551,7 @@ void DXCom::UpDate() {
 		isGaussian_ = false;
 		isShockWave_ = false;
 		isFire_ = false;
+		isThunder_ = false;
 	}
 	if (isMetaBall_ && !(preIsMetaBall_)) {
 		isGrayscale_ = false;
@@ -524,6 +559,7 @@ void DXCom::UpDate() {
 		isGaussian_ = false;
 		isShockWave_ = false;
 		isFire_ = false;
+		isThunder_ = false;
 	}
 	if (isGaussian_ && !(preIsGaussian_)) {
 		isGrayscale_ = false;
@@ -531,6 +567,7 @@ void DXCom::UpDate() {
 		isMetaBall_ = false;
 		isShockWave_ = false;
 		isFire_ = false;
+		isThunder_ = false;
 	}
 	if (isShockWave_ && !(preIsShock_)) {
 		isGrayscale_ = false;
@@ -538,6 +575,7 @@ void DXCom::UpDate() {
 		isMetaBall_ = false;
 		isGaussian_ = false;
 		isFire_ = false;
+		isThunder_ = false;
 	}
 	if (isFire_ && !(preIsFire_)) {
 		isGrayscale_ = false;
@@ -545,7 +583,18 @@ void DXCom::UpDate() {
 		isMetaBall_ = false;
 		isGaussian_ = false;
 		isShockWave_ = false;
+		isThunder_ = false;
 	}
+	if (isThunder_ && !(preIsThunder_)) {
+		isGrayscale_ = false;
+		isNonePost_ = false;
+		isMetaBall_ = false;
+		isGaussian_ = false;
+		isShockWave_ = false;
+		isFire_ = false;
+	}
+
+
 
 	if (ImGui::Button("shock")) {
 		shockData_->shockTime = 0.0f;
@@ -567,10 +616,25 @@ void DXCom::UpDate() {
 	}
 
 
+	if (ImGui::TreeNode("ThunderData")) {
+		ImGui::DragFloat("time", &thunderData_->time, 0.1f, 0.0f, 60.0f);
+		ImGui::DragFloat2("resolution", &thunderData_->resolution.x);
+		ImGui::DragFloat("mainBranchStrength", &thunderData_->mainBranchStrength, 0.1f);
+		ImGui::DragFloat("branchCount", &thunderData_->branchCount, 1);
+		ImGui::DragFloat("branchFade", &thunderData_->branchFade,0.1f);
+		ImGui::DragFloat("highlightStrength", &thunderData_->highlightStrength,0.1f);
+		ImGui::DragFloat("noiseScale", &thunderData_->noiseScale,0.1f);
+		ImGui::DragFloat("noiseSpeed", &thunderData_->noiseSpeed,0.1f);
+		ImGui::DragFloat2("rangeMin", &thunderData_->rangeMin.x,0.01f);
+		ImGui::DragFloat2("rangeMax", &thunderData_->rangeMax.x,0.01f);
+		ImGui::TreePop();
+	}
+
 	ImGui::End();
 
 	shockData_->shockTime += 0.025f;
 	fireData_->animeTime += 0.025f;
+	thunderData_->time += 0.025f;
 
 #endif // _DEBUG
 

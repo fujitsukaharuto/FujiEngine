@@ -115,6 +115,20 @@ struct FireElement {
 };
 
 
+struct LightningElement {
+	Vector2 rangeMin; // 描画範囲（最小UV）
+	Vector2 rangeMax; // 描画範囲（最大UV）
+	Vector2 resolution; // 画面解像度
+	float time; // アニメーション時間
+	float mainBranchStrength; // 主幹の強度
+	float branchCount; // 分岐の数
+	float branchFade; // 分岐のフェード率
+	float highlightStrength; // ハイライトの強度
+	float noiseScale; // ノイズのスケール
+	float noiseSpeed; // ノイズの移動速度
+};
+
+
 /// <summary>
 /// 2次元ベクトルのスカラー倍を求める
 /// </summary>

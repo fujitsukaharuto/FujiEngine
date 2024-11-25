@@ -199,9 +199,14 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> fireResource_ = nullptr;
 	FireElement* fireData_;
 
+	Microsoft::WRL::ComPtr<ID3D12Resource> thunderResource_ = nullptr;
+	LightningElement* thunderData_;
+
+
 	Texture* baseTex_;
 	Texture* voronoTex_;
 	Texture* noiseTex_;
+	Texture* noiseDirTex_;
 
 	bool isGrayscale_ = true;
 	bool isNonePost_ = true;
@@ -209,6 +214,7 @@ private:
 	bool isGaussian_ = true;
 	bool isShockWave_ = true;
 	bool isFire_ = true;
+	bool isThunder_ = true;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexGrayResource_ = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexGrayBufferView_{};
