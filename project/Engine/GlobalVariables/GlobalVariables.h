@@ -1,12 +1,8 @@
 #pragma once
-#include <iostream>
-#include <fstream>
 #include <variant>
 #include <map>
 #include <json.hpp>
-
 #include "MatrixCalculation.h"
-
 
 class GlobalVariables {
 public:

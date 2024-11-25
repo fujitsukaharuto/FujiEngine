@@ -1,5 +1,7 @@
 #include "MatrixCalculation.h"
 #include <numbers>
+#include <cmath>
+#include <assert.h>
 
 Vector2 Multiply(const Vector2& vec, const float& num)
 {

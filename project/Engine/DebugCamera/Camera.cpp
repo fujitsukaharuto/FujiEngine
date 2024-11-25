@@ -1,6 +1,8 @@
 #include "Camera.h"
-#include "DXCom.h"
+#include "DX/FPSKeeper.h"
+#include "WinApp/MyWindow.h"
 #include "CameraManager.h"
+#include "DebugCamera/DebugCamera.h"
 #include "Random.h"
 #include "ImGuiManager.h"
 

@@ -1,4 +1,5 @@
 #include "GameRun.h"
+#include <memory>
 
 // やること
 // オフスクリーンのかんり
@@ -8,11 +9,9 @@
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
-	Framework* game = new GameRun;
+	std::unique_ptr<Framework> game = std::make_unique<GameRun>();
 
 	game->Run();
-
-	delete game;
 
 	return 0;
 }

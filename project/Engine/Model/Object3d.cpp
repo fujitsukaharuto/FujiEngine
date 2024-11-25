@@ -4,9 +4,7 @@
 #include "PointLightManager.h"
 #include "CameraManager.h"
 
-Object3d::~Object3d() {
-	delete model_;
-}
+Object3d::~Object3d() {}
 
 void Object3d::Create(const std::string& fileName) {
 
@@ -89,7 +87,7 @@ void Object3d::SetTexture(const std::string& name) {
 }
 
 void Object3d::SetModel(const std::string& fileName) {
-	model_ = new Model(*(ModelManager::FindModel(fileName)));
+	model_ = std::make_unique<Model>(*(ModelManager::FindModel(fileName)));
 }
 
 void Object3d::CreateWVP() {

@@ -126,7 +126,7 @@ Model* ModelManager::FindModel(const std::string& filename) {
 	ModelManager* instance = GetInstance();
 	auto iterator = instance->models_.find(filename);
 	if (iterator != instance->models_.end()) {
-		return (*iterator).second.get();
+		return iterator->second.get();
 	}
 	return nullptr;
 }

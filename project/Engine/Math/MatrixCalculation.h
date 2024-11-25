@@ -1,9 +1,7 @@
 #pragma once
 #define _USE_MATH_DEFINES
-#include <cmath>
 #include <vector>
 #include <string>
-#include <assert.h>
 
 #include "Vector2.h"
 #include "Vector3.h"

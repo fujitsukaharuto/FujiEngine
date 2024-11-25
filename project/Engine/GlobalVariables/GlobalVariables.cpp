@@ -1,5 +1,7 @@
 #include "GlobalVariables.h"
 #include "ImGuiManager.h"
+#include <fstream>
+#include <iostream>
 
 GlobalVariables* GlobalVariables::GetInstance() {
 

@@ -1,4 +1,5 @@
 #include "CameraManager.h"
+#include "DebugCamera.h"
 
 CameraManager* CameraManager::GetInstance() {
 	static CameraManager instatnce;
@@ -7,7 +8,7 @@ CameraManager* CameraManager::GetInstance() {
 
 void CameraManager::Initialize() {
 	DebugCamera::GetInstance()->Initialize();
-	camera_.reset(new Camera());
+	camera_ = std::make_unique<Camera>();
 }
 
 void CameraManager::Update() {

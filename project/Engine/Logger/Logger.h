@@ -2,8 +2,6 @@
 #include <string>
 #include <format>
 
-
-
 namespace Logger {
 
 	void Log(const std::string& outputString);

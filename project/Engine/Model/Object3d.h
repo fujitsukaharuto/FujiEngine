@@ -58,7 +58,7 @@ private:
 
 private:
 	Object3dCommon* common_;
-	Model* model_ = nullptr;
+	std::unique_ptr<Model> model_ = nullptr;
 	PointLight* pointLight_;
 	SpotLight* spotLight_;
 	Camera* camera_;

@@ -44,13 +44,13 @@ void GameRun::Initialize() {
 
 #pragma endregion
 
-	sceneFactory_ = new SceneFactory();
-	sceneManager_->SetFactory(sceneFactory_);
+	sceneFactory_ = std::make_unique<SceneFactory>();
+	sceneManager_->SetFactory(sceneFactory_.get());
 	sceneManager_->StartScene("TITLE");
 }
 
 void GameRun::Finalize() {
-	delete sceneFactory_;
+	sceneFactory_.reset();
 	sceneManager_->Finalize();
 	audio_->Finalize();
 	imguiManager_->Fin();
