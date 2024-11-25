@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include "BaseScene.h"
-
+#include "AbstractSceneFactory.h"
 
 
 class SceneManager {
@@ -25,19 +25,23 @@ public:
 
 	void ChangeScene(const std::string& sceneName,float extraTime);
 
-	BaseScene* CreateScene(const std::string& sceneName);
-
 	void SetClear(bool is);
 	void SetGameOver(bool is);
 
 	bool GetClear()const { return Clear; }
 	bool GetGameover()const { return gameover; }
 
+
+	void SetFactory(AbstractSceneFactory* factory) { sceneFactory_ = factory; }
+
+
 private:
 
 	void SceneSet();
 
 private:
+
+	AbstractSceneFactory* sceneFactory_ = nullptr;
 
 	BaseScene* scene_ = nullptr;
 	BaseScene* nextScene_ = nullptr;

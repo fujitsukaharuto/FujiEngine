@@ -11,6 +11,7 @@
 #include "PointLightManager.h"
 #include "CameraManager.h"
 #include "Particle/ParticleManager.h"
+#include "Scene//AbstractSceneFactory.h"
 #include "Scene/SceneManager.h"
 
 class Framework {
@@ -44,6 +45,7 @@ protected:
 	Input* input_ = nullptr;
 	Audio* audio_ = nullptr;
 	FPSKeeper* fpsKeeper_ = nullptr;
+	AbstractSceneFactory* sceneFactory_ = nullptr;
 	SceneManager* sceneManager_ = nullptr;
 	TextureManager* textureManager_ = nullptr;
 	ModelManager* modelManager_ = nullptr;

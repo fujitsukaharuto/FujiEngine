@@ -75,6 +75,7 @@ void SceneManager::StartScene(const std::string& sceneName) {
 
 void SceneManager::ChangeScene(const std::string& sceneName, float extraTime) {
 
+	assert(sceneFactory_);
 	assert(nextScene_ == nullptr);
 
 	isChange_ = true;
@@ -87,28 +88,8 @@ void SceneManager::ChangeScene(const std::string& sceneName, float extraTime) {
 	isFinifh_ = true;;
 
 
-	nextScene_ = CreateScene(sceneName);
+	nextScene_ = sceneFactory_->CreateScene(sceneName);
 
-}
-
-BaseScene* SceneManager::CreateScene(const std::string& sceneName) {
-
-	BaseScene* newScene = nullptr;
-
-	if (sceneName == "TITLE") {
-		newScene = new TitleScene();
-		nowScene = sceneName;
-	}
-	else if (sceneName == "GAME") {
-		newScene = new GameScene();
-		nowScene = sceneName;
-	}
-	else if (sceneName == "RESULT") {
-		newScene = new ResultScene();
-		nowScene = sceneName;
-	}
-
-	return newScene;
 }
 
 void SceneManager::SetClear(bool is) {

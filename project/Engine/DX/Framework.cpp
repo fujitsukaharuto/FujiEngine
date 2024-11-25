@@ -58,6 +58,7 @@ void Framework::Init() {
 
 	dxCommon_->SettingTexture();
 
+
 	sceneManager_ = SceneManager::GetInstance();
 	sceneManager_->Initialize();
 }

@@ -160,6 +160,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\GameRun.cpp" />
     <ClCompile Include="Game\GameScene.cpp" />
     <ClCompile Include="Game\ResultScene.cpp" />
+    <ClCompile Include="Game\SceneFactory.cpp" />
     <ClCompile Include="Game\TitleScene.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
@@ -212,6 +213,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Particle\Particle.h" />
     <ClInclude Include="Engine\Particle\ParticleEmitter.h" />
     <ClInclude Include="Engine\Particle\ParticleManager.h" />
+    <ClInclude Include="Engine\Scene\AbstractSceneFactory.h" />
     <ClInclude Include="Engine\Scene\BaseScene.h" />
     <ClInclude Include="Engine\Scene\SceneManager.h" />
     <ClInclude Include="Engine\WinApp\MyWindow.h" />
@@ -219,6 +221,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Game\GameRun.h" />
     <ClInclude Include="Game\GameScene.h" />
     <ClInclude Include="Game\ResultScene.h" />
+    <ClInclude Include="Game\SceneFactory.h" />
     <ClInclude Include="Game\TitleScene.h" />
   </ItemGroup>
   <ItemGroup>

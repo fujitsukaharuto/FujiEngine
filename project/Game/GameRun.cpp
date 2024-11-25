@@ -1,4 +1,5 @@
 #include "GameRun.h"
+#include "SceneFactory.h"
 
 GameRun::GameRun() {
 }
@@ -43,10 +44,13 @@ void GameRun::Initialize() {
 
 #pragma endregion
 
+	sceneFactory_ = new SceneFactory();
+	sceneManager_->SetFactory(sceneFactory_);
 	sceneManager_->StartScene("TITLE");
 }
 
 void GameRun::Finalize() {
+	delete sceneFactory_;
 	sceneManager_->Finalize();
 	audio_->Finalize();
 	imguiManager_->Fin();
