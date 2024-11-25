@@ -1,3 +1,4 @@
+
 #pragma once
 #include <Windows.h>
 #include <string>
@@ -16,6 +17,7 @@
 
 #include "FPSKeeper.h"
 #include "PipelineManager.h"
+#include "TextureManager.h"
 #include "Camera.h"
 
 
@@ -23,13 +25,10 @@
 const int particleIndex = 400;
 const UINT instanceCount_ = 10;
 
-struct D3DResourceLeakChecker
-{
-	~D3DResourceLeakChecker()
-	{
+struct D3DResourceLeakChecker {
+	~D3DResourceLeakChecker() {
 		Microsoft::WRL::ComPtr<IDXGIDebug1> debug;
-		if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&debug))))
-		{
+		if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&debug)))) {
 			debug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
 			debug->ReportLiveObjects(DXGI_DEBUG_APP, DXGI_DEBUG_RLO_ALL);
 			debug->ReportLiveObjects(DXGI_DEBUG_D3D12, DXGI_DEBUG_RLO_ALL);
@@ -39,8 +38,7 @@ struct D3DResourceLeakChecker
 
 
 
-enum BlendMode
-{
+enum BlendMode {
 	// ブレンド無し
 	kBlendModeNone,
 	// 通常αブレンド
@@ -61,8 +59,7 @@ enum BlendMode
 class DebugCamera;//今だけ、後から消す
 
 
-class DXCom
-{
+class DXCom {
 public:
 
 	static DXCom* GetInstance();
@@ -199,11 +196,25 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> shockResource_ = nullptr;
 	ShockWaveData* shockData_;
 
+	Microsoft::WRL::ComPtr<ID3D12Resource> fireResource_ = nullptr;
+	FireElement* fireData_;
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> thunderResource_ = nullptr;
+	LightningElement* thunderData_;
+
+
+	Texture* baseTex_;
+	Texture* voronoTex_;
+	Texture* noiseTex_;
+	Texture* noiseDirTex_;
+
 	bool isGrayscale_ = true;
 	bool isNonePost_ = true;
 	bool isMetaBall_ = true;
 	bool isGaussian_ = true;
 	bool isShockWave_ = true;
+	bool isFire_ = true;
+	bool isThunder_ = true;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexGrayResource_ = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexGrayBufferView_{};
