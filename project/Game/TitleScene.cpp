@@ -26,6 +26,15 @@ void TitleScene::Initialize() {
 	sphere = new Object3d();
 	sphere->CreateSphere();
 
+	emit.count = 5;
+	emit.frequencyTime = 40.0f;
+	emit.name = "sphere";
+	emit.pos = { 0.0f,2.0f,0.0f };
+	emit.grain.lifeTime_ = 50.0f;
+	//emit.animeData.lifeTime = 40.0f;
+	emit.RandomSpeed({ -0.1f,0.1f }, { -0.1f,0.1f }, { -0.1f,0.1f });
+	emit.RandomTranslate({ -0.1f,0.1f }, { -0.1f,0.1f }, { -0.1f,0.1f });
+
 }
 
 void TitleScene::Update() {
@@ -53,6 +62,10 @@ void TitleScene::Update() {
 		SceneManager::GetInstance()->ChangeScene("GAME", 40.0f);
 	}
 
+	if (input_->TriggerKey(DIK_5)) {
+		emit.Emit();
+	}
+	emit.Emit();
 
 	sphere->transform.rotate.y += 0.02f;
 

@@ -1,11 +1,33 @@
 #include "ParticleEmitter.h"
 #include "Random.h"
+#include "ImGuiManager.h"
 
 ParticleEmitter::ParticleEmitter() {
 }
 
 ParticleEmitter::~ParticleEmitter() {
 }
+
+#ifdef _DEBUG
+void ParticleEmitter::DebugGUI() {
+
+	ImGui::Begin(name.c_str());
+	if (ImGui::TreeNode("emitter")) {
+		ImGui::DragFloat3("pos", &pos.x, 0.01f);
+		ImGui::DragFloat("frenquencyTime", &frequencyTime, 0.1f);
+		ImGui::TreePop();
+	}
+	ImGui::Separator();
+	if (ImGui::TreeNode("particle")) {
+
+
+
+		ImGui::TreePop();
+	}
+	ImGui::End();
+
+}
+#endif // _DEBUG
 
 void ParticleEmitter::Emit() {
 

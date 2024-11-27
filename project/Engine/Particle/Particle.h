@@ -4,14 +4,12 @@
 
 enum SizeType {
 	kNormal,
-	kReduction,
-	kExpantion,
+	kShift
 };
 
 enum SpeedType {
 	kConstancy,
-	kDecele,
-	kAccele,
+	kChange,
 };
 
 class Particle {
@@ -21,12 +19,14 @@ public:
 
 public:
 
+	bool isLive_ = false;
 	float lifeTime_ = 0;
 	float startLifeTime_ = 0;
-	bool isLive_ = false;
+
 	Vector3 accele{};
 	Vector3 speed{};
 	Trans transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{ 0.0f,0.0f,0.0f } };
+
 	int type = SizeType::kNormal;
 	int speedType = SpeedType::kConstancy;
 

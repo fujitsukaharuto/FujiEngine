@@ -10,6 +10,10 @@ public:
 
 public:
 
+#ifdef _DEBUG
+	void DebugGUI();
+#endif // _DEBUG
+
 	void Emit();
 
 	void Burst();

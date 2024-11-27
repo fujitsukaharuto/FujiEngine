@@ -59,7 +59,7 @@ public:
 
 	struct AnimeGroup {
 		std::string farst;
-		std::vector<Object3d*> objects_;
+		std::vector<std::unique_ptr<Object3d>> objects_;
 		std::vector<float> lifeTime;
 		std::vector<float> animeTime;
 		std::vector<float> startLifeTime_;
@@ -104,8 +104,8 @@ private:
 	SRVManager* srvManager_;
 	Camera* camera_;
 
-	std::unordered_map<std::string, ParticleGroup*> particleGroups_;
-	std::unordered_map<std::string, AnimeGroup*> animeGroups_;
+	std::unordered_map<std::string, std::unique_ptr<ParticleGroup>> particleGroups_;
+	std::unordered_map<std::string, std::unique_ptr<AnimeGroup>> animeGroups_;
 
 
 	ComPtr<ID3D12Resource> vBuffer_;

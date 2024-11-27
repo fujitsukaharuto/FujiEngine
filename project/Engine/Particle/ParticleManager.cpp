@@ -66,26 +66,18 @@ void ParticleManager::Initialize(DXCom* dxcom, SRVManager* srvManager) {
 }
 
 void ParticleManager::Finalize() {
-	for (auto& groupPair : particleGroups_) {
 
-		delete groupPair.second;
-
-	}
 	particleGroups_.clear();
 	for (auto& groupPair : animeGroups_) {
 
-		for (auto& i : groupPair.second->objects_) {
-			delete i;
-		}
 		groupPair.second->lifeTime.clear();
 		groupPair.second->startLifeTime_.clear();
 		groupPair.second->isLive_.clear();
 		groupPair.second->accele.clear();
 		groupPair.second->speed.clear();
-
-		delete groupPair.second;
-
+		groupPair.second.reset();
 	}
+	animeGroups_.clear();
 
 }
 
@@ -113,7 +105,7 @@ void ParticleManager::Update() {
 
 	for (auto& groupPair : particleGroups_) {
 
-		ParticleGroup* group = groupPair.second;
+		ParticleGroup* group = groupPair.second.get();
 
 		int particleCount = 0;
 		group->drawCount_ = 0;
@@ -131,14 +123,7 @@ void ParticleManager::Update() {
 			switch (sizeType) {
 			case kNormal:
 				break;
-			case kReduction:
-
-				t = 1 - powf(1 - t, 4);
-				particle.transform.scale.x = Lerp(particle.startSize.x, particle.endSize.x, t);
-				particle.transform.scale.y = Lerp(particle.startSize.y, particle.endSize.y, t);
-
-				break;
-			case kExpantion:
+			case kShift:
 
 				particle.transform.scale.x = Lerp(particle.startSize.x, particle.endSize.x, t);
 				particle.transform.scale.y = Lerp(particle.startSize.y, particle.endSize.y, t);
@@ -180,7 +165,7 @@ void ParticleManager::Update() {
 
 	for (auto& groupPair : animeGroups_) {
 
-		AnimeGroup* group = groupPair.second;
+		AnimeGroup* group = groupPair.second.get();
 		for (int i = 0; i < group->objects_.size(); i++) {
 
 
@@ -205,13 +190,7 @@ void ParticleManager::Update() {
 			switch (sizeType) {
 			case kNormal:
 				break;
-			case kReduction:
-
-				group->objects_[i]->transform.scale.x = Lerp(group->startSize.x, group->endSize.x, t);
-				group->objects_[i]->transform.scale.y = Lerp(group->startSize.y, group->endSize.y, t);
-
-				break;
-			case kExpantion:
+			case kShift:
 
 				group->objects_[i]->transform.scale.x = Lerp(group->startSize.x, group->endSize.x, t);
 				group->objects_[i]->transform.scale.y = Lerp(group->startSize.y, group->endSize.y, t);
@@ -237,7 +216,7 @@ void ParticleManager::Draw() {
 
 	for (auto& groupPair : animeGroups_) {
 
-		AnimeGroup* group = groupPair.second;
+		AnimeGroup* group = groupPair.second.get();
 		for (int i = 0; i < group->objects_.size(); i++) {
 			if (group->isLive_[i]) {
 				group->objects_[i]->AnimeDraw();
@@ -255,7 +234,7 @@ void ParticleManager::Draw() {
 	dxCommon_->GetCommandList()->IASetIndexBuffer(&ibView);
 
 	for (auto& groupPair : particleGroups_) {
-		ParticleGroup* group = groupPair.second;
+		ParticleGroup* group = groupPair.second.get();
 
 		dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, group->material_.GetMaterialResource()->GetGPUVirtualAddress());
 		dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group->srvIndex_));
@@ -319,17 +298,18 @@ void ParticleManager::CreateAnimeGroup(const std::string& name, const std::strin
 		return;
 	}
 
-	AnimeGroup* newGroup = new AnimeGroup();
+	std::unique_ptr<AnimeGroup> newGroup;
+	newGroup = std::make_unique<AnimeGroup>();
 
 	newGroup->farst = fileName;
 	TextureManager::GetInstance()->LoadTexture(fileName);
 	for (int i = 0; i < 6; i++) {
-		Object3d* newobj = new Object3d();
+		std::unique_ptr<Object3d> newobj = std::make_unique<Object3d>();
 		newobj->Create("plane.obj");
 		newobj->SetTexture(fileName);
 
 
-		newGroup->objects_.push_back(newobj);
+		newGroup->objects_.push_back(std::move(newobj));
 		newGroup->lifeTime.push_back(0.0f);
 		newGroup->animeTime.push_back(0.0f);
 		newGroup->startLifeTime_.push_back(0.0f);
@@ -339,7 +319,7 @@ void ParticleManager::CreateAnimeGroup(const std::string& name, const std::strin
 
 	}
 
-	instance->animeGroups_.insert(std::make_pair(name, newGroup));
+	instance->animeGroups_.insert(std::make_pair(name, std::move(newGroup)));
 
 }
 
@@ -351,7 +331,7 @@ void ParticleManager::Emit(const std::string& name, const Vector3& pos, const Pa
 	if (iterator != instance->particleGroups_.end()) {
 		uint32_t newCount = 0;
 
-		ParticleGroup* group = iterator->second;
+		ParticleGroup* group = iterator->second.get();
 		for (auto& particle : group->particles_) {
 
 			if (particle.isLive_ == false) {
@@ -365,13 +345,10 @@ void ParticleManager::Emit(const std::string& name, const Vector3& pos, const Pa
 				SpeedType type = SpeedType(grain.speedType);
 				switch (type) {
 				case kConstancy:
-					particle.accele = grain.accele;
+					particle.accele = Vector3{ 0.0f,0.0f,0.0f };
 					break;
-				case kDecele:
+				case kChange:
 					particle.accele = (particle.speed) * -0.05f;
-					break;
-				case kAccele:
-					particle.accele = (particle.speed) * 0.05f;
 					break;
 				}
 
@@ -404,7 +381,7 @@ void ParticleManager::EmitAnime(const std::string& name, const Vector3& pos, con
 		uint32_t newCount = 0;
 
 
-		AnimeGroup* group = iterator->second;
+		AnimeGroup* group = iterator->second.get();
 		group->speedType = data.speedType;
 		group->type = data.type;
 		group->startSize = data.startSize;
@@ -422,13 +399,10 @@ void ParticleManager::EmitAnime(const std::string& name, const Vector3& pos, con
 				SpeedType type = SpeedType(group->speedType);
 				switch (type) {
 				case kConstancy:
-					group->accele[i] = data.accele;
+					group->accele[i] = Vector3{ 0.0f,0.0f,0.0f };
 					break;
-				case kDecele:
+				case kChange:
 					group->accele[i] = (group->speed[i]) * -0.05f;
-					break;
-				case kAccele:
-					group->accele[i] = (group->speed[i]) * 0.05f;
 					break;
 				}
 
@@ -455,7 +429,7 @@ void ParticleManager::AddAnime(const std::string& name, const std::string& fileN
 	auto iterator = instance->animeGroups_.find(name);
 	if (iterator != instance->animeGroups_.end()) {
 
-		AnimeGroup* group = iterator->second;
+		AnimeGroup* group = iterator->second.get();
 		TextureManager::GetInstance()->LoadTexture(fileName);
 		group->anime_.insert(std::make_pair(fileName, animeChangeTime));
 
