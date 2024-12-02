@@ -204,12 +204,12 @@ void DXCom::CreateRenderTargets() {
 	thunderResource_->Map(0, nullptr, reinterpret_cast<void**>(&thunderData_));
 	thunderData_->time = 0.0f;
 	thunderData_->resolution = { 1280.0f, 720.0f };
-	thunderData_->mainBranchStrength = 20.0f;
-	thunderData_->branchCount = 5.0f;
-	thunderData_->branchFade = 10.0f;
-	thunderData_->highlightStrength = 2.0f;
-	thunderData_->noiseScale = 10.0f;
-	thunderData_->noiseSpeed = 2.0f;
+	thunderData_->mainBranchStrength = 25.0f;
+	thunderData_->branchCount = 4.0f;
+	thunderData_->branchFade = 20.0f;
+	thunderData_->highlightStrength = 15.0f;
+	thunderData_->noiseScale = 0.2f;
+	thunderData_->noiseSpeed = 5.0f;
 	thunderData_->rangeMin = { 0.0f,0.0f };
 	thunderData_->rangeMax = { 1.0f,1.0f };
 
@@ -329,7 +329,9 @@ void DXCom::SettingTexture() {
 	baseTex_ = TextureManager::GetInstance()->LoadTexture("Gradient02.jpg");
 	voronoTex_ = TextureManager::GetInstance()->LoadTexture("T_Noise04.jpg");
 	noiseTex_ = TextureManager::GetInstance()->LoadTexture("T_Noise02-300x300.jpg");
-	noiseDirTex_= TextureManager::GetInstance()->LoadTexture("Noise_Dir.jpg");
+	//noiseDirTex_ = TextureManager::GetInstance()->LoadTexture("Noise_Dir.jpg");
+	//noiseDirTex_ = TextureManager::GetInstance()->LoadTexture("worley_Noise.jpg");
+	noiseDirTex_= TextureManager::GetInstance()->LoadTexture("perlin_Noise.png");
 
 
 
@@ -623,7 +625,7 @@ void DXCom::UpDate() {
 		ImGui::DragFloat("branchCount", &thunderData_->branchCount, 1);
 		ImGui::DragFloat("branchFade", &thunderData_->branchFade,0.1f);
 		ImGui::DragFloat("highlightStrength", &thunderData_->highlightStrength,0.1f);
-		ImGui::DragFloat("noiseScale", &thunderData_->noiseScale,0.1f);
+		ImGui::DragFloat("noiseScale", &thunderData_->noiseScale,0.01f);
 		ImGui::DragFloat("noiseSpeed", &thunderData_->noiseSpeed,0.1f);
 		ImGui::DragFloat2("rangeMin", &thunderData_->rangeMin.x,0.01f);
 		ImGui::DragFloat2("rangeMax", &thunderData_->rangeMax.x,0.01f);
@@ -634,7 +636,9 @@ void DXCom::UpDate() {
 
 	shockData_->shockTime += 0.025f;
 	fireData_->animeTime += 0.025f;
-	thunderData_->time += 0.025f;
+	thunderData_->time += 0.005f;
+
+	thunderData_->time = std::fmodf(thunderData_->time, 1.5f);
 
 #endif // _DEBUG
 
