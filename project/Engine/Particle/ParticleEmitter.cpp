@@ -15,12 +15,23 @@ void ParticleEmitter::DebugGUI() {
 	if (ImGui::TreeNode("emitter")) {
 		ImGui::DragFloat3("pos", &pos.x, 0.01f);
 		ImGui::DragFloat("frenquencyTime", &frequencyTime, 0.1f);
+		ImGui::DragFloat3("emitSizeMax", &emitSizeMax.x, 0.1f);
+		ImGui::DragFloat3("emitSizeMin", &emitSizeMin.x, 0.1f);
 		ImGui::TreePop();
 	}
 	ImGui::Separator();
 	if (ImGui::TreeNode("particle")) {
 
+		ImGui::DragFloat("lifetime", &grain.lifeTime_, 0.1f);
+		ImGui::DragFloat2("startSize", &grain.startSize.x, 0.1f);
+		ImGui::DragFloat2("endSize", &grain.endSize.x, 0.1f);
 
+		if (ImGui::TreeNode("typeSelect")) {
+			ImGui::Combo("sizeType##type", &grain.type, "kNormal\0kShift\0");
+			ImGui::Combo("speedType##type", &grain.speedType, "kConstancy\0kChange\0");
+			ImGui::Combo("colorType##type", &grain.colorType, "kDefault\0kRandom\0");
+			ImGui::TreePop();
+		}
 
 		ImGui::TreePop();
 	}
@@ -32,7 +43,10 @@ void ParticleEmitter::DebugGUI() {
 void ParticleEmitter::Emit() {
 
 	if (time_ <= 0) {
-		ParticleManager::Emit(name, pos, grain, para_, count);
+		Vector3 posAddSize{};
+		posAddSize = Random::GetVector3({ emitSizeMin.x,emitSizeMax.x }, { emitSizeMin.y,emitSizeMax.y }, { emitSizeMin.z,emitSizeMax.z });
+		posAddSize += pos;
+		ParticleManager::Emit(name, posAddSize, grain, para_, count);
 		time_ = frequencyTime;
 	}
 	else {

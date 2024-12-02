@@ -338,6 +338,7 @@ void ParticleManager::Emit(const std::string& name, const Vector3& pos, const Pa
 				particle.transform = grain.transform;
 				particle.transform.translate = Random::GetVector3(para.transx, para.transy, para.transz);
 				particle.transform.translate += pos;
+				particle.transform.scale = { grain.startSize.x,grain.startSize.y,1.0f };
 				particle.speed = Random::GetVector3(para.speedx, para.speedy, para.speedz);
 				particle.lifeTime_ = grain.lifeTime_;
 				particle.startLifeTime_ = particle.lifeTime_;

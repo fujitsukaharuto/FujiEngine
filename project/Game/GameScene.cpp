@@ -96,6 +96,7 @@ void GameScene::Update() {
 	sphere->SetRightDir(rightDir);
 	ImGui::End();
 
+	emit.DebugGUI();
 
 #endif // _DEBUG
 

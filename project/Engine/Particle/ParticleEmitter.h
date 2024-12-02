@@ -27,6 +27,9 @@ public:
 
 	std::string name;
 	Vector3 pos;
+	Vector3 emitSizeMax{};
+	Vector3 emitSizeMin{};
+
 	Particle grain{};
 	AnimeData animeData{};
 	uint32_t count;

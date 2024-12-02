@@ -12,6 +12,11 @@ enum SpeedType {
 	kChange,
 };
 
+enum ColorType {
+	kDefault,
+	kRandom,
+};
+
 class Particle {
 public:
 	Particle();
@@ -29,9 +34,12 @@ public:
 
 	int type = SizeType::kNormal;
 	int speedType = SpeedType::kConstancy;
+	int colorType = ColorType::kDefault;
 
 	Vector2 startSize = { 1.0f,1.0f };
 	Vector2 endSize = { 1.0f,1.0f };
+
+	Vector4 color = { 1.0f,1.0f,1.0f,1.0f };
 
 private:
 
