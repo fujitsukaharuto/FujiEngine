@@ -13,7 +13,6 @@
 TitleScene::TitleScene() {}
 
 TitleScene::~TitleScene() {
-	delete sphere;
 }
 
 void TitleScene::Initialize() {
@@ -23,7 +22,7 @@ void TitleScene::Initialize() {
 	obj3dCommon.reset(new Object3dCommon());
 	obj3dCommon->Initialize();
 
-	sphere = new Object3d();
+	sphere = std::make_unique<Object3d>();
 	sphere->CreateSphere();
 
 	emit.count = 5;

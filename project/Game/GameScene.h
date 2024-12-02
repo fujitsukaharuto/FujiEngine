@@ -20,15 +20,15 @@ private:
 
 	std::unique_ptr<Object3dCommon> obj3dCommon = nullptr;
 
-	Object3d* sphere = nullptr;
-	Object3d* suzunne = nullptr;
-	Object3d* fence = nullptr;
-	Object3d* terrain = nullptr;
+	std::unique_ptr<Object3d> sphere = nullptr;
+	std::unique_ptr<Object3d> suzunne = nullptr;
+	std::unique_ptr<Object3d> fence = nullptr;
+	std::unique_ptr<Object3d> terrain = nullptr;
 
-	std::vector<Object3d*> suzunnes;
+	std::vector<std::unique_ptr<Object3d>> suzunnes;
 
 
-	Sprite* test = nullptr;
+	std::unique_ptr<Sprite> test = nullptr;
 	Vector4 color_ = { 1.0f,1.0f,1.0f,1.0f };
 	Vector3 rightDir = { 1.0f,0.0f,0.0f };
 

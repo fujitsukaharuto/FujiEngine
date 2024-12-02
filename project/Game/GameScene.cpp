@@ -11,14 +11,6 @@
 GameScene::GameScene() {}
 
 GameScene::~GameScene() {
-	delete sphere;
-	delete suzunne;
-	delete fence;
-	for (auto suzunneModel : suzunnes) {
-		delete suzunneModel;
-	}
-	delete terrain;
-	delete test;
 }
 
 void GameScene::Initialize() {
@@ -39,33 +31,33 @@ void GameScene::Initialize() {
 	obj3dCommon.reset(new Object3dCommon());
 	obj3dCommon->Initialize();
 
-	sphere = new Object3d();
+	sphere = std::make_unique<Object3d>();
 	sphere->CreateSphere();
 
-	suzunne = new Object3d();
+	suzunne = std::make_unique<Object3d>();
 	suzunne->Create("suzanne.obj");
 
 	float addDis = 1.0f;
 	for (int i = 0; i < 3; i++) {
 
-		Object3d* newModel = new Object3d();
+		std::unique_ptr<Object3d> newModel = std::make_unique<Object3d>();
 		newModel->Create("suzanne.obj");
 		newModel->transform.translate.x += addDis;
 		newModel->transform.translate.z += addDis;
 		newModel->transform.rotate.y = 3.14f;
-		suzunnes.push_back(newModel);
+		suzunnes.push_back(std::move(newModel));
 		addDis += 0.5f;
 
 	}
 
-	fence = new Object3d();
+	fence = std::make_unique<Object3d>();
 	fence->Create("Fence.obj");
 
-	terrain = new Object3d();
+	terrain = std::make_unique<Object3d>();
 	terrain->Create("terrain.obj");
 
 
-	test = new Sprite();
+	test = std::make_unique<Sprite>();
 	test->Load("uvChecker.png");
 
 
@@ -140,7 +132,7 @@ void GameScene::Update() {
 
 
 	float rotaSpeed = 0.1f;
-	for (auto suzunneModel : suzunnes) {
+	for (auto& suzunneModel : suzunnes) {
 		suzunneModel->transform.rotate.x += rotaSpeed * FPSKeeper::DeltaTime();
 		//suzunneModel->transform.translate = Random::GetVector3({ -4.0f,4.0f }, { -4.0f,4.0f }, { -4.0f,4.0f });
 		rotaSpeed += 0.05f;
@@ -172,7 +164,7 @@ void GameScene::Draw() {
 	sphere->Draw();
 	suzunne->Draw();
 	fence->Draw();
-	for (auto suzunneModel : suzunnes) {
+	for (auto& suzunneModel : suzunnes) {
 		suzunneModel->Draw();
 	}
 	terrain->Draw();

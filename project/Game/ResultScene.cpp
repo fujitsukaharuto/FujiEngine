@@ -14,7 +14,6 @@
 ResultScene::ResultScene() {}
 
 ResultScene::~ResultScene() {
-	delete sphere;
 }
 
 void ResultScene::Initialize() {
@@ -24,7 +23,7 @@ void ResultScene::Initialize() {
 	obj3dCommon.reset(new Object3dCommon());
 	obj3dCommon->Initialize();
 
-	sphere = new Object3d();
+	sphere = std::make_unique<Object3d>();
 	sphere->CreateSphere();
 	sphere->SetColor({ 1.0f,0.0f,0.0f,1.0f });
 
