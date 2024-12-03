@@ -201,6 +201,7 @@ private:
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> thunderResource_ = nullptr;
 	LightningElement* thunderData_;
+	int nowTex;
 
 
 	Texture* baseTex_;

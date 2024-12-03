@@ -212,6 +212,8 @@ void DXCom::CreateRenderTargets() {
 	thunderData_->noiseSpeed = 5.0f;
 	thunderData_->rangeMin = { 0.0f,0.0f };
 	thunderData_->rangeMax = { 1.0f,1.0f };
+	thunderData_->startPos = { 0.5f,0.3f };
+	thunderData_->endPos = { 0.5f,0.8f };
 
 }
 
@@ -329,10 +331,10 @@ void DXCom::SettingTexture() {
 	baseTex_ = TextureManager::GetInstance()->LoadTexture("Gradient02.jpg");
 	voronoTex_ = TextureManager::GetInstance()->LoadTexture("T_Noise04.jpg");
 	noiseTex_ = TextureManager::GetInstance()->LoadTexture("T_Noise02-300x300.jpg");
-	//noiseDirTex_ = TextureManager::GetInstance()->LoadTexture("Noise_Dir.jpg");
-	//noiseDirTex_ = TextureManager::GetInstance()->LoadTexture("worley_Noise.jpg");
+	noiseDirTex_ = TextureManager::GetInstance()->LoadTexture("Noise_Dir.jpg");
+	noiseDirTex_ = TextureManager::GetInstance()->LoadTexture("worley_Noise.jpg");
 	noiseDirTex_= TextureManager::GetInstance()->LoadTexture("perlin_Noise.png");
-
+	nowTex = 2;
 
 
 	CommandExecution();
@@ -619,6 +621,8 @@ void DXCom::UpDate() {
 
 
 	if (ImGui::TreeNode("ThunderData")) {
+		ImGui::DragFloat2("startPos", &thunderData_->startPos.x, 0.01f);
+		ImGui::DragFloat2("endPos", &thunderData_->endPos.x, 0.01f);
 		ImGui::DragFloat("time", &thunderData_->time, 0.1f, 0.0f, 60.0f);
 		ImGui::DragFloat2("resolution", &thunderData_->resolution.x);
 		ImGui::DragFloat("mainBranchStrength", &thunderData_->mainBranchStrength, 0.1f);
@@ -629,6 +633,25 @@ void DXCom::UpDate() {
 		ImGui::DragFloat("noiseSpeed", &thunderData_->noiseSpeed,0.1f);
 		ImGui::DragFloat2("rangeMin", &thunderData_->rangeMin.x,0.01f);
 		ImGui::DragFloat2("rangeMax", &thunderData_->rangeMax.x,0.01f);
+
+		int tex = nowTex;
+		ImGui::Combo("sizeType##type", &tex, "Noise_Dir.jpg\0worley_Noise.jpg\0perlin_Noise.png\0");
+		if (tex != nowTex) {
+			if (tex == 0) {
+				noiseDirTex_ = TextureManager::GetInstance()->LoadTexture("Noise_Dir.jpg");
+				nowTex = tex;
+			}
+			if (tex == 1) {
+				noiseDirTex_ = TextureManager::GetInstance()->LoadTexture("worley_Noise.jpg");
+				nowTex = tex;
+			}
+			if (tex == 2) {
+				noiseDirTex_ = TextureManager::GetInstance()->LoadTexture("perlin_Noise.png");
+				nowTex = tex;
+			}
+		}
+
+
 		ImGui::TreePop();
 	}
 

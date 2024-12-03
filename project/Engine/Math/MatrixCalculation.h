@@ -114,6 +114,8 @@ struct FireElement {
 
 
 struct LightningElement {
+	Vector2 startPos;
+	Vector2 endPos;
 	Vector2 rangeMin; // 描画範囲（最小UV）
 	Vector2 rangeMax; // 描画範囲（最大UV）
 	Vector2 resolution; // 画面解像度
