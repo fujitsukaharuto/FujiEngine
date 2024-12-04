@@ -55,6 +55,8 @@ public:
 		return leng == 0 ? *this : *this / leng;
 	}
 
+	static Vector3 GetZeroVec() { return { 0.0f,0.0f,0.0f }; }
+
 };
 
 

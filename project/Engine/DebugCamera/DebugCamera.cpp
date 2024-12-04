@@ -1,6 +1,7 @@
 #include "DebugCamera.h"
 #include "Input.h"
 #include "MyWindow.h"
+#include <numbers>
 
 DebugCamera::DebugCamera()
 {
@@ -35,14 +36,14 @@ void DebugCamera::Update()
 
 void DebugCamera::InputUpdate() {
 
+	moveTrans_ = Vector3::GetZeroVec();
 	// ホイールでズーム
 	const float zoomSpeed = 0.1f;
 	float wheel = Input::GetInstance()->GetWheel();
 	if (wheel != 0.0f) {
-		translation_.z += zoomSpeed * wheel; // ズームの方向
+		moveTrans_.z += zoomSpeed * wheel; // ズームの方向
 	}
-	yaw_ = 0.0f;
-	pitch_ = 0.0f;
+
 	// マウスのドラッグで回転
 	Vector2 mousePos = Input::GetInstance()->GetMousePosition();
 	if (Input::GetInstance()->IsPressMouse(0)) {
@@ -50,9 +51,24 @@ void DebugCamera::InputUpdate() {
 		float deltaX = mousePos.x - lastMousePos_.x;
 		float deltaY = mousePos.y - lastMousePos_.y;
 
-		const float rotationSpeed = 0.1f;
+		// ノイズを除去するための閾値を設定
+		const float threshold = 0.1f; // 調整可能な閾値
+
+		// 閾値以下の値を 0 とみなす
+		if (fabs(deltaY) < threshold) deltaY = 0.0f;
+		if (fabs(deltaX) < threshold) deltaX = 0.0f;
+		
+
+
+		const float rotationSpeed = 0.01f;
 		yaw_ += deltaX * rotationSpeed;  // 横の回転
 		pitch_ += deltaY * rotationSpeed; // 縦の回転
+
+		// pitch_の回転範囲を制限 (-89度～89度程度)
+		const float pitchLimit = 90.0f * (std::numbers::pi_v<float> / 180.0f); // ラジアン変換
+		if (pitch_ > pitchLimit) pitch_ = pitchLimit;
+		if (pitch_ < -pitchLimit) pitch_ = -pitchLimit;
+
 	}
 
 	// マウスの位置を更新
@@ -96,23 +112,37 @@ void DebugCamera::TransUpdate()
 
 void DebugCamera::ViewUpadate()
 {
+	// 初期状態の回転行列
+	Matrix4x4 rotation = MakeIdentity4x4();
 
-	Matrix4x4 matRotDelta = MakeIdentity4x4();
-	matRotDelta = Multiply(matRotDelta, MakeRotateXMatrix(pitch_));
-	matRotDelta = Multiply(matRotDelta, MakeRotateYMatrix(yaw_));
+	// 縦回転（Pitch）をローカルX軸に基づいて適用
+	rotation = Multiply(rotation, MakeRotateXMatrix(pitch_));
 
-	matRot_ = Multiply(matRotDelta, matRot_);
+	// 横回転（Yaw）をローカルY軸に基づいて適用
+	rotation = Multiply(rotation, MakeRotateYMatrix(yaw_));
+
+	// 最終的な回転行列を更新
+	matRot_ = rotation;
 }
 
 void DebugCamera::MatrixUpdate()
 {
 
-	Matrix4x4 matPivotTrans = MakeTranslateMatrix(pivot_);
+	/*Matrix4x4 matPivotTrans = MakeTranslateMatrix(pivot_);
 	Matrix4x4 matPivotTransInv = MakeTranslateMatrix(-pivot_);
 
 	Matrix4x4 matTrans = MakeTranslateMatrix(translation_);
 	Matrix4x4 matWorld = Multiply(matPivotTransInv, Multiply(matRot_, matPivotTrans));
 	matWorld = Multiply(matWorld, matTrans);
+	viewMatrix_ = Inverse(matWorld);*/
+
+	// ワールド座標系でのカメラの位置を表す行列
+	Matrix4x4 matTrans = MakeTranslateMatrix(translation_);
+
+	// カメラ自体の回転を反映
+	Matrix4x4 matWorld = Multiply(matRot_, matTrans);
+
+	// ビュー行列はワールド行列の逆行列
 	viewMatrix_ = Inverse(matWorld);
 }
 
