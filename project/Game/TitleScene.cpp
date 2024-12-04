@@ -86,7 +86,7 @@ void TitleScene::Draw() {
 #pragma region 3Dオブジェクト
 	obj3dCommon->PreDraw();
 	sphere->Draw();
-	
+
 
 	ParticleManager::GetInstance()->Draw();
 

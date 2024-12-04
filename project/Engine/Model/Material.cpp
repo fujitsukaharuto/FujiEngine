@@ -7,8 +7,7 @@ Material::Material() {}
 Material::~Material() {}
 
 
-void Material::CreateMaterial()
-{
+void Material::CreateMaterial() {
 	materialResource_ = DXCom::GetInstance()->CreateBufferResource(DXCom::GetInstance()->GetDevice(), sizeof(MaterialDate));
 	materialDate_ = nullptr;
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialDate_));
@@ -18,32 +17,27 @@ void Material::CreateMaterial()
 	materialDate_->uvTransform = MakeIdentity4x4();
 	materialDate_->shininess = 50.0f;
 
-	if (textureNamePath_.textureFilePath.empty())
-	{
+	if (textureNamePath_.textureFilePath.empty()) {
 		texture_ = TextureManager::GetInstance()->LoadTexture("uvChecker.png");
 	}
-	else
-	{
+	else {
 		texture_ = TextureManager::GetInstance()->LoadTexture(textureNamePath_.textureFilePath);
 	}
 
 }
 
 
-Texture* Material::GetTexture()
-{
+Texture* Material::GetTexture() {
 	return texture_;
 }
 
 
-ID3D12Resource* Material::GetMaterialResource()
-{
+ID3D12Resource* Material::GetMaterialResource() {
 	return materialResource_.Get();
 }
 
 
-void Material::SetTextureNamePath(const std::string& pathName)
-{
+void Material::SetTextureNamePath(const std::string& pathName) {
 	textureNamePath_.textureFilePath = pathName;
 }
 
