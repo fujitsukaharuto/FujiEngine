@@ -137,10 +137,10 @@ void ParticleManager::Update() {
 			Matrix4x4 worldViewProjectionMatrix;
 			Matrix4x4 worldMatrix = MakeIdentity4x4();
 
-			if (!isBillBoard_) {
+			if (!particle.isBillBoard_) {
 				worldMatrix = MakeAffineMatrix(particle.transform.scale, particle.transform.rotate, particle.transform.translate);
 			}
-			if (isBillBoard_) {
+			if (particle.isBillBoard_) {
 				worldMatrix = Multiply(MakeScaleMatrix(particle.transform.scale), MakeRotateXYZMatrix(particle.transform.rotate));
 				worldMatrix = Multiply(worldMatrix, billboardMatrix);
 				worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform.translate));
@@ -342,6 +342,7 @@ void ParticleManager::Emit(const std::string& name, const Vector3& pos, const Pa
 				particle.speed = Random::GetVector3(para.speedx, para.speedy, para.speedz);
 				particle.lifeTime_ = grain.lifeTime_;
 				particle.startLifeTime_ = particle.lifeTime_;
+				particle.isBillBoard_ = grain.isBillBoard_;
 
 				SpeedType type = SpeedType(grain.speedType);
 				switch (type) {

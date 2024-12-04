@@ -128,6 +128,7 @@ struct LightningElement {
 	float noiseSpeed; // ノイズの移動速度
 	float branchStrngth;
 	float boltCount;
+	float progres;
 };
 
 

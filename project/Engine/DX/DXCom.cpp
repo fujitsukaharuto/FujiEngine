@@ -637,6 +637,7 @@ void DXCom::UpDate() {
 		ImGui::DragFloat2("rangeMin", &thunderData_->rangeMin.x,0.01f);
 		ImGui::DragFloat2("rangeMax", &thunderData_->rangeMax.x,0.01f);
 		ImGui::DragFloat("boltCount", &thunderData_->boltCount, 0.1f);
+		ImGui::DragFloat("progres", &thunderData_->progres, 0.1f, 0.0f, 1.0f);
 
 		int tex = nowTex;
 		ImGui::Combo("sizeType##type", &tex, "Noise_Dir.jpg\0worley_Noise.jpg\0perlin_Noise.png\0");
@@ -666,6 +667,8 @@ void DXCom::UpDate() {
 	thunderData_->time += 0.005f;
 
 	thunderData_->time = std::fmodf(thunderData_->time, 1.5f);
+	thunderData_->progres = thunderData_->time / 1.5f;
+
 
 #endif // _DEBUG
 

@@ -41,6 +41,8 @@ public:
 
 	Vector4 color = { 1.0f,1.0f,1.0f,1.0f };
 
+	bool isBillBoard_ = true;
+
 private:
 
 

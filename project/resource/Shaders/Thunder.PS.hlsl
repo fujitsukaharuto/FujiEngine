@@ -49,7 +49,7 @@ float LightningMainBranch(float2 uv, float2 start, float2 end, float time)
     float noiseValue = noiseTexture.Sample(g_Sampler, noiseUV).r;
 
     // 主幹の強度（太さを細く調整）
-    float distance = abs((uv - closestPoint).x + (noiseValue - 0.5f) * 0.1f); // ノイズ(noisで細かい揺らぎを加える
+    float distance = abs(length(uv - closestPoint) + (noiseValue - 0.5f) * 0.1f); // ノイズ(noisで細かい揺らぎを加える
     
     // 雷の主幹を細く表示
     return exp(-distance * g_Lightning.mainBranchStrength * 2.0f); // より細くする
