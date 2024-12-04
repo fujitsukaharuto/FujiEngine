@@ -26,12 +26,12 @@ void TitleScene::Initialize() {
 	sphere->CreateSphere();
 
 	emit.count = 5;
-	emit.frequencyTime = 40.0f;
+	emit.frequencyTime = 13.0f;
 	emit.name = "sphere";
-	emit.pos = { 0.0f,2.0f,0.0f };
+	emit.pos = { 0.0f,0.4f,0.0f };
 	emit.grain.lifeTime_ = 50.0f;
 	//emit.animeData.lifeTime = 40.0f;
-	emit.RandomSpeed({ -0.1f,0.1f }, { -0.1f,0.1f }, { -0.1f,0.1f });
+	emit.RandomSpeed({ -0.1f,0.1f }, { 0.0f,0.1f }, { -0.1f,0.1f });
 	emit.RandomTranslate({ -0.1f,0.1f }, { -0.1f,0.1f }, { -0.1f,0.1f });
 
 }
