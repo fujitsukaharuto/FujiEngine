@@ -22,7 +22,7 @@ public:
 
 	bool GetDebugMode()const { return debugMode_; }
 
-	void SetDebugMode(bool is) { debugMode_ = is; }
+	void SetDebugMode(bool is);
 
 private:
 

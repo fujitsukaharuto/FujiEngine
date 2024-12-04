@@ -35,13 +35,14 @@ public:
 	/// Mouse-------------------------------------
 
 	bool IsPressMouse(int32_t mouseNumber) const;
-
 	bool IsTriggerMouse(int32_t buttonNumber) const;
 
 	const DIMOUSESTATE2& GetAllMouse() const { return mouse_; }
 
+
 	const Vector2& GetMousePosition() const { return mousePosition_; }
 
+	float GetWheel()const { return static_cast<float>(mouse_.lZ); }
 
 
 

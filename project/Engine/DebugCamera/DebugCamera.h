@@ -26,6 +26,8 @@ public:
 
 	Matrix4x4 GetViewMatrix()const;
 
+	void PreChange();
+
 private:
 
 	Matrix4x4 matRot_;
@@ -38,5 +40,5 @@ private:
 	Vector3 moveTrans_ = { 0.0f,0.0f,0.0f };
 	float pitch_ = 0.0f;
 	float yaw_ = 0.0f;
-
+	Vector2 lastMousePos_{};
 };

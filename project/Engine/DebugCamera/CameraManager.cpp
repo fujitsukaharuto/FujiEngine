@@ -22,3 +22,10 @@ void CameraManager::Update() {
 	camera_->Update();
 
 }
+
+void CameraManager::SetDebugMode(bool is) {
+	if (is) {
+		DebugCamera::GetInstance()->PreChange();
+	}
+	debugMode_ = is;
+}

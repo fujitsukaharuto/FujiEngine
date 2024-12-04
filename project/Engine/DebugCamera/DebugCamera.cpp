@@ -33,57 +33,30 @@ void DebugCamera::Update()
 	MatrixUpdate();
 }
 
-void DebugCamera::InputUpdate()
-{
-	moveTrans_ = { 0.0f,0.0f,0.0f };
-	// 前後
-	if (Input::GetInstance()->GetAllKey()[DIK_W])
-	{
-		moveTrans_.z++;
-	}
-	if (Input::GetInstance()->GetAllKey()[DIK_S])
-	{
-		moveTrans_.z--;
-	}
+void DebugCamera::InputUpdate() {
 
-	// 上下左右
-	if (Input::GetInstance()->GetAllKey()[DIK_A])
-	{
-		moveTrans_.x--;
+	// ホイールでズーム
+	const float zoomSpeed = 0.1f;
+	float wheel = Input::GetInstance()->GetWheel();
+	if (wheel != 0.0f) {
+		translation_.z += zoomSpeed * wheel; // ズームの方向
 	}
-	if (Input::GetInstance()->GetAllKey()[DIK_D])
-	{
-		moveTrans_.x++;
-	}
-	/*if (Input::GetInstance()->GetAllKey()[DIK_S])
-	{
-		moveTrans_.y--;
-	}
-	if (Input::GetInstance()->GetAllKey()[DIK_W])
-	{
-		moveTrans_.y++;
-	}*/
-
-	pitch_ = 0.0f;
 	yaw_ = 0.0f;
-	const float speed = 0.05f;
-	// 回転
-	if (Input::GetInstance()->GetAllKey()[DIK_I])
-	{
-		pitch_ += speed;
+	pitch_ = 0.0f;
+	// マウスのドラッグで回転
+	Vector2 mousePos = Input::GetInstance()->GetMousePosition();
+	if (Input::GetInstance()->IsPressMouse(0)) {
+		// ドラッグによる角度の更新
+		float deltaX = mousePos.x - lastMousePos_.x;
+		float deltaY = mousePos.y - lastMousePos_.y;
+
+		const float rotationSpeed = 0.1f;
+		yaw_ += deltaX * rotationSpeed;  // 横の回転
+		pitch_ += deltaY * rotationSpeed; // 縦の回転
 	}
-	if (Input::GetInstance()->GetAllKey()[DIK_K])
-	{
-		pitch_ -= speed;
-	}
-	if (Input::GetInstance()->GetAllKey()[DIK_J])
-	{
-		yaw_ -= speed;
-	}
-	if (Input::GetInstance()->GetAllKey()[DIK_L])
-	{
-		yaw_ += speed;
-	}
+
+	// マウスの位置を更新
+	lastMousePos_ = { mousePos.x, mousePos.y };
 }
 
 void DebugCamera::TransUpdate()
@@ -146,4 +119,9 @@ void DebugCamera::MatrixUpdate()
 Matrix4x4 DebugCamera::GetViewMatrix() const
 {
 	return viewMatrix_;
+}
+
+void DebugCamera::PreChange() {
+	Vector2 mousePos = Input::GetInstance()->GetMousePosition();
+	lastMousePos_ = { mousePos.x, mousePos.y };
 }
