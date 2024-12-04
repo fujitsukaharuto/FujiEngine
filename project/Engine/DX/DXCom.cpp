@@ -214,6 +214,8 @@ void DXCom::CreateRenderTargets() {
 	thunderData_->rangeMax = { 1.0f,1.0f };
 	thunderData_->startPos = { 0.5f,0.3f };
 	thunderData_->endPos = { 0.5f,0.8f };
+	thunderData_->branchStrngth = 4.0f;
+	thunderData_->boltCount = 3.0f;
 
 }
 
@@ -626,6 +628,7 @@ void DXCom::UpDate() {
 		ImGui::DragFloat("time", &thunderData_->time, 0.1f, 0.0f, 60.0f);
 		ImGui::DragFloat2("resolution", &thunderData_->resolution.x);
 		ImGui::DragFloat("mainBranchStrength", &thunderData_->mainBranchStrength, 0.1f);
+		ImGui::DragFloat("branchStrength", &thunderData_->branchStrngth, 0.1f);
 		ImGui::DragFloat("branchCount", &thunderData_->branchCount, 1);
 		ImGui::DragFloat("branchFade", &thunderData_->branchFade,0.1f);
 		ImGui::DragFloat("highlightStrength", &thunderData_->highlightStrength,0.1f);
@@ -633,6 +636,7 @@ void DXCom::UpDate() {
 		ImGui::DragFloat("noiseSpeed", &thunderData_->noiseSpeed,0.1f);
 		ImGui::DragFloat2("rangeMin", &thunderData_->rangeMin.x,0.01f);
 		ImGui::DragFloat2("rangeMax", &thunderData_->rangeMax.x,0.01f);
+		ImGui::DragFloat("boltCount", &thunderData_->boltCount, 0.1f);
 
 		int tex = nowTex;
 		ImGui::Combo("sizeType##type", &tex, "Noise_Dir.jpg\0worley_Noise.jpg\0perlin_Noise.png\0");

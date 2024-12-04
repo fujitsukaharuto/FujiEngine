@@ -126,6 +126,8 @@ struct LightningElement {
 	float highlightStrength; // ハイライトの強度
 	float noiseScale; // ノイズのスケール
 	float noiseSpeed; // ノイズの移動速度
+	float branchStrngth;
+	float boltCount;
 };
 
 
