@@ -164,6 +164,9 @@
     <ClCompile Include="Game\SceneFactory.cpp">
       <Filter>Game</Filter>
     </ClCompile>
+    <ClCompile Include="Game\BaseGameObject.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -338,6 +341,9 @@
       <Filter>Engine\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Game\SceneFactory.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\BaseGameObject.h">
       <Filter>Game</Filter>
     </ClInclude>
   </ItemGroup>

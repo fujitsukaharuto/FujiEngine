@@ -156,6 +156,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Scene\BaseScene.cpp" />
     <ClCompile Include="Engine\Scene\SceneManager.cpp" />
     <ClCompile Include="Engine\WinApp\MyWindow.cpp" />
+    <ClCompile Include="Game\BaseGameObject.cpp" />
     <ClCompile Include="Game\Field\MapChipField.cpp" />
     <ClCompile Include="Game\GameRun.cpp" />
     <ClCompile Include="Game\GameScene.cpp" />
@@ -217,6 +218,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Scene\BaseScene.h" />
     <ClInclude Include="Engine\Scene\SceneManager.h" />
     <ClInclude Include="Engine\WinApp\MyWindow.h" />
+    <ClInclude Include="Game\BaseGameObject.h" />
     <ClInclude Include="Game\Field\MapChipField.h" />
     <ClInclude Include="Game\GameRun.h" />
     <ClInclude Include="Game\GameScene.h" />
