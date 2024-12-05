@@ -16,7 +16,7 @@ public:
 	Model(const Model& other);
 	~Model();
 
-	void Draw(ID3D12GraphicsCommandList* commandList);
+	void Draw(ID3D12GraphicsCommandList* commandList, Material* mate);
 
 	void AddMaterial(const Material& material);
 

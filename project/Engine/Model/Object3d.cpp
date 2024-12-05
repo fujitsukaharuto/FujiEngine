@@ -26,7 +26,7 @@ void Object3d::CreateSphere() {
 	CreateWVP();
 }
 
-void Object3d::Draw() {
+void Object3d::Draw(Material* mate) {
 
 	SetWVP();
 
@@ -37,7 +37,7 @@ void Object3d::Draw() {
 	PointLightManager::GetInstance()->SetLightCommand(cList);
 
 	if (model_) {
-		model_->Draw(cList);
+		model_->Draw(cList, mate);
 	}
 
 }
@@ -53,7 +53,7 @@ void Object3d::AnimeDraw() {
 	PointLightManager::GetInstance()->SetLightCommand(cList);
 
 	if (model_) {
-		model_->Draw(cList);
+		model_->Draw(cList, nullptr);
 	}
 }
 

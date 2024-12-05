@@ -56,6 +56,10 @@ void GameScene::Initialize() {
 	terrain = std::make_unique<Object3d>();
 	terrain->Create("terrain.obj");
 
+	mate = std::make_unique<Material>();
+	mate->SetTextureNamePath("grass.png");
+	mate->CreateMaterial();
+	mate->SetColor({ 1.0f,0.0f,0.0f,1.0f });
 
 	test = std::make_unique<Sprite>();
 	test->Load("uvChecker.png");

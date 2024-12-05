@@ -20,7 +20,7 @@ public:
 
 	void CreateSphere();
 
-	void Draw();
+	void Draw(Material* mate = nullptr);
 
 	void AnimeDraw();
 
