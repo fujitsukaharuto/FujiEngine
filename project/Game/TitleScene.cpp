@@ -30,6 +30,9 @@ void TitleScene::Initialize() {
 	emit.name = "sphere";
 	emit.pos = { 0.0f,0.4f,0.0f };
 	emit.grain.lifeTime_ = 50.0f;
+	emit.grain.startSize = { 0.05f,0.05f };
+	emit.grain.endSize = { 0.03f,0.03f };
+	emit.grain.type = SizeType::kShift;
 	//emit.animeData.lifeTime = 40.0f;
 	emit.RandomSpeed({ -0.1f,0.1f }, { 0.0f,0.1f }, { -0.1f,0.1f });
 	emit.RandomTranslate({ -0.1f,0.1f }, { -0.1f,0.1f }, { -0.1f,0.1f });
