@@ -5,7 +5,7 @@
 #include "CameraManager.h"
 #include "FPSKeeper.h"
 #include "Random.h"
-
+#include "Model/Line3dDrawer.h"
 #include "Particle/ParticleManager.h"
 #include "Scene/SceneManager.h"
 
@@ -92,6 +92,9 @@ void TitleScene::Draw() {
 
 
 	ParticleManager::GetInstance()->Draw();
+
+	emit.DrawSize();
+	Line3dDrawer::GetInstance()->Render();
 
 #pragma endregion
 
