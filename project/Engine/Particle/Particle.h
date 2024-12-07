@@ -1,6 +1,7 @@
 #pragma once
 #include "TextureManager.h"
 #include "MatrixCalculation.h"
+#include "Model/Material.h"
 
 enum SizeType {
 	kNormal,
@@ -40,6 +41,7 @@ public:
 	Vector2 startSize = { 1.0f,1.0f };
 	Vector2 endSize = { 1.0f,1.0f };
 
+	Material material_;
 	Vector4 color = { 1.0f,1.0f,1.0f,1.0f };
 
 	bool isBillBoard_ = true;

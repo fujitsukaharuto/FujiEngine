@@ -255,9 +255,12 @@ void ParticleManager::Draw() {
 	for (auto& groupPair : particleGroups_) {
 		ParticleGroup* group = groupPair.second.get();
 
-		dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, group->material_.GetMaterialResource()->GetGPUVirtualAddress());
 		dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group->srvIndex_));
-		dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, group->material_.GetTexture()->gpuHandle);
+
+		for (auto& g : group->particles_) {
+			dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, g.material_.GetMaterialResource()->GetGPUVirtualAddress());
+			dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, g.material_.GetTexture()->gpuHandle);
+		}
 
 		dxCommon_->GetCommandList()->DrawIndexedInstanced(6, group->drawCount_, 0, 0, 0);
 	}
@@ -275,8 +278,6 @@ void ParticleManager::CreateParticleGroup(const std::string& name, const std::st
 
 
 	ParticleGroup* newGroup = new ParticleGroup();
-	newGroup->material_.SetTextureNamePath(fileName);
-	newGroup->material_.CreateMaterial();
 
 
 	newGroup->insstanceCount_ = 20;
@@ -299,6 +300,8 @@ void ParticleManager::CreateParticleGroup(const std::string& name, const std::st
 		p.transform.scale = { 1.0f,1.0f,1.0f };
 		p.transform.translate.x += add;
 		p.transform.translate.y += add;
+		p.material_.SetTextureNamePath(fileName);
+		p.material_.CreateMaterial();
 		newGroup->particles_.push_back(p);
 		add += 0.1f;
 	}
@@ -362,6 +365,19 @@ void ParticleManager::Emit(const std::string& name, const Vector3& pos, const Pa
 				particle.lifeTime_ = grain.lifeTime_;
 				particle.startLifeTime_ = particle.lifeTime_;
 				particle.isBillBoard_ = grain.isBillBoard_;
+				particle.colorType = grain.colorType;
+				switch (particle.colorType) {
+				case kDefault:
+					particle.color = para.colorMax;
+					break;
+				case kRandom:
+					particle.color.X = Random::GetFloat(para.colorMin.X, para.colorMax.X);
+					particle.color.Y = Random::GetFloat(para.colorMin.Y, para.colorMax.Y);
+					particle.color.Z = Random::GetFloat(para.colorMin.Z, para.colorMax.Z);
+					particle.color.W = Random::GetFloat(para.colorMin.W, para.colorMax.W);
+					break;
+				}
+				particle.material_.SetColor(particle.color);
 
 				SpeedType type = SpeedType(grain.speedType);
 				switch (type) {

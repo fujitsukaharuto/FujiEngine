@@ -37,6 +37,20 @@ void TitleScene::Initialize() {
 	emit.RandomSpeed({ -0.1f,0.1f }, { 0.0f,0.1f }, { -0.1f,0.1f });
 	emit.RandomTranslate({ -0.1f,0.1f }, { -0.1f,0.1f }, { -0.1f,0.1f });
 
+
+	kira.count = 3;
+	kira.frequencyTime = 13.0f;
+	kira.name = "kira";
+	kira.pos = { 0.0f,0.4f,0.0f };
+	kira.emitSizeMax = { 3.0f,2.0f,-1.0f };
+	kira.emitSizeMin = { -3.0f,0.0f,1.0f };
+	kira.grain.lifeTime_ = 30.0f;
+	kira.grain.startSize = { 0.03f,0.03f };
+	kira.grain.endSize = { 0.1f,0.1f };
+	kira.grain.type = SizeType::kSin;
+	kira.RandomSpeed({ -0.0f,0.0f }, { 0.0f,0.0f }, { -0.0f,0.0f });
+	kira.RandomTranslate({ -0.1f,0.1f }, { -0.1f,0.1f }, { -0.1f,0.1f });
+
 }
 
 void TitleScene::Update() {
@@ -54,6 +68,7 @@ void TitleScene::Update() {
 	ImGui::End();
 
 	emit.DebugGUI();
+	kira.DebugGUI();
 
 #endif // _DEBUG
 
@@ -69,6 +84,7 @@ void TitleScene::Update() {
 		emit.Emit();
 	}
 	emit.Emit();
+	kira.Emit();
 
 	sphere->transform.rotate.y += 0.02f;
 

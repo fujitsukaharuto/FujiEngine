@@ -204,11 +204,11 @@ void DXCom::CreateRenderTargets() {
 	thunderResource_->Map(0, nullptr, reinterpret_cast<void**>(&thunderData_));
 	thunderData_->time = 0.0f;
 	thunderData_->resolution = { 1280.0f, 720.0f };
-	thunderData_->mainBranchStrength = 25.0f;
+	thunderData_->mainBranchStrength = 15.0f;
 	thunderData_->branchCount = 4.0f;
 	thunderData_->branchFade = 20.0f;
-	thunderData_->highlightStrength = 15.0f;
-	thunderData_->noiseScale = 0.2f;
+	thunderData_->highlightStrength = 10.0f;
+	thunderData_->noiseScale = 0.02f;
 	thunderData_->noiseSpeed = 5.0f;
 	thunderData_->rangeMin = { 0.0f,0.0f };
 	thunderData_->rangeMax = { 1.0f,1.0f };

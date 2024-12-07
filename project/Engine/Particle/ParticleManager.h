@@ -17,6 +17,9 @@ struct RandomParametor {
 	Vector2 transx;
 	Vector2 transy;
 	Vector2 transz;
+
+	Vector4 colorMin = { 1.0f,1.0f,1.0f,1.0f };
+	Vector4 colorMax = { 1.0f,1.0f,1.0f,1.0f };
 };
 
 
@@ -47,7 +50,6 @@ public:
 public:
 
 	struct ParticleGroup {
-		Material material_;
 		std::list<Particle> particles_;
 		uint32_t srvIndex_;
 		ComPtr<ID3D12Resource> instancing_ = nullptr;

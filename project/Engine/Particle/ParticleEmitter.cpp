@@ -25,6 +25,9 @@ void ParticleEmitter::DebugGUI() {
 	ImGui::Separator();
 	if (ImGui::TreeNode("particle")) {
 
+		ImGui::ColorEdit4("colorMin", &para_.colorMin.X);
+		ImGui::ColorEdit4("colorMax", &para_.colorMax.X);
+
 		ImGui::DragFloat("lifetime", &grain.lifeTime_, 0.1f);
 		if (ImGui::TreeNode("typeSelect")) {
 			ImGui::Combo("sizeType##type", &grain.type, "kNormal\0kShift\0kSin\0");
