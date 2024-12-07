@@ -13,6 +13,7 @@
 #include "Particle/ParticleManager.h"
 #include "Scene//AbstractSceneFactory.h"
 #include "Scene/SceneManager.h"
+#include "Model/Line3dDrawer.h"
 
 class Framework {
 public:
@@ -53,5 +54,5 @@ protected:
 	ImGuiManager* imguiManager_ = nullptr;
 	PointLightManager* pointLightManager_ = nullptr;
 	ParticleManager* pManager_ = nullptr;
-
+	Line3dDrawer* line3dDrawer_ = nullptr;
 };

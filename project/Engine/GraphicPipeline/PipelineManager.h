@@ -8,6 +8,7 @@ enum class Pipe : int {
 
 	None,
 	Normal,
+	Line3d,
 	particle,
 	Gray,
 	Gauss,

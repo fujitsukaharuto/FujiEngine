@@ -12,6 +12,7 @@ public:
 
 #ifdef _DEBUG
 	void DebugGUI();
+	void DrawSize();
 #endif // _DEBUG
 
 	void Emit();
@@ -44,4 +45,5 @@ private:
 
 	RandomParametor para_;
 
+	bool isDrawSize_ = false;
 };

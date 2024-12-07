@@ -1,6 +1,7 @@
 #include "ParticleEmitter.h"
 #include "Random.h"
 #include "ImGuiManager.h"
+#include "Model/Line3dDrawer.h"
 
 ParticleEmitter::ParticleEmitter() {
 }
@@ -44,11 +45,42 @@ void ParticleEmitter::DebugGUI() {
 		ImGui::DragFloat2("speedZ", &para_.speedz.x, 0.01f);
 		ImGui::SeparatorText("billBoard");
 		ImGui::Checkbox("BillBoard", &grain.isBillBoard_);
-
+		ImGui::Checkbox("SizeCheck", &isDrawSize_);
 		ImGui::TreePop();
 	}
 	ImGui::End();
 
+}
+void ParticleEmitter::DrawSize() {
+	if (isDrawSize_) {
+
+		Vector3 points[8];
+		points[0] = emitSizeMin;
+		points[1] = { emitSizeMax.x,emitSizeMin.y,emitSizeMin.z };
+		points[2] = { emitSizeMax.x,emitSizeMin.y,emitSizeMax.z };
+		points[3] = { emitSizeMin.x,emitSizeMin.y,emitSizeMax.z };
+
+		points[4] = emitSizeMax;
+		points[5] = { emitSizeMin.x,emitSizeMax.y,emitSizeMax.z };
+		points[6] = { emitSizeMin.x,emitSizeMax.y,emitSizeMin.z };
+		points[7] = { emitSizeMax.x,emitSizeMax.y,emitSizeMin.z };
+
+		Line3dDrawer::GetInstance()->DrawLine3d(points[0], points[1], Vector4{ 1.0f, 0.0f, 0.0f, 1.0f });
+		Line3dDrawer::GetInstance()->DrawLine3d(points[1], points[2], Vector4{ 1.0f, 0.0f, 0.0f, 1.0f });
+		Line3dDrawer::GetInstance()->DrawLine3d(points[2], points[3], Vector4{ 1.0f, 0.0f, 0.0f, 1.0f });
+		Line3dDrawer::GetInstance()->DrawLine3d(points[3], points[0], Vector4{ 1.0f, 0.0f, 0.0f, 1.0f });
+		
+		Line3dDrawer::GetInstance()->DrawLine3d(points[4], points[5], Vector4{ 1.0f, 0.0f, 0.0f, 1.0f });
+		Line3dDrawer::GetInstance()->DrawLine3d(points[5], points[6], Vector4{ 1.0f, 0.0f, 0.0f, 1.0f });
+		Line3dDrawer::GetInstance()->DrawLine3d(points[6], points[7], Vector4{ 1.0f, 0.0f, 0.0f, 1.0f });
+		Line3dDrawer::GetInstance()->DrawLine3d(points[7], points[4], Vector4{ 1.0f, 0.0f, 0.0f, 1.0f });
+		
+		Line3dDrawer::GetInstance()->DrawLine3d(points[0], points[6], Vector4{ 1.0f, 0.0f, 0.0f, 1.0f });
+		Line3dDrawer::GetInstance()->DrawLine3d(points[1], points[7], Vector4{ 1.0f, 0.0f, 0.0f, 1.0f });
+		Line3dDrawer::GetInstance()->DrawLine3d(points[2], points[4], Vector4{ 1.0f, 0.0f, 0.0f, 1.0f });
+		Line3dDrawer::GetInstance()->DrawLine3d(points[3], points[5], Vector4{ 1.0f, 0.0f, 0.0f, 1.0f });
+
+	}
 }
 #endif // _DEBUG
 
