@@ -22,5 +22,7 @@ private:
 	Vector3 rightDir = { 1.0f,0.0f,0.0f };
 
 	ParticleEmitter emit;
+	ParticleEmitter kira;
+	ParticleEmitter force;
 
 };

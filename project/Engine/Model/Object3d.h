@@ -41,7 +41,6 @@ public:
 	void SetBillboardMat(const Matrix4x4& mat) { billboardMatrix_ = mat; }
 
 	/*void SetPointLight(PointLight* light) { pointLight_ = light; }
-
 	void SetSpotLight(SpotLight* light) { spotLight_ = light; }*/
 
 	Trans transform{};

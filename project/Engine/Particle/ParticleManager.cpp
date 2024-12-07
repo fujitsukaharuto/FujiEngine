@@ -129,6 +129,25 @@ void ParticleManager::Update() {
 				particle.transform.scale.y = Lerp(particle.startSize.y, particle.endSize.y, t);
 
 				break;
+			case kSin:
+
+				Vector2 minSize = particle.startSize; // 最小値
+				Vector2 maxSize = particle.endSize; // 最大値
+
+				if (minSize.x > maxSize.x) {
+					std::swap(minSize.x, maxSize.x); // minとmaxを交換
+				}
+				if (minSize.y > maxSize.y) {
+					std::swap(minSize.y, maxSize.y); // minとmaxを交換
+				}
+
+
+				Vector2 sizeSin = minSize + (maxSize - minSize) * 0.5f * (1.0f + sin(particle.lifeTime_));
+
+				particle.transform.scale.x = sizeSin.x;
+				particle.transform.scale.y = sizeSin.y;
+
+				break;
 			}
 
 			particle.speed += particle.accele * FPSKeeper::DeltaTime();

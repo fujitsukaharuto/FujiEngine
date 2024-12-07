@@ -27,7 +27,7 @@ void ParticleEmitter::DebugGUI() {
 
 		ImGui::DragFloat("lifetime", &grain.lifeTime_, 0.1f);
 		if (ImGui::TreeNode("typeSelect")) {
-			ImGui::Combo("sizeType##type", &grain.type, "kNormal\0kShift\0");
+			ImGui::Combo("sizeType##type", &grain.type, "kNormal\0kShift\0kSin\0");
 			ImGui::Combo("speedType##type", &grain.speedType, "kConstancy\0kChange\0");
 			ImGui::Combo("colorType##type", &grain.colorType, "kDefault\0kRandom\0");
 			ImGui::TreePop();

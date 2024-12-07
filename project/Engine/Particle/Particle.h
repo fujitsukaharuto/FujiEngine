@@ -4,7 +4,8 @@
 
 enum SizeType {
 	kNormal,
-	kShift
+	kShift,
+	kSin,
 };
 
 enum SpeedType {
