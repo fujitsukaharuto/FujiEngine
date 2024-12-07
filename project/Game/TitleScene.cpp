@@ -111,6 +111,7 @@ void TitleScene::Draw() {
 
 #ifdef _DEBUG
 	emit.DrawSize();
+	kira.DrawSize();
 #endif // _DEBUG
 	Line3dDrawer::GetInstance()->Render();
 
