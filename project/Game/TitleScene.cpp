@@ -93,7 +93,9 @@ void TitleScene::Draw() {
 
 	ParticleManager::GetInstance()->Draw();
 
+#ifdef _DEBUG
 	emit.DrawSize();
+#endif // _DEBUG
 	Line3dDrawer::GetInstance()->Render();
 
 #pragma endregion
