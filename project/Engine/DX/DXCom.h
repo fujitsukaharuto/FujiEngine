@@ -113,6 +113,10 @@ public:
 
 	/*void Tick();*/
 
+	void SetThunder(bool is) { isThunder_ = is; }
+	void SetFire(bool is) { isFire_ = is; }
+	void SetNone(bool is) { isNonePost_ = is; }
+
 private:
 
 	void CreateDevice();

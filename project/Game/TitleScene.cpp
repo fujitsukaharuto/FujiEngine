@@ -18,12 +18,13 @@ TitleScene::~TitleScene() {
 void TitleScene::Initialize() {
 	Init();
 
+	
 
 	obj3dCommon.reset(new Object3dCommon());
 	obj3dCommon->Initialize();
 
-	sphere = std::make_unique<Object3d>();
-	sphere->CreateSphere();
+	/*sphere = std::make_unique<Object3d>();
+	sphere->CreateSphere();*/
 
 	emit.count = 5;
 	emit.frequencyTime = 13.0f;
@@ -42,8 +43,8 @@ void TitleScene::Initialize() {
 	kira.frequencyTime = 13.0f;
 	kira.name = "kira";
 	kira.pos = { 0.0f,0.4f,0.0f };
-	kira.emitSizeMax = { 3.0f,2.0f,-1.0f };
-	kira.emitSizeMin = { -3.0f,0.0f,1.0f };
+	kira.emitSizeMax = { 3.0f,3.0f,-1.0f };
+	kira.emitSizeMin = { -3.0f,0.3f,1.0f };
 	kira.grain.lifeTime_ = 30.0f;
 	kira.grain.startSize = { 0.03f,0.03f };
 	kira.grain.endSize = { 0.1f,0.1f };
@@ -58,14 +59,14 @@ void TitleScene::Update() {
 #ifdef _DEBUG
 
 
-	ImGui::Begin("Sphere");
+	/*ImGui::Begin("Sphere");
 
 	ImGui::DragFloat3("scale", &sphere->transform.scale.x, 0.01f);
 	ImGui::DragFloat3("rotate", &sphere->transform.rotate.x, 0.01f);
 	ImGui::DragFloat3("right", &rightDir.x, 0.01f);
 	rightDir = rightDir.Normalize();
 	sphere->SetRightDir(rightDir);
-	ImGui::End();
+	ImGui::End();*/
 
 	emit.DebugGUI();
 	kira.DebugGUI();
@@ -77,6 +78,8 @@ void TitleScene::Update() {
 
 
 	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
+		dxCommon_->SetThunder(false);
+		dxCommon_->SetFire(true);
 		SceneManager::GetInstance()->ChangeScene("GAME", 40.0f);
 	}
 
@@ -86,7 +89,7 @@ void TitleScene::Update() {
 	emit.Emit();
 	kira.Emit();
 
-	sphere->transform.rotate.y += 0.02f;
+	//sphere->transform.rotate.y += 0.02f;
 
 
 
@@ -104,7 +107,7 @@ void TitleScene::Draw() {
 
 #pragma region 3Dオブジェクト
 	obj3dCommon->PreDraw();
-	sphere->Draw();
+	/*sphere->Draw();*/
 
 
 	ParticleManager::GetInstance()->Draw();

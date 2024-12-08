@@ -50,6 +50,7 @@ public:
 public:
 
 	struct ParticleGroup {
+		Material material_;
 		std::list<Particle> particles_;
 		uint32_t srvIndex_;
 		ComPtr<ID3D12Resource> instancing_ = nullptr;
@@ -90,7 +91,7 @@ public:
 
 	static void CreateAnimeGroup(const std::string& name, const std::string& fileName);
 
-	static void Emit(const std::string& name, const Vector3& pos, const Particle& grain, const RandomParametor& para, uint32_t count);
+	static void Emit(const std::string& name, const Vector3& pos, const Vector3& rotate,const Particle& grain, const RandomParametor& para, uint32_t count);
 
 	static void EmitAnime(const std::string& name, const Vector3& pos, const AnimeData& data, const RandomParametor& para, uint32_t count);
 

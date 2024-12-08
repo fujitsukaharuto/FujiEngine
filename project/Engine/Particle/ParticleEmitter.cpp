@@ -39,10 +39,14 @@ void ParticleEmitter::DebugGUI() {
 		ImGui::SeparatorText("size");
 		ImGui::DragFloat2("startSize", &grain.startSize.x, 0.01f);
 		ImGui::DragFloat2("endSize", &grain.endSize.x, 0.01f);
+		ImGui::SeparatorText("rotate");
+		ImGui::DragFloat3("rotate", &particleRotate.x, 0.01f);
 		ImGui::SeparatorText("randSpeed");
 		ImGui::DragFloat2("speedX", &para_.speedx.x, 0.01f);
 		ImGui::DragFloat2("speedY", &para_.speedy.x, 0.01f);
 		ImGui::DragFloat2("speedZ", &para_.speedz.x, 0.01f);
+		ImGui::SeparatorText("accele");
+		ImGui::DragFloat3("accele", &grain.accele.x, 0.01f);
 		ImGui::SeparatorText("billBoard");
 		ImGui::Checkbox("BillBoard", &grain.isBillBoard_);
 		ImGui::Checkbox("SizeCheck", &isDrawSize_);
@@ -91,7 +95,7 @@ void ParticleEmitter::Emit() {
 			Vector3 posAddSize{};
 			posAddSize = Random::GetVector3({ emitSizeMin.x,emitSizeMax.x }, { emitSizeMin.y,emitSizeMax.y }, { emitSizeMin.z,emitSizeMax.z });
 			posAddSize += pos;
-			ParticleManager::Emit(name, posAddSize, grain, para_, 1);
+			ParticleManager::Emit(name, posAddSize, particleRotate, grain, para_, 1);
 		}
 		time_ = frequencyTime;
 	}
@@ -102,7 +106,10 @@ void ParticleEmitter::Emit() {
 }
 
 void ParticleEmitter::Burst() {
-	ParticleManager::Emit(name, pos, grain, para_, count);
+	Vector3 posAddSize{};
+	posAddSize = Random::GetVector3({ emitSizeMin.x,emitSizeMax.x }, { emitSizeMin.y,emitSizeMax.y }, { emitSizeMin.z,emitSizeMax.z });
+	posAddSize += pos;
+	ParticleManager::Emit(name, posAddSize, particleRotate,grain, para_, count);
 }
 
 void ParticleEmitter::BurstAnime() {

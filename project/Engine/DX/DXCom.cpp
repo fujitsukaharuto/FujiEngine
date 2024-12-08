@@ -295,12 +295,12 @@ void DXCom::SettingGraphicPipeline() {
 	indexGrayData_[5] = 3;
 
 	isGrayscale_ = false;
-	isNonePost_ = true;
+	isNonePost_ = false;
 	isMetaBall_ = false;
 	isGaussian_ = false;
 	isShockWave_ = false;
 	isFire_ = false;
-	isThunder_ = false;
+	isThunder_ = true;
 }
 
 void DXCom::CreateBarrier(D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after) {

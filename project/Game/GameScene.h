@@ -46,5 +46,7 @@ private:
 	SoundData soundData2;
 
 	ParticleEmitter emit;
+	ParticleEmitter moku;
+	ParticleEmitter spark;
 
 };
