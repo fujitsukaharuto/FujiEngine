@@ -29,28 +29,13 @@ void TitleScene::Initialize() {
 	emit.count = 5;
 	emit.frequencyTime = 13.0f;
 	emit.name = "sphere";
-	emit.pos = { 0.0f,0.4f,0.0f };
-	emit.grain.lifeTime_ = 50.0f;
-	emit.grain.startSize = { 0.05f,0.05f };
-	emit.grain.endSize = { 0.03f,0.03f };
-	emit.grain.type = SizeType::kShift;
-	//emit.animeData.lifeTime = 40.0f;
-	emit.RandomSpeed({ -0.1f,0.1f }, { 0.0f,0.1f }, { -0.1f,0.1f });
-	emit.RandomTranslate({ -0.1f,0.1f }, { -0.1f,0.1f }, { -0.1f,0.1f });
+	emit.Load("sphere");
 
 
 	kira.count = 3;
 	kira.frequencyTime = 13.0f;
 	kira.name = "kira";
-	kira.pos = { 0.0f,0.4f,0.0f };
-	kira.emitSizeMax = { 3.0f,3.0f,-1.0f };
-	kira.emitSizeMin = { -3.0f,0.3f,1.0f };
-	kira.grain.lifeTime_ = 30.0f;
-	kira.grain.startSize = { 0.03f,0.03f };
-	kira.grain.endSize = { 0.1f,0.1f };
-	kira.grain.type = SizeType::kSin;
-	kira.RandomSpeed({ -0.0f,0.0f }, { 0.0f,0.0f }, { -0.0f,0.0f });
-	kira.RandomTranslate({ -0.1f,0.1f }, { -0.1f,0.1f }, { -0.1f,0.1f });
+	kira.Load("kira");
 
 }
 

@@ -2,6 +2,8 @@
 #include "Random.h"
 #include "ImGuiManager.h"
 #include "Model/Line3dDrawer.h"
+#include <iostream>
+#include <fstream>
 
 ParticleEmitter::ParticleEmitter() {
 }
@@ -51,6 +53,9 @@ void ParticleEmitter::DebugGUI() {
 		ImGui::Checkbox("BillBoard", &grain.isBillBoard_);
 		ImGui::Checkbox("SizeCheck", &isDrawSize_);
 		ImGui::TreePop();
+	}
+	if (ImGui::Button("save")) {
+		Save();
 	}
 	ImGui::End();
 
@@ -128,4 +133,131 @@ void ParticleEmitter::RandomTranslate(const Vector2& x, const Vector2& y, const 
 	para_.transx = x;
 	para_.transy = y;
 	para_.transz = z;
+}
+
+void ParticleEmitter::Save() {
+
+	json j;
+
+	j.push_back(json::array({ pos.x,pos.y,pos.z }));
+	j.push_back(json::array({ particleRotate.x,particleRotate.y,particleRotate.z }));
+	j.push_back(json::array({ emitSizeMax.x,emitSizeMax.y,emitSizeMax.z }));
+	j.push_back(json::array({ emitSizeMin.x,emitSizeMin.y,emitSizeMin.z }));
+
+	j.push_back(count);
+
+	j.push_back(grain.lifeTime_);
+	j.push_back(json::array({ grain.accele.x,grain.accele.y,grain.accele.z }));
+	j.push_back(json::array({ grain.speed.x,grain.speed.y,grain.speed.z }));
+
+	j.push_back(grain.type);
+	j.push_back(grain.speedType);
+	j.push_back(grain.colorType);
+
+	j.push_back(json::array({ grain.startSize.x,grain.startSize.y }));
+	j.push_back(json::array({ grain.endSize.x,grain.endSize.y }));
+
+	j.push_back(grain.isBillBoard_);
+
+	j.push_back(json::array({ para_.speedx.x,para_.speedx.y }));
+	j.push_back(json::array({ para_.speedy.x,para_.speedy.y }));
+	j.push_back(json::array({ para_.speedz.x,para_.speedz.y }));
+
+	j.push_back(json::array({ para_.transx.x,para_.transx.y }));
+	j.push_back(json::array({ para_.transy.x,para_.transy.y }));
+	j.push_back(json::array({ para_.transz.x,para_.transz.y }));
+
+	j.push_back(json::array({ para_.colorMin.X,para_.colorMin.Y,para_.colorMin.Z,para_.colorMin.W }));
+	j.push_back(json::array({ para_.colorMax.X,para_.colorMax.Y,para_.colorMax.Z,para_.colorMax.W }));
+
+
+	std::ofstream file(kDirectoryPath + name + ".json");
+	if (file.is_open()) {
+		file << j.dump(4);
+		file.close();
+	}
+
+}
+
+void ParticleEmitter::Load(const std::string& filename) {
+
+	std::ifstream file(kDirectoryPath + filename + ".json");
+	if (!file.is_open()) {
+		return;
+	}
+
+	json j;
+	file >> j;
+	file.close();
+
+	// データをロードしてメンバーに復元
+	int index = 0;
+	pos = Vector3(j[index][0], j[index][1], j[index][2]);
+	index++;
+
+	particleRotate = Vector3(j[index][0], j[index][1], j[index][2]);
+	index++;
+
+	emitSizeMax = Vector3(j[index][0], j[index][1], j[index][2]);
+	index++;
+
+	emitSizeMin = Vector3(j[index][0], j[index][1], j[index][2]);
+	index++;
+
+	count = j[index].get<int>();
+	index++;
+
+	grain.lifeTime_ = j[index].get<float>();
+	index++;
+
+	grain.accele = Vector3(j[index][0], j[index][1], j[index][2]);
+	index++;
+
+	grain.speed = Vector3(j[index][0], j[index][1], j[index][2]);
+	index++;
+
+	grain.type = j[index].get<int>();
+	index++;
+
+	grain.speedType = j[index].get<int>();
+	index++;
+
+	grain.colorType = j[index].get<int>();
+	index++;
+
+	grain.startSize = Vector2(j[index][0], j[index][1]);
+	index++;
+
+	grain.endSize = Vector2(j[index][0], j[index][1]);
+	index++;
+
+	grain.isBillBoard_ = j[index].get<bool>();
+	index++;
+
+	para_.speedx = Vector2(j[index][0], j[index][1]);
+	index++;
+
+	para_.speedy = Vector2(j[index][0], j[index][1]);
+	index++;
+
+	para_.speedz = Vector2(j[index][0], j[index][1]);
+	index++;
+
+	para_.transx = Vector2(j[index][0], j[index][1]);
+	index++;
+
+	para_.transy = Vector2(j[index][0], j[index][1]);
+	index++;
+
+	para_.transz = Vector2(j[index][0], j[index][1]);
+	index++;
+
+	para_.colorMin = Vector4(j[index][0], j[index][1], j[index][2], j[index][3]);
+	index++;
+
+	para_.colorMax = Vector4(j[index][0], j[index][1], j[index][2], j[index][3]);
+	index++;
+
+
+
 }

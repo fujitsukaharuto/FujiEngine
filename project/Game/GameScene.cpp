@@ -83,32 +83,13 @@ void GameScene::Initialize() {
 	moku.count = 5;
 	moku.frequencyTime = 13.0f;
 	moku.name = "moku";
-	moku.emitSizeMax = { 3.0f,0.1f,0.0f };
-	moku.emitSizeMin = { -3.0f,-0.0f,0.0f };
-	moku.pos = { 0.0f,0.4f,0.0f };
-	moku.para_.colorMax = { 0.2f,0.2f,0.2f,0.5f };
-	moku.grain.lifeTime_ = 50.0f;
-	moku.grain.startSize = { 2.25f,2.25f };
-	moku.grain.endSize = { 0.6f,0.6f };
-	moku.grain.type = SizeType::kShift;
-	moku.RandomSpeed({ -0.05f,0.05f }, { 0.05f,0.2f }, { -0.0f,0.0f });
-	moku.RandomTranslate({ -0.1f,0.1f }, { -0.1f,0.1f }, { -0.1f,0.1f });
+	moku.Load("moku");
 
 
 	spark.count = 5;
 	spark.frequencyTime = 13.0f;
 	spark.name = "spark";
-	spark.pos = { 0.0f,0.4f,0.0f };
-	spark.emitSizeMax = { 3.9f,2.0f,-1.0f };
-	spark.emitSizeMin = { -3.9f,0.0f,1.0f };
-	spark.para_.colorMax = { 0.4f,0.01f,0.01f,1.0f };
-	spark.grain.lifeTime_ = 40.0f;
-	spark.grain.startSize = { 0.09f,0.09f };
-	spark.grain.endSize = { 0.04f,0.04f };
-	spark.grain.type = SizeType::kShift;
-	spark.RandomSpeed({ -0.15f,0.15f }, { 0.05f,0.14f }, { -0.01f,0.01f });
-	spark.RandomTranslate({ -0.1f,0.1f }, { -0.1f,0.1f }, { -0.1f,0.1f });
-
+	spark.Load("spark");
 
 }
 

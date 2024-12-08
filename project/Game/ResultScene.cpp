@@ -29,31 +29,14 @@ void ResultScene::Initialize() {
 
 	emit.count = 10;
 	emit.frequencyTime = 13.0f;
-	emit.name = "sphere";
-	emit.pos = { 0.0f,3.0f,-1.0f };
-	emit.grain.lifeTime_ = 13.0f;
-	emit.grain.startSize = { 0.75f,0.75f };
-	emit.grain.endSize = { 0.01f,0.01f };
-	emit.grain.type = SizeType::kShift;
-	emit.para_.colorMax = { 1.0f,0.0f,0.0f,0.6f };
-	emit.RandomSpeed({ -0.25f,0.25f }, { -0.25f,0.25f }, { -0.1f,0.1f });
-	emit.RandomTranslate({ -0.1f,0.1f }, { -0.1f,0.1f }, { -0.1f,0.1f });
+	emit.name = "blad";
+	emit.Load("blad");
 
 
 	kira.count = 1;
 	kira.frequencyTime = 13.0f;
-	kira.name = "kira";
-	kira.pos = { 0.0f,3.0f,0.0f };
-	kira.emitSizeMax = { 0.0f,0.0f,0.0f };
-	kira.emitSizeMin = { 0.0f,0.0f,0.0f };
-	kira.grain.lifeTime_ = 13.0f;
-	kira.particleRotate.z = 1.0f;
-	kira.para_.colorMax = { 1.0f,1.0f,0.0f,0.5f };
-	kira.grain.startSize = { 0.65f,2.5f };
-	kira.grain.endSize = { 13.0f,0.1f };
-	kira.grain.type = SizeType::kShift;
-	kira.RandomSpeed({ 0.0f,0.0f }, { 0.0f,0.0f }, { 0.0f,0.0f });
-	kira.RandomTranslate({ -0.1f,0.1f }, { -0.1f,0.1f }, { -0.1f,0.1f });
+	kira.name = "crit";
+	kira.Load("crit");
 
 }
 
