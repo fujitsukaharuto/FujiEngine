@@ -524,6 +524,10 @@ void DXCom::UpDate() {
 #ifdef _DEBUG
 	ImGui::Begin("debug");
 
+	ImGui::SeparatorText("key");
+	ImGui::Text("SPACE:next scene");
+	ImGui::Text("ENTER:BURST");
+	ImGui::SeparatorText("offscreen");
 
 	bool preIsGrayscale_ = isGrayscale_;
 	bool preIsNonePost_ = isNonePost_;
@@ -533,7 +537,7 @@ void DXCom::UpDate() {
 	bool preIsFire_ = isFire_;
 	bool preIsThunder_ = isThunder_;
 
-	if (ImGui::TreeNode("OffScreen ShaderPath")) {
+	if (ImGui::TreeNodeEx("OffScreen ShaderPath", ImGuiTreeNodeFlags_DefaultOpen)) {
 		ImGui::Checkbox("Gray", &isGrayscale_);
 		ImGui::Checkbox("None", &isNonePost_);
 		ImGui::Checkbox("Meta", &isMetaBall_);
@@ -606,7 +610,7 @@ void DXCom::UpDate() {
 		shockData_->shockTime = 0.0f;
 	}
 
-	if (ImGui::TreeNode("FireData")) {
+	if (ImGui::TreeNodeEx("FireData", ImGuiTreeNodeFlags_DefaultOpen)) {
 		ImGui::DragFloat("animeTime", &fireData_->animeTime, 0.1f, 0.0f, 60.0f);
 		ImGui::DragFloat2("resolution", &fireData_->resolution.x);
 		ImGui::DragFloat("distortionStrength", &fireData_->distortionStrength, 0.01f);
@@ -622,7 +626,7 @@ void DXCom::UpDate() {
 	}
 
 
-	if (ImGui::TreeNode("ThunderData")) {
+	if (ImGui::TreeNodeEx("ThunderData", ImGuiTreeNodeFlags_DefaultOpen)) {
 		ImGui::DragFloat2("startPos", &thunderData_->startPos.x, 0.01f);
 		ImGui::DragFloat2("endPos", &thunderData_->endPos.x, 0.01f);
 		ImGui::DragFloat("time", &thunderData_->time, 0.1f, 0.0f, 60.0f);
