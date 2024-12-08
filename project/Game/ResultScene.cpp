@@ -27,14 +27,10 @@ void ResultScene::Initialize() {
 	sphere->CreateSphere();
 	sphere->SetColor({ 1.0f,0.0f,0.0f,1.0f });*/
 
-	emit.count = 10;
-	emit.frequencyTime = 13.0f;
 	emit.name = "blad";
 	emit.Load("blad");
 
 
-	kira.count = 1;
-	kira.frequencyTime = 13.0f;
 	kira.name = "crit";
 	kira.Load("crit");
 

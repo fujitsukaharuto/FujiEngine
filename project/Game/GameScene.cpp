@@ -79,15 +79,10 @@ void GameScene::Initialize() {
 	emit.RandomTranslate({ -0.1f,0.1f }, { -0.1f,0.1f }, { -0.1f,0.1f });*/
 
 
-
-	moku.count = 5;
-	moku.frequencyTime = 13.0f;
 	moku.name = "moku";
 	moku.Load("moku");
 
 
-	spark.count = 5;
-	spark.frequencyTime = 13.0f;
 	spark.name = "spark";
 	spark.Load("spark");
 

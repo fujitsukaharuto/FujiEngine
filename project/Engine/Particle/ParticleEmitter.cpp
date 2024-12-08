@@ -145,6 +145,7 @@ void ParticleEmitter::Save() {
 	j.push_back(json::array({ emitSizeMin.x,emitSizeMin.y,emitSizeMin.z }));
 
 	j.push_back(count);
+	j.push_back(frequencyTime);
 
 	j.push_back(grain.lifeTime_);
 	j.push_back(json::array({ grain.accele.x,grain.accele.y,grain.accele.z }));
@@ -194,40 +195,35 @@ void ParticleEmitter::Load(const std::string& filename) {
 	int index = 0;
 	pos = Vector3(j[index][0], j[index][1], j[index][2]);
 	index++;
-
 	particleRotate = Vector3(j[index][0], j[index][1], j[index][2]);
 	index++;
 
 	emitSizeMax = Vector3(j[index][0], j[index][1], j[index][2]);
 	index++;
-
 	emitSizeMin = Vector3(j[index][0], j[index][1], j[index][2]);
 	index++;
 
 	count = j[index].get<int>();
 	index++;
-
+	frequencyTime = j[index].get<float>();
+	index++;
 	grain.lifeTime_ = j[index].get<float>();
 	index++;
 
 	grain.accele = Vector3(j[index][0], j[index][1], j[index][2]);
 	index++;
-
 	grain.speed = Vector3(j[index][0], j[index][1], j[index][2]);
 	index++;
 
 	grain.type = j[index].get<int>();
 	index++;
-
 	grain.speedType = j[index].get<int>();
 	index++;
-
 	grain.colorType = j[index].get<int>();
 	index++;
 
 	grain.startSize = Vector2(j[index][0], j[index][1]);
 	index++;
-
 	grain.endSize = Vector2(j[index][0], j[index][1]);
 	index++;
 
@@ -236,28 +232,21 @@ void ParticleEmitter::Load(const std::string& filename) {
 
 	para_.speedx = Vector2(j[index][0], j[index][1]);
 	index++;
-
 	para_.speedy = Vector2(j[index][0], j[index][1]);
 	index++;
-
 	para_.speedz = Vector2(j[index][0], j[index][1]);
 	index++;
 
 	para_.transx = Vector2(j[index][0], j[index][1]);
 	index++;
-
 	para_.transy = Vector2(j[index][0], j[index][1]);
 	index++;
-
 	para_.transz = Vector2(j[index][0], j[index][1]);
 	index++;
 
 	para_.colorMin = Vector4(j[index][0], j[index][1], j[index][2], j[index][3]);
 	index++;
-
 	para_.colorMax = Vector4(j[index][0], j[index][1], j[index][2], j[index][3]);
 	index++;
-
-
 
 }

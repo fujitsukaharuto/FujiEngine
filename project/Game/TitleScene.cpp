@@ -26,14 +26,9 @@ void TitleScene::Initialize() {
 	/*sphere = std::make_unique<Object3d>();
 	sphere->CreateSphere();*/
 
-	emit.count = 5;
-	emit.frequencyTime = 13.0f;
 	emit.name = "sphere";
 	emit.Load("sphere");
 
-
-	kira.count = 3;
-	kira.frequencyTime = 13.0f;
 	kira.name = "kira";
 	kira.Load("kira");
 
