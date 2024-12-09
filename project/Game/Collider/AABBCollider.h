@@ -1,0 +1,45 @@
+#pragma once
+#include "Game/Collider/BaseCollider.h"
+
+
+class AABBCollider : public BaseCollider {
+public:
+	AABBCollider();
+	~AABBCollider()override = default;
+
+public:
+
+	// stateによって呼び出す関数を決める
+	void OnCollision(const ColliderInfo& other);
+
+	void OnCollisionEnter(const ColliderInfo& other)override;
+	void OnCollisionStay(const ColliderInfo& other)override;
+	void OnCollisionExit(const ColliderInfo& other)override;
+
+	// イベントハンドラの設定
+	void SetCollisionEnterCallback(std::function<void(const ColliderInfo&)> callback) {
+		onCollisionEnter = callback;
+	}
+	void SetCollisionStayCallback(std::function<void(const ColliderInfo&)> callback) {
+		onCollisionStay = callback;
+	}
+	void SetCollisionExitCallback(std::function<void(const ColliderInfo&)> callback) {
+		onCollisionExit = callback;
+	}
+
+	void SetState(CollisionState change) { state = change; }
+
+
+private:
+
+
+
+private:
+
+	CollisionState state;
+
+	std::function<void(const ColliderInfo&)> onCollisionEnter;
+	std::function<void(const ColliderInfo&)> onCollisionStay;
+	std::function<void(const ColliderInfo&)> onCollisionExit;
+
+};

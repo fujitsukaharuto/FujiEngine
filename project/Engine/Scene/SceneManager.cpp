@@ -1,9 +1,9 @@
 #include "SceneManager.h"
 #include <cassert>
 #include "FPSKeeper.h"
-#include "TitleScene.h"
-#include "GameScene.h"
-#include "ResultScene.h"
+#include "Game/Scene/TitleScene.h"
+#include "Game/Scene/GameScene.h"
+#include "Game/Scene/ResultScene.h"
 #include "ImGuiManager.h"
 
 

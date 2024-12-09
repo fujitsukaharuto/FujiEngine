@@ -72,6 +72,14 @@ Matrix4x4 Object3d::GetWorldMat() const {
 	return worldMatrix;
 }
 
+Vector3 Object3d::GetWorldPos() const {
+
+	Matrix4x4 worldM = GetWorldMat();
+	Vector3 worldPos = { worldM.m[3][0],worldM.m[3][1] ,worldM.m[3][2] };
+
+	return worldPos;
+}
+
 
 
 void Object3d::SetColor(const Vector4& color) {
