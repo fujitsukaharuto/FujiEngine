@@ -64,7 +64,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <TreatWarningAsError>true</TreatWarningAsError>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir)externals\assimp\include;$(ProjectDir)externals;$(ProjectDir)Game;$(ProjectDir)Engine/WinApp;$(ProjectDir)Engine/Model;$(ProjectDir)Engine/Math;$(ProjectDir)Engine/Logger;$(ProjectDir)Engine/Light;$(ProjectDir)Engine/Input;$(ProjectDir)Engine/ImGuiManager;$(ProjectDir)Engine/GraphicPipeline;$(ProjectDir)Engine/GlobalVariables;$(ProjectDir)Engine/DX;$(ProjectDir)Engine/DebugCamera;$(ProjectDir)Engine/Audio;$(ProjectDir)Engine;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)externals\assimp\include;$(ProjectDir)externals;$(ProjectDir)Game;$(ProjectDir)Engine/WinApp;$(ProjectDir)Engine/Model;$(ProjectDir)Engine/Math;$(ProjectDir)Engine/Logger;$(ProjectDir)Engine/Light;$(ProjectDir)Engine/Input;$(ProjectDir)Engine/ImGuiManager;$(ProjectDir)Engine/GraphicPipeline;$(ProjectDir)Engine/GlobalVariables;$(ProjectDir)Engine/DX;$(ProjectDir)Engine/Camera;$(ProjectDir)Engine/Audio;$(ProjectDir)Engine;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -91,7 +91,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir)externals\assimp\include;$(ProjectDir)externals;$(ProjectDir)Game;$(ProjectDir)Engine/WinApp;$(ProjectDir)Engine/Model;$(ProjectDir)Engine/Math;$(ProjectDir)Engine/Logger;$(ProjectDir)Engine/Light;$(ProjectDir)Engine/Input;$(ProjectDir)Engine/ImGuiManager;$(ProjectDir)Engine/GraphicPipeline;$(ProjectDir)Engine/GlobalVariables;$(ProjectDir)Engine/DX;$(ProjectDir)Engine/DebugCamera;$(ProjectDir)Engine/Audio;$(ProjectDir)Engine;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)externals\assimp\include;$(ProjectDir)externals;$(ProjectDir)Game;$(ProjectDir)Engine/WinApp;$(ProjectDir)Engine/Model;$(ProjectDir)Engine/Math;$(ProjectDir)Engine/Logger;$(ProjectDir)Engine/Light;$(ProjectDir)Engine/Input;$(ProjectDir)Engine/ImGuiManager;$(ProjectDir)Engine/GraphicPipeline;$(ProjectDir)Engine/GlobalVariables;$(ProjectDir)Engine/DX;$(ProjectDir)Engine/Camera;$(ProjectDir)Engine/Audio;$(ProjectDir)Engine;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -109,9 +109,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Engine\Audio\Audio.cpp" />
-    <ClCompile Include="Engine\DebugCamera\Camera.cpp" />
-    <ClCompile Include="Engine\DebugCamera\CameraManager.cpp" />
-    <ClCompile Include="Engine\DebugCamera\DebugCamera.cpp" />
+    <ClCompile Include="Engine\Camera\Camera.cpp" />
+    <ClCompile Include="Engine\Camera\CameraManager.cpp" />
+    <ClCompile Include="Engine\Camera\DebugCamera.cpp" />
     <ClCompile Include="Engine\DX\DXCom.cpp" />
     <ClCompile Include="Engine\DX\DXCommand.cpp" />
     <ClCompile Include="Engine\DX\DXCompil.cpp" />
@@ -169,9 +169,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Audio\Audio.h" />
-    <ClInclude Include="Engine\DebugCamera\Camera.h" />
-    <ClInclude Include="Engine\DebugCamera\CameraManager.h" />
-    <ClInclude Include="Engine\DebugCamera\DebugCamera.h" />
+    <ClInclude Include="Engine\Camera\Camera.h" />
+    <ClInclude Include="Engine\Camera\CameraManager.h" />
+    <ClInclude Include="Engine\Camera\DebugCamera.h" />
     <ClInclude Include="Engine\DX\DXCom.h" />
     <ClInclude Include="Engine\DX\DXCommand.h" />
     <ClInclude Include="Engine\DX\DXCompil.h" />
@@ -228,6 +228,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Game\GameScene.h" />
     <ClInclude Include="Game\ResultScene.h" />
     <ClInclude Include="Game\SceneFactory.h" />
+    <ClInclude Include="Game\TestBaseObj.h" />
     <ClInclude Include="Game\TitleScene.h" />
   </ItemGroup>
   <ItemGroup>

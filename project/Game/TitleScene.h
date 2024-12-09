@@ -1,6 +1,6 @@
 #pragma once
 #include "Scene/BaseScene.h"
-
+#include "Game/TestBaseObj.h"
 
 class TitleScene:public BaseScene {
 public:
@@ -22,7 +22,7 @@ private:
 	Vector3 rightDir = { 1.0f,0.0f,0.0f };
 
 	ParticleEmitter emit;
-	ParticleEmitter kira;
-	ParticleEmitter force;
+
+	std::unique_ptr<TestBaseObj> test_;
 
 };

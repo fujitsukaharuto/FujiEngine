@@ -25,6 +25,9 @@ void TitleScene::Initialize() {
 	sphere = std::make_unique<Object3d>();
 	sphere->CreateSphere();
 
+	test_ = std::make_unique<TestBaseObj>();
+	test_->Initialize();
+
 	emit.name = "sphere";
 	emit.Load("sphere");
 
@@ -51,6 +54,7 @@ void TitleScene::Update() {
 
 	dxCommon_->UpDate();
 
+	test_->Update();
 
 	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
 		SceneManager::GetInstance()->ChangeScene("GAME", 40.0f);
@@ -80,7 +84,7 @@ void TitleScene::Draw() {
 #pragma region 3Dオブジェクト
 	obj3dCommon->PreDraw();
 	sphere->Draw();
-
+	test_->Draw();
 
 	ParticleManager::GetInstance()->Draw();
 

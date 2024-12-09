@@ -8,9 +8,6 @@
     <ClCompile Include="Engine\Audio\Audio.cpp">
       <Filter>Engine\Audio</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\DebugCamera\DebugCamera.cpp">
-      <Filter>Engine\DebugCamera</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\DX\DXCom.cpp">
       <Filter>Engine\DX</Filter>
     </ClCompile>
@@ -76,12 +73,6 @@
     </ClCompile>
     <ClCompile Include="Engine\WinApp\MyWindow.cpp">
       <Filter>Engine\WinApp</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\DebugCamera\Camera.cpp">
-      <Filter>Engine\DebugCamera</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\DebugCamera\CameraManager.cpp">
-      <Filter>Engine\DebugCamera</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Light\DirectionLight.cpp">
       <Filter>Engine\Light</Filter>
@@ -173,6 +164,15 @@
     <ClCompile Include="Engine\GraphicPipeline\Line3dPipe.cpp">
       <Filter>Engine\GraphicPipeline</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Camera\Camera.cpp">
+      <Filter>Engine\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Camera\CameraManager.cpp">
+      <Filter>Engine\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Camera\DebugCamera.cpp">
+      <Filter>Engine\Camera</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -180,9 +180,6 @@
     </ClInclude>
     <ClInclude Include="Engine\Audio\Audio.h">
       <Filter>Engine\Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\DebugCamera\DebugCamera.h">
-      <Filter>Engine\DebugCamera</Filter>
     </ClInclude>
     <ClInclude Include="Engine\DX\DXCom.h">
       <Filter>Engine\DX</Filter>
@@ -258,12 +255,6 @@
     </ClInclude>
     <ClInclude Include="Engine\WinApp\MyWindow.h">
       <Filter>Engine\WinApp</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\DebugCamera\Camera.h">
-      <Filter>Engine\DebugCamera</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\DebugCamera\CameraManager.h">
-      <Filter>Engine\DebugCamera</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Light\DirectionLight.h">
       <Filter>Engine\Light</Filter>
@@ -358,6 +349,18 @@
     <ClInclude Include="Engine\GraphicPipeline\Line3dPipe.h">
       <Filter>Engine\GraphicPipeline</Filter>
     </ClInclude>
+    <ClInclude Include="Game\TestBaseObj.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Camera\Camera.h">
+      <Filter>Engine\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Camera\CameraManager.h">
+      <Filter>Engine\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Camera\DebugCamera.h">
+      <Filter>Engine\Camera</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -377,9 +380,6 @@
     </Filter>
     <Filter Include="Engine\Input">
       <UniqueIdentifier>{4fc9f971-4a5f-4773-aa3d-57b056c87b75}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\DebugCamera">
-      <UniqueIdentifier>{cf744bcb-b934-4c5e-9da0-1a40d0968e23}</UniqueIdentifier>
     </Filter>
     <Filter Include="Engine\DX">
       <UniqueIdentifier>{6a497f9a-2b7b-4445-af09-d340cd39e7f8}</UniqueIdentifier>
@@ -419,6 +419,9 @@
     </Filter>
     <Filter Include="Engine\Scene">
       <UniqueIdentifier>{9b2b279b-994d-4704-b28e-0a62df13d1b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Camera">
+      <UniqueIdentifier>{cf744bcb-b934-4c5e-9da0-1a40d0968e23}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
