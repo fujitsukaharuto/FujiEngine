@@ -139,8 +139,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Light\SpotLight.cpp" />
     <ClCompile Include="Engine\Logger\Logger.cpp" />
     <ClCompile Include="Engine\Math\MatrixCalculation.cpp" />
-    <ClCompile Include="Engine\Math\MyVec2.cpp" />
-    <ClCompile Include="Engine\Math\MyVec3.cpp" />
     <ClCompile Include="Engine\Math\Random.cpp" />
     <ClCompile Include="Engine\Model\Line3dDrawer.cpp" />
     <ClCompile Include="Engine\Model\Material.cpp" />
@@ -199,8 +197,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Light\SpotLight.h" />
     <ClInclude Include="Engine\Logger\Logger.h" />
     <ClInclude Include="Engine\Math\MatrixCalculation.h" />
-    <ClInclude Include="Engine\Math\MyVec2.h" />
-    <ClInclude Include="Engine\Math\MyVec3.h" />
     <ClInclude Include="Engine\Math\Random.h" />
     <ClInclude Include="Engine\Math\Vector2.h" />
     <ClInclude Include="Engine\Math\Vector2Matrix.h" />

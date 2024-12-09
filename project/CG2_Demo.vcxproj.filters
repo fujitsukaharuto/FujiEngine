@@ -65,12 +65,6 @@
     <ClCompile Include="Engine\Math\MatrixCalculation.cpp">
       <Filter>Engine\Math</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Math\MyVec2.cpp">
-      <Filter>Engine\Math</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Math\MyVec3.cpp">
-      <Filter>Engine\Math</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\WinApp\MyWindow.cpp">
       <Filter>Engine\WinApp</Filter>
     </ClCompile>
@@ -236,12 +230,6 @@
       <Filter>Engine\Model</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Math\MatrixCalculation.h">
-      <Filter>Engine\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Math\MyVec2.h">
-      <Filter>Engine\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Math\MyVec3.h">
       <Filter>Engine\Math</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Math\Vector2.h">
