@@ -17,6 +17,9 @@ struct RandomParametor {
 	Vector2 transx;
 	Vector2 transy;
 	Vector2 transz;
+
+	Vector4 colorMin = { 1.0f,1.0f,1.0f,1.0f };
+	Vector4 colorMax = { 1.0f,1.0f,1.0f,1.0f };
 };
 
 
@@ -88,7 +91,7 @@ public:
 
 	static void CreateAnimeGroup(const std::string& name, const std::string& fileName);
 
-	static void Emit(const std::string& name, const Vector3& pos, const Particle& grain, const RandomParametor& para, uint32_t count);
+	static void Emit(const std::string& name, const Vector3& pos, const Vector3& rotate, const Particle& grain, const RandomParametor& para, uint32_t count);
 
 	static void EmitAnime(const std::string& name, const Vector3& pos, const AnimeData& data, const RandomParametor& para, uint32_t count);
 

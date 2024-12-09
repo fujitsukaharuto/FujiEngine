@@ -175,6 +175,7 @@ void ParticleManager::Update() {
 
 			group->instancingData_[particleCount].World = worldMatrix;
 			group->instancingData_[particleCount].WVP = worldViewProjectionMatrix;
+			group->instancingData_[particleCount].color = particle.color;
 
 			particleCount++;
 			group->drawCount_++;
@@ -255,8 +256,8 @@ void ParticleManager::Draw() {
 	for (auto& groupPair : particleGroups_) {
 		ParticleGroup* group = groupPair.second.get();
 
-		dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, group->material_.GetMaterialResource()->GetGPUVirtualAddress());
 		dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group->srvIndex_));
+		dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, group->material_.GetMaterialResource()->GetGPUVirtualAddress());
 		dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, group->material_.GetTexture()->gpuHandle);
 
 		dxCommon_->GetCommandList()->DrawIndexedInstanced(6, group->drawCount_, 0, 0, 0);
@@ -275,8 +276,6 @@ void ParticleManager::CreateParticleGroup(const std::string& name, const std::st
 
 
 	ParticleGroup* newGroup = new ParticleGroup();
-	newGroup->material_.SetTextureNamePath(fileName);
-	newGroup->material_.CreateMaterial();
 
 
 	newGroup->insstanceCount_ = 20;
@@ -287,7 +286,8 @@ void ParticleManager::CreateParticleGroup(const std::string& name, const std::st
 		newGroup->instancingData_[index].WVP = MakeIdentity4x4();
 		newGroup->instancingData_[index].World = MakeIdentity4x4();
 	}
-
+	newGroup->material_.SetTextureNamePath(fileName);
+	newGroup->material_.CreateMaterial();
 	newGroup->srvIndex_ = instance->srvManager_->Allocate();
 	instance->srvManager_->CreateStructuredSRV(newGroup->srvIndex_, newGroup->instancing_.Get(), newGroup->insstanceCount_, sizeof(TransformationParticleMatrix));
 
@@ -342,7 +342,7 @@ void ParticleManager::CreateAnimeGroup(const std::string& name, const std::strin
 
 }
 
-void ParticleManager::Emit(const std::string& name, const Vector3& pos, const Particle& grain, const RandomParametor& para, uint32_t count) {
+void ParticleManager::Emit(const std::string& name, const Vector3& pos, const Vector3& rotate, const Particle& grain, const RandomParametor& para, uint32_t count) {
 
 	ParticleManager* instance = GetInstance();
 
@@ -358,10 +358,23 @@ void ParticleManager::Emit(const std::string& name, const Vector3& pos, const Pa
 				particle.transform.translate = Random::GetVector3(para.transx, para.transy, para.transz);
 				particle.transform.translate += pos;
 				particle.transform.scale = { grain.startSize.x,grain.startSize.y,1.0f };
+				particle.transform.rotate = rotate;
 				particle.speed = Random::GetVector3(para.speedx, para.speedy, para.speedz);
 				particle.lifeTime_ = grain.lifeTime_;
 				particle.startLifeTime_ = particle.lifeTime_;
 				particle.isBillBoard_ = grain.isBillBoard_;
+				particle.colorType = grain.colorType;
+				switch (particle.colorType) {
+				case kDefault:
+					particle.color = para.colorMax;
+					break;
+				case kRandom:
+					particle.color.X = Random::GetFloat(para.colorMin.X, para.colorMax.X);
+					particle.color.Y = Random::GetFloat(para.colorMin.Y, para.colorMax.Y);
+					particle.color.Z = Random::GetFloat(para.colorMin.Z, para.colorMax.Z);
+					particle.color.W = Random::GetFloat(para.colorMin.W, para.colorMax.W);
+					break;
+				}
 
 				SpeedType type = SpeedType(grain.speedType);
 				switch (type) {
@@ -369,7 +382,10 @@ void ParticleManager::Emit(const std::string& name, const Vector3& pos, const Pa
 					particle.accele = Vector3{ 0.0f,0.0f,0.0f };
 					break;
 				case kChange:
-					particle.accele = (particle.speed) * -0.05f;
+					particle.accele = grain.accele;
+					break;
+				case kReturn:
+					particle.accele = (particle.speed) * grain.returnPower_;
 					break;
 				}
 

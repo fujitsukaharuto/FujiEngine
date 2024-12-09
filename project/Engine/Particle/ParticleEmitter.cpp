@@ -2,6 +2,8 @@
 #include "Random.h"
 #include "ImGuiManager.h"
 #include "Model/Line3dDrawer.h"
+#include <iostream>
+#include <fstream>
 
 ParticleEmitter::ParticleEmitter() {
 }
@@ -26,24 +28,37 @@ void ParticleEmitter::DebugGUI() {
 	ImGui::Separator();
 	if (ImGui::TreeNode("particle")) {
 
+		ImGui::ColorEdit4("colorMin", &para_.colorMin.X);
+		ImGui::ColorEdit4("colorMax", &para_.colorMax.X);
+
 		ImGui::DragFloat("lifetime", &grain.lifeTime_, 0.1f);
 		if (ImGui::TreeNode("typeSelect")) {
 			ImGui::Combo("sizeType##type", &grain.type, "kNormal\0kShift\0kSin\0");
-			ImGui::Combo("speedType##type", &grain.speedType, "kConstancy\0kChange\0");
+			ImGui::Combo("speedType##type", &grain.speedType, "kConstancy\0kChange\0kReturn\0");
 			ImGui::Combo("colorType##type", &grain.colorType, "kDefault\0kRandom\0");
 			ImGui::TreePop();
 		}
 		ImGui::SeparatorText("size");
 		ImGui::DragFloat2("startSize", &grain.startSize.x, 0.01f);
 		ImGui::DragFloat2("endSize", &grain.endSize.x, 0.01f);
+		ImGui::SeparatorText("rotate");
+		ImGui::DragFloat3("rotate", &particleRotate.x, 0.01f);
 		ImGui::SeparatorText("randSpeed");
 		ImGui::DragFloat2("speedX", &para_.speedx.x, 0.01f);
 		ImGui::DragFloat2("speedY", &para_.speedy.x, 0.01f);
 		ImGui::DragFloat2("speedZ", &para_.speedz.x, 0.01f);
+		if (grain.speedType == SpeedType::kReturn) {
+			ImGui::DragFloat("returnPower", &grain.returnPower_, 0.001f);
+		}
+		ImGui::SeparatorText("accele");
+		ImGui::DragFloat3("accele", &grain.accele.x, 0.01f);
 		ImGui::SeparatorText("billBoard");
 		ImGui::Checkbox("BillBoard", &grain.isBillBoard_);
 		ImGui::Checkbox("SizeCheck", &isDrawSize_);
 		ImGui::TreePop();
+	}
+	if (ImGui::Button("save")) {
+		Save();
 	}
 	ImGui::End();
 
@@ -66,12 +81,12 @@ void ParticleEmitter::DrawSize() {
 		Line3dDrawer::GetInstance()->DrawLine3d(points[1], points[2], Vector4{ 1.0f, 0.0f, 0.0f, 1.0f });
 		Line3dDrawer::GetInstance()->DrawLine3d(points[2], points[3], Vector4{ 1.0f, 0.0f, 0.0f, 1.0f });
 		Line3dDrawer::GetInstance()->DrawLine3d(points[3], points[0], Vector4{ 1.0f, 0.0f, 0.0f, 1.0f });
-		
+
 		Line3dDrawer::GetInstance()->DrawLine3d(points[4], points[5], Vector4{ 1.0f, 0.0f, 0.0f, 1.0f });
 		Line3dDrawer::GetInstance()->DrawLine3d(points[5], points[6], Vector4{ 1.0f, 0.0f, 0.0f, 1.0f });
 		Line3dDrawer::GetInstance()->DrawLine3d(points[6], points[7], Vector4{ 1.0f, 0.0f, 0.0f, 1.0f });
 		Line3dDrawer::GetInstance()->DrawLine3d(points[7], points[4], Vector4{ 1.0f, 0.0f, 0.0f, 1.0f });
-		
+
 		Line3dDrawer::GetInstance()->DrawLine3d(points[0], points[6], Vector4{ 1.0f, 0.0f, 0.0f, 1.0f });
 		Line3dDrawer::GetInstance()->DrawLine3d(points[1], points[7], Vector4{ 1.0f, 0.0f, 0.0f, 1.0f });
 		Line3dDrawer::GetInstance()->DrawLine3d(points[2], points[4], Vector4{ 1.0f, 0.0f, 0.0f, 1.0f });
@@ -88,7 +103,7 @@ void ParticleEmitter::Emit() {
 			Vector3 posAddSize{};
 			posAddSize = Random::GetVector3({ emitSizeMin.x,emitSizeMax.x }, { emitSizeMin.y,emitSizeMax.y }, { emitSizeMin.z,emitSizeMax.z });
 			posAddSize += pos;
-			ParticleManager::Emit(name, posAddSize, grain, para_, 1);
+			ParticleManager::Emit(name, posAddSize, particleRotate, grain, para_, 1);
 		}
 		time_ = frequencyTime;
 	}
@@ -99,7 +114,10 @@ void ParticleEmitter::Emit() {
 }
 
 void ParticleEmitter::Burst() {
-	ParticleManager::Emit(name, pos, grain, para_, count);
+	Vector3 posAddSize{};
+	posAddSize = Random::GetVector3({ emitSizeMin.x,emitSizeMax.x }, { emitSizeMin.y,emitSizeMax.y }, { emitSizeMin.z,emitSizeMax.z });
+	posAddSize += pos;
+	ParticleManager::Emit(name, posAddSize, particleRotate, grain, para_, count);
 }
 
 void ParticleEmitter::BurstAnime() {
@@ -118,4 +136,125 @@ void ParticleEmitter::RandomTranslate(const Vector2& x, const Vector2& y, const 
 	para_.transx = x;
 	para_.transy = y;
 	para_.transz = z;
+}
+
+void ParticleEmitter::Save() {
+
+	json j;
+
+	j.push_back(json::array({ pos.x,pos.y,pos.z }));
+	j.push_back(json::array({ particleRotate.x,particleRotate.y,particleRotate.z }));
+	j.push_back(json::array({ emitSizeMax.x,emitSizeMax.y,emitSizeMax.z }));
+	j.push_back(json::array({ emitSizeMin.x,emitSizeMin.y,emitSizeMin.z }));
+
+	j.push_back(count);
+	j.push_back(frequencyTime);
+
+	j.push_back(grain.lifeTime_);
+	j.push_back(json::array({ grain.accele.x,grain.accele.y,grain.accele.z }));
+	j.push_back(json::array({ grain.speed.x,grain.speed.y,grain.speed.z }));
+
+	j.push_back(grain.type);
+	j.push_back(grain.speedType);
+	j.push_back(grain.colorType);
+
+	j.push_back(grain.returnPower_);
+
+	j.push_back(json::array({ grain.startSize.x,grain.startSize.y }));
+	j.push_back(json::array({ grain.endSize.x,grain.endSize.y }));
+
+	j.push_back(grain.isBillBoard_);
+
+	j.push_back(json::array({ para_.speedx.x,para_.speedx.y }));
+	j.push_back(json::array({ para_.speedy.x,para_.speedy.y }));
+	j.push_back(json::array({ para_.speedz.x,para_.speedz.y }));
+
+	j.push_back(json::array({ para_.transx.x,para_.transx.y }));
+	j.push_back(json::array({ para_.transy.x,para_.transy.y }));
+	j.push_back(json::array({ para_.transz.x,para_.transz.y }));
+
+	j.push_back(json::array({ para_.colorMin.X,para_.colorMin.Y,para_.colorMin.Z,para_.colorMin.W }));
+	j.push_back(json::array({ para_.colorMax.X,para_.colorMax.Y,para_.colorMax.Z,para_.colorMax.W }));
+
+
+	std::ofstream file(kDirectoryPath + name + ".json");
+	if (file.is_open()) {
+		file << j.dump(4);
+		file.close();
+	}
+
+}
+
+void ParticleEmitter::Load(const std::string& filename) {
+
+	std::ifstream file(kDirectoryPath + filename + ".json");
+	if (!file.is_open()) {
+		return;
+	}
+
+	json j;
+	file >> j;
+	file.close();
+
+	// データをロードしてメンバーに復元
+	int index = 0;
+	pos = Vector3(j[index][0], j[index][1], j[index][2]);
+	index++;
+	particleRotate = Vector3(j[index][0], j[index][1], j[index][2]);
+	index++;
+
+	emitSizeMax = Vector3(j[index][0], j[index][1], j[index][2]);
+	index++;
+	emitSizeMin = Vector3(j[index][0], j[index][1], j[index][2]);
+	index++;
+
+	count = j[index].get<int>();
+	index++;
+	frequencyTime = j[index].get<float>();
+	index++;
+	grain.lifeTime_ = j[index].get<float>();
+	index++;
+
+	grain.accele = Vector3(j[index][0], j[index][1], j[index][2]);
+	index++;
+	grain.speed = Vector3(j[index][0], j[index][1], j[index][2]);
+	index++;
+
+	grain.type = j[index].get<int>();
+	index++;
+	grain.speedType = j[index].get<int>();
+	index++;
+	grain.colorType = j[index].get<int>();
+	index++;
+
+	grain.returnPower_ = j[index].get<float>();
+	index++;
+
+	grain.startSize = Vector2(j[index][0], j[index][1]);
+	index++;
+	grain.endSize = Vector2(j[index][0], j[index][1]);
+	index++;
+
+	grain.isBillBoard_ = j[index].get<bool>();
+	index++;
+
+	para_.speedx = Vector2(j[index][0], j[index][1]);
+	index++;
+	para_.speedy = Vector2(j[index][0], j[index][1]);
+	index++;
+	para_.speedz = Vector2(j[index][0], j[index][1]);
+	index++;
+
+	para_.transx = Vector2(j[index][0], j[index][1]);
+	index++;
+	para_.transy = Vector2(j[index][0], j[index][1]);
+	index++;
+	para_.transz = Vector2(j[index][0], j[index][1]);
+	index++;
+
+	para_.colorMin = Vector4(j[index][0], j[index][1], j[index][2], j[index][3]);
+	index++;
+	para_.colorMax = Vector4(j[index][0], j[index][1], j[index][2], j[index][3]);
+	index++;
+
 }

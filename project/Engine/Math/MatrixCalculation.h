@@ -40,6 +40,7 @@ struct TransformationMatrix {
 struct TransformationParticleMatrix {
 	Matrix4x4 WVP;
 	Matrix4x4 World;
+	Vector4 color;
 };
 
 struct Materials {
