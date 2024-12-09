@@ -1,7 +1,7 @@
 #pragma once
 #include "Audio.h"
 #include "DXCom.h"
-#include "GameScene.h"
+#include "Game/Scene/GameScene.h"
 #include "TextureManager.h"
 #include "ImGuiManager.h"
 #include "SRVManager.h"

@@ -1,4 +1,4 @@
-#include "GameRun.h"
+#include "Game/Scene/GameRun.h"
 #include <memory>
 
 // やること
