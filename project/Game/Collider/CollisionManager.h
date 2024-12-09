@@ -2,6 +2,9 @@
 #include "Game/Collider/BaseCollider.h"
 #include <list>
 
+
+class AABBCollider;
+
 class CollisionManager {
 public:
 	CollisionManager();
@@ -19,6 +22,7 @@ public:
 
 private:
 
+	bool checkAABBCollision(AABBCollider* A, AABBCollider* B);
 
 private:
 

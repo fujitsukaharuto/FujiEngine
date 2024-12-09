@@ -1,6 +1,7 @@
 #pragma once
 #include "Scene/BaseScene.h"
 #include "Game/TestBaseObj.h"
+#include "Game/Collider/CollisionManager.h"
 
 class TitleScene:public BaseScene {
 public:
@@ -24,5 +25,7 @@ private:
 	ParticleEmitter emit;
 
 	std::unique_ptr<TestBaseObj> test_;
+	std::unique_ptr<TestBaseObj> test2_;
+	std::unique_ptr<CollisionManager> cMane_;
 
 };

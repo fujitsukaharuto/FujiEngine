@@ -27,6 +27,13 @@ void TitleScene::Initialize() {
 
 	test_ = std::make_unique<TestBaseObj>();
 	test_->Initialize();
+	test_->name_ = "testObj";
+
+	test2_ = std::make_unique<TestBaseObj>();
+	test2_->Initialize();
+	test2_->name_ = "testObj2";
+
+	cMane_ = std::make_unique<CollisionManager>();
 
 	emit.name = "sphere";
 	emit.Load("sphere");
@@ -34,6 +41,8 @@ void TitleScene::Initialize() {
 }
 
 void TitleScene::Update() {
+
+	cMane_->Reset();
 
 #ifdef _DEBUG
 
@@ -49,12 +58,16 @@ void TitleScene::Update() {
 
 	emit.DebugGUI();
 
+	test_->Debug();
+	test2_->Debug();
+
 #endif // _DEBUG
 
 
 	dxCommon_->UpDate();
 
 	test_->Update();
+	test2_->Update();
 
 	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
 		SceneManager::GetInstance()->ChangeScene("GAME", 40.0f);
@@ -67,7 +80,9 @@ void TitleScene::Update() {
 
 	sphere->transform.rotate.y += 0.02f;
 
-
+	cMane_->AddCollider(test_->GetCollider());
+	cMane_->AddCollider(test2_->GetCollider());
+	cMane_->CheckAllCollision();
 
 	ParticleManager::GetInstance()->Update();
 }
@@ -90,6 +105,8 @@ void TitleScene::Draw() {
 
 #ifdef _DEBUG
 	emit.DrawSize();
+	test_->DrawCollider();
+	test2_->DrawCollider();
 #endif // _DEBUG
 	Line3dDrawer::GetInstance()->Render();
 

@@ -27,7 +27,7 @@ public:
 	virtual void OnCollisionExit(const ColliderInfo& other) = 0;
 
 	void SetTag(const std::string& tag) { info.tag = tag; }
-	void setPos(const Vector3& pos) { info.pos = pos; }
+	void SetPos(const Vector3& pos) { info.pos = pos; }
 
 	const std::string GetTag()const { return info.tag; }
 	const Vector3 GetPos()const { return info.pos; }
