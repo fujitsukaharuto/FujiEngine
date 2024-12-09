@@ -34,7 +34,7 @@ void ParticleEmitter::DebugGUI() {
 		ImGui::DragFloat("lifetime", &grain.lifeTime_, 0.1f);
 		if (ImGui::TreeNode("typeSelect")) {
 			ImGui::Combo("sizeType##type", &grain.type, "kNormal\0kShift\0kSin\0");
-			ImGui::Combo("speedType##type", &grain.speedType, "kConstancy\0kChange\0");
+			ImGui::Combo("speedType##type", &grain.speedType, "kConstancy\0kChange\0kReturn\0");
 			ImGui::Combo("colorType##type", &grain.colorType, "kDefault\0kRandom\0");
 			ImGui::TreePop();
 		}
@@ -47,6 +47,9 @@ void ParticleEmitter::DebugGUI() {
 		ImGui::DragFloat2("speedX", &para_.speedx.x, 0.01f);
 		ImGui::DragFloat2("speedY", &para_.speedy.x, 0.01f);
 		ImGui::DragFloat2("speedZ", &para_.speedz.x, 0.01f);
+		if (grain.speedType == SpeedType::kReturn) {
+			ImGui::DragFloat("returnPower", &grain.returnPower_, 0.001f);
+		}
 		ImGui::SeparatorText("accele");
 		ImGui::DragFloat3("accele", &grain.accele.x, 0.01f);
 		ImGui::SeparatorText("billBoard");
@@ -155,6 +158,8 @@ void ParticleEmitter::Save() {
 	j.push_back(grain.speedType);
 	j.push_back(grain.colorType);
 
+	j.push_back(grain.returnPower_);
+
 	j.push_back(json::array({ grain.startSize.x,grain.startSize.y }));
 	j.push_back(json::array({ grain.endSize.x,grain.endSize.y }));
 
@@ -220,6 +225,9 @@ void ParticleEmitter::Load(const std::string& filename) {
 	grain.speedType = j[index].get<int>();
 	index++;
 	grain.colorType = j[index].get<int>();
+	index++;
+
+	grain.returnPower_ = j[index].get<float>();
 	index++;
 
 	grain.startSize = Vector2(j[index][0], j[index][1]);

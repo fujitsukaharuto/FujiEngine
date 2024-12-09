@@ -384,6 +384,9 @@ void ParticleManager::Emit(const std::string& name, const Vector3& pos, const Ve
 				case kChange:
 					particle.accele = grain.accele;
 					break;
+				case kReturn:
+					particle.accele = (particle.speed) * grain.returnPower_;
+					break;
 				}
 
 				particle.type = grain.type;

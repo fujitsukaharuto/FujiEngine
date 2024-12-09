@@ -24,5 +24,6 @@ private:
 
 	ParticleEmitter kira;
 	ParticleEmitter emit;
+	ParticleEmitter returnP;
 
 };

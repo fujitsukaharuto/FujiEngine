@@ -30,6 +30,8 @@ void ResultScene::Initialize() {
 	emit.name = "blad";
 	emit.Load("blad");
 
+	returnP.name = "returnP";
+	returnP.Load("returnP");
 
 	kira.name = "crit";
 	kira.Load("crit");
@@ -52,6 +54,7 @@ void ResultScene::Update() {
 
 	emit.DebugGUI();
 	kira.DebugGUI();
+	returnP.DebugGUI();
 
 #endif // _DEBUG
 
@@ -69,6 +72,7 @@ void ResultScene::Update() {
 	if (Input::GetInstance()->TriggerKey(DIK_RETURN)) {
 		emit.Burst();
 		kira.Burst();
+		returnP.Burst();
 	}
 
 	ParticleManager::GetInstance()->Update();
@@ -93,6 +97,7 @@ void ResultScene::Draw() {
 #ifdef _DEBUG
 	emit.DrawSize();
 	kira.DrawSize();
+	returnP.DrawSize();
 #endif // _DEBUG
 	Line3dDrawer::GetInstance()->Render();
 

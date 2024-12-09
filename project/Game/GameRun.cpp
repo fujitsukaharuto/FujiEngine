@@ -32,6 +32,7 @@ void GameRun::Initialize() {
 	pManager_->CreateParticleGroup("crit", "kira.png");
 	pManager_->CreateParticleGroup("moku", "blueParticle.png");
 	pManager_->CreateParticleGroup("spark", "blueParticle.png");
+	pManager_->CreateParticleGroup("returnP", "kira.png");
 	pManager_->CreateAnimeGroup("animetest", "uvChecker.png");
 	pManager_->AddAnime("animetest", "white2x2.png", 10.0f);
 #pragma endregion

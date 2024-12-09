@@ -12,6 +12,7 @@ enum SizeType {
 enum SpeedType {
 	kConstancy,
 	kChange,
+	kReturn,
 };
 
 enum ColorType {
@@ -37,6 +38,8 @@ public:
 	int type = SizeType::kNormal;
 	int speedType = SpeedType::kConstancy;
 	int colorType = ColorType::kDefault;
+
+	float returnPower_ = -0.05f;
 
 	Vector2 startSize = { 1.0f,1.0f };
 	Vector2 endSize = { 1.0f,1.0f };

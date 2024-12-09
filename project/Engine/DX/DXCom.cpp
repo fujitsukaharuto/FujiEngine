@@ -666,17 +666,15 @@ void DXCom::UpDate() {
 
 	ImGui::End();
 
+
+#endif // _DEBUG
+
 	shockData_->shockTime += 0.025f;
 	fireData_->animeTime += 0.025f;
 	thunderData_->time += 0.005f;
 
 	thunderData_->time = std::fmodf(thunderData_->time, 1.5f);
 	thunderData_->progres = thunderData_->time / 1.5f;
-
-
-#endif // _DEBUG
-
-
 
 	/*transform.rotate.y += 0.05f;*/
 	/*Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);*/
