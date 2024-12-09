@@ -38,9 +38,6 @@
     <ClCompile Include="Engine\GraphicPipeline\Pipeline.cpp">
       <Filter>Engine\GraphicPipeline</Filter>
     </ClCompile>
-    <ClCompile Include="Game\GameScene.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\ImGuiManager\ImGuiManager.cpp">
       <Filter>Engine\ImGuiManager</Filter>
     </ClCompile>
@@ -107,12 +104,6 @@
     <ClCompile Include="Engine\Math\Random.cpp">
       <Filter>Engine\Math</Filter>
     </ClCompile>
-    <ClCompile Include="Game\ResultScene.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\TitleScene.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Scene\BaseScene.cpp">
       <Filter>Engine\Scene</Filter>
     </ClCompile>
@@ -137,17 +128,11 @@
     <ClCompile Include="Engine\DX\Framework.cpp">
       <Filter>Engine\DX</Filter>
     </ClCompile>
-    <ClCompile Include="Game\GameRun.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\GraphicPipeline\FirePipe.cpp">
       <Filter>Engine\GraphicPipeline</Filter>
     </ClCompile>
     <ClCompile Include="Engine\GraphicPipeline\ThunderPipe.cpp">
       <Filter>Engine\GraphicPipeline</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\SceneFactory.cpp">
-      <Filter>Game</Filter>
     </ClCompile>
     <ClCompile Include="Game\BaseGameObject.cpp">
       <Filter>Game</Filter>
@@ -166,6 +151,21 @@
     </ClCompile>
     <ClCompile Include="Engine\Camera\DebugCamera.cpp">
       <Filter>Engine\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Scene\GameRun.cpp">
+      <Filter>Game\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Scene\GameScene.cpp">
+      <Filter>Game\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Scene\ResultScene.cpp">
+      <Filter>Game\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Scene\SceneFactory.cpp">
+      <Filter>Game\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Scene\TitleScene.cpp">
+      <Filter>Game\Scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -204,9 +204,6 @@
     </ClInclude>
     <ClInclude Include="Engine\GraphicPipeline\Pipeline.h">
       <Filter>Engine\GraphicPipeline</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\GameScene.h">
-      <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="Engine\ImGuiManager\ImGuiManager.h">
       <Filter>Engine\ImGuiManager</Filter>
@@ -283,12 +280,6 @@
     <ClInclude Include="Engine\Math\Random.h">
       <Filter>Engine\Math</Filter>
     </ClInclude>
-    <ClInclude Include="Game\ResultScene.h">
-      <Filter>Game</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\TitleScene.h">
-      <Filter>Game</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\Scene\BaseScene.h">
       <Filter>Engine\Scene</Filter>
     </ClInclude>
@@ -313,9 +304,6 @@
     <ClInclude Include="Engine\DX\Framework.h">
       <Filter>Engine\DX</Filter>
     </ClInclude>
-    <ClInclude Include="Game\GameRun.h">
-      <Filter>Game</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\GraphicPipeline\FirePipe.h">
       <Filter>Engine\GraphicPipeline</Filter>
     </ClInclude>
@@ -324,9 +312,6 @@
     </ClInclude>
     <ClInclude Include="Engine\Scene\AbstractSceneFactory.h">
       <Filter>Engine\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\SceneFactory.h">
-      <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="Game\BaseGameObject.h">
       <Filter>Game</Filter>
@@ -348,6 +333,21 @@
     </ClInclude>
     <ClInclude Include="Engine\Camera\DebugCamera.h">
       <Filter>Engine\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Scene\GameRun.h">
+      <Filter>Game\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Scene\GameScene.h">
+      <Filter>Game\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Scene\ResultScene.h">
+      <Filter>Game\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Scene\SceneFactory.h">
+      <Filter>Game\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Scene\TitleScene.h">
+      <Filter>Game\Scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -410,6 +410,12 @@
     </Filter>
     <Filter Include="Engine\Camera">
       <UniqueIdentifier>{cf744bcb-b934-4c5e-9da0-1a40d0968e23}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Collider">
+      <UniqueIdentifier>{20f410ec-47e8-4e10-a499-b1fd2ef09cde}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Scene">
+      <UniqueIdentifier>{9f02f36c-fca6-4a84-99db-93ec2013ba4b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
