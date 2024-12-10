@@ -3,6 +3,7 @@
 #include "Game/TestBaseObj.h"
 #include "Game/Collider/CollisionManager.h"
 #include "Game/GameObj/Player/Player.h"
+#include "Game/GameObj/FollowCamera.h"
 
 class TitleScene:public BaseScene {
 public:
@@ -31,5 +32,6 @@ private:
 
 	std::unique_ptr<Object3d> terrain = nullptr;
 	std::unique_ptr<Player> player_;
+	std::unique_ptr<FollowCamera> followCamera_;
 
 };

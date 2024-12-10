@@ -42,6 +42,10 @@ void TitleScene::Initialize() {
 	player_ = std::make_unique<Player>();
 	player_->Initialize();
 
+	followCamera_ = std::make_unique<FollowCamera>();
+	followCamera_->Initialize();
+	followCamera_->SetTarget(&player_->GetTrans());
+
 	/*emit.name = "sphere";
 	emit.Load("sphere");*/
 
@@ -77,6 +81,8 @@ void TitleScene::Update() {
 	test2_->Update();*/
 
 	player_->Update();
+
+	followCamera_->Update();
 
 	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
 		SceneManager::GetInstance()->ChangeScene("GAME", 40.0f);

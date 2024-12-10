@@ -36,8 +36,8 @@ enum class PadInput : WORD {
 
 struct GamePad {
 	Microsoft::WRL::ComPtr<IDirectInputDevice8> device_;
-	int32_t deadZoneL_;
-	int32_t deadZoneR_;
+	int32_t deadZoneL_ = 4000;
+	int32_t deadZoneR_ = 4000;
 	XINPUT_STATE state_;
 	XINPUT_STATE statePre_;
 	bool isConnected_ = false;

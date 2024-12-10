@@ -29,7 +29,7 @@ void Camera::Update() {
 	ImGui::End();
 
 #endif // _DEBUG
-	Vector3 shakeGap = { 0.0f,0.0f,0.0f };
+	shakeGap = { 0.0f,0.0f,0.0f };
 	
 	if (shakeTime_ > 0.0f) {
 		shakeGap = Random::GetVector3({ -0.5f,0.5f }, { -0.5f,0.5f }, { -0.5f,0.5f });
@@ -54,4 +54,22 @@ void Camera::Update() {
 	projectionMatrix_ = MakePerspectiveFovMatrix(fovY_, aspect_, nearClip_, farClip_);
 	viewProjectionMatrix_ = Multiply(viewMatrix_, projectionMatrix_);
 
+}
+
+void Camera::UpdateMaterix() {
+	worldMatrix_ = MakeAffineMatrix(transform.scale, transform.rotate, (transform.translate + shakeGap));
+	viewMatrix_ = Inverse(worldMatrix_);
+
+#ifdef _DEBUG
+
+	if (CameraManager::GetInstance()->GetDebugMode()) {
+
+		viewMatrix_ = DebugCamera::GetInstance()->GetViewMatrix();
+
+	}
+
+#endif // _DEBUG
+
+	projectionMatrix_ = MakePerspectiveFovMatrix(fovY_, aspect_, nearClip_, farClip_);
+	viewProjectionMatrix_ = Multiply(viewMatrix_, projectionMatrix_);
 }

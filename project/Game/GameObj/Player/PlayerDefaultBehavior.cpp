@@ -2,6 +2,7 @@
 #include "Game/GameObj/Player/Player.h"
 #include "Input/Input.h"
 #include "Math/MatrixCalculation.h"
+#include "Camera/CameraManager.h"
 
 PlayerDefaultBehavior::PlayerDefaultBehavior(Player* pPlayer) : pPlayer_(pPlayer) {
 }
@@ -35,8 +36,10 @@ void PlayerDefaultBehavior::Move() {
 		if (ismoving) {
 			const float kCharacterSpeed = 0.15f;
 			velo = velo.Normalize() * kCharacterSpeed;
-			/*Matrix4x4 rotateCamera = MakeRotateXYZMatrix(viewProjection_->rotation_);
-			velocity_ = TransformNormal(velocity_, rotateCamera);*/
+
+			Vector3 cameraR = CameraManager::GetInstance()->GetCamera()->transform.rotate;
+			Matrix4x4 rotateCamera = MakeRotateXYZMatrix(cameraR);
+			velo = TransformNormal(velo, rotateCamera);
 
 			pPlayer_->GetTrans().translate += velo * FPSKeeper::DeltaTime();
 			pPlayer_->SetVelocity(velo);
