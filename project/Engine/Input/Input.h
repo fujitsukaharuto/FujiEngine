@@ -40,6 +40,7 @@ struct GamePad {
 	int32_t deadZoneR_;
 	XINPUT_STATE state_;
 	XINPUT_STATE statePre_;
+	bool isConnected_ = false;
 };
 
 
