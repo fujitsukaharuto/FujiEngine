@@ -435,6 +435,15 @@
     <Filter Include="Game\Scene">
       <UniqueIdentifier>{9f02f36c-fca6-4a84-99db-93ec2013ba4b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game\Player">
+      <UniqueIdentifier>{272b979d-4022-461f-9b40-fa2e97c94d98}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Enemy">
+      <UniqueIdentifier>{75f61a48-bc79-46a6-b1ec-ceee4a1b817f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameItem">
+      <UniqueIdentifier>{b615b2ac-8822-443b-a5e7-9647949a5713}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resource\Shaders\GaussianBlur.PS.hlsl">
