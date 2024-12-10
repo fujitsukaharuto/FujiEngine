@@ -1,12 +1,12 @@
 #pragma once
-#include "Game/BaseGameObject.h"
+#include "Game/OriginGameObject.h"
 #include "ImGuiManager/ImGuiManager.h"
 #include <numbers>
 #include "Game/Collider/BaseCollider.h"
 #include "Game/Collider/AABBCollider.h"
 #include "Model/Line3dDrawer.h"
 
-class TestBaseObj : public BaseGameObject {
+class TestBaseObj : public OriginGameObject {
 public:
 	TestBaseObj();
 	~TestBaseObj()override;
@@ -45,7 +45,7 @@ inline TestBaseObj::~TestBaseObj() {
 }
 
 inline void TestBaseObj::Initialize() {
-	BaseGameObject::Initialize();
+	OriginGameObject::Initialize();
 	model_->Create("suzanne.obj");
 	omega_ = 2.0f * std::numbers::pi_v<float> / 300.0f;
 	collider_ = std::make_unique<AABBCollider>();
@@ -59,7 +59,7 @@ inline void TestBaseObj::Update() {
 }
 
 inline void TestBaseObj::Draw([[maybe_unused]] Material* mate) {
-	BaseGameObject::Draw(mate);
+	OriginGameObject::Draw(mate);
 }
 
 inline void TestBaseObj::OnCollisionEnter([[maybe_unused]]const ColliderInfo& other) {

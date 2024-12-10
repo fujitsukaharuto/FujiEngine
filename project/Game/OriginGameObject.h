@@ -3,10 +3,10 @@
 #include "Model/Object3d.h"
 
 
-class BaseGameObject {
+class OriginGameObject {
 public:
-	BaseGameObject();
-	virtual ~BaseGameObject() = default;
+	OriginGameObject();
+	virtual ~OriginGameObject() = default;
 
 	virtual void Initialize();
 	virtual void Update();
