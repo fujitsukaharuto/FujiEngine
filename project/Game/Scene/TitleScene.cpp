@@ -98,15 +98,15 @@ void TitleScene::Draw() {
 
 #pragma region 3Dオブジェクト
 	obj3dCommon->PreDraw();
-	sphere->Draw();
-	test_->Draw();
+	/*sphere->Draw();
+	test_->Draw();*/
 
 	ParticleManager::GetInstance()->Draw();
 
 #ifdef _DEBUG
-	emit.DrawSize();
+	/*emit.DrawSize();
 	test_->DrawCollider();
-	test2_->DrawCollider();
+	test2_->DrawCollider();*/
 #endif // _DEBUG
 	Line3dDrawer::GetInstance()->Render();
 
