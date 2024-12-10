@@ -8,7 +8,7 @@ Player::~Player() {
 }
 
 void Player::Initialize() {
-	BaseGameObject::Initialize();
+	OriginGameObject::Initialize();
 	model_->CreateSphere();
 	model_->transform.scale = { 0.5f,0.5f,0.5f };
 
@@ -34,7 +34,7 @@ void Player::Update() {
 }
 
 void Player::Draw([[maybe_unused]]Material* mate) {
-	BaseGameObject::Draw(mate);
+	OriginGameObject::Draw(mate);
 }
 
 void Player::BehaviorRequest() {

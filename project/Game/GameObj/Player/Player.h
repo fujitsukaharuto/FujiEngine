@@ -1,12 +1,12 @@
 #pragma once
-#include "Game/BaseGameObject.h"
+#include "Game/OriginGameObject.h"
 #include "ImGuiManager/ImGuiManager.h"
 #include "Game/Collider/BaseCollider.h"
 #include "Game/Collider/AABBCollider.h"
 #include "Math/MatrixCalculation.h"
 #include "Game/OriginState.h"
 
-class Player : public BaseGameObject {
+class Player : public OriginGameObject {
 public:
 	Player();
 	~Player()override;
