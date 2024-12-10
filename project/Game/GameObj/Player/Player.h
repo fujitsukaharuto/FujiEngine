@@ -3,7 +3,7 @@
 #include "ImGuiManager/ImGuiManager.h"
 #include "Game/Collider/BaseCollider.h"
 #include "Game/Collider/AABBCollider.h"
-
+#include "Math/MatrixCalculation.h"
 
 class Player : public BaseGameObject {
 public:
@@ -23,6 +23,11 @@ public:
 
 	BaseCollider* GetCollider() { return collider_.get(); }
 
+
+
+	void SetVelocity(const Vector3& v) { velocity_ = v; }
+
+
 #ifdef _DEBUG
 	void Debug()override;
 #endif // _DEBUG
@@ -31,5 +36,9 @@ public:
 private:
 
 	std::unique_ptr<AABBCollider> collider_ = nullptr;
+
+	Vector3 velocity_{};
+
+
 
 };
