@@ -228,6 +228,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Game\Collider\AABBCollider.h" />
     <ClInclude Include="Game\Collider\CollisionManager.h" />
     <ClInclude Include="Game\Field\MapChipField.h" />
+    <ClInclude Include="Game\OriginState.h" />
     <ClInclude Include="Game\Scene\GameRun.h" />
     <ClInclude Include="Game\Scene\GameScene.h" />
     <ClInclude Include="Game\Scene\ResultScene.h" />
