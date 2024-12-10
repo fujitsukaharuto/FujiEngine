@@ -229,6 +229,8 @@ Vector3 CatmullRom(const std::vector<Vector3>& control, float t);
 
 Vector3 ExtractEulerAngles(const Matrix4x4& rotationMatrix);
 
+float LerpShortAngle(float a, float b, float t);
+
 Matrix4x4 MakeLookAtMatrix(const Vector3& forward, const Vector3& up);
 
 Matrix4x4 MakeRotationAxisAngle(const Vector3& axis, float angle);
