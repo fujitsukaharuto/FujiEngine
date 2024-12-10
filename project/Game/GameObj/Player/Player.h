@@ -4,6 +4,7 @@
 #include "Game/Collider/BaseCollider.h"
 #include "Game/Collider/AABBCollider.h"
 #include "Math/MatrixCalculation.h"
+#include "Game/OriginState.h"
 
 class Player : public BaseGameObject {
 public:
@@ -19,8 +20,10 @@ public:
 	void Update()override;
 	void Draw(Material* mate = nullptr)override;
 
-	void OnCollisionEnter(const ColliderInfo& other);
+	void BehaviorRequest();
+	void SetState(std::unique_ptr<OriginState> behaviorState) { state_ = std::move(behaviorState); }
 
+	void OnCollisionEnter(const ColliderInfo& other);
 	BaseCollider* GetCollider() { return collider_.get(); }
 
 
@@ -30,6 +33,7 @@ public:
 
 #ifdef _DEBUG
 	void Debug()override;
+	void DrawCollider() { collider_->DrawCollider(); }
 #endif // _DEBUG
 
 
@@ -39,6 +43,8 @@ private:
 
 	Vector3 velocity_{};
 
-
+	std::unique_ptr<OriginState> state_;
+	PlayerBehavior behavior_ = PlayerBehavior::kDefult;
+	std::optional<PlayerBehavior> behaviorRequest_ = std::nullopt;
 
 };

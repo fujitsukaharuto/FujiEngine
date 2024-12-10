@@ -35,6 +35,13 @@ void TitleScene::Initialize() {
 
 	cMane_ = std::make_unique<CollisionManager>();
 
+	terrain = std::make_unique<Object3d>();
+	terrain->Create("terrain.obj");
+	terrain->transform.scale = { 8.0f,8.0f,8.0f };
+
+	player_ = std::make_unique<Player>();
+	player_->Initialize();
+
 	/*emit.name = "sphere";
 	emit.Load("sphere");*/
 
@@ -69,6 +76,8 @@ void TitleScene::Update() {
 	/*test_->Update();
 	test2_->Update();*/
 
+	player_->Update();
+
 	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
 		SceneManager::GetInstance()->ChangeScene("GAME", 40.0f);
 	}
@@ -100,6 +109,8 @@ void TitleScene::Draw() {
 	obj3dCommon->PreDraw();
 	/*sphere->Draw();
 	test_->Draw();*/
+	terrain->Draw();
+	player_->Draw();
 
 	ParticleManager::GetInstance()->Draw();
 
@@ -107,6 +118,7 @@ void TitleScene::Draw() {
 	/*emit.DrawSize();
 	test_->DrawCollider();
 	test2_->DrawCollider();*/
+	player_->DrawCollider();
 #endif // _DEBUG
 	Line3dDrawer::GetInstance()->Render();
 

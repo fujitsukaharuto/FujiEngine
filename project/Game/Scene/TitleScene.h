@@ -2,6 +2,7 @@
 #include "Scene/BaseScene.h"
 #include "Game/TestBaseObj.h"
 #include "Game/Collider/CollisionManager.h"
+#include "Game/GameObj/Player/Player.h"
 
 class TitleScene:public BaseScene {
 public:
@@ -27,5 +28,8 @@ private:
 	std::unique_ptr<TestBaseObj> test_;
 	std::unique_ptr<TestBaseObj> test2_;*/
 	std::unique_ptr<CollisionManager> cMane_;
+
+	std::unique_ptr<Object3d> terrain = nullptr;
+	std::unique_ptr<Player> player_;
 
 };
