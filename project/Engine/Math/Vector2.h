@@ -88,12 +88,12 @@ public:
 
 	//Function
 
-	float Lenght() const {
+	float Length() const {
 		return std::sqrtf((*this) * (*this));
 	}
 
 	Vector2 NormaliZe()const {
-		const float leng = Lenght();
+		const float leng = Length();
 		return leng == 0 ? *this : *this / leng;
 	}
 
