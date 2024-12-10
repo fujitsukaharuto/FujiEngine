@@ -80,7 +80,7 @@ void ModelManager::LoadOBJ(const std::string& filename) {
 				}
 
 
-				vertex.position.X *= -1.0f;
+				vertex.position.x *= -1.0f;
 				vertex.normal.x *= -1.0f;
 
 				newMesh.AddVertex({ {vertex.position},{vertex.texcoord},{vertex.normal} });

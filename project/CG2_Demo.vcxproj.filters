@@ -176,6 +176,9 @@
     <ClCompile Include="Game\Collider\CollisionManager.cpp">
       <Filter>Game\Collider</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Math\Quaternion.cpp">
+      <Filter>Engine\Math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -367,6 +370,9 @@
     <ClInclude Include="Game\Collider\CollisionManager.h">
       <Filter>Game\Collider</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Math\Quaternion.h">
+      <Filter>Engine\Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -435,14 +441,14 @@
     <Filter Include="Game\Scene">
       <UniqueIdentifier>{9f02f36c-fca6-4a84-99db-93ec2013ba4b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\Player">
+    <Filter Include="Game\GameObj">
+      <UniqueIdentifier>{617e8378-5eb2-45b5-b7d1-72cdc9b6216f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameObj\Player">
       <UniqueIdentifier>{272b979d-4022-461f-9b40-fa2e97c94d98}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\Enemy">
+    <Filter Include="Game\GameObj\Enemy">
       <UniqueIdentifier>{75f61a48-bc79-46a6-b1ec-ceee4a1b817f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\GameItem">
-      <UniqueIdentifier>{b615b2ac-8822-443b-a5e7-9647949a5713}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

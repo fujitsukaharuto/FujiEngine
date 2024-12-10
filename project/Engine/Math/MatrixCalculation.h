@@ -8,10 +8,10 @@
 #include "Vector2Matrix.h"
 
 struct Vector4 {
-	float X;
-	float Y;
-	float Z;
-	float W;
+	float x;
+	float y;
+	float z;
+	float w;
 };
 
 struct Trans {
@@ -234,3 +234,7 @@ Matrix4x4 MakeLookAtMatrix(const Vector3& forward, const Vector3& up);
 Matrix4x4 MakeRotationAxisAngle(const Vector3& axis, float angle);
 
 bool IsCollision(const AABB& aabb, const Vector3& point);
+
+Matrix4x4 MakeRotateAxisAngle(const Vector3& axis, float angle);
+
+Matrix4x4 DirectionToDirection(const Vector3& from, const Vector3& to);

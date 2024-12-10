@@ -28,8 +28,8 @@ void ParticleEmitter::DebugGUI() {
 	ImGui::Separator();
 	if (ImGui::TreeNode("particle")) {
 
-		ImGui::ColorEdit4("colorMin", &para_.colorMin.X);
-		ImGui::ColorEdit4("colorMax", &para_.colorMax.X);
+		ImGui::ColorEdit4("colorMin", &para_.colorMin.x);
+		ImGui::ColorEdit4("colorMax", &para_.colorMax.x);
 
 		ImGui::DragFloat("lifetime", &grain.lifeTime_, 0.1f);
 		if (ImGui::TreeNode("typeSelect")) {
@@ -173,8 +173,8 @@ void ParticleEmitter::Save() {
 	j.push_back(json::array({ para_.transy.x,para_.transy.y }));
 	j.push_back(json::array({ para_.transz.x,para_.transz.y }));
 
-	j.push_back(json::array({ para_.colorMin.X,para_.colorMin.Y,para_.colorMin.Z,para_.colorMin.W }));
-	j.push_back(json::array({ para_.colorMax.X,para_.colorMax.Y,para_.colorMax.Z,para_.colorMax.W }));
+	j.push_back(json::array({ para_.colorMin.x,para_.colorMin.y,para_.colorMin.z,para_.colorMin.w }));
+	j.push_back(json::array({ para_.colorMax.x,para_.colorMax.y,para_.colorMax.z,para_.colorMax.w }));
 
 
 	std::ofstream file(kDirectoryPath + name + ".json");

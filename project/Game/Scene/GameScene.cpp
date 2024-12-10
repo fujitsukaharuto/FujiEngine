@@ -87,7 +87,7 @@ void GameScene::Update() {
 
 	ImGui::Begin("suzunne");
 
-	ImGui::ColorEdit4("color", &color_.X);
+	ImGui::ColorEdit4("color", &color_.x);
 	suzunne->SetColor(color_);
 	ImGui::End();
 

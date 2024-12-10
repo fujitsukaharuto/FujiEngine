@@ -369,10 +369,10 @@ void ParticleManager::Emit(const std::string& name, const Vector3& pos, const Ve
 					particle.color = para.colorMax;
 					break;
 				case kRandom:
-					particle.color.X = Random::GetFloat(para.colorMin.X, para.colorMax.X);
-					particle.color.Y = Random::GetFloat(para.colorMin.Y, para.colorMax.Y);
-					particle.color.Z = Random::GetFloat(para.colorMin.Z, para.colorMax.Z);
-					particle.color.W = Random::GetFloat(para.colorMin.W, para.colorMax.W);
+					particle.color.x = Random::GetFloat(para.colorMin.x, para.colorMax.x);
+					particle.color.y = Random::GetFloat(para.colorMin.y, para.colorMax.y);
+					particle.color.z = Random::GetFloat(para.colorMin.z, para.colorMax.z);
+					particle.color.w = Random::GetFloat(para.colorMin.w, para.colorMax.w);
 					break;
 				}
 
