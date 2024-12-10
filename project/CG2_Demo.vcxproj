@@ -163,6 +163,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\Collider\CollisionManager.cpp" />
     <ClCompile Include="Game\Field\MapChipField.cpp" />
     <ClCompile Include="Game\GameObj\Player\Player.cpp" />
+    <ClCompile Include="Game\GameObj\Player\PlayerDefaultBehavior.cpp" />
     <ClCompile Include="Game\Scene\GameRun.cpp" />
     <ClCompile Include="Game\Scene\GameScene.cpp" />
     <ClCompile Include="Game\Scene\ResultScene.cpp" />
@@ -230,6 +231,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Game\Collider\CollisionManager.h" />
     <ClInclude Include="Game\Field\MapChipField.h" />
     <ClInclude Include="Game\GameObj\Player\Player.h" />
+    <ClInclude Include="Game\GameObj\Player\PlayerDefaultBehavior.h" />
     <ClInclude Include="Game\OriginState.h" />
     <ClInclude Include="Game\Scene\GameRun.h" />
     <ClInclude Include="Game\Scene\GameScene.h" />

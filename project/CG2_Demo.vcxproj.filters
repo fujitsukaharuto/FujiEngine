@@ -182,6 +182,9 @@
     <ClCompile Include="Game\GameObj\Player\Player.cpp">
       <Filter>Game\GameObj\Player</Filter>
     </ClCompile>
+    <ClCompile Include="Game\GameObj\Player\PlayerDefaultBehavior.cpp">
+      <Filter>Game\GameObj\Player</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -381,6 +384,9 @@
     </ClInclude>
     <ClInclude Include="Game\OriginState.h">
       <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\Player\PlayerDefaultBehavior.h">
+      <Filter>Game\GameObj\Player</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
