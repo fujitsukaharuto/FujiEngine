@@ -22,7 +22,7 @@ void TitleScene::Initialize() {
 	obj3dCommon.reset(new Object3dCommon());
 	obj3dCommon->Initialize();
 
-	sphere = std::make_unique<Object3d>();
+	/*sphere = std::make_unique<Object3d>();
 	sphere->CreateSphere();
 
 	test_ = std::make_unique<TestBaseObj>();
@@ -31,12 +31,12 @@ void TitleScene::Initialize() {
 
 	test2_ = std::make_unique<TestBaseObj>();
 	test2_->Initialize();
-	test2_->name_ = "testObj2";
+	test2_->name_ = "testObj2";*/
 
 	cMane_ = std::make_unique<CollisionManager>();
 
-	emit.name = "sphere";
-	emit.Load("sphere");
+	/*emit.name = "sphere";
+	emit.Load("sphere");*/
 
 }
 
@@ -47,7 +47,7 @@ void TitleScene::Update() {
 #ifdef _DEBUG
 
 
-	ImGui::Begin("Sphere");
+	/*ImGui::Begin("Sphere");
 
 	ImGui::DragFloat3("scale", &sphere->transform.scale.x, 0.01f);
 	ImGui::DragFloat3("rotate", &sphere->transform.rotate.x, 0.01f);
@@ -59,21 +59,21 @@ void TitleScene::Update() {
 	emit.DebugGUI();
 
 	test_->Debug();
-	test2_->Debug();
+	test2_->Debug();*/
 
 #endif // _DEBUG
 
 
 	dxCommon_->UpDate();
 
-	test_->Update();
-	test2_->Update();
+	/*test_->Update();
+	test2_->Update();*/
 
 	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
 		SceneManager::GetInstance()->ChangeScene("GAME", 40.0f);
 	}
 
-	if (input_->TriggerKey(DIK_5)) {
+	/*if (input_->TriggerKey(DIK_5)) {
 		emit.Emit();
 	}
 	emit.Emit();
@@ -81,7 +81,7 @@ void TitleScene::Update() {
 	sphere->transform.rotate.y += 0.02f;
 
 	cMane_->AddCollider(test_->GetCollider());
-	cMane_->AddCollider(test2_->GetCollider());
+	cMane_->AddCollider(test2_->GetCollider());*/
 	cMane_->CheckAllCollision();
 
 	ParticleManager::GetInstance()->Update();
