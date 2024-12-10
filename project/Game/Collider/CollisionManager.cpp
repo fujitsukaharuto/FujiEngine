@@ -23,6 +23,10 @@ void CollisionManager::CheckCollisionPair(BaseCollider* A, BaseCollider* B) {
 
 void CollisionManager::CheckAllCollision() {
 
+	if (colliders_.empty()) {
+		return; // colliders_が空なら処理を終了
+	}
+
 	std::list<BaseCollider*>::iterator itrA = colliders_.begin();
 	for (; itrA != colliders_.end(); ++itrA) {
 		BaseCollider* colliderA = *itrA;
