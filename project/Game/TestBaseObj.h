@@ -50,6 +50,7 @@ inline void TestBaseObj::Initialize() {
 	omega_ = 2.0f * std::numbers::pi_v<float> / 300.0f;
 	collider_ = std::make_unique<AABBCollider>();
 	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
+	collider_->SetTag("enemy");
 }
 
 inline void TestBaseObj::Update() {
@@ -64,8 +65,10 @@ inline void TestBaseObj::Draw([[maybe_unused]] Material* mate) {
 
 inline void TestBaseObj::OnCollisionEnter([[maybe_unused]]const ColliderInfo& other) {
 
-	isCollider_ = true;
-	color_ = { 1.0f,0.0f,0.0f,1.0f };
+	if (other.tag=="attack") {
+		isCollider_ = true;
+		color_ = { 1.0f,0.0f,0.0f,1.0f };
+	}
 
 }
 

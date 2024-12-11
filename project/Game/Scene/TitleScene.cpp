@@ -33,6 +33,11 @@ void TitleScene::Initialize() {
 	test2_->Initialize();
 	test2_->name_ = "testObj2";*/
 
+	test_ = std::make_unique<TestBaseObj>();
+	test_->Initialize();
+	test_->name_ = "testObj";
+	test_->GetModel()->transform.scale = { 0.5f,0.5f,0.5f };
+
 	cMane_ = std::make_unique<CollisionManager>();
 
 	terrain = std::make_unique<Object3d>();
@@ -79,7 +84,7 @@ void TitleScene::Update() {
 
 	/*test_->Update();
 	test2_->Update();*/
-
+	test_->Update();
 	player_->Update();
 
 	followCamera_->Update();
@@ -97,6 +102,11 @@ void TitleScene::Update() {
 
 	cMane_->AddCollider(test_->GetCollider());
 	cMane_->AddCollider(test2_->GetCollider());*/
+	cMane_->AddCollider(test_->GetCollider());
+	cMane_->AddCollider(player_->GetCollider());
+	if (player_->GetIsAttack()) {
+		cMane_->AddCollider(player_->GetColliderAttack());
+	}
 	cMane_->CheckAllCollision();
 
 	ParticleManager::GetInstance()->Update();
@@ -115,6 +125,7 @@ void TitleScene::Draw() {
 	obj3dCommon->PreDraw();
 	/*sphere->Draw();
 	test_->Draw();*/
+	test_->Draw();
 	terrain->Draw();
 	player_->Draw();
 
@@ -124,7 +135,9 @@ void TitleScene::Draw() {
 	/*emit.DrawSize();
 	test_->DrawCollider();
 	test2_->DrawCollider();*/
+	test_->DrawCollider();
 	player_->DrawCollider();
+	player_->DrawColliderAttack();
 #endif // _DEBUG
 	Line3dDrawer::GetInstance()->Render();
 

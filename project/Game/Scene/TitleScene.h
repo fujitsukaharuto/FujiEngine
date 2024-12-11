@@ -30,6 +30,7 @@ private:
 	std::unique_ptr<TestBaseObj> test2_;*/
 	std::unique_ptr<CollisionManager> cMane_;
 
+	std::unique_ptr<TestBaseObj> test_;
 	std::unique_ptr<Object3d> terrain = nullptr;
 	std::unique_ptr<Player> player_;
 	std::unique_ptr<FollowCamera> followCamera_;
