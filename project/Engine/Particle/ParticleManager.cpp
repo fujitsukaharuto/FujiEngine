@@ -160,9 +160,49 @@ void ParticleManager::Update() {
 				worldMatrix = MakeAffineMatrix(particle.transform.scale, particle.transform.rotate, particle.transform.translate);
 			}
 			if (particle.isBillBoard_) {
-				worldMatrix = Multiply(MakeScaleMatrix(particle.transform.scale), MakeRotateXYZMatrix(particle.transform.rotate));
-				worldMatrix = Multiply(worldMatrix, billboardMatrix);
-				worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform.translate));
+				switch (particle.pattern_) {
+				case BillBoardPattern::kXYZBillBoard:
+					worldMatrix = Multiply(MakeScaleMatrix(particle.transform.scale), MakeRotateXYZMatrix(particle.transform.rotate));
+					worldMatrix = Multiply(worldMatrix, billboardMatrix);
+					worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform.translate));
+					break;
+				case BillBoardPattern::kXBillBoard:
+
+					Matrix4x4 xBillboardMatrix = billboardMatrix;
+					xBillboardMatrix.m[1][0] = 0.0f; // Y軸成分をゼロにする
+					xBillboardMatrix.m[2][0] = 0.0f; // Z軸成分をゼロにする
+
+					worldMatrix = Multiply(MakeScaleMatrix(particle.transform.scale), MakeRotateXYZMatrix(particle.transform.rotate));
+					worldMatrix = Multiply(worldMatrix, xBillboardMatrix);
+					worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform.translate));
+
+					break;
+				case BillBoardPattern::kYBillBoard:
+
+					Matrix4x4 yBillboardMatrix = billboardMatrix;
+					yBillboardMatrix.m[0][1] = 0.0f; // X軸成分をゼロにする
+					yBillboardMatrix.m[2][1] = 0.0f; // Z軸成分をゼロにする
+
+					worldMatrix = Multiply(MakeScaleMatrix(particle.transform.scale), MakeRotateXYZMatrix(particle.transform.rotate));
+					worldMatrix = Multiply(worldMatrix, yBillboardMatrix);
+					worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform.translate));
+
+					break;
+				case BillBoardPattern::kZBillBoard:
+
+					Matrix4x4 zBillboardMatrix = billboardMatrix;
+					zBillboardMatrix.m[0][2] = 0.0f; // X軸成分をゼロにする
+					zBillboardMatrix.m[1][2] = 0.0f; // Y軸成分をゼロにする
+
+					worldMatrix = Multiply(MakeScaleMatrix(particle.transform.scale), MakeRotateXYZMatrix(particle.transform.rotate));
+					worldMatrix = Multiply(worldMatrix, zBillboardMatrix);
+					worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform.translate));
+
+					break;
+				default:
+					break;
+				}
+
 			}
 
 			if (camera_) {
@@ -363,6 +403,7 @@ void ParticleManager::Emit(const std::string& name, const Vector3& pos, const Ve
 				particle.lifeTime_ = grain.lifeTime_;
 				particle.startLifeTime_ = particle.lifeTime_;
 				particle.isBillBoard_ = grain.isBillBoard_;
+				particle.pattern_ = grain.pattern_;
 				particle.colorType = grain.colorType;
 				switch (particle.colorType) {
 				case kDefault:
