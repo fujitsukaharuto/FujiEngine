@@ -54,6 +54,14 @@ void ParticleEmitter::DebugGUI() {
 		ImGui::DragFloat3("accele", &grain.accele.x, 0.01f);
 		ImGui::SeparatorText("billBoard");
 		ImGui::Checkbox("BillBoard", &grain.isBillBoard_);
+		if (grain.isBillBoard_) {
+			int billPattern = static_cast<int>(grain.pattern_);
+			ImGui::RadioButton("XYZ", &billPattern, 0); ImGui::SameLine();
+			ImGui::RadioButton("X", &billPattern, 1); ImGui::SameLine();
+			ImGui::RadioButton("Y", &billPattern, 2); ImGui::SameLine();
+			ImGui::RadioButton("Z", &billPattern, 3);
+			grain.pattern_ = static_cast<BillBoardPattern>(billPattern);
+		}
 		ImGui::Checkbox("SizeCheck", &isDrawSize_);
 		ImGui::TreePop();
 	}
@@ -165,6 +173,8 @@ void ParticleEmitter::Save() {
 
 	j.push_back(grain.isBillBoard_);
 
+	j.push_back(static_cast<int>(grain.pattern_));
+
 	j.push_back(json::array({ para_.speedx.x,para_.speedx.y }));
 	j.push_back(json::array({ para_.speedy.x,para_.speedy.y }));
 	j.push_back(json::array({ para_.speedz.x,para_.speedz.y }));
@@ -237,6 +247,9 @@ void ParticleEmitter::Load(const std::string& filename) {
 
 	grain.isBillBoard_ = j[index].get<bool>();
 	index++;
+
+	/*grain.pattern_ = static_cast<BillBoardPattern>(j[index][0].get<int>());
+	index++;*/
 
 	para_.speedx = Vector2(j[index][0], j[index][1]);
 	index++;
