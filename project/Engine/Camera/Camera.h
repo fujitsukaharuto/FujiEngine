@@ -10,6 +10,7 @@ public:
 
 
 	void Update();
+	void UpdateMaterix();
 
 
 	void SetFovY(float fov) { fovY_ = fov; }
