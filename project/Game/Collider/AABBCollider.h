@@ -33,6 +33,9 @@ public:
 	void SetHeight(float h) { height = h; }
 	void SetDepth(float d) { depth = d; }
 
+
+	CollisionState GetState()const { return state; }
+
 	float GetWidth() const { return width; }
 	float GetHeight() const { return height; }
 	float GetDepth() const { return depth; }
