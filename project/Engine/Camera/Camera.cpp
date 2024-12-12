@@ -68,7 +68,7 @@ void Camera::UpdateMaterix() {
 
 	}
 
-#endif //_DEBUG
+#endif // _DEBUG
 
 	projectionMatrix_ = MakePerspectiveFovMatrix(fovY_, aspect_, nearClip_, farClip_);
 	viewProjectionMatrix_ = Multiply(viewMatrix_, projectionMatrix_);
