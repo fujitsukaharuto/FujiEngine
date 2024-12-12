@@ -32,7 +32,7 @@
 /// https://docs.google.com/document/u/0/d/1lUpgCc6XqLgLKEJcuu56m6yqqhdGDwCGz_9dRb5ebM0/edit
 ///*****************************************************************************************
 
-float Player::InitY_ = 0.5f;
+float Player::InitY_ = 1.0f;
 
 Player::Player() {}
 

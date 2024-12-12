@@ -11,13 +11,14 @@
 /// <summary>
 /// プレイヤークラス
 /// </summary>
-class Boss;
+//class Boss;
 class Player :public OriginGameObject {
 
 private:
 	/// other class
-	Boss* pBoss_;
+	/*Boss* pBoss_;*/
 private:
+
 	/// ===================================================
 	///private variaus
 	/// ===================================================
@@ -83,14 +84,17 @@ public:
 	void TakeDamage();
 
 	/// ===================================================
-	/// getter
+	/// getter method
 	/// ===================================================
+	
 	const bool& GetIsAttack()const { return isAttack_; }
-	Boss* GetBoss()const { return pBoss_; }
+	/*Boss* GetBoss()const { return pBoss_; }*/
 	float GetMuzzulJumpSpeed()const { return muzzelJumpSpeed_; }
+
 	/// ===================================================
-	/// setter
+	/// setter method
 	/// ===================================================
+	
 	/*void SetJumpSpeed(float speed) { muzzelJumpSpeed_ = speed; }*/
 	void SetIsAttack(bool is) { isAttack_ = is; }
 };
