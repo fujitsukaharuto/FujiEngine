@@ -162,8 +162,7 @@ void ParticleManager::Update() {
 			if (particle.isBillBoard_) {
 				switch (particle.pattern_) {
 				case BillBoardPattern::kXYZBillBoard:
-					worldMatrix = Multiply(MakeScaleMatrix(particle.transform.scale), MakeRotateXYZMatrix(particle.transform.rotate));
-					worldMatrix = Multiply(worldMatrix, billboardMatrix);
+					worldMatrix = Multiply(MakeScaleMatrix(particle.transform.scale), billboardMatrix);
 					worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform.translate));
 					break;
 				case BillBoardPattern::kXBillBoard:
@@ -172,7 +171,7 @@ void ParticleManager::Update() {
 					xBillboardMatrix.m[1][0] = 0.0f; // Y軸成分をゼロにする
 					xBillboardMatrix.m[2][0] = 0.0f; // Z軸成分をゼロにする
 
-					worldMatrix = Multiply(MakeScaleMatrix(particle.transform.scale), MakeRotateXYZMatrix(particle.transform.rotate));
+					worldMatrix = Multiply(MakeScaleMatrix(particle.transform.scale), MakeRotateXYZMatrix({ 0.0f,particle.transform.rotate.y,particle.transform.rotate.z }));
 					worldMatrix = Multiply(worldMatrix, xBillboardMatrix);
 					worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform.translate));
 
@@ -183,7 +182,7 @@ void ParticleManager::Update() {
 					yBillboardMatrix.m[0][1] = 0.0f; // X軸成分をゼロにする
 					yBillboardMatrix.m[2][1] = 0.0f; // Z軸成分をゼロにする
 
-					worldMatrix = Multiply(MakeScaleMatrix(particle.transform.scale), MakeRotateXYZMatrix(particle.transform.rotate));
+					worldMatrix = Multiply(MakeScaleMatrix(particle.transform.scale), MakeRotateXYZMatrix({ particle.transform.rotate.x,0.0f,particle.transform.rotate.z }));
 					worldMatrix = Multiply(worldMatrix, yBillboardMatrix);
 					worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform.translate));
 
@@ -194,7 +193,7 @@ void ParticleManager::Update() {
 					zBillboardMatrix.m[0][2] = 0.0f; // X軸成分をゼロにする
 					zBillboardMatrix.m[1][2] = 0.0f; // Y軸成分をゼロにする
 
-					worldMatrix = Multiply(MakeScaleMatrix(particle.transform.scale), MakeRotateXYZMatrix(particle.transform.rotate));
+					worldMatrix = Multiply(MakeScaleMatrix(particle.transform.scale), MakeRotateXYZMatrix({ particle.transform.rotate.x,particle.transform.rotate.y,0.0f }));
 					worldMatrix = Multiply(worldMatrix, zBillboardMatrix);
 					worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform.translate));
 
