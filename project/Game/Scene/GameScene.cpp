@@ -21,7 +21,7 @@ void GameScene::Initialize() {
 	obj3dCommon = std::make_unique<Object3dCommon>();
 	player_ = std::make_unique<Player>();
 	field_ = std::make_unique<Field>();
-	followCamera_ = std::make_unique<FollowCamera>();
+	gameCamera_ = std::make_unique<GameCamera>();
 
 	///-------------------------------------------------------------
 	///　初期化
@@ -29,9 +29,9 @@ void GameScene::Initialize() {
 	obj3dCommon->Initialize();
 	field_->Initialize();
 	player_->Initialize();
-	followCamera_->Initialize();
+	gameCamera_->Initialize();
 
-	followCamera_->SetTarget(&player_->GetTrans());
+	gameCamera_->SetTarget(&player_->GetTrans());
 	
 
 }
@@ -45,7 +45,7 @@ void GameScene::Update() {
 	///-------------------------------------------------------------- 
 	field_->Update();
 	player_->Update();
-	followCamera_->Update();
+	gameCamera_->Update();
 
 	ParticleManager::GetInstance()->Update();
 

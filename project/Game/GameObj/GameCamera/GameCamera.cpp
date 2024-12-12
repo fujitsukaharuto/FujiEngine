@@ -1,18 +1,18 @@
-#include "FollowCamera.h"
+#include "GameCamera.h"
 #include "Input/Input.h"
 #include "Camera/CameraManager.h"
 #include "DX/FPSKeeper.h"
 
-FollowCamera::FollowCamera() {
+GameCamera::GameCamera() {
 }
 
-FollowCamera::~FollowCamera() {
+GameCamera::~GameCamera() {
 }
 
-void FollowCamera::Initialize() {
+void GameCamera::Initialize() {
 }
 
-void FollowCamera::Update() {
+void GameCamera::Update() {
 
     XINPUT_STATE pad;
     Camera* camera = CameraManager::GetInstance()->GetCamera();
@@ -35,12 +35,12 @@ void FollowCamera::Update() {
     camera->UpdateMaterix();
 }
 
-void FollowCamera::SetTarget(const Trans* target) {
+void GameCamera::SetTarget(const Trans* target) {
     target_ = target;
     Reset();
 }
 
-void FollowCamera::Reset() {
+void GameCamera::Reset() {
     Camera* camera = CameraManager::GetInstance()->GetCamera();
     if (target_) {
         interTarget_ = target_->translate;
@@ -52,7 +52,7 @@ void FollowCamera::Reset() {
     camera->transform.translate = interTarget_ + offset;
 }
 
-Vector3 FollowCamera::OffsetCal() const {
+Vector3 GameCamera::OffsetCal() const {
     Vector3 offset = { 0.0f, 6.0f, -55.0f };
 
     Camera* camera = CameraManager::GetInstance()->GetCamera();

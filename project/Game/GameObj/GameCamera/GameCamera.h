@@ -2,10 +2,10 @@
 #include "Math/MatrixCalculation.h"
 
 
-class FollowCamera {
+class GameCamera {
 public:
-	FollowCamera();
-	~FollowCamera();
+	GameCamera();
+	~GameCamera();
 
 public:
 
