@@ -29,16 +29,16 @@ void Camera::Update() {
 	ImGui::End();
 
 #endif // _DEBUG
-	shakeGap = { 0.0f,0.0f,0.0f };
+	shakeGap_ = { 0.0f,0.0f,0.0f };
 	
 	if (shakeTime_ > 0.0f) {
-		shakeGap = Random::GetVector3({ -0.5f,0.5f }, { -0.5f,0.5f }, { -0.5f,0.5f });
-		shakeGap.z = 0.0f;
-		shakeGap = shakeGap * shakeStrength_;
+		shakeGap_ = Random::GetVector3({ -0.5f,0.5f }, { -0.5f,0.5f }, { -0.5f,0.5f });
+		shakeGap_.z = 0.0f;
+		shakeGap_ = shakeGap_ * shakeStrength_;
 		shakeTime_ -= FPSKeeper::DeltaTime();
 	}
 
-	worldMatrix_ = MakeAffineMatrix(transform.scale, transform.rotate, (transform.translate + shakeGap));
+	worldMatrix_ = MakeAffineMatrix(transform.scale, transform.rotate, (transform.translate + shakeGap_));
 	viewMatrix_ = Inverse(worldMatrix_);
 
 #ifdef _DEBUG

@@ -47,5 +47,5 @@ private:
 
 	float shakeTime_;
 	float shakeStrength_;
-	Vector3 shakeGap;
+	Vector3 shakeGap_;
 };
