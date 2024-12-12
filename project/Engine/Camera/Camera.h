@@ -13,6 +13,7 @@ public:
 	void Update();
 	void UpdateMaterix();
 
+
 	void SetFovY(float fov) { fovY_ = fov; }
 	void SetAspect(float width, float height) { aspect_ = width / height; }
 	void SetNearClip(float clip) { nearClip_ = clip; }
@@ -48,7 +49,5 @@ private:
 
 	float shakeTime_;
 	float shakeStrength_;
-
 	Vector3 shakeGap_;
-
 };
