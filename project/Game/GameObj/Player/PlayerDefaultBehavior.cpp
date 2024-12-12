@@ -26,7 +26,7 @@ void PlayerDefaultBehavior::Move() {
 		bool ismoving = false;
 
 		Vector2 padStickL = Input::GetInstance()->GetLStick();
-		Vector3 velo = { padStickL.x / SHRT_MAX, 0, padStickL.y / SHRT_MAX };
+		Vector3 velo = { padStickL.x / SHRT_MAX, 0.0f, padStickL.y / SHRT_MAX };
 
 		if (velo.Length() > threshold) {
 			ismoving = true;
