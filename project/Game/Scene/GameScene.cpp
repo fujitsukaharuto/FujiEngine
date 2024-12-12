@@ -1,7 +1,5 @@
 #include "GameScene.h"
-#include "ImGuiManager.h"
-#include "GlobalVariables.h"
-#include "FPSKeeper.h"
+#include"Camera/CameraManager.h"
 
 #include "Particle/ParticleManager.h"
 #include "Scene/SceneManager.h"
@@ -29,6 +27,11 @@ void GameScene::Initialize() {
 	obj3dCommon->Initialize();
 	field_->Initialize();
 	player_->Initialize();
+
+	
+	CameraManager::GetInstance()->GetCamera()->transform.translate.y = 36.0f;
+	CameraManager::GetInstance()->GetCamera()->transform.translate.z = -118.0f;
+	CameraManager::GetInstance()->GetCamera()->transform.rotate.x = 0.2f;
 }
 
 void GameScene::Update() {

@@ -47,8 +47,8 @@ private:
 
 
 	/// jump
-	float jumpSpeed_;	/// ジャンプスピード
-	float muzzelJumpSpeed_;	/// ジャンプ
+	
+	float muzzelJumpSpeed_;	/// 初期ジャンプ
 	const float jumpLimit_ = -1.2f;
 
 	// fall

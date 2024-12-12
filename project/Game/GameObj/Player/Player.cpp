@@ -42,7 +42,7 @@ Player::Player() {}
 /// ===================================================
 void Player::Initialize() {
 
-	jumpSpeed_ = 0.0f;
+	
 	muzzelJumpSpeed_ = 1.5f;
 
 	OriginGameObject::Initialize();
@@ -79,8 +79,7 @@ void Player::Update() {
 void Player::Fall() {
 	if (!dynamic_cast<PlayerJump*>(behavior_.get())) {
 	
-		// 移動
-		
+		// 移動	
 		model_->transform.translate.y += fallSpeed_;
 		// 重力加速度
 		const float kGravityAcceleration = 3.4f * FPSKeeper::DeltaTime();
