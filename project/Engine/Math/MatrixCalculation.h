@@ -5,14 +5,10 @@
 
 #include "Vector2.h"
 #include "Vector3.h"
+#include"Vector4.h"
 #include "Vector2Matrix.h"
 
-struct Vector4 {
-	float x;
-	float y;
-	float z;
-	float w;
-};
+
 
 struct Trans {
 	Vector3 scale;

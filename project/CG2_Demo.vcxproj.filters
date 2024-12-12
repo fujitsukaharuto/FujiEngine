@@ -179,6 +179,27 @@
     <ClCompile Include="Engine\Math\Quaternion.cpp">
       <Filter>Engine\Math</Filter>
     </ClCompile>
+    <ClCompile Include="Game\GameObj\Player\Player.cpp">
+      <Filter>Game\GameObj\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameObj\PlayerBehavior\BasePlayerBehavior.cpp">
+      <Filter>Game\Behavior\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameObj\PlayerBehavior\PlayerJump.cpp">
+      <Filter>Game\Behavior\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameObj\PlayerBehavior\PlayerRoot.cpp">
+      <Filter>Game\Behavior\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Math\Vector4.cpp">
+      <Filter>Engine\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Math\Easing.cpp">
+      <Filter>Engine\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Math\MathFunction.cpp">
+      <Filter>Engine\Math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -373,6 +394,27 @@
     <ClInclude Include="Engine\Math\Quaternion.h">
       <Filter>Engine\Math</Filter>
     </ClInclude>
+    <ClInclude Include="Game\GameObj\Player\Player.h">
+      <Filter>Game\GameObj\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\PlayerBehavior\BasePlayerBehavior.h">
+      <Filter>Game\Behavior\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\PlayerBehavior\PlayerJump.h">
+      <Filter>Game\Behavior\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\PlayerBehavior\PlayerRoot.h">
+      <Filter>Game\Behavior\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Math\Vector4.h">
+      <Filter>Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Math\Easing.h">
+      <Filter>Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Math\MathFunction.h">
+      <Filter>Engine\Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -449,6 +491,12 @@
     </Filter>
     <Filter Include="Game\GameObj\Enemy">
       <UniqueIdentifier>{75f61a48-bc79-46a6-b1ec-ceee4a1b817f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Behavior">
+      <UniqueIdentifier>{333622ee-7f2c-4e7f-95ca-83fbf231643b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Behavior\Player">
+      <UniqueIdentifier>{2f9dd270-714f-481d-8867-8534b4588c4c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

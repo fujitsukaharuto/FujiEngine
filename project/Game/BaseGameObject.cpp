@@ -8,10 +8,12 @@ void BaseGameObject::Initialize() {
 }
 
 void BaseGameObject::Update() {
+
 }
 
 void BaseGameObject::Draw(Material* mate) {
 	model_->Draw(mate);
+
 }
 
 #ifdef _DEBUG

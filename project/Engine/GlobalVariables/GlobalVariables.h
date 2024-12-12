@@ -1,83 +1,117 @@
 #pragma once
-#include <variant>
+#include "Vector3.h"
+#include "Vector2.h"
+#include "Vector4.h"
+/// std
 #include <map>
+#include <string>
+#include <variant>
+#include<stack>
 #include <json.hpp>
-#include "MatrixCalculation.h"
 
 class GlobalVariables {
 public:
-	static GlobalVariables* GetInstance();
+    enum class WidgetType {
+        SliderInt,
+        DragFloat,
+        DragFloat2,
+        DragFloat3,
+        DragFloat4,
+        Checkbox,
+        ColorEdit4,
+        SlideAngle,
+    };
+    // 描画設定用の構造体
+    struct DrawSettings {
 
-	struct Item {
-		std::variant<int32_t, float, Vector3> value;
-	};
-
-	struct Group {
-		std::map<std::string, Item> items;
-	};
-
-	// 全データ
-	std::map<std::string, Group> datas_;
-
-	/// <summary>
-	/// グループの作成
-	/// </summary>
-	/// <param name="groupName">グループ名</param>
-	void CreateGroup(const std::string& groupName);
-
-	// 値のセット(int)
-	void SetValue(const std::string& groupName, const std::string& key, int32_t value);
-	// 値のセット(float)
-	void SetValue(const std::string& groupName, const std::string& key, float value);
-	// 値のセット(Vector3)
-	void SetValue(const std::string& groupName, const std::string& key, Vector3 value);
-
-	/// <summary>
-	/// ファイルに書き出し
-	/// </summary>
-	/// <param name="groupName">グループ</param>
-	void SaveFile(const std::string& groupName);
-
-	/// <summary>
-	/// ディレクトリの全ファイル読み込み
-	/// </summary>
-	void LoadFiles();
-
-	/// <summary>
-	/// ファイルから読み込む
-	/// </summary>
-	/// <param name="groupName">グループ</param>
-	void LoadFile(const std::string& groupName);
-
-	// 項目の追加(int)
-	void AddItem(const std::string& groupName, const std::string& key, int32_t value);
-	// 項目の追加(float)
-	void AddItem(const std::string& groupName, const std::string& key, float value);
-	// 項目の追加(Vector3)
-	void AddItem(const std::string& groupName, const std::string& key, Vector3& value);
-
-	// 値の取得
-	int32_t GetIntValue(const std::string& groupName, const std::string& key) const;
-	float GetFloatValue(const std::string& groupName, const std::string& key) const;
-	Vector3 GetVector3Value(const std::string& groupName, const std::string& key) const;
-
-	/// <summary>
-	/// 毎フレーム処理
-	/// </summary>
-	void Update();
-
-
-	//グローバル変数の保存先ファイルパス
-	const std::string kDirectoryPath = "resource/GlobalVariables/";
-
+        WidgetType widgetType;       // 使用するImGuiウィジェットの種類
+        float minValue = 0.0f;       // 最小値 (必要に応じて)
+        float maxValue = 100.0f;       // 最大値 (必要に応じて)
+        std::string treeNodeLabel;   // TreeNodeの場合のラベル (必要に応じて)
+    };
 
 private:
-	GlobalVariables() = default;
-	~GlobalVariables() = default;
-	GlobalVariables(const GlobalVariables&) = delete;
-	GlobalVariables& operator=(const GlobalVariables&) = delete;
 
+    /// 格納できる複数の値の型を定義
+    using Item = std::variant
+        <int32_t, uint32_t, float, Vector2, Vector3, Vector4, bool>;
 
-	using json = nlohmann::json;
+    using Parameter = std::pair<Item, DrawSettings>; // 値と描画設定をペアにする
+    using Group = std::map<std::string, Parameter>;  // パラメータ名とペア
 
+    /// json
+    using json = nlohmann::json;
+
+    /// 
+    bool isLoading_;
+
+private:
+
+    ///=================================================================================
+    ///private variant
+    ///=================================================================================
+
+    // グループ名(キー)とグループのデータ
+    std::unordered_map<std::string, Group> datas_;
+
+    // 値が変更されたかどうかのフラグ
+    std::unordered_map<std::string, bool> isValueChanged_;
+
+    /// グループごとの可視性フラグを管理
+    std::unordered_map<std::string, bool> visibilityFlags_;
+
+    // データを保存する際のディレクトリパス
+    const std::string kDirectoryPath = "Resources/GlobalParameter/";
+
+    std::stack<std::string> treeNodeStack_;
+
+public:
+
+    static GlobalVariables* GetInstance();
+
+    ///=================================================================================
+   ///public method
+   ///=================================================================================
+
+    ///　　更新
+    void Update();
+
+    // 新しいグループを作成
+    void CreateGroup(const std::string& groupName, const bool& isVisible);
+
+    // ツリーのノード追加
+    void AddSeparatorText(const std::string& nodeName);
+
+    // ツリーのノードを閉じる
+    void AddTreePoP();
+
+    void DrawGroup(Group& group);
+
+    void DrawWidget(const std::string& itemName, Item& item, const DrawSettings& drawSettings);
+
+    // 値を設定する
+    template<typename T> void SetValue(const std::string& groupName, const std::string& key, T value, WidgetType widgetType);
+
+    // 新しいアイテムをグループに追加する
+    template<typename T> void AddItem(const std::string& groupName, const std::string& key, T value, WidgetType widgetType);
+
+    // 値を取得する
+    template<typename T> T GetValue(const std::string& groupName, const std::string& key) const;
+
+    // ------------------------------------------------------------------------------
+    // ファイルへの保存・読み込み
+    // ------------------------------------------------------------------------------
+
+    void ParmSaveForImGui(const std::string& groupName);
+
+    // すべてのグループのデータをファイルから読み込む
+    void LoadFiles();
+
+    // 特定のグループのデータをファイルから読み込む
+    void LoadFile(const std::string& groupName);
+
+private:
+    // 特定のグループのデータをファイルに保存する
+    void SaveFile(const std::string& groupName);
+    void ParmLoadForImGui(const std::string& groupName);
 };
