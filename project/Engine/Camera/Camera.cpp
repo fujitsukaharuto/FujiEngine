@@ -60,15 +60,15 @@ void Camera::UpdateMaterix() {
 	worldMatrix_ = MakeAffineMatrix(transform.scale, transform.rotate, (transform.translate + shakeGap_));
 	viewMatrix_ = Inverse(worldMatrix_);
 
-#ifdef DEBUG
+#ifdef _DEBUG
 
 	if (CameraManager::GetInstance()->GetDebugMode()) {
 
-		viewMatrix = DebugCamera::GetInstance()->GetViewMatrix();
+		viewMatrix_ = DebugCamera::GetInstance()->GetViewMatrix();
 
 	}
 
-#endif // DEBUG
+#endif //_DEBUG
 
 	projectionMatrix_ = MakePerspectiveFovMatrix(fovY_, aspect_, nearClip_, farClip_);
 	viewProjectionMatrix_ = Multiply(viewMatrix_, projectionMatrix_);
