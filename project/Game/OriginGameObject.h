@@ -12,9 +12,9 @@ public:
 	virtual void Update();
 	virtual void Draw(Material* mate = nullptr);
 
-#ifdef _DEBUG
+
 	virtual void Debug();
-#endif // _DEBUG
+
 
 public:
 

@@ -3,11 +3,15 @@
 #include"PlayerJump.h"
 
 /// boss
-#include"Game/Player/Player.h"
+#include"GameObj/Player/Player.h"
 /// frame
-#include"myEngine/Frame/Frame.h"
+#include"DX/FPSKeeper.h"
 /// inupt
-#include"myEngine/input/Input.h"
+#include"Input/Input.h"
+
+
+#include<imgui.h>
+
 
 //初期化
 PlayerRoot::PlayerRoot(Player* boss)
@@ -36,7 +40,8 @@ void PlayerRoot::Update() {
 
 
 void  PlayerRoot::Debug() {
+#ifdef _DEBUG
 	ImGui::Text("Root");
-	
+#endif // _DEBUG	
 }
 

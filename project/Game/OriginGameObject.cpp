@@ -14,10 +14,13 @@ void OriginGameObject::Draw(Material* mate) {
 	model_->Draw(mate);
 }
 
-#ifdef _DEBUG
+
 void OriginGameObject::Debug() {
-}
+#ifdef _DEBUG
+
 #endif // _DEBUG
+}
+
 
 void OriginGameObject::SetModel(const std::string& name) {
 	model_->Create(name);

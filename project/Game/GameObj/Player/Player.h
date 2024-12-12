@@ -6,13 +6,13 @@
 
 /// behavior
 #include"GameObj/PlayerBehavior/BasePlayerBehavior.h"
-#include"Game/BaseGameObject.h"
+#include"Game/OriginGameObject.h"
 
 /// <summary>
 /// プレイヤークラス
 /// </summary>
 class Boss;
-class Player :public BaseGameObject {
+class Player :public OriginGameObject {
 
 private:
 	/// other class
@@ -61,9 +61,9 @@ public:
 	/// ===================================================
 
 	//* 初期化、更新、
-	void Init();
-	void Update();
-	void Draw();
+	void Initialize()override;
+	void Update()override;
+	void Draw(Material* mate = nullptr)override;
 
 	///* 移動
 	void Move(const float& speed);
@@ -76,8 +76,8 @@ public:
 	void Fall();
 	void ChangeBehavior(std::unique_ptr<BasePlayerBehavior>behavior);
 
-	void Debug();
-
+	void Debug()override;
+	
 	/// ダメージ
 	void DamageRendition();
 	void TakeDamage();

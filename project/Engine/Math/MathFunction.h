@@ -3,16 +3,16 @@
 #include"Vector2.h"
 #include <vector>
 
-float Lerp(const float& start, const float& end, float t);
-
-Vector2 Lerp(const Vector2& start, const Vector2& end, float t);
-
-Vector3 Lerp(const Vector3& start, const Vector3& end, float t);
-
-Vector3 SLerp(const Vector3& start, const Vector3& end, float t);
-
-float Clamp(float n, float min, float max);
-size_t Clamp(size_t n, size_t min, size_t max);
+//float Lerp(const float& start, const float& end, float t);
+//
+//Vector2 Lerp(const Vector2& start, const Vector2& end, float t);
+//
+//Vector3 Lerp(const Vector3& start, const Vector3& end, float t);
+//
+//Vector3 SLerp(const Vector3& start, const Vector3& end, float t);
+////
+//float Clamp(float n, float min, float max);
+//size_t Clamp(size_t n, size_t min, size_t max);
 
 
 /// <summary>///
@@ -44,4 +44,4 @@ Vector3 toDegree(const Vector3& radians);
 
 Vector3 toRadian(const Vector3& degrees);
 
-float LerpShortAngle(float a, float b, float t);
+//float LerpShortAngle(float a, float b, float t);

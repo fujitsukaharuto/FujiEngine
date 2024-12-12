@@ -4,10 +4,11 @@
 #include"DX/FPSKeeper.h"
 
 ///*input
-#include"Input/Input.h"
+#include"GameObj/JoyState/JoyState.h"
 
 ///* math
-#include"MathFunction.h"
+#include"Vector2Matrix.h"
+
 
 ///*camera
 #include"Camera/CameraManager.h"
@@ -17,7 +18,7 @@
 #include"GameObj/PlayerBehavior/PlayerJump.h"
 
 /////* obj
-//#include"fi"
+#include"Field/Field.h"
 
 ///* std
 #include<algorithm>
@@ -35,17 +36,26 @@ float Player::InitY_ = 0.5f;
 
 Player::Player() {}
 
-//初期化
-void Player::Init() {
+
+/// ===================================================
+///  初期化
+/// ===================================================
+void Player::Initialize() {
 
 	jumpSpeed_ = 0.0f;
 	muzzelJumpSpeed_ = 1.5f;
+
+	OriginGameObject::Initialize();
+	OriginGameObject::SetModel("player.obj");
 
 	/// 通常モードから
 	ChangeBehavior(std::make_unique<PlayerRoot>(this));
 }
 
-/// 更新
+
+/// ===================================================
+///  更新処理
+/// ===================================================
 void Player::Update() {
 	/*prePos_ = GetWorldPosition();*/
 
@@ -59,9 +69,13 @@ void Player::Update() {
 	Fall();
 
 	/// 更新
-	BaseGameObject::Update();
+	//base::Update();
 }
 
+
+/// ===================================================
+///  落ちる
+/// ===================================================
 void Player::Fall() {
 	if (!dynamic_cast<PlayerJump*>(behavior_.get())) {
 	
@@ -73,7 +87,7 @@ void Player::Fall() {
 		// 加速度ベクトル
 		float accelerationY = -kGravityAcceleration;
 		// 加速する
-		//fallSpeed_ =/* max(fallSpeed_ + accelerationY, -0.75f);*/
+		fallSpeed_ = max(fallSpeed_ + accelerationY, -0.75f);
 
 		// 着地
 		if (model_->transform.translate.y <= Player::InitY_) {
@@ -83,12 +97,19 @@ void Player::Fall() {
 }
 
 
-/// 描画
-void Player::Draw() {
 
-	//BaseObject::Draw(viewProjection);
+/// ===================================================
+///  描画
+/// ===================================================
+void Player::Draw(Material* material) {
+
+	OriginGameObject::Draw(material);
 }
 
+
+/// ===================================================
+///  ダメージ演出
+/// ===================================================
 void Player::DamageRendition() {
 	if (isDamage_) {
 		damageTime_ -= FPSKeeper::DeltaTime();
@@ -121,10 +142,8 @@ void Player::DamageRendition() {
 
 
 /// ===================================================
-///  Player Move
+///  移動入力処理
 /// ===================================================
-
-/// 入力処理
 Vector3 Player::GetInputVelocity() {
 	Vector3 velocity = { 0.0f, 0.0f, 0.0f };
 	Input* input = Input::GetInstance();
@@ -143,17 +162,19 @@ Vector3 Player::GetInputVelocity() {
 		velocity.x += 1.0f;  // 右移動
 	}
 
-	//// ジョイスティック入力
-	//XINPUT_STATE joyState;
-	//if (input->GetJoystickState(0, joyState)) {
-	//	velocity.x += (float)joyState.Gamepad.sThumbLX / SHRT_MAX;
-	//	velocity.z += (float)joyState.Gamepad.sThumbLY / SHRT_MAX;
-	//}
+	// ジョイスティック入力
+	if (input->GetGamepadState(joyState)) {
+		velocity.x += (float)joyState.Gamepad.sThumbLX / SHRT_MAX;
+		velocity.z += (float)joyState.Gamepad.sThumbLY / SHRT_MAX;
+	}
 
 	return velocity;
 }
 
-// 移動の処理
+
+/// ===================================================
+///  移動処理
+/// ===================================================
 void Player::Move(const float& speed) {
 
 	/// Inuputから速度代入
@@ -179,29 +200,33 @@ void Player::Move(const float& speed) {
 	}
 }
 
-//動いているか
+
+/// ===================================================
+///  動いているか
+/// ===================================================
 bool Player::GetIsMoving() {
 	Input* input = Input::GetInstance();
 	bool isMoving = false;
 	const float thresholdValue = 0.3f;
 	Vector3 StickVelocity;
-	Vector3 keyBoradVelocity;
+	Vector3 keyBoradVelocity = {};
 
 	///----------------------------------------------------
 	///  JoyStick
 	///----------------------------------------------------
-	//if (Input::GetInstance()->GetGamepadState()) {
-	//	// 移動量
-	//	StickVelocity = { (float)joyState.Gamepad.sThumbLX / SHRT_MAX, 0, (float)joyState.Gamepad.sThumbLY / SHRT_MAX };
-	//	if ((StickVelocity).Lenght() > thresholdValue) {
-	//		isMoving = true;
-	//	}
-	//}
+	
+	if (Input::GetInstance()->GetGamepadState(joyState)) {
+		// 移動量
+		StickVelocity = { (float)joyState.Gamepad.sThumbLX / SHRT_MAX, 0, (float)joyState.Gamepad.sThumbLY / SHRT_MAX };
+		if ((StickVelocity).Length() > thresholdValue) {
+			isMoving = true;
+		}
+	}
 
 	///----------------------------------------------------
 	///  keyBorad
 	///----------------------------------------------------
-	/*else {*/
+	else {
 		// キーボード入力
 		if (input->PushKey(DIK_W)) {
 			keyBoradVelocity.z += 1.0f;  // 前進
@@ -215,10 +240,10 @@ bool Player::GetIsMoving() {
 		if (input->PushKey(DIK_D)) {
 			keyBoradVelocity.x += 1.0f;  // 右移動
 		}
-		if ((keyBoradVelocity).Lenght() > 0) {
+		if ((keyBoradVelocity).Length() > 0) {
 			isMoving = true;
 		}
-	//}
+	}
 	return isMoving;
 }
 
@@ -307,6 +332,9 @@ void Player::ChangeBehavior(std::unique_ptr<BasePlayerBehavior>behavior) {
 	behavior_ = std::move(behavior);
 }
 
+void Player::Debug() {
+
+}
 
 ///=========================================================
 /// Class Set

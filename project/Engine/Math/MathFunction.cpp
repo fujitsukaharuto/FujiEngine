@@ -2,89 +2,90 @@
 #include <cmath>
 #include<numbers>
 #include<assert.h>
+#include<algorithm>
 
-float Lerp(const float& start, const float& end, float t) {
-	return (1.0f - t) * start + end * t;
-}
+//float Lerp(const float& start, const float& end, float t) {
+//	return (1.0f - t) * start + end * t;
+//}
+//
+//Vector2 Lerp(const Vector2& start, const Vector2& end, float t) {
+//	Vector2 result;
+//	result.x = (1.0f - t) * start.x + end.x * t;
+//	result.y = (1.0f - t) * start.y + end.y * t;
+//	return result;
+//}
+//
+//
+//Vector3 Lerp(const Vector3& start, const Vector3& end, float t) {
+//	Vector3 result;
+//	result.x = (1.0f - t) * start.x + end.x * t;
+//	result.y = (1.0f - t) * start.y + end.y * t;
+//	result.z = (1.0f - t) * start.z + end.z * t;
+//	return result;
+//}
+//
+//
+//Vector3 SLerp(const Vector3& start, const Vector3& end, float t) {
+//	// ベクトルの正規化
+//	Vector3 Nstart = (start).Normalize();
+//	Vector3 Nend = (end).Normalize();
+//
+//	// 内積を求める
+//	float dot =(Nstart*Nend);
+//
+//	// ドット積の誤差補正
+//	if (dot > 1.0f) {
+//		dot = 1.0f;
+//	}
+//	else if (dot < -1.0f) {
+//		dot = -1.0f;
+//	}
+//
+//	// 角度θをアークコサインで求める
+//	float theta = std::acos(dot);
+//
+//	// もしθが非常に小さい（つまりベクトルがほぼ同じ方向）なら、線形補間を使う
+//	if (std::abs(theta) < 1.0e-5) {
+//		return Lerp(start, end, t);  // 線形補間で十分
+//	}
+//
+//	// sinθを求める
+//	float sinTheta = std::sin(theta);
+//	float sinThetaFrom = std::sin((1 - t) * theta);
+//	float sinThetaTo = std::sin(t * theta);
+//
+//	// 球面線形補間したベクトル（単位ベクトル）
+//	Vector3 NormalizeVector = (sinThetaFrom * Nstart + sinThetaTo * Nend) / sinTheta;
+//
+//	// ベクトルの長さを線形補間
+//	float length1 = (start).Length();
+//	float length2 = (end).Length();
+//	float length = Lerp(length1, length2, t);
+//
+//	// 補間したベクトルに長さを掛けて返す
+//	return NormalizeVector * length;
+//}
+//
 
-Vector2 Lerp(const Vector2& start, const Vector2& end, float t) {
-	Vector2 result;
-	result.x = (1.0f - t) * start.x + end.x * t;
-	result.y = (1.0f - t) * start.y + end.y * t;
-	return result;
-}
-
-
-Vector3 Lerp(const Vector3& start, const Vector3& end, float t) {
-	Vector3 result;
-	result.x = (1.0f - t) * start.x + end.x * t;
-	result.y = (1.0f - t) * start.y + end.y * t;
-	result.z = (1.0f - t) * start.z + end.z * t;
-	return result;
-}
-
-
-Vector3 SLerp(const Vector3& start, const Vector3& end, float t) {
-	// ベクトルの正規化
-	Vector3 Nstart = (start).Normalize();
-	Vector3 Nend = (end).Normalize();
-
-	// 内積を求める
-	float dot =(Nstart*Nend);
-
-	// ドット積の誤差補正
-	if (dot > 1.0f) {
-		dot = 1.0f;
-	}
-	else if (dot < -1.0f) {
-		dot = -1.0f;
-	}
-
-	// 角度θをアークコサインで求める
-	float theta = std::acos(dot);
-
-	// もしθが非常に小さい（つまりベクトルがほぼ同じ方向）なら、線形補間を使う
-	if (std::abs(theta) < 1.0e-5) {
-		return Lerp(start, end, t);  // 線形補間で十分
-	}
-
-	// sinθを求める
-	float sinTheta = std::sin(theta);
-	float sinThetaFrom = std::sin((1 - t) * theta);
-	float sinThetaTo = std::sin(t * theta);
-
-	// 球面線形補間したベクトル（単位ベクトル）
-	Vector3 NormalizeVector = (sinThetaFrom * Nstart + sinThetaTo * Nend) / sinTheta;
-
-	// ベクトルの長さを線形補間
-	float length1 = (start).Lenght();
-	float length2 = (end).Lenght();
-	float length = Lerp(length1, length2, t);
-
-	// 補間したベクトルに長さを掛けて返す
-	return NormalizeVector * length;
-}
-
-
-float Clamp(float n, float min, float max) {
-	if (n > max) {
-		return max;
-	}
-	if (n < min) {
-		return min;
-	}
-	return n;
-}
-
-size_t Clamp(size_t n, size_t min, size_t max) {
-	if (n > max) {
-		return max;
-	}
-	if (n < min) {
-		return min;
-	}
-	return n;
-}
+//float Clamp(float n, float min, float max) {
+//	if (n > max) {
+//		return max;
+//	}
+//	if (n < min) {
+//		return min;
+//	}
+//	return n;
+//}
+//
+//size_t Clamp(size_t n, size_t min, size_t max) {
+//	if (n > max) {
+//		return max;
+//	}
+//	if (n < min) {
+//		return min;
+//	}
+//	return n;
+//}
 
 Vector3 CatmullRomInterpolation(const Vector3& p0, const Vector3& p1, const Vector3 p2, const Vector3& p3, float t) {
 	Vector3 result;
@@ -124,11 +125,11 @@ Vector3 CatmullRomPosition(const std::vector<Vector3>& points, float t) {
 	// 区間内の始点0.0f、終点を1.0fとした時の現在位置
 	float t_2 = std::fmod(t, areaWidth) * division;
 	// 下限(0.0f)と上限(1.0f)とした時の現在位置
-	t_2 = Clamp(t_2, 0.0f, 1.0f);
+	t_2 = std::clamp(t_2, 0.0f, 1.0f);
 	// 区間番号
 	size_t index = static_cast<size_t>(t / areaWidth);
 	// 区間番号が上限を超えないように収める
-	index = Clamp(index, 0, division - 1);
+	index = std::clamp(int(index), 0, int(division - 1));
 
 	// 4点分のインデックス
 	size_t index0 = index - 1;
@@ -182,18 +183,18 @@ Vector3 toDegree(const Vector3& radians) {
 	};
 }
 
-float LerpShortAngle(float a, float b, float t) {
-	// 角度差分を求める
-	float diff = b - a;
-	float pi = 3.141592f;
-	// 角度を[-2PI,+2PI]に補正する
-	diff = std::fmodf(diff, 2.0f * pi);
-	// 角度を[-PI,PI]に補正する
-	if (diff > pi) {
-		diff -= 2.0f * pi;
-	}
-	else if (diff < -pi) {
-		diff += 2.0f * pi;
-	}
-	return a + diff * t;
-}
+//float LerpShortAngle(float a, float b, float t) {
+//	// 角度差分を求める
+//	float diff = b - a;
+//	float pi = 3.141592f;
+//	// 角度を[-2PI,+2PI]に補正する
+//	diff = std::fmodf(diff, 2.0f * pi);
+//	// 角度を[-PI,PI]に補正する
+//	if (diff > pi) {
+//		diff -= 2.0f * pi;
+//	}
+//	else if (diff < -pi) {
+//		diff += 2.0f * pi;
+//	}
+//	return a + diff * t;
+//}

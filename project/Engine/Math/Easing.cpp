@@ -1,6 +1,6 @@
 
 #include "Easing.h"
-#include"MathFunction.h"
+#include"MatrixCalculation.h"
 ///std
 #include<numbers>
 #include <cmath>
