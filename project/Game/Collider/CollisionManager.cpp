@@ -13,34 +13,44 @@ void CollisionManager::CheckCollisionPair(BaseCollider* A, BaseCollider* B) {
 	AABBCollider* aabbB = dynamic_cast<AABBCollider*>(B);
 
 	if (aabbA && aabbB) {
+		bool isColliding = checkAABBCollision(aabbA, aabbB);
 
-		CollisionState a = aabbA->GetState();
-		CollisionState b = aabbB->GetState();
+		auto& hitListA = aabbA->hitList_;
+		auto& hitListB = aabbB->hitList_;
 
-		if (checkAABBCollision(aabbA, aabbB)) {
-			if (a == CollisionState::None || b == CollisionState::None) {
+		if (isColliding) {
+			// AとBが初めて衝突した場合
+			if (std::find(hitListA.begin(), hitListA.end(), B) == hitListA.end()) {
+				hitListA.push_back(B);
 				aabbA->SetState(CollisionState::collisionEnter);
+			}
+			else {
+				aabbA->SetState(CollisionState::collisionStay);
+			}
+
+			if (std::find(hitListB.begin(), hitListB.end(), A) == hitListB.end()) {
+				hitListB.push_back(A);
 				aabbB->SetState(CollisionState::collisionEnter);
 			}
-			else if (a == CollisionState::collisionEnter || b == CollisionState::collisionEnter) {
-				aabbA->SetState(CollisionState::collisionStay);
+			else {
 				aabbB->SetState(CollisionState::collisionStay);
 			}
 		}
 		else {
-			if ((a == CollisionState::collisionStay || b == CollisionState::collisionStay)
-				|| (a == CollisionState::collisionEnter || b == CollisionState::collisionEnter)) {
+			// 衝突が終了した場合
+			if (std::find(hitListA.begin(), hitListA.end(), B) != hitListA.end()) {
+				hitListA.remove(B);
 				aabbA->SetState(CollisionState::collisionExit);
-				aabbB->SetState(CollisionState::collisionExit);
 			}
-			else {
-				aabbA->SetState(CollisionState::None);
-				aabbB->SetState(CollisionState::None);
+			if (std::find(hitListB.begin(), hitListB.end(), A) != hitListB.end()) {
+				hitListB.remove(A);
+				aabbB->SetState(CollisionState::collisionExit);
 			}
 		}
 
-		aabbA->OnCollision({ B->GetTag(),B->GetPos() });
-		aabbB->OnCollision({ A->GetTag(),A->GetPos() });
+		// 衝突情報を通知
+		aabbA->OnCollision({ B->GetTag(), B->GetPos() });
+		aabbB->OnCollision({ A->GetTag(), A->GetPos() });
 	}
 
 }

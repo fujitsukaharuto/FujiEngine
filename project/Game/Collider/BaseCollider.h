@@ -32,6 +32,10 @@ public:
 	const std::string GetTag()const { return info.tag; }
 	const Vector3 GetPos()const { return info.pos; }
 
+
+
+	std::list<BaseCollider*> hitList_;
+
 protected:
 	ColliderInfo info;
 
