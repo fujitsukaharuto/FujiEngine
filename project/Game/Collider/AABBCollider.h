@@ -12,6 +12,7 @@ public:
 	// stateによって呼び出す関数を決める
 	void OnCollision(const ColliderInfo& other);
 
+	// 衝突判定
 	void OnCollisionEnter(const ColliderInfo& other)override;
 	void OnCollisionStay(const ColliderInfo& other)override;
 	void OnCollisionExit(const ColliderInfo& other)override;
