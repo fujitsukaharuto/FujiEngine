@@ -57,7 +57,7 @@ void Camera::Update() {
 }
 
 void Camera::UpdateMaterix() {
-	worldMatrix_ = MakeAffineMatrix(transform.scale, transform.rotate, (transform.translate + shakeGap));
+	worldMatrix_ = MakeAffineMatrix(transform.scale, transform.rotate, (transform.translate + shakeGap_));
 	viewMatrix_ = Inverse(worldMatrix_);
 
 #ifdef _DEBUG
