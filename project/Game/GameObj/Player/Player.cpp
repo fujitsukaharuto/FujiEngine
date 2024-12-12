@@ -332,7 +332,12 @@ void Player::ChangeBehavior(std::unique_ptr<BasePlayerBehavior>behavior) {
 }
 
 void Player::Debug() {
-
+#ifdef _DEBUG
+	if (ImGui::TreeNode("Player")) {
+		OriginGameObject::Debug();
+		ImGui::TreePop();
+	}
+#endif
 }
 
 ///=========================================================

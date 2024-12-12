@@ -4,6 +4,7 @@
 #include "Particle/ParticleManager.h"
 #include "Scene/SceneManager.h"
 
+#include<imgui.h>
 
 
 GameScene::GameScene() {}
@@ -20,6 +21,7 @@ void GameScene::Initialize() {
 	obj3dCommon = std::make_unique<Object3dCommon>();
 	player_ = std::make_unique<Player>();
 	field_ = std::make_unique<Field>();
+	followCamera_ = std::make_unique<FollowCamera>();
 
 	///-------------------------------------------------------------
 	///　初期化
@@ -27,20 +29,23 @@ void GameScene::Initialize() {
 	obj3dCommon->Initialize();
 	field_->Initialize();
 	player_->Initialize();
+	followCamera_->Initialize();
 
+	followCamera_->SetTarget(&player_->GetTrans());
 	
-	CameraManager::GetInstance()->GetCamera()->transform.translate.y = 36.0f;
-	CameraManager::GetInstance()->GetCamera()->transform.translate.z = -118.0f;
-	CameraManager::GetInstance()->GetCamera()->transform.rotate.x = 0.2f;
+
 }
 
 void GameScene::Update() {
+
+	Debug();
 
 	///-------------------------------------------------------------
 	///　更新
 	///-------------------------------------------------------------- 
 	field_->Update();
 	player_->Update();
+	followCamera_->Update();
 
 	ParticleManager::GetInstance()->Update();
 
@@ -87,3 +92,9 @@ void GameScene::Draw() {
 
 }
 
+void GameScene::Debug() {
+	ImGui::Begin("PositionDebug");
+	player_->Debug();
+	ImGui::End();
+
+}

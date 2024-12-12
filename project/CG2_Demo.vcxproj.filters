@@ -206,6 +206,9 @@
     <ClCompile Include="Game\Field\Field.cpp">
       <Filter>Game\Field</Filter>
     </ClCompile>
+    <ClCompile Include="Game\GameObj\FollowCamera\FollowCamera.cpp">
+      <Filter>Game\GameObj\FollowCamera</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -430,6 +433,9 @@
     <ClInclude Include="Game\Field\Field.h">
       <Filter>Game\Field</Filter>
     </ClInclude>
+    <ClInclude Include="Game\GameObj\FollowCamera\FollowCamera.h">
+      <Filter>Game\GameObj\FollowCamera</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -515,6 +521,9 @@
     </Filter>
     <Filter Include="Game\JoyState">
       <UniqueIdentifier>{4d9e2a25-37b9-4495-a24e-c2ede3ca953c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameObj\FollowCamera">
+      <UniqueIdentifier>{0ac72fdb-75dc-4114-828f-a862d4677131}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

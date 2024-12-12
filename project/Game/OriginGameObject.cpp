@@ -1,4 +1,5 @@
 #include "OriginGameObject.h"
+#include<imgui.h>
 
 OriginGameObject::OriginGameObject() {
 }
@@ -16,9 +17,9 @@ void OriginGameObject::Draw(Material* mate) {
 
 
 void OriginGameObject::Debug() {
-#ifdef _DEBUG
 
-#endif // _DEBUG
+	ImGui::DragFloat3("transform", &model_->transform.translate.x);
+
 }
 
 
