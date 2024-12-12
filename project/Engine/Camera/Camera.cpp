@@ -29,7 +29,7 @@ void Camera::Update() {
 	ImGui::End();
 
 #endif // _DEBUG
-	Vector3 shakeGap = { 0.0f,0.0f,0.0f };
+	shakeGap = { 0.0f,0.0f,0.0f };
 	
 	if (shakeTime_ > 0.0f) {
 		shakeGap = Random::GetVector3({ -0.5f,0.5f }, { -0.5f,0.5f }, { -0.5f,0.5f });
