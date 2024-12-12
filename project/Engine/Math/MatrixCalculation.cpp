@@ -519,6 +519,27 @@ Vector3 ExtractEulerAngles(const Matrix4x4& rotationMatrix) {
 	return eulerAngles;
 }
 
+float LerpShortAngle(float a, float b, float t) {
+	const float TWO_PI = 2.0f * (float)std::numbers::pi; // 2π (6.283185307179586)
+	const float PI = (float)std::numbers::pi;            // π (3.141592653589793)
+
+	// 角度差分を求める
+	float diff = b - a;
+
+	// 角度を[-π, π]に補正する
+	diff = fmod(diff, TWO_PI);
+	if (diff > PI) {
+		diff -= TWO_PI;
+	}
+	else if (diff < -PI) {
+		diff += TWO_PI;
+	}
+
+	// Lerpを使用して補間
+	return Lerp(a, a + diff, t);
+
+}
+
 Matrix4x4 MakeLookAtMatrix(const Vector3& forward, const Vector3& up) {
 	Vector3 zAxis = forward.Normalize();  // 視線方向
 	Vector3 xAxis = Cross(up, zAxis).Normalize();  // 右方向
@@ -618,7 +639,7 @@ Matrix4x4 DirectionToDirection(const Vector3& from, const Vector3& to) {
 	float dot = fromNorm * toNorm;
 	float angle = std::acos(dot);
 
-	if (axis.Lenght() < 1e-6f) {
+	if (axis.Length() < 1e-6f) {
 		if (dot > 0.9999f) {
 			result.m[0][0] = result.m[1][1] = result.m[2][2] = result.m[3][3] = 1.0f;
 			return result;

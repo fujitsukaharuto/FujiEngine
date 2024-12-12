@@ -134,7 +134,7 @@
     <ClCompile Include="Engine\GraphicPipeline\ThunderPipe.cpp">
       <Filter>Engine\GraphicPipeline</Filter>
     </ClCompile>
-    <ClCompile Include="Game\BaseGameObject.cpp">
+    <ClCompile Include="Game\OriginGameObject.cpp">
       <Filter>Game</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Model\Line3dDrawer.cpp">
@@ -346,7 +346,7 @@
     <ClInclude Include="Engine\Scene\AbstractSceneFactory.h">
       <Filter>Engine\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Game\BaseGameObject.h">
+    <ClInclude Include="Game\OriginGameObject.h">
       <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Model\Line3dDrawer.h">
@@ -414,6 +414,9 @@
     </ClInclude>
     <ClInclude Include="Engine\Math\MathFunction.h">
       <Filter>Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\OriginState.h">
+      <Filter>Game</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

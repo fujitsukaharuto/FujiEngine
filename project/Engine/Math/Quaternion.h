@@ -25,10 +25,11 @@ public:
 		float halfAngle = angle * 0.5f;
 		float sinHalfAngle = std::sin(halfAngle);
 		float cosHalfAngle = std::cos(halfAngle);
+		Vector3 normAxis = axis.Normalize();
 		return Quaternion(
-			axis.x * sinHalfAngle,
-			axis.y * sinHalfAngle,
-			axis.z * sinHalfAngle,
+			normAxis.x * sinHalfAngle,
+			normAxis.y * sinHalfAngle,
+			normAxis.z * sinHalfAngle,
 			cosHalfAngle
 		);
 	}
@@ -82,19 +83,19 @@ public:
 		Matrix4x4 mat;
 
 		// クォータニオンを使って回転行列を計算
-		mat.m[0][0] = 1 - 2 * (y * y + z * z);
-		mat.m[0][1] = 2 * (x * y - w * z);
-		mat.m[0][2] = 2 * (x * z + w * y);
+		mat.m[0][0] = 1.0f - 2.0f * (y * y + z * z);
+		mat.m[0][1] = 2.0f * (x * y + w * z);
+		mat.m[0][2] = 2.0f * (x * z - w * y);
 		mat.m[0][3] = 0;
 
-		mat.m[1][0] = 2 * (x * y + w * z);
-		mat.m[1][1] = 1 - 2 * (x * x + z * z);
-		mat.m[1][2] = 2 * (y * z - w * x);
+		mat.m[1][0] = 2.0f * (x * y - w * z);
+		mat.m[1][1] = 1.0f - 2.0f * (x * x + z * z);
+		mat.m[1][2] = 2.0f * (y * z + w * x);
 		mat.m[1][3] = 0;
 
-		mat.m[2][0] = 2 * (x * z - w * y);
-		mat.m[2][1] = 2 * (y * z + w * x);
-		mat.m[2][2] = 1 - 2 * (x * x + y * y);
+		mat.m[2][0] = 2.0f * (x * z + w * y);
+		mat.m[2][1] = 2.0f * (y * z - w * x);
+		mat.m[2][2] = 1.0f - 2.0f * (x * x + y * y);
 		mat.m[2][3] = 0;
 
 		mat.m[3][0] = 0;
@@ -116,7 +117,5 @@ public:
 			w * rhs.w - x * rhs.x - y * rhs.y - z * rhs.z  // w
 		);
 	}
-
-
 
 };

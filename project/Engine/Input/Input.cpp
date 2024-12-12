@@ -56,8 +56,8 @@ void Input::Initialize()
 	// デバイスの取得
 	devMouse_->Acquire();
 
-	ZeroMemory(&gamepadState_, sizeof(XINPUT_STATE));
-	ZeroMemory(&gamepadStatePrevious_, sizeof(XINPUT_STATE));
+	ZeroMemory(&pad_.state_, sizeof(XINPUT_STATE));
+	ZeroMemory(&pad_.statePre_, sizeof(XINPUT_STATE));
 
 }
 
@@ -103,16 +103,57 @@ bool Input::TriggerKey(uint8_t keyNumber) const
 
 /// GamePad-----------------------------------
 
-bool Input::GetGamepadState(XINPUT_STATE& out) const
-{
-	out = gamepadState_;
-	return true;
+bool Input::GetGamepadState(XINPUT_STATE& out) const {
+	if (pad_.isConnected_) {
+		out = pad_.state_;
+		return true;
+	}
+	return false;
 }
 
 bool Input::GetGamepadStatePrevious(XINPUT_STATE& out) const
 {
-	out = gamepadStatePrevious_;
-	return true;
+	if (pad_.isConnected_) {
+		out = pad_.statePre_;
+		return true;
+	}
+	return false;
+}
+
+void Input::SetPadDeadZone(int32_t deadZoneL, int32_t deadZoneR) {
+	pad_.deadZoneL_ = deadZoneL;
+	pad_.deadZoneR_ = deadZoneR;
+	//pad = pad_;
+}
+
+Vector2 Input::GetLStick() const {
+	return ApplyDeadZone(pad_.state_.Gamepad.sThumbLX, pad_.state_.Gamepad.sThumbLY, pad_.deadZoneL_);
+}
+
+Vector2 Input::GetRStick() const {
+	return ApplyDeadZone(pad_.state_.Gamepad.sThumbRX, pad_.state_.Gamepad.sThumbRY, pad_.deadZoneR_);
+}
+
+uint8_t Input::GetLTrigger() const {
+	return pad_.state_.Gamepad.bLeftTrigger;
+}
+
+uint8_t Input::GetRTrigger() const {
+	return pad_.state_.Gamepad.bRightTrigger;
+}
+
+bool Input::PressButton(PadInput padInput) const {
+	return (pad_.state_.Gamepad.wButtons & static_cast<WORD>(padInput)) != 0;
+}
+
+bool Input::TriggerButton(PadInput padInput) const {
+	return (!(pad_.statePre_.Gamepad.wButtons & static_cast<WORD>(padInput)) &&
+		(pad_.state_.Gamepad.wButtons & static_cast<WORD>(padInput)));
+}
+
+bool Input::ReleaseButton(PadInput padInput) const {
+	return ((pad_.statePre_.Gamepad.wButtons & static_cast<WORD>(padInput)) &&
+		!(pad_.state_.Gamepad.wButtons & static_cast<WORD>(padInput)));
 }
 
 
@@ -153,6 +194,41 @@ void Input::KeyboardUpdate() {
 }
 
 void Input::GamepadUpdate() {
-	gamepadStatePrevious_ = gamepadState_;
-	XInputGetState(0, &gamepadState_);
+
+	pad_.statePre_ = pad_.state_;
+
+	DWORD dwResult = XInputGetState(0, &pad_.state_);
+	pad_.isConnected_ = (dwResult == ERROR_SUCCESS);
+
+	if (pad_.isConnected_) {
+		// 左スティックのデッドゾーン計算結果をキャッシュ
+		Vector2 currentLStick = ApplyDeadZone(pad_.state_.Gamepad.sThumbLX, pad_.state_.Gamepad.sThumbLY, pad_.deadZoneL_);
+		Vector2 previousLStick = ApplyDeadZone(pad_.statePre_.Gamepad.sThumbLX, pad_.statePre_.Gamepad.sThumbLY, pad_.deadZoneL_);
+		// 左スティックの移動状態を更新
+		isLStickMoving_ = currentLStick.Length() != 0.0f;
+		isPrevLStickMoving_ = previousLStick.Length() != 0.0f;
+
+		// 右スティックのデッドゾーン計算結果をキャッシュ
+		Vector2 currentRStick = ApplyDeadZone(pad_.state_.Gamepad.sThumbRX, pad_.state_.Gamepad.sThumbRY, pad_.deadZoneR_);
+		Vector2 previousRStick = ApplyDeadZone(pad_.statePre_.Gamepad.sThumbRX, pad_.statePre_.Gamepad.sThumbRY, pad_.deadZoneR_);
+		// 右スティックの移動状態を更新
+		isRStickMoving_ = currentRStick.Length() != 0.0f;
+		isPrevRStickMoving_ = previousRStick.Length() != 0.0f;
+	}
+}
+
+Vector2 Input::ApplyDeadZone(int32_t x, int32_t y, int32_t deadZone) const {
+	Vector2 stick;
+
+	float magnitude = sqrtf(static_cast<float>(x) * static_cast<float>(x) + static_cast<float>(y) * static_cast<float>(y));
+	if (magnitude < deadZone) {
+		stick.x = 0.0f;
+		stick.y = 0.0f;
+	}
+	else {
+		stick.x = static_cast<float>(x);
+		stick.y = static_cast<float>(y);
+	}
+
+	return stick;
 }

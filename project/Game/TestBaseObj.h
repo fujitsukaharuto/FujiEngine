@@ -1,12 +1,12 @@
 #pragma once
-#include "Game/BaseGameObject.h"
+#include "Game/OriginGameObject.h"
 #include "ImGuiManager/ImGuiManager.h"
 #include <numbers>
 #include "Game/Collider/BaseCollider.h"
 #include "Game/Collider/AABBCollider.h"
 #include "Model/Line3dDrawer.h"
 
-class TestBaseObj : public BaseGameObject {
+class TestBaseObj : public OriginGameObject {
 public:
 	TestBaseObj();
 	~TestBaseObj()override;
@@ -16,6 +16,9 @@ public:
 	void Draw(Material* mate = nullptr)override;
 
 	void OnCollisionEnter(const ColliderInfo& other);
+	void OnCollisionStay(const ColliderInfo& other);
+	void OnCollisionExit(const ColliderInfo& other);
+
 
 	BaseCollider* GetCollider() { return collider_.get(); }
 
@@ -45,28 +48,39 @@ inline TestBaseObj::~TestBaseObj() {
 }
 
 inline void TestBaseObj::Initialize() {
-	BaseGameObject::Initialize();
+	OriginGameObject::Initialize();
 	model_->Create("suzanne.obj");
 	omega_ = 2.0f * std::numbers::pi_v<float> / 300.0f;
 	collider_ = std::make_unique<AABBCollider>();
 	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
+	collider_->SetCollisionStayCallback([this](const ColliderInfo& other) {OnCollisionStay(other); });
+	collider_->SetCollisionExitCallback([this](const ColliderInfo& other) {OnCollisionExit(other); });
 }
 
 inline void TestBaseObj::Update() {
 	isCollider_ = false;
-	color_ = { 1.0f,1.0f,1.0f,1.0f };
+	
 	collider_->SetPos(model_->GetWorldPos());
 }
 
 inline void TestBaseObj::Draw([[maybe_unused]] Material* mate) {
-	BaseGameObject::Draw(mate);
+	OriginGameObject::Draw(mate);
 }
 
 inline void TestBaseObj::OnCollisionEnter([[maybe_unused]]const ColliderInfo& other) {
 
 	isCollider_ = true;
-	color_ = { 1.0f,0.0f,0.0f,1.0f };
+	color_ = { 0.0f,0.0f,0.0f,1.0f };
 
+}
+
+inline void TestBaseObj::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
+	isCollider_ = true;
+	color_ = { 0.0f,1.0f,1.0f,1.0f };
+}
+
+inline void TestBaseObj::OnCollisionExit([[maybe_unused]] const ColliderInfo& other) {
+	color_ = { 1.0f,0.0f,1.0f,1.0f };
 }
 
 #ifdef _DEBUG

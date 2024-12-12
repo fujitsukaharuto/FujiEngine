@@ -20,6 +20,13 @@ enum ColorType {
 	kRandom,
 };
 
+enum class BillBoardPattern {
+	kXYZBillBoard,
+	kXBillBoard,
+	kYBillBoard,
+	kZBillBoard,
+};
+
 class Particle {
 public:
 	Particle();
@@ -47,6 +54,7 @@ public:
 	Vector4 color = { 1.0f,1.0f,1.0f,1.0f };
 
 	bool isBillBoard_ = true;
+	BillBoardPattern pattern_ = BillBoardPattern::kXYZBillBoard;
 
 private:
 
