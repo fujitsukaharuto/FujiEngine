@@ -48,11 +48,13 @@ public:
 	Vector3 operator/(float k) const { return Vector3(x / k, y / k, z / k); }
 
 
-	float Lenght() const { return std::sqrtf((*this) * (*this)); }
+	float Length() const { return std::sqrtf((*this) * (*this)); }
 	Vector3 Normalize() const {
-		const float leng = Lenght();
+		const float leng = Length();
 		return leng == 0 ? *this : *this / leng;
 	}
+
+	float Dot(const Vector3& other)const { return *this * other; }
 
 	Vector3 Cross(const Vector3& other) const {
 		return {
@@ -63,6 +65,9 @@ public:
 	}
 
 	static Vector3 GetZeroVec() { return { 0.0f,0.0f,0.0f }; }
+	static Vector3 GetUpVec() { return { 0.0f,1.0f,0.0f }; }
+	static float Dot(const Vector3& a, const Vector3& b) { return a * b; }
+	static float Length(const Vector3& a) { return a.Length(); }
 
 };
 

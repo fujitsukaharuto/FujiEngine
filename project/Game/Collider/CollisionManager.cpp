@@ -13,10 +13,34 @@ void CollisionManager::CheckCollisionPair(BaseCollider* A, BaseCollider* B) {
 	AABBCollider* aabbB = dynamic_cast<AABBCollider*>(B);
 
 	if (aabbA && aabbB) {
+
+		CollisionState a = aabbA->GetState();
+		CollisionState b = aabbB->GetState();
+
 		if (checkAABBCollision(aabbA, aabbB)) {
-			aabbA->OnCollisionEnter({ B->GetTag(),B->GetPos() });
-			aabbB->OnCollisionEnter({ A->GetTag(),A->GetPos() });
+			if (a == CollisionState::None || b == CollisionState::None) {
+				aabbA->SetState(CollisionState::collisionEnter);
+				aabbB->SetState(CollisionState::collisionEnter);
+			}
+			else if (a == CollisionState::collisionEnter || b == CollisionState::collisionEnter) {
+				aabbA->SetState(CollisionState::collisionStay);
+				aabbB->SetState(CollisionState::collisionStay);
+			}
 		}
+		else {
+			if ((a == CollisionState::collisionStay || b == CollisionState::collisionStay)
+				|| (a == CollisionState::collisionEnter || b == CollisionState::collisionEnter)) {
+				aabbA->SetState(CollisionState::collisionExit);
+				aabbB->SetState(CollisionState::collisionExit);
+			}
+			else {
+				aabbA->SetState(CollisionState::None);
+				aabbB->SetState(CollisionState::None);
+			}
+		}
+
+		aabbA->OnCollision({ B->GetTag(),B->GetPos() });
+		aabbB->OnCollision({ A->GetTag(),A->GetPos() });
 	}
 
 }
