@@ -13,76 +13,47 @@
 TitleScene::TitleScene() {}
 
 TitleScene::~TitleScene() {
+	delete inputHandler_;
+	if (iCommand_) {
+		delete iCommand_;
+	}
+	delete player_;
 }
 
 void TitleScene::Initialize() {
 	Init();
 
-
 	obj3dCommon.reset(new Object3dCommon());
 	obj3dCommon->Initialize();
 
-	sphere = std::make_unique<Object3d>();
-	sphere->CreateSphere();
 
-	test_ = std::make_unique<TestBaseObj>();
-	test_->Initialize();
-	test_->name_ = "testObj";
+	inputHandler_ = new InputHandler();
 
-	test2_ = std::make_unique<TestBaseObj>();
-	test2_->Initialize();
-	test2_->name_ = "testObj2";
+	inputHandler_->AssignMoveRightCommand2PressKeyD();
+	inputHandler_->AssignMoveLeftCommand2PressKeyA();
 
-	cMane_ = std::make_unique<CollisionManager>();
-
-	emit.name = "sphere";
-	emit.Load("sphere");
+	player_ = new Player();
+	player_->Initialize();
 
 }
 
 void TitleScene::Update() {
 
-	cMane_->Reset();
+
 
 #ifdef _DEBUG
 
 
-	ImGui::Begin("Sphere");
-
-	ImGui::DragFloat3("scale", &sphere->transform.scale.x, 0.01f);
-	ImGui::DragFloat3("rotate", &sphere->transform.rotate.x, 0.01f);
-	ImGui::DragFloat3("right", &rightDir.x, 0.01f);
-	rightDir = rightDir.Normalize();
-	sphere->SetRightDir(rightDir);
-	ImGui::End();
-
-	emit.DebugGUI();
-
-	test_->Debug();
-	test2_->Debug();
-
 #endif // _DEBUG
 
 
-	dxCommon_->UpDate();
+	iCommand_ = inputHandler_->HandleInput();
 
-	test_->Update();
-	test2_->Update();
-
-	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
-		SceneManager::GetInstance()->ChangeScene("GAME", 40.0f);
+	if (iCommand_) {
+		iCommand_->Exec(*player_);
 	}
 
-	if (input_->TriggerKey(DIK_5)) {
-		emit.Emit();
-	}
-	emit.Emit();
-
-	sphere->transform.rotate.y += 0.02f;
-
-	cMane_->AddCollider(test_->GetCollider());
-	cMane_->AddCollider(test2_->GetCollider());
-	cMane_->CheckAllCollision();
+	player_->Update();
 
 	ParticleManager::GetInstance()->Update();
 }
@@ -98,15 +69,14 @@ void TitleScene::Draw() {
 
 #pragma region 3Dオブジェクト
 	obj3dCommon->PreDraw();
-	sphere->Draw();
-	test_->Draw();
+
+	player_->Draw();
 
 	ParticleManager::GetInstance()->Draw();
 
 #ifdef _DEBUG
-	emit.DrawSize();
-	test_->DrawCollider();
-	test2_->DrawCollider();
+
+
 #endif // _DEBUG
 	Line3dDrawer::GetInstance()->Render();
 

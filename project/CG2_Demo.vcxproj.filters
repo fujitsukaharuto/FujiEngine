@@ -179,6 +179,15 @@
     <ClCompile Include="Engine\Math\Quaternion.cpp">
       <Filter>Engine\Math</Filter>
     </ClCompile>
+    <ClCompile Include="Game\GameObj\Command.cpp">
+      <Filter>Game\GameObj</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameObj\InputHandler.cpp">
+      <Filter>Game\GameObj</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameObj\player\Player.cpp">
+      <Filter>Game\GameObj\Player</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -375,6 +384,15 @@
     </ClInclude>
     <ClInclude Include="Game\OriginState.h">
       <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\Player\Player.h">
+      <Filter>Game\GameObj\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\Command.h">
+      <Filter>Game\GameObj</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\InputHandler.h">
+      <Filter>Game\GameObj</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
