@@ -158,6 +158,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Scene\SceneManager.cpp" />
     <ClCompile Include="Engine\WinApp\MyWindow.cpp" />
     <ClCompile Include="Game\GameObj\FollowCamera.cpp" />
+    <ClCompile Include="Game\GameObj\Player\PlayerAttackBehavior.cpp" />
     <ClCompile Include="Game\OriginGameObject.cpp" />
     <ClCompile Include="Game\Collider\BaseCollider.cpp" />
     <ClCompile Include="Game\Collider\AABBCollider.cpp" />
@@ -227,6 +228,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Scene\SceneManager.h" />
     <ClInclude Include="Engine\WinApp\MyWindow.h" />
     <ClInclude Include="Game\GameObj\FollowCamera.h" />
+    <ClInclude Include="Game\GameObj\Player\PlayerAttackBehavior.h" />
     <ClInclude Include="Game\OriginGameObject.h" />
     <ClInclude Include="Game\Collider\BaseCollider.h" />
     <ClInclude Include="Game\Collider\AABBCollider.h" />

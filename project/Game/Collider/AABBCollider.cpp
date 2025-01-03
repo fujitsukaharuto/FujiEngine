@@ -57,14 +57,14 @@ void AABBCollider::DrawCollider() {
 	float halfDepth = depth / 2.0f;
 
 	// 8つの頂点を計算
-	Vector3 v1 = { info.pos.x - halfWidth, info.pos.y - halfHeight, info.pos.z - halfDepth };
-	Vector3 v2 = { info.pos.x + halfWidth, info.pos.y - halfHeight, info.pos.z - halfDepth };
-	Vector3 v3 = { info.pos.x + halfWidth, info.pos.y + halfHeight, info.pos.z - halfDepth };
-	Vector3 v4 = { info.pos.x - halfWidth, info.pos.y + halfHeight, info.pos.z - halfDepth };
-	Vector3 v5 = { info.pos.x - halfWidth, info.pos.y - halfHeight, info.pos.z + halfDepth };
-	Vector3 v6 = { info.pos.x + halfWidth, info.pos.y - halfHeight, info.pos.z + halfDepth };
-	Vector3 v7 = { info.pos.x + halfWidth, info.pos.y + halfHeight, info.pos.z + halfDepth };
-	Vector3 v8 = { info.pos.x - halfWidth, info.pos.y + halfHeight, info.pos.z + halfDepth };
+	Vector3 v1 = { info.worldPos.x - halfWidth, info.worldPos.y - halfHeight, info.worldPos.z - halfDepth };
+	Vector3 v2 = { info.worldPos.x + halfWidth, info.worldPos.y - halfHeight, info.worldPos.z - halfDepth };
+	Vector3 v3 = { info.worldPos.x + halfWidth, info.worldPos.y + halfHeight, info.worldPos.z - halfDepth };
+	Vector3 v4 = { info.worldPos.x - halfWidth, info.worldPos.y + halfHeight, info.worldPos.z - halfDepth };
+	Vector3 v5 = { info.worldPos.x - halfWidth, info.worldPos.y - halfHeight, info.worldPos.z + halfDepth };
+	Vector3 v6 = { info.worldPos.x + halfWidth, info.worldPos.y - halfHeight, info.worldPos.z + halfDepth };
+	Vector3 v7 = { info.worldPos.x + halfWidth, info.worldPos.y + halfHeight, info.worldPos.z + halfDepth };
+	Vector3 v8 = { info.worldPos.x - halfWidth, info.worldPos.y + halfHeight, info.worldPos.z + halfDepth };
 
 	// 線を描画
 	Line3dDrawer::GetInstance()->DrawLine3d(v1, v2, { 1.0f,1.0f,1.0f,1.0f }); // 底面の線

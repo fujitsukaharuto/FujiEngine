@@ -19,4 +19,8 @@ private:
 
 	Player* pPlayer_;
 
+
+	// 変数
+	float kCharacterSpeed_ = 0.15f;
+
 };

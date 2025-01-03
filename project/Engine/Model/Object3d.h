@@ -28,6 +28,8 @@ public:
 
 	Vector3 GetWorldPos()const;
 
+	void UpdateWVP() { SetWVP(); }
+
 	void SetColor(const Vector4& color);
 
 	void SetRightDir(const Vector3& right) { directionalLightData_->direction = right; }

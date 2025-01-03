@@ -29,6 +29,17 @@ void GameRun::Initialize() {
 	pManager_->CreateParticleGroup("sphere", "blueParticle.png");
 	pManager_->CreateAnimeGroup("animetest", "uvChecker.png");
 	pManager_->AddAnime("animetest", "white2x2.png", 10.0f);
+
+	// プレイヤーのパーティクル
+	pManager_->CreateParticleGroup("attackParticle", "blueParticle.png");
+
+
+	// 敵のパーティクル
+	pManager_->CreateParticleGroup("hitParticle1", "blueParticle.png");
+	pManager_->CreateParticleGroup("hitParticle2", "blueParticle.png");
+	pManager_->CreateParticleGroup("hitParticle3", "blueParticle.png");
+	pManager_->CreateParticleGroup("hitParticle4", "blueParticle.png");
+
 #pragma endregion
 
 

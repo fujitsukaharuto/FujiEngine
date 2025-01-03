@@ -188,6 +188,9 @@
     <ClCompile Include="Game\GameObj\FollowCamera.cpp">
       <Filter>Game\GameObj</Filter>
     </ClCompile>
+    <ClCompile Include="Game\GameObj\Player\PlayerAttackBehavior.cpp">
+      <Filter>Game\GameObj\Player</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -393,6 +396,9 @@
     </ClInclude>
     <ClInclude Include="Game\GameObj\FollowCamera.h">
       <Filter>Game\GameObj</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\Player\PlayerAttackBehavior.h">
+      <Filter>Game\GameObj\Player</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -5,6 +5,7 @@
 #include "Game/Collider/AABBCollider.h"
 #include "Math/MatrixCalculation.h"
 #include "Game/OriginState.h"
+#include "Particle/ParticleEmitter.h"
 
 class Player : public OriginGameObject {
 public:
@@ -22,18 +23,24 @@ public:
 
 	void BehaviorRequest();
 	void SetState(std::unique_ptr<OriginState> behaviorState) { state_ = std::move(behaviorState); }
+	void SetBehaviorRequest(PlayerBehavior behavior) { behaviorRequest_ = behavior; }
 
 	void OnCollisionEnter(const ColliderInfo& other);
 	BaseCollider* GetCollider() { return collider_.get(); }
 	void OnCollisionAttackEnter(const ColliderInfo& other);
 	BaseCollider* GetColliderAttack() { return colliderAttack_.get(); }
-
+	AABBCollider* GetAABBAttack() { return colliderAttack_.get(); }
 
 
 	void SetVelocity(const Vector3& v) { velocity_ = v; }
 
-
+	void SetIsAttack(bool is) { isAttack_ = is; }
 	bool GetIsAttack()const { return isAttack_; }
+
+
+	Object3d* GetBodyModel() { return body_.get(); }
+	Trans& GetBodyTrans() { return body_->transform; }
+
 
 #ifdef _DEBUG
 	void Debug()override;
@@ -45,6 +52,8 @@ public:
 
 private:
 
+	std::unique_ptr<Object3d> body_;
+
 	std::unique_ptr<AABBCollider> collider_ = nullptr;
 	std::unique_ptr<AABBCollider> colliderAttack_ = nullptr;
 
@@ -55,10 +64,11 @@ private:
 	PlayerBehavior behavior_ = PlayerBehavior::kDefult;
 	std::optional<PlayerBehavior> behaviorRequest_ = std::nullopt;
 
-
-	float attackT_ = 30.0f;
-	float attackT2_ = 0.0f;
 	bool isAttack_ = false;
 	bool isAttack2_ = false;
+
+
+
+	ParticleEmitter attackParticle_;
 
 };

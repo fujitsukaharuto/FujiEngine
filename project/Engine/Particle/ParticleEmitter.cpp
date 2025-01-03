@@ -248,8 +248,8 @@ void ParticleEmitter::Load(const std::string& filename) {
 	grain.isBillBoard_ = j[index].get<bool>();
 	index++;
 
-	/*grain.pattern_ = static_cast<BillBoardPattern>(j[index][0].get<int>());
-	index++;*/
+	grain.pattern_ = static_cast<BillBoardPattern>(j[index].get<int>());
+	index++;
 
 	para_.speedx = Vector2(j[index][0], j[index][1]);
 	index++;

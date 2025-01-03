@@ -5,6 +5,7 @@
 #include "Game/Collider/BaseCollider.h"
 #include "Game/Collider/AABBCollider.h"
 #include "Model/Line3dDrawer.h"
+#include "Particle/ParticleEmitter.h"
 
 class TestBaseObj : public OriginGameObject {
 public:
@@ -38,6 +39,12 @@ private:
 	std::unique_ptr<AABBCollider> collider_ = nullptr;
 	bool isCollider_ = false;
 
+
+	ParticleEmitter hitParticle1_;
+	ParticleEmitter hitParticle2_;
+	ParticleEmitter hitParticle3_;
+	ParticleEmitter hitParticle4_;
+
 };
 
 
@@ -56,12 +63,36 @@ inline void TestBaseObj::Initialize() {
 	collider_->SetCollisionStayCallback([this](const ColliderInfo& other) {OnCollisionStay(other); });
 	collider_->SetCollisionExitCallback([this](const ColliderInfo& other) {OnCollisionExit(other); });
 	collider_->SetTag("enemy");
+
+	hitParticle1_.name = "hitParticle1";
+	hitParticle2_.name = "hitParticle2";
+	hitParticle3_.name = "hitParticle3";
+	hitParticle4_.name = "hitParticle4";
+
+	hitParticle1_.Load("hitParticle1");
+	hitParticle2_.Load("hitParticle2");
+	hitParticle3_.Load("hitParticle3");
+	hitParticle4_.Load("hitParticle4");
+
 }
 
 inline void TestBaseObj::Update() {
 	isCollider_ = false;
 	
 	collider_->SetPos(model_->GetWorldPos());
+
+	hitParticle1_.pos = model_->GetWorldPos();
+	hitParticle2_.pos = model_->GetWorldPos();
+	hitParticle3_.pos = model_->GetWorldPos();
+	hitParticle4_.pos = model_->GetWorldPos();
+
+#ifdef _DEBUG
+	hitParticle1_.DebugGUI();
+	hitParticle2_.DebugGUI();
+	hitParticle3_.DebugGUI();
+	hitParticle4_.DebugGUI();
+#endif // _DEBUG
+
 }
 
 inline void TestBaseObj::Draw([[maybe_unused]] Material* mate) {
@@ -73,6 +104,10 @@ inline void TestBaseObj::OnCollisionEnter([[maybe_unused]]const ColliderInfo& ot
 	if (other.tag=="attack") {
 		isCollider_ = true;
 		color_ = { 1.0f,0.0f,0.0f,1.0f };
+		hitParticle1_.Burst();
+		hitParticle2_.Burst();
+		hitParticle3_.Burst();
+		hitParticle4_.Burst();
 	}
 
 }
