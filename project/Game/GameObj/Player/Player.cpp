@@ -14,9 +14,17 @@ void Player::Initialize() {
 	model_->Create("suzanne.obj");
 
 	body_ = std::make_unique<Object3d>();
-	body_->Create("suzanne.obj");
+	body_->Create("player.obj");
 	body_->SetParent(model_.get());
 	body_->transform.scale = { 0.5f,0.5f,0.5f };
+
+
+	weapon_ = std::make_unique<Object3d>();
+	weapon_->Create("playerWeaponTest.obj");
+	weapon_->SetParent(model_.get());
+	weapon_->transform.scale = { 0.5f,1.0f,0.5f };
+	weapon_->transform.translate = { 1.0f,0.5f,0.0f };
+
 
 	collider_ = std::make_unique<AABBCollider>();
 	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
@@ -64,6 +72,10 @@ void Player::Update() {
 
 	attackParticle_.DebugGUI();
 
+	ImGui::Begin("weapon");
+	ImGui::DragFloat3("rotate", &weapon_->transform.rotate.x, 0.01f);
+	ImGui::End();
+
 #endif // _DEBUG
 
 
@@ -84,6 +96,7 @@ void Player::Update() {
 void Player::Draw([[maybe_unused]]Material* mate) {
 	//OriginGameObject::Draw(mate);
 	body_->Draw(mate);
+	weapon_->Draw(mate);
 #ifdef _DEBUG
 	attackParticle_.DrawSize();
 #endif // _DEBUG

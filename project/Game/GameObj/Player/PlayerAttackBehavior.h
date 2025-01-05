@@ -16,6 +16,9 @@ public:
 
 
 	void Attack();
+	void Direction();
+
+	void EndInit();
 
 private:
 
