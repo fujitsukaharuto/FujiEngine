@@ -37,6 +37,7 @@ void PlayerDefaultBehavior::Move() {
 			velo = velo.Normalize() * kCharacterSpeed_;
 
 			Vector3 cameraR = CameraManager::GetInstance()->GetCamera()->transform.rotate;
+			cameraR.x = 0.0f;
 			Matrix4x4 rotateCamera = MakeRotateXYZMatrix(cameraR);
 			velo = TransformNormal(velo, rotateCamera);
 

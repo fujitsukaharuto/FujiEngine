@@ -31,6 +31,8 @@ public:
 
 	float frequencyTime = 0;
 
+	void SetParent(Object3d* parent) { parent_ = parent; }
+
 	std::string name;
 	Vector3 pos;
 	Vector3 particleRotate;
@@ -52,6 +54,7 @@ private:
 
 	float time_;
 
+	Object3d* parent_ = nullptr;
 
 	bool isDrawSize_ = false;
 };

@@ -194,6 +194,12 @@
     <ClCompile Include="Game\GameObj\Player\PlayerDushBehavior.cpp">
       <Filter>Game\GameObj\Player</Filter>
     </ClCompile>
+    <ClCompile Include="Game\GameObj\Enemy\Enemy.cpp">
+      <Filter>Game\GameObj\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameObj\Enemy\EnemyManager.cpp">
+      <Filter>Game\GameObj\Enemy</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -405,6 +411,12 @@
     </ClInclude>
     <ClInclude Include="Game\GameObj\Player\PlayerDushBehavior.h">
       <Filter>Game\GameObj\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\Enemy\Enemy.h">
+      <Filter>Game\GameObj\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\Enemy\EnemyManager.h">
+      <Filter>Game\GameObj\Enemy</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

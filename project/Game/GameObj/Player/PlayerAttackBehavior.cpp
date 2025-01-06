@@ -23,9 +23,9 @@
 
 
 PlayerAttackBehavior::PlayerAttackBehavior(Player* pPlayer) : pPlayer_(pPlayer) {
-	pPlayer_->GetAABBAttack()->SetWidth(1.2f);
-	pPlayer_->GetAABBAttack()->SetHeight(1.2f);
-	pPlayer_->GetAABBAttack()->SetDepth(1.2f);
+	pPlayer_->GetAABBAttack()->SetWidth(1.4f);
+	pPlayer_->GetAABBAttack()->SetHeight(1.4f);
+	pPlayer_->GetAABBAttack()->SetDepth(1.4f);
 
 	isAttack_ = true;
 	pPlayer_->SetIsAttack(true);
@@ -37,10 +37,10 @@ PlayerAttackBehavior::PlayerAttackBehavior(Player* pPlayer) : pPlayer_(pPlayer) 
 		{0.0f,0.2f,1.2f},
 	};
 	attackPoint2_ = {
-		{-1.0f,0.5f,0.0f},
-		{-0.5f,0.5f,0.5f},
-		{0.5f,0.5f,0.5f},
-		{1.0f,0.5f,0.0f},
+		{-1.0f,0.5f,0.5f},
+		{-0.5f,0.5f,0.75f},
+		{0.5f,0.5f,0.75f},
+		{1.0f,0.5f,0.5f},
 	};
 	attackPoint3_ = {
 		{1.0f,1.5f,0.2f},
@@ -93,7 +93,7 @@ void PlayerAttackBehavior::Attack() {
 			if (attackT1_ >= (40.0f - attackLimmit1_)) {
 				float t = 1.0f / attackLimmit1_ * (attackLimmit1_ - (attackT1_ - (40.0f-attackLimmit1_)));
 				Vector3 attackCollider = CatmullRom(attackPoint1_, t);
-				pPlayer_->GetAABBAttack()->SetPos({ attackCollider.x * 1.4f,attackCollider.y,attackCollider.z * 1.6f });
+				pPlayer_->GetAABBAttack()->SetPos({ attackCollider.x * 1.4f,attackCollider.y,attackCollider.z * 1.8f });
 				pPlayer_->GetWeaponModel()->transform.translate = { attackCollider };
 
 				pPlayer_->GetWeaponModel()->transform.rotate.x = LerpShortAngle(-0.23f, 2.0f, t);
@@ -104,14 +104,14 @@ void PlayerAttackBehavior::Attack() {
 				pPlayer_->GetBodyModel()->transform.scale.x = xzScale;
 				pPlayer_->GetBodyModel()->transform.scale.z = xzScale;
 
-				pPlayer_->GetFireModel()->transform.scale.x += 0.14f;
+				pPlayer_->GetFireModel()->transform.scale.x += 0.16f;
 
 			}
 			else {
 				pPlayer_->GetAABBAttack()->SetPos(attackPoint1_[3]);
 				pPlayer_->SetIsAttack(false);
 				if (pPlayer_->GetFireModel()->transform.scale.x > 0.0f) {
-					pPlayer_->GetFireModel()->transform.scale.x -= 0.04f;
+					pPlayer_->GetFireModel()->transform.scale.x -= 0.03f;
 					if (pPlayer_->GetFireModel()->transform.scale.x < 0.0f) {
 						pPlayer_->GetFireModel()->transform.scale.x = 0.0f;
 					}
@@ -162,7 +162,7 @@ void PlayerAttackBehavior::Attack() {
 			if (attackT2_ >= (40.0f - attackLimmit2_)) {
 				float t = 1.0f / attackLimmit2_ * (attackLimmit2_ - (attackT2_ - (40.0f - attackLimmit2_)));
 				Vector3 attackCollider = CatmullRom(attackPoint2_, t);
-				pPlayer_->GetAABBAttack()->SetPos({ attackCollider.x * 1.4f,attackCollider.y,attackCollider.z * 1.6f });
+				pPlayer_->GetAABBAttack()->SetPos({ attackCollider.x * 1.8f,attackCollider.y,attackCollider.z * 2.4f });
 				pPlayer_->GetWeaponModel()->transform.translate = { attackCollider };
 
 				pPlayer_->GetWeaponModel()->transform.rotate.x = LerpShortAngle(0.57f, 2.5f, t);
@@ -174,7 +174,7 @@ void PlayerAttackBehavior::Attack() {
 				pPlayer_->GetBodyModel()->transform.scale.x = xzScale;
 				pPlayer_->GetBodyModel()->transform.scale.z = xzScale;
 
-				pPlayer_->GetFireModel()->transform.scale.x += 0.14f;
+				pPlayer_->GetFireModel()->transform.scale.x += 0.16f;
 				pPlayer_->SetIsAttack(true);
 			}
 			else {
@@ -182,7 +182,7 @@ void PlayerAttackBehavior::Attack() {
 				pPlayer_->SetIsAttack(false);
 
 				if (pPlayer_->GetFireModel()->transform.scale.x > 0.0f) {
-					pPlayer_->GetFireModel()->transform.scale.x -= 0.04f;
+					pPlayer_->GetFireModel()->transform.scale.x -= 0.03f;
 					if (pPlayer_->GetFireModel()->transform.scale.x < 0.0f) {
 						pPlayer_->GetFireModel()->transform.scale.x = 0.0f;
 					}
@@ -237,7 +237,7 @@ void PlayerAttackBehavior::Attack() {
 			if (attackT3_ >= (40.0f - attackLimmit3_)) {
 				float t = 1.0f / attackLimmit3_ * (attackLimmit3_ - (attackT3_ - (40.0f - attackLimmit3_)));
 				Vector3 attackCollider = CatmullRom(attackPoint3_, t);
-				pPlayer_->GetAABBAttack()->SetPos({ attackCollider.x * 1.4f,attackCollider.y,attackCollider.z * 1.6f });
+				pPlayer_->GetAABBAttack()->SetPos({ attackCollider.x * 1.4f,attackCollider.y,attackCollider.z * 2.2f });
 				pPlayer_->GetWeaponModel()->transform.translate = { attackCollider };
 
 				pPlayer_->GetWeaponModel()->transform.rotate.x = LerpShortAngle(-0.23f, 2.0f, t);
@@ -249,7 +249,7 @@ void PlayerAttackBehavior::Attack() {
 				pPlayer_->GetBodyModel()->transform.scale.x = xzScale;
 				pPlayer_->GetBodyModel()->transform.scale.z = xzScale;
 
-				pPlayer_->GetFireModel()->transform.scale.x += 0.14f;
+				pPlayer_->GetFireModel()->transform.scale.x += 0.16f;
 				pPlayer_->SetIsAttack(true);
 			}
 			else {
@@ -257,7 +257,7 @@ void PlayerAttackBehavior::Attack() {
 				pPlayer_->SetIsAttack(false);
 
 				if (pPlayer_->GetFireModel()->transform.scale.x > 0.0f) {
-					pPlayer_->GetFireModel()->transform.scale.x -= 0.04f;
+					pPlayer_->GetFireModel()->transform.scale.x -= 0.03f;
 					if (pPlayer_->GetFireModel()->transform.scale.x < 0.0f) {
 						pPlayer_->GetFireModel()->transform.scale.x = 0.0f;
 					}
@@ -309,7 +309,7 @@ void PlayerAttackBehavior::Attack() {
 			if (attackT4_ >= (40.0f - attackLimmit4_)) {
 				float t = 1.0f / attackLimmit4_ * (attackLimmit4_ - (attackT4_ - (40.0f - attackLimmit4_)));
 				Vector3 attackCollider = CatmullRom(attackPoint4_, t);
-				pPlayer_->GetAABBAttack()->SetPos({ attackCollider.x * 1.4f,attackCollider.y,attackCollider.z * 1.6f });
+				pPlayer_->GetAABBAttack()->SetPos({ attackCollider.x * 1.4f,attackCollider.y,attackCollider.z * 2.2f });
 				pPlayer_->GetWeaponModel()->transform.translate = { attackCollider };
 
 				pPlayer_->GetWeaponModel()->transform.rotate.x = LerpShortAngle(-0.23f, 2.0f, t);
@@ -321,7 +321,7 @@ void PlayerAttackBehavior::Attack() {
 				pPlayer_->GetBodyModel()->transform.scale.x = xzScale;
 				pPlayer_->GetBodyModel()->transform.scale.z = xzScale;
 
-				pPlayer_->GetFireModel()->transform.scale.x += 0.14f;
+				pPlayer_->GetFireModel()->transform.scale.x += 0.16f;
 				pPlayer_->SetIsAttack(true);
 			}
 			else {
@@ -329,7 +329,7 @@ void PlayerAttackBehavior::Attack() {
 				pPlayer_->SetIsAttack(false);
 
 				if (pPlayer_->GetFireModel()->transform.scale.x > 0.0f) {
-					pPlayer_->GetFireModel()->transform.scale.x -= 0.04f;
+					pPlayer_->GetFireModel()->transform.scale.x -= 0.03f;
 					if (pPlayer_->GetFireModel()->transform.scale.x < 0.0f) {
 						pPlayer_->GetFireModel()->transform.scale.x = 0.0f;
 					}
@@ -346,9 +346,9 @@ void PlayerAttackBehavior::Attack() {
 				comboIndex_++;
 				isChain_ = false;
 				isAttack4_ = false;
-				pPlayer_->GetAABBAttack()->SetWidth(4.0f);
+				pPlayer_->GetAABBAttack()->SetWidth(5.0f);
 				pPlayer_->GetAABBAttack()->SetHeight(1.0f);
-				pPlayer_->GetAABBAttack()->SetDepth(4.0f);
+				pPlayer_->GetAABBAttack()->SetDepth(5.0f);
 
 				pPlayer_->GetWeaponModel()->transform.rotate.z = -1.6f;
 				pPlayer_->GetWeaponModel()->transform.rotate.y = -0.1f;
@@ -394,7 +394,7 @@ void PlayerAttackBehavior::Attack() {
 				pPlayer_->GetBodyModel()->transform.scale.x = xzScale;
 				pPlayer_->GetBodyModel()->transform.scale.z = xzScale;
 
-				pPlayer_->GetFireModel()->transform.scale.x += 0.15f;
+				pPlayer_->GetFireModel()->transform.scale.x += 0.18f;
 				pPlayer_->SetIsAttack(true);
 			}
 			else {
@@ -402,7 +402,7 @@ void PlayerAttackBehavior::Attack() {
 				pPlayer_->SetIsAttack(false);
 
 				if (pPlayer_->GetFireModel()->transform.scale.x > 0.0f) {
-					pPlayer_->GetFireModel()->transform.scale.x -= 0.04f;
+					pPlayer_->GetFireModel()->transform.scale.x -= 0.03f;
 					if (pPlayer_->GetFireModel()->transform.scale.x < 0.0f) {
 						pPlayer_->GetFireModel()->transform.scale.x = 0.0f;
 					}
@@ -417,6 +417,7 @@ void PlayerAttackBehavior::Attack() {
 				pPlayer_->SetIsAttack(false);
 				pPlayer_->SetBehaviorRequest(Player::PlayerBehavior::kDefult);
 				EndInit();
+				pPlayer_->GetFireModel()->transform.scale.x = 0.0f;
 				isChain_ = false;
 			}
 			else {
@@ -424,6 +425,7 @@ void PlayerAttackBehavior::Attack() {
 				pPlayer_->SetIsAttack(false);
 				pPlayer_->SetBehaviorRequest(Player::PlayerBehavior::kDefult);
 				EndInit();
+				pPlayer_->GetFireModel()->transform.scale.x = 0.0f;
 			}
 		}
 		else {

@@ -75,5 +75,6 @@ private:
 
 
 	ParticleEmitter attackParticle_;
+	ParticleEmitter attackParticle2_;
 
 };

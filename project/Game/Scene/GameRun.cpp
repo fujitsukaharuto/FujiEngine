@@ -32,6 +32,7 @@ void GameRun::Initialize() {
 
 	// プレイヤーのパーティクル
 	pManager_->CreateParticleGroup("attackParticle", "blueParticle.png");
+	pManager_->CreateParticleGroup("attackParticle2", "blueParticle.png");
 
 
 	// 敵のパーティクル

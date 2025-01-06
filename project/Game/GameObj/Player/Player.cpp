@@ -23,14 +23,15 @@ void Player::Initialize() {
 	weapon_ = std::make_unique<Object3d>();
 	weapon_->Create("playerWeapon.obj");
 	weapon_->SetParent(model_.get());
-	weapon_->transform.scale = { 0.6f,0.6f,0.6f };
+	weapon_->transform.scale = { 0.6f,0.8f,0.6f };
 	weapon_->transform.translate = { 1.0f,0.5f,0.0f };
 
 	firePlane_ = std::make_unique<Object3d>();
 	firePlane_->Create("firePlane.obj");
 	firePlane_->SetLightEnable(LightMode::kLightNone);
 	firePlane_->SetParent(weapon_.get());
-	firePlane_->transform.translate = { 0.0f,0.67f,0.0f };
+	firePlane_->transform.translate = { 0.0f,0.45f,0.0f };
+	firePlane_->transform.scale.y = 1.13f;
 	firePlane_->transform.rotate = { 0.0f,1.48f,0.0f };
 
 	collider_ = std::make_unique<AABBCollider>();
@@ -51,6 +52,12 @@ void Player::Initialize() {
 
 	attackParticle_.name = "attackParticle";
 	attackParticle_.Load("attackParticle");
+	attackParticle_.SetParent(weapon_.get());
+
+	attackParticle2_.name = "attackParticle2";
+	attackParticle2_.Load("attackParticle");
+	attackParticle2_.pos.y += 0.3f;
+	attackParticle2_.SetParent(weapon_.get());
 
 }
 
@@ -104,8 +111,8 @@ void Player::Update() {
 	colliderAttack_->InfoUpdate();
 
 	if (isAttack_) {
-		attackParticle_.pos = colliderAttack_->GetPos();
 		attackParticle_.Emit();
+		attackParticle2_.Emit();
 	}
 	else {
 		if (firePlane_->transform.scale.x > 0.0f) {

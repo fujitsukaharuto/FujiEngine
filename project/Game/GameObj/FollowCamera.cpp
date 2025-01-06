@@ -10,6 +10,8 @@ FollowCamera::~FollowCamera() {
 }
 
 void FollowCamera::Initialize() {
+	Camera* camera = CameraManager::GetInstance()->GetCamera();
+	camera->transform.rotate.x = 0.13f;
 }
 
 void FollowCamera::Update() {
@@ -53,7 +55,7 @@ void FollowCamera::Reset() {
 }
 
 Vector3 FollowCamera::OffsetCal() const {
-	Vector3 offset = { 0.0f, 3.0f, -15.0f };
+	Vector3 offset = { 0.0f, 3.0f, -18.0f };
 
 	Camera* camera = CameraManager::GetInstance()->GetCamera();
 	Matrix4x4 rotateCamera = MakeRotateXYZMatrix(camera->transform.rotate);
