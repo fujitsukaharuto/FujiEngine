@@ -191,6 +191,9 @@
     <ClCompile Include="Game\GameObj\Player\PlayerAttackBehavior.cpp">
       <Filter>Game\GameObj\Player</Filter>
     </ClCompile>
+    <ClCompile Include="Game\GameObj\Player\PlayerDushBehavior.cpp">
+      <Filter>Game\GameObj\Player</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -398,6 +401,9 @@
       <Filter>Game\GameObj</Filter>
     </ClInclude>
     <ClInclude Include="Game\GameObj\Player\PlayerAttackBehavior.h">
+      <Filter>Game\GameObj\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\Player\PlayerDushBehavior.h">
       <Filter>Game\GameObj\Player</Filter>
     </ClInclude>
   </ItemGroup>

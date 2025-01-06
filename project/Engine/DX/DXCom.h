@@ -90,6 +90,7 @@ public:
 	ID3D12GraphicsCommandList* GetCommandList() const { return command_->GetList(); }
 
 	void UpDate();
+	void ShaderTexture();
 
 	void ReleaseData();
 
@@ -112,6 +113,8 @@ public:
 	PipelineManager* GetPipelineManager()const { return pipeManager_; }
 
 	/*void Tick();*/
+
+	D3D12_GPU_DESCRIPTOR_HANDLE GetShaderTextureGPU();
 
 private:
 
@@ -167,7 +170,7 @@ private:
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc_{};
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap_ = nullptr;
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc_{};
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles_[3];
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles_[4];
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> offscreenrt_ = nullptr;
 	D3D12_RENDER_TARGET_VIEW_DESC offscreenrtvDesc_{};
@@ -175,6 +178,14 @@ private:
 	uint32_t offscreenSRVIndex_;
 	D3D12_GPU_DESCRIPTOR_HANDLE offTextureHandle_;
 	D3D12_CPU_DESCRIPTOR_HANDLE offTextureHandleCPU_;
+
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> offscreenrt2_ = nullptr;
+	D3D12_RENDER_TARGET_VIEW_DESC offscreenrtvDesc2_{};
+	D3D12_CLEAR_VALUE clearColorValue2{};
+	uint32_t offscreenSRVIndex2_;
+	D3D12_GPU_DESCRIPTOR_HANDLE offTextureHandle2_;
+	D3D12_CPU_DESCRIPTOR_HANDLE offTextureHandleCPU2_;
 
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> swapChainResources_[2] = { nullptr };

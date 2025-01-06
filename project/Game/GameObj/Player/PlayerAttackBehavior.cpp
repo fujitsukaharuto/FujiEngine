@@ -23,9 +23,9 @@
 
 
 PlayerAttackBehavior::PlayerAttackBehavior(Player* pPlayer) : pPlayer_(pPlayer) {
-	pPlayer_->GetAABBAttack()->SetWidth(0.5f);
-	pPlayer_->GetAABBAttack()->SetHeight(0.5f);
-	pPlayer_->GetAABBAttack()->SetDepth(0.5f);
+	pPlayer_->GetAABBAttack()->SetWidth(1.2f);
+	pPlayer_->GetAABBAttack()->SetHeight(1.2f);
+	pPlayer_->GetAABBAttack()->SetDepth(1.2f);
 
 	isAttack_ = true;
 	pPlayer_->SetIsAttack(true);
@@ -43,16 +43,22 @@ PlayerAttackBehavior::PlayerAttackBehavior(Player* pPlayer) : pPlayer_(pPlayer) 
 		{1.0f,0.5f,0.0f},
 	};
 	attackPoint3_ = {
-		{-1.0f,1.5f,0.2f},
-		{-0.5f,0.9f,0.7f},
-		{0.5f,0.5f,1.0f},
-		{1.0f,0.2f,1.0f},
-	};
-	attackPoint4_ = {
 		{1.0f,1.5f,0.2f},
 		{0.5f,0.9f,0.7f},
 		{-0.5f,0.5f,1.0f},
 		{-1.0f,0.2f,1.0f},
+	};
+	attackPoint4_ = {
+		{-1.0f,1.5f,0.2f},
+		{-0.5f,0.9f,0.7f},
+		{0.5f,0.5f,1.0f},
+		{1.0f,0.2f,1.0f},
+	}; 
+	attackPoint5_ = {
+		{1.0f,0.5f,0.0f},
+		{0.5f,0.5f,0.5f},
+		{-0.5f,0.5f,0.5f},
+		{-1.0f,0.5f,0.0f},
 	};
 
 }
@@ -71,28 +77,9 @@ void PlayerAttackBehavior::Attack() {
 
 	XINPUT_STATE pad;
 	if (Input::GetInstance()->GetGamepadState(pad)) {
-		if (Input::GetInstance()->TriggerButton(PadInput::B)) {
+		if (Input::GetInstance()->TriggerButton(PadInput::X)) {
 			if (!isChain_) {
-				switch (comboIndex_) {
-				case 0:
-					Direction();
-					isChain_ = true;
-					break;
-				case 1:
-					Direction();
-					isChain_ = true;
-					break;
-				case 2:
-					Direction();
-					isChain_ = true;
-					break;
-				case 3:
-					Direction();
-					isChain_ = true;
-					break;
-				default:
-					break;
-				}
+				isChain_ = true;
 			}
 		}
 	}
@@ -102,6 +89,34 @@ void PlayerAttackBehavior::Attack() {
 
 		if (isAttack1_) {
 			attackT1_ -= FPSKeeper::DeltaTime();
+
+			if (attackT1_ >= (40.0f - attackLimmit1_)) {
+				float t = 1.0f / attackLimmit1_ * (attackLimmit1_ - (attackT1_ - (40.0f-attackLimmit1_)));
+				Vector3 attackCollider = CatmullRom(attackPoint1_, t);
+				pPlayer_->GetAABBAttack()->SetPos({ attackCollider.x * 1.4f,attackCollider.y,attackCollider.z * 1.6f });
+				pPlayer_->GetWeaponModel()->transform.translate = { attackCollider };
+
+				pPlayer_->GetWeaponModel()->transform.rotate.x = LerpShortAngle(-0.23f, 2.0f, t);
+
+				pPlayer_->GetBodyModel()->transform.scale.y = Lerp(0.75f, 0.3f, t);
+				pPlayer_->GetBodyModel()->transform.rotate.x = LerpShortAngle(-0.15f, 0.2f, t);
+				float xzScale = Lerp(0.25f, 0.7f, t);
+				pPlayer_->GetBodyModel()->transform.scale.x = xzScale;
+				pPlayer_->GetBodyModel()->transform.scale.z = xzScale;
+
+				pPlayer_->GetFireModel()->transform.scale.x += 0.14f;
+
+			}
+			else {
+				pPlayer_->GetAABBAttack()->SetPos(attackPoint1_[3]);
+				pPlayer_->SetIsAttack(false);
+				if (pPlayer_->GetFireModel()->transform.scale.x > 0.0f) {
+					pPlayer_->GetFireModel()->transform.scale.x -= 0.04f;
+					if (pPlayer_->GetFireModel()->transform.scale.x < 0.0f) {
+						pPlayer_->GetFireModel()->transform.scale.x = 0.0f;
+					}
+				}
+			}
 
 			if (attackT1_ <= 0.0f) {
 				if (isChain_) {
@@ -114,7 +129,10 @@ void PlayerAttackBehavior::Attack() {
 
 
 					pPlayer_->GetWeaponModel()->transform.rotate.z = 1.53f;
+					pPlayer_->GetBodyModel()->transform.scale = { 0.5f,0.5f,0.5f };
+					pPlayer_->GetBodyModel()->transform.rotate.x = 0.0f;
 
+					Direction();
 				}
 				else {
 					isAttack_ = false;
@@ -132,18 +150,6 @@ void PlayerAttackBehavior::Attack() {
 				pPlayer_->GetModel()->transform.translate += move * FPSKeeper::DeltaTime();
 			}
 
-			if (attackT1_ >= 20.0f) {
-				float t = 1.0f / 20.0f * (20.0f - (attackT1_ - 20.0f));
-				Vector3 attackCollider = CatmullRom(attackPoint1_, t);
-				pPlayer_->GetAABBAttack()->SetPos(attackCollider);
-				pPlayer_->GetWeaponModel()->transform.translate = { attackCollider };
-
-				pPlayer_->GetWeaponModel()->transform.rotate.x = LerpShortAngle(-0.23f, 2.0f, t);
-
-			}
-			else {
-				pPlayer_->GetAABBAttack()->SetPos(attackPoint1_[3]);
-			}
 
 		}
 
@@ -152,6 +158,36 @@ void PlayerAttackBehavior::Attack() {
 
 		if (isAttack2_) {
 			attackT2_ -= FPSKeeper::DeltaTime();
+
+			if (attackT2_ >= (40.0f - attackLimmit2_)) {
+				float t = 1.0f / attackLimmit2_ * (attackLimmit2_ - (attackT2_ - (40.0f - attackLimmit2_)));
+				Vector3 attackCollider = CatmullRom(attackPoint2_, t);
+				pPlayer_->GetAABBAttack()->SetPos({ attackCollider.x * 1.4f,attackCollider.y,attackCollider.z * 1.6f });
+				pPlayer_->GetWeaponModel()->transform.translate = { attackCollider };
+
+				pPlayer_->GetWeaponModel()->transform.rotate.x = LerpShortAngle(0.57f, 2.5f, t);
+
+				pPlayer_->GetBodyModel()->transform.rotate.y = LerpShortAngle(-0.45f, 0.45f, t);
+				pPlayer_->GetBodyModel()->transform.rotate.z= LerpShortAngle(0.15f, -0.15f, t);
+				pPlayer_->GetBodyModel()->transform.scale.y = Lerp(0.45f, 0.35f, t);
+				float xzScale = Lerp(0.55f, 0.65f, t);
+				pPlayer_->GetBodyModel()->transform.scale.x = xzScale;
+				pPlayer_->GetBodyModel()->transform.scale.z = xzScale;
+
+				pPlayer_->GetFireModel()->transform.scale.x += 0.14f;
+				pPlayer_->SetIsAttack(true);
+			}
+			else {
+				pPlayer_->GetAABBAttack()->SetPos(attackPoint2_[3]);
+				pPlayer_->SetIsAttack(false);
+
+				if (pPlayer_->GetFireModel()->transform.scale.x > 0.0f) {
+					pPlayer_->GetFireModel()->transform.scale.x -= 0.04f;
+					if (pPlayer_->GetFireModel()->transform.scale.x < 0.0f) {
+						pPlayer_->GetFireModel()->transform.scale.x = 0.0f;
+					}
+				}
+			}
 
 			if (attackT2_ <= 0.0f) {
 				if (isChain_) {
@@ -164,6 +200,13 @@ void PlayerAttackBehavior::Attack() {
 					/*pPlayer_->GetAABBAttack()->SetWidth(3.0f);
 					pPlayer_->GetAABBAttack()->SetHeight(1.0f);
 					pPlayer_->GetAABBAttack()->SetDepth(1.0f);*/
+
+					pPlayer_->GetWeaponModel()->transform.rotate.z = -0.5f;
+					pPlayer_->GetWeaponModel()->transform.rotate.y = -0.55f;
+					pPlayer_->GetBodyModel()->transform.rotate.z = 0.0f;
+					pPlayer_->GetBodyModel()->transform.scale = { 0.5f,0.5f,0.5f };
+
+					Direction();
 				}
 				else {
 					isAttack_ = false;
@@ -183,19 +226,6 @@ void PlayerAttackBehavior::Attack() {
 
 			}
 
-			if (attackT2_ >= 20.0f) {
-				float t = 1.0f / 20.0f * (20.0f - (attackT2_ - 20.0f));
-				Vector3 attackCollider = CatmullRom(attackPoint2_, t);
-				pPlayer_->GetAABBAttack()->SetPos(attackCollider);
-				pPlayer_->GetWeaponModel()->transform.translate = { attackCollider };
-
-				pPlayer_->GetWeaponModel()->transform.rotate.x = LerpShortAngle(0.57f, 2.5f, t);
-
-			}
-			else {
-				pPlayer_->GetAABBAttack()->SetPos(attackPoint2_[3]);
-			}
-
 		}
 
 		break;
@@ -204,44 +234,70 @@ void PlayerAttackBehavior::Attack() {
 		if (isAttack3_) {
 			attackT3_ -= FPSKeeper::DeltaTime();
 
-			if (attackT3_ <= 0.0f) {
-				if (isChain_) {
-					attackT3_ = 0.0f;
-					attackT4_ = 40.0f;
-					isAttack4_ = true;
-					comboIndex_++;
-					isChain_ = false;
-					isAttack3_ = false;
-					/*pPlayer_->GetAABBAttack()->SetWidth(4.0f);
-					pPlayer_->GetAABBAttack()->SetHeight(1.0f);
-					pPlayer_->GetAABBAttack()->SetDepth(2.0f);*/
-				}
-				else {
-					isAttack_ = false;
-					pPlayer_->SetIsAttack(false);
-					pPlayer_->SetBehaviorRequest(Player::PlayerBehavior::kDefult);
-					EndInit();
-				}
-			}
-			else {
-				const float kCharacterSpeed = 0.0f;
-				Vector3 move = { 0.0f, 0.0f, 1.0f };
-				move = move.Normalize() * kCharacterSpeed;
-				Matrix4x4 rotatePlayer = MakeRotateXYZMatrix(pPlayer_->GetModel()->transform.rotate);
-				move = TransformNormal(move, rotatePlayer);
-				pPlayer_->GetModel()->transform.translate += move * FPSKeeper::DeltaTime();
-			}
-
-			if (attackT3_ >= 20.0f) {
-				float t = 1.0f / 20.0f * (20.0f - (attackT3_ - 20.0f));
+			if (attackT3_ >= (40.0f - attackLimmit3_)) {
+				float t = 1.0f / attackLimmit3_ * (attackLimmit3_ - (attackT3_ - (40.0f - attackLimmit3_)));
 				Vector3 attackCollider = CatmullRom(attackPoint3_, t);
-				pPlayer_->GetAABBAttack()->SetPos(attackCollider);
+				pPlayer_->GetAABBAttack()->SetPos({ attackCollider.x * 1.4f,attackCollider.y,attackCollider.z * 1.6f });
 				pPlayer_->GetWeaponModel()->transform.translate = { attackCollider };
+
+				pPlayer_->GetWeaponModel()->transform.rotate.x = LerpShortAngle(-0.23f, 2.0f, t);
+
+				pPlayer_->GetBodyModel()->transform.rotate.y = LerpShortAngle(0.35f, -0.35f, t);
+				pPlayer_->GetBodyModel()->transform.rotate.x = LerpShortAngle(-0.15f, 0.2f, t);
+				pPlayer_->GetBodyModel()->transform.scale.y = Lerp(0.65f, 0.4f, t);
+				float xzScale = Lerp(0.35f, 0.6f, t);
+				pPlayer_->GetBodyModel()->transform.scale.x = xzScale;
+				pPlayer_->GetBodyModel()->transform.scale.z = xzScale;
+
+				pPlayer_->GetFireModel()->transform.scale.x += 0.14f;
+				pPlayer_->SetIsAttack(true);
 			}
 			else {
 				pPlayer_->GetAABBAttack()->SetPos(attackPoint3_[3]);
+				pPlayer_->SetIsAttack(false);
+
+				if (pPlayer_->GetFireModel()->transform.scale.x > 0.0f) {
+					pPlayer_->GetFireModel()->transform.scale.x -= 0.04f;
+					if (pPlayer_->GetFireModel()->transform.scale.x < 0.0f) {
+						pPlayer_->GetFireModel()->transform.scale.x = 0.0f;
+					}
+				}
 			}
 
+		}
+
+		if (attackT3_ <= 0.0f) {
+			if (isChain_) {
+				attackT3_ = 0.0f;
+				attackT4_ = 40.0f;
+				isAttack4_ = true;
+				comboIndex_++;
+				isChain_ = false;
+				isAttack3_ = false;
+				/*pPlayer_->GetAABBAttack()->SetWidth(4.0f);
+				pPlayer_->GetAABBAttack()->SetHeight(1.0f);
+				pPlayer_->GetAABBAttack()->SetDepth(2.0f);*/
+
+				pPlayer_->GetWeaponModel()->transform.rotate.z = 0.5f;
+				pPlayer_->GetWeaponModel()->transform.rotate.y = 0.55f;
+				pPlayer_->GetBodyModel()->transform.scale = { 0.5f,0.5f,0.5f };
+
+				Direction();
+			}
+			else {
+				isAttack_ = false;
+				pPlayer_->SetIsAttack(false);
+				pPlayer_->SetBehaviorRequest(Player::PlayerBehavior::kDefult);
+				EndInit();
+			}
+		}
+		else {
+			const float kCharacterSpeed = 0.0f;
+			Vector3 move = { 0.0f, 0.0f, 1.0f };
+			move = move.Normalize() * kCharacterSpeed;
+			Matrix4x4 rotatePlayer = MakeRotateXYZMatrix(pPlayer_->GetModel()->transform.rotate);
+			move = TransformNormal(move, rotatePlayer);
+			pPlayer_->GetModel()->transform.translate += move * FPSKeeper::DeltaTime();
 		}
 
 		break;
@@ -250,40 +306,133 @@ void PlayerAttackBehavior::Attack() {
 		if (isAttack4_) {
 			attackT4_ -= FPSKeeper::DeltaTime();
 
-			if (attackT4_ <= 0.0f) {
-				if (isChain_) {
-					isAttack_ = false;
-					pPlayer_->SetIsAttack(false);
-					pPlayer_->SetBehaviorRequest(Player::PlayerBehavior::kDefult);
-					EndInit();
-					isChain_ = false;
-				}
-				else {
-					isAttack_ = false;
-					pPlayer_->SetIsAttack(false);
-					pPlayer_->SetBehaviorRequest(Player::PlayerBehavior::kDefult);
-					EndInit();
-				}
-			}
-			else {
-				const float kCharacterSpeed = 0.0f;
-				Vector3 move = { 0.0f, 0.0f, 1.0f };
-				move = move.Normalize() * kCharacterSpeed;
-				Matrix4x4 rotatePlayer = MakeRotateXYZMatrix(pPlayer_->GetModel()->transform.rotate);
-				move = TransformNormal(move, rotatePlayer);
-				pPlayer_->GetModel()->transform.translate += move * FPSKeeper::DeltaTime();
-			}
-
-			if (attackT4_ >= 20.0f) {
-				float t = 1.0f / 20.0f * (20.0f - (attackT4_ - 20.0f));
+			if (attackT4_ >= (40.0f - attackLimmit4_)) {
+				float t = 1.0f / attackLimmit4_ * (attackLimmit4_ - (attackT4_ - (40.0f - attackLimmit4_)));
 				Vector3 attackCollider = CatmullRom(attackPoint4_, t);
-				pPlayer_->GetAABBAttack()->SetPos(attackCollider);
+				pPlayer_->GetAABBAttack()->SetPos({ attackCollider.x * 1.4f,attackCollider.y,attackCollider.z * 1.6f });
 				pPlayer_->GetWeaponModel()->transform.translate = { attackCollider };
+
+				pPlayer_->GetWeaponModel()->transform.rotate.x = LerpShortAngle(-0.23f, 2.0f, t);
+
+				pPlayer_->GetBodyModel()->transform.rotate.y = LerpShortAngle(-0.35f, 0.35f, t);
+				pPlayer_->GetBodyModel()->transform.rotate.x = LerpShortAngle(-0.15f, 0.2f, t);
+				pPlayer_->GetBodyModel()->transform.scale.y = Lerp(0.65f, 0.4f, t);
+				float xzScale = Lerp(0.35f, 0.6f, t);
+				pPlayer_->GetBodyModel()->transform.scale.x = xzScale;
+				pPlayer_->GetBodyModel()->transform.scale.z = xzScale;
+
+				pPlayer_->GetFireModel()->transform.scale.x += 0.14f;
+				pPlayer_->SetIsAttack(true);
 			}
 			else {
 				pPlayer_->GetAABBAttack()->SetPos(attackPoint4_[3]);
+				pPlayer_->SetIsAttack(false);
+
+				if (pPlayer_->GetFireModel()->transform.scale.x > 0.0f) {
+					pPlayer_->GetFireModel()->transform.scale.x -= 0.04f;
+					if (pPlayer_->GetFireModel()->transform.scale.x < 0.0f) {
+						pPlayer_->GetFireModel()->transform.scale.x = 0.0f;
+					}
+				}
 			}
 
+		}
+
+		if (attackT4_ <= 0.0f) {
+			if (isChain_) {
+				attackT4_ = 0.0f;
+				attackT5_ = 40.0f;
+				isAttack5_ = true;
+				comboIndex_++;
+				isChain_ = false;
+				isAttack4_ = false;
+				pPlayer_->GetAABBAttack()->SetWidth(4.0f);
+				pPlayer_->GetAABBAttack()->SetHeight(1.0f);
+				pPlayer_->GetAABBAttack()->SetDepth(4.0f);
+
+				pPlayer_->GetWeaponModel()->transform.rotate.z = -1.6f;
+				pPlayer_->GetWeaponModel()->transform.rotate.y = -0.1f;
+				pPlayer_->GetBodyModel()->transform.scale = { 0.5f,0.5f,0.5f };
+
+				Direction();
+			}
+			else {
+				isAttack_ = false;
+				pPlayer_->SetIsAttack(false);
+				pPlayer_->SetBehaviorRequest(Player::PlayerBehavior::kDefult);
+				EndInit();
+			}
+		}
+		else {
+			const float kCharacterSpeed = 0.0f;
+			Vector3 move = { 0.0f, 0.0f, 1.0f };
+			move = move.Normalize() * kCharacterSpeed;
+			Matrix4x4 rotatePlayer = MakeRotateXYZMatrix(pPlayer_->GetModel()->transform.rotate);
+			move = TransformNormal(move, rotatePlayer);
+			pPlayer_->GetModel()->transform.translate += move * FPSKeeper::DeltaTime();
+		}
+
+		break;
+	case 4:
+
+		if (isAttack5_) {
+			attackT5_ -= FPSKeeper::DeltaTime();
+
+			if (attackT5_ >= (40.0f - attackLimmit5_)) {
+				float t = 1.0f / attackLimmit5_ * (attackLimmit5_ - (attackT5_ - (40.0f - attackLimmit5_)));
+				Vector3 attackCollider = CatmullRom(attackPoint5_, t);
+				pPlayer_->GetAABBAttack()->SetPos({ attackCollider.x * 1.4f,attackCollider.y,attackCollider.z * 1.6f });
+				pPlayer_->GetWeaponModel()->transform.translate = { attackCollider };
+
+				pPlayer_->GetWeaponModel()->transform.rotate.x = LerpShortAngle(2.5f, 2.46f, t);
+
+				pPlayer_->GetModel()->transform.rotate.y -= 0.405f;
+				pPlayer_->GetBodyModel()->transform.rotate.y = LerpShortAngle(-0.45f, 0.45f, t);
+				pPlayer_->GetBodyModel()->transform.rotate.z = LerpShortAngle(-0.15f, 0.15f, t);
+				pPlayer_->GetBodyModel()->transform.scale.y = Lerp(0.35f, 0.45f, t);
+				float xzScale = Lerp(0.65f, 0.55f, t);
+				pPlayer_->GetBodyModel()->transform.scale.x = xzScale;
+				pPlayer_->GetBodyModel()->transform.scale.z = xzScale;
+
+				pPlayer_->GetFireModel()->transform.scale.x += 0.15f;
+				pPlayer_->SetIsAttack(true);
+			}
+			else {
+				pPlayer_->GetAABBAttack()->SetPos(attackPoint5_[3]);
+				pPlayer_->SetIsAttack(false);
+
+				if (pPlayer_->GetFireModel()->transform.scale.x > 0.0f) {
+					pPlayer_->GetFireModel()->transform.scale.x -= 0.04f;
+					if (pPlayer_->GetFireModel()->transform.scale.x < 0.0f) {
+						pPlayer_->GetFireModel()->transform.scale.x = 0.0f;
+					}
+				}
+			}
+
+		}
+
+		if (attackT5_ <= 0.0f) {
+			if (isChain_) {
+				isAttack_ = false;
+				pPlayer_->SetIsAttack(false);
+				pPlayer_->SetBehaviorRequest(Player::PlayerBehavior::kDefult);
+				EndInit();
+				isChain_ = false;
+			}
+			else {
+				isAttack_ = false;
+				pPlayer_->SetIsAttack(false);
+				pPlayer_->SetBehaviorRequest(Player::PlayerBehavior::kDefult);
+				EndInit();
+			}
+		}
+		else {
+			const float kCharacterSpeed = 0.0f;
+			Vector3 move = { 0.0f, 0.0f, 1.0f };
+			move = move.Normalize() * kCharacterSpeed;
+			Matrix4x4 rotatePlayer = MakeRotateXYZMatrix(pPlayer_->GetModel()->transform.rotate);
+			move = TransformNormal(move, rotatePlayer);
+			pPlayer_->GetModel()->transform.translate += move * FPSKeeper::DeltaTime();
 		}
 
 		break;
@@ -292,8 +441,8 @@ void PlayerAttackBehavior::Attack() {
 	}
 
 
-	if (isAttack2_) {
-		/*pPlayer_->GetAABBAttack()->SetPos({ 0.0f,0.0f,0.0f });*/
+	if (isAttack5_) {
+		pPlayer_->GetAABBAttack()->SetPos({ 0.0f,0.0f,0.0f });
 	}
 
 }
@@ -332,6 +481,9 @@ void PlayerAttackBehavior::Direction() {
 void PlayerAttackBehavior::EndInit() {
 	pPlayer_->GetWeaponModel()->transform.translate = { 1.0f,0.5f,0.0f };
 	pPlayer_->GetWeaponModel()->transform.rotate = { 0.0f,0.0f,0.0f };
+
+	pPlayer_->GetBodyModel()->transform.rotate = { 0.0f,0.0f,0.0f };
+	pPlayer_->GetBodyModel()->transform.scale = { 0.5f,0.5f,0.5f };
 }
 
 

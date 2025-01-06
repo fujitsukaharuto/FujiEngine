@@ -46,3 +46,7 @@ void Material::SetTexture(const std::string& name) {
 	texture_ = TextureManager::GetInstance()->GetTexture(name);
 
 }
+
+void Material::SetLightEnable(LightMode mode) {
+	materialDate_->enableLighting = mode;
+}

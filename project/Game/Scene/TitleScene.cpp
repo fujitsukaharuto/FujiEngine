@@ -62,7 +62,6 @@ void TitleScene::Update() {
 
 #ifdef _DEBUG
 
-
 	/*ImGui::Begin("Sphere");
 
 	ImGui::DragFloat3("scale", &sphere->transform.scale.x, 0.01f);

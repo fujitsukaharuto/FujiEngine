@@ -15,6 +15,7 @@ public:
 	enum class PlayerBehavior {
 		kDefult,
 		kAttack,
+		kDush,
 	};
 
 	void Initialize()override;
@@ -40,6 +41,7 @@ public:
 
 	Object3d* GetBodyModel() { return body_.get(); }
 	Object3d* GetWeaponModel() { return weapon_.get(); }
+	Object3d* GetFireModel() { return firePlane_.get(); }
 	Trans& GetBodyTrans() { return body_->transform; }
 
 
@@ -55,6 +57,7 @@ private:
 
 	std::unique_ptr<Object3d> body_;
 	std::unique_ptr<Object3d> weapon_;
+	std::unique_ptr<Object3d> firePlane_ = nullptr;
 
 	std::unique_ptr<AABBCollider> collider_ = nullptr;
 	std::unique_ptr<AABBCollider> colliderAttack_ = nullptr;

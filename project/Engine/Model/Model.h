@@ -30,6 +30,9 @@ public:
 
 	std::string GetTextuerName() { return nowTextuer; }
 
+	void SetLightEnable(LightMode mode);
+
+	void ShaderTextureDraw(ID3D12GraphicsCommandList* commandList);
 private:
 
 

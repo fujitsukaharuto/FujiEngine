@@ -130,108 +130,167 @@ struct PSInput
 
 
 //切り取りする
-// UVに動きを追加して上昇感を調整
+//// UVに動きを追加して上昇感を調整
+//float2 AddDynamicUV(float2 uv, float time)
+//{
+//    // 上昇する動きを基本とする
+//    float2 scrollOffset = float2(0.0f, 0.3f) * time; // 縦方向のスクロール
+
+//    // 上昇しながら揺らぐ動き
+//    float2 waveOffset = float2(
+//        sin(time * 1.2f + uv.y * 12.0f) * 0.03f, // 水平方向の小さな揺らぎ
+//        cos(time * 1.5f + uv.x * 8.0f) * 0.05f // 縦方向の揺らぎ
+//    );
+
+//    // 最終的な動き
+//    return uv + scrollOffset + waveOffset;
+//}
+
+//// Voronoiノイズを使用したUVディストーション
+//float2 ApplyVoronoiDistortion(float2 uv, float time)
+//{
+//    // 時間によるスクロールと揺らぎ
+//    float2 animatedUV = uv * g_Fire.voronoiScale 
+//                        + float2(0.1f, 0.2f) * time * g_Fire.voronoiSpeed;
+
+//    // スクロールとランダムな動きの調整
+//    float2 randomWave = float2(sin(time * 0.7f), cos(time * 0.5f)) * 0.08f; // 荒々しさを強調
+//    animatedUV += randomWave;
+
+//    // Voronoiノイズをサンプリングしてディストーション計算
+//    float2 distortion = voronoiNoiseTexture.Sample(g_Sampler, animatedUV).rg;
+//    return uv + (distortion - 0.5f) * g_Fire.distortionStrength;
+//}
+
+//// 細かいノイズを使用して炎の質感を追加
+//float AddFineNoiseTexture(float2 uv, float time)
+//{
+//    // 縦スクロールを加えた細かいノイズ
+//    float2 animatedFineUV = uv * g_Fire.detailScale 
+//                            + float2(0.0f, -0.5f) * time * g_Fire.fineNoiseSpeed; // 縦方向強調
+//    return fineNoiseTexture.Sample(g_Sampler, animatedFineUV).r;
+//}
+
+//// 炎の色を時間と共に動的に変化させる（濃さ調整）
+//float3 GetFireColor(float intensity)
+//{
+//    // 炎の色のグラデーション：赤から黄色、オレンジ、白に変化（濃さを強調）
+//    float3 fireColor = lerp(float3(1.0f, 0.2f, 0.0f), float3(1.0f, 0.8f, 0.2f), intensity * 0.7f);
+//    return fireColor;
+//}
+
+//float4 main(PSInput input) : SV_TARGET
+//{
+//    // 元の画面テクスチャを取得
+//    float4 baseColor = g_InputTexture.Sample(g_Sampler, input.texcoord);
+
+//    // 元のUV座標をそのまま使用
+//    float2 normalizedUV = input.texcoord;
+
+//    // 描画範囲内のUVを正規化
+//    float2 rangeUV = (normalizedUV - g_Fire.rangeMin) / (g_Fire.rangeMax - g_Fire.rangeMin);
+
+//    // 炎エフェクトの計算範囲外なら元の色をそのまま返す
+//    if (rangeUV.x < 0.0f || rangeUV.x > 1.0f || rangeUV.y < 0.0f || rangeUV.y > 1.0f)
+//    {
+//        return float4(baseColor.rgb, 1.0f); // 範囲外は元のテクスチャをそのまま返す
+//    }
+
+//    // UVに動きを追加
+//    float2 dynamicUV = AddDynamicUV(rangeUV, g_Fire.time);
+
+//    // マスクのフェード効果（正規化UVを使用）
+//    float maskValue = maskTexture.Sample(g_Sampler, rangeUV).r;
+
+//    // Voronoiノイズを使ったUVディストーション（正規化されたUVを使用）
+//    float2 distortedUV = ApplyVoronoiDistortion(dynamicUV, g_Fire.time);
+
+//    // Voronoiによる炎の強度（明るさ）
+//    float intensity = voronoiNoiseTexture.Sample(g_Sampler, distortedUV).r;
+
+//    // 細かいノイズを追加（色計算前に強度に加算）
+//    float fineNoise = AddFineNoiseTexture(dynamicUV, g_Fire.time);
+//    intensity += fineNoise * 0.2f; // 細かいノイズの影響を増加
+
+//    // 強度を調整して炎の効果を濃くする
+//    intensity = pow(intensity, 1.3f); // 強度を強調（明るい部分をさらに強く）
+
+//    // 時間に応じた炎の色を取得
+//    float3 fireColor = GetFireColor(intensity);
+
+//    // 炎の最終的な色を計算
+//    float3 fireEffect = fireColor * intensity;
+
+//    // fireColor の明るさ（輝度）を計算
+//    float fireBrightness = dot(fireColor, float3(0.299f, 0.587f, 0.114f));
+
+//    // fireBrightness を使って炎と元の色のブレンド比率を動的に調整
+//    float adjustedBlendFactor = g_Fire.blendStrength * maskValue * saturate(fireBrightness);
+
+//    // 元の色と炎のエフェクトをブレンド
+//    float3 finalColor = lerp(baseColor.rgb, fireEffect, adjustedBlendFactor);
+
+//    // 常に透明度は1.0
+//    return float4(finalColor, 1.0f);
+//}
+
+
+// texture用
 float2 AddDynamicUV(float2 uv, float time)
 {
-    // 上昇する動きを基本とする
-    float2 scrollOffset = float2(0.0f, 0.3f) * time; // 縦方向のスクロール
-
-    // 上昇しながら揺らぐ動き
+    float2 scrollOffset = float2(0.0f, 0.3f) * time;
     float2 waveOffset = float2(
-        sin(time * 1.2f + uv.y * 12.0f) * 0.03f, // 水平方向の小さな揺らぎ
-        cos(time * 1.5f + uv.x * 8.0f) * 0.05f // 縦方向の揺らぎ
+        sin(time * 1.2f + uv.y * 12.0f) * 0.03f,
+        cos(time * 1.5f + uv.x * 8.0f) * 0.05f
     );
-
-    // 最終的な動き
     return uv + scrollOffset + waveOffset;
 }
 
-// Voronoiノイズを使用したUVディストーション
 float2 ApplyVoronoiDistortion(float2 uv, float time)
 {
-    // 時間によるスクロールと揺らぎ
     float2 animatedUV = uv * g_Fire.voronoiScale 
                         + float2(0.1f, 0.2f) * time * g_Fire.voronoiSpeed;
-
-    // スクロールとランダムな動きの調整
-    float2 randomWave = float2(sin(time * 0.7f), cos(time * 0.5f)) * 0.08f; // 荒々しさを強調
+    float2 randomWave = float2(sin(time * 0.7f), cos(time * 0.5f)) * 0.08f;
     animatedUV += randomWave;
-
-    // Voronoiノイズをサンプリングしてディストーション計算
     float2 distortion = voronoiNoiseTexture.Sample(g_Sampler, animatedUV).rg;
     return uv + (distortion - 0.5f) * g_Fire.distortionStrength;
 }
 
-// 細かいノイズを使用して炎の質感を追加
 float AddFineNoiseTexture(float2 uv, float time)
 {
-    // 縦スクロールを加えた細かいノイズ
     float2 animatedFineUV = uv * g_Fire.detailScale 
-                            + float2(0.0f, -0.5f) * time * g_Fire.fineNoiseSpeed; // 縦方向強調
+                            + float2(0.0f, -0.5f) * time * g_Fire.fineNoiseSpeed;
     return fineNoiseTexture.Sample(g_Sampler, animatedFineUV).r;
 }
 
-// 炎の色を時間と共に動的に変化させる（濃さ調整）
 float3 GetFireColor(float intensity)
 {
-    // 炎の色のグラデーション：赤から黄色、オレンジ、白に変化（濃さを強調）
     float3 fireColor = lerp(float3(1.0f, 0.2f, 0.0f), float3(1.0f, 0.8f, 0.2f), intensity * 0.7f);
     return fireColor;
 }
 
 float4 main(PSInput input) : SV_TARGET
 {
-    // 元の画面テクスチャを取得
-    float4 baseColor = g_InputTexture.Sample(g_Sampler, input.texcoord);
-
-    // 元のUV座標をそのまま使用
     float2 normalizedUV = input.texcoord;
-
-    // 描画範囲内のUVを正規化
     float2 rangeUV = (normalizedUV - g_Fire.rangeMin) / (g_Fire.rangeMax - g_Fire.rangeMin);
 
-    // 炎エフェクトの計算範囲外なら元の色をそのまま返す
     if (rangeUV.x < 0.0f || rangeUV.x > 1.0f || rangeUV.y < 0.0f || rangeUV.y > 1.0f)
     {
-        return float4(baseColor.rgb, 1.0f); // 範囲外は元のテクスチャをそのまま返す
+        return float4(0.0f, 0.0f, 0.0f, 0.0f); // 範囲外は完全透明
     }
 
-    // UVに動きを追加
     float2 dynamicUV = AddDynamicUV(rangeUV, g_Fire.time);
-
-    // マスクのフェード効果（正規化UVを使用）
-    float maskValue = maskTexture.Sample(g_Sampler, rangeUV).r;
-
-    // Voronoiノイズを使ったUVディストーション（正規化されたUVを使用）
     float2 distortedUV = ApplyVoronoiDistortion(dynamicUV, g_Fire.time);
 
-    // Voronoiによる炎の強度（明るさ）
     float intensity = voronoiNoiseTexture.Sample(g_Sampler, distortedUV).r;
-
-    // 細かいノイズを追加（色計算前に強度に加算）
     float fineNoise = AddFineNoiseTexture(dynamicUV, g_Fire.time);
-    intensity += fineNoise * 0.2f; // 細かいノイズの影響を増加
+    intensity += fineNoise * 0.2f;
+    intensity = pow(intensity, 1.3f);
 
-    // 強度を調整して炎の効果を濃くする
-    intensity = pow(intensity, 1.3f); // 強度を強調（明るい部分をさらに強く）
-
-    // 時間に応じた炎の色を取得
     float3 fireColor = GetFireColor(intensity);
+    float alpha = saturate(intensity);
 
-    // 炎の最終的な色を計算
-    float3 fireEffect = fireColor * intensity;
-
-    // fireColor の明るさ（輝度）を計算
-    float fireBrightness = dot(fireColor, float3(0.299f, 0.587f, 0.114f));
-
-    // fireBrightness を使って炎と元の色のブレンド比率を動的に調整
-    float adjustedBlendFactor = g_Fire.blendStrength * maskValue * saturate(fireBrightness);
-
-    // 元の色と炎のエフェクトをブレンド
-    float3 finalColor = lerp(baseColor.rgb, fireEffect, adjustedBlendFactor);
-
-    // 常に透明度は1.0
-    return float4(finalColor, 1.0f);
+    return float4(fireColor, alpha);
 }
 
 

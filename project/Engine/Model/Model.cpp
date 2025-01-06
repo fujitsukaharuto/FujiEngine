@@ -62,3 +62,17 @@ void Model::SetTexture(const std::string& name) {
 void Model::SetTextureName(const std::string& name) {
 	nowTextuer = name;
 }
+
+void Model::SetLightEnable(LightMode mode) {
+	for (uint32_t index = 0; index < mesh_.size(); ++index) {
+		material_[index].SetLightEnable(mode);
+	}
+}
+
+void Model::ShaderTextureDraw(ID3D12GraphicsCommandList* commandList) {
+	for (uint32_t index = 0; index < mesh_.size(); ++index) {
+		commandList->SetGraphicsRootConstantBufferView(0, material_[index].GetMaterialResource()->GetGPUVirtualAddress());
+		commandList->SetGraphicsRootDescriptorTable(2, DXCom::GetInstance()->GetShaderTextureGPU());
+		mesh_[index].Draw(commandList);
+	}
+}

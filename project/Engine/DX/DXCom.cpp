@@ -39,6 +39,10 @@ void DXCom::Initialize(MyWin* myWin) {
 
 }
 
+D3D12_GPU_DESCRIPTOR_HANDLE DXCom::GetShaderTextureGPU() {
+	return offTextureHandle2_;
+}
+
 void DXCom::CreateDevice() {
 
 #ifdef _DEBUG
@@ -141,7 +145,7 @@ void DXCom::CreateSwapChain() {
 
 void DXCom::CreateRenderTargets() {
 
-	rtvDescriptorHeap_ = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 3, false);
+	rtvDescriptorHeap_ = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 4, false);
 
 	HRESULT hr = swapChain_->GetBuffer(0, IID_PPV_ARGS(&swapChainResources_[0]));
 	assert(SUCCEEDED(hr));
@@ -172,6 +176,21 @@ void DXCom::CreateRenderTargets() {
 
 	device_->CreateRenderTargetView(offscreenrt_.Get(), &offscreenrtvDesc_, rtvHandles_[2]);
 
+
+	rtvHandles_[3].ptr = rtvHandles_[2].ptr + device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	offscreenrtvDesc2_.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	offscreenrtvDesc2_.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+
+	clearColorValue2.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	clearColorValue2.Color[0] = 1.0f;
+	clearColorValue2.Color[1] = 1.0f;
+	clearColorValue2.Color[2] = 1.0f;
+	clearColorValue2.Color[3] = 0.0f;
+
+	offscreenrt2_ = CreateOffscreenTextureResource(
+		device_.Get(), MyWin::kWindowWidth, MyWin::kWindowHeight, clearColorValue2);
+
+	device_->CreateRenderTargetView(offscreenrt2_.Get(), &offscreenrtvDesc2_, rtvHandles_[3]);
 
 	shockResource_ = CreateBufferResource(device_, sizeof(ShockWaveData));
 	shockData_ = nullptr;
@@ -330,6 +349,15 @@ void DXCom::SettingTexture() {
 	offTextureHandleCPU_ = srvManager->GetCPUDescriptorHandle(offscreenSRVIndex_);
 	offTextureHandle_ = srvManager->GetGPUDescriptorHandle(offscreenSRVIndex_);
 
+
+	offscreenSRVIndex2_ = srvManager->Allocate();
+
+	srvManager->CreateTextureSRV(offscreenSRVIndex2_, offscreenrt2_.Get(), DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, 1);
+
+	offTextureHandleCPU2_ = srvManager->GetCPUDescriptorHandle(offscreenSRVIndex2_);
+	offTextureHandle2_ = srvManager->GetGPUDescriptorHandle(offscreenSRVIndex2_);
+
+
 	baseTex_ = TextureManager::GetInstance()->LoadTexture("Gradient02.jpg");
 	voronoTex_ = TextureManager::GetInstance()->LoadTexture("T_Noise04.jpg");
 	noiseTex_ = TextureManager::GetInstance()->LoadTexture("T_Noise02-300x300.jpg");
@@ -379,6 +407,10 @@ void DXCom::PostEffect() {
 	offbarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	offbarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
 	commandList->ResourceBarrier(1, &offbarrier);
+
+
+	ShaderTexture();
+
 
 
 	UINT backBufferIndex = swapChain_->GetCurrentBackBufferIndex();
@@ -681,6 +713,50 @@ void DXCom::UpDate() {
 	/*wvpDate_->World = worldMatrix;
 	wvpDate_->WVP = worldViewProjectionMatrix;*/
 
+}
+
+void DXCom::ShaderTexture() {
+	ID3D12GraphicsCommandList* commandList = command_->GetList();
+
+	D3D12_RESOURCE_BARRIER offbarrier2{};
+	offbarrier2.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	offbarrier2.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	offbarrier2.Transition.pResource = offscreenrt2_.Get();
+	offbarrier2.Transition.StateBefore = D3D12_RESOURCE_STATE_GENERIC_READ;
+	offbarrier2.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	command_->GetList()->ResourceBarrier(1, &offbarrier2);
+
+	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle2 = dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
+	commandList->OMSetRenderTargets(1, &rtvHandles_[3], false, &dsvHandle2);
+	commandList->ClearDepthStencilView(dsvHandle2, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+
+	commandList->ClearRenderTargetView(rtvHandles_[3], clearColorValue2.Color, 0, nullptr);
+
+
+
+	command_->SetViewAndscissor();
+	pipeManager_->SetPipeline(Pipe::Fire);
+
+	commandList->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	commandList->IASetIndexBuffer(&indexGrayBufferView_);
+	commandList->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
+	commandList->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
+	commandList->SetGraphicsRootDescriptorTable(1, baseTex_->gpuHandle);
+	commandList->SetGraphicsRootDescriptorTable(2, voronoTex_->gpuHandle);
+	commandList->SetGraphicsRootDescriptorTable(3, noiseTex_->gpuHandle);
+	commandList->SetGraphicsRootConstantBufferView(4, fireResource_->GetGPUVirtualAddress());
+	commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
+
+
+
+
+	D3D12_RESOURCE_BARRIER offbarrier3{};
+	offbarrier2.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	offbarrier2.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	offbarrier2.Transition.pResource = offscreenrt2_.Get();
+	offbarrier2.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	offbarrier2.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
+	command_->GetList()->ResourceBarrier(1, &offbarrier2);
 }
 
 void DXCom::ReleaseData() {

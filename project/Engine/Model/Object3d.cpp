@@ -94,6 +94,24 @@ void Object3d::SetTexture(const std::string& name) {
 	nowTextureName = name;
 }
 
+void Object3d::SetLightEnable(LightMode mode) {
+	model_->SetLightEnable(mode);
+}
+
+void Object3d::ShaderTextureDraw() {
+	SetWVP();
+
+	ID3D12GraphicsCommandList* cList = DXCom::GetInstance()->GetCommandList();
+	cList->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
+	cList->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
+	cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_->GetGPUVirtualAddress());
+	PointLightManager::GetInstance()->SetLightCommand(cList);
+
+	if (model_) {
+		model_->ShaderTextureDraw(cList);
+	}
+}
+
 void Object3d::SetModel(const std::string& fileName) {
 	model_ = std::make_unique<Model>(*(ModelManager::FindModel(fileName)));
 }

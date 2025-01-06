@@ -44,6 +44,8 @@ public:
 
 	void SetTexture(const std::string& name);
 
+	void SetLightEnable(LightMode mode);
+
 private:
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_ = nullptr;
