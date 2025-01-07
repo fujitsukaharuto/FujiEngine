@@ -18,9 +18,14 @@ TitleScene::~TitleScene() {
 void TitleScene::Initialize() {
 	Init();
 
-
 	obj3dCommon.reset(new Object3dCommon());
 	obj3dCommon->Initialize();
+
+	black_ = std::make_unique<Sprite>();
+	black_->Load("white2x2.png");
+	black_->SetColor({ 0.0f,0.0f,0.0f,1.0f });
+	black_->SetSize({ 1280.0f,720.0f });
+	black_->SetAnchor({ 0.0f,0.0f });
 
 	/*sphere = std::make_unique<Object3d>();
 	sphere->CreateSphere();
@@ -33,24 +38,6 @@ void TitleScene::Initialize() {
 	test2_->Initialize();
 	test2_->name_ = "testObj2";*/
 
-	test_ = std::make_unique<TestBaseObj>();
-	test_->Initialize();
-	test_->name_ = "testObj";
-	test_->GetModel()->transform.scale = { 0.5f,0.5f,0.5f };
-
-	cMane_ = std::make_unique<CollisionManager>();
-
-	terrain = std::make_unique<Object3d>();
-	terrain->Create("terrain.obj");
-	terrain->transform.scale = { 8.0f,8.0f,8.0f };
-
-	player_ = std::make_unique<Player>();
-	player_->Initialize();
-
-	followCamera_ = std::make_unique<FollowCamera>();
-	followCamera_->Initialize();
-	followCamera_->SetTarget(&player_->GetTrans());
-
 	/*emit.name = "sphere";
 	emit.Load("sphere");*/
 
@@ -58,55 +45,21 @@ void TitleScene::Initialize() {
 
 void TitleScene::Update() {
 
-	cMane_->Reset();
-
 #ifdef _DEBUG
 
-	/*ImGui::Begin("Sphere");
 
-	ImGui::DragFloat3("scale", &sphere->transform.scale.x, 0.01f);
-	ImGui::DragFloat3("rotate", &sphere->transform.rotate.x, 0.01f);
-	ImGui::DragFloat3("right", &rightDir.x, 0.01f);
-	rightDir = rightDir.Normalize();
-	sphere->SetRightDir(rightDir);
-	ImGui::End();
-
-	emit.DebugGUI();
-
-	test_->Debug();
-	test2_->Debug();*/
 
 #endif // _DEBUG
 
 
 	dxCommon_->UpDate();
 
+	BlackFade();
+
 	/*test_->Update();
 	test2_->Update();*/
-	test_->Update();
-	player_->Update();
 
-	followCamera_->Update();
 
-	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
-		SceneManager::GetInstance()->ChangeScene("GAME", 40.0f);
-	}
-
-	/*if (input_->TriggerKey(DIK_5)) {
-		emit.Emit();
-	}
-	emit.Emit();
-
-	sphere->transform.rotate.y += 0.02f;
-
-	cMane_->AddCollider(test_->GetCollider());
-	cMane_->AddCollider(test2_->GetCollider());*/
-	cMane_->AddCollider(test_->GetCollider());
-	cMane_->AddCollider(player_->GetCollider());
-	if (player_->GetIsAttack()) {
-		cMane_->AddCollider(player_->GetColliderAttack());
-	}
-	cMane_->CheckAllCollision();
 
 	ParticleManager::GetInstance()->Update();
 }
@@ -124,9 +77,7 @@ void TitleScene::Draw() {
 	obj3dCommon->PreDraw();
 	/*sphere->Draw();
 	test_->Draw();*/
-	test_->Draw();
-	terrain->Draw();
-	player_->Draw();
+
 
 	ParticleManager::GetInstance()->Draw();
 
@@ -134,9 +85,7 @@ void TitleScene::Draw() {
 	/*emit.DrawSize();
 	test_->DrawCollider();
 	test2_->DrawCollider();*/
-	test_->DrawCollider();
-	player_->DrawCollider();
-	player_->DrawColliderAttack();
+
 #endif // _DEBUG
 	Line3dDrawer::GetInstance()->Render();
 
@@ -146,9 +95,38 @@ void TitleScene::Draw() {
 #pragma region 前景スプライト
 
 	dxCommon_->PreSpriteDraw();
+	black_->Draw();
 
 #pragma endregion
 
+}
+
+void TitleScene::BlackFade() {
+	if (isChangeFase) {
+		if (blackTime < blackLimmite) {
+			blackTime += FPSKeeper::DeltaTime();
+			if (blackTime >= blackLimmite) {
+				blackTime = blackLimmite;
+			}
+		}
+		else {
+			SceneManager::GetInstance()->ChangeScene("GAME", 40.0f);
+		}
+	}
+	else {
+		if (blackTime > 0.0f) {
+			blackTime -= FPSKeeper::DeltaTime();
+			if (blackTime <= 0.0f) {
+				blackTime = 0.0f;
+			}
+		}
+	}
+	black_->SetColor({ 0.0f,0.0f,0.0f,Lerp(0.0f,1.0f,(1.0f / blackLimmite * blackTime)) });
+	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
+		if (blackTime == 0.0f) {
+			isChangeFase = true;
+		}
+	}
 }
 
 void TitleScene::ApplyGlobalVariables() {

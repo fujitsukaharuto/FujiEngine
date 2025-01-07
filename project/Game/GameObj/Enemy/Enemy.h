@@ -25,6 +25,8 @@ public:
 
 	BaseCollider* GetCollider() { return collider_.get(); }
 
+	void ColliderInit();
+
 	std::string name_;
 
 #ifdef _DEBUG

@@ -14,6 +14,8 @@ public:
 	void Update();
 	void Draw(Material* mate = nullptr);
 
+	std::list<std::unique_ptr<Enemy>>& GetEnemyList() { return enemies_; }
+
 #ifdef _DEBUG
 	void Debug();
 	void DrawCollider();
@@ -23,12 +25,6 @@ private:
 
 private:
 
-
+	std::list<std::unique_ptr<Enemy>> enemies_;
 
 };
-
-EnemyManager::EnemyManager() {
-}
-
-EnemyManager::~EnemyManager() {
-}

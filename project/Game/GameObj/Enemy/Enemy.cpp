@@ -1,4 +1,5 @@
 #include "Enemy.h"
+#include "Math/Random.h"
 
 Enemy::Enemy() {
 }
@@ -8,13 +9,16 @@ Enemy::~Enemy() {
 
 void Enemy::Initialize() {
 	OriginGameObject::Initialize();
-	model_->Create("suzanne.obj");
+	model_->Create("EnemyBody.obj");
 	omega_ = 2.0f * std::numbers::pi_v<float> / 300.0f;
 	collider_ = std::make_unique<AABBCollider>();
 	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
 	collider_->SetCollisionStayCallback([this](const ColliderInfo& other) {OnCollisionStay(other); });
 	collider_->SetCollisionExitCallback([this](const ColliderInfo& other) {OnCollisionExit(other); });
 	collider_->SetTag("enemy");
+	collider_->SetWidth(0.5f);
+	collider_->SetHeight(0.5f);
+	collider_->SetDepth(0.5f);
 
 	hitParticle1_.name = "hitParticle1";
 	hitParticle2_.name = "hitParticle2";
@@ -55,6 +59,7 @@ void Enemy::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 		color_ = { 1.0f,0.0f,0.0f,1.0f };
 		hitParticle1_.Burst();
 		hitParticle2_.Burst();
+		hitParticle3_.particleRotate.z = Random::GetFloat(-6.0f, 6.0f);
 		hitParticle3_.Burst();
 		hitParticle4_.Burst();
 	}
@@ -67,6 +72,10 @@ void Enemy::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
 
 void Enemy::OnCollisionExit([[maybe_unused]] const ColliderInfo& other) {
 	color_ = { 1.0f,0.0f,1.0f,1.0f };
+}
+
+void Enemy::ColliderInit() {
+	collider_->SetPos(model_->GetWorldPos());
 }
 
 #ifdef _DEBUG

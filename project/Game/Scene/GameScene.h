@@ -1,5 +1,10 @@
 #pragma once
 #include "Scene/BaseScene.h"
+#include "Game/TestBaseObj.h"
+#include "Game/Collider/CollisionManager.h"
+#include "Game/GameObj/Player/Player.h"
+#include "Game/GameObj/Enemy/EnemyManager.h"
+#include "Game/GameObj/FollowCamera.h"
 
 
 class GameScene :public BaseScene
@@ -14,11 +19,13 @@ public:
 
 	void Draw()override;
 
+	void BlackFade();
+
 private:
 
 	void ApplyGlobalVariables();//値読み込みテスト用今度Objectクラス作って継承で使えるようにする
 
-	std::unique_ptr<Object3dCommon> obj3dCommon = nullptr;
+	/*std::unique_ptr<Object3dCommon> obj3dCommon = nullptr;
 
 	std::unique_ptr<Object3d> sphere = nullptr;
 	std::unique_ptr<Object3d> suzunne = nullptr;
@@ -45,6 +52,22 @@ private:
 	SoundData soundData1;
 	SoundData soundData2;
 
-	ParticleEmitter emit;
+	ParticleEmitter emit;*/
+
+	std::unique_ptr<Object3dCommon> obj3dCommon = nullptr;
+
+	std::unique_ptr<CollisionManager> cMane_;
+
+	std::unique_ptr<EnemyManager> enemyManager_;
+	std::unique_ptr<Object3d> terrain = nullptr;
+	std::unique_ptr<Player> player_;
+	std::unique_ptr<FollowCamera> followCamera_;
+
+
+
+	std::unique_ptr<Sprite> black_;
+	float blackLimmite = 20.0f;
+	float blackTime = 20.0f;
+	bool isChangeFase = false;
 
 };
