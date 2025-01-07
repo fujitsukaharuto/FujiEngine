@@ -16,7 +16,7 @@ MyWin* MyWin::GetInstance()
 
 
 void MyWin::Initialize() {
-	CreateGWindow(L"FUJI", kWindowWidth, kWindowHeight);
+	CreateGWindow(L"LE2A_17_フジツカ_ハルト_キューブスラッシュ", kWindowWidth, kWindowHeight);
 	timeBeginPeriod(1);
 }
 
