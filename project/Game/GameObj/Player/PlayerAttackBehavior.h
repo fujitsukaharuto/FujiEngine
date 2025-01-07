@@ -2,6 +2,7 @@
 #include "Game/OriginState.h"
 #include "Math/Vector3.h"
 #include <vector>
+#include "Audio/Audio.h"
 
 class Player;
 
@@ -24,6 +25,8 @@ private:
 
 	Player* pPlayer_;
 	bool isAttack_ = true;
+
+	float attackSpeed_ = 0.1f;
 
 	int comboIndex_ = 0;
 	bool isChain_ = false;

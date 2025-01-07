@@ -3,6 +3,7 @@
 #include "Input/Input.h"
 #include "Math/MatrixCalculation.h"
 #include "Camera/CameraManager.h"
+#include "Game/GameObj/LockOn.h"
 
 
 // やらなければならないこと
@@ -61,6 +62,8 @@ PlayerAttackBehavior::PlayerAttackBehavior(Player* pPlayer) : pPlayer_(pPlayer) 
 		{-1.0f,0.5f,0.0f},
 	};
 
+	Direction();
+	Audio::GetInstance()->SoundPlayWave(pPlayer_->attackSound1);
 }
 
 PlayerAttackBehavior::~PlayerAttackBehavior() {
@@ -91,6 +94,13 @@ void PlayerAttackBehavior::Attack() {
 			attackT1_ -= FPSKeeper::DeltaTime();
 
 			if (attackT1_ >= (40.0f - attackLimmit1_)) {
+
+				Vector3 move = { 0.0f, 0.0f, 1.0f };
+				move = move.Normalize() * attackSpeed_;
+				Matrix4x4 rotatePlayer = MakeRotateXYZMatrix(pPlayer_->GetModel()->transform.rotate);
+				move = TransformNormal(move, rotatePlayer);
+				pPlayer_->GetModel()->transform.translate += move * FPSKeeper::DeltaTime();
+
 				float t = 1.0f / attackLimmit1_ * (attackLimmit1_ - (attackT1_ - (40.0f-attackLimmit1_)));
 				Vector3 attackCollider = CatmullRom(attackPoint1_, t);
 				pPlayer_->GetAABBAttack()->SetPos({ attackCollider.x * 1.4f,attackCollider.y,attackCollider.z * 1.8f });
@@ -133,6 +143,8 @@ void PlayerAttackBehavior::Attack() {
 					pPlayer_->GetBodyModel()->transform.rotate.x = 0.0f;
 
 					Direction();
+					Audio::GetInstance()->SoundPlayWave(pPlayer_->attackSound1);
+
 				}
 				else {
 					isAttack_ = false;
@@ -207,6 +219,8 @@ void PlayerAttackBehavior::Attack() {
 					pPlayer_->GetBodyModel()->transform.scale = { 0.5f,0.5f,0.5f };
 
 					Direction();
+					Audio::GetInstance()->SoundPlayWave(pPlayer_->attackSound1);
+
 				}
 				else {
 					isAttack_ = false;
@@ -283,6 +297,8 @@ void PlayerAttackBehavior::Attack() {
 				pPlayer_->GetBodyModel()->transform.scale = { 0.5f,0.5f,0.5f };
 
 				Direction();
+				Audio::GetInstance()->SoundPlayWave(pPlayer_->attackSound1);
+
 			}
 			else {
 				isAttack_ = false;
@@ -354,7 +370,11 @@ void PlayerAttackBehavior::Attack() {
 				pPlayer_->GetWeaponModel()->transform.rotate.y = -0.1f;
 				pPlayer_->GetBodyModel()->transform.scale = { 0.5f,0.5f,0.5f };
 
+				pPlayer_->GetAABBAttack()->SetTag("attack_knock");
+
 				Direction();
+				Audio::GetInstance()->SoundPlayWave(pPlayer_->attackSound2);
+
 			}
 			else {
 				isAttack_ = false;
@@ -477,12 +497,31 @@ void PlayerAttackBehavior::Direction() {
 
 		}
 
+
+		if (pPlayer_->GetLockOn()) {
+			Vector3 lockOnPosition = pPlayer_->GetLockOnPtr()->GetTargetPosition();
+			Vector3 sub = lockOnPosition - pPlayer_->GetModel()->transform.translate;
+
+			float distance = sub.Length();
+			const float threshold2 = 2.0f;
+
+			if (distance > threshold2) {
+				pPlayer_->GetModel()->transform.rotate.y = std::atan2(sub.x, sub.z);
+
+				if (attackSpeed_ > distance - threshold2) {
+					attackSpeed_ = distance - threshold2;
+				}
+			}
+		}
+
 	}
 }
 
 void PlayerAttackBehavior::EndInit() {
 	pPlayer_->GetWeaponModel()->transform.translate = { 1.0f,0.5f,0.0f };
 	pPlayer_->GetWeaponModel()->transform.rotate = { 0.0f,0.0f,0.0f };
+
+	pPlayer_->GetAABBAttack()->SetTag("attack");
 
 	pPlayer_->GetBodyModel()->transform.rotate = { 0.0f,0.0f,0.0f };
 	pPlayer_->GetBodyModel()->transform.scale = { 0.5f,0.5f,0.5f };

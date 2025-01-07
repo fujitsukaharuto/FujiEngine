@@ -32,6 +32,8 @@ public:
 
 	void SetColor(const Vector4& color);
 
+	void SetUVScale(const Vector2& scale);
+
 	void SetRightDir(const Vector3& right) { directionalLightData_->direction = right; }
 
 	void SetCamera(Camera* camera) { this->camera_ = camera; }

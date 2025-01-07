@@ -4,6 +4,7 @@
 #include "Game/Collider/CollisionManager.h"
 #include "Game/GameObj/Player/Player.h"
 #include "Game/GameObj/Enemy/EnemyManager.h"
+#include "Game/GameObj/LockOn.h"
 #include "Game/GameObj/FollowCamera.h"
 
 
@@ -60,11 +61,13 @@ private:
 
 	std::unique_ptr<EnemyManager> enemyManager_;
 	std::unique_ptr<Object3d> terrain = nullptr;
+	std::unique_ptr<Object3d> sky = nullptr;
 	std::unique_ptr<Player> player_;
 	std::unique_ptr<FollowCamera> followCamera_;
+	std::unique_ptr<LockOn> lockOn_;
 
 
-
+	std::unique_ptr<Sprite> paneru;
 	std::unique_ptr<Sprite> black_;
 	float blackLimmite = 20.0f;
 	float blackTime = 20.0f;

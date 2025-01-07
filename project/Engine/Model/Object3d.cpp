@@ -86,6 +86,10 @@ void Object3d::SetColor(const Vector4& color) {
 	model_->SetColor(color);
 }
 
+void Object3d::SetUVScale(const Vector2& scale) {
+	model_->SetUVScale(scale);
+}
+
 void Object3d::SetTexture(const std::string& name) {
 	if (name == nowTextureName) {
 		return;
@@ -130,8 +134,8 @@ void Object3d::CreateWVP() {
 	directionalLightData_ = nullptr;
 	directionalLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData_));
 	directionalLightData_->color = { 1.0f,1.0f,1.0f,1.0f };
-	directionalLightData_->direction = { 1.0f,0.0f,0.0f };
-	directionalLightData_->intensity = 1.0f;
+	directionalLightData_->direction = { 0.0f,-1.0f,0.0f };
+	directionalLightData_->intensity = 0.3f;
 
 
 	cameraPosResource_ = DXCom::GetInstance()->CreateBufferResource(DXCom::GetInstance()->GetDevice(), sizeof(DirectionalLight));

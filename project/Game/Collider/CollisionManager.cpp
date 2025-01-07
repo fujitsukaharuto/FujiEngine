@@ -68,8 +68,14 @@ void CollisionManager::CheckAllCollision() {
 		AABBCollider* aabb = dynamic_cast<AABBCollider*>(collider);
 		if (aabb) {
 			auto& hitList = aabb->hitList_;
-			hitList.remove_if([this](BaseCollider* other) {
-				return std::find(colliders_.begin(), colliders_.end(), other) == colliders_.end();
+			hitList.remove_if([this, aabb](BaseCollider* other) {
+				// コライダーリストに存在しない場合
+				if (std::find(colliders_.begin(), colliders_.end(), other) == colliders_.end()) {
+					// 衝突終了状態を設定
+					aabb->SetState(CollisionState::collisionExit);
+					return true; // リストから削除
+				}
+				return false; // 残す
 				});
 		}
 	}

@@ -46,6 +46,7 @@ void AABBCollider::OnCollisionExit(const ColliderInfo& other) {
 	if (onCollisionExit) {
 		onCollisionExit(other);
 	}
+	state = CollisionState::None;
 }
 
 #ifdef _DEBUG

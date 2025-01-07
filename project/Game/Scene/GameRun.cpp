@@ -20,8 +20,13 @@ void GameRun::Initialize() {
 
 #pragma region オブジェクト読み込み
 	modelManager_->LoadOBJ("suzanne.obj");
-	modelManager_->LoadOBJ("Fence.obj");
-	modelManager_->LoadOBJ("terrain.obj");
+	modelManager_->LoadOBJ("playerWeapon.obj");
+	modelManager_->LoadOBJ("player.obj");
+	modelManager_->LoadOBJ("shadow.obj");
+	modelManager_->LoadOBJ("ground.obj");
+	modelManager_->LoadOBJ("sky.obj");
+
+
 #pragma endregion
 
 
@@ -31,8 +36,12 @@ void GameRun::Initialize() {
 	pManager_->AddAnime("animetest", "white2x2.png", 10.0f);
 
 	// プレイヤーのパーティクル
-	pManager_->CreateParticleGroup("attackParticle", "blueParticle.png");
-	pManager_->CreateParticleGroup("attackParticle2", "blueParticle.png");
+	pManager_->CreateParticleGroup("attackParticle", "blueParticle.png",40);
+	pManager_->CreateParticleGroup("attackParticle2", "blueParticle.png", 40);
+
+	pManager_->CreateParticleGroup("attackParticle3", "shockWave.png", 3);
+	pManager_->CreateParticleGroup("attackParticle4", "blueParticle.png", 20);
+	pManager_->CreateParticleGroup("attackParticle5", "blueParticle.png",20);
 
 
 	// 敵のパーティクル
@@ -48,6 +57,11 @@ void GameRun::Initialize() {
 
 	audio_->LoadWave("xxx.wav");
 	audio_->LoadWave("mokugyo.wav");
+	audio_->LoadWave("attack1.wav");
+	audio_->LoadWave("attack2.wav");
+	audio_->LoadWave("jumpAttack.wav");
+	audio_->LoadWave("jump01.wav");
+	audio_->LoadWave("dush.wav");
 
 #pragma endregion
 

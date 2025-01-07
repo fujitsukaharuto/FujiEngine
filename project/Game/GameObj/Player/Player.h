@@ -6,6 +6,9 @@
 #include "Math/MatrixCalculation.h"
 #include "Game/OriginState.h"
 #include "Particle/ParticleEmitter.h"
+#include "Audio/Audio.h"
+
+class LockOn;
 
 class Player : public OriginGameObject {
 public:
@@ -16,6 +19,7 @@ public:
 		kDefult,
 		kAttack,
 		kDush,
+		kJump,
 	};
 
 	void Initialize()override;
@@ -44,6 +48,11 @@ public:
 	Object3d* GetFireModel() { return firePlane_.get(); }
 	Trans& GetBodyTrans() { return body_->transform; }
 
+	void EmitJumpAttack();
+
+	void SetLockOn(const LockOn* target) { lockOn_ = target; }
+	bool GetLockOn();
+	const LockOn* GetLockOnPtr() { return lockOn_; }
 
 #ifdef _DEBUG
 	void Debug()override;
@@ -51,6 +60,14 @@ public:
 	void DrawColliderAttack() { if (isAttack_) { colliderAttack_->DrawCollider(); } }
 
 #endif // _DEBUG
+
+
+	SoundData attackSound1;
+	SoundData attackSound2;
+	SoundData attackSound3;
+
+	SoundData dushSound;
+	SoundData jumpSound;
 
 
 private:
@@ -76,5 +93,12 @@ private:
 
 	ParticleEmitter attackParticle_;
 	ParticleEmitter attackParticle2_;
+
+	ParticleEmitter attackParticle3_;
+	ParticleEmitter attackParticle4_;
+	ParticleEmitter attackParticle5_;
+
+	const LockOn* lockOn_ = nullptr;
+
 
 };

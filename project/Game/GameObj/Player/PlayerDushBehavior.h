@@ -2,6 +2,7 @@
 #include "Game/OriginState.h"
 #include "Math/Vector3.h"
 #include <vector>
+#include "Audio/Audio.h"
 
 class Player;
 

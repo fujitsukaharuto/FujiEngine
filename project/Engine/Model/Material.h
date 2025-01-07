@@ -42,11 +42,15 @@ public:
 
 	void SetColor(const Vector4& color) { materialDate_->color = color; }
 
+	void SetUVScale(const Vector2& scale);
+
 	void SetTexture(const std::string& name);
 
 	void SetLightEnable(LightMode mode);
 
 private:
+
+	Matrix4x4 MakeScale4x4(const Vector3& scale);
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_ = nullptr;
 	MaterialDate* materialDate_ = nullptr;

@@ -6,6 +6,7 @@
 
 
 PlayerDushBehavior::PlayerDushBehavior(Player* pPlayer) :pPlayer_(pPlayer) {
+	Audio::GetInstance()->SoundPlayWave(pPlayer_->dushSound);
 }
 
 PlayerDushBehavior::~PlayerDushBehavior() {

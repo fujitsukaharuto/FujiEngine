@@ -2,23 +2,32 @@
 #include "Game/GameObj/Player/PlayerDefaultBehavior.h"
 #include "Game/GameObj/Player/PlayerAttackBehavior.h"
 #include "Game/GameObj/Player/PlayerDushBehavior.h"
+#include "Game/GameObj/Player/PlayerJumpBehavior.h"
 #include "Input/Input.h"
+#include "Game/GameObj/LockOn.h"
 
 Player::Player() {
 }
 
 Player::~Player() {
+	Audio::GetInstance()->SoundStopWave(attackSound1);
+	Audio::GetInstance()->SoundStopWave(attackSound2);
+	Audio::GetInstance()->SoundStopWave(attackSound3);
+
+	Audio::GetInstance()->SoundStopWave(jumpSound);
+	Audio::GetInstance()->SoundStopWave(dushSound);
 }
 
 void Player::Initialize() {
 	OriginGameObject::Initialize();
-	model_->Create("suzanne.obj");
+	model_->Create("player.obj");
 
 	body_ = std::make_unique<Object3d>();
 	body_->Create("player.obj");
 	body_->SetParent(model_.get());
 	body_->transform.scale = { 0.5f,0.5f,0.5f };
 
+	shadow_->transform.scale = { 0.7f,0.7f,0.7f };
 
 	weapon_ = std::make_unique<Object3d>();
 	weapon_->Create("playerWeapon.obj");
@@ -59,6 +68,27 @@ void Player::Initialize() {
 	attackParticle2_.pos.y += 0.3f;
 	attackParticle2_.SetParent(weapon_.get());
 
+
+	attackParticle3_.name = "attackParticle3";
+	attackParticle3_.Load("attackParticle3");
+	attackParticle3_.SetParent(body_.get());
+
+	attackParticle4_.name = "attackParticle4";
+	attackParticle4_.Load("attackParticle4");
+	attackParticle4_.SetParent(body_.get());
+
+	attackParticle5_.name = "attackParticle5";
+	attackParticle5_.Load("attackParticle5");
+	attackParticle5_.SetParent(body_.get());
+
+
+	attackSound1=Audio::GetInstance()->SoundLoadWave("attack2.wav");
+	attackSound2 = Audio::GetInstance()->SoundLoadWave("attack1.wav");
+	attackSound3 = Audio::GetInstance()->SoundLoadWave("jumpAttack.wav");
+
+	dushSound = Audio::GetInstance()->SoundLoadWave("dush.wav");
+	jumpSound = Audio::GetInstance()->SoundLoadWave("jump01.wav");
+
 }
 
 void Player::Update() {
@@ -85,17 +115,26 @@ void Player::Update() {
 				behaviorRequest_ = PlayerBehavior::kDush;
 			}
 		}
+		if (Input::GetInstance()->TriggerButton(PadInput::B)) {
+			if (!isAttack_ && behavior_ == PlayerBehavior::kDefult) {
+				behaviorRequest_ = PlayerBehavior::kJump;
+			}
+		}
 	}
 
 #ifdef _DEBUG
 
 	attackParticle_.DebugGUI();
 
+	attackParticle3_.DebugGUI();
+	attackParticle4_.DebugGUI();
+	attackParticle5_.DebugGUI();
+
 	ImGui::Begin("weapon");
 	ImGui::DragFloat3("rotate", &weapon_->transform.rotate.x, 0.01f);
 	ImGui::End();
 	ImGui::Begin("body");
-	ImGui::DragFloat3("rotateBody", &body_->transform.scale.x, 0.01f);
+	ImGui::DragFloat3("rotateBody", &body_->transform.rotate.x, 0.01f);
 	ImGui::End();
 	ImGui::Begin("fire");
 	ImGui::DragFloat3("trans", &firePlane_->transform.translate.x, 0.01f);
@@ -130,6 +169,7 @@ void Player::Update() {
 
 void Player::Draw([[maybe_unused]]Material* mate) {
 	//OriginGameObject::Draw(mate);
+	OriginGameObject::ShdowDraw();
 	body_->Draw(mate);
 	weapon_->Draw(mate);
 	firePlane_->ShaderTextureDraw();
@@ -153,6 +193,9 @@ void Player::BehaviorRequest() {
 		case Player::PlayerBehavior::kDush:
 			SetState(std::make_unique<PlayerDushBehavior>(this));
 			break;
+		case Player::PlayerBehavior::kJump:
+			SetState(std::make_unique<PlayerJumpBehavior>(this));
+			break;
 		default:
 			break;
 		}
@@ -168,6 +211,15 @@ void Player::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 void Player::OnCollisionAttackEnter([[maybe_unused]] const ColliderInfo& other) {
 }
 
+void Player::EmitJumpAttack() {
+	attackParticle3_.Burst();
+	attackParticle4_.Burst();
+	attackParticle5_.Burst();
+}
+
+bool Player::GetLockOn() {
+	return lockOn_ && lockOn_->ExistTarget();
+}
 #ifdef _DEBUG
 void Player::Debug() {
 

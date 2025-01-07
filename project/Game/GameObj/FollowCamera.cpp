@@ -2,6 +2,7 @@
 #include "Input/Input.h"
 #include "Camera/CameraManager.h"
 #include "DX/FPSKeeper.h"
+#include "Game/GameObj/LockOn.h"
 
 FollowCamera::FollowCamera() {
 }
@@ -18,18 +19,19 @@ void FollowCamera::Update() {
 
 	XINPUT_STATE pad;
 	Camera* camera = CameraManager::GetInstance()->GetCamera();
+
 	if (Input::GetInstance()->GetGamepadState(pad)) {
 		const float kRotateSpeed = 0.05f;
 
 		destinationAngleY_ += (Input::GetInstance()->GetRStick().x / SHRT_MAX * kRotateSpeed) * FPSKeeper::DeltaTime();
 
 		if (Input::GetInstance()->TriggerButton(PadInput::RStick)) {
-			destinationAngleY_ = target_->rotate.y;
+			//destinationAngleY_ = target_->rotate.y;
 		}
 	}
 	camera->transform.rotate.y = LerpShortAngle(camera->transform.rotate.y, destinationAngleY_, 0.4f);
 	if (target_) {
-		interTarget_ = Lerp(interTarget_, target_->translate, 0.3f);
+		interTarget_ = Lerp(interTarget_, { target_->translate.x,0.0f,target_->translate.z }, 0.3f);
 	}
 
 	Vector3 offset = OffsetCal();
@@ -52,6 +54,10 @@ void FollowCamera::Reset() {
 
 	Vector3 offset = OffsetCal();
 	camera->transform.translate = interTarget_ + offset;
+}
+
+void FollowCamera::SetLockOn(const LockOn* target) {
+	lockOn_ = target;
 }
 
 Vector3 FollowCamera::OffsetCal() const {

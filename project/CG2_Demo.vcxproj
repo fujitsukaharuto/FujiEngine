@@ -160,8 +160,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\GameObj\Enemy\Enemy.cpp" />
     <ClCompile Include="Game\GameObj\Enemy\EnemyManager.cpp" />
     <ClCompile Include="Game\GameObj\FollowCamera.cpp" />
+    <ClCompile Include="Game\GameObj\LockOn.cpp" />
     <ClCompile Include="Game\GameObj\Player\PlayerAttackBehavior.cpp" />
     <ClCompile Include="Game\GameObj\Player\PlayerDushBehavior.cpp" />
+    <ClCompile Include="Game\GameObj\Player\PlayerJumpBehavior.cpp" />
     <ClCompile Include="Game\OriginGameObject.cpp" />
     <ClCompile Include="Game\Collider\BaseCollider.cpp" />
     <ClCompile Include="Game\Collider\AABBCollider.cpp" />
@@ -233,8 +235,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Game\GameObj\Enemy\Enemy.h" />
     <ClInclude Include="Game\GameObj\Enemy\EnemyManager.h" />
     <ClInclude Include="Game\GameObj\FollowCamera.h" />
+    <ClInclude Include="Game\GameObj\LockOn.h" />
     <ClInclude Include="Game\GameObj\Player\PlayerAttackBehavior.h" />
     <ClInclude Include="Game\GameObj\Player\PlayerDushBehavior.h" />
+    <ClInclude Include="Game\GameObj\Player\PlayerJumpBehavior.h" />
     <ClInclude Include="Game\OriginGameObject.h" />
     <ClInclude Include="Game\Collider\BaseCollider.h" />
     <ClInclude Include="Game\Collider\AABBCollider.h" />

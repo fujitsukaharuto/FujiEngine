@@ -129,17 +129,17 @@ void ParticleEmitter::Emit() {
 }
 
 void ParticleEmitter::Burst() {
-	Vector3 posAddSize{};
-	posAddSize = Random::GetVector3({ emitSizeMin.x,emitSizeMax.x }, { emitSizeMin.y,emitSizeMax.y }, { emitSizeMin.z,emitSizeMax.z });
+
+	Matrix4x4 worldMatrix = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, pos);
 	if (parent_) {
-		Matrix4x4 worldMatrix = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, pos);
 		const Matrix4x4& parentWorldMatrix = parent_->GetWorldMat();
 		worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
-		posAddSize += pos;
 	}
-	else {
-		posAddSize += pos;
-	}
+
+	Vector3 posAddSize{};
+	posAddSize = Random::GetVector3({ emitSizeMin.x,emitSizeMax.x }, { emitSizeMin.y,emitSizeMax.y }, { emitSizeMin.z,emitSizeMax.z });
+	posAddSize += {worldMatrix.m[3][0], worldMatrix.m[3][1], worldMatrix.m[3][2]};
+
 	ParticleManager::Emit(name, posAddSize, particleRotate, grain, para_, count);
 }
 

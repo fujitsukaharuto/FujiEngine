@@ -48,6 +48,12 @@ void Model::SetColor(const Vector4& color) {
 	}
 }
 
+void Model::SetUVScale(const Vector2& scale) {
+	for (Material material : material_) {
+		material.SetUVScale(scale);
+	}
+}
+
 void Model::SetTexture(const std::string& name) {
 
 	if (nowTextuer==name) {

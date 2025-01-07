@@ -24,6 +24,8 @@ public:
 
 	void SetColor(const Vector4& color);
 
+	void SetUVScale(const Vector2& scale);
+
 	void SetTexture(const std::string& name);
 
 	void SetTextureName(const std::string& name);

@@ -29,6 +29,12 @@ void ResultScene::Initialize() {
 	black_->SetSize({ 1280.0f,720.0f });
 	black_->SetAnchor({ 0.0f,0.0f });
 
+	paneru = std::make_unique<Sprite>();
+	paneru->Load("clear2.png");
+	paneru->SetColor({ 1.0f,1.0f,1.0f,1.0f });
+	paneru->SetSize({ 1280.0f,720.0f });
+	paneru->SetAnchor({ 0.0f,0.0f });
+
 	sphere = std::make_unique<Object3d>();
 	sphere->CreateSphere();
 	sphere->SetColor({ 1.0f,0.0f,0.0f,1.0f });
@@ -86,6 +92,7 @@ void ResultScene::Draw() {
 #pragma region 前景スプライト
 
 	dxCommon_->PreSpriteDraw();
+	paneru->Draw();
 	black_->Draw();
 
 #pragma endregion
@@ -113,9 +120,12 @@ void ResultScene::BlackFade() {
 		}
 	}
 	black_->SetColor({ 0.0f,0.0f,0.0f,Lerp(0.0f,1.0f,(1.0f / blackLimmite * blackTime)) });
-	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
-		if (blackTime == 0.0f) {
-			isChangeFase = true;
+	XINPUT_STATE pad;
+	if (Input::GetInstance()->GetGamepadState(pad)) {
+		if (Input::GetInstance()->TriggerButton(PadInput::A)) {
+			if (blackTime == 0.0f) {
+				isChangeFase = true;
+			}
 		}
 	}
 }

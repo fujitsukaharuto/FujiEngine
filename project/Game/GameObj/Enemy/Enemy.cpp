@@ -1,5 +1,7 @@
 #include "Enemy.h"
 #include "Math/Random.h"
+#include <cmath>
+#include <numbers>
 
 Enemy::Enemy() {
 }
@@ -10,6 +12,13 @@ Enemy::~Enemy() {
 void Enemy::Initialize() {
 	OriginGameObject::Initialize();
 	model_->Create("EnemyBody.obj");
+
+	body_ = std::make_unique<Object3d>();
+	body_->Create("EnemyBody.obj");
+	body_->SetParent(model_.get());
+
+	shadow_->transform.scale = { 0.4f,0.4f,0.4f };
+
 	omega_ = 2.0f * std::numbers::pi_v<float> / 300.0f;
 	collider_ = std::make_unique<AABBCollider>();
 	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
@@ -29,17 +38,81 @@ void Enemy::Initialize() {
 	hitParticle2_.Load("hitParticle2");
 	hitParticle3_.Load("hitParticle3");
 	hitParticle4_.Load("hitParticle4");
+
+	hitParticle1_.SetParent(model_.get());
+	hitParticle2_.SetParent(model_.get());
+	hitParticle3_.SetParent(model_.get());
+	hitParticle4_.SetParent(model_.get());
+
 }
 
 void Enemy::Update() {
-	isCollider_ = false;
+
+	targetPos_.y = 0.0f;
+	toTarget_ = targetPos_ - Vector3{ model_->transform.translate.x, 0.0f, model_->transform.translate.z };
+
+	if (!isDamage_ && !isKnockBack_) {
+		TargetChase();
+	}
+	else if(isDamage_) {
+		damegeTime_ -= FPSKeeper::DeltaTime();
+		if (damegeTime_ <= 0.0f) {
+			damegeTime_ = 0.0f;
+			isDamage_ = false;
+		}
+
+		float t = 1.0f / 30.0f * (30.0f - damegeTime_);
+		body_->transform.scale.y = Lerp(1.3f, 1.0f, t);
+		body_->transform.scale.x = Lerp(0.7f, 1.0f, t);
+		body_->transform.scale.z = Lerp(0.7f, 1.0f, t);
+		body_->transform.rotate.x = LerpShortAngle(-0.25f, 0.0f, t);
+
+	}
+	else if (isKnockBack_) {
+
+		knockBackTime_ -= FPSKeeper::DeltaTime();
+		if (knockBackTime_ <= 0.0f) {
+			knockBackTime_ = 0.0f;
+		}
+
+		if (knockBackTime_ > 20.0f) {
+
+			Vector3 velo = toTarget_.Normalize() * kKnockSpeed_;
+			model_->transform.translate -= velo * FPSKeeper::DeltaTime();
+
+			float t = 1.0f / 40.0f * (knockBackTime_ - 20.0f);
+			model_->transform.translate.y = Lerp(0.0f, 0.6f, CustomEasing(t));
+
+			body_->transform.scale.y = Lerp(1.2f, 1.5f, t);
+			body_->transform.scale.x = Lerp(0.8f, 0.5f, t);
+			body_->transform.scale.z = Lerp(0.8f, 0.5f, t);
+			body_->transform.rotate.x = LerpShortAngle(-0.15f, -0.25f, t);
+		}
+		else if(knockBackTime_ > 10.0f) {
+			float t = 1.0f / 10.0f * (10.0f - (knockBackTime_ - 10.0f));
+			body_->transform.scale.y = Lerp(1.5f, 0.6f, t);
+			body_->transform.scale.x = Lerp(0.5f, 1.4f, t);
+			body_->transform.scale.z = Lerp(0.5f, 1.4f, t);
+			body_->transform.rotate.x = LerpShortAngle(-0.25f, -0.35f, t);
+		}
+		else {
+			float t = 1.0f / 10.0f * (10.0f - knockBackTime_);
+			body_->transform.scale.y = Lerp(0.6f, 1.0f, t);
+			body_->transform.scale.x = Lerp(1.4f, 1.0f, t);
+			body_->transform.scale.z = Lerp(1.4f, 1.0f, t);
+			body_->transform.rotate.x = LerpShortAngle(-0.35f, 0.0f, t);
+		}
+
+		if (knockBackTime_ <= 0.0f) {
+			isKnockBack_ = false;
+			body_->transform.scale = { 1.0f,1.0f,1.0f };
+			body_->transform.rotate = { 0.0f,0.0f,0.0f };
+			model_->transform.translate.y = 0.0f;
+		}
+	}
+
 
 	collider_->SetPos(model_->GetWorldPos());
-
-	hitParticle1_.pos = model_->GetWorldPos();
-	hitParticle2_.pos = model_->GetWorldPos();
-	hitParticle3_.pos = model_->GetWorldPos();
-	hitParticle4_.pos = model_->GetWorldPos();
 
 #ifdef _DEBUG
 	/*hitParticle1_.DebugGUI();
@@ -47,10 +120,15 @@ void Enemy::Update() {
 	hitParticle3_.DebugGUI();
 	hitParticle4_.DebugGUI();*/
 #endif // _DEBUG
+
+	isCollider_ = false;
+
 }
 
 void Enemy::Draw(Material* mate) {
-	OriginGameObject::Draw(mate);
+	//OriginGameObject::Draw(mate);
+	OriginGameObject::ShdowDraw();
+	body_->Draw(mate);
 }
 
 void Enemy::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
@@ -62,20 +140,69 @@ void Enemy::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 		hitParticle3_.particleRotate.z = Random::GetFloat(-6.0f, 6.0f);
 		hitParticle3_.Burst();
 		hitParticle4_.Burst();
+
+		life_ -= 10.0f;
+		if (life_ <= 0.0f) {
+			isLive_ = false;
+		}
+
+		if (!isKnockBack_) {
+			isDamage_ = true;
+			damegeTime_ = 60.0f;
+		}
 	}
+	if (other.tag == "attack_knock") {
+		isCollider_ = true;
+		color_ = { 1.0f,0.0f,0.0f,1.0f };
+		hitParticle1_.Burst();
+		hitParticle2_.Burst();
+		hitParticle3_.particleRotate.z = Random::GetFloat(-6.0f, 6.0f);
+		hitParticle3_.Burst();
+		hitParticle4_.Burst();
+
+		life_ -= 30.0f;
+		if (life_ <= 0.0f) {
+			isLive_ = false;
+		}
+
+		isDamage_ = false;
+		damegeTime_ = 3.0f;
+
+		isKnockBack_ = true;
+		knockBackTime_ = 30.0f;
+	}
+
 }
 
 void Enemy::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
-	isCollider_ = true;
-	color_ = { 0.0f,1.0f,1.0f,1.0f };
+	if (other.tag == "attack") {
+		isCollider_ = true;
+		color_ = { 0.0f,1.0f,1.0f,1.0f };
+	}
 }
 
 void Enemy::OnCollisionExit([[maybe_unused]] const ColliderInfo& other) {
 	color_ = { 1.0f,0.0f,1.0f,1.0f };
 }
 
+void Enemy::TargetChase() {
+
+	if (toTarget_.Length() > 1.75f) {
+
+		Vector3 velo = toTarget_.Normalize() * kSpeed_;
+		model_->transform.translate += velo * FPSKeeper::DeltaTime();
+		float targetRotate = std::atan2(velo.x, velo.z);
+		model_->transform.rotate.y = LerpShortAngle(model_->transform.rotate.y, targetRotate, 0.1f);
+	}
+
+}
+
 void Enemy::ColliderInit() {
 	collider_->SetPos(model_->GetWorldPos());
+}
+
+float Enemy::CustomEasing(float t) {
+	return std::sinf(t * std::numbers::pi_v<float>);
 }
 
 #ifdef _DEBUG
