@@ -33,16 +33,18 @@ public:
 	void CreateMaterial();
 
 	Texture* GetTexture();
-
 	ID3D12Resource* GetMaterialResource();
-
 	std::string GetPathName() const { return textureNamePath_.textureFilePath; }
 
 	void SetTextureNamePath(const std::string& pathName);
-
 	void SetColor(const Vector4& color) { materialDate_->color = color; }
-
+	void SetUVScale(const Vector2& scale);
 	void SetTexture(const std::string& name);
+	void SetLightEnable(LightMode mode);
+
+private:
+
+	Matrix4x4 MakeScale4x4(const Vector3& scale);
 
 private:
 

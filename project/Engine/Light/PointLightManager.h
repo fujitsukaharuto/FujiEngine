@@ -20,6 +20,8 @@ public:
 
 	void SetLightCommand(ID3D12GraphicsCommandList* commandList);
 
+	PointLight* GetPointLight(int num) { return pointLights_[num].get(); }
+	SpotLight* GetSpotLight(int num) { return spotLights_[num].get(); }
 
 private:
 

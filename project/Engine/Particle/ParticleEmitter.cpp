@@ -106,11 +106,18 @@ void ParticleEmitter::DrawSize() {
 
 void ParticleEmitter::Emit() {
 
+	Matrix4x4 worldMatrix = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, pos);
+	if (parent_) {
+		const Matrix4x4& parentWorldMatrix = parent_->GetWorldMat();
+		worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
+	}
+
 	if (time_ <= 0) {
 		for (uint32_t i = 0; i < count; i++) {
 			Vector3 posAddSize{};
 			posAddSize = Random::GetVector3({ emitSizeMin.x,emitSizeMax.x }, { emitSizeMin.y,emitSizeMax.y }, { emitSizeMin.z,emitSizeMax.z });
-			posAddSize += pos;
+			posAddSize += {worldMatrix.m[3][0], worldMatrix.m[3][1], worldMatrix.m[3][2]};
+
 			ParticleManager::Emit(name, posAddSize, particleRotate, grain, para_, 1);
 		}
 		time_ = frequencyTime;
@@ -122,9 +129,17 @@ void ParticleEmitter::Emit() {
 }
 
 void ParticleEmitter::Burst() {
+
+	Matrix4x4 worldMatrix = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, pos);
+	if (parent_) {
+		const Matrix4x4& parentWorldMatrix = parent_->GetWorldMat();
+		worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
+	}
+
 	Vector3 posAddSize{};
 	posAddSize = Random::GetVector3({ emitSizeMin.x,emitSizeMax.x }, { emitSizeMin.y,emitSizeMax.y }, { emitSizeMin.z,emitSizeMax.z });
-	posAddSize += pos;
+	posAddSize += {worldMatrix.m[3][0], worldMatrix.m[3][1], worldMatrix.m[3][2]};
+
 	ParticleManager::Emit(name, posAddSize, particleRotate, grain, para_, count);
 }
 
@@ -248,8 +263,8 @@ void ParticleEmitter::Load(const std::string& filename) {
 	grain.isBillBoard_ = j[index].get<bool>();
 	index++;
 
-	/*grain.pattern_ = static_cast<BillBoardPattern>(j[index][0].get<int>());
-	index++;*/
+	grain.pattern_ = static_cast<BillBoardPattern>(j[index].get<int>());
+	index++;
 
 	para_.speedx = Vector2(j[index][0], j[index][1]);
 	index++;

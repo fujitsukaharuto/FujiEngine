@@ -26,6 +26,10 @@ public:
 
 	PointLightData* pointLightData_ = nullptr;
 
+#ifdef _DEBUG
+	void Debug();
+#endif // _DEBUG
+
 private:
 
 

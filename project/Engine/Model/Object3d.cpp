@@ -86,12 +86,20 @@ void Object3d::SetColor(const Vector4& color) {
 	model_->SetColor(color);
 }
 
+void Object3d::SetUVScale(const Vector2& scale) {
+	model_->SetUVScale(scale);
+}
+
 void Object3d::SetTexture(const std::string& name) {
 	if (name == nowTextureName) {
 		return;
 	}
 	model_->SetTexture(name);
 	nowTextureName = name;
+}
+
+void Object3d::SetLightEnable(LightMode mode) {
+	model_->SetLightEnable(mode);
 }
 
 void Object3d::SetModel(const std::string& fileName) {

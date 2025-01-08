@@ -9,10 +9,10 @@ public:
 	~GameScene();
 
 	void Initialize()override;
-
 	void Update()override;
-
 	void Draw()override;
+
+	void BlackFade();
 
 private:
 
@@ -47,4 +47,10 @@ private:
 
 	ParticleEmitter emit;
 
+
+	// sceneChange
+	std::unique_ptr<Sprite> black_;
+	float blackLimmite = 20.0f;
+	float blackTime = 20.0f;
+	bool isChangeFase = false;
 };

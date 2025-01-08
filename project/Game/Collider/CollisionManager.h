@@ -13,7 +13,6 @@ public:
 public:
 
 	void CheckCollisionPair(BaseCollider* A, BaseCollider* B);
-
 	void CheckAllCollision();
 
 	void AddCollider(BaseCollider* collider) { colliders_.push_back(collider); }

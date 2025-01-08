@@ -304,7 +304,7 @@ void ParticleManager::Draw() {
 
 }
 
-void ParticleManager::CreateParticleGroup(const std::string& name, const std::string& fileName) {
+void ParticleManager::CreateParticleGroup(const std::string& name, const std::string& fileName, uint32_t count) {
 
 	ParticleManager* instance = GetInstance();
 
@@ -317,7 +317,7 @@ void ParticleManager::CreateParticleGroup(const std::string& name, const std::st
 	ParticleGroup* newGroup = new ParticleGroup();
 
 
-	newGroup->insstanceCount_ = 20;
+	newGroup->insstanceCount_ = count;
 	newGroup->instancing_ = instance->dxCommon_->CreateBufferResource(instance->dxCommon_->GetDevice(), (sizeof(TransformationParticleMatrix) * newGroup->insstanceCount_));
 	newGroup->instancing_->Map(0, nullptr, reinterpret_cast<void**>(&newGroup->instancingData_));
 	uint32_t max = newGroup->insstanceCount_;
