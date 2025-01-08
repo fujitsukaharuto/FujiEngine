@@ -8,10 +8,10 @@ public:
 	~ResultScene();
 
 	void Initialize()override;
-
 	void Update()override;
-
 	void Draw()override;
+
+	void BlackFade();
 
 private:
 
@@ -21,4 +21,10 @@ private:
 	std::unique_ptr<Object3d> sphere = nullptr;
 	Vector3 rightDir = { 1.0f,0.0f,0.0f };
 
+
+	// sceneChange
+	std::unique_ptr<Sprite> black_;
+	float blackLimmite = 20.0f;
+	float blackTime = 20.0f;
+	bool isChangeFase = false;
 };

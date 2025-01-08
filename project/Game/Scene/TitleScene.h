@@ -9,10 +9,10 @@ public:
 	~TitleScene();
 
 	void Initialize()override;
-
 	void Update()override;
-
 	void Draw()override;
+
+	void BlackFade();
 
 private:
 
@@ -28,4 +28,10 @@ private:
 	std::unique_ptr<TestBaseObj> test2_;
 	std::unique_ptr<CollisionManager> cMane_;
 
+
+	// sceneChange
+	std::unique_ptr<Sprite> black_;
+	float blackLimmite = 20.0f;
+	float blackTime = 20.0f;
+	bool isChangeFase = false;
 };

@@ -87,7 +87,7 @@ public:
 
 	void Draw();
 
-	static void CreateParticleGroup(const std::string& name, const std::string& fileName);
+	static void CreateParticleGroup(const std::string& name, const std::string& fileName, uint32_t count = 20);
 
 	static void CreateAnimeGroup(const std::string& name, const std::string& fileName);
 

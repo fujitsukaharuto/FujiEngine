@@ -1,5 +1,6 @@
 #include "PointLight.h"
 #include "DXCom.h"
+#include "ImGuiManager/ImGuiManager.h"
 
 void PointLight::Initialize() {
 
@@ -20,3 +21,16 @@ void PointLight::SetLightCommand(ID3D12GraphicsCommandList* commandList) {
 	commandList->SetGraphicsRootConstantBufferView(5, pointLightResource_->GetGPUVirtualAddress());
 
 }
+
+#ifdef _DEBUG
+void PointLight::Debug() {
+	ImGui::Begin("spotlight");
+
+	ImGui::DragFloat3("position", &pointLightData_->position.x, 0.1f);
+	ImGui::DragFloat("intensity", &pointLightData_->intensity, 0.01f);
+	ImGui::DragFloat("distance", &pointLightData_->radius, 0.01f);
+	ImGui::DragFloat("decay", &pointLightData_->decay, 0.01f);
+
+	ImGui::End();
+}
+#endif // _DEBUG

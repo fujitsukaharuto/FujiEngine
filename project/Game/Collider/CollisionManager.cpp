@@ -23,17 +23,21 @@ void CollisionManager::CheckCollisionPair(BaseCollider* A, BaseCollider* B) {
 			if (std::find(hitListA.begin(), hitListA.end(), B) == hitListA.end()) {
 				hitListA.push_back(B);
 				aabbA->SetState(CollisionState::collisionEnter);
+				aabbA->OnCollision({ B->GetTag(), B->GetPos() });
 			}
 			else {
 				aabbA->SetState(CollisionState::collisionStay);
+				aabbA->OnCollision({ B->GetTag(), B->GetPos() });
 			}
 
 			if (std::find(hitListB.begin(), hitListB.end(), A) == hitListB.end()) {
 				hitListB.push_back(A);
 				aabbB->SetState(CollisionState::collisionEnter);
+				aabbB->OnCollision({ A->GetTag(), A->GetPos() });
 			}
 			else {
 				aabbB->SetState(CollisionState::collisionStay);
+				aabbB->OnCollision({ A->GetTag(), A->GetPos() });
 			}
 		}
 		else {
@@ -41,16 +45,15 @@ void CollisionManager::CheckCollisionPair(BaseCollider* A, BaseCollider* B) {
 			if (std::find(hitListA.begin(), hitListA.end(), B) != hitListA.end()) {
 				hitListA.remove(B);
 				aabbA->SetState(CollisionState::collisionExit);
+				aabbA->OnCollision({ B->GetTag(), B->GetPos() });
 			}
 			if (std::find(hitListB.begin(), hitListB.end(), A) != hitListB.end()) {
 				hitListB.remove(A);
 				aabbB->SetState(CollisionState::collisionExit);
+				aabbB->OnCollision({ A->GetTag(), A->GetPos() });
 			}
 		}
 
-		// 衝突情報を通知
-		aabbA->OnCollision({ B->GetTag(), B->GetPos() });
-		aabbB->OnCollision({ A->GetTag(), A->GetPos() });
 	}
 
 }
@@ -59,6 +62,22 @@ void CollisionManager::CheckAllCollision() {
 
 	if (colliders_.empty()) {
 		return; // colliders_が空なら処理を終了
+	}
+
+	for (auto& collider : colliders_) {
+		AABBCollider* aabb = dynamic_cast<AABBCollider*>(collider);
+		if (aabb) {
+			auto& hitList = aabb->hitList_;
+			hitList.remove_if([this, aabb](BaseCollider* other) {
+				// コライダーリストに存在しない場合
+				if (std::find(colliders_.begin(), colliders_.end(), other) == colliders_.end()) {
+					// 衝突終了状態を設定
+					aabb->SetState(CollisionState::collisionExit);
+					return true; // リストから削除
+				}
+				return false; // 残す
+				});
+		}
 	}
 
 	std::list<BaseCollider*>::iterator itrA = colliders_.begin();
