@@ -92,6 +92,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AdditionalIncludeDirectories>$(ProjectDir)externals\assimp\include;$(ProjectDir)externals;$(ProjectDir)Game;$(ProjectDir)Engine/WinApp;$(ProjectDir)Engine/Model;$(ProjectDir)Engine/Math;$(ProjectDir)Engine/Logger;$(ProjectDir)Engine/Light;$(ProjectDir)Engine/Input;$(ProjectDir)Engine/ImGuiManager;$(ProjectDir)Engine/GraphicPipeline;$(ProjectDir)Engine/GlobalVariables;$(ProjectDir)Engine/DX;$(ProjectDir)Engine/Camera;$(ProjectDir)Engine/Audio;$(ProjectDir)Engine;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <Optimization>MinSpace</Optimization>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

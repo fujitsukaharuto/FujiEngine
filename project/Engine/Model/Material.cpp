@@ -44,6 +44,7 @@ void Material::SetTextureNamePath(const std::string& pathName) {
 void Material::SetUVScale(const Vector2& scale) {
 
 	Matrix4x4 uvScaleMatrix = MakeScale4x4(Vector3(scale.x, scale.y, 1.0f));
+	materialDate_->uvTransform = MakeIdentity4x4();
 	materialDate_->uvTransform = Multiply(uvScaleMatrix, materialDate_->uvTransform);
 
 }

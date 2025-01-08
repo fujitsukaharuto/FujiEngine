@@ -161,6 +161,12 @@ void Player::Update() {
 			}
 		}
 	}
+	if (firePlane_->transform.scale.x <= 1.0f) {
+		firePlane_->SetUVScale({ 1.0f,firePlane_->transform.scale.x });
+	}
+	else {
+		firePlane_->SetUVScale({ 1.0f,1.0f });
+	}
 
 	model_->UpdateWVP();
 
