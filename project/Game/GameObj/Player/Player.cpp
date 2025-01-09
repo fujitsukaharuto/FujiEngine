@@ -290,6 +290,8 @@ void Player::AdjustParm() {
 
 		/// 位置
 		ImGui::SeparatorText("Transform");
+		ImGui::DragFloat3("Position", &model_->transform.translate.x, 0.1f);
+
 
 		///　Floatのパラメータ
 		ImGui::SeparatorText("FloatParamater");
@@ -326,7 +328,7 @@ void Player::ParmLoadForImGui() {
 ///=================================================================================
 void Player::AddParmGroup() {
 
-	
+	globalParameter_->AddItem(groupName_, "Translate", model_->transform.translate);
 	globalParameter_->AddItem(groupName_, "JumpSpeed", jumpSpeed_);
 	globalParameter_->AddItem(groupName_, "MoveSpeed", moveSpeed_);
 	globalParameter_->AddItem(groupName_, "Gravity", gravity_);
@@ -339,7 +341,7 @@ void Player::AddParmGroup() {
 ///=================================================================================
 void Player::SetValues() {
 
-
+	globalParameter_->SetValue(groupName_, "Translate", model_->transform.translate);
 	globalParameter_->SetValue(groupName_, "JumpSpeed", jumpSpeed_);
 	globalParameter_->SetValue(groupName_, "Gravity", gravity_);
 	globalParameter_->SetValue(groupName_, "MoveSpeed", moveSpeed_);
@@ -350,7 +352,7 @@ void Player::SetValues() {
 ///  ImGuiからパラメータを得る
 ///===================================================== 
 void Player::ApplyGlobalParameter() {
-	
+	model_->transform.translate = globalParameter_->GetValue<Vector3>(groupName_, "Translate");
 	jumpSpeed_ = globalParameter_->GetValue<float>(groupName_, "JumpSpeed");
 	gravity_ = globalParameter_->GetValue<float>(groupName_, "Gravity");
 	moveSpeed_ = globalParameter_->GetValue<float>(groupName_, "MoveSpeed");
