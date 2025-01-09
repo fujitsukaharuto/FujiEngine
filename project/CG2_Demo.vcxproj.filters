@@ -209,6 +209,15 @@
     <ClCompile Include="Game\GameObj\SkyDome\SkyDome.cpp">
       <Filter>Game\GameObj\SkyDome</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\KRailEditor\ControlPosManager.cpp">
+      <Filter>Engine\KRailEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\KRailEditor\EmitRail.cpp">
+      <Filter>Engine\KRailEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\KRailEditor\RailManager.cpp">
+      <Filter>Engine\KRailEditor</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Audio\Audio.h">
@@ -436,6 +445,15 @@
     <ClInclude Include="Game\GameObj\SkyDome\SkyDome.h">
       <Filter>Game\GameObj\SkyDome</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\KRailEditor\ControlPosManager.h">
+      <Filter>Engine\KRailEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\KRailEditor\EmitRail.h">
+      <Filter>Engine\KRailEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\KRailEditor\RailManager.h">
+      <Filter>Engine\KRailEditor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -527,6 +545,9 @@
     </Filter>
     <Filter Include="Game\GameObj\SkyDome">
       <UniqueIdentifier>{5818e449-9305-4256-b73f-f698542f9c0b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\KRailEditor">
+      <UniqueIdentifier>{fe454760-08ee-4e6c-956e-d5fd262eac8f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

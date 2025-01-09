@@ -23,7 +23,7 @@ public:
 
 	void BlackFade();
 
-	void Debug();
+	void ParamaterEdit();
 private:
 
 	/// ===================================================

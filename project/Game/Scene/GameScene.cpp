@@ -57,7 +57,7 @@ void GameScene::Initialize() {
 
 void GameScene::Update() {
 
-	Debug();
+	ParamaterEdit();// パラメータエディター
 	BlackFade();
 
 	///-------------------------------------------------------------
@@ -156,9 +156,9 @@ void GameScene::BlackFade() {
 }
 
 
-void GameScene::Debug() {
-	ImGui::Begin("PositionDebug");
-	player_->Debug();
+void GameScene::ParamaterEdit() {
+	ImGui::Begin("ParamaterEditor");
+	player_->AdjustParm();
 	ImGui::End();
 
 }

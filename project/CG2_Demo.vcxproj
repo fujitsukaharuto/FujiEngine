@@ -133,6 +133,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\GraphicPipeline\ThunderPipe.cpp" />
     <ClCompile Include="Engine\ImGuiManager\ImGuiManager.cpp" />
     <ClCompile Include="Engine\Input\Input.cpp" />
+    <ClCompile Include="Engine\KRailEditor\ControlPosManager.cpp" />
+    <ClCompile Include="Engine\KRailEditor\EmitRail.cpp" />
+    <ClCompile Include="Engine\KRailEditor\RailManager.cpp" />
     <ClCompile Include="Engine\Light\DirectionLight.cpp" />
     <ClCompile Include="Engine\Light\PointLight.cpp" />
     <ClCompile Include="Engine\Light\PointLightManager.cpp" />
@@ -205,6 +208,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\GraphicPipeline\ThunderPipe.h" />
     <ClInclude Include="Engine\ImGuiManager\ImGuiManager.h" />
     <ClInclude Include="Engine\Input\Input.h" />
+    <ClInclude Include="Engine\KRailEditor\ControlPosManager.h" />
+    <ClInclude Include="Engine\KRailEditor\EmitRail.h" />
+    <ClInclude Include="Engine\KRailEditor\RailManager.h" />
     <ClInclude Include="Engine\Light\DirectionLight.h" />
     <ClInclude Include="Engine\Light\PointLight.h" />
     <ClInclude Include="Engine\Light\PointLightManager.h" />

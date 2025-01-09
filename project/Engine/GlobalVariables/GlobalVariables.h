@@ -12,6 +12,7 @@
 class GlobalVariables {
 public:
     enum class WidgetType {
+        NONE,
         SliderInt,
         DragFloat,
         DragFloat2,
@@ -21,6 +22,7 @@ public:
         ColorEdit4,
         SlideAngle,
     };
+
     // 描画設定用の構造体
     struct DrawSettings {
 
@@ -90,10 +92,12 @@ public:
     void DrawWidget(const std::string& itemName, Item& item, const DrawSettings& drawSettings);
 
     // 値を設定する
-    template<typename T> void SetValue(const std::string& groupName, const std::string& key, T value, WidgetType widgetType);
+    template<typename T>
+    void SetValue(const std::string& groupName, const std::string& key, T value, WidgetType widgetType = WidgetType::NONE);
 
     // 新しいアイテムをグループに追加する
-    template<typename T> void AddItem(const std::string& groupName, const std::string& key, T value, WidgetType widgetType);
+    template<typename T>
+    void AddItem(const std::string& groupName, const std::string& key, T value, WidgetType widgetType = WidgetType::NONE);
 
     // 値を取得する
     template<typename T> T GetValue(const std::string& groupName, const std::string& key) const;

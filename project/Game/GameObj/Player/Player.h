@@ -1,12 +1,14 @@
 #pragma once
 
 
-#include <memory>
 #include"Vector3.h"
 
 /// behavior
 #include"GameObj/PlayerBehavior/BasePlayerBehavior.h"
+#include"GlobalVariables/GlobalVariables.h"
 #include"Game/OriginGameObject.h"
+
+#include <memory>
 
 /// <summary>
 /// プレイヤークラス
@@ -26,30 +28,22 @@ private:
 		///* behavior
 	std::unique_ptr<BasePlayerBehavior>behavior_ = nullptr;
 
-	///* 目標角度
-	float objectiveAngle_;
+	
+/// グローバルなパラメータ
+	GlobalVariables* globalParameter_;            /// グローバルパラメータ
+	const std::string groupName_ = "Player";      /// グループ名
+
 	///* 速度
 	Vector3 velocity_;
 	Vector3 prePos_;
 
-	///* 攻撃フラグ
-	bool isAttack_;
-
-	///* ダメージ
-	bool isDamage_;
-	float damageTime_;
-	float damageCollTime_;
-	float life_;
-
-	float blinkTimer_;
-	float blinkInterval_;
-	bool isTransparent_;
-
-
-	/// jump
+	///* 目標角度
+	float objectiveAngle_;
 	
-	float muzzelJumpSpeed_;	/// 初期ジャンプ
-	const float jumpLimit_ = -1.2f;
+	/// 移動、ジャンプ
+	float moveSpeed_;
+	float jumpSpeed_;
+	float gravity_;
 
 	// fall
 	float fallSpeed_;
@@ -72,29 +66,35 @@ public:
 	Vector3 GetInputVelocity();
 	void MoveToLimit();
 
-
+	///* ジャンプ
 	void Jump(float& speed);
-	void Fall();
+	void Fall(float& speed,const bool&isJump=false);
 	void ChangeBehavior(std::unique_ptr<BasePlayerBehavior>behavior);
 
-	void Debug()override;
-	
+
 	/// ダメージ
 	void DamageRendition();
 	void TakeDamage();
 
+	
+	///-------------------------------------------------------------------------------------
+    /// Editor
+    ///-------------------------------------------------------------------------------------
+	void AdjustParm();
+	void ParmLoadForImGui();
+	void AddParmGroup();
+	void SetValues();
+	void ApplyGlobalParameter();
+
+
 	/// ===================================================
 	/// getter method
 	/// ===================================================
-	
-	const bool& GetIsAttack()const { return isAttack_; }
-	/*Boss* GetBoss()const { return pBoss_; }*/
-	float GetMuzzulJumpSpeed()const { return muzzelJumpSpeed_; }
+	float GetMoveSpeed()const { return moveSpeed_; }
+	float GetJumpSpeed()const { return jumpSpeed_; }
 
 	/// ===================================================
 	/// setter method
 	/// ===================================================
-	
-	/*void SetJumpSpeed(float speed) { muzzelJumpSpeed_ = speed; }*/
-	void SetIsAttack(bool is) { isAttack_ = is; }
+
 };

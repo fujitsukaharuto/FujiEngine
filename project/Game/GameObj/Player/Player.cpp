@@ -1,38 +1,28 @@
 #include "Player.h"
-
 ///* fps
 #include"DX/FPSKeeper.h"
-
 ///*input
 #include"GameObj/JoyState/JoyState.h"
-
 ///* math
 #include"Vector2Matrix.h"
-
-
 ///*camera
 #include"Camera/CameraManager.h"
-
 ///* behavior
 #include"GameObj/PlayerBehavior/PlayerRoot.h"
 #include"GameObj/PlayerBehavior/PlayerJump.h"
-
-/////* obj
+//* obj
 #include"Field/Field.h"
-
 ///* std
 #include<algorithm>
 
 ///* imgui
-#ifdef _DEBUG
-#include"imgui.h"
-#endif 
+#include<imgui.h> 
 
 ///プレイヤーの仕様書**************************************************************************
 /// https://docs.google.com/document/u/0/d/1lUpgCc6XqLgLKEJcuu56m6yqqhdGDwCGz_9dRb5ebM0/edit
 ///*****************************************************************************************
 
-float Player::InitY_ = 1.0f;
+float Player::InitY_ = 1.5f;
 
 Player::Player() {}
 
@@ -42,11 +32,14 @@ Player::Player() {}
 /// ===================================================
 void Player::Initialize() {
 
-	
-	muzzelJumpSpeed_ = 1.5f;
-
 	OriginGameObject::Initialize();
 	OriginGameObject::SetModel("player.obj");
+
+	///* グローバルパラメータ
+	globalParameter_ = GlobalVariables::GetInstance();
+	globalParameter_->CreateGroup(groupName_, false);
+	AddParmGroup();
+	ApplyGlobalParameter();
 
 	/// 通常モードから
 	ChangeBehavior(std::make_unique<PlayerRoot>(this));
@@ -65,35 +58,11 @@ void Player::Update() {
 	behavior_->Update();
 	//　移動制限
 	MoveToLimit();
-	// 落ちる
-	Fall();
-
+	
 	/// 更新
 	//base::Update();
 }
 
-
-/// ===================================================
-///  落ちる
-/// ===================================================
-void Player::Fall() {
-	if (!dynamic_cast<PlayerJump*>(behavior_.get())) {
-	
-		// 移動	
-		model_->transform.translate.y += fallSpeed_;
-		// 重力加速度
-		const float kGravityAcceleration = 3.4f * FPSKeeper::DeltaTime();
-		// 加速度ベクトル
-		float accelerationY = -kGravityAcceleration;
-		// 加速する
-		fallSpeed_ = max(fallSpeed_ + accelerationY, -0.75f);
-
-		// 着地
-		if (model_->transform.translate.y <= Player::InitY_) {
-			model_->transform.translate.y = Player::InitY_;
-		}
-	}
-}
 
 
 
@@ -110,33 +79,7 @@ void Player::Draw(Material* material) {
 ///  ダメージ演出
 /// ===================================================
 void Player::DamageRendition() {
-	if (isDamage_) {
-		damageTime_ -= FPSKeeper::DeltaTime();
-
-		// ダメージ時間がまだ残っている場合
-
-		blinkTimer_ += FPSKeeper::DeltaTime();
-
-		// チカチカ間隔ごとに透明フラグを切り替え
-		if (blinkTimer_ >= blinkInterval_) {
-			blinkTimer_ = 0.0f;          // チカチカタイマーをリセット
-			isTransparent_ = !isTransparent_; // 透明フラグを反転
-
-			//if (isTransparent_) {
-			//	objColor_.SetColor(Vector4(1.0f, 1.0f, 1.0f, 0.0f)); // 透明色
-			//}
-			//else {
-			//	objColor_.SetColor(Vector4(0.5f, 0.0f, 0.0f, 0.99f)); // 赤常色
-			//}
-		}
-
-		if (damageTime_ <= 0.0f) {
-			// ダメージ時間が終了したらフラグをリセット
-			isDamage_ = false;
-			isTransparent_ = false;
-			//objColor_.SetColor(Vector4(1.0f, 1.0f, 1.0f, 1.0f)); // 通常色に戻す
-		}
-	}
+	
 }
 
 
@@ -182,7 +125,7 @@ void Player::Move(const float& speed) {
 	/// 移動処理
 	if (GetIsMoving()) {
 		// 移動ベクトルの正規化と速さの適用
-		velocity_ = (velocity_).Normalize() * speed;
+		velocity_ = (velocity_).Normalize() * (speed*FPSKeeper::DeltaTime());
 
 		// 移動ベクトルをカメラの角度に基づいて回転
 		Matrix4x4 rotateMatrix = MakeRotateYMatrix(CameraManager::GetInstance()->GetCamera()->transform.rotate.y);
@@ -253,21 +196,32 @@ bool Player::GetIsMoving() {
 void Player::Jump(float& speed) {
 	// 移動
 	model_->transform.translate.y += speed;
-	// 重力加速度
-	const float kGravityAcceleration = 4.4f * FPSKeeper::DeltaTime();
-	// 加速度ベクトル
-	float accelerationY = -kGravityAcceleration;
+	Fall(speed,true);
+	
+}
+
+///=========================================================
+///　落ちる
+///==========================================================
+void Player::Fall(float& speed, const bool& isJump) {
+	if (!isJump) {
+		// 移動
+		model_->transform.translate.y += speed;
+	}
 	// 加速する
-	speed = max(speed + accelerationY, jumpLimit_);
+	speed = max(speed - (gravity_ * FPSKeeper::DeltaTime()), -1.0f);
 
 	// 着地
-	if (model_->transform.translate.y <= Player::InitY_) {
-		model_->transform.translate.y = Player::InitY_;
-
-		// ジャンプ終了
-		ChangeBehavior(std::make_unique<PlayerRoot>(this));
+	if (model_->transform.translate.y  <= Player::InitY_) {
+		model_->transform.translate.y  = Player::InitY_;
+		speed = 0.0f;
+		if (!dynamic_cast<PlayerJump*>(behavior_.get()))return;
+			// ジャンプ終了
+			ChangeBehavior(std::make_unique<PlayerRoot>(this));	
 	}
 }
+
+
 
 void Player::MoveToLimit() {
 
@@ -316,11 +270,7 @@ void Player::MoveToLimit() {
 /// ダメージ受ける
 ///==========================================================
 void Player::TakeDamage() {
-	if (!isDamage_) {
-		life_--;
-		isDamage_ = true;
-		damageTime_ = damageCollTime_;
-	}
+	
 }
 
 ///=========================================================
@@ -330,16 +280,81 @@ void Player::ChangeBehavior(std::unique_ptr<BasePlayerBehavior>behavior) {
 	//引数で受け取った状態を次の状態としてセット
 	behavior_ = std::move(behavior);
 }
-
-void Player::Debug() {
+///=========================================================
+/// パラメータ調整
+///==========================================================
+void Player::AdjustParm() {
+	SetValues();
 #ifdef _DEBUG
-	if (ImGui::TreeNode("Player")) {
-		OriginGameObject::Debug();
-		ImGui::TreePop();
+	if (ImGui::CollapsingHeader("Player")) {
+
+		/// 位置
+		ImGui::SeparatorText("Transform");
+
+		///　Floatのパラメータ
+		ImGui::SeparatorText("FloatParamater");
+		ImGui::DragFloat("jumpSpeed", &jumpSpeed_, 0.01f);
+		ImGui::DragFloat("MoveSpeed", &moveSpeed_, 0.01f);
+		ImGui::DragFloat("Gravity", &gravity_, 0.01f);
+
+		
+		/// セーブとロード
+		globalParameter_->ParmSaveForImGui(groupName_);
+		ParmLoadForImGui();
 	}
-#endif
+
+#endif // _DEBUG
+}
+///=================================================================================
+/// ロード
+///=================================================================================
+void Player::ParmLoadForImGui() {
+
+	// ロードボタン
+	if (ImGui::Button(std::format("Load {}", groupName_).c_str())) {
+
+		globalParameter_->LoadFile(groupName_);
+		// セーブ完了メッセージ
+		ImGui::Text("Load Successful: %s", groupName_.c_str());
+		ApplyGlobalParameter();
+	}
 }
 
+
+///=================================================================================
+///パラメータをグループに追加
+///=================================================================================
+void Player::AddParmGroup() {
+
+	
+	globalParameter_->AddItem(groupName_, "JumpSpeed", jumpSpeed_);
+	globalParameter_->AddItem(groupName_, "MoveSpeed", moveSpeed_);
+	globalParameter_->AddItem(groupName_, "Gravity", gravity_);
+
+}
+
+
+///=================================================================================
+///パラメータをグループに追加
+///=================================================================================
+void Player::SetValues() {
+
+
+	globalParameter_->SetValue(groupName_, "JumpSpeed", jumpSpeed_);
+	globalParameter_->SetValue(groupName_, "Gravity", gravity_);
+	globalParameter_->SetValue(groupName_, "MoveSpeed", moveSpeed_);
+}
+
+
+///=====================================================
+///  ImGuiからパラメータを得る
+///===================================================== 
+void Player::ApplyGlobalParameter() {
+	
+	jumpSpeed_ = globalParameter_->GetValue<float>(groupName_, "JumpSpeed");
+	gravity_ = globalParameter_->GetValue<float>(groupName_, "Gravity");
+	moveSpeed_ = globalParameter_->GetValue<float>(groupName_, "MoveSpeed");
+}
 ///=========================================================
 /// Class Set
 ///==========================================================

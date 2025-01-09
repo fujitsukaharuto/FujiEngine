@@ -264,7 +264,7 @@ void GlobalVariables::SaveFile(const std::string& groupName) {
     std::ofstream ofs(filePath);
     if (ofs.fail()) {
         std::string message = "Failed to open data file for write.";
-        MessageBoxA(nullptr, message.c_str(), "GlobalParameter", 0);
+        MessageBoxA(nullptr, message.c_str(), "GlobalVariables", 0);
         assert(0);
         return;
     }
@@ -290,7 +290,7 @@ void GlobalVariables::LoadFile(const std::string& groupName) {
     std::ifstream ifs(filePath);
     if (ifs.fail()) {
         std::string message = "Failed to open data file for read.";
-        MessageBoxA(nullptr, message.c_str(), "GlobalParameter", 0);
+        MessageBoxA(nullptr, message.c_str(), "GlobalVariables", 0);
         assert(0);
         return;
     }
@@ -350,7 +350,7 @@ void GlobalVariables::ParmSaveForImGui(const std::string& groupName) {
         SaveFile(groupName);
         // セーブ完了メッセージ
         std::string message = std::format("{}.json saved.", groupName);
-        MessageBoxA(nullptr, message.c_str(), "GlobalParameter", 0);
+        MessageBoxA(nullptr, message.c_str(), "GlobalVariables", 0);
     }
 }
 
