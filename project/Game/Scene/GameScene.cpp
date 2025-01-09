@@ -51,8 +51,7 @@ void GameScene::Initialize() {
 	player_->Initialize();
 	gameCamera_->Initialize();
 
-	gameCamera_->SetTarget(&player_->GetTrans());
-	
+		gameCamera_->SetTarget(&player_->GetTrans());
 
 }
 
