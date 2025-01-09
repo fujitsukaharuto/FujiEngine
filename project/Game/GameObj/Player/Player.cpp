@@ -221,8 +221,6 @@ void Player::Fall(float& speed, const bool& isJump) {
 	}
 }
 
-
-
 void Player::MoveToLimit() {
 
 	// フィールドの中心とスケールを取得
@@ -237,9 +235,9 @@ void Player::MoveToLimit() {
 	bool insideX = std::abs(model_->transform.translate.x - fieldCenter.x) <= radiusX;
 	bool insideZ = std::abs(model_->transform.translate.z - fieldCenter.z) <= radiusZ;
 
-	//////////////////////////////////////////////////////
+	///-----------------------------------------------------------
 	///範囲外なら戻す
-	//////////////////////////////////////////////////////
+	///-----------------------------------------------------------
 
 	if (!insideX) {/// X座標
 		model_->transform.translate.x = std::clamp(
