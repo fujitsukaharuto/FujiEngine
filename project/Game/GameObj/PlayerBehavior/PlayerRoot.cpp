@@ -13,13 +13,12 @@
 
 #include<imgui.h>
 
-
 //初期化
 PlayerRoot::PlayerRoot(Player* boss)
 	: BasePlayerBehavior("PlayerRoot", boss) {
 
 	/// ===================================================
-	///変数初期化
+	/// 変数初期化
 	/// ===================================================
 	
 

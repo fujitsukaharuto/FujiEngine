@@ -40,11 +40,11 @@ private:
 
     /// グローバルなパラメータ
     GlobalVariables* globalParameter_;            /// グローバルパラメータ
-    const std::string groupName_ = "Enemies";      /// グループ名
+    const std::string groupName_ = "Enemies";     /// グループ名
   
     std::array<Paramater, 2>paramaters_;
   
-    bool isEditorMode_;             // エディタモード中かどうか
+    bool isEditorMode_;                          // エディタモード中かどうか
   
     ///* 敵リスト
     std::list<std::unique_ptr<BaseEnemy>> enemies_;

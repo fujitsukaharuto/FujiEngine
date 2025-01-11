@@ -266,8 +266,8 @@ void Player::ChangeBehavior(std::unique_ptr<BasePlayerBehavior>behavior) {
 void Player::AdjustParm() {
 	SetValues();
 #ifdef _DEBUG
-	if (ImGui::CollapsingHeader("Player")) {
-
+	if (ImGui::CollapsingHeader(groupName_.c_str())) {
+		ImGui::PushID(groupName_.c_str());
 		/// 位置
 		ImGui::SeparatorText("Transform");
 		ImGui::DragFloat3("Position", &model_->transform.translate.x, 0.1f);
@@ -282,6 +282,8 @@ void Player::AdjustParm() {
 		/// セーブとロード
 		globalParameter_->ParmSaveForImGui(groupName_);
 		ParmLoadForImGui();
+
+		ImGui::PopID();
 	}
 
 #endif // _DEBUG

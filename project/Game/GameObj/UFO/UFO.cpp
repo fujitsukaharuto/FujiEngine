@@ -2,11 +2,13 @@
 ///behavior
 #include"Behavior/UFORoot.h"
 #include"Behavior/UFOPopEnemy.h"
+//obj
+#include"GameObj/Enemy/EnemyManager.h"
 ///* imgui
 #include<imgui.h> 
 
 
-float UFO::InitY_ = 1.5f;
+float UFO::InitY_ = 30.5f;
 
 UFO::UFO() {}
 
@@ -32,7 +34,7 @@ void UFO::Initialize() {
 ///  更新処理
 /// ===================================================
 void UFO::Update() {
-	/*prePos_ = GetWorldPosition();*/
+	popPos_ = Vector3(GetTrans().translate.x, GetTrans().translate.y,EnemyManager::InitZPos_);
 	/// ダメージエフェクト
 	DamageRendition();
 	/// 振る舞い処理
@@ -52,6 +54,10 @@ void UFO::Draw(Material* material) {
 	OriginGameObject::Draw(material);
 }
 
+
+void UFO::EnemySpawn() {
+	pEnemyManager_->SpawnEnemy("NormalEnemy", popPos_);
+}
 
 /// ===================================================
 ///  ダメージ演出
@@ -126,19 +132,20 @@ void UFO::ChangeBehavior(std::unique_ptr<BaseUFOBehavior>behavior) {
 void UFO::AdjustParm() {
 	SetValues();
 #ifdef _DEBUG
-	if (ImGui::CollapsingHeader("Player")) {
-
+	if (ImGui::CollapsingHeader(groupName_.c_str())) {
+		ImGui::PushID(groupName_.c_str());
 		/// 位置
 		ImGui::SeparatorText("Transform");
 		ImGui::DragFloat3("Position", &model_->transform.translate.x, 0.1f);
 
 		///　Floatのパラメータ
 		ImGui::SeparatorText("FloatParamater");
-		
-		
+		ImGui::DragFloat("PopWaitTime(s)", &popWaitTime_, 0.01f);
+			
 		/// セーブとロード
 		globalParameter_->ParmSaveForImGui(groupName_);
 		ParmLoadForImGui();
+		ImGui::PopID();
 	}
 
 #endif // _DEBUG
@@ -164,7 +171,7 @@ void UFO::ParmLoadForImGui() {
 void UFO::AddParmGroup() {
 
 	globalParameter_->AddItem(groupName_, "Translate", model_->transform.translate);
-	
+	globalParameter_->AddItem(groupName_, "PopWaitTime", popWaitTime_);
 
 }
 
@@ -174,6 +181,7 @@ void UFO::AddParmGroup() {
 void UFO::SetValues() {
 
 	globalParameter_->SetValue(groupName_, "Translate", model_->transform.translate);
+	globalParameter_->SetValue(groupName_, "PopWaitTime", popWaitTime_);
 	
 }
 
@@ -182,9 +190,12 @@ void UFO::SetValues() {
 ///===================================================== 
 void UFO::ApplyGlobalParameter() {
 	model_->transform.translate = globalParameter_->GetValue<Vector3>(groupName_, "Translate");
-	
+	popWaitTime_ = globalParameter_->GetValue<float>(groupName_, "PopWaitTime");
 }
 ///=========================================================
 /// Class Set
 ///==========================================================
 
+void UFO::SetEnemyManager(EnemyManager* enemymanager) {
+	pEnemyManager_ = enemymanager;
+}

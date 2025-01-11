@@ -2,7 +2,11 @@
     "Enemies": {
         "AttackValue1": 0.7699999809265137,
         "AttackValue2": 0.0,
-        "FallSpeed1": 0.28999999165534973,
-        "FallSpeed2": 0.0
+        "FallSpeed1": 5.53000020980835,
+        "FallSpeed2": 0.0,
+        "Gravity1": 7.639999866485596,
+        "Gravity2": 0.0,
+        "NormalJump1": 0.0,
+        "NormalJump2": 0.0
     }
 }

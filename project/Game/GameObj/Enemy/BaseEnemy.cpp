@@ -3,13 +3,14 @@
 ///*behavior
 #include"Behavior/EnemyRoot.h"
 #include"Behavior/EnemyJump.h"
+#include"Behavior/EnemyFall.h"
 ///* std
 #include<algorithm>
 
 ///=========================================================
 ///　static 変数初期化
 ///==========================================================
-float BaseEnemy::InitY_ = 0.5f;
+float BaseEnemy::InitY_ = 1.5f;
 Vector3 BaseEnemy::InitScale_ = {1.0f,1.0f,1.0f};
 
 BaseEnemy::BaseEnemy() {
@@ -30,7 +31,7 @@ void BaseEnemy::Initialize() {
 	spawnEasing_.maxTime = 0.8f;
 	model_->transform.scale = Vector3::GetZeroVec();
 
-	ChangeBehavior(std::make_unique<EnemyRoot>(this));/// 追っかけ
+	ChangeBehavior(std::make_unique<EnemyFall>(this));/// 追っかけ
 }
 
 ///========================================================
@@ -47,11 +48,11 @@ void BaseEnemy::Update() {
 
 	behavior_->Update();
 	
-	// 体力がなくなったら死亡
-	if (hp_ <= 0) {
-		isdeath_=true;
-		/*Audio::GetInstance()->PlayWave(deathSound_);*/
-	}
+	//// 体力がなくなったら死亡
+	//if (hp_ <= 0) {
+	//	isdeath_=true;
+	//	/*Audio::GetInstance()->PlayWave(deathSound_);*/
+	//}
 }
 ///========================================================
 /// HpBar表示

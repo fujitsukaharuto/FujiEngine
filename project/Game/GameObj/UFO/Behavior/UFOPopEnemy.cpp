@@ -1,9 +1,10 @@
 
 ///* behavior
 #include"UFOPopEnemy.h"
+#include"UFORoot.h"
 
 ///* obj
-#include"Game/GameObj/UFO/UFO.h"
+#include"GameObj/UFO/UFO.h"
 
 ///* frame
 #include"DX/FPSKeeper.h"
@@ -23,7 +24,7 @@ UFOPopEnemy::UFOPopEnemy(UFO* player)
 	///---------------------------------------------------
 	///変数初期化
 	///---------------------------------------------------
-
+	step_ = Step::POP;
 	
 }
 
@@ -33,7 +34,24 @@ UFOPopEnemy ::~UFOPopEnemy() {
 
 //更新
 void UFOPopEnemy::Update() {
-	
+	switch (step_)
+	{
+	case UFOPopEnemy::Step::POP:
+		///-------------------------------------------------------
+		///　敵生成
+		///-------------------------------------------------------
+		pUFO_->EnemySpawn();
+		step_ = Step::RETURNROOT;
+		break;
+	case UFOPopEnemy::Step::RETURNROOT:
+		///-------------------------------------------------------
+		///　通常に戻るお
+		///-------------------------------------------------------
+		pUFO_->ChangeBehavior(std::make_unique<UFORoot>(pUFO_));
+		break;
+	default:
+		break;
+	}
 }
 
 

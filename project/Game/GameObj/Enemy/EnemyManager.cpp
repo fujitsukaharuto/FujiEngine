@@ -62,7 +62,7 @@ void EnemyManager::SpawnEnemy(const std::string& enemyType, const Vector3& posit
 
 		// 位置初期化とlistに追加
 		enemy->Initialize();
-		enemy->SetPosition(Vector3(position.x,position.y, InitZPos_));
+		enemy->SetPosition(Vector3(position.x,position.y, position.z));
 		enemy->SetPlayer(pPlayer_);// プレイヤーセット
 		enemies_.push_back(std::move(enemy));
 }
@@ -222,8 +222,8 @@ void EnemyManager::AdjustParm() {
 	SetValues();
 #ifdef _DEBUG
 
-	if (ImGui::CollapsingHeader("Enemies")) {
-
+	if (ImGui::CollapsingHeader(groupName_.c_str())) {
+		ImGui::PushID(groupName_.c_str());
 		///---------------------------------------------------------
 		/// 通常敵
 		///----------------------------------------------------------
@@ -276,6 +276,8 @@ void EnemyManager::AdjustParm() {
 		/// セーブとロード
 		globalParameter_->ParmSaveForImGui(groupName_);
 		ParmLoadForImGui();
+
+		ImGui::PopID();
 	}
 
 #endif // _DEBUG

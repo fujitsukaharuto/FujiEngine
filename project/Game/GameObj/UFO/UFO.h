@@ -8,14 +8,12 @@
 
 #include <memory>
 
-/// <summary>
-/// プレイヤークラス
-/// </summary>
+class EnemyManager;
 class UFO :public OriginGameObject {
 
 private:
 	/// other class
-	/*Boss* pBoss_;*/
+	EnemyManager* pEnemyManager_;
 private:
 
 	/// ===================================================
@@ -26,11 +24,15 @@ private:
 	std::unique_ptr<BaseUFOBehavior>behavior_ = nullptr;
 
 	
-/// グローバルなパラメータ
+     /// グローバルなパラメータ
 	GlobalVariables* globalParameter_;            /// グローバルパラメータ
 	const std::string groupName_ = "UFO";      /// グループ名
 
+
+	Vector3 popPos_;
 	
+	///parm
+	float popWaitTime_;
 
 public:
 	static float InitY_;
@@ -44,6 +46,7 @@ public:
 	void Update()override;
 	void Draw(Material* mate = nullptr)override;
 
+	void EnemySpawn();
 	void ChangeBehavior(std::unique_ptr<BaseUFOBehavior>behavior);
 
 	/// ダメージ
@@ -64,10 +67,11 @@ public:
 	/// ===================================================
 	/// getter method
 	/// ===================================================
-
+	EnemyManager* GetEnemyManager() { return pEnemyManager_; }
+	float GetPopWaitTime()const { return popWaitTime_; }
 
 	/// ===================================================
 	/// setter method
 	/// ===================================================
-
+	void SetEnemyManager(EnemyManager*enemymanager);
 };

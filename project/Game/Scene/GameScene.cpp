@@ -51,8 +51,9 @@ void GameScene::Initialize() {
 	gameCamera_->Initialize();
 	enemyManager_->Initialize();
 	ufo_->Initialize();
-		/*gameCamera_->SetTarget(&player_->GetTrans());*/
 
+	///set
+	ufo_->SetEnemyManager(enemyManager_.get());
 }
 
 void GameScene::Update() {
@@ -163,6 +164,7 @@ void GameScene::ParamaterEdit() {
 	ImGui::Begin("ParamaterEditor");
 	player_->AdjustParm();
 	enemyManager_->AdjustParm();
+	ufo_->AdjustParm();
 	ImGui::End();
 
 }

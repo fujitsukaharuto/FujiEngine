@@ -5,6 +5,12 @@
 
 class UFOPopEnemy : public BaseUFOBehavior {
 private:
+	enum class Step {
+		POP,
+		RETURNROOT,
+	};
+private:
+	Step step_;
 	float speed_;
 	/// ===================================================
 	///private varians

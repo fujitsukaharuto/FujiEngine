@@ -24,7 +24,7 @@ UFORoot::UFORoot(UFO* player)
 	///---------------------------------------------------
 	///変数初期化
 	///---------------------------------------------------
-
+	step_ = Step::WAIT;
 
 }
 
@@ -34,7 +34,28 @@ UFORoot ::~UFORoot() {
 
 //更新
 void UFORoot::Update() {
+	switch (step_)
+	{
+	case Step::WAIT:
+		///-------------------------------------------------------
+		///　待機
+		///-------------------------------------------------------
+		waitTime_ += FPSKeeper::NormalDeltaTime();
+		if (waitTime_ < pUFO_->GetPopWaitTime())break;
+		step_ = Step::CHANGEPOP;
+		break;
 
+	case Step::CHANGEPOP:
+		///-------------------------------------------------------
+		///　popするお
+		///-------------------------------------------------------
+		pUFO_->ChangeBehavior(std::make_unique<UFOPopEnemy>(pUFO_));
+		break;
+	default:
+		break;
+	}
+
+	
 }
 
 

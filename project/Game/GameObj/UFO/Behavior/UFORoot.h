@@ -5,10 +5,15 @@
 
 class UFORoot : public BaseUFOBehavior {
 private:
-	float speed_;
+	enum class Step {
+		WAIT,
+		CHANGEPOP,
+	};
 	/// ===================================================
 	///private varians
 	/// ===================================================
+	Step step_;
+	float waitTime_;
 
 public:
 	//コンストラクタ

@@ -16,7 +16,7 @@ EnemyFall::EnemyFall(BaseEnemy* boss)
     : BaseEnemyBehaivor("EnemyFall", boss) {
 
     step_ = Step::FALL; // ステップ初期化
-    amplitude_ = 1.0f;
+    amplitude_ = 0.2f;
     frequency_ = 2.0f;
     time_ = 0.0f;       // 時間カウンタの初期化
 }
@@ -38,7 +38,7 @@ void EnemyFall::Update() {
         pBaseEnemy_->SetRotation(Vector3(0, 0, zRotation_));
 
         // Y軸方向に落下
-        pBaseEnemy_->AddPosition(Vector3(0, pBaseEnemy_->GetFallSpeed()*FPSKeeper::NormalDeltaTime(), 0));
+        pBaseEnemy_->AddPosition(Vector3(0, -pBaseEnemy_->GetFallSpeed()*FPSKeeper::NormalDeltaTime(), 0));
 
         // 着地判定
         if (pBaseEnemy_->GetTrans().translate.y > BaseEnemy::InitY_) break;
@@ -56,6 +56,8 @@ void EnemyFall::Update() {
         ///----------------------------------------------------------------------
         /// 攻撃に切り替え
         ///----------------------------------------------------------------------
+        pBaseEnemy_->SetRotation(Vector3::GetZeroVec());
+        pBaseEnemy_->SetWorldPositionY(BaseEnemy::InitY_);
         pBaseEnemy_->ChangeBehavior(std::make_unique<EnemyAttack>(pBaseEnemy_));
         break;
 
