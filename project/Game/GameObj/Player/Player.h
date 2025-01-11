@@ -1,13 +1,13 @@
 #pragma once
 #include"Vector3.h"
-
+#include"Collider/AABBCollider.h"
 /// behavior
 #include"GameObj/PlayerBehavior/BasePlayerBehavior.h"
 #include"GlobalVariables/GlobalVariables.h"
 #include"Game/OriginGameObject.h"
 
 #include <memory>
-#include"Collider/AABBCollider.h"
+
 
 
 /// <summary>
@@ -26,7 +26,8 @@ private:
 
 		///* behavior
 	std::unique_ptr<BasePlayerBehavior>behavior_ = nullptr;
-	
+
+	std::unique_ptr<AABBCollider>normalKikCollider_;
 	
 /// グローバルなパラメータ
 	GlobalVariables* globalParameter_;            /// グローバルパラメータ
@@ -76,6 +77,9 @@ public:
 	void DamageRendition();
 	void TakeDamage();
 
+	void OnCollisionEnter(const ColliderInfo& other);
+	void OnCollisionStay(const ColliderInfo& other);
+	void OnCollisionExit(const ColliderInfo& other);
 	
 	///-------------------------------------------------------------------------------------
     /// Editor

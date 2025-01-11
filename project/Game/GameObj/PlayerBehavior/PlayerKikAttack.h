@@ -3,23 +3,22 @@
 #include"BasePlayerBehavior.h"
 #include"math/Easing.h"
 
-class PlayerRoot : public BasePlayerBehavior {
+
+class PlayerKikAttack : public BasePlayerBehavior {
 private:
 
 /// ===================================================
-///private varians
+///  private varians
 /// ===================================================
-
+	
 	
 
 public:
 	//コンストラクタ
-	PlayerRoot(Player* boss);
-	~PlayerRoot();
+	PlayerKikAttack(Player* boss);
+	~PlayerKikAttack();
 
 	void Update()override;
-	void JumpForJoyState();
-	void KikAttackState();
 	void Debug()override;
 
 };

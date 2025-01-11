@@ -1,7 +1,6 @@
 /// behavior
-#include"PlayerRoot.h"
-#include"PlayerJump.h"
 #include"PlayerKikAttack.h"
+#include"PlayerJump.h"
 
 /// boss
 #include"GameObj/Player/Player.h"
@@ -11,12 +10,11 @@
 #include"Input/Input.h"
 #include"GameObj/JoyState/JoyState.h"
 
-
 #include<imgui.h>
 
 //初期化
-PlayerRoot::PlayerRoot(Player* boss)
-	: BasePlayerBehavior("PlayerRoot", boss) {
+PlayerKikAttack::PlayerKikAttack(Player* boss)
+	: BasePlayerBehavior("PlayerKikAttack", boss) {
 
 	/// ===================================================
 	/// 変数初期化
@@ -25,37 +23,25 @@ PlayerRoot::PlayerRoot(Player* boss)
 
 }
 
-PlayerRoot ::~PlayerRoot() {
+PlayerKikAttack ::~PlayerKikAttack() {
 
 }
 
 //更新
-void PlayerRoot::Update() {
+void PlayerKikAttack::Update() {
 
 	pPlayer_->Move(pPlayer_->GetMoveSpeed());
 
 	//　ジャンプに切り替え
 	if (Input::GetInstance()->PushKey(DIK_J)) {
 		pPlayer_->ChangeBehavior(std::make_unique<PlayerJump>(pPlayer_));
-		return;
 	}
 	else {
 		JumpForJoyState();//コントローラジャンプ
-		return;
-	}
-
-	//　キックする
-	if (Input::GetInstance()->PushKey(DIK_K)) {
-		pPlayer_->ChangeBehavior(std::make_unique<PlayerKikAttack>(pPlayer_));
-		return;
-	}
-	else {
-		KikAttackState();//キック
-		return;
 	}
 }
 
-void PlayerRoot::JumpForJoyState() {
+void PlayerKikAttack::JumpForJoyState() {
 	if (!(Input::GetInstance()->GetGamepadState(joyState))) return;
 
 	if (!((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A))) return;
@@ -64,16 +50,8 @@ void PlayerRoot::JumpForJoyState() {
 
 }
 
-void PlayerRoot::KikAttackState() {
-	if (!(Input::GetInstance()->GetGamepadState(joyState))) return;
 
-	if (!((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_B))) return;
-
-	pPlayer_->ChangeBehavior(std::make_unique<PlayerKikAttack>(pPlayer_));
-}
-
-
-void  PlayerRoot::Debug() {
+void  PlayerKikAttack::Debug() {
 #ifdef _DEBUG
 	ImGui::Text("Root");
 #endif // _DEBUG	

@@ -228,34 +228,37 @@
       <Filter>Game\GameObj\Enemy</Filter>
     </ClCompile>
     <ClCompile Include="Game\GameObj\Enemy\Behavior\BaseEnemyBehavior.cpp">
-      <Filter>Game\GameObj\Enemy\Behavior</Filter>
+      <Filter>Game\Behavior\Enemy</Filter>
     </ClCompile>
     <ClCompile Include="Game\GameObj\Enemy\Behavior\EnemyRoot.cpp">
-      <Filter>Game\GameObj\Enemy\Behavior</Filter>
+      <Filter>Game\Behavior\Enemy</Filter>
     </ClCompile>
     <ClCompile Include="Game\GameObj\Enemy\StrongEnemy.cpp">
       <Filter>Game\GameObj\Enemy</Filter>
     </ClCompile>
     <ClCompile Include="Game\GameObj\Enemy\Behavior\EnemyFall.cpp">
-      <Filter>Game\GameObj\Enemy\Behavior</Filter>
+      <Filter>Game\Behavior\Enemy</Filter>
     </ClCompile>
     <ClCompile Include="Game\GameObj\Enemy\Behavior\EnemyAttack.cpp">
-      <Filter>Game\GameObj\Enemy\Behavior</Filter>
+      <Filter>Game\Behavior\Enemy</Filter>
     </ClCompile>
     <ClCompile Include="Game\GameObj\UFO\UFO.cpp">
       <Filter>Game\GameObj\UFO</Filter>
     </ClCompile>
     <ClCompile Include="Game\GameObj\UFO\Behavior\BaseUFOrBehavior.cpp">
-      <Filter>Game\GameObj\UFO\Behavior</Filter>
+      <Filter>Game\Behavior\UFO</Filter>
     </ClCompile>
     <ClCompile Include="Game\GameObj\UFO\Behavior\UFOPopEnemy.cpp">
-      <Filter>Game\GameObj\UFO\Behavior</Filter>
+      <Filter>Game\Behavior\UFO</Filter>
     </ClCompile>
     <ClCompile Include="Game\GameObj\UFO\Behavior\UFORoot.cpp">
-      <Filter>Game\GameObj\UFO\Behavior</Filter>
+      <Filter>Game\Behavior\UFO</Filter>
     </ClCompile>
     <ClCompile Include="Game\GameObj\Enemy\Behavior\EnemyJump.cpp">
-      <Filter>Game\GameObj\Enemy\Behavior</Filter>
+      <Filter>Game\Behavior\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameObj\PlayerBehavior\PlayerKikAttack.cpp">
+      <Filter>Game\Behavior\Player</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -503,34 +506,37 @@
       <Filter>Game\GameObj\Enemy</Filter>
     </ClInclude>
     <ClInclude Include="Game\GameObj\Enemy\Behavior\BaseEnemyBehavior.h">
-      <Filter>Game\GameObj\Enemy\Behavior</Filter>
+      <Filter>Game\Behavior\Enemy</Filter>
     </ClInclude>
     <ClInclude Include="Game\GameObj\Enemy\Behavior\EnemyRoot.h">
-      <Filter>Game\GameObj\Enemy\Behavior</Filter>
+      <Filter>Game\Behavior\Enemy</Filter>
     </ClInclude>
     <ClInclude Include="Game\GameObj\Enemy\StrongEnemy.h">
       <Filter>Game\GameObj\Enemy</Filter>
     </ClInclude>
     <ClInclude Include="Game\GameObj\Enemy\Behavior\EnemyFall.h">
-      <Filter>Game\GameObj\Enemy\Behavior</Filter>
+      <Filter>Game\Behavior\Enemy</Filter>
     </ClInclude>
     <ClInclude Include="Game\GameObj\Enemy\Behavior\EnemyAttack.h">
-      <Filter>Game\GameObj\Enemy\Behavior</Filter>
+      <Filter>Game\Behavior\Enemy</Filter>
     </ClInclude>
     <ClInclude Include="Game\GameObj\UFO\UFO.h">
       <Filter>Game\GameObj\UFO</Filter>
     </ClInclude>
     <ClInclude Include="Game\GameObj\UFO\Behavior\BaseUFOrBehavior.h">
-      <Filter>Game\GameObj\UFO\Behavior</Filter>
+      <Filter>Game\Behavior\UFO</Filter>
     </ClInclude>
     <ClInclude Include="Game\GameObj\UFO\Behavior\UFOPopEnemy.h">
-      <Filter>Game\GameObj\UFO\Behavior</Filter>
+      <Filter>Game\Behavior\UFO</Filter>
     </ClInclude>
     <ClInclude Include="Game\GameObj\UFO\Behavior\UFORoot.h">
-      <Filter>Game\GameObj\UFO\Behavior</Filter>
+      <Filter>Game\Behavior\UFO</Filter>
     </ClInclude>
     <ClInclude Include="Game\GameObj\Enemy\Behavior\EnemyJump.h">
-      <Filter>Game\GameObj\Enemy\Behavior</Filter>
+      <Filter>Game\Behavior\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\PlayerBehavior\PlayerKikAttack.h">
+      <Filter>Game\Behavior\Player</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -627,13 +633,13 @@
     <Filter Include="Engine\KRailEditor">
       <UniqueIdentifier>{fe454760-08ee-4e6c-956e-d5fd262eac8f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\GameObj\Enemy\Behavior">
-      <UniqueIdentifier>{6ab409ff-636a-4f8b-ab3e-d294d86e6294}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Game\GameObj\UFO">
       <UniqueIdentifier>{db55aab5-cd20-41a7-b2eb-2991b5160361}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\GameObj\UFO\Behavior">
+    <Filter Include="Game\Behavior\Enemy">
+      <UniqueIdentifier>{6ab409ff-636a-4f8b-ab3e-d294d86e6294}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Behavior\UFO">
       <UniqueIdentifier>{8ddc066b-aa74-4e48-a9a6-3c271dd5aaef}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
