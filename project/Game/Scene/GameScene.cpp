@@ -24,6 +24,7 @@ void GameScene::Initialize() {
 	skydome_ = std::make_unique<SkyDome>();
 	gameCamera_ = std::make_unique<GameCamera>();
 	enemyManager_ = std::make_unique<EnemyManager>();
+	ufo_= std::make_unique<UFO>();
 	///-------------------------------------------------------------
 	///　初期化
 	///-------------------------------------------------------------- 
@@ -44,19 +45,18 @@ void GameScene::Initialize() {
 	suzunne = std::make_unique<Object3d>();
 	suzunne->Create("suzanne.obj");
 
-
-
 	field_->Initialize();
 	skydome_->Initialize();
 	player_->Initialize();
 	gameCamera_->Initialize();
 	enemyManager_->Initialize();
+	ufo_->Initialize();
 		/*gameCamera_->SetTarget(&player_->GetTrans());*/
 
 }
 
 void GameScene::Update() {
-	enemyManager_->PoPEditorUpdate();
+	
 	ParamaterEdit();// パラメータエディター
 	BlackFade();
 
@@ -66,6 +66,7 @@ void GameScene::Update() {
 	field_->Update();
 	skydome_->Update();
 	player_->Update();
+	ufo_->Update();
 	gameCamera_->Update();
 	enemyManager_->Update();
 
@@ -95,6 +96,7 @@ void GameScene::Draw() {
 	field_->Draw();
 	player_->Draw();
 	enemyManager_->Draw();
+	ufo_->Draw();
 
 	ParticleManager::GetInstance()->Draw();
 

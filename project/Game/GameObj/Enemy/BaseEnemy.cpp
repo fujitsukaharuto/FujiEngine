@@ -2,6 +2,7 @@
 #include"FPSKeeper.h"
 ///*behavior
 #include"Behavior/EnemyRoot.h"
+#include"Behavior/EnemyJump.h"
 ///* std
 #include<algorithm>
 
@@ -79,6 +80,38 @@ void BaseEnemy::Draw(Material*material) {
 
 }
 
+/// ===================================================
+///  Player Jump
+/// ===================================================
+
+void BaseEnemy::Jump(float& speed) {
+	// 移動
+	model_->transform.translate.y += speed;
+	Fall(speed, true);
+
+}
+
+///=========================================================
+///　落ちる
+///==========================================================
+void BaseEnemy::Fall(float& speed, const bool& isJump) {
+	if (!isJump) {
+		// 移動
+		model_->transform.translate.y += speed;
+	}
+	// 加速する
+	speed = max(speed - (gravity_ * FPSKeeper::NormalDeltaTime()), -0.7f);
+
+	// 着地
+	if (model_->transform.translate.y <= BaseEnemy::InitY_) {
+		model_->transform.translate.y = BaseEnemy::InitY_;
+		speed = 0.0f;
+
+		if (!dynamic_cast<EnemyJump*>(behavior_.get()))return;
+		// ジャンプ終了
+		ChangeBehavior(std::make_unique<EnemyRoot>(this));
+	}
+}
 
 
 void BaseEnemy::SetPlayer(Player* player) {
@@ -111,7 +144,9 @@ void BaseEnemy::DamageForPar(const float& par) {
 	//}
 }
 
-void BaseEnemy::SetParm(const float& fallSpeed, const float& attackValue) {
+void BaseEnemy::SetParm(const float& fallSpeed, const float& attackValue, const float& gravity, const std::array<float, 1>& jumpSpeed) {
 	fallSpeed_ = fallSpeed;
 	attackValue_ = attackValue;
+	gravity_ = gravity;
+	jumpSpeed_ = jumpSpeed;
 }

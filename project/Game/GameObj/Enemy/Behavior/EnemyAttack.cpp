@@ -1,6 +1,6 @@
 
 /// behavior
-#include"EnemyRoot.h"
+#include"EnemyAttack.h"
 
 /// obj
 #include"GameObj/Enemy/BaseEnemy.h"
@@ -11,23 +11,23 @@
 
 
 //初期化
-EnemyRoot::EnemyRoot(BaseEnemy* boss)
-	: BaseEnemyBehaivor("EnemyRoot", boss) {
+EnemyAttack::EnemyAttack(BaseEnemy* boss)
+	: BaseEnemyBehaivor("EnemyAttack", boss) {
 	
 	step_ = Step::BOUND; /// ステップ初期化
 }
 
-EnemyRoot::~EnemyRoot() {
+EnemyAttack::~EnemyAttack() {
 
 }
 
-void EnemyRoot::Update() {
+void EnemyAttack::Update() {
 	
 	
 	
 }
 
-void EnemyRoot::Debug() {
+void EnemyAttack::Debug() {
 	
 
 }

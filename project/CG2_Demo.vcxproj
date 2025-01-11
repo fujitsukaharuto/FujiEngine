@@ -167,6 +167,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\GameObj\Enemy\Behavior\BaseEnemyBehavior.cpp" />
     <ClCompile Include="Game\GameObj\Enemy\Behavior\EnemyAttack.cpp" />
     <ClCompile Include="Game\GameObj\Enemy\Behavior\EnemyFall.cpp" />
+    <ClCompile Include="Game\GameObj\Enemy\Behavior\EnemyJump.cpp" />
     <ClCompile Include="Game\GameObj\Enemy\Behavior\EnemyRoot.cpp" />
     <ClCompile Include="Game\GameObj\Enemy\EnemyManager.cpp" />
     <ClCompile Include="Game\GameObj\Enemy\NormalEnemy.cpp" />
@@ -175,6 +176,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\GameObj\GameCamera\GameCamera.cpp" />
     <ClCompile Include="Game\GameObj\JoyState\JoyState.cpp" />
     <ClCompile Include="Game\GameObj\SkyDome\SkyDome.cpp" />
+    <ClCompile Include="Game\GameObj\UFO\Behavior\BaseUFOrBehavior.cpp" />
+    <ClCompile Include="Game\GameObj\UFO\Behavior\UFOPopEnemy.cpp" />
+    <ClCompile Include="Game\GameObj\UFO\Behavior\UFORoot.cpp" />
+    <ClCompile Include="Game\GameObj\UFO\UFO.cpp" />
     <ClCompile Include="Game\OriginGameObject.cpp" />
     <ClCompile Include="Game\Collider\BaseCollider.cpp" />
     <ClCompile Include="Game\Collider\AABBCollider.cpp" />
@@ -254,6 +259,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Game\GameObj\Enemy\Behavior\BaseEnemyBehavior.h" />
     <ClInclude Include="Game\GameObj\Enemy\Behavior\EnemyAttack.h" />
     <ClInclude Include="Game\GameObj\Enemy\Behavior\EnemyFall.h" />
+    <ClInclude Include="Game\GameObj\Enemy\Behavior\EnemyJump.h" />
     <ClInclude Include="Game\GameObj\Enemy\Behavior\EnemyRoot.h" />
     <ClInclude Include="Game\GameObj\Enemy\EnemyManager.h" />
     <ClInclude Include="Game\GameObj\Enemy\NormalEnemy.h" />
@@ -262,6 +268,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Game\GameObj\GameCamera\GameCamera.h" />
     <ClInclude Include="Game\GameObj\JoyState\JoyState.h" />
     <ClInclude Include="Game\GameObj\SkyDome\SkyDome.h" />
+    <ClInclude Include="Game\GameObj\UFO\Behavior\BaseUFOrBehavior.h" />
+    <ClInclude Include="Game\GameObj\UFO\Behavior\UFOPopEnemy.h" />
+    <ClInclude Include="Game\GameObj\UFO\Behavior\UFORoot.h" />
+    <ClInclude Include="Game\GameObj\UFO\UFO.h" />
     <ClInclude Include="Game\OriginGameObject.h" />
     <ClInclude Include="Game\Collider\BaseCollider.h" />
     <ClInclude Include="Game\Collider\AABBCollider.h" />

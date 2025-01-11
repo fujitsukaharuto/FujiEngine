@@ -7,6 +7,7 @@
 #include"GameObj/SkyDome/SkyDome.h"
 #include"GameObj/GameCamera/GameCamera.h"
 #include"GameObj/Enemy/EnemyManager.h"
+#include"GameObj/UFO/UFO.h"
 
 class GameScene :public BaseScene
 {
@@ -73,4 +74,5 @@ private:
 	std::unique_ptr<SkyDome>skydome_;
 	std::unique_ptr<GameCamera>gameCamera_;
 	std::unique_ptr<EnemyManager>enemyManager_;
+	std::unique_ptr<UFO>ufo_;
 };

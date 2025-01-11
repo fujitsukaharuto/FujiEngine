@@ -242,6 +242,21 @@
     <ClCompile Include="Game\GameObj\Enemy\Behavior\EnemyAttack.cpp">
       <Filter>Game\GameObj\Enemy\Behavior</Filter>
     </ClCompile>
+    <ClCompile Include="Game\GameObj\UFO\UFO.cpp">
+      <Filter>Game\GameObj\UFO</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameObj\UFO\Behavior\BaseUFOrBehavior.cpp">
+      <Filter>Game\GameObj\UFO\Behavior</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameObj\UFO\Behavior\UFOPopEnemy.cpp">
+      <Filter>Game\GameObj\UFO\Behavior</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameObj\UFO\Behavior\UFORoot.cpp">
+      <Filter>Game\GameObj\UFO\Behavior</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameObj\Enemy\Behavior\EnemyJump.cpp">
+      <Filter>Game\GameObj\Enemy\Behavior</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Audio\Audio.h">
@@ -502,6 +517,21 @@
     <ClInclude Include="Game\GameObj\Enemy\Behavior\EnemyAttack.h">
       <Filter>Game\GameObj\Enemy\Behavior</Filter>
     </ClInclude>
+    <ClInclude Include="Game\GameObj\UFO\UFO.h">
+      <Filter>Game\GameObj\UFO</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\UFO\Behavior\BaseUFOrBehavior.h">
+      <Filter>Game\GameObj\UFO\Behavior</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\UFO\Behavior\UFOPopEnemy.h">
+      <Filter>Game\GameObj\UFO\Behavior</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\UFO\Behavior\UFORoot.h">
+      <Filter>Game\GameObj\UFO\Behavior</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\Enemy\Behavior\EnemyJump.h">
+      <Filter>Game\GameObj\Enemy\Behavior</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -599,6 +629,12 @@
     </Filter>
     <Filter Include="Game\GameObj\Enemy\Behavior">
       <UniqueIdentifier>{6ab409ff-636a-4f8b-ab3e-d294d86e6294}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameObj\UFO">
+      <UniqueIdentifier>{db55aab5-cd20-41a7-b2eb-2991b5160361}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameObj\UFO\Behavior">
+      <UniqueIdentifier>{8ddc066b-aa74-4e48-a9a6-3c271dd5aaef}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -6,9 +6,16 @@
 #include "OriginGameObject.h"
 #include"Collider/AABBCollider.h"
 #include"Behavior/BaseEnemyBehavior.h"
+#include<array>
 
 class Player;
 class BaseEnemy : public OriginGameObject {
+public:
+	/*enum class JumpPower {
+		WEAK,
+		NORMAL,
+		STRONG,
+	};*/
 protected:
 
 	/// other class
@@ -24,6 +31,8 @@ protected:
 	/// parm
 	float fallSpeed_;
 	float attackValue_;
+	float gravity_;
+	std::array<float,1>jumpSpeed_;
 
 	/// behavior
 	std::unique_ptr<BaseEnemyBehaivor>behavior_ = nullptr;
@@ -43,10 +52,12 @@ public:
 	virtual void Update()override;
 	virtual void Draw(Material* mate = nullptr)override;
 
-	void SetParm(const float&fallSpeed,const float&attackValue);
-	
-	void DamageForPar(const float& par);
+	///* ジャンプ
+	void Jump(float& speed);
+	void Fall(float& speed, const bool& isJump = false);
 
+	void SetParm(const float& fallSpeed, const float& attackValue, const float& gravity, const std::array<float, 1>& jumpSpeed);
+	void DamageForPar(const float& par);
 	void ChangeBehavior(std::unique_ptr<BaseEnemyBehaivor>behavior);
 
 
@@ -55,7 +66,10 @@ public:
 	///========================================================================================
 	bool GetIsDeath()const { return isdeath_; }
 	Player* GetPlayer() { return pPlayer_; }
-	
+	float GetFallSpeed()const { return fallSpeed_; }
+	float GetAttackValue()const { return attackValue_; }
+	float GetGravity()const { return gravity_; }
+	 float GetJumpSpeed(int num) const { return jumpSpeed_[num]; }
 	///========================================================================================
 	///  setter method
 	///========================================================================================
