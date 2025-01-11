@@ -275,6 +275,7 @@ void Player::AdjustParm() {
 		///　Floatのパラメータ
 		ImGui::SeparatorText("FloatParamater");
 		ImGui::DragFloat("jumpSpeed", &jumpSpeed_, 0.01f);
+		ImGui::DragFloat("AirJumpSpeed", &airMoveSpeed_, 0.01f);
 		ImGui::DragFloat("MoveSpeed", &moveSpeed_, 0.01f);
 		ImGui::DragFloat("Gravity", &gravity_, 0.01f);
 
@@ -310,6 +311,7 @@ void Player::AddParmGroup() {
 	globalParameter_->AddItem(groupName_, "JumpSpeed", jumpSpeed_);
 	globalParameter_->AddItem(groupName_, "MoveSpeed", moveSpeed_);
 	globalParameter_->AddItem(groupName_, "Gravity", gravity_);
+	globalParameter_->AddItem(groupName_, "AirMoveSpeed", airMoveSpeed_);
 
 }
 
@@ -322,6 +324,7 @@ void Player::SetValues() {
 	globalParameter_->SetValue(groupName_, "JumpSpeed", jumpSpeed_);
 	globalParameter_->SetValue(groupName_, "Gravity", gravity_);
 	globalParameter_->SetValue(groupName_, "MoveSpeed", moveSpeed_);
+	globalParameter_->SetValue(groupName_, "AirMoveSpeed", airMoveSpeed_);
 }
 
 ///=====================================================
@@ -332,6 +335,7 @@ void Player::ApplyGlobalParameter() {
 	jumpSpeed_ = globalParameter_->GetValue<float>(groupName_, "JumpSpeed");
 	gravity_ = globalParameter_->GetValue<float>(groupName_, "Gravity");
 	moveSpeed_ = globalParameter_->GetValue<float>(groupName_, "MoveSpeed");
+	airMoveSpeed_ = globalParameter_->GetValue<float>(groupName_, "AirMoveSpeed");
 }
 ///=========================================================
 /// Class Set

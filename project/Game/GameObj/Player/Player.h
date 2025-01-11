@@ -39,6 +39,7 @@ private:
 	
 	/// 移動、ジャンプ
 	float moveSpeed_;
+	float airMoveSpeed_;
 	float jumpSpeed_;
 	float gravity_;
 
@@ -88,6 +89,7 @@ public:
 	/// getter method
 	/// ===================================================
 	float GetMoveSpeed()const { return moveSpeed_; }
+	float GetAirMoveSpeed()const { return airMoveSpeed_; }
 	float GetJumpSpeed()const { return jumpSpeed_; }
 
 	/// ===================================================
