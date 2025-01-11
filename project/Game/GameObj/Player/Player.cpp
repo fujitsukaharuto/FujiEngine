@@ -140,21 +140,9 @@ bool Player::GetIsMoving() {
 	Vector3 keyBoradVelocity = {};
 
 	///----------------------------------------------------
-	///  JoyStick
-	///----------------------------------------------------
-	
-	if (Input::GetInstance()->GetGamepadState(joyState)) {
-		// 移動量
-		StickVelocity = { (float)joyState.Gamepad.sThumbLX / SHRT_MAX, 0, 0};
-		if ((StickVelocity).Length() > thresholdValue) {
-			isMoving = true;
-		}
-	}
-
-	///----------------------------------------------------
 	///  keyBorad
 	///----------------------------------------------------
-	else {
+	if (input->PushKey(DIK_A) || input->PushKey(DIK_D)) {
 		if (input->PushKey(DIK_A)) {
 			keyBoradVelocity.x -= 1.0f;  // 左移動
 		}
@@ -163,7 +151,19 @@ bool Player::GetIsMoving() {
 		}
 		if ((keyBoradVelocity).Length() > 0) {
 			isMoving = true;
-		}
+		};
+	}
+	///----------------------------------------------------
+	///  JoyStick
+	///----------------------------------------------------
+
+	else if (Input::GetInstance()->GetGamepadState(joyState)) {
+		// 移動量
+		StickVelocity = { (float)joyState.Gamepad.sThumbLX / SHRT_MAX, 0, 0 };
+		if ((StickVelocity).Length() > thresholdValue) {
+			isMoving = true;
+		};
+	
 	}
 	return isMoving;
 }
@@ -188,12 +188,13 @@ void Player::Fall(float& speed, const bool& isJump) {
 		model_->transform.translate.y += speed;
 	}
 	// 加速する
-	speed = max(speed - (gravity_ * FPSKeeper::DeltaTime()), -1.0f);
+	speed = max(speed - (gravity_ * FPSKeeper::DeltaTime()), -0.7f);
 
 	// 着地
 	if (model_->transform.translate.y  <= Player::InitY_) {
 		model_->transform.translate.y  = Player::InitY_;
 		speed = 0.0f;
+
 		if (!dynamic_cast<PlayerJump*>(behavior_.get()))return;
 			// ジャンプ終了
 			ChangeBehavior(std::make_unique<PlayerRoot>(this));	
@@ -271,14 +272,12 @@ void Player::AdjustParm() {
 		ImGui::SeparatorText("Transform");
 		ImGui::DragFloat3("Position", &model_->transform.translate.x, 0.1f);
 
-
 		///　Floatのパラメータ
 		ImGui::SeparatorText("FloatParamater");
 		ImGui::DragFloat("jumpSpeed", &jumpSpeed_, 0.01f);
 		ImGui::DragFloat("AirJumpSpeed", &airMoveSpeed_, 0.01f);
 		ImGui::DragFloat("MoveSpeed", &moveSpeed_, 0.01f);
 		ImGui::DragFloat("Gravity", &gravity_, 0.01f);
-
 		
 		/// セーブとロード
 		globalParameter_->ParmSaveForImGui(groupName_);

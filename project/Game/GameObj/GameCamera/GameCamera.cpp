@@ -18,9 +18,9 @@ void GameCamera::Initialize() {
 
 void GameCamera::Update() {
 
-    XINPUT_STATE pad;
+    /*XINPUT_STATE pad;*/
    
-    if (Input::GetInstance()->GetGamepadState(pad)) {
+   /* if (Input::GetInstance()->GetGamepadState(pad)) {
         const float kRotateSpeed = 0.05f;
 
         destinationAngleY_ += (Input::GetInstance()->GetRStick().x / SHRT_MAX * kRotateSpeed) * FPSKeeper::DeltaTime();
@@ -29,7 +29,7 @@ void GameCamera::Update() {
             destinationAngleY_ = target_->rotate.y;
         }
     }
-    camera_->transform.rotate.y = LerpShortAngle(camera_->transform.rotate.y, destinationAngleY_, 0.4f);
+    camera_->transform.rotate.y = LerpShortAngle(camera_->transform.rotate.y, destinationAngleY_, 0.4f);*/
     if (target_) {
         interTarget_ = Lerp(interTarget_, target_->translate, 0.3f);
     }

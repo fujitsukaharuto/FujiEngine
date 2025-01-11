@@ -8,6 +8,7 @@
 #include"DX/FPSKeeper.h"
 /// inupt
 #include"Input/Input.h"
+#include"GameObj/JoyState/JoyState.h"
 
 
 #include<imgui.h>
@@ -33,9 +34,22 @@ void PlayerRoot::Update() {
 
 	pPlayer_->Move(pPlayer_->GetMoveSpeed());
 
-	if (Input::GetInstance()->TriggerKey(DIK_J)) {
+	//　ジャンプに切り替え
+	if (Input::GetInstance()->PushKey(DIK_J)) {
 		pPlayer_->ChangeBehavior(std::make_unique<PlayerJump>(pPlayer_));
 	}
+	else {
+		JumpForJoyState();//コントローラジャンプ
+	}
+}
+
+void PlayerRoot::JumpForJoyState() {
+	if (!(Input::GetInstance()->GetGamepadState(joyState))) return;
+
+	if (!((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A))) return;
+
+	pPlayer_->ChangeBehavior(std::make_unique<PlayerJump>(pPlayer_));
+
 }
 
 

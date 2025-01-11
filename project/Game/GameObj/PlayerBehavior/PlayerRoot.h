@@ -18,7 +18,7 @@ public:
 	~PlayerRoot();
 
 	void Update()override;
-
+	void JumpForJoyState();
 	void Debug()override;
 
 };
