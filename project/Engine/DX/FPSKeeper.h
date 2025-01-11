@@ -18,6 +18,7 @@ public:
 	void Update();
 
 	static float DeltaTime();
+	static float NormalDeltaTime();
 
 private:
 

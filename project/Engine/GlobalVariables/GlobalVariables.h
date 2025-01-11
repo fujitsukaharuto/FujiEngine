@@ -63,7 +63,7 @@ private:
     std::unordered_map<std::string, bool> visibilityFlags_;
 
     // データを保存する際のディレクトリパス
-    const std::string kDirectoryPath = "Resources/GlobalParameter/";
+    const std::string kDirectoryPath = "Resource/GlobalParameter/";
 
     std::stack<std::string> treeNodeStack_;
 

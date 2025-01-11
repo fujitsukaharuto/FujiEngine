@@ -23,7 +23,7 @@ void GameScene::Initialize() {
 	field_ = std::make_unique<Field>();
 	skydome_ = std::make_unique<SkyDome>();
 	gameCamera_ = std::make_unique<GameCamera>();
-
+	enemyManager_ = std::make_unique<EnemyManager>();
 	///-------------------------------------------------------------
 	///　初期化
 	///-------------------------------------------------------------- 
@@ -50,7 +50,7 @@ void GameScene::Initialize() {
 	skydome_->Initialize();
 	player_->Initialize();
 	gameCamera_->Initialize();
-
+	enemyManager_->Initialize();
 		/*gameCamera_->SetTarget(&player_->GetTrans());*/
 
 }
@@ -67,6 +67,7 @@ void GameScene::Update() {
 	skydome_->Update();
 	player_->Update();
 	gameCamera_->Update();
+	enemyManager_->Update();
 
 	ParticleManager::GetInstance()->Update();
 
@@ -93,7 +94,7 @@ void GameScene::Draw() {
 	skydome_->Draw();
 	field_->Draw();
 	player_->Draw();
-
+	enemyManager_->Draw();
 
 	ParticleManager::GetInstance()->Draw();
 

@@ -6,6 +6,7 @@
 #include"GameObj/Field/Field.h"
 #include"GameObj/SkyDome/SkyDome.h"
 #include"GameObj/GameCamera/GameCamera.h"
+#include"GameObj/Enemy/EnemyManager.h"
 
 class GameScene :public BaseScene
 {
@@ -36,6 +37,7 @@ private:
 	std::unique_ptr<Object3d> suzunne = nullptr;
 	std::unique_ptr<Object3d> fence = nullptr;
 	std::unique_ptr<Object3d> terrain = nullptr;
+	
 
 	std::vector<std::unique_ptr<Object3d>> suzunnes;
 
@@ -70,4 +72,5 @@ private:
 	std::unique_ptr<Field>field_;
 	std::unique_ptr<SkyDome>skydome_;
 	std::unique_ptr<GameCamera>gameCamera_;
+	std::unique_ptr<EnemyManager>enemyManager_;
 };

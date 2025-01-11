@@ -218,6 +218,24 @@
     <ClCompile Include="Engine\KRailEditor\RailManager.cpp">
       <Filter>Engine\KRailEditor</Filter>
     </ClCompile>
+    <ClCompile Include="Game\GameObj\Enemy\BaseEnemy.cpp">
+      <Filter>Game\GameObj\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameObj\Enemy\EnemyManager.cpp">
+      <Filter>Game\GameObj\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameObj\Enemy\NormalEnemy.cpp">
+      <Filter>Game\GameObj\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameObj\Enemy\Behavior\BaseEnemyBehavior.cpp">
+      <Filter>Game\GameObj\Enemy\Behavior</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameObj\Enemy\Behavior\EnemyRoot.cpp">
+      <Filter>Game\GameObj\Enemy\Behavior</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameObj\Enemy\StrongEnemy.cpp">
+      <Filter>Game\GameObj\Enemy</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Audio\Audio.h">
@@ -454,6 +472,24 @@
     <ClInclude Include="Engine\KRailEditor\RailManager.h">
       <Filter>Engine\KRailEditor</Filter>
     </ClInclude>
+    <ClInclude Include="Game\GameObj\Enemy\BaseEnemy.h">
+      <Filter>Game\GameObj\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\Enemy\EnemyManager.h">
+      <Filter>Game\GameObj\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\Enemy\NormalEnemy.h">
+      <Filter>Game\GameObj\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\Enemy\Behavior\BaseEnemyBehavior.h">
+      <Filter>Game\GameObj\Enemy\Behavior</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\Enemy\Behavior\EnemyRoot.h">
+      <Filter>Game\GameObj\Enemy\Behavior</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\Enemy\StrongEnemy.h">
+      <Filter>Game\GameObj\Enemy</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -548,6 +584,9 @@
     </Filter>
     <Filter Include="Engine\KRailEditor">
       <UniqueIdentifier>{fe454760-08ee-4e6c-956e-d5fd262eac8f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameObj\Enemy\Behavior">
+      <UniqueIdentifier>{6ab409ff-636a-4f8b-ab3e-d294d86e6294}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
