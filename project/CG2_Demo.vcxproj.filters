@@ -206,6 +206,9 @@
     <ClCompile Include="Game\GameObj\LockOn.cpp">
       <Filter>Game\GameObj</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Model\PlaneDrawer.cpp">
+      <Filter>Engine\Model</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -430,6 +433,9 @@
     <ClInclude Include="Game\GameObj\LockOn.h">
       <Filter>Game\GameObj</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Model\PlaneDrawer.h">
+      <Filter>Engine\Model</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -567,6 +573,12 @@
       <Filter>resource\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="resource\Shaders\Line3d.PS.hlsl">
+      <Filter>resource\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\PlaneDrawer.VS.hlsl">
+      <Filter>resource\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\PlaneDrawer.PS.hlsl">
       <Filter>resource\Shaders</Filter>
     </FxCompile>
   </ItemGroup>
