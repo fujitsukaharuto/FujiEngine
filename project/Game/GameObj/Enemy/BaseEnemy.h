@@ -21,6 +21,10 @@ protected:
 
 	Easing spawnEasing_;
 
+	/// parm
+	float fallSpeed_;
+	float attackValue_;
+
 	/// behavior
 	std::unique_ptr<BaseEnemyBehaivor>behavior_ = nullptr;
 
@@ -38,6 +42,8 @@ public:
 	virtual void Initialize()override;
 	virtual void Update()override;
 	virtual void Draw(Material* mate = nullptr)override;
+
+	void SetParm(const float&fallSpeed,const float&attackValue);
 	
 	void DamageForPar(const float& par);
 

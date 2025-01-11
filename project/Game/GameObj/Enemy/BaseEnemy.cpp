@@ -110,3 +110,8 @@ void BaseEnemy::DamageForPar(const float& par) {
 	//	//HP_ = 0.0f;
 	//}
 }
+
+void BaseEnemy::SetParm(const float& fallSpeed, const float& attackValue) {
+	fallSpeed_ = fallSpeed;
+	attackValue_ = attackValue;
+}

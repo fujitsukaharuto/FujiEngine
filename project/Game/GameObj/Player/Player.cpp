@@ -112,7 +112,7 @@ void Player::Move(const float& speed) {
 	/// 移動処理
 	if (GetIsMoving()) {
 		// 移動ベクトルの正規化と速さの適用
-		velocity_ = (velocity_).Normalize() * (speed*FPSKeeper::DeltaTime());
+		velocity_ = (velocity_).Normalize() * (speed*FPSKeeper::NormalDeltaTime());
 
 		// 移動ベクトルをカメラの角度に基づいて回転
 		Matrix4x4 rotateMatrix = MakeRotateYMatrix(CameraManager::GetInstance()->GetCamera()->transform.rotate.y);
@@ -188,7 +188,7 @@ void Player::Fall(float& speed, const bool& isJump) {
 		model_->transform.translate.y += speed;
 	}
 	// 加速する
-	speed = max(speed - (gravity_ * FPSKeeper::DeltaTime()), -0.7f);
+	speed = max(speed - (gravity_ * FPSKeeper::NormalDeltaTime()), -0.7f);
 
 	// 着地
 	if (model_->transform.translate.y  <= Player::InitY_) {
@@ -275,7 +275,7 @@ void Player::AdjustParm() {
 		///　Floatのパラメータ
 		ImGui::SeparatorText("FloatParamater");
 		ImGui::DragFloat("jumpSpeed", &jumpSpeed_, 0.01f);
-		ImGui::DragFloat("AirJumpSpeed", &airMoveSpeed_, 0.01f);
+		ImGui::DragFloat("AirMoveSpeed", &airMoveSpeed_, 0.01f);
 		ImGui::DragFloat("MoveSpeed", &moveSpeed_, 0.01f);
 		ImGui::DragFloat("Gravity", &gravity_, 0.01f);
 		

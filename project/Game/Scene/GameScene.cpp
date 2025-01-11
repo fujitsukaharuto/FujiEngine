@@ -56,7 +56,7 @@ void GameScene::Initialize() {
 }
 
 void GameScene::Update() {
-
+	enemyManager_->PoPEditorUpdate();
 	ParamaterEdit();// パラメータエディター
 	BlackFade();
 

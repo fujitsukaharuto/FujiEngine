@@ -10,6 +10,8 @@
 #include <fstream>
 #include <imgui.h>
 
+float EnemyManager::InitZPos_ = -45.0f;
+
 EnemyManager::EnemyManager() {
 
 }
@@ -19,7 +21,7 @@ EnemyManager::EnemyManager() {
 ///========================================================================================
 
 void EnemyManager::Initialize() {
-	selectedEnemyType_ = enemyTypes_[0];
+	selectedEnemyType_ = enemyTypes_[NORMAL];
 	spownPosition_ = {};
 
 	spownNum_ = 1;
@@ -46,8 +48,8 @@ void EnemyManager::Initialize() {
 }
 
 void  EnemyManager::FSpawn() {
-	SpawnEnemy(enemyTypes_[0], Vector3{-30,0,40});
-	SpawnEnemy(enemyTypes_[1], Vector3{ 30,0,40 });
+	SpawnEnemy(enemyTypes_[NORMAL], Vector3{-30,0,InitZPos_ });
+	SpawnEnemy(enemyTypes_[STRONG], Vector3{ 30,0,InitZPos_ });
 }
 
 ///========================================================================================
@@ -57,16 +59,18 @@ void EnemyManager::SpawnEnemy(const std::string& enemyType, const Vector3& posit
 	
 		std::unique_ptr<BaseEnemy> enemy;
 
-		if (enemyType == enemyTypes_[0]) {// 通常敵
+		if (enemyType == enemyTypes_[NORMAL]) {// 通常敵
 			enemy = std::make_unique<NormalEnemy>();		
+			enemy->SetParm(paramaters_[0].fallSpeed_, paramaters_[0].attackValue_);
 		}
-		if (enemyType == enemyTypes_[1]) {// 通常敵
+		if (enemyType == enemyTypes_[STRONG]) {// 通常敵
 			enemy = std::make_unique<StrongEnemy>();
+			enemy->SetParm(paramaters_[1].fallSpeed_, paramaters_[1].attackValue_);
 		}
 
 		// 位置初期化とlistに追加
 		enemy->Initialize();
-		enemy->SetPosition(position);
+		enemy->SetPosition(Vector3(position.x,position.y, InitZPos_));
 		enemy->SetPlayer(pPlayer_);// プレイヤーセット
 		enemies_.push_back(std::move(enemy));
 }
@@ -161,7 +165,7 @@ void EnemyManager::Draw(Material*material) {
 ///========================================================================================
 ///  ImGuiによるエディタ
 ///========================================================================================
-void EnemyManager::ImGuiUpdate() {
+void EnemyManager::PoPEditorUpdate() {
 	ImGui::Begin("Enemy Manager");
 
 	// エディターモードフラグ
@@ -227,7 +231,7 @@ void EnemyManager::ImGuiUpdate() {
 
 						// 敵グループの設定UI
 						ImGui::InputText("Type", &group.enemyType[0], group.enemyType.size());
-						ImGui::DragFloat3("Position", &group.position.x, 0.1f);
+						ImGui::DragFloat2("Position", &group.position.x, 0.1f);
 
 						ImGui::PopID(); // 敵ID解除
 					}
@@ -543,15 +547,15 @@ void EnemyManager::AdjustParm() {
 		/// 通常敵
 		///----------------------------------------------------------
 
-		ImGui::SeparatorText(enemyTypes_[0].c_str()); 
-		ImGui::PushID(enemyTypes_[0].c_str());
+		ImGui::SeparatorText(enemyTypes_[NORMAL].c_str());
+		ImGui::PushID(enemyTypes_[NORMAL].c_str());
 
 		ImGui::DragFloat("FallSpeed",
-			&paramaters_[0].fallSpeed_,
+			&paramaters_[NORMAL].fallSpeed_,
 			0.01f);
 
 		ImGui::DragFloat("AttackValue",
-			&paramaters_[0].attackValue_,
+			&paramaters_[NORMAL].attackValue_,
 			0.01f);
 
 		ImGui::PopID();
@@ -560,15 +564,15 @@ void EnemyManager::AdjustParm() {
 		/// ストロングな敵
 		///----------------------------------------------------------
 
-		ImGui::SeparatorText(enemyTypes_[1].c_str()); 
-		ImGui::PushID(enemyTypes_[1].c_str());
+		ImGui::SeparatorText(enemyTypes_[STRONG].c_str()); 
+		ImGui::PushID(enemyTypes_[STRONG].c_str());
 
 		ImGui::DragFloat("FallSpeed",
-			&paramaters_[1].fallSpeed_,
+			&paramaters_[STRONG].fallSpeed_,
 			0.01f);
 
 		ImGui::DragFloat("AttackValue",
-			&paramaters_[1].attackValue_,
+			&paramaters_[STRONG].attackValue_,
 			0.01f);
 		ImGui::PopID();
 		/// セーブとロード

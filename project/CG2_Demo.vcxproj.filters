@@ -236,6 +236,12 @@
     <ClCompile Include="Game\GameObj\Enemy\StrongEnemy.cpp">
       <Filter>Game\GameObj\Enemy</Filter>
     </ClCompile>
+    <ClCompile Include="Game\GameObj\Enemy\Behavior\EnemyFall.cpp">
+      <Filter>Game\GameObj\Enemy\Behavior</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameObj\Enemy\Behavior\EnemyAttack.cpp">
+      <Filter>Game\GameObj\Enemy\Behavior</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Audio\Audio.h">
@@ -489,6 +495,12 @@
     </ClInclude>
     <ClInclude Include="Game\GameObj\Enemy\StrongEnemy.h">
       <Filter>Game\GameObj\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\Enemy\Behavior\EnemyFall.h">
+      <Filter>Game\GameObj\Enemy\Behavior</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\Enemy\Behavior\EnemyAttack.h">
+      <Filter>Game\GameObj\Enemy\Behavior</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

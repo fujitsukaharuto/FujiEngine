@@ -14,6 +14,10 @@
 class Player;
 class LockOn;
 class EnemyManager {
+    enum Type {
+        NORMAL,
+        STRONG,
+    };
 private:
     struct Paramater {
        float fallSpeed_;
@@ -82,7 +86,8 @@ private:
 
     const std::string directrypath_ = "./resource/EnemyParamater/";// path
     const std::string filename_ = "PoPData.json";// name
-
+public:
+   static float InitZPos_;
 public:
 
     ///========================================================
@@ -115,7 +120,7 @@ public:
    ///========================================================
 
    
-    void ImGuiUpdate();/// ImGuiによるエディタ
+    void PoPEditorUpdate();/// ImGuiによるエディタ
     void SaveAndLoad();/// セーブとロード
 
     ///* セーブ
