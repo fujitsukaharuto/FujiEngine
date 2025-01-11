@@ -1,6 +1,4 @@
 #pragma once
-
-
 #include"Vector3.h"
 
 /// behavior
@@ -13,7 +11,6 @@
 /// <summary>
 /// プレイヤークラス
 /// </summary>
-//class Boss;
 class Player :public OriginGameObject {
 
 private:
@@ -55,7 +52,7 @@ public:
 	///public method
 	/// ===================================================
 
-	//* 初期化、更新、
+	//* 初期化、更新、描画
 	void Initialize()override;
 	void Update()override;
 	void Draw(Material* mate = nullptr)override;

@@ -14,7 +14,6 @@
 #include"Field/Field.h"
 ///* std
 #include<algorithm>
-
 ///* imgui
 #include<imgui.h> 
 
@@ -25,7 +24,6 @@
 float Player::InitY_ = 1.5f;
 
 Player::Player() {}
-
 
 /// ===================================================
 ///  初期化
@@ -45,13 +43,11 @@ void Player::Initialize() {
 	ChangeBehavior(std::make_unique<PlayerRoot>(this));
 }
 
-
 /// ===================================================
 ///  更新処理
 /// ===================================================
 void Player::Update() {
 	/*prePos_ = GetWorldPosition();*/
-
 	/// ダメージエフェクト
 	DamageRendition();
 	/// 振る舞い処理
@@ -62,9 +58,6 @@ void Player::Update() {
 	/// 更新
 	//base::Update();
 }
-
-
-
 
 /// ===================================================
 ///  描画
@@ -90,13 +83,7 @@ Vector3 Player::GetInputVelocity() {
 	Vector3 velocity = { 0.0f, 0.0f, 0.0f };
 	Input* input = Input::GetInstance();
 
-	// キーボード入力
-	if (input->PushKey(DIK_W)) {
-		velocity.z += 1.0f;  // 前進
-	}
-	if (input->PushKey(DIK_S)) {
-		velocity.z -= 1.0f;  // 後退
-	}
+	
 	if (input->PushKey(DIK_A)) {
 		velocity.x -= 1.0f;  // 左移動
 	}
@@ -107,7 +94,7 @@ Vector3 Player::GetInputVelocity() {
 	// ジョイスティック入力
 	if (input->GetGamepadState(joyState)) {
 		velocity.x += (float)joyState.Gamepad.sThumbLX / SHRT_MAX;
-		velocity.z += (float)joyState.Gamepad.sThumbLY / SHRT_MAX;
+	/*	velocity.z += (float)joyState.Gamepad.sThumbLY / SHRT_MAX;*/
 	}
 
 	return velocity;
@@ -142,7 +129,6 @@ void Player::Move(const float& speed) {
 	}
 }
 
-
 /// ===================================================
 ///  動いているか
 /// ===================================================
@@ -159,7 +145,7 @@ bool Player::GetIsMoving() {
 	
 	if (Input::GetInstance()->GetGamepadState(joyState)) {
 		// 移動量
-		StickVelocity = { (float)joyState.Gamepad.sThumbLX / SHRT_MAX, 0, (float)joyState.Gamepad.sThumbLY / SHRT_MAX };
+		StickVelocity = { (float)joyState.Gamepad.sThumbLX / SHRT_MAX, 0, 0};
 		if ((StickVelocity).Length() > thresholdValue) {
 			isMoving = true;
 		}
@@ -169,13 +155,6 @@ bool Player::GetIsMoving() {
 	///  keyBorad
 	///----------------------------------------------------
 	else {
-		// キーボード入力
-		if (input->PushKey(DIK_W)) {
-			keyBoradVelocity.z += 1.0f;  // 前進
-		}
-		if (input->PushKey(DIK_S)) {
-			keyBoradVelocity.z -= 1.0f;  // 後退
-		}
 		if (input->PushKey(DIK_A)) {
 			keyBoradVelocity.x -= 1.0f;  // 左移動
 		}
@@ -221,6 +200,9 @@ void Player::Fall(float& speed, const bool& isJump) {
 	}
 }
 
+///=========================================================
+///　移動制限
+///==========================================================
 void Player::MoveToLimit() {
 
 	// フィールドの中心とスケールを取得
@@ -262,7 +244,6 @@ void Player::MoveToLimit() {
 		model_->transform.translate.z += directionToCenter.z * 0.1f; // 軽く押し戻す
 	}
 }
-
 
 ///=========================================================
 /// ダメージ受ける
@@ -320,7 +301,6 @@ void Player::ParmLoadForImGui() {
 	}
 }
 
-
 ///=================================================================================
 ///パラメータをグループに追加
 ///=================================================================================
@@ -333,7 +313,6 @@ void Player::AddParmGroup() {
 
 }
 
-
 ///=================================================================================
 ///パラメータをグループに追加
 ///=================================================================================
@@ -344,7 +323,6 @@ void Player::SetValues() {
 	globalParameter_->SetValue(groupName_, "Gravity", gravity_);
 	globalParameter_->SetValue(groupName_, "MoveSpeed", moveSpeed_);
 }
-
 
 ///=====================================================
 ///  ImGuiからパラメータを得る
