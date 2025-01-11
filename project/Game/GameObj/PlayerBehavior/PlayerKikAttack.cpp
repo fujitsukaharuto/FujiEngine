@@ -22,6 +22,7 @@ PlayerKikAttack::PlayerKikAttack(Player* boss)
 	/// 変数初期化
 	/// ===================================================
 	
+	/// collider
 	weakikCollider_ = std::make_unique<AABBCollider>();
 	weakikCollider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
 	weakikCollider_->SetTag("WeakKik");
@@ -47,25 +48,30 @@ void PlayerKikAttack::Update() {
 	switch (step_)
 	{
 	case Step::KIK:
+		///-----------------------------------------------------------
+        /// キック
+        ///------------------------------------------------------------
 		kikTime_ += FPSKeeper::NormalDeltaTime();
+		// 反動に移行
 		if (isCollision_) {
 			pPlayer_->ChangeBehavior(std::make_unique<PlayerRecoil>(pPlayer_));
 			pPlayer_->ChangeAttackBehavior(std::make_unique<PlayerAttackRoot>(pPlayer_));
 			break;
 		}
-		if (kikTime_ < 0.2f) break;
+		if (kikTime_ < pPlayer_->GetKikTime()) break;// キックタイム
 		step_ = Step::RETUNROOT;
 		
 		break;
 	case Step::RETUNROOT:
+		///-----------------------------------------------------------
+		/// 通常に戻る
+		///------------------------------------------------------------
 		pPlayer_->ChangeAttackBehavior(std::make_unique<PlayerAttackRoot>(pPlayer_));
 		break;
 	default:
 		break;
 	}
 
-	
-	
 }
 
 

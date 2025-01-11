@@ -11,6 +11,7 @@
 #include"GameObj/PlayerBehavior/PlayerRoot.h"
 #include"GameObj/PlayerBehavior/PlayerJump.h"
 #include"GameObj/PlayerBehavior/PlayerAttackRoot.h"
+#include"GameObj/PlayerBehavior/PlayerRecoil.h"
 //* obj
 #include"Field/Field.h"
 ///* std
@@ -54,7 +55,9 @@ void Player::Update() {
 	DamageRendition();
 	/// 振る舞い処理
 	behavior_->Update();
-	attackBehavior_->Update();
+	if (!dynamic_cast<PlayerRecoil*>(behavior_.get())) {
+		attackBehavior_->Update();
+	}
 	//　移動制限
 	MoveToLimit();
 	
@@ -288,6 +291,7 @@ void Player::AdjustParm() {
 		ImGui::DragFloat("Gravity", &gravity_, 0.01f);
 		ImGui::DragFloat("RecoilSpeed", &recoilSpeed_, 0.01f);
 		ImGui::DragFloat("RecoilJumpSpeed", &recoilJumpSpeed_, 0.01f);
+		ImGui::DragFloat("KikTime", &kikTime_, 0.01f);
 		
 		/// セーブとロード
 		globalParameter_->ParmSaveForImGui(groupName_);
@@ -325,6 +329,7 @@ void Player::AddParmGroup() {
 	globalParameter_->AddItem(groupName_, "AirMoveSpeed", airMoveSpeed_);
 	globalParameter_->AddItem(groupName_, "RecoilSpeed", recoilSpeed_);
 	globalParameter_->AddItem(groupName_, "RecoilJumpSpeed", recoilJumpSpeed_);
+	globalParameter_->AddItem(groupName_, "KikTime", kikTime_);
 
 }
 
@@ -340,6 +345,7 @@ void Player::SetValues() {
 	globalParameter_->SetValue(groupName_, "AirMoveSpeed", airMoveSpeed_);
 	globalParameter_->SetValue(groupName_, "RecoilSpeed", recoilSpeed_);
 	globalParameter_->SetValue(groupName_, "RecoilJumpSpeed", recoilJumpSpeed_);
+	globalParameter_->SetValue(groupName_, "KikTime", kikTime_);
 }
 
 ///=====================================================
@@ -353,6 +359,7 @@ void Player::ApplyGlobalParameter() {
 	airMoveSpeed_ = globalParameter_->GetValue<float>(groupName_, "AirMoveSpeed");
 	recoilSpeed_ = globalParameter_->GetValue<float>(groupName_, "RecoilSpeed");
 	recoilJumpSpeed_ = globalParameter_->GetValue<float>(groupName_, "RecoilJumpSpeed");
+	kikTime_ = globalParameter_->GetValue<float>(groupName_, "KikTime");
 }
 ///=========================================================
 /// Class Set

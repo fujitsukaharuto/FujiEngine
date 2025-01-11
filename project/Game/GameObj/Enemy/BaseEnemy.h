@@ -66,6 +66,7 @@ public:
 
 	void OnCollisionEnter(const ColliderInfo& other);
 	void OnCollisionStay(const ColliderInfo& other);
+	void DrawCollider();
 	///========================================================================================
 	///  getter method
 	///========================================================================================

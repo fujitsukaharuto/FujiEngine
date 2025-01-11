@@ -1,5 +1,6 @@
 #include "BaseEnemy.h"
 #include"FPSKeeper.h"
+#include "Model/Line3dDrawer.h"
 ///*behavior
 #include"Behavior/EnemyRoot.h"
 #include"Behavior/EnemyJump.h"
@@ -30,14 +31,15 @@ void BaseEnemy::Initialize() {
 	spawnEasing_.time = 0.0f;
 	spawnEasing_.maxTime = 0.8f;
 	model_->transform.scale = Vector3::GetZeroVec();
-
+	
+	// collider
 	collider_ = std::make_unique<AABBCollider>();
 	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
 	collider_->SetTag("Enemy");
-	collider_->SetWidth(1.0f);
-	collider_->SetHeight(1.0f);
-	collider_->SetDepth(1.0f);
-	collider_->SetPos(model_->GetWorldPos());
+	collider_->SetWidth(2.0f);
+	collider_->SetHeight(2.0f);
+	collider_->SetDepth(2.0f);
+	collider_->SetParent(model_.get());
 
 	ChangeBehavior(std::make_unique<EnemyFall>(this));/// 追っかけ
 }
@@ -54,7 +56,12 @@ void BaseEnemy::Update() {
 		EaseOutBack(Vector3::GetZeroVec(), BaseEnemy::InitScale_,
 		spawnEasing_.time, spawnEasing_.maxTime);
 
+	// 振る舞い更新
 	behavior_->Update();
+
+	// collider更新
+	collider_->InfoUpdate();
+
 	
 	//// 体力がなくなったら死亡
 	//if (hp_ <= 0) {
@@ -86,7 +93,6 @@ void BaseEnemy::Update() {
 ///========================================================
 void BaseEnemy::Draw(Material*material) {
 	OriginGameObject::Draw(material);
-
 }
 
 /// ===================================================
@@ -120,17 +126,6 @@ void BaseEnemy::Fall(float& speed, const bool& isJump) {
 		// ジャンプ終了
 		ChangeBehavior(std::make_unique<EnemyRoot>(this));
 	}
-}
-
-
-void BaseEnemy::SetPlayer(Player* player) {
-	pPlayer_ = player;
-}
-
-
-void BaseEnemy::ChangeBehavior(std::unique_ptr<BaseEnemyBehaivor>behavior) {
-	//引数で受け取った状態を次の状態としてセット
-	behavior_ = std::move(behavior);
 }
 
 
@@ -172,4 +167,15 @@ void BaseEnemy::SetParm(const float& fallSpeed, const float& attackValue, const 
 	attackValue_ = attackValue;
 	gravity_ = gravity;
 	jumpSpeed_ = jumpSpeed;
+}
+
+
+void BaseEnemy::SetPlayer(Player* player) {
+	pPlayer_ = player;
+}
+
+
+void BaseEnemy::ChangeBehavior(std::unique_ptr<BaseEnemyBehaivor>behavior) {
+	//引数で受け取った状態を次の状態としてセット
+	behavior_ = std::move(behavior);
 }
