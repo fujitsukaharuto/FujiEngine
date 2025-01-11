@@ -31,6 +31,10 @@ void BaseEnemy::Initialize() {
 	spawnEasing_.maxTime = 0.8f;
 	model_->transform.scale = Vector3::GetZeroVec();
 
+	collider_ = std::make_unique<AABBCollider>();
+	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
+	collider_->SetTag("Enemy");
+
 	ChangeBehavior(std::make_unique<EnemyFall>(this));/// 追っかけ
 }
 
@@ -144,6 +148,17 @@ void BaseEnemy::DamageForPar(const float& par) {
 	//	//HP_ = 0.0f;
 	//}
 }
+
+void BaseEnemy::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
+
+
+
+}
+
+void BaseEnemy::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
+
+}
+
 
 void BaseEnemy::SetParm(const float& fallSpeed, const float& attackValue, const float& gravity, const std::array<float, 1>& jumpSpeed) {
 	fallSpeed_ = fallSpeed;

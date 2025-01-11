@@ -26,8 +26,6 @@ private:
 
 		///* behavior
 	std::unique_ptr<BasePlayerBehavior>behavior_ = nullptr;
-
-	std::unique_ptr<AABBCollider>normalKikCollider_;
 	
 /// グローバルなパラメータ
 	GlobalVariables* globalParameter_;            /// グローバルパラメータ
@@ -77,9 +75,7 @@ public:
 	void DamageRendition();
 	void TakeDamage();
 
-	void OnCollisionEnter(const ColliderInfo& other);
-	void OnCollisionStay(const ColliderInfo& other);
-	void OnCollisionExit(const ColliderInfo& other);
+	
 	
 	///-------------------------------------------------------------------------------------
     /// Editor

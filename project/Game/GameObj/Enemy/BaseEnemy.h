@@ -10,12 +10,14 @@
 
 class Player;
 class BaseEnemy : public OriginGameObject {
+private:
+	std::unique_ptr<AABBCollider>collider_;
 public:
-	/*enum class JumpPower {
+	enum class JumpPower {
 		WEAK,
 		NORMAL,
 		STRONG,
-	};*/
+	};
 protected:
 
 	/// other class
@@ -32,6 +34,8 @@ protected:
 	float fallSpeed_;
 	float attackValue_;
 	float gravity_;
+
+	JumpPower jumpPower_;
 	std::array<float,1>jumpSpeed_;
 
 	/// behavior
@@ -60,7 +64,8 @@ public:
 	void DamageForPar(const float& par);
 	void ChangeBehavior(std::unique_ptr<BaseEnemyBehaivor>behavior);
 
-
+	void OnCollisionEnter(const ColliderInfo& other);
+	void OnCollisionStay(const ColliderInfo& other);
 	///========================================================================================
 	///  getter method
 	///========================================================================================
@@ -69,7 +74,8 @@ public:
 	float GetFallSpeed()const { return fallSpeed_; }
 	float GetAttackValue()const { return attackValue_; }
 	float GetGravity()const { return gravity_; }
-	 float GetJumpSpeed(int num) const { return jumpSpeed_[num]; }
+	JumpPower GetJumpPower()const { return jumpPower_; }
+	 float GetJumpSpeed(JumpPower num) const { return jumpSpeed_[static_cast<size_t>(num)]; }
 	///========================================================================================
 	///  setter method
 	///========================================================================================

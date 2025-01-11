@@ -39,9 +39,7 @@ void Player::Initialize() {
 	AddParmGroup();
 	ApplyGlobalParameter();
 
-	normalKikCollider_ = std::make_unique<AABBCollider>();
-	normalKikCollider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
-	normalKikCollider_->SetTag("NormalKik");
+	
 
 	/// 通常モードから
 	ChangeBehavior(std::make_unique<PlayerRoot>(this));
@@ -346,12 +344,3 @@ void Player::ApplyGlobalParameter() {
 /// Class Set
 ///==========================================================
 
- void Player::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
-
-
-
-}
-
- void Player::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
-	
-}
