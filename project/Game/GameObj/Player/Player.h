@@ -7,6 +7,8 @@
 #include"Game/OriginGameObject.h"
 
 #include <memory>
+#include"Collider/AABBCollider.h"
+
 
 /// <summary>
 /// プレイヤークラス
@@ -24,7 +26,7 @@ private:
 
 		///* behavior
 	std::unique_ptr<BasePlayerBehavior>behavior_ = nullptr;
-
+	
 	
 /// グローバルなパラメータ
 	GlobalVariables* globalParameter_;            /// グローバルパラメータ
