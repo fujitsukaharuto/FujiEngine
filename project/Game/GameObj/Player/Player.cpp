@@ -5,6 +5,7 @@
 #include "Game/GameObj/Player/PlayerJumpBehavior.h"
 #include "Input/Input.h"
 #include "Game/GameObj/LockOn.h"
+#include "Model/PlaneDrawer.h"
 
 Player::Player() {
 }
@@ -64,7 +65,7 @@ void Player::Initialize() {
 	attackParticle_.SetParent(weapon_.get());
 
 	attackParticle2_.name = "attackParticle2";
-	attackParticle2_.Load("attackParticle");
+	attackParticle2_.Load("attackParticle2");
 	attackParticle2_.pos.y += 0.3f;
 	attackParticle2_.SetParent(weapon_.get());
 
@@ -125,6 +126,7 @@ void Player::Update() {
 #ifdef _DEBUG
 
 	attackParticle_.DebugGUI();
+	attackParticle2_.DebugGUI();
 
 	attackParticle3_.DebugGUI();
 	attackParticle4_.DebugGUI();
@@ -152,6 +154,10 @@ void Player::Update() {
 	if (isAttack_) {
 		attackParticle_.Emit();
 		attackParticle2_.Emit();
+
+		PlaneDrawer::GetInstance()->AddPlanePoint(attackParticle_.GetWorldPos());
+		PlaneDrawer::GetInstance()->AddPlanePoint(attackParticle2_.GetWorldPos());
+
 	}
 	else {
 		if (firePlane_->transform.scale.x > 0.0f) {
@@ -160,6 +166,7 @@ void Player::Update() {
 				firePlane_->transform.scale.x = 0.0f;
 			}
 		}
+
 	}
 	if (firePlane_->transform.scale.x <= 1.0f) {
 		firePlane_->SetUVScale({ 1.0f,firePlane_->transform.scale.x });
@@ -181,6 +188,7 @@ void Player::Draw([[maybe_unused]]Material* mate) {
 	firePlane_->ShaderTextureDraw();
 #ifdef _DEBUG
 	attackParticle_.DrawSize();
+	attackParticle2_.DrawSize();
 #endif // _DEBUG
 
 }

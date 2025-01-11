@@ -5,7 +5,8 @@
 #include "CameraManager.h"
 #include "FPSKeeper.h"
 #include "Random.h"
-
+#include "Model/Line3dDrawer.h"
+#include "Model/PlaneDrawer.h"
 #include "Particle/ParticleManager.h"
 #include "Scene/SceneManager.h"
 
@@ -86,6 +87,9 @@ void ResultScene::Draw() {
 
 	ParticleManager::GetInstance()->Draw();
 
+
+	PlaneDrawer::GetInstance()->Render();
+	Line3dDrawer::GetInstance()->Render();
 #pragma endregion
 
 

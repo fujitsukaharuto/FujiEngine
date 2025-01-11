@@ -209,6 +209,9 @@
     <ClCompile Include="Engine\Model\PlaneDrawer.cpp">
       <Filter>Engine\Model</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\GraphicPipeline\PlaneDrawerPipe.cpp">
+      <Filter>Engine\GraphicPipeline</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -435,6 +438,9 @@
     </ClInclude>
     <ClInclude Include="Engine\Model\PlaneDrawer.h">
       <Filter>Engine\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\GraphicPipeline\PlaneDrawerPipe.h">
+      <Filter>Engine\GraphicPipeline</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

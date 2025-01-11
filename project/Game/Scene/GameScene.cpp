@@ -2,7 +2,7 @@
 #include "ImGuiManager.h"
 #include "GlobalVariables.h"
 #include "FPSKeeper.h"
-
+#include "Model/PlaneDrawer.h"
 #include "Particle/ParticleManager.h"
 #include "Scene/SceneManager.h"
 #include "Light/PointLightManager.h"
@@ -70,6 +70,17 @@ void GameScene::Initialize() {
 	followCamera_->Initialize();
 	followCamera_->SetTarget(&player_->GetTrans());
 	followCamera_->SetLockOn(lockOn_.get());
+
+	PlaneDrawer::GetInstance()->AddPlanePoint({ 1.0f,2.0f,5.0f });
+	PlaneDrawer::GetInstance()->AddPlanePoint({ 0.0f,2.0f,5.0f });
+	PlaneDrawer::GetInstance()->AddPlanePoint({ 1.0f,3.0f,5.0f });
+	PlaneDrawer::GetInstance()->AddPlanePoint({ 0.0f,3.0f,5.0f });
+	PlaneDrawer::GetInstance()->AddPlanePoint({ 1.0f,4.0f,5.0f });
+	PlaneDrawer::GetInstance()->AddPlanePoint({ 0.0f,4.0f,5.0f });
+	PlaneDrawer::GetInstance()->AddPlanePoint({ 1.0f,5.0f,5.0f });
+	PlaneDrawer::GetInstance()->AddPlanePoint({ 0.0f,5.0f,5.0f });
+
+
 }
 
 void GameScene::Update() {
@@ -146,6 +157,7 @@ void GameScene::Draw() {
 	player_->DrawCollider();
 	player_->DrawColliderAttack();
 #endif // _DEBUG
+	PlaneDrawer::GetInstance()->Render();
 	Line3dDrawer::GetInstance()->Render();
 
 #pragma endregion

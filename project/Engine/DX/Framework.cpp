@@ -35,6 +35,10 @@ void Framework::Init() {
 	line3dDrawer_->Initialize();
 	line3dDrawer_->SetCamera(cameraManager_->GetCamera());
 
+	planeDrawer_ = PlaneDrawer::GetInstance();
+	planeDrawer_->Initialize();
+	planeDrawer_->SetCamera(cameraManager_->GetCamera());
+
 #pragma region 汎用機能初期化
 	// ImGuiの初期化
 	imguiManager_ = ImGuiManager::GetInstance();

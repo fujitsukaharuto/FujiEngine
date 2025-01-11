@@ -6,6 +6,7 @@
 #include "FPSKeeper.h"
 #include "Random.h"
 #include "Model/Line3dDrawer.h"
+#include "Model/PlaneDrawer.h"
 #include "Particle/ParticleManager.h"
 #include "Scene/SceneManager.h"
 
@@ -92,6 +93,7 @@ void TitleScene::Draw() {
 	test2_->DrawCollider();*/
 
 #endif // _DEBUG
+	PlaneDrawer::GetInstance()->Render();
 	Line3dDrawer::GetInstance()->Render();
 
 #pragma endregion
@@ -131,6 +133,13 @@ void TitleScene::BlackFade() {
 	XINPUT_STATE pad;
 	if (Input::GetInstance()->GetGamepadState(pad)) {
 		if (Input::GetInstance()->TriggerButton(PadInput::A)) {
+			if (blackTime == 0.0f) {
+				isChangeFase = true;
+			}
+		}
+	}
+	else {
+		if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
 			if (blackTime == 0.0f) {
 				isChangeFase = true;
 			}

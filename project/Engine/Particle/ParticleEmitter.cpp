@@ -74,16 +74,30 @@ void ParticleEmitter::DebugGUI() {
 void ParticleEmitter::DrawSize() {
 	if (isDrawSize_) {
 
+		Matrix4x4 worldMatrix = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, pos);
+		if (parent_) {
+			const Matrix4x4& parentWorldMatrix = parent_->GetWorldMat();
+			worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
+		}
+
 		Vector3 points[8];
 		points[0] = emitSizeMin;
+		points[0] += {worldMatrix.m[3][0], worldMatrix.m[3][1], worldMatrix.m[3][2]};
 		points[1] = { emitSizeMax.x,emitSizeMin.y,emitSizeMin.z };
+		points[1] += {worldMatrix.m[3][0], worldMatrix.m[3][1], worldMatrix.m[3][2]};
 		points[2] = { emitSizeMax.x,emitSizeMin.y,emitSizeMax.z };
+		points[2] += {worldMatrix.m[3][0], worldMatrix.m[3][1], worldMatrix.m[3][2]};
 		points[3] = { emitSizeMin.x,emitSizeMin.y,emitSizeMax.z };
+		points[3] += {worldMatrix.m[3][0], worldMatrix.m[3][1], worldMatrix.m[3][2]};
 
 		points[4] = emitSizeMax;
+		points[4] += {worldMatrix.m[3][0], worldMatrix.m[3][1], worldMatrix.m[3][2]};
 		points[5] = { emitSizeMin.x,emitSizeMax.y,emitSizeMax.z };
+		points[5] += {worldMatrix.m[3][0], worldMatrix.m[3][1], worldMatrix.m[3][2]};
 		points[6] = { emitSizeMin.x,emitSizeMax.y,emitSizeMin.z };
+		points[6] += {worldMatrix.m[3][0], worldMatrix.m[3][1], worldMatrix.m[3][2]};
 		points[7] = { emitSizeMax.x,emitSizeMax.y,emitSizeMin.z };
+		points[7] += {worldMatrix.m[3][0], worldMatrix.m[3][1], worldMatrix.m[3][2]};
 
 		Line3dDrawer::GetInstance()->DrawLine3d(points[0], points[1], Vector4{ 1.0f, 0.0f, 0.0f, 1.0f });
 		Line3dDrawer::GetInstance()->DrawLine3d(points[1], points[2], Vector4{ 1.0f, 0.0f, 0.0f, 1.0f });
@@ -285,4 +299,13 @@ void ParticleEmitter::Load(const std::string& filename) {
 	para_.colorMax = Vector4(j[index][0], j[index][1], j[index][2], j[index][3]);
 	index++;
 
+}
+
+Vector3 ParticleEmitter::GetWorldPos() {
+	Matrix4x4 worldMatrix = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, pos);
+	if (parent_) {
+		const Matrix4x4& parentWorldMatrix = parent_->GetWorldMat();
+		worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
+	}
+	return Vector3{ worldMatrix.m[3][0], worldMatrix.m[3][1], worldMatrix.m[3][2] };
 }

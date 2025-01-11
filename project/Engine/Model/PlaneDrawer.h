@@ -19,7 +19,7 @@ public:
 
 public:
 
-	static const size_t kMaxPlanes = 10;
+	static const size_t kMaxPlanes = 30;
 
 	struct VertexPosUV {
 		Vector3 pos;
@@ -44,7 +44,7 @@ public:
 
 	void Finalize();
 
-	void AddPlanePoint(const Vector3& p1, const Vector3& p2);
+	void AddPlanePoint(const Vector3& p1);
 
 	void Reset();
 
@@ -56,19 +56,19 @@ public:
 private:
 
 	void CreateMeshes();
-
 	void CreateResource();
 
 private:
 
-	std::deque<std::unique_ptr<PlaneData>> planes_;
+	std::unique_ptr<PlaneData> planes_;
+	std::deque<VertexPosUV> points_;
+
+	uint32_t indexPlane_ = 0;
 
 	Camera* camera_ = nullptr;
-
 	struct CBuffer {
 		Matrix4x4 viewProject;
 	};
-
 	ComPtr<ID3D12Resource> cBufferResource_ = nullptr;
 	CBuffer* cBufferData_ = nullptr;
 

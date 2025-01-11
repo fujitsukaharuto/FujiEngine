@@ -2,6 +2,7 @@
 
 #include "Pipeline.h"
 #include "Line3dPipe.h"
+#include "PlaneDrawerPipe.h"
 #include "ParticlePipeline.h"
 #include "GrayPipeline.h"
 #include "MetaBallPipeline.h"
@@ -33,6 +34,7 @@ void PipelineManager::CreatePipeline() {
 
 	std::unique_ptr<Pipeline> pipeline = nullptr;
 	std::unique_ptr<Line3dPipe> lLine = nullptr;
+	std::unique_ptr<PlanePipe> plane_ = nullptr;
 	std::unique_ptr<ParticlePipeline> particlePipline = nullptr;
 	std::unique_ptr<GrayPipeline> grayPipeline = nullptr;
 	std::unique_ptr<MetaBallPipeline> metaballPipeline = nullptr;
@@ -57,6 +59,11 @@ void PipelineManager::CreatePipeline() {
 	lLine.reset(new Line3dPipe());
 	lLine->Initialize();
 	pipelines_.push_back(std::move(lLine));
+
+
+	plane_.reset(new PlanePipe());
+	plane_->Initialize();
+	pipelines_.push_back(std::move(plane_));
 
 
 	particlePipline.reset(new ParticlePipeline());

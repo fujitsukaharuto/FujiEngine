@@ -14,6 +14,7 @@
 #include "Scene//AbstractSceneFactory.h"
 #include "Scene/SceneManager.h"
 #include "Model/Line3dDrawer.h"
+#include "Model/PlaneDrawer.h"
 
 class Framework {
 public:
@@ -55,4 +56,5 @@ protected:
 	PointLightManager* pointLightManager_ = nullptr;
 	ParticleManager* pManager_ = nullptr;
 	Line3dDrawer* line3dDrawer_ = nullptr;
+	PlaneDrawer* planeDrawer_ = nullptr;
 };

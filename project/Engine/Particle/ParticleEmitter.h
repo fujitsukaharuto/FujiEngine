@@ -32,6 +32,7 @@ public:
 	float frequencyTime = 0;
 
 	void SetParent(Object3d* parent) { parent_ = parent; }
+	Vector3 GetWorldPos();
 
 	std::string name;
 	Vector3 pos;
