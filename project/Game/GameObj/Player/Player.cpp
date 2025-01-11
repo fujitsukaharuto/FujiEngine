@@ -10,6 +10,7 @@
 ///* behavior
 #include"GameObj/PlayerBehavior/PlayerRoot.h"
 #include"GameObj/PlayerBehavior/PlayerJump.h"
+#include"GameObj/PlayerBehavior/PlayerAttackRoot.h"
 //* obj
 #include"Field/Field.h"
 ///* std
@@ -39,10 +40,9 @@ void Player::Initialize() {
 	AddParmGroup();
 	ApplyGlobalParameter();
 
-	
-
 	/// 通常モードから
 	ChangeBehavior(std::make_unique<PlayerRoot>(this));
+	ChangeAttackBehavior(std::make_unique<PlayerAttackRoot>(this));
 }
 
 /// ===================================================
@@ -54,6 +54,7 @@ void Player::Update() {
 	DamageRendition();
 	/// 振る舞い処理
 	behavior_->Update();
+	attackBehavior_->Update();
 	//　移動制限
 	MoveToLimit();
 	
@@ -82,24 +83,24 @@ void Player::DamageRendition() {
 ///  移動入力処理
 /// ===================================================
 Vector3 Player::GetInputVelocity() {
-	Vector3 velocity = { 0.0f, 0.0f, 0.0f };
+	direction_ = { 0.0f, 0.0f, 0.0f };
 	Input* input = Input::GetInstance();
 
 	
 	if (input->PushKey(DIK_A)) {
-		velocity.x -= 1.0f;  // 左移動
+		direction_.x -= 1.0f;  // 左移動
 	}
 	if (input->PushKey(DIK_D)) {
-		velocity.x += 1.0f;  // 右移動
+		direction_.x += 1.0f;  // 右移動
 	}
 
 	// ジョイスティック入力
 	if (input->GetGamepadState(joyState)) {
-		velocity.x += (float)joyState.Gamepad.sThumbLX / SHRT_MAX;
+		direction_.x += (float)joyState.Gamepad.sThumbLX / SHRT_MAX;
 	/*	velocity.z += (float)joyState.Gamepad.sThumbLY / SHRT_MAX;*/
 	}
 
-	return velocity;
+	return direction_;
 }
 
 
@@ -262,6 +263,11 @@ void Player::ChangeBehavior(std::unique_ptr<BasePlayerBehavior>behavior) {
 	//引数で受け取った状態を次の状態としてセット
 	behavior_ = std::move(behavior);
 }
+
+void Player::ChangeAttackBehavior(std::unique_ptr<BasePlayerAttackBehavior>behavior) {
+	attackBehavior_= std::move(behavior);
+}
+
 ///=========================================================
 /// パラメータ調整
 ///==========================================================
@@ -280,6 +286,8 @@ void Player::AdjustParm() {
 		ImGui::DragFloat("AirMoveSpeed", &airMoveSpeed_, 0.01f);
 		ImGui::DragFloat("MoveSpeed", &moveSpeed_, 0.01f);
 		ImGui::DragFloat("Gravity", &gravity_, 0.01f);
+		ImGui::DragFloat("RecoilSpeed", &recoilSpeed_, 0.01f);
+		ImGui::DragFloat("RecoilJumpSpeed", &recoilJumpSpeed_, 0.01f);
 		
 		/// セーブとロード
 		globalParameter_->ParmSaveForImGui(groupName_);
@@ -315,6 +323,8 @@ void Player::AddParmGroup() {
 	globalParameter_->AddItem(groupName_, "MoveSpeed", moveSpeed_);
 	globalParameter_->AddItem(groupName_, "Gravity", gravity_);
 	globalParameter_->AddItem(groupName_, "AirMoveSpeed", airMoveSpeed_);
+	globalParameter_->AddItem(groupName_, "RecoilSpeed", recoilSpeed_);
+	globalParameter_->AddItem(groupName_, "RecoilJumpSpeed", recoilJumpSpeed_);
 
 }
 
@@ -328,6 +338,8 @@ void Player::SetValues() {
 	globalParameter_->SetValue(groupName_, "Gravity", gravity_);
 	globalParameter_->SetValue(groupName_, "MoveSpeed", moveSpeed_);
 	globalParameter_->SetValue(groupName_, "AirMoveSpeed", airMoveSpeed_);
+	globalParameter_->SetValue(groupName_, "RecoilSpeed", recoilSpeed_);
+	globalParameter_->SetValue(groupName_, "RecoilJumpSpeed", recoilJumpSpeed_);
 }
 
 ///=====================================================
@@ -339,6 +351,8 @@ void Player::ApplyGlobalParameter() {
 	gravity_ = globalParameter_->GetValue<float>(groupName_, "Gravity");
 	moveSpeed_ = globalParameter_->GetValue<float>(groupName_, "MoveSpeed");
 	airMoveSpeed_ = globalParameter_->GetValue<float>(groupName_, "AirMoveSpeed");
+	recoilSpeed_ = globalParameter_->GetValue<float>(groupName_, "RecoilSpeed");
+	recoilJumpSpeed_ = globalParameter_->GetValue<float>(groupName_, "RecoilJumpSpeed");
 }
 ///=========================================================
 /// Class Set

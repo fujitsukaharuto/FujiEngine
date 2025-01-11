@@ -1,7 +1,7 @@
 /// behavior
 #include"PlayerRoot.h"
 #include"PlayerJump.h"
-#include"PlayerKikAttack.h"
+
 
 /// boss
 #include"GameObj/Player/Player.h"
@@ -44,15 +44,7 @@ void PlayerRoot::Update() {
 		return;
 	}
 
-	//　キックする
-	if (Input::GetInstance()->PushKey(DIK_K)) {
-		pPlayer_->ChangeBehavior(std::make_unique<PlayerKikAttack>(pPlayer_));
-		return;
-	}
-	else {
-		KikAttackState();//キック
-		return;
-	}
+	
 }
 
 void PlayerRoot::JumpForJoyState() {
@@ -64,13 +56,6 @@ void PlayerRoot::JumpForJoyState() {
 
 }
 
-void PlayerRoot::KikAttackState() {
-	if (!(Input::GetInstance()->GetGamepadState(joyState))) return;
-
-	if (!((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_B))) return;
-
-	pPlayer_->ChangeBehavior(std::make_unique<PlayerKikAttack>(pPlayer_));
-}
 
 
 void  PlayerRoot::Debug() {

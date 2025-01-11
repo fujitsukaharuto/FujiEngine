@@ -1,17 +1,22 @@
 #pragma once
 
-#include"BasePlayerBehavior.h"
+#include"BasePlayerAttackBehavior.h"
 #include"math/Easing.h"
 #include"Collider/AABBCollider.h"
 
-class PlayerKikAttack : public BasePlayerBehavior {
+class PlayerKikAttack : public BasePlayerAttackBehavior {
 private:
-
+	enum class Step {
+		KIK,
+		RETUNROOT,
+	};
 /// ===================================================
 ///  private varians
 /// ===================================================
-	std::unique_ptr<AABBCollider>normalKikCollider_;
-	
+	Step step_;
+	std::unique_ptr<AABBCollider>weakikCollider_;
+	float kikTime_;
+	bool isCollision_;
 
 public:
 	//コンストラクタ

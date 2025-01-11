@@ -34,6 +34,10 @@ void BaseEnemy::Initialize() {
 	collider_ = std::make_unique<AABBCollider>();
 	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
 	collider_->SetTag("Enemy");
+	collider_->SetWidth(1.0f);
+	collider_->SetHeight(1.0f);
+	collider_->SetDepth(1.0f);
+	collider_->SetPos(model_->GetWorldPos());
 
 	ChangeBehavior(std::make_unique<EnemyFall>(this));/// 追っかけ
 }
@@ -151,7 +155,10 @@ void BaseEnemy::DamageForPar(const float& par) {
 
 void BaseEnemy::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 
-
+	if (other.tag == "WeakKik") {
+		jumpPower_ = JumpPower::WEAK;
+		ChangeBehavior(std::make_unique<EnemyJump>(this));
+	}
 
 }
 

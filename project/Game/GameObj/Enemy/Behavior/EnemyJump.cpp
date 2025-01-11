@@ -14,8 +14,7 @@
 EnemyJump::EnemyJump(BaseEnemy* boss)
 	: BaseEnemyBehaivor("EnemyJump", boss) {
 	
-	step_ = Step::BOUND; /// ステップ初期化
-	jumpSpeed_ = pBaseEnemy_->GetJumpSpeed(0);
+	jumpSpeed_ = pBaseEnemy_->GetJumpSpeed(pBaseEnemy_->GetJumpPower());
 }
 
 EnemyJump::~EnemyJump() {

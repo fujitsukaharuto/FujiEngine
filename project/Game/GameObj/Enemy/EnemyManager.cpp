@@ -211,6 +211,14 @@ void EnemyManager::ApplyGlobalParameter() {
 		paramaters_[i].attackValue_ = globalParameter_->GetValue<float>(
 			groupName_,
 			"AttackValue" + std::to_string(int(i + 1)));
+
+		paramaters_[i].gravity_ = globalParameter_->GetValue<float>(
+			groupName_,
+			"Gravity" + std::to_string(int(i + 1)));
+
+		paramaters_[i].jumpSpeed_[0] = globalParameter_->GetValue<float>(
+			groupName_,
+			"NormalJump" + std::to_string(int(i + 1)));
 	}
 
 }

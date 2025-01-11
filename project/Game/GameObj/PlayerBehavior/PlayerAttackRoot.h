@@ -1,24 +1,24 @@
 #pragma once
 
-#include"BasePlayerBehavior.h"
+#include"BasePlayerAttackBehavior.h"
 #include"math/Easing.h"
+#include"Collider/AABBCollider.h"
 
-class PlayerRoot : public BasePlayerBehavior {
+class PlayerAttackRoot : public BasePlayerAttackBehavior {
 private:
 
 /// ===================================================
-///private varians
+///  private varians
 /// ===================================================
 
-	
 
 public:
 	//コンストラクタ
-	PlayerRoot(Player* boss);
-	~PlayerRoot();
+	PlayerAttackRoot(Player* boss);
+	~PlayerAttackRoot();
 
 	void Update()override;
-	void JumpForJoyState();
 	void Debug()override;
 
+	void KikAttackState();
 };

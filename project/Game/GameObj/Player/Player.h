@@ -3,6 +3,7 @@
 #include"Collider/AABBCollider.h"
 /// behavior
 #include"GameObj/PlayerBehavior/BasePlayerBehavior.h"
+#include"GameObj/PlayerBehavior/BasePlayerAttackBehavior.h"
 #include"GlobalVariables/GlobalVariables.h"
 #include"Game/OriginGameObject.h"
 
@@ -23,10 +24,11 @@ private:
 	/// ===================================================
 	///private variaus
 	/// ===================================================
-
+	
 		///* behavior
 	std::unique_ptr<BasePlayerBehavior>behavior_ = nullptr;
-	
+	std::unique_ptr<BasePlayerAttackBehavior>attackBehavior_ = nullptr;
+
 /// グローバルなパラメータ
 	GlobalVariables* globalParameter_;            /// グローバルパラメータ
 	const std::string groupName_ = "Player";      /// グループ名
@@ -37,12 +39,15 @@ private:
 
 	///* 目標角度
 	float objectiveAngle_;
+	Vector3 direction_;
 	
 	/// 移動、ジャンプ
 	float moveSpeed_;
 	float airMoveSpeed_;
 	float jumpSpeed_;
 	float gravity_;
+	float recoilSpeed_;
+	float recoilJumpSpeed_;
 
 	// fall
 	float fallSpeed_;
@@ -69,6 +74,7 @@ public:
 	void Jump(float& speed);
 	void Fall(float& speed,const bool&isJump=false);
 	void ChangeBehavior(std::unique_ptr<BasePlayerBehavior>behavior);
+	void ChangeAttackBehavior(std::unique_ptr<BasePlayerAttackBehavior>behavior);
 
 
 	/// ダメージ
@@ -93,7 +99,9 @@ public:
 	float GetMoveSpeed()const { return moveSpeed_; }
 	float GetAirMoveSpeed()const { return airMoveSpeed_; }
 	float GetJumpSpeed()const { return jumpSpeed_; }
-
+	float GetDirectionX()const { return direction_.x;}
+	float GetRecoilJumpSpeed()const { return recoilJumpSpeed_; }
+	float  GetRecoilSpeed()const { return recoilSpeed_; }
 	/// ===================================================
 	/// setter method
 	/// ===================================================
