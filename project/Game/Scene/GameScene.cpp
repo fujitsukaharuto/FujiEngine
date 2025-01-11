@@ -160,6 +160,7 @@ void GameScene::BlackFade() {
 void GameScene::ParamaterEdit() {
 	ImGui::Begin("ParamaterEditor");
 	player_->AdjustParm();
+	enemyManager_->AdjustParm();
 	ImGui::End();
 
 }

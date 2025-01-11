@@ -22,7 +22,6 @@ void EnemyManager::Initialize() {
 	selectedEnemyType_ = enemyTypes_[0];
 	spownPosition_ = {};
 
-  
 	spownNum_ = 1;
 	currentPhase_ = 0;
 	currentTime_ = 0.0f;
@@ -33,7 +32,14 @@ void EnemyManager::Initialize() {
 		phases_[0] = phase;
 	}
 
+	// 出現データロード
 	LoadEnemyPoPData();
+
+	///* グローバルパラメータ
+	globalParameter_ = GlobalVariables::GetInstance();
+	globalParameter_->CreateGroup(groupName_, false);
+	AddParmGroup();
+	ApplyGlobalParameter();
 	
 
 	isEditorMode_ = false;
@@ -450,6 +456,128 @@ void EnemyManager::LoadSpawn(EnemyGroup& group, const json& spawnData) {
 	}
 }
 
+///=================================================================================
+/// ロード
+///=================================================================================
+void EnemyManager::ParmLoadForImGui() {
+
+	// ロードボタン
+	if (ImGui::Button(std::format("Load {}", groupName_).c_str())) {
+
+		globalParameter_->LoadFile(groupName_);
+		// セーブ完了メッセージ
+		ImGui::Text("Load Successful: %s", groupName_.c_str());
+		ApplyGlobalParameter();
+	}
+}
+
+
+///=================================================================================
+///パラメータをグループに追加
+///=================================================================================
+void EnemyManager::AddParmGroup() {
+
+	for (uint32_t i = 0; i < paramaters_.size(); ++i) {
+		globalParameter_->AddItem(
+			groupName_,
+			"FallSpeed" + std::to_string(int(i + 1)),
+			paramaters_[i].fallSpeed_);
+
+		globalParameter_->AddItem(
+			groupName_,
+			"AttackValue" + std::to_string(int(i + 1)),
+			paramaters_[i].attackValue_);
+	}
+
+}
+
+
+///=================================================================================
+///パラメータをグループに追加
+///=================================================================================
+void EnemyManager::SetValues() {
+
+
+	for (uint32_t i = 0; i < paramaters_.size(); ++i) {
+		globalParameter_->SetValue(
+			groupName_,
+			"FallSpeed" + std::to_string(int(i + 1)),
+			paramaters_[i].fallSpeed_);
+
+		globalParameter_->SetValue(
+			groupName_,
+			"AttackValue" + std::to_string(int(i + 1)),
+			paramaters_[i].attackValue_);
+	}
+
+}
+
+
+///=====================================================
+///  ImGuiからパラメータを得る
+///===================================================== 
+void EnemyManager::ApplyGlobalParameter() {
+	/// パラメータ
+	for (uint32_t i = 0; i < paramaters_.size(); ++i) {
+		paramaters_[i].fallSpeed_ = globalParameter_->GetValue<float>(
+			groupName_,
+			"FallSpeed" + std::to_string(int(i + 1)));
+
+		paramaters_[i].attackValue_ = globalParameter_->GetValue<float>(
+			groupName_,
+			"AttackValue" + std::to_string(int(i + 1)));
+	}
+
+}
+
+///=========================================================
+/// パラメータ調整
+///==========================================================
+void EnemyManager::AdjustParm() {
+	SetValues();
+#ifdef _DEBUG
+
+	if (ImGui::CollapsingHeader("Enemies")) {
+
+		///---------------------------------------------------------
+		/// 通常敵
+		///----------------------------------------------------------
+
+		ImGui::SeparatorText(enemyTypes_[0].c_str()); 
+		ImGui::PushID(enemyTypes_[0].c_str());
+
+		ImGui::DragFloat("FallSpeed",
+			&paramaters_[0].fallSpeed_,
+			0.01f);
+
+		ImGui::DragFloat("AttackValue",
+			&paramaters_[0].attackValue_,
+			0.01f);
+
+		ImGui::PopID();
+
+		///---------------------------------------------------------
+		/// ストロングな敵
+		///----------------------------------------------------------
+
+		ImGui::SeparatorText(enemyTypes_[1].c_str()); 
+		ImGui::PushID(enemyTypes_[1].c_str());
+
+		ImGui::DragFloat("FallSpeed",
+			&paramaters_[1].fallSpeed_,
+			0.01f);
+
+		ImGui::DragFloat("AttackValue",
+			&paramaters_[1].attackValue_,
+			0.01f);
+		ImGui::PopID();
+		/// セーブとロード
+		globalParameter_->ParmSaveForImGui(groupName_);
+		ParmLoadForImGui();
+	}
+
+#endif // _DEBUG
+}
 
 void EnemyManager::SetPlayer(Player* player) {
 	pPlayer_ = player;

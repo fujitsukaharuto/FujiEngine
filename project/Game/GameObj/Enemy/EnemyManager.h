@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BaseEnemy.h"
+#include"GlobalVariables/GlobalVariables.h"
 
 /// std
 #include <vector>
@@ -13,6 +14,11 @@
 class Player;
 class LockOn;
 class EnemyManager {
+private:
+    struct Paramater {
+       float fallSpeed_;
+       float attackValue_;
+    };
 
 private:
     using json = nlohmann::json;
@@ -46,7 +52,13 @@ private:
     // ohter class
     Player* pPlayer_;
     LockOn* pLockOn_;
+
+ 
+    /// グローバルなパラメータ
+    GlobalVariables* globalParameter_;            /// グローバルパラメータ
+    const std::string groupName_ = "Enemies";      /// グループ名
   
+    std::array<Paramater, 2>paramaters_;
   
     bool isEditorMode_;             // エディタモード中かどうか
     std::map<int, Phase> phases_;  // フェーズ番号をキーとしたフェーズマップ
@@ -65,6 +77,8 @@ private:
     uint32_t spownNum_;
 
     bool enemyAnnihilated_; // 敵がすべていなくなったことを示すフラグ
+
+
 
     const std::string directrypath_ = "./resource/EnemyParamater/";// path
     const std::string filename_ = "PoPData.json";// name
@@ -116,6 +130,15 @@ public:
     void SetEditorMode(bool isEditorMode);
 
     bool GetCread()const { return enemyAnnihilated_; }
+
+  ///-------------------------------------------------------------------------------------
+///GlobalVariabe
+///-------------------------------------------------------------------------------------
+    void ParmLoadForImGui();
+    void AddParmGroup();
+    void SetValues();
+    void ApplyGlobalParameter();
+    void AdjustParm();
 
     ///========================================================
     /// setter method
