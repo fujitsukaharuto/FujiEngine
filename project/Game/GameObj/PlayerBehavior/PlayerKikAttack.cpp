@@ -21,7 +21,7 @@ PlayerKikAttack::PlayerKikAttack(Player* boss)
 	/// ===================================================
 	/// 変数初期化
 	/// ===================================================
-	pPlayer_->SetCollisionSize(Vector3(5.0f, 5.0f, 20.0f));
+
 	step_ = Step::KIK;
 }
 
@@ -51,7 +51,7 @@ void PlayerKikAttack::Update() {
 		///-----------------------------------------------------------
 		/// 通常に戻る
 		///------------------------------------------------------------
-		pPlayer_->SetCollisionSize(Vector3::GetZeroVec());
+	
 		pPlayer_->ChangeAttackBehavior(std::make_unique<PlayerAttackRoot>(pPlayer_));
 	
 		break;

@@ -46,7 +46,7 @@ void Player::Initialize() {
 	weakikCollider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
 	weakikCollider_->SetTag("WeakKik");
 	weakikCollider_->SetParent(GetModel());
-	SetCollisionSize(Vector3::GetZeroVec());
+	SetCollisionSize(Vector3(5.0f, 5.0f, 20.0f));
 	weakikCollider_->SetPos(Vector3(0, 0, 1.5f));
 	weakikCollider_->InfoUpdate();
 
@@ -383,7 +383,6 @@ void Player::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 
 	if (other.tag == "Enemy") {
 		if (dynamic_cast<PlayerRecoil*>(behavior_.get()))return;
-		SetCollisionSize(Vector3::GetZeroVec());
 		ChangeBehavior(std::make_unique<PlayerRecoil>(this));
 		ChangeAttackBehavior(std::make_unique<PlayerAttackRoot>(this));
 		return;
