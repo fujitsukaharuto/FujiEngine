@@ -46,7 +46,10 @@ void Player::Initialize() {
 	weakikCollider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
 	weakikCollider_->SetTag("WeakKik");
 	weakikCollider_->SetParent(GetModel());
-	SetCollisionSize(Vector3(5.0f, 5.0f, 20.0f));
+	weakikCollider_->SetWidth(5.0f);
+	weakikCollider_->SetHeight(5.0f);
+	weakikCollider_->SetDepth(20.0f);
+	weakikCollider_->SetIsCollisonCheck(false);
 	weakikCollider_->SetPos(Vector3(0, 0, 1.5f));
 	weakikCollider_->InfoUpdate();
 
@@ -396,8 +399,6 @@ void Player::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
 }
 
 
-void Player::SetCollisionSize(const Vector3& size) {
-	weakikCollider_->SetWidth(size.x);
-	weakikCollider_->SetHeight(size.y);
-	weakikCollider_->SetDepth(size.z);
+void  Player::SetIsSetCollision(const bool& is) {
+	weakikCollider_->SetIsCollisonCheck(is);
 }

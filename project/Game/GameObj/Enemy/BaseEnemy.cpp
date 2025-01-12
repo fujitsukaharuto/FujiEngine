@@ -44,7 +44,10 @@ void BaseEnemy::Initialize() {
 
 	jumpCollider_ = std::make_unique<AABBCollider>();
 	jumpCollider_->SetTag("EnemyJump");
-	SetAttackCollisionSize(Vector3(2.0f, 2.0f, 2.0f));
+	jumpCollider_->SetWidth(2.0f);
+	jumpCollider_->SetHeight(2.0f);
+	jumpCollider_->SetDepth(2.0f);
+	jumpCollider_->SetIsCollisonCheck(false);
 	jumpCollider_->SetParent(model_.get());
 	
 
@@ -135,7 +138,7 @@ void BaseEnemy::Fall(float& speed, const bool& isJump) {
 
 		if (!dynamic_cast<EnemyJump*>(behavior_.get()))return;
 		// ジャンプ終了
-
+		SetIsCollision(false);
 		ChangeBehavior(std::make_unique<EnemyRoot>(this));
 	}
 }
@@ -198,9 +201,7 @@ void BaseEnemy::ChangeBehavior(std::unique_ptr<BaseEnemyBehaivor>behavior) {
 	behavior_ = std::move(behavior);
 }
 
-void BaseEnemy::SetAttackCollisionSize(const Vector3& size) {
-	jumpCollider_->SetWidth(size.x);
-	jumpCollider_->SetHeight(size.y);
-	jumpCollider_->SetDepth(size.z);
-}
 
+void   BaseEnemy::SetIsCollision(const bool& is) {
+	jumpCollider_->SetIsCollisonCheck(is);
+}

@@ -87,6 +87,5 @@ public:
 	/*void SetPosition(const Vector3& spownPos) {
 		model_->transform.translate = spownPos; 
 	};*/
-
-	void SetAttackCollisionSize(const Vector3& size);
+	void SetIsCollision(const bool& is);
 };
