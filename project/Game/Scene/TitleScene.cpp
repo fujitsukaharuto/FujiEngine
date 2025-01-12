@@ -37,6 +37,7 @@ void TitleScene::Initialize() {
 	test_ = std::make_unique<TestBaseObj>();
 	test_->Initialize();
 	test_->name_ = "testObj";
+	test_->GetCollider()->SetIsCollisonCheck(false);
 
 	test2_ = std::make_unique<TestBaseObj>();
 	test2_->Initialize();
