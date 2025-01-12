@@ -84,8 +84,5 @@ public:
 	///  setter method
 	///========================================================================================
 	void SetPlayer(Player* plyaer);
-	/*void SetPosition(const Vector3& spownPos) {
-		model_->transform.translate = spownPos; 
-	};*/
 	void SetIsCollision(const bool& is);
 };

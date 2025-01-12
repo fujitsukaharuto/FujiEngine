@@ -107,7 +107,7 @@ public:
 	float GetRecoilJumpSpeed()const { return recoilJumpSpeed_; }
 	float  GetRecoilSpeed()const { return recoilSpeed_; }
 	float  GetKikTime()const { return kikTime_; }
-
+	float GetFacingDirection()const;
 	/// ===================================================
 	/// setter method
 	/// ===================================================

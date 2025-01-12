@@ -402,3 +402,14 @@ void Player::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
 void  Player::SetIsSetCollision(const bool& is) {
 	weakikCollider_->SetIsCollisonCheck(is);
 }
+
+/// ===================================================
+///  現在の向きを取得（-1: 左, 1: 右）
+/// ===================================================
+float Player::GetFacingDirection() const {
+	// Y軸の回転（モデルの向き）を使用して計算
+	float angle = model_->transform.rotate.y;
+
+	// 角度に基づいて向きを決定（右: 1, 左: -1）
+	return (std::cos(angle) >= 0) ? 1.0f : -1.0f;
+}
