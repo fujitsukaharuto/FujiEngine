@@ -3,10 +3,10 @@
         "AirMoveSpeed": 26.510000228881836,
         "Gravity": 1.0,
         "JumpSpeed": 0.9599999785423279,
-        "KikTime": 0.33000001311302185,
+        "KikTime": 0.10000000149011612,
         "MoveSpeed": 10.1899995803833,
-        "RecoilJumpSpeed": 0.5,
-        "RecoilSpeed": 0.8299999833106995,
+        "RecoilJumpSpeed": 0.44999998807907104,
+        "RecoilSpeed": 0.8500000238418579,
         "Translate": [
             -14.611814498901367,
             1.5,

@@ -2,6 +2,7 @@
 ///* behavior
 #include"UFOPopEnemy.h"
 #include"UFODamage.h"
+#include"UFORoot.h"
 
 ///* obj
 #include"Game/GameObj/UFO/UFO.h"
@@ -45,7 +46,7 @@ void UFODamage::Update() {
 		easing_.time += FPSKeeper::NormalDeltaTime();
 
 		pUFO_->SetWorldPositionY(
-			EaseInCirc(initPos_.y, initPos_.y + pUFO_->GetDamageDistance(), 
+			EaseInExpo(initPos_.y, initPos_.y + pUFO_->GetDamageDistance(), 
 				       easing_.time, easing_.maxTime)
 		);
 		
@@ -59,7 +60,7 @@ void UFODamage::Update() {
 		///　popするお
 		///-------------------------------------------------------
 		
-		pUFO_->ChangeBehavior(std::make_unique<UFOPopEnemy>(pUFO_));
+		pUFO_->ChangeBehavior(std::make_unique<UFORoot>(pUFO_));
 		break;
 	default:
 		break;

@@ -168,6 +168,11 @@ void BaseEnemy::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 		ChangeBehavior(std::make_unique<EnemyJump>(this));
 	}
 
+	if (other.tag == "UFO") {
+		if (!dynamic_cast<EnemyJump*>(behavior_.get()))return;
+		isdeath_ = true;
+	}
+
 }
 
 void BaseEnemy::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {

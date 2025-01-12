@@ -100,24 +100,24 @@ void Player::DamageRendition() {
 ///  移動入力処理
 /// ===================================================
 Vector3 Player::GetInputVelocity() {
-	direction_ = { 0.0f, 0.0f, 0.0f };
+	inputDirection_ = { 0.0f, 0.0f, 0.0f };
 	Input* input = Input::GetInstance();
 
 	
 	if (input->PushKey(DIK_A)) {
-		direction_.x -= 1.0f;  // 左移動
+		inputDirection_.x -= 1.0f;  // 左移動
 	}
 	if (input->PushKey(DIK_D)) {
-		direction_.x += 1.0f;  // 右移動
+		inputDirection_.x += 1.0f;  // 右移動
 	}
 
 	// ジョイスティック入力
 	if (input->GetGamepadState(joyState)) {
-		direction_.x += (float)joyState.Gamepad.sThumbLX / SHRT_MAX;
+		inputDirection_.x += (float)joyState.Gamepad.sThumbLX / SHRT_MAX;
 	/*	velocity.z += (float)joyState.Gamepad.sThumbLY / SHRT_MAX;*/
 	}
 
-	return direction_;
+	return inputDirection_;
 }
 
 

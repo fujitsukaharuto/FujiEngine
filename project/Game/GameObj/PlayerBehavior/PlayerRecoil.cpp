@@ -30,7 +30,8 @@ void PlayerRecoil::Update() {
         // X軸の逆方向に吹っ飛ぶ
         pPlayer_->AddPosition(Vector3(-playerDirectionX_ * (pPlayer_->GetRecoilSpeed() * FPSKeeper::NormalDeltaTime()), 0, 0));
         pPlayer_->Jump(jumpSpeed_);
-        if (pPlayer_->GetTrans().translate.y < Player::InitY_)break;
+        if (pPlayer_->GetTrans().translate.y > Player::InitY_)break;
+        pPlayer_->GetTrans().translate.y = Player::InitY_;
         step_ = Step::RETUNROOT;
         break;
     case Step::RETUNROOT:

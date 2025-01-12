@@ -39,7 +39,7 @@ private:
 
 	///* 目標角度
 	float objectiveAngle_;
-	Vector3 direction_;
+	Vector3 inputDirection_;
 	
 	/// 移動、ジャンプ
 	float moveSpeed_;
@@ -104,7 +104,6 @@ public:
 	float GetMoveSpeed()const { return moveSpeed_; }
 	float GetAirMoveSpeed()const { return airMoveSpeed_; }
 	float GetJumpSpeed()const { return jumpSpeed_; }
-	float GetDirectionX()const { return direction_.x;}
 	float GetRecoilJumpSpeed()const { return recoilJumpSpeed_; }
 	float  GetRecoilSpeed()const { return recoilSpeed_; }
 	float  GetKikTime()const { return kikTime_; }
