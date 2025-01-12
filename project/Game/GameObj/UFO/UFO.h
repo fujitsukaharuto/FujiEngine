@@ -5,6 +5,7 @@
 #include"Behavior/BaseUFOrBehavior.h"
 #include"GlobalVariables/GlobalVariables.h"
 #include"Game/OriginGameObject.h"
+#include"Collider/AABBCollider.h"
 
 #include <memory>
 
@@ -22,7 +23,7 @@ private:
 
 		///* behavior
 	std::unique_ptr<BaseUFOBehavior>behavior_ = nullptr;
-
+	std::unique_ptr<AABBCollider>collider_;
 	
      /// グローバルなパラメータ
 	GlobalVariables* globalParameter_;            /// グローバルパラメータ
@@ -33,6 +34,8 @@ private:
 	
 	///parm
 	float popWaitTime_;
+	float dagameDistance_;
+	float damageTime_;
 
 public:
 	static float InitY_;
@@ -53,6 +56,8 @@ public:
 	void DamageRendition();
 	void TakeDamage();
 
+	void OnCollisionEnter(const ColliderInfo& other);
+	void OnCollisionStay(const ColliderInfo& other);
 	
 	///-------------------------------------------------------------------------------------
     /// Editor
@@ -69,6 +74,8 @@ public:
 	/// ===================================================
 	EnemyManager* GetEnemyManager() { return pEnemyManager_; }
 	float GetPopWaitTime()const { return popWaitTime_; }
+	float GetDamageDistance()const { return dagameDistance_; }
+	float GetDamageTime()const { return damageTime_; }
 
 	/// ===================================================
 	/// setter method

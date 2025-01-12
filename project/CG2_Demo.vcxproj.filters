@@ -269,6 +269,9 @@
     <ClCompile Include="Game\GameObj\PlayerBehavior\PlayerRecoil.cpp">
       <Filter>Game\Behavior\Player\NormalBehavior</Filter>
     </ClCompile>
+    <ClCompile Include="Game\GameObj\UFO\Behavior\UFODamage.cpp">
+      <Filter>Game\Behavior\UFO</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Audio\Audio.h">
@@ -555,6 +558,9 @@
     </ClInclude>
     <ClInclude Include="Game\GameObj\PlayerBehavior\PlayerRecoil.h">
       <Filter>Game\Behavior\Player\NormalBehavior</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\UFO\Behavior\UFODamage.h">
+      <Filter>Game\Behavior\UFO</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

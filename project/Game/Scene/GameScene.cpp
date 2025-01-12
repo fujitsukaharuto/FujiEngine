@@ -2,7 +2,10 @@
 #include"Camera/CameraManager.h"
 
 #include "Particle/ParticleManager.h"
+
 #include "Scene/SceneManager.h"
+
+#include "Model/Line3dDrawer.h"
 
 #include<imgui.h>
 
@@ -71,8 +74,9 @@ void GameScene::Update() {
 	gameCamera_->Update();
 	enemyManager_->Update();
 
-	ParticleManager::GetInstance()->Update();
 
+	ParticleManager::GetInstance()->Update();
+	
 }
 
 void GameScene::Draw() {
@@ -98,8 +102,10 @@ void GameScene::Draw() {
 	player_->Draw();
 	enemyManager_->Draw();
 	ufo_->Draw();
+	
 
 	ParticleManager::GetInstance()->Draw();
+	Line3dDrawer::GetInstance()->Render();
 
 #pragma endregion
 

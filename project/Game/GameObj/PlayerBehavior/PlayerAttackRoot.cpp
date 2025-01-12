@@ -53,8 +53,6 @@ void PlayerAttackRoot::KikAttackState() {
 
 
 void  PlayerAttackRoot::Debug() {
-#ifdef _DEBUG
-	ImGui::Text("Root");
-#endif // _DEBUG	
+
 }
 

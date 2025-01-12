@@ -2,6 +2,7 @@
 ///behavior
 #include"Behavior/UFORoot.h"
 #include"Behavior/UFOPopEnemy.h"
+#include"Behavior/UFODamage.h"
 //obj
 #include"GameObj/Enemy/EnemyManager.h"
 ///* imgui
@@ -26,6 +27,16 @@ void UFO::Initialize() {
 	AddParmGroup();
 	ApplyGlobalParameter();
 
+	// collider
+	collider_ = std::make_unique<AABBCollider>();
+	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
+	collider_->SetTag("UFO");
+	collider_->SetWidth(3.0f);
+	collider_->SetHeight(2.0f);
+	collider_->SetDepth(2.0f);
+	collider_->SetParent(model_.get());
+	collider_->InfoUpdate();
+
 	/// 通常モードから
 	ChangeBehavior(std::make_unique<UFORoot>(this));
 }
@@ -34,11 +45,13 @@ void UFO::Initialize() {
 ///  更新処理
 /// ===================================================
 void UFO::Update() {
-	popPos_ = Vector3(GetTrans().translate.x, GetTrans().translate.y,EnemyManager::InitZPos_);
+	popPos_ = model_->GetWorldPos();
 	/// ダメージエフェクト
 	DamageRendition();
 	/// 振る舞い処理
 	behavior_->Update();
+	///
+	collider_->InfoUpdate();
 	//　移動制限
 	/*MoveToLimit();*/
 	
@@ -52,6 +65,7 @@ void UFO::Update() {
 void UFO::Draw(Material* material) {
 
 	OriginGameObject::Draw(material);
+	collider_->DrawCollider();
 }
 
 
@@ -141,6 +155,8 @@ void UFO::AdjustParm() {
 		///　Floatのパラメータ
 		ImGui::SeparatorText("FloatParamater");
 		ImGui::DragFloat("PopWaitTime(s)", &popWaitTime_, 0.01f);
+		ImGui::DragFloat("DamageTime(s)", &damageTime_, 0.01f);
+		ImGui::DragFloat("DamageDistance", &dagameDistance_, 0.01f);
 			
 		/// セーブとロード
 		globalParameter_->ParmSaveForImGui(groupName_);
@@ -172,6 +188,8 @@ void UFO::AddParmGroup() {
 
 	globalParameter_->AddItem(groupName_, "Translate", model_->transform.translate);
 	globalParameter_->AddItem(groupName_, "PopWaitTime", popWaitTime_);
+	globalParameter_->AddItem(groupName_, "DamageTime", damageTime_);
+	globalParameter_->AddItem(groupName_, "DamageDistance", dagameDistance_);
 
 }
 
@@ -182,6 +200,8 @@ void UFO::SetValues() {
 
 	globalParameter_->SetValue(groupName_, "Translate", model_->transform.translate);
 	globalParameter_->SetValue(groupName_, "PopWaitTime", popWaitTime_);
+	globalParameter_->SetValue(groupName_, "DamageTime", damageTime_);
+	globalParameter_->SetValue(groupName_, "DamageDistance", dagameDistance_);
 	
 }
 
@@ -191,6 +211,8 @@ void UFO::SetValues() {
 void UFO::ApplyGlobalParameter() {
 	model_->transform.translate = globalParameter_->GetValue<Vector3>(groupName_, "Translate");
 	popWaitTime_ = globalParameter_->GetValue<float>(groupName_, "PopWaitTime");
+	damageTime_ = globalParameter_->GetValue<float>(groupName_, "DamageTime");
+	dagameDistance_ = globalParameter_->GetValue<float>(groupName_, "DamageDistance");
 }
 ///=========================================================
 /// Class Set
@@ -198,4 +220,17 @@ void UFO::ApplyGlobalParameter() {
 
 void UFO::SetEnemyManager(EnemyManager* enemymanager) {
 	pEnemyManager_ = enemymanager;
+}
+
+void UFO::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
+
+	if (other.tag == "Enemy") {
+		if (dynamic_cast<UFODamage*>(behavior_.get()))return;
+		ChangeBehavior(std::make_unique<UFODamage>(this));
+	}
+
+}
+
+void UFO::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
+
 }

@@ -10,7 +10,7 @@
 #include <fstream>
 #include <imgui.h>
 
-float EnemyManager::InitZPos_ = -45.0f;
+float EnemyManager::InitZPos_ = 0.0f;
 
 EnemyManager::EnemyManager() {
 

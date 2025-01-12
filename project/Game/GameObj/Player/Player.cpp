@@ -71,6 +71,7 @@ void Player::Update() {
 void Player::Draw(Material* material) {
 
 	OriginGameObject::Draw(material);
+	attackBehavior_->Debug();
 }
 
 

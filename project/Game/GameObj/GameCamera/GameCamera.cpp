@@ -13,7 +13,7 @@ GameCamera::~GameCamera() {
 void GameCamera::Initialize() {
     offset_ = { 0.0f, 6.0f, -55.0f };
     camera_ = CameraManager::GetInstance()->GetCamera();
-    camera_->transform.translate = { 0,15,-117 };
+    camera_->transform.translate = { 0,15,-137 };
 }
 
 void GameCamera::Update() {

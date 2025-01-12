@@ -27,10 +27,11 @@ PlayerKikAttack::PlayerKikAttack(Player* boss)
 	weakikCollider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
 	weakikCollider_->SetTag("WeakKik");
 	weakikCollider_->SetParent(pPlayer_->GetModel());
-	weakikCollider_->SetWidth(1.0f);
-	weakikCollider_->SetHeight(1.0f);
-	weakikCollider_->SetDepth(1.0f);
-	weakikCollider_->SetPos(Vector3(1, 0, 0));
+	weakikCollider_->SetWidth(5.0f);
+	weakikCollider_->SetHeight(5.0f);
+	weakikCollider_->SetDepth(20.0f);
+	weakikCollider_->SetPos(Vector3(0, 0, 1.5f));
+	weakikCollider_->InfoUpdate();
 
 	isCollision_ = false;
 	step_ = Step::KIK;
@@ -43,7 +44,8 @@ PlayerKikAttack ::~PlayerKikAttack() {
 //更新
 void PlayerKikAttack::Update() {
 	weakikCollider_->InfoUpdate();
-	pPlayer_->Move(pPlayer_->GetJumpSpeed());
+
+	//pPlayer_->Move(pPlayer_->GetJumpSpeed());
 
 	switch (step_)
 	{
@@ -74,16 +76,15 @@ void PlayerKikAttack::Update() {
 
 }
 
-
-
 void  PlayerKikAttack::Debug() {
 #ifdef _DEBUG
-	ImGui::Text("Root");
+	weakikCollider_->DrawCollider();
 #endif // _DEBUG	
 }
 
 
 void PlayerKikAttack::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
+
 	if (other.tag=="Enemy") {
 		isCollision_ = true;
 		return;

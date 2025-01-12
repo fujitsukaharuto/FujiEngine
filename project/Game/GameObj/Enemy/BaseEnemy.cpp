@@ -61,7 +61,7 @@ void BaseEnemy::Update() {
 
 	// collider更新
 	collider_->InfoUpdate();
-
+	collider_->Debug();
 	
 	//// 体力がなくなったら死亡
 	//if (hp_ <= 0) {
@@ -93,6 +93,9 @@ void BaseEnemy::Update() {
 ///========================================================
 void BaseEnemy::Draw(Material*material) {
 	OriginGameObject::Draw(material);
+#ifdef _DEBUG
+	collider_->DrawCollider();
+#endif // _DEBUG
 }
 
 /// ===================================================
@@ -151,6 +154,7 @@ void BaseEnemy::DamageForPar(const float& par) {
 void BaseEnemy::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 
 	if (other.tag == "WeakKik") {
+		if (dynamic_cast<EnemyJump*>(behavior_.get()))return;
 		jumpPower_ = JumpPower::WEAK;
 		ChangeBehavior(std::make_unique<EnemyJump>(this));
 	}

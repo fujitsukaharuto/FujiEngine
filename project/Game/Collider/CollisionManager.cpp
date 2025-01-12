@@ -60,7 +60,7 @@ void CollisionManager::CheckCollisionPair(BaseCollider* A, BaseCollider* B) {
 
 void CollisionManager::CheckAllCollision() {
 
-	if (colliders_.empty()) {
+ 	if (colliders_.empty()) {
 		return; // colliders_が空なら処理を終了
 	}
 
