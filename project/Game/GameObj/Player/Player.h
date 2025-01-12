@@ -53,6 +53,8 @@ private:
 	// fall
 	float fallSpeed_;
 
+	std::unique_ptr<AABBCollider>weakikCollider_;
+
 public:
 	static float InitY_;
 	Player();
@@ -83,7 +85,9 @@ public:
 	void TakeDamage();
 
 	
-	
+	void OnCollisionEnter(const ColliderInfo& other);
+	void OnCollisionStay(const ColliderInfo& other);
+	BaseCollider* GetWeakColliderCollider() { return weakikCollider_.get(); }
 	///-------------------------------------------------------------------------------------
     /// Editor
     ///-------------------------------------------------------------------------------------
@@ -107,5 +111,5 @@ public:
 	/// ===================================================
 	/// setter method
 	/// ===================================================
-
+	void SetCollisionSize(const Vector3& size);
 };

@@ -12,6 +12,7 @@ class Player;
 class BaseEnemy : public OriginGameObject {
 private:
 	std::unique_ptr<AABBCollider>collider_;
+	std::unique_ptr<AABBCollider>jumpCollider_;
 public:
 	enum class JumpPower {
 		WEAK,
@@ -66,7 +67,8 @@ public:
 
 	void OnCollisionEnter(const ColliderInfo& other);
 	void OnCollisionStay(const ColliderInfo& other);
-	
+	BaseCollider* GetCollider() { return collider_.get(); } 
+	BaseCollider* GetJumpCollider() { return jumpCollider_.get(); }
 	///========================================================================================
 	///  getter method
 	///========================================================================================
@@ -76,12 +78,15 @@ public:
 	float GetAttackValue()const { return attackValue_; }
 	float GetGravity()const { return gravity_; }
 	JumpPower GetJumpPower()const { return jumpPower_; }
+	BaseEnemyBehaivor* GetBehavior()const { return behavior_.get(); }
 	 float GetJumpSpeed(JumpPower num) const { return jumpSpeed_[static_cast<size_t>(num)]; }
 	///========================================================================================
 	///  setter method
 	///========================================================================================
 	void SetPlayer(Player* plyaer);
-	void SetPosition(const Vector3& spownPos) {
+	/*void SetPosition(const Vector3& spownPos) {
 		model_->transform.translate = spownPos; 
-	};
+	};*/
+
+	void SetAttackCollisionSize(const Vector3& size);
 };

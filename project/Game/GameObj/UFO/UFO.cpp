@@ -5,6 +5,8 @@
 #include"Behavior/UFODamage.h"
 //obj
 #include"GameObj/Enemy/EnemyManager.h"
+#include"GameObj/Enemy/BaseEnemy.h"
+
 ///* imgui
 #include<imgui.h> 
 
@@ -224,7 +226,7 @@ void UFO::SetEnemyManager(EnemyManager* enemymanager) {
 
 void UFO::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 
-	if (other.tag == "Enemy") {
+	if (other.tag == "EnemyJump") {
 		if (dynamic_cast<UFODamage*>(behavior_.get()))return;
 		ChangeBehavior(std::make_unique<UFODamage>(this));
 	}

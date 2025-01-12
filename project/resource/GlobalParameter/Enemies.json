@@ -1,12 +1,12 @@
 {
-    "Enemies": {
-        "AttackValue1": 0.7699999809265137,
-        "AttackValue2": 0.0,
-        "FallSpeed1": 5.53000020980835,
-        "FallSpeed2": 0.0,
-        "Gravity1": 0.8299999833106995,
-        "Gravity2": 0.0,
-        "NormalJump1": 1.1299999952316284,
-        "NormalJump2": 0.0
-    }
+  "Enemies": {
+    "AttackValue1": 0.7699999809265137,
+    "AttackValue2": 0.0,
+    "FallSpeed1": 5.53000020980835,
+    "FallSpeed2": 0.0,
+    "Gravity1": 0.8299999833106995,
+    "Gravity2": 0.0,
+    "WeakJump1": 1.1299999952316284,
+    "WeakJump2": 0.0
+  }
 }

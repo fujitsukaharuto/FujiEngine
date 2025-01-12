@@ -8,6 +8,7 @@
 #include"GameObj/GameCamera/GameCamera.h"
 #include"GameObj/Enemy/EnemyManager.h"
 #include"GameObj/UFO/UFO.h"
+#include"Collider/CollisionManager.h"
 
 class GameScene :public BaseScene
 {
@@ -75,4 +76,6 @@ private:
 	std::unique_ptr<GameCamera>gameCamera_;
 	std::unique_ptr<EnemyManager>enemyManager_;
 	std::unique_ptr<UFO>ufo_;
+
+	std::unique_ptr<CollisionManager> cMane_;
 };

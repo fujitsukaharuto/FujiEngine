@@ -58,6 +58,7 @@ public:
 
 	void OnCollisionEnter(const ColliderInfo& other);
 	void OnCollisionStay(const ColliderInfo& other);
+	BaseCollider* GetCollider() { return collider_.get(); }
 	
 	///-------------------------------------------------------------------------------------
     /// Editor

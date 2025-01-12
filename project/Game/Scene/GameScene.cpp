@@ -28,6 +28,7 @@ void GameScene::Initialize() {
 	gameCamera_ = std::make_unique<GameCamera>();
 	enemyManager_ = std::make_unique<EnemyManager>();
 	ufo_= std::make_unique<UFO>();
+	cMane_ = std::make_unique<CollisionManager>();
 	///-------------------------------------------------------------
 	///　初期化
 	///-------------------------------------------------------------- 
@@ -55,11 +56,14 @@ void GameScene::Initialize() {
 	enemyManager_->Initialize();
 	ufo_->Initialize();
 
+
 	///set
 	ufo_->SetEnemyManager(enemyManager_.get());
 }
 
 void GameScene::Update() {
+
+	cMane_->Reset();
 	
 	ParamaterEdit();// パラメータエディター
 	BlackFade();
@@ -74,6 +78,14 @@ void GameScene::Update() {
 	gameCamera_->Update();
 	enemyManager_->Update();
 
+	for (auto& enemy : enemyManager_->GetEnemies()) {
+		cMane_->AddCollider(enemy->GetCollider());
+		cMane_->AddCollider(enemy->GetJumpCollider());
+	}
+	cMane_->AddCollider(ufo_->GetCollider());
+	cMane_->AddCollider(player_->GetWeakColliderCollider());
+	cMane_->CheckAllCollision();
+	
 
 	ParticleManager::GetInstance()->Update();
 	

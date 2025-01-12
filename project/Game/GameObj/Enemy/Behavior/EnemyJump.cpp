@@ -15,6 +15,7 @@ EnemyJump::EnemyJump(BaseEnemy* boss)
 	: BaseEnemyBehaivor("EnemyJump", boss) {
 	
 	jumpSpeed_ = pBaseEnemy_->GetJumpSpeed(pBaseEnemy_->GetJumpPower());
+	pBaseEnemy_->SetAttackCollisionSize(Vector3(2, 2, 2));
 }
 
 EnemyJump::~EnemyJump() {

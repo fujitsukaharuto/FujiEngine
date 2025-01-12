@@ -40,6 +40,13 @@ void BaseEnemy::Initialize() {
 	collider_->SetHeight(2.0f);
 	collider_->SetDepth(2.0f);
 	collider_->SetParent(model_.get());
+	
+
+	jumpCollider_ = std::make_unique<AABBCollider>();
+	jumpCollider_->SetTag("EnemyJump");
+	SetAttackCollisionSize(Vector3::GetZeroVec());
+	jumpCollider_->SetParent(model_.get());
+	
 
 	ChangeBehavior(std::make_unique<EnemyFall>(this));/// 追っかけ
 }
@@ -61,6 +68,7 @@ void BaseEnemy::Update() {
 
 	// collider更新
 	collider_->InfoUpdate();
+	jumpCollider_->InfoUpdate();
 	collider_->Debug();
 	
 	//// 体力がなくなったら死亡
@@ -127,6 +135,7 @@ void BaseEnemy::Fall(float& speed, const bool& isJump) {
 
 		if (!dynamic_cast<EnemyJump*>(behavior_.get()))return;
 		// ジャンプ終了
+		SetAttackCollisionSize(Vector3::GetZeroVec());
 		ChangeBehavior(std::make_unique<EnemyRoot>(this));
 	}
 }
@@ -183,3 +192,10 @@ void BaseEnemy::ChangeBehavior(std::unique_ptr<BaseEnemyBehaivor>behavior) {
 	//引数で受け取った状態を次の状態としてセット
 	behavior_ = std::move(behavior);
 }
+
+void BaseEnemy::SetAttackCollisionSize(const Vector3& size) {
+	jumpCollider_->SetWidth(size.x);
+	jumpCollider_->SetHeight(size.y);
+	jumpCollider_->SetDepth(size.z);
+}
+

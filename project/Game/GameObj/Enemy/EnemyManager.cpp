@@ -62,7 +62,7 @@ void EnemyManager::SpawnEnemy(const std::string& enemyType, const Vector3& posit
 
 		// 位置初期化とlistに追加
 		enemy->Initialize();
-		enemy->SetPosition(Vector3(position.x,position.y, position.z));
+		enemy->SetWorldPosition(Vector3(position.x,position.y, position.z));
 		enemy->SetPlayer(pPlayer_);// プレイヤーセット
 		enemies_.push_back(std::move(enemy));
 }
@@ -160,7 +160,7 @@ void EnemyManager::AddParmGroup() {
 
 		globalParameter_->AddItem(
 			groupName_,
-			"NormalJump" + std::to_string(int(i + 1)),
+			"WeakJump" + std::to_string(int(i + 1)),
 			paramaters_[i].jumpSpeed_[0]);
 	}
 
@@ -191,7 +191,7 @@ void EnemyManager::SetValues() {
 
 		globalParameter_->SetValue(
 			groupName_,
-			"NormalJump" + std::to_string(int(i + 1)),
+			"WeakJump" + std::to_string(int(i + 1)),
 			paramaters_[i].jumpSpeed_[0]);
 	}
 
@@ -218,7 +218,7 @@ void EnemyManager::ApplyGlobalParameter() {
 
 		paramaters_[i].jumpSpeed_[0] = globalParameter_->GetValue<float>(
 			groupName_,
-			"NormalJump" + std::to_string(int(i + 1)));
+			"WeakJump" + std::to_string(int(i + 1)));
 	}
 
 }
@@ -251,7 +251,7 @@ void EnemyManager::AdjustParm() {
 			&paramaters_[static_cast<size_t>(Type::NORMAL)].gravity_,
 			0.01f);
 
-		ImGui::DragFloat("NormalJumpSpeed",
+		ImGui::DragFloat("WeakJumpSpeed",
 			&paramaters_[static_cast<size_t>(Type::NORMAL)].jumpSpeed_[0],
 			0.01f);
 
@@ -276,7 +276,7 @@ void EnemyManager::AdjustParm() {
 			&paramaters_[static_cast<size_t>(Type::STRONG)].gravity_,
 			0.01f);
 
-		ImGui::DragFloat("NormalJumpSpeed",
+		ImGui::DragFloat("WeakJumpSpeed",
 			&paramaters_[static_cast<size_t>(Type::STRONG)].jumpSpeed_[0],
 			0.01f);
 

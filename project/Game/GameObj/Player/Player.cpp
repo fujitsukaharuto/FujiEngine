@@ -41,6 +41,15 @@ void Player::Initialize() {
 	AddParmGroup();
 	ApplyGlobalParameter();
 
+	/// collider
+	weakikCollider_ = std::make_unique<AABBCollider>();
+	weakikCollider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
+	weakikCollider_->SetTag("WeakKik");
+	weakikCollider_->SetParent(GetModel());
+	SetCollisionSize(Vector3::GetZeroVec());
+	weakikCollider_->SetPos(Vector3(0, 0, 1.5f));
+	weakikCollider_->InfoUpdate();
+
 	/// 通常モードから
 	ChangeBehavior(std::make_unique<PlayerRoot>(this));
 	ChangeAttackBehavior(std::make_unique<PlayerAttackRoot>(this));
@@ -60,6 +69,8 @@ void Player::Update() {
 	}
 	//　移動制限
 	MoveToLimit();
+
+	weakikCollider_->InfoUpdate();
 	
 	/// 更新
 	//base::Update();
@@ -71,7 +82,9 @@ void Player::Update() {
 void Player::Draw(Material* material) {
 
 	OriginGameObject::Draw(material);
-	attackBehavior_->Debug();
+#ifdef _DEBUG
+	weakikCollider_->DrawCollider();
+#endif // _DEBUG
 }
 
 
@@ -366,3 +379,26 @@ void Player::ApplyGlobalParameter() {
 /// Class Set
 ///==========================================================
 
+void Player::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
+
+	if (other.tag == "Enemy") {
+		if (dynamic_cast<PlayerRecoil*>(behavior_.get()))return;
+		SetCollisionSize(Vector3::GetZeroVec());
+		ChangeBehavior(std::make_unique<PlayerRecoil>(this));
+		ChangeAttackBehavior(std::make_unique<PlayerAttackRoot>(this));
+		return;
+	}
+
+
+}
+
+void Player::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
+
+}
+
+
+void Player::SetCollisionSize(const Vector3& size) {
+	weakikCollider_->SetWidth(size.x);
+	weakikCollider_->SetHeight(size.y);
+	weakikCollider_->SetDepth(size.z);
+}
