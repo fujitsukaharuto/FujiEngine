@@ -100,6 +100,10 @@ inline void TestBaseObj::Debug() {
 	collider_->SetWidth(w);
 	collider_->SetHeight(h);
 	collider_->SetDepth(d);
+	bool isColl = collider_->GetIsCollisonCheck();
+	ImGui::Checkbox("isCollision", &isColl);
+	collider_->SetIsCollisonCheck(isColl);
+
 
 	ImGui::End();
 }

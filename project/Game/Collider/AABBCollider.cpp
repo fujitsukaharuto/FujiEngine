@@ -58,6 +58,7 @@ void AABBCollider::Debug() {
 	ImGui::DragFloat("width", &width, 0.01f);
 	ImGui::DragFloat("height", &height, 0.01f);
 	ImGui::DragFloat("depth", &depth, 0.01f);
+	ImGui::Checkbox("isCollision", &isCollisionCheck_);
 	ImGui::End();
 }
 

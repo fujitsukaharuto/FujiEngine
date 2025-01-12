@@ -19,6 +19,26 @@ void CollisionManager::CheckCollisionPair(BaseCollider* A, BaseCollider* B) {
 		auto& hitListB = aabbB->hitList_;
 
 		if (isColliding) {
+
+			if (!aabbA->GetIsCollisonCheck() || !aabbB->GetIsCollisonCheck()) {
+				if (std::find(hitListA.begin(), hitListA.end(), B) == hitListA.end()) {
+				}
+				else {
+					hitListA.remove(B);
+					aabbA->SetState(CollisionState::collisionExit);
+					aabbA->OnCollision({ B->GetTag(), B->GetPos() });
+				}
+
+				if (std::find(hitListB.begin(), hitListB.end(), A) == hitListB.end()) {
+				}
+				else {
+					hitListB.remove(A);
+					aabbB->SetState(CollisionState::collisionExit);
+					aabbB->OnCollision({ A->GetTag(), A->GetPos() });
+				}
+				return;
+			}
+
 			// AとBが初めて衝突した場合
 			if (std::find(hitListA.begin(), hitListA.end(), B) == hitListA.end()) {
 				hitListA.push_back(B);

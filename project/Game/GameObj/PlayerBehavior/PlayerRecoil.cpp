@@ -15,7 +15,6 @@ PlayerRecoil::PlayerRecoil(Player* player)
     ///---------------------------------------------------
     jumpSpeed_ = pPlayer_->GetRecoilJumpSpeed();
     // プレイヤーの向き (X軸の方向) を取得
-     playerDirectionX_ = pPlayer_->GetDirectionX();
     step_ = Step::RECOIL;
 }
 

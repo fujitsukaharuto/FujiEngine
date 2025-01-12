@@ -33,13 +33,16 @@ public:
 	void SetParent(Object3d* parent) { parent_ = parent; }
 	void SetTag(const std::string& tag) { info.tag = tag; }
 	void SetPos(const Vector3& pos) { info.pos = pos; }
+	void SetIsCollisonCheck(bool is) { isCollisionCheck_ = is; }
 
 	const std::string GetTag()const { return info.tag; }
 	Vector3 GetPos();
+	bool GetIsCollisonCheck() { return isCollisionCheck_; }
 
 	std::list<BaseCollider*> hitList_;
 
 protected:
 	ColliderInfo info;
 	Object3d* parent_ = nullptr;
+	bool isCollisionCheck_ = true;
 };

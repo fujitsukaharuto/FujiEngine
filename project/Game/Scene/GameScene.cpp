@@ -43,6 +43,9 @@ void GameScene::Initialize() {
 	black_->SetAnchor({ 0.0f,0.0f });
 #pragma endregion
 
+	obj3dCommon.reset(new Object3dCommon());
+	obj3dCommon->Initialize();
+
 	sphere = std::make_unique<Object3d>();
 	sphere->CreateSphere();
 
