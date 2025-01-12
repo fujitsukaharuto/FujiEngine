@@ -72,7 +72,6 @@ void BaseEnemy::Update() {
 	// collider更新
 	collider_->InfoUpdate();
 	jumpCollider_->InfoUpdate();
-	collider_->Debug();
 	
 	//// 体力がなくなったら死亡
 	//if (hp_ <= 0) {
