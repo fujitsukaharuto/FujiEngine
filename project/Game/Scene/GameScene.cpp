@@ -43,6 +43,10 @@ void GameScene::Initialize() {
 	black_->SetAnchor({ 0.0f,0.0f });
 #pragma endregion
 
+	keyPaneru_ = std::make_unique<Sprite>();
+	keyPaneru_->Load("key.png");
+	keyPaneru_->SetAnchor({ 0.0f,0.0f });
+
 	obj3dCommon.reset(new Object3dCommon());
 	obj3dCommon->Initialize();
 
@@ -129,6 +133,7 @@ void GameScene::Draw() {
 
 	dxCommon_->PreSpriteDraw();
 
+	keyPaneru_->Draw();
 	if (blackTime != 0.0f) {
 		black_->Draw();
 	}

@@ -64,6 +64,7 @@ private:
 	ParticleEmitter emit;
 
 
+	std::unique_ptr<Sprite> keyPaneru_;
 	// sceneChange
 	std::unique_ptr<Sprite> black_;
 	float blackLimmite = 20.0f;
