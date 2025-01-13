@@ -39,7 +39,7 @@ void GameScene::Initialize() {
 	black_ = std::make_unique<Sprite>();
 	black_->Load("white2x2.png");
 	black_->SetColor({ 0.0f,0.0f,0.0f,1.0f });
-	black_->SetSize({ 1280.0f,720.0f });
+	black_->SetSize({ 1280.0f,950.0f });
 	black_->SetAnchor({ 0.0f,0.0f });
 #pragma endregion
 
