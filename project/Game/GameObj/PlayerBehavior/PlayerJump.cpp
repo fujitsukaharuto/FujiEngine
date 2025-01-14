@@ -42,5 +42,7 @@ void PlayerJump::Update() {
 
 
 void  PlayerJump::Debug() {
+#ifdef _DEBUG
 	ImGui::Text("Jump");
+#endif
 }

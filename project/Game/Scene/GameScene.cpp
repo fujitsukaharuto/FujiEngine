@@ -192,10 +192,11 @@ void GameScene::BlackFade() {
 
 
 void GameScene::ParamaterEdit() {
+#ifdef _DEBUG
 	ImGui::Begin("ParamaterEditor");
 	player_->AdjustParm();
 	enemyManager_->AdjustParm();
 	ufo_->AdjustParm();
 	ImGui::End();
-
+#endif
 }

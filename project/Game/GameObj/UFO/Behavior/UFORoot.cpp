@@ -61,5 +61,7 @@ void UFORoot::Update() {
 
 
 void  UFORoot::Debug() {
+#ifdef _DEBUG
 	ImGui::Text("Jump");
+#endif
 }

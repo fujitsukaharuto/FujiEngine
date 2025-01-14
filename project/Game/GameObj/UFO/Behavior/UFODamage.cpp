@@ -75,5 +75,7 @@ void UFODamage::Update() {
 
 
 void   UFODamage::Debug() {
+#ifdef _DEBUG
 	ImGui::Text("UFODamage");
+#endif // _DEBUG
 }

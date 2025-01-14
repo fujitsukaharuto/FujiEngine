@@ -77,6 +77,7 @@ void GlobalVariables::Update() {
 
 // 描画処理を分ける関数
 void GlobalVariables::DrawWidget(const std::string& itemName, Item& item, const DrawSettings& drawSettings) {
+#ifdef _DEBUG
     std::visit([&](auto& value) {
         using T = std::decay_t<decltype(value)>;
         if constexpr (std::is_same_v<T, int32_t>) {
@@ -118,6 +119,7 @@ void GlobalVariables::DrawWidget(const std::string& itemName, Item& item, const 
             }
         }
         }, item);
+#endif
 }
 
 

@@ -50,8 +50,9 @@ void AABBCollider::OnCollisionExit(const ColliderInfo& other) {
 	state = CollisionState::None;
 }
 
-#ifdef _DEBUG
+
 void AABBCollider::Debug() {
+#ifdef _DEBUG
 	std::string uniqueName = "AABBCollider##" + std::to_string(reinterpret_cast<uintptr_t>(this));
 	ImGui::Begin(uniqueName.c_str());
 	ImGui::DragFloat3("pos", &info.pos.x, 0.01f);
@@ -60,9 +61,11 @@ void AABBCollider::Debug() {
 	ImGui::DragFloat("depth", &depth, 0.01f);
 	ImGui::Checkbox("isCollision", &isCollisionCheck_);
 	ImGui::End();
+#endif
 }
 
 void AABBCollider::DrawCollider() {
+#ifdef _DEBUG
 
 	// 半サイズを計算
 	float halfWidth = width / 2.0f;
@@ -94,6 +97,5 @@ void AABBCollider::DrawCollider() {
 	Line3dDrawer::GetInstance()->DrawLine3d(v2, v6, { 1.0f,1.0f,1.0f,1.0f });
 	Line3dDrawer::GetInstance()->DrawLine3d(v3, v7, { 1.0f,1.0f,1.0f,1.0f });
 	Line3dDrawer::GetInstance()->DrawLine3d(v4, v8, { 1.0f,1.0f,1.0f,1.0f });
-
+#endif
 }
-#endif // _DEBUG

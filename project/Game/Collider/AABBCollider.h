@@ -42,10 +42,10 @@ public:
 	float GetDepth() const { return depth; }
 
 
-#ifdef _DEBUG
+
 	void Debug();
 	void DrawCollider();
-#endif // _DEBUG
+
 
 
 private:

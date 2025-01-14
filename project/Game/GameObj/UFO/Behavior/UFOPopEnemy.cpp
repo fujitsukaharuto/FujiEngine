@@ -56,5 +56,7 @@ void UFOPopEnemy::Update() {
 
 
 void  UFOPopEnemy::Debug() {
+#ifdef _DEBUG
 	ImGui::Text("Jump");
+#endif
 }
