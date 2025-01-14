@@ -63,6 +63,13 @@ void PlaneDrawer::AddPlanePoint(const Vector3& p1) {
 
 }
 
+void PlaneDrawer::PopPlanePoint() {
+	if (points_.empty()) {
+		return;
+	}
+	points_.pop_front();
+}
+
 void PlaneDrawer::Reset() {
 
 	points_.clear();
@@ -85,7 +92,7 @@ void PlaneDrawer::Render() {
 	cList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	// ポイントをvertMapに転送
-	size_t planeCount = (points_.size() - 1) / 3; // 平面の数
+	size_t planeCount = (points_.size()) / 2 - 1; // 平面の数
 	size_t vertexIndex = 0;
 	size_t indexIndex = 0;
 
@@ -131,7 +138,7 @@ void PlaneDrawer::SetCamera(Camera* camera) {
 void PlaneDrawer::CreateMeshes() {
 
 	const UINT maxVertex = kMaxPlanes * 4;
-	const UINT maxIndices = maxVertex * 40;
+	const UINT maxIndices = maxVertex * 120;
 
 	planes_ = CreateMesh(maxVertex, maxIndices);
 }

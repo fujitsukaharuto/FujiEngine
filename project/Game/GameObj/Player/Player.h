@@ -89,6 +89,7 @@ private:
 	bool isAttack_ = false;
 	bool isAttack2_ = false;
 
+	float popTime_ = 8.0f;
 
 
 	ParticleEmitter attackParticle_;

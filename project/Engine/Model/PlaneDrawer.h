@@ -46,6 +46,8 @@ public:
 
 	void AddPlanePoint(const Vector3& p1);
 
+	void PopPlanePoint();
+
 	void Reset();
 
 	void Render();

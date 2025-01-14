@@ -17,6 +17,8 @@ Player::~Player() {
 
 	Audio::GetInstance()->SoundStopWave(jumpSound);
 	Audio::GetInstance()->SoundStopWave(dushSound);
+
+	PlaneDrawer::GetInstance()->Reset();
 }
 
 void Player::Initialize() {
@@ -167,9 +169,16 @@ void Player::Update() {
 			}
 		}
 
-		PlaneDrawer::GetInstance()->Reset();
-
 	}
+	if (popTime_ > 0.0f) {
+		popTime_ -= FPSKeeper::DeltaTime();
+	}
+	else {
+		PlaneDrawer::GetInstance()->PopPlanePoint();
+		PlaneDrawer::GetInstance()->PopPlanePoint();
+		popTime_ = 1.5f;
+	}
+
 	if (firePlane_->transform.scale.x <= 1.0f) {
 		firePlane_->SetUVScale({ 1.0f,firePlane_->transform.scale.x });
 	}
