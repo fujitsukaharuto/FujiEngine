@@ -167,6 +167,8 @@ void Player::Update() {
 			}
 		}
 
+		PlaneDrawer::GetInstance()->Reset();
+
 	}
 	if (firePlane_->transform.scale.x <= 1.0f) {
 		firePlane_->SetUVScale({ 1.0f,firePlane_->transform.scale.x });

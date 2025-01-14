@@ -71,16 +71,6 @@ void GameScene::Initialize() {
 	followCamera_->SetTarget(&player_->GetTrans());
 	followCamera_->SetLockOn(lockOn_.get());
 
-	PlaneDrawer::GetInstance()->AddPlanePoint({ 1.0f,2.0f,5.0f });
-	PlaneDrawer::GetInstance()->AddPlanePoint({ 0.0f,2.0f,5.0f });
-	PlaneDrawer::GetInstance()->AddPlanePoint({ 1.0f,3.0f,5.0f });
-	PlaneDrawer::GetInstance()->AddPlanePoint({ 0.0f,3.0f,5.0f });
-	PlaneDrawer::GetInstance()->AddPlanePoint({ 1.0f,4.0f,5.0f });
-	PlaneDrawer::GetInstance()->AddPlanePoint({ 0.0f,4.0f,5.0f });
-	PlaneDrawer::GetInstance()->AddPlanePoint({ 1.0f,5.0f,5.0f });
-	PlaneDrawer::GetInstance()->AddPlanePoint({ 0.0f,5.0f,5.0f });
-
-
 }
 
 void GameScene::Update() {
