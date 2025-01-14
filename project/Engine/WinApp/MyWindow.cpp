@@ -16,7 +16,7 @@ MyWin* MyWin::GetInstance()
 
 
 void MyWin::Initialize() {
-	CreateGWindow(L"2307_タイトル", kWindowWidth, kWindowHeight);
+	CreateGWindow(L"2307_ふっとバース", kWindowWidth, kWindowHeight);
 	timeBeginPeriod(1);
 }
 
