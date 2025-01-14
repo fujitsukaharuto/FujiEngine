@@ -138,6 +138,7 @@ void BaseEnemy::Fall(float& speed, const bool& isJump) {
 		if (!dynamic_cast<EnemyJump*>(behavior_.get()))return;
 		// ジャンプ終了
 		SetIsCollision(false);
+		SetRotation(Vector3(0, 0, 0));
 		ChangeBehavior(std::make_unique<EnemyRoot>(this));
 	}
 }

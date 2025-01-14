@@ -14,6 +14,9 @@ private:
 	Step step_;
 	float jumpSpeed_;
 
+	float rotateZ_;
+	float rotateSpeed_;
+
 
 public:
 	//コンストラクタ

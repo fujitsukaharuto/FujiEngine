@@ -16,6 +16,8 @@ EnemyJump::EnemyJump(BaseEnemy* boss)
 	
 	jumpSpeed_ = pBaseEnemy_->GetJumpSpeed(pBaseEnemy_->GetJumpPower());
 	pBaseEnemy_->SetIsCollision(true);
+
+	rotateSpeed_ = 30.0f;
 }
 
 EnemyJump::~EnemyJump() {
@@ -23,7 +25,8 @@ EnemyJump::~EnemyJump() {
 }
 
 void  EnemyJump::Update() {
-	
+	rotateZ_ += rotateSpeed_ * FPSKeeper::NormalDeltaTime();
+	pBaseEnemy_->SetRotation(Vector3(0, 0, rotateZ_));
 	pBaseEnemy_->Jump(jumpSpeed_);
 	
 }
