@@ -33,7 +33,7 @@ void UFO::Initialize() {
 	moveDirection = 1.0f;
 
 	MaxHp_ = 30.0f;
-	hp_ = 10.0f;
+	hp_ = MaxHp_;
 	// collider
 	collider_ = std::make_unique<AABBCollider>();
 	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
@@ -61,10 +61,7 @@ void UFO::Update() {
 	collider_->InfoUpdate();
 	//　移動制限
 	/*MoveToLimit();*/
-	if (hp_ <= 0) {
-		isDeath_=true;
-		/*Audio::GetInstance()->PlayWave(deathSound_);*/
-	}
+
 	/// 更新
 	//base::Update();
 }
@@ -139,9 +136,18 @@ void UFO::DamageRendition() {
 ///==========================================================
 /// ダメージ受ける
 ///==========================================================
-void UFO::TakeDamage() {
-	hp_--;
+void UFO::TakeDamageForPar(const float& par) {
 
+	//割合によるインクる面とする値を決める
+	float decrementSize = MaxHp_ * par;
+	// HP減少
+	hp_ -= decrementSize;
+
+	//HPが0以下にならないように
+	if (hp_ <= 0) {
+		// 死亡処理
+		isDeath_ = true;
+	}
 }
 
 void UFO::Move() {
@@ -234,7 +240,7 @@ void UFO::ApplyGlobalParameter() {
 	popWaitTime_ = globalParameter_->GetValue<float>(groupName_, "PopWaitTime");
 	damageTime_ = globalParameter_->GetValue<float>(groupName_, "DamageTime");
 	dagameDistance_ = globalParameter_->GetValue<float>(groupName_, "DamageDistance");
-	damageValue_ = globalParameter_->GetValue<float>(groupName_, "DamageValue");
+	damageValue_ = globalParameter_->GetValue<float>(groupName_, "DamageValue(par)");
 }
 ///=========================================================
 /// Class Set

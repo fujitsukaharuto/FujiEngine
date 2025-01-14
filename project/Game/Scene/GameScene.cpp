@@ -172,9 +172,9 @@ void GameScene::BlackFade() {
 	black_->SetColor({ 0.0f,0.0f,0.0f,Lerp(0.0f,1.0f,(1.0f / blackLimmite * blackTime)) });
 
 	///遷移条件
-	/*if (ufo_->GetIsDeath()) {
+	if (ufo_->GetIsDeath()) {
 		isChangeFase = true;
-	}*/
+	}
 	/*if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
 		if (blackTime == 0.0f) {
 			isChangeFase = true;

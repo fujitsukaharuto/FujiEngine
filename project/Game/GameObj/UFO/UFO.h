@@ -60,7 +60,7 @@ public:
 
 	/// ダメージ
 	void DamageRendition();
-	void TakeDamage();
+	void TakeDamageForPar(const float& par);
 
 	void OnCollisionEnter(const ColliderInfo& other);
 	void OnCollisionStay(const ColliderInfo& other);
@@ -84,7 +84,7 @@ public:
 	float GetDamageDistance()const { return dagameDistance_; }
 	float GetDamageTime()const { return damageTime_; }
 	bool GetIsDeath()const { return isDeath_; }
-
+	float GetDamageValue()const { return damageValue_; }
 	/// ===================================================
 	/// setter method
 	/// ===================================================
