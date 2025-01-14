@@ -148,7 +148,7 @@ void GameScene::Draw() {
 }
 
 void GameScene::BlackFade() {
-	XINPUT_STATE pad;
+	/*XINPUT_STATE pad;*/
 
 	if (isChangeFase) {
 		if (blackTime < blackLimmite) {
@@ -170,7 +170,7 @@ void GameScene::BlackFade() {
 		}
 	}
 	black_->SetColor({ 0.0f,0.0f,0.0f,Lerp(0.0f,1.0f,(1.0f / blackLimmite * blackTime)) });
-	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
+	/*if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
 		if (blackTime == 0.0f) {
 			isChangeFase = true;
 		}
@@ -182,7 +182,7 @@ void GameScene::BlackFade() {
 				isChangeFase = true;
 			}
 		}
-	}
+	}*/
 }
 
 
