@@ -9,10 +9,6 @@
 ///* frame
 #include"DX/FPSKeeper.h"
 
-///* imgui
-#ifdef _DEBUG
-#include"imgui.h"
-#endif 
 
 
 /// ===================================================
@@ -42,7 +38,5 @@ void PlayerJump::Update() {
 
 
 void  PlayerJump::Debug() {
-#ifdef _DEBUG
-	ImGui::Text("Jump");
-#endif
+
 }

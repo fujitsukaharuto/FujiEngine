@@ -26,12 +26,12 @@ private:
 	// キック仮モデル
 	std::unique_ptr<Object3d>kikModel_;
 
-     /// グローバルなパラメータ
+	/// グローバルなパラメータ
 	const std::string groupName_ = "Player";       /// グループ名
 	GlobalVariables* globalParameter_;            /// グローバルパラメータ
 
 	///* behavior
-	std::unique_ptr<BasePlayerBehavior>       behavior_       = nullptr;
+	std::unique_ptr<BasePlayerBehavior>       behavior_ = nullptr;
 	std::unique_ptr<BasePlayerAttackBehavior> attackBehavior_ = nullptr;
 
 
@@ -66,15 +66,15 @@ public:
 	/// ===================================================
 
 	//* 初期化、更新、描画
-	void Initialize()override;
-	void Update()override;
-	void Draw(Material* mate = nullptr)override;
+	void Initialize()                     override;
+	void Update()                         override;
+	void Draw(Material* mate = nullptr)   override;
 
 	///* 移動
-	void Move(const float& speed);
-	bool GetIsMoving();
+	void    Move(const float& speed);
+	bool    GetIsMoving();
 	Vector3 GetInputVelocity();
-	void MoveToLimit();
+	void    MoveToLimit();
 
 	///* ジャンプ
 	void Jump(float& speed);
@@ -88,8 +88,8 @@ public:
 	void TakeDamage();
 
 
-	void OnCollisionEnter(const ColliderInfo& other);
-	void OnCollisionStay(const ColliderInfo& other);
+	void          OnCollisionEnter(const ColliderInfo& other);
+	void          OnCollisionStay(const ColliderInfo& other);
 	BaseCollider* GetWeakColliderCollider() { return weakikCollider_.get(); }
 	///-------------------------------------------------------------------------------------
 	/// Editor
