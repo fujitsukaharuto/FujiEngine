@@ -21,7 +21,7 @@ UFO::UFO() {}
 void UFO::Initialize() {
 
 	OriginGameObject::Initialize();
-	OriginGameObject::SetModel("UFO.obj");
+	OriginGameObject::SetModel("ufo_test.obj");
 
 	///* グローバルパラメータ
 	globalParameter_ = GlobalVariables::GetInstance();
