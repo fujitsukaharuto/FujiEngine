@@ -31,6 +31,9 @@ void UFO::Initialize() {
 
 	moveRestrectionPos_ = 25.0f;
 	moveDirection = 1.0f;
+
+	MaxHp_ = 30.0f;
+	hp_ = 10.0f;
 	// collider
 	collider_ = std::make_unique<AABBCollider>();
 	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
@@ -173,6 +176,7 @@ void UFO::AdjustParm() {
 		ImGui::DragFloat("PopWaitTime(s)", &popWaitTime_, 0.01f);
 		ImGui::DragFloat("DamageTime(s)", &damageTime_, 0.01f);
 		ImGui::DragFloat("DamageDistance", &dagameDistance_, 0.01f);
+		ImGui::DragFloat("DamageValue(par)", &damageValue_, 0.01f);
 			
 		/// セーブとロード
 		globalParameter_->ParmSaveForImGui(groupName_);
@@ -206,7 +210,7 @@ void UFO::AddParmGroup() {
 	globalParameter_->AddItem(groupName_, "PopWaitTime", popWaitTime_);
 	globalParameter_->AddItem(groupName_, "DamageTime", damageTime_);
 	globalParameter_->AddItem(groupName_, "DamageDistance", dagameDistance_);
-	globalParameter_->AddItem(groupName_, "HP", hp_);
+	globalParameter_->AddItem(groupName_, "DamageValue(par)",damageValue_);
 }
 
 ///=================================================================================
@@ -218,7 +222,7 @@ void UFO::SetValues() {
 	globalParameter_->SetValue(groupName_, "PopWaitTime", popWaitTime_);
 	globalParameter_->SetValue(groupName_, "DamageTime", damageTime_);
 	globalParameter_->SetValue(groupName_, "DamageDistance", dagameDistance_);
-	globalParameter_->SetValue(groupName_, "HP", hp_);
+	globalParameter_->SetValue(groupName_, "DamageValue(par)", damageValue_);
 	
 }
 
@@ -230,7 +234,7 @@ void UFO::ApplyGlobalParameter() {
 	popWaitTime_ = globalParameter_->GetValue<float>(groupName_, "PopWaitTime");
 	damageTime_ = globalParameter_->GetValue<float>(groupName_, "DamageTime");
 	dagameDistance_ = globalParameter_->GetValue<float>(groupName_, "DamageDistance");
-	hp_ = globalParameter_->GetValue<float>(groupName_, "HP");
+	damageValue_ = globalParameter_->GetValue<float>(groupName_, "DamageValue");
 }
 ///=========================================================
 /// Class Set

@@ -29,16 +29,18 @@ private:
 	GlobalVariables* globalParameter_;            /// グローバルパラメータ
 	const std::string groupName_ = "UFO";         /// グループ名
 
-	float hp_;                                    /// HP
 	Vector3 popPos_;                              /// 生成座標
 	bool isDeath_;                                /// 死んだか
 	float moveDirection;                          /// 移動向き
 	float moveRestrectionPos_;
 	
 	///* parm 
+	float hp_;                                    /// HP
+	float MaxHp_;
 	float popWaitTime_;                           
 	float dagameDistance_;
 	float damageTime_;
+	float damageValue_;
 
 public:
 	static float InitY_;
