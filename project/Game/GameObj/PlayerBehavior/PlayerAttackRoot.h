@@ -6,11 +6,16 @@
 
 class PlayerAttackRoot : public BasePlayerAttackBehavior {
 private:
+	enum class Step {
+		WAIT,
+		ATTACK,
+	};
 
 /// ===================================================
 ///  private varians
 /// ===================================================
-
+	Step step_;
+	float waitTime_;
 
 public:
 	//コンストラクタ

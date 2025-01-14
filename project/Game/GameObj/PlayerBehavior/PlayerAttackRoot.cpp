@@ -30,16 +30,27 @@ PlayerAttackRoot ::~PlayerAttackRoot() {
 
 //更新
 void PlayerAttackRoot::Update() {
+	switch (step_)
+	{
+	case PlayerAttackRoot::Step::WAIT:
+		waitTime_ += FPSKeeper::NormalDeltaTime();
+		if (waitTime_ < pPlayer_->GetKikWaitTime())break;
+		step_ = Step::ATTACK;
+		break;
+	case PlayerAttackRoot::Step::ATTACK:
+		//　キックする
+		if (Input::GetInstance()->PushKey(DIK_K)) {
+			pPlayer_->ChangeAttackBehavior(std::make_unique<PlayerKikAttack>(pPlayer_));
+		}
+		else {
+			KikAttackState();//キック
 
-	//　キックする
-	if (Input::GetInstance()->PushKey(DIK_K)) {
-		pPlayer_->ChangeAttackBehavior(std::make_unique<PlayerKikAttack>(pPlayer_));
-		
+		}
+		break;
+	default:
+		break;
 	}
-	else {
-		KikAttackState();//キック
-		
-	}
+	
 	
 }
 

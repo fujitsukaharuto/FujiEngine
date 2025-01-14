@@ -319,6 +319,7 @@ void Player::AdjustParm() {
 		ImGui::DragFloat("RecoilSpeed", &recoilSpeed_, 0.01f);
 		ImGui::DragFloat("RecoilJumpSpeed", &recoilJumpSpeed_, 0.01f);
 		ImGui::DragFloat("KikTime", &kikTime_, 0.01f);
+		ImGui::DragFloat("KikWaitTime", &kikWaitTime_, 0.01f);
 		
 		/// セーブとロード
 		globalParameter_->ParmSaveForImGui(groupName_);
@@ -357,6 +358,7 @@ void Player::AddParmGroup() {
 	globalParameter_->AddItem(groupName_, "RecoilSpeed", recoilSpeed_);
 	globalParameter_->AddItem(groupName_, "RecoilJumpSpeed", recoilJumpSpeed_);
 	globalParameter_->AddItem(groupName_, "KikTime", kikTime_);
+	globalParameter_->AddItem(groupName_, "KikWaitTime", kikWaitTime_);
 
 }
 
@@ -373,6 +375,7 @@ void Player::SetValues() {
 	globalParameter_->SetValue(groupName_, "RecoilSpeed", recoilSpeed_);
 	globalParameter_->SetValue(groupName_, "RecoilJumpSpeed", recoilJumpSpeed_);
 	globalParameter_->SetValue(groupName_, "KikTime", kikTime_);
+	globalParameter_->SetValue(groupName_, "KikWaitTime", kikWaitTime_);
 }
 
 ///=====================================================
@@ -387,6 +390,7 @@ void Player::ApplyGlobalParameter() {
 	recoilSpeed_ = globalParameter_->GetValue<float>(groupName_, "RecoilSpeed");
 	recoilJumpSpeed_ = globalParameter_->GetValue<float>(groupName_, "RecoilJumpSpeed");
 	kikTime_ = globalParameter_->GetValue<float>(groupName_, "KikTime");
+	kikWaitTime_ = globalParameter_->GetValue<float>(groupName_, "KikWaitTime");
 }
 ///=========================================================
 /// Class Set

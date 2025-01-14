@@ -35,7 +35,6 @@ private:
 	std::unique_ptr<BasePlayerAttackBehavior> attackBehavior_ = nullptr;
 
 
-
 	///* 速度
 	Vector3           velocity_;
 	Vector3           prePos_;
@@ -52,6 +51,8 @@ private:
 	float             recoilSpeed_;
 	float             recoilJumpSpeed_;
 	float             kikTime_;
+	float             kikWaitTime_;
+
 
 	// fall
 	float             fallSpeed_;
@@ -111,6 +112,7 @@ public:
 	float GetRecoilJumpSpeed()const { return recoilJumpSpeed_; }
 	float  GetRecoilSpeed()const { return recoilSpeed_; }
 	float  GetKikTime()const { return kikTime_; }
+	float GetKikWaitTime()const { return kikWaitTime_; }
 	float GetFacingDirection()const;
 	/// ===================================================
 	/// setter method
