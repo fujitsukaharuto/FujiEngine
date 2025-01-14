@@ -21,19 +21,22 @@ private:
 	///private variaus
 	/// ===================================================
 
-		///* behavior
+	///* behavior
 	std::unique_ptr<BaseUFOBehavior>behavior_ = nullptr;
 	std::unique_ptr<AABBCollider>collider_;
 	
-     /// グローバルなパラメータ
+    ///* グローバルなパラメータ
 	GlobalVariables* globalParameter_;            /// グローバルパラメータ
-	const std::string groupName_ = "UFO";      /// グループ名
+	const std::string groupName_ = "UFO";         /// グループ名
 
-
-	Vector3 popPos_;
+	float hp_;                                    /// HP
+	Vector3 popPos_;                              /// 生成座標
+	bool isDeath_;                                /// 死んだか
+	float moveDirection;                          /// 移動向き
+	float moveRestrectionPos_;
 	
-	///parm
-	float popWaitTime_;
+	///* parm 
+	float popWaitTime_;                           
 	float dagameDistance_;
 	float damageTime_;
 
@@ -49,6 +52,7 @@ public:
 	void Update()override;
 	void Draw(Material* mate = nullptr)override;
 
+	void Move();
 	void EnemySpawn();
 	void ChangeBehavior(std::unique_ptr<BaseUFOBehavior>behavior);
 
@@ -77,9 +81,11 @@ public:
 	float GetPopWaitTime()const { return popWaitTime_; }
 	float GetDamageDistance()const { return dagameDistance_; }
 	float GetDamageTime()const { return damageTime_; }
+	bool GetIsDeath()const { return isDeath_; }
 
 	/// ===================================================
 	/// setter method
 	/// ===================================================
 	void SetEnemyManager(EnemyManager*enemymanager);
+	void SetColor(const Vector4& color);
 };

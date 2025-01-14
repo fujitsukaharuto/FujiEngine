@@ -26,6 +26,10 @@ UFODamage::UFODamage(UFO* player)
 	///---------------------------------------------------
 	easing_.maxTime = pUFO_->GetDamageTime();
 	initPos_ = pUFO_->GetModel()->GetWorldPos();
+
+	pUFO_->TakeDamage();
+	pUFO_->SetColor(Vector4(1, 0, 0, 1));
+
 	step_ = Step::HITBACK;
 
 }
@@ -58,8 +62,9 @@ void UFODamage::Update() {
 		///-------------------------------------------------------
 		///　popするお
 		///-------------------------------------------------------
-		
+		pUFO_->SetColor(Vector4(1, 1, 1, 1));
 		pUFO_->ChangeBehavior(std::make_unique<UFORoot>(pUFO_));
+
 		break;
 	default:
 		break;

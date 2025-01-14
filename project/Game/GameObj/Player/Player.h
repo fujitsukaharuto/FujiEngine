@@ -9,8 +9,6 @@
 
 #include <memory>
 
-
-
 /// <summary>
 /// プレイヤークラス
 /// </summary>
