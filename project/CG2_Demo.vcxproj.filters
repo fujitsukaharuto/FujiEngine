@@ -376,6 +376,9 @@
     <ClInclude Include="Game\OriginState.h">
       <Filter>Game</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Math\KeyFrame.h">
+      <Filter>Engine\Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
