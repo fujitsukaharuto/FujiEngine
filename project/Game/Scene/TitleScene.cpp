@@ -31,6 +31,11 @@ void TitleScene::Initialize() {
 	black_->SetAnchor({ 0.0f,0.0f });
 #pragma endregion
 
+	titlePaneru_ = std::make_unique<Sprite>();
+	titlePaneru_->Load("title_none.png");
+	titlePaneru_->SetAnchor({ 0.0f,0.0f });
+
+
 	sphere = std::make_unique<Object3d>();
 	sphere->CreateSphere();
 
@@ -125,6 +130,8 @@ void TitleScene::Draw() {
 #pragma region 前景スプライト
 
 	dxCommon_->PreSpriteDraw();
+
+	titlePaneru_->Draw();
 	if (blackTime != 0.0f) {
 		black_->Draw();
 	}

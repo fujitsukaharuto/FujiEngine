@@ -22,6 +22,7 @@ private:
 	Vector3 rightDir = { 1.0f,0.0f,0.0f };
 
 
+	std::unique_ptr<Sprite> clearPaneru_;
 	// sceneChange
 	std::unique_ptr<Sprite> black_;
 	float blackLimmite = 20.0f;

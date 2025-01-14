@@ -32,6 +32,10 @@ void ResultScene::Initialize() {
 	black_->SetAnchor({ 0.0f,0.0f });
 #pragma endregion
 
+	clearPaneru_ = std::make_unique<Sprite>();
+	clearPaneru_->Load("clear_none.png");
+	clearPaneru_->SetAnchor({ 0.0f,0.0f });
+
 	sphere = std::make_unique<Object3d>();
 	sphere->CreateSphere();
 	sphere->SetColor({ 1.0f,0.0f,0.0f,1.0f });
@@ -89,6 +93,8 @@ void ResultScene::Draw() {
 #pragma region 前景スプライト
 
 	dxCommon_->PreSpriteDraw();
+
+	clearPaneru_->Draw();
 	if (blackTime != 0.0f) {
 		black_->Draw();
 	}

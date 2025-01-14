@@ -29,6 +29,7 @@ private:
 	std::unique_ptr<CollisionManager> cMane_;
 
 
+	std::unique_ptr<Sprite> titlePaneru_;
 	// sceneChange
 	std::unique_ptr<Sprite> black_;
 	float blackLimmite = 20.0f;
