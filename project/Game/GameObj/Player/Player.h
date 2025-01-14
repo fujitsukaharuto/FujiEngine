@@ -22,36 +22,41 @@ private:
 	/// ===================================================
 	///private variaus
 	/// ===================================================
-	
-		///* behavior
-	std::unique_ptr<BasePlayerBehavior>behavior_ = nullptr;
-	std::unique_ptr<BasePlayerAttackBehavior>attackBehavior_ = nullptr;
 
-/// グローバルなパラメータ
+	// キック仮モデル
+	std::unique_ptr<Object3d>kikModel_;
+
+     /// グローバルなパラメータ
+	const std::string groupName_ = "Player";       /// グループ名
 	GlobalVariables* globalParameter_;            /// グローバルパラメータ
-	const std::string groupName_ = "Player";      /// グループ名
+
+	///* behavior
+	std::unique_ptr<BasePlayerBehavior>       behavior_       = nullptr;
+	std::unique_ptr<BasePlayerAttackBehavior> attackBehavior_ = nullptr;
+
+
 
 	///* 速度
-	Vector3 velocity_;
-	Vector3 prePos_;
+	Vector3           velocity_;
+	Vector3           prePos_;
 
 	///* 目標角度
-	float objectiveAngle_;
-	Vector3 inputDirection_;
-	
+	float             objectiveAngle_;
+	Vector3           inputDirection_;
+
 	/// 移動、ジャンプ
-	float moveSpeed_;
-	float airMoveSpeed_;
-	float jumpSpeed_;
-	float gravity_;
-	float recoilSpeed_;
-	float recoilJumpSpeed_;
-	float kikTime_;
+	float             moveSpeed_;
+	float             airMoveSpeed_;
+	float             jumpSpeed_;
+	float             gravity_;
+	float             recoilSpeed_;
+	float             recoilJumpSpeed_;
+	float             kikTime_;
 
 	// fall
-	float fallSpeed_;
+	float             fallSpeed_;
 
-	std::unique_ptr<AABBCollider>weakikCollider_;
+	std::unique_ptr<AABBCollider> weakikCollider_;
 
 public:
 	static float InitY_;
@@ -73,7 +78,7 @@ public:
 
 	///* ジャンプ
 	void Jump(float& speed);
-	void Fall(float& speed,const bool&isJump=false);
+	void Fall(float& speed, const bool& isJump = false);
 	void ChangeBehavior(std::unique_ptr<BasePlayerBehavior>behavior);
 	void ChangeAttackBehavior(std::unique_ptr<BasePlayerAttackBehavior>behavior);
 
@@ -82,13 +87,13 @@ public:
 	void DamageRendition();
 	void TakeDamage();
 
-	
+
 	void OnCollisionEnter(const ColliderInfo& other);
 	void OnCollisionStay(const ColliderInfo& other);
 	BaseCollider* GetWeakColliderCollider() { return weakikCollider_.get(); }
 	///-------------------------------------------------------------------------------------
-    /// Editor
-    ///-------------------------------------------------------------------------------------
+	/// Editor
+	///-------------------------------------------------------------------------------------
 
 	void AdjustParm();
 	void ParmLoadForImGui();

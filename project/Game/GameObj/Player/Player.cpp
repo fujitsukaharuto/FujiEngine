@@ -11,6 +11,7 @@
 #include"GameObj/PlayerBehavior/PlayerRoot.h"
 #include"GameObj/PlayerBehavior/PlayerJump.h"
 #include"GameObj/PlayerBehavior/PlayerAttackRoot.h"
+#include"GameObj/PlayerBehavior/PlayerKikAttack.h"
 #include"GameObj/PlayerBehavior/PlayerRecoil.h"
 //* obj
 #include"Field/Field.h"
@@ -53,6 +54,12 @@ void Player::Initialize() {
 	weakikCollider_->SetPos(Vector3(0, 0, 1.5f));
 	weakikCollider_->InfoUpdate();
 
+	// 仮モデル
+	kikModel_ = std::make_unique<Object3d>();
+	kikModel_->Create("NormalEnemy.obj");
+	kikModel_->SetParent(GetModel());
+	kikModel_->transform.translate.z = 1.5f;
+
 	/// 通常モードから
 	ChangeBehavior(std::make_unique<PlayerRoot>(this));
 	ChangeAttackBehavior(std::make_unique<PlayerAttackRoot>(this));
@@ -85,6 +92,9 @@ void Player::Update() {
 void Player::Draw(Material* material) {
 
 	OriginGameObject::Draw(material);
+	if (dynamic_cast<PlayerKikAttack*>(attackBehavior_.get())) {
+		kikModel_->Draw();
+	}
 #ifdef _DEBUG
 	weakikCollider_->DrawCollider();
 #endif // _DEBUG

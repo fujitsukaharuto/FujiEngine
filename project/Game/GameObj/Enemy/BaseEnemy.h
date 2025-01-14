@@ -22,28 +22,27 @@ public:
 protected:
 
 	/// other class
-	Player* pPlayer_;
-	bool isdeath_;
-	float hp_;
-	float HPMax_;
-	Vector2 hpbarSize_;
-	float damageParm_;
-
-	Easing spawnEasing_;
+	Player*              pPlayer_;
+			             
+	bool                 isdeath_;
+	float                hp_;
+	float                HPMax_;
+	Vector2              hpbarSize_;
+	Easing               spawnEasing_;
 
 	/// parm
-	float fallSpeed_;
-	float attackValue_;
-	float gravity_;
-
-	JumpPower jumpPower_;
-	std::array<float,1>jumpSpeed_;
+	float                damageParm_;
+	float                fallSpeed_;
+	float                attackValue_;
+	float                gravity_;
+	JumpPower            jumpPower_;
+	std::array<float, 1> jumpSpeed_;
 
 	/// behavior
 	std::unique_ptr<BaseEnemyBehaivor>behavior_ = nullptr;
 
 public:
-	static float InitY_;
+	static float   InitY_;
 	static Vector3 InitScale_;
 public:
 	BaseEnemy();
@@ -67,19 +66,19 @@ public:
 
 	void OnCollisionEnter(const ColliderInfo& other);
 	void OnCollisionStay(const ColliderInfo& other);
-	BaseCollider* GetCollider() { return collider_.get(); } 
+	BaseCollider* GetCollider() { return collider_.get(); }
 	BaseCollider* GetJumpCollider() { return jumpCollider_.get(); }
 	///========================================================================================
 	///  getter method
 	///========================================================================================
-	bool GetIsDeath()const { return isdeath_; }
-	Player* GetPlayer() { return pPlayer_; }
-	float GetFallSpeed()const { return fallSpeed_; }
-	float GetAttackValue()const { return attackValue_; }
-	float GetGravity()const { return gravity_; }
+	bool      GetIsDeath()const { return isdeath_; }
+	Player*   GetPlayer() { return pPlayer_; }
+	float     GetFallSpeed()const { return fallSpeed_; }
+	float     GetAttackValue()const { return attackValue_; }
+	float     GetGravity()const { return gravity_; }
 	JumpPower GetJumpPower()const { return jumpPower_; }
 	BaseEnemyBehaivor* GetBehavior()const { return behavior_.get(); }
-	 float GetJumpSpeed(JumpPower num) const { return jumpSpeed_[static_cast<size_t>(num)]; }
+	float GetJumpSpeed(JumpPower num) const { return jumpSpeed_[static_cast<size_t>(num)]; }
 	///========================================================================================
 	///  setter method
 	///========================================================================================
