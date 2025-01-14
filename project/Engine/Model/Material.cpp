@@ -13,7 +13,7 @@ void Material::CreateMaterial() {
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialDate_));
 	//色変えるやつ（Resource）
 	materialDate_->color = { 1.0f,1.0f,1.0f,1.0f };
-	materialDate_->enableLighting = LightMode::kLightHalfLambert;
+	materialDate_->enableLighting = LightMode::kSpotLightON;
 	materialDate_->uvTransform = MakeIdentity4x4();
 	materialDate_->shininess = 50.0f;
 
