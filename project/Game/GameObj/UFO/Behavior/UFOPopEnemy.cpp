@@ -24,6 +24,10 @@ UFOPopEnemy::UFOPopEnemy(UFO* player)
 	///---------------------------------------------------
 	///変数初期化
 	///---------------------------------------------------
+	easing_.time = 0.0f;
+	easing_.maxTime = 0.5f;
+	easing_.amplitude = 0.4f;
+	easing_.period = 0.2f;
 	step_ = Step::POP;
 	
 }
@@ -41,7 +45,24 @@ void UFOPopEnemy::Update() {
 		///　敵生成
 		///-------------------------------------------------------
 		pUFO_->EnemySpawn();
+		step_ = Step::ANIMATION;
+
+		break;
+
+	case UFOPopEnemy::Step::ANIMATION:
+		///-------------------------------------------------------
+		///　アニメーション演出
+		///-------------------------------------------------------
+		
+		easing_.time += FPSKeeper::NormalDeltaTime();
+		pUFO_->SetScale(EaseAmplitudeScale(
+			Vector3(1, 1, 1), easing_.time, easing_.maxTime, easing_.amplitude, easing_.period)
+		);
+		// ステップ遷移
+		if (easing_.time < easing_.maxTime)break;
+		easing_.time = easing_.maxTime;
 		step_ = Step::RETURNROOT;
+
 		break;
 	case UFOPopEnemy::Step::RETURNROOT:
 		///-------------------------------------------------------

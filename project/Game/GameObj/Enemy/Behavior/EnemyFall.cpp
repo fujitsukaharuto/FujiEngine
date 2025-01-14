@@ -42,6 +42,7 @@ void EnemyFall::Update() {
 
         // 着地判定
         if (pBaseEnemy_->GetTrans().translate.y > BaseEnemy::InitY_) break;
+        pBaseEnemy_->SetRotation(Vector3(0, 0, 0));
         step_ = Step::LANDING;
 
         break;
