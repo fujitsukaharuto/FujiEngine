@@ -19,6 +19,9 @@ EnemyFall::EnemyFall(BaseEnemy* boss)
     amplitude_ = 0.2f;
     frequency_ = 2.0f;
     time_ = 0.0f;       // 時間カウンタの初期化
+
+    speedEase_.maxTime = 0.7f;
+    maxSpeed_ = pBaseEnemy_->GetFallSpeed() + 9.0f;
 }
 
 EnemyFall::~EnemyFall() {}
@@ -29,6 +32,7 @@ void EnemyFall::Update() {
         ///----------------------------------------------------------------------
         /// 落ちる 
         ///----------------------------------------------------------------------
+        SpeedChangeMethod();
         time_ += FPSKeeper::NormalDeltaTime(); // フレーム間の経過時間を加算
 
         // サイン波で左右に揺れるZ軸回転角を計算
@@ -38,7 +42,7 @@ void EnemyFall::Update() {
         pBaseEnemy_->SetRotation(Vector3(0, 0, zRotation_));
 
         // Y軸方向に落下
-        pBaseEnemy_->AddPosition(Vector3(0, -pBaseEnemy_->GetFallSpeed()*FPSKeeper::NormalDeltaTime(), 0));
+        pBaseEnemy_->AddPosition(Vector3(0, -fallspeed_ *FPSKeeper::NormalDeltaTime(), 0));
 
         // 着地判定
         if (pBaseEnemy_->GetTrans().translate.y > BaseEnemy::InitY_) break;
@@ -68,4 +72,14 @@ void EnemyFall::Update() {
 
 void EnemyFall::Debug() {
     // デバッグ用コードがあればここに記述
+}
+
+void EnemyFall::SpeedChangeMethod() {
+    speedEase_.time += FPSKeeper::NormalDeltaTime();
+    fallspeed_ = EaseInCirc(maxSpeed_, pBaseEnemy_->GetFallSpeed(), speedEase_.time, speedEase_.maxTime);
+
+    if (speedEase_.time >= speedEase_.maxTime) {
+        speedEase_.time = speedEase_.maxTime;
+        fallspeed_ = pBaseEnemy_->GetFallSpeed();
+    }
 }

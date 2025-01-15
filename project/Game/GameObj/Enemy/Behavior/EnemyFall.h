@@ -17,9 +17,13 @@ private:
 	// fall
 	float fallspeed_;
 	float time_;
-	 float amplitude_;    // 揺れ幅
-	 float frequency_;   // 揺れる速さ
-	 float zRotation_;
+	float amplitude_;    // 揺れ幅
+	float frequency_;   // 揺れる速さ
+	float zRotation_;
+
+	Easing speedEase_;
+	float   maxSpeed_;
+	
 
 	//land
 	float waitTime_;
@@ -32,5 +36,7 @@ public:
 
 	void Update()override;
 	void Debug()override;
+
+	void SpeedChangeMethod();
 
 };
