@@ -117,5 +117,5 @@ public:
 	/// ===================================================
 	/// setter method
 	/// ===================================================
-	void SetIsSetCollision(const bool& is);
+	void SetIsCollision(const bool& is);
 };

@@ -399,9 +399,8 @@ void Player::ApplyGlobalParameter() {
 void Player::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 
 	if (other.tag == "Enemy") {
-		if (dynamic_cast<PlayerRecoil*>(behavior_.get()))return;
-		SetIsSetCollision(false);
-		ChangeBehavior(std::make_unique<PlayerRecoil>(this));
+		
+		SetIsCollision(false);
 		ChangeAttackBehavior(std::make_unique<PlayerAttackRoot>(this));
 		return;
 	}
@@ -412,7 +411,7 @@ void Player::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
 }
 
 
-void  Player::SetIsSetCollision(const bool& is) {
+void  Player::SetIsCollision(const bool& is) {
 	weakikCollider_->SetIsCollisonCheck(is);
 }
 
