@@ -2,6 +2,7 @@
 /// behavior
 #include"EnemyFall.h"
 #include"EnemyAttack.h"
+#include"EnemyBound.h"
 
 /// obj
 #include"GameObj/Enemy/BaseEnemy.h"
@@ -46,7 +47,7 @@ void EnemyFall::Update() {
 
         // 着地判定
         if (pBaseEnemy_->GetTrans().translate.y > BaseEnemy::InitY_) break;
-        pBaseEnemy_->SetRotation(Vector3(0, 0, 0));
+        pBaseEnemy_->SetRotation(Vector3::GetZeroVec());
         step_ = Step::LANDING;
 
         break;
@@ -54,6 +55,9 @@ void EnemyFall::Update() {
         ///----------------------------------------------------------------------
         /// 着地
         ///----------------------------------------------------------------------
+        pBaseEnemy_->SetRotation(Vector3::GetZeroVec());
+        pBaseEnemy_->SetWorldPositionY(BaseEnemy::InitY_);
+        pBaseEnemy_->DecrementDeathCount();
 
         step_ = Step::CHANGEATTACK;
         break;
@@ -61,9 +65,7 @@ void EnemyFall::Update() {
         ///----------------------------------------------------------------------
         /// 攻撃に切り替え
         ///----------------------------------------------------------------------
-        pBaseEnemy_->SetRotation(Vector3::GetZeroVec());
-        pBaseEnemy_->SetWorldPositionY(BaseEnemy::InitY_);
-        pBaseEnemy_->ChangeBehavior(std::make_unique<EnemyAttack>(pBaseEnemy_));
+            pBaseEnemy_->ChangeBehavior(std::make_unique<EnemyBound>(pBaseEnemy_));
         break;
 
  

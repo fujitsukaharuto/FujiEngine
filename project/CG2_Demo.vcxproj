@@ -166,6 +166,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\GameObj\Enemy\BaseEnemy.cpp" />
     <ClCompile Include="Game\GameObj\Enemy\Behavior\BaseEnemyBehavior.cpp" />
     <ClCompile Include="Game\GameObj\Enemy\Behavior\EnemyAttack.cpp" />
+    <ClCompile Include="Game\GameObj\Enemy\Behavior\EnemyBound.cpp" />
     <ClCompile Include="Game\GameObj\Enemy\Behavior\EnemyFall.cpp" />
     <ClCompile Include="Game\GameObj\Enemy\Behavior\EnemyJump.cpp" />
     <ClCompile Include="Game\GameObj\Enemy\Behavior\EnemyRoot.cpp" />
@@ -263,6 +264,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Game\GameObj\Enemy\BaseEnemy.h" />
     <ClInclude Include="Game\GameObj\Enemy\Behavior\BaseEnemyBehavior.h" />
     <ClInclude Include="Game\GameObj\Enemy\Behavior\EnemyAttack.h" />
+    <ClInclude Include="Game\GameObj\Enemy\Behavior\EnemyBound.h" />
     <ClInclude Include="Game\GameObj\Enemy\Behavior\EnemyFall.h" />
     <ClInclude Include="Game\GameObj\Enemy\Behavior\EnemyJump.h" />
     <ClInclude Include="Game\GameObj\Enemy\Behavior\EnemyRoot.h" />

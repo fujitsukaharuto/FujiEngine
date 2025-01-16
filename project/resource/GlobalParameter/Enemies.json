@@ -2,11 +2,17 @@
     "Enemies": {
         "AttackValue1": 0.7699999809265137,
         "AttackValue2": 0.0,
+        "DeathCount1": 3,
+        "DeathCount2": 2,
         "FallSpeed1": 5.53000020980835,
         "FallSpeed2": 0.0,
-        "Gravity1": 0.10000000149011612,
+        "Gravity1": 0.8299999833106995,
         "Gravity2": 0.0,
-        "WeakJump1": 1.0,
-        "WeakJump2": 0.0
+        "WeakJump1": 1.1299999952316284,
+        "WeakJump2": 0.0,
+        "attenuate_1": 0.15000000596046448,
+        "attenuate_2": 0.0,
+        "baseBoundPower_1": 1.0299999713897705,
+        "baseBoundPower_2": 0.0
     }
 }

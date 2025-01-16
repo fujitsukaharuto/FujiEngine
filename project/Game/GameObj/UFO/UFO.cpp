@@ -40,16 +40,15 @@ void UFO::Initialize() {
 
 	moveRestrectionPos_ = 25.0f;
 	moveDirection = 1.0f;
-
 	MaxHp_ = 30.0f;
 	hp_ = MaxHp_;
+	model_->transform.scale.x = 10.0f;
+
 	// collider
 	collider_ = std::make_unique<AABBCollider>();
 	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
 	collider_->SetTag("UFO");
-	collider_->SetWidth(3.0f);
-	collider_->SetHeight(2.0f);
-	collider_->SetDepth(2.0f);
+	SetCollisionSize(collisionSize_);
 	collider_->SetParent(model_.get());
 	collider_->InfoUpdate();
 
@@ -191,6 +190,7 @@ void UFO::AdjustParm() {
 		/// 位置
 		ImGui::SeparatorText("Transform");
 		ImGui::DragFloat3("Position", &model_->transform.translate.x, 0.1f);
+		ImGui::DragFloat3("CollisionSize", &collisionSize_.x, 0.1f);
 
 		///　Floatのパラメータ
 		ImGui::SeparatorText("FloatParamater");
@@ -242,6 +242,7 @@ void UFO::AddParmGroup() {
 	globalParameter_->AddItem(groupName_, "DamageTime", damageTime_);
 	globalParameter_->AddItem(groupName_, "DamageDistance", dagameDistance_);
 	globalParameter_->AddItem(groupName_, "DamageValue(par)",damageValue_);
+	globalParameter_->AddItem(groupName_, "collisionSize_", collisionSize_);
 }
 
 ///=================================================================================
@@ -250,6 +251,7 @@ void UFO::AddParmGroup() {
 void UFO::SetValues() {
 	
 	globalParameter_->SetValue(groupName_, "Translate", model_->transform.translate);
+	globalParameter_->SetValue(groupName_, "collisionSize_", collisionSize_);
 	globalParameter_->SetValue(groupName_, "PopWaitTime", popWaitTime_);
 	globalParameter_->SetValue(groupName_, "DamageTime", damageTime_);
 	globalParameter_->SetValue(groupName_, "DamageDistance", dagameDistance_);
@@ -262,6 +264,7 @@ void UFO::SetValues() {
 ///===================================================== 
 void UFO::ApplyGlobalParameter() {
 	model_->transform.translate = globalParameter_->GetValue<Vector3>(groupName_, "Translate");
+	collisionSize_ = globalParameter_->GetValue<Vector3>(groupName_, "collisionSize_");
 	popWaitTime_ = globalParameter_->GetValue<float>(groupName_, "PopWaitTime");
 	damageTime_ = globalParameter_->GetValue<float>(groupName_, "DamageTime");
 	dagameDistance_ = globalParameter_->GetValue<float>(groupName_, "DamageDistance");
@@ -292,3 +295,8 @@ void UFO::SetColor(const Vector4& color) {
 	model_->SetColor(color);
 }
 
+void  UFO::SetCollisionSize(const Vector3& size) {
+	collider_->SetWidth(size.x);
+	collider_->SetHeight(size.y);
+	collider_->SetDepth(size.z);
+}

@@ -42,6 +42,8 @@ private:
 	float damageTime_;
 	float damageValue_;
 
+	Vector3 collisionSize_;
+
 	Vector4 ufoLightColor_ = { 0.796f,0.796f,0.129f,0.5f };
 
 	///* obj
@@ -96,4 +98,5 @@ public:
 	/// ===================================================
 	void SetEnemyManager(EnemyManager*enemymanager);
 	void SetColor(const Vector4& color);
+	void SetCollisionSize(const Vector3& size);
 };
