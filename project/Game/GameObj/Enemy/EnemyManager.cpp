@@ -178,7 +178,7 @@ void EnemyManager::AddParmGroup() {
 		globalParameter_->AddItem(
 			groupName_,
 			"DeathCount" + std::to_string(int(i + 1)),
-			paramaters_[i].deathCount);
+			paramaters_[i].deathCountMax);
 	}
 
 }
@@ -225,7 +225,7 @@ void EnemyManager::SetValues() {
 		globalParameter_->SetValue(
 			groupName_,
 			"DeathCount" + std::to_string(int(i + 1)),
-			paramaters_[i].deathCount);
+			paramaters_[i].deathCountMax);
 	}
 
 }
@@ -261,7 +261,7 @@ void EnemyManager::ApplyGlobalParameter() {
 			groupName_,
 			"attenuate_" + std::to_string(int(i + 1)));
 
-		paramaters_[i].deathCount = globalParameter_->GetValue<int>(
+		paramaters_[i].deathCountMax = globalParameter_->GetValue<int>(
 			groupName_,
 			"DeathCount" + std::to_string(int(i + 1)));
 	}
@@ -309,7 +309,7 @@ void EnemyManager::AdjustParm() {
 			0.01f);
 
 		ImGui::SliderInt("DeathCount",
-			&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].deathCount,0,10);
+			&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].deathCountMax,0,10);
 
 		ImGui::PopID();
 
@@ -346,7 +346,7 @@ void EnemyManager::AdjustParm() {
 			0.01f);
 
 		ImGui::SliderInt("DeathCount",
-			&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].deathCount, 0, 10);
+			&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].deathCountMax, 0, 10);
 
 		ImGui::PopID();
 		/// セーブとロード
