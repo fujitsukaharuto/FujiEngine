@@ -29,6 +29,18 @@ void ImGuiManager::Init(
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGui::StyleColorsDark();
+	/// style
+	ImGui::GetStyle().FrameRounding = 4;
+	ImGui::GetStyle().TabRounding = 8;
+	ImGui::GetStyle().Colors[33] = { 0.55f,0.588f,0.632f,0.8f };
+	ImGui::GetStyle().Colors[34] = { 0.091f,0.179f,0.299f,0.862f };
+	ImGui::GetStyle().Colors[35] = { 0.109f,0.522f,0.0f,1.0f };
+	
+	/// font
+	ImGuiIO& io = ImGui::GetIO();
+	io.Fonts->AddFontFromFileTTF("imgui/FiraMono-Medium.ttf", 15.0f);
+
+
 	ImGui_ImplWin32_Init(myWin->GetHwnd());
 	ImGui_ImplDX12_Init(
 		dxCommon_->GetDevice(), static_cast<int>(dxCommon_->GetBackBufferCount()),
@@ -38,8 +50,8 @@ void ImGuiManager::Init(
 
 	ImGuiPlatformIO& platform_io = ImGui::GetPlatformIO();
 	platform_io;
-	ImGuiIO& io = ImGui::GetIO();
-	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;  // Dockingを有効化
+	ImGuiIO& io2 = ImGui::GetIO();
+	io2.ConfigFlags |= ImGuiConfigFlags_DockingEnable;  // Dockingを有効化
 
 
 #endif // _DEBUG
