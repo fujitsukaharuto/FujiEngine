@@ -212,7 +212,7 @@ float BaseEnemy::GetBoundPower()const {
 	remainingRate = std::clamp(remainingRate, 0.0f, 1.0f); // 範囲を制限
 
 	// 減衰率に基づくジャンプ速度の計算
-	float baseSpeed = paramater_.baseBoundPower; // 初期ジャンプ力を基準とする
+	float baseSpeed = paramater_.boundPower; // 初期ジャンプ力を基準とする
 	float scaledSpeed = baseSpeed * std::pow(remainingRate, paramater_.attenuate); // 減衰を2乗で適用
 	return scaledSpeed;
 }

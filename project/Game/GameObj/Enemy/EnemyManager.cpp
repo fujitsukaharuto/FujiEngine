@@ -167,7 +167,7 @@ void EnemyManager::AddParmGroup() {
 		globalParameter_->AddItem(
 			groupName_,
 			"baseBoundPower_" + std::to_string(int(i + 1)),
-			paramaters_[i].baseBoundPower);
+			paramaters_[i].boundPower);
 
 		globalParameter_->AddItem(
 			groupName_,
@@ -224,7 +224,7 @@ void EnemyManager::SetValues() {
 		globalParameter_->SetValue(
 			groupName_,
 			"baseBoundPower_" + std::to_string(int(i + 1)),
-			paramaters_[i].baseBoundPower);
+			paramaters_[i].boundPower);
 
 		globalParameter_->SetValue(
 			groupName_,
@@ -278,7 +278,7 @@ void EnemyManager::ApplyGlobalParameter() {
 			groupName_,
 			"WeakJump" + std::to_string(int(i + 1)));
 
-		paramaters_[i].baseBoundPower = globalParameter_->GetValue<float>(
+		paramaters_[i].boundPower = globalParameter_->GetValue<float>(
 			groupName_,
 			"baseBoundPower_" + std::to_string(int(i + 1)));
 
@@ -350,7 +350,7 @@ void EnemyManager::AdjustParm() {
 			0.01f);
 
 		ImGui::DragFloat("BaseBoundPower",
-			&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].baseBoundPower,
+			&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].boundPower,
 			0.01f);
 
 		ImGui::DragFloat("BoundAttenuate",
@@ -397,8 +397,8 @@ void EnemyManager::AdjustParm() {
 			&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].jumpSpeed[0],
 			0.01f);
 
-		ImGui::DragFloat("BaseBoundPower",
-			&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].baseBoundPower,
+		ImGui::DragFloat("BoundPower",
+			&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].boundPower,
 			0.01f);
 
 		ImGui::DragFloat("BoundAttenuate",

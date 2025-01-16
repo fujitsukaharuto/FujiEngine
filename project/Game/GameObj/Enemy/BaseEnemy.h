@@ -30,7 +30,7 @@ public:
 		float                attackValue;
 		float                gravityForKik;
 		float                gravityForBound;
-		float                baseBoundPower;
+		float                boundPower;
 		float                attenuate;
 		float                maxFallSpeedForKik;
 		float                maxFallSpeedForBound;

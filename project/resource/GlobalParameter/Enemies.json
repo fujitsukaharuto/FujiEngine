@@ -16,9 +16,9 @@
         "baseBoundPower_2": 0.0,
         "gravityForBound1": 1.3899999856948853,
         "gravityForBound2": 0.0,
-        "maxFallSpeedForBound1": 0.33000001311302185,
+        "maxFallSpeedForBound1": 0.5,
         "maxFallSpeedForBound2": 0.0,
-        "maxFallSpeedForKik1": 0.30000001192092896,
+        "maxFallSpeedForKik1": 0.5099999904632568,
         "maxFallSpeedForKik2": 0.0
     }
 }
