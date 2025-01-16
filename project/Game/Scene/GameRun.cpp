@@ -15,6 +15,8 @@ void GameRun::Initialize() {
 
 #pragma region テクスチャ読み込み
 	textureManager_->Load("uvChecker.png");
+	textureManager_->Load("title_none.png");
+	textureManager_->Load("key.png");
 #pragma endregion
 
 
@@ -23,6 +25,7 @@ void GameRun::Initialize() {
 	modelManager_->LoadOBJ("Fence.obj");
 	modelManager_->LoadOBJ("terrain.obj");
 	modelManager_->LoadOBJ("ufo_test.obj");
+	modelManager_->LoadOBJ("SkyDome.obj");
 #pragma endregion
 
 
