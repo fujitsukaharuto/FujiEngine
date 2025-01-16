@@ -123,6 +123,8 @@ void GameScene::Draw() {
 	ufo_->Draw();
 	
 
+	ufo_->UFOLightDraw();
+
 	ParticleManager::GetInstance()->Draw();
 	Line3dDrawer::GetInstance()->Render();
 

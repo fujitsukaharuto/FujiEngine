@@ -42,6 +42,11 @@ private:
 	float damageTime_;
 	float damageValue_;
 
+	Vector4 ufoLightColor_ = { 0.796f,0.796f,0.129f,0.5f };
+
+	///* obj
+	std::unique_ptr<Object3d> ufoLight_;
+
 public:
 	static float InitY_;
 	UFO();
@@ -53,6 +58,7 @@ public:
 	void Initialize()override;
 	void Update()override;
 	void Draw(Material* mate = nullptr)override;
+	void UFOLightDraw();
 
 	void Move();
 	void EnemySpawn();

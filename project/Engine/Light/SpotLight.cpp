@@ -12,7 +12,7 @@ void SpotLight::Initialize() {
 	spotLightData_->position = { 0.0f,2.0f,0.0f };
 	spotLightData_->intensity = 1.0f;
 	spotLightData_->distance = 6.0f;
-	spotLightData_->direction = Vector3({ -1.0f,-1.0f,0.0f }).Normalize();
+	spotLightData_->direction = Vector3({ 0.0f,-1.0f,0.0f }).Normalize();
 	spotLightData_->decay = 2.0f;
 	spotLightData_->cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
 	spotLightData_->cosFalloffStart = 3.0f;

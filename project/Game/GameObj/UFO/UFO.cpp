@@ -7,6 +7,8 @@
 #include"GameObj/Enemy/EnemyManager.h"
 #include"GameObj/Enemy/BaseEnemy.h"
 
+#include "PointLightManager.h"
+
 ///* imgui
 #include<imgui.h> 
 
@@ -22,6 +24,13 @@ void UFO::Initialize() {
 
 	OriginGameObject::Initialize();
 	OriginGameObject::SetModel("ufo_test.obj");
+
+	ufoLight_ = std::make_unique<Object3d>();
+	ufoLight_->Create("ufo_light.obj");
+	ufoLight_->SetParent(model_.get());
+	ufoLight_->SetColor(ufoLightColor_);
+
+	PointLightManager::GetInstance()->GetSpotLight(0)->spotLightData_->position = model_->transform.translate;
 
 	///* グローバルパラメータ
 	globalParameter_ = GlobalVariables::GetInstance();
@@ -64,6 +73,8 @@ void UFO::Update() {
 
 	/// 更新
 	//base::Update();
+
+	PointLightManager::GetInstance()->GetSpotLight(0)->spotLightData_->position = model_->transform.translate;
 }
 
 /// ===================================================
@@ -73,6 +84,10 @@ void UFO::Draw(Material* material) {
 
 	OriginGameObject::Draw(material);
 	collider_->DrawCollider();
+}
+
+void UFO::UFOLightDraw() {
+	ufoLight_->Draw();
 }
 
 
@@ -189,6 +204,16 @@ void UFO::AdjustParm() {
 		ParmLoadForImGui();
 		ImGui::PopID();
 	}
+
+
+	ImGui::Begin("lightSetting");
+	ImGui::DragFloat3("lightSize", &ufoLight_->transform.scale.x, 0.1f);
+	ImGui::DragFloat3("lightPos", &ufoLight_->transform.translate.x, 0.1f);
+	ImGui::ColorEdit4("ufoLightColor", &ufoLightColor_.x);
+	ufoLight_->SetColor(ufoLightColor_);
+	ImGui::End();
+
+	PointLightManager::GetInstance()->GetSpotLight(0)->Debug();
 
 #endif // _DEBUG
 }
