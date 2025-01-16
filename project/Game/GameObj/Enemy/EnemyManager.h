@@ -13,23 +13,10 @@
 
 class Player;
 class LockOn;
+enum class  Type;
+struct BaseEnemy::Paramater;
 class EnemyManager {
-    enum class Type {
-        NORMAL,
-        STRONG,
-    };
-private:
-    struct Paramater {
-       float fallSpeed_;
-       float attackValue_;
-       float gravity_;
-       std::array<float, 1>jumpSpeed_;
-    };
-
-private:
-
    
-
     ///========================================================
     /// Private variants
     ///========================================================
@@ -42,7 +29,7 @@ private:
     GlobalVariables* globalParameter_;            /// グローバルパラメータ
     const std::string groupName_ = "Enemies";     /// グループ名
   
-    std::array<Paramater, 2>paramaters_;
+    std::array<BaseEnemy::Paramater, 2>paramaters_;
   
     bool isEditorMode_;                          // エディタモード中かどうか
   

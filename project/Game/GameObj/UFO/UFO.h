@@ -42,6 +42,8 @@ private:
 	float damageTime_;
 	float damageValue_;
 
+	Vector3 collisionSize_;
+
 public:
 	static float InitY_;
 	UFO();
@@ -90,4 +92,5 @@ public:
 	/// ===================================================
 	void SetEnemyManager(EnemyManager*enemymanager);
 	void SetColor(const Vector4& color);
+	void SetCollisionSize(const Vector3& size);
 };

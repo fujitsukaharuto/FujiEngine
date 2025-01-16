@@ -272,6 +272,9 @@
     <ClCompile Include="Game\GameObj\UFO\Behavior\UFODamage.cpp">
       <Filter>Game\Behavior\UFO</Filter>
     </ClCompile>
+    <ClCompile Include="Game\GameObj\Enemy\Behavior\EnemyBound.cpp">
+      <Filter>Game\Behavior\Enemy</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Audio\Audio.h">
@@ -561,6 +564,9 @@
     </ClInclude>
     <ClInclude Include="Game\GameObj\UFO\Behavior\UFODamage.h">
       <Filter>Game\Behavior\UFO</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\Enemy\Behavior\EnemyBound.h">
+      <Filter>Game\Behavior\Enemy</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

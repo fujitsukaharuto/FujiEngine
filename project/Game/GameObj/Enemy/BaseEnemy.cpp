@@ -128,7 +128,7 @@ void BaseEnemy::Fall(float& speed, const bool& isJump) {
 		model_->transform.translate.y += speed;
 	}
 	// 加速する
-	speed = max(speed - (gravity_ * FPSKeeper::NormalDeltaTime()), -0.7f);
+	speed = max(speed - (paramater_.gravity * FPSKeeper::NormalDeltaTime()), -0.7f);
 
 	// 着地
 	if (model_->transform.translate.y <= BaseEnemy::InitY_) {
@@ -183,11 +183,10 @@ void BaseEnemy::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
 }
 
 
-void BaseEnemy::SetParm(const float& fallSpeed, const float& attackValue, const float& gravity, const std::array<float, 1>& jumpSpeed) {
-	fallSpeed_ = fallSpeed;
-	attackValue_ = attackValue;
-	gravity_ = gravity;
-	jumpSpeed_ = jumpSpeed;
+void BaseEnemy::SetParm(const Type& type,const Paramater& paramater) {
+	type_ = type;
+	paramater_ = paramater;
+	deathCountMax_ = paramater.deathCount;
 }
 
 
@@ -204,4 +203,15 @@ void BaseEnemy::ChangeBehavior(std::unique_ptr<BaseEnemyBehaivor>behavior) {
 
 void   BaseEnemy::SetIsCollision(const bool& is) {
 	jumpCollider_->SetIsCollisonCheck(is);
+}
+
+float BaseEnemy::GetBoundPower()const {
+	// 減衰率を計算 (0～1)
+	float remainingRate = (float(deathCountMax_) - float((deathCountMax_- paramater_.deathCount))) / float(deathCountMax_);
+	remainingRate = std::clamp(remainingRate, 0.0f, 1.0f); // 範囲を制限
+
+	// 減衰率に基づくジャンプ速度の計算
+	float baseSpeed = paramater_.baseBoundPower; // 初期ジャンプ力を基準とする
+	float scaledSpeed = baseSpeed * std::pow(remainingRate, paramater_.attenuate); // 減衰を2乗で適用
+	return scaledSpeed;
 }
