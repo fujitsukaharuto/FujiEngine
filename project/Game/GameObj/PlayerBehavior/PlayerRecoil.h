@@ -25,7 +25,8 @@ public:
 	~PlayerRecoil();
 
 	void Update()override;
-
 	void Debug()override;
 
+	void JumpForBotton();
+	void JumpForJoyState();
 };

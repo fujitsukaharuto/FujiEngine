@@ -1,7 +1,9 @@
 #include "PlayerRecoil.h"
 #include "PlayerRoot.h"
+#include"PlayerJump.h"
 
 #include "Game/GameObj/Player/Player.h"
+#include"Game/GameObj/JoyState/JoyState.h"
 #include "DX/FPSKeeper.h"
 
 /// ===================================================
@@ -29,16 +31,13 @@ void PlayerRecoil::Update() {
 	 /// 反動
 	 ///-------------------------------------------------------------------------------------
 
-		pPlayer_->SetRotationZ((pPlayer_->GetFacingDirection() * 10.0f)*FPSKeeper::NormalDeltaTime() );
-
 		/// X軸の逆方向に吹っ飛ぶ
-		pPlayer_->AddPosition(Vector3(-pPlayer_->GetFacingDirection() * (pPlayer_->GetRecoilSpeed() * FPSKeeper::NormalDeltaTime()), 0, 0));
 		pPlayer_->Jump(jumpSpeed_);
+		pPlayer_->Move(pPlayer_->GetAirMoveSpeed());
 
 		/// 地面につく
 		if (pPlayer_->GetTrans().translate.y > Player::InitY_)break;
 		pPlayer_->GetTrans().translate.y = Player::InitY_;
-		pPlayer_->SetRotationZ(0.0f);
 
 		step_ = Step::RETUNROOT;
 
@@ -49,12 +48,39 @@ void PlayerRecoil::Update() {
 	///-------------------------------------------------------------------------------------
 
 		pPlayer_->ChangeBehavior(std::make_unique<PlayerRoot>(pPlayer_));
+		return;
 		break;
+
 	default:
 		break;
 	}
+	if (this) {
+		JumpForBotton();
+	}
+}
+
+void PlayerRecoil::JumpForBotton() {
+	//　ジャンプに切り替え
+	if (Input::GetInstance()->PushKey(DIK_J)) {
+		pPlayer_->ChangeBehavior(std::make_unique<PlayerJump>(pPlayer_));
+		return;
+	}
+	else {
+		JumpForJoyState();//コントローラジャンプ
+		return;
+	}
+}
+
+void PlayerRecoil::JumpForJoyState() {
+
+	if (!(Input::GetInstance()->GetGamepadState(joyState))) return;
+
+	if (!((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A))) return;
+
+	pPlayer_->ChangeBehavior(std::make_unique<PlayerJump>(pPlayer_));
 
 }
+
 
 /// デバッグ用
 void PlayerRecoil::Debug() {
