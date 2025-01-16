@@ -25,17 +25,17 @@ void PlayerRecoil::Update() {
 	switch (step_)
 	{
 	case Step::RECOIL:
-	///-------------------------------------------------------------------------------------
+	 ///-------------------------------------------------------------------------------------
 	 /// 反動
 	 ///-------------------------------------------------------------------------------------
 
 		pPlayer_->SetRotationZ((pPlayer_->GetFacingDirection() * 10.0f)*FPSKeeper::NormalDeltaTime() );
 
-		// X軸の逆方向に吹っ飛ぶ
+		/// X軸の逆方向に吹っ飛ぶ
 		pPlayer_->AddPosition(Vector3(-pPlayer_->GetFacingDirection() * (pPlayer_->GetRecoilSpeed() * FPSKeeper::NormalDeltaTime()), 0, 0));
 		pPlayer_->Jump(jumpSpeed_);
 
-		// 地面につく
+		/// 地面につく
 		if (pPlayer_->GetTrans().translate.y > Player::InitY_)break;
 		pPlayer_->GetTrans().translate.y = Player::InitY_;
 		pPlayer_->SetRotationZ(0.0f);

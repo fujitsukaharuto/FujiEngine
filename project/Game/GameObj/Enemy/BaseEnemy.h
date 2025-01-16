@@ -13,6 +13,7 @@ class BaseEnemy : public OriginGameObject {
 private:
 	std::unique_ptr<AABBCollider>collider_;
 	std::unique_ptr<AABBCollider>jumpCollider_;
+
 public:
 	enum class Type {
 		NORMAL,
@@ -44,9 +45,6 @@ protected:
 	Player*              pPlayer_;
 			             
 	bool                 isdeath_;
-	float                hp_;
-	float                HPMax_;
-	Vector2              hpbarSize_;
 	Easing               spawnEasing_;
 
 	/// parm
@@ -82,13 +80,13 @@ public:
 
 	void SetParm(const Type&type,const Paramater&paramater);
 
-	void DamageForPar(const float& par);
 	void ChangeBehavior(std::unique_ptr<BaseEnemyBehaivor>behavior);
 
 	void OnCollisionEnter(const ColliderInfo& other);
 	void OnCollisionStay(const ColliderInfo& other);
 	BaseCollider* GetCollider() { return collider_.get(); }
 	BaseCollider* GetJumpCollider() { return jumpCollider_.get(); }
+
 	///========================================================================================
 	///  getter method
 	///========================================================================================

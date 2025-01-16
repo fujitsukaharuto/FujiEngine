@@ -83,11 +83,11 @@ void EnemyManager::Update() {
 		(*it)->Update(); // 更新
 
 		if ((*it)->GetIsDeath()) {
-			it = enemies_.erase(it); // 削除して次の要素を指すイテレータを取得
-			//UpdateEnemyClearedFlag(); // フラグを更新
+			it = enemies_.erase(it); /// 削除して次の要素を指すイテレータを取得
+			///UpdateEnemyClearedFlag(); // フラグを更新
 		}
 		else {
-			++it; // 削除しない場合はイテレータを進める
+			++it; /// 削除しない場合はイテレータを進める
 		}
 	}
 }
@@ -127,11 +127,11 @@ void EnemyManager::SetEditorMode(bool isEditorMode) {
 ///=================================================================================
 void EnemyManager::ParmLoadForImGui() {
 
-	// ロードボタン
+	/// ロードボタン
 	if (ImGui::Button(std::format("Load {}", groupName_).c_str())) {
 
 		globalParameter_->LoadFile(groupName_);
-		// セーブ完了メッセージ
+		/// セーブ完了メッセージ
 		ImGui::Text("Load Successful: %s", groupName_.c_str());
 		ApplyGlobalParameter();
 	}

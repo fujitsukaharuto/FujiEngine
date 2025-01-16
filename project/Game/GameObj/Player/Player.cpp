@@ -71,9 +71,9 @@ void Player::Update() {
 	DamageRendition();
 	/// 振る舞い処理
 	behavior_->Update();
-	if (!dynamic_cast<PlayerRecoil*>(behavior_.get())) {
-		attackBehavior_->Update();
-	}
+	
+	attackBehavior_->Update();
+	
 	//　移動制限
 	MoveToLimit();
 
@@ -193,8 +193,8 @@ bool Player::GetIsMoving() {
 		if ((StickVelocity).Length() > thresholdValue) {
 			isMoving = true;
 		};
-	
 	}
+
 	return isMoving;
 }
 
@@ -402,6 +402,7 @@ void Player::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 	if (other.tag == "Enemy") {
 		
 		SetIsCollision(false);
+		ChangeBehavior(std::make_unique<PlayerRecoil>(this));
 		ChangeAttackBehavior(std::make_unique<PlayerAttackRoot>(this));
 		return;
 	}

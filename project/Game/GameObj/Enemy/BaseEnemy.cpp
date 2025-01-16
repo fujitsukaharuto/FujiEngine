@@ -145,24 +145,7 @@ void BaseEnemy::Fall(float& speed, const bool& isJump) {
 }
 
 
-//割合によるダメージ
-void BaseEnemy::DamageForPar(const float& par) {
 
-	//割合によるインクる面とする値を決める
-	float decrementSize = HPMax_ * par;
-	// HP減少
-	hp_ -= decrementSize;
-
-	////HPが0以下にならないように
-	//if (hp_ <= 0) {
-
-	//	hp_ = 0.0f;
-	//	isdeath_ = true;
-	//	//// 死亡処理
-	//	//DeathMethod();
-	//	//HP_ = 0.0f;
-	//}
-}
 
 void BaseEnemy::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 
@@ -221,5 +204,7 @@ float BaseEnemy::GetBoundPower()const {
 void BaseEnemy::DecrementDeathCount() {
 	deathCount_--;
 	deathCount_ = max(deathCount_, 0);
-
+	if (deathCount_ <= 0) {
+		isdeath_ = true;
+	}
 }
