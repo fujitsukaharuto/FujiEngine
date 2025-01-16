@@ -17,7 +17,7 @@ GameScene::~GameScene() {
 
 void GameScene::Initialize() {
 	Init();
-
+	GlobalVariables::GetInstance()->LoadFiles();
 	///-------------------------------------------------------------
 	///　生成
 	///-------------------------------------------------------------- 

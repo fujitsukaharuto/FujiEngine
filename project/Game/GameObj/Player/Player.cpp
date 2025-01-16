@@ -20,9 +20,6 @@
 ///* imgui
 #include<imgui.h> 
 
-///プレイヤーの仕様書**************************************************************************
-/// https://docs.google.com/document/u/0/d/1lUpgCc6XqLgLKEJcuu56m6yqqhdGDwCGz_9dRb5ebM0/edit
-///*****************************************************************************************
 
 float Player::InitY_ = 1.5f;
 
@@ -158,7 +155,7 @@ void Player::Move(const float& speed) {
 		objectiveAngle_ = std::atan2(velocity_.x, velocity_.z);
 
 		// 最短角度補間でプレイヤーの回転を更新
-		model_->transform.rotate.y = LerpShortAngle(model_->transform.rotate.y, objectiveAngle_, 0.3f);
+		model_->transform.rotate.y = LerpShortAngle(model_->transform.rotate.y, objectiveAngle_, 0.5f);
 	}
 }
 
