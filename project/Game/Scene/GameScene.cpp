@@ -305,20 +305,20 @@ void GameScene::MenuInit() {
 
 	menuPaneru_ = std::make_unique<Sprite>();
 	menuPaneru_->Load("white2x2.png");
-	menuPaneru_->SetColor({ 0.78f,0.78f,0.78f,0.5f });
+	menuPaneru_->SetColor({ 0.78f,0.78f,0.78f,0.4f });
 	menuPaneru_->SetSize({ 1280.0f,950.0f });
 	menuPaneru_->SetAnchor({ 0.0f,0.0f });
 
 	menuButton1_ = std::make_unique<Sprite>();
-	menuButton1_->Load("white2x2.png");
-	menuButton1_->SetColor({ 1.0f,0.0f,1.0f,0.5f });
+	menuButton1_->Load("menu_button1.png");
+	menuButton1_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
 	menuButton1_->SetSize({ 300.0f,100.0f });
 	menuButton1_->SetAnchor({ 0.5f,0.5f });
 	menuButton1_->SetPos({ 400.0f,350.0f,0.0f });
 
 	menuButton2_ = std::make_unique<Sprite>();
-	menuButton2_->Load("white2x2.png");
-	menuButton2_->SetColor({ 1.0f,0.0f,1.0f,0.5f });
+	menuButton2_->Load("menu_button2.png");
+	menuButton2_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
 	menuButton2_->SetSize({ 300.0f,100.0f });
 	menuButton2_->SetAnchor({ 0.5f,0.5f });
 	menuButton2_->SetPos({ 400.0f,600.0f,0.0f });
