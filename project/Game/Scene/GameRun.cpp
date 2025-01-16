@@ -83,7 +83,6 @@ void GameRun::Update() {
 	cameraManager_->Update();
 
 #ifdef _DEBUG
-	ImGui::ShowDemoWindow();
 	if (input_->TriggerKey(DIK_F12)) {
 		if (cameraManager_->GetDebugMode()) {
 			cameraManager_->SetDebugMode(false);
