@@ -76,6 +76,7 @@ void PlayerJumpBehavior::Jump() {
 			isFall_ = false;
 			isUnCharge_ = true;
 			pPlayer_->EmitJumpAttack();
+			CameraManager::GetInstance()->GetCamera()->SetShakeTime(20.0f);
 		}
 
 		if (pPlayer_->GetFireModel()->transform.scale.x > 0.0f) {

@@ -132,6 +132,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\GraphicPipeline\PipelineManager.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\PlaneDrawerPipe.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\ShockWavePipe.cpp" />
+    <ClCompile Include="Engine\GraphicPipeline\SlashPipe.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\ThunderPipe.cpp" />
     <ClCompile Include="Engine\ImGuiManager\ImGuiManager.cpp" />
     <ClCompile Include="Engine\Input\Input.cpp" />
@@ -167,6 +168,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\GameObj\Player\PlayerAttackBehavior.cpp" />
     <ClCompile Include="Game\GameObj\Player\PlayerDushBehavior.cpp" />
     <ClCompile Include="Game\GameObj\Player\PlayerJumpBehavior.cpp" />
+    <ClCompile Include="Game\GameObj\Player\SlashDrawer.cpp" />
     <ClCompile Include="Game\OriginGameObject.cpp" />
     <ClCompile Include="Game\Collider\BaseCollider.cpp" />
     <ClCompile Include="Game\Collider\AABBCollider.cpp" />
@@ -205,6 +207,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\GraphicPipeline\PipelineManager.h" />
     <ClInclude Include="Engine\GraphicPipeline\PlaneDrawerPipe.h" />
     <ClInclude Include="Engine\GraphicPipeline\ShockWavePipe.h" />
+    <ClInclude Include="Engine\GraphicPipeline\SlashPipe.h" />
     <ClInclude Include="Engine\GraphicPipeline\ThunderPipe.h" />
     <ClInclude Include="Engine\ImGuiManager\ImGuiManager.h" />
     <ClInclude Include="Engine\Input\Input.h" />
@@ -244,6 +247,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Game\GameObj\Player\PlayerAttackBehavior.h" />
     <ClInclude Include="Game\GameObj\Player\PlayerDushBehavior.h" />
     <ClInclude Include="Game\GameObj\Player\PlayerJumpBehavior.h" />
+    <ClInclude Include="Game\GameObj\Player\SlashDrawer.h" />
     <ClInclude Include="Game\OriginGameObject.h" />
     <ClInclude Include="Game\Collider\BaseCollider.h" />
     <ClInclude Include="Game\Collider\AABBCollider.h" />
@@ -362,6 +366,18 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
+    <FxCompile Include="resource\Shaders\SlashDrawer.PS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\SlashDrawer.VS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="resource\Shaders\Thunder.PS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
@@ -385,6 +401,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </None>
     <None Include="resource\Shaders\Particle.hlsli">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
+    <None Include="resource\Shaders\SlashDrawer.hlsli">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </None>

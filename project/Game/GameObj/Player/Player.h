@@ -7,6 +7,7 @@
 #include "Game/OriginState.h"
 #include "Particle/ParticleEmitter.h"
 #include "Audio/Audio.h"
+#include "Game/GameObj/Player/SlashDrawer.h"
 
 class LockOn;
 
@@ -25,6 +26,7 @@ public:
 	void Initialize()override;
 	void Update()override;
 	void Draw(Material* mate = nullptr)override;
+	void SlashDraw();
 
 	void BehaviorRequest();
 	void SetState(std::unique_ptr<OriginState> behaviorState) { state_ = std::move(behaviorState); }
@@ -75,6 +77,8 @@ private:
 	std::unique_ptr<Object3d> body_;
 	std::unique_ptr<Object3d> weapon_;
 	std::unique_ptr<Object3d> firePlane_ = nullptr;
+
+	std::unique_ptr<SlashDrawer> slash_;
 
 	std::unique_ptr<AABBCollider> collider_ = nullptr;
 	std::unique_ptr<AABBCollider> colliderAttack_ = nullptr;

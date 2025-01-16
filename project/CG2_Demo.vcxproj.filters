@@ -212,6 +212,12 @@
     <ClCompile Include="Engine\GraphicPipeline\PlaneDrawerPipe.cpp">
       <Filter>Engine\GraphicPipeline</Filter>
     </ClCompile>
+    <ClCompile Include="Game\GameObj\Player\SlashDrawer.cpp">
+      <Filter>Game\GameObj\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\GraphicPipeline\SlashPipe.cpp">
+      <Filter>Engine\GraphicPipeline</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -442,6 +448,12 @@
     <ClInclude Include="Engine\GraphicPipeline\PlaneDrawerPipe.h">
       <Filter>Engine\GraphicPipeline</Filter>
     </ClInclude>
+    <ClInclude Include="Game\GameObj\Player\SlashDrawer.h">
+      <Filter>Game\GameObj\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\GraphicPipeline\SlashPipe.h">
+      <Filter>Engine\GraphicPipeline</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -587,6 +599,12 @@
     <FxCompile Include="resource\Shaders\PlaneDrawer.PS.hlsl">
       <Filter>resource\Shaders</Filter>
     </FxCompile>
+    <FxCompile Include="resource\Shaders\SlashDrawer.VS.hlsl">
+      <Filter>resource\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\SlashDrawer.PS.hlsl">
+      <Filter>resource\Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="resource\Shaders\Object3d.hlsli">
@@ -596,6 +614,9 @@
       <Filter>resource\Shaders</Filter>
     </None>
     <None Include="resource\Shaders\Line3d.hlsli">
+      <Filter>resource\Shaders</Filter>
+    </None>
+    <None Include="resource\Shaders\SlashDrawer.hlsli">
       <Filter>resource\Shaders</Filter>
     </None>
   </ItemGroup>

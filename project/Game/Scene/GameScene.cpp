@@ -140,6 +140,8 @@ void GameScene::Draw() {
 	sky->Draw();
 	player_->Draw();
 
+	player_->SlashDraw();
+
 	ParticleManager::GetInstance()->Draw();
 
 #ifdef _DEBUG

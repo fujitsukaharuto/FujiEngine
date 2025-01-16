@@ -46,6 +46,12 @@ void Player::Initialize() {
 	firePlane_->transform.scale.y = 1.13f;
 	firePlane_->transform.rotate = { 0.0f,1.48f,0.0f };
 
+
+	slash_ = std::make_unique<SlashDrawer>();
+	slash_->Initialize();
+	slash_->SetParent(model_.get());
+
+
 	collider_ = std::make_unique<AABBCollider>();
 	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
 	collider_->SetTag("player");
@@ -186,6 +192,7 @@ void Player::Update() {
 		firePlane_->SetUVScale({ 1.0f,1.0f });
 	}
 
+	slash_->Update();
 	model_->UpdateWVP();
 
 
@@ -202,6 +209,10 @@ void Player::Draw([[maybe_unused]]Material* mate) {
 	attackParticle2_.DrawSize();
 #endif // _DEBUG
 
+}
+
+void Player::SlashDraw() {
+	slash_->Draw();
 }
 
 void Player::BehaviorRequest() {
