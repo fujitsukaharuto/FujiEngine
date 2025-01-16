@@ -39,10 +39,13 @@ public:
 	/// </summary>
 	void Draw();
 
-	
+	void SetFontJapanese();
+	void UnSetFont();
+
 private:
 	DXCom* dxCommon_ = nullptr;
 	uint32_t srvIndex;
+	ImFont* font_japanese = nullptr;
 private:
 	ImGuiManager() = default;
 	~ImGuiManager() = default;

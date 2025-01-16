@@ -38,7 +38,11 @@ void ImGuiManager::Init(
 	
 	/// font
 	ImGuiIO& io = ImGui::GetIO();
-	io.Fonts->AddFontFromFileTTF("imgui/FiraMono-Medium.ttf", 15.0f);
+	io.Fonts->AddFontFromFileTTF("imgui/FiraMono-Medium.ttf", 16.0f);
+
+	ImFontConfig font_config;
+	font_config.SizePixels = 18.0f;
+	font_japanese = io.Fonts->AddFontFromFileTTF("imgui/NotoSansJP-Regular.ttf", 18.0f, &font_config, io.Fonts->GetGlyphRangesJapanese());
 
 
 	ImGui_ImplWin32_Init(myWin->GetHwnd());
@@ -96,4 +100,12 @@ void ImGuiManager::Draw()
 	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList);
 #endif // _DEBUG
 
+}
+
+void ImGuiManager::SetFontJapanese() {
+	ImGui::PushFont(font_japanese);
+}
+
+void ImGuiManager::UnSetFont() {
+	ImGui::PopFont();
 }
