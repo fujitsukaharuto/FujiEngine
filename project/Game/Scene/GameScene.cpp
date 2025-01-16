@@ -43,6 +43,8 @@ void GameScene::Initialize() {
 	black_->SetAnchor({ 0.0f,0.0f });
 #pragma endregion
 
+	MenuInit();
+
 	keyPaneru_ = std::make_unique<Sprite>();
 	keyPaneru_->Load("key.png");
 	keyPaneru_->SetAnchor({ 0.0f,0.0f });
@@ -71,31 +73,33 @@ void GameScene::Initialize() {
 void GameScene::Update() {
 
 	cMane_->Reset();
-	
+
 	ParamaterEdit();// パラメータエディター
 	BlackFade();
 
-	///-------------------------------------------------------------
-	///　更新
-	///-------------------------------------------------------------- 
-	field_->Update();
-	skydome_->Update();
-	player_->Update();
-	ufo_->Update();
-	gameCamera_->Update();
-	enemyManager_->Update();
+	Menu();
+	if (!isMenu_) {
+		///-------------------------------------------------------------
+		///　更新
+		///-------------------------------------------------------------- 
+		field_->Update();
+		skydome_->Update();
+		player_->Update();
+		ufo_->Update();
+		gameCamera_->Update();
+		enemyManager_->Update();
 
-	for (auto& enemy : enemyManager_->GetEnemies()) {
-		cMane_->AddCollider(enemy->GetCollider());
-		cMane_->AddCollider(enemy->GetJumpCollider());
+		for (auto& enemy : enemyManager_->GetEnemies()) {
+			cMane_->AddCollider(enemy->GetCollider());
+			cMane_->AddCollider(enemy->GetJumpCollider());
+		}
+		cMane_->AddCollider(ufo_->GetCollider());
+		cMane_->AddCollider(player_->GetWeakColliderCollider());
+		cMane_->CheckAllCollision();
+
+
+		ParticleManager::GetInstance()->Update();
 	}
-	cMane_->AddCollider(ufo_->GetCollider());
-	cMane_->AddCollider(player_->GetWeakColliderCollider());
-	cMane_->CheckAllCollision();
-	
-
-	ParticleManager::GetInstance()->Update();
-	
 }
 
 void GameScene::Draw() {
@@ -136,6 +140,11 @@ void GameScene::Draw() {
 	dxCommon_->PreSpriteDraw();
 
 	keyPaneru_->Draw();
+	if (isMenu_) {
+		menuPaneru_->Draw();
+		menuButton1_->Draw();
+		menuButton2_->Draw();
+	}
 	if (blackTime != 0.0f) {
 		black_->Draw();
 	}
@@ -160,7 +169,12 @@ void GameScene::BlackFade() {
 			}
 		}
 		else {
-			SceneManager::GetInstance()->ChangeScene("RESULT", 40.0f);
+			if (!isTitle_) {
+				SceneManager::GetInstance()->ChangeScene("RESULT", 40.0f);
+			}
+			else {
+				SceneManager::GetInstance()->ChangeScene("TITLE", 40.0f);
+			}
 		}
 	}
 	else {
@@ -190,6 +204,125 @@ void GameScene::BlackFade() {
 			}
 		}
 	}*/
+}
+
+void GameScene::Menu() {
+	XINPUT_STATE pad;
+	if (!isMenu_) {
+		if (Input::GetInstance()->TriggerKey(DIK_ESCAPE)) {
+			if (blackTime == 0.0f) {
+				isMenu_ = true;
+			}
+		}
+		else if (Input::GetInstance()->GetGamepadState(pad)) {
+			if (Input::GetInstance()->TriggerButton(PadInput::Start)) {
+				if (blackTime == 0.0f) {
+					isMenu_ = true;
+				}
+			}
+		}
+	}
+	else {
+		// esc
+		if (Input::GetInstance()->TriggerKey(DIK_ESCAPE)) {
+			if (blackTime == 0.0f) {
+				isMenu_ = false;
+			}
+		}
+		else if (Input::GetInstance()->GetGamepadState(pad)) {
+			if (Input::GetInstance()->TriggerButton(PadInput::Start)) {
+				if (blackTime == 0.0f) {
+					isMenu_ = false;
+				}
+			}
+		}
+
+		// セレクト
+		if (Input::GetInstance()->TriggerKey(DIK_W)) {
+			if (blackTime == 0.0f) {
+				nowSelect_ = 1;
+				menuButton1_->SetSize(buttonSizeMax_);
+				menuButton2_->SetSize({ 300.0f,100.0f });
+			}
+		}
+		else if (Input::GetInstance()->TriggerKey(DIK_S)) {
+			if (blackTime == 0.0f) {
+				nowSelect_ = 2;
+				menuButton1_->SetSize({ 300.0f,100.0f });
+				menuButton2_->SetSize(buttonSizeMax_);
+			}
+		}
+		else if (Input::GetInstance()->GetGamepadState(pad)) {
+			if (Input::GetInstance()->TriggerButton(PadInput::Up)) {
+				if (blackTime == 0.0f) {
+					nowSelect_ = 1;
+					menuButton1_->SetSize(buttonSizeMax_);
+					menuButton2_->SetSize({ 300.0f,100.0f });
+				}
+			}
+		}
+		else if (Input::GetInstance()->GetGamepadState(pad)) {
+			if (Input::GetInstance()->TriggerButton(PadInput::Down)) {
+				if (blackTime == 0.0f) {
+					nowSelect_ = 2;
+					menuButton1_->SetSize({ 300.0f,100.0f });
+					menuButton2_->SetSize(buttonSizeMax_);
+				}
+			}
+		}
+
+		// 決定
+		if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
+			if (blackTime == 0.0f) {
+				if (nowSelect_ == 1) {
+					isMenu_ = false;
+				}
+				else {
+					isChangeFase = true;
+					isTitle_ = true;
+				}
+			}
+		}
+		else if (Input::GetInstance()->GetGamepadState(pad)) {
+			if (Input::GetInstance()->TriggerButton(PadInput::A)) {
+				if (blackTime == 0.0f) {
+					if (nowSelect_ == 1) {
+						isMenu_ = false;
+					}
+					else {
+						isChangeFase = true;
+						isTitle_ = true;
+					}
+				}
+			}
+		}
+
+	}
+
+}
+
+void GameScene::MenuInit() {
+
+	menuPaneru_ = std::make_unique<Sprite>();
+	menuPaneru_->Load("white2x2.png");
+	menuPaneru_->SetColor({ 0.78f,0.78f,0.78f,0.4f });
+	menuPaneru_->SetSize({ 1280.0f,950.0f });
+	menuPaneru_->SetAnchor({ 0.0f,0.0f });
+
+	menuButton1_ = std::make_unique<Sprite>();
+	menuButton1_->Load("menu_button1.png");
+	menuButton1_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
+	menuButton1_->SetSize({ 300.0f,100.0f });
+	menuButton1_->SetAnchor({ 0.5f,0.5f });
+	menuButton1_->SetPos({ 400.0f,350.0f,0.0f });
+
+	menuButton2_ = std::make_unique<Sprite>();
+	menuButton2_->Load("menu_button2.png");
+	menuButton2_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
+	menuButton2_->SetSize({ 300.0f,100.0f });
+	menuButton2_->SetAnchor({ 0.5f,0.5f });
+	menuButton2_->SetPos({ 400.0f,600.0f,0.0f });
+
 }
 
 

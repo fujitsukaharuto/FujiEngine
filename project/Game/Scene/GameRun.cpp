@@ -17,6 +17,8 @@ void GameRun::Initialize() {
 	textureManager_->Load("uvChecker.png");
 	textureManager_->Load("title_none.png");
 	textureManager_->Load("key.png");
+	textureManager_->Load("menu_button1.png");
+	textureManager_->Load("menu_button2.png");
 #pragma endregion
 
 
