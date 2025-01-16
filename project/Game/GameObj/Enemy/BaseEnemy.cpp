@@ -30,6 +30,7 @@ void BaseEnemy::Initialize() {
 	///spawn
 	spawnEasing_.time = 0.0f;
 	spawnEasing_.maxTime = 0.8f;
+	deathCount_ = paramater_.deathCountMax;
 	model_->transform.scale = Vector3::GetZeroVec();
 	
 	// collider
@@ -186,7 +187,7 @@ void BaseEnemy::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
 void BaseEnemy::SetParm(const Type& type,const Paramater& paramater) {
 	type_ = type;
 	paramater_ = paramater;
-	deathCountMax_ = paramater.deathCount;
+
 }
 
 
@@ -207,11 +208,18 @@ void   BaseEnemy::SetIsCollision(const bool& is) {
 
 float BaseEnemy::GetBoundPower()const {
 	// 減衰率を計算 (0～1)
-	float remainingRate = (float(deathCountMax_) - float((deathCountMax_- paramater_.deathCount))) / float(deathCountMax_);
+	float remainingRate = (float(paramater_.deathCountMax) - float((paramater_.deathCountMax - deathCount_))) / float(paramater_.deathCountMax);
 	remainingRate = std::clamp(remainingRate, 0.0f, 1.0f); // 範囲を制限
 
 	// 減衰率に基づくジャンプ速度の計算
 	float baseSpeed = paramater_.baseBoundPower; // 初期ジャンプ力を基準とする
 	float scaledSpeed = baseSpeed * std::pow(remainingRate, paramater_.attenuate); // 減衰を2乗で適用
 	return scaledSpeed;
+}
+
+
+void BaseEnemy::DecrementDeathCount() {
+	deathCount_--;
+	deathCount_ = max(deathCount_, 0);
+
 }

@@ -31,7 +31,7 @@ public:
 		float                gravity;
 		float                baseBoundPower;
 		float                attenuate;
-		int                  deathCount;
+		int                  deathCountMax;
 		std::array<float, 1> jumpSpeed;
 	};
 protected:
@@ -49,7 +49,7 @@ protected:
 	Paramater            paramater_;
 	float                damageParm_;
 	JumpPower            jumpPower_;
-	int                  deathCountMax_;
+	int                  deathCount_;
 	Type                 type_;
 	
 	/// behavior
@@ -91,8 +91,8 @@ public:
 	float              GetFallSpeed()const { return paramater_.fallSpeed; }
 	float              GetAttackValue()const { return paramater_.attackValue; }
 	float              GetGravity()const { return paramater_.gravity; }
-	int                GetDeathCount()const { return paramater_.deathCount; }
-	int                GetDeathCountMax()const { return deathCountMax_; }
+	int                GetDeathCount()const { return deathCount_; }
+	int                GetDeathCountMax()const { return paramater_.deathCountMax; }
 	float              GetBoundPower()const;
 	JumpPower          GetJumpPower()const { return jumpPower_; }
 	BaseEnemyBehaivor* GetBehavior()const { return behavior_.get(); }
@@ -103,5 +103,5 @@ public:
 	///========================================================================================
 	void SetPlayer(Player* plyaer);
 	void SetIsCollision(const bool& is);
-	void DecrementDeathCount() { paramater_.deathCount--; }
+	void DecrementDeathCount();
 };

@@ -7,7 +7,7 @@ class EnemyBound : public BaseEnemyBehaivor {
 private:
 	enum class Step {
 		BOUND,
-		RETUNROOT,
+		REBOUND,
 	};
 private:
 

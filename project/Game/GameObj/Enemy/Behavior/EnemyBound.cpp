@@ -16,6 +16,8 @@ EnemyBound::EnemyBound(BaseEnemy* boss)
 	
 	jumpSpeed_ = pBaseEnemy_->GetBoundPower();
 	pBaseEnemy_->SetIsCollision(true);
+
+	step_ = Step::BOUND;
 }
 
 EnemyBound::~EnemyBound() {
@@ -23,11 +25,31 @@ EnemyBound::~EnemyBound() {
 }
 
 void  EnemyBound::Update() {
-	
-	pBaseEnemy_->Jump(jumpSpeed_);
-	
+	switch (step_)
+	{
+	case EnemyBound::Step::BOUND:
+		///-------------------------------------------------------------
+       ///　バウンド
+       ///-------------------------------------------------------------- 
+		pBaseEnemy_->Jump(jumpSpeed_);
 
+		if (pBaseEnemy_->GetTrans().translate.y > BaseEnemy::InitY_)break;
+		pBaseEnemy_->DecrementDeathCount(); 
+		step_ = Step::REBOUND;
+		
+		break;
 
+	case EnemyBound::Step::REBOUND:
+		///-------------------------------------------------------------
+        ///　再バウンド
+        ///-------------------------------------------------------------- 
+		pBaseEnemy_->ChangeBehavior(std::make_unique<EnemyBound>(pBaseEnemy_));
+
+		break;
+	default:
+		break;
+	}
+	
 }
 
 void  EnemyBound::Debug() {
