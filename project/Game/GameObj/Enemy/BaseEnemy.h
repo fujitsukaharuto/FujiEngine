@@ -28,12 +28,16 @@ public:
 	struct Paramater {
 		float                fallSpeed;
 		float                attackValue;
-		float                gravity;
+		float                gravityForKik;
+		float                gravityForBound;
 		float                baseBoundPower;
 		float                attenuate;
+		float                maxFallSpeedForKik;
+		float                maxFallSpeedForBound;
 		int                  deathCountMax;
 		std::array<float, 1> jumpSpeed;
 	};
+
 protected:
 
 	/// other class
@@ -48,6 +52,8 @@ protected:
 	/// parm
 	Paramater            paramater_;
 	float                damageParm_;
+	float                maxFallSpeed_;
+	float                gravity_;
 	JumpPower            jumpPower_;
 	int                  deathCount_;
 	Type                 type_;
@@ -86,22 +92,27 @@ public:
 	///========================================================================================
 	///  getter method
 	///========================================================================================
-	bool               GetIsDeath()const { return isdeath_; }
-	Player*            GetPlayer() { return pPlayer_; }
-	float              GetFallSpeed()const { return paramater_.fallSpeed; }
-	float              GetAttackValue()const { return paramater_.attackValue; }
-	float              GetGravity()const { return paramater_.gravity; }
-	int                GetDeathCount()const { return deathCount_; }
-	int                GetDeathCountMax()const { return paramater_.deathCountMax; }
+	Player*            GetPlayer()                         { return pPlayer_; }
+	bool               GetIsDeath()const                   { return isdeath_; }
+	float              GetFallSpeed()const                 { return paramater_.fallSpeed; }
+	float              GetAttackValue()const               { return paramater_.attackValue; }
+	float              GetGravityForKik()const                   { return paramater_.gravityForKik; }
+	float              GetJumpSpeed(JumpPower num) const   { return paramater_.jumpSpeed[static_cast<size_t>(num)]; }
+	float              GetFallMaxForKik()const             { return paramater_.maxFallSpeedForKik; }
+	float              GetFallMaxForBound()const           { return paramater_.maxFallSpeedForBound; }
+	float              GetBoundGravity()const              { return paramater_.gravityForBound; }
+	int                GetDeathCount()const                { return deathCount_; }
+	int                GetDeathCountMax()const             { return paramater_.deathCountMax; }
+	JumpPower          GetJumpPower()const                 { return jumpPower_; }
+	BaseEnemyBehaivor* GetBehavior()const                  { return behavior_.get(); }
+	Type               GetType()const                      { return type_; }
 	float              GetBoundPower()const;
-	JumpPower          GetJumpPower()const { return jumpPower_; }
-	BaseEnemyBehaivor* GetBehavior()const { return behavior_.get(); }
-	float              GetJumpSpeed(JumpPower num) const { return paramater_.jumpSpeed[static_cast<size_t>(num)]; }
-	Type               GetType()const { return type_; }
 	///========================================================================================
 	///  setter method
 	///========================================================================================
-	void SetPlayer(Player* plyaer);
-	void SetIsCollision(const bool& is);
-	void DecrementDeathCount();
+	void               SetPlayer(Player* plyaer);
+	void               SetIsCollision(const bool& is);
+	void               DecrementDeathCount();
+	void               SetFallMaxSpeed(const float& speed) { maxFallSpeed_ = speed; }
+	void               SetGravity(const float& gravity) { gravity_ = gravity; }
 };

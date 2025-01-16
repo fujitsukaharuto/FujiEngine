@@ -17,6 +17,9 @@ EnemyBound::EnemyBound(BaseEnemy* boss)
 	jumpSpeed_ = pBaseEnemy_->GetBoundPower();
 	pBaseEnemy_->SetIsCollision(true);
 
+	pBaseEnemy_->SetGravity(pBaseEnemy_->GetBoundGravity());
+	pBaseEnemy_->SetFallMaxSpeed(pBaseEnemy_->GetFallMaxForBound());
+
 	step_ = Step::BOUND;
 }
 

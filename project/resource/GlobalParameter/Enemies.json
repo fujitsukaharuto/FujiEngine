@@ -13,6 +13,12 @@
         "attenuate_1": 0.4300000071525574,
         "attenuate_2": 0.0,
         "baseBoundPower_1": 1.0299999713897705,
-        "baseBoundPower_2": 0.0
+        "baseBoundPower_2": 0.0,
+        "gravityForBound1": 1.3899999856948853,
+        "gravityForBound2": 0.0,
+        "maxFallSpeedForBound1": 0.33000001311302185,
+        "maxFallSpeedForBound2": 0.0,
+        "maxFallSpeedForKik1": 0.30000001192092896,
+        "maxFallSpeedForKik2": 0.0
     }
 }

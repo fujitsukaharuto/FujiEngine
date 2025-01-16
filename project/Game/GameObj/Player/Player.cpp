@@ -218,7 +218,7 @@ void Player::Fall(float& speed, const bool& isJump) {
 		model_->transform.translate.y += speed;
 	}
 	// 加速する
-	speed = max(speed - (gravity_ * FPSKeeper::NormalDeltaTime()), -0.7f);
+	speed = max(speed - (gravity_ * FPSKeeper::NormalDeltaTime()), -maxFallSpeed_);
 
 	// 着地
 	if (model_->transform.translate.y  <= Player::InitY_) {
@@ -317,6 +317,7 @@ void Player::AdjustParm() {
 		ImGui::DragFloat("RecoilJumpSpeed", &recoilJumpSpeed_, 0.01f);
 		ImGui::DragFloat("KikTime", &kikTime_, 0.01f);
 		ImGui::DragFloat("KikWaitTime", &kikWaitTime_, 0.01f);
+		ImGui::DragFloat("MaxFallSpeed", &maxFallSpeed_, 0.01f);
 		
 		/// セーブとロード
 		globalParameter_->ParmSaveForImGui(groupName_);
@@ -356,6 +357,7 @@ void Player::AddParmGroup() {
 	globalParameter_->AddItem(groupName_, "RecoilJumpSpeed", recoilJumpSpeed_);
 	globalParameter_->AddItem(groupName_, "KikTime", kikTime_);
 	globalParameter_->AddItem(groupName_, "KikWaitTime", kikWaitTime_);
+	globalParameter_->AddItem(groupName_, "MaxFallSpeed", maxFallSpeed_);
 
 }
 
@@ -373,6 +375,7 @@ void Player::SetValues() {
 	globalParameter_->SetValue(groupName_, "RecoilJumpSpeed", recoilJumpSpeed_);
 	globalParameter_->SetValue(groupName_, "KikTime", kikTime_);
 	globalParameter_->SetValue(groupName_, "KikWaitTime", kikWaitTime_);
+	globalParameter_->SetValue(groupName_, "MaxFallSpeed", maxFallSpeed_);
 }
 
 ///=====================================================
@@ -388,6 +391,7 @@ void Player::ApplyGlobalParameter() {
 	recoilJumpSpeed_ = globalParameter_->GetValue<float>(groupName_, "RecoilJumpSpeed");
 	kikTime_ = globalParameter_->GetValue<float>(groupName_, "KikTime");
 	kikWaitTime_ = globalParameter_->GetValue<float>(groupName_, "KikWaitTime");
+	maxFallSpeed_ = globalParameter_->GetValue<float>(groupName_, "MaxFallSpeed");
 }
 ///=========================================================
 /// Class Set

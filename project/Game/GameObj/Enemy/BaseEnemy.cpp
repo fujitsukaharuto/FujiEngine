@@ -129,7 +129,7 @@ void BaseEnemy::Fall(float& speed, const bool& isJump) {
 		model_->transform.translate.y += speed;
 	}
 	// 加速する
-	speed = max(speed - (paramater_.gravity * FPSKeeper::NormalDeltaTime()), -0.7f);
+	speed = max(speed - (gravity_ * FPSKeeper::NormalDeltaTime()), -maxFallSpeed_);
 
 	// 着地
 	if (model_->transform.translate.y <= BaseEnemy::InitY_) {

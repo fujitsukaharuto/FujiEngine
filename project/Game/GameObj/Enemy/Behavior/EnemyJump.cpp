@@ -17,6 +17,9 @@ EnemyJump::EnemyJump(BaseEnemy* boss)
 	jumpSpeed_ = pBaseEnemy_->GetJumpSpeed(pBaseEnemy_->GetJumpPower());
 	pBaseEnemy_->SetIsCollision(true);
 
+	pBaseEnemy_->SetGravity(pBaseEnemy_->GetGravityForKik());
+	pBaseEnemy_->SetFallMaxSpeed(pBaseEnemy_->GetFallMaxForKik());
+
 	rotateSpeed_ = 30.0f;
 }
 

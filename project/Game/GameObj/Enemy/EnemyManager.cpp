@@ -157,7 +157,7 @@ void EnemyManager::AddParmGroup() {
 		globalParameter_->AddItem(
 			groupName_,
 			"Gravity" + std::to_string(int(i + 1)),
-			paramaters_[i].gravity);
+			paramaters_[i].gravityForKik);
 
 		globalParameter_->AddItem(
 			groupName_,
@@ -174,11 +174,21 @@ void EnemyManager::AddParmGroup() {
 			"attenuate_" + std::to_string(int(i + 1)),
 			paramaters_[i].attenuate);
 
+		globalParameter_->AddItem(
+			groupName_,
+			"gravityForBound" + std::to_string(int(i + 1)),
+			paramaters_[i].gravityForBound);
 
 		globalParameter_->AddItem(
 			groupName_,
-			"DeathCount" + std::to_string(int(i + 1)),
-			paramaters_[i].deathCountMax);
+			"maxFallSpeedForBound" + std::to_string(int(i + 1)),
+			paramaters_[i].maxFallSpeedForBound);
+
+
+		globalParameter_->AddItem(
+			groupName_,
+			"maxFallSpeedForKik" + std::to_string(int(i + 1)),
+			paramaters_[i].maxFallSpeedForKik);
 	}
 
 }
@@ -204,7 +214,7 @@ void EnemyManager::SetValues() {
 		globalParameter_->SetValue(
 			groupName_,
 			"Gravity" + std::to_string(int(i + 1)),
-			paramaters_[i].gravity);
+			paramaters_[i].gravityForKik);
 
 		globalParameter_->SetValue(
 			groupName_,
@@ -221,6 +231,21 @@ void EnemyManager::SetValues() {
 			"attenuate_" + std::to_string(int(i + 1)),
 			paramaters_[i].attenuate);
 
+		globalParameter_->SetValue(
+			groupName_,
+			"gravityForBound" + std::to_string(int(i + 1)),
+			paramaters_[i].gravityForBound);
+
+		globalParameter_->SetValue(
+			groupName_,
+			"maxFallSpeedForBound" + std::to_string(int(i + 1)),
+			paramaters_[i].maxFallSpeedForBound);
+
+
+		globalParameter_->SetValue(
+			groupName_,
+			"maxFallSpeedForKik" + std::to_string(int(i + 1)),
+			paramaters_[i].maxFallSpeedForKik);
 
 		globalParameter_->SetValue(
 			groupName_,
@@ -245,7 +270,7 @@ void EnemyManager::ApplyGlobalParameter() {
 			groupName_,
 			"AttackValue" + std::to_string(int(i + 1)));
 
-		paramaters_[i].gravity = globalParameter_->GetValue<float>(
+		paramaters_[i].gravityForKik = globalParameter_->GetValue<float>(
 			groupName_,
 			"Gravity" + std::to_string(int(i + 1)));
 
@@ -264,6 +289,18 @@ void EnemyManager::ApplyGlobalParameter() {
 		paramaters_[i].deathCountMax = globalParameter_->GetValue<int>(
 			groupName_,
 			"DeathCount" + std::to_string(int(i + 1)));
+
+		paramaters_[i].maxFallSpeedForBound = globalParameter_->GetValue<float>(
+			groupName_,
+			"maxFallSpeedForBound" + std::to_string(int(i + 1)));
+
+		paramaters_[i].maxFallSpeedForKik = globalParameter_->GetValue<float>(
+			groupName_,
+			"maxFallSpeedForKik" + std::to_string(int(i + 1)));
+
+		paramaters_[i].gravityForBound = globalParameter_->GetValue<float>(
+			groupName_,
+			"gravityForBound" + std::to_string(int(i + 1)));
 	}
 
 }
@@ -292,8 +329,20 @@ void EnemyManager::AdjustParm() {
 			&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].attackValue,
 			0.01f);
 
-		ImGui::DragFloat("Gravity",
-			&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].gravity,
+		ImGui::DragFloat("GravityForKik",
+			&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].gravityForKik,
+			0.01f);
+
+		ImGui::DragFloat("GravityForBound",
+			&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].gravityForBound,
+			0.01f);
+
+		ImGui::DragFloat("MaxFallSpeedForKik",
+			&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].maxFallSpeedForKik,
+			0.01f);
+
+		ImGui::DragFloat("MaxFallSpeedForBound",
+			&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].maxFallSpeedForBound,
 			0.01f);
 
 		ImGui::DragFloat("WeakJumpSpeed",
@@ -328,10 +377,21 @@ void EnemyManager::AdjustParm() {
 			&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].attackValue,
 			0.01f);
 
-		ImGui::DragFloat("Gravity",
-			&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].gravity,
+		ImGui::DragFloat("GravityForKik",
+			&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].gravityForKik,
 			0.01f);
 
+		ImGui::DragFloat("GravityForBound",
+			&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].gravityForBound,
+			0.01f);
+
+		ImGui::DragFloat("MaxFallSpeedForKik",
+			&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].maxFallSpeedForKik,
+			0.01f);
+
+		ImGui::DragFloat("MaxFallSpeedForBound",
+			&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].maxFallSpeedForBound,
+			0.01f);
 
 		ImGui::DragFloat("WeakJumpSpeed",
 			&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].jumpSpeed[0],

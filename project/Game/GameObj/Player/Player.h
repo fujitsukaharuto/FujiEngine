@@ -52,6 +52,7 @@ private:
 	float             recoilJumpSpeed_;
 	float             kikTime_;
 	float             kikWaitTime_;
+	float             maxFallSpeed_;
 
 
 	// fall
