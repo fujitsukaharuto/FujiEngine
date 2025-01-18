@@ -14,6 +14,7 @@
 class Player;
 class LockOn;
 enum class  Type;
+enum class JumpPower;
 struct BaseEnemy::Paramater;
 class EnemyManager {
    

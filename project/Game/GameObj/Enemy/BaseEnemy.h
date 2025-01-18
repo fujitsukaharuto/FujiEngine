@@ -23,7 +23,7 @@ public:
 	enum class JumpPower {
 		WEAK,
 		NORMAL,
-		STRONG,
+		MaxPower,
 	};
 
 	struct Paramater {
@@ -36,7 +36,7 @@ public:
 		float                maxFallSpeedForKik;
 		float                maxFallSpeedForBound;
 		int                  deathCountMax;
-		std::array<float, 1> jumpSpeed;
+		std::array<float, 3> jumpSpeed;
 	};
 
 protected:
@@ -94,7 +94,7 @@ public:
 	bool               GetIsDeath()const                   { return isdeath_; }
 	float              GetFallSpeed()const                 { return paramater_.fallSpeed; }
 	float              GetAttackValue()const               { return paramater_.attackValue; }
-	float              GetGravityForKik()const                   { return paramater_.gravityForKik; }
+	float              GetGravityForKik()const             { return paramater_.gravityForKik; }
 	float              GetJumpSpeed(JumpPower num) const   { return paramater_.jumpSpeed[static_cast<size_t>(num)]; }
 	float              GetFallMaxForKik()const             { return paramater_.maxFallSpeedForKik; }
 	float              GetFallMaxForBound()const           { return paramater_.maxFallSpeedForBound; }

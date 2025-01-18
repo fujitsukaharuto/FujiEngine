@@ -176,6 +176,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\GameObj\Field\Field.cpp" />
     <ClCompile Include="Game\GameObj\GameCamera\GameCamera.cpp" />
     <ClCompile Include="Game\GameObj\JoyState\JoyState.cpp" />
+    <ClCompile Include="Game\GameObj\KikArea\KikArea.cpp" />
     <ClCompile Include="Game\GameObj\PlayerBehavior\BasePlayerAttackBehavior.cpp" />
     <ClCompile Include="Game\GameObj\PlayerBehavior\PlayerAttackRoot.cpp" />
     <ClCompile Include="Game\GameObj\PlayerBehavior\PlayerKikAttack.cpp" />
@@ -274,6 +275,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Game\GameObj\Field\Field.h" />
     <ClInclude Include="Game\GameObj\GameCamera\GameCamera.h" />
     <ClInclude Include="Game\GameObj\JoyState\JoyState.h" />
+    <ClInclude Include="Game\GameObj\KikArea\KikArea.h" />
     <ClInclude Include="Game\GameObj\PlayerBehavior\BasePlayerAttackBehavior.h" />
     <ClInclude Include="Game\GameObj\PlayerBehavior\PlayerAttackRoot.h" />
     <ClInclude Include="Game\GameObj\PlayerBehavior\PlayerKikAttack.h" />

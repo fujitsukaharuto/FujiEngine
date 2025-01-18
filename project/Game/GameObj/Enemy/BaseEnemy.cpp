@@ -1,4 +1,5 @@
 #include "BaseEnemy.h"
+#include"GameObj/Player/Player.h"
 #include"FPSKeeper.h"
 #include "Model/Line3dDrawer.h"
 ///*behavior
@@ -8,11 +9,11 @@
 ///* std
 #include<algorithm>
 
-///=========================================================
+///==========================================================
 ///　static 変数初期化
 ///==========================================================
 float BaseEnemy::InitY_ = 1.5f;
-Vector3 BaseEnemy::InitScale_ = {1.0f,1.0f,1.0f};
+Vector3 BaseEnemy::InitScale_ = { 1.0f,1.0f,1.0f };
 
 BaseEnemy::BaseEnemy() {
 
@@ -32,7 +33,7 @@ void BaseEnemy::Initialize() {
 	spawnEasing_.maxTime = 0.8f;
 	deathCount_ = paramater_.deathCountMax;
 	model_->transform.scale = Vector3::GetZeroVec();
-	
+
 	// collider
 	collider_ = std::make_unique<AABBCollider>();
 	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
@@ -41,7 +42,7 @@ void BaseEnemy::Initialize() {
 	collider_->SetHeight(2.0f);
 	collider_->SetDepth(2.0f);
 	collider_->SetParent(model_.get());
-	
+
 
 	jumpCollider_ = std::make_unique<AABBCollider>();
 	jumpCollider_->SetTag("EnemyJump");
@@ -50,7 +51,7 @@ void BaseEnemy::Initialize() {
 	jumpCollider_->SetDepth(2.0f);
 	jumpCollider_->SetIsCollisonCheck(false);
 	jumpCollider_->SetParent(model_.get());
-	
+
 
 	ChangeBehavior(std::make_unique<EnemyFall>(this));/// 追っかけ
 }
@@ -65,7 +66,7 @@ void BaseEnemy::Update() {
 	spawnEasing_.time = min(spawnEasing_.time, spawnEasing_.maxTime);
 	model_->transform.scale =
 		EaseOutBack(Vector3::GetZeroVec(), BaseEnemy::InitScale_,
-		spawnEasing_.time, spawnEasing_.maxTime);
+			spawnEasing_.time, spawnEasing_.maxTime);
 
 	// 振る舞い更新
 	behavior_->Update();
@@ -73,7 +74,7 @@ void BaseEnemy::Update() {
 	// collider更新
 	collider_->InfoUpdate();
 	jumpCollider_->InfoUpdate();
-	
+
 	//// 体力がなくなったら死亡
 	//if (hp_ <= 0) {
 	//	isdeath_=true;
@@ -102,7 +103,7 @@ void BaseEnemy::Update() {
 ///========================================================
 /// 描画
 ///========================================================
-void BaseEnemy::Draw(Material*material) {
+void BaseEnemy::Draw(Material* material) {
 	OriginGameObject::Draw(material);
 #ifdef _DEBUG
 	collider_->DrawCollider();
@@ -144,14 +145,22 @@ void BaseEnemy::Fall(float& speed, const bool& isJump) {
 	}
 }
 
-
-
-
 void BaseEnemy::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 
-	if (other.tag == "WeakKik") {
-	/*	if (dynamic_cast<EnemyJump*>(behavior_.get()))return;*/
+	if (other.tag == pPlayer_->GetTag(static_cast<size_t>(Player::KikPower::WEAK))) {
+
 		jumpPower_ = JumpPower::WEAK;
+		ChangeBehavior(std::make_unique<EnemyJump>(this));
+	}
+	else  if (other.tag == pPlayer_->GetTag(static_cast<size_t>(Player::KikPower::NORMAL))) {
+
+		jumpPower_ = JumpPower::NORMAL;
+		ChangeBehavior(std::make_unique<EnemyJump>(this));
+	}
+
+	else 	if (other.tag == pPlayer_->GetTag(static_cast<size_t>(Player::KikPower::MAXPOWER))) {
+
+		jumpPower_ = JumpPower::MaxPower;
 		ChangeBehavior(std::make_unique<EnemyJump>(this));
 	}
 
@@ -167,7 +176,7 @@ void BaseEnemy::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
 }
 
 
-void BaseEnemy::SetParm(const Type& type,const Paramater& paramater) {
+void BaseEnemy::SetParm(const Type& type, const Paramater& paramater) {
 	type_ = type;
 	paramater_ = paramater;
 

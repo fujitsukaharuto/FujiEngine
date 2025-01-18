@@ -5,7 +5,6 @@
 
 #include "FPSKeeper.h"
 
-
 #include <format>
 #include <fstream>
 #include <imgui.h>
@@ -162,7 +161,18 @@ void EnemyManager::AddParmGroup() {
 		globalParameter_->AddItem(
 			groupName_,
 			"WeakJump" + std::to_string(int(i + 1)),
-			paramaters_[i].jumpSpeed[0]);
+			paramaters_[i].jumpSpeed[static_cast<size_t>(BaseEnemy::JumpPower::WEAK)]);
+
+		globalParameter_->AddItem(
+			groupName_,
+			"NormalJump" + std::to_string(int(i + 1)),
+			paramaters_[i].jumpSpeed[static_cast<size_t>(BaseEnemy::JumpPower::NORMAL)]);
+
+
+		globalParameter_->AddItem(
+			groupName_,
+			"MaxPowerJump" + std::to_string(int(i + 1)),
+			paramaters_[i].jumpSpeed[static_cast<size_t>(BaseEnemy::JumpPower::MaxPower)]);
 
 		globalParameter_->AddItem(
 			groupName_,
@@ -219,7 +229,19 @@ void EnemyManager::SetValues() {
 		globalParameter_->SetValue(
 			groupName_,
 			"WeakJump" + std::to_string(int(i + 1)),
-			paramaters_[i].jumpSpeed[0]);
+			paramaters_[i].jumpSpeed[static_cast<size_t>(BaseEnemy::JumpPower::WEAK)]);
+
+		globalParameter_->SetValue(
+			groupName_,
+			"NormalJump" + std::to_string(int(i + 1)),
+			paramaters_[i].jumpSpeed[static_cast<size_t>(BaseEnemy::JumpPower::NORMAL)]);
+
+
+		globalParameter_->SetValue(
+			groupName_,
+			"MaxPowerJump" + std::to_string(int(i + 1)),
+			paramaters_[i].jumpSpeed[static_cast<size_t>(BaseEnemy::JumpPower::MaxPower)]);
+
 
 		globalParameter_->SetValue(
 			groupName_,
@@ -274,9 +296,18 @@ void EnemyManager::ApplyGlobalParameter() {
 			groupName_,
 			"Gravity" + std::to_string(int(i + 1)));
 
-		paramaters_[i].jumpSpeed[0] = globalParameter_->GetValue<float>(
+		paramaters_[i].jumpSpeed[static_cast<size_t>(BaseEnemy::JumpPower::WEAK)] = globalParameter_->GetValue<float>(
 			groupName_,
 			"WeakJump" + std::to_string(int(i + 1)));
+
+		paramaters_[i].jumpSpeed[static_cast<size_t>(BaseEnemy::JumpPower::NORMAL)] = globalParameter_->GetValue<float>(
+			groupName_,
+			"NormalJump" + std::to_string(int(i + 1)));
+
+		paramaters_[i].jumpSpeed[static_cast<size_t>(BaseEnemy::JumpPower::MaxPower)] = globalParameter_->GetValue<float>(
+			groupName_,
+			"MaxPowerJump" + std::to_string(int(i + 1)));
+
 
 		paramaters_[i].boundPower = globalParameter_->GetValue<float>(
 			groupName_,
@@ -345,10 +376,6 @@ void EnemyManager::AdjustParm() {
 			&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].maxFallSpeedForBound,
 			0.01f);
 
-		ImGui::DragFloat("WeakJumpSpeed",
-			&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].jumpSpeed[0],
-			0.01f);
-
 		ImGui::DragFloat("BaseBoundPower",
 			&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].boundPower,
 			0.01f);
@@ -359,6 +386,20 @@ void EnemyManager::AdjustParm() {
 
 		ImGui::SliderInt("DeathCount",
 			&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].deathCountMax,0,10);
+
+		ImGui::SeparatorText("JumpPower");
+		ImGui::DragFloat("WeakJumpSpeed",
+			&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].jumpSpeed[static_cast<size_t>(BaseEnemy::JumpPower::WEAK)],
+			0.01f);
+
+		ImGui::DragFloat("NormalJumpSpeed",
+			&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].jumpSpeed[static_cast<size_t>(BaseEnemy::JumpPower::NORMAL)],
+			0.01f);
+
+		ImGui::DragFloat("MaxJumpSpeed",
+			&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].jumpSpeed[static_cast<size_t>(BaseEnemy::JumpPower::MaxPower)],
+			0.01f);
+
 
 		ImGui::PopID();
 
@@ -393,10 +434,6 @@ void EnemyManager::AdjustParm() {
 			&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].maxFallSpeedForBound,
 			0.01f);
 
-		ImGui::DragFloat("WeakJumpSpeed",
-			&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].jumpSpeed[0],
-			0.01f);
-
 		ImGui::DragFloat("BoundPower",
 			&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].boundPower,
 			0.01f);
@@ -407,6 +444,19 @@ void EnemyManager::AdjustParm() {
 
 		ImGui::SliderInt("DeathCount",
 			&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].deathCountMax, 0, 10);
+
+		ImGui::SeparatorText("JumpPower");
+		ImGui::DragFloat("WeakJumpSpeed",
+			&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].jumpSpeed[static_cast<size_t>(BaseEnemy::JumpPower::WEAK)],
+			0.01f);
+
+		ImGui::DragFloat("NormalJumpSpeed",
+			&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].jumpSpeed[static_cast<size_t>(BaseEnemy::JumpPower::NORMAL)],
+			0.01f);
+
+		ImGui::DragFloat("MaxJumpSpeed",
+			&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].jumpSpeed[static_cast<size_t>(BaseEnemy::JumpPower::MaxPower)],
+			0.01f);
 
 		ImGui::PopID();
 		/// セーブとロード

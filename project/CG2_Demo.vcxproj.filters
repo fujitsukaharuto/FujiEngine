@@ -275,6 +275,9 @@
     <ClCompile Include="Game\GameObj\Enemy\Behavior\EnemyBound.cpp">
       <Filter>Game\Behavior\Enemy</Filter>
     </ClCompile>
+    <ClCompile Include="Game\GameObj\KikArea\KikArea.cpp">
+      <Filter>Game\GameObj\KikArea</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Audio\Audio.h">
@@ -568,6 +571,9 @@
     <ClInclude Include="Game\GameObj\Enemy\Behavior\EnemyBound.h">
       <Filter>Game\Behavior\Enemy</Filter>
     </ClInclude>
+    <ClInclude Include="Game\GameObj\KikArea\KikArea.h">
+      <Filter>Game\GameObj\KikArea</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -677,6 +683,9 @@
     </Filter>
     <Filter Include="Game\Behavior\Player\AttackBehavior">
       <UniqueIdentifier>{505cfd85-6044-41d4-93d3-2227f4950c72}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameObj\KikArea">
+      <UniqueIdentifier>{0c4be5e0-93f2-45f9-8927-63764ab0d2c5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

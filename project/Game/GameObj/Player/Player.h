@@ -14,9 +14,12 @@
 /// </summary>
 class Player :public OriginGameObject {
 
-private:
-	/// other class
-	/*Boss* pBoss_;*/
+public:
+	enum class KikPower {
+		WEAK,
+		NORMAL,
+		MAXPOWER,
+	};
 private:
 
 	/// ===================================================
@@ -58,7 +61,10 @@ private:
 	// fall
 	float             fallSpeed_;
 
-	std::unique_ptr<AABBCollider> weakikCollider_;
+	/// collider
+	std::unique_ptr<AABBCollider> kikCollider_;
+	std::unique_ptr<AABBCollider> collider_;
+	std::array<std::string, 3>tags_;
 
 public:
 	static float InitY_;
@@ -92,7 +98,8 @@ public:
 
 	void          OnCollisionEnter(const ColliderInfo& other);
 	void          OnCollisionStay(const ColliderInfo& other);
-	BaseCollider* GetWeakColliderCollider() { return weakikCollider_.get(); }
+	BaseCollider* GetKikCollider() { return kikCollider_.get(); }
+	BaseCollider* GetCollider() { return collider_.get(); }
 	///-------------------------------------------------------------------------------------
 	/// Editor
 	///-------------------------------------------------------------------------------------
@@ -115,6 +122,7 @@ public:
 	float  GetKikTime()const { return kikTime_; }
 	float GetKikWaitTime()const { return kikWaitTime_; }
 	float GetFacingDirection()const;
+	std::string GetTag(int i) { return tags_[i]; }
 	/// ===================================================
 	/// setter method
 	/// ===================================================

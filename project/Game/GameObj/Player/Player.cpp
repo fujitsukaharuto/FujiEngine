@@ -32,6 +32,9 @@ void Player::Initialize() {
 
 	OriginGameObject::Initialize();
 	OriginGameObject::SetModel("player.obj");
+	tags_[static_cast<size_t>(KikPower::WEAK)] = "WeakKik";
+	tags_[static_cast<size_t>(KikPower::NORMAL)] = "NormalKik";
+	tags_[static_cast<size_t>(KikPower::MAXPOWER)] = "MaxPowerKik";
 
 	///* グローバルパラメータ
 	globalParameter_ = GlobalVariables::GetInstance();
@@ -40,16 +43,25 @@ void Player::Initialize() {
 	ApplyGlobalParameter();
 
 	/// collider
-	weakikCollider_ = std::make_unique<AABBCollider>();
-	weakikCollider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
-	weakikCollider_->SetTag("WeakKik");
-	weakikCollider_->SetParent(GetModel());
-	weakikCollider_->SetWidth(2.0f);
-	weakikCollider_->SetHeight(2.0f);
-	weakikCollider_->SetDepth(15.0f);
-	weakikCollider_->SetIsCollisonCheck(false);
-	weakikCollider_->SetPos(Vector3(0, 0, 1.5f));
-	weakikCollider_->InfoUpdate();
+	kikCollider_ = std::make_unique<AABBCollider>();
+	kikCollider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
+	kikCollider_->SetTag(tags_[static_cast<size_t>(KikPower::MAXPOWER)]);
+	kikCollider_->SetParent(GetModel());
+	kikCollider_->SetWidth(2.0f);
+	kikCollider_->SetHeight(2.0f);
+	kikCollider_->SetDepth(15.0f);
+	kikCollider_->SetIsCollisonCheck(false);
+	kikCollider_->SetPos(Vector3(0, 0, 1.5f));
+	kikCollider_->InfoUpdate();
+
+	collider_ = std::make_unique<AABBCollider>();
+	collider_->SetCollisionStayCallback([this](const ColliderInfo& other) {OnCollisionStay(other); });
+	collider_->SetTag("Player");
+	collider_->SetParent(GetModel());
+	collider_->SetWidth(2.0f);
+	collider_->SetHeight(2.0f);
+	collider_->SetDepth(2.0f);
+	collider_->InfoUpdate();
 
 	// 仮モデル
 	kikModel_ = std::make_unique<Object3d>();
@@ -71,14 +83,15 @@ void Player::Update() {
 	DamageRendition();
 	/// 振る舞い処理
 	behavior_->Update();
-	
+
 	attackBehavior_->Update();
-	
+
 	//　移動制限
 	MoveToLimit();
 
-	weakikCollider_->InfoUpdate();
-	
+	collider_->InfoUpdate();
+	kikCollider_->InfoUpdate();
+
 	/// 更新
 	//base::Update();
 }
@@ -93,7 +106,8 @@ void Player::Draw(Material* material) {
 		kikModel_->Draw();
 	}
 #ifdef _DEBUG
-	weakikCollider_->DrawCollider();
+	kikCollider_->DrawCollider();
+	collider_->DrawCollider();
 #endif // _DEBUG
 }
 
@@ -102,7 +116,7 @@ void Player::Draw(Material* material) {
 ///  ダメージ演出
 /// ===================================================
 void Player::DamageRendition() {
-	
+
 }
 
 
@@ -113,7 +127,7 @@ Vector3 Player::GetInputVelocity() {
 	inputDirection_ = { 0.0f, 0.0f, 0.0f };
 	Input* input = Input::GetInstance();
 
-	
+
 	if (input->PushKey(DIK_A)) {
 		inputDirection_.x -= 1.0f;  // 左移動
 	}
@@ -124,7 +138,7 @@ Vector3 Player::GetInputVelocity() {
 	// ジョイスティック入力
 	if (input->GetGamepadState(joyState)) {
 		inputDirection_.x += (float)joyState.Gamepad.sThumbLX / SHRT_MAX;
-	/*	velocity.z += (float)joyState.Gamepad.sThumbLY / SHRT_MAX;*/
+		/*	velocity.z += (float)joyState.Gamepad.sThumbLY / SHRT_MAX;*/
 	}
 
 	return inputDirection_;
@@ -142,7 +156,7 @@ void Player::Move(const float& speed) {
 	/// 移動処理
 	if (GetIsMoving()) {
 		// 移動ベクトルの正規化と速さの適用
-		velocity_ = (velocity_).Normalize() * (speed*FPSKeeper::NormalDeltaTime());
+		velocity_ = (velocity_).Normalize() * (speed * FPSKeeper::NormalDeltaTime());
 
 		// 移動ベクトルをカメラの角度に基づいて回転
 		Matrix4x4 rotateMatrix = MakeRotateYMatrix(CameraManager::GetInstance()->GetCamera()->transform.rotate.y);
@@ -205,8 +219,8 @@ bool Player::GetIsMoving() {
 void Player::Jump(float& speed) {
 	// 移動
 	model_->transform.translate.y += speed;
-	Fall(speed,true);
-	
+	Fall(speed, true);
+
 }
 
 ///=========================================================
@@ -221,13 +235,13 @@ void Player::Fall(float& speed, const bool& isJump) {
 	speed = max(speed - (gravity_ * FPSKeeper::NormalDeltaTime()), -maxFallSpeed_);
 
 	// 着地
-	if (model_->transform.translate.y  <= Player::InitY_) {
-		model_->transform.translate.y  = Player::InitY_;
+	if (model_->transform.translate.y <= Player::InitY_) {
+		model_->transform.translate.y = Player::InitY_;
 		speed = 0.0f;
 
 		if (!dynamic_cast<PlayerJump*>(behavior_.get()))return;
-			// ジャンプ終了
-			ChangeBehavior(std::make_unique<PlayerRoot>(this));	
+		// ジャンプ終了
+		ChangeBehavior(std::make_unique<PlayerRoot>(this));
 	}
 }
 
@@ -280,7 +294,7 @@ void Player::MoveToLimit() {
 /// ダメージ受ける
 ///==========================================================
 void Player::TakeDamage() {
-	
+
 }
 
 ///=========================================================
@@ -292,7 +306,7 @@ void Player::ChangeBehavior(std::unique_ptr<BasePlayerBehavior>behavior) {
 }
 
 void Player::ChangeAttackBehavior(std::unique_ptr<BasePlayerAttackBehavior>behavior) {
-	attackBehavior_= std::move(behavior);
+	attackBehavior_ = std::move(behavior);
 }
 
 ///=========================================================
@@ -318,7 +332,7 @@ void Player::AdjustParm() {
 		ImGui::DragFloat("KikTime", &kikTime_, 0.01f);
 		ImGui::DragFloat("KikWaitTime", &kikWaitTime_, 0.01f);
 		ImGui::DragFloat("MaxFallSpeed", &maxFallSpeed_, 0.01f);
-		
+
 		/// セーブとロード
 		globalParameter_->ParmSaveForImGui(groupName_);
 		ParmLoadForImGui();
@@ -400,7 +414,7 @@ void Player::ApplyGlobalParameter() {
 void Player::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 
 	if (other.tag == "Enemy") {
-		
+
 		SetIsCollision(false);
 		ChangeBehavior(std::make_unique<PlayerRecoil>(this));
 		ChangeAttackBehavior(std::make_unique<PlayerAttackRoot>(this));
@@ -410,20 +424,30 @@ void Player::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 
 void Player::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
 
+	if (other.tag == "WeakArea") {
+		kikCollider_->SetTag(tags_[static_cast<size_t>(KikPower::WEAK)]);
+	}
+
+	else if (other.tag == "NormalArea") {
+		kikCollider_->SetTag(tags_[static_cast<size_t>(KikPower::NORMAL)]);
+	}
+	else	if (other.tag == "MaxPowerArea") {
+		kikCollider_->SetTag(tags_[static_cast<size_t>(KikPower::MAXPOWER)]);
+	}
 }
 
 
 void  Player::SetIsCollision(const bool& is) {
-	weakikCollider_->SetIsCollisonCheck(is);
+	kikCollider_->SetIsCollisonCheck(is);
 }
 
 /// ===================================================
 ///  現在の向きを取得（-1: 左, 1: 右）
 /// ===================================================
 float Player::GetFacingDirection() const {
-    // Y軸回転（ラジアン）を取得
-    float angle = model_->transform.rotate.y;
+	// Y軸回転（ラジアン）を取得
+	float angle = model_->transform.rotate.y;
 
-    // sin関数を使用して向きを判定（左: 負, 右: 正）
-    return (std::sin(angle) >= 0.0f) ? 1.0f : -1.0f;
+	// sin関数を使用して向きを判定（左: 負, 右: 正）
+	return (std::sin(angle) >= 0.0f) ? 1.0f : -1.0f;
 }

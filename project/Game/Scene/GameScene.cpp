@@ -28,6 +28,7 @@ void GameScene::Initialize() {
 	gameCamera_ = std::make_unique<GameCamera>();
 	enemyManager_ = std::make_unique<EnemyManager>();
 	ufo_= std::make_unique<UFO>();
+	kikArea_ = std::make_unique<KikArea>();
 	cMane_ = std::make_unique<CollisionManager>();
 	///-------------------------------------------------------------
 	///　初期化
@@ -64,9 +65,11 @@ void GameScene::Initialize() {
 	gameCamera_->Initialize();
 	enemyManager_->Initialize();
 	ufo_->Initialize();
+	kikArea_->Initialize();
 
 
 	///set
+	enemyManager_->SetPlayer(player_.get());
 	ufo_->SetEnemyManager(enemyManager_.get());
 }
 
@@ -88,13 +91,18 @@ void GameScene::Update() {
 		ufo_->Update();
 		gameCamera_->Update();
 		enemyManager_->Update();
+		kikArea_->Update();
 
 		for (auto& enemy : enemyManager_->GetEnemies()) {
 			cMane_->AddCollider(enemy->GetCollider());
 			cMane_->AddCollider(enemy->GetJumpCollider());
 		}
 		cMane_->AddCollider(ufo_->GetCollider());
-		cMane_->AddCollider(player_->GetWeakColliderCollider());
+		cMane_->AddCollider(player_->GetKikCollider());
+		cMane_->AddCollider(kikArea_->GetWeakAreaCollider());
+		cMane_->AddCollider(kikArea_->GetNormalAreaCollider());
+		cMane_->AddCollider(kikArea_->GetMaxPowerArea());
+		cMane_->AddCollider(player_->GetCollider());
 		cMane_->CheckAllCollision();
 
 
@@ -125,7 +133,7 @@ void GameScene::Draw() {
 	player_->Draw();
 	enemyManager_->Draw();
 	ufo_->Draw();
-	
+	kikArea_->Draw();
 
 	ufo_->UFOLightDraw();
 
@@ -332,6 +340,7 @@ void GameScene::ParamaterEdit() {
 	player_->AdjustParm();
 	enemyManager_->AdjustParm();
 	ufo_->AdjustParm();
+	kikArea_->AdjustParm();
 	ImGui::End();
 #endif
 }
