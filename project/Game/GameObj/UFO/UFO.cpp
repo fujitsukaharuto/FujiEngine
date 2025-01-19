@@ -165,7 +165,7 @@ void UFO::TakeDamageForPar(const float& par) {
 }
 
 void UFO::Move() {
-	model_->transform.translate.x += 3.0f * moveDirection * FPSKeeper::NormalDeltaTime();
+	model_->transform.translate.x += 3.0f * moveDirection * FPSKeeper::DeltaTimeRate();
 	if (std::abs(model_->transform.translate.x) > moveRestrectionPos_) {
 		moveDirection = -moveDirection;
 		model_->transform.translate.x = Clamp(model_->transform.translate.x, -moveRestrectionPos_, moveRestrectionPos_);

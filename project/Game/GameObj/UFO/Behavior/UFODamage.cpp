@@ -46,7 +46,7 @@ void UFODamage::Update() {
 		///-------------------------------------------------------
 		///　待機
 		///-------------------------------------------------------
-		easing_.time += FPSKeeper::NormalDeltaTime();
+		easing_.time += FPSKeeper::DeltaTimeRate();
 
 		pUFO_->SetWorldPositionY(
 			EaseOutBack(initPos_.y, initPos_.y + pUFO_->GetDamageDistance(), 

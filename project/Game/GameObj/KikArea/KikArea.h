@@ -15,17 +15,19 @@ private:
 	std::unique_ptr<AABBCollider> weakArea_;
 	std::unique_ptr<AABBCollider> normalArea_;
 	std::unique_ptr<AABBCollider> maxPowerArea_;
+	std::unique_ptr<AABBCollider> specialAttackArea_;
 
 	/// Pos
 	Vector3 weakAreaPos_;
 	Vector3 normalAreaPos_;
 	Vector3 maxPowerAreaPos_;
+	Vector3 specialAttackPos_;
 
 	/// Scale
 	Vector3 weakAreaScale_;
 	Vector3 normalAreaScale_;
 	Vector3 maxPowerAreaScale_;
-
+	Vector3 specialAttackScale_;
 
 public:
 
@@ -46,6 +48,7 @@ public:
 	BaseCollider* GetWeakAreaCollider() { return weakArea_.get(); }
 	BaseCollider* GetNormalAreaCollider() { return normalArea_.get(); }
 	BaseCollider* GetMaxPowerArea() { return maxPowerArea_.get(); }
+	BaseCollider* GetSpecialAttackArea() { return specialAttackArea_.get(); }
 
 	///-------------------------------------------------------------------------------------
 	/// Editor

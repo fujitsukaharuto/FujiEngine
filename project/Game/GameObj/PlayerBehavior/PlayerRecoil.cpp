@@ -15,7 +15,7 @@ PlayerRecoil::PlayerRecoil(Player* player)
 	///---------------------------------------------------
 	/// 変数初期化
 	///---------------------------------------------------
-	jumpSpeed_ = pPlayer_->GetRecoilJumpSpeed();
+	jumpSpeed_ = pPlayer_->GetParamater().recoilJumpSpeed_;
 	// プレイヤーの向き (X軸の方向) を取得
 	step_ = Step::RECOIL;
 }
@@ -33,7 +33,7 @@ void PlayerRecoil::Update() {
 
 		/// X軸の逆方向に吹っ飛ぶ
 		pPlayer_->Jump(jumpSpeed_);
-		pPlayer_->Move(pPlayer_->GetAirMoveSpeed());
+		pPlayer_->Move(pPlayer_->GetParamater().airMoveSpeed_);
 
 		/// 地面につく
 		if (pPlayer_->GetTrans().translate.y > Player::InitY_)break;

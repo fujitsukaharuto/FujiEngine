@@ -41,7 +41,7 @@ void UFORoot::Update() {
 		///　待機
 		///-------------------------------------------------------
 	/*	pUFO_->Move();*/
-		waitTime_ += FPSKeeper::NormalDeltaTime();
+		waitTime_ += FPSKeeper::DeltaTimeRate();
 		if (waitTime_ < pUFO_->GetPopWaitTime())break;
 		step_ = Step::CHANGEPOP;
 		break;

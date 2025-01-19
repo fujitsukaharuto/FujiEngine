@@ -17,6 +17,7 @@ void FPSKeeper::Initialize() {
 	reference_ = std::chrono::steady_clock::now();
 	lastTime_ = std::chrono::steady_clock::now();
 
+	timeScale_ = 1.0f;
 }
 
 void FPSKeeper::FixFPS() {
@@ -43,7 +44,7 @@ void FPSKeeper::Update() {
 	std::chrono::duration<float> deltaTime = currentTime - lastTime_;
 	lastTime_ = currentTime;
 	deltaTime_ = deltaTime.count();
-
+	deltaTimeRate_ = deltaTime_ * timeScale_;
 }
 
 
@@ -51,6 +52,21 @@ float FPSKeeper::DeltaTime() {
 	return ((GetInstance()->deltaTime_) * 60.0f);
 }
 
+float FPSKeeper::DeltaTimeRate() {
+	return (GetInstance()->deltaTimeRate_);
+}
+
+void FPSKeeper::SetTimeScale(float scale) {
+	if (scale < 0.0f) {
+		scale = 0.0f; // 負の値を防ぐ
+	}
+	GetInstance()->timeScale_ = scale;
+}
+
+float FPSKeeper::GetTimeScale() {
+	return GetInstance()->timeScale_;
+}
+
  float FPSKeeper::NormalDeltaTime() {
-	return (GetInstance()->deltaTime_);
+	 return (GetInstance()->deltaTime_);
 }

@@ -54,7 +54,7 @@ void UFOPopEnemy::Update() {
 		///　アニメーション演出
 		///-------------------------------------------------------
 		
-		easing_.time += FPSKeeper::NormalDeltaTime();
+		easing_.time += FPSKeeper::DeltaTimeRate();
 		pUFO_->SetScale(EaseAmplitudeScale(
 			Vector3(10, 1, 1), easing_.time, easing_.maxTime, easing_.amplitude, easing_.period)
 		);

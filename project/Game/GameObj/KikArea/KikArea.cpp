@@ -33,10 +33,16 @@ void KikArea::Initialize() {
 	maxPowerArea_->SetPos(maxPowerAreaPos_);
 	maxPowerArea_->InfoUpdate();
 
+	specialAttackArea_ = std::make_unique<AABBCollider>();
+	specialAttackArea_->SetTag("SpecialAttackArea");
+	specialAttackArea_->SetPos(specialAttackPos_);
+	specialAttackArea_->InfoUpdate();
+
 	//サイズセット
 	SetAreaSize(weakArea_.get(), weakAreaScale_);
 	SetAreaSize(normalArea_.get(), normalAreaScale_);
 	SetAreaSize(maxPowerArea_.get(), maxPowerAreaScale_);
+	SetAreaSize(specialAttackArea_.get(), specialAttackScale_);
 }
 
 void KikArea::Update() {
@@ -45,14 +51,17 @@ void KikArea::Update() {
 	weakArea_->SetPos(weakAreaPos_);
 	normalArea_->SetPos(normalAreaPos_);
 	maxPowerArea_->SetPos(maxPowerAreaPos_);
+	specialAttackArea_->SetPos(specialAttackPos_);
 
 	SetAreaSize(weakArea_.get(), weakAreaScale_);
 	SetAreaSize(normalArea_.get(), normalAreaScale_);
 	SetAreaSize(maxPowerArea_.get(), maxPowerAreaScale_);
+	SetAreaSize(specialAttackArea_.get(), specialAttackScale_);
 
 	weakArea_->InfoUpdate();
 	normalArea_->InfoUpdate();
 	maxPowerArea_->InfoUpdate();
+	specialAttackArea_->InfoUpdate();
 
 }
 
@@ -62,6 +71,7 @@ void KikArea::Draw(Material* material) {
 	weakArea_->DrawCollider();
 	normalArea_->DrawCollider();
 	maxPowerArea_->DrawCollider();
+	specialAttackArea_->DrawCollider();
 }
 
 
@@ -97,6 +107,9 @@ void KikArea::AddParmGroup() {
 	globalParameter_->AddItem(groupName_, "maxPowerAreaPos_", maxPowerAreaPos_);
 	globalParameter_->AddItem(groupName_, "maxPowerAreaScale_", maxPowerAreaScale_);
 
+	globalParameter_->AddItem(groupName_, "specialAttackPos_", specialAttackPos_);
+	globalParameter_->AddItem(groupName_, "specialAttackScale_", specialAttackScale_);
+
 }
 
 
@@ -115,6 +128,9 @@ void KikArea::SetValues() {
 	globalParameter_->SetValue(groupName_, "maxPowerAreaPos_", maxPowerAreaPos_);
 	globalParameter_->SetValue(groupName_, "maxPowerAreaScale_", maxPowerAreaScale_);
 
+	globalParameter_->SetValue(groupName_, "specialAttackPos_", specialAttackPos_);
+	globalParameter_->SetValue(groupName_, "specialAttackScale_", specialAttackScale_);
+
 }
 
 
@@ -126,10 +142,14 @@ void KikArea::ApplyGlobalParameter() {
 	weakAreaPos_ = globalParameter_->GetValue<Vector3>(groupName_, "weakAreaPos_");
 	normalAreaPos_ = globalParameter_->GetValue<Vector3>(groupName_, "normalAreaPos_");
 	maxPowerAreaPos_ = globalParameter_->GetValue<Vector3>(groupName_, "maxPowerAreaPos_");
+	specialAttackPos_ = globalParameter_->GetValue<Vector3>(groupName_, "specialAttackPos_");
+
 
 	weakAreaScale_ = globalParameter_->GetValue<Vector3>(groupName_, "weakAreaScale_");
 	normalAreaScale_ = globalParameter_->GetValue<Vector3>(groupName_, "normalAreaScale_");
 	maxPowerAreaScale_ = globalParameter_->GetValue<Vector3>(groupName_, "maxPowerAreaScale_");
+	specialAttackScale_ = globalParameter_->GetValue<Vector3>(groupName_, "specialAttackScale_");
+
 }
 
 ///=========================================================
@@ -158,6 +178,12 @@ void KikArea::AdjustParm() {
 		ImGui::PushID("MaxPowerArea");
 		ImGui::DragFloat3("Pos", &maxPowerAreaPos_.x, 0.1f);
 		ImGui::DragFloat3("Scale", &maxPowerAreaScale_.x, 0.1f);
+		ImGui::PopID();
+
+		ImGui::SeparatorText("SpecialAttackArea");
+		ImGui::PushID("SpecialAttackArea");
+		ImGui::DragFloat3("Pos", &specialAttackPos_.x, 0.1f);
+		ImGui::DragFloat3("Scale", &specialAttackScale_.x, 0.1f);
 		ImGui::PopID();
 
 		/// セーブとロード

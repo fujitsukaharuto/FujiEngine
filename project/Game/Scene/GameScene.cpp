@@ -102,6 +102,7 @@ void GameScene::Update() {
 		cMane_->AddCollider(kikArea_->GetWeakAreaCollider());
 		cMane_->AddCollider(kikArea_->GetNormalAreaCollider());
 		cMane_->AddCollider(kikArea_->GetMaxPowerArea());
+		cMane_->AddCollider(kikArea_->GetSpecialAttackArea());
 		cMane_->AddCollider(player_->GetCollider());
 		cMane_->CheckAllCollision();
 

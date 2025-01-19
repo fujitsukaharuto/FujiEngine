@@ -13,6 +13,7 @@
 #include"GameObj/PlayerBehavior/PlayerAttackRoot.h"
 #include"GameObj/PlayerBehavior/PlayerKikAttack.h"
 #include"GameObj/PlayerBehavior/PlayerRecoil.h"
+#include"GameObj/PlayerBehavior/PlayerSpecialFall.h"
 //* obj
 #include"Field/Field.h"
 ///* std
@@ -81,9 +82,11 @@ void Player::Update() {
 	/*prePos_ = GetWorldPosition();*/
 	/// ダメージエフェクト
 	DamageRendition();
-	/// 振る舞い処理
-	behavior_->Update();
 
+	/// 振る舞い処理
+	if (!dynamic_cast<PlayerSpecialFall*>(attackBehavior_.get())) {
+		behavior_->Update();
+	}
 	attackBehavior_->Update();
 
 	//　移動制限
@@ -156,7 +159,7 @@ void Player::Move(const float& speed) {
 	/// 移動処理
 	if (GetIsMoving()) {
 		// 移動ベクトルの正規化と速さの適用
-		velocity_ = (velocity_).Normalize() * (speed * FPSKeeper::NormalDeltaTime());
+		velocity_ = (velocity_).Normalize() * (speed * FPSKeeper::DeltaTimeRate());
 
 		// 移動ベクトルをカメラの角度に基づいて回転
 		Matrix4x4 rotateMatrix = MakeRotateYMatrix(CameraManager::GetInstance()->GetCamera()->transform.rotate.y);
@@ -232,7 +235,7 @@ void Player::Fall(float& speed, const bool& isJump) {
 		model_->transform.translate.y += speed;
 	}
 	// 加速する
-	speed = max(speed - (gravity_ * FPSKeeper::NormalDeltaTime()), -maxFallSpeed_);
+	speed = max(speed - (paramater_.gravity_ * FPSKeeper::NormalDeltaTime()), -paramater_.maxFallSpeed_);
 
 	// 着地
 	if (model_->transform.translate.y <= Player::InitY_) {
@@ -323,15 +326,21 @@ void Player::AdjustParm() {
 
 		///　Floatのパラメータ
 		ImGui::SeparatorText("FloatParamater");
-		ImGui::DragFloat("jumpSpeed", &jumpSpeed_, 0.01f);
-		ImGui::DragFloat("AirMoveSpeed", &airMoveSpeed_, 0.01f);
-		ImGui::DragFloat("MoveSpeed", &moveSpeed_, 0.01f);
-		ImGui::DragFloat("Gravity", &gravity_, 0.01f);
-		ImGui::DragFloat("RecoilSpeed", &recoilSpeed_, 0.01f);
-		ImGui::DragFloat("RecoilJumpSpeed", &recoilJumpSpeed_, 0.01f);
-		ImGui::DragFloat("KikTime", &kikTime_, 0.01f);
-		ImGui::DragFloat("KikWaitTime", &kikWaitTime_, 0.01f);
-		ImGui::DragFloat("MaxFallSpeed", &maxFallSpeed_, 0.01f);
+		ImGui::DragFloat("jumpSpeed", &paramater_.jumpSpeed_, 0.01f);
+		ImGui::DragFloat("AirMoveSpeed", &paramater_.airMoveSpeed_, 0.01f);
+		ImGui::DragFloat("MoveSpeed", &paramater_.moveSpeed_, 0.01f);
+		ImGui::DragFloat("Gravity", &paramater_.gravity_, 0.01f);
+		ImGui::DragFloat("MaxFallSpeed", &paramater_.maxFallSpeed_, 0.01f);
+		ImGui::DragFloat("RecoilSpeed", &paramater_.recoilSpeed_, 0.01f);
+		ImGui::DragFloat("RecoilJumpSpeed", &paramater_.recoilJumpSpeed_, 0.01f);
+		ImGui::SeparatorText("Kik");
+		ImGui::DragFloat("KikTime", &paramater_.kikTime_, 0.01f);
+		ImGui::DragFloat("KikWaitTime", &paramater_.kikWaitTime_, 0.01f);
+		ImGui::SeparatorText("SpecialAttack");
+		ImGui::DragFloat("specialAttackAntiTime_", &paramater_.specialAttackAntiTime_, 0.01f);
+		ImGui::DragFloat("specialAttackFallSpeed_", &paramater_.specialAttackFallSpeed_, 0.01f);
+		ImGui::DragFloat("specialAttackPostJump_", &paramater_.specialAttackPostJump_, 0.01f);
+
 
 		/// セーブとロード
 		globalParameter_->ParmSaveForImGui(groupName_);
@@ -363,15 +372,18 @@ void Player::ParmLoadForImGui() {
 void Player::AddParmGroup() {
 
 	globalParameter_->AddItem(groupName_, "Translate", model_->transform.translate);
-	globalParameter_->AddItem(groupName_, "JumpSpeed", jumpSpeed_);
-	globalParameter_->AddItem(groupName_, "MoveSpeed", moveSpeed_);
-	globalParameter_->AddItem(groupName_, "Gravity", gravity_);
-	globalParameter_->AddItem(groupName_, "AirMoveSpeed", airMoveSpeed_);
-	globalParameter_->AddItem(groupName_, "RecoilSpeed", recoilSpeed_);
-	globalParameter_->AddItem(groupName_, "RecoilJumpSpeed", recoilJumpSpeed_);
-	globalParameter_->AddItem(groupName_, "KikTime", kikTime_);
-	globalParameter_->AddItem(groupName_, "KikWaitTime", kikWaitTime_);
-	globalParameter_->AddItem(groupName_, "MaxFallSpeed", maxFallSpeed_);
+	globalParameter_->AddItem(groupName_, "JumpSpeed", paramater_.jumpSpeed_);
+	globalParameter_->AddItem(groupName_, "MoveSpeed", paramater_.moveSpeed_);
+	globalParameter_->AddItem(groupName_, "Gravity", paramater_.gravity_);
+	globalParameter_->AddItem(groupName_, "AirMoveSpeed", paramater_.airMoveSpeed_);
+	globalParameter_->AddItem(groupName_, "RecoilSpeed", paramater_.recoilSpeed_);
+	globalParameter_->AddItem(groupName_, "RecoilJumpSpeed", paramater_.recoilJumpSpeed_);
+	globalParameter_->AddItem(groupName_, "KikTime", paramater_.kikTime_);
+	globalParameter_->AddItem(groupName_, "KikWaitTime", paramater_.kikWaitTime_);
+	globalParameter_->AddItem(groupName_, "MaxFallSpeed", paramater_.maxFallSpeed_);
+	globalParameter_->AddItem(groupName_, "specialAttackAntiTime_", paramater_.specialAttackAntiTime_);
+	globalParameter_->AddItem(groupName_, "specialAttackFallSpeed_", paramater_.specialAttackFallSpeed_);
+	globalParameter_->AddItem(groupName_, "specialAttackPostJump_", paramater_.specialAttackPostJump_);
 
 }
 
@@ -381,15 +393,19 @@ void Player::AddParmGroup() {
 void Player::SetValues() {
 
 	globalParameter_->SetValue(groupName_, "Translate", model_->transform.translate);
-	globalParameter_->SetValue(groupName_, "JumpSpeed", jumpSpeed_);
-	globalParameter_->SetValue(groupName_, "Gravity", gravity_);
-	globalParameter_->SetValue(groupName_, "MoveSpeed", moveSpeed_);
-	globalParameter_->SetValue(groupName_, "AirMoveSpeed", airMoveSpeed_);
-	globalParameter_->SetValue(groupName_, "RecoilSpeed", recoilSpeed_);
-	globalParameter_->SetValue(groupName_, "RecoilJumpSpeed", recoilJumpSpeed_);
-	globalParameter_->SetValue(groupName_, "KikTime", kikTime_);
-	globalParameter_->SetValue(groupName_, "KikWaitTime", kikWaitTime_);
-	globalParameter_->SetValue(groupName_, "MaxFallSpeed", maxFallSpeed_);
+	globalParameter_->SetValue(groupName_, "JumpSpeed", paramater_.jumpSpeed_);
+	globalParameter_->SetValue(groupName_, "Gravity", paramater_.gravity_);
+	globalParameter_->SetValue(groupName_, "MoveSpeed", paramater_.moveSpeed_);
+	globalParameter_->SetValue(groupName_, "AirMoveSpeed", paramater_.airMoveSpeed_);
+	globalParameter_->SetValue(groupName_, "RecoilSpeed", paramater_.recoilSpeed_);
+	globalParameter_->SetValue(groupName_, "RecoilJumpSpeed", paramater_.recoilJumpSpeed_);
+	globalParameter_->SetValue(groupName_, "KikTime", paramater_.kikTime_);
+	globalParameter_->SetValue(groupName_, "KikWaitTime", paramater_.kikWaitTime_);
+	globalParameter_->SetValue(groupName_, "MaxFallSpeed", paramater_.maxFallSpeed_);
+	globalParameter_->SetValue(groupName_, "specialAttackAntiTime_", paramater_.specialAttackAntiTime_);
+	globalParameter_->SetValue(groupName_, "specialAttackFallSpeed_", paramater_.specialAttackFallSpeed_);
+	globalParameter_->SetValue(groupName_, "specialAttackPostJump_", paramater_.specialAttackPostJump_);
+
 }
 
 ///=====================================================
@@ -397,15 +413,18 @@ void Player::SetValues() {
 ///===================================================== 
 void Player::ApplyGlobalParameter() {
 	model_->transform.translate = globalParameter_->GetValue<Vector3>(groupName_, "Translate");
-	jumpSpeed_ = globalParameter_->GetValue<float>(groupName_, "JumpSpeed");
-	gravity_ = globalParameter_->GetValue<float>(groupName_, "Gravity");
-	moveSpeed_ = globalParameter_->GetValue<float>(groupName_, "MoveSpeed");
-	airMoveSpeed_ = globalParameter_->GetValue<float>(groupName_, "AirMoveSpeed");
-	recoilSpeed_ = globalParameter_->GetValue<float>(groupName_, "RecoilSpeed");
-	recoilJumpSpeed_ = globalParameter_->GetValue<float>(groupName_, "RecoilJumpSpeed");
-	kikTime_ = globalParameter_->GetValue<float>(groupName_, "KikTime");
-	kikWaitTime_ = globalParameter_->GetValue<float>(groupName_, "KikWaitTime");
-	maxFallSpeed_ = globalParameter_->GetValue<float>(groupName_, "MaxFallSpeed");
+	paramater_.jumpSpeed_ = globalParameter_->GetValue<float>(groupName_, "JumpSpeed");
+	paramater_.gravity_ = globalParameter_->GetValue<float>(groupName_, "Gravity");
+	paramater_.moveSpeed_ = globalParameter_->GetValue<float>(groupName_, "MoveSpeed");
+	paramater_.airMoveSpeed_ = globalParameter_->GetValue<float>(groupName_, "AirMoveSpeed");
+	paramater_.recoilSpeed_ = globalParameter_->GetValue<float>(groupName_, "RecoilSpeed");
+	paramater_.recoilJumpSpeed_ = globalParameter_->GetValue<float>(groupName_, "RecoilJumpSpeed");
+	paramater_.kikTime_ = globalParameter_->GetValue<float>(groupName_, "KikTime");
+	paramater_.kikWaitTime_ = globalParameter_->GetValue<float>(groupName_, "KikWaitTime");
+	paramater_.maxFallSpeed_ = globalParameter_->GetValue<float>(groupName_, "MaxFallSpeed");
+	paramater_.specialAttackAntiTime_ = globalParameter_->GetValue<float>(groupName_, "specialAttackAntiTime_");
+	paramater_.specialAttackFallSpeed_ = globalParameter_->GetValue<float>(groupName_, "specialAttackFallSpeed_");
+	paramater_.specialAttackPostJump_ = globalParameter_->GetValue<float>(groupName_, "specialAttackPostJump_");
 }
 ///=========================================================
 /// Class Set
@@ -415,7 +434,7 @@ void Player::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 
 	if (other.tag == "Enemy") {
 
-		SetIsCollision(false);
+		SetKikIsCollision(false);
 		ChangeBehavior(std::make_unique<PlayerRecoil>(this));
 		ChangeAttackBehavior(std::make_unique<PlayerAttackRoot>(this));
 		return;
@@ -424,20 +443,28 @@ void Player::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 
 void Player::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
 
-	if (other.tag == "WeakArea") {
-		kikCollider_->SetTag(tags_[static_cast<size_t>(KikPower::WEAK)]);
+	if (other.tag == "SpecialAttackArea") {
+		if (!dynamic_cast<PlayerSpecialFall*>(attackBehavior_.get())) {
+			ChangeAttackBehavior(std::make_unique<PlayerSpecialFall>(this));
+		}
 	}
+	else {
 
-	else if (other.tag == "NormalArea") {
-		kikCollider_->SetTag(tags_[static_cast<size_t>(KikPower::NORMAL)]);
-	}
-	else	if (other.tag == "MaxPowerArea") {
-		kikCollider_->SetTag(tags_[static_cast<size_t>(KikPower::MAXPOWER)]);
+		if (other.tag == "WeakArea") {
+			kikCollider_->SetTag(tags_[static_cast<size_t>(KikPower::WEAK)]);
+		}
+
+		else if (other.tag == "NormalArea") {
+			kikCollider_->SetTag(tags_[static_cast<size_t>(KikPower::NORMAL)]);
+		}
+		else	if (other.tag == "MaxPowerArea") {
+			kikCollider_->SetTag(tags_[static_cast<size_t>(KikPower::MAXPOWER)]);
+		}
 	}
 }
 
 
-void  Player::SetIsCollision(const bool& is) {
+void  Player::SetKikIsCollision(const bool& is) {
 	kikCollider_->SetIsCollisonCheck(is);
 }
 

@@ -62,7 +62,7 @@ void BaseEnemy::Initialize() {
 void BaseEnemy::Update() {
 
 	/// 生成処理
-	spawnEasing_.time += FPSKeeper::NormalDeltaTime();
+	spawnEasing_.time += FPSKeeper::DeltaTimeRate();
 	spawnEasing_.time = min(spawnEasing_.time, spawnEasing_.maxTime);
 	model_->transform.scale =
 		EaseOutBack(Vector3::GetZeroVec(), BaseEnemy::InitScale_,
@@ -130,7 +130,7 @@ void BaseEnemy::Fall(float& speed, const bool& isJump) {
 		model_->transform.translate.y += speed;
 	}
 	// 加速する
-	speed = max(speed - (gravity_ * FPSKeeper::NormalDeltaTime()), -maxFallSpeed_);
+	speed = max(speed - (gravity_ * FPSKeeper::DeltaTimeRate()), -maxFallSpeed_);
 
 	// 着地
 	if (model_->transform.translate.y <= BaseEnemy::InitY_) {

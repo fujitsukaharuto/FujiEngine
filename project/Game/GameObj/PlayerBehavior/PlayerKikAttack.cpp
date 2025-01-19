@@ -21,7 +21,7 @@ PlayerKikAttack::PlayerKikAttack(Player* boss)
 	/// ===================================================
 	/// 変数初期化
 	/// ===================================================
-	pPlayer_->SetIsCollision(true);
+	pPlayer_->SetKikIsCollision(true);
 	step_ = Step::KIK;
 }
 
@@ -41,9 +41,9 @@ void PlayerKikAttack::Update() {
 		///-----------------------------------------------------------
         /// キック
         ///------------------------------------------------------------
-		kikTime_ += FPSKeeper::NormalDeltaTime();
+		kikTime_ += FPSKeeper::DeltaTimeRate();
 		
-		if (kikTime_ < pPlayer_->GetKikTime()) break;// キックタイム
+		if (kikTime_ < pPlayer_->GetParamater().kikTime_) break;// キックタイム
 		step_ = Step::RETUNROOT;
 		
 		break;
@@ -51,7 +51,7 @@ void PlayerKikAttack::Update() {
 		///-----------------------------------------------------------
 		/// 通常に戻る
 		///------------------------------------------------------------
-		pPlayer_->SetIsCollision(false);
+		pPlayer_->SetKikIsCollision(false);
 		pPlayer_->ChangeAttackBehavior(std::make_unique<PlayerAttackRoot>(pPlayer_));
 	
 		break;

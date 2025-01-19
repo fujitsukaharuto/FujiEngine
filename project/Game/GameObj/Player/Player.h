@@ -20,6 +20,21 @@ public:
 		NORMAL,
 		MAXPOWER,
 	};
+	struct Paramater {
+		float             moveSpeed_;
+		float             airMoveSpeed_;
+		float             jumpSpeed_;
+		float             gravity_;
+		float             recoilSpeed_;
+		float             recoilJumpSpeed_;
+		float             kikTime_;
+		float             kikWaitTime_;
+		float             maxFallSpeed_;
+		float             specialAttackAntiTime_;
+		float             specialAttackFallSpeed_;
+		float             specialAttackPostJump_;
+		float             fallSpeed_;
+	};
 private:
 
 	/// ===================================================
@@ -46,20 +61,7 @@ private:
 	float             objectiveAngle_;
 	Vector3           inputDirection_;
 
-	/// 移動、ジャンプ
-	float             moveSpeed_;
-	float             airMoveSpeed_;
-	float             jumpSpeed_;
-	float             gravity_;
-	float             recoilSpeed_;
-	float             recoilJumpSpeed_;
-	float             kikTime_;
-	float             kikWaitTime_;
-	float             maxFallSpeed_;
-
-
-	// fall
-	float             fallSpeed_;
+	Paramater paramater_;
 
 	/// collider
 	std::unique_ptr<AABBCollider> kikCollider_;
@@ -114,17 +116,11 @@ public:
 	/// ===================================================
 	/// getter method
 	/// ===================================================
-	float GetMoveSpeed()const { return moveSpeed_; }
-	float GetAirMoveSpeed()const { return airMoveSpeed_; }
-	float GetJumpSpeed()const { return jumpSpeed_; }
-	float GetRecoilJumpSpeed()const { return recoilJumpSpeed_; }
-	float  GetRecoilSpeed()const { return recoilSpeed_; }
-	float  GetKikTime()const { return kikTime_; }
-	float GetKikWaitTime()const { return kikWaitTime_; }
+	Paramater GetParamater()const { return paramater_; }
 	float GetFacingDirection()const;
 	std::string GetTag(int i) { return tags_[i]; }
 	/// ===================================================
 	/// setter method
 	/// ===================================================
-	void SetIsCollision(const bool& is);
+	void SetKikIsCollision(const bool& is);
 };

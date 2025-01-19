@@ -28,7 +28,7 @@ EnemyJump::~EnemyJump() {
 }
 
 void  EnemyJump::Update() {
-	rotateZ_ += rotateSpeed_ * FPSKeeper::NormalDeltaTime();
+	rotateZ_ += rotateSpeed_ * FPSKeeper::DeltaTimeRate();
 	pBaseEnemy_->SetRotation(Vector3(0, 0, rotateZ_));
 	pBaseEnemy_->Jump(jumpSpeed_);
 	

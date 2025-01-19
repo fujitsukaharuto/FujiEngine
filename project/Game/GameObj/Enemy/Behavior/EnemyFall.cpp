@@ -34,7 +34,7 @@ void EnemyFall::Update() {
         /// 落ちる 
         ///----------------------------------------------------------------------
         SpeedChangeMethod();
-        time_ += FPSKeeper::NormalDeltaTime(); // フレーム間の経過時間を加算
+        time_ += FPSKeeper::DeltaTimeRate(); // フレーム間の経過時間を加算
 
         // サイン波で左右に揺れるZ軸回転角を計算
         zRotation_ = amplitude_ * std::sin(frequency_ * time_);
@@ -43,7 +43,7 @@ void EnemyFall::Update() {
         pBaseEnemy_->SetRotation(Vector3(0, 0, zRotation_));
 
         // Y軸方向に落下
-        pBaseEnemy_->AddPosition(Vector3(0, -fallspeed_ *FPSKeeper::NormalDeltaTime(), 0));
+        pBaseEnemy_->AddPosition(Vector3(0, -fallspeed_ *FPSKeeper::DeltaTimeRate(), 0));
 
         // 着地判定
         if (pBaseEnemy_->GetTrans().translate.y > BaseEnemy::InitY_) break;
@@ -77,7 +77,7 @@ void EnemyFall::Debug() {
 }
 
 void EnemyFall::SpeedChangeMethod() {
-    speedEase_.time += FPSKeeper::NormalDeltaTime();
+    speedEase_.time += FPSKeeper::DeltaTimeRate();
     fallspeed_ = EaseInCirc(maxSpeed_, pBaseEnemy_->GetFallSpeed(), speedEase_.time, speedEase_.maxTime);
 
     if (speedEase_.time >= speedEase_.maxTime) {

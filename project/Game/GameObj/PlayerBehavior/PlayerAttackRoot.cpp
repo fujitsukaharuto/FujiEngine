@@ -33,8 +33,8 @@ void PlayerAttackRoot::Update() {
 	switch (step_)
 	{
 	case PlayerAttackRoot::Step::WAIT:
-		waitTime_ += FPSKeeper::NormalDeltaTime();
-		if (waitTime_ < pPlayer_->GetKikWaitTime())break;
+		waitTime_ += FPSKeeper::DeltaTimeRate();
+		if (waitTime_ < pPlayer_->GetParamater().kikWaitTime_)break;
 		step_ = Step::ATTACK;
 		break;
 	case PlayerAttackRoot::Step::ATTACK:

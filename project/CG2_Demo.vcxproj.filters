@@ -278,6 +278,9 @@
     <ClCompile Include="Game\GameObj\KikArea\KikArea.cpp">
       <Filter>Game\GameObj\KikArea</Filter>
     </ClCompile>
+    <ClCompile Include="Game\GameObj\PlayerBehavior\PlayerSpecialFall.cpp">
+      <Filter>Game\Behavior\Player\AttackBehavior</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Audio\Audio.h">
@@ -573,6 +576,9 @@
     </ClInclude>
     <ClInclude Include="Game\GameObj\KikArea\KikArea.h">
       <Filter>Game\GameObj\KikArea</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\PlayerBehavior\PlayerSpecialFall.h">
+      <Filter>Game\Behavior\Player\AttackBehavior</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
