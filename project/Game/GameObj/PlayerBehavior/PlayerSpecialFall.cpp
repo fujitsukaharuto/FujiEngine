@@ -68,7 +68,7 @@ void PlayerSpecialFall::Update() {
 		/// ---------------------------------------------------------
 	    ///  後動作
 	    /// ---------------------------------------------------------
-		pPlayer_->Jump(postJumpSpeed_);
+		pPlayer_->SpecialPostJump(postJumpSpeed_);
 		rotationZ_ += rotateSpeed_ * FPSKeeper::NormalDeltaTime();
 		pPlayer_->SetRotationZ(rotationZ_);
 

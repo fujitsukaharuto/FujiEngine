@@ -248,6 +248,35 @@ void Player::Fall(float& speed, const bool& isJump) {
 	}
 }
 
+/// ===================================================
+///  Player Jump
+/// ===================================================
+
+void Player::SpecialPostJump(float& speed) {
+	// 移動
+	model_->transform.translate.y += speed;
+	SpecialPostFall(speed, true);
+
+}
+
+///=========================================================
+///　落ちる
+///==========================================================
+void Player::SpecialPostFall(float& speed, const bool& isJump) {
+	if (!isJump) {
+		// 移動
+		model_->transform.translate.y += speed;
+	}
+	// 加速する
+	speed = max(speed - (paramater_.specialAttackPostGravity_ * FPSKeeper::NormalDeltaTime()), -paramater_.specialAttackPostMaxFallSpeed_);
+
+	// 着地
+	if (model_->transform.translate.y <= Player::InitY_) {
+		model_->transform.translate.y = Player::InitY_;
+		speed = 0.0f;
+	}
+}
+
 ///=========================================================
 ///　移動制限
 ///==========================================================
@@ -340,6 +369,8 @@ void Player::AdjustParm() {
 		ImGui::DragFloat("specialAttackAntiTime_", &paramater_.specialAttackAntiTime_, 0.01f);
 		ImGui::DragFloat("specialAttackFallSpeed_", &paramater_.specialAttackFallSpeed_, 0.01f);
 		ImGui::DragFloat("specialAttackPostJump_", &paramater_.specialAttackPostJump_, 0.01f);
+		ImGui::DragFloat("specialAttackPostGravity_", &paramater_.specialAttackPostGravity_, 0.01f);
+		ImGui::DragFloat("specialAttackPostMaxFallSpeed_", &paramater_.specialAttackPostMaxFallSpeed_, 0.01f);
 
 
 		/// セーブとロード
@@ -384,6 +415,8 @@ void Player::AddParmGroup() {
 	globalParameter_->AddItem(groupName_, "specialAttackAntiTime_", paramater_.specialAttackAntiTime_);
 	globalParameter_->AddItem(groupName_, "specialAttackFallSpeed_", paramater_.specialAttackFallSpeed_);
 	globalParameter_->AddItem(groupName_, "specialAttackPostJump_", paramater_.specialAttackPostJump_);
+	globalParameter_->AddItem(groupName_, "specialAttackPostGravity_", paramater_.specialAttackPostGravity_);
+	globalParameter_->AddItem(groupName_, "specialAttackPostMaxFallSpeed_", paramater_.specialAttackPostMaxFallSpeed_);
 
 }
 
@@ -405,6 +438,8 @@ void Player::SetValues() {
 	globalParameter_->SetValue(groupName_, "specialAttackAntiTime_", paramater_.specialAttackAntiTime_);
 	globalParameter_->SetValue(groupName_, "specialAttackFallSpeed_", paramater_.specialAttackFallSpeed_);
 	globalParameter_->SetValue(groupName_, "specialAttackPostJump_", paramater_.specialAttackPostJump_);
+	globalParameter_->SetValue(groupName_, "specialAttackPostGravity_", paramater_.specialAttackPostGravity_);
+	globalParameter_->SetValue(groupName_, "specialAttackPostMaxFallSpeed_", paramater_.specialAttackPostMaxFallSpeed_);
 
 }
 
@@ -425,6 +460,8 @@ void Player::ApplyGlobalParameter() {
 	paramater_.specialAttackAntiTime_ = globalParameter_->GetValue<float>(groupName_, "specialAttackAntiTime_");
 	paramater_.specialAttackFallSpeed_ = globalParameter_->GetValue<float>(groupName_, "specialAttackFallSpeed_");
 	paramater_.specialAttackPostJump_ = globalParameter_->GetValue<float>(groupName_, "specialAttackPostJump_");
+	paramater_.specialAttackPostGravity_ = globalParameter_->GetValue<float>(groupName_, "specialAttackPostGravity_");
+	paramater_.specialAttackPostMaxFallSpeed_ = globalParameter_->GetValue<float>(groupName_, "specialAttackPostMaxFallSpeed_");
 }
 ///=========================================================
 /// Class Set

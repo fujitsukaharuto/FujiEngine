@@ -10,12 +10,14 @@
         "RecoilJumpSpeed": 0.44999998807907104,
         "RecoilSpeed": 2.4200000762939453,
         "Translate": [
-            -2.058976173400879,
+            -6.462203502655029,
             1.5,
             -2.558469295501709
         ],
         "specialAttackAntiTime_": 0.2800000011920929,
         "specialAttackFallSpeed_": 34.27000045776367,
-        "specialAttackPostJump_": 0.25
+        "specialAttackPostGravity_": 1.7000000476837158,
+        "specialAttackPostJump_": 0.9800000190734863,
+        "specialAttackPostMaxFallSpeed_": 0.75
     }
 }

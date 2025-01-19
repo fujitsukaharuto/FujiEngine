@@ -33,6 +33,8 @@ public:
 		float             specialAttackAntiTime_;
 		float             specialAttackFallSpeed_;
 		float             specialAttackPostJump_;
+		float             specialAttackPostGravity_;
+		float             specialAttackPostMaxFallSpeed_;
 		float             fallSpeed_;
 	};
 private:
@@ -88,7 +90,9 @@ public:
 
 	///* ジャンプ
 	void Jump(float& speed);
+	void SpecialPostJump(float& speed);
 	void Fall(float& speed, const bool& isJump = false);
+	void SpecialPostFall(float& speed, const bool& isJump = false);
 	void ChangeBehavior(std::unique_ptr<BasePlayerBehavior>behavior);
 	void ChangeAttackBehavior(std::unique_ptr<BasePlayerAttackBehavior>behavior);
 
