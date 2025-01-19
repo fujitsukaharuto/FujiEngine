@@ -19,7 +19,6 @@ void PointLight::Initialize() {
 void PointLight::SetLightCommand(ID3D12GraphicsCommandList* commandList) {
 
 	commandList->SetGraphicsRootConstantBufferView(5, pointLightResource_->GetGPUVirtualAddress());
-
 }
 
 #ifdef _DEBUG

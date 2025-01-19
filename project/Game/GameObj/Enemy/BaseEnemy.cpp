@@ -147,17 +147,19 @@ void BaseEnemy::Fall(float& speed, const bool& isJump) {
 
 void BaseEnemy::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 
+	// 弱いキックをくらう
 	if (other.tag == pPlayer_->GetTag(static_cast<size_t>(Player::KikPower::WEAK))) {
 
 		jumpPower_ = JumpPower::WEAK;
 		ChangeBehavior(std::make_unique<EnemyJump>(this));
 	}
+	// 普通のキックをくらう
 	else  if (other.tag == pPlayer_->GetTag(static_cast<size_t>(Player::KikPower::NORMAL))) {
 
 		jumpPower_ = JumpPower::NORMAL;
 		ChangeBehavior(std::make_unique<EnemyJump>(this));
 	}
-
+	// 強いキックをくらう
 	else 	if (other.tag == pPlayer_->GetTag(static_cast<size_t>(Player::KikPower::MAXPOWER))) {
 
 		jumpPower_ = JumpPower::MaxPower;
