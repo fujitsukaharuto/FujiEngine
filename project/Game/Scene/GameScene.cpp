@@ -50,7 +50,7 @@ void GameScene::Initialize() {
 
 	terrain = std::make_unique<Object3d>();
 	terrain->Create("ground.obj");
-	terrain->SetUVScale({ 15.0f,15.0f });
+	terrain->SetUVScale({ 15.0f,15.0f }, { 0.0f,0.0f });
 	terrain->transform.scale = { 3.0f,3.0f,3.0f };
 
 	sky = std::make_unique<Object3d>();
@@ -70,6 +70,17 @@ void GameScene::Initialize() {
 	followCamera_->Initialize();
 	followCamera_->SetTarget(&player_->GetTrans());
 	followCamera_->SetLockOn(lockOn_.get());
+
+
+	/*PlaneDrawer::GetInstance()->AddPlanePoint({ 0.0f,1.0f,1.0f });
+	PlaneDrawer::GetInstance()->AddPlanePoint({ 1.0f,1.0f,1.0f });
+	PlaneDrawer::GetInstance()->AddPlanePoint({ 0.0f,2.0f,1.0f });
+	PlaneDrawer::GetInstance()->AddPlanePoint({ 1.0f,2.0f,1.0f });
+	PlaneDrawer::GetInstance()->AddPlanePoint({ 0.0f,3.0f,1.0f });
+	PlaneDrawer::GetInstance()->AddPlanePoint({ 1.0f,3.0f,1.0f });
+	PlaneDrawer::GetInstance()->AddPlanePoint({ 0.0f,4.0f,1.0f });
+	PlaneDrawer::GetInstance()->AddPlanePoint({ 1.0f,4.0f,1.0f });*/
+
 
 }
 

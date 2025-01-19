@@ -48,9 +48,9 @@ void Model::SetColor(const Vector4& color) {
 	}
 }
 
-void Model::SetUVScale(const Vector2& scale) {
+void Model::SetUVScale(const Vector2& scale, const Vector2& uvTrans) {
 	for (Material material : material_) {
-		material.SetUVScale(scale);
+		material.SetUVScale(scale,uvTrans);
 	}
 }
 

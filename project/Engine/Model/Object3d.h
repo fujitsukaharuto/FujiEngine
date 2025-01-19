@@ -23,6 +23,7 @@ public:
 	void Draw(Material* mate = nullptr);
 
 	void AnimeDraw();
+	void SlashDraw();
 
 	Matrix4x4 GetWorldMat() const;
 
@@ -32,7 +33,7 @@ public:
 
 	void SetColor(const Vector4& color);
 
-	void SetUVScale(const Vector2& scale);
+	void SetUVScale(const Vector2& scale, const Vector2& uvTrans);
 
 	void SetRightDir(const Vector3& right) { directionalLightData_->direction = right; }
 

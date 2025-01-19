@@ -57,6 +57,23 @@ void Object3d::AnimeDraw() {
 	}
 }
 
+void Object3d::SlashDraw() {
+
+	SetWVP();
+
+	PipelineManager::GetInstance()->SetPipeline(Pipe::Slash);
+	ID3D12GraphicsCommandList* cList = DXCom::GetInstance()->GetCommandList();
+	cList->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
+	cList->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
+	cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_->GetGPUVirtualAddress());
+	PointLightManager::GetInstance()->SetLightCommand(cList);
+
+	if (model_) {
+		model_->Draw(cList, nullptr);
+	}
+
+}
+
 Matrix4x4 Object3d::GetWorldMat() const {
 	Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 
@@ -86,8 +103,8 @@ void Object3d::SetColor(const Vector4& color) {
 	model_->SetColor(color);
 }
 
-void Object3d::SetUVScale(const Vector2& scale) {
-	model_->SetUVScale(scale);
+void Object3d::SetUVScale(const Vector2& scale, const Vector2& uvTrans) {
+	model_->SetUVScale(scale,uvTrans);
 }
 
 void Object3d::SetTexture(const std::string& name) {

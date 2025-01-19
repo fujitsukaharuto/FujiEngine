@@ -14,8 +14,10 @@ public:
 	void Update();
 	void Draw();
 
-	void SetParent(Object3d* parent) { slashModel_->SetParent(parent); }
+	void ReSet();
 
+	void SetParent(Object3d* parent) { slashModel_->SetParent(parent); }
+	Object3d* GetModel() { return slashModel_.get(); }
 
 #ifdef _DEBUG
 	void Debug();
@@ -30,7 +32,7 @@ private:
 
 
 	float slashTime_ = 0.0f;
-	float slashTimeLimitte_ = 40.0f;
+	float slashTimeLimitte_ = 20.0f;
 
 	Vector4 modelColor_ = { 1.0f,1.0f,1.0f,1.0f };
 	Vector2 uvTrans_ = { 0.0f,0.0f };

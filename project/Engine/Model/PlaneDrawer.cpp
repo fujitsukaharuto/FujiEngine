@@ -98,8 +98,27 @@ void PlaneDrawer::Render() {
 
 	for (size_t i = 0; i < planeCount; ++i) {
 		// 4つの頂点を取得
+
+		float step = 1.0f / static_cast<float>(planeCount);
+
 		for (size_t j = 0; j < 4; ++j) {
-			planes_->vertMap[vertexIndex++] = points_[i * 2 + j];
+
+			planes_->vertMap[vertexIndex] = points_[i * 2 + j];
+
+			// UV座標を設定
+			if (j == 0) {
+				planes_->vertMap[vertexIndex].uv = { step * i , 0.0f };   // 左上
+			}
+			else if (j == 1) {
+				planes_->vertMap[vertexIndex].uv = { step * i , 1.0f };   // 左下
+			}
+			else if (j == 2) {
+				planes_->vertMap[vertexIndex].uv = { step + (step * i) , 0.0f };   // 右上
+			}
+			else if (j == 3) {
+				planes_->vertMap[vertexIndex].uv = { step + (step * i), 1.0f };   // 右下
+			}
+			vertexIndex++;
 		}
 
 		// インデックスを設定

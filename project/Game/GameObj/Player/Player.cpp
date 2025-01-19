@@ -50,7 +50,9 @@ void Player::Initialize() {
 	slash_ = std::make_unique<SlashDrawer>();
 	slash_->Initialize();
 	slash_->SetParent(model_.get());
-
+	slash_->GetModel()->transform.translate.y = 0.5f;
+	slash_->GetModel()->transform.rotate.z = 1.4f;
+	slash_->GetModel()->transform.rotate.y = 1.4f;
 
 	collider_ = std::make_unique<AABBCollider>();
 	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
@@ -114,6 +116,7 @@ void Player::Update() {
 				behaviorRequest_ = PlayerBehavior::kAttack;
 				Vector3 attackCollider = { 0.0f,0.0f,1.0f };
 				colliderAttack_->SetPos(attackCollider);
+				slash_->ReSet();
 			}
 			else {
 				isAttack2_ = true;
@@ -142,6 +145,8 @@ void Player::Update() {
 
 	ImGui::Begin("weapon");
 	ImGui::DragFloat3("rotate", &weapon_->transform.rotate.x, 0.01f);
+
+	ImGui::DragFloat3("rotateSlash", &slash_->GetModel()->transform.rotate.x, 0.01f);
 	ImGui::End();
 	ImGui::Begin("body");
 	ImGui::DragFloat3("rotateBody", &body_->transform.rotate.x, 0.01f);
@@ -166,6 +171,7 @@ void Player::Update() {
 		PlaneDrawer::GetInstance()->AddPlanePoint(attackParticle_.GetWorldPos());
 		PlaneDrawer::GetInstance()->AddPlanePoint(attackParticle2_.GetWorldPos());
 
+		slash_->Update();
 	}
 	else {
 		if (firePlane_->transform.scale.x > 0.0f) {
@@ -186,13 +192,12 @@ void Player::Update() {
 	}
 
 	if (firePlane_->transform.scale.x <= 1.0f) {
-		firePlane_->SetUVScale({ 1.0f,firePlane_->transform.scale.x });
+		firePlane_->SetUVScale({ 1.0f,firePlane_->transform.scale.x }, { 0.0f,0.0f });
 	}
 	else {
-		firePlane_->SetUVScale({ 1.0f,1.0f });
+		firePlane_->SetUVScale({ 1.0f,1.0f }, { 0.0f,0.0f });
 	}
 
-	slash_->Update();
 	model_->UpdateWVP();
 
 
@@ -212,7 +217,9 @@ void Player::Draw([[maybe_unused]]Material* mate) {
 }
 
 void Player::SlashDraw() {
-	slash_->Draw();
+	if (isAttack_) {
+		slash_->Draw();
+	}
 }
 
 void Player::BehaviorRequest() {
