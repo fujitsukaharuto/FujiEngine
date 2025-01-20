@@ -59,6 +59,8 @@ private:
 
 	std::unique_ptr<CollisionManager> cMane_;
 
+	std::unique_ptr<TestBaseObj> test_;
+
 	std::unique_ptr<EnemyManager> enemyManager_;
 	std::unique_ptr<Object3d> terrain = nullptr;
 	std::unique_ptr<Object3d> sky = nullptr;

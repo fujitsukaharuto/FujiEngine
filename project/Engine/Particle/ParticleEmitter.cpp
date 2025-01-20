@@ -35,6 +35,7 @@ void ParticleEmitter::DebugGUI() {
 		if (ImGui::TreeNode("typeSelect")) {
 			ImGui::Combo("sizeType##type", &grain.type, "kNormal\0kShift\0kSin\0");
 			ImGui::Combo("speedType##type", &grain.speedType, "kConstancy\0kChange\0kReturn\0");
+			ImGui::Combo("rotateType##type", &grain.rotateType, "kUsually\0kVelocityR\0");
 			ImGui::Combo("colorType##type", &grain.colorType, "kDefault\0kRandom\0");
 			ImGui::TreePop();
 		}

@@ -86,6 +86,8 @@ inline void TestBaseObj::Update() {
 	hitParticle3_.pos = model_->GetWorldPos();
 	hitParticle4_.pos = model_->GetWorldPos();
 
+	hitParticle1_.Emit();
+
 #ifdef _DEBUG
 	hitParticle1_.DebugGUI();
 	hitParticle2_.DebugGUI();

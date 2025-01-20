@@ -71,6 +71,8 @@ void GameScene::Initialize() {
 	followCamera_->SetTarget(&player_->GetTrans());
 	followCamera_->SetLockOn(lockOn_.get());
 
+	test_ = std::make_unique<TestBaseObj>();
+	test_->Initialize();
 
 	/*PlaneDrawer::GetInstance()->AddPlanePoint({ 0.0f,1.0f,1.0f });
 	PlaneDrawer::GetInstance()->AddPlanePoint({ 1.0f,1.0f,1.0f });
@@ -98,6 +100,8 @@ void GameScene::Update() {
 	dxCommon_->UpDate();
 
 	BlackFade();
+
+	test_->Update();
 
 	enemyManager_->GetEnemyList().remove_if([this](const std::unique_ptr<Enemy>& enemy) {
 		if (!enemy->IsLive()) {
@@ -129,6 +133,7 @@ void GameScene::Update() {
 	if (player_->GetIsAttack()) {
 		cMane_->AddCollider(player_->GetColliderAttack());
 	}
+	cMane_->AddCollider(test_->GetCollider());
 	cMane_->CheckAllCollision();
 
 	ParticleManager::GetInstance()->Update();
@@ -150,6 +155,7 @@ void GameScene::Draw() {
 	terrain->Draw();
 	sky->Draw();
 	player_->Draw();
+	test_->Draw();
 
 	player_->SlashDraw();
 

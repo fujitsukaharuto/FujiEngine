@@ -217,9 +217,9 @@ void Player::Draw([[maybe_unused]]Material* mate) {
 }
 
 void Player::SlashDraw() {
-	if (isAttack_) {
+	
 		slash_->Draw();
-	}
+	
 }
 
 void Player::BehaviorRequest() {

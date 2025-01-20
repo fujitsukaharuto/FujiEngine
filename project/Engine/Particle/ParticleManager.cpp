@@ -397,8 +397,43 @@ void ParticleManager::Emit(const std::string& name, const Vector3& pos, const Ve
 				particle.transform.translate = Random::GetVector3(para.transx, para.transy, para.transz);
 				particle.transform.translate += pos;
 				particle.transform.scale = { grain.startSize.x,grain.startSize.y,1.0f };
-				particle.transform.rotate = rotate;
 				particle.speed = Random::GetVector3(para.speedx, para.speedy, para.speedz);
+
+				particle.rotateType = grain.rotateType;
+				switch (particle.rotateType) {
+				case kUsually:
+					particle.transform.rotate = rotate;
+					break;
+				case kVelocityR:
+
+					Vector3 veloSpeed = particle.speed.Normalize();
+
+					// カメラの回転を考慮して速度ベクトルを変換
+					Vector3 cameraR = CameraManager::GetInstance()->GetCamera()->transform.rotate;
+					Matrix4x4 rotateCamera = MakeRotateXYZMatrix(-cameraR);
+					veloSpeed = TransformNormal(veloSpeed, rotateCamera);
+
+					Vector3 defo = { 0.0f,1.0f,0.0f };
+					defo= TransformNormal(defo, rotateCamera);
+
+					Matrix4x4 dToD = DirectionToDirection(defo, veloSpeed.Normalize());
+					Vector3 angleDToD = ExtractEulerAngles(dToD);
+					particle.transform.rotate = angleDToD;
+
+					//// 速度ベクトルの方向からZ軸の回転を計算
+					//particle.transform.rotate.z = std::atan2(veloSpeed.x, veloSpeed.y);
+
+					//// Y軸回転は0で固定（必要であれば調整）
+					//particle.transform.rotate.y = 0.0f;
+
+					//// X軸の回転を計算するための処理（速度ベクトルをZ軸回転の逆変換）
+					//Matrix4x4 zrota = MakeRotateZMatrix(-particle.transform.rotate.z);
+					//Vector3 velocityZ = TransformNormal(veloSpeed, zrota);
+					//particle.transform.rotate.x = std::atan2(-velocityZ.z, velocityZ.y);
+
+					break;
+				}
+
 				particle.lifeTime_ = grain.lifeTime_;
 				particle.startLifeTime_ = particle.lifeTime_;
 				particle.isBillBoard_ = grain.isBillBoard_;
