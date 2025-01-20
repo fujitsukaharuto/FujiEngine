@@ -4,6 +4,7 @@
 #include "Game/Scene/TitleScene.h"
 #include "Game/Scene/GameScene.h"
 #include "Game/Scene/ResultScene.h"
+#include "Game/Scene/GameOverScene.h"
 #include "ImGuiManager.h"
 
 
@@ -66,6 +67,10 @@ void SceneManager::StartScene(const std::string& sceneName) {
 	}
 	else if (sceneName == "RESULT") {
 		scene_ = new ResultScene();
+		finishTime = 80.0f;
+	}
+	else if (sceneName == "GAMEOVER") {
+		scene_ = new GameOverScene();
 		finishTime = 80.0f;
 	}
 	scene_->Init();
