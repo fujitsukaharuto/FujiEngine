@@ -34,7 +34,6 @@ void Player::Initialize() {
 	OriginGameObject::Initialize();
 	OriginGameObject::SetModel("player.obj");
 	tags_[static_cast<size_t>(KikPower::WEAK)] = "WeakKik";
-	tags_[static_cast<size_t>(KikPower::NORMAL)] = "NormalKik";
 	tags_[static_cast<size_t>(KikPower::MAXPOWER)] = "MaxPowerKik";
 
 	///* グローバルパラメータ
@@ -43,10 +42,13 @@ void Player::Initialize() {
 	AddParmGroup();
 	ApplyGlobalParameter();
 
+	kikDirectionView_ = std::make_unique<KikDirectionView>();
+	kikDirectionView_->Initialize();
+
 	/// collider
 	kikCollider_ = std::make_unique<AABBCollider>();
 	kikCollider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
-	kikCollider_->SetTag(tags_[static_cast<size_t>(KikPower::MAXPOWER)]);
+	kikCollider_->SetTag(tags_[static_cast<size_t>(KikPower::WEAK)]);
 	kikCollider_->SetParent(GetModel());
 	kikCollider_->SetWidth(2.0f);
 	kikCollider_->SetHeight(2.0f);
@@ -92,9 +94,10 @@ void Player::Update() {
 	//　移動制限
 	MoveToLimit();
 
+	ChangeKikDirection();// キック向き
+
 	collider_->InfoUpdate();
 	kikCollider_->InfoUpdate();
-
 	/// 更新
 	//base::Update();
 }
@@ -108,6 +111,7 @@ void Player::Draw(Material* material) {
 	if (dynamic_cast<PlayerKikAttack*>(attackBehavior_.get())) {
 		kikModel_->Draw();
 	}
+	kikDirectionView_->Draw(material);
 #ifdef _DEBUG
 	kikCollider_->DrawCollider();
 	collider_->DrawCollider();
@@ -221,7 +225,7 @@ bool Player::GetIsMoving() {
 
 void Player::Jump(float& speed) {
 	// 移動
-	model_->transform.translate.y += speed;
+	model_->transform.translate.y += speed * FPSKeeper::NormalDeltaTime();
 	Fall(speed, true);
 
 }
@@ -232,7 +236,7 @@ void Player::Jump(float& speed) {
 void Player::Fall(float& speed, const bool& isJump) {
 	if (!isJump) {
 		// 移動
-		model_->transform.translate.y += speed;
+		model_->transform.translate.y += speed * FPSKeeper::NormalDeltaTime();
 	}
 	// 加速する
 	speed = max(speed - (paramater_.gravity_ * FPSKeeper::NormalDeltaTime()), -paramater_.maxFallSpeed_);
@@ -371,6 +375,8 @@ void Player::AdjustParm() {
 		ImGui::DragFloat("specialAttackPostJump_", &paramater_.specialAttackPostJump_, 0.01f);
 		ImGui::DragFloat("specialAttackPostGravity_", &paramater_.specialAttackPostGravity_, 0.01f);
 		ImGui::DragFloat("specialAttackPostMaxFallSpeed_", &paramater_.specialAttackPostMaxFallSpeed_, 0.01f);
+		ImGui::SeparatorText("DirectionChange");
+		ImGui::DragFloat("kikDirectionSpeed_", &paramater_.kikDirectionSpeed_, 0.01f);
 
 
 		/// セーブとロード
@@ -417,6 +423,7 @@ void Player::AddParmGroup() {
 	globalParameter_->AddItem(groupName_, "specialAttackPostJump_", paramater_.specialAttackPostJump_);
 	globalParameter_->AddItem(groupName_, "specialAttackPostGravity_", paramater_.specialAttackPostGravity_);
 	globalParameter_->AddItem(groupName_, "specialAttackPostMaxFallSpeed_", paramater_.specialAttackPostMaxFallSpeed_);
+	globalParameter_->AddItem(groupName_, "kikDirectionSpeed_", paramater_.kikDirectionSpeed_);
 
 }
 
@@ -440,7 +447,7 @@ void Player::SetValues() {
 	globalParameter_->SetValue(groupName_, "specialAttackPostJump_", paramater_.specialAttackPostJump_);
 	globalParameter_->SetValue(groupName_, "specialAttackPostGravity_", paramater_.specialAttackPostGravity_);
 	globalParameter_->SetValue(groupName_, "specialAttackPostMaxFallSpeed_", paramater_.specialAttackPostMaxFallSpeed_);
-
+	globalParameter_->SetValue(groupName_, "kikDirectionSpeed_", paramater_.kikDirectionSpeed_);
 }
 
 ///=====================================================
@@ -462,6 +469,7 @@ void Player::ApplyGlobalParameter() {
 	paramater_.specialAttackPostJump_ = globalParameter_->GetValue<float>(groupName_, "specialAttackPostJump_");
 	paramater_.specialAttackPostGravity_ = globalParameter_->GetValue<float>(groupName_, "specialAttackPostGravity_");
 	paramater_.specialAttackPostMaxFallSpeed_ = globalParameter_->GetValue<float>(groupName_, "specialAttackPostMaxFallSpeed_");
+	paramater_.kikDirectionSpeed_ = globalParameter_->GetValue<float>(groupName_, "kikDirectionSpeed_");
 }
 ///=========================================================
 /// Class Set
@@ -485,7 +493,7 @@ void Player::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
 			ChangeAttackBehavior(std::make_unique<PlayerSpecialFall>(this));
 		}
 	}
-	else {
+	/*else {
 
 		if (other.tag == "WeakArea") {
 			kikCollider_->SetTag(tags_[static_cast<size_t>(KikPower::WEAK)]);
@@ -497,7 +505,7 @@ void Player::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
 		else	if (other.tag == "MaxPowerArea") {
 			kikCollider_->SetTag(tags_[static_cast<size_t>(KikPower::MAXPOWER)]);
 		}
-	}
+	}*/
 }
 
 
@@ -514,4 +522,74 @@ float Player::GetFacingDirection() const {
 
 	// sin関数を使用して向きを判定（左: 負, 右: 正）
 	return (std::sin(angle) >= 0.0f) ? 1.0f : -1.0f;
+}
+
+
+void Player::ChangeKikDirection() {
+	Input* input = Input::GetInstance();
+	
+
+	float moveSpeed = paramater_.kikDirectionSpeed_ * FPSKeeper::DeltaTimeRate(); // 速度をdeltaTimeで調整
+
+	// 入力に応じて X軸方向の変更量を決定
+	float xMove = 0.0f;
+
+	///----------------------------------------------------
+	///  keyBorad
+	///----------------------------------------------------
+	if (input->PushKey(DIK_LEFT)) {
+		xMove = -moveSpeed;
+	}
+	if (input->PushKey(DIK_RIGHT)) {
+		xMove = moveSpeed;
+	}
+
+	///----------------------------------------------------
+	///  JoyStick
+	///----------------------------------------------------
+	if (Input::GetInstance()->GetGamepadState(joyState)) {
+		if ((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER)) {
+			xMove = -moveSpeed;
+		}
+		else if ((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER)) {
+			xMove = moveSpeed;
+		}
+	}
+
+
+	// X軸方向の変更を適用
+	kikDirection_.x += xMove;
+
+	// 正規化処理
+	kikDirection_.Normalize();
+
+
+	// 傾き制限と、常に上向きにする処理
+	float maxY = 0.9f; // 上向きを維持する為のY軸の最低値 
+	float minX = -0.9f; // X軸の傾きの最小値
+	float maxX = 0.9f; // X軸の傾きの最大値
+
+	// X軸の制限
+	kikDirection_.x = std::clamp(kikDirection_.x, minX, maxX);
+
+	// 上向きを維持するためのY軸の調整
+	// X軸が最大または最小の場合、Y軸を最低値に設定
+	if (kikDirection_.x >= maxX || kikDirection_.x <= minX) {
+		kikDirection_.y = maxY;
+	}
+	else {
+		// 緩やかに上向きを維持
+		kikDirection_.y = max(kikDirection_.y, maxY);
+	}
+
+	// 再度正規化
+	kikDirection_.Normalize();
+
+	// 念のため、Z成分を0に設定（2Dでの使用を想定）
+	kikDirection_.z = 0.0f;
+
+	// 可視化
+	kikDirectionView_->SetDirection(kikDirection_);
+	kikDirectionView_->SetStartPos(kikCollider_->GetPos());
+	kikDirectionView_->Update();
 }

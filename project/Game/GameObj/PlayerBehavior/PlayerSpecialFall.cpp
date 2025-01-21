@@ -7,6 +7,7 @@
 
 /// boss
 #include"GameObj/Player/Player.h"
+#include"DXCom.h"
 /// frame
 #include"DX/FPSKeeper.h"
 /// inupt
@@ -27,6 +28,7 @@ PlayerSpecialFall::PlayerSpecialFall(Player* boss)
 	rotateSpeed_ = 30.0f;
 	pPlayer_->SetKikIsCollision(false);
 	step_ = Step::ANTIPATION;
+	DXCom::GetInstance()->SetGrayscale(true);
 	
 }
 
@@ -59,7 +61,8 @@ void PlayerSpecialFall::Update() {
 
 		if (pPlayer_->GetModel()->GetWorldPos().y > Player::InitY_)break;
 		pPlayer_->SetWorldPositionY(Player::InitY_);
-
+		FPSKeeper::SetTimeScale(1.0f);
+		DXCom::GetInstance()->SetGrayscale(false);
 		step_ = Step::POSTACTION;
 
 		break;
@@ -83,7 +86,6 @@ void PlayerSpecialFall::Update() {
 		/// ---------------------------------------------------------
 		///  通常に戻る
 		/// ---------------------------------------------------------
-		FPSKeeper::SetTimeScale(1.0f);
 		pPlayer_->ChangeBehavior(std::make_unique<PlayerRoot>(pPlayer_));
 		pPlayer_->ChangeAttackBehavior(std::make_unique<PlayerAttackRoot>(pPlayer_));
 		

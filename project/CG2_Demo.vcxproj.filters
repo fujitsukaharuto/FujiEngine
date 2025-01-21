@@ -287,6 +287,9 @@
     <ClCompile Include="Game\GameObj\Timer\Timer.cpp">
       <Filter>Game\GameObj\Timer</Filter>
     </ClCompile>
+    <ClCompile Include="Game\GameObj\KikDirectionView\KikDirectionView.cpp">
+      <Filter>Game\GameObj\KikDirectionView</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Audio\Audio.h">
@@ -592,6 +595,9 @@
     <ClInclude Include="Game\GameObj\Timer\Timer.h">
       <Filter>Game\GameObj\Timer</Filter>
     </ClInclude>
+    <ClInclude Include="Game\GameObj\KikDirectionView\KikDirectionView.h">
+      <Filter>Game\GameObj\KikDirectionView</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -707,6 +713,9 @@
     </Filter>
     <Filter Include="Game\GameObj\Timer">
       <UniqueIdentifier>{c3da771b-3630-468f-8b5a-e7d47fb4a868}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameObj\KikDirectionView">
+      <UniqueIdentifier>{4429d364-be7e-4ea9-a3f4-633d90575a6d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -1,19 +1,20 @@
 {
     "Player": {
         "AirMoveSpeed": 26.510000228881836,
-        "Gravity": 1.159999966621399,
-        "JumpSpeed": 0.6299999952316284,
+        "Gravity": 27.639999389648438,
+        "JumpSpeed": 26.229999542236328,
         "KikTime": 0.10000000149011612,
         "KikWaitTime": 0.1899999976158142,
-        "MaxFallSpeed": 0.07000000029802322,
+        "MaxFallSpeed": 9.229999542236328,
         "MoveSpeed": 10.1899995803833,
         "RecoilJumpSpeed": 0.44999998807907104,
         "RecoilSpeed": 2.4200000762939453,
         "Translate": [
-            -6.462203502655029,
+            3.5516631603240967,
             1.5,
             -2.558469295501709
         ],
+        "kikDirectionSpeed_": 2.4800000190734863,
         "specialAttackAntiTime_": 0.2800000011920929,
         "specialAttackFallSpeed_": 34.27000045776367,
         "specialAttackPostGravity_": 1.7000000476837158,

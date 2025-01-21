@@ -1,6 +1,7 @@
 #pragma once
 #include"Vector3.h"
 #include"Collider/AABBCollider.h"
+#include"GameObj/KikDirectionView/KikDirectionView.h"
 /// behavior
 #include"GameObj/PlayerBehavior/BasePlayerBehavior.h"
 #include"GameObj/PlayerBehavior/BasePlayerAttackBehavior.h"
@@ -17,7 +18,6 @@ class Player :public OriginGameObject {
 public:
 	enum class KikPower {
 		WEAK,
-		NORMAL,
 		MAXPOWER,
 	};
 	struct Paramater {
@@ -36,6 +36,7 @@ public:
 		float             specialAttackPostGravity_;
 		float             specialAttackPostMaxFallSpeed_;
 		float             fallSpeed_;
+		float             kikDirectionSpeed_;
 	};
 private:
 
@@ -45,6 +46,7 @@ private:
 
 	// キック仮モデル
 	std::unique_ptr<Object3d>kikModel_;
+	std::unique_ptr<KikDirectionView>kikDirectionView_;
 
 	/// グローバルなパラメータ
 	const std::string groupName_ = "Player";       /// グループ名
@@ -62,13 +64,14 @@ private:
 	///* 目標角度
 	float             objectiveAngle_;
 	Vector3           inputDirection_;
+	Vector3           kikDirection_;
 
 	Paramater paramater_;
 
 	/// collider
 	std::unique_ptr<AABBCollider> kikCollider_;
 	std::unique_ptr<AABBCollider> collider_;
-	std::array<std::string, 3>tags_;
+	std::array<std::string, 2>tags_;
 
 public:
 	static float InitY_;
@@ -87,6 +90,8 @@ public:
 	bool    GetIsMoving();
 	Vector3 GetInputVelocity();
 	void    MoveToLimit();
+
+	void ChangeKikDirection();
 
 	///* ジャンプ
 	void Jump(float& speed);

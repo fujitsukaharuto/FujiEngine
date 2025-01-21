@@ -71,8 +71,6 @@ void GameScene::Initialize() {
 	///set
 	enemyManager_->SetPlayer(player_.get());
 	ufo_->SetEnemyManager(enemyManager_.get());
-
-	dxCommon_->SetGrayscale(true);
 }
 
 void GameScene::Update() {

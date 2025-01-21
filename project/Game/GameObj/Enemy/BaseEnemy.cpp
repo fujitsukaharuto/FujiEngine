@@ -116,7 +116,7 @@ void BaseEnemy::Draw(Material* material) {
 
 void BaseEnemy::Jump(float& speed) {
 	// 移動
-	model_->transform.translate.y += speed;
+	model_->transform.translate.y += speed* FPSKeeper::DeltaTimeRate();
 	Fall(speed, true);
 
 }
@@ -127,10 +127,10 @@ void BaseEnemy::Jump(float& speed) {
 void BaseEnemy::Fall(float& speed, const bool& isJump) {
 	if (!isJump) {
 		// 移動
-		model_->transform.translate.y += speed;
+		model_->transform.translate.y += speed* FPSKeeper::DeltaTimeRate();
 	}
 	// 加速する
-	speed = max(speed - (gravity_ * FPSKeeper::DeltaTimeRate()), -maxFallSpeed_);
+	speed = max(speed - (gravity_)*FPSKeeper::DeltaTimeRate(), -maxFallSpeed_);
 
 	// 着地
 	if (model_->transform.translate.y <= BaseEnemy::InitY_) {
@@ -153,12 +153,7 @@ void BaseEnemy::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 		jumpPower_ = JumpPower::WEAK;
 		ChangeBehavior(std::make_unique<EnemyJump>(this));
 	}
-	// 普通のキックをくらう
-	else  if (other.tag == pPlayer_->GetTag(static_cast<size_t>(Player::KikPower::NORMAL))) {
-
-		jumpPower_ = JumpPower::NORMAL;
-		ChangeBehavior(std::make_unique<EnemyJump>(this));
-	}
+	
 	// 強いキックをくらう
 	else 	if (other.tag == pPlayer_->GetTag(static_cast<size_t>(Player::KikPower::MAXPOWER))) {
 
