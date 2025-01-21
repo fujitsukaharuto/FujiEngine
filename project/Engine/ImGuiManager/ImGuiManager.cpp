@@ -96,9 +96,13 @@ void ImGuiManager::Draw() {
 }
 
 void ImGuiManager::SetFontJapanese() {
+#ifdef _DEBUG
 	ImGui::PushFont(font_japanese);
+#endif // _DEBUG
 }
 
 void ImGuiManager::UnSetFont() {
+#ifdef _DEBUG
 	ImGui::PopFont();
+#endif // _DEBUG
 }

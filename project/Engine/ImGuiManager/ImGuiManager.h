@@ -44,7 +44,10 @@ public:
 private:
 	DXCom* dxCommon_ = nullptr;
 	uint32_t srvIndex;
+
+#ifdef _DEBUG
 	ImFont* font_japanese = nullptr;
+#endif // _DEBUG
 private:
 	ImGuiManager() = default;
 	~ImGuiManager() = default;
