@@ -15,6 +15,11 @@ enum SpeedType {
 	kReturn,
 };
 
+enum RotateType {
+	kUsually,
+	kVelocityR,
+};
+
 enum ColorType {
 	kDefault,
 	kRandom,
@@ -44,6 +49,7 @@ public:
 
 	int type = SizeType::kNormal;
 	int speedType = SpeedType::kConstancy;
+	int rotateType = RotateType::kUsually;
 	int colorType = ColorType::kDefault;
 
 	float returnPower_ = -0.05f;

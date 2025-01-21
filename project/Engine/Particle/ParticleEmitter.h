@@ -18,6 +18,7 @@ public:
 #endif // _DEBUG
 
 	void Emit();
+
 	void Burst();
 
 	void BurstAnime();
@@ -25,12 +26,13 @@ public:
 	void RandomSpeed(const Vector2& x, const Vector2& y, const Vector2& z);
 	void RandomTranslate(const Vector2& x, const Vector2& y, const Vector2& z);
 
-	void SetParent(Object3d* parent) { parent_ = parent; }
-
 	void Save();
 	void Load(const std::string& filename);
 
 	float frequencyTime = 0;
+
+	void SetParent(Object3d* parent) { parent_ = parent; }
+	Vector3 GetWorldPos();
 
 	std::string name;
 	Vector3 pos;

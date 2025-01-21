@@ -397,8 +397,32 @@ void ParticleManager::Emit(const std::string& name, const Vector3& pos, const Ve
 				particle.transform.translate = Random::GetVector3(para.transx, para.transy, para.transz);
 				particle.transform.translate += pos;
 				particle.transform.scale = { grain.startSize.x,grain.startSize.y,1.0f };
-				particle.transform.rotate = rotate;
 				particle.speed = Random::GetVector3(para.speedx, para.speedy, para.speedz);
+
+				particle.rotateType = grain.rotateType;
+				switch (particle.rotateType) {
+				case kUsually:
+					particle.transform.rotate = rotate;
+					break;
+				case kVelocityR:
+
+					Vector3 veloSpeed = particle.speed.Normalize();
+
+					// カメラの回転を考慮して速度ベクトルを変換
+					Vector3 cameraR = CameraManager::GetInstance()->GetCamera()->transform.rotate;
+					Matrix4x4 rotateCamera = MakeRotateXYZMatrix(-cameraR);
+					veloSpeed = TransformNormal(veloSpeed, rotateCamera);
+
+					Vector3 defo = { 0.0f,1.0f,0.0f };
+					defo = TransformNormal(defo, rotateCamera);
+
+					Matrix4x4 dToD = DirectionToDirection(defo, veloSpeed.Normalize());
+					Vector3 angleDToD = ExtractEulerAngles(dToD);
+					particle.transform.rotate = angleDToD;
+
+					break;
+				}
+
 				particle.lifeTime_ = grain.lifeTime_;
 				particle.startLifeTime_ = particle.lifeTime_;
 				particle.isBillBoard_ = grain.isBillBoard_;

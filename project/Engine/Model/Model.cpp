@@ -17,8 +17,7 @@ Model::Model(const Model& other) {
 }
 Model::~Model() {}
 
-void Model::Draw(ID3D12GraphicsCommandList* commandList, Material* mate = nullptr)
-{
+void Model::Draw(ID3D12GraphicsCommandList* commandList, Material* mate = nullptr) {
 	for (uint32_t index = 0; index < mesh_.size(); ++index) {
 		if (mate) {
 			commandList->SetGraphicsRootConstantBufferView(0, mate->GetMaterialResource()->GetGPUVirtualAddress());
@@ -48,15 +47,15 @@ void Model::SetColor(const Vector4& color) {
 	}
 }
 
-void Model::SetUVScale(const Vector2& scale) {
+void Model::SetUVScale(const Vector2& scale, const Vector2& uvTrans) {
 	for (Material material : material_) {
-		material.SetUVScale(scale);
+		material.SetUVScale(scale, uvTrans);
 	}
 }
 
 void Model::SetTexture(const std::string& name) {
 
-	if (nowTextuer==name) {
+	if (nowTextuer == name) {
 		return;
 	}
 	for (uint32_t index = 0; index < mesh_.size(); ++index) {

@@ -10,20 +10,19 @@
 class MyWin;
 class DXCom;
 
-class ImGuiManager
-{
+class ImGuiManager {
 public:
 	static ImGuiManager* GetInstance();
 	/// <summary>
 	/// 初期化
 	/// </summary>
 	void Init(MyWin* myWin, DXCom* dxComon);
-	
+
 	/// <summary>
 	/// 終了
 	/// </summary>
 	void Fin();
-	
+
 	/// <summary>
 	/// ImGui受付
 	/// </summary>
@@ -39,10 +38,13 @@ public:
 	/// </summary>
 	void Draw();
 
-	
+	void SetFontJapanese();
+	void UnSetFont();
+
 private:
 	DXCom* dxCommon_ = nullptr;
 	uint32_t srvIndex;
+	ImFont* font_japanese = nullptr;
 private:
 	ImGuiManager() = default;
 	~ImGuiManager() = default;

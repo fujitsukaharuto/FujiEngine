@@ -9,8 +9,7 @@
 #include "externals/DirectXTex/DirectXTex.h"
 #include "externals/DirectXTex/d3dx12.h"
 
-class Model
-{
+class Model {
 public:
 	Model();
 	Model(const Model& other);
@@ -19,15 +18,20 @@ public:
 	void Draw(ID3D12GraphicsCommandList* commandList, Material* mate);
 
 	void AddMaterial(const Material& material);
+
 	void AddMesh(const Mesh& mesh);
 
 	void SetColor(const Vector4& color);
-	void SetUVScale(const Vector2& scale);
+
+	void SetUVScale(const Vector2& scale, const Vector2& uvTrans);
+
 	void SetTexture(const std::string& name);
+
 	void SetTextureName(const std::string& name);
-	void SetLightEnable(LightMode mode);
 
 	std::string GetTextuerName() { return nowTextuer; }
+
+	void SetLightEnable(LightMode mode);
 
 private:
 
