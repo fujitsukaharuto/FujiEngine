@@ -113,6 +113,8 @@ public:
 
 	/*void Tick();*/
 
+	void SetGrayscale(bool is) { isGrayscale_ = is; is ? isNonePost_ = false : isNonePost_ = true; }
+
 private:
 
 	void CreateDevice();
