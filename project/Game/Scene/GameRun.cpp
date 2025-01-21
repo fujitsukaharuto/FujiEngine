@@ -15,17 +15,20 @@ void GameRun::Initialize() {
 
 #pragma region テクスチャ読み込み
 	textureManager_->Load("uvChecker.png");
+	textureManager_->Load("ui.png");
+	textureManager_->Load("reticle.png");
 #pragma endregion
 
 
 #pragma region オブジェクト読み込み
 	modelManager_->LoadOBJ("suzanne.obj");
 	modelManager_->LoadOBJ("playerWeapon.obj");
+	modelManager_->LoadOBJ("slash2.obj");
 	modelManager_->LoadOBJ("player.obj");
 	modelManager_->LoadOBJ("shadow.obj");
 	modelManager_->LoadOBJ("ground.obj");
 	modelManager_->LoadOBJ("sky.obj");
-
+	modelManager_->LoadOBJ("EnemyBody.obj");
 
 #pragma endregion
 
