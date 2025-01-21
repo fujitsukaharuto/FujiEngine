@@ -50,7 +50,10 @@ void Player::Initialize() {
 	slash_ = std::make_unique<SlashDrawer>();
 	slash_->Initialize();
 	slash_->SetParent(model_.get());
-	slash_->GetModel()->transform.translate.y = 0.5f;
+	slash_->GetModel()->transform.translate.y = 1.4f;
+	slash_->GetModel()->transform.translate.z = 1.0f;
+	slash_->GetModel()->transform.scale.y = 1.4f;
+	slash_->GetModel()->transform.scale.z = 1.2f;
 	slash_->GetModel()->transform.rotate.z = 1.4f;
 	slash_->GetModel()->transform.rotate.y = 1.4f;
 
@@ -76,7 +79,6 @@ void Player::Initialize() {
 
 	attackParticle2_.name = "attackParticle2";
 	attackParticle2_.Load("attackParticle2");
-	attackParticle2_.pos.y += 0.3f;
 	attackParticle2_.SetParent(weapon_.get());
 
 
@@ -116,6 +118,7 @@ void Player::Update() {
 				behaviorRequest_ = PlayerBehavior::kAttack;
 				Vector3 attackCollider = { 0.0f,0.0f,1.0f };
 				colliderAttack_->SetPos(attackCollider);
+				slash_->SetTimeLimitte(12.0f);
 				slash_->ReSet();
 			}
 			else {
@@ -164,6 +167,8 @@ void Player::Update() {
 	collider_->InfoUpdate();
 	colliderAttack_->InfoUpdate();
 
+	slash_->Update();
+
 	if (isAttack_) {
 		attackParticle_.Emit();
 		attackParticle2_.Emit();
@@ -171,7 +176,7 @@ void Player::Update() {
 		PlaneDrawer::GetInstance()->AddPlanePoint(attackParticle_.GetWorldPos());
 		PlaneDrawer::GetInstance()->AddPlanePoint(attackParticle2_.GetWorldPos());
 
-		slash_->Update();
+		slashTime_ = 10.0f;
 	}
 	else {
 		if (firePlane_->transform.scale.x > 0.0f) {
@@ -181,6 +186,12 @@ void Player::Update() {
 			}
 		}
 
+		if (slashTime_ > 0.0f) {
+			slashTime_ -= FPSKeeper::DeltaTime();
+			if (slashTime_ <= 0.0f) {
+				slashTime_ = 0.0f;
+			}
+		}
 	}
 	if (popTime_ > 0.0f) {
 		popTime_ -= FPSKeeper::DeltaTime();
@@ -208,7 +219,7 @@ void Player::Draw([[maybe_unused]]Material* mate) {
 	OriginGameObject::ShdowDraw();
 	body_->Draw(mate);
 	weapon_->Draw(mate);
-	firePlane_->ShaderTextureDraw();
+	//firePlane_->ShaderTextureDraw();
 #ifdef _DEBUG
 	attackParticle_.DrawSize();
 	attackParticle2_.DrawSize();
@@ -217,9 +228,9 @@ void Player::Draw([[maybe_unused]]Material* mate) {
 }
 
 void Player::SlashDraw() {
-	
+	if (slashTime_ > 0.0f) {
 		slash_->Draw();
-	
+	}
 }
 
 void Player::BehaviorRequest() {

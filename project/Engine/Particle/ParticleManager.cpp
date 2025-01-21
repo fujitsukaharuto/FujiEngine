@@ -420,17 +420,6 @@ void ParticleManager::Emit(const std::string& name, const Vector3& pos, const Ve
 					Vector3 angleDToD = ExtractEulerAngles(dToD);
 					particle.transform.rotate = angleDToD;
 
-					//// 速度ベクトルの方向からZ軸の回転を計算
-					//particle.transform.rotate.z = std::atan2(veloSpeed.x, veloSpeed.y);
-
-					//// Y軸回転は0で固定（必要であれば調整）
-					//particle.transform.rotate.y = 0.0f;
-
-					//// X軸の回転を計算するための処理（速度ベクトルをZ軸回転の逆変換）
-					//Matrix4x4 zrota = MakeRotateZMatrix(-particle.transform.rotate.z);
-					//Vector3 velocityZ = TransformNormal(veloSpeed, zrota);
-					//particle.transform.rotate.x = std::atan2(-velocityZ.z, velocityZ.y);
-
 					break;
 				}
 

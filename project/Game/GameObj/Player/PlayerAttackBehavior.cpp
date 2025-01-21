@@ -62,6 +62,11 @@ PlayerAttackBehavior::PlayerAttackBehavior(Player* pPlayer) : pPlayer_(pPlayer) 
 		{-1.0f,0.5f,0.0f},
 	};
 
+	pPlayer_->GetSlashModel()->transform.translate.y = 1.4f;
+	pPlayer_->GetSlashModel()->transform.translate.z = 1.0f;
+	pPlayer_->GetSlashModel()->transform.rotate.z = 1.53f;
+	pPlayer_->GetSlashModel()->transform.rotate.y = 1.4f;
+
 	Direction();
 	Audio::GetInstance()->SoundPlayWave(pPlayer_->attackSound1);
 }
@@ -107,6 +112,7 @@ void PlayerAttackBehavior::Attack() {
 				pPlayer_->GetWeaponModel()->transform.translate = { attackCollider };
 
 				pPlayer_->GetWeaponModel()->transform.rotate.x = LerpShortAngle(-0.23f, 2.0f, t);
+				pPlayer_->GetSlashModel()->transform.rotate.y = Lerp(2.22f, 0.2f, t);
 
 				pPlayer_->GetBodyModel()->transform.scale.y = Lerp(0.75f, 0.3f, t);
 				pPlayer_->GetBodyModel()->transform.rotate.x = LerpShortAngle(-0.15f, 0.2f, t);
@@ -141,6 +147,12 @@ void PlayerAttackBehavior::Attack() {
 					pPlayer_->GetWeaponModel()->transform.rotate.z = 1.53f;
 					pPlayer_->GetBodyModel()->transform.scale = { 0.5f,0.5f,0.5f };
 					pPlayer_->GetBodyModel()->transform.rotate.x = 0.0f;
+
+					pPlayer_->GetSlashModel()->transform.translate.y = 0.5f;
+					pPlayer_->GetSlashModel()->transform.translate.z = 1.0f;
+					pPlayer_->GetSlashModel()->transform.rotate.z = 3.15f;
+					pPlayer_->GetSlashModel()->transform.rotate.y = 1.6f;
+					pPlayer_->SetSlashReSet(10.0f);
 
 					Direction();
 					Audio::GetInstance()->SoundPlayWave(pPlayer_->attackSound1);
@@ -178,6 +190,7 @@ void PlayerAttackBehavior::Attack() {
 				pPlayer_->GetWeaponModel()->transform.translate = { attackCollider };
 
 				pPlayer_->GetWeaponModel()->transform.rotate.x = LerpShortAngle(0.57f, 2.5f, t);
+				pPlayer_->GetSlashModel()->transform.rotate.y = Lerp(1.6f, -0.65f, t);
 
 				pPlayer_->GetBodyModel()->transform.rotate.y = LerpShortAngle(-0.45f, 0.45f, t);
 				pPlayer_->GetBodyModel()->transform.rotate.z= LerpShortAngle(0.15f, -0.15f, t);
@@ -218,6 +231,12 @@ void PlayerAttackBehavior::Attack() {
 					pPlayer_->GetBodyModel()->transform.rotate.z = 0.0f;
 					pPlayer_->GetBodyModel()->transform.scale = { 0.5f,0.5f,0.5f };
 
+					pPlayer_->GetSlashModel()->transform.translate.y = 1.4f;
+					pPlayer_->GetSlashModel()->transform.translate.z = 1.0f;
+					pPlayer_->GetSlashModel()->transform.rotate.z = 0.8f;
+					pPlayer_->GetSlashModel()->transform.rotate.y = 2.2f;
+					pPlayer_->SetSlashReSet(10.0f);
+
 					Direction();
 					Audio::GetInstance()->SoundPlayWave(pPlayer_->attackSound1);
 
@@ -255,6 +274,8 @@ void PlayerAttackBehavior::Attack() {
 				pPlayer_->GetWeaponModel()->transform.translate = { attackCollider };
 
 				pPlayer_->GetWeaponModel()->transform.rotate.x = LerpShortAngle(-0.23f, 2.0f, t);
+				pPlayer_->GetSlashModel()->transform.rotate.y = Lerp(2.22f, 0.2f, t);
+
 
 				pPlayer_->GetBodyModel()->transform.rotate.y = LerpShortAngle(0.35f, -0.35f, t);
 				pPlayer_->GetBodyModel()->transform.rotate.x = LerpShortAngle(-0.15f, 0.2f, t);
@@ -296,6 +317,12 @@ void PlayerAttackBehavior::Attack() {
 				pPlayer_->GetWeaponModel()->transform.rotate.y = 0.55f;
 				pPlayer_->GetBodyModel()->transform.scale = { 0.5f,0.5f,0.5f };
 
+				pPlayer_->GetSlashModel()->transform.translate.y = 1.4f;
+				pPlayer_->GetSlashModel()->transform.translate.z = 1.0f;
+				pPlayer_->GetSlashModel()->transform.rotate.z = 2.4f;
+				pPlayer_->GetSlashModel()->transform.rotate.y = 2.2f;
+				pPlayer_->SetSlashReSet(10.0f);
+
 				Direction();
 				Audio::GetInstance()->SoundPlayWave(pPlayer_->attackSound1);
 
@@ -329,6 +356,7 @@ void PlayerAttackBehavior::Attack() {
 				pPlayer_->GetWeaponModel()->transform.translate = { attackCollider };
 
 				pPlayer_->GetWeaponModel()->transform.rotate.x = LerpShortAngle(-0.23f, 2.0f, t);
+				pPlayer_->GetSlashModel()->transform.rotate.y = Lerp(2.22f, 0.2f, t);
 
 				pPlayer_->GetBodyModel()->transform.rotate.y = LerpShortAngle(-0.35f, 0.35f, t);
 				pPlayer_->GetBodyModel()->transform.rotate.x = LerpShortAngle(-0.15f, 0.2f, t);
@@ -372,6 +400,12 @@ void PlayerAttackBehavior::Attack() {
 
 				pPlayer_->GetAABBAttack()->SetTag("attack_knock");
 
+				pPlayer_->GetSlashModel()->transform.translate.y = 0.5f;
+				pPlayer_->GetSlashModel()->transform.translate.z = 1.0f;
+				pPlayer_->GetSlashModel()->transform.rotate.z = 0.0f;
+				pPlayer_->GetSlashModel()->transform.rotate.y = 2.2f;
+				pPlayer_->SetSlashReSet(12.0f);
+
 				Direction();
 				Audio::GetInstance()->SoundPlayWave(pPlayer_->attackSound2);
 
@@ -405,6 +439,8 @@ void PlayerAttackBehavior::Attack() {
 				pPlayer_->GetWeaponModel()->transform.translate = { attackCollider };
 
 				pPlayer_->GetWeaponModel()->transform.rotate.x = LerpShortAngle(2.5f, 2.46f, t);
+				pPlayer_->GetSlashModel()->transform.rotate.y = Lerp(1.0f, -0.2f, t);
+
 
 				pPlayer_->GetModel()->transform.rotate.y -= 0.405f;
 				pPlayer_->GetBodyModel()->transform.rotate.y = LerpShortAngle(-0.45f, 0.45f, t);

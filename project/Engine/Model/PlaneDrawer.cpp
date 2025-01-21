@@ -59,7 +59,14 @@ void PlaneDrawer::Finalize() {
 
 void PlaneDrawer::AddPlanePoint(const Vector3& p1) {
 
-	points_.push_back({ p1,{0.0f,0.0f} });
+	if (numberCount_ == 0) {
+		points_.push_back({ p1,{0.0f,0.0f},{1.0f,1.0f,0.0f,0.3f} });
+		numberCount_++;
+	}
+	else {
+		points_.push_back({ p1,{0.0f,0.0f},{1.0f,1.0f,0.0f,0.8f} });
+		numberCount_ = 0;
+	}
 
 }
 
@@ -146,6 +153,32 @@ void PlaneDrawer::Render() {
 
 	// 描画
 	cList->DrawIndexedInstanced(static_cast<UINT>(indexIndex), 1, 0, 0, 0);
+
+	int addT = 0;
+	float alphaT = 2.0f;
+	for (auto& point : points_) {
+		point.color.w -= (0.1f * alphaT) * FPSKeeper::DeltaTime();
+		if (point.color.w < 0.0f) {
+			point.color.w = 0.0f;
+		}
+		addT++;
+		if (addT == 4) {
+			addT = 0;
+			alphaT = -0.04f;
+			if (alphaT < 0.1f) {
+				alphaT = 0.1f;
+			}
+		}
+	}
+
+	//points_.erase(
+	//	std::remove_if(points_.begin(), points_.end(),
+	//		[](const VertexPosUV& point) {
+	//			return point.color.w == 0.0f; // α値が0かチェック
+	//		}),
+	//	points_.end()
+	//);
+
 }
 
 

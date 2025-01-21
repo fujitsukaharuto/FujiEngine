@@ -15,6 +15,7 @@ public:
 	void Draw();
 
 	void ReSet();
+	void SetTimeLimitte(float t);
 
 	void SetParent(Object3d* parent) { slashModel_->SetParent(parent); }
 	Object3d* GetModel() { return slashModel_.get(); }
@@ -33,6 +34,9 @@ private:
 
 	float slashTime_ = 0.0f;
 	float slashTimeLimitte_ = 20.0f;
+
+	float scrollTime_ = 0.0f;
+	float scrollTimeLimitte_ = 10.0f;
 
 	Vector4 modelColor_ = { 1.0f,1.0f,1.0f,1.0f };
 	Vector2 uvTrans_ = { 0.0f,0.0f };

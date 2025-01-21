@@ -40,6 +40,7 @@ public:
 
 
 	void SetVelocity(const Vector3& v) { velocity_ = v; }
+	void SetSlashReSet(float t) { slash_->SetTimeLimitte(t); slash_->ReSet(); }
 
 	void SetIsAttack(bool is) { isAttack_ = is; }
 	bool GetIsAttack()const { return isAttack_; }
@@ -48,6 +49,7 @@ public:
 	Object3d* GetBodyModel() { return body_.get(); }
 	Object3d* GetWeaponModel() { return weapon_.get(); }
 	Object3d* GetFireModel() { return firePlane_.get(); }
+	Object3d* GetSlashModel() { return slash_->GetModel(); }
 	Trans& GetBodyTrans() { return body_->transform; }
 
 	void EmitJumpAttack();
@@ -79,6 +81,7 @@ private:
 	std::unique_ptr<Object3d> firePlane_ = nullptr;
 
 	std::unique_ptr<SlashDrawer> slash_;
+	float slashTime_ = 0.0f;
 
 	std::unique_ptr<AABBCollider> collider_ = nullptr;
 	std::unique_ptr<AABBCollider> colliderAttack_ = nullptr;

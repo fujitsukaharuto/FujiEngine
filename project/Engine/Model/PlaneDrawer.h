@@ -24,6 +24,7 @@ public:
 	struct VertexPosUV {
 		Vector3 pos;
 		Vector2 uv;
+		Vector4 color;
 	};
 
 	struct PlaneData {
@@ -64,6 +65,8 @@ private:
 
 	std::unique_ptr<PlaneData> planes_;
 	std::deque<VertexPosUV> points_;
+
+	int numberCount_ = 0;
 
 	uint32_t indexPlane_ = 0;
 

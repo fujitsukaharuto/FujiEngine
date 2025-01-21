@@ -65,7 +65,7 @@ void PlanePipe::CreatePSO(ID3D12Device* device) {
 
 	HRESULT hr;
 
-	D3D12_INPUT_ELEMENT_DESC element[2] = {};
+	D3D12_INPUT_ELEMENT_DESC element[3] = {};
 	element[0].SemanticName = "POSITION";
 	element[0].SemanticIndex = 0;
 	element[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
@@ -75,6 +75,11 @@ void PlanePipe::CreatePSO(ID3D12Device* device) {
 	element[1].SemanticIndex = 0;
 	element[1].Format = DXGI_FORMAT_R32G32_FLOAT;
 	element[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+
+	element[2].SemanticName = "COLOR";
+	element[2].SemanticIndex = 0;
+	element[2].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	element[2].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
 
 	D3D12_INPUT_LAYOUT_DESC layout{};
 	layout.pInputElementDescs = element;
