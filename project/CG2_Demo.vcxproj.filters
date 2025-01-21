@@ -284,6 +284,9 @@
     <ClCompile Include="Game\Scene\GameOverScene.cpp">
       <Filter>Game\Scene</Filter>
     </ClCompile>
+    <ClCompile Include="Game\GameObj\Timer\Timer.cpp">
+      <Filter>Game\GameObj\Timer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Audio\Audio.h">
@@ -586,6 +589,9 @@
     <ClInclude Include="Game\Scene\GameOverScene.h">
       <Filter>Game\Scene</Filter>
     </ClInclude>
+    <ClInclude Include="Game\GameObj\Timer\Timer.h">
+      <Filter>Game\GameObj\Timer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -698,6 +704,9 @@
     </Filter>
     <Filter Include="Game\GameObj\KikArea">
       <UniqueIdentifier>{0c4be5e0-93f2-45f9-8927-63764ab0d2c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameObj\Timer">
+      <UniqueIdentifier>{c3da771b-3630-468f-8b5a-e7d47fb4a868}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -183,6 +183,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\GameObj\PlayerBehavior\PlayerRecoil.cpp" />
     <ClCompile Include="Game\GameObj\PlayerBehavior\PlayerSpecialFall.cpp" />
     <ClCompile Include="Game\GameObj\SkyDome\SkyDome.cpp" />
+    <ClCompile Include="Game\GameObj\Timer\Timer.cpp" />
     <ClCompile Include="Game\GameObj\UFO\Behavior\BaseUFOrBehavior.cpp" />
     <ClCompile Include="Game\GameObj\UFO\Behavior\UFODamage.cpp" />
     <ClCompile Include="Game\GameObj\UFO\Behavior\UFOPopEnemy.cpp" />
@@ -284,6 +285,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Game\GameObj\PlayerBehavior\PlayerRecoil.h" />
     <ClInclude Include="Game\GameObj\PlayerBehavior\PlayerSpecialFall.h" />
     <ClInclude Include="Game\GameObj\SkyDome\SkyDome.h" />
+    <ClInclude Include="Game\GameObj\Timer\Timer.h" />
     <ClInclude Include="Game\GameObj\UFO\Behavior\BaseUFOrBehavior.h" />
     <ClInclude Include="Game\GameObj\UFO\Behavior\UFODamage.h" />
     <ClInclude Include="Game\GameObj\UFO\Behavior\UFOPopEnemy.h" />
