@@ -8,7 +8,6 @@ void NormalEnemy::Initialize() {
 
 	OriginGameObject::SetModel("NormalEnemy.obj");
 
-	damageParm_ = 0.2f;
 }
 
 ///========================================================

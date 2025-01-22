@@ -14,11 +14,7 @@
 EnemyJump::EnemyJump(BaseEnemy* boss)
 	: BaseEnemyBehaivor("EnemyJump", boss) {
 	
-	jumpSpeed_ = pBaseEnemy_->GetJumpSpeed(pBaseEnemy_->GetJumpPower());
-	pBaseEnemy_->SetIsCollision(true);
-
-	pBaseEnemy_->SetGravity(pBaseEnemy_->GetGravityForKik());
-	pBaseEnemy_->SetFallMaxSpeed(pBaseEnemy_->GetFallMaxForKik());
+	
 
 	rotateSpeed_ = 30.0f;
 }
@@ -30,7 +26,7 @@ EnemyJump::~EnemyJump() {
 void  EnemyJump::Update() {
 	rotateZ_ += rotateSpeed_ * FPSKeeper::DeltaTimeRate();
 	pBaseEnemy_->SetRotation(Vector3(0, 0, rotateZ_));
-	pBaseEnemy_->Jump(jumpSpeed_);
+	
 	
 }
 

@@ -22,7 +22,7 @@ EnemyFall::EnemyFall(BaseEnemy* boss)
     time_ = 0.0f;       // 時間カウンタの初期化
 
     speedEase_.maxTime = 0.7f;
-    maxSpeed_ = pBaseEnemy_->GetFallSpeed() + 9.0f;
+    maxSpeed_ = pBaseEnemy_->GetParamater().fallSpeed + 9.0f;
 }
 
 EnemyFall::~EnemyFall() {}
@@ -57,7 +57,7 @@ void EnemyFall::Update() {
         ///----------------------------------------------------------------------
         pBaseEnemy_->SetRotation(Vector3::GetZeroVec());
         pBaseEnemy_->SetWorldPositionY(BaseEnemy::InitY_);
-        pBaseEnemy_->DecrementDeathCount();
+        
 
         step_ = Step::CHANGEATTACK;
         break;
@@ -78,10 +78,10 @@ void EnemyFall::Debug() {
 
 void EnemyFall::SpeedChangeMethod() {
     speedEase_.time += FPSKeeper::DeltaTimeRate();
-    fallspeed_ = EaseInCirc(maxSpeed_, pBaseEnemy_->GetFallSpeed(), speedEase_.time, speedEase_.maxTime);
+    fallspeed_ = EaseInCirc(maxSpeed_, pBaseEnemy_->GetParamater().fallSpeed, speedEase_.time, speedEase_.maxTime);
 
     if (speedEase_.time >= speedEase_.maxTime) {
         speedEase_.time = speedEase_.maxTime;
-        fallspeed_ = pBaseEnemy_->GetFallSpeed();
+        fallspeed_ = pBaseEnemy_->GetParamater().fallSpeed;
     }
 }

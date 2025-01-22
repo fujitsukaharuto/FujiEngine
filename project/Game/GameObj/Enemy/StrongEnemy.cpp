@@ -8,7 +8,7 @@ void StrongEnemy::Initialize() {
 
 	OriginGameObject::SetModel("StrongEnemy.obj");
 
-	damageParm_ = 0.2f;
+
 }
 
 ///========================================================

@@ -1,28 +1,12 @@
 {
     "Enemies": {
-        "AttackValue1": 0.7699999809265137,
+        "AttackValue1": 0.0,
         "AttackValue2": 0.0,
-        "DeathCount1": 3,
-        "DeathCount2": 2,
-        "FallSpeed1": 5.53000020980835,
+        "FallSpeed1": 2.890000104904175,
         "FallSpeed2": 0.0,
-        "Gravity1": 21.81999969482422,
-        "Gravity2": 0.0,
-        "MaxPowerJump1": 41.400001525878906,
-        "MaxPowerJump2": 0.0,
-        "NormalJump1": 29.219999313354492,
-        "NormalJump2": 0.0,
-        "WeakJump1": 14.829999923706055,
-        "WeakJump2": 0.0,
-        "attenuate_1": 0.5299999713897705,
-        "attenuate_2": 0.0,
-        "baseBoundPower_1": 39.599998474121094,
-        "baseBoundPower_2": 0.0,
-        "gravityForBound1": 23.010000228881836,
-        "gravityForBound2": 0.0,
-        "maxFallSpeedForBound1": 30.649999618530273,
-        "maxFallSpeedForBound2": 0.0,
-        "maxFallSpeedForKik1": 30.6299991607666,
-        "maxFallSpeedForKik2": 0.0
+        "MaxPowerBlow1": 0.0,
+        "MaxPowerBlow2": 0.0,
+        "WeakBlow1": 0.0,
+        "WeakBlow2": 0.0
     }
 }

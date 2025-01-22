@@ -153,52 +153,16 @@ void EnemyManager::AddParmGroup() {
 			"AttackValue" + std::to_string(int(i + 1)),
 			paramaters_[i].attackValue);
 
+		
 		globalParameter_->AddItem(
 			groupName_,
-			"Gravity" + std::to_string(int(i + 1)),
-			paramaters_[i].gravityForKik);
-
-		globalParameter_->AddItem(
-			groupName_,
-			"WeakJump" + std::to_string(int(i + 1)),
-			paramaters_[i].jumpSpeed[static_cast<size_t>(BaseEnemy::JumpPower::WEAK)]);
+			"WeakBlow" + std::to_string(int(i + 1)),
+			paramaters_[i].blowingPower[static_cast<size_t>(BaseEnemy::BlowingPower::WEAK)]);
 
 		globalParameter_->AddItem(
 			groupName_,
-			"NormalJump" + std::to_string(int(i + 1)),
-			paramaters_[i].jumpSpeed[static_cast<size_t>(BaseEnemy::JumpPower::NORMAL)]);
-
-
-		globalParameter_->AddItem(
-			groupName_,
-			"MaxPowerJump" + std::to_string(int(i + 1)),
-			paramaters_[i].jumpSpeed[static_cast<size_t>(BaseEnemy::JumpPower::MaxPower)]);
-
-		globalParameter_->AddItem(
-			groupName_,
-			"baseBoundPower_" + std::to_string(int(i + 1)),
-			paramaters_[i].boundPower);
-
-		globalParameter_->AddItem(
-			groupName_,
-			"attenuate_" + std::to_string(int(i + 1)),
-			paramaters_[i].attenuate);
-
-		globalParameter_->AddItem(
-			groupName_,
-			"gravityForBound" + std::to_string(int(i + 1)),
-			paramaters_[i].gravityForBound);
-
-		globalParameter_->AddItem(
-			groupName_,
-			"maxFallSpeedForBound" + std::to_string(int(i + 1)),
-			paramaters_[i].maxFallSpeedForBound);
-
-
-		globalParameter_->AddItem(
-			groupName_,
-			"maxFallSpeedForKik" + std::to_string(int(i + 1)),
-			paramaters_[i].maxFallSpeedForKik);
+			"MaxPowerBlow" + std::to_string(int(i + 1)),
+			paramaters_[i].blowingPower[static_cast<size_t>(BaseEnemy::BlowingPower::MaxPower)]);
 	}
 
 }
@@ -221,58 +185,16 @@ void EnemyManager::SetValues() {
 			"AttackValue" + std::to_string(int(i + 1)),
 			paramaters_[i].attackValue);
 
-		globalParameter_->SetValue(
-			groupName_,
-			"Gravity" + std::to_string(int(i + 1)),
-			paramaters_[i].gravityForKik);
 
 		globalParameter_->SetValue(
 			groupName_,
-			"WeakJump" + std::to_string(int(i + 1)),
-			paramaters_[i].jumpSpeed[static_cast<size_t>(BaseEnemy::JumpPower::WEAK)]);
+			"WeakBlow" + std::to_string(int(i + 1)),
+			paramaters_[i].blowingPower[static_cast<size_t>(BaseEnemy::BlowingPower::WEAK)]);
 
 		globalParameter_->SetValue(
 			groupName_,
-			"NormalJump" + std::to_string(int(i + 1)),
-			paramaters_[i].jumpSpeed[static_cast<size_t>(BaseEnemy::JumpPower::NORMAL)]);
-
-
-		globalParameter_->SetValue(
-			groupName_,
-			"MaxPowerJump" + std::to_string(int(i + 1)),
-			paramaters_[i].jumpSpeed[static_cast<size_t>(BaseEnemy::JumpPower::MaxPower)]);
-
-
-		globalParameter_->SetValue(
-			groupName_,
-			"baseBoundPower_" + std::to_string(int(i + 1)),
-			paramaters_[i].boundPower);
-
-		globalParameter_->SetValue(
-			groupName_,
-			"attenuate_" + std::to_string(int(i + 1)),
-			paramaters_[i].attenuate);
-
-		globalParameter_->SetValue(
-			groupName_,
-			"gravityForBound" + std::to_string(int(i + 1)),
-			paramaters_[i].gravityForBound);
-
-		globalParameter_->SetValue(
-			groupName_,
-			"maxFallSpeedForBound" + std::to_string(int(i + 1)),
-			paramaters_[i].maxFallSpeedForBound);
-
-
-		globalParameter_->SetValue(
-			groupName_,
-			"maxFallSpeedForKik" + std::to_string(int(i + 1)),
-			paramaters_[i].maxFallSpeedForKik);
-
-		globalParameter_->SetValue(
-			groupName_,
-			"DeathCount" + std::to_string(int(i + 1)),
-			paramaters_[i].deathCountMax);
+			"MaxPowerBlow" + std::to_string(int(i + 1)),
+			paramaters_[i].blowingPower[static_cast<size_t>(BaseEnemy::BlowingPower::MaxPower)]);
 	}
 
 }
@@ -292,46 +214,17 @@ void EnemyManager::ApplyGlobalParameter() {
 			groupName_,
 			"AttackValue" + std::to_string(int(i + 1)));
 
-		paramaters_[i].gravityForKik = globalParameter_->GetValue<float>(
+		
+		paramaters_[i].blowingPower[static_cast<size_t>(BaseEnemy::BlowingPower::WEAK)] = globalParameter_->GetValue<float>(
 			groupName_,
-			"Gravity" + std::to_string(int(i + 1)));
-
-		paramaters_[i].jumpSpeed[static_cast<size_t>(BaseEnemy::JumpPower::WEAK)] = globalParameter_->GetValue<float>(
-			groupName_,
-			"WeakJump" + std::to_string(int(i + 1)));
-
-		paramaters_[i].jumpSpeed[static_cast<size_t>(BaseEnemy::JumpPower::NORMAL)] = globalParameter_->GetValue<float>(
-			groupName_,
-			"NormalJump" + std::to_string(int(i + 1)));
-
-		paramaters_[i].jumpSpeed[static_cast<size_t>(BaseEnemy::JumpPower::MaxPower)] = globalParameter_->GetValue<float>(
-			groupName_,
-			"MaxPowerJump" + std::to_string(int(i + 1)));
+			"WeakBlow" + std::to_string(int(i + 1)));
 
 
-		paramaters_[i].boundPower = globalParameter_->GetValue<float>(
+		paramaters_[i].blowingPower[static_cast<size_t>(BaseEnemy::BlowingPower::MaxPower)] = globalParameter_->GetValue<float>(
 			groupName_,
-			"baseBoundPower_" + std::to_string(int(i + 1)));
+			"MaxPowerBlow" + std::to_string(int(i + 1)));
 
-		paramaters_[i].attenuate = globalParameter_->GetValue<float>(
-			groupName_,
-			"attenuate_" + std::to_string(int(i + 1)));
 
-		paramaters_[i].deathCountMax = globalParameter_->GetValue<int>(
-			groupName_,
-			"DeathCount" + std::to_string(int(i + 1)));
-
-		paramaters_[i].maxFallSpeedForBound = globalParameter_->GetValue<float>(
-			groupName_,
-			"maxFallSpeedForBound" + std::to_string(int(i + 1)));
-
-		paramaters_[i].maxFallSpeedForKik = globalParameter_->GetValue<float>(
-			groupName_,
-			"maxFallSpeedForKik" + std::to_string(int(i + 1)));
-
-		paramaters_[i].gravityForBound = globalParameter_->GetValue<float>(
-			groupName_,
-			"gravityForBound" + std::to_string(int(i + 1)));
 	}
 
 }
@@ -360,44 +253,14 @@ void EnemyManager::AdjustParm() {
 			&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].attackValue,
 			0.01f);
 
-		ImGui::DragFloat("GravityForKik",
-			&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].gravityForKik,
-			0.01f);
-
-		ImGui::DragFloat("GravityForBound",
-			&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].gravityForBound,
-			0.01f);
-
-		ImGui::DragFloat("MaxFallSpeedForKik",
-			&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].maxFallSpeedForKik,
-			0.01f);
-
-		ImGui::DragFloat("MaxFallSpeedForBound",
-			&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].maxFallSpeedForBound,
-			0.01f);
-
-		ImGui::DragFloat("BaseBoundPower",
-			&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].boundPower,
-			0.01f);
-
-		ImGui::DragFloat("BoundAttenuate",
-			&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].attenuate,
-			0.01f);
-
-		ImGui::SliderInt("DeathCount",
-			&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].deathCountMax,0,10);
-
 		ImGui::SeparatorText("JumpPower");
-		ImGui::DragFloat("WeakJumpSpeed",
-			&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].jumpSpeed[static_cast<size_t>(BaseEnemy::JumpPower::WEAK)],
+		ImGui::DragFloat("WeakBlowSpeed",
+			&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].blowingPower[static_cast<size_t>(BaseEnemy::BlowingPower::WEAK)],
 			0.01f);
 
-		ImGui::DragFloat("NormalJumpSpeed",
-			&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].jumpSpeed[static_cast<size_t>(BaseEnemy::JumpPower::NORMAL)],
-			0.01f);
 
-		ImGui::DragFloat("MaxJumpSpeed",
-			&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].jumpSpeed[static_cast<size_t>(BaseEnemy::JumpPower::MaxPower)],
+		ImGui::DragFloat("MaxPowerBlowSpeed",
+			&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].blowingPower[static_cast<size_t>(BaseEnemy::BlowingPower::MaxPower)],
 			0.01f);
 
 
@@ -418,44 +281,14 @@ void EnemyManager::AdjustParm() {
 			&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].attackValue,
 			0.01f);
 
-		ImGui::DragFloat("GravityForKik",
-			&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].gravityForKik,
-			0.01f);
-
-		ImGui::DragFloat("GravityForBound",
-			&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].gravityForBound,
-			0.01f);
-
-		ImGui::DragFloat("MaxFallSpeedForKik",
-			&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].maxFallSpeedForKik,
-			0.01f);
-
-		ImGui::DragFloat("MaxFallSpeedForBound",
-			&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].maxFallSpeedForBound,
-			0.01f);
-
-		ImGui::DragFloat("BoundPower",
-			&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].boundPower,
-			0.01f);
-
-		ImGui::DragFloat("BoundAttenuate",
-			&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].attenuate,
-			0.01f);
-
-		ImGui::SliderInt("DeathCount",
-			&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].deathCountMax, 0, 10);
-
 		ImGui::SeparatorText("JumpPower");
-		ImGui::DragFloat("WeakJumpSpeed",
-			&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].jumpSpeed[static_cast<size_t>(BaseEnemy::JumpPower::WEAK)],
+		ImGui::DragFloat("WeakBlowSpeed",
+			&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].blowingPower[static_cast<size_t>(BaseEnemy::BlowingPower::WEAK)],
 			0.01f);
 
-		ImGui::DragFloat("NormalJumpSpeed",
-			&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].jumpSpeed[static_cast<size_t>(BaseEnemy::JumpPower::NORMAL)],
-			0.01f);
 
-		ImGui::DragFloat("MaxJumpSpeed",
-			&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].jumpSpeed[static_cast<size_t>(BaseEnemy::JumpPower::MaxPower)],
+		ImGui::DragFloat("MaxPowerBlowSpeed",
+			&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].blowingPower[static_cast<size_t>(BaseEnemy::BlowingPower::MaxPower)],
 			0.01f);
 
 		ImGui::PopID();

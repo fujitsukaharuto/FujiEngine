@@ -95,7 +95,6 @@ void GameScene::Update() {
 
 		for (auto& enemy : enemyManager_->GetEnemies()) {
 			cMane_->AddCollider(enemy->GetCollider());
-			cMane_->AddCollider(enemy->GetJumpCollider());
 		}
 		cMane_->AddCollider(ufo_->GetCollider());
 		cMane_->AddCollider(player_->GetKikCollider());

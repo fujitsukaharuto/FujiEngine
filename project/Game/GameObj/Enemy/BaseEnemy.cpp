@@ -31,7 +31,6 @@ void BaseEnemy::Initialize() {
 	///spawn
 	spawnEasing_.time = 0.0f;
 	spawnEasing_.maxTime = 0.8f;
-	deathCount_ = paramater_.deathCountMax;
 	model_->transform.scale = Vector3::GetZeroVec();
 
 	// collider
@@ -42,15 +41,6 @@ void BaseEnemy::Initialize() {
 	collider_->SetHeight(2.0f);
 	collider_->SetDepth(2.0f);
 	collider_->SetParent(model_.get());
-
-
-	jumpCollider_ = std::make_unique<AABBCollider>();
-	jumpCollider_->SetTag("EnemyJump");
-	jumpCollider_->SetWidth(2.0f);
-	jumpCollider_->SetHeight(2.0f);
-	jumpCollider_->SetDepth(2.0f);
-	jumpCollider_->SetIsCollisonCheck(false);
-	jumpCollider_->SetParent(model_.get());
 
 
 	ChangeBehavior(std::make_unique<EnemyFall>(this));/// 追っかけ
@@ -73,31 +63,8 @@ void BaseEnemy::Update() {
 
 	// collider更新
 	collider_->InfoUpdate();
-	jumpCollider_->InfoUpdate();
 
-	//// 体力がなくなったら死亡
-	//if (hp_ <= 0) {
-	//	isdeath_=true;
-	//	/*Audio::GetInstance()->PlayWave(deathSound_);*/
-	//}
 }
-///========================================================
-/// HpBar表示
-///========================================================
-//void BaseEnemy::DisplayHpBar(const ViewProjection& viewProjection) {
-//	// ワールド座標からスクリーン座標に変換
-//	Vector3 positionScreen = ScreenTransform(GetWorldPosition(), viewProjection);
-//	// Vector2に格納
-//	Vector2 positionScreenV2(positionScreen.x-70, positionScreen.y - 90.0f);
-//	// Hpバーの座標確定
-//	Vector2 hpBarPosition = positionScreenV2;
-//	// Hpバーのサイズ
-//	hpbar_->SetSize(hpbarSize_);
-//	// HPBarスプライト
-//	hpbar_->SetPosition(hpBarPosition);
-//	// Hpバー更新
-//	hpbar_->Update(int(hp_));
-//}
 
 
 ///========================================================
@@ -110,54 +77,18 @@ void BaseEnemy::Draw(Material* material) {
 #endif // _DEBUG
 }
 
-/// ===================================================
-///  Player Jump
-/// ===================================================
-
-void BaseEnemy::Jump(float& speed) {
-	// 移動
-	model_->transform.translate.y += speed* FPSKeeper::DeltaTimeRate();
-	Fall(speed, true);
-
-}
-
-///=========================================================
-///　落ちる
-///==========================================================
-void BaseEnemy::Fall(float& speed, const bool& isJump) {
-	if (!isJump) {
-		// 移動
-		model_->transform.translate.y += speed* FPSKeeper::DeltaTimeRate();
-	}
-	// 加速する
-	speed = max(speed - (gravity_)*FPSKeeper::DeltaTimeRate(), -maxFallSpeed_);
-
-	// 着地
-	if (model_->transform.translate.y <= BaseEnemy::InitY_) {
-		model_->transform.translate.y = BaseEnemy::InitY_;
-		speed = 0.0f;
-
-		if (!dynamic_cast<EnemyJump*>(behavior_.get()))return;
-		// ジャンプ終了
-		SetIsCollision(false);
-		SetRotation(Vector3(0, 0, 0));
-		ChangeBehavior(std::make_unique<EnemyRoot>(this));
-	}
-}
 
 void BaseEnemy::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 
 	// 弱いキックをくらう
 	if (other.tag == pPlayer_->GetTag(static_cast<size_t>(Player::KikPower::WEAK))) {
 
-		jumpPower_ = JumpPower::WEAK;
 		ChangeBehavior(std::make_unique<EnemyJump>(this));
 	}
 	
 	// 強いキックをくらう
 	else 	if (other.tag == pPlayer_->GetTag(static_cast<size_t>(Player::KikPower::MAXPOWER))) {
 
-		jumpPower_ = JumpPower::MaxPower;
 		ChangeBehavior(std::make_unique<EnemyJump>(this));
 	}
 
@@ -190,27 +121,13 @@ void BaseEnemy::ChangeBehavior(std::unique_ptr<BaseEnemyBehaivor>behavior) {
 	behavior_ = std::move(behavior);
 }
 
-
-void   BaseEnemy::SetIsCollision(const bool& is) {
-	jumpCollider_->SetIsCollisonCheck(is);
-}
-
-float BaseEnemy::GetBoundPower()const {
-	// 減衰率を計算 (0～1)
-	float remainingRate = (float(paramater_.deathCountMax) - float((paramater_.deathCountMax - deathCount_))) / float(paramater_.deathCountMax);
-	remainingRate = std::clamp(remainingRate, 0.0f, 1.0f); // 範囲を制限
-
-	// 減衰率に基づくジャンプ速度の計算
-	float baseSpeed = paramater_.boundPower; // 初期ジャンプ力を基準とする
-	float scaledSpeed = baseSpeed * std::pow(remainingRate, paramater_.attenuate); // 減衰を2乗で適用
-	return scaledSpeed;
-}
-
-
-void BaseEnemy::DecrementDeathCount() {
-	deathCount_--;
-	deathCount_ = max(deathCount_, 0);
-	if (deathCount_ <= 0) {
-		isdeath_ = true;
-	}
-}
+//float BaseEnemy::GetBoundPower()const {
+//	// 減衰率を計算 (0～1)
+//	float remainingRate = (float(paramater_.deathCountMax) - float((paramater_.deathCountMax - deathCount_))) / float(paramater_.deathCountMax);
+//	remainingRate = std::clamp(remainingRate, 0.0f, 1.0f); // 範囲を制限
+//
+//	// 減衰率に基づくジャンプ速度の計算
+//	float baseSpeed = paramater_.boundPower; // 初期ジャンプ力を基準とする
+//	float scaledSpeed = baseSpeed * std::pow(remainingRate, paramater_.attenuate); // 減衰を2乗で適用
+//	return scaledSpeed;
+//}
