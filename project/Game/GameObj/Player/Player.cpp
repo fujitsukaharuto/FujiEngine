@@ -73,6 +73,11 @@ void Player::Initialize() {
 	BehaviorRequest();
 
 
+	walkParticle_.name = "walkParticle";
+	walkParticle_.Load("walkParticle");
+	walkParticle_.SetParent(model_.get());
+
+
 	attackParticle_.name = "attackParticle";
 	attackParticle_.Load("attackParticle");
 	attackParticle_.SetParent(weapon_.get());
@@ -138,6 +143,8 @@ void Player::Update() {
 	}
 
 #ifdef _DEBUG
+
+	walkParticle_.DebugGUI();
 
 	attackParticle_.DebugGUI();
 	attackParticle2_.DebugGUI();
@@ -269,6 +276,10 @@ void Player::EmitJumpAttack() {
 	attackParticle3_.Burst();
 	attackParticle4_.Burst();
 	attackParticle5_.Burst();
+}
+
+void Player::EmitWalk() {
+	walkParticle_.Burst();
 }
 
 bool Player::GetLockOn() {

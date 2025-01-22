@@ -53,6 +53,7 @@ public:
 	Trans& GetBodyTrans() { return body_->transform; }
 
 	void EmitJumpAttack();
+	void EmitWalk();
 
 	void SetLockOn(const LockOn* target) { lockOn_ = target; }
 	bool GetLockOn();
@@ -98,6 +99,7 @@ private:
 
 	float popTime_ = 3.0f;
 
+	ParticleEmitter walkParticle_;
 
 	ParticleEmitter attackParticle_;
 	ParticleEmitter attackParticle2_;

@@ -23,4 +23,7 @@ private:
 	// 変数
 	float kCharacterSpeed_ = 0.15f;
 
+	float animeTime_ = 0.0f;
+	float animeTimeLimitte_ = 30.0f;
+
 };

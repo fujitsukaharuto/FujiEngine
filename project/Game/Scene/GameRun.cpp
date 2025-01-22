@@ -39,6 +39,8 @@ void GameRun::Initialize() {
 	pManager_->AddAnime("animetest", "white2x2.png", 10.0f);
 
 	// プレイヤーのパーティクル
+	pManager_->CreateParticleGroup("walkParticle", "blueParticle.png", 50);
+
 	pManager_->CreateParticleGroup("attackParticle", "blueParticle.png",40);
 	pManager_->CreateParticleGroup("attackParticle2", "blueParticle.png", 40);
 
