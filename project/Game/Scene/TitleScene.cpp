@@ -47,6 +47,13 @@ void TitleScene::Initialize() {
 	/*emit.name = "sphere";
 	emit.Load("sphere");*/
 
+	emit1.name = "bomb1";
+	emit1.Load("bomb1");
+	emit2.name = "bomb2";
+	emit2.Load("bomb2");
+	emit3.name = "bomb3";
+	emit3.Load("bomb3");
+
 }
 
 void TitleScene::Update() {
@@ -65,6 +72,15 @@ void TitleScene::Update() {
 	/*test_->Update();
 	test2_->Update();*/
 
+	emit1.Emit();
+	emit2.Emit();
+	emit3.Emit();
+
+#ifdef _DEBUG
+	emit1.DebugGUI();
+	emit2.DebugGUI();
+	emit3.DebugGUI();
+#endif // _DEBUG
 
 
 	ParticleManager::GetInstance()->Update();
@@ -84,7 +100,11 @@ void TitleScene::Draw() {
 	/*sphere->Draw();
 	test_->Draw();*/
 
-
+//#ifdef _DEBUG
+//	emit1.DrawSize();
+//	emit2.DrawSize();
+//	emit3.DrawSize();
+//#endif // _DEBUG
 	ParticleManager::GetInstance()->Draw();
 
 #ifdef _DEBUG
@@ -102,7 +122,7 @@ void TitleScene::Draw() {
 #pragma region 前景スプライト
 
 	dxCommon_->PreSpriteDraw();
-	paneru->Draw();
+	//paneru->Draw();
 	black_->Draw();
 
 #pragma endregion

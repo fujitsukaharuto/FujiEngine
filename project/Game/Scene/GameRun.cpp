@@ -50,8 +50,12 @@ void GameRun::Initialize() {
 	// 敵のパーティクル
 	pManager_->CreateParticleGroup("hitParticle1", "blueParticle.png",70);
 	pManager_->CreateParticleGroup("hitParticle2", "blueParticle.png",50);
-	pManager_->CreateParticleGroup("hitParticle3", "hit_Don.png");
-	pManager_->CreateParticleGroup("hitParticle4", "kira.png");
+	pManager_->CreateParticleGroup("hitParticle3", "blueParticle.png",50);
+	pManager_->CreateParticleGroup("hitParticle4", "blueParticle.png");
+
+	pManager_->CreateParticleGroup("bomb1", "blueParticle.png", 50);
+	pManager_->CreateParticleGroup("bomb2", "blueParticle.png", 50);
+	pManager_->CreateParticleGroup("bomb3", "blueParticle.png", 50);
 
 #pragma endregion
 

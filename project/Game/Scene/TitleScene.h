@@ -26,4 +26,8 @@ private:
 	float blackTime = 20.0f;
 	bool isChangeFase = false;
 
+
+	ParticleEmitter emit1;
+	ParticleEmitter emit2;
+	ParticleEmitter emit3;
 };
