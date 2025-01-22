@@ -128,6 +128,7 @@ public:
 	/// ===================================================
 	Paramater GetParamater()const { return paramater_; }
 	float GetFacingDirection()const;
+	Vector3 GetKikDirection()const { return kikDirection_; };
 	std::string GetTag(int i) { return tags_[i]; }
 	/// ===================================================
 	/// setter method

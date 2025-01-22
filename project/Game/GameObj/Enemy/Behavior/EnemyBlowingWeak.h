@@ -6,13 +6,14 @@
 class EnemyBlowingWeak : public BaseEnemyBehaivor {
 private:
 	enum class Step {
-		BOUND,
+		BLOW,
 		RETUNROOT,
 	};
 private:
 
 	Step step_;
-	float jumpSpeed_;
+	float blowPower_;
+	Vector3 direction_;
 
 	float rotateZ_;
 	float rotateSpeed_;

@@ -593,7 +593,7 @@ void Player::ChangeKikDirection() {
 
 	// 可視化
 	kikDirectionView_->SetDirection(kikDirection_);
-	kikDirectionView_->SetStartPos(kikCollider_->GetPos());
+	kikDirectionView_->SetStartPos(Vector3(kikCollider_->GetPos().x, kikCollider_->GetPos().y, 2.0f));
 	kikDirectionView_->Update();
 }
 

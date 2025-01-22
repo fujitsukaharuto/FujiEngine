@@ -12,7 +12,8 @@ private:
 private:
 
 	Step step_;
-	float jumpSpeed_;
+	float blowPower_;
+	Vector3 direction_;
 
 	float rotateZ_;
 	float rotateSpeed_;
