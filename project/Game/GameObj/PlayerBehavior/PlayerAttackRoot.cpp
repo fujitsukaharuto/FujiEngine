@@ -20,8 +20,8 @@ PlayerAttackRoot::PlayerAttackRoot(Player* boss)
 	/// ===================================================
 	/// 変数初期化
 	/// ===================================================
-	
-	
+	chargeTime_ = 0.0f;
+	pPlayer_->SetTag(static_cast<size_t>(Player::KikPower::WEAK));
 }
 
 PlayerAttackRoot ::~PlayerAttackRoot() {
@@ -33,18 +33,63 @@ void PlayerAttackRoot::Update() {
 	switch (step_)
 	{
 	case PlayerAttackRoot::Step::WAIT:
+		/// --------------------------------------------------------------
+        ///  キック待機
+        /// ---------------------------------------------------------------
 		waitTime_ += FPSKeeper::DeltaTimeRate();
 		if (waitTime_ < pPlayer_->GetParamater().kikWaitTime_)break;
-		step_ = Step::ATTACK;
+	
+		///* ボタン推したらチャージスタート
+
+		// キー
+		 if (Input::GetInstance()->PushKey(DIK_K)) {
+			 step_ = Step::ATTACKCHAREGE;
+			 break;
+		}
+		 // コントローラ
+		 if (!(Input::GetInstance()->GetGamepadState(joyState)))break;
+		 if (!(Input::GetInstance()->PressButton(PadInput::B)))break;
+		step_ = Step::ATTACKCHAREGE;
+
 		break;
-	case PlayerAttackRoot::Step::ATTACK:
-		//　キックする
+	case PlayerAttackRoot::Step::ATTACKCHAREGE:
+		/// --------------------------------------------------------------
+		///  攻撃チャージ
+		/// ---------------------------------------------------------------
+		
+		// チャージ
 		if (Input::GetInstance()->PushKey(DIK_K)) {
-			pPlayer_->ChangeAttackBehavior(std::make_unique<PlayerKikAttack>(pPlayer_));
+			chargeTime_ += FPSKeeper::NormalDeltaTime();
 		}
 		else {
-			KikAttackState();//キック
+			ChargeForJoyStick();//キック
+		}
+		
+		///* ボタン離したらキック攻撃開始
+		if (Input::GetInstance()->ReleaseKey(DIK_K)) {
+			pPlayer_->ChangeAttackBehavior(std::make_unique<PlayerKikAttack>(pPlayer_));
+			return;
+		}
+		else {
+			AtttackForJoyStick();
+		}
 
+		 	///* 時間経過で強化キックに
+		if (chargeTime_ < pPlayer_->GetParamater().kikChargeTime_)break;
+		step_ = Step::STRONGATTACK;
+		break;
+	case PlayerAttackRoot::Step::STRONGATTACK:
+		/// --------------------------------------------------------------
+		///  強い攻撃
+		/// ---------------------------------------------------------------
+		pPlayer_->SetTag(static_cast<size_t>(Player::KikPower::MAXPOWER));
+
+		if (Input::GetInstance()->ReleaseKey(DIK_K)) {
+			pPlayer_->ChangeAttackBehavior(std::make_unique<PlayerKikAttack>(pPlayer_));
+			return;
+		}
+		else {
+			AtttackForJoyStick();
 		}
 		break;
 	default:
@@ -54,10 +99,17 @@ void PlayerAttackRoot::Update() {
 	
 }
 
-void PlayerAttackRoot::KikAttackState() {
-	if (!(Input::GetInstance()->GetGamepadState(joyState))) return;
+void PlayerAttackRoot::ChargeForJoyStick() {
+	if (!(Input::GetInstance()->GetGamepadState(joyState)))return;
 
-	if (!((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_B))) return;
+	if (!(Input::GetInstance()->PressButton(PadInput::B)))return;
+	chargeTime_ += FPSKeeper::NormalDeltaTime();
+}
+
+void PlayerAttackRoot::AtttackForJoyStick() {
+	if (!(Input::GetInstance()->GetGamepadState(joyState)))return;
+
+	if (!(Input::GetInstance()->ReleaseButton(PadInput::B)))return;
 
 	pPlayer_->ChangeAttackBehavior(std::make_unique<PlayerKikAttack>(pPlayer_));
 }

@@ -14,7 +14,6 @@
 EnemyBound::EnemyBound(BaseEnemy* boss)
 	: BaseEnemyBehaivor("EnemyBound", boss) {
 	
-	
 
 	step_ = Step::BOUND;
 }

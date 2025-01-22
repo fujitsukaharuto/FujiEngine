@@ -3,7 +3,7 @@
 #include"BaseEnemyBehavior.h"
 #include"Easing.h"
 
-class EnemyJump : public BaseEnemyBehaivor {
+class EnemyBlowingWeak : public BaseEnemyBehaivor {
 private:
 	enum class Step {
 		BOUND,
@@ -20,8 +20,8 @@ private:
 
 public:
 	//コンストラクタ
-	EnemyJump(BaseEnemy* boss);
-	~EnemyJump();
+	EnemyBlowingWeak(BaseEnemy* boss);
+	~EnemyBlowingWeak();
 
 
 	void Update()override;

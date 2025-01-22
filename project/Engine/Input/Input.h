@@ -81,6 +81,9 @@ public:
 
 	bool TriggerKey(uint8_t keyNumber) const;
 
+	bool ReleaseKey(uint8_t keyNumber) const;
+
+
 	const std::array<BYTE, 256>& GetAllKey() { return key_; }
 
 

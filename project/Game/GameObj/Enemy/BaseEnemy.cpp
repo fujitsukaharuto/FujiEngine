@@ -4,7 +4,8 @@
 #include "Model/Line3dDrawer.h"
 ///*behavior
 #include"Behavior/EnemyRoot.h"
-#include"Behavior/EnemyJump.h"
+#include"Behavior/EnemyBlowingWeak.h"
+#include"Behavior/EnemyBlowingStrong.h"
 #include"Behavior/EnemyFall.h"
 ///* std
 #include<algorithm>
@@ -26,7 +27,8 @@ void BaseEnemy::Initialize() {
 	// 基底クラスの初期化
 	OriginGameObject::Initialize();
 
-	/*model_->transform.translate = spownPos;*/
+	tags_[static_cast<size_t>(Tag::FALL)] = "FallEnemy";
+	tags_[static_cast<size_t>(Tag::BLOWING)] = "BlowingEnemy";
 
 	///spawn
 	spawnEasing_.time = 0.0f;
@@ -36,7 +38,7 @@ void BaseEnemy::Initialize() {
 	// collider
 	collider_ = std::make_unique<AABBCollider>();
 	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
-	collider_->SetTag("Enemy");
+	collider_->SetTag(tags_[static_cast<size_t>(Tag::FALL)]);
 	collider_->SetWidth(2.0f);
 	collider_->SetHeight(2.0f);
 	collider_->SetDepth(2.0f);
@@ -79,24 +81,28 @@ void BaseEnemy::Draw(Material* material) {
 
 
 void BaseEnemy::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
+	// fall
+	if (collider_->GetTag() == tags_[static_cast<size_t>(Tag::FALL)]) {
+		// 弱いキックをくらう
+		if (other.tag == pPlayer_->GetTag(static_cast<size_t>(Player::KikPower::WEAK))) {
+			collider_->SetTag(tags_[static_cast<size_t>(Tag::BLOWING)]);
+			ChangeBehavior(std::make_unique<EnemyBlowingWeak>(this));
+			return;
+		}
 
-	// 弱いキックをくらう
-	if (other.tag == pPlayer_->GetTag(static_cast<size_t>(Player::KikPower::WEAK))) {
-
-		ChangeBehavior(std::make_unique<EnemyJump>(this));
+		// 強いキックをくらう
+		else if (other.tag == pPlayer_->GetTag(static_cast<size_t>(Player::KikPower::MAXPOWER))) {
+			collider_->SetTag(tags_[static_cast<size_t>(Tag::BLOWING)]);
+			ChangeBehavior(std::make_unique<EnemyBlowingStrong>(this));
+			return;
+		}
 	}
-	
-	// 強いキックをくらう
-	else 	if (other.tag == pPlayer_->GetTag(static_cast<size_t>(Player::KikPower::MAXPOWER))) {
-
-		ChangeBehavior(std::make_unique<EnemyJump>(this));
+	//blow
+	if (collider_->GetTag() == tags_[static_cast<size_t>(Tag::BLOWING)]) {
+		if (other.tag == "UFO") {
+			isdeath_ = true;
+		}
 	}
-
-	if (other.tag == "UFO") {
-		if (!dynamic_cast<EnemyJump*>(behavior_.get()))return;
-		isdeath_ = true;
-	}
-
 }
 
 void BaseEnemy::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {

@@ -37,6 +37,7 @@ public:
 		float             specialAttackPostMaxFallSpeed_;
 		float             fallSpeed_;
 		float             kikDirectionSpeed_;
+		float             kikChargeTime_;
 	};
 private:
 
@@ -132,4 +133,5 @@ public:
 	/// setter method
 	/// ===================================================
 	void SetKikIsCollision(const bool& is);
+	void SetTag(const int& i);
 };

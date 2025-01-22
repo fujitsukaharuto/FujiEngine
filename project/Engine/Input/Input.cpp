@@ -99,7 +99,12 @@ bool Input::TriggerKey(uint8_t keyNumber) const
 	return (key_[keyNumber] & 0x80) && !(keyPre_[keyNumber] & 0x80);
 }
 
-
+/// keta勝手に追加
+bool Input::ReleaseKey(uint8_t keyNumber) const
+{
+	
+	return !(key_[keyNumber] & 0x80) && (keyPre_[keyNumber] & 0x80);
+}
 
 /// GamePad-----------------------------------
 

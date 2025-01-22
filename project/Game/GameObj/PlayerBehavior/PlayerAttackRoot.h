@@ -8,7 +8,8 @@ class PlayerAttackRoot : public BasePlayerAttackBehavior {
 private:
 	enum class Step {
 		WAIT,
-		ATTACK,
+		ATTACKCHAREGE,
+		STRONGATTACK,
 	};
 
 /// ===================================================
@@ -17,6 +18,7 @@ private:
 	Step step_;
 	float waitTime_;
 
+	float chargeTime_;
 public:
 	//コンストラクタ
 	PlayerAttackRoot(Player* boss);
@@ -25,5 +27,6 @@ public:
 	void Update()override;
 	void Debug()override;
 
-	void KikAttackState();
+	void ChargeForJoyStick();
+	void AtttackForJoyStick();
 };

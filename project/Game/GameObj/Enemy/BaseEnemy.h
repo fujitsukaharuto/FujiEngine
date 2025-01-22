@@ -24,6 +24,11 @@ public:
 		MaxPower,
 	};
 
+	enum class Tag {
+		FALL,
+		BLOWING,
+	};
+
 	struct Paramater {
 		float                fallSpeed;
 		float                attackValue;
@@ -41,6 +46,7 @@ protected:
 	/// parm
 	Paramater            paramater_;
 	Type                 type_;
+	std::array<std::string, 2>tags_;
 	
 	/// behavior
 	std::unique_ptr<BaseEnemyBehaivor> behavior_ = nullptr;

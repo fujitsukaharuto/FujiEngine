@@ -1,6 +1,6 @@
 
 /// behavior
-#include"EnemyJump.h"
+#include"EnemyBlowingWeak.h"
 
 /// obj
 #include"GameObj/Enemy/BaseEnemy.h"
@@ -11,26 +11,26 @@
 
 
 //初期化
-EnemyJump::EnemyJump(BaseEnemy* boss)
-	: BaseEnemyBehaivor("EnemyJump", boss) {
+EnemyBlowingWeak::EnemyBlowingWeak(BaseEnemy* boss)
+	: BaseEnemyBehaivor("EnemyBlowingWeak", boss) {
 	
 	
 
 	rotateSpeed_ = 30.0f;
 }
 
-EnemyJump::~EnemyJump() {
+EnemyBlowingWeak::~EnemyBlowingWeak() {
 
 }
 
-void  EnemyJump::Update() {
+void  EnemyBlowingWeak::Update() {
 	rotateZ_ += rotateSpeed_ * FPSKeeper::DeltaTimeRate();
 	pBaseEnemy_->SetRotation(Vector3(0, 0, rotateZ_));
 	
 	
 }
 
-void  EnemyJump::Debug() {
+void  EnemyBlowingWeak::Debug() {
 	
 
 }

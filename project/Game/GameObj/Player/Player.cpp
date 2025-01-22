@@ -377,7 +377,8 @@ void Player::AdjustParm() {
 		ImGui::DragFloat("specialAttackPostMaxFallSpeed_", &paramater_.specialAttackPostMaxFallSpeed_, 0.01f);
 		ImGui::SeparatorText("DirectionChange");
 		ImGui::DragFloat("kikDirectionSpeed_", &paramater_.kikDirectionSpeed_, 0.01f);
-
+		ImGui::SeparatorText("KikCharge");
+		ImGui::DragFloat("kikChargeTime_", &paramater_.kikChargeTime_, 0.01f);
 
 		/// セーブとロード
 		globalParameter_->ParmSaveForImGui(groupName_);
@@ -424,7 +425,7 @@ void Player::AddParmGroup() {
 	globalParameter_->AddItem(groupName_, "specialAttackPostGravity_", paramater_.specialAttackPostGravity_);
 	globalParameter_->AddItem(groupName_, "specialAttackPostMaxFallSpeed_", paramater_.specialAttackPostMaxFallSpeed_);
 	globalParameter_->AddItem(groupName_, "kikDirectionSpeed_", paramater_.kikDirectionSpeed_);
-
+	globalParameter_->AddItem(groupName_, "kikChargeTime_", paramater_.kikChargeTime_);
 }
 
 ///=================================================================================
@@ -448,6 +449,7 @@ void Player::SetValues() {
 	globalParameter_->SetValue(groupName_, "specialAttackPostGravity_", paramater_.specialAttackPostGravity_);
 	globalParameter_->SetValue(groupName_, "specialAttackPostMaxFallSpeed_", paramater_.specialAttackPostMaxFallSpeed_);
 	globalParameter_->SetValue(groupName_, "kikDirectionSpeed_", paramater_.kikDirectionSpeed_);
+	globalParameter_->SetValue(groupName_, "kikChargeTime_", paramater_.kikChargeTime_);
 }
 
 ///=====================================================
@@ -470,6 +472,7 @@ void Player::ApplyGlobalParameter() {
 	paramater_.specialAttackPostGravity_ = globalParameter_->GetValue<float>(groupName_, "specialAttackPostGravity_");
 	paramater_.specialAttackPostMaxFallSpeed_ = globalParameter_->GetValue<float>(groupName_, "specialAttackPostMaxFallSpeed_");
 	paramater_.kikDirectionSpeed_ = globalParameter_->GetValue<float>(groupName_, "kikDirectionSpeed_");
+	paramater_.kikChargeTime_ = globalParameter_->GetValue<float>(groupName_, "kikChargeTime_");
 }
 ///=========================================================
 /// Class Set
@@ -592,4 +595,8 @@ void Player::ChangeKikDirection() {
 	kikDirectionView_->SetDirection(kikDirection_);
 	kikDirectionView_->SetStartPos(kikCollider_->GetPos());
 	kikDirectionView_->Update();
+}
+
+void Player::SetTag(const int& i) {
+	kikCollider_->SetTag(tags_[i]);
 }
