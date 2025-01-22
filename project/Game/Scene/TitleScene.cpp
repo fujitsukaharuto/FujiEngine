@@ -47,13 +47,14 @@ void TitleScene::Initialize() {
 	/*emit.name = "sphere";
 	emit.Load("sphere");*/
 
-	emit1.name = "bomb1";
+	emit1.name = "kick1";
 	emit1.Load("bomb1");
-	emit2.name = "bomb2";
+	emit2.name = "kick2";
 	emit2.Load("bomb2");
-	emit3.name = "bomb3";
+	emit3.name = "kick3";
 	emit3.Load("bomb3");
-
+	emit4.name = "kick4";
+	emit4.Load("bomb3");
 }
 
 void TitleScene::Update() {
@@ -75,11 +76,13 @@ void TitleScene::Update() {
 	emit1.Emit();
 	emit2.Emit();
 	emit3.Emit();
+	emit4.Emit();
 
 #ifdef _DEBUG
 	emit1.DebugGUI();
 	emit2.DebugGUI();
 	emit3.DebugGUI();
+	emit4.DebugGUI();
 #endif // _DEBUG
 
 

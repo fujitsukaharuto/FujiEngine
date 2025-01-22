@@ -30,4 +30,5 @@ private:
 	ParticleEmitter emit1;
 	ParticleEmitter emit2;
 	ParticleEmitter emit3;
+	ParticleEmitter emit4;
 };
