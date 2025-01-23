@@ -347,26 +347,27 @@ void Player::AdjustParm() {
 		ImGui::DragFloat3("位置", &model_->transform.translate.x, 0.1f);
 
 		///　Floatのパラメータ
+		ImGui::SeparatorText("基本移動");
 		ImGui::DragFloat("ジャンプの高さ", &paramater_.jumpSpeed_, 0.01f);
 		ImGui::DragFloat("ジャンプ中の移動スピード", &paramater_.airMoveSpeed_, 0.01f);
 		ImGui::DragFloat("移動スピード", &paramater_.moveSpeed_, 0.01f);
 		ImGui::DragFloat("重力", &paramater_.gravity_, 0.01f);
 		ImGui::DragFloat("最大重力", &paramater_.maxFallSpeed_, 0.01f);
-		ImGui::DragFloat("RecoilSpeed", &paramater_.recoilSpeed_, 0.01f);
-		ImGui::DragFloat("RecoilJumpSpeed", &paramater_.recoilJumpSpeed_, 0.01f);
-		ImGui::SeparatorText("Kik");
-		ImGui::DragFloat("KikTime", &paramater_.kikTime_, 0.01f);
-		ImGui::DragFloat("KikWaitTime", &paramater_.kikWaitTime_, 0.01f);
-		ImGui::SeparatorText("SpecialAttack");
+		ImGui::SeparatorText("キック");
+		ImGui::DragFloat("キックの当たり判定適応時間(秒)", &paramater_.kikTime_, 0.01f);
+		ImGui::DragFloat("キックのクールタイム(秒)", &paramater_.kikWaitTime_, 0.01f);
+		ImGui::DragFloat("キックのチャージタイム(秒)", &paramater_.kikChargeTime_, 0.01f);
+		ImGui::DragFloat("キックの向き変更スピード", &paramater_.kikDirectionSpeed_, 0.01f);
+		ImGui::SeparatorText("いらないかもパラメータ");
 		ImGui::DragFloat("specialAttackAntiTime_", &paramater_.specialAttackAntiTime_, 0.01f);
 		ImGui::DragFloat("specialAttackFallSpeed_", &paramater_.specialAttackFallSpeed_, 0.01f);
 		ImGui::DragFloat("specialAttackPostJump_", &paramater_.specialAttackPostJump_, 0.01f);
 		ImGui::DragFloat("specialAttackPostGravity_", &paramater_.specialAttackPostGravity_, 0.01f);
 		ImGui::DragFloat("specialAttackPostMaxFallSpeed_", &paramater_.specialAttackPostMaxFallSpeed_, 0.01f);
-		ImGui::SeparatorText("DirectionChange");
-		ImGui::DragFloat("kikDirectionSpeed_", &paramater_.kikDirectionSpeed_, 0.01f);
-		ImGui::SeparatorText("KikCharge");
-		ImGui::DragFloat("kikChargeTime_", &paramater_.kikChargeTime_, 0.01f);
+		ImGui::DragFloat("RecoilSpeed", &paramater_.recoilSpeed_, 0.01f);
+		ImGui::DragFloat("キック当てた時の上に飛ぶ高さ", &paramater_.recoilJumpSpeed_, 0.01f);
+		
+		
 		ImGuiManager::GetInstance()->UnSetFont();
 		/// セーブとロード
 		globalParameter_->ParmSaveForImGui(groupName_);
