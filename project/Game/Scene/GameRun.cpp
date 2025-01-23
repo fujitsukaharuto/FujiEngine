@@ -46,6 +46,11 @@ void GameRun::Initialize() {
 	pManager_->CreateParticleGroup("kick3", "blueParticle.png");
 	pManager_->CreateParticleGroup("kick4", "blueParticle.png");
 
+	pManager_->CreateParticleGroup("charge1", "blueParticle.png");
+	pManager_->CreateParticleGroup("charge2", "blueParticle.png");
+
+	pManager_->CreateParticleGroup("kiran1", "blueParticle.png");
+	pManager_->CreateParticleGroup("kiran2", "blueParticle.png");
 
 #pragma endregion
 
