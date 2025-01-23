@@ -302,10 +302,10 @@ void EnemyManager::AdjustParm() {
 		ImGui::DragFloat("爆発する延長時間(秒)",
 			&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].explotionExtensionTime_,
 			0.01f);
-
+		ImGuiManager::GetInstance()->UnSetFont();
 		ImGui::PopID();
 
-		ImGuiManager::GetInstance()->UnSetFont();
+		
 		///---------------------------------------------------------
 		/// ストロングな敵
 		///----------------------------------------------------------
@@ -338,9 +338,8 @@ void EnemyManager::AdjustParm() {
 		ImGui::DragFloat("爆発する延長時間(秒)",
 			&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].explotionExtensionTime_,
 			0.01f);
-
-		ImGui::PopID();
 		ImGuiManager::GetInstance()->UnSetFont();
+		ImGui::PopID();
 		/// セーブとロード
 		globalParameter_->ParmSaveForImGui(groupName_);
 		ParmLoadForImGui();

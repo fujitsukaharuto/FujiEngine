@@ -19,6 +19,7 @@
 ///* std
 #include<algorithm>
 ///* imgui
+#include"ImGuiManager.h"
 #include<imgui.h> 
 
 
@@ -341,17 +342,16 @@ void Player::AdjustParm() {
 #ifdef _DEBUG
 	if (ImGui::CollapsingHeader(groupName_.c_str())) {
 		ImGui::PushID(groupName_.c_str());
+		ImGuiManager::GetInstance()->SetFontJapanese();/// 日本語
 		/// 位置
-		ImGui::SeparatorText("Transform");
-		ImGui::DragFloat3("Position", &model_->transform.translate.x, 0.1f);
+		ImGui::DragFloat3("位置", &model_->transform.translate.x, 0.1f);
 
 		///　Floatのパラメータ
-		ImGui::SeparatorText("FloatParamater");
-		ImGui::DragFloat("jumpSpeed", &paramater_.jumpSpeed_, 0.01f);
-		ImGui::DragFloat("AirMoveSpeed", &paramater_.airMoveSpeed_, 0.01f);
-		ImGui::DragFloat("MoveSpeed", &paramater_.moveSpeed_, 0.01f);
-		ImGui::DragFloat("Gravity", &paramater_.gravity_, 0.01f);
-		ImGui::DragFloat("MaxFallSpeed", &paramater_.maxFallSpeed_, 0.01f);
+		ImGui::DragFloat("ジャンプの高さ", &paramater_.jumpSpeed_, 0.01f);
+		ImGui::DragFloat("ジャンプ中の移動スピード", &paramater_.airMoveSpeed_, 0.01f);
+		ImGui::DragFloat("移動スピード", &paramater_.moveSpeed_, 0.01f);
+		ImGui::DragFloat("重力", &paramater_.gravity_, 0.01f);
+		ImGui::DragFloat("最大重力", &paramater_.maxFallSpeed_, 0.01f);
 		ImGui::DragFloat("RecoilSpeed", &paramater_.recoilSpeed_, 0.01f);
 		ImGui::DragFloat("RecoilJumpSpeed", &paramater_.recoilJumpSpeed_, 0.01f);
 		ImGui::SeparatorText("Kik");
@@ -367,7 +367,7 @@ void Player::AdjustParm() {
 		ImGui::DragFloat("kikDirectionSpeed_", &paramater_.kikDirectionSpeed_, 0.01f);
 		ImGui::SeparatorText("KikCharge");
 		ImGui::DragFloat("kikChargeTime_", &paramater_.kikChargeTime_, 0.01f);
-
+		ImGuiManager::GetInstance()->UnSetFont();
 		/// セーブとロード
 		globalParameter_->ParmSaveForImGui(groupName_);
 		ParmLoadForImGui();
