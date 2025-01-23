@@ -442,7 +442,13 @@ void ParticleManager::Emit(const std::string& name, const Vector3& pos, const Ve
 				particle.transform.translate = Random::GetVector3(para.transx, para.transy, para.transz);
 				particle.transform.translate += pos;
 				particle.transform.scale = { grain.startSize.x,grain.startSize.y,1.0f };
-				particle.speed = Random::GetVector3(para.speedx, para.speedy, para.speedz);
+				if (grain.speedType == SpeedType::kCenter) {
+					particle.speed = grain.speed;
+				}
+				else {
+					particle.speed = Random::GetVector3(para.speedx, para.speedy, para.speedz);
+				}
+
 
 				particle.rotateType = grain.rotateType;
 				switch (particle.rotateType) {
@@ -495,6 +501,9 @@ void ParticleManager::Emit(const std::string& name, const Vector3& pos, const Ve
 					break;
 				case kReturn:
 					particle.accele = (particle.speed) * grain.returnPower_;
+					break;
+				case kCenter:
+					particle.accele = Vector3{ 0.0f,0.0f,0.0f };
 					break;
 				}
 
