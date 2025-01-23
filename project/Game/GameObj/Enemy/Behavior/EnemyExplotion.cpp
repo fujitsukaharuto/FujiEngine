@@ -23,6 +23,7 @@ EnemyExplotion::~EnemyExplotion() {
 
 void EnemyExplotion::Update() {
 	
+	// 死ぬ
 	pBaseEnemy_->SetIsDeath(true);
 	
 }
