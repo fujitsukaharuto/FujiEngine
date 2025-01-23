@@ -10,6 +10,7 @@
 #include"GameObj/UFO/UFO.h"
 #include"Collider/CollisionManager.h"
 #include"GameObj/KikArea/KikArea.h"
+#include"GameObj/Enemy/EnemySpawn/EnemySpawn.h"
 
 class GameScene :public BaseScene
 {
@@ -91,6 +92,7 @@ private:
 	std::unique_ptr<EnemyManager>enemyManager_;
 	std::unique_ptr<UFO>ufo_;
 	std::unique_ptr<KikArea>kikArea_;
+	std::unique_ptr<EnemySpawn>enemySpawn_;
 
 	std::unique_ptr<CollisionManager> cMane_;
 };

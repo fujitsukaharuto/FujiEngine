@@ -32,7 +32,6 @@ class EnemyManager {
   
     std::array<BaseEnemy::Paramater, 2>paramaters_;
   
-    bool isEditorMode_;                          // エディタモード中かどうか
   
     ///* 敵リスト
     std::list<std::unique_ptr<BaseEnemy>> enemies_;
@@ -73,7 +72,7 @@ public:
 
 
     ///* EditorModeセット
-    void SetEditorMode(bool isEditorMode);
+  
 
   ///-------------------------------------------------------------------------------------
   ///GlobalVariabe
@@ -92,6 +91,14 @@ public:
 
     // 現在の敵リスト取得
     const std::list<std::unique_ptr<BaseEnemy>>& GetEnemies() const {
-        return enemies_;}
-};
+        return enemies_;
+    }
 
+    std::array<std::string, 2>GetEnemyTypes()const {
+        return enemyTypes_;
+    }
+
+   std::string GetEnemyType(int type)const {
+        return enemyTypes_[type];
+    }
+};

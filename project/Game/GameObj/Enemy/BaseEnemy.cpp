@@ -20,6 +20,7 @@
 float BaseEnemy::InitY_ = 1.5f;
 float BaseEnemy::BoundPosY_ = 42.0f;
 float BaseEnemy::StartZPos_ = 5.0f;
+float BaseEnemy::StartYPos_ = 60.0f;
 Vector3 BaseEnemy::InitScale_ = { 1.0f,1.0f,1.0f };
 
 BaseEnemy::BaseEnemy() {

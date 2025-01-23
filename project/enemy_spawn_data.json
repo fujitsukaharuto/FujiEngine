@@ -1,0 +1,14 @@
+[
+    {
+        "enemyType": "NormalEnemy",
+        "time": 3.4000000953674316,
+        "x": 0.0,
+        "y": 47.29999923706055
+    },
+    {
+        "enemyType": "NormalEnemy",
+        "time": 0.0,
+        "x": 0.0,
+        "y": 0.0
+    }
+]

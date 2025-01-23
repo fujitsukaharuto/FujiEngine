@@ -299,6 +299,9 @@
     <ClCompile Include="Game\GameObj\Enemy\Behavior\EnemySpawnFall.cpp">
       <Filter>Game\Behavior\Enemy</Filter>
     </ClCompile>
+    <ClCompile Include="Game\GameObj\Enemy\EnemySpawn\EnemySpawn.cpp">
+      <Filter>Game\GameObj\Enemy\EnemySpawn</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Audio\Audio.h">
@@ -616,6 +619,9 @@
     <ClInclude Include="Game\GameObj\Enemy\Behavior\EnemySpawnFall.h">
       <Filter>Game\Behavior\Enemy</Filter>
     </ClInclude>
+    <ClInclude Include="Game\GameObj\Enemy\EnemySpawn\EnemySpawn.h">
+      <Filter>Game\GameObj\Enemy\EnemySpawn</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -734,6 +740,9 @@
     </Filter>
     <Filter Include="Game\GameObj\KikDirectionView">
       <UniqueIdentifier>{4429d364-be7e-4ea9-a3f4-633d90575a6d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameObj\Enemy\EnemySpawn">
+      <UniqueIdentifier>{cdf076f9-fbf4-43a2-89a5-47e578315ba2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

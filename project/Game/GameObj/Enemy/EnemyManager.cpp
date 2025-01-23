@@ -30,7 +30,6 @@ void EnemyManager::Initialize() {
 	AddParmGroup();
 	ApplyGlobalParameter();
 
-	isEditorMode_ = false;
 }
 
 void  EnemyManager::FSpawn() {
@@ -70,9 +69,7 @@ void EnemyManager::SpawnEnemy(const std::string& enemyType, const Vector3& posit
 ///  更新処理
 ///========================================================================================
 void EnemyManager::Update() {
-	if (isEditorMode_) {
-		return; // エディタモード中は停止
-	}
+	
 
 	//SpawnUpdate(); // スポーン更新
 
@@ -123,9 +120,7 @@ void EnemyManager::Draw(Material* material) {
 ///========================================================================================
 /// エディターモード変更
 ///========================================================================================
-void EnemyManager::SetEditorMode(bool isEditorMode) {
-	isEditorMode_ = isEditorMode;
-}
+
 
 ///=================================================================================
 /// ロード
