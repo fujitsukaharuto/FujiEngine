@@ -3,7 +3,7 @@
 #include "assert.h"
 
 
-Vector3 Field::baseScale_ = {25,1,10};
+Vector3 Field::baseScale_ = {25,1,5};
 
 Field::Field() {}
 

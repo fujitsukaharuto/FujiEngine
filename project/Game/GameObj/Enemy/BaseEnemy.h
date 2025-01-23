@@ -52,6 +52,7 @@ protected:
 	Type                               type_;
 	std::array<std::string, 3>         tags_;
 	float                              explotionTime_; //爆発時間
+	float                              blowDirection_;
 	
 	/// behavior
 	std::unique_ptr<BaseEnemyBehaivor> behavior_ = nullptr;
@@ -72,6 +73,7 @@ public:
 	virtual void Draw  (Material* mate = nullptr)override;
 
 	void SetParm        (const Type&type,const Paramater&paramater);
+	void WallRefrection ();
 
 	void ChangeBehavior (std::unique_ptr<BaseEnemyBehaivor>behavior);
 
@@ -88,6 +90,7 @@ public:
 	Type               GetType()const                      { return type_; }
 	Paramater          GetParamater()const                 { return paramater_; }
 	float              GetExplotionTime()const             { return explotionTime_; }
+	float              GetBlowDirection()const             { return blowDirection_; }
 	///========================================================================================
 	///  setter method
 	///========================================================================================

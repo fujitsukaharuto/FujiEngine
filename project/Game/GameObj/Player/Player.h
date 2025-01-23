@@ -68,7 +68,7 @@ private:
 	Vector3           inputDirection_;
 	Vector3           kikDirection_;
 
-	Paramater paramater_;
+	Paramater         paramater_;
 
 	/// collider
 	std::unique_ptr<AABBCollider> kikCollider_;

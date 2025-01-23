@@ -8,6 +8,8 @@
 #include"Behavior/EnemyBlowingStrong.h"
 #include"Behavior/EnemyExplotion.h"
 #include"Behavior/EnemyFall.h"
+
+#include"Field/Field.h"
 ///* std
 #include<algorithm>
 
@@ -47,9 +49,9 @@ void BaseEnemy::Initialize() {
 	collider_->SetDepth(2.0f);
 	collider_->SetParent(model_.get());
 
+	// 初期パラメータセット
 	explotionTime_ = paramater_.explotionTime_;
-
-
+	blowDirection_ = 1.0f;
 	ChangeBehavior(std::make_unique<EnemyFall>(this)); /// 追っかけ
 }
 
@@ -67,6 +69,8 @@ void BaseEnemy::Update() {
 
 	// 振る舞い更新
 	behavior_->Update();
+
+	WallRefrection(); // 壁反発
 
 	// collider更新
 	collider_->InfoUpdate();
@@ -168,6 +172,40 @@ void BaseEnemy::ChangeBehavior(std::unique_ptr<BaseEnemyBehaivor>behavior) {
 	behavior_ = std::move(behavior);
 }
 
+
+///=========================================================
+///　移動制限
+///==========================================================
+void BaseEnemy::WallRefrection () {
+
+	// フィールドの中心とスケールを取得
+	Vector3 fieldCenter = { 0.0f, 0.0f, 0.0f }; // フィールド中心 
+	Vector3 fieldScale = Field::baseScale_;     // フィールドのスケール
+
+	// プレイヤーのスケールを考慮した半径
+	float radiusX = fieldScale.x - model_->transform.scale.x;
+
+	// 現在位置が範囲内かチェック
+	bool insideX = std::abs(model_->transform.translate.x - fieldCenter.x) <= radiusX;
+
+	///-----------------------------------------------------------
+	/// 範囲外なら処理を実行
+	///-----------------------------------------------------------
+	if (!insideX) {
+		// 範囲外の場合の位置補正
+		model_->transform.translate.x = std::clamp(
+			model_->transform.translate.x,
+			fieldCenter.x - radiusX,
+			fieldCenter.x + radiusX
+		);
+
+		// 範囲外の反発処理
+		Vector3 directionToCenter = (fieldCenter - model_->transform.translate).Normalize();
+		model_->transform.translate.x += directionToCenter.x * 0.1f; // 軽く押し戻す
+
+		blowDirection_ *= -1.0f;// 向き反転
+	}
+}
 //float BaseEnemy::GetBoundPower()const {
 //	// 減衰率を計算 (0～1)
 //	float remainingRate = (float(paramater_.deathCountMax) - float((paramater_.deathCountMax - deathCount_))) / float(paramater_.deathCountMax);
