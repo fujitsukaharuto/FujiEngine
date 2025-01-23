@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Particle/ParticleEmitter.h"
 #include"BaseEnemyBehavior.h"
 #include"Easing.h"
 
@@ -18,6 +19,10 @@ private:
 	float rotateZ_;
 	float rotateSpeed_;
 
+	ParticleEmitter kickEmit1_;
+	ParticleEmitter kickEmit2_;
+	ParticleEmitter kickEmit3_;
+	ParticleEmitter kickEmit4_;
 
 public:
 	//コンストラクタ

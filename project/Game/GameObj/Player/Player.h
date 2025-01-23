@@ -75,12 +75,6 @@ private:
 	std::unique_ptr<AABBCollider> collider_;
 	std::array<std::string, 2>tags_;
 
-	/// emitter
-	ParticleEmitter kickEmit1_;
-	ParticleEmitter kickEmit2_;
-	ParticleEmitter kickEmit3_;
-	ParticleEmitter kickEmit4_;
-
 
 public:
 	static float InitY_;

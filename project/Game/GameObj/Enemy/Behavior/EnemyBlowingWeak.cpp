@@ -19,6 +19,18 @@ EnemyBlowingWeak::EnemyBlowingWeak(BaseEnemy* boss)
 	direction_ = pBaseEnemy_->GetPlayer()->GetKikDirection();
 
 	// 爆発時間
+
+	/// emitter
+	kickEmit1_.name = "kick1";
+	kickEmit2_.name = "kick2";
+	kickEmit3_.name = "kick3";
+	kickEmit4_.name = "kick4";
+
+	kickEmit1_.Load("kick1");
+	kickEmit2_.Load("kick2");
+	kickEmit3_.Load("kick3");
+	kickEmit4_.Load("kick4");
+
 }
 
 EnemyBlowingWeak::~EnemyBlowingWeak() {
