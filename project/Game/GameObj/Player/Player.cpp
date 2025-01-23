@@ -66,6 +66,18 @@ void Player::Initialize() {
 	collider_->SetDepth(2.0f);
 	collider_->InfoUpdate();
 
+	/// emitter
+	kickEmit1_.name = "kick1";
+	kickEmit2_.name = "kick2";
+	kickEmit3_.name = "kick3";
+	kickEmit4_.name = "kick4";
+
+	kickEmit1_.Load("kick1");
+	kickEmit2_.Load("kick2");
+	kickEmit3_.Load("kick3");
+	kickEmit4_.Load("kick4");
+
+
 	// 仮モデル
 	kikModel_ = std::make_unique<Object3d>();
 	kikModel_->Create("NormalEnemy.obj");
