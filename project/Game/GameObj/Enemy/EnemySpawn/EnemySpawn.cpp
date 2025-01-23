@@ -1,4 +1,5 @@
 #include "EnemySpawn.h"
+#include <windows.h> 
 #include "ImGuiManager.h"
 #include <imgui.h>
 #include <fstream>
@@ -126,8 +127,18 @@ void EnemySpawn::SaveSpawnData(const std::string& filename) {
         json_data.push_back(spawn_json);
     }
 
+    // ファイルに書き出し
     std::ofstream ofs(filename);
-    ofs << json_data.dump(4); // インデント付きで書き出し
+    if (ofs.is_open()) {
+        ofs << json_data.dump(4); // インデント付きで書き出し
+        ofs.close();
+        // 成功メッセージボックス
+        MessageBoxA(nullptr, ("Spawn data saved successfully to " + filename).c_str(), "Save Successful", MB_OK | MB_ICONINFORMATION);
+    }
+    else {
+        // エラーメッセージボックス
+        MessageBoxA(nullptr, ("Failed to save spawn data to " + filename).c_str(), "Save Failed", MB_OK | MB_ICONERROR);
+    }
 }
 
 void EnemySpawn::LoadSpawnData(const std::string& filename) {
