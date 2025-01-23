@@ -32,6 +32,11 @@ EnemyBlowingWeak::EnemyBlowingWeak(BaseEnemy* boss)
 	ParticleManager::Load(kickEmit3_, "kick3");
 	ParticleManager::Load(kickEmit4_, "kick4");
 
+	kickEmit1_.pos = pBaseEnemy_->GetModel()->GetWorldPos();
+	kickEmit2_.pos = pBaseEnemy_->GetModel()->GetWorldPos();
+	kickEmit3_.pos = pBaseEnemy_->GetModel()->GetWorldPos();
+	kickEmit4_.pos = pBaseEnemy_->GetModel()->GetWorldPos();
+
 	kickEmit1_.Burst();
 	kickEmit2_.Burst();
 	kickEmit3_.Burst();

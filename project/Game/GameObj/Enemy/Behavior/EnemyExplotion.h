@@ -1,6 +1,7 @@
 #pragma once
 
 #include"BaseEnemyBehavior.h"
+#include "Particle/ParticleEmitter.h"
 #include"Easing.h"
 
 class EnemyExplotion : public BaseEnemyBehaivor {
@@ -12,6 +13,10 @@ private:
 
 	Step step_;
 	
+	/// emitter
+	ParticleEmitter bombEmit1_;
+	ParticleEmitter bombEmit2_;
+	ParticleEmitter bombEmit3_;
 
 public:
 	//コンストラクタ
