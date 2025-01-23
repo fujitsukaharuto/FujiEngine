@@ -16,7 +16,9 @@ EnemySpawnFall::EnemySpawnFall(BaseEnemy* boss)
 
 	speed_ = pBaseEnemy_->GetParamater().spawnFallSpeed;
 	boundSpeed_ = pBaseEnemy_->GetParamater().spawnBoundSpeed;
-	rotateSpeed_ = 30.0f;
+	rotateSpeed_ = 20.0f;
+
+	gotoFrontEase_.maxTime = 0.7f;
 
 	step_ = Step::FALL;
 }
@@ -43,8 +45,19 @@ void EnemySpawnFall::Update() {
 		///----------------------------------------------------------------------
 	   /// バウンド 
 	  ///------------------------------------------------------------------------
+	  
+		///* 回転
 		rotateX_ += rotateSpeed_ * FPSKeeper::DeltaTimeRate();
 		pBaseEnemy_->SetRotationX(rotateX_);
+
+		///* 手前にイージング
+		gotoFrontEase_.time += FPSKeeper::DeltaTimeRate();
+	
+		if (gotoFrontEase_.time >= gotoFrontEase_.maxTime) {
+			gotoFrontEase_.time = gotoFrontEase_.maxTime;
+		}
+		pBaseEnemy_->SetWorldPositionZ(EaseInExpo(BaseEnemy::StartZPos_, 0.0f, gotoFrontEase_.time, gotoFrontEase_.maxTime));
+
 		pBaseEnemy_->Bound(boundSpeed_);
 		
 		break;

@@ -19,6 +19,7 @@
 ///==========================================================
 float BaseEnemy::InitY_ = 1.5f;
 float BaseEnemy::BoundPosY_ = 42.0f;
+float BaseEnemy::StartZPos_ = 5.0f;
 Vector3 BaseEnemy::InitScale_ = { 1.0f,1.0f,1.0f };
 
 BaseEnemy::BaseEnemy() {
@@ -99,11 +100,11 @@ void BaseEnemy::SpawnFall(float& speed, const bool& isJump) {
 		model_->transform.translate.y += speed * FPSKeeper::NormalDeltaTime();
 	}
 	// 加速する
-	speed = max(speed - (paramater_.spawnBoundGravity * FPSKeeper::NormalDeltaTime()), -paramater_.spawnBoundGravityMax);
+	speed -= paramater_.spawnBoundGravity * FPSKeeper::NormalDeltaTime();
 
 	if (speed <= -paramater_.spawnBoundGravityMax) {// 落ちる
 
-		if (dynamic_cast<EnemySpawnFall*>(behavior_.get())) return;
+		if (!dynamic_cast<EnemySpawnFall*>(behavior_.get())) return;
 			// ジャンプ終了
 			SetRotationX(0.0f);
 			ChangeBehavior(std::make_unique<EnemyFall>(this));

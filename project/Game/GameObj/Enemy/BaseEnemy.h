@@ -65,6 +65,7 @@ public:
 	static float                       InitY_;
 	static Vector3                     InitScale_;
 	static float                       BoundPosY_;
+	static float                       StartZPos_;
 public:
 	BaseEnemy();
 

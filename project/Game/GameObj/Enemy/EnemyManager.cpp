@@ -34,9 +34,9 @@ void EnemyManager::Initialize() {
 }
 
 void  EnemyManager::FSpawn() {
-	SpawnEnemy(enemyTypes_[static_cast<size_t>(BaseEnemy::Type::NORMAL)], Vector3(-3, 60, 4));
-	SpawnEnemy(enemyTypes_[static_cast<size_t>(BaseEnemy::Type::NORMAL)], Vector3(0, 50, 4));
-	SpawnEnemy(enemyTypes_[static_cast<size_t>(BaseEnemy::Type::NORMAL)], Vector3(8, 70, 4));
+	SpawnEnemy(enemyTypes_[static_cast<size_t>(BaseEnemy::Type::NORMAL)], Vector3(-3, 60, BaseEnemy::StartZPos_));
+	SpawnEnemy(enemyTypes_[static_cast<size_t>(BaseEnemy::Type::NORMAL)], Vector3(0, 50, BaseEnemy::StartZPos_));
+	SpawnEnemy(enemyTypes_[static_cast<size_t>(BaseEnemy::Type::NORMAL)], Vector3(8, 70, BaseEnemy::StartZPos_));
 }
 
 ///========================================================================================
@@ -46,12 +46,14 @@ void EnemyManager::SpawnEnemy(const std::string& enemyType, const Vector3& posit
 
 	std::unique_ptr<BaseEnemy> enemy;
 
-	if (enemyType == enemyTypes_[static_cast<size_t>(BaseEnemy::Type::NORMAL)]) { // 通常敵
+	// 通常敵
+	if (enemyType == enemyTypes_[static_cast<size_t>(BaseEnemy::Type::NORMAL)]) {
 		enemy = std::make_unique<NormalEnemy>();
 		enemy->SetParm(BaseEnemy::Type::NORMAL, paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)]);
 	}
 
-	else if (enemyType == enemyTypes_[static_cast<size_t>(BaseEnemy::Type::STRONG)]) { // ストロングな敵
+	// ストロングな敵
+	else if (enemyType == enemyTypes_[static_cast<size_t>(BaseEnemy::Type::STRONG)]) { 
 		enemy = std::make_unique<StrongEnemy>();
 		enemy->SetParm(BaseEnemy::Type::STRONG, paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)]);
 	}
@@ -330,128 +332,134 @@ void EnemyManager::AdjustParm() {
 		/// 通常敵
 		///----------------------------------------------------------
 
-		ImGui::SeparatorText(enemyTypes_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].c_str());
-		ImGui::PushID(enemyTypes_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].c_str());
+		if (ImGui::TreeNode(enemyTypes_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].c_str())) {
 
-		ImGuiManager::GetInstance()->SetFontJapanese();/// 日本語
+			ImGui::PushID(enemyTypes_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].c_str());
 
-		ImGui::SeparatorText("出現時");
+			ImGuiManager::GetInstance()->SetFontJapanese();/// 日本語
 
-		ImGui::DragFloat("出現時の落ちる速さ(毎秒)",
-			&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].spawnFallSpeed,
-			0.01f);
+			ImGui::SeparatorText("出現時");
 
-		ImGui::DragFloat("出現時UFOに当たった時のバウンド力",
-			&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].spawnBoundSpeed,
-			0.01f);
+			ImGui::DragFloat("出現時の落ちる速さ(毎秒)",
+				&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].spawnFallSpeed,
+				0.01f);
 
-		ImGui::DragFloat("バウンド中の重力",
-			&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].spawnBoundGravity,
-			0.01f);
+			ImGui::DragFloat("出現時UFOに当たった時のバウンド力",
+				&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].spawnBoundSpeed,
+				0.01f);
 
-		ImGui::DragFloat("バウンド中の重力(最大)",
-			&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].spawnBoundGravityMax,
-			0.01f);
+			ImGui::DragFloat("バウンド中の重力",
+				&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].spawnBoundGravity,
+				0.01f);
 
-
-		ImGui::SeparatorText("出現後");
-		ImGui::DragFloat("落ちる速さ(毎秒)",
-			&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].fallSpeed,
-			0.01f);
-
-		ImGui::DragFloat("攻撃力",
-			&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].attackValue,
-			0.01f);
-
-		ImGui::DragFloat("弱いキックでの吹っ飛び(毎秒)",
-			&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].blowingPower[static_cast<size_t>(BaseEnemy::BlowingPower::WEAK)],
-			0.01f);
+			ImGui::DragFloat("バウンド中の重力(最大)",
+				&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].spawnBoundGravityMax,
+				0.01f);
 
 
-		ImGui::DragFloat("強いキックでの吹っ飛び(毎秒)",
-			&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].blowingPower[static_cast<size_t>(BaseEnemy::BlowingPower::MaxPower)],
-			0.01f);
+			ImGui::SeparatorText("出現後");
+			ImGui::DragFloat("落ちる速さ(毎秒)",
+				&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].fallSpeed,
+				0.01f);
 
-		ImGui::DragFloat("爆発する時間(秒)",
-			&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].explotionTime_,
-			0.01f);
+			ImGui::DragFloat("攻撃力",
+				&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].attackValue,
+				0.01f);
 
-		ImGui::DragFloat("爆発する延長時間(秒)",
-			&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].explotionExtensionTime_,
-			0.01f);
-		ImGuiManager::GetInstance()->UnSetFont();
-		ImGui::PopID();
-
-
-		///---------------------------------------------------------
-		/// ストロングな敵
-		///----------------------------------------------------------
-
-		ImGui::SeparatorText(enemyTypes_[static_cast<size_t>(BaseEnemy::Type::STRONG)].c_str());
-		ImGui::PushID(enemyTypes_[static_cast<size_t>(BaseEnemy::Type::STRONG)].c_str());
-
-		ImGuiManager::GetInstance()->SetFontJapanese();/// 日本語
-
-		ImGui::SeparatorText("出現時");
-
-		ImGui::DragFloat("出現時の落ちる速さ(毎秒)",
-			&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].spawnFallSpeed,
-			0.01f);
-
-		ImGui::DragFloat("出現時UFOに当たった時のバウンド力",
-			&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].spawnBoundSpeed,
-			0.01f);
-
-		ImGui::DragFloat("バウンド中の重力",
-			&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].spawnBoundGravity,
-			0.01f);
-
-		ImGui::DragFloat("バウンド中の重力(最大)",
-			&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].spawnBoundGravityMax,
-			0.01f);
+			ImGui::DragFloat("弱いキックでの吹っ飛び(毎秒)",
+				&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].blowingPower[static_cast<size_t>(BaseEnemy::BlowingPower::WEAK)],
+				0.01f);
 
 
-		ImGui::SeparatorText("出現後");
-		ImGui::DragFloat("落ちる速さ(毎秒)",
-			&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].fallSpeed,
-			0.01f);
+			ImGui::DragFloat("強いキックでの吹っ飛び(毎秒)",
+				&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].blowingPower[static_cast<size_t>(BaseEnemy::BlowingPower::MaxPower)],
+				0.01f);
 
-		ImGui::DragFloat("攻撃力",
-			&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].attackValue,
-			0.01f);
+			ImGui::DragFloat("爆発する時間(秒)",
+				&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].explotionTime_,
+				0.01f);
 
-		ImGui::DragFloat("弱いキックでの吹っ飛び(毎秒)",
-			&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].blowingPower[static_cast<size_t>(BaseEnemy::BlowingPower::WEAK)],
-			0.01f);
+			ImGui::DragFloat("爆発する延長時間(秒)",
+				&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].explotionExtensionTime_,
+				0.01f);
+			ImGuiManager::GetInstance()->UnSetFont();
+			ImGui::PopID();
 
-		ImGui::DragFloat("強いキックでの吹っ飛び(毎秒)",
-			&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].blowingPower[static_cast<size_t>(BaseEnemy::BlowingPower::MaxPower)],
-			0.01f);
+			ImGui::TreePop();
+		}
 
-		ImGui::DragFloat("爆発する時間(秒)",
-			&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].explotionTime_,
-			0.01f);
+			///---------------------------------------------------------
+			/// ストロングな敵
+			///----------------------------------------------------------
 
-		ImGui::DragFloat("爆発する延長時間(秒)",
-			&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].explotionExtensionTime_,
-			0.01f);
+		if (ImGui::TreeNode(enemyTypes_[static_cast<size_t>(BaseEnemy::Type::STRONG)].c_str())) {
+			ImGui::PushID(enemyTypes_[static_cast<size_t>(BaseEnemy::Type::STRONG)].c_str());
 
-		ImGuiManager::GetInstance()->UnSetFont();
-		ImGui::PopID();
-		/// セーブとロード
-		globalParameter_->ParmSaveForImGui(groupName_);
-		ParmLoadForImGui();
+			ImGuiManager::GetInstance()->SetFontJapanese();/// 日本語
 
-		ImGui::PopID();
-	}
+			ImGui::SeparatorText("出現時");
+
+			ImGui::DragFloat("出現時の落ちる速さ(毎秒)",
+				&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].spawnFallSpeed,
+				0.01f);
+
+			ImGui::DragFloat("出現時UFOに当たった時のバウンド力",
+				&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].spawnBoundSpeed,
+				0.01f);
+
+			ImGui::DragFloat("バウンド中の重力",
+				&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].spawnBoundGravity,
+				0.01f);
+
+			ImGui::DragFloat("バウンド中の重力(最大)",
+				&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].spawnBoundGravityMax,
+				0.01f);
+
+
+			ImGui::SeparatorText("出現後");
+			ImGui::DragFloat("落ちる速さ(毎秒)",
+				&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].fallSpeed,
+				0.01f);
+
+			ImGui::DragFloat("攻撃力",
+				&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].attackValue,
+				0.01f);
+
+			ImGui::DragFloat("弱いキックでの吹っ飛び(毎秒)",
+				&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].blowingPower[static_cast<size_t>(BaseEnemy::BlowingPower::WEAK)],
+				0.01f);
+
+			ImGui::DragFloat("強いキックでの吹っ飛び(毎秒)",
+				&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].blowingPower[static_cast<size_t>(BaseEnemy::BlowingPower::MaxPower)],
+				0.01f);
+
+			ImGui::DragFloat("爆発する時間(秒)",
+				&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].explotionTime_,
+				0.01f);
+
+			ImGui::DragFloat("爆発する延長時間(秒)",
+				&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].explotionExtensionTime_,
+				0.01f);
+
+			ImGuiManager::GetInstance()->UnSetFont();
+			ImGui::PopID();
+
+			ImGui::TreePop();
+		}
+			/// セーブとロード
+			globalParameter_->ParmSaveForImGui(groupName_);
+			ParmLoadForImGui();
+
+			ImGui::PopID();
+		}
 
 #endif // _DEBUG
-}
+	}
 
-void EnemyManager::SetPlayer(Player* player) {
-	pPlayer_ = player;
-}
-void EnemyManager::SetLockon(LockOn* lockOn) {
-	pLockOn_ = lockOn;
-}
+	void EnemyManager::SetPlayer(Player * player) {
+		pPlayer_ = player;
+	}
+	void EnemyManager::SetLockon(LockOn * lockOn) {
+		pLockOn_ = lockOn;
+	}
 

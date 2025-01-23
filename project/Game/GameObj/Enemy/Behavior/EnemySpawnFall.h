@@ -16,9 +16,10 @@ private:
 	Step step_;
 	float speed_;
 	float boundSpeed_;
-
 	float rotateX_;
 	float rotateSpeed_;
+
+	Easing gotoFrontEase_;
 
 public:
 	//コンストラクタ

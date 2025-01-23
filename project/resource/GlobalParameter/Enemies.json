@@ -12,13 +12,13 @@
         "explotionExtensionTime_2": 0.0,
         "explotionTime_1": 2.1500000953674316,
         "explotionTime_2": 0.0,
-        "spawnBoundGravity1": 45.81999969482422,
+        "spawnBoundGravity1": 30.219999313354492,
         "spawnBoundGravity2": 0.0,
-        "spawnBoundGravityMax1": 30.690000534057617,
+        "spawnBoundGravityMax1": 26.579999923706055,
         "spawnBoundGravityMax2": 0.0,
         "spawnBoundSpeed1": 17.889999389648438,
         "spawnBoundSpeed2": 0.0,
-        "spawnFallSpeed1": 9.380000114440918,
+        "spawnFallSpeed1": 16.18000030517578,
         "spawnFallSpeed2": 0.0
     }
 }
