@@ -26,34 +26,38 @@ public:
 
 	enum class Tag {
 		FALL,
-		BLOWING,
+		BLOWINGWEAK,
+		BLOWINGSTRONG,
 	};
-
+public:
+	// パラメータ
 	struct Paramater {
-		float                fallSpeed;
-		float                attackValue;
-		std::array<float, 2> blowingPower;
+		float                fallSpeed;                /// 落ちる速さ
+		float                attackValue;              /// 攻撃力
+		float                explotionTime_;           ///　爆発時間
+		float                explotionExtensionTime_;  ///  爆発延長時間
+		std::array<float, 2> blowingPower;             ///  吹っ飛びスピード
 	};
 
 protected:
 
 	/// other class
-	Player*              pPlayer_;
-			             
-	bool                 isdeath_;
-	Easing               spawnEasing_;
-
-	/// parm
-	Paramater            paramater_;
-	Type                 type_;
-	std::array<std::string, 2>tags_;
+	Player*                            pPlayer_;
+			                           
+	bool                               isdeath_;
+	Easing                             spawnEasing_;
+							           
+	/// parm				           
+	Paramater                          paramater_;
+	Type                               type_;
+	std::array<std::string, 3>         tags_;
 	
 	/// behavior
 	std::unique_ptr<BaseEnemyBehaivor> behavior_ = nullptr;
 
 public:
-	static float   InitY_;
-	static Vector3 InitScale_;
+	static float                       InitY_;
+	static Vector3                     InitScale_;
 public:
 	BaseEnemy();
 
@@ -62,17 +66,17 @@ public:
 	///========================================================================================
 
 	/// 初期化、更新、描画
-	virtual void Initialize()override;
-	virtual void Update()override;
-	virtual void Draw(Material* mate = nullptr)override;
+	virtual void Initialize() override;
+	virtual void Update()     override;
+	virtual void Draw  (Material* mate = nullptr)override;
 
-	void SetParm(const Type&type,const Paramater&paramater);
+	void SetParm (const Type&type,const Paramater&paramater);
 
-	void ChangeBehavior(std::unique_ptr<BaseEnemyBehaivor>behavior);
+	void ChangeBehavior (std::unique_ptr<BaseEnemyBehaivor>behavior);
 
-	void OnCollisionEnter(const ColliderInfo& other);
-	void OnCollisionStay(const ColliderInfo& other);
-	BaseCollider* GetCollider() { return collider_.get(); }
+	void          OnCollisionEnter (const ColliderInfo& other);
+	void          OnCollisionStay  (const ColliderInfo& other);
+	BaseCollider* GetCollider      () { return collider_.get(); }
 
 	///========================================================================================
 	///  getter method

@@ -7,6 +7,7 @@
 
 #include <format>
 #include <fstream>
+#include"ImGuiManager.h"
 #include <imgui.h>
 
 float EnemyManager::InitZPos_ = 0.0f;
@@ -163,6 +164,18 @@ void EnemyManager::AddParmGroup() {
 			groupName_,
 			"MaxPowerBlow" + std::to_string(int(i + 1)),
 			paramaters_[i].blowingPower[static_cast<size_t>(BaseEnemy::BlowingPower::MaxPower)]);
+
+		globalParameter_->AddItem(
+			groupName_,
+			"explotionTime_" + std::to_string(int(i + 1)),
+			paramaters_[i].explotionTime_);
+
+
+		globalParameter_->AddItem(
+			groupName_,
+			"explotionExtensionTime_" + std::to_string(int(i + 1)),
+			paramaters_[i].explotionExtensionTime_);
+
 	}
 
 }
@@ -195,6 +208,18 @@ void EnemyManager::SetValues() {
 			groupName_,
 			"MaxPowerBlow" + std::to_string(int(i + 1)),
 			paramaters_[i].blowingPower[static_cast<size_t>(BaseEnemy::BlowingPower::MaxPower)]);
+
+		globalParameter_->SetValue(
+			groupName_,
+			"explotionTime_" + std::to_string(int(i + 1)),
+			paramaters_[i].explotionTime_);
+
+
+		globalParameter_->SetValue(
+			groupName_,
+			"explotionExtensionTime_" + std::to_string(int(i + 1)),
+			paramaters_[i].explotionExtensionTime_);
+
 	}
 
 }
@@ -224,6 +249,13 @@ void EnemyManager::ApplyGlobalParameter() {
 			groupName_,
 			"MaxPowerBlow" + std::to_string(int(i + 1)));
 
+		paramaters_[i].explotionTime_ = globalParameter_->GetValue<float>(
+			groupName_,
+			"explotionTime_" + std::to_string(int(i + 1)));
+
+		paramaters_[i].explotionExtensionTime_ = globalParameter_->GetValue<float>(
+			groupName_,
+			"explotionExtensionTime_" + std::to_string(int(i + 1)));
 
 	}
 
@@ -245,27 +277,35 @@ void EnemyManager::AdjustParm() {
 		ImGui::SeparatorText(enemyTypes_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].c_str());
 		ImGui::PushID(enemyTypes_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].c_str());
 
-		ImGui::DragFloat("FallSpeed",
+		ImGuiManager::GetInstance()->SetFontJapanese();/// 日本語
+		ImGui::DragFloat("落ちる速さ(毎秒)",
 			&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].fallSpeed,
 			0.01f);
 
-		ImGui::DragFloat("AttackValue",
+		ImGui::DragFloat("攻撃力",
 			&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].attackValue,
 			0.01f);
 
-		ImGui::SeparatorText("JumpPower");
-		ImGui::DragFloat("WeakBlowSpeed",
+		ImGui::DragFloat("弱いキックでの吹っ飛び(毎秒)",
 			&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].blowingPower[static_cast<size_t>(BaseEnemy::BlowingPower::WEAK)],
 			0.01f);
 
 
-		ImGui::DragFloat("MaxPowerBlowSpeed",
+		ImGui::DragFloat("強いキックでの吹っ飛び(毎秒)",
 			&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].blowingPower[static_cast<size_t>(BaseEnemy::BlowingPower::MaxPower)],
 			0.01f);
 
+		ImGui::DragFloat("爆発する時間(秒)",
+			&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].explotionTime_,
+			0.01f);
+
+		ImGui::DragFloat("爆発する延長時間(秒)",
+			&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].explotionExtensionTime_,
+			0.01f);
 
 		ImGui::PopID();
 
+		ImGuiManager::GetInstance()->UnSetFont();
 		///---------------------------------------------------------
 		/// ストロングな敵
 		///----------------------------------------------------------
@@ -273,25 +313,34 @@ void EnemyManager::AdjustParm() {
 		ImGui::SeparatorText(enemyTypes_[static_cast<size_t>(BaseEnemy::Type::STRONG)].c_str());
 		ImGui::PushID(enemyTypes_[static_cast<size_t>(BaseEnemy::Type::STRONG)].c_str());
 
-		ImGui::DragFloat("FallSpeed",
+		ImGuiManager::GetInstance()->SetFontJapanese();/// 日本語
+		ImGui::DragFloat("落ちる速さ(毎秒)",
 			&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].fallSpeed,
 			0.01f);
 
-		ImGui::DragFloat("AttackValue",
+		ImGui::DragFloat("攻撃力",
 			&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].attackValue,
 			0.01f);
 
-		ImGui::SeparatorText("JumpPower");
-		ImGui::DragFloat("WeakBlowSpeed",
+		ImGui::DragFloat("弱いキックでの吹っ飛び(毎秒)",
 			&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].blowingPower[static_cast<size_t>(BaseEnemy::BlowingPower::WEAK)],
 			0.01f);
 
 
-		ImGui::DragFloat("MaxPowerBlowSpeed",
+		ImGui::DragFloat("強いキックでの吹っ飛び(毎秒)",
 			&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].blowingPower[static_cast<size_t>(BaseEnemy::BlowingPower::MaxPower)],
 			0.01f);
 
+		ImGui::DragFloat("爆発する時間(秒)",
+			&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].explotionTime_,
+			0.01f);
+
+		ImGui::DragFloat("爆発する延長時間(秒)",
+			&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].explotionExtensionTime_,
+			0.01f);
+
 		ImGui::PopID();
+		ImGuiManager::GetInstance()->UnSetFont();
 		/// セーブとロード
 		globalParameter_->ParmSaveForImGui(groupName_);
 		ParmLoadForImGui();

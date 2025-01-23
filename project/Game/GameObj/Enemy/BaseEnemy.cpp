@@ -28,7 +28,8 @@ void BaseEnemy::Initialize() {
 	OriginGameObject::Initialize();
 
 	tags_[static_cast<size_t>(Tag::FALL)] = "FallEnemy";
-	tags_[static_cast<size_t>(Tag::BLOWING)] = "BlowingEnemy";
+	tags_[static_cast<size_t>(Tag::BLOWINGWEAK)] = "BlowingWeakEnemy";
+	tags_[static_cast<size_t>(Tag::BLOWINGSTRONG)] = "BlowingStrongEnemy";
 
 	///spawn
 	spawnEasing_.time = 0.0f;
@@ -45,7 +46,7 @@ void BaseEnemy::Initialize() {
 	collider_->SetParent(model_.get());
 
 
-	ChangeBehavior(std::make_unique<EnemyFall>(this));/// 追っかけ
+	ChangeBehavior(std::make_unique<EnemyFall>(this)); /// 追っかけ
 }
 
 ///========================================================
@@ -85,20 +86,21 @@ void BaseEnemy::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 	if (collider_->GetTag() == tags_[static_cast<size_t>(Tag::FALL)]) {
 		// 弱いキックをくらう
 		if (other.tag == pPlayer_->GetTag(static_cast<size_t>(Player::KikPower::WEAK))) {
-			collider_->SetTag(tags_[static_cast<size_t>(Tag::BLOWING)]);
+			collider_->SetTag(tags_[static_cast<size_t>(Tag::BLOWINGWEAK)]);
 			ChangeBehavior(std::make_unique<EnemyBlowingWeak>(this));
 			return;
 		}
 
 		// 強いキックをくらう
 		else if (other.tag == pPlayer_->GetTag(static_cast<size_t>(Player::KikPower::MAXPOWER))) {
-			collider_->SetTag(tags_[static_cast<size_t>(Tag::BLOWING)]);
+			collider_->SetTag(tags_[static_cast<size_t>(Tag::BLOWINGSTRONG)]);
 			ChangeBehavior(std::make_unique<EnemyBlowingStrong>(this));
 			return;
 		}
 	}
 	//blow
-	if (collider_->GetTag() == tags_[static_cast<size_t>(Tag::BLOWING)]) {
+	if (collider_->GetTag() == tags_[static_cast<size_t>(Tag::BLOWINGWEAK)]||
+		collider_->GetTag() == tags_[static_cast<size_t>(Tag::BLOWINGSTRONG)]) {
 		if (other.tag == "UFO") {
 			isdeath_ = true;
 		}
