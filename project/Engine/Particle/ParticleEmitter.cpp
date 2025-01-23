@@ -1,4 +1,5 @@
 #include "ParticleEmitter.h"
+#include "ParticleManager.h"
 #include "Random.h"
 #include "ImGuiManager.h"
 #include "Model/Line3dDrawer.h"
@@ -194,7 +195,7 @@ void ParticleEmitter::Save() {
 
 	j.push_back(grain.type);
 	j.push_back(grain.speedType);
-	//j.push_back(grain.rotateType);
+	j.push_back(grain.rotateType);
 	j.push_back(grain.colorType);
 
 	j.push_back(grain.returnPower_);
@@ -265,8 +266,8 @@ void ParticleEmitter::Load(const std::string& filename) {
 	index++;
 	grain.speedType = j[index].get<int>();
 	index++;
-	/*grain.rotateType = j[index].get<int>();
-	index++;*/
+	grain.rotateType = j[index].get<int>();
+	index++;
 	grain.colorType = j[index].get<int>();
 	index++;
 

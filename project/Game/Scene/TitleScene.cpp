@@ -45,8 +45,7 @@ void TitleScene::Initialize() {
 
 	cMane_ = std::make_unique<CollisionManager>();
 
-	emit.name = "sphere";
-	emit.Load("sphere");
+	ParticleManager::Load(emit, "sphere");
 
 }
 

@@ -1,9 +1,35 @@
 #pragma once
-#include "ParticleManager.h"
 #include "Particle.h"
+#include "Model//Object3d.h"
 #include <json.hpp>
 
 using json = nlohmann::json;
+
+
+struct RandomParametor {
+	Vector2 speedx;
+	Vector2 speedy;
+	Vector2 speedz;
+
+	Vector2 transx;
+	Vector2 transy;
+	Vector2 transz;
+
+	Vector4 colorMin = { 1.0f,1.0f,1.0f,1.0f };
+	Vector4 colorMax = { 1.0f,1.0f,1.0f,1.0f };
+};
+
+struct AnimeData {
+	float lifeTime = 20.0f;
+	float startLifeTime = 20.0f;
+	bool isLive = true;
+	Vector3 accele{};
+	int type = SizeType::kNormal;
+	int speedType = SpeedType::kConstancy;
+	Vector2 startSize = { 1.0f,1.0f };
+	Vector2 endSize = { 1.0f,1.0f };
+};
+
 
 class ParticleEmitter {
 public:
