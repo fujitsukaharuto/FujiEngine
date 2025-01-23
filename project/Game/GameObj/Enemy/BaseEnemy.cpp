@@ -34,9 +34,9 @@ void BaseEnemy::Initialize() {
 	OriginGameObject::Initialize();
 
 	/// teg
-	tags_[static_cast<size_t>(Tag::FALL)] = "FallEnemy";
-	tags_[static_cast<size_t>(Tag::BLOWINGWEAK)] = "BlowingWeakEnemy";
-	tags_[static_cast<size_t>(Tag::BLOWINGSTRONG)] = "BlowingStrongEnemy";
+	tags_[static_cast<size_t>(Tag::FALL)]          =   "FallEnemy";
+	tags_[static_cast<size_t>(Tag::BLOWINGWEAK)]   =   "BlowingWeakEnemy";
+	tags_[static_cast<size_t>(Tag::BLOWINGSTRONG)] =   "BlowingStrongEnemy";
 
 	///spawn
 	spawnEasing_.time = 0.0f;
@@ -66,6 +66,7 @@ void BaseEnemy::Update() {
 	/// 生成処理
 	spawnEasing_.time += FPSKeeper::DeltaTimeRate();
 	spawnEasing_.time = min(spawnEasing_.time, spawnEasing_.maxTime);
+
 	model_->transform.scale =
 		EaseOutBack(Vector3::GetZeroVec(), BaseEnemy::InitScale_,
 			spawnEasing_.time, spawnEasing_.maxTime);
@@ -118,7 +119,7 @@ void BaseEnemy::SpawnFall(float& speed, const bool& isJump) {
 void BaseEnemy::Draw(Material* material) {
 	OriginGameObject::Draw(material);
 #ifdef _DEBUG
-	collider_->DrawCollider();
+	/*collider_->DrawCollider();*/
 #endif // _DEBUG
 }
 
