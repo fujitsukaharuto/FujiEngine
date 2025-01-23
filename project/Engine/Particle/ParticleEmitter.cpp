@@ -35,7 +35,7 @@ void ParticleEmitter::DebugGUI() {
 		ImGui::DragFloat("lifetime", &grain.lifeTime_, 0.1f);
 		if (ImGui::TreeNode("typeSelect")) {
 			ImGui::Combo("sizeType##type", &grain.type, "kNormal\0kShift\0kSin\0");
-			ImGui::Combo("speedType##type", &grain.speedType, "kConstancy\0kChange\0kReturn\0");
+			ImGui::Combo("speedType##type", &grain.speedType, "kConstancy\0kChange\0kReturn\0kCenter\0");
 			ImGui::Combo("rotateType##type", &grain.rotateType, "kUsually\0kVelocityR\0");
 			ImGui::Combo("colorType##type", &grain.colorType, "kDefault\0kRandom\0");
 			ImGui::TreePop();
@@ -49,7 +49,7 @@ void ParticleEmitter::DebugGUI() {
 		ImGui::DragFloat2("speedX", &para_.speedx.x, 0.01f);
 		ImGui::DragFloat2("speedY", &para_.speedy.x, 0.01f);
 		ImGui::DragFloat2("speedZ", &para_.speedz.x, 0.01f);
-		if (grain.speedType == SpeedType::kReturn) {
+		if (grain.speedType == SpeedType::kReturn || grain.speedType == SpeedType::kCenter) {
 			ImGui::DragFloat("returnPower", &grain.returnPower_, 0.001f);
 		}
 		ImGui::SeparatorText("accele");
@@ -134,6 +134,10 @@ void ParticleEmitter::Emit() {
 			posAddSize = Random::GetVector3({ emitSizeMin.x,emitSizeMax.x }, { emitSizeMin.y,emitSizeMax.y }, { emitSizeMin.z,emitSizeMax.z });
 			posAddSize += {worldMatrix.m[3][0], worldMatrix.m[3][1], worldMatrix.m[3][2]};
 
+			if (grain.speedType == SpeedType::kCenter) {
+				grain.speed = (pos - posAddSize) * grain.returnPower_;
+			}
+
 			ParticleManager::Emit(name, posAddSize, particleRotate, grain, para_, 1);
 		}
 		time_ = frequencyTime;
@@ -152,11 +156,18 @@ void ParticleEmitter::Burst() {
 		worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
 	}
 
-	Vector3 posAddSize{};
-	posAddSize = Random::GetVector3({ emitSizeMin.x,emitSizeMax.x }, { emitSizeMin.y,emitSizeMax.y }, { emitSizeMin.z,emitSizeMax.z });
-	posAddSize += {worldMatrix.m[3][0], worldMatrix.m[3][1], worldMatrix.m[3][2]};
+	for (uint32_t i = 0; i < count; i++) {
+		Vector3 posAddSize{};
+		posAddSize = Random::GetVector3({ emitSizeMin.x,emitSizeMax.x }, { emitSizeMin.y,emitSizeMax.y }, { emitSizeMin.z,emitSizeMax.z });
+		posAddSize += {worldMatrix.m[3][0], worldMatrix.m[3][1], worldMatrix.m[3][2]};
 
-	ParticleManager::Emit(name, posAddSize, particleRotate, grain, para_, count);
+		if (grain.speedType == SpeedType::kCenter) {
+			grain.speed = (pos - posAddSize).Normalize() * grain.returnPower_;
+		}
+
+		ParticleManager::Emit(name, posAddSize, particleRotate, grain, para_, 1);
+	}
+
 }
 
 void ParticleEmitter::BurstAnime() {

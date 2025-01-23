@@ -13,6 +13,7 @@ enum SpeedType {
 	kConstancy,
 	kChange,
 	kReturn,
+	kCenter,
 };
 
 enum RotateType {
