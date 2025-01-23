@@ -480,7 +480,7 @@ void Player::ApplyGlobalParameter() {
 
 void Player::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 
-	if (other.tag == "Enemy") {
+	if (other.tag == "FallEnemy") {
 
 		SetKikIsCollision(false);
 		ChangeBehavior(std::make_unique<PlayerRecoil>(this));

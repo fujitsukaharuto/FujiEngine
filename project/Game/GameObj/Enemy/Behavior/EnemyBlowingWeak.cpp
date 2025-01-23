@@ -14,8 +14,11 @@ EnemyBlowingWeak::EnemyBlowingWeak(BaseEnemy* boss)
 	: BaseEnemyBehaivor("EnemyBlowingWeak", boss) {
 
 	rotateSpeed_ = 30.0f;
+	// 力と向き
 	blowPower_ = pBaseEnemy_->GetParamater().blowingPower[static_cast<int>(BaseEnemy::BlowingPower::WEAK)];
 	direction_ = pBaseEnemy_->GetPlayer()->GetKikDirection();
+
+	// 爆発時間
 }
 
 EnemyBlowingWeak::~EnemyBlowingWeak() {
