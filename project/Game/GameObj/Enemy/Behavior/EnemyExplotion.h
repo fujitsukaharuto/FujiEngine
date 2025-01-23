@@ -3,25 +3,20 @@
 #include"BaseEnemyBehavior.h"
 #include"Easing.h"
 
-class EnemyBound : public BaseEnemyBehaivor {
+class EnemyExplotion : public BaseEnemyBehaivor {
 private:
 	enum class Step {
-		BOUND,
-		REBOUND,
+		DEATH,
 	};
 private:
 
 	Step step_;
-	float jumpSpeed_;
-
-	float rotateZ_;
-	float rotateSpeed_;
-
+	
 
 public:
 	//コンストラクタ
-	EnemyBound(BaseEnemy* boss);
-	~EnemyBound();
+	EnemyExplotion(BaseEnemy* boss);
+	~EnemyExplotion();
 
 
 	void Update()override;

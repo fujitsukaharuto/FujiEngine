@@ -230,7 +230,7 @@
     <ClCompile Include="Game\GameObj\Enemy\Behavior\EnemyFall.cpp">
       <Filter>Game\Behavior\Enemy</Filter>
     </ClCompile>
-    <ClCompile Include="Game\GameObj\Enemy\Behavior\EnemyAttack.cpp">
+    <ClCompile Include="Game\GameObj\Enemy\Behavior\EnemyExplotion.cpp">
       <Filter>Game\Behavior\Enemy</Filter>
     </ClCompile>
     <ClCompile Include="Game\GameObj\UFO\UFO.cpp">
@@ -541,7 +541,7 @@
     <ClInclude Include="Game\GameObj\Enemy\Behavior\EnemyFall.h">
       <Filter>Game\Behavior\Enemy</Filter>
     </ClInclude>
-    <ClInclude Include="Game\GameObj\Enemy\Behavior\EnemyAttack.h">
+    <ClInclude Include="Game\GameObj\Enemy\Behavior\EnemyExplotion.h">
       <Filter>Game\Behavior\Enemy</Filter>
     </ClInclude>
     <ClInclude Include="Game\GameObj\UFO\UFO.h">

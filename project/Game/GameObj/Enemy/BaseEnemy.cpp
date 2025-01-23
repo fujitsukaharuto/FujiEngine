@@ -6,6 +6,7 @@
 #include"Behavior/EnemyRoot.h"
 #include"Behavior/EnemyBlowingWeak.h"
 #include"Behavior/EnemyBlowingStrong.h"
+#include"Behavior/EnemyExplotion.h"
 #include"Behavior/EnemyFall.h"
 ///* std
 #include<algorithm>
@@ -27,8 +28,9 @@ void BaseEnemy::Initialize() {
 	// 基底クラスの初期化
 	OriginGameObject::Initialize();
 
-	tags_[static_cast<size_t>(Tag::FALL)] = "FallEnemy";
-	tags_[static_cast<size_t>(Tag::BLOWINGWEAK)] = "BlowingWeakEnemy";
+	/// teg
+	tags_[static_cast<size_t>(Tag::FALL)] =          "FallEnemy";
+	tags_[static_cast<size_t>(Tag::BLOWINGWEAK)] =   "BlowingWeakEnemy";
 	tags_[static_cast<size_t>(Tag::BLOWINGSTRONG)] = "BlowingStrongEnemy";
 
 	///spawn
@@ -44,6 +46,8 @@ void BaseEnemy::Initialize() {
 	collider_->SetHeight(2.0f);
 	collider_->SetDepth(2.0f);
 	collider_->SetParent(model_.get());
+
+	explotionTime_ = paramater_.explotionTime_;
 
 
 	ChangeBehavior(std::make_unique<EnemyFall>(this)); /// 追っかけ
@@ -82,8 +86,12 @@ void BaseEnemy::Draw(Material* material) {
 
 
 void BaseEnemy::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
-	// fall
-	if (collider_->GetTag() == tags_[static_cast<size_t>(Tag::FALL)]) {
+	
+	///---------------------------------------------------------------------------------------
+	/// 落ちてるとき
+	///---------------------------------------------------------------------------------------
+	   
+	if (collider_->GetTag() == tags_[static_cast<size_t>(Tag::FALL)]) { 
 		// 弱いキックをくらう
 		if (other.tag == pPlayer_->GetTag(static_cast<size_t>(Player::KikPower::WEAK))) {
 			collider_->SetTag(tags_[static_cast<size_t>(Tag::BLOWINGWEAK)]);
@@ -97,12 +105,43 @@ void BaseEnemy::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 			ChangeBehavior(std::make_unique<EnemyBlowingStrong>(this));
 			return;
 		}
+
+		// 弱いふっとび当たった時
+		else if (other.tag == tags_[static_cast<size_t>(Tag::BLOWINGWEAK)]) {
+			isdeath_ = true; // 単に消える
+			return;
+		}
+
+		// 強いふっとび当たった時
+		else if (other.tag == tags_[static_cast<size_t>(Tag::BLOWINGSTRONG)]) {
+			if (!dynamic_cast<EnemyExplotion*>(behavior_.get())) {
+				ChangeBehavior(std::make_unique<EnemyExplotion>(this)); // 爆破
+				return;
+			}
+		}
 	}
-	//blow
+	///---------------------------------------------------------------------------------------
+	/// 吹っ飛んでる時
+	///---------------------------------------------------------------------------------------
+
 	if (collider_->GetTag() == tags_[static_cast<size_t>(Tag::BLOWINGWEAK)]||
 		collider_->GetTag() == tags_[static_cast<size_t>(Tag::BLOWINGSTRONG)]) {
+
+		//UFOに当たったら爆破
 		if (other.tag == "UFO") {
-			isdeath_ = true;
+			if (!dynamic_cast<EnemyExplotion*>(behavior_.get())) {
+				ChangeBehavior(std::make_unique<EnemyExplotion>(this));
+				return;
+			}
+		}
+		else {
+			// 弱いキックを受けてる時
+			if (collider_->GetTag() == tags_[static_cast<size_t>(Tag::BLOWINGWEAK)]) {
+				if (other.tag == tags_[static_cast<size_t>(Tag::FALL)]) {
+					explotionTime_ += paramater_.explotionExtensionTime_;
+					return;
+				}
+			}
 		}
 	}
 }

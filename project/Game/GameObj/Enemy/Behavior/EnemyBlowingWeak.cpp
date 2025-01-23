@@ -1,5 +1,7 @@
 /// behavior
 #include"EnemyBlowingWeak.h"
+#include"EnemyExplotion.h"
+
 #include"GameObj/Player/Player.h"
 /// obj
 #include"GameObj/Enemy/BaseEnemy.h"
@@ -19,6 +21,9 @@ EnemyBlowingWeak::EnemyBlowingWeak(BaseEnemy* boss)
 	direction_ = pBaseEnemy_->GetPlayer()->GetKikDirection();
 
 	// 爆発時間
+	explotionTime_ = 0.0f;
+
+	step_ = Step::BLOW;
 
 	/// emitter
 	kickEmit1_.name = "kick1";
@@ -39,11 +44,33 @@ EnemyBlowingWeak::~EnemyBlowingWeak() {
 
 void  EnemyBlowingWeak::Update() {
 
-	pBaseEnemy_->AddPosition(blowPower_ * direction_ * FPSKeeper::DeltaTimeRate());
+	switch (step_)
+	{
+	case EnemyBlowingWeak::Step::BLOW:
+		///---------------------------------------------------------
+		/// ぶっ飛び中
+		///----------------------------------------------------------
 
-	rotateZ_ += rotateSpeed_ * FPSKeeper::DeltaTimeRate();
-	pBaseEnemy_->SetRotation(Vector3(0, 0, rotateZ_));
+		explotionTime_ += FPSKeeper::DeltaTimeRate();
 
+		pBaseEnemy_->AddPosition(blowPower_ * direction_ * FPSKeeper::DeltaTimeRate());
+		rotateZ_ += rotateSpeed_ * FPSKeeper::DeltaTimeRate();
+		pBaseEnemy_->SetRotation(Vector3(0, 0, rotateZ_));
+
+		if (explotionTime_ < pBaseEnemy_->GetExplotionTime())break;
+		step_ = Step::EXPLOTION;
+		break;
+	case EnemyBlowingWeak::Step::EXPLOTION:
+		///---------------------------------------------------------
+		/// 死ぬ
+		///----------------------------------------------------------
+		pBaseEnemy_->ChangeBehavior(std::make_unique<EnemyExplotion>(pBaseEnemy_));
+		break;
+	default:
+		break;
+	}
+
+	
 
 }
 

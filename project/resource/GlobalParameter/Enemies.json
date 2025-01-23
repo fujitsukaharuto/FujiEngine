@@ -7,6 +7,10 @@
         "MaxPowerBlow1": 37.08000183105469,
         "MaxPowerBlow2": 0.0,
         "WeakBlow1": 9.800000190734863,
-        "WeakBlow2": 0.0
+        "WeakBlow2": 0.0,
+        "explotionExtensionTime_1": 1.1699999570846558,
+        "explotionExtensionTime_2": 0.0,
+        "explotionTime_1": 2.1500000953674316,
+        "explotionTime_2": 0.0
     }
 }

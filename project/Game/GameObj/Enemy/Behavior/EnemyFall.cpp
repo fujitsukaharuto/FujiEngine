@@ -1,8 +1,8 @@
 
 /// behavior
 #include"EnemyFall.h"
-#include"EnemyAttack.h"
 #include"EnemyBound.h"
+#include"EnemyExplotion.h"
 
 /// obj
 #include"GameObj/Enemy/BaseEnemy.h"
@@ -65,7 +65,7 @@ void EnemyFall::Update() {
         ///----------------------------------------------------------------------
         /// 攻撃に切り替え
         ///----------------------------------------------------------------------
-            pBaseEnemy_->ChangeBehavior(std::make_unique<EnemyBound>(pBaseEnemy_));
+            pBaseEnemy_->ChangeBehavior(std::make_unique<EnemyExplotion>(pBaseEnemy_));
         break;
 
  

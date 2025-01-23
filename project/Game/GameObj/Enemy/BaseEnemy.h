@@ -48,9 +48,10 @@ protected:
 	Easing                             spawnEasing_;
 							           
 	/// parm				           
-	Paramater                          paramater_;
+	Paramater                          paramater_;     //パラメータ
 	Type                               type_;
 	std::array<std::string, 3>         tags_;
+	float                              explotionTime_; //爆発時間
 	
 	/// behavior
 	std::unique_ptr<BaseEnemyBehaivor> behavior_ = nullptr;
@@ -70,7 +71,7 @@ public:
 	virtual void Update()     override;
 	virtual void Draw  (Material* mate = nullptr)override;
 
-	void SetParm (const Type&type,const Paramater&paramater);
+	void SetParm        (const Type&type,const Paramater&paramater);
 
 	void ChangeBehavior (std::unique_ptr<BaseEnemyBehaivor>behavior);
 
@@ -86,8 +87,10 @@ public:
 	BaseEnemyBehaivor* GetBehavior()const                  { return behavior_.get(); }
 	Type               GetType()const                      { return type_; }
 	Paramater          GetParamater()const                 { return paramater_; }
+	float              GetExplotionTime()const             { return explotionTime_; }
 	///========================================================================================
 	///  setter method
 	///========================================================================================
 	void               SetPlayer(Player* plyaer);
+	void               SetIsDeath(const bool& is) { isdeath_ = is; };
 };
