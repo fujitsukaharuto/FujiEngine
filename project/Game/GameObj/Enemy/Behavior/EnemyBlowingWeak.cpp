@@ -7,6 +7,7 @@
 #include"GameObj/Enemy/BaseEnemy.h"
 
 /// math
+#include "Particle/ParticleManager.h"
 #include"MathFunction.h"
 #include"FPSKeeper.h"
 
@@ -26,15 +27,15 @@ EnemyBlowingWeak::EnemyBlowingWeak(BaseEnemy* boss)
 	step_ = Step::BLOW;
 
 	/// emitter
-	kickEmit1_.name = "kick1";
-	kickEmit2_.name = "kick2";
-	kickEmit3_.name = "kick3";
-	kickEmit4_.name = "kick4";
+	ParticleManager::Load(kickEmit1_, "kick1");
+	ParticleManager::Load(kickEmit2_, "kick2");
+	ParticleManager::Load(kickEmit3_, "kick3");
+	ParticleManager::Load(kickEmit4_, "kick4");
 
-	kickEmit1_.Load("kick1");
-	kickEmit2_.Load("kick2");
-	kickEmit3_.Load("kick3");
-	kickEmit4_.Load("kick4");
+	kickEmit1_.Burst();
+	kickEmit2_.Burst();
+	kickEmit3_.Burst();
+	kickEmit4_.Burst();
 
 }
 
