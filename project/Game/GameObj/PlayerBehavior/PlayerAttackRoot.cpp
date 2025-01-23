@@ -10,6 +10,7 @@
 /// inupt
 #include"Input/Input.h"
 #include"GameObj/JoyState/JoyState.h"
+#include "Particle/ParticleManager.h"
 
 #include<imgui.h>
 
@@ -22,6 +23,12 @@ PlayerAttackRoot::PlayerAttackRoot(Player* boss)
 	/// ===================================================
 	chargeTime_ = 0.0f;
 	pPlayer_->SetTag(static_cast<size_t>(Player::KikPower::WEAK));
+
+	ParticleManager::Load(charge1_, "charge1");
+	ParticleManager::Load(charge2_, "charge2");
+	ParticleManager::Load(kiran1_, "kiran1");
+	ParticleManager::Load(kiran2_, "kiran2");
+
 }
 
 PlayerAttackRoot ::~PlayerAttackRoot() {
@@ -61,6 +68,10 @@ void PlayerAttackRoot::Update() {
 		if (Input::GetInstance()->PushKey(DIK_K)) {
 			chargeTime_ += FPSKeeper::NormalDeltaTime();
 			/// チャージパーティクル入れる
+			charge1_.pos = pPlayer_->GetModel()->GetWorldPos();
+			charge2_.pos = pPlayer_->GetModel()->GetWorldPos();
+			charge1_.Emit();
+
 		}
 		else {
 		
@@ -87,6 +98,9 @@ void PlayerAttackRoot::Update() {
 		pPlayer_->SetTag(static_cast<size_t>(Player::KikPower::MAXPOWER));
 
 		/// チャージパーティクル(つおい(赤))入れる
+		kiran1_.pos = pPlayer_->GetModel()->GetWorldPos();
+		kiran2_.pos = pPlayer_->GetModel()->GetWorldPos();
+		kiran1_.Emit();
 
 		if (Input::GetInstance()->ReleaseKey(DIK_K)) {
 			pPlayer_->ChangeAttackBehavior(std::make_unique<PlayerKikAttack>(pPlayer_));

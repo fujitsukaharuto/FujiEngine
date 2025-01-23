@@ -3,6 +3,7 @@
 #include"BasePlayerAttackBehavior.h"
 #include"math/Easing.h"
 #include"Collider/AABBCollider.h"
+#include "Particle/ParticleEmitter.h"
 
 class PlayerAttackRoot : public BasePlayerAttackBehavior {
 private:
@@ -19,6 +20,14 @@ private:
 	float waitTime_;
 
 	float chargeTime_;
+
+	ParticleEmitter charge1_;
+	ParticleEmitter charge2_;
+
+	ParticleEmitter kiran1_;
+	ParticleEmitter kiran2_;
+
+
 public:
 	//コンストラクタ
 	PlayerAttackRoot(Player* boss);
