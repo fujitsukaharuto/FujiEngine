@@ -176,6 +176,9 @@
     <ClCompile Include="Engine\Math\Quaternion.cpp">
       <Filter>Engine\Math</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\GraphicPipeline\CRTPipe.cpp">
+      <Filter>Engine\GraphicPipeline</Filter>
+    </ClCompile>
     <ClCompile Include="Game\GameObj\Player\Player.cpp">
       <Filter>Game\GameObj\Player</Filter>
     </ClCompile>
@@ -604,6 +607,9 @@
     <ClInclude Include="Game\GameObj\Enemy\Behavior\EnemyBlowingStrong.h">
       <Filter>Game\Behavior\Enemy</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\GraphicPipeline\CRTPipe.h">
+      <Filter>Engine\GraphicPipeline</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -783,6 +789,12 @@
       <Filter>resource\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="resource\Shaders\Line3d.PS.hlsl">
+      <Filter>resource\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\CRTEffect.VS.hlsl">
+      <Filter>resource\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\CRTEffect.PS.hlsl">
       <Filter>resource\Shaders</Filter>
     </FxCompile>
   </ItemGroup>

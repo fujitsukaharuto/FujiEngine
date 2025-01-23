@@ -1,4 +1,5 @@
 #include "ParticleEmitter.h"
+#include "ParticleManager.h"
 #include "Random.h"
 #include "ImGuiManager.h"
 #include "Model/Line3dDrawer.h"

@@ -8,15 +8,12 @@
 #include "imgui_impl_win32.h"
 #endif // _DEBUG
 
-ImGuiManager* ImGuiManager::GetInstance()
-{
+ImGuiManager* ImGuiManager::GetInstance() {
 	static ImGuiManager instance;
 	return &instance;
 }
 
-void ImGuiManager::Init(
-	[[maybe_unused]] MyWin* myWin, [[maybe_unused]] DXCom* dxComon)
-{
+void ImGuiManager::Init([[maybe_unused]] MyWin* myWin, [[maybe_unused]] DXCom* dxComon) {
 
 	dxCommon_ = dxComon;
 
@@ -62,10 +59,9 @@ void ImGuiManager::Init(
 
 }
 
-void ImGuiManager::Fin()
-{
+void ImGuiManager::Fin() {
 #ifdef _DEBUG
-	
+
 	ImGui_ImplDX12_Shutdown();
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
@@ -74,8 +70,7 @@ void ImGuiManager::Fin()
 
 }
 
-void ImGuiManager::Begin()
-{
+void ImGuiManager::Begin() {
 #ifdef _DEBUG
 	ImGui_ImplDX12_NewFrame();
 	ImGui_ImplWin32_NewFrame();
@@ -84,16 +79,14 @@ void ImGuiManager::Begin()
 
 }
 
-void ImGuiManager::End()
-{
+void ImGuiManager::End() {
 #ifdef _DEBUG
 	ImGui::Render();
 #endif // _DEBUG
 
 }
 
-void ImGuiManager::Draw()
-{
+void ImGuiManager::Draw() {
 	ID3D12GraphicsCommandList* commandList = dxCommon_->GetCommandList();
 
 #ifdef _DEBUG

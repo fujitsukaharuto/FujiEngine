@@ -86,8 +86,8 @@ void Object3d::SetColor(const Vector4& color) {
 	model_->SetColor(color);
 }
 
-void Object3d::SetUVScale(const Vector2& scale) {
-	model_->SetUVScale(scale);
+void Object3d::SetUVScale(const Vector2& scale, const Vector2& uvTrans) {
+	model_->SetUVScale(scale, uvTrans);
 }
 
 void Object3d::SetTexture(const std::string& name) {
@@ -150,7 +150,7 @@ void Object3d::SetWVP() {
 
 	if (camera_) {
 		const Matrix4x4& viewProjectionMatrix = camera_->GetViewProjectionMatrix();
-		worldViewProjectionMatrix= Multiply(worldMatrix, viewProjectionMatrix);
+		worldViewProjectionMatrix = Multiply(worldMatrix, viewProjectionMatrix);
 	}
 	else {
 		worldViewProjectionMatrix = worldMatrix;
@@ -173,7 +173,7 @@ void Object3d::SetBillboardWVP() {
 	worldMatrix = Multiply(MakeScaleMatrix(transform.scale), MakeRotateXYZMatrix(transform.rotate));
 	worldMatrix = Multiply(worldMatrix, billboardMatrix_);
 	worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(transform.translate));
-	
+
 	if (camera_) {
 		const Matrix4x4& viewProjectionMatrix = camera_->GetViewProjectionMatrix();
 		worldViewProjectionMatrix = Multiply(worldMatrix, viewProjectionMatrix);

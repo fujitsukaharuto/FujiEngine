@@ -17,24 +17,35 @@ public:
 public:
 
 	void Create(const std::string& fileName);
+
 	void CreateSphere();
 
-	void UpdateWVP() { SetWVP(); }
-
 	void Draw(Material* mate = nullptr);
+
 	void AnimeDraw();
 
 	Matrix4x4 GetWorldMat() const;
+
 	Vector3 GetWorldPos()const;
 
+	void UpdateWVP() { SetWVP(); }
+
 	void SetColor(const Vector4& color);
-	void SetUVScale(const Vector2& scale);
+
+	void SetUVScale(const Vector2& scale, const Vector2& uvTrans);
+
 	void SetRightDir(const Vector3& right) { directionalLightData_->direction = right; }
+
 	void SetCamera(Camera* camera) { this->camera_ = camera; }
+
 	void SetParent(Object3d* parent) { parent_ = parent; }
+
 	void SetCameraParent(bool is) { isCameraParent_ = is; }
+
 	void SetTexture(const std::string& name);
+
 	void SetBillboardMat(const Matrix4x4& mat) { billboardMatrix_ = mat; }
+
 	void SetLightEnable(LightMode mode);
 
 	/*void SetPointLight(PointLight* light) { pointLight_ = light; }

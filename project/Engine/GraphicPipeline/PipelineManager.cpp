@@ -10,6 +10,7 @@
 #include "ShockWavePipe.h"
 #include "FirePipe.h"
 #include "ThunderPipe.h"
+#include "CRTPipe.h"
 
 
 
@@ -41,6 +42,7 @@ void PipelineManager::CreatePipeline() {
 	std::unique_ptr<ShockWavePipe> shockWave = nullptr;
 	std::unique_ptr<FirePipe> firePipe = nullptr;
 	std::unique_ptr<ThunderPipe> thunderPipe = nullptr;
+	std::unique_ptr<CRTPipe> crtPipe = nullptr;
 
 
 
@@ -92,6 +94,9 @@ void PipelineManager::CreatePipeline() {
 	thunderPipe->Initialize();
 	pipelines_.push_back(std::move(thunderPipe));
 
+	//crtPipe.reset(new CRTPipe);
+	//crtPipe->Initialize();
+	//pipelines_.push_back(std::move(crtPipe));
 
 }
 

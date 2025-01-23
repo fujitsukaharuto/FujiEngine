@@ -316,6 +316,8 @@ void ParticleManager::CreateParticleGroup(const std::string& name, const std::st
 
 	ParticleGroup* newGroup = new ParticleGroup();
 
+	newGroup->emitter_.name = name;
+	newGroup->emitter_.Load(name);
 
 	newGroup->insstanceCount_ = count;
 	newGroup->instancing_ = instance->dxCommon_->CreateBufferResource(instance->dxCommon_->GetDevice(), (sizeof(TransformationParticleMatrix) * newGroup->insstanceCount_));
@@ -378,6 +380,49 @@ void ParticleManager::CreateAnimeGroup(const std::string& name, const std::strin
 	}
 
 	instance->animeGroups_.insert(std::make_pair(name, std::move(newGroup)));
+
+}
+
+void ParticleManager::Load(ParticleEmitter& emit, const std::string& name) {
+
+	ParticleManager* instance = GetInstance();
+	emit.name = name;
+
+	auto iterator = instance->particleGroups_.find(name);
+	if (iterator != instance->particleGroups_.end()) {
+		ParticleGroup* group = iterator->second.get();
+		emit.pos                = group->emitter_.pos;
+		emit.particleRotate     = group->emitter_.particleRotate;
+		emit.emitSizeMax        = group->emitter_.emitSizeMax;
+		emit.emitSizeMin        = group->emitter_.emitSizeMin;
+		emit.count              = group->emitter_.count;
+		emit.frequencyTime      = group->emitter_.frequencyTime;
+		emit.grain.lifeTime_    = group->emitter_.grain.lifeTime_;
+		emit.grain.accele       = group->emitter_.grain.accele;
+		emit.grain.speed        = group->emitter_.grain.speed;
+		emit.grain.type         = group->emitter_.grain.type;
+		emit.grain.speedType    = group->emitter_.grain.speedType;
+		emit.grain.rotateType   = group->emitter_.grain.rotateType;
+		emit.grain.colorType    = group->emitter_.grain.colorType;
+		emit.grain.returnPower_ = group->emitter_.grain.returnPower_;
+		emit.grain.startSize    = group->emitter_.grain.startSize;
+		emit.grain.endSize      = group->emitter_.grain.endSize;
+		emit.grain.isBillBoard_ = group->emitter_.grain.isBillBoard_;
+		emit.grain.pattern_     = group->emitter_.grain.pattern_;
+		emit.para_.speedx       = group->emitter_.para_.speedx;
+		emit.para_.speedy       = group->emitter_.para_.speedy;
+		emit.para_.speedz       = group->emitter_.para_.speedz;
+		emit.para_.transx       = group->emitter_.para_.transx;
+		emit.para_.transy       = group->emitter_.para_.transy;
+		emit.para_.transz       = group->emitter_.para_.transz;
+		emit.para_.colorMin     = group->emitter_.para_.colorMin;
+		emit.para_.colorMax     = group->emitter_.para_.colorMax;
+
+	}
+	else {
+		return;
+	}
+
 
 }
 

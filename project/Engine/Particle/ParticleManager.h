@@ -2,37 +2,13 @@
 #include <wrl/client.h>
 #include <map>
 #include "Particle.h"
+#include "ParticleEmitter.h"
 #include "Model.h"
 #include "Object3d.h"
 #include "MatrixCalculation.h"
 
 using namespace Microsoft::WRL;
 
-
-struct RandomParametor {
-	Vector2 speedx;
-	Vector2 speedy;
-	Vector2 speedz;
-
-	Vector2 transx;
-	Vector2 transy;
-	Vector2 transz;
-
-	Vector4 colorMin = { 1.0f,1.0f,1.0f,1.0f };
-	Vector4 colorMax = { 1.0f,1.0f,1.0f,1.0f };
-};
-
-
-struct AnimeData {
-	float lifeTime = 20.0f;
-	float startLifeTime = 20.0f;
-	bool isLive = true;
-	Vector3 accele{};
-	int type = SizeType::kNormal;
-	int speedType = SpeedType::kConstancy;
-	Vector2 startSize = { 1.0f,1.0f };
-	Vector2 endSize = { 1.0f,1.0f };
-};
 
 struct AcceleFiled {
 	Vector3 Accele;
@@ -57,6 +33,7 @@ public:
 		uint32_t insstanceCount_;
 		TransformationParticleMatrix* instancingData_ = nullptr;
 		uint32_t drawCount_;
+		ParticleEmitter emitter_;
 	};
 
 
@@ -90,6 +67,8 @@ public:
 	static void CreateParticleGroup(const std::string& name, const std::string& fileName, uint32_t count = 20);
 
 	static void CreateAnimeGroup(const std::string& name, const std::string& fileName);
+
+	static void Load(ParticleEmitter& emit, const std::string& name);
 
 	static void Emit(const std::string& name, const Vector3& pos, const Vector3& rotate, const Particle& grain, const RandomParametor& para, uint32_t count);
 
