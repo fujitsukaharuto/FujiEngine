@@ -4,6 +4,7 @@
 #include "Model/Line3dDrawer.h"
 ///*behavior
 #include"Behavior/EnemyRoot.h"
+#include"Behavior/EnemySpawnFall.h"
 #include"Behavior/EnemyBlowingWeak.h"
 #include"Behavior/EnemyBlowingStrong.h"
 #include"Behavior/EnemyExplotion.h"
@@ -17,6 +18,7 @@
 ///　static 変数初期化
 ///==========================================================
 float BaseEnemy::InitY_ = 1.5f;
+float BaseEnemy::BoundPosY_ = 42.0f;
 Vector3 BaseEnemy::InitScale_ = { 1.0f,1.0f,1.0f };
 
 BaseEnemy::BaseEnemy() {
@@ -31,8 +33,8 @@ void BaseEnemy::Initialize() {
 	OriginGameObject::Initialize();
 
 	/// teg
-	tags_[static_cast<size_t>(Tag::FALL)] =          "FallEnemy";
-	tags_[static_cast<size_t>(Tag::BLOWINGWEAK)] =   "BlowingWeakEnemy";
+	tags_[static_cast<size_t>(Tag::FALL)] = "FallEnemy";
+	tags_[static_cast<size_t>(Tag::BLOWINGWEAK)] = "BlowingWeakEnemy";
 	tags_[static_cast<size_t>(Tag::BLOWINGSTRONG)] = "BlowingStrongEnemy";
 
 	///spawn
@@ -52,7 +54,7 @@ void BaseEnemy::Initialize() {
 	// 初期パラメータセット
 	explotionTime_ = paramater_.explotionTime_;
 	blowDirection_ = 1.0f;
-	ChangeBehavior(std::make_unique<EnemyFall>(this)); /// 追っかけ
+	ChangeBehavior(std::make_unique<EnemySpawnFall>(this)); /// 追っかけ
 }
 
 ///========================================================
@@ -77,6 +79,37 @@ void BaseEnemy::Update() {
 
 }
 
+/// ===================================================
+///  Player Jump
+/// ===================================================
+
+void BaseEnemy::Bound(float& speed) {
+	// 移動
+	model_->transform.translate.y += speed * FPSKeeper::NormalDeltaTime();
+	SpawnFall(speed, true);
+
+}
+
+///=========================================================
+///　落ちる
+///==========================================================
+void BaseEnemy::SpawnFall(float& speed, const bool& isJump) {
+	if (!isJump) {
+		// 移動
+		model_->transform.translate.y += speed * FPSKeeper::NormalDeltaTime();
+	}
+	// 加速する
+	speed = max(speed - (paramater_.spawnBoundGravity * FPSKeeper::NormalDeltaTime()), -paramater_.spawnBoundGravityMax);
+
+	if (speed <= -paramater_.spawnBoundGravityMax) {// 落ちる
+
+		if (dynamic_cast<EnemySpawnFall*>(behavior_.get())) return;
+			// ジャンプ終了
+			SetRotationX(0.0f);
+			ChangeBehavior(std::make_unique<EnemyFall>(this));
+	}
+}
+
 
 ///========================================================
 /// 描画
@@ -90,12 +123,12 @@ void BaseEnemy::Draw(Material* material) {
 
 
 void BaseEnemy::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
-	
+
 	///---------------------------------------------------------------------------------------
 	/// 落ちてるとき
 	///---------------------------------------------------------------------------------------
-	   
-	if (collider_->GetTag() == tags_[static_cast<size_t>(Tag::FALL)]) { 
+
+	if (collider_->GetTag() == tags_[static_cast<size_t>(Tag::FALL)]) {
 		// 弱いキックをくらう
 		if (other.tag == pPlayer_->GetTag(static_cast<size_t>(Player::KikPower::WEAK))) {
 			collider_->SetTag(tags_[static_cast<size_t>(Tag::BLOWINGWEAK)]);
@@ -128,7 +161,7 @@ void BaseEnemy::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 	/// 吹っ飛んでる時
 	///---------------------------------------------------------------------------------------
 
-	if (collider_->GetTag() == tags_[static_cast<size_t>(Tag::BLOWINGWEAK)]||
+	if (collider_->GetTag() == tags_[static_cast<size_t>(Tag::BLOWINGWEAK)] ||
 		collider_->GetTag() == tags_[static_cast<size_t>(Tag::BLOWINGSTRONG)]) {
 
 		//UFOに当たったら爆破
@@ -176,7 +209,7 @@ void BaseEnemy::ChangeBehavior(std::unique_ptr<BaseEnemyBehaivor>behavior) {
 ///=========================================================
 ///　移動制限
 ///==========================================================
-void BaseEnemy::WallRefrection () {
+void BaseEnemy::WallRefrection() {
 
 	// フィールドの中心とスケールを取得
 	Vector3 fieldCenter = { 0.0f, 0.0f, 0.0f }; // フィールド中心 

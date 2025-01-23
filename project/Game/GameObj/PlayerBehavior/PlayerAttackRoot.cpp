@@ -60,8 +60,10 @@ void PlayerAttackRoot::Update() {
 		// チャージ
 		if (Input::GetInstance()->PushKey(DIK_K)) {
 			chargeTime_ += FPSKeeper::NormalDeltaTime();
+			/// チャージパーティクル入れる
 		}
 		else {
+		
 			ChargeForJoyStick();//キック
 		}
 		
@@ -84,6 +86,8 @@ void PlayerAttackRoot::Update() {
 		/// ---------------------------------------------------------------
 		pPlayer_->SetTag(static_cast<size_t>(Player::KikPower::MAXPOWER));
 
+		/// チャージパーティクル(つおい(赤))入れる
+
 		if (Input::GetInstance()->ReleaseKey(DIK_K)) {
 			pPlayer_->ChangeAttackBehavior(std::make_unique<PlayerKikAttack>(pPlayer_));
 			return;
@@ -104,8 +108,10 @@ void PlayerAttackRoot::ChargeForJoyStick() {
 
 	if (!(Input::GetInstance()->PressButton(PadInput::B)))return;
 	chargeTime_ += FPSKeeper::NormalDeltaTime();
+	/// チャージパーティクル入れる
 }
 
+// ボタン離した時
 void PlayerAttackRoot::AtttackForJoyStick() {
 	if (!(Input::GetInstance()->GetGamepadState(joyState)))return;
 

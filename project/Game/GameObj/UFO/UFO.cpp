@@ -91,7 +91,7 @@ void UFO::UFOLightDraw() {
 
 
 void UFO::EnemySpawn() {
-	pEnemyManager_->SpawnEnemy("NormalEnemy", popPos_);
+	/*pEnemyManager_->SpawnEnemy("NormalEnemy", popPos_);*/
 }
 
 /// ===================================================
@@ -101,51 +101,6 @@ void UFO::DamageRendition() {
 	
 }
 
-
-///=========================================================
-///　移動制限
-///==========================================================
-//void Player::MoveToLimit() {
-//
-//	// フィールドの中心とスケールを取得
-//	Vector3 fieldCenter = { 0.0f, 0.0f, 0.0f }; // フィールド中心 
-//	Vector3 fieldScale = Field::baseScale_;     // フィールドのスケール
-//
-//	// プレイヤーのスケールを考慮した半径
-//	float radiusX = fieldScale.x - model_->transform.scale.x;
-//	float radiusZ = fieldScale.z - model_->transform.scale.z;
-//
-//	// 現在位置が範囲内かチェック
-//	bool insideX = std::abs(model_->transform.translate.x - fieldCenter.x) <= radiusX;
-//	bool insideZ = std::abs(model_->transform.translate.z - fieldCenter.z) <= radiusZ;
-//
-//	///-----------------------------------------------------------
-//	///範囲外なら戻す
-//	///-----------------------------------------------------------
-//
-//	if (!insideX) {/// X座標
-//		model_->transform.translate.x = std::clamp(
-//			model_->transform.translate.x,
-//			fieldCenter.x - radiusX,
-//			fieldCenter.x + radiusX
-//		);
-//	}
-//
-//	if (!insideZ) {/// Z座標
-//		model_->transform.translate.z = std::clamp(
-//			model_->transform.translate.z,
-//			fieldCenter.z - radiusZ,
-//			fieldCenter.z + radiusZ
-//		);
-//	}
-//
-//	// 範囲外の反発処理
-//	if (!insideX || !insideZ) {
-//		Vector3 directionToCenter = (fieldCenter - model_->transform.translate).Normalize();
-//		model_->transform.translate.x += directionToCenter.x * 0.1f; // 軽く押し戻す
-//		model_->transform.translate.z += directionToCenter.z * 0.1f; // 軽く押し戻す
-//	}
-//}
 
 ///==========================================================
 /// ダメージ受ける

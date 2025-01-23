@@ -38,7 +38,7 @@ class EnemyManager {
     std::list<std::unique_ptr<BaseEnemy>> enemies_;
 
     ///* 敵の種類リスト
-    std::vector<std::string> enemyTypes_ = { "NormalEnemy","StrongEnemy"};
+    std::array<std::string, 2> enemyTypes_;
 
 public:
    static float InitZPos_;

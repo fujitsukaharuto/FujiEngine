@@ -32,6 +32,10 @@ public:
 public:
 	// パラメータ
 	struct Paramater {
+		float                spawnFallSpeed;           /// 落ちる速さ(発生)
+		float                spawnBoundSpeed;
+		float                spawnBoundGravity;
+		float                spawnBoundGravityMax;
 		float                fallSpeed;                /// 落ちる速さ
 		float                attackValue;              /// 攻撃力
 		float                explotionTime_;           ///　爆発時間
@@ -60,6 +64,7 @@ protected:
 public:
 	static float                       InitY_;
 	static Vector3                     InitScale_;
+	static float                       BoundPosY_;
 public:
 	BaseEnemy();
 
@@ -71,6 +76,9 @@ public:
 	virtual void Initialize() override;
 	virtual void Update()     override;
 	virtual void Draw  (Material* mate = nullptr)override;
+
+	void Bound(float& speed);
+	void SpawnFall(float& speed, const bool& isJump);
 
 	void SetParm        (const Type&type,const Paramater&paramater);
 	void WallRefrection ();

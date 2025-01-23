@@ -71,6 +71,8 @@ void GameScene::Initialize() {
 	///set
 	enemyManager_->SetPlayer(player_.get());
 	ufo_->SetEnemyManager(enemyManager_.get());
+
+	enemyManager_->FSpawn();
 }
 
 void GameScene::Update() {

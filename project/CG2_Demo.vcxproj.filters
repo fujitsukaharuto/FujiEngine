@@ -296,6 +296,9 @@
     <ClCompile Include="Game\GameObj\Enemy\Behavior\EnemyBlowingStrong.cpp">
       <Filter>Game\Behavior\Enemy</Filter>
     </ClCompile>
+    <ClCompile Include="Game\GameObj\Enemy\Behavior\EnemySpawnFall.cpp">
+      <Filter>Game\Behavior\Enemy</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Audio\Audio.h">
@@ -609,6 +612,9 @@
     </ClInclude>
     <ClInclude Include="Engine\GraphicPipeline\CRTPipe.h">
       <Filter>Engine\GraphicPipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\Enemy\Behavior\EnemySpawnFall.h">
+      <Filter>Game\Behavior\Enemy</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
