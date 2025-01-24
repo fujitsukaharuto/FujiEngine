@@ -53,11 +53,11 @@ void EnemySpawn::DrawImGuiEditor() {
 
     ImGui::Checkbox("エディターモード",&isEditorMode_);//editorMode
 
-    if (ImGui::Button("Add Spawn Point")) {
+    if (ImGui::Button("追加")) {
         spawnDataList_.push_back({ 0.0f, 0.0f, 0.0f, pEnemyManager_->GetEnemyType(0) });
     }
 
-    ImGui::SeparatorText("Spawn List");
+    ImGui::SeparatorText("スポーンする爆弾リスト");
 
     ///--------------------------------------------------------
     ///リスト表示
