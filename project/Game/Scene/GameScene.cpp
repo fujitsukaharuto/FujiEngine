@@ -31,6 +31,7 @@ void GameScene::Initialize() {
 	kikArea_ = std::make_unique<KikArea>();
 	cMane_ = std::make_unique<CollisionManager>();
 	enemySpawn_ = std::make_unique<EnemySpawn>();
+	fieldBlockManager_ = std::make_unique<FieldBlockManager>();
 	///-------------------------------------------------------------
 	///　初期化
 	///-------------------------------------------------------------- 
@@ -68,11 +69,16 @@ void GameScene::Initialize() {
 	ufo_->Initialize();
 	kikArea_->Initialize();
 	enemySpawn_->Init();
-
+	fieldBlockManager_->Initialize();
 	///set
+	fieldBlockManager_->SetPlayer(player_.get());
 	enemyManager_->SetPlayer(player_.get());
 	ufo_->SetEnemyManager(enemyManager_.get());
 	enemySpawn_->SetEnemyManager(enemyManager_.get());
+
+	fieldBlockManager_->AddFieldBlock();
+	fieldBlockManager_->AddFieldBlock();
+	fieldBlockManager_->AddFieldBlock();
 
 	/*enemyManager_->FSpawn();*/
 }
@@ -98,6 +104,7 @@ void GameScene::Update() {
 		ufo_->Update();
 		gameCamera_->Update();
 		enemyManager_->Update();
+		fieldBlockManager_->Update();
 		kikArea_->Update();
 
 		for (auto& enemy : enemyManager_->GetEnemies()) {
@@ -137,6 +144,7 @@ void GameScene::Draw() {
 	///-------------------------------------------------------------- 
 	skydome_->Draw();
 	field_->Draw();
+	fieldBlockManager_->Draw();
 	player_->Draw();
 	enemyManager_->Draw();
 	ufo_->Draw();
@@ -348,7 +356,9 @@ void GameScene::ParamaterEdit() {
 	enemyManager_->AdjustParm();
 	ufo_->AdjustParm();
 	kikArea_->AdjustParm();
+	fieldBlockManager_->AdjustParm();
 	ImGui::End();
 	enemySpawn_->DrawImGuiEditor();
+	
 #endif
 }

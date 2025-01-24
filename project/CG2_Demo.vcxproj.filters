@@ -302,6 +302,18 @@
     <ClCompile Include="Game\GameObj\Enemy\EnemySpawn\EnemySpawn.cpp">
       <Filter>Game\GameObj\Enemy\EnemySpawn</Filter>
     </ClCompile>
+    <ClCompile Include="Game\GameObj\FieldBlock\FieldBlock.cpp">
+      <Filter>Game\GameObj\FieldBlock</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameObj\FieldBlock\FieldBlockManager.cpp">
+      <Filter>Game\GameObj\FieldBlock</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameObj\FieldBlock\State\BaseFieldBlockState.cpp">
+      <Filter>Game\GameObj\FieldBlock\State</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameObj\FieldBlock\State\FieldBlockRoot.cpp">
+      <Filter>Game\GameObj\FieldBlock\State</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Audio\Audio.h">
@@ -622,6 +634,18 @@
     <ClInclude Include="Game\GameObj\Enemy\EnemySpawn\EnemySpawn.h">
       <Filter>Game\GameObj\Enemy\EnemySpawn</Filter>
     </ClInclude>
+    <ClInclude Include="Game\GameObj\FieldBlock\FieldBlock.h">
+      <Filter>Game\GameObj\FieldBlock</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\FieldBlock\FieldBlockManager.h">
+      <Filter>Game\GameObj\FieldBlock</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\FieldBlock\State\BaseFieldBlockState.h">
+      <Filter>Game\GameObj\FieldBlock\State</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\FieldBlock\State\FieldBlockRoot.h">
+      <Filter>Game\GameObj\FieldBlock\State</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -743,6 +767,12 @@
     </Filter>
     <Filter Include="Game\GameObj\Enemy\EnemySpawn">
       <UniqueIdentifier>{cdf076f9-fbf4-43a2-89a5-47e578315ba2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameObj\FieldBlock">
+      <UniqueIdentifier>{3eaa4493-8c8b-4404-9195-fdc6d80cc54a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameObj\FieldBlock\State">
+      <UniqueIdentifier>{188c42d0-334f-4b8b-a44f-351c7d3a2bb2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
