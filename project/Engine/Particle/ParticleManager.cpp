@@ -150,6 +150,10 @@ void ParticleManager::Update() {
 				break;
 			}
 
+			if (particle.rotateType == kRandomR) {
+				particle.transform.rotate += Random::GetVector3({ -0.5f,0.5f }, { -0.5f,0.5f }, { -0.2f,0.2f });
+			}
+
 			particle.speed += particle.accele * FPSKeeper::DeltaTime();
 
 			particle.transform.translate += particle.speed * FPSKeeper::DeltaTime();
@@ -451,26 +455,33 @@ void ParticleManager::Emit(const std::string& name, const Vector3& pos, const Ve
 
 
 				particle.rotateType = grain.rotateType;
+				Vector3 veloSpeed = particle.speed.Normalize();
+				Vector3 cameraR{};
+				Vector3 defo = { 0.0f,1.0f,0.0f };
+				Vector3 angleDToD{};
+
 				switch (particle.rotateType) {
 				case kUsually:
 					particle.transform.rotate = rotate;
 					break;
 				case kVelocityR:
 
-					Vector3 veloSpeed = particle.speed.Normalize();
+					veloSpeed = particle.speed.Normalize();
 
 					// カメラの回転を考慮して速度ベクトルを変換
-					Vector3 cameraR = CameraManager::GetInstance()->GetCamera()->transform.rotate;
+					cameraR = CameraManager::GetInstance()->GetCamera()->transform.rotate;
 					Matrix4x4 rotateCamera = MakeRotateXYZMatrix(-cameraR);
 					veloSpeed = TransformNormal(veloSpeed, rotateCamera);
 
-					Vector3 defo = { 0.0f,1.0f,0.0f };
 					defo = TransformNormal(defo, rotateCamera);
 
 					Matrix4x4 dToD = DirectionToDirection(defo, veloSpeed.Normalize());
-					Vector3 angleDToD = ExtractEulerAngles(dToD);
+					angleDToD = ExtractEulerAngles(dToD);
 					particle.transform.rotate = angleDToD;
 
+					break;
+				case kRandomR:
+					particle.transform.rotate = Random::GetVector3({ -1.0f,1.0f }, { -1.0f,1.0f }, { -1.0f,1.0f });
 					break;
 				}
 
