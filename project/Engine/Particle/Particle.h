@@ -19,6 +19,7 @@ enum SpeedType {
 enum RotateType {
 	kUsually,
 	kVelocityR,
+	kRandomR,
 };
 
 enum ColorType {
