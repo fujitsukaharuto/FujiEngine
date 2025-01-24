@@ -71,7 +71,7 @@ void GameScene::Initialize() {
 	enemySpawn_->Init();
 	fieldBlockManager_->Initialize();
 	///set
-	fieldBlockManager_->SetPlayer(player_.get());
+	player_->SetFieldBlockManager(fieldBlockManager_.get());
 	enemyManager_->SetPlayer(player_.get());
 	ufo_->SetEnemyManager(enemyManager_.get());
 	enemySpawn_->SetEnemyManager(enemyManager_.get());
@@ -117,6 +117,9 @@ void GameScene::Update() {
 		cMane_->AddCollider(kikArea_->GetMaxPowerArea());
 		cMane_->AddCollider(kikArea_->GetSpecialAttackArea());
 		cMane_->AddCollider(player_->GetCollider());
+		for (auto& field : fieldBlockManager_->GetFieldBlocks()) {
+			cMane_->AddCollider(field->GetCollider());
+		}
 		cMane_->CheckAllCollision();
 
 
@@ -143,7 +146,6 @@ void GameScene::Draw() {
 	///　モデル描画
 	///-------------------------------------------------------------- 
 	skydome_->Draw();
-	field_->Draw();
 	fieldBlockManager_->Draw();
 	player_->Draw();
 	enemyManager_->Draw();

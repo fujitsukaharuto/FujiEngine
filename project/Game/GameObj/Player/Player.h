@@ -14,6 +14,8 @@
 /// <summary>
 /// プレイヤークラス
 /// </summary>
+
+class FieldBlockManager;
 class Player :public OriginGameObject {
 
 public:
@@ -46,6 +48,8 @@ private:
 	///private variaus
 	/// ===================================================
 
+	FieldBlockManager* pFieldBlockManager_;
+
 	// キック仮モデル
 	std::unique_ptr<Object3d>kikModel_;
 	std::unique_ptr<KikDirectionView>kikDirectionView_;
@@ -74,6 +78,7 @@ private:
 	std::unique_ptr<AABBCollider> kikCollider_;
 	std::unique_ptr<AABBCollider> collider_;
 	std::array<std::string, 2>tags_;
+	Vector3                       collisionSize_;
 
 
 public:
@@ -103,7 +108,6 @@ public:
 	void SpecialPostFall(float& speed, const bool& isJump = false);
 	void ChangeBehavior(std::unique_ptr<BasePlayerBehavior>behavior);
 	void ChangeAttackBehavior(std::unique_ptr<BasePlayerAttackBehavior>behavior);
-
 
 	/// ダメージ
 	void DamageRendition();
@@ -137,4 +141,5 @@ public:
 	/// ===================================================
 	void SetKikIsCollision(const bool& is);
 	void SetTag(const int& i);
+	void SetFieldBlockManager(FieldBlockManager*fbm);
 };

@@ -34,7 +34,8 @@ protected:
 	Paramater          paramater_;     //パラメータ
 	bool               isBreak_;
 	uint32_t           serialNum_;
-	Vector3            collisionSize_;
+	Vector3            colliderSize_;
+	bool               isCurrentCollision_;
 	
 	/// behavior
 	std::unique_ptr<BaseFieldBlockState> state_ = nullptr;
@@ -80,8 +81,10 @@ public:
 	///========================================================================================
 	Player*            GetPlayer()                         { return pPlayer_; }
 	bool               GetIsBreak()const                   { return isBreak_; }
+	bool                GetIsCurrentCollision()const       { return isCurrentCollision_; }
 	BaseFieldBlockState* GetBehavior()const                { return state_.get(); }
 	Paramater          GetParamater()const                 { return paramater_; }
+	Vector3            GetCollisionSize()const { return colliderSize_; }
 	///========================================================================================
 	///  setter method
 	///========================================================================================

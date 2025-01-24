@@ -29,20 +29,20 @@ void FieldBlock::Initialize() {
 	OriginGameObject::Initialize();
 	OriginGameObject::SetModel("FieldBlock.obj");
 
-	groupName_ = "FieldBlock"+std::to_string(serialNum_);
+	groupName_ = "FieldBlock" + std::to_string(serialNum_);
 
 	///* グローバルパラメータ
 	globalParameter_ = GlobalVariables::GetInstance();
 	globalParameter_->CreateGroup(groupName_, false);
 	AddParmGroup();
 	ApplyGlobalParameter();
-	
-	
+
+
 	// collider
 	collider_ = std::make_unique<AABBCollider>();
-	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
+	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionStay(other); });
 	collider_->SetTag(tag_);
-	SetCollisionSize(collisionSize_);
+	SetCollisionSize(colliderSize_);
 	collider_->SetParent(model_.get());
 
 	// 初期パラメータセット
@@ -56,7 +56,8 @@ void FieldBlock::Update() {
 
 	// 振る舞い更新
 	state_->Update();
-	SetCollisionSize(collisionSize_);
+	SetCollisionSize(colliderSize_);
+	isCurrentCollision_ = false;
 	// collider更新
 	collider_->InfoUpdate();
 }
@@ -82,6 +83,12 @@ void FieldBlock::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 
 }
 
+
+void  FieldBlock::OnCollisionStay(const ColliderInfo& other) {
+	if (other.tag == "Player") {
+		isCurrentCollision_ = true;
+	}
+}
 
 void FieldBlock::SetParm(const Paramater& paramater) {
 	paramater_ = paramater;
@@ -123,7 +130,7 @@ void FieldBlock::AddParmGroup() {
 	// Position
 	//globalParameter_->AddSeparatorText("Position");
 	globalParameter_->AddItem(groupName_, "Translate", model_->transform.translate);
-	globalParameter_->AddItem(groupName_, "collisionSize_", collisionSize_);
+	globalParameter_->AddItem(groupName_, "collisionSize_", colliderSize_);
 	globalParameter_->AddItem(groupName_, "LooksSize", model_->transform.scale);
 }
 
@@ -137,7 +144,7 @@ void FieldBlock::SetValues() {
 	// Position
 	//globalParameter_->AddSeparatorText("Position");
 	globalParameter_->SetValue(groupName_, "Translate", model_->transform.translate);
-	globalParameter_->SetValue(groupName_, "collisionSize_", collisionSize_);
+	globalParameter_->SetValue(groupName_, "collisionSize_", colliderSize_);
 	globalParameter_->SetValue(groupName_, "LooksSize", model_->transform.scale);
 }
 
@@ -148,8 +155,8 @@ void FieldBlock::SetValues() {
 void FieldBlock::ApplyGlobalParameter() {
 	// Position
 	model_->transform.translate = globalParameter_->GetValue<Vector3>(groupName_, "Translate");
-	collisionSize_              = globalParameter_->GetValue<Vector3>(groupName_, "collisionSize_");
-	model_->transform.scale     = globalParameter_->GetValue<Vector3>(groupName_, "LooksSize");
+	colliderSize_ = globalParameter_->GetValue<Vector3>(groupName_, "collisionSize_");
+	model_->transform.scale = globalParameter_->GetValue<Vector3>(groupName_, "LooksSize");
 }
 
 ///=========================================================
@@ -163,9 +170,10 @@ void FieldBlock::AdjustParm() {
 		ImGui::PushID(groupName_.c_str());
 		ImGuiManager::GetInstance()->SetFontJapanese();
 
-		ImGui::DragFloat3("座標", &model_->transform.translate.x,0.1f);
+		ImGui::DragFloat3("座標", &model_->transform.translate.x, 0.1f);
 		ImGui::DragFloat3("見た目スケール", &model_->transform.scale.x, 0.01f);
-		ImGui::DragFloat3("当たり判定サイズ", &collisionSize_.x, 0.01f);
+		ImGui::SeparatorText("※プログラマーが操作する場所");
+		ImGui::DragFloat3("当たり判定サイズ", &colliderSize_.x, 0.01f);
 
 		/// セーブとロード
 		globalParameter_->ParmSaveForImGui(groupName_);

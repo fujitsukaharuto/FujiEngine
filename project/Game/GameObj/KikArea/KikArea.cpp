@@ -71,7 +71,7 @@ void KikArea::Draw(Material* material) {
 	/*weakArea_->DrawCollider();
 	normalArea_->DrawCollider();
 	maxPowerArea_->DrawCollider();*/
-	specialAttackArea_->DrawCollider();
+	//specialAttackArea_->DrawCollider();
 }
 
 

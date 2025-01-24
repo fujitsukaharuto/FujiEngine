@@ -16,6 +16,7 @@
 #include"GameObj/PlayerBehavior/PlayerSpecialFall.h"
 //* obj
 #include"Field/Field.h"
+#include"GameObj/FieldBlock/FieldBlockManager.h"
 ///* std
 #include<algorithm>
 ///* imgui
@@ -37,6 +38,8 @@ void Player::Initialize() {
 	tags_[static_cast<size_t>(KikPower::WEAK)] = "WeakKik";
 	tags_[static_cast<size_t>(KikPower::MAXPOWER)] = "MaxPowerKik";
 
+	collisionSize_ = Vector3(2, 2, 15);
+
 	///* グローバルパラメータ
 	globalParameter_ = GlobalVariables::GetInstance();
 	globalParameter_->CreateGroup(groupName_, false);
@@ -51,9 +54,9 @@ void Player::Initialize() {
 	kikCollider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
 	kikCollider_->SetTag(tags_[static_cast<size_t>(KikPower::WEAK)]);
 	kikCollider_->SetParent(GetModel());
-	kikCollider_->SetWidth(2.0f);
-	kikCollider_->SetHeight(2.0f);
-	kikCollider_->SetDepth(15.0f);
+	kikCollider_->SetWidth(collisionSize_.x);
+	kikCollider_->SetHeight(collisionSize_.y);
+	kikCollider_->SetDepth(collisionSize_.z);
 	kikCollider_->SetIsCollisonCheck(false);
 	kikCollider_->SetPos(Vector3(0, 0, 1.5f));
 	kikCollider_->InfoUpdate();
@@ -96,6 +99,8 @@ void Player::Update() {
 	MoveToLimit();
 
 	ChangeKikDirection();// キック向き
+
+
 
 	collider_->InfoUpdate();
 	kikCollider_->InfoUpdate();
@@ -302,7 +307,7 @@ void Player::MoveToLimit() {
 	///-----------------------------------------------------------
 	if (!insideX) {
 		// 範囲外の場合の位置補正
-		    model_->transform.translate.x = std::clamp(
+		model_->transform.translate.x = std::clamp(
 			model_->transform.translate.x,
 			fieldCenter.x - radiusX,
 			fieldCenter.x + radiusX
@@ -366,8 +371,8 @@ void Player::AdjustParm() {
 		ImGui::DragFloat("specialAttackPostMaxFallSpeed_", &paramater_.specialAttackPostMaxFallSpeed_, 0.01f);
 		ImGui::DragFloat("RecoilSpeed", &paramater_.recoilSpeed_, 0.01f);
 		ImGui::DragFloat("キック当てた時の上に飛ぶ高さ", &paramater_.recoilJumpSpeed_, 0.01f);
-		
-		
+
+
 		ImGuiManager::GetInstance()->UnSetFont();
 		/// セーブとロード
 		globalParameter_->ParmSaveForImGui(groupName_);
@@ -485,19 +490,10 @@ void Player::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
 			ChangeAttackBehavior(std::make_unique<PlayerSpecialFall>(this));
 		}
 	}
-	/*else {
 
-		if (other.tag == "WeakArea") {
-			kikCollider_->SetTag(tags_[static_cast<size_t>(KikPower::WEAK)]);
-		}
-
-		else if (other.tag == "NormalArea") {
-			kikCollider_->SetTag(tags_[static_cast<size_t>(KikPower::NORMAL)]);
-		}
-		else	if (other.tag == "MaxPowerArea") {
-			kikCollider_->SetTag(tags_[static_cast<size_t>(KikPower::MAXPOWER)]);
-		}
-	}*/
+	if (other.tag == "FieldBlock") {
+		
+	}
 }
 
 
@@ -519,7 +515,7 @@ float Player::GetFacingDirection() const {
 
 void Player::ChangeKikDirection() {
 	Input* input = Input::GetInstance();
-	
+
 
 	float moveSpeed = paramater_.kikDirectionSpeed_ * FPSKeeper::DeltaTimeRate(); // 速度をdeltaTimeで調整
 
@@ -588,4 +584,8 @@ void Player::ChangeKikDirection() {
 
 void Player::SetTag(const int& i) {
 	kikCollider_->SetTag(tags_[i]);
+}
+
+void Player::SetFieldBlockManager(FieldBlockManager* fbm) {
+	pFieldBlockManager_ = fbm;
 }
