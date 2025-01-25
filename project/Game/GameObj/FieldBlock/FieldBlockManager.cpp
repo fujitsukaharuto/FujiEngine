@@ -121,6 +121,7 @@ void FieldBlockManager::AddParmGroup() {
 
 	globalParameter_->AddItem(groupName_, "breakCount", paramaters_.breakCount);
 	globalParameter_->AddItem(groupName_, "restoreTime_", paramaters_.restoreTime_);
+	globalParameter_->AddItem(groupName_, "damageCollTime_", paramaters_.damageCollTime_);
 }
 
 
@@ -131,6 +132,7 @@ void FieldBlockManager::SetValues() {
 
 	globalParameter_->SetValue(groupName_, "breakCount", paramaters_.breakCount);
 	globalParameter_->SetValue(groupName_, "restoreTime_", paramaters_.restoreTime_);
+	globalParameter_->SetValue(groupName_, "damageCollTime_", paramaters_.damageCollTime_);
 }
 
 
@@ -141,6 +143,7 @@ void FieldBlockManager::ApplyGlobalParameter() {
 	/// パラメータ
 	paramaters_.breakCount = globalParameter_->GetValue<int>(groupName_, "breakCount");
 	paramaters_.restoreTime_ = globalParameter_->GetValue<float>(groupName_, "restoreTime_");
+	paramaters_.damageCollTime_ = globalParameter_->GetValue<float>(groupName_, "damageCollTime_");
 }
 
 ///=========================================================
@@ -160,6 +163,7 @@ void FieldBlockManager::AdjustParm() {
 
 		ImGui::SliderInt("何回で壊れるか", &paramaters_.breakCount,0,100);
 		ImGui::DragFloat("復活までの時間(秒)", &paramaters_.restoreTime_, 0.01f);
+		ImGui::DragFloat("ダメージクールタイム", &paramaters_.damageCollTime_, 0.01f);
 
 		ImGuiManager::GetInstance()->UnSetFont();
 
@@ -173,7 +177,6 @@ void FieldBlockManager::AdjustParm() {
 	for (auto it = fieldBlocks_.begin(); it != fieldBlocks_.end(); ++it) {
 		(*it)->AdjustParm();
 	}
-	
 }
 void FieldBlockManager::SetPlayer(Player* player) {
 	pPlayer_ = player;

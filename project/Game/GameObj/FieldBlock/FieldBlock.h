@@ -2,6 +2,8 @@
 
 ///behavior
 #include"State/BaseFieldBlockState.h"
+#include"Behavior/BaseFieldBlockBehavior.h"
+
 #include"GlobalVariables.h"
 // class
 #include "OriginGameObject.h"
@@ -12,10 +14,17 @@ class Player;
 class FieldBlock : public OriginGameObject {
 	
 public:
+
+	enum class Tag {
+		NORMAL,
+		DAUNGEROUS,
+	};
+
 	// パラメータ
 	struct Paramater {
 		int   breakCount;
 		float restoreTime_;
+		float damageCollTime_;
 	};
 
 protected:
@@ -30,15 +39,17 @@ protected:
 
 			           
 	/// parm		
-	const std::string& tag_ = "FieldBlock";
+	std::array<std::string, 2>tags_;
+	std::array<std::string, 2>modelNames_;
 	Paramater          paramater_;     //パラメータ
 	bool               isBreak_;
 	uint32_t           serialNum_;
 	Vector3            colliderSize_;
-	bool               isCurrentCollision_;
+	int                hp_;
 	
 	/// behavior
 	std::unique_ptr<BaseFieldBlockState> state_ = nullptr;
+	std::unique_ptr<BaseFieldBlockBehavior>behavior_ = nullptr;
 	std::unique_ptr<AABBCollider>collider_;
 public:
 	static uint32_t nextSerialNum_;
@@ -54,13 +65,8 @@ public:
 	virtual void Update()     override;
 	virtual void Draw  (Material* mate = nullptr)override;
 
-
-	void Bound(float& speed);
-	void SpawnFall(float& speed, const bool& isJump);
-
-	void SetParm        (const Paramater&paramater);
-
-	void ChangeBehavior (std::unique_ptr<BaseFieldBlockState>behavior);
+	void ChangeState (std::unique_ptr<BaseFieldBlockState>behavior);
+	void ChangeBehavior(std::unique_ptr<BaseFieldBlockBehavior>behavior);
 
 	void          OnCollisionEnter (const ColliderInfo& other);
 	void          OnCollisionStay  (const ColliderInfo& other);
@@ -81,14 +87,19 @@ public:
 	///========================================================================================
 	Player*            GetPlayer()                         { return pPlayer_; }
 	bool               GetIsBreak()const                   { return isBreak_; }
-	bool                GetIsCurrentCollision()const       { return isCurrentCollision_; }
 	BaseFieldBlockState* GetBehavior()const                { return state_.get(); }
 	Paramater          GetParamater()const                 { return paramater_; }
-	Vector3            GetCollisionSize()const { return colliderSize_; }
+	Vector3            GetCollisionSize()const             { return colliderSize_; }
+	int                GetHp()const                        { return hp_; }
 	///========================================================================================
 	///  setter method
 	///========================================================================================
 	void               SetPlayer(Player* plyaer);
 	void               SetIsBreak(const bool& is) { isBreak_ = is; };
 	void               SetCollisionSize(const Vector3& size);
+	void               SetTag(const int& i);
+	void               DecrementHp() { hp_--; }
+	void               SetHp(const int& hp) { hp_ = hp; }
+	void SetParm(const Paramater& paramater);
+	void ChangeModel(const int& i);
 };

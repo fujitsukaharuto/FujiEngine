@@ -1,6 +1,7 @@
 {
     "FieldBlockManager": {
         "breakCount": 3,
+        "damageCollTime_": 0.27000001072883606,
         "restoreTime_": 10.0
     }
 }

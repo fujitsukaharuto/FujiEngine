@@ -7,6 +7,7 @@
 class EnemyExplotion : public BaseEnemyBehaivor {
 private:
 	enum class Step {
+		WAIT,
 		DEATH,
 	};
 private:
@@ -17,6 +18,9 @@ private:
 	ParticleEmitter bombEmit1_;
 	ParticleEmitter bombEmit2_;
 	ParticleEmitter bombEmit3_;
+
+	float waitTime_;
+	float waitTimeMax_;
 
 public:
 	//コンストラクタ

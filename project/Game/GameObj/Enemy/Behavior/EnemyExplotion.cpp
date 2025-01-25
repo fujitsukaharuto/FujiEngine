@@ -29,7 +29,10 @@ EnemyExplotion::EnemyExplotion(BaseEnemy* boss)
 	bombEmit2_.Burst();
 	bombEmit3_.Burst();
 
+	step_ = Step::WAIT;
 
+	waitTimeMax_ = 0.1f;
+	waitTime_ = waitTimeMax_;
 }
 
 EnemyExplotion::~EnemyExplotion() {
@@ -37,9 +40,27 @@ EnemyExplotion::~EnemyExplotion() {
 }
 
 void EnemyExplotion::Update() {
+	switch (step_)
+	{
+	case EnemyExplotion::Step::WAIT:
+		///-----------------------------------------------------------------
+		///
+		///-----------------------------------------------------------------
+		waitTime_ += FPSKeeper::NormalDeltaTime();
+		if (waitTime_ < waitTimeMax_)break;
+		step_ = Step::DEATH;
+		break;
+	case EnemyExplotion::Step::DEATH:
+		///-----------------------------------------------------------------
+		///
+		///-----------------------------------------------------------------
+		// 死ぬ
+		pBaseEnemy_->SetIsDeath(true);
+		break;
+	default:
+		break;
+	}
 	
-	// 死ぬ
-	pBaseEnemy_->SetIsDeath(true);
 	
 }
 

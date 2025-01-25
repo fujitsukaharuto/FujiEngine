@@ -10,7 +10,7 @@ SkyDome::~SkyDome() {}
 void SkyDome::Initialize() {
 
 	OriginGameObject::Initialize();
-	OriginGameObject::SetModel("SkyDome.obj");
+	OriginGameObject::CreateModel("SkyDome.obj");
 
 	model_->transform.scale = { 500,500,500 };
 

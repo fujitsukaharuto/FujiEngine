@@ -18,7 +18,7 @@
 ///　static 変数初期化
 ///==========================================================
 float BaseEnemy::InitY_ = 1.5f;
-float BaseEnemy::BoundPosY_ = 42.0f;
+float BaseEnemy::BoundPosY_ = 52.0f;
 float BaseEnemy::StartZPos_ = 5.0f;
 float BaseEnemy::StartYPos_ = 70.0f;
 Vector3 BaseEnemy::InitScale_ = { 1.0f,1.0f,1.0f };
@@ -52,6 +52,7 @@ void BaseEnemy::Initialize() {
 	collider_->SetHeight(2.0f);
 	collider_->SetDepth(2.0f);
 	collider_->SetParent(model_.get());
+	collider_->InfoUpdate();
 
 	// 初期パラメータセット
 	explotionTime_ = paramater_.explotionTime_;
@@ -154,6 +155,14 @@ void BaseEnemy::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 
 		// 強いふっとび当たった時
 		else if (other.tag == tags_[static_cast<size_t>(Tag::BLOWINGSTRONG)]) {
+			if (!dynamic_cast<EnemyExplotion*>(behavior_.get())) {
+				ChangeBehavior(std::make_unique<EnemyExplotion>(this)); // 爆破
+				return;
+			}
+		}
+
+		// フィールドに落ちた時
+		else if (other.tag == "NormalFieldBlock"|| other.tag == "DaungerousFieldBlock") {
 			if (!dynamic_cast<EnemyExplotion*>(behavior_.get())) {
 				ChangeBehavior(std::make_unique<EnemyExplotion>(this)); // 爆破
 				return;

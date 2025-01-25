@@ -1,12 +1,12 @@
 #pragma once
 
-#include"BaseFieldBlockState.h"
+#include"BaseFieldBlockBehavior.h"
 #include"Easing.h"
 
-class FieldBlockRoot: public BaseFieldBlockState {
+class FieldBlockNoDamage : public BaseFieldBlockBehavior {
 private:
 	enum class Step {
-		BLOW,
+		DAMAGE,
 		RETUNROOT,
 	};
 private:
@@ -17,8 +17,8 @@ private:
 
 public:
 	//コンストラクタ
-	FieldBlockRoot(FieldBlock* boss);
-	~FieldBlockRoot();
+	FieldBlockNoDamage(FieldBlock* boss);
+	~FieldBlockNoDamage();
 
 
 	void Update()override;

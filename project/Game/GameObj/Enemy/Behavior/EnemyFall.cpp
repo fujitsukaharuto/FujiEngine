@@ -45,8 +45,8 @@ void EnemyFall::Update() {
         // Y軸方向に落下
         pBaseEnemy_->AddPosition(Vector3(0, -fallspeed_ *FPSKeeper::DeltaTimeRate(), 0));
 
-        // 着地判定
-        if (pBaseEnemy_->GetTrans().translate.y > BaseEnemy::InitY_) break;
+        // 
+        if (pBaseEnemy_->GetTrans().translate.y > BaseEnemy::InitY_-10) break;
         pBaseEnemy_->SetRotation(Vector3::GetZeroVec());
         step_ = Step::LANDING;
 

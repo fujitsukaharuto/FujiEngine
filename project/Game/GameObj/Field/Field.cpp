@@ -12,7 +12,7 @@ Field::~Field() {}
 void Field::Initialize() {
 
 	OriginGameObject::Initialize();
-	OriginGameObject::SetModel("Field.obj");
+	OriginGameObject::CreateModel("Field.obj");
 	
 	model_->transform.scale = baseScale_;
 }

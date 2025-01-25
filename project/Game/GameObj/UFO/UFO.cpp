@@ -23,7 +23,7 @@ UFO::UFO() {}
 void UFO::Initialize() {
 
 	OriginGameObject::Initialize();
-	OriginGameObject::SetModel("ufo_test.obj");
+	OriginGameObject::CreateModel("ufo_test.obj");
 
 	ufoLight_ = std::make_unique<Object3d>();
 	ufoLight_->Create("ufo_light.obj");

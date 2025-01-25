@@ -23,6 +23,10 @@ void OriginGameObject::Debug() {
 }
 
 
-void OriginGameObject::SetModel(const std::string& name) {
+void OriginGameObject::CreateModel(const std::string& name) {
 	model_->Create(name);
+}
+
+void OriginGameObject::SetModel(const std::string& name) {
+	model_->SetModel(name);
 }

@@ -311,7 +311,19 @@
     <ClCompile Include="Game\GameObj\FieldBlock\State\BaseFieldBlockState.cpp">
       <Filter>Game\GameObj\FieldBlock\State</Filter>
     </ClCompile>
-    <ClCompile Include="Game\GameObj\FieldBlock\State\FieldBlockRoot.cpp">
+    <ClCompile Include="Game\GameObj\FieldBlock\State\FieldBlockNormal.cpp">
+      <Filter>Game\GameObj\FieldBlock\State</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameObj\FieldBlock\Behavior\BaseFieldBlockBehavior.cpp">
+      <Filter>Game\Behavior\FieldBLock</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameObj\FieldBlock\Behavior\FieldBlockTakeDamage.cpp">
+      <Filter>Game\Behavior\FieldBLock</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameObj\FieldBlock\Behavior\FieldBlockNoDamage.cpp">
+      <Filter>Game\Behavior\FieldBLock</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameObj\FieldBlock\State\FieldBlockDaungerous.cpp">
       <Filter>Game\GameObj\FieldBlock\State</Filter>
     </ClCompile>
   </ItemGroup>
@@ -643,7 +655,19 @@
     <ClInclude Include="Game\GameObj\FieldBlock\State\BaseFieldBlockState.h">
       <Filter>Game\GameObj\FieldBlock\State</Filter>
     </ClInclude>
-    <ClInclude Include="Game\GameObj\FieldBlock\State\FieldBlockRoot.h">
+    <ClInclude Include="Game\GameObj\FieldBlock\State\FieldBlockNormal.h">
+      <Filter>Game\GameObj\FieldBlock\State</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\FieldBlock\Behavior\BaseFieldBlockBehavior.h">
+      <Filter>Game\Behavior\FieldBLock</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\FieldBlock\Behavior\FieldBlockTakeDamage.h">
+      <Filter>Game\Behavior\FieldBLock</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\FieldBlock\Behavior\FieldBlockNoDamage.h">
+      <Filter>Game\Behavior\FieldBLock</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\FieldBlock\State\FieldBlockDaungerous.h">
       <Filter>Game\GameObj\FieldBlock\State</Filter>
     </ClInclude>
   </ItemGroup>
@@ -773,6 +797,9 @@
     </Filter>
     <Filter Include="Game\GameObj\FieldBlock\State">
       <UniqueIdentifier>{188c42d0-334f-4b8b-a44f-351c7d3a2bb2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Behavior\FieldBLock">
+      <UniqueIdentifier>{84321c48-1d70-4545-a5bf-1dd3a02739a8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

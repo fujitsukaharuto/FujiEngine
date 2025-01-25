@@ -6,7 +6,7 @@
 void StrongEnemy::Initialize() {
 	BaseEnemy::Initialize();
 
-	OriginGameObject::SetModel("StrongEnemy.obj");
+	OriginGameObject::CreateModel("StrongEnemy.obj");
 
 
 }

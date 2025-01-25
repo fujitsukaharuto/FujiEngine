@@ -34,7 +34,7 @@ Player::Player() {}
 void Player::Initialize() {
 
 	OriginGameObject::Initialize();
-	OriginGameObject::SetModel("player.obj");
+	OriginGameObject::CreateModel("player.obj");
 	tags_[static_cast<size_t>(KikPower::WEAK)] = "WeakKik";
 	tags_[static_cast<size_t>(KikPower::MAXPOWER)] = "MaxPowerKik";
 
@@ -491,8 +491,9 @@ void Player::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
 		}
 	}
 
-	if (other.tag == "FieldBlock") {
-		
+	// 死にます
+	if (other.tag == "DaungerousFieldBlock") {
+		// デス振る舞い
 	}
 }
 

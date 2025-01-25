@@ -53,9 +53,12 @@ public:
 
 	Trans transform{};
 
+	/// privateからpublicに移動
+	void SetModel(const std::string& fileName);
+
 private:
 
-	void SetModel(const std::string& fileName);
+
 
 	void CreateWVP();
 

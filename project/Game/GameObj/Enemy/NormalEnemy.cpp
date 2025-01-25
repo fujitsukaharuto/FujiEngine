@@ -6,7 +6,7 @@
 void NormalEnemy::Initialize() {
 	BaseEnemy::Initialize();
 
-	OriginGameObject::SetModel("NormalEnemy.obj");
+	OriginGameObject::CreateModel("NormalEnemy.obj");
 
 }
 

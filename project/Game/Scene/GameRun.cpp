@@ -28,7 +28,10 @@ void GameRun::Initialize() {
 	modelManager_->LoadOBJ("terrain.obj");
 	modelManager_->LoadOBJ("ufo_test.obj");
 	modelManager_->LoadOBJ("ufo_light.obj");
-	modelManager_->LoadOBJ("SkyDome.obj");
+	modelManager_->LoadOBJ("FieldBlock.obj");
+	modelManager_->LoadOBJ("daungerousBlock.obj");
+	modelManager_->LoadOBJ("NormalEnemy.obj");
+	modelManager_->LoadOBJ("StrongEnemy.obj");
 #pragma endregion
 
 
