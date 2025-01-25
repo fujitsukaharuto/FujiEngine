@@ -45,6 +45,13 @@ EnemyBlowingWeak::EnemyBlowingWeak(BaseEnemy* boss)
 	ParticleManager::Load(flyEmit1_, "flyEnemy1");
 	ParticleManager::Load(flyEmit2_, "flyEnemy2");
 
+	flyEmit1_.frequencyTime = 2.0f;
+	flyEmit1_.count = 1;
+	flyEmit1_.grain.lifeTime_ = 6.0f;
+
+	flyEmit2_.frequencyTime = 2.0f;
+	flyEmit2_.count = 1;
+	flyEmit2_.grain.lifeTime_ = 6.0f;
 
 }
 

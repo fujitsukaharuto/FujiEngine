@@ -36,6 +36,14 @@ EnemyBlowingStrong::EnemyBlowingStrong(BaseEnemy* boss)
 	ParticleManager::Load(flyEmit1_, "flyEnemy1");
 	ParticleManager::Load(flyEmit2_, "flyEnemy2");
 
+	flyEmit1_.frequencyTime = 2.0f;
+	flyEmit1_.count = 1;
+	flyEmit1_.grain.lifeTime_ = 8.0f;
+
+	flyEmit2_.frequencyTime = 2.0f;
+	flyEmit2_.count = 1;
+	flyEmit2_.grain.lifeTime_ = 8.0f;
+
 }
 
 EnemyBlowingStrong::~EnemyBlowingStrong() {
@@ -53,10 +61,11 @@ void  EnemyBlowingStrong::Update() {
 	pBaseEnemy_->SetRotation(Vector3(0, 0, rotateZ_));
 	
 	// particle
+	Vector3 flydirection = { direction_.x * FPSKeeper::DeltaTimeRate() * pBaseEnemy_->GetBlowDirection(), direction_.y * FPSKeeper::DeltaTimeRate() ,0.0f };
 	flyEmit1_.pos = pBaseEnemy_->GetModel()->GetWorldPos();
 	flyEmit2_.pos = pBaseEnemy_->GetModel()->GetWorldPos();
-	flyEmit1_.RandomSpeed({ -direction_.x,-direction_.x }, { -direction_.y,-direction_.y }, { 0.0f,0.0f });
-	flyEmit2_.RandomSpeed({ -direction_.x,-direction_.x }, { -direction_.y,-direction_.y }, { 0.0f,0.0f });
+	flyEmit1_.RandomSpeed({ -flydirection.x,-flydirection.x }, { -flydirection.y,-flydirection.y }, { 0.0f,0.0f });
+	flyEmit2_.RandomSpeed({ -flydirection.x,-flydirection.x }, { -flydirection.y,-flydirection.y }, { 0.0f,0.0f });
 	flyEmit1_.Emit();
 	flyEmit2_.Emit();
 
