@@ -24,6 +24,9 @@ private:
 	ParticleEmitter kickEmit3_;
 	ParticleEmitter kickEmit4_;
 
+	ParticleEmitter flyEmit1_;
+	ParticleEmitter flyEmit2_;
+
 public:
 	//コンストラクタ
 	EnemyBlowingStrong(BaseEnemy* boss);

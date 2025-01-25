@@ -33,6 +33,9 @@ EnemyBlowingStrong::EnemyBlowingStrong(BaseEnemy* boss)
 	kickEmit3_.Burst();
 	kickEmit4_.Burst();
 
+	ParticleManager::Load(flyEmit1_, "flyEnemy1");
+	ParticleManager::Load(flyEmit2_, "flyEnemy2");
+
 }
 
 EnemyBlowingStrong::~EnemyBlowingStrong() {
@@ -49,6 +52,14 @@ void  EnemyBlowingStrong::Update() {
 	rotateZ_ += rotateSpeed_ * FPSKeeper::DeltaTimeRate();
 	pBaseEnemy_->SetRotation(Vector3(0, 0, rotateZ_));
 	
+	// particle
+	flyEmit1_.pos = pBaseEnemy_->GetModel()->GetWorldPos();
+	flyEmit2_.pos = pBaseEnemy_->GetModel()->GetWorldPos();
+	flyEmit1_.RandomSpeed({ -direction_.x,-direction_.x }, { -direction_.y,-direction_.y }, { 0.0f,0.0f });
+	flyEmit2_.RandomSpeed({ -direction_.x,-direction_.x }, { -direction_.y,-direction_.y }, { 0.0f,0.0f });
+	flyEmit1_.Emit();
+	flyEmit2_.Emit();
+
 	
 }
 
