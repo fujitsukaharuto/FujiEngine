@@ -2,6 +2,7 @@
 
 #include"BaseEnemyBehavior.h"
 #include"Easing.h"
+#include "Particle/ParticleEmitter.h"
 
 class EnemyBlowingStrong: public BaseEnemyBehaivor {
 private:
@@ -18,6 +19,10 @@ private:
 	float rotateZ_;
 	float rotateSpeed_;
 
+	ParticleEmitter kickEmit1_;
+	ParticleEmitter kickEmit2_;
+	ParticleEmitter kickEmit3_;
+	ParticleEmitter kickEmit4_;
 
 public:
 	//コンストラクタ
