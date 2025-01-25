@@ -89,13 +89,14 @@ void PlayerAttackRoot::Update() {
 
 		 	///* 時間経過で強化キックに
 		if (chargeTime_ < pPlayer_->GetParamater().kikChargeTime_)break;
+		pPlayer_->SetTag(static_cast<size_t>(Player::KikPower::MAXPOWER));
 		step_ = Step::STRONGATTACK;
 		break;
 	case PlayerAttackRoot::Step::STRONGATTACK:
 		/// --------------------------------------------------------------
 		///  強い攻撃
 		/// ---------------------------------------------------------------
-		pPlayer_->SetTag(static_cast<size_t>(Player::KikPower::MAXPOWER));
+		
 
 		/// チャージパーティクル(つおい(赤))入れる
 		kiran1_.pos = pPlayer_->GetModel()->GetWorldPos();

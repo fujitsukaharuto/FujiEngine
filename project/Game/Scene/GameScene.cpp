@@ -71,7 +71,6 @@ void GameScene::Initialize() {
 	enemySpawn_->Init();
 	fieldBlockManager_->Initialize();
 	///set
-	player_->SetFieldBlockManager(fieldBlockManager_.get());
 	enemyManager_->SetPlayer(player_.get());
 	ufo_->SetEnemyManager(enemyManager_.get());
 	enemySpawn_->SetEnemyManager(enemyManager_.get());

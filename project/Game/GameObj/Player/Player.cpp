@@ -476,9 +476,9 @@ void Player::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 
 	if (other.tag == "FallEnemy") {
 
-		SetKikIsCollision(false);
+		/*SetKikIsCollision(false);
 		ChangeBehavior(std::make_unique<PlayerRecoil>(this));
-		ChangeAttackBehavior(std::make_unique<PlayerAttackRoot>(this));
+		ChangeAttackBehavior(std::make_unique<PlayerAttackRoot>(this));*/
 		return;
 	}
 }
@@ -587,6 +587,3 @@ void Player::SetTag(const int& i) {
 	kikCollider_->SetTag(tags_[i]);
 }
 
-void Player::SetFieldBlockManager(FieldBlockManager* fbm) {
-	pFieldBlockManager_ = fbm;
-}

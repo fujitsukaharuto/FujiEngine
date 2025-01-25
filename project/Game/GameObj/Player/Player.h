@@ -141,5 +141,5 @@ public:
 	/// ===================================================
 	void SetKikIsCollision(const bool& is);
 	void SetTag(const int& i);
-	void SetFieldBlockManager(FieldBlockManager*fbm);
+
 };
