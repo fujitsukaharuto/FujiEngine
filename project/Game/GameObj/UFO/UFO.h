@@ -11,6 +11,12 @@
 
 class EnemyManager;
 class UFO :public OriginGameObject {
+public:
+	struct Paramater {
+		Vector3 collisionSize_;
+		float dagameDistance_;
+		float damageTime_;
+	};
 
 private:
 	/// other class
@@ -37,12 +43,9 @@ private:
 	///* parm 
 	float hp_;                                    /// HP
 	float MaxHp_;
-	float popWaitTime_;                           
-	float dagameDistance_;
-	float damageTime_;
-	float damageValue_;
+	
 
-	Vector3 collisionSize_;
+	Paramater paramater_;
 
 	Vector4 ufoLightColor_ = { 0.796f,0.796f,0.129f,0.5f };
 
@@ -88,11 +91,8 @@ public:
 	/// getter method
 	/// ===================================================
 	EnemyManager* GetEnemyManager() { return pEnemyManager_; }
-	float GetPopWaitTime()const { return popWaitTime_; }
-	float GetDamageDistance()const { return dagameDistance_; }
-	float GetDamageTime()const { return damageTime_; }
+	Paramater GetParamater()const { return paramater_; }
 	bool GetIsDeath()const { return isDeath_; }
-	float GetDamageValue()const { return damageValue_; }
 	/// ===================================================
 	/// setter method
 	/// ===================================================

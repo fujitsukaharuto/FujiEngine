@@ -3,6 +3,7 @@
 #include"Behavior/UFORoot.h"
 #include"Behavior/UFOPopEnemy.h"
 #include"Behavior/UFODamage.h"
+#include"GameObj/Enemy/Behavior/EnemyBlowingWeak.h"
 //obj
 #include"GameObj/Enemy/EnemyManager.h"
 #include"GameObj/Enemy/BaseEnemy.h"
@@ -11,7 +12,7 @@
 
 ///* imgui
 #include<imgui.h> 
-
+#include"ImGuiManager.h"
 
 float UFO::InitY_ = 30.5f;
 
@@ -48,7 +49,7 @@ void UFO::Initialize() {
 	collider_ = std::make_unique<AABBCollider>();
 	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
 	collider_->SetTag("UFO");
-	SetCollisionSize(collisionSize_);
+	SetCollisionSize(paramater_.collisionSize_);
 	collider_->SetParent(model_.get());
 	collider_->InfoUpdate();
 
@@ -108,7 +109,7 @@ void UFO::DamageRendition() {
 void UFO::TakeDamageForPar(const float& par) {
 
 	//割合によるインクる面とする値を決める
-	float decrementSize = MaxHp_ * par;
+	float decrementSize = MaxHp_ * (par / 100.0f);;
 	// HP減少
 	hp_ -= decrementSize;
 
@@ -142,21 +143,24 @@ void UFO::AdjustParm() {
 #ifdef _DEBUG
 	if (ImGui::CollapsingHeader(groupName_.c_str())) {
 		ImGui::PushID(groupName_.c_str());
-		/// 位置
-		ImGui::SeparatorText("Transform");
-		ImGui::DragFloat3("Position", &model_->transform.translate.x, 0.1f);
-		ImGui::DragFloat3("CollisionSize", &collisionSize_.x, 0.1f);
+		ImGuiManager::GetInstance()->SetFontJapanese();/// 日本語
+	
+		ImGui::DragFloat3("位置", &model_->transform.translate.x, 0.1f);
+		ImGui::DragFloat3("当たり判定サイズ", &paramater_.collisionSize_.x, 0.1f);
 
-		///　Floatのパラメータ
-		ImGui::SeparatorText("FloatParamater");
-		ImGui::DragFloat("PopWaitTime(s)", &popWaitTime_, 0.01f);
-		ImGui::DragFloat("DamageTime(s)", &damageTime_, 0.01f);
-		ImGui::DragFloat("DamageDistance", &dagameDistance_, 0.01f);
-		ImGui::DragFloat("DamageValue(par)", &damageValue_, 0.01f);
+		ImGui::DragFloat("ダメージ中の時間(s)", &paramater_.damageTime_, 0.01f);
+
+		ImGui::SeparatorText("いらないかも");
+		ImGui::DragFloat("ダメージの吹っ飛び距離", &paramater_.dagameDistance_, 0.01f);
 			
 		/// セーブとロード
 		globalParameter_->ParmSaveForImGui(groupName_);
 		ParmLoadForImGui();
+
+		ImGui::SeparatorText("セーブできないデバッグ用");
+		ImGui::DragFloat("体力", &hp_, 0.01f);
+
+		ImGuiManager::GetInstance()->UnSetFont();
 		ImGui::PopID();
 	}
 
@@ -193,11 +197,9 @@ void UFO::ParmLoadForImGui() {
 void UFO::AddParmGroup() {
 
 	globalParameter_->AddItem(groupName_, "Translate", model_->transform.translate);
-	globalParameter_->AddItem(groupName_, "PopWaitTime", popWaitTime_);
-	globalParameter_->AddItem(groupName_, "DamageTime", damageTime_);
-	globalParameter_->AddItem(groupName_, "DamageDistance", dagameDistance_);
-	globalParameter_->AddItem(groupName_, "DamageValue(par)",damageValue_);
-	globalParameter_->AddItem(groupName_, "collisionSize_", collisionSize_);
+	globalParameter_->AddItem(groupName_, "DamageTime", paramater_.damageTime_);
+	globalParameter_->AddItem(groupName_, "DamageDistance", paramater_.dagameDistance_);
+	globalParameter_->AddItem(groupName_, "collisionSize_", paramater_.collisionSize_);
 }
 
 ///=================================================================================
@@ -206,11 +208,9 @@ void UFO::AddParmGroup() {
 void UFO::SetValues() {
 	
 	globalParameter_->SetValue(groupName_, "Translate", model_->transform.translate);
-	globalParameter_->SetValue(groupName_, "collisionSize_", collisionSize_);
-	globalParameter_->SetValue(groupName_, "PopWaitTime", popWaitTime_);
-	globalParameter_->SetValue(groupName_, "DamageTime", damageTime_);
-	globalParameter_->SetValue(groupName_, "DamageDistance", dagameDistance_);
-	globalParameter_->SetValue(groupName_, "DamageValue(par)", damageValue_);
+	globalParameter_->SetValue(groupName_, "collisionSize_", paramater_.collisionSize_);
+	globalParameter_->SetValue(groupName_, "DamageTime", paramater_.damageTime_);
+	globalParameter_->SetValue(groupName_, "DamageDistance", paramater_.dagameDistance_);
 	
 }
 
@@ -219,11 +219,9 @@ void UFO::SetValues() {
 ///===================================================== 
 void UFO::ApplyGlobalParameter() {
 	model_->transform.translate = globalParameter_->GetValue<Vector3>(groupName_, "Translate");
-	collisionSize_ = globalParameter_->GetValue<Vector3>(groupName_, "collisionSize_");
-	popWaitTime_ = globalParameter_->GetValue<float>(groupName_, "PopWaitTime");
-	damageTime_ = globalParameter_->GetValue<float>(groupName_, "DamageTime");
-	dagameDistance_ = globalParameter_->GetValue<float>(groupName_, "DamageDistance");
-	damageValue_ = globalParameter_->GetValue<float>(groupName_, "DamageValue(par)");
+	paramater_.collisionSize_ = globalParameter_->GetValue<Vector3>(groupName_, "collisionSize_");
+	paramater_.damageTime_ = globalParameter_->GetValue<float>(groupName_, "DamageTime");
+	paramater_.dagameDistance_ = globalParameter_->GetValue<float>(groupName_, "DamageDistance");
 }
 ///=========================================================
 /// Class Set
@@ -235,10 +233,34 @@ void UFO::SetEnemyManager(EnemyManager* enemymanager) {
 
 void UFO::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 
-	if (other.tag == "EnemyJump") {
+	/// 弱い吹っ飛びをくらってる
+	if (other.tag == "BlowingWeakEnemy") {
+
+		// ダメージ量分受ける
+		for (auto& enemy : pEnemyManager_->GetEnemies()) {
+			if (dynamic_cast<EnemyBlowingWeak*>(enemy->GetBehavior())) {
+				TakeDamageForPar(enemy->GetSumWeakAttackValue());
+			}
+		}
+
+		// ダメージ演出
 		if (dynamic_cast<UFODamage*>(behavior_.get()))return;
 		ChangeBehavior(std::make_unique<UFODamage>(this));
+		return;
 	}
+
+	/// つおい吹っ飛び
+	if (other.tag == "BlowingStrongEnemy") {
+	
+		//デカダメージ受ける（一定）
+		TakeDamageForPar(pEnemyManager_->GetParamater(static_cast<size_t>(BaseEnemy::Type::NORMAL)).strongAttackValue);
+
+		// ダメージ演出
+		if (dynamic_cast<UFODamage*>(behavior_.get()))return;
+		ChangeBehavior(std::make_unique<UFODamage>(this));
+		return;
+	}
+
 
 }
 

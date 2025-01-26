@@ -152,7 +152,17 @@ void EnemyManager::AddParmGroup() {
 		globalParameter_->AddItem(
 			groupName_,
 			"AttackValue" + std::to_string(int(i + 1)),
-			paramaters_[i].attackValue);
+			paramaters_[i].weakAttackValue);
+
+		globalParameter_->AddItem(
+			groupName_,
+			"plusAttackValue" + std::to_string(int(i + 1)),
+			paramaters_[i].plusAttackValue);
+
+		globalParameter_->AddItem(
+			groupName_,
+			"strongAttackValue" + std::to_string(int(i + 1)),
+			paramaters_[i].strongAttackValue);
 
 
 		globalParameter_->AddItem(
@@ -214,8 +224,17 @@ void EnemyManager::SetValues() {
 		globalParameter_->SetValue(
 			groupName_,
 			"AttackValue" + std::to_string(int(i + 1)),
-			paramaters_[i].attackValue);
+			paramaters_[i].weakAttackValue);
 
+		globalParameter_->SetValue(
+			groupName_,
+			"plusAttackValue" + std::to_string(int(i + 1)),
+			paramaters_[i].plusAttackValue);
+
+		globalParameter_->SetValue(
+			groupName_,
+			"strongAttackValue" + std::to_string(int(i + 1)),
+			paramaters_[i].strongAttackValue);
 
 		globalParameter_->SetValue(
 			groupName_,
@@ -272,9 +291,17 @@ void EnemyManager::ApplyGlobalParameter() {
 			groupName_,
 			"FallSpeed" + std::to_string(int(i + 1)));
 
-		paramaters_[i].attackValue = globalParameter_->GetValue<float>(
+		paramaters_[i].weakAttackValue = globalParameter_->GetValue<float>(
 			groupName_,
 			"AttackValue" + std::to_string(int(i + 1)));
+
+		paramaters_[i].plusAttackValue = globalParameter_->GetValue<float>(
+			groupName_,
+			"plusAttackValue" + std::to_string(int(i + 1)));
+
+		paramaters_[i].strongAttackValue = globalParameter_->GetValue<float>(
+			groupName_,
+			"strongAttackValue" + std::to_string(int(i + 1)));
 
 
 		paramaters_[i].blowingPower[static_cast<size_t>(BaseEnemy::BlowingPower::WEAK)] = globalParameter_->GetValue<float>(
@@ -357,9 +384,18 @@ void EnemyManager::AdjustParm() {
 				&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].fallSpeed,
 				0.01f);
 
-			ImGui::DragFloat("攻撃力",
-				&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].attackValue,
-				0.01f);
+			ImGui::DragFloat("弱い初期攻撃力(%)",
+				&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].weakAttackValue,
+				0.01f,0,100);
+
+			ImGui::DragFloat("合体した時の攻撃力上昇値(%)",
+				&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].plusAttackValue,
+				0.01f, 0, 100);
+
+			ImGui::DragFloat("強い攻撃力(%)",
+				&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].strongAttackValue,
+				0.01f, 0, 100);
+
 
 			ImGui::DragFloat("弱いキックでの吹っ飛び(毎秒)",
 				&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].blowingPower[static_cast<size_t>(BaseEnemy::BlowingPower::WEAK)],
@@ -416,8 +452,17 @@ void EnemyManager::AdjustParm() {
 				&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].fallSpeed,
 				0.01f);
 
-			ImGui::DragFloat("攻撃力",
-				&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].attackValue,
+			ImGui::DragFloat("弱い初期攻撃力",
+				&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].weakAttackValue,
+				0.01f);
+
+			ImGui::DragFloat("合体した時の攻撃力上昇値",
+				&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].plusAttackValue,
+				0.01f);
+
+
+			ImGui::DragFloat("強い攻撃力",
+				&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].strongAttackValue,
 				0.01f);
 
 			ImGui::DragFloat("弱いキックでの吹っ飛び(毎秒)",

@@ -83,11 +83,11 @@ public:
     void ApplyGlobalParameter();
     void AdjustParm();
 
+
     ///========================================================
-    /// setter method
+    /// getter method
     ///========================================================
-    void SetPlayer(Player* plyaer);
-    void SetLockon(LockOn* lockOn);
+    BaseEnemy::Paramater GetParamater(const int& i)const { return paramaters_[i]; }
 
     // 現在の敵リスト取得
     const std::list<std::unique_ptr<BaseEnemy>>& GetEnemies() const {
@@ -98,7 +98,15 @@ public:
         return enemyTypes_;
     }
 
-   std::string GetEnemyType(int type)const {
+    std::string GetEnemyType(int type)const {
         return enemyTypes_[type];
     }
+
+    ///========================================================
+    /// setter method
+    ///========================================================
+    void SetPlayer(Player* plyaer);
+    void SetLockon(LockOn* lockOn);
+
+
 };

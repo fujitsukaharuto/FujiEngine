@@ -11,7 +11,6 @@
 class Player;
 class BaseEnemy : public OriginGameObject {
 private:
-	std::unique_ptr<AABBCollider>collider_;
 	
 public:
 	enum class Type {
@@ -37,7 +36,9 @@ public:
 		float                spawnBoundGravity;
 		float                spawnBoundGravityMax;
 		float                fallSpeed;                /// 落ちる速さ
-		float                attackValue;              /// 攻撃力
+		float                weakAttackValue;              /// 攻撃力
+		float                strongAttackValue;
+		float                plusAttackValue;          /// 加算攻撃力
 		float                explotionTime_;           ///　爆発時間
 		float                explotionExtensionTime_;  ///  爆発延長時間
 		std::array<float, 2> blowingPower;             ///  吹っ飛びスピード
@@ -47,6 +48,7 @@ protected:
 
 	/// other class
 	Player*                            pPlayer_;
+	std::unique_ptr<AABBCollider>      collider_;
 			                           
 	bool                               isdeath_;
 	Easing                             spawnEasing_;
@@ -57,7 +59,7 @@ protected:
 	std::array<std::string, 3>         tags_;
 	float                              explotionTime_; //爆発時間
 	float                              blowDirection_;
-	
+	float                              sumWeakAttackValue_;
 	/// behavior
 	std::unique_ptr<BaseEnemyBehaivor> behavior_ = nullptr;
 
@@ -101,6 +103,7 @@ public:
 	Paramater          GetParamater()const                 { return paramater_; }
 	float              GetExplotionTime()const             { return explotionTime_; }
 	float              GetBlowDirection()const             { return blowDirection_; }
+	float              GetSumWeakAttackValue()const        { return sumWeakAttackValue_; }
 	///========================================================================================
 	///  setter method
 	///========================================================================================

@@ -1,6 +1,6 @@
 {
     "Enemies": {
-        "AttackValue1": 0.0,
+        "AttackValue1": 11.760000228881836,
         "AttackValue2": 0.0,
         "FallSpeed1": 2.890000104904175,
         "FallSpeed2": 0.0,
@@ -12,6 +12,8 @@
         "explotionExtensionTime_2": 0.0,
         "explotionTime_1": 2.1500000953674316,
         "explotionTime_2": 0.0,
+        "plusAttackValue1": 4.650000095367432,
+        "plusAttackValue2": 0.0,
         "spawnBoundGravity1": 30.219999313354492,
         "spawnBoundGravity2": 0.0,
         "spawnBoundGravityMax1": 26.579999923706055,
@@ -19,6 +21,8 @@
         "spawnBoundSpeed1": 17.889999389648438,
         "spawnBoundSpeed2": 0.0,
         "spawnFallSpeed1": 16.18000030517578,
-        "spawnFallSpeed2": 0.0
+        "spawnFallSpeed2": 0.0,
+        "strongAttackValue1": 16.469999313354492,
+        "strongAttackValue2": 0.0
     }
 }

@@ -24,10 +24,9 @@ UFODamage::UFODamage(UFO* player)
 	///---------------------------------------------------
 	///変数初期化
 	///---------------------------------------------------
-	easing_.maxTime = pUFO_->GetDamageTime();
+	easing_.maxTime = pUFO_->GetParamater().damageTime_;
 	initPos_ = pUFO_->GetModel()->GetWorldPos();
 
-	pUFO_->TakeDamageForPar(pUFO_->GetDamageValue());
 	pUFO_->SetColor(Vector4(1, 0, 0, 1));
 
 	step_ = Step::HITBACK;
@@ -49,7 +48,7 @@ void UFODamage::Update() {
 		easing_.time += FPSKeeper::DeltaTimeRate();
 
 		pUFO_->SetWorldPositionY(
-			EaseOutBack(initPos_.y, initPos_.y + pUFO_->GetDamageDistance(), 
+			EaseOutBack(initPos_.y, initPos_.y + pUFO_->GetParamater().dagameDistance_, 
 				       easing_.time, easing_.maxTime)
 		);
 		

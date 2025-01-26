@@ -57,6 +57,7 @@ void BaseEnemy::Initialize() {
 	// 初期パラメータセット
 	explotionTime_ = paramater_.explotionTime_;
 	blowDirection_ = 1.0f;
+	sumWeakAttackValue_ = paramater_.weakAttackValue;
 	ChangeBehavior(std::make_unique<EnemySpawnFall>(this)); /// 追っかけ
 }
 
@@ -184,10 +185,12 @@ void BaseEnemy::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 			}
 		}
 		else {
-			// 弱いキックを受けてる時
+			// 弱いキックに当たったら
 			if (collider_->GetTag() == tags_[static_cast<size_t>(Tag::BLOWINGWEAK)]) {
 				if (other.tag == tags_[static_cast<size_t>(Tag::FALL)]) {
+					// パラメータ加算
 					explotionTime_ += paramater_.explotionExtensionTime_;
+					sumWeakAttackValue_ += paramater_.plusAttackValue;
 					return;
 				}
 			}
