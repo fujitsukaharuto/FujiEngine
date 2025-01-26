@@ -96,6 +96,7 @@ void TitleScene::Update() {
 	sphere->SetLightEnable(static_cast<LightMode>(mode_));
 	terain->SetLightEnable(static_cast<LightMode>(mode_));
 	plane->SetLightEnable(static_cast<LightMode>(mode_));
+	plane2->SetLightEnable(static_cast<LightMode>(mode_));
 	ImGui::End();
 
 	PointLightManager::GetInstance()->GetDirectionLight()->Debug();
@@ -185,11 +186,7 @@ void TitleScene::BlackFade() {
 		}
 	}
 	else {
-		if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
-			if (blackTime == 0.0f) {
-				isChangeFase = true;
-			}
-		}
+		
 	}
 }
 
