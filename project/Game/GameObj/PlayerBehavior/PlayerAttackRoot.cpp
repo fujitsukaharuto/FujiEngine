@@ -65,7 +65,7 @@ void PlayerAttackRoot::Update() {
 		/// ---------------------------------------------------------------
 		
 		// チャージ
-		if (Input::GetInstance()->PushKey(DIK_K)) {
+		if (Input::GetInstance()->PushKey(DIK_K) || Input::GetInstance()->PressButton(PadInput::B)) {
 			chargeTime_ += FPSKeeper::NormalDeltaTime();
 			/// チャージパーティクル入れる
 			charge1_.pos = pPlayer_->GetModel()->GetWorldPos();
@@ -79,7 +79,7 @@ void PlayerAttackRoot::Update() {
 		}
 		
 		///* ボタン離したらキック攻撃開始
-		if (Input::GetInstance()->ReleaseKey(DIK_K)) {
+		if (Input::GetInstance()->ReleaseKey(DIK_K) || Input::GetInstance()->ReleaseButton(PadInput::B)) {
 			pPlayer_->ChangeAttackBehavior(std::make_unique<PlayerKikAttack>(pPlayer_));
 			return;
 		}
