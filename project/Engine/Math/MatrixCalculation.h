@@ -76,9 +76,16 @@ struct MaterialDataPath {
 	std::string textureFilePath;
 };
 
+struct Node {
+	Matrix4x4 local;
+	std::string name;
+	std::vector<Node> children;
+};
+
 struct ModelData {
 	std::vector<VertexDate> vertices;
 	MaterialDataPath material;
+	Node rootNode;
 };
 
 struct ParticleDate {
@@ -113,10 +120,10 @@ struct FireElement {
 	float blendStrength;// どれくらい混ぜるか
 };
 
-//struct CRTElemnt {
-//	float crtTime;
-//	Vector2 resolution;
-//};
+struct CRTElemnt {
+	float crtTime;
+	Vector2 resolution;
+};
 
 struct LightningElement {
 	Vector2 startPos;

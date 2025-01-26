@@ -121,6 +121,103 @@ void ModelManager::LoadOBJ(const std::string& filename) {
 	instance->models_.insert(std::make_pair(filename, std::move(model)));
 }
 
+void ModelManager::LoadGLTF(const std::string& filename) {
+	ModelManager* instance = GetInstance();
+
+	auto iterator = instance->models_.find(filename);
+	if (iterator != instance->models_.end()) {
+		return;
+	}
+
+
+	std::unique_ptr<Model> model;
+	model.reset(new Model());
+	Mesh newMesh{};
+	Material newMaterial{};
+
+
+	Assimp::Importer importer;
+	std::string path = instance->kDirectoryPath_ + "/" + filename;
+	const aiScene* scene = importer.ReadFile(path.c_str(), aiProcess_FlipWindingOrder | aiProcess_FlipUVs);
+	assert(scene->HasMeshes());
+
+
+	// Mesh解析
+	for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; meshIndex++) {
+
+		aiMesh* mesh = scene->mMeshes[meshIndex];
+		assert(mesh->HasNormals());
+		bool hasTexcoord = mesh->HasTextureCoords(0);
+
+
+		// Face解析
+		for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; faceIndex++) {
+
+			aiFace& face = mesh->mFaces[faceIndex];
+			assert(face.mNumIndices == 3);
+
+			// Vertex解析
+			for (uint32_t element = 0; element < face.mNumIndices; element++) {
+
+				uint32_t vertexIndex = face.mIndices[element];
+				aiVector3D& position = mesh->mVertices[vertexIndex];
+				aiVector3D& normal = mesh->mNormals[vertexIndex];
+
+				VertexDate vertex;
+				vertex.position = { position.x,position.y,position.z,1.0f };
+				vertex.normal = { normal.x,normal.y,normal.z };
+
+				if (hasTexcoord) {
+					aiVector3D& texcoord = mesh->mTextureCoords[0][vertexIndex];
+					vertex.texcoord = { texcoord.x,texcoord.y };
+				}
+				else {
+					vertex.texcoord = { 0.0f,0.0f };
+				}
+
+
+				vertex.position.x *= -1.0f;
+				vertex.normal.x *= -1.0f;
+
+				newMesh.AddVertex({ {vertex.position},{vertex.texcoord},{vertex.normal} });
+
+			}
+		}
+	}
+
+	// Material解析
+	for (uint32_t materialIndex = 0; materialIndex < scene->mNumMaterials; materialIndex++) {
+
+		aiMaterial* material = scene->mMaterials[materialIndex];
+
+		if (material->GetTextureCount(aiTextureType_DIFFUSE) != 0) {
+
+			aiString textureFileName;
+			material->GetTexture(aiTextureType_DIFFUSE, 0, &textureFileName);
+			newMaterial.SetTextureNamePath((textureFileName).C_Str());
+			newMaterial.CreateMaterial();
+			model->AddMaterial(newMaterial);
+			model->SetTextureName((textureFileName).C_Str());
+		}
+	}
+
+	if (model->GetTextuerName().empty()) {
+		const std::string defaultTexture = "white2x2.png";
+		newMaterial.SetTextureNamePath(defaultTexture);
+		newMaterial.CreateMaterial();
+		model->AddMaterial(newMaterial);
+		model->SetTextureName(defaultTexture);
+	}
+
+
+	newMesh.CreateMesh();
+
+	model->AddMesh(newMesh);
+	model->data_.rootNode = ReadNode(scene->mRootNode);
+
+	instance->models_.insert(std::make_pair(filename, std::move(model)));
+}
+
 
 Model* ModelManager::FindModel(const std::string& filename) {
 	ModelManager* instance = GetInstance();
@@ -237,4 +334,38 @@ MaterialDataPath ModelManager::LoadMaterialFile(const std::string& filename) {
 	}
 
 	return materialData;
+}
+
+Node ModelManager::ReadNode(aiNode* node) {
+	Node result;
+	aiMatrix4x4 ailocal = node->mTransformation;
+	ailocal.Transpose();
+	result.local.m[0][0] = ailocal[0][0];
+	result.local.m[0][1] = ailocal[0][1];
+	result.local.m[0][2] = ailocal[0][2];
+	result.local.m[0][3] = ailocal[0][3];
+
+	result.local.m[1][0] = ailocal[1][0];
+	result.local.m[1][1] = ailocal[1][1];
+	result.local.m[1][2] = ailocal[1][2];
+	result.local.m[1][3] = ailocal[1][3];
+
+	result.local.m[2][0] = ailocal[2][0];
+	result.local.m[2][1] = ailocal[2][1];
+	result.local.m[2][2] = ailocal[2][2];
+	result.local.m[2][3] = ailocal[2][3];
+
+	result.local.m[3][0] = ailocal[3][0];
+	result.local.m[3][1] = ailocal[3][1];
+	result.local.m[3][2] = ailocal[3][2];
+	result.local.m[3][3] = ailocal[3][3];
+
+
+	result.name = node->mName.C_Str();
+	result.children.resize(node->mNumChildren);
+	for (uint32_t i = 0; i < node->mNumChildren; i++) {
+		result.children[i] = ReadNode(node->mChildren[i]);
+	}
+
+	return result;
 }

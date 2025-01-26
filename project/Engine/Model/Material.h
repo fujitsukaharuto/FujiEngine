@@ -10,6 +10,7 @@ enum LightMode {
 	kBlinnPhongReflection,
 	kPointLightON,
 	kSpotLightON,
+	kRectLightON,
 };
 
 

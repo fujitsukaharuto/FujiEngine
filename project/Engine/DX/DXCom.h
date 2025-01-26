@@ -203,8 +203,8 @@ private:
 	LightningElement* thunderData_;
 	int nowTex;
 
-	/*Microsoft::WRL::ComPtr<ID3D12Resource> cRTResource_ = nullptr;
-	CRTElemnt* crtData_;*/
+	Microsoft::WRL::ComPtr<ID3D12Resource> cRTResource_ = nullptr;
+	CRTElemnt* crtData_;
 
 
 	Texture* baseTex_;
@@ -219,7 +219,7 @@ private:
 	bool isShockWave_ = true;
 	bool isFire_ = true;
 	bool isThunder_ = true;
-	//bool isCRT_ = true;
+	bool isCRT_ = true;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexGrayResource_ = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexGrayBufferView_{};

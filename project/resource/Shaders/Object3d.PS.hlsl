@@ -42,6 +42,18 @@ struct SpotLight
     float cosStart;
 };
 
+struct RectLight
+{
+    float4 color;
+    float3 pos;
+    float padding1;
+    float3 normal;
+    float padding2;
+    float2 size;
+    float intensity;
+    float padding3;
+};
+
 ConstantBuffer<Material> gMaterial : register(b0);
 Texture2D<float4> gTexture : register(t0);
 SamplerState gSampler : register(s0);
@@ -51,13 +63,78 @@ ConstantBuffer<DirectionalLight> gDirectionnalLight : register(b1);
 ConstantBuffer<Camera> gCamera : register(b2);
 ConstantBuffer<PointLight> gPointLight : register(b3);
 ConstantBuffer<SpotLight> gSpotLight : register(b4);
-
-
+ConstantBuffer<RectLight> gRectLight : register(b5);
 
 struct PixelShaderOutput
 {
     float4 color : SV_TARGET0;
 };
+
+
+
+float2 Hammersley(int i, int N)
+{
+    if (N == 0)
+        return float2(0, 0);
+    float p = 0.0;
+    float f = 0.5;
+    while (i > 0)
+    {
+        p += f * (i % 2);
+        i /= 2;
+        f *= 0.5;
+    }
+    return float2((float) i / (float) N, p);
+}
+
+float3 ComputeAreaLight(RectLight light, float3 P, float3 N, float3 toEye, float shininess)
+{
+    float3 resultDiffuse = 0;
+    float3 resultSpecular = 0;
+    int numSamples = 8;
+
+ 
+    float3 normal = normalize(light.normal);
+    float3 tangent = normalize(cross(float3(0, 1, 0), normal));
+    if (dot(tangent, tangent) < 0.01)
+    {
+        tangent = normalize(cross(float3(1, 0, 0), normal));
+    }
+    float3 bitangent = normalize(cross(light.normal, tangent));
+
+    float3 lightRight = tangent * (light.size.x * 0.5f);
+    float3 lightUp = bitangent * (light.size.y * 0.5f);
+
+    for (int i = 0; i < numSamples; ++i)
+    {
+        float2 randomUV = Hammersley(i, numSamples);
+        float3 samplePoint = light.pos +
+                             (randomUV.x - 0.5f) * 2.0f * lightRight +
+                             (randomUV.y - 0.5f) * 2.0f * lightUp;
+
+        float3 L = normalize(samplePoint - P);
+        float NdotL = max(dot(N, L), 0.0);
+
+        float distance = length(samplePoint - P);
+        float attenuation = 1.0 / (1.0 + 0.1 * distance * distance);
+
+        resultDiffuse += light.color.rgb * light.intensity * NdotL * attenuation;
+
+
+        float3 halfVector = normalize(L + toEye);
+        float NDotH = max(dot(N, halfVector), 0.0);
+        float specularPow = pow(NDotH, shininess);
+        resultSpecular += light.color.rgb * light.intensity * specularPow * attenuation;
+    }
+
+ 
+    resultDiffuse /= numSamples;
+    resultSpecular /= numSamples;
+
+    return saturate(resultDiffuse + resultSpecular);
+}
+
+
 
 PixelShaderOutput main(VertxShaderOutput input)
 {
@@ -198,6 +275,30 @@ PixelShaderOutput main(VertxShaderOutput input)
             
             output.color.rgb = diffuse + specular + diffuseSpot + specularSpot;
             output.color.a = gMaterial.color.a * textureColor.a;
+            if (output.color.a == 0.0)
+            {
+                discard;
+            }
+        }
+        if (gMaterial.enableLighting == 7)
+        {
+            float NdotL = dot(normalize(input.normal), -gDirectionnalLight.direction);
+            float cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
+            
+            float3 toEye = normalize(gCamera.worldPosition - input.WorldPosition);
+            float3 halfVector = normalize(-gDirectionnalLight.direction + toEye);
+            float NDotH = dot(normalize(input.normal), halfVector);
+            float specularPow = pow(saturate(NDotH), gMaterial.shininess);
+            float3 diffuse = gMaterial.color.rgb * textureColor.rgb * gDirectionnalLight.color.rgb * cos * gDirectionnalLight.intensity;
+            float3 specular = gDirectionnalLight.color.rgb * gDirectionnalLight.intensity * specularPow * float3(1.0f, 1.0f, 1.0f);
+
+            RectLight rect = gRectLight;
+            float3 areaLightResult = ComputeAreaLight(rect, input.WorldPosition, normalize(input.normal), toEye, gMaterial.shininess);
+
+
+            output.color.rgb = areaLightResult + (diffuse + specular);
+            output.color.a = gMaterial.color.a * textureColor.a;
+
             if (output.color.a == 0.0)
             {
                 discard;

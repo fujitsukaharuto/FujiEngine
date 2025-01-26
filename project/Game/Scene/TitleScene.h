@@ -20,12 +20,14 @@ private:
 
 	std::unique_ptr<Object3dCommon> obj3dCommon = nullptr;
 	std::unique_ptr<Object3d> sphere = nullptr;
-	Vector3 rightDir = { 1.0f,0.0f,0.0f };
+	std::unique_ptr<Object3d> plane = nullptr;
+	std::unique_ptr<Object3d> plane2 = nullptr;
+	std::unique_ptr<Object3d> terain = nullptr;
+	int mode_ = 6;
 
 	ParticleEmitter emit;
 
-	std::unique_ptr<TestBaseObj> test_;
-	std::unique_ptr<TestBaseObj> test2_;
+
 	std::unique_ptr<CollisionManager> cMane_;
 
 

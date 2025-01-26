@@ -6,8 +6,6 @@
 #include "Object3dCommon.h"
 
 
-class PointLight;
-class SpotLight;
 
 class Object3d {
 public:
@@ -21,6 +19,7 @@ public:
 	void CreateSphere();
 
 	void Draw(Material* mate = nullptr);
+	void DrawGltf(Material* mate = nullptr);
 
 	void AnimeDraw();
 
@@ -33,8 +32,6 @@ public:
 	void SetColor(const Vector4& color);
 
 	void SetUVScale(const Vector2& scale, const Vector2& uvTrans);
-
-	void SetRightDir(const Vector3& right) { directionalLightData_->direction = right; }
 
 	void SetCamera(Camera* camera) { this->camera_ = camera; }
 
@@ -60,14 +57,14 @@ private:
 	void CreateWVP();
 
 	void SetWVP();
+	void SetGltfWVP();
 
 	void SetBillboardWVP();
 
 private:
 	Object3dCommon* common_;
 	std::unique_ptr<Model> model_ = nullptr;
-	PointLight* pointLight_;
-	SpotLight* spotLight_;
+
 	Camera* camera_;
 	Object3d* parent_ = nullptr;
 
@@ -75,9 +72,6 @@ private:
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource_ = nullptr;
 	TransformationMatrix* wvpDate_ = nullptr;
-
-	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_ = nullptr;
-	DirectionalLight* directionalLightData_ = nullptr;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> cameraPosResource_ = nullptr;
 	CameraForGPU* cameraPosData_ = nullptr;

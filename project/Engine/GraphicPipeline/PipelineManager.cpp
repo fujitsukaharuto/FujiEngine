@@ -94,9 +94,9 @@ void PipelineManager::CreatePipeline() {
 	thunderPipe->Initialize();
 	pipelines_.push_back(std::move(thunderPipe));
 
-	//crtPipe.reset(new CRTPipe);
-	//crtPipe->Initialize();
-	//pipelines_.push_back(std::move(crtPipe));
+	crtPipe.reset(new CRTPipe);
+	crtPipe->Initialize();
+	pipelines_.push_back(std::move(crtPipe));
 
 }
 

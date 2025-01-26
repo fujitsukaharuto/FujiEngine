@@ -208,7 +208,7 @@ void DXCom::CreateRenderTargets() {
 	thunderData_->branchCount = 4.0f;
 	thunderData_->branchFade = 20.0f;
 	thunderData_->highlightStrength = 15.0f;
-	thunderData_->noiseScale = 0.2f;
+	thunderData_->noiseScale = 0.02f;
 	thunderData_->noiseSpeed = 5.0f;
 	thunderData_->rangeMin = { 0.0f,0.0f };
 	thunderData_->rangeMax = { 1.0f,1.0f };
@@ -218,11 +218,11 @@ void DXCom::CreateRenderTargets() {
 	thunderData_->boltCount = 3.0f;
 
 
-	/*cRTResource_ = CreateBufferResource(device_, sizeof(CRTElemnt));
+	cRTResource_ = CreateBufferResource(device_, sizeof(CRTElemnt));
 	crtData_ = nullptr;
 	cRTResource_->Map(0, nullptr, reinterpret_cast<void**>(&crtData_));
 	crtData_->crtTime = 0.0f;
-	crtData_->resolution = { 1280.0f, 720.0f };*/
+	crtData_->resolution = { 1280.0f, 720.0f };
 
 }
 
@@ -308,7 +308,7 @@ void DXCom::SettingGraphicPipeline() {
 	isShockWave_ = false;
 	isFire_ = false;
 	isThunder_ = false;
-	//isCRT_ = false;
+	isCRT_ = false;
 }
 
 void DXCom::CreateBarrier(D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after) {
@@ -478,7 +478,7 @@ void DXCom::PostEffect() {
 		commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
 	}
 
-	/*if (isCRT_) {
+	if (isCRT_) {
 		command_->SetViewAndscissor();
 		pipeManager_->SetPipeline(Pipe::CRT);
 
@@ -488,7 +488,7 @@ void DXCom::PostEffect() {
 		commandList->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
 		commandList->SetGraphicsRootConstantBufferView(1, cRTResource_->GetGPUVirtualAddress());
 		commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
-	}*/
+	}
 
 }
 
@@ -552,17 +552,16 @@ void DXCom::UpDate() {
 	bool preIsShock_ = isShockWave_;
 	bool preIsFire_ = isFire_;
 	bool preIsThunder_ = isThunder_;
-	//bool preIsCRT_ = isCRT_;
+	bool preIsCRT_ = isCRT_;
 
 	if (ImGui::TreeNode("OffScreen ShaderPath")) {
-		ImGui::Checkbox("Gray", &isGrayscale_);
 		ImGui::Checkbox("None", &isNonePost_);
-		ImGui::Checkbox("Meta", &isMetaBall_);
+		ImGui::Checkbox("Gray", &isGrayscale_);
 		ImGui::Checkbox("Blur", &isGaussian_);
 		ImGui::Checkbox("shock", &isShockWave_);
 		ImGui::Checkbox("fire", &isFire_);
 		ImGui::Checkbox("thunder", &isThunder_);
-		//ImGui::Checkbox("crt", &isCRT_);
+		ImGui::Checkbox("crt", &isCRT_);
 		ImGui::TreePop();
 	}
 	if (isGrayscale_ && !(preIsGrayscale_)) {
@@ -572,7 +571,7 @@ void DXCom::UpDate() {
 		isShockWave_ = false;
 		isFire_ = false;
 		isThunder_ = false;
-		//isCRT_ = false;
+		isCRT_ = false;
 	}
 	if (isNonePost_ && !(preIsNonePost_)) {
 		isGrayscale_ = false;
@@ -581,7 +580,7 @@ void DXCom::UpDate() {
 		isShockWave_ = false;
 		isFire_ = false;
 		isThunder_ = false;
-		//isCRT_ = false;
+		isCRT_ = false;
 	}
 	if (isMetaBall_ && !(preIsMetaBall_)) {
 		isGrayscale_ = false;
@@ -590,7 +589,7 @@ void DXCom::UpDate() {
 		isShockWave_ = false;
 		isFire_ = false;
 		isThunder_ = false;
-		//isCRT_ = false;
+		isCRT_ = false;
 	}
 	if (isGaussian_ && !(preIsGaussian_)) {
 		isGrayscale_ = false;
@@ -599,7 +598,7 @@ void DXCom::UpDate() {
 		isShockWave_ = false;
 		isFire_ = false;
 		isThunder_ = false;
-		//isCRT_ = false;
+		isCRT_ = false;
 	}
 	if (isShockWave_ && !(preIsShock_)) {
 		isGrayscale_ = false;
@@ -608,7 +607,7 @@ void DXCom::UpDate() {
 		isGaussian_ = false;
 		isFire_ = false;
 		isThunder_ = false;
-		//isCRT_ = false;
+		isCRT_ = false;
 	}
 	if (isFire_ && !(preIsFire_)) {
 		isGrayscale_ = false;
@@ -617,7 +616,7 @@ void DXCom::UpDate() {
 		isGaussian_ = false;
 		isShockWave_ = false;
 		isThunder_ = false;
-		//isCRT_ = false;
+		isCRT_ = false;
 	}
 	if (isThunder_ && !(preIsThunder_)) {
 		isGrayscale_ = false;
@@ -626,9 +625,9 @@ void DXCom::UpDate() {
 		isGaussian_ = false;
 		isShockWave_ = false;
 		isFire_ = false;
-		//isCRT_ = false;
+		isCRT_ = false;
 	}
-	/*if (isCRT_ && !(preIsCRT_)) {
+	if (isCRT_ && !(preIsCRT_)) {
 		isGrayscale_ = false;
 		isNonePost_ = false;
 		isMetaBall_ = false;
@@ -636,7 +635,7 @@ void DXCom::UpDate() {
 		isShockWave_ = false;
 		isFire_ = false;
 		isThunder_ = false;
-	}*/
+	}
 
 
 
@@ -707,7 +706,7 @@ void DXCom::UpDate() {
 	thunderData_->time = std::fmodf(thunderData_->time, 1.5f);
 	thunderData_->progres = thunderData_->time / 1.5f;
 
-	//crtData_->crtTime += 0.025f;
+	crtData_->crtTime += 0.025f;
 
 #endif // _DEBUG
 

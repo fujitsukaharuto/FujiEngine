@@ -33,6 +33,8 @@ public:
 
 	void SetLightEnable(LightMode mode);
 
+	ModelData data_;
+
 private:
 
 

@@ -24,8 +24,9 @@ void PointLight::SetLightCommand(ID3D12GraphicsCommandList* commandList) {
 
 #ifdef _DEBUG
 void PointLight::Debug() {
-	ImGui::Begin("spotlight");
+	ImGui::Begin("pointLight");
 
+	ImGui::ColorEdit4("color", &pointLightData_->color.x);
 	ImGui::DragFloat3("position", &pointLightData_->position.x, 0.1f);
 	ImGui::DragFloat("intensity", &pointLightData_->intensity, 0.01f);
 	ImGui::DragFloat("distance", &pointLightData_->radius, 0.01f);

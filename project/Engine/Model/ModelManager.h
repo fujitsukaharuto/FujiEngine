@@ -3,6 +3,7 @@
 #include <memory>
 #include <map>
 #include "Model.h"
+#include <assimp/scene.h>
 
 #include "externals/DirectXTex/DirectXTex.h"
 #include "externals/DirectXTex/d3dx12.h"
@@ -23,6 +24,7 @@ public:
 	void Finalize();
 
 	static void LoadOBJ(const std::string& filename);
+	static void LoadGLTF(const std::string& filename);
 
 	static Model* FindModel(const std::string& filename);
 
@@ -33,6 +35,7 @@ public:
 private:
 
 	static MaterialDataPath LoadMaterialFile(const std::string& filename);
+	static Node ReadNode(aiNode* node);
 
 private:
 

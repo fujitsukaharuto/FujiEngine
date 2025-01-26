@@ -16,6 +16,13 @@ void PointLightManager::Update() {
 
 }
 
+void PointLightManager::CreateLight() {
+	directionLight_ = std::make_unique<DirectionLight>();
+	directionLight_->Initialize();
+	rectLight_ = std::make_unique<RectLight>();
+	rectLight_->Initialize();
+}
+
 void PointLightManager::AddPointLight() {
 	std::unique_ptr<PointLight> newPoint;
 	newPoint.reset(new PointLight());
@@ -32,6 +39,8 @@ void PointLightManager::AddSpotLight() {
 
 void PointLightManager::SetLightCommand(ID3D12GraphicsCommandList* commandList) {
 
+	directionLight_->SetLightCommand(commandList);
 	pointLights_[0]->SetLightCommand(commandList);
 	spotLights_[0]->SetLightCommand(commandList);
+	rectLight_->SetLightCommand(commandList);
 }

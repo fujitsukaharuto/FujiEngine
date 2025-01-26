@@ -52,6 +52,7 @@ void Framework::Init() {
 	modelManager_ = ModelManager::GetInstance();
 
 	pointLightManager_ = PointLightManager::GetInstance();
+	pointLightManager_->CreateLight();
 	pointLightManager_->AddPointLight();
 	pointLightManager_->AddSpotLight();
 

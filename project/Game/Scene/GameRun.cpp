@@ -22,6 +22,9 @@ void GameRun::Initialize() {
 	modelManager_->LoadOBJ("suzanne.obj");
 	modelManager_->LoadOBJ("Fence.obj");
 	modelManager_->LoadOBJ("terrain.obj");
+	modelManager_->LoadOBJ("plane.obj");
+	modelManager_->LoadGLTF("plane.gltf");
+
 #pragma endregion
 
 

@@ -8,6 +8,7 @@
 #include "Model/Line3dDrawer.h"
 #include "Particle/ParticleManager.h"
 #include "Scene/SceneManager.h"
+#include "Light/PointLightManager.h"
 
 
 TitleScene::TitleScene() {}
@@ -34,14 +35,24 @@ void TitleScene::Initialize() {
 	sphere = std::make_unique<Object3d>();
 	sphere->CreateSphere();
 
-	test_ = std::make_unique<TestBaseObj>();
+	terain = std::make_unique<Object3d>();
+	terain->Create("terrain.obj");
+
+	plane = std::make_unique<Object3d>();
+	plane->Create("plane.gltf");
+
+	plane2 = std::make_unique<Object3d>();
+	plane2->Create("plane.obj");
+	plane2->transform.translate.y = 3.0f;
+
+	/*test_ = std::make_unique<TestBaseObj>();
 	test_->Initialize();
 	test_->name_ = "testObj";
 	test_->GetCollider()->SetIsCollisonCheck(false);
 
 	test2_ = std::make_unique<TestBaseObj>();
 	test2_->Initialize();
-	test2_->name_ = "testObj2";
+	test2_->name_ = "testObj2";*/
 
 	cMane_ = std::make_unique<CollisionManager>();
 
@@ -58,17 +69,40 @@ void TitleScene::Update() {
 
 	ImGui::Begin("Sphere");
 
+	ImGui::DragFloat3("trans", &sphere->transform.translate.x, 0.01f);
 	ImGui::DragFloat3("scale", &sphere->transform.scale.x, 0.01f);
 	ImGui::DragFloat3("rotate", &sphere->transform.rotate.x, 0.01f);
-	ImGui::DragFloat3("right", &rightDir.x, 0.01f);
-	rightDir = rightDir.Normalize();
-	sphere->SetRightDir(rightDir);
+
 	ImGui::End();
 
-	emit.DebugGUI();
+	ImGui::Begin("planeGLTF");
 
-	test_->Debug();
-	test2_->Debug();
+	ImGui::DragFloat3("trans", &plane->transform.translate.x, 0.01f);
+	ImGui::DragFloat3("scale", &plane->transform.scale.x, 0.01f);
+	ImGui::DragFloat3("rotate", &plane->transform.rotate.x, 0.01f);
+
+	ImGui::End();
+
+	ImGui::Begin("plane");
+
+	ImGui::DragFloat3("trans", &plane2->transform.translate.x, 0.01f);
+	ImGui::DragFloat3("scale", &plane2->transform.scale.x, 0.01f);
+	ImGui::DragFloat3("rotate", &plane2->transform.rotate.x, 0.01f);
+
+	ImGui::End();
+
+	ImGui::Begin("lightMode");
+	ImGui::Combo("lightMode", &mode_, "kLightNone\0kLightHalfLambert\0kLightLambert\0kPhongReflect\0kBlinnPhongReflection\0kPointLightON\0kSpotLightON\0kRectLightON\0");
+	sphere->SetLightEnable(static_cast<LightMode>(mode_));
+	terain->SetLightEnable(static_cast<LightMode>(mode_));
+	plane->SetLightEnable(static_cast<LightMode>(mode_));
+	ImGui::End();
+
+	PointLightManager::GetInstance()->GetDirectionLight()->Debug();
+	PointLightManager::GetInstance()->GetPointLight(0)->Debug();
+	PointLightManager::GetInstance()->GetSpotLight(0)->Debug();
+	PointLightManager::GetInstance()->GetRectLight()->Debug();
+
 
 #endif // _DEBUG
 
@@ -77,19 +111,9 @@ void TitleScene::Update() {
 
 	BlackFade();
 
-	test_->Update();
-	test2_->Update();
-
-
-	if (input_->TriggerKey(DIK_5)) {
-		emit.Emit();
-	}
-	emit.Emit();
 
 	sphere->transform.rotate.y += 0.02f;
 
-	cMane_->AddCollider(test_->GetCollider());
-	cMane_->AddCollider(test2_->GetCollider());
 	cMane_->CheckAllCollision();
 
 	ParticleManager::GetInstance()->Update();
@@ -107,14 +131,13 @@ void TitleScene::Draw() {
 #pragma region 3Dオブジェクト
 	obj3dCommon->PreDraw();
 	sphere->Draw();
-	test_->Draw();
-
+	plane->DrawGltf();
+	plane2->Draw();
+	terain->Draw();
 	ParticleManager::GetInstance()->Draw();
 
 #ifdef _DEBUG
-	emit.DrawSize();
-	test_->DrawCollider();
-	test2_->DrawCollider();
+
 #endif // _DEBUG
 	Line3dDrawer::GetInstance()->Render();
 
