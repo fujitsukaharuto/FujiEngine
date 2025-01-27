@@ -2,8 +2,8 @@
 #include<imgui.h>
 #include "assert.h"
 
-Vector3 Field::baseTranslate_ = { 2.5f,0,0 };
-Vector3 Field::baseScale_ = {27.1f,1,5};
+Vector3 Field::baseTranslate_ = { 0.3f,0,0 };
+Vector3 Field::baseScale_ = {24.9f,1,5};
 
 Field::Field() {}
 
