@@ -8,6 +8,7 @@
 /// math
 #include"MathFunction.h"
 #include"FPSKeeper.h"
+#include "Particle/ParticleManager.h"
 
 
 //初期化
@@ -21,6 +22,10 @@ EnemySpawnFall::EnemySpawnFall(BaseEnemy* boss)
 	gotoFrontEase_.maxTime = 0.7f;
 
 	step_ = Step::FALL;
+
+	ParticleManager::Load(star1_, "star1");
+	ParticleManager::Load(star2_, "star2");
+
 }
 
 EnemySpawnFall::~EnemySpawnFall() {
@@ -38,6 +43,10 @@ void EnemySpawnFall::Update() {
 		pBaseEnemy_->AddPosition(Vector3(0, -speed_ * FPSKeeper::DeltaTimeRate(), 0));
 
 		if (pBaseEnemy_->GetModel()->GetWorldPos().y > BaseEnemy::BoundPosY_)break;
+		star1_.pos = pBaseEnemy_->GetModel()->GetWorldPos();
+		star2_.pos = pBaseEnemy_->GetModel()->GetWorldPos();
+		star1_.Burst();
+		star2_.Burst();
 		step_ = Step::BOUND;
 
 		break;

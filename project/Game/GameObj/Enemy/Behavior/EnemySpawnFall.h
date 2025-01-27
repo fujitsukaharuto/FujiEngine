@@ -2,6 +2,7 @@
 
 #include"BaseEnemyBehavior.h"
 #include"Easing.h"
+#include "Particle/ParticleEmitter.h"
 
 class EnemySpawnFall : public BaseEnemyBehaivor {
 private:
@@ -20,6 +21,9 @@ private:
 	float rotateSpeed_;
 
 	Easing gotoFrontEase_;
+
+	ParticleEmitter star1_;
+	ParticleEmitter star2_;
 
 public:
 	//コンストラクタ
