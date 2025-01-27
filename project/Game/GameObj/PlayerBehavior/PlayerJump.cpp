@@ -23,6 +23,9 @@ PlayerJump::PlayerJump(Player* player)
 
 	speed_ = pPlayer_->GetParamater().jumpSpeed_;
 
+	jumpSE_ = Audio::GetInstance()->SoundLoadWave("jump.wav");
+	Audio::GetInstance()->SoundPlayWave(jumpSE_);
+
 	/*pPlayer_->SetJumpSpeed(1.5f);*/
 }
 

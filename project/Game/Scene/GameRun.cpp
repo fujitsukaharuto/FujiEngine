@@ -76,6 +76,7 @@ void GameRun::Initialize() {
 	audio_->LoadWave("kickHit.wav");
 	audio_->LoadWave("kickCharge.wav");
 	audio_->LoadWave("mini_bomb2.wav");
+	audio_->LoadWave("jump.wav");
 
 
 #pragma endregion

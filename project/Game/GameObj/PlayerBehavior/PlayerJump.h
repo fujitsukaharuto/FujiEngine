@@ -2,6 +2,7 @@
 
 #include"BasePlayerBehavior.h"
 #include"math/Easing.h"
+#include "Audio/Audio.h"
 
 class PlayerJump : public BasePlayerBehavior {
 private:
@@ -9,6 +10,8 @@ private:
 	/// ===================================================
 	///private varians
 	/// ===================================================
+
+	SoundData jumpSE_;
 
 public:
 	//コンストラクタ
