@@ -100,7 +100,6 @@ void GameScene::Update() {
 		
 		timer_->Update();
 		timer_->SetTextureRangeForDigit();
-		timer_->SetPos(Vector3(100,100,1));
 
 		enemySpawn_->Update();
 		field_->Update();
@@ -171,14 +170,13 @@ void GameScene::Draw() {
 
 	dxCommon_->PreSpriteDraw();
 
-	timer_->Draw();
-
 	if (isMenu_) {
 		menuPaneru_->Draw();
 		menuButton1_->Draw();
 		menuButton2_->Draw();
 	}
 	keyPaneru_->Draw();
+	timer_->Draw();
 	if (blackTime != 0.0f) {
 		black_->Draw();
 	}
@@ -373,6 +371,7 @@ void GameScene::ParamaterEdit() {
 	
 	ImGui::Begin("DebugParm");
 	field_->Debug();
+	timer_->Debug();
 	ImGui::End();
 #endif
 }

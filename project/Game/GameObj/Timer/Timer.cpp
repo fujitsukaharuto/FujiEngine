@@ -1,8 +1,16 @@
 #include"Timer.h"
 #include"DX/FPSKeeper.h"
 
+#include<imgui.h>
+
 // 初期化
 void Timer::Init() {
+
+	// タイムの点々
+	timeDotSprite_ = std::make_unique<Sprite>();
+	timeDotSprite_->Load("GameTexture/timeDot.png");
+
+	// 数字
 	for (int i = 0; i < sprites_.size(); i++) {
 		sprites_[i] = std::make_unique<Sprite>();
 		sprites_[i]->Load("GameTexture/TimeNumber.png");
@@ -12,29 +20,44 @@ void Timer::Init() {
 		textureIndex_[i] = 0;
 	}
 	time_ = 0;
-	timeCount_ = 0;
+	basePos_ = { 857.7f,155.0f,0.0f };
+	dotPos_ = { 952.0f,194.0f,0.0f };
 }
 
 // 更新
 void Timer::Update() {
+	// 秒加算
 	time_ += FPSKeeper::DeltaTimeRate();
+
+	// 位置セット
+	float offset = kTextureWidth * 1.0f; //数字間のオフセット
+	for (int i = 0; i < sprites_.size(); i++) {
+		sprites_[i]->SetPos({ basePos_.x + offset * i,basePos_.y,basePos_.z });
+	}
+
+	//dot
+	timeDotSprite_->SetPos(dotPos_);
 }
 
 void Timer::SetTextureRangeForDigit() {
+
 	// 分と秒を取得
 	int timeValue = static_cast<int>(time_);
-	int minute = timeValue / 60; // 分を算出
+	int minute = timeValue / 60; // 分
 	int second = timeValue % 60; // 秒を算出
 
 	// 各桁の数字を計算
-	int num3 = second % 10;          /// 1桁（秒）
-	int num2 = second / 10 % 10;     /// 2桁（秒）
-	int num1 = minute % 100 % 10;  	/// 3桁（分）
+	int s1 = second % 10;              /// 1桁（秒）
+	int s2 = second / 10 % 10;         /// 2桁（秒）
+	int m1 = minute % 10;  	           /// 1桁（分）
+	int m2 = minute/10 % 10;  	       /// 2桁（分）
 
 	// 表示する数字を確定
-	textureIndex_[static_cast<int>(Digit::FIRST)] = num1;
-	textureIndex_[static_cast<int>(Digit::SECOND)] = num2;
-	textureIndex_[static_cast<int>(Digit::THIRD)] = num3;
+	textureIndex_[static_cast<int>(Digit::MFIRST)]  = m1;
+	textureIndex_[static_cast<int>(Digit::MSECOND)] = m2;
+	textureIndex_[static_cast<int>(Digit::SFIRST)]  = s1;
+	textureIndex_[static_cast<int>(Digit::SSECOND)] = s2;
+
 
 	// 描画範囲をセット
 	for (int i = 0; i < sprites_.size(); i++) {
@@ -44,14 +67,27 @@ void Timer::SetTextureRangeForDigit() {
 
 // 描画
 void Timer::Draw() {
+	/// time
 	for (int i = 0; i < sprites_.size(); i++) {
 		sprites_[i]->Draw();
 	}
+
+	/// dot
+	timeDotSprite_->Draw();
 }
 
-void Timer::SetPos(const Vector3& pos) {
-	float offset = kTextureWidth * 1.2f; //数字間のオフセット
-	for (int i = 0; i < sprites_.size(); i++) {
-		sprites_[i]->SetPos({ pos.x + offset * i,pos.y,pos.z });
+void Timer::SetPos(const Vector3& pos, const Vector3& dotPos) {
+	basePos_ = pos;
+	dotPos_ = dotPos;
+}
+
+void Timer::Debug(){
+	if(ImGui::CollapsingHeader("Time")) {
+		ImGui::PushID("Time");
+		ImGui::DragFloat3("BasePos", &basePos_.x, 0.1f);
+		ImGui::DragFloat3("DotPos",  &dotPos_.x,  0.1f);
+
+		ImGui::PopID();
+			
 	}
 }

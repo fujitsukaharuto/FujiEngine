@@ -7,18 +7,26 @@
 class Timer {
 public:
     enum class Digit {
-        FIRST,
-        SECOND,
-        THIRD,
+        MSECOND,
+        MFIRST,
+        SSECOND,
+        SFIRST,
     };
 
 private:
-    std::array<std::unique_ptr<Sprite>, 3> sprites_;
+    /// ------------------------------------------------------
+    /// private variant
+    /// ------------------------------------------------------
+    std::array<std::unique_ptr<Sprite>, 4> sprites_;
+    std::unique_ptr<Sprite> timeDotSprite_;
     float time_;
-    float timeCount_;
-    std::array<int,3> textureIndex_;
+    std::array<int,4> textureIndex_;
     const float kTextureWidth = 48;//テクスチャの1枚の幅
     const float kTextureHeight = 86;//テクスチャの1枚の高さ
+
+    //pos
+    Vector3 basePos_;
+    Vector3 dotPos_;
 public:
     /// ------------------------------------------------------
     /// public method
@@ -27,5 +35,8 @@ public:
     void Update();
     void SetTextureRangeForDigit();
     void Draw();
-    void SetPos(const Vector3& pos);
+
+    void Debug();
+
+    void SetPos(const Vector3&pos, const Vector3& dotPos);
 };
