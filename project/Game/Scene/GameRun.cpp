@@ -15,8 +15,10 @@ void GameRun::Initialize() {
 
 #pragma region テクスチャ読み込み
 	textureManager_->Load("uvChecker.png");
-	textureManager_->Load("title_none.png");
+	textureManager_->Load("title.png");
+	textureManager_->Load("clear.png");
 	textureManager_->Load("key.png");
+	textureManager_->Load("uiHome.png");
 	textureManager_->Load("menu_button1.png");
 	textureManager_->Load("menu_button2.png");
 #pragma endregion

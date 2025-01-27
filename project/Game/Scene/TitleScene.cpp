@@ -32,7 +32,7 @@ void TitleScene::Initialize() {
 #pragma endregion
 
 	titlePaneru_ = std::make_unique<Sprite>();
-	titlePaneru_->Load("title_none.png");
+	titlePaneru_->Load("title.png");
 	titlePaneru_->SetAnchor({ 0.0f,0.0f });
 
 

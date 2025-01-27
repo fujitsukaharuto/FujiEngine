@@ -68,7 +68,7 @@ private:
 
 	ParticleEmitter emit;
 
-
+	Vector4 colorUihome = { 0.0f,0.0f,0.0f,1.0f };
 	std::unique_ptr<Sprite> keyPaneru_;
 
 	std::unique_ptr<Sprite> menuPaneru_;

@@ -33,7 +33,7 @@ void ResultScene::Initialize() {
 #pragma endregion
 
 	clearPaneru_ = std::make_unique<Sprite>();
-	clearPaneru_->Load("clear_none.png");
+	clearPaneru_->Load("clear.png");
 	clearPaneru_->SetAnchor({ 0.0f,0.0f });
 
 	sphere = std::make_unique<Object3d>();
