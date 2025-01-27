@@ -14,9 +14,10 @@
 //初期化
 EnemyPowerUp::EnemyPowerUp(BaseEnemy* boss)
 	: BaseEnemyState("EnemyPowerUp", boss) {
-
+	
+	ease_.time = 0.0f;
 	ease_.maxTime = 0.4f;
-	ease_.amplitude = 3.8f;
+	ease_.amplitude = 1.8f;
 	ease_.period = 0.2f;
 	/*saveScale_ = pBaseEnemy_->GetPowerUpScale();*/
 	step_ = Step::SCALEUP; /// ステップ初期化
