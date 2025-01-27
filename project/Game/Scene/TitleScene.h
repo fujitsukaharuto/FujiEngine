@@ -22,7 +22,8 @@ private:
 	std::unique_ptr<Object3d> sphere = nullptr;
 	Vector3 rightDir = { 1.0f,0.0f,0.0f };
 
-	ParticleEmitter emit;
+	ParticleEmitter emit1;
+	ParticleEmitter emit2;
 
 	std::unique_ptr<TestBaseObj> test_;
 	std::unique_ptr<TestBaseObj> test2_;
