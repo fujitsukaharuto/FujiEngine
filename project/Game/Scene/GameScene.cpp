@@ -57,7 +57,7 @@ void GameScene::Initialize() {
 	startUI_ = std::make_unique<Sprite>();
 	startUI_->Load("startUI.png");
 	startUI_->SetAnchor({ 0.0f,0.0f });
-	startUI_->SetPos({ 1100.0f,0.0f,0.0f });
+	startUI_->SetPos(startUIPos_);
 
 	obj3dCommon.reset(new Object3dCommon());
 	obj3dCommon->Initialize();
@@ -405,15 +405,15 @@ void GameScene::StartUI() {
 		
 		float t = slideTime_ / slideLimitteTime_;
 		if (t < 0.5f) {
-			// easeOutExpo
-			t = 1.0f - std::pow(2.0f, -10.0f * t);
+			// easeOutExpo: 0 ~ 0.5 にスケール
+			t = (1.0f - std::pow(2.0f, -10.0f * t)) * 0.5f;
 		}
 		else {
-			// easeInExpo
-			t = std::pow(2.0f, 10.0f * (t - 1.0f));
+			// easeInExpo: 0.5 ~ 1 にスケール
+			t = 0.5f + (std::pow(2.0f, 10.0f * (t - 0.5f)) - 1.0f) * 0.5f;
 		}
 
-		startUIPos_.x = Lerp(1100.0f, -1100.0f, t);
+		startUIPos_.x = Lerp(1020.0f, -1100.0f, t);
 
 		if (slideTime_ >= slideLimitteTime_) {
 			startUIPos_.x = -1100.0f;

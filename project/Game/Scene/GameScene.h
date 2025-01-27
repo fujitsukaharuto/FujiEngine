@@ -75,9 +75,9 @@ private:
 	std::unique_ptr<Sprite> keyPaneru_;
 
 	std::unique_ptr<Sprite> startUI_;
-	Vector3 startUIPos_ = { 1100.0f,0.0f,0.0f };
+	Vector3 startUIPos_ = { 1020.0f,0.0f,0.0f };
 	float slideTime_ = 0.0f;
-	float slideLimitteTime_ = 10.0f;
+	float slideLimitteTime_ = 5.0f;
 	std::unique_ptr<Sprite> menuPaneru_;
 	std::unique_ptr<Sprite> menuButton1_;
 	std::unique_ptr<Sprite> menuButton2_;
