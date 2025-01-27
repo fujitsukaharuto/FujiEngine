@@ -13,7 +13,7 @@ private:
 
 	Step step_;
 	float collTime_;
-
+	Vector3 originPos_{};
 
 public:
 	//コンストラクタ

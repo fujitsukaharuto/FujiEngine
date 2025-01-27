@@ -9,6 +9,7 @@
 
 /// math
 #include"MathFunction.h"
+#include "Math/Random.h"
 #include"FPSKeeper.h"
 
 
@@ -17,6 +18,7 @@ FieldBlockTakeDamage::FieldBlockTakeDamage(FieldBlock* boss)
 	: BaseFieldBlockBehavior("FieldBlockTakeDamage", boss) {
 	
 	pFieldBlock_->GetModel()->SetColor(Vector4(1, 0, 0, 1));
+	originPos_ = pFieldBlock_->GetModel()->transform.translate;
 	collTime_ = 0.0f;
 	pFieldBlock_->DecrementHp();
 	step_ = Step::DAMAGE;
@@ -27,6 +29,9 @@ FieldBlockTakeDamage::~FieldBlockTakeDamage() {
 }
 
 void  FieldBlockTakeDamage::Update() {
+	float limitte = 0;
+	float shakeRate = 0;
+	float shakeValue = 0;
 	switch (step_)
 	{
 	case FieldBlockTakeDamage::Step::DAMAGE:
@@ -34,7 +39,14 @@ void  FieldBlockTakeDamage::Update() {
 		/// ダメージ
 		///----------------------------------------------------------
 		collTime_ += FPSKeeper::NormalDeltaTime();
-		if (collTime_ < pFieldBlock_->GetParamater().damageCollTime_)break;
+
+		// シェイク
+		limitte = pFieldBlock_->GetParamater().damageCollTime_;
+		shakeRate = limitte - collTime_ / limitte;
+		shakeValue = 1.0f * shakeRate;
+		pFieldBlock_->GetModel()->transform.translate = originPos_ + Random::GetVector3({ -shakeValue,shakeValue }, { -shakeValue,shakeValue }, { -shakeValue,shakeValue });
+
+		if (collTime_ < limitte)break;
 		step_ = Step::NODAMAGE;
 		break;
 	case FieldBlockTakeDamage::Step::NODAMAGE:
@@ -42,6 +54,7 @@ void  FieldBlockTakeDamage::Update() {
 		/// 通常モードに
 		///----------------------------------------------------------
 
+		pFieldBlock_->GetModel()->transform.translate = originPos_;
 		pFieldBlock_->ChangeBehavior(std::make_unique<FieldBlockNoDamage>(pFieldBlock_));
 		break;
 	default:
