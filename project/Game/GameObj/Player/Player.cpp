@@ -135,18 +135,32 @@ Vector3 Player::GetInputVelocity() {
 	inputDirection_ = { 0.0f, 0.0f, 0.0f };
 	Input* input = Input::GetInstance();
 
-
-	if (input->PushKey(DIK_A)) {
-		inputDirection_.x -= 1.0f;  // 左移動
+	if (input->PushKey(DIK_A) || input->PushKey(DIK_D)) {
+		if (input->PushKey(DIK_A)) {
+			inputDirection_.x -= 1.0f;  // 左移動
+		}
+		else if (input->PushKey(DIK_D)) {
+			inputDirection_.x += 1.0f;  // 右移動
+		}
 	}
-	if (input->PushKey(DIK_D)) {
-		inputDirection_.x += 1.0f;  // 右移動
-	}
-
 	// ジョイスティック入力
-	if (input->GetGamepadState(joyState)) {
-		inputDirection_.x += (float)joyState.Gamepad.sThumbLX / SHRT_MAX;
-		/*	velocity.z += (float)joyState.Gamepad.sThumbLY / SHRT_MAX;*/
+	else if (input->GetGamepadState(joyState)) {
+		// DPAD
+		if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT||
+			joyState.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_LEFT) {
+
+			if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_LEFT) {
+				inputDirection_.x -= 1.0f;
+			}
+			else if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT) {
+				inputDirection_.x += 1.0f;
+			}
+		}
+		else {
+			///　Stick
+			inputDirection_.x += (float)joyState.Gamepad.sThumbLX / SHRT_MAX;
+			/*	velocity.z += (float)joyState.Gamepad.sThumbLY / SHRT_MAX;*/
+		}
 	}
 
 	return inputDirection_;
@@ -198,7 +212,7 @@ bool Player::GetIsMoving() {
 		if (input->PushKey(DIK_A)) {
 			keyBoradVelocity.x -= 1.0f;  // 左移動
 		}
-		if (input->PushKey(DIK_D)) {
+		else if (input->PushKey(DIK_D)) {
 			keyBoradVelocity.x += 1.0f;  // 右移動
 		}
 		if ((keyBoradVelocity).Length() > 0) {
@@ -210,8 +224,25 @@ bool Player::GetIsMoving() {
 	///----------------------------------------------------
 
 	else if (Input::GetInstance()->GetGamepadState(joyState)) {
-		// 移動量
-		StickVelocity = { (float)joyState.Gamepad.sThumbLX / SHRT_MAX, 0, 0 };
+
+		// DPAD
+		if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT ||
+			joyState.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_LEFT) {
+
+			if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_LEFT) {
+				StickVelocity.x -= 1.0f;
+			}
+			else if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT) {
+				StickVelocity.x += 1.0f;
+			}
+		}
+		/// Stick
+		else {
+			
+			StickVelocity = { (float)joyState.Gamepad.sThumbLX / SHRT_MAX, 0, 0 };
+		}
+
+		//移動条件
 		if ((StickVelocity).Length() > thresholdValue) {
 			isMoving = true;
 		};

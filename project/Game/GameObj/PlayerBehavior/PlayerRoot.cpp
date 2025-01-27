@@ -48,13 +48,27 @@ void PlayerRoot::Update() {
 }
 
 void PlayerRoot::JumpForJoyState() {
-	if (!(Input::GetInstance()->GetGamepadState(joyState))) return;
+	bool isMoving = false;
+	const float thresholdValue = 0.8f;
+	Vector3 StickVelocity;
 
-	if (!((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A))) return;
+	// 移動量の計算（スティックの入力値を正規化）
+	StickVelocity = { 0.0f, (float)joyState.Gamepad.sThumbLY / SHRT_MAX, 0.0f };
 
-	pPlayer_->ChangeBehavior(std::make_unique<PlayerJump>(pPlayer_));
+	// スティックの移動が一定値を超えているかチェック
+	if (StickVelocity.Length() > thresholdValue) {
+		isMoving = true;
+	}
 
+	// ジャンプの条件を追加
+	// Aボタンが押されている、またはスティックが一定以上上方向に倒されている場合にジャンプ
+	if ((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A)       || 
+		(joyState.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP) ||
+		isMoving) {
+		pPlayer_->ChangeBehavior(std::make_unique<PlayerJump>(pPlayer_));
+	}
 }
+ 
 
 
 
