@@ -3,6 +3,7 @@
 #include "Particle/ParticleEmitter.h"
 #include"BaseEnemyBehavior.h"
 #include"Easing.h"
+#include "Audio/Audio.h"
 
 class EnemyBlowingWeak : public BaseEnemyBehaivor {
 private:
@@ -31,6 +32,8 @@ private:
 
 	ParticleEmitter flyEmit1_;
 	ParticleEmitter flyEmit2_;
+
+	SoundData kickHit_;
 
 public:
 	//コンストラクタ

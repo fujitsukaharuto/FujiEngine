@@ -29,6 +29,9 @@ EnemyExplotion::EnemyExplotion(BaseEnemy* boss)
 	bombEmit2_.Burst();
 	bombEmit3_.Burst();
 
+	bomb_ = Audio::GetInstance()->SoundLoadWave("mini_bomb2.wav");
+	Audio::GetInstance()->SoundPlayWave(bomb_);
+
 	step_ = Step::WAIT;
 
 	waitTimeMax_ = 0.1f;

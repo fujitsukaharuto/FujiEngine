@@ -53,6 +53,9 @@ EnemyBlowingWeak::EnemyBlowingWeak(BaseEnemy* boss)
 	flyEmit2_.count = 1;
 	flyEmit2_.grain.lifeTime_ = 6.0f;
 
+	kickHit_ = Audio::GetInstance()->SoundLoadWave("kickHit.wav");
+	Audio::GetInstance()->SoundPlayWave(kickHit_);
+
 }
 
 EnemyBlowingWeak::~EnemyBlowingWeak() {

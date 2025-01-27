@@ -4,6 +4,7 @@
 #include"math/Easing.h"
 #include"Collider/AABBCollider.h"
 #include "Particle/ParticleEmitter.h"
+#include "Audio/Audio.h"
 
 class PlayerAttackRoot : public BasePlayerAttackBehavior {
 private:
@@ -27,6 +28,8 @@ private:
 	ParticleEmitter kiran1_;
 	ParticleEmitter kiran2_;
 
+	SoundData kickAir_;
+	SoundData kickCharge_;
 
 public:
 	//コンストラクタ

@@ -70,6 +70,11 @@ void GameRun::Initialize() {
 
 	audio_->LoadWave("xxx.wav");
 	audio_->LoadWave("mokugyo.wav");
+	audio_->LoadWave("kickAir.wav");
+	audio_->LoadWave("kickHit.wav");
+	audio_->LoadWave("kickCharge.wav");
+	audio_->LoadWave("mini_bomb2.wav");
+
 
 #pragma endregion
 

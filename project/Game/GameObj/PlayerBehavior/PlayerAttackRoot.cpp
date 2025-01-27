@@ -29,6 +29,9 @@ PlayerAttackRoot::PlayerAttackRoot(Player* boss)
 	ParticleManager::Load(kiran1_, "kiran1");
 	ParticleManager::Load(kiran2_, "kiran2");
 
+	kickAir_ = Audio::GetInstance()->SoundLoadWave("kickAir.wav");
+	kickCharge_ = Audio::GetInstance()->SoundLoadWave("kickCharge.wav");
+
 }
 
 PlayerAttackRoot ::~PlayerAttackRoot() {
@@ -77,12 +80,14 @@ void PlayerAttackRoot::Update() {
 		
 		///* ボタン離したらキック攻撃開始
 		if (Input::GetInstance()->ReleaseKey(DIK_K) || Input::GetInstance()->ReleaseButton(PadInput::B)) {
+			Audio::GetInstance()->SoundPlayWave(kickAir_);
 			pPlayer_->ChangeAttackBehavior(std::make_unique<PlayerKikAttack>(pPlayer_));
 			return;
 		}
 
 		 	///* 時間経過で強化キックに
 		if (chargeTime_ < pPlayer_->GetParamater().kikChargeTime_)break;
+		Audio::GetInstance()->SoundPlayWave(kickCharge_);
 		pPlayer_->SetTag(static_cast<size_t>(Player::KikPower::MAXPOWER));
 		step_ = Step::STRONGATTACK;
 		break;
@@ -97,12 +102,10 @@ void PlayerAttackRoot::Update() {
 		kiran2_.pos = pPlayer_->GetModel()->GetWorldPos();
 		kiran1_.Emit();
 
-		if (Input::GetInstance()->ReleaseKey(DIK_K)) {
+		if (Input::GetInstance()->ReleaseKey(DIK_K) || Input::GetInstance()->ReleaseButton(PadInput::B)) {
+			Audio::GetInstance()->SoundPlayWave(kickAir_);
 			pPlayer_->ChangeAttackBehavior(std::make_unique<PlayerKikAttack>(pPlayer_));
 			return;
-		}
-		else {
-			AtttackForJoyStick();
 		}
 		break;
 	default:
