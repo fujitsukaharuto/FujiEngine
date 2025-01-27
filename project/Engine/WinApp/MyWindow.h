@@ -8,7 +8,7 @@ public:
 	~MyWin() = default;
 
 public:
-	static const int kWindowWidth = 800;
+	static const int kWindowWidth = 1000;
 	static const int kWindowHeight = 950;
 
 public:
