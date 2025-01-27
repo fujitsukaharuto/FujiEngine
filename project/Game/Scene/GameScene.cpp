@@ -166,12 +166,12 @@ void GameScene::Draw() {
 
 	dxCommon_->PreSpriteDraw();
 
-	keyPaneru_->Draw();
 	if (isMenu_) {
 		menuPaneru_->Draw();
 		menuButton1_->Draw();
 		menuButton2_->Draw();
 	}
+	keyPaneru_->Draw();
 	if (blackTime != 0.0f) {
 		black_->Draw();
 	}
