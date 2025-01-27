@@ -24,6 +24,7 @@ void Timer::Init() {
 	
 	basePos_ = { 857.7f,155.0f,0.0f };
 	dotPos_ = { 969.0f,194.0f,0.0f };
+	offset_ = kTextureWidth * 1.2f; //数字間のオフセット
 }
 
 // 更新
@@ -33,11 +34,9 @@ void Timer::Update() {
 }
 
 void Timer::SetTextureRangeForDigit() {
-
-	// 位置セット
-	float offset = kTextureWidth * 1.2f; //数字間のオフセット
+	
 	for (int i = 0; i < sprites_.size(); i++) {
-		sprites_[i]->SetPos({ basePos_.x + offset * i,basePos_.y,basePos_.z });
+		sprites_[i]->SetPos({ basePos_.x + offset_ * i,basePos_.y,basePos_.z });
 	}
 
 	//dot
@@ -92,11 +91,16 @@ void Timer::SetScale(const float& scale, const float& dots) {
 	timeDotSprite_->SetSize({ kTextureHeight * dots,kTextureHeight * dots });
 }
 
+void Timer ::SetOffSet(const float& offset) {
+	offset_ = offset;
+}
+
 void Timer::Debug(){
 	if(ImGui::CollapsingHeader("Time")) {
 		ImGui::PushID("Time");
 		ImGui::DragFloat3("BasePos", &basePos_.x, 0.1f);
 		ImGui::DragFloat3("DotPos",  &dotPos_.x,  0.1f);
+		ImGui::DragFloat("Offset", &offset_, 0.1f);
 
 		ImGui::PopID();
 			

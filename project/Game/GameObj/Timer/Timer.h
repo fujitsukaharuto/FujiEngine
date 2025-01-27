@@ -27,6 +27,7 @@ private:
     //pos
     Vector3 basePos_;
     Vector3 dotPos_;
+    float offset_;
 public:
     static  float time_;
 public:
@@ -41,5 +42,6 @@ public:
     void Debug();
     void SetScale(const float& scale, const float& dots);
     void SetPos(const Vector3&pos, const Vector3& dotPos);
+    void SetOffSet(const float& offset);
     void SetTimerZero();
 };

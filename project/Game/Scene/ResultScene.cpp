@@ -20,6 +20,9 @@ void ResultScene::Initialize() {
 	Init();
 	timer_ = std::make_unique<Timer>();
 	timer_->Init();
+	timer_->SetScale(2.0f, 2.0f);
+	timer_->SetPos(Vector3(339.4f, 432.0f, 0.0f), Vector3(571.4f, 515.0f, 0.0f));
+	timer_->SetOffSet(124.2f);
 
 	obj3dCommon.reset(new Object3dCommon());
 	obj3dCommon->Initialize();
