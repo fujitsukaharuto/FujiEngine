@@ -10,7 +10,7 @@ void KikDirectionView::Initialize() {
 	for (size_t i = 0; i < obj3dies_.size(); ++i) {
 		obj3dies_[i] = std::make_unique<Object3d>();
 		obj3dies_[i]->Create("KickDir.obj"); // オブジェクトの形状は必要に応じて変更
-
+		obj3dies_[i]->SetColor({ 1.0f,0.0f,0.0f,1.0f });
 
 	}
 	spacing_ = 3.0f; // spacing_の初期値設定
