@@ -16,15 +16,16 @@ private:
     std::array<std::unique_ptr<Sprite>, 3> sprites_;
     float time_;
     float timeCount_;
-    int textureIndex_[3];
-    const int kTextureWidth = 24;//テクスチャの1枚の幅
-    const int kTextureHeight = 32;//テクスチャの1枚の高さ
+    std::array<int,3> textureIndex_;
+    const float kTextureWidth = 48;//テクスチャの1枚の幅
+    const float kTextureHeight = 86;//テクスチャの1枚の高さ
 public:
     /// ------------------------------------------------------
     /// public method
     /// ------------------------------------------------------
     void Init();
     void Update();
+    void SetTextureRangeForDigit();
     void Draw();
     void SetPos(const Vector3& pos);
 };

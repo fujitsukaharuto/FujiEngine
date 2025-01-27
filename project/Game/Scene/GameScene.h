@@ -12,6 +12,7 @@
 #include"GameObj/KikArea/KikArea.h"
 #include"GameObj/Enemy/EnemySpawn/EnemySpawn.h"
 #include"GameObj/FieldBlock/FieldBlockManager.h"
+#include"GameObj/Timer/Timer.h"
 
 class GameScene :public BaseScene
 {
@@ -95,6 +96,7 @@ private:
 	std::unique_ptr<KikArea>kikArea_;
 	std::unique_ptr<EnemySpawn>enemySpawn_;
 	std::unique_ptr<FieldBlockManager>fieldBlockManager_;
+	std::unique_ptr<Timer>timer_;
 
 	std::unique_ptr<CollisionManager> cMane_;
 };

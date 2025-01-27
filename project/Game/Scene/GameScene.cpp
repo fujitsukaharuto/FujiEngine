@@ -32,6 +32,7 @@ void GameScene::Initialize() {
 	cMane_ = std::make_unique<CollisionManager>();
 	enemySpawn_ = std::make_unique<EnemySpawn>();
 	fieldBlockManager_ = std::make_unique<FieldBlockManager>();
+	timer_ = std::make_unique<Timer>();
 	///-------------------------------------------------------------
 	///　初期化
 	///-------------------------------------------------------------- 
@@ -62,6 +63,7 @@ void GameScene::Initialize() {
 	suzunne = std::make_unique<Object3d>();
 	suzunne->Create("suzanne.obj");
 
+	timer_->Init();
 	field_->Initialize();
 	skydome_->Initialize();
 	player_->Initialize();
@@ -95,9 +97,12 @@ void GameScene::Update() {
 		///-------------------------------------------------------------
 		///　更新
 		///-------------------------------------------------------------- 
-		/// 
-		enemySpawn_->Update();
+		
+		timer_->Update();
+		timer_->SetTextureRangeForDigit();
+		timer_->SetPos(Vector3(100,100,1));
 
+		enemySpawn_->Update();
 		field_->Update();
 		skydome_->Update();
 		player_->Update();
@@ -165,6 +170,8 @@ void GameScene::Draw() {
 #pragma region 前景スプライト
 
 	dxCommon_->PreSpriteDraw();
+
+	timer_->Draw();
 
 	if (isMenu_) {
 		menuPaneru_->Draw();
