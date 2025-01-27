@@ -9,7 +9,7 @@
 void KikDirectionView::Initialize() {
 	for (size_t i = 0; i < obj3dies_.size(); ++i) {
 		obj3dies_[i] = std::make_unique<Object3d>();
-		obj3dies_[i]->Create("Plane.obj"); // オブジェクトの形状は必要に応じて変更
+		obj3dies_[i]->Create("KickDir.obj"); // オブジェクトの形状は必要に応じて変更
 
 
 	}
@@ -30,7 +30,7 @@ void KikDirectionView::Update() {
 
 
 		// Z軸回転
-		float zRotation = std::atan2(normalizedDirection.x, normalizedDirection.y);
+		float zRotation = std::atan2(-normalizedDirection.x, normalizedDirection.y);
 
 		// オイラー角を設定
 		obj3dies_[i]->transform.rotate = { 0, 0, zRotation };
