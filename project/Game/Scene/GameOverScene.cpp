@@ -32,9 +32,9 @@ void GameOverScene::Initialize() {
 	black_->SetAnchor({ 0.0f,0.0f });
 #pragma endregion
 
-	clearPaneru_ = std::make_unique<Sprite>();
-	clearPaneru_->Load("clear_none.png");
-	clearPaneru_->SetAnchor({ 0.0f,0.0f });
+	overPaneru_ = std::make_unique<Sprite>();
+	overPaneru_->Load("gameover.png");
+	overPaneru_->SetAnchor({ 0.0f,0.0f });
 
 	sphere = std::make_unique<Object3d>();
 	sphere->CreateSphere();
@@ -94,7 +94,7 @@ void GameOverScene::Draw() {
 
 	dxCommon_->PreSpriteDraw();
 
-	clearPaneru_->Draw();
+	overPaneru_->Draw();
 	if (blackTime != 0.0f) {
 		black_->Draw();
 	}
