@@ -307,9 +307,7 @@ void GameScene::Menu() {
 					menuButton2_->SetSize({ 300.0f,100.0f });
 				}
 			}
-		}
-		else if (Input::GetInstance()->GetGamepadState(pad)) {
-			if (Input::GetInstance()->TriggerButton(PadInput::Down)) {
+			else if (Input::GetInstance()->TriggerButton(PadInput::Down)) {
 				if (blackTime == 0.0f) {
 					nowSelect_ = 2;
 					menuButton1_->SetSize({ 300.0f,100.0f });
