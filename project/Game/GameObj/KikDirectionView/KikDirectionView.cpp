@@ -20,15 +20,6 @@ void KikDirectionView::Update() {
 		// 正規化された方向ベクトル
 		Vector3 normalizedDirection = direction_.Normalize();
 
-		// Y軸上方向を基準とする
-		Vector3 up = { 0.0f, 1.0f, 0.0f };
-
-		// X軸ベクトル（外積）
-		Vector3 xAxis = up.Cross(normalizedDirection);
-		xAxis.Normalize();
-
-
-
 		// Z軸回転
 		float zRotation = std::atan2(-normalizedDirection.x, normalizedDirection.y);
 
@@ -46,3 +37,5 @@ void KikDirectionView::Draw(Material* mate) {
 		obj3dies_[i]->Draw(mate);
 	}
 }
+
+
