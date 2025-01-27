@@ -75,6 +75,7 @@ void UFO::Update() {
 	//base::Update();
 
 	PointLightManager::GetInstance()->GetSpotLight(0)->spotLightData_->position = model_->transform.translate;
+	PointLightManager::GetInstance()->GetSpotLight(0)->spotLightData_->position.z = 0.0f;
 }
 
 /// ===================================================
