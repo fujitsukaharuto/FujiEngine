@@ -16,6 +16,10 @@ public:
         std::string enemyType;
     };
 private:
+    ///========================================================================================
+    ///  private variant
+    ///========================================================================================
+
     EnemyManager* pEnemyManager_ = nullptr;
     bool isEditorMode_;
     std::vector<SpawnData> spawnDataList_;
@@ -29,13 +33,22 @@ public:
     EnemySpawn();
     ~EnemySpawn() = default;
 
+    ///========================================================================================
+    ///  public method
+    ///========================================================================================
+
+
     void Init();
     void Update();
     void DrawImGuiEditor();
+
+    void ResetSpawner();
 
 
     void SaveSpawnData(const std::string& filename);
     void LoadSpawnData(const std::string& filename);
 
     void SetEnemyManager(EnemyManager* enemyManager);
+
+
 };

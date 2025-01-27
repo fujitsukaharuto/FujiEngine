@@ -12,7 +12,7 @@ EnemySpawn::EnemySpawn() {
 }
 
 void EnemySpawn::Init() {
-    isEditorMode_ = true;
+   /* isEditorMode_ = true;*/
     LoadSpawnData(filename_);
 }
 
@@ -23,8 +23,7 @@ void EnemySpawn::Update() {
 
     /// エディターモード
     if (isEditorMode_) {
-        currentTime_ = 0.0f;
-        spawnedEnemies_.clear(); 
+        ResetSpawner();
         return;
     }
 
@@ -38,6 +37,11 @@ void EnemySpawn::Update() {
             pEnemyManager_->SpawnEnemy(spawnData.enemyType, Vector3(spawnData.x, BaseEnemy::StartYPos_, BaseEnemy::StartZPos_));
             spawnedEnemies_.insert(i);  // 生成済みとして登録
         }
+    }
+
+    // リセット
+    if (spawnedEnemies_.size() == spawnDataList_.size()) {
+        ResetSpawner();
     }
 }
 void EnemySpawn::DrawImGuiEditor() {
@@ -163,4 +167,11 @@ void EnemySpawn::LoadSpawnData(const std::string& filename) {
 
 void EnemySpawn::SetEnemyManager(EnemyManager* enemyManager) {
     pEnemyManager_ = enemyManager;
+}
+
+void EnemySpawn::ResetSpawner() {
+  
+        currentTime_ = 0.0f;
+        spawnedEnemies_.clear();
+    
 }
