@@ -69,8 +69,6 @@ void BaseEnemy::Initialize() {
 ///========================================================
 void BaseEnemy::Update() {
 
-	
-
 	// 振る舞い更新
 	behavior_->Update();
 	state_->Update();
