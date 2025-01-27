@@ -6,7 +6,7 @@
 void NormalEnemy::Initialize() {
 	BaseEnemy::Initialize();
 
-	OriginGameObject::CreateModel("NormalEnemy.obj");
+	OriginGameObject::CreateModel("bakudan.obj");
 
 }
 
