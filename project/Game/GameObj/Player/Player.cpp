@@ -14,6 +14,9 @@
 #include"GameObj/PlayerBehavior/PlayerKikAttack.h"
 #include"GameObj/PlayerBehavior/PlayerRecoil.h"
 #include"GameObj/PlayerBehavior/PlayerSpecialFall.h"
+///state
+#include"GameObj/Player/State/PlayerDeath.h"
+#include"GameObj/Player/State/PlayerNoneState.h"
 //* obj
 #include"Field/Field.h"
 #include"GameObj/FieldBlock/FieldBlockManager.h"
@@ -24,7 +27,7 @@
 #include<imgui.h> 
 
 
-float Player::InitY_ = 1.5f;
+float Player::InitY_ = 1.0f;
 
 Player::Player() {}
 
@@ -51,7 +54,6 @@ void Player::Initialize() {
 
 	/// collider
 	kikCollider_ = std::make_unique<AABBCollider>();
-	kikCollider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
 	kikCollider_->SetTag(tags_[static_cast<size_t>(KikPower::WEAK)]);
 	kikCollider_->SetParent(GetModel());
 	kikCollider_->SetWidth(collisionSize_.x);
@@ -62,7 +64,7 @@ void Player::Initialize() {
 	kikCollider_->InfoUpdate();
 
 	collider_ = std::make_unique<AABBCollider>();
-	collider_->SetCollisionStayCallback([this](const ColliderInfo& other) {OnCollisionStay(other); });
+	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
 	collider_->SetTag("Player");
 	collider_->SetParent(GetModel());
 	collider_->SetWidth(2.0f);
@@ -76,9 +78,13 @@ void Player::Initialize() {
 	kikModel_->SetParent(GetModel());
 	kikModel_->transform.translate.z = 1.5f;
 
+	//パラメータセット
+	deathCount_ = paramater_.deathCount_;
+
 	/// 通常モードから
 	ChangeBehavior(std::make_unique<PlayerRoot>(this));
 	ChangeAttackBehavior(std::make_unique<PlayerAttackRoot>(this));
+	ChangeState(std::make_unique<PlayerNoneState>(this));
 }
 
 /// ===================================================
@@ -86,21 +92,17 @@ void Player::Initialize() {
 /// ===================================================
 void Player::Update() {
 	/*prePos_ = GetWorldPosition();*/
-	/// ダメージエフェクト
-	DamageRendition();
-
+	
 	/// 振る舞い処理
-	if (!dynamic_cast<PlayerSpecialFall*>(attackBehavior_.get())) {
+	if (!dynamic_cast<PlayerDeath*>(state_.get())) {
 		behavior_->Update();
+		attackBehavior_->Update();
 	}
-	attackBehavior_->Update();
+	state_->Update();
 
 	//　移動制限
 	MoveToLimit();
-
 	ChangeKikDirection();// キック向き
-
-
 
 	collider_->InfoUpdate();
 	kikCollider_->InfoUpdate();
@@ -124,13 +126,6 @@ void Player::Draw(Material* material) {
 #endif // _DEBUG
 }
 
-
-/// ===================================================
-///  ダメージ演出
-/// ===================================================
-void Player::DamageRendition() {
-
-}
 
 
 /// ===================================================
@@ -327,6 +322,30 @@ void Player::TakeDamage() {
 
 }
 
+
+/// ===================================================
+///  ダメージ演出
+/// ===================================================
+void Player::DamageRendition(const float& interval) {
+	// 時間の更新
+	elapsedTime_ += FPSKeeper::NormalDeltaTime();
+
+	// 一定時間ごとに透明状態を切り替え
+	if (elapsedTime_ >= interval) {
+		isTransparent_ = !isTransparent_; // 透明状態をトグル
+
+		// 透明状態に応じて色を変更
+		if (isTransparent_) {
+			model_->SetColor(Vector4(1, 1, 1, 0)); // 透明
+		}
+		else {
+			model_->SetColor(Vector4(1, 1, 1, 1)); // 不透明
+		}
+
+		elapsedTime_ = 0.0f; // 経過時間をリセット
+	}
+}
+
 ///=========================================================
 /// 振る舞い切り替え
 ///==========================================================
@@ -337,6 +356,10 @@ void Player::ChangeBehavior(std::unique_ptr<BasePlayerBehavior>behavior) {
 
 void Player::ChangeAttackBehavior(std::unique_ptr<BasePlayerAttackBehavior>behavior) {
 	attackBehavior_ = std::move(behavior);
+}
+
+void Player::ChangeState(std::unique_ptr<BasePlayerState>behavior) {
+	state_ = std::move(behavior);
 }
 
 ///=========================================================
@@ -363,14 +386,19 @@ void Player::AdjustParm() {
 		ImGui::DragFloat("キックのクールタイム(秒)", &paramater_.kikWaitTime_, 0.01f);
 		ImGui::DragFloat("キックのチャージタイム(秒)", &paramater_.kikChargeTime_, 0.01f);
 		ImGui::DragFloat("キックの向き変更スピード", &paramater_.kikDirectionSpeed_, 0.01f);
-		ImGui::SeparatorText("いらないかもパラメータ");
+		ImGui::SeparatorText("死亡、リスポーン");
+		ImGui::SliderInt("何回当たったら死ぬか(初期化のみ適応)", &paramater_.deathCount_, 1, 3);
+		ImGui::DragFloat3("復活座標", &paramater_.respownPos_.x, 0.1f);
+		ImGui::DragFloat("復活までの待機時間(秒)", &paramater_.respownWaitTime_, 0.01f);
+		ImGui::DragFloat("復活後の無敵時間(秒)", &paramater_.respownInvincibleTime_, 0.01f);
+		/*ImGui::SeparatorText("いらないかもパラメータ");
 		ImGui::DragFloat("specialAttackAntiTime_", &paramater_.specialAttackAntiTime_, 0.01f);
 		ImGui::DragFloat("specialAttackFallSpeed_", &paramater_.specialAttackFallSpeed_, 0.01f);
 		ImGui::DragFloat("specialAttackPostJump_", &paramater_.specialAttackPostJump_, 0.01f);
 		ImGui::DragFloat("specialAttackPostGravity_", &paramater_.specialAttackPostGravity_, 0.01f);
 		ImGui::DragFloat("specialAttackPostMaxFallSpeed_", &paramater_.specialAttackPostMaxFallSpeed_, 0.01f);
 		ImGui::DragFloat("RecoilSpeed", &paramater_.recoilSpeed_, 0.01f);
-		ImGui::DragFloat("キック当てた時の上に飛ぶ高さ", &paramater_.recoilJumpSpeed_, 0.01f);
+		ImGui::DragFloat("キック当てた時の上に飛ぶ高さ", &paramater_.recoilJumpSpeed_, 0.01f);*/
 
 
 		ImGuiManager::GetInstance()->UnSetFont();
@@ -420,6 +448,10 @@ void Player::AddParmGroup() {
 	globalParameter_->AddItem(groupName_, "specialAttackPostMaxFallSpeed_", paramater_.specialAttackPostMaxFallSpeed_);
 	globalParameter_->AddItem(groupName_, "kikDirectionSpeed_", paramater_.kikDirectionSpeed_);
 	globalParameter_->AddItem(groupName_, "kikChargeTime_", paramater_.kikChargeTime_);
+	globalParameter_->AddItem(groupName_, "deathCount_", paramater_.deathCount_);
+	globalParameter_->AddItem(groupName_, "respownWaitTime_", paramater_.respownWaitTime_);
+	globalParameter_->AddItem(groupName_, "respownInvincibleTime_", paramater_.respownInvincibleTime_);
+	globalParameter_->AddItem(groupName_, "respownPos_", paramater_.respownPos_);
 }
 
 ///=================================================================================
@@ -444,6 +476,10 @@ void Player::SetValues() {
 	globalParameter_->SetValue(groupName_, "specialAttackPostMaxFallSpeed_", paramater_.specialAttackPostMaxFallSpeed_);
 	globalParameter_->SetValue(groupName_, "kikDirectionSpeed_", paramater_.kikDirectionSpeed_);
 	globalParameter_->SetValue(groupName_, "kikChargeTime_", paramater_.kikChargeTime_);
+	globalParameter_->SetValue(groupName_, "deathCount_", paramater_.deathCount_);
+	globalParameter_->SetValue(groupName_, "respownWaitTime_", paramater_.respownWaitTime_);
+	globalParameter_->SetValue(groupName_, "respownInvincibleTime_", paramater_.respownInvincibleTime_);
+	globalParameter_->SetValue(groupName_, "respownPos_", paramater_.respownPos_);
 }
 
 ///=====================================================
@@ -467,6 +503,10 @@ void Player::ApplyGlobalParameter() {
 	paramater_.specialAttackPostMaxFallSpeed_ = globalParameter_->GetValue<float>(groupName_, "specialAttackPostMaxFallSpeed_");
 	paramater_.kikDirectionSpeed_ = globalParameter_->GetValue<float>(groupName_, "kikDirectionSpeed_");
 	paramater_.kikChargeTime_ = globalParameter_->GetValue<float>(groupName_, "kikChargeTime_");
+	paramater_.deathCount_ = globalParameter_->GetValue<int>(groupName_, "deathCount_");
+	paramater_.respownWaitTime_ = globalParameter_->GetValue<float>(groupName_, "respownWaitTime_");
+	paramater_.respownInvincibleTime_ = globalParameter_->GetValue<float>(groupName_, "respownInvincibleTime_");
+	paramater_.respownPos_ = globalParameter_->GetValue<Vector3>(groupName_, "respownPos_");
 }
 ///=========================================================
 /// Class Set
@@ -474,27 +514,34 @@ void Player::ApplyGlobalParameter() {
 
 void Player::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 
-	if (other.tag == "FallEnemy") {
+	// 死にます
+	if (other.tag == "DaungerousFieldBlock") {
+		deathCount_--; // デクリメント
 
-		/*SetKikIsCollision(false);
-		ChangeBehavior(std::make_unique<PlayerRecoil>(this));
-		ChangeAttackBehavior(std::make_unique<PlayerAttackRoot>(this));*/
-		return;
+		/// 死亡
+		if (deathCount_ <= 0) {
+			ChangeState(std::make_unique<PlayerDeath>(this));
+			return;
+		}
+		/// ダメージ演出
+		else {
+			
+
+			return;
+		}
 	}
 }
 
 void Player::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
 
-	if (other.tag == "SpecialAttackArea") {
+	/*if (other.tag == "SpecialAttackArea") {
 		if (!dynamic_cast<PlayerSpecialFall*>(attackBehavior_.get())) {
 			ChangeAttackBehavior(std::make_unique<PlayerSpecialFall>(this));
+			return;
 		}
-	}
+	}*/
 
-	// 死にます
-	if (other.tag == "DaungerousFieldBlock") {
-		// デス振る舞い
-	}
+	
 }
 
 
@@ -574,7 +621,7 @@ void Player::ChangeKikDirection() {
 	// 再度正規化
 	kikDirection_.Normalize();
 
-	// 念のため、Z成分を0に設定（2Dでの使用を想定）
+	// 念のため、Z成分を0に設定
 	kikDirection_.z = 0.0f;
 
 	// 可視化
@@ -587,3 +634,7 @@ void Player::SetTag(const int& i) {
 	kikCollider_->SetTag(tags_[i]);
 }
 
+void Player::SetDamageRenditionReset() {
+	elapsedTime_ = 0.0f;
+	isTransparent_ = false;
+}

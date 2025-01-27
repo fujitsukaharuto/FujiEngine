@@ -6,6 +6,7 @@
 /// behavior
 #include"GameObj/PlayerBehavior/BasePlayerBehavior.h"
 #include"GameObj/PlayerBehavior/BasePlayerAttackBehavior.h"
+#include"GameObj/Player/State/BasePlayerState.h"
 #include"GlobalVariables/GlobalVariables.h"
 #include"Game/OriginGameObject.h"
 
@@ -23,6 +24,8 @@ public:
 		WEAK,
 		MAXPOWER,
 	};
+
+
 	struct Paramater {
 		float             moveSpeed_;
 		float             airMoveSpeed_;
@@ -41,6 +44,10 @@ public:
 		float             fallSpeed_;
 		float             kikDirectionSpeed_;
 		float             kikChargeTime_;
+		int               deathCount_;
+		float             respownWaitTime_;
+		float             respownInvincibleTime_;
+		Vector3           respownPos_;
 	};
 private:
 
@@ -58,10 +65,10 @@ private:
 	const std::string groupName_ = "Player";       /// グループ名
 	GlobalVariables* globalParameter_;            /// グローバルパラメータ
 
-	///* behavior
+	///* behavior,State
 	std::unique_ptr<BasePlayerBehavior>       behavior_ = nullptr;
 	std::unique_ptr<BasePlayerAttackBehavior> attackBehavior_ = nullptr;
-
+	std::unique_ptr<BasePlayerState>          state_ = nullptr;
 
 	///* 速度
 	Vector3           velocity_;
@@ -71,13 +78,17 @@ private:
 	float             objectiveAngle_;
 	Vector3           inputDirection_;
 	Vector3           kikDirection_;
-
+	int               deathCount_;
 	Paramater         paramater_;
+
+	// ダメージ演出
+	float elapsedTime_;
+	bool  isTransparent_;
 
 	/// collider
 	std::unique_ptr<AABBCollider> kikCollider_;
 	std::unique_ptr<AABBCollider> collider_;
-	std::array<std::string, 2>tags_;
+	std::array<std::string, 2>    tags_;
 	Vector3                       collisionSize_;
 
 
@@ -108,9 +119,10 @@ public:
 	void SpecialPostFall(float& speed, const bool& isJump = false);
 	void ChangeBehavior(std::unique_ptr<BasePlayerBehavior>behavior);
 	void ChangeAttackBehavior(std::unique_ptr<BasePlayerAttackBehavior>behavior);
+	void ChangeState(std::unique_ptr<BasePlayerState>behavior);
 
 	/// ダメージ
-	void DamageRendition();
+	void DamageRendition(const float&interval);
 	void TakeDamage();
 
 
@@ -139,7 +151,8 @@ public:
 	/// ===================================================
 	/// setter method
 	/// ===================================================
+	void SetdeathCount(const int& i) { deathCount_ = i; };
 	void SetKikIsCollision(const bool& is);
 	void SetTag(const int& i);
-
+	void SetDamageRenditionReset();
 };

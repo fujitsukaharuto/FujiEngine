@@ -14,8 +14,16 @@
             1.5,
             -2.558469295501709
         ],
+        "deathCount_": 1,
         "kikChargeTime_": 0.6800000071525574,
         "kikDirectionSpeed_": 2.4800000190734863,
+        "respownInvincibleTime_": 1.059999942779541,
+        "respownPos_": [
+            0.0,
+            4.099999904632568,
+            0.0
+        ],
+        "respownWaitTime_": 0.800000011920929,
         "specialAttackAntiTime_": 0.2800000011920929,
         "specialAttackFallSpeed_": 34.27000045776367,
         "specialAttackPostGravity_": 1.7000000476837158,

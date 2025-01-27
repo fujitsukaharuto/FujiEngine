@@ -326,6 +326,18 @@
     <ClCompile Include="Game\GameObj\FieldBlock\State\FieldBlockDaungerous.cpp">
       <Filter>Game\GameObj\FieldBlock\State</Filter>
     </ClCompile>
+    <ClCompile Include="Game\GameObj\Player\State\PlayerDeath.cpp">
+      <Filter>Game\GameObj\Player\State</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameObj\Player\State\BasePlayerState.cpp">
+      <Filter>Game\GameObj\Player\State</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameObj\Player\State\PlayerRespown.cpp">
+      <Filter>Game\GameObj\Player\State</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameObj\Player\State\PlayerNoneState.cpp">
+      <Filter>Game\GameObj\Player\State</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Audio\Audio.h">
@@ -670,6 +682,18 @@
     <ClInclude Include="Game\GameObj\FieldBlock\State\FieldBlockDaungerous.h">
       <Filter>Game\GameObj\FieldBlock\State</Filter>
     </ClInclude>
+    <ClInclude Include="Game\GameObj\Player\State\PlayerDeath.h">
+      <Filter>Game\GameObj\Player\State</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\Player\State\BasePlayerState.h">
+      <Filter>Game\GameObj\Player\State</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\Player\State\PlayerRespown.h">
+      <Filter>Game\GameObj\Player\State</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\Player\State\PlayerNoneState.h">
+      <Filter>Game\GameObj\Player\State</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -800,6 +824,9 @@
     </Filter>
     <Filter Include="Game\Behavior\FieldBLock">
       <UniqueIdentifier>{84321c48-1d70-4545-a5bf-1dd3a02739a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameObj\Player\State">
+      <UniqueIdentifier>{63731e96-2d4c-4f03-81cd-e8b15fda1c8e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
