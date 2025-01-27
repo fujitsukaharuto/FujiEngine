@@ -10,7 +10,7 @@
 #include"Behavior/EnemyExplotion.h"
 #include"Behavior/EnemyFall.h"
 
-#include"Field/Field.h"
+#include"GameObj/Field/Field.h"
 ///* std
 #include<algorithm>
 
@@ -227,7 +227,7 @@ void BaseEnemy::ChangeBehavior(std::unique_ptr<BaseEnemyBehaivor>behavior) {
 void BaseEnemy::WallRefrection() {
 
 	// フィールドの中心とスケールを取得
-	Vector3 fieldCenter = { 0.0f, 0.0f, 0.0f }; // フィールド中心 
+	Vector3 fieldCenter = Field::baseTranslate_; // フィールド中心 
 	Vector3 fieldScale = Field::baseScale_;     // フィールドのスケール
 
 	// プレイヤーのスケールを考慮した半径

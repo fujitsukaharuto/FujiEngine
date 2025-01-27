@@ -9,6 +9,7 @@ private:
 
 public:
 
+	static Vector3 baseTranslate_;
 	static Vector3 baseScale_;
 
 	Field();
@@ -21,4 +22,5 @@ public:
 	void Initialize()override;
 	void Update()override;
 	void Draw(Material* mate = nullptr)override;
+	void Debug();
 };

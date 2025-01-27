@@ -18,7 +18,7 @@
 #include"GameObj/Player/State/PlayerDeath.h"
 #include"GameObj/Player/State/PlayerNoneState.h"
 //* obj
-#include"Field/Field.h"
+#include"GameObj/Field/Field.h"
 #include"GameObj/FieldBlock/FieldBlockManager.h"
 ///* std
 #include<algorithm>
@@ -288,7 +288,7 @@ void Player::SpecialPostFall(float& speed, const bool& isJump) {
 void Player::MoveToLimit() {
 
 	// フィールドの中心とスケールを取得
-	Vector3 fieldCenter = { 0.0f, 0.0f, 0.0f }; // フィールド中心 
+	Vector3 fieldCenter = Field::baseTranslate_; // フィールド中心 
 	Vector3 fieldScale = Field::baseScale_;     // フィールドのスケール
 
 	// プレイヤーのスケールを考慮した半径

@@ -152,7 +152,7 @@ void GameScene::Draw() {
 	enemyManager_->Draw();
 	ufo_->Draw();
 	kikArea_->Draw();
-
+	/*field_->Draw();*/
 	ufo_->UFOLightDraw();
 
 	ParticleManager::GetInstance()->Draw();
@@ -363,5 +363,8 @@ void GameScene::ParamaterEdit() {
 	ImGui::End();
 	enemySpawn_->DrawImGuiEditor();
 	
+	ImGui::Begin("DebugParm");
+	field_->Debug();
+	ImGui::End();
 #endif
 }
