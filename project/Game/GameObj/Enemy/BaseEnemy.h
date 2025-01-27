@@ -6,6 +6,7 @@
 #include "OriginGameObject.h"
 #include"Collider/AABBCollider.h"
 #include"Behavior/BaseEnemyBehavior.h"
+#include"State/BaseEnemyState.h"
 #include<array>
 
 class Player;
@@ -42,6 +43,7 @@ public:
 		float                explotionTime_;           ///　爆発時間
 		float                explotionExtensionTime_;  ///  爆発延長時間
 		std::array<float, 2> blowingPower;             ///  吹っ飛びスピード
+		Vector3              scaleUpParm_;
 	};
 
 protected:
@@ -60,12 +62,16 @@ protected:
 	float                              explotionTime_; //爆発時間
 	float                              blowDirection_;
 	float                              sumWeakAttackValue_;
+	Vector3                            powerUpScale_;
+	
+
 	/// behavior
 	std::unique_ptr<BaseEnemyBehaivor> behavior_ = nullptr;
+	std::unique_ptr<BaseEnemyState> state_ = nullptr;
 
 public:
 	static float                       InitY_;
-	static Vector3                     InitScale_;
+	static Vector3                     BaseScale_;
 	static float                       BoundPosY_;
 	static float                       StartZPos_;
 	static float                       StartYPos_;
@@ -88,6 +94,7 @@ public:
 	void WallRefrection ();
 
 	void ChangeBehavior (std::unique_ptr<BaseEnemyBehaivor>behavior);
+	void ChangeState(std::unique_ptr<BaseEnemyState>behavior);
 
 	void          OnCollisionEnter (const ColliderInfo& other);
 	void          OnCollisionStay  (const ColliderInfo& other);
@@ -104,9 +111,12 @@ public:
 	float              GetExplotionTime()const             { return explotionTime_; }
 	float              GetBlowDirection()const             { return blowDirection_; }
 	float              GetSumWeakAttackValue()const        { return sumWeakAttackValue_; }
+	Vector3            GetPowerUpScale()const              { return powerUpScale_; }
 	///========================================================================================
 	///  setter method
 	///========================================================================================
 	void               SetPlayer(Player* plyaer);
 	void               SetIsDeath(const bool& is) { isdeath_ = is; };
+	void               SetCollisionSize(const Vector3& size);
+	
 };

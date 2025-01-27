@@ -9,6 +9,8 @@
 #include"Behavior/EnemyBlowingStrong.h"
 #include"Behavior/EnemyExplotion.h"
 #include"Behavior/EnemyFall.h"
+#include"State/EnemyNoneState.h"
+#include"State/EnemyPowerUp.h"
 
 #include"GameObj/Field/Field.h"
 ///* std
@@ -21,7 +23,7 @@ float BaseEnemy::InitY_ = 1.0f;
 float BaseEnemy::BoundPosY_ = 52.0f;
 float BaseEnemy::StartZPos_ = 5.0f;
 float BaseEnemy::StartYPos_ = 70.0f;
-Vector3 BaseEnemy::InitScale_ = { 1.0f,1.0f,1.0f };
+Vector3 BaseEnemy::BaseScale_ = { 1.0f,1.0f,1.0f };
 
 BaseEnemy::BaseEnemy() {
 
@@ -42,15 +44,12 @@ void BaseEnemy::Initialize() {
 	///spawn
 	spawnEasing_.time = 0.0f;
 	spawnEasing_.maxTime = 0.8f;
-	model_->transform.scale = Vector3::GetZeroVec();
-
+	
 	// collider
 	collider_ = std::make_unique<AABBCollider>();
 	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
 	collider_->SetTag(tags_[static_cast<size_t>(Tag::FALL)]);
-	collider_->SetWidth(2.0f);
-	collider_->SetHeight(2.0f);
-	collider_->SetDepth(2.0f);
+	SetCollisionSize(BaseScale_ * 2.0f);
 	collider_->SetParent(model_.get());
 	collider_->InfoUpdate();
 
@@ -58,7 +57,11 @@ void BaseEnemy::Initialize() {
 	explotionTime_ = paramater_.explotionTime_;
 	blowDirection_ = 1.0f;
 	sumWeakAttackValue_ = paramater_.weakAttackValue;
+	model_->transform.scale = BaseEnemy::BaseScale_;
+	powerUpScale_ = BaseEnemy::BaseScale_;
+
 	ChangeBehavior(std::make_unique<EnemySpawnFall>(this)); /// 追っかけ
+	ChangeState(std::make_unique<EnemyNoneState>(this)); /// 追っかけ
 }
 
 ///========================================================
@@ -66,20 +69,16 @@ void BaseEnemy::Initialize() {
 ///========================================================
 void BaseEnemy::Update() {
 
-	/// 生成処理
-	spawnEasing_.time += FPSKeeper::DeltaTimeRate();
-	spawnEasing_.time = min(spawnEasing_.time, spawnEasing_.maxTime);
-
-	model_->transform.scale =
-		EaseOutBack(Vector3::GetZeroVec(), BaseEnemy::InitScale_,
-			spawnEasing_.time, spawnEasing_.maxTime);
+	
 
 	// 振る舞い更新
 	behavior_->Update();
+	state_->Update();
 
 	WallRefrection(); // 壁反発
 
 	// collider更新
+	SetCollisionSize(model_->transform.scale * 2.0f);
 	collider_->InfoUpdate();
 
 }
@@ -170,6 +169,7 @@ void BaseEnemy::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 			}
 		}
 	}
+
 	///---------------------------------------------------------------------------------------
 	/// 吹っ飛んでる時
 	///---------------------------------------------------------------------------------------
@@ -189,8 +189,14 @@ void BaseEnemy::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 			if (collider_->GetTag() == tags_[static_cast<size_t>(Tag::BLOWINGWEAK)]) {
 				if (other.tag == tags_[static_cast<size_t>(Tag::FALL)]) {
 					// パラメータ加算
-					explotionTime_ += paramater_.explotionExtensionTime_;
-					sumWeakAttackValue_ += paramater_.plusAttackValue;
+					explotionTime_ += paramater_.explotionExtensionTime_;  //爆発時間延長
+					sumWeakAttackValue_ += paramater_.plusAttackValue;     // 攻撃力アップ
+					powerUpScale_ += paramater_.scaleUpParm_;                 // スケールアップ
+					
+					if (!dynamic_cast<EnemyPowerUp*>(state_.get())) {
+						ChangeState(std::make_unique<EnemyPowerUp>(this));
+					}
+
 					return;
 				}
 			}
@@ -209,7 +215,6 @@ void BaseEnemy::SetParm(const Type& type, const Paramater& paramater) {
 
 }
 
-
 void BaseEnemy::SetPlayer(Player* player) {
 	pPlayer_ = player;
 }
@@ -220,6 +225,10 @@ void BaseEnemy::ChangeBehavior(std::unique_ptr<BaseEnemyBehaivor>behavior) {
 	behavior_ = std::move(behavior);
 }
 
+void BaseEnemy::ChangeState(std::unique_ptr<BaseEnemyState>behavior) {
+	//引数で受け取った状態を次の状態としてセット
+	state_ = std::move(behavior);
+}
 
 ///=========================================================
 ///　移動制限
@@ -254,6 +263,14 @@ void BaseEnemy::WallRefrection() {
 		blowDirection_ *= -1.0f;// 向き反転
 	}
 }
+
+void BaseEnemy::SetCollisionSize(const Vector3& size) {
+	collider_->SetWidth(size.x);
+	collider_->SetHeight(size.y);
+	collider_->SetDepth(size.z);
+}
+
+
 //float BaseEnemy::GetBoundPower()const {
 //	// 減衰率を計算 (0～1)
 //	float remainingRate = (float(paramater_.deathCountMax) - float((paramater_.deathCountMax - deathCount_))) / float(paramater_.deathCountMax);

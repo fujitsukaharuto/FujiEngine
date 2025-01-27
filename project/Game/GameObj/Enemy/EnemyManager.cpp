@@ -205,6 +205,11 @@ void EnemyManager::AddParmGroup() {
 			groupName_,
 			"spawnBoundGravityMax" + std::to_string(int(i + 1)),
 			paramaters_[i].spawnBoundGravityMax);
+
+		globalParameter_->AddItem(
+			groupName_,
+			"scaleUpParm_" + std::to_string(int(i + 1)),
+			paramaters_[i].scaleUpParm_);
 	}
 }
 
@@ -276,6 +281,11 @@ void EnemyManager::SetValues() {
 			groupName_,
 			"spawnBoundGravityMax" + std::to_string(int(i + 1)),
 			paramaters_[i].spawnBoundGravityMax);
+
+		globalParameter_->SetValue(
+			groupName_,
+			"scaleUpParm_" + std::to_string(int(i + 1)),
+			paramaters_[i].scaleUpParm_);
 	}
 
 }
@@ -336,6 +346,10 @@ void EnemyManager::ApplyGlobalParameter() {
 		paramaters_[i].spawnBoundGravityMax = globalParameter_->GetValue<float>(
 			groupName_,
 			"spawnBoundGravityMax" + std::to_string(int(i + 1)));
+
+		paramaters_[i].scaleUpParm_ = globalParameter_->GetValue<Vector3>(
+			groupName_,
+			"scaleUpParm_" + std::to_string(int(i + 1)));
 
 	}
 
@@ -413,6 +427,11 @@ void EnemyManager::AdjustParm() {
 			ImGui::DragFloat("爆発する延長時間(秒)",
 				&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].explotionExtensionTime_,
 				0.01f);
+
+			ImGui::DragFloat3("スケールアップするサイズ",
+				&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].scaleUpParm_.x,
+				0.01f);
+
 			ImGuiManager::GetInstance()->UnSetFont();
 			ImGui::PopID();
 
@@ -479,6 +498,10 @@ void EnemyManager::AdjustParm() {
 
 			ImGui::DragFloat("爆発する延長時間(秒)",
 				&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].explotionExtensionTime_,
+				0.01f);
+
+			ImGui::DragFloat3("スケールアップするサイズ",
+				&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].scaleUpParm_.x,
 				0.01f);
 
 			ImGuiManager::GetInstance()->UnSetFont();

@@ -14,6 +14,16 @@
         "explotionTime_2": 0.0,
         "plusAttackValue1": 4.650000095367432,
         "plusAttackValue2": 0.0,
+        "scaleUpParm_1": [
+            0.4000000059604645,
+            0.4099999964237213,
+            0.0
+        ],
+        "scaleUpParm_2": [
+            0.0,
+            0.0,
+            0.0
+        ],
         "spawnBoundGravity1": 30.219999313354492,
         "spawnBoundGravity2": 0.0,
         "spawnBoundGravityMax1": 26.579999923706055,

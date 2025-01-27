@@ -338,6 +338,15 @@
     <ClCompile Include="Game\GameObj\Player\State\PlayerNoneState.cpp">
       <Filter>Game\GameObj\Player\State</Filter>
     </ClCompile>
+    <ClCompile Include="Game\GameObj\Enemy\State\BaseEnemyState.cpp">
+      <Filter>Game\GameObj\Enemy\State</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameObj\Enemy\State\EnemyPowerUp.cpp">
+      <Filter>Game\GameObj\Enemy\State</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameObj\Enemy\State\EnemyNoneState.cpp">
+      <Filter>Game\GameObj\Enemy\State</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Audio\Audio.h">
@@ -694,6 +703,15 @@
     <ClInclude Include="Game\GameObj\Player\State\PlayerNoneState.h">
       <Filter>Game\GameObj\Player\State</Filter>
     </ClInclude>
+    <ClInclude Include="Game\GameObj\Enemy\State\BaseEnemyState.h">
+      <Filter>Game\GameObj\Enemy\State</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\Enemy\State\EnemyPowerUp.h">
+      <Filter>Game\GameObj\Enemy\State</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\Enemy\State\EnemyNoneState.h">
+      <Filter>Game\GameObj\Enemy\State</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -827,6 +845,9 @@
     </Filter>
     <Filter Include="Game\GameObj\Player\State">
       <UniqueIdentifier>{63731e96-2d4c-4f03-81cd-e8b15fda1c8e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameObj\Enemy\State">
+      <UniqueIdentifier>{9084616c-7dfb-470c-b318-438a444fd002}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
