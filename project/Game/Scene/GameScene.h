@@ -35,6 +35,8 @@ public:
 	void ParamaterEdit();
 private:
 
+	void StartUI();
+
 	/// ===================================================
 	///private variaus
 	/// ===================================================
@@ -51,7 +53,7 @@ private:
 
 	std::unique_ptr<Material> mate = nullptr;
 
-	std::unique_ptr<Sprite> test = nullptr;
+
 	Vector4 color_ = { 1.0f,1.0f,1.0f,1.0f };
 	Vector3 rightDir = { 1.0f,0.0f,0.0f };
 
@@ -72,6 +74,10 @@ private:
 	Vector4 colorUihome = { 0.0f,0.0f,0.0f,1.0f };
 	std::unique_ptr<Sprite> keyPaneru_;
 
+	std::unique_ptr<Sprite> startUI_;
+	Vector3 startUIPos_ = { 1100.0f,0.0f,0.0f };
+	float slideTime_ = 0.0f;
+	float slideLimitteTime_ = 10.0f;
 	std::unique_ptr<Sprite> menuPaneru_;
 	std::unique_ptr<Sprite> menuButton1_;
 	std::unique_ptr<Sprite> menuButton2_;

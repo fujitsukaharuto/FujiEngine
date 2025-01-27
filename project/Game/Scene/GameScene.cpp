@@ -54,6 +54,11 @@ void GameScene::Initialize() {
 	keyPaneru_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
 	keyPaneru_->SetAnchor({ 0.0f,0.0f });
 
+	startUI_ = std::make_unique<Sprite>();
+	startUI_->Load("startUI.png");
+	startUI_->SetAnchor({ 0.0f,0.0f });
+	startUI_->SetPos({ 1100.0f,0.0f,0.0f });
+
 	obj3dCommon.reset(new Object3dCommon());
 	obj3dCommon->Initialize();
 
@@ -97,7 +102,9 @@ void GameScene::Update() {
 		///-------------------------------------------------------------
 		///　更新
 		///-------------------------------------------------------------- 
-		
+
+		StartUI();
+
 		timer_->Update();
 		timer_->SetTextureRangeForDigit();
 
@@ -170,6 +177,10 @@ void GameScene::Draw() {
 
 	dxCommon_->PreSpriteDraw();
 
+	timer_->Draw();
+	if (!(slideTime_ >= slideLimitteTime_)) {
+		startUI_->Draw();
+	}
 	if (isMenu_) {
 		menuPaneru_->Draw();
 		menuButton1_->Draw();
@@ -192,6 +203,10 @@ void GameScene::Draw() {
 
 void GameScene::BlackFade() {
 	/*XINPUT_STATE pad;*/
+
+	if (FPSKeeper::DeltaTime() > 15.0f) {
+		return;
+	}
 
 	if (isChangeFase) {
 		if (blackTime < blackLimmite) {
@@ -374,4 +389,37 @@ void GameScene::ParamaterEdit() {
 	timer_->Debug();
 	ImGui::End();
 #endif
+}
+
+void GameScene::StartUI() {
+
+	if (FPSKeeper::DeltaTime() > 15.0f) {
+		return;
+	}
+
+	if (slideTime_ < slideLimitteTime_) {
+		slideTime_ += FPSKeeper::DeltaTimeRate();
+		if (slideTime_ >= slideLimitteTime_) {
+			slideTime_ = slideLimitteTime_;
+		}
+		
+		float t = slideTime_ / slideLimitteTime_;
+		if (t < 0.5f) {
+			// easeOutExpo
+			t = 1.0f - std::pow(2.0f, -10.0f * t);
+		}
+		else {
+			// easeInExpo
+			t = std::pow(2.0f, 10.0f * (t - 1.0f));
+		}
+
+		startUIPos_.x = Lerp(1100.0f, -1100.0f, t);
+
+		if (slideTime_ >= slideLimitteTime_) {
+			startUIPos_.x = -1100.0f;
+		}
+
+		startUI_->SetPos(startUIPos_);
+
+	}
 }

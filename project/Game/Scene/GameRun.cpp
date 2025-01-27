@@ -21,6 +21,7 @@ void GameRun::Initialize() {
 	textureManager_->Load("uiHome.png");
 	textureManager_->Load("menu_button1.png");
 	textureManager_->Load("menu_button2.png");
+	textureManager_->Load("startUI.png");
 #pragma endregion
 
 
