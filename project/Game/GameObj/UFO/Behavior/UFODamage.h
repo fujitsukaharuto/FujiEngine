@@ -7,6 +7,7 @@ class UFODamage : public BaseUFOBehavior {
 private:
 	enum class Step {
 		HITBACK,
+		RETURN,
 		RETURNROOT,
 	};
 	/// ===================================================
@@ -14,6 +15,7 @@ private:
 	/// ===================================================
 	Step step_;
 	Easing easing_;
+	Easing returnEase_;
 	Vector3 initPos_;
 	float stopTime_;
 
