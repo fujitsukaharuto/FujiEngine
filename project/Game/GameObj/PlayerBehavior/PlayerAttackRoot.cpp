@@ -76,7 +76,7 @@ void PlayerAttackRoot::Update() {
 
 		
 		///* ボタン離したらキック攻撃開始
-		if (Input::GetInstance()->ReleaseKey(DIK_K) || Input::GetInstance()->PressButton(PadInput::B)) {
+		if (Input::GetInstance()->ReleaseKey(DIK_K) || Input::GetInstance()->ReleaseButton(PadInput::B)) {
 			pPlayer_->ChangeAttackBehavior(std::make_unique<PlayerKikAttack>(pPlayer_));
 			return;
 		}
