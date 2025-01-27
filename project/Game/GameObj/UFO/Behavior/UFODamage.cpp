@@ -34,6 +34,12 @@ UFODamage::UFODamage(UFO* player)
 	// タイムスケール
 	if (pUFO_->GetDamageValue() >= pUFO_->GetParamater().hitStopDamage_) {
 		FPSKeeper::SetTimeScale(0.1f);
+		damageSE_ = Audio::GetInstance()->SoundLoadWave("bigDamage.wav");
+		Audio::GetInstance()->SoundPlayWave(damageSE_);
+	}
+	else {
+		damageSE_ = Audio::GetInstance()->SoundLoadWave("littleDamage.wav");
+		Audio::GetInstance()->SoundPlayWave(damageSE_);
 	}
 }
 

@@ -2,6 +2,7 @@
 
 #include"BaseUFOrBehavior.h"
 #include"math/Easing.h"
+#include "Audio/Audio.h"
 
 class UFODamage : public BaseUFOBehavior {
 private:
@@ -18,6 +19,8 @@ private:
 	Easing returnEase_;
 	Vector3 initPos_;
 	float stopTime_;
+
+	SoundData damageSE_;
 
 public:
 	//コンストラクタ
