@@ -16,9 +16,9 @@ EnemyPowerUp::EnemyPowerUp(BaseEnemy* boss)
 	: BaseEnemyState("EnemyPowerUp", boss) {
 
 	ease_.maxTime = 0.4f;
-	ease_.amplitude = 0.5f;
+	ease_.amplitude = 3.8f;
 	ease_.period = 0.2f;
-	saveScale_ = pBaseEnemy_->GetPowerUpScale();
+	/*saveScale_ = pBaseEnemy_->GetPowerUpScale();*/
 	step_ = Step::SCALEUP; /// ステップ初期化
 }
 
@@ -35,11 +35,15 @@ void EnemyPowerUp::Update() {
 		/// スケールアップ
 		///---------------------------------------------------------------------------------------
 		ease_.time += FPSKeeper::DeltaTimeRate();
-		pBaseEnemy_->SetScale(EaseAmplitudeScale(saveScale_, ease_.time, ease_.maxTime, ease_.amplitude, ease_.period));
+		pBaseEnemy_->SetScale(EaseAmplitudeScale(pBaseEnemy_->GetPowerUpScale(), ease_.time, ease_.maxTime, ease_.amplitude, ease_.period));
+
+		/// タイム超越で
 		if (ease_.time < ease_.maxTime)break;
+
 		ease_.time = ease_.maxTime;
-		pBaseEnemy_->SetScale(saveScale_);
+		pBaseEnemy_->SetScale(pBaseEnemy_->GetPowerUpScale());
 		step_ = Step::RETUNROOT;
+
 		break;
 	case EnemyPowerUp::Step::RETUNROOT:
 		///---------------------------------------------------------------------------------------
