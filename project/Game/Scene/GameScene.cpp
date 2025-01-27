@@ -50,7 +50,7 @@ void GameScene::Initialize() {
 
 	keyPaneru_ = std::make_unique<Sprite>();
 	keyPaneru_->Load("uiHome.png");
-	keyPaneru_->SetColor({ 0.236f,0.236f,0.236f,1.0f });
+	keyPaneru_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
 	keyPaneru_->SetAnchor({ 0.0f,0.0f });
 
 	obj3dCommon.reset(new Object3dCommon());
