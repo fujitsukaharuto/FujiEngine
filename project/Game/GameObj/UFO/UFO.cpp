@@ -43,7 +43,7 @@ void UFO::Initialize() {
 	moveDirection = 1.0f;
 	MaxHp_ = 30.0f;
 	hp_ = MaxHp_;
-	model_->transform.scale.x = 10.0f;
+	
 
 	// collider
 	collider_ = std::make_unique<AABBCollider>();
@@ -159,6 +159,7 @@ void UFO::AdjustParm() {
 
 		ImGui::SeparatorText("セーブできないデバッグ用");
 		ImGui::DragFloat("体力", &hp_, 0.01f);
+		ImGui::DragFloat3("size", &model_->transform.scale.x, 0.1f);
 
 		ImGuiManager::GetInstance()->UnSetFont();
 		ImGui::PopID();
