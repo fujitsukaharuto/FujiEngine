@@ -17,7 +17,7 @@
 ///==========================================================
 ///　static 変数初期化
 ///==========================================================
-float BaseEnemy::InitY_ = 1.5f;
+float BaseEnemy::InitY_ = 1.0f;
 float BaseEnemy::BoundPosY_ = 52.0f;
 float BaseEnemy::StartZPos_ = 5.0f;
 float BaseEnemy::StartYPos_ = 70.0f;

@@ -41,7 +41,7 @@ void Player::Initialize() {
 	tags_[static_cast<size_t>(KikPower::WEAK)] = "WeakKik";
 	tags_[static_cast<size_t>(KikPower::MAXPOWER)] = "MaxPowerKik";
 
-	collisionSize_ = Vector3(2, 2, 15);
+	collisionSize_ = Vector3(3, 3, 15);
 
 	///* グローバルパラメータ
 	globalParameter_ = GlobalVariables::GetInstance();
@@ -60,7 +60,7 @@ void Player::Initialize() {
 	kikCollider_->SetHeight(collisionSize_.y);
 	kikCollider_->SetDepth(collisionSize_.z);
 	kikCollider_->SetIsCollisonCheck(false);
-	kikCollider_->SetPos(Vector3(0, 0, 1.5f));
+	kikCollider_->SetPos(Vector3(0, 0, 0.5f));
 	kikCollider_->InfoUpdate();
 
 	collider_ = std::make_unique<AABBCollider>();
