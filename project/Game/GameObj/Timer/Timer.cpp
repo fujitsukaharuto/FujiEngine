@@ -3,6 +3,7 @@
 
 #include<imgui.h>
 
+float Timer::time_ = 0.0f;
 // 初期化
 void Timer::Init() {
 
@@ -19,30 +20,31 @@ void Timer::Init() {
 		sprites_[i]->SetSize({ kTextureWidth,kTextureHeight }); // サイズを固定
 		textureIndex_[i] = 0;
 	}
-	time_ = 0;
+
+	
 	basePos_ = { 857.7f,155.0f,0.0f };
-	dotPos_ = { 952.0f,194.0f,0.0f };
+	dotPos_ = { 969.0f,194.0f,0.0f };
 }
 
 // 更新
 void Timer::Update() {
 	// 秒加算
-	time_ += FPSKeeper::DeltaTimeRate();
+	Timer::time_ += FPSKeeper::DeltaTimeRate();
+}
+
+void Timer::SetTextureRangeForDigit() {
 
 	// 位置セット
-	float offset = kTextureWidth * 1.0f; //数字間のオフセット
+	float offset = kTextureWidth * 1.2f; //数字間のオフセット
 	for (int i = 0; i < sprites_.size(); i++) {
 		sprites_[i]->SetPos({ basePos_.x + offset * i,basePos_.y,basePos_.z });
 	}
 
 	//dot
 	timeDotSprite_->SetPos(dotPos_);
-}
-
-void Timer::SetTextureRangeForDigit() {
 
 	// 分と秒を取得
-	int timeValue = static_cast<int>(time_);
+	int timeValue = static_cast<int>(Timer::time_);
 	int minute = timeValue / 60; // 分
 	int second = timeValue % 60; // 秒を算出
 
@@ -81,6 +83,15 @@ void Timer::SetPos(const Vector3& pos, const Vector3& dotPos) {
 	dotPos_ = dotPos;
 }
 
+void Timer::SetScale(const float& scale, const float& dots) {
+
+	for (int i = 0; i < sprites_.size(); i++) {
+		sprites_[i]->SetSize({ kTextureWidth* scale,kTextureHeight* scale });
+	}
+
+	timeDotSprite_->SetSize({ kTextureHeight * dots,kTextureHeight * dots });
+}
+
 void Timer::Debug(){
 	if(ImGui::CollapsingHeader("Time")) {
 		ImGui::PushID("Time");
@@ -90,4 +101,8 @@ void Timer::Debug(){
 		ImGui::PopID();
 			
 	}
+}
+
+void Timer::SetTimerZero() {
+	Timer::time_ = 0.0f;
 }

@@ -1,6 +1,6 @@
 #pragma once
 #include "Scene/BaseScene.h"
-
+#include"GameObj/Timer/Timer.h"
 
 class ResultScene :public BaseScene {
 public:
@@ -28,4 +28,6 @@ private:
 	float blackLimmite = 20.0f;
 	float blackTime = 20.0f;
 	bool isChangeFase = false;
+
+	std::unique_ptr<Timer>timer_;
 };

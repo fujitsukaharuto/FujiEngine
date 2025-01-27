@@ -87,7 +87,7 @@ void GameScene::Initialize() {
 	fieldBlockManager_->AddFieldBlock();
 	fieldBlockManager_->AddFieldBlock();
 
-	/*enemyManager_->FSpawn();*/
+	timer_->SetTimerZero();
 }
 
 void GameScene::Update() {

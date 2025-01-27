@@ -18,7 +18,8 @@ ResultScene::~ResultScene() {
 
 void ResultScene::Initialize() {
 	Init();
-
+	timer_ = std::make_unique<Timer>();
+	timer_->Init();
 
 	obj3dCommon.reset(new Object3dCommon());
 	obj3dCommon->Initialize();
@@ -44,6 +45,8 @@ void ResultScene::Initialize() {
 
 void ResultScene::Update() {
 
+	timer_->SetTextureRangeForDigit();
+
 #ifdef _DEBUG
 
 
@@ -54,6 +57,7 @@ void ResultScene::Update() {
 	ImGui::DragFloat3("right", &rightDir.x, 0.01f);
 	rightDir = rightDir.Normalize();
 	sphere->SetRightDir(rightDir);
+	timer_->Debug();
 	ImGui::End();
 
 
@@ -95,6 +99,7 @@ void ResultScene::Draw() {
 	dxCommon_->PreSpriteDraw();
 
 	clearPaneru_->Draw();
+	timer_->Draw();
 	if (blackTime != 0.0f) {
 		black_->Draw();
 	}
