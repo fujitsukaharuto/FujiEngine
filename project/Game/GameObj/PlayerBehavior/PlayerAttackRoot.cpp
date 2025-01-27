@@ -73,18 +73,12 @@ void PlayerAttackRoot::Update() {
 			charge1_.Emit();
 
 		}
-		else {
-		
-			ChargeForJoyStick();//キック
-		}
+
 		
 		///* ボタン離したらキック攻撃開始
-		if (Input::GetInstance()->ReleaseKey(DIK_K) || Input::GetInstance()->ReleaseButton(PadInput::B)) {
+		if (Input::GetInstance()->ReleaseKey(DIK_K) || Input::GetInstance()->PressButton(PadInput::B)) {
 			pPlayer_->ChangeAttackBehavior(std::make_unique<PlayerKikAttack>(pPlayer_));
 			return;
-		}
-		else {
-			AtttackForJoyStick();
 		}
 
 		 	///* 時間経過で強化キックに
