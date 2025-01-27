@@ -383,6 +383,7 @@ void Player::AdjustParm() {
 		ImGui::DragFloat("最大重力", &paramater_.maxFallSpeed_, 0.01f);
 		ImGui::SeparatorText("キック");
 		ImGui::DragFloat("キックの当たり判定適応時間(秒)", &paramater_.kikTime_, 0.01f);
+		ImGui::DragFloat("キックの回転にかかる時間(秒)", &paramater_.kikRotateTime_, 0.01f);
 		ImGui::DragFloat("キックのクールタイム(秒)", &paramater_.kikWaitTime_, 0.01f);
 		ImGui::DragFloat("キックのチャージタイム(秒)", &paramater_.kikChargeTime_, 0.01f);
 		ImGui::DragFloat("キックの向き変更スピード", &paramater_.kikDirectionSpeed_, 0.01f);
@@ -452,6 +453,7 @@ void Player::AddParmGroup() {
 	globalParameter_->AddItem(groupName_, "respownWaitTime_", paramater_.respownWaitTime_);
 	globalParameter_->AddItem(groupName_, "respownInvincibleTime_", paramater_.respownInvincibleTime_);
 	globalParameter_->AddItem(groupName_, "respownPos_", paramater_.respownPos_);
+	globalParameter_->AddItem(groupName_, "kikRotateTime_", paramater_.kikRotateTime_);
 }
 
 ///=================================================================================
@@ -480,6 +482,7 @@ void Player::SetValues() {
 	globalParameter_->SetValue(groupName_, "respownWaitTime_", paramater_.respownWaitTime_);
 	globalParameter_->SetValue(groupName_, "respownInvincibleTime_", paramater_.respownInvincibleTime_);
 	globalParameter_->SetValue(groupName_, "respownPos_", paramater_.respownPos_);
+	globalParameter_->SetValue(groupName_, "kikRotateTime_", paramater_.kikRotateTime_);
 }
 
 ///=====================================================
@@ -507,6 +510,7 @@ void Player::ApplyGlobalParameter() {
 	paramater_.respownWaitTime_ = globalParameter_->GetValue<float>(groupName_, "respownWaitTime_");
 	paramater_.respownInvincibleTime_ = globalParameter_->GetValue<float>(groupName_, "respownInvincibleTime_");
 	paramater_.respownPos_ = globalParameter_->GetValue<Vector3>(groupName_, "respownPos_");
+	paramater_.kikRotateTime_ = globalParameter_->GetValue<float>(groupName_, "kikRotateTime_");
 }
 ///=========================================================
 /// Class Set

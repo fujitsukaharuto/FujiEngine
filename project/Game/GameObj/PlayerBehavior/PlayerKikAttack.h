@@ -15,8 +15,8 @@ private:
 /// ===================================================
 	Step step_;
 	float kikTime_;
+	float kikRotateZ_;
 	
-
 public:
 	//コンストラクタ
 	PlayerKikAttack(Player* boss);
@@ -24,7 +24,7 @@ public:
 
 	void Update()override;
 	void Debug()override;
-
+	void KikRotation();
 
 	
 };

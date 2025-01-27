@@ -22,7 +22,7 @@ PlayerReSpown::PlayerReSpown(Player* boss)
 	/// ===================================================
 
 	
-	pPlayer_->GetKikCollider()->SetIsCollisonCheck(true);
+	/*pPlayer_->GetKikCollider()->SetIsCollisonCheck(true);*/
 	pPlayer_->SetdeathCount(pPlayer_->GetParamater().deathCount_);
 	pPlayer_->SetWorldPosition(pPlayer_->GetParamater().respownPos_);
 

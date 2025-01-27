@@ -1,18 +1,16 @@
 /// behavior
 #include"PlayerKikAttack.h"
 #include"PlayerAttackRoot.h"
-#include"PlayerRecoil.h"
+
 
 /// boss
 #include"GameObj/Player/Player.h"
-#include"GameObj/Enemy/BaseEnemy.h"
+
 /// frame
 #include"DX/FPSKeeper.h"
 /// inupt
-#include"Input/Input.h"
-#include"GameObj/JoyState/JoyState.h"
-
 #include<imgui.h>
+#include<numbers>
 
 //初期化
 PlayerKikAttack::PlayerKikAttack(Player* boss)
@@ -39,19 +37,28 @@ void PlayerKikAttack::Update() {
 	{
 	case Step::KIK:
 		///-----------------------------------------------------------
-        /// キック
+        /// 1:キック
         ///------------------------------------------------------------
 		kikTime_ += FPSKeeper::DeltaTimeRate();
+		// タイム超越で次のステップ
+		if (kikTime_ >=pPlayer_->GetParamater().kikTime_) {
+			pPlayer_->SetKikIsCollision(false);
+		};
+
+		// 回転
+		KikRotation();
 		
-		if (kikTime_ < pPlayer_->GetParamater().kikTime_) break;// キックタイム
+		// タイム超越で次のステップ
+		if (kikTime_ < pPlayer_->GetParamater().kikRotateTime_)break;
+		pPlayer_->SetRotationZ(0.0f);
 		step_ = Step::RETUNROOT;
 		
 		break;
 	case Step::RETUNROOT:
 		///-----------------------------------------------------------
-		/// 通常に戻る
+		/// 2:通常に戻る
 		///------------------------------------------------------------
-		pPlayer_->SetKikIsCollision(false);
+	
 		pPlayer_->ChangeAttackBehavior(std::make_unique<PlayerAttackRoot>(pPlayer_));
 	
 		break;
@@ -66,3 +73,13 @@ void  PlayerKikAttack::Debug() {
 }
 
 
+void PlayerKikAttack::KikRotation() {
+	if (pPlayer_->GetFacingDirection() == 1.0f) {
+		kikRotateZ_ = EaseOutBack(0.0f, std::numbers::pi_v<float>*2.0f, kikTime_, pPlayer_->GetParamater().kikRotateTime_);
+		pPlayer_->SetRotationZ(kikRotateZ_);
+	}
+	else {
+		kikRotateZ_ = EaseOutBack(0.0f, -std::numbers::pi_v<float>*2.0f, kikTime_, pPlayer_->GetParamater().kikRotateTime_);
+		pPlayer_->SetRotationZ(kikRotateZ_);
+	}
+}

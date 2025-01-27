@@ -48,6 +48,7 @@ public:
 		float             respownWaitTime_;
 		float             respownInvincibleTime_;
 		Vector3           respownPos_;
+		float             kikRotateTime_;
 	};
 private:
 
