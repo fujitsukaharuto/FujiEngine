@@ -150,6 +150,8 @@ void UFO::AdjustParm() {
 		ImGui::DragFloat3("当たり判定サイズ", &paramater_.collisionSize_.x, 0.1f);
 
 		ImGui::DragFloat("ダメージ中の時間(s)", &paramater_.damageTime_, 0.01f);
+		ImGui::DragFloat("ヒットストップをするダメージ量(%)", &paramater_.hitStopDamage_, 0.01f);
+		ImGui::DragFloat("ヒットストップ時間(%)", &paramater_.hitStopTime_, 0.01f);
 
 		ImGui::SeparatorText("いらないかも");
 		ImGui::DragFloat("ダメージの吹っ飛び距離", &paramater_.dagameDistance_, 0.01f);
@@ -202,6 +204,8 @@ void UFO::AddParmGroup() {
 	globalParameter_->AddItem(groupName_, "DamageTime", paramater_.damageTime_);
 	globalParameter_->AddItem(groupName_, "DamageDistance", paramater_.dagameDistance_);
 	globalParameter_->AddItem(groupName_, "collisionSize_", paramater_.collisionSize_);
+	globalParameter_->AddItem(groupName_, "hitStopDamage_", paramater_.hitStopDamage_);
+	globalParameter_->AddItem(groupName_, "hitStopTime_", paramater_.hitStopTime_);
 }
 
 ///=================================================================================
@@ -213,7 +217,8 @@ void UFO::SetValues() {
 	globalParameter_->SetValue(groupName_, "collisionSize_", paramater_.collisionSize_);
 	globalParameter_->SetValue(groupName_, "DamageTime", paramater_.damageTime_);
 	globalParameter_->SetValue(groupName_, "DamageDistance", paramater_.dagameDistance_);
-	
+	globalParameter_->SetValue(groupName_, "hitStopDamage_", paramater_.hitStopDamage_);
+	globalParameter_->SetValue(groupName_, "hitStopTime_", paramater_.hitStopTime_);
 }
 
 ///=====================================================
@@ -224,6 +229,8 @@ void UFO::ApplyGlobalParameter() {
 	paramater_.collisionSize_ = globalParameter_->GetValue<Vector3>(groupName_, "collisionSize_");
 	paramater_.damageTime_ = globalParameter_->GetValue<float>(groupName_, "DamageTime");
 	paramater_.dagameDistance_ = globalParameter_->GetValue<float>(groupName_, "DamageDistance");
+	paramater_.hitStopDamage_ = globalParameter_->GetValue<float>(groupName_, "hitStopDamage_");
+	paramater_.hitStopTime_ = globalParameter_->GetValue<float>(groupName_, "hitStopTime_");
 }
 ///=========================================================
 /// Class Set
@@ -241,7 +248,8 @@ void UFO::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 		// ダメージ量分受ける
 		for (auto& enemy : pEnemyManager_->GetEnemies()) {
 			if (dynamic_cast<EnemyBlowingWeak*>(enemy->GetBehavior())) {
-				TakeDamageForPar(enemy->GetSumWeakAttackValue());
+				takeDamageValue_ = enemy->GetSumWeakAttackValue();
+				TakeDamageForPar(takeDamageValue_);
 			}
 		}
 
@@ -253,9 +261,9 @@ void UFO::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 
 	/// つおい吹っ飛び
 	if (other.tag == "BlowingStrongEnemy") {
-	
-		//デカダメージ受ける（一定）
-		TakeDamageForPar(pEnemyManager_->GetParamater(static_cast<size_t>(BaseEnemy::Type::NORMAL)).strongAttackValue);
+		takeDamageValue_ = pEnemyManager_->GetParamater(static_cast<size_t>(BaseEnemy::Type::NORMAL)).strongAttackValue;
+		//デカダメージ受ける
+		TakeDamageForPar(takeDamageValue_);
 
 		// ダメージ演出
 		if (dynamic_cast<UFODamage*>(behavior_.get()))return;

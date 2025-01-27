@@ -28,9 +28,12 @@ UFODamage::UFODamage(UFO* player)
 	initPos_ = pUFO_->GetModel()->GetWorldPos();
 
 	pUFO_->SetColor(Vector4(1, 0, 0, 1));
-
 	step_ = Step::HITBACK;
 
+	// タイムスケール
+	if (pUFO_->GetDamageValue() >= pUFO_->GetParamater().hitStopDamage_) {
+		FPSKeeper::SetTimeScale(0.1f);
+	}
 }
 
 UFODamage::~UFODamage() {
@@ -39,6 +42,12 @@ UFODamage::~UFODamage() {
 
 //更新
 void UFODamage::Update() {
+
+	stopTime_ += FPSKeeper::NormalDeltaTime();
+	if (stopTime_ >= pUFO_->GetParamater().hitStopTime_) {
+		FPSKeeper::SetTimeScale(1.0f);
+	}
+
 	switch (step_)
 	{
 	case Step::HITBACK:
@@ -61,8 +70,10 @@ void UFODamage::Update() {
 		///-------------------------------------------------------
 		///　popするお
 		///-------------------------------------------------------
-		pUFO_->SetColor(Vector4(1, 1, 1, 1));
-		pUFO_->ChangeBehavior(std::make_unique<UFORoot>(pUFO_));
+		if (stopTime_ >= pUFO_->GetParamater().hitStopTime_) {
+			pUFO_->SetColor(Vector4(1, 1, 1, 1));
+			pUFO_->ChangeBehavior(std::make_unique<UFORoot>(pUFO_));
+		}
 
 		break;
 	default:

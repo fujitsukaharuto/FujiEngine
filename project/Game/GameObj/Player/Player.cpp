@@ -226,7 +226,7 @@ bool Player::GetIsMoving() {
 
 void Player::Jump(float& speed) {
 	// 移動
-	model_->transform.translate.y += speed * FPSKeeper::NormalDeltaTime();
+	model_->transform.translate.y += speed * FPSKeeper::DeltaTimeRate();
 	Fall(speed, true);
 
 }
@@ -237,10 +237,10 @@ void Player::Jump(float& speed) {
 void Player::Fall(float& speed, const bool& isJump) {
 	if (!isJump) {
 		// 移動
-		model_->transform.translate.y += speed * FPSKeeper::NormalDeltaTime();
+		model_->transform.translate.y += speed * FPSKeeper::DeltaTimeRate();
 	}
 	// 加速する
-	speed = max(speed - (paramater_.gravity_ * FPSKeeper::NormalDeltaTime()), -paramater_.maxFallSpeed_);
+	speed = max(speed - (paramater_.gravity_ * FPSKeeper::DeltaTimeRate()), -paramater_.maxFallSpeed_);
 
 	// 着地
 	if (model_->transform.translate.y <= Player::InitY_) {
@@ -328,7 +328,7 @@ void Player::TakeDamage() {
 /// ===================================================
 void Player::DamageRendition(const float& interval) {
 	// 時間の更新
-	elapsedTime_ += FPSKeeper::NormalDeltaTime();
+	elapsedTime_ += FPSKeeper::DeltaTimeRate();
 
 	// 一定時間ごとに透明状態を切り替え
 	if (elapsedTime_ >= interval) {
@@ -592,13 +592,10 @@ void Player::ChangeKikDirection() {
 		}
 	}
 
-
 	// X軸方向の変更を適用
 	kikDirection_.x += xMove;
-
 	// 正規化処理
 	kikDirection_.Normalize();
-
 
 	// 傾き制限と、常に上向きにする処理
 	float maxY = 0.9f; // 上向きを維持する為のY軸の最低値 
@@ -607,21 +604,11 @@ void Player::ChangeKikDirection() {
 
 	// X軸の制限
 	kikDirection_.x = std::clamp(kikDirection_.x, minX, maxX);
-
-	// 上向きを維持するためのY軸の調整
-	// X軸が最大または最小の場合、Y軸を最低値に設定
-	if (kikDirection_.x >= maxX || kikDirection_.x <= minX) {
-		kikDirection_.y = maxY;
-	}
-	else {
-		// 緩やかに上向きを維持
-		kikDirection_.y = max(kikDirection_.y, maxY);
-	}
-
+	// 緩やかに上向きを維持
+	kikDirection_.y = max(kikDirection_.y, maxY);	
 	// 再度正規化
 	kikDirection_.Normalize();
-
-	// 念のため、Z成分を0に設定
+	// Z成分を0に設定
 	kikDirection_.z = 0.0f;
 
 	// 可視化

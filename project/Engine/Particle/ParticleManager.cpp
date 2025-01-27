@@ -116,7 +116,7 @@ void ParticleManager::Update() {
 				continue;
 			}
 
-			particle.lifeTime_--;
+			particle.lifeTime_-= FPSKeeper::DeltaTime() * FPSKeeper::GetTimeScale();
 
 			SizeType sizeType = SizeType(particle.type);
 			float t = (1.0f - float(float(particle.lifeTime_) / float(particle.startLifeTime_)));
@@ -154,9 +154,9 @@ void ParticleManager::Update() {
 				particle.transform.rotate += Random::GetVector3({ -0.5f,0.5f }, { -0.5f,0.5f }, { -0.2f,0.2f });
 			}
 
-			particle.speed += particle.accele * FPSKeeper::DeltaTime();
+			particle.speed += particle.accele * FPSKeeper::DeltaTime() * FPSKeeper::GetTimeScale();
 
-			particle.transform.translate += particle.speed * FPSKeeper::DeltaTime();
+			particle.transform.translate += particle.speed * FPSKeeper::DeltaTime()* FPSKeeper::GetTimeScale();
 			Matrix4x4 worldViewProjectionMatrix;
 			Matrix4x4 worldMatrix = MakeIdentity4x4();
 

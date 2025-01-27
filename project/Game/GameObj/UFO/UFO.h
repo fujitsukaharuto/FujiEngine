@@ -16,6 +16,8 @@ public:
 		Vector3 collisionSize_;
 		float dagameDistance_;
 		float damageTime_;
+		float hitStopDamage_;
+		float hitStopTime_;
 	};
 
 private:
@@ -43,7 +45,7 @@ private:
 	///* parm 
 	float hp_;                                    /// HP
 	float MaxHp_;
-	
+	float takeDamageValue_;
 
 	Paramater paramater_;
 
@@ -93,6 +95,7 @@ public:
 	EnemyManager* GetEnemyManager() { return pEnemyManager_; }
 	Paramater GetParamater()const { return paramater_; }
 	bool GetIsDeath()const { return isDeath_; }
+	float GetDamageValue()const { return takeDamageValue_; }
 	/// ===================================================
 	/// setter method
 	/// ===================================================

@@ -15,6 +15,7 @@ private:
 	Step step_;
 	Easing easing_;
 	Vector3 initPos_;
+	float stopTime_;
 
 public:
 	//コンストラクタ
