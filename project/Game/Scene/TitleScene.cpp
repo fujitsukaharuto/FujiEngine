@@ -50,8 +50,8 @@ void TitleScene::Initialize() {
 
 	cMane_ = std::make_unique<CollisionManager>();
 
-	/*ParticleManager::Load(emit1, "star1");
-	ParticleManager::Load(emit2, "star2");*/
+	/*ParticleManager::Load(emit1, "jump");*/
+	/*ParticleManager::Load(emit2, "star2");*/
 
 }
 
@@ -71,8 +71,8 @@ void TitleScene::Update() {
 	sphere->SetRightDir(rightDir);
 	ImGui::End();
 
-	/*emit1.DebugGUI();
-	emit2.DebugGUI();*/
+	/*emit1.DebugGUI();*/
+	/*emit2.DebugGUI();*/
 
 	test_->Debug();
 	test2_->Debug();
@@ -88,10 +88,10 @@ void TitleScene::Update() {
 	test2_->Update();
 
 
-	/*if (input_->TriggerKey(DIK_5)) {
-		emit1.Burst();
-		emit2.Burst();
-	}*/
+	//if (input_->TriggerKey(DIK_5)) {
+	//	emit1.Burst();
+	//	/*emit2.Burst();*/
+	//}
 
 	sphere->transform.rotate.y += 0.02f;
 

@@ -3,6 +3,7 @@
 #include"BasePlayerBehavior.h"
 #include"math/Easing.h"
 #include "Audio/Audio.h"
+#include "Particle/ParticleEmitter.h"
 
 class PlayerJump : public BasePlayerBehavior {
 private:
@@ -12,6 +13,7 @@ private:
 	/// ===================================================
 
 	SoundData jumpSE_;
+	ParticleEmitter jumpEmit_;
 
 public:
 	//コンストラクタ

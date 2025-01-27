@@ -8,7 +8,7 @@
 
 ///* frame
 #include"DX/FPSKeeper.h"
-
+#include "Particle/ParticleManager.h"
 
 
 /// ===================================================
@@ -25,6 +25,10 @@ PlayerJump::PlayerJump(Player* player)
 
 	jumpSE_ = Audio::GetInstance()->SoundLoadWave("jump.wav");
 	Audio::GetInstance()->SoundPlayWave(jumpSE_);
+
+	ParticleManager::Load(jumpEmit_, "jump");
+	jumpEmit_.pos = pPlayer_->GetModel()->GetWorldPos();
+	jumpEmit_.Burst();
 
 	/*pPlayer_->SetJumpSpeed(1.5f);*/
 }
