@@ -37,7 +37,7 @@ Player::Player() {}
 void Player::Initialize() {
 
 	OriginGameObject::Initialize();
-	OriginGameObject::CreateModel("player.obj");
+	OriginGameObject::CreateModel("Player.obj");
 	tags_[static_cast<size_t>(KikPower::WEAK)] = "WeakKik";
 	tags_[static_cast<size_t>(KikPower::MAXPOWER)] = "MaxPowerKik";
 
@@ -81,6 +81,16 @@ void Player::Initialize() {
 	//パラメータセット
 	deathCount_ = paramater_.deathCount_;
 
+	// パーツモデル
+	for (int i = 0; i < partsModel_.size(); i++) {
+		partsModel_[i] = std::make_unique<Object3d>();
+		partsModel_[i]->Create("PlayerFoot.obj");
+		partsModel_[i]->SetParent(model_.get());
+	}
+	// 位置
+	partsModel_[static_cast<size_t>(Parts::LEFT)]->transform.translate = paramater_.footStartPosLeft_;
+	partsModel_[static_cast<size_t>(Parts::RIGHT)]->transform.translate = paramater_.footStartPosRight_;
+
 	/// 通常モードから
 	ChangeBehavior(std::make_unique<PlayerRoot>(this));
 	ChangeAttackBehavior(std::make_unique<PlayerAttackRoot>(this));
@@ -91,8 +101,11 @@ void Player::Initialize() {
 ///  更新処理
 /// ===================================================
 void Player::Update() {
-	/*prePos_ = GetWorldPosition();*/
 	
+	//位置デバッグ
+	partsModel_[static_cast<size_t>(Parts::LEFT)]->transform.translate = paramater_.footStartPosLeft_;
+	partsModel_[static_cast<size_t>(Parts::RIGHT)]->transform.translate = paramater_.footStartPosRight_;
+
 	/// 振る舞い処理
 	if (!dynamic_cast<PlayerDeath*>(state_.get())) {
 		behavior_->Update();
@@ -116,6 +129,9 @@ void Player::Update() {
 void Player::Draw(Material* material) {
 
 	OriginGameObject::Draw(material);
+	partsModel_[static_cast<size_t>(Parts::LEFT)]->Draw(material);
+	partsModel_[static_cast<size_t>(Parts::RIGHT)]->Draw(material);
+	
 	if (dynamic_cast<PlayerKikAttack*>(attackBehavior_.get())) {
 		kikModel_->Draw();
 	}
@@ -403,7 +419,10 @@ void Player::AdjustParm() {
 		ImGui::PushID(groupName_.c_str());
 		ImGuiManager::GetInstance()->SetFontJapanese();/// 日本語
 		/// 位置
-		ImGui::DragFloat3("位置", &model_->transform.translate.x, 0.1f);
+		ImGui::SeparatorText("位置");
+		ImGui::DragFloat3("本体", &model_->transform.translate.x, 0.1f);
+		ImGui::DragFloat3("足左", &paramater_.footStartPosLeft_.x, 0.1f);
+		ImGui::DragFloat3("足右", &paramater_.footStartPosRight_.x, 0.1f);
 
 		///　Floatのパラメータ
 		ImGui::SeparatorText("基本移動");
@@ -485,6 +504,8 @@ void Player::AddParmGroup() {
 	globalParameter_->AddItem(groupName_, "respownInvincibleTime_", paramater_.respownInvincibleTime_);
 	globalParameter_->AddItem(groupName_, "respownPos_", paramater_.respownPos_);
 	globalParameter_->AddItem(groupName_, "kikRotateTime_", paramater_.kikRotateTime_);
+	globalParameter_->AddItem(groupName_, "footStartPosLeft_", paramater_.footStartPosLeft_);
+	globalParameter_->AddItem(groupName_, "footStartPosRight_", paramater_.footStartPosRight_);
 }
 
 ///=================================================================================
@@ -514,6 +535,8 @@ void Player::SetValues() {
 	globalParameter_->SetValue(groupName_, "respownInvincibleTime_", paramater_.respownInvincibleTime_);
 	globalParameter_->SetValue(groupName_, "respownPos_", paramater_.respownPos_);
 	globalParameter_->SetValue(groupName_, "kikRotateTime_", paramater_.kikRotateTime_);
+	globalParameter_->SetValue(groupName_, "footStartPosLeft_", paramater_.footStartPosLeft_);
+	globalParameter_->SetValue(groupName_, "footStartPosRight_", paramater_.footStartPosRight_);
 }
 
 ///=====================================================
@@ -542,6 +565,8 @@ void Player::ApplyGlobalParameter() {
 	paramater_.respownInvincibleTime_ = globalParameter_->GetValue<float>(groupName_, "respownInvincibleTime_");
 	paramater_.respownPos_ = globalParameter_->GetValue<Vector3>(groupName_, "respownPos_");
 	paramater_.kikRotateTime_ = globalParameter_->GetValue<float>(groupName_, "kikRotateTime_");
+	paramater_.footStartPosLeft_ = globalParameter_->GetValue<Vector3>(groupName_, "footStartPosLeft_");
+	paramater_.footStartPosRight_ = globalParameter_->GetValue<Vector3>(groupName_, "footStartPosRight_");
 }
 ///=========================================================
 /// Class Set

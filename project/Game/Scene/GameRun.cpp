@@ -5,6 +5,7 @@ GameRun::GameRun() {
 }
 
 GameRun::~GameRun() {
+
 }
 
 void GameRun::Initialize() {
@@ -40,6 +41,8 @@ void GameRun::Initialize() {
 	modelManager_->LoadOBJ("NormalEnemy.obj");
 	modelManager_->LoadOBJ("StrongEnemy.obj");
 	modelManager_->LoadOBJ("KickDir.obj");
+	modelManager_->LoadOBJ("bakudan.obj");
+	modelManager_->LoadOBJ("PlayerFoot.obj");
 #pragma endregion
 
 

@@ -25,6 +25,10 @@ public:
 		MAXPOWER,
 	};
 
+	enum class Parts {
+		LEFT,
+		RIGHT,
+	};
 
 	struct Paramater {
 		float             moveSpeed_;
@@ -49,6 +53,8 @@ public:
 		float             respownInvincibleTime_;
 		Vector3           respownPos_;
 		float             kikRotateTime_;
+		Vector3           footStartPosLeft_;
+		Vector3           footStartPosRight_;
 	};
 private:
 
@@ -60,6 +66,7 @@ private:
 
 	// キック仮モデル
 	std::unique_ptr<Object3d>kikModel_;
+	std::array<std::unique_ptr<Object3d>, 2>partsModel_;
 	std::unique_ptr<KikDirectionView>kikDirectionView_;
 
 	/// グローバルなパラメータ
