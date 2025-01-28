@@ -10,7 +10,7 @@
         "RecoilJumpSpeed": 0.44999998807907104,
         "RecoilSpeed": 2.4200000762939453,
         "Translate": [
-            16.798601150512695,
+            16.605037689208984,
             2.200000047683716,
             0.0
         ],
@@ -30,7 +30,7 @@
         "kikChargeTime_": 0.6800000071525574,
         "kikDirectionSpeed_": 2.4800000190734863,
         "kikRotateTime_": 0.44999998807907104,
-        "moveFootSpeed_": 0.3799999952316284,
+        "moveFootSpeed_": 26.540000915527344,
         "respownInvincibleTime_": 1.059999942779541,
         "respownPos_": [
             -16.5,

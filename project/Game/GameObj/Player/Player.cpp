@@ -111,7 +111,7 @@ void Player::Update() {
 	/// 移動処理
 	if (GetIsMoving()) {
 		if (!dynamic_cast<PlayerJump*>(behavior_.get())) {
-			MoveMotion(paramater_.moveSpeed_);
+			MoveMotion(paramater_.moveFootSpeed_);
 		}
 	}
 
