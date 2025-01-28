@@ -17,9 +17,12 @@ private:
 	// fall
 	float fallspeed_;
 	float time_;
-	float amplitude_;    // 揺れ幅
-	float frequency_;   // 揺れる速さ
-	float zRotation_;
+	float rotateAmplitude_;      // 揺れ幅R
+	float rotateFrequency_;      // 揺れる速さR
+	float translateAmplitude_;    // 揺れ幅T
+	float translateFrequency_;   // 揺れる速さT
+	float zRotation_;            //	Z回転
+	float xTranslation_;         // X変位
 
 	Easing speedEase_;
 	float   maxSpeed_;
