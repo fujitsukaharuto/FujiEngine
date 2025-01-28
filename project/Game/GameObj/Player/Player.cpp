@@ -102,8 +102,6 @@ void Player::Initialize() {
 /// ===================================================
 void Player::Update() {
 
-
-
 	/// 振る舞い処理
 	if (!dynamic_cast<PlayerDeath*>(state_.get())) {
 		behavior_->Update();
@@ -130,9 +128,9 @@ void Player::Draw(Material* material) {
 	partsModel_[static_cast<size_t>(Parts::LEFT)]->Draw(material);
 	partsModel_[static_cast<size_t>(Parts::RIGHT)]->Draw(material);
 
-	if (dynamic_cast<PlayerKikAttack*>(attackBehavior_.get())) {
+	/*if (dynamic_cast<PlayerKikAttack*>(attackBehavior_.get())) {
 		kikModel_->Draw();
-	}
+	}*/
 	kikDirectionView_->Draw(material);
 #ifdef _DEBUG
 	kikCollider_->DrawCollider();
