@@ -1,15 +1,12 @@
 /// behavior
 #include"PlayerReSpown.h"
 #include"PlayerNoneState.h"
-
+#include"GameObj/PlayerBehavior/PlayerAttackRoot.h"
+#include"GameObj/PlayerBehavior/PlayerRoot.h"
 /// boss
 #include"GameObj/Player/Player.h"
 /// frame
 #include"DX/FPSKeeper.h"
-/// inupt
-#include"Input/Input.h"
-#include"GameObj/JoyState/JoyState.h"
-
 
 #include<imgui.h>
 
@@ -21,13 +18,16 @@ PlayerReSpown::PlayerReSpown(Player* boss)
 	/// 変数初期化
 	/// ===================================================
 
-	
-	/*pPlayer_->GetKikCollider()->SetIsCollisonCheck(true);*/
+	// パラメータ、位置リセット
 	pPlayer_->SetdeathCount(pPlayer_->GetParamater().deathCount_);
+	pPlayer_->SetDamageRenditionReset();
 	pPlayer_->SetWorldPosition(pPlayer_->GetParamater().respownPos_);
 
+	// 振る舞いリセット
+	pPlayer_->ChangeBehavior(std::make_unique<PlayerRoot>(pPlayer_));
+	pPlayer_->ChangeAttackBehavior(std::make_unique<PlayerAttackRoot>(pPlayer_));
+
 	ease_.maxTime = 0.7f;
-	pPlayer_->SetDamageRenditionReset();
 	step_ = Step::RESPAWN;
 }
 
