@@ -139,8 +139,9 @@ public:
 	void TakeDamage();
 
 
-	void          OnCollisionEnter(const ColliderInfo& other);
-	void          OnCollisionStay(const ColliderInfo& other);
+	void          OnCollisionPlayerEnter(const ColliderInfo& other);
+	void          OnCollisionPlayerStay(const ColliderInfo& other);
+	void          OnCollisionKikStay(const ColliderInfo& other);
 	BaseCollider* GetKikCollider() { return kikCollider_.get(); }
 	BaseCollider* GetCollider() { return collider_.get(); }
 	///-------------------------------------------------------------------------------------

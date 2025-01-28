@@ -63,7 +63,8 @@ void Player::Initialize() {
 	kikCollider_->InfoUpdate();
 
 	collider_ = std::make_unique<AABBCollider>();
-	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
+	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionPlayerEnter(other); });
+	collider_->SetCollisionStayCallback([this](const ColliderInfo& other) {OnCollisionPlayerStay(other); });
 	collider_->SetTag("Player");
 	collider_->SetParent(GetModel());
 	collider_->SetWidth(2.0f);
@@ -100,8 +101,8 @@ void Player::Initialize() {
 ///  更新処理
 /// ===================================================
 void Player::Update() {
-	
-	
+
+
 
 	/// 振る舞い処理
 	if (!dynamic_cast<PlayerDeath*>(state_.get())) {
@@ -128,7 +129,7 @@ void Player::Draw(Material* material) {
 	OriginGameObject::Draw(material);
 	partsModel_[static_cast<size_t>(Parts::LEFT)]->Draw(material);
 	partsModel_[static_cast<size_t>(Parts::RIGHT)]->Draw(material);
-	
+
 	if (dynamic_cast<PlayerKikAttack*>(attackBehavior_.get())) {
 		kikModel_->Draw();
 	}
@@ -159,7 +160,7 @@ Vector3 Player::GetInputVelocity() {
 	// ジョイスティック入力
 	else if (input->GetGamepadState(joyState)) {
 		// DPAD
-		if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT||
+		if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT ||
 			joyState.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_LEFT) {
 
 			if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_LEFT) {
@@ -184,7 +185,7 @@ Vector3 Player::GetInputVelocity() {
 ///  移動処理
 /// ===================================================
 void Player::Move(const float& speed) {
-	
+
 	/// Inuputから速度代入
 	velocity_ = GetInputVelocity();
 
@@ -255,7 +256,7 @@ bool Player::GetIsMoving() {
 		}
 		/// Stick
 		else {
-			
+
 			StickVelocity = { (float)joyState.Gamepad.sThumbLX / SHRT_MAX, 0, 0 };
 		}
 
@@ -586,8 +587,27 @@ void Player::ApplyGlobalParameter() {
 /// Class Set
 ///==========================================================
 
-void Player::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
+void Player::OnCollisionPlayerEnter([[maybe_unused]] const ColliderInfo& other) {
 
+	//// 死にます
+	//if (other.tag == "DaungerousFieldBlock") {
+	//	deathCount_--; // デクリメント
+
+	//	/// 死亡
+	//	if (deathCount_ <= 0) {
+	//		ChangeState(std::make_unique<PlayerDeath>(this));
+	//		return;
+	//	}
+	//	/// ダメージ演出
+	//	else {
+	//		
+
+	//		return;
+	//	}
+	//}
+}
+
+void   Player::OnCollisionPlayerStay(const ColliderInfo& other) {
 	// 死にます
 	if (other.tag == "DaungerousFieldBlock") {
 		deathCount_--; // デクリメント
@@ -599,14 +619,14 @@ void Player::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 		}
 		/// ダメージ演出
 		else {
-			
+
 
 			return;
 		}
 	}
 }
 
-void Player::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
+void Player::OnCollisionKikStay([[maybe_unused]] const ColliderInfo& other) {
 
 	/*if (other.tag == "SpecialAttackArea") {
 		if (!dynamic_cast<PlayerSpecialFall*>(attackBehavior_.get())) {
@@ -615,7 +635,7 @@ void Player::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
 		}
 	}*/
 
-	
+
 }
 
 
@@ -679,7 +699,7 @@ void Player::ChangeKikDirection() {
 	// X軸の制限
 	kikDirection_.x = std::clamp(kikDirection_.x, minX, maxX);
 	// 緩やかに上向きを維持
-	kikDirection_.y = max(kikDirection_.y, maxY);	
+	kikDirection_.y = max(kikDirection_.y, maxY);
 	// 再度正規化
 	kikDirection_.Normalize();
 	// Z成分を0に設定
@@ -701,7 +721,7 @@ void Player::SetDamageRenditionReset() {
 }
 
 
-void Player::MoveMotion(const float &moveSpeed) {
+void Player::MoveMotion(const float& moveSpeed) {
 	if (moveSpeed != 0.0f) {
 		// モーションの経過時間を更新
 		motionTime_ += moveSpeed * FPSKeeper::DeltaTimeRate();
