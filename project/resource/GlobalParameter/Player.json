@@ -1,16 +1,16 @@
 {
     "Player": {
-        "AirMoveSpeed": 17.0,
+        "AirMoveSpeed": 15.0,
         "Gravity": 27.639999389648438,
-        "JumpSpeed": 26.229999542236328,
+        "JumpSpeed": 23.0,
         "KikTime": 0.10000000149011612,
         "KikWaitTime": 0.1899999976158142,
         "MaxFallSpeed": 9.229999542236328,
-        "MoveSpeed": 17.0,
+        "MoveSpeed": 13.0,
         "RecoilJumpSpeed": 0.44999998807907104,
         "RecoilSpeed": 2.4200000762939453,
         "Translate": [
-            11.199189186096191,
+            13.868107795715332,
             2.200000047683716,
             0.0
         ],
