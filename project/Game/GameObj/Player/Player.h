@@ -58,6 +58,8 @@ public:
 		float             footMotionAmount_;
 		float             moveFootSpeed_;
 		float             jumpFootSpeed_;
+		Vector3           trainTipPos_;
+		Vector3           trainRootPos_;
 	};
 private:
 
@@ -67,8 +69,6 @@ private:
 
 	FieldBlockManager* pFieldBlockManager_;
 
-	// キック仮モデル
-	std::unique_ptr<Object3d>kikModel_;
 	std::array<std::unique_ptr<Object3d>, 2>partsModel_;
 	std::unique_ptr<KikDirectionView>kikDirectionView_;
 
@@ -103,6 +103,10 @@ private:
 	std::array<std::string, 2>    tags_;
 	Vector3                       collisionSize_;
 
+
+	/// trailPos
+	std::unique_ptr<AABBCollider>trailRoot_;
+	std::unique_ptr<AABBCollider>trailTip_;
 
 public:
 	static float InitY_;

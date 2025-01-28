@@ -72,11 +72,17 @@ void Player::Initialize() {
 	collider_->SetDepth(2.0f);
 	collider_->InfoUpdate();
 
-	// 仮モデル
-	kikModel_ = std::make_unique<Object3d>();
-	kikModel_->Create("NormalEnemy.obj");
-	kikModel_->SetParent(GetModel());
-	kikModel_->transform.translate.z = 1.5f;
+	// 仮置き（トレール用）
+	trailRoot_ = std::make_unique<AABBCollider>();
+	trailRoot_->SetParent(model_.get());
+	trailRoot_->SetWidth(2.0f);
+	trailRoot_->SetHeight(2.0f);
+	trailRoot_->SetDepth(2.0f);
+	trailTip_ = std::make_unique<AABBCollider>();
+	trailTip_->SetParent(model_.get());
+	trailTip_->SetWidth(2.0f);
+	trailTip_->SetHeight(2.0f);
+	trailTip_->SetDepth(2.0f);
 
 	//パラメータセット
 	deathCount_ = paramater_.deathCount_;
@@ -109,12 +115,18 @@ void Player::Update() {
 		}
 	}
 
+	// トレール可視化用
+	trailRoot_->SetPos(paramater_.trainRootPos_);
+	trailTip_->SetPos(paramater_.trainTipPos_);
+
+
+	state_->Update();// 状態更新
+
 	/// 振る舞い処理
 	if (!dynamic_cast<PlayerDeath*>(state_.get())) {
 		behavior_->Update();
 		attackBehavior_->Update();
 	}
-	state_->Update();
 
 	//　移動制限
 	MoveToLimit();
@@ -122,8 +134,9 @@ void Player::Update() {
 
 	collider_->InfoUpdate();
 	kikCollider_->InfoUpdate();
-	/// 更新
-	//base::Update();
+	trailRoot_->InfoUpdate();
+	trailTip_->InfoUpdate();
+	
 }
 
 /// ===================================================
@@ -135,13 +148,13 @@ void Player::Draw(Material* material) {
 	partsModel_[static_cast<size_t>(Parts::LEFT)]->Draw(material);
 	partsModel_[static_cast<size_t>(Parts::RIGHT)]->Draw(material);
 
-	/*if (dynamic_cast<PlayerKikAttack*>(attackBehavior_.get())) {
-		kikModel_->Draw();
-	}*/
+	
 	kikDirectionView_->Draw(material);
 #ifdef _DEBUG
 	kikCollider_->DrawCollider();
 	collider_->DrawCollider();
+	trailRoot_->DrawCollider();
+	trailTip_->DrawCollider();
 #endif // _DEBUG
 }
 
@@ -197,7 +210,6 @@ void Player::Move(const float& speed) {
 	/// 移動処理
 	if (GetIsMoving()) {
 		
-
 		// 移動ベクトルの正規化と速さの適用
 		velocity_ = (velocity_).Normalize() * (speed * FPSKeeper::DeltaTimeRate());
 
@@ -451,6 +463,9 @@ void Player::AdjustParm() {
 		ImGui::DragFloat("足の移動量", &paramater_.footMotionAmount_, 0.01f);
 		ImGui::DragFloat("足の挙動スピード(普通移動)", &paramater_.moveFootSpeed_, 0.01f);
 		ImGui::DragFloat("足の挙動スピード(ジャンプ)", &paramater_.jumpFootSpeed_, 0.01f);
+		ImGui::SeparatorText("トレールエフェクト");
+		ImGui::DragFloat3("先端位置", &paramater_.trainTipPos_.x, 0.01f);
+		ImGui::DragFloat3("根本位置", &paramater_.trainRootPos_.x, 0.01f);
 		/*ImGui::SeparatorText("いらないかもパラメータ");
 		ImGui::DragFloat("specialAttackAntiTime_", &paramater_.specialAttackAntiTime_, 0.01f);
 		ImGui::DragFloat("specialAttackFallSpeed_", &paramater_.specialAttackFallSpeed_, 0.01f);
@@ -518,6 +533,8 @@ void Player::AddParmGroup() {
 	globalParameter_->AddItem(groupName_, "footMotionAmount_", paramater_.footMotionAmount_);
 	globalParameter_->AddItem(groupName_, "moveFootSpeed_", paramater_.moveFootSpeed_);
 	globalParameter_->AddItem(groupName_, "jumpFootSpeed_", paramater_.jumpFootSpeed_);
+	globalParameter_->AddItem(groupName_, "trainTipPos_", paramater_.trainTipPos_);
+	globalParameter_->AddItem(groupName_, "trainRootPos_", paramater_.trainRootPos_);
 }
 
 ///=================================================================================
@@ -552,6 +569,8 @@ void Player::SetValues() {
 	globalParameter_->SetValue(groupName_, "footMotionAmount_", paramater_.footMotionAmount_);
 	globalParameter_->SetValue(groupName_, "moveFootSpeed_", paramater_.moveFootSpeed_);
 	globalParameter_->SetValue(groupName_, "jumpFootSpeed_", paramater_.jumpFootSpeed_);
+	globalParameter_->SetValue(groupName_, "trainTipPos_", paramater_.trainTipPos_);
+	globalParameter_->SetValue(groupName_, "trainRootPos_", paramater_.trainRootPos_);
 }
 
 ///=====================================================
@@ -585,6 +604,8 @@ void Player::ApplyGlobalParameter() {
 	paramater_.footMotionAmount_ = globalParameter_->GetValue<float>(groupName_, "footMotionAmount_");
 	paramater_.moveFootSpeed_ = globalParameter_->GetValue<float>(groupName_, "moveFootSpeed_");
 	paramater_.jumpFootSpeed_ = globalParameter_->GetValue<float>(groupName_, "jumpFootSpeed_");
+	paramater_.trainTipPos_ = globalParameter_->GetValue<Vector3>(groupName_, "trainTipPos_");
+	paramater_.trainRootPos_ = globalParameter_->GetValue<Vector3>(groupName_, "trainRootPos_");
 }
 ///=========================================================
 /// Class Set

@@ -10,7 +10,7 @@
         "RecoilJumpSpeed": 0.44999998807907104,
         "RecoilSpeed": 2.4200000762939453,
         "Translate": [
-            13.868107795715332,
+            16.798601150512695,
             2.200000047683716,
             0.0
         ],
@@ -42,6 +42,16 @@
         "specialAttackFallSpeed_": 34.27000045776367,
         "specialAttackPostGravity_": 1.7000000476837158,
         "specialAttackPostJump_": 0.9800000190734863,
-        "specialAttackPostMaxFallSpeed_": 0.75
+        "specialAttackPostMaxFallSpeed_": 0.75,
+        "trainRootPos_": [
+            0.0,
+            0.0,
+            3.630000114440918
+        ],
+        "trainTipPos_": [
+            1.8799999952316284,
+            2.7899999618530273,
+            1.0700000524520874
+        ]
     }
 }

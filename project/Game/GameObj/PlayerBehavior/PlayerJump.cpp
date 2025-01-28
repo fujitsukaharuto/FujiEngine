@@ -12,7 +12,7 @@
 
 
 /// ===================================================
-///初期化
+/// 初期化
 /// ===================================================
 PlayerJump::PlayerJump(Player* player)
 	: BasePlayerBehavior("PlayerJump", player) {
