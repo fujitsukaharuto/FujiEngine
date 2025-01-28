@@ -6,6 +6,7 @@
 #include "Scene/SceneManager.h"
 
 #include "Model/Line3dDrawer.h"
+#include "Model/PlaneDrawer.h"
 
 #include<imgui.h>
 
@@ -168,6 +169,7 @@ void GameScene::Draw() {
 	ufo_->UFOLightDraw();
 
 	ParticleManager::GetInstance()->Draw();
+	PlaneDrawer::GetInstance()->Render();
 	Line3dDrawer::GetInstance()->Render();
 
 #pragma endregion

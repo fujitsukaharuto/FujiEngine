@@ -60,7 +60,7 @@ void PlaneDrawer::Finalize() {
 void PlaneDrawer::AddPlanePoint(const Vector3& p1) {
 
 	if (numberCount_ == 0) {
-		points_.push_back({ p1,{0.0f,0.0f},{1.0f,1.0f,0.0f,0.3f} });
+		points_.push_back({ p1,{0.0f,0.0f},{1.0f,1.0f,0.0f,0.2f} });
 		numberCount_++;
 	}
 	else {
@@ -190,7 +190,7 @@ void PlaneDrawer::SetCamera(Camera* camera) {
 void PlaneDrawer::CreateMeshes() {
 
 	const UINT maxVertex = kMaxPlanes * 4;
-	const UINT maxIndices = maxVertex * 120;
+	const UINT maxIndices = maxVertex * 240;
 
 	planes_ = CreateMesh(maxVertex, maxIndices);
 }

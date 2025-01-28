@@ -108,6 +108,8 @@ private:
 	std::unique_ptr<AABBCollider>trailRoot_;
 	std::unique_ptr<AABBCollider>trailTip_;
 
+	float popTime_ = 0.0f;
+
 public:
 	static float InitY_;
 	Player();
@@ -142,6 +144,7 @@ public:
 	void DamageRendition(const float&interval);
 	void TakeDamage();
 
+	void TrailUpdate();
 
 	void          OnCollisionPlayerEnter(const ColliderInfo& other);
 	void          OnCollisionPlayerStay(const ColliderInfo& other);
@@ -166,6 +169,8 @@ public:
 	float GetFacingDirection()const;
 	Vector3 GetKikDirection()const { return kikDirection_; };
 	std::string GetTag(int i) { return tags_[i]; }
+	AABBCollider* GetTrailRoot() { return trailRoot_.get(); }
+	AABBCollider* GetTrailTip() { return trailTip_.get(); }
 	/// ===================================================
 	/// setter method
 	/// ===================================================

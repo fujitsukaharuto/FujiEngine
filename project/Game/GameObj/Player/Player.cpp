@@ -1,6 +1,7 @@
 #include "Player.h"
 ///* fps
 #include"DX/FPSKeeper.h"
+#include "Model/PlaneDrawer.h"
 ///*input
 #include"GameObj/JoyState/JoyState.h"
 ///* math
@@ -115,10 +116,8 @@ void Player::Update() {
 		}
 	}
 
-	// トレール可視化用
-	trailRoot_->SetPos(paramater_.trainRootPos_);
-	trailTip_->SetPos(paramater_.trainTipPos_);
 
+	TrailUpdate();
 
 	state_->Update();// 状態更新
 
@@ -381,6 +380,22 @@ void Player::MoveToLimit() {
 /// ダメージ受ける
 ///==========================================================
 void Player::TakeDamage() {
+
+}
+
+void Player::TrailUpdate() {
+	// トレール可視化用
+	trailRoot_->SetPos(paramater_.trainRootPos_);
+	trailTip_->SetPos(paramater_.trainTipPos_);
+
+	if (popTime_ > 0.0f) {
+		popTime_ -= FPSKeeper::DeltaTime();
+	}
+	else {
+		PlaneDrawer::GetInstance()->PopPlanePoint();
+		PlaneDrawer::GetInstance()->PopPlanePoint();
+		popTime_ = 1.5f;
+	}
 
 }
 

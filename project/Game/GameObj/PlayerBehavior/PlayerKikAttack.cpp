@@ -11,6 +11,8 @@
 /// inupt
 #include<imgui.h>
 #include<numbers>
+#include "Model/PlaneDrawer.h"
+
 
 //初期化
 PlayerKikAttack::PlayerKikAttack(Player* boss)
@@ -48,6 +50,12 @@ void PlayerKikAttack::Update() {
 		// 回転
 		KikRotation();
 		
+		if (kikTime_ <= pPlayer_->GetParamater().kikTime_ * 2.0f) {
+			PlaneDrawer::GetInstance()->AddPlanePoint(pPlayer_->GetTrailRoot()->GetPos());
+			PlaneDrawer::GetInstance()->AddPlanePoint(pPlayer_->GetTrailTip()->GetPos());
+		};
+
+
 		// タイム超越で次のステップ
 		if (kikTime_ < pPlayer_->GetParamater().kikRotateTime_)break;
 		pPlayer_->SetRotationZ(0.0f);
