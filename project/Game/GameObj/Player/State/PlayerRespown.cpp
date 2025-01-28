@@ -26,7 +26,7 @@ PlayerReSpown::PlayerReSpown(Player* boss)
 	pPlayer_->SetdeathCount(pPlayer_->GetParamater().deathCount_);
 	pPlayer_->SetWorldPosition(pPlayer_->GetParamater().respownPos_);
 
-	ease_.maxTime = 0.5f;
+	ease_.maxTime = 0.7f;
 	pPlayer_->SetDamageRenditionReset();
 	step_ = Step::RESPAWN;
 }

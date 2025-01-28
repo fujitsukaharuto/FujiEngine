@@ -40,7 +40,7 @@ void Player::Initialize() {
 	tags_[static_cast<size_t>(KikPower::WEAK)] = "WeakKik";
 	tags_[static_cast<size_t>(KikPower::MAXPOWER)] = "MaxPowerKik";
 
-	collisionSize_ = Vector3(3, 5, 15);
+	collisionSize_ = Vector3(3, 4, 15);
 
 	///* グローバルパラメータ
 	globalParameter_ = GlobalVariables::GetInstance();
@@ -67,7 +67,7 @@ void Player::Initialize() {
 	collider_->SetTag("Player");
 	collider_->SetParent(GetModel());
 	collider_->SetWidth(2.0f);
-	collider_->SetHeight(2.0f);
+	collider_->SetHeight(5.0f);
 	collider_->SetDepth(2.0f);
 	collider_->InfoUpdate();
 
@@ -101,9 +101,7 @@ void Player::Initialize() {
 /// ===================================================
 void Player::Update() {
 	
-	//位置デバッグ
-	partsModel_[static_cast<size_t>(Parts::LEFT)]->transform.translate = paramater_.footStartPosLeft_;
-	partsModel_[static_cast<size_t>(Parts::RIGHT)]->transform.translate = paramater_.footStartPosRight_;
+	
 
 	/// 振る舞い処理
 	if (!dynamic_cast<PlayerDeath*>(state_.get())) {
