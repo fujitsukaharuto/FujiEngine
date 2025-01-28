@@ -2,6 +2,7 @@
 
 #include"BaseFieldBlockState.h"
 #include"Easing.h"
+#include "Particle/ParticleEmitter.h"
 
 class FieldBlockDaungerous: public BaseFieldBlockState {
 private:
@@ -14,6 +15,7 @@ private:
 	Step step_;
 	float restoreTime_;
 
+	ParticleEmitter darkEmit_;
 
 public:
 	//コンストラクタ

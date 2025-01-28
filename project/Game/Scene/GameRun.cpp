@@ -79,6 +79,8 @@ void GameRun::Initialize() {
 
 	pManager_->CreateParticleGroup("jump", "blueParticle.png", 15);
 
+	pManager_->CreateParticleGroup("dark", "blueParticle.png", 30, true);
+
 #pragma endregion
 
 

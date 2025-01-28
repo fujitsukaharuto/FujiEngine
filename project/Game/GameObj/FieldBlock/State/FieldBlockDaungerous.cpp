@@ -9,7 +9,7 @@
 /// math
 #include"MathFunction.h"
 #include"FPSKeeper.h"
-
+#include "Particle/ParticleManager.h"
 
 //初期化
 FieldBlockDaungerous::FieldBlockDaungerous(FieldBlock* boss)
@@ -20,6 +20,14 @@ FieldBlockDaungerous::FieldBlockDaungerous(FieldBlock* boss)
 	pFieldBlock_->SetTag(static_cast<size_t>(FieldBlock::Tag::DAUNGEROUS));
 	restoreTime_ = 0.0f;
 	step_ = Step::DAUNGEROUSMODE;
+
+	ParticleManager::Load(darkEmit_, "dark");
+	darkEmit_.pos = pFieldBlock_->GetModel()->GetWorldPos();
+	Vector3 emitSizeMax = pFieldBlock_->GetCollisionSize() * 0.5f;
+	Vector3 emitSizeMin = pFieldBlock_->GetCollisionSize() * -0.5f;
+	darkEmit_.emitSizeMax = emitSizeMax;
+	darkEmit_.emitSizeMin.x = emitSizeMin.x;
+	darkEmit_.emitSizeMin.z = emitSizeMin.z;
 }
 
 FieldBlockDaungerous::~FieldBlockDaungerous() {
@@ -35,6 +43,7 @@ void  FieldBlockDaungerous::Update() {
 		/// 危険モード
 		///----------------------------------------------------------
 		restoreTime_ += FPSKeeper::DeltaTimeRate();
+		darkEmit_.Emit();
 		if (restoreTime_<pFieldBlock_->GetParamater().restoreTime_)break;
 		step_ = Step::GONORMAL;
 
