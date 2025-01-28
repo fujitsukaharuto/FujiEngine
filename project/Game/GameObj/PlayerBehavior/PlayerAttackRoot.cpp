@@ -58,7 +58,7 @@ void PlayerAttackRoot::Update() {
 		}
 		 // コントローラ
 		 if (!(Input::GetInstance()->GetGamepadState(joyState)))break;
-		 if (!(Input::GetInstance()->PressButton(PadInput::B)))break;
+		 if (!(Input::GetInstance()->PressButton(PadInput::X)))break;
 		step_ = Step::ATTACKCHAREGE;
 
 		break;
@@ -68,7 +68,7 @@ void PlayerAttackRoot::Update() {
 		/// ---------------------------------------------------------------
 		
 		// チャージ
-		if (Input::GetInstance()->PushKey(DIK_K) || Input::GetInstance()->PressButton(PadInput::B)) {
+		if (Input::GetInstance()->PushKey(DIK_K) || Input::GetInstance()->PressButton(PadInput::X)) {
 			chargeTime_ += FPSKeeper::NormalDeltaTime();
 			/// チャージパーティクル入れる
 			charge1_.pos = pPlayer_->GetModel()->GetWorldPos();
@@ -79,7 +79,7 @@ void PlayerAttackRoot::Update() {
 
 		
 		///* ボタン離したらキック攻撃開始
-		if (Input::GetInstance()->ReleaseKey(DIK_K) || Input::GetInstance()->ReleaseButton(PadInput::B)) {
+		if (Input::GetInstance()->ReleaseKey(DIK_K) || Input::GetInstance()->ReleaseButton(PadInput::X)) {
 			Audio::GetInstance()->SoundPlayWave(kickAir_);
 			pPlayer_->ChangeAttackBehavior(std::make_unique<PlayerKikAttack>(pPlayer_));
 			return;
@@ -102,7 +102,7 @@ void PlayerAttackRoot::Update() {
 		kiran2_.pos = pPlayer_->GetModel()->GetWorldPos();
 		kiran1_.Emit();
 
-		if (Input::GetInstance()->ReleaseKey(DIK_K) || Input::GetInstance()->ReleaseButton(PadInput::B)) {
+		if (Input::GetInstance()->ReleaseKey(DIK_K) || Input::GetInstance()->ReleaseButton(PadInput::X)) {
 			Audio::GetInstance()->SoundPlayWave(kickAir_);
 			pPlayer_->ChangeAttackBehavior(std::make_unique<PlayerKikAttack>(pPlayer_));
 			return;
@@ -118,7 +118,7 @@ void PlayerAttackRoot::Update() {
 void PlayerAttackRoot::ChargeForJoyStick() {
 	if (!(Input::GetInstance()->GetGamepadState(joyState)))return;
 
-	if (!(Input::GetInstance()->PressButton(PadInput::B)))return;
+	if (!(Input::GetInstance()->PressButton(PadInput::X)))return;
 	chargeTime_ += FPSKeeper::NormalDeltaTime();
 	/// チャージパーティクル入れる
 }
@@ -127,7 +127,7 @@ void PlayerAttackRoot::ChargeForJoyStick() {
 void PlayerAttackRoot::AtttackForJoyStick() {
 	if (!(Input::GetInstance()->GetGamepadState(joyState)))return;
 
-	if (!(Input::GetInstance()->ReleaseButton(PadInput::B)))return;
+	if (!(Input::GetInstance()->ReleaseButton(PadInput::X)))return;
 
 	pPlayer_->ChangeAttackBehavior(std::make_unique<PlayerKikAttack>(pPlayer_));
 }

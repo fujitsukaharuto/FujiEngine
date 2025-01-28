@@ -18,7 +18,7 @@ EnemyFall::EnemyFall(BaseEnemy* boss)
 
     rotateAmplitude_ = 0.2f;
     rotateFrequency_ = 2.0f;
-    translateAmplitude_ = 0.1f;
+    translateAmplitude_ = 0.05f;
     translateFrequency_ = 2.0f;
     time_ = 0.0f;            
 
