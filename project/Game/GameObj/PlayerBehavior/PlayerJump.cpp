@@ -39,6 +39,7 @@ PlayerJump ::~PlayerJump() {
 
 //更新
 void PlayerJump::Update() {
+	pPlayer_->MoveMotion(pPlayer_->GetParamater().jumpFootSpeed_);
 	pPlayer_->Move(pPlayer_->GetParamater().airMoveSpeed_);
 	pPlayer_->Jump(speed_);
 }

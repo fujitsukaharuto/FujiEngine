@@ -57,8 +57,6 @@ void  FieldBlockDaungerous::Update() {
 	default:
 		break;
 	}
-
-	
 }
 
 void  FieldBlockDaungerous::Debug() {

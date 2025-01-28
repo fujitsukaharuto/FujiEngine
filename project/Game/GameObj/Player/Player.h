@@ -55,6 +55,9 @@ public:
 		float             kikRotateTime_;
 		Vector3           footStartPosLeft_;
 		Vector3           footStartPosRight_;
+		float             footMotionAmount_;
+		float             moveFootSpeed_;
+		float             jumpFootSpeed_;
 	};
 private:
 
@@ -82,12 +85,13 @@ private:
 	Vector3           velocity_;
 	Vector3           prePos_;
 
-	///* 目標角度
+	///* Parm
 	float             objectiveAngle_;
 	Vector3           inputDirection_;
 	Vector3           kikDirection_;
 	int               deathCount_;
 	Paramater         paramater_;
+	float             motionTime_;
 
 	// ダメージ演出
 	float elapsedTime_;
@@ -114,6 +118,7 @@ public:
 
 	///* 移動
 	void    Move(const float& speed);
+	void    MoveMotion(const float& moveSpeed);
 	bool    GetIsMoving();
 	Vector3 GetInputVelocity();
 	void    MoveToLimit();
@@ -163,4 +168,5 @@ public:
 	void SetKikIsCollision(const bool& is);
 	void SetTag(const int& i);
 	void SetDamageRenditionReset();
+	void SetMotionTime(const float& t) { motionTime_ = t; }
 };

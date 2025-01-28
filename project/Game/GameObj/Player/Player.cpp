@@ -12,8 +12,6 @@
 #include"GameObj/PlayerBehavior/PlayerJump.h"
 #include"GameObj/PlayerBehavior/PlayerAttackRoot.h"
 #include"GameObj/PlayerBehavior/PlayerKikAttack.h"
-#include"GameObj/PlayerBehavior/PlayerRecoil.h"
-#include"GameObj/PlayerBehavior/PlayerSpecialFall.h"
 ///state
 #include"GameObj/Player/State/PlayerDeath.h"
 #include"GameObj/Player/State/PlayerNoneState.h"
@@ -22,12 +20,13 @@
 #include"GameObj/FieldBlock/FieldBlockManager.h"
 ///* std
 #include<algorithm>
+#include<numbers>
 ///* imgui
 #include"ImGuiManager.h"
 #include<imgui.h> 
 
 
-float Player::InitY_ = 2.8f;
+float Player::InitY_ = 2.2f;
 
 Player::Player() {}
 
@@ -187,12 +186,16 @@ Vector3 Player::GetInputVelocity() {
 ///  移動処理
 /// ===================================================
 void Player::Move(const float& speed) {
-
+	
 	/// Inuputから速度代入
 	velocity_ = GetInputVelocity();
 
 	/// 移動処理
 	if (GetIsMoving()) {
+		if (!dynamic_cast<PlayerJump*>(behavior_.get())) {
+			MoveMotion(paramater_.moveSpeed_);
+		}
+
 		// 移動ベクトルの正規化と速さの適用
 		velocity_ = (velocity_).Normalize() * (speed * FPSKeeper::DeltaTimeRate());
 
@@ -442,6 +445,10 @@ void Player::AdjustParm() {
 		ImGui::DragFloat3("復活座標", &paramater_.respownPos_.x, 0.1f);
 		ImGui::DragFloat("復活までの待機時間(秒)", &paramater_.respownWaitTime_, 0.01f);
 		ImGui::DragFloat("復活後の無敵時間(秒)", &paramater_.respownInvincibleTime_, 0.01f);
+		ImGui::SeparatorText("足の動きモーション");
+		ImGui::DragFloat("足の移動量", &paramater_.footMotionAmount_, 0.01f);
+		ImGui::DragFloat("足の挙動スピード(普通移動)", &paramater_.moveFootSpeed_, 0.01f);
+		ImGui::DragFloat("足の挙動スピード(ジャンプ)", &paramater_.jumpFootSpeed_, 0.01f);
 		/*ImGui::SeparatorText("いらないかもパラメータ");
 		ImGui::DragFloat("specialAttackAntiTime_", &paramater_.specialAttackAntiTime_, 0.01f);
 		ImGui::DragFloat("specialAttackFallSpeed_", &paramater_.specialAttackFallSpeed_, 0.01f);
@@ -506,6 +513,9 @@ void Player::AddParmGroup() {
 	globalParameter_->AddItem(groupName_, "kikRotateTime_", paramater_.kikRotateTime_);
 	globalParameter_->AddItem(groupName_, "footStartPosLeft_", paramater_.footStartPosLeft_);
 	globalParameter_->AddItem(groupName_, "footStartPosRight_", paramater_.footStartPosRight_);
+	globalParameter_->AddItem(groupName_, "footMotionAmount_", paramater_.footMotionAmount_);
+	globalParameter_->AddItem(groupName_, "moveFootSpeed_", paramater_.moveFootSpeed_);
+	globalParameter_->AddItem(groupName_, "jumpFootSpeed_", paramater_.jumpFootSpeed_);
 }
 
 ///=================================================================================
@@ -537,6 +547,9 @@ void Player::SetValues() {
 	globalParameter_->SetValue(groupName_, "kikRotateTime_", paramater_.kikRotateTime_);
 	globalParameter_->SetValue(groupName_, "footStartPosLeft_", paramater_.footStartPosLeft_);
 	globalParameter_->SetValue(groupName_, "footStartPosRight_", paramater_.footStartPosRight_);
+	globalParameter_->SetValue(groupName_, "footMotionAmount_", paramater_.footMotionAmount_);
+	globalParameter_->SetValue(groupName_, "moveFootSpeed_", paramater_.moveFootSpeed_);
+	globalParameter_->SetValue(groupName_, "jumpFootSpeed_", paramater_.jumpFootSpeed_);
 }
 
 ///=====================================================
@@ -567,6 +580,9 @@ void Player::ApplyGlobalParameter() {
 	paramater_.kikRotateTime_ = globalParameter_->GetValue<float>(groupName_, "kikRotateTime_");
 	paramater_.footStartPosLeft_ = globalParameter_->GetValue<Vector3>(groupName_, "footStartPosLeft_");
 	paramater_.footStartPosRight_ = globalParameter_->GetValue<Vector3>(groupName_, "footStartPosRight_");
+	paramater_.footMotionAmount_ = globalParameter_->GetValue<float>(groupName_, "footMotionAmount_");
+	paramater_.moveFootSpeed_ = globalParameter_->GetValue<float>(groupName_, "moveFootSpeed_");
+	paramater_.jumpFootSpeed_ = globalParameter_->GetValue<float>(groupName_, "jumpFootSpeed_");
 }
 ///=========================================================
 /// Class Set
@@ -684,4 +700,20 @@ void Player::SetTag(const int& i) {
 void Player::SetDamageRenditionReset() {
 	elapsedTime_ = 0.0f;
 	isTransparent_ = false;
+}
+
+
+void Player::MoveMotion(const float &moveSpeed) {
+	if (moveSpeed != 0.0f) {
+		// モーションの経過時間を更新
+		motionTime_ += moveSpeed * FPSKeeper::DeltaTimeRate();
+
+		// 各足のZ軸方向の動きを計算
+		float leftFootZOffset = paramater_.footMotionAmount_ * std::sin(motionTime_ + 0.0f);
+		float rightFootZOffset = paramater_.footMotionAmount_ * std::sin(motionTime_ + std::numbers::pi_v<float>);
+
+		// 足のモデルに動きを適用
+		partsModel_[static_cast<size_t>(Parts::LEFT)]->transform.translate.z = paramater_.footStartPosLeft_.z + leftFootZOffset;
+		partsModel_[static_cast<size_t>(Parts::RIGHT)]->transform.translate.z = paramater_.footStartPosRight_.z + rightFootZOffset;
+	}
 }
