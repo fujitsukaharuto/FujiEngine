@@ -935,6 +935,12 @@
     <FxCompile Include="resource\Shaders\CRTEffect.PS.hlsl">
       <Filter>resource\Shaders</Filter>
     </FxCompile>
+    <FxCompile Include="resource\Shaders\PlaneDrawer.PS.hlsl">
+      <Filter>resource\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\PlaneDrawer.VS.hlsl">
+      <Filter>resource\Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="resource\Shaders\Object3d.hlsli">
