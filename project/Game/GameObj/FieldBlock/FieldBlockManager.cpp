@@ -102,6 +102,7 @@ void FieldBlockManager::Draw(Material* material) {
 /// ロード
 ///=================================================================================
 void FieldBlockManager::ParmLoadForImGui() {
+#ifdef _DEBUG
 
 	/// ロードボタン
 	if (ImGui::Button(std::format("Load {}", groupName_).c_str())) {
@@ -111,6 +112,7 @@ void FieldBlockManager::ParmLoadForImGui() {
 		ImGui::Text("Load Successful: %s", groupName_.c_str());
 		ApplyGlobalParameter();
 	}
+#endif // DEBUG
 }
 
 
@@ -171,9 +173,8 @@ void FieldBlockManager::AdjustParm() {
 		ParmLoadForImGui();
 		ImGui::PopID();
 
-
-#endif // _DEBUG
 	}
+#endif // _DEBUG
 	for (auto it = fieldBlocks_.begin(); it != fieldBlocks_.end(); ++it) {
 		(*it)->AdjustParm();
 	}
