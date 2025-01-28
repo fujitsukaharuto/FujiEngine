@@ -13,6 +13,7 @@ void SkyDome::Initialize() {
 	OriginGameObject::CreateModel("SkyDome.obj");
 
 	model_->transform.scale = { 500,500,500 };
+	model_->SetLightEnable(LightMode::kLightNone);
 
 }
 
