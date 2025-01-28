@@ -350,6 +350,12 @@
     <ClCompile Include="Engine\GraphicPipeline\ParticleSabPipe.cpp">
       <Filter>Engine\GraphicPipeline</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\GraphicPipeline\PlaneDrawerPipe.cpp">
+      <Filter>Engine\GraphicPipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Model\PlaneDrawer.cpp">
+      <Filter>Engine\Model</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Audio\Audio.h">
@@ -717,6 +723,12 @@
     </ClInclude>
     <ClInclude Include="Engine\GraphicPipeline\ParticleSabPipe.h">
       <Filter>Engine\GraphicPipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\GraphicPipeline\PlaneDrawerPipe.h">
+      <Filter>Engine\GraphicPipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Model\PlaneDrawer.h">
+      <Filter>Engine\Model</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

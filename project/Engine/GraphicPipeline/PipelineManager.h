@@ -18,6 +18,7 @@ enum class Pipe : int {
 	Fire,
 	Thunder,
 	CRT,
+	Plane,
 };
 
 

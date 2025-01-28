@@ -12,7 +12,7 @@
 #include "FirePipe.h"
 #include "ThunderPipe.h"
 #include "CRTPipe.h"
-
+#include "PlaneDrawerPipe.h"
 
 
 PipelineManager::~PipelineManager() {
@@ -45,7 +45,7 @@ void PipelineManager::CreatePipeline() {
 	std::unique_ptr<FirePipe> firePipe = nullptr;
 	std::unique_ptr<ThunderPipe> thunderPipe = nullptr;
 	std::unique_ptr<CRTPipe> crtPipe = nullptr;
-
+	std::unique_ptr<PlanePipe> plane = nullptr;
 
 
 	nonePipeline.reset(new NonePipeline());
@@ -104,6 +104,10 @@ void PipelineManager::CreatePipeline() {
 	crtPipe.reset(new CRTPipe);
 	crtPipe->Initialize();
 	pipelines_.push_back(std::move(crtPipe));
+
+	plane.reset(new PlanePipe);
+	plane->Initialize();
+	pipelines_.push_back(std::move(plane));
 
 }
 

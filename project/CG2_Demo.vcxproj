@@ -131,6 +131,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\GraphicPipeline\ParticleSabPipe.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\Pipeline.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\PipelineManager.cpp" />
+    <ClCompile Include="Engine\GraphicPipeline\PlaneDrawerPipe.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\ShockWavePipe.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\ThunderPipe.cpp" />
     <ClCompile Include="Engine\ImGuiManager\ImGuiManager.cpp" />
@@ -157,6 +158,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Model\ModelManager.cpp" />
     <ClCompile Include="Engine\Model\Object3d.cpp" />
     <ClCompile Include="Engine\Model\Object3dCommon.cpp" />
+    <ClCompile Include="Engine\Model\PlaneDrawer.cpp" />
     <ClCompile Include="Engine\Model\Sprite.cpp" />
     <ClCompile Include="Engine\Model\TextureManager.cpp" />
     <ClCompile Include="Engine\Particle\Particle.cpp" />
@@ -250,6 +252,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\GraphicPipeline\ParticleSabPipe.h" />
     <ClInclude Include="Engine\GraphicPipeline\Pipeline.h" />
     <ClInclude Include="Engine\GraphicPipeline\PipelineManager.h" />
+    <ClInclude Include="Engine\GraphicPipeline\PlaneDrawerPipe.h" />
     <ClInclude Include="Engine\GraphicPipeline\ShockWavePipe.h" />
     <ClInclude Include="Engine\GraphicPipeline\ThunderPipe.h" />
     <ClInclude Include="Engine\ImGuiManager\ImGuiManager.h" />
@@ -279,6 +282,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Model\ModelManager.h" />
     <ClInclude Include="Engine\Model\Object3d.h" />
     <ClInclude Include="Engine\Model\Object3dCommon.h" />
+    <ClInclude Include="Engine\Model\PlaneDrawer.h" />
     <ClInclude Include="Engine\Model\Sprite.h" />
     <ClInclude Include="Engine\Model\TextureManager.h" />
     <ClInclude Include="Engine\Particle\Particle.h" />
