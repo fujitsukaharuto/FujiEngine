@@ -41,7 +41,7 @@ void Player::Initialize() {
 	tags_[static_cast<size_t>(KikPower::WEAK)] = "WeakKik";
 	tags_[static_cast<size_t>(KikPower::MAXPOWER)] = "MaxPowerKik";
 
-	collisionSize_ = Vector3(4, 4, 15);
+	collisionSize_ = Vector3(5, 4, 15);
 
 	///* グローバルパラメータ
 	globalParameter_ = GlobalVariables::GetInstance();
@@ -60,7 +60,7 @@ void Player::Initialize() {
 	kikCollider_->SetHeight(collisionSize_.y);
 	kikCollider_->SetDepth(collisionSize_.z);
 	kikCollider_->SetIsCollisonCheck(false);
-	kikCollider_->SetPos(Vector3(0, -1.0f, 0.5f));
+	kikCollider_->SetPos(Vector3(0, -1.0f, 1.0f));
 	kikCollider_->InfoUpdate();
 
 	collider_ = std::make_unique<AABBCollider>();
@@ -76,14 +76,10 @@ void Player::Initialize() {
 	// 仮置き（トレール用）
 	trailRoot_ = std::make_unique<AABBCollider>();
 	trailRoot_->SetParent(model_.get());
-	trailRoot_->SetWidth(2.0f);
-	trailRoot_->SetHeight(2.0f);
-	trailRoot_->SetDepth(2.0f);
+	
 	trailTip_ = std::make_unique<AABBCollider>();
 	trailTip_->SetParent(model_.get());
-	trailTip_->SetWidth(2.0f);
-	trailTip_->SetHeight(2.0f);
-	trailTip_->SetDepth(2.0f);
+	
 
 	//パラメータセット
 	deathCount_ = paramater_.deathCount_;
