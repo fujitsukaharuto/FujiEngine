@@ -14,7 +14,7 @@ void SkyDome::Initialize() {
 
 	model_->transform.scale = { 500,500,500 };
 	model_->SetLightEnable(LightMode::kLightHalfLambert);
-	model_->SetLightIntensity(0.55f);
+	model_->SetLightIntensity(1.0f);
 
 }
 
