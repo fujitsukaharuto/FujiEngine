@@ -33,6 +33,22 @@ void UFO::Initialize() {
 
 	PointLightManager::GetInstance()->GetSpotLight(0)->spotLightData_->position = model_->transform.translate;
 
+	hpSprite_ = std::make_unique<Sprite>();
+	hpSprite_->Load("white2x2.png");
+	hpSprite_->SetColor({ 0.8f,0.0f ,0.0f ,1.0f });
+	hpSprite_->SetAnchor({ 0.0f,0.0f });
+	hpSprite_->SetSize({ 500.0f,16.0f });
+	hpSprite_->SetPos({ 150.0f,38.0f,0.0f });
+
+	hpMaxSprite_ = std::make_unique<Sprite>();
+	hpMaxSprite_->Load("white2x2.png");
+	hpMaxSprite_->SetColor({ 0.023f,0.023f ,0.023f ,1.0f });
+	hpMaxSprite_->SetAnchor({ 0.5f,0.5f });
+	hpMaxSprite_->SetSize({ 520.0f,36.0f });
+	hpMaxSprite_->SetPos({ 400.0f,50.0f,0.0f });
+
+
+
 	///* グローバルパラメータ
 	globalParameter_ = GlobalVariables::GetInstance();
 	globalParameter_->CreateGroup(groupName_, false);
@@ -74,6 +90,12 @@ void UFO::Update() {
 	/// 更新
 	//base::Update();
 
+	hpSize_ = hp_ / MaxHp_ * hpMaxSize_;
+	if (hpSize_ < 0.0f) {
+		hpSize_ = 0.0f;
+	}
+	hpSprite_->SetSize({ hpSize_,25.0f });
+
 	PointLightManager::GetInstance()->GetSpotLight(0)->spotLightData_->position = model_->transform.translate;
 	PointLightManager::GetInstance()->GetSpotLight(0)->spotLightData_->position.z = 0.0f;
 }
@@ -89,6 +111,11 @@ void UFO::Draw(Material* material) {
 
 void UFO::UFOLightDraw() {
 	ufoLight_->Draw();
+}
+
+void UFO::SpriteDraw() {
+	hpMaxSprite_->Draw();
+	hpSprite_->Draw();
 }
 
 

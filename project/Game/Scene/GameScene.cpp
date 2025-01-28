@@ -177,6 +177,7 @@ void GameScene::Draw() {
 
 	dxCommon_->PreSpriteDraw();
 
+	ufo_->SpriteDraw();
 	timer_->Draw();
 	if (!(slideTime_ >= slideLimitteTime_)) {
 		startUI_->Draw();

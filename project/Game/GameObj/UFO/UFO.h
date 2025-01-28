@@ -6,6 +6,7 @@
 #include"GlobalVariables/GlobalVariables.h"
 #include"Game/OriginGameObject.h"
 #include"Collider/AABBCollider.h"
+#include "Model/Sprite.h"
 
 #include <memory>
 
@@ -54,6 +55,11 @@ private:
 	///* obj
 	std::unique_ptr<Object3d> ufoLight_;
 
+	std::unique_ptr<Sprite> hpSprite_;
+	float hpSize_ = 500.0f;
+	float hpMaxSize_ = 500.0f;
+	std::unique_ptr<Sprite> hpMaxSprite_;
+
 public:
 	static float InitY_;
 	UFO();
@@ -66,6 +72,7 @@ public:
 	void Update()override;
 	void Draw(Material* mate = nullptr)override;
 	void UFOLightDraw();
+	void SpriteDraw();
 
 	void Move();
 	void EnemySpawn();
