@@ -102,6 +102,13 @@ void Player::Initialize() {
 /// ===================================================
 void Player::Update() {
 
+	/// 移動処理
+	if (GetIsMoving()) {
+		if (!dynamic_cast<PlayerJump*>(behavior_.get())) {
+			MoveMotion(paramater_.moveSpeed_);
+		}
+	}
+
 	/// 振る舞い処理
 	if (!dynamic_cast<PlayerDeath*>(state_.get())) {
 		behavior_->Update();
@@ -189,9 +196,7 @@ void Player::Move(const float& speed) {
 
 	/// 移動処理
 	if (GetIsMoving()) {
-		if (!dynamic_cast<PlayerJump*>(behavior_.get())) {
-			MoveMotion(paramater_.moveSpeed_);
-		}
+		
 
 		// 移動ベクトルの正規化と速さの適用
 		velocity_ = (velocity_).Normalize() * (speed * FPSKeeper::DeltaTimeRate());

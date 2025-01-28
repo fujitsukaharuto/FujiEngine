@@ -20,7 +20,7 @@
 ///　static 変数初期化
 ///==========================================================
 float BaseEnemy::InitY_ = 1.0f;
-float BaseEnemy::BoundPosY_ = 52.0f;
+float BaseEnemy::BoundPosY_ = 47.0f;
 float BaseEnemy::StartZPos_ = 5.0f;
 float BaseEnemy::StartYPos_ = 70.0f;
 Vector3 BaseEnemy::BaseScale_ = { 1.0f,1.0f,1.0f };
