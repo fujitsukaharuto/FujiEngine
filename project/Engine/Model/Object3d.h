@@ -47,6 +47,7 @@ public:
 	void SetBillboardMat(const Matrix4x4& mat) { billboardMatrix_ = mat; }
 
 	void SetLightEnable(LightMode mode);
+	void SetLightIntensity(float i);
 
 	/*void SetPointLight(PointLight* light) { pointLight_ = light; }
 	void SetSpotLight(SpotLight* light) { spotLight_ = light; }*/

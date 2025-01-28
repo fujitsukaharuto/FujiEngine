@@ -102,6 +102,10 @@ void Object3d::SetLightEnable(LightMode mode) {
 	model_->SetLightEnable(mode);
 }
 
+void Object3d::SetLightIntensity(float i) {
+	directionalLightData_->intensity = i;
+}
+
 void Object3d::SetModel(const std::string& fileName) {
 	model_ = std::make_unique<Model>(*(ModelManager::FindModel(fileName)));
 }

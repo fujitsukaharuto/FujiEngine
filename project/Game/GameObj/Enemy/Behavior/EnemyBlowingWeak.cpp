@@ -84,6 +84,7 @@ void  EnemyBlowingWeak::Update() {
 
 		// particle
 		flydirection = { direction_.x * FPSKeeper::DeltaTimeRate() * pBaseEnemy_->GetBlowDirection(), direction_.y * FPSKeeper::DeltaTimeRate() ,0.0f };
+		flydirection = flydirection * 25.0f;
 		flyEmit1_.pos = pBaseEnemy_->GetModel()->GetWorldPos();
 		flyEmit2_.pos = pBaseEnemy_->GetModel()->GetWorldPos();
 		flyEmit1_.RandomSpeed({ -flydirection.x,-flydirection.x }, { -flydirection.y,-flydirection.y }, { 0.0f,0.0f });
