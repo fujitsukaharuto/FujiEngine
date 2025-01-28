@@ -36,8 +36,8 @@ void GameRun::Initialize() {
 	modelManager_->LoadOBJ("player.obj");
 	modelManager_->LoadOBJ("ufo_test.obj");
 	modelManager_->LoadOBJ("ufo_light.obj");
-	modelManager_->LoadOBJ("FieldBlock.obj");
-	modelManager_->LoadOBJ("daungerousBlock.obj");
+	modelManager_->LoadOBJ("Ground.obj");
+	modelManager_->LoadOBJ("DangerGround.obj");
 	modelManager_->LoadOBJ("NormalEnemy.obj");
 	modelManager_->LoadOBJ("StrongEnemy.obj");
 	modelManager_->LoadOBJ("KickDir.obj");

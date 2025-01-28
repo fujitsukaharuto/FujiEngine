@@ -29,8 +29,8 @@ FieldBlock::FieldBlock() {
 ///========================================================
 void FieldBlock::Initialize() {
 
-	modelNames_[static_cast<size_t>(Tag::NORMAL)] = "FieldBlock.obj";
-	modelNames_[static_cast<size_t>(Tag::DAUNGEROUS)] = "daungerousBlock.obj";
+	modelNames_[static_cast<size_t>(Tag::NORMAL)] = "Ground.obj";
+	modelNames_[static_cast<size_t>(Tag::DAUNGEROUS)] = "DangerGround.obj";
 
 	tags_[static_cast<size_t>(Tag::NORMAL)] = "NormalFieldBlock";
 	tags_[static_cast<size_t>(Tag::DAUNGEROUS)] = "DaungerousFieldBlock";
