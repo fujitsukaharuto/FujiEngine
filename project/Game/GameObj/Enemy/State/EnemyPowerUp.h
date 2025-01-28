@@ -16,6 +16,9 @@ private:
 	Vector3 scaleUpParm_;
 	Easing ease_;
 
+	float stopTime_;
+	float stopTimeMax_;
+
 public:
 	//コンストラクタ
 	EnemyPowerUp(BaseEnemy* boss);

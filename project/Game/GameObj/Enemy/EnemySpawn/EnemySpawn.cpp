@@ -78,7 +78,7 @@ void EnemySpawn::DrawImGuiEditor() {
     if (currentSelected_ != -1 && currentSelected_ < spawnDataList_.size()) {
         ImGui::SeparatorText("スポーンの設定");
 
-        ImGui::DragFloat("Xの発生位置", &spawnDataList_[currentSelected_].x, 0.1f);
+        ImGui::DragFloat("Xの発生位置(-25～23)", &spawnDataList_[currentSelected_].x, 0.1f);
       /*  ImGui::DragFloat("Yの発生位置(50～70が好ましいかも)", &spawnDataList_[currentSelected_].y, 0.1f);*/
         ImGui::DragFloat("発生時間(秒)", &spawnDataList_[currentSelected_].time, 0.1f);
 

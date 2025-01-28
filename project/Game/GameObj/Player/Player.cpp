@@ -40,7 +40,7 @@ void Player::Initialize() {
 	tags_[static_cast<size_t>(KikPower::WEAK)] = "WeakKik";
 	tags_[static_cast<size_t>(KikPower::MAXPOWER)] = "MaxPowerKik";
 
-	collisionSize_ = Vector3(3, 4, 15);
+	collisionSize_ = Vector3(4, 4, 15);
 
 	///* グローバルパラメータ
 	globalParameter_ = GlobalVariables::GetInstance();
@@ -446,6 +446,7 @@ void Player::AdjustParm() {
 		ImGui::DragFloat("移動スピード", &paramater_.moveSpeed_, 0.01f);
 		ImGui::DragFloat("重力", &paramater_.gravity_, 0.01f);
 		ImGui::DragFloat("最大重力", &paramater_.maxFallSpeed_, 0.01f);
+
 		ImGui::SeparatorText("キック");
 		ImGui::DragFloat("キックの当たり判定適応時間(秒)", &paramater_.kikTime_, 0.01f);
 		ImGui::DragFloat("キックの回転にかかる時間(秒)", &paramater_.kikRotateTime_, 0.01f);
@@ -457,10 +458,12 @@ void Player::AdjustParm() {
 		ImGui::DragFloat3("復活座標", &paramater_.respownPos_.x, 0.1f);
 		ImGui::DragFloat("復活までの待機時間(秒)", &paramater_.respownWaitTime_, 0.01f);
 		ImGui::DragFloat("復活後の無敵時間(秒)", &paramater_.respownInvincibleTime_, 0.01f);
+
 		ImGui::SeparatorText("足の動きモーション");
 		ImGui::DragFloat("足の移動量", &paramater_.footMotionAmount_, 0.01f);
 		ImGui::DragFloat("足の挙動スピード(普通移動)", &paramater_.moveFootSpeed_, 0.01f);
 		ImGui::DragFloat("足の挙動スピード(ジャンプ)", &paramater_.jumpFootSpeed_, 0.01f);
+
 		ImGui::SeparatorText("トレールエフェクト");
 		ImGui::DragFloat3("先端位置", &paramater_.trainTipPos_.x, 0.01f);
 		ImGui::DragFloat3("根本位置", &paramater_.trainRootPos_.x, 0.01f);
