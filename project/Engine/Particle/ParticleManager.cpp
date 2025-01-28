@@ -299,6 +299,10 @@ void ParticleManager::Draw() {
 	for (auto& groupPair : particleGroups_) {
 		ParticleGroup* group = groupPair.second.get();
 
+		if (group->isSabMode_) {
+			continue;
+		}
+
 		dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group->srvIndex_));
 		dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, group->material_.GetMaterialResource()->GetGPUVirtualAddress());
 		dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, group->material_.GetTexture()->gpuHandle);
@@ -306,9 +310,31 @@ void ParticleManager::Draw() {
 		dxCommon_->GetCommandList()->DrawIndexedInstanced(6, group->drawCount_, 0, 0, 0);
 	}
 
+
+	dxCommon_->GetDXCommand()->SetViewAndscissor();
+	dxCommon_->GetPipelineManager()->SetPipeline(Pipe::particleSab);
+	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	dxCommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vbView);
+	dxCommon_->GetCommandList()->IASetIndexBuffer(&ibView);
+
+	for (auto& groupPair : particleGroups_) {
+		ParticleGroup* group = groupPair.second.get();
+
+		if (!group->isSabMode_) {
+			continue;
+		}
+
+		dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group->srvIndex_));
+		dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, group->material_.GetMaterialResource()->GetGPUVirtualAddress());
+		dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, group->material_.GetTexture()->gpuHandle);
+
+		dxCommon_->GetCommandList()->DrawIndexedInstanced(6, group->drawCount_, 0, 0, 0);
+	}
+
+
 }
 
-void ParticleManager::CreateParticleGroup(const std::string& name, const std::string& fileName, uint32_t count) {
+void ParticleManager::CreateParticleGroup(const std::string& name, const std::string& fileName, uint32_t count, bool isSabMode) {
 
 	ParticleManager* instance = GetInstance();
 
@@ -324,6 +350,7 @@ void ParticleManager::CreateParticleGroup(const std::string& name, const std::st
 	newGroup->emitter_.Load(name);
 
 	newGroup->insstanceCount_ = count;
+	newGroup->isSabMode_ = isSabMode;
 	newGroup->instancing_ = instance->dxCommon_->CreateBufferResource(instance->dxCommon_->GetDevice(), (sizeof(TransformationParticleMatrix) * newGroup->insstanceCount_));
 	newGroup->instancing_->Map(0, nullptr, reinterpret_cast<void**>(&newGroup->instancingData_));
 	uint32_t max = newGroup->insstanceCount_;

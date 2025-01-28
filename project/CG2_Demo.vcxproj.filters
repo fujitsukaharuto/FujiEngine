@@ -347,6 +347,9 @@
     <ClCompile Include="Game\GameObj\Enemy\State\EnemyNoneState.cpp">
       <Filter>Game\GameObj\Enemy\State</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\GraphicPipeline\ParticleSabPipe.cpp">
+      <Filter>Engine\GraphicPipeline</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Audio\Audio.h">
@@ -711,6 +714,9 @@
     </ClInclude>
     <ClInclude Include="Game\GameObj\Enemy\State\EnemyNoneState.h">
       <Filter>Game\GameObj\Enemy\State</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\GraphicPipeline\ParticleSabPipe.h">
+      <Filter>Engine\GraphicPipeline</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

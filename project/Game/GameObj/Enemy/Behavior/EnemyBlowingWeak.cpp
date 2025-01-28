@@ -64,6 +64,8 @@ EnemyBlowingWeak::~EnemyBlowingWeak() {
 
 void  EnemyBlowingWeak::Update() {
 
+	Vector3 flydirection{};
+
 	switch (step_)
 	{
 	case EnemyBlowingWeak::Step::BLOW:
@@ -81,10 +83,11 @@ void  EnemyBlowingWeak::Update() {
 		pBaseEnemy_->SetRotation(Vector3(0, 0, rotateZ_));
 
 		// particle
+		flydirection = { direction_.x * FPSKeeper::DeltaTimeRate() * pBaseEnemy_->GetBlowDirection(), direction_.y * FPSKeeper::DeltaTimeRate() ,0.0f };
 		flyEmit1_.pos = pBaseEnemy_->GetModel()->GetWorldPos();
 		flyEmit2_.pos = pBaseEnemy_->GetModel()->GetWorldPos();
-		flyEmit1_.RandomSpeed({ -direction_.x,-direction_.x }, { -direction_.y,-direction_.y }, { 0.0f,0.0f });
-		flyEmit2_.RandomSpeed({ -direction_.x,-direction_.x }, { -direction_.y,-direction_.y }, { 0.0f,0.0f });
+		flyEmit1_.RandomSpeed({ -flydirection.x,-flydirection.x }, { -flydirection.y,-flydirection.y }, { 0.0f,0.0f });
+		flyEmit2_.RandomSpeed({ -flydirection.x,-flydirection.x }, { -flydirection.y,-flydirection.y }, { 0.0f,0.0f });
 		flyEmit1_.Emit();
 		flyEmit2_.Emit();
 

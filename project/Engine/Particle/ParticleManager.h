@@ -33,6 +33,7 @@ public:
 		uint32_t insstanceCount_;
 		TransformationParticleMatrix* instancingData_ = nullptr;
 		uint32_t drawCount_;
+		bool isSabMode_ = false;
 		ParticleEmitter emitter_;
 	};
 
@@ -64,7 +65,7 @@ public:
 
 	void Draw();
 
-	static void CreateParticleGroup(const std::string& name, const std::string& fileName, uint32_t count = 20);
+	static void CreateParticleGroup(const std::string& name, const std::string& fileName, uint32_t count = 20, bool isSabMode = false);
 
 	static void CreateAnimeGroup(const std::string& name, const std::string& fileName);
 

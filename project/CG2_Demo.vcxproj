@@ -128,6 +128,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\GraphicPipeline\MetaBallPipeline.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\NonePipeline.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\ParticlePipeline.cpp" />
+    <ClCompile Include="Engine\GraphicPipeline\ParticleSabPipe.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\Pipeline.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\PipelineManager.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\ShockWavePipe.cpp" />
@@ -246,6 +247,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\GraphicPipeline\MetaBallPipeline.h" />
     <ClInclude Include="Engine\GraphicPipeline\NonePipeline.h" />
     <ClInclude Include="Engine\GraphicPipeline\ParticlePipeline.h" />
+    <ClInclude Include="Engine\GraphicPipeline\ParticleSabPipe.h" />
     <ClInclude Include="Engine\GraphicPipeline\Pipeline.h" />
     <ClInclude Include="Engine\GraphicPipeline\PipelineManager.h" />
     <ClInclude Include="Engine\GraphicPipeline\ShockWavePipe.h" />

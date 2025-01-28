@@ -48,9 +48,9 @@ void GameRun::Initialize() {
 	pManager_->CreateAnimeGroup("animetest", "uvChecker.png");
 	pManager_->AddAnime("animetest", "white2x2.png", 10.0f);
 
-	pManager_->CreateParticleGroup("bomb1", "blueParticle.png");
-	pManager_->CreateParticleGroup("bomb2", "blueParticle.png");
-	pManager_->CreateParticleGroup("bomb3", "blueParticle.png");
+	pManager_->CreateParticleGroup("bomb1", "blueParticle.png", 30);
+	pManager_->CreateParticleGroup("bomb2", "blueParticle.png", 30);
+	pManager_->CreateParticleGroup("bomb3", "blueParticle.png", 30);
 
 	pManager_->CreateParticleGroup("kick1", "blueParticle.png");
 	pManager_->CreateParticleGroup("kick2", "blueParticle.png");
