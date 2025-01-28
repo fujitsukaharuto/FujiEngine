@@ -27,7 +27,7 @@
 #include<imgui.h> 
 
 
-float Player::InitY_ = 1.0f;
+float Player::InitY_ = 2.8f;
 
 Player::Player() {}
 
@@ -41,7 +41,7 @@ void Player::Initialize() {
 	tags_[static_cast<size_t>(KikPower::WEAK)] = "WeakKik";
 	tags_[static_cast<size_t>(KikPower::MAXPOWER)] = "MaxPowerKik";
 
-	collisionSize_ = Vector3(3, 3, 15);
+	collisionSize_ = Vector3(3, 5, 15);
 
 	///* グローバルパラメータ
 	globalParameter_ = GlobalVariables::GetInstance();
@@ -60,7 +60,7 @@ void Player::Initialize() {
 	kikCollider_->SetHeight(collisionSize_.y);
 	kikCollider_->SetDepth(collisionSize_.z);
 	kikCollider_->SetIsCollisonCheck(false);
-	kikCollider_->SetPos(Vector3(0, 0, 0.5f));
+	kikCollider_->SetPos(Vector3(0, -1.0f, 0.5f));
 	kikCollider_->InfoUpdate();
 
 	collider_ = std::make_unique<AABBCollider>();
