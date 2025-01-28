@@ -22,9 +22,9 @@ void Timer::Init() {
 	}
 
 	
-	basePos_ = { 857.7f,155.0f,0.0f };
-	dotPos_ = { 969.0f,194.0f,0.0f };
-	offset_ = kTextureWidth * 1.2f; //数字間のオフセット
+	basePos_ = { 845.4f,155.0f,0.0f };
+	dotPos_ = { 969.0f,196.7f,0.0f };
+	offset_ = 65.9f; //数字間のオフセット
 }
 
 // 更新
