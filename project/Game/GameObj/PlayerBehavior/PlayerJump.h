@@ -25,9 +25,15 @@ private:
 	SoundData jumpSE_;
 	ParticleEmitter jumpEmit_;
 
+	float backStartTime_;
+
+	// tempRotate
+	float  slopeRotate_;
 	float backRotate_;
-	float backTime_;
-	Easing footBackEase_;
+
+	//easeT
+	float footSlopeTime_;
+	float footBackTime_;
 
 public:
 	//コンストラクタ

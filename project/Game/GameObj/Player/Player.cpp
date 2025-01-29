@@ -421,13 +421,18 @@ void Player::AdjustParm() {
 		ImGui::DragFloat("復活までの待機時間(秒)", &paramater_.respownWaitTime_, 0.01f);
 		ImGui::DragFloat("復活後の無敵時間(秒)", &paramater_.respownInvincibleTime_, 0.01f);
 
+		ImGui::SeparatorText("演出");
+
 		ImGui::SeparatorText("足の動きモーション");
 		ImGui::DragFloat("足の移動量", &paramater_.footMotionAmount_, 0.01f);
 		ImGui::DragFloat("足の挙動スピード(普通移動)", &paramater_.moveFootSpeed_, 0.01f);
 		ImGui::DragFloat("足の挙動スピード(ジャンプ)", &paramater_.jumpFootSpeed_, 0.01f);
 		ImGui::SeparatorText("足のジャンプモーション");
 		ImGui::DragFloat("向き", &paramater_.jumpFootRotateX_, 0.01f);
+		ImGui::DragFloat("足が傾く速さ", &paramater_.footSlopeTime_, 0.01f);
+		ImGui::DragFloat("足の傾き戻る速さ", &paramater_.footSlopeBackTime_, 0.01f);
 		ImGui::DragFloat("足の向きが戻るまでの時間", &paramater_.footBackTime_, 0.01f);
+		ImGui::DragFloat("ジャンプ時のパーツとのオフセット", &paramater_.jumpPartsOffset_, 0.01f);
 		ImGui::SeparatorText("トレールエフェクト");
 		ImGui::DragFloat3("先端位置", &paramater_.trainTipPos_.x, 0.01f);
 		ImGui::DragFloat3("根本位置", &paramater_.trainRootPos_.x, 0.01f);
@@ -502,6 +507,9 @@ void Player::AddParmGroup() {
 	globalParameter_->AddItem(groupName_, "trainRootPos_", paramater_.trainRootPos_);
 	globalParameter_->AddItem(groupName_, "jumpFootRotateX_", paramater_.jumpFootRotateX_);
 	globalParameter_->AddItem(groupName_, "footBackTime_", paramater_.footBackTime_);
+	globalParameter_->AddItem(groupName_, "jumpPartsOffset_", paramater_.jumpPartsOffset_);
+	globalParameter_->AddItem(groupName_, "footSlopeTime_", paramater_.footSlopeTime_);
+	globalParameter_->AddItem(groupName_, "footSlopeBackTime_", paramater_.footSlopeBackTime_);
 }
 
 ///=================================================================================
@@ -540,6 +548,9 @@ void Player::SetValues() {
 	globalParameter_->SetValue(groupName_, "trainRootPos_", paramater_.trainRootPos_);
 	globalParameter_->SetValue(groupName_, "jumpFootRotateX_", paramater_.jumpFootRotateX_);
 	globalParameter_->SetValue(groupName_, "footBackTime_", paramater_.footBackTime_);
+	globalParameter_->SetValue(groupName_, "jumpPartsOffset_", paramater_.jumpPartsOffset_);
+	globalParameter_->SetValue(groupName_, "footSlopeTime_", paramater_.footSlopeTime_);
+	globalParameter_->SetValue(groupName_, "footSlopeBackTime_", paramater_.footSlopeBackTime_);
 }
 
 ///=====================================================
@@ -577,6 +588,8 @@ void Player::ApplyGlobalParameter() {
 	paramater_.trainRootPos_ = globalParameter_->GetValue<Vector3>(groupName_, "trainRootPos_");
 	paramater_.jumpFootRotateX_ = globalParameter_->GetValue<float>(groupName_, "jumpFootRotateX_");
 	paramater_.footBackTime_ = globalParameter_->GetValue<float>(groupName_, "footBackTime_");
+	paramater_.jumpPartsOffset_ = globalParameter_->GetValue<float>(groupName_, "jumpPartsOffset_");
+	paramater_.footSlopeTime_ = globalParameter_->GetValue<float>(groupName_, "footSlopeTime_");
 }
 ///=========================================================
 /// Class Set

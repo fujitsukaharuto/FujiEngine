@@ -62,6 +62,9 @@ public:
 		Vector3           trainRootPos_;
 		float             jumpFootRotateX_;
 		float             footBackTime_;
+		float             footSlopeBackTime_;
+		float             footSlopeTime_;
+		float             jumpPartsOffset_;
 	};
 private:
 

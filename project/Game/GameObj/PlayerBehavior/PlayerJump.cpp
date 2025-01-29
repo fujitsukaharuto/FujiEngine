@@ -18,7 +18,7 @@ PlayerJump::PlayerJump(Player* player)
 	: BasePlayerBehavior("PlayerJump", player) {
 
 	///---------------------------------------------------
-	///変数初期化
+	/// 変数初期化
 	///---------------------------------------------------
 
 	// parm
@@ -33,9 +33,6 @@ PlayerJump::PlayerJump(Player* player)
 	ParticleManager::Load(jumpEmit_, "jump");
 	jumpEmit_.pos = pPlayer_->GetModel()->GetWorldPos();
 	jumpEmit_.Burst();
-
-	//ease
-	footBackEase_.maxTime = 1.5f;
 
 	step_ = Step::JUMP;
 	renditionStep_ = RenditionStep::SLOPE;
@@ -58,15 +55,22 @@ void PlayerJump::Update() {
 		///---------------------------------------------------------------------------------------
 	case PlayerJump::RenditionStep::SLOPE:
 
-		backTime_ += FPSKeeper::DeltaTimeRate();
+		// time更新
+		backStartTime_ += FPSKeeper::DeltaTimeRate();
+		footSlopeTime_ += FPSKeeper::DeltaTimeRate();
+		footSlopeTime_ = min(footSlopeTime_, pPlayer_->GetParamater().footSlopeTime_);
+	
+		// 回転イージング
+		slopeRotate_ = EaseInSine(0.0f, pPlayer_->GetParamater().jumpFootRotateX_,
+			footSlopeTime_, pPlayer_->GetParamater().footSlopeTime_);
 
-		// 足の向き
+		// 回転代入
 		for (size_t i = 0; i < 2; i++) {
-			pPlayer_->GetPartsModel(i)->transform.rotate.x = pPlayer_->GetParamater().jumpFootRotateX_;
+			pPlayer_->GetPartsModel(i)->transform.rotate.x = slopeRotate_;
 		}
 
 		// 次のステップ
-		if (backTime_ < pPlayer_->GetParamater().footBackTime_) break;
+		if (backStartTime_ < pPlayer_->GetParamater().footBackTime_) break;
 		renditionStep_ = RenditionStep::SLOPEBACK;
 
 		break;
@@ -75,16 +79,16 @@ void PlayerJump::Update() {
 		///---------------------------------------------------------------------------------------
 	case PlayerJump::RenditionStep::SLOPEBACK:
 
-		footBackEase_.time += FPSKeeper::DeltaTimeRate();
-		backRotate_ = EaseOutBack(pPlayer_->GetParamater().jumpFootRotateX_, 0.0f, footBackEase_.time, footBackEase_.maxTime);
+		footBackTime_ += FPSKeeper::DeltaTimeRate();
+		backRotate_ = EaseOutBack(pPlayer_->GetParamater().jumpFootRotateX_, 0.0f, footBackTime_, pPlayer_->GetParamater().footSlopeBackTime_);
 		// 足の向き
 		for (size_t i = 0; i < 2; i++) {
 			pPlayer_->GetPartsModel(i)->transform.rotate.x = backRotate_;
 		}
 
 		//向き戻す
-		if (footBackEase_.time >= footBackEase_.maxTime) {
-			footBackEase_.time = footBackEase_.maxTime;
+		if (footBackTime_ >= pPlayer_->GetParamater().footSlopeBackTime_) {
+			footBackTime_ = pPlayer_->GetParamater().footSlopeBackTime_;
 			for (size_t i = 0; i < 2; i++) {
 				pPlayer_->GetPartsModel(i)->transform.rotate.x = 0.0f;
 			}
