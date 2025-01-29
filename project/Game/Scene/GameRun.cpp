@@ -68,6 +68,9 @@ void GameRun::Initialize() {
 	pManager_->CreateParticleGroup("flyEnemy1", "blueParticle.png", 30);
 	pManager_->CreateParticleGroup("flyEnemy2", "blueParticle.png", 30);
 
+	pManager_->CreateParticleGroup("flyPlayer1", "blueParticle.png", 30);
+	pManager_->CreateParticleGroup("flyPlayer2", "blueParticle.png", 30);
+
 	pManager_->CreateParticleGroup("charge1", "blueParticle.png");
 	pManager_->CreateParticleGroup("charge2", "blueParticle.png");
 
@@ -78,6 +81,7 @@ void GameRun::Initialize() {
 	pManager_->CreateParticleGroup("star2", "kira.png",40);
 
 	pManager_->CreateParticleGroup("jump", "blueParticle.png", 15);
+	pManager_->CreateParticleGroup("jumpLanding", "blueParticle.png", 15);
 
 	pManager_->CreateParticleGroup("dark", "blueParticle.png", 30, true);
 
