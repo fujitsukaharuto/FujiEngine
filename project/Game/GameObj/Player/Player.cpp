@@ -428,7 +428,9 @@ void Player::AdjustParm() {
 
 		ImGui::SeparatorText("演出");
 
-		ImGui::SeparatorText("頭の動き");
+		ImGui::SeparatorText("頭のモーション");
+		ImGui::DragFloat("待機モーション大きさ", &paramater_.headWaitMotionAmount_, 0.01f);
+		ImGui::DragFloat("待機モーション速さ", &paramater_.headWaitMotionSpeed_, 0.01f);
 		ImGui::DragFloat("移動時の縦モーション大きさ", &paramater_.headMotionAmount_, 0.01f);
 		ImGui::DragFloat("移動時の縦モーション速さ", &paramater_.headMotionSpeed, 0.01f);
 
@@ -519,6 +521,8 @@ void Player::AddParmGroup() {
 	globalParameter_->AddItem(groupName_, "jumpPartsOffset_", paramater_.jumpPartsOffset_);
 	globalParameter_->AddItem(groupName_, "footSlopeTime_", paramater_.footSlopeTime_);
 	globalParameter_->AddItem(groupName_, "footSlopeBackTime_", paramater_.footSlopeBackTime_);
+	globalParameter_->AddItem(groupName_, "headWaitMotionAmount_", paramater_.headWaitMotionAmount_);
+	globalParameter_->AddItem(groupName_, "headWaitMotionSpeed_", paramater_.headWaitMotionSpeed_);
 }
 
 ///=================================================================================
@@ -561,6 +565,8 @@ void Player::SetValues() {
 	globalParameter_->SetValue(groupName_, "jumpPartsOffset_", paramater_.jumpPartsOffset_);
 	globalParameter_->SetValue(groupName_, "footSlopeTime_", paramater_.footSlopeTime_);
 	globalParameter_->SetValue(groupName_, "footSlopeBackTime_", paramater_.footSlopeBackTime_);
+	globalParameter_->SetValue(groupName_, "headWaitMotionAmount_", paramater_.headWaitMotionAmount_);
+	globalParameter_->SetValue(groupName_, "headWaitMotionSpeed_", paramater_.headWaitMotionSpeed_);
 }
 
 ///=====================================================
@@ -602,6 +608,8 @@ void Player::ApplyGlobalParameter() {
 	paramater_.jumpPartsOffset_ = globalParameter_->GetValue<float>(groupName_, "jumpPartsOffset_");
 	paramater_.footSlopeTime_ = globalParameter_->GetValue<float>(groupName_, "footSlopeTime_");
 	paramater_.footSlopeBackTime_ = globalParameter_->GetValue<float>(groupName_, "footSlopeBackTime_");
+	paramater_.headWaitMotionAmount_ = globalParameter_->GetValue<float>(groupName_, "headWaitMotionAmount_");
+	paramater_.headWaitMotionSpeed_ = globalParameter_->GetValue<float>(groupName_, "headWaitMotionSpeed_");
 }
 ///=========================================================
 /// Class Set
@@ -743,13 +751,13 @@ void Player::MoveMotionFoot(const float& moveSpeed) {
 	}
 }
 
-void  Player::HeadMotion(const float& animeSpeed) {
+void  Player::HeadMotion(const float& animeSpeed, const float& animeAmaunt) {
 	if (animeSpeed != 0.0f) {
 
 		// 時間更新
 		headMotionTime_ += animeSpeed * FPSKeeper::DeltaTimeRate();
 		// 動きを計算sin
-		float headOffset = paramater_.headMotionAmount_ * std::sin(headMotionTime_);
+		float headOffset = animeAmaunt * std::sin(headMotionTime_);
 		/// 頭の動き適応
 		headModel_->transform.translate.y = paramater_.headStartPos_.y + headOffset;
 	}

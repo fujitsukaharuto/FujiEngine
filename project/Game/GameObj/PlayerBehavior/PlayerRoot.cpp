@@ -44,7 +44,11 @@ void PlayerRoot::Update() {
 		// 移動モーション
 		if (pPlayer_->GetIsMoving()) {
 			pPlayer_->MoveMotionFoot(pPlayer_->GetParamater().moveFootSpeed_);
-			pPlayer_->HeadMotion(pPlayer_->GetParamater().headMotionSpeed);
+			pPlayer_->HeadMotion(pPlayer_->GetParamater().headMotionSpeed, pPlayer_->GetParamater().headMotionAmount_);
+		}
+		else {
+			pPlayer_->HeadMotion(pPlayer_->GetParamater().headWaitMotionSpeed_, pPlayer_->GetParamater().headWaitMotionAmount_);
+
 		}
 
 		//移動

@@ -61,6 +61,8 @@ public:
 		Vector3           trainRootPos_;
 		float             footMotionAmount_;
 		float             headMotionAmount_;
+		float             headWaitMotionSpeed_;
+		float             headWaitMotionAmount_;
 		float             moveFootSpeed_;
 		float             headMotionSpeed;
 		float             jumpFootRotateX_;
@@ -142,7 +144,7 @@ public:
 
 	///* パーツ演出
 	void    MoveMotionFoot(const float& moveSpeed);
-	void    HeadMotion(const float& animeSpeed);
+	void    HeadMotion(const float& animeSpeed, const float& animeAmaunt);
 
 	///* ジャンプ
 	void Jump(float& speed);

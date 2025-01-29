@@ -31,6 +31,8 @@
         ],
         "headMotionAmount_": 0.20000000298023224,
         "headMotionSpeed": 20.360000610351563,
+        "headWaitMotionAmount_": 0.11999999731779099,
+        "headWaitMotionSpeed_": 7.739999771118164,
         "jumpFootRotateX_": 1.2799999713897705,
         "jumpFootRotate_": [
             1.5499999523162842,
