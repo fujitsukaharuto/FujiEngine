@@ -47,26 +47,32 @@ void Player::Initialize() {
 	AddParmGroup();
 	ApplyGlobalParameter();
 
+	///* キック向き可視化のオブジェ
 	kikDirectionView_ = std::make_unique<KikDirectionView>();
 	kikDirectionView_->Initialize();
 
-	/// コライダーセット
+	///* コライダーセット
 	SetColliderSetting();
 
-	//パラメータセット
+	//* パラメータセット
 	deathCount_ = paramater_.deathCount_;
 
-	// パーツモデル
-	for (int i = 0; i < partsModel_.size(); i++) {
-		partsModel_[i] = std::make_unique<Object3d>();
-		partsModel_[i]->Create("PlayerFoot.obj");
-		partsModel_[i]->SetParent(model_.get());
-	}
-	// 位置
-	partsModel_[static_cast<size_t>(Parts::LEFT)]->transform.translate = paramater_.footStartPosLeft_;
-	partsModel_[static_cast<size_t>(Parts::RIGHT)]->transform.translate = paramater_.footStartPosRight_;
+	///* 頭のパーツ
+	headModel_ = std::make_unique<Object3d>();
+	headModel_->Create("Player.obj");
+	headModel_->SetParent(model_.get());
 
-	/// 通常モードから
+	//* 足のパーツモデル
+	for (int i = 0; i < footPartsModel_.size(); i++) {
+		footPartsModel_[i] = std::make_unique<Object3d>();
+		footPartsModel_[i]->Create("PlayerFoot.obj");
+		footPartsModel_[i]->SetParent(model_.get());
+	}
+
+	//* 位置
+	SetStartPositionAll();
+
+	///* 通常モードから
 	ChangeBehavior(std::make_unique<PlayerRoot>(this));
 	ChangeAttackBehavior(std::make_unique<PlayerAttackRoot>(this));
 	ChangeState(std::make_unique<PlayerNoneState>(this));
@@ -109,9 +115,10 @@ void Player::Update() {
 /// ===================================================
 void Player::Draw(Material* material) {
 
-	OriginGameObject::Draw(material);
-	partsModel_[static_cast<size_t>(Parts::LEFT)]->Draw(material);
-	partsModel_[static_cast<size_t>(Parts::RIGHT)]->Draw(material);
+	// パーツ描画
+	headModel_->Draw(material);
+	footPartsModel_[static_cast<size_t>(Parts::LEFT)]->Draw(material);
+	footPartsModel_[static_cast<size_t>(Parts::RIGHT)]->Draw(material);
 
 	
 	kikDirectionView_->Draw(material);
@@ -397,7 +404,12 @@ void Player::AdjustParm() {
 		ImGuiManager::GetInstance()->SetFontJapanese();/// 日本語
 		/// 位置
 		ImGui::SeparatorText("位置");
-		ImGui::DragFloat3("本体", &model_->transform.translate.x, 0.1f);
+		ImGui::Checkbox("位置適応するか", &isAdaptStartPos_);
+		if(isAdaptStartPos_){
+			SetStartPositionAll();
+		}
+		ImGui::DragFloat3("本体", &paramater_.baseStartPos_.x, 0.1f);
+		ImGui::DragFloat3("頭", &paramater_.headStartPos_.x, 0.1f);
 		ImGui::DragFloat3("足左", &paramater_.footStartPosLeft_.x, 0.1f);
 		ImGui::DragFloat3("足右", &paramater_.footStartPosRight_.x, 0.1f);
 
@@ -476,7 +488,7 @@ void Player::ParmLoadForImGui() {
 ///=================================================================================
 void Player::AddParmGroup() {
 
-	globalParameter_->AddItem(groupName_, "Translate", model_->transform.translate);
+	globalParameter_->AddItem(groupName_, "Translate", paramater_.baseStartPos_);
 	globalParameter_->AddItem(groupName_, "JumpSpeed", paramater_.jumpSpeed_);
 	globalParameter_->AddItem(groupName_, "MoveSpeed", paramater_.moveSpeed_);
 	globalParameter_->AddItem(groupName_, "Gravity", paramater_.gravity_);
@@ -517,7 +529,7 @@ void Player::AddParmGroup() {
 ///=================================================================================
 void Player::SetValues() {
 
-	globalParameter_->SetValue(groupName_, "Translate", model_->transform.translate);
+	globalParameter_->SetValue(groupName_, "Translate", paramater_.baseStartPos_);
 	globalParameter_->SetValue(groupName_, "JumpSpeed", paramater_.jumpSpeed_);
 	globalParameter_->SetValue(groupName_, "Gravity", paramater_.gravity_);
 	globalParameter_->SetValue(groupName_, "MoveSpeed", paramater_.moveSpeed_);
@@ -557,7 +569,7 @@ void Player::SetValues() {
 ///  ImGuiからパラメータを得る
 ///===================================================== 
 void Player::ApplyGlobalParameter() {
-	model_->transform.translate = globalParameter_->GetValue<Vector3>(groupName_, "Translate");
+	paramater_.baseStartPos_ = globalParameter_->GetValue<Vector3>(groupName_, "Translate");
 	paramater_.jumpSpeed_ = globalParameter_->GetValue<float>(groupName_, "JumpSpeed");
 	paramater_.gravity_ = globalParameter_->GetValue<float>(groupName_, "Gravity");
 	paramater_.moveSpeed_ = globalParameter_->GetValue<float>(groupName_, "MoveSpeed");
@@ -590,6 +602,7 @@ void Player::ApplyGlobalParameter() {
 	paramater_.footBackTime_ = globalParameter_->GetValue<float>(groupName_, "footBackTime_");
 	paramater_.jumpPartsOffset_ = globalParameter_->GetValue<float>(groupName_, "jumpPartsOffset_");
 	paramater_.footSlopeTime_ = globalParameter_->GetValue<float>(groupName_, "footSlopeTime_");
+	paramater_.footSlopeBackTime_ = globalParameter_->GetValue<float>(groupName_, "footSlopeBackTime_");
 }
 ///=========================================================
 /// Class Set
@@ -726,8 +739,8 @@ void Player::MoveMotion(const float& moveSpeed) {
 		float rightFootZOffset = paramater_.footMotionAmount_ * std::sin(motionTime_ + std::numbers::pi_v<float>);
 
 		// 足のモデルに動きを適用
-		partsModel_[static_cast<size_t>(Parts::LEFT)]->transform.translate.z = paramater_.footStartPosLeft_.z + leftFootZOffset;
-		partsModel_[static_cast<size_t>(Parts::RIGHT)]->transform.translate.z = paramater_.footStartPosRight_.z + rightFootZOffset;
+		footPartsModel_[static_cast<size_t>(Parts::LEFT)]->transform.translate.z = paramater_.footStartPosLeft_.z + leftFootZOffset;
+		footPartsModel_[static_cast<size_t>(Parts::RIGHT)]->transform.translate.z = paramater_.footStartPosRight_.z + rightFootZOffset;
 	}
 }
 
@@ -762,6 +775,13 @@ void Player::SetTag(const int& i) {
 void Player::SetDamageRenditionReset() {
 	elapsedTime_ = 0.0f;
 	isTransparent_ = false;
+}
+
+void Player::SetStartPositionAll() {
+	model_->transform.translate = paramater_.baseStartPos_;
+	headModel_->transform.translate = paramater_.headStartPos_;
+	footPartsModel_[static_cast<size_t>(Parts::LEFT)]->transform.translate = paramater_.footStartPosLeft_;
+	footPartsModel_[static_cast<size_t>(Parts::RIGHT)]->transform.translate = paramater_.footStartPosRight_;
 }
 
 void  Player::SetColliderSetting() {

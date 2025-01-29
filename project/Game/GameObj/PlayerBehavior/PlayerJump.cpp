@@ -66,7 +66,7 @@ void PlayerJump::Update() {
 
 		// 回転代入
 		for (size_t i = 0; i < 2; i++) {
-			pPlayer_->GetPartsModel(i)->transform.rotate.x = slopeRotate_;
+			pPlayer_->GetFootPartsModel(i)->transform.rotate.x = slopeRotate_;
 		}
 
 		// 次のステップ
@@ -83,14 +83,14 @@ void PlayerJump::Update() {
 		backRotate_ = EaseOutBack(pPlayer_->GetParamater().jumpFootRotateX_, 0.0f, footBackTime_, pPlayer_->GetParamater().footSlopeBackTime_);
 		// 足の向き
 		for (size_t i = 0; i < 2; i++) {
-			pPlayer_->GetPartsModel(i)->transform.rotate.x = backRotate_;
+			pPlayer_->GetFootPartsModel(i)->transform.rotate.x = backRotate_;
 		}
 
 		//向き戻す
 		if (footBackTime_ >= pPlayer_->GetParamater().footSlopeBackTime_) {
 			footBackTime_ = pPlayer_->GetParamater().footSlopeBackTime_;
 			for (size_t i = 0; i < 2; i++) {
-				pPlayer_->GetPartsModel(i)->transform.rotate.x = 0.0f;
+				pPlayer_->GetFootPartsModel(i)->transform.rotate.x = 0.0f;
 			}
 		}
 		break;
@@ -126,7 +126,7 @@ void PlayerJump::Update() {
 		
 		// 足の向きをゼロに
 		for (size_t i = 0; i < 2; i++) {
-			pPlayer_->GetPartsModel(i)->transform.rotate = {0.0f,0.0f,0.0f};
+			pPlayer_->GetFootPartsModel(i)->transform.rotate = {0.0f,0.0f,0.0f};
 		}
 
 		/// プレイヤー状態遷移

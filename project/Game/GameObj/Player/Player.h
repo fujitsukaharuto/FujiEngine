@@ -55,6 +55,8 @@ public:
 		float             kikRotateTime_;
 		Vector3           footStartPosLeft_;
 		Vector3           footStartPosRight_;
+		Vector3           headStartPos_;
+		Vector3           baseStartPos_;
 		float             footMotionAmount_;
 		float             moveFootSpeed_;
 		float             jumpFootSpeed_;
@@ -74,7 +76,9 @@ private:
 
 	FieldBlockManager* pFieldBlockManager_;
 
-	std::array<std::unique_ptr<Object3d>, 2>partsModel_;
+	// viewObj
+	std::unique_ptr<Object3d>               headModel_;
+	std::array<std::unique_ptr<Object3d>, 2>footPartsModel_;
 	std::unique_ptr<KikDirectionView>       kikDirectionView_;
 
 	/// グローバルなパラメータ
@@ -97,6 +101,7 @@ private:
 	int               deathCount_;
 	Paramater         paramater_;
 	float             motionTime_;
+	bool              isAdaptStartPos_;
 
 	// ダメージ演出
 	float elapsedTime_;
@@ -179,7 +184,7 @@ public:
 	std::string   GetTag(int i) { return tags_[i]; }
 	AABBCollider* GetTrailRoot() { return trailRoot_.get(); }
 	AABBCollider* GetTrailTip() { return trailTip_.get(); }
-	Object3d*     GetPartsModel(const size_t& i){ return partsModel_[i].get(); }
+	Object3d*     GetFootPartsModel(const size_t& i){ return footPartsModel_[i].get(); }
 
 	/// ===================================================
 	/// setter method
@@ -190,5 +195,6 @@ public:
 	void SetDamageRenditionReset();
 	void SetMotionTime(const float& t) { motionTime_ = t; }
 	void SetColliderSetting();
+	void SetStartPositionAll();
 
 };
