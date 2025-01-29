@@ -7,13 +7,27 @@
 
 class PlayerJump : public BasePlayerBehavior {
 private:
-	float speed_;
+	enum class Step {
+		JUMP,
+		RETURNROOT,
+	};
+	enum class RenditionStep {
+		SLOPE,
+		SLOPEBACK,
+	};
 	/// ===================================================
 	///private varians
 	/// ===================================================
+	RenditionStep renditionStep_;
+	Step step_;
 
+	float speed_;
 	SoundData jumpSE_;
 	ParticleEmitter jumpEmit_;
+
+	float backRotate_;
+	float backTime_;
+	Easing footBackEase_;
 
 public:
 	//コンストラクタ

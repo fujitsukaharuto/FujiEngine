@@ -60,6 +60,8 @@ public:
 		float             jumpFootSpeed_;
 		Vector3           trainTipPos_;
 		Vector3           trainRootPos_;
+		float             jumpFootRotateX_;
+		float             footBackTime_;
 	};
 private:
 
@@ -70,7 +72,7 @@ private:
 	FieldBlockManager* pFieldBlockManager_;
 
 	std::array<std::unique_ptr<Object3d>, 2>partsModel_;
-	std::unique_ptr<KikDirectionView>kikDirectionView_;
+	std::unique_ptr<KikDirectionView>       kikDirectionView_;
 
 	/// グローバルなパラメータ
 	const std::string groupName_ = "Player";       /// グループ名
@@ -128,14 +130,15 @@ public:
 	bool    GetIsMoving();
 	Vector3 GetInputVelocity();
 	void    MoveToLimit();
-
-	void ChangeKikDirection();
+	void    ChangeKikDirection();
 
 	///* ジャンプ
 	void Jump(float& speed);
 	void SpecialPostJump(float& speed);
 	void Fall(float& speed, const bool& isJump = false);
 	void SpecialPostFall(float& speed, const bool& isJump = false);
+
+	///* behavior
 	void ChangeBehavior(std::unique_ptr<BasePlayerBehavior>behavior);
 	void ChangeAttackBehavior(std::unique_ptr<BasePlayerAttackBehavior>behavior);
 	void ChangeState(std::unique_ptr<BasePlayerState>behavior);
@@ -144,8 +147,10 @@ public:
 	void DamageRendition(const float&interval);
 	void TakeDamage();
 
+	///* トレール
 	void TrailUpdate();
 
+	///* Collider
 	void          OnCollisionPlayerEnter(const ColliderInfo& other);
 	void          OnCollisionPlayerStay(const ColliderInfo& other);
 	void          OnCollisionKikStay(const ColliderInfo& other);
@@ -165,12 +170,14 @@ public:
 	/// ===================================================
 	/// getter method
 	/// ===================================================
-	Paramater GetParamater()const { return paramater_; }
-	float GetFacingDirection()const;
-	Vector3 GetKikDirection()const { return kikDirection_; };
-	std::string GetTag(int i) { return tags_[i]; }
+	Paramater     GetParamater()const { return paramater_; }
+	float         GetFacingDirection()const;
+	Vector3       GetKikDirection()const { return kikDirection_; };
+	std::string   GetTag(int i) { return tags_[i]; }
 	AABBCollider* GetTrailRoot() { return trailRoot_.get(); }
 	AABBCollider* GetTrailTip() { return trailTip_.get(); }
+	Object3d*     GetPartsModel(const size_t& i){ return partsModel_[i].get(); }
+
 	/// ===================================================
 	/// setter method
 	/// ===================================================
@@ -179,4 +186,6 @@ public:
 	void SetTag(const int& i);
 	void SetDamageRenditionReset();
 	void SetMotionTime(const float& t) { motionTime_ = t; }
+	void SetColliderSetting();
+
 };

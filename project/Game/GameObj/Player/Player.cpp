@@ -27,7 +27,7 @@
 #include<imgui.h> 
 
 
-float Player::InitY_ = 2.2f;
+float Player::InitY_ = 2.9f;
 
 Player::Player() {}
 
@@ -41,8 +41,6 @@ void Player::Initialize() {
 	tags_[static_cast<size_t>(KikPower::WEAK)] = "WeakKik";
 	tags_[static_cast<size_t>(KikPower::MAXPOWER)] = "MaxPowerKik";
 
-	collisionSize_ = Vector3(5, 4, 15);
-
 	///* グローバルパラメータ
 	globalParameter_ = GlobalVariables::GetInstance();
 	globalParameter_->CreateGroup(groupName_, false);
@@ -52,34 +50,8 @@ void Player::Initialize() {
 	kikDirectionView_ = std::make_unique<KikDirectionView>();
 	kikDirectionView_->Initialize();
 
-	/// collider
-	kikCollider_ = std::make_unique<AABBCollider>();
-	kikCollider_->SetTag(tags_[static_cast<size_t>(KikPower::WEAK)]);
-	kikCollider_->SetParent(GetModel());
-	kikCollider_->SetWidth(collisionSize_.x);
-	kikCollider_->SetHeight(collisionSize_.y);
-	kikCollider_->SetDepth(collisionSize_.z);
-	kikCollider_->SetIsCollisonCheck(false);
-	kikCollider_->SetPos(Vector3(0, -1.0f, 1.0f));
-	kikCollider_->InfoUpdate();
-
-	collider_ = std::make_unique<AABBCollider>();
-	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionPlayerEnter(other); });
-	collider_->SetCollisionStayCallback([this](const ColliderInfo& other) {OnCollisionPlayerStay(other); });
-	collider_->SetTag("Player");
-	collider_->SetParent(GetModel());
-	collider_->SetWidth(2.0f);
-	collider_->SetHeight(5.0f);
-	collider_->SetDepth(2.0f);
-	collider_->InfoUpdate();
-
-	// 仮置き（トレール用）
-	trailRoot_ = std::make_unique<AABBCollider>();
-	trailRoot_->SetParent(model_.get());
-	
-	trailTip_ = std::make_unique<AABBCollider>();
-	trailTip_->SetParent(model_.get());
-	
+	/// コライダーセット
+	SetColliderSetting();
 
 	//パラメータセット
 	deathCount_ = paramater_.deathCount_;
@@ -112,10 +84,11 @@ void Player::Update() {
 		}
 	}
 
-
-	TrailUpdate();
-
+	TrailUpdate(); // トレール更新
 	state_->Update();// 状態更新
+	//　移動制限
+	MoveToLimit();
+	ChangeKikDirection();// キック向き
 
 	/// 振る舞い処理
 	if (!dynamic_cast<PlayerDeath*>(state_.get())) {
@@ -123,10 +96,7 @@ void Player::Update() {
 		attackBehavior_->Update();
 	}
 
-	//　移動制限
-	MoveToLimit();
-	ChangeKikDirection();// キック向き
-
+	/// コライダー更新
 	collider_->InfoUpdate();
 	kikCollider_->InfoUpdate();
 	trailRoot_->InfoUpdate();
@@ -303,10 +273,6 @@ void Player::Fall(float& speed, const bool& isJump) {
 	if (model_->transform.translate.y <= Player::InitY_) {
 		model_->transform.translate.y = Player::InitY_;
 		speed = 0.0f;
-
-		if (!dynamic_cast<PlayerJump*>(behavior_.get()))return;
-		// ジャンプ終了
-		ChangeBehavior(std::make_unique<PlayerRoot>(this));
 	}
 }
 
@@ -419,21 +385,6 @@ void Player::DamageRendition(const float& interval) {
 	}
 }
 
-///=========================================================
-/// 振る舞い切り替え
-///==========================================================
-void Player::ChangeBehavior(std::unique_ptr<BasePlayerBehavior>behavior) {
-	//引数で受け取った状態を次の状態としてセット
-	behavior_ = std::move(behavior);
-}
-
-void Player::ChangeAttackBehavior(std::unique_ptr<BasePlayerAttackBehavior>behavior) {
-	attackBehavior_ = std::move(behavior);
-}
-
-void Player::ChangeState(std::unique_ptr<BasePlayerState>behavior) {
-	state_ = std::move(behavior);
-}
 
 ///=========================================================
 /// パラメータ調整
@@ -474,7 +425,9 @@ void Player::AdjustParm() {
 		ImGui::DragFloat("足の移動量", &paramater_.footMotionAmount_, 0.01f);
 		ImGui::DragFloat("足の挙動スピード(普通移動)", &paramater_.moveFootSpeed_, 0.01f);
 		ImGui::DragFloat("足の挙動スピード(ジャンプ)", &paramater_.jumpFootSpeed_, 0.01f);
-
+		ImGui::SeparatorText("足のジャンプモーション");
+		ImGui::DragFloat("向き", &paramater_.jumpFootRotateX_, 0.01f);
+		ImGui::DragFloat("足の向きが戻るまでの時間", &paramater_.footBackTime_, 0.01f);
 		ImGui::SeparatorText("トレールエフェクト");
 		ImGui::DragFloat3("先端位置", &paramater_.trainTipPos_.x, 0.01f);
 		ImGui::DragFloat3("根本位置", &paramater_.trainRootPos_.x, 0.01f);
@@ -547,6 +500,8 @@ void Player::AddParmGroup() {
 	globalParameter_->AddItem(groupName_, "jumpFootSpeed_", paramater_.jumpFootSpeed_);
 	globalParameter_->AddItem(groupName_, "trainTipPos_", paramater_.trainTipPos_);
 	globalParameter_->AddItem(groupName_, "trainRootPos_", paramater_.trainRootPos_);
+	globalParameter_->AddItem(groupName_, "jumpFootRotateX_", paramater_.jumpFootRotateX_);
+	globalParameter_->AddItem(groupName_, "footBackTime_", paramater_.footBackTime_);
 }
 
 ///=================================================================================
@@ -583,6 +538,8 @@ void Player::SetValues() {
 	globalParameter_->SetValue(groupName_, "jumpFootSpeed_", paramater_.jumpFootSpeed_);
 	globalParameter_->SetValue(groupName_, "trainTipPos_", paramater_.trainTipPos_);
 	globalParameter_->SetValue(groupName_, "trainRootPos_", paramater_.trainRootPos_);
+	globalParameter_->SetValue(groupName_, "jumpFootRotateX_", paramater_.jumpFootRotateX_);
+	globalParameter_->SetValue(groupName_, "footBackTime_", paramater_.footBackTime_);
 }
 
 ///=====================================================
@@ -618,6 +575,8 @@ void Player::ApplyGlobalParameter() {
 	paramater_.jumpFootSpeed_ = globalParameter_->GetValue<float>(groupName_, "jumpFootSpeed_");
 	paramater_.trainTipPos_ = globalParameter_->GetValue<Vector3>(groupName_, "trainTipPos_");
 	paramater_.trainRootPos_ = globalParameter_->GetValue<Vector3>(groupName_, "trainRootPos_");
+	paramater_.jumpFootRotateX_ = globalParameter_->GetValue<float>(groupName_, "jumpFootRotateX_");
+	paramater_.footBackTime_ = globalParameter_->GetValue<float>(groupName_, "footBackTime_");
 }
 ///=========================================================
 /// Class Set
@@ -672,11 +631,6 @@ void Player::OnCollisionKikStay([[maybe_unused]] const ColliderInfo& other) {
 	}*/
 
 
-}
-
-
-void  Player::SetKikIsCollision(const bool& is) {
-	kikCollider_->SetIsCollisonCheck(is);
 }
 
 /// ===================================================
@@ -747,14 +701,6 @@ void Player::ChangeKikDirection() {
 	kikDirectionView_->Update();
 }
 
-void Player::SetTag(const int& i) {
-	kikCollider_->SetTag(tags_[i]);
-}
-
-void Player::SetDamageRenditionReset() {
-	elapsedTime_ = 0.0f;
-	isTransparent_ = false;
-}
 
 
 void Player::MoveMotion(const float& moveSpeed) {
@@ -771,3 +717,71 @@ void Player::MoveMotion(const float& moveSpeed) {
 		partsModel_[static_cast<size_t>(Parts::RIGHT)]->transform.translate.z = paramater_.footStartPosRight_.z + rightFootZOffset;
 	}
 }
+
+///=========================================================
+/// 振る舞い切り替え
+///==========================================================
+void Player::ChangeBehavior(std::unique_ptr<BasePlayerBehavior>behavior) {
+	//引数で受け取った状態を次の状態としてセット
+	behavior_ = std::move(behavior);
+}
+
+void Player::ChangeAttackBehavior(std::unique_ptr<BasePlayerAttackBehavior>behavior) {
+	attackBehavior_ = std::move(behavior);
+}
+
+void Player::ChangeState(std::unique_ptr<BasePlayerState>behavior) {
+	state_ = std::move(behavior);
+}
+
+void  Player::SetKikIsCollision(const bool& is) {
+	kikCollider_->SetIsCollisonCheck(is);
+}
+
+
+/// ===================================================
+/// setter method
+/// ===================================================
+void Player::SetTag(const int& i) {
+	kikCollider_->SetTag(tags_[i]);
+}
+
+void Player::SetDamageRenditionReset() {
+	elapsedTime_ = 0.0f;
+	isTransparent_ = false;
+}
+
+void  Player::SetColliderSetting() {
+
+	collisionSize_ = Vector3(5, 4, 15);
+
+	/// collider
+	kikCollider_ = std::make_unique<AABBCollider>();
+	kikCollider_->SetTag(tags_[static_cast<size_t>(KikPower::WEAK)]);
+	kikCollider_->SetParent(GetModel());
+	kikCollider_->SetWidth(collisionSize_.x);
+	kikCollider_->SetHeight(collisionSize_.y);
+	kikCollider_->SetDepth(collisionSize_.z);
+	kikCollider_->SetIsCollisonCheck(false);
+	kikCollider_->SetPos(Vector3(0, -1.0f, 1.0f));
+	kikCollider_->InfoUpdate();
+
+	collider_ = std::make_unique<AABBCollider>();
+	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionPlayerEnter(other); });
+	collider_->SetCollisionStayCallback([this](const ColliderInfo& other) {OnCollisionPlayerStay(other); });
+	collider_->SetTag("Player");
+	collider_->SetParent(GetModel());
+	collider_->SetWidth(2.0f);
+	collider_->SetHeight(5.4f);
+	collider_->SetDepth(2.0f);
+	collider_->InfoUpdate();
+
+	// 仮置き（トレール用）
+	trailRoot_ = std::make_unique<AABBCollider>();
+	trailRoot_->SetParent(model_.get());
+
+	trailTip_ = std::make_unique<AABBCollider>();
+	trailTip_->SetParent(model_.get());
+
+}
+
