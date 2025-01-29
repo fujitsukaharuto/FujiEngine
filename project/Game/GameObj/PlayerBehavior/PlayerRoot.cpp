@@ -22,7 +22,8 @@ PlayerRoot::PlayerRoot(Player* boss)
 	/// 変数初期化
 	/// ===================================================
 	
-
+	// ステップ
+	step_ = Step::ROOT;
 
 }
 
@@ -33,17 +34,43 @@ PlayerRoot ::~PlayerRoot() {
 //更新
 void PlayerRoot::Update() {
 
-	pPlayer_->Move(pPlayer_->GetParamater().moveSpeed_);
+	switch (step_)
+	{
+	///---------------------------------------------------
+	/// 変数初期化
+	///---------------------------------------------------
+	case PlayerRoot::Step::ROOT:
 
-	//　ジャンプに切り替え
-	if (Input::GetInstance()->PushKey(DIK_J)) {
+		// 移動モーション
+		if (pPlayer_->GetIsMoving()) {
+			pPlayer_->MoveMotionFoot(pPlayer_->GetParamater().moveFootSpeed_);
+			pPlayer_->HeadMotion(pPlayer_->GetParamater().headMotionSpeed);
+		}
+
+		//移動
+		pPlayer_->Move(pPlayer_->GetParamater().moveSpeed_);
+
+		//　ジャンプに切り替え
+		if (Input::GetInstance()->PushKey(DIK_J)) {
+			step_ = Step::GOJUMP;
+			break;
+		}
+		else {
+			JumpForJoyState();//コントローラジャンプ
+			break;
+		}
+		break;
+	///---------------------------------------------------
+	/// ジャンプ
+	///---------------------------------------------------
+	case PlayerRoot::Step::GOJUMP:
 		pPlayer_->ChangeBehavior(std::make_unique<PlayerJump>(pPlayer_));
-		return;
+		break;
+	default:
+		break;
 	}
-	else {
-		JumpForJoyState();//コントローラジャンプ
-		return;
-	}
+	
+	
 
 	
 }
@@ -66,7 +93,7 @@ void PlayerRoot::JumpForJoyState() {
 	if ((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A)       || 
 		(joyState.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP) ||
 		isMoving) {
-		pPlayer_->ChangeBehavior(std::make_unique<PlayerJump>(pPlayer_));
+		step_ = Step::GOJUMP;
 	}
 }
  

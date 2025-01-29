@@ -6,10 +6,15 @@
 class PlayerRoot : public BasePlayerBehavior {
 private:
 
+	enum class Step {
+		ROOT,
+		GOJUMP,
+	};
+
 /// ===================================================
 ///private varians
 /// ===================================================
-
+	Step step_;
 	
 
 public:

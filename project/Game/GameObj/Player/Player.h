@@ -51,17 +51,18 @@ public:
 		int               deathCount_;
 		float             respownWaitTime_;
 		float             respownInvincibleTime_;
-		Vector3           respownPos_;
 		float             kikRotateTime_;
+		Vector3           respownPos_;
 		Vector3           footStartPosLeft_;
 		Vector3           footStartPosRight_;
 		Vector3           headStartPos_;
 		Vector3           baseStartPos_;
-		float             footMotionAmount_;
-		float             moveFootSpeed_;
-		float             jumpFootSpeed_;
 		Vector3           trainTipPos_;
 		Vector3           trainRootPos_;
+		float             footMotionAmount_;
+		float             headMotionAmount_;
+		float             moveFootSpeed_;
+		float             headMotionSpeed;
 		float             jumpFootRotateX_;
 		float             footBackTime_;
 		float             footSlopeBackTime_;
@@ -100,7 +101,8 @@ private:
 	Vector3           kikDirection_;
 	int               deathCount_;
 	Paramater         paramater_;
-	float             motionTime_;
+	float             footMotionTime_;
+	float             headMotionTime_;
 	bool              isAdaptStartPos_;
 
 	// ダメージ演出
@@ -134,11 +136,13 @@ public:
 
 	///* 移動
 	void    Move(const float& speed);
-	void    MoveMotion(const float& moveSpeed);
-	bool    GetIsMoving();
 	Vector3 GetInputVelocity();
 	void    MoveToLimit();
 	void    ChangeKikDirection();
+
+	///* パーツ演出
+	void    MoveMotionFoot(const float& moveSpeed);
+	void    HeadMotion(const float& animeSpeed);
 
 	///* ジャンプ
 	void Jump(float& speed);
@@ -174,7 +178,6 @@ public:
 	void SetValues();
 	void ApplyGlobalParameter();
 
-
 	/// ===================================================
 	/// getter method
 	/// ===================================================
@@ -185,7 +188,7 @@ public:
 	AABBCollider* GetTrailRoot() { return trailRoot_.get(); }
 	AABBCollider* GetTrailTip() { return trailTip_.get(); }
 	Object3d*     GetFootPartsModel(const size_t& i){ return footPartsModel_[i].get(); }
-
+	bool          GetIsMoving();
 	/// ===================================================
 	/// setter method
 	/// ===================================================
@@ -193,7 +196,7 @@ public:
 	void SetKikIsCollision(const bool& is);
 	void SetTag(const int& i);
 	void SetDamageRenditionReset();
-	void SetMotionTime(const float& t) { motionTime_ = t; }
+	void SetFootMotionTime(const float& t) { footMotionTime_ = t; }
 	void SetColliderSetting();
 	void SetStartPositionAll();
 

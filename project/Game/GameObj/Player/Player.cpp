@@ -83,13 +83,6 @@ void Player::Initialize() {
 /// ===================================================
 void Player::Update() {
 
-	/// 移動処理
-	if (GetIsMoving()) {
-		if (!dynamic_cast<PlayerJump*>(behavior_.get())) {
-			MoveMotion(paramater_.moveFootSpeed_);
-		}
-	}
-
 	TrailUpdate(); // トレール更新
 	state_->Update();// 状態更新
 	//　移動制限
@@ -435,10 +428,13 @@ void Player::AdjustParm() {
 
 		ImGui::SeparatorText("演出");
 
-		ImGui::SeparatorText("足の動きモーション");
-		ImGui::DragFloat("足の移動量", &paramater_.footMotionAmount_, 0.01f);
-		ImGui::DragFloat("足の挙動スピード(普通移動)", &paramater_.moveFootSpeed_, 0.01f);
-		ImGui::DragFloat("足の挙動スピード(ジャンプ)", &paramater_.jumpFootSpeed_, 0.01f);
+		ImGui::SeparatorText("頭の動き");
+		ImGui::DragFloat("移動時の縦モーション大きさ", &paramater_.headMotionAmount_, 0.01f);
+		ImGui::DragFloat("移動時の縦モーション速さ", &paramater_.headMotionSpeed, 0.01f);
+
+		ImGui::SeparatorText("足のモーション");
+		ImGui::DragFloat("足のモーション大きさ", &paramater_.footMotionAmount_, 0.01f);
+		ImGui::DragFloat("足の歩きモーションスピード", &paramater_.moveFootSpeed_, 0.01f);
 		ImGui::SeparatorText("足のジャンプモーション");
 		ImGui::DragFloat("向き", &paramater_.jumpFootRotateX_, 0.01f);
 		ImGui::DragFloat("足が傾く速さ", &paramater_.footSlopeTime_, 0.01f);
@@ -514,7 +510,8 @@ void Player::AddParmGroup() {
 	globalParameter_->AddItem(groupName_, "footStartPosRight_", paramater_.footStartPosRight_);
 	globalParameter_->AddItem(groupName_, "footMotionAmount_", paramater_.footMotionAmount_);
 	globalParameter_->AddItem(groupName_, "moveFootSpeed_", paramater_.moveFootSpeed_);
-	globalParameter_->AddItem(groupName_, "jumpFootSpeed_", paramater_.jumpFootSpeed_);
+	globalParameter_->AddItem(groupName_, "headMotionSpeed", paramater_.headMotionSpeed);
+	globalParameter_->AddItem(groupName_, "headMotionAmount_", paramater_.headMotionAmount_);
 	globalParameter_->AddItem(groupName_, "trainTipPos_", paramater_.trainTipPos_);
 	globalParameter_->AddItem(groupName_, "trainRootPos_", paramater_.trainRootPos_);
 	globalParameter_->AddItem(groupName_, "jumpFootRotateX_", paramater_.jumpFootRotateX_);
@@ -555,7 +552,8 @@ void Player::SetValues() {
 	globalParameter_->SetValue(groupName_, "footStartPosRight_", paramater_.footStartPosRight_);
 	globalParameter_->SetValue(groupName_, "footMotionAmount_", paramater_.footMotionAmount_);
 	globalParameter_->SetValue(groupName_, "moveFootSpeed_", paramater_.moveFootSpeed_);
-	globalParameter_->SetValue(groupName_, "jumpFootSpeed_", paramater_.jumpFootSpeed_);
+	globalParameter_->SetValue(groupName_, "headMotionSpeed", paramater_.headMotionSpeed);
+	globalParameter_->SetValue(groupName_, "headMotionAmount_", paramater_.headMotionAmount_);
 	globalParameter_->SetValue(groupName_, "trainTipPos_", paramater_.trainTipPos_);
 	globalParameter_->SetValue(groupName_, "trainRootPos_", paramater_.trainRootPos_);
 	globalParameter_->SetValue(groupName_, "jumpFootRotateX_", paramater_.jumpFootRotateX_);
@@ -595,7 +593,8 @@ void Player::ApplyGlobalParameter() {
 	paramater_.footStartPosRight_ = globalParameter_->GetValue<Vector3>(groupName_, "footStartPosRight_");
 	paramater_.footMotionAmount_ = globalParameter_->GetValue<float>(groupName_, "footMotionAmount_");
 	paramater_.moveFootSpeed_ = globalParameter_->GetValue<float>(groupName_, "moveFootSpeed_");
-	paramater_.jumpFootSpeed_ = globalParameter_->GetValue<float>(groupName_, "jumpFootSpeed_");
+	paramater_.headMotionSpeed = globalParameter_->GetValue<float>(groupName_, "headMotionSpeed");
+	paramater_.headMotionAmount_ = globalParameter_->GetValue<float>(groupName_, "headMotionAmount_");
 	paramater_.trainTipPos_ = globalParameter_->GetValue<Vector3>(groupName_, "trainTipPos_");
 	paramater_.trainRootPos_ = globalParameter_->GetValue<Vector3>(groupName_, "trainRootPos_");
 	paramater_.jumpFootRotateX_ = globalParameter_->GetValue<float>(groupName_, "jumpFootRotateX_");
@@ -729,18 +728,30 @@ void Player::ChangeKikDirection() {
 
 
 
-void Player::MoveMotion(const float& moveSpeed) {
+void Player::MoveMotionFoot(const float& moveSpeed) {
 	if (moveSpeed != 0.0f) {
 		// モーションの経過時間を更新
-		motionTime_ += moveSpeed * FPSKeeper::DeltaTimeRate();
+		footMotionTime_ += moveSpeed * FPSKeeper::DeltaTimeRate();
 
 		// 各足のZ軸方向の動きを計算
-		float leftFootZOffset = paramater_.footMotionAmount_ * std::sin(motionTime_ + 0.0f);
-		float rightFootZOffset = paramater_.footMotionAmount_ * std::sin(motionTime_ + std::numbers::pi_v<float>);
+		float leftFootZOffset = paramater_.footMotionAmount_ * std::sin(footMotionTime_ + 0.0f);
+		float rightFootZOffset = paramater_.footMotionAmount_ * std::sin(footMotionTime_ + std::numbers::pi_v<float>);
 
 		// 足のモデルに動きを適用
 		footPartsModel_[static_cast<size_t>(Parts::LEFT)]->transform.translate.z = paramater_.footStartPosLeft_.z + leftFootZOffset;
 		footPartsModel_[static_cast<size_t>(Parts::RIGHT)]->transform.translate.z = paramater_.footStartPosRight_.z + rightFootZOffset;
+	}
+}
+
+void  Player::HeadMotion(const float& animeSpeed) {
+	if (animeSpeed != 0.0f) {
+
+		// 時間更新
+		headMotionTime_ += animeSpeed * FPSKeeper::DeltaTimeRate();
+		// 動きを計算sin
+		float headOffset = paramater_.headMotionAmount_ * std::sin(headMotionTime_);
+		/// 頭の動き適応
+		headModel_->transform.translate.y = paramater_.headStartPos_.y + headOffset;
 	}
 }
 

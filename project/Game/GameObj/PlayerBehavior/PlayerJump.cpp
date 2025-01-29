@@ -23,7 +23,7 @@ PlayerJump::PlayerJump(Player* player)
 
 	// parm
 	speed_ = pPlayer_->GetParamater().jumpSpeed_;
-	pPlayer_->SetMotionTime(0.0f);
+	pPlayer_->SetFootMotionTime(0.0f);
 	
 	//se
 	jumpSE_ = Audio::GetInstance()->SoundLoadWave("jump.wav");
