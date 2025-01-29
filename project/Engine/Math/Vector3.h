@@ -69,6 +69,12 @@ public:
 	static float Dot(const Vector3& a, const Vector3& b) { return a * b; }
 	static float Length(const Vector3& a) { return a.Length(); }
 
+	static Vector3 Project(const Vector3& v1, const Vector3& v2) {
+		Vector3 normVec = v2.Normalize();
+		float dot = v1 * normVec;
+		return normVec * dot;
+	}
+
 };
 
 
