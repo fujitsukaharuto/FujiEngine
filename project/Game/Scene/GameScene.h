@@ -64,6 +64,7 @@ private:
 	std::unique_ptr<EnemyManager> enemyManager_;
 	std::unique_ptr<Object3d> terrain = nullptr;
 	std::unique_ptr<Object3d> sky = nullptr;
+	std::unique_ptr<Object3d> dome = nullptr;
 	std::unique_ptr<Player> player_;
 	std::unique_ptr<FollowCamera> followCamera_;
 	std::unique_ptr<LockOn> lockOn_;

@@ -29,6 +29,7 @@ void GameRun::Initialize() {
 	modelManager_->LoadOBJ("ground.obj");
 	modelManager_->LoadOBJ("sky.obj");
 	modelManager_->LoadOBJ("EnemyBody.obj");
+	modelManager_->LoadOBJ("Colosseum.obj");
 
 #pragma endregion
 

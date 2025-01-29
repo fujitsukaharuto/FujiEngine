@@ -53,6 +53,10 @@ void GameScene::Initialize() {
 	terrain->SetUVScale({ 15.0f,15.0f }, { 0.0f,0.0f });
 	terrain->transform.scale = { 3.0f,3.0f,3.0f };
 
+	dome = std::make_unique<Object3d>();
+	dome->Create("Colosseum.obj");
+	dome->transform.scale = { 60.0f,20.0f,60.0f };
+
 	sky = std::make_unique<Object3d>();
 	sky->Create("sky.obj");
 	sky->SetLightEnable(LightMode::kLightNone);
@@ -152,6 +156,7 @@ void GameScene::Draw() {
 	obj3dCommon->PreDraw();
 
 	enemyManager_->Draw();
+	dome->Draw();
 	terrain->Draw();
 	sky->Draw();
 	player_->Draw();

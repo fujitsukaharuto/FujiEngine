@@ -1,5 +1,6 @@
 #include "Enemy.h"
 #include "Math/Random.h"
+#include "Camera/CameraManager.h"
 #include <cmath>
 #include <numbers>
 
@@ -133,6 +134,8 @@ void Enemy::Draw(Material* mate) {
 
 void Enemy::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 	if (other.tag == "attack") {
+		FPSKeeper::SetHitStopFrame(2.0f);
+		CameraManager::GetInstance()->GetCamera()->SetShakeTime(3.0f);
 		isCollider_ = true;
 		color_ = { 1.0f,0.0f,0.0f,1.0f };
 		hitParticle1_.Burst();
@@ -152,6 +155,8 @@ void Enemy::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 		}
 	}
 	if (other.tag == "attack_knock") {
+		FPSKeeper::SetHitStopFrame(3.0f);
+		CameraManager::GetInstance()->GetCamera()->SetShakeTime(25.0f);
 		isCollider_ = true;
 		color_ = { 1.0f,0.0f,0.0f,1.0f };
 		hitParticle1_.Burst();

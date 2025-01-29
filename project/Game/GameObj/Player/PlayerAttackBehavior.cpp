@@ -2,23 +2,30 @@
 #include "Game/GameObj/Player/Player.h"
 #include "Input/Input.h"
 #include "Math/MatrixCalculation.h"
+#include "Model/PlaneDrawer.h"
 #include "Camera/CameraManager.h"
 #include "Game/GameObj/LockOn.h"
 
 
 // やらなければならないこと
 //
-// 1obbの当たり判定
-// 2ヒットエフェク
-// 3攻撃モーション
-// 4雷エフェクト
-// 5
-// 6
-// 1月4日
-// 雷エフェクト(後回し)
-// 攻撃の動き(薙刀とプレイヤー)
+// ヒットストップ
+// もっとエフェクト
+// 敵の攻撃、自機の喰らうモーション
+// 移動制限
+// シェイク
+// 攻撃の追加
+// UI
+// 影
 // 
 // 
+// 
+// トレイルエフェクトに炎を
+// スラッシュを複数色にする
+// 
+// 
+// 
+
 
 
 
@@ -154,6 +161,7 @@ void PlayerAttackBehavior::Attack() {
 					pPlayer_->GetSlashModel()->transform.rotate.y = 1.6f;
 					pPlayer_->SetSlashReSet(10.0f);
 
+					PlaneDrawer::GetInstance()->Reset();
 					Direction();
 					Audio::GetInstance()->SoundPlayWave(pPlayer_->attackSound1);
 
@@ -237,6 +245,7 @@ void PlayerAttackBehavior::Attack() {
 					pPlayer_->GetSlashModel()->transform.rotate.y = 2.2f;
 					pPlayer_->SetSlashReSet(10.0f);
 
+					PlaneDrawer::GetInstance()->Reset();
 					Direction();
 					Audio::GetInstance()->SoundPlayWave(pPlayer_->attackSound1);
 
@@ -323,6 +332,7 @@ void PlayerAttackBehavior::Attack() {
 				pPlayer_->GetSlashModel()->transform.rotate.y = 2.2f;
 				pPlayer_->SetSlashReSet(10.0f);
 
+				PlaneDrawer::GetInstance()->Reset();
 				Direction();
 				Audio::GetInstance()->SoundPlayWave(pPlayer_->attackSound1);
 
@@ -406,6 +416,7 @@ void PlayerAttackBehavior::Attack() {
 				pPlayer_->GetSlashModel()->transform.rotate.y = 2.2f;
 				pPlayer_->SetSlashReSet(12.0f);
 
+				PlaneDrawer::GetInstance()->Reset();
 				Direction();
 				Audio::GetInstance()->SoundPlayWave(pPlayer_->attackSound2);
 
