@@ -24,6 +24,10 @@ private:
 	float speed_;
 	SoundData jumpSE_;
 	ParticleEmitter jumpEmit_;
+	ParticleEmitter landingEmit_;
+	ParticleEmitter flyEmit1_;
+	ParticleEmitter flyEmit2_;
+
 
 	float backStartTime_;
 

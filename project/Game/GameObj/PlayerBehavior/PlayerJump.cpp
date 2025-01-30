@@ -34,6 +34,11 @@ PlayerJump::PlayerJump(Player* player)
 	jumpEmit_.pos = pPlayer_->GetModel()->GetWorldPos();
 	jumpEmit_.Burst();
 
+	ParticleManager::Load(landingEmit_, "jumpLanding");
+	ParticleManager::Load(flyEmit1_, "flyPlayer1");
+	ParticleManager::Load(flyEmit2_, "flyPlayer2");
+
+
 	step_ = Step::JUMP;
 	renditionStep_ = RenditionStep::SLOPE;
 }
@@ -102,6 +107,7 @@ void PlayerJump::Update() {
 	/// ===================================================
 	/// 普通処理のステップ
 	/// ===================================================
+	Vector3 flydirection{};
 	switch (step_)
 	{
 		///---------------------------------------------------------------------------------------
@@ -113,9 +119,21 @@ void PlayerJump::Update() {
 		pPlayer_->Move(pPlayer_->GetParamater().airMoveSpeed_);
 		pPlayer_->Jump(speed_);
 
+		flydirection = { pPlayer_->GetFacingDirection(), speed_ * 0.75f ,0.0f };
+		flydirection = flydirection.Normalize() * 0.4f;
+		flyEmit1_.pos = pPlayer_->GetModel()->GetWorldPos();
+		flyEmit2_.pos = pPlayer_->GetModel()->GetWorldPos();
+		flyEmit1_.RandomSpeed({ -flydirection.x,-flydirection.x }, { -flydirection.y,-flydirection.y }, { 0.0f,0.0f });
+		flyEmit2_.RandomSpeed({ -flydirection.x,-flydirection.x }, { -flydirection.y,-flydirection.y }, { 0.0f,0.0f });
+		flyEmit1_.Emit();
+		flyEmit2_.Emit();
+
 
 		// ジャンプ終了
 		if (pPlayer_->GetModel()->transform.translate.y > Player::InitY_) break;
+		landingEmit_.pos = pPlayer_->GetModel()->GetWorldPos();
+		landingEmit_.pos.y -= 3.0f;
+		landingEmit_.Burst();
 		step_ = Step::RETURNROOT;
 		 
 		break;
