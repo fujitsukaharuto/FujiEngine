@@ -19,13 +19,13 @@ LifeUIDeath::LifeUIDeath(LifeUI* boss)
 	/// ===================================================
 	
 	// startParm
-	startPram_.basePos = pLifeUI_->GetParamater().basePosNormal;
+	startPram_.basePos = pLifeUI_->GetParamater().basePosies_[pLifeUI_->GetMaxLife()- pLifeUI_->GetLife()];
 	startPram_.textureWidth = pLifeUI_->GetParamater().kTextureWidth;
 	startPram_.textureHeight = pLifeUI_->GetParamater().kTextureHeight;
 	startPram_.offSet= pLifeUI_->GetParamater().offsetNormal,
 
 	///endParm
-	endParm_.basePos = pLifeUI_->GetParamater().basePosDeath;
+	endParm_.basePos = pLifeUI_->GetParamater().basePosiesDeath[pLifeUI_->GetMaxLife() - pLifeUI_->GetLife()];
 	endParm_.textureWidth = pLifeUI_->GetParamater().deathTextureWidth_;
 	endParm_.textureHeight = pLifeUI_->GetParamater().deathTextureHeigth_;
 	endParm_.offSet = pLifeUI_->GetParamater().offsetDeath,
@@ -94,7 +94,15 @@ void LifeUIDeath::Update() {
 		pLifeUI_->LifeBreak();// ライフ減らす
 
 		pLifeUI_->GetEmitterPos();//エミッター座標
-		step_ = Step::RETURN;
+
+		if (pLifeUI_->GetLife()>0) {
+			nextSetPos_ = pLifeUI_->GetParamater().basePosies_[pLifeUI_->GetMaxLife() - pLifeUI_->GetLife()];
+			step_ = Step::RETURN;
+		}
+		else {
+			pLifeUI_->SetIsGameOver(true);
+			step_ = Step::GOROOT;
+		}
 		break;
 		///-------------------------------------------------------
 		/// UI元の位置に戻る
@@ -103,7 +111,7 @@ void LifeUIDeath::Update() {
 		returnMoveTime_ += FPSKeeper::NormalDeltaTime();
 
 		// イージング適応
-		pLifeUI_->SetPos       (EaseInCirc(endParm_.basePos,      startPram_.basePos,        returnMoveTime_, pLifeUI_->GetParamater().moveUIEaseTime_));
+		pLifeUI_->SetPos       (EaseInCirc(endParm_.basePos,      nextSetPos_,               returnMoveTime_, pLifeUI_->GetParamater().moveUIEaseTime_));
 		pLifeUI_->SetSizeWidth (EaseInCirc(endParm_.textureWidth, startPram_.textureWidth,   returnMoveTime_, pLifeUI_->GetParamater().moveUIEaseTime_));
 		pLifeUI_->SetSizeHeigth(EaseInCirc(endParm_.textureHeight, startPram_.textureHeight, returnMoveTime_, pLifeUI_->GetParamater().moveUIEaseTime_));
 		pLifeUI_->SetOffSet    (EaseInCirc(endParm_.offSet,        startPram_.offSet,        returnMoveTime_, pLifeUI_->GetParamater().moveUIEaseTime_));
@@ -111,9 +119,10 @@ void LifeUIDeath::Update() {
 
 		// 次の
 		if (returnMoveTime_ < pLifeUI_->GetParamater().moveUIEaseTime_)break;
-		returnMoveTime_ = pLifeUI_->GetParamater().moveUIEaseTime_;
+		    returnMoveTime_ = pLifeUI_->GetParamater().moveUIEaseTime_;
+
 		//parmSet
-		pLifeUI_->SetPos        (startPram_.basePos);
+		pLifeUI_->SetPos        (nextSetPos_);
 		pLifeUI_->SetSizeWidth  (startPram_.textureWidth);
 		pLifeUI_->SetSizeHeigth (startPram_.textureHeight);
 		pLifeUI_->SetOffSet     (startPram_.offSet);

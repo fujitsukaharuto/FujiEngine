@@ -1,5 +1,6 @@
 #include"LifeUI.h"
 #include"GameObj/Player/Player.h"
+#include"Random.h"
 /// behavior
 #include"behavior/LifeUIRoot.h"
 #include"DX/FPSKeeper.h"
@@ -8,6 +9,8 @@
 
 // 初期化
 void LifeUI::Init() {
+    life_ = lifeMax_;
+    isShakeStart_ = true;
 
 	///* グローバルパラメータ
 	globalParameter_ = GlobalVariables::GetInstance();
@@ -28,7 +31,12 @@ void LifeUI::Init() {
     sizeWidth_  = paramater_.kTextureWidth;
     sizeHeigth_ = paramater_.kTextureHeight;
     offset_     = paramater_.offsetNormal;
-    basePos_    = paramater_.basePosNormal;
+    basePos_    = paramater_.basePosies_[0];
+
+    isShakeStart_ = false;
+    shakeValue_.x = 0.0f;
+    shakeValue_.y = 0.0f;
+
 
     // 振る舞い初期化
     ChangeBehavior(std::make_unique<LifeUIRoot>(this));
@@ -37,9 +45,12 @@ void LifeUI::Init() {
 // 更新
 void LifeUI::Update() {
 
+    Shake();
+   /* basePos_ = paramater_.basePosies_[2];*/
+
     // 位置、サイズ
     for (int i = 0; i < sprites_.size(); i++) {
-        sprites_[i]->SetPos ({ basePos_.x + (float(i) * offset_),basePos_.y,basePos_.z });
+        sprites_[i]->SetPos ({ basePos_.x + (float(i) * offset_)+ shakeValue_.x, basePos_.y+ shakeValue_.y, basePos_.z });
         sprites_[i]->SetSize({ sizeWidth_,sizeHeigth_ }); // サイズを固定
     }
 
@@ -78,8 +89,12 @@ void LifeUI::ParmLoadForImGui() {
 void LifeUI::AddParmGroup() {
 
     // Position
-    globalParameter_->AddItem(groupName_, "basePosNormal", paramater_.basePosNormal);
-    globalParameter_->AddItem(groupName_, "basePosDeath", paramater_.basePosDeath);
+    globalParameter_->AddItem(groupName_, "basePosNormal", paramater_.basePosies_[0]);
+    globalParameter_->AddItem(groupName_, "basePosNormal1", paramater_.basePosies_[1]);
+    globalParameter_->AddItem(groupName_, "basePosNormal2", paramater_.basePosies_[2]);
+    globalParameter_->AddItem(groupName_, "basePosDeath", paramater_.basePosiesDeath[0]);
+    globalParameter_->AddItem(groupName_, "basePosDeath1", paramater_.basePosiesDeath[1]);
+    globalParameter_->AddItem(groupName_, "basePosDeath2", paramater_.basePosiesDeath[2]);
     globalParameter_->AddItem(groupName_, "offsetNormal", paramater_.offsetNormal);
     globalParameter_->AddItem(groupName_, "offsetDeath", paramater_.offsetDeath);
     globalParameter_->AddItem(groupName_, "moveUIEaseTime_", paramater_.moveUIEaseTime_);
@@ -97,8 +112,12 @@ void LifeUI::AddParmGroup() {
 ///パラメータをグループに追加
 ///===================================================================================
 void LifeUI::SetValues() {
-    globalParameter_->SetValue(groupName_, "basePosNormal", paramater_.basePosNormal);
-    globalParameter_->SetValue(groupName_, "basePosDeath", paramater_.basePosDeath);
+    globalParameter_->SetValue(groupName_, "basePosNormal", paramater_.basePosies_[0]);
+    globalParameter_->SetValue(groupName_, "basePosNormal1", paramater_.basePosies_[1]);
+    globalParameter_->SetValue(groupName_, "basePosNormal2", paramater_.basePosies_[2]);
+    globalParameter_->SetValue(groupName_, "basePosDeath", paramater_.basePosiesDeath[0]);
+    globalParameter_->SetValue(groupName_, "basePosDeath1", paramater_.basePosiesDeath[1]);
+    globalParameter_->SetValue(groupName_, "basePosDeath2", paramater_.basePosiesDeath[2]);
     globalParameter_->SetValue(groupName_, "offsetNormal", paramater_.offsetNormal);
     globalParameter_->SetValue(groupName_, "offsetDeath", paramater_.offsetDeath);
     globalParameter_->SetValue(groupName_, "moveUIEaseTime_", paramater_.moveUIEaseTime_);
@@ -117,8 +136,6 @@ void LifeUI::SetValues() {
 ///===================================================== 
 void LifeUI::ApplyGlobalParameter() {
     // Position
-    paramater_.basePosNormal = globalParameter_->GetValue<Vector3>(groupName_, "basePosNormal");
-    paramater_.basePosDeath = globalParameter_->GetValue<Vector3>(groupName_, "basePosDeath");
     paramater_.offsetNormal=globalParameter_->GetValue<float>(groupName_, "offsetNormal");
     paramater_.offsetDeath = globalParameter_->GetValue<float>(groupName_, "offsetDeath");
     paramater_.moveUIEaseTime_ = globalParameter_->GetValue<float>(groupName_, "moveUIEaseTime_");
@@ -129,6 +146,12 @@ void LifeUI::ApplyGlobalParameter() {
     paramater_.emitterPosies_[0] = globalParameter_->GetValue<Vector3>(groupName_, "emitterPosies_[0]");
     paramater_.emitterPosies_[1] = globalParameter_->GetValue<Vector3>(groupName_, "emitterPosies_[1]");
     paramater_.emitterPosies_[2] = globalParameter_->GetValue<Vector3>(groupName_, "emitterPosies_[2]");
+    paramater_.basePosies_[0] = globalParameter_->GetValue<Vector3>(groupName_, "basePosNormal");
+    paramater_.basePosies_[1] = globalParameter_->GetValue<Vector3>(groupName_, "basePosNormal1");
+    paramater_.basePosies_[2] = globalParameter_->GetValue<Vector3>(groupName_, "basePosNormal2");
+    paramater_.basePosiesDeath[0] = globalParameter_->GetValue<Vector3>(groupName_, "basePosDeath");
+    paramater_.basePosiesDeath[1] = globalParameter_->GetValue<Vector3>(groupName_, "basePosDeath1");
+    paramater_.basePosiesDeath[2] = globalParameter_->GetValue<Vector3>(groupName_, "basePosDeath2");
 }
 
 ///=========================================================
@@ -143,10 +166,19 @@ void LifeUI::AdjustParm() {
         ImGuiManager::GetInstance()->SetFontJapanese();/// 日本語
 
         ImGui::SeparatorText("位置");
-        ImGui::DragFloat3("通常時の位置", &paramater_.basePosNormal.x, 0.1f);
-        ImGui::DragFloat3("死亡時の位置", &paramater_.basePosDeath.x, 0.1f);
+        ImGui::DragFloat3("通常時の位置1", &paramater_.basePosies_[0].x, 0.1f);
+        ImGui::DragFloat3("通常時の位置2", &paramater_.basePosies_[1].x, 0.1f);
+        ImGui::DragFloat3("通常時の位置3", &paramater_.basePosies_[2].x, 0.1f);
+        ImGui::DragFloat3("死亡時の位置1", &paramater_.basePosiesDeath[0].x, 0.1f);
+        ImGui::DragFloat3("死亡時の位置2", &paramater_.basePosiesDeath[1].x, 0.1f);
+        ImGui::DragFloat3("死亡時の位置3", &paramater_.basePosiesDeath[2].x, 0.1f);
+   
         ImGui::DragFloat("通常時のUI間隔", &paramater_.offsetNormal, 0.1f);
         ImGui::DragFloat("死亡時のUI間隔", &paramater_.offsetDeath, 0.1f);
+
+        ImGui::DragFloat3("エミッター位置1", &paramater_.emitterPosies_[0].x, 0.1f);
+        ImGui::DragFloat3("エミッター位置2", &paramater_.emitterPosies_[1].x, 0.1f);
+        ImGui::DragFloat3("エミッター位置3", &paramater_.emitterPosies_[2].x, 0.1f);
         ImGui::SeparatorText("サイズ");
         ImGui::DragFloat("死亡時のサイズ横", &paramater_.deathTextureWidth_, 0.1f);
         ImGui::DragFloat("死亡時のサイズ縦", &paramater_.deathTextureHeigth_, 0.1f);
@@ -165,19 +197,9 @@ void LifeUI::AdjustParm() {
 #endif // _DEBUG
 }
 
-void LifeUI::SetPlayer(Player* player) {
-    pPlayer_ = player;
-    life_ = pPlayer_->GetParamater().deathCount_;
-}
-
-
-void  LifeUI::ChangeBehavior(std::unique_ptr<BaseLifeUIBehavior> behavior ) {
-    behavior_ = std::move(behavior);
-}
-
 void LifeUI::LifeBreak() {
     if (life_ > 0 && !sprites_.empty()) {
-        size_t index = sprites_.size() - life_; // 現在のライフに対応するスプライト
+        size_t index = lifeMax_ - life_; // 現在のライフに対応するスプライト
 
         if (index < sprites_.size()) {
          
@@ -187,6 +209,37 @@ void LifeUI::LifeBreak() {
 
             // ライフを減らす
             life_--;
+
+            if (life_ > 1)return;
+            isShakeStart_ = true;
         }
     }
+}
+
+void LifeUI::SetPlayer(Player* player) {
+    pPlayer_ = player;
+}
+
+
+void  LifeUI::ChangeBehavior(std::unique_ptr<BaseLifeUIBehavior> behavior) {
+    behavior_ = std::move(behavior);
+}
+
+
+void LifeUI::Reset() {
+
+}
+
+void LifeUI::Shake() {
+    if (!isShakeStart_) {
+        shakeValue_ = { 0.0f, 0.0f}; // シェイク終了後、値をリセット
+        return;
+    }
+
+    // ランダムなオフセットを生成
+    shakeValue_.x = Random::GetFloat(-10, 10) * 0.4f;
+    shakeValue_.y = Random::GetFloat(-10, 10) * 0.4f;
+
+    //shakeValue_ = { 0.0f, 0.0f }; // シェイク終了後、値をリセット
+
 }

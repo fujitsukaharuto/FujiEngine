@@ -34,7 +34,7 @@ private:
 	Parm startPram_;
 	Parm endParm_;
 	
-
+	Vector3 nextSetPos_;
 
 public:
 	//コンストラクタ

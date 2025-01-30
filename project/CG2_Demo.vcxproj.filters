@@ -368,6 +368,9 @@
     <ClCompile Include="Game\GameObj\LifeUI\behavior\LifeUIDeath.cpp">
       <Filter>Game\Behavior\LifeUI</Filter>
     </ClCompile>
+    <ClCompile Include="Game\GameObj\GameOverScreen\GameOver.cpp">
+      <Filter>Game\GameObj\GameOverScreen</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Audio\Audio.h">
@@ -754,6 +757,9 @@
     <ClInclude Include="Game\GameObj\LifeUI\behavior\LifeUIDeath.h">
       <Filter>Game\Behavior\LifeUI</Filter>
     </ClInclude>
+    <ClInclude Include="Game\GameObj\GameOverScreen\GameOver.h">
+      <Filter>Game\GameObj\GameOverScreen</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -896,6 +902,9 @@
     </Filter>
     <Filter Include="Game\Behavior\LifeUI">
       <UniqueIdentifier>{fcffe826-4d51-4979-ae1c-c48964553d04}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameObj\GameOverScreen">
+      <UniqueIdentifier>{a42a8ef1-da85-4305-9961-b3803de9873d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
