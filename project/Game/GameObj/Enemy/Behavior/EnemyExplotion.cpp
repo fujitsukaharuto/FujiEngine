@@ -30,7 +30,7 @@ EnemyExplotion::EnemyExplotion(BaseEnemy* boss)
 	bombEmit3_.Burst();
 
 	bomb_ = Audio::GetInstance()->SoundLoadWave("mini_bomb2.wav");
-	Audio::GetInstance()->SoundPlayWave(bomb_);
+	Audio::GetInstance()->SoundPlayWave(bomb_,0.05f);
 
 	step_ = Step::WAIT;
 
