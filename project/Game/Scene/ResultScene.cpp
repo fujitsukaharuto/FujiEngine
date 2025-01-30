@@ -140,7 +140,7 @@ void ResultScene::BlackFade() {
 	}
 
 	else if (Input::GetInstance()->GetGamepadState(pad)) {
-		if (Input::GetInstance()->TriggerButton(PadInput::Y)) {
+		if (Input::GetInstance()->TriggerButton(PadInput::A)) {
 			if (blackTime == 0.0f) {
 				isChangeFase = true;
 			}
