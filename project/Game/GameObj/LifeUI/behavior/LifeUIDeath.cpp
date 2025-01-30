@@ -30,6 +30,8 @@ LifeUIDeath::LifeUIDeath(LifeUI* boss)
 	endParm_.textureHeight = pLifeUI_->GetParamater().deathTextureHeigth_;
 	endParm_.offSet = pLifeUI_->GetParamater().offsetDeath,
 
+	kWaitAfterBreakTime_ = 0.4f;
+
 	step_ = Step::WAIT;
 
 }
@@ -75,16 +77,16 @@ void LifeUIDeath::Update() {
 		pLifeUI_->SetSizeHeigth(endParm_.textureHeight);
 		pLifeUI_->SetOffSet    (endParm_.offSet);
 
-		step_ = Step::WAIT2;
+		step_ = Step::WAITBEFOREBREAK;
 		break;
 		///-------------------------------------------------------
 		/// 壊れるまでの待機時間
 		///-------------------------------------------------------
-	case LifeUIDeath::Step::WAIT2:
-		wait2Time_ += FPSKeeper::NormalDeltaTime();//deltatime加算
+	case LifeUIDeath::Step::WAITBEFOREBREAK:
+		waitBeforeBreakTime_ += FPSKeeper::NormalDeltaTime();//deltatime加算
 
 		// 次のステップ
-		if (wait2Time_ < pLifeUI_->GetParamater().braekWaitTime_)break;
+		if (waitBeforeBreakTime_ < pLifeUI_->GetParamater().braekWaitTime_)break;
 		step_ = Step::BREAK;
 		break;
 		///-------------------------------------------------------
@@ -95,14 +97,27 @@ void LifeUIDeath::Update() {
 
 		pLifeUI_->GetEmitterPos();//エミッター座標
 
+		// UI戻す
 		if (pLifeUI_->GetLife()>0) {
 			nextSetPos_ = pLifeUI_->GetParamater().basePosies_[pLifeUI_->GetMaxLife() - pLifeUI_->GetLife()];
-			step_ = Step::RETURN;
+			step_ = Step::WAITAFTERBREAK;
 		}
+		// 終わる
 		else {
 			pLifeUI_->SetIsGameOver(true);
 			step_ = Step::GOROOT;
 		}
+		break;
+		///-------------------------------------------------------
+		/// 壊れてからの待機
+		///-------------------------------------------------------
+	case LifeUIDeath::Step::WAITAFTERBREAK:
+
+		waitAfterBreakTime_ += FPSKeeper::NormalDeltaTime();//deltatime加算
+
+		// 次のステップ
+		if (waitAfterBreakTime_ < kWaitAfterBreakTime_)break;
+		step_ = Step::RETURN;
 		break;
 		///-------------------------------------------------------
 		/// UI元の位置に戻る

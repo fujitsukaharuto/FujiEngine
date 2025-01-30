@@ -10,7 +10,7 @@
         "RecoilJumpSpeed": 0.44999998807907104,
         "RecoilSpeed": 2.4200000762939453,
         "Translate": [
-            12.73031997680664,
+            -18.06999969482422,
             2.9000000953674316,
             0.0
         ],
@@ -50,7 +50,7 @@
             2.9000000953674316,
             0.0
         ],
-        "respownWaitTime_": 1.8600000143051147,
+        "respownWaitTime_": 3.0799999237060547,
         "specialAttackAntiTime_": 0.2800000011920929,
         "specialAttackFallSpeed_": 34.27000045776367,
         "specialAttackPostGravity_": 1.7000000476837158,

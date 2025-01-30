@@ -426,6 +426,7 @@ void GameScene::ParamaterEdit() {
 	ImGui::Begin("DebugParm");
 	field_->Debug();
 	timer_->Debug();
+	gameOver_->Debug();
 	ImGui::End();
 #endif
 }

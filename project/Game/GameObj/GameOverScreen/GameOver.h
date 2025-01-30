@@ -23,10 +23,17 @@ private:
 	std::unique_ptr<Sprite> selectArrow_;
 	Vector3 selectPos_;
 
+	/// fade
 	Easing fadeInEaseT_;
 	Easing fadeOutEaseT_;
 	float alpha_;
 
+	/// selectPos
+	const Vector3 gameSelectPos_ = { 276.0f,473.0f ,0};
+	const Vector3 titleSelectPos_ = { 276.0f,539.8f ,0 };
+	float selectPosOffSet_;
+	Easing offsetEasing_;
+	float  easeDirection_;
 
 	/// frag
 	bool isTitleBack_;
@@ -36,6 +43,7 @@ public:
 	void Update();
 	void Draw();
 	void Debug();
+	void OffsetMove();
 	///==============================================================
 	/// getter method
 	///================================================================

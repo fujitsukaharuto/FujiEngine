@@ -10,8 +10,9 @@ private:
 	enum class Step {
 		WAIT,
 		UIMOVE,
-		WAIT2,
+		WAITBEFOREBREAK,
 		BREAK,
+		WAITAFTERBREAK,
 		RETURN,
 		GOROOT,
 	};
@@ -27,7 +28,9 @@ private:
 	/// ===================================================
 	Step  step_;
 	float waitTime_;
-	float wait2Time_;
+	float waitBeforeBreakTime_;
+	float waitAfterBreakTime_;
+	float kWaitAfterBreakTime_;
 	float deathMoveTime_;
 	float returnMoveTime_;
 

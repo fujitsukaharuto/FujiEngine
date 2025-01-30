@@ -68,6 +68,7 @@ void PlayerReSpown::Update() {
 			ease_.time = ease_.maxTime;
 			pPlayer_->SetScale(Vector3(1, 1, 1));
 		}
+		
 		pPlayer_->SetScale(EaseOutBack(Vector3::GetZeroVec(), Vector3(1, 1, 1), ease_.time, ease_.maxTime));
 
 		if (invincibleTime_ < pPlayer_->GetParamater().respownInvincibleTime_)break;
