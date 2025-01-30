@@ -35,6 +35,7 @@ void GameScene::Initialize() {
 	fieldBlockManager_ = std::make_unique<FieldBlockManager>();
 	timer_ = std::make_unique<Timer>();
 	lifeUI_= std::make_unique<LifeUI>();
+	gameOver_ = std::make_unique<GameOver>();
 	///-------------------------------------------------------------
 	///　初期化
 	///-------------------------------------------------------------- 
@@ -70,7 +71,6 @@ void GameScene::Initialize() {
 	suzunne = std::make_unique<Object3d>();
 	suzunne->Create("suzanne.obj");
 
-	lifeUI_->Init();
 	timer_->Init();
 	field_->Initialize();
 	skydome_->Initialize();
@@ -81,6 +81,10 @@ void GameScene::Initialize() {
 	kikArea_->Initialize();
 	enemySpawn_->Init();
 	fieldBlockManager_->Initialize();
+
+	lifeUI_->Init();
+	gameOver_->Init();
+
 	///set
 	lifeUI_->SetPlayer(player_.get());
 	enemyManager_->SetPlayer(player_.get());
@@ -92,6 +96,8 @@ void GameScene::Initialize() {
 	fieldBlockManager_->AddFieldBlock();
 
 	timer_->SetTimerZero();
+
+	mode_ = Mode::GAME;
 }
 
 void GameScene::Update() {
@@ -107,41 +113,67 @@ void GameScene::Update() {
 		///　更新
 		///-------------------------------------------------------------- 
 
-		StartUI();
+		switch (mode_)
+		{
+		case GameScene::GAME:
+			StartUI();
 
-		timer_->Update();
-		timer_->SetTextureRangeForDigit();
+			timer_->Update();
+			timer_->SetTextureRangeForDigit();
 
-		enemySpawn_->Update();
-		field_->Update();
-		skydome_->Update();
-		player_->Update();
-		ufo_->Update();
-		gameCamera_->Update();
-		enemyManager_->Update();
-		fieldBlockManager_->Update();
-		kikArea_->Update();
-		lifeUI_->Update();
+			enemySpawn_->Update();
+			field_->Update();
+			skydome_->Update();
+			player_->Update();
+			ufo_->Update();
+			gameCamera_->Update();
+			enemyManager_->Update();
+			fieldBlockManager_->Update();
+			kikArea_->Update();
+			lifeUI_->Update();
 
-	
-		cMane_->AddCollider(ufo_->GetCollider());
-		cMane_->AddCollider(player_->GetKikCollider());
-		cMane_->AddCollider(kikArea_->GetWeakAreaCollider());
-		cMane_->AddCollider(kikArea_->GetNormalAreaCollider());
-		cMane_->AddCollider(kikArea_->GetMaxPowerArea());
-		cMane_->AddCollider(kikArea_->GetSpecialAttackArea());
-		cMane_->AddCollider(player_->GetCollider());
-		for (auto& field : fieldBlockManager_->GetFieldBlocks()) {
-			cMane_->AddCollider(field->GetCollider());
+
+			cMane_->AddCollider(ufo_->GetCollider());
+			cMane_->AddCollider(player_->GetKikCollider());
+			cMane_->AddCollider(kikArea_->GetWeakAreaCollider());
+			cMane_->AddCollider(kikArea_->GetNormalAreaCollider());
+			cMane_->AddCollider(kikArea_->GetMaxPowerArea());
+			cMane_->AddCollider(kikArea_->GetSpecialAttackArea());
+			cMane_->AddCollider(player_->GetCollider());
+			for (auto& field : fieldBlockManager_->GetFieldBlocks()) {
+				cMane_->AddCollider(field->GetCollider());
+			}
+
+			for (auto& enemy : enemyManager_->GetEnemies()) {
+				cMane_->AddCollider(enemy->GetCollider());
+			}
+			cMane_->CheckAllCollision();
+
+
+			ParticleManager::GetInstance()->Update();
+
+			if (!lifeUI_->GetIsGameOver())break;
+			mode_ = Mode::GAMEOVER;
+
+			break;
+		case GameScene::GAMEOVER:
+			gameOver_->Update();
+			if (gameOver_->GetIsTitleBack()) {
+				isChangeFase = true;
+			}
+
+			if (!gameOver_->GetIsGameBack())break;
+			player_->Initialize();
+			gameOver_->Init();
+			lifeUI_->Init();
+			mode_ = GAME;
+
+			break;
+		default:
+			break;
 		}
-
-		for (auto& enemy : enemyManager_->GetEnemies()) {
-			cMane_->AddCollider(enemy->GetCollider());
-		}
-		cMane_->CheckAllCollision();
-
-
-		ParticleManager::GetInstance()->Update();
+			
+		
 	}
 }
 
@@ -195,6 +227,7 @@ void GameScene::Draw() {
 	keyPaneru_->Draw();
 	timer_->Draw();
 	lifeUI_->Draw();
+	gameOver_->Draw();
 	if (blackTime != 0.0f) {
 		black_->Draw();
 	}
@@ -223,7 +256,7 @@ void GameScene::BlackFade() {
 			}
 		}
 		else {
-			if (!isTitle_) {
+			if (!isTitle_&&!gameOver_->GetIsTitleBack()) {
 				SceneManager::GetInstance()->ChangeScene("RESULT", 40.0f);
 			}
 			else {

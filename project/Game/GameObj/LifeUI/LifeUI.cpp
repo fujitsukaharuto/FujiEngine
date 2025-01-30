@@ -10,7 +10,7 @@
 // 初期化
 void LifeUI::Init() {
     life_ = lifeMax_;
-    isShakeStart_ = true;
+    isShakeStart_ = false;
 
 	///* グローバルパラメータ
 	globalParameter_ = GlobalVariables::GetInstance();
@@ -33,7 +33,7 @@ void LifeUI::Init() {
     offset_     = paramater_.offsetNormal;
     basePos_    = paramater_.basePosies_[0];
 
-    isShakeStart_ = false;
+    isGameOver_ = false;
     shakeValue_.x = 0.0f;
     shakeValue_.y = 0.0f;
 

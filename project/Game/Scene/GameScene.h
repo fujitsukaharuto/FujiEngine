@@ -14,10 +14,17 @@
 #include"GameObj/FieldBlock/FieldBlockManager.h"
 #include"GameObj/Timer/Timer.h"
 #include"GameObj/LifeUI/LifeUI.h"
+#include"GameObj/GameOverScreen/GameOver.h"
 
 class GameScene :public BaseScene
 {
 public:
+
+	enum Mode {
+		GAME,
+		GAMEOVER,
+	};
+
 	GameScene();
 	~GameScene();
 
@@ -105,6 +112,9 @@ private:
 	std::unique_ptr<FieldBlockManager>fieldBlockManager_;
 	std::unique_ptr<Timer>timer_;
 	std::unique_ptr<LifeUI>lifeUI_;
+	std::unique_ptr<GameOver>gameOver_;
 
 	std::unique_ptr<CollisionManager> cMane_;
+
+	Mode mode_;
 };
