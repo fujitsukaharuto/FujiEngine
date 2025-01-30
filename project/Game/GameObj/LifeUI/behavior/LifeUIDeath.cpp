@@ -7,6 +7,7 @@
 /// frame
 #include"DX/FPSKeeper.h"
 /// inupt
+#include "Particle/ParticleManager.h"
 
 #include<imgui.h>
 
@@ -33,6 +34,9 @@ LifeUIDeath::LifeUIDeath(LifeUI* boss)
 	kWaitAfterBreakTime_ = 0.4f;
 
 	step_ = Step::WAIT;
+
+	ParticleManager::Load(breakEmit1_, "lifeUIBreak1");
+	ParticleManager::Load(breakEmit2_, "lifeUIBreak2");
 
 }
 
@@ -95,7 +99,10 @@ void LifeUIDeath::Update() {
 	case LifeUIDeath::Step::BREAK:
 		pLifeUI_->LifeBreak();// ライフ減らす
 
-		pLifeUI_->GetEmitterPos();//エミッター座標
+		breakEmit1_.pos = pLifeUI_->GetEmitterPos();
+		breakEmit2_.pos = pLifeUI_->GetEmitterPos();
+		breakEmit1_.Burst();
+		breakEmit2_.Burst();
 
 		// UI戻す
 		if (pLifeUI_->GetLife()>0) {

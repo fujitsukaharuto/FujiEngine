@@ -50,8 +50,11 @@ void TitleScene::Initialize() {
 
 	cMane_ = std::make_unique<CollisionManager>();
 
-	/*ParticleManager::Load(emit1, "flyPlayer1");*/
-	/*ParticleManager::Load(emit2, "flyPlayer2");*/
+	ParticleManager::Load(emit1, "lifeUIBreak1");
+	ParticleManager::Load(emit2, "lifeUIBreak2");
+
+	emit1.Load("playerDead1");
+	emit2.Load("playerDead2");
 
 }
 
@@ -71,8 +74,8 @@ void TitleScene::Update() {
 	sphere->SetRightDir(rightDir);
 	ImGui::End();
 
-	/*emit1.DebugGUI();*/
-	/*emit2.DebugGUI();*/
+	emit1.DebugGUI();
+	emit2.DebugGUI();
 
 	test_->Debug();
 	test2_->Debug();
@@ -88,10 +91,10 @@ void TitleScene::Update() {
 	test2_->Update();
 
 
-	//if (input_->TriggerKey(DIK_5)) {
-	//	emit1.Burst();
-	//	/*emit2.Burst();*/
-	//}
+	if (input_->TriggerKey(DIK_5)) {
+		emit1.Burst();
+		emit2.Burst();
+	}
 	/*emit1.Emit();*/
 	/*emit2.Emit();*/
 
@@ -133,7 +136,7 @@ void TitleScene::Draw() {
 
 	dxCommon_->PreSpriteDraw();
 
-	titlePaneru_->Draw();
+	//titlePaneru_->Draw();
 	if (blackTime != 0.0f) {
 		black_->Draw();
 	}

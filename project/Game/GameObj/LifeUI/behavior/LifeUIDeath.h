@@ -39,6 +39,9 @@ private:
 	
 	Vector3 nextSetPos_;
 
+	ParticleEmitter breakEmit1_;
+	ParticleEmitter breakEmit2_;
+
 public:
 	//コンストラクタ
 	LifeUIDeath(LifeUI* boss);
