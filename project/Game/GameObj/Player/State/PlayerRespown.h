@@ -2,6 +2,7 @@
 
 #include"BasePlayerState.h"
 #include"math/Easing.h"
+#include "Particle/ParticleEmitter.h"
 
 class PlayerReSpown : public BasePlayerState {
 private:
@@ -18,6 +19,8 @@ private:
 	Easing ease_;
 	float invincibleTime_;
 
+	ParticleEmitter reviveEmit1_;
+	ParticleEmitter reviveEmit2_;
 
 public:
 	//コンストラクタ

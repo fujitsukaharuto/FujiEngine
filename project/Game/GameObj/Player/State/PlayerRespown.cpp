@@ -7,6 +7,7 @@
 #include"GameObj/Player/Player.h"
 /// frame
 #include"DX/FPSKeeper.h"
+#include "Particle/ParticleManager.h"
 
 #include<imgui.h>
 
@@ -29,6 +30,10 @@ PlayerReSpown::PlayerReSpown(Player* boss)
 
 	ease_.maxTime = 0.7f;
 	step_ = Step::RESPAWN;
+
+	ParticleManager::Load(reviveEmit1_, "revival1");
+	ParticleManager::Load(reviveEmit2_, "revival2");
+
 }
 
 PlayerReSpown ::~PlayerReSpown() {
@@ -48,6 +53,12 @@ void PlayerReSpown::Update() {
 		invincibleTime_ += FPSKeeper::NormalDeltaTime();
 
 		pPlayer_->DamageRendition(0.1f);// ダメージ演出
+		// 復活パーティクル
+		reviveEmit1_.pos = pPlayer_->GetModel()->GetWorldPos();
+		reviveEmit2_.pos = pPlayer_->GetModel()->GetWorldPos();
+		reviveEmit1_.Emit();
+		reviveEmit2_.Emit();
+
 
 		ease_.time = min(ease_.time, ease_.maxTime);
 		if (ease_.time >= ease_.maxTime) {

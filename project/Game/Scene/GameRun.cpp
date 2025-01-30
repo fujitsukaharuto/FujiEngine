@@ -85,6 +85,10 @@ void GameRun::Initialize() {
 
 	pManager_->CreateParticleGroup("dark", "blueParticle.png", 30, true);
 
+	pManager_->CreateParticleGroup("revival1", "blueParticle.png", 30);
+	pManager_->CreateParticleGroup("revival2", "kira.png", 30);
+
+
 #pragma endregion
 
 
