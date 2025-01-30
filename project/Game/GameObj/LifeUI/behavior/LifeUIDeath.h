@@ -10,9 +10,16 @@ private:
 	enum class Step {
 		WAIT,
 		UIMOVE,
+		WAIT2,
 		BREAK,
 		RETURN,
 		GOROOT,
+	};
+	struct Parm {
+		Vector3 basePos;
+		float   textureWidth;
+		float   textureHeight;
+		float   offSet;
 	};
 
 	/// ===================================================
@@ -20,8 +27,15 @@ private:
 	/// ===================================================
 	Step  step_;
 	float waitTime_;
+	float wait2Time_;
 	float deathMoveTime_;
 	float returnMoveTime_;
+
+	Parm startPram_;
+	Parm endParm_;
+	
+
+
 public:
 	//コンストラクタ
 	LifeUIDeath(LifeUI* boss);

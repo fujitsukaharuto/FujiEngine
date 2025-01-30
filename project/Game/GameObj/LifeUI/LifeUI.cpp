@@ -88,6 +88,7 @@ void LifeUI::AddParmGroup() {
     globalParameter_->AddItem(groupName_, "deathTextureWidth_", paramater_.deathTextureWidth_);
     globalParameter_->AddItem(groupName_, "deathTextureHeigth_", paramater_.deathTextureHeigth_);
     globalParameter_->AddItem(groupName_, "moveWaitTime_", paramater_.moveWaitTime_);
+    globalParameter_->AddItem(groupName_, "braekWaitTime_", paramater_.braekWaitTime_);
 }
 
 
@@ -103,6 +104,7 @@ void LifeUI::SetValues() {
     globalParameter_->SetValue(groupName_, "deathTextureWidth_", paramater_.deathTextureWidth_);
     globalParameter_->SetValue(groupName_, "deathTextureHeigth_", paramater_.deathTextureHeigth_);
     globalParameter_->SetValue(groupName_, "moveWaitTime_", paramater_.moveWaitTime_);
+    globalParameter_->SetValue(groupName_, "braekWaitTime_", paramater_.braekWaitTime_);
 }
 
 
@@ -119,6 +121,7 @@ void LifeUI::ApplyGlobalParameter() {
     paramater_.deathTextureWidth_ = globalParameter_->GetValue<float>(groupName_, "deathTextureWidth_");
     paramater_.deathTextureHeigth_ = globalParameter_->GetValue<float>(groupName_, "deathTextureHeigth_");
     paramater_.moveWaitTime_ = globalParameter_->GetValue<float>(groupName_, "moveWaitTime_");
+    paramater_.braekWaitTime_ = globalParameter_->GetValue<float>(groupName_, "braekWaitTime_");
 }
 
 ///=========================================================
@@ -141,7 +144,8 @@ void LifeUI::AdjustParm() {
         ImGui::DragFloat("死亡時のサイズ横", &paramater_.deathTextureWidth_, 0.1f);
         ImGui::DragFloat("死亡時のサイズ縦", &paramater_.deathTextureHeigth_, 0.1f);
         ImGui::SeparatorText("イージング");
-        ImGui::DragFloat("待機時間", &paramater_.moveWaitTime_, 0.1f);
+        ImGui::DragFloat("開始までの待機時間", &paramater_.moveWaitTime_, 0.01f);
+        ImGui::DragFloat("破壊までの待機時間", &paramater_.braekWaitTime_, 0.01f);
         ImGui::DragFloat("UIが動くイージングタイム", &paramater_.moveUIEaseTime_, 0.01f);
         /// セーブとロード
         globalParameter_->ParmSaveForImGui(groupName_);
@@ -164,11 +168,18 @@ void  LifeUI::ChangeBehavior(std::unique_ptr<BaseLifeUIBehavior> behavior ) {
 }
 
 void LifeUI::LifeBreak() {
-    if (!sprites_.empty()) {
+    if (life_ > 0 && !sprites_.empty()) {
+        size_t index = sprites_.size() - life_; // 現在のライフに対応するスプライト
 
+        if (index < sprites_.size()) {
+         
+            // サイズを0にする（非表示にする）
+            sprites_[index]->SetColor(Vector4(0,0,0,0));
 
-        // スプライトの削除
-        sprites_.pop_back();
-        life_--;
+            // ライフを減らす
+            life_--;
+
+   
+        }
     }
 }

@@ -20,6 +20,7 @@ public:
         const float kTextureWidth = 84;               
         const float kTextureHeight = 84;    
         float moveWaitTime_;
+        float braekWaitTime_;
    };
 private:
     /// ------------------------------------------------------

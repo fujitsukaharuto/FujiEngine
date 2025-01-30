@@ -10,9 +10,11 @@
             428.0,
             0.0
         ],
+        "braekWaitTime_": 0.7200000286102295,
         "deathTextureHeigth_": 160.0,
         "deathTextureWidth_": 160.0,
-        "moveUIEaseTime_": 0.0,
+        "moveUIEaseTime_": 0.6700000166893005,
+        "moveWaitTime_": 0.3799999952316284,
         "offsetDeath": 191.0,
         "offsetNormal": 96.9000015258789
     }
