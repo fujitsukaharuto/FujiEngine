@@ -3,6 +3,7 @@
 #include"BasePlayerState.h"
 #include"math/Easing.h"
 #include "Particle/ParticleEmitter.h"
+#include "Audio/Audio.h"
 
 class PlayerReSpown : public BasePlayerState {
 private:
@@ -21,6 +22,8 @@ private:
 
 	ParticleEmitter reviveEmit1_;
 	ParticleEmitter reviveEmit2_;
+
+	SoundData revivalSE_;
 
 public:
 	//コンストラクタ

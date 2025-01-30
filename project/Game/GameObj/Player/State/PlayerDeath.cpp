@@ -30,6 +30,9 @@ PlayerDeath::PlayerDeath(Player* boss)
 	deadEmit1_.Burst();
 	deadEmit2_.Burst();
 
+	deadSE_ = Audio::GetInstance()->SoundLoadWave("playerDead.wav");
+	Audio::GetInstance()->SoundPlayWave(deadSE_);
+
 }
 
 PlayerDeath ::~PlayerDeath() {

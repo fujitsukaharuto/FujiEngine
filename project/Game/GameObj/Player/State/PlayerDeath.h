@@ -3,6 +3,7 @@
 #include"BasePlayerState.h"
 #include"math/Easing.h"
 #include "Particle/ParticleEmitter.h"
+#include "Audio/Audio.h"
 
 class PlayerDeath : public BasePlayerState {
 private:
@@ -19,6 +20,8 @@ private:
 	
 	ParticleEmitter deadEmit1_;
 	ParticleEmitter deadEmit2_;
+
+	SoundData deadSE_;
 
 public:
 	//コンストラクタ
