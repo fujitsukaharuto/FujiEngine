@@ -3,6 +3,7 @@
 #include"BaseUFOrBehavior.h"
 #include"math/Easing.h"
 #include "Audio/Audio.h"
+#include "Particle/ParticleEmitter.h"
 
 class UFODamage : public BaseUFOBehavior {
 private:
@@ -20,6 +21,8 @@ private:
 	Vector3 initPos_;
 	float stopTime_;
 
+	ParticleEmitter shockEmit1_;
+	ParticleEmitter shockEmit2_;
 	SoundData damageSE_;
 
 public:

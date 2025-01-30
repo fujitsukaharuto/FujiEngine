@@ -60,6 +60,9 @@ void GameRun::Initialize() {
 	pManager_->CreateParticleGroup("kick3", "blueParticle.png");
 	pManager_->CreateParticleGroup("kick4", "blueParticle.png");
 
+	pManager_->CreateParticleGroup("shockWave1", "blueParticle.png", 40);
+	pManager_->CreateParticleGroup("shockWave2", "blueParticle.png", 40);
+
 	pManager_->CreateParticleGroup("hardKick1", "blueParticle.png");
 	pManager_->CreateParticleGroup("hardKick2", "blueParticle.png");
 	pManager_->CreateParticleGroup("hardKick3", "blueParticle.png");

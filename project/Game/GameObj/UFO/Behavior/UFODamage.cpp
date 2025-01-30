@@ -9,6 +9,7 @@
 
 ///* frame
 #include"DX/FPSKeeper.h"
+#include "Particle/ParticleManager.h"
 
 ///* imgui
 #ifdef _DEBUG
@@ -33,6 +34,14 @@ UFODamage::UFODamage(UFO* player)
 
 	// タイムスケール
 	if (pUFO_->GetDamageValue() >= pUFO_->GetParamater().hitStopDamage_) {
+
+		ParticleManager::Load(shockEmit1_, "shockWave1");
+		ParticleManager::Load(shockEmit2_, "shockWave2");
+		shockEmit1_.pos = pUFO_->GetHitPosition();
+		shockEmit2_.pos = pUFO_->GetHitPosition();
+		shockEmit1_.Burst();
+		shockEmit2_.Burst();
+
 		FPSKeeper::SetTimeScale(0.1f);
 		damageSE_ = Audio::GetInstance()->SoundLoadWave("bigDamage.wav");
 		Audio::GetInstance()->SoundPlayWave(damageSE_);

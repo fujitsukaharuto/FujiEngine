@@ -42,7 +42,8 @@ private:
 	bool isDeath_;                                /// 死んだか
 	float moveDirection;                          /// 移動向き
 	float moveRestrectionPos_;
-	
+	Vector3 hitPosition_;
+
 	///* parm 
 	float hp_;                                    /// HP
 	float MaxHp_;
@@ -103,6 +104,7 @@ public:
 	Paramater GetParamater()const { return paramater_; }
 	bool GetIsDeath()const { return isDeath_; }
 	float GetDamageValue()const { return takeDamageValue_; }
+	Vector3 GetHitPosition()const { return hitPosition_; }
 	/// ===================================================
 	/// setter method
 	/// ===================================================

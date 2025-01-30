@@ -279,6 +279,7 @@ void UFO::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 				TakeDamageForPar(takeDamageValue_);
 			}
 		}
+		hitPosition_ = other.pos;
 
 		// ダメージ演出
 		if (dynamic_cast<UFODamage*>(behavior_.get()))return;
@@ -291,6 +292,7 @@ void UFO::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 		takeDamageValue_ = pEnemyManager_->GetParamater(static_cast<size_t>(BaseEnemy::Type::NORMAL)).strongAttackValue;
 		//デカダメージ受ける
 		TakeDamageForPar(takeDamageValue_);
+		hitPosition_ = other.pos;
 
 		// ダメージ演出
 		if (dynamic_cast<UFODamage*>(behavior_.get()))return;
