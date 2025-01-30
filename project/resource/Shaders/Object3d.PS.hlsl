@@ -206,6 +206,7 @@ PixelShaderOutput main(VertxShaderOutput input)
     }
     else
     {
+        textureColor.rgb = pow(textureColor.rgb, 2.2);
         output.color = gMaterial.color * textureColor;
         if (output.color.a == 0.0)
         {

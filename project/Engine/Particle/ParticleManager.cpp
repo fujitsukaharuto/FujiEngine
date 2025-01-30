@@ -302,6 +302,9 @@ void ParticleManager::Draw() {
 		if (group->isSabMode_) {
 			continue;
 		}
+		if (group->drawCount_ == 0) {
+			continue;
+		}
 
 		dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group->srvIndex_));
 		dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, group->material_.GetMaterialResource()->GetGPUVirtualAddress());
@@ -321,6 +324,9 @@ void ParticleManager::Draw() {
 		ParticleGroup* group = groupPair.second.get();
 
 		if (!group->isSabMode_) {
+			continue;
+		}
+		if (group->drawCount_ == 0) {
 			continue;
 		}
 
