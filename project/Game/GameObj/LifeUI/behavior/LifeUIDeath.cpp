@@ -91,7 +91,9 @@ void LifeUIDeath::Update() {
 		/// ライフUI破壊
 		///-------------------------------------------------------
 	case LifeUIDeath::Step::BREAK:
-		pLifeUI_->LifeBreak();
+		pLifeUI_->LifeBreak();// ライフ減らす
+
+		pLifeUI_->GetEmitterPos();//エミッター座標
 		step_ = Step::RETURN;
 		break;
 		///-------------------------------------------------------

@@ -1,4 +1,5 @@
 #include"LifeUI.h"
+#include"GameObj/Player/Player.h"
 /// behavior
 #include"behavior/LifeUIRoot.h"
 #include"DX/FPSKeeper.h"
@@ -13,9 +14,6 @@ void LifeUI::Init() {
 	globalParameter_->CreateGroup(groupName_, false);
 	AddParmGroup();
 	ApplyGlobalParameter();
-	
-    life_ = 3;
-    sprites_.resize(life_);
 
 	// 初期化
 	for (int i = 0; i < sprites_.size(); i++) {
@@ -89,6 +87,9 @@ void LifeUI::AddParmGroup() {
     globalParameter_->AddItem(groupName_, "deathTextureHeigth_", paramater_.deathTextureHeigth_);
     globalParameter_->AddItem(groupName_, "moveWaitTime_", paramater_.moveWaitTime_);
     globalParameter_->AddItem(groupName_, "braekWaitTime_", paramater_.braekWaitTime_);
+    globalParameter_->AddItem(groupName_, "emitterPosies_[0]", paramater_.emitterPosies_[0]);
+    globalParameter_->AddItem(groupName_, "emitterPosies_[1]", paramater_.emitterPosies_[1]);
+    globalParameter_->AddItem(groupName_, "emitterPosies_[2]", paramater_.emitterPosies_[2]);
 }
 
 
@@ -105,6 +106,9 @@ void LifeUI::SetValues() {
     globalParameter_->SetValue(groupName_, "deathTextureHeigth_", paramater_.deathTextureHeigth_);
     globalParameter_->SetValue(groupName_, "moveWaitTime_", paramater_.moveWaitTime_);
     globalParameter_->SetValue(groupName_, "braekWaitTime_", paramater_.braekWaitTime_);
+    globalParameter_->SetValue(groupName_, "emitterPosies_[0]", paramater_.emitterPosies_[0]);
+    globalParameter_->SetValue(groupName_, "emitterPosies_[1]", paramater_.emitterPosies_[1]);
+    globalParameter_->SetValue(groupName_, "emitterPosies_[2]", paramater_.emitterPosies_[2]);
 }
 
 
@@ -122,6 +126,9 @@ void LifeUI::ApplyGlobalParameter() {
     paramater_.deathTextureHeigth_ = globalParameter_->GetValue<float>(groupName_, "deathTextureHeigth_");
     paramater_.moveWaitTime_ = globalParameter_->GetValue<float>(groupName_, "moveWaitTime_");
     paramater_.braekWaitTime_ = globalParameter_->GetValue<float>(groupName_, "braekWaitTime_");
+    paramater_.emitterPosies_[0] = globalParameter_->GetValue<Vector3>(groupName_, "emitterPosies_[0]");
+    paramater_.emitterPosies_[1] = globalParameter_->GetValue<Vector3>(groupName_, "emitterPosies_[1]");
+    paramater_.emitterPosies_[2] = globalParameter_->GetValue<Vector3>(groupName_, "emitterPosies_[2]");
 }
 
 ///=========================================================
@@ -160,6 +167,7 @@ void LifeUI::AdjustParm() {
 
 void LifeUI::SetPlayer(Player* player) {
     pPlayer_ = player;
+    life_ = pPlayer_->GetParamater().deathCount_;
 }
 
 
@@ -174,6 +182,7 @@ void LifeUI::LifeBreak() {
         if (index < sprites_.size()) {
          
             // サイズを0にする（非表示にする）
+            emitterPos_ = paramater_.emitterPosies_[index];
             sprites_[index]->SetColor(Vector4(0,0,0,0));
 
             // ライフを減らす

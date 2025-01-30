@@ -21,6 +21,7 @@ public:
         const float kTextureHeight = 84;    
         float moveWaitTime_;
         float braekWaitTime_;
+        std::array<Vector3, 3>emitterPosies_;
    };
 private:
     /// ------------------------------------------------------
@@ -33,7 +34,7 @@ private:
     GlobalVariables* globalParameter_;                   /// グローバルパラメータ
     const std::string groupName_ = "LifeUI";             /// グループ名
 
-    std::vector<std::unique_ptr<Sprite>> sprites_;       /// スプライト
+    std::array<std::unique_ptr<Sprite>,3> sprites_;       /// スプライト
     Paramater paramater_;                                /// パラメータ
 
     ///parm
@@ -42,6 +43,7 @@ private:
     float     sizeHeigth_;
     Vector3   basePos_;
      int      life_;
+     Vector3   emitterPos_;
 
     ///behavior
     std::unique_ptr<BaseLifeUIBehavior>behavior_;
@@ -70,9 +72,10 @@ public:
     ///------------------------------------------------------------------------------------
     /// getter method
     ///------------------------------------------------------------------------------------
-    Sprite* GetSprite(const size_t& i) { return sprites_[i].get(); }
-    Player* GetPlayer() { return pPlayer_; }
+    Sprite*   GetSprite(const size_t& i) { return sprites_[i].get(); }
+    Player*   GetPlayer() { return pPlayer_; }
     Paramater GetParamater() { return paramater_; }
+    Vector3   GetEmitterPos()const { return emitterPos_; }
     ///------------------------------------------------------------------------------------
     /// setter method
     ///------------------------------------------------------------------------------------
