@@ -26,6 +26,8 @@ EnemySpawnFall::EnemySpawnFall(BaseEnemy* boss)
 	ParticleManager::Load(star1_, "star1");
 	ParticleManager::Load(star2_, "star2");
 
+	katunSE_ = Audio::GetInstance()->SoundLoadWave("hit_wdn_pillar3.wav");
+
 }
 
 EnemySpawnFall::~EnemySpawnFall() {
@@ -47,6 +49,7 @@ void EnemySpawnFall::Update() {
 		star2_.pos = pBaseEnemy_->GetModel()->GetWorldPos();
 		star1_.Burst();
 		star2_.Burst();
+		Audio::GetInstance()->SoundPlayWave(katunSE_);
 		step_ = Step::BOUND;
 
 		break;

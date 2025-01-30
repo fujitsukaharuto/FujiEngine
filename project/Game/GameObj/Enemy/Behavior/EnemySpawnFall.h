@@ -3,6 +3,7 @@
 #include"BaseEnemyBehavior.h"
 #include"Easing.h"
 #include "Particle/ParticleEmitter.h"
+#include "Audio/Audio.h"
 
 class EnemySpawnFall : public BaseEnemyBehaivor {
 private:
@@ -24,6 +25,8 @@ private:
 
 	ParticleEmitter star1_;
 	ParticleEmitter star2_;
+
+	SoundData katunSE_;
 
 public:
 	//コンストラクタ

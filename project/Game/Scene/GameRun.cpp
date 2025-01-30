@@ -111,6 +111,7 @@ void GameRun::Initialize() {
 	audio_->LoadWave("bigDamage.wav");
 	audio_->LoadWave("playerDead.wav");
 	audio_->LoadWave("playerRevival.wav");
+	audio_->LoadWave("hit_wdn_pillar3.wav");
 
 #pragma endregion
 
