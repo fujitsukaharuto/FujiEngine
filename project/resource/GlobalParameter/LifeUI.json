@@ -1,0 +1,19 @@
+{
+    "LifeUI": {
+        "basePosDeath": [
+            160.5,
+            372.8999938964844,
+            0.0
+        ],
+        "basePosNormal": [
+            813.5,
+            428.0,
+            0.0
+        ],
+        "deathTextureHeigth_": 160.0,
+        "deathTextureWidth_": 160.0,
+        "moveUIEaseTime_": 0.0,
+        "offsetDeath": 191.0,
+        "offsetNormal": 96.9000015258789
+    }
+}

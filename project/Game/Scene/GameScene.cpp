@@ -34,6 +34,7 @@ void GameScene::Initialize() {
 	enemySpawn_ = std::make_unique<EnemySpawn>();
 	fieldBlockManager_ = std::make_unique<FieldBlockManager>();
 	timer_ = std::make_unique<Timer>();
+	lifeUI_= std::make_unique<LifeUI>();
 	///-------------------------------------------------------------
 	///　初期化
 	///-------------------------------------------------------------- 
@@ -69,6 +70,7 @@ void GameScene::Initialize() {
 	suzunne = std::make_unique<Object3d>();
 	suzunne->Create("suzanne.obj");
 
+	lifeUI_->Init();
 	timer_->Init();
 	field_->Initialize();
 	skydome_->Initialize();
@@ -80,6 +82,7 @@ void GameScene::Initialize() {
 	enemySpawn_->Init();
 	fieldBlockManager_->Initialize();
 	///set
+	lifeUI_->SetPlayer(player_.get());
 	enemyManager_->SetPlayer(player_.get());
 	ufo_->SetEnemyManager(enemyManager_.get());
 	enemySpawn_->SetEnemyManager(enemyManager_.get());
@@ -118,6 +121,7 @@ void GameScene::Update() {
 		enemyManager_->Update();
 		fieldBlockManager_->Update();
 		kikArea_->Update();
+		lifeUI_->Update();
 
 	
 		cMane_->AddCollider(ufo_->GetCollider());
@@ -180,7 +184,6 @@ void GameScene::Draw() {
 	dxCommon_->PreSpriteDraw();
 
 	ufo_->SpriteDraw();
-	timer_->Draw();
 	if (!(slideTime_ >= slideLimitteTime_)) {
 		startUI_->Draw();
 	}
@@ -191,6 +194,7 @@ void GameScene::Draw() {
 	}
 	keyPaneru_->Draw();
 	timer_->Draw();
+	lifeUI_->Draw();
 	if (blackTime != 0.0f) {
 		black_->Draw();
 	}
@@ -382,6 +386,7 @@ void GameScene::ParamaterEdit() {
 	ufo_->AdjustParm();
 	kikArea_->AdjustParm();
 	fieldBlockManager_->AdjustParm();
+	lifeUI_->AdjustParm();
 	ImGui::End();
 	enemySpawn_->DrawImGuiEditor();
 	

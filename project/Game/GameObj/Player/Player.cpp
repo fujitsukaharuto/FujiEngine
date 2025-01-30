@@ -50,7 +50,7 @@ void Player::Initialize() {
 	///* キック向き可視化のオブジェ
 	kikDirectionView_ = std::make_unique<KikDirectionView>();
 	kikDirectionView_->Initialize();
-
+	
 	///* コライダーセット
 	SetColliderSetting();
 
@@ -446,15 +446,6 @@ void Player::AdjustParm() {
 		ImGui::SeparatorText("トレールエフェクト");
 		ImGui::DragFloat3("先端位置", &paramater_.trainTipPos_.x, 0.01f);
 		ImGui::DragFloat3("根本位置", &paramater_.trainRootPos_.x, 0.01f);
-		/*ImGui::SeparatorText("いらないかもパラメータ");
-		ImGui::DragFloat("specialAttackAntiTime_", &paramater_.specialAttackAntiTime_, 0.01f);
-		ImGui::DragFloat("specialAttackFallSpeed_", &paramater_.specialAttackFallSpeed_, 0.01f);
-		ImGui::DragFloat("specialAttackPostJump_", &paramater_.specialAttackPostJump_, 0.01f);
-		ImGui::DragFloat("specialAttackPostGravity_", &paramater_.specialAttackPostGravity_, 0.01f);
-		ImGui::DragFloat("specialAttackPostMaxFallSpeed_", &paramater_.specialAttackPostMaxFallSpeed_, 0.01f);
-		ImGui::DragFloat("RecoilSpeed", &paramater_.recoilSpeed_, 0.01f);
-		ImGui::DragFloat("キック当てた時の上に飛ぶ高さ", &paramater_.recoilJumpSpeed_, 0.01f);*/
-
 
 		ImGuiManager::GetInstance()->UnSetFont();
 		/// セーブとロード
@@ -641,7 +632,7 @@ void   Player::OnCollisionPlayerStay(const ColliderInfo& other) {
 		deathCount_--; // デクリメント
 
 		/// 死亡
-		if (deathCount_ <= 0) {
+		if (deathCount_ >= 0) {
 			ChangeState(std::make_unique<PlayerDeath>(this));
 			return;
 		}

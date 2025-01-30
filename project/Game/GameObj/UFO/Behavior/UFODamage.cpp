@@ -102,7 +102,7 @@ void UFODamage::Update() {
 		///-------------------------------------------------------
 		///　振る舞い戻る
 		///-------------------------------------------------------
-		if (stopTime_ >= pUFO_->GetParamater().hitStopTime_) {
+		if (stopTime_ > pUFO_->GetParamater().hitStopTime_) {
 			pUFO_->SetColor(Vector4(1, 1, 1, 1));
 			pUFO_->ChangeBehavior(std::make_unique<UFORoot>(pUFO_));
 		}

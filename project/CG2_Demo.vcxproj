@@ -196,6 +196,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\GameObj\JoyState\JoyState.cpp" />
     <ClCompile Include="Game\GameObj\KikArea\KikArea.cpp" />
     <ClCompile Include="Game\GameObj\KikDirectionView\KikDirectionView.cpp" />
+    <ClCompile Include="Game\GameObj\LifeUI\behavior\BaseLifeUIBehavior.cpp" />
+    <ClCompile Include="Game\GameObj\LifeUI\behavior\LifeUIDeath.cpp" />
+    <ClCompile Include="Game\GameObj\LifeUI\behavior\LifeUIRoot.cpp" />
+    <ClCompile Include="Game\GameObj\LifeUI\LifeUI.cpp" />
     <ClCompile Include="Game\GameObj\PlayerBehavior\BasePlayerAttackBehavior.cpp" />
     <ClCompile Include="Game\GameObj\PlayerBehavior\PlayerAttackRoot.cpp" />
     <ClCompile Include="Game\GameObj\PlayerBehavior\PlayerKikAttack.cpp" />
@@ -321,6 +325,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Game\GameObj\JoyState\JoyState.h" />
     <ClInclude Include="Game\GameObj\KikArea\KikArea.h" />
     <ClInclude Include="Game\GameObj\KikDirectionView\KikDirectionView.h" />
+    <ClInclude Include="Game\GameObj\LifeUI\behavior\BaseLifeUIBehavior.h" />
+    <ClInclude Include="Game\GameObj\LifeUI\behavior\LifeUIDeath.h" />
+    <ClInclude Include="Game\GameObj\LifeUI\behavior\LifeUIRoot.h" />
+    <ClInclude Include="Game\GameObj\LifeUI\LifeUI.h" />
     <ClInclude Include="Game\GameObj\PlayerBehavior\BasePlayerAttackBehavior.h" />
     <ClInclude Include="Game\GameObj\PlayerBehavior\PlayerAttackRoot.h" />
     <ClInclude Include="Game\GameObj\PlayerBehavior\PlayerKikAttack.h" />

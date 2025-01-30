@@ -20,7 +20,7 @@ PlayerDeath::PlayerDeath(Player* boss)
 	/// ===================================================
 	/// 変数初期化
 	/// ===================================================
-	
+	pPlayer_->SetIsDeathUIStart(true);
 	step_ = Step::DEATH;
 }
 

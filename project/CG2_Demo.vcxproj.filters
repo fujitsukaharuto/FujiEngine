@@ -356,6 +356,18 @@
     <ClCompile Include="Engine\Model\PlaneDrawer.cpp">
       <Filter>Engine\Model</Filter>
     </ClCompile>
+    <ClCompile Include="Game\GameObj\LifeUI\LifeUI.cpp">
+      <Filter>Game\GameObj\LifeUI</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameObj\LifeUI\behavior\BaseLifeUIBehavior.cpp">
+      <Filter>Game\Behavior\LifeUI</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameObj\LifeUI\behavior\LifeUIRoot.cpp">
+      <Filter>Game\Behavior\LifeUI</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameObj\LifeUI\behavior\LifeUIDeath.cpp">
+      <Filter>Game\Behavior\LifeUI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Audio\Audio.h">
@@ -730,6 +742,18 @@
     <ClInclude Include="Engine\Model\PlaneDrawer.h">
       <Filter>Engine\Model</Filter>
     </ClInclude>
+    <ClInclude Include="Game\GameObj\LifeUI\LifeUI.h">
+      <Filter>Game\GameObj\LifeUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\LifeUI\behavior\BaseLifeUIBehavior.h">
+      <Filter>Game\Behavior\LifeUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\LifeUI\behavior\LifeUIRoot.h">
+      <Filter>Game\Behavior\LifeUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\LifeUI\behavior\LifeUIDeath.h">
+      <Filter>Game\Behavior\LifeUI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -866,6 +890,12 @@
     </Filter>
     <Filter Include="Game\GameObj\Enemy\State">
       <UniqueIdentifier>{9084616c-7dfb-470c-b318-438a444fd002}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameObj\LifeUI">
+      <UniqueIdentifier>{a7d4703e-5127-4141-b14c-c873f8bb2ac5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Behavior\LifeUI">
+      <UniqueIdentifier>{fcffe826-4d51-4979-ae1c-c48964553d04}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

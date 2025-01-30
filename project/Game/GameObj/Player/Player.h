@@ -1,6 +1,8 @@
 #pragma once
 #include"Vector3.h"
 #include"Collider/AABBCollider.h"
+/// obj
+#include"GameObj/LifeUI/LifeUI.h"
 #include"GameObj/KikDirectionView/KikDirectionView.h"
 #include "Particle/ParticleEmitter.h"
 /// behavior
@@ -77,16 +79,17 @@ private:
 	///private variaus
 	/// ===================================================
 
+		/// グローバルなパラメータ
+	const std::string groupName_ = "Player";       /// グループ名
+	GlobalVariables* globalParameter_;            /// グローバルパラメータ
+
+	// other class
 	FieldBlockManager* pFieldBlockManager_;
 
-	// viewObj
+	// Obj
 	std::unique_ptr<Object3d>               headModel_;
 	std::array<std::unique_ptr<Object3d>, 2>footPartsModel_;
 	std::unique_ptr<KikDirectionView>       kikDirectionView_;
-
-	/// グローバルなパラメータ
-	const std::string groupName_ = "Player";       /// グループ名
-	GlobalVariables* globalParameter_;            /// グローバルパラメータ
 
 	///* behavior,State
 	std::unique_ptr<BasePlayerBehavior>       behavior_ = nullptr;
@@ -106,6 +109,7 @@ private:
 	float             footMotionTime_;
 	float             headMotionTime_;
 	bool              isAdaptStartPos_;
+	bool              isDeathUIStart_;
 
 	// ダメージ演出
 	float elapsedTime_;
@@ -191,6 +195,7 @@ public:
 	AABBCollider* GetTrailTip() { return trailTip_.get(); }
 	Object3d*     GetFootPartsModel(const size_t& i){ return footPartsModel_[i].get(); }
 	bool          GetIsMoving();
+	bool          GetIsDeathUIStart()const { return isDeathUIStart_; }
 	/// ===================================================
 	/// setter method
 	/// ===================================================
@@ -201,5 +206,5 @@ public:
 	void SetFootMotionTime(const float& t) { footMotionTime_ = t; }
 	void SetColliderSetting();
 	void SetStartPositionAll();
-
+	void SetIsDeathUIStart(const bool& is) { isDeathUIStart_ = is; }
 };
