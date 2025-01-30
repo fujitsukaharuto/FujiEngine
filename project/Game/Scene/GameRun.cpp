@@ -86,6 +86,9 @@ void GameRun::Initialize() {
 	pManager_->CreateParticleGroup("jump", "blueParticle.png", 15);
 	pManager_->CreateParticleGroup("jumpLanding", "blueParticle.png", 15);
 
+	pManager_->CreateParticleGroup("playerDead1", "blueParticle.png");
+	pManager_->CreateParticleGroup("playerDead2", "blueParticle.png");
+
 	pManager_->CreateParticleGroup("dark", "blueParticle.png", 30, true);
 
 	pManager_->CreateParticleGroup("revival1", "blueParticle.png", 30);

@@ -2,6 +2,7 @@
 
 #include"BasePlayerState.h"
 #include"math/Easing.h"
+#include "Particle/ParticleEmitter.h"
 
 class PlayerDeath : public BasePlayerState {
 private:
@@ -16,6 +17,8 @@ private:
 	Step step_;
 	float waitTime_;
 	
+	ParticleEmitter deadEmit1_;
+	ParticleEmitter deadEmit2_;
 
 public:
 	//コンストラクタ

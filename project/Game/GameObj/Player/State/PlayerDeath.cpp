@@ -9,7 +9,7 @@
 /// inupt
 #include"Input/Input.h"
 #include"GameObj/JoyState/JoyState.h"
-
+#include "Particle/ParticleManager.h"
 
 #include<imgui.h>
 
@@ -22,6 +22,14 @@ PlayerDeath::PlayerDeath(Player* boss)
 	/// ===================================================
 	pPlayer_->SetIsDeathUIStart(true);
 	step_ = Step::DEATH;
+
+	ParticleManager::Load(deadEmit1_, "playerDead1");
+	ParticleManager::Load(deadEmit2_, "playerDead2");
+	deadEmit1_.pos = pPlayer_->GetModel()->transform.translate;
+	deadEmit2_.pos = pPlayer_->GetModel()->transform.translate;
+	deadEmit1_.Burst();
+	deadEmit2_.Burst();
+
 }
 
 PlayerDeath ::~PlayerDeath() {
