@@ -30,7 +30,6 @@ void LifeUI::Init() {
     offset_     = paramater_.offsetNormal;
     basePos_    = paramater_.basePosNormal;
 
-
     // 振る舞い初期化
     ChangeBehavior(std::make_unique<LifeUIRoot>(this));
 }
@@ -38,6 +37,7 @@ void LifeUI::Init() {
 // 更新
 void LifeUI::Update() {
 
+    // 位置、サイズ
     for (int i = 0; i < sprites_.size(); i++) {
         sprites_[i]->SetPos ({ basePos_.x + (float(i) * offset_),basePos_.y,basePos_.z });
         sprites_[i]->SetSize({ sizeWidth_,sizeHeigth_ }); // サイズを固定
@@ -50,7 +50,7 @@ void LifeUI::Update() {
 
 // 描画
 void LifeUI::Draw() {
-	/// time
+	/// 描画
 	for (int i = 0; i < sprites_.size(); i++) {
 		sprites_[i]->Draw();
 	}
@@ -187,8 +187,6 @@ void LifeUI::LifeBreak() {
 
             // ライフを減らす
             life_--;
-
-   
         }
     }
 }

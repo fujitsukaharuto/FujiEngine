@@ -207,4 +207,5 @@ public:
 	void SetColliderSetting();
 	void SetStartPositionAll();
 	void SetIsDeathUIStart(const bool& is) { isDeathUIStart_ = is; }
+	void SetColorAll(const Vector4& color);
 };

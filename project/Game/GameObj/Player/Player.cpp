@@ -375,10 +375,10 @@ void Player::DamageRendition(const float& interval) {
 
 		// 透明状態に応じて色を変更
 		if (isTransparent_) {
-			model_->SetColor(Vector4(1, 1, 1, 0)); // 透明
+			SetColorAll(Vector4(1, 1, 1, 0)); // 透明
 		}
 		else {
-			model_->SetColor(Vector4(1, 1, 1, 1)); // 不透明
+			SetColorAll(Vector4(1, 1, 1, 1)); // 不透明
 		}
 
 		elapsedTime_ = 0.0f; // 経過時間をリセット
@@ -608,22 +608,7 @@ void Player::ApplyGlobalParameter() {
 
 void Player::OnCollisionPlayerEnter([[maybe_unused]] const ColliderInfo& other) {
 
-	//// 死にます
-	//if (other.tag == "DaungerousFieldBlock") {
-	//	deathCount_--; // デクリメント
-
-	//	/// 死亡
-	//	if (deathCount_ <= 0) {
-	//		ChangeState(std::make_unique<PlayerDeath>(this));
-	//		return;
-	//	}
-	//	/// ダメージ演出
-	//	else {
-	//		
-
-	//		return;
-	//	}
-	//}
+	
 }
 
 void   Player::OnCollisionPlayerStay(const ColliderInfo& other) {
@@ -792,6 +777,12 @@ void Player::SetStartPositionAll() {
 	headModel_->transform.translate = paramater_.headStartPos_;
 	footPartsModel_[static_cast<size_t>(Parts::LEFT)]->transform.translate = paramater_.footStartPosLeft_;
 	footPartsModel_[static_cast<size_t>(Parts::RIGHT)]->transform.translate = paramater_.footStartPosRight_;
+}
+
+void  Player::SetColorAll(const Vector4& color) {
+	headModel_->SetColor(color);
+	footPartsModel_[static_cast<size_t>(Parts::LEFT)]->SetColor(color);
+	footPartsModel_[static_cast<size_t>(Parts::RIGHT)]->SetColor(color);
 }
 
 void  Player::SetColliderSetting() {

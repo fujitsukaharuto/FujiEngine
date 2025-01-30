@@ -31,11 +31,11 @@ private:
     ///* other class
     Player* pPlayer_;
   
-    GlobalVariables* globalParameter_;                   /// グローバルパラメータ
-    const std::string groupName_ = "LifeUI";             /// グループ名
+    GlobalVariables* globalParameter_;                    /// グローバルパラメータ
+    const std::string groupName_ = "LifeUI";              /// グループ名
 
     std::array<std::unique_ptr<Sprite>,3> sprites_;       /// スプライト
-    Paramater paramater_;                                /// パラメータ
+    Paramater paramater_;                                 /// パラメータ
 
     ///parm
     float     offset_;

@@ -20,7 +20,7 @@ PlayerReSpown::PlayerReSpown(Player* boss)
 	/// ===================================================
 
 	// パラメータ、位置リセット
-	pPlayer_->SetdeathCount(pPlayer_->GetParamater().deathCount_);
+	/*pPlayer_->SetdeathCount(pPlayer_->GetParamater().deathCount_);*/
 	pPlayer_->SetDamageRenditionReset();
 	pPlayer_->SetWorldPosition(pPlayer_->GetParamater().respownPos_);
 
@@ -52,7 +52,7 @@ void PlayerReSpown::Update() {
 		ease_.time += FPSKeeper::NormalDeltaTime();
 		invincibleTime_ += FPSKeeper::NormalDeltaTime();
 
-		pPlayer_->DamageRendition(0.1f);// ダメージ演出
+		pPlayer_->DamageRendition(0.15f);// ダメージ演出
 		// 復活パーティクル
 		reviveEmit1_.pos = pPlayer_->GetModel()->GetWorldPos();
 		reviveEmit2_.pos = pPlayer_->GetModel()->GetWorldPos();
@@ -68,7 +68,7 @@ void PlayerReSpown::Update() {
 		pPlayer_->SetScale(EaseOutBack(Vector3::GetZeroVec(), Vector3(1, 1, 1), ease_.time, ease_.maxTime));
 
 		if (invincibleTime_ < pPlayer_->GetParamater().respownInvincibleTime_)break;
-		pPlayer_->GetModel()->SetColor(Vector4(1, 1, 1, 1));
+	    pPlayer_->SetColorAll(Vector4(1, 1, 1, 1));
 		pPlayer_->GetCollider()->SetIsCollisonCheck(true);
 		step_ = Step::GOROOT;
 		break;
