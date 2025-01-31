@@ -1,9 +1,7 @@
 #pragma once
 
 #include"BaseEnemyBehavior.h"
-#include "Particle/ParticleEmitter.h"
-#include"Easing.h"
-#include "Audio/Audio.h"
+
 
 class EnemyExplotion : public BaseEnemyBehaivor {
 private:
@@ -14,13 +12,7 @@ private:
 private:
 
 	Step step_;
-	
-	/// emitter
-	ParticleEmitter bombEmit1_;
-	ParticleEmitter bombEmit2_;
-	ParticleEmitter bombEmit3_;
 
-	SoundData bomb_;
 
 	float waitTime_;
 	float waitTimeMax_;

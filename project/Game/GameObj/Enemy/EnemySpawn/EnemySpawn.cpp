@@ -32,6 +32,7 @@ void EnemySpawn::Update() {
     for (size_t i = 0; i < spawnDataList_.size(); ++i) {
         const auto& spawnData = spawnDataList_[i];
 
+
         // まだ生成されていないかつ、指定時間経過していれば生成
         if (currentTime_ >= spawnData.time && spawnedEnemies_.find(i) == spawnedEnemies_.end()) {
             pEnemyManager_->SpawnEnemy(spawnData.enemyType, Vector3(spawnData.x, BaseEnemy::StartYPos_, BaseEnemy::StartZPos_));

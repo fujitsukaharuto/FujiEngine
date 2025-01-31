@@ -87,6 +87,10 @@ public:
 	virtual void Update()     override;
 	virtual void Draw  (Material* mate = nullptr)override;
 
+	// 子供の処理
+	virtual void FallMove() = 0;
+	virtual void ExplotionRendition() = 0;
+
 	void Bound(float& speed);
 	void SpawnFall(float& speed, const bool& isJump);
 

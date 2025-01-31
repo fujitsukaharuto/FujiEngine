@@ -1,7 +1,7 @@
 
 #include "EnemyManager.h"
 #include"NormalEnemy.h"
-#include"StrongEnemy.h"
+#include"MissileEnemy.h"
 
 #include "FPSKeeper.h"
 
@@ -33,9 +33,7 @@ void EnemyManager::Initialize() {
 }
 
 void  EnemyManager::FSpawn() {
-	SpawnEnemy(enemyTypes_[static_cast<size_t>(BaseEnemy::Type::NORMAL)], Vector3(-3, 60, BaseEnemy::StartZPos_));
-	SpawnEnemy(enemyTypes_[static_cast<size_t>(BaseEnemy::Type::NORMAL)], Vector3(0, 50, BaseEnemy::StartZPos_));
-	SpawnEnemy(enemyTypes_[static_cast<size_t>(BaseEnemy::Type::NORMAL)], Vector3(8, 70, BaseEnemy::StartZPos_));
+	
 }
 
 ///========================================================================================
@@ -53,7 +51,7 @@ void EnemyManager::SpawnEnemy(const std::string& enemyType, const Vector3& posit
 
 	// ストロングな敵
 	else if (enemyType == enemyTypes_[static_cast<size_t>(BaseEnemy::Type::STRONG)]) { 
-		enemy = std::make_unique<StrongEnemy>();
+		enemy = std::make_unique<MissileEnemy>();
 		enemy->SetParm(BaseEnemy::Type::STRONG, paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)]);
 	}
 

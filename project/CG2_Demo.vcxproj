@@ -182,7 +182,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\GameObj\Enemy\State\BaseEnemyState.cpp" />
     <ClCompile Include="Game\GameObj\Enemy\State\EnemyNoneState.cpp" />
     <ClCompile Include="Game\GameObj\Enemy\State\EnemyPowerUp.cpp" />
-    <ClCompile Include="Game\GameObj\Enemy\StrongEnemy.cpp" />
+    <ClCompile Include="Game\GameObj\Enemy\MissileEnemy.cpp" />
     <ClCompile Include="Game\GameObj\FieldBlock\Behavior\BaseFieldBlockBehavior.cpp" />
     <ClCompile Include="Game\GameObj\FieldBlock\Behavior\FieldBlockNoDamage.cpp" />
     <ClCompile Include="Game\GameObj\FieldBlock\Behavior\FieldBlockTakeDamage.cpp" />
@@ -312,7 +312,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Game\GameObj\Enemy\State\BaseEnemyState.h" />
     <ClInclude Include="Game\GameObj\Enemy\State\EnemyNoneState.h" />
     <ClInclude Include="Game\GameObj\Enemy\State\EnemyPowerUp.h" />
-    <ClInclude Include="Game\GameObj\Enemy\StrongEnemy.h" />
+    <ClInclude Include="Game\GameObj\Enemy\MissileEnemy.h" />
     <ClInclude Include="Game\GameObj\FieldBlock\Behavior\BaseFieldBlockBehavior.h" />
     <ClInclude Include="Game\GameObj\FieldBlock\Behavior\FieldBlockNoDamage.h" />
     <ClInclude Include="Game\GameObj\FieldBlock\Behavior\FieldBlockTakeDamage.h" />

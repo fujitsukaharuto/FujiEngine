@@ -1,6 +1,8 @@
 #pragma once
 #include <list>
 #include <memory>
+#include "Particle/ParticleEmitter.h"
+#include "Audio/Audio.h"
 //Function
 #include "Easing.h"
 // class
@@ -9,9 +11,13 @@
 /// <summary>
 /// 敵クラス
 /// </summary>
-class StrongEnemy : public BaseEnemy {
+class MissileEnemy : public BaseEnemy {
 private:
 
+	enum class STEP{
+		SERCH,
+		FALL,
+	};
 
 private:
 
@@ -26,4 +32,6 @@ public:
 	void Update()override;
 	void Draw(Material* mate = nullptr)override;
 
+	void FallMove()override;
+	void ExplotionRendition()override;
 };

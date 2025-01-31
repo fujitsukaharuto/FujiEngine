@@ -227,7 +227,7 @@
     <ClCompile Include="Game\GameObj\Enemy\Behavior\EnemyRoot.cpp">
       <Filter>Game\Behavior\Enemy</Filter>
     </ClCompile>
-    <ClCompile Include="Game\GameObj\Enemy\StrongEnemy.cpp">
+    <ClCompile Include="Game\GameObj\Enemy\MissileEnemy.cpp">
       <Filter>Game\GameObj\Enemy</Filter>
     </ClCompile>
     <ClCompile Include="Game\GameObj\Enemy\Behavior\EnemyFall.cpp">
@@ -252,25 +252,25 @@
       <Filter>Game\Behavior\Enemy</Filter>
     </ClCompile>
     <ClCompile Include="Game\GameObj\PlayerBehavior\BasePlayerBehavior.cpp">
-      <Filter>Game\Behavior\Player\NormalBehavior</Filter>
+      <Filter>Game\Behavior\LifeUI\Player\NormalBehavior</Filter>
     </ClCompile>
     <ClCompile Include="Game\GameObj\PlayerBehavior\PlayerJump.cpp">
-      <Filter>Game\Behavior\Player\NormalBehavior</Filter>
+      <Filter>Game\Behavior\LifeUI\Player\NormalBehavior</Filter>
     </ClCompile>
     <ClCompile Include="Game\GameObj\PlayerBehavior\PlayerRoot.cpp">
-      <Filter>Game\Behavior\Player\NormalBehavior</Filter>
+      <Filter>Game\Behavior\LifeUI\Player\NormalBehavior</Filter>
     </ClCompile>
     <ClCompile Include="Game\GameObj\PlayerBehavior\PlayerKikAttack.cpp">
-      <Filter>Game\Behavior\Player\AttackBehavior</Filter>
+      <Filter>Game\Behavior\LifeUI\Player\AttackBehavior</Filter>
     </ClCompile>
     <ClCompile Include="Game\GameObj\PlayerBehavior\BasePlayerAttackBehavior.cpp">
-      <Filter>Game\Behavior\Player\AttackBehavior</Filter>
+      <Filter>Game\Behavior\LifeUI\Player\AttackBehavior</Filter>
     </ClCompile>
     <ClCompile Include="Game\GameObj\PlayerBehavior\PlayerAttackRoot.cpp">
-      <Filter>Game\Behavior\Player\AttackBehavior</Filter>
+      <Filter>Game\Behavior\LifeUI\Player\AttackBehavior</Filter>
     </ClCompile>
     <ClCompile Include="Game\GameObj\PlayerBehavior\PlayerRecoil.cpp">
-      <Filter>Game\Behavior\Player\NormalBehavior</Filter>
+      <Filter>Game\Behavior\LifeUI\Player\NormalBehavior</Filter>
     </ClCompile>
     <ClCompile Include="Game\GameObj\UFO\Behavior\UFODamage.cpp">
       <Filter>Game\Behavior\UFO</Filter>
@@ -282,7 +282,7 @@
       <Filter>Game\GameObj\KikArea</Filter>
     </ClCompile>
     <ClCompile Include="Game\GameObj\PlayerBehavior\PlayerSpecialFall.cpp">
-      <Filter>Game\Behavior\Player\AttackBehavior</Filter>
+      <Filter>Game\Behavior\LifeUI\Player\AttackBehavior</Filter>
     </ClCompile>
     <ClCompile Include="Game\Scene\GameOverScene.cpp">
       <Filter>Game\Scene</Filter>
@@ -613,7 +613,7 @@
     <ClInclude Include="Game\GameObj\Enemy\Behavior\EnemyRoot.h">
       <Filter>Game\Behavior\Enemy</Filter>
     </ClInclude>
-    <ClInclude Include="Game\GameObj\Enemy\StrongEnemy.h">
+    <ClInclude Include="Game\GameObj\Enemy\MissileEnemy.h">
       <Filter>Game\GameObj\Enemy</Filter>
     </ClInclude>
     <ClInclude Include="Game\GameObj\Enemy\Behavior\EnemyFall.h">
@@ -638,25 +638,25 @@
       <Filter>Game\Behavior\Enemy</Filter>
     </ClInclude>
     <ClInclude Include="Game\GameObj\PlayerBehavior\BasePlayerBehavior.h">
-      <Filter>Game\Behavior\Player\NormalBehavior</Filter>
+      <Filter>Game\Behavior\LifeUI\Player\NormalBehavior</Filter>
     </ClInclude>
     <ClInclude Include="Game\GameObj\PlayerBehavior\PlayerJump.h">
-      <Filter>Game\Behavior\Player\NormalBehavior</Filter>
+      <Filter>Game\Behavior\LifeUI\Player\NormalBehavior</Filter>
     </ClInclude>
     <ClInclude Include="Game\GameObj\PlayerBehavior\PlayerRoot.h">
-      <Filter>Game\Behavior\Player\NormalBehavior</Filter>
+      <Filter>Game\Behavior\LifeUI\Player\NormalBehavior</Filter>
     </ClInclude>
     <ClInclude Include="Game\GameObj\PlayerBehavior\PlayerKikAttack.h">
-      <Filter>Game\Behavior\Player\AttackBehavior</Filter>
+      <Filter>Game\Behavior\LifeUI\Player\AttackBehavior</Filter>
     </ClInclude>
     <ClInclude Include="Game\GameObj\PlayerBehavior\BasePlayerAttackBehavior.h">
-      <Filter>Game\Behavior\Player\AttackBehavior</Filter>
+      <Filter>Game\Behavior\LifeUI\Player\AttackBehavior</Filter>
     </ClInclude>
     <ClInclude Include="Game\GameObj\PlayerBehavior\PlayerAttackRoot.h">
-      <Filter>Game\Behavior\Player\AttackBehavior</Filter>
+      <Filter>Game\Behavior\LifeUI\Player\AttackBehavior</Filter>
     </ClInclude>
     <ClInclude Include="Game\GameObj\PlayerBehavior\PlayerRecoil.h">
-      <Filter>Game\Behavior\Player\NormalBehavior</Filter>
+      <Filter>Game\Behavior\LifeUI\Player\NormalBehavior</Filter>
     </ClInclude>
     <ClInclude Include="Game\GameObj\UFO\Behavior\UFODamage.h">
       <Filter>Game\Behavior\UFO</Filter>
@@ -668,7 +668,7 @@
       <Filter>Game\GameObj\KikArea</Filter>
     </ClInclude>
     <ClInclude Include="Game\GameObj\PlayerBehavior\PlayerSpecialFall.h">
-      <Filter>Game\Behavior\Player\AttackBehavior</Filter>
+      <Filter>Game\Behavior\LifeUI\Player\AttackBehavior</Filter>
     </ClInclude>
     <ClInclude Include="Game\Scene\GameOverScene.h">
       <Filter>Game\Scene</Filter>
@@ -837,9 +837,6 @@
     <Filter Include="Game\Behavior">
       <UniqueIdentifier>{333622ee-7f2c-4e7f-95ca-83fbf231643b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\Behavior\Player">
-      <UniqueIdentifier>{2f9dd270-714f-481d-8867-8534b4588c4c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Game\JoyState">
       <UniqueIdentifier>{4d9e2a25-37b9-4495-a24e-c2ede3ca953c}</UniqueIdentifier>
     </Filter>
@@ -863,12 +860,6 @@
     </Filter>
     <Filter Include="Game\Behavior\UFO">
       <UniqueIdentifier>{8ddc066b-aa74-4e48-a9a6-3c271dd5aaef}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\Behavior\Player\NormalBehavior">
-      <UniqueIdentifier>{3f62bc85-046d-4149-9817-d348d2d25775}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\Behavior\Player\AttackBehavior">
-      <UniqueIdentifier>{505cfd85-6044-41d4-93d3-2227f4950c72}</UniqueIdentifier>
     </Filter>
     <Filter Include="Game\GameObj\KikArea">
       <UniqueIdentifier>{0c4be5e0-93f2-45f9-8927-63764ab0d2c5}</UniqueIdentifier>
@@ -905,6 +896,15 @@
     </Filter>
     <Filter Include="Game\GameObj\GameOverScreen">
       <UniqueIdentifier>{a42a8ef1-da85-4305-9961-b3803de9873d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Behavior\LifeUI\Player">
+      <UniqueIdentifier>{2f9dd270-714f-481d-8867-8534b4588c4c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Behavior\LifeUI\Player\NormalBehavior">
+      <UniqueIdentifier>{3f62bc85-046d-4149-9817-d348d2d25775}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Behavior\LifeUI\Player\AttackBehavior">
+      <UniqueIdentifier>{505cfd85-6044-41d4-93d3-2227f4950c72}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

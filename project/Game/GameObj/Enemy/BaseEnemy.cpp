@@ -44,15 +44,7 @@ void BaseEnemy::Initialize() {
 	///spawn
 	spawnEasing_.time = 0.0f;
 	spawnEasing_.maxTime = 0.8f;
-	
-	// collider
-	collider_ = std::make_unique<AABBCollider>();
-	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
-	collider_->SetTag(tags_[static_cast<size_t>(Tag::FALL)]);
-	SetCollisionSize(BaseScale_ * 2.0f);
-	collider_->SetParent(model_.get());
-	collider_->InfoUpdate();
-
+		
 	// 初期パラメータセット
 	explotionTime_ = paramater_.explotionTime_;
 	blowDirection_ = 1.0f;
@@ -60,7 +52,7 @@ void BaseEnemy::Initialize() {
 	model_->transform.scale = BaseEnemy::BaseScale_;
 	powerUpScale_ = BaseEnemy::BaseScale_;
 
-	ChangeBehavior(std::make_unique<EnemySpawnFall>(this)); /// 追っかけ
+	
 	ChangeState(std::make_unique<EnemyNoneState>(this)); /// 追っかけ
 }
 

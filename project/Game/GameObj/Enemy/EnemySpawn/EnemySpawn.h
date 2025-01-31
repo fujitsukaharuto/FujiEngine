@@ -37,13 +37,11 @@ public:
     ///  public method
     ///========================================================================================
 
-
     void Init();
     void Update();
     void DrawImGuiEditor();
 
     void ResetSpawner();
-
 
     void SaveSpawnData(const std::string& filename);
     void LoadSpawnData(const std::string& filename);
