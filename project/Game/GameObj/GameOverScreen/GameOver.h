@@ -29,8 +29,8 @@ private:
 	float alpha_;
 
 	/// selectPos
-	const Vector3 gameSelectPos_ = { 276.0f,473.0f ,0};
-	const Vector3 titleSelectPos_ = { 276.0f,539.8f ,0 };
+	const Vector3 gameSelectPos_ = { 251.6f,444.0f ,0};
+	const Vector3 titleSelectPos_ = { 251.6f,584.5f ,0 };
 	float selectPosOffSet_;
 	Easing offsetEasing_;
 	float  easeDirection_;

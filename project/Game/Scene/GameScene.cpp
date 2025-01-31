@@ -171,7 +171,7 @@ void GameScene::Update() {
 			lifeUI_->Init();
 			fieldBlockManager_->AllReset();
 			gameOver_->Init();
-			mode_ = GAME;
+			mode_ = Mode::GAME;
 
 			break;
 		default:
