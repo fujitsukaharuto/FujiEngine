@@ -48,18 +48,15 @@ public:
 
     // 初期化
     void Initialize();
-    void FSpawn();
+    void Update();
+    void Draw(Material* material = nullptr);
 
-  
     // 敵の生成
+    void FSpawn();
     void AddFieldBlock();
 
-    // 更新処理
-    void Update();
-   
-
-    // 描画処理
-    void Draw(Material*material=nullptr);
+    /// オール初期化
+    void AllReset();
 
 
     ///========================================================

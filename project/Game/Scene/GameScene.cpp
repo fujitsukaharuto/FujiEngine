@@ -115,6 +115,9 @@ void GameScene::Update() {
 
 		switch (mode_)
 		{
+			///-------------------------------------------------------------
+			///　Game
+			///-------------------------------------------------------------- 
 		case GameScene::GAME:
 			StartUI();
 
@@ -149,13 +152,14 @@ void GameScene::Update() {
 			}
 			cMane_->CheckAllCollision();
 
-
-			ParticleManager::GetInstance()->Update();
-
 			if (!lifeUI_->GetIsGameOver())break;
+			/*gameOver_->SetStepStart();*/
 			mode_ = Mode::GAMEOVER;
 
 			break;
+			///-------------------------------------------------------------
+			///　GameOver
+			///-------------------------------------------------------------- 
 		case GameScene::GAMEOVER:
 			gameOver_->Update();
 			if (gameOver_->GetIsTitleBack()) {
@@ -164,15 +168,16 @@ void GameScene::Update() {
 
 			if (!gameOver_->GetIsGameBack())break;
 			player_->Initialize();
-			gameOver_->Init();
 			lifeUI_->Init();
+			fieldBlockManager_->AllReset();
+			gameOver_->Init();
 			mode_ = GAME;
 
 			break;
 		default:
 			break;
 		}
-			
+		ParticleManager::GetInstance()->Update();
 		
 	}
 }
@@ -227,7 +232,9 @@ void GameScene::Draw() {
 	keyPaneru_->Draw();
 	timer_->Draw();
 	lifeUI_->Draw();
-	gameOver_->Draw();
+	if (mode_ == GAMEOVER) {
+		gameOver_->Draw();
+	}
 	if (blackTime != 0.0f) {
 		black_->Draw();
 	}

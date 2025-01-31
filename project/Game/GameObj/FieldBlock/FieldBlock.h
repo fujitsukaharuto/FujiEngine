@@ -65,6 +65,8 @@ public:
 	virtual void Update()     override;
 	virtual void Draw  (Material* mate = nullptr)override;
 
+	void Reset();
+
 	void ChangeState (std::unique_ptr<BaseFieldBlockState>behavior);
 	void ChangeBehavior(std::unique_ptr<BaseFieldBlockBehavior>behavior);
 

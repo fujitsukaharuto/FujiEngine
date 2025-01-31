@@ -56,8 +56,13 @@ void FieldBlock::Initialize() {
 	collider_->InfoUpdate();
 
 	// 初期パラメータセット
-	ChangeState(std::make_unique<FieldBlockNormal>(this)); /// 追っかけ
-	ChangeBehavior(std::make_unique<FieldBlockNoDamage>(this)); /// 追っかけ
+	Reset();
+}
+
+void FieldBlock::Reset() {
+	// 初期パラメータセット
+	ChangeState(std::make_unique<FieldBlockNormal>(this));
+	ChangeBehavior(std::make_unique<FieldBlockNoDamage>(this)); 
 }
 
 ///========================================================

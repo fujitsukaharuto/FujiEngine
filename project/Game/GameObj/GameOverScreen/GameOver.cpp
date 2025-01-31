@@ -20,7 +20,7 @@ void GameOver::Init() {
 	alpha_ = 0.0f;
 	isGameBack_ = false;
 	isTitleBack_ = false;
-	
+
 	overPaneru_->SetColor(Vector4(1, 1, 1, alpha_));
 	selectArrow_->SetColor(Vector4(1, 1, 1, alpha_));
 
@@ -30,17 +30,21 @@ void GameOver::Init() {
 	offsetEasing_.maxTime = 0.7f;
 	offsetEasing_.time = 0.0f;
 
-	
+
 	selectMode_ = SelectMode::GOGAME;
 	step_ = Step::FADEIN;
 }
 
+//void GameOver::SetStepStart() {
+//	step_ = Step::FADEIN;
+//}
+
 void GameOver::Update() {
 
 	//alpha
-	overPaneru_->SetColor(Vector4(1,1,1,alpha_));
+	overPaneru_->SetColor(Vector4(1, 1, 1, alpha_));
 	selectArrow_->SetColor(Vector4(1, 1, 1, alpha_));
-	selectArrow_->SetPos(Vector3(selectPos_.x+ selectPosOffSet_,selectPos_.y,selectPos_.z));
+	selectArrow_->SetPos(Vector3(selectPos_.x + selectPosOffSet_, selectPos_.y, selectPos_.z));
 
 	switch (step_)
 	{
@@ -49,7 +53,7 @@ void GameOver::Update() {
 		///---------------------------------------------------------------
 	case GameOver::Step::FADEIN:
 		fadeInEaseT_.time += FPSKeeper::NormalDeltaTime();
-		alpha_ = EaseInCubic(0.0f, 1.0f, fadeInEaseT_.time, fadeInEaseT_.maxTime);
+		alpha_ = EaseOutCubic(0.0f, 1.0f, fadeInEaseT_.time, fadeInEaseT_.maxTime);
 
 		if (fadeInEaseT_.time < fadeInEaseT_.maxTime)break;
 		alpha_ = 1.0f;
@@ -60,14 +64,14 @@ void GameOver::Update() {
 		/// タイトルに戻るかゲームに戻るか
 		///---------------------------------------------------------------
 	case GameOver::Step::UISELECT:
-		
+
 		OffsetMove();
 
-		if (Input::GetInstance()->TriggerKey(DIK_S)&& selectMode_ == SelectMode::GOGAME) {
+		if (Input::GetInstance()->TriggerKey(DIK_S) && selectMode_ == SelectMode::GOGAME) {
 			selectMode_ = SelectMode::GOTITLE;
 			selectPos_ = titleSelectPos_;
 		}
-		else if(Input::GetInstance()->TriggerKey(DIK_W) && selectMode_ == SelectMode::GOTITLE){
+		else if (Input::GetInstance()->TriggerKey(DIK_W) && selectMode_ == SelectMode::GOTITLE) {
 			selectMode_ = SelectMode::GOGAME;
 			selectPos_ = gameSelectPos_;
 		}
@@ -103,10 +107,13 @@ void GameOver::Update() {
 		OffsetMove();
 
 		fadeOutEaseT_.time += FPSKeeper::NormalDeltaTime();
-		alpha_ = EaseInCubic(1.0f, 0.0f, fadeOutEaseT_.time, fadeOutEaseT_.maxTime);
+		alpha_ = EaseOutCubic(1.0f, 0.0f, fadeOutEaseT_.time, fadeOutEaseT_.maxTime);
+
 
 		if (fadeOutEaseT_.time < fadeOutEaseT_.maxTime)break;
 		alpha_ = 0.0f;
+		overPaneru_->SetColor(Vector4(1, 1, 1, alpha_));
+		selectArrow_->SetColor(Vector4(1, 1, 1, alpha_));
 		fadeOutEaseT_.time = fadeOutEaseT_.maxTime;
 		isGameBack_ = true;
 		break;
@@ -116,6 +123,7 @@ void GameOver::Update() {
 }
 
 void GameOver::Draw() {
+	if (alpha_ <= 0.0f)return;
 	overPaneru_->Draw();
 	selectArrow_->Draw();
 }
@@ -127,7 +135,7 @@ void GameOver::Debug() {
 
 void GameOver::OffsetMove() {
 	// イージングタイムを更新
-	offsetEasing_.time +=FPSKeeper::NormalDeltaTime()* easeDirection_; // 方向に応じて時間を増減
+	offsetEasing_.time += FPSKeeper::NormalDeltaTime() * easeDirection_; // 方向に応じて時間を増減
 
 	// タイムが1を超えたら逆方向に、0未満になったら進む方向に変更
 	if (offsetEasing_.time >= offsetEasing_.maxTime) {
@@ -140,5 +148,5 @@ void GameOver::OffsetMove() {
 	}
 
 	selectPosOffSet_ = EaseOutBack(-10.0f, 10.0f, offsetEasing_.time, offsetEasing_.maxTime);
-	
+
 }
