@@ -7,7 +7,7 @@
 ///========================================================
 void MissileEnemy::Initialize() {
 	BaseEnemy::Initialize();
-	OriginGameObject::CreateModel("StrongEnemy.obj");
+	OriginGameObject::CreateModel("Missile.obj");
 
 	ParticleManager::Load(bombEmit1_, "MisilleBomb1");
 	ParticleManager::Load(bombEmit2_, "MisilleBomb2");
@@ -123,6 +123,7 @@ void MissileEnemy::FallMove() {
 		if (antipationEase_.time < antipationEase_.maxTime)break;
 		model_->transform.translate.y = paramater_.fallPos + paramater_.antipationOffsetPos_;
 		antipationEase_.time = antipationEase_.maxTime;
+		FallSE();//落ちるSE
 		step_ = Step::FALL;
 		break;
 		///-------------------------------------------------------------
@@ -140,7 +141,7 @@ void MissileEnemy::FallMove() {
 
 // 爆破演出
 void MissileEnemy::ExplotionRendition() {
-	/*/// emitter
+	/// emitter
 
 	bombEmit1_.pos = model_->GetWorldPos();
 	bombEmit2_.pos = model_->GetWorldPos();
@@ -152,10 +153,9 @@ void MissileEnemy::ExplotionRendition() {
 	bombEmit3_.Burst();
 	bombEmit4_.Burst();
 
-	Audio::GetInstance()->SoundPlayWave(bombSE_, 0.05f);*/
-}
-	bomb_ = Audio::GetInstance()->SoundLoadWave("mini_bomb2.wav");
-	Audio::GetInstance()->SoundPlayWave(bomb_, 0.05f);*/
+	
+	bombSE_ = Audio::GetInstance()->SoundLoadWave("mini_bomb2.wav");
+	Audio::GetInstance()->SoundPlayWave(bombSE_, 0.05f);
 }
 
 void MissileEnemy::SetOnlyParamater(const Paramater& parm) {
@@ -183,4 +183,11 @@ void MissileEnemy::ScalingEaseing() {
 
 void MissileEnemy::SetPosition() {
 	startPos_ = model_->GetWorldPos();
+}
+
+void MissileEnemy::FallSE() {
+	Audio::GetInstance()->SoundPlayWave(luncherSE_, 0.05f);
+
+	luncherSE_ = Audio::GetInstance()->SoundLoadWave("mini_bomb2.wav");
+	Audio::GetInstance()->SoundPlayWave(luncherSE_, 0.05f);
 }

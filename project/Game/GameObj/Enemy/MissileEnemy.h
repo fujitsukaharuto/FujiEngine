@@ -34,6 +34,7 @@ public:
 private:/// パラメータ、ステップ
 	Paramater paramater_;
 	Step step_;
+
 	ParticleEmitter bombEmit1_;
 	ParticleEmitter bombEmit2_;
 	ParticleEmitter bombEmit3_;
@@ -73,6 +74,9 @@ public:
 
 	void FallMove()override;
 	void ExplotionRendition()override;
+
+	void FallSE();
+
 	void SetOnlyParamater(const Paramater&parm);
 
 	void SetPosition();
