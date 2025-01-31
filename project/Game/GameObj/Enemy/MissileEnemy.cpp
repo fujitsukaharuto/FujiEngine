@@ -14,6 +14,9 @@ void MissileEnemy::Initialize() {
 	ParticleManager::Load(bombEmit3_, "bombShock1");
 	ParticleManager::Load(bombEmit4_, "bombShock2");
 
+	ParticleManager::Load(luncherEmit1_, "misilleSmoke1");
+	ParticleManager::Load(luncherEmit2_, "misilleSmoke2");
+
 	bombSE_ = Audio::GetInstance()->SoundLoadWave("MissileBomb.wav");
 	luncherSE_ = Audio::GetInstance()->SoundLoadWave("MissileLauncher.wav");
 
@@ -127,6 +130,11 @@ void MissileEnemy::FallMove() {
 		///-------------------------------------------------------------- 
 	case MissileEnemy::Step::FALL:
 		model_->transform.translate.y -= BaseEnemy::paramater_.fallSpeed* FPSKeeper::DeltaTimeRate();
+
+		luncherEmit1_.pos = model_->transform.translate;
+		luncherEmit2_.pos = model_->transform.translate;
+		luncherEmit1_.Emit();
+		luncherEmit2_.Emit();
 
 		break;
 	default:
