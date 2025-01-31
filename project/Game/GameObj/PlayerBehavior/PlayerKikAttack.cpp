@@ -23,6 +23,9 @@ PlayerKikAttack::PlayerKikAttack(Player* boss)
 	/// ===================================================
 	pPlayer_->SetKikIsCollision(true);
 	step_ = Step::KIK;
+
+	kickColor_ = { 1.0f,1.0f,0.0f };
+	strongKickColor_ = { 0.5f,0.0f,0.0f };
 }
 
 PlayerKikAttack ::~PlayerKikAttack() {
@@ -52,12 +55,12 @@ void PlayerKikAttack::Update() {
 		
 		if (kikTime_ <= pPlayer_->GetParamater().kikTime_ * 2.0f) {
 			if (pPlayer_->GetKikCollider()->GetTag() == "MaxPowerKik") {
-				PlaneDrawer::GetInstance()->AddPlanePoint(pPlayer_->GetTrailRoot()->GetPos(), { 0.5f,0.0f,0.0f });
-				PlaneDrawer::GetInstance()->AddPlanePoint(pPlayer_->GetTrailTip()->GetPos(), { 0.5f,0.0f,0.0f });
+				PlaneDrawer::GetInstance()->AddPlanePoint(pPlayer_->GetTrailRoot()->GetPos(), strongKickColor_);
+				PlaneDrawer::GetInstance()->AddPlanePoint(pPlayer_->GetTrailTip()->GetPos(), strongKickColor_);
 			}
 			else {
-				PlaneDrawer::GetInstance()->AddPlanePoint(pPlayer_->GetTrailRoot()->GetPos(), { 1.0f,1.0f,0.0f });
-				PlaneDrawer::GetInstance()->AddPlanePoint(pPlayer_->GetTrailTip()->GetPos(), { 1.0f,1.0f,0.0f });
+				PlaneDrawer::GetInstance()->AddPlanePoint(pPlayer_->GetTrailRoot()->GetPos(), kickColor_);
+				PlaneDrawer::GetInstance()->AddPlanePoint(pPlayer_->GetTrailTip()->GetPos(), kickColor_);
 			}
 			
 		};

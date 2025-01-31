@@ -17,6 +17,9 @@ private:
 	float kikTime_;
 	float kikRotateZ_;
 
+	Vector3 kickColor_;
+	Vector3 strongKickColor_;
+
 public:
 	//コンストラクタ
 	PlayerKikAttack(Player* boss);
