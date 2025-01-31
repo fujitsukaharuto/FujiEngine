@@ -104,7 +104,6 @@ void GameRun::Initialize() {
 	pManager_->CreateParticleGroup("revival1", "blueParticle.png", 30);
 	pManager_->CreateParticleGroup("revival2", "kira.png", 30);
 
-
 	pManager_->CreateParticleGroup("misilleSmoke1", "blueParticle.png");
 	pManager_->CreateParticleGroup("misilleSmoke2", "blueParticle.png");
 
