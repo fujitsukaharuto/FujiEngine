@@ -104,16 +104,7 @@ void LifeUIDeath::Update() {
 		breakEmit1_.Burst();
 		breakEmit2_.Burst();
 
-		// UI戻す
-		if (pLifeUI_->GetLife()>0) {
-			nextSetPos_ = pLifeUI_->GetParamater().basePosies_[pLifeUI_->GetMaxLife() - pLifeUI_->GetLife()];
-			step_ = Step::WAITAFTERBREAK;
-		}
-		// 終わる
-		else {
-			pLifeUI_->SetIsGameOver(true);
-			step_ = Step::GOROOT;
-		}
+		step_ = Step::WAITAFTERBREAK;
 		break;
 		///-------------------------------------------------------
 		/// 壊れてからの待機
@@ -124,7 +115,18 @@ void LifeUIDeath::Update() {
 
 		// 次のステップ
 		if (waitAfterBreakTime_ < kWaitAfterBreakTime_)break;
-		step_ = Step::RETURN;
+
+		// UI戻す
+		if (pLifeUI_->GetLife() > 0) {
+			nextSetPos_ = pLifeUI_->GetParamater().basePosies_[pLifeUI_->GetMaxLife() - pLifeUI_->GetLife()];
+			step_ = Step::RETURN;
+		}
+		// 終わる
+		else {
+
+			pLifeUI_->SetIsGameOver(true);
+			step_ = Step::GOROOT;
+		}
 		break;
 		///-------------------------------------------------------
 		/// UI元の位置に戻る
