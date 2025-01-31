@@ -24,12 +24,19 @@ UFOMissilePop::UFOMissilePop(UFO* player)
 	///---------------------------------------------------
 	///変数初期化
 	///---------------------------------------------------
-	easing_.time = 0.0f;
-	easing_.maxTime = 0.5f;
-	easing_.amplitude = 0.4f;
-	easing_.period = 0.2f;
+	lightUpEasing_.time = 0.0f;
+	lightUpEasing_.maxTime = 0.5f;
 
-	step_ = Step::POP;
+	lightCloseEasing_.time = 0.0f;
+	lightCloseEasing_.maxTime = 0.5f;
+	
+	initScale_ = pUFO_->GetParamater().initLightScale;
+	scaleUnderPop_ = pUFO_->GetParamater().lightScaleUnderPop;
+
+	waitTime_ = 0.0f;
+	kWaitTime_ = 0.3f;
+
+	step_ = Step::LIGHTUP;
 	
 }
 
@@ -41,34 +48,57 @@ UFOMissilePop ::~UFOMissilePop() {
 void UFOMissilePop::Update() {
 	switch (step_)
 	{
-	case UFOMissilePop::Step::POP:
 		///-------------------------------------------------------
-		///　敵生成
+		///　ライト出す
 		///-------------------------------------------------------
-		pUFO_->EnemySpawn();
-		step_ = Step::ANIMATION;
+	case UFOMissilePop::Step::LIGHTUP:
 
+		/// タイム加算
+		lightUpEasing_.time += FPSKeeper::DeltaTimeRate();
+	
+		// イージング適応
+		pUFO_->GetUFOLight()->transform.scale =
+			EaseInCubic(initScale_, scaleUnderPop_, lightUpEasing_.time,lightUpEasing_.maxTime);
+
+		/// 次のステップ
+		if (lightUpEasing_.time < lightUpEasing_.maxTime)break;
+		lightUpEasing_.time = lightUpEasing_.maxTime;
+		step_ = Step::LIGHTCLOSE;
 		break;
 
-	case UFOMissilePop::Step::ANIMATION:
 		///-------------------------------------------------------
-		///　アニメーション演出
+		///　待機
 		///-------------------------------------------------------
+	case UFOMissilePop::Step::WAIT:
+		waitTime_ += FPSKeeper::NormalDeltaTime();
+		if (waitTime_ < kWaitTime_)break;
+		step_ = Step::LIGHTCLOSE;
+		break;
+
+		///-------------------------------------------------------
+		///　ライト閉じる
+		///-------------------------------------------------------
+	case UFOMissilePop::Step::LIGHTCLOSE:
 		
-		easing_.time += FPSKeeper::DeltaTimeRate();
-		pUFO_->SetScale(EaseAmplitudeScale(
-			Vector3(10, 1, 1), easing_.time, easing_.maxTime, easing_.amplitude, easing_.period)
-		);
-		// ステップ遷移
-		if (easing_.time < easing_.maxTime)break;
-		easing_.time = easing_.maxTime;
+		/// タイム加算
+		lightCloseEasing_.time += FPSKeeper::DeltaTimeRate();
+
+		// イージング適応
+		pUFO_->GetUFOLight()->transform.scale =
+			EaseInCubic(scaleUnderPop_, initScale_,  lightCloseEasing_.time, lightCloseEasing_.maxTime);
+
+		/// 次のステップ
+		if (lightCloseEasing_.time < lightCloseEasing_.maxTime)break;
+		lightCloseEasing_.time = lightCloseEasing_.maxTime;
 		step_ = Step::RETURNROOT;
+		
 
 		break;
-	case UFOMissilePop::Step::RETURNROOT:
 		///-------------------------------------------------------
 		///　通常に戻るお
 		///-------------------------------------------------------
+	case UFOMissilePop::Step::RETURNROOT:
+		
 		pUFO_->ChangeState(std::make_unique<UFOPopWait>(pUFO_));
 		break;
 	default:

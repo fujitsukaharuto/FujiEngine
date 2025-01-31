@@ -6,14 +6,21 @@
 class UFOMissilePop : public BaseUFOState {
 private:
 	enum class Step {
-		POP,
-		ANIMATION,
+		LIGHTUP,
+		WAIT,
+		LIGHTCLOSE,
 		RETURNROOT,
 	};
 private:
 	Step step_;
-	float speed_;
-	Easing easing_;
+
+	float waitTime_;
+	float kWaitTime_;
+	
+	Vector3 initScale_;
+	Vector3 scaleUnderPop_;
+	Easing lightUpEasing_;
+	Easing lightCloseEasing_;
 	/// ===================================================
 	///private varians
 	/// ===================================================

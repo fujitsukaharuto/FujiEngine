@@ -15,6 +15,16 @@
             27.100000381469727
         ],
         "hitStopDamage_": 15.010000228881836,
-        "hitStopTime_": 0.20000000298023224
+        "hitStopTime_": 0.20000000298023224,
+        "lightScaleUnderPop": [
+            5.0,
+            7.0,
+            5.0
+        ],
+        "rootLightScale": [
+            1.0,
+            1.0,
+            1.0
+        ]
     }
 }

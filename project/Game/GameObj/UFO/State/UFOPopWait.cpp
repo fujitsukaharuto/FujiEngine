@@ -24,11 +24,7 @@ UFOPopWait::UFOPopWait(UFO* player)
 	///---------------------------------------------------
 	///変数初期化
 	///---------------------------------------------------
-	easing_.time = 0.0f;
-	easing_.maxTime = 0.5f;
-	easing_.amplitude = 0.4f;
-	easing_.period = 0.2f;
-	step_ = Step::POP;
+	pUFO_->GetUFOLight()->transform.scale = pUFO_->GetParamater().initLightScale;
 	
 }
 

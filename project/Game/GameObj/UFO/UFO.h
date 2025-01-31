@@ -18,6 +18,8 @@ public:
 
 	struct Paramater {
 		Vector3 collisionSize_;
+		Vector3 initLightScale;
+		Vector3 lightScaleUnderPop;
 		float dagameDistance_;
 		float damageTime_;
 		float hitStopDamage_;
@@ -107,6 +109,7 @@ public:
 	/// getter method
 	/// ===================================================
 	EnemyManager* GetEnemyManager() { return pEnemyManager_; }
+	Object3d* GetUFOLight() { return ufoLight_.get(); }
 	Paramater GetParamater()const { return paramater_; }
 	bool GetIsDeath()const { return isDeath_; }
 	float GetDamageValue()const { return takeDamageValue_; }

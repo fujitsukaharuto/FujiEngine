@@ -30,6 +30,8 @@ void UFO::Initialize() {
 	ufoLight_ = std::make_unique<Object3d>();
 	ufoLight_->Create("ufo_light.obj");
 	ufoLight_->SetParent(model_.get());
+	ufoLight_->transform.translate.x = -1.0f;
+	ufoLight_->transform.scale = paramater_.initLightScale;
 	ufoLight_->SetColor(ufoLightColor_);
 
 	PointLightManager::GetInstance()->GetSpotLight(0)->spotLightData_->position = model_->transform.translate;
@@ -84,6 +86,7 @@ void UFO::Update() {
 	DamageRendition();
 	/// 振る舞い処理
 	behavior_->Update();
+	state_->Update();
 	///
 	collider_->InfoUpdate();
 	
@@ -172,6 +175,9 @@ void UFO::AdjustParm() {
 		ImGui::DragFloat("ヒットストップをするダメージ量(%)", &paramater_.hitStopDamage_, 0.01f);
 		ImGui::DragFloat("ヒットストップ時間(%)", &paramater_.hitStopTime_, 0.01f);
 
+		ImGui::DragFloat3("通常ライトサイズ", &paramater_.initLightScale.x, 0.01f);
+		ImGui::DragFloat3("ミサイル出す時のライトサイズ", &paramater_.lightScaleUnderPop.x, 0.01f);
+
 		ImGui::SeparatorText("いらないかも");
 		ImGui::DragFloat("ダメージの吹っ飛び距離", &paramater_.dagameDistance_, 0.01f);
 			
@@ -225,6 +231,8 @@ void UFO::AddParmGroup() {
 	globalParameter_->AddItem(groupName_, "collisionSize_", paramater_.collisionSize_);
 	globalParameter_->AddItem(groupName_, "hitStopDamage_", paramater_.hitStopDamage_);
 	globalParameter_->AddItem(groupName_, "hitStopTime_", paramater_.hitStopTime_);
+	globalParameter_->AddItem(groupName_, "rootLightScale", paramater_.initLightScale);
+	globalParameter_->AddItem(groupName_, "lightScaleUnderPop", paramater_.lightScaleUnderPop);
 }
 
 ///=================================================================================
@@ -238,6 +246,8 @@ void UFO::SetValues() {
 	globalParameter_->SetValue(groupName_, "DamageDistance", paramater_.dagameDistance_);
 	globalParameter_->SetValue(groupName_, "hitStopDamage_", paramater_.hitStopDamage_);
 	globalParameter_->SetValue(groupName_, "hitStopTime_", paramater_.hitStopTime_);
+	globalParameter_->SetValue(groupName_, "rootLightScale", paramater_.initLightScale);
+	globalParameter_->SetValue(groupName_, "lightScaleUnderPop", paramater_.lightScaleUnderPop);
 }
 
 ///=====================================================
@@ -250,6 +260,8 @@ void UFO::ApplyGlobalParameter() {
 	paramater_.dagameDistance_ = globalParameter_->GetValue<float>(groupName_, "DamageDistance");
 	paramater_.hitStopDamage_ = globalParameter_->GetValue<float>(groupName_, "hitStopDamage_");
 	paramater_.hitStopTime_ = globalParameter_->GetValue<float>(groupName_, "hitStopTime_");
+	paramater_.initLightScale = globalParameter_->GetValue<Vector3>(groupName_, "rootLightScale");
+	paramater_.lightScaleUnderPop = globalParameter_->GetValue<Vector3>(groupName_, "lightScaleUnderPop");
 }
 ///=========================================================
 /// Class Set
