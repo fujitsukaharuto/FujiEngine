@@ -154,6 +154,7 @@ void GameScene::Update() {
 
 			if (!lifeUI_->GetIsGameOver())break;
 			/*gameOver_->SetStepStart();*/
+			lifeUI_->Init();//ライフUiは既に復活済みに
 			mode_ = Mode::GAMEOVER;
 
 			break;
@@ -168,7 +169,6 @@ void GameScene::Update() {
 
 			if (!gameOver_->GetIsGameBack())break;
 			player_->Initialize();
-			lifeUI_->Init();
 			fieldBlockManager_->AllReset();
 			gameOver_->Init();
 			mode_ = Mode::GAME;

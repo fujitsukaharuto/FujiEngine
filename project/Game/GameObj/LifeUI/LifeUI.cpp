@@ -37,6 +37,11 @@ void LifeUI::Init() {
     shakeValue_.x = 0.0f;
     shakeValue_.y = 0.0f;
 
+    // 位置、サイズ
+    for (int i = 0; i < sprites_.size(); i++) {
+        sprites_[i]->SetPos({ basePos_.x + (float(i) * offset_) + shakeValue_.x, basePos_.y + shakeValue_.y, basePos_.z });
+        sprites_[i]->SetSize({ sizeWidth_,sizeHeigth_ }); // サイズを固定
+    }
 
     // 振る舞い初期化
     ChangeBehavior(std::make_unique<LifeUIRoot>(this));
