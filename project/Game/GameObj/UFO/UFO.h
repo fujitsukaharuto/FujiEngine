@@ -3,6 +3,8 @@
 
 /// behavior
 #include"Behavior/BaseUFOrBehavior.h"
+#include"State/BaseUFOState.h"
+
 #include"GlobalVariables/GlobalVariables.h"
 #include"Game/OriginGameObject.h"
 #include"Collider/AABBCollider.h"
@@ -13,6 +15,7 @@
 class EnemyManager;
 class UFO :public OriginGameObject {
 public:
+
 	struct Paramater {
 		Vector3 collisionSize_;
 		float dagameDistance_;
@@ -32,7 +35,8 @@ private:
 
 	///* behavior
 	std::unique_ptr<BaseUFOBehavior>behavior_ = nullptr;
-	std::unique_ptr<AABBCollider>collider_;
+	std::unique_ptr<BaseUFOState>   state_ = nullptr;
+	std::unique_ptr<AABBCollider>   collider_;
 	
     ///* グローバルなパラメータ
 	GlobalVariables* globalParameter_;            /// グローバルパラメータ
@@ -78,6 +82,8 @@ public:
 	void Move();
 	void EnemySpawn();
 	void ChangeBehavior(std::unique_ptr<BaseUFOBehavior>behavior);
+	void ChangeState(std::unique_ptr<BaseUFOState>behavior);
+	void ChangePopBehavior();
 
 	/// ダメージ
 	void DamageRendition();

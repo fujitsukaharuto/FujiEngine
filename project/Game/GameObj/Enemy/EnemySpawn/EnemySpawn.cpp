@@ -83,7 +83,7 @@ void EnemySpawn::DrawImGuiEditor() {
       /*  ImGui::DragFloat("Yの発生位置(50～70が好ましいかも)", &spawnDataList_[currentSelected_].y, 0.1f);*/
         ImGui::DragFloat("発生時間(秒)", &spawnDataList_[currentSelected_].time, 0.1f);
 
-        const char* enemyType_items[] = {"普通の爆弾" ,"強い爆弾"};
+        const char* enemyType_items[] = {"普通の爆弾" ,"ミサイル爆弾"};
 
         int combo_preview_value = 0;
         for (int i = 0; i < pEnemyManager_->GetEnemyTypes().size(); i++) {

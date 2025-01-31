@@ -242,9 +242,6 @@
     <ClCompile Include="Game\GameObj\UFO\Behavior\BaseUFOrBehavior.cpp">
       <Filter>Game\Behavior\UFO</Filter>
     </ClCompile>
-    <ClCompile Include="Game\GameObj\UFO\Behavior\UFOPopEnemy.cpp">
-      <Filter>Game\Behavior\UFO</Filter>
-    </ClCompile>
     <ClCompile Include="Game\GameObj\UFO\Behavior\UFORoot.cpp">
       <Filter>Game\Behavior\UFO</Filter>
     </ClCompile>
@@ -252,25 +249,25 @@
       <Filter>Game\Behavior\Enemy</Filter>
     </ClCompile>
     <ClCompile Include="Game\GameObj\PlayerBehavior\BasePlayerBehavior.cpp">
-      <Filter>Game\Behavior\LifeUI\Player\NormalBehavior</Filter>
+      <Filter>Game\Behavior\Player\NormalBehavior</Filter>
     </ClCompile>
     <ClCompile Include="Game\GameObj\PlayerBehavior\PlayerJump.cpp">
-      <Filter>Game\Behavior\LifeUI\Player\NormalBehavior</Filter>
+      <Filter>Game\Behavior\Player\NormalBehavior</Filter>
     </ClCompile>
     <ClCompile Include="Game\GameObj\PlayerBehavior\PlayerRoot.cpp">
-      <Filter>Game\Behavior\LifeUI\Player\NormalBehavior</Filter>
+      <Filter>Game\Behavior\Player\NormalBehavior</Filter>
     </ClCompile>
     <ClCompile Include="Game\GameObj\PlayerBehavior\PlayerKikAttack.cpp">
-      <Filter>Game\Behavior\LifeUI\Player\AttackBehavior</Filter>
+      <Filter>Game\Behavior\Player\AttackBehavior</Filter>
     </ClCompile>
     <ClCompile Include="Game\GameObj\PlayerBehavior\BasePlayerAttackBehavior.cpp">
-      <Filter>Game\Behavior\LifeUI\Player\AttackBehavior</Filter>
+      <Filter>Game\Behavior\Player\AttackBehavior</Filter>
     </ClCompile>
     <ClCompile Include="Game\GameObj\PlayerBehavior\PlayerAttackRoot.cpp">
-      <Filter>Game\Behavior\LifeUI\Player\AttackBehavior</Filter>
+      <Filter>Game\Behavior\Player\AttackBehavior</Filter>
     </ClCompile>
     <ClCompile Include="Game\GameObj\PlayerBehavior\PlayerRecoil.cpp">
-      <Filter>Game\Behavior\LifeUI\Player\NormalBehavior</Filter>
+      <Filter>Game\Behavior\Player\NormalBehavior</Filter>
     </ClCompile>
     <ClCompile Include="Game\GameObj\UFO\Behavior\UFODamage.cpp">
       <Filter>Game\Behavior\UFO</Filter>
@@ -282,7 +279,7 @@
       <Filter>Game\GameObj\KikArea</Filter>
     </ClCompile>
     <ClCompile Include="Game\GameObj\PlayerBehavior\PlayerSpecialFall.cpp">
-      <Filter>Game\Behavior\LifeUI\Player\AttackBehavior</Filter>
+      <Filter>Game\Behavior\Player\AttackBehavior</Filter>
     </ClCompile>
     <ClCompile Include="Game\Scene\GameOverScene.cpp">
       <Filter>Game\Scene</Filter>
@@ -370,6 +367,15 @@
     </ClCompile>
     <ClCompile Include="Game\GameObj\GameOverScreen\GameOver.cpp">
       <Filter>Game\GameObj\GameOverScreen</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameObj\UFO\State\UFOMissilePop.cpp">
+      <Filter>Game\Behavior\UFO\State</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameObj\UFO\State\BaseUFOState.cpp">
+      <Filter>Game\Behavior\UFO\State</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameObj\UFO\State\UFOPopWait.cpp">
+      <Filter>Game\Behavior\UFO\State</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -628,9 +634,6 @@
     <ClInclude Include="Game\GameObj\UFO\Behavior\BaseUFOrBehavior.h">
       <Filter>Game\Behavior\UFO</Filter>
     </ClInclude>
-    <ClInclude Include="Game\GameObj\UFO\Behavior\UFOPopEnemy.h">
-      <Filter>Game\Behavior\UFO</Filter>
-    </ClInclude>
     <ClInclude Include="Game\GameObj\UFO\Behavior\UFORoot.h">
       <Filter>Game\Behavior\UFO</Filter>
     </ClInclude>
@@ -638,25 +641,25 @@
       <Filter>Game\Behavior\Enemy</Filter>
     </ClInclude>
     <ClInclude Include="Game\GameObj\PlayerBehavior\BasePlayerBehavior.h">
-      <Filter>Game\Behavior\LifeUI\Player\NormalBehavior</Filter>
+      <Filter>Game\Behavior\Player\NormalBehavior</Filter>
     </ClInclude>
     <ClInclude Include="Game\GameObj\PlayerBehavior\PlayerJump.h">
-      <Filter>Game\Behavior\LifeUI\Player\NormalBehavior</Filter>
+      <Filter>Game\Behavior\Player\NormalBehavior</Filter>
     </ClInclude>
     <ClInclude Include="Game\GameObj\PlayerBehavior\PlayerRoot.h">
-      <Filter>Game\Behavior\LifeUI\Player\NormalBehavior</Filter>
+      <Filter>Game\Behavior\Player\NormalBehavior</Filter>
     </ClInclude>
     <ClInclude Include="Game\GameObj\PlayerBehavior\PlayerKikAttack.h">
-      <Filter>Game\Behavior\LifeUI\Player\AttackBehavior</Filter>
+      <Filter>Game\Behavior\Player\AttackBehavior</Filter>
     </ClInclude>
     <ClInclude Include="Game\GameObj\PlayerBehavior\BasePlayerAttackBehavior.h">
-      <Filter>Game\Behavior\LifeUI\Player\AttackBehavior</Filter>
+      <Filter>Game\Behavior\Player\AttackBehavior</Filter>
     </ClInclude>
     <ClInclude Include="Game\GameObj\PlayerBehavior\PlayerAttackRoot.h">
-      <Filter>Game\Behavior\LifeUI\Player\AttackBehavior</Filter>
+      <Filter>Game\Behavior\Player\AttackBehavior</Filter>
     </ClInclude>
     <ClInclude Include="Game\GameObj\PlayerBehavior\PlayerRecoil.h">
-      <Filter>Game\Behavior\LifeUI\Player\NormalBehavior</Filter>
+      <Filter>Game\Behavior\Player\NormalBehavior</Filter>
     </ClInclude>
     <ClInclude Include="Game\GameObj\UFO\Behavior\UFODamage.h">
       <Filter>Game\Behavior\UFO</Filter>
@@ -668,7 +671,7 @@
       <Filter>Game\GameObj\KikArea</Filter>
     </ClInclude>
     <ClInclude Include="Game\GameObj\PlayerBehavior\PlayerSpecialFall.h">
-      <Filter>Game\Behavior\LifeUI\Player\AttackBehavior</Filter>
+      <Filter>Game\Behavior\Player\AttackBehavior</Filter>
     </ClInclude>
     <ClInclude Include="Game\Scene\GameOverScene.h">
       <Filter>Game\Scene</Filter>
@@ -759,6 +762,15 @@
     </ClInclude>
     <ClInclude Include="Game\GameObj\GameOverScreen\GameOver.h">
       <Filter>Game\GameObj\GameOverScreen</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\UFO\State\UFOMissilePop.h">
+      <Filter>Game\Behavior\UFO\State</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\UFO\State\BaseUFOState.h">
+      <Filter>Game\Behavior\UFO\State</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\UFO\State\UFOPopWait.h">
+      <Filter>Game\Behavior\UFO\State</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -897,13 +909,16 @@
     <Filter Include="Game\GameObj\GameOverScreen">
       <UniqueIdentifier>{a42a8ef1-da85-4305-9961-b3803de9873d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\Behavior\LifeUI\Player">
+    <Filter Include="Game\Behavior\UFO\State">
+      <UniqueIdentifier>{61e35a0b-bbba-429a-8511-4e7ef9684f62}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Behavior\Player">
       <UniqueIdentifier>{2f9dd270-714f-481d-8867-8534b4588c4c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\Behavior\LifeUI\Player\NormalBehavior">
+    <Filter Include="Game\Behavior\Player\NormalBehavior">
       <UniqueIdentifier>{3f62bc85-046d-4149-9817-d348d2d25775}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\Behavior\LifeUI\Player\AttackBehavior">
+    <Filter Include="Game\Behavior\Player\AttackBehavior">
       <UniqueIdentifier>{505cfd85-6044-41d4-93d3-2227f4950c72}</UniqueIdentifier>
     </Filter>
   </ItemGroup>

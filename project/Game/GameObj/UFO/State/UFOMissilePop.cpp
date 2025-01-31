@@ -1,7 +1,7 @@
 
 ///* behavior
-#include"UFOPopEnemy.h"
-#include"UFORoot.h"
+#include"UFOMissilePop.h"
+#include"UFOPopWait.h"
 
 ///* obj
 #include"GameObj/UFO/UFO.h"
@@ -18,8 +18,8 @@
 /// ===================================================
 ///初期化
 /// ===================================================
-UFOPopEnemy::UFOPopEnemy(UFO* player)
-	: BaseUFOBehavior("UFOPopEnemy", player) {
+UFOMissilePop::UFOMissilePop(UFO* player)
+	: BaseUFOState("UFOMissilePop", player) {
 
 	///---------------------------------------------------
 	///変数初期化
@@ -28,19 +28,20 @@ UFOPopEnemy::UFOPopEnemy(UFO* player)
 	easing_.maxTime = 0.5f;
 	easing_.amplitude = 0.4f;
 	easing_.period = 0.2f;
+
 	step_ = Step::POP;
 	
 }
 
-UFOPopEnemy ::~UFOPopEnemy() {
+UFOMissilePop ::~UFOMissilePop() {
 
 }
 
 //更新
-void UFOPopEnemy::Update() {
+void UFOMissilePop::Update() {
 	switch (step_)
 	{
-	case UFOPopEnemy::Step::POP:
+	case UFOMissilePop::Step::POP:
 		///-------------------------------------------------------
 		///　敵生成
 		///-------------------------------------------------------
@@ -49,7 +50,7 @@ void UFOPopEnemy::Update() {
 
 		break;
 
-	case UFOPopEnemy::Step::ANIMATION:
+	case UFOMissilePop::Step::ANIMATION:
 		///-------------------------------------------------------
 		///　アニメーション演出
 		///-------------------------------------------------------
@@ -64,11 +65,11 @@ void UFOPopEnemy::Update() {
 		step_ = Step::RETURNROOT;
 
 		break;
-	case UFOPopEnemy::Step::RETURNROOT:
+	case UFOMissilePop::Step::RETURNROOT:
 		///-------------------------------------------------------
 		///　通常に戻るお
 		///-------------------------------------------------------
-		pUFO_->ChangeBehavior(std::make_unique<UFORoot>(pUFO_));
+		pUFO_->ChangeState(std::make_unique<UFOPopWait>(pUFO_));
 		break;
 	default:
 		break;
@@ -76,8 +77,9 @@ void UFOPopEnemy::Update() {
 }
 
 
-void  UFOPopEnemy::Debug() {
+void  UFOMissilePop::Debug() {
 #ifdef _DEBUG
 	ImGui::Text("Jump");
 #endif
 }
+

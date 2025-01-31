@@ -12,13 +12,28 @@
 /// 敵クラス
 /// </summary>
 class MissileEnemy : public BaseEnemy {
-private:
+public:
 
-	enum class STEP{
-		SERCH,
+	struct Paramater {
+		float fallWaitTime_;
+		float scalingUpTime;
+		float fallPos;
+		float antipationOffsetPos_;
+		Vector3 baseScale;
+		Vector3 expansionScale;
+	};
+
+	enum class Step{
+		FIRSTFALL,
+		SIDEMOVE,
+		FALLWAIT,
+		ANTIPATION,
 		FALL,
 	};
 
+private:/// パラメータ、ステップ
+	Paramater paramater_;
+	Step step_;
 	ParticleEmitter bombEmit1_;
 	ParticleEmitter bombEmit2_;
 	ParticleEmitter bombEmit3_;
@@ -32,6 +47,18 @@ private:
 
 private:
 
+private:/// イージング
+	Easing firstFallEase_;
+	Easing sideMoveEase_;
+	Easing scalingEase_;
+	Easing antipationEase_;
+	float easeDirection_;
+
+private:/// 座標
+	float targetPosX_;
+	Vector3 startPos_;
+private://時間
+	float waitTime_;
 public:
 
 	///========================================================================================
@@ -42,7 +69,14 @@ public:
 	void Initialize()override;
 	void Update()override;
 	void Draw(Material* mate = nullptr)override;
+	void ScalingEaseing();
 
 	void FallMove()override;
 	void ExplotionRendition()override;
+	void SetOnlyParamater(const Paramater&parm);
+
+	void SetPosition();
+
+	void SetTargetPosX(const float& targetPos) { targetPosX_ = targetPos; }
+
 };

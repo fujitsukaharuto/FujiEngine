@@ -1,6 +1,6 @@
 
 ///* behavior
-#include"UFOPopEnemy.h"
+
 #include"UFODamage.h"
 #include"UFORoot.h"
 

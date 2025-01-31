@@ -1,7 +1,8 @@
 #include "UFO.h"
 ///behavior
 #include"Behavior/UFORoot.h"
-#include"Behavior/UFOPopEnemy.h"
+#include"State/UFOMissilePop.h"
+#include"State/UFOPopWait.h"
 #include"Behavior/UFODamage.h"
 #include"GameObj/Enemy/Behavior/EnemyBlowingWeak.h"
 //obj
@@ -14,7 +15,7 @@
 #include<imgui.h> 
 #include"ImGuiManager.h"
 
-float UFO::InitY_ = 30.5f;
+float UFO::InitY_ = 44.6f;
 
 UFO::UFO() {}
 
@@ -71,6 +72,7 @@ void UFO::Initialize() {
 
 	/// 通常モードから
 	ChangeBehavior(std::make_unique<UFORoot>(this));
+	ChangeState(std::make_unique<UFOPopWait>(this));
 }
 
 /// ===================================================
@@ -84,11 +86,7 @@ void UFO::Update() {
 	behavior_->Update();
 	///
 	collider_->InfoUpdate();
-	//　移動制限
-	/*MoveToLimit();*/
-
-	/// 更新
-	//base::Update();
+	
 
 	hpSize_ = hp_ / MaxHp_ * hpMaxSize_;
 	if (hpSize_ < 0.0f) {
@@ -156,13 +154,7 @@ void UFO::Move() {
 	}
 }
 
-///=========================================================
-/// 振る舞い切り替え
-///==========================================================
-void UFO::ChangeBehavior(std::unique_ptr<BaseUFOBehavior>behavior) {
-	//引数で受け取った状態を次の状態としてセット
-	behavior_ = std::move(behavior);
-}
+
 ///=========================================================
 /// パラメータ調整
 ///==========================================================
@@ -315,4 +307,20 @@ void  UFO::SetCollisionSize(const Vector3& size) {
 	collider_->SetWidth(size.x);
 	collider_->SetHeight(size.y);
 	collider_->SetDepth(size.z);
+}
+
+///=========================================================
+/// 振る舞い切り替え
+///==========================================================
+void UFO::ChangeBehavior(std::unique_ptr<BaseUFOBehavior>behavior) {
+	//引数で受け取った状態を次の状態としてセット
+	behavior_ = std::move(behavior);
+}
+
+void UFO::ChangeState(std::unique_ptr<BaseUFOState>behavior) {
+	state_ = std::move(behavior);
+}
+
+void UFO::ChangePopBehavior() {
+	ChangeState(std::make_unique<UFOMissilePop>(this));
 }

@@ -1,7 +1,7 @@
 
 #include "EnemyManager.h"
 #include"NormalEnemy.h"
-#include"MissileEnemy.h"
+#include"GameObj/UFO/UFO.h"
 
 #include "FPSKeeper.h"
 
@@ -33,7 +33,7 @@ void EnemyManager::Initialize() {
 }
 
 void  EnemyManager::FSpawn() {
-	
+
 }
 
 ///========================================================================================
@@ -41,25 +41,34 @@ void  EnemyManager::FSpawn() {
 ///========================================================================================
 void EnemyManager::SpawnEnemy(const std::string& enemyType, const Vector3& position) {
 
-	std::unique_ptr<BaseEnemy> enemy;
 
 	// 通常敵
 	if (enemyType == enemyTypes_[static_cast<size_t>(BaseEnemy::Type::NORMAL)]) {
+		std::unique_ptr<NormalEnemy> enemy;
 		enemy = std::make_unique<NormalEnemy>();
 		enemy->SetParm(BaseEnemy::Type::NORMAL, paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)]);
+		// 位置初期化とlistに追加
+		enemy->Initialize();
+		enemy->SetWorldPosition(Vector3(position.x, position.y, position.z));
+		enemy->SetPlayer(pPlayer_);// プレイヤーセット
+		enemies_.push_back(std::move(enemy));
 	}
 
 	// ストロングな敵
-	else if (enemyType == enemyTypes_[static_cast<size_t>(BaseEnemy::Type::STRONG)]) { 
-		enemy = std::make_unique<MissileEnemy>();
-		enemy->SetParm(BaseEnemy::Type::STRONG, paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)]);
+	else if (enemyType == enemyTypes_[static_cast<size_t>(BaseEnemy::Type::STRONG)]) {
+		std::unique_ptr<MissileEnemy> missle;
+		missle = std::make_unique<MissileEnemy>();
+		missle->SetParm(BaseEnemy::Type::STRONG, paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)]);
+		missle->SetOnlyParamater(missileParamater_);
+		// 位置初期化とlistに追加
+		missle->Initialize();
+		missle->SetTargetPosX(position.x);
+		missle->SetWorldPosition(Vector3(0.0f, UFO::InitY_, 10.0f));
+		missle->SetPosition();
+		missle->SetPlayer(pPlayer_);// プレイヤーセット
+		pUFO_->ChangePopBehavior();
+		enemies_.push_back(std::move(missle));
 	}
-
-	// 位置初期化とlistに追加
-	enemy->Initialize();
-	enemy->SetWorldPosition(Vector3(position.x, position.y, position.z));
-	enemy->SetPlayer(pPlayer_);// プレイヤーセット
-	enemies_.push_back(std::move(enemy));
 }
 
 
@@ -67,7 +76,7 @@ void EnemyManager::SpawnEnemy(const std::string& enemyType, const Vector3& posit
 ///  更新処理
 ///========================================================================================
 void EnemyManager::Update() {
-	
+
 
 	//SpawnUpdate(); // スポーン更新
 
@@ -209,6 +218,14 @@ void EnemyManager::AddParmGroup() {
 			"scaleUpParm_" + std::to_string(int(i + 1)),
 			paramaters_[i].scaleUpParm_);
 	}
+
+	// ミサイル個別
+	globalParameter_->AddItem(groupName_, "fallWaitTime_", missileParamater_.fallWaitTime_);
+	globalParameter_->AddItem(groupName_, "fallPos", missileParamater_.fallPos);
+	globalParameter_->AddItem(groupName_, "baseScale", missileParamater_.baseScale);
+	globalParameter_->AddItem(groupName_, "expansionScale", missileParamater_.expansionScale);
+	globalParameter_->AddItem(groupName_, "nearLimitTime_", missileParamater_.scalingUpTime);
+	globalParameter_->AddItem(groupName_, "antipationOffsetPos_", missileParamater_.antipationOffsetPos_);
 }
 
 
@@ -285,7 +302,13 @@ void EnemyManager::SetValues() {
 			"scaleUpParm_" + std::to_string(int(i + 1)),
 			paramaters_[i].scaleUpParm_);
 	}
-
+	// ミサイル個別
+	globalParameter_->SetValue(groupName_, "fallWaitTime_", missileParamater_.fallWaitTime_);
+	globalParameter_->SetValue(groupName_, "fallPos", missileParamater_.fallPos);
+	globalParameter_->SetValue(groupName_, "baseScale", missileParamater_.baseScale);
+	globalParameter_->SetValue(groupName_, "expansionScale", missileParamater_.expansionScale);
+	globalParameter_->SetValue(groupName_, "nearLimitTime_", missileParamater_.scalingUpTime);
+	globalParameter_->SetValue(groupName_, "antipationOffsetPos_", missileParamater_.antipationOffsetPos_);
 }
 
 
@@ -350,7 +373,12 @@ void EnemyManager::ApplyGlobalParameter() {
 			"scaleUpParm_" + std::to_string(int(i + 1)));
 
 	}
-
+	missileParamater_.fallWaitTime_ = globalParameter_->GetValue<float>(groupName_, "fallWaitTime_");
+	missileParamater_.fallPos = globalParameter_->GetValue<float>(groupName_, "fallPos");
+	missileParamater_.baseScale = globalParameter_->GetValue<Vector3>(groupName_, "baseScale");
+	missileParamater_.expansionScale = globalParameter_->GetValue<Vector3>(groupName_, "expansionScale");
+	missileParamater_.scalingUpTime = globalParameter_->GetValue<float>(groupName_, "nearLimitTime_");
+	missileParamater_.antipationOffsetPos_ = globalParameter_->GetValue<float>(groupName_, "antipationOffsetPos_");
 }
 
 ///=========================================================
@@ -398,7 +426,7 @@ void EnemyManager::AdjustParm() {
 
 			ImGui::DragFloat("弱い初期攻撃力(%)",
 				&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].weakAttackValue,
-				0.01f,0,100);
+				0.01f, 0, 100);
 
 			ImGui::DragFloat("合体した時の攻撃力上昇値(%)",
 				&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].plusAttackValue,
@@ -436,9 +464,9 @@ void EnemyManager::AdjustParm() {
 			ImGui::TreePop();
 		}
 
-			///---------------------------------------------------------
-			/// ストロングな敵
-			///----------------------------------------------------------
+		///---------------------------------------------------------
+		/// ストロングな敵
+		///----------------------------------------------------------
 
 		if (ImGui::TreeNode(enemyTypes_[static_cast<size_t>(BaseEnemy::Type::STRONG)].c_str())) {
 			ImGui::PushID(enemyTypes_[static_cast<size_t>(BaseEnemy::Type::STRONG)].c_str());
@@ -502,25 +530,37 @@ void EnemyManager::AdjustParm() {
 				&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].scaleUpParm_.x,
 				0.01f);
 
+			ImGui::SeparatorText("個別パラメータ");
+			ImGui::DragFloat("ミサイル落ちるまでの時間", &missileParamater_.fallWaitTime_, 0.01f);
+			ImGui::DragFloat("ミサイル初期位置Y", &missileParamater_.fallPos, 0.01f);
+			ImGui::DragFloat3("基準スケール", &missileParamater_.baseScale.x, 0.01f);
+			ImGui::DragFloat3("膨張スケール", &missileParamater_.expansionScale.x, 0.01f);
+			ImGui::DragFloat("スケーリングアップタイム", &missileParamater_.scalingUpTime, 0.01f);
+			ImGui::DragFloat("落ちる予備動作の上がる量", &missileParamater_.antipationOffsetPos_, 0.01f);
+
+
 			ImGuiManager::GetInstance()->UnSetFont();
 			ImGui::PopID();
 
 			ImGui::TreePop();
 		}
-			/// セーブとロード
-			globalParameter_->ParmSaveForImGui(groupName_);
-			ParmLoadForImGui();
+		/// セーブとロード
+		globalParameter_->ParmSaveForImGui(groupName_);
+		ParmLoadForImGui();
 
-			ImGui::PopID();
-		}
+		ImGui::PopID();
+	}
 
 #endif // _DEBUG
-	}
+}
 
-	void EnemyManager::SetPlayer(Player * player) {
-		pPlayer_ = player;
-	}
-	void EnemyManager::SetLockon(LockOn * lockOn) {
-		pLockOn_ = lockOn;
-	}
+void EnemyManager::SetPlayer(Player* player) {
+	pPlayer_ = player;
+}
+void EnemyManager::SetLockon(LockOn* lockOn) {
+	pLockOn_ = lockOn;
+}
 
+void EnemyManager::SetUFO(UFO* ufo) {
+	pUFO_ = ufo;
+}

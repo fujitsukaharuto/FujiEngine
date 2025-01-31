@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BaseEnemy.h"
+#include"MissileEnemy.h"
 #include"GlobalVariables/GlobalVariables.h"
 
 /// std
@@ -13,9 +14,11 @@
 
 class Player;
 class LockOn;
+class UFO;
 enum class  Type;
 enum class JumpPower;
 struct BaseEnemy::Paramater;
+struct MissileEnemy::Paramater;
 class EnemyManager {
    
     ///========================================================
@@ -25,12 +28,14 @@ class EnemyManager {
     // ohter class
     Player* pPlayer_;
     LockOn* pLockOn_;
+    UFO*    pUFO_;
 
     /// グローバルなパラメータ
     GlobalVariables* globalParameter_;            /// グローバルパラメータ
     const std::string groupName_ = "Enemies";     /// グループ名
   
     std::array<BaseEnemy::Paramater, 2>paramaters_;
+    MissileEnemy::Paramater missileParamater_;
   
   
     ///* 敵リスト
@@ -107,6 +112,6 @@ public:
     ///========================================================
     void SetPlayer(Player* plyaer);
     void SetLockon(LockOn* lockOn);
-
+    void SetUFO(UFO* ufo);
 
 };

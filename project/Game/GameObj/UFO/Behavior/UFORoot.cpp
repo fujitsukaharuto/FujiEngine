@@ -1,6 +1,5 @@
 
 ///* behavior
-#include"UFOPopEnemy.h"
 #include"UFORoot.h"
 
 ///* obj
@@ -49,7 +48,7 @@ void UFORoot::Update() {
 		///-------------------------------------------------------
 		///　popするお
 		///-------------------------------------------------------
-		pUFO_->ChangeBehavior(std::make_unique<UFOPopEnemy>(pUFO_));
+		
 		break;
 	default:
 		break;

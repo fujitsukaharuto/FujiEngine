@@ -15,7 +15,6 @@
 EnemyExplotion::EnemyExplotion(BaseEnemy* boss)
 	: BaseEnemyBehaivor("EnemyExplotion", boss) {
 
-
 	//パーティクルと音
 	pBaseEnemy_->ExplotionRendition();
 

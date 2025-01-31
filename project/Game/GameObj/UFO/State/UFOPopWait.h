@@ -1,9 +1,9 @@
 #pragma once
 
-#include"BaseUFOrBehavior.h"
+#include"BaseUFOState.h"
 #include"math/Easing.h"
 
-class UFOPopEnemy : public BaseUFOBehavior {
+class UFOPopWait : public BaseUFOState {
 private:
 	enum class Step {
 		POP,
@@ -20,8 +20,8 @@ private:
 
 public:
 	//コンストラクタ
-	UFOPopEnemy(UFO* boss);
-	~UFOPopEnemy();
+	UFOPopWait(UFO* boss);
+	~UFOPopWait();
 
 	void Update()override;
 
