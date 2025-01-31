@@ -104,6 +104,7 @@ void UFODamage::Update() {
 		///-------------------------------------------------------
 		if (stopTime_ > pUFO_->GetParamater().hitStopTime_) {
 			pUFO_->SetColor(Vector4(1, 1, 1, 1));
+			FPSKeeper::SetTimeScale(1.0f);
 			pUFO_->ChangeBehavior(std::make_unique<UFORoot>(pUFO_));
 		}
 
