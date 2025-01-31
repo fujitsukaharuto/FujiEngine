@@ -63,6 +63,12 @@ void GameRun::Initialize() {
 	pManager_->CreateParticleGroup("shockWave1", "blueParticle.png", 40);
 	pManager_->CreateParticleGroup("shockWave2", "blueParticle.png", 40);
 
+	pManager_->CreateParticleGroup("bombShock1", "blueParticle.png", 40);
+	pManager_->CreateParticleGroup("bombShock2", "blueParticle.png", 40);
+
+	pManager_->CreateParticleGroup("MisilleBomb1", "blueParticle.png");
+	pManager_->CreateParticleGroup("MisilleBomb2", "blueParticle.png");
+
 	pManager_->CreateParticleGroup("hardKick1", "blueParticle.png");
 	pManager_->CreateParticleGroup("hardKick2", "blueParticle.png");
 	pManager_->CreateParticleGroup("hardKick3", "blueParticle.png");
@@ -115,6 +121,8 @@ void GameRun::Initialize() {
 	audio_->LoadWave("playerDead.wav");
 	audio_->LoadWave("playerRevival.wav");
 	audio_->LoadWave("hit_wdn_pillar3.wav");
+	audio_->LoadWave("MissileBomb.wav");
+	audio_->LoadWave("MissileLauncher.wav");
 
 #pragma endregion
 

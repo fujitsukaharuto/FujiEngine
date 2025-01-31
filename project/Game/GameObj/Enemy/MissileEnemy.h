@@ -19,6 +19,17 @@ private:
 		FALL,
 	};
 
+	ParticleEmitter bombEmit1_;
+	ParticleEmitter bombEmit2_;
+	ParticleEmitter bombEmit3_;
+	ParticleEmitter bombEmit4_;
+
+	ParticleEmitter luncherEmit1_;
+	ParticleEmitter luncherEmit2_;
+
+	SoundData luncherSE_;
+	SoundData bombSE_;
+
 private:
 
 public:

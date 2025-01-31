@@ -9,6 +9,13 @@ void MissileEnemy::Initialize() {
 
 	OriginGameObject::CreateModel("StrongEnemy.obj");
 
+	ParticleManager::Load(bombEmit1_, "MisilleBomb1");
+	ParticleManager::Load(bombEmit2_, "MisilleBomb2");
+	ParticleManager::Load(bombEmit3_, "bombShock1");
+	ParticleManager::Load(bombEmit4_, "bombShock2");
+
+	bombSE_ = Audio::GetInstance()->SoundLoadWave("MissileBomb.wav");
+	luncherSE_ = Audio::GetInstance()->SoundLoadWave("MissileLauncher.wav");
 
 }
 
@@ -35,18 +42,16 @@ void MissileEnemy::FallMove() {
 // 爆破演出
 void MissileEnemy::ExplotionRendition() {
 	/*/// emitter
-	ParticleManager::Load(bombEmit1_, "bomb1");
-	ParticleManager::Load(bombEmit2_, "bomb2");
-	ParticleManager::Load(bombEmit3_, "bomb3");
 
 	bombEmit1_.pos = model_->GetWorldPos();
 	bombEmit2_.pos = model_->GetWorldPos();
 	bombEmit3_.pos = model_->GetWorldPos();
+	bombEmit4_.pos = model_->GetWorldPos();
 
 	bombEmit1_.Burst();
 	bombEmit2_.Burst();
 	bombEmit3_.Burst();
+	bombEmit4_.Burst();
 
-	bomb_ = Audio::GetInstance()->SoundLoadWave("mini_bomb2.wav");
-	Audio::GetInstance()->SoundPlayWave(bomb_, 0.05f);*/
+	Audio::GetInstance()->SoundPlayWave(bombSE_, 0.05f);*/
 }
