@@ -51,8 +51,15 @@ void PlayerKikAttack::Update() {
 		KikRotation();
 		
 		if (kikTime_ <= pPlayer_->GetParamater().kikTime_ * 2.0f) {
-			PlaneDrawer::GetInstance()->AddPlanePoint(pPlayer_->GetTrailRoot()->GetPos());
-			PlaneDrawer::GetInstance()->AddPlanePoint(pPlayer_->GetTrailTip()->GetPos());
+			if (pPlayer_->GetKikCollider()->GetTag() == "MaxPowerKik") {
+				PlaneDrawer::GetInstance()->AddPlanePoint(pPlayer_->GetTrailRoot()->GetPos(), { 0.5f,0.0f,0.0f });
+				PlaneDrawer::GetInstance()->AddPlanePoint(pPlayer_->GetTrailTip()->GetPos(), { 0.5f,0.0f,0.0f });
+			}
+			else {
+				PlaneDrawer::GetInstance()->AddPlanePoint(pPlayer_->GetTrailRoot()->GetPos(), { 1.0f,1.0f,0.0f });
+				PlaneDrawer::GetInstance()->AddPlanePoint(pPlayer_->GetTrailTip()->GetPos(), { 1.0f,1.0f,0.0f });
+			}
+			
 		};
 
 

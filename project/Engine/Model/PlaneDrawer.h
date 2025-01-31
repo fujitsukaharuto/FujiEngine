@@ -45,7 +45,7 @@ public:
 
 	void Finalize();
 
-	void AddPlanePoint(const Vector3& p1);
+	void AddPlanePoint(const Vector3& p1, const Vector3& color);
 
 	void PopPlanePoint();
 

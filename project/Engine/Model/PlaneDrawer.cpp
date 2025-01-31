@@ -57,14 +57,14 @@ void PlaneDrawer::Initialize() {
 void PlaneDrawer::Finalize() {
 }
 
-void PlaneDrawer::AddPlanePoint(const Vector3& p1) {
+void PlaneDrawer::AddPlanePoint(const Vector3& p1, const Vector3& color) {
 
 	if (numberCount_ == 0) {
-		points_.push_back({ p1,{0.0f,0.0f},{1.0f,1.0f,0.0f,0.2f} });
+		points_.push_back({ p1,{0.0f,0.0f},{color.x,color.y,color.z,0.2f} });
 		numberCount_++;
 	}
 	else {
-		points_.push_back({ p1,{0.0f,0.0f},{1.0f,1.0f,0.0f,0.8f} });
+		points_.push_back({ p1,{0.0f,0.0f},{color.x,color.y,color.z,0.8f} });
 		numberCount_ = 0;
 	}
 
