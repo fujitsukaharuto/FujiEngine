@@ -23,6 +23,7 @@ PlayerReSpown::PlayerReSpown(Player* boss)
 	/*pPlayer_->SetdeathCount(pPlayer_->GetParamater().deathCount_);*/
 	pPlayer_->SetDamageRenditionReset();
 	pPlayer_->SetWorldPosition(pPlayer_->GetParamater().respownPos_);
+	pPlayer_->SetRotation(Vector3::GetZeroVec());
 
 	// 振る舞いリセット
 	pPlayer_->ChangeBehavior(std::make_unique<PlayerRoot>(pPlayer_));
