@@ -153,9 +153,8 @@ void MissileEnemy::ExplotionRendition() {
 	bombEmit3_.Burst();
 	bombEmit4_.Burst();
 
-	
-	bombSE_ = Audio::GetInstance()->SoundLoadWave("mini_bomb2.wav");
-	Audio::GetInstance()->SoundPlayWave(bombSE_, 0.05f);
+
+	Audio::GetInstance()->SoundPlayWave(bombSE_, 0.08f);
 }
 
 void MissileEnemy::SetOnlyParamater(const Paramater& parm) {
@@ -186,8 +185,6 @@ void MissileEnemy::SetPosition() {
 }
 
 void MissileEnemy::FallSE() {
-	Audio::GetInstance()->SoundPlayWave(luncherSE_, 0.05f);
+	Audio::GetInstance()->SoundPlayWave(luncherSE_, 0.08f);
 
-	luncherSE_ = Audio::GetInstance()->SoundLoadWave("mini_bomb2.wav");
-	Audio::GetInstance()->SoundPlayWave(luncherSE_, 0.05f);
 }

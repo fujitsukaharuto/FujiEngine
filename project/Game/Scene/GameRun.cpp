@@ -43,6 +43,7 @@ void GameRun::Initialize() {
 	modelManager_->LoadOBJ("KickDir.obj");
 	modelManager_->LoadOBJ("bakudan.obj");
 	modelManager_->LoadOBJ("PlayerFoot.obj");
+	modelManager_->LoadOBJ("Missile.obj");
 #pragma endregion
 
 
