@@ -60,6 +60,7 @@ void GameScene::Initialize() {
 	sky = std::make_unique<Object3d>();
 	sky->Create("sky.obj");
 	sky->SetLightEnable(LightMode::kLightNone);
+	sky->SetColor({ 0.0f,0.0f,0.0f,1.0f });
 	sky->transform.scale = { 1.0f,1.0f,1.0f };
 
 	player_ = std::make_unique<Player>();
