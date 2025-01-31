@@ -89,7 +89,7 @@ void GameScene::Initialize() {
 	lifeUI_->SetPlayer(player_.get());
 	enemyManager_->SetPlayer(player_.get());
 	enemyManager_->SetUFO(ufo_.get());
-	/*ufo_->SetEnemyManager(enemyManager_.get());*/
+	ufo_->SetEnemyManager(enemyManager_.get());
 	enemySpawn_->SetEnemyManager(enemyManager_.get());
 
 	fieldBlockManager_->AddFieldBlock();
