@@ -8,6 +8,7 @@
         "MaxPowerBlow2": 0.0,
         "WeakBlow1": 22.84000015258789,
         "WeakBlow2": 0.0,
+        "antipationEaseMax": 0.5199999809265137,
         "antipationOffsetPos_": 0.8600000143051147,
         "baseScale": [
             1.0,
@@ -25,6 +26,7 @@
         "explotionTime_2": 0.0,
         "fallPos": 38.77000045776367,
         "fallWaitTime_": 6.46999979019165,
+        "firstFallEaseMax": 0.7099999785423279,
         "nearLimitTime_": 3.0,
         "plusAttackValue1": 4.0,
         "plusAttackValue2": 0.0,
@@ -38,6 +40,9 @@
             0.0,
             0.0
         ],
+        "scalingEaseMax": 0.3799999952316284,
+        "scalingEaseMaxAsLimit": 0.12999999523162842,
+        "sideMoveEaseMax": 0.7099999785423279,
         "spawnBoundGravity1": 30.219999313354492,
         "spawnBoundGravity2": 0.0,
         "spawnBoundGravityMax1": 26.579999923706055,

@@ -21,6 +21,11 @@ public:
 		float antipationOffsetPos_;
 		Vector3 baseScale;
 		Vector3 expansionScale;
+		float firstFallEaseMax;
+		float sideMoveEaseMax;
+		float scalingEaseMax;
+		float scalingEaseMaxAsLimit;
+		float antipationEaseMax;
 	};
 
 	enum class Step{
@@ -35,6 +40,9 @@ private:/// パラメータ、ステップ
 	Paramater paramater_;
 	Step step_;
 
+	
+
+private:
 	ParticleEmitter bombEmit1_;
 	ParticleEmitter bombEmit2_;
 	ParticleEmitter bombEmit3_;
@@ -45,14 +53,11 @@ private:/// パラメータ、ステップ
 
 	SoundData luncherSE_;
 	SoundData bombSE_;
-
-private:
-
-private:/// イージング
-	Easing firstFallEase_;
-	Easing sideMoveEase_;
+private:/// イージングタイム
+	float firstFallEaseT_;
+	float sideMoveEaseT_;
 	Easing scalingEase_;
-	Easing antipationEase_;
+	float antipationEaseT_;
 	float easeDirection_;
 
 private:/// 座標

@@ -226,6 +226,11 @@ void EnemyManager::AddParmGroup() {
 	globalParameter_->AddItem(groupName_, "expansionScale", missileParamater_.expansionScale);
 	globalParameter_->AddItem(groupName_, "nearLimitTime_", missileParamater_.scalingUpTime);
 	globalParameter_->AddItem(groupName_, "antipationOffsetPos_", missileParamater_.antipationOffsetPos_);
+	globalParameter_->AddItem(groupName_, "firstFallEaseMax", missileParamater_.firstFallEaseMax);
+	globalParameter_->AddItem(groupName_, "sideMoveEaseMax", missileParamater_.sideMoveEaseMax);
+	globalParameter_->AddItem(groupName_, "scalingEaseMax", missileParamater_.scalingEaseMax);
+	globalParameter_->AddItem(groupName_, "antipationEaseMax", missileParamater_.antipationEaseMax);
+	globalParameter_->AddItem(groupName_, "scalingEaseMaxAsLimit", missileParamater_.scalingEaseMaxAsLimit);
 }
 
 
@@ -309,6 +314,11 @@ void EnemyManager::SetValues() {
 	globalParameter_->SetValue(groupName_, "expansionScale", missileParamater_.expansionScale);
 	globalParameter_->SetValue(groupName_, "nearLimitTime_", missileParamater_.scalingUpTime);
 	globalParameter_->SetValue(groupName_, "antipationOffsetPos_", missileParamater_.antipationOffsetPos_);
+	globalParameter_->SetValue(groupName_, "firstFallEaseMax", missileParamater_.firstFallEaseMax);
+	globalParameter_->SetValue(groupName_, "sideMoveEaseMax", missileParamater_.sideMoveEaseMax);
+	globalParameter_->SetValue(groupName_, "scalingEaseMax", missileParamater_.scalingEaseMax);
+	globalParameter_->SetValue(groupName_, "antipationEaseMax", missileParamater_.antipationEaseMax);
+	globalParameter_->SetValue(groupName_, "scalingEaseMaxAsLimit", missileParamater_.scalingEaseMaxAsLimit);
 }
 
 
@@ -379,6 +389,11 @@ void EnemyManager::ApplyGlobalParameter() {
 	missileParamater_.expansionScale = globalParameter_->GetValue<Vector3>(groupName_, "expansionScale");
 	missileParamater_.scalingUpTime = globalParameter_->GetValue<float>(groupName_, "nearLimitTime_");
 	missileParamater_.antipationOffsetPos_ = globalParameter_->GetValue<float>(groupName_, "antipationOffsetPos_");
+	missileParamater_.firstFallEaseMax = globalParameter_->GetValue<float>(groupName_, "firstFallEaseMax");
+	missileParamater_.sideMoveEaseMax = globalParameter_->GetValue<float>(groupName_, "sideMoveEaseMax");
+	missileParamater_.scalingEaseMax = globalParameter_->GetValue<float>(groupName_, "scalingEaseMax");
+	missileParamater_.antipationEaseMax = globalParameter_->GetValue<float>(groupName_, "antipationEaseMax");
+	missileParamater_.scalingEaseMaxAsLimit = globalParameter_->GetValue<float>(groupName_, "scalingEaseMaxAsLimit");
 }
 
 ///=========================================================
@@ -537,7 +552,12 @@ void EnemyManager::AdjustParm() {
 			ImGui::DragFloat3("膨張スケール", &missileParamater_.expansionScale.x, 0.01f);
 			ImGui::DragFloat("スケーリングアップタイム", &missileParamater_.scalingUpTime, 0.01f);
 			ImGui::DragFloat("落ちる予備動作の上がる量", &missileParamater_.antipationOffsetPos_, 0.01f);
-
+			ImGui::DragFloat("イージングタイム最初の出現", &missileParamater_.firstFallEaseMax, 0.01f);
+			ImGui::DragFloat("イージングタイム横移動", &missileParamater_.sideMoveEaseMax, 0.01f);
+			ImGui::DragFloat("イージングタイムスケーリング", &missileParamater_.scalingEaseMax, 0.01f);
+			ImGui::DragFloat("イージングタイムスケーリング限界の時", &missileParamater_.scalingEaseMaxAsLimit, 0.01f);
+			ImGui::DragFloat("イージングタイム予備動作", &missileParamater_.antipationEaseMax, 0.01f);
+			
 
 			ImGuiManager::GetInstance()->UnSetFont();
 			ImGui::PopID();

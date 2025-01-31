@@ -17,11 +17,7 @@ void MissileEnemy::Initialize() {
 	bombSE_ = Audio::GetInstance()->SoundLoadWave("MissileBomb.wav");
 	luncherSE_ = Audio::GetInstance()->SoundLoadWave("MissileLauncher.wav");
 
-	firstFallEase_.maxTime = 0.5f;
-	sideMoveEase_.maxTime = 0.5f;
-	scalingEase_.maxTime = 1.0f;
-	easeDirection_ = 1.0f;
-	antipationEase_.maxTime = 0.5f;
+	scalingEase_.maxTime = paramater_.scalingEaseMax;
 	model_->transform.scale = paramater_.baseScale;
 
 	// collider
@@ -61,16 +57,16 @@ void MissileEnemy::FallMove() {
 		///-------------------------------------------------------------- 
 	case MissileEnemy::Step::FIRSTFALL:
 		// タイム加算
-		firstFallEase_.time += FPSKeeper::DeltaTimeRate();
+		firstFallEaseT_ += FPSKeeper::DeltaTimeRate();
 
 		// イージング適応
 		model_->transform.translate.y = EaseInCubic(startPos_.y, paramater_.fallPos, 
-			                                        firstFallEase_.time, firstFallEase_.maxTime);
+			                                        firstFallEaseT_,paramater_.firstFallEaseMax);
 
 		
-		if (firstFallEase_.time < firstFallEase_.maxTime)break;
+		if (firstFallEaseT_ < paramater_.firstFallEaseMax)break;
 		model_->transform.translate.y = paramater_.fallPos;
-		firstFallEase_.time = firstFallEase_.maxTime;
+		firstFallEaseT_ = paramater_.firstFallEaseMax;
 		step_ = Step::SIDEMOVE;
 
 		break;
@@ -79,16 +75,16 @@ void MissileEnemy::FallMove() {
 		///-------------------------------------------------------------- 
 	case MissileEnemy::Step::SIDEMOVE:
 		// タイム加算
-		sideMoveEase_.time += FPSKeeper::DeltaTimeRate();
+		sideMoveEaseT_ += FPSKeeper::DeltaTimeRate();
 
 		// イージング適応
 		model_->transform.translate.x = EaseInCubic(startPos_.x, targetPosX_,
-			sideMoveEase_.time, sideMoveEase_.maxTime);
+			sideMoveEaseT_, paramater_.sideMoveEaseMax);
 
 		/// 次のステップ
-		if (sideMoveEase_.time < sideMoveEase_.maxTime)break;
+		if (sideMoveEaseT_ < paramater_.sideMoveEaseMax)break;
 		model_->transform.translate.y = paramater_.fallPos;
-		sideMoveEase_.time = sideMoveEase_.maxTime;
+		sideMoveEaseT_ = paramater_.sideMoveEaseMax;
 		step_ = Step::FALLWAIT;
 		break;
 		///-------------------------------------------------------------
@@ -101,7 +97,7 @@ void MissileEnemy::FallMove() {
 
 		// タイムにより膨張速度上昇
 		if (waitTime_ >= paramater_.scalingUpTime) {
-			scalingEase_.maxTime = 0.4f;
+			scalingEase_.maxTime = paramater_.scalingEaseMaxAsLimit;
 		}
 		/// 次のステップ
 		if (waitTime_ < paramater_.fallWaitTime_)break;
@@ -113,16 +109,16 @@ void MissileEnemy::FallMove() {
 		///-------------------------------------------------------------- 
 	case MissileEnemy::Step::ANTIPATION:
 		// タイム加算
-		antipationEase_.time += FPSKeeper::DeltaTimeRate();
+		antipationEaseT_ += FPSKeeper::DeltaTimeRate();
 
 		// イージング適応
 		model_->transform.translate.y = EaseInCubic(paramater_.fallPos, paramater_.fallPos+paramater_.antipationOffsetPos_,
-			antipationEase_.time, antipationEase_.maxTime);
+			antipationEaseT_, paramater_.antipationEaseMax);
 
 		/// 次のステップ
-		if (antipationEase_.time < antipationEase_.maxTime)break;
+		if (antipationEaseT_ < paramater_.antipationEaseMax)break;
 		model_->transform.translate.y = paramater_.fallPos + paramater_.antipationOffsetPos_;
-		antipationEase_.time = antipationEase_.maxTime;
+		antipationEaseT_ = paramater_.antipationEaseMax;
 		FallSE();//落ちるSE
 		step_ = Step::FALL;
 		break;
