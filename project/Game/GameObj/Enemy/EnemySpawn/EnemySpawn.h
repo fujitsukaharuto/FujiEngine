@@ -7,13 +7,14 @@
 #include<set>
 
 class EnemyManager;
+enum class Type;
 class EnemySpawn {
 public:
     struct SpawnData {
         float x;
         float y;
         float time;
-        std::string enemyType;
+       BaseEnemy::Type enemyType;
     };
 private:
     ///========================================================================================

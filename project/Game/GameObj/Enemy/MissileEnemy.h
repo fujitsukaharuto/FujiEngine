@@ -40,8 +40,6 @@ private:/// パラメータ、ステップ
 	Paramater paramater_;
 	Step step_;
 
-	
-
 private:
 	ParticleEmitter bombEmit1_;
 	ParticleEmitter bombEmit2_;

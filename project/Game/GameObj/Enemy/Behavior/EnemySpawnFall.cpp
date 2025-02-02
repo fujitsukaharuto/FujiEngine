@@ -4,6 +4,7 @@
 
 /// obj
 #include"GameObj/Enemy/BaseEnemy.h"
+#include"GameObj/Enemy/NormalEnemy.h"
 
 /// math
 #include"MathFunction.h"
@@ -68,7 +69,7 @@ void EnemySpawnFall::Update() {
 		if (gotoFrontEase_.time >= gotoFrontEase_.maxTime) {
 			gotoFrontEase_.time = gotoFrontEase_.maxTime;
 		}
-		pBaseEnemy_->SetWorldPositionZ(EaseInExpo(BaseEnemy::StartZPos_, 0.0f, gotoFrontEase_.time, gotoFrontEase_.maxTime));
+		pBaseEnemy_->SetWorldPositionZ(EaseInExpo(NormalEnemy::StartZPos_, 0.0f, gotoFrontEase_.time, gotoFrontEase_.maxTime));
 
 		pBaseEnemy_->Bound(boundSpeed_);
 		

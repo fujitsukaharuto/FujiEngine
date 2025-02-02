@@ -16,7 +16,9 @@ private:
 public:
 	enum class Type {
 		NORMAL,
-		STRONG,
+		MISSILE,
+		LEFTSIDE,
+		RIGHTSIDE,
 	};
 
 	enum class BlowingPower {
@@ -73,8 +75,6 @@ public:
 	static float                       InitY_;
 	static Vector3                     BaseScale_;
 	static float                       BoundPosY_;
-	static float                       StartZPos_;
-	static float                       StartYPos_;
 public:
 	BaseEnemy();
 

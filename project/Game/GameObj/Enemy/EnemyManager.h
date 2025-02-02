@@ -2,6 +2,7 @@
 
 #include "BaseEnemy.h"
 #include"MissileEnemy.h"
+#include"NormalEnemy.h"
 #include"GlobalVariables/GlobalVariables.h"
 
 /// std
@@ -18,6 +19,7 @@ class UFO;
 enum class  Type;
 enum class JumpPower;
 struct BaseEnemy::Paramater;
+struct NormalEnemy::Paramater;
 struct MissileEnemy::Paramater;
 class EnemyManager {
    
@@ -36,7 +38,7 @@ class EnemyManager {
   
     std::array<BaseEnemy::Paramater, 2>paramaters_;
     MissileEnemy::Paramater missileParamater_;
-  
+    NormalEnemy::Paramater normalParamater_;
   
     ///* 敵リスト
     std::list<std::unique_ptr<BaseEnemy>> enemies_;
@@ -59,9 +61,8 @@ public:
     void Initialize();
     void FSpawn();
 
-  
     // 敵の生成
-    void SpawnEnemy(const std::string& enemyType, const Vector3& position);
+    void SpawnEnemy(const BaseEnemy::Type& enemyType, const Vector3& position);
 
     // 更新処理
     void Update();

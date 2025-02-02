@@ -22,7 +22,7 @@ EnemyManager::EnemyManager() {
 
 void EnemyManager::Initialize() {
 	enemyTypes_[static_cast<size_t>(BaseEnemy::Type::NORMAL)] = "NormalEnemy";
-	enemyTypes_[static_cast<size_t>(BaseEnemy::Type::STRONG)] = "StrongEnemy";
+	enemyTypes_[static_cast<size_t>(BaseEnemy::Type::MISSILE)] = "StrongEnemy";
 
 	///* グローバルパラメータ
 	globalParameter_ = GlobalVariables::GetInstance();
@@ -39,26 +39,28 @@ void  EnemyManager::FSpawn() {
 ///========================================================================================
 ///  敵の生成
 ///========================================================================================
-void EnemyManager::SpawnEnemy(const std::string& enemyType, const Vector3& position) {
-
+void EnemyManager::SpawnEnemy(const BaseEnemy::Type& enemyType, const Vector3& position) {
 
 	// 通常敵
-	if (enemyType == enemyTypes_[static_cast<size_t>(BaseEnemy::Type::NORMAL)]) {
+	if (enemyType == BaseEnemy::Type::NORMAL||
+		enemyType == BaseEnemy::Type::LEFTSIDE||
+		enemyType == BaseEnemy::Type::RIGHTSIDE) {
 		std::unique_ptr<NormalEnemy> enemy;
 		enemy = std::make_unique<NormalEnemy>();
-		enemy->SetParm(BaseEnemy::Type::NORMAL, paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)]);
+		enemy->SetParm(enemyType, paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)]);
+		enemy->SetOnlyParamater(normalParamater_);
 		// 位置初期化とlistに追加
 		enemy->Initialize();
-		enemy->SetWorldPosition(Vector3(position.x, position.y, position.z));
+		enemy->SetPosition(Vector3(position.x, position.y, position.z));
 		enemy->SetPlayer(pPlayer_);// プレイヤーセット
 		enemies_.push_back(std::move(enemy));
 	}
 
-	// ストロングな敵
-	else if (enemyType == enemyTypes_[static_cast<size_t>(BaseEnemy::Type::STRONG)]) {
+	// ミサイル
+	else if (enemyType == BaseEnemy::Type::MISSILE) {
 		std::unique_ptr<MissileEnemy> missle;
 		missle = std::make_unique<MissileEnemy>();
-		missle->SetParm(BaseEnemy::Type::STRONG, paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)]);
+		missle->SetParm(BaseEnemy::Type::MISSILE, paramaters_[static_cast<size_t>(BaseEnemy::Type::MISSILE)]);
 		missle->SetOnlyParamater(missileParamater_);
 		// 位置初期化とlistに追加
 		missle->Initialize();
@@ -82,11 +84,13 @@ void EnemyManager::Update() {
 
 	for (auto it = enemies_.begin(); it != enemies_.end(); ) {
 
-		if ((*it)->GetType() == BaseEnemy::Type::NORMAL) {
-			(*it)->SetParm(BaseEnemy::Type::NORMAL, paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)]);
+		if ((*it)->GetType() == BaseEnemy::Type::NORMAL||
+			(*it)->GetType() == BaseEnemy::Type::LEFTSIDE||
+			(*it)->GetType() == BaseEnemy::Type::RIGHTSIDE) {
+			(*it)->SetParm((*it)->GetType(), paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)]);
 		}
-		else if ((*it)->GetType() == BaseEnemy::Type::STRONG) {
-			(*it)->SetParm(BaseEnemy::Type::STRONG, paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)]);
+		else if ((*it)->GetType() == BaseEnemy::Type::MISSILE) {
+			(*it)->SetParm(BaseEnemy::Type::MISSILE, paramaters_[static_cast<size_t>(BaseEnemy::Type::MISSILE)]);
 		}
 
 		(*it)->Update(); // 更新
@@ -219,6 +223,11 @@ void EnemyManager::AddParmGroup() {
 			paramaters_[i].scaleUpParm_);
 	}
 
+	// 普通個別
+	globalParameter_->AddItem(groupName_, "leftX", normalParamater_.leftX);
+	globalParameter_->AddItem(groupName_, "rightX", normalParamater_.rightX);
+	globalParameter_->AddItem(groupName_, "moveValue_", normalParamater_.moveValue_);
+
 	// ミサイル個別
 	globalParameter_->AddItem(groupName_, "fallWaitTime_", missileParamater_.fallWaitTime_);
 	globalParameter_->AddItem(groupName_, "fallPos", missileParamater_.fallPos);
@@ -307,6 +316,12 @@ void EnemyManager::SetValues() {
 			"scaleUpParm_" + std::to_string(int(i + 1)),
 			paramaters_[i].scaleUpParm_);
 	}
+
+	// 通常個別
+	globalParameter_->SetValue(groupName_, "leftX", normalParamater_.leftX);
+	globalParameter_->SetValue(groupName_, "rightX", normalParamater_.rightX);
+	globalParameter_->SetValue(groupName_, "moveValue_", normalParamater_.moveValue_);
+
 	// ミサイル個別
 	globalParameter_->SetValue(groupName_, "fallWaitTime_", missileParamater_.fallWaitTime_);
 	globalParameter_->SetValue(groupName_, "fallPos", missileParamater_.fallPos);
@@ -383,6 +398,11 @@ void EnemyManager::ApplyGlobalParameter() {
 			"scaleUpParm_" + std::to_string(int(i + 1)));
 
 	}
+
+	normalParamater_.leftX = globalParameter_->GetValue<float>(groupName_, "leftX");
+	normalParamater_.rightX = globalParameter_->GetValue<float>(groupName_, "rightX");
+	normalParamater_.moveValue_ = globalParameter_->GetValue<float>(groupName_, "moveValue_");
+
 	missileParamater_.fallWaitTime_ = globalParameter_->GetValue<float>(groupName_, "fallWaitTime_");
 	missileParamater_.fallPos = globalParameter_->GetValue<float>(groupName_, "fallPos");
 	missileParamater_.baseScale = globalParameter_->GetValue<Vector3>(groupName_, "baseScale");
@@ -433,7 +453,6 @@ void EnemyManager::AdjustParm() {
 				&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].spawnBoundGravityMax,
 				0.01f);
 
-
 			ImGui::SeparatorText("出現後");
 			ImGui::DragFloat("落ちる速さ(毎秒)",
 				&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].fallSpeed,
@@ -473,6 +492,12 @@ void EnemyManager::AdjustParm() {
 				&paramaters_[static_cast<size_t>(BaseEnemy::Type::NORMAL)].scaleUpParm_.x,
 				0.01f);
 
+			ImGui::SeparatorText("個別パラメータ");
+			ImGui::DragFloat("生成位置左X", &normalParamater_.leftX, 0.01f);
+			ImGui::DragFloat("生成位置右X", &normalParamater_.rightX, 0.01f);
+			ImGui::DragFloat("移動量", &normalParamater_.moveValue_, 0.01f);
+
+
 			ImGuiManager::GetInstance()->UnSetFont();
 			ImGui::PopID();
 
@@ -483,66 +508,66 @@ void EnemyManager::AdjustParm() {
 		/// ストロングな敵
 		///----------------------------------------------------------
 
-		if (ImGui::TreeNode(enemyTypes_[static_cast<size_t>(BaseEnemy::Type::STRONG)].c_str())) {
-			ImGui::PushID(enemyTypes_[static_cast<size_t>(BaseEnemy::Type::STRONG)].c_str());
+		if (ImGui::TreeNode(enemyTypes_[static_cast<size_t>(BaseEnemy::Type::MISSILE)].c_str())) {
+			ImGui::PushID(enemyTypes_[static_cast<size_t>(BaseEnemy::Type::MISSILE)].c_str());
 
 			ImGuiManager::GetInstance()->SetFontJapanese();/// 日本語
 
 			ImGui::SeparatorText("出現時");
 
 			ImGui::DragFloat("出現時の落ちる速さ(毎秒)",
-				&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].spawnFallSpeed,
+				&paramaters_[static_cast<size_t>(BaseEnemy::Type::MISSILE)].spawnFallSpeed,
 				0.01f);
 
 			ImGui::DragFloat("出現時UFOに当たった時のバウンド力",
-				&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].spawnBoundSpeed,
+				&paramaters_[static_cast<size_t>(BaseEnemy::Type::MISSILE)].spawnBoundSpeed,
 				0.01f);
 
 			ImGui::DragFloat("バウンド中の重力",
-				&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].spawnBoundGravity,
+				&paramaters_[static_cast<size_t>(BaseEnemy::Type::MISSILE)].spawnBoundGravity,
 				0.01f);
 
 			ImGui::DragFloat("バウンド中の重力(最大)",
-				&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].spawnBoundGravityMax,
+				&paramaters_[static_cast<size_t>(BaseEnemy::Type::MISSILE)].spawnBoundGravityMax,
 				0.01f);
 
 
 			ImGui::SeparatorText("出現後");
 			ImGui::DragFloat("落ちる速さ(毎秒)",
-				&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].fallSpeed,
+				&paramaters_[static_cast<size_t>(BaseEnemy::Type::MISSILE)].fallSpeed,
 				0.01f);
 
 			ImGui::DragFloat("弱い初期攻撃力",
-				&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].weakAttackValue,
+				&paramaters_[static_cast<size_t>(BaseEnemy::Type::MISSILE)].weakAttackValue,
 				0.01f);
 
 			ImGui::DragFloat("合体した時の攻撃力上昇値",
-				&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].plusAttackValue,
+				&paramaters_[static_cast<size_t>(BaseEnemy::Type::MISSILE)].plusAttackValue,
 				0.01f);
 
 
 			ImGui::DragFloat("強い攻撃力",
-				&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].strongAttackValue,
+				&paramaters_[static_cast<size_t>(BaseEnemy::Type::MISSILE)].strongAttackValue,
 				0.01f);
 
 			ImGui::DragFloat("弱いキックでの吹っ飛び(毎秒)",
-				&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].blowingPower[static_cast<size_t>(BaseEnemy::BlowingPower::WEAK)],
+				&paramaters_[static_cast<size_t>(BaseEnemy::Type::MISSILE)].blowingPower[static_cast<size_t>(BaseEnemy::BlowingPower::WEAK)],
 				0.01f);
 
 			ImGui::DragFloat("強いキックでの吹っ飛び(毎秒)",
-				&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].blowingPower[static_cast<size_t>(BaseEnemy::BlowingPower::MaxPower)],
+				&paramaters_[static_cast<size_t>(BaseEnemy::Type::MISSILE)].blowingPower[static_cast<size_t>(BaseEnemy::BlowingPower::MaxPower)],
 				0.01f);
 
 			ImGui::DragFloat("爆発する時間(秒)",
-				&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].explotionTime_,
+				&paramaters_[static_cast<size_t>(BaseEnemy::Type::MISSILE)].explotionTime_,
 				0.01f);
 
 			ImGui::DragFloat("爆発する延長時間(秒)",
-				&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].explotionExtensionTime_,
+				&paramaters_[static_cast<size_t>(BaseEnemy::Type::MISSILE)].explotionExtensionTime_,
 				0.01f);
 
 			ImGui::DragFloat3("スケールアップするサイズ",
-				&paramaters_[static_cast<size_t>(BaseEnemy::Type::STRONG)].scaleUpParm_.x,
+				&paramaters_[static_cast<size_t>(BaseEnemy::Type::MISSILE)].scaleUpParm_.x,
 				0.01f);
 
 			ImGui::SeparatorText("個別パラメータ");

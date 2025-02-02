@@ -35,7 +35,7 @@ void EnemySpawn::Update() {
 
         // まだ生成されていないかつ、指定時間経過していれば生成
         if (currentTime_ >= spawnData.time && spawnedEnemies_.find(i) == spawnedEnemies_.end()) {
-            pEnemyManager_->SpawnEnemy(spawnData.enemyType, Vector3(spawnData.x, BaseEnemy::StartYPos_, BaseEnemy::StartZPos_));
+            pEnemyManager_->SpawnEnemy(spawnData.enemyType, Vector3(spawnData.x, spawnData.y, 0.0f));
             spawnedEnemies_.insert(i);  // 生成済みとして登録
         }
     }
@@ -59,7 +59,7 @@ void EnemySpawn::DrawImGuiEditor() {
     ImGui::Checkbox("エディターモード",&isEditorMode_);//editorMode
 
     if (ImGui::Button("追加")) {
-        spawnDataList_.push_back({ 0.0f, 0.0f, 0.0f, pEnemyManager_->GetEnemyType(0) });
+        spawnDataList_.push_back({ 0.0f, 0.0f, 0.0f, BaseEnemy::Type::NORMAL});
     }
 
     ImGui::SeparatorText("スポーンする爆弾リスト");
@@ -76,28 +76,34 @@ void EnemySpawn::DrawImGuiEditor() {
         ImGui::PopID();
     }
 
+    //選択中の敵編集
     if (currentSelected_ != -1 && currentSelected_ < spawnDataList_.size()) {
         ImGui::SeparatorText("スポーンの設定");
 
-        ImGui::DragFloat("Xの発生位置(-25～23)", &spawnDataList_[currentSelected_].x, 0.1f);
-      /*  ImGui::DragFloat("Yの発生位置(50～70が好ましいかも)", &spawnDataList_[currentSelected_].y, 0.1f);*/
-        ImGui::DragFloat("発生時間(秒)", &spawnDataList_[currentSelected_].time, 0.1f);
+        //種類選択
+        const char* enemyType_items[] = {"普通の爆弾" ,"ミサイル爆弾","普通の爆弾(左から)","普通の爆弾(右から)" };
 
-        const char* enemyType_items[] = {"普通の爆弾" ,"ミサイル爆弾"};
-
-        int combo_preview_value = 0;
-        for (int i = 0; i < pEnemyManager_->GetEnemyTypes().size(); i++) {
-            if (spawnDataList_[currentSelected_].enemyType == pEnemyManager_->GetEnemyType(i)) {
-                combo_preview_value = i;
-                break;
-            }
-        }
-
+        int combo_preview_value = static_cast<int>(spawnDataList_[currentSelected_].enemyType);
+        
         if (ImGui::Combo("EnemyType", &combo_preview_value, enemyType_items, IM_ARRAYSIZE(enemyType_items))) {
-            spawnDataList_[currentSelected_].enemyType = pEnemyManager_->GetEnemyType(combo_preview_value);
+            spawnDataList_[currentSelected_].enemyType = static_cast<BaseEnemy::Type>((combo_preview_value));
         }
 
+        /// 通常とミサイルのImgui操作
+        if (spawnDataList_[currentSelected_].enemyType == BaseEnemy::Type::NORMAL ||
+            spawnDataList_[currentSelected_].enemyType == BaseEnemy::Type::MISSILE) {
+            ImGui::DragFloat("Xの発生位置(-25～23)", &spawnDataList_[currentSelected_].x, 0.01f);
+        }
 
+        /// サイドエネミーのImguiそう差
+        if (spawnDataList_[currentSelected_].enemyType == BaseEnemy::Type::LEFTSIDE ||
+            spawnDataList_[currentSelected_].enemyType == BaseEnemy::Type::RIGHTSIDE) {
+            ImGui::DragFloat("Yの発生位置", &spawnDataList_[currentSelected_].y, 0.01f);
+        }
+
+        ImGui::DragFloat("発生時間(秒)", &spawnDataList_[currentSelected_].time, 0.01f);
+
+        // 消す
         if (ImGui::Button("削除")) {
             spawnDataList_.erase(spawnDataList_.begin() + currentSelected_);
             currentSelected_ = -1;

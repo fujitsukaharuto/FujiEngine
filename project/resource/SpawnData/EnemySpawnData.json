@@ -1,104 +1,44 @@
 [
     {
-        "enemyType": "NormalEnemy",
-        "time": 2.5999999046325684,
-        "x": 0.0,
-        "y": 54.29999923706055
-    },
-    {
-        "enemyType": "NormalEnemy",
-        "time": 3.799999952316284,
-        "x": -4.5,
-        "y": 54.79999923706055
-    },
-    {
-        "enemyType": "NormalEnemy",
-        "time": 5.0,
-        "x": 4.5,
-        "y": 0.0
-    },
-    {
-        "enemyType": "NormalEnemy",
-        "time": 9.0,
+        "enemyType": 0,
+        "time": 0.8999999761581421,
         "x": 0.0,
         "y": 0.0
     },
     {
-        "enemyType": "NormalEnemy",
-        "time": 11.0,
+        "enemyType": 0,
+        "time": 1.600000023841858,
+        "x": -2.319999933242798,
+        "y": 0.0
+    },
+    {
+        "enemyType": 1,
+        "time": 2.549999952316284,
+        "x": 13.819999694824219,
+        "y": 0.0
+    },
+    {
+        "enemyType": 0,
+        "time": 3.690000057220459,
+        "x": -2.3499999046325684,
+        "y": 0.0
+    },
+    {
+        "enemyType": 0,
+        "time": 12.239999771118164,
+        "x": 13.15999984741211,
+        "y": 0.0
+    },
+    {
+        "enemyType": 2,
+        "time": 0.4000000059604645,
         "x": 0.0,
-        "y": 0.0
+        "y": 34.04999923706055
     },
     {
-        "enemyType": "NormalEnemy",
-        "time": 13.0,
-        "x": 0.0,
-        "y": 0.0
-    },
-    {
-        "enemyType": "NormalEnemy",
-        "time": 20.0,
-        "x": -7.0,
-        "y": 0.0
-    },
-    {
-        "enemyType": "NormalEnemy",
-        "time": 22.5,
-        "x": -10.0,
-        "y": 0.0
-    },
-    {
-        "enemyType": "NormalEnemy",
-        "time": 25.0,
-        "x": -13.0,
-        "y": 0.0
-    },
-    {
-        "enemyType": "NormalEnemy",
-        "time": 30.0,
-        "x": -16.0,
-        "y": 0.0
-    },
-    {
-        "enemyType": "NormalEnemy",
-        "time": 35.0,
-        "x": 0.0,
-        "y": 0.0
-    },
-    {
-        "enemyType": "NormalEnemy",
-        "time": 32.5,
-        "x": 0.0,
-        "y": 0.0
-    },
-    {
-        "enemyType": "NormalEnemy",
-        "time": 36.0,
-        "x": 5.0,
-        "y": 0.0
-    },
-    {
-        "enemyType": "NormalEnemy",
-        "time": 38.5,
-        "x": 5.0,
-        "y": 0.0
-    },
-    {
-        "enemyType": "NormalEnemy",
-        "time": 40.0,
-        "x": -5.0,
-        "y": 0.0
-    },
-    {
-        "enemyType": "NormalEnemy",
-        "time": 42.5,
-        "x": -5.0,
-        "y": 0.0
-    },
-    {
-        "enemyType": "StrongEnemy",
-        "time": 2.5,
-        "x": 13.899999618530273,
-        "y": 0.0
+        "enemyType": 3,
+        "time": 0.5299999713897705,
+        "x": -13.40999984741211,
+        "y": 38.650001525878906
     }
 ]

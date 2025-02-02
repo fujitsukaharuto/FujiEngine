@@ -21,8 +21,6 @@
 ///==========================================================
 float BaseEnemy::InitY_ = 1.0f;
 float BaseEnemy::BoundPosY_ = 47.0f;
-float BaseEnemy::StartZPos_ = 5.0f;
-float BaseEnemy::StartYPos_ = 70.0f;
 Vector3 BaseEnemy::BaseScale_ = { 1.0f,1.0f,1.0f };
 
 BaseEnemy::BaseEnemy() {
@@ -37,9 +35,9 @@ void BaseEnemy::Initialize() {
 	OriginGameObject::Initialize();
 
 	/// teg
-	tags_[static_cast<size_t>(Tag::FALL)]          =   "FallEnemy";
-	tags_[static_cast<size_t>(Tag::BLOWINGWEAK)]   =   "BlowingWeakEnemy";
-	tags_[static_cast<size_t>(Tag::BLOWINGSTRONG)] =   "BlowingStrongEnemy";
+	tags_[static_cast<size_t>(Tag::FALL)]           =   "FallEnemy";
+	tags_[static_cast<size_t>(Tag::BLOWINGWEAK)]    =   "BlowingWeakEnemy";
+	tags_[static_cast<size_t>(Tag::BLOWINGSTRONG)]  =   "BlowingStrongEnemy";
 
 	///spawn
 	spawnEasing_.time = 0.0f;
@@ -224,6 +222,8 @@ void BaseEnemy::ChangeState(std::unique_ptr<BaseEnemyState>behavior) {
 ///　移動制限
 ///==========================================================
 void BaseEnemy::WallRefrection() {
+
+	if (dynamic_cast<EnemyFall*>(behavior_.get()))return;
 
 	// フィールドの中心とスケールを取得
 	Vector3 fieldCenter = Field::baseTranslate_; // フィールド中心 

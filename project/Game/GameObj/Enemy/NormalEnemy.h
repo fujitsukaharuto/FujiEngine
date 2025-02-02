@@ -12,7 +12,13 @@
 /// 敵クラス
 /// </summary>
 class NormalEnemy : public BaseEnemy {
-private:
+public:
+	struct Paramater {
+		float leftX;
+		float rightX;
+		float moveValue_;
+	};
+private:/// パラメータ
 	
 	// fall
 	float fallspeed_;
@@ -24,7 +30,15 @@ private:
 
 	Easing speedEase_;
 	float   maxSpeed_;
+	float xTranslation_;
 
+	Paramater paramater_;
+
+private:/// パラシュート
+	std::unique_ptr<Object3d>parachuteModel_;
+	Easing parachuteExpatioinEase_;
+
+private:/// 演出
 	/// emitter
 	ParticleEmitter bombEmit1_;
 	ParticleEmitter bombEmit2_;
@@ -32,8 +46,12 @@ private:
 
 	SoundData bomb_;
 
-private: 
-	
+private: /// 行動
+	 std::unordered_map<Type, void (NormalEnemy::*)()> behaviorMap_;
+
+public:
+	static float                       StartZPos_;
+	static float                       StartYPos_;
 public: 
 
 	///========================================================================================
@@ -47,7 +65,19 @@ public:
 
 	 void FallMove()override;
 	 void ExplotionRendition()override;
-
+	 // 
 	 void SpeedChangeMethod();
+	 void ParachuteExpationMethod();
+
+	 //behavior
+	 void NormalBehavior();
+	 void LeftSideBehavior();
+	 void RightSideBehavior();
+
+	 //setter
+	 void SetPosition(const Vector3&pos);
+	 void SetOnlyParamater(const Paramater& parm);
+private://behavior
+	
 	
 };
