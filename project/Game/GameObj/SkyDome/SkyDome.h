@@ -20,4 +20,6 @@ public:
 	void Initialize()override;
 	void Update()override;
 	void Draw(Material* mate = nullptr)override;
+
+	void Debug();
 };

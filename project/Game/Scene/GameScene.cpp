@@ -432,6 +432,7 @@ void GameScene::ParamaterEdit() {
 	enemySpawn_->DrawImGuiEditor();
 	
 	ImGui::Begin("DebugParm");
+	skydome_->Debug();
 	field_->Debug();
 	timer_->Debug();
 	gameOver_->Debug();
