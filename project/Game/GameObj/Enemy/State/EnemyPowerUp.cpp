@@ -25,8 +25,6 @@ EnemyPowerUp::EnemyPowerUp(BaseEnemy* boss)
 	FPSKeeper::SetTimeScale(0.1f);
 	step_ = Step::SCALEUP; /// ステップ初期化
 
-	sizeupSE_ = Audio::GetInstance()->SoundLoadWave("sizeup.wav");
-	Audio::GetInstance()->SoundPlayWave(sizeupSE_);
 }
 
 EnemyPowerUp::~EnemyPowerUp() {

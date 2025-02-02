@@ -2,6 +2,7 @@
 
 // function
 #include "Easing.h"
+#include "Audio/Audio.h"
 // class
 #include "OriginGameObject.h"
 #include"Collider/AABBCollider.h"
@@ -66,6 +67,7 @@ protected:
 	float                              sumWeakAttackValue_;
 	Vector3                            powerUpScale_;
 	
+	SoundData sizeupSE_;
 
 	/// behavior
 	std::unique_ptr<BaseEnemyBehaivor> behavior_ = nullptr;

@@ -50,6 +50,7 @@ void BaseEnemy::Initialize() {
 	model_->transform.scale = BaseEnemy::BaseScale_;
 	powerUpScale_ = BaseEnemy::BaseScale_;
 
+	sizeupSE_ = Audio::GetInstance()->SoundLoadWave("sizeup.wav");
 	
 	ChangeState(std::make_unique<EnemyNoneState>(this)); /// 追っかけ
 }
@@ -181,6 +182,8 @@ void BaseEnemy::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 					sumWeakAttackValue_ += paramater_.plusAttackValue;     // 攻撃力アップ
 					powerUpScale_ += paramater_.scaleUpParm_;                 // スケールアップ
 					
+					Audio::GetInstance()->SoundPlayWave(sizeupSE_);
+
 					if (!dynamic_cast<EnemyPowerUp*>(state_.get())) {
 						ChangeState(std::make_unique<EnemyPowerUp>(this));
 					}
