@@ -56,6 +56,7 @@ void Player::Initialize() {
 
 	//* パラメータセット
 	deathCount_ = paramater_.deathCount_;
+	model_->transform.rotate.y = std::numbers::pi_v<float>/2.0f;
 
 	///* 頭のパーツ
 	headModel_ = std::make_unique<Object3d>();
