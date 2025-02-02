@@ -30,7 +30,7 @@ void Player::Initialize() {
 	body_->SetParent(model_.get());
 	body_->transform.scale = { 0.5f,0.5f,0.5f };
 
-	shadow_->transform.scale = { 0.7f,0.7f,0.7f };
+	shadow_->transform.scale = { 0.7f,0.0f,0.7f };
 
 	weapon_ = std::make_unique<Object3d>();
 	weapon_->Create("playerWeapon.obj");
@@ -235,7 +235,7 @@ void Player::Draw([[maybe_unused]]Material* mate) {
 }
 
 void Player::SlashDraw() {
-	if (slashTime_ > 0.0f) {
+	if (slashTime_ > 0.0f && behavior_ != PlayerBehavior::kJump) {
 		slash_->Draw();
 	}
 }

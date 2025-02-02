@@ -6,6 +6,7 @@
 #include "Game/Collider/AABBCollider.h"
 #include "Model/Line3dDrawer.h"
 #include "Particle/ParticleEmitter.h"
+#include "Audio/Audio.h"
 
 class Enemy : public OriginGameObject {
 public:
@@ -23,10 +24,12 @@ public:
 	void OnCollisionExit(const ColliderInfo& other);
 
 	void TargetChase();
+	void DeathEffect();
 
 	void SetTargetPos(const Vector3& target) { targetPos_ = target; }
 
 	bool IsLive() { return isLive_; }
+	bool IsDeath() { return isDeath_; }
 	BaseCollider* GetCollider() { return collider_.get(); }
 	Vector3 GetWorldPos() const { return model_->GetWorldPos(); }
 
@@ -53,7 +56,7 @@ private:
 
 	float life_ = 40.0f;
 	bool isLive_ = true;
-
+	bool isDeath_ = false;
 
 	std::unique_ptr<Object3d> body_;
 
@@ -63,9 +66,11 @@ private:
 
 	bool isDamage_ = false;
 	bool isKnockBack_ = false;
+	bool isStop_ = false;
 
 	float damegeTime_ = 0.0f;
 	float knockBackTime_ = 0.0f;
+	float deathTime_ = 0.0f;
 
 
 	Vector3 targetPos_{};
@@ -75,5 +80,12 @@ private:
 	ParticleEmitter hitParticle2_;
 	ParticleEmitter hitParticle3_;
 	ParticleEmitter hitParticle4_;
+
+	ParticleEmitter deathPre_;
+	ParticleEmitter death1_;
+	ParticleEmitter death2_;
+
+
+	SoundData hitSE_;
 
 };

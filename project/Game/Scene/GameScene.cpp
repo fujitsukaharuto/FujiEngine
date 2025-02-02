@@ -76,8 +76,19 @@ void GameScene::Initialize() {
 	followCamera_->SetTarget(&player_->GetTrans());
 	followCamera_->SetLockOn(lockOn_.get());
 
-	test_ = std::make_unique<TestBaseObj>();
-	test_->Initialize();
+
+	numbers1_ = std::make_unique<Sprite>();
+	numbers1_->Load("number/TimeNumber.png");
+	numbers1_->SetAnchor({ 0.0f,0.0f });
+	numbers1_->SetSize({ 48.0f,86.0f });
+	numbers1_->SetPos({ 1050.0f,20.0f,0.0f });
+
+	numbers2_ = std::make_unique<Sprite>();
+	numbers2_->Load("number/TimeNumber.png");
+	numbers2_->SetAnchor({ 0.0f,0.0f });
+	numbers2_->SetSize({ 48.0f,86.0f });
+	numbers2_->SetPos({ 1100.0f,20.0f,0.0f });
+
 
 	/*PlaneDrawer::GetInstance()->AddPlanePoint({ 0.0f,1.0f,1.0f });
 	PlaneDrawer::GetInstance()->AddPlanePoint({ 1.0f,1.0f,1.0f });
@@ -106,14 +117,14 @@ void GameScene::Update() {
 
 	BlackFade();
 
-	test_->Update();
 
 	enemyManager_->GetEnemyList().remove_if([this](const std::unique_ptr<Enemy>& enemy) {
-		if (!enemy->IsLive()) {
+		if (enemy->IsDeath()) {
 			// ロックオン対象が削除される場合に解除する
 			if (lockOn_->GetTarget() == enemy.get()) {
 				lockOn_->SetTarget(nullptr);
 			}
+			enemyCount_--;
 			return true;
 		}
 		return false;;
@@ -132,14 +143,21 @@ void GameScene::Update() {
 
 
 	for (auto& enemy : enemyManager_->GetEnemyList()) {
+		if (!enemy->IsLive()) continue;
+
 		cMane_->AddCollider(enemy->GetCollider());
 	}
 	cMane_->AddCollider(player_->GetCollider());
 	if (player_->GetIsAttack()) {
 		cMane_->AddCollider(player_->GetColliderAttack());
 	}
-	cMane_->AddCollider(test_->GetCollider());
 	cMane_->CheckAllCollision();
+
+
+	int m1 = enemyCount_ % 10;
+	int m2 = enemyCount_ / 10 % 10;
+	numbers1_->SetRange({ 48.0f * float(m2),0.0f }, { 48.0f,86.0f });
+	numbers2_->SetRange({ 48.0f * float(m1),0.0f}, {48.0f,86.0f});
 
 	ParticleManager::GetInstance()->Update();
 }
@@ -161,7 +179,7 @@ void GameScene::Draw() {
 	terrain->Draw();
 	sky->Draw();
 	player_->Draw();
-	test_->Draw();
+
 
 	player_->SlashDraw();
 
@@ -182,6 +200,8 @@ void GameScene::Draw() {
 
 	dxCommon_->PreSpriteDraw();
 	paneru->Draw();
+	numbers1_->Draw();
+	numbers2_->Draw();
 	lockOn_->Draw();
 	black_->Draw();
 

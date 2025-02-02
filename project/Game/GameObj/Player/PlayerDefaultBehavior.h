@@ -22,6 +22,7 @@ private:
 
 	// 変数
 	float kCharacterSpeed_ = 0.15f;
+	float mapMaxSize_ = 41.0f;
 
 	float animeTime_ = 0.0f;
 	float animeTimeLimitte_ = 30.0f;

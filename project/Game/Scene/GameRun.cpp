@@ -56,6 +56,10 @@ void GameRun::Initialize() {
 	pManager_->CreateParticleGroup("hitParticle3", "blueParticle.png",50);
 	pManager_->CreateParticleGroup("hitParticle4", "blueParticle.png");
 
+	pManager_->CreateParticleGroup("deathPre", "blueParticle.png",100);
+
+	pManager_->CreateParticleGroup("death1", "blueParticle.png",60);
+	pManager_->CreateParticleGroup("death2", "blueParticle.png",60);
 
 	pManager_->CreateParticleGroup("bomb1", "blueParticle.png", 50);
 	pManager_->CreateParticleGroup("bomb2", "blueParticle.png", 50);
@@ -78,6 +82,7 @@ void GameRun::Initialize() {
 	audio_->LoadWave("jumpAttack.wav");
 	audio_->LoadWave("jump01.wav");
 	audio_->LoadWave("dush.wav");
+	audio_->LoadWave("punch2a.wav");
 
 #pragma endregion
 

@@ -151,11 +151,14 @@ void ParticleEmitter::Burst() {
 		worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
 	}
 
-	Vector3 posAddSize{};
-	posAddSize = Random::GetVector3({ emitSizeMin.x,emitSizeMax.x }, { emitSizeMin.y,emitSizeMax.y }, { emitSizeMin.z,emitSizeMax.z });
-	posAddSize += {worldMatrix.m[3][0], worldMatrix.m[3][1], worldMatrix.m[3][2]};
+	for (uint32_t i = 0; i < count; i++) {
+		Vector3 posAddSize{};
+		posAddSize = Random::GetVector3({ emitSizeMin.x,emitSizeMax.x }, { emitSizeMin.y,emitSizeMax.y }, { emitSizeMin.z,emitSizeMax.z });
+		posAddSize += {worldMatrix.m[3][0], worldMatrix.m[3][1], worldMatrix.m[3][2]};
 
-	ParticleManager::Emit(name, posAddSize, particleRotate, grain, para_, count);
+		ParticleManager::Emit(name, posAddSize, particleRotate, grain, para_, 1);
+	}
+
 }
 
 void ParticleEmitter::BurstAnime() {

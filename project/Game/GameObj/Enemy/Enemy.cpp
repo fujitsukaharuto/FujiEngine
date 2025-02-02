@@ -18,17 +18,17 @@ void Enemy::Initialize() {
 	body_->Create("EnemyBody.obj");
 	body_->SetParent(model_.get());
 
-	shadow_->transform.scale = { 0.4f,0.4f,0.4f };
+	shadow_->transform.scale = { 0.6f,0.0f,0.6f };
 
 	omega_ = 2.0f * std::numbers::pi_v<float> / 300.0f;
 	collider_ = std::make_unique<AABBCollider>();
 	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
 	collider_->SetCollisionStayCallback([this](const ColliderInfo& other) {OnCollisionStay(other); });
 	collider_->SetCollisionExitCallback([this](const ColliderInfo& other) {OnCollisionExit(other); });
-	collider_->SetTag("enemy");
-	collider_->SetWidth(0.5f);
-	collider_->SetHeight(0.5f);
-	collider_->SetDepth(0.5f);
+	collider_->SetTag("moveEnemy");
+	collider_->SetWidth(0.75f);
+	collider_->SetHeight(0.75f);
+	collider_->SetDepth(0.75f);
 
 	hitParticle1_.name = "hitParticle1";
 	hitParticle2_.name = "hitParticle2";
@@ -45,9 +45,42 @@ void Enemy::Initialize() {
 	hitParticle3_.SetParent(model_.get());
 	hitParticle4_.SetParent(model_.get());
 
+	deathPre_.name = "deathPre";
+	deathPre_.Load("deathPre");
+	deathPre_.SetParent(model_.get());
+	death1_.name = "death1";
+	death1_.Load("death1");
+	death1_.SetParent(model_.get());
+	death2_.name = "death2";
+	death2_.Load("death2");
+	death2_.SetParent(model_.get());
+
+
+	hitSE_ = Audio::GetInstance()->SoundLoadWave("punch2a.wav");
+
 }
 
 void Enemy::Update() {
+
+	if (!isLive_) {
+
+		deathTime_ -= FPSKeeper::DeltaTime();
+		if (deathTime_ <= 0.0f) {
+			deathTime_ = 0.0f;
+			isDeath_ = true;
+			death1_.Burst();
+			death2_.Burst();
+		}
+
+		float t = 1.0f / 30.0f * (30.0f - deathTime_);
+		float scaleLerp = Lerp(1.0f, 0.0f, t);
+		body_->transform.scale = { scaleLerp,scaleLerp,scaleLerp };
+		shadow_->transform.scale.x = Lerp(0.6f, 0.0f, t);
+		shadow_->transform.scale.z = Lerp(0.6f, 0.0f, t);
+		body_->transform.rotate.x = LerpShortAngle(0.0f, -1.5f, t);
+
+		return;
+	}
 
 	targetPos_.y = 0.0f;
 	toTarget_ = targetPos_ - Vector3{ model_->transform.translate.x, 0.0f, model_->transform.translate.z };
@@ -144,14 +177,17 @@ void Enemy::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 		hitParticle3_.Burst();
 		hitParticle4_.Burst();
 
+		Audio::GetInstance()->SoundPlayWave(hitSE_, 0.075f);
+
 		life_ -= 10.0f;
 		if (life_ <= 0.0f) {
 			isLive_ = false;
+			deathTime_ = 30.0f;
 		}
 
 		if (!isKnockBack_) {
 			isDamage_ = true;
-			damegeTime_ = 60.0f;
+			damegeTime_ = 40.0f;
 		}
 	}
 	if (other.tag == "attack_knock") {
@@ -165,9 +201,12 @@ void Enemy::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 		hitParticle3_.Burst();
 		hitParticle4_.Burst();
 
+		Audio::GetInstance()->SoundPlayWave(hitSE_, 0.075f);
+
 		life_ -= 30.0f;
 		if (life_ <= 0.0f) {
 			isLive_ = false;
+			deathTime_ = 30.0f;
 		}
 
 		isDamage_ = false;
@@ -177,6 +216,11 @@ void Enemy::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 		knockBackTime_ = 30.0f;
 	}
 
+	if (other.tag == "moveEnemy") {
+		isStop_ = true;
+		collider_->SetTag("stopEnemy");
+	}
+
 }
 
 void Enemy::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
@@ -184,6 +228,12 @@ void Enemy::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
 		isCollider_ = true;
 		color_ = { 0.0f,1.0f,1.0f,1.0f };
 	}
+
+	if (other.tag == "moveEnemy") {
+		isStop_ = true;
+		collider_->SetTag("stopEnemy");
+	}
+
 }
 
 void Enemy::OnCollisionExit([[maybe_unused]] const ColliderInfo& other) {
@@ -194,10 +244,20 @@ void Enemy::TargetChase() {
 
 	if (toTarget_.Length() > 1.75f) {
 
-		Vector3 velo = toTarget_.Normalize() * kSpeed_;
-		model_->transform.translate += velo * FPSKeeper::DeltaTime();
-		float targetRotate = std::atan2(velo.x, velo.z);
-		model_->transform.rotate.y = LerpShortAngle(model_->transform.rotate.y, targetRotate, 0.1f);
+		if (!isStop_) {
+			Vector3 velo = toTarget_.Normalize() * kSpeed_;
+			model_->transform.translate += velo * FPSKeeper::DeltaTime();
+			float targetRotate = std::atan2(velo.x, velo.z);
+			model_->transform.rotate.y = LerpShortAngle(model_->transform.rotate.y, targetRotate, 0.1f);
+			collider_->SetTag("moveEnemy");
+		}
+
+		isStop_ = false;
+
+	}
+	else {
+		isStop_ = false;
+		collider_->SetTag("moveEnemy");
 	}
 
 }

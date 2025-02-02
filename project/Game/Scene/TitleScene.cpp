@@ -47,14 +47,13 @@ void TitleScene::Initialize() {
 	/*emit.name = "sphere";
 	emit.Load("sphere");*/
 
-	emit1.name = "kick1";
-	emit1.Load("bomb1");
-	emit2.name = "kick2";
-	emit2.Load("bomb2");
-	emit3.name = "kick3";
-	emit3.Load("bomb3");
-	emit4.name = "kick4";
-	emit4.Load("bomb3");
+	/*emit1.name = "attackParticle3";
+	emit1.Load("attackParticle3");
+	emit2.name = "attackParticle4";
+	emit2.Load("attackParticle4");
+	emit3.name = "attackParticle5";
+	emit3.Load("attackParticle5");*/
+
 }
 
 void TitleScene::Update() {
@@ -73,16 +72,20 @@ void TitleScene::Update() {
 	/*test_->Update();
 	test2_->Update();*/
 
-	emit1.Emit();
-	emit2.Emit();
-	emit3.Emit();
-	emit4.Emit();
+	/*if (Input::GetInstance()->TriggerKey(DIK_5)) {
+		emit1.Burst();
+		emit2.Burst();
+		emit3.Burst();
+	}*/
+
+
+
 
 #ifdef _DEBUG
-	emit1.DebugGUI();
-	emit2.DebugGUI();
-	emit3.DebugGUI();
-	emit4.DebugGUI();
+	//emit1.DebugGUI();
+	//emit2.DebugGUI();
+	//emit3.DebugGUI();
+
 #endif // _DEBUG
 
 
@@ -125,7 +128,7 @@ void TitleScene::Draw() {
 #pragma region 前景スプライト
 
 	dxCommon_->PreSpriteDraw();
-	//paneru->Draw();
+	paneru->Draw();
 	black_->Draw();
 
 #pragma endregion

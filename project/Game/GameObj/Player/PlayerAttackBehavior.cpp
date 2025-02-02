@@ -10,12 +10,6 @@
 // やらなければならないこと
 //
 // もっとエフェクト
-// 敵の攻撃、自機の喰らうモーション
-// 移動制限
-// UI
-// 影
-// 敵を大きくする
-// 音
 // 
 // スラッシュを複数色にする
 // 
@@ -64,6 +58,8 @@ PlayerAttackBehavior::PlayerAttackBehavior(Player* pPlayer) : pPlayer_(pPlayer) 
 		{-0.5f,0.5f,0.5f},
 		{-1.0f,0.5f,0.0f},
 	};
+
+	PlaneDrawer::GetInstance()->Reset();
 
 	pPlayer_->GetSlashModel()->transform.translate.y = 1.4f;
 	pPlayer_->GetSlashModel()->transform.translate.z = 1.0f;
@@ -500,15 +496,15 @@ void PlayerAttackBehavior::Attack() {
 			pPlayer_->GetModel()->transform.translate += move * FPSKeeper::DeltaTime();
 		}
 
+		if (isAttack5_) {
+			pPlayer_->GetAABBAttack()->SetPos({ 0.0f,0.0f,0.0f });
+		}
+
 		break;
 	default:
 		break;
 	}
 
-
-	if (isAttack5_) {
-		pPlayer_->GetAABBAttack()->SetPos({ 0.0f,0.0f,0.0f });
-	}
 
 }
 
@@ -548,12 +544,16 @@ void PlayerAttackBehavior::Direction() {
 			float distance = sub.Length();
 			const float threshold2 = 2.0f;
 
+			pPlayer_->GetModel()->transform.rotate.y = std::atan2(sub.x, sub.z);
+
 			if (distance > threshold2) {
-				pPlayer_->GetModel()->transform.rotate.y = std::atan2(sub.x, sub.z);
 
 				if (attackSpeed_ > distance - threshold2) {
 					attackSpeed_ = distance - threshold2;
 				}
+			}
+			else {
+				attackSpeed_ = 0.0f;
 			}
 		}
 

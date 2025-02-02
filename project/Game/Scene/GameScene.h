@@ -76,4 +76,8 @@ private:
 	float blackTime = 20.0f;
 	bool isChangeFase = false;
 
+	int enemyCount_ = 20;
+	std::unique_ptr<Sprite> numbers1_;
+	std::unique_ptr<Sprite> numbers2_;
+
 };

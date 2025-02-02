@@ -3,9 +3,10 @@
 #include "Input/Input.h"
 #include "Math/MatrixCalculation.h"
 #include "Camera/CameraManager.h"
-
+#include "Model/PlaneDrawer.h"
 
 PlayerJumpBehavior::PlayerJumpBehavior(Player* pPlayer) : pPlayer_(pPlayer) {
+	PlaneDrawer::GetInstance()->Reset();
 
 }
 

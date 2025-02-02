@@ -41,7 +41,39 @@ void PlayerDefaultBehavior::Move() {
 			Matrix4x4 rotateCamera = MakeRotateXYZMatrix(cameraR);
 			velo = TransformNormal(velo, rotateCamera);
 
-			pPlayer_->GetTrans().translate += velo * FPSKeeper::DeltaTime();
+			/*//現在のプレイヤーの座標
+			Vector3 playerPos = pPlayer_->GetTrans().translate;
+			// 移動後の座標を計算
+			Vector3 newPos = playerPos + velo * FPSKeeper::DeltaTime();
+			// 原点からの距離（円の半径方向の長さ）を計算
+			float newPosLength = std::sqrt(newPos.x * newPos.x + newPos.z * newPos.z);
+			// もし円の外に出るなら、velo を調整して境界上を滑るようにする
+			if (newPosLength > mapMaxSize_) {
+				// 法線ベクトル（円の中心方向）
+				Vector3 normal = Vector3(newPos.x, 0.0f, newPos.z).Normalize();
+				// velo の円の中心方向成分を除去（垂直成分のみ残す）
+				float dot = velo.Dot(normal);  // velo の円の中心方向の成分
+				velo -= normal * dot;          // 円の中心方向の動きを打ち消す
+			}
+			
+			pPlayer_->GetTrans().translate = velo * FPSKeeper::DeltaTime();
+			pPlayer_->SetVelocity(velo);*/
+
+
+			// プレイヤーの新しい座標を計算
+			Vector3 newPos = pPlayer_->GetTrans().translate + velo * FPSKeeper::DeltaTime();
+
+			// 新しい座標の長さ（原点からの距離）を計算
+			float newPosLength = newPos.Length();
+
+			// 半径制限を超えていたら、38.5の円の内側に補正
+			if (newPosLength > mapMaxSize_) {
+				Vector3 correctionDir = newPos.Normalize(); // 中心方向の単位ベクトル
+				newPos = correctionDir * mapMaxSize_; // 半径38.5の位置に補正
+			}
+
+
+			pPlayer_->GetTrans().translate = newPos;
 			pPlayer_->SetVelocity(velo);
 
 			float targetRotate = std::atan2(velo.x, velo.z);

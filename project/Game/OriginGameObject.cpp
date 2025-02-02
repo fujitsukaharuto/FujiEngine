@@ -18,7 +18,7 @@ void OriginGameObject::Draw(Material* mate) {
 }
 
 void OriginGameObject::ShdowDraw(Material* mate) {
-	shadow_->transform.translate = { model_->transform.translate.x,0.001f,model_->transform.translate.z };
+	shadow_->transform.translate = { model_->transform.translate.x,0.01f,model_->transform.translate.z };
 	shadow_->Draw(mate);
 }
 
