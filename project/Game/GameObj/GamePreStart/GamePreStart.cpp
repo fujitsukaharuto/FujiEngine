@@ -6,7 +6,7 @@
 
 void GamePreStart::Init() {
 	aimSprite_ = std::make_unique<Sprite>();
-	aimSprite_->Load("GameTexture/Life.png");
+	aimSprite_->Load("GameTexture/KillUFO.png");
 	aimSprite_->SetAnchor({ 0.0f,0.0f });
 
 	blackSprite_ = std::make_unique<Sprite>();
@@ -27,8 +27,8 @@ void GamePreStart::Init() {
 	aimCloseEase_.maxTime = 1.0f;
 	goUpTime_.maxTime = 1.4f;
 
-	aimStartPos_ = 1280.0f;
-	aimEndPos_ = 350.0f;
+	aimStartPos_ = 1200.0f;
+	aimEndPos_ = 100.0f;
 	aimCloseEndPos_ = -1280.0f;
 	aimPosX_ = aimStartPos_;
 
