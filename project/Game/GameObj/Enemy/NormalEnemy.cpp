@@ -147,6 +147,13 @@ void NormalEnemy::SpeedChangeMethod() {
 /// パラシュート展開
 ///--------------------------------------------------------------------------
 void NormalEnemy::ParachuteExpationMethod() {
+
+	if (parachuteExpatioinEase_.time >= parachuteExpatioinEase_.maxTime)return;
+	if (parachuteExpatioinEase_.time == 0.0f) {
+		parachuteSE_ = Audio::GetInstance()->SoundLoadWave("openParachute.wav");
+		Audio::GetInstance()->SoundPlayWave(parachuteSE_, 0.4f);
+	}
+
 	parachuteExpatioinEase_.time += FPSKeeper::DeltaTimeRate();
 
 	parachuteModel_->transform.scale = EaseOutBack(

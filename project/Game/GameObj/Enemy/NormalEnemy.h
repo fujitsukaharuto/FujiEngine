@@ -45,6 +45,7 @@ private:/// 演出
 	ParticleEmitter bombEmit3_;
 
 	SoundData bomb_;
+	SoundData parachuteSE_;
 
 private: /// 行動
 	 std::unordered_map<Type, void (NormalEnemy::*)()> behaviorMap_;

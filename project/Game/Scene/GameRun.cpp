@@ -130,7 +130,7 @@ void GameRun::Initialize() {
 	audio_->LoadWave("missileSize.wav");
 	audio_->LoadWave("missileApe.wav");
 	audio_->LoadWave("sizeup.wav");
-
+	audio_->LoadWave("openParachute.wav");
 #pragma endregion
 
 
