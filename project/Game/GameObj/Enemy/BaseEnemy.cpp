@@ -182,7 +182,7 @@ void BaseEnemy::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 					sumWeakAttackValue_ += paramater_.plusAttackValue;     // 攻撃力アップ
 					powerUpScale_ += paramater_.scaleUpParm_;                 // スケールアップ
 					
-					Audio::GetInstance()->SoundPlayWave(sizeupSE_);
+					Audio::GetInstance()->SoundPlayWave(sizeupSE_,0.3f);
 
 					if (!dynamic_cast<EnemyPowerUp*>(state_.get())) {
 						ChangeState(std::make_unique<EnemyPowerUp>(this));
