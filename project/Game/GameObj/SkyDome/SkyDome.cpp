@@ -12,9 +12,10 @@ void SkyDome::Initialize() {
 	OriginGameObject::Initialize();
 	OriginGameObject::CreateModel("SkyDome.obj");
 
-	model_->transform.scale = { 174,174,174 };
+	model_->transform.scale = { 180,180,160 };
 	model_->SetLightEnable(LightMode::kLightHalfLambert);
 	model_->SetLightIntensity(1.0f);
+	model_->SetUVScale({ 5.0f,3.0f }, { 0.0f,0.0f });
 
 }
 
