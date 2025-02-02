@@ -1,6 +1,7 @@
 #include "SkyDome.h"
 #include<imgui.h>
 #include "assert.h"
+#include"Easing.h"
 
 
 SkyDome::SkyDome() {}
@@ -15,7 +16,10 @@ void SkyDome::Initialize() {
 	uvScale_ = { 3,2 };
 	uvTrans_ = { 0,0.117f };
 
-	model_->transform.translate = { 0,35.0f,0 };
+	yStart_ = 151.0f;
+	yEnd_ = 42.0f;
+
+	model_->transform.translate = { 0,yStart_,0 };
 	model_->transform.scale = { 180,180,215 };
 	model_->SetLightEnable(LightMode::kLightHalfLambert);
 	model_->SetLightIntensity(1.0f);
@@ -44,4 +48,12 @@ void SkyDome::Debug() {
 
 		ImGui::PopID();
 	}
+}
+
+void SkyDome::Apear(const float& time, const float& maxTime) {
+	model_->transform.translate.y = EaseInCubic(
+		yStart_, yEnd_, time, maxTime);
+
+	if (time < maxTime) return;
+	model_->transform.translate.y = yEnd_;
 }

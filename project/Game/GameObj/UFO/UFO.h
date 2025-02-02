@@ -20,6 +20,8 @@ public:
 		Vector3 collisionSize_;
 		Vector3 initLightScale;
 		Vector3 lightScaleUnderPop;
+		Vector3 startPos;
+		Vector3 gamePos;
 		float dagameDistance_;
 		float damageTime_;
 		float hitStopDamage_;
@@ -90,6 +92,9 @@ public:
 	/// ダメージ
 	void DamageRendition();
 	void TakeDamageForPar(const float& par);
+
+	/// 出現
+	void Apear(const float& time, const float& maxTime);
 
 	void OnCollisionEnter(const ColliderInfo& other);
 	void OnCollisionStay(const ColliderInfo& other);

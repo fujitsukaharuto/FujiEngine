@@ -7,6 +7,8 @@ private:
 
 	Vector2 uvScale_;
 	Vector2 uvTrans_;
+	float yStart_;
+	float yEnd_;
 
 public:
 
@@ -21,6 +23,8 @@ public:
 	void Initialize()override;
 	void Update()override;
 	void Draw(Material* mate = nullptr)override;
+
+	void Apear(const float& time, const float& maxTime);
 
 	void Debug();
 };

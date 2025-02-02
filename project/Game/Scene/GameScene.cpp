@@ -36,6 +36,7 @@ void GameScene::Initialize() {
 	timer_ = std::make_unique<Timer>();
 	lifeUI_= std::make_unique<LifeUI>();
 	gameOver_ = std::make_unique<GameOver>();
+	gamePreStart_ = std::make_unique<GamePreStart>();
 	///-------------------------------------------------------------
 	///　初期化
 	///-------------------------------------------------------------- 
@@ -71,6 +72,7 @@ void GameScene::Initialize() {
 	suzunne = std::make_unique<Object3d>();
 	suzunne->Create("suzanne.obj");
 
+	gamePreStart_->Init();
 	timer_->Init();
 	field_->Initialize();
 	skydome_->Initialize();
@@ -86,6 +88,8 @@ void GameScene::Initialize() {
 	gameOver_->Init();
 
 	///set
+	gamePreStart_->SetSkyDome(skydome_.get());
+	gamePreStart_->SetUFO(ufo_.get());
 	lifeUI_->SetPlayer(player_.get());
 	enemyManager_->SetPlayer(player_.get());
 	enemyManager_->SetUFO(ufo_.get());
@@ -97,8 +101,7 @@ void GameScene::Initialize() {
 	fieldBlockManager_->AddFieldBlock();
 
 	timer_->SetTimerZero();
-
-	mode_ = Mode::GAME;
+	mode_ = Mode::PREGAME;
 }
 
 void GameScene::Update() {
@@ -116,6 +119,19 @@ void GameScene::Update() {
 
 		switch (mode_)
 		{
+
+			///-------------------------------------------------------------
+			///　PreGame
+			///-------------------------------------------------------------- 
+		case GameScene::PREGAME:
+			timer_->SetTextureRangeForDigit();
+			gameCamera_->Update();
+			gamePreStart_->Update();
+			lifeUI_->Update();
+			
+			if (!gamePreStart_->GetIsEnd())break;
+			mode_ = Mode::GAME;
+			break;
 			///-------------------------------------------------------------
 			///　Game
 			///-------------------------------------------------------------- 
@@ -233,6 +249,7 @@ void GameScene::Draw() {
 	keyPaneru_->Draw();
 	timer_->Draw();
 	lifeUI_->Draw();
+	gamePreStart_->Draw();
 	if (mode_ == GAMEOVER) {
 		gameOver_->Draw();
 	}

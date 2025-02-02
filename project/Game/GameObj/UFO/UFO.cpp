@@ -50,7 +50,7 @@ void UFO::Initialize() {
 	hpMaxSprite_->SetSize({ 520.0f,36.0f });
 	hpMaxSprite_->SetPos({ 400.0f,50.0f,0.0f });
 
-
+	
 
 	///* グローバルパラメータ
 	globalParameter_ = GlobalVariables::GetInstance();
@@ -58,6 +58,8 @@ void UFO::Initialize() {
 	AddParmGroup();
 	ApplyGlobalParameter();
 
+	// パラメータセット
+	model_->transform.translate = paramater_.startPos;
 	moveRestrectionPos_ = 25.0f;
 	moveDirection = 1.0f;
 	MaxHp_ = 30.0f;
@@ -89,6 +91,7 @@ void UFO::Update() {
 	state_->Update();
 	///
 	collider_->InfoUpdate();
+	
 	
 
 	hpSize_ = hp_ / MaxHp_ * hpMaxSize_;
@@ -168,7 +171,8 @@ void UFO::AdjustParm() {
 		ImGui::PushID(groupName_.c_str());
 		ImGuiManager::GetInstance()->SetFontJapanese();/// 日本語
 	
-		ImGui::DragFloat3("位置", &model_->transform.translate.x, 0.1f);
+		ImGui::DragFloat3("位置", &paramater_.gamePos.x, 0.1f);
+		ImGui::DragFloat3("スタート位置", &paramater_.startPos.x, 0.1f);
 		ImGui::DragFloat3("当たり判定サイズ", &paramater_.collisionSize_.x, 0.1f);
 
 		ImGui::DragFloat("ダメージ中の時間(s)", &paramater_.damageTime_, 0.01f);
@@ -225,7 +229,8 @@ void UFO::ParmLoadForImGui() {
 ///=================================================================================
 void UFO::AddParmGroup() {
 
-	globalParameter_->AddItem(groupName_, "Translate", model_->transform.translate);
+	globalParameter_->AddItem(groupName_, "Translate", paramater_.gamePos);
+	globalParameter_->AddItem(groupName_, "startPos", paramater_.startPos);
 	globalParameter_->AddItem(groupName_, "DamageTime", paramater_.damageTime_);
 	globalParameter_->AddItem(groupName_, "DamageDistance", paramater_.dagameDistance_);
 	globalParameter_->AddItem(groupName_, "collisionSize_", paramater_.collisionSize_);
@@ -240,7 +245,8 @@ void UFO::AddParmGroup() {
 ///=================================================================================
 void UFO::SetValues() {
 	
-	globalParameter_->SetValue(groupName_, "Translate", model_->transform.translate);
+	globalParameter_->SetValue(groupName_, "Translate", paramater_.gamePos);
+	globalParameter_->SetValue(groupName_, "startPos", paramater_.startPos);
 	globalParameter_->SetValue(groupName_, "collisionSize_", paramater_.collisionSize_);
 	globalParameter_->SetValue(groupName_, "DamageTime", paramater_.damageTime_);
 	globalParameter_->SetValue(groupName_, "DamageDistance", paramater_.dagameDistance_);
@@ -254,7 +260,7 @@ void UFO::SetValues() {
 ///  ImGuiからパラメータを得る
 ///===================================================== 
 void UFO::ApplyGlobalParameter() {
-	model_->transform.translate = globalParameter_->GetValue<Vector3>(groupName_, "Translate");
+	paramater_.gamePos = globalParameter_->GetValue<Vector3>(groupName_, "Translate");
 	paramater_.collisionSize_ = globalParameter_->GetValue<Vector3>(groupName_, "collisionSize_");
 	paramater_.damageTime_ = globalParameter_->GetValue<float>(groupName_, "DamageTime");
 	paramater_.dagameDistance_ = globalParameter_->GetValue<float>(groupName_, "DamageDistance");
@@ -262,6 +268,7 @@ void UFO::ApplyGlobalParameter() {
 	paramater_.hitStopTime_ = globalParameter_->GetValue<float>(groupName_, "hitStopTime_");
 	paramater_.initLightScale = globalParameter_->GetValue<Vector3>(groupName_, "rootLightScale");
 	paramater_.lightScaleUnderPop = globalParameter_->GetValue<Vector3>(groupName_, "lightScaleUnderPop");
+	paramater_.startPos = globalParameter_->GetValue<Vector3>(groupName_, "startPos");
 }
 ///=========================================================
 /// Class Set
@@ -335,4 +342,12 @@ void UFO::ChangeState(std::unique_ptr<BaseUFOState>behavior) {
 
 void UFO::ChangePopBehavior() {
 	ChangeState(std::make_unique<UFOMissilePop>(this));
+}
+
+void UFO::Apear(const float&time, const float& maxTime) {
+	model_->transform.translate.y = EaseInCubic(
+		paramater_.startPos.y, paramater_.gamePos.y, time, maxTime);
+
+	if (time < maxTime) return;
+	model_->transform.translate.y = paramater_.gamePos.y;
 }

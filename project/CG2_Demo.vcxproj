@@ -194,6 +194,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\GameObj\Field\Field.cpp" />
     <ClCompile Include="Game\GameObj\GameCamera\GameCamera.cpp" />
     <ClCompile Include="Game\GameObj\GameOverScreen\GameOver.cpp" />
+    <ClCompile Include="Game\GameObj\GamePreStart\GamePreStart.cpp" />
     <ClCompile Include="Game\GameObj\JoyState\JoyState.cpp" />
     <ClCompile Include="Game\GameObj\KikArea\KikArea.cpp" />
     <ClCompile Include="Game\GameObj\KikDirectionView\KikDirectionView.cpp" />
@@ -326,6 +327,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Game\GameObj\Field\Field.h" />
     <ClInclude Include="Game\GameObj\GameCamera\GameCamera.h" />
     <ClInclude Include="Game\GameObj\GameOverScreen\GameOver.h" />
+    <ClInclude Include="Game\GameObj\GamePreStart\GamePreStart.h" />
     <ClInclude Include="Game\GameObj\JoyState\JoyState.h" />
     <ClInclude Include="Game\GameObj\KikArea\KikArea.h" />
     <ClInclude Include="Game\GameObj\KikDirectionView\KikDirectionView.h" />

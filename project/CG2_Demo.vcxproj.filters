@@ -377,6 +377,9 @@
     <ClCompile Include="Game\GameObj\UFO\State\UFOPopWait.cpp">
       <Filter>Game\Behavior\UFO\State</Filter>
     </ClCompile>
+    <ClCompile Include="Game\GameObj\GamePreStart\GamePreStart.cpp">
+      <Filter>Game\GameObj\GamePreStart</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Audio\Audio.h">
@@ -772,6 +775,9 @@
     <ClInclude Include="Game\GameObj\UFO\State\UFOPopWait.h">
       <Filter>Game\Behavior\UFO\State</Filter>
     </ClInclude>
+    <ClInclude Include="Game\GameObj\GamePreStart\GamePreStart.h">
+      <Filter>Game\GameObj\GamePreStart</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -920,6 +926,9 @@
     </Filter>
     <Filter Include="Game\Behavior\Player\AttackBehavior">
       <UniqueIdentifier>{505cfd85-6044-41d4-93d3-2227f4950c72}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameObj\GamePreStart">
+      <UniqueIdentifier>{826c79fe-14c4-4b13-bb35-322664002992}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

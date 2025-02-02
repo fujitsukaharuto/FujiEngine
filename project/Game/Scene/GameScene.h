@@ -15,12 +15,14 @@
 #include"GameObj/Timer/Timer.h"
 #include"GameObj/LifeUI/LifeUI.h"
 #include"GameObj/GameOverScreen/GameOver.h"
+#include"GameObj/GamePreStart/GamePreStart.h"
 
 class GameScene :public BaseScene
 {
 public:
 
 	enum Mode {
+		PREGAME,
 		GAME,
 		GAMEOVER,
 	};
@@ -113,6 +115,7 @@ private:
 	std::unique_ptr<Timer>timer_;
 	std::unique_ptr<LifeUI>lifeUI_;
 	std::unique_ptr<GameOver>gameOver_;
+	std::unique_ptr<GamePreStart>gamePreStart_;
 
 	std::unique_ptr<CollisionManager> cMane_;
 
