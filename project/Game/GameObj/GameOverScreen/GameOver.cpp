@@ -76,6 +76,18 @@ void GameOver::Update() {
 			selectPos_ = gameSelectPos_;
 		}
 
+		XINPUT_STATE pad;
+		if (Input::GetInstance()->GetGamepadState(pad)) {
+			if (Input::GetInstance()->TriggerButton(PadInput::Down) && selectMode_ == SelectMode::GOGAME) {
+				selectMode_ = SelectMode::GOTITLE;
+				selectPos_ = titleSelectPos_;
+			}
+			else if (Input::GetInstance()->TriggerButton(PadInput::Up) && selectMode_ == SelectMode::GOTITLE) {
+				selectMode_ = SelectMode::GOGAME;
+				selectPos_ = gameSelectPos_;
+			}
+		}
+
 		///　決定
 		if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
 
@@ -92,6 +104,22 @@ void GameOver::Update() {
 				break;
 			}
 		}
+		if (Input::GetInstance()->GetGamepadState(pad)) {
+			if (Input::GetInstance()->TriggerButton(PadInput::A)) {
+				//ゲームに戻る
+				if (selectMode_ == SelectMode::GOGAME) {
+					step_ = Step::FADEOUT;
+					break;
+				}
+
+				//タイトルに戻るなら
+				if (selectMode_ == SelectMode::GOTITLE) {
+					step_ = Step::GOTITLE;
+					break;
+				}
+			}
+		}
+
 		break;
 		///---------------------------------------------------------------
 		/// タイトルに戻るフラグを立てる
