@@ -88,6 +88,7 @@ void MissileEnemy::FallMove() {
 		if (sideMoveEaseT_ < paramater_.sideMoveEaseMax)break;
 		model_->transform.translate.y = paramater_.fallPos;
 		sideMoveEaseT_ = paramater_.sideMoveEaseMax;
+		model_->SetColor(Vector4(1, 0, 0, 1));
 		step_ = Step::FALLWAIT;
 		break;
 		///-------------------------------------------------------------
@@ -174,10 +175,12 @@ void MissileEnemy::ScalingEaseing() {
 	if (scalingEase_.time >= scalingEase_.maxTime) {
 		scalingEase_.time = scalingEase_.maxTime;
 		easeDirection_ = -1.0f; // 逆方向に切り替え
+		model_->SetColor(Vector4(1, 1, 1, 1));
 	}
 	else if (scalingEase_.time <= 0.0f) {
 		scalingEase_.time = 0.0f;
 		easeDirection_ = 1.0f; // 進む方向に切り替え
+		model_->SetColor(Vector4(1, 0, 0, 1));
 	}
 
 	model_->transform.scale = EaseInCubic(paramater_.baseScale, paramater_.expansionScale, scalingEase_.time, scalingEase_.maxTime);

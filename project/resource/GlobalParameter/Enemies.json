@@ -16,15 +16,15 @@
             1.0
         ],
         "expansionScale": [
-            2.0,
-            2.0,
-            2.0
+            1.5,
+            1.5,
+            1.5
         ],
         "explotionExtensionTime_1": 1.6399999856948853,
         "explotionExtensionTime_2": 0.0,
         "explotionTime_1": 0.949999988079071,
         "explotionTime_2": 0.0,
-        "fallPos": 38.77000045776367,
+        "fallPos": 35.27000045776367,
         "fallWaitTime_": 6.46999979019165,
         "firstFallEaseMax": 0.7099999785423279,
         "leftX": -37.869998931884766,
