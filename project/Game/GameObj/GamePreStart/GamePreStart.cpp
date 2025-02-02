@@ -9,6 +9,12 @@ void GamePreStart::Init() {
 	aimSprite_->Load("GameTexture/Life.png");
 	aimSprite_->SetAnchor({ 0.0f,0.0f });
 
+	blackSprite_ = std::make_unique<Sprite>();
+	blackSprite_->Load("white2x2.png");
+	blackSprite_->SetColor({ 0.0f,0.0f,0.0f,0.5f });
+	blackSprite_->SetSize({ 1280.0f,950.0f });
+	blackSprite_->SetAnchor({ 0.0f,0.0f });
+
 	// wait
 	waitTime_ = 0.0f;
 	kWaitTime_ = 1.0f;
@@ -19,11 +25,11 @@ void GamePreStart::Init() {
 
 	aimEase_.maxTime = 1.5f;
 	aimCloseEase_.maxTime = 1.0f;
-	goUpTime_.maxTime = 1.0f;
+	goUpTime_.maxTime = 1.4f;
 
-	aimStartPos_ = -1280.0f;
-	aimEndPos_ = 0.0f;
-	aimCloseEndPos_ = 1280.0f;
+	aimStartPos_ = 1280.0f;
+	aimEndPos_ = 350.0f;
+	aimCloseEndPos_ = -1280.0f;
 	aimPosX_ = aimStartPos_;
 
 	aimSprite_->SetPos(Vector3(aimStartPos_, 320.0f, 0));
@@ -56,7 +62,7 @@ void GamePreStart::Update() {
 	case GamePreStart::Step::GOUP:
 		goUpTime_.time += FPSKeeper::NormalDeltaTime();
 		pUFO_->Apear(goUpTime_.time, goUpTime_.maxTime);
-		pSkyDome_->Apear(goUpTime_.time, goUpTime_.maxTime);
+		pSkyDome_->Apear(goUpTime_.time, 1.0f);
 
 		if (goUpTime_.time < goUpTime_.maxTime)break;
 		goUpTime_.time = goUpTime_.maxTime;
@@ -98,12 +104,19 @@ void GamePreStart::Update() {
 		///-----------------------------------------------------------------
 	case GamePreStart::Step::AIMCLOSE:
 		aimCloseEase_.time += FPSKeeper::NormalDeltaTime();
-		aimClosePosX_ = EaseOutCubic(aimEndPos_, aimCloseEndPos_, aimCloseEase_.time, aimCloseEase_.maxTime);
+		aimPosX_ = EaseOutCubic(aimEndPos_, aimCloseEndPos_, aimCloseEase_.time, aimCloseEase_.maxTime);
 
 		if (aimCloseEase_.time < aimEase_.maxTime)break;
 		aimPosX_ = aimCloseEndPos_;
 		aimCloseEase_.time = aimEase_.maxTime;
 		isEnd_ = true;
+		step_ = Step::END;
+		break;
+		///-----------------------------------------------------------------
+		/// 終わり
+		///-----------------------------------------------------------------
+	case GamePreStart::Step::END:
+
 		break;
 	default:
 		break;
@@ -111,9 +124,15 @@ void GamePreStart::Update() {
 }
 
 void GamePreStart::Draw() {
-	
 	aimSprite_->Draw();
+}
 
+void  GamePreStart::BlockSpriteDraw() {
+	if (step_ == Step::AIMOPEN ||
+		step_ == Step::CLOSEWAIT ||
+		step_ == Step::AIMCLOSE) {
+		blackSprite_->Draw();
+	}
 }
 
 void GamePreStart::Debug() {

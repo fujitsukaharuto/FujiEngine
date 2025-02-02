@@ -14,6 +14,7 @@ public:
 		AIMOPEN,
 		CLOSEWAIT,
 		AIMCLOSE,
+		END,
 	};
 
 private:
@@ -44,11 +45,13 @@ private://aimclose
 	float aimClosePosX_;
 	Easing aimCloseEase_;
 
+	std::unique_ptr<Sprite> blackSprite_;
 	bool isEnd_;
 public:
 	void Init();
 	void Update();
 	void Draw();
+	void BlockSpriteDraw();
 	void Debug();
 	void OffsetMove();
 	
