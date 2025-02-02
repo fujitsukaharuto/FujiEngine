@@ -5,7 +5,8 @@
 class SkyDome :public OriginGameObject {
 private:
 
-
+	Vector2 uvScale_;
+	Vector2 uvTrans_;
 
 public:
 
