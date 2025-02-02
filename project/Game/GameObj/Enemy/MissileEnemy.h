@@ -51,6 +51,7 @@ private:
 
 	SoundData luncherSE_;
 	SoundData bombSE_;
+	SoundData sizeSE_;
 private:/// イージングタイム
 	float firstFallEaseT_;
 	float sideMoveEaseT_;

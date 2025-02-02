@@ -19,6 +19,8 @@ void MissileEnemy::Initialize() {
 
 	bombSE_ = Audio::GetInstance()->SoundLoadWave("MissileBomb.wav");
 	luncherSE_ = Audio::GetInstance()->SoundLoadWave("MissileLauncher.wav");
+	sizeSE_ = Audio::GetInstance()->SoundLoadWave("missileSize.wav");
+
 
 	scalingEase_.maxTime = paramater_.scalingEaseMax;
 	model_->transform.scale = paramater_.baseScale;
@@ -176,7 +178,7 @@ void MissileEnemy::ScalingEaseing() {
 	if (scalingEase_.time >= scalingEase_.maxTime) {
 		scalingEase_.time = scalingEase_.maxTime;
 		easeDirection_ = -1.0f; // 逆方向に切り替え
-	
+		Audio::GetInstance()->SoundPlayWave(sizeSE_);
 	}
 	else if (scalingEase_.time <= 0.0f) {
 		scalingEase_.time = 0.0f;

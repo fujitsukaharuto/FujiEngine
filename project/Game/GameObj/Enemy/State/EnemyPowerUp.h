@@ -2,6 +2,7 @@
 
 #include"BaseEnemyState.h"
 #include"Easing.h"
+#include "Audio/Audio.h"
 
 class EnemyPowerUp : public BaseEnemyState {
 private:
@@ -18,6 +19,8 @@ private:
 
 	float stopTime_;
 	float stopTimeMax_;
+
+	SoundData sizeupSE_;
 
 public:
 	//コンストラクタ

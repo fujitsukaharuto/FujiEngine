@@ -127,6 +127,9 @@ void GameRun::Initialize() {
 	audio_->LoadWave("hit_wdn_pillar3.wav");
 	audio_->LoadWave("MissileBomb.wav");
 	audio_->LoadWave("MissileLauncher.wav");
+	audio_->LoadWave("missileSize.wav");
+	audio_->LoadWave("missileApe.wav");
+	audio_->LoadWave("sizeup.wav");
 
 #pragma endregion
 

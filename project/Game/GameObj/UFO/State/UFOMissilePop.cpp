@@ -38,6 +38,9 @@ UFOMissilePop::UFOMissilePop(UFO* player)
 
 	step_ = Step::LIGHTUP;
 	
+	firstSE_ = Audio::GetInstance()->SoundLoadWave("missileApe.wav");
+
+
 }
 
 UFOMissilePop ::~UFOMissilePop() {
@@ -63,6 +66,8 @@ void UFOMissilePop::Update() {
 		/// 次のステップ
 		if (lightUpEasing_.time < lightUpEasing_.maxTime)break;
 		lightUpEasing_.time = lightUpEasing_.maxTime;
+		Audio::GetInstance()->SoundPlayWave(firstSE_, 0.08f);
+
 		step_ = Step::LIGHTCLOSE;
 		break;
 

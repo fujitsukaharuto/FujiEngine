@@ -2,6 +2,7 @@
 
 #include"BaseUFOState.h"
 #include"math/Easing.h"
+#include "Audio/Audio.h"
 
 class UFOMissilePop : public BaseUFOState {
 private:
@@ -21,6 +22,9 @@ private:
 	Vector3 scaleUnderPop_;
 	Easing lightUpEasing_;
 	Easing lightCloseEasing_;
+
+	SoundData firstSE_;
+
 	/// ===================================================
 	///private varians
 	/// ===================================================
