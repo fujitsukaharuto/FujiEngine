@@ -14,6 +14,7 @@ public:
 	void Update();
 	void Draw();
 
+	void Move(int x, int y);
 
 private:
 
