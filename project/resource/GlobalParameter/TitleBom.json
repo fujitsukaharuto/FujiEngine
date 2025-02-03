@@ -1,0 +1,16 @@
+{
+    "TitleBom": {
+        "baseposX_": 550.0,
+        "expationScaleX_": 1.190000057220459,
+        "expationScale_": 1.399999976158142,
+        "fallEaseMaxTime": 0.6399999856948853,
+        "fallEndPosY_": 437.2099914550781,
+        "fallStartPosY_": -551.1799926757813,
+        "initScale_": 1.0,
+        "kWaitTime_": 0.5,
+        "maxTime": 0.3100000023841858,
+        "reverseMaxTime": 0.3100000023841858,
+        "shrinkEaseMaxTime": 0.05999999865889549,
+        "shrinkScale_": 0.6000000238418579
+    }
+}

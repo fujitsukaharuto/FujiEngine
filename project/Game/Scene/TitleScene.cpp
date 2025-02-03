@@ -48,15 +48,21 @@ void TitleScene::Initialize() {
 	test2_->Initialize();
 	test2_->name_ = "testObj2";
 
-	cMane_ = std::make_unique<CollisionManager>();
+	titleAnimation_ = std::make_unique<TitleAnimationManager>();
+	titleAnimation_->Init();
 
-	/*ParticleManager::Load(emit1, "lifeUIBreak1");*/
-	/*ParticleManager::Load(emit2, "lifeUIBreak2");*/
+	cMane_ = std::make_unique<CollisionManager>();
+	
+	//titleAnimation_->SetOnAnimationCompleteCallback([]() {});
+	//titleAnimation_->StartAnimation(); // アニメーションの開始
 
 }
 
 void TitleScene::Update() {
-
+#ifdef _DEBUG
+	titleAnimation_->AdjustParamater();
+#endif // _DEBUG
+	titleAnimation_->Update();
 	cMane_->Reset();
 
 #ifdef _DEBUG
@@ -78,22 +84,12 @@ void TitleScene::Update() {
 	test2_->Debug();
 
 #endif // _DEBUG
-
-
 	dxCommon_->UpDate();
 
 	BlackFade();
 
 	test_->Update();
 	test2_->Update();
-
-
-	//if (input_->TriggerKey(DIK_5)) {
-	//	emit1.Burst();
-	//	/*emit2.Burst();*/
-	//}
-	/*emit1.Emit();*/
-	/*emit2.Emit();*/
 
 	sphere->transform.rotate.y += 0.02f;
 
@@ -115,8 +111,8 @@ void TitleScene::Draw() {
 
 #pragma region 3Dオブジェクト
 	obj3dCommon->PreDraw();
-	sphere->Draw();
-	test_->Draw();
+	/*sphere->Draw();
+	test_->Draw();*/
 
 	ParticleManager::GetInstance()->Draw();
 
@@ -132,8 +128,8 @@ void TitleScene::Draw() {
 #pragma region 前景スプライト
 
 	dxCommon_->PreSpriteDraw();
-
-	titlePaneru_->Draw();
+	titleAnimation_->Draw();
+	/*titlePaneru_->Draw();*/
 	if (blackTime != 0.0f) {
 		black_->Draw();
 	}

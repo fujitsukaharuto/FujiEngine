@@ -1,0 +1,101 @@
+#include "TitleAnimationManager.h"
+#include "TitleBom.h"
+#include "TItleBottom.h"
+#include"Input/Input.h"
+#include <iostream>
+
+TitleAnimationManager::TitleAnimationManager()
+{
+
+}
+///--------------------------------------------------------------------------
+/// 初期化
+///--------------------------------------------------------------------------
+void TitleAnimationManager::Init() 
+{
+    titleBom_ = std::make_unique<TitleBom>();
+    titleBottom_ = std::make_unique<TitleBottom>();
+
+    Reset();
+}
+
+
+///--------------------------------------------------------------------------
+/// 更新
+///--------------------------------------------------------------------------
+void TitleAnimationManager::Update()
+{
+    // ステップごとに更新
+    (this->*spFuncTable_[static_cast<size_t>(step_)])();
+}
+
+///--------------------------------------------------------------------------
+/// 描画
+///--------------------------------------------------------------------------
+void TitleAnimationManager::Draw() 
+{
+    titleBom_->Draw();
+    titleBottom_->Draw();
+}
+
+///-------------------------------------------------------------------------
+///  調節
+///-------------------------------------------------------------------------
+void TitleAnimationManager::AdjustParamater() 
+{
+    titleBom_->AdjustParm();
+    titleBottom_->AdjustParm();
+
+    if (Input::GetInstance()->TriggerKey(DIK_R)) {
+        Reset();
+    }
+}
+
+///-------------------------------------------------------------------------
+///  ボムアニメーション
+///-------------------------------------------------------------------------
+void TitleAnimationManager::BomAnimation() 
+{
+    titleBom_->Update();
+    if (!titleBom_->IsAnimationFinished())return;
+    step_ = Step::BOTTOM;
+}
+
+///-------------------------------------------------------------------------
+///  ボタンアニメーション
+///-------------------------------------------------------------------------
+void TitleAnimationManager::BottomAnimation() 
+{
+    titleBottom_->Update();
+    if (!titleBottom_->IsAnimationFinished())return;
+    step_ = Step::ALL;
+}
+///-------------------------------------------------------------------------
+/// 全てアニメーション
+///-------------------------------------------------------------------------
+void TitleAnimationManager::AllAnimation() 
+{
+  
+}
+
+///-------------------------------------------------------------------------
+///  ポインタテーブル
+///-------------------------------------------------------------------------
+void (TitleAnimationManager::* TitleAnimationManager::spFuncTable_[])()
+{
+    &TitleAnimationManager::BomAnimation,
+    &TitleAnimationManager::BottomAnimation,
+    &TitleAnimationManager::AllAnimation,
+
+};
+
+///-------------------------------------------------------------------------
+///  リセット
+///-------------------------------------------------------------------------
+void TitleAnimationManager::Reset()
+{
+    titleBom_->Init();
+    titleBottom_->Init();
+
+    step_ = Step::BOM;
+}

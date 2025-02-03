@@ -380,6 +380,18 @@
     <ClCompile Include="Game\GameObj\GamePreStart\GamePreStart.cpp">
       <Filter>Game\GameObj\GamePreStart</Filter>
     </ClCompile>
+    <ClCompile Include="Game\Titleobj\BaseTitleSprite.cpp">
+      <Filter>Game\TitleObj</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Titleobj\TitleBom.cpp">
+      <Filter>Game\TitleObj</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Titleobj\TitleBottom.cpp">
+      <Filter>Game\TitleObj</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Titleobj\TitleAnimationManager.cpp">
+      <Filter>Game\TitleObj</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Audio\Audio.h">
@@ -778,6 +790,18 @@
     <ClInclude Include="Game\GameObj\GamePreStart\GamePreStart.h">
       <Filter>Game\GameObj\GamePreStart</Filter>
     </ClInclude>
+    <ClInclude Include="Game\Titleobj\BaseTitleSprite.h">
+      <Filter>Game\TitleObj</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Titleobj\TitleBom.h">
+      <Filter>Game\TitleObj</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Titleobj\TItleBottom.h">
+      <Filter>Game\TitleObj</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Titleobj\TitleAnimationManager.h">
+      <Filter>Game\TitleObj</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -929,6 +953,9 @@
     </Filter>
     <Filter Include="Game\GameObj\GamePreStart">
       <UniqueIdentifier>{826c79fe-14c4-4b13-bb35-322664002992}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\TitleObj">
+      <UniqueIdentifier>{3a90a5da-77de-4bfa-8881-30756e1f56f8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

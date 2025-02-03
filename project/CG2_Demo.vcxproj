@@ -234,6 +234,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\Scene\ResultScene.cpp" />
     <ClCompile Include="Game\Scene\SceneFactory.cpp" />
     <ClCompile Include="Game\Scene\TitleScene.cpp" />
+    <ClCompile Include="Game\Titleobj\BaseTitleSprite.cpp" />
+    <ClCompile Include="Game\Titleobj\TitleBom.cpp" />
+    <ClCompile Include="Game\Titleobj\TitleBottom.cpp" />
+    <ClCompile Include="Game\Titleobj\TitleAnimationManager.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -369,6 +373,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Game\Scene\SceneFactory.h" />
     <ClInclude Include="Game\Scene\TitleScene.h" />
     <ClInclude Include="Game\TestBaseObj.h" />
+    <ClInclude Include="Game\Titleobj\BaseTitleSprite.h" />
+    <ClInclude Include="Game\Titleobj\TitleBom.h" />
+    <ClInclude Include="Game\Titleobj\TItleBottom.h" />
+    <ClInclude Include="Game\Titleobj\TitleAnimationManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">

@@ -2,6 +2,7 @@
 #include "Scene/BaseScene.h"
 #include "Game/TestBaseObj.h"
 #include "Game/Collider/CollisionManager.h"
+#include"Titleobj/TitleAnimationManager.h"
 
 class TitleScene:public BaseScene {
 public:
@@ -28,9 +29,10 @@ private:
 	std::unique_ptr<TestBaseObj> test_;
 	std::unique_ptr<TestBaseObj> test2_;
 	std::unique_ptr<CollisionManager> cMane_;
-
+	std::unique_ptr<TitleAnimationManager>titleAnimation_;
 
 	std::unique_ptr<Sprite> titlePaneru_;
+
 	// sceneChange
 	std::unique_ptr<Sprite> black_;
 	float blackLimmite = 20.0f;
