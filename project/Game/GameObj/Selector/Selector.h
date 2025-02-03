@@ -1,19 +1,32 @@
 #pragma once
+#include "Game/OriginGameObject.h"
 #include "Game/GameObj/Unit/Unit.h"
 
-class Selector {
+enum SelectMode {
+	SELECTOR,
+	UNIT,
+};
+
+class Selector : public OriginGameObject {
 public:
 	Selector();
-	~Selector();
+	~Selector()override;
 
 public:
 
-	void Init();
-	void Update();
-	void Draw();
+	void Initialize()override;
+	void Update()override;
+	void Draw(Material* mate = nullptr)override;
 
 	void Move(int x, int y);
 	void SelectUnit();
+	void UnSelectUnit();
+
+	int GetSelectMode() { return selectMode_; }
+	Unit* GetSelectedUnitAddress() { return selectedUnit_; }
+
+	int GetPosX() { return int(model_->transform.translate.x); }
+	int GetPosY() { return int(model_->transform.translate.y); }
 
 private:
 

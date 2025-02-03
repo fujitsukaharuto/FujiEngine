@@ -13,11 +13,7 @@
 TitleScene::TitleScene() {}
 
 TitleScene::~TitleScene() {
-	delete inputHandler_;
-	if (iCommand_) {
-		delete iCommand_;
-	}
-	delete player_;
+	
 }
 
 void TitleScene::Initialize() {
@@ -26,14 +22,9 @@ void TitleScene::Initialize() {
 	obj3dCommon.reset(new Object3dCommon());
 	obj3dCommon->Initialize();
 
-
-	inputHandler_ = new InputHandler();
-
-	inputHandler_->AssignMoveRightCommand2PressKeyD();
-	inputHandler_->AssignMoveLeftCommand2PressKeyA();
-
-	player_ = new Player();
-	player_->Initialize();
+	inputHandler_ = new StageSceneInputHandler();
+	selector_ = new Selector();
+	selector_->Initialize();
 
 }
 
@@ -47,13 +38,27 @@ void TitleScene::Update() {
 #endif // _DEBUG
 
 
-	iCommand_ = inputHandler_->HandleInput();
-
-	if (iCommand_) {
-		iCommand_->Exec(*player_);
+	if (selector_->GetSelectMode() == SelectMode::SELECTOR) {
+		this->command_ = inputHandler_->selectorHandleInput(this->selector_);
+	} else if (selector_->GetSelectMode() == SelectMode::UNIT) {
+		this->command_ = inputHandler_->UnitHandleInput(selector_->GetSelectedUnitAddress());
 	}
 
-	player_->Update();
+	if (this->command_) {
+		this->command_->Exec();
+		if (commandHistory_.empty()) {
+			commandHistory_.push_back(this->command_);
+			commandHistoryItr_ = commandHistory_.end();
+		} else if (commandHistoryItr_ == commandHistory_.end()) {
+			commandHistory_.push_back(this->command_);
+			commandHistoryItr_ = commandHistory_.end();
+		} else {
+			*commandHistoryItr_ = this->command_;
+			commandHistoryItr_++;
+		}
+	}
+
+	selector_->Update();
 
 	ParticleManager::GetInstance()->Update();
 }
@@ -70,7 +75,7 @@ void TitleScene::Draw() {
 #pragma region 3Dオブジェクト
 	obj3dCommon->PreDraw();
 
-	player_->Draw();
+	selector_->Draw();
 
 	ParticleManager::GetInstance()->Draw();
 

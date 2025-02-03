@@ -2,8 +2,10 @@
 #include "Scene/BaseScene.h"
 #include "Game/TestBaseObj.h"
 #include "Game/Collider/CollisionManager.h"
-#include "Game/GameObj/Command.h"
-#include "Game/GameObj/InputHandler.h"
+#include "Game/GameObj/StageCommand.h"
+#include "Game/GameObj/StageSceneInputHandler.h"
+#include "Game/GameObj/Selector/Selector.h"
+#include "Game/GameObj/Unit/Unit.h"
 #include "Game/GameObj/Player/Player.h"
 
 
@@ -23,8 +25,13 @@ private:
 	void ApplyGlobalVariables();//値読み込みテスト用今度Objectクラス作って継承で使えるようにする
 
 	std::unique_ptr<Object3dCommon> obj3dCommon = nullptr;
-	InputHandler* inputHandler_ = nullptr;
-	ICommand* iCommand_ = nullptr;
-	Player* player_;
+
+	StageSceneInputHandler* inputHandler_ = nullptr;
+	IStageCommand* command_ = nullptr;
+
+	std::list<IStageCommand*> commandHistory_;
+	std::list<IStageCommand*>::iterator commandHistoryItr_;
+
+	Selector* selector_;
 
 };

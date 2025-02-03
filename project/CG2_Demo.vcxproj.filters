@@ -188,6 +188,18 @@
     <ClCompile Include="Game\GameObj\player\Player.cpp">
       <Filter>Game\GameObj\Player</Filter>
     </ClCompile>
+    <ClCompile Include="Game\GameObj\Selector\Selector.cpp">
+      <Filter>Game\GameObj\Selector</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameObj\Unit\Unit.cpp">
+      <Filter>Game\GameObj\Unit</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameObj\StageSceneInputHandler.cpp">
+      <Filter>Game\GameObj</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameObj\StageCommand.cpp">
+      <Filter>Game\GameObj</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -399,6 +411,12 @@
     </ClInclude>
     <ClInclude Include="Game\GameObj\Unit\Unit.h">
       <Filter>Game\GameObj\Unit</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\StageCommand.h">
+      <Filter>Game\GameObj</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\StageSceneInputHandler.h">
+      <Filter>Game\GameObj</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
