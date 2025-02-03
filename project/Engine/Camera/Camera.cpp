@@ -11,7 +11,7 @@ Camera::Camera() :transform({ { 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, { 0.0f,3.5
 ,nearClip_(0.1f),farClip_(100.0f),worldMatrix_(MakeAffineMatrix(transform.scale,transform.rotate,transform.translate))
 ,viewMatrix_(Inverse(worldMatrix_))
 ,projectionMatrix_(MakePerspectiveFovMatrix(fovY_,aspect_,nearClip_,farClip_))
-,viewProjectionMatrix_(Multiply(viewMatrix_,projectionMatrix_))
+,viewProjectionMatrix_(Multiply(viewMatrix_,projectionMatrix_)),shakeMode_(ShakeMode::RandomShake)
 ,shakeTime_(0.0f),shakeStrength_(0.1f)
 {}
 
@@ -32,10 +32,25 @@ void Camera::Update() {
 	shakeGap_ = { 0.0f,0.0f,0.0f };
 	
 	if (shakeTime_ > 0.0f) {
-		shakeGap_ = Random::GetVector3({ -0.5f,0.5f }, { -0.5f,0.5f }, { -0.5f,0.5f });
-		shakeGap_.z = 0.0f;
-		shakeGap_ = shakeGap_ * shakeStrength_;
+		float gap;
+		switch (shakeMode_) {
+		case Camera::RandomShake:
+			shakeGap_ = Random::GetVector3({ -0.5f,0.5f }, { -0.5f,0.5f }, { -0.5f,0.5f });
+			shakeGap_.z = 0.0f;
+			shakeGap_ = shakeGap_ * shakeStrength_;
+			break;
+		case Camera::RollingShake:
+			gap = std::sin(rollingTime_);
+			shakeGap_.x = gap * shakeStrength_;
+			rollingTime_ -= FPSKeeper::DeltaTime();
+			break;
+		default:
+			break;
+		}
 		shakeTime_ -= FPSKeeper::DeltaTime();
+	}
+	else {
+		rollingTime_ = 0.0f;
 	}
 
 	worldMatrix_ = MakeAffineMatrix(transform.scale, transform.rotate, (transform.translate + shakeGap_));
