@@ -20,6 +20,11 @@ private:
    
     std::unique_ptr<TitleBom>titleBom_;
     std::unique_ptr<TitleBottom>titleBottom_;
+    std::array<std::unique_ptr<Sprite>,2>backSprite_;
+
+    const float kTeexHeigth = 950.0f;
+    float scroolTime_;
+    float scrollSpeed_;
 
     TitleAnimationManager* phaseFunc_;
     Step step_;
@@ -35,6 +40,7 @@ public:
     void Init();
     void Update();
     void Draw();
+    void BackDraw();
     void AdjustParamater();
     void Reset();
 private:

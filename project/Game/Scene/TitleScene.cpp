@@ -103,9 +103,8 @@ void TitleScene::Update() {
 void TitleScene::Draw() {
 
 #pragma region 背景描画
-
-
 	dxCommon_->ClearDepthBuffer();
+
 #pragma endregion
 
 
@@ -128,6 +127,7 @@ void TitleScene::Draw() {
 #pragma region 前景スプライト
 
 	dxCommon_->PreSpriteDraw();
+	titleAnimation_->BackDraw();
 	titleAnimation_->Draw();
 	/*titlePaneru_->Draw();*/
 	if (blackTime != 0.0f) {
