@@ -70,19 +70,27 @@ void GameOver::Update() {
 		if (Input::GetInstance()->TriggerKey(DIK_S) && selectMode_ == SelectMode::GOGAME) {
 			selectMode_ = SelectMode::GOTITLE;
 			selectPos_ = titleSelectPos_;
-		}
-		else if (Input::GetInstance()->TriggerKey(DIK_W) && selectMode_ == SelectMode::GOTITLE) {
+		} else if (Input::GetInstance()->TriggerKey(DIK_W) && selectMode_ == SelectMode::GOTITLE) {
 			selectMode_ = SelectMode::GOGAME;
 			selectPos_ = gameSelectPos_;
 		}
 
 		XINPUT_STATE pad;
 		if (Input::GetInstance()->GetGamepadState(pad)) {
-			if (Input::GetInstance()->TriggerButton(PadInput::Down) && selectMode_ == SelectMode::GOGAME) {
+			bool ismoving = false;
+			const float thresholdValue = 0.8f;
+			Vector2 stickVelocity;
+			stickVelocity = { 0.0f,Input::GetInstance()->GetLStick().y / SHRT_MAX };
+			if (stickVelocity.Length() > thresholdValue) {
+				ismoving = true;
+			}
+
+			if ((Input::GetInstance()->TriggerButton(PadInput::Down) || (ismoving && stickVelocity.y < 0.0f))
+				&& selectMode_ == SelectMode::GOGAME) {
 				selectMode_ = SelectMode::GOTITLE;
 				selectPos_ = titleSelectPos_;
-			}
-			else if (Input::GetInstance()->TriggerButton(PadInput::Up) && selectMode_ == SelectMode::GOTITLE) {
+			} else if ((Input::GetInstance()->TriggerButton(PadInput::Up) || (ismoving && stickVelocity.y > 0.0f))
+				&& selectMode_ == SelectMode::GOTITLE) {
 				selectMode_ = SelectMode::GOGAME;
 				selectPos_ = gameSelectPos_;
 			}
@@ -169,8 +177,7 @@ void GameOver::OffsetMove() {
 	if (offsetEasing_.time >= offsetEasing_.maxTime) {
 		offsetEasing_.time = offsetEasing_.maxTime;
 		easeDirection_ = -1.0f; // 逆方向に切り替え
-	}
-	else if (offsetEasing_.time <= 0.0f) {
+	} else if (offsetEasing_.time <= 0.0f) {
 		offsetEasing_.time = 0.0f;
 		easeDirection_ = 1.0f; // 進む方向に切り替え
 	}
