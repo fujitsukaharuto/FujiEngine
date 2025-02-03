@@ -26,6 +26,8 @@ public:
       float expationScaleX_;
       float shrinkScale_;
       float baseposX_;
+      float scalingEaseTMax;
+      float expatingScale;
     };
 private:
      ///-------------------------------------------------------------------------
@@ -54,6 +56,7 @@ private:
     float kTextureWidth_;
     float kTextureHeigth_;
 
+ 
 
 public:
     TitleBom();
@@ -66,7 +69,9 @@ public:
     void Update() override;
     void Draw() override;
     bool IsAnimationFinished() override;
- 
+    void AdaptState()override;
+    void ExPationing()override;
+    void Reset();
 
   ///-------------------------------------------------------------------------------------
 ///Editor

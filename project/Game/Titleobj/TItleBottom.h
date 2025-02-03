@@ -11,21 +11,32 @@ public:
         REVERSE,
         WAIT,
     };
+
     struct Paramater {
+        Vector3 bottomAPos_;
+        Vector3 controllaPos_;
         float reverseMaxTime;
         float expationMaxTime;
         float initScale_;
         float expationScale_;
         float kWaitTime;
+        float bottomAWidth;
+        float bottomAHeigth;
+        float controllaWidth;
+        float controllaHeigth;
+        float scalingEaseTMax;
+        float expatingScale;
     };
+
 private:
     ///-------------------------------------------------------------------------
     ///  private variants
     ///-------------------------------------------------------------------------
     TitleBottom* phaseFunc_;
     Step step_;
+    std::unique_ptr<Sprite>controllaSprite_;
     
-
+    /// パラメータ
     Paramater paramater_;
 
     ///変数
@@ -39,10 +50,7 @@ private:
  
     //pos,scale,size
     float scalerScale_;
-    float kTextureWidth_;
-    float kTextureHeigth_;
-
-
+  
 public:
     TitleBottom();
     ~TitleBottom() override = default;
@@ -54,7 +62,9 @@ public:
     void Update() override;
     void Draw() override;
     bool IsAnimationFinished() override;
-    
+    void ExPationing()override;
+    void AdaptState()override;
+    void Reset();    
     ///-------------------------------------------------------------------------------------
   ///Editor
   ///-------------------------------------------------------------------------------------

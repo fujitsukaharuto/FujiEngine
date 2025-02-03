@@ -12,6 +12,8 @@ protected:
    ///-------------------------------------------------------------------------
     std::unique_ptr<Sprite>sprite_;
     bool isFinished_;
+    float scalingEaseTime_;
+    float easeDirection_;
 public:
     ///-------------------------------------------------------------------------
     /// public method
@@ -22,5 +24,7 @@ public:
     virtual void Draw() = 0;
     virtual bool IsAnimationFinished() = 0;
     virtual void AdjustParm()=0;
+    virtual void ExPationing() = 0;
+    virtual void AdaptState() = 0;
 
 };

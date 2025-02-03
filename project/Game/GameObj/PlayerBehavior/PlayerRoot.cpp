@@ -74,9 +74,6 @@ void PlayerRoot::Update() {
 		break;
 	}
 	
-	
-
-	
 }
 
 void PlayerRoot::JumpForJoyState() {

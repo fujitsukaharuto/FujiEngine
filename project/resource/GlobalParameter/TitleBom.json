@@ -1,6 +1,7 @@
 {
     "TitleBom": {
         "baseposX_": 550.0,
+        "expatingScale": 0.11999999731779099,
         "expationScaleX_": 1.190000057220459,
         "expationScale_": 1.399999976158142,
         "fallEaseMaxTime": 0.6399999856948853,
@@ -10,6 +11,7 @@
         "kWaitTime_": 0.5,
         "maxTime": 0.3100000023841858,
         "reverseMaxTime": 0.3100000023841858,
+        "scalingEaseTMax": 0.4399999976158142,
         "shrinkEaseMaxTime": 0.05999999865889549,
         "shrinkScale_": 0.6000000238418579
     }

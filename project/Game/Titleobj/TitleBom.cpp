@@ -20,36 +20,30 @@ void TitleBom::Init()
     AddParmGroup();
     ApplyGlobalParameter();
 
-    kTextureWidth_ = 900.0f;
-    kTextureHeigth_ = 700.0f;
-    // pos
-    positionY_ = paramater_.fallStartPosY_;
-    //scale
-    scale_={ paramater_.initScale_,paramater_.initScale_ };
-
-    fallEaseTime_ = 0.0f;
-    expationEaseTime_ = 0.0f;
-    shrinkEaseTime_ = 0.0f;
-    reverseEaseTime_ = 0.0f;
-    waitTime_ = 0.0f;
-    isFinished_ = false;
-    step_ = Step::FALL;
+    /// リセット
+    Reset();
   
 };
 
 void TitleBom::Update()
 {
+
+   
     // 終わってたら更新しない
     if (isFinished_) return;
 
     /// 関数ポインタ呼び出し
     (this->*spFuncTable_[static_cast<size_t>(step_)])();
 
+    AdaptState();
+};
+
+void TitleBom::AdaptState() {
     // サイズ、位置適応
     sprite_->SetPos(Vector3(paramater_.baseposX_, positionY_, 0));
-    sprite_->SetSize(Vector2(kTextureWidth_* scale_.x, kTextureHeigth_ * scale_.y));
+    sprite_->SetSize(Vector2(kTextureWidth_ * scale_.x, kTextureHeigth_ * scale_.y));
 
-};
+}
 
 void TitleBom::Draw()
 {
@@ -126,7 +120,7 @@ void  TitleBom::Reverse()
     reverseEaseTime_ = 0.0f;
 }
 ///-------------------------------------------------------------------
-///
+///　待機
 ///-------------------------------------------------------------------
 void  TitleBom::Wait()
 {
@@ -138,6 +132,31 @@ void  TitleBom::Wait()
     isFinished_ = true;
 }
 
+///-------------------------------------------------------------------
+///　拡大
+///-------------------------------------------------------------------
+void TitleBom::ExPationing()
+{
+    // イージングタイムを更新
+    scalingEaseTime_ += FPSKeeper::NormalDeltaTime() * easeDirection_; // 方向に応じて時間を増減
+
+    // タイムが1を超えたら逆方向に、0未満になったら進む方向に変更
+    if (scalingEaseTime_ >= paramater_.scalingEaseTMax) {
+        scalingEaseTime_ = paramater_.scalingEaseTMax;
+        easeDirection_ = -1.0f; // 逆方向に切り替え
+
+    }
+    else if (scalingEaseTime_ <= 0.0f) {
+        scalingEaseTime_ = 0.0f;
+        easeDirection_ = 1.0f; // 進む方向に切り替え
+
+    }
+  
+    scale_.y = EaseInCubic(paramater_.initScale_, paramater_.expatingScale, scalingEaseTime_, paramater_.scalingEaseTMax);
+    scale_.x = EaseInCubic(paramater_.initScale_, paramater_.expatingScale, scalingEaseTime_, paramater_.scalingEaseTMax);
+ 
+}
+
 bool TitleBom::IsAnimationFinished()
 {
     return isFinished_;
@@ -146,7 +165,7 @@ bool TitleBom::IsAnimationFinished()
 
 void (TitleBom::* TitleBom::spFuncTable_[])()
 {
-    &TitleBom::Fall,
+        &TitleBom::Fall,
         & TitleBom::Shrink,
         & TitleBom::Expation,
         & TitleBom::Reverse,
@@ -187,6 +206,8 @@ void TitleBom::AddParmGroup() {
     globalParameter_->AddItem(groupName_, "shrinkScale_", paramater_.shrinkScale_);
     globalParameter_->AddItem(groupName_, "baseposX_", paramater_.baseposX_);
     globalParameter_->AddItem(groupName_, "expationScaleX_", paramater_.expationScaleX_);
+    globalParameter_->AddItem(groupName_, "scalingEaseTMax", paramater_.scalingEaseTMax);
+    globalParameter_->AddItem(groupName_, "expatingScale", paramater_.expatingScale);
 }
 
 
@@ -207,6 +228,8 @@ void TitleBom::SetValues() {
     globalParameter_->SetValue(groupName_, "shrinkScale_", paramater_.shrinkScale_);
     globalParameter_->SetValue(groupName_, "baseposX_", paramater_.baseposX_);
     globalParameter_->SetValue(groupName_, "expationScaleX_", paramater_.expationScaleX_);
+    globalParameter_->SetValue(groupName_, "scalingEaseTMax", paramater_.scalingEaseTMax);
+    globalParameter_->SetValue(groupName_, "expatingScale", paramater_.expatingScale);
 }
 
 
@@ -227,6 +250,8 @@ void TitleBom::ApplyGlobalParameter() {
     paramater_.shrinkScale_ = globalParameter_->GetValue<float>(groupName_, "shrinkScale_");
     paramater_.baseposX_ = globalParameter_->GetValue<float>(groupName_, "baseposX_");
     paramater_.expationScaleX_ = globalParameter_->GetValue<float>(groupName_, "expationScaleX_");
+    paramater_.scalingEaseTMax = globalParameter_->GetValue<float>(groupName_, "scalingEaseTMax");
+    paramater_.expatingScale = globalParameter_->GetValue<float>(groupName_, "expatingScale");
 }
 
 ///=========================================================
@@ -252,6 +277,8 @@ void TitleBom::AdjustParm() {
         ImGui::DragFloat("拡大スケール", &paramater_.expationScale_, 0.01f);
         ImGui::DragFloat("拡大スケールX", &paramater_.expationScaleX_, 0.01f);
         ImGui::DragFloat("縮小スケール", &paramater_.shrinkScale_, 0.01f);
+        ImGui::DragFloat("拡縮イージング最大", &paramater_.scalingEaseTMax, 0.01f);
+        ImGui::DragFloat("拡縮(でかい)スケール", &paramater_.expatingScale, 0.01f);
 
         globalParameter_->ParmSaveForImGui(groupName_);
         ParmLoadForImGui();
@@ -260,4 +287,21 @@ void TitleBom::AdjustParm() {
     }
 
 #endif // _DEBUG
+}
+
+void TitleBom::Reset() {
+    /// parm
+    kTextureWidth_ = 900.0f;
+    kTextureHeigth_ = 700.0f;
+    positionY_ = paramater_.fallStartPosY_; // pos
+    scale_ = { paramater_.initScale_,paramater_.initScale_ };  //scale
+    easeDirection_ = 1.0f;
+
+    fallEaseTime_ = 0.0f;
+    expationEaseTime_ = 0.0f;
+    shrinkEaseTime_ = 0.0f;
+    reverseEaseTime_ = 0.0f;
+    waitTime_ = 0.0f;
+    isFinished_ = false;
+    step_ = Step::FALL;
 }

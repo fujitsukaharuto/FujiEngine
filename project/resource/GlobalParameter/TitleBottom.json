@@ -1,0 +1,25 @@
+{
+    "TitleBottom": {
+        "bottomAHeigth": 150.0,
+        "bottomAPos": [
+            537.9000244140625,
+            809.4000244140625,
+            0.0
+        ],
+        "bottomAWidth": 150.0,
+        "controllaHeigth": 180.0,
+        "controllaPos": [
+            842.7999877929688,
+            77.5999984741211,
+            0.0
+        ],
+        "controllaWidth": 430.0,
+        "expatingScale": 0.8999999761581421,
+        "expationMaxTime": 0.3499999940395355,
+        "expationScale_": 1.309999942779541,
+        "initScale_": 0.0,
+        "kWaitTime": 0.3700000047683716,
+        "reverseMaxTime": 0.5,
+        "scalingEaseTMax": 0.46000000834465027
+    }
+}

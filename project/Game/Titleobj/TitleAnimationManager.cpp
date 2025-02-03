@@ -75,7 +75,11 @@ void TitleAnimationManager::BottomAnimation()
 ///-------------------------------------------------------------------------
 void TitleAnimationManager::AllAnimation() 
 {
-  
+    titleBom_->ExPationing();
+    titleBottom_->ExPationing();
+
+    titleBom_->AdaptState();
+    titleBottom_->AdaptState();
 }
 
 ///-------------------------------------------------------------------------
