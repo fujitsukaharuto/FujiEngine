@@ -9,6 +9,10 @@ public:
 
 public:
 
+	enum ShakeMode {
+		RandomShake,
+		RollingShake,// 横揺れ
+	};
 
 	void Update();
 	void UpdateMaterix();
@@ -19,7 +23,9 @@ public:
 	void SetNearClip(float clip) { nearClip_ = clip; }
 	void SetFarClip(float clip) { farClip_ = clip; }
 
+	void SetShakeMode(ShakeMode mode) { shakeMode_ = mode; }
 	void SetShakeTime(float time) { shakeTime_ = time; }
+	void SetShakeStrength(float strength) { shakeStrength_ = strength; }
 
 	const Matrix4x4& GetWorldMatrix() const { return worldMatrix_; }
 	const Matrix4x4& GetViewMatrix() const { return viewMatrix_; }
@@ -47,7 +53,9 @@ private:
 
 	Matrix4x4 viewProjectionMatrix_;
 
+	ShakeMode shakeMode_;
 	float shakeTime_;
 	float shakeStrength_;
 	Vector3 shakeGap_;
+	float rollingTime_;
 };
