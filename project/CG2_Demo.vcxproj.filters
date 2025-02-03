@@ -394,6 +394,12 @@
     <ClInclude Include="Game\GameObj\InputHandler.h">
       <Filter>Game\GameObj</Filter>
     </ClInclude>
+    <ClInclude Include="Game\GameObj\Selector\Selector.h">
+      <Filter>Game\GameObj\Selector</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\Unit\Unit.h">
+      <Filter>Game\GameObj\Unit</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -470,6 +476,12 @@
     </Filter>
     <Filter Include="Game\GameObj\Enemy">
       <UniqueIdentifier>{75f61a48-bc79-46a6-b1ec-ceee4a1b817f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameObj\Selector">
+      <UniqueIdentifier>{afcb9889-42e4-4167-921f-b279486ff9be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameObj\Unit">
+      <UniqueIdentifier>{d78928ca-a1eb-4329-b70d-ea15bc9e3e06}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
