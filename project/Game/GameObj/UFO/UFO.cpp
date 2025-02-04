@@ -68,6 +68,7 @@ void UFO::Initialize() {
 	// collider
 	collider_ = std::make_unique<AABBCollider>();
 	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
+	collider_->SetCollisionStayCallback([this](const ColliderInfo& other) {OnCollisionStay(other); });
 	collider_->SetTag("UFO");
 	SetCollisionSize(paramater_.collisionSize_);
 	collider_->SetParent(model_.get());
@@ -283,7 +284,7 @@ void UFO::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 
 	/// 弱い吹っ飛びをくらってる
 	if (other.tag == "BlowingWeakEnemy") {
-	 
+
 		// ダメージ量分受ける
 		for (auto& enemy : pEnemyManager_->GetEnemies()) {
 			if (dynamic_cast<EnemyExplotion*>(enemy->GetBehavior())) {
@@ -316,6 +317,7 @@ void UFO::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 }
 
 void UFO::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
+	
 
 }
 

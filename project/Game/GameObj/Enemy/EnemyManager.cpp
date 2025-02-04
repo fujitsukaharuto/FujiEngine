@@ -79,9 +79,6 @@ void EnemyManager::SpawnEnemy(const BaseEnemy::Type& enemyType, const Vector3& p
 ///========================================================================================
 void EnemyManager::Update() {
 
-
-	//SpawnUpdate(); // スポーン更新
-
 	for (auto it = enemies_.begin(); it != enemies_.end(); ) {
 
 		if ((*it)->GetType() == BaseEnemy::Type::NORMAL||
