@@ -151,7 +151,9 @@ void MissileEnemy::FallMove() {
 		model_->transform.translate.y -= BaseEnemy::paramater_.fallSpeed* FPSKeeper::DeltaTimeRate();
 
 		luncherEmit1_.pos = model_->transform.translate;
+		luncherEmit1_.pos.y += 1.0f;
 		luncherEmit2_.pos = model_->transform.translate;
+		luncherEmit2_.pos.y += 1.0f;
 		luncherEmit1_.Emit();
 		luncherEmit2_.Emit();
 
