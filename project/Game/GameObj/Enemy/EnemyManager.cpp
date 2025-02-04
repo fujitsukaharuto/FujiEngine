@@ -1,9 +1,6 @@
-
 #include "EnemyManager.h"
 #include"NormalEnemy.h"
 #include"GameObj/UFO/UFO.h"
-
-#include "FPSKeeper.h"
 
 #include <format>
 #include <fstream>

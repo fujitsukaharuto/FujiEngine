@@ -22,9 +22,9 @@ void Timer::Init() {
 	}
 
 	
-	basePos_ = { 830.6f,159.7f,0.0f };
-	dotPos_ = { 958.0f,196.7f,0.0f };
-	offset_ = 67.7f; //数字間のオフセット
+	basePos_ = { 863.0f,162.0f,0.0f };
+	dotPos_ = { 951.0f,196.7f,0.0f };
+	offset_ = 49.5f; //数字間のオフセット
 }
 
 // 更新
@@ -35,7 +35,10 @@ void Timer::Update() {
 
 void Timer::SetTextureRangeForDigit() {
 	
-	for (int i = 0; i < sprites_.size(); i++) {
+	for (int i = 0; i < sprites_.size()-2; i++) {
+		sprites_[i]->SetPos({ basePos_.x + offset_ * i-20,basePos_.y,basePos_.z });
+	}
+	for (int i = int(sprites_.size()) - 2; i < int(sprites_.size()); i++) {
 		sprites_[i]->SetPos({ basePos_.x + offset_ * i,basePos_.y,basePos_.z });
 	}
 

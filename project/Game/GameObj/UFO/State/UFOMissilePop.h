@@ -12,6 +12,7 @@ private:
 		LIGHTCLOSE,
 		RETURNROOT,
 	};
+
 private:
 	Step step_;
 
@@ -22,6 +23,8 @@ private:
 	Vector3 scaleUnderPop_;
 	Easing lightUpEasing_;
 	Easing lightCloseEasing_;
+
+	
 
 	SoundData firstSE_;
 

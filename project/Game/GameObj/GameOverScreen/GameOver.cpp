@@ -5,11 +5,11 @@
 
 void GameOver::Init() {
 	overPaneru_ = std::make_unique<Sprite>();
-	overPaneru_->Load("gameover.png");
+	overPaneru_->Load("GameTexture/gameover.png");
 	overPaneru_->SetAnchor({ 0.0f,0.0f });
 
 	selectArrow_ = std::make_unique<Sprite>();
-	selectArrow_->Load("GameTexture/Life.png");
+	selectArrow_->Load("GameTexture/GO_Serect.png");
 	selectArrow_->SetAnchor({ 0.0f,0.0f });
 
 	///parm初期化

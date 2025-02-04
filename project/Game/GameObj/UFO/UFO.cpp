@@ -91,8 +91,6 @@ void UFO::Update() {
 	///
 	collider_->InfoUpdate();
 
-
-
 	hpSize_ = hp_ / MaxHp_ * hpMaxSize_;
 	if (hpSize_ < 0.0f) {
 		hpSize_ = 0.0f;

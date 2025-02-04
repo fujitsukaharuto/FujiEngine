@@ -1,4 +1,3 @@
-
 ///* behavior
 #include"UFOMissilePop.h"
 #include"UFOPopWait.h"
