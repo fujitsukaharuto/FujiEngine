@@ -41,6 +41,8 @@ public:
 
 	const std::string GetTag()const { return info.tag; }
 	Vector3 GetPos();
+	Vector3 GetWorldPos();
+	OriginGameObject* GetOwner();
 	bool GetIsCollisonCheck() { return isCollisionCheck_; }
 
 	std::list<BaseCollider*> hitList_;

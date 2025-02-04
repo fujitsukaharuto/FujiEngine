@@ -28,3 +28,11 @@ Vector3 BaseCollider::GetPos() {
 	info.worldPos = position;
 	return position;
 }
+
+Vector3 BaseCollider::GetWorldPos() {
+	return GetPos();
+}
+
+OriginGameObject* BaseCollider::GetOwner() {
+	return info.owner;
+}
