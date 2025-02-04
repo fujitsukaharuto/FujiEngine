@@ -28,7 +28,7 @@ EnemyPowerUp::EnemyPowerUp(BaseEnemy* boss)
 }
 
 EnemyPowerUp::~EnemyPowerUp() {
-
+	FPSKeeper::SetTimeScale(1.0f);
 }
 
 void EnemyPowerUp::Update() {
