@@ -9,7 +9,7 @@ void Timer::Init() {
 
 	// タイムの点々
 	timeDotSprite_ = std::make_unique<Sprite>();
-	timeDotSprite_->Load("GameTexture/timeDot.png");
+	timeDotSprite_->Load("GameTexture/TimeDot.png");
 
 	// 数字
 	for (int i = 0; i < sprites_.size(); i++) {
@@ -22,9 +22,9 @@ void Timer::Init() {
 	}
 
 	
-	basePos_ = { 845.4f,155.0f,0.0f };
-	dotPos_ = { 969.0f,196.7f,0.0f };
-	offset_ = 65.9f; //数字間のオフセット
+	basePos_ = { 830.6f,159.7f,0.0f };
+	dotPos_ = { 958.0f,196.7f,0.0f };
+	offset_ = 67.7f; //数字間のオフセット
 }
 
 // 更新

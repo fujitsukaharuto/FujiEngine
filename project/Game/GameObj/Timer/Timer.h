@@ -22,7 +22,7 @@ private:
    
     std::array<int,4> textureIndex_;
     const float kTextureWidth = 48;//テクスチャの1枚の幅
-    const float kTextureHeight = 86;//テクスチャの1枚の高さ
+    const float kTextureHeight = 60;//テクスチャの1枚の高さ
 
     //pos
     Vector3 basePos_;

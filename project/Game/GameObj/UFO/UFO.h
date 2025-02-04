@@ -22,6 +22,8 @@ public:
 		Vector3 lightScaleUnderPop;
 		Vector3 startPos;
 		Vector3 gamePos;
+		Vector2 barPos_;
+		Vector2 hpPos_;
 		float dagameDistance_;
 		float damageTime_;
 		float hitStopDamage_;

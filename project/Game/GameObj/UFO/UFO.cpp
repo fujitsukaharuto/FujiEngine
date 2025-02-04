@@ -8,6 +8,7 @@
 //obj
 #include"GameObj/Enemy/EnemyManager.h"
 #include"GameObj/Enemy/BaseEnemy.h"
+#include"GameObj/Enemy/Behavior/EnemyExplotion.h"
 
 #include "PointLightManager.h"
 
@@ -37,20 +38,18 @@ void UFO::Initialize() {
 	PointLightManager::GetInstance()->GetSpotLight(0)->spotLightData_->position = model_->transform.translate;
 
 	hpSprite_ = std::make_unique<Sprite>();
-	hpSprite_->Load("white2x2.png");
-	hpSprite_->SetColor({ 0.8f,0.0f ,0.0f ,1.0f });
-	hpSprite_->SetAnchor({ 0.0f,0.0f });
-	hpSprite_->SetSize({ 500.0f,16.0f });
+	hpSprite_->Load("GameTexture/UFO_Hp_In.png");
+	//hpSprite_->SetColor({ 0.8f,0.0f ,0.0f ,1.0f });
+	hpSprite_->SetAnchor({ 0.5f,0.5f });
+	/*hpSprite_->SetSize({ 500.0f,16.0f });*/
 	hpSprite_->SetPos({ 150.0f,38.0f,0.0f });
 
 	hpMaxSprite_ = std::make_unique<Sprite>();
-	hpMaxSprite_->Load("white2x2.png");
-	hpMaxSprite_->SetColor({ 0.023f,0.023f ,0.023f ,1.0f });
+	hpMaxSprite_->Load("GameTexture/UFO_Hp_Out.png");
+	/*hpMaxSprite_->SetColor({ 0.023f,0.023f ,0.023f ,1.0f });*/
 	hpMaxSprite_->SetAnchor({ 0.5f,0.5f });
-	hpMaxSprite_->SetSize({ 520.0f,36.0f });
+	/*hpMaxSprite_->SetSize({ 520.0f,36.0f });*/
 	hpMaxSprite_->SetPos({ 400.0f,50.0f,0.0f });
-
-	
 
 	///* グローバルパラメータ
 	globalParameter_ = GlobalVariables::GetInstance();
@@ -98,7 +97,7 @@ void UFO::Update() {
 	if (hpSize_ < 0.0f) {
 		hpSize_ = 0.0f;
 	}
-	hpSprite_->SetSize({ hpSize_,25.0f });
+	hpSprite_->SetSize({ hpSize_,75.0f });
 
 	PointLightManager::GetInstance()->GetSpotLight(0)->spotLightData_->position = model_->transform.translate;
 	PointLightManager::GetInstance()->GetSpotLight(0)->spotLightData_->position.z = 0.0f;
@@ -238,6 +237,8 @@ void UFO::AddParmGroup() {
 	globalParameter_->AddItem(groupName_, "hitStopTime_", paramater_.hitStopTime_);
 	globalParameter_->AddItem(groupName_, "rootLightScale", paramater_.initLightScale);
 	globalParameter_->AddItem(groupName_, "lightScaleUnderPop", paramater_.lightScaleUnderPop);
+	globalParameter_->AddItem(groupName_, "rootLightScale", paramater_.barPos_);
+	globalParameter_->AddItem(groupName_, "lightScaleUnderPop", paramater_.hpPos_);
 }
 
 ///=================================================================================
@@ -282,10 +283,10 @@ void UFO::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 
 	/// 弱い吹っ飛びをくらってる
 	if (other.tag == "BlowingWeakEnemy") {
-
+	 
 		// ダメージ量分受ける
 		for (auto& enemy : pEnemyManager_->GetEnemies()) {
-			if (dynamic_cast<EnemyBlowingWeak*>(enemy->GetBehavior())) {
+			if (dynamic_cast<EnemyExplotion*>(enemy->GetBehavior())) {
 				takeDamageValue_ = enemy->GetSumWeakAttackValue();
 				TakeDamageForPar(takeDamageValue_);
 			}

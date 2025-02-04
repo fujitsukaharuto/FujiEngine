@@ -21,7 +21,7 @@ void LifeUI::Init() {
 	// 初期化
 	for (int i = 0; i < sprites_.size(); i++) {
 		sprites_[i] = std::make_unique<Sprite>();
-		sprites_[i]->Load("GameTexture/Life.png");
+		sprites_[i]->Load("GameTexture/Player_Hp.png");
 		sprites_[i]->SetColor  ({ 1.0f,1.0f,1.0f,1.0f });
 		sprites_[i]->SetAnchor ({ 0.0f,0.0f });
 		sprites_[i]->SetSize({ paramater_.kTextureWidth,paramater_.kTextureHeight }); // サイズを固定
