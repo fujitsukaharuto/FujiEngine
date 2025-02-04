@@ -22,8 +22,8 @@ public:
 		Vector3 lightScaleUnderPop;
 		Vector3 startPos;
 		Vector3 gamePos;
-		Vector2 barPos_;
-		Vector2 hpPos_;
+		Vector3 barPos_;
+		Vector3 hpPos_;
 		float dagameDistance_;
 		float damageTime_;
 		float hitStopDamage_;
@@ -67,8 +67,8 @@ private:
 	std::unique_ptr<Object3d> ufoLight_;
 
 	std::unique_ptr<Sprite> hpSprite_;
-	float hpSize_ = 500.0f;
-	float hpMaxSize_ = 500.0f;
+	float hpSize_ = 700.0f;
+	float hpMaxSize_ = 700.0f;
 	std::unique_ptr<Sprite> hpMaxSprite_;
 
 public:

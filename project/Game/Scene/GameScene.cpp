@@ -152,9 +152,7 @@ void GameScene::Update() {
 			kikArea_->Update();
 			lifeUI_->Update();
 
-			for (auto& enemy : enemyManager_->GetEnemies()) {
-				cMane_->AddCollider(enemy->GetCollider());
-			}
+		
 			cMane_->AddCollider(ufo_->GetCollider());
 			cMane_->AddCollider(player_->GetKikCollider());
 			cMane_->AddCollider(kikArea_->GetWeakAreaCollider());
@@ -162,6 +160,9 @@ void GameScene::Update() {
 			cMane_->AddCollider(kikArea_->GetMaxPowerArea());
 			cMane_->AddCollider(kikArea_->GetSpecialAttackArea());
 			cMane_->AddCollider(player_->GetCollider());
+			for (auto& enemy : enemyManager_->GetEnemies()) {
+				cMane_->AddCollider(enemy->GetCollider());
+			}
 			for (auto& field : fieldBlockManager_->GetFieldBlocks()) {
 				cMane_->AddCollider(field->GetCollider());
 			}

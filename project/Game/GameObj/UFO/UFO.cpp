@@ -39,17 +39,13 @@ void UFO::Initialize() {
 
 	hpSprite_ = std::make_unique<Sprite>();
 	hpSprite_->Load("GameTexture/UFO_Hp_In.png");
-	//hpSprite_->SetColor({ 0.8f,0.0f ,0.0f ,1.0f });
 	hpSprite_->SetAnchor({ 0.5f,0.5f });
-	/*hpSprite_->SetSize({ 500.0f,16.0f });*/
-	hpSprite_->SetPos({ 150.0f,38.0f,0.0f });
+	hpSprite_->SetPos(paramater_.hpPos_);
 
 	hpMaxSprite_ = std::make_unique<Sprite>();
 	hpMaxSprite_->Load("GameTexture/UFO_Hp_Out.png");
-	/*hpMaxSprite_->SetColor({ 0.023f,0.023f ,0.023f ,1.0f });*/
 	hpMaxSprite_->SetAnchor({ 0.5f,0.5f });
-	/*hpMaxSprite_->SetSize({ 520.0f,36.0f });*/
-	hpMaxSprite_->SetPos({ 400.0f,50.0f,0.0f });
+	hpMaxSprite_->SetPos(paramater_.barPos_);
 
 	///* グローバルパラメータ
 	globalParameter_ = GlobalVariables::GetInstance();
@@ -83,6 +79,10 @@ void UFO::Initialize() {
 ///  更新処理
 /// ===================================================
 void UFO::Update() {
+
+	hpSprite_->SetPos(paramater_.hpPos_);
+	hpMaxSprite_->SetPos(paramater_.barPos_);
+
 	popPos_ = model_->GetWorldPos();
 	/// ダメージエフェクト
 	DamageRendition();
@@ -182,6 +182,11 @@ void UFO::AdjustParm() {
 		ImGui::DragFloat3("通常ライトサイズ", &paramater_.initLightScale.x, 0.01f);
 		ImGui::DragFloat3("ミサイル出す時のライトサイズ", &paramater_.lightScaleUnderPop.x, 0.01f);
 
+		ImGui::SeparatorText("UI");
+		ImGui::DragFloat3("バー位置", &paramater_.barPos_.x, 0.5f);
+		ImGui::DragFloat3("HP位置", &paramater_.hpPos_.x, 0.5f);
+
+
 		ImGui::SeparatorText("いらないかも");
 		ImGui::DragFloat("ダメージの吹っ飛び距離", &paramater_.dagameDistance_, 0.01f);
 			
@@ -238,8 +243,8 @@ void UFO::AddParmGroup() {
 	globalParameter_->AddItem(groupName_, "hitStopTime_", paramater_.hitStopTime_);
 	globalParameter_->AddItem(groupName_, "rootLightScale", paramater_.initLightScale);
 	globalParameter_->AddItem(groupName_, "lightScaleUnderPop", paramater_.lightScaleUnderPop);
-	globalParameter_->AddItem(groupName_, "rootLightScale", paramater_.barPos_);
-	globalParameter_->AddItem(groupName_, "lightScaleUnderPop", paramater_.hpPos_);
+	globalParameter_->AddItem(groupName_, "barPos_", paramater_.barPos_);
+	globalParameter_->AddItem(groupName_, "hpPos_", paramater_.hpPos_);
 }
 
 ///=================================================================================
@@ -256,6 +261,8 @@ void UFO::SetValues() {
 	globalParameter_->SetValue(groupName_, "hitStopTime_", paramater_.hitStopTime_);
 	globalParameter_->SetValue(groupName_, "rootLightScale", paramater_.initLightScale);
 	globalParameter_->SetValue(groupName_, "lightScaleUnderPop", paramater_.lightScaleUnderPop);
+	globalParameter_->SetValue(groupName_, "barPos_", paramater_.barPos_);
+	globalParameter_->SetValue(groupName_, "hpPos_", paramater_.hpPos_);
 }
 
 ///=====================================================
@@ -271,6 +278,8 @@ void UFO::ApplyGlobalParameter() {
 	paramater_.initLightScale = globalParameter_->GetValue<Vector3>(groupName_, "rootLightScale");
 	paramater_.lightScaleUnderPop = globalParameter_->GetValue<Vector3>(groupName_, "lightScaleUnderPop");
 	paramater_.startPos = globalParameter_->GetValue<Vector3>(groupName_, "startPos");
+	paramater_.barPos_ = globalParameter_->GetValue<Vector3>(groupName_, "barPos_");
+	paramater_.hpPos_ = globalParameter_->GetValue<Vector3>(groupName_, "hpPos_");
 }
 ///=========================================================
 /// Class Set
