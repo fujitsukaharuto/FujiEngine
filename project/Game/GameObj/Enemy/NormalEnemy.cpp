@@ -41,7 +41,8 @@ void NormalEnemy::Initialize() {
 	speedEase_.maxTime = 0.7f;
 	maxSpeed_ = BaseEnemy::paramater_.fallSpeed + 9.0f;
 
-	SetCollisionSize(BaseScale_ * 2.0f);
+	collisionScale_ = 3.0f;
+	SetCollisionSize(BaseScale_ * collisionScale_);
 	collider_->SetParent(model_.get());
 	collider_->InfoUpdate();
 
@@ -59,6 +60,8 @@ void NormalEnemy::Initialize() {
 ///========================================================
 
 void NormalEnemy::Update() {
+	// collider更新
+	SetCollisionSize(model_->transform.scale * collisionScale_);
 	BaseEnemy::Update();
 }
 
@@ -205,4 +208,8 @@ void NormalEnemy::SetPosition(const Vector3& pos) {
 
 void NormalEnemy::SetOnlyParamater(const Paramater& parm) {
 	paramater_ = parm;
+}
+
+void NormalEnemy::SetCollisionSize(const Vector3& size) {
+	BaseEnemy::SetCollisionSize(size);
 }

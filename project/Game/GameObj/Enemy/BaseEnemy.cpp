@@ -73,8 +73,6 @@ void BaseEnemy::Update() {
 
 	WallRefrection(); // 壁反発
 
-	// collider更新
-	SetCollisionSize(model_->transform.scale * 2.0f);
 	collider_->InfoUpdate();
 
 }

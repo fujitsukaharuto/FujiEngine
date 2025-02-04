@@ -122,8 +122,8 @@ public:
 	///========================================================================================
 	///  setter method
 	///========================================================================================
-	void               SetPlayer(Player* plyaer);
-	void               SetIsDeath(const bool& is) { isdeath_ = is; };
-	void               SetCollisionSize(const Vector3& size);
+	void                       SetPlayer(Player* plyaer);
+	void                       SetIsDeath(const bool& is) { isdeath_ = is; };
+	virtual void               SetCollisionSize(const Vector3& size);
 	
 };

@@ -27,6 +27,7 @@ private:/// パラメータ
 	float rotateFrequency_;      // 揺れる速さR
 	float translateAmplitude_;    // 揺れ幅T
 	float translateFrequency_;   // 揺れる速さT
+	float collisionScale_;
 
 	Easing speedEase_;
 	float   maxSpeed_;
@@ -77,6 +78,7 @@ public:
 	 //setter
 	 void SetPosition(const Vector3&pos);
 	 void SetOnlyParamater(const Paramater& parm);
+	 void SetCollisionSize(const Vector3& size)override;
 private://behavior
 	
 	

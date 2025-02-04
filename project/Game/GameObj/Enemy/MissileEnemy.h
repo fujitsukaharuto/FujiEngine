@@ -60,7 +60,7 @@ private:/// イージングタイム
 	Easing zMove_;
 	float antipationEaseT_;
 	float easeDirection_;
-
+	float collisionScale_;
 private:/// 座標
 	float targetPosX_;
 	Vector3 startPos_;
@@ -86,7 +86,7 @@ public:
 	void SetOnlyParamater(const Paramater&parm);
 
 	void SetPosition();
-
+	void SetCollisionSize(const Vector3& size)override;
 	void SetTargetPosX(const float& targetPos) { targetPosX_ = targetPos; }
 
 };

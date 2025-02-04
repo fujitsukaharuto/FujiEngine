@@ -25,7 +25,8 @@ void MissileEnemy::Initialize() {
 	model_->transform.scale = paramater_.baseScale;
 
 	// collider
-	SetCollisionSize(BaseScale_ * 14.0f);
+	collisionScale_ = 5.0f;
+	SetCollisionSize(BaseScale_ * collisionScale_);
 	collider_->SetParent(model_.get());
 	collider_->InfoUpdate();
 
@@ -214,4 +215,8 @@ void MissileEnemy::SetPosition() {
 void MissileEnemy::FallSE() {
 	Audio::GetInstance()->SoundPlayWave(luncherSE_, 0.08f);
 
+}
+
+void MissileEnemy::SetCollisionSize(const Vector3& size) {
+	BaseEnemy::SetCollisionSize(size);
 }
