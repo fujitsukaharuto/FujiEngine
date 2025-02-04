@@ -39,12 +39,11 @@ void UFO::Initialize() {
 
 	hpSprite_ = std::make_unique<Sprite>();
 	hpSprite_->Load("GameTexture/UFO_Hp_In.png");
-	hpSprite_->SetAnchor({ 0.5f,0.5f });
 	hpSprite_->SetPos(paramater_.hpPos_);
+	hpSprite_->SetAnchor(Vector2(0.0f, 0.0f));
 
 	hpMaxSprite_ = std::make_unique<Sprite>();
 	hpMaxSprite_->Load("GameTexture/UFO_Hp_Out.png");
-	hpMaxSprite_->SetAnchor({ 0.5f,0.5f });
 	hpMaxSprite_->SetPos(paramater_.barPos_);
 
 	///* グローバルパラメータ
@@ -59,7 +58,7 @@ void UFO::Initialize() {
 	moveDirection = 1.0f;
 	MaxHp_ = 30.0f;
 	hp_ = MaxHp_;
-	
+
 
 	// collider
 	collider_ = std::make_unique<AABBCollider>();
@@ -91,8 +90,8 @@ void UFO::Update() {
 	state_->Update();
 	///
 	collider_->InfoUpdate();
-	
-	
+
+
 
 	hpSize_ = hp_ / MaxHp_ * hpMaxSize_;
 	if (hpSize_ < 0.0f) {
@@ -118,8 +117,8 @@ void UFO::UFOLightDraw() {
 }
 
 void UFO::SpriteDraw() {
-	hpMaxSprite_->Draw();
 	hpSprite_->Draw();
+	hpMaxSprite_->Draw();
 }
 
 
@@ -131,7 +130,7 @@ void UFO::EnemySpawn() {
 ///  ダメージ演出
 /// ===================================================
 void UFO::DamageRendition() {
-	
+
 }
 
 
@@ -141,7 +140,7 @@ void UFO::DamageRendition() {
 void UFO::TakeDamageForPar(const float& par) {
 
 	//割合によるインクる面とする値を決める
-	float decrementSize = MaxHp_ * (par / 100.0f);;
+	float decrementSize = MaxHp_ * (par / 100.0f);
 	// HP減少
 	hp_ -= decrementSize;
 
@@ -170,7 +169,7 @@ void UFO::AdjustParm() {
 	if (ImGui::CollapsingHeader(groupName_.c_str())) {
 		ImGui::PushID(groupName_.c_str());
 		ImGuiManager::GetInstance()->SetFontJapanese();/// 日本語
-	
+
 		ImGui::DragFloat3("位置", &paramater_.gamePos.x, 0.1f);
 		ImGui::DragFloat3("スタート位置", &paramater_.startPos.x, 0.1f);
 		ImGui::DragFloat3("当たり判定サイズ", &paramater_.collisionSize_.x, 0.1f);
@@ -189,7 +188,7 @@ void UFO::AdjustParm() {
 
 		ImGui::SeparatorText("いらないかも");
 		ImGui::DragFloat("ダメージの吹っ飛び距離", &paramater_.dagameDistance_, 0.01f);
-			
+
 		/// セーブとロード
 		globalParameter_->ParmSaveForImGui(groupName_);
 		ParmLoadForImGui();
@@ -251,7 +250,7 @@ void UFO::AddParmGroup() {
 ///パラメータをグループに追加
 ///=================================================================================
 void UFO::SetValues() {
-	
+
 	globalParameter_->SetValue(groupName_, "Translate", paramater_.gamePos);
 	globalParameter_->SetValue(groupName_, "startPos", paramater_.startPos);
 	globalParameter_->SetValue(groupName_, "collisionSize_", paramater_.collisionSize_);
@@ -293,14 +292,13 @@ void UFO::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 
 	/// 弱い吹っ飛びをくらってる
 	if (other.tag == "BlowingWeakEnemy") {
+		
+		if (BaseEnemy* enemy = dynamic_cast<BaseEnemy*>(other.owner)) {
 
-		// ダメージ量分受ける
-		for (auto& enemy : pEnemyManager_->GetEnemies()) {
-			if (dynamic_cast<EnemyExplotion*>(enemy->GetBehavior())) {
-				takeDamageValue_ = enemy->GetSumWeakAttackValue();
-				TakeDamageForPar(takeDamageValue_);
-			}
+			takeDamageValue_ = enemy->GetSumWeakAttackValue();
+			TakeDamageForPar(takeDamageValue_);
 		}
+
 		hitPosition_ = other.pos;
 
 		// ダメージ演出
@@ -326,7 +324,7 @@ void UFO::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 }
 
 void UFO::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
-	
+
 
 }
 
@@ -356,7 +354,7 @@ void UFO::ChangePopBehavior() {
 	ChangeState(std::make_unique<UFOMissilePop>(this));
 }
 
-void UFO::Apear(const float&time, const float& maxTime) {
+void UFO::Apear(const float& time, const float& maxTime) {
 	model_->transform.translate.y = EaseOutBack(
 		paramater_.startPos.y, paramater_.gamePos.y, time, maxTime);
 

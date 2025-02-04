@@ -50,6 +50,13 @@ void BaseEnemy::Initialize() {
 	model_->transform.scale = BaseEnemy::BaseScale_;
 	powerUpScale_ = BaseEnemy::BaseScale_;
 
+	// collider
+	collider_ = std::make_unique<AABBCollider>();
+	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
+	collider_->SetTag(tags_[static_cast<size_t>(Tag::FALL)]);
+	collider_->SetOwner(this);
+	
+
 	sizeupSE_ = Audio::GetInstance()->SoundLoadWave("sizeup.wav");
 	
 	ChangeState(std::make_unique<EnemyNoneState>(this)); /// 追っかけ

@@ -25,10 +25,7 @@ void MissileEnemy::Initialize() {
 	model_->transform.scale = paramater_.baseScale;
 
 	// collider
-	collider_ = std::make_unique<AABBCollider>();
-	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
-	collider_->SetTag(tags_[static_cast<size_t>(Tag::FALL)]);
-	SetCollisionSize(BaseScale_ * 6.0f);
+	SetCollisionSize(BaseScale_ * 2.0f);
 	collider_->SetParent(model_.get());
 	collider_->InfoUpdate();
 
