@@ -48,8 +48,8 @@ void TitleScene::Initialize() {
 	//titleAnimation_->SetOnAnimationCompleteCallback([]() {});
 	//titleAnimation_->StartAnimation(); // アニメーションの開始
 
-	//ParticleManager::Load(emit1, "flyPlayer1");
-	//ParticleManager::Load(emit2, "flyPlayer2");
+	ParticleManager::Load(emit1, "misilleSmoke1");
+	ParticleManager::Load(emit2, "misilleSmoke2");
 
 }
 
@@ -72,11 +72,11 @@ void TitleScene::Update() {
 	sphere->SetRightDir(rightDir);
 	ImGui::End();
 
-	//emit1.DebugGUI();
-	//emit2.DebugGUI();
+	emit1.DebugGUI();
+	emit2.DebugGUI();
 
-	//emit1.Emit();
-	//emit2.Emit();
+	emit1.Emit();
+	emit2.Emit();
 
 	/*if (Input::GetInstance()->TriggerKey(DIK_5)) {
 		emit1.Burst();
@@ -122,8 +122,8 @@ void TitleScene::Draw() {
 #pragma region 前景スプライト
 
 	dxCommon_->PreSpriteDraw();
-	titleAnimation_->BackDraw();
-	titleAnimation_->Draw();
+	/*titleAnimation_->BackDraw();
+	titleAnimation_->Draw();*/
 	/*titlePaneru_->Draw();*/
 	if (blackTime != 0.0f) {
 		black_->Draw();
