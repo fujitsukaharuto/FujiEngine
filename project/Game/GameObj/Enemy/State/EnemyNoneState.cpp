@@ -22,7 +22,10 @@ EnemyNoneState::~EnemyNoneState() {
 }
 
 void EnemyNoneState::Update() {
-	
+	/*stopTime_ += FPSKeeper::NormalDeltaTime();
+	if (stopTime_ >= stopTimeMax_) {
+		FPSKeeper::SetTimeScale(1.0f);
+	}*/
 	
 	
 }

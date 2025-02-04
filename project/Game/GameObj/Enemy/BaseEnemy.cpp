@@ -61,8 +61,8 @@ void BaseEnemy::Initialize() {
 void BaseEnemy::Update() {
 
 	// 振る舞い更新
-	behavior_->Update();
 	state_->Update();
+	behavior_->Update();
 
 	WallRefrection(); // 壁反発
 
@@ -260,7 +260,7 @@ void BaseEnemy::WallRefrection() {
 void BaseEnemy::SetCollisionSize(const Vector3& size) {
 	collider_->SetWidth(size.x);
 	collider_->SetHeight(size.y);
-	collider_->SetDepth(size.z);
+	collider_->SetDepth(size.z*5.0f);
 }
 
 

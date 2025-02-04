@@ -21,7 +21,6 @@ void MissileEnemy::Initialize() {
 	luncherSE_ = Audio::GetInstance()->SoundLoadWave("MissileLauncher.wav");
 	sizeSE_ = Audio::GetInstance()->SoundLoadWave("missileSize.wav");
 
-
 	scalingEase_.maxTime = paramater_.scalingEaseMax;
 	model_->transform.scale = paramater_.baseScale;
 
@@ -29,13 +28,15 @@ void MissileEnemy::Initialize() {
 	collider_ = std::make_unique<AABBCollider>();
 	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
 	collider_->SetTag(tags_[static_cast<size_t>(Tag::FALL)]);
-	SetCollisionSize(BaseScale_ * 2.0f);
+	SetCollisionSize(BaseScale_ * 6.0f);
 	collider_->SetParent(model_.get());
 	collider_->InfoUpdate();
 
+	zMove_.maxTime = 0.7f;
+
 	
 	step_ = Step::FIRSTFALL;
-	ChangeBehavior(std::make_unique<EnemyFall>(this)); /// 追っかけ
+	ChangeBehavior(std::make_unique<EnemyFall>(this));
 }
 
 ///========================================================
@@ -49,6 +50,7 @@ void MissileEnemy::Update() {
 /// 描画
 ///========================================================
 void MissileEnemy::Draw(Material* material) {
+	collider_->DrawCollider();
 	BaseEnemy::Draw(material);
 }
 
@@ -67,11 +69,27 @@ void MissileEnemy::FallMove() {
 		// イージング適応
 		model_->transform.translate.y = EaseInCubic(startPos_.y, paramater_.fallPos, 
 			                                        firstFallEaseT_,paramater_.firstFallEaseMax);
-
 		
 		if (firstFallEaseT_ < paramater_.firstFallEaseMax)break;
 		model_->transform.translate.y = paramater_.fallPos;
 		firstFallEaseT_ = paramater_.firstFallEaseMax;
+		step_ = Step::ZMOVE;
+
+		break;
+		///-------------------------------------------------------------
+		///　最初の落下
+		///-------------------------------------------------------------- 
+	case MissileEnemy::Step::ZMOVE:
+		// タイム加算
+		zMove_.time += FPSKeeper::DeltaTimeRate();
+
+		// イージング適応
+		model_->transform.translate.z = EaseInCubic(startPos_.z, 0.0f,
+			zMove_.time, zMove_.maxTime);
+
+		if (zMove_.time < zMove_.maxTime)break;
+		model_->transform.translate.z = 0.0f;
+		zMove_.time = zMove_.maxTime;
 		step_ = Step::SIDEMOVE;
 
 		break;

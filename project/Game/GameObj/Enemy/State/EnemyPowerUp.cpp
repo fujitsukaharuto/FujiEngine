@@ -20,7 +20,7 @@ EnemyPowerUp::EnemyPowerUp(BaseEnemy* boss)
 	ease_.amplitude = 2.0f;
 	ease_.period = 0.2f;
 
-	stopTimeMax_ = 0.1f;
+	stopTimeMax_ = 0.2f;
 
 	FPSKeeper::SetTimeScale(0.1f);
 	step_ = Step::SCALEUP; /// ステップ初期化
@@ -61,6 +61,7 @@ void EnemyPowerUp::Update() {
 		///---------------------------------------------------------------------------------------
 		if (stopTime_ < stopTimeMax_) break;
 		pBaseEnemy_->ChangeState(std::make_unique<EnemyNoneState>(pBaseEnemy_));
+		FPSKeeper::SetTimeScale(1.0f);
 		break;
 	default:
 		break;

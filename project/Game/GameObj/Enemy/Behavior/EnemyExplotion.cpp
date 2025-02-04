@@ -20,7 +20,7 @@ EnemyExplotion::EnemyExplotion(BaseEnemy* boss)
 
 	step_ = Step::WAIT;
 
-	waitTimeMax_ = 0.1f;
+	waitTimeMax_ = 0.5f;
 	waitTime_ = waitTimeMax_;
 }
 

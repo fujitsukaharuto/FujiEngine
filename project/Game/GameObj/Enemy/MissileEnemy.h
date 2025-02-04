@@ -30,6 +30,7 @@ public:
 
 	enum class Step{
 		FIRSTFALL,
+		ZMOVE,
 		SIDEMOVE,
 		FALLWAIT,
 		ANTIPATION,
@@ -56,6 +57,7 @@ private:/// イージングタイム
 	float firstFallEaseT_;
 	float sideMoveEaseT_;
 	Easing scalingEase_;
+	Easing zMove_;
 	float antipationEaseT_;
 	float easeDirection_;
 

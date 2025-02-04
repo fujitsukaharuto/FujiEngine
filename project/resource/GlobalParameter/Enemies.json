@@ -1,13 +1,13 @@
 {
     "Enemies": {
-        "AttackValue1": 8.0,
+        "AttackValue1": 3.0,
         "AttackValue2": 0.0,
         "FallSpeed1": 3.5,
         "FallSpeed2": 44.41999816894531,
         "MaxPowerBlow1": 48.720001220703125,
-        "MaxPowerBlow2": 0.0,
+        "MaxPowerBlow2": 52.880001068115234,
         "WeakBlow1": 22.84000015258789,
-        "WeakBlow2": 0.0,
+        "WeakBlow2": 23.639999389648438,
         "antipationEaseMax": 0.5199999809265137,
         "antipationOffsetPos_": 0.8600000143051147,
         "baseScale": [
@@ -22,8 +22,8 @@
         ],
         "explotionExtensionTime_1": 1.6399999856948853,
         "explotionExtensionTime_2": 0.0,
-        "explotionTime_1": 0.949999988079071,
-        "explotionTime_2": 0.0,
+        "explotionTime_1": 7.889999866485596,
+        "explotionTime_2": 0.05999999865889549,
         "fallPos": 35.27000045776367,
         "fallWaitTime_": 6.46999979019165,
         "firstFallEaseMax": 0.7099999785423279,
@@ -54,7 +54,7 @@
         "spawnBoundSpeed2": 0.0,
         "spawnFallSpeed1": 16.18000030517578,
         "spawnFallSpeed2": 0.0,
-        "strongAttackValue1": 11.699999809265137,
+        "strongAttackValue1": 6.0,
         "strongAttackValue2": 0.0
     }
 }
