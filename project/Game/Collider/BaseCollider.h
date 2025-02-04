@@ -5,10 +5,13 @@
 #include "Model/Object3d.h"
 
 
+class OriginGameObject;
+
 struct ColliderInfo {
 	std::string tag;
 	Vector3 pos;
 	Vector3 worldPos;
+	OriginGameObject* owner = nullptr; //コライダーを持つオブジェクトのポインタ
 };
 
 enum class CollisionState {
@@ -30,6 +33,7 @@ public:
 
 	void InfoUpdate();
 
+	void SetOwner(OriginGameObject* owner) { info.owner = owner; }
 	void SetParent(Object3d* parent) { parent_ = parent; }
 	void SetTag(const std::string& tag) { info.tag = tag; }
 	void SetPos(const Vector3& pos) { info.pos = pos; }
