@@ -27,7 +27,7 @@ void GameOver::Init() {
 	selectPos_ = gameSelectPos_;
 	easeDirection_ = 1.0f;
 	selectPosOffSet_ = 0.0f;
-	offsetEasing_.maxTime = 0.7f;
+	offsetEasing_.maxTime = 0.4f;
 	offsetEasing_.time = 0.0f;
 
 
@@ -182,6 +182,6 @@ void GameOver::OffsetMove() {
 		easeDirection_ = 1.0f; // 進む方向に切り替え
 	}
 
-	selectPosOffSet_ = EaseOutBack(-10.0f, 10.0f, offsetEasing_.time, offsetEasing_.maxTime);
+	selectPosOffSet_ = EaseInCubic(-8.0f,11.0f, offsetEasing_.time, offsetEasing_.maxTime);
 
 }

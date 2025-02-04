@@ -18,7 +18,7 @@ void GameRun::Initialize() {
 	textureManager_->Load("uvChecker.png");
 	textureManager_->Load("title.png");
 	textureManager_->Load("clear.png");
-	textureManager_->Load("gameover.png");
+	textureManager_->Load("GameTexture/gameover.png");
 	textureManager_->Load("key.png");
 	textureManager_->Load("uiHome.png");
 	textureManager_->Load("menu_button1.png");
