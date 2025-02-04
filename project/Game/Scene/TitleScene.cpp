@@ -48,8 +48,8 @@ void TitleScene::Initialize() {
 	//titleAnimation_->SetOnAnimationCompleteCallback([]() {});
 	//titleAnimation_->StartAnimation(); // アニメーションの開始
 
-	//ParticleManager::Load(emit1, "flyPlayer1");
-	//ParticleManager::Load(emit2, "flyPlayer2");
+	//ParticleManager::Load(emit1, "star1");
+	//ParticleManager::Load(emit2, "star2");
 
 }
 
@@ -75,11 +75,12 @@ void TitleScene::Update() {
 	//emit1.DebugGUI();
 	//emit2.DebugGUI();
 
-	//emit1.Emit();
-	//emit2.Emit();
+	/*emit1.Emit();*/
+	/*emit2.Emit();*/
 
 	/*if (Input::GetInstance()->TriggerKey(DIK_5)) {
 		emit1.Burst();
+		emit2.Burst();
 	}*/
 
 

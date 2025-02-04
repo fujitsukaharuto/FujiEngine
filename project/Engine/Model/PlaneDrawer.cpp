@@ -190,7 +190,7 @@ void PlaneDrawer::SetCamera(Camera* camera) {
 void PlaneDrawer::CreateMeshes() {
 
 	const UINT maxVertex = kMaxPlanes * 4;
-	const UINT maxIndices = maxVertex * 240;
+	const UINT maxIndices = maxVertex * 400;
 
 	planes_ = CreateMesh(maxVertex, maxIndices);
 }
