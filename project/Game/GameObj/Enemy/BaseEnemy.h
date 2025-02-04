@@ -68,6 +68,7 @@ protected:
 	Vector3                            powerUpScale_;
 	
 	SoundData sizeupSE_;
+	SoundData parachuteSE_;
 
 	/// behavior
 	std::unique_ptr<BaseEnemyBehaivor> behavior_ = nullptr;

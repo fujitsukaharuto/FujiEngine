@@ -106,6 +106,8 @@ void BaseEnemy::SpawnFall(float& speed, const bool& isJump) {
 		if (!dynamic_cast<EnemySpawnFall*>(behavior_.get())) return;
 			// ジャンプ終了
 			SetRotationX(0.0f);
+			parachuteSE_ = Audio::GetInstance()->SoundLoadWave("openParachute.wav");
+			Audio::GetInstance()->SoundPlayWave(parachuteSE_, 0.6f);
 			ChangeBehavior(std::make_unique<EnemyFall>(this));
 	}
 }
