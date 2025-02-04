@@ -26,6 +26,7 @@ PlayerAttackRoot::PlayerAttackRoot(Player* boss)
 
 	ParticleManager::Load(charge1_, "charge1");
 	ParticleManager::Load(charge2_, "charge2");
+	ParticleManager::Load(chargeMax1_, "chargeMax1");
 	ParticleManager::Load(kiran1_, "kiran1");
 	ParticleManager::Load(kiran2_, "kiran2");
 
@@ -88,6 +89,8 @@ void PlayerAttackRoot::Update() {
 		 	///* 時間経過で強化キックに
 		if (chargeTime_ < pPlayer_->GetParamater().kikChargeTime_)break;
 		Audio::GetInstance()->SoundPlayWave(kickCharge_);
+		chargeMax1_.pos = pPlayer_->GetModel()->GetWorldPos();
+		chargeMax1_.Burst();
 		pPlayer_->SetTag(static_cast<size_t>(Player::KikPower::MAXPOWER));
 		step_ = Step::STRONGATTACK;
 		break;

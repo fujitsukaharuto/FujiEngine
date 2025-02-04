@@ -25,6 +25,8 @@ private:
 	ParticleEmitter charge1_;
 	ParticleEmitter charge2_;
 
+	ParticleEmitter chargeMax1_;
+
 	ParticleEmitter kiran1_;
 	ParticleEmitter kiran2_;
 

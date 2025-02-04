@@ -39,14 +39,6 @@ void TitleScene::Initialize() {
 	sphere = std::make_unique<Object3d>();
 	sphere->CreateSphere();
 
-	test_ = std::make_unique<TestBaseObj>();
-	test_->Initialize();
-	test_->name_ = "testObj";
-	test_->GetCollider()->SetIsCollisonCheck(false);
-
-	test2_ = std::make_unique<TestBaseObj>();
-	test2_->Initialize();
-	test2_->name_ = "testObj2";
 
 	titleAnimation_ = std::make_unique<TitleAnimationManager>();
 	titleAnimation_->Init();
@@ -55,6 +47,9 @@ void TitleScene::Initialize() {
 	
 	//titleAnimation_->SetOnAnimationCompleteCallback([]() {});
 	//titleAnimation_->StartAnimation(); // アニメーションの開始
+
+	//ParticleManager::Load(emit1, "chargeMax1");
+	//ParticleManager::Load(emit2, "kiran2");
 
 }
 
@@ -80,21 +75,22 @@ void TitleScene::Update() {
 	/*emit1.DebugGUI();*/
 	/*emit2.DebugGUI();*/
 
-	test_->Debug();
-	test2_->Debug();
+	//emit1.Emit();
+	/*emit2.Emit();*/
+
+	/*if (Input::GetInstance()->TriggerKey(DIK_5)) {
+		emit1.Burst();
+	}*/
+
 
 #endif // _DEBUG
 	dxCommon_->UpDate();
 
 	BlackFade();
 
-	test_->Update();
-	test2_->Update();
 
 	sphere->transform.rotate.y += 0.02f;
 
-	cMane_->AddCollider(test_->GetCollider());
-	cMane_->AddCollider(test2_->GetCollider());
 	cMane_->CheckAllCollision();
 
 	ParticleManager::GetInstance()->Update();
@@ -116,8 +112,7 @@ void TitleScene::Draw() {
 	ParticleManager::GetInstance()->Draw();
 
 #ifdef _DEBUG
-	test_->DrawCollider();
-	test2_->DrawCollider();
+
 #endif // _DEBUG
 	Line3dDrawer::GetInstance()->Render();
 

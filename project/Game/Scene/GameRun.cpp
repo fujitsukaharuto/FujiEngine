@@ -85,6 +85,8 @@ void GameRun::Initialize() {
 	pManager_->CreateParticleGroup("charge1", "blueParticle.png");
 	pManager_->CreateParticleGroup("charge2", "blueParticle.png");
 
+	pManager_->CreateParticleGroup("chargeMax1", "kira.png");
+
 	pManager_->CreateParticleGroup("kiran1", "blueParticle.png");
 	pManager_->CreateParticleGroup("kiran2", "blueParticle.png");
 
