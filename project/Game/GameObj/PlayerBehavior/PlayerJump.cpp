@@ -119,7 +119,7 @@ void PlayerJump::Update() {
 		pPlayer_->Move(pPlayer_->GetParamater().airMoveSpeed_);
 		pPlayer_->Jump(speed_);
 
-		flydirection = { pPlayer_->GetFacingDirection(), speed_ * 0.75f ,0.0f };
+		flydirection = { pPlayer_->GetFacingDirection(), speed_ * 0.5f ,0.0f };
 		flydirection = flydirection.Normalize() * 0.4f;
 		flyEmit1_.pos = pPlayer_->GetModel()->GetWorldPos();
 		flyEmit2_.pos = pPlayer_->GetModel()->GetWorldPos();
