@@ -323,95 +323,48 @@ void GameScene::BlackFade() {
 }
 
 void GameScene::Menu() {
-	XINPUT_STATE pad;
+	if (mode_ == GameScene::GAMEOVER && !isMenu_)return;
+	if (blackTime != 0.0f)return;
+
 	if (!isMenu_) {
-		if (Input::GetInstance()->TriggerKey(DIK_ESCAPE)) {
-			if (blackTime == 0.0f) {
-				isMenu_ = true;
-			}
-		} else if (Input::GetInstance()->GetGamepadState(pad)) {
-			if (Input::GetInstance()->TriggerButton(PadInput::Start)) {
-				if (blackTime == 0.0f) {
-					isMenu_ = true;
-				}
-			}
+		if (Input::GetInstance()->TriggerKey(DIK_ESCAPE) || Input::GetInstance()->TriggerButton(PadInput::Start)) {
+			isMenu_ = true;
 		}
 	} else {
 		// esc
-		if (Input::GetInstance()->TriggerKey(DIK_ESCAPE)) {
-			if (blackTime == 0.0f) {
-				isMenu_ = false;
-			}
-		} else if (Input::GetInstance()->GetGamepadState(pad)) {
-			if (Input::GetInstance()->TriggerButton(PadInput::Start)) {
-				if (blackTime == 0.0f) {
-					isMenu_ = false;
-				}
-			}
+		if (Input::GetInstance()->TriggerKey(DIK_ESCAPE) || Input::GetInstance()->TriggerButton(PadInput::Start)) {
+			isMenu_ = false;
 		}
 
 		// セレクト
-		if (Input::GetInstance()->TriggerKey(DIK_W)) {
-			if (blackTime == 0.0f) {
-				nowSelect_ = 1;
-				menuButton1_->SetSize(buttonSizeMax_);
-				menuButton2_->SetSize({ 300.0f,100.0f });
-			}
-		} else if (Input::GetInstance()->TriggerKey(DIK_S)) {
-			if (blackTime == 0.0f) {
-				nowSelect_ = 2;
-				menuButton1_->SetSize({ 300.0f,100.0f });
-				menuButton2_->SetSize(buttonSizeMax_);
-			}
-		} else if (Input::GetInstance()->GetGamepadState(pad)) {
-			bool ismoving = false;
-			const float thresholdValue = 0.8f;
-			Vector2 stickVelocity;
-			stickVelocity = { 0.0f,Input::GetInstance()->GetLStick().y / SHRT_MAX };
-			if (stickVelocity.Length() > thresholdValue) {
-				ismoving = true;
-			}
+		bool ismoving = false;
+		const float thresholdValue = 0.8f;
+		Vector2 stickVelocity;
+		stickVelocity = { 0.0f,Input::GetInstance()->GetLStick().y / SHRT_MAX };
+		if (stickVelocity.Length() > thresholdValue) {
+			ismoving = true;
+		}
 
-			if (Input::GetInstance()->TriggerButton(PadInput::Up) || (ismoving && stickVelocity.y > 0.0f)) {
-				if (blackTime == 0.0f) {
-					nowSelect_ = 1;
-					menuButton1_->SetSize(buttonSizeMax_);
-					menuButton2_->SetSize({ 300.0f,100.0f });
-				}
-			} else if (Input::GetInstance()->TriggerButton(PadInput::Down) || (ismoving && stickVelocity.y < 0.0f)) {
-				if (blackTime == 0.0f) {
-					nowSelect_ = 2;
-					menuButton1_->SetSize({ 300.0f,100.0f });
-					menuButton2_->SetSize(buttonSizeMax_);
-				}
-			}
+		if (Input::GetInstance()->TriggerKey(DIK_W) || Input::GetInstance()->TriggerButton(PadInput::Up) || (ismoving && stickVelocity.y > 0.0f)) {
+			nowSelect_ = 1;
+			menuButton1_->SetSize(buttonSizeMax_);
+			menuButton2_->SetSize({ 300.0f,100.0f });
+		} else if (Input::GetInstance()->TriggerKey(DIK_S) || Input::GetInstance()->TriggerButton(PadInput::Down) || (ismoving && stickVelocity.y < 0.0f)) {
+			nowSelect_ = 2;
+			menuButton1_->SetSize({ 300.0f,100.0f });
+			menuButton2_->SetSize(buttonSizeMax_);
 		}
 
 		// 決定
-		if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
-			if (blackTime == 0.0f) {
-				if (nowSelect_ == 1) {
-					isMenu_ = false;
-				} else {
-					isChangeFase = true;
-					isTitle_ = true;
-				}
-			}
-		} else if (Input::GetInstance()->GetGamepadState(pad)) {
-			if (Input::GetInstance()->TriggerButton(PadInput::A)) {
-				if (blackTime == 0.0f) {
-					if (nowSelect_ == 1) {
-						isMenu_ = false;
-					} else {
-						isChangeFase = true;
-						isTitle_ = true;
-					}
-				}
+		if (Input::GetInstance()->TriggerKey(DIK_SPACE) || Input::GetInstance()->TriggerButton(PadInput::A)) {
+			if (nowSelect_ == 1) {
+				isMenu_ = false;
+			} else {
+				isChangeFase = true;
+				isTitle_ = true;
 			}
 		}
-
 	}
-
 }
 
 void GameScene::MenuInit() {
