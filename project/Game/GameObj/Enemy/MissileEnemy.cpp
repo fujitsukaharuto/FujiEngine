@@ -20,12 +20,12 @@ void MissileEnemy::Initialize() {
 	bombSE_ = Audio::GetInstance()->SoundLoadWave("MissileBomb.wav");
 	luncherSE_ = Audio::GetInstance()->SoundLoadWave("MissileLauncher.wav");
 	sizeSE_ = Audio::GetInstance()->SoundLoadWave("missileSize.wav");
-
+	  
 	scalingEase_.maxTime = paramater_.scalingEaseMax;
 	model_->transform.scale = paramater_.baseScale;
 
 	// collider
-	SetCollisionSize(BaseScale_ * 2.0f);
+	SetCollisionSize(BaseScale_ * 14.0f);
 	collider_->SetParent(model_.get());
 	collider_->InfoUpdate();
 

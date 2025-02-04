@@ -19,7 +19,7 @@ void NormalEnemy::Initialize() {
 	parachuteModel_->Create("Parachute.obj");
 	parachuteModel_->SetParent(model_.get());
 	parachuteModel_->transform.scale = Vector3::GetZeroVec();
-	parachuteModel_->transform.translate.y = 1.5f;
+	parachuteModel_->transform.translate.y = 2.5f;
 
 	/// behavior
 	behaviorMap_ = {

@@ -65,7 +65,7 @@ void EnemyManager::SpawnEnemy(const BaseEnemy::Type& enemyType, const Vector3& p
 		// 位置初期化とlistに追加
 		missle->Initialize();
 		missle->SetTargetPosX(position.x);
-		missle->SetWorldPosition(Vector3(0.0f, UFO::InitY_, 10.0f));
+		missle->SetWorldPosition(Vector3(0.0f, UFO::InitY_, 15.0f));
 		missle->SetPosition();
 		missle->SetPlayer(pPlayer_);// プレイヤーセット
 		pUFO_->ChangePopBehavior();
