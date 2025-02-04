@@ -54,6 +54,7 @@ public:
 
 	void EmitJumpAttack();
 	void EmitWalk();
+	void EmitDush();
 
 	void SetLockOn(const LockOn* target) { lockOn_ = target; }
 	bool GetLockOn();
@@ -107,6 +108,11 @@ private:
 	ParticleEmitter attackParticle3_;
 	ParticleEmitter attackParticle4_;
 	ParticleEmitter attackParticle5_;
+
+	ParticleEmitter dushEmit1_;
+	ParticleEmitter dushEmit2_;
+
+
 
 	const LockOn* lockOn_ = nullptr;
 

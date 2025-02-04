@@ -49,6 +49,8 @@ void GameRun::Initialize() {
 	pManager_->CreateParticleGroup("attackParticle4", "blueParticle.png", 20);
 	pManager_->CreateParticleGroup("attackParticle5", "blueParticle.png",20);
 
+	pManager_->CreateParticleGroup("flyEnemy1", "blueParticle.png", 30);
+	pManager_->CreateParticleGroup("flyEnemy2", "blueParticle.png", 30);
 
 	// 敵のパーティクル
 	pManager_->CreateParticleGroup("hitParticle1", "blueParticle.png",70);

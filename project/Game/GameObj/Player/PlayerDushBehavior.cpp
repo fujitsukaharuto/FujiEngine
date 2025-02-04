@@ -43,6 +43,9 @@ void PlayerDushBehavior::Dush() {
 
 	pPlayer_->GetModel()->transform.translate = newPos;
 
+	move = move.Normalize();
+	pPlayer_->EmitDush();
+
 	float t = CustomEasing(1.0f / 30.0f * (30.0f - attackT1_));
 	pPlayer_->GetBodyModel()->transform.scale.z = Lerp(0.5f, 0.75f, t);
 	float xySize = Lerp(0.5f, 0.25f, t);

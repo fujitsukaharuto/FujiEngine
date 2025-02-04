@@ -99,6 +99,13 @@ void Player::Initialize() {
 	attackParticle5_.Load("attackParticle5");
 	attackParticle5_.SetParent(body_.get());
 
+	dushEmit1_.name = "flyEnemy1";
+	dushEmit1_.Load("flyEnemy1");
+	dushEmit1_.SetParent(body_.get());
+	dushEmit2_.name = "flyEnemy2";
+	dushEmit2_.Load("flyEnemy2");
+	dushEmit2_.SetParent(body_.get());
+
 
 	attackSound1=Audio::GetInstance()->SoundLoadWave("attack2.wav");
 	attackSound2 = Audio::GetInstance()->SoundLoadWave("attack1.wav");
@@ -152,6 +159,9 @@ void Player::Update() {
 	attackParticle3_.DebugGUI();
 	attackParticle4_.DebugGUI();
 	attackParticle5_.DebugGUI();
+
+	dushEmit1_.DebugGUI();
+	dushEmit2_.DebugGUI();
 
 	ImGui::Begin("weapon");
 	ImGui::DragFloat3("rotate", &weapon_->transform.rotate.x, 0.01f);
@@ -280,6 +290,11 @@ void Player::EmitJumpAttack() {
 
 void Player::EmitWalk() {
 	walkParticle_.Burst();
+}
+
+void Player::EmitDush() {
+	dushEmit1_.Emit();
+	dushEmit2_.Emit();
 }
 
 bool Player::GetLockOn() {
