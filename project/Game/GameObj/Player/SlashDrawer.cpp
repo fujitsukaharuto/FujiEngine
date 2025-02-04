@@ -27,7 +27,7 @@ void SlashDrawer::Update() {
 		}
 
 		uvTrans_.y = std::lerp(0.0f, 0.9f, t);
-		slashModel_->SetColor({ 1.0f,0.0f,0.0f,(alpha) });
+		slashModel_->SetColor({ 0.75f,0.0f,0.0f,(alpha) });
 	}
 	else {
 		if (scrollTime_ > 0.0f) {

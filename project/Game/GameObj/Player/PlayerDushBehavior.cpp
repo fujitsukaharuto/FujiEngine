@@ -28,7 +28,20 @@ void PlayerDushBehavior::Dush() {
 	move = move.Normalize() * kCharacterSpeed;
 	Matrix4x4 rotatePlayer = MakeRotateXYZMatrix(pPlayer_->GetModel()->transform.rotate);
 	move = TransformNormal(move, rotatePlayer);
-	pPlayer_->GetModel()->transform.translate += move * FPSKeeper::DeltaTime();
+
+	// プレイヤーの新しい座標を計算
+	Vector3 newPos = pPlayer_->GetTrans().translate + move * FPSKeeper::DeltaTime();
+
+	// 新しい座標の長さ（原点からの距離）を計算
+	float newPosLength = newPos.Length();
+
+	// 半径制限を超えていたら、円の内側に補正
+	if (newPosLength > 41.0f) {
+		Vector3 correctionDir = newPos.Normalize(); // 中心方向の単位ベクトル
+		newPos = correctionDir * 41.0f; // 半径からの位置に補正
+	}
+
+	pPlayer_->GetModel()->transform.translate = newPos;
 
 	float t = CustomEasing(1.0f / 30.0f * (30.0f - attackT1_));
 	pPlayer_->GetBodyModel()->transform.scale.z = Lerp(0.5f, 0.75f, t);

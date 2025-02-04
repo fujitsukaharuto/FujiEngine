@@ -60,11 +60,11 @@ void PlaneDrawer::Finalize() {
 void PlaneDrawer::AddPlanePoint(const Vector3& p1) {
 
 	if (numberCount_ == 0) {
-		points_.push_back({ p1,{0.0f,0.0f},{1.0f,1.0f,0.0f,0.3f} });
+		points_.push_back({ p1,{0.0f,0.0f},{0.8f,0.1f,0.0f,0.3f} });
 		numberCount_++;
 	}
 	else {
-		points_.push_back({ p1,{0.0f,0.0f},{1.0f,1.0f,0.0f,0.8f} });
+		points_.push_back({ p1,{0.0f,0.0f},{0.8f,0.1f,0.0f,0.9f} });
 		numberCount_ = 0;
 	}
 
