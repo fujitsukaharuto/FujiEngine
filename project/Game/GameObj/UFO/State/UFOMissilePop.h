@@ -24,7 +24,7 @@ private:
 	Easing lightUpEasing_;
 	Easing lightCloseEasing_;
 
-	
+	Easing scalingEase_;
 
 	SoundData firstSE_;
 

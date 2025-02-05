@@ -34,6 +34,11 @@ UFOMissilePop::UFOMissilePop(UFO* player)
 	waitTime_ = 0.0f;
 	kWaitTime_ = 0.3f;
 
+	scalingEase_.maxTime = 0.5f;
+	scalingEase_.amplitude = 1.0f;
+	scalingEase_.period = 0.2f;
+
+
 	step_ = Step::LIGHTUP;
 	
 	firstSE_ = Audio::GetInstance()->SoundLoadWave("missileApe.wav");
@@ -56,15 +61,18 @@ void UFOMissilePop::Update() {
 
 		/// タイム加算
 		lightUpEasing_.time += FPSKeeper::DeltaTimeRate();
+		scalingEase_.time += FPSKeeper::DeltaTimeRate();
 	
 		// イージング適応
 		pUFO_->GetUFOLight()->transform.scale =
 			EaseInCubic(initScale_, scaleUnderPop_, lightUpEasing_.time,lightUpEasing_.maxTime);
+		pUFO_->SetScale(EaseAmplitudeScale(Vector3(1, 1, 1), scalingEase_.time, scalingEase_.maxTime, scalingEase_.amplitude, scalingEase_.period));
 
 		/// 次のステップ
 		if (lightUpEasing_.time < lightUpEasing_.maxTime)break;
 		lightUpEasing_.time = lightUpEasing_.maxTime;
 		Audio::GetInstance()->SoundPlayWave(firstSE_, 0.08f);
+		pUFO_->SetScale(Vector3(1, 1, 1));
 
 		step_ = Step::LIGHTCLOSE;
 		break;
