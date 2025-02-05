@@ -16,6 +16,7 @@
 #include"GameObj/LifeUI/LifeUI.h"
 #include"GameObj/GameOverScreen/GameOver.h"
 #include"GameObj/GamePreStart/GamePreStart.h"
+#include"GameObj/BackGround/BackGround.h"
 
 class GameScene :public BaseScene
 {
@@ -116,6 +117,7 @@ private:
 	std::unique_ptr<LifeUI>lifeUI_;
 	std::unique_ptr<GameOver>gameOver_;
 	std::unique_ptr<GamePreStart>gamePreStart_;
+	std::unique_ptr<BackGround>backGround_;
 
 	std::unique_ptr<CollisionManager> cMane_;
 

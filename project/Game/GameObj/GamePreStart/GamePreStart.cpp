@@ -1,6 +1,7 @@
 #include"GamePreStart.h"
 #include"GameObj/UFO/UFO.h"
 #include"GameObj/SkyDome/SkyDome.h"
+#include"GameObj/BackGround/BackGround.h"
 #include"FPSKeeper.h"
 #include<imgui.h>
 
@@ -48,7 +49,7 @@ void GamePreStart::Update() {
 	switch (step_)
 	{
 		///-----------------------------------------------------------------
-		///最初の待機
+		/// 最初の待機
 		///-----------------------------------------------------------------
 	case GamePreStart::Step::WAIT:
 		waitTime_ += FPSKeeper::NormalDeltaTime();
@@ -57,19 +58,20 @@ void GamePreStart::Update() {
 		step_ = Step::GOUP;
 		break;
 		///-----------------------------------------------------------------
-		///上に上がる
+		/// 上に上がる
 		///-----------------------------------------------------------------
 	case GamePreStart::Step::GOUP:
 		goUpTime_.time += FPSKeeper::NormalDeltaTime();
+		/// 出現
 		pUFO_->Apear(goUpTime_.time, goUpTime_.maxTime);
-		pSkyDome_->Apear(goUpTime_.time, 1.0f);
+		pBackGround_->Scrool(goUpTime_.time, 1.0f);
 
 		if (goUpTime_.time < goUpTime_.maxTime)break;
 		goUpTime_.time = goUpTime_.maxTime;
 		step_ = Step::AIMWAIT;
 		break;
 		///-----------------------------------------------------------------
-		///最初の待機
+		/// 最初の待機
 		///-----------------------------------------------------------------
 	case GamePreStart::Step::AIMWAIT:
 		aimWaitTime_ += FPSKeeper::NormalDeltaTime();
@@ -78,7 +80,7 @@ void GamePreStart::Update() {
 		step_ = Step::AIMOPEN;
 		break;
 		///-----------------------------------------------------------------
-		///最初の待機
+		/// 最初の待機
 		///-----------------------------------------------------------------
 	case GamePreStart::Step::AIMOPEN:
 		aimEase_.time += FPSKeeper::NormalDeltaTime();
@@ -149,4 +151,7 @@ void GamePreStart::SetSkyDome(SkyDome* skydome) {
 }
 void GamePreStart::SetUFO(UFO* ufo) {
 	pUFO_ = ufo;
+}
+void GamePreStart::SetBackGround(BackGround* back) {
+	pBackGround_ = back;
 }

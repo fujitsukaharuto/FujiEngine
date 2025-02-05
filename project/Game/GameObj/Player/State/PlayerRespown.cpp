@@ -39,6 +39,8 @@ PlayerReSpown::PlayerReSpown(Player* boss)
 	revivalSE_ = Audio::GetInstance()->SoundLoadWave("playerRevival.wav");
 	Audio::GetInstance()->SoundPlayWave(revivalSE_,0.05f);
 
+	pPlayer_->GetFieldManager()->AllReset();
+
 }
 
 PlayerReSpown ::~PlayerReSpown() {
@@ -82,7 +84,6 @@ void PlayerReSpown::Update() {
 		///-------------------------------------------------------
 		/// 死
 		///-------------------------------------------------------
-		pPlayer_->GetFieldManager()->AllReset();
 		pPlayer_->ChangeState(std::make_unique<PlayerNoneState>(pPlayer_));
 		break;
 	default:

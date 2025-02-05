@@ -50,10 +50,3 @@ void SkyDome::Debug() {
 	}
 }
 
-void SkyDome::Apear(const float& time, const float& maxTime) {
-	model_->transform.translate.y = EaseInCubic(
-		yStart_, yEnd_, time, maxTime);
-
-	if (time < maxTime) return;
-	model_->transform.translate.y = yEnd_;
-}

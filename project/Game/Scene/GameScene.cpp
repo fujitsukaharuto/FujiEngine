@@ -37,6 +37,7 @@ void GameScene::Initialize() {
 	lifeUI_= std::make_unique<LifeUI>();
 	gameOver_ = std::make_unique<GameOver>();
 	gamePreStart_ = std::make_unique<GamePreStart>();
+	backGround_ = std::make_unique<BackGround>();
 	///-------------------------------------------------------------
 	///　初期化
 	///-------------------------------------------------------------- 
@@ -74,6 +75,7 @@ void GameScene::Initialize() {
 
 	gamePreStart_->Init();
 	timer_->Init();
+	backGround_->Init();
 	field_->Initialize();
 	skydome_->Initialize();
 	player_->Initialize();
@@ -90,13 +92,15 @@ void GameScene::Initialize() {
 	ParticleManager::Load(emit, "star");
 
 	///set
-	gamePreStart_->SetSkyDome(skydome_.get());
+	/*gamePreStart_->SetSkyDome(skydome_.get());*/
 	gamePreStart_->SetUFO(ufo_.get());
+	gamePreStart_->SetBackGround(backGround_.get());
 	lifeUI_->SetPlayer(player_.get());
 	enemyManager_->SetPlayer(player_.get());
 	enemyManager_->SetUFO(ufo_.get());
 	ufo_->SetEnemyManager(enemyManager_.get());
 	enemySpawn_->SetEnemyManager(enemyManager_.get());
+	player_->SetFieldBlockManager(fieldBlockManager_.get());
 
 	fieldBlockManager_->AddFieldBlock();
 	fieldBlockManager_->AddFieldBlock();
@@ -130,6 +134,7 @@ void GameScene::Update() {
 			gameCamera_->Update();
 			gamePreStart_->Update();
 			lifeUI_->Update();
+			backGround_->Update();
 			
 			if (!gamePreStart_->GetIsEnd())break;
 			mode_ = Mode::GAME;
@@ -144,14 +149,15 @@ void GameScene::Update() {
 			timer_->Update();
 			timer_->SetTextureRangeForDigit();
 
+			backGround_->Update();
 			enemySpawn_->Update();
 			field_->Update();
 			skydome_->Update();
+			fieldBlockManager_->Update();
 			player_->Update();
 			ufo_->Update();
 			gameCamera_->Update();
 			enemyManager_->Update();
-			fieldBlockManager_->Update();
 			kikArea_->Update();
 			lifeUI_->Update();
 
@@ -208,8 +214,11 @@ void GameScene::Draw() {
 	///-------------------------------------------------------------
 	///　背景描画
 	///--------------------------------------------------------------
+	dxCommon_->PreSpriteDraw();
 
+	backGround_->Draw();
 	dxCommon_->ClearDepthBuffer();
+
 #pragma endregion
 
 
@@ -219,7 +228,7 @@ void GameScene::Draw() {
 	///-------------------------------------------------------------
 	///　モデル描画
 	///-------------------------------------------------------------- 
-	skydome_->Draw();
+	/*skydome_->Draw();*/
 	fieldBlockManager_->Draw();
 	player_->Draw();
 	enemyManager_->Draw();
@@ -238,20 +247,26 @@ void GameScene::Draw() {
 #pragma region 前景スプライト
 
 	dxCommon_->PreSpriteDraw();
-
+	
+	//UFOスプライト
 	ufo_->SpriteDraw();
 	if (!(slideTime_ >= slideLimitteTime_)) {
 		startUI_->Draw();
 	}
+	///　メニュー描画
 	if (isMenu_) {
 		menuPaneru_->Draw();
 		menuButton1_->Draw();
 		menuButton2_->Draw();
 	}
+
+	/// 操作、タイム描画
 	keyPaneru_->Draw();
 	timer_->Draw();
 	lifeUI_->Draw();
 	gamePreStart_->Draw();
+
+	// ゲームオーバー描画
 	if (mode_ == GAMEOVER) {
 		gameOver_->Draw();
 	}
@@ -408,6 +423,7 @@ void GameScene::ParamaterEdit() {
 	
 	ImGui::Begin("DebugParm");
 	skydome_->Debug();
+	backGround_->Debug();
 	field_->Debug();
 	timer_->Debug();
 	gameOver_->Debug();

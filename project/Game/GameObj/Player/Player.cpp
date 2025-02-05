@@ -820,3 +820,6 @@ void  Player::SetColliderSetting() {
 
 }
 
+void Player::SetFieldBlockManager(FieldBlockManager* fieldBlockManager) {
+	pFieldBlockManager_ = fieldBlockManager;
+}

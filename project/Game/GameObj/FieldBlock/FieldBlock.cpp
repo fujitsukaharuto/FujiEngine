@@ -67,6 +67,7 @@ void FieldBlock::Initialize() {
 
 void FieldBlock::Reset() {
 	// 初期パラメータセット
+	if (dynamic_cast<FieldBlockNormal*>(state_.get()))return;
 	ChangeState(std::make_unique<FieldBlockNormal>(this));
 	ChangeBehavior(std::make_unique<FieldBlockNoDamage>(this)); 
 }

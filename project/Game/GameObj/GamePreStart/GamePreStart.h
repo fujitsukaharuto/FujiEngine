@@ -5,6 +5,7 @@
 
 class UFO;
 class SkyDome;
+class BackGround;
 class GamePreStart {
 public:
 	enum class Step {
@@ -20,6 +21,7 @@ public:
 private:
 	UFO* pUFO_;
 	SkyDome* pSkyDome_;
+	BackGround* pBackGround_;
 private:
 	Step step_;
 
@@ -63,6 +65,7 @@ public:
 	/// setter method
 	///================================================================
 	
+	void SetBackGround(BackGround* back);
 	void SetSkyDome(SkyDome* skydome);
 	void SetUFO(UFO* ufo);
 };
