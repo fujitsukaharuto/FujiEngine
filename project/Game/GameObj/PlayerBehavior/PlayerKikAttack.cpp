@@ -26,6 +26,7 @@ PlayerKikAttack::PlayerKikAttack(Player* boss)
 
 	kickColor_ = { 1.0f,1.0f,0.0f };
 	strongKickColor_ = { 0.5f,0.0f,0.0f };
+	PlaneDrawer::GetInstance()->Reset();
 }
 
 PlayerKikAttack ::~PlayerKikAttack() {
