@@ -35,9 +35,15 @@ UFODeath::UFODeath(UFO* player)
 		bombEmit2_[i].pos = pUFO_->GetModel()->GetWorldPos()+ pUFO_->GetParamater().particleOffsets_[i];
 		bombEmit3_[i].pos = pUFO_->GetModel()->GetWorldPos()+ pUFO_->GetParamater().particleOffsets_[i];
 
-		bombEmit1_[i].SetTime(5.0f + (5.0f * i));
-		bombEmit2_[i].SetTime(5.0f + (5.0f * i));
-		bombEmit3_[i].SetTime(5.0f + (5.0f * i));
+		bombEmit1_[i].SetTime(5.0f + (10.0f * i));
+		bombEmit2_[i].SetTime(5.0f + (10.0f * i));
+		bombEmit3_[i].SetTime(5.0f + (10.0f * i));
+
+		if (i == 2) {
+			bombEmit1_[i].SetTime(10.0f);
+			bombEmit2_[i].SetTime(10.0f);
+			bombEmit3_[i].SetTime(10.0f);
+		}
 
 		bombEmit1_[i].frequencyTime = 20.0f;
 		bombEmit2_[i].frequencyTime = 20.0f;
