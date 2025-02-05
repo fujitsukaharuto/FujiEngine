@@ -60,6 +60,7 @@ public:
 	void SetParent(Object3d* parent) { parent_ = parent; }
 	void SetTime(float t) { time_ = t; }
 	Vector3 GetWorldPos();
+	float GetTime() { return time_; }
 
 	std::string name;
 	Vector3 pos;

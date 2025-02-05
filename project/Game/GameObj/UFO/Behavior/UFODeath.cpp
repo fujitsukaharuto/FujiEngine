@@ -51,6 +51,8 @@ UFODeath::UFODeath(UFO* player)
 	ParticleManager::Load(deathSmoke1_, "UFOSmoke1");
 	ParticleManager::Load(deathSmoke2_, "UFOSmoke2");
 
+	bomb_ = Audio::GetInstance()->SoundLoadWave("mini_bomb2.wav");
+
 	pUFO_->GetEnemyManager()->AllDeath();
 	prePos_ = pUFO_->GetModel()->GetWorldPos();
 	kWaitTime_ = 0.1f;
@@ -101,6 +103,9 @@ void UFODeath::Update() {
 			bombEmit1_[i].Emit();
 			bombEmit2_[i].Emit();
 			bombEmit3_[i].Emit();
+		}
+		if (bombEmit1_[0].GetTime() == bombEmit1_[0].frequencyTime) {
+			Audio::GetInstance()->SoundPlayWave(bomb_);
 		}
 
 		smoke_.pos = pUFO_->GetModel()->GetWorldPos() + Random::GetVector3({ -14.0f,14.0f }, { -4.0f,4.0f }, { -2.0f,-1.0f });
