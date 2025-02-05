@@ -55,9 +55,9 @@ void GameRun::Initialize() {
 	pManager_->CreateAnimeGroup("animetest", "uvChecker.png");
 	pManager_->AddAnime("animetest", "white2x2.png", 10.0f);
 
-	pManager_->CreateParticleGroup("bomb1", "blueParticle.png", 30);
-	pManager_->CreateParticleGroup("bomb2", "blueParticle.png", 30);
-	pManager_->CreateParticleGroup("bomb3", "blueParticle.png", 30);
+	pManager_->CreateParticleGroup("bomb1", "blueParticle.png", 50);
+	pManager_->CreateParticleGroup("bomb2", "blueParticle.png", 50);
+	pManager_->CreateParticleGroup("bomb3", "blueParticle.png", 50);
 
 	pManager_->CreateParticleGroup("kick1", "blueParticle.png");
 	pManager_->CreateParticleGroup("kick2", "blueParticle.png");
@@ -119,6 +119,10 @@ void GameRun::Initialize() {
 	pManager_->CreateParticleGroup("groundBreak", "blueParticle.png", 80);
 	pManager_->CreateParticleGroup("groundBreakReverse", "blueParticle.png",80);
 
+	pManager_->CreateParticleGroup("UFOSmoke", "blueParticle.png", 50);
+
+	pManager_->CreateParticleGroup("UFOSmoke1", "blueParticle.png", 20);
+	pManager_->CreateParticleGroup("UFOSmoke2", "blueParticle.png", 20);
 
 
 

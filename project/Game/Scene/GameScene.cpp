@@ -347,7 +347,7 @@ void GameScene::BlackFade() {
 }
 
 void GameScene::Menu() {
-	if (mode_ == GameScene::GAMEOVER && !isMenu_)return;
+	if ((mode_ == GameScene::PREGAME || mode_ == GameScene::GAMEOVER) && !isMenu_)return;
 	if (blackTime != 0.0f)return;
 
 	if (!isMenu_) {

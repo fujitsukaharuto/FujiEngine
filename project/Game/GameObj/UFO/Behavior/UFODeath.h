@@ -4,6 +4,8 @@
 #include "math/Easing.h"
 #include "GameObj/UFO/UFO.h"
 #include "Camera/CameraManager.h"
+#include "Particle/ParticleEmitter.h"
+#include "Audio/Audio.h"
 
 class UFODeath : public BaseUFOBehavior {
 private:
@@ -25,6 +27,20 @@ private:
 
     Vector3 prePos_;
     Vector3 shakePos_;
+
+
+    ParticleEmitter bombEmit1_[3];
+    ParticleEmitter bombEmit2_[3];
+    ParticleEmitter bombEmit3_[3];
+
+    ParticleEmitter smoke_;
+
+    ParticleEmitter deathSmoke1_;
+    ParticleEmitter deathSmoke2_;
+
+
+    SoundData bomb_;
+
 
 public:
     // コンストラクタ・デストラクタ
