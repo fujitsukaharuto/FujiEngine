@@ -38,6 +38,8 @@ LifeUIDeath::LifeUIDeath(LifeUI* boss)
 	ParticleManager::Load(breakEmit1_, "lifeUIBreak1");
 	ParticleManager::Load(breakEmit2_, "lifeUIBreak2");
 
+	breakSE_ = Audio::GetInstance()->SoundLoadWave("UIBreakSE.wav");
+
 }
 
 LifeUIDeath ::~LifeUIDeath() {
@@ -103,7 +105,7 @@ void LifeUIDeath::Update() {
 		breakEmit2_.pos = pLifeUI_->GetEmitterPos();
 		breakEmit1_.Burst();
 		breakEmit2_.Burst();
-
+		Audio::GetInstance()->SoundPlayWave(breakSE_,0.25f);
 		step_ = Step::WAITAFTERBREAK;
 		break;
 		///-------------------------------------------------------

@@ -42,6 +42,8 @@ private:
 	ParticleEmitter breakEmit1_;
 	ParticleEmitter breakEmit2_;
 
+	SoundData breakSE_;
+
 public:
 	//コンストラクタ
 	LifeUIDeath(LifeUI* boss);

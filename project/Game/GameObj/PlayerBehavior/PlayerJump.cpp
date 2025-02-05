@@ -27,7 +27,7 @@ PlayerJump::PlayerJump(Player* player)
 	
 	//se
 	jumpSE_ = Audio::GetInstance()->SoundLoadWave("jump.wav");
-	Audio::GetInstance()->SoundPlayWave(jumpSE_);
+	Audio::GetInstance()->SoundPlayWave(jumpSE_, 0.1f);
 
 	//particle
 	ParticleManager::Load(jumpEmit_, "jump");

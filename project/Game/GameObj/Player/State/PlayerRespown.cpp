@@ -37,7 +37,7 @@ PlayerReSpown::PlayerReSpown(Player* boss)
 	ParticleManager::Load(reviveEmit2_, "revival2");
 
 	revivalSE_ = Audio::GetInstance()->SoundLoadWave("playerRevival.wav");
-	Audio::GetInstance()->SoundPlayWave(revivalSE_,0.05f);
+	Audio::GetInstance()->SoundPlayWave(revivalSE_,0.1f);
 
 	pPlayer_->GetFieldManager()->AllReset();
 

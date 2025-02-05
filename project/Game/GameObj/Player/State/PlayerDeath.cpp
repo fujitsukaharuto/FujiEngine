@@ -31,7 +31,7 @@ PlayerDeath::PlayerDeath(Player* boss)
 	deadEmit2_.Burst();
 
 	deadSE_ = Audio::GetInstance()->SoundLoadWave("playerDead.wav");
-	Audio::GetInstance()->SoundPlayWave(deadSE_);
+	Audio::GetInstance()->SoundPlayWave(deadSE_,0.3f);
 
 }
 

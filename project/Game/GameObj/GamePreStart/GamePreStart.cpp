@@ -58,7 +58,7 @@ void GamePreStart::Update() {
 		times_[static_cast<size_t>(Step::WAIT)] += FPSKeeper::NormalDeltaTime();
 		if (times_[static_cast<size_t>(Step::WAIT)] < params_.kWaitTime)break;
 		times_[static_cast<size_t>(Step::WAIT)] = params_.kWaitTime;
-		Audio::GetInstance()->SoundPlayWave(skySE_);
+		Audio::GetInstance()->SoundPlayWave(skySE_, 0.1f);
 		step_ = Step::GOUPGROUND;
 		break;
 

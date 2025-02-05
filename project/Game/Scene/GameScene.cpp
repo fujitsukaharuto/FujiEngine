@@ -143,7 +143,7 @@ void GameScene::Update() {
 			backGround_->Update();
 			
 			if (!gamePreStart_->GetIsEnd())break;
-			Audio::GetInstance()->SoundLoop(bgm_, 0.1f);
+			Audio::GetInstance()->SoundLoop(bgm_, 0.075f);
 			mode_ = Mode::GAME;
 			break;
 			///-------------------------------------------------------------
