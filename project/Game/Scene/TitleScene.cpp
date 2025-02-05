@@ -48,7 +48,7 @@ void TitleScene::Initialize() {
 	//titleAnimation_->SetOnAnimationCompleteCallback([]() {});
 	//titleAnimation_->StartAnimation(); // アニメーションの開始
 
-	ParticleManager::Load(emit1, "groundCrack1");
+	ParticleManager::Load(emit1, "groundBreak");
 	//ParticleManager::Load(emit2, "groundCrack2");
 
 }
