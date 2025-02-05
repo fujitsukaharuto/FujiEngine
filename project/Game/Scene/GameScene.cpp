@@ -13,6 +13,7 @@
 GameScene::GameScene() {}
 
 GameScene::~GameScene() {
+	Audio::GetInstance()->SoundStopWave(bgm_);
 }
 
 void GameScene::Initialize() {
@@ -92,6 +93,7 @@ void GameScene::Initialize() {
 
 	dicisionSE_ = Audio::GetInstance()->SoundLoadWave("DecisionSE.wav");
 	selectSE_ = Audio::GetInstance()->SoundLoadWave("missileSize.wav");
+	bgm_ = Audio::GetInstance()->SoundLoadWave("BGM2.wav");
 
 	///set
 	/*gamePreStart_->SetSkyDome(skydome_.get());*/
@@ -141,6 +143,7 @@ void GameScene::Update() {
 			backGround_->Update();
 			
 			if (!gamePreStart_->GetIsEnd())break;
+			Audio::GetInstance()->SoundLoop(bgm_, 0.1f);
 			mode_ = Mode::GAME;
 			break;
 			///-------------------------------------------------------------

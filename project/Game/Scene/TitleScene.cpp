@@ -13,6 +13,7 @@
 TitleScene::TitleScene() {}
 
 TitleScene::~TitleScene() {
+	Audio::GetInstance()->SoundStopWave(bgm_);
 }
 
 void TitleScene::Initialize() {
@@ -45,6 +46,9 @@ void TitleScene::Initialize() {
 
 	cMane_ = std::make_unique<CollisionManager>();
 	
+	bgm_ = Audio::GetInstance()->SoundLoadWave("BGM2.wav");
+	Audio::GetInstance()->SoundLoop(bgm_);
+
 	//titleAnimation_->SetOnAnimationCompleteCallback([]() {});
 	//titleAnimation_->StartAnimation(); // アニメーションの開始
 

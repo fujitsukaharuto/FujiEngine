@@ -147,6 +147,7 @@ void GameRun::Initialize() {
 	audio_->LoadWave("openParachute.wav");
 	audio_->LoadWave("DecisionSE.wav");
 	audio_->LoadWave("UIBreakSE.wav");
+	audio_->LoadWave("BGM2.wav");
 #pragma endregion
 
 

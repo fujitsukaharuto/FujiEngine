@@ -33,6 +33,8 @@ private:
 
 	std::unique_ptr<Sprite> titlePaneru_;
 
+	SoundData bgm_;
+
 	// sceneChange
 	std::unique_ptr<Sprite> black_;
 	float blackLimmite = 20.0f;

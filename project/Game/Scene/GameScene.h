@@ -79,6 +79,8 @@ private:
 
 	SoundData dicisionSE_;
 	SoundData selectSE_;
+	SoundData bgm_;
+
 
 	ParticleEmitter emit;
 
