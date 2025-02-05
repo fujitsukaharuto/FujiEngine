@@ -353,7 +353,7 @@ void UFO::ChangePopBehavior() {
 }
 
 void UFO::Apear(const float& time, const float& maxTime) {
-	model_->transform.translate.y = EaseOutBack(
+	model_->transform.translate.y = EaseInCirc(
 		paramater_.startPos.y, paramater_.gamePos.y, time, maxTime);
 
 	if (time < maxTime) return;

@@ -35,7 +35,7 @@ void BackGround::Draw() {
 ///----------------------------------------------
 void BackGround::Scrool(const float& time, const float& maxTime) {
 
-	leftTopPos_ = EaseInCubic(startScrollPos_, endScrollPos_, time, maxTime);
+	leftTopPos_ = EaseInBack(startScrollPos_, endScrollPos_, time, maxTime);
 
 	if (time < maxTime) return;
 	leftTopPos_ = endScrollPos_;

@@ -64,7 +64,7 @@ void GamePreStart::Update() {
 		goUpTime_.time += FPSKeeper::NormalDeltaTime();
 		/// 出現
 		pUFO_->Apear(goUpTime_.time, goUpTime_.maxTime);
-		pBackGround_->Scrool(goUpTime_.time, 1.0f);
+		pBackGround_->Scrool(goUpTime_.time, goUpTime_.maxTime);
 
 		if (goUpTime_.time < goUpTime_.maxTime)break;
 		goUpTime_.time = goUpTime_.maxTime;
