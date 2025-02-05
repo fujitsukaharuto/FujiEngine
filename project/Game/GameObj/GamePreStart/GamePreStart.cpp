@@ -3,12 +3,14 @@
 #include"GameObj/SkyDome/SkyDome.h"
 #include"GameObj/BackGround/BackGround.h"
 #include"FPSKeeper.h"
+#include"ImGuiManager.h"
+#include"Input/Input.h"
 #include<imgui.h>
 
 void GamePreStart::Init() {
 	aimSprite_ = std::make_unique<Sprite>();
 	aimSprite_->Load("GameTexture/StartUI.png");
-	aimSprite_->SetAnchor({ 0.0f,0.0f });
+	aimSprite_->SetAnchor({ 0.5f,0.5f });
 
 	kikAimSprite_ = std::make_unique<Sprite>();
 	kikAimSprite_->Load("GameTexture/StartUI_Kick.png");
@@ -20,30 +22,19 @@ void GamePreStart::Init() {
 	blackSprite_->SetSize({ 1280.0f,950.0f });
 	blackSprite_->SetAnchor({ 0.0f,0.0f });
 
-	// wait
-	waitTime_ = 0.0f;
-	kWaitTime_ = 1.0f;
-	aimWaitTime_ = 0.0f;
-	aimKWaitTime_ = 1.0f;
-	closeWaitTime_ = 0.0f;
-	closekWaitTime_ = 1.0f;
-	closeScale_= 1.0f;
+	///* グローバルパラメータ
+	globalParameter_ = GlobalVariables::GetInstance();
+	globalParameter_->CreateGroup(groupName_, false);
+	AddParmGroup();
+	ApplyGlobalParameter();
 
-	aimEase_.maxTime = 0.5f;
-	kikAimEase_.maxTime = 0.5f;
-	aimCloseEase_.maxTime = 1.0f;
-	goUpTime_.maxTime = 1.5f;
-	apearUFO_.maxTime = 0.6f;
-
-	aimStartPos_ = 1200.0f;
-	aimEndPos_ = 100.0f;
-	aimCloseEndPos_ = -1280.0f;
-	aimPosX_ = aimStartPos_;
+	
+	aimPosX = params_.aimStartPos;
 
 	///pos
-	aimSprite_->SetPos(Vector3(aimStartPos_, 210.0f, 0));
-	kikAimSprite_->SetPos(Vector3(500.0f, 620.0f, 0));
-	kikAimSprite_->SetSize(Vector2(0,0));
+	aimSprite_->SetPos(Vector3(params_.aimStartPos, 110.0f, 0));
+	kikAimSprite_->SetPos(Vector3(params_.kikAimPos.x, params_.kikAimPos.y, 0));
+	kikAimSprite_->SetSize(Vector2(0, 0));
 
 	step_ = Step::WAIT;
 }
@@ -54,7 +45,8 @@ void GamePreStart::Init() {
 
 void GamePreStart::Update() {
 
-	aimSprite_->SetPos(Vector3(aimPosX_, 210.0f, 0));
+	aimSprite_->SetPos(Vector3(aimPosX, 240.0f, 0));
+	kikAimSprite_->SetPos(Vector3(params_.kikAimPos.x, params_.kikAimPos.y, 0));
 
 	switch (step_)
 	{
@@ -62,9 +54,9 @@ void GamePreStart::Update() {
 		/// 最初の待機
 		///-----------------------------------------------------------------
 	case GamePreStart::Step::WAIT:
-		waitTime_ += FPSKeeper::NormalDeltaTime();
-		if (waitTime_ < kWaitTime_)break;
-		waitTime_ = kWaitTime_;
+		times_[static_cast<size_t>(Step::WAIT)] += FPSKeeper::NormalDeltaTime();
+		if (times_[static_cast<size_t>(Step::WAIT)] < params_.kWaitTime)break;
+		times_[static_cast<size_t>(Step::WAIT)] = params_.kWaitTime;
 		step_ = Step::GOUPGROUND;
 		break;
 
@@ -72,61 +64,61 @@ void GamePreStart::Update() {
 		/// 上に上がる
 		///-----------------------------------------------------------------
 	case GamePreStart::Step::GOUPGROUND:
-		goUpTime_.time += FPSKeeper::NormalDeltaTime();
+		times_[static_cast<size_t>(Step::GOUPGROUND)] += FPSKeeper::NormalDeltaTime();
 		/// 出現
-		pBackGround_->Scrool(goUpTime_.time, goUpTime_.maxTime);
+		pBackGround_->Scrool(times_[static_cast<size_t>(Step::GOUPGROUND)], params_.goUpTimeMax);
 
-		if (goUpTime_.time < goUpTime_.maxTime)break;
-		goUpTime_.time = goUpTime_.maxTime;
+		if (times_[static_cast<size_t>(Step::GOUPGROUND)] < params_.goUpTimeMax)break;
+		times_[static_cast<size_t>(Step::GOUPGROUND)] = params_.goUpTimeMax;
 		step_ = Step::APEARUFO;
 		break;
 		///-----------------------------------------------------------------
 		/// 上に上がる
 		///-----------------------------------------------------------------
 	case GamePreStart::Step::APEARUFO:
-		apearUFO_.time += FPSKeeper::NormalDeltaTime();
+		times_[static_cast<size_t>(Step::APEARUFO)] += FPSKeeper::NormalDeltaTime();
 		/// 出現
-		pUFO_->Apear(apearUFO_.time, apearUFO_.maxTime);
-	
-		if (apearUFO_.time < apearUFO_.maxTime)break;
-		apearUFO_.time = apearUFO_.maxTime;
+		pUFO_->Apear(times_[static_cast<size_t>(Step::APEARUFO)], params_.apearUFOMax);
+
+		if (times_[static_cast<size_t>(Step::APEARUFO)] < params_.apearUFOMax)break;
+		times_[static_cast<size_t>(Step::APEARUFO)] = params_.apearUFOMax;
 		step_ = Step::AIMWAIT;
 		break;
 		///-----------------------------------------------------------------
 		/// 最初の待機
 		///-----------------------------------------------------------------
 	case GamePreStart::Step::AIMWAIT:
-		aimWaitTime_ += FPSKeeper::NormalDeltaTime();
-		if (aimWaitTime_ < aimKWaitTime_)break;
-		aimWaitTime_ = aimKWaitTime_;
+		times_[static_cast<size_t>(Step::AIMWAIT)] += FPSKeeper::NormalDeltaTime();
+		if (times_[static_cast<size_t>(Step::AIMWAIT)] < params_.aimKWaitTime)break;
+		times_[static_cast<size_t>(Step::AIMWAIT)] = params_.aimKWaitTime;
 		step_ = Step::AIMOPEN;
 		break;
 		///-----------------------------------------------------------------
 		/// 最初の待機
 		///-----------------------------------------------------------------
 	case GamePreStart::Step::AIMOPEN:
-		aimEase_.time += FPSKeeper::NormalDeltaTime();
-		aimPosX_ = EaseOutCubic(aimStartPos_, aimEndPos_, aimEase_.time, aimEase_.maxTime);
+		times_[static_cast<size_t>(Step::AIMOPEN)] += FPSKeeper::NormalDeltaTime();
+		aimPosX = EaseOutCubic(params_.aimStartPos, params_.aimEndPos, times_[static_cast<size_t>(Step::AIMOPEN)], params_.aimEaseMax);
 
-		if (aimEase_.time < aimEase_.maxTime)break;	
-		aimEase_.time = aimEase_.maxTime;
-		aimPosX_ = aimEndPos_;
+		if (times_[static_cast<size_t>(Step::AIMOPEN)] < params_.aimEaseMax)break;
+		times_[static_cast<size_t>(Step::AIMOPEN)] = params_.aimEaseMax;
+		aimPosX = params_.aimEndPos;
 		step_ = Step::AIMKIKOPEN;
-	
+
 		break;
-	///-----------------------------------------------------------------
-	/// キックエイム
-	///-----------------------------------------------------------------
+		///-----------------------------------------------------------------
+		/// キックエイム
+		///-----------------------------------------------------------------
 	case GamePreStart::Step::AIMKIKOPEN:
 		//タイム
-		kikAimEase_.time += FPSKeeper::NormalDeltaTime();
-		kikAimScale_ = EaseOutCubic(Vector2(0,0), Vector2(1, 1), kikAimEase_.time, kikAimEase_.maxTime);
+		times_[static_cast<size_t>(Step::AIMKIKOPEN)] += FPSKeeper::NormalDeltaTime();
+		params_.kikAimScale = EaseOutCubic(Vector2(0, 0), Vector2(1, 1), times_[static_cast<size_t>(Step::AIMKIKOPEN)], params_.kikAimEaseMax);
 
 		///適応
-		kikAimSprite_->SetSize(Vector2(kikTextureSize_.x * kikAimScale_.x, kikTextureSize_.y * kikAimScale_.y));
+		kikAimSprite_->SetSize(Vector2(kikTextureSize_.x * params_.kikAimScale.x, kikTextureSize_.y * params_.kikAimScale.y));
 
-		if (kikAimEase_.time < kikAimEase_.maxTime)break;
-		kikAimEase_.time = kikAimEase_.maxTime;
+		if (times_[static_cast<size_t>(Step::AIMKIKOPEN)] < params_.kikAimEaseMax)break;
+		times_[static_cast<size_t>(Step::AIMKIKOPEN)] = params_.kikAimEaseMax;
 		kikAimSprite_->SetSize(kikTextureSize_);
 		step_ = Step::CLOSEWAIT;
 
@@ -135,9 +127,9 @@ void GamePreStart::Update() {
 		///閉め待機
 		///-----------------------------------------------------------------
 	case GamePreStart::Step::CLOSEWAIT:
-		closeWaitTime_ += FPSKeeper::NormalDeltaTime();
-		if (closeWaitTime_ < closekWaitTime_)break;
-		closeWaitTime_ = closekWaitTime_;
+		times_[static_cast<size_t>(Step::CLOSEWAIT)] += FPSKeeper::NormalDeltaTime();
+		if (times_[static_cast<size_t>(Step::CLOSEWAIT)] < params_.closekWaitTime)break;
+		times_[static_cast<size_t>(Step::CLOSEWAIT)] = params_.closekWaitTime;
 		step_ = Step::AIMCLOSE;
 		break;
 		///-----------------------------------------------------------------
@@ -145,17 +137,16 @@ void GamePreStart::Update() {
 		///-----------------------------------------------------------------
 	case GamePreStart::Step::AIMCLOSE:
 		// タイム
-		aimCloseEase_.time += FPSKeeper::NormalDeltaTime();
-		closeScale_ = EaseInBack(1.0f, 0.0f, aimCloseEase_.time, aimCloseEase_.maxTime);
+		times_[static_cast<size_t>(Step::AIMCLOSE)] += FPSKeeper::NormalDeltaTime();
+		closeScale_ = EaseInBack(1.0f, 0.0f, times_[static_cast<size_t>(Step::AIMCLOSE)], params_.aimCloseEaseMax);
 
 		///適応
 		kikAimSprite_->SetSize(Vector2(kikTextureSize_.x * closeScale_, kikTextureSize_.y * closeScale_));
 		aimSprite_->SetSize(Vector2(aimTextureSize_.x * closeScale_, aimTextureSize_.y * closeScale_));
 
 		/// 終了
-		if (aimCloseEase_.time < aimEase_.maxTime)break;
-		aimPosX_ = aimCloseEndPos_;
-		aimCloseEase_.time = aimEase_.maxTime;
+		if (times_[static_cast<size_t>(Step::AIMCLOSE)] < params_.aimCloseEaseMax)break;
+		times_[static_cast<size_t>(Step::AIMCLOSE)] = params_.aimEaseMax;
 		kikAimSprite_->SetSize(Vector2(0, 0));
 		aimSprite_->SetSize(Vector2(0, 0));
 		//エンド
@@ -179,9 +170,9 @@ void GamePreStart::Draw() {
 }
 
 void  GamePreStart::BlockSpriteDraw() {
-	if (step_ == Step::AIMOPEN    ||
+	if (step_ == Step::AIMOPEN ||
 		step_ == Step::AIMKIKOPEN ||
-		step_ == Step::CLOSEWAIT  ||
+		step_ == Step::CLOSEWAIT ||
 		step_ == Step::AIMCLOSE) {
 		blackSprite_->Draw();
 	}
@@ -193,7 +184,7 @@ void GamePreStart::Debug() {
 
 
 void GamePreStart::OffsetMove() {
-	
+
 }
 
 void GamePreStart::SetSkyDome(SkyDome* skydome) {
@@ -204,4 +195,115 @@ void GamePreStart::SetUFO(UFO* ufo) {
 }
 void GamePreStart::SetBackGround(BackGround* back) {
 	pBackGround_ = back;
+}
+
+
+///=================================================================================
+/// ロード
+///=================================================================================
+void GamePreStart::ParmLoadForImGui() {
+
+	// ロードボタン
+	if (ImGui::Button(std::format("Load {}", groupName_).c_str())) {
+
+		globalParameter_->LoadFile(groupName_);
+		// セーブ完了メッセージ
+		ImGui::Text("Load Successful: %s", groupName_.c_str());
+		ApplyGlobalParameter();
+	}
+}
+
+//////=================================================================================
+///パラメータをグループに追加
+///=================================================================================
+void GamePreStart::AddParmGroup() {
+	globalParameter_->AddItem(groupName_, "kWaitTime", params_.kWaitTime);
+	globalParameter_->AddItem(groupName_, "goUpTimeMax", params_.goUpTimeMax);
+	globalParameter_->AddItem(groupName_, "apearUFOMax", params_.apearUFOMax);
+	globalParameter_->AddItem(groupName_, "aimKWaitTime", params_.aimKWaitTime);
+	globalParameter_->AddItem(groupName_, "aimEaseMax", params_.aimEaseMax);
+	globalParameter_->AddItem(groupName_, "aimStartPos", params_.aimStartPos);
+	globalParameter_->AddItem(groupName_, "aimEndPos", params_.aimEndPos);
+	globalParameter_->AddItem(groupName_, "closekWaitTime", params_.closekWaitTime);
+	globalParameter_->AddItem(groupName_, "aimCloseEndPos", params_.aimCloseEndPos);
+	globalParameter_->AddItem(groupName_, "aimCloseEaseMax", params_.aimCloseEaseMax);
+	globalParameter_->AddItem(groupName_, "kikAimEaseMax", params_.kikAimEaseMax);
+	globalParameter_->AddItem(groupName_, "kikAimPos", params_.kikAimPos);
+}
+
+///=================================================================================
+///パラメータをグループに追加
+///=================================================================================
+void GamePreStart::SetValues() {
+	globalParameter_->SetValue(groupName_, "kWaitTime", params_.kWaitTime);
+	globalParameter_->SetValue(groupName_, "goUpTimeMax", params_.goUpTimeMax);
+	globalParameter_->SetValue(groupName_, "apearUFOMax", params_.apearUFOMax);
+	globalParameter_->SetValue(groupName_, "aimKWaitTime", params_.aimKWaitTime);
+	globalParameter_->SetValue(groupName_, "aimEaseMax", params_.aimEaseMax);
+	globalParameter_->SetValue(groupName_, "aimStartPos", params_.aimStartPos);
+	globalParameter_->SetValue(groupName_, "aimEndPos", params_.aimEndPos);
+	globalParameter_->SetValue(groupName_, "closekWaitTime", params_.closekWaitTime);
+	globalParameter_->SetValue(groupName_, "aimCloseEndPos", params_.aimCloseEndPos);
+	globalParameter_->SetValue(groupName_, "aimCloseEaseMax", params_.aimCloseEaseMax);
+	globalParameter_->SetValue(groupName_, "kikAimEaseMax", params_.kikAimEaseMax);
+	globalParameter_->SetValue(groupName_, "kikAimPos", params_.kikAimPos);
+}
+
+///=====================================================
+/// ImGuiからパラメータを得る
+///===================================================== 
+void GamePreStart::ApplyGlobalParameter() {
+	params_.kWaitTime = globalParameter_->GetValue<float>(groupName_, "kWaitTime");
+	params_.goUpTimeMax = globalParameter_->GetValue<float>(groupName_, "goUpTimeMax");
+	params_.apearUFOMax = globalParameter_->GetValue<float>(groupName_, "apearUFOMax");
+	params_.aimKWaitTime = globalParameter_->GetValue<float>(groupName_, "aimKWaitTime");
+	params_.aimEaseMax = globalParameter_->GetValue<float>(groupName_, "aimEaseMax");
+	params_.aimStartPos = globalParameter_->GetValue<float>(groupName_, "aimStartPos");
+	params_.aimEndPos = globalParameter_->GetValue<float>(groupName_, "aimEndPos");
+	params_.closekWaitTime = globalParameter_->GetValue<float>(groupName_, "closekWaitTime");
+	params_.aimCloseEndPos = globalParameter_->GetValue<float>(groupName_, "aimCloseEndPos");
+	params_.aimCloseEaseMax = globalParameter_->GetValue<float>(groupName_, "aimCloseEaseMax");
+	params_.kikAimEaseMax = globalParameter_->GetValue<float>(groupName_, "kikAimEaseMax");
+	params_.kikAimPos = globalParameter_->GetValue<Vector2>(groupName_, "kikAimPos");
+}
+
+///=========================================================
+/// パラメータ調整
+///==========================================================
+void GamePreStart::AdjustParm() {
+	SetValues();
+#ifdef _DEBUG
+	if (ImGui::CollapsingHeader(groupName_.c_str())) {
+		ImGui::PushID(groupName_.c_str());
+		ImGuiManager::GetInstance()->SetFontJapanese();/// 日本語
+
+		// パラメータ表示・調整
+		ImGui::DragFloat("待機時間", &params_.kWaitTime, 0.01f);
+		ImGui::DragFloat("上昇最大時間", &params_.goUpTimeMax, 0.01f);
+		ImGui::DragFloat("UFO出現最大時間", &params_.apearUFOMax, 0.01f);
+		ImGui::DragFloat("狙い待機時間", &params_.aimKWaitTime, 0.01f);
+		ImGui::DragFloat("狙いイージング最大値", &params_.aimEaseMax, 0.01f);
+		ImGui::DragFloat("狙い開始位置", &params_.aimStartPos, 0.5f);
+		ImGui::DragFloat("狙い終了位置", &params_.aimEndPos, 0.5f);
+		ImGui::DragFloat("閉じる待機時間", &params_.closekWaitTime, 0.01f);
+		ImGui::DragFloat("キック狙いイージング", &params_.kikAimEaseMax, 0.01f);
+		ImGui::DragFloat2("キック狙い位置", &params_.kikAimPos.x, 0.5f);
+		ImGui::DragFloat("狙い閉じるイージング最大値", &params_.aimCloseEaseMax, 0.01f);
+	
+		if (Input::GetInstance()->TriggerKey(DIK_R)) {
+			step_ = Step::WAIT;
+			for (size_t i = 0; i < times_.size(); i++) {
+				times_[i] = 0.0f;
+			}
+		}
+
+		/// セーブとロード
+		globalParameter_->ParmSaveForImGui(groupName_);
+		ParmLoadForImGui();
+
+		ImGuiManager::GetInstance()->UnSetFont();
+		ImGui::PopID();
+	}
+
+#endif // _DEBUG
 }

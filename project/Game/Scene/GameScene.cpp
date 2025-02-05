@@ -255,9 +255,9 @@ void GameScene::Draw() {
 	
 	//UFOスプライト
 	ufo_->SpriteDraw();
-	if (!(slideTime_ >= slideLimitteTime_)) {
+	/*if (!(slideTime_ >= slideLimitteTime_)) {
 		startUI_->Draw();
-	}
+	}*/
 	///　メニュー描画
 	if (isMenu_) {
 		menuPaneru_->Draw();
@@ -427,6 +427,7 @@ void GameScene::ParamaterEdit() {
 	kikArea_->AdjustParm();
 	fieldBlockManager_->AdjustParm();
 	lifeUI_->AdjustParm();
+	gamePreStart_->AdjustParm();
 	ImGui::End();
 	enemySpawn_->DrawImGuiEditor();
 	

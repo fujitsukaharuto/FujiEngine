@@ -1,0 +1,19 @@
+{
+    "PreGame": {
+        "aimCloseEaseMax": 0.44999998807907104,
+        "aimCloseEndPos": -1280.0,
+        "aimEaseMax": 0.6800000071525574,
+        "aimEndPos": 448.5,
+        "aimKWaitTime": 1.0,
+        "aimStartPos": 1399.0,
+        "apearUFOMax": 0.6000000238418579,
+        "closekWaitTime": 1.0,
+        "goUpTimeMax": 1.5,
+        "kWaitTime": 1.409999966621399,
+        "kikAimEaseMax": 0.550000011920929,
+        "kikAimPos": [
+            431.0,
+            574.0
+        ]
+    }
+}
