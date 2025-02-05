@@ -1,7 +1,7 @@
 {
     "Enemies": {
         "AttackValue1": 1.0,
-        "AttackValue2": 1.0,
+        "AttackValue2": 2.0,
         "FallSpeed1": 4.300000190734863,
         "FallSpeed2": 44.41999816894531,
         "MaxPowerBlow1": 48.720001220703125,
@@ -31,7 +31,7 @@
         "moveValue_": 3.0,
         "nearLimitTime_": 3.0,
         "plusAttackValue1": 3.0,
-        "plusAttackValue2": 1.0,
+        "plusAttackValue2": 2.0,
         "rightX": 35.630001068115234,
         "scaleUpParm_1": [
             0.4000000059604645,
@@ -55,6 +55,6 @@
         "spawnFallSpeed1": 16.18000030517578,
         "spawnFallSpeed2": 0.0,
         "strongAttackValue1": 4.0,
-        "strongAttackValue2": 1.0
+        "strongAttackValue2": 2.0
     }
 }
