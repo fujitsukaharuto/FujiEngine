@@ -8,6 +8,7 @@
 // class
 #include "OriginGameObject.h"
 #include"Collider/AABBCollider.h"
+#include "Particle/ParticleEmitter.h"
 #include<array>
 
 class Player;
@@ -59,6 +60,9 @@ protected:
 	std::unique_ptr<BaseFieldBlockState> state_ = nullptr;
 	std::unique_ptr<BaseFieldBlockBehavior>behavior_ = nullptr;
 	std::unique_ptr<AABBCollider>collider_;
+
+	ParticleEmitter reverseEmit_;
+
 public:
 	static uint32_t nextSerialNum_;
 public:

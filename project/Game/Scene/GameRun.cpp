@@ -116,7 +116,8 @@ void GameRun::Initialize() {
 
 	pManager_->CreateParticleGroup("groundCrack1", "kira.png");
 
-	pManager_->CreateParticleGroup("groundBreak", "blueParticle.png",80);
+	pManager_->CreateParticleGroup("groundBreak", "blueParticle.png", 80);
+	pManager_->CreateParticleGroup("groundBreakReverse", "blueParticle.png",80);
 
 
 

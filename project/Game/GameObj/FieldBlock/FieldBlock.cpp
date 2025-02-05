@@ -5,7 +5,7 @@
 #include"State/FieldBlockDaungerous.h"
 #include"Behavior/FieldBlockNoDamage.h"
 #include"Behavior/FieldBlockTakeDamage.h"
-
+#include "Particle/ParticleManager.h"
 #include"Field/Field.h"
 ///* std
 #include<algorithm>
@@ -61,6 +61,13 @@ void FieldBlock::Initialize() {
 	collider_->SetParent(model_.get());
 	collider_->InfoUpdate();
 
+	ParticleManager::Load(reverseEmit_, "groundBreakReverse");
+	reverseEmit_.pos = model_->GetWorldPos();
+	Vector3 emitSizeMax = colliderSize_ * 0.5f;
+	Vector3 emitSizeMin = colliderSize_ * -0.5f;
+	reverseEmit_.emitSizeMax = { emitSizeMax.x,8.0f,emitSizeMin.z - 2.0f };
+	reverseEmit_.emitSizeMin = { emitSizeMin.x,2.0f,emitSizeMin.z - 3.0f };
+
 	// 初期パラメータセット
 	Reset();
 }
@@ -68,6 +75,7 @@ void FieldBlock::Initialize() {
 void FieldBlock::Reset() {
 	// 初期パラメータセット
 	if (dynamic_cast<FieldBlockNormal*>(state_.get()))return;
+	reverseEmit_.Burst();
 	ChangeState(std::make_unique<FieldBlockNormal>(this));
 	ChangeBehavior(std::make_unique<FieldBlockNoDamage>(this)); 
 }
