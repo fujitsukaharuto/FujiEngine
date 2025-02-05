@@ -23,7 +23,9 @@ public:
 		Vector3 startPos;
 		Vector3 gamePos;
 		Vector3 barPos_;
-		Vector3 hpPos_;
+		Vector3 hpPosEnd_;
+		Vector3 startBarPos_;
+		Vector3 startHpPos_;
 		float dagameDistance_;
 		float damageTime_;
 		float hitStopDamage_;
@@ -58,6 +60,8 @@ private:
 	float hp_;                                    /// HP
 	float MaxHp_;
 	float takeDamageValue_;
+	Vector3 barPos_;
+	Vector3 hpPos_;
 
 	Paramater paramater_;
 
@@ -97,6 +101,7 @@ public:
 
 	/// 出現
 	void Apear(const float& time, const float& maxTime);
+	void AdaptHP();
 
 	void OnCollisionEnter(const ColliderInfo& other);
 	void OnCollisionStay(const ColliderInfo& other);

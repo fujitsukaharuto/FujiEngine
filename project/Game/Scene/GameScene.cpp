@@ -10,7 +10,6 @@
 
 #include<imgui.h>
 
-
 GameScene::GameScene() {}
 
 GameScene::~GameScene() {
@@ -130,9 +129,11 @@ void GameScene::Update() {
 			///　PreGame
 			///-------------------------------------------------------------- 
 		case GameScene::PREGAME:
+			/// 更新
 			timer_->SetTextureRangeForDigit();
 			gameCamera_->Update();
 			gamePreStart_->Update();
+			ufo_->AdaptHP();
 			lifeUI_->Update();
 			backGround_->Update();
 			

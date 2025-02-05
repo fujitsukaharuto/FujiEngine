@@ -37,15 +37,6 @@ void UFO::Initialize() {
 
 	PointLightManager::GetInstance()->GetSpotLight(0)->spotLightData_->position = model_->transform.translate;
 
-	hpSprite_ = std::make_unique<Sprite>();
-	hpSprite_->Load("GameTexture/UFO_Hp_In.png");
-	hpSprite_->SetPos(paramater_.hpPos_);
-	hpSprite_->SetAnchor(Vector2(0.0f, 0.0f));
-
-	hpMaxSprite_ = std::make_unique<Sprite>();
-	hpMaxSprite_->Load("GameTexture/UFO_Hp_Out.png");
-	hpMaxSprite_->SetPos(paramater_.barPos_);
-
 	///* グローバルパラメータ
 	globalParameter_ = GlobalVariables::GetInstance();
 	globalParameter_->CreateGroup(groupName_, false);
@@ -59,6 +50,16 @@ void UFO::Initialize() {
 	MaxHp_ = 30.0f;
 	hp_ = MaxHp_;
 
+	hpSprite_ = std::make_unique<Sprite>();
+	hpSprite_->Load("GameTexture/UFO_Hp_In.png");
+	hpPos_=paramater_.startHpPos_;
+	hpSprite_->SetAnchor(Vector2(0.0f, 0.0f));
+
+	hpMaxSprite_ = std::make_unique<Sprite>();
+	hpMaxSprite_->Load("GameTexture/UFO_Hp_Out.png");
+	barPos_ = paramater_.startBarPos_;
+
+	AdaptHP();
 
 	// collider
 	collider_ = std::make_unique<AABBCollider>();
@@ -81,9 +82,6 @@ void UFO::Update() {
 
 	/*model_->transform.rotate.y += 20.0f*FPSKeeper::DeltaTimeRate();*/
 
-	hpSprite_->SetPos(paramater_.hpPos_);
-	hpMaxSprite_->SetPos(paramater_.barPos_);
-
 	popPos_ = model_->GetWorldPos();
 	/// ダメージエフェクト
 	DamageRendition();
@@ -92,12 +90,7 @@ void UFO::Update() {
 	state_->Update();
 	///
 	collider_->InfoUpdate();
-
-	hpSize_ = hp_ / MaxHp_ * hpMaxSize_;
-	if (hpSize_ < 0.0f) {
-		hpSize_ = 0.0f;
-	}
-	hpSprite_->SetSize({ hpSize_,75.0f });
+	AdaptHP();
 
 	PointLightManager::GetInstance()->GetSpotLight(0)->spotLightData_->position = model_->transform.translate;
 	PointLightManager::GetInstance()->GetSpotLight(0)->spotLightData_->position.z = 0.0f;
@@ -183,7 +176,9 @@ void UFO::AdjustParm() {
 
 		ImGui::SeparatorText("UI");
 		ImGui::DragFloat3("バー位置", &paramater_.barPos_.x, 0.5f);
-		ImGui::DragFloat3("HP位置", &paramater_.hpPos_.x, 0.5f);
+		ImGui::DragFloat3("HP位置", &paramater_.hpPosEnd_.x, 0.5f);
+		ImGui::DragFloat3("バー位置最初", &paramater_.startBarPos_.x, 0.5f);
+		ImGui::DragFloat3("HP位置最初", &paramater_.startHpPos_.x, 0.5f);
 
 
 		ImGui::SeparatorText("いらないかも");
@@ -243,7 +238,9 @@ void UFO::AddParmGroup() {
 	globalParameter_->AddItem(groupName_, "rootLightScale", paramater_.initLightScale);
 	globalParameter_->AddItem(groupName_, "lightScaleUnderPop", paramater_.lightScaleUnderPop);
 	globalParameter_->AddItem(groupName_, "barPos_", paramater_.barPos_);
-	globalParameter_->AddItem(groupName_, "hpPos_", paramater_.hpPos_);
+	globalParameter_->AddItem(groupName_, "hpPos_", paramater_.hpPosEnd_);
+	globalParameter_->AddItem(groupName_, "startBarPos_", paramater_.startBarPos_);
+	globalParameter_->AddItem(groupName_, "startHpPos_", paramater_.startHpPos_);
 }
 
 ///=================================================================================
@@ -261,7 +258,9 @@ void UFO::SetValues() {
 	globalParameter_->SetValue(groupName_, "rootLightScale", paramater_.initLightScale);
 	globalParameter_->SetValue(groupName_, "lightScaleUnderPop", paramater_.lightScaleUnderPop);
 	globalParameter_->SetValue(groupName_, "barPos_", paramater_.barPos_);
-	globalParameter_->SetValue(groupName_, "hpPos_", paramater_.hpPos_);
+	globalParameter_->SetValue(groupName_, "hpPos_", paramater_.hpPosEnd_);
+	globalParameter_->SetValue(groupName_, "startBarPos_", paramater_.startBarPos_);
+	globalParameter_->SetValue(groupName_, "startHpPos_", paramater_.startHpPos_);
 }
 
 ///=====================================================
@@ -278,7 +277,9 @@ void UFO::ApplyGlobalParameter() {
 	paramater_.lightScaleUnderPop = globalParameter_->GetValue<Vector3>(groupName_, "lightScaleUnderPop");
 	paramater_.startPos = globalParameter_->GetValue<Vector3>(groupName_, "startPos");
 	paramater_.barPos_ = globalParameter_->GetValue<Vector3>(groupName_, "barPos_");
-	paramater_.hpPos_ = globalParameter_->GetValue<Vector3>(groupName_, "hpPos_");
+	paramater_.hpPosEnd_ = globalParameter_->GetValue<Vector3>(groupName_, "hpPos_");
+	paramater_.startHpPos_ = globalParameter_->GetValue<Vector3>(groupName_, "startHpPos_");
+	paramater_.startBarPos_ = globalParameter_->GetValue<Vector3>(groupName_, "startBarPos_");
 }
 ///=========================================================
 /// Class Set
@@ -358,6 +359,20 @@ void UFO::Apear(const float& time, const float& maxTime) {
 	model_->transform.translate.y = EaseOutBack(
 		paramater_.startPos.y, paramater_.gamePos.y, time, maxTime);
 
+	hpPos_= EaseOutBack(paramater_.startHpPos_, paramater_.hpPosEnd_, time, maxTime);
+	barPos_ = EaseOutBack(paramater_.startBarPos_, paramater_.barPos_, time, maxTime);
+
 	if (time < maxTime) return;
 	model_->transform.translate.y = paramater_.gamePos.y;
+}
+
+void UFO::AdaptHP() {
+	hpSprite_->SetPos(hpPos_);
+	hpMaxSprite_->SetPos(barPos_);
+
+	hpSize_ = hp_ / MaxHp_ * hpMaxSize_;
+	if (hpSize_ < 0.0f) {
+		hpSize_ = 0.0f;
+	}
+	hpSprite_->SetSize({ hpSize_,75.0f });
 }
