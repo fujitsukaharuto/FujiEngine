@@ -46,6 +46,8 @@ void ResultScene::Initialize() {
 	sphere->CreateSphere();
 	sphere->SetColor({ 1.0f,0.0f,0.0f,1.0f });
 
+	decisionSE_ = Audio::GetInstance()->SoundLoadWave("DecisionSE.wav");
+
 }
 
 void ResultScene::Update() {
@@ -139,6 +141,7 @@ void ResultScene::BlackFade() {
 	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
 		if (blackTime == 0.0f) {
 			isChangeFase = true;
+			Audio::GetInstance()->SoundPlayWave(decisionSE_);
 		}
 	}
 
@@ -146,6 +149,7 @@ void ResultScene::BlackFade() {
 		if (Input::GetInstance()->TriggerButton(PadInput::A)) {
 			if (blackTime == 0.0f) {
 				isChangeFase = true;
+				Audio::GetInstance()->SoundPlayWave(decisionSE_);
 			}
 		}
 	}

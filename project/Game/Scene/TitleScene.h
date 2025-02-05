@@ -35,6 +35,8 @@ private:
 
 	SoundData bgm_;
 	SoundData start_;
+	SoundData decisionSE_;
+
 
 	// sceneChange
 	std::unique_ptr<Sprite> black_;

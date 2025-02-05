@@ -47,6 +47,8 @@ void TitleScene::Initialize() {
 	
 	bgm_ = Audio::GetInstance()->SoundLoadWave("BGM2.wav");
 	Audio::GetInstance()->SoundLoop(bgm_, 0.075f);
+	decisionSE_ = Audio::GetInstance()->SoundLoadWave("DecisionSE.wav");
+
 
 	//titleAnimation_->SetOnAnimationCompleteCallback([]() {});
 	//titleAnimation_->StartAnimation(); // アニメーションの開始
@@ -162,6 +164,7 @@ void TitleScene::BlackFade() {
 	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
 		if (blackTime == 0.0f) {
 			isChangeFase = true;
+			Audio::GetInstance()->SoundPlayWave(decisionSE_);
 		}
 	}
 
@@ -169,6 +172,7 @@ void TitleScene::BlackFade() {
 		if (Input::GetInstance()->TriggerButton(PadInput::A)) {
 			if (blackTime == 0.0f) {
 				isChangeFase = true;
+				Audio::GetInstance()->SoundPlayWave(decisionSE_);
 			}
 		}
 	}
