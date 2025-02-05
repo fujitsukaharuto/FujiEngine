@@ -34,6 +34,7 @@ private:
 	std::unique_ptr<Sprite> titlePaneru_;
 
 	SoundData bgm_;
+	SoundData start_;
 
 	// sceneChange
 	std::unique_ptr<Sprite> black_;

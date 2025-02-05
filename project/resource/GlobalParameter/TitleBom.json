@@ -11,7 +11,7 @@
         "kWaitTime_": 0.5,
         "maxTime": 0.3100000023841858,
         "reverseMaxTime": 0.3100000023841858,
-        "scalingEaseTMax": 0.25999999046325684,
+        "scalingEaseTMax": 0.1599999964237213,
         "shrinkEaseMaxTime": 0.05999999865889549,
         "shrinkScale_": 0.6000000238418579
     }

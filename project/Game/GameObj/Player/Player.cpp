@@ -668,10 +668,10 @@ void Player::ChangeKikDirection() {
 	///----------------------------------------------------
 	///  keyBorad
 	///----------------------------------------------------
-	if (input->PushKey(DIK_LEFT)) {
+	if (input->PushKey(DIK_Q)|| input->PushKey(DIK_LEFT)) {
 		xMove = -moveSpeed;
 	}
-	if (input->PushKey(DIK_RIGHT)) {
+	if (input->PushKey(DIK_E) || input->PushKey(DIK_RIGHT)) {
 		xMove = moveSpeed;
 	}
 

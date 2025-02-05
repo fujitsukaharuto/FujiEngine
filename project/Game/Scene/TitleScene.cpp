@@ -19,7 +19,6 @@ TitleScene::~TitleScene() {
 void TitleScene::Initialize() {
 	Init();
 
-
 	obj3dCommon.reset(new Object3dCommon());
 	obj3dCommon->Initialize();
 
