@@ -7,8 +7,12 @@
 
 void GamePreStart::Init() {
 	aimSprite_ = std::make_unique<Sprite>();
-	aimSprite_->Load("GameTexture/KillUFO.png");
+	aimSprite_->Load("GameTexture/StartUI.png");
 	aimSprite_->SetAnchor({ 0.0f,0.0f });
+
+	kikAimSprite_ = std::make_unique<Sprite>();
+	kikAimSprite_->Load("GameTexture/StartUI_Kick.png");
+	kikAimSprite_->SetAnchor({ 0.5f,0.5f });
 
 	blackSprite_ = std::make_unique<Sprite>();
 	blackSprite_->Load("white2x2.png");
@@ -23,8 +27,10 @@ void GamePreStart::Init() {
 	aimKWaitTime_ = 1.0f;
 	closeWaitTime_ = 0.0f;
 	closekWaitTime_ = 1.0f;
+	closeScale_= 1.0f;
 
-	aimEase_.maxTime = 1.5f;
+	aimEase_.maxTime = 0.5f;
+	kikAimEase_.maxTime = 0.5f;
 	aimCloseEase_.maxTime = 1.0f;
 	goUpTime_.maxTime = 1.5f;
 	apearUFO_.maxTime = 0.6f;
@@ -34,7 +40,10 @@ void GamePreStart::Init() {
 	aimCloseEndPos_ = -1280.0f;
 	aimPosX_ = aimStartPos_;
 
-	aimSprite_->SetPos(Vector3(aimStartPos_, 320.0f, 0));
+	///pos
+	aimSprite_->SetPos(Vector3(aimStartPos_, 210.0f, 0));
+	kikAimSprite_->SetPos(Vector3(500.0f, 620.0f, 0));
+	kikAimSprite_->SetSize(Vector2(0,0));
 
 	step_ = Step::WAIT;
 }
@@ -45,7 +54,7 @@ void GamePreStart::Init() {
 
 void GamePreStart::Update() {
 
-	aimSprite_->SetPos(Vector3(aimPosX_, 320.0f, 0));
+	aimSprite_->SetPos(Vector3(aimPosX_, 210.0f, 0));
 
 	switch (step_)
 	{
@@ -102,8 +111,25 @@ void GamePreStart::Update() {
 		if (aimEase_.time < aimEase_.maxTime)break;	
 		aimEase_.time = aimEase_.maxTime;
 		aimPosX_ = aimEndPos_;
-		step_ = Step::CLOSEWAIT;
+		step_ = Step::AIMKIKOPEN;
 	
+		break;
+	///-----------------------------------------------------------------
+	/// キックエイム
+	///-----------------------------------------------------------------
+	case GamePreStart::Step::AIMKIKOPEN:
+		//タイム
+		kikAimEase_.time += FPSKeeper::NormalDeltaTime();
+		kikAimScale_ = EaseOutCubic(Vector2(0,0), Vector2(1, 1), kikAimEase_.time, kikAimEase_.maxTime);
+
+		///適応
+		kikAimSprite_->SetSize(Vector2(kikTextureSize_.x * kikAimScale_.x, kikTextureSize_.y * kikAimScale_.y));
+
+		if (kikAimEase_.time < kikAimEase_.maxTime)break;
+		kikAimEase_.time = kikAimEase_.maxTime;
+		kikAimSprite_->SetSize(kikTextureSize_);
+		step_ = Step::CLOSEWAIT;
+
 		break;
 		///-----------------------------------------------------------------
 		///閉め待機
@@ -118,12 +144,21 @@ void GamePreStart::Update() {
 		///閉め
 		///-----------------------------------------------------------------
 	case GamePreStart::Step::AIMCLOSE:
+		// タイム
 		aimCloseEase_.time += FPSKeeper::NormalDeltaTime();
-		aimPosX_ = EaseOutCubic(aimEndPos_, aimCloseEndPos_, aimCloseEase_.time, aimCloseEase_.maxTime);
+		closeScale_ = EaseInBack(1.0f, 0.0f, aimCloseEase_.time, aimCloseEase_.maxTime);
 
+		///適応
+		kikAimSprite_->SetSize(Vector2(kikTextureSize_.x * closeScale_, kikTextureSize_.y * closeScale_));
+		aimSprite_->SetSize(Vector2(aimTextureSize_.x * closeScale_, aimTextureSize_.y * closeScale_));
+
+		/// 終了
 		if (aimCloseEase_.time < aimEase_.maxTime)break;
 		aimPosX_ = aimCloseEndPos_;
 		aimCloseEase_.time = aimEase_.maxTime;
+		kikAimSprite_->SetSize(Vector2(0, 0));
+		aimSprite_->SetSize(Vector2(0, 0));
+		//エンド
 		isEnd_ = true;
 		step_ = Step::END;
 		break;
@@ -140,11 +175,13 @@ void GamePreStart::Update() {
 
 void GamePreStart::Draw() {
 	aimSprite_->Draw();
+	kikAimSprite_->Draw();
 }
 
 void  GamePreStart::BlockSpriteDraw() {
-	if (step_ == Step::AIMOPEN ||
-		step_ == Step::CLOSEWAIT ||
+	if (step_ == Step::AIMOPEN    ||
+		step_ == Step::AIMKIKOPEN ||
+		step_ == Step::CLOSEWAIT  ||
 		step_ == Step::AIMCLOSE) {
 		blackSprite_->Draw();
 	}

@@ -61,7 +61,7 @@ void  FieldBlockDaungerous::Update() {
 		///---------------------------------------------------------
 		/// 通常
 		///----------------------------------------------------------
-		pFieldBlock_->ChangeState(std::make_unique<FieldBlockNormal>(pFieldBlock_));
+		pFieldBlock_->Reset();
 		break;
 	default:
 		break;

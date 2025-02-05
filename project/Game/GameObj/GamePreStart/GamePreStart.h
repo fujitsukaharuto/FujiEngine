@@ -14,6 +14,7 @@ public:
 		APEARUFO,
 		AIMWAIT,
 		AIMOPEN,
+		AIMKIKOPEN,
 		CLOSEWAIT,
 		AIMCLOSE,
 		END,
@@ -42,6 +43,12 @@ private:/// aim
 	std::unique_ptr<Sprite> aimSprite_;
 	float aimStartPos_;
 	float aimEndPos_;
+private:/// aimScale
+	Easing kikAimEase_;
+	std::unique_ptr<Sprite> kikAimSprite_;
+	Vector2 kikAimScale_;
+	const Vector2 kikTextureSize_ = {650,550};
+	const Vector2 aimTextureSize_ = { 700.0f,150.0f };
 private:/// CloseWait
 	float closeWaitTime_;
 	float closekWaitTime_;
@@ -49,6 +56,7 @@ private:/// CloseWait
 private://aimclose
 	float aimClosePosX_;
 	Easing aimCloseEase_;
+	float closeScale_;
 
 	std::unique_ptr<Sprite> blackSprite_;
 	bool isEnd_;
