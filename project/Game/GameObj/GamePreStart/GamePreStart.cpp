@@ -28,6 +28,7 @@ void GamePreStart::Init() {
 	AddParmGroup();
 	ApplyGlobalParameter();
 
+	skySE_ = Audio::GetInstance()->SoundLoadWave("SkyUp.wav");
 	
 	aimPosX = params_.aimStartPos;
 
@@ -57,6 +58,7 @@ void GamePreStart::Update() {
 		times_[static_cast<size_t>(Step::WAIT)] += FPSKeeper::NormalDeltaTime();
 		if (times_[static_cast<size_t>(Step::WAIT)] < params_.kWaitTime)break;
 		times_[static_cast<size_t>(Step::WAIT)] = params_.kWaitTime;
+		Audio::GetInstance()->SoundPlayWave(skySE_);
 		step_ = Step::GOUPGROUND;
 		break;
 

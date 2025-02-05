@@ -4,6 +4,7 @@
 #include"Sprite.h"
 #include"Easing.h"
 #include"GlobalVariables/GlobalVariables.h"
+#include "Audio/Audio.h"
 
 class UFO;
 class SkyDome;
@@ -72,6 +73,9 @@ private:// aimScale
 	bool isEnd_;
 	float aimPosX;
 	float closeScale_;
+
+	SoundData skySE_;
+
 public:
 	void Init();
 	void Update();
