@@ -33,7 +33,7 @@ void UFO::Initialize() {
 	ufoLight_ = std::make_unique<Object3d>();
 	ufoLight_->Create("ufo_light.obj");
 	ufoLight_->SetParent(model_.get());
-	ufoLight_->transform.translate.x = -1.0f;
+	ufoLight_->transform.translate.x = 0.1f;
 	ufoLight_->transform.scale = paramater_.initLightScale;
 	ufoLight_->SetColor(ufoLightColor_);
 
