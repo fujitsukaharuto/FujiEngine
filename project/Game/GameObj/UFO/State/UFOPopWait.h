@@ -14,6 +14,11 @@ private:
 	Step step_;
 	float speed_;
 	Easing easing_;
+
+	float easeDirection_;
+	float scalingEaseMax_;
+	float scalingEaseTime_;
+
 	/// ===================================================
 	///private varians
 	/// ===================================================
@@ -26,5 +31,7 @@ public:
 	void Update()override;
 
 	void Debug()override;
+
+	void ExPationing();
 
 };

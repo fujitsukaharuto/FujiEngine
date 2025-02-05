@@ -403,7 +403,9 @@ void UFO::AdaptHP() {
 
 
 
-
+void UFO::SetFieldManager(FieldBlockManager* fm) {
+	pFieldManager_ = fm;
+}
 
 
 

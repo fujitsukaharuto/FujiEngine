@@ -94,7 +94,7 @@ void ResultAnimationManager::BottomAnimation()
 {
     timerT_ += FPSKeeper::NormalDeltaTime();
     timerPosX = EaseOutBack(timerPosSX, timerPosEX, timerT_, timerTM_);
-    pTimer_->SetPos(Vector3(timerPosX, 432.0f, 0.0f), Vector3(timerPosX + 246, 500.0f, 0.0f));
+    pTimer_->SetPos(Vector3(timerPosX, 432.0f, 0.0f), Vector3(timerPosX  +230, 500.0f, 0.0f));
     if (timerT_ < timerTM_)return;
   
     step_ = Step::AUI;
@@ -139,7 +139,7 @@ void ResultAnimationManager::Reset()
      timerT_ = 0.0f;
      timerTM_=0.7f;
      timerPosX=0.0f;
-     timerPosSX = -470.0f;
+     timerPosSX = -490.0f;
      timerPosEX = 316.0f;
 
     step_ = Step::BOM;
@@ -147,5 +147,5 @@ void ResultAnimationManager::Reset()
 
 void ResultAnimationManager::SetTimer(Timer* timer) {
     pTimer_ = timer;
-    pTimer_->SetPos(Vector3(timerPosSX, 432.0f, 0.0f), Vector3(timerPosSX+246, 500.0f, 0.0f));
+    pTimer_->SetPos(Vector3(timerPosSX, 432.0f, 0.0f), Vector3(timerPosSX+230, 500.0f, 0.0f));
 }

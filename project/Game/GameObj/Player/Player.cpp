@@ -46,10 +46,6 @@ void Player::Initialize() {
 	globalParameter_->CreateGroup(groupName_, false);
 	AddParmGroup();
 	ApplyGlobalParameter();
-
-	///* キック向き可視化のオブジェ
-	kikDirectionView_ = std::make_unique<KikDirectionView>();
-	kikDirectionView_->Initialize();
 	
 	///* コライダーセット
 	SetColliderSetting();
@@ -69,6 +65,11 @@ void Player::Initialize() {
 		footPartsModel_[i]->Create("PlayerFoot.obj");
 		footPartsModel_[i]->SetParent(model_.get());
 	}
+
+	///* キック向き可視化のオブジェ
+	kikDirectionView_ = std::make_unique<KikDirectionView>();
+	kikDirectionView_->Initialize();
+	
 
 	//* 位置
 	SetStartPositionAll();
@@ -778,6 +779,10 @@ void Player::SetStartPositionAll() {
 	headModel_->transform.translate = paramater_.headStartPos_;
 	footPartsModel_[static_cast<size_t>(Parts::LEFT)]->transform.translate = paramater_.footStartPosLeft_;
 	footPartsModel_[static_cast<size_t>(Parts::RIGHT)]->transform.translate = paramater_.footStartPosRight_;
+
+	kikDirectionView_->SetDirection(Vector3(0,1,0));
+	kikDirectionView_->SetStartPos(Vector3(kikCollider_->GetPos().x, kikCollider_->GetPos().y, 2.0f));
+	kikDirectionView_->Update();
 }
 
 void  Player::SetColorAll(const Vector4& color) {

@@ -4,6 +4,7 @@
 ///* obj
 #include"Game/GameObj/UFO/UFO.h"
 #include"GameObj/Enemy/EnemyManager.h"
+#include"GameObj/FieldBlock/FieldBlockManager.h"
 ///* frame
 #include"DX/FPSKeeper.h"
 #include"Camera/CameraManager.h"
@@ -61,6 +62,8 @@ UFODeath::UFODeath(UFO* player)
 	CollisionBomb_ = Audio::GetInstance()->SoundLoadWave("MissileBomb.wav");
 
 	pUFO_->GetEnemyManager()->AllDeath();
+	pUFO_->GetFieldManager()->AllReset();
+
 	prePos_ = pUFO_->GetModel()->GetWorldPos();
 	kWaitTime_ = 0.1f;
 	shakeTime_ = pUFO_->GetParamater().shakeTime;

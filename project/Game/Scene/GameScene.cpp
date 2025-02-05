@@ -2,6 +2,7 @@
 #include"Camera/CameraManager.h"
 
 #include "Particle/ParticleManager.h"
+#include"GameObj/UFO/Behavior/UFODeath.h"
 
 #include "Scene/SceneManager.h"
 
@@ -103,6 +104,7 @@ void GameScene::Initialize() {
 	enemyManager_->SetPlayer(player_.get());
 	enemyManager_->SetUFO(ufo_.get());
 	ufo_->SetEnemyManager(enemyManager_.get());
+	ufo_->SetFieldManager(fieldBlockManager_.get());
 	enemySpawn_->SetEnemyManager(enemyManager_.get());
 	player_->SetFieldBlockManager(fieldBlockManager_.get());
 
@@ -153,7 +155,9 @@ void GameScene::Update() {
 			StartUI();
 
 			emit.Emit();
-			timer_->Update();
+			if (!dynamic_cast<UFODeath*>(ufo_->GetBehavior())) {
+				timer_->Update();
+			}
 			timer_->SetTextureRangeForDigit();
 
 			backGround_->Update();

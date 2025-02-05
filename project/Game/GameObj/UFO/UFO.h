@@ -13,6 +13,7 @@
 #include <memory>
 
 class EnemyManager;
+class FieldBlockManager;
 class UFO :public OriginGameObject {
 public:
 
@@ -41,6 +42,7 @@ public:
 private:
 	/// other class
 	EnemyManager* pEnemyManager_;
+	FieldBlockManager* pFieldManager_;
 private:
 
 	/// ===================================================
@@ -127,6 +129,7 @@ public:
 	/// getter method
 	/// ===================================================
 	EnemyManager* GetEnemyManager() { return pEnemyManager_; }
+	FieldBlockManager* GetFieldManager() { return pFieldManager_; }
 	Object3d* GetUFOLight() { return ufoLight_.get(); }
 	Paramater GetParamater()const { return paramater_; }
 	bool GetIsDeath()const { return isDeath_; }
@@ -138,6 +141,7 @@ public:
 	/// setter method
 	/// ===================================================
 	void SetEnemyManager(EnemyManager*enemymanager);
+	void SetFieldManager(FieldBlockManager* fm);
 	void SetColor(const Vector4& color);
 	void SetCollisionSize(const Vector3& size);
 	void SetIsDeath(const bool& is) { isDeath_ = is; }

@@ -7,6 +7,7 @@
 
 ///* obj
 #include"Game/GameObj/UFO/UFO.h"
+#include"GameObj/FieldBlock/FieldBlockManager.h"
 
 ///* frame
 #include"DX/FPSKeeper.h"
@@ -51,6 +52,7 @@ UFODamage::UFODamage(UFO* player)
 		damageSE_ = Audio::GetInstance()->SoundLoadWave("littleDamage.wav");
 		Audio::GetInstance()->SoundPlayWave(damageSE_);
 	}
+	
 }
 
 UFODamage::~UFODamage() {
