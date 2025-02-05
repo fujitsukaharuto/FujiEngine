@@ -153,6 +153,7 @@ void GameRun::Initialize() {
 	audio_->LoadWave("UIBreakSE.wav");
 	audio_->LoadWave("SkyUp.wav");
 	audio_->LoadWave("BGM2.wav");
+	audio_->LoadWave("Serect_SE.wav");
 #pragma endregion
 
 

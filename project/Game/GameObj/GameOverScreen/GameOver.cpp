@@ -31,7 +31,7 @@ void GameOver::Init() {
 	offsetEasing_.time = 0.0f;
 
 	dicisionSE_ = Audio::GetInstance()->SoundLoadWave("DecisionSE.wav");
-	selectSE_ = Audio::GetInstance()->SoundLoadWave("missileSize.wav");
+	selectSE_ = Audio::GetInstance()->SoundLoadWave("Serect_SE.wav");
 
 	selectMode_ = SelectMode::GOGAME;
 	step_ = Step::FADEIN;

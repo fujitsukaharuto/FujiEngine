@@ -93,7 +93,7 @@ void GameScene::Initialize() {
 	ParticleManager::Load(emit, "star");
 
 	dicisionSE_ = Audio::GetInstance()->SoundLoadWave("DecisionSE.wav");
-	selectSE_ = Audio::GetInstance()->SoundLoadWave("missileSize.wav");
+	selectSE_ = Audio::GetInstance()->SoundLoadWave("Serect_SE.wav");
 	bgm_ = Audio::GetInstance()->SoundLoadWave("BGM2.wav");
 
 	///set
