@@ -58,6 +58,7 @@ UFODeath::UFODeath(UFO* player)
 	ParticleManager::Load(deathSmoke2_, "UFOSmoke2");
 
 	bomb_ = Audio::GetInstance()->SoundLoadWave("mini_bomb2.wav");
+	CollisionBomb_ = Audio::GetInstance()->SoundLoadWave("MissileBomb.wav");
 
 	pUFO_->GetEnemyManager()->AllDeath();
 	prePos_ = pUFO_->GetModel()->GetWorldPos();
@@ -125,8 +126,8 @@ void UFODeath::Update() {
 		CameraManager::GetInstance()->GetCamera()->SetShakeTime(180.0f);
 		deathSmoke1_.pos = pUFO_->GetModel()->GetWorldPos();
 		deathSmoke2_.pos = pUFO_->GetModel()->GetWorldPos();
+		Audio::GetInstance()->SoundPlayWave(CollisionBomb_);
 		step_ = Step::EXPLOTION;
-
 		break;
 		///-------------------------------------------------------------------------------------
 		///　破壊

@@ -40,7 +40,7 @@ private:
 
 
     SoundData bomb_;
-
+    SoundData CollisionBomb_;
 
 public:
     // コンストラクタ・デストラクタ
