@@ -133,6 +133,7 @@ public:
 	float GetDamageValue()const { return takeDamageValue_; }
 	Vector3 GetHitPosition()const { return hitPosition_; }
 	float GetHP()const { return hp_; }
+	BaseUFOBehavior* GetBehavior()const { return behavior_.get(); }
 	/// ===================================================
 	/// setter method
 	/// ===================================================

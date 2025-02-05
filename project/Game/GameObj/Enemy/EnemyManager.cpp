@@ -38,7 +38,7 @@ void  EnemyManager::FSpawn() {
 ///  敵の生成
 ///========================================================================================
 void EnemyManager::SpawnEnemy(const BaseEnemy::Type& enemyType, const Vector3& position) {
-	if (dynamic_cast<UFODeath*>(pUFO_))return;
+	if (dynamic_cast<UFODeath*>(pUFO_->GetBehavior()))return;
 	// 通常敵
 	if (enemyType == BaseEnemy::Type::NORMAL||
 		enemyType == BaseEnemy::Type::LEFTSIDE||
