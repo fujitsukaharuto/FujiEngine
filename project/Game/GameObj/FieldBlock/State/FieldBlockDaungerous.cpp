@@ -16,6 +16,7 @@ FieldBlockDaungerous::FieldBlockDaungerous(FieldBlock* boss)
 	: BaseFieldBlockState("FieldBlockDaungerous", boss) {
 	
 	pFieldBlock_->ChangeModel(static_cast<size_t>(FieldBlock::Tag::DAUNGEROUS));
+	pFieldBlock_->ChangeTexture(pFieldBlock_->GetHp());
 	pFieldBlock_->GetModel()->SetColor(Vector4(1, 1, 0, 1));
 	pFieldBlock_->SetTag(static_cast<size_t>(FieldBlock::Tag::DAUNGEROUS));
 	restoreTime_ = 0.0f;

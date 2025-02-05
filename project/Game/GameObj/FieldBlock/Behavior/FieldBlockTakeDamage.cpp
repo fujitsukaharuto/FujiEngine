@@ -21,6 +21,11 @@ FieldBlockTakeDamage::FieldBlockTakeDamage(FieldBlock* boss)
 	originPos_ = pFieldBlock_->GetModel()->transform.translate;
 	collTime_ = 0.0f;
 	pFieldBlock_->DecrementHp();
+
+	//テクスチャ切り替え
+	pFieldBlock_->ChangeTexture(pFieldBlock_->GetHp());
+	
+	//体力によってモデル切り替え
 	step_ = Step::DAMAGE;
 }
 

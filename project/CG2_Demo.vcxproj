@@ -167,6 +167,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Scene\BaseScene.cpp" />
     <ClCompile Include="Engine\Scene\SceneManager.cpp" />
     <ClCompile Include="Engine\WinApp\MyWindow.cpp" />
+    <ClCompile Include="Game\GameObj\BackGround\BackGround.cpp" />
     <ClCompile Include="Game\GameObj\Enemy\BaseEnemy.cpp" />
     <ClCompile Include="Game\GameObj\Enemy\Behavior\BaseEnemyBehavior.cpp" />
     <ClCompile Include="Game\GameObj\Enemy\Behavior\EnemyExplotion.cpp" />
@@ -304,6 +305,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Scene\BaseScene.h" />
     <ClInclude Include="Engine\Scene\SceneManager.h" />
     <ClInclude Include="Engine\WinApp\MyWindow.h" />
+    <ClInclude Include="Game\GameObj\BackGround\BackGround.h" />
     <ClInclude Include="Game\GameObj\Enemy\BaseEnemy.h" />
     <ClInclude Include="Game\GameObj\Enemy\Behavior\BaseEnemyBehavior.h" />
     <ClInclude Include="Game\GameObj\Enemy\Behavior\EnemyExplotion.h" />

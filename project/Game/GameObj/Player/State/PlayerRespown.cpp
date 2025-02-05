@@ -5,6 +5,7 @@
 #include"GameObj/PlayerBehavior/PlayerRoot.h"
 /// boss
 #include"GameObj/Player/Player.h"
+#include"GameObj/FieldBlock/FieldBlockManager.h"
 /// frame
 #include"DX/FPSKeeper.h"
 #include "Particle/ParticleManager.h"
@@ -81,6 +82,7 @@ void PlayerReSpown::Update() {
 		///-------------------------------------------------------
 		/// 死
 		///-------------------------------------------------------
+		pPlayer_->GetFieldManager()->AllReset();
 		pPlayer_->ChangeState(std::make_unique<PlayerNoneState>(pPlayer_));
 		break;
 	default:

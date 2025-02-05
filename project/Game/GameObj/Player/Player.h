@@ -194,6 +194,7 @@ public:
 	AABBCollider* GetTrailRoot() { return trailRoot_.get(); }
 	AABBCollider* GetTrailTip() { return trailTip_.get(); }
 	Object3d*     GetFootPartsModel(const size_t& i){ return footPartsModel_[i].get(); }
+	FieldBlockManager* GetFieldManager() { return pFieldBlockManager_; }
 	bool          GetIsMoving();
 	bool          GetIsDeathUIStart()const { return isDeathUIStart_; }
 	/// ===================================================

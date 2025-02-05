@@ -29,8 +29,14 @@ FieldBlock::FieldBlock() {
 ///========================================================
 void FieldBlock::Initialize() {
 
-	modelNames_[static_cast<size_t>(Tag::NORMAL)] = "Ground.obj";
+	modelNames_[static_cast<size_t>(Tag::NORMAL)] = "NormalGround.obj";
 	modelNames_[static_cast<size_t>(Tag::DAUNGEROUS)] = "DangerGround.obj";
+
+	/// テクスチャ
+	damageStates_[static_cast<size_t>(TEXTURE::DAUNGEROUST)] = "DangerGround_color.png";
+	damageStates_[static_cast<size_t>(TEXTURE::DAMAGETWO)] = "HibiGround_color2.png";
+	damageStates_[static_cast<size_t>(TEXTURE::DAMAGEONE)] = "HibiGround_color1.png";
+	damageStates_[static_cast<size_t>(TEXTURE::NODAMAGE)] = "NormalGround_color.png";
 
 	tags_[static_cast<size_t>(Tag::NORMAL)] = "NormalFieldBlock";
 	tags_[static_cast<size_t>(Tag::DAUNGEROUS)] = "DaungerousFieldBlock";
@@ -78,15 +84,13 @@ void FieldBlock::Update() {
 	collider_->InfoUpdate();
 }
 
-
-
 ///========================================================
 /// 描画
 ///========================================================
 void FieldBlock::Draw(Material* material) {
 	OriginGameObject::Draw(material);
 #ifdef _DEBUG
-	collider_->DrawCollider();
+	/*collider_->DrawCollider();*/
 #endif // _DEBUG
 }
 
@@ -220,4 +224,9 @@ void FieldBlock::SetTag(const int& i) {
 
 void FieldBlock::ChangeModel(const int& i) {
 	OriginGameObject::SetModel(modelNames_[i]);
+}
+
+void FieldBlock::ChangeTexture(const int& i) {
+	
+	model_->SetTexture(damageStates_[i]);
 }

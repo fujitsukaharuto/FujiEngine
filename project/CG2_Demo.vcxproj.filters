@@ -392,6 +392,9 @@
     <ClCompile Include="Game\Titleobj\TitleAnimationManager.cpp">
       <Filter>Game\TitleObj</Filter>
     </ClCompile>
+    <ClCompile Include="Game\GameObj\BackGround\BackGround.cpp">
+      <Filter>Game\GameObj\BackGround</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Audio\Audio.h">
@@ -802,6 +805,9 @@
     <ClInclude Include="Game\Titleobj\TitleAnimationManager.h">
       <Filter>Game\TitleObj</Filter>
     </ClInclude>
+    <ClInclude Include="Game\GameObj\BackGround\BackGround.h">
+      <Filter>Game\GameObj\BackGround</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -956,6 +962,9 @@
     </Filter>
     <Filter Include="Game\TitleObj">
       <UniqueIdentifier>{3a90a5da-77de-4bfa-8881-30756e1f56f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameObj\BackGround">
+      <UniqueIdentifier>{66fa690b-e427-4605-a5ac-9f4ea65ebd34}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

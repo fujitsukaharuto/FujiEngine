@@ -18,7 +18,7 @@ FieldBlockNormal::FieldBlockNormal(FieldBlock* boss)
 	pFieldBlock_->ChangeModel(static_cast<size_t>(FieldBlock::Tag::NORMAL));
 	pFieldBlock_->SetHp(pFieldBlock_->GetParamater().breakCount);
 	pFieldBlock_->SetTag(static_cast<size_t>(FieldBlock::Tag::NORMAL));
-
+	pFieldBlock_->ChangeTexture(pFieldBlock_->GetHp());
 	step_ = Step::NORMAL;
 }
 

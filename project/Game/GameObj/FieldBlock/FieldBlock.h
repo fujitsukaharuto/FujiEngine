@@ -20,6 +20,13 @@ public:
 		DAUNGEROUS,
 	};
 
+	enum class TEXTURE {
+		DAUNGEROUST,
+		DAMAGETWO,
+		DAMAGEONE,
+		NODAMAGE,
+	};
+
 	// パラメータ
 	struct Paramater {
 		int   breakCount;
@@ -41,11 +48,12 @@ protected:
 	/// parm		
 	std::array<std::string, 2>tags_;
 	std::array<std::string, 2>modelNames_;
-	Paramater          paramater_;     //パラメータ
-	bool               isBreak_;
-	uint32_t           serialNum_;
-	Vector3            colliderSize_;
-	int                hp_;
+	std::array<std::string, 4>damageStates_;
+	Paramater                 paramater_;     //パラメータ
+	bool                      isBreak_;
+	uint32_t                  serialNum_;
+	Vector3                   colliderSize_;
+	int                       hp_;
 	
 	/// behavior
 	std::unique_ptr<BaseFieldBlockState> state_ = nullptr;
@@ -104,4 +112,6 @@ public:
 	void               SetHp(const int& hp) { hp_ = hp; }
 	void SetParm(const Paramater& paramater);
 	void ChangeModel(const int& i);
+
+	void ChangeTexture(const int& i);
 };
