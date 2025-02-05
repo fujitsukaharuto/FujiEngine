@@ -30,6 +30,8 @@ void GameOver::Init() {
 	offsetEasing_.maxTime = 0.4f;
 	offsetEasing_.time = 0.0f;
 
+	dicisionSE_ = Audio::GetInstance()->SoundLoadWave("DecisionSE.wav");
+	selectSE_ = Audio::GetInstance()->SoundLoadWave("missileSize.wav");
 
 	selectMode_ = SelectMode::GOGAME;
 	step_ = Step::FADEIN;
@@ -70,9 +72,11 @@ void GameOver::Update() {
 		if (Input::GetInstance()->TriggerKey(DIK_S) && selectMode_ == SelectMode::GOGAME) {
 			selectMode_ = SelectMode::GOTITLE;
 			selectPos_ = titleSelectPos_;
+			Audio::GetInstance()->SoundPlayWave(selectSE_);
 		} else if (Input::GetInstance()->TriggerKey(DIK_W) && selectMode_ == SelectMode::GOTITLE) {
 			selectMode_ = SelectMode::GOGAME;
 			selectPos_ = gameSelectPos_;
+			Audio::GetInstance()->SoundPlayWave(selectSE_);
 		}
 
 		XINPUT_STATE pad;
@@ -89,10 +93,12 @@ void GameOver::Update() {
 				&& selectMode_ == SelectMode::GOGAME) {
 				selectMode_ = SelectMode::GOTITLE;
 				selectPos_ = titleSelectPos_;
+				Audio::GetInstance()->SoundPlayWave(selectSE_);
 			} else if ((Input::GetInstance()->TriggerButton(PadInput::Up) || (ismoving && stickVelocity.y > 0.0f))
 				&& selectMode_ == SelectMode::GOTITLE) {
 				selectMode_ = SelectMode::GOGAME;
 				selectPos_ = gameSelectPos_;
+				Audio::GetInstance()->SoundPlayWave(selectSE_);
 			}
 		}
 
@@ -103,12 +109,14 @@ void GameOver::Update() {
 			//ゲームに戻る
 			if (selectMode_ == SelectMode::GOGAME) {
 				step_ = Step::FADEOUT;
+				Audio::GetInstance()->SoundPlayWave(dicisionSE_);
 				break;
 			}
 
 			//タイトルに戻るなら
 			if (selectMode_ == SelectMode::GOTITLE) {
 				step_ = Step::GOTITLE;
+				Audio::GetInstance()->SoundPlayWave(dicisionSE_);
 				break;
 			}
 		}
@@ -117,12 +125,14 @@ void GameOver::Update() {
 				//ゲームに戻る
 				if (selectMode_ == SelectMode::GOGAME) {
 					step_ = Step::FADEOUT;
+					Audio::GetInstance()->SoundPlayWave(dicisionSE_);
 					break;
 				}
 
 				//タイトルに戻るなら
 				if (selectMode_ == SelectMode::GOTITLE) {
 					step_ = Step::GOTITLE;
+					Audio::GetInstance()->SoundPlayWave(dicisionSE_);
 					break;
 				}
 			}

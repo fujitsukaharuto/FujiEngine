@@ -2,6 +2,7 @@
 
 #include"Sprite.h"
 #include"Easing.h"
+#include "Audio/Audio.h"
 
 class GameOver {
 public:
@@ -34,6 +35,10 @@ private:
 	float selectPosOffSet_;
 	Easing offsetEasing_;
 	float  easeDirection_;
+
+
+	SoundData dicisionSE_;
+	SoundData selectSE_;
 
 	/// frag
 	bool isTitleBack_;

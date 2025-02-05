@@ -77,8 +77,8 @@ private:
 	bool isDebugCameraMode_ = false;
 
 
-	SoundData soundData1;
-	SoundData soundData2;
+	SoundData dicisionSE_;
+	SoundData selectSE_;
 
 	ParticleEmitter emit;
 

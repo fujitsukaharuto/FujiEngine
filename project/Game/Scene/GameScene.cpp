@@ -90,6 +90,9 @@ void GameScene::Initialize() {
 
 	ParticleManager::Load(emit, "star");
 
+	dicisionSE_ = Audio::GetInstance()->SoundLoadWave("DecisionSE.wav");
+	selectSE_ = Audio::GetInstance()->SoundLoadWave("missileSize.wav");
+
 	///set
 	/*gamePreStart_->SetSkyDome(skydome_.get());*/
 	gamePreStart_->SetUFO(ufo_.get());
@@ -368,19 +371,23 @@ void GameScene::Menu() {
 			nowSelect_ = 1;
 			menuButton1_->SetSize(buttonSizeMax_);
 			menuButton2_->SetSize({ 300.0f,100.0f });
+			Audio::GetInstance()->SoundPlayWave(selectSE_);
 		} else if (Input::GetInstance()->TriggerKey(DIK_S) || Input::GetInstance()->TriggerButton(PadInput::Down) || (ismoving && stickVelocity.y < 0.0f)) {
 			nowSelect_ = 2;
 			menuButton1_->SetSize({ 300.0f,100.0f });
 			menuButton2_->SetSize(buttonSizeMax_);
+			Audio::GetInstance()->SoundPlayWave(selectSE_);
 		}
 
 		// 決定
 		if (Input::GetInstance()->TriggerKey(DIK_SPACE) || Input::GetInstance()->TriggerButton(PadInput::A)) {
 			if (nowSelect_ == 1) {
 				isMenu_ = false;
+				Audio::GetInstance()->SoundPlayWave(dicisionSE_);
 			} else {
 				isChangeFase = true;
 				isTitle_ = true;
+				Audio::GetInstance()->SoundPlayWave(dicisionSE_);
 			}
 		}
 	}
