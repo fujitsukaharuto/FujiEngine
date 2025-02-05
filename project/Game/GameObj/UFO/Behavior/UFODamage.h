@@ -25,13 +25,17 @@ private:
 	ParticleEmitter shockEmit2_;
 	SoundData damageSE_;
 
+	float rTIme_;
+	float rotateAmplitude_;
+	float rotateFrequency_;
+
 public:
 	//コンストラクタ
 	UFODamage(UFO* boss);
 	~UFODamage();
 
 	void Update()override;
-
+	void Rotation();
 	void Debug()override;
 
 };

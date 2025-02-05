@@ -53,6 +53,8 @@ UFODamage::UFODamage(UFO* player)
 		Audio::GetInstance()->SoundPlayWave(damageSE_);
 	}
 	
+	rotateAmplitude_ = 0.1f;
+	rotateFrequency_ = 6.6f;
 }
 
 UFODamage::~UFODamage() {
@@ -61,6 +63,8 @@ UFODamage::~UFODamage() {
 
 //更新
 void UFODamage::Update() {
+
+	Rotation();
 
 	stopTime_ += FPSKeeper::NormalDeltaTime();
 	if (stopTime_ >= pUFO_->GetParamater().hitStopTime_) {
@@ -110,10 +114,15 @@ void UFODamage::Update() {
 			FPSKeeper::SetTimeScale(1.0f);
 			//HPが0以下にならないように
 			if (pUFO_->GetHP() <= 0) {
+				pUFO_->SetRotation(Vector3(0, 0, 0.0f)); // 回転を適用
 				pUFO_->ChangeBehavior(std::make_unique<UFODeath>(pUFO_));
+				
 				/*isDeath_ = true;*/
 			} else {
+				pUFO_->SetRotation(Vector3(0, 0, 0.0f)); // 回転を適用
+			
 				pUFO_->ChangeBehavior(std::make_unique<UFORoot>(pUFO_));
+		
 			}
 		}
 
@@ -130,4 +139,14 @@ void   UFODamage::Debug() {
 #ifdef _DEBUG
 	ImGui::Text("UFODamage");
 #endif // _DEBUG
+}
+
+void UFODamage::Rotation() {
+	rTIme_ += FPSKeeper::DeltaTimeRate(); // フレーム間の経過時間を加算
+	// Sinewave
+	float	zRotation_ = rotateAmplitude_ * std::sin(rotateFrequency_ * rTIme_);
+
+	///* rotate
+	pUFO_->SetRotation(Vector3(0, 0, zRotation_)); // 回転を適用
+
 }

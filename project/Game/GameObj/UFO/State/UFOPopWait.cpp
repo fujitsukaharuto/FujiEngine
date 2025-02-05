@@ -27,6 +27,8 @@ UFOPopWait::UFOPopWait(UFO* player)
 	pUFO_->GetUFOLight()->transform.scale = pUFO_->GetParamater().initLightScale;
 	easeDirection_ = 1.0f;
 	scalingEaseMax_ = 0.7f;
+
+	
 }
 
 UFOPopWait ::~UFOPopWait() {
@@ -35,6 +37,7 @@ UFOPopWait ::~UFOPopWait() {
 
 //更新
 void UFOPopWait::Update() {
+	
 	ExPationing();
 }
 

@@ -19,6 +19,10 @@ private:
 	float scalingEaseMax_;
 	float scalingEaseTime_;
 
+	float rTIme_;
+	float rotateAmplitude_;
+	float rotateFrequency_;
+
 	/// ===================================================
 	///private varians
 	/// ===================================================
@@ -33,5 +37,7 @@ public:
 	void Debug()override;
 
 	void ExPationing();
+
+	void Rotation();
 
 };
