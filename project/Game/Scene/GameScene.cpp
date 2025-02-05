@@ -87,6 +87,8 @@ void GameScene::Initialize() {
 	lifeUI_->Init();
 	gameOver_->Init();
 
+	ParticleManager::Load(emit, "star");
+
 	///set
 	gamePreStart_->SetSkyDome(skydome_.get());
 	gamePreStart_->SetUFO(ufo_.get());
@@ -138,6 +140,7 @@ void GameScene::Update() {
 		case GameScene::GAME:
 			StartUI();
 
+			emit.Emit();
 			timer_->Update();
 			timer_->SetTextureRangeForDigit();
 

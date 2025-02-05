@@ -112,6 +112,9 @@ void GameRun::Initialize() {
 	pManager_->CreateParticleGroup("misilleSmoke1", "blueParticle.png");
 	pManager_->CreateParticleGroup("misilleSmoke2", "blueParticle.png");
 
+	pManager_->CreateParticleGroup("star", "kira.png", 50);
+
+
 #pragma endregion
 
 
