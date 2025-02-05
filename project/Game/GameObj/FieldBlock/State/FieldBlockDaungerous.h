@@ -16,8 +16,7 @@ private:
 	float restoreTime_;
 
 	ParticleEmitter darkEmit_;
-	ParticleEmitter ChangeEmit_;
-
+	
 public:
 	//コンストラクタ
 	FieldBlockDaungerous(FieldBlock* boss);

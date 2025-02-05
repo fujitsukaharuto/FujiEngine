@@ -20,23 +20,18 @@ FieldBlockDaungerous::FieldBlockDaungerous(FieldBlock* boss)
 	pFieldBlock_->GetModel()->SetColor(Vector4(1, 1, 0, 1));
 	pFieldBlock_->SetTag(static_cast<size_t>(FieldBlock::Tag::DAUNGEROUS));
 	restoreTime_ = 0.0f;
-	step_ = Step::DAUNGEROUSMODE;
 
 	ParticleManager::Load(darkEmit_, "dark");
-	ParticleManager::Load(ChangeEmit_, "groundBreak");
-
 	darkEmit_.pos = pFieldBlock_->GetModel()->GetWorldPos();
-	ChangeEmit_.pos = pFieldBlock_->GetModel()->GetWorldPos();
-
 	Vector3 emitSizeMax = pFieldBlock_->GetCollisionSize() * 0.5f;
 	Vector3 emitSizeMin = pFieldBlock_->GetCollisionSize() * -0.5f;
 	darkEmit_.emitSizeMax = emitSizeMax;
 	darkEmit_.emitSizeMin.x = emitSizeMin.x;
 	darkEmit_.emitSizeMin.z = emitSizeMin.z;
 
-	ChangeEmit_.emitSizeMax = { emitSizeMax.x,8.0f,emitSizeMin.z - 2.0f };
-	ChangeEmit_.emitSizeMin = { emitSizeMin.x,2.0f,emitSizeMin.z - 3.0f };
-	ChangeEmit_.Burst();
+	step_ = Step::DAUNGEROUSMODE;
+
+	
 }
 
 FieldBlockDaungerous::~FieldBlockDaungerous() {
