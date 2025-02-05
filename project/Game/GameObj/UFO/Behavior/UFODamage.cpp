@@ -3,6 +3,7 @@
 
 #include"UFODamage.h"
 #include"UFORoot.h"
+#include"UFODeath.h"
 
 ///* obj
 #include"Game/GameObj/UFO/UFO.h"
@@ -105,7 +106,13 @@ void UFODamage::Update() {
 		if (stopTime_ > pUFO_->GetParamater().hitStopTime_) {
 			pUFO_->SetColor(Vector4(1, 1, 1, 1));
 			FPSKeeper::SetTimeScale(1.0f);
-			pUFO_->ChangeBehavior(std::make_unique<UFORoot>(pUFO_));
+			//HPが0以下にならないように
+			if (pUFO_->GetHP() <= 0) {
+				pUFO_->ChangeBehavior(std::make_unique<UFODeath>(pUFO_));
+				/*isDeath_ = true;*/
+			} else {
+				pUFO_->ChangeBehavior(std::make_unique<UFORoot>(pUFO_));
+			}
 		}
 
 		break;

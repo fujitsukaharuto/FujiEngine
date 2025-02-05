@@ -395,6 +395,9 @@
     <ClCompile Include="Game\GameObj\BackGround\BackGround.cpp">
       <Filter>Game\GameObj\BackGround</Filter>
     </ClCompile>
+    <ClCompile Include="Game\GameObj\UFO\Behavior\UFODeath.cpp">
+      <Filter>Game\Behavior\UFO</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Audio\Audio.h">
@@ -807,6 +810,9 @@
     </ClInclude>
     <ClInclude Include="Game\GameObj\BackGround\BackGround.h">
       <Filter>Game\GameObj\BackGround</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\UFO\Behavior\UFODeath.h">
+      <Filter>Game\Behavior\UFO</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -19,6 +19,8 @@
             7.599999904632568,
             27.100000381469727
         ],
+        "deathFallSpeed_": 8.619999885559082,
+        "explotionPosY_": 0.0,
         "hitStopDamage_": 10.0,
         "hitStopTime_": 0.20000000298023224,
         "hpPos_": [
@@ -31,11 +33,28 @@
             7.0,
             5.0
         ],
+        "particleOffsets0_": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "particleOffsets1_": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "particleOffsets2_": [
+            0.0,
+            0.0,
+            0.0
+        ],
         "rootLightScale": [
             1.0,
             1.0,
             1.0
         ],
+        "shakeLength": 6.269999980926514,
+        "shakeTime": 21.729999542236328,
         "startBarPos_": [
             415.0,
             -41.5,

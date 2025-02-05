@@ -5,10 +5,12 @@
 #include"State/UFOPopWait.h"
 #include"Behavior/UFODamage.h"
 #include"GameObj/Enemy/Behavior/EnemyBlowingWeak.h"
+#include"Behavior/UFODeath.h"
 //obj
 #include"GameObj/Enemy/EnemyManager.h"
 #include"GameObj/Enemy/BaseEnemy.h"
 #include"GameObj/Enemy/Behavior/EnemyExplotion.h"
+
 
 #include "PointLightManager.h"
 
@@ -52,7 +54,7 @@ void UFO::Initialize() {
 
 	hpSprite_ = std::make_unique<Sprite>();
 	hpSprite_->Load("GameTexture/UFO_Hp_In.png");
-	hpPos_=paramater_.startHpPos_;
+	hpPos_ = paramater_.startHpPos_;
 	hpSprite_->SetAnchor(Vector2(0.0f, 0.0f));
 
 	hpMaxSprite_ = std::make_unique<Sprite>();
@@ -87,7 +89,9 @@ void UFO::Update() {
 	DamageRendition();
 	/// 振る舞い処理
 	behavior_->Update();
-	state_->Update();
+	if (!dynamic_cast<UFODeath*>(behavior_.get())) {
+		state_->Update();
+	}
 	///
 	collider_->InfoUpdate();
 	AdaptHP();
@@ -137,11 +141,7 @@ void UFO::TakeDamageForPar(const float& par) {
 	// HP減少
 	hp_ -= decrementSize;
 
-	//HPが0以下にならないように
-	if (hp_ <= 0) {
-		// 死亡処理
-		isDeath_ = true;
-	}
+
 }
 
 void UFO::Move() {
@@ -180,6 +180,14 @@ void UFO::AdjustParm() {
 		ImGui::DragFloat3("バー位置最初", &paramater_.startBarPos_.x, 0.5f);
 		ImGui::DragFloat3("HP位置最初", &paramater_.startHpPos_.x, 0.5f);
 
+		ImGui::SeparatorText("墜落パラメータ");
+		ImGui::DragFloat("シェイクでかさ", &paramater_.shakeLength, 0.01f);
+		ImGui::DragFloat("シェイク時間", &paramater_.shakeTime, 0.01f);
+		ImGui::DragFloat("落ちるスピード", &paramater_.deathFallSpeed_, 0.01f);
+		ImGui::DragFloat3("爆破パーティクルオフセット1", &paramater_.particleOffsets_[0].x, 0.1f);
+		ImGui::DragFloat3("爆破パーティクルオフセット2", &paramater_.particleOffsets_[1].x, 0.1f);
+		ImGui::DragFloat3("爆破パーティクルオフセット3", &paramater_.particleOffsets_[2].x, 0.1f);
+		ImGui::DragFloat("爆破位置Y", &paramater_.explotionPosY_, 0.1f);
 
 		ImGui::SeparatorText("いらないかも");
 		ImGui::DragFloat("ダメージの吹っ飛び距離", &paramater_.dagameDistance_, 0.01f);
@@ -222,12 +230,10 @@ void UFO::ParmLoadForImGui() {
 		ApplyGlobalParameter();
 	}
 }
-
 ///=================================================================================
-///パラメータをグループに追加
+/// パラメータをグループに追加
 ///=================================================================================
 void UFO::AddParmGroup() {
-
 	globalParameter_->AddItem(groupName_, "Translate", paramater_.gamePos);
 	globalParameter_->AddItem(groupName_, "startPos", paramater_.startPos);
 	globalParameter_->AddItem(groupName_, "DamageTime", paramater_.damageTime_);
@@ -241,13 +247,19 @@ void UFO::AddParmGroup() {
 	globalParameter_->AddItem(groupName_, "hpPos_", paramater_.hpPosEnd_);
 	globalParameter_->AddItem(groupName_, "startBarPos_", paramater_.startBarPos_);
 	globalParameter_->AddItem(groupName_, "startHpPos_", paramater_.startHpPos_);
+	globalParameter_->AddItem(groupName_, "particleOffsets0_", paramater_.particleOffsets_[0]);
+	globalParameter_->AddItem(groupName_, "particleOffsets1_", paramater_.particleOffsets_[1]);
+	globalParameter_->AddItem(groupName_, "particleOffsets2_", paramater_.particleOffsets_[2]);
+	globalParameter_->AddItem(groupName_, "explotionPosY_", paramater_.explotionPosY_);
+	globalParameter_->AddItem(groupName_, "shakeLength", paramater_.shakeLength);
+	globalParameter_->AddItem(groupName_, "shakeTime", paramater_.shakeTime);
+	globalParameter_->AddItem(groupName_, "deathFallSpeed_", paramater_.deathFallSpeed_);
 }
 
 ///=================================================================================
-///パラメータをグループに追加
+/// パラメータをグループに追加
 ///=================================================================================
 void UFO::SetValues() {
-
 	globalParameter_->SetValue(groupName_, "Translate", paramater_.gamePos);
 	globalParameter_->SetValue(groupName_, "startPos", paramater_.startPos);
 	globalParameter_->SetValue(groupName_, "collisionSize_", paramater_.collisionSize_);
@@ -261,11 +273,18 @@ void UFO::SetValues() {
 	globalParameter_->SetValue(groupName_, "hpPos_", paramater_.hpPosEnd_);
 	globalParameter_->SetValue(groupName_, "startBarPos_", paramater_.startBarPos_);
 	globalParameter_->SetValue(groupName_, "startHpPos_", paramater_.startHpPos_);
+	globalParameter_->SetValue(groupName_, "particleOffsets0_", paramater_.particleOffsets_[0]);
+	globalParameter_->SetValue(groupName_, "particleOffsets1_", paramater_.particleOffsets_[1]);
+	globalParameter_->SetValue(groupName_, "particleOffsets2_", paramater_.particleOffsets_[2]);
+	globalParameter_->SetValue(groupName_, "explotionPosY_", paramater_.explotionPosY_);
+	globalParameter_->SetValue(groupName_, "shakeLength", paramater_.shakeLength);
+	globalParameter_->SetValue(groupName_, "shakeTime", paramater_.shakeTime);
+	globalParameter_->SetValue(groupName_, "deathFallSpeed_", paramater_.deathFallSpeed_);
 }
 
 ///=====================================================
-///  ImGuiからパラメータを得る
-///===================================================== 
+/// ImGuiからパラメータを得る
+///=====================================================
 void UFO::ApplyGlobalParameter() {
 	paramater_.gamePos = globalParameter_->GetValue<Vector3>(groupName_, "Translate");
 	paramater_.collisionSize_ = globalParameter_->GetValue<Vector3>(groupName_, "collisionSize_");
@@ -280,6 +299,13 @@ void UFO::ApplyGlobalParameter() {
 	paramater_.hpPosEnd_ = globalParameter_->GetValue<Vector3>(groupName_, "hpPos_");
 	paramater_.startHpPos_ = globalParameter_->GetValue<Vector3>(groupName_, "startHpPos_");
 	paramater_.startBarPos_ = globalParameter_->GetValue<Vector3>(groupName_, "startBarPos_");
+	paramater_.particleOffsets_[0] = globalParameter_->GetValue<Vector3>(groupName_, "particleOffsets0_");
+	paramater_.particleOffsets_[1] = globalParameter_->GetValue<Vector3>(groupName_, "particleOffsets1_");
+	paramater_.particleOffsets_[2] = globalParameter_->GetValue<Vector3>(groupName_, "particleOffsets2_");
+	paramater_.shakeLength = globalParameter_->GetValue<float>(groupName_, "shakeLength");
+	paramater_.shakeTime = globalParameter_->GetValue<float>(groupName_, "shakeTime");
+	paramater_.deathFallSpeed_ = globalParameter_->GetValue<float>(groupName_, "deathFallSpeed_");
+	paramater_.explotionPosY_ = globalParameter_->GetValue<float>(groupName_, "explotionPosY_");
 }
 ///=========================================================
 /// Class Set
@@ -290,10 +316,10 @@ void UFO::SetEnemyManager(EnemyManager* enemymanager) {
 }
 
 void UFO::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
-
+	if (dynamic_cast<UFODeath*>(behavior_.get()))return;
 	/// 弱い吹っ飛びをくらってる
 	if (other.tag == "BlowingWeakEnemy") {
-		
+
 		if (BaseEnemy* enemy = dynamic_cast<BaseEnemy*>(other.owner)) {
 
 			takeDamageValue_ = enemy->GetSumWeakAttackValue();
@@ -320,8 +346,6 @@ void UFO::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 		ChangeBehavior(std::make_unique<UFODamage>(this));
 		return;
 	}
-
-
 }
 
 void UFO::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
@@ -359,7 +383,7 @@ void UFO::Apear(const float& time, const float& maxTime) {
 	model_->transform.translate.y = EaseOutBack(
 		paramater_.startPos.y, paramater_.gamePos.y, time, maxTime);
 
-	hpPos_= EaseOutBack(paramater_.startHpPos_, paramater_.hpPosEnd_, time, maxTime);
+	hpPos_ = EaseOutBack(paramater_.startHpPos_, paramater_.hpPosEnd_, time, maxTime);
 	barPos_ = EaseOutBack(paramater_.startBarPos_, paramater_.barPos_, time, maxTime);
 
 	if (time < maxTime) return;
@@ -376,3 +400,12 @@ void UFO::AdaptHP() {
 	}
 	hpSprite_->SetSize({ hpSize_,75.0f });
 }
+
+
+
+
+
+
+
+
+

@@ -216,6 +216,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\GameObj\Timer\Timer.cpp" />
     <ClCompile Include="Game\GameObj\UFO\Behavior\BaseUFOrBehavior.cpp" />
     <ClCompile Include="Game\GameObj\UFO\Behavior\UFODamage.cpp" />
+    <ClCompile Include="Game\GameObj\UFO\Behavior\UFODeath.cpp" />
     <ClCompile Include="Game\GameObj\UFO\Behavior\UFORoot.cpp" />
     <ClCompile Include="Game\GameObj\UFO\State\UFOMissilePop.cpp" />
     <ClCompile Include="Game\GameObj\UFO\State\BaseUFOState.cpp" />
@@ -354,6 +355,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Game\GameObj\Timer\Timer.h" />
     <ClInclude Include="Game\GameObj\UFO\Behavior\BaseUFOrBehavior.h" />
     <ClInclude Include="Game\GameObj\UFO\Behavior\UFODamage.h" />
+    <ClInclude Include="Game\GameObj\UFO\Behavior\UFODeath.h" />
     <ClInclude Include="Game\GameObj\UFO\Behavior\UFORoot.h" />
     <ClInclude Include="Game\GameObj\UFO\State\UFOMissilePop.h" />
     <ClInclude Include="Game\GameObj\UFO\State\BaseUFOState.h" />

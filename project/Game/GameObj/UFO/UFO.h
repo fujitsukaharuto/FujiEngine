@@ -30,6 +30,11 @@ public:
 		float damageTime_;
 		float hitStopDamage_;
 		float hitStopTime_;
+		float shakeLength;
+		float shakeTime;
+		float deathFallSpeed_;
+		std::array<Vector3, 3>particleOffsets_;
+		float explotionPosY_;
 	};
 
 private:
@@ -126,10 +131,12 @@ public:
 	bool GetIsDeath()const { return isDeath_; }
 	float GetDamageValue()const { return takeDamageValue_; }
 	Vector3 GetHitPosition()const { return hitPosition_; }
+	float GetHP()const { return hp_; }
 	/// ===================================================
 	/// setter method
 	/// ===================================================
 	void SetEnemyManager(EnemyManager*enemymanager);
 	void SetColor(const Vector4& color);
 	void SetCollisionSize(const Vector3& size);
+	void SetIsDeath(const bool& is) { isDeath_ = is; }
 };
