@@ -4,7 +4,7 @@
 
 class BackGround {
 private:
-	std::unique_ptr<Sprite>sprite_
+	std::unique_ptr<Sprite>sprite_;
 
 public:
 	void Init();
