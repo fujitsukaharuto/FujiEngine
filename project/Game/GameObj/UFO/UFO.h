@@ -35,6 +35,7 @@ public:
 		float deathFallSpeed_;
 		std::array<Vector3, 3>particleOffsets_;
 		float explotionPosY_;
+		
 	};
 
 private:

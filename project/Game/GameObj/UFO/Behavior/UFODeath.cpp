@@ -25,12 +25,6 @@ UFODeath::UFODeath(UFO* player)
 	///変数初期化
 	///---------------------------------------------------
 
-	pUFO_->GetParamater().particleOffsets_[0];
-	pUFO_->GetParamater().particleOffsets_[1];
-	pUFO_->GetParamater().particleOffsets_[2];
-	//例
-	pUFO_->GetModel()->GetWorldPos()+ pUFO_->GetParamater().particleOffsets_[0];
-
 	prePos_ = pUFO_->GetModel()->GetWorldPos();
 	kWaitTime_ = 0.1f;
 	shakeTime_ = pUFO_->GetParamater().shakeTime;

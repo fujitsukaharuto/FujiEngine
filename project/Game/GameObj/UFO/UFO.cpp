@@ -198,7 +198,7 @@ void UFO::AdjustParm() {
 
 		ImGui::SeparatorText("セーブできないデバッグ用");
 		ImGui::DragFloat("体力", &hp_, 0.01f);
-		ImGui::DragFloat3("size", &model_->transform.scale.x, 0.1f);
+		ImGui::DragFloat3("rotate", &model_->transform.rotate.x, 0.1f);
 
 		ImGuiManager::GetInstance()->UnSetFont();
 		ImGui::PopID();
