@@ -11,7 +11,7 @@ void BackGround::Init() {
 	sprite_->SetAnchor({ 0.0f,0.0f });
 
 	/// leftTop
-	startScrollPos_ = 987.0f;
+	startScrollPos_ = 970.0f;
 	endScrollPos_ = 0.0f;
 	leftTopPos_ = startScrollPos_;
 }

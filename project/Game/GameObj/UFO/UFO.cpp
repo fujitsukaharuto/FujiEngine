@@ -79,6 +79,8 @@ void UFO::Initialize() {
 /// ===================================================
 void UFO::Update() {
 
+	/*model_->transform.rotate.y += 20.0f*FPSKeeper::DeltaTimeRate();*/
+
 	hpSprite_->SetPos(paramater_.hpPos_);
 	hpMaxSprite_->SetPos(paramater_.barPos_);
 
@@ -353,7 +355,7 @@ void UFO::ChangePopBehavior() {
 }
 
 void UFO::Apear(const float& time, const float& maxTime) {
-	model_->transform.translate.y = EaseInCirc(
+	model_->transform.translate.y = EaseOutBack(
 		paramater_.startPos.y, paramater_.gamePos.y, time, maxTime);
 
 	if (time < maxTime) return;

@@ -10,7 +10,8 @@ class GamePreStart {
 public:
 	enum class Step {
 		WAIT,
-		GOUP,
+		GOUPGROUND,
+		APEARUFO,
 		AIMWAIT,
 		AIMOPEN,
 		CLOSEWAIT,
@@ -30,6 +31,8 @@ private://wait
 	float kWaitTime_;
 private:/// goup
 	Easing goUpTime_;
+private:/// apearUFO
+	Easing apearUFO_;
 private:/// aimWait
 	float aimWaitTime_;
 	float aimKWaitTime_;

@@ -26,7 +26,8 @@ void GamePreStart::Init() {
 
 	aimEase_.maxTime = 1.5f;
 	aimCloseEase_.maxTime = 1.0f;
-	goUpTime_.maxTime = 1.4f;
+	goUpTime_.maxTime = 1.5f;
+	apearUFO_.maxTime = 0.6f;
 
 	aimStartPos_ = 1200.0f;
 	aimEndPos_ = 100.0f;
@@ -55,19 +56,31 @@ void GamePreStart::Update() {
 		waitTime_ += FPSKeeper::NormalDeltaTime();
 		if (waitTime_ < kWaitTime_)break;
 		waitTime_ = kWaitTime_;
-		step_ = Step::GOUP;
+		step_ = Step::GOUPGROUND;
 		break;
+
 		///-----------------------------------------------------------------
 		/// 上に上がる
 		///-----------------------------------------------------------------
-	case GamePreStart::Step::GOUP:
+	case GamePreStart::Step::GOUPGROUND:
 		goUpTime_.time += FPSKeeper::NormalDeltaTime();
 		/// 出現
-		pUFO_->Apear(goUpTime_.time, goUpTime_.maxTime);
 		pBackGround_->Scrool(goUpTime_.time, goUpTime_.maxTime);
 
 		if (goUpTime_.time < goUpTime_.maxTime)break;
 		goUpTime_.time = goUpTime_.maxTime;
+		step_ = Step::APEARUFO;
+		break;
+		///-----------------------------------------------------------------
+		/// 上に上がる
+		///-----------------------------------------------------------------
+	case GamePreStart::Step::APEARUFO:
+		apearUFO_.time += FPSKeeper::NormalDeltaTime();
+		/// 出現
+		pUFO_->Apear(apearUFO_.time, apearUFO_.maxTime);
+	
+		if (apearUFO_.time < apearUFO_.maxTime)break;
+		apearUFO_.time = apearUFO_.maxTime;
 		step_ = Step::AIMWAIT;
 		break;
 		///-----------------------------------------------------------------
