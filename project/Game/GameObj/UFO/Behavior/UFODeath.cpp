@@ -1,10 +1,9 @@
 
-
-
 ///* behavior
 #include"UFODeath.h"
 ///* obj
 #include"Game/GameObj/UFO/UFO.h"
+#include"GameObj/Enemy/EnemyManager.h"
 ///* frame
 #include"DX/FPSKeeper.h"
 #include"Camera/CameraManager.h"
@@ -25,6 +24,7 @@ UFODeath::UFODeath(UFO* player)
 	///変数初期化
 	///---------------------------------------------------
 
+	pUFO_->GetEnemyManager()->AllDeath();
 	prePos_ = pUFO_->GetModel()->GetWorldPos();
 	kWaitTime_ = 0.1f;
 	shakeTime_ = pUFO_->GetParamater().shakeTime;

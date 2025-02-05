@@ -60,6 +60,7 @@ public:
     // 初期化
     void Initialize();
     void FSpawn();
+    void AllDeath();
 
     // 敵の生成
     void SpawnEnemy(const BaseEnemy::Type& enemyType, const Vector3& position);

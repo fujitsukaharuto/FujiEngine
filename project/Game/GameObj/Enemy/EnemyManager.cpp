@@ -1,4 +1,5 @@
 #include "EnemyManager.h"
+#include"GameObj/UFO/Behavior/UFODeath.h"
 #include"NormalEnemy.h"
 #include"GameObj/UFO/UFO.h"
 
@@ -37,7 +38,7 @@ void  EnemyManager::FSpawn() {
 ///  敵の生成
 ///========================================================================================
 void EnemyManager::SpawnEnemy(const BaseEnemy::Type& enemyType, const Vector3& position) {
-
+	if (dynamic_cast<UFODeath*>(pUFO_))return;
 	// 通常敵
 	if (enemyType == BaseEnemy::Type::NORMAL||
 		enemyType == BaseEnemy::Type::LEFTSIDE||
@@ -602,4 +603,15 @@ void EnemyManager::SetLockon(LockOn* lockOn) {
 
 void EnemyManager::SetUFO(UFO* ufo) {
 	pUFO_ = ufo;
+}
+
+void EnemyManager::AllDeath() {
+	for (auto it = enemies_.begin(); it != enemies_.end(); ) {
+
+		(*it)->SetExplotion();
+	
+	++it; /// 削除しない場合はイテレータを進める
+		
+	}
+
 }

@@ -270,6 +270,12 @@ void BaseEnemy::SetCollisionSize(const Vector3& size) {
 	collider_->SetDepth(size.z*5.0f);
 }
 
+void  BaseEnemy::SetExplotion() {
+	if (!dynamic_cast<EnemyExplotion*>(behavior_.get())) {
+		ChangeBehavior(std::make_unique<EnemyExplotion>(this));
+		return;
+	}
+}
 
 //float BaseEnemy::GetBoundPower()const {
 //	// 減衰率を計算 (0～1)
