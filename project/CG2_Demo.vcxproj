@@ -230,6 +230,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\GameObj\PlayerBehavior\PlayerJump.cpp" />
     <ClCompile Include="Game\GameObj\PlayerBehavior\PlayerRoot.cpp" />
     <ClCompile Include="Game\GameObj\Player\Player.cpp" />
+    <ClCompile Include="Game\reslutobj\BaseResultSprite.cpp" />
+    <ClCompile Include="Game\reslutobj\ResultAnimationManager.cpp" />
+    <ClCompile Include="Game\reslutobj\ResultFont.cpp" />
+    <ClCompile Include="Game\reslutobj\ResultFontA.cpp" />
+    <ClCompile Include="Game\reslutobj\ResultTime.cpp" />
     <ClCompile Include="Game\Scene\GameOverScene.cpp" />
     <ClCompile Include="Game\Scene\GameRun.cpp" />
     <ClCompile Include="Game\Scene\GameScene.cpp" />
@@ -370,6 +375,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Game\GameObj\PlayerBehavior\PlayerRoot.h" />
     <ClInclude Include="Game\GameObj\Player\Player.h" />
     <ClInclude Include="Game\OriginState.h" />
+    <ClInclude Include="Game\reslutobj\BaseResultSprite.h" />
+    <ClInclude Include="Game\reslutobj\ResultAnimationManager.h" />
+    <ClInclude Include="Game\reslutobj\ResultFont.h" />
+    <ClInclude Include="Game\reslutobj\ResultFontA.h" />
+    <ClInclude Include="Game\reslutobj\ResultTime.h" />
     <ClInclude Include="Game\Scene\GameOverScene.h" />
     <ClInclude Include="Game\Scene\GameRun.h" />
     <ClInclude Include="Game\Scene\GameScene.h" />

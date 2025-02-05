@@ -19,9 +19,12 @@ void ResultScene::Initialize() {
 	Init();
 	timer_ = std::make_unique<Timer>();
 	timer_->Init();
-	timer_->SetScale(2.0f, 2.0f);
-	timer_->SetPos(Vector3(325.7f, 432.0f, 0.0f), Vector3(571.4f, 515.0f, 0.0f));
-	timer_->SetOffSet(132.8f);
+	timer_->SetScale(2.0f, 1.3f);
+	timer_->SetOffSet(129.5f);
+
+	reani_ = std::make_unique<ResultAnimationManager>();
+	reani_->Init();
+	reani_->SetTimer(timer_.get());
 
 	obj3dCommon.reset(new Object3dCommon());
 	obj3dCommon->Initialize();
@@ -47,10 +50,11 @@ void ResultScene::Initialize() {
 
 void ResultScene::Update() {
 
+	reani_->Update();
 	timer_->SetTextureRangeForDigit();
 
 #ifdef _DEBUG
-
+	reani_->AdjustParamater();
 
 	ImGui::Begin("Sphere");
 
@@ -99,8 +103,8 @@ void ResultScene::Draw() {
 #pragma region 前景スプライト
 
 	dxCommon_->PreSpriteDraw();
-
-	clearPaneru_->Draw();
+	reani_->BackDraw();
+	reani_->Draw();
 	timer_->Draw();
 	if (blackTime != 0.0f) {
 		black_->Draw();

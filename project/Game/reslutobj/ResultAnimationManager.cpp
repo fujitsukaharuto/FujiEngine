@@ -1,18 +1,17 @@
-#include "TitleAnimationManager.h"
-#include "TitleBom.h"
-#include "TItleBottom.h"
+#include "ResultAnimationManager.h"
+#include"GameObj/Timer/Timer.h"
 #include"Input/Input.h"
 #include"FPSKeeper.h"
 #include <iostream>
 
-TitleAnimationManager::TitleAnimationManager()
+ResultAnimationManager::ResultAnimationManager()
 {
 
 }
 ///--------------------------------------------------------------------------
 /// 初期化
 ///--------------------------------------------------------------------------
-void TitleAnimationManager::Init() 
+void ResultAnimationManager::Init()
 {
     for (size_t i = 0; i < backSprite_.size(); i++) {
         backSprite_[i] = std::make_unique<Sprite>();
@@ -25,8 +24,8 @@ void TitleAnimationManager::Init()
     backSprite_[1]->SetPos(Vector3(0, 0.0f, 0));
     scroolTime_ = 0.0f;
 
-    titleBom_ = std::make_unique<TitleBom>();
-    titleBottom_ = std::make_unique<TitleBottom>();
+    font_ = std::make_unique<ResultFont>();
+    fontA = std::make_unique<ResultFontA>();
 
     Reset();
 }
@@ -35,7 +34,7 @@ void TitleAnimationManager::Init()
 ///--------------------------------------------------------------------------
 /// 更新
 ///--------------------------------------------------------------------------
-void TitleAnimationManager::Update()
+void ResultAnimationManager::Update()
 {
     scroolTime_ += scrollSpeed_*FPSKeeper::NormalDeltaTime();
     if (scroolTime_ >= kTeexWidth) {
@@ -51,13 +50,13 @@ void TitleAnimationManager::Update()
 ///--------------------------------------------------------------------------
 /// 描画
 ///--------------------------------------------------------------------------
-void TitleAnimationManager::Draw() 
+void ResultAnimationManager::Draw()
 {
-    titleBom_->Draw();
-    titleBottom_->Draw();
+    font_->Draw();
+    fontA->Draw();
 }
 
-void TitleAnimationManager::BackDraw() {
+void ResultAnimationManager::BackDraw() {
     for (size_t i = 0; i < backSprite_.size(); i++) {
     
         backSprite_[i]->Draw();
@@ -67,10 +66,11 @@ void TitleAnimationManager::BackDraw() {
 ///-------------------------------------------------------------------------
 ///  調節
 ///-------------------------------------------------------------------------
-void TitleAnimationManager::AdjustParamater() 
+void ResultAnimationManager::AdjustParamater()
 {
-    titleBom_->AdjustParm();
-    titleBottom_->AdjustParm();
+    font_->AdjustParm();
+    fontA->AdjustParm();
+    fontA->AdaptState();
 
     if (Input::GetInstance()->TriggerKey(DIK_R)) {
         Reset();
@@ -80,51 +80,72 @@ void TitleAnimationManager::AdjustParamater()
 ///-------------------------------------------------------------------------
 ///  ボムアニメーション
 ///-------------------------------------------------------------------------
-void TitleAnimationManager::BomAnimation() 
+void ResultAnimationManager::FirstAnimation()
 {
-    titleBom_->Update();
-    if (!titleBom_->IsAnimationFinished())return;
+    font_->Update();
+    if (!font_->IsAnimationFinished())return;
     step_ = Step::BOTTOM;
 }
 
 ///-------------------------------------------------------------------------
 ///  ボタンアニメーション
 ///-------------------------------------------------------------------------
-void TitleAnimationManager::BottomAnimation() 
+void ResultAnimationManager::BottomAnimation()
 {
-    titleBottom_->Update();
-    if (!titleBottom_->IsAnimationFinished())return;
+    timerT_ += FPSKeeper::NormalDeltaTime();
+    timerPosX = EaseOutBack(timerPosSX, timerPosEX, timerT_, timerTM_);
+    pTimer_->SetPos(Vector3(timerPosX, 432.0f, 0.0f), Vector3(timerPosX + 246, 500.0f, 0.0f));
+    if (timerT_ < timerTM_)return;
+  
+    step_ = Step::AUI;
+}
+///-------------------------------------------------------------------------
+///  ボタンアニメーション
+///-------------------------------------------------------------------------
+void ResultAnimationManager::AUIMove()
+{
+    fontA->Update();
+    if (!fontA->IsAnimationFinished())return;
+  
     step_ = Step::ALL;
 }
 ///-------------------------------------------------------------------------
 /// 全てアニメーション
 ///-------------------------------------------------------------------------
-void TitleAnimationManager::AllAnimation() 
+void ResultAnimationManager::AllAnimation()
 {
-    titleBom_->ExPationing();
-    titleBottom_->ExPationing();
-
-    titleBom_->AdaptState();
-    titleBottom_->AdaptState();
+    fontA->ExPationing();
 }
 
 ///-------------------------------------------------------------------------
 ///  ポインタテーブル
 ///-------------------------------------------------------------------------
-void (TitleAnimationManager::* TitleAnimationManager::spFuncTable_[])()
+void (ResultAnimationManager::* ResultAnimationManager::spFuncTable_[])()
 {
-    &TitleAnimationManager::BomAnimation,
-    &TitleAnimationManager::BottomAnimation,
-    &TitleAnimationManager::AllAnimation,
+    &ResultAnimationManager::FirstAnimation,
+    & ResultAnimationManager::BottomAnimation,
+        & ResultAnimationManager::AUIMove,
+    & ResultAnimationManager::AllAnimation,
 };
 
 ///-------------------------------------------------------------------------
 ///  リセット
 ///-------------------------------------------------------------------------
-void TitleAnimationManager::Reset()
+void ResultAnimationManager::Reset()
 {
-    titleBom_->Init();
-    titleBottom_->Init();
+    font_->Init();
+    fontA->Init();
+
+     timerT_ = 0.0f;
+     timerTM_=0.7f;
+     timerPosX=0.0f;
+     timerPosSX = -470.0f;
+     timerPosEX = 316.0f;
 
     step_ = Step::BOM;
+}
+
+void ResultAnimationManager::SetTimer(Timer* timer) {
+    pTimer_ = timer;
+    pTimer_->SetPos(Vector3(timerPosSX, 432.0f, 0.0f), Vector3(timerPosSX+246, 500.0f, 0.0f));
 }

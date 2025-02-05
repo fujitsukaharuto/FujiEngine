@@ -1,54 +1,37 @@
 // TitleBom.h
 #pragma once
-#include "BaseTitleSprite.h"
+#include "BaseResultSprite.h"
 #include"GlobalVariables/GlobalVariables.h"
 
 
-class TitleBom : public BaseTitleSprite {
+class ResultFont : public BaseResultSprite {
 public:
     enum class Step {
         FALL,
-        SHRINK,
-        EXPATION,
-        REVERSE,
         WAIT,
     };
     struct Paramater {
       float  fallEaseMaxTime;
-      float  expationMaxTime;
-      float shrinkEaseMaxTime;
-      float reverseMaxTime;
       float kWaitTime_;
       float fallStartPosY_;
       float fallEndPosY_;
-      float initScale_;
-      float expationScale_;
-      float expationScaleX_;
-      float shrinkScale_;
-      float baseposX_;
-      float scalingEaseTMax;
-      float expatingScale;
     };
 private:
      ///-------------------------------------------------------------------------
      ///  private variants
      ///-------------------------------------------------------------------------
-    TitleBom* phaseFunc_;
+    ResultFont* phaseFunc_;
     Step step_;
 
     Paramater paramater_;
 
     ///変数
     GlobalVariables* globalParameter_;            /// グローバルパラメータ
-    const std::string groupName_ = "TitleBom";      /// グループ名
+    const std::string groupName_ = "ResultFont";      /// グループ名
 
     /// ease,time
     float fallEaseTime_;
-    float expationEaseTime_;
-    float shrinkEaseTime_;
-    float reverseEaseTime_;
     float waitTime_;
-    float kWaitTime_;
 
     //pos,scale,size
     Vector2 scale_;
@@ -59,20 +42,21 @@ private:
  
 
 public:
-    TitleBom();
-    ~TitleBom() override = default;
+    ResultFont();
+    ~ResultFont() override = default;
 
     ///-------------------------------------------------------------------------
     ///  public method
     ///-------------------------------------------------------------------------
-    void Init()override;
+     /// オーバーライドするメソッド
+    void Init() override;
     void Update() override;
     void Draw() override;
     bool IsAnimationFinished() override;
-    void AdaptState()override;
-    void ExPationing()override;
+    void AdaptState() override;
     void Reset();
-
+    void ExPationing() override; // 追加
+   
   ///-------------------------------------------------------------------------------------
 ///Editor
 ///-------------------------------------------------------------------------------------
@@ -85,12 +69,9 @@ public:
 private:
 
     void Fall();
-    void Shrink();
-    void Expation();
-    void Reverse();
     void Wait();
 
     /// メンバ関数のポインタテーブル
-    static void (TitleBom::* spFuncTable_[])();
+    static void (ResultFont::* spFuncTable_[])();
 
 };

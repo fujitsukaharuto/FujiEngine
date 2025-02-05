@@ -398,6 +398,21 @@
     <ClCompile Include="Game\GameObj\UFO\Behavior\UFODeath.cpp">
       <Filter>Game\Behavior\UFO</Filter>
     </ClCompile>
+    <ClCompile Include="Game\reslutobj\BaseResultSprite.cpp">
+      <Filter>Game\ResultObj</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\reslutobj\ResultAnimationManager.cpp">
+      <Filter>Game\ResultObj</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\reslutobj\ResultFont.cpp">
+      <Filter>Game\ResultObj</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\reslutobj\ResultTime.cpp">
+      <Filter>Game\ResultObj</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\reslutobj\ResultFontA.cpp">
+      <Filter>Game\ResultObj</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Audio\Audio.h">
@@ -813,6 +828,21 @@
     </ClInclude>
     <ClInclude Include="Game\GameObj\UFO\Behavior\UFODeath.h">
       <Filter>Game\Behavior\UFO</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\reslutobj\BaseResultSprite.h">
+      <Filter>Game\ResultObj</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\reslutobj\ResultAnimationManager.h">
+      <Filter>Game\ResultObj</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\reslutobj\ResultFont.h">
+      <Filter>Game\ResultObj</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\reslutobj\ResultTime.h">
+      <Filter>Game\ResultObj</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\reslutobj\ResultFontA.h">
+      <Filter>Game\ResultObj</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

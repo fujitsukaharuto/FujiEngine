@@ -1,6 +1,7 @@
 #pragma once
 #include "Scene/BaseScene.h"
 #include"GameObj/Timer/Timer.h"
+#include"Game/reslutobj/ResultAnimationManager.h"
 
 class ResultScene :public BaseScene {
 public:
@@ -30,4 +31,5 @@ private:
 	bool isChangeFase = false;
 
 	std::unique_ptr<Timer>timer_;
+	std::unique_ptr<ResultAnimationManager>reani_;
 };

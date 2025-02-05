@@ -1,23 +1,18 @@
-#include "TitleBottom.h"
+#include "ResultFontA.h"
 #include "FPSKeeper.h"
 #include "Sprite.h"
 #include<imgui.h>
 #include"ImGuiManager/ImGuiManager.h"
 #include <memory>
 
-TitleBottom::TitleBottom(){}
+ResultFontA::ResultFontA(){}
 
-void TitleBottom::Init()
+void ResultFontA::Init()
 {
 	// ボタン
 	sprite_ = std::make_unique<Sprite>();
-	sprite_->Load("GameTexture/Title_Start.png");
+	sprite_->Load("GameTexture/Clear_Key.png");
 	sprite_->SetAnchor(Vector2(0.5f, 0.5f));
-
-	/// コントローラ
-	controllaSprite_ = std::make_unique<Sprite>();
-	controllaSprite_->Load("GameTexture/Title_Control.png");
-	controllaSprite_->SetAnchor(Vector2(0.5f, 0.5f));
 
 	///* グローバルパラメータ
 	globalParameter_ = GlobalVariables::GetInstance();
@@ -30,10 +25,8 @@ void TitleBottom::Init()
 	
 };
 
-void TitleBottom::Update()
+void ResultFontA::Update()
 {
-
-	
 
 	// 終わってたら更新しない
 	if (isFinished_) return;
@@ -45,33 +38,32 @@ void TitleBottom::Update()
 
 };
 
-void TitleBottom::AdaptState() {
+void ResultFontA::AdaptState() {
 	// サイズ、位置適応
 	sprite_->SetSize(Vector2(paramater_.bottomAWidth * scalerScale_, paramater_.bottomAHeigth * scalerScale_));
-	controllaSprite_->SetSize(Vector2(paramater_.controllaWidth * scalerScale_, paramater_.controllaHeigth * scalerScale_));
-
+	
 	/// スプライト
 	sprite_->SetPos(Vector3(paramater_.bottomAPos_));
-	controllaSprite_->SetPos(Vector3(paramater_.controllaPos_));
+
 }
 
-void TitleBottom::Draw()
+void ResultFontA::Draw()
 {
 	sprite_->Draw();
-	controllaSprite_->Draw();
+	
 };
 
 
 ///-------------------------------------------------------------------
 /// 
 ///-------------------------------------------------------------------
-void  TitleBottom::Expation()
+void  ResultFontA::Expation()
 {
 	// タイム加算
 	expationEaseTime_ += FPSKeeper::NormalDeltaTime();
 
 	// 適応
-	scalerScale_ = EaseInOutBack(paramater_.initScale_, paramater_.expationScale_, expationEaseTime_, paramater_.expationMaxTime);
+	scalerScale_ = EaseInCubic(paramater_.initScale_, paramater_.expationScale_, expationEaseTime_, paramater_.expationMaxTime);
 
 	// 終わったらフラグとコールバック呼び出し
 	if (expationEaseTime_ < paramater_.expationMaxTime)return;
@@ -79,13 +71,13 @@ void  TitleBottom::Expation()
 	scalerScale_ = paramater_.expationScale_;
 	expationEaseTime_ = 0.0f;
 }
-void  TitleBottom::Reverse()
+void  ResultFontA::Reverse()
 {
 	// タイム加算
 	reverseEaseTime_ += FPSKeeper::NormalDeltaTime();
 
 	// 適応
-	scalerScale_ = EaseInOutBack(paramater_.expationScale_, 1.0f, reverseEaseTime_, paramater_.reverseMaxTime);
+	scalerScale_ = EaseInCubic(paramater_.expationScale_, 1.0f, reverseEaseTime_, paramater_.reverseMaxTime);
 
 	// 終わったらフラグとコールバック呼び出し
 	if (reverseEaseTime_ < paramater_.reverseMaxTime)return;
@@ -96,7 +88,7 @@ void  TitleBottom::Reverse()
 ///-------------------------------------------------------------------
 ///
 ///-------------------------------------------------------------------
-void   TitleBottom::Wait()
+void   ResultFontA::Wait()
 {
 	// 待機時間加算
 	waitTime_ += FPSKeeper::NormalDeltaTime();
@@ -107,7 +99,7 @@ void   TitleBottom::Wait()
 
 }
 
-void TitleBottom::ExPationing() 
+void ResultFontA::ExPationing()
 {
 	// イージングタイムを更新
 	scalingEaseTime_ += FPSKeeper::NormalDeltaTime() * easeDirection_; // 方向に応じて時間を増減
@@ -116,7 +108,6 @@ void TitleBottom::ExPationing()
 	if (scalingEaseTime_ >= paramater_.scalingEaseTMax) {
 		scalingEaseTime_ = paramater_.scalingEaseTMax;
 		easeDirection_ = -1.0f; // 逆方向に切り替え
-
 	}
 	else if (scalingEaseTime_ <= 0.0f) {
 		scalingEaseTime_ = 0.0f;
@@ -127,23 +118,23 @@ void TitleBottom::ExPationing()
 	scalerScale_ = EaseInCubic(1.0f, paramater_.expatingScale, scalingEaseTime_, paramater_.scalingEaseTMax);
 }
 
-bool TitleBottom::IsAnimationFinished()
+bool ResultFontA::IsAnimationFinished()
 {
 	return isFinished_;
 };
 
 
-void (TitleBottom::* TitleBottom::spFuncTable_[])()
+void (ResultFontA::* ResultFontA::spFuncTable_[])()
 {
-	&TitleBottom::Expation,
-	&TitleBottom::Reverse,
-	&TitleBottom::Wait,
+	&ResultFontA::Expation,
+	&ResultFontA::Reverse,
+	&ResultFontA::Wait,
 };
 
 ///=================================================================================
 /// ロード
 ///=================================================================================
-void TitleBottom::ParmLoadForImGui() {
+void ResultFontA::ParmLoadForImGui() {
 
 	// ロードボタン
 	if (ImGui::Button(std::format("Load {}", groupName_).c_str())) {
@@ -159,7 +150,7 @@ void TitleBottom::ParmLoadForImGui() {
 ///=================================================================================
 ///パラメータをグループに追加
 ///=================================================================================
-void TitleBottom::AddParmGroup() {
+void ResultFontA::AddParmGroup() {
 
 	globalParameter_->AddItem(groupName_, "bottomAPos", paramater_.bottomAPos_);
 	globalParameter_->AddItem(groupName_, "controllaPos", paramater_.controllaPos_);
@@ -179,7 +170,7 @@ void TitleBottom::AddParmGroup() {
 ///=================================================================================
 ///パラメータをグループに追加
 ///=================================================================================
-void TitleBottom::SetValues() {
+void ResultFontA::SetValues() {
 
 	globalParameter_->SetValue(groupName_, "bottomAPos", paramater_.bottomAPos_);
 	globalParameter_->SetValue(groupName_, "controllaPos", paramater_.controllaPos_);
@@ -200,7 +191,7 @@ void TitleBottom::SetValues() {
 ///=====================================================
 ///  ImGuiからパラメータを得る
 ///===================================================== 
-void TitleBottom::ApplyGlobalParameter() {
+void ResultFontA::ApplyGlobalParameter() {
 
 
 	paramater_.bottomAPos_ = globalParameter_->GetValue<Vector3>(groupName_, "bottomAPos");
@@ -221,7 +212,7 @@ void TitleBottom::ApplyGlobalParameter() {
 ///=========================================================
 /// パラメータ調整
 ///==========================================================
-void TitleBottom::AdjustParm() {
+void ResultFontA::AdjustParm() {
 	SetValues();
 #ifdef _DEBUG
 
@@ -252,18 +243,15 @@ void TitleBottom::AdjustParm() {
 #endif // _DEBUG
 }
 
-void TitleBottom::Reset() {
+void ResultFontA::Reset() {
 	
 	scalerScale_ = paramater_.initScale_;
 	isFinished_ = false;
 
 	// サイズ、位置適応
 	sprite_->SetSize(Vector2(paramater_.bottomAWidth * scalerScale_, paramater_.bottomAHeigth * scalerScale_));
-	controllaSprite_->SetSize(Vector2(paramater_.controllaWidth * scalerScale_, paramater_.controllaHeigth * scalerScale_));
-
 	/// スプライト
 	sprite_->SetPos(Vector3(paramater_.bottomAPos_));
-	controllaSprite_->SetPos(Vector3(paramater_.controllaPos_));
 
 	easeDirection_ = 1.0f;
 	waitTime_ = 0.0f;

@@ -1,0 +1,25 @@
+{
+    "ResultFontA": {
+        "bottomAHeigth": 150.0,
+        "bottomAPos": [
+            536.7999877929688,
+            681.2000122070313,
+            0.0
+        ],
+        "bottomAWidth": 150.0,
+        "controllaHeigth": 150.0,
+        "controllaPos": [
+            -92.0,
+            0.0,
+            0.0
+        ],
+        "controllaWidth": 150.0,
+        "expatingScale": 1.2200000286102295,
+        "expationMaxTime": 0.4399999976158142,
+        "expationScale_": 1.159999966621399,
+        "initScale_": 0.0,
+        "kWaitTime": 0.11999999731779099,
+        "reverseMaxTime": 0.4099999964237213,
+        "scalingEaseTMax": 0.5099999904632568
+    }
+}

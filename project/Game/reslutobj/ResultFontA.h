@@ -1,10 +1,10 @@
 // TitleBom.h
 #pragma once
-#include "BaseTitleSprite.h"
+#include "BaseResultSprite.h"
 #include"GlobalVariables/GlobalVariables.h"
 
 
-class TitleBottom : public BaseTitleSprite {
+class ResultFontA : public BaseResultSprite {
 public:
     enum class Step {
         EXPATION,
@@ -32,16 +32,15 @@ private:
     ///-------------------------------------------------------------------------
     ///  private variants
     ///-------------------------------------------------------------------------
-    TitleBottom* phaseFunc_;
+    ResultFontA* phaseFunc_;
     Step step_;
-    std::unique_ptr<Sprite>controllaSprite_;
     
     /// パラメータ
     Paramater paramater_;
 
     ///変数
     GlobalVariables* globalParameter_;            /// グローバルパラメータ
-    const std::string groupName_ = "TitleBottom";      /// グループ名
+    const std::string groupName_ = "ResultFontA";      /// グループ名
 
     /// ease,time
     float expationEaseTime_;
@@ -52,8 +51,8 @@ private:
     float scalerScale_;
   
 public:
-    TitleBottom();
-    ~TitleBottom() override = default;
+    ResultFontA();
+    ~ResultFontA() override = default;
 
     ///-------------------------------------------------------------------------
     ///  public method
@@ -83,6 +82,6 @@ private:
     void Wait();
 
     /// メンバ関数のポインタテーブル
-    static void (TitleBottom::* spFuncTable_[])();
+    static void (ResultFontA::* spFuncTable_[])();
 
 };
