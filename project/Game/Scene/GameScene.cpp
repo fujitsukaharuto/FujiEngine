@@ -145,6 +145,7 @@ void GameScene::Update() {
 		case GameScene::GAME:
 			StartUI();
 
+			emit.DebugGUI();
 			emit.Emit();
 			timer_->Update();
 			timer_->SetTextureRangeForDigit();

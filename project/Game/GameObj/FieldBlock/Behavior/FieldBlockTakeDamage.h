@@ -2,6 +2,7 @@
 
 #include"BaseFieldBlockBehavior.h"
 #include"Easing.h"
+#include "Particle/ParticleEmitter.h"
 
 class FieldBlockTakeDamage : public BaseFieldBlockBehavior {
 private:
@@ -14,6 +15,8 @@ private:
 	Step step_;
 	float collTime_;
 	Vector3 originPos_{};
+
+	ParticleEmitter emit_;
 
 public:
 	//コンストラクタ

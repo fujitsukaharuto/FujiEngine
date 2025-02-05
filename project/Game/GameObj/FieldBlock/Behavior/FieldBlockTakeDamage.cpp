@@ -11,7 +11,7 @@
 #include"MathFunction.h"
 #include "Math/Random.h"
 #include"FPSKeeper.h"
-
+#include "Particle/ParticleManager.h"
 
 //初期化
 FieldBlockTakeDamage::FieldBlockTakeDamage(FieldBlock* boss)
@@ -25,6 +25,16 @@ FieldBlockTakeDamage::FieldBlockTakeDamage(FieldBlock* boss)
 	//テクスチャ切り替え
 	pFieldBlock_->ChangeTexture(pFieldBlock_->GetHp());
 	
+	ParticleManager::Load(emit_, "groundCrack1");
+	emit_.pos = originPos_;
+	emit_.pos.y += 1.0f;
+	Vector3 emitSizeMax = pFieldBlock_->GetCollisionSize() * 0.5f;
+	Vector3 emitSizeMin = pFieldBlock_->GetCollisionSize() * -0.5f;
+	emit_.emitSizeMax = { emitSizeMax.x,1.0f,emitSizeMax.z };
+	emit_.emitSizeMin.x = emitSizeMin.x;
+	emit_.emitSizeMin.z = emitSizeMin.z;
+	emit_.Burst();
+
 	//体力によってモデル切り替え
 	step_ = Step::DAMAGE;
 }
