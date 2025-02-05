@@ -2,7 +2,7 @@
     "Enemies": {
         "AttackValue1": 1.0,
         "AttackValue2": 0.0,
-        "FallSpeed1": 3.5,
+        "FallSpeed1": 4.0,
         "FallSpeed2": 44.41999816894531,
         "MaxPowerBlow1": 48.720001220703125,
         "MaxPowerBlow2": 52.880001068115234,
