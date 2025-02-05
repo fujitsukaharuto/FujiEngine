@@ -71,6 +71,7 @@ void UFODeath::Update() {
 		CameraManager::GetInstance()->GetCamera()->SetShakeMode(Camera::RollingShake);
 		CameraManager::GetInstance()->GetCamera()->SetShakeStrength(1.8f);
 		CameraManager::GetInstance()->GetCamera()->SetShakeTime(180.0f);
+
 		step_ = Step::EXPLOTION;
 
 		break;
@@ -78,6 +79,7 @@ void UFODeath::Update() {
 		///　破壊
 		///--------------------------------------------------------------------------------------
 	case Step::EXPLOTION:
+
 		explotionWait_ += FPSKeeper::DeltaTimeRate();
 		if (explotionWait_ < kExplotionWait_)break;
 		pUFO_->SetIsDeath(true);

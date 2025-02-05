@@ -972,6 +972,9 @@
     <Filter Include="Game\GameObj\BackGround">
       <UniqueIdentifier>{66fa690b-e427-4605-a5ac-9f4ea65ebd34}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game\ResultObj">
+      <UniqueIdentifier>{c6a654e7-a4b8-416f-b3dc-a65fc3f15fea}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resource\Shaders\GaussianBlur.PS.hlsl">
