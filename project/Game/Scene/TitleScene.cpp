@@ -13,7 +13,8 @@
 TitleScene::TitleScene() {}
 
 TitleScene::~TitleScene() {
-	
+	delete selector_;
+	delete inputHandler_;
 }
 
 void TitleScene::Initialize() {
@@ -25,6 +26,8 @@ void TitleScene::Initialize() {
 	inputHandler_ = new StageSceneInputHandler();
 	selector_ = new Selector();
 	selector_->Initialize();
+
+	inputHandler_->SetSelector(selector_);
 
 }
 
@@ -45,18 +48,37 @@ void TitleScene::Update() {
 	}
 
 	if (this->command_) {
-		this->command_->Exec();
-		if (commandHistory_.empty()) {
-			commandHistory_.push_back(this->command_);
-			commandHistoryItr_ = commandHistory_.end();
-		} else if (commandHistoryItr_ == commandHistory_.end()) {
-			commandHistory_.push_back(this->command_);
-			commandHistoryItr_ = commandHistory_.end();
+		if (selector_->GetSelectMode() == SelectMode::UNIT) {
+			this->command_->Exec();
+			if (commandHistory_.empty()) {
+				commandHistory_.push_back(this->command_);
+				commandHistoryItr_ = commandHistory_.end();
+			} else if (commandHistoryItr_ == commandHistory_.end()) {
+				commandHistory_.push_back(this->command_);
+				commandHistoryItr_ = commandHistory_.end();
+			} else {
+				*commandHistoryItr_ = this->command_;
+				commandHistoryItr_++;
+			}
+			if (typeid(*this->command_) == typeid(UnitMoveEndCommand)) {
+				commandHistory_.clear();
+				commandHistoryItr_ = commandHistory_.end();
+			}
 		} else {
-			*commandHistoryItr_ = this->command_;
-			commandHistoryItr_++;
+			this->command_->Exec();
 		}
 	}
+
+	if (Input::GetInstance()->PushKey(DIK_LCONTROL) && Input::GetInstance()->TriggerKey(DIK_Z)) {
+		if (commandHistory_.empty() || commandHistoryItr_ == commandHistory_.begin()) return;
+		if (commandHistoryItr_ == commandHistory_.end()) {
+			commandHistoryItr_--;
+		} else {
+			--commandHistoryItr_;
+		}
+		(*commandHistoryItr_)->Exec();
+	}
+	
 
 	selector_->Update();
 

@@ -5,6 +5,7 @@ Selector::Selector() {
 }
 
 Selector::~Selector() {
+	delete unit_;
 }
 
 void Selector::Initialize() {
@@ -12,6 +13,7 @@ void Selector::Initialize() {
 	model_->CreateSphere();
 	model_->transform.translate.z = 10.0f;
 	model_->transform.scale.z = 1.2f;
+	model_->SetColor({ 1.0f,0.0f,0.0f,1.0f });
 
 	unit_ = new Unit();
 	unit_->Initialize();
@@ -23,7 +25,9 @@ void Selector::Update() {
 }
 
 void Selector::Draw(Material* mate) {
-	OriginGameObject::Draw(mate);
+	if (selectMode_ != SelectMode::UNIT) {
+		OriginGameObject::Draw(mate);
+	}
 	unit_->Draw();
 }
 

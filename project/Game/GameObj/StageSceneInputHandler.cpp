@@ -20,6 +20,8 @@ IStageCommand* StageSceneInputHandler::selectorHandleInput(Selector* selector) {
 		command = new SelectorMoveCommand(selector, selector->GetPosX(), selector->GetPosY() + 1);
 	} else if (Input::GetInstance()->TriggerKey(DIK_S)) {
 		command = new SelectorMoveCommand(selector, selector->GetPosX(), selector->GetPosY() - 1);
+	} else if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
+		command = new SelectUnitCommand(selector);
 	}
 	
 	return command;
@@ -40,6 +42,8 @@ IStageCommand* StageSceneInputHandler::UnitHandleInput(Unit* unit) {
 	}
 	else if (Input::GetInstance()->TriggerKey(DIK_S)) {
 		command = new UnitMoveCommand(unit, unit->GetPosX(), unit->GetPosY() - 1);
+	} else if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
+		command = new UnitMoveEndCommand(unit, selector_);
 	}
 	
 	return command;
