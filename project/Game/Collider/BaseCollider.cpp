@@ -1,4 +1,5 @@
 #include "BaseCollider.h"
+#include "Game/OriginGameObject.h"
 
 BaseCollider::BaseCollider() {
 }
@@ -26,4 +27,12 @@ Vector3 BaseCollider::GetPos() {
 	Vector3 position = { worldMatrix.m[3][0],worldMatrix.m[3][1],worldMatrix.m[3][2] };
 	info.worldPos = position;
 	return position;
+}
+
+Vector3 BaseCollider::GetWorldPos() {
+	return GetPos();
+}
+
+OriginGameObject* BaseCollider::GetOwner() {
+	return info.owner;
 }

@@ -104,12 +104,10 @@ void ResultScene::BlackFade() {
 			if (blackTime >= blackLimmite) {
 				blackTime = blackLimmite;
 			}
-		}
-		else {
+		} else {
 			SceneManager::GetInstance()->ChangeScene("TITLE", 40.0f);
 		}
-	}
-	else {
+	} else {
 		if (blackTime > 0.0f) {
 			blackTime -= FPSKeeper::DeltaTime();
 			if (blackTime <= 0.0f) {
@@ -119,15 +117,12 @@ void ResultScene::BlackFade() {
 	}
 	black_->SetColor({ 0.0f,0.0f,0.0f,Lerp(0.0f,1.0f,(1.0f / blackLimmite * blackTime)) });
 	XINPUT_STATE pad;
-	if (Input::GetInstance()->GetGamepadState(pad)) {
-		if (Input::GetInstance()->TriggerButton(PadInput::A)) {
-			if (blackTime == 0.0f) {
-				isChangeFase = true;
-			}
+	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
+		if (blackTime == 0.0f) {
+			isChangeFase = true;
 		}
-	}
-	else {
-		if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
+	} else if (Input::GetInstance()->GetGamepadState(pad)) {
+		if (Input::GetInstance()->TriggerButton(PadInput::A)) {
 			if (blackTime == 0.0f) {
 				isChangeFase = true;
 			}

@@ -51,11 +51,11 @@ public:
 	/*void SetPointLight(PointLight* light) { pointLight_ = light; }
 	void SetSpotLight(SpotLight* light) { spotLight_ = light; }*/
 
+	void SetModel(const std::string& fileName);
+
 	Trans transform{};
 
 private:
-
-	void SetModel(const std::string& fileName);
 
 	void CreateWVP();
 

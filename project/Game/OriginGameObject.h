@@ -18,6 +18,7 @@ public:
 
 public:
 
+	void CreateModel(const std::string& name);
 	void SetModel(const std::string& name);
 	Object3d* GetModel() { return model_.get(); }
 	Trans& GetTrans() { return model_->transform; }

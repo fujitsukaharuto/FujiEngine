@@ -22,19 +22,17 @@ void CollisionManager::CheckCollisionPair(BaseCollider* A, BaseCollider* B) {
 
 			if (!aabbA->GetIsCollisonCheck() || !aabbB->GetIsCollisonCheck()) {
 				if (std::find(hitListA.begin(), hitListA.end(), B) == hitListA.end()) {
-				}
-				else {
+				} else {
 					hitListA.remove(B);
 					aabbA->SetState(CollisionState::collisionExit);
-					aabbA->OnCollision({ B->GetTag(), B->GetPos() });
+					aabbA->OnCollision({ B->GetTag(), B->GetPos(),B->GetWorldPos(),B->GetOwner() });
 				}
 
 				if (std::find(hitListB.begin(), hitListB.end(), A) == hitListB.end()) {
-				}
-				else {
+				} else {
 					hitListB.remove(A);
 					aabbB->SetState(CollisionState::collisionExit);
-					aabbB->OnCollision({ A->GetTag(), A->GetPos() });
+					aabbB->OnCollision({ A->GetTag(), A->GetPos(),A->GetWorldPos(),A->GetOwner() });
 				}
 				return;
 			}
@@ -43,34 +41,31 @@ void CollisionManager::CheckCollisionPair(BaseCollider* A, BaseCollider* B) {
 			if (std::find(hitListA.begin(), hitListA.end(), B) == hitListA.end()) {
 				hitListA.push_back(B);
 				aabbA->SetState(CollisionState::collisionEnter);
-				aabbA->OnCollision({ B->GetTag(), B->GetPos() });
-			}
-			else {
+				aabbA->OnCollision({ B->GetTag(), B->GetPos(),B->GetWorldPos(),B->GetOwner() });
+			} else {
 				aabbA->SetState(CollisionState::collisionStay);
-				aabbA->OnCollision({ B->GetTag(), B->GetPos() });
+				aabbA->OnCollision({ B->GetTag(), B->GetPos(),B->GetWorldPos(),B->GetOwner() });
 			}
 
 			if (std::find(hitListB.begin(), hitListB.end(), A) == hitListB.end()) {
 				hitListB.push_back(A);
 				aabbB->SetState(CollisionState::collisionEnter);
-				aabbB->OnCollision({ A->GetTag(), A->GetPos() });
-			}
-			else {
+				aabbB->OnCollision({ A->GetTag(), A->GetPos(),A->GetWorldPos(),A->GetOwner() });
+			} else {
 				aabbB->SetState(CollisionState::collisionStay);
-				aabbB->OnCollision({ A->GetTag(), A->GetPos() });
+				aabbB->OnCollision({ A->GetTag(), A->GetPos(),A->GetWorldPos(),A->GetOwner() });
 			}
-		}
-		else {
+		} else {
 			// 衝突が終了した場合
 			if (std::find(hitListA.begin(), hitListA.end(), B) != hitListA.end()) {
 				hitListA.remove(B);
 				aabbA->SetState(CollisionState::collisionExit);
-				aabbA->OnCollision({ B->GetTag(), B->GetPos() });
+				aabbA->OnCollision({ B->GetTag(), B->GetPos(),B->GetWorldPos(),B->GetOwner() });
 			}
 			if (std::find(hitListB.begin(), hitListB.end(), A) != hitListB.end()) {
 				hitListB.remove(A);
 				aabbB->SetState(CollisionState::collisionExit);
-				aabbB->OnCollision({ A->GetTag(), A->GetPos() });
+				aabbB->OnCollision({ A->GetTag(), A->GetPos(),A->GetWorldPos(),A->GetOwner() });
 			}
 		}
 
