@@ -24,14 +24,14 @@ void CollisionManager::CheckCollisionPair(BaseCollider* A, BaseCollider* B) {
 				if (std::find(hitListA.begin(), hitListA.end(), B) == hitListA.end()) {
 				} else {
 					hitListA.remove(B);
-					aabbA->SetState(CollisionState::collisionExit);
+					aabbA->SetState(CollisionState::CollisionExit);
 					aabbA->OnCollision({ B->GetTag(), B->GetPos(),B->GetWorldPos(),B->GetOwner() });
 				}
 
 				if (std::find(hitListB.begin(), hitListB.end(), A) == hitListB.end()) {
 				} else {
 					hitListB.remove(A);
-					aabbB->SetState(CollisionState::collisionExit);
+					aabbB->SetState(CollisionState::CollisionExit);
 					aabbB->OnCollision({ A->GetTag(), A->GetPos(),A->GetWorldPos(),A->GetOwner() });
 				}
 				return;
@@ -40,31 +40,31 @@ void CollisionManager::CheckCollisionPair(BaseCollider* A, BaseCollider* B) {
 			// AとBが初めて衝突した場合
 			if (std::find(hitListA.begin(), hitListA.end(), B) == hitListA.end()) {
 				hitListA.push_back(B);
-				aabbA->SetState(CollisionState::collisionEnter);
+				aabbA->SetState(CollisionState::CollisionEnter);
 				aabbA->OnCollision({ B->GetTag(), B->GetPos(),B->GetWorldPos(),B->GetOwner() });
 			} else {
-				aabbA->SetState(CollisionState::collisionStay);
+				aabbA->SetState(CollisionState::CollisionStay);
 				aabbA->OnCollision({ B->GetTag(), B->GetPos(),B->GetWorldPos(),B->GetOwner() });
 			}
 
 			if (std::find(hitListB.begin(), hitListB.end(), A) == hitListB.end()) {
 				hitListB.push_back(A);
-				aabbB->SetState(CollisionState::collisionEnter);
+				aabbB->SetState(CollisionState::CollisionEnter);
 				aabbB->OnCollision({ A->GetTag(), A->GetPos(),A->GetWorldPos(),A->GetOwner() });
 			} else {
-				aabbB->SetState(CollisionState::collisionStay);
+				aabbB->SetState(CollisionState::CollisionStay);
 				aabbB->OnCollision({ A->GetTag(), A->GetPos(),A->GetWorldPos(),A->GetOwner() });
 			}
 		} else {
 			// 衝突が終了した場合
 			if (std::find(hitListA.begin(), hitListA.end(), B) != hitListA.end()) {
 				hitListA.remove(B);
-				aabbA->SetState(CollisionState::collisionExit);
+				aabbA->SetState(CollisionState::CollisionExit);
 				aabbA->OnCollision({ B->GetTag(), B->GetPos(),B->GetWorldPos(),B->GetOwner() });
 			}
 			if (std::find(hitListB.begin(), hitListB.end(), A) != hitListB.end()) {
 				hitListB.remove(A);
-				aabbB->SetState(CollisionState::collisionExit);
+				aabbB->SetState(CollisionState::CollisionExit);
 				aabbB->OnCollision({ A->GetTag(), A->GetPos(),A->GetWorldPos(),A->GetOwner() });
 			}
 		}
@@ -87,7 +87,7 @@ void CollisionManager::CheckAllCollision() {
 				// コライダーリストに存在しない場合
 				if (std::find(colliders_.begin(), colliders_.end(), other) == colliders_.end()) {
 					// 衝突終了状態を設定
-					aabb->SetState(CollisionState::collisionExit);
+					aabb->SetState(CollisionState::CollisionExit);
 					return true; // リストから削除
 				}
 				return false; // 残す

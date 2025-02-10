@@ -15,9 +15,9 @@ struct ColliderInfo {
 };
 
 enum class CollisionState {
-	collisionEnter,
-	collisionStay,
-	collisionExit,
+	CollisionEnter,
+	CollisionStay,
+	CollisionExit,
 	None,
 };
 
@@ -33,10 +33,10 @@ public:
 
 	void InfoUpdate();
 
-	void SetOwner(OriginGameObject* owner) { info.owner = owner; }
 	void SetParent(Object3d* parent) { parent_ = parent; }
 	void SetTag(const std::string& tag) { info.tag = tag; }
 	void SetPos(const Vector3& pos) { info.pos = pos; }
+	void SetOwner(OriginGameObject* owner) { info.owner = owner; }
 	void SetIsCollisonCheck(bool is) { isCollisionCheck_ = is; }
 
 	const std::string GetTag()const { return info.tag; }

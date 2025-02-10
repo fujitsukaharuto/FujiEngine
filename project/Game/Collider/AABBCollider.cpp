@@ -6,19 +6,26 @@ AABBCollider::AABBCollider() {
 }
 
 void AABBCollider::OnCollision(const ColliderInfo& other) {
-	switch (state) {
-	case CollisionState::collisionEnter:
-		if (onCollisionEnter) {
+	if (onCollisionEvents_[static_cast<int>(state)]) {
+		onCollisionEvents_[static_cast<int>(state)](other);
+		if (state == CollisionState::CollisionExit) {
+			state = CollisionState::None;
+		}
+	}
+	
+	/*switch (state) {
+	case CollisionState::CollisionEnter:
+		if (onCollisionEvents_[static_cast<int>(CollisionState::CollisionEnter)]) {
 			OnCollisionEnter(other);
 		}
 		break;
-	case CollisionState::collisionStay:
-		if (onCollisionStay) {
+	case CollisionState::CollisionStay:
+		if (onCollisionEvents_[static_cast<int>(CollisionState::CollisionStay)]) {
 			OnCollisionStay(other);
 		}
 		break;
-	case CollisionState::collisionExit:
-		if (onCollisionExit) {
+	case CollisionState::CollisionExit:
+		if (onCollisionEvents_[static_cast<int>(CollisionState::CollisionExit)]) {
 			OnCollisionExit(other);
 		}
 		break;
@@ -27,25 +34,25 @@ void AABBCollider::OnCollision(const ColliderInfo& other) {
 		break;
 	default:
 		break;
-	}
+	}*/
 }
 
 
 void AABBCollider::OnCollisionEnter(const ColliderInfo& other) {
-	if (onCollisionEnter) {
-		onCollisionEnter(other);
+	if (onCollisionEvents_[static_cast<int>(CollisionState::CollisionEnter)]) {
+		onCollisionEvents_[static_cast<int>(CollisionState::CollisionEnter)](other);
 	}
 }
 
 void AABBCollider::OnCollisionStay(const ColliderInfo& other) {
-	if (onCollisionStay) {
-		onCollisionStay(other);
+	if (onCollisionEvents_[static_cast<int>(CollisionState::CollisionStay)]) {
+		onCollisionEvents_[static_cast<int>(CollisionState::CollisionStay)](other);
 	}
 }
 
 void AABBCollider::OnCollisionExit(const ColliderInfo& other) {
-	if (onCollisionExit) {
-		onCollisionExit(other);
+	if (onCollisionEvents_[static_cast<int>(CollisionState::CollisionExit)]) {
+		onCollisionEvents_[static_cast<int>(CollisionState::CollisionExit)](other);
 	}
 	state = CollisionState::None;
 }

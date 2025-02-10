@@ -1,4 +1,5 @@
 #pragma once
+#include <array>
 #include "Game/Collider/BaseCollider.h"
 
 
@@ -19,13 +20,13 @@ public:
 
 	// イベントハンドラの設定
 	void SetCollisionEnterCallback(std::function<void(const ColliderInfo&)> callback) {
-		onCollisionEnter = callback;
+		onCollisionEvents_[static_cast<int>(CollisionState::CollisionEnter)] = callback;
 	}
 	void SetCollisionStayCallback(std::function<void(const ColliderInfo&)> callback) {
-		onCollisionStay = callback;
+		onCollisionEvents_[static_cast<int>(CollisionState::CollisionStay)] = callback;
 	}
 	void SetCollisionExitCallback(std::function<void(const ColliderInfo&)> callback) {
-		onCollisionExit = callback;
+		onCollisionEvents_[static_cast<int>(CollisionState::CollisionExit)] = callback;
 	}
 
 	void SetState(CollisionState change) { state = change; }
@@ -56,9 +57,7 @@ private:
 
 	CollisionState state;
 
-	std::function<void(const ColliderInfo&)> onCollisionEnter;
-	std::function<void(const ColliderInfo&)> onCollisionStay;
-	std::function<void(const ColliderInfo&)> onCollisionExit;
+	std::array<std::function<void(const ColliderInfo&)>, 3> onCollisionEvents_;
 
 	float width = 1.0f;
 	float height = 1.0f;
