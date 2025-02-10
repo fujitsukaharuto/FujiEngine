@@ -1,5 +1,5 @@
 #pragma once
-#include "Audio.h"
+#include "AudioPlayer.h"
 #include "DXCom.h"
 #include "Game/Scene/GameScene.h"
 #include "TextureManager.h"
@@ -44,7 +44,7 @@ protected:
 	SRVManager* srvManager_ = nullptr;
 	// 汎用
 	Input* input_ = nullptr;
-	Audio* audio_ = nullptr;
+	AudioPlayer* audioPlayer_ = nullptr;
 	FPSKeeper* fpsKeeper_ = nullptr;
 	std::unique_ptr<AbstractSceneFactory> sceneFactory_ = nullptr;
 	SceneManager* sceneManager_ = nullptr;

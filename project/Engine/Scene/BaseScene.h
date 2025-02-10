@@ -1,7 +1,7 @@
 #pragma once
 #include "DXCom.h"
 #include "Input.h"
-#include "Audio.h"
+#include "AudioPlayer.h"
 #include "DebugCamera.h"
 #include "Object3dCommon.h"
 #include "Object3d.h"
@@ -36,7 +36,7 @@ protected:
 
 	DXCom* dxCommon_ = nullptr;
 	Input* input_ = nullptr;
-	Audio* audio_ = nullptr;
+	AudioPlayer* audioPlayer_ = nullptr;
 
 
 private:

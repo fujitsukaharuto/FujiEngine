@@ -12,7 +12,6 @@ ParticleManager::ParticleManager() {
 }
 
 ParticleManager::~ParticleManager() {
-
 }
 
 ParticleManager* ParticleManager::GetInstance() {
@@ -21,7 +20,6 @@ ParticleManager* ParticleManager::GetInstance() {
 }
 
 void ParticleManager::Initialize(DXCom* dxcom, SRVManager* srvManager) {
-
 	dxCommon_ = dxcom;
 	srvManager_ = srvManager;
 	this->camera_ = CameraManager::GetInstance()->GetCamera();
@@ -58,15 +56,9 @@ void ParticleManager::Initialize(DXCom* dxcom, SRVManager* srvManager) {
 	ibView.BufferLocation = iBuffer_->GetGPUVirtualAddress();
 	ibView.Format = DXGI_FORMAT_R32_UINT;
 	ibView.SizeInBytes = static_cast<UINT>(sizeof(uint32_t) * index_.size());
-
-
-
-
-
 }
 
 void ParticleManager::Finalize() {
-
 	particleGroups_.clear();
 	for (auto& groupPair : animeGroups_) {
 
@@ -78,12 +70,9 @@ void ParticleManager::Finalize() {
 		groupPair.second.reset();
 	}
 	animeGroups_.clear();
-
 }
 
 void ParticleManager::Update() {
-
-
 	Matrix4x4 billboardMatrix = MakeIdentity4x4();
 
 	if (camera_) {
@@ -211,8 +200,7 @@ void ParticleManager::Update() {
 			if (camera_) {
 				const Matrix4x4& viewProjectionMatrix = camera_->GetViewProjectionMatrix();
 				worldViewProjectionMatrix = Multiply(worldMatrix, viewProjectionMatrix);
-			}
-			else {
+			} else {
 				worldViewProjectionMatrix = worldMatrix;
 			}
 
@@ -267,12 +255,9 @@ void ParticleManager::Update() {
 			group->objects_[i]->SetBillboardMat(billboardMatrix);
 		}
 	}
-
-
 }
 
 void ParticleManager::Draw() {
-
 	dxCommon_->GetDXCommand()->SetViewAndscissor();
 	dxCommon_->GetPipelineManager()->SetPipeline(Pipe::Normal);
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -287,7 +272,6 @@ void ParticleManager::Draw() {
 
 		}
 	}
-
 
 
 	dxCommon_->GetDXCommand()->SetViewAndscissor();
@@ -305,11 +289,9 @@ void ParticleManager::Draw() {
 
 		dxCommon_->GetCommandList()->DrawIndexedInstanced(6, group->drawCount_, 0, 0, 0);
 	}
-
 }
 
 void ParticleManager::CreateParticleGroup(const std::string& name, const std::string& fileName, uint32_t count) {
-
 	ParticleManager* instance = GetInstance();
 
 	auto iterator = instance->particleGroups_.find(name);
@@ -350,11 +332,9 @@ void ParticleManager::CreateParticleGroup(const std::string& name, const std::st
 
 
 	instance->particleGroups_.insert(std::make_pair(name, newGroup));
-
 }
 
 void ParticleManager::CreateAnimeGroup(const std::string& name, const std::string& fileName) {
-
 	ParticleManager* instance = GetInstance();
 
 	auto iterator = instance->animeGroups_.find(name);
@@ -384,54 +364,48 @@ void ParticleManager::CreateAnimeGroup(const std::string& name, const std::strin
 	}
 
 	instance->animeGroups_.insert(std::make_pair(name, std::move(newGroup)));
-
 }
 
 void ParticleManager::Load(ParticleEmitter& emit, const std::string& name) {
-
 	ParticleManager* instance = GetInstance();
 	emit.name = name;
 
 	auto iterator = instance->particleGroups_.find(name);
 	if (iterator != instance->particleGroups_.end()) {
 		ParticleGroup* group = iterator->second.get();
-		emit.pos                = group->emitter_.pos;
-		emit.particleRotate     = group->emitter_.particleRotate;
-		emit.emitSizeMax        = group->emitter_.emitSizeMax;
-		emit.emitSizeMin        = group->emitter_.emitSizeMin;
-		emit.count              = group->emitter_.count;
-		emit.frequencyTime      = group->emitter_.frequencyTime;
-		emit.grain.lifeTime_    = group->emitter_.grain.lifeTime_;
-		emit.grain.accele       = group->emitter_.grain.accele;
-		emit.grain.speed        = group->emitter_.grain.speed;
-		emit.grain.type         = group->emitter_.grain.type;
-		emit.grain.speedType    = group->emitter_.grain.speedType;
-		emit.grain.rotateType   = group->emitter_.grain.rotateType;
-		emit.grain.colorType    = group->emitter_.grain.colorType;
+		emit.pos = group->emitter_.pos;
+		emit.particleRotate = group->emitter_.particleRotate;
+		emit.emitSizeMax = group->emitter_.emitSizeMax;
+		emit.emitSizeMin = group->emitter_.emitSizeMin;
+		emit.count = group->emitter_.count;
+		emit.frequencyTime = group->emitter_.frequencyTime;
+		emit.grain.lifeTime_ = group->emitter_.grain.lifeTime_;
+		emit.grain.accele = group->emitter_.grain.accele;
+		emit.grain.speed = group->emitter_.grain.speed;
+		emit.grain.type = group->emitter_.grain.type;
+		emit.grain.speedType = group->emitter_.grain.speedType;
+		emit.grain.rotateType = group->emitter_.grain.rotateType;
+		emit.grain.colorType = group->emitter_.grain.colorType;
 		emit.grain.returnPower_ = group->emitter_.grain.returnPower_;
-		emit.grain.startSize    = group->emitter_.grain.startSize;
-		emit.grain.endSize      = group->emitter_.grain.endSize;
+		emit.grain.startSize = group->emitter_.grain.startSize;
+		emit.grain.endSize = group->emitter_.grain.endSize;
 		emit.grain.isBillBoard_ = group->emitter_.grain.isBillBoard_;
-		emit.grain.pattern_     = group->emitter_.grain.pattern_;
-		emit.para_.speedx       = group->emitter_.para_.speedx;
-		emit.para_.speedy       = group->emitter_.para_.speedy;
-		emit.para_.speedz       = group->emitter_.para_.speedz;
-		emit.para_.transx       = group->emitter_.para_.transx;
-		emit.para_.transy       = group->emitter_.para_.transy;
-		emit.para_.transz       = group->emitter_.para_.transz;
-		emit.para_.colorMin     = group->emitter_.para_.colorMin;
-		emit.para_.colorMax     = group->emitter_.para_.colorMax;
+		emit.grain.pattern_ = group->emitter_.grain.pattern_;
+		emit.para_.speedx = group->emitter_.para_.speedx;
+		emit.para_.speedy = group->emitter_.para_.speedy;
+		emit.para_.speedz = group->emitter_.para_.speedz;
+		emit.para_.transx = group->emitter_.para_.transx;
+		emit.para_.transy = group->emitter_.para_.transy;
+		emit.para_.transz = group->emitter_.para_.transz;
+		emit.para_.colorMin = group->emitter_.para_.colorMin;
+		emit.para_.colorMax = group->emitter_.para_.colorMax;
 
-	}
-	else {
+	} else {
 		return;
 	}
-
-
 }
 
 void ParticleManager::Emit(const std::string& name, const Vector3& pos, const Vector3& rotate, const Particle& grain, const RandomParametor& para, uint32_t count) {
-
 	ParticleManager* instance = GetInstance();
 
 	auto iterator = instance->particleGroups_.find(name);
@@ -448,8 +422,7 @@ void ParticleManager::Emit(const std::string& name, const Vector3& pos, const Ve
 				particle.transform.scale = { grain.startSize.x,grain.startSize.y,1.0f };
 				if (grain.speedType == SpeedType::kCenter) {
 					particle.speed = grain.speed;
-				}
-				else {
+				} else {
 					particle.speed = Random::GetVector3(para.speedx, para.speedy, para.speedz);
 				}
 
@@ -529,17 +502,12 @@ void ParticleManager::Emit(const std::string& name, const Vector3& pos, const Ve
 				return;
 			}
 		}
-	}
-	else {
+	} else {
 		return;
 	}
-
-
 }
 
 void ParticleManager::EmitAnime(const std::string& name, const Vector3& pos, const AnimeData& data, const RandomParametor& para, uint32_t count) {
-
-
 	ParticleManager* instance = GetInstance();
 
 	auto iterator = instance->animeGroups_.find(name);
@@ -580,16 +548,12 @@ void ParticleManager::EmitAnime(const std::string& name, const Vector3& pos, con
 				return;
 			}
 		}
-	}
-	else {
+	} else {
 		return;
 	}
-
-
 }
 
 void ParticleManager::AddAnime(const std::string& name, const std::string& fileName, float animeChangeTime) {
-
 	ParticleManager* instance = GetInstance();
 
 	auto iterator = instance->animeGroups_.find(name);
@@ -599,9 +563,7 @@ void ParticleManager::AddAnime(const std::string& name, const std::string& fileN
 		TextureManager::GetInstance()->LoadTexture(fileName);
 		group->anime_.insert(std::make_pair(fileName, animeChangeTime));
 
-	}
-	else {
+	} else {
 		return;
 	}
-
 }

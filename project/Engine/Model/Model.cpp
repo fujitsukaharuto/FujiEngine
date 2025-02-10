@@ -4,6 +4,7 @@
 
 
 Model::Model() {}
+
 Model::Model(const Model& other) {
 
 	mesh_ = other.mesh_;
@@ -13,8 +14,8 @@ Model::Model(const Model& other) {
 		newMaterial.CreateMaterial();
 		material_.push_back(newMaterial);
 	}
-
 }
+
 Model::~Model() {}
 
 void Model::Draw(ID3D12GraphicsCommandList* commandList, Material* mate = nullptr) {
@@ -22,8 +23,7 @@ void Model::Draw(ID3D12GraphicsCommandList* commandList, Material* mate = nullpt
 		if (mate) {
 			commandList->SetGraphicsRootConstantBufferView(0, mate->GetMaterialResource()->GetGPUVirtualAddress());
 			commandList->SetGraphicsRootDescriptorTable(2, mate->GetTexture()->gpuHandle);
-		}
-		else {
+		} else {
 			commandList->SetGraphicsRootConstantBufferView(0, material_[index].GetMaterialResource()->GetGPUVirtualAddress());
 			commandList->SetGraphicsRootDescriptorTable(2, material_[index].GetTexture()->gpuHandle);
 		}
@@ -31,11 +31,9 @@ void Model::Draw(ID3D12GraphicsCommandList* commandList, Material* mate = nullpt
 	}
 }
 
-
 void Model::AddMaterial(const Material& material) {
 	material_.push_back(material);
 }
-
 
 void Model::AddMesh(const Mesh& mesh) {
 	mesh_.push_back(mesh);
@@ -54,7 +52,6 @@ void Model::SetUVScale(const Vector2& scale, const Vector2& uvTrans) {
 }
 
 void Model::SetTexture(const std::string& name) {
-
 	if (nowTextuer == name) {
 		return;
 	}

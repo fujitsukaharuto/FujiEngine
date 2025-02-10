@@ -74,8 +74,7 @@ void ModelManager::LoadOBJ(const std::string& filename) {
 				if (hasTexcoord) {
 					aiVector3D& texcoord = mesh->mTextureCoords[0][vertexIndex];
 					vertex.texcoord = { texcoord.x,texcoord.y };
-				}
-				else {
+				} else {
 					vertex.texcoord = { 0.0f,0.0f };
 				}
 
@@ -133,7 +132,6 @@ Model* ModelManager::FindModel(const std::string& filename) {
 
 
 void ModelManager::CreateSphere() {
-
 	ModelManager* instance = GetInstance();
 
 	auto iterator = instance->models_.find("Sphere");

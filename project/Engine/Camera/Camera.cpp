@@ -7,16 +7,15 @@
 #include "ImGuiManager.h"
 
 Camera::Camera() :transform({ { 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, { 0.0f,3.5f,-20.0f } })
-,fovY_(0.45f),aspect_(float(MyWin::kWindowWidth) / float(MyWin::kWindowHeight))
-,nearClip_(0.1f),farClip_(100.0f),worldMatrix_(MakeAffineMatrix(transform.scale,transform.rotate,transform.translate))
-,viewMatrix_(Inverse(worldMatrix_))
-,projectionMatrix_(MakePerspectiveFovMatrix(fovY_,aspect_,nearClip_,farClip_))
-,viewProjectionMatrix_(Multiply(viewMatrix_,projectionMatrix_)),shakeMode_(ShakeMode::RandomShake)
-,shakeTime_(0.0f),shakeStrength_(0.1f)
-{}
+, fovY_(0.45f), aspect_(float(MyWin::kWindowWidth) / float(MyWin::kWindowHeight))
+, nearClip_(0.1f), farClip_(100.0f), worldMatrix_(MakeAffineMatrix(transform.scale, transform.rotate, transform.translate))
+, viewMatrix_(Inverse(worldMatrix_))
+, projectionMatrix_(MakePerspectiveFovMatrix(fovY_, aspect_, nearClip_, farClip_))
+, viewProjectionMatrix_(Multiply(viewMatrix_, projectionMatrix_)), shakeMode_(ShakeMode::RandomShake)
+, shakeTime_(0.0f), shakeStrength_(0.1f) {
+}
 
 void Camera::Update() {
-
 #ifdef _DEBUG
 
 	ImGui::Begin("Camera");
@@ -27,10 +26,10 @@ void Camera::Update() {
 	ImGui::DragFloat("shakeTime", &shakeTime_, 0.01f, 0.0f);
 	ImGui::DragFloat("shakeStrength", &shakeStrength_, 0.01f, 0.0f);
 	ImGui::End();
-
 #endif // _DEBUG
+
 	shakeGap_ = { 0.0f,0.0f,0.0f };
-	
+
 	if (shakeTime_ > 0.0f) {
 		float gap;
 		switch (shakeMode_) {
@@ -48,8 +47,7 @@ void Camera::Update() {
 			break;
 		}
 		shakeTime_ -= FPSKeeper::DeltaTime();
-	}
-	else {
+	} else {
 		rollingTime_ = 0.0f;
 	}
 
@@ -57,18 +55,13 @@ void Camera::Update() {
 	viewMatrix_ = Inverse(worldMatrix_);
 
 #ifdef _DEBUG
-
 	if (CameraManager::GetInstance()->GetDebugMode()) {
-
 		viewMatrix_ = DebugCamera::GetInstance()->GetViewMatrix();
-
 	}
-
 #endif // _DEBUG
 
 	projectionMatrix_ = MakePerspectiveFovMatrix(fovY_, aspect_, nearClip_, farClip_);
 	viewProjectionMatrix_ = Multiply(viewMatrix_, projectionMatrix_);
-
 }
 
 void Camera::UpdateMaterix() {
@@ -76,13 +69,9 @@ void Camera::UpdateMaterix() {
 	viewMatrix_ = Inverse(worldMatrix_);
 
 #ifdef _DEBUG
-
 	if (CameraManager::GetInstance()->GetDebugMode()) {
-
 		viewMatrix_ = DebugCamera::GetInstance()->GetViewMatrix();
-
 	}
-
 #endif // _DEBUG
 
 	projectionMatrix_ = MakePerspectiveFovMatrix(fovY_, aspect_, nearClip_, farClip_);

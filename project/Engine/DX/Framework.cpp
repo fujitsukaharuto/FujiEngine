@@ -45,8 +45,8 @@ void Framework::Init() {
 	input_->Initialize();
 
 	// オーディオの初期化
-	audio_ = Audio::GetInstance();
-	audio_->Initialize();
+	audioPlayer_ = AudioPlayer::GetInstance();
+	audioPlayer_->Initialize();
 
 	textureManager_ = TextureManager::GetInstance();
 	modelManager_ = ModelManager::GetInstance();

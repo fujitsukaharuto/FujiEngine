@@ -19,7 +19,7 @@ public:
 	static Quaternion IdentityQuaternion() {
 		return Quaternion(0.0f, 0.0f, 0.0f, 1.0f);
 	}
-	
+
 	// 軸と角度(ラジアン)からクォータニオン
 	static Quaternion AngleAxis(float angle, const Vector3& axis) {
 		float halfAngle = angle * 0.5f;

@@ -23,7 +23,7 @@ public:
 
 	void StartScene(const std::string& sceneName);
 
-	void ChangeScene(const std::string& sceneName,float extraTime);
+	void ChangeScene(const std::string& sceneName, float extraTime);
 
 	void SetClear(bool is);
 	void SetGameOver(bool is);

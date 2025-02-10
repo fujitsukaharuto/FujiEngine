@@ -7,10 +7,9 @@
 #include <vector>
 #include <wrl.h>
 
-class Mesh
-{
+class Mesh {
 public:
-	
+
 	struct VertexData {
 		Vector4 pos;    // xyz座標
 		Vector2 uv;     // uv座標

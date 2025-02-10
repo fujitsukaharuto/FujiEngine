@@ -2,7 +2,7 @@
 #include "Framework.h"
 
 
-class GameRun : public Framework{
+class GameRun : public Framework {
 public:
 	GameRun();
 	~GameRun()override;

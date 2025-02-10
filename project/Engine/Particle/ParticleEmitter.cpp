@@ -14,7 +14,6 @@ ParticleEmitter::~ParticleEmitter() {
 
 #ifdef _DEBUG
 void ParticleEmitter::DebugGUI() {
-
 	ImGui::Begin(name.c_str());
 	if (ImGui::TreeNode("emitter")) {
 		ImGui::DragFloat3("pos", &pos.x, 0.01f);
@@ -71,7 +70,6 @@ void ParticleEmitter::DebugGUI() {
 		Save();
 	}
 	ImGui::End();
-
 }
 void ParticleEmitter::DrawSize() {
 	if (isDrawSize_) {
@@ -121,7 +119,6 @@ void ParticleEmitter::DrawSize() {
 #endif // _DEBUG
 
 void ParticleEmitter::Emit() {
-
 	Matrix4x4 worldMatrix = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, pos);
 	if (parent_) {
 		const Matrix4x4& parentWorldMatrix = parent_->GetWorldMat();
@@ -141,15 +138,12 @@ void ParticleEmitter::Emit() {
 			ParticleManager::Emit(name, posAddSize, particleRotate, grain, para_, 1);
 		}
 		time_ = frequencyTime;
-	}
-	else {
+	} else {
 		time_--;
 	}
-
 }
 
 void ParticleEmitter::Burst() {
-
 	Matrix4x4 worldMatrix = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, pos);
 	if (parent_) {
 		const Matrix4x4& parentWorldMatrix = parent_->GetWorldMat();
@@ -167,13 +161,10 @@ void ParticleEmitter::Burst() {
 
 		ParticleManager::Emit(name, posAddSize, particleRotate, grain, para_, 1);
 	}
-
 }
 
 void ParticleEmitter::BurstAnime() {
-
 	ParticleManager::EmitAnime(name, pos, animeData, para_, count);
-
 }
 
 void ParticleEmitter::RandomSpeed(const Vector2& x, const Vector2& y, const Vector2& z) {
@@ -189,7 +180,6 @@ void ParticleEmitter::RandomTranslate(const Vector2& x, const Vector2& y, const 
 }
 
 void ParticleEmitter::Save() {
-
 	json j;
 
 	j.push_back(json::array({ pos.x,pos.y,pos.z }));
@@ -235,11 +225,9 @@ void ParticleEmitter::Save() {
 		file << j.dump(4);
 		file.close();
 	}
-
 }
 
 void ParticleEmitter::Load(const std::string& filename) {
-
 	std::ifstream file(kDirectoryPath + filename + ".json");
 	if (!file.is_open()) {
 		return;
@@ -314,7 +302,6 @@ void ParticleEmitter::Load(const std::string& filename) {
 	index++;
 	para_.colorMax = Vector4(j[index][0], j[index][1], j[index][2], j[index][3]);
 	index++;
-
 }
 
 Vector3 ParticleEmitter::GetWorldPos() {

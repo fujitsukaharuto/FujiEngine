@@ -19,11 +19,9 @@ void Material::CreateMaterial() {
 
 	if (textureNamePath_.textureFilePath.empty()) {
 		texture_ = TextureManager::GetInstance()->LoadTexture("uvChecker.png");
-	}
-	else {
+	} else {
 		texture_ = TextureManager::GetInstance()->LoadTexture(textureNamePath_.textureFilePath);
 	}
-
 }
 
 
@@ -42,18 +40,14 @@ void Material::SetTextureNamePath(const std::string& pathName) {
 }
 
 void Material::SetUVScale(const Vector2& scale, const Vector2& uvTrans) {
-
 	Matrix4x4 uvScaleMatrix = MakeScale4x4(Vector3(scale.x, scale.y, 1.0f));
 	Matrix4x4 uvTransMatrix = MakeTranslateMatrix(Vector3(uvTrans.x, uvTrans.y, 0.0f));
 	materialDate_->uvTransform = MakeIdentity4x4();
 	materialDate_->uvTransform = Multiply(uvTransMatrix, uvScaleMatrix);
-
 }
 
 void Material::SetTexture(const std::string& name) {
-
 	texture_ = TextureManager::GetInstance()->GetTexture(name);
-
 }
 
 void Material::SetLightEnable(LightMode mode) {

@@ -13,15 +13,25 @@ public:
 public:
 
 	static CameraManager* GetInstance();
-
 	void Initialize();
-
 	void Update();
 
+	/// <summary>
+	/// カメラの取得
+	/// </summary>
+	/// <returns></returns>
 	Camera* GetCamera()const { return camera_.get(); }
 
+	/// <summary>
+	/// Debugモードかどうかの取得
+	/// </summary>
+	/// <returns></returns>
 	bool GetDebugMode()const { return debugMode_; }
 
+	/// <summary>
+	/// Debugモードを設定
+	/// </summary>
+	/// <param name="is">Debugモードにするかどうか</param>
 	void SetDebugMode(bool is);
 
 private:

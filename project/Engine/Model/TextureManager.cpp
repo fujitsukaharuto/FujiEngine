@@ -84,11 +84,9 @@ TextureManager* TextureManager::GetInstance() {
 
 
 void TextureManager::Finalize() {
-
 }
 
 Texture* TextureManager::LoadTexture(const std::string& filename) {
-
 	// 既にロードされているかチェック
 	if (m_textureCache.find(filename) != m_textureCache.end()) {
 		return m_textureCache[filename].get();
@@ -139,14 +137,11 @@ Texture* TextureManager::GetTexture(const std::string& filename) const {
 }
 
 const DirectX::TexMetadata& TextureManager::GetMetaData(const std::string& filename) {
-
 	if (m_textureCache.find(filename) != m_textureCache.end()) {
 		return m_textureCache[filename]->meta;
-	}
-	else {
+	} else {
 		throw std::runtime_error("Texture metadata not found for: " + filename);
 	}
-
 }
 
 void TextureManager::ReleaseTexture(const std::string& filename) {

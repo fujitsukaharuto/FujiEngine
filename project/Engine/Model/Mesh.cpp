@@ -1,16 +1,13 @@
 #include "Mesh.h"
 #include "DXCom.h"
 
-Mesh::Mesh()
-{
+Mesh::Mesh() {
 }
 
-Mesh::~Mesh()
-{
+Mesh::~Mesh() {
 }
 
-void Mesh::CreateMesh()
-{
+void Mesh::CreateMesh() {
 	vertexResource_ = DXCom::GetInstance()->CreateBufferResource(DXCom::GetInstance()->GetDevice(), sizeof(VertexData) * vertexData_.size());
 	VertexData* vData = nullptr;
 	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vData));
@@ -29,21 +26,17 @@ void Mesh::CreateMesh()
 	//indexBufferView_.BufferLocation = indexResourece_->GetGPUVirtualAddress();
 	//indexBufferView_.Format = DXGI_FORMAT_R32_UINT;
 	//indexBufferView_.SizeInBytes = static_cast<UINT>(sizeof(uint32_t) * indexData_.size());
-
 }
 
-void Mesh::AddVertex(const VertexData& vertex)
-{
+void Mesh::AddVertex(const VertexData& vertex) {
 	vertexData_.push_back(vertex);
 }
 
-void Mesh::AddIndex(uint32_t index)
-{
+void Mesh::AddIndex(uint32_t index) {
 	indexData_.push_back(index);
 }
 
-void Mesh::Draw(ID3D12GraphicsCommandList* commandList)
-{
+void Mesh::Draw(ID3D12GraphicsCommandList* commandList) {
 	commandList->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	commandList->DrawInstanced(static_cast<UINT>((vertexData_.size())), 1, 0, 0);
 }

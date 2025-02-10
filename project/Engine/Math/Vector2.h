@@ -1,8 +1,7 @@
 #pragma once
 #include <cmath>
 
-class Vector2
-{
+class Vector2 {
 public:
 
 	float x;

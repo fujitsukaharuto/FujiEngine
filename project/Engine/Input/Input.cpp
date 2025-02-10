@@ -11,8 +11,7 @@ Input* Input::GetInstance() {
 }
 
 
-void Input::Initialize()
-{
+void Input::Initialize() {
 
 	HINSTANCE hInstance = GetModuleHandle(nullptr);
 	hwnd_ = MyWin::GetInstance()->GetHwnd();
@@ -23,18 +22,15 @@ void Input::Initialize()
 	}
 
 	// キーボードの初期化
-	if (FAILED(directInput_->CreateDevice(GUID_SysKeyboard, &keyboard_, NULL)))
-	{
+	if (FAILED(directInput_->CreateDevice(GUID_SysKeyboard, &keyboard_, NULL))) {
 		throw std::runtime_error("Failed to create Keyboard object");
 	}
 
-	if (FAILED(keyboard_->SetDataFormat(&c_dfDIKeyboard)))
-	{
+	if (FAILED(keyboard_->SetDataFormat(&c_dfDIKeyboard))) {
 		throw std::runtime_error("Failed to create DataFormat object");
 	}
 
-	if (FAILED(keyboard_->SetCooperativeLevel(hwnd_, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY)))
-	{
+	if (FAILED(keyboard_->SetCooperativeLevel(hwnd_, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY))) {
 		throw std::runtime_error("Failed to create CooperativeLevel object");
 	}
 
@@ -62,8 +58,7 @@ void Input::Initialize()
 }
 
 
-void Input::Update()
-{
+void Input::Update() {
 	KeyboardUpdate();
 
 	MouseUpdate();
@@ -75,13 +70,11 @@ void Input::Update()
 
 /// Mouse-------------------------------------
 
-bool Input::IsPressMouse(int32_t mouseNumber) const
-{
+bool Input::IsPressMouse(int32_t mouseNumber) const {
 	return (mouse_.rgbButtons[mouseNumber] & 0x80) != 0;
 }
 
-bool Input::IsTriggerMouse(int32_t buttonNumber) const
-{
+bool Input::IsTriggerMouse(int32_t buttonNumber) const {
 	return (mouse_.rgbButtons[buttonNumber] & 0x80) != 0 && (mousePre_.rgbButtons[buttonNumber] & 0x80) == 0;
 }
 
@@ -89,13 +82,11 @@ bool Input::IsTriggerMouse(int32_t buttonNumber) const
 
 /// Key---------------------------------------
 
-bool Input::PushKey(uint8_t keyNumber) const
-{
+bool Input::PushKey(uint8_t keyNumber) const {
 	return key_[keyNumber] & 0x80;
 }
 
-bool Input::TriggerKey(uint8_t keyNumber) const
-{
+bool Input::TriggerKey(uint8_t keyNumber) const {
 	return (key_[keyNumber] & 0x80) && !(keyPre_[keyNumber] & 0x80);
 }
 
@@ -111,8 +102,7 @@ bool Input::GetGamepadState(XINPUT_STATE& out) const {
 	return false;
 }
 
-bool Input::GetGamepadStatePrevious(XINPUT_STATE& out) const
-{
+bool Input::GetGamepadStatePrevious(XINPUT_STATE& out) const {
 	if (pad_.isConnected_) {
 		out = pad_.statePre_;
 		return true;
@@ -224,8 +214,7 @@ Vector2 Input::ApplyDeadZone(int32_t x, int32_t y, int32_t deadZone) const {
 	if (magnitude < deadZone) {
 		stick.x = 0.0f;
 		stick.y = 0.0f;
-	}
-	else {
+	} else {
 		stick.x = static_cast<float>(x);
 		stick.y = static_cast<float>(y);
 	}

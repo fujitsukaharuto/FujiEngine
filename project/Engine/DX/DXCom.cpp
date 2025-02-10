@@ -343,7 +343,7 @@ void DXCom::SettingTexture() {
 	noiseTex_ = TextureManager::GetInstance()->LoadTexture("T_Noise02-300x300.jpg");
 	noiseDirTex_ = TextureManager::GetInstance()->LoadTexture("Noise_Dir.jpg");
 	noiseDirTex_ = TextureManager::GetInstance()->LoadTexture("worley_Noise.jpg");
-	noiseDirTex_= TextureManager::GetInstance()->LoadTexture("perlin_Noise.png");
+	noiseDirTex_ = TextureManager::GetInstance()->LoadTexture("perlin_Noise.png");
 	nowTex = 2;
 
 
@@ -668,12 +668,12 @@ void DXCom::UpDate() {
 		ImGui::DragFloat("mainBranchStrength", &thunderData_->mainBranchStrength, 0.1f);
 		ImGui::DragFloat("branchStrength", &thunderData_->branchStrngth, 0.1f);
 		ImGui::DragFloat("branchCount", &thunderData_->branchCount, 1);
-		ImGui::DragFloat("branchFade", &thunderData_->branchFade,0.1f);
-		ImGui::DragFloat("highlightStrength", &thunderData_->highlightStrength,0.1f);
-		ImGui::DragFloat("noiseScale", &thunderData_->noiseScale,0.01f);
-		ImGui::DragFloat("noiseSpeed", &thunderData_->noiseSpeed,0.1f);
-		ImGui::DragFloat2("rangeMin", &thunderData_->rangeMin.x,0.01f);
-		ImGui::DragFloat2("rangeMax", &thunderData_->rangeMax.x,0.01f);
+		ImGui::DragFloat("branchFade", &thunderData_->branchFade, 0.1f);
+		ImGui::DragFloat("highlightStrength", &thunderData_->highlightStrength, 0.1f);
+		ImGui::DragFloat("noiseScale", &thunderData_->noiseScale, 0.01f);
+		ImGui::DragFloat("noiseSpeed", &thunderData_->noiseSpeed, 0.1f);
+		ImGui::DragFloat2("rangeMin", &thunderData_->rangeMin.x, 0.01f);
+		ImGui::DragFloat2("rangeMax", &thunderData_->rangeMax.x, 0.01f);
 		ImGui::DragFloat("boltCount", &thunderData_->boltCount, 0.1f);
 		ImGui::DragFloat("progres", &thunderData_->progres, 0.1f, 0.0f, 1.0f);
 

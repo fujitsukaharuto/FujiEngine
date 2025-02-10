@@ -8,8 +8,7 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg
 
 
 
-MyWin* MyWin::GetInstance()
-{
+MyWin* MyWin::GetInstance() {
 	static MyWin instance;
 	return &instance;
 }
@@ -40,16 +39,12 @@ bool MyWin::ProcessMessage() {
 }
 
 
-LRESULT MyWin::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
-{
-
-	if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam))
-	{
+LRESULT MyWin::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
+	if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam)) {
 		return true;
 	}
 	//メッセージに応じてゲーム固有の処理を行う
-	switch (msg)
-	{
+	switch (msg) {
 		//ウィンドウが破棄された
 	case WM_DESTROY:
 		//OSに対応して、アプリの終了を伝える
@@ -62,8 +57,7 @@ LRESULT MyWin::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 }
 
 
-void MyWin::CreateGWindow(const wchar_t* name, uint32_t windowSizeX, uint32_t windowSizeY)
-{
+void MyWin::CreateGWindow(const wchar_t* name, uint32_t windowSizeX, uint32_t windowSizeY) {
 	CoInitializeEx(0, COINIT_MULTITHREADED);
 
 	//ウィンドウプロシージャ
@@ -107,10 +101,8 @@ void MyWin::CreateGWindow(const wchar_t* name, uint32_t windowSizeX, uint32_t wi
 }
 
 
-void MyWin::ThrowAwayWindow()
-{
+void MyWin::ThrowAwayWindow() {
 	UnregisterClass(wc_.lpszClassName, wc_.hInstance);
 	CoUninitialize();
 	CloseWindow(hwnd_);
-
 }

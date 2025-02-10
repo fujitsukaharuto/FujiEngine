@@ -34,8 +34,8 @@ void GameRun::Initialize() {
 
 #pragma region サウンド読み込み
 
-	audio_->LoadWave("xxx.wav");
-	audio_->LoadWave("mokugyo.wav");
+	audioPlayer_->LoadWave("xxx.wav");
+	audioPlayer_->LoadWave("mokugyo.wav");
 
 #pragma endregion
 
@@ -53,7 +53,7 @@ void GameRun::Initialize() {
 void GameRun::Finalize() {
 	sceneFactory_.reset();
 	sceneManager_->Finalize();
-	audio_->Finalize();
+	audioPlayer_->Finalize();
 	imguiManager_->Fin();
 	pManager_->Finalize();
 	textureManager_->Finalize();
@@ -79,8 +79,7 @@ void GameRun::Update() {
 	if (input_->TriggerKey(DIK_F12)) {
 		if (cameraManager_->GetDebugMode()) {
 			cameraManager_->SetDebugMode(false);
-		}
-		else {
+		} else {
 			cameraManager_->SetDebugMode(true);
 		}
 	}

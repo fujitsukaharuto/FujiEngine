@@ -3,31 +3,24 @@
 #include "MyWindow.h"
 #include <numbers>
 
-DebugCamera::DebugCamera()
-{
+DebugCamera::DebugCamera() {
 }
 
-DebugCamera::~DebugCamera()
-{
+DebugCamera::~DebugCamera() {
 }
 
-DebugCamera* DebugCamera::GetInstance()
-{
+DebugCamera* DebugCamera::GetInstance() {
 	static DebugCamera instance;
 	return &instance;
 }
 
-void DebugCamera::Initialize()
-{
-
+void DebugCamera::Initialize() {
 	matRot_ = MakeIdentity4x4();
 	viewMatrix_ = MakeIdentity4x4();
 	projectionMatrix_ = MakePerspectiveFovMatrix(0.45f, float(MyWin::kWindowWidth) / float(MyWin::kWindowHeight), 0.1f, 100.0f);
-
 }
 
-void DebugCamera::Update()
-{
+void DebugCamera::Update() {
 	InputUpdate();
 	TransUpdate();
 	ViewUpadate();
@@ -57,7 +50,6 @@ void DebugCamera::InputUpdate() {
 		// 閾値以下の値を 0 とみなす
 		if (fabs(deltaY) < threshold) deltaY = 0.0f;
 		if (fabs(deltaX) < threshold) deltaX = 0.0f;
-		
 
 
 		const float rotationSpeed = 0.01f;
@@ -68,19 +60,15 @@ void DebugCamera::InputUpdate() {
 		const float pitchLimit = 90.0f * (std::numbers::pi_v<float> / 180.0f); // ラジアン変換
 		if (pitch_ > pitchLimit) pitch_ = pitchLimit;
 		if (pitch_ < -pitchLimit) pitch_ = -pitchLimit;
-
 	}
 
 	// マウスの位置を更新
 	lastMousePos_ = { mousePos.x, mousePos.y };
 }
 
-void DebugCamera::TransUpdate()
-{
-	if (moveTrans_.z != 0.0f)
-	{
+void DebugCamera::TransUpdate() {
+	if (moveTrans_.z != 0.0f) {
 		const float speed = 0.1f;
-
 		Vector3 move = { 0.0f,0.0f,speed * moveTrans_.z };
 		move = TransformNormal(move, matRot_);
 		translation_ += move;
@@ -88,10 +76,8 @@ void DebugCamera::TransUpdate()
 	}
 
 
-	if (moveTrans_.x != 0.0f)
-	{
+	if (moveTrans_.x != 0.0f) {
 		const float speed = 0.1f;
-
 		Vector3 move = { speed * moveTrans_.x,0.0f,0.0f };
 		move = TransformNormal(move, matRot_);
 		translation_ += move;
@@ -99,10 +85,8 @@ void DebugCamera::TransUpdate()
 	}
 
 
-	if (moveTrans_.y != 0.0f)
-	{
+	if (moveTrans_.y != 0.0f) {
 		const float speed = 0.1f;
-
 		Vector3 move = { 0.0f,speed * moveTrans_.y,0.0f };
 		move = TransformNormal(move, matRot_);
 		translation_ += move;
@@ -110,24 +94,18 @@ void DebugCamera::TransUpdate()
 	}
 }
 
-void DebugCamera::ViewUpadate()
-{
+void DebugCamera::ViewUpadate() {
 	// 初期状態の回転行列
 	Matrix4x4 rotation = MakeIdentity4x4();
-
 	// 縦回転（Pitch）をローカルX軸に基づいて適用
 	rotation = Multiply(rotation, MakeRotateXMatrix(pitch_));
-
 	// 横回転（Yaw）をローカルY軸に基づいて適用
 	rotation = Multiply(rotation, MakeRotateYMatrix(yaw_));
-
 	// 最終的な回転行列を更新
 	matRot_ = rotation;
 }
 
-void DebugCamera::MatrixUpdate()
-{
-
+void DebugCamera::MatrixUpdate() {
 	/*Matrix4x4 matPivotTrans = MakeTranslateMatrix(pivot_);
 	Matrix4x4 matPivotTransInv = MakeTranslateMatrix(-pivot_);
 
@@ -146,8 +124,7 @@ void DebugCamera::MatrixUpdate()
 	viewMatrix_ = Inverse(matWorld);
 }
 
-Matrix4x4 DebugCamera::GetViewMatrix() const
-{
+Matrix4x4 DebugCamera::GetViewMatrix() const {
 	return viewMatrix_;
 }
 

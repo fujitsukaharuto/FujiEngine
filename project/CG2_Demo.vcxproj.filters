@@ -5,7 +5,7 @@
     <ClCompile Include="Game\Field\MapChipField.cpp">
       <Filter>Game\Field</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Audio\Audio.cpp">
+    <ClCompile Include="Engine\Audio\AudioPlayer.cpp">
       <Filter>Engine\Audio</Filter>
     </ClCompile>
     <ClCompile Include="Engine\DX\DXCom.cpp">
@@ -187,7 +187,7 @@
     <ClInclude Include="Game\Field\MapChipField.h">
       <Filter>Game\Field</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Audio\Audio.h">
+    <ClInclude Include="Engine\Audio\AudioPlayer.h">
       <Filter>Engine\Audio</Filter>
     </ClInclude>
     <ClInclude Include="Engine\DX\DXCom.h">

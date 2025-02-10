@@ -74,9 +74,6 @@ void GameScene::Initialize() {
 	test->Load("uvChecker.png");
 
 
-	soundData1 = audio_->SoundLoadWave("xxx.wav");
-	soundData2 = audio_->SoundLoadWave("mokugyo.wav");
-
 	ApplyGlobalVariables();
 
 	emit.count = 3;
@@ -89,7 +86,6 @@ void GameScene::Initialize() {
 }
 
 void GameScene::Update() {
-
 #ifdef _DEBUG
 
 	ApplyGlobalVariables();
@@ -104,7 +100,7 @@ void GameScene::Update() {
 
 	ImGui::DragFloat3("scale", &sphere->transform.scale.x, 0.01f);
 	ImGui::DragFloat3("rotate", &sphere->transform.rotate.x, 0.01f);
-	ImGui::DragFloat3("right", &rightDir.x,0.01f);
+	ImGui::DragFloat3("right", &rightDir.x, 0.01f);
 	rightDir = rightDir.Normalize();
 	sphere->SetRightDir(rightDir);
 	ImGui::End();
@@ -130,14 +126,17 @@ void GameScene::Update() {
 		emit.BurstAnime();
 	}
 	if (input_->TriggerKey(DIK_8)) {
-		audio_->SoundPlayWave(soundData1);
+		SoundData& soundData1 = audioPlayer_->SoundLoadWave("xxx.wav");
+		audioPlayer_->SoundPlayWave(soundData1);
 	}
 	if (input_->TriggerKey(DIK_9)) {
-		audio_->SoundStopWave(soundData1);
+		SoundData& soundData1 = audioPlayer_->SoundLoadWave("xxx.wav");
+		audioPlayer_->SoundStopWave(soundData1);
 
 	}
-	if (input_->TriggerKey(DIK_7)) {
-		audio_->SoundPlayWave(soundData2);
+ 	if (input_->TriggerKey(DIK_7)) {
+		SoundData& soundData2 = audioPlayer_->SoundLoadWave("mokugyo.wav");
+		audioPlayer_->SoundPlayWave(soundData2);
 	}
 
 	dxCommon_->UpDate();
@@ -162,13 +161,11 @@ void GameScene::Update() {
 	fence->transform.translate = fencevec;
 	fence->transform.rotate.x = 0.5f;
 
-	
-	ParticleManager::GetInstance()->Update();
 
+	ParticleManager::GetInstance()->Update();
 }
 
 void GameScene::Draw() {
-
 #pragma region 背景描画
 
 
@@ -200,7 +197,6 @@ void GameScene::Draw() {
 	}
 
 #pragma endregion
-
 }
 
 void GameScene::BlackFade() {
@@ -246,5 +242,4 @@ void GameScene::ApplyGlobalVariables() {
 
 	fencePara = globalVariables->GetFloatValue(groupName2, "parametar");
 	fencevec = globalVariables->GetVector3Value(groupName2, "Position");
-
 }

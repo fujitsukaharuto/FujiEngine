@@ -1,53 +1,42 @@
-#include "Audio.h"
+#include "AudioPlayer.h"
 #include <cassert>
 
-Audio::Audio()
-{
+AudioPlayer::AudioPlayer() {
 }
 
-Audio::~Audio()
-{
+AudioPlayer::~AudioPlayer() {
 }
 
-void Audio::Initialize()
-{
-
+void AudioPlayer::Initialize() {
 	XAudio2Create(&xAudio2_, 0, XAUDIO2_DEFAULT_PROCESSOR);
 	xAudio2_->CreateMasteringVoice(&masterVoice_);
-
 }
 
-void Audio::Finalize()
-{
-	if (masterVoice_)
-	{
+void AudioPlayer::Finalize() {
+	if (masterVoice_) {
 		masterVoice_->DestroyVoice();
 		masterVoice_ = nullptr;
 	}
 
-	if (xAudio2_)
-	{
+	if (xAudio2_) {
 		xAudio2_ = nullptr;
 	}
 }
 
-Audio* Audio::GetInstance()
-{
-	static Audio instance;
+AudioPlayer* AudioPlayer::GetInstance() {
+	static AudioPlayer instance;
 	return &instance;
 }
 
-void Audio::LoadWave(const char* filename) {
+void AudioPlayer::LoadWave(const char* filename) {
 	auto it = container_.find(filename);
 	if (it != container_.end()) {
 		return;
 	}
 
-
 	std::ifstream file;
 	file.open((kDirectoryPath_ + filename), std::ios_base::binary);
 	assert(file.is_open());
-
 
 	RiffHeader riff;
 	file.read((char*)&riff, sizeof(riff));
@@ -78,27 +67,22 @@ void Audio::LoadWave(const char* filename) {
 				file.read((char*)extraBytes, data.size - 16);
 				delete[] extraBytes;
 			}
-
-
 			formatFound = true;
-		}
-		else if (strncmp(data.id, "data", 4) == 0) {
+
+		} else if (strncmp(data.id, "data", 4) == 0) {
 
 			pBuffer = new char[data.size];
 			file.read(pBuffer, data.size);
 			dataFound = true;
 
-		}
-		else {
+		} else {
 			file.seekg(data.size, std::ios_base::cur);
 		}
 
 		if (formatFound && dataFound) {
 			break;
 		}
-
 	}
-
 
 	file.close();
 	assert(formatFound && dataFound);
@@ -111,8 +95,7 @@ void Audio::LoadWave(const char* filename) {
 	container_.insert(std::make_pair(filename, soundData));
 }
 
-SoundData Audio::SoundLoadWave(const char* filename)
-{
+SoundData& AudioPlayer::SoundLoadWave(const char* filename) {
 	auto it = container_.find(filename);
 	if (it != container_.end()) {
 		return it->second;
@@ -121,12 +104,11 @@ SoundData Audio::SoundLoadWave(const char* filename)
 	LoadWave(filename);
 
 	it = container_.find(filename);
+	assert(it != container_.end()); // データが必ず存在することを確認
 	return it->second;
-
 }
 
-void Audio::SoundUnload(SoundData* soundData)
-{
+void AudioPlayer::SoundUnload(SoundData* soundData) {
 	delete[] soundData->pBuffer;
 
 	soundData->pBuffer = 0;
@@ -134,11 +116,8 @@ void Audio::SoundUnload(SoundData* soundData)
 	soundData->wfex = {};
 }
 
-void Audio::SoundPlayWave(SoundData& soundData, float volume)
-{
-
+void AudioPlayer::SoundPlayWave(SoundData& soundData, float volume) {
 	HRESULT result;
-
 	IXAudio2SourceVoice* pSourceVoice = nullptr;
 	result = xAudio2_->CreateSourceVoice(&pSourceVoice, &soundData.wfex);
 	assert(SUCCEEDED(result));
@@ -153,13 +132,11 @@ void Audio::SoundPlayWave(SoundData& soundData, float volume)
 
 	result = pSourceVoice->SubmitSourceBuffer(&buf);
 	result = pSourceVoice->Start();
-
 	soundData.pSourceVoices.push_back(pSourceVoice);
 }
 
-void Audio::SoundLoop(SoundData& soundData, float volume) {
+void AudioPlayer::SoundLoop(SoundData& soundData, float volume) {
 	HRESULT result;
-
 	IXAudio2SourceVoice* pSourceVoice = nullptr;
 	result = xAudio2_->CreateSourceVoice(&pSourceVoice, &soundData.wfex);
 	assert(SUCCEEDED(result));
@@ -171,16 +148,14 @@ void Audio::SoundLoop(SoundData& soundData, float volume) {
 	buf.pAudioData = soundData.pBuffer;
 	buf.AudioBytes = soundData.bufferSize;
 	buf.Flags = XAUDIO2_END_OF_STREAM;
-	buf.LoopCount = XAUDIO2_LOOP_INFINITE;
+	buf.LoopCount = XAUDIO2_LOOP_INFINITE; // ループする
 
 	result = pSourceVoice->SubmitSourceBuffer(&buf);
 	result = pSourceVoice->Start();
-
 	soundData.pSourceVoices.push_back(pSourceVoice);
 }
 
-void Audio::SoundStopWave(SoundData& soundData) {
-
+void AudioPlayer::SoundStopWave(SoundData& soundData) {
 	for (auto& voice : soundData.pSourceVoices) {
 		if (voice) {
 			voice->Stop();

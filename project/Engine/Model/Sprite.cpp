@@ -6,7 +6,6 @@
 
 
 void Sprite::Load(const std::string& fileName) {
-
 	material_.SetTextureNamePath(fileName);
 	nowtexture = fileName;
 	InitializeBuffer();
@@ -17,7 +16,6 @@ void Sprite::Load(const std::string& fileName) {
 void Sprite::Draw() {
 	ID3D12GraphicsCommandList* cList = DXCom::GetInstance()->GetCommandList();
 
-
 	cList->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	cList->IASetIndexBuffer(&indexBufferView_);
 	cList->SetGraphicsRootConstantBufferView(0, material_.GetMaterialResource()->GetGPUVirtualAddress());
@@ -27,7 +25,6 @@ void Sprite::Draw() {
 	PointLightManager::GetInstance()->SetLightCommand(cList);
 	cList->SetGraphicsRootDescriptorTable(2, material_.GetTexture()->gpuHandle);
 	cList->DrawIndexedInstanced(6, 1, 0, 0, 0);
-
 }
 
 void Sprite::SetColor(const Vector4& color) {
@@ -71,11 +68,9 @@ void Sprite::SetAnchor(const Vector2& anchor) {
 	vertex_[2].position = { right,bottom,0.0f,1.0f };
 	vertex_[3].position = { right,top,0.0f,1.0f };
 	std::memcpy(vData, vertex_.data(), sizeof(VertexDate) * vertex_.size());
-
 }
 
 void Sprite::SetRange(const Vector2& leftTop, const Vector2& size) {
-
 	const DirectX::TexMetadata& meta = TextureManager::GetInstance()->GetMetaData(nowtexture);
 
 	float left = leftTop.x / meta.width;
@@ -88,11 +83,9 @@ void Sprite::SetRange(const Vector2& leftTop, const Vector2& size) {
 	vertex_[2].texcoord = { right,bottom };
 	vertex_[3].texcoord = { right,top };
 	std::memcpy(vData, vertex_.data(), sizeof(VertexDate) * vertex_.size());
-
 }
 
 void Sprite::InitializeBuffer() {
-
 	vertex_.push_back({ {0.0f,0.0f,0.0f,1.0f},{0.0f,0.0f},{0.0f,0.0f,-1.0f} });
 	vertex_.push_back({ {0.0f,1.0f,0.0f,1.0f},{0.0f,1.0f},{0.0f,0.0f,-1.0f} });
 	vertex_.push_back({ {1.0f,1.0f,0.0f,1.0f},{1.0f,1.0f},{0.0f,0.0f,-1.0f} });
@@ -148,7 +141,6 @@ void Sprite::InitializeBuffer() {
 	cameraPosData_ = nullptr;
 	cameraPosResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraPosData_));
 	cameraPosData_->worldPosition = { 0.0f,0.0f,0.0f };
-
 }
 
 void Sprite::AdjustTextureSize() {
@@ -168,5 +160,4 @@ void Sprite::SetWvp() {
 	wvpData_->World = worldMatrix;
 	wvpData_->WVP = worldViewProjectionMatrix;
 	wvpData_->WorldInverseTransPose = Transpose(Inverse(wvpData_->World));
-
 }

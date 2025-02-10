@@ -2,8 +2,7 @@
 #include "Scene/BaseScene.h"
 
 
-class GameScene :public BaseScene
-{
+class GameScene :public BaseScene {
 public:
 	GameScene();
 	~GameScene();
@@ -41,9 +40,6 @@ private:
 
 	bool isDebugCameraMode_ = false;
 
-
-	SoundData soundData1;
-	SoundData soundData2;
 
 	ParticleEmitter emit;
 

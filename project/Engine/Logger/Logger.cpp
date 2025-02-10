@@ -5,14 +5,12 @@
 
 
 void Logger::Log(const std::string& outputString) {
-	OutputDebugStringA((outputString+"\n").c_str());
+	OutputDebugStringA((outputString + "\n").c_str());
 }
-
 
 void Logger::Log(const std::wstring& outputString) {
 	OutputDebugStringA((ConvertString(outputString) + "\n").c_str());
 }
-
 
 std::string Logger::ConvertString(const std::wstring& str) {
 	if (str.empty()) {
@@ -28,8 +26,7 @@ std::string Logger::ConvertString(const std::wstring& str) {
 	return result;
 }
 
-std::wstring Logger::ConvertString(const std::string& str)
-{
+std::wstring Logger::ConvertString(const std::string& str) {
 	if (str.empty()) {
 		return std::wstring();
 	}

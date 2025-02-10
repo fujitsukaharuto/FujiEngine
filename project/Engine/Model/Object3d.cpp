@@ -7,18 +7,15 @@
 Object3d::~Object3d() {}
 
 void Object3d::Create(const std::string& fileName) {
-
 	this->camera_ = CameraManager::GetInstance()->GetCamera();
 	ModelManager::GetInstance()->LoadOBJ(fileName);
 	SetModel(fileName);
 	transform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 	nowTextureName = model_->GetTextuerName();
 	CreateWVP();
-
 }
 
 void Object3d::CreateSphere() {
-
 	this->camera_ = CameraManager::GetInstance()->GetCamera();
 	ModelManager::GetInstance()->CreateSphere();
 	SetModel("Sphere");
@@ -27,7 +24,6 @@ void Object3d::CreateSphere() {
 }
 
 void Object3d::Draw(Material* mate) {
-
 	SetWVP();
 
 	ID3D12GraphicsCommandList* cList = DXCom::GetInstance()->GetCommandList();
@@ -39,11 +35,9 @@ void Object3d::Draw(Material* mate) {
 	if (model_) {
 		model_->Draw(cList, mate);
 	}
-
 }
 
 void Object3d::AnimeDraw() {
-
 	SetBillboardWVP();
 
 	ID3D12GraphicsCommandList* cList = DXCom::GetInstance()->GetCommandList();
@@ -63,8 +57,7 @@ Matrix4x4 Object3d::GetWorldMat() const {
 	if (parent_) {
 		const Matrix4x4& parentWorldMatrix = parent_->GetWorldMat();
 		worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
-	}
-	else if (isCameraParent_) {
+	} else if (isCameraParent_) {
 		const Matrix4x4& parentWorldMatrix = camera_->GetWorldMatrix();
 		worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
 	}
@@ -107,7 +100,6 @@ void Object3d::SetModel(const std::string& fileName) {
 }
 
 void Object3d::CreateWVP() {
-
 	wvpResource_ = DXCom::GetInstance()->CreateBufferResource(DXCom::GetInstance()->GetDevice(), sizeof(TransformationMatrix));
 	wvpDate_ = nullptr;
 	wvpResource_->Map(0, nullptr, reinterpret_cast<void**>(&wvpDate_));
@@ -128,12 +120,9 @@ void Object3d::CreateWVP() {
 	cameraPosData_ = nullptr;
 	cameraPosResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraPosData_));
 	cameraPosData_->worldPosition = camera_->transform.translate;
-
-
 }
 
 void Object3d::SetWVP() {
-
 	Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 	Matrix4x4 worldViewProjectionMatrix;
 
@@ -141,8 +130,7 @@ void Object3d::SetWVP() {
 	if (parent_) {
 		const Matrix4x4& parentWorldMatrix = parent_->GetWorldMat();
 		worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
-	}
-	else if (isCameraParent_) {
+	} else if (isCameraParent_) {
 		const Matrix4x4& parentWorldMatrix = camera_->GetWorldMatrix();
 		worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
 	}
@@ -151,8 +139,7 @@ void Object3d::SetWVP() {
 	if (camera_) {
 		const Matrix4x4& viewProjectionMatrix = camera_->GetViewProjectionMatrix();
 		worldViewProjectionMatrix = Multiply(worldMatrix, viewProjectionMatrix);
-	}
-	else {
+	} else {
 		worldViewProjectionMatrix = worldMatrix;
 	}
 
@@ -165,7 +152,6 @@ void Object3d::SetWVP() {
 }
 
 void Object3d::SetBillboardWVP() {
-
 	Matrix4x4 worldViewProjectionMatrix;
 	Matrix4x4 worldMatrix = MakeIdentity4x4();
 
@@ -177,13 +163,11 @@ void Object3d::SetBillboardWVP() {
 	if (camera_) {
 		const Matrix4x4& viewProjectionMatrix = camera_->GetViewProjectionMatrix();
 		worldViewProjectionMatrix = Multiply(worldMatrix, viewProjectionMatrix);
-	}
-	else {
+	} else {
 		worldViewProjectionMatrix = worldMatrix;
 	}
 
 	wvpDate_->World = worldMatrix;
 	wvpDate_->WVP = worldViewProjectionMatrix;
 	wvpDate_->WorldInverseTransPose = Transpose(Inverse(wvpDate_->World));
-
 }
