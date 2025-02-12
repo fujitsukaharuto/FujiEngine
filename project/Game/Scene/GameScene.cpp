@@ -90,22 +90,6 @@ void GameScene::Update() {
 
 	ApplyGlobalVariables();
 
-	ImGui::Begin("suzunne");
-
-	ImGui::ColorEdit4("color", &color_.x);
-	suzunne->SetColor(color_);
-	ImGui::End();
-
-	ImGui::Begin("Sphere");
-
-	ImGui::DragFloat3("scale", &sphere->transform.scale.x, 0.01f);
-	ImGui::DragFloat3("rotate", &sphere->transform.rotate.x, 0.01f);
-	ImGui::DragFloat3("right", &rightDir.x, 0.01f);
-	rightDir = rightDir.Normalize();
-	sphere->SetRightDir(rightDir);
-	ImGui::End();
-
-	emit.DebugGUI();
 
 #endif // _DEBUG
 
@@ -197,6 +181,37 @@ void GameScene::Draw() {
 	}
 
 #pragma endregion
+}
+
+void GameScene::DebugGUI() {
+#ifdef _DEBUG
+	ImGui::Indent();
+	
+	if (ImGui::CollapsingHeader("suzunne")) {
+		ImGui::ColorEdit4("color", &color_.x);
+		suzunne->SetColor(color_);
+	}
+
+	if (ImGui::CollapsingHeader("Sphere")) {
+		ImGui::DragFloat3("scale", &sphere->transform.scale.x, 0.01f);
+		ImGui::DragFloat3("rotate", &sphere->transform.rotate.x, 0.01f);
+		ImGui::DragFloat3("right", &rightDir.x, 0.01f);
+		rightDir = rightDir.Normalize();
+		sphere->SetRightDir(rightDir);
+	}
+
+	ImGui::Unindent();
+#endif // _DEBUG
+}
+
+void GameScene::ParticleDebugGUI() {
+#ifdef _DEBUG
+	ImGui::Indent();
+	
+	emit.DebugGUI();
+
+	ImGui::Unindent();
+#endif // _DEBUG
 }
 
 void GameScene::BlackFade() {

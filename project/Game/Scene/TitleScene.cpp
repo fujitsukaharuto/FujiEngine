@@ -56,19 +56,6 @@ void TitleScene::Update() {
 #ifdef _DEBUG
 
 
-	ImGui::Begin("Sphere");
-
-	ImGui::DragFloat3("scale", &sphere->transform.scale.x, 0.01f);
-	ImGui::DragFloat3("rotate", &sphere->transform.rotate.x, 0.01f);
-	ImGui::DragFloat3("right", &rightDir.x, 0.01f);
-	rightDir = rightDir.Normalize();
-	sphere->SetRightDir(rightDir);
-	ImGui::End();
-
-	emit.DebugGUI();
-
-	test_->Debug();
-	test2_->Debug();
 
 #endif // _DEBUG
 
@@ -130,6 +117,32 @@ void TitleScene::Draw() {
 
 #pragma endregion
 
+}
+
+void TitleScene::DebugGUI() {
+#ifdef _DEBUG
+	ImGui::Indent();
+	if (ImGui::CollapsingHeader("Sphere")) {
+		ImGui::DragFloat3("scale", &sphere->transform.scale.x, 0.01f);
+		ImGui::DragFloat3("rotate", &sphere->transform.rotate.x, 0.01f);
+		ImGui::DragFloat3("right", &rightDir.x, 0.01f);
+		rightDir = rightDir.Normalize();
+		sphere->SetRightDir(rightDir);
+	}
+
+	test_->Debug();
+	test2_->Debug();
+
+	ImGui::Unindent();
+#endif // _DEBUG
+}
+
+void TitleScene::ParticleDebugGUI() {
+#ifdef _DEBUG
+	ImGui::Indent();
+	emit.DebugGUI();
+	ImGui::Unindent();
+#endif // _DEBUG
 }
 
 void TitleScene::BlackFade() {

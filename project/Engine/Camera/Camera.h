@@ -87,7 +87,7 @@ public:
 	/// <returns></returns>
 	const Matrix4x4& GetViewProjectionMatrix() const { return viewProjectionMatrix_; }
 
-
+	void DebugGUI();
 
 	Trans transform;
 

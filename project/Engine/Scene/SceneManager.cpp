@@ -88,6 +88,16 @@ void SceneManager::SetGameOver(bool is) {
 	Clear = !is;
 }
 
+void SceneManager::DebugGUI() {
+#ifdef _DEBUG
+	if (ImGui::CollapsingHeader("Scene")) {
+		scene_->DebugGUI();
+		ImGui::SeparatorText("Particle");
+		scene_->ParticleDebugGUI();
+	}
+#endif // _DEBUG
+}
+
 void SceneManager::SceneSet() {
 	if (nextScene_) {
 		if (scene_) {

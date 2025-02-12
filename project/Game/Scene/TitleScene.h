@@ -11,6 +11,8 @@ public:
 	void Initialize()override;
 	void Update()override;
 	void Draw()override;
+	void DebugGUI()override;
+	void ParticleDebugGUI()override;
 
 	void BlackFade();
 

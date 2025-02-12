@@ -16,17 +16,6 @@ Camera::Camera() :transform({ { 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, { 0.0f,3.5
 }
 
 void Camera::Update() {
-#ifdef _DEBUG
-
-	ImGui::Begin("Camera");
-
-	ImGui::DragFloat3("pos", &transform.translate.x, 0.01f);
-	ImGui::DragFloat3("rotate", &transform.rotate.x, 0.01f);
-	ImGui::SeparatorText("Shake");
-	ImGui::DragFloat("shakeTime", &shakeTime_, 0.01f, 0.0f);
-	ImGui::DragFloat("shakeStrength", &shakeStrength_, 0.01f, 0.0f);
-	ImGui::End();
-#endif // _DEBUG
 
 	shakeGap_ = { 0.0f,0.0f,0.0f };
 
@@ -76,4 +65,16 @@ void Camera::UpdateMaterix() {
 
 	projectionMatrix_ = MakePerspectiveFovMatrix(fovY_, aspect_, nearClip_, farClip_);
 	viewProjectionMatrix_ = Multiply(viewMatrix_, projectionMatrix_);
+}
+
+void Camera::DebugGUI() {
+#ifdef _DEBUG
+	if (ImGui::CollapsingHeader("Camera")) {
+		ImGui::DragFloat3("pos", &transform.translate.x, 0.01f);
+		ImGui::DragFloat3("rotate", &transform.rotate.x, 0.01f);
+		ImGui::SeparatorText("Shake");
+		ImGui::DragFloat("shakeTime", &shakeTime_, 0.01f, 0.0f);
+		ImGui::DragFloat("shakeStrength", &shakeStrength_, 0.01f, 0.0f);
+	}
+#endif // _DEBUG
 }

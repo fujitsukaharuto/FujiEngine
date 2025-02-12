@@ -14,62 +14,62 @@ ParticleEmitter::~ParticleEmitter() {
 
 #ifdef _DEBUG
 void ParticleEmitter::DebugGUI() {
-	ImGui::Begin(name.c_str());
-	if (ImGui::TreeNode("emitter")) {
-		ImGui::DragFloat3("pos", &pos.x, 0.01f);
-		int im_Count = int(count);
-		ImGui::DragInt("count", &im_Count, 1, 0, 10);
-		count = uint32_t(im_Count);
-		ImGui::DragFloat("frenquencyTime", &frequencyTime, 0.1f, 1.0f, 600.0f);
-		ImGui::DragFloat3("emitSizeMax", &emitSizeMax.x, 0.01f);
-		ImGui::DragFloat3("emitSizeMin", &emitSizeMin.x, 0.01f);
-		ImGui::TreePop();
-	}
-	ImGui::Separator();
-	if (ImGui::TreeNode("particle")) {
-
-		ImGui::ColorEdit4("colorMin", &para_.colorMin.x);
-		ImGui::ColorEdit4("colorMax", &para_.colorMax.x);
-
-		ImGui::DragFloat("lifetime", &grain.lifeTime_, 0.1f);
-		if (ImGui::TreeNode("typeSelect")) {
-			ImGui::Combo("sizeType##type", &grain.type, "kNormal\0kShift\0kSin\0");
-			ImGui::Combo("speedType##type", &grain.speedType, "kConstancy\0kChange\0kReturn\0kCenter\0");
-			ImGui::Combo("rotateType##type", &grain.rotateType, "kUsually\0kVelocityR\0kRandomR\0");
-			ImGui::Combo("colorType##type", &grain.colorType, "kDefault\0kRandom\0");
+	if (ImGui::CollapsingHeader(name.c_str())) {
+		if (ImGui::TreeNode("emitter")) {
+			ImGui::DragFloat3("pos", &pos.x, 0.01f);
+			int im_Count = int(count);
+			ImGui::DragInt("count", &im_Count, 1, 0, 10);
+			count = uint32_t(im_Count);
+			ImGui::DragFloat("frenquencyTime", &frequencyTime, 0.1f, 1.0f, 600.0f);
+			ImGui::DragFloat3("emitSizeMax", &emitSizeMax.x, 0.01f);
+			ImGui::DragFloat3("emitSizeMin", &emitSizeMin.x, 0.01f);
 			ImGui::TreePop();
 		}
-		ImGui::SeparatorText("size");
-		ImGui::DragFloat2("startSize", &grain.startSize.x, 0.01f);
-		ImGui::DragFloat2("endSize", &grain.endSize.x, 0.01f);
-		ImGui::SeparatorText("rotate");
-		ImGui::DragFloat3("rotate", &particleRotate.x, 0.01f);
-		ImGui::SeparatorText("randSpeed");
-		ImGui::DragFloat2("speedX", &para_.speedx.x, 0.01f);
-		ImGui::DragFloat2("speedY", &para_.speedy.x, 0.01f);
-		ImGui::DragFloat2("speedZ", &para_.speedz.x, 0.01f);
-		if (grain.speedType == SpeedType::kReturn || grain.speedType == SpeedType::kCenter) {
-			ImGui::DragFloat("returnPower", &grain.returnPower_, 0.001f);
+		ImGui::Separator();
+		if (ImGui::TreeNode("particle")) {
+
+			ImGui::ColorEdit4("colorMin", &para_.colorMin.x);
+			ImGui::ColorEdit4("colorMax", &para_.colorMax.x);
+
+			ImGui::DragFloat("lifetime", &grain.lifeTime_, 0.1f);
+			if (ImGui::TreeNode("typeSelect")) {
+				ImGui::Combo("sizeType##type", &grain.type, "kNormal\0kShift\0kSin\0");
+				ImGui::Combo("speedType##type", &grain.speedType, "kConstancy\0kChange\0kReturn\0kCenter\0");
+				ImGui::Combo("rotateType##type", &grain.rotateType, "kUsually\0kVelocityR\0kRandomR\0");
+				ImGui::Combo("colorType##type", &grain.colorType, "kDefault\0kRandom\0");
+				ImGui::TreePop();
+			}
+			ImGui::SeparatorText("size");
+			ImGui::DragFloat2("startSize", &grain.startSize.x, 0.01f);
+			ImGui::DragFloat2("endSize", &grain.endSize.x, 0.01f);
+			ImGui::SeparatorText("rotate");
+			ImGui::DragFloat3("rotate", &particleRotate.x, 0.01f);
+			ImGui::SeparatorText("randSpeed");
+			ImGui::DragFloat2("speedX", &para_.speedx.x, 0.01f);
+			ImGui::DragFloat2("speedY", &para_.speedy.x, 0.01f);
+			ImGui::DragFloat2("speedZ", &para_.speedz.x, 0.01f);
+			if (grain.speedType == SpeedType::kReturn || grain.speedType == SpeedType::kCenter) {
+				ImGui::DragFloat("returnPower", &grain.returnPower_, 0.001f);
+			}
+			ImGui::SeparatorText("accele");
+			ImGui::DragFloat3("accele", &grain.accele.x, 0.01f);
+			ImGui::SeparatorText("billBoard");
+			ImGui::Checkbox("BillBoard", &grain.isBillBoard_);
+			if (grain.isBillBoard_) {
+				int billPattern = static_cast<int>(grain.pattern_);
+				ImGui::RadioButton("XYZ", &billPattern, 0); ImGui::SameLine();
+				ImGui::RadioButton("X", &billPattern, 1); ImGui::SameLine();
+				ImGui::RadioButton("Y", &billPattern, 2); ImGui::SameLine();
+				ImGui::RadioButton("Z", &billPattern, 3);
+				grain.pattern_ = static_cast<BillBoardPattern>(billPattern);
+			}
+			ImGui::Checkbox("SizeCheck", &isDrawSize_);
+			ImGui::TreePop();
 		}
-		ImGui::SeparatorText("accele");
-		ImGui::DragFloat3("accele", &grain.accele.x, 0.01f);
-		ImGui::SeparatorText("billBoard");
-		ImGui::Checkbox("BillBoard", &grain.isBillBoard_);
-		if (grain.isBillBoard_) {
-			int billPattern = static_cast<int>(grain.pattern_);
-			ImGui::RadioButton("XYZ", &billPattern, 0); ImGui::SameLine();
-			ImGui::RadioButton("X", &billPattern, 1); ImGui::SameLine();
-			ImGui::RadioButton("Y", &billPattern, 2); ImGui::SameLine();
-			ImGui::RadioButton("Z", &billPattern, 3);
-			grain.pattern_ = static_cast<BillBoardPattern>(billPattern);
+		if (ImGui::Button("save")) {
+			Save();
 		}
-		ImGui::Checkbox("SizeCheck", &isDrawSize_);
-		ImGui::TreePop();
 	}
-	if (ImGui::Button("save")) {
-		Save();
-	}
-	ImGui::End();
 }
 void ParticleEmitter::DrawSize() {
 	if (isDrawSize_) {

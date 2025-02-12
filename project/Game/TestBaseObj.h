@@ -86,26 +86,23 @@ inline void TestBaseObj::OnCollisionExit([[maybe_unused]] const ColliderInfo& ot
 #ifdef _DEBUG
 inline void TestBaseObj::Debug() {
 
-	ImGui::Begin(name_.c_str());
+	if (ImGui::CollapsingHeader(name_.c_str())) {
+		ImGui::DragFloat3("position", &model_->transform.translate.x, 0.1f);
+		collider_->SetPos(model_->GetWorldPos());
 
-	ImGui::DragFloat3("position", &model_->transform.translate.x, 0.1f);
-	collider_->SetPos(model_->GetWorldPos());
-
-	float w = collider_->GetWidth();
-	float h = collider_->GetHeight();
-	float d = collider_->GetDepth();
-	ImGui::DragFloat("width", &w, 0.1f);
-	ImGui::DragFloat("height", &h, 0.1f);
-	ImGui::DragFloat("depth", &d, 0.1f);
-	collider_->SetWidth(w);
-	collider_->SetHeight(h);
-	collider_->SetDepth(d);
-	bool isColl = collider_->GetIsCollisonCheck();
-	ImGui::Checkbox("isCollision", &isColl);
-	collider_->SetIsCollisonCheck(isColl);
-
-
-	ImGui::End();
+		float w = collider_->GetWidth();
+		float h = collider_->GetHeight();
+		float d = collider_->GetDepth();
+		ImGui::DragFloat("width", &w, 0.1f);
+		ImGui::DragFloat("height", &h, 0.1f);
+		ImGui::DragFloat("depth", &d, 0.1f);
+		collider_->SetWidth(w);
+		collider_->SetHeight(h);
+		collider_->SetDepth(d);
+		bool isColl = collider_->GetIsCollisonCheck();
+		ImGui::Checkbox("isCollision", &isColl);
+		collider_->SetIsCollisonCheck(isColl);
+	}
 }
 inline void TestBaseObj::DrawCollider() {
 

@@ -25,6 +25,8 @@ public:
 
 	void Init();
 
+	virtual void DebugGUI();
+	virtual void ParticleDebugGUI();
 
 private:
 

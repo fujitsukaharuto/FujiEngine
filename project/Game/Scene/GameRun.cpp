@@ -83,6 +83,9 @@ void GameRun::Update() {
 			cameraManager_->SetDebugMode(true);
 		}
 	}
+
+	DebugGUI();
+
 #endif // _DEBUG
 
 	GlobalVariables::GetInstance()->Update();
@@ -105,4 +108,13 @@ void GameRun::Draw() {
 	// 描画終了
 	dxCommon_->PostDraw();
 
+}
+
+void GameRun::DebugGUI() {
+#ifdef _DEBUG
+	ImGui::Begin("SceneDebug");
+	cameraManager_->GetCamera()->DebugGUI();
+	sceneManager_->DebugGUI();
+	ImGui::End();
+#endif // _DEBUG
 }
