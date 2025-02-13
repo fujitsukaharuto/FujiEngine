@@ -29,13 +29,13 @@ void SpotLight::Debug() {
 #ifdef _DEBUG
 	if (ImGui::CollapsingHeader("spotlight")) {
 
-		ImGui::ColorEdit4("color", &spotLightData_->color.x);
-		ImGui::DragFloat3("position", &spotLightData_->position.x, 0.1f);
-		ImGui::DragFloat("intensity", &spotLightData_->intensity, 0.01f);
-		ImGui::DragFloat("distance", &spotLightData_->distance, 0.01f);
-		ImGui::DragFloat("decay", &spotLightData_->decay, 0.01f);
-		ImGui::DragFloat("cosAngle", &spotLightData_->cosAngle, 0.01f);
-		ImGui::DragFloat("cosFalloffStart", &spotLightData_->cosFalloffStart, 0.01f);
+		ImGui::ColorEdit4("color##spot", &spotLightData_->color.x);
+		ImGui::DragFloat3("position##spot", &spotLightData_->position.x, 0.1f);
+		ImGui::DragFloat("intensity##spot", &spotLightData_->intensity, 0.01f);
+		ImGui::DragFloat("distance##spot", &spotLightData_->distance, 0.01f);
+		ImGui::DragFloat("decay##spot", &spotLightData_->decay, 0.01f);
+		ImGui::DragFloat("cosAngle##spot", &spotLightData_->cosAngle, 0.01f);
+		ImGui::DragFloat("cosFalloffStart##spot", &spotLightData_->cosFalloffStart, 0.01f);
 
 	}
 #endif // _DEBUG

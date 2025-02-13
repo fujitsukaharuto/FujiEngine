@@ -25,11 +25,11 @@ void PointLight::Debug() {
 #ifdef _DEBUG
 	if (ImGui::CollapsingHeader("pointlight")) {
 
-		ImGui::ColorEdit4("color", &pointLightData_->color.x);
-		ImGui::DragFloat3("position", &pointLightData_->position.x, 0.1f);
-		ImGui::DragFloat("intensity", &pointLightData_->intensity, 0.01f);
-		ImGui::DragFloat("radius", &pointLightData_->radius, 0.01f);
-		ImGui::DragFloat("decay", &pointLightData_->decay, 0.01f);
+		ImGui::ColorEdit4("color##point", &pointLightData_->color.x);
+		ImGui::DragFloat3("position##point", &pointLightData_->position.x, 0.1f);
+		ImGui::DragFloat("intensity##point", &pointLightData_->intensity, 0.01f);
+		ImGui::DragFloat("radius##point", &pointLightData_->radius, 0.01f);
+		ImGui::DragFloat("decay##point", &pointLightData_->decay, 0.01f);
 
 	}
 #endif // _DEBUG

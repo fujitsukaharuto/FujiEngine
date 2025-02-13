@@ -20,9 +20,9 @@ void DirectionLight::Debug() {
 #ifdef _DEBUG
 	if (ImGui::CollapsingHeader("directionLight")) {
 
-		ImGui::ColorEdit4("color", &directionLightData_->color.x);
-		ImGui::DragFloat("intensity", &directionLightData_->intensity, 0.01f);
-		ImGui::DragFloat3("direction", &directionLightData_->direction.x, 0.1f);
+		ImGui::ColorEdit4("color##direction", &directionLightData_->color.x);
+		ImGui::DragFloat("intensity##direction", &directionLightData_->intensity, 0.01f);
+		ImGui::DragFloat3("direction##direction", &directionLightData_->direction.x, 0.1f);
 		directionLightData_->direction = directionLightData_->direction.Normalize();
 
 	}
