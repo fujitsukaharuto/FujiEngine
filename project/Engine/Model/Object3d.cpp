@@ -1,7 +1,7 @@
 #include "Object3d.h"
 #include "ModelManager.h"
 #include "DXCom.h"
-#include "PointLightManager.h"
+#include "LightManager.h"
 #include "CameraManager.h"
 
 Object3d::~Object3d() {}
@@ -28,9 +28,8 @@ void Object3d::Draw(Material* mate) {
 
 	ID3D12GraphicsCommandList* cList = DXCom::GetInstance()->GetCommandList();
 	cList->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
-	cList->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
 	cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_->GetGPUVirtualAddress());
-	PointLightManager::GetInstance()->SetLightCommand(cList);
+	LightManager::GetInstance()->SetLightCommand(cList);
 
 	if (model_) {
 		model_->Draw(cList, mate);
@@ -42,9 +41,8 @@ void Object3d::AnimeDraw() {
 
 	ID3D12GraphicsCommandList* cList = DXCom::GetInstance()->GetCommandList();
 	cList->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
-	cList->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
 	cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_->GetGPUVirtualAddress());
-	PointLightManager::GetInstance()->SetLightCommand(cList);
+	LightManager::GetInstance()->SetLightCommand(cList);
 
 	if (model_) {
 		model_->Draw(cList, nullptr);
@@ -106,15 +104,6 @@ void Object3d::CreateWVP() {
 	wvpDate_->WVP = MakeIdentity4x4();
 	wvpDate_->World = MakeIdentity4x4();
 	wvpDate_->WorldInverseTransPose = Transpose(Inverse(wvpDate_->World));
-
-
-	directionalLightResource_ = DXCom::GetInstance()->CreateBufferResource(DXCom::GetInstance()->GetDevice(), sizeof(DirectionalLight));
-	directionalLightData_ = nullptr;
-	directionalLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData_));
-	directionalLightData_->color = { 1.0f,1.0f,1.0f,1.0f };
-	directionalLightData_->direction = { 0.0f,-1.0f,0.0f };
-	directionalLightData_->intensity = 0.3f;
-
 
 	cameraPosResource_ = DXCom::GetInstance()->CreateBufferResource(DXCom::GetInstance()->GetDevice(), sizeof(DirectionalLight));
 	cameraPosData_ = nullptr;

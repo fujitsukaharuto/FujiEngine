@@ -14,22 +14,18 @@ public:
 	static SRVManager* GetInstance();
 
 	void Initialize();
-
 	void Finalize();
 
 	void CreateTextureSRV(uint32_t srvIndex, ID3D12Resource* resource, DXGI_FORMAT format, UINT mipLevels);
-
 	void CreateStructuredSRV(uint32_t srvIndex, ID3D12Resource* resource, UINT numElements, UINT structureByteStride);
 
 	void SetDescriptorHeap();
-
 	void SetGraphicsRootDescriptorTable(UINT rootIndex, uint32_t srvIndex);
 
 	uint32_t Allocate();
 
 	D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(uint32_t index);
 	D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(uint32_t index);
-
 	ID3D12DescriptorHeap* GetSRVHeap() { return descriptorHeap.Get(); }
 
 private:

@@ -112,8 +112,13 @@ void GameRun::Draw() {
 
 void GameRun::DebugGUI() {
 #ifdef _DEBUG
-	ImGui::Begin("SceneDebug");
+	ImGui::Begin("Camera");
 	cameraManager_->GetCamera()->DebugGUI();
+	ImGui::End();
+	ImGui::Begin("Light");
+	lightManager_->DebugGUI();
+	ImGui::End();
+	ImGui::Begin("SceneDebug");
 	sceneManager_->DebugGUI();
 	ImGui::End();
 #endif // _DEBUG

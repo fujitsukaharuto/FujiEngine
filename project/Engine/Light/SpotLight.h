@@ -28,13 +28,9 @@ public:
 
 	SpotLightData* spotLightData_ = nullptr;
 
-#ifdef _DEBUG
 	void Debug();
-#endif // _DEBUG
 
 private:
-
-
 
 private:
 

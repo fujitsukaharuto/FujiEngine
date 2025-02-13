@@ -22,15 +22,19 @@ void Framework::Init() {
 	dxCommon_ = DXCom::GetInstance();
 	dxCommon_->Initialize(win_);
 
+	// srvManager初期化
 	srvManager_ = SRVManager::GetInstance();
 	srvManager_->Initialize();
 
+	// FPS管理
 	fpsKeeper_ = FPSKeeper::GetInstance();
 	fpsKeeper_->Initialize();
 
+	// カメラ管理
 	cameraManager_ = CameraManager::GetInstance();
 	cameraManager_->Initialize();
 
+	// ライン描画
 	line3dDrawer_ = Line3dDrawer::GetInstance();
 	line3dDrawer_->Initialize();
 	line3dDrawer_->SetCamera(cameraManager_->GetCamera());
@@ -48,13 +52,17 @@ void Framework::Init() {
 	audioPlayer_ = AudioPlayer::GetInstance();
 	audioPlayer_->Initialize();
 
+	// object関係
 	textureManager_ = TextureManager::GetInstance();
 	modelManager_ = ModelManager::GetInstance();
 
-	pointLightManager_ = PointLightManager::GetInstance();
-	pointLightManager_->AddPointLight();
-	pointLightManager_->AddSpotLight();
-
+	// ライト管理
+	lightManager_ = LightManager::GetInstance();
+	lightManager_->CreateLight();
+	lightManager_->AddPointLight();
+	lightManager_->AddSpotLight();
+	
+	// パーティクル管理
 	pManager_ = ParticleManager::GetInstance();
 	pManager_->Initialize(dxCommon_, srvManager_);
 
@@ -62,7 +70,7 @@ void Framework::Init() {
 
 	dxCommon_->SettingTexture();
 
-
+	// シーン管理
 	sceneManager_ = SceneManager::GetInstance();
 	sceneManager_->Initialize();
 }

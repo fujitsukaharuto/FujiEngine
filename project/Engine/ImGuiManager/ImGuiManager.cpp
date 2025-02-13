@@ -14,9 +14,7 @@ ImGuiManager* ImGuiManager::GetInstance() {
 }
 
 void ImGuiManager::Init([[maybe_unused]] MyWin* myWin, [[maybe_unused]] DXCom* dxComon) {
-
 	dxCommon_ = dxComon;
-
 #ifdef _DEBUG
 
 	SRVManager* srvManager = SRVManager::GetInstance();
@@ -56,7 +54,6 @@ void ImGuiManager::Init([[maybe_unused]] MyWin* myWin, [[maybe_unused]] DXCom* d
 
 
 #endif // _DEBUG
-
 }
 
 void ImGuiManager::Fin() {
@@ -67,7 +64,6 @@ void ImGuiManager::Fin() {
 	ImGui::DestroyContext();
 
 #endif // _DEBUG
-
 }
 
 void ImGuiManager::Begin() {
@@ -76,14 +72,12 @@ void ImGuiManager::Begin() {
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
 #endif // _DEBUG
-
 }
 
 void ImGuiManager::End() {
 #ifdef _DEBUG
 	ImGui::Render();
 #endif // _DEBUG
-
 }
 
 void ImGuiManager::Draw() {
@@ -92,7 +86,6 @@ void ImGuiManager::Draw() {
 #ifdef _DEBUG
 	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList);
 #endif // _DEBUG
-
 }
 
 void ImGuiManager::SetFontJapanese() {

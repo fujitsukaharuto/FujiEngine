@@ -38,7 +38,14 @@ public:
 	/// </summary>
 	void Draw();
 
+	/// <summary>
+	/// 日本語フォントを使うためにセットする
+	/// </summary>
 	void SetFontJapanese();
+
+	/// <summary>
+	/// 英語用のフォントに戻す
+	/// </summary>
 	void UnSetFont();
 
 private:

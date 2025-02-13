@@ -24,6 +24,8 @@ public:
 
 	void SetPos(const Vector3& pos);
 
+	void SetScale(const Vector2& scale);
+
 	void SetSize(const Vector2& size);
 
 	void SetAngle(float rotate);
@@ -35,6 +37,8 @@ public:
 	void SetFlipY(bool is) { isFlipY_ = is; }
 
 	void SetRange(const Vector2& leftTop, const Vector2& size);
+
+	Vector2 GetDefaultSize() const { return defaultSize_; }
 
 	/*void SetPointLight(PointLight* light) { pointLight_ = light; }
 
@@ -66,9 +70,6 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource_ = nullptr;
 	TransformationMatrix* wvpData_;
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_ = nullptr;
-	DirectionalLight* directionalLightData_ = nullptr;
-
 	Microsoft::WRL::ComPtr<ID3D12Resource> cameraPosResource_ = nullptr;
 	CameraForGPU* cameraPosData_ = nullptr;
 
@@ -77,7 +78,9 @@ private:
 
 	Vector2 anchorPoint_{ 0.5f,0.5f };
 	Vector3 position_ = { 0,0,0 };
+	Vector2 defaultSize_ = {};
 	Vector2 size_ = { 200, 200 };
+	Vector2 scale_ = { 1.0f,1.0f };
 	float rotate_ = 0.0f;
 
 	bool isFlipX_ = false;

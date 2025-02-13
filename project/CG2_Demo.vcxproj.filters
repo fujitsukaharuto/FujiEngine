@@ -71,7 +71,7 @@
     <ClCompile Include="Engine\Light\PointLight.cpp">
       <Filter>Engine\Light</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Light\PointLightManager.cpp">
+    <ClCompile Include="Engine\Light\LightManager.cpp">
       <Filter>Engine\Light</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Light\SpotLight.cpp">
@@ -262,7 +262,7 @@
     <ClInclude Include="Engine\Light\PointLight.h">
       <Filter>Engine\Light</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Light\PointLightManager.h">
+    <ClInclude Include="Engine\Light\LightManager.h">
       <Filter>Engine\Light</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Light\SpotLight.h">

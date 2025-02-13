@@ -1,5 +1,7 @@
 #pragma once
-
+#include <wrl/client.h>
+#include <d3d12.h>
+#include "MatrixCalculation.h"
 
 
 class DirectionLight {
@@ -11,15 +13,16 @@ public:
 
 	void Initialize();
 
-	void Update();
+	void SetLightCommand(ID3D12GraphicsCommandList* commandList);
 
-	void SetCommand();
+	DirectionalLight* directionLightData_ = nullptr;
 
-private:
-
-
+	void Debug();
 
 private:
 
+private:
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> drectionLightResource_ = nullptr;
 
 };

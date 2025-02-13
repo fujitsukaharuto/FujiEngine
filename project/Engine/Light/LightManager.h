@@ -1,20 +1,22 @@
 #pragma once
+#include "DirectionLight.h"
 #include "PointLight.h"
 #include "SpotLight.h"
 #include <d3d12.h>
 #include <memory>
 
-class PointLightManager {
+class LightManager {
 public:
-	PointLightManager() = default;
-	~PointLightManager() = default;
+	LightManager() = default;
+	~LightManager() = default;
 
 public:
 
-	static PointLightManager* GetInstance();
+	static LightManager* GetInstance();
 
 	void Update();
 
+	void CreateLight();
 	void AddPointLight();
 	void AddSpotLight();
 
@@ -23,10 +25,13 @@ public:
 	PointLight* GetPointLight(int num) { return pointLights_[num].get(); }
 	SpotLight* GetSpotLight(int num) { return spotLights_[num].get(); }
 
-private:
+	void DebugGUI();
 
 private:
 
+private:
+
+	std::unique_ptr<DirectionLight> directionLight_;
 	std::vector <std::unique_ptr<PointLight>> pointLights_;
 	std::vector<std::unique_ptr<SpotLight>> spotLights_;
 

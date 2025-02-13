@@ -195,9 +195,6 @@ void GameScene::DebugGUI() {
 	if (ImGui::CollapsingHeader("Sphere")) {
 		ImGui::DragFloat3("scale", &sphere->transform.scale.x, 0.01f);
 		ImGui::DragFloat3("rotate", &sphere->transform.rotate.x, 0.01f);
-		ImGui::DragFloat3("right", &rightDir.x, 0.01f);
-		rightDir = rightDir.Normalize();
-		sphere->SetRightDir(rightDir);
 	}
 
 	ImGui::Unindent();

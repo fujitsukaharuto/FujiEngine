@@ -25,17 +25,18 @@ void SpotLight::SetLightCommand(ID3D12GraphicsCommandList* commandList) {
 
 }
 
-#ifdef _DEBUG
 void SpotLight::Debug() {
-	ImGui::Begin("spotlight");
+#ifdef _DEBUG
+	if (ImGui::CollapsingHeader("spotlight")) {
 
-	ImGui::DragFloat3("position", &spotLightData_->position.x, 0.1f);
-	ImGui::DragFloat("intensity", &spotLightData_->intensity, 0.01f);
-	ImGui::DragFloat("distance", &spotLightData_->distance, 0.01f);
-	ImGui::DragFloat("decay", &spotLightData_->decay, 0.01f);
-	ImGui::DragFloat("cosAngle", &spotLightData_->cosAngle, 0.01f);
-	ImGui::DragFloat("cosFalloffStart", &spotLightData_->cosFalloffStart, 0.01f);
+		ImGui::ColorEdit4("color", &spotLightData_->color.x);
+		ImGui::DragFloat3("position", &spotLightData_->position.x, 0.1f);
+		ImGui::DragFloat("intensity", &spotLightData_->intensity, 0.01f);
+		ImGui::DragFloat("distance", &spotLightData_->distance, 0.01f);
+		ImGui::DragFloat("decay", &spotLightData_->decay, 0.01f);
+		ImGui::DragFloat("cosAngle", &spotLightData_->cosAngle, 0.01f);
+		ImGui::DragFloat("cosFalloffStart", &spotLightData_->cosFalloffStart, 0.01f);
 
-	ImGui::End();
-}
+	}
 #endif // _DEBUG
+}

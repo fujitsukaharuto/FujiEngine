@@ -136,7 +136,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Input\Input.cpp" />
     <ClCompile Include="Engine\Light\DirectionLight.cpp" />
     <ClCompile Include="Engine\Light\PointLight.cpp" />
-    <ClCompile Include="Engine\Light\PointLightManager.cpp" />
+    <ClCompile Include="Engine\Light\LightManager.cpp" />
     <ClCompile Include="Engine\Light\SpotLight.cpp" />
     <ClCompile Include="Engine\Logger\Logger.cpp" />
     <ClCompile Include="Engine\Math\MatrixCalculation.cpp" />
@@ -199,7 +199,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Input\Input.h" />
     <ClInclude Include="Engine\Light\DirectionLight.h" />
     <ClInclude Include="Engine\Light\PointLight.h" />
-    <ClInclude Include="Engine\Light\PointLightManager.h" />
+    <ClInclude Include="Engine\Light\LightManager.h" />
     <ClInclude Include="Engine\Light\SpotLight.h" />
     <ClInclude Include="Engine\Logger\Logger.h" />
     <ClInclude Include="Engine\Math\MatrixCalculation.h" />

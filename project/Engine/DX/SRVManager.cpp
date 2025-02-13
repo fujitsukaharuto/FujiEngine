@@ -18,12 +18,10 @@ SRVManager* SRVManager::GetInstance() {
 }
 
 void SRVManager::Initialize() {
-
 	this->dxcommon_ = DXCom::GetInstance();
 
 	descriptorHeap = dxcommon_->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, kMaxSRVCount_, true);
 	descriptorSize_ = dxcommon_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-
 }
 
 void SRVManager::Finalize() {
@@ -32,7 +30,6 @@ void SRVManager::Finalize() {
 
 
 void SRVManager::CreateTextureSRV(uint32_t srvIndex, ID3D12Resource* resource, DXGI_FORMAT format, UINT mipLevels) {
-
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
 	srvDesc.Format = format;
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -44,7 +41,6 @@ void SRVManager::CreateTextureSRV(uint32_t srvIndex, ID3D12Resource* resource, D
 
 
 void SRVManager::CreateStructuredSRV(uint32_t srvIndex, ID3D12Resource* resource, UINT numElements, UINT structureByteStride) {
-
 	D3D12_SHADER_RESOURCE_VIEW_DESC instancingSrvDesc{};
 	instancingSrvDesc.Format = DXGI_FORMAT_UNKNOWN;
 	instancingSrvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -55,7 +51,6 @@ void SRVManager::CreateStructuredSRV(uint32_t srvIndex, ID3D12Resource* resource
 	instancingSrvDesc.Buffer.StructureByteStride = structureByteStride;
 
 	dxcommon_->GetDevice()->CreateShaderResourceView(resource, &instancingSrvDesc, GetCPUDescriptorHandle(srvIndex));
-
 }
 
 void SRVManager::SetDescriptorHeap() {
@@ -65,14 +60,11 @@ void SRVManager::SetDescriptorHeap() {
 }
 
 void SRVManager::SetGraphicsRootDescriptorTable(UINT rootIndex, uint32_t srvIndex) {
-
 	dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(rootIndex, GetGPUDescriptorHandle(srvIndex));
-
 }
 
 
 uint32_t SRVManager::Allocate() {
-
 	assert(kMaxSRVCount_ != useIndex);
 
 	int index = useIndex;

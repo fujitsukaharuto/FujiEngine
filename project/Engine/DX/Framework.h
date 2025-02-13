@@ -8,7 +8,7 @@
 #include "MyWindow.h"
 #include "GlobalVariables.h"
 #include "ModelManager.h"
-#include "PointLightManager.h"
+#include "LightManager.h"
 #include "CameraManager.h"
 #include "Particle/ParticleManager.h"
 #include "Scene//AbstractSceneFactory.h"
@@ -52,7 +52,7 @@ protected:
 	ModelManager* modelManager_ = nullptr;
 	CameraManager* cameraManager_ = nullptr;
 	ImGuiManager* imguiManager_ = nullptr;
-	PointLightManager* pointLightManager_ = nullptr;
+	LightManager* lightManager_ = nullptr;
 	ParticleManager* pManager_ = nullptr;
 	Line3dDrawer* line3dDrawer_ = nullptr;
 };

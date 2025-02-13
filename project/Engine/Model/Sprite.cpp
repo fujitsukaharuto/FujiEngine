@@ -2,7 +2,7 @@
 #include "DXCom.h"
 #include "PointLight.h"
 #include "SpotLight.h"
-#include "PointLightManager.h"
+#include "LightManager.h"
 
 
 void Sprite::Load(const std::string& fileName) {
@@ -20,9 +20,8 @@ void Sprite::Draw() {
 	cList->IASetIndexBuffer(&indexBufferView_);
 	cList->SetGraphicsRootConstantBufferView(0, material_.GetMaterialResource()->GetGPUVirtualAddress());
 	cList->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
-	cList->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
 	cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_->GetGPUVirtualAddress());
-	PointLightManager::GetInstance()->SetLightCommand(cList);
+	LightManager::GetInstance()->SetLightCommand(cList);
 	cList->SetGraphicsRootDescriptorTable(2, material_.GetTexture()->gpuHandle);
 	cList->DrawIndexedInstanced(6, 1, 0, 0, 0);
 }
@@ -33,6 +32,11 @@ void Sprite::SetColor(const Vector4& color) {
 
 void Sprite::SetPos(const Vector3& pos) {
 	position_ = pos;
+	SetWvp();
+}
+
+void Sprite::SetScale(const Vector2& scale) {
+	scale_ = scale;
 	SetWvp();
 }
 
@@ -129,14 +133,6 @@ void Sprite::InitializeBuffer() {
 	wvpResource_->Map(0, nullptr, reinterpret_cast<void**>(&wvpData_));
 	SetWvp();
 
-	directionalLightResource_ = DXCom::GetInstance()->CreateBufferResource(DXCom::GetInstance()->GetDevice(), sizeof(DirectionalLight));
-	directionalLightData_ = nullptr;
-	directionalLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData_));
-	directionalLightData_->color = { 1.0f,1.0f,1.0f,1.0f };
-	directionalLightData_->direction = { 1.0f,0.0f,0.0f };
-	directionalLightData_->intensity = 1.0f;
-
-
 	cameraPosResource_ = DXCom::GetInstance()->CreateBufferResource(DXCom::GetInstance()->GetDevice(), sizeof(DirectionalLight));
 	cameraPosData_ = nullptr;
 	cameraPosResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraPosData_));
@@ -147,11 +143,12 @@ void Sprite::AdjustTextureSize() {
 	const DirectX::TexMetadata& meta = TextureManager::GetInstance()->GetMetaData(nowtexture);
 
 	size_ = { static_cast<float>(meta.width),static_cast<float>(meta.height) };
+	defaultSize_ = size_;
 	SetWvp();
 }
 
 void Sprite::SetWvp() {
-	Matrix4x4 worldMatrix = Multiply(Multiply(MakeScaleMatrix({ size_.x,size_.y,1.0f }), MakeRotateZMatrix(rotate_)), MakeTranslateMatrix(position_));
+	Matrix4x4 worldMatrix = Multiply(Multiply(MakeScaleMatrix({ size_.x * scale_.x,size_.y * scale_.y,1.0f }), MakeRotateZMatrix(rotate_)), MakeTranslateMatrix(position_));
 	Matrix4x4 viewMatrix = MakeIdentity4x4();
 
 	Matrix4x4 projectionMatrix = MakeOrthographicMatrix(0.0f, 0.0f, float(MyWin::kWindowWidth), float(MyWin::kWindowHeight), 0.0f, 100.0f);

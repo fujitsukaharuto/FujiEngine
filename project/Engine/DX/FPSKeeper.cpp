@@ -42,11 +42,31 @@ void FPSKeeper::Update() {
 	auto currentTime = std::chrono::steady_clock::now();
 	std::chrono::duration<float> deltaTime = currentTime - lastTime_;
 	lastTime_ = currentTime;
-	deltaTime_ = deltaTime.count();
+
+	if (stopFrame_ > 0.0f) {
+		stopFrame_--;
+		isHitStop_ = true;
+		deltaTime_ = deltaTime.count() * stopRate_;
+	} else {
+		isHitStop_ = false;
+		deltaTime_ = deltaTime.count();
+	}
 
 }
 
-
 float FPSKeeper::DeltaTime() {
 	return ((GetInstance()->deltaTime_) * 60.0f);
+}
+
+float FPSKeeper::DeltaTimeFrame() {
+	return (GetInstance()->deltaTime_);
+}
+
+void FPSKeeper::SetHitStopRate(float rate) {
+	GetInstance()->stopRate_ = rate;
+}
+
+void FPSKeeper::SetHitStopFrame(float frame) {
+	GetInstance()->stopFrame_ = frame;
+	GetInstance()->isHitStop_ = true;
 }

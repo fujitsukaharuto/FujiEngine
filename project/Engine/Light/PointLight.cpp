@@ -3,7 +3,6 @@
 #include "ImGuiManager/ImGuiManager.h"
 
 void PointLight::Initialize() {
-
 	pointLightResource_ = DXCom::GetInstance()->CreateBufferResource(DXCom::GetInstance()->GetDevice(), sizeof(PointLightData));
 	pointLightData_ = nullptr;
 	pointLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&pointLightData_));
@@ -12,7 +11,6 @@ void PointLight::Initialize() {
 	pointLightData_->intensity = 1.0f;
 	pointLightData_->radius = 6.0f;
 	pointLightData_->decay = 2.0f;
-
 }
 
 
@@ -22,15 +20,17 @@ void PointLight::SetLightCommand(ID3D12GraphicsCommandList* commandList) {
 
 }
 
-#ifdef _DEBUG
+
 void PointLight::Debug() {
-	ImGui::Begin("spotlight");
+#ifdef _DEBUG
+	if (ImGui::CollapsingHeader("pointlight")) {
 
-	ImGui::DragFloat3("position", &pointLightData_->position.x, 0.1f);
-	ImGui::DragFloat("intensity", &pointLightData_->intensity, 0.01f);
-	ImGui::DragFloat("distance", &pointLightData_->radius, 0.01f);
-	ImGui::DragFloat("decay", &pointLightData_->decay, 0.01f);
+		ImGui::ColorEdit4("color", &pointLightData_->color.x);
+		ImGui::DragFloat3("position", &pointLightData_->position.x, 0.1f);
+		ImGui::DragFloat("intensity", &pointLightData_->intensity, 0.01f);
+		ImGui::DragFloat("radius", &pointLightData_->radius, 0.01f);
+		ImGui::DragFloat("decay", &pointLightData_->decay, 0.01f);
 
-	ImGui::End();
-}
+	}
 #endif // _DEBUG
+}

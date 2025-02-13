@@ -23,6 +23,10 @@ public:
 		return *this;
 	}
 
+	bool operator==(const Vector3& other) const { return x == other.x && y == other.y && z == other.z; }
+	bool operator!=(const Vector3& other) const { return !(*this == other); }
+
+
 	Vector3 operator+()const { return *this; }
 	Vector3 operator-()const { return Vector3(-x, -y, -z); }
 
@@ -68,6 +72,8 @@ public:
 	static Vector3 GetUpVec() { return { 0.0f,1.0f,0.0f }; }
 	static float Dot(const Vector3& a, const Vector3& b) { return a * b; }
 	static float Length(const Vector3& a) { return a.Length(); }
+	static float Distance(const Vector3& a, const Vector3& b) { return (a - b).Length(); }
+	static Vector3 Normalize(const Vector3& v) { v.Normalize(); }
 
 };
 

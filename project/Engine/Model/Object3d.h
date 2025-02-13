@@ -34,8 +34,6 @@ public:
 
 	void SetUVScale(const Vector2& scale, const Vector2& uvTrans);
 
-	void SetRightDir(const Vector3& right) { directionalLightData_->direction = right; }
-
 	void SetCamera(Camera* camera) { this->camera_ = camera; }
 
 	void SetParent(Object3d* parent) { parent_ = parent; }
@@ -47,9 +45,6 @@ public:
 	void SetBillboardMat(const Matrix4x4& mat) { billboardMatrix_ = mat; }
 
 	void SetLightEnable(LightMode mode);
-
-	/*void SetPointLight(PointLight* light) { pointLight_ = light; }
-	void SetSpotLight(SpotLight* light) { spotLight_ = light; }*/
 
 	void SetModel(const std::string& fileName);
 
@@ -66,8 +61,7 @@ private:
 private:
 	Object3dCommon* common_;
 	std::unique_ptr<Model> model_ = nullptr;
-	PointLight* pointLight_;
-	SpotLight* spotLight_;
+
 	Camera* camera_;
 	Object3d* parent_ = nullptr;
 
@@ -75,9 +69,6 @@ private:
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource_ = nullptr;
 	TransformationMatrix* wvpDate_ = nullptr;
-
-	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_ = nullptr;
-	DirectionalLight* directionalLightData_ = nullptr;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> cameraPosResource_ = nullptr;
 	CameraForGPU* cameraPosData_ = nullptr;
