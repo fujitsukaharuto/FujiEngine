@@ -25,6 +25,12 @@ void BasePipeline::SetPipelineState() {
 
 }
 
+void BasePipeline::SetPipelineCSState() {
+	ID3D12GraphicsCommandList* commandList = DXCom::GetInstance()->GetDXCommand()->GetList();
+	commandList->SetComputeRootSignature(rootSignature_.Get());
+	commandList->SetPipelineState(pso_.Get());
+}
+
 void BasePipeline::CreateRootSignature([[maybe_unused]] ID3D12Device* device) {
 }
 

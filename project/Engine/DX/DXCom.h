@@ -14,6 +14,7 @@
 #include "MyWindow.h"
 #include "DXCommand.h"
 #include "DXCompil.h"
+#include "OffscreenManager.h"
 
 #include "FPSKeeper.h"
 #include "PipelineManager.h"
@@ -111,6 +112,8 @@ public:
 
 	PipelineManager* GetPipelineManager()const { return pipeManager_; }
 
+	D3D12_CPU_DESCRIPTOR_HANDLE GetRTVHandle() { return rtvHandles_[2]; }
+
 	/*void Tick();*/
 
 private:
@@ -169,65 +172,19 @@ private:
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc_{};
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles_[3];
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> offscreenrt_ = nullptr;
-	D3D12_RENDER_TARGET_VIEW_DESC offscreenrtvDesc_{};
-	D3D12_CLEAR_VALUE clearColorValue{};
-	uint32_t offscreenSRVIndex_;
-	D3D12_GPU_DESCRIPTOR_HANDLE offTextureHandle_;
-	D3D12_CPU_DESCRIPTOR_HANDLE offTextureHandleCPU_;
-
-
 	Microsoft::WRL::ComPtr<ID3D12Resource> swapChainResources_[2] = { nullptr };
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap_ = nullptr;
 	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc_{};
 
-
 	std::unique_ptr<DXCompil> compiler_ = nullptr;
-
 
 	FPSKeeper* fpsKeeper_ = nullptr;
 
 	PipelineManager* pipeManager_;
 
-
-
-	Microsoft::WRL::ComPtr<ID3D12Resource> shockResource_ = nullptr;
-	ShockWaveData* shockData_;
-
-	Microsoft::WRL::ComPtr<ID3D12Resource> fireResource_ = nullptr;
-	FireElement* fireData_;
-
-	Microsoft::WRL::ComPtr<ID3D12Resource> thunderResource_ = nullptr;
-	LightningElement* thunderData_;
-	int nowTex;
-
-	Microsoft::WRL::ComPtr<ID3D12Resource> cRTResource_ = nullptr;
-	CRTElemnt* crtData_;
-
-
-	Texture* baseTex_;
-	Texture* voronoTex_;
-	Texture* noiseTex_;
-	Texture* noiseDirTex_;
-
-	bool isGrayscale_ = true;
-	bool isNonePost_ = true;
-	bool isMetaBall_ = true;
-	bool isGaussian_ = true;
-	bool isShockWave_ = true;
-	bool isFire_ = true;
-	bool isThunder_ = true;
-	bool isCRT_ = true;
-
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertexGrayResource_ = nullptr;
-	D3D12_VERTEX_BUFFER_VIEW vertexGrayBufferView_{};
-	GrayscaleVertex* grayVertexDate_ = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12Resource> indexGrayResourece_ = nullptr;
-	D3D12_INDEX_BUFFER_VIEW indexGrayBufferView_{};
-	uint32_t* indexGrayData_ = nullptr;
-
+	std::unique_ptr<OffscreenManager> offscreen_;
 
 	bool isPlaneAndSprite_ = true;
 	bool isPlaneParticle_ = false;

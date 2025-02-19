@@ -17,6 +17,7 @@ enum class Pipe : int {
 	Fire,
 	Thunder,
 	CRT,
+	GrayCS,
 };
 
 
@@ -38,6 +39,7 @@ public:
 
 
 	void SetPipeline(Pipe type);
+	void SetCSPipeline(Pipe type);
 
 
 private:

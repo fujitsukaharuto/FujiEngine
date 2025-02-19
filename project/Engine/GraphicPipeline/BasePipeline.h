@@ -21,6 +21,7 @@ public:
 	void Initialize();
 
 	void SetPipelineState();
+	void SetPipelineCSState();
 
 private:
 

@@ -21,6 +21,8 @@ void DXCom::Initialize(MyWin* myWin) {
 	assert(myWin);
 	myWin_ = myWin;
 	pipeManager_ = PipelineManager::GetInstance();
+	offscreen_ = std::make_unique<OffscreenManager>();
+	offscreen_->Init(GetInstance());
 
 	CreateDevice();
 	CreateCommand();
@@ -158,71 +160,8 @@ void DXCom::CreateRenderTargets() {
 	device_->CreateRenderTargetView(swapChainResources_[1].Get(), &rtvDesc_, rtvHandles_[1]);
 
 	rtvHandles_[2].ptr = rtvHandles_[1].ptr + device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-	offscreenrtvDesc_.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-	offscreenrtvDesc_.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 
-	clearColorValue.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-	clearColorValue.Color[0] = 0.1f;
-	clearColorValue.Color[1] = 0.25f;
-	clearColorValue.Color[2] = 0.5f;
-	clearColorValue.Color[3] = 1.0f;
-
-	offscreenrt_ = CreateOffscreenTextureResource(
-		device_.Get(), MyWin::kWindowWidth, MyWin::kWindowHeight, clearColorValue);
-
-	device_->CreateRenderTargetView(offscreenrt_.Get(), &offscreenrtvDesc_, rtvHandles_[2]);
-
-
-	shockResource_ = CreateBufferResource(device_, sizeof(ShockWaveData));
-	shockData_ = nullptr;
-	shockResource_->Map(0, nullptr, reinterpret_cast<void**>(&shockData_));
-	shockData_->center = { 0.5f,0.5f,0.0f,0.0f };
-	shockData_->shockTime = 0.0f;
-	shockData_->radius = 1.0f;
-	shockData_->intensity = 0.15f;
-	shockData_->padding = 0.0f;
-
-
-	fireResource_ = CreateBufferResource(device_, sizeof(FireElement));
-	fireData_ = nullptr;
-	fireResource_->Map(0, nullptr, reinterpret_cast<void**>(&fireData_));
-	fireData_->animeTime = 0.0f;
-	fireData_->resolution = { 1280.0f, 720.0f };
-	fireData_->distortionStrength = 0.18f;
-	fireData_->highlightStrength = 0.6f;
-	fireData_->detailScale = 7.99f;
-	fireData_->rangeMin = { 0.05f,0.3f };
-	fireData_->rangeMax = { 0.93f,2.82f };
-	fireData_->scale = 1.20f;
-	fireData_->speed = 4.01f;
-	fireData_->noiseSpeed = -0.12f;
-	fireData_->blendStrength = 2.0f;
-
-
-	thunderResource_ = CreateBufferResource(device_, sizeof(LightningElement));
-	thunderData_ = nullptr;
-	thunderResource_->Map(0, nullptr, reinterpret_cast<void**>(&thunderData_));
-	thunderData_->time = 0.0f;
-	thunderData_->resolution = { 1280.0f, 720.0f };
-	thunderData_->mainBranchStrength = 25.0f;
-	thunderData_->branchCount = 4.0f;
-	thunderData_->branchFade = 20.0f;
-	thunderData_->highlightStrength = 15.0f;
-	thunderData_->noiseScale = 0.2f;
-	thunderData_->noiseSpeed = 5.0f;
-	thunderData_->rangeMin = { 0.0f,0.0f };
-	thunderData_->rangeMax = { 1.0f,1.0f };
-	thunderData_->startPos = { 0.5f,0.3f };
-	thunderData_->endPos = { 0.5f,0.8f };
-	thunderData_->branchStrngth = 4.0f;
-	thunderData_->boltCount = 3.0f;
-
-
-	cRTResource_ = CreateBufferResource(device_, sizeof(CRTElemnt));
-	crtData_ = nullptr;
-	cRTResource_->Map(0, nullptr, reinterpret_cast<void**>(&crtData_));
-	crtData_->crtTime = 0.0f;
-	crtData_->resolution = { 1280.0f, 720.0f };
+	offscreen_->CreateResource();
 
 }
 
@@ -270,45 +209,6 @@ void DXCom::SettingGraphicPipeline() {
 		particles_[index].velocity = { 0.0f,1.0f,0.0f };
 	}*/
 
-
-	vertexGrayResource_ = CreateBufferResource(device_.Get(), sizeof(GrayscaleVertex) * 6);
-
-	vertexGrayBufferView_.BufferLocation = vertexGrayResource_->GetGPUVirtualAddress();
-	vertexGrayBufferView_.SizeInBytes = sizeof(GrayscaleVertex) * 6;
-	vertexGrayBufferView_.StrideInBytes = sizeof(GrayscaleVertex);
-
-	grayVertexDate_ = nullptr;
-	vertexGrayResource_->Map(0, nullptr, reinterpret_cast<void**>(&grayVertexDate_));
-
-	grayVertexDate_[0] = { Vector4(-1.0f,-1.0f,0.0f,1.0f),Vector2(0.0f,1.0f) };
-	grayVertexDate_[1] = { Vector4(-1.0f,1.0f,0.0f,1.0f),Vector2(0.0f,0.0f) };
-	grayVertexDate_[2] = { Vector4(1.0f,1.0f,0.0f,1.0f),Vector2(1.0f,0.0f) };
-	grayVertexDate_[3] = { Vector4(1.0f,-1.0f,0.0f,1.0f),Vector2(1.0f,1.0f) };
-
-
-	indexGrayResourece_ = CreateBufferResource(device_.Get(), sizeof(uint32_t) * 6);
-
-	indexGrayBufferView_.BufferLocation = indexGrayResourece_->GetGPUVirtualAddress();
-	indexGrayBufferView_.SizeInBytes = sizeof(uint32_t) * 6;
-	indexGrayBufferView_.Format = DXGI_FORMAT_R32_UINT;
-
-	indexGrayResourece_->Map(0, nullptr, reinterpret_cast<void**>(&indexGrayData_));
-
-	indexGrayData_[0] = 0;
-	indexGrayData_[1] = 1;
-	indexGrayData_[2] = 2;
-	indexGrayData_[3] = 0;
-	indexGrayData_[4] = 2;
-	indexGrayData_[5] = 3;
-
-	isGrayscale_ = false;
-	isNonePost_ = true;
-	isMetaBall_ = false;
-	isGaussian_ = false;
-	isShockWave_ = false;
-	isFire_ = false;
-	isThunder_ = false;
-	isCRT_ = false;
 }
 
 void DXCom::CreateBarrier(D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after) {
@@ -329,23 +229,7 @@ void DXCom::SettingTexture() {
 	//const uint32_t descriptorSizeRTV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	//const uint32_t descriptorSizeDSV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
-
-	SRVManager* srvManager = SRVManager::GetInstance();
-	offscreenSRVIndex_ = srvManager->Allocate();
-
-	srvManager->CreateTextureSRV(offscreenSRVIndex_, offscreenrt_.Get(), DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, 1);
-
-	offTextureHandleCPU_ = srvManager->GetCPUDescriptorHandle(offscreenSRVIndex_);
-	offTextureHandle_ = srvManager->GetGPUDescriptorHandle(offscreenSRVIndex_);
-
-	baseTex_ = TextureManager::GetInstance()->LoadTexture("Gradient02.jpg");
-	voronoTex_ = TextureManager::GetInstance()->LoadTexture("T_Noise04.jpg");
-	noiseTex_ = TextureManager::GetInstance()->LoadTexture("T_Noise02-300x300.jpg");
-	noiseDirTex_ = TextureManager::GetInstance()->LoadTexture("Noise_Dir.jpg");
-	noiseDirTex_ = TextureManager::GetInstance()->LoadTexture("worley_Noise.jpg");
-	noiseDirTex_ = TextureManager::GetInstance()->LoadTexture("perlin_Noise.png");
-	nowTex = 2;
-
+	offscreen_->SettingTexture();
 
 	CommandExecution();
 }
@@ -355,7 +239,7 @@ void DXCom::PreDraw() {
 	D3D12_RESOURCE_BARRIER offbarrier{};
 	offbarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	offbarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	offbarrier.Transition.pResource = offscreenrt_.Get();
+	offbarrier.Transition.pResource = offscreen_->GetOffscreenResource().Get();
 	offbarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_GENERIC_READ;
 	offbarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	command_->GetList()->ResourceBarrier(1, &offbarrier);
@@ -383,7 +267,7 @@ void DXCom::PostEffect() {
 	D3D12_RESOURCE_BARRIER offbarrier{};
 	offbarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	offbarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	offbarrier.Transition.pResource = offscreenrt_.Get();
+	offbarrier.Transition.pResource = offscreen_->GetOffscreenResource().Get();
 	offbarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	offbarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
 	commandList->ResourceBarrier(1, &offbarrier);
@@ -400,96 +284,7 @@ void DXCom::PostEffect() {
 	float clearColor[] = { 0.1f,0.25f,0.5f,1.0f };
 	commandList->ClearRenderTargetView(rtvHandles_[backBufferIndex], clearColor, 0, nullptr);
 
-
-
-
-	if (isGrayscale_) {
-		command_->SetViewAndscissor();
-		pipeManager_->SetPipeline(Pipe::Gray);
-
-		commandList->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		commandList->IASetIndexBuffer(&indexGrayBufferView_);
-		commandList->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
-		commandList->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
-		commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
-	}
-
-
-	if (isGaussian_) {
-		command_->SetViewAndscissor();
-		pipeManager_->SetPipeline(Pipe::Gauss);
-
-		commandList->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		commandList->IASetIndexBuffer(&indexGrayBufferView_);
-		commandList->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
-		commandList->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
-		commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
-	}
-
-	if (isNonePost_ || isMetaBall_) {
-		command_->SetViewAndscissor();
-		pipeManager_->SetPipeline(Pipe::None);
-
-		commandList->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		commandList->IASetIndexBuffer(&indexGrayBufferView_);
-		commandList->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
-		commandList->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
-		commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
-	}
-
-	if (isShockWave_) {
-		command_->SetViewAndscissor();
-		pipeManager_->SetPipeline(Pipe::ShockWave);
-
-		commandList->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		commandList->IASetIndexBuffer(&indexGrayBufferView_);
-		commandList->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
-		commandList->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
-		commandList->SetGraphicsRootConstantBufferView(1, shockResource_->GetGPUVirtualAddress());
-		commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
-	}
-
-	if (isFire_) {
-		command_->SetViewAndscissor();
-		pipeManager_->SetPipeline(Pipe::Fire);
-
-		commandList->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		commandList->IASetIndexBuffer(&indexGrayBufferView_);
-		commandList->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
-		commandList->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
-		commandList->SetGraphicsRootDescriptorTable(1, baseTex_->gpuHandle);
-		commandList->SetGraphicsRootDescriptorTable(2, voronoTex_->gpuHandle);
-		commandList->SetGraphicsRootDescriptorTable(3, noiseTex_->gpuHandle);
-		commandList->SetGraphicsRootConstantBufferView(4, fireResource_->GetGPUVirtualAddress());
-		commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
-	}
-
-
-	if (isThunder_) {
-		command_->SetViewAndscissor();
-		pipeManager_->SetPipeline(Pipe::Thunder);
-
-		commandList->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		commandList->IASetIndexBuffer(&indexGrayBufferView_);
-		commandList->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
-		commandList->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
-		commandList->SetGraphicsRootDescriptorTable(1, noiseDirTex_->gpuHandle);
-		commandList->SetGraphicsRootConstantBufferView(2, thunderResource_->GetGPUVirtualAddress());
-		commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
-	}
-
-	if (isCRT_) {
-		command_->SetViewAndscissor();
-		pipeManager_->SetPipeline(Pipe::CRT);
-
-		commandList->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		commandList->IASetIndexBuffer(&indexGrayBufferView_);
-		commandList->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
-		commandList->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
-		commandList->SetGraphicsRootConstantBufferView(1, cRTResource_->GetGPUVirtualAddress());
-		commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
-	}
-
+	offscreen_->Command();
 }
 
 void DXCom::PostDraw() {
@@ -529,7 +324,7 @@ void DXCom::SetRenderTargets() {
 
 void DXCom::ClearRenderTarget() {
 
-	command_->GetList()->ClearRenderTargetView(rtvHandles_[2], clearColorValue.Color, 0, nullptr);
+	command_->GetList()->ClearRenderTargetView(rtvHandles_[2], offscreen_->GetClearColorValue().Color, 0, nullptr);
 }
 
 void DXCom::ClearDepthBuffer() {
@@ -541,177 +336,7 @@ void DXCom::ClearDepthBuffer() {
 void DXCom::UpDate() {
 	/*Tick();*/
 
-#ifdef _DEBUG
-	ImGui::Begin("debug");
-
-
-	bool preIsGrayscale_ = isGrayscale_;
-	bool preIsNonePost_ = isNonePost_;
-	bool preIsMetaBall_ = isMetaBall_;
-	bool preIsGaussian_ = isGaussian_;
-	bool preIsShock_ = isShockWave_;
-	bool preIsFire_ = isFire_;
-	bool preIsThunder_ = isThunder_;
-	bool preIsCRT_ = isCRT_;
-
-	if (ImGui::TreeNode("OffScreen ShaderPath")) {
-		ImGui::Checkbox("Gray", &isGrayscale_);
-		ImGui::Checkbox("None", &isNonePost_);
-		ImGui::Checkbox("Meta", &isMetaBall_);
-		ImGui::Checkbox("Blur", &isGaussian_);
-		ImGui::Checkbox("shock", &isShockWave_);
-		ImGui::Checkbox("fire", &isFire_);
-		ImGui::Checkbox("thunder", &isThunder_);
-		ImGui::Checkbox("crt", &isCRT_);
-		ImGui::TreePop();
-	}
-	if (isGrayscale_ && !(preIsGrayscale_)) {
-		isNonePost_ = false;
-		isMetaBall_ = false;
-		isGaussian_ = false;
-		isShockWave_ = false;
-		isFire_ = false;
-		isThunder_ = false;
-		isCRT_ = false;
-	}
-	if (isNonePost_ && !(preIsNonePost_)) {
-		isGrayscale_ = false;
-		isMetaBall_ = false;
-		isGaussian_ = false;
-		isShockWave_ = false;
-		isFire_ = false;
-		isThunder_ = false;
-		isCRT_ = false;
-	}
-	if (isMetaBall_ && !(preIsMetaBall_)) {
-		isGrayscale_ = false;
-		isNonePost_ = false;
-		isGaussian_ = false;
-		isShockWave_ = false;
-		isFire_ = false;
-		isThunder_ = false;
-		isCRT_ = false;
-	}
-	if (isGaussian_ && !(preIsGaussian_)) {
-		isGrayscale_ = false;
-		isNonePost_ = false;
-		isMetaBall_ = false;
-		isShockWave_ = false;
-		isFire_ = false;
-		isThunder_ = false;
-		isCRT_ = false;
-	}
-	if (isShockWave_ && !(preIsShock_)) {
-		isGrayscale_ = false;
-		isNonePost_ = false;
-		isMetaBall_ = false;
-		isGaussian_ = false;
-		isFire_ = false;
-		isThunder_ = false;
-		isCRT_ = false;
-	}
-	if (isFire_ && !(preIsFire_)) {
-		isGrayscale_ = false;
-		isNonePost_ = false;
-		isMetaBall_ = false;
-		isGaussian_ = false;
-		isShockWave_ = false;
-		isThunder_ = false;
-		isCRT_ = false;
-	}
-	if (isThunder_ && !(preIsThunder_)) {
-		isGrayscale_ = false;
-		isNonePost_ = false;
-		isMetaBall_ = false;
-		isGaussian_ = false;
-		isShockWave_ = false;
-		isFire_ = false;
-		isCRT_ = false;
-	}
-	if (isCRT_ && !(preIsCRT_)) {
-		isGrayscale_ = false;
-		isNonePost_ = false;
-		isMetaBall_ = false;
-		isGaussian_ = false;
-		isShockWave_ = false;
-		isFire_ = false;
-		isThunder_ = false;
-	}
-
-
-
-	if (ImGui::Button("shock")) {
-		shockData_->shockTime = 0.0f;
-	}
-
-	if (ImGui::TreeNode("FireData")) {
-		ImGui::DragFloat("animeTime", &fireData_->animeTime, 0.1f, 0.0f, 60.0f);
-		ImGui::DragFloat2("resolution", &fireData_->resolution.x);
-		ImGui::DragFloat("distortionStrength", &fireData_->distortionStrength, 0.01f);
-		ImGui::DragFloat("highlightStrength", &fireData_->highlightStrength, 0.01f);
-		ImGui::DragFloat("detailScale", &fireData_->detailScale, 0.01f);
-		ImGui::DragFloat2("rangeMin", &fireData_->rangeMin.x, 0.01f);
-		ImGui::DragFloat2("rangeMax", &fireData_->rangeMax.x, 0.01f);
-		ImGui::DragFloat("scale", &fireData_->scale, 0.01f);
-		ImGui::DragFloat("speed", &fireData_->speed, 0.01f);
-		ImGui::DragFloat("noiseSpeed", &fireData_->noiseSpeed, 0.01f);
-		ImGui::DragFloat("blend", &fireData_->blendStrength, 0.01f);
-		ImGui::TreePop();
-	}
-
-
-	if (ImGui::TreeNode("ThunderData")) {
-		ImGui::DragFloat2("startPos", &thunderData_->startPos.x, 0.01f);
-		ImGui::DragFloat2("endPos", &thunderData_->endPos.x, 0.01f);
-		ImGui::DragFloat("time", &thunderData_->time, 0.1f, 0.0f, 60.0f);
-		ImGui::DragFloat2("resolution", &thunderData_->resolution.x);
-		ImGui::DragFloat("mainBranchStrength", &thunderData_->mainBranchStrength, 0.1f);
-		ImGui::DragFloat("branchStrength", &thunderData_->branchStrngth, 0.1f);
-		ImGui::DragFloat("branchCount", &thunderData_->branchCount, 1);
-		ImGui::DragFloat("branchFade", &thunderData_->branchFade, 0.1f);
-		ImGui::DragFloat("highlightStrength", &thunderData_->highlightStrength, 0.1f);
-		ImGui::DragFloat("noiseScale", &thunderData_->noiseScale, 0.01f);
-		ImGui::DragFloat("noiseSpeed", &thunderData_->noiseSpeed, 0.1f);
-		ImGui::DragFloat2("rangeMin", &thunderData_->rangeMin.x, 0.01f);
-		ImGui::DragFloat2("rangeMax", &thunderData_->rangeMax.x, 0.01f);
-		ImGui::DragFloat("boltCount", &thunderData_->boltCount, 0.1f);
-		ImGui::DragFloat("progres", &thunderData_->progres, 0.1f, 0.0f, 1.0f);
-
-		int tex = nowTex;
-		ImGui::Combo("sizeType##type", &tex, "Noise_Dir.jpg\0worley_Noise.jpg\0perlin_Noise.png\0");
-		if (tex != nowTex) {
-			if (tex == 0) {
-				noiseDirTex_ = TextureManager::GetInstance()->LoadTexture("Noise_Dir.jpg");
-				nowTex = tex;
-			}
-			if (tex == 1) {
-				noiseDirTex_ = TextureManager::GetInstance()->LoadTexture("worley_Noise.jpg");
-				nowTex = tex;
-			}
-			if (tex == 2) {
-				noiseDirTex_ = TextureManager::GetInstance()->LoadTexture("perlin_Noise.png");
-				nowTex = tex;
-			}
-		}
-
-
-		ImGui::TreePop();
-	}
-
-	ImGui::End();
-
-	shockData_->shockTime += 0.025f;
-	fireData_->animeTime += 0.025f;
-	thunderData_->time += 0.005f;
-
-	thunderData_->time = std::fmodf(thunderData_->time, 1.5f);
-	thunderData_->progres = thunderData_->time / 1.5f;
-
-	crtData_->crtTime += 0.025f;
-
-#endif // _DEBUG
-
-
+	offscreen_->Update();
 
 	/*transform.rotate.y += 0.05f;*/
 	/*Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);*/
