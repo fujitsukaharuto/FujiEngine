@@ -113,10 +113,10 @@ struct FireElement {
 	float blendStrength;// どれくらい混ぜるか
 };
 
-//struct CRTElemnt {
-//	float crtTime;
-//	Vector2 resolution;
-//};
+struct CRTElemnt {
+	float crtTime;
+	Vector2 resolution;
+};
 
 struct LightningElement {
 	Vector2 startPos;

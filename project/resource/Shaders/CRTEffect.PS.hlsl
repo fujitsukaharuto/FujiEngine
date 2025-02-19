@@ -27,17 +27,17 @@ float3 scanline(float2 coord, float3 screen)
 
 float2 crt(float2 coord, float bend)
 {
-    // 中心座標系に変換
-    coord = (coord - 0.5) * 2.0;
+    //// 中心座標系に変換
+    //coord = (coord - 0.5) * 2.0;
 
-    coord *= 1.1;
+    //coord *= 1.1;
 
-    // 座標の変形
-    coord.x *= 1.0 + pow(abs(coord.y) / bend, 2.0);
-    coord.y *= 1.0 + pow(abs(coord.x) / bend, 2.0);
+    //// 座標の変形
+    //coord.x *= 1.0 + pow(abs(coord.y) / bend, 2.0);
+    //coord.y *= 1.0 + pow(abs(coord.x) / bend, 2.0);
 
-    // 0.0 - 1.0 の空間に戻す
-    coord = (coord / 2.0) + 0.5;
+    //// 0.0 - 1.0 の空間に戻す
+    //coord = (coord / 2.0) + 0.5;
 
     return coord;
 }
@@ -45,9 +45,9 @@ float2 crt(float2 coord, float bend)
 float3 sampleSplit(Texture2D tex, float2 coord)
 {
     float3 frag;
-    frag.r = tex.Sample(samplerState, float2(coord.x - 0.01 * sin(iTime), coord.y)).r;
+    frag.r = tex.Sample(samplerState, float2(coord.x - 0.005 * sin(iTime), coord.y)).r;
     frag.g = tex.Sample(samplerState, float2(coord.x, coord.y)).g;
-    frag.b = tex.Sample(samplerState, float2(coord.x + 0.01 * sin(iTime), coord.y)).b;
+    frag.b = tex.Sample(samplerState, float2(coord.x + 0.005 * sin(iTime), coord.y)).b;
     return frag;
 }
 
