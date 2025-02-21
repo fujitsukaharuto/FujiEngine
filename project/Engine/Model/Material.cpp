@@ -13,7 +13,7 @@ void Material::CreateMaterial() {
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialDate_));
 	//色変えるやつ（Resource）
 	materialDate_->color = { 1.0f,1.0f,1.0f,1.0f };
-	materialDate_->enableLighting = LightMode::kSpotLightON;
+	materialDate_->enableLighting = static_cast<int32_t>(LightMode::kSpotLightON);
 	materialDate_->uvTransform = MakeIdentity4x4();
 	materialDate_->shininess = 50.0f;
 
@@ -51,7 +51,7 @@ void Material::SetTexture(const std::string& name) {
 }
 
 void Material::SetLightEnable(LightMode mode) {
-	materialDate_->enableLighting = mode;
+	materialDate_->enableLighting = static_cast<int32_t>(mode);
 }
 
 Matrix4x4 Material::MakeScale4x4(const Vector3& scale) {

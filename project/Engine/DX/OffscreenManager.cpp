@@ -294,10 +294,6 @@ void OffscreenManager::SettingTexture() {
 
 void OffscreenManager::Command() {
 
-
-
-
-
 	if (isGrayscale_) {
 
 
@@ -305,7 +301,7 @@ void OffscreenManager::Command() {
 		offbarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 		offbarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 		offbarrier.Transition.pResource = offscreenrt_.Get();
-		offbarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_GENERIC_READ;
+		offbarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 		offbarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
 		pDXCom_->GetCommandList()->ResourceBarrier(1, &offbarrier);
 
@@ -364,6 +360,14 @@ void OffscreenManager::Command() {
 		outputbarrierB.Transition.StateAfter = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
 		pDXCom_->GetCommandList()->ResourceBarrier(1, &outputbarrierB);
 
+	} else {
+		D3D12_RESOURCE_BARRIER offbarrier{};
+		offbarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+		offbarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+		offbarrier.Transition.pResource = offscreenrt_.Get();
+		offbarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+		offbarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
+		pDXCom_->GetCommandList()->ResourceBarrier(1, &offbarrier);
 	}
 
 

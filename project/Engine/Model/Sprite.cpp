@@ -1,9 +1,7 @@
 #include "Sprite.h"
 #include "DXCom.h"
-#include "PointLight.h"
-#include "SpotLight.h"
 #include "LightManager.h"
-
+#include "TextureManager.h"
 
 void Sprite::Load(const std::string& fileName) {
 	material_.SetTextureNamePath(fileName);
@@ -21,7 +19,6 @@ void Sprite::Draw() {
 	cList->SetGraphicsRootConstantBufferView(0, material_.GetMaterialResource()->GetGPUVirtualAddress());
 	cList->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
 	cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_->GetGPUVirtualAddress());
-	LightManager::GetInstance()->SetLightCommand(cList);
 	cList->SetGraphicsRootDescriptorTable(2, material_.GetTexture()->gpuHandle);
 	cList->DrawIndexedInstanced(6, 1, 0, 0, 0);
 }

@@ -17,7 +17,6 @@ public:
 	BasePipeline() = default;
 	~BasePipeline();
 
-
 	void Initialize();
 
 	void SetPipelineState();

@@ -46,8 +46,8 @@ public:
 		std::vector<bool> isLive_;
 		std::vector<Vector3> accele{};
 		std::vector<Vector3> speed{};
-		int type = SizeType::kNormal;
-		int speedType = SpeedType::kConstancy;
+		int type = static_cast<int>(SizeType::kNormal);
+		int speedType = static_cast<int>(SpeedType::kConstancy);
 		Vector2 startSize = { 1.0f,1.0f };
 		Vector2 endSize = { 1.0f,1.0f };
 		std::map<std::string, float> anime_;

@@ -110,15 +110,15 @@ void ParticleManager::Update() {
 			SizeType sizeType = SizeType(particle.type);
 			float t = (1.0f - float(float(particle.lifeTime_) / float(particle.startLifeTime_)));
 			switch (sizeType) {
-			case kNormal:
+			case SizeType::kNormal:
 				break;
-			case kShift:
+			case SizeType::kShift:
 
 				particle.transform.scale.x = Lerp(particle.startSize.x, particle.endSize.x, t);
 				particle.transform.scale.y = Lerp(particle.startSize.y, particle.endSize.y, t);
 
 				break;
-			case kSin:
+			case SizeType::kSin:
 
 				Vector2 minSize = particle.startSize; // 最小値
 				Vector2 maxSize = particle.endSize; // 最大値
@@ -139,7 +139,7 @@ void ParticleManager::Update() {
 				break;
 			}
 
-			if (particle.rotateType == kRandomR) {
+			if (particle.rotateType == static_cast<int>(RotateType::kRandomR)) {
 				particle.transform.rotate += Random::GetVector3({ -0.5f,0.5f }, { -0.5f,0.5f }, { -0.2f,0.2f });
 			}
 
@@ -239,9 +239,9 @@ void ParticleManager::Update() {
 			SizeType sizeType = SizeType(group->type);
 			float t = (1.0f - float(float(group->lifeTime[i]) / float(group->startLifeTime_[i])));
 			switch (sizeType) {
-			case kNormal:
+			case SizeType::kNormal:
 				break;
-			case kShift:
+			case SizeType::kShift:
 
 				group->objects_[i]->transform.scale.x = Lerp(group->startSize.x, group->endSize.x, t);
 				group->objects_[i]->transform.scale.y = Lerp(group->startSize.y, group->endSize.y, t);
@@ -420,7 +420,7 @@ void ParticleManager::Emit(const std::string& name, const Vector3& pos, const Ve
 				particle.transform.translate = Random::GetVector3(para.transx, para.transy, para.transz);
 				particle.transform.translate += pos;
 				particle.transform.scale = { grain.startSize.x,grain.startSize.y,1.0f };
-				if (grain.speedType == SpeedType::kCenter) {
+				if (grain.speedType == static_cast<int>(SpeedType::kCenter)) {
 					particle.speed = grain.speed;
 				} else {
 					particle.speed = Random::GetVector3(para.speedx, para.speedy, para.speedz);
@@ -434,10 +434,10 @@ void ParticleManager::Emit(const std::string& name, const Vector3& pos, const Ve
 				Vector3 angleDToD{};
 
 				switch (particle.rotateType) {
-				case kUsually:
+				case static_cast<int>(RotateType::kUsually):
 					particle.transform.rotate = rotate;
 					break;
-				case kVelocityR:
+				case static_cast<int>(RotateType::kVelocityR):
 
 					veloSpeed = particle.speed.Normalize();
 
@@ -453,7 +453,7 @@ void ParticleManager::Emit(const std::string& name, const Vector3& pos, const Ve
 					particle.transform.rotate = angleDToD;
 
 					break;
-				case kRandomR:
+				case static_cast<int>(RotateType::kRandomR):
 					particle.transform.rotate = Random::GetVector3({ -1.0f,1.0f }, { -1.0f,1.0f }, { -1.0f,1.0f });
 					break;
 				}
@@ -464,10 +464,10 @@ void ParticleManager::Emit(const std::string& name, const Vector3& pos, const Ve
 				particle.pattern_ = grain.pattern_;
 				particle.colorType = grain.colorType;
 				switch (particle.colorType) {
-				case kDefault:
+				case static_cast<int>(ColorType::kDefault):
 					particle.color = para.colorMax;
 					break;
-				case kRandom:
+				case static_cast<int>(ColorType::kRandom):
 					particle.color.x = Random::GetFloat(para.colorMin.x, para.colorMax.x);
 					particle.color.y = Random::GetFloat(para.colorMin.y, para.colorMax.y);
 					particle.color.z = Random::GetFloat(para.colorMin.z, para.colorMax.z);
@@ -477,16 +477,16 @@ void ParticleManager::Emit(const std::string& name, const Vector3& pos, const Ve
 
 				SpeedType type = SpeedType(grain.speedType);
 				switch (type) {
-				case kConstancy:
+				case SpeedType::kConstancy:
 					particle.accele = Vector3{ 0.0f,0.0f,0.0f };
 					break;
-				case kChange:
+				case SpeedType::kChange:
 					particle.accele = grain.accele;
 					break;
-				case kReturn:
+				case SpeedType::kReturn:
 					particle.accele = (particle.speed) * grain.returnPower_;
 					break;
-				case kCenter:
+				case SpeedType::kCenter:
 					particle.accele = Vector3{ 0.0f,0.0f,0.0f };
 					break;
 				}
@@ -532,10 +532,10 @@ void ParticleManager::EmitAnime(const std::string& name, const Vector3& pos, con
 
 				SpeedType type = SpeedType(group->speedType);
 				switch (type) {
-				case kConstancy:
+				case SpeedType::kConstancy:
 					group->accele[i] = Vector3{ 0.0f,0.0f,0.0f };
 					break;
-				case kChange:
+				case SpeedType::kChange:
 					group->accele[i] = (group->speed[i]) * -0.05f;
 					break;
 				}

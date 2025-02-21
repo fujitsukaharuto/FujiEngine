@@ -264,15 +264,6 @@ void DXCom::PostEffect() {
 
 	ID3D12GraphicsCommandList* commandList = command_->GetList();
 
-	D3D12_RESOURCE_BARRIER offbarrier{};
-	offbarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	offbarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	offbarrier.Transition.pResource = offscreen_->GetOffscreenResource().Get();
-	offbarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	offbarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
-	commandList->ResourceBarrier(1, &offbarrier);
-
-
 	UINT backBufferIndex = swapChain_->GetCurrentBackBufferIndex();
 
 	CreateBarrier(D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);

@@ -1,5 +1,5 @@
 #pragma once
-#include "MatrixCalculation.h"
+#include "Math/MatrixCalculation.h"
 
 class Camera {
 public:
@@ -8,7 +8,7 @@ public:
 
 public:
 
-	enum ShakeMode {
+	enum class ShakeMode {
 		RandomShake,
 		RollingShake,// 横揺れ
 	};

@@ -2,7 +2,6 @@
 #include <wrl/client.h>
 #include "MatrixCalculation.h"
 #include "Material.h"
-#include "TextureManager.h"
 
 
 

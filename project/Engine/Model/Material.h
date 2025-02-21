@@ -2,7 +2,7 @@
 #include "MatrixCalculation.h"
 #include "TextureManager.h"
 
-enum LightMode {
+enum class LightMode {
 	kLightNone,
 	kLightHalfLambert,
 	kLightLambert,

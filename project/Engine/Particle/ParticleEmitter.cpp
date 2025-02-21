@@ -48,7 +48,7 @@ void ParticleEmitter::DebugGUI() {
 			ImGui::DragFloat2("speedX", &para_.speedx.x, 0.01f);
 			ImGui::DragFloat2("speedY", &para_.speedy.x, 0.01f);
 			ImGui::DragFloat2("speedZ", &para_.speedz.x, 0.01f);
-			if (grain.speedType == SpeedType::kReturn || grain.speedType == SpeedType::kCenter) {
+			if (grain.speedType == static_cast<int>(SpeedType::kReturn) || grain.speedType == static_cast<int>(SpeedType::kCenter)) {
 				ImGui::DragFloat("returnPower", &grain.returnPower_, 0.001f);
 			}
 			ImGui::SeparatorText("accele");
@@ -131,7 +131,7 @@ void ParticleEmitter::Emit() {
 			posAddSize = Random::GetVector3({ emitSizeMin.x,emitSizeMax.x }, { emitSizeMin.y,emitSizeMax.y }, { emitSizeMin.z,emitSizeMax.z });
 			posAddSize += {worldMatrix.m[3][0], worldMatrix.m[3][1], worldMatrix.m[3][2]};
 
-			if (grain.speedType == SpeedType::kCenter) {
+			if (grain.speedType == static_cast<int>(SpeedType::kCenter)) {
 				grain.speed = (pos - posAddSize) * grain.returnPower_;
 			}
 
@@ -155,7 +155,7 @@ void ParticleEmitter::Burst() {
 		posAddSize = Random::GetVector3({ emitSizeMin.x,emitSizeMax.x }, { emitSizeMin.y,emitSizeMax.y }, { emitSizeMin.z,emitSizeMax.z });
 		posAddSize += {worldMatrix.m[3][0], worldMatrix.m[3][1], worldMatrix.m[3][2]};
 
-		if (grain.speedType == SpeedType::kCenter) {
+		if (grain.speedType == static_cast<int>(SpeedType::kCenter)) {
 			grain.speed = (pos - posAddSize).Normalize() * grain.returnPower_;
 		}
 

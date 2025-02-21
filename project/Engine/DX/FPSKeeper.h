@@ -44,6 +44,8 @@ public:
 	/// <param name="frame">フレーム数</param>
 	static void SetHitStopFrame(float frame);
 
+	void Debug();
+
 private:
 
 
@@ -52,6 +54,8 @@ private:
 
 	std::chrono::steady_clock::time_point reference_;
 	std::chrono::steady_clock::time_point lastTime_;
+
+	float fps_ = 0.0f;
 
 	float deltaTime_ = 0.0f;
 	float stopRate_ = 0.0f;

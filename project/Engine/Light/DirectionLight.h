@@ -4,6 +4,15 @@
 #include "MatrixCalculation.h"
 
 
+struct DirectionalLight {
+
+	Vector4 color;
+	Vector3 direction;
+	float intensity;
+
+};
+
+
 class DirectionLight {
 public:
 	DirectionLight() = default;

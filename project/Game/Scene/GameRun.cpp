@@ -120,6 +120,8 @@ void GameRun::DebugGUI() {
 	ImGui::End();
 	ImGui::Begin("SceneDebug");
 	sceneManager_->DebugGUI();
+	fpsKeeper_->Debug();
+	ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
 	ImGui::End();
 #endif // _DEBUG
 }

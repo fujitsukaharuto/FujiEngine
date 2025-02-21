@@ -24,8 +24,8 @@ struct AnimeData {
 	float startLifeTime = 20.0f;
 	bool isLive = true;
 	Vector3 accele{};
-	int type = SizeType::kNormal;
-	int speedType = SpeedType::kConstancy;
+	int type = static_cast<int>(SizeType::kNormal);
+	int speedType = static_cast<int>(SpeedType::kConstancy);
 	Vector2 startSize = { 1.0f,1.0f };
 	Vector2 endSize = { 1.0f,1.0f };
 };

@@ -29,7 +29,6 @@ void Object3d::Draw(Material* mate) {
 	ID3D12GraphicsCommandList* cList = DXCom::GetInstance()->GetCommandList();
 	cList->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
 	cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_->GetGPUVirtualAddress());
-	LightManager::GetInstance()->SetLightCommand(cList);
 
 	if (model_) {
 		model_->Draw(cList, mate);

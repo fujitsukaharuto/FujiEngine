@@ -1,28 +1,26 @@
 #pragma once
-#include "TextureManager.h"
 #include "MatrixCalculation.h"
-#include "Model/Material.h"
 
-enum SizeType {
+enum class SizeType {
 	kNormal,
 	kShift,
 	kSin,
 };
 
-enum SpeedType {
+enum class SpeedType {
 	kConstancy,
 	kChange,
 	kReturn,
 	kCenter,
 };
 
-enum RotateType {
+enum class RotateType {
 	kUsually,
 	kVelocityR,
 	kRandomR,
 };
 
-enum ColorType {
+enum class ColorType {
 	kDefault,
 	kRandom,
 };
@@ -49,10 +47,10 @@ public:
 	Vector3 speed{};
 	Trans transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{ 0.0f,0.0f,0.0f } };
 
-	int type = SizeType::kNormal;
-	int speedType = SpeedType::kConstancy;
-	int rotateType = RotateType::kUsually;
-	int colorType = ColorType::kDefault;
+	int type = static_cast<int>(SizeType::kNormal);
+	int speedType = static_cast<int>(SpeedType::kConstancy);
+	int rotateType = static_cast<int>(RotateType::kUsually);
+	int colorType = static_cast<int>(ColorType::kDefault);
 
 	float returnPower_ = -0.05f;
 

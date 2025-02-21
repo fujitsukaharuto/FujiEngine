@@ -22,12 +22,12 @@ void Camera::Update() {
 	if (shakeTime_ > 0.0f) {
 		float gap;
 		switch (shakeMode_) {
-		case Camera::RandomShake:
+		case Camera::ShakeMode::RandomShake:
 			shakeGap_ = Random::GetVector3({ -0.5f,0.5f }, { -0.5f,0.5f }, { -0.5f,0.5f });
 			shakeGap_.z = 0.0f;
 			shakeGap_ = shakeGap_ * shakeStrength_;
 			break;
-		case Camera::RollingShake:
+		case Camera::ShakeMode::RollingShake:
 			gap = std::sin(rollingTime_);
 			shakeGap_.x = gap * shakeStrength_;
 			rollingTime_ -= FPSKeeper::DeltaTime();

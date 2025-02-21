@@ -39,7 +39,7 @@ struct D3DResourceLeakChecker {
 
 
 
-enum BlendMode {
+enum class BlendMode {
 	// ブレンド無し
 	kBlendModeNone,
 	// 通常αブレンド
@@ -185,13 +185,5 @@ private:
 	PipelineManager* pipeManager_;
 
 	std::unique_ptr<OffscreenManager> offscreen_;
-
-	bool isPlaneAndSprite_ = true;
-	bool isPlaneParticle_ = false;
-	bool isSphere_ = false;
-	bool isFenceModel_ = false;
-	bool isSuzanneModel_ = false;
-	bool isMMesh_ = false;
-
 
 };

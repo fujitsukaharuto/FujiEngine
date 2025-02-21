@@ -18,11 +18,61 @@ using namespace Microsoft::WRL;
 
 class DXCom;
 
-
+#pragma region 構造体群
 struct GrayCS {
 	Vector3 gray_;
 };
 
+struct GrayscaleVertex {
+	Vector4 position;
+	Vector2 texcoord;
+};
+
+struct ShockWaveData {
+	Vector4 center;
+	float shockTime;
+	float radius;
+	float intensity;// 歪みの強さ
+	float padding;
+};
+
+struct FireElement {
+	float animeTime; // アニメーション時間
+	Vector2 resolution; // 画面解像度
+	float distortionStrength; // UVディストーションの強度
+	float highlightStrength; // ハイライトの強度
+	float detailScale; // 細かいノイズのスケール
+	Vector2 rangeMin; // 炎の描画範囲（最小UV）
+	Vector2 rangeMax; // 炎の描画範囲（最大UV）
+	float scale; // Voronoiノイズのスケール
+	float speed; // 炎の揺らぎ速度
+	float noiseSpeed; // 細かいノイズの移動速度
+	float blendStrength;// どれくらい混ぜるか
+};
+
+struct CRTElemnt {
+	float crtTime;
+	Vector2 resolution;
+};
+
+struct LightningElement {
+	Vector2 startPos;
+	Vector2 endPos;
+	Vector2 rangeMin; // 描画範囲（最小UV）
+	Vector2 rangeMax; // 描画範囲（最大UV）
+	Vector2 resolution; // 画面解像度
+	float time; // アニメーション時間
+	float mainBranchStrength; // 主幹の強度
+	float branchCount; // 分岐の数
+	float branchFade; // 分岐のフェード率
+	float highlightStrength; // ハイライトの強度
+	float noiseScale; // ノイズのスケール
+	float noiseSpeed; // ノイズの移動速度
+	float branchStrngth;
+	float boltCount;
+	float progres;
+};
+#pragma endregion
 
 class OffscreenManager {
 public:

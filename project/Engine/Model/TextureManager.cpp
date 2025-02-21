@@ -2,7 +2,6 @@
 #include "DXCom.h"
 #include "Logger.h"
 #include "SRVManager.h"
-#include "ImGuiManager.h"
 
 #include "externals/DirectXTex/DirectXTex.h"
 #include "externals/DirectXTex/d3dx12.h"

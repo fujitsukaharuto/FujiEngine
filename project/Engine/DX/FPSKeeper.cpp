@@ -1,5 +1,6 @@
 #include "FPSKeeper.h"
 #include <thread>
+#include "ImGuiManager/ImGuiManager.h"
 
 FPSKeeper::FPSKeeper() {
 }
@@ -42,16 +43,19 @@ void FPSKeeper::Update() {
 	auto currentTime = std::chrono::steady_clock::now();
 	std::chrono::duration<float> deltaTime = currentTime - lastTime_;
 	lastTime_ = currentTime;
+	deltaTime_ = deltaTime.count();
+
+	if (deltaTime_ > 0.0f) {
+		fps_ = 1.0f / deltaTime_;
+	}
 
 	if (stopFrame_ > 0.0f) {
 		stopFrame_--;
 		isHitStop_ = true;
-		deltaTime_ = deltaTime.count() * stopRate_;
+		deltaTime_ = deltaTime_ * stopRate_;
 	} else {
 		isHitStop_ = false;
-		deltaTime_ = deltaTime.count();
 	}
-
 }
 
 float FPSKeeper::DeltaTime() {
@@ -69,4 +73,10 @@ void FPSKeeper::SetHitStopRate(float rate) {
 void FPSKeeper::SetHitStopFrame(float frame) {
 	GetInstance()->stopFrame_ = frame;
 	GetInstance()->isHitStop_ = true;
+}
+
+void FPSKeeper::Debug() {
+#ifdef _DEBUG
+	ImGui::Text("FPS: %.1f", fps_);
+#endif // _DEBUG
 }
