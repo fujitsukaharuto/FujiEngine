@@ -4,6 +4,7 @@
 #include "Model/Model.h"
 #include "Camera.h"
 #include "Model/Object3dCommon.h"
+#include "Math/Animation/Animation.h"
 
 
 class PointLight;
@@ -15,6 +16,8 @@ public:
 	~AnimationModel();
 
 public:
+
+	void LoadAnimationFile(const std::string& filename);
 
 	void Create(const std::string& fileName);
 
@@ -48,6 +51,8 @@ public:
 
 	void SetModel(const std::string& fileName);
 
+	void IsAnimation(bool is) { isAnimation_ = is; }
+
 	Trans transform{};
 
 private:
@@ -58,7 +63,11 @@ private:
 
 	void SetBillboardWVP();
 
+	Vector3 CalculationValue(const std::vector<KeyframeVector3>& keyframe, float time);
+	Quaternion CalculationValue(const std::vector<KeyframeQuaternion>& keyframe, float time);
+
 private:
+	const std::string kDirectoryPath_ = "resource/";
 	Object3dCommon* common_;
 	std::unique_ptr<Model> model_ = nullptr;
 
@@ -67,9 +76,12 @@ private:
 
 	bool isCameraParent_ = false;
 
+	bool isAnimation_ = true;
+	float animationTime_ = 0.0f;
+	Animation animation_;
+
 	Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource_ = nullptr;
 	TransformationMatrix* wvpDate_ = nullptr;
-
 	Microsoft::WRL::ComPtr<ID3D12Resource> cameraPosResource_ = nullptr;
 	CameraForGPU* cameraPosData_ = nullptr;
 

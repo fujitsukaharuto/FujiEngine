@@ -6,6 +6,7 @@
 #include "Vector2.h"
 #include "Vector3.h"
 #include "Vector2Matrix.h"
+#include "Quaternion.h"
 
 struct Vector4 {
 	float x;
@@ -156,6 +157,8 @@ Matrix4x4 MakeRotateZMatrix(float rad);
 Matrix4x4 MakeRotateXYZMatrix(const Vector3& rota);
 
 Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Vector3& translate);
+
+Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Quaternion& rotate, const Vector3& translate);
 
 Matrix4x4 MakePerspectiveFovMatrix(float fovy, float aspectRation, float nearClip, float farClip);
 

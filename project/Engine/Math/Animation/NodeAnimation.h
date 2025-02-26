@@ -11,6 +11,6 @@ struct AnimationCurve {
 
 struct NodeAnimation {
 	AnimationCurve<Vector3> translate;
-	AnimationCurve<Quaternion> translate;
+	AnimationCurve<Quaternion> rotate;
 	AnimationCurve<Vector3> scale;
 };

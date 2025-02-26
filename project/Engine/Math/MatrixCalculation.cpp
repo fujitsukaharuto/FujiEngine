@@ -347,6 +347,24 @@ Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Ve
 	return result;
 }
 
+Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Quaternion& rotate, const Vector3& translate) {
+	Matrix4x4 result = MakeIdentity4x4();
+	Matrix4x4 S = MakeScaleMatrix(scale);
+	Matrix4x4 R = (rotate.MakeRotateMatrix());
+	Matrix4x4 T = MakeTranslateMatrix(translate);
+
+	for (int row = 0; row < 3; row++) {
+		for (int col = 0; col < 3; col++) {
+			result.m[row][col] = S.m[row][row] * R.m[row][col];
+		}
+	}
+	result.m[3][0] = T.m[3][0];
+	result.m[3][1] = T.m[3][1];
+	result.m[3][2] = T.m[3][2];
+
+	return result;
+}
+
 Matrix4x4 MakePerspectiveFovMatrix(float fovy, float aspectRation, float nearClip, float farClip) {
 	Matrix4x4 result{};
 

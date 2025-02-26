@@ -51,7 +51,9 @@ public:
 		return Vector3(result.x, result.y, result.z);
 	}
 
-
+	static float Dot(const Quaternion& q1, const Quaternion& q2) {
+		return q1.x * q2.x + q1.y * q2.y + q1.z * q2.z + q1.w * q2.w;
+	}
 
 	float Norm() const {
 		return std::sqrtf(x * x + y * y + z * z + w * w);
@@ -77,6 +79,41 @@ public:
 			return Quaternion(-x * invNormSquared, -y * invNormSquared, -z * invNormSquared, w * invNormSquared);
 		}
 		return IdentityQuaternion();
+	}
+
+	static Quaternion Slerp(const Quaternion& q0, const Quaternion& q1, float t) {
+		float dot = Dot(q0, q1);
+
+		bool flip = false;
+
+		if (dot < 0.0f) {
+			flip = true;
+			dot = -dot;
+		}
+
+		float s0, s1;
+		const float slerpEpsilon = 1e-6f;
+
+		if (dot > (1.0f - slerpEpsilon)) {
+
+			s0 = 1.0f - t;
+			s1 = (flip) ? -t : t;
+		} else {
+			float omega = std::acos(dot);
+			float invSinOmega = 1 / std::sin(omega);
+
+			s0 = std::sin((1.0f - t) * omega) * invSinOmega;
+			s1 = (flip)
+				? -std::sin(t * omega) * invSinOmega
+				: std::sin(t * omega) * invSinOmega;
+		}
+
+		return Quaternion(
+			s0 * q0.x + s1 * q1.x,
+			s0 * q0.y + s1 * q1.y,
+			s0 * q0.z + s1 * q1.z,
+			s0 * q0.w + s1 * q1.w
+		);
 	}
 
 	Matrix4x4 MakeRotateMatrix()const {

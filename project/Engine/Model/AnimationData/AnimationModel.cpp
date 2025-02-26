@@ -3,8 +3,54 @@
 #include "DXCom.h"
 #include "LightManager.h"
 #include "CameraManager.h"
+#include "FPSKeeper.h"
+
+#include <fstream>
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+#include "Math/Animation/NodeAnimation.h"
+
 
 AnimationModel::~AnimationModel() {}
+
+void AnimationModel::LoadAnimationFile(const std::string& filename) {
+	Animation animation;
+	Assimp::Importer importer;
+
+	const aiScene* scene = importer.ReadFile(kDirectoryPath_ + filename.c_str(), 0);
+	assert(scene->mNumAnimations != 0);
+	aiAnimation* animationAssimp = scene->mAnimations[0];
+	animation.duration = float(animationAssimp->mDuration / animationAssimp->mTicksPerSecond);
+
+	for (uint32_t channelIndex = 0; channelIndex < animationAssimp->mNumChannels; channelIndex++) {
+		aiNodeAnim* nodeAnimationAssimp = animationAssimp->mChannels[channelIndex];
+		NodeAnimation& nodeAnimation = animation.nodeAnimations[nodeAnimationAssimp->mNodeName.C_Str()];
+		for (uint32_t keyIndex = 0; keyIndex < nodeAnimationAssimp->mNumPositionKeys; keyIndex++) {
+			aiVectorKey& keyAssimp = nodeAnimationAssimp->mPositionKeys[keyIndex];
+			KeyframeVector3 keyframe;
+			keyframe.time = float(keyAssimp.mTime / animationAssimp->mTicksPerSecond);
+			keyframe.value = { -keyAssimp.mValue.x,keyAssimp.mValue.y,keyAssimp.mValue.z };
+			nodeAnimation.translate.keyframes.push_back(keyframe);
+		}
+		for (uint32_t keyIndex = 0; keyIndex < nodeAnimationAssimp->mNumRotationKeys; keyIndex++) {
+			aiQuatKey& keyAssimp = nodeAnimationAssimp->mRotationKeys[keyIndex];
+			KeyframeQuaternion keyframe;
+			keyframe.time = float(keyAssimp.mTime / animationAssimp->mTicksPerSecond);
+			keyframe.value = { keyAssimp.mValue.x,-keyAssimp.mValue.y,-keyAssimp.mValue.z,keyAssimp.mValue.w };
+			nodeAnimation.rotate.keyframes.push_back(keyframe);
+		}for (uint32_t keyIndex = 0; keyIndex < nodeAnimationAssimp->mNumScalingKeys; keyIndex++) {
+			aiVectorKey& keyAssimp = nodeAnimationAssimp->mScalingKeys[keyIndex];
+			KeyframeVector3 keyframe;
+			keyframe.time = float(keyAssimp.mTime / animationAssimp->mTicksPerSecond);
+			keyframe.value = { keyAssimp.mValue.x,keyAssimp.mValue.y,keyAssimp.mValue.z };
+			nodeAnimation.scale.keyframes.push_back(keyframe);
+		}
+
+	}
+
+	animation_ = animation;
+}
 
 void AnimationModel::Create(const std::string& fileName) {
 	this->camera_ = CameraManager::GetInstance()->GetCamera();
@@ -131,12 +177,22 @@ void AnimationModel::SetWVP() {
 		worldViewProjectionMatrix = worldMatrix;
 	}
 
-	wvpDate_->World = Multiply(model_->data_.rootNode.local, worldMatrix);
-	wvpDate_->WVP = Multiply(model_->data_.rootNode.local, worldViewProjectionMatrix);
+	Matrix4x4 localMatrix = model_->data_.rootNode.local;
+	if (isAnimation_) {
+		animationTime_ += FPSKeeper::DeltaTime();
+		animationTime_ = std::fmod(animationTime_, animation_.duration);
+		NodeAnimation& rootNodeAnimation = animation_.nodeAnimations[model_->data_.rootNode.name];
+		Vector3 translate = CalculationValue(rootNodeAnimation.translate.keyframes, animationTime_);
+		Quaternion rotate = CalculationValue(rootNodeAnimation.rotate.keyframes, animationTime_);
+		Vector3 scale = CalculationValue(rootNodeAnimation.scale.keyframes, animationTime_);
+		localMatrix = MakeAffineMatrix(scale, rotate, translate);
+	}
+
+	wvpDate_->World = Multiply(localMatrix, worldMatrix);
+	wvpDate_->WVP = Multiply(localMatrix, worldViewProjectionMatrix);
 	wvpDate_->WorldInverseTransPose = Transpose(Inverse(wvpDate_->World));
 
 	cameraPosData_->worldPosition = camera_->transform.translate;
-
 }
 
 void AnimationModel::SetBillboardWVP() {
@@ -158,4 +214,36 @@ void AnimationModel::SetBillboardWVP() {
 	wvpDate_->World = worldMatrix;
 	wvpDate_->WVP = worldViewProjectionMatrix;
 	wvpDate_->WorldInverseTransPose = Transpose(Inverse(wvpDate_->World));
+}
+
+Vector3 AnimationModel::CalculationValue(const std::vector<KeyframeVector3>& keyframe, float time) {
+	assert(!keyframe.empty());
+	if (keyframe.size() == 1 || time <= keyframe[0].time) {
+		return keyframe[0].value;
+	}
+
+	for (size_t i = 0; i < keyframe.size() - 1; i++) {
+		size_t nextIndex = i + 1;
+		if (keyframe[i].time <= time && time <= keyframe[nextIndex].time) {
+			float t = (time - keyframe[i].time) / (keyframe[nextIndex].time - keyframe[i].time);
+			return Lerp(keyframe[i].value, keyframe[nextIndex].value, t);
+		}
+	}
+	return (*keyframe.rbegin()).value;
+}
+
+Quaternion AnimationModel::CalculationValue(const std::vector<KeyframeQuaternion>& keyframe, float time) 	{
+	assert(!keyframe.empty());
+	if (keyframe.size() == 1 || time <= keyframe[0].time) {
+		return keyframe[0].value;
+	}
+
+	for (size_t i = 0; i < keyframe.size() - 1; i++) {
+		size_t nextIndex = i + 1;
+		if (keyframe[i].time <= time && time <= keyframe[nextIndex].time) {
+			float t = (time - keyframe[i].time) / (keyframe[nextIndex].time - keyframe[i].time);
+			return Quaternion::Slerp(keyframe[i].value, keyframe[nextIndex].value, t);
+		}
+	}
+	return (*keyframe.rbegin()).value;
 }

@@ -34,6 +34,11 @@ void TitleScene::Initialize() {
 	sphere = std::make_unique<Object3d>();
 	sphere->CreateSphere();
 
+	cube_ = std::make_unique<AnimationModel>();
+	cube_->Create("AnimatedCube.gltf");
+	cube_->LoadAnimationFile("AnimatedCube.gltf");
+	cube_->transform.translate.y = 3.0f;
+
 	test_ = std::make_unique<TestBaseObj>();
 	test_->Initialize();
 	test_->name_ = "testObj";
@@ -95,7 +100,7 @@ void TitleScene::Draw() {
 	obj3dCommon->PreDraw();
 	sphere->Draw();
 	test_->Draw();
-
+	cube_->Draw();
 	ParticleManager::GetInstance()->Draw();
 
 #ifdef _DEBUG
