@@ -188,6 +188,9 @@
     <ClCompile Include="Engine\GraphicPipeline\GrayCSPipe.cpp">
       <Filter>Engine\GraphicPipeline</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Model\AnimationData\AnimationModel.cpp">
+      <Filter>Engine\Model\AnimationData</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -394,6 +397,18 @@
     <ClInclude Include="Engine\GraphicPipeline\GrayCSPipe.h">
       <Filter>Engine\GraphicPipeline</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Math\Animation\Keyframe.h">
+      <Filter>Engine\Math\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Math\Animation\NodeAnimation.h">
+      <Filter>Engine\Math\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Math\Animation\Animation.h">
+      <Filter>Engine\Math\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Model\AnimationData\AnimationModel.h">
+      <Filter>Engine\Model\AnimationData</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -473,6 +488,12 @@
     </Filter>
     <Filter Include="resource\Shaders\CS">
       <UniqueIdentifier>{a2b12930-efd8-4b03-84dc-c65ccb0fc2eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Math\Animation">
+      <UniqueIdentifier>{bd1e8302-2cd0-47fe-bbf8-ba4e941d5a51}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Model\AnimationData">
+      <UniqueIdentifier>{caf4aa0b-f65b-4267-bfeb-452ebca8902c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

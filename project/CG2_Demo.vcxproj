@@ -144,6 +144,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Math\MatrixCalculation.cpp" />
     <ClCompile Include="Engine\Math\Quaternion.cpp" />
     <ClCompile Include="Engine\Math\Random.cpp" />
+    <ClCompile Include="Engine\Model\AnimationData\AnimationModel.cpp" />
     <ClCompile Include="Engine\Model\Line3dDrawer.cpp" />
     <ClCompile Include="Engine\Model\Material.cpp" />
     <ClCompile Include="Engine\Model\Mesh.cpp" />
@@ -206,12 +207,16 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Light\LightManager.h" />
     <ClInclude Include="Engine\Light\SpotLight.h" />
     <ClInclude Include="Engine\Logger\Logger.h" />
+    <ClInclude Include="Engine\Math\Animation\Animation.h" />
+    <ClInclude Include="Engine\Math\Animation\Keyframe.h" />
+    <ClInclude Include="Engine\Math\Animation\NodeAnimation.h" />
     <ClInclude Include="Engine\Math\MatrixCalculation.h" />
     <ClInclude Include="Engine\Math\Quaternion.h" />
     <ClInclude Include="Engine\Math\Random.h" />
     <ClInclude Include="Engine\Math\Vector2.h" />
     <ClInclude Include="Engine\Math\Vector2Matrix.h" />
     <ClInclude Include="Engine\Math\Vector3.h" />
+    <ClInclude Include="Engine\Model\AnimationData\AnimationModel.h" />
     <ClInclude Include="Engine\Model\Line3dDrawer.h" />
     <ClInclude Include="Engine\Model\Material.h" />
     <ClInclude Include="Engine\Model\Mesh.h" />
