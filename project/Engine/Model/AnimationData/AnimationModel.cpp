@@ -179,7 +179,7 @@ void AnimationModel::SetWVP() {
 
 	Matrix4x4 localMatrix = model_->data_.rootNode.local;
 	if (isAnimation_) {
-		animationTime_ += FPSKeeper::DeltaTime();
+		animationTime_ += FPSKeeper::DeltaTimeFrame();
 		animationTime_ = std::fmod(animationTime_, animation_.duration);
 		NodeAnimation& rootNodeAnimation = animation_.nodeAnimations[model_->data_.rootNode.name];
 		Vector3 translate = CalculationValue(rootNodeAnimation.translate.keyframes, animationTime_);
