@@ -63,9 +63,16 @@ struct MaterialDataPath {
 	std::string textureFilePath;
 };
 
+struct Node {
+	Matrix4x4 local;
+	std::string name;
+	std::vector<Node> children;
+};
+
 struct ModelData {
 	std::vector<VertexDate> vertices;
 	MaterialDataPath material;
+	Node rootNode;
 };
 
 struct ParticleDate {

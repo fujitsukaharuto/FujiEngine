@@ -3,11 +3,14 @@
 
 
 
-Model::Model() {}
+Model::Model() {
+	data_.rootNode.local = MakeIdentity4x4();
+}
 
 Model::Model(const Model& other) {
 
 	mesh_ = other.mesh_;
+	data_ = other.data_;
 	for (uint32_t index = 0; index < other.material_.size(); ++index) {
 		Material newMaterial{};
 		newMaterial.SetTextureNamePath(other.material_[index].GetPathName());

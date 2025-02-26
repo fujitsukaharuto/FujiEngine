@@ -1,11 +1,9 @@
 #include "Mesh.h"
 #include "DXCom.h"
 
-Mesh::Mesh() {
-}
+Mesh::Mesh() {}
 
-Mesh::~Mesh() {
-}
+Mesh::~Mesh() {}
 
 void Mesh::CreateMesh() {
 	vertexResource_ = DXCom::GetInstance()->CreateBufferResource(DXCom::GetInstance()->GetDevice(), sizeof(VertexData) * vertexData_.size());
