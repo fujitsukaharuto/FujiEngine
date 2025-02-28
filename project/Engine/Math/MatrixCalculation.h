@@ -21,6 +21,12 @@ struct Trans {
 	Vector3 translate;
 };
 
+struct QuaternioonTrans {
+	Vector3 scale;
+	Quaternion rotate;
+	Vector3 translate;
+};
+
 struct VertexDate {
 	Vector4 position;
 	Vector2 texcoord;
@@ -65,6 +71,7 @@ struct MaterialDataPath {
 };
 
 struct Node {
+	QuaternioonTrans transform;
 	Matrix4x4 local;
 	std::string name;
 	std::vector<Node> children;

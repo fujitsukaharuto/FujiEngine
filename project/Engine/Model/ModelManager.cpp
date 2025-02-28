@@ -335,28 +335,13 @@ MaterialDataPath ModelManager::LoadMaterialFile(const std::string& filename) {
 
 Node ModelManager::ReadNode(aiNode* node) {
 	Node result;
-	aiMatrix4x4 ailocal = node->mTransformation;
-	ailocal.Transpose();
-	result.local.m[0][0] = ailocal[0][0];
-	result.local.m[0][1] = ailocal[0][1];
-	result.local.m[0][2] = ailocal[0][2];
-	result.local.m[0][3] = ailocal[0][3];
-
-	result.local.m[1][0] = ailocal[1][0];
-	result.local.m[1][1] = ailocal[1][1];
-	result.local.m[1][2] = ailocal[1][2];
-	result.local.m[1][3] = ailocal[1][3];
-
-	result.local.m[2][0] = ailocal[2][0];
-	result.local.m[2][1] = ailocal[2][1];
-	result.local.m[2][2] = ailocal[2][2];
-	result.local.m[2][3] = ailocal[2][3];
-
-	result.local.m[3][0] = ailocal[3][0];
-	result.local.m[3][1] = ailocal[3][1];
-	result.local.m[3][2] = ailocal[3][2];
-	result.local.m[3][3] = ailocal[3][3];
-
+	aiVector3D scale, translate;
+	aiQuaternion rotate;
+	node->mTransformation.Decompose(scale, rotate, translate);
+	result.transform.scale = { scale.x,scale.y,scale.z };
+	result.transform.rotate = { rotate.x,-rotate.y,-rotate.z,rotate.w };
+	result.transform.translate = { -translate.x,translate.y,translate.z };
+	result.local = MakeAffineMatrix(result.transform.scale, result.transform.rotate, result.transform.translate);
 
 	result.name = node->mName.C_Str();
 	result.children.resize(node->mNumChildren);
