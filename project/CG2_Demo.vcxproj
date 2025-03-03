@@ -210,6 +210,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Math\Animation\Animation.h" />
     <ClInclude Include="Engine\Math\Animation\Keyframe.h" />
     <ClInclude Include="Engine\Math\Animation\NodeAnimation.h" />
+    <ClInclude Include="Engine\Math\Animation\Skelton.h" />
     <ClInclude Include="Engine\Math\MatrixCalculation.h" />
     <ClInclude Include="Engine\Math\Quaternion.h" />
     <ClInclude Include="Engine\Math\Random.h" />

@@ -409,6 +409,9 @@
     <ClInclude Include="Engine\Model\AnimationData\AnimationModel.h">
       <Filter>Engine\Model\AnimationData</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Math\Animation\Skelton.h">
+      <Filter>Engine\Math\Animation</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">

@@ -15,17 +15,16 @@
 AnimationModel::~AnimationModel() {}
 
 void AnimationModel::LoadAnimationFile(const std::string& filename) {
-	Animation animation;
 	Assimp::Importer importer;
 
 	const aiScene* scene = importer.ReadFile(kDirectoryPath_ + filename.c_str(), 0);
 	assert(scene->mNumAnimations != 0);
 	aiAnimation* animationAssimp = scene->mAnimations[0];
-	animation.duration = float(animationAssimp->mDuration / animationAssimp->mTicksPerSecond);
+	animation_.duration = float(animationAssimp->mDuration / animationAssimp->mTicksPerSecond);
 
 	for (uint32_t channelIndex = 0; channelIndex < animationAssimp->mNumChannels; channelIndex++) {
 		aiNodeAnim* nodeAnimationAssimp = animationAssimp->mChannels[channelIndex];
-		NodeAnimation& nodeAnimation = animation.nodeAnimations[nodeAnimationAssimp->mNodeName.C_Str()];
+		NodeAnimation& nodeAnimation = animation_.nodeAnimations[nodeAnimationAssimp->mNodeName.C_Str()];
 		for (uint32_t keyIndex = 0; keyIndex < nodeAnimationAssimp->mNumPositionKeys; keyIndex++) {
 			aiVectorKey& keyAssimp = nodeAnimationAssimp->mPositionKeys[keyIndex];
 			KeyframeVector3 keyframe;
@@ -46,10 +45,14 @@ void AnimationModel::LoadAnimationFile(const std::string& filename) {
 			keyframe.value = { keyAssimp.mValue.x,keyAssimp.mValue.y,keyAssimp.mValue.z };
 			nodeAnimation.scale.keyframes.push_back(keyframe);
 		}
-
 	}
+}
 
-	animation_ = animation;
+void AnimationModel::CreateSkeleton(const Node& rootNode) {
+	skeleton_.root = CreateJoint(rootNode, {}, skeleton_.joints);
+	for (const Joint& joint : skeleton_.joints) {
+		skeleton_.jointMap.emplace(joint.name, joint.index);
+	}
 }
 
 void AnimationModel::Create(const std::string& fileName) {
@@ -140,6 +143,23 @@ void AnimationModel::SetLightEnable(LightMode mode) {
 
 void AnimationModel::SetModel(const std::string& fileName) {
 	model_ = std::make_unique<Model>(*(ModelManager::FindModel(fileName)));
+}
+
+int32_t AnimationModel::CreateJoint(const Node& node, const std::optional<int32_t>& parent, std::vector<Joint>& joints) {
+	Joint joint;
+	joint.name = node.name;
+	joint.loaclMatrix = node.local;
+	joint.skeletonSpaceMatrix = MakeIdentity4x4();
+	joint.transform = node.transform;
+	joint.index = int32_t(joints.size());
+	joint.parent = parent;
+	joints.push_back(joint);
+
+	for (const Node& child : node.children) {
+		int32_t childIndex = CreateJoint(child, joint.index, joints);
+		joints[joint.index].children.push_back(childIndex);
+	}
+	return joint.index;
 }
 
 void AnimationModel::CreateWVP() {

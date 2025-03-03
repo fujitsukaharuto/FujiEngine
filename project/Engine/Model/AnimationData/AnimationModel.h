@@ -1,10 +1,13 @@
 #pragma once
 #include <wrl/client.h>
 #include <string>
+#include <vector>
+#include <optional>
 #include "Model/Model.h"
 #include "Camera.h"
 #include "Model/Object3dCommon.h"
 #include "Math/Animation/Animation.h"
+#include "Math/Animation/Skelton.h"
 
 
 class PointLight;
@@ -18,6 +21,8 @@ public:
 public:
 
 	void LoadAnimationFile(const std::string& filename);
+
+	void CreateSkeleton(const Node& rootNode);
 
 	void Create(const std::string& fileName);
 
@@ -57,6 +62,8 @@ public:
 
 private:
 
+	int32_t CreateJoint(const Node& node, const std::optional<int32_t>& parent, std::vector<Joint>& joints);
+
 	void CreateWVP();
 
 	void SetWVP();
@@ -79,6 +86,7 @@ private:
 	bool isAnimation_ = true;
 	float animationTime_ = 0.0f;
 	Animation animation_;
+	Skeleton skeleton_;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource_ = nullptr;
 	TransformationMatrix* wvpDate_ = nullptr;
