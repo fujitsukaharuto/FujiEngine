@@ -69,13 +69,13 @@ void DXCommand::Close() {
 	hr = list_->Close();
 	assert(SUCCEEDED(hr));
 
+	ComPtr<ID3D12CommandList> commandLists[] = { list_.Get() };
+	queue_->ExecuteCommandLists(1, commandLists->GetAddressOf());
+
 }
 
 
 void DXCommand::Execution() {
-
-	ComPtr<ID3D12CommandList> commandLists[] = { list_.Get() };
-	queue_->ExecuteCommandLists(1, commandLists->GetAddressOf());
 
 	// コマンドリストの実行完了を待つ
 	fenceValue_++;

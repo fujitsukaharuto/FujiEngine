@@ -23,6 +23,8 @@ void GameRun::Initialize() {
 	modelManager_->LoadOBJ("Fence.obj");
 	modelManager_->LoadOBJ("terrain.obj");
 	modelManager_->LoadGLTF("AnimatedCube.gltf");
+	modelManager_->LoadGLTF("walk.gltf");
+	modelManager_->LoadGLTF("simpleSkin.gltf");
 #pragma endregion
 
 

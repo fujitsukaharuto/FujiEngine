@@ -2,6 +2,7 @@
 #include "Model/ModelManager.h"
 #include "DXCom.h"
 #include "LightManager.h"
+#include "Engine/Model/Line3dDrawer.h"
 #include "CameraManager.h"
 #include "FPSKeeper.h"
 
@@ -21,6 +22,8 @@ void AnimationModel::LoadAnimationFile(const std::string& filename) {
 	assert(scene->mNumAnimations != 0);
 	aiAnimation* animationAssimp = scene->mAnimations[0];
 	animation_.duration = float(animationAssimp->mDuration / animationAssimp->mTicksPerSecond);
+
+	CreateSkeleton(model_->data_.rootNode);
 
 	for (uint32_t channelIndex = 0; channelIndex < animationAssimp->mNumChannels; channelIndex++) {
 		aiNodeAnim* nodeAnimationAssimp = animationAssimp->mChannels[channelIndex];
@@ -72,6 +75,13 @@ void AnimationModel::CreateSphere() {
 	CreateWVP();
 }
 
+void AnimationModel::AnimationUpdate() {
+	animationTime_ += FPSKeeper::DeltaTimeFrame();
+	animationTime_ = std::fmod(animationTime_, animation_.duration);
+	ApplyAnimation();
+	SkeletonUpdate();
+}
+
 void AnimationModel::Draw(Material* mate) {
 	SetWVP();
 
@@ -97,6 +107,17 @@ void AnimationModel::AnimeDraw() {
 	}
 }
 
+void AnimationModel::SkeletonDraw() {
+	for (Joint& joint : skeleton_.joints) {
+		Vector3 jointPos = { joint.skeletonSpaceMatrix.m[3][0],joint.skeletonSpaceMatrix.m[3][1],joint.skeletonSpaceMatrix.m[3][2] };
+		JointDraw(joint.skeletonSpaceMatrix);
+		if (joint.parent) {
+			Vector3 parentPos = { skeleton_.joints[*joint.parent].skeletonSpaceMatrix.m[3][0],skeleton_.joints[*joint.parent].skeletonSpaceMatrix.m[3][1] ,skeleton_.joints[*joint.parent].skeletonSpaceMatrix.m[3][2] };
+			Line3dDrawer::GetInstance()->DrawLine3d(jointPos, parentPos, { 1.0f,1.0f,1.0f,1.0f });
+		}
+	}
+}
+
 Matrix4x4 AnimationModel::GetWorldMat() const {
 	Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 
@@ -119,7 +140,27 @@ Vector3 AnimationModel::GetWorldPos() const {
 	return worldPos;
 }
 
+void AnimationModel::SkeletonUpdate() {
+	for (Joint& joint : skeleton_.joints) {
+		joint.loaclMatrix = MakeAffineMatrix(joint.transform.scale, joint.transform.rotate, joint.transform.translate);
+		if (joint.parent) {
+			joint.skeletonSpaceMatrix = Multiply(joint.loaclMatrix, skeleton_.joints[*joint.parent].skeletonSpaceMatrix);
+		} else {
+			joint.skeletonSpaceMatrix = joint.loaclMatrix;
+		}
+	}
+}
 
+void AnimationModel::ApplyAnimation() {
+	for (Joint& joint : skeleton_.joints) {
+		if (auto it = animation_.nodeAnimations.find(joint.name); it != animation_.nodeAnimations.end()) {
+			const NodeAnimation& rootNodeAnimation = (*it).second;
+			joint.transform.translate = CalculationValue(rootNodeAnimation.translate.keyframes, animationTime_);
+			joint.transform.rotate = CalculationValue(rootNodeAnimation.rotate.keyframes, animationTime_);
+			joint.transform.scale = CalculationValue(rootNodeAnimation.scale.keyframes, animationTime_);
+		}
+	}
+}
 
 void AnimationModel::SetColor(const Vector4& color) {
 	model_->SetColor(color);
@@ -199,13 +240,11 @@ void AnimationModel::SetWVP() {
 
 	Matrix4x4 localMatrix = model_->data_.rootNode.local;
 	if (isAnimation_) {
-		animationTime_ += FPSKeeper::DeltaTimeFrame();
-		animationTime_ = std::fmod(animationTime_, animation_.duration);
-		NodeAnimation& rootNodeAnimation = animation_.nodeAnimations[model_->data_.rootNode.name];
+		/*NodeAnimation& rootNodeAnimation = animation_.nodeAnimations[model_->data_.rootNode.name];
 		Vector3 translate = CalculationValue(rootNodeAnimation.translate.keyframes, animationTime_);
 		Quaternion rotate = CalculationValue(rootNodeAnimation.rotate.keyframes, animationTime_);
 		Vector3 scale = CalculationValue(rootNodeAnimation.scale.keyframes, animationTime_);
-		localMatrix = MakeAffineMatrix(scale, rotate, translate);
+		localMatrix = MakeAffineMatrix(scale, rotate, translate);*/
 	}
 
 	wvpDate_->World = Multiply(localMatrix, worldMatrix);
@@ -266,4 +305,51 @@ Quaternion AnimationModel::CalculationValue(const std::vector<KeyframeQuaternion
 		}
 	}
 	return (*keyframe.rbegin()).value;
+}
+
+void AnimationModel::JointDraw(const Matrix4x4& m) {
+	Vector3 jointCube[8] = {
+		Vector3( 0.075f, 0.075f, 0.075f),
+		Vector3(-0.075f, 0.075f, 0.075f),
+		Vector3(-0.075f, 0.075f,-0.075f),
+		Vector3( 0.075f, 0.075f,-0.075f),
+		
+		Vector3( 0.075f,-0.075f, 0.075f),
+		Vector3(-0.075f,-0.075f, 0.075f),
+		Vector3(-0.075f,-0.075f,-0.075f),
+		Vector3( 0.075f,-0.075f,-0.075f),
+	};
+
+	for (int i = 0; i < 8; i++) {
+		jointCube[i] = Transform(jointCube[i], m);
+	}
+
+	int p1 = 0;
+	int p2 = 1;
+	for (int i = 0; i < 4;  i++) {
+		Line3dDrawer::GetInstance()->DrawLine3d(jointCube[p1], jointCube[p2], { 1.0f,1.0f,1.0f,1.0f });
+
+		p1++;
+		p2++;
+		p1 = int(fmod(p1, 4));
+		p2 = int(fmod(p2, 4));
+	}
+	p1 = 4;
+	p2 = 5;
+	for (int i = 0; i < 4; i++) {
+		Line3dDrawer::GetInstance()->DrawLine3d(jointCube[p1], jointCube[p2], { 1.0f,1.0f,1.0f,1.0f });
+
+		p1++;
+		p2++;
+		p1 = 4 + int(fmod(p1, 4));
+		p2 = 4 + int(fmod(p2, 4));
+	}
+	p1 = 0;
+	p2 = 4;
+	for (int i = 0; i < 4; i++) {
+		Line3dDrawer::GetInstance()->DrawLine3d(jointCube[p1], jointCube[p2], { 1.0f,1.0f,1.0f,1.0f });
+
+		p1++;
+		p2++;
+	}
 }

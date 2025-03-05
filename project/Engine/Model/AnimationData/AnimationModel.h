@@ -28,13 +28,21 @@ public:
 
 	void CreateSphere();
 
+	void AnimationUpdate();
+
 	void Draw(Material* mate = nullptr);
 
 	void AnimeDraw();
 
+	void SkeletonDraw();
+
 	Matrix4x4 GetWorldMat() const;
 
 	Vector3 GetWorldPos()const;
+
+	void SkeletonUpdate();
+
+	void ApplyAnimation();
 
 	void UpdateWVP() { SetWVP(); }
 
@@ -72,6 +80,8 @@ private:
 
 	Vector3 CalculationValue(const std::vector<KeyframeVector3>& keyframe, float time);
 	Quaternion CalculationValue(const std::vector<KeyframeQuaternion>& keyframe, float time);
+
+	void JointDraw(const Matrix4x4& m);
 
 private:
 	const std::string kDirectoryPath_ = "resource/";

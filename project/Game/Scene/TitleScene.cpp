@@ -35,8 +35,8 @@ void TitleScene::Initialize() {
 	sphere->CreateSphere();
 
 	cube_ = std::make_unique<AnimationModel>();
-	cube_->Create("AnimatedCube.gltf");
-	cube_->LoadAnimationFile("AnimatedCube.gltf");
+	cube_->Create("walk.gltf");
+	cube_->LoadAnimationFile("walk.gltf");
 	cube_->transform.translate.y = 3.0f;
 
 	test_ = std::make_unique<TestBaseObj>();
@@ -72,6 +72,7 @@ void TitleScene::Update() {
 	test_->Update();
 	test2_->Update();
 
+	cube_->AnimationUpdate();
 
 	if (input_->TriggerKey(DIK_5)) {
 		emit.Emit();
@@ -98,8 +99,8 @@ void TitleScene::Draw() {
 
 #pragma region 3Dオブジェクト
 	obj3dCommon->PreDraw();
-	sphere->Draw();
-	test_->Draw();
+	//sphere->Draw();
+	//test_->Draw();
 	cube_->Draw();
 	ParticleManager::GetInstance()->Draw();
 
@@ -108,6 +109,7 @@ void TitleScene::Draw() {
 	test_->DrawCollider();
 	test2_->DrawCollider();
 #endif // _DEBUG
+	cube_->SkeletonDraw();
 	Line3dDrawer::GetInstance()->Render();
 
 #pragma endregion

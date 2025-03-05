@@ -286,9 +286,9 @@ void DXCom::PostDraw() {
 	// 命令のクローズ
 	command_->Close();
 	// コマンドリストの実行
+	swapChain_->Present(1, 0);
 	command_->Execution();
 	fpsKeeper_->FixFPS();
-	swapChain_->Present(1, 0);
 	command_->Reset();
 }
 
