@@ -2,6 +2,7 @@
 #define _USE_MATH_DEFINES
 #include <vector>
 #include <string>
+#include <map>
 
 #include "Vector2.h"
 #include "Vector3.h"
@@ -77,8 +78,20 @@ struct Node {
 	std::vector<Node> children;
 };
 
+struct VertexWeightData {
+	float weight;
+	uint32_t vertexIndex;
+};
+
+struct JointWeightData {
+	Matrix4x4 inverseBindPoseMatrix;
+	std::vector<VertexWeightData> vertexWeights;
+};
+
 struct ModelData {
+	std::map<std::string, JointWeightData> skinClusterData;
 	std::vector<VertexDate> vertices;
+	std::vector<uint32_t> indicies;
 	MaterialDataPath material;
 	Node rootNode;
 };

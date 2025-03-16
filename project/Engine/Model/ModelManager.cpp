@@ -85,6 +85,11 @@ void ModelManager::LoadOBJ(const std::string& filename) {
 				newMesh.AddVertex({ {vertex.position},{vertex.texcoord},{vertex.normal} });
 
 			}
+
+			for (uint32_t element = 0; element < face.mNumIndices; element++) {
+				uint32_t vertexIndex = face.mIndices[element];
+				newMesh.AddIndex(vertexIndex);
+			}
 		}
 	}
 
@@ -179,6 +184,11 @@ void ModelManager::LoadGLTF(const std::string& filename) {
 
 				newMesh.AddVertex({ {vertex.position},{vertex.texcoord},{vertex.normal} });
 
+			}
+
+			for (uint32_t element = 0; element < face.mNumIndices; element++) {
+				uint32_t vertexIndex = face.mIndices[element];
+				newMesh.AddIndex(vertexIndex);
 			}
 		}
 	}
@@ -284,6 +294,22 @@ void ModelManager::CreateSphere() {
 			mesh.AddVertex({ {(cosf(lat) * cosf(lon + kLonEvery)), (sinf(lat)), (cosf(lat) * sinf(lon + kLonEvery)), 1.0f},
 				{u + (float(1.0f) / float(kSubdivision)),v},
 				{(cosf(lat) * cosf(lon + kLonEvery)), (sinf(lat)), (cosf(lat) * sinf(lon + kLonEvery))} });
+
+
+			// 各頂点のインデックス計算
+			uint32_t v0 = latIndex * (kSubdivision + 1) + lonIndex;
+			uint32_t v1 = v0 + 1;
+			uint32_t v2 = (latIndex + 1) * (kSubdivision + 1) + lonIndex;
+			uint32_t v3 = v2 + 1;
+
+			// 二つの三角形を追加 (v0-v2-v1, v1-v2-v3)
+			mesh.AddIndex(v0);
+			mesh.AddIndex(v2);
+			mesh.AddIndex(v1);
+			
+			mesh.AddIndex(v1);
+			mesh.AddIndex(v2);
+			mesh.AddIndex(v3);
 		}
 	}
 
