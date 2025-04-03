@@ -75,6 +75,12 @@ void AnimationModel::CreateSphere() {
 	CreateWVP();
 }
 
+//SkinCluster AnimationModel::CreateSkinCluster(const Microsoft::WRL::ComPtr<ID3D12Device>& device, const Skeleton& skeleton, const ModelData& modelData, const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& descriptor, uint32_t descriptorSize) {
+//	SkinCluster skinCluster;
+//
+//	return skinCluster;
+//}
+
 void AnimationModel::AnimationUpdate() {
 	animationTime_ += FPSKeeper::DeltaTimeFrame();
 	animationTime_ = std::fmod(animationTime_, animation_.duration);

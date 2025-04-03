@@ -36,5 +36,6 @@ void Mesh::AddIndex(uint32_t index) {
 
 void Mesh::Draw(ID3D12GraphicsCommandList* commandList) {
 	commandList->IASetVertexBuffers(0, 1, &vertexBufferView_);
-	commandList->DrawInstanced(static_cast<UINT>((vertexData_.size())), 1, 0, 0);
+	commandList->IASetIndexBuffer(&indexBufferView_);
+	commandList->DrawIndexedInstanced(static_cast<UINT>((indexData_.size())), 1, 0, 0, 0);
 }
