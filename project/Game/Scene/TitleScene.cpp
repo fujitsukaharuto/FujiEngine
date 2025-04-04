@@ -33,6 +33,7 @@ void TitleScene::Initialize() {
 
 	sphere = std::make_unique<Object3d>();
 	sphere->CreateSphere();
+	sphere->transform.translate.x = 4.0f;
 
 	cube_ = std::make_unique<AnimationModel>();
 	cube_->Create("walk.gltf");
@@ -99,7 +100,7 @@ void TitleScene::Draw() {
 
 #pragma region 3Dオブジェクト
 	obj3dCommon->PreDraw();
-	//sphere->Draw();
+	sphere->Draw();
 	//test_->Draw();
 	cube_->Draw();
 	ParticleManager::GetInstance()->Draw();

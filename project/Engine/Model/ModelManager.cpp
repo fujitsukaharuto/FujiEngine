@@ -271,62 +271,52 @@ void ModelManager::CreateSphere() {
 	Mesh mesh{};
 	Material material{};
 
-
+	
 	const float pi = 3.1415926535f;
 	const uint32_t kSubdivision = 16;
-	const float kLonEvery = (pi * 2.0f) / static_cast<float>(kSubdivision);
-	const float kLatEvery = (pi) / static_cast<float>(kSubdivision);
 
-	for (uint32_t latIndex = 0; latIndex < kSubdivision; latIndex++) {
+	const float kLonEvery = (2.0f * pi) / static_cast<float>(kSubdivision);
+	const float kLatEvery = pi / static_cast<float>(kSubdivision);
+
+	// 頂点生成
+	for (uint32_t latIndex = 0; latIndex <= kSubdivision; ++latIndex) {
 		float lat = -pi / 2.0f + kLatEvery * latIndex;
-		for (uint32_t lonIndex = 0; lonIndex < kSubdivision; lonIndex++) {
+		float v = 1.0f - float(latIndex) / float(kSubdivision); // 上がv=0, 下がv=1になるように
+
+		for (uint32_t lonIndex = 0; lonIndex <= kSubdivision; ++lonIndex) {
+			// 経度ループ用に +1 まで回す
 			float lon = lonIndex * kLonEvery;
+			float u = float(lonIndex) / float(kSubdivision); // 経度でuを算出（0〜1）
 
-			float u = float(lonIndex) / float(kSubdivision);
-			float v = 1.0f - float(latIndex) / float(kSubdivision);
+			float x = cosf(lat) * cosf(lon);
+			float y = sinf(lat);
+			float z = cosf(lat) * sinf(lon);
 
+			mesh.AddVertex({
+				{x, y, z, 1.0f},   // Position
+				{u, v},            // UV
+				{x, y, z}          // Normal（球の中心を原点とした法線）
+				});
+		}
+	}
 
-			mesh.AddVertex({ {(cosf(lat) * cosf(lon)), (sinf(lat)), (cosf(lat) * sinf(lon)), 1.0f},
-				{u, v},
-				{(cosf(lat) * cosf(lon)), (sinf(lat)), (cosf(lat) * sinf(lon))} });
+	// インデックス生成
+	for (uint32_t latIndex = 0; latIndex < kSubdivision; ++latIndex) {
+		for (uint32_t lonIndex = 0; lonIndex < kSubdivision; ++lonIndex) {
+			uint32_t row1 = latIndex * (kSubdivision + 1);
+			uint32_t row2 = (latIndex + 1) * (kSubdivision + 1);
 
+			uint32_t v0 = row1 + lonIndex;
+			uint32_t v1 = row1 + lonIndex + 1;
+			uint32_t v2 = row2 + lonIndex;
+			uint32_t v3 = row2 + lonIndex + 1;
 
-			mesh.AddVertex({ {(cosf(lat + kLatEvery) * cosf(lon)), (sinf(lat + kLatEvery)), (cosf(lat + kLatEvery) * sinf(lon)), 1.0f},
-				{u,v - (float(1.0f) / float(kSubdivision))},
-				{(cosf(lat + kLatEvery) * cosf(lon)), (sinf(lat + kLatEvery)), (cosf(lat + kLatEvery) * sinf(lon))} });
-
-
-			mesh.AddVertex({ {(cosf(lat) * cosf(lon + kLonEvery)), (sinf(lat)), (cosf(lat) * sinf(lon + kLonEvery)), 1.0f},
-				{u + (float(1.0f) / float(kSubdivision)),v},
-				{(cosf(lat) * cosf(lon + kLonEvery)), (sinf(lat)), (cosf(lat) * sinf(lon + kLonEvery))} });
-
-
-			mesh.AddVertex({ {(cosf(lat + kLatEvery) * cosf(lon)), (sinf(lat + kLatEvery)), (cosf(lat + kLatEvery) * sinf(lon)), 1.0f},
-				{u,v - (float(1.0f) / float(kSubdivision))},
-				{(cosf(lat + kLatEvery) * cosf(lon)), (sinf(lat + kLatEvery)), (cosf(lat + kLatEvery) * sinf(lon))} });
-
-
-			mesh.AddVertex({ {(cosf(lat + kLatEvery) * cosf(lon + kLonEvery)), (sinf(lat + kLatEvery)), (cosf(lat + kLatEvery) * sinf(lon + kLonEvery)), 1.0f},
-				{u + (float(1.0f) / float(kSubdivision)),v - (float(1.0f) / float(kSubdivision))},
-				{(cosf(lat + kLatEvery) * cosf(lon + kLonEvery)), (sinf(lat + kLatEvery)), (cosf(lat + kLatEvery) * sinf(lon + kLonEvery))} });
-
-
-			mesh.AddVertex({ {(cosf(lat) * cosf(lon + kLonEvery)), (sinf(lat)), (cosf(lat) * sinf(lon + kLonEvery)), 1.0f},
-				{u + (float(1.0f) / float(kSubdivision)),v},
-				{(cosf(lat) * cosf(lon + kLonEvery)), (sinf(lat)), (cosf(lat) * sinf(lon + kLonEvery))} });
-
-
-			// 各頂点のインデックス計算
-			uint32_t v0 = latIndex * (kSubdivision + 1) + lonIndex;
-			uint32_t v1 = v0 + 1;
-			uint32_t v2 = (latIndex + 1) * (kSubdivision + 1) + lonIndex;
-			uint32_t v3 = v2 + 1;
-
-			// 二つの三角形を追加 (v0-v2-v1, v1-v2-v3)
+			// 三角形1
 			mesh.AddIndex(v0);
 			mesh.AddIndex(v2);
 			mesh.AddIndex(v1);
-			
+
+			// 三角形2
 			mesh.AddIndex(v1);
 			mesh.AddIndex(v2);
 			mesh.AddIndex(v3);
