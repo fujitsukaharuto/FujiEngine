@@ -18,7 +18,7 @@ class SpotLight;
 const uint32_t kNumMaxInfluence = 4;
 struct VertexInfluence {
 	std::array<float, kNumMaxInfluence> weights;
-	std::array<int32_t, kNumMaxInfluence>jointIndices;
+	std::array<int32_t, kNumMaxInfluence> jointIndices;
 };
 
 struct WellForGPU {
@@ -51,7 +51,7 @@ public:
 
 	void CreateSphere();
 
-	SkinCluster CreateSkinCluster(const Microsoft::WRL::ComPtr<ID3D12Device>& device, const Skeleton& skeleton, const ModelData& modelData, const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& descriptor, uint32_t descriptorSize);
+	SkinCluster CreateSkinCluster(const Skeleton& skeleton, const ModelData& modelData);
 
 	void AnimationUpdate();
 
@@ -66,6 +66,8 @@ public:
 	Vector3 GetWorldPos()const;
 
 	void SkeletonUpdate();
+
+	void SkinClusterUpdate();
 
 	void ApplyAnimation();
 
@@ -122,6 +124,7 @@ private:
 	float animationTime_ = 0.0f;
 	Animation animation_;
 	Skeleton skeleton_;
+	SkinCluster skinCluster_;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource_ = nullptr;
 	TransformationMatrix* wvpDate_ = nullptr;

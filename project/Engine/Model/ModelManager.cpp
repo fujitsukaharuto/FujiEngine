@@ -183,12 +183,13 @@ void ModelManager::LoadGLTF(const std::string& filename) {
 				vertex.normal.x *= -1.0f;
 
 				newMesh.AddVertex({ {vertex.position},{vertex.texcoord},{vertex.normal} });
-
+				model->data_.vertices.push_back({ {vertex.position},{vertex.texcoord},{vertex.normal} });
 			}
 
 			for (uint32_t element = 0; element < face.mNumIndices; element++) {
 				uint32_t vertexIndex = face.mIndices[element];
 				newMesh.AddIndex(vertexIndex);
+				model->data_.indicies.push_back(vertexIndex);
 			}
 		}
 

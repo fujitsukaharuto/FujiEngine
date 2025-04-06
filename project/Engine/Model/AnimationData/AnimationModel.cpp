@@ -1,6 +1,7 @@
 #include "AnimationModel.h"
 #include "Model/ModelManager.h"
 #include "DXCom.h"
+#include "DX/SRVManager.h"
 #include "LightManager.h"
 #include "Engine/Model/Line3dDrawer.h"
 #include "CameraManager.h"
@@ -24,6 +25,7 @@ void AnimationModel::LoadAnimationFile(const std::string& filename) {
 	animation_.duration = float(animationAssimp->mDuration / animationAssimp->mTicksPerSecond);
 
 	CreateSkeleton(model_->data_.rootNode);
+	skinCluster_ = CreateSkinCluster(skeleton_, model_->data_);
 
 	for (uint32_t channelIndex = 0; channelIndex < animationAssimp->mNumChannels; channelIndex++) {
 		aiNodeAnim* nodeAnimationAssimp = animationAssimp->mChannels[channelIndex];
@@ -75,17 +77,75 @@ void AnimationModel::CreateSphere() {
 	CreateWVP();
 }
 
-//SkinCluster AnimationModel::CreateSkinCluster(const Microsoft::WRL::ComPtr<ID3D12Device>& device, const Skeleton& skeleton, const ModelData& modelData, const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& descriptor, uint32_t descriptorSize) {
-//	SkinCluster skinCluster;
-//
-//	return skinCluster;
-//}
+SkinCluster AnimationModel::CreateSkinCluster(const Skeleton& skeleton, const ModelData& modelData) {
+	SkinCluster skinCluster;
+	DXCom* dxcom = DXCom::GetInstance();
+	SRVManager* srv = SRVManager::GetInstance();
+
+	// MatrixPalette
+	skinCluster.paletteResource = dxcom->CreateBufferResource(dxcom->GetDevice(), sizeof(WellForGPU) * skeleton.joints.size());
+	WellForGPU* mappedPallette = nullptr;
+	skinCluster.paletteResource->Map(0, nullptr, reinterpret_cast<void**>(&mappedPallette));
+	skinCluster.mappedPalette = { mappedPallette,skeleton.joints.size() };
+
+	uint32_t paletteIndex = srv->Allocate();
+	skinCluster.paletteSrvHandle.first = srv->GetCPUDescriptorHandle(paletteIndex);
+	skinCluster.paletteSrvHandle.second = srv->GetGPUDescriptorHandle(paletteIndex);
+
+	D3D12_SHADER_RESOURCE_VIEW_DESC paletteSrvDesc{};
+	paletteSrvDesc.Format = DXGI_FORMAT_UNKNOWN;
+	paletteSrvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	paletteSrvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+	paletteSrvDesc.Buffer.FirstElement = 0;
+	paletteSrvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
+	paletteSrvDesc.Buffer.NumElements = UINT(skeleton.joints.size());
+	paletteSrvDesc.Buffer.StructureByteStride = sizeof(WellForGPU);
+	dxcom->GetDevice()->CreateShaderResourceView(skinCluster.paletteResource.Get(), &paletteSrvDesc, skinCluster.paletteSrvHandle.first);
+
+	// InfluenceResource
+	skinCluster.influenceResource = dxcom->CreateBufferResource(dxcom->GetDevice(), sizeof(VertexInfluence) * modelData.vertices.size());
+	VertexInfluence* mappedInfluence = nullptr;
+	skinCluster.influenceResource->Map(0, nullptr, reinterpret_cast<void**>(&mappedInfluence));
+	std::memset(mappedInfluence, 0, sizeof(VertexInfluence) * modelData.vertices.size());
+	skinCluster.mappedInfluece = { mappedInfluence,modelData.vertices.size() };
+
+	skinCluster.influenceBuffreView.BufferLocation = skinCluster.influenceResource->GetGPUVirtualAddress();
+	skinCluster.influenceBuffreView.SizeInBytes = UINT(sizeof(VertexInfluence) * modelData.vertices.size());
+	skinCluster.influenceBuffreView.StrideInBytes = sizeof(VertexInfluence);
+
+	skinCluster.inverseBindPoseMatrices.resize(skeleton.joints.size());
+	std::generate(skinCluster.inverseBindPoseMatrices.begin(), skinCluster.inverseBindPoseMatrices.end(), MakeIdentity4x4);
+
+	// ModelData,Influence
+	for (const auto& jointWeight : modelData.skinClusterData) {
+		auto it = skeleton.jointMap.find(jointWeight.first);
+		if (it == skeleton.jointMap.end()) {
+			continue;
+		}
+
+		skinCluster.inverseBindPoseMatrices[(*it).second] = jointWeight.second.inverseBindPoseMatrix;
+		for (const auto& vertexWeight : jointWeight.second.vertexWeights) {
+			auto& currentInfluence = skinCluster.mappedInfluece[vertexWeight.vertexIndex];
+			for (uint32_t index = 0; index < kNumMaxInfluence; index++) {
+				if (currentInfluence.weights[index] == 0.0f) {
+					currentInfluence.weights[index] = vertexWeight.weight;
+					currentInfluence.jointIndices[index] = (*it).second;
+					break;
+				}
+			}
+
+		}
+	}
+
+	return skinCluster;
+}
 
 void AnimationModel::AnimationUpdate() {
 	animationTime_ += FPSKeeper::DeltaTimeFrame();
 	animationTime_ = std::fmod(animationTime_, animation_.duration);
 	ApplyAnimation();
 	SkeletonUpdate();
+	SkinClusterUpdate();
 }
 
 void AnimationModel::Draw(Material* mate) {
@@ -154,6 +214,16 @@ void AnimationModel::SkeletonUpdate() {
 		} else {
 			joint.skeletonSpaceMatrix = joint.loaclMatrix;
 		}
+	}
+}
+
+void AnimationModel::SkinClusterUpdate() {
+	for (size_t jointIndex = 0; jointIndex < skeleton_.joints.size(); jointIndex++) {
+		assert(jointIndex < skinCluster_.inverseBindPoseMatrices.size());
+		skinCluster_.mappedPalette[jointIndex].skeltonSpaceMatrix =
+			Multiply(skinCluster_.inverseBindPoseMatrices[jointIndex], skeleton_.joints[jointIndex].skeletonSpaceMatrix);
+		skinCluster_.mappedPalette[jointIndex].skeletonSpaceInverseTransposeMatrix =
+			Transpose(Inverse(skinCluster_.mappedPalette[jointIndex].skeltonSpaceMatrix));
 	}
 }
 
