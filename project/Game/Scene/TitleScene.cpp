@@ -36,8 +36,8 @@ void TitleScene::Initialize() {
 	sphere->transform.translate.x = 4.0f;
 
 	cube_ = std::make_unique<AnimationModel>();
-	cube_->Create("AnimatedCube.gltf");
-	cube_->LoadAnimationFile("AnimatedCube.gltf");
+	cube_->Create("walk.gltf");
+	cube_->LoadAnimationFile("walk.gltf");
 	cube_->transform.translate.y = 3.0f;
 
 	test_ = std::make_unique<TestBaseObj>();
@@ -102,7 +102,10 @@ void TitleScene::Draw() {
 	obj3dCommon->PreDraw();
 	sphere->Draw();
 	//test_->Draw();
+
+	obj3dCommon->PreAnimationDraw();
 	cube_->Draw();
+
 	ParticleManager::GetInstance()->Draw();
 
 #ifdef _DEBUG

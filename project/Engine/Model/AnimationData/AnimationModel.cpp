@@ -133,7 +133,6 @@ SkinCluster AnimationModel::CreateSkinCluster(const Skeleton& skeleton, const Mo
 					break;
 				}
 			}
-
 		}
 	}
 
@@ -154,9 +153,10 @@ void AnimationModel::Draw(Material* mate) {
 	ID3D12GraphicsCommandList* cList = DXCom::GetInstance()->GetCommandList();
 	cList->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
 	cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_->GetGPUVirtualAddress());
+	cList->SetGraphicsRootDescriptorTable(7, skinCluster_.paletteSrvHandle.second);
 
 	if (model_) {
-		model_->Draw(cList, mate);
+		model_->AnimationDraw(skinCluster_,cList, mate);
 	}
 }
 
@@ -323,8 +323,12 @@ void AnimationModel::SetWVP() {
 		localMatrix = MakeAffineMatrix(scale, rotate, translate);*/
 	}
 
-	wvpDate_->World = Multiply(localMatrix, worldMatrix);
+	/*wvpDate_->World = Multiply(localMatrix, worldMatrix);
 	wvpDate_->WVP = Multiply(localMatrix, worldViewProjectionMatrix);
+	wvpDate_->WorldInverseTransPose = Transpose(Inverse(wvpDate_->World));*/
+
+	wvpDate_->World = worldMatrix;
+	wvpDate_->WVP = worldViewProjectionMatrix;
 	wvpDate_->WorldInverseTransPose = Transpose(Inverse(wvpDate_->World));
 
 	cameraPosData_->worldPosition = camera_->transform.translate;

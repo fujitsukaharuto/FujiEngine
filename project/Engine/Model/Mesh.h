@@ -2,6 +2,7 @@
 #include "Vector3.h"
 #include "Vector2.h"
 #include "MatrixCalculation.h"
+#include "Engine/Model/AnimationData/AnimationStructs.h"
 
 #include <d3d12.h>
 #include <vector>
@@ -27,6 +28,8 @@ public:
 	void AddIndex(uint32_t index);
 
 	void Draw(ID3D12GraphicsCommandList* commandList);
+
+	void AnimationDraw(const SkinCluster& skinCluster, ID3D12GraphicsCommandList* commandList);
 
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_ = nullptr;

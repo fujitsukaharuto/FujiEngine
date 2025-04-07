@@ -1,0 +1,31 @@
+#pragma once
+#include <wrl/client.h>
+#include <string>
+#include <vector>
+#include <optional>
+#include <span>
+#include <array>
+
+#include "Engine/DX/DXCom.h"
+#include "Engine/Math/MatrixCalculation.h"
+
+const uint32_t kNumMaxInfluence = 4;
+struct VertexInfluence {
+	std::array<float, kNumMaxInfluence> weights;
+	std::array<int32_t, kNumMaxInfluence> jointIndices;
+};
+
+struct WellForGPU {
+	Matrix4x4 skeltonSpaceMatrix;
+	Matrix4x4 skeletonSpaceInverseTransposeMatrix;
+};
+
+struct SkinCluster {
+	std::vector<Matrix4x4> inverseBindPoseMatrices;
+	Microsoft::WRL::ComPtr<ID3D12Resource> influenceResource;
+	D3D12_VERTEX_BUFFER_VIEW influenceBuffreView;
+	std::span<VertexInfluence> mappedInfluece;
+	Microsoft::WRL::ComPtr<ID3D12Resource> paletteResource;
+	std::span<WellForGPU> mappedPalette;
+	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> paletteSrvHandle;
+};

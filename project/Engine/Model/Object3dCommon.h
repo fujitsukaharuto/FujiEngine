@@ -12,6 +12,7 @@ public:
 
 	void PreDraw();
 
+	void PreAnimationDraw();
 
 private:
 

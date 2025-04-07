@@ -191,6 +191,9 @@
     <ClCompile Include="Engine\Model\AnimationData\AnimationModel.cpp">
       <Filter>Engine\Model\AnimationData</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\GraphicPipeline\AnimationPipeline.cpp">
+      <Filter>Engine\GraphicPipeline</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -412,6 +415,12 @@
     <ClInclude Include="Engine\Math\Animation\Skelton.h">
       <Filter>Engine\Math\Animation</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\GraphicPipeline\AnimationPipeline.h">
+      <Filter>Engine\GraphicPipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Model\AnimationData\AnimationStructs.h">
+      <Filter>Engine\Model\AnimationData</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -569,6 +578,12 @@
     <FxCompile Include="resource\Shaders\CS\Grayscale.CS.hlsl">
       <Filter>resource\Shaders\CS</Filter>
     </FxCompile>
+    <FxCompile Include="resource\Shaders\SkinningObject3d.VS.hlsl">
+      <Filter>resource\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\SkinningObject3d.PS.hlsl">
+      <Filter>resource\Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="resource\Shaders\Object3d.hlsli">
@@ -578,6 +593,9 @@
       <Filter>resource\Shaders</Filter>
     </None>
     <None Include="resource\Shaders\Line3d.hlsli">
+      <Filter>resource\Shaders</Filter>
+    </None>
+    <None Include="resource\Shaders\SkinningObject3d.hlsli">
       <Filter>resource\Shaders</Filter>
     </None>
   </ItemGroup>

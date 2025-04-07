@@ -39,3 +39,13 @@ void Mesh::Draw(ID3D12GraphicsCommandList* commandList) {
 	commandList->IASetIndexBuffer(&indexBufferView_);
 	commandList->DrawIndexedInstanced(static_cast<UINT>((indexData_.size())), 1, 0, 0, 0);
 }
+
+void Mesh::AnimationDraw(const SkinCluster& skinCluster, ID3D12GraphicsCommandList* commandList) {
+	D3D12_VERTEX_BUFFER_VIEW vbvs[2] = {
+		vertexBufferView_,
+		skinCluster.influenceBuffreView
+	};
+	commandList->IASetVertexBuffers(0, 2, vbvs);
+	commandList->IASetIndexBuffer(&indexBufferView_);
+	commandList->DrawIndexedInstanced(static_cast<UINT>((indexData_.size())), 1, 0, 0, 0);
+}

@@ -1,4 +1,6 @@
 #pragma once
+#include <cfloat>
+
 #include "Vector3.h"
 #include "Vector2Matrix.h"
 
@@ -82,69 +84,75 @@ public:
 	}
 
 	static Quaternion Slerp(const Quaternion& q0, const Quaternion& q1, float t) {
-		float dot = Dot(q0, q1);
+		Quaternion q0_0 = q0;
+		// q0とq1の内積
+		float dot = Dot(q0_0, q1);
 
-		bool flip = false;
-
+		// 内積が負の場合、もう片方の回転を利用する
 		if (dot < 0.0f) {
-			flip = true;
+
+			q0_0 = -q0_0;
 			dot = -dot;
 		}
 
-		float s0, s1;
-		const float slerpEpsilon = 1e-6f;
+		if (dot >= 1.0f - FLT_EPSILON) {
 
-		if (dot > (1.0f - slerpEpsilon)) {
-
-			s0 = 1.0f - t;
-			s1 = (flip) ? -t : t;
-		} else {
-			float omega = std::acos(dot);
-			float invSinOmega = 1 / std::sin(omega);
-
-			s0 = std::sin((1.0f - t) * omega) * invSinOmega;
-			s1 = (flip)
-				? -std::sin(t * omega) * invSinOmega
-				: std::sin(t * omega) * invSinOmega;
+			return (1.0f - t) * q0_0 + t * q1;
 		}
 
-		return Quaternion(
-			s0 * q0.x + s1 * q1.x,
-			s0 * q0.y + s1 * q1.y,
-			s0 * q0.z + s1 * q1.z,
-			s0 * q0.w + s1 * q1.w
-		);
+		// なす角を求める
+		float theta = std::acos(dot);
+		float sinTheta = std::sin(theta);
+
+		// 補完係数を計算
+		float scale0 = std::sin((1.0f - t) * theta) / sinTheta;
+		float scale1 = std::sin(t * theta) / sinTheta;
+
+		// 補完後のクォータニオンを求める
+		return q0_0 * scale0 + q1 * scale1;
 	}
 
 	Matrix4x4 MakeRotateMatrix()const {
-		Matrix4x4 mat;
 
-		// クォータニオンを使って回転行列を計算
-		mat.m[0][0] = 1.0f - 2.0f * (y * y + z * z);
-		mat.m[0][1] = 2.0f * (x * y + w * z);
-		mat.m[0][2] = 2.0f * (x * z - w * y);
-		mat.m[0][3] = 0;
+		Matrix4x4 result;
+		float xx = x * x;
+		float yy = y * y;
+		float zz = z * z;
+		float ww = w * w;
+		float xy = x * y;
+		float xz = x * z;
+		float yz = y * z;
+		float wx = w * x;
+		float wy = w * y;
+		float wz = w * z;
 
-		mat.m[1][0] = 2.0f * (x * y - w * z);
-		mat.m[1][1] = 1.0f - 2.0f * (x * x + z * z);
-		mat.m[1][2] = 2.0f * (y * z + w * x);
-		mat.m[1][3] = 0;
+		result.m[0][0] = ww + xx - yy - zz;
+		result.m[0][1] = 2.0f * (xy + wz);
+		result.m[0][2] = 2.0f * (xz - wy);
+		result.m[0][3] = 0.0f;
 
-		mat.m[2][0] = 2.0f * (x * z + w * y);
-		mat.m[2][1] = 2.0f * (y * z - w * x);
-		mat.m[2][2] = 1.0f - 2.0f * (x * x + y * y);
-		mat.m[2][3] = 0;
+		result.m[1][0] = 2.0f * (xy - wz);
+		result.m[1][1] = ww - xx + yy - zz;
+		result.m[1][2] = 2.0f * (yz + wx);
+		result.m[1][3] = 0.0f;
 
-		mat.m[3][0] = 0;
-		mat.m[3][1] = 0;
-		mat.m[3][2] = 0;
-		mat.m[3][3] = 1;
+		result.m[2][0] = 2.0f * (xz + wy);
+		result.m[2][1] = 2.0f * (yz - wx);
+		result.m[2][2] = ww - xx - yy + zz;
+		result.m[2][3] = 0.0f;
 
-		return mat;
+		result.m[3][0] = 0.0f;
+		result.m[3][1] = 0.0f;
+		result.m[3][2] = 0.0f;
+		result.m[3][3] = 1.0f;
+
+		return result;
 	}
 
 
-
+	Quaternion operator-() const {
+		return Quaternion(-x, -y, -z, -w);
+	}
 
 	Quaternion operator*(const Quaternion& rhs) const {
 		return Quaternion(
@@ -153,6 +161,20 @@ public:
 			w * rhs.z + x * rhs.y - y * rhs.x + z * rhs.w, // z
 			w * rhs.w - x * rhs.x - y * rhs.y - z * rhs.z  // w
 		);
+	}
+
+	Quaternion operator*(float scalar) const {
+		return Quaternion(x * scalar, y * scalar, z * scalar, w * scalar);
+	}
+
+	// Quaternion と float の乗算（左側・非メンバ関数）
+	friend Quaternion operator*(float scalar, const Quaternion& q) {
+		return Quaternion(q.x * scalar, q.y * scalar, q.z * scalar, q.w * scalar);
+	}
+
+	// Quaternion の加算
+	Quaternion operator+(const Quaternion& rhs) const {
+		return Quaternion(x + rhs.x, y + rhs.y, z + rhs.z, w + rhs.w);
 	}
 
 };

@@ -34,6 +34,19 @@ void Model::Draw(ID3D12GraphicsCommandList* commandList, Material* mate = nullpt
 	}
 }
 
+void Model::AnimationDraw(const SkinCluster& skinCluster, ID3D12GraphicsCommandList* commandList, Material* mate) {
+	for (uint32_t index = 0; index < mesh_.size(); ++index) {
+		if (mate) {
+			commandList->SetGraphicsRootConstantBufferView(0, mate->GetMaterialResource()->GetGPUVirtualAddress());
+			commandList->SetGraphicsRootDescriptorTable(2, mate->GetTexture()->gpuHandle);
+		} else {
+			commandList->SetGraphicsRootConstantBufferView(0, material_[index].GetMaterialResource()->GetGPUVirtualAddress());
+			commandList->SetGraphicsRootDescriptorTable(2, material_[index].GetTexture()->gpuHandle);
+		}
+		mesh_[index].AnimationDraw(skinCluster,commandList);
+	}
+}
+
 void Model::AddMaterial(const Material& material) {
 	material_.push_back(material);
 }

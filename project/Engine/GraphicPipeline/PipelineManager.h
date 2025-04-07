@@ -10,6 +10,7 @@ enum class Pipe : int {
 	Normal,
 	Line3d,
 	particle,
+	Animation,
 	Gray,
 	Gauss,
 	MetaBall,

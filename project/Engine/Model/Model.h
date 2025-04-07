@@ -6,6 +6,7 @@
 #include "Mesh.h"
 #include "Material.h"
 
+#include "AnimationData/AnimationStructs.h"
 #include "externals/DirectXTex/DirectXTex.h"
 #include "externals/DirectXTex/d3dx12.h"
 
@@ -16,6 +17,8 @@ public:
 	~Model();
 
 	void Draw(ID3D12GraphicsCommandList* commandList, Material* mate);
+
+	void AnimationDraw(const SkinCluster& skinCluster, ID3D12GraphicsCommandList* commandList, Material* mate);
 
 	void AddMaterial(const Material& material);
 
