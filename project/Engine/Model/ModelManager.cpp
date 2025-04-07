@@ -47,50 +47,46 @@ void ModelManager::LoadOBJ(const std::string& filename) {
 
 
 	// Mesh解析
+	uint32_t meshVertexCount = 0;
 	for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; meshIndex++) {
 
 		aiMesh* mesh = scene->mMeshes[meshIndex];
 		assert(mesh->HasNormals());
 		bool hasTexcoord = mesh->HasTextureCoords(0);
 
+		// Vertex解析
+		for (uint32_t element = 0; element < mesh->mNumVertices; element++) {
 
-		// Face解析
+			aiVector3D& position = mesh->mVertices[element];
+			aiVector3D& normal = mesh->mNormals[element];
+
+			VertexDate vertex;
+			vertex.position = { position.x,position.y,position.z,1.0f };
+			vertex.normal = { normal.x,normal.y,normal.z };
+
+			if (hasTexcoord) {
+				aiVector3D& texcoord = mesh->mTextureCoords[0][element];
+				vertex.texcoord = { texcoord.x,texcoord.y };
+			} else {
+				vertex.texcoord = { 0.0f,0.0f };
+			}
+
+			vertex.position.x *= -1.0f;
+			vertex.normal.x *= -1.0f;
+
+			newMesh.AddVertex({ {vertex.position},{vertex.texcoord},{vertex.normal} });
+		}
+
 		for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; faceIndex++) {
-
 			aiFace& face = mesh->mFaces[faceIndex];
 			assert(face.mNumIndices == 3);
 
-			// Vertex解析
-			for (uint32_t element = 0; element < face.mNumIndices; element++) {
-
-				uint32_t vertexIndex = face.mIndices[element];
-				aiVector3D& position = mesh->mVertices[vertexIndex];
-				aiVector3D& normal = mesh->mNormals[vertexIndex];
-
-				VertexDate vertex;
-				vertex.position = { position.x,position.y,position.z,1.0f };
-				vertex.normal = { normal.x,normal.y,normal.z };
-
-				if (hasTexcoord) {
-					aiVector3D& texcoord = mesh->mTextureCoords[0][vertexIndex];
-					vertex.texcoord = { texcoord.x,texcoord.y };
-				} else {
-					vertex.texcoord = { 0.0f,0.0f };
-				}
-
-
-				vertex.position.x *= -1.0f;
-				vertex.normal.x *= -1.0f;
-
-				newMesh.AddVertex({ {vertex.position},{vertex.texcoord},{vertex.normal} });
-
-			}
-
 			for (uint32_t element = 0; element < face.mNumIndices; element++) {
 				uint32_t vertexIndex = face.mIndices[element];
-				newMesh.AddIndex(vertexIndex);
+				newMesh.AddIndex(vertexIndex + meshVertexCount);
 			}
 		}
+		meshVertexCount += mesh->mNumVertices;
 	}
 
 	// Material解析
@@ -147,6 +143,7 @@ void ModelManager::LoadGLTF(const std::string& filename) {
 
 
 	// Mesh解析
+	uint32_t meshVertexCount = 0;
 	for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; meshIndex++) {
 		aiMesh* mesh = scene->mMeshes[meshIndex];
 		assert(mesh->HasNormals());
@@ -184,48 +181,10 @@ void ModelManager::LoadGLTF(const std::string& filename) {
 			for (uint32_t element = 0; element < face.mNumIndices; element++) {
 				uint32_t vertexIndex = face.mIndices[element];
 				newMesh.AddIndex(vertexIndex);
-				model->data_.indicies.push_back(vertexIndex);
+				model->data_.indicies.push_back(vertexIndex + meshVertexCount);
 			}
 		}
-
-		/*// Face解析
-		//for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; faceIndex++) {
-
-		//	aiFace& face = mesh->mFaces[faceIndex];
-		//	assert(face.mNumIndices == 3);
-
-		//	// Vertex解析
-		//	for (uint32_t element = 0; element < face.mNumIndices; element++) {
-
-		//		uint32_t vertexIndex = face.mIndices[element];
-		//		aiVector3D& position = mesh->mVertices[vertexIndex];
-		//		aiVector3D& normal = mesh->mNormals[vertexIndex];
-
-		//		VertexDate vertex;
-		//		vertex.position = { position.x,position.y,position.z,1.0f };
-		//		vertex.normal = { normal.x,normal.y,normal.z };
-
-		//		if (hasTexcoord) {
-		//			aiVector3D& texcoord = mesh->mTextureCoords[0][vertexIndex];
-		//			vertex.texcoord = { texcoord.x,texcoord.y };
-		//		} else {
-		//			vertex.texcoord = { 0.0f,0.0f };
-		//		}
-
-
-		//		vertex.position.x *= -1.0f;
-		//		vertex.normal.x *= -1.0f;
-
-		//		newMesh.AddVertex({ {vertex.position},{vertex.texcoord},{vertex.normal} });
-		//		model->data_.vertices.push_back({ {vertex.position},{vertex.texcoord},{vertex.normal} });
-		//	}
-
-		//	for (uint32_t element = 0; element < face.mNumIndices; element++) {
-		//		uint32_t vertexIndex = face.mIndices[element];
-		//		newMesh.AddIndex(vertexIndex);
-		//		model->data_.indicies.push_back(vertexIndex);
-		//	}
-		//}*/
+		meshVertexCount += mesh->mNumVertices;
 
 		// SkinCluster構築用のデータ取得
 		for (uint32_t boneIndex = 0; boneIndex < mesh->mNumBones; boneIndex++) {

@@ -32,7 +32,7 @@ void TitleScene::Initialize() {
 #pragma endregion
 
 	sphere = std::make_unique<Object3d>();
-	sphere->CreateSphere();
+	sphere->Create("Fence.obj");
 	sphere->transform.translate.x = 4.0f;
 
 	cube_ = std::make_unique<AnimationModel>();
