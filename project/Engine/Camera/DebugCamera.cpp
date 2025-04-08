@@ -1,7 +1,10 @@
 #include "DebugCamera.h"
-#include "Input.h"
-#include "MyWindow.h"
+
 #include <numbers>
+
+#include "Input/Input.h"
+#include "WinApp/MyWindow.h"
+
 
 DebugCamera::DebugCamera() {
 }

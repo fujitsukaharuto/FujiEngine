@@ -10,7 +10,7 @@
 
 #include "DXCommand.h"
 #include "DXCompil.h"
-#include "MatrixCalculation.h"
+#include "Math/Matrix/MatrixCalculation.h"
 #include "TextureManager.h"
 
 

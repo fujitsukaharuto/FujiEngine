@@ -1,10 +1,12 @@
 #include "Camera.h"
-#include "DX/FPSKeeper.h"
+
 #include "WinApp/MyWindow.h"
+#include "DX/FPSKeeper.h"
 #include "CameraManager.h"
-#include "Camera/DebugCamera.h"
-#include "Random.h"
+#include "DebugCamera.h"
+#include "Math/Random/Random.h"
 #include "ImGuiManager.h"
+
 
 Camera::Camera() :transform({ { 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, { 0.0f,3.5f,-20.0f } })
 , fovY_(0.45f), aspect_(float(MyWin::kWindowWidth) / float(MyWin::kWindowHeight))

@@ -1,8 +1,8 @@
 #pragma once
 #include <vector>
 #include "Keyframe.h"
-#include "Vector3.h"
-#include "Quaternion.h"
+#include "Math/Vector/Vector3.h"
+#include "Math/Quaternion/Quaternion.h"
 
 template <typename tValue>
 struct AnimationCurve {

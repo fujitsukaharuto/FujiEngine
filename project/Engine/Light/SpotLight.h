@@ -1,7 +1,7 @@
 #pragma once
 #include <wrl/client.h>
 #include <d3d12.h>
-#include "MatrixCalculation.h"
+#include "Math/Matrix/MatrixCalculation.h"
 
 struct SpotLightData {
 	Vector4 color;

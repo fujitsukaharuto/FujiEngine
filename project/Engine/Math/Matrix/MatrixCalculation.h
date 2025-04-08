@@ -4,17 +4,14 @@
 #include <string>
 #include <map>
 
-#include "Vector2.h"
-#include "Vector3.h"
-#include "Vector2Matrix.h"
-#include "Quaternion.h"
-
-struct Vector4 {
-	float x;
-	float y;
-	float z;
-	float w;
-};
+#include "Vector/Vector2.h"
+#include "Vector/Vector3.h"
+#include "Vector/Vector4.h"
+#include "Vector/Vector2Matrix.h"
+#include "Matrix/Matrix2x2.h"
+#include "Matrix/Matrix3x3.h"
+#include "Matrix/Matrix4x4.h"
+#include "Quaternion/Quaternion.h"
 
 struct Trans {
 	Vector3 scale;

@@ -59,9 +59,6 @@
     <ClCompile Include="Engine\Model\TextureManager.cpp">
       <Filter>Engine\Model</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Math\MatrixCalculation.cpp">
-      <Filter>Engine\Math</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\WinApp\MyWindow.cpp">
       <Filter>Engine\WinApp</Filter>
     </ClCompile>
@@ -100,9 +97,6 @@
     </ClCompile>
     <ClCompile Include="Engine\GraphicPipeline\PipelineManager.cpp">
       <Filter>Engine\GraphicPipeline</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Math\Random.cpp">
-      <Filter>Engine\Math</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Scene\BaseScene.cpp">
       <Filter>Engine\Scene</Filter>
@@ -176,9 +170,6 @@
     <ClCompile Include="Game\Collider\CollisionManager.cpp">
       <Filter>Game\Collider</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Math\Quaternion.cpp">
-      <Filter>Engine\Math</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\GraphicPipeline\CRTPipe.cpp">
       <Filter>Engine\GraphicPipeline</Filter>
     </ClCompile>
@@ -193,6 +184,21 @@
     </ClCompile>
     <ClCompile Include="Engine\GraphicPipeline\AnimationPipeline.cpp">
       <Filter>Engine\GraphicPipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Math\Matrix\MatrixCalculation.cpp">
+      <Filter>Engine\Math\Matrix</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Math\Random\Random.cpp">
+      <Filter>Engine\Math\Random</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Math\Quaternion\Quaternion.cpp">
+      <Filter>Engine\Math\Quaternion</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Math\Vector\Vector3.cpp">
+      <Filter>Engine\Math\Vector</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Math\Vector\Vector2.cpp">
+      <Filter>Engine\Math\Vector</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -253,18 +259,6 @@
     <ClInclude Include="Engine\Model\TextureManager.h">
       <Filter>Engine\Model</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Math\MatrixCalculation.h">
-      <Filter>Engine\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Math\Vector2.h">
-      <Filter>Engine\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Math\Vector2Matrix.h">
-      <Filter>Engine\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Math\Vector3.h">
-      <Filter>Engine\Math</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\WinApp\MyWindow.h">
       <Filter>Engine\WinApp</Filter>
     </ClInclude>
@@ -303,9 +297,6 @@
     </ClInclude>
     <ClInclude Include="Engine\GraphicPipeline\PipelineManager.h">
       <Filter>Engine\GraphicPipeline</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Math\Random.h">
-      <Filter>Engine\Math</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Scene\BaseScene.h">
       <Filter>Engine\Scene</Filter>
@@ -385,9 +376,6 @@
     <ClInclude Include="Game\Collider\CollisionManager.h">
       <Filter>Game\Collider</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Math\Quaternion.h">
-      <Filter>Engine\Math</Filter>
-    </ClInclude>
     <ClInclude Include="Game\OriginState.h">
       <Filter>Game</Filter>
     </ClInclude>
@@ -420,6 +408,36 @@
     </ClInclude>
     <ClInclude Include="Engine\Model\AnimationData\AnimationStructs.h">
       <Filter>Engine\Model\AnimationData</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Math\Vector\Vector2.h">
+      <Filter>Engine\Math\Vector</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Math\Vector\Vector2Matrix.h">
+      <Filter>Engine\Math\Vector</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Math\Vector\Vector3.h">
+      <Filter>Engine\Math\Vector</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Math\Matrix\MatrixCalculation.h">
+      <Filter>Engine\Math\Matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Math\Random\Random.h">
+      <Filter>Engine\Math\Random</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Math\Quaternion\Quaternion.h">
+      <Filter>Engine\Math\Quaternion</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Math\Matrix\Matrix4x4.h">
+      <Filter>Engine\Math\Matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Math\Matrix\Matrix3x3.h">
+      <Filter>Engine\Math\Matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Math\Matrix\Matrix2x2.h">
+      <Filter>Engine\Math\Matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Math\Vector\Vector4.h">
+      <Filter>Engine\Math\Vector</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -506,6 +524,18 @@
     </Filter>
     <Filter Include="Engine\Model\AnimationData">
       <UniqueIdentifier>{caf4aa0b-f65b-4267-bfeb-452ebca8902c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Math\Vector">
+      <UniqueIdentifier>{7d72c698-8a41-43a4-8ede-abcee7e036a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Math\Matrix">
+      <UniqueIdentifier>{c3c8cefe-3407-4bcf-89b5-30a88c2d74c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Math\Quaternion">
+      <UniqueIdentifier>{de0ec3b1-c396-481f-829b-4a87b6923d46}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Math\Random">
+      <UniqueIdentifier>{fbafdfc2-b133-4fa5-8806-f13994df902f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -3,7 +3,7 @@
 #include "SRVManager.h"
 #include "CameraManager.h"
 #include "Particle.h"
-#include "Random.h"
+#include "Math/Random/Random.h"
 #include "FPSKeeper.h"
 
 
@@ -148,6 +148,9 @@ void ParticleManager::Update() {
 			particle.transform.translate += particle.speed * FPSKeeper::DeltaTime();
 			Matrix4x4 worldViewProjectionMatrix;
 			Matrix4x4 worldMatrix = MakeIdentity4x4();
+			Matrix4x4 xBillboardMatrix;
+			Matrix4x4 yBillboardMatrix;
+			Matrix4x4 zBillboardMatrix;
 
 			if (!particle.isBillBoard_) {
 				worldMatrix = MakeAffineMatrix(particle.transform.scale, particle.transform.rotate, particle.transform.translate);
@@ -160,7 +163,7 @@ void ParticleManager::Update() {
 					break;
 				case BillBoardPattern::kXBillBoard:
 
-					Matrix4x4 xBillboardMatrix = billboardMatrix;
+					xBillboardMatrix = billboardMatrix;
 					xBillboardMatrix.m[1][0] = 0.0f; // Y軸成分をゼロにする
 					xBillboardMatrix.m[2][0] = 0.0f; // Z軸成分をゼロにする
 
@@ -171,7 +174,7 @@ void ParticleManager::Update() {
 					break;
 				case BillBoardPattern::kYBillBoard:
 
-					Matrix4x4 yBillboardMatrix = billboardMatrix;
+					yBillboardMatrix = billboardMatrix;
 					yBillboardMatrix.m[0][1] = 0.0f; // X軸成分をゼロにする
 					yBillboardMatrix.m[2][1] = 0.0f; // Z軸成分をゼロにする
 
@@ -182,7 +185,7 @@ void ParticleManager::Update() {
 					break;
 				case BillBoardPattern::kZBillBoard:
 
-					Matrix4x4 zBillboardMatrix = billboardMatrix;
+					zBillboardMatrix = billboardMatrix;
 					zBillboardMatrix.m[0][2] = 0.0f; // X軸成分をゼロにする
 					zBillboardMatrix.m[1][2] = 0.0f; // Y軸成分をゼロにする
 
@@ -432,6 +435,8 @@ void ParticleManager::Emit(const std::string& name, const Vector3& pos, const Ve
 				Vector3 cameraR{};
 				Vector3 defo = { 0.0f,1.0f,0.0f };
 				Vector3 angleDToD{};
+				Matrix4x4 rotateCamera;
+				Matrix4x4 dToD;
 
 				switch (particle.rotateType) {
 				case static_cast<int>(RotateType::kUsually):
@@ -443,12 +448,12 @@ void ParticleManager::Emit(const std::string& name, const Vector3& pos, const Ve
 
 					// カメラの回転を考慮して速度ベクトルを変換
 					cameraR = CameraManager::GetInstance()->GetCamera()->transform.rotate;
-					Matrix4x4 rotateCamera = MakeRotateXYZMatrix(-cameraR);
+					rotateCamera = MakeRotateXYZMatrix(-cameraR);
 					veloSpeed = TransformNormal(veloSpeed, rotateCamera);
 
 					defo = TransformNormal(defo, rotateCamera);
 
-					Matrix4x4 dToD = DirectionToDirection(defo, veloSpeed.Normalize());
+					dToD = DirectionToDirection(defo, veloSpeed.Normalize());
 					angleDToD = ExtractEulerAngles(dToD);
 					particle.transform.rotate = angleDToD;
 

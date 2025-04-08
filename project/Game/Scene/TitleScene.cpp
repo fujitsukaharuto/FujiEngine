@@ -4,7 +4,7 @@
 #include "GlobalVariables.h"
 #include "CameraManager.h"
 #include "FPSKeeper.h"
-#include "Random.h"
+#include "Math/Random/Random.h"
 #include "Model/Line3dDrawer.h"
 #include "Particle/ParticleManager.h"
 #include "Scene/SceneManager.h"

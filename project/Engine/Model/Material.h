@@ -1,5 +1,5 @@
 #pragma once
-#include "MatrixCalculation.h"
+#include "Math/Matrix/MatrixCalculation.h"
 #include "TextureManager.h"
 
 enum class LightMode {

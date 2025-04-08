@@ -1,7 +1,7 @@
 #pragma once
-#include "Vector3.h"
-#include "Vector2.h"
-#include "MatrixCalculation.h"
+#include "Math/Vector/Vector3.h"
+#include "Math/Vector/Vector2.h"
+#include "Math/Matrix/MatrixCalculation.h"
 #include "Engine/Model/AnimationData/AnimationStructs.h"
 
 #include <d3d12.h>

@@ -5,7 +5,7 @@
 #include "ParticleEmitter.h"
 #include "Model.h"
 #include "Object3d.h"
-#include "MatrixCalculation.h"
+#include "Math/Matrix/MatrixCalculation.h"
 
 using namespace Microsoft::WRL;
 

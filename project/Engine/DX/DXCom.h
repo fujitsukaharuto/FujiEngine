@@ -10,7 +10,7 @@
 #include <wrl.h>
 
 
-#include "MatrixCalculation.h"
+#include "Math/Matrix/MatrixCalculation.h"
 #include "MyWindow.h"
 #include "DXCommand.h"
 #include "DXCompil.h"

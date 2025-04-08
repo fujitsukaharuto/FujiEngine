@@ -7,7 +7,7 @@
 #include <array>
 
 #include "Engine/DX/DXCom.h"
-#include "Engine/Math/MatrixCalculation.h"
+#include "Engine/Math/Matrix/MatrixCalculation.h"
 
 const uint32_t kNumMaxInfluence = 4;
 struct VertexInfluence {

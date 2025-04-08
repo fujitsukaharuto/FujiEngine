@@ -1,8 +1,9 @@
 #pragma once
 #include <cfloat>
 
-#include "Vector3.h"
-#include "Vector2Matrix.h"
+#include "Math/Vector/Vector3.h"
+#include "Math/Vector/Vector4.h"
+#include "Math/Matrix/Matrix4x4.h"
 
 class Quaternion {
 public:
@@ -112,7 +113,7 @@ public:
 		return q0_0 * scale0 + q1 * scale1;
 	}
 
-	Matrix4x4 MakeRotateMatrix()const {
+	Matrix4x4 MakeRotateMatrix() const {
 
 		Matrix4x4 result;
 		float xx = x * x;
