@@ -148,9 +148,6 @@ void ParticleManager::Update() {
 			particle.transform.translate += particle.speed * FPSKeeper::DeltaTime();
 			Matrix4x4 worldViewProjectionMatrix;
 			Matrix4x4 worldMatrix = MakeIdentity4x4();
-			Matrix4x4 xBillboardMatrix;
-			Matrix4x4 yBillboardMatrix;
-			Matrix4x4 zBillboardMatrix;
 
 			if (!particle.isBillBoard_) {
 				worldMatrix = MakeAffineMatrix(particle.transform.scale, particle.transform.rotate, particle.transform.translate);
@@ -161,8 +158,9 @@ void ParticleManager::Update() {
 					worldMatrix = Multiply(MakeScaleMatrix(particle.transform.scale), billboardMatrix);
 					worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform.translate));
 					break;
-				case BillBoardPattern::kXBillBoard:
+				case BillBoardPattern::kXBillBoard: {
 
+					Matrix4x4 xBillboardMatrix;
 					xBillboardMatrix = billboardMatrix;
 					xBillboardMatrix.m[1][0] = 0.0f; // Y軸成分をゼロにする
 					xBillboardMatrix.m[2][0] = 0.0f; // Z軸成分をゼロにする
@@ -170,11 +168,11 @@ void ParticleManager::Update() {
 					worldMatrix = Multiply(MakeScaleMatrix(particle.transform.scale), MakeRotateXYZMatrix({ 0.0f,particle.transform.rotate.y,particle.transform.rotate.z }));
 					worldMatrix = Multiply(worldMatrix, xBillboardMatrix);
 					worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform.translate));
-
 					break;
-				case BillBoardPattern::kYBillBoard:
+				}
+				case BillBoardPattern::kYBillBoard: {
 
-					yBillboardMatrix = billboardMatrix;
+					Matrix4x4 yBillboardMatrix = billboardMatrix;
 					yBillboardMatrix.m[0][1] = 0.0f; // X軸成分をゼロにする
 					yBillboardMatrix.m[2][1] = 0.0f; // Z軸成分をゼロにする
 
@@ -183,9 +181,10 @@ void ParticleManager::Update() {
 					worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform.translate));
 
 					break;
-				case BillBoardPattern::kZBillBoard:
+				}
+				case BillBoardPattern::kZBillBoard: {
 
-					zBillboardMatrix = billboardMatrix;
+					Matrix4x4 zBillboardMatrix = billboardMatrix;
 					zBillboardMatrix.m[0][2] = 0.0f; // X軸成分をゼロにする
 					zBillboardMatrix.m[1][2] = 0.0f; // Y軸成分をゼロにする
 
@@ -194,10 +193,10 @@ void ParticleManager::Update() {
 					worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform.translate));
 
 					break;
+				}
 				default:
 					break;
 				}
-
 			}
 
 			if (camera_) {
