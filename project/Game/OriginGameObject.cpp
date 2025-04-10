@@ -14,6 +14,9 @@ void OriginGameObject::Draw(Material* mate) {
 	model_->Draw(mate);
 }
 
+void OriginGameObject::DebugGUI() {
+}
+
 #ifdef _DEBUG
 void OriginGameObject::Debug() {
 }

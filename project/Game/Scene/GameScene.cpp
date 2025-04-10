@@ -40,30 +40,11 @@ void GameScene::Initialize() {
 	black_->SetAnchor({ 0.0f,0.0f });
 #pragma endregion
 
-	sphere = std::make_unique<Object3d>();
-	sphere->CreateSphere();
-
-	suzunne = std::make_unique<Object3d>();
-	suzunne->Create("suzanne.obj");
-
-	float addDis = 1.0f;
-	for (int i = 0; i < 3; i++) {
-
-		std::unique_ptr<Object3d> newModel = std::make_unique<Object3d>();
-		newModel->Create("suzanne.obj");
-		newModel->transform.translate.x += addDis;
-		newModel->transform.translate.z += addDis;
-		newModel->transform.rotate.y = 3.14f;
-		suzunnes.push_back(std::move(newModel));
-		addDis += 0.5f;
-
-	}
-
-	fence = std::make_unique<Object3d>();
-	fence->Create("Fence.obj");
-
 	terrain = std::make_unique<Object3d>();
 	terrain->Create("terrain.obj");
+
+	player_ = std::make_unique<Player>();
+	player_->Initialize();
 
 	mate = std::make_unique<Material>();
 	mate->SetTextureNamePath("grass.png");
@@ -90,21 +71,9 @@ void GameScene::Update() {
 
 	ApplyGlobalVariables();
 
+	player_->Update();
 
 #endif // _DEBUG
-
-	if (input_->PushKey(DIK_LEFT)) {
-		suzunne->transform.translate.x -= 0.05f;
-	}
-	if (input_->PushKey(DIK_RIGHT)) {
-		suzunne->transform.translate.x += 0.05f;
-	}
-	if (input_->PushKey(DIK_UP)) {
-		suzunne->transform.translate.y += 0.05f;
-	}
-	if (input_->PushKey(DIK_DOWN)) {
-		suzunne->transform.translate.y -= 0.05f;
-	}
 
 	if (input_->TriggerKey(DIK_5)) {
 		emit.BurstAnime();
@@ -127,25 +96,6 @@ void GameScene::Update() {
 
 	BlackFade();
 
-	suzunne->transform.rotate.y = 3.14f;
-	suzunne->transform.rotate.x += (0.05f) * FPSKeeper::DeltaTime();
-
-
-	float rotaSpeed = 0.1f;
-	for (auto& suzunneModel : suzunnes) {
-		suzunneModel->transform.rotate.x += rotaSpeed * FPSKeeper::DeltaTime();
-		//suzunneModel->transform.translate = Random::GetVector3({ -4.0f,4.0f }, { -4.0f,4.0f }, { -4.0f,4.0f });
-		rotaSpeed += 0.05f;
-	}
-
-
-	sphere->transform.translate = spherevec;
-	sphere->transform.rotate.y += 0.02f;
-
-	fence->transform.translate = fencevec;
-	fence->transform.rotate.x = 0.5f;
-
-
 	ParticleManager::GetInstance()->Update();
 }
 
@@ -159,13 +109,10 @@ void GameScene::Draw() {
 
 #pragma region 3Dオブジェクト
 	obj3dCommon->PreDraw();
-	sphere->Draw();
-	suzunne->Draw();
-	fence->Draw();
-	for (auto& suzunneModel : suzunnes) {
-		suzunneModel->Draw();
-	}
+	
 	terrain->Draw();
+	player_->Draw();
+
 
 	ParticleManager::GetInstance()->Draw();
 
@@ -187,15 +134,7 @@ void GameScene::DebugGUI() {
 #ifdef _DEBUG
 	ImGui::Indent();
 	
-	if (ImGui::CollapsingHeader("suzunne")) {
-		ImGui::ColorEdit4("color", &color_.x);
-		suzunne->SetColor(color_);
-	}
-
-	if (ImGui::CollapsingHeader("Sphere")) {
-		ImGui::DragFloat3("scale", &sphere->transform.scale.x, 0.01f);
-		ImGui::DragFloat3("rotate", &sphere->transform.rotate.x, 0.01f);
-	}
+	player_->DebugGUI();
 
 	ImGui::Unindent();
 #endif // _DEBUG
@@ -231,7 +170,7 @@ void GameScene::BlackFade() {
 	}
 	black_->SetColor({ 0.0f,0.0f,0.0f,Lerp(0.0f,1.0f,(1.0f / blackLimmite * blackTime)) });
 	XINPUT_STATE pad;
-	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
+	if (Input::GetInstance()->TriggerKey(DIK_0)) {
 		if (blackTime == 0.0f) {
 			isChangeFase = true;
 		}
