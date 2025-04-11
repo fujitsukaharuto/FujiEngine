@@ -1,11 +1,11 @@
 #include "ParticleManager.h"
-#include "DXCom.h"
-#include "SRVManager.h"
-#include "CameraManager.h"
+#include "Engine/DX/DXCom.h"
+#include "Engine/DX/SRVManager.h"
+#include "Engine/Camera/CameraManager.h"
 #include "Particle.h"
 #include "Math/Random/Random.h"
-#include "FPSKeeper.h"
-
+#include "Engine/DX/FPSKeeper.h"
+#include "ImGuiManager/ImGuiManager.h"
 
 
 ParticleManager::ParticleManager() {
@@ -59,6 +59,9 @@ void ParticleManager::Initialize(DXCom* dxcom, SRVManager* srvManager) {
 }
 
 void ParticleManager::Finalize() {
+#ifdef _DEBUG
+	selectParticleGroup_ = nullptr;
+#endif // _DEBUG
 	particleGroups_.clear();
 	for (auto& groupPair : animeGroups_) {
 
@@ -291,6 +294,48 @@ void ParticleManager::Draw() {
 
 		dxCommon_->GetCommandList()->DrawIndexedInstanced(6, group->drawCount_, 0, 0, 0);
 	}
+}
+
+void ParticleManager::ParticleDebugGUI() {
+#ifdef _DEBUG
+	ImGui::Begin("ParticleDebug");
+	ImGui::SeparatorText("ParticleGroup");
+
+	if (particleGroups_.size() != 0) {
+		if (!selectParticleGroup_) {
+			selectParticleGroup_ = particleGroups_.begin()->second.get();
+		}
+	}
+
+	std::vector<const char*> keys;
+	for (const auto& pair : particleGroups_) {
+		keys.push_back(pair.first.c_str());
+	}
+	if (ImGui::Combo("Particle Group", &currentIndex_, keys.data(), int(keys.size()))) {
+		currentKey_ = keys[currentIndex_];
+		// currentKey を使って選択中の ParticleGroup を取得
+		selectParticleGroup_ = particleGroups_[currentKey_].get();
+	}
+
+	if (selectParticleGroup_) {
+		if (ImGui::CollapsingHeader("Emitter")) {
+			ImGui::Indent();
+			ParticleEmitter& selecrtEmitter = selectParticleGroup_->emitter_;
+
+			ImGui::DragFloat3("pos", &selecrtEmitter.pos_.x, 0.01f);
+
+			ImGui::Unindent();
+		}
+
+
+
+
+
+
+	}
+
+	ImGui::End();
+#endif // _DEBUG
 }
 
 void ParticleManager::CreateParticleGroup(const std::string& name, const std::string& fileName, uint32_t count) {

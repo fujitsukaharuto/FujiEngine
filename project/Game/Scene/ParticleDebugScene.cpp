@@ -44,6 +44,8 @@ void ParticleDebugScene::Update() {
 
 	dxCommon_->UpDate();
 
+	ParticleManager::GetInstance()->ParticleDebugGUI();
+
 	BlackFade();
 
 	ParticleManager::GetInstance()->Update();
@@ -81,10 +83,6 @@ void ParticleDebugScene::Draw() {
 void ParticleDebugScene::DebugGUI() {
 #ifdef _DEBUG
 	ImGui::Indent();
-
-	if (ImGui::CollapsingHeader("Sphere")) {
-		
-	}
 
 	ImGui::Unindent();
 #endif // _DEBUG
