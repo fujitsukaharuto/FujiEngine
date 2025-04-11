@@ -14,15 +14,15 @@ ParticleEmitter::~ParticleEmitter() {
 
 #ifdef _DEBUG
 void ParticleEmitter::DebugGUI() {
-	if (ImGui::CollapsingHeader(name.c_str())) {
+	if (ImGui::CollapsingHeader(name_.c_str())) {
 		if (ImGui::TreeNode("emitter")) {
-			ImGui::DragFloat3("pos", &pos.x, 0.01f);
-			int im_Count = int(count);
+			ImGui::DragFloat3("pos", &pos_.x, 0.01f);
+			int im_Count = int(count_);
 			ImGui::DragInt("count", &im_Count, 1, 0, 10);
-			count = uint32_t(im_Count);
-			ImGui::DragFloat("frenquencyTime", &frequencyTime, 0.1f, 1.0f, 600.0f);
-			ImGui::DragFloat3("emitSizeMax", &emitSizeMax.x, 0.01f);
-			ImGui::DragFloat3("emitSizeMin", &emitSizeMin.x, 0.01f);
+			count_ = uint32_t(im_Count);
+			ImGui::DragFloat("frenquencyTime", &frequencyTime_, 0.1f, 1.0f, 600.0f);
+			ImGui::DragFloat3("emitSizeMax", &emitSizeMax_.x, 0.01f);
+			ImGui::DragFloat3("emitSizeMin", &emitSizeMin_.x, 0.01f);
 			ImGui::TreePop();
 		}
 		ImGui::Separator();
@@ -31,37 +31,37 @@ void ParticleEmitter::DebugGUI() {
 			ImGui::ColorEdit4("colorMin", &para_.colorMin.x);
 			ImGui::ColorEdit4("colorMax", &para_.colorMax.x);
 
-			ImGui::DragFloat("lifetime", &grain.lifeTime_, 0.1f);
+			ImGui::DragFloat("lifetime", &grain_.lifeTime_, 0.1f);
 			if (ImGui::TreeNode("typeSelect")) {
-				ImGui::Combo("sizeType##type", &grain.type, "kNormal\0kShift\0kSin\0");
-				ImGui::Combo("speedType##type", &grain.speedType, "kConstancy\0kChange\0kReturn\0kCenter\0");
-				ImGui::Combo("rotateType##type", &grain.rotateType, "kUsually\0kVelocityR\0kRandomR\0");
-				ImGui::Combo("colorType##type", &grain.colorType, "kDefault\0kRandom\0");
+				ImGui::Combo("sizeType##type", &grain_.type_, "kNormal\0kShift\0kSin\0");
+				ImGui::Combo("speedType##type", &grain_.speedType_, "kConstancy\0kChange\0kReturn\0kCenter\0");
+				ImGui::Combo("rotateType##type", &grain_.rotateType_, "kUsually\0kVelocityR\0kRandomR\0");
+				ImGui::Combo("colorType##type", &grain_.colorType_, "kDefault\0kRandom\0");
 				ImGui::TreePop();
 			}
 			ImGui::SeparatorText("size");
-			ImGui::DragFloat2("startSize", &grain.startSize.x, 0.01f);
-			ImGui::DragFloat2("endSize", &grain.endSize.x, 0.01f);
+			ImGui::DragFloat2("startSize", &grain_.startSize_.x, 0.01f);
+			ImGui::DragFloat2("endSize", &grain_.endSize_.x, 0.01f);
 			ImGui::SeparatorText("rotate");
-			ImGui::DragFloat3("rotate", &particleRotate.x, 0.01f);
+			ImGui::DragFloat3("rotate", &particleRotate_.x, 0.01f);
 			ImGui::SeparatorText("randSpeed");
 			ImGui::DragFloat2("speedX", &para_.speedx.x, 0.01f);
 			ImGui::DragFloat2("speedY", &para_.speedy.x, 0.01f);
 			ImGui::DragFloat2("speedZ", &para_.speedz.x, 0.01f);
-			if (grain.speedType == static_cast<int>(SpeedType::kReturn) || grain.speedType == static_cast<int>(SpeedType::kCenter)) {
-				ImGui::DragFloat("returnPower", &grain.returnPower_, 0.001f);
+			if (grain_.speedType_ == static_cast<int>(SpeedType::kReturn) || grain_.speedType_ == static_cast<int>(SpeedType::kCenter)) {
+				ImGui::DragFloat("returnPower", &grain_.returnPower_, 0.001f);
 			}
 			ImGui::SeparatorText("accele");
-			ImGui::DragFloat3("accele", &grain.accele.x, 0.01f);
+			ImGui::DragFloat3("accele", &grain_.accele_.x, 0.01f);
 			ImGui::SeparatorText("billBoard");
-			ImGui::Checkbox("BillBoard", &grain.isBillBoard_);
-			if (grain.isBillBoard_) {
-				int billPattern = static_cast<int>(grain.pattern_);
+			ImGui::Checkbox("BillBoard", &grain_.isBillBoard_);
+			if (grain_.isBillBoard_) {
+				int billPattern = static_cast<int>(grain_.pattern_);
 				ImGui::RadioButton("XYZ", &billPattern, 0); ImGui::SameLine();
 				ImGui::RadioButton("X", &billPattern, 1); ImGui::SameLine();
 				ImGui::RadioButton("Y", &billPattern, 2); ImGui::SameLine();
 				ImGui::RadioButton("Z", &billPattern, 3);
-				grain.pattern_ = static_cast<BillBoardPattern>(billPattern);
+				grain_.pattern_ = static_cast<BillBoardPattern>(billPattern);
 			}
 			ImGui::Checkbox("SizeCheck", &isDrawSize_);
 			ImGui::TreePop();
@@ -74,29 +74,29 @@ void ParticleEmitter::DebugGUI() {
 void ParticleEmitter::DrawSize() {
 	if (isDrawSize_) {
 
-		Matrix4x4 worldMatrix = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, pos);
+		Matrix4x4 worldMatrix = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, pos_);
 		if (parent_) {
 			const Matrix4x4& parentWorldMatrix = parent_->GetWorldMat();
 			worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
 		}
 
 		Vector3 points[8];
-		points[0] = emitSizeMin;
+		points[0] = emitSizeMin_;
 		points[0] += {worldMatrix.m[3][0], worldMatrix.m[3][1], worldMatrix.m[3][2]};
-		points[1] = { emitSizeMax.x,emitSizeMin.y,emitSizeMin.z };
+		points[1] = { emitSizeMax_.x,emitSizeMin_.y,emitSizeMin_.z };
 		points[1] += {worldMatrix.m[3][0], worldMatrix.m[3][1], worldMatrix.m[3][2]};
-		points[2] = { emitSizeMax.x,emitSizeMin.y,emitSizeMax.z };
+		points[2] = { emitSizeMax_.x,emitSizeMin_.y,emitSizeMax_.z };
 		points[2] += {worldMatrix.m[3][0], worldMatrix.m[3][1], worldMatrix.m[3][2]};
-		points[3] = { emitSizeMin.x,emitSizeMin.y,emitSizeMax.z };
+		points[3] = { emitSizeMin_.x,emitSizeMin_.y,emitSizeMax_.z };
 		points[3] += {worldMatrix.m[3][0], worldMatrix.m[3][1], worldMatrix.m[3][2]};
 
-		points[4] = emitSizeMax;
+		points[4] = emitSizeMax_;
 		points[4] += {worldMatrix.m[3][0], worldMatrix.m[3][1], worldMatrix.m[3][2]};
-		points[5] = { emitSizeMin.x,emitSizeMax.y,emitSizeMax.z };
+		points[5] = { emitSizeMin_.x,emitSizeMax_.y,emitSizeMax_.z };
 		points[5] += {worldMatrix.m[3][0], worldMatrix.m[3][1], worldMatrix.m[3][2]};
-		points[6] = { emitSizeMin.x,emitSizeMax.y,emitSizeMin.z };
+		points[6] = { emitSizeMin_.x,emitSizeMax_.y,emitSizeMin_.z };
 		points[6] += {worldMatrix.m[3][0], worldMatrix.m[3][1], worldMatrix.m[3][2]};
-		points[7] = { emitSizeMax.x,emitSizeMax.y,emitSizeMin.z };
+		points[7] = { emitSizeMax_.x,emitSizeMax_.y,emitSizeMin_.z };
 		points[7] += {worldMatrix.m[3][0], worldMatrix.m[3][1], worldMatrix.m[3][2]};
 
 		Line3dDrawer::GetInstance()->DrawLine3d(points[0], points[1], Vector4{ 1.0f, 0.0f, 0.0f, 1.0f });
@@ -119,52 +119,52 @@ void ParticleEmitter::DrawSize() {
 #endif // _DEBUG
 
 void ParticleEmitter::Emit() {
-	Matrix4x4 worldMatrix = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, pos);
+	Matrix4x4 worldMatrix = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, pos_);
 	if (parent_) {
 		const Matrix4x4& parentWorldMatrix = parent_->GetWorldMat();
 		worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
 	}
 
 	if (time_ <= 0) {
-		for (uint32_t i = 0; i < count; i++) {
+		for (uint32_t i = 0; i < count_; i++) {
 			Vector3 posAddSize{};
-			posAddSize = Random::GetVector3({ emitSizeMin.x,emitSizeMax.x }, { emitSizeMin.y,emitSizeMax.y }, { emitSizeMin.z,emitSizeMax.z });
+			posAddSize = Random::GetVector3({ emitSizeMin_.x,emitSizeMax_.x }, { emitSizeMin_.y,emitSizeMax_.y }, { emitSizeMin_.z,emitSizeMax_.z });
 			posAddSize += {worldMatrix.m[3][0], worldMatrix.m[3][1], worldMatrix.m[3][2]};
 
-			if (grain.speedType == static_cast<int>(SpeedType::kCenter)) {
-				grain.speed = (pos - posAddSize) * grain.returnPower_;
+			if (grain_.speedType_ == static_cast<int>(SpeedType::kCenter)) {
+				grain_.speed_ = (pos_ - posAddSize) * grain_.returnPower_;
 			}
 
-			ParticleManager::Emit(name, posAddSize, particleRotate, grain, para_, 1);
+			ParticleManager::Emit(name_, posAddSize, particleRotate_, grain_, para_, 1);
 		}
-		time_ = frequencyTime;
+		time_ = frequencyTime_;
 	} else {
 		time_--;
 	}
 }
 
 void ParticleEmitter::Burst() {
-	Matrix4x4 worldMatrix = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, pos);
+	Matrix4x4 worldMatrix = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, pos_);
 	if (parent_) {
 		const Matrix4x4& parentWorldMatrix = parent_->GetWorldMat();
 		worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
 	}
 
-	for (uint32_t i = 0; i < count; i++) {
+	for (uint32_t i = 0; i < count_; i++) {
 		Vector3 posAddSize{};
-		posAddSize = Random::GetVector3({ emitSizeMin.x,emitSizeMax.x }, { emitSizeMin.y,emitSizeMax.y }, { emitSizeMin.z,emitSizeMax.z });
+		posAddSize = Random::GetVector3({ emitSizeMin_.x,emitSizeMax_.x }, { emitSizeMin_.y,emitSizeMax_.y }, { emitSizeMin_.z,emitSizeMax_.z });
 		posAddSize += {worldMatrix.m[3][0], worldMatrix.m[3][1], worldMatrix.m[3][2]};
 
-		if (grain.speedType == static_cast<int>(SpeedType::kCenter)) {
-			grain.speed = (pos - posAddSize).Normalize() * grain.returnPower_;
+		if (grain_.speedType_ == static_cast<int>(SpeedType::kCenter)) {
+			grain_.speed_ = (pos_ - posAddSize).Normalize() * grain_.returnPower_;
 		}
 
-		ParticleManager::Emit(name, posAddSize, particleRotate, grain, para_, 1);
+		ParticleManager::Emit(name_, posAddSize, particleRotate_, grain_, para_, 1);
 	}
 }
 
 void ParticleEmitter::BurstAnime() {
-	ParticleManager::EmitAnime(name, pos, animeData, para_, count);
+	ParticleManager::EmitAnime(name_, pos_, animeData_, para_, count_);
 }
 
 void ParticleEmitter::RandomSpeed(const Vector2& x, const Vector2& y, const Vector2& z) {
@@ -182,31 +182,31 @@ void ParticleEmitter::RandomTranslate(const Vector2& x, const Vector2& y, const 
 void ParticleEmitter::Save() {
 	json j;
 
-	j.push_back(json::array({ pos.x,pos.y,pos.z }));
-	j.push_back(json::array({ particleRotate.x,particleRotate.y,particleRotate.z }));
-	j.push_back(json::array({ emitSizeMax.x,emitSizeMax.y,emitSizeMax.z }));
-	j.push_back(json::array({ emitSizeMin.x,emitSizeMin.y,emitSizeMin.z }));
+	j.push_back(json::array({ pos_.x,pos_.y,pos_.z }));
+	j.push_back(json::array({ particleRotate_.x,particleRotate_.y,particleRotate_.z }));
+	j.push_back(json::array({ emitSizeMax_.x,emitSizeMax_.y,emitSizeMax_.z }));
+	j.push_back(json::array({ emitSizeMin_.x,emitSizeMin_.y,emitSizeMin_.z }));
 
-	j.push_back(count);
-	j.push_back(frequencyTime);
+	j.push_back(count_);
+	j.push_back(frequencyTime_);
 
-	j.push_back(grain.lifeTime_);
-	j.push_back(json::array({ grain.accele.x,grain.accele.y,grain.accele.z }));
-	j.push_back(json::array({ grain.speed.x,grain.speed.y,grain.speed.z }));
+	j.push_back(grain_.lifeTime_);
+	j.push_back(json::array({ grain_.accele_.x,grain_.accele_.y,grain_.accele_.z }));
+	j.push_back(json::array({ grain_.speed_.x,grain_.speed_.y,grain_.speed_.z }));
 
-	j.push_back(grain.type);
-	j.push_back(grain.speedType);
-	j.push_back(grain.rotateType);
-	j.push_back(grain.colorType);
+	j.push_back(grain_.type_);
+	j.push_back(grain_.speedType_);
+	j.push_back(grain_.rotateType_);
+	j.push_back(grain_.colorType_);
 
-	j.push_back(grain.returnPower_);
+	j.push_back(grain_.returnPower_);
 
-	j.push_back(json::array({ grain.startSize.x,grain.startSize.y }));
-	j.push_back(json::array({ grain.endSize.x,grain.endSize.y }));
+	j.push_back(json::array({ grain_.startSize_.x,grain_.startSize_.y }));
+	j.push_back(json::array({ grain_.endSize_.x,grain_.endSize_.y }));
 
-	j.push_back(grain.isBillBoard_);
+	j.push_back(grain_.isBillBoard_);
 
-	j.push_back(static_cast<int>(grain.pattern_));
+	j.push_back(static_cast<int>(grain_.pattern_));
 
 	j.push_back(json::array({ para_.speedx.x,para_.speedx.y }));
 	j.push_back(json::array({ para_.speedy.x,para_.speedy.y }));
@@ -220,7 +220,7 @@ void ParticleEmitter::Save() {
 	j.push_back(json::array({ para_.colorMax.x,para_.colorMax.y,para_.colorMax.z,para_.colorMax.w }));
 
 
-	std::ofstream file(kDirectoryPath + name + ".json");
+	std::ofstream file(kDirectoryPath_ + name_ + ".json");
 	if (file.is_open()) {
 		file << j.dump(4);
 		file.close();
@@ -228,7 +228,7 @@ void ParticleEmitter::Save() {
 }
 
 void ParticleEmitter::Load(const std::string& filename) {
-	std::ifstream file(kDirectoryPath + filename + ".json");
+	std::ifstream file(kDirectoryPath_ + filename + ".json");
 	if (!file.is_open()) {
 		return;
 	}
@@ -239,49 +239,49 @@ void ParticleEmitter::Load(const std::string& filename) {
 
 	// データをロードしてメンバーに復元
 	int index = 0;
-	pos = Vector3(j[index][0], j[index][1], j[index][2]);
+	pos_ = Vector3(j[index][0], j[index][1], j[index][2]);
 	index++;
-	particleRotate = Vector3(j[index][0], j[index][1], j[index][2]);
-	index++;
-
-	emitSizeMax = Vector3(j[index][0], j[index][1], j[index][2]);
-	index++;
-	emitSizeMin = Vector3(j[index][0], j[index][1], j[index][2]);
+	particleRotate_ = Vector3(j[index][0], j[index][1], j[index][2]);
 	index++;
 
-	count = j[index].get<int>();
+	emitSizeMax_ = Vector3(j[index][0], j[index][1], j[index][2]);
 	index++;
-	frequencyTime = j[index].get<float>();
-	index++;
-	grain.lifeTime_ = j[index].get<float>();
+	emitSizeMin_ = Vector3(j[index][0], j[index][1], j[index][2]);
 	index++;
 
-	grain.accele = Vector3(j[index][0], j[index][1], j[index][2]);
+	count_ = j[index].get<int>();
 	index++;
-	grain.speed = Vector3(j[index][0], j[index][1], j[index][2]);
+	frequencyTime_ = j[index].get<float>();
 	index++;
-
-	grain.type = j[index].get<int>();
-	index++;
-	grain.speedType = j[index].get<int>();
-	index++;
-	grain.rotateType = j[index].get<int>();
-	index++;
-	grain.colorType = j[index].get<int>();
+	grain_.lifeTime_ = j[index].get<float>();
 	index++;
 
-	grain.returnPower_ = j[index].get<float>();
+	grain_.accele_ = Vector3(j[index][0], j[index][1], j[index][2]);
+	index++;
+	grain_.speed_ = Vector3(j[index][0], j[index][1], j[index][2]);
 	index++;
 
-	grain.startSize = Vector2(j[index][0], j[index][1]);
+	grain_.type_ = j[index].get<int>();
 	index++;
-	grain.endSize = Vector2(j[index][0], j[index][1]);
+	grain_.speedType_ = j[index].get<int>();
+	index++;
+	grain_.rotateType_ = j[index].get<int>();
+	index++;
+	grain_.colorType_ = j[index].get<int>();
 	index++;
 
-	grain.isBillBoard_ = j[index].get<bool>();
+	grain_.returnPower_ = j[index].get<float>();
 	index++;
 
-	grain.pattern_ = static_cast<BillBoardPattern>(j[index].get<int>());
+	grain_.startSize_ = Vector2(j[index][0], j[index][1]);
+	index++;
+	grain_.endSize_ = Vector2(j[index][0], j[index][1]);
+	index++;
+
+	grain_.isBillBoard_ = j[index].get<bool>();
+	index++;
+
+	grain_.pattern_ = static_cast<BillBoardPattern>(j[index].get<int>());
 	index++;
 
 	para_.speedx = Vector2(j[index][0], j[index][1]);
@@ -305,7 +305,7 @@ void ParticleEmitter::Load(const std::string& filename) {
 }
 
 Vector3 ParticleEmitter::GetWorldPos() {
-	Matrix4x4 worldMatrix = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, pos);
+	Matrix4x4 worldMatrix = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, pos_);
 	if (parent_) {
 		const Matrix4x4& parentWorldMatrix = parent_->GetWorldMat();
 		worldMatrix = Multiply(worldMatrix, parentWorldMatrix);

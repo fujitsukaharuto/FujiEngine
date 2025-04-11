@@ -55,23 +55,23 @@ public:
 	void Save();
 	void Load(const std::string& filename);
 
-	float frequencyTime = 0;
+	float frequencyTime_ = 0;
 
 	void SetParent(Object3d* parent) { parent_ = parent; }
 	Vector3 GetWorldPos();
 
-	std::string name;
-	Vector3 pos;
-	Vector3 particleRotate;
-	Vector3 emitSizeMax{};
-	Vector3 emitSizeMin{};
+	std::string name_;
+	Vector3 pos_;
+	Vector3 particleRotate_;
+	Vector3 emitSizeMax_{};
+	Vector3 emitSizeMin_{};
 
-	Particle grain{};
-	AnimeData animeData{};
-	uint32_t count;
+	Particle grain_{};
+	AnimeData animeData_{};
+	uint32_t count_;
 	RandomParametor para_;
 
-	const std::string kDirectoryPath = "resource/EmitterSaveFile/";
+	const std::string kDirectoryPath_ = "resource/EmitterSaveFile/";
 
 private:
 
