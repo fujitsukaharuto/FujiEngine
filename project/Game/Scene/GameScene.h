@@ -1,5 +1,6 @@
 #pragma once
 #include "Scene/BaseScene.h"
+#include "Game/GameObj/FollowCamera.h"
 #include "Game/GameObj/Player/Player.h"
 
 class GameScene :public BaseScene {
@@ -23,6 +24,9 @@ private:
 
 	std::unique_ptr<Object3d> terrain = nullptr;
 	std::unique_ptr<Player> player_ = nullptr;
+	std::unique_ptr<FollowCamera> followCamera_;
+
+	std::unique_ptr<Object3d> sphere_ = nullptr;
 
 	std::unique_ptr<Material> mate = nullptr;
 

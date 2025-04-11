@@ -26,8 +26,6 @@ void PlayerRoot::Update() {
 		}
 
 		pPlayer_->Move(pPlayer_->GetMoveSpeed());
-		pPlayer_->Fall(speed_);
-		if (pPlayer_->GetIsMove())pPlayer_->SetIsFall(true);
 
 		break;
 		///---------------------------------------------------------------------------------------

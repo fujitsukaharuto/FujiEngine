@@ -16,21 +16,43 @@ void FollowCamera::Initialize() {
 
 void FollowCamera::Update() {
 
-	XINPUT_STATE pad;
+	//XINPUT_STATE pad;
 	Camera* camera = CameraManager::GetInstance()->GetCamera();
 
-	if (Input::GetInstance()->GetGamepadState(pad)) {
-		const float kRotateSpeed = 0.05f;
+	//if (Input::GetInstance()->GetGamepadState(pad)) {
+	//	const float kRotateSpeed = 0.05f;
 
-		destinationAngleY_ += (Input::GetInstance()->GetRStick().x / SHRT_MAX * kRotateSpeed) * FPSKeeper::DeltaTime();
+	//	destinationAngleY_ += (Input::GetInstance()->GetRStick().x / SHRT_MAX * kRotateSpeed) * FPSKeeper::DeltaTime();
 
-		if (Input::GetInstance()->TriggerButton(PadInput::RStick)) {
-			//destinationAngleY_ = target_->rotate.y;
-		}
+	//	if (Input::GetInstance()->TriggerButton(PadInput::RStick)) {
+	//		//destinationAngleY_ = target_->rotate.y;
+	//	}
+	//} else {
+	//	const float kRotateSpeed = 0.05f;
+	//	if (Input::GetInstance()->PushKey(DIK_LEFTARROW)) {
+	//		destinationAngleY_ += (0.5f * kRotateSpeed) * FPSKeeper::DeltaTime();
+	//	}
+	//	if (Input::GetInstance()->PushKey(DIK_RIGHTARROW)) {
+	//		destinationAngleY_ -= (0.5f * kRotateSpeed) * FPSKeeper::DeltaTime();
+	//	}
+	//}
+
+	Vector3 lockOnPosition = Vector3(0.0f, 4.0f, 5.0f);
+	Vector3 sub = lockOnPosition - target_->translate;
+
+	destinationAngleY_ = std::atan2(sub.x, sub.z);
+	camera->transform.rotate.y = LerpShortAngle(camera->transform.rotate.y, destinationAngleY_, 0.3f);
+
+	// X軸
+	float horizontalDistance = std::sqrt(sub.x * sub.x + sub.z * sub.z);
+	float destinationAngleX = std::atan2(-sub.y, horizontalDistance);
+	if (destinationAngleX < -0.09f) {
+		destinationAngleX = -0.09f;
 	}
-	camera->transform.rotate.y = LerpShortAngle(camera->transform.rotate.y, destinationAngleY_, 0.4f);
+	camera->transform.rotate.x = LerpShortAngle(camera->transform.rotate.x, destinationAngleX, 0.3f);
+
 	if (target_) {
-		interTarget_ = Lerp(interTarget_, { target_->translate.x,0.0f,target_->translate.z }, 0.3f);
+		interTarget_ = Lerp(interTarget_, { target_->translate.x,0.0f,target_->translate.z }, 0.05f);
 	}
 
 	Vector3 offset = OffsetCal();
@@ -56,7 +78,7 @@ void FollowCamera::Reset() {
 }
 
 Vector3 FollowCamera::OffsetCal() const {
-	Vector3 offset = { 0.0f, 3.0f, -18.0f };
+	Vector3 offset = { 0.0f, 4.0f, -25.0f };
 
 	Camera* camera = CameraManager::GetInstance()->GetCamera();
 	Matrix4x4 rotateCamera = MakeRotateXYZMatrix(camera->transform.rotate);

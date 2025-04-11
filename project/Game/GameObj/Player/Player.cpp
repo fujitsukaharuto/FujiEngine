@@ -16,8 +16,8 @@ void Player::Initialize() {
 	OriginGameObject::CreateModel("Sphere");
 
 	moveSpeed_ = 0.2f;
-	jumpSpeed_ = 0.5f;
-	gravity_ = 0.05f;
+	jumpSpeed_ = 0.2f;
+	gravity_ = 0.005f;
 	maxFallSpeed_ = 2.0f;
 
 	collider_ = std::make_unique<AABBCollider>();

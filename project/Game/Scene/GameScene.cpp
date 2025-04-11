@@ -2,6 +2,7 @@
 #include "ImGuiManager.h"
 #include "GlobalVariables.h"
 #include "FPSKeeper.h"
+#include "Game/GameObj/FollowCamera.h"
 
 #include "Particle/ParticleManager.h"
 #include "Scene/SceneManager.h"
@@ -46,6 +47,15 @@ void GameScene::Initialize() {
 	player_ = std::make_unique<Player>();
 	player_->Initialize();
 
+	followCamera_ = std::make_unique<FollowCamera>();
+	followCamera_->Initialize();
+	followCamera_->SetTarget(&player_->GetTrans());
+
+	sphere_ = std::make_unique<Object3d>();
+	sphere_->Create("Sphere");
+	sphere_->transform.translate = Vector3(0.0f, 4.0f, 5.0f);
+	sphere_->transform.scale = Vector3(0.5f, 0.5f, 0.5f);
+
 	mate = std::make_unique<Material>();
 	mate->SetTextureNamePath("grass.png");
 	mate->CreateMaterial();
@@ -72,6 +82,8 @@ void GameScene::Update() {
 	ApplyGlobalVariables();
 
 	player_->Update();
+
+	followCamera_->Update();
 
 #endif // _DEBUG
 
@@ -113,6 +125,7 @@ void GameScene::Draw() {
 	terrain->Draw();
 	player_->Draw();
 
+	sphere_->Draw();
 
 	ParticleManager::GetInstance()->Draw();
 
