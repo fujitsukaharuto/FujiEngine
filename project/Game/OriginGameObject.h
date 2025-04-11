@@ -23,6 +23,7 @@ public:
 	void SetModel(const std::string& name);
 	Object3d* GetModel() { return model_.get(); }
 	Trans& GetTrans() { return model_->transform; }
+	Vector3 GetWorldPos()const { return model_->GetWorldPos(); }
 
 protected:
 
