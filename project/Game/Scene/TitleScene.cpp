@@ -184,6 +184,11 @@ void TitleScene::BlackFade() {
 			}
 		}
 	}
+#ifdef _DEBUG
+	if (Input::GetInstance()->PushKey(DIK_RETURN) && Input::GetInstance()->PushKey(DIK_P) && Input::GetInstance()->PushKey(DIK_D) && Input::GetInstance()->TriggerKey(DIK_S)) {
+		SceneManager::GetInstance()->ChangeScene("PARTICLEDEBUG", 40.0f);
+	}
+#endif // _DEBUG
 }
 
 void TitleScene::ApplyGlobalVariables() {
