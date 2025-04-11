@@ -200,6 +200,12 @@
     <ClCompile Include="Engine\Math\Vector\Vector2.cpp">
       <Filter>Engine\Math\Vector</Filter>
     </ClCompile>
+    <ClCompile Include="Game\GameObj\FollowCamera.cpp">
+      <Filter>Game\GameObj</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameObj\LockOn.cpp">
+      <Filter>Game\GameObj</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -438,6 +444,12 @@
     </ClInclude>
     <ClInclude Include="Engine\Math\Vector\Vector4.h">
       <Filter>Engine\Math\Vector</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\FollowCamera.h">
+      <Filter>Game\GameObj</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\LockOn.h">
+      <Filter>Game\GameObj</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
