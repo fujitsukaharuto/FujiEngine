@@ -323,6 +323,9 @@ void ParticleManager::ParticleDebugGUI() {
 			ParticleEmitter& selecrtEmitter = selectParticleGroup_->emitter_;
 
 			ImGui::DragFloat3("pos", &selecrtEmitter.pos_.x, 0.01f);
+			int im_Count = int(selecrtEmitter.count_);
+			ImGui::DragInt("count", &im_Count, 1, 0, 10);
+			selecrtEmitter.count_ = uint32_t(im_Count);
 
 			ImGui::Unindent();
 		}
