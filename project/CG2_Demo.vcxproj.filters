@@ -439,6 +439,9 @@
     <ClInclude Include="Engine\Math\Vector\Vector4.h">
       <Filter>Engine\Math\Vector</Filter>
     </ClInclude>
+    <ClInclude Include="Game\GameObj\FollowCamera.h">
+      <Filter>Game\GameObj</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">

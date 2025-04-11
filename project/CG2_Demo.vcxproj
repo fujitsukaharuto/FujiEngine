@@ -244,6 +244,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Scene\BaseScene.h" />
     <ClInclude Include="Engine\Scene\SceneManager.h" />
     <ClInclude Include="Engine\WinApp\MyWindow.h" />
+    <ClInclude Include="Game\GameObj\FollowCamera.h" />
     <ClInclude Include="Game\OriginGameObject.h" />
     <ClInclude Include="Game\Collider\BaseCollider.h" />
     <ClInclude Include="Game\Collider\AABBCollider.h" />
