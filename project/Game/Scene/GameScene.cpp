@@ -67,11 +67,11 @@ void GameScene::Initialize() {
 
 	ApplyGlobalVariables();
 
-	emit.count = 3;
-	emit.frequencyTime = 20.0f;
-	emit.name = "animetest";
-	emit.pos = { 0.0f,2.0f,0.0f };
-	emit.animeData.lifeTime = 40.0f;
+	emit.count_ = 3;
+	emit.frequencyTime_ = 20.0f;
+	emit.name_ = "animetest";
+	emit.pos_ = { 0.0f,2.0f,0.0f };
+	emit.animeData_.lifeTime = 40.0f;
 	emit.RandomSpeed({ -0.1f,0.1f }, { -0.1f,0.1f }, { -0.1f,0.1f });
 	emit.RandomTranslate({ -0.1f,0.1f }, { -0.1f,0.1f }, { -0.1f,0.1f });
 }

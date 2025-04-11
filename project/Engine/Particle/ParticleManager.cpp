@@ -107,21 +107,21 @@ void ParticleManager::Update() {
 
 			particle.lifeTime_--;
 
-			SizeType sizeType = SizeType(particle.type);
+			SizeType sizeType = SizeType(particle.type_);
 			float t = (1.0f - float(float(particle.lifeTime_) / float(particle.startLifeTime_)));
 			switch (sizeType) {
 			case SizeType::kNormal:
 				break;
 			case SizeType::kShift:
 
-				particle.transform.scale.x = Lerp(particle.startSize.x, particle.endSize.x, t);
-				particle.transform.scale.y = Lerp(particle.startSize.y, particle.endSize.y, t);
+				particle.transform_.scale.x = Lerp(particle.startSize_.x, particle.endSize_.x, t);
+				particle.transform_.scale.y = Lerp(particle.startSize_.y, particle.endSize_.y, t);
 
 				break;
 			case SizeType::kSin:
 
-				Vector2 minSize = particle.startSize; // 最小値
-				Vector2 maxSize = particle.endSize; // 最大値
+				Vector2 minSize = particle.startSize_; // 最小値
+				Vector2 maxSize = particle.endSize_; // 最大値
 
 				if (minSize.x > maxSize.x) {
 					std::swap(minSize.x, maxSize.x); // minとmaxを交換
@@ -133,30 +133,30 @@ void ParticleManager::Update() {
 
 				Vector2 sizeSin = minSize + (maxSize - minSize) * 0.5f * (1.0f + sin(particle.lifeTime_));
 
-				particle.transform.scale.x = sizeSin.x;
-				particle.transform.scale.y = sizeSin.y;
+				particle.transform_.scale.x = sizeSin.x;
+				particle.transform_.scale.y = sizeSin.y;
 
 				break;
 			}
 
-			if (particle.rotateType == static_cast<int>(RotateType::kRandomR)) {
-				particle.transform.rotate += Random::GetVector3({ -0.5f,0.5f }, { -0.5f,0.5f }, { -0.2f,0.2f });
+			if (particle.rotateType_ == static_cast<int>(RotateType::kRandomR)) {
+				particle.transform_.rotate += Random::GetVector3({ -0.5f,0.5f }, { -0.5f,0.5f }, { -0.2f,0.2f });
 			}
 
-			particle.speed += particle.accele * FPSKeeper::DeltaTime();
+			particle.speed_ += particle.accele_ * FPSKeeper::DeltaTime();
 
-			particle.transform.translate += particle.speed * FPSKeeper::DeltaTime();
+			particle.transform_.translate += particle.speed_ * FPSKeeper::DeltaTime();
 			Matrix4x4 worldViewProjectionMatrix;
 			Matrix4x4 worldMatrix = MakeIdentity4x4();
 
 			if (!particle.isBillBoard_) {
-				worldMatrix = MakeAffineMatrix(particle.transform.scale, particle.transform.rotate, particle.transform.translate);
+				worldMatrix = MakeAffineMatrix(particle.transform_.scale, particle.transform_.rotate, particle.transform_.translate);
 			}
 			if (particle.isBillBoard_) {
 				switch (particle.pattern_) {
 				case BillBoardPattern::kXYZBillBoard:
-					worldMatrix = Multiply(MakeScaleMatrix(particle.transform.scale), billboardMatrix);
-					worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform.translate));
+					worldMatrix = Multiply(MakeScaleMatrix(particle.transform_.scale), billboardMatrix);
+					worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform_.translate));
 					break;
 				case BillBoardPattern::kXBillBoard: {
 
@@ -165,9 +165,9 @@ void ParticleManager::Update() {
 					xBillboardMatrix.m[1][0] = 0.0f; // Y軸成分をゼロにする
 					xBillboardMatrix.m[2][0] = 0.0f; // Z軸成分をゼロにする
 
-					worldMatrix = Multiply(MakeScaleMatrix(particle.transform.scale), MakeRotateXYZMatrix({ 0.0f,particle.transform.rotate.y,particle.transform.rotate.z }));
+					worldMatrix = Multiply(MakeScaleMatrix(particle.transform_.scale), MakeRotateXYZMatrix({ 0.0f,particle.transform_.rotate.y,particle.transform_.rotate.z }));
 					worldMatrix = Multiply(worldMatrix, xBillboardMatrix);
-					worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform.translate));
+					worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform_.translate));
 					break;
 				}
 				case BillBoardPattern::kYBillBoard: {
@@ -176,9 +176,9 @@ void ParticleManager::Update() {
 					yBillboardMatrix.m[0][1] = 0.0f; // X軸成分をゼロにする
 					yBillboardMatrix.m[2][1] = 0.0f; // Z軸成分をゼロにする
 
-					worldMatrix = Multiply(MakeScaleMatrix(particle.transform.scale), MakeRotateXYZMatrix({ particle.transform.rotate.x,0.0f,particle.transform.rotate.z }));
+					worldMatrix = Multiply(MakeScaleMatrix(particle.transform_.scale), MakeRotateXYZMatrix({ particle.transform_.rotate.x,0.0f,particle.transform_.rotate.z }));
 					worldMatrix = Multiply(worldMatrix, yBillboardMatrix);
-					worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform.translate));
+					worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform_.translate));
 
 					break;
 				}
@@ -188,9 +188,9 @@ void ParticleManager::Update() {
 					zBillboardMatrix.m[0][2] = 0.0f; // X軸成分をゼロにする
 					zBillboardMatrix.m[1][2] = 0.0f; // Y軸成分をゼロにする
 
-					worldMatrix = Multiply(MakeScaleMatrix(particle.transform.scale), MakeRotateXYZMatrix({ particle.transform.rotate.x,particle.transform.rotate.y,0.0f }));
+					worldMatrix = Multiply(MakeScaleMatrix(particle.transform_.scale), MakeRotateXYZMatrix({ particle.transform_.rotate.x,particle.transform_.rotate.y,0.0f }));
 					worldMatrix = Multiply(worldMatrix, zBillboardMatrix);
-					worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform.translate));
+					worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform_.translate));
 
 					break;
 				}
@@ -208,7 +208,7 @@ void ParticleManager::Update() {
 
 			group->instancingData_[particleCount].World = worldMatrix;
 			group->instancingData_[particleCount].WVP = worldViewProjectionMatrix;
-			group->instancingData_[particleCount].color = particle.color;
+			group->instancingData_[particleCount].color = particle.color_;
 
 			particleCount++;
 			group->drawCount_++;
@@ -304,7 +304,7 @@ void ParticleManager::CreateParticleGroup(const std::string& name, const std::st
 
 	ParticleGroup* newGroup = new ParticleGroup();
 
-	newGroup->emitter_.name = name;
+	newGroup->emitter_.name_ = name;
 	newGroup->emitter_.Load(name);
 
 	newGroup->insstanceCount_ = count;
@@ -325,9 +325,9 @@ void ParticleManager::CreateParticleGroup(const std::string& name, const std::st
 	float add = 0.1f;
 	for (int i = 0; i < int(max); i++) {
 		Particle p{};
-		p.transform.scale = { 1.0f,1.0f,1.0f };
-		p.transform.translate.x += add;
-		p.transform.translate.y += add;
+		p.transform_.scale = { 1.0f,1.0f,1.0f };
+		p.transform_.translate.x += add;
+		p.transform_.translate.y += add;
 		newGroup->particles_.push_back(p);
 		add += 0.1f;
 	}
@@ -370,37 +370,37 @@ void ParticleManager::CreateAnimeGroup(const std::string& name, const std::strin
 
 void ParticleManager::Load(ParticleEmitter& emit, const std::string& name) {
 	ParticleManager* instance = GetInstance();
-	emit.name = name;
+	emit.name_ = name;
 
 	auto iterator = instance->particleGroups_.find(name);
 	if (iterator != instance->particleGroups_.end()) {
 		ParticleGroup* group = iterator->second.get();
-		emit.pos = group->emitter_.pos;
-		emit.particleRotate = group->emitter_.particleRotate;
-		emit.emitSizeMax = group->emitter_.emitSizeMax;
-		emit.emitSizeMin = group->emitter_.emitSizeMin;
-		emit.count = group->emitter_.count;
-		emit.frequencyTime = group->emitter_.frequencyTime;
-		emit.grain.lifeTime_ = group->emitter_.grain.lifeTime_;
-		emit.grain.accele = group->emitter_.grain.accele;
-		emit.grain.speed = group->emitter_.grain.speed;
-		emit.grain.type = group->emitter_.grain.type;
-		emit.grain.speedType = group->emitter_.grain.speedType;
-		emit.grain.rotateType = group->emitter_.grain.rotateType;
-		emit.grain.colorType = group->emitter_.grain.colorType;
-		emit.grain.returnPower_ = group->emitter_.grain.returnPower_;
-		emit.grain.startSize = group->emitter_.grain.startSize;
-		emit.grain.endSize = group->emitter_.grain.endSize;
-		emit.grain.isBillBoard_ = group->emitter_.grain.isBillBoard_;
-		emit.grain.pattern_ = group->emitter_.grain.pattern_;
-		emit.para_.speedx = group->emitter_.para_.speedx;
-		emit.para_.speedy = group->emitter_.para_.speedy;
-		emit.para_.speedz = group->emitter_.para_.speedz;
-		emit.para_.transx = group->emitter_.para_.transx;
-		emit.para_.transy = group->emitter_.para_.transy;
-		emit.para_.transz = group->emitter_.para_.transz;
-		emit.para_.colorMin = group->emitter_.para_.colorMin;
-		emit.para_.colorMax = group->emitter_.para_.colorMax;
+		emit.pos_                 = group->emitter_.pos_;
+		emit.particleRotate_      = group->emitter_.particleRotate_;
+		emit.emitSizeMax_         = group->emitter_.emitSizeMax_;
+		emit.emitSizeMin_         = group->emitter_.emitSizeMin_;
+		emit.count_               = group->emitter_.count_;
+		emit.frequencyTime_       = group->emitter_.frequencyTime_;
+		emit.grain_.lifeTime_     = group->emitter_.grain_.lifeTime_;
+		emit.grain_.accele_       = group->emitter_.grain_.accele_;
+		emit.grain_.speed_        = group->emitter_.grain_.speed_;
+		emit.grain_.type_         = group->emitter_.grain_.type_;
+		emit.grain_.speedType_    = group->emitter_.grain_.speedType_;
+		emit.grain_.rotateType_   = group->emitter_.grain_.rotateType_;
+		emit.grain_.colorType_    = group->emitter_.grain_.colorType_;
+		emit.grain_.returnPower_  = group->emitter_.grain_.returnPower_;
+		emit.grain_.startSize_    = group->emitter_.grain_.startSize_;
+		emit.grain_.endSize_      = group->emitter_.grain_.endSize_;
+		emit.grain_.isBillBoard_  = group->emitter_.grain_.isBillBoard_;
+		emit.grain_.pattern_      = group->emitter_.grain_.pattern_;
+		emit.para_.speedx         = group->emitter_.para_.speedx;
+		emit.para_.speedy         = group->emitter_.para_.speedy;
+		emit.para_.speedz         = group->emitter_.para_.speedz;
+		emit.para_.transx         = group->emitter_.para_.transx;
+		emit.para_.transy         = group->emitter_.para_.transy;
+		emit.para_.transz         = group->emitter_.para_.transz;
+		emit.para_.colorMin       = group->emitter_.para_.colorMin;
+		emit.para_.colorMax       = group->emitter_.para_.colorMax;
 
 	} else {
 		return;
@@ -418,32 +418,32 @@ void ParticleManager::Emit(const std::string& name, const Vector3& pos, const Ve
 		for (auto& particle : group->particles_) {
 
 			if (particle.isLive_ == false) {
-				particle.transform = grain.transform;
-				particle.transform.translate = Random::GetVector3(para.transx, para.transy, para.transz);
-				particle.transform.translate += pos;
-				particle.transform.scale = { grain.startSize.x,grain.startSize.y,1.0f };
-				if (grain.speedType == static_cast<int>(SpeedType::kCenter)) {
-					particle.speed = grain.speed;
+				particle.transform_ = grain.transform_;
+				particle.transform_.translate = Random::GetVector3(para.transx, para.transy, para.transz);
+				particle.transform_.translate += pos;
+				particle.transform_.scale = { grain.startSize_.x,grain.startSize_.y,1.0f };
+				if (grain.speedType_ == static_cast<int>(SpeedType::kCenter)) {
+					particle.speed_ = grain.speed_;
 				} else {
-					particle.speed = Random::GetVector3(para.speedx, para.speedy, para.speedz);
+					particle.speed_ = Random::GetVector3(para.speedx, para.speedy, para.speedz);
 				}
 
 
-				particle.rotateType = grain.rotateType;
-				Vector3 veloSpeed = particle.speed.Normalize();
+				particle.rotateType_ = grain.rotateType_;
+				Vector3 veloSpeed = particle.speed_.Normalize();
 				Vector3 cameraR{};
 				Vector3 defo = { 0.0f,1.0f,0.0f };
 				Vector3 angleDToD{};
 				Matrix4x4 rotateCamera;
 				Matrix4x4 dToD;
 
-				switch (particle.rotateType) {
+				switch (particle.rotateType_) {
 				case static_cast<int>(RotateType::kUsually):
-					particle.transform.rotate = rotate;
+					particle.transform_.rotate = rotate;
 					break;
 				case static_cast<int>(RotateType::kVelocityR):
 
-					veloSpeed = particle.speed.Normalize();
+					veloSpeed = particle.speed_.Normalize();
 
 					// カメラの回転を考慮して速度ベクトルを変換
 					cameraR = CameraManager::GetInstance()->GetCamera()->transform.rotate;
@@ -454,11 +454,11 @@ void ParticleManager::Emit(const std::string& name, const Vector3& pos, const Ve
 
 					dToD = DirectionToDirection(defo, veloSpeed.Normalize());
 					angleDToD = ExtractEulerAngles(dToD);
-					particle.transform.rotate = angleDToD;
+					particle.transform_.rotate = angleDToD;
 
 					break;
 				case static_cast<int>(RotateType::kRandomR):
-					particle.transform.rotate = Random::GetVector3({ -1.0f,1.0f }, { -1.0f,1.0f }, { -1.0f,1.0f });
+					particle.transform_.rotate = Random::GetVector3({ -1.0f,1.0f }, { -1.0f,1.0f }, { -1.0f,1.0f });
 					break;
 				}
 
@@ -466,38 +466,38 @@ void ParticleManager::Emit(const std::string& name, const Vector3& pos, const Ve
 				particle.startLifeTime_ = particle.lifeTime_;
 				particle.isBillBoard_ = grain.isBillBoard_;
 				particle.pattern_ = grain.pattern_;
-				particle.colorType = grain.colorType;
-				switch (particle.colorType) {
+				particle.colorType_ = grain.colorType_;
+				switch (particle.colorType_) {
 				case static_cast<int>(ColorType::kDefault):
-					particle.color = para.colorMax;
+					particle.color_ = para.colorMax;
 					break;
 				case static_cast<int>(ColorType::kRandom):
-					particle.color.x = Random::GetFloat(para.colorMin.x, para.colorMax.x);
-					particle.color.y = Random::GetFloat(para.colorMin.y, para.colorMax.y);
-					particle.color.z = Random::GetFloat(para.colorMin.z, para.colorMax.z);
-					particle.color.w = Random::GetFloat(para.colorMin.w, para.colorMax.w);
+					particle.color_.x = Random::GetFloat(para.colorMin.x, para.colorMax.x);
+					particle.color_.y = Random::GetFloat(para.colorMin.y, para.colorMax.y);
+					particle.color_.z = Random::GetFloat(para.colorMin.z, para.colorMax.z);
+					particle.color_.w = Random::GetFloat(para.colorMin.w, para.colorMax.w);
 					break;
 				}
 
-				SpeedType type = SpeedType(grain.speedType);
+				SpeedType type = SpeedType(grain.speedType_);
 				switch (type) {
 				case SpeedType::kConstancy:
-					particle.accele = Vector3{ 0.0f,0.0f,0.0f };
+					particle.accele_ = Vector3{ 0.0f,0.0f,0.0f };
 					break;
 				case SpeedType::kChange:
-					particle.accele = grain.accele;
+					particle.accele_ = grain.accele_;
 					break;
 				case SpeedType::kReturn:
-					particle.accele = (particle.speed) * grain.returnPower_;
+					particle.accele_ = (particle.speed_) * grain.returnPower_;
 					break;
 				case SpeedType::kCenter:
-					particle.accele = Vector3{ 0.0f,0.0f,0.0f };
+					particle.accele_ = Vector3{ 0.0f,0.0f,0.0f };
 					break;
 				}
 
-				particle.type = grain.type;
-				particle.startSize = grain.startSize;
-				particle.endSize = grain.endSize;
+				particle.type_ = grain.type_;
+				particle.startSize_ = grain.startSize_;
+				particle.endSize_ = grain.endSize_;
 
 				particle.isLive_ = true;
 				newCount++;

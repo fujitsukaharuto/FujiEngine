@@ -42,23 +42,36 @@ public:
 	bool isLive_ = false;
 	float lifeTime_ = 0;
 	float startLifeTime_ = 0;
+	Trans transform_{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{ 0.0f,0.0f,0.0f } };
 
-	Vector3 accele{};
-	Vector3 speed{};
-	Trans transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{ 0.0f,0.0f,0.0f } };
+	//========================================================================*/
+	//* Size
+	int type_ = static_cast<int>(SizeType::kNormal);
 
-	int type = static_cast<int>(SizeType::kNormal);
-	int speedType = static_cast<int>(SpeedType::kConstancy);
-	int rotateType = static_cast<int>(RotateType::kUsually);
-	int colorType = static_cast<int>(ColorType::kDefault);
+	Vector2 startSize_ = { 1.0f,1.0f };
+	Vector2 endSize_ = { 1.0f,1.0f };
 
+	//========================================================================*/
+	//* Speed
+	int speedType_ = static_cast<int>(SpeedType::kConstancy);
+
+	Vector3 accele_{};
+	Vector3 speed_{};
+
+	Vector3 returnPosition_{};
 	float returnPower_ = -0.05f;
 
-	Vector2 startSize = { 1.0f,1.0f };
-	Vector2 endSize = { 1.0f,1.0f };
+	//========================================================================*/
+	//* Rotate
+	int rotateType_ = static_cast<int>(RotateType::kUsually);
 
-	Vector4 color = { 1.0f,1.0f,1.0f,1.0f };
+	//========================================================================*/
+	//* Color
+	int colorType_ = static_cast<int>(ColorType::kDefault);
+	Vector4 color_ = { 1.0f,1.0f,1.0f,1.0f };
 
+	//========================================================================*/
+	//* BillBoard
 	bool isBillBoard_ = true;
 	BillBoardPattern pattern_ = BillBoardPattern::kXYZBillBoard;
 
