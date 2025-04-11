@@ -218,6 +218,9 @@
     <ClCompile Include="Game\GameObj\Player\AttackBehavior\PlayerAttackRoot.cpp">
       <Filter>Game\GameObj\Player\AttackBehavior</Filter>
     </ClCompile>
+    <ClCompile Include="Game\Scene\ParticleDebugScene.cpp">
+      <Filter>Game\Scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -480,6 +483,9 @@
     </ClInclude>
     <ClInclude Include="Game\GameObj\Player\AttackBehavior\BasePlayerAttackBehavior.h">
       <Filter>Game\GameObj\Player\AttackBehavior</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Scene\ParticleDebugScene.h">
+      <Filter>Game\Scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

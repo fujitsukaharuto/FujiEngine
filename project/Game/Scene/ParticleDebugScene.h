@@ -1,0 +1,27 @@
+#pragma once
+#include "Scene/BaseScene.h"
+
+
+class ParticleDebugScene :public BaseScene {
+public:
+	ParticleDebugScene();
+	~ParticleDebugScene();
+
+	void Initialize()override;
+	void Update()override;
+	void Draw()override;
+	void DebugGUI()override;
+	void ParticleDebugGUI()override;
+
+	void BlackFade();
+
+private:
+
+	std::unique_ptr<Object3dCommon> obj3dCommon = nullptr;
+
+	// sceneChange
+	std::unique_ptr<Sprite> black_;
+	float blackLimmite = 20.0f;
+	float blackTime = 20.0f;
+	bool isChangeFase = false;
+};

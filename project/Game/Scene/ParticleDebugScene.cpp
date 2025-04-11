@@ -1,0 +1,125 @@
+#include "ParticleDebugScene.h"
+#include "ImGuiManager.h"
+#include "ModelManager.h"
+#include "GlobalVariables.h"
+#include "CameraManager.h"
+#include "FPSKeeper.h"
+#include "Math/Random/Random.h"
+
+#include "Particle/ParticleManager.h"
+#include "Scene/SceneManager.h"
+
+
+
+ParticleDebugScene::ParticleDebugScene() {}
+
+ParticleDebugScene::~ParticleDebugScene() {
+}
+
+void ParticleDebugScene::Initialize() {
+	Init();
+
+
+	obj3dCommon.reset(new Object3dCommon());
+	obj3dCommon->Initialize();
+
+
+#pragma region シーン遷移用
+	black_ = std::make_unique<Sprite>();
+	black_->Load("white2x2.png");
+	black_->SetColor({ 0.0f,0.0f,0.0f,1.0f });
+	black_->SetSize({ 1280.0f,720.0f });
+	black_->SetAnchor({ 0.0f,0.0f });
+#pragma endregion
+
+}
+
+void ParticleDebugScene::Update() {
+
+#ifdef _DEBUG
+
+
+#endif // _DEBUG
+
+
+	dxCommon_->UpDate();
+
+	BlackFade();
+
+	ParticleManager::GetInstance()->Update();
+}
+
+void ParticleDebugScene::Draw() {
+
+#pragma region 背景描画
+
+
+	dxCommon_->ClearDepthBuffer();
+#pragma endregion
+
+
+#pragma region 3Dオブジェクト
+	obj3dCommon->PreDraw();
+
+
+	ParticleManager::GetInstance()->Draw();
+
+#pragma endregion
+
+
+#pragma region 前景スプライト
+
+	dxCommon_->PreSpriteDraw();
+	if (blackTime != 0.0f) {
+		black_->Draw();
+	}
+
+#pragma endregion
+
+}
+
+void ParticleDebugScene::DebugGUI() {
+#ifdef _DEBUG
+	ImGui::Indent();
+
+	if (ImGui::CollapsingHeader("Sphere")) {
+		
+	}
+
+	ImGui::Unindent();
+#endif // _DEBUG
+}
+
+void ParticleDebugScene::ParticleDebugGUI() {
+#ifdef _DEBUG
+	ImGui::Indent();
+
+	ImGui::Unindent();
+#endif // _DEBUG
+}
+
+void ParticleDebugScene::BlackFade() {
+	if (isChangeFase) {
+		if (blackTime < blackLimmite) {
+			blackTime += FPSKeeper::DeltaTime();
+			if (blackTime >= blackLimmite) {
+				blackTime = blackLimmite;
+			}
+		} else {
+			SceneManager::GetInstance()->ChangeScene("TITLE", 40.0f);
+		}
+	} else {
+		if (blackTime > 0.0f) {
+			blackTime -= FPSKeeper::DeltaTime();
+			if (blackTime <= 0.0f) {
+				blackTime = 0.0f;
+			}
+		}
+	}
+	black_->SetColor({ 0.0f,0.0f,0.0f,Lerp(0.0f,1.0f,(1.0f / blackLimmite * blackTime)) });
+	
+	if (Input::GetInstance()->PushKey(DIK_RETURN) && Input::GetInstance()->PushKey(DIK_P) && Input::GetInstance()->PushKey(DIK_D) && Input::GetInstance()->TriggerKey(DIK_S)) {
+		SceneManager::GetInstance()->ChangeScene("TITLE", 40.0f);
+	}
+
+}
