@@ -15,6 +15,18 @@ struct AcceleFiled {
 	AABB area;
 };
 
+enum class ShapeType {
+	PLANE,
+	CIRCLE,
+	RING,
+	SPHERE,
+	TORUS,
+	CYLINDER,
+	CONE,
+	TRIANGLE,
+	BOX,
+};
+
 class DXCom;
 class SRVManager;
 
@@ -34,6 +46,7 @@ public:
 		TransformationParticleMatrix* instancingData_ = nullptr;
 		uint32_t drawCount_;
 		ParticleEmitter emitter_;
+		ShapeType shapeType_ = ShapeType::PLANE;
 	};
 
 
