@@ -38,10 +38,8 @@ public:
 
 public:
 
-#ifdef _DEBUG
 	void DebugGUI();
 	void DrawSize();
-#endif // _DEBUG
 
 	void Emit();
 

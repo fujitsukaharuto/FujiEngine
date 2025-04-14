@@ -12,8 +12,8 @@ ParticleEmitter::ParticleEmitter() {
 ParticleEmitter::~ParticleEmitter() {
 }
 
-#ifdef _DEBUG
 void ParticleEmitter::DebugGUI() {
+#ifdef _DEBUG
 	if (ImGui::CollapsingHeader(name_.c_str())) {
 		ImGui::Indent();
 		if (ImGui::CollapsingHeader("Emitter")) {
@@ -108,9 +108,11 @@ void ParticleEmitter::DebugGUI() {
 		}
 		ImGui::Unindent();
 	}
+#endif // _DEBUG
 }
 
 void ParticleEmitter::DrawSize() {
+#ifdef _DEBUG
 	if (isDrawSize_) {
 
 		Matrix4x4 worldMatrix = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, pos_);
@@ -154,8 +156,8 @@ void ParticleEmitter::DrawSize() {
 		Line3dDrawer::GetInstance()->DrawLine3d(points[3], points[5], Vector4{ 1.0f, 0.0f, 0.0f, 1.0f });
 
 	}
-}
 #endif // _DEBUG
+}
 
 void ParticleEmitter::Emit() {
 	Matrix4x4 worldMatrix = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, pos_);
