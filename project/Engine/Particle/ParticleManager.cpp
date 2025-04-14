@@ -317,27 +317,30 @@ void ParticleManager::ParticleDebugGUI() {
 		selectParticleGroup_ = particleGroups_[currentKey_].get();
 	}
 
+	ImGui::Separator();
+
 	if (selectParticleGroup_) {
-		if (ImGui::CollapsingHeader("Emitter")) {
-			ImGui::Indent();
-			ParticleEmitter& selecrtEmitter = selectParticleGroup_->emitter_;
-
-			ImGui::DragFloat3("pos", &selecrtEmitter.pos_.x, 0.01f);
-			int im_Count = int(selecrtEmitter.count_);
-			ImGui::DragInt("count", &im_Count, 1, 0, 10);
-			selecrtEmitter.count_ = uint32_t(im_Count);
-
-			ImGui::Unindent();
-		}
-
-
-
-
-
-
+		ParticleEmitter& selecrtEmitter = selectParticleGroup_->emitter_;
+		selecrtEmitter.DebugGUI();
 	}
 
 	ImGui::End();
+#endif // _DEBUG
+}
+
+void ParticleManager::SelectParticleUpdate() {
+#ifdef _DEBUG
+	if (selectParticleGroup_) {
+		selectParticleGroup_->emitter_.Emit();
+	}
+#endif // _DEBUG
+}
+
+void ParticleManager::SelectEmitterSizeDraw() {
+#ifdef _DEBUG
+	if (selectParticleGroup_) {
+		selectParticleGroup_->emitter_.DrawSize();
+	}
 #endif // _DEBUG
 }
 

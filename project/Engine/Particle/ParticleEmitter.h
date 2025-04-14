@@ -73,6 +73,8 @@ public:
 
 	const std::string kDirectoryPath_ = "resource/EmitterSaveFile/";
 
+	bool isDrawSize_ = false;
+
 private:
 
 
@@ -82,6 +84,4 @@ private:
 	float time_;
 
 	Object3d* parent_ = nullptr;
-
-	bool isDrawSize_ = false;
 };

@@ -65,6 +65,8 @@ public:
 	void Draw();
 
 	void ParticleDebugGUI();
+	void SelectParticleUpdate();
+	void SelectEmitterSizeDraw();
 
 	static void CreateParticleGroup(const std::string& name, const std::string& fileName, uint32_t count = 20);
 
