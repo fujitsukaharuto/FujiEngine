@@ -99,6 +99,12 @@ void ParticleManager::Update() {
 
 		ParticleGroup* group = groupPair.second.get();
 
+		if (group->emitter_.isEmit_) {
+			if (selectParticleGroup_ != group) {
+				group->emitter_.Emit();
+			}
+		}
+
 		int particleCount = 0;
 		group->drawCount_ = 0;
 		for (auto& particle : group->particles_) {
@@ -322,6 +328,12 @@ void ParticleManager::ParticleDebugGUI() {
 	if (selectParticleGroup_) {
 		ParticleEmitter& selecrtEmitter = selectParticleGroup_->emitter_;
 		selecrtEmitter.DebugGUI();
+	}
+
+	if (ImGui::Button("ResetFrenquencyTime")) {
+		for (auto& groupPair : particleGroups_) {
+			groupPair.second->emitter_.TimeReset();
+		}
 	}
 
 	ImGui::End();

@@ -102,6 +102,7 @@ void ParticleEmitter::DebugGUI() {
 		}
 
 		ImGui::Checkbox("SizeCheck", &isDrawSize_);
+		ImGui::Checkbox("IsEmitte", &isEmit_);
 
 		if (ImGui::Button("save")) {
 			Save();

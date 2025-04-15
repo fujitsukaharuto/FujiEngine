@@ -55,6 +55,7 @@ public:
 
 	float frequencyTime_ = 0;
 
+	void TimeReset() { time_ = frequencyTime_; }
 	void SetParent(Object3d* parent) { parent_ = parent; }
 	Vector3 GetWorldPos();
 
@@ -72,6 +73,7 @@ public:
 	const std::string kDirectoryPath_ = "resource/EmitterSaveFile/";
 
 	bool isDrawSize_ = false;
+	bool isEmit_ = false;
 
 private:
 

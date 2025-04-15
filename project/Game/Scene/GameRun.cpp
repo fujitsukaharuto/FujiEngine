@@ -30,6 +30,8 @@ void GameRun::Initialize() {
 
 #pragma region パーティクル生成
 	pManager_->CreateParticleGroup("sphere", "blueParticle.png");
+	pManager_->CreateParticleGroup("sphere2", "blueParticle.png");
+	pManager_->CreateParticleGroup("sphere3", "blueParticle.png");
 	pManager_->CreateAnimeGroup("animetest", "uvChecker.png");
 	pManager_->AddAnime("animetest", "white2x2.png", 10.0f);
 #pragma endregion
@@ -115,16 +117,30 @@ void GameRun::Draw() {
 
 void GameRun::DebugGUI() {
 #ifdef _DEBUG
-	ImGui::Begin("Camera");
-	cameraManager_->GetCamera()->DebugGUI();
-	ImGui::End();
-	ImGui::Begin("Light");
-	lightManager_->DebugGUI();
-	ImGui::End();
 	ImGui::Begin("SceneDebug");
-	sceneManager_->DebugGUI();
+
 	fpsKeeper_->Debug();
 	ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
+	ImGui::Text("DeltaTime: %.3f", ImGui::GetIO().DeltaTime);
+
+	ImGui::Separator();
+	ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_Reorderable;
+	if (ImGui::BeginTabBar("SceneDebug", tab_bar_flags)) {
+		if (ImGui::BeginTabItem("Scene")) {
+			sceneManager_->DebugGUI();
+			ImGui::EndTabItem();
+		}
+		if (ImGui::BeginTabItem("Camera")) {
+			cameraManager_->GetCamera()->DebugGUI();
+			ImGui::EndTabItem();
+		}
+		if (ImGui::BeginTabItem("Light")) {
+			lightManager_->DebugGUI();
+			ImGui::EndTabItem();
+		}
+		ImGui::EndTabBar();
+	}
+
 	ImGui::End();
 #endif // _DEBUG
 }
