@@ -6,6 +6,7 @@
 #include "FPSKeeper.h"
 #include "Math/Random/Random.h"
 
+#include "Engine/Model/Line3dDrawer.h"
 #include "Particle/ParticleManager.h"
 #include "Scene/SceneManager.h"
 
@@ -36,13 +37,14 @@ void ParticleDebugScene::Initialize() {
 
 void ParticleDebugScene::Update() {
 
+	dxCommon_->UpDate();
+
 #ifdef _DEBUG
 
+	ParticleManager::GetInstance()->ParticleDebugGUI();
+	ParticleManager::GetInstance()->SelectParticleUpdate();
 
 #endif // _DEBUG
-
-
-	dxCommon_->UpDate();
 
 	BlackFade();
 
@@ -64,6 +66,14 @@ void ParticleDebugScene::Draw() {
 
 	ParticleManager::GetInstance()->Draw();
 
+#ifdef _DEBUG
+
+	ParticleManager::GetInstance()->SelectEmitterSizeDraw();
+
+#endif // _DEBUG
+
+	Line3dDrawer::GetInstance()->Render();
+
 #pragma endregion
 
 
@@ -81,10 +91,6 @@ void ParticleDebugScene::Draw() {
 void ParticleDebugScene::DebugGUI() {
 #ifdef _DEBUG
 	ImGui::Indent();
-
-	if (ImGui::CollapsingHeader("Sphere")) {
-		
-	}
 
 	ImGui::Unindent();
 #endif // _DEBUG

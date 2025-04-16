@@ -38,10 +38,8 @@ public:
 
 public:
 
-#ifdef _DEBUG
 	void DebugGUI();
 	void DrawSize();
-#endif // _DEBUG
 
 	void Emit();
 
@@ -57,6 +55,7 @@ public:
 
 	float frequencyTime_ = 0;
 
+	void TimeReset() { time_ = frequencyTime_; }
 	void SetParent(Object3d* parent) { parent_ = parent; }
 	Vector3 GetWorldPos();
 
@@ -73,6 +72,9 @@ public:
 
 	const std::string kDirectoryPath_ = "resource/EmitterSaveFile/";
 
+	bool isDrawSize_ = false;
+	bool isEmit_ = false;
+
 private:
 
 
@@ -82,6 +84,4 @@ private:
 	float time_;
 
 	Object3d* parent_ = nullptr;
-
-	bool isDrawSize_ = false;
 };

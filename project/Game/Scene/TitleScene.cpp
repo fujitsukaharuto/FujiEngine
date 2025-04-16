@@ -36,8 +36,8 @@ void TitleScene::Initialize() {
 	sphere->transform.translate.x = 4.0f;
 
 	cube_ = std::make_unique<AnimationModel>();
-	cube_->Create("walk.gltf");
-	cube_->LoadAnimationFile("walk.gltf");
+	cube_->Create("sneakWalk.gltf");
+	cube_->LoadAnimationFile("sneakWalk.gltf");
 	cube_->transform.translate.y = 3.0f;
 
 	test_ = std::make_unique<TestBaseObj>();

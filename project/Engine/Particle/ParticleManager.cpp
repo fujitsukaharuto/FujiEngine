@@ -1,11 +1,11 @@
 #include "ParticleManager.h"
-#include "DXCom.h"
-#include "SRVManager.h"
-#include "CameraManager.h"
+#include "Engine/DX/DXCom.h"
+#include "Engine/DX/SRVManager.h"
+#include "Engine/Camera/CameraManager.h"
 #include "Particle.h"
 #include "Math/Random/Random.h"
-#include "FPSKeeper.h"
-
+#include "Engine/DX/FPSKeeper.h"
+#include "ImGuiManager/ImGuiManager.h"
 
 
 ParticleManager::ParticleManager() {
@@ -59,6 +59,9 @@ void ParticleManager::Initialize(DXCom* dxcom, SRVManager* srvManager) {
 }
 
 void ParticleManager::Finalize() {
+#ifdef _DEBUG
+	selectParticleGroup_ = nullptr;
+#endif // _DEBUG
 	particleGroups_.clear();
 	for (auto& groupPair : animeGroups_) {
 
@@ -95,6 +98,14 @@ void ParticleManager::Update() {
 	for (auto& groupPair : particleGroups_) {
 
 		ParticleGroup* group = groupPair.second.get();
+
+#ifdef _DEBUG
+		if (group->emitter_.isEmit_) {
+			if (selectParticleGroup_ != group) {
+				group->emitter_.Emit();
+			}
+		}
+#endif // _DEBUG
 
 		int particleCount = 0;
 		group->drawCount_ = 0;
@@ -291,6 +302,81 @@ void ParticleManager::Draw() {
 
 		dxCommon_->GetCommandList()->DrawIndexedInstanced(6, group->drawCount_, 0, 0, 0);
 	}
+}
+
+void ParticleManager::ParticleDebugGUI() {
+#ifdef _DEBUG
+	ImGui::Begin("ParticleDebug");
+	ImGui::SeparatorText("ParticleGroup");
+	if (particleGroups_.size() != 0) {
+		if (!selectParticleGroup_) {
+			selectParticleGroup_ = particleGroups_.begin()->second.get();
+		}
+	}
+
+	std::vector<const char*> keys;
+	for (const auto& pair : particleGroups_) {
+		keys.push_back(pair.first.c_str());
+	}
+	if (ImGui::Combo("Particle Group", &currentIndex_, keys.data(), int(keys.size()))) {
+		currentKey_ = keys[currentIndex_];
+		// currentKey を使って選択中の ParticleGroup を取得
+		selectParticleGroup_ = particleGroups_[currentKey_].get();
+	}
+
+	ImGui::SeparatorText("SelectGroup");
+	if (selectParticleGroup_) {
+		ParticleEmitter& selecrtEmitter = selectParticleGroup_->emitter_;
+		selecrtEmitter.DebugGUI();
+	}
+
+	ImGui::SeparatorText("Emit Control");
+	if (ImGui::TreeNode("ParticleGroup Emit Control")) {
+		static ParticleGroupSelector selector;
+		if (ImGui::Button("ResetFrenquencyTime")) {
+			for (auto& groupPair : particleGroups_) {
+				groupPair.second->emitter_.TimeReset();
+			}
+		}
+
+		// 初期化（1回だけ）
+		if (selector.items[0].empty() && selector.items[1].empty()) {
+			for (const auto& [name, group] : particleGroups_) {
+				if (group->emitter_.isEmit_)
+					selector.items[1].push_back(name);
+				else
+					selector.items[0].push_back(name);
+			}
+		}
+
+		selector.Show([&](const std::string& name, bool emit) {
+			auto it = particleGroups_.find(name);
+			if (it != particleGroups_.end()) {
+				it->second->emitter_.isEmit_ = emit;
+			}
+			});
+
+		ImGui::TreePop();
+	}
+
+	ImGui::End();
+#endif // _DEBUG
+}
+
+void ParticleManager::SelectParticleUpdate() {
+#ifdef _DEBUG
+	if (selectParticleGroup_) {
+		selectParticleGroup_->emitter_.Emit();
+	}
+#endif // _DEBUG
+}
+
+void ParticleManager::SelectEmitterSizeDraw() {
+#ifdef _DEBUG
+	if (selectParticleGroup_) {
+		selectParticleGroup_->emitter_.DrawSize();
+	}
+#endif // _DEBUG
 }
 
 void ParticleManager::CreateParticleGroup(const std::string& name, const std::string& fileName, uint32_t count) {

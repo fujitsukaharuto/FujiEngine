@@ -12,66 +12,108 @@ ParticleEmitter::ParticleEmitter() {
 ParticleEmitter::~ParticleEmitter() {
 }
 
-#ifdef _DEBUG
 void ParticleEmitter::DebugGUI() {
+#ifdef _DEBUG
 	if (ImGui::CollapsingHeader(name_.c_str())) {
-		if (ImGui::TreeNode("emitter")) {
-			ImGui::DragFloat3("pos", &pos_.x, 0.01f);
+		ImGui::Indent();
+		if (ImGui::CollapsingHeader("Emitter")) {
+			ImGui::Indent();
+
+			ImGui::DragFloat3("Pos", &pos_.x, 0.01f);
 			int im_Count = int(count_);
-			ImGui::DragInt("count", &im_Count, 1, 0, 10);
+			ImGui::DragInt("Count", &im_Count, 1, 0, 10);
 			count_ = uint32_t(im_Count);
-			ImGui::DragFloat("frenquencyTime", &frequencyTime_, 0.1f, 1.0f, 600.0f);
-			ImGui::DragFloat3("emitSizeMax", &emitSizeMax_.x, 0.01f);
-			ImGui::DragFloat3("emitSizeMin", &emitSizeMin_.x, 0.01f);
-			ImGui::TreePop();
+			ImGui::DragFloat("FrenquencyTime", &frequencyTime_, 0.1f, 1.0f, 600.0f);
+			ImGui::DragFloat("LifeTime", &grain_.lifeTime_, 0.1f);
+			ImGui::SeparatorText("EmitterSize");
+			ImGui::DragFloat3("EmitSizeMax", &emitSizeMax_.x, 0.01f);
+			ImGui::DragFloat3("EmitSizeMin", &emitSizeMin_.x, 0.01f);
+
+			ImGui::Unindent();
 		}
-		ImGui::Separator();
-		if (ImGui::TreeNode("particle")) {
 
-			ImGui::ColorEdit4("colorMin", &para_.colorMin.x);
-			ImGui::ColorEdit4("colorMax", &para_.colorMax.x);
-
-			ImGui::DragFloat("lifetime", &grain_.lifeTime_, 0.1f);
-			if (ImGui::TreeNode("typeSelect")) {
-				ImGui::Combo("sizeType##type", &grain_.type_, "kNormal\0kShift\0kSin\0");
-				ImGui::Combo("speedType##type", &grain_.speedType_, "kConstancy\0kChange\0kReturn\0kCenter\0");
-				ImGui::Combo("rotateType##type", &grain_.rotateType_, "kUsually\0kVelocityR\0kRandomR\0");
-				ImGui::Combo("colorType##type", &grain_.colorType_, "kDefault\0kRandom\0");
+		if (ImGui::CollapsingHeader("Particle")) {
+			ImGui::Indent();
+			ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Selected;
+			if (ImGui::TreeNodeEx("Color", flags)) {
+				ImGui::Combo("ColorType##type", &grain_.colorType_, "kDefault\0kRandom\0");
+				ImGui::Separator();
+				if (grain_.colorType_ != static_cast<int>(ColorType::kRandom)) {
+					ImGui::ColorEdit4("Color", &para_.colorMax.x);
+				} else {
+					ImGui::ColorEdit4("ColorMax", &para_.colorMax.x);
+					ImGui::ColorEdit4("ColorMin", &para_.colorMin.x);
+				}
 				ImGui::TreePop();
 			}
-			ImGui::SeparatorText("size");
-			ImGui::DragFloat2("startSize", &grain_.startSize_.x, 0.01f);
-			ImGui::DragFloat2("endSize", &grain_.endSize_.x, 0.01f);
-			ImGui::SeparatorText("rotate");
-			ImGui::DragFloat3("rotate", &particleRotate_.x, 0.01f);
-			ImGui::SeparatorText("randSpeed");
-			ImGui::DragFloat2("speedX", &para_.speedx.x, 0.01f);
-			ImGui::DragFloat2("speedY", &para_.speedy.x, 0.01f);
-			ImGui::DragFloat2("speedZ", &para_.speedz.x, 0.01f);
-			if (grain_.speedType_ == static_cast<int>(SpeedType::kReturn) || grain_.speedType_ == static_cast<int>(SpeedType::kCenter)) {
-				ImGui::DragFloat("returnPower", &grain_.returnPower_, 0.001f);
+
+			if (ImGui::TreeNodeEx("Size", flags)) {
+				ImGui::Combo("SizeType##type", &grain_.type_, "kNormal\0kShift\0kSin\0");
+				ImGui::Separator();
+				if (grain_.type_ == static_cast<int>(SizeType::kNormal)) {
+					ImGui::DragFloat2("Size", &grain_.startSize_.x, 0.01f);
+				} else {
+					ImGui::DragFloat2("StartSize", &grain_.startSize_.x, 0.01f);
+					ImGui::DragFloat2("EndSize", &grain_.endSize_.x, 0.01f);
+				}
+				ImGui::TreePop();
 			}
-			ImGui::SeparatorText("accele");
-			ImGui::DragFloat3("accele", &grain_.accele_.x, 0.01f);
-			ImGui::SeparatorText("billBoard");
-			ImGui::Checkbox("BillBoard", &grain_.isBillBoard_);
-			if (grain_.isBillBoard_) {
-				int billPattern = static_cast<int>(grain_.pattern_);
-				ImGui::RadioButton("XYZ", &billPattern, 0); ImGui::SameLine();
-				ImGui::RadioButton("X", &billPattern, 1); ImGui::SameLine();
-				ImGui::RadioButton("Y", &billPattern, 2); ImGui::SameLine();
-				ImGui::RadioButton("Z", &billPattern, 3);
-				grain_.pattern_ = static_cast<BillBoardPattern>(billPattern);
+
+			if (ImGui::TreeNodeEx("Rotate", flags)) {
+				ImGui::Combo("RotateType##type", &grain_.rotateType_, "kUsually\0kVelocityR\0kRandomR\0");
+				ImGui::Separator();
+				ImGui::DragFloat3("Rotate", &particleRotate_.x, 0.01f);
+				ImGui::SeparatorText("BillBoard");
+				ImGui::Checkbox("BillBoard", &grain_.isBillBoard_);
+				if (grain_.isBillBoard_) {
+					int billPattern = static_cast<int>(grain_.pattern_);
+					ImGui::RadioButton("XYZ", &billPattern, 0); ImGui::SameLine();
+					ImGui::RadioButton("X", &billPattern, 1); ImGui::SameLine();
+					ImGui::RadioButton("Y", &billPattern, 2); ImGui::SameLine();
+					ImGui::RadioButton("Z", &billPattern, 3);
+					grain_.pattern_ = static_cast<BillBoardPattern>(billPattern);
+				}
+				ImGui::TreePop();
 			}
-			ImGui::Checkbox("SizeCheck", &isDrawSize_);
-			ImGui::TreePop();
+
+			if (ImGui::TreeNodeEx("Speed", flags)) {
+				ImGui::Combo("SpeedType##type", &grain_.speedType_, "kConstancy\0kChange\0kReturn\0kCenter\0");
+				ImGui::Separator();
+
+				ImGui::DragFloat2("SpeedX", &para_.speedx.x, 0.01f);
+				ImGui::DragFloat2("SpeedY", &para_.speedy.x, 0.01f);
+				ImGui::DragFloat2("SpeedZ", &para_.speedz.x, 0.01f);
+				if (grain_.speedType_ == static_cast<int>(SpeedType::kReturn) || grain_.speedType_ == static_cast<int>(SpeedType::kCenter)) {
+					ImGui::DragFloat("ReturnPower", &grain_.returnPower_, 0.001f);
+				}
+				if (grain_.speedType_ == static_cast<int>(SpeedType::kReturn)) {
+					ImGui::SeparatorText("Accele");
+					ImGui::DragFloat3("Accele", &grain_.accele_.x, 0.01f);
+				}
+				ImGui::TreePop();
+			}
+
+			/*if (ImGui::TreeNodeEx("Color", flags)) {
+
+				ImGui::TreePop();
+			}*/
+
+			ImGui::Unindent();
 		}
+
+		ImGui::Checkbox("SizeCheck", &isDrawSize_);
+		ImGui::Checkbox("IsEmitte", &isEmit_);
+
 		if (ImGui::Button("save")) {
 			Save();
 		}
+		ImGui::Unindent();
 	}
+#endif // _DEBUG
 }
+
 void ParticleEmitter::DrawSize() {
+#ifdef _DEBUG
 	if (isDrawSize_) {
 
 		Matrix4x4 worldMatrix = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, pos_);
@@ -115,8 +157,8 @@ void ParticleEmitter::DrawSize() {
 		Line3dDrawer::GetInstance()->DrawLine3d(points[3], points[5], Vector4{ 1.0f, 0.0f, 0.0f, 1.0f });
 
 	}
-}
 #endif // _DEBUG
+}
 
 void ParticleEmitter::Emit() {
 	Matrix4x4 worldMatrix = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, pos_);

@@ -15,6 +15,18 @@ struct AcceleFiled {
 	AABB area;
 };
 
+enum class ShapeType {
+	PLANE,
+	CIRCLE,
+	RING,
+	SPHERE,
+	TORUS,
+	CYLINDER,
+	CONE,
+	TRIANGLE,
+	BOX,
+};
+
 class DXCom;
 class SRVManager;
 
@@ -34,6 +46,7 @@ public:
 		TransformationParticleMatrix* instancingData_ = nullptr;
 		uint32_t drawCount_;
 		ParticleEmitter emitter_;
+		ShapeType shapeType_ = ShapeType::PLANE;
 	};
 
 
@@ -64,6 +77,10 @@ public:
 
 	void Draw();
 
+	void ParticleDebugGUI();
+	void SelectParticleUpdate();
+	void SelectEmitterSizeDraw();
+
 	static void CreateParticleGroup(const std::string& name, const std::string& fileName, uint32_t count = 20);
 
 	static void CreateAnimeGroup(const std::string& name, const std::string& fileName);
@@ -89,7 +106,6 @@ private:
 	std::unordered_map<std::string, std::unique_ptr<ParticleGroup>> particleGroups_;
 	std::unordered_map<std::string, std::unique_ptr<AnimeGroup>> animeGroups_;
 
-
 	ComPtr<ID3D12Resource> vBuffer_;
 	ComPtr<ID3D12Resource> iBuffer_;
 	D3D12_VERTEX_BUFFER_VIEW vbView{};
@@ -99,4 +115,10 @@ private:
 	std::vector<uint32_t> index_;
 
 	bool isBillBoard_ = true;
+
+#ifdef _DEBUG
+	ParticleGroup* selectParticleGroup_ = nullptr;
+	int currentIndex_ = 0;
+	std::string currentKey_;
+#endif // _DEBUG
 };
