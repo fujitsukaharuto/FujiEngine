@@ -24,6 +24,7 @@ void GameRun::Initialize() {
 	modelManager_->LoadOBJ("terrain.obj");
 	modelManager_->LoadGLTF("AnimatedCube.gltf");
 	modelManager_->LoadGLTF("walk.gltf");
+	modelManager_->LoadGLTF("sneakWalk.gltf");
 	modelManager_->LoadGLTF("simpleSkin.gltf");
 #pragma endregion
 

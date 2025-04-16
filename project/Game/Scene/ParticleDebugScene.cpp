@@ -37,16 +37,14 @@ void ParticleDebugScene::Initialize() {
 
 void ParticleDebugScene::Update() {
 
-#ifdef _DEBUG
-
-
-#endif // _DEBUG
-
-
 	dxCommon_->UpDate();
+
+#ifdef _DEBUG
 
 	ParticleManager::GetInstance()->ParticleDebugGUI();
 	ParticleManager::GetInstance()->SelectParticleUpdate();
+
+#endif // _DEBUG
 
 	BlackFade();
 

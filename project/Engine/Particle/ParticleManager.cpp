@@ -99,11 +99,13 @@ void ParticleManager::Update() {
 
 		ParticleGroup* group = groupPair.second.get();
 
+#ifdef _DEBUG
 		if (group->emitter_.isEmit_) {
 			if (selectParticleGroup_ != group) {
 				group->emitter_.Emit();
 			}
 		}
+#endif // _DEBUG
 
 		int particleCount = 0;
 		group->drawCount_ = 0;
@@ -306,7 +308,6 @@ void ParticleManager::ParticleDebugGUI() {
 #ifdef _DEBUG
 	ImGui::Begin("ParticleDebug");
 	ImGui::SeparatorText("ParticleGroup");
-
 	if (particleGroups_.size() != 0) {
 		if (!selectParticleGroup_) {
 			selectParticleGroup_ = particleGroups_.begin()->second.get();
@@ -323,17 +324,39 @@ void ParticleManager::ParticleDebugGUI() {
 		selectParticleGroup_ = particleGroups_[currentKey_].get();
 	}
 
-	ImGui::Separator();
-
+	ImGui::SeparatorText("SelectGroup");
 	if (selectParticleGroup_) {
 		ParticleEmitter& selecrtEmitter = selectParticleGroup_->emitter_;
 		selecrtEmitter.DebugGUI();
 	}
 
-	if (ImGui::Button("ResetFrenquencyTime")) {
-		for (auto& groupPair : particleGroups_) {
-			groupPair.second->emitter_.TimeReset();
+	ImGui::SeparatorText("Emit Control");
+	if (ImGui::TreeNode("ParticleGroup Emit Control")) {
+		static ParticleGroupSelector selector;
+		if (ImGui::Button("ResetFrenquencyTime")) {
+			for (auto& groupPair : particleGroups_) {
+				groupPair.second->emitter_.TimeReset();
+			}
 		}
+
+		// 初期化（1回だけ）
+		if (selector.items[0].empty() && selector.items[1].empty()) {
+			for (const auto& [name, group] : particleGroups_) {
+				if (group->emitter_.isEmit_)
+					selector.items[1].push_back(name);
+				else
+					selector.items[0].push_back(name);
+			}
+		}
+
+		selector.Show([&](const std::string& name, bool emit) {
+			auto it = particleGroups_.find(name);
+			if (it != particleGroups_.end()) {
+				it->second->emitter_.isEmit_ = emit;
+			}
+			});
+
+		ImGui::TreePop();
 	}
 
 	ImGui::End();
