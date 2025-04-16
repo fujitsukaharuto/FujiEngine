@@ -120,6 +120,11 @@ void ParticleManager::Update() {
 
 			SizeType sizeType = SizeType(particle.type_);
 			float t = (1.0f - float(float(particle.lifeTime_) / float(particle.startLifeTime_)));
+
+			if (particle.isColorFade_) {
+				particle.color_.w = Lerp(particle.startAlpha_, 0.0f, t * t);
+			}
+
 			switch (sizeType) {
 			case SizeType::kNormal:
 				break;
@@ -151,7 +156,9 @@ void ParticleManager::Update() {
 			}
 
 			if (particle.rotateType_ == static_cast<int>(RotateType::kRandomR)) {
-				particle.transform_.rotate += Random::GetVector3({ -0.5f,0.5f }, { -0.5f,0.5f }, { -0.2f,0.2f });
+				if (particle.isContinuouslyRotate_) {
+					particle.transform_.rotate += Random::GetVector3({ -0.2f,0.2f }, { -0.2f,0.2f }, { -0.2f,0.2f }) * FPSKeeper::DeltaTime();
+				}
 			}
 
 			particle.speed_ += particle.accele_ * FPSKeeper::DeltaTime();
@@ -516,6 +523,7 @@ void ParticleManager::Emit(const std::string& name, const Vector3& pos, const Ve
 
 
 				particle.rotateType_ = grain.rotateType_;
+				particle.isContinuouslyRotate_ = grain.isContinuouslyRotate_;
 				Vector3 veloSpeed = particle.speed_.Normalize();
 				Vector3 cameraR{};
 				Vector3 defo = { 0.0f,1.0f,0.0f };
@@ -553,6 +561,7 @@ void ParticleManager::Emit(const std::string& name, const Vector3& pos, const Ve
 				particle.isBillBoard_ = grain.isBillBoard_;
 				particle.pattern_ = grain.pattern_;
 				particle.colorType_ = grain.colorType_;
+				particle.isColorFade_ = grain.isColorFade_;
 				switch (particle.colorType_) {
 				case static_cast<int>(ColorType::kDefault):
 					particle.color_ = para.colorMax;
@@ -564,6 +573,7 @@ void ParticleManager::Emit(const std::string& name, const Vector3& pos, const Ve
 					particle.color_.w = Random::GetFloat(para.colorMin.w, para.colorMax.w);
 					break;
 				}
+				particle.startAlpha_ = particle.color_.w;
 
 				SpeedType type = SpeedType(grain.speedType_);
 				switch (type) {
