@@ -55,7 +55,7 @@ void PlayerBullet::CalculetionFollowVec(const Vector3& target) {
 	// 速度に反映
 	velocity_ = newForward * velocity_.Length();
 
-	zRotate_ += 0.05f * FPSKeeper::DeltaTime();
+	zRotate_ += 0.2f * FPSKeeper::DeltaTime();
 	if (zRotate_ > (std::numbers::pi_v<float> *2.0f)) zRotate_ -= (std::numbers::pi_v<float> *2.0f);
 	Quaternion spinRot = Quaternion::AngleAxis(zRotate_, Vector3(0, 0, 1));
 	// スピン回転を補間後のクォータニオンに加える（Z軸にひねる）
