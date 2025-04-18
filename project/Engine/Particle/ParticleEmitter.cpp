@@ -44,6 +44,7 @@ void ParticleEmitter::DebugGUI() {
 					ImGui::ColorEdit4("ColorMax", &para_.colorMax.x);
 					ImGui::ColorEdit4("ColorMin", &para_.colorMin.x);
 				}
+				ImGui::Checkbox("IsColorFade", &grain_.isColorFade_);
 				ImGui::TreePop();
 			}
 
@@ -63,6 +64,9 @@ void ParticleEmitter::DebugGUI() {
 				ImGui::Combo("RotateType##type", &grain_.rotateType_, "kUsually\0kVelocityR\0kRandomR\0");
 				ImGui::Separator();
 				ImGui::DragFloat3("Rotate", &particleRotate_.x, 0.01f);
+				if (grain_.rotateType_ == static_cast<int>(RotateType::kRandomR)) {
+					ImGui::Checkbox("ContinuouslyRotate", &grain_.isContinuouslyRotate_);
+				}
 				ImGui::SeparatorText("BillBoard");
 				ImGui::Checkbox("BillBoard", &grain_.isBillBoard_);
 				if (grain_.isBillBoard_) {

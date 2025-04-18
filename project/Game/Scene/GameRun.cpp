@@ -31,8 +31,8 @@ void GameRun::Initialize() {
 
 
 #pragma region パーティクル生成
-	pManager_->CreateParticleGroup("sphere", "blueParticle.png");
-	pManager_->CreateParticleGroup("sphere2", "blueParticle.png");
+	pManager_->CreateParticleGroup("sphere", "defaultParticle.png");
+	pManager_->CreateParticleGroup("sphere2", "defaultParticle.png");
 	pManager_->CreateParticleGroup("sphere3", "blueParticle.png");
 	pManager_->CreateAnimeGroup("animetest", "uvChecker.png");
 	pManager_->AddAnime("animetest", "white2x2.png", 10.0f);
