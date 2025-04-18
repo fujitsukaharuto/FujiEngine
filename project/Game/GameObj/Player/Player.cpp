@@ -1,12 +1,8 @@
 #include "Player.h"
 
-#include "Engine/DX/FPSKeeper.h"
-#include "Camera/CameraManager.h"
-#include "Input/Input.h"
-#include "Engine/ImGuiManager/ImGuiManager.h"
-
 #include "Game/GameObj/Player/Behavior/PlayerRoot.h"
-
+#include "Game/GameObj/Player/AttackBehavior/PlayerAttackRoot.h"
+#include "Game/GameObj/Player/PlayerBullet.h"
 
 Player::Player() {
 }
@@ -19,25 +15,51 @@ void Player::Initialize() {
 	jumpSpeed_ = 0.2f;
 	gravity_ = 0.005f;
 	maxFallSpeed_ = 2.0f;
+	maxChargeTime_ = 30.0f;
 
 	collider_ = std::make_unique<AABBCollider>();
 	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
 	collider_->SetCollisionStayCallback([this](const ColliderInfo& other) {OnCollisionStay(other); });
 	collider_->SetCollisionExitCallback([this](const ColliderInfo& other) {OnCollisionExit(other); });
 
+	bullet_ = std::make_unique<PlayerBullet>();
+	bullet_->Initialize();
+
 	ChangeBehavior(std::make_unique<PlayerRoot>(this));
+	ChangeAttackBehavior(std::make_unique<PlayerAttackRoot>(this));
 
 }
 
 void Player::Update() {
 
 	behavior_->Update();
+	attackBehavior_->Update();
 
+	if (bullet_->GetIsLive()) {
+
+		if (bullet_->GetIsCharge()) {
+			Vector3 forward = { 0, 0, 1 };
+			Matrix4x4 rotateMatrix = MakeRotateYMatrix(model_->transform.rotate.y);
+			Vector3 worldForward = TransformNormal(forward, rotateMatrix);
+			Vector3 targetPos = model_->transform.translate + worldForward;
+			bullet_->Charge(targetPos, model_->transform.rotate);
+		} else {
+			bullet_->CalculetionFollowVec(Vector3(0.0f, 4.0f, 5.0f));
+		}
+
+		bullet_->Update();
+
+	}
 
 	collider_->SetPos(model_->GetWorldPos());
 }
 
 void Player::Draw(Material* mate) {
+
+	if (bullet_->GetIsLive()) {
+		bullet_->Draw();
+	}
+
 	OriginGameObject::Draw(mate);
 }
 
@@ -71,6 +93,10 @@ void Player::DebugGUI() {
 #pragma region Behavior
 void Player::ChangeBehavior(std::unique_ptr<BasePlayerBehavior>behavior) {
 	behavior_ = std::move(behavior);
+}
+
+void Player::ChangeAttackBehavior(std::unique_ptr<BasePlayerAttackBehavior> behavior) {
+	attackBehavior_ = std::move(behavior);
 }
 #pragma endregion
 
@@ -172,6 +198,20 @@ void Player::Fall(float& speed) {
 #pragma endregion
 
 
-float Player::ComparNum(float a, float b) {
-	return (a < b) ? a : b;
+void Player::InitBullet() {
+	Vector3 forward = { 0, 0, 1 };
+	Matrix4x4 rotateMatrix = MakeRotateYMatrix(model_->transform.rotate.y);
+	Vector3 worldForward = TransformNormal(forward, rotateMatrix);
+	Vector3 targetPos = model_->transform.translate + worldForward;
+	bullet_->InitParameter(targetPos);
+}
+
+///= Bullet ===================================================================*/
+void Player::ReleaseBullet() {
+	if (bullet_->GetIsLive()) {
+		Vector3 forward = { 0, 0, 1 };
+		Matrix4x4 rotateMatrix = MakeRotateYMatrix(model_->transform.rotate.y);
+		Vector3 worldForward = TransformNormal(forward, rotateMatrix);
+		bullet_->Release(0.5f, 10.0f, worldForward);
+	}
 }

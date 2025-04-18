@@ -221,6 +221,9 @@
     <ClCompile Include="Game\Scene\ParticleDebugScene.cpp">
       <Filter>Game\Scene</Filter>
     </ClCompile>
+    <ClCompile Include="Game\GameObj\Player\PlayerBullet.cpp">
+      <Filter>Game\GameObj\Player</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -486,6 +489,9 @@
     </ClInclude>
     <ClInclude Include="Game\Scene\ParticleDebugScene.h">
       <Filter>Game\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\Player\PlayerBullet.h">
+      <Filter>Game\GameObj\Player</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

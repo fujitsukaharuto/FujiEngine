@@ -1,7 +1,11 @@
 #pragma once
 #include <memory>
-#include "Model/Object3d.h"
 
+#include "Model/Object3d.h"
+#include "Engine/DX/FPSKeeper.h"
+#include "Camera/CameraManager.h"
+#include "Input/Input.h"
+#include "Engine/ImGuiManager/ImGuiManager.h"
 
 class OriginGameObject {
 public:
@@ -19,6 +23,7 @@ public:
 
 public:
 
+	float ComparNum(float a, float b);
 	void CreateModel(const std::string& name);
 	void SetModel(const std::string& name);
 	Object3d* GetModel() { return model_.get(); }

@@ -19,5 +19,6 @@ public:
 private:
 
 	Step step_;
+	float chargeTime_;
 
 };

@@ -1,5 +1,6 @@
 #pragma once
 #include <cfloat>
+#include <numbers>
 
 #include "Math/Vector/Vector3.h"
 #include "Math/Vector/Vector4.h"
@@ -150,6 +151,76 @@ public:
 		return result;
 	}
 
+	static Quaternion MatrixToQuaternion(const Matrix4x4& m) {
+		float trace = m.m[0][0] + m.m[1][1] + m.m[2][2];
+		Quaternion q;
+
+		if (trace > 0.0f) {
+			float s = std::sqrt(trace + 1.0f) * 2.0f; // s = 4 * qw
+			q.w = 0.25f * s;
+			q.x = (m.m[2][1] - m.m[1][2]) / s;
+			q.y = (m.m[0][2] - m.m[2][0]) / s;
+			q.z = (m.m[1][0] - m.m[0][1]) / s;
+		} else if (m.m[0][0] > m.m[1][1] && m.m[0][0] > m.m[2][2]) {
+			float s = std::sqrt(1.0f + m.m[0][0] - m.m[1][1] - m.m[2][2]) * 2.0f; // s = 4 * qx
+			q.w = (m.m[2][1] - m.m[1][2]) / s;
+			q.x = 0.25f * s;
+			q.y = (m.m[0][1] + m.m[1][0]) / s;
+			q.z = (m.m[0][2] + m.m[2][0]) / s;
+		} else if (m.m[1][1] > m.m[2][2]) {
+			float s = std::sqrt(1.0f + m.m[1][1] - m.m[0][0] - m.m[2][2]) * 2.0f; // s = 4 * qy
+			q.w = (m.m[0][2] - m.m[2][0]) / s;
+			q.x = (m.m[0][1] + m.m[1][0]) / s;
+			q.y = 0.25f * s;
+			q.z = (m.m[1][2] + m.m[2][1]) / s;
+		} else {
+			float s = std::sqrt(1.0f + m.m[2][2] - m.m[0][0] - m.m[1][1]) * 2.0f; // s = 4 * qz
+			q.w = (m.m[1][0] - m.m[0][1]) / s;
+			q.x = (m.m[0][2] + m.m[2][0]) / s;
+			q.y = (m.m[1][2] + m.m[2][1]) / s;
+			q.z = 0.25f * s;
+		}
+
+		return q.Normalize(); // 念のため正規化
+	}
+
+	static Quaternion LookRotation(const Vector3& forward, const Vector3& up = Vector3(0, 1, 0)) {
+		Vector3 z = forward.Normalize();
+		Vector3 x = up.Cross(z).Normalize();
+		Vector3 y = z.Cross(x);
+
+		Matrix4x4 m;
+		m.m[0][0] = x.x; m.m[0][1] = y.x; m.m[0][2] = z.x; m.m[0][3] = 0;
+		m.m[1][0] = x.y; m.m[1][1] = y.y; m.m[1][2] = z.y; m.m[1][3] = 0;
+		m.m[2][0] = x.z; m.m[2][1] = y.z; m.m[2][2] = z.z; m.m[2][3] = 0;
+		m.m[3][0] = 0;   m.m[3][1] = 0;   m.m[3][2] = 0;   m.m[3][3] = 1;
+
+		// 変換行列からクォータニオンを作る（関数が必要）
+		return MatrixToQuaternion(m);
+	}
+
+	static Vector3 QuaternionToEuler(const Quaternion& q) {
+		Vector3 euler;
+
+		// roll (x-axis rotation)
+		float sinr_cosp = 2.0f * (q.w * q.x + q.y * q.z);
+		float cosr_cosp = 1.0f - 2.0f * (q.x * q.x + q.y * q.y);
+		euler.x = std::atan2(sinr_cosp, cosr_cosp);
+
+		// pitch (y-axis rotation)
+		float sinp = 2.0f * (q.w * q.y - q.z * q.x);
+		if (std::abs(sinp) >= 1.0f)
+			euler.y = std::copysign(std::numbers::pi_v<float> / 2.0f, sinp); // use 90 degrees if out of range
+		else
+			euler.y = std::asin(sinp);
+
+		// yaw (z-axis rotation)
+		float siny_cosp = 2.0f * (q.w * q.z + q.x * q.y);
+		float cosy_cosp = 1.0f - 2.0f * (q.y * q.y + q.z * q.z);
+		euler.z = std::atan2(siny_cosp, cosy_cosp);
+
+		return euler;
+	}
 
 	Quaternion operator-() const {
 		return Quaternion(-x, -y, -z, -w);

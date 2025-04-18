@@ -3,9 +3,10 @@
 #include "Game/Collider/AABBCollider.h"
 
 #include "Game/GameObj/Player/Behavior/BasePlayerBehavior.h"
+#include "Game/GameObj/Player/AttackBehavior/BasePlayerAttackBehavior.h"
 
 
-
+class PlayerBullet;
 class StageBlock;
 
 class Player : public OriginGameObject{
@@ -21,6 +22,7 @@ public:
 	//========================================================================*/
 	//* Behavior
 	void ChangeBehavior(std::unique_ptr<BasePlayerBehavior>behavior);
+	void ChangeAttackBehavior(std::unique_ptr<BasePlayerAttackBehavior>behavior);
 
 	//========================================================================*/
 	//* Collision
@@ -40,10 +42,16 @@ public:
 	void Fall(float& speed);
 
 	//========================================================================*/
+	//* Bullet
+	void InitBullet();
+	void ReleaseBullet();
+
+	//========================================================================*/
 	//* Getter
 	float GetMoveSpeed() { return moveSpeed_; }
 	float GetJumpSpeed() { return jumpSpeed_; }
 	float GetFallSpeed() { return fallSpeed_; }
+	float GetMaxChargeTime() { return maxChargeTime_; }
 	int GetGrabDir() { return dir_; }
 	bool GetIsFall() { return isFall_; }
 	BaseCollider* GetCollider() { return collider_.get(); }
@@ -55,17 +63,13 @@ public:
 
 private:
 
-	/**
-	* @brief 値の比較
-	* @param a 現在の値
-	* @param b 最大値
-	* @return (a < b) ? a : b
-	*/
-	float ComparNum(float a, float b);
+
 
 private:
 
 	std::unique_ptr<BasePlayerBehavior> behavior_ = nullptr;
+	std::unique_ptr<BasePlayerAttackBehavior> attackBehavior_ = nullptr;
+	std::unique_ptr<PlayerBullet> bullet_ = nullptr;
 
 	std::unique_ptr<AABBCollider> collider_;
 
@@ -74,6 +78,7 @@ private:
 	float fallSpeed_;
 	float gravity_;
 	float maxFallSpeed_;
+	float maxChargeTime_;
 	bool isFall_;
 
 	Vector3 velocity_;

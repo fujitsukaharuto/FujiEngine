@@ -20,6 +20,7 @@ void GameRun::Initialize() {
 
 #pragma region オブジェクト読み込み
 	ModelManager::GetInstance()->CreateSphere();
+	modelManager_->LoadOBJ("cube.obj");
 	modelManager_->LoadOBJ("suzanne.obj");
 	modelManager_->LoadOBJ("Fence.obj");
 	modelManager_->LoadOBJ("terrain.obj");

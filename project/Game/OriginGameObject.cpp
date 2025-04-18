@@ -22,6 +22,10 @@ void OriginGameObject::Debug() {
 }
 #endif // _DEBUG
 
+float OriginGameObject::ComparNum(float a, float b) {
+	return (a < b) ? a : b;
+}
+
 void OriginGameObject::CreateModel(const std::string& name) {
 	model_->Create(name);
 }
