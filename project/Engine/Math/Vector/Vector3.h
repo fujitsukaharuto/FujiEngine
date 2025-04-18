@@ -40,10 +40,12 @@ public:
 
 	static Vector3 GetZeroVec() { return { 0.0f,0.0f,0.0f }; }
 	static Vector3 GetUpVec() { return { 0.0f,1.0f,0.0f }; }
+	static Vector3 FillVec(float k) { return { k,k,k }; }
 	static float Dot(const Vector3& a, const Vector3& b) { return a * b; }
 	static float Length(const Vector3& a) { return a.Length(); }
 	static float Distance(const Vector3& a, const Vector3& b) { return (a - b).Length(); }
-	static Vector3 Normalize(const Vector3& v) { v.Normalize(); }
+	static Vector3 Normalize(const Vector3& v) { return v.Normalize(); }
+	static Vector3 Cross(const Vector3& v1, const Vector3& v2) { return v1.Cross(v2); }
 };
 
 
