@@ -24,7 +24,7 @@ void Framework::Init() {
 
 	// srvManager初期化
 	srvManager_ = SRVManager::GetInstance();
-	srvManager_->Initialize();
+	srvManager_->Initialize(dxCommon_);
 
 	// FPS管理
 	fpsKeeper_ = FPSKeeper::GetInstance();
@@ -36,7 +36,7 @@ void Framework::Init() {
 
 	// ライン描画
 	line3dDrawer_ = Line3dDrawer::GetInstance();
-	line3dDrawer_->Initialize();
+	line3dDrawer_->Initialize(dxCommon_);
 	line3dDrawer_->SetCamera(cameraManager_->GetCamera());
 
 #pragma region 汎用機能初期化

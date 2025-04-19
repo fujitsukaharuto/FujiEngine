@@ -1,5 +1,6 @@
 #include "PipelineManager.h"
 
+#include "Engine/DX/DXCom.h"
 #include "Pipeline.h"
 #include "Line3dPipe.h"
 #include "ParticlePipeline.h"
@@ -24,7 +25,8 @@ PipelineManager* PipelineManager::GetInstance() {
 	return &instance;
 }
 
-void PipelineManager::Initialize() {
+void PipelineManager::Initialize(DXCom* pDxcom) {
+	dxcommon_ = pDxcom;
 }
 
 void PipelineManager::Finalize() {
@@ -50,64 +52,64 @@ void PipelineManager::CreatePipeline() {
 
 
 	nonePipeline.reset(new NonePipeline());
-	nonePipeline->Initialize();
+	nonePipeline->Initialize(dxcommon_);
 	pipelines_.push_back(std::move(nonePipeline));
 
 
 	pipeline.reset(new Pipeline());
-	pipeline->Initialize();
+	pipeline->Initialize(dxcommon_);
 	pipelines_.push_back(std::move(pipeline));
 
 
 	lLine.reset(new Line3dPipe());
-	lLine->Initialize();
+	lLine->Initialize(dxcommon_);
 	pipelines_.push_back(std::move(lLine));
 
 
 	particlePipline.reset(new ParticlePipeline());
-	particlePipline->Initialize();
+	particlePipline->Initialize(dxcommon_);
 	pipelines_.push_back(std::move(particlePipline));
 
 
 	animationPipline.reset(new AnimationPipeline());
-	animationPipline->Initialize();
+	animationPipline->Initialize(dxcommon_);
 	pipelines_.push_back(std::move(animationPipline));
 
 
 	grayPipeline.reset(new GrayPipeline());
-	grayPipeline->Initialize();
+	grayPipeline->Initialize(dxcommon_);
 	pipelines_.push_back(std::move(grayPipeline));
 
 
 	gaussPipeline.reset(new GaussPipeline());
-	gaussPipeline->Initialize();
+	gaussPipeline->Initialize(dxcommon_);
 	pipelines_.push_back(std::move(gaussPipeline));
 
 
 	metaballPipeline.reset(new MetaBallPipeline());
-	metaballPipeline->Initialize();
+	metaballPipeline->Initialize(dxcommon_);
 	pipelines_.push_back(std::move(metaballPipeline));
 
 
 	shockWave.reset(new ShockWavePipe);
-	shockWave->Initialize();
+	shockWave->Initialize(dxcommon_);
 	pipelines_.push_back(std::move(shockWave));
 
 	firePipe.reset(new FirePipe);
-	firePipe->Initialize();
+	firePipe->Initialize(dxcommon_);
 	pipelines_.push_back(std::move(firePipe));
 
 
 	thunderPipe.reset(new ThunderPipe);
-	thunderPipe->Initialize();
+	thunderPipe->Initialize(dxcommon_);
 	pipelines_.push_back(std::move(thunderPipe));
 
 	crtPipe.reset(new CRTPipe);
-	crtPipe->Initialize();
+	crtPipe->Initialize(dxcommon_);
 	pipelines_.push_back(std::move(crtPipe));
 
 	grayCS.reset(new GrayCSPipe);
-	grayCS->Initialize();
+	grayCS->Initialize(dxcommon_);
 	pipelines_.push_back(std::move(grayCS));
 
 }

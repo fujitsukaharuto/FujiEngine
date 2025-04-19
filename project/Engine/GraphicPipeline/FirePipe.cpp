@@ -1,5 +1,5 @@
 #include "FirePipe.h"
-#include "DXCom.h"
+#include "Engine/DX/DXCom.h"
 #include "DXCommand.h"
 #include "DXCompil.h"
 #include "Logger.h"
@@ -108,9 +108,9 @@ void FirePipe::CreatePSO(ID3D12Device* device) {
 	layout.NumElements = _countof(element);
 
 
-	vs = DXCom::GetInstance()->GetDXCompil()->CompileShader(kDirectoryPath_ + L"Fire.VS.hlsl", L"vs_6_0");
+	vs = dxcommon_->GetDXCompil()->CompileShader(kDirectoryPath_ + L"Fire.VS.hlsl", L"vs_6_0");
 	assert(vs != nullptr);
-	ps = DXCom::GetInstance()->GetDXCompil()->CompileShader(kDirectoryPath_ + L"Fire.PS.hlsl", L"ps_6_0");
+	ps = dxcommon_->GetDXCompil()->CompileShader(kDirectoryPath_ + L"Fire.PS.hlsl", L"ps_6_0");
 	assert(ps != nullptr);
 
 

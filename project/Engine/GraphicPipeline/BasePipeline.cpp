@@ -1,5 +1,5 @@
 #include "BasePipeline.h"
-#include "DXCom.h"
+#include "Engine/DX/DXCom.h"
 #include "DXCommand.h"
 
 
@@ -10,23 +10,25 @@ BasePipeline::~BasePipeline() {
 	vs.Reset();
 }
 
-void BasePipeline::Initialize() {
+void BasePipeline::Initialize(DXCom* pDxcom) {
 
-	CreateRootSignature(DXCom::GetInstance()->GetDevice());
-	CreatePSO(DXCom::GetInstance()->GetDevice());
+	dxcommon_ = pDxcom;
+
+	CreateRootSignature(dxcommon_->GetDevice());
+	CreatePSO(dxcommon_->GetDevice());
 
 }
 
 void BasePipeline::SetPipelineState() {
 
-	ID3D12GraphicsCommandList* commandList = DXCom::GetInstance()->GetDXCommand()->GetList();
+	ID3D12GraphicsCommandList* commandList = dxcommon_->GetDXCommand()->GetList();
 	commandList->SetGraphicsRootSignature(rootSignature_.Get());
 	commandList->SetPipelineState(pso_.Get());
 
 }
 
 void BasePipeline::SetPipelineCSState() {
-	ID3D12GraphicsCommandList* commandList = DXCom::GetInstance()->GetDXCommand()->GetList();
+	ID3D12GraphicsCommandList* commandList = dxcommon_->GetDXCommand()->GetList();
 	commandList->SetComputeRootSignature(rootSignature_.Get());
 	commandList->SetPipelineState(pso_.Get());
 }

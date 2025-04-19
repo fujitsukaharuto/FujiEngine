@@ -1,9 +1,12 @@
 #include "PointLight.h"
-#include "DXCom.h"
+#include "Engine/DX/DXCom.h"
 #include "ImGuiManager/ImGuiManager.h"
 
-void PointLight::Initialize() {
-	pointLightResource_ = DXCom::GetInstance()->CreateBufferResource(DXCom::GetInstance()->GetDevice(), sizeof(PointLightData));
+void PointLight::Initialize(DXCom* pDxcom) {
+	
+	dxcommon_ = pDxcom;
+
+	pointLightResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(PointLightData));
 	pointLightData_ = nullptr;
 	pointLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&pointLightData_));
 	pointLightData_->color = { 1.0f,1.0f,1.0f,1.0f };

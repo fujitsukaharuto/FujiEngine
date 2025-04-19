@@ -4,6 +4,8 @@
 #include "Math/Matrix/MatrixCalculation.h"
 
 
+class DXCom;
+
 struct DirectionalLight {
 
 	Vector4 color;
@@ -20,7 +22,7 @@ public:
 
 public:
 
-	void Initialize();
+	void Initialize(DXCom* pDxcom);
 
 	void SetLightCommand(ID3D12GraphicsCommandList* commandList);
 
@@ -32,6 +34,7 @@ private:
 
 private:
 
+	DXCom* dxcommon_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> drectionLightResource_ = nullptr;
 
 };

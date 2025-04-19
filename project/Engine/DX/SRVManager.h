@@ -1,8 +1,11 @@
 #pragma once
 #include <wrl/client.h>
-#include"DXCom.h"
+#include <Windows.h>
+#include <string>
+#include <d3d12.h>
 
 
+class DXCom;
 
 class SRVManager {
 public:
@@ -13,7 +16,7 @@ public:
 
 	static SRVManager* GetInstance();
 
-	void Initialize();
+	void Initialize(DXCom* pDxcom);
 	void Finalize();
 
 	void CreateTextureSRV(uint32_t srvIndex, ID3D12Resource* resource, DXGI_FORMAT format, UINT mipLevels);

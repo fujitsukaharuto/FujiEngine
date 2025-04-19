@@ -1,11 +1,13 @@
 #include "SpotLight.h"
-#include "DXCom.h"
+#include "Engine/DX/DXCom.h"
 #include <numbers>
 #include "ImGuiManager/ImGuiManager.h"
 
-void SpotLight::Initialize() {
+void SpotLight::Initialize(DXCom* pDxcom) {
 
-	spotLightResource_ = DXCom::GetInstance()->CreateBufferResource(DXCom::GetInstance()->GetDevice(), sizeof(SpotLightData));
+	dxcommon_ = pDxcom;
+
+	spotLightResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(SpotLightData));
 	spotLightData_ = nullptr;
 	spotLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&spotLightData_));
 	spotLightData_->color = { 1.0f,1.0f,1.0f,1.0f };

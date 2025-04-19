@@ -1,6 +1,6 @@
 #include "AnimationModel.h"
 #include "Model/ModelManager.h"
-#include "DXCom.h"
+#include "Engine/DX/DXCom.h"
 #include "DX/SRVManager.h"
 #include "LightManager.h"
 #include "Engine/Model/Line3dDrawer.h"

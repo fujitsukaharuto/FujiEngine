@@ -21,8 +21,9 @@ void DXCom::Initialize(MyWin* myWin) {
 	assert(myWin);
 	myWin_ = myWin;
 	pipeManager_ = PipelineManager::GetInstance();
+	pipeManager_->Initialize(this);
 	offscreen_ = std::make_unique<OffscreenManager>();
-	offscreen_->Init(GetInstance());
+	offscreen_->Init(this);
 
 	CreateDevice();
 	CreateCommand();
