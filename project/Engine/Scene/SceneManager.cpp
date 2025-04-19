@@ -98,6 +98,13 @@ void SceneManager::DebugGUI() {
 #endif // _DEBUG
 }
 
+void SceneManager::ParticleGroupDebugGUI() {
+#ifdef _DEBUG
+	scene_->ParticleGroupDebugGUI();
+#endif // _DEBUG
+
+}
+
 void SceneManager::SceneSet() {
 	if (nextScene_) {
 		if (scene_) {

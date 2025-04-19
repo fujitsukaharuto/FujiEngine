@@ -83,7 +83,8 @@ public:
 
 	void Init(DXCom* dxcom);
 	void Update();
-	
+	void DebugGUI();
+
 	void CreateResource();
 	void SettingTexture();
 	void Command();

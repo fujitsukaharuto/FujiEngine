@@ -65,9 +65,6 @@ void TitleScene::Update() {
 
 #endif // _DEBUG
 
-
-	dxCommon_->UpDate();
-
 	BlackFade();
 
 	test_->Update();

@@ -35,6 +35,7 @@ public:
 	void SetFactory(AbstractSceneFactory* factory) { sceneFactory_ = factory; }
 
 	void DebugGUI();
+	void ParticleGroupDebugGUI();
 
 private:
 

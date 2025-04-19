@@ -324,7 +324,7 @@ void DXCom::ClearDepthBuffer() {
 	command_->GetList()->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 }
 
-void DXCom::UpDate() {
+void DXCom::OffscreenUpDate() {
 	/*Tick();*/
 
 	offscreen_->Update();
@@ -336,6 +336,10 @@ void DXCom::UpDate() {
 	/*wvpDate_->World = worldMatrix;
 	wvpDate_->WVP = worldViewProjectionMatrix;*/
 
+}
+
+void DXCom::OffscreenDebugGUI() {
+	offscreen_->DebugGUI();
 }
 
 void DXCom::ReleaseData() {
