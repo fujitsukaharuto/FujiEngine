@@ -28,6 +28,7 @@ public:
 
 	virtual void DebugGUI();
 	virtual void ParticleDebugGUI();
+	virtual void ParticleGroupDebugGUI();
 
 private:
 

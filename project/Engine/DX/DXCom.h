@@ -90,7 +90,8 @@ public:
 
 	ID3D12GraphicsCommandList* GetCommandList() const { return command_->GetList(); }
 
-	void UpDate();
+	void OffscreenUpDate();
+	void OffscreenDebugGUI();
 
 	void ReleaseData();
 

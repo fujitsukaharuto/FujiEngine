@@ -29,3 +29,9 @@ void BaseScene::ParticleDebugGUI() {
 
 #endif // _DEBUG
 }
+
+void BaseScene::ParticleGroupDebugGUI() {
+#ifdef _DEBUG
+
+#endif // _DEBUG
+}

@@ -10,6 +10,17 @@ void OffscreenManager::Init(DXCom* dxcom) {
 }
 
 void OffscreenManager::Update() {
+	shockData_->shockTime += 0.025f;
+	fireData_->animeTime += 0.025f;
+	thunderData_->time += 0.005f;
+
+	thunderData_->time = std::fmodf(thunderData_->time, 1.5f);
+	thunderData_->progres = thunderData_->time / 1.5f;
+
+	crtData_->crtTime += 0.025f;
+}
+
+void OffscreenManager::DebugGUI() {
 #ifdef _DEBUG
 	ImGui::Begin("debug");
 
@@ -173,17 +184,8 @@ void OffscreenManager::Update() {
 	}
 
 	ImGui::End();
-
-	shockData_->shockTime += 0.025f;
-	fireData_->animeTime += 0.025f;
-	thunderData_->time += 0.005f;
-
-	thunderData_->time = std::fmodf(thunderData_->time, 1.5f);
-	thunderData_->progres = thunderData_->time / 1.5f;
-
-	crtData_->crtTime += 0.025f;
-
 #endif // _DEBUG
+
 }
 
 void OffscreenManager::CreateResource() {

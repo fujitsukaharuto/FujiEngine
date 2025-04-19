@@ -104,7 +104,6 @@ void GameScene::Update() {
 		audioPlayer_->SoundPlayWave(soundData2);
 	}
 
-	dxCommon_->UpDate();
 
 	BlackFade();
 

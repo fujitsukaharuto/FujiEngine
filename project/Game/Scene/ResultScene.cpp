@@ -45,9 +45,6 @@ void ResultScene::Update() {
 
 #endif // _DEBUG
 
-
-	dxCommon_->UpDate();
-
 	BlackFade();
 
 	sphere->transform.rotate.y += 0.02f;

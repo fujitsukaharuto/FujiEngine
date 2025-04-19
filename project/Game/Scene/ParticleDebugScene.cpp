@@ -37,11 +37,8 @@ void ParticleDebugScene::Initialize() {
 
 void ParticleDebugScene::Update() {
 
-	dxCommon_->UpDate();
-
 #ifdef _DEBUG
 
-	ParticleManager::GetInstance()->ParticleDebugGUI();
 	ParticleManager::GetInstance()->SelectParticleUpdate();
 
 #endif // _DEBUG
@@ -101,6 +98,12 @@ void ParticleDebugScene::ParticleDebugGUI() {
 	ImGui::Indent();
 
 	ImGui::Unindent();
+#endif // _DEBUG
+}
+
+void ParticleDebugScene::ParticleGroupDebugGUI() {
+#ifdef _DEBUG
+	ParticleManager::GetInstance()->ParticleDebugGUI();
 #endif // _DEBUG
 }
 

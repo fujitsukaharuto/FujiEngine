@@ -12,6 +12,7 @@ public:
 	void Draw()override;
 	void DebugGUI()override;
 	void ParticleDebugGUI()override;
+	void ParticleGroupDebugGUI()override;
 
 	void BlackFade();
 

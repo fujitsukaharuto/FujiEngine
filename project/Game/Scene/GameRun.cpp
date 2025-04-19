@@ -74,14 +74,11 @@ void GameRun::Finalize() {
 
 void GameRun::Update() {
 	fpsKeeper_->Update();
-#ifdef _DEBUG
-	// ImGui受付
-	imguiManager_->Begin();
-#endif // _DEBUG
 
 	// 入力関連の毎フレーム処理
 	input_->Update();
 	cameraManager_->Update();
+	dxCommon_->OffscreenUpDate();
 
 #ifdef _DEBUG
 	if (input_->TriggerKey(DIK_F12)) {
@@ -92,15 +89,19 @@ void GameRun::Update() {
 		}
 	}
 
-	DebugGUI();
-
 #endif // _DEBUG
 
-	GlobalVariables::GetInstance()->Update();
 	// ゲームシーンの毎フレーム処理
 	sceneManager_->Update();
+
+#ifdef _DEBUG
+	// ImGui受付
+	imguiManager_->Begin();
+	DebugGUI();
+	GlobalVariables::GetInstance()->Update();
 	// ImGui受付
 	imguiManager_->End();
+#endif // _DEBUG
 }
 
 void GameRun::Draw() {
@@ -120,6 +121,9 @@ void GameRun::Draw() {
 
 void GameRun::DebugGUI() {
 #ifdef _DEBUG
+	dxCommon_->OffscreenDebugGUI();
+	sceneManager_->ParticleGroupDebugGUI();
+
 	ImGui::Begin("SceneDebug");
 
 	fpsKeeper_->Debug();
