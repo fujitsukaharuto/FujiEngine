@@ -55,9 +55,11 @@ void Framework::Init() {
 	// object関係
 	textureManager_ = TextureManager::GetInstance();
 	modelManager_ = ModelManager::GetInstance();
+	modelManager_->Initialize(dxCommon_);
 
 	// ライト管理
 	lightManager_ = LightManager::GetInstance();
+	lightManager_->Initialize(dxCommon_);
 	lightManager_->CreateLight();
 	lightManager_->AddPointLight();
 	lightManager_->AddSpotLight();

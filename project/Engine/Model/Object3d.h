@@ -5,13 +5,13 @@
 #include "Camera.h"
 #include "Object3dCommon.h"
 
-
+class DXCom;
 class PointLight;
 class SpotLight;
 
 class Object3d {
 public:
-	Object3d() = default;
+	Object3d();
 	~Object3d();
 
 public:
@@ -62,6 +62,7 @@ private:
 	Object3dCommon* common_;
 	std::unique_ptr<Model> model_ = nullptr;
 
+	DXCom* dxcommon_;
 	Camera* camera_;
 	Object3d* parent_ = nullptr;
 

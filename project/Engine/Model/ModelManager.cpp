@@ -15,7 +15,8 @@ ModelManager* ModelManager::GetInstance() {
 }
 
 
-void ModelManager::Initialize() {
+void ModelManager::Initialize(DXCom* pDxcom) {
+	dxcommon_ = pDxcom;
 }
 
 

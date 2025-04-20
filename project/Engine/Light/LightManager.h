@@ -5,6 +5,8 @@
 #include <d3d12.h>
 #include <memory>
 
+class DXCom;
+
 class LightManager {
 public:
 	LightManager() = default;
@@ -14,6 +16,7 @@ public:
 
 	static LightManager* GetInstance();
 
+	void Initialize(DXCom* pDxcom);
 	void Update();
 
 	void CreateLight();
@@ -31,6 +34,7 @@ private:
 
 private:
 
+	DXCom* dxcommon_;
 	std::unique_ptr<DirectionLight> directionLight_;
 	std::vector <std::unique_ptr<PointLight>> pointLights_;
 	std::vector<std::unique_ptr<SpotLight>> spotLights_;

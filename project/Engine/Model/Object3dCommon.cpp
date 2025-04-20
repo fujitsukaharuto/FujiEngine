@@ -1,4 +1,5 @@
 #include "Object3dCommon.h"
+#include "Engine/DX/DXCom.h"
 #include "Light/LightManager.h"
 
 void Object3dCommon::Initialize() {

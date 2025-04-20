@@ -1,5 +1,6 @@
 #pragma once
-#include "DXCom.h"
+
+class DXCom;
 
 class Object3dCommon {
 public:

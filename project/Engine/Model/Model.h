@@ -2,13 +2,14 @@
 #include "Math/Matrix/MatrixCalculation.h"
 #include <d3d12.h>
 #include <string>
-#include "DXCom.h"
 #include "Mesh.h"
 #include "Material.h"
 
 #include "AnimationData/AnimationStructs.h"
 #include "externals/DirectXTex/DirectXTex.h"
 #include "externals/DirectXTex/d3dx12.h"
+
+class DXCom;
 
 class Model {
 public:

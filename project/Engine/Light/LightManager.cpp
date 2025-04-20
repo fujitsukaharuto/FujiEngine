@@ -8,6 +8,10 @@ LightManager* LightManager::GetInstance() {
 	return &instance;
 }
 
+void LightManager::Initialize(DXCom* pDxcom) {
+	dxcommon_ = pDxcom;
+}
+
 void LightManager::Update() {
 #ifdef _DEBUG
 
@@ -19,20 +23,20 @@ void LightManager::Update() {
 
 void LightManager::CreateLight() {
 	directionLight_ = std::make_unique<DirectionLight>();
-	directionLight_->Initialize(DXCom::GetInstance());
+	directionLight_->Initialize(dxcommon_);
 }
 
 void LightManager::AddPointLight() {
 	std::unique_ptr<PointLight> newPoint;
 	newPoint.reset(new PointLight());
-	newPoint->Initialize(DXCom::GetInstance());
+	newPoint->Initialize(dxcommon_);
 	pointLights_.push_back(std::move(newPoint));
 }
 
 void LightManager::AddSpotLight() {
 	std::unique_ptr<SpotLight> newSpot;
 	newSpot.reset(new SpotLight());
-	newSpot->Initialize(DXCom::GetInstance());
+	newSpot->Initialize(dxcommon_);
 	spotLights_.push_back(std::move(newSpot));
 }
 
