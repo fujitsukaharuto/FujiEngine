@@ -17,7 +17,6 @@
 
 
 PipelineManager::~PipelineManager() {
-	pipelines_.clear();
 }
 
 PipelineManager* PipelineManager::GetInstance() {

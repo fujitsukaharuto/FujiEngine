@@ -21,6 +21,10 @@ void SpotLight::Initialize(DXCom* pDxcom) {
 
 }
 
+void SpotLight::Finalize() {
+	spotLightResource_.Reset();
+}
+
 void SpotLight::SetLightCommand(ID3D12GraphicsCommandList* commandList) {
 
 	commandList->SetGraphicsRootConstantBufferView(6, spotLightResource_->GetGPUVirtualAddress());

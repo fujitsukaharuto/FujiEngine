@@ -19,12 +19,12 @@ void Framework::Init() {
 	win_->Initialize();
 
 	// DirectX初期化
-	dxcommon_ = DXCom::GetInstance();
+	dxcommon_ = std::make_unique<DXCom>();
 	dxcommon_->Initialize(win_);
 
 	// srvManager初期化
 	srvManager_ = SRVManager::GetInstance();
-	srvManager_->Initialize(dxcommon_);
+	srvManager_->Initialize(dxcommon_.get());
 
 	// FPS管理
 	fpsKeeper_ = FPSKeeper::GetInstance();
@@ -36,13 +36,13 @@ void Framework::Init() {
 
 	// ライン描画
 	line3dDrawer_ = Line3dDrawer::GetInstance();
-	line3dDrawer_->Initialize(dxcommon_);
+	line3dDrawer_->Initialize(dxcommon_.get());
 	line3dDrawer_->SetCamera(cameraManager_->GetCamera());
 
 #pragma region 汎用機能初期化
 	// ImGuiの初期化
 	imguiManager_ = ImGuiManager::GetInstance();
-	imguiManager_->Init(win_, dxcommon_);
+	imguiManager_->Init(win_, dxcommon_.get());
 
 	// 入力の初期化
 	input_ = Input::GetInstance();
@@ -54,20 +54,20 @@ void Framework::Init() {
 
 	// object関係
 	textureManager_ = TextureManager::GetInstance();
-	textureManager_->Initialize(dxcommon_);
+	textureManager_->Initialize(dxcommon_.get());
 	modelManager_ = ModelManager::GetInstance();
-	modelManager_->Initialize(dxcommon_);
+	modelManager_->Initialize(dxcommon_.get());
 
 	// ライト管理
 	lightManager_ = LightManager::GetInstance();
-	lightManager_->Initialize(dxcommon_);
+	lightManager_->Initialize(dxcommon_.get());
 	lightManager_->CreateLight();
 	lightManager_->AddPointLight();
 	lightManager_->AddSpotLight();
 	
 	// パーティクル管理
 	pManager_ = ParticleManager::GetInstance();
-	pManager_->Initialize(dxcommon_, srvManager_);
+	pManager_->Initialize(dxcommon_.get(), srvManager_);
 
 #pragma endregion
 
@@ -75,7 +75,7 @@ void Framework::Init() {
 
 	// シーン管理
 	sceneManager_ = SceneManager::GetInstance();
-	sceneManager_->Initialize(dxcommon_);
+	sceneManager_->Initialize(dxcommon_.get());
 }
 
 void Framework::Run() {

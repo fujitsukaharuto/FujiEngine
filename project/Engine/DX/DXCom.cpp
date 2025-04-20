@@ -12,11 +12,6 @@
 #pragma comment(lib,"dxgi.lib")
 
 
-DXCom* DXCom::GetInstance() {
-	static DXCom instance;
-	return &instance;
-}
-
 void DXCom::Initialize(MyWin* myWin) {
 	assert(myWin);
 	myWin_ = myWin;
@@ -40,6 +35,33 @@ void DXCom::Initialize(MyWin* myWin) {
 	//SettingTexture();
 	//SettingImgui();
 
+}
+
+void DXCom::Finalize() {
+	if (pipeManager_) {
+		pipeManager_->Finalize();
+		pipeManager_ = nullptr;
+	}
+	if (offscreen_) {
+		offscreen_.reset();
+	}
+	if (command_) {
+		command_.reset();
+	}
+	compiler_.reset();
+	depthStencilResource_.Reset();
+	dsvDescriptorHeap_.Reset();
+	for (auto& res : swapChainResources_) {
+		res.Reset();
+	}
+	swapChain_.Reset();
+	rtvDescriptorHeap_.Reset();
+	device_.Reset();
+	useAdapter_.Reset();
+	dxgiFactory_.Reset();
+#ifdef _DEBUG
+	debugController_.Reset();
+#endif
 }
 
 void DXCom::CreateDevice() {

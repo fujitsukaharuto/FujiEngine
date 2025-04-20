@@ -60,11 +60,16 @@ void GameRun::Finalize() {
 	sceneFactory_.reset();
 	sceneManager_->Finalize();
 	audioPlayer_->Finalize();
+	input_->Finalize();
 	imguiManager_->Fin();
+	line3dDrawer_->Finalize();
+	cameraManager_->Finalize();
 	pManager_->Finalize();
 	textureManager_->Finalize();
 	modelManager_->Finalize();
+	lightManager_->Finalize();
 	srvManager_->Finalize();
+	dxcommon_->Finalize();
 
 	// ゲームウィンドウの破棄
 	win_->Finalize();

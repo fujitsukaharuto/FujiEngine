@@ -12,6 +12,21 @@ void LightManager::Initialize(DXCom* pDxcom) {
 	dxcommon_ = pDxcom;
 }
 
+void LightManager::Finalize() {
+	directionLight_->Finalize();
+	directionLight_.reset();
+
+	for (auto& pointLight : pointLights_) {
+		pointLight->Finalize();
+	}
+	pointLights_.clear();
+
+	for (auto& spotLight : spotLights_) {
+		spotLight->Finalize();
+	}
+	spotLights_.clear();
+}
+
 void LightManager::Update() {
 #ifdef _DEBUG
 

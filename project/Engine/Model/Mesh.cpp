@@ -8,6 +8,12 @@ Mesh::Mesh() {
 
 Mesh::~Mesh() {
 	dxcommon_ = nullptr;
+
+	vertexResource_.Reset();
+	vertexData_.clear();
+	indexResourece_.Reset();
+	indexData_.clear();
+
 }
 
 void Mesh::CreateMesh() {

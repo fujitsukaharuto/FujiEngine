@@ -17,6 +17,7 @@ public:
 	static LightManager* GetInstance();
 
 	void Initialize(DXCom* pDxcom);
+	void Finalize();
 	void Update();
 
 	void CreateLight();

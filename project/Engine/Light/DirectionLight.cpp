@@ -14,6 +14,10 @@ void DirectionLight::Initialize(DXCom* pDxcom) {
 	directionLightData_->intensity = 0.3f;
 }
 
+void DirectionLight::Finalize() {
+	drectionLightResource_.Reset();
+}
+
 void DirectionLight::SetLightCommand(ID3D12GraphicsCommandList* commandList) {
 	commandList->SetGraphicsRootConstantBufferView(3, drectionLightResource_->GetGPUVirtualAddress());
 }

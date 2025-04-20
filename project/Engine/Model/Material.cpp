@@ -8,6 +8,9 @@ Material::Material() {
 }
 Material::~Material() {
 	dxcommon_ = nullptr;
+
+	materialResource_.Reset();
+
 }
 
 

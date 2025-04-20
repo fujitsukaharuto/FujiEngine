@@ -19,7 +19,10 @@ Model::Model(const Model& other) {
 	}
 }
 
-Model::~Model() {}
+Model::~Model() {
+	material_.clear();
+	mesh_.clear();
+}
 
 void Model::Draw(ID3D12GraphicsCommandList* commandList, Material* mate = nullptr) {
 	for (uint32_t index = 0; index < mesh_.size(); ++index) {

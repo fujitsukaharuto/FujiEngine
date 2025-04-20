@@ -22,6 +22,9 @@ void TextureManager::Initialize(DXCom* pDxcom) {
 }
 
 void TextureManager::Finalize() {
+	dxcommon_ = nullptr;
+
+	m_textureCache.clear();
 }
 
 Texture* TextureManager::LoadTexture(const std::string& filename) {

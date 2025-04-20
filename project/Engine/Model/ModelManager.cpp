@@ -21,8 +21,9 @@ void ModelManager::Initialize(DXCom* pDxcom) {
 
 
 void ModelManager::Finalize() {
-	ModelManager* instance = GetInstance();
-	instance->models_.clear();
+	dxcommon_ = nullptr;
+
+	models_.clear();
 }
 
 

@@ -23,6 +23,7 @@ public:
 public:
 
 	void Initialize(DXCom* pDxcom);
+	void Finalize();
 
 	void SetLightCommand(ID3D12GraphicsCommandList* commandList);
 

@@ -16,6 +16,10 @@ void PointLight::Initialize(DXCom* pDxcom) {
 	pointLightData_->decay = 2.0f;
 }
 
+void PointLight::Finalize() {
+	pointLightResource_.Reset();
+}
+
 
 void PointLight::SetLightCommand(ID3D12GraphicsCommandList* commandList) {
 

@@ -40,7 +40,7 @@ protected:
 	bool endRequest_ = false;
 
 	MyWin* win_ = nullptr;
-	DXCom* dxcommon_ = nullptr;
+	std::unique_ptr<DXCom> dxcommon_ = nullptr;
 	SRVManager* srvManager_ = nullptr;
 	// 汎用
 	Input* input_ = nullptr;

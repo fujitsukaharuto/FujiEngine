@@ -20,7 +20,12 @@ void AudioPlayer::Finalize() {
 		masterVoice_ = nullptr;
 	}
 
+	if (container_.size() > 0) {
+		container_.clear();
+	}
+
 	if (xAudio2_) {
+		xAudio2_.Reset();
 		xAudio2_ = nullptr;
 	}
 }

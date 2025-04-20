@@ -62,6 +62,17 @@ void ParticleManager::Finalize() {
 #ifdef _DEBUG
 	selectParticleGroup_ = nullptr;
 #endif // _DEBUG
+
+	dxcommon_ = nullptr;
+	srvManager_ = nullptr;
+	camera_ = nullptr;
+
+	for (auto& group : particleGroups_) {
+		if (group.second->instancing_) {
+			group.second->instancing_->Unmap(0, nullptr);
+			group.second->instancingData_ = nullptr;
+		}
+	}
 	particleGroups_.clear();
 	for (auto& groupPair : animeGroups_) {
 
@@ -73,6 +84,10 @@ void ParticleManager::Finalize() {
 		groupPair.second.reset();
 	}
 	animeGroups_.clear();
+
+	vBuffer_.Reset();
+	iBuffer_.Reset();
+
 }
 
 void ParticleManager::Update() {

@@ -66,9 +66,8 @@ public:
 	~DXCom() = default;
 public:
 
-	static DXCom* GetInstance();
-
 	void Initialize(MyWin* myWin);
+	void Finalize();
 
 	void SettingTexture();
 

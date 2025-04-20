@@ -54,6 +54,7 @@ public:
 
 	static Input* GetInstance();
 	void Initialize();
+	void Finalize();
 	void Update();
 
 
