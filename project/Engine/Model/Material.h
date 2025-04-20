@@ -2,6 +2,8 @@
 #include "Math/Matrix/MatrixCalculation.h"
 #include "TextureManager.h"
 
+class DXCom;
+
 enum class LightMode {
 	kLightNone,
 	kLightHalfLambert,
@@ -47,6 +49,8 @@ public:
 	void SetLightEnable(LightMode mode);
 
 private:
+
+	DXCom* dxcommon_;
 
 	Matrix4x4 MakeScale4x4(const Vector3& scale);
 

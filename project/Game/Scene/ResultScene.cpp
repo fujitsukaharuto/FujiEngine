@@ -17,8 +17,6 @@ ResultScene::~ResultScene() {
 }
 
 void ResultScene::Initialize() {
-	Init();
-
 
 	obj3dCommon.reset(new Object3dCommon());
 	obj3dCommon->Initialize();
@@ -59,7 +57,7 @@ void ResultScene::Draw() {
 #pragma region 背景描画
 
 
-	dxCommon_->ClearDepthBuffer();
+	dxcommon_->ClearDepthBuffer();
 #pragma endregion
 
 
@@ -75,7 +73,7 @@ void ResultScene::Draw() {
 
 #pragma region 前景スプライト
 
-	dxCommon_->PreSpriteDraw();
+	dxcommon_->PreSpriteDraw();
 	if (blackTime != 0.0f) {
 		black_->Draw();
 	}

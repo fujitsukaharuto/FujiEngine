@@ -12,8 +12,8 @@ void BaseScene::Update() {
 void BaseScene::Draw() {
 }
 
-void BaseScene::Init() {
-	dxCommon_ = DXCom::GetInstance();
+void BaseScene::Init(DXCom* pDxcom) {
+	dxcommon_ = pDxcom;
 	input_ = Input::GetInstance();
 	audioPlayer_ = AudioPlayer::GetInstance();
 }

@@ -51,6 +51,9 @@ void Line3dDrawer::Initialize(DXCom* pDxcom) {
 }
 
 void Line3dDrawer::Finalize() {
+	cBufferResource_.Reset();
+	camera_ = nullptr;
+	dxcommon_ = nullptr;
 }
 
 void Line3dDrawer::DrawLine3d(const Vector3& p1, const Vector3& p2, const Vector4& color) {

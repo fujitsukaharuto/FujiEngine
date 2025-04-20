@@ -1,8 +1,9 @@
 #pragma once
 #include <string>
-#include "BaseScene.h"
 #include "AbstractSceneFactory.h"
 
+class DXCom;
+class BaseScene;
 
 class SceneManager {
 public:
@@ -13,7 +14,7 @@ public:
 
 	static SceneManager* GetInstance();
 
-	void Initialize();
+	void Initialize(DXCom* pDxcom);
 
 	void Finalize();
 
@@ -43,6 +44,7 @@ private:
 
 private:
 
+	DXCom* dxcommon_;
 	AbstractSceneFactory* sceneFactory_ = nullptr;
 
 	BaseScene* scene_ = nullptr;

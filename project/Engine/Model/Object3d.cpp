@@ -8,7 +8,9 @@ Object3d::Object3d() {
 	dxcommon_ = ModelManager::GetInstance()->ShareDXCom();
 }
 
-Object3d::~Object3d() {}
+Object3d::~Object3d() {
+	dxcommon_ = nullptr;
+}
 
 void Object3d::Create(const std::string& fileName) {
 	this->camera_ = CameraManager::GetInstance()->GetCamera();

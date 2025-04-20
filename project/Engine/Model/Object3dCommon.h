@@ -21,6 +21,6 @@ private:
 
 private:
 
-	DXCom* dxCommon_ = nullptr;
+	DXCom* dxcommon_ = nullptr;
 
 };

@@ -18,7 +18,9 @@ AnimationModel::AnimationModel() {
 	dxcommon_ = ModelManager::GetInstance()->ShareDXCom();
 }
 
-AnimationModel::~AnimationModel() {}
+AnimationModel::~AnimationModel() {
+	dxcommon_ = nullptr;
+}
 
 void AnimationModel::LoadAnimationFile(const std::string& filename) {
 	Assimp::Importer importer;

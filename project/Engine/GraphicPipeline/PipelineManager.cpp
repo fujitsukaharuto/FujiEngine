@@ -30,6 +30,11 @@ void PipelineManager::Initialize(DXCom* pDxcom) {
 }
 
 void PipelineManager::Finalize() {
+	for (auto& pipe : pipelines_) {
+		pipe.reset();
+	}
+	pipelines_.clear();
+	dxcommon_ = nullptr;
 }
 
 void PipelineManager::CreatePipeline() {

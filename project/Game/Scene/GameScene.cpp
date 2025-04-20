@@ -14,7 +14,6 @@ GameScene::~GameScene() {
 }
 
 void GameScene::Initialize() {
-	Init();
 
 	GlobalVariables* globalvariables = GlobalVariables::GetInstance();
 	const char* groupName = "Sphere";
@@ -152,7 +151,7 @@ void GameScene::Draw() {
 #pragma region 背景描画
 
 
-	dxCommon_->ClearDepthBuffer();
+	dxcommon_->ClearDepthBuffer();
 #pragma endregion
 
 
@@ -173,7 +172,7 @@ void GameScene::Draw() {
 
 #pragma region 前景スプライト
 
-	dxCommon_->PreSpriteDraw();
+	dxcommon_->PreSpriteDraw();
 	test->Draw();
 	if (blackTime != 0.0f) {
 		black_->Draw();

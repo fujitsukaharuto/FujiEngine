@@ -1,14 +1,18 @@
 #include "Material.h"
-#include "DXCom.h"
+#include "Engine/DX/DXCom.h"
 
 
 
-Material::Material() {}
-Material::~Material() {}
+Material::Material() {
+	dxcommon_ = TextureManager::GetInstance()->ShareDXCom();
+}
+Material::~Material() {
+	dxcommon_ = nullptr;
+}
 
 
 void Material::CreateMaterial() {
-	materialResource_ = DXCom::GetInstance()->CreateBufferResource(DXCom::GetInstance()->GetDevice(), sizeof(MaterialDate));
+	materialResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(MaterialDate));
 	materialDate_ = nullptr;
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialDate_));
 	//色変えるやつ（Resource）

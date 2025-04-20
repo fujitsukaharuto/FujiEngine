@@ -1,5 +1,5 @@
 #pragma once
-#include "DXCom.h"
+#include "Engine/DX/DXCom.h"
 #include "Input.h"
 #include "AudioPlayer.h"
 #include "DebugCamera.h"
@@ -24,7 +24,7 @@ public:
 
 	virtual void Draw();
 
-	void Init();
+	void Init(DXCom* pDxcom);
 
 	virtual void DebugGUI();
 	virtual void ParticleDebugGUI();
@@ -38,7 +38,7 @@ private:
 
 protected:
 
-	DXCom* dxCommon_ = nullptr;
+	DXCom* dxcommon_;
 	Input* input_ = nullptr;
 	AudioPlayer* audioPlayer_ = nullptr;
 

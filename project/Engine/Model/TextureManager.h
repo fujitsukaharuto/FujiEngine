@@ -12,6 +12,8 @@
 #include "externals/DirectXTex/d3dx12.h"
 
 
+class DXCom;
+
 struct Texture {
 	Microsoft::WRL::ComPtr<ID3D12Resource> textureResource; // テクスチャリソース
 	uint32_t srvIndex;
@@ -28,7 +30,7 @@ public:
 
 	static TextureManager* GetInstance();
 
-
+	void Initialize(DXCom* pDxcom);
 	void Finalize();
 
 	// テクスチャのロード
@@ -42,10 +44,19 @@ public:
 
 	void ReleaseTexture(const std::string& filename);
 
+	DXCom* ShareDXCom() { return dxcommon_; }
+
 private:
 
+	DirectX::ScratchImage LoadTextureFile(const std::string& filePath);
+	Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResource(Microsoft::WRL::ComPtr<ID3D12Device> device, const DirectX::TexMetadata& metadata);
+
+	[[nodiscard]]
+	Microsoft::WRL::ComPtr<ID3D12Resource> UploadTextureData(Microsoft::WRL::ComPtr<ID3D12Resource> texture, const DirectX::ScratchImage& mipImages, Microsoft::WRL::ComPtr<ID3D12Device> device, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList);
 
 private:
+
+	DXCom* dxcommon_;
 
 	std::unordered_map<std::string, std::unique_ptr<Texture>> m_textureCache;
 

@@ -16,8 +16,6 @@ TitleScene::~TitleScene() {
 }
 
 void TitleScene::Initialize() {
-	Init();
-
 
 	obj3dCommon.reset(new Object3dCommon());
 	obj3dCommon->Initialize();
@@ -91,7 +89,7 @@ void TitleScene::Draw() {
 #pragma region 背景描画
 
 
-	dxCommon_->ClearDepthBuffer();
+	dxcommon_->ClearDepthBuffer();
 #pragma endregion
 
 
@@ -118,7 +116,7 @@ void TitleScene::Draw() {
 	//test
 #pragma region 前景スプライト
 
-	dxCommon_->PreSpriteDraw();
+	dxcommon_->PreSpriteDraw();
 	if (blackTime != 0.0f) {
 		black_->Draw();
 	}
@@ -158,7 +156,11 @@ void TitleScene::BlackFade() {
 				blackTime = blackLimmite;
 			}
 		} else {
-			SceneManager::GetInstance()->ChangeScene("GAME", 40.0f);
+			if (!isParticleDebugScene_) {
+				SceneManager::GetInstance()->ChangeScene("GAME", 40.0f);
+			} else {
+				SceneManager::GetInstance()->ChangeScene("PARTICLEDEBUG", 40.0f);
+			}
 		}
 	} else {
 		if (blackTime > 0.0f) {
@@ -183,7 +185,10 @@ void TitleScene::BlackFade() {
 	}
 #ifdef _DEBUG
 	if (Input::GetInstance()->PushKey(DIK_RETURN) && Input::GetInstance()->PushKey(DIK_P) && Input::GetInstance()->PushKey(DIK_D) && Input::GetInstance()->TriggerKey(DIK_S)) {
-		SceneManager::GetInstance()->ChangeScene("PARTICLEDEBUG", 40.0f);
+		if (blackTime == 0.0f) {
+			isChangeFase = true;
+			isParticleDebugScene_ = true;
+		}
 	}
 #endif // _DEBUG
 }

@@ -69,7 +69,7 @@ public:
 
 	static ParticleManager* GetInstance();
 
-	void Initialize(DXCom* dxcom, SRVManager* srvManager);
+	void Initialize(DXCom* pDxcom, SRVManager* srvManager);
 
 	void Finalize();
 
@@ -99,7 +99,7 @@ private:
 
 private:
 
-	DXCom* dxCommon_;
+	DXCom* dxcommon_;
 	SRVManager* srvManager_;
 	Camera* camera_;
 

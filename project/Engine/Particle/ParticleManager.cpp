@@ -19,8 +19,8 @@ ParticleManager* ParticleManager::GetInstance() {
 	return &instance;
 }
 
-void ParticleManager::Initialize(DXCom* dxcom, SRVManager* srvManager) {
-	dxCommon_ = dxcom;
+void ParticleManager::Initialize(DXCom* pDxcom, SRVManager* srvManager) {
+	dxcommon_ = pDxcom;
 	srvManager_ = srvManager;
 	this->camera_ = CameraManager::GetInstance()->GetCamera();
 
@@ -38,8 +38,8 @@ void ParticleManager::Initialize(DXCom* dxcom, SRVManager* srvManager) {
 	index_.push_back(2);
 
 
-	vBuffer_ = DXCom::GetInstance()->CreateBufferResource(DXCom::GetInstance()->GetDevice(), sizeof(VertexDate) * vertex_.size());
-	iBuffer_ = DXCom::GetInstance()->CreateBufferResource(DXCom::GetInstance()->GetDevice(), sizeof(uint32_t) * index_.size());
+	vBuffer_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(VertexDate) * vertex_.size());
+	iBuffer_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(uint32_t) * index_.size());
 
 	VertexDate* vData = nullptr;
 	vBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&vData));
@@ -278,9 +278,9 @@ void ParticleManager::Update() {
 }
 
 void ParticleManager::Draw() {
-	dxCommon_->GetDXCommand()->SetViewAndscissor();
-	dxCommon_->GetPipelineManager()->SetPipeline(Pipe::Normal);
-	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	dxcommon_->GetDXCommand()->SetViewAndscissor();
+	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Normal);
+	dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	for (auto& groupPair : animeGroups_) {
 
@@ -294,20 +294,20 @@ void ParticleManager::Draw() {
 	}
 
 
-	dxCommon_->GetDXCommand()->SetViewAndscissor();
-	dxCommon_->GetPipelineManager()->SetPipeline(Pipe::particle);
-	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	dxCommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vbView);
-	dxCommon_->GetCommandList()->IASetIndexBuffer(&ibView);
+	dxcommon_->GetDXCommand()->SetViewAndscissor();
+	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::particle);
+	dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vbView);
+	dxcommon_->GetCommandList()->IASetIndexBuffer(&ibView);
 
 	for (auto& groupPair : particleGroups_) {
 		ParticleGroup* group = groupPair.second.get();
 
-		dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group->srvIndex_));
-		dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, group->material_.GetMaterialResource()->GetGPUVirtualAddress());
-		dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, group->material_.GetTexture()->gpuHandle);
+		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group->srvIndex_));
+		dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, group->material_.GetMaterialResource()->GetGPUVirtualAddress());
+		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, group->material_.GetTexture()->gpuHandle);
 
-		dxCommon_->GetCommandList()->DrawIndexedInstanced(6, group->drawCount_, 0, 0, 0);
+		dxcommon_->GetCommandList()->DrawIndexedInstanced(6, group->drawCount_, 0, 0, 0);
 	}
 }
 
@@ -401,7 +401,7 @@ void ParticleManager::CreateParticleGroup(const std::string& name, const std::st
 	newGroup->emitter_.Load(name);
 
 	newGroup->insstanceCount_ = count;
-	newGroup->instancing_ = instance->dxCommon_->CreateBufferResource(instance->dxCommon_->GetDevice(), (sizeof(TransformationParticleMatrix) * newGroup->insstanceCount_));
+	newGroup->instancing_ = instance->dxcommon_->CreateBufferResource(instance->dxcommon_->GetDevice(), (sizeof(TransformationParticleMatrix) * newGroup->insstanceCount_));
 	newGroup->instancing_->Map(0, nullptr, reinterpret_cast<void**>(&newGroup->instancingData_));
 	uint32_t max = newGroup->insstanceCount_;
 	for (uint32_t index = 0; index < max; ++index) {

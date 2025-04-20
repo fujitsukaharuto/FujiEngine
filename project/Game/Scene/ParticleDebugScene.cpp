@@ -18,8 +18,6 @@ ParticleDebugScene::~ParticleDebugScene() {
 }
 
 void ParticleDebugScene::Initialize() {
-	Init();
-
 
 	obj3dCommon.reset(new Object3dCommon());
 	obj3dCommon->Initialize();
@@ -53,7 +51,7 @@ void ParticleDebugScene::Draw() {
 #pragma region 背景描画
 
 
-	dxCommon_->ClearDepthBuffer();
+	dxcommon_->ClearDepthBuffer();
 #pragma endregion
 
 
@@ -76,7 +74,7 @@ void ParticleDebugScene::Draw() {
 
 #pragma region 前景スプライト
 
-	dxCommon_->PreSpriteDraw();
+	dxcommon_->PreSpriteDraw();
 	if (blackTime != 0.0f) {
 		black_->Draw();
 	}
@@ -128,7 +126,9 @@ void ParticleDebugScene::BlackFade() {
 	black_->SetColor({ 0.0f,0.0f,0.0f,Lerp(0.0f,1.0f,(1.0f / blackLimmite * blackTime)) });
 	
 	if (Input::GetInstance()->PushKey(DIK_RETURN) && Input::GetInstance()->PushKey(DIK_P) && Input::GetInstance()->PushKey(DIK_D) && Input::GetInstance()->TriggerKey(DIK_S)) {
-		SceneManager::GetInstance()->ChangeScene("TITLE", 40.0f);
+		if (blackTime == 0.0f) {
+			isChangeFase = true;
+		}
 	}
 
 }

@@ -62,6 +62,9 @@ class DebugCamera;//今だけ、後から消す
 
 class DXCom {
 public:
+	DXCom() = default;
+	~DXCom() = default;
+public:
 
 	static DXCom* GetInstance();
 
@@ -145,9 +148,6 @@ private:
 
 
 private:
-
-	DXCom() = default;
-	~DXCom() = default;
 
 	D3DResourceLeakChecker leakCheck_;
 

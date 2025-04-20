@@ -14,6 +14,7 @@ public:
 
 	static CameraManager* GetInstance();
 	void Initialize();
+	void Finalize();
 	void Update();
 
 	/// <summary>

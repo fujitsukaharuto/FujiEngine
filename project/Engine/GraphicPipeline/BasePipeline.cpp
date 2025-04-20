@@ -8,6 +8,7 @@ BasePipeline::~BasePipeline() {
 	rootSignature_.Reset();
 	ps.Reset();
 	vs.Reset();
+	dxcommon_ = nullptr;
 }
 
 void BasePipeline::Initialize(DXCom* pDxcom) {

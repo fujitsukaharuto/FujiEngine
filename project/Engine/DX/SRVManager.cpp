@@ -28,6 +28,7 @@ void SRVManager::Initialize(DXCom* pDxcom) {
 
 void SRVManager::Finalize() {
 	descriptorHeap.Reset();
+	dxcommon_ = nullptr;
 }
 
 

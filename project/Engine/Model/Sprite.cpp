@@ -1,7 +1,15 @@
 #include "Sprite.h"
-#include "DXCom.h"
+#include "Engine/DX/DXCom.h"
 #include "LightManager.h"
 #include "TextureManager.h"
+
+Sprite::Sprite() {
+	dxcommon_ = TextureManager::GetInstance()->ShareDXCom();
+}
+
+Sprite::~Sprite() {
+	dxcommon_ = nullptr;
+}
 
 void Sprite::Load(const std::string& fileName) {
 	material_.SetTextureNamePath(fileName);
@@ -12,7 +20,7 @@ void Sprite::Load(const std::string& fileName) {
 }
 
 void Sprite::Draw() {
-	ID3D12GraphicsCommandList* cList = DXCom::GetInstance()->GetCommandList();
+	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
 
 	cList->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	cList->IASetIndexBuffer(&indexBufferView_);
@@ -101,8 +109,8 @@ void Sprite::InitializeBuffer() {
 	index_.push_back(2);
 
 
-	vertexResource_ = DXCom::GetInstance()->CreateBufferResource(DXCom::GetInstance()->GetDevice(), sizeof(VertexDate) * vertex_.size());
-	indexResource_ = DXCom::GetInstance()->CreateBufferResource(DXCom::GetInstance()->GetDevice(), sizeof(uint32_t) * index_.size());
+	vertexResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(VertexDate) * vertex_.size());
+	indexResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(uint32_t) * index_.size());
 
 	vData = nullptr;
 	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vData));
@@ -125,12 +133,12 @@ void Sprite::InitializeBuffer() {
 	material_.SetLightEnable(LightMode::kLightNone);
 
 
-	wvpResource_ = DXCom::GetInstance()->CreateBufferResource(DXCom::GetInstance()->GetDevice(), sizeof(TransformationMatrix));
+	wvpResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(TransformationMatrix));
 	wvpData_ = nullptr;
 	wvpResource_->Map(0, nullptr, reinterpret_cast<void**>(&wvpData_));
 	SetWvp();
 
-	cameraPosResource_ = DXCom::GetInstance()->CreateBufferResource(DXCom::GetInstance()->GetDevice(), sizeof(DirectionalLight));
+	cameraPosResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(DirectionalLight));
 	cameraPosData_ = nullptr;
 	cameraPosResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraPosData_));
 	cameraPosData_->worldPosition = { 0.0f,0.0f,0.0f };
