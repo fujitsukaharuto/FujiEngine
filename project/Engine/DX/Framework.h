@@ -51,8 +51,8 @@ protected:
 	TextureManager* textureManager_ = nullptr;
 	ModelManager* modelManager_ = nullptr;
 	CameraManager* cameraManager_ = nullptr;
-	ImGuiManager* imguiManager_ = nullptr;
-	LightManager* lightManager_ = nullptr;
+	std::unique_ptr<ImGuiManager> imguiManager_ = nullptr;
+	std::unique_ptr<LightManager> lightManager_ = nullptr;
 	ParticleManager* pManager_ = nullptr;
 	Line3dDrawer* line3dDrawer_ = nullptr;
 };

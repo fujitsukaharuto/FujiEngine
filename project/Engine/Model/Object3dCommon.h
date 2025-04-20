@@ -1,6 +1,7 @@
 #pragma once
 
 class DXCom;
+class LightManager;
 
 class Object3dCommon {
 public:
@@ -22,5 +23,6 @@ private:
 private:
 
 	DXCom* dxcommon_ = nullptr;
+	LightManager* lightManager_;
 
 };

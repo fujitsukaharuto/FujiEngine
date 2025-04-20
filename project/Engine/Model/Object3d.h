@@ -6,6 +6,7 @@
 #include "Object3dCommon.h"
 
 class DXCom;
+class LightManager;
 class PointLight;
 class SpotLight;
 
@@ -63,6 +64,7 @@ private:
 	std::unique_ptr<Model> model_ = nullptr;
 
 	DXCom* dxcommon_;
+	LightManager* lightManager_;
 	Camera* camera_;
 	Object3d* parent_ = nullptr;
 

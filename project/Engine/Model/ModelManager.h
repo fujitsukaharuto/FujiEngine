@@ -10,6 +10,7 @@
 
 
 class DXCom;
+class LightManager;
 
 class ModelManager {
 public:
@@ -20,7 +21,7 @@ public:
 
 	static ModelManager* GetInstance();
 
-	void Initialize(DXCom* pDxcom);
+	void Initialize(DXCom* pDxcom, LightManager* pLight);
 
 	void Finalize();
 
@@ -34,6 +35,7 @@ public:
 	void AddModel(const std::string& filename, Model* model);
 
 	DXCom* ShareDXCom() { return dxcommon_; }
+	LightManager* ShareLight() { return lightManager_; }
 
 private:
 
@@ -43,6 +45,7 @@ private:
 private:
 
 	DXCom* dxcommon_;
+	LightManager* lightManager_;
 
 	const std::string kDirectoryPath_ = "resource/";
 

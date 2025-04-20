@@ -3,11 +3,6 @@
 
 #include "Engine/DX/DXCom.h"
 
-LightManager* LightManager::GetInstance() {
-	static LightManager instance;
-	return &instance;
-}
-
 void LightManager::Initialize(DXCom* pDxcom) {
 	dxcommon_ = pDxcom;
 }

@@ -15,8 +15,10 @@
 
 
 class DXCom;
+class LightManager;
 class PointLight;
 class SpotLight;
+
 
 class AnimationModel {
 public:
@@ -98,6 +100,7 @@ private:
 	std::unique_ptr<Model> model_ = nullptr;
 
 	DXCom* dxcommon_;
+	LightManager* lightManager_;
 	Camera* camera_;
 	AnimationModel* parent_ = nullptr;
 

@@ -6,6 +6,7 @@
 
 Object3d::Object3d() {
 	dxcommon_ = ModelManager::GetInstance()->ShareDXCom();
+	lightManager_ = ModelManager::GetInstance()->ShareLight();
 }
 
 Object3d::~Object3d() {
@@ -47,7 +48,7 @@ void Object3d::AnimeDraw() {
 	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
 	cList->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
 	cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_->GetGPUVirtualAddress());
-	LightManager::GetInstance()->SetLightCommand(cList);
+	lightManager_->SetLightCommand(cList);
 
 	if (model_) {
 		model_->Draw(cList, nullptr);

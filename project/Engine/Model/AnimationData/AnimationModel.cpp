@@ -16,10 +16,12 @@
 
 AnimationModel::AnimationModel() {
 	dxcommon_ = ModelManager::GetInstance()->ShareDXCom();
+	lightManager_ = ModelManager::GetInstance()->ShareLight();
 }
 
 AnimationModel::~AnimationModel() {
 	dxcommon_ = nullptr;
+	lightManager_ = nullptr;
 }
 
 void AnimationModel::LoadAnimationFile(const std::string& filename) {
@@ -171,7 +173,7 @@ void AnimationModel::AnimeDraw() {
 	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
 	cList->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
 	cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_->GetGPUVirtualAddress());
-	LightManager::GetInstance()->SetLightCommand(cList);
+	lightManager_->SetLightCommand(cList);
 
 	if (model_) {
 		model_->Draw(cList, nullptr);

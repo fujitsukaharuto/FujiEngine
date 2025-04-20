@@ -8,11 +8,6 @@
 #include "imgui_impl_win32.h"
 #endif // _DEBUG
 
-ImGuiManager* ImGuiManager::GetInstance() {
-	static ImGuiManager instance;
-	return &instance;
-}
-
 void ImGuiManager::Init([[maybe_unused]] MyWin* myWin, [[maybe_unused]] DXCom* dxComon) {
 	dxCommon_ = dxComon;
 #ifdef _DEBUG

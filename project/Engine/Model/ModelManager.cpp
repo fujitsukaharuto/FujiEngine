@@ -15,8 +15,9 @@ ModelManager* ModelManager::GetInstance() {
 }
 
 
-void ModelManager::Initialize(DXCom* pDxcom) {
+void ModelManager::Initialize(DXCom* pDxcom, LightManager* pLight) {
 	dxcommon_ = pDxcom;
+	lightManager_ = pLight;
 }
 
 
