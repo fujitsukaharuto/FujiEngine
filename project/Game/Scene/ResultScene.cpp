@@ -111,7 +111,7 @@ void ResultScene::BlackFade() {
 				blackTime = blackLimmite;
 			}
 		} else {
-			SceneManager::GetInstance()->ChangeScene("TITLE", 40.0f);
+			ChangeScene("TITLE", 40.0f);
 		}
 	} else {
 		if (blackTime > 0.0f) {

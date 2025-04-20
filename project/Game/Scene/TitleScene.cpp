@@ -157,9 +157,9 @@ void TitleScene::BlackFade() {
 			}
 		} else {
 			if (!isParticleDebugScene_) {
-				SceneManager::GetInstance()->ChangeScene("GAME", 40.0f);
+				ChangeScene("GAME", 40.0f);
 			} else {
-				SceneManager::GetInstance()->ChangeScene("PARTICLEDEBUG", 40.0f);
+				ChangeScene("PARTICLEDEBUG", 40.0f);
 			}
 		}
 	} else {

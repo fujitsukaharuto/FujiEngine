@@ -15,11 +15,6 @@ SceneManager::SceneManager() {
 SceneManager::~SceneManager() {
 }
 
-SceneManager* SceneManager::GetInstance() {
-	static SceneManager instance;
-	return &instance;
-}
-
 void SceneManager::Initialize(DXCom* pDxcom) {
 	dxcommon_ = pDxcom;
 }
@@ -54,7 +49,7 @@ void SceneManager::StartScene(const std::string& sceneName) {
 	assert(sceneFactory_);
 
 	scene_ = sceneFactory_->CreateScene(sceneName);
-	scene_->Init(dxcommon_);
+	scene_->Init(dxcommon_, this);
 	scene_->Initialize();
 }
 
@@ -111,7 +106,7 @@ void SceneManager::SceneSet() {
 		scene_ = nextScene_;
 		nextScene_ = nullptr;
 
-		scene_->Init(dxcommon_);
+		scene_->Init(dxcommon_, this);
 		scene_->Initialize();
 		isChange_ = false;
 	}

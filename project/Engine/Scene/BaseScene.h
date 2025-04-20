@@ -10,6 +10,7 @@
 #include "Particle/ParticleEmitter.h"
 
 
+class SceneManager;
 
 class BaseScene {
 public:
@@ -24,11 +25,13 @@ public:
 
 	virtual void Draw();
 
-	void Init(DXCom* pDxcom);
+	void Init(DXCom* pDxcom, SceneManager* pSceneManager);
 
 	virtual void DebugGUI();
 	virtual void ParticleDebugGUI();
 	virtual void ParticleGroupDebugGUI();
+
+	void ChangeScene(const std::string& sceneName, float extraTime);
 
 private:
 
@@ -39,6 +42,7 @@ private:
 protected:
 
 	DXCom* dxcommon_;
+	SceneManager* sceneManager_;
 	Input* input_ = nullptr;
 	AudioPlayer* audioPlayer_ = nullptr;
 

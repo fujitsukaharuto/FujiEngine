@@ -217,7 +217,7 @@ void GameScene::BlackFade() {
 				blackTime = blackLimmite;
 			}
 		} else {
-			SceneManager::GetInstance()->ChangeScene("RESULT", 40.0f);
+			ChangeScene("RESULT", 40.0f);
 		}
 	} else {
 		if (blackTime > 0.0f) {

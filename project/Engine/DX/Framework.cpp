@@ -74,7 +74,7 @@ void Framework::Init() {
 	dxcommon_->SettingTexture();
 
 	// シーン管理
-	sceneManager_ = SceneManager::GetInstance();
+	sceneManager_ = std::make_unique<SceneManager>();
 	sceneManager_->Initialize(dxcommon_.get());
 }
 

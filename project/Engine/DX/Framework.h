@@ -47,7 +47,7 @@ protected:
 	AudioPlayer* audioPlayer_ = nullptr;
 	FPSKeeper* fpsKeeper_ = nullptr;
 	std::unique_ptr<AbstractSceneFactory> sceneFactory_ = nullptr;
-	SceneManager* sceneManager_ = nullptr;
+	std::unique_ptr<SceneManager> sceneManager_ = nullptr;
 	TextureManager* textureManager_ = nullptr;
 	ModelManager* modelManager_ = nullptr;
 	CameraManager* cameraManager_ = nullptr;

@@ -12,8 +12,6 @@ public:
 
 public:
 
-	static SceneManager* GetInstance();
-
 	void Initialize(DXCom* pDxcom);
 
 	void Finalize();

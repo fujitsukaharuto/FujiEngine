@@ -1,5 +1,7 @@
 #include "BaseScene.h"
 
+#include "Engine/Scene/SceneManager.h"
+
 BaseScene::BaseScene() {
 }
 
@@ -12,8 +14,9 @@ void BaseScene::Update() {
 void BaseScene::Draw() {
 }
 
-void BaseScene::Init(DXCom* pDxcom) {
+void BaseScene::Init(DXCom* pDxcom, SceneManager* pSceneManager) {
 	dxcommon_ = pDxcom;
+	sceneManager_ = pSceneManager;
 	input_ = Input::GetInstance();
 	audioPlayer_ = AudioPlayer::GetInstance();
 }
@@ -34,4 +37,8 @@ void BaseScene::ParticleGroupDebugGUI() {
 #ifdef _DEBUG
 
 #endif // _DEBUG
+}
+
+void BaseScene::ChangeScene(const std::string& sceneName, float extraTime) {
+	sceneManager_->ChangeScene(sceneName, extraTime);
 }
