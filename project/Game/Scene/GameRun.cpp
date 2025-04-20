@@ -62,11 +62,16 @@ void GameRun::Finalize() {
 	sceneFactory_.reset();
 	sceneManager_->Finalize();
 	audioPlayer_->Finalize();
+	input_->Finalize();
 	imguiManager_->Fin();
+	line3dDrawer_->Finalize();
+	cameraManager_->Finalize();
 	pManager_->Finalize();
 	textureManager_->Finalize();
 	modelManager_->Finalize();
+	lightManager_->Finalize();
 	srvManager_->Finalize();
+	dxcommon_->Finalize();
 
 	// ゲームウィンドウの破棄
 	win_->Finalize();
@@ -78,7 +83,7 @@ void GameRun::Update() {
 	// 入力関連の毎フレーム処理
 	input_->Update();
 	cameraManager_->Update();
-	dxCommon_->OffscreenUpDate();
+	dxcommon_->OffscreenUpDate();
 
 #ifdef _DEBUG
 	if (input_->TriggerKey(DIK_F12)) {
@@ -107,21 +112,21 @@ void GameRun::Update() {
 void GameRun::Draw() {
 
 	// 描画開始
-	dxCommon_->PreDraw();
+	dxcommon_->PreDraw();
 	// ゲームシーンの描画
 	sceneManager_->Draw();
-	dxCommon_->Command();
-	dxCommon_->PostEffect();
+	dxcommon_->Command();
+	dxcommon_->PostEffect();
 	// ImGuiの描画
 	imguiManager_->Draw();
 	// 描画終了
-	dxCommon_->PostDraw();
+	dxcommon_->PostDraw();
 
 }
 
 void GameRun::DebugGUI() {
 #ifdef _DEBUG
-	dxCommon_->OffscreenDebugGUI();
+	dxcommon_->OffscreenDebugGUI();
 	sceneManager_->ParticleGroupDebugGUI();
 
 	ImGui::Begin("SceneDebug");

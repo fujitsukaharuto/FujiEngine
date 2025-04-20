@@ -8,11 +8,6 @@
 #include "imgui_impl_win32.h"
 #endif // _DEBUG
 
-ImGuiManager* ImGuiManager::GetInstance() {
-	static ImGuiManager instance;
-	return &instance;
-}
-
 void ImGuiManager::Init([[maybe_unused]] MyWin* myWin, [[maybe_unused]] DXCom* dxComon) {
 	dxCommon_ = dxComon;
 #ifdef _DEBUG
@@ -57,6 +52,7 @@ void ImGuiManager::Init([[maybe_unused]] MyWin* myWin, [[maybe_unused]] DXCom* d
 }
 
 void ImGuiManager::Fin() {
+	dxCommon_ = nullptr;
 #ifdef _DEBUG
 
 	ImGui_ImplDX12_Shutdown();

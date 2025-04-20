@@ -1,6 +1,8 @@
 #include "SceneManager.h"
 #include <cassert>
+#include "Engine/DX/DXCom.h"
 #include "FPSKeeper.h"
+#include "Engine/Scene/BaseScene.h"
 #include "Game/Scene/TitleScene.h"
 #include "Game/Scene/GameScene.h"
 #include "Game/Scene/ResultScene.h"
@@ -13,12 +15,8 @@ SceneManager::SceneManager() {
 SceneManager::~SceneManager() {
 }
 
-SceneManager* SceneManager::GetInstance() {
-	static SceneManager instance;
-	return &instance;
-}
-
-void SceneManager::Initialize() {
+void SceneManager::Initialize(DXCom* pDxcom) {
+	dxcommon_ = pDxcom;
 }
 
 void SceneManager::Finalize() {
@@ -48,17 +46,10 @@ void SceneManager::Draw() {
 }
 
 void SceneManager::StartScene(const std::string& sceneName) {
-	if (sceneName == "TITLE") {
-		scene_ = new TitleScene();
-		finishTime = 80.0f;
-	} else if (sceneName == "GAME") {
-		scene_ = new GameScene();
-		finishTime = 80.0f;
-	} else if (sceneName == "RESULT") {
-		scene_ = new ResultScene();
-		finishTime = 80.0f;
-	}
-	scene_->Init();
+	assert(sceneFactory_);
+
+	scene_ = sceneFactory_->CreateScene(sceneName);
+	scene_->Init(dxcommon_, this);
 	scene_->Initialize();
 }
 
@@ -115,7 +106,7 @@ void SceneManager::SceneSet() {
 		scene_ = nextScene_;
 		nextScene_ = nullptr;
 
-		scene_->Init();
+		scene_->Init(dxcommon_, this);
 		scene_->Initialize();
 		isChange_ = false;
 	}

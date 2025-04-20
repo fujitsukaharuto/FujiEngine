@@ -5,8 +5,12 @@
 #include "MyWindow.h"
 #include "PipelineManager.h"
 
-void OffscreenManager::Init(DXCom* dxcom) {
-	pDXCom_ = dxcom;
+OffscreenManager::~OffscreenManager() {
+	dxcommon_ = nullptr;
+}
+
+void OffscreenManager::Init(DXCom* pDxcom) {
+	dxcommon_ = pDxcom;
 }
 
 void OffscreenManager::Update() {
@@ -199,18 +203,18 @@ void OffscreenManager::CreateResource() {
 	clearColorValue_.Color[2] = 0.5f;
 	clearColorValue_.Color[3] = 1.0f;
 
-	offscreenrt_ = pDXCom_->CreateOffscreenTextureResource(pDXCom_->GetDevice(), MyWin::kWindowWidth, MyWin::kWindowHeight, clearColorValue_);
+	offscreenrt_ = dxcommon_->CreateOffscreenTextureResource(dxcommon_->GetDevice(), MyWin::kWindowWidth, MyWin::kWindowHeight, clearColorValue_);
 
-	pDXCom_->GetDevice()->CreateRenderTargetView(offscreenrt_.Get(), &offscreenrtvDesc_, pDXCom_->GetRTVHandle());
+	dxcommon_->GetDevice()->CreateRenderTargetView(offscreenrt_.Get(), &offscreenrtvDesc_, dxcommon_->GetRTVHandle());
 
 
-	grayCSResource_ = pDXCom_->CreateBufferResource(pDXCom_->GetDevice(), sizeof(GrayCS));
+	grayCSResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(GrayCS));
 	grayCSData_ = nullptr;
 	grayCSResource_->Map(0, nullptr, reinterpret_cast<void**>(&grayCSData_));
 	grayCSData_->gray_ = { 0.2f,0.4f,0.2f };
 
 
-	shockResource_ = pDXCom_->CreateBufferResource(pDXCom_->GetDevice(), sizeof(ShockWaveData));
+	shockResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(ShockWaveData));
 	shockData_ = nullptr;
 	shockResource_->Map(0, nullptr, reinterpret_cast<void**>(&shockData_));
 	shockData_->center = { 0.5f,0.5f,0.0f,0.0f };
@@ -220,7 +224,7 @@ void OffscreenManager::CreateResource() {
 	shockData_->padding = 0.0f;
 
 
-	fireResource_ = pDXCom_->CreateBufferResource(pDXCom_->GetDevice(), sizeof(FireElement));
+	fireResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(FireElement));
 	fireData_ = nullptr;
 	fireResource_->Map(0, nullptr, reinterpret_cast<void**>(&fireData_));
 	fireData_->animeTime = 0.0f;
@@ -236,7 +240,7 @@ void OffscreenManager::CreateResource() {
 	fireData_->blendStrength = 2.0f;
 
 
-	thunderResource_ = pDXCom_->CreateBufferResource(pDXCom_->GetDevice(), sizeof(LightningElement));
+	thunderResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(LightningElement));
 	thunderData_ = nullptr;
 	thunderResource_->Map(0, nullptr, reinterpret_cast<void**>(&thunderData_));
 	thunderData_->time = 0.0f;
@@ -255,7 +259,7 @@ void OffscreenManager::CreateResource() {
 	thunderData_->boltCount = 3.0f;
 
 
-	cRTResource_ = pDXCom_->CreateBufferResource(pDXCom_->GetDevice(), sizeof(CRTElemnt));
+	cRTResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(CRTElemnt));
 	crtData_ = nullptr;
 	cRTResource_->Map(0, nullptr, reinterpret_cast<void**>(&crtData_));
 	crtData_->crtTime = 0.0f;
@@ -305,21 +309,21 @@ void OffscreenManager::Command() {
 		offbarrier.Transition.pResource = offscreenrt_.Get();
 		offbarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 		offbarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
-		pDXCom_->GetCommandList()->ResourceBarrier(1, &offbarrier);
+		dxcommon_->GetCommandList()->ResourceBarrier(1, &offbarrier);
 
 
 
-		pDXCom_->GetPipelineManager()->SetCSPipeline(Pipe::GrayCS);
+		dxcommon_->GetPipelineManager()->SetCSPipeline(Pipe::GrayCS);
 
 		// 3. SRVとUAVをセット
-		pDXCom_->GetCommandList()->SetComputeRootDescriptorTable(0, offTextureHandle_);   // 入力テクスチャ
-		pDXCom_->GetCommandList()->SetComputeRootDescriptorTable(1, outputUAVHandle_);  // 出力テクスチャ
+		dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(0, offTextureHandle_);   // 入力テクスチャ
+		dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(1, outputUAVHandle_);  // 出力テクスチャ
 
 		// 4. 定数バッファ(CBV)をバインド
-		pDXCom_->GetCommandList()->SetComputeRootConstantBufferView(2, grayCSResource_->GetGPUVirtualAddress());    // b0 レジスタ
+		dxcommon_->GetCommandList()->SetComputeRootConstantBufferView(2, grayCSResource_->GetGPUVirtualAddress());    // b0 レジスタ
 
 		// 5. コンピュートシェーダーを実行 (Dispatch)
-		pDXCom_->GetCommandList()->Dispatch(
+		dxcommon_->GetCommandList()->Dispatch(
 			(MyWin::kWindowWidth + 7) / 8,  // スレッドグループ数 (8x8x1の場合)
 			(MyWin::kWindowHeight + 7) / 8,
 			1
@@ -332,7 +336,7 @@ void OffscreenManager::Command() {
 		offbarrierB.Transition.pResource = offscreenrt_.Get();
 		offbarrierB.Transition.StateBefore = D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
 		offbarrierB.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
-		pDXCom_->GetCommandList()->ResourceBarrier(1, &offbarrierB);
+		dxcommon_->GetCommandList()->ResourceBarrier(1, &offbarrierB);
 
 
 		D3D12_RESOURCE_BARRIER outputbarrier{};
@@ -341,18 +345,18 @@ void OffscreenManager::Command() {
 		outputbarrier.Transition.pResource = outputTexture_.Get();
 		outputbarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
 		outputbarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
-		pDXCom_->GetCommandList()->ResourceBarrier(1, &outputbarrier);
+		dxcommon_->GetCommandList()->ResourceBarrier(1, &outputbarrier);
 
 
 
-		pDXCom_->GetDXCommand()->SetViewAndscissor();
-		pDXCom_->GetPipelineManager()->SetPipeline(Pipe::None);
+		dxcommon_->GetDXCommand()->SetViewAndscissor();
+		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::None);
 
-		pDXCom_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		pDXCom_->GetCommandList()->IASetIndexBuffer(&indexGrayBufferView_);
-		pDXCom_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
-		pDXCom_->GetCommandList()->SetGraphicsRootDescriptorTable(0, outputSRVHandle_);
-		pDXCom_->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
+		dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		dxcommon_->GetCommandList()->IASetIndexBuffer(&indexGrayBufferView_);
+		dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
+		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, outputSRVHandle_);
+		dxcommon_->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
 
 		D3D12_RESOURCE_BARRIER outputbarrierB{};
 		outputbarrierB.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
@@ -360,7 +364,7 @@ void OffscreenManager::Command() {
 		outputbarrierB.Transition.pResource = outputTexture_.Get();
 		outputbarrierB.Transition.StateBefore = D3D12_RESOURCE_STATE_GENERIC_READ;
 		outputbarrierB.Transition.StateAfter = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
-		pDXCom_->GetCommandList()->ResourceBarrier(1, &outputbarrierB);
+		dxcommon_->GetCommandList()->ResourceBarrier(1, &outputbarrierB);
 
 	} else {
 		D3D12_RESOURCE_BARRIER offbarrier{};
@@ -369,88 +373,88 @@ void OffscreenManager::Command() {
 		offbarrier.Transition.pResource = offscreenrt_.Get();
 		offbarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 		offbarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
-		pDXCom_->GetCommandList()->ResourceBarrier(1, &offbarrier);
+		dxcommon_->GetCommandList()->ResourceBarrier(1, &offbarrier);
 	}
 
 
 	if (isGaussian_) {
-		pDXCom_->GetDXCommand()->SetViewAndscissor();
-		pDXCom_->GetPipelineManager()->SetPipeline(Pipe::Gauss);
+		dxcommon_->GetDXCommand()->SetViewAndscissor();
+		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Gauss);
 
-		pDXCom_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		pDXCom_->GetCommandList()->IASetIndexBuffer(&indexGrayBufferView_);
-		pDXCom_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
-		pDXCom_->GetCommandList()->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
-		pDXCom_->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
+		dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		dxcommon_->GetCommandList()->IASetIndexBuffer(&indexGrayBufferView_);
+		dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
+		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
+		dxcommon_->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
 	}
 
 	if (isNonePost_ || isMetaBall_) {
-		pDXCom_->GetDXCommand()->SetViewAndscissor();
-		pDXCom_->GetPipelineManager()->SetPipeline(Pipe::None);
+		dxcommon_->GetDXCommand()->SetViewAndscissor();
+		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::None);
 
-		pDXCom_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		pDXCom_->GetCommandList()->IASetIndexBuffer(&indexGrayBufferView_);
-		pDXCom_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
-		pDXCom_->GetCommandList()->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
-		pDXCom_->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
+		dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		dxcommon_->GetCommandList()->IASetIndexBuffer(&indexGrayBufferView_);
+		dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
+		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
+		dxcommon_->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
 	}
 
 	if (isShockWave_) {
-		pDXCom_->GetDXCommand()->SetViewAndscissor();
-		pDXCom_->GetPipelineManager()->SetPipeline(Pipe::ShockWave);
+		dxcommon_->GetDXCommand()->SetViewAndscissor();
+		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::ShockWave);
 
-		pDXCom_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		pDXCom_->GetCommandList()->IASetIndexBuffer(&indexGrayBufferView_);
-		pDXCom_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
-		pDXCom_->GetCommandList()->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
-		pDXCom_->GetCommandList()->SetGraphicsRootConstantBufferView(1, shockResource_->GetGPUVirtualAddress());
-		pDXCom_->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
+		dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		dxcommon_->GetCommandList()->IASetIndexBuffer(&indexGrayBufferView_);
+		dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
+		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
+		dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(1, shockResource_->GetGPUVirtualAddress());
+		dxcommon_->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
 	}
 
 	if (isFire_) {
-		pDXCom_->GetDXCommand()->SetViewAndscissor();
-		pDXCom_->GetPipelineManager()->SetPipeline(Pipe::Fire);
+		dxcommon_->GetDXCommand()->SetViewAndscissor();
+		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Fire);
 
-		pDXCom_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		pDXCom_->GetCommandList()->IASetIndexBuffer(&indexGrayBufferView_);
-		pDXCom_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
-		pDXCom_->GetCommandList()->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
-		pDXCom_->GetCommandList()->SetGraphicsRootDescriptorTable(1, baseTex_->gpuHandle);
-		pDXCom_->GetCommandList()->SetGraphicsRootDescriptorTable(2, voronoTex_->gpuHandle);
-		pDXCom_->GetCommandList()->SetGraphicsRootDescriptorTable(3, noiseTex_->gpuHandle);
-		pDXCom_->GetCommandList()->SetGraphicsRootConstantBufferView(4, fireResource_->GetGPUVirtualAddress());
-		pDXCom_->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
+		dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		dxcommon_->GetCommandList()->IASetIndexBuffer(&indexGrayBufferView_);
+		dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
+		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
+		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, baseTex_->gpuHandle);
+		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, voronoTex_->gpuHandle);
+		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(3, noiseTex_->gpuHandle);
+		dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(4, fireResource_->GetGPUVirtualAddress());
+		dxcommon_->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
 	}
 
 
 	if (isThunder_) {
-		pDXCom_->GetDXCommand()->SetViewAndscissor();
-		pDXCom_->GetPipelineManager()->SetPipeline(Pipe::Thunder);
+		dxcommon_->GetDXCommand()->SetViewAndscissor();
+		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Thunder);
 
-		pDXCom_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		pDXCom_->GetCommandList()->IASetIndexBuffer(&indexGrayBufferView_);
-		pDXCom_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
-		pDXCom_->GetCommandList()->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
-		pDXCom_->GetCommandList()->SetGraphicsRootDescriptorTable(1, noiseDirTex_->gpuHandle);
-		pDXCom_->GetCommandList()->SetGraphicsRootConstantBufferView(2, thunderResource_->GetGPUVirtualAddress());
-		pDXCom_->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
+		dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		dxcommon_->GetCommandList()->IASetIndexBuffer(&indexGrayBufferView_);
+		dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
+		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
+		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, noiseDirTex_->gpuHandle);
+		dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(2, thunderResource_->GetGPUVirtualAddress());
+		dxcommon_->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
 	}
 
 	if (isCRT_) {
-		pDXCom_->GetDXCommand()->SetViewAndscissor();
-		pDXCom_->GetPipelineManager()->SetPipeline(Pipe::CRT);
+		dxcommon_->GetDXCommand()->SetViewAndscissor();
+		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::CRT);
 
-		pDXCom_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		pDXCom_->GetCommandList()->IASetIndexBuffer(&indexGrayBufferView_);
-		pDXCom_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
-		pDXCom_->GetCommandList()->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
-		pDXCom_->GetCommandList()->SetGraphicsRootConstantBufferView(1, cRTResource_->GetGPUVirtualAddress());
-		pDXCom_->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
+		dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		dxcommon_->GetCommandList()->IASetIndexBuffer(&indexGrayBufferView_);
+		dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
+		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
+		dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(1, cRTResource_->GetGPUVirtualAddress());
+		dxcommon_->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
 	}
 }
 
 void OffscreenManager::SettingVertex() {
-	vertexGrayResource_ = pDXCom_->CreateBufferResource(pDXCom_->GetDevice(), sizeof(GrayscaleVertex) * 6);
+	vertexGrayResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(GrayscaleVertex) * 6);
 
 	vertexGrayBufferView_.BufferLocation = vertexGrayResource_->GetGPUVirtualAddress();
 	vertexGrayBufferView_.SizeInBytes = sizeof(GrayscaleVertex) * 6;
@@ -465,7 +469,7 @@ void OffscreenManager::SettingVertex() {
 	grayVertexDate_[3] = { Vector4(1.0f,-1.0f,0.0f,1.0f),Vector2(1.0f,1.0f) };
 
 
-	indexGrayResourece_ = pDXCom_->CreateBufferResource(pDXCom_->GetDevice(), sizeof(uint32_t) * 6);
+	indexGrayResourece_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(uint32_t) * 6);
 
 	indexGrayBufferView_.BufferLocation = indexGrayResourece_->GetGPUVirtualAddress();
 	indexGrayBufferView_.SizeInBytes = sizeof(uint32_t) * 6;
@@ -482,7 +486,7 @@ void OffscreenManager::SettingVertex() {
 
 
 
-	auto device = pDXCom_->GetDevice();
+	auto device = dxcommon_->GetDevice();
 
 	D3D12_RESOURCE_DESC textureDesc = {};
 	textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;

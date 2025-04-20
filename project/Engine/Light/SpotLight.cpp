@@ -1,11 +1,13 @@
 #include "SpotLight.h"
-#include "DXCom.h"
+#include "Engine/DX/DXCom.h"
 #include <numbers>
 #include "ImGuiManager/ImGuiManager.h"
 
-void SpotLight::Initialize() {
+void SpotLight::Initialize(DXCom* pDxcom) {
 
-	spotLightResource_ = DXCom::GetInstance()->CreateBufferResource(DXCom::GetInstance()->GetDevice(), sizeof(SpotLightData));
+	dxcommon_ = pDxcom;
+
+	spotLightResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(SpotLightData));
 	spotLightData_ = nullptr;
 	spotLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&spotLightData_));
 	spotLightData_->color = { 1.0f,1.0f,1.0f,1.0f };
@@ -17,6 +19,10 @@ void SpotLight::Initialize() {
 	spotLightData_->cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
 	spotLightData_->cosFalloffStart = 3.0f;
 
+}
+
+void SpotLight::Finalize() {
+	spotLightResource_.Reset();
 }
 
 void SpotLight::SetLightCommand(ID3D12GraphicsCommandList* commandList) {

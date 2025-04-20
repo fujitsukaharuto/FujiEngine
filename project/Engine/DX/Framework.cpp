@@ -19,12 +19,12 @@ void Framework::Init() {
 	win_->Initialize();
 
 	// DirectX初期化
-	dxCommon_ = DXCom::GetInstance();
-	dxCommon_->Initialize(win_);
+	dxcommon_ = std::make_unique<DXCom>();
+	dxcommon_->Initialize(win_);
 
 	// srvManager初期化
 	srvManager_ = SRVManager::GetInstance();
-	srvManager_->Initialize();
+	srvManager_->Initialize(dxcommon_.get());
 
 	// FPS管理
 	fpsKeeper_ = FPSKeeper::GetInstance();
@@ -36,13 +36,13 @@ void Framework::Init() {
 
 	// ライン描画
 	line3dDrawer_ = Line3dDrawer::GetInstance();
-	line3dDrawer_->Initialize();
+	line3dDrawer_->Initialize(dxcommon_.get());
 	line3dDrawer_->SetCamera(cameraManager_->GetCamera());
 
 #pragma region 汎用機能初期化
 	// ImGuiの初期化
-	imguiManager_ = ImGuiManager::GetInstance();
-	imguiManager_->Init(win_, dxCommon_);
+	imguiManager_ = std::make_unique<ImGuiManager>();
+	imguiManager_->Init(win_, dxcommon_.get());
 
 	// 入力の初期化
 	input_ = Input::GetInstance();
@@ -52,27 +52,31 @@ void Framework::Init() {
 	audioPlayer_ = AudioPlayer::GetInstance();
 	audioPlayer_->Initialize();
 
-	// object関係
-	textureManager_ = TextureManager::GetInstance();
-	modelManager_ = ModelManager::GetInstance();
-
 	// ライト管理
-	lightManager_ = LightManager::GetInstance();
+	lightManager_ = std::make_unique<LightManager>();
+	lightManager_->Initialize(dxcommon_.get());
 	lightManager_->CreateLight();
 	lightManager_->AddPointLight();
 	lightManager_->AddSpotLight();
+
+	// object関係
+	textureManager_ = TextureManager::GetInstance();
+	textureManager_->Initialize(dxcommon_.get());
+	modelManager_ = ModelManager::GetInstance();
+	modelManager_->Initialize(dxcommon_.get(),lightManager_.get());
+
 	
 	// パーティクル管理
 	pManager_ = ParticleManager::GetInstance();
-	pManager_->Initialize(dxCommon_, srvManager_);
+	pManager_->Initialize(dxcommon_.get(), srvManager_);
 
 #pragma endregion
 
-	dxCommon_->SettingTexture();
+	dxcommon_->SettingTexture();
 
 	// シーン管理
-	sceneManager_ = SceneManager::GetInstance();
-	sceneManager_->Initialize();
+	sceneManager_ = std::make_unique<SceneManager>();
+	sceneManager_->Initialize(dxcommon_.get());
 }
 
 void Framework::Run() {

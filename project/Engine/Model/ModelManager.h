@@ -9,6 +9,8 @@
 #include "externals/DirectXTex/d3dx12.h"
 
 
+class DXCom;
+class LightManager;
 
 class ModelManager {
 public:
@@ -19,7 +21,7 @@ public:
 
 	static ModelManager* GetInstance();
 
-	void Initialize();
+	void Initialize(DXCom* pDxcom, LightManager* pLight);
 
 	void Finalize();
 
@@ -32,12 +34,18 @@ public:
 
 	void AddModel(const std::string& filename, Model* model);
 
+	DXCom* ShareDXCom() { return dxcommon_; }
+	LightManager* ShareLight() { return lightManager_; }
+
 private:
 
 	static MaterialDataPath LoadMaterialFile(const std::string& filename);
 	static Node ReadNode(aiNode* node);
 
 private:
+
+	DXCom* dxcommon_;
+	LightManager* lightManager_;
 
 	const std::string kDirectoryPath_ = "resource/";
 

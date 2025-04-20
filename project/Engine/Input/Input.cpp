@@ -57,6 +57,12 @@ void Input::Initialize() {
 
 }
 
+void Input::Finalize() {
+	directInput_.Reset();
+	devMouse_.Reset();
+	keyboard_.Reset();
+}
+
 
 void Input::Update() {
 	KeyboardUpdate();

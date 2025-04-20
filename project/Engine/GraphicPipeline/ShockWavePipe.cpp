@@ -1,5 +1,5 @@
 #include "ShockWavePipe.h"
-#include "DXCom.h"
+#include "Engine/DX/DXCom.h"
 #include "DXCommand.h"
 #include "DXCompil.h"
 #include "Logger.h"
@@ -85,9 +85,9 @@ void ShockWavePipe::CreatePSO(ID3D12Device* device) {
 	layout.NumElements = _countof(element);
 
 
-	vs = DXCom::GetInstance()->GetDXCompil()->CompileShader(kDirectoryPath_ + L"ShockWave.VS.hlsl", L"vs_6_0");
+	vs = dxcommon_->GetDXCompil()->CompileShader(kDirectoryPath_ + L"ShockWave.VS.hlsl", L"vs_6_0");
 	assert(vs != nullptr);
-	ps = DXCom::GetInstance()->GetDXCompil()->CompileShader(kDirectoryPath_ + L"ShockWave.PS.hlsl", L"ps_6_0");
+	ps = dxcommon_->GetDXCompil()->CompileShader(kDirectoryPath_ + L"ShockWave.PS.hlsl", L"ps_6_0");
 	assert(ps != nullptr);
 
 

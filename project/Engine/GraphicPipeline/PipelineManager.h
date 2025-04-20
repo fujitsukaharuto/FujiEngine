@@ -4,6 +4,8 @@
 #include <vector>
 
 
+class DXCom;
+
 enum class Pipe : int {
 
 	None,
@@ -31,7 +33,7 @@ public:
 
 	static PipelineManager* GetInstance();
 
-	void Initialize();
+	void Initialize(DXCom* pDxcom);
 
 	void Finalize();
 
@@ -48,7 +50,7 @@ private:
 
 private:
 
-
+	DXCom* dxcommon_;
 	std::vector<std::unique_ptr<BasePipeline>> pipelines_;
 
 

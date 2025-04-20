@@ -1,5 +1,5 @@
 #include "Line3dPipe.h"
-#include "DXCom.h"
+#include "Engine/DX/DXCom.h"
 #include "DXCommand.h"
 #include "DXCompil.h"
 #include "Logger.h"
@@ -94,9 +94,9 @@ void Line3dPipe::CreatePSO(ID3D12Device* device) {
 	rasterizer.CullMode = D3D12_CULL_MODE_NONE;
 	rasterizer.FillMode = D3D12_FILL_MODE_SOLID;
 
-	vs = DXCom::GetInstance()->GetDXCompil()->CompileShader(kDirectoryPath_ + L"Line3d.VS.hlsl", L"vs_6_0");
+	vs = dxcommon_->GetDXCompil()->CompileShader(kDirectoryPath_ + L"Line3d.VS.hlsl", L"vs_6_0");
 	assert(vs != nullptr);
-	ps = DXCom::GetInstance()->GetDXCompil()->CompileShader(kDirectoryPath_ + L"Line3d.PS.hlsl", L"ps_6_0");
+	ps = dxcommon_->GetDXCompil()->CompileShader(kDirectoryPath_ + L"Line3d.PS.hlsl", L"ps_6_0");
 	assert(ps != nullptr);
 
 

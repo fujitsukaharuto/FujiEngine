@@ -1,9 +1,25 @@
 #include "LightManager.h"
 #include "ImGuiManager/ImGuiManager.h"
 
-LightManager* LightManager::GetInstance() {
-	static LightManager instance;
-	return &instance;
+#include "Engine/DX/DXCom.h"
+
+void LightManager::Initialize(DXCom* pDxcom) {
+	dxcommon_ = pDxcom;
+}
+
+void LightManager::Finalize() {
+	directionLight_->Finalize();
+	directionLight_.reset();
+
+	for (auto& pointLight : pointLights_) {
+		pointLight->Finalize();
+	}
+	pointLights_.clear();
+
+	for (auto& spotLight : spotLights_) {
+		spotLight->Finalize();
+	}
+	spotLights_.clear();
 }
 
 void LightManager::Update() {
@@ -17,20 +33,20 @@ void LightManager::Update() {
 
 void LightManager::CreateLight() {
 	directionLight_ = std::make_unique<DirectionLight>();
-	directionLight_->Initialize();
+	directionLight_->Initialize(dxcommon_);
 }
 
 void LightManager::AddPointLight() {
 	std::unique_ptr<PointLight> newPoint;
 	newPoint.reset(new PointLight());
-	newPoint->Initialize();
+	newPoint->Initialize(dxcommon_);
 	pointLights_.push_back(std::move(newPoint));
 }
 
 void LightManager::AddSpotLight() {
 	std::unique_ptr<SpotLight> newSpot;
 	newSpot.reset(new SpotLight());
-	newSpot->Initialize();
+	newSpot->Initialize(dxcommon_);
 	spotLights_.push_back(std::move(newSpot));
 }
 

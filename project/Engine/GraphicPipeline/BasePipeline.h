@@ -11,13 +11,14 @@
 using namespace Microsoft::WRL;
 
 
+class DXCom;
 
 class BasePipeline {
 public:
 	BasePipeline() = default;
 	~BasePipeline();
 
-	void Initialize();
+	void Initialize(DXCom* pDxcom);
 
 	void SetPipelineState();
 	void SetPipelineCSState();
@@ -29,6 +30,8 @@ private:
 	virtual void CreatePSO(ID3D12Device* device);
 
 protected:
+
+	DXCom* dxcommon_;
 
 	ComPtr<ID3D12RootSignature> rootSignature_ = nullptr;
 	ComPtr<ID3D12PipelineState> pso_ = nullptr;

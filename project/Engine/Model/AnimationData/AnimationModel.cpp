@@ -1,6 +1,6 @@
 #include "AnimationModel.h"
 #include "Model/ModelManager.h"
-#include "DXCom.h"
+#include "Engine/DX/DXCom.h"
 #include "DX/SRVManager.h"
 #include "LightManager.h"
 #include "Engine/Model/Line3dDrawer.h"
@@ -14,7 +14,15 @@
 #include "Math/Animation/NodeAnimation.h"
 
 
-AnimationModel::~AnimationModel() {}
+AnimationModel::AnimationModel() {
+	dxcommon_ = ModelManager::GetInstance()->ShareDXCom();
+	lightManager_ = ModelManager::GetInstance()->ShareLight();
+}
+
+AnimationModel::~AnimationModel() {
+	dxcommon_ = nullptr;
+	lightManager_ = nullptr;
+}
 
 void AnimationModel::LoadAnimationFile(const std::string& filename) {
 	Assimp::Importer importer;
@@ -79,11 +87,10 @@ void AnimationModel::CreateSphere() {
 
 SkinCluster AnimationModel::CreateSkinCluster(const Skeleton& skeleton, const ModelData& modelData) {
 	SkinCluster skinCluster;
-	DXCom* dxcom = DXCom::GetInstance();
 	SRVManager* srv = SRVManager::GetInstance();
 
 	// MatrixPalette
-	skinCluster.paletteResource = dxcom->CreateBufferResource(dxcom->GetDevice(), sizeof(WellForGPU) * skeleton.joints.size());
+	skinCluster.paletteResource = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(WellForGPU) * skeleton.joints.size());
 	WellForGPU* mappedPallette = nullptr;
 	skinCluster.paletteResource->Map(0, nullptr, reinterpret_cast<void**>(&mappedPallette));
 	skinCluster.mappedPalette = { mappedPallette,skeleton.joints.size() };
@@ -100,10 +107,10 @@ SkinCluster AnimationModel::CreateSkinCluster(const Skeleton& skeleton, const Mo
 	paletteSrvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
 	paletteSrvDesc.Buffer.NumElements = UINT(skeleton.joints.size());
 	paletteSrvDesc.Buffer.StructureByteStride = sizeof(WellForGPU);
-	dxcom->GetDevice()->CreateShaderResourceView(skinCluster.paletteResource.Get(), &paletteSrvDesc, skinCluster.paletteSrvHandle.first);
+	dxcommon_->GetDevice()->CreateShaderResourceView(skinCluster.paletteResource.Get(), &paletteSrvDesc, skinCluster.paletteSrvHandle.first);
 
 	// InfluenceResource
-	skinCluster.influenceResource = dxcom->CreateBufferResource(dxcom->GetDevice(), sizeof(VertexInfluence) * modelData.vertices.size());
+	skinCluster.influenceResource = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(VertexInfluence) * modelData.vertices.size());
 	VertexInfluence* mappedInfluence = nullptr;
 	skinCluster.influenceResource->Map(0, nullptr, reinterpret_cast<void**>(&mappedInfluence));
 	std::memset(mappedInfluence, 0, sizeof(VertexInfluence) * modelData.vertices.size());
@@ -150,7 +157,7 @@ void AnimationModel::AnimationUpdate() {
 void AnimationModel::Draw(Material* mate) {
 	SetWVP();
 
-	ID3D12GraphicsCommandList* cList = DXCom::GetInstance()->GetCommandList();
+	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
 	cList->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
 	cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_->GetGPUVirtualAddress());
 	cList->SetGraphicsRootDescriptorTable(7, skinCluster_.paletteSrvHandle.second);
@@ -163,10 +170,10 @@ void AnimationModel::Draw(Material* mate) {
 void AnimationModel::AnimeDraw() {
 	SetBillboardWVP();
 
-	ID3D12GraphicsCommandList* cList = DXCom::GetInstance()->GetCommandList();
+	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
 	cList->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
 	cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_->GetGPUVirtualAddress());
-	LightManager::GetInstance()->SetLightCommand(cList);
+	lightManager_->SetLightCommand(cList);
 
 	if (model_) {
 		model_->Draw(cList, nullptr);
@@ -280,14 +287,14 @@ int32_t AnimationModel::CreateJoint(const Node& node, const std::optional<int32_
 }
 
 void AnimationModel::CreateWVP() {
-	wvpResource_ = DXCom::GetInstance()->CreateBufferResource(DXCom::GetInstance()->GetDevice(), sizeof(TransformationMatrix));
+	wvpResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(TransformationMatrix));
 	wvpDate_ = nullptr;
 	wvpResource_->Map(0, nullptr, reinterpret_cast<void**>(&wvpDate_));
 	wvpDate_->WVP = MakeIdentity4x4();
 	wvpDate_->World = MakeIdentity4x4();
 	wvpDate_->WorldInverseTransPose = Transpose(Inverse(wvpDate_->World));
 
-	cameraPosResource_ = DXCom::GetInstance()->CreateBufferResource(DXCom::GetInstance()->GetDevice(), sizeof(DirectionalLight));
+	cameraPosResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(DirectionalLight));
 	cameraPosData_ = nullptr;
 	cameraPosResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraPosData_));
 	cameraPosData_->worldPosition = camera_->transform.translate;

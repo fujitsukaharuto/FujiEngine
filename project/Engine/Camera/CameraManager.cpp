@@ -11,6 +11,10 @@ void CameraManager::Initialize() {
 	camera_ = std::make_unique<Camera>();
 }
 
+void CameraManager::Finalize() {
+	camera_.reset();
+}
+
 void CameraManager::Update() {
 #ifdef _DEBUG
 	if (debugMode_) {

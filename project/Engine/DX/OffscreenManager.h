@@ -77,7 +77,7 @@ struct LightningElement {
 class OffscreenManager {
 public:
 	OffscreenManager() = default;
-	~OffscreenManager() = default;
+	~OffscreenManager();
 
 public:
 
@@ -99,7 +99,7 @@ private:
 
 private:
 
-	DXCom* pDXCom_ = nullptr;
+	DXCom* dxcommon_ = nullptr;
 
 	ComPtr<ID3D12Resource> offscreenrt_ = nullptr;
 	D3D12_RENDER_TARGET_VIEW_DESC offscreenrtvDesc_{};

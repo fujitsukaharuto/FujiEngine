@@ -3,6 +3,8 @@
 #include <d3d12.h>
 #include "Math/Matrix/MatrixCalculation.h"
 
+class DXCom;
+
 struct SpotLightData {
 	Vector4 color;
 	Vector3 position;
@@ -22,7 +24,8 @@ public:
 
 public:
 
-	void Initialize();
+	void Initialize(DXCom* pDxcom);
+	void Finalize();
 
 	void SetLightCommand(ID3D12GraphicsCommandList* commandList);
 
@@ -34,6 +37,7 @@ private:
 
 private:
 
+	DXCom* dxcommon_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> spotLightResource_ = nullptr;
 
 };

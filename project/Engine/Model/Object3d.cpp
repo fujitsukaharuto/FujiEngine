@@ -4,7 +4,14 @@
 #include "LightManager.h"
 #include "CameraManager.h"
 
-Object3d::~Object3d() {}
+Object3d::Object3d() {
+	dxcommon_ = ModelManager::GetInstance()->ShareDXCom();
+	lightManager_ = ModelManager::GetInstance()->ShareLight();
+}
+
+Object3d::~Object3d() {
+	dxcommon_ = nullptr;
+}
 
 void Object3d::Create(const std::string& fileName) {
 	this->camera_ = CameraManager::GetInstance()->GetCamera();
@@ -26,7 +33,7 @@ void Object3d::CreateSphere() {
 void Object3d::Draw(Material* mate) {
 	SetWVP();
 
-	ID3D12GraphicsCommandList* cList = DXCom::GetInstance()->GetCommandList();
+	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
 	cList->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
 	cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_->GetGPUVirtualAddress());
 
@@ -38,10 +45,10 @@ void Object3d::Draw(Material* mate) {
 void Object3d::AnimeDraw() {
 	SetBillboardWVP();
 
-	ID3D12GraphicsCommandList* cList = DXCom::GetInstance()->GetCommandList();
+	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
 	cList->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
 	cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_->GetGPUVirtualAddress());
-	LightManager::GetInstance()->SetLightCommand(cList);
+	lightManager_->SetLightCommand(cList);
 
 	if (model_) {
 		model_->Draw(cList, nullptr);
@@ -97,14 +104,14 @@ void Object3d::SetModel(const std::string& fileName) {
 }
 
 void Object3d::CreateWVP() {
-	wvpResource_ = DXCom::GetInstance()->CreateBufferResource(DXCom::GetInstance()->GetDevice(), sizeof(TransformationMatrix));
+	wvpResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(TransformationMatrix));
 	wvpDate_ = nullptr;
 	wvpResource_->Map(0, nullptr, reinterpret_cast<void**>(&wvpDate_));
 	wvpDate_->WVP = MakeIdentity4x4();
 	wvpDate_->World = MakeIdentity4x4();
 	wvpDate_->WorldInverseTransPose = Transpose(Inverse(wvpDate_->World));
 
-	cameraPosResource_ = DXCom::GetInstance()->CreateBufferResource(DXCom::GetInstance()->GetDevice(), sizeof(DirectionalLight));
+	cameraPosResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(DirectionalLight));
 	cameraPosData_ = nullptr;
 	cameraPosResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraPosData_));
 	cameraPosData_->worldPosition = camera_->transform.translate;

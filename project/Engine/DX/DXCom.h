@@ -62,10 +62,12 @@ class DebugCamera;//今だけ、後から消す
 
 class DXCom {
 public:
-
-	static DXCom* GetInstance();
+	DXCom() = default;
+	~DXCom() = default;
+public:
 
 	void Initialize(MyWin* myWin);
+	void Finalize();
 
 	void SettingTexture();
 
@@ -145,9 +147,6 @@ private:
 
 
 private:
-
-	DXCom() = default;
-	~DXCom() = default;
 
 	D3DResourceLeakChecker leakCheck_;
 

@@ -8,6 +8,8 @@
 #include <vector>
 #include <wrl.h>
 
+class DXCom;
+
 class Mesh {
 public:
 
@@ -32,6 +34,9 @@ public:
 	void AnimationDraw(const SkinCluster& skinCluster, ID3D12GraphicsCommandList* commandList);
 
 private:
+
+	DXCom* dxcommon_;
+
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_ = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
 	std::vector<VertexData> vertexData_;

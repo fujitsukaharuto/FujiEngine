@@ -1,5 +1,7 @@
 #pragma once
-#include "DXCom.h"
+
+class DXCom;
+class LightManager;
 
 class Object3dCommon {
 public:
@@ -20,6 +22,7 @@ private:
 
 private:
 
-	DXCom* dxCommon_ = nullptr;
+	DXCom* dxcommon_ = nullptr;
+	LightManager* lightManager_;
 
 };

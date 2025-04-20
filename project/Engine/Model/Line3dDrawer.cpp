@@ -1,10 +1,8 @@
 #include "Line3dDrawer.h"
-#include "DXCom.h"
+#include "Engine/DX/DXCom.h"
 #include "Camera.h"
 
 Line3dDrawer::Line3dDrawer() {
-
-	Initialize();
 }
 
 Line3dDrawer::~Line3dDrawer() {}
@@ -16,11 +14,10 @@ Line3dDrawer* Line3dDrawer::GetInstance() {
 
 std::unique_ptr<Line3dDrawer::LineData> Line3dDrawer::CreateMesh(UINT vertexCount, UINT indexCount) {
 
-	DXCom* dxCommon = DXCom::GetInstance();
 	std::unique_ptr<LineData> mesh = std::make_unique<LineData>();
 
 	UINT vertBufferSize = sizeof(VertexPosColor) * vertexCount;
-	mesh->vertBuffer = dxCommon->CreateBufferResource(dxCommon->GetDevice(), vertBufferSize);
+	mesh->vertBuffer = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), vertBufferSize);
 
 	mesh->vbView.BufferLocation = mesh->vertBuffer->GetGPUVirtualAddress();
 	mesh->vbView.StrideInBytes = sizeof(VertexPosColor);
@@ -32,7 +29,7 @@ std::unique_ptr<Line3dDrawer::LineData> Line3dDrawer::CreateMesh(UINT vertexCoun
 
 	UINT indexBufferSize = sizeof(uint16_t) * indexCount;
 	if (indexCount > 0) {
-		mesh->indexBuffer = dxCommon->CreateBufferResource(dxCommon->GetDevice(), indexBufferSize);
+		mesh->indexBuffer = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), indexBufferSize);
 
 		mesh->ibView.BufferLocation = mesh->indexBuffer->GetGPUVirtualAddress();
 		mesh->ibView.Format = DXGI_FORMAT_R16_UINT;
@@ -44,7 +41,9 @@ std::unique_ptr<Line3dDrawer::LineData> Line3dDrawer::CreateMesh(UINT vertexCoun
 	return mesh;
 }
 
-void Line3dDrawer::Initialize() {
+void Line3dDrawer::Initialize(DXCom* pDxcom) {
+
+	dxcommon_ = pDxcom;
 
 	CreateMeshes();
 	CreateResource();
@@ -52,6 +51,10 @@ void Line3dDrawer::Initialize() {
 }
 
 void Line3dDrawer::Finalize() {
+	line_.reset();
+	cBufferResource_.Reset();
+	camera_ = nullptr;
+	dxcommon_ = nullptr;
 }
 
 void Line3dDrawer::DrawLine3d(const Vector3& p1, const Vector3& p2, const Vector4& color) {
@@ -74,11 +77,11 @@ void Line3dDrawer::Render() {
 		return;
 	}
 
-	ID3D12GraphicsCommandList* cList = DXCom::GetInstance()->GetCommandList();
+	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
 
 	cBufferData_->viewProject = camera_->GetViewProjectionMatrix();
 
-	DXCom::GetInstance()->GetPipelineManager()->SetPipeline(Pipe::Line3d);
+	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Line3d);
 	cList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
 
 	D3D12_VERTEX_BUFFER_VIEW vbView = line_->vbView;
@@ -105,9 +108,7 @@ void Line3dDrawer::CreateMeshes() {
 
 void Line3dDrawer::CreateResource() {
 
-	DXCom* dxCommon = DXCom::GetInstance();
-
-	cBufferResource_ = dxCommon->CreateBufferResource(dxCommon->GetDevice(), sizeof(CBuffer));
+	cBufferResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(CBuffer));
 	cBufferData_ = nullptr;
 	cBufferResource_->Map(0, nullptr, reinterpret_cast<void**>(&cBufferData_));
 	cBufferData_->viewProject = MakeIdentity4x4();

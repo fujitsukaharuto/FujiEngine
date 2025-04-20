@@ -4,14 +4,14 @@
 #include "Material.h"
 
 
-
+class DXCom;
 class PointLight;
 class SpotLight;
 
 class Sprite {
 public:
-	Sprite() = default;
-	~Sprite() = default;
+	Sprite();
+	~Sprite();
 
 public:
 
@@ -53,6 +53,7 @@ private:
 
 private:
 
+	DXCom* dxcommon_;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_ = nullptr;

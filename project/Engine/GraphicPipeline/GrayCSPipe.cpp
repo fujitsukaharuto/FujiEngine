@@ -1,5 +1,5 @@
 #include "GrayCSPipe.h"
-#include "DXCom.h"
+#include "Engine/DX/DXCom.h"
 #include "DXCommand.h"
 #include "DXCompil.h"
 #include "Logger.h"
@@ -82,7 +82,7 @@ void GrayCSPipe::CreatePSO(ID3D12Device* device) {
     HRESULT hr;
 
 
-    vs = DXCom::GetInstance()->GetDXCompil()->CompileShader(kDirectoryPath_ + L"CS/Grayscale.CS.hlsl", L"cs_6_0");
+    vs = dxcommon_->GetDXCompil()->CompileShader(kDirectoryPath_ + L"CS/Grayscale.CS.hlsl", L"cs_6_0");
     assert(vs != nullptr);
 
     D3D12_COMPUTE_PIPELINE_STATE_DESC computePipelineStateDesc = {};

@@ -1,6 +1,8 @@
 #include "SRVManager.h"
 #include <cassert>
 
+#include "Engine/DX/DXCom.h"
+
 
 const uint32_t SRVManager::kMaxSRVCount_ = 512;
 
@@ -17,8 +19,8 @@ SRVManager* SRVManager::GetInstance() {
 	return &instance;
 }
 
-void SRVManager::Initialize() {
-	this->dxcommon_ = DXCom::GetInstance();
+void SRVManager::Initialize(DXCom* pDxcom) {
+	dxcommon_ = pDxcom;
 
 	descriptorHeap = dxcommon_->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, kMaxSRVCount_, true);
 	descriptorSize_ = dxcommon_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
@@ -26,6 +28,7 @@ void SRVManager::Initialize() {
 
 void SRVManager::Finalize() {
 	descriptorHeap.Reset();
+	dxcommon_ = nullptr;
 }
 
 

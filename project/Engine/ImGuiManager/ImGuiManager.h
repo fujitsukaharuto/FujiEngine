@@ -15,7 +15,9 @@ class DXCom;
 
 class ImGuiManager {
 public:
-	static ImGuiManager* GetInstance();
+	ImGuiManager() = default;
+	~ImGuiManager() = default;
+public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
@@ -59,8 +61,6 @@ private:
 	ImFont* font_japanese = nullptr;
 #endif // _DEBUG
 private:
-	ImGuiManager() = default;
-	~ImGuiManager() = default;
 	ImGuiManager(const ImGuiManager&) = delete;
 	const ImGuiManager& operator=(const ImGuiManager&) = delete;
 };

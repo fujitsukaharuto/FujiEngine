@@ -15,13 +15,16 @@ ModelManager* ModelManager::GetInstance() {
 }
 
 
-void ModelManager::Initialize() {
+void ModelManager::Initialize(DXCom* pDxcom, LightManager* pLight) {
+	dxcommon_ = pDxcom;
+	lightManager_ = pLight;
 }
 
 
 void ModelManager::Finalize() {
-	ModelManager* instance = GetInstance();
-	instance->models_.clear();
+	dxcommon_ = nullptr;
+
+	models_.clear();
 }
 
 

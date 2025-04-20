@@ -8,6 +8,7 @@
 using namespace Microsoft::WRL;
 
 
+class DXCom;
 class Camera;
 
 class Line3dDrawer {
@@ -40,7 +41,7 @@ public:
 
 	std::unique_ptr<LineData> CreateMesh(UINT vertexCount, UINT indexCount);
 
-	void Initialize();
+	void Initialize(DXCom* pDxcom);
 
 	void Finalize();
 
@@ -65,6 +66,7 @@ private:
 
 	uint32_t indexLine_ = 0;
 
+	DXCom* dxcommon_;
 	Camera* camera_ = nullptr;
 
 	struct CBuffer {

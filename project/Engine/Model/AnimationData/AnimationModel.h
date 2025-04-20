@@ -14,12 +14,15 @@
 #include "Math/Animation/Skelton.h"
 
 
+class DXCom;
+class LightManager;
 class PointLight;
 class SpotLight;
 
+
 class AnimationModel {
 public:
-	AnimationModel() = default;
+	AnimationModel();
 	~AnimationModel();
 
 public:
@@ -96,6 +99,8 @@ private:
 	Object3dCommon* common_;
 	std::unique_ptr<Model> model_ = nullptr;
 
+	DXCom* dxcommon_;
+	LightManager* lightManager_;
 	Camera* camera_;
 	AnimationModel* parent_ = nullptr;
 

@@ -40,19 +40,19 @@ protected:
 	bool endRequest_ = false;
 
 	MyWin* win_ = nullptr;
-	DXCom* dxCommon_ = nullptr;
+	std::unique_ptr<DXCom> dxcommon_ = nullptr;
 	SRVManager* srvManager_ = nullptr;
 	// 汎用
 	Input* input_ = nullptr;
 	AudioPlayer* audioPlayer_ = nullptr;
 	FPSKeeper* fpsKeeper_ = nullptr;
 	std::unique_ptr<AbstractSceneFactory> sceneFactory_ = nullptr;
-	SceneManager* sceneManager_ = nullptr;
+	std::unique_ptr<SceneManager> sceneManager_ = nullptr;
 	TextureManager* textureManager_ = nullptr;
 	ModelManager* modelManager_ = nullptr;
 	CameraManager* cameraManager_ = nullptr;
-	ImGuiManager* imguiManager_ = nullptr;
-	LightManager* lightManager_ = nullptr;
+	std::unique_ptr<ImGuiManager> imguiManager_ = nullptr;
+	std::unique_ptr<LightManager> lightManager_ = nullptr;
 	ParticleManager* pManager_ = nullptr;
 	Line3dDrawer* line3dDrawer_ = nullptr;
 };

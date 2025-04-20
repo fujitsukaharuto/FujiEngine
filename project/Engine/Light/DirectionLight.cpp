@@ -1,14 +1,21 @@
 #include "DirectionLight.h"
-#include "DXCom.h"
+#include "Engine/DX/DXCom.h"
 #include "ImGuiManager/ImGuiManager.h"
 
-void DirectionLight::Initialize() {
-	drectionLightResource_ = DXCom::GetInstance()->CreateBufferResource(DXCom::GetInstance()->GetDevice(), sizeof(DirectionalLight));
+void DirectionLight::Initialize(DXCom* pDxcom) {
+
+	dxcommon_ = pDxcom;
+
+	drectionLightResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(DirectionalLight));
 	directionLightData_ = nullptr;
 	drectionLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&directionLightData_));
 	directionLightData_->color = { 1.0f,1.0f,1.0f,1.0f };
 	directionLightData_->direction = { 0.0f,-1.0f,0.0f };
 	directionLightData_->intensity = 0.3f;
+}
+
+void DirectionLight::Finalize() {
+	drectionLightResource_.Reset();
 }
 
 void DirectionLight::SetLightCommand(ID3D12GraphicsCommandList* commandList) {
