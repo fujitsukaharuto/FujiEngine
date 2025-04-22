@@ -22,9 +22,9 @@ private:
 	float chargeTime_;
 
 	// Emitter
-	ParticleEmitter charge1_;
-	ParticleEmitter charge2_;
-	ParticleEmitter charge3_;
-	ParticleEmitter chargeLight_;
+	ParticleEmitter* charge1_;
+	ParticleEmitter* charge2_;
+	ParticleEmitter* charge3_;
+	ParticleEmitter* chargeLight_;
 
 };

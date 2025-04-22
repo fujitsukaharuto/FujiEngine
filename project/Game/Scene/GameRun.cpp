@@ -37,10 +37,10 @@ void GameRun::Initialize() {
 	pManager_->CreateParticleGroup("sphere3", "blueParticle.png");
 	
 	// playerBullet用
-	pManager_->CreateParticleGroup("ChargeEffect1", "redCircle.png",40);
-	pManager_->CreateParticleGroup("ChargeEffect2", "redCircle.png",40);
-	pManager_->CreateParticleGroup("ChargeEffect3", "redCircle.png",40);
-	pManager_->CreateParticleGroup("ChargeLight", "redCircle.png",40);
+	pManager_->CreateParentParticleGroup("ChargeEffect1", "redCircle.png",40);
+	pManager_->CreateParentParticleGroup("ChargeEffect2", "redCircle.png",40);
+	pManager_->CreateParentParticleGroup("ChargeEffect3", "redCircle.png",40);
+	pManager_->CreateParentParticleGroup("ChargeLight", "redCircle.png",40);
 
 
 	pManager_->CreateAnimeGroup("animetest", "uvChecker.png");
