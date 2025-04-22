@@ -214,7 +214,9 @@ void ParticleEmitter::Emit() {
 			// 変換はそのまま（位置は影響受けてOKなら）
 			worldMatrix_ = Multiply(worldMatrix_, noScaleParentMatrix);
 		}
-		isUpDatedMatrix_ = true;
+		if (grain_.isParent_) {
+			isUpDatedMatrix_ = true;
+		}
 
 
 		for (uint32_t i = 0; i < count_; i++) {
