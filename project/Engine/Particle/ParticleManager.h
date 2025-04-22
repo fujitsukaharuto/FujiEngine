@@ -49,6 +49,17 @@ public:
 		ShapeType shapeType_ = ShapeType::PLANE;
 	};
 
+	struct ParentParticleGroup {
+		Material material_;
+		std::list<Particle> particles_;
+		uint32_t srvIndex_;
+		ComPtr<ID3D12Resource> instancing_ = nullptr;
+		uint32_t insstanceCount_;
+		TransformationParticleMatrix* instancingData_ = nullptr;
+		uint32_t drawCount_;
+		std::unique_ptr<ParticleEmitter> emitter_;
+		ShapeType shapeType_ = ShapeType::PLANE;
+	};
 
 	struct AnimeGroup {
 		std::string farst;
@@ -83,9 +94,13 @@ public:
 
 	static void CreateParticleGroup(const std::string& name, const std::string& fileName, uint32_t count = 20);
 
+	static void CreateParentParticleGroup(const std::string& name, const std::string& fileName, uint32_t count = 20);
+
 	static void CreateAnimeGroup(const std::string& name, const std::string& fileName);
 
 	static void Load(ParticleEmitter& emit, const std::string& name);
+
+	static void LoadParentGroup(ParticleEmitter* emit, const std::string& name);
 
 	static void Emit(const std::string& name, const Vector3& pos, const Vector3& rotate, const Particle& grain, const RandomParametor& para, uint32_t count);
 
@@ -104,6 +119,7 @@ private:
 	Camera* camera_;
 
 	std::unordered_map<std::string, std::unique_ptr<ParticleGroup>> particleGroups_;
+	std::unordered_map<std::string, std::unique_ptr<ParentParticleGroup>> parentParticleGroups_;
 	std::unordered_map<std::string, std::unique_ptr<AnimeGroup>> animeGroups_;
 
 	ComPtr<ID3D12Resource> vBuffer_;

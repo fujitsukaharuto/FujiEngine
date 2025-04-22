@@ -78,6 +78,10 @@ public:
 	bool isBillBoard_ = true;
 	BillBoardPattern pattern_ = BillBoardPattern::kXYZBillBoard;
 
+	//========================================================================*/
+	//* Parent
+	bool isParent_ = false;
+
 private:
 
 

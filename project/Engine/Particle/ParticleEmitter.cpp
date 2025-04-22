@@ -214,7 +214,9 @@ void ParticleEmitter::Emit() {
 			// 変換はそのまま（位置は影響受けてOKなら）
 			worldMatrix_ = Multiply(worldMatrix_, noScaleParentMatrix);
 		}
-
+		if (grain_.isParent_) {
+			isUpDatedMatrix_ = true;
+		}
 
 
 		for (uint32_t i = 0; i < count_; i++) {
@@ -408,4 +410,20 @@ void ParticleEmitter::Load(const std::string& filename) {
 	index++;
 	para_.colorMax = Vector4(j[index][0], j[index][1], j[index][2], j[index][3]);
 	index++;
+}
+
+Vector3 ParticleEmitter::GetWorldPos() {
+	worldMatrix_ = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, pos_);
+	if (parent_) {
+		const Matrix4x4& parentWorldMatrix = parent_->GetWorldMat();
+		worldMatrix_ = Multiply(worldMatrix_, parentWorldMatrix);
+	}
+	return Vector3{ worldMatrix_.m[3][0], worldMatrix_.m[3][1], worldMatrix_.m[3][2] };
+}
+
+Matrix4x4 ParticleEmitter::GetParentMatrix() {
+	if (parent_) {
+		return parent_->GetWorldMat();
+	}
+	return Matrix4x4::MakeIdentity4x4();
 }

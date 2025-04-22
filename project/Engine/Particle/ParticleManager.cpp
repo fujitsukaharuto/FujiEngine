@@ -249,6 +249,179 @@ void ParticleManager::Update() {
 	}
 
 
+	for (auto& groupPair : parentParticleGroups_) {
+
+		ParentParticleGroup* group = groupPair.second.get();
+
+		for (auto& particle : group->particles_) {
+			if (!particle.isLive_) {
+				continue;
+			}
+			if (!group->emitter_->GetIsUpdatedMatrix()) {
+				group->emitter_->worldMatrix_ = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, group->emitter_->pos_);
+				if (group->emitter_->HaveParent()) {
+					const Matrix4x4& parentWorldMatrix = group->emitter_->GetParentMatrix();
+					// スケール成分を除去した親ワールド行列を作成
+					Matrix4x4 noScaleParentMatrix = parentWorldMatrix;
+
+					// 各軸ベクトルの長さ（スケール）を計算
+					Vector3 xAxis = { parentWorldMatrix.m[0][0], parentWorldMatrix.m[1][0], parentWorldMatrix.m[2][0] };
+					Vector3 yAxis = { parentWorldMatrix.m[0][1], parentWorldMatrix.m[1][1], parentWorldMatrix.m[2][1] };
+					Vector3 zAxis = { parentWorldMatrix.m[0][2], parentWorldMatrix.m[1][2], parentWorldMatrix.m[2][2] };
+
+					float xLen = Vector3::Length(xAxis);
+					float yLen = Vector3::Length(yAxis);
+					float zLen = Vector3::Length(zAxis);
+
+					// 正規化（スケールを除去）
+					for (int i = 0; i < 3; ++i) {
+						noScaleParentMatrix.m[i][0] /= xLen;
+						noScaleParentMatrix.m[i][1] /= yLen;
+						noScaleParentMatrix.m[i][2] /= zLen;
+					}
+
+					// 変換はそのまま（位置は影響受けてOKなら）
+					group->emitter_->worldMatrix_ = Multiply(group->emitter_->worldMatrix_, noScaleParentMatrix);
+				}
+			}
+			break;
+		}
+
+		int particleCount = 0;
+		group->drawCount_ = 0;
+		for (auto& particle : group->particles_) {
+
+			if (particle.lifeTime_ <= 0) {
+				particle.isLive_ = false;
+				continue;
+			}
+			if (!particle.isLive_) {
+				continue;
+			}
+
+			particle.lifeTime_--;
+
+			SizeType sizeType = SizeType(particle.type_);
+			float t = (1.0f - float(float(particle.lifeTime_) / float(particle.startLifeTime_)));
+
+			if (particle.isColorFade_) {
+				particle.color_.w = Lerp(particle.startAlpha_, 0.0f, t * t);
+			}
+
+			switch (sizeType) {
+			case SizeType::kNormal:
+				break;
+			case SizeType::kShift:
+
+				particle.transform_.scale.x = Lerp(particle.startSize_.x, particle.endSize_.x, t);
+				particle.transform_.scale.y = Lerp(particle.startSize_.y, particle.endSize_.y, t);
+
+				break;
+			case SizeType::kSin:
+
+				Vector2 minSize = particle.startSize_; // 最小値
+				Vector2 maxSize = particle.endSize_; // 最大値
+
+				if (minSize.x > maxSize.x) {
+					std::swap(minSize.x, maxSize.x); // minとmaxを交換
+				}
+				if (minSize.y > maxSize.y) {
+					std::swap(minSize.y, maxSize.y); // minとmaxを交換
+				}
+
+
+				Vector2 sizeSin = minSize + (maxSize - minSize) * 0.5f * (1.0f + sin(particle.lifeTime_));
+
+				particle.transform_.scale.x = sizeSin.x;
+				particle.transform_.scale.y = sizeSin.y;
+
+				break;
+			}
+
+			if (particle.rotateType_ == static_cast<int>(RotateType::kRandomR)) {
+				if (particle.isContinuouslyRotate_) {
+					particle.transform_.rotate += Random::GetVector3({ -0.2f,0.2f }, { -0.2f,0.2f }, { -0.2f,0.2f }) * FPSKeeper::DeltaTime();
+				}
+			}
+
+			particle.speed_ += particle.accele_ * FPSKeeper::DeltaTime();
+
+			particle.transform_.translate += particle.speed_ * FPSKeeper::DeltaTime();
+			Matrix4x4 worldViewProjectionMatrix;
+			Matrix4x4 worldMatrix = MakeIdentity4x4();
+
+			if (!particle.isBillBoard_) {
+				worldMatrix = MakeAffineMatrix(particle.transform_.scale, particle.transform_.rotate, particle.transform_.translate);
+			}
+			if (particle.isBillBoard_) {
+				switch (particle.pattern_) {
+				case BillBoardPattern::kXYZBillBoard:
+					worldMatrix = Multiply(MakeScaleMatrix(particle.transform_.scale), billboardMatrix);
+					worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform_.translate));
+					break;
+				case BillBoardPattern::kXBillBoard: {
+
+					Matrix4x4 xBillboardMatrix;
+					xBillboardMatrix = billboardMatrix;
+					xBillboardMatrix.m[1][0] = 0.0f; // Y軸成分をゼロにする
+					xBillboardMatrix.m[2][0] = 0.0f; // Z軸成分をゼロにする
+
+					worldMatrix = Multiply(MakeScaleMatrix(particle.transform_.scale), MakeRotateXYZMatrix({ 0.0f,particle.transform_.rotate.y,particle.transform_.rotate.z }));
+					worldMatrix = Multiply(worldMatrix, xBillboardMatrix);
+					worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform_.translate));
+					break;
+				}
+				case BillBoardPattern::kYBillBoard: {
+					if (camera_) {
+						Matrix4x4 yBillboardMatrix = billboardMatrix;
+						yBillboardMatrix.m[0][1] = 0.0f; // X軸成分をゼロにする
+						yBillboardMatrix.m[2][1] = 0.0f; // Z軸成分をゼロにする
+
+						worldMatrix = Multiply(MakeScaleMatrix(particle.transform_.scale), MakeRotateXYZMatrix({ particle.transform_.rotate.x,0.0f,particle.transform_.rotate.z }));
+						worldMatrix = Multiply(worldMatrix, yBillboardMatrix);
+						worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform_.translate));
+
+					}
+					break;
+				}
+				case BillBoardPattern::kZBillBoard: {
+
+					Matrix4x4 zBillboardMatrix = billboardMatrix;
+					zBillboardMatrix.m[0][2] = 0.0f; // X軸成分をゼロにする
+					zBillboardMatrix.m[1][2] = 0.0f; // Y軸成分をゼロにする
+
+					worldMatrix = Multiply(MakeScaleMatrix(particle.transform_.scale), MakeRotateXYZMatrix({ particle.transform_.rotate.x,particle.transform_.rotate.y,0.0f }));
+					worldMatrix = Multiply(worldMatrix, zBillboardMatrix);
+					worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform_.translate));
+
+					break;
+				}
+				default:
+					break;
+				}
+			}
+
+			if (particle.isParent_) {
+				worldMatrix = Multiply(worldMatrix, group->emitter_->worldMatrix_);
+			}
+			if (camera_) {
+				const Matrix4x4& viewProjectionMatrix = camera_->GetViewProjectionMatrix();
+				worldViewProjectionMatrix = Multiply(worldMatrix, viewProjectionMatrix);
+			} else {
+				worldViewProjectionMatrix = worldMatrix;
+			}
+
+			group->instancingData_[particleCount].World = worldMatrix;
+			group->instancingData_[particleCount].WVP = worldViewProjectionMatrix;
+			group->instancingData_[particleCount].color = particle.color_;
+
+			particleCount++;
+			group->drawCount_++;
+		}
+		group->emitter_->SetIsUpdatedMatrix(false);
+	}
+
+
 	for (auto& groupPair : animeGroups_) {
 
 		AnimeGroup* group = groupPair.second.get();
@@ -444,6 +617,50 @@ void ParticleManager::CreateParticleGroup(const std::string& name, const std::st
 	instance->particleGroups_.insert(std::make_pair(name, newGroup));
 }
 
+void ParticleManager::CreateParentParticleGroup(const std::string& name, const std::string& fileName, uint32_t count) {
+
+	ParticleManager* instance = GetInstance();
+
+	auto iterator = instance->particleGroups_.find(name);
+	if (iterator != instance->particleGroups_.end()) {
+		return;
+	}
+
+	auto newGroup = std::make_unique<ParentParticleGroup>();
+
+	// 必要な初期化処理
+	newGroup->emitter_ = std::make_unique<ParticleEmitter>();
+	newGroup->emitter_->name_ = name;
+	newGroup->emitter_->Load(name);
+
+	newGroup->insstanceCount_ = count;
+	newGroup->instancing_ = instance->dxcommon_->CreateBufferResource(instance->dxcommon_->GetDevice(), (sizeof(TransformationParticleMatrix) * newGroup->insstanceCount_));
+	newGroup->instancing_->Map(0, nullptr, reinterpret_cast<void**>(&newGroup->instancingData_));
+	uint32_t max = newGroup->insstanceCount_;
+	for (uint32_t index = 0; index < max; ++index) {
+		newGroup->instancingData_[index].WVP = MakeIdentity4x4();
+		newGroup->instancingData_[index].World = MakeIdentity4x4();
+	}
+	newGroup->material_.SetTextureNamePath(fileName);
+	newGroup->material_.CreateMaterial();
+	newGroup->srvIndex_ = instance->srvManager_->Allocate();
+	instance->srvManager_->CreateStructuredSRV(newGroup->srvIndex_, newGroup->instancing_.Get(), newGroup->insstanceCount_, sizeof(TransformationParticleMatrix));
+
+
+	//ここでパーティクルをあらかじめ作る
+	float add = 0.1f;
+	for (int i = 0; i < int(max); i++) {
+		Particle p{};
+		p.transform_.scale = { 1.0f,1.0f,1.0f };
+		p.transform_.translate.x += add;
+		p.transform_.translate.y += add;
+		newGroup->particles_.push_back(p);
+		add += 0.1f;
+	}
+
+	instance->parentParticleGroups_.emplace(name, std::move(newGroup));
+}
+
 void ParticleManager::CreateAnimeGroup(const std::string& name, const std::string& fileName) {
 	ParticleManager* instance = GetInstance();
 
@@ -509,6 +726,21 @@ void ParticleManager::Load(ParticleEmitter& emit, const std::string& name) {
 		emit.para_.transz         = group->emitter_.para_.transz;
 		emit.para_.colorMin       = group->emitter_.para_.colorMin;
 		emit.para_.colorMax       = group->emitter_.para_.colorMax;
+
+	} else {
+		return;
+	}
+}
+
+void ParticleManager::LoadParentGroup(ParticleEmitter* emit, const std::string& name) {
+	ParticleManager* instance = GetInstance();
+	emit->name_ = name;
+
+	auto iterator = instance->parentParticleGroups_.find(name);
+	if (iterator != instance->parentParticleGroups_.end()) {
+		ParentParticleGroup* group = iterator->second.get();
+		emit = group->emitter_.get();
+		emit->grain_.isParent_ = true;
 
 	} else {
 		return;
