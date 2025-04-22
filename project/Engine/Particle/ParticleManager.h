@@ -100,7 +100,7 @@ public:
 
 	static void Load(ParticleEmitter& emit, const std::string& name);
 
-	static void LoadParentGroup(ParticleEmitter* emit, const std::string& name);
+	static void LoadParentGroup(ParticleEmitter*& emit, const std::string& name);
 
 	static void Emit(const std::string& name, const Vector3& pos, const Vector3& rotate, const Particle& grain, const RandomParametor& para, uint32_t count);
 

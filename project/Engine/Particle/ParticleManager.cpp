@@ -732,9 +732,8 @@ void ParticleManager::Load(ParticleEmitter& emit, const std::string& name) {
 	}
 }
 
-void ParticleManager::LoadParentGroup(ParticleEmitter* emit, const std::string& name) {
+void ParticleManager::LoadParentGroup(ParticleEmitter*& emit, const std::string& name) {
 	ParticleManager* instance = GetInstance();
-	emit->name_ = name;
 
 	auto iterator = instance->parentParticleGroups_.find(name);
 	if (iterator != instance->parentParticleGroups_.end()) {
