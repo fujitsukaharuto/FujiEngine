@@ -32,9 +32,17 @@ void GameRun::Initialize() {
 
 
 #pragma region パーティクル生成
-	pManager_->CreateParticleGroup("sphere", "defaultParticle.png");
+	pManager_->CreateParticleGroup("sphere", "redCircle.png");
 	pManager_->CreateParticleGroup("sphere2", "defaultParticle.png");
 	pManager_->CreateParticleGroup("sphere3", "blueParticle.png");
+	
+	// playerBullet用
+	pManager_->CreateParticleGroup("ChargeEffect1", "redCircle.png",40);
+	pManager_->CreateParticleGroup("ChargeEffect2", "redCircle.png",40);
+	pManager_->CreateParticleGroup("ChargeEffect3", "redCircle.png",40);
+	pManager_->CreateParticleGroup("ChargeLight", "redCircle.png",40);
+
+
 	pManager_->CreateAnimeGroup("animetest", "uvChecker.png");
 	pManager_->AddAnime("animetest", "white2x2.png", 10.0f);
 #pragma endregion

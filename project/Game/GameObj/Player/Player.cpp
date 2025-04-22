@@ -15,7 +15,7 @@ void Player::Initialize() {
 	jumpSpeed_ = 0.2f;
 	gravity_ = 0.005f;
 	maxFallSpeed_ = 2.0f;
-	maxChargeTime_ = 30.0f;
+	maxChargeTime_ = 60.0f;
 
 	collider_ = std::make_unique<AABBCollider>();
 	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
