@@ -120,30 +120,52 @@ void ParticleEmitter::DrawSize() {
 #ifdef _DEBUG
 	if (isDrawSize_) {
 
-		Matrix4x4 worldMatrix = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, pos_);
+
+		worldMatrix_ = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, pos_);
 		if (parent_) {
 			const Matrix4x4& parentWorldMatrix = parent_->GetWorldMat();
-			worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
+			// スケール成分を除去した親ワールド行列を作成
+			Matrix4x4 noScaleParentMatrix = parentWorldMatrix;
+
+			// 各軸ベクトルの長さ（スケール）を計算
+			Vector3 xAxis = { parentWorldMatrix.m[0][0], parentWorldMatrix.m[1][0], parentWorldMatrix.m[2][0] };
+			Vector3 yAxis = { parentWorldMatrix.m[0][1], parentWorldMatrix.m[1][1], parentWorldMatrix.m[2][1] };
+			Vector3 zAxis = { parentWorldMatrix.m[0][2], parentWorldMatrix.m[1][2], parentWorldMatrix.m[2][2] };
+
+			float xLen = Vector3::Length(xAxis);
+			float yLen = Vector3::Length(yAxis);
+			float zLen = Vector3::Length(zAxis);
+
+			// 正規化（スケールを除去）
+			for (int i = 0; i < 3; ++i) {
+				noScaleParentMatrix.m[i][0] /= xLen;
+				noScaleParentMatrix.m[i][1] /= yLen;
+				noScaleParentMatrix.m[i][2] /= zLen;
+			}
+
+			// 変換はそのまま（位置は影響受けてOKなら）
+			worldMatrix_ = Multiply(worldMatrix_, noScaleParentMatrix);
 		}
+
 
 		Vector3 points[8];
 		points[0] = emitSizeMin_;
-		points[0] += {worldMatrix.m[3][0], worldMatrix.m[3][1], worldMatrix.m[3][2]};
+		points[0] += {worldMatrix_.m[3][0], worldMatrix_.m[3][1], worldMatrix_.m[3][2]};
 		points[1] = { emitSizeMax_.x,emitSizeMin_.y,emitSizeMin_.z };
-		points[1] += {worldMatrix.m[3][0], worldMatrix.m[3][1], worldMatrix.m[3][2]};
+		points[1] += {worldMatrix_.m[3][0], worldMatrix_.m[3][1], worldMatrix_.m[3][2]};
 		points[2] = { emitSizeMax_.x,emitSizeMin_.y,emitSizeMax_.z };
-		points[2] += {worldMatrix.m[3][0], worldMatrix.m[3][1], worldMatrix.m[3][2]};
+		points[2] += {worldMatrix_.m[3][0], worldMatrix_.m[3][1], worldMatrix_.m[3][2]};
 		points[3] = { emitSizeMin_.x,emitSizeMin_.y,emitSizeMax_.z };
-		points[3] += {worldMatrix.m[3][0], worldMatrix.m[3][1], worldMatrix.m[3][2]};
+		points[3] += {worldMatrix_.m[3][0], worldMatrix_.m[3][1], worldMatrix_.m[3][2]};
 
 		points[4] = emitSizeMax_;
-		points[4] += {worldMatrix.m[3][0], worldMatrix.m[3][1], worldMatrix.m[3][2]};
+		points[4] += {worldMatrix_.m[3][0], worldMatrix_.m[3][1], worldMatrix_.m[3][2]};
 		points[5] = { emitSizeMin_.x,emitSizeMax_.y,emitSizeMax_.z };
-		points[5] += {worldMatrix.m[3][0], worldMatrix.m[3][1], worldMatrix.m[3][2]};
+		points[5] += {worldMatrix_.m[3][0], worldMatrix_.m[3][1], worldMatrix_.m[3][2]};
 		points[6] = { emitSizeMin_.x,emitSizeMax_.y,emitSizeMin_.z };
-		points[6] += {worldMatrix.m[3][0], worldMatrix.m[3][1], worldMatrix.m[3][2]};
+		points[6] += {worldMatrix_.m[3][0], worldMatrix_.m[3][1], worldMatrix_.m[3][2]};
 		points[7] = { emitSizeMax_.x,emitSizeMax_.y,emitSizeMin_.z };
-		points[7] += {worldMatrix.m[3][0], worldMatrix.m[3][1], worldMatrix.m[3][2]};
+		points[7] += {worldMatrix_.m[3][0], worldMatrix_.m[3][1], worldMatrix_.m[3][2]};
 
 		Line3dDrawer::GetInstance()->DrawLine3d(points[0], points[1], Vector4{ 1.0f, 0.0f, 0.0f, 1.0f });
 		Line3dDrawer::GetInstance()->DrawLine3d(points[1], points[2], Vector4{ 1.0f, 0.0f, 0.0f, 1.0f });
@@ -165,17 +187,55 @@ void ParticleEmitter::DrawSize() {
 }
 
 void ParticleEmitter::Emit() {
-	Matrix4x4 worldMatrix = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, pos_);
-	if (parent_) {
-		const Matrix4x4& parentWorldMatrix = parent_->GetWorldMat();
-		worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
-	}
-
 	if (time_ <= 0) {
+
+		worldMatrix_ = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, pos_);
+		if (parent_) {
+			const Matrix4x4& parentWorldMatrix = parent_->GetWorldMat();
+			// スケール成分を除去した親ワールド行列を作成
+			Matrix4x4 noScaleParentMatrix = parentWorldMatrix;
+
+			// 各軸ベクトルの長さ（スケール）を計算
+			Vector3 xAxis = { parentWorldMatrix.m[0][0], parentWorldMatrix.m[1][0], parentWorldMatrix.m[2][0] };
+			Vector3 yAxis = { parentWorldMatrix.m[0][1], parentWorldMatrix.m[1][1], parentWorldMatrix.m[2][1] };
+			Vector3 zAxis = { parentWorldMatrix.m[0][2], parentWorldMatrix.m[1][2], parentWorldMatrix.m[2][2] };
+
+			float xLen = Vector3::Length(xAxis);
+			float yLen = Vector3::Length(yAxis);
+			float zLen = Vector3::Length(zAxis);
+
+			// 正規化（スケールを除去）
+			for (int i = 0; i < 3; ++i) {
+				noScaleParentMatrix.m[i][0] /= xLen;
+				noScaleParentMatrix.m[i][1] /= yLen;
+				noScaleParentMatrix.m[i][2] /= zLen;
+			}
+
+			// 変換はそのまま（位置は影響受けてOKなら）
+			worldMatrix_ = Multiply(worldMatrix_, noScaleParentMatrix);
+		}
+
+
+
 		for (uint32_t i = 0; i < count_; i++) {
-			Vector3 posAddSize{};
-			posAddSize = Random::GetVector3({ emitSizeMin_.x,emitSizeMax_.x }, { emitSizeMin_.y,emitSizeMax_.y }, { emitSizeMin_.z,emitSizeMax_.z });
-			posAddSize += {worldMatrix.m[3][0], worldMatrix.m[3][1], worldMatrix.m[3][2]};
+			Vector3 posAddSize = Random::GetVector3(
+				{ emitSizeMin_.x, emitSizeMax_.x },
+				{ emitSizeMin_.y, emitSizeMax_.y },
+				{ emitSizeMin_.z, emitSizeMax_.z }
+			);
+
+			// 親の回転だけを取り出して適用する
+			Matrix4x4 parentRotationOnly = parent_ ? parent_->GetWorldMat() : Matrix4x4::MakeIdentity4x4();
+			if (parent_) {
+				parentRotationOnly.m[3][0] = 0.0f;
+				parentRotationOnly.m[3][1] = 0.0f;
+				parentRotationOnly.m[3][2] = 0.0f;
+			}
+			posAddSize = Transform(posAddSize, parentRotationOnly); // ← 回転だけ適用
+
+			// 最終的な位置はワールド座標の位置を加算
+			posAddSize += { worldMatrix_.m[3][0], worldMatrix_.m[3][1], worldMatrix_.m[3][2] };
+
 
 			if (grain_.speedType_ == static_cast<int>(SpeedType::kCenter)) {
 				grain_.speed_ = (pos_ - posAddSize) * grain_.returnPower_;
@@ -190,16 +250,16 @@ void ParticleEmitter::Emit() {
 }
 
 void ParticleEmitter::Burst() {
-	Matrix4x4 worldMatrix = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, pos_);
+	worldMatrix_ = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, pos_);
 	if (parent_) {
 		const Matrix4x4& parentWorldMatrix = parent_->GetWorldMat();
-		worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
+		worldMatrix_ = Multiply(worldMatrix_, parentWorldMatrix);
 	}
 
 	for (uint32_t i = 0; i < count_; i++) {
 		Vector3 posAddSize{};
 		posAddSize = Random::GetVector3({ emitSizeMin_.x,emitSizeMax_.x }, { emitSizeMin_.y,emitSizeMax_.y }, { emitSizeMin_.z,emitSizeMax_.z });
-		posAddSize += {worldMatrix.m[3][0], worldMatrix.m[3][1], worldMatrix.m[3][2]};
+		posAddSize += {worldMatrix_.m[3][0], worldMatrix_.m[3][1], worldMatrix_.m[3][2]};
 
 		if (grain_.speedType_ == static_cast<int>(SpeedType::kCenter)) {
 			grain_.speed_ = (pos_ - posAddSize).Normalize() * grain_.returnPower_;
@@ -348,13 +408,4 @@ void ParticleEmitter::Load(const std::string& filename) {
 	index++;
 	para_.colorMax = Vector4(j[index][0], j[index][1], j[index][2], j[index][3]);
 	index++;
-}
-
-Vector3 ParticleEmitter::GetWorldPos() {
-	Matrix4x4 worldMatrix = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, pos_);
-	if (parent_) {
-		const Matrix4x4& parentWorldMatrix = parent_->GetWorldMat();
-		worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
-	}
-	return Vector3{ worldMatrix.m[3][0], worldMatrix.m[3][1], worldMatrix.m[3][2] };
 }

@@ -222,6 +222,30 @@ public:
 		return euler;
 	}
 
+	Quaternion DirectionToDirection(const Vector3& from, const Vector3& to) {
+		Vector3 f = from.Normalize();
+		Vector3 t = to.Normalize();
+
+		float dot = Vector3::Dot(f, t);
+
+		if (dot >= 1.0f - FLT_EPSILON) {
+			// 完全に同じ方向なら回転不要
+			return Quaternion::IdentityQuaternion();
+		} else if (dot <= -1.0f + FLT_EPSILON) {
+			// 真逆方向の場合、回転軸を見つけて180度回す必要あり
+			Vector3 orthogonal = Vector3(1, 0, 0).Cross(f);
+			if (orthogonal.Length() < FLT_EPSILON) {
+				orthogonal = Vector3(0, 1, 0).Cross(f);
+			}
+			orthogonal = orthogonal.Normalize();
+			return Quaternion::AngleAxis(std::numbers::pi_v<float>, orthogonal);
+		} else {
+			Vector3 axis = f.Cross(t).Normalize();
+			float angle = std::acos(dot);
+			return Quaternion::AngleAxis(angle, axis);
+		}
+	}
+
 	Quaternion operator-() const {
 		return Quaternion(-x, -y, -z, -w);
 	}
