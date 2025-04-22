@@ -15,6 +15,7 @@ PlayerAttackRoot::PlayerAttackRoot(Player* pPlayer) : BasePlayerAttackBehavior(p
 	ParticleManager::LoadParentGroup(chargeLight_, "ChargeLight");
 
 
+	charge1_->SetParent(pPlayer_->GetModel());
 	charge2_->SetParent(pPlayer_->GetModel());
 	charge3_->SetParent(pPlayer_->GetModel());
 	chargeLight_->SetParent(pPlayer_->GetModel());

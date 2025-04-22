@@ -30,7 +30,7 @@ void PlayerBullet::Draw(Material* mate) {
 void PlayerBullet::InitParameter(const Vector3& pos) {
 	isLive_ = true;
 	isCharge_ = true;
-	model_->transform.scale = Vector3::FillVec(1.0f);
+	model_->transform.scale = Vector3::FillVec(0.1f);
 	model_->transform.translate = pos;
 	speed_ = 0.0f;
 	damage_ = 0.0f;

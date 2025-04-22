@@ -212,7 +212,7 @@ void ParticleEmitter::Emit() {
 			}
 
 			// 変換はそのまま（位置は影響受けてOKなら）
-			worldMatrix_ = Multiply(noScaleParentMatrix, worldMatrix_);
+			worldMatrix_ = Multiply(worldMatrix_, noScaleParentMatrix);
 		}
 		if (grain_.isParent_) {
 			isUpDatedMatrix_ = true;
@@ -226,24 +226,36 @@ void ParticleEmitter::Emit() {
 				{ emitSizeMin_.z, emitSizeMax_.z }
 			);
 
+
 			// 親の回転だけを取り出して適用する
 			Matrix4x4 parentRotationOnly = parent_ ? parent_->GetWorldMat() : Matrix4x4::MakeIdentity4x4();
 			if (parent_) {
 				parentRotationOnly.m[3][0] = 0.0f;
 				parentRotationOnly.m[3][1] = 0.0f;
 				parentRotationOnly.m[3][2] = 0.0f;
+				parentRotationOnly.m[0][3] = 0.0f;
+				parentRotationOnly.m[1][3] = 0.0f;
+				parentRotationOnly.m[2][3] = 0.0f;
+				parentRotationOnly.m[3][3] = 1.0f;
 			}
 			posAddSize = Transform(posAddSize, parentRotationOnly); // ← 回転だけ適用
-
-			// 最終的な位置はワールド座標の位置を加算
-			posAddSize += { worldMatrix_.m[3][0], worldMatrix_.m[3][1], worldMatrix_.m[3][2] };
-
-
-			if (grain_.speedType_ == static_cast<int>(SpeedType::kCenter)) {
-				grain_.speed_ = (pos_ - posAddSize) * grain_.returnPower_;
+			if (!grain_.isParent_) {
+				// 最終的な位置はワールド座標の位置を加算
+				posAddSize += { worldMatrix_.m[3][0], worldMatrix_.m[3][1], worldMatrix_.m[3][2] };
 			}
 
-			ParticleManager::Emit(name_, posAddSize, particleRotate_, grain_, para_, 1);
+			if (grain_.speedType_ == static_cast<int>(SpeedType::kCenter)) {
+				Vector3 rPos = pos_;
+				rPos = Transform(rPos, parentRotationOnly);
+				grain_.speed_ = (rPos - (posAddSize + rPos)) * grain_.returnPower_;
+
+			}
+
+			if (grain_.isParent_) {
+				ParticleManager::ParentEmit(name_, posAddSize, particleRotate_, grain_, para_, 1);
+			} else {
+				ParticleManager::Emit(name_, posAddSize, particleRotate_, grain_, para_, 1);
+			}
 		}
 		time_ = frequencyTime_;
 	} else {
