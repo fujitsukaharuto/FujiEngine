@@ -57,7 +57,11 @@ public:
 
 	void TimeReset() { time_ = frequencyTime_; }
 	void SetParent(Object3d* parent) { parent_ = parent; }
+	void SetIsUpdatedMatrix(bool is) { isUpDatedMatrix_ = is; }
 	Vector3 GetWorldPos();
+	Matrix4x4 GetParentMatrix();
+	bool HaveParent() { return parent_ ? true : false; }
+	bool GetIsUpdatedMatrix() { return isUpDatedMatrix_; }
 
 	std::string name_;
 	Vector3 pos_;
@@ -75,6 +79,8 @@ public:
 	bool isDrawSize_ = false;
 	bool isEmit_ = false;
 
+	Matrix4x4 worldMatrix_;
+
 private:
 
 
@@ -83,7 +89,7 @@ private:
 
 	float time_;
 
-	Matrix4x4 worldMatrix_;
-
 	Object3d* parent_ = nullptr;
+
+	bool isUpDatedMatrix_ = false;
 };
