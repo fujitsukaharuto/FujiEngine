@@ -89,8 +89,6 @@ private:
 
 	float time_;
 
-	Matrix4x4 worldMatrix_;
-
 	Object3d* parent_ = nullptr;
 
 	bool isUpDatedMatrix_ = false;
