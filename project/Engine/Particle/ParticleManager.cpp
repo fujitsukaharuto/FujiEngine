@@ -288,7 +288,7 @@ void ParticleManager::Update() {
 					}
 
 					// 変換はそのまま（位置は影響受けてOKなら）
-					group->emitter_->worldMatrix_ = Multiply(group->emitter_->worldMatrix_, noScaleParentMatrix);
+					group->emitter_->worldMatrix_ = Multiply(noScaleParentMatrix, group->emitter_->worldMatrix_);
 				}
 			}
 			break;
@@ -409,7 +409,7 @@ void ParticleManager::Update() {
 			}
 
 			if (particle.isParent_) {
-				worldMatrix = Multiply(worldMatrix, group->emitter_->worldMatrix_);
+				worldMatrix = Multiply(group->emitter_->worldMatrix_, worldMatrix);
 			}
 			if (camera_) {
 				const Matrix4x4& viewProjectionMatrix = camera_->GetViewProjectionMatrix();

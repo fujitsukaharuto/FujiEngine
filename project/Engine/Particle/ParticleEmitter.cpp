@@ -212,7 +212,7 @@ void ParticleEmitter::Emit() {
 			}
 
 			// 変換はそのまま（位置は影響受けてOKなら）
-			worldMatrix_ = Multiply(worldMatrix_, noScaleParentMatrix);
+			worldMatrix_ = Multiply(noScaleParentMatrix, worldMatrix_);
 		}
 		if (grain_.isParent_) {
 			isUpDatedMatrix_ = true;
