@@ -74,6 +74,13 @@ void ParticleManager::Finalize() {
 		}
 	}
 	particleGroups_.clear();
+	for (auto& group : parentParticleGroups_) {
+		if (group.second->instancing_) {
+			group.second->instancing_->Unmap(0, nullptr);
+			group.second->instancingData_ = nullptr;
+		}
+	}
+	parentParticleGroups_.clear();
 	for (auto& groupPair : animeGroups_) {
 
 		groupPair.second->lifeTime.clear();
@@ -490,6 +497,16 @@ void ParticleManager::Draw() {
 
 	for (auto& groupPair : particleGroups_) {
 		ParticleGroup* group = groupPair.second.get();
+
+		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group->srvIndex_));
+		dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, group->material_.GetMaterialResource()->GetGPUVirtualAddress());
+		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, group->material_.GetTexture()->gpuHandle);
+
+		dxcommon_->GetCommandList()->DrawIndexedInstanced(6, group->drawCount_, 0, 0, 0);
+	}
+
+	for (auto& groupPair : parentParticleGroups_) {
+		ParentParticleGroup* group = groupPair.second.get();
 
 		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group->srvIndex_));
 		dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, group->material_.GetMaterialResource()->GetGPUVirtualAddress());
