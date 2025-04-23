@@ -234,6 +234,19 @@ void ParticleManager::Update() {
 
 					break;
 				}
+				case BillBoardPattern::kXYBillBoard: {
+					Matrix4x4 xyBillboardMatrix = billboardMatrix;
+					xyBillboardMatrix.m[0][1] = 0.0f; // X軸成分をゼロにする
+					xyBillboardMatrix.m[2][1] = 0.0f; // Z軸成分をゼロにする
+					xyBillboardMatrix.m[1][0] = 0.0f; // Y軸成分をゼロにする
+					xyBillboardMatrix.m[2][0] = 0.0f; // Z軸成分をゼロにする
+
+					worldMatrix = Multiply(MakeScaleMatrix(particle.transform_.scale), MakeRotateXYZMatrix({ particle.transform_.rotate.x,0.0f,particle.transform_.rotate.z }));
+					worldMatrix = Multiply(worldMatrix, xyBillboardMatrix);
+					worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform_.translate));
+
+					break;
+				}
 				default:
 					break;
 				}
@@ -399,6 +412,19 @@ void ParticleManager::Update() {
 
 					worldMatrix = Multiply(MakeScaleMatrix(particle.transform_.scale), MakeRotateXYZMatrix({ particle.transform_.rotate.x,particle.transform_.rotate.y,0.0f }));
 					worldMatrix = Multiply(worldMatrix, zBillboardMatrix);
+					worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform_.translate));
+
+					break;
+				}
+				case BillBoardPattern::kXYBillBoard: {
+					Matrix4x4 xyBillboardMatrix = billboardMatrix;
+					xyBillboardMatrix.m[0][1] = 0.0f; // X軸成分をゼロにする
+					xyBillboardMatrix.m[2][1] = 0.0f; // Z軸成分をゼロにする
+					xyBillboardMatrix.m[1][0] = 0.0f; // Y軸成分をゼロにする
+					xyBillboardMatrix.m[2][0] = 0.0f; // Z軸成分をゼロにする
+
+					worldMatrix = Multiply(MakeScaleMatrix(particle.transform_.scale), MakeRotateXYZMatrix({ particle.transform_.rotate.x,0.0f,particle.transform_.rotate.z }));
+					worldMatrix = Multiply(worldMatrix, xyBillboardMatrix);
 					worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform_.translate));
 
 					break;
