@@ -670,8 +670,8 @@ void ParticleManager::CreateParentParticleGroup(const std::string& name, const s
 
 	ParticleManager* instance = GetInstance();
 
-	auto iterator = instance->particleGroups_.find(name);
-	if (iterator != instance->particleGroups_.end()) {
+	auto iterator = instance->parentParticleGroups_.find(name);
+	if (iterator != instance->parentParticleGroups_.end()) {
 		return;
 	}
 
