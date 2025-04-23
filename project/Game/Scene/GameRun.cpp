@@ -35,12 +35,23 @@ void GameRun::Initialize() {
 	pManager_->CreateParticleGroup("sphere", "redCircle.png");
 	pManager_->CreateParticleGroup("sphere2", "defaultParticle.png");
 	pManager_->CreateParticleGroup("sphere3", "blueParticle.png");
+	pManager_->CreateParticleGroup("ChargeEffect1", "redCircle.png", 40);
+	pManager_->CreateParticleGroup("ChargeEffect2", "redCircle.png", 40);
+	pManager_->CreateParticleGroup("ChargeEffect3", "redCircle.png", 40);
+	pManager_->CreateParticleGroup("ChargeLight", "redCircle.png", 40);
+	pManager_->CreateParticleGroup("ChargeRay", "chargeRay.png", 20);
+	pManager_->CreateParticleGroup("ChargeWave", "chargeCircle.png", 10);
+	pManager_->CreateParticleGroup("ChargeCircle", "chargeCircle.png", 10);
+
 
 	// playerBullet用
 	pManager_->CreateParentParticleGroup("ChargeEffect1", "redCircle.png",40);
 	pManager_->CreateParentParticleGroup("ChargeEffect2", "redCircle.png",40);
 	pManager_->CreateParentParticleGroup("ChargeEffect3", "redCircle.png",40);
 	pManager_->CreateParentParticleGroup("ChargeLight", "redCircle.png",40);
+	pManager_->CreateParentParticleGroup("ChargeRay", "chargeRay.png", 20);
+	pManager_->CreateParentParticleGroup("ChargeWave", "chargeCircle.png", 10);
+	pManager_->CreateParentParticleGroup("ChargeCircle", "chargeCircle.png", 10);
 
 
 	pManager_->CreateAnimeGroup("animetest", "uvChecker.png");

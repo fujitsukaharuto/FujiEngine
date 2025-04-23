@@ -13,12 +13,21 @@ PlayerAttackRoot::PlayerAttackRoot(Player* pPlayer) : BasePlayerAttackBehavior(p
 	ParticleManager::LoadParentGroup(charge2_, "ChargeEffect2");
 	ParticleManager::LoadParentGroup(charge3_, "ChargeEffect3");
 	ParticleManager::LoadParentGroup(chargeLight_, "ChargeLight");
+	ParticleManager::LoadParentGroup(chargeRay_, "ChargeRay");
+	ParticleManager::LoadParentGroup(chargeWave_, "ChargeWave");
+	ParticleManager::LoadParentGroup(chargeCircle_, "ChargeCircle");
 
 
 	charge1_->SetParent(pPlayer_->GetModel());
 	charge2_->SetParent(pPlayer_->GetModel());
 	charge3_->SetParent(pPlayer_->GetModel());
 	chargeLight_->SetParent(pPlayer_->GetModel());
+	chargeRay_->SetParent(pPlayer_->GetModel());
+	chargeWave_->SetParent(pPlayer_->GetModel());
+	chargeCircle_->SetParent(pPlayer_->GetModel());
+
+	chargeRay_->frequencyTime_ = 0.0f;
+	chargeWave_->frequencyTime_ = 0.0f;
 
 }
 
@@ -35,6 +44,7 @@ void PlayerAttackRoot::Update() {
 
 		if (Input::GetInstance()->TriggerKey(DIK_J)) {
 			pPlayer_->InitBullet();
+			chargeTime_ = 0.0f;
 			step_ = Step::CHAREGE;
 			break;
 		}
@@ -62,6 +72,8 @@ void PlayerAttackRoot::Update() {
 		}
 		if (chargeTime_ >= pPlayer_->GetMaxChargeTime()) {
 			step_ = Step::STRONGSHOT;
+			chargeRay_->Emit();
+			chargeWave_->Emit();
 		}
 
 		break;
@@ -71,6 +83,7 @@ void PlayerAttackRoot::Update() {
 		charge2_->Emit();
 		charge3_->Emit();
 		chargeLight_->Emit();
+		chargeCircle_->Emit();
 
 		if (!Input::GetInstance()->PushKey(DIK_J)) {
 			step_ = Step::ROOT;

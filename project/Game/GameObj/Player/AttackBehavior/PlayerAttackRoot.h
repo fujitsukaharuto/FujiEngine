@@ -26,5 +26,8 @@ private:
 	ParticleEmitter* charge2_;
 	ParticleEmitter* charge3_;
 	ParticleEmitter* chargeLight_;
+	ParticleEmitter* chargeRay_;
+	ParticleEmitter* chargeWave_;
+	ParticleEmitter* chargeCircle_;
 
 };
