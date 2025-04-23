@@ -74,7 +74,8 @@ void ParticleEmitter::DebugGUI() {
 					ImGui::RadioButton("XYZ", &billPattern, 0); ImGui::SameLine();
 					ImGui::RadioButton("X", &billPattern, 1); ImGui::SameLine();
 					ImGui::RadioButton("Y", &billPattern, 2); ImGui::SameLine();
-					ImGui::RadioButton("Z", &billPattern, 3);
+					ImGui::RadioButton("Z", &billPattern, 3); ImGui::SameLine();
+					ImGui::RadioButton("XY", &billPattern, 4);
 					grain_.pattern_ = static_cast<BillBoardPattern>(billPattern);
 				}
 				ImGui::TreePop();
@@ -247,8 +248,11 @@ void ParticleEmitter::Emit() {
 			if (grain_.speedType_ == static_cast<int>(SpeedType::kCenter)) {
 				Vector3 rPos = pos_;
 				rPos = Transform(rPos, parentRotationOnly);
-				grain_.speed_ = (rPos - (posAddSize + rPos)) * grain_.returnPower_;
-
+				if (grain_.isParent_) {
+					grain_.speed_ = (rPos - (posAddSize + rPos)) * grain_.returnPower_;
+				} else {
+					grain_.speed_ = (rPos - posAddSize) * grain_.returnPower_;
+				}
 			}
 
 			if (grain_.isParent_) {

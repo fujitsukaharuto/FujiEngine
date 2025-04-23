@@ -30,6 +30,7 @@ enum class BillBoardPattern {
 	kXBillBoard,
 	kYBillBoard,
 	kZBillBoard,
+	kXYBillBoard,
 };
 
 class Particle {
