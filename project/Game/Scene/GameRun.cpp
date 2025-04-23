@@ -24,6 +24,8 @@ void GameRun::Initialize() {
 	modelManager_->LoadOBJ("suzanne.obj");
 	modelManager_->LoadOBJ("Fence.obj");
 	modelManager_->LoadOBJ("terrain.obj");
+	modelManager_->LoadOBJ("skydome.obj");
+	modelManager_->LoadOBJ("playerModel.obj");
 	modelManager_->LoadGLTF("AnimatedCube.gltf");
 	modelManager_->LoadGLTF("walk.gltf");
 	modelManager_->LoadGLTF("sneakWalk.gltf");
@@ -40,8 +42,10 @@ void GameRun::Initialize() {
 	pManager_->CreateParticleGroup("ChargeEffect3", "redCircle.png", 40);
 	pManager_->CreateParticleGroup("ChargeLight", "redCircle.png", 40);
 	pManager_->CreateParticleGroup("ChargeRay", "chargeRay.png", 20);
-	pManager_->CreateParticleGroup("ChargeWave", "chargeCircle.png", 10);
-	pManager_->CreateParticleGroup("ChargeCircle", "chargeCircle.png", 10);
+	pManager_->CreateParticleGroup("ChargeWave", "chargeCircle.png", 2);
+	pManager_->CreateParticleGroup("ChargeCircle", "chargeCircle.png", 2);
+	pManager_->CreateParticleGroup("BulletTrajectory", "redCircle.png", 300);
+	pManager_->CreateParticleGroup("BulletTrajectory2", "redCircle.png",300);
 
 
 	// playerBullet用

@@ -2,6 +2,7 @@
 #include "Game/OriginGameObject.h"
 #include "Game/Collider/AABBCollider.h"
 
+#include "Engine/Particle/ParticleEmitter.h"
 
 class PlayerBullet : public OriginGameObject {
 public:
@@ -24,6 +25,7 @@ public:
 	//========================================================================*/
 	//* Charge
 	void Charge(const Vector3& pos, const Vector3& rot);
+	void StrnghtBullet();
 
 	//========================================================================*/
 	//* Release
@@ -42,8 +44,12 @@ private:
 
 	std::unique_ptr<AABBCollider> collider_;
 
+	ParticleEmitter trajectory;
+	ParticleEmitter trajectory2;
+
 	bool isLive_ = false;
 	bool isCharge_ = false;
+	bool isStrnght_ = false;
 
 	Vector3 velocity_;
 	float speed_;

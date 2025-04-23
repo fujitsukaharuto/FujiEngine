@@ -45,6 +45,7 @@ void ParticleEmitter::DebugGUI() {
 					ImGui::ColorEdit4("ColorMin", &para_.colorMin.x);
 				}
 				ImGui::Checkbox("IsColorFade", &grain_.isColorFade_);
+				ImGui::Checkbox("IsColorFadeIn", &grain_.isColorFadeIn_);
 				ImGui::TreePop();
 			}
 

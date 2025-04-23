@@ -324,8 +324,20 @@ void ParticleManager::Update() {
 			SizeType sizeType = SizeType(particle.type_);
 			float t = (1.0f - float(float(particle.lifeTime_) / float(particle.startLifeTime_)));
 
+			float halfLife = particle.startLifeTime_ * 0.5f;
+			if (particle.isColorFadeIn_) {
+				if (halfLife < particle.lifeTime_) {
+					float lifeTime = particle.lifeTime_ * 0.5f;
+					float tFadeIn = (1.0f - float(float(lifeTime) / float(halfLife)));
+					particle.color_.w = Lerp(0.0f, particle.startAlpha_, 1.0f - (1.0f * tFadeIn) * (1.0f * tFadeIn));
+				}
+			}
 			if (particle.isColorFade_) {
-				particle.color_.w = Lerp(particle.startAlpha_, 0.0f, t * t);
+				if (halfLife > particle.lifeTime_) {
+					float lifeTime = particle.lifeTime_;
+					float tFade = (1.0f - float(float(lifeTime) / float(halfLife)));
+					particle.color_.w = Lerp(particle.startAlpha_, 0.0f, tFade * tFade);
+				}
 			}
 
 			switch (sizeType) {

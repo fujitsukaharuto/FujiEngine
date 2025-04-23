@@ -26,6 +26,8 @@ PlayerAttackRoot::PlayerAttackRoot(Player* pPlayer) : BasePlayerAttackBehavior(p
 	chargeWave_->SetParent(pPlayer_->GetModel());
 	chargeCircle_->SetParent(pPlayer_->GetModel());
 
+	chargeCircle_->grain_.isColorFadeIn_ = true;
+
 	chargeRay_->frequencyTime_ = 0.0f;
 	chargeWave_->frequencyTime_ = 0.0f;
 
@@ -74,6 +76,7 @@ void PlayerAttackRoot::Update() {
 			step_ = Step::STRONGSHOT;
 			chargeRay_->Emit();
 			chargeWave_->Emit();
+			pPlayer_->StrngthBullet();
 		}
 
 		break;

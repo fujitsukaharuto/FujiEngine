@@ -73,6 +73,7 @@ public:
 	Vector4 color_ = { 1.0f,1.0f,1.0f,1.0f };
 	float startAlpha_ = 1.0f;
 	bool isColorFade_ = true;
+	bool isColorFadeIn_ = false;
 
 	//========================================================================*/
 	//* BillBoard

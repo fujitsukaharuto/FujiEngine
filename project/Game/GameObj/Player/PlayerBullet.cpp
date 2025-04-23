@@ -1,5 +1,6 @@
 #include "PlayerBullet.h"
 
+#include "Engine/Particle/ParticleManager.h"
 #include "Engine/Math/Quaternion/Quaternion.h"
 
 PlayerBullet::PlayerBullet() {
@@ -14,29 +15,54 @@ void PlayerBullet::Initialize() {
 	collider_->SetCollisionStayCallback([this](const ColliderInfo& other) {OnCollisionStay(other); });
 	collider_->SetCollisionExitCallback([this](const ColliderInfo& other) {OnCollisionExit(other); });
 
+	ParticleManager::Load(trajectory, "BulletTrajectory");
+	ParticleManager::Load(trajectory2, "BulletTrajectory2");
+
+	trajectory.SetParent(model_.get());
+	trajectory2.SetParent(model_.get());
+
+	trajectory.pos_ = { 0.0f,0.0f,0.0f };
+	trajectory2.pos_ = { 0.6f,0.0f,0.6f };
+
+
 }
 
 void PlayerBullet::Update() {
 
-	model_->transform.translate += (velocity_ * speed_) * FPSKeeper::DeltaTime();
+	if (isLive_) {
+		model_->transform.translate += (velocity_ * speed_) * FPSKeeper::DeltaTime();
 
-	collider_->SetPos(model_->GetWorldPos());
+		collider_->SetPos(model_->GetWorldPos());
+	}
 }
 
 void PlayerBullet::Draw(Material* mate) {
-	OriginGameObject::Draw(mate);
+	if (isLive_) {
+		OriginGameObject::Draw(mate);
+	}
 }
 
 void PlayerBullet::InitParameter(const Vector3& pos) {
 	isLive_ = true;
 	isCharge_ = true;
-	model_->transform.scale = Vector3::FillVec(0.1f);
+	isStrnght_ = false;
+	collider_->SetWidth(0.3f);
+	collider_->SetDepth(0.3f);
+	collider_->SetHeight(0.3f);
+	trajectory.pos_ = { 0.0f,0.0f,0.0f };
+	model_->transform.scale = Vector3::FillVec(0.3f);
 	model_->transform.translate = pos;
 	speed_ = 0.0f;
 	damage_ = 0.0f;
 }
 
 void PlayerBullet::CalculetionFollowVec(const Vector3& target) {
+
+	trajectory.Emit();
+	if (isStrnght_) {
+		trajectory2.Emit();
+	}
+
 	Vector3 currentPos = model_->transform.translate;
 	Vector3 toTarget = (target - currentPos).Normalize();
 	Vector3 forward = velocity_.Normalize();
@@ -46,7 +72,7 @@ void PlayerBullet::CalculetionFollowVec(const Vector3& target) {
 	Quaternion targetRot = Quaternion::LookRotation(toTarget);
 
 	// 補間
-	Quaternion newRot = Quaternion::Slerp(currentRot, targetRot, 0.05f);
+	Quaternion newRot = Quaternion::Slerp(currentRot, targetRot, 0.1f);
 
 	// 回転行列に変換して前方向を取得
 	Matrix4x4 rotMat = newRot.MakeRotateMatrix();
@@ -65,6 +91,9 @@ void PlayerBullet::CalculetionFollowVec(const Vector3& target) {
 
 ///= Collision ================================================================*/
 void PlayerBullet::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
+	if (other.tag == "testBoss") {
+		isLive_ = false;
+	}
 }
 
 void PlayerBullet::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
@@ -80,6 +109,15 @@ void PlayerBullet::Charge(const Vector3& pos, const Vector3& rot) {
 	model_->transform.translate = pos;
 	model_->transform.rotate = rot;
 
+}
+
+void PlayerBullet::StrnghtBullet() {
+	isStrnght_ = true;
+	collider_->SetWidth(0.6f);
+	collider_->SetDepth(0.6f);
+	collider_->SetHeight(0.6f);
+	trajectory.pos_ = { -0.6f,0.0f,-0.6f };
+	model_->transform.scale = Vector3::FillVec(0.6f);
 }
 
 ///= Release ==================================================================*/

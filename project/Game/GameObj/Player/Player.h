@@ -45,6 +45,7 @@ public:
 	//* Bullet
 	void InitBullet();
 	void ReleaseBullet();
+	void StrngthBullet();
 
 	//========================================================================*/
 	//* Getter
@@ -56,10 +57,13 @@ public:
 	bool GetIsFall() { return isFall_; }
 	BaseCollider* GetCollider() { return collider_.get(); }
 
+	PlayerBullet* GetPlayerBullet() { return bullet_.get(); }
+
 	//========================================================================*/
 	//* Setter
 	void SetFallSpeed(float speed) { fallSpeed_ = speed; }
 	void SetIsFall(bool is) { isFall_ = is; }
+	void SetTargetPos(const Vector3& pos) { targetPos_ = pos; }
 
 private:
 
@@ -71,7 +75,10 @@ private:
 	std::unique_ptr<BasePlayerAttackBehavior> attackBehavior_ = nullptr;
 	std::unique_ptr<PlayerBullet> bullet_ = nullptr;
 
+	std::unique_ptr<Object3d> shadow_;
 	std::unique_ptr<AABBCollider> collider_;
+
+	Vector3 targetPos_;
 
 	float moveSpeed_;
 	float jumpSpeed_;

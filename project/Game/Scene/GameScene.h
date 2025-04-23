@@ -2,6 +2,9 @@
 #include "Scene/BaseScene.h"
 #include "Game/GameObj/FollowCamera.h"
 #include "Game/GameObj/Player/Player.h"
+#include "Game/TestBaseObj.h"
+#include "Game/Collider/CollisionManager.h"
+
 
 class GameScene :public BaseScene {
 public:
@@ -21,12 +24,14 @@ private:
 	void ApplyGlobalVariables();//値読み込みテスト用今度Objectクラス作って継承で使えるようにする
 
 	std::unique_ptr<Object3dCommon> obj3dCommon = nullptr;
+	std::unique_ptr<CollisionManager> cMane_;
 
 	std::unique_ptr<Object3d> terrain = nullptr;
+	std::unique_ptr<Object3d> skydome_ = nullptr;
 	std::unique_ptr<Player> player_ = nullptr;
 	std::unique_ptr<FollowCamera> followCamera_;
 
-	std::unique_ptr<Object3d> sphere_ = nullptr;
+	std::unique_ptr<TestBaseObj> sphere_ = nullptr;
 
 	std::unique_ptr<Material> mate = nullptr;
 

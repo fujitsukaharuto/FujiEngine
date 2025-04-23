@@ -3,6 +3,7 @@
 #include "GlobalVariables.h"
 #include "FPSKeeper.h"
 #include "Game/GameObj/FollowCamera.h"
+#include "Game/GameObj/Player/PlayerBullet.h"
 
 #include "Particle/ParticleManager.h"
 #include "Scene/SceneManager.h"
@@ -42,6 +43,13 @@ void GameScene::Initialize() {
 
 	terrain = std::make_unique<Object3d>();
 	terrain->Create("terrain.obj");
+	terrain->transform.scale = { 10.0f,10.0f,10.0f };
+	terrain->SetUVScale({ 8.0f,8.0f }, { 0.0f,0.0f });
+
+	skydome_ = std::make_unique<Object3d>();
+	skydome_->Create("skydome.obj");
+	skydome_->transform.scale = { 40.0f,40.0f,40.0f };
+	skydome_->SetLightEnable(LightMode::kLightNone);
 
 	player_ = std::make_unique<Player>();
 	player_->Initialize();
@@ -50,10 +58,8 @@ void GameScene::Initialize() {
 	followCamera_->Initialize();
 	followCamera_->SetTarget(&player_->GetTrans());
 
-	sphere_ = std::make_unique<Object3d>();
-	sphere_->Create("Sphere");
-	sphere_->transform.translate = Vector3(0.0f, 4.0f, 5.0f);
-	sphere_->transform.scale = Vector3(0.5f, 0.5f, 0.5f);
+	sphere_ = std::make_unique<TestBaseObj>();
+	sphere_->Initialize();
 
 	mate = std::make_unique<Material>();
 	mate->SetTextureNamePath("grass.png");
@@ -66,6 +72,8 @@ void GameScene::Initialize() {
 
 	ApplyGlobalVariables();
 
+	cMane_ = std::make_unique<CollisionManager>();
+
 	emit.count_ = 3;
 	emit.frequencyTime_ = 20.0f;
 	emit.name_ = "animetest";
@@ -76,13 +84,19 @@ void GameScene::Initialize() {
 }
 
 void GameScene::Update() {
+
+	cMane_->Reset();
+
 #ifdef _DEBUG
 
 	ApplyGlobalVariables();
 
+	player_->SetTargetPos(sphere_->GetWorldPos());
 	player_->Update();
 
 	followCamera_->Update();
+
+	sphere_->Update();
 
 #endif // _DEBUG
 
@@ -106,6 +120,13 @@ void GameScene::Update() {
 
 	BlackFade();
 
+	cMane_->AddCollider(player_->GetCollider());
+	if (player_->GetPlayerBullet()->GetIsLive()) {
+		cMane_->AddCollider(player_->GetPlayerBullet()->GetCollider());
+	}
+	cMane_->AddCollider(sphere_->GetCollider());
+	cMane_->CheckAllCollision();
+
 	ParticleManager::GetInstance()->Update();
 }
 
@@ -120,6 +141,7 @@ void GameScene::Draw() {
 #pragma region 3Dオブジェクト
 	obj3dCommon->PreDraw();
 	
+	skydome_->Draw();
 	terrain->Draw();
 	player_->Draw();
 

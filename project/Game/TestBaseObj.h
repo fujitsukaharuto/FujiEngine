@@ -35,6 +35,7 @@ private:
 	float omega_;
 	Vector4 color_ = { 1.0f,1.0f,1.0f,1.0f };
 
+	std::unique_ptr<Object3d> shadow_;
 	std::unique_ptr<AABBCollider> collider_ = nullptr;
 	bool isCollider_ = false;
 
@@ -49,12 +50,27 @@ inline TestBaseObj::~TestBaseObj() {
 
 inline void TestBaseObj::Initialize() {
 	OriginGameObject::Initialize();
-	model_->Create("suzanne.obj");
+	model_->Create("Sphere");
+	model_->transform.translate = Vector3(0.0f, 4.0f, 5.0f);
+	model_->transform.scale = Vector3(0.5f, 0.5f, 0.5f);
+
+	shadow_ = std::make_unique<Object3d>();
+	shadow_->Create("Sphere");
+	shadow_->SetColor({ 0.0f,0.0f,0.0f,1.0f });
+	shadow_->SetLightEnable(LightMode::kLightNone);
+	shadow_->transform.translate = model_->transform.translate;
+	shadow_->transform.translate.y = 0.15f;
+	shadow_->transform.scale = { 0.5f,0.1f,0.5f };
+
 	omega_ = 2.0f * std::numbers::pi_v<float> / 300.0f;
 	collider_ = std::make_unique<AABBCollider>();
 	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
 	collider_->SetCollisionStayCallback([this](const ColliderInfo& other) {OnCollisionStay(other); });
 	collider_->SetCollisionExitCallback([this](const ColliderInfo& other) {OnCollisionExit(other); });
+	collider_->SetTag("testBoss");
+	collider_->SetWidth(0.5f);
+	collider_->SetDepth(0.5f);
+	collider_->SetHeight(0.5f);
 }
 
 inline void TestBaseObj::Update() {
@@ -64,6 +80,9 @@ inline void TestBaseObj::Update() {
 }
 
 inline void TestBaseObj::Draw([[maybe_unused]] Material* mate) {
+
+	shadow_->Draw();
+
 	OriginGameObject::Draw(mate);
 }
 

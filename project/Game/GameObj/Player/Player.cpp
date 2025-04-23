@@ -9,7 +9,18 @@ Player::Player() {
 
 void Player::Initialize() {
 	OriginGameObject::Initialize();
-	OriginGameObject::CreateModel("Sphere");
+	OriginGameObject::CreateModel("playerModel.obj");
+
+	model_->transform.translate.y = 1.0f;
+	model_->transform.translate.z = -10.0f;
+
+	shadow_ = std::make_unique<Object3d>();
+	shadow_->Create("Sphere");
+	shadow_->SetColor({ 0.0f,0.0f,0.0f,1.0f });
+	shadow_->SetLightEnable(LightMode::kLightNone);
+	shadow_->transform.translate = model_->transform.translate;
+	shadow_->transform.translate.y = 0.15f;
+	shadow_->transform.scale.y = 0.1f;
 
 	moveSpeed_ = 0.2f;
 	jumpSpeed_ = 0.2f;
@@ -44,13 +55,14 @@ void Player::Update() {
 			Vector3 targetPos = model_->transform.translate + worldForward;
 			bullet_->Charge(targetPos, model_->transform.rotate);
 		} else {
-			bullet_->CalculetionFollowVec(Vector3(0.0f, 4.0f, 5.0f));
+			bullet_->CalculetionFollowVec(targetPos_);
 		}
 
 		bullet_->Update();
-
 	}
 
+	shadow_->transform.translate = model_->transform.translate;
+	shadow_->transform.translate.y = 0.15f;
 	collider_->SetPos(model_->GetWorldPos());
 }
 
@@ -59,6 +71,8 @@ void Player::Draw(Material* mate) {
 	if (bullet_->GetIsLive()) {
 		bullet_->Draw();
 	}
+
+	shadow_->Draw();
 
 	OriginGameObject::Draw(mate);
 }
@@ -119,11 +133,28 @@ void Player::Move(const float& speed) {
 		velocity_ = TransformNormal(velocity_, rotateMatrix);
 		// 位置を更新
 		model_->transform.translate += velocity_;
-		// 目標角度を計算
-		float objectiveAngle_ = std::atan2(velocity_.x, velocity_.z);
-		// 最短角度補間でプレイヤーの回転を更新
-		model_->transform.rotate.y = LerpShortAngle(model_->transform.rotate.y, objectiveAngle_, 0.5f);
 	}
+
+	Vector3 forward = targetPos_ - model_->transform.translate;
+	Quaternion targetRotation = Quaternion::LookRotation(forward); // Y軸を上とした視線方向
+	// 現在の回転（Y軸回転からクォータニオンを構成する）
+	Quaternion currentRotation = Quaternion::AngleAxis(model_->transform.rotate.y, Vector3(0, 1, 0));
+	// 最短経路で補間
+	Quaternion newRotation = Quaternion::Slerp(currentRotation, targetRotation, 0.5f);
+
+	float zRotate_ = 0.0f;
+	if (inputDirection_.x == -1.0f) {
+		zRotate_ = 0.2f;
+	} else if (inputDirection_.x == 1.0f) {
+		zRotate_ = -0.2f;
+	}
+	if (zRotate_ != 0.0f) {
+		Quaternion spinRot = Quaternion::AngleAxis(zRotate_, Vector3(0, 0, 1));
+		newRotation = newRotation * spinRot;
+	}
+	// 新しい回転からY軸角度を抽出（回転更新）
+	model_->transform.rotate = Quaternion::QuaternionToEuler(newRotation);
+
 }
 
 Vector3 Player::GetInputDirection() {
@@ -188,8 +219,8 @@ void Player::Fall(float& speed) {
 	}
 
 	// 着地
-	if (model_->transform.translate.y < 0.0f) {
-		model_->transform.translate.y = 0.0f;
+	if (model_->transform.translate.y < 1.0f) {
+		model_->transform.translate.y = 1.0f;
 		speed = 0.0f;
 		isFall_ = false;
 	}
@@ -213,5 +244,11 @@ void Player::ReleaseBullet() {
 		Matrix4x4 rotateMatrix = MakeRotateYMatrix(model_->transform.rotate.y);
 		Vector3 worldForward = TransformNormal(forward, rotateMatrix);
 		bullet_->Release(0.5f, 10.0f, worldForward);
+	}
+}
+
+void Player::StrngthBullet() {
+	if (bullet_->GetIsLive()) {
+		bullet_->StrnghtBullet();
 	}
 }
