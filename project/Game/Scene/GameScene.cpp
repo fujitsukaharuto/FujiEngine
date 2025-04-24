@@ -43,8 +43,8 @@ void GameScene::Initialize() {
 
 	terrain = std::make_unique<Object3d>();
 	terrain->Create("terrain.obj");
-	terrain->transform.scale = { 10.0f,10.0f,10.0f };
-	terrain->SetUVScale({ 8.0f,8.0f }, { 0.0f,0.0f });
+	terrain->transform.scale = { 30.0f,30.0f,30.0f };
+	terrain->SetUVScale({ 25.0f,25.0f }, { 0.0f,0.0f });
 
 	skydome_ = std::make_unique<Object3d>();
 	skydome_->Create("skydome.obj");

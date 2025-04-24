@@ -135,7 +135,7 @@ void Player::Move(const float& speed) {
 		model_->transform.translate += velocity_;
 	}
 
-	Vector3 forward = targetPos_ - model_->transform.translate;
+	Vector3 forward = (targetPos_ - model_->transform.translate).Normalize();
 	Quaternion targetRotation = Quaternion::LookRotation(forward); // Y軸を上とした視線方向
 	// 現在の回転（Y軸回転からクォータニオンを構成する）
 	Quaternion currentRotation = Quaternion::AngleAxis(model_->transform.rotate.y, Vector3(0, 1, 0));
