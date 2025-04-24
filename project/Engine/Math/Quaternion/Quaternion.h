@@ -99,7 +99,7 @@ public:
 
 		if (dot >= 1.0f - FLT_EPSILON) {
 
-			return (1.0f - t) * q0_0 + t * q1;
+			return ((1.0f - t) * q0_0 + t * q1).Normalize();
 		}
 
 		// なす角を求める

@@ -21,6 +21,9 @@ void PlayerBullet::Initialize() {
 	trajectory.SetParent(model_.get());
 	trajectory2.SetParent(model_.get());
 
+	trajectory.frequencyTime_ = 0.0f;
+	trajectory2.frequencyTime_ = 0.0f;
+
 	trajectory.pos_ = { 0.0f,0.0f,0.0f };
 	trajectory2.pos_ = { 0.6f,0.0f,0.6f };
 
@@ -58,11 +61,6 @@ void PlayerBullet::InitParameter(const Vector3& pos) {
 
 void PlayerBullet::CalculetionFollowVec(const Vector3& target) {
 
-	trajectory.Emit();
-	if (isStrnght_) {
-		trajectory2.Emit();
-	}
-
 	Vector3 currentPos = model_->transform.translate;
 	Vector3 toTarget = (target - currentPos).Normalize();
 	Vector3 forward = velocity_.Normalize();
@@ -87,6 +85,12 @@ void PlayerBullet::CalculetionFollowVec(const Vector3& target) {
 	// スピン回転を補間後のクォータニオンに加える（Z軸にひねる）
 	Quaternion finalRot = newRot * spinRot;
 	model_->transform.rotate = Quaternion::QuaternionToEuler(finalRot);  // オプション：オイラー角に変換して代入
+
+	trajectory.Emit();
+	if (isStrnght_) {
+		trajectory2.Emit();
+	}
+
 }
 
 ///= Collision ================================================================*/

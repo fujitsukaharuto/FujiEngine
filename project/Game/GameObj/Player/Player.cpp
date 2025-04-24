@@ -50,7 +50,7 @@ void Player::Update() {
 
 		if (bullet_->GetIsCharge()) {
 			Vector3 forward = { 0, 0, 1 };
-			Matrix4x4 rotateMatrix = MakeRotateYMatrix(model_->transform.rotate.y);
+			Matrix4x4 rotateMatrix = MakeRotateXYZMatrix(model_->transform.rotate);
 			Vector3 worldForward = TransformNormal(forward, rotateMatrix);
 			Vector3 targetPos = model_->transform.translate + worldForward;
 			bullet_->Charge(targetPos, model_->transform.rotate);
@@ -138,9 +138,10 @@ void Player::Move(const float& speed) {
 	Vector3 forward = (targetPos_ - model_->transform.translate).Normalize();
 	Quaternion targetRotation = Quaternion::LookRotation(forward); // Y軸を上とした視線方向
 	// 現在の回転（Y軸回転からクォータニオンを構成する）
-	Quaternion currentRotation = Quaternion::AngleAxis(model_->transform.rotate.y, Vector3(0, 1, 0));
+	//Quaternion currentRotation = Quaternion::FromEuler(model_->transform.rotate);
 	// 最短経路で補間
-	Quaternion newRotation = Quaternion::Slerp(currentRotation, targetRotation, 0.5f);
+	Quaternion newRotation = targetRotation;
+	//Quaternion newRotation = Quaternion::Slerp(targetRotation, currentRotation, 0.01f); // なんかバグっちゃってる
 
 	float zRotate_ = 0.0f;
 	if (inputDirection_.x == -1.0f) {
@@ -241,7 +242,7 @@ void Player::InitBullet() {
 void Player::ReleaseBullet() {
 	if (bullet_->GetIsLive()) {
 		Vector3 forward = { 0, 0, 1 };
-		Matrix4x4 rotateMatrix = MakeRotateYMatrix(model_->transform.rotate.y);
+		Matrix4x4 rotateMatrix = MakeRotateXYZMatrix(model_->transform.rotate);
 		Vector3 worldForward = TransformNormal(forward, rotateMatrix);
 		bullet_->Release(0.5f, 10.0f, worldForward);
 	}
