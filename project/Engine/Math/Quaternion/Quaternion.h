@@ -199,6 +199,19 @@ public:
 		return MatrixToQuaternion(m);
 	}
 
+	static Quaternion FromEuler(const Vector3& euler) {
+		float pitch = euler.x; // X軸（上下）
+		float yaw = euler.y; // Y軸（左右）
+		float roll = euler.z; // Z軸（ひねり）
+
+		// 必要に応じて順序を変更
+		Quaternion qx = Quaternion::AngleAxis(pitch, Vector3(1, 0, 0));
+		Quaternion qy = Quaternion::AngleAxis(yaw, Vector3(0, 1, 0));
+		Quaternion qz = Quaternion::AngleAxis(roll, Vector3(0, 0, 1));
+
+		return qy * qx * qz; // 例：Yaw → Pitch → Roll
+	}
+
 	static Vector3 QuaternionToEuler(const Quaternion& q) {
 		Vector3 euler;
 
