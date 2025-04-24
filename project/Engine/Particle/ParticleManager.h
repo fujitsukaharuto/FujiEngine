@@ -47,6 +47,7 @@ public:
 		uint32_t drawCount_;
 		ParticleEmitter emitter_;
 		ShapeType shapeType_ = ShapeType::PLANE;
+		bool isSubMode_ = false;
 	};
 
 	struct ParentParticleGroup {
@@ -92,7 +93,7 @@ public:
 	void SelectParticleUpdate();
 	void SelectEmitterSizeDraw();
 
-	static void CreateParticleGroup(const std::string& name, const std::string& fileName, uint32_t count = 20);
+	static void CreateParticleGroup(const std::string& name, const std::string& fileName, uint32_t count = 20, bool subMode = false);
 
 	static void CreateParentParticleGroup(const std::string& name, const std::string& fileName, uint32_t count = 20);
 

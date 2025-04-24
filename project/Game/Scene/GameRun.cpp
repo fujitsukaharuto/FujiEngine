@@ -46,6 +46,12 @@ void GameRun::Initialize() {
 	pManager_->CreateParticleGroup("ChargeCircle", "chargeCircle.png", 2);
 	pManager_->CreateParticleGroup("BulletTrajectory", "redCircle.png", 300);
 	pManager_->CreateParticleGroup("BulletTrajectory2", "redCircle.png",300);
+	
+	pManager_->CreateParticleGroup("bulletHit", "redCircle.png", 100);
+	pManager_->CreateParticleGroup("bulletHit2", "redCircle.png", 100);
+	pManager_->CreateParticleGroup("bulletHit3", "redCircle.png", 100);
+	pManager_->CreateParticleGroup("bulletHitSmoke", "smoke.png", 100);
+	pManager_->CreateParticleGroup("bulletHitCircle", "chargeCircle.png", 10);
 
 
 	// playerBullet用

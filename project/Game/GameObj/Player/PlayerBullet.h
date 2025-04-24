@@ -47,6 +47,13 @@ private:
 	ParticleEmitter trajectory;
 	ParticleEmitter trajectory2;
 
+	ParticleEmitter hit_;
+	ParticleEmitter hit2_;
+	ParticleEmitter hit3_;
+	ParticleEmitter hitSmoke_;
+	ParticleEmitter hitcircle_;;
+
+
 	bool isLive_ = false;
 	bool isCharge_ = false;
 	bool isStrnght_ = false;

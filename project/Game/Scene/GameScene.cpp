@@ -155,7 +155,7 @@ void GameScene::Draw() {
 #pragma region 前景スプライト
 
 	dxcommon_->PreSpriteDraw();
-	test->Draw();
+	//test->Draw();
 	if (blackTime != 0.0f) {
 		black_->Draw();
 	}

@@ -17,7 +17,7 @@ public:
 
 public:
 
-
+	void SetIsSubMode(bool is) { isSubMode_ = is; }
 
 private:
 
@@ -27,5 +27,6 @@ private:
 
 private:
 
+	bool isSubMode_ = false;
 
 };

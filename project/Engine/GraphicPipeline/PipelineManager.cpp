@@ -42,6 +42,7 @@ void PipelineManager::CreatePipeline() {
 	std::unique_ptr<Pipeline> pipeline = nullptr;
 	std::unique_ptr<Line3dPipe> lLine = nullptr;
 	std::unique_ptr<ParticlePipeline> particlePipline = nullptr;
+	std::unique_ptr<ParticlePipeline> particlePiplineSub = nullptr;
 	std::unique_ptr<AnimationPipeline> animationPipline = nullptr;
 	std::unique_ptr<GrayPipeline> grayPipeline = nullptr;
 	std::unique_ptr<MetaBallPipeline> metaballPipeline = nullptr;
@@ -73,6 +74,12 @@ void PipelineManager::CreatePipeline() {
 	particlePipline.reset(new ParticlePipeline());
 	particlePipline->Initialize(dxcommon_);
 	pipelines_.push_back(std::move(particlePipline));
+
+
+	particlePiplineSub.reset(new ParticlePipeline());
+	particlePiplineSub->SetIsSubMode(true);
+	particlePiplineSub->Initialize(dxcommon_);
+	pipelines_.push_back(std::move(particlePiplineSub));
 
 
 	animationPipline.reset(new AnimationPipeline());

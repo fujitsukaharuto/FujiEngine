@@ -28,6 +28,25 @@ void PlayerBullet::Initialize() {
 	trajectory2.pos_ = { 0.6f,0.0f,0.6f };
 
 
+	ParticleManager::Load(hit_, "bulletHit");
+	ParticleManager::Load(hit2_, "bulletHit2");
+	ParticleManager::Load(hit3_, "bulletHit3");
+	ParticleManager::Load(hitSmoke_, "bulletHitSmoke");
+	ParticleManager::Load(hitcircle_, "bulletHitCircle");
+
+	hit_.SetParent(model_.get());
+	hit2_.SetParent(model_.get());
+	hit3_.SetParent(model_.get());
+	hitSmoke_.SetParent(model_.get());
+	hitcircle_.SetParent(model_.get());
+
+	hit_.frequencyTime_ = 0.0f;
+	hit2_.frequencyTime_ = 0.0f;
+	hit3_.frequencyTime_ = 0.0f;
+	hitSmoke_.frequencyTime_ = 0.0f;
+	hitcircle_.frequencyTime_ = 0.0f;
+
+
 }
 
 void PlayerBullet::Update() {
@@ -97,6 +116,13 @@ void PlayerBullet::CalculetionFollowVec(const Vector3& target) {
 void PlayerBullet::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 	if (other.tag == "testBoss") {
 		isLive_ = false;
+		if (isStrnght_) {
+			hitSmoke_.Emit();
+			hitcircle_.Emit();
+			hit3_.Emit();
+		}
+		hit_.Emit();
+		hit2_.Emit();
 	}
 }
 

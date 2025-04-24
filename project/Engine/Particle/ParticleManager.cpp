@@ -542,6 +542,13 @@ void ParticleManager::Draw() {
 	for (auto& groupPair : particleGroups_) {
 		ParticleGroup* group = groupPair.second.get();
 
+		if (group->isSubMode_) {
+			continue;
+		}
+		if (group->drawCount_ == 0) {
+			continue;
+		}
+
 		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group->srvIndex_));
 		dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, group->material_.GetMaterialResource()->GetGPUVirtualAddress());
 		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, group->material_.GetTexture()->gpuHandle);
@@ -551,6 +558,29 @@ void ParticleManager::Draw() {
 
 	for (auto& groupPair : parentParticleGroups_) {
 		ParentParticleGroup* group = groupPair.second.get();
+
+		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group->srvIndex_));
+		dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, group->material_.GetMaterialResource()->GetGPUVirtualAddress());
+		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, group->material_.GetTexture()->gpuHandle);
+
+		dxcommon_->GetCommandList()->DrawIndexedInstanced(6, group->drawCount_, 0, 0, 0);
+	}
+
+	dxcommon_->GetDXCommand()->SetViewAndscissor();
+	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::particleSub);
+	dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vbView);
+	dxcommon_->GetCommandList()->IASetIndexBuffer(&ibView);
+
+	for (auto& groupPair : particleGroups_) {
+		ParticleGroup* group = groupPair.second.get();
+
+		if (!group->isSubMode_) {
+			continue;
+		}
+		if (group->drawCount_ == 0) {
+			continue;
+		}
 
 		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group->srvIndex_));
 		dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, group->material_.GetMaterialResource()->GetGPUVirtualAddress());
@@ -635,7 +665,7 @@ void ParticleManager::SelectEmitterSizeDraw() {
 #endif // _DEBUG
 }
 
-void ParticleManager::CreateParticleGroup(const std::string& name, const std::string& fileName, uint32_t count) {
+void ParticleManager::CreateParticleGroup(const std::string& name, const std::string& fileName, uint32_t count, bool subMode) {
 	ParticleManager* instance = GetInstance();
 
 	auto iterator = instance->particleGroups_.find(name);
@@ -646,6 +676,7 @@ void ParticleManager::CreateParticleGroup(const std::string& name, const std::st
 
 	ParticleGroup* newGroup = new ParticleGroup();
 
+	newGroup->isSubMode_ = subMode;
 	newGroup->emitter_.name_ = name;
 	newGroup->emitter_.Load(name);
 
