@@ -251,6 +251,7 @@ void ParticleEmitter::Emit() {
 				if (grain_.isParent_) {
 					grain_.speed_ = (rPos - (posAddSize + rPos)) * grain_.returnPower_;
 				} else {
+					rPos = pos_ + Vector3{ worldMatrix_.m[3][0], worldMatrix_.m[3][1], worldMatrix_.m[3][2] };
 					grain_.speed_ = (rPos - posAddSize) * grain_.returnPower_;
 				}
 			}
