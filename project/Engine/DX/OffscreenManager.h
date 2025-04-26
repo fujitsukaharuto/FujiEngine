@@ -105,8 +105,11 @@ private:
 	D3D12_RENDER_TARGET_VIEW_DESC offscreenrtvDesc_{};
 	D3D12_CLEAR_VALUE clearColorValue_{};
 	uint32_t offscreenSRVIndex_;
+	uint32_t offscreenIndex_;
 	D3D12_GPU_DESCRIPTOR_HANDLE offTextureHandle_;
 	D3D12_CPU_DESCRIPTOR_HANDLE offTextureHandleCPU_;
+	D3D12_CPU_DESCRIPTOR_HANDLE offTextureUAVHandleCPU_;
+	D3D12_GPU_DESCRIPTOR_HANDLE offTextureUAVHandle_;
 
 
 	ComPtr<ID3D12Resource> grayCSResource_ = nullptr;

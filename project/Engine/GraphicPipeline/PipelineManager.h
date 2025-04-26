@@ -21,6 +21,7 @@ enum class Pipe : int {
 	Thunder,
 	CRT,
 	GrayCS,
+	CRTCS,
 };
 
 

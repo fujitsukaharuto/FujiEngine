@@ -86,35 +86,25 @@ public:
 	void ClearDepthBuffer();
 
 
-	ID3D12Device* GetDevice() const { return device_.Get(); }
-
-	size_t GetBackBufferCount() const { return swapChainDesc_.BufferCount; }
-
-	ID3D12GraphicsCommandList* GetCommandList() const { return command_->GetList(); }
-
 	void OffscreenUpDate();
 	void OffscreenDebugGUI();
 
-	void ReleaseData();
+
+	void TransitionResource(ID3D12Resource* resource, D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after);
+
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(Microsoft::WRL::ComPtr<ID3D12Device> device, size_t sizeInBytes);
-
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
-
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateDepthStencilTextureResource(Microsoft::WRL::ComPtr<ID3D12Device> device, int32_t width, int32_t height);
-
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateOffscreenTextureResource(Microsoft::WRL::ComPtr<ID3D12Device> device, int32_t width, int32_t height, D3D12_CLEAR_VALUE color);
 
-	D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap, uint32_t descriptorSize, uint32_t index);
 
-	D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap, uint32_t descriptorSize, uint32_t index);
-
+	ID3D12Device* GetDevice() const { return device_.Get(); }
+	size_t GetBackBufferCount() const { return swapChainDesc_.BufferCount; }
+	ID3D12GraphicsCommandList* GetCommandList() const { return command_->GetList(); }
 	DXCommand* GetDXCommand() const { return command_.get(); }
-
 	DXCompil* GetDXCompil() const { return compiler_.get(); }
-
 	PipelineManager* GetPipelineManager()const { return pipeManager_; }
-
 	D3D12_CPU_DESCRIPTOR_HANDLE GetRTVHandle() { return rtvHandles_[2]; }
 
 	/*void Tick();*/

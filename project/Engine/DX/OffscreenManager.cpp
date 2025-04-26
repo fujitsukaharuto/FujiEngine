@@ -282,11 +282,19 @@ void OffscreenManager::SettingTexture() {
 
 	SRVManager* srvManager = SRVManager::GetInstance();
 	offscreenSRVIndex_ = srvManager->Allocate();
+	offscreenIndex_ = srvManager->Allocate();
 
 	srvManager->CreateTextureSRV(offscreenSRVIndex_, offscreenrt_.Get(), DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, 1);
 
 	offTextureHandleCPU_ = srvManager->GetCPUDescriptorHandle(offscreenSRVIndex_);
 	offTextureHandle_ = srvManager->GetGPUDescriptorHandle(offscreenSRVIndex_);
+	offTextureUAVHandleCPU_ = srvManager->GetCPUDescriptorHandle(offscreenIndex_);
+	offTextureUAVHandle_ = srvManager->GetGPUDescriptorHandle(offscreenIndex_);
+
+	D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
+	uavDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
+	dxcommon_->GetDevice()->CreateUnorderedAccessView(offscreenrt_.Get(), nullptr, &uavDesc, offTextureUAVHandleCPU_);
 
 
 	baseTex_ = TextureManager::GetInstance()->LoadTexture("Gradient02.jpg");
@@ -303,51 +311,71 @@ void OffscreenManager::Command() {
 	if (isGrayscale_) {
 
 
-		D3D12_RESOURCE_BARRIER offbarrier{};
-		offbarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-		offbarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-		offbarrier.Transition.pResource = offscreenrt_.Get();
-		offbarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-		offbarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
-		dxcommon_->GetCommandList()->ResourceBarrier(1, &offbarrier);
+		dxcommon_->TransitionResource(offscreenrt_.Get(),
+			D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
 
 
-
-		dxcommon_->GetPipelineManager()->SetCSPipeline(Pipe::GrayCS);
-
-		// 3. SRVとUAVをセット
-		dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(0, offTextureHandle_);   // 入力テクスチャ
-		dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(1, outputUAVHandle_);  // 出力テクスチャ
-
-		// 4. 定数バッファ(CBV)をバインド
-		dxcommon_->GetCommandList()->SetComputeRootConstantBufferView(2, grayCSResource_->GetGPUVirtualAddress());    // b0 レジスタ
-
-		// 5. コンピュートシェーダーを実行 (Dispatch)
-		dxcommon_->GetCommandList()->Dispatch(
-			(MyWin::kWindowWidth + 7) / 8,  // スレッドグループ数 (8x8x1の場合)
-			(MyWin::kWindowHeight + 7) / 8,
-			1
-		);
+		ComPtr<ID3D12Resource> ping = offscreenrt_;
+		ComPtr<ID3D12Resource> pong = outputTexture_;
+		bool isUsePing = true;
 
 
-		D3D12_RESOURCE_BARRIER offbarrierB{};
-		offbarrierB.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-		offbarrierB.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-		offbarrierB.Transition.pResource = offscreenrt_.Get();
-		offbarrierB.Transition.StateBefore = D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
-		offbarrierB.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
-		dxcommon_->GetCommandList()->ResourceBarrier(1, &offbarrierB);
+		for (int i = 0; i < 2; i++) {
+			auto inputResource = isUsePing ? ping : pong;
+			auto outputResource = isUsePing ? pong : ping;
+
+			auto inputSRVHandle = isUsePing ? offTextureHandle_ : outputSRVHandle_;
+			auto outputUAVHandle = isUsePing ? outputUAVHandle_ : offTextureUAVHandle_;
 
 
-		D3D12_RESOURCE_BARRIER outputbarrier{};
-		outputbarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-		outputbarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-		outputbarrier.Transition.pResource = outputTexture_.Get();
-		outputbarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
-		outputbarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
-		dxcommon_->GetCommandList()->ResourceBarrier(1, &outputbarrier);
+			if (i != 0) {
+				dxcommon_->TransitionResource(inputResource.Get(),
+					D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+
+				dxcommon_->TransitionResource(outputResource.Get(),
+					D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+			}
 
 
+			if (i == 0) {
+				dxcommon_->GetPipelineManager()->SetCSPipeline(Pipe::GrayCS);
+				// 3. SRVとUAVをセット
+				dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(0, inputSRVHandle);   // 入力テクスチャ
+				dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(1, outputUAVHandle);  // 出力テクスチャ
+				// 4. 定数バッファ(CBV)をバインド
+				dxcommon_->GetCommandList()->SetComputeRootConstantBufferView(2, grayCSResource_->GetGPUVirtualAddress());    // b0 レジスタ
+				// 5. コンピュートシェーダーを実行 (Dispatch)
+				dxcommon_->GetCommandList()->Dispatch(
+					(MyWin::kWindowWidth + 7) / 8,  // スレッドグループ数 (8x8x1の場合)
+					(MyWin::kWindowHeight + 7) / 8,
+					1
+				);
+			}
+			if (i == 1) {
+				dxcommon_->GetPipelineManager()->SetCSPipeline(Pipe::CRTCS);
+				// 3. SRVとUAVをセット
+				dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(0, inputSRVHandle);   // 入力テクスチャ
+				dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(1, outputUAVHandle);  // 出力テクスチャ
+				// 4. 定数バッファ(CBV)をバインド
+				dxcommon_->GetCommandList()->SetComputeRootConstantBufferView(2, cRTResource_->GetGPUVirtualAddress());    // b0 レジスタ
+				// 5. コンピュートシェーダーを実行 (Dispatch)
+				dxcommon_->GetCommandList()->Dispatch(
+					(MyWin::kWindowWidth + 7) / 8,  // スレッドグループ数 (8x8x1の場合)
+					(MyWin::kWindowHeight + 7) / 8,
+					1
+				);
+			}
+
+			isUsePing = !isUsePing;
+		}
+		isUsePing = !isUsePing;
+
+
+		auto finalOutput = isUsePing ? pong : ping;
+		auto finalSRVHandle = isUsePing ? outputSRVHandle_ : offTextureHandle_;
+
+		dxcommon_->TransitionResource(finalOutput.Get(),
+			D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_GENERIC_READ);
 
 		dxcommon_->GetDXCommand()->SetViewAndscissor();
 		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::None);
@@ -355,25 +383,27 @@ void OffscreenManager::Command() {
 		dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		dxcommon_->GetCommandList()->IASetIndexBuffer(&indexGrayBufferView_);
 		dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
-		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, outputSRVHandle_);
+		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, finalSRVHandle);
 		dxcommon_->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
 
-		D3D12_RESOURCE_BARRIER outputbarrierB{};
-		outputbarrierB.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-		outputbarrierB.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-		outputbarrierB.Transition.pResource = outputTexture_.Get();
-		outputbarrierB.Transition.StateBefore = D3D12_RESOURCE_STATE_GENERIC_READ;
-		outputbarrierB.Transition.StateAfter = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
-		dxcommon_->GetCommandList()->ResourceBarrier(1, &outputbarrierB);
+
+		if (isUsePing) {
+			dxcommon_->TransitionResource(ping.Get(),
+				D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_GENERIC_READ);
+
+			dxcommon_->TransitionResource(pong.Get(),
+				D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+		} else {
+			dxcommon_->TransitionResource(pong.Get(),
+				D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+
+			/*dxcommon_->TransitionResource(ping.Get(),
+				D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);*/
+		}
 
 	} else {
-		D3D12_RESOURCE_BARRIER offbarrier{};
-		offbarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-		offbarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-		offbarrier.Transition.pResource = offscreenrt_.Get();
-		offbarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-		offbarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
-		dxcommon_->GetCommandList()->ResourceBarrier(1, &offbarrier);
+		dxcommon_->TransitionResource(offscreenrt_.Get(),
+			D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_GENERIC_READ);
 	}
 
 

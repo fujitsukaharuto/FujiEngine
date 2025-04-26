@@ -259,13 +259,8 @@ void DXCom::SettingTexture() {
 
 
 void DXCom::PreDraw() {
-	D3D12_RESOURCE_BARRIER offbarrier{};
-	offbarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	offbarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	offbarrier.Transition.pResource = offscreen_->GetOffscreenResource().Get();
-	offbarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_GENERIC_READ;
-	offbarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	command_->GetList()->ResourceBarrier(1, &offbarrier);
+	TransitionResource(offscreen_->GetOffscreenResource().Get(),
+		D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
 	SRVManager::GetInstance()->SetDescriptorHeap();
 
@@ -365,22 +360,20 @@ void DXCom::OffscreenDebugGUI() {
 	offscreen_->DebugGUI();
 }
 
-void DXCom::ReleaseData() {
-	/*for (int i = 0; i < particleIndex; i++)
-	{
-		vertexParticleResource_[i]->Release();
-		wvpParticleResource_[i]->Release();
-		materialParticleResource_[i]->Release();
-	}*/
 
-	/*particles.clear();*/
+void DXCom::TransitionResource(ID3D12Resource* resource, D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after) {
+	if (before == after) return;
 
-#ifdef _DEBUG
+	D3D12_RESOURCE_BARRIER barrier{};
+	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	barrier.Transition.pResource = resource;
+	barrier.Transition.StateBefore = before;
+	barrier.Transition.StateAfter = after;
+	barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 
-#endif // _DEBUG
-
+	command_->GetList()->ResourceBarrier(1, &barrier);
 }
-
 
 
 Microsoft::WRL::ComPtr<ID3D12Resource> DXCom::CreateBufferResource(Microsoft::WRL::ComPtr<ID3D12Device> device, size_t sizeInBytes) {
@@ -456,8 +449,10 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DXCom::CreateOffscreenTextureResource(Mic
 	resourceDesc.SampleDesc.Count = 1;
 	resourceDesc.SampleDesc.Quality = 0;
 	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-	resourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
-	//resourceDesc.Flags = D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE;
+	resourceDesc.Flags =
+		D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET |
+		D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+
 	resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
 
 	D3D12_HEAP_PROPERTIES heapProperties{};
@@ -471,16 +466,4 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DXCom::CreateOffscreenTextureResource(Mic
 	assert(SUCCEEDED(hr));
 
 	return resource;
-}
-
-D3D12_CPU_DESCRIPTOR_HANDLE DXCom::GetCPUDescriptorHandle(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap, uint32_t descriptorSize, uint32_t index) {
-	D3D12_CPU_DESCRIPTOR_HANDLE handleCPU = descriptorHeap->GetCPUDescriptorHandleForHeapStart();
-	handleCPU.ptr += (descriptorSize * index);
-	return handleCPU;
-}
-
-D3D12_GPU_DESCRIPTOR_HANDLE DXCom::GetGPUDescriptorHandle(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap, uint32_t descriptorSize, uint32_t index) {
-	D3D12_GPU_DESCRIPTOR_HANDLE handleGPU = descriptorHeap->GetGPUDescriptorHandleForHeapStart();
-	handleGPU.ptr += (descriptorSize * index);
-	return handleGPU;
 }
