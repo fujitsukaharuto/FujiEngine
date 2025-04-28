@@ -137,9 +137,6 @@ private:
 	ComPtr<ID3D12Resource> vertexGrayResource_ = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexGrayBufferView_{};
 	GrayscaleVertex* grayVertexDate_ = nullptr;
-	ComPtr<ID3D12Resource> indexGrayResourece_ = nullptr;
-	D3D12_INDEX_BUFFER_VIEW indexGrayBufferView_{};
-	uint32_t* indexGrayData_ = nullptr;
 	
 
 	ComPtr<ID3D12Resource> outputTexture_;

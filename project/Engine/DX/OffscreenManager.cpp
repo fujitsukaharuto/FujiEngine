@@ -381,10 +381,9 @@ void OffscreenManager::Command() {
 		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::None);
 
 		dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		dxcommon_->GetCommandList()->IASetIndexBuffer(&indexGrayBufferView_);
 		dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
 		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, finalSRVHandle);
-		dxcommon_->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
+		dxcommon_->GetCommandList()->DrawInstanced(3, 1, 0, 0);
 
 
 		if (isUsePing) {
@@ -412,10 +411,9 @@ void OffscreenManager::Command() {
 		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Gauss);
 
 		dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		dxcommon_->GetCommandList()->IASetIndexBuffer(&indexGrayBufferView_);
 		dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
 		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
-		dxcommon_->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
+		dxcommon_->GetCommandList()->DrawInstanced(3, 1, 0, 0);
 	}
 
 	if (isNonePost_ || isMetaBall_) {
@@ -423,10 +421,9 @@ void OffscreenManager::Command() {
 		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::None);
 
 		dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		dxcommon_->GetCommandList()->IASetIndexBuffer(&indexGrayBufferView_);
 		dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
 		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
-		dxcommon_->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
+		dxcommon_->GetCommandList()->DrawInstanced(3, 1, 0, 0);
 	}
 
 	if (isShockWave_) {
@@ -434,11 +431,10 @@ void OffscreenManager::Command() {
 		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::ShockWave);
 
 		dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		dxcommon_->GetCommandList()->IASetIndexBuffer(&indexGrayBufferView_);
 		dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
 		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
 		dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(1, shockResource_->GetGPUVirtualAddress());
-		dxcommon_->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
+		dxcommon_->GetCommandList()->DrawInstanced(3, 1, 0, 0);
 	}
 
 	if (isFire_) {
@@ -446,14 +442,13 @@ void OffscreenManager::Command() {
 		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Fire);
 
 		dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		dxcommon_->GetCommandList()->IASetIndexBuffer(&indexGrayBufferView_);
 		dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
 		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
 		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, baseTex_->gpuHandle);
 		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, voronoTex_->gpuHandle);
 		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(3, noiseTex_->gpuHandle);
 		dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(4, fireResource_->GetGPUVirtualAddress());
-		dxcommon_->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
+		dxcommon_->GetCommandList()->DrawInstanced(3, 1, 0, 0);
 	}
 
 
@@ -462,12 +457,11 @@ void OffscreenManager::Command() {
 		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Thunder);
 
 		dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		dxcommon_->GetCommandList()->IASetIndexBuffer(&indexGrayBufferView_);
 		dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
 		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
 		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, noiseDirTex_->gpuHandle);
 		dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(2, thunderResource_->GetGPUVirtualAddress());
-		dxcommon_->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
+		dxcommon_->GetCommandList()->DrawInstanced(3, 1, 0, 0);
 	}
 
 	if (isCRT_) {
@@ -475,45 +469,27 @@ void OffscreenManager::Command() {
 		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::CRT);
 
 		dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		dxcommon_->GetCommandList()->IASetIndexBuffer(&indexGrayBufferView_);
 		dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
 		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
 		dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(1, cRTResource_->GetGPUVirtualAddress());
-		dxcommon_->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
+		dxcommon_->GetCommandList()->DrawInstanced(3, 1, 0, 0);
 	}
 }
 
 void OffscreenManager::SettingVertex() {
-	vertexGrayResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(GrayscaleVertex) * 6);
+	vertexGrayResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(GrayscaleVertex) * 3);
 
 	vertexGrayBufferView_.BufferLocation = vertexGrayResource_->GetGPUVirtualAddress();
-	vertexGrayBufferView_.SizeInBytes = sizeof(GrayscaleVertex) * 6;
+	vertexGrayBufferView_.SizeInBytes = sizeof(GrayscaleVertex) * 3;
 	vertexGrayBufferView_.StrideInBytes = sizeof(GrayscaleVertex);
 
 	grayVertexDate_ = nullptr;
 	vertexGrayResource_->Map(0, nullptr, reinterpret_cast<void**>(&grayVertexDate_));
 
-	grayVertexDate_[0] = { Vector4(-1.0f,-1.0f,0.0f,1.0f),Vector2(0.0f,1.0f) };
-	grayVertexDate_[1] = { Vector4(-1.0f,1.0f,0.0f,1.0f),Vector2(0.0f,0.0f) };
-	grayVertexDate_[2] = { Vector4(1.0f,1.0f,0.0f,1.0f),Vector2(1.0f,0.0f) };
-	grayVertexDate_[3] = { Vector4(1.0f,-1.0f,0.0f,1.0f),Vector2(1.0f,1.0f) };
-
-
-	indexGrayResourece_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(uint32_t) * 6);
-
-	indexGrayBufferView_.BufferLocation = indexGrayResourece_->GetGPUVirtualAddress();
-	indexGrayBufferView_.SizeInBytes = sizeof(uint32_t) * 6;
-	indexGrayBufferView_.Format = DXGI_FORMAT_R32_UINT;
-
-	indexGrayResourece_->Map(0, nullptr, reinterpret_cast<void**>(&indexGrayData_));
-
-	indexGrayData_[0] = 0;
-	indexGrayData_[1] = 1;
-	indexGrayData_[2] = 2;
-	indexGrayData_[3] = 0;
-	indexGrayData_[4] = 2;
-	indexGrayData_[5] = 3;
-
+	// でっかい三角形をセット
+	grayVertexDate_[0] = { Vector4(-1.0f, -1.0f, 0.0f, 1.0f), Vector2(0.0f, 1.0f) }; // 左下
+	grayVertexDate_[1] = { Vector4(-1.0f, 3.0f, 0.0f, 1.0f), Vector2(0.0f, -1.0f) };  // 左上（画面外へ）
+	grayVertexDate_[2] = { Vector4(3.0f, -1.0f, 0.0f, 1.0f), Vector2(2.0f, 1.0f) };
 
 
 	auto device = dxcommon_->GetDevice();
