@@ -17,7 +17,6 @@ struct AcceleFiled {
 
 enum class ShapeType {
 	PLANE,
-	CIRCLE,
 	RING,
 	SPHERE,
 	TORUS,
@@ -112,7 +111,8 @@ public:
 
 private:
 
-
+	void InitPlaneVertex();
+	void InitRingVertex();
 
 private:
 
@@ -131,6 +131,15 @@ private:
 
 	std::vector<VertexDate> vertex_;
 	std::vector<uint32_t> index_;
+
+	ComPtr<ID3D12Resource> ringVBuffer_;
+	ComPtr<ID3D12Resource> ringIBuffer_;
+	D3D12_VERTEX_BUFFER_VIEW ringVbView{};
+	D3D12_INDEX_BUFFER_VIEW ringIbView{};
+
+	std::vector<VertexDate> ringVertex_;
+	std::vector<uint32_t> ringIndex_;
+
 
 	bool isBillBoard_ = true;
 

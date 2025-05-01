@@ -33,6 +33,7 @@ void GameRun::Initialize() {
 	pManager_->CreateParticleGroup("sphere", "defaultParticle.png");
 	pManager_->CreateParticleGroup("sphere2", "defaultParticle.png");
 	pManager_->CreateParticleGroup("sphere3", "blueParticle.png");
+	pManager_->CreateParticleGroup("ring", "gradationLine.png");
 	pManager_->CreateAnimeGroup("animetest", "uvChecker.png");
 	pManager_->AddAnime("animetest", "white2x2.png", 10.0f);
 #pragma endregion

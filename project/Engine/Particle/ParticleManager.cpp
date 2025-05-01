@@ -24,38 +24,8 @@ void ParticleManager::Initialize(DXCom* pDxcom, SRVManager* srvManager) {
 	srvManager_ = srvManager;
 	this->camera_ = CameraManager::GetInstance()->GetCamera();
 
-	vertex_.push_back({ {-1.0f,1.0f,0.0f,1.0f},{0.0f,0.0f},{0.0f,0.0f,-1.0f} });
-	vertex_.push_back({ {-1.0f,-1.0f,0.0f,1.0f},{0.0f,1.0f},{0.0f,0.0f,-1.0f} });
-	vertex_.push_back({ {1.0f,-1.0f,0.0f,1.0f},{1.0f,1.0f},{0.0f,0.0f,-1.0f} });
-	vertex_.push_back({ {1.0f,1.0f,0.0f,1.0f},{1.0f,0.0f},{0.0f,0.0f,-1.0f} });
-
-	index_.push_back(0);
-	index_.push_back(3);
-	index_.push_back(1);
-
-	index_.push_back(1);
-	index_.push_back(3);
-	index_.push_back(2);
-
-
-	vBuffer_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(VertexDate) * vertex_.size());
-	iBuffer_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(uint32_t) * index_.size());
-
-	VertexDate* vData = nullptr;
-	vBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&vData));
-	std::memcpy(vData, vertex_.data(), sizeof(VertexDate) * vertex_.size());
-
-	vbView.BufferLocation = vBuffer_->GetGPUVirtualAddress();
-	vbView.SizeInBytes = static_cast<UINT>(sizeof(VertexDate) * vertex_.size());
-	vbView.StrideInBytes = static_cast<UINT>(sizeof(VertexDate));
-
-	uint32_t* iData = nullptr;
-	iBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&iData));
-	std::memcpy(iData, index_.data(), sizeof(uint32_t) * index_.size());
-
-	ibView.BufferLocation = iBuffer_->GetGPUVirtualAddress();
-	ibView.Format = DXGI_FORMAT_R32_UINT;
-	ibView.SizeInBytes = static_cast<UINT>(sizeof(uint32_t) * index_.size());
+	InitPlaneVertex();
+	InitRingVertex();
 }
 
 void ParticleManager::Finalize() {
@@ -94,6 +64,8 @@ void ParticleManager::Finalize() {
 
 	vBuffer_.Reset();
 	iBuffer_.Reset();
+	ringVBuffer_.Reset();
+	ringIBuffer_.Reset();
 
 }
 
@@ -145,6 +117,9 @@ void ParticleManager::Update() {
 
 			if (particle.isColorFade_) {
 				particle.color_.w = Lerp(particle.startAlpha_, 0.0f, t * t);
+			}
+			if (particle.isAutoUVMove_) {
+				particle.uvTrans_.x += 0.1f;
 			}
 
 			switch (sizeType) {
@@ -262,6 +237,8 @@ void ParticleManager::Update() {
 			group->instancingData_[particleCount].World = worldMatrix;
 			group->instancingData_[particleCount].WVP = worldViewProjectionMatrix;
 			group->instancingData_[particleCount].color = particle.color_;
+			group->instancingData_[particleCount].uvTrans = particle.uvTrans_;
+			group->instancingData_[particleCount].uvScale = particle.uvScale_;
 
 			particleCount++;
 			group->drawCount_++;
@@ -530,11 +507,63 @@ void ParticleManager::Draw() {
 	for (auto& groupPair : particleGroups_) {
 		ParticleGroup* group = groupPair.second.get();
 
+		if (group->shapeType_ != ShapeType::PLANE) {
+			switch (group->shapeType_) {
+			case ShapeType::PLANE:
+				break;
+			case ShapeType::RING:
+				dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &ringVbView);
+				dxcommon_->GetCommandList()->IASetIndexBuffer(&ringIbView);
+				break;
+			case ShapeType::SPHERE:
+				break;
+			case ShapeType::TORUS:
+				break;
+			case ShapeType::CYLINDER:
+				break;
+			case ShapeType::CONE:
+				break;
+			case ShapeType::TRIANGLE:
+				break;
+			case ShapeType::BOX:
+				break;
+			default:
+				break;
+			}
+		}
+
 		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group->srvIndex_));
 		dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, group->material_.GetMaterialResource()->GetGPUVirtualAddress());
 		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, group->material_.GetTexture()->gpuHandle);
 
-		dxcommon_->GetCommandList()->DrawIndexedInstanced(6, group->drawCount_, 0, 0, 0);
+
+		switch (group->shapeType_) {
+		case ShapeType::PLANE:
+			dxcommon_->GetCommandList()->DrawIndexedInstanced(static_cast<UINT>((index_.size())), group->drawCount_, 0, 0, 0);
+			break;
+		case ShapeType::RING:
+			dxcommon_->GetCommandList()->DrawIndexedInstanced(static_cast<UINT>((ringIndex_.size())), group->drawCount_, 0, 0, 0);
+			break;
+		case ShapeType::SPHERE:
+			break;
+		case ShapeType::TORUS:
+			break;
+		case ShapeType::CYLINDER:
+			break;
+		case ShapeType::CONE:
+			break;
+		case ShapeType::TRIANGLE:
+			break;
+		case ShapeType::BOX:
+			break;
+		default:
+			break;
+		}
+		
+		if (group->shapeType_ != ShapeType::PLANE) {
+			dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vbView);
+			dxcommon_->GetCommandList()->IASetIndexBuffer(&ibView);
+		}
 	}
 
 	for (auto& groupPair : parentParticleGroups_) {
@@ -566,6 +595,11 @@ void ParticleManager::ParticleDebugGUI() {
 		currentKey_ = keys[currentIndex_];
 		// currentKey を使って選択中の ParticleGroup を取得
 		selectParticleGroup_ = particleGroups_[currentKey_].get();
+	}
+	if (selectParticleGroup_) {
+		int shapeType = static_cast<int>(selectParticleGroup_->shapeType_);
+		ImGui::Combo("ShapeType##type", &shapeType, "Plane\0Ring\0");
+		selectParticleGroup_->shapeType_ = static_cast<ShapeType>(shapeType);
 	}
 
 	ImGui::SeparatorText("SelectGroup");
@@ -858,6 +892,9 @@ void ParticleManager::Emit(const std::string& name, const Vector3& pos, const Ve
 				particle.pattern_ = grain.pattern_;
 				particle.colorType_ = grain.colorType_;
 				particle.isColorFade_ = grain.isColorFade_;
+				particle.uvTrans_ = grain.uvTrans_;
+				particle.uvScale_ = grain.uvScale_;
+				particle.isAutoUVMove_ = grain.isAutoUVMove_;
 				switch (particle.colorType_) {
 				case static_cast<int>(ColorType::kDefault):
 					particle.color_ = para.colorMax;
@@ -1071,4 +1108,97 @@ void ParticleManager::AddAnime(const std::string& name, const std::string& fileN
 	} else {
 		return;
 	}
+}
+
+void ParticleManager::InitPlaneVertex() {
+	vertex_.push_back({ {-1.0f,1.0f,0.0f,1.0f},{0.0f,0.0f},{0.0f,0.0f,-1.0f} });
+	vertex_.push_back({ {-1.0f,-1.0f,0.0f,1.0f},{0.0f,1.0f},{0.0f,0.0f,-1.0f} });
+	vertex_.push_back({ {1.0f,-1.0f,0.0f,1.0f},{1.0f,1.0f},{0.0f,0.0f,-1.0f} });
+	vertex_.push_back({ {1.0f,1.0f,0.0f,1.0f},{1.0f,0.0f},{0.0f,0.0f,-1.0f} });
+
+	index_.push_back(0);
+	index_.push_back(3);
+	index_.push_back(1);
+
+	index_.push_back(1);
+	index_.push_back(3);
+	index_.push_back(2);
+
+
+	vBuffer_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(VertexDate) * vertex_.size());
+	iBuffer_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(uint32_t) * index_.size());
+
+	VertexDate* vData = nullptr;
+	vBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&vData));
+	std::memcpy(vData, vertex_.data(), sizeof(VertexDate) * vertex_.size());
+
+	vbView.BufferLocation = vBuffer_->GetGPUVirtualAddress();
+	vbView.SizeInBytes = static_cast<UINT>(sizeof(VertexDate) * vertex_.size());
+	vbView.StrideInBytes = static_cast<UINT>(sizeof(VertexDate));
+
+	uint32_t* iData = nullptr;
+	iBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&iData));
+	std::memcpy(iData, index_.data(), sizeof(uint32_t) * index_.size());
+
+	ibView.BufferLocation = iBuffer_->GetGPUVirtualAddress();
+	ibView.Format = DXGI_FORMAT_R32_UINT;
+	ibView.SizeInBytes = static_cast<UINT>(sizeof(uint32_t) * index_.size());
+}
+
+void ParticleManager::InitRingVertex() {
+
+	const uint32_t kRingDivide = 32;
+	const float kOuterRadius = 1.0f;
+	const float kInnerRadius = 0.2f;
+	const float radianPerDivide = 2.0f * std::numbers::pi_v<float> / float(kRingDivide);
+
+	for (uint32_t i = 0; i <= kRingDivide; i++) {
+		float angle = i * radianPerDivide;
+		float sinA = std::sin(angle);
+		float cosA = std::cos(angle);
+		float u = float(i) / float(kRingDivide);
+
+		// 外周
+		ringVertex_.push_back({ {-sinA * kOuterRadius, cosA * kOuterRadius, 0.0f, 1.0f}, {u, 0.0f}, {0,0,1} });
+		// 内周
+		ringVertex_.push_back({ {-sinA * kInnerRadius, cosA * kInnerRadius, 0.0f, 1.0f}, {u, 1.0f}, {0,0,1} });
+	}
+
+	// インデックス生成
+	for (uint32_t i = 0; i < kRingDivide; i++) {
+		uint32_t outer0 = i * 2;
+		uint32_t inner0 = outer0 + 1;
+		uint32_t outer1 = outer0 + 2;
+		uint32_t inner1 = outer0 + 3;
+
+		// 三角形1
+		ringIndex_.push_back(outer0);
+		ringIndex_.push_back(inner0);
+		ringIndex_.push_back(outer1);
+
+		// 三角形2
+		ringIndex_.push_back(outer1);
+		ringIndex_.push_back(inner0);
+		ringIndex_.push_back(inner1);
+	}
+
+
+	ringVBuffer_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(VertexDate) * ringVertex_.size());
+	ringIBuffer_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(uint32_t) * ringIndex_.size());
+
+	VertexDate* vData = nullptr;
+	ringVBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&vData));
+	std::memcpy(vData, ringVertex_.data(), sizeof(VertexDate) * ringVertex_.size());
+
+	ringVbView.BufferLocation = ringVBuffer_->GetGPUVirtualAddress();
+	ringVbView.SizeInBytes = static_cast<UINT>(sizeof(VertexDate) * ringVertex_.size());
+	ringVbView.StrideInBytes = static_cast<UINT>(sizeof(VertexDate));
+
+	uint32_t* iData = nullptr;
+	ringIBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&iData));
+	std::memcpy(iData, ringIndex_.data(), sizeof(uint32_t) * ringIndex_.size());
+
+	ringIbView.BufferLocation = ringIBuffer_->GetGPUVirtualAddress();
+	ringIbView.Format = DXGI_FORMAT_R32_UINT;
+	ringIbView.SizeInBytes = static_cast<UINT>(sizeof(uint32_t) * ringIndex_.size());
 }

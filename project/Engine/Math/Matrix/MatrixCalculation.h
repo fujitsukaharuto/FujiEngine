@@ -46,6 +46,8 @@ struct TransformationParticleMatrix {
 	Matrix4x4 WVP;
 	Matrix4x4 World;
 	Vector4 color;
+	Vector2 uvTrans = { 0.0f,0.0f };
+	Vector2 uvScale = { 1.0f,1.0f };
 };
 
 struct Materials {
