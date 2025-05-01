@@ -224,6 +224,9 @@
     <ClCompile Include="Game\GameObj\Player\PlayerBullet.cpp">
       <Filter>Game\GameObj\Player</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\GraphicPipeline\CRTCSPipe.cpp">
+      <Filter>Engine\GraphicPipeline</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -493,6 +496,9 @@
     <ClInclude Include="Game\GameObj\Player\PlayerBullet.h">
       <Filter>Game\GameObj\Player</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\GraphicPipeline\CRTCSPipe.h">
+      <Filter>Engine\GraphicPipeline</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -673,6 +679,9 @@
     </FxCompile>
     <FxCompile Include="resource\Shaders\SkinningObject3d.PS.hlsl">
       <Filter>resource\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\CS\CRTEffect.CS.hlsl">
+      <Filter>resource\Shaders\CS</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>

@@ -72,7 +72,10 @@ public:
 	int colorType_ = static_cast<int>(ColorType::kDefault);
 	Vector4 color_ = { 1.0f,1.0f,1.0f,1.0f };
 	float startAlpha_ = 1.0f;
+	Vector2 uvTrans_ = { 0.0f,0.0f };
+	Vector2 uvScale_ = { 1.0f,1.0f };
 	bool isColorFade_ = true;
+	bool isAutoUVMove_ = false;
 	bool isColorFadeIn_ = false;
 
 	//========================================================================*/

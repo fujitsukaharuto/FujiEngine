@@ -14,6 +14,7 @@
 #include "ThunderPipe.h"
 #include "CRTPipe.h"
 #include "GrayCSPipe.h"
+#include "CRTCSPipe.h"
 
 
 PipelineManager::~PipelineManager() {
@@ -53,6 +54,7 @@ void PipelineManager::CreatePipeline() {
 	std::unique_ptr<ThunderPipe> thunderPipe = nullptr;
 	std::unique_ptr<CRTPipe> crtPipe = nullptr;
 	std::unique_ptr<GrayCSPipe> grayCS = nullptr;
+	std::unique_ptr<CRTCSPipe> crtCS = nullptr;
 
 
 
@@ -122,6 +124,10 @@ void PipelineManager::CreatePipeline() {
 	grayCS.reset(new GrayCSPipe);
 	grayCS->Initialize(dxcommon_);
 	pipelines_.push_back(std::move(grayCS));
+
+	crtCS.reset(new CRTCSPipe);
+	crtCS->Initialize(dxcommon_);
+	pipelines_.push_back(std::move(crtCS));
 
 }
 
