@@ -430,6 +430,8 @@ void ParticleManager::Update() {
 			group->instancingData_[particleCount].World = worldMatrix;
 			group->instancingData_[particleCount].WVP = worldViewProjectionMatrix;
 			group->instancingData_[particleCount].color = particle.color_;
+			group->instancingData_[particleCount].uvTrans = particle.uvTrans_;
+			group->instancingData_[particleCount].uvScale = particle.uvScale_;
 
 			particleCount++;
 			group->drawCount_++;
