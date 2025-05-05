@@ -45,9 +45,9 @@ float2 crt(float2 coord, float bend)
 float3 sampleSplit(Texture2D tex, float2 coord)
 {
     float3 frag;
-    frag.r = tex.Sample(samplerState, float2(coord.x - 0.005 * sin(iTime), coord.y)).r;
+    frag.r = tex.Sample(samplerState, float2(coord.x - 0.002 * sin(iTime), coord.y)).r;
     frag.g = tex.Sample(samplerState, float2(coord.x, coord.y)).g;
-    frag.b = tex.Sample(samplerState, float2(coord.x + 0.005 * sin(iTime), coord.y)).b;
+    frag.b = tex.Sample(samplerState, float2(coord.x + 0.002 * sin(iTime), coord.y)).b;
     return frag;
 }
 
