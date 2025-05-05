@@ -27,17 +27,22 @@ float3 scanline(float2 coord, float3 screen)
 
 float2 crt(float2 coord, float bend)
 {
-    //// 中心座標系に変換
-    //coord = (coord - 0.5) * 2.0;
+    // 中心座標系に変換
+    coord = (coord - 0.5) * 2.0;
 
-    //coord *= 1.1;
+    // 極座標に変換
+    float tht = atan2(coord.y, coord.x);
+    float r = length(coord);
 
-    //// 座標の変形
-    //coord.x *= 1.0 + pow(abs(coord.y) / bend, 2.0);
-    //coord.y *= 1.0 + pow(abs(coord.x) / bend, 2.0);
+    // 中心を歪めない非線形変形
+    r /= (1.0 - 0.1 * r * r);
 
-    //// 0.0 - 1.0 の空間に戻す
-    //coord = (coord / 2.0) + 0.5;
+    // 歪みを反映した新しい座標
+    coord.x = r * cos(tht);
+    coord.y = r * sin(tht);
+
+    // 0.0 - 1.0 の空間に戻す
+    coord = (coord / 2.0) + 0.5;
 
     return coord;
 }
@@ -45,19 +50,19 @@ float2 crt(float2 coord, float bend)
 float3 sampleSplit(Texture2D tex, float2 coord)
 {
     float3 frag;
-    frag.r = tex.Sample(samplerState, float2(coord.x - 0.002 * sin(iTime), coord.y)).r;
+    frag.r = tex.Sample(samplerState, float2(coord.x - 0.0035 * sin(iTime), coord.y)).r;
     frag.g = tex.Sample(samplerState, float2(coord.x, coord.y)).g;
-    frag.b = tex.Sample(samplerState, float2(coord.x + 0.002 * sin(iTime), coord.y)).b;
+    frag.b = tex.Sample(samplerState, float2(coord.x + 0.0035 * sin(iTime), coord.y)).b;
     return frag;
 }
 
 float4 main(VS_OUTPUT input) : SV_Target
 {
-    float2 crtCoords = crt(input.uv, 3.2);
+    float2 crtCoords = crt(input.uv, 4.0);
 
     // テクスチャ範囲外をチェック
     if (crtCoords.x < 0.0 || crtCoords.x > 1.0 || crtCoords.y < 0.0 || crtCoords.y > 1.0)
-        discard;
+        return float4(0.0, 0.0, 0.0, 1.0);
 
     // 色チャネルを分割
     float3 color = sampleSplit(iChannel0, crtCoords);
@@ -66,5 +71,10 @@ float4 main(VS_OUTPUT input) : SV_Target
     float2 screenSpace = crtCoords * iResolution.xy;
     color = scanline(screenSpace, color);
 
+    float2 centeredUV = input.uv - 0.5;
+    float vignette = 1.0 - dot(centeredUV, centeredUV) * 2.2;
+    vignette = saturate(pow(vignette, 1.5)); // 減光の強さ調整
+    color *= vignette;
+    
     return float4(color, 1.0);
 }
