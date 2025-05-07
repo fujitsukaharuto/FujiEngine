@@ -3,6 +3,7 @@
 #include "DXCom.h"
 #include "LightManager.h"
 #include "CameraManager.h"
+#include "Engine/ImGuiManager/ImGuiManager.h"
 
 Object3d::Object3d() {
 	dxcommon_ = ModelManager::GetInstance()->ShareDXCom();
@@ -78,6 +79,26 @@ Vector3 Object3d::GetWorldPos() const {
 }
 
 
+
+void Object3d::DebugGUI() {
+#ifdef _DEBUG
+	ImGui::Indent();
+	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Selected;
+	if (ImGui::TreeNodeEx("Trans",flags)) {
+	ImGui::DragFloat3("position", &transform.translate.x, 0.01f);
+	ImGui::DragFloat3("rotate", &transform.rotate.x, 0.01f);
+	ImGui::DragFloat3("scale", &transform.scale.x, 0.01f);
+		ImGui::TreePop();
+	}
+	if (ImGui::TreeNodeEx("color",flags)) {
+		Vector4 color = model_->GetColor(0);
+		ImGui::ColorEdit4("color", &color.x);
+		SetColor(color);
+		ImGui::TreePop();
+	}
+	ImGui::Unindent();
+#endif // _DEBUG
+}
 
 void Object3d::SetColor(const Vector4& color) {
 	model_->SetColor(color);

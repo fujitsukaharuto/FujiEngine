@@ -35,6 +35,10 @@ public:
 
 	std::string GetTextuerName() { return nowTextuer; }
 
+	int GetMaterialSize() { return int(material_.size()); }
+
+	Vector4 GetColor(int index) { return material_[index].GetColor(); }
+
 	void SetLightEnable(LightMode mode);
 
 	ModelData data_;

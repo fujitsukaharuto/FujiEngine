@@ -14,6 +14,7 @@ public:
 	void Initialize()override;
 	void Update()override;
 	void Draw(Material* mate = nullptr)override;
+	void DebugGUI()override;
 
 	void OnCollisionEnter(const ColliderInfo& other);
 	void OnCollisionStay(const ColliderInfo& other);
@@ -84,6 +85,17 @@ inline void TestBaseObj::Draw([[maybe_unused]] Material* mate) {
 	shadow_->Draw();
 
 	OriginGameObject::Draw(mate);
+}
+
+inline void TestBaseObj::DebugGUI() {
+#ifdef _DEBUG
+	if (ImGui::CollapsingHeader(name_.c_str())) {
+		OriginGameObject::DebugGUI();
+		collider_->SetPos(model_->GetWorldPos());
+
+		collider_->DebugGUI();
+	}
+#endif // _DEBUG
 }
 
 inline void TestBaseObj::OnCollisionEnter([[maybe_unused]]const ColliderInfo& other) {

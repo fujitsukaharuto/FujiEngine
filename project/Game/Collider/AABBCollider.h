@@ -10,6 +10,8 @@ public:
 
 public:
 
+	void DebugGUI();
+
 	// stateによって呼び出す関数を決める
 	void OnCollision(const ColliderInfo& other);
 

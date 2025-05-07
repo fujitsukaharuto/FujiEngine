@@ -167,6 +167,13 @@ void GameScene::DebugGUI() {
 #ifdef _DEBUG
 	ImGui::Indent();
 	
+	if (ImGui::CollapsingHeader("suzunne")) {
+		suzunne->DebugGUI();
+	}
+
+	if (ImGui::CollapsingHeader("Sphere")) {
+		sphere->DebugGUI();
+	}
 	player_->DebugGUI();
 
 	ImGui::Unindent();

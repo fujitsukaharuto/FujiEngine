@@ -129,12 +129,11 @@ void TitleScene::DebugGUI() {
 #ifdef _DEBUG
 	ImGui::Indent();
 	if (ImGui::CollapsingHeader("Sphere")) {
-		ImGui::DragFloat3("scale", &sphere->transform.scale.x, 0.01f);
-		ImGui::DragFloat3("rotate", &sphere->transform.rotate.x, 0.01f);
+		sphere->DebugGUI();
 	}
 
-	test_->Debug();
-	test2_->Debug();
+	test_->DebugGUI();
+	test2_->DebugGUI();
 
 	ImGui::Unindent();
 #endif // _DEBUG

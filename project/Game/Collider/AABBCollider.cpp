@@ -5,6 +5,21 @@
 AABBCollider::AABBCollider() {
 }
 
+void AABBCollider::DebugGUI() {
+#ifdef _DEBUG
+	ImGui::Indent();
+	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Selected;
+	if (ImGui::TreeNodeEx("Collider",flags)) {
+	ImGui::DragFloat("width", &width, 0.1f);
+	ImGui::DragFloat("height", &height, 0.1f);
+	ImGui::DragFloat("depth", &depth, 0.1f);
+	ImGui::Checkbox("isCollision", &isCollisionCheck_);
+		ImGui::TreePop();
+	}
+	ImGui::Unindent();
+#endif // _DEBUG
+}
+
 void AABBCollider::OnCollision(const ColliderInfo& other) {
 	if (onCollisionEvents_[static_cast<int>(state)]) {
 		onCollisionEvents_[static_cast<int>(state)](other);
