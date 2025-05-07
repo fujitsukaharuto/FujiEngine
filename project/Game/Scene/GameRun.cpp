@@ -45,8 +45,8 @@ void GameRun::Initialize() {
 	pManager_->CreateParticleGroup("ChargeRay", "chargeRay.png", 20);
 	pManager_->CreateParticleGroup("ChargeWave", "chargeCircle.png", 2);
 	pManager_->CreateParticleGroup("ChargeCircle", "chargeCircle.png", 2);
-	pManager_->CreateParticleGroup("BulletTrajectory", "redCircle.png", 300);
-	pManager_->CreateParticleGroup("BulletTrajectory2", "redCircle.png",300);
+	pManager_->CreateParticleGroup("BulletTrajectory", "redCircle.png", 400);
+	pManager_->CreateParticleGroup("BulletTrajectory2", "redCircle.png",400);
 	
 	pManager_->CreateParticleGroup("bulletHit", "redCircle.png", 100);
 	pManager_->CreateParticleGroup("bulletHit2", "redCircle.png", 100);

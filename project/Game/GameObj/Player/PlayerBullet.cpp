@@ -105,9 +105,9 @@ void PlayerBullet::CalculetionFollowVec(const Vector3& target) {
 	Quaternion finalRot = newRot * spinRot;
 	model_->transform.rotate = Quaternion::QuaternionToEuler(finalRot);  // オプション：オイラー角に変換して代入
 
-	trajectory.Emit();
+	trajectory.DistanceEmit();
 	if (isStrnght_) {
-		trajectory2.Emit();
+		trajectory2.DistanceEmit();
 	}
 
 }
@@ -156,4 +156,7 @@ void PlayerBullet::Release(float speed, float damage, const Vector3& velo) {
 	speed_ = speed;
 	damage_ = damage;
 	velocity_ = velo.Normalize();
+
+	trajectory.firstEmit_ = true;
+	trajectory2.firstEmit_ = true;
 }

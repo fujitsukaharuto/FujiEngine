@@ -85,6 +85,7 @@ public:
 
 	Vector3 currentWorldPos_;
 	Vector3 previousWorldPos_;
+	bool firstEmit_ = false;
 
 private:
 
