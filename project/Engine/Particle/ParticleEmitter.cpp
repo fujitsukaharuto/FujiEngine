@@ -109,6 +109,7 @@ void ParticleEmitter::DebugGUI() {
 
 		ImGui::Checkbox("SizeCheck", &isDrawSize_);
 		ImGui::Checkbox("IsEmitte", &isEmit_);
+		ImGui::Checkbox("IsDistance", &isDistanceComplement_);
 
 		if (ImGui::Button("save")) {
 			Save();
@@ -190,6 +191,9 @@ void ParticleEmitter::DrawSize() {
 
 void ParticleEmitter::Emit() {
 	if (time_ <= 0) {
+		if (isDistanceComplement_) {
+			previousWorldPos_ = currentWorldPos_;
+		}
 
 		worldMatrix_ = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, pos_);
 		if (parent_) {
@@ -215,6 +219,13 @@ void ParticleEmitter::Emit() {
 
 			// 変換はそのまま（位置は影響受けてOKなら）
 			worldMatrix_ = Multiply(worldMatrix_, noScaleParentMatrix);
+		}
+		if (isDistanceComplement_) {
+			currentWorldPos_ = Vector3{ worldMatrix_.m[3][0], worldMatrix_.m[3][1] ,worldMatrix_.m[3][2] };
+			if (firstEmit_) {
+				previousWorldPos_ = currentWorldPos_;
+				firstEmit_ = false;
+			}
 		}
 		if (grain_.isParent_) {
 			isUpDatedMatrix_ = true;
@@ -263,88 +274,21 @@ void ParticleEmitter::Emit() {
 				ParticleManager::Emit(name_, posAddSize, particleRotate_, grain_, para_, 1);
 			}
 		}
-		time_ = frequencyTime_;
-	} else {
-		time_--;
-	}
-}
 
-void ParticleEmitter::DistanceEmit() {
-	previousWorldPos_ = currentWorldPos_;
-	worldMatrix_ = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, pos_);
-	if (parent_) {
-		const Matrix4x4& parentWorldMatrix = parent_->GetWorldMat();
-		// スケール成分を除去した親ワールド行列を作成
-		Matrix4x4 noScaleParentMatrix = parentWorldMatrix;
+		if (isDistanceComplement_) {
+			float distanceMoved = (currentWorldPos_ - previousWorldPos_).Length();
+			int emitCount = (int)(distanceMoved / 0.05f); // spacing = 理想の間隔
 
-		// 各軸ベクトルの長さ（スケール）を計算
-		Vector3 xAxis = { parentWorldMatrix.m[0][0], parentWorldMatrix.m[1][0], parentWorldMatrix.m[2][0] };
-		Vector3 yAxis = { parentWorldMatrix.m[0][1], parentWorldMatrix.m[1][1], parentWorldMatrix.m[2][1] };
-		Vector3 zAxis = { parentWorldMatrix.m[0][2], parentWorldMatrix.m[1][2], parentWorldMatrix.m[2][2] };
-
-		float xLen = Vector3::Length(xAxis);
-		float yLen = Vector3::Length(yAxis);
-		float zLen = Vector3::Length(zAxis);
-
-		// 正規化（スケールを除去）
-		for (int i = 0; i < 3; ++i) {
-			noScaleParentMatrix.m[i][0] /= xLen;
-			noScaleParentMatrix.m[i][1] /= yLen;
-			noScaleParentMatrix.m[i][2] /= zLen;
-		}
-
-		// 変換はそのまま（位置は影響受けてOKなら）
-		worldMatrix_ = Multiply(worldMatrix_, noScaleParentMatrix);
-	}
-	currentWorldPos_ = Vector3{ worldMatrix_.m[3][0], worldMatrix_.m[3][1] ,worldMatrix_.m[3][2] };
-	if (grain_.isParent_) {
-		isUpDatedMatrix_ = true;
-	}
-	float distanceMoved = (currentWorldPos_ - previousWorldPos_).Length();
-	int emitCount = (int)(distanceMoved / 0.1f); // spacing = 理想の間隔
-
-	count_ = emitCount;
-	for (uint32_t i = 0; i < count_; i++) {
-		Vector3 posAddSize = Random::GetVector3(
-			{ emitSizeMin_.x, emitSizeMax_.x },
-			{ emitSizeMin_.y, emitSizeMax_.y },
-			{ emitSizeMin_.z, emitSizeMax_.z }
-		);
-
-
-		// 親の回転だけを取り出して適用する
-		Matrix4x4 parentRotationOnly = parent_ ? parent_->GetWorldMat() : Matrix4x4::MakeIdentity4x4();
-		if (parent_) {
-			parentRotationOnly.m[3][0] = 0.0f;
-			parentRotationOnly.m[3][1] = 0.0f;
-			parentRotationOnly.m[3][2] = 0.0f;
-			parentRotationOnly.m[0][3] = 0.0f;
-			parentRotationOnly.m[1][3] = 0.0f;
-			parentRotationOnly.m[2][3] = 0.0f;
-			parentRotationOnly.m[3][3] = 1.0f;
-		}
-		posAddSize = Transform(posAddSize, parentRotationOnly); // ← 回転だけ適用
-		if (!grain_.isParent_) {
-			// 最終的な位置はワールド座標の位置を加算
-			posAddSize += { worldMatrix_.m[3][0], worldMatrix_.m[3][1], worldMatrix_.m[3][2] };
-		}
-
-		if (grain_.speedType_ == static_cast<int>(SpeedType::kCenter)) {
-			Vector3 rPos = pos_;
-			rPos = Transform(rPos, parentRotationOnly);
-			if (grain_.isParent_) {
-				grain_.speed_ = (rPos - (posAddSize + rPos)) * grain_.returnPower_;
-			} else {
-				rPos = pos_ + Vector3{ worldMatrix_.m[3][0], worldMatrix_.m[3][1], worldMatrix_.m[3][2] };
-				grain_.speed_ = (rPos - posAddSize) * grain_.returnPower_;
+			for (int i = 0; i < emitCount; ++i) {
+				float t = (float)i / emitCount;
+				Vector3 emitPos = Lerp(previousWorldPos_, currentWorldPos_, t);
+				ParticleManager::Emit(name_, emitPos, particleRotate_, grain_, para_, 1);
 			}
 		}
 
-		if (grain_.isParent_) {
-			ParticleManager::ParentEmit(name_, posAddSize, particleRotate_, grain_, para_, 1);
-		} else {
-			ParticleManager::Emit(name_, posAddSize, particleRotate_, grain_, para_, 1);
-		}
+		time_ = frequencyTime_;
+	} else {
+		time_--;
 	}
 }
 
