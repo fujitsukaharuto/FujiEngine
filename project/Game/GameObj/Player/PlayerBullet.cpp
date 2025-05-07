@@ -27,6 +27,8 @@ void PlayerBullet::Initialize() {
 	trajectory.pos_ = { 0.0f,0.0f,0.0f };
 	trajectory2.pos_ = { 0.6f,0.0f,0.6f };
 
+	trajectory.isDistanceComplement_ = true;
+	trajectory2.isDistanceComplement_ = true;
 
 	ParticleManager::Load(hit_, "bulletHit");
 	ParticleManager::Load(hit2_, "bulletHit2");
@@ -105,9 +107,9 @@ void PlayerBullet::CalculetionFollowVec(const Vector3& target) {
 	Quaternion finalRot = newRot * spinRot;
 	model_->transform.rotate = Quaternion::QuaternionToEuler(finalRot);  // オプション：オイラー角に変換して代入
 
-	trajectory.DistanceEmit();
+	trajectory.Emit();
 	if (isStrnght_) {
-		trajectory2.DistanceEmit();
+		trajectory2.Emit();
 	}
 
 }
