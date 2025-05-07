@@ -43,8 +43,6 @@ public:
 
 	void Emit();
 
-	void DistanceEmit();
-
 	void Burst();
 
 	void BurstAnime();
@@ -83,6 +81,7 @@ public:
 
 	Matrix4x4 worldMatrix_;
 
+	bool isDistanceComplement_ = false;
 	Vector3 currentWorldPos_;
 	Vector3 previousWorldPos_;
 	bool firstEmit_ = false;
