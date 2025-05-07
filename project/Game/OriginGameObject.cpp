@@ -18,10 +18,10 @@ void OriginGameObject::DebugGUI() {
 #ifdef _DEBUG
 	ImGui::Indent();
 	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Selected;
-	if (ImGui::TreeNodeEx("Trans",flags)) {
-	ImGui::DragFloat3("position", &model_->transform.translate.x, 0.01f);
-	ImGui::DragFloat3("rotate", &model_->transform.rotate.x, 0.01f);
-	ImGui::DragFloat3("scale", &model_->transform.scale.x, 0.01f);
+	if (ImGui::TreeNodeEx("Trans", flags)) {
+		ImGui::DragFloat3("position", &model_->transform.translate.x, 0.01f);
+		ImGui::DragFloat3("rotate", &model_->transform.rotate.x, 0.01f);
+		ImGui::DragFloat3("scale", &model_->transform.scale.x, 0.01f);
 		ImGui::TreePop();
 	}
 	ImGui::Unindent();
