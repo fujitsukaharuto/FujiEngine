@@ -78,29 +78,31 @@ void Player::Draw(Material* mate) {
 }
 
 void Player::DebugGUI() {
+#ifdef _DEBUG
 	if (ImGui::CollapsingHeader("Player")) {
-		ImGui::DragFloat3("position", &model_->transform.translate.x, 0.1f);
+		model_->DebugGUI();
 		collider_->SetPos(model_->GetWorldPos());
 
+		collider_->DebugGUI();
+
+		ParameterGUI();
+	}
+#endif // _DEBUG
+}
+
+void Player::ParameterGUI() {
+#ifdef _DEBUG
+	ImGui::Indent();
+	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Selected;
+	if (ImGui::TreeNodeEx("Paramater", flags)) {
 		ImGui::DragFloat("moveSpeed", &moveSpeed_, 0.01f);
 		ImGui::DragFloat("jumpSpeedw", &jumpSpeed_, 0.01f);
 		ImGui::DragFloat("gravity", &gravity_, 0.01f);
 		ImGui::DragFloat("maxFallSpeed", &maxFallSpeed_, 0.01f);
-
-		ImGui::SeparatorText("Collider");
-		float w = collider_->GetWidth();
-		float h = collider_->GetHeight();
-		float d = collider_->GetDepth();
-		ImGui::DragFloat("width", &w, 0.1f);
-		ImGui::DragFloat("height", &h, 0.1f);
-		ImGui::DragFloat("depth", &d, 0.1f);
-		collider_->SetWidth(w);
-		collider_->SetHeight(h);
-		collider_->SetDepth(d);
-		bool isColl = collider_->GetIsCollisonCheck();
-		ImGui::Checkbox("isCollision", &isColl);
-		collider_->SetIsCollisonCheck(isColl);
+		ImGui::TreePop();
 	}
+	ImGui::Unindent();
+#endif // _DEBUG
 }
 
 ///= Behavior =================================================================*/

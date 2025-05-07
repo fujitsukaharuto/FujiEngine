@@ -18,6 +18,7 @@ public:
 	void Update()override;
 	void Draw(Material* mate = nullptr)override;
 	void DebugGUI()override;
+	void ParameterGUI();
 
 	//========================================================================*/
 	//* Behavior
