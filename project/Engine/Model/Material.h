@@ -38,6 +38,8 @@ public:
 
 	std::string GetPathName() const { return textureNamePath_.textureFilePath; }
 
+	Vector4 GetColor() { return materialDate_->color; }
+
 	void SetTextureNamePath(const std::string& pathName);
 
 	void SetColor(const Vector4& color) { materialDate_->color = color; }

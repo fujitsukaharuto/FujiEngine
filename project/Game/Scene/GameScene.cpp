@@ -186,13 +186,11 @@ void GameScene::DebugGUI() {
 	ImGui::Indent();
 	
 	if (ImGui::CollapsingHeader("suzunne")) {
-		ImGui::ColorEdit4("color", &color_.x);
-		suzunne->SetColor(color_);
+		suzunne->DebugGUI();
 	}
 
 	if (ImGui::CollapsingHeader("Sphere")) {
-		ImGui::DragFloat3("scale", &sphere->transform.scale.x, 0.01f);
-		ImGui::DragFloat3("rotate", &sphere->transform.rotate.x, 0.01f);
+		sphere->DebugGUI();
 	}
 
 	ImGui::Unindent();
