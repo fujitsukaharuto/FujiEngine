@@ -114,6 +114,11 @@ private:
 	void InitPlaneVertex();
 	void InitRingVertex();
 
+	bool LifeUpdate(Particle& particle);
+	void ParticleSizeUpdate(Particle& particle);
+	void SRTUpdate(Particle& particle, Matrix4x4& worldMatrix, const Matrix4x4& billboardMatrix);
+	bool InitEmitParticle(Particle& particle, const Vector3& pos, const Vector3& rotate, const Particle& grain, const RandomParametor& para);
+
 private:
 
 	DXCom* dxcommon_;

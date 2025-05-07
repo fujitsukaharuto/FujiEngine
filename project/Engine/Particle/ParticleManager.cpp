@@ -105,127 +105,15 @@ void ParticleManager::Update() {
 		group->drawCount_ = 0;
 		for (auto& particle : group->particles_) {
 
-			if (particle.lifeTime_ <= 0) {
-				particle.isLive_ = false;
+			if (LifeUpdate(particle)) {
 				continue;
 			}
 
-			particle.lifeTime_--;
+			ParticleSizeUpdate(particle);
 
-			SizeType sizeType = SizeType(particle.type_);
-			float t = (1.0f - float(float(particle.lifeTime_) / float(particle.startLifeTime_)));
-
-			if (particle.isColorFade_) {
-				particle.color_.w = Lerp(particle.startAlpha_, 0.0f, t * t);
-			}
-			if (particle.isAutoUVMove_) {
-				particle.uvTrans_.x += 0.1f;
-			}
-
-			switch (sizeType) {
-			case SizeType::kNormal:
-				break;
-			case SizeType::kShift:
-
-				particle.transform_.scale.x = Lerp(particle.startSize_.x, particle.endSize_.x, t);
-				particle.transform_.scale.y = Lerp(particle.startSize_.y, particle.endSize_.y, t);
-
-				break;
-			case SizeType::kSin:
-
-				Vector2 minSize = particle.startSize_; // 最小値
-				Vector2 maxSize = particle.endSize_; // 最大値
-
-				if (minSize.x > maxSize.x) {
-					std::swap(minSize.x, maxSize.x); // minとmaxを交換
-				}
-				if (minSize.y > maxSize.y) {
-					std::swap(minSize.y, maxSize.y); // minとmaxを交換
-				}
-
-
-				Vector2 sizeSin = minSize + (maxSize - minSize) * 0.5f * (1.0f + sin(particle.lifeTime_));
-
-				particle.transform_.scale.x = sizeSin.x;
-				particle.transform_.scale.y = sizeSin.y;
-
-				break;
-			}
-
-			if (particle.rotateType_ == static_cast<int>(RotateType::kRandomR)) {
-				if (particle.isContinuouslyRotate_) {
-					particle.transform_.rotate += Random::GetVector3({ -0.2f,0.2f }, { -0.2f,0.2f }, { -0.2f,0.2f }) * FPSKeeper::DeltaTime();
-				}
-			}
-
-			particle.speed_ += particle.accele_ * FPSKeeper::DeltaTime();
-
-			particle.transform_.translate += particle.speed_ * FPSKeeper::DeltaTime();
 			Matrix4x4 worldViewProjectionMatrix;
 			Matrix4x4 worldMatrix = MakeIdentity4x4();
-
-			if (!particle.isBillBoard_) {
-				worldMatrix = MakeAffineMatrix(particle.transform_.scale, particle.transform_.rotate, particle.transform_.translate);
-			}
-			if (particle.isBillBoard_) {
-				switch (particle.pattern_) {
-				case BillBoardPattern::kXYZBillBoard:
-					worldMatrix = Multiply(MakeScaleMatrix(particle.transform_.scale), billboardMatrix);
-					worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform_.translate));
-					break;
-				case BillBoardPattern::kXBillBoard: {
-
-					Matrix4x4 xBillboardMatrix;
-					xBillboardMatrix = billboardMatrix;
-					xBillboardMatrix.m[1][0] = 0.0f; // Y軸成分をゼロにする
-					xBillboardMatrix.m[2][0] = 0.0f; // Z軸成分をゼロにする
-
-					worldMatrix = Multiply(MakeScaleMatrix(particle.transform_.scale), MakeRotateXYZMatrix({ 0.0f,particle.transform_.rotate.y,particle.transform_.rotate.z }));
-					worldMatrix = Multiply(worldMatrix, xBillboardMatrix);
-					worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform_.translate));
-					break;
-				}
-				case BillBoardPattern::kYBillBoard: {
-
-					Matrix4x4 yBillboardMatrix = billboardMatrix;
-					yBillboardMatrix.m[0][1] = 0.0f; // X軸成分をゼロにする
-					yBillboardMatrix.m[2][1] = 0.0f; // Z軸成分をゼロにする
-
-					worldMatrix = Multiply(MakeScaleMatrix(particle.transform_.scale), MakeRotateXYZMatrix({ particle.transform_.rotate.x,0.0f,particle.transform_.rotate.z }));
-					worldMatrix = Multiply(worldMatrix, yBillboardMatrix);
-					worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform_.translate));
-
-					break;
-				}
-				case BillBoardPattern::kZBillBoard: {
-
-					Matrix4x4 zBillboardMatrix = billboardMatrix;
-					zBillboardMatrix.m[0][2] = 0.0f; // X軸成分をゼロにする
-					zBillboardMatrix.m[1][2] = 0.0f; // Y軸成分をゼロにする
-
-					worldMatrix = Multiply(MakeScaleMatrix(particle.transform_.scale), MakeRotateXYZMatrix({ particle.transform_.rotate.x,particle.transform_.rotate.y,0.0f }));
-					worldMatrix = Multiply(worldMatrix, zBillboardMatrix);
-					worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform_.translate));
-
-					break;
-				}
-				case BillBoardPattern::kXYBillBoard: {
-					Matrix4x4 xyBillboardMatrix = billboardMatrix;
-					xyBillboardMatrix.m[0][1] = 0.0f; // X軸成分をゼロにする
-					xyBillboardMatrix.m[2][1] = 0.0f; // Z軸成分をゼロにする
-					xyBillboardMatrix.m[1][0] = 0.0f; // Y軸成分をゼロにする
-					xyBillboardMatrix.m[2][0] = 0.0f; // Z軸成分をゼロにする
-
-					worldMatrix = Multiply(MakeScaleMatrix(particle.transform_.scale), MakeRotateXYZMatrix({ particle.transform_.rotate.x,0.0f,particle.transform_.rotate.z }));
-					worldMatrix = Multiply(worldMatrix, xyBillboardMatrix);
-					worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform_.translate));
-
-					break;
-				}
-				default:
-					break;
-				}
-			}
+			SRTUpdate(particle, worldMatrix, billboardMatrix);
 
 			if (camera_) {
 				const Matrix4x4& viewProjectionMatrix = camera_->GetViewProjectionMatrix();
@@ -288,128 +176,15 @@ void ParticleManager::Update() {
 		group->drawCount_ = 0;
 		for (auto& particle : group->particles_) {
 
-			if (particle.lifeTime_ <= 0) {
-				particle.isLive_ = false;
-				continue;
-			}
-			if (!particle.isLive_) {
+			if (LifeUpdate(particle)) {
 				continue;
 			}
 
-			particle.lifeTime_--;
+			ParticleSizeUpdate(particle);
 
-			SizeType sizeType = SizeType(particle.type_);
-			float t = (1.0f - float(float(particle.lifeTime_) / float(particle.startLifeTime_)));
-
-			if (particle.isColorFade_) {
-				particle.color_.w = Lerp(particle.startAlpha_, 0.0f, t * t);
-			}
-
-			switch (sizeType) {
-			case SizeType::kNormal:
-				break;
-			case SizeType::kShift:
-
-				particle.transform_.scale.x = Lerp(particle.startSize_.x, particle.endSize_.x, t);
-				particle.transform_.scale.y = Lerp(particle.startSize_.y, particle.endSize_.y, t);
-
-				break;
-			case SizeType::kSin:
-
-				Vector2 minSize = particle.startSize_; // 最小値
-				Vector2 maxSize = particle.endSize_; // 最大値
-
-				if (minSize.x > maxSize.x) {
-					std::swap(minSize.x, maxSize.x); // minとmaxを交換
-				}
-				if (minSize.y > maxSize.y) {
-					std::swap(minSize.y, maxSize.y); // minとmaxを交換
-				}
-
-
-				Vector2 sizeSin = minSize + (maxSize - minSize) * 0.5f * (1.0f + sin(particle.lifeTime_));
-
-				particle.transform_.scale.x = sizeSin.x;
-				particle.transform_.scale.y = sizeSin.y;
-
-				break;
-			}
-
-			if (particle.rotateType_ == static_cast<int>(RotateType::kRandomR)) {
-				if (particle.isContinuouslyRotate_) {
-					particle.transform_.rotate += Random::GetVector3({ -0.2f,0.2f }, { -0.2f,0.2f }, { -0.2f,0.2f }) * FPSKeeper::DeltaTime();
-				}
-			}
-
-			particle.speed_ += particle.accele_ * FPSKeeper::DeltaTime();
-
-			particle.transform_.translate += particle.speed_ * FPSKeeper::DeltaTime();
 			Matrix4x4 worldViewProjectionMatrix;
 			Matrix4x4 worldMatrix = MakeIdentity4x4();
-
-			if (!particle.isBillBoard_) {
-				worldMatrix = MakeAffineMatrix(particle.transform_.scale, particle.transform_.rotate, particle.transform_.translate);
-			}
-			if (particle.isBillBoard_) {
-				switch (particle.pattern_) {
-				case BillBoardPattern::kXYZBillBoard:
-					worldMatrix = Multiply(MakeScaleMatrix(particle.transform_.scale), billboardMatrix);
-					worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform_.translate));
-					break;
-				case BillBoardPattern::kXBillBoard: {
-
-					Matrix4x4 xBillboardMatrix;
-					xBillboardMatrix = billboardMatrix;
-					xBillboardMatrix.m[1][0] = 0.0f; // Y軸成分をゼロにする
-					xBillboardMatrix.m[2][0] = 0.0f; // Z軸成分をゼロにする
-
-					worldMatrix = Multiply(MakeScaleMatrix(particle.transform_.scale), MakeRotateXYZMatrix({ 0.0f,particle.transform_.rotate.y,particle.transform_.rotate.z }));
-					worldMatrix = Multiply(worldMatrix, xBillboardMatrix);
-					worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform_.translate));
-					break;
-				}
-				case BillBoardPattern::kYBillBoard: {
-					if (camera_) {
-						Matrix4x4 yBillboardMatrix = billboardMatrix;
-						yBillboardMatrix.m[0][1] = 0.0f; // X軸成分をゼロにする
-						yBillboardMatrix.m[2][1] = 0.0f; // Z軸成分をゼロにする
-
-						worldMatrix = Multiply(MakeScaleMatrix(particle.transform_.scale), MakeRotateXYZMatrix({ particle.transform_.rotate.x,0.0f,particle.transform_.rotate.z }));
-						worldMatrix = Multiply(worldMatrix, yBillboardMatrix);
-						worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform_.translate));
-
-					}
-					break;
-				}
-				case BillBoardPattern::kZBillBoard: {
-
-					Matrix4x4 zBillboardMatrix = billboardMatrix;
-					zBillboardMatrix.m[0][2] = 0.0f; // X軸成分をゼロにする
-					zBillboardMatrix.m[1][2] = 0.0f; // Y軸成分をゼロにする
-
-					worldMatrix = Multiply(MakeScaleMatrix(particle.transform_.scale), MakeRotateXYZMatrix({ particle.transform_.rotate.x,particle.transform_.rotate.y,0.0f }));
-					worldMatrix = Multiply(worldMatrix, zBillboardMatrix);
-					worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform_.translate));
-
-					break;
-				}
-				case BillBoardPattern::kXYBillBoard: {
-					Matrix4x4 xyBillboardMatrix = billboardMatrix;
-					xyBillboardMatrix.m[0][1] = 0.0f; // X軸成分をゼロにする
-					xyBillboardMatrix.m[2][1] = 0.0f; // Z軸成分をゼロにする
-					xyBillboardMatrix.m[1][0] = 0.0f; // Y軸成分をゼロにする
-					xyBillboardMatrix.m[2][0] = 0.0f; // Z軸成分をゼロにする
-
-					worldMatrix = Multiply(MakeScaleMatrix(particle.transform_.scale), MakeRotateXYZMatrix({ particle.transform_.rotate.x,0.0f,particle.transform_.rotate.z }));
-					worldMatrix = Multiply(worldMatrix, xyBillboardMatrix);
-					worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform_.translate));
-
-					break;
-				}
-				default:
-					break;
-				}
-			}
+			SRTUpdate(particle, worldMatrix, billboardMatrix);
 
 			if (particle.isParent_) {
 				// 親行列のスケール・回転を取り除いた「平行移動のみマトリクス」を作る
@@ -445,12 +220,10 @@ void ParticleManager::Update() {
 		AnimeGroup* group = groupPair.second.get();
 		for (int i = 0; i < group->objects_.size(); i++) {
 
-
 			if (group->lifeTime[i] <= 0) {
 				group->isLive_[i] = false;
 				continue;
 			}
-
 
 			group->lifeTime[i] -= FPSKeeper::DeltaTime();
 			group->animeTime[i] += FPSKeeper::DeltaTime();
@@ -460,7 +233,6 @@ void ParticleManager::Update() {
 					group->objects_[i]->SetTexture(animeChange.first);
 				}
 			}
-
 
 			SizeType sizeType = SizeType(group->type);
 			float t = (1.0f - float(float(group->lifeTime[i]) / float(group->startLifeTime_[i])));
@@ -842,96 +614,7 @@ void ParticleManager::Emit(const std::string& name, const Vector3& pos, const Ve
 		ParticleGroup* group = iterator->second.get();
 		for (auto& particle : group->particles_) {
 
-			if (particle.isLive_ == false) {
-				particle.transform_ = grain.transform_;
-				particle.transform_.translate = Random::GetVector3(para.transx, para.transy, para.transz);
-				particle.transform_.translate += pos;
-				particle.transform_.scale = { grain.startSize_.x,grain.startSize_.y,1.0f };
-				if (grain.speedType_ == static_cast<int>(SpeedType::kCenter)) {
-					particle.speed_ = grain.speed_;
-				} else {
-					particle.speed_ = Random::GetVector3(para.speedx, para.speedy, para.speedz);
-				}
-				particle.returnPower_ = grain.returnPower_;
-
-
-				particle.rotateType_ = grain.rotateType_;
-				particle.isContinuouslyRotate_ = grain.isContinuouslyRotate_;
-				Vector3 veloSpeed = particle.speed_.Normalize();
-				Vector3 cameraR{};
-				Vector3 defo = { 0.0f,1.0f,0.0f };
-				Vector3 angleDToD{};
-				Matrix4x4 rotateCamera;
-				Matrix4x4 dToD;
-
-				switch (particle.rotateType_) {
-				case static_cast<int>(RotateType::kUsually):
-					particle.transform_.rotate = rotate;
-					break;
-				case static_cast<int>(RotateType::kVelocityR):
-
-					veloSpeed = particle.speed_.Normalize();
-
-					// カメラの回転を考慮して速度ベクトルを変換
-					cameraR = CameraManager::GetInstance()->GetCamera()->transform.rotate;
-					rotateCamera = MakeRotateXYZMatrix(-cameraR);
-					veloSpeed = TransformNormal(veloSpeed, rotateCamera);
-
-					defo = TransformNormal(defo, rotateCamera);
-
-					dToD = DirectionToDirection(defo, veloSpeed.Normalize());
-					angleDToD = ExtractEulerAngles(dToD);
-					particle.transform_.rotate = angleDToD;
-
-					break;
-				case static_cast<int>(RotateType::kRandomR):
-					particle.transform_.rotate = Random::GetVector3({ -1.0f,1.0f }, { -1.0f,1.0f }, { -1.0f,1.0f });
-					break;
-				}
-
-				particle.lifeTime_ = grain.lifeTime_;
-				particle.startLifeTime_ = particle.lifeTime_;
-				particle.isBillBoard_ = grain.isBillBoard_;
-				particle.pattern_ = grain.pattern_;
-				particle.colorType_ = grain.colorType_;
-				particle.isColorFade_ = grain.isColorFade_;
-				particle.uvTrans_ = grain.uvTrans_;
-				particle.uvScale_ = grain.uvScale_;
-				particle.isAutoUVMove_ = grain.isAutoUVMove_;
-				switch (particle.colorType_) {
-				case static_cast<int>(ColorType::kDefault):
-					particle.color_ = para.colorMax;
-					break;
-				case static_cast<int>(ColorType::kRandom):
-					particle.color_.x = Random::GetFloat(para.colorMin.x, para.colorMax.x);
-					particle.color_.y = Random::GetFloat(para.colorMin.y, para.colorMax.y);
-					particle.color_.z = Random::GetFloat(para.colorMin.z, para.colorMax.z);
-					particle.color_.w = Random::GetFloat(para.colorMin.w, para.colorMax.w);
-					break;
-				}
-				particle.startAlpha_ = particle.color_.w;
-
-				SpeedType type = SpeedType(grain.speedType_);
-				switch (type) {
-				case SpeedType::kConstancy:
-					particle.accele_ = Vector3{ 0.0f,0.0f,0.0f };
-					break;
-				case SpeedType::kChange:
-					particle.accele_ = grain.accele_;
-					break;
-				case SpeedType::kReturn:
-					particle.accele_ = (particle.speed_) * grain.returnPower_;
-					break;
-				case SpeedType::kCenter:
-					particle.accele_ = Vector3{ 0.0f,0.0f,0.0f };
-					break;
-				}
-
-				particle.type_ = grain.type_;
-				particle.startSize_ = grain.startSize_;
-				particle.endSize_ = grain.endSize_;
-
-				particle.isLive_ = true;
+			if (instance->InitEmitParticle(particle, pos, rotate, grain, para)) {
 				newCount++;
 			}
 			if (newCount == count) {
@@ -953,94 +636,7 @@ void ParticleManager::ParentEmit(const std::string& name, const Vector3& pos, co
 		ParentParticleGroup* group = iterator->second.get();
 		for (auto& particle : group->particles_) {
 
-			if (particle.isLive_ == false) {
-				particle.transform_ = grain.transform_;
-				particle.transform_.translate = Random::GetVector3(para.transx, para.transy, para.transz);
-				particle.transform_.translate += pos;
-				particle.transform_.scale = { grain.startSize_.x,grain.startSize_.y,1.0f };
-				if (grain.speedType_ == static_cast<int>(SpeedType::kCenter)) {
-					particle.speed_ = grain.speed_;
-				} else {
-					particle.speed_ = Random::GetVector3(para.speedx, para.speedy, para.speedz);
-				}
-				particle.returnPower_ = grain.returnPower_;
-
-
-				particle.rotateType_ = grain.rotateType_;
-				particle.isContinuouslyRotate_ = grain.isContinuouslyRotate_;
-				Vector3 veloSpeed = particle.speed_.Normalize();
-				Vector3 cameraR{};
-				Vector3 defo = { 0.0f,1.0f,0.0f };
-				Vector3 angleDToD{};
-				Matrix4x4 rotateCamera;
-				Matrix4x4 dToD;
-
-				switch (particle.rotateType_) {
-				case static_cast<int>(RotateType::kUsually):
-					particle.transform_.rotate = rotate;
-					break;
-				case static_cast<int>(RotateType::kVelocityR):
-
-					veloSpeed = particle.speed_.Normalize();
-
-					// カメラの回転を考慮して速度ベクトルを変換
-					cameraR = CameraManager::GetInstance()->GetCamera()->transform.rotate;
-					rotateCamera = MakeRotateXYZMatrix(-cameraR);
-					veloSpeed = TransformNormal(veloSpeed, rotateCamera);
-
-					defo = TransformNormal(defo, rotateCamera);
-
-					dToD = DirectionToDirection(defo, veloSpeed.Normalize());
-					angleDToD = ExtractEulerAngles(dToD);
-					particle.transform_.rotate = angleDToD;
-
-					break;
-				case static_cast<int>(RotateType::kRandomR):
-					particle.transform_.rotate = Random::GetVector3({ -1.0f,1.0f }, { -1.0f,1.0f }, { -1.0f,1.0f });
-					break;
-				}
-
-				particle.lifeTime_ = grain.lifeTime_;
-				particle.startLifeTime_ = particle.lifeTime_;
-				particle.isBillBoard_ = grain.isBillBoard_;
-				particle.pattern_ = grain.pattern_;
-				particle.colorType_ = grain.colorType_;
-				particle.isColorFade_ = grain.isColorFade_;
-				switch (particle.colorType_) {
-				case static_cast<int>(ColorType::kDefault):
-					particle.color_ = para.colorMax;
-					break;
-				case static_cast<int>(ColorType::kRandom):
-					particle.color_.x = Random::GetFloat(para.colorMin.x, para.colorMax.x);
-					particle.color_.y = Random::GetFloat(para.colorMin.y, para.colorMax.y);
-					particle.color_.z = Random::GetFloat(para.colorMin.z, para.colorMax.z);
-					particle.color_.w = Random::GetFloat(para.colorMin.w, para.colorMax.w);
-					break;
-				}
-				particle.startAlpha_ = particle.color_.w;
-
-				SpeedType type = SpeedType(grain.speedType_);
-				switch (type) {
-				case SpeedType::kConstancy:
-					particle.accele_ = Vector3{ 0.0f,0.0f,0.0f };
-					break;
-				case SpeedType::kChange:
-					particle.accele_ = grain.accele_;
-					break;
-				case SpeedType::kReturn:
-					particle.accele_ = (particle.speed_) * grain.returnPower_;
-					break;
-				case SpeedType::kCenter:
-					particle.accele_ = Vector3{ 0.0f,0.0f,0.0f };
-					break;
-				}
-
-				particle.type_ = grain.type_;
-				particle.startSize_ = grain.startSize_;
-				particle.endSize_ = grain.endSize_;
-				particle.isParent_ = grain.isParent_;
-
-				particle.isLive_ = true;
+			if (instance->InitEmitParticle(particle, pos, rotate, grain, para)) {
 				newCount++;
 			}
 			if (newCount == count) {
@@ -1204,4 +800,235 @@ void ParticleManager::InitRingVertex() {
 	ringIbView.BufferLocation = ringIBuffer_->GetGPUVirtualAddress();
 	ringIbView.Format = DXGI_FORMAT_R32_UINT;
 	ringIbView.SizeInBytes = static_cast<UINT>(sizeof(uint32_t) * ringIndex_.size());
+}
+
+
+bool ParticleManager::LifeUpdate(Particle& particle) {
+	if (particle.lifeTime_ <= 0) {
+		particle.isLive_ = false;
+		return true;
+	}
+	if (!particle.isLive_) {
+		return true;
+	}
+
+	particle.lifeTime_--;
+	return false;
+}
+
+void ParticleManager::ParticleSizeUpdate(Particle& particle) {
+	SizeType sizeType = SizeType(particle.type_);
+	float t = (1.0f - float(float(particle.lifeTime_) / float(particle.startLifeTime_)));
+
+	if (particle.isColorFade_) {
+		particle.color_.w = Lerp(particle.startAlpha_, 0.0f, t * t);
+	}
+	if (particle.isAutoUVMove_) {
+		particle.uvTrans_.x += 0.1f;
+	}
+
+	switch (sizeType) {
+	case SizeType::kNormal:
+		break;
+	case SizeType::kShift:
+
+		particle.transform_.scale.x = Lerp(particle.startSize_.x, particle.endSize_.x, t);
+		particle.transform_.scale.y = Lerp(particle.startSize_.y, particle.endSize_.y, t);
+
+		break;
+	case SizeType::kSin:
+
+		Vector2 minSize = particle.startSize_; // 最小値
+		Vector2 maxSize = particle.endSize_; // 最大値
+
+		if (minSize.x > maxSize.x) {
+			std::swap(minSize.x, maxSize.x); // minとmaxを交換
+		}
+		if (minSize.y > maxSize.y) {
+			std::swap(minSize.y, maxSize.y); // minとmaxを交換
+		}
+
+
+		Vector2 sizeSin = minSize + (maxSize - minSize) * 0.5f * (1.0f + sin(particle.lifeTime_));
+
+		particle.transform_.scale.x = sizeSin.x;
+		particle.transform_.scale.y = sizeSin.y;
+
+		break;
+	}
+}
+
+void ParticleManager::SRTUpdate(Particle& particle, Matrix4x4& worldMatrix, const Matrix4x4& billboardMatrix) {
+	if (particle.rotateType_ == static_cast<int>(RotateType::kRandomR)) {
+		if (particle.isContinuouslyRotate_) {
+			particle.transform_.rotate += Random::GetVector3({ -0.2f,0.2f }, { -0.2f,0.2f }, { -0.2f,0.2f }) * FPSKeeper::DeltaTime();
+		}
+	}
+
+	particle.speed_ += particle.accele_ * FPSKeeper::DeltaTime();
+
+	particle.transform_.translate += particle.speed_ * FPSKeeper::DeltaTime();
+
+	if (!particle.isBillBoard_) {
+		worldMatrix = MakeAffineMatrix(particle.transform_.scale, particle.transform_.rotate, particle.transform_.translate);
+	}
+	if (particle.isBillBoard_) {
+		switch (particle.pattern_) {
+		case BillBoardPattern::kXYZBillBoard:
+			worldMatrix = Multiply(MakeScaleMatrix(particle.transform_.scale), billboardMatrix);
+			worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform_.translate));
+			break;
+		case BillBoardPattern::kXBillBoard: {
+
+			Matrix4x4 xBillboardMatrix;
+			xBillboardMatrix = billboardMatrix;
+			xBillboardMatrix.m[1][0] = 0.0f; // Y軸成分をゼロにする
+			xBillboardMatrix.m[2][0] = 0.0f; // Z軸成分をゼロにする
+
+			worldMatrix = Multiply(MakeScaleMatrix(particle.transform_.scale), MakeRotateXYZMatrix({ 0.0f,particle.transform_.rotate.y,particle.transform_.rotate.z }));
+			worldMatrix = Multiply(worldMatrix, xBillboardMatrix);
+			worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform_.translate));
+			break;
+		}
+		case BillBoardPattern::kYBillBoard: {
+			if (camera_) {
+				Matrix4x4 yBillboardMatrix = billboardMatrix;
+				yBillboardMatrix.m[0][1] = 0.0f; // X軸成分をゼロにする
+				yBillboardMatrix.m[2][1] = 0.0f; // Z軸成分をゼロにする
+
+				worldMatrix = Multiply(MakeScaleMatrix(particle.transform_.scale), MakeRotateXYZMatrix({ particle.transform_.rotate.x,0.0f,particle.transform_.rotate.z }));
+				worldMatrix = Multiply(worldMatrix, yBillboardMatrix);
+				worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform_.translate));
+
+			}
+			break;
+		}
+		case BillBoardPattern::kZBillBoard: {
+
+			Matrix4x4 zBillboardMatrix = billboardMatrix;
+			zBillboardMatrix.m[0][2] = 0.0f; // X軸成分をゼロにする
+			zBillboardMatrix.m[1][2] = 0.0f; // Y軸成分をゼロにする
+
+			worldMatrix = Multiply(MakeScaleMatrix(particle.transform_.scale), MakeRotateXYZMatrix({ particle.transform_.rotate.x,particle.transform_.rotate.y,0.0f }));
+			worldMatrix = Multiply(worldMatrix, zBillboardMatrix);
+			worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform_.translate));
+
+			break;
+		}
+		case BillBoardPattern::kXYBillBoard: {
+			Matrix4x4 xyBillboardMatrix = billboardMatrix;
+			xyBillboardMatrix.m[0][1] = 0.0f; // X軸成分をゼロにする
+			xyBillboardMatrix.m[2][1] = 0.0f; // Z軸成分をゼロにする
+			xyBillboardMatrix.m[1][0] = 0.0f; // Y軸成分をゼロにする
+			xyBillboardMatrix.m[2][0] = 0.0f; // Z軸成分をゼロにする
+
+			worldMatrix = Multiply(MakeScaleMatrix(particle.transform_.scale), MakeRotateXYZMatrix({ particle.transform_.rotate.x,0.0f,particle.transform_.rotate.z }));
+			worldMatrix = Multiply(worldMatrix, xyBillboardMatrix);
+			worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform_.translate));
+
+			break;
+		}
+		default:
+			break;
+		}
+	}
+}
+
+bool ParticleManager::InitEmitParticle(Particle& particle, const Vector3& pos, const Vector3& rotate, const Particle& grain, const RandomParametor& para) {
+
+	if (particle.isLive_ == false) {
+		particle.transform_ = grain.transform_;
+		particle.transform_.translate = Random::GetVector3(para.transx, para.transy, para.transz);
+		particle.transform_.translate += pos;
+		particle.transform_.scale = { grain.startSize_.x,grain.startSize_.y,1.0f };
+		if (grain.speedType_ == static_cast<int>(SpeedType::kCenter)) {
+			particle.speed_ = grain.speed_;
+		} else {
+			particle.speed_ = Random::GetVector3(para.speedx, para.speedy, para.speedz);
+		}
+		particle.returnPower_ = grain.returnPower_;
+
+
+		particle.rotateType_ = grain.rotateType_;
+		particle.isContinuouslyRotate_ = grain.isContinuouslyRotate_;
+		Vector3 veloSpeed = particle.speed_.Normalize();
+		Vector3 cameraR{};
+		Vector3 defo = { 0.0f,1.0f,0.0f };
+		Vector3 angleDToD{};
+		Matrix4x4 rotateCamera;
+		Matrix4x4 dToD;
+
+		switch (particle.rotateType_) {
+		case static_cast<int>(RotateType::kUsually):
+			particle.transform_.rotate = rotate;
+			break;
+		case static_cast<int>(RotateType::kVelocityR):
+
+			veloSpeed = particle.speed_.Normalize();
+
+			// カメラの回転を考慮して速度ベクトルを変換
+			cameraR = CameraManager::GetInstance()->GetCamera()->transform.rotate;
+			rotateCamera = MakeRotateXYZMatrix(-cameraR);
+			veloSpeed = TransformNormal(veloSpeed, rotateCamera);
+
+			defo = TransformNormal(defo, rotateCamera);
+
+			dToD = DirectionToDirection(defo, veloSpeed.Normalize());
+			angleDToD = ExtractEulerAngles(dToD);
+			particle.transform_.rotate = angleDToD;
+
+			break;
+		case static_cast<int>(RotateType::kRandomR):
+			particle.transform_.rotate = Random::GetVector3({ -1.0f,1.0f }, { -1.0f,1.0f }, { -1.0f,1.0f });
+			break;
+		}
+
+		particle.lifeTime_ = grain.lifeTime_;
+		particle.startLifeTime_ = particle.lifeTime_;
+		particle.isBillBoard_ = grain.isBillBoard_;
+		particle.pattern_ = grain.pattern_;
+		particle.colorType_ = grain.colorType_;
+		particle.isColorFade_ = grain.isColorFade_;
+		particle.uvTrans_ = grain.uvTrans_;
+		particle.uvScale_ = grain.uvScale_;
+		particle.isAutoUVMove_ = grain.isAutoUVMove_;
+		switch (particle.colorType_) {
+		case static_cast<int>(ColorType::kDefault):
+			particle.color_ = para.colorMax;
+			break;
+		case static_cast<int>(ColorType::kRandom):
+			particle.color_.x = Random::GetFloat(para.colorMin.x, para.colorMax.x);
+			particle.color_.y = Random::GetFloat(para.colorMin.y, para.colorMax.y);
+			particle.color_.z = Random::GetFloat(para.colorMin.z, para.colorMax.z);
+			particle.color_.w = Random::GetFloat(para.colorMin.w, para.colorMax.w);
+			break;
+		}
+		particle.startAlpha_ = particle.color_.w;
+
+		SpeedType type = SpeedType(grain.speedType_);
+		switch (type) {
+		case SpeedType::kConstancy:
+			particle.accele_ = Vector3{ 0.0f,0.0f,0.0f };
+			break;
+		case SpeedType::kChange:
+			particle.accele_ = grain.accele_;
+			break;
+		case SpeedType::kReturn:
+			particle.accele_ = (particle.speed_) * grain.returnPower_;
+			break;
+		case SpeedType::kCenter:
+			particle.accele_ = Vector3{ 0.0f,0.0f,0.0f };
+			break;
+		}
+
+		particle.type_ = grain.type_;
+		particle.startSize_ = grain.startSize_;
+		particle.endSize_ = grain.endSize_;
+		particle.isParent_ = grain.isParent_;
+
+		particle.isLive_ = true;
+		return true;
+	}
+
+	return false;
 }
