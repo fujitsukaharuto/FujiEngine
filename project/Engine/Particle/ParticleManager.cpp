@@ -644,6 +644,7 @@ void ParticleManager::ParticleDebugGUI() {
 		int shapeType = static_cast<int>(selectParticleGroup_->shapeType_);
 		ImGui::Combo("ShapeType##type", &shapeType, "Plane\0Ring\0");
 		selectParticleGroup_->shapeType_ = static_cast<ShapeType>(shapeType);
+		ImGui::Text("count : %d", int(selectParticleGroup_->drawCount_));
 	}
 
 	ImGui::SeparatorText("SelectGroup");

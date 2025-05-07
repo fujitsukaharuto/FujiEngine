@@ -269,10 +269,12 @@ void ParticleEmitter::Emit() {
 				}
 			}
 
-			if (grain_.isParent_) {
-				ParticleManager::ParentEmit(name_, posAddSize, particleRotate_, grain_, para_, 1);
-			} else {
-				ParticleManager::Emit(name_, posAddSize, particleRotate_, grain_, para_, 1);
+			if (!isDistanceComplement_) {
+				if (grain_.isParent_) {
+					ParticleManager::ParentEmit(name_, posAddSize, particleRotate_, grain_, para_, 1);
+				} else {
+					ParticleManager::Emit(name_, posAddSize, particleRotate_, grain_, para_, 1);
+				}
 			}
 		}
 
