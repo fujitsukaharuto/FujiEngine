@@ -26,6 +26,7 @@ public:
 	bool CanRedo() const { return !redoStack.empty(); }
 
 	void CheckInputForUndoRedo();
+	void Reset();
 	void Finalize();
 
 private:

@@ -41,6 +41,11 @@ void CommandManager::CheckInputForUndoRedo() {
 	}
 }
 
+void CommandManager::Reset() {
+	undoStack = std::stack<std::unique_ptr<ICommand>>();
+	redoStack = std::stack<std::unique_ptr<ICommand>>();
+}
+
 void CommandManager::Finalize() {
 	undoStack = std::stack<std::unique_ptr<ICommand>>();
 	redoStack = std::stack<std::unique_ptr<ICommand>>();
