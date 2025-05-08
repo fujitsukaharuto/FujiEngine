@@ -77,6 +77,8 @@ void Framework::Init() {
 	// シーン管理
 	sceneManager_ = std::make_unique<SceneManager>();
 	sceneManager_->Initialize(dxcommon_.get());
+
+	commandManger_ = CommandManager::GetInstance();
 }
 
 void Framework::Run() {

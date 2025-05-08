@@ -212,6 +212,9 @@
     <ClCompile Include="Engine\GraphicPipeline\CRTCSPipe.cpp">
       <Filter>Engine\GraphicPipeline</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Editor\CommandManager.cpp">
+      <Filter>Engine\Editor</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -463,6 +466,15 @@
     <ClInclude Include="Engine\GraphicPipeline\CRTCSPipe.h">
       <Filter>Engine\GraphicPipeline</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Editor\ICommand.h">
+      <Filter>Engine\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Editor\CommandManager.h">
+      <Filter>Engine\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Editor\MoveCommand.h">
+      <Filter>Engine\Editor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -560,6 +572,9 @@
     </Filter>
     <Filter Include="Engine\Math\Random">
       <UniqueIdentifier>{fbafdfc2-b133-4fa5-8806-f13994df902f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Editor">
+      <UniqueIdentifier>{b324ee81-9c59-4fe2-9acd-053eaf7bcddc}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

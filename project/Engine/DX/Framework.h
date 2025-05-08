@@ -14,6 +14,7 @@
 #include "Scene//AbstractSceneFactory.h"
 #include "Scene/SceneManager.h"
 #include "Model/Line3dDrawer.h"
+#include "Engine/Editor/CommandManager.h"
 
 class Framework {
 public:
@@ -55,4 +56,5 @@ protected:
 	std::unique_ptr<LightManager> lightManager_ = nullptr;
 	ParticleManager* pManager_ = nullptr;
 	Line3dDrawer* line3dDrawer_ = nullptr;
+	CommandManager* commandManger_;
 };

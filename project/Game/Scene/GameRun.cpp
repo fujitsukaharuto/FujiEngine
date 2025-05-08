@@ -58,6 +58,7 @@ void GameRun::Initialize() {
 }
 
 void GameRun::Finalize() {
+	commandManger_->Finalize();
 	sceneFactory_.reset();
 	sceneManager_->Finalize();
 	audioPlayer_->Finalize();
@@ -105,6 +106,7 @@ void GameRun::Update() {
 	GlobalVariables::GetInstance()->Update();
 	// ImGui受付
 	imguiManager_->End();
+	commandManger_->CheckInputForUndoRedo();
 #endif // _DEBUG
 }
 

@@ -4,6 +4,8 @@
 #include "LightManager.h"
 #include "CameraManager.h"
 #include "Engine/ImGuiManager/ImGuiManager.h"
+#include "Engine/Editor/CommandManager.h"
+#include "Engine/Editor/MoveCommand.h"
 
 Object3d::Object3d() {
 	dxcommon_ = ModelManager::GetInstance()->ShareDXCom();
@@ -85,7 +87,15 @@ void Object3d::DebugGUI() {
 	ImGui::Indent();
 	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Selected;
 	if (ImGui::TreeNodeEx("Trans",flags)) {
+	static Vector3 prevPos = transform.translate;
 	ImGui::DragFloat3("position", &transform.translate.x, 0.01f);
+	if (ImGui::IsItemDeactivatedAfterEdit()) { // 編集完了検出
+		if (transform.translate != prevPos) {
+			auto command = std::make_unique<MoveCommand>(transform, prevPos, transform.translate);
+			CommandManager::GetInstance()->Execute(std::move(command));
+			prevPos = transform.translate;
+		}
+	}
 	ImGui::DragFloat3("rotate", &transform.rotate.x, 0.01f);
 	ImGui::DragFloat3("scale", &transform.scale.x, 0.01f);
 		ImGui::TreePop();
