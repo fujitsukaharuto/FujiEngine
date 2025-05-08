@@ -82,5 +82,4 @@ private:
 	std::string nowTextureName;
 
 	Vector3 prevPos_;
-	bool isOnlyOnce_ = true;
 };

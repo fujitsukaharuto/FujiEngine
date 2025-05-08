@@ -87,11 +87,10 @@ void Object3d::DebugGUI() {
 	ImGui::Indent();
 	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Selected;
 	if (ImGui::TreeNodeEx("Trans", flags)) {
-		if (isOnlyOnce_) {
-			prevPos_ = transform.translate;
-			isOnlyOnce_ = false;
-		}
 		ImGui::DragFloat3("position", &transform.translate.x, 0.01f);
+		if (ImGui::IsItemActivated()) {
+			prevPos_ = transform.translate;
+		}
 		if (ImGui::IsItemDeactivatedAfterEdit()) { // 編集完了検出
 			if (transform.translate != prevPos_) {
 				auto command = std::make_unique<MoveCommand>(transform, prevPos_, transform.translate);
