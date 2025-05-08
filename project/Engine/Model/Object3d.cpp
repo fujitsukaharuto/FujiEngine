@@ -86,18 +86,21 @@ void Object3d::DebugGUI() {
 #ifdef _DEBUG
 	ImGui::Indent();
 	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Selected;
-	if (ImGui::TreeNodeEx("Trans",flags)) {
-	static Vector3 prevPos = transform.translate;
-	ImGui::DragFloat3("position", &transform.translate.x, 0.01f);
-	if (ImGui::IsItemDeactivatedAfterEdit()) { // 編集完了検出
-		if (transform.translate != prevPos) {
-			auto command = std::make_unique<MoveCommand>(transform, prevPos, transform.translate);
-			CommandManager::GetInstance()->Execute(std::move(command));
-			prevPos = transform.translate;
+	if (ImGui::TreeNodeEx("Trans", flags)) {
+		if (isOnlyOnce_) {
+			prevPos_ = transform.translate;
+			isOnlyOnce_ = false;
 		}
-	}
-	ImGui::DragFloat3("rotate", &transform.rotate.x, 0.01f);
-	ImGui::DragFloat3("scale", &transform.scale.x, 0.01f);
+		ImGui::DragFloat3("position", &transform.translate.x, 0.01f);
+		if (ImGui::IsItemDeactivatedAfterEdit()) { // 編集完了検出
+			if (transform.translate != prevPos_) {
+				auto command = std::make_unique<MoveCommand>(transform, prevPos_, transform.translate);
+				CommandManager::GetInstance()->Execute(std::move(command));
+				prevPos_ = transform.translate;
+			}
+		}
+		ImGui::DragFloat3("rotate", &transform.rotate.x, 0.01f);
+		ImGui::DragFloat3("scale", &transform.scale.x, 0.01f);
 		ImGui::TreePop();
 	}
 	if (ImGui::TreeNodeEx("color",flags)) {

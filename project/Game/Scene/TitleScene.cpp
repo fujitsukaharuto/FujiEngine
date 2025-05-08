@@ -33,6 +33,10 @@ void TitleScene::Initialize() {
 	sphere->Create("Fence.obj");
 	sphere->transform.translate.x = 4.0f;
 
+	sphere2 = std::make_unique<Object3d>();
+	sphere2->CreateSphere();
+	sphere2->transform.translate.x = 1.0f;
+
 	cube_ = std::make_unique<AnimationModel>();
 	cube_->Create("sneakWalk.gltf");
 	cube_->LoadAnimationFile("sneakWalk.gltf");
@@ -96,6 +100,7 @@ void TitleScene::Draw() {
 #pragma region 3Dオブジェクト
 	obj3dCommon->PreDraw();
 	sphere->Draw();
+	sphere2->Draw();
 	//test_->Draw();
 
 	obj3dCommon->PreAnimationDraw();
@@ -130,6 +135,9 @@ void TitleScene::DebugGUI() {
 	ImGui::Indent();
 	if (ImGui::CollapsingHeader("Sphere")) {
 		sphere->DebugGUI();
+	}
+	if (ImGui::CollapsingHeader("Sphere2")) {
+		sphere2->DebugGUI();
 	}
 
 	test_->DebugGUI();

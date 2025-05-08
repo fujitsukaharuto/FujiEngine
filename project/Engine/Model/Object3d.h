@@ -80,4 +80,7 @@ private:
 
 	Matrix4x4 billboardMatrix_;
 	std::string nowTextureName;
+
+	Vector3 prevPos_;
+	bool isOnlyOnce_ = true;
 };
