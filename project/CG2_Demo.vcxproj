@@ -195,7 +195,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\DX\SRVManager.h" />
     <ClInclude Include="Engine\Editor\CommandManager.h" />
     <ClInclude Include="Engine\Editor\ICommand.h" />
-    <ClInclude Include="Engine\Editor\MoveCommand.h" />
+    <ClInclude Include="Engine\Editor\PropertyCommand.h" />
     <ClInclude Include="Engine\GlobalVariables\GlobalVariables.h" />
     <ClInclude Include="Engine\GraphicPipeline\AnimationPipeline.h" />
     <ClInclude Include="Engine\GraphicPipeline\BasePipeline.h" />

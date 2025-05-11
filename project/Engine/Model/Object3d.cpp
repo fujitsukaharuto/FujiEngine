@@ -5,7 +5,7 @@
 #include "CameraManager.h"
 #include "Engine/ImGuiManager/ImGuiManager.h"
 #include "Engine/Editor/CommandManager.h"
-#include "Engine/Editor/MoveCommand.h"
+#include "Engine/Editor/PropertyCommand.h"
 #include "ImGuizmo.h"
 
 Object3d::Object3d() {

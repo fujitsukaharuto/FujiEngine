@@ -472,7 +472,7 @@
     <ClInclude Include="Engine\Editor\CommandManager.h">
       <Filter>Engine\Editor</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Editor\MoveCommand.h">
+    <ClInclude Include="Engine\Editor\PropertyCommand.h">
       <Filter>Engine\Editor</Filter>
     </ClInclude>
   </ItemGroup>
