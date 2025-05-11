@@ -61,6 +61,8 @@ private:
 
 	void SetBillboardWVP();
 
+	void CreatePropertyCommand(int type);
+
 private:
 	Object3dCommon* common_;
 	std::unique_ptr<Model> model_ = nullptr;
@@ -82,7 +84,8 @@ private:
 	std::string nowTextureName;
 
 	Vector3 prevPos_;
-	Trans preTrans_;
+	Vector3 prevRotate_;
+	Vector3 prevScale_;
 	int guizmoType_ = 0;
 	float IsUsingGuizmo_ = false;
 };
