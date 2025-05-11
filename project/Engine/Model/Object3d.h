@@ -82,4 +82,7 @@ private:
 	std::string nowTextureName;
 
 	Vector3 prevPos_;
+	Trans preTrans_;
+	int guizmoType_ = 0;
+	float IsUsingGuizmo_ = false;
 };

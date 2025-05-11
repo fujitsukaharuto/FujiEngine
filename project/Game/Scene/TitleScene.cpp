@@ -79,8 +79,6 @@ void TitleScene::Update() {
 	}
 	emit.Emit();
 
-	sphere->transform.rotate.y += 0.02f;
-
 	cMane_->AddCollider(test_->GetCollider());
 	cMane_->AddCollider(test2_->GetCollider());
 	cMane_->CheckAllCollision();

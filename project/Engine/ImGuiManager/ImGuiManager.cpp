@@ -6,6 +6,7 @@
 #ifdef _DEBUG
 #include "imgui_impl_dx12.h"
 #include "imgui_impl_win32.h"
+#include "ImGuizmo.h"
 #endif // _DEBUG
 
 void ImGuiManager::Init([[maybe_unused]] MyWin* myWin, [[maybe_unused]] DXCom* dxComon) {
@@ -47,7 +48,8 @@ void ImGuiManager::Init([[maybe_unused]] MyWin* myWin, [[maybe_unused]] DXCom* d
 	ImGuiIO& io2 = ImGui::GetIO();
 	io2.ConfigFlags |= ImGuiConfigFlags_DockingEnable;  // Dockingを有効化
 
-
+	winSizeX_ = myWin->kWindowWidth;
+	winSizeY_ = myWin->kWindowHeight;
 #endif // _DEBUG
 }
 
@@ -67,6 +69,11 @@ void ImGuiManager::Begin() {
 	ImGui_ImplDX12_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
+
+	ImGuizmo::BeginFrame();
+	ImGuizmo::SetOrthographic(false);
+	ImGuizmo::SetRect(0, 0, winSizeX_, winSizeY_);
+
 #endif // _DEBUG
 }
 
