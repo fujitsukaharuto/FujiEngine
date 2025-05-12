@@ -215,6 +215,12 @@
     <ClCompile Include="Engine\Editor\CommandManager.cpp">
       <Filter>Engine\Editor</Filter>
     </ClCompile>
+    <ClCompile Include="Game\GameObj\SkyDome\SkyBox.cpp">
+      <Filter>Game\GameObj\SkyDome</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\GraphicPipeline\SkyboxPipe.cpp">
+      <Filter>Engine\GraphicPipeline</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -475,6 +481,12 @@
     <ClInclude Include="Engine\Editor\PropertyCommand.h">
       <Filter>Engine\Editor</Filter>
     </ClInclude>
+    <ClInclude Include="Game\GameObj\SkyDome\SkyBox.h">
+      <Filter>Game\GameObj\SkyDome</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\GraphicPipeline\SkyboxPipe.h">
+      <Filter>Engine\GraphicPipeline</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -576,6 +588,9 @@
     <Filter Include="Engine\Editor">
       <UniqueIdentifier>{b324ee81-9c59-4fe2-9acd-053eaf7bcddc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game\GameObj\SkyDome">
+      <UniqueIdentifier>{972c8ba7-1fdf-4420-8976-641d635fa5ae}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resource\Shaders\GaussianBlur.PS.hlsl">
@@ -656,6 +671,12 @@
     <FxCompile Include="resource\Shaders\CS\CRTEffect.CS.hlsl">
       <Filter>resource\Shaders\CS</Filter>
     </FxCompile>
+    <FxCompile Include="resource\Shaders\Skybox.PS.hlsl">
+      <Filter>resource\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\Skybox.VS.hlsl">
+      <Filter>resource\Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="resource\Shaders\Object3d.hlsli">
@@ -668,6 +689,9 @@
       <Filter>resource\Shaders</Filter>
     </None>
     <None Include="resource\Shaders\SkinningObject3d.hlsli">
+      <Filter>resource\Shaders</Filter>
+    </None>
+    <None Include="resource\Shaders\Skybox.hlsli">
       <Filter>resource\Shaders</Filter>
     </None>
   </ItemGroup>

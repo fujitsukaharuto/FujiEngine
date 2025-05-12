@@ -14,7 +14,7 @@ class DXCom;
 class Model {
 public:
 	Model();
-	Model(const Model& other);
+	Model(const Model& other);// これなくす
 	~Model();
 
 	void Draw(ID3D12GraphicsCommandList* commandList, Material* mate);

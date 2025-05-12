@@ -59,7 +59,7 @@ void TextureManager::Load(const std::string& filename) {
 
 	texture->srvIndex = srvManager->Allocate();
 
-	srvManager->CreateTextureSRV(texture->srvIndex, texture->textureResource.Get(), texture->meta.format, UINT(texture->meta.mipLevels));
+	srvManager->CreateTextureSRV(texture->srvIndex, texture->textureResource.Get(), texture->meta.format, UINT(texture->meta.mipLevels), texture->meta.IsCubemap());
 
 	texture->cpuHandle = srvManager->GetCPUDescriptorHandle(texture->srvIndex);
 	texture->gpuHandle = srvManager->GetGPUDescriptorHandle(texture->srvIndex);
@@ -91,13 +91,22 @@ void TextureManager::ReleaseTexture(const std::string& filename) {
 
 DirectX::ScratchImage TextureManager::LoadTextureFile(const std::string& filePath) {
 	DirectX::ScratchImage image{};
+	HRESULT hr;
 	std::wstring filePathw = Logger::ConvertString(filePath);
-	HRESULT hr = DirectX::LoadFromWICFile(filePathw.c_str(), DirectX::WIC_FLAGS_FORCE_SRGB, nullptr, image);
+	if (filePathw.ends_with(L".dds")) {
+		hr = DirectX::LoadFromDDSFile(filePathw.c_str(), DirectX::DDS_FLAGS_NONE, nullptr, image);
+	} else {
+		hr = DirectX::LoadFromWICFile(filePathw.c_str(), DirectX::WIC_FLAGS_FORCE_SRGB, nullptr, image);
+	}
 	assert(SUCCEEDED(hr));
 
 	DirectX::ScratchImage mipImages{};
-	hr = DirectX::GenerateMipMaps(image.GetImages(), image.GetImageCount(), image.GetMetadata(),
-		DirectX::TEX_FILTER_SRGB, 0, mipImages);
+	if (DirectX::IsCompressed(image.GetMetadata().format)) {
+		mipImages = std::move(image);
+	} else {
+		hr = DirectX::GenerateMipMaps(image.GetImages(), image.GetImageCount(), image.GetMetadata(),
+			DirectX::TEX_FILTER_SRGB, 0, mipImages);
+	}
 	assert(SUCCEEDED(hr));
 
 	return mipImages;

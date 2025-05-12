@@ -6,7 +6,9 @@
 #include "Engine/ImGuiManager/ImGuiManager.h"
 #include "Engine/Editor/CommandManager.h"
 #include "Engine/Editor/PropertyCommand.h"
+#ifdef _DEBUG
 #include "ImGuizmo.h"
+#endif // _DEBUG
 
 Object3d::Object3d() {
 	dxcommon_ = ModelManager::GetInstance()->ShareDXCom();

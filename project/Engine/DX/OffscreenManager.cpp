@@ -284,7 +284,7 @@ void OffscreenManager::SettingTexture() {
 	offscreenSRVIndex_ = srvManager->Allocate();
 	offscreenIndex_ = srvManager->Allocate();
 
-	srvManager->CreateTextureSRV(offscreenSRVIndex_, offscreenrt_.Get(), DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, 1);
+	srvManager->CreateTextureSRV(offscreenSRVIndex_, offscreenrt_.Get(), DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, 1, false);
 
 	offTextureHandleCPU_ = srvManager->GetCPUDescriptorHandle(offscreenSRVIndex_);
 	offTextureHandle_ = srvManager->GetGPUDescriptorHandle(offscreenSRVIndex_);
