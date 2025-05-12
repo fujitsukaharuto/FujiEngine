@@ -4,6 +4,11 @@
 #include "LightManager.h"
 #include "CameraManager.h"
 #include "Engine/ImGuiManager/ImGuiManager.h"
+#include "Engine/Editor/CommandManager.h"
+#include "Engine/Editor/PropertyCommand.h"
+#ifdef _DEBUG
+#include "ImGuizmo.h"
+#endif // _DEBUG
 
 Object3d::Object3d() {
 	dxcommon_ = ModelManager::GetInstance()->ShareDXCom();
@@ -84,12 +89,79 @@ void Object3d::DebugGUI() {
 #ifdef _DEBUG
 	ImGui::Indent();
 	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Selected;
-	if (ImGui::TreeNodeEx("Trans",flags)) {
-	ImGui::DragFloat3("position", &transform.translate.x, 0.01f);
-	ImGui::DragFloat3("rotate", &transform.rotate.x, 0.01f);
-	ImGui::DragFloat3("scale", &transform.scale.x, 0.01f);
+	if (ImGui::TreeNodeEx("Trans", flags)) {
+		ImGui::DragFloat3("position", &transform.translate.x, 0.01f);
+		CreatePropertyCommand(0);
+		ImGui::DragFloat3("rotate", &transform.rotate.x, 0.01f);
+		CreatePropertyCommand(1);
+		ImGui::DragFloat3("scale", &transform.scale.x, 0.01f);
+		CreatePropertyCommand(2);
+
+		ImGui::Separator();
+		ImGui::RadioButton("TRANSLATE", &guizmoType_, 0); ImGui::SameLine();
+		ImGui::RadioButton("ROTATE", &guizmoType_, 1); ImGui::SameLine();
+		ImGui::RadioButton("SCALE", &guizmoType_, 2);
+		ImGuizmo::OPERATION operation;
+		switch (guizmoType_) {
+		case 0: operation = ImGuizmo::TRANSLATE; break;
+		case 1: operation = ImGuizmo::ROTATE;    break;
+		case 2: operation = ImGuizmo::SCALE;     break;
+		default: operation = ImGuizmo::TRANSLATE; break; // デフォルト安全策
+		}
+
+		// ギズモの表示
+		Matrix4x4 model = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
+
+		Matrix4x4 view;
+		Matrix4x4 proj;
+		view = CameraManager::GetInstance()->GetCamera()->GetViewMatrix();
+		proj = CameraManager::GetInstance()->GetCamera()->GetProjectionMatrix();
+
+		ImGuizmo::Manipulate(
+			&view.m[0][0], &proj.m[0][0],         // カメラ
+			operation,                  // 操作モード
+			ImGuizmo::WORLD,                      // ローカル座標系
+			&model.m[0][0]                        // 行列
+		);
+
+		// 編集中なら Transform に反映
+		if (ImGuizmo::IsUsing()) {
+			if (!IsUsingGuizmo_) {
+				prevPos_ = transform.translate; // 開始時の状態を保存
+				prevRotate_ = transform.rotate;
+				prevScale_ = transform.scale;
+			}
+			IsUsingGuizmo_ = true;
+
+			Vector3 t, r, s;
+			ImGuizmo::DecomposeMatrixToComponents(&model.m[0][0], &t.x, &r.x, &s.x);
+			transform.translate = t;
+			constexpr float DegToRad = 3.14159265f / 180.0f;
+			transform.rotate = r * DegToRad;
+			transform.scale = s;
+		} else if (IsUsingGuizmo_) {
+			// 編集終了検出 → Command 発行
+			if (transform.translate != prevPos_) {
+				auto command = std::make_unique<PropertyCommand<Vector3>>(
+					transform, &Trans::translate, prevPos_, transform.translate);
+				CommandManager::GetInstance()->Execute(std::move(command));
+			} else if (transform.rotate != prevRotate_) {
+				auto command = std::make_unique<PropertyCommand<Vector3>>(
+					transform, &Trans::rotate, prevRotate_, transform.rotate);
+				CommandManager::GetInstance()->Execute(std::move(command));
+			}else if (transform.scale != prevScale_) {
+				auto command = std::make_unique<PropertyCommand<Vector3>>(
+					transform, &Trans::scale, prevScale_, transform.scale);
+				CommandManager::GetInstance()->Execute(std::move(command));
+			}
+			// ※必要に応じて rotate/scale の比較と Command 追加も可
+
+			IsUsingGuizmo_ = false; // フラグリセット
+		}
+
 		ImGui::TreePop();
 	}
+
 	if (ImGui::TreeNodeEx("color",flags)) {
 		Vector4 color = model_->GetColor(0);
 		ImGui::ColorEdit4("color", &color.x);
@@ -186,4 +258,46 @@ void Object3d::SetBillboardWVP() {
 	wvpDate_->World = worldMatrix;
 	wvpDate_->WVP = worldViewProjectionMatrix;
 	wvpDate_->WorldInverseTransPose = Transpose(Inverse(wvpDate_->World));
+}
+
+void Object3d::CreatePropertyCommand(int type) {
+#ifdef _DEBUG
+	if (ImGui::IsItemActivated()) {
+		switch (type) {
+		case 0: prevPos_    = transform.translate; break;
+		case 1: prevRotate_ = transform.rotate;    break;
+		case 2: prevScale_  = transform.scale;     break;
+		default: break;
+		}
+	}
+	if (ImGui::IsItemDeactivatedAfterEdit()) { // 編集完了検出
+		switch (type) {
+		case 0:
+			if (transform.translate != prevPos_) {
+				auto command = std::make_unique<PropertyCommand<Vector3>>(
+					transform, &Trans::translate, prevPos_, transform.translate);
+				CommandManager::GetInstance()->Execute(std::move(command));
+				prevPos_ = transform.translate;
+			}
+			break;
+		case 1:
+			if (transform.rotate != prevRotate_) {
+				auto command = std::make_unique<PropertyCommand<Vector3>>(
+					transform, &Trans::rotate, prevRotate_, transform.rotate);
+				CommandManager::GetInstance()->Execute(std::move(command));
+				prevRotate_ = transform.rotate;
+			}
+			break;
+		case 2:
+			if (transform.scale != prevScale_) {
+				auto command = std::make_unique<PropertyCommand<Vector3>>(
+					transform, &Trans::scale, prevScale_, transform.scale);
+				CommandManager::GetInstance()->Execute(std::move(command));
+				prevScale_ = transform.scale;
+			}
+			break;
+		default: break;
+		}
+	}
+#endif // _DEBUG
 }

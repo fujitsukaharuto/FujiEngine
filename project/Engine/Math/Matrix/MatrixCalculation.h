@@ -212,3 +212,7 @@ bool IsCollision(const AABB& aabb, const Vector3& point);
 Matrix4x4 MakeRotateAxisAngle(const Vector3& axis, float angle);
 
 Matrix4x4 DirectionToDirection(const Vector3& from, const Vector3& to);
+
+void ToFloatArray(const Matrix4x4& m, float out[16]);
+
+Matrix4x4 FromFloatArray(const float in[16]);

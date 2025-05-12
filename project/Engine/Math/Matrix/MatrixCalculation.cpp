@@ -624,3 +624,21 @@ Matrix4x4 DirectionToDirection(const Vector3& from, const Vector3& to) {
 
 	return MakeRotateAxisAngle(axis, angle);
 }
+
+void ToFloatArray(const Matrix4x4& m, float out[16]) {
+	for (int row = 0; row < 4; ++row) {
+		for (int col = 0; col < 4; ++col) {
+			out[col * 4 + row] = m.m[row][col]; // 転置
+		}
+	}
+}
+
+Matrix4x4 FromFloatArray(const float in[16]) {
+	Matrix4x4 mat;
+	for (int row = 0; row < 4; ++row) {
+		for (int col = 0; col < 4; ++col) {
+			mat.m[row][col] = in[col * 4 + row]; // 逆転置
+		}
+	}
+	return mat;
+}

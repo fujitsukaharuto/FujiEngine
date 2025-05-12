@@ -14,6 +14,7 @@ enum class Pipe : int {
 	particle,
 	particleSub,
 	Animation,
+	Skybox,
 	Gray,
 	Gauss,
 	MetaBall,

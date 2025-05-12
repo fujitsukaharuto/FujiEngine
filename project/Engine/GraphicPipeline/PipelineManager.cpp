@@ -5,6 +5,7 @@
 #include "Line3dPipe.h"
 #include "ParticlePipeline.h"
 #include "AnimationPipeline.h"
+#include "SkyboxPipe.h"
 #include "GrayPipeline.h"
 #include "MetaBallPipeline.h"
 #include "GaussPipeline.h"
@@ -45,6 +46,7 @@ void PipelineManager::CreatePipeline() {
 	std::unique_ptr<ParticlePipeline> particlePipline = nullptr;
 	std::unique_ptr<ParticlePipeline> particlePiplineSub = nullptr;
 	std::unique_ptr<AnimationPipeline> animationPipline = nullptr;
+	std::unique_ptr<SkyboxPipe> skyboxPipline = nullptr;
 	std::unique_ptr<GrayPipeline> grayPipeline = nullptr;
 	std::unique_ptr<MetaBallPipeline> metaballPipeline = nullptr;
 	std::unique_ptr<GaussPipeline> gaussPipeline = nullptr;
@@ -87,6 +89,11 @@ void PipelineManager::CreatePipeline() {
 	animationPipline.reset(new AnimationPipeline());
 	animationPipline->Initialize(dxcommon_);
 	pipelines_.push_back(std::move(animationPipline));
+
+
+	skyboxPipline.reset(new SkyboxPipe());
+	skyboxPipline->Initialize(dxcommon_);
+	pipelines_.push_back(std::move(skyboxPipline));
 
 
 	grayPipeline.reset(new GrayPipeline());

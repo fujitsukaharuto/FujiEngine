@@ -1,6 +1,7 @@
 #pragma once
 #include "Scene/BaseScene.h"
 #include "Game/TestBaseObj.h"
+#include "Game/GameObj/SkyDome/SkyBox.h"
 #include "Game/Collider/CollisionManager.h"
 
 class TitleScene:public BaseScene {
@@ -21,7 +22,9 @@ private:
 	void ApplyGlobalVariables();//値読み込みテスト用今度Objectクラス作って継承で使えるようにする
 
 	std::unique_ptr<Object3dCommon> obj3dCommon = nullptr;
+	std::unique_ptr<SkyBox> skybox_;
 	std::unique_ptr<Object3d> sphere = nullptr;
+	std::unique_ptr<Object3d> sphere2 = nullptr;
 	std::unique_ptr<AnimationModel> cube_ = nullptr;
 	Vector3 rightDir = { 1.0f,0.0f,0.0f };
 

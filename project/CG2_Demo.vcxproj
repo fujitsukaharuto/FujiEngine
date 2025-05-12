@@ -119,6 +119,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\DX\Framework.cpp" />
     <ClCompile Include="Engine\DX\OffscreenManager.cpp" />
     <ClCompile Include="Engine\DX\SRVManager.cpp" />
+    <ClCompile Include="Engine\Editor\CommandManager.cpp" />
     <ClCompile Include="Engine\GlobalVariables\GlobalVariables.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\AnimationPipeline.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\BasePipeline.cpp" />
@@ -135,6 +136,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\GraphicPipeline\Pipeline.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\PipelineManager.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\ShockWavePipe.cpp" />
+    <ClCompile Include="Engine\GraphicPipeline\SkyboxPipe.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\ThunderPipe.cpp" />
     <ClCompile Include="Engine\ImGuiManager\ImGuiManager.cpp" />
     <ClCompile Include="Engine\Input\Input.cpp" />
@@ -173,6 +175,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\GameObj\Player\Behavior\PlayerRoot.cpp" />
     <ClCompile Include="Game\GameObj\Player\Player.cpp" />
     <ClCompile Include="Game\GameObj\Player\PlayerBullet.cpp" />
+    <ClCompile Include="Game\GameObj\SkyDome\SkyBox.cpp" />
     <ClCompile Include="Game\OriginGameObject.cpp" />
     <ClCompile Include="Game\Collider\BaseCollider.cpp" />
     <ClCompile Include="Game\Collider\AABBCollider.cpp" />
@@ -198,6 +201,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\DX\Framework.h" />
     <ClInclude Include="Engine\DX\OffscreenManager.h" />
     <ClInclude Include="Engine\DX\SRVManager.h" />
+    <ClInclude Include="Engine\Editor\CommandManager.h" />
+    <ClInclude Include="Engine\Editor\ICommand.h" />
+    <ClInclude Include="Engine\Editor\PropertyCommand.h" />
     <ClInclude Include="Engine\GlobalVariables\GlobalVariables.h" />
     <ClInclude Include="Engine\GraphicPipeline\AnimationPipeline.h" />
     <ClInclude Include="Engine\GraphicPipeline\BasePipeline.h" />
@@ -214,6 +220,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\GraphicPipeline\Pipeline.h" />
     <ClInclude Include="Engine\GraphicPipeline\PipelineManager.h" />
     <ClInclude Include="Engine\GraphicPipeline\ShockWavePipe.h" />
+    <ClInclude Include="Engine\GraphicPipeline\SkyboxPipe.h" />
     <ClInclude Include="Engine\GraphicPipeline\ThunderPipe.h" />
     <ClInclude Include="Engine\ImGuiManager\ImGuiManager.h" />
     <ClInclude Include="Engine\Input\Input.h" />
@@ -266,6 +273,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Game\GameObj\Player\Behavior\PlayerRoot.h" />
     <ClInclude Include="Game\GameObj\Player\Player.h" />
     <ClInclude Include="Game\GameObj\Player\PlayerBullet.h" />
+    <ClInclude Include="Game\GameObj\SkyDome\SkyBox.h" />
     <ClInclude Include="Game\OriginGameObject.h" />
     <ClInclude Include="Game\Collider\BaseCollider.h" />
     <ClInclude Include="Game\Collider\AABBCollider.h" />
@@ -411,6 +419,18 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
+    <FxCompile Include="resource\Shaders\Skybox.PS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\Skybox.VS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="resource\Shaders\Thunder.PS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
@@ -438,6 +458,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </None>
     <None Include="resource\Shaders\SkinningObject3d.hlsli">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
+    <None Include="resource\Shaders\Skybox.hlsli">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </None>

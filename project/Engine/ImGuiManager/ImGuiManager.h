@@ -57,6 +57,9 @@ private:
 	DXCom* dxCommon_ = nullptr;
 	uint32_t srvIndex;
 
+	float winSizeX_ = 0.0f;
+	float winSizeY_ = 0.0f;
+
 #ifdef _DEBUG
 	ImFont* font_japanese = nullptr;
 #endif // _DEBUG

@@ -1,6 +1,7 @@
 #include "BaseScene.h"
 
 #include "Engine/Scene/SceneManager.h"
+#include "Engine/Editor/CommandManager.h"
 
 BaseScene::BaseScene() {
 }
@@ -41,4 +42,5 @@ void BaseScene::ParticleGroupDebugGUI() {
 
 void BaseScene::ChangeScene(const std::string& sceneName, float extraTime) {
 	sceneManager_->ChangeScene(sceneName, extraTime);
+	CommandManager::GetInstance()->Reset();
 }

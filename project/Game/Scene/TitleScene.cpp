@@ -29,9 +29,17 @@ void TitleScene::Initialize() {
 	black_->SetAnchor({ 0.0f,0.0f });
 #pragma endregion
 
+	skybox_ = std::make_unique<SkyBox>();
+	skybox_->SetCommonResources(dxcommon_, SRVManager::GetInstance(), CameraManager::GetInstance()->GetCamera());
+	skybox_->Initialize();
+
 	sphere = std::make_unique<Object3d>();
 	sphere->Create("Fence.obj");
 	sphere->transform.translate.x = 4.0f;
+
+	sphere2 = std::make_unique<Object3d>();
+	sphere2->CreateSphere();
+	sphere2->transform.translate.x = 1.0f;
 
 	cube_ = std::make_unique<AnimationModel>();
 	cube_->Create("sneakWalk.gltf");
@@ -64,6 +72,7 @@ void TitleScene::Update() {
 #endif // _DEBUG
 
 	BlackFade();
+	skybox_->Update();
 
 	test_->Update();
 	test2_->Update();
@@ -74,8 +83,6 @@ void TitleScene::Update() {
 		emit.Emit();
 	}
 	emit.Emit();
-
-	sphere->transform.rotate.y += 0.02f;
 
 	cMane_->AddCollider(test_->GetCollider());
 	cMane_->AddCollider(test2_->GetCollider());
@@ -94,8 +101,11 @@ void TitleScene::Draw() {
 
 
 #pragma region 3Dオブジェクト
+	skybox_->Draw();
+
 	obj3dCommon->PreDraw();
 	sphere->Draw();
+	sphere2->Draw();
 	//test_->Draw();
 
 	obj3dCommon->PreAnimationDraw();
@@ -130,6 +140,9 @@ void TitleScene::DebugGUI() {
 	ImGui::Indent();
 	if (ImGui::CollapsingHeader("Sphere")) {
 		sphere->DebugGUI();
+	}
+	if (ImGui::CollapsingHeader("Sphere2")) {
+		sphere2->DebugGUI();
 	}
 
 	test_->DebugGUI();
