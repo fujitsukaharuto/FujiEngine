@@ -25,12 +25,23 @@ public:
 		float shininess;
 	};
 
+	struct MaterialEnvironment {
+		Vector4 color;
+		int32_t enableLighting;
+		float padding[3];
+		Matrix4x4 uvTransform;
+		float shininess;
+		float environmentCoefficient = 1.0f;
+	};
+
 public:
 	Material();
 	~Material();
 
 
 	void CreateMaterial();
+
+	void CreateEnvironmentMaterial();
 
 	Texture* GetTexture();
 
@@ -58,6 +69,11 @@ private:
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_ = nullptr;
 	MaterialDate* materialDate_ = nullptr;
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> materialEnvironmentResource_ = nullptr;
+	MaterialEnvironment* materialEnvironment_ = nullptr;
+	bool isEnvironment_ = false;
+
 	Texture* texture_ = nullptr;
 	MaterialDataPath textureNamePath_;
 };

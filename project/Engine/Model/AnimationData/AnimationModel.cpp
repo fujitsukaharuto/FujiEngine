@@ -59,6 +59,9 @@ void AnimationModel::LoadAnimationFile(const std::string& filename) {
 			nodeAnimation.scale.keyframes.push_back(keyframe);
 		}
 	}
+
+	model_->CreateEnvironment();
+	environment_ = TextureManager::GetInstance()->LoadTexture("skyboxTexture.dds");
 }
 
 void AnimationModel::CreateSkeleton(const Node& rootNode) {
@@ -161,6 +164,7 @@ void AnimationModel::Draw(Material* mate) {
 	cList->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
 	cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_->GetGPUVirtualAddress());
 	cList->SetGraphicsRootDescriptorTable(7, skinCluster_.paletteSrvHandle.second);
+	cList->SetGraphicsRootDescriptorTable(8, environment_->gpuHandle);
 
 	if (model_) {
 		model_->AnimationDraw(skinCluster_,cList, mate);
@@ -338,7 +342,7 @@ void AnimationModel::SetWVP() {
 	wvpDate_->WVP = worldViewProjectionMatrix;
 	wvpDate_->WorldInverseTransPose = Transpose(Inverse(wvpDate_->World));
 
-	cameraPosData_->worldPosition = camera_->transform.translate;
+	cameraPosData_->worldPosition = camera_->GetTranslate();
 }
 
 void AnimationModel::SetBillboardWVP() {

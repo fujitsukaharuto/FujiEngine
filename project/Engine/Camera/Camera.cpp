@@ -80,3 +80,11 @@ void Camera::DebugGUI() {
 	}
 #endif // _DEBUG
 }
+
+Vector3 Camera::GetTranslate() {
+	if (CameraManager::GetInstance()->GetDebugMode()) {
+		return DebugCamera::GetInstance()->GetTranslate();
+	} else {
+		return transform.translate;
+	}
+}

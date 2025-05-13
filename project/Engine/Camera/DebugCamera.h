@@ -44,6 +44,8 @@ public:
 	/// </summary>
 	void PreChange();
 
+	Vector3 GetTranslate() { return translation_; }
+
 private:
 
 	Matrix4x4 matRot_;

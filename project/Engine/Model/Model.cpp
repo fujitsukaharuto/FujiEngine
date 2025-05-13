@@ -58,14 +58,20 @@ void Model::AddMesh(const Mesh& mesh) {
 	mesh_.push_back(mesh);
 }
 
+void Model::CreateEnvironment() {
+	for (Material& material : material_) {
+		material.CreateEnvironmentMaterial();
+	}
+}
+
 void Model::SetColor(const Vector4& color) {
-	for (Material material : material_) {
+	for (Material& material : material_) {
 		material.SetColor(color);
 	}
 }
 
 void Model::SetUVScale(const Vector2& scale, const Vector2& uvTrans) {
-	for (Material material : material_) {
+	for (Material& material : material_) {
 		material.SetUVScale(scale, uvTrans);
 	}
 }

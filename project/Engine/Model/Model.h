@@ -25,6 +25,8 @@ public:
 
 	void AddMesh(const Mesh& mesh);
 
+	void CreateEnvironment();
+
 	void SetColor(const Vector4& color);
 
 	void SetUVScale(const Vector2& scale, const Vector2& uvTrans);

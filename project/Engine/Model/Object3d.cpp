@@ -235,7 +235,7 @@ void Object3d::SetWVP() {
 	wvpDate_->WVP = Multiply(model_->data_.rootNode.local, worldViewProjectionMatrix);
 	wvpDate_->WorldInverseTransPose = Transpose(Inverse(wvpDate_->World));
 
-	cameraPosData_->worldPosition = camera_->transform.translate;
+	cameraPosData_->worldPosition = camera_->GetTranslate();
 
 }
 

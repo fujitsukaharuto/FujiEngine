@@ -89,6 +89,8 @@ public:
 
 	void DebugGUI();
 
+	Vector3 GetTranslate();
+
 	Trans transform;
 
 private:
