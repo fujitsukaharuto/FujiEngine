@@ -7,16 +7,23 @@
 class Boss : public OriginGameObject {
 public:
 	Boss();
-	~Boss();
+	~Boss() = default;
 
 	void Initialize()override;
 	void Update()override;
 	void Draw(Material* mate = nullptr)override;
 	void DebugGUI()override;
+	void ParameterGUI();
 
 	//========================================================================*/
 	//* Behavior
 	void ChangeBehavior(std::unique_ptr<BaseBossBehavior>behavior);
+
+	//========================================================================*/
+	//* Collision
+	void OnCollisionEnter([[maybe_unused]] const ColliderInfo& other);
+	void OnCollisionStay([[maybe_unused]] const ColliderInfo& other);
+	void OnCollisionExit([[maybe_unused]] const ColliderInfo& other);
 
 private:
 

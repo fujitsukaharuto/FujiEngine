@@ -7,7 +7,6 @@
 
 
 class PlayerBullet;
-class StageBlock;
 
 class Player : public OriginGameObject{
 public:
