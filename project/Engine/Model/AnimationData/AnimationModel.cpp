@@ -61,6 +61,7 @@ void AnimationModel::LoadAnimationFile(const std::string& filename) {
 	}
 
 	model_->CreateEnvironment();
+	model_->CreateSkinningInformation(dxcommon_);
 	environment_ = TextureManager::GetInstance()->LoadTexture("skyboxTexture.dds");
 }
 
@@ -101,16 +102,9 @@ SkinCluster AnimationModel::CreateSkinCluster(const Skeleton& skeleton, const Mo
 	uint32_t paletteIndex = srv->Allocate();
 	skinCluster.paletteSrvHandle.first = srv->GetCPUDescriptorHandle(paletteIndex);
 	skinCluster.paletteSrvHandle.second = srv->GetGPUDescriptorHandle(paletteIndex);
+	srv->CreateStructuredSRV(paletteIndex, skinCluster.paletteResource.Get(),
+		static_cast<UINT>(skeleton.joints.size()), static_cast<UINT>(sizeof(WellForGPU)));
 
-	D3D12_SHADER_RESOURCE_VIEW_DESC paletteSrvDesc{};
-	paletteSrvDesc.Format = DXGI_FORMAT_UNKNOWN;
-	paletteSrvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	paletteSrvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
-	paletteSrvDesc.Buffer.FirstElement = 0;
-	paletteSrvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
-	paletteSrvDesc.Buffer.NumElements = UINT(skeleton.joints.size());
-	paletteSrvDesc.Buffer.StructureByteStride = sizeof(WellForGPU);
-	dxcommon_->GetDevice()->CreateShaderResourceView(skinCluster.paletteResource.Get(), &paletteSrvDesc, skinCluster.paletteSrvHandle.first);
 
 	// InfluenceResource
 	skinCluster.influenceResource = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(VertexInfluence) * modelData.vertices.size());
@@ -122,6 +116,14 @@ SkinCluster AnimationModel::CreateSkinCluster(const Skeleton& skeleton, const Mo
 	skinCluster.influenceBuffreView.BufferLocation = skinCluster.influenceResource->GetGPUVirtualAddress();
 	skinCluster.influenceBuffreView.SizeInBytes = UINT(sizeof(VertexInfluence) * modelData.vertices.size());
 	skinCluster.influenceBuffreView.StrideInBytes = sizeof(VertexInfluence);
+
+	uint32_t influenceIndex = srv->Allocate();
+	skinCluster.influenceSrvHandle.first = srv->GetCPUDescriptorHandle(influenceIndex);
+	skinCluster.influenceSrvHandle.second = srv->GetGPUDescriptorHandle(influenceIndex);
+	// SRV作成
+	srv->CreateStructuredSRV(influenceIndex, skinCluster.influenceResource.Get(),
+		static_cast<UINT>(model_->GetVertexSize()), static_cast<UINT>(sizeof(VertexInfluence)));
+
 
 	skinCluster.inverseBindPoseMatrices.resize(skeleton.joints.size());
 	std::generate(skinCluster.inverseBindPoseMatrices.begin(), skinCluster.inverseBindPoseMatrices.end(), MakeIdentity4x4);
@@ -157,14 +159,21 @@ void AnimationModel::AnimationUpdate() {
 	SkinClusterUpdate();
 }
 
+void AnimationModel::CSDispatch() {
+	model_->CSDispatch(skinCluster_, dxcommon_->GetCommandList());
+}
+
 void AnimationModel::Draw(Material* mate) {
 	SetWVP();
+
+	if (model_) {
+		model_->TransBarrier();
+	}
 
 	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
 	cList->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
 	cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_->GetGPUVirtualAddress());
-	cList->SetGraphicsRootDescriptorTable(7, skinCluster_.paletteSrvHandle.second);
-	cList->SetGraphicsRootDescriptorTable(8, environment_->gpuHandle);
+	cList->SetGraphicsRootDescriptorTable(7, environment_->gpuHandle);
 
 	if (model_) {
 		model_->AnimationDraw(skinCluster_,cList, mate);
@@ -270,7 +279,28 @@ void AnimationModel::SetLightEnable(LightMode mode) {
 }
 
 void AnimationModel::SetModel(const std::string& fileName) {
-	model_ = std::make_unique<Model>(*(ModelManager::FindModel(fileName)));
+	model_ = std::make_unique<Model>();
+	model_->data_ = ModelManager::FindModel(fileName);
+
+	for (size_t i = 0; i < model_->data_.meshes.size(); i++) {
+		Mesh newMesh{};
+		Material newMaterial{};
+		newMaterial.SetTextureNamePath((model_->data_.meshes[i].material.textureFilePath));
+		newMaterial.CreateMaterial();
+		model_->AddMaterial(newMaterial);
+		model_->SetTextureName((model_->data_.meshes[i].material.textureFilePath));
+
+		for (size_t index = 0; index < model_->data_.meshes[i].vertices.size(); index++) {
+			VertexDate newVertex = model_->data_.meshes[i].vertices[index];
+			newMesh.AddVertex({ { newVertex.position },{newVertex.texcoord},{newVertex.normal} });
+		}
+		for (size_t index = 0; index < model_->data_.meshes[i].indicies.size(); index++) {
+			uint32_t newIndex = model_->data_.meshes[i].indicies[index];
+			newMesh.AddIndex(newIndex);
+		}
+		newMesh.CreateMesh();
+		model_->AddMesh(newMesh);
+	}
 }
 
 int32_t AnimationModel::CreateJoint(const Node& node, const std::optional<int32_t>& parent, std::vector<Joint>& joints) {

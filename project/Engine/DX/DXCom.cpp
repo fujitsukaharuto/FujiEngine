@@ -467,3 +467,26 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DXCom::CreateOffscreenTextureResource(Mic
 
 	return resource;
 }
+
+Microsoft::WRL::ComPtr<ID3D12Resource> DXCom::CreateUAVResource(ID3D12Device* device, size_t sizeInBytes) {
+	HRESULT hr;
+
+	D3D12_HEAP_PROPERTIES uploadHeapProperties{};
+	uploadHeapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
+	D3D12_RESOURCE_DESC vertexResourceDesc{};
+	vertexResourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+	vertexResourceDesc.Width = sizeInBytes;
+	vertexResourceDesc.Height = 1;
+	vertexResourceDesc.DepthOrArraySize = 1;
+	vertexResourceDesc.MipLevels = 1;
+	vertexResourceDesc.SampleDesc.Count = 1;
+	vertexResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+	vertexResourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+	ComPtr<ID3D12Resource> bufferResource = nullptr;
+	hr = device->CreateCommittedResource(
+		&uploadHeapProperties, D3D12_HEAP_FLAG_NONE, &vertexResourceDesc,
+		D3D12_RESOURCE_STATE_COMMON, nullptr, IID_PPV_ARGS(&bufferResource));
+	assert(SUCCEEDED(hr));
+
+	return bufferResource;
+}

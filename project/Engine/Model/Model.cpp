@@ -7,18 +7,6 @@ Model::Model() {
 	data_.rootNode.local = MakeIdentity4x4();
 }
 
-Model::Model(const Model& other) {
-
-	mesh_ = other.mesh_;
-	data_ = other.data_;
-	for (uint32_t index = 0; index < other.material_.size(); ++index) {
-		Material newMaterial{};
-		newMaterial.SetTextureNamePath(other.material_[index].GetPathName());
-		newMaterial.CreateMaterial();
-		material_.push_back(newMaterial);
-	}
-}
-
 Model::~Model() {
 	material_.clear();
 	mesh_.clear();
@@ -50,6 +38,12 @@ void Model::AnimationDraw(const SkinCluster& skinCluster, ID3D12GraphicsCommandL
 	}
 }
 
+void Model::TransBarrier() {
+	for (uint32_t index = 0; index < mesh_.size(); ++index) {
+		mesh_[index].TransBarrier();
+	}
+}
+
 void Model::AddMaterial(const Material& material) {
 	material_.push_back(material);
 }
@@ -62,6 +56,16 @@ void Model::CreateEnvironment() {
 	for (Material& material : material_) {
 		material.CreateEnvironmentMaterial();
 	}
+	for (uint32_t index = 0; index < mesh_.size(); ++index) {
+		mesh_[index].CreateUAV();
+	}
+}
+
+void Model::CreateSkinningInformation(DXCom* pDxcom) {
+	skinningInformation_ = pDxcom->CreateBufferResource(pDxcom->GetDevice(), sizeof(SkinningInformation));
+	infoData_ = nullptr;
+	skinningInformation_->Map(0, nullptr, reinterpret_cast<void**>(&infoData_));
+	infoData_->numVertices = static_cast<int32_t>(mesh_.front().GetVertexDataSize());
 }
 
 void Model::SetColor(const Vector4& color) {
@@ -94,4 +98,13 @@ void Model::SetLightEnable(LightMode mode) {
 	for (uint32_t index = 0; index < mesh_.size(); ++index) {
 		material_[index].SetLightEnable(mode);
 	}
+}
+
+void Model::CSDispatch(const SkinCluster& skinCluster, ID3D12GraphicsCommandList* commandList) {
+	PipelineManager::GetInstance()->SetCSPipeline(Pipe::SkinningCS);
+	commandList->SetComputeRootDescriptorTable(0, skinCluster.paletteSrvHandle.second);
+	commandList->SetComputeRootDescriptorTable(2, skinCluster.influenceSrvHandle.second);
+	mesh_.front().CSDispatch(commandList);
+	commandList->SetComputeRootConstantBufferView(4, skinningInformation_->GetGPUVirtualAddress());
+	commandList->Dispatch(static_cast<UINT>(mesh_.front().GetVertexDataSize() + 1023) / 1024, 1, 1);
 }

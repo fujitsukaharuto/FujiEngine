@@ -39,6 +39,8 @@ public:
 
 	void AnimationUpdate();
 
+	void CSDispatch();
+
 	void Draw(Material* mate = nullptr);
 
 	void AnimeDraw();

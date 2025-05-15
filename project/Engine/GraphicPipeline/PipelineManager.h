@@ -23,6 +23,7 @@ enum class Pipe : int {
 	CRT,
 	GrayCS,
 	CRTCS,
+	SkinningCS,
 };
 
 

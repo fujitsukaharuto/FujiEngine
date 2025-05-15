@@ -30,33 +30,27 @@ void ModelManager::Finalize() {
 
 void ModelManager::LoadOBJ(const std::string& filename) {
 	ModelManager* instance = GetInstance();
-
 	auto iterator = instance->models_.find(filename);
 	if (iterator != instance->models_.end()) {
 		return;
 	}
 
-
 	std::unique_ptr<Model> model;
 	model.reset(new Model());
-	Mesh newMesh{};
-	Material newMaterial{};
-
 
 	Assimp::Importer importer;
 	std::string path = instance->kDirectoryPath_ + "/" + filename;
 	const aiScene* scene = importer.ReadFile(path.c_str(), aiProcess_FlipWindingOrder | aiProcess_FlipUVs);
 	assert(scene->HasMeshes());
 
-
 	// Mesh解析
 	uint32_t meshVertexCount = 0;
 	for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; meshIndex++) {
-
 		aiMesh* mesh = scene->mMeshes[meshIndex];
 		assert(mesh->HasNormals());
 		bool hasTexcoord = mesh->HasTextureCoords(0);
 
+		ModelMesh newModelMesh{};
 		// Vertex解析
 		for (uint32_t element = 0; element < mesh->mNumVertices; element++) {
 
@@ -77,7 +71,9 @@ void ModelManager::LoadOBJ(const std::string& filename) {
 			vertex.position.x *= -1.0f;
 			vertex.normal.x *= -1.0f;
 
-			newMesh.AddVertex({ {vertex.position},{vertex.texcoord},{vertex.normal} });
+			//newMesh.AddVertex({ {vertex.position},{vertex.texcoord},{vertex.normal} });
+			model->data_.vertices.push_back({ {vertex.position},{vertex.texcoord},{vertex.normal} });
+			newModelMesh.vertices.push_back({ {vertex.position},{vertex.texcoord},{vertex.normal} });
 		}
 
 		for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; faceIndex++) {
@@ -86,65 +82,50 @@ void ModelManager::LoadOBJ(const std::string& filename) {
 
 			for (uint32_t element = 0; element < face.mNumIndices; element++) {
 				uint32_t vertexIndex = face.mIndices[element];
-				newMesh.AddIndex(vertexIndex + meshVertexCount);
+				//newMesh.AddIndex(vertexIndex + meshVertexCount);
+				model->data_.indicies.push_back(vertexIndex + meshVertexCount);
+				newModelMesh.indicies.push_back(vertexIndex);
 			}
 		}
 		meshVertexCount += mesh->mNumVertices;
-	}
 
-	// Material解析
-	for (uint32_t materialIndex = 0; materialIndex < scene->mNumMaterials; materialIndex++) {
-
+		// === メッシュに対応するマテリアルを取得 ===
+		uint32_t materialIndex = mesh->mMaterialIndex;
 		aiMaterial* material = scene->mMaterials[materialIndex];
 
-		if (material->GetTextureCount(aiTextureType_DIFFUSE) != 0) {
+		aiString textureFileName;
+		std::string texturePath;
 
-			aiString textureFileName;
-			material->GetTexture(aiTextureType_DIFFUSE, 0, &textureFileName);
-			newMaterial.SetTextureNamePath((textureFileName).C_Str());
-			newMaterial.CreateMaterial();
-			model->AddMaterial(newMaterial);
-			model->SetTextureName((textureFileName).C_Str());
+		if (material->GetTextureCount(aiTextureType_DIFFUSE) > 0 &&
+			material->GetTexture(aiTextureType_DIFFUSE, 0, &textureFileName) == AI_SUCCESS) {
+			texturePath = textureFileName.C_Str();
+		} else {
+			texturePath = "white2x2.png";  // デフォルト
 		}
+		newModelMesh.material.textureFilePath = texturePath;
+
+		model->data_.meshes.push_back(newModelMesh);
 	}
-
-	if (model->GetTextuerName().empty()) {
-		const std::string defaultTexture = "white2x2.png";
-		newMaterial.SetTextureNamePath(defaultTexture);
-		newMaterial.CreateMaterial();
-		model->AddMaterial(newMaterial);
-		model->SetTextureName(defaultTexture);
-	}
-
-
-	newMesh.CreateMesh();
-
-	model->AddMesh(newMesh);
 
 	instance->models_.insert(std::make_pair(filename, std::move(model)));
 }
 
 void ModelManager::LoadGLTF(const std::string& filename) {
 	ModelManager* instance = GetInstance();
-
 	auto iterator = instance->models_.find(filename);
 	if (iterator != instance->models_.end()) {
 		return;
 	}
 
-
 	std::unique_ptr<Model> model;
 	model.reset(new Model());
-	Mesh newMesh{};
-	Material newMaterial{};
-
 
 	Assimp::Importer importer;
 	std::string path = instance->kDirectoryPath_ + "/" + filename;
 	const aiScene* scene = importer.ReadFile(path.c_str(), aiProcess_FlipWindingOrder | aiProcess_FlipUVs);
 	assert(scene->HasMeshes());
 
-
+	ModelMesh newModelMesh{};
 	// Mesh解析
 	uint32_t meshVertexCount = 0;
 	for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; meshIndex++) {
@@ -154,7 +135,6 @@ void ModelManager::LoadGLTF(const std::string& filename) {
 
 		// Vertex解析
 		for (uint32_t element = 0; element < mesh->mNumVertices; element++) {
-
 			aiVector3D& position = mesh->mVertices[element];
 			aiVector3D& normal = mesh->mNormals[element];
 
@@ -169,12 +149,11 @@ void ModelManager::LoadGLTF(const std::string& filename) {
 				vertex.texcoord = { 0.0f,0.0f };
 			}
 
-
 			vertex.position.x *= -1.0f;
 			vertex.normal.x *= -1.0f;
 
-			newMesh.AddVertex({ {vertex.position},{vertex.texcoord},{vertex.normal} });
 			model->data_.vertices.push_back({ {vertex.position},{vertex.texcoord},{vertex.normal} });
+			newModelMesh.vertices.push_back({ {vertex.position},{vertex.texcoord},{vertex.normal} });
 		}
 
 		for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; faceIndex++) {
@@ -183,11 +162,27 @@ void ModelManager::LoadGLTF(const std::string& filename) {
 			
 			for (uint32_t element = 0; element < face.mNumIndices; element++) {
 				uint32_t vertexIndex = face.mIndices[element];
-				newMesh.AddIndex(vertexIndex);
 				model->data_.indicies.push_back(vertexIndex + meshVertexCount);
+				newModelMesh.indicies.push_back(vertexIndex);
 			}
 		}
 		meshVertexCount += mesh->mNumVertices;
+
+		// === メッシュに対応するマテリアルを取得 ===
+		uint32_t materialIndex = mesh->mMaterialIndex;
+		aiMaterial* material = scene->mMaterials[materialIndex];
+
+		aiString textureFileName;
+		std::string texturePath;
+
+		if (material->GetTextureCount(aiTextureType_DIFFUSE) > 0 &&
+			material->GetTexture(aiTextureType_DIFFUSE, 0, &textureFileName) == AI_SUCCESS) {
+			texturePath = textureFileName.C_Str();
+		} else {
+			texturePath = "white2x2.png";  // デフォルト
+		}
+		newModelMesh.material.textureFilePath = texturePath;
+		model->data_.meshes.push_back(newModelMesh);
 
 		// SkinCluster構築用のデータ取得
 		for (uint32_t boneIndex = 0; boneIndex < mesh->mNumBones; boneIndex++) {
@@ -209,48 +204,19 @@ void ModelManager::LoadGLTF(const std::string& filename) {
 			}
 		}
 	}
-
-	// Material解析
-	for (uint32_t materialIndex = 0; materialIndex < scene->mNumMaterials; materialIndex++) {
-
-		aiMaterial* material = scene->mMaterials[materialIndex];
-
-		if (material->GetTextureCount(aiTextureType_DIFFUSE) != 0) {
-
-			aiString textureFileName;
-			material->GetTexture(aiTextureType_DIFFUSE, 0, &textureFileName);
-			newMaterial.SetTextureNamePath((textureFileName).C_Str());
-			newMaterial.CreateMaterial();
-			model->AddMaterial(newMaterial);
-			model->SetTextureName((textureFileName).C_Str());
-		}
-	}
-
-	if (model->GetTextuerName().empty()) {
-		const std::string defaultTexture = "white2x2.png";
-		newMaterial.SetTextureNamePath(defaultTexture);
-		newMaterial.CreateMaterial();
-		model->AddMaterial(newMaterial);
-		model->SetTextureName(defaultTexture);
-	}
-
-
-	newMesh.CreateMesh();
-
-	model->AddMesh(newMesh);
 	model->data_.rootNode = ReadNode(scene->mRootNode);
 
 	instance->models_.insert(std::make_pair(filename, std::move(model)));
 }
 
 
-Model* ModelManager::FindModel(const std::string& filename) {
+ModelData ModelManager::FindModel(const std::string& filename) {
 	ModelManager* instance = GetInstance();
 	auto iterator = instance->models_.find(filename);
 	if (iterator != instance->models_.end()) {
-		return iterator->second.get();
+		return iterator->second->data_;
 	}
-	return nullptr;
+	return ModelData{};
 }
 
 
@@ -262,12 +228,9 @@ void ModelManager::CreateSphere() {
 		return;
 	}
 
-
 	std::unique_ptr<Model> model;
 	model.reset(new Model());
-	Mesh mesh{};
-	Material material{};
-
+	ModelMesh newModelMesh{};
 
 	const float pi = 3.1415926535f;
 	const uint32_t kSubdivision = 16;
@@ -289,11 +252,8 @@ void ModelManager::CreateSphere() {
 			float y = sinf(lat);
 			float z = cosf(lat) * sinf(lon);
 
-			mesh.AddVertex({
-				{x, y, z, 1.0f},   // Position
-				{u, v},            // UV
-				{x, y, z}          // Normal（球の中心を原点とした法線）
-				});
+			model->data_.vertices.push_back({ {x, y, z, 1.0f},{u, v},{x, y, z} });
+			newModelMesh.vertices.push_back({ {x, y, z, 1.0f},{u, v},{x, y, z} });
 		}
 	}
 
@@ -308,25 +268,22 @@ void ModelManager::CreateSphere() {
 			uint32_t v2 = row2 + lonIndex;
 			uint32_t v3 = row2 + lonIndex + 1;
 
-			// 三角形1
-			mesh.AddIndex(v0);
-			mesh.AddIndex(v2);
-			mesh.AddIndex(v1);
+			model->data_.indicies.push_back(v0);
+			newModelMesh.indicies.push_back(v0);
+			model->data_.indicies.push_back(v2);
+			newModelMesh.indicies.push_back(v2);
+			model->data_.indicies.push_back(v1);
+			newModelMesh.indicies.push_back(v1);
 
-			// 三角形2
-			mesh.AddIndex(v1);
-			mesh.AddIndex(v2);
-			mesh.AddIndex(v3);
+			model->data_.indicies.push_back(v1);
+			newModelMesh.indicies.push_back(v1);
+			model->data_.indicies.push_back(v2);
+			newModelMesh.indicies.push_back(v2);
+			model->data_.indicies.push_back(v3);
+			newModelMesh.indicies.push_back(v3);
 		}
 	}
-
-
-	mesh.CreateMesh();
-	material.CreateMaterial();
-
-
-	model->AddMesh(mesh);
-	model->AddMaterial(material);
+	model->data_.meshes.push_back(newModelMesh);
 
 	instance->models_.insert(std::make_pair("Sphere", std::move(model)));
 }

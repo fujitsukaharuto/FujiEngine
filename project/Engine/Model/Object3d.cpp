@@ -193,7 +193,29 @@ void Object3d::SetLightEnable(LightMode mode) {
 }
 
 void Object3d::SetModel(const std::string& fileName) {
-	model_ = std::make_unique<Model>(*(ModelManager::FindModel(fileName)));
+	model_ = std::make_unique<Model>();
+	model_->data_ = ModelManager::FindModel(fileName);
+
+	for (size_t i = 0; i < model_->data_.meshes.size(); i++) {
+		Mesh newMesh{};
+		Material newMaterial{};
+		newMaterial.SetTextureNamePath((model_->data_.meshes[i].material.textureFilePath));
+		newMaterial.CreateMaterial();
+		model_->AddMaterial(newMaterial);
+		model_->SetTextureName((model_->data_.meshes[i].material.textureFilePath));
+
+		for (size_t index = 0; index < model_->data_.meshes[i].vertices.size(); index++) {
+			VertexDate newVertex = model_->data_.meshes[i].vertices[index];
+			newMesh.AddVertex({ { newVertex.position },{newVertex.texcoord},{newVertex.normal} });
+		}
+		for (size_t index = 0; index < model_->data_.meshes[i].indicies.size(); index++) {
+			uint32_t newIndex = model_->data_.meshes[i].indicies[index];
+			newMesh.AddIndex(newIndex);
+		}
+		newMesh.CreateMesh();
+		model_->AddMesh(newMesh);
+	}
+
 }
 
 void Object3d::CreateWVP() {

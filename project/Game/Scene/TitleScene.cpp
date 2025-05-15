@@ -93,6 +93,8 @@ void TitleScene::Update() {
 
 void TitleScene::Draw() {
 
+	cube_->CSDispatch();
+
 #pragma region 背景描画
 
 

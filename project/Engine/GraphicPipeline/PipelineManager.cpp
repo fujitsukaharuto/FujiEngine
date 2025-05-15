@@ -16,6 +16,7 @@
 #include "CRTPipe.h"
 #include "GrayCSPipe.h"
 #include "CRTCSPipe.h"
+#include "SkinningCSPipe.h"
 
 
 PipelineManager::~PipelineManager() {
@@ -56,6 +57,7 @@ void PipelineManager::CreatePipeline() {
 	std::unique_ptr<CRTPipe> crtPipe = nullptr;
 	std::unique_ptr<GrayCSPipe> grayCS = nullptr;
 	std::unique_ptr<CRTCSPipe> crtCS = nullptr;
+	std::unique_ptr<SkinningCSPipe> skinningCS = nullptr;
 
 
 
@@ -128,6 +130,10 @@ void PipelineManager::CreatePipeline() {
 	crtCS.reset(new CRTCSPipe);
 	crtCS->Initialize(dxcommon_);
 	pipelines_.push_back(std::move(crtCS));
+
+	skinningCS.reset(new SkinningCSPipe);
+	skinningCS->Initialize(dxcommon_);
+	pipelines_.push_back(std::move(skinningCS));
 
 }
 

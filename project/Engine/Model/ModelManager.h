@@ -28,7 +28,7 @@ public:
 	static void LoadOBJ(const std::string& filename);
 	static void LoadGLTF(const std::string& filename);
 
-	static Model* FindModel(const std::string& filename);
+	static ModelData FindModel(const std::string& filename);
 
 	static void CreateSphere();
 
