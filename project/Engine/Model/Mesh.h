@@ -25,6 +25,8 @@ public:
 
 	void CreateMesh();
 
+	void CreateUAV();
+
 	void AddVertex(const VertexData& vertex);
 
 	void AddIndex(uint32_t index);
@@ -33,6 +35,12 @@ public:
 
 	void AnimationDraw(const SkinCluster& skinCluster, ID3D12GraphicsCommandList* commandList);
 
+	void TransBarrier();
+
+	void CSDispatch(ID3D12GraphicsCommandList* commandList);
+
+	size_t GetVertexDataSize() { return vertexData_.size(); }
+
 private:
 
 	DXCom* dxcommon_;
@@ -40,6 +48,11 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_ = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
 	std::vector<VertexData> vertexData_;
+	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> srvHandle;
+
+	ComPtr<ID3D12Resource> skinnedVertexBuffer_;
+	D3D12_VERTEX_BUFFER_VIEW skinnedVBV_;
+	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> skinnedSrvHandle;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResourece_ = nullptr;
 	D3D12_INDEX_BUFFER_VIEW indexBufferView_{};

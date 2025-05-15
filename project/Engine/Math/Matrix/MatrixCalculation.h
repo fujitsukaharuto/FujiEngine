@@ -82,9 +82,19 @@ struct VertexWeightData {
 	uint32_t vertexIndex;
 };
 
+struct SkinningInformation {
+	uint32_t numVertices;
+};
+
 struct JointWeightData {
 	Matrix4x4 inverseBindPoseMatrix;
 	std::vector<VertexWeightData> vertexWeights;
+};
+
+struct ModelMesh {
+	std::vector<VertexDate> vertices;
+	std::vector<uint32_t> indicies;
+	MaterialDataPath material;
 };
 
 struct ModelData {
@@ -93,6 +103,7 @@ struct ModelData {
 	std::vector<uint32_t> indicies;
 	MaterialDataPath material;
 	Node rootNode;
+	std::vector<ModelMesh> meshes;
 };
 
 struct ParticleDate {

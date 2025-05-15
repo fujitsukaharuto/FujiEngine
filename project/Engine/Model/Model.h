@@ -14,16 +14,21 @@ class DXCom;
 class Model {
 public:
 	Model();
-	Model(const Model& other);// これなくす
 	~Model();
 
 	void Draw(ID3D12GraphicsCommandList* commandList, Material* mate);
 
 	void AnimationDraw(const SkinCluster& skinCluster, ID3D12GraphicsCommandList* commandList, Material* mate);
 
+	void TransBarrier();
+
 	void AddMaterial(const Material& material);
 
 	void AddMesh(const Mesh& mesh);
+
+	void CreateEnvironment();
+
+	void CreateSkinningInformation(DXCom* pDxcom);
 
 	void SetColor(const Vector4& color);
 
@@ -43,6 +48,10 @@ public:
 
 	ModelData data_;
 
+	size_t GetVertexSize() { return mesh_.front().GetVertexDataSize(); }
+
+	void CSDispatch(const SkinCluster& skinCluster, ID3D12GraphicsCommandList* commandList);
+
 private:
 
 
@@ -52,5 +61,10 @@ private:
 	std::vector<Material> material_;
 	std::vector<Mesh> mesh_;
 	std::string nowTextuer;
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> skinningInformation_;
+	SkinningInformation* infoData_;
+
+
 
 };

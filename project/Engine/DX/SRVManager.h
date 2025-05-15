@@ -21,6 +21,7 @@ public:
 
 	void CreateTextureSRV(uint32_t srvIndex, ID3D12Resource* resource, DXGI_FORMAT format, UINT mipLevels, bool isCube);
 	void CreateStructuredSRV(uint32_t srvIndex, ID3D12Resource* resource, UINT numElements, UINT structureByteStride);
+	void CreateStructuredUAV(uint32_t uavIndex, ID3D12Resource* resource, UINT numElements, UINT structureByteStride);
 
 	void SetDescriptorHeap();
 	void SetGraphicsRootDescriptorTable(UINT rootIndex, uint32_t srvIndex);

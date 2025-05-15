@@ -239,6 +239,9 @@
     <ClCompile Include="Engine\GraphicPipeline\SkyboxPipe.cpp">
       <Filter>Engine\GraphicPipeline</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\GraphicPipeline\SkinningCSPipe.cpp">
+      <Filter>Engine\GraphicPipeline</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -532,6 +535,9 @@
     <ClInclude Include="Engine\GraphicPipeline\SkyboxPipe.h">
       <Filter>Engine\GraphicPipeline</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\GraphicPipeline\SkinningCSPipe.h">
+      <Filter>Engine\GraphicPipeline</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -645,6 +651,9 @@
     <Filter Include="Game\GameObj\SkyDome">
       <UniqueIdentifier>{972c8ba7-1fdf-4420-8976-641d635fa5ae}</UniqueIdentifier>
     </Filter>
+    <Filter Include="resource\Shaders\CS\Engine">
+      <UniqueIdentifier>{a53b59b2-f85d-43ce-897a-0b92b392dcaf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resource\Shaders\GaussianBlur.PS.hlsl">
@@ -730,6 +739,9 @@
     </FxCompile>
     <FxCompile Include="resource\Shaders\Skybox.VS.hlsl">
       <Filter>resource\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\CS\Engine\Skinning.CS.hlsl">
+      <Filter>resource\Shaders\CS\Engine</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>

@@ -39,6 +39,8 @@ public:
 
 	void AnimationUpdate();
 
+	void CSDispatch();
+
 	void Draw(Material* mate = nullptr);
 
 	void AnimeDraw();
@@ -119,4 +121,6 @@ private:
 
 	Matrix4x4 billboardMatrix_;
 	std::string nowTextureName;
+
+	Texture* environment_;
 };
