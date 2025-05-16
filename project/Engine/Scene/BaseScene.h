@@ -45,7 +45,7 @@ protected:
 	SceneManager* sceneManager_;
 	Input* input_ = nullptr;
 	AudioPlayer* audioPlayer_ = nullptr;
-
+	
 
 private:
 

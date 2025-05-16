@@ -9,11 +9,21 @@
 #include "Engine/Editor/JsonSerializer.h"
 #ifdef _DEBUG
 #include "ImGuizmo.h"
+namespace ed = ax::NodeEditor;
 #endif // _DEBUG
+
 
 Object3d::Object3d() {
 	dxcommon_ = ModelManager::GetInstance()->ShareDXCom();
 	lightManager_ = ModelManager::GetInstance()->ShareLight();
+
+#ifdef _DEBUG
+	nodeEditorContext_ = nullptr;
+	uintptr_t base = reinterpret_cast<uintptr_t>(this);
+	nodeId_ = static_cast<int>(base);
+	inputId_ = nodeId_ + 1;
+	outputId_ = nodeId_ + 2;
+#endif // _DEBUG
 }
 
 Object3d::~Object3d() {
@@ -169,6 +179,7 @@ void Object3d::DebugGUI() {
 		Vector4 color = model_->GetColor(0);
 		ImGui::ColorEdit4("color", &color.x);
 		SetColor(color);
+		SetTextureNode();
 		ImGui::TreePop();
 	}
 	ImGui::Unindent();
@@ -312,5 +323,11 @@ void Object3d::CreatePropertyCommand(int type) {
 		default: break;
 		}
 	}
+#endif // _DEBUG
+}
+
+void Object3d::SetTextureNode() {
+#ifdef _DEBUG
+
 #endif // _DEBUG
 }

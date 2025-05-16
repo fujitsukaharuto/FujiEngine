@@ -41,7 +41,7 @@ void Framework::Init() {
 
 #pragma region 汎用機能初期化
 	// ImGuiの初期化
-	imguiManager_ = std::make_unique<ImGuiManager>();
+	imguiManager_ = ImGuiManager::GetInstance();
 	imguiManager_->Init(win_, dxcommon_.get());
 
 	// 入力の初期化

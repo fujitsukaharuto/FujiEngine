@@ -8,7 +8,15 @@
 #include "imgui_impl_dx12.h"
 #include "imgui_impl_win32.h"
 #include "ImGuizmo.h"
+#include "imgui_node_editor.h"
+
+namespace ed = ax::NodeEditor;
 #endif // _DEBUG
+
+ImGuiManager* ImGuiManager::GetInstance() {
+	static ImGuiManager instance;
+	return &instance;
+}
 
 void ImGuiManager::Init([[maybe_unused]] MyWin* myWin, [[maybe_unused]] DXCom* dxComon) {
 	dxCommon_ = dxComon;
@@ -57,11 +65,14 @@ void ImGuiManager::Init([[maybe_unused]] MyWin* myWin, [[maybe_unused]] DXCom* d
 void ImGuiManager::Fin() {
 	dxCommon_ = nullptr;
 #ifdef _DEBUG
+	if (nodeEditorContext_) {
+		ax::NodeEditor::DestroyEditor(nodeEditorContext_);
+		nodeEditorContext_ = nullptr;
+	}
 
 	ImGui_ImplDX12_Shutdown();
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
-
 #endif // _DEBUG
 }
 
@@ -102,4 +113,93 @@ void ImGuiManager::UnSetFont() {
 #ifdef _DEBUG
 	ImGui::PopFont();
 #endif // _DEBUG
+}
+
+void ImGuiManager::DrawNodeEditor() {
+#ifdef _DEBUG
+	using namespace ax::NodeEditor;
+
+	if (!nodeEditorContext_) {
+		Config config;
+		config.SettingsFile = "resource/NodeEditor/NodeEditor.json";
+		nodeEditorContext_ = CreateEditor(&config);
+	}
+
+	SetCurrentEditor(nodeEditorContext_);
+	ed::Begin("My Node Editor");
+
+	// 簡単なノード描画（省略）
+
+	ed::End();
+	SetCurrentEditor(nullptr);
+#endif // _DEBUG
+}
+
+
+// ParticleGroup
+void ParticleGroupSelector::Show(std::function<void(const std::string&, bool)> on_move) {
+	const float listBoxHeight = 200.0f;
+
+	if (ImGui::BeginTable("ParticleGroupTable", 3, ImGuiTableFlags_None)) {
+		ImGui::TableSetupColumn("Emitte: False", ImGuiTableColumnFlags_WidthStretch);    // Left side
+		ImGui::TableSetupColumn("", ImGuiTableColumnFlags_WidthFixed);      // Buttons
+		ImGui::TableSetupColumn("Emitte: True", ImGuiTableColumnFlags_WidthStretch);    // Right side
+		ImGui::TableNextRow();
+
+		ImGui::TableHeadersRow();
+		ImGui::TableNextRow();
+
+		// --- 左列（false） ---
+		ImGui::TableSetColumnIndex(0);
+		if (ImGui::BeginListBox("##falseList", ImVec2(-FLT_MIN, listBoxHeight))) {
+			for (const auto& name : items[0]) {
+				bool is_selected = (selected[0] == name);
+				if (ImGui::Selectable(name.c_str(), is_selected)) {
+					selected[0] = name;
+				}
+			}
+			ImGui::EndListBox();
+		}
+
+		// --- 中央列（ボタン） ---
+		ImGui::TableSetColumnIndex(1);
+		{
+			//// 中央揃えするためにダミースペースを使う
+			//float buttonHeight = ImGui::GetFrameHeight();
+			//float spacing = (listBoxHeight - buttonHeight * 2.0f - ImGui::GetStyle().ItemSpacing.y) * 0.5f;
+			//ImGui::Dummy(ImVec2(0.0f, spacing));
+
+			if (ImGui::Button(">")) {
+				if (!selected[0].empty()) {
+					items[1].push_back(selected[0]);
+					items[0].erase(std::remove(items[0].begin(), items[0].end(), selected[0]), items[0].end());
+					on_move(selected[0], true);
+					selected[0].clear();
+				}
+			}
+
+			if (ImGui::Button("<")) {
+				if (!selected[1].empty()) {
+					items[0].push_back(selected[1]);
+					items[1].erase(std::remove(items[1].begin(), items[1].end(), selected[1]), items[1].end());
+					on_move(selected[1], false);
+					selected[1].clear();
+				}
+			}
+		}
+
+		// --- 右列（true） ---
+		ImGui::TableSetColumnIndex(2);
+		if (ImGui::BeginListBox("##trueList", ImVec2(-FLT_MIN, listBoxHeight))) {
+			for (const auto& name : items[1]) {
+				bool is_selected = (selected[1] == name);
+				if (ImGui::Selectable(name.c_str(), is_selected)) {
+					selected[1] = name;
+				}
+			}
+			ImGui::EndListBox();
+		}
+
+		ImGui::EndTable();
+	}
 }
