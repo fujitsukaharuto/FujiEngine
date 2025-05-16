@@ -3,6 +3,7 @@
 #include "DXCom.h"
 #include "MyWindow.h"
 #include "SRVManager.h"
+#include "Engine/Editor/JsonSerializer.h"
 #ifdef _DEBUG
 #include "imgui_impl_dx12.h"
 #include "imgui_impl_win32.h"

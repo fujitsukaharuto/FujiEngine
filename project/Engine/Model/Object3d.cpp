@@ -6,6 +6,7 @@
 #include "Engine/ImGuiManager/ImGuiManager.h"
 #include "Engine/Editor/CommandManager.h"
 #include "Engine/Editor/PropertyCommand.h"
+#include "Engine/Editor/JsonSerializer.h"
 #ifdef _DEBUG
 #include "ImGuizmo.h"
 #endif // _DEBUG
@@ -101,6 +102,8 @@ void Object3d::DebugGUI() {
 		ImGui::RadioButton("TRANSLATE", &guizmoType_, 0); ImGui::SameLine();
 		ImGui::RadioButton("ROTATE", &guizmoType_, 1); ImGui::SameLine();
 		ImGui::RadioButton("SCALE", &guizmoType_, 2);
+		JsonSerializer::ShowSaveTransformPopup(transform); ImGui::SameLine();
+		JsonSerializer::ShowLoadTransformPopup(transform);
 		ImGuizmo::OPERATION operation;
 		switch (guizmoType_) {
 		case 0: operation = ImGuizmo::TRANSLATE; break;
@@ -295,28 +298,16 @@ void Object3d::CreatePropertyCommand(int type) {
 	if (ImGui::IsItemDeactivatedAfterEdit()) { // 編集完了検出
 		switch (type) {
 		case 0:
-			if (transform.translate != prevPos_) {
-				auto command = std::make_unique<PropertyCommand<Vector3>>(
-					transform, &Trans::translate, prevPos_, transform.translate);
-				CommandManager::GetInstance()->Execute(std::move(command));
-				prevPos_ = transform.translate;
-			}
+			CommandManager::TryCreatePropertyCommand(transform, prevPos_, transform.translate, &Trans::translate);
+			prevPos_ = transform.translate;
 			break;
 		case 1:
-			if (transform.rotate != prevRotate_) {
-				auto command = std::make_unique<PropertyCommand<Vector3>>(
-					transform, &Trans::rotate, prevRotate_, transform.rotate);
-				CommandManager::GetInstance()->Execute(std::move(command));
-				prevRotate_ = transform.rotate;
-			}
+			CommandManager::TryCreatePropertyCommand(transform, prevRotate_, transform.rotate, &Trans::rotate);
+			prevRotate_ = transform.rotate;
 			break;
 		case 2:
-			if (transform.scale != prevScale_) {
-				auto command = std::make_unique<PropertyCommand<Vector3>>(
-					transform, &Trans::scale, prevScale_, transform.scale);
-				CommandManager::GetInstance()->Execute(std::move(command));
-				prevScale_ = transform.scale;
-			}
+			CommandManager::TryCreatePropertyCommand(transform, prevScale_, transform.scale, &Trans::scale);
+			prevScale_ = transform.scale;
 			break;
 		default: break;
 		}
