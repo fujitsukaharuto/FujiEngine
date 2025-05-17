@@ -15,6 +15,7 @@ void GameRun::Initialize() {
 
 #pragma region テクスチャ読み込み
 	textureManager_->Load("uvChecker.png");
+	textureManager_->Load("checkerBoard.png");
 #pragma endregion
 
 

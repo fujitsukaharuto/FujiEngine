@@ -18,16 +18,57 @@ Object3d::Object3d() {
 	lightManager_ = ModelManager::GetInstance()->ShareLight();
 
 #ifdef _DEBUG
-	nodeEditorContext_ = nullptr;
-	uintptr_t base = reinterpret_cast<uintptr_t>(this);
-	nodeId_ = static_cast<int>(base);
-	inputId_ = nodeId_ + 1;
-	outputId_ = nodeId_ + 2;
+	nodeEditorContext_ = ax::NodeEditor::CreateEditor();
+
+	MyNode texNode;
+	texNode.id = ImGuiManager::GetInstance()->GenerateNodeId();
+	texNode.name = "TextureInput";
+	texNode.type = MyNode::NodeType::Texture;
+	texNode.outputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), Pin::Type::Output });
+	texNode.evaluator = [](auto&&) {
+		Value v;
+		v.type = Value::Type::Texture;
+		v.textureName = "checkerBoard.png";
+		return v;
+		};
+	nodeGraph_.AddNode(texNode);
+
+	MyNode texNode2;
+	texNode2.id = ImGuiManager::GetInstance()->GenerateNodeId();
+	texNode2.name = "TextureInput2";
+	texNode2.type = MyNode::NodeType::Texture;
+	texNode2.outputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), Pin::Type::Output });
+	texNode2.evaluator = [](auto&&) {
+		Value v;
+		v.type = Value::Type::Texture;
+		v.textureName = "uvChecker.png";
+		return v;
+		};
+	nodeGraph_.AddNode(texNode2);
+
+	MyNode selNode;
+	selNode.id = ImGuiManager::GetInstance()->GenerateNodeId();
+	selNode.name = "Selector";
+	selNode.type = MyNode::NodeType::Selector;
+	selNode.inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), Pin::Type::Input });
+	selNode.evaluator = [](const std::vector<Value>& inputs) {
+		return !inputs.empty() ? inputs[0] : Value();
+		};
+	nodeGraph_.AddNode(selNode);
+
+	selectorNodeId_ = selNode.id;
 #endif // _DEBUG
 }
 
 Object3d::~Object3d() {
 	dxcommon_ = nullptr;
+#ifdef _DEBUG
+	if (nodeEditorContext_) {
+		ax::NodeEditor::DestroyEditor(nodeEditorContext_);
+		nodeEditorContext_ = nullptr;
+	}
+#endif // _DEBUG
+
 }
 
 void Object3d::Create(const std::string& fileName) {
@@ -328,6 +369,25 @@ void Object3d::CreatePropertyCommand(int type) {
 
 void Object3d::SetTextureNode() {
 #ifdef _DEBUG
+	nodeGraph_.ClearResults();
 
+	// Selector ノードを探して評価
+	if (selectorNodeId_.Get() != 0) {
+		MyNode* selNode = nodeGraph_.FindNodeById(selectorNodeId_);
+		if (selNode) {
+			Value out = nodeGraph_.EvaluateNode(*selNode);
+			if (out.type == Value::Type::Texture) {
+				SetTexture(out.textureName);
+			}
+		}
+	}
+
+	if (!nodeEditorContext_) {
+		nodeEditorContext_ = ax::NodeEditor::CreateEditor();
+	}
+
+	ed::SetCurrentEditor(nodeEditorContext_);
+	ImGuiManager::GetInstance()->DrawNodeEditor(&nodeGraph_);
+	ed::SetCurrentEditor(nullptr);
 #endif // _DEBUG
 }

@@ -6,6 +6,7 @@
 #include "Object3dCommon.h"
 #ifdef _DEBUG
 #include "imgui_node_editor.h"
+#include "Engine/ImGuiManager/NodeGraph.h"
 #endif
 
 
@@ -96,9 +97,7 @@ private:
 	float IsUsingGuizmo_ = false;
 #ifdef _DEBUG
 	ax::NodeEditor::EditorContext* nodeEditorContext_ = nullptr;
-	int nodeId_ = 0;
-	int inputId_ = 0;
-	int outputId_ = 0;
-	int currentTexIndex_ = 0;
+	NodeGraph nodeGraph_;
+	ed::NodeId selectorNodeId_;
 #endif // _DEBUG
 };

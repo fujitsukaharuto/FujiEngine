@@ -227,6 +227,9 @@
     <ClCompile Include="Engine\Editor\JsonSerializer.cpp">
       <Filter>Engine\Editor</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\ImGuiManager\NodeGraph.cpp">
+      <Filter>Engine\ImGuiManager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -498,6 +501,9 @@
     </ClInclude>
     <ClInclude Include="Engine\Editor\JsonSerializer.h">
       <Filter>Engine\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\ImGuiManager\NodeGraph.h">
+      <Filter>Engine\ImGuiManager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

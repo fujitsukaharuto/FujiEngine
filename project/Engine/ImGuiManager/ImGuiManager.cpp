@@ -115,29 +115,140 @@ void ImGuiManager::UnSetFont() {
 #endif // _DEBUG
 }
 
-void ImGuiManager::DrawNodeEditor() {
+//void ImGuiManager::DrawNodeEditor() {
+//#ifdef _DEBUG
+//	using namespace ax::NodeEditor;
+//
+//	if (!nodeEditorContext_) {
+//		Config config;
+//		config.SettingsFile = "resource/NodeEditor/NodeEditor.json";
+//		nodeEditorContext_ = CreateEditor(&config);
+//	}
+//
+//	SetCurrentEditor(nodeEditorContext_);
+//	ed::Begin("My Node Editor");
+//
+//	// 簡単なノード描画（省略）
+//
+//	ed::End();
+//	SetCurrentEditor(nullptr);
+//#endif // _DEBUG
+//}
+
+
 #ifdef _DEBUG
-	using namespace ax::NodeEditor;
-
-	if (!nodeEditorContext_) {
-		Config config;
-		config.SettingsFile = "resource/NodeEditor/NodeEditor.json";
-		nodeEditorContext_ = CreateEditor(&config);
-	}
-
-	SetCurrentEditor(nodeEditorContext_);
-	ed::Begin("My Node Editor");
-
-	// 簡単なノード描画（省略）
-
-	ed::End();
-	SetCurrentEditor(nullptr);
-#endif // _DEBUG
+bool ImGuiManager::CanCreateLink(const Pin& a, const Pin& b) {
+	// 出力 → 入力 のみに限定する例
+	if (a.type == b.type)
+		return false;
+	return (a.type == Pin::Type::Output) ? true : false;
 }
 
+const MyNode* ImGuiManager::FindNodeByPinId(const ed::PinId& pinId, const std::vector<MyNode>& nodes) {
+	for (const auto& node : nodes) {
+		for (const auto& pin : node.inputs)
+			if (pin.id == pinId)
+				return &node;
+		for (const auto& pin : node.outputs)
+			if (pin.id == pinId)
+				return &node;
+	}
+	return nullptr;
+}
 
+const Pin* ImGuiManager::FindPin(const ed::PinId& id, const std::vector<MyNode>& nodes) {
+	for (const auto& node : nodes) {
+		for (const auto& pin : node.inputs)
+			if (pin.id == id)
+				return &pin;
+		for (const auto& pin : node.outputs)
+			if (pin.id == id)
+				return &pin;
+	}
+	return nullptr;
+}
+
+void ImGuiManager::HandleCreateLink(std::vector<Link>& links, const std::vector<MyNode>& nodes) {
+	if (ed::BeginCreate()) {
+		ed::PinId inputId, outputId;
+		if (ed::QueryNewLink(&outputId, &inputId)) {
+			auto* inPin = FindPin(inputId, nodes);
+			auto* outPin = FindPin(outputId, nodes);
+
+			if (inPin && outPin && CanCreateLink(*outPin, *inPin)) {
+				if (ed::AcceptNewItem()) {
+					links.push_back({ GenerateLinkId(), outputId, inputId });
+				}
+			} else {
+				ed::RejectNewItem();
+			}
+		} else {
+			ed::RejectNewItem();
+		}
+	}
+	ed::EndCreate();
+}
+
+void ImGuiManager::HandleDeleteLink(std::vector<Link>& links) {
+	if (ed::BeginDelete()) {
+		ed::LinkId deletedLinkId;
+		while (ed::QueryDeletedLink(&deletedLinkId)) {
+			if (ed::AcceptDeletedItem()) {
+				// IDで探して削除
+				links.erase(std::remove_if(links.begin(), links.end(),
+					[deletedLinkId](const Link& link) {
+						return link.id == deletedLinkId;
+					}), links.end());
+			}
+		}
+	}
+	ed::EndDelete();
+}
+
+void ImGuiManager::DrawNode(const MyNode& node) {
+	ed::BeginNode(node.id);
+
+	ImGui::Text("%s", node.name.c_str());
+
+	for (const auto& pin : node.inputs) {
+		ed::BeginPin(pin.id, ed::PinKind::Input);
+		ImGui::Text("->");
+		ed::EndPin();
+	}
+
+	for (const auto& pin : node.outputs) {
+		ed::BeginPin(pin.id, ed::PinKind::Output);
+		ImGui::Text("->");
+		ed::EndPin();
+	}
+
+	ed::EndNode();
+}
+
+void ImGuiManager::DrawNodeEditor(NodeGraph* nodeGraph) {
+	ed::Begin("My Node Editor");
+
+	for (const auto& node : nodeGraph->nodes) {
+		DrawNode(node);
+	}
+	for (const auto& link : nodeGraph->links) {
+		ed::Link(link.id, link.startPinId, link.endPinId);
+	}
+
+	HandleCreateLink(nodeGraph->links, nodeGraph->nodes);
+
+	HandleDeleteLink(nodeGraph->links);
+
+	ed::End();
+}
+
+#endif // _DEBUG
+
+
+#ifdef _DEBUG
 // ParticleGroup
 void ParticleGroupSelector::Show(std::function<void(const std::string&, bool)> on_move) {
+
 	const float listBoxHeight = 200.0f;
 
 	if (ImGui::BeginTable("ParticleGroupTable", 3, ImGuiTableFlags_None)) {
@@ -203,3 +314,4 @@ void ParticleGroupSelector::Show(std::function<void(const std::string&, bool)> o
 		ImGui::EndTable();
 	}
 }
+#endif // _DEBUG

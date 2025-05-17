@@ -9,7 +9,12 @@
 #ifdef _DEBUG
 #include "imgui.h"
 #include "imgui_node_editor.h"
+#include "NodeGraph.h"
+
+namespace ed = ax::NodeEditor;
 #endif // _DEBUG
+
+
 
 class MyWin;
 class DXCom;
@@ -56,7 +61,23 @@ public:
 	/// </summary>
 	void UnSetFont();
 
-	void DrawNodeEditor();
+#ifdef _DEBUG
+
+	ed::NodeId GenerateNodeId() { return ed::NodeId(nextId++); }
+	ed::PinId GeneratePinId() { return ed::PinId(nextId++); }
+	ed::LinkId GenerateLinkId() { return ed::LinkId(nextId++); }
+
+	bool CanCreateLink(const Pin& a, const Pin& b);
+	const MyNode* FindNodeByPinId(const ed::PinId& pinId, const std::vector<MyNode>& nodes);
+	const Pin* FindPin(const ed::PinId& id, const std::vector<MyNode>& nodes);
+
+	void HandleCreateLink(std::vector<Link>& links, const std::vector<MyNode>& nodes);
+	void HandleDeleteLink(std::vector<Link>& links);
+	void DrawNode(const MyNode& node);
+	void DrawNodeEditor(NodeGraph* nodeGraph);
+
+#endif // _DEBUG
+
 
 private:
 	DXCom* dxCommon_ = nullptr;
@@ -68,6 +89,7 @@ private:
 #ifdef _DEBUG
 	ImFont* font_japanese = nullptr;
 
+	int nextId = 1;
 	// ノードエディタのコンテキスト
 	ax::NodeEditor::EditorContext* nodeEditorContext_ = nullptr;
 #endif // _DEBUG
