@@ -1,5 +1,8 @@
 #include "Boss.h"
 
+#include "Game/GameObj/Enemy/Behavior/BossRoot.h"
+#include "Game/GameObj/Enemy/Behavior/BossAttack.h"
+
 Boss::Boss() {
 }
 
@@ -7,8 +10,9 @@ void Boss::Initialize() {
 	OriginGameObject::Initialize();
 	OriginGameObject::CreateModel("cube.obj");
 
-	model_->transform.translate.y = 1.0f;
-	model_->transform.translate.z = -10.0f;
+	model_->transform.translate = Vector3(0.0f, 4.0f, 5.0f);
+	model_->transform.scale = Vector3(0.5f, 0.5f, 0.5f);
+
 
 	shadow_ = std::make_unique<Object3d>();
 	shadow_->Create("Sphere");
@@ -24,10 +28,14 @@ void Boss::Initialize() {
 	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
 	collider_->SetCollisionStayCallback([this](const ColliderInfo& other) {OnCollisionStay(other); });
 	collider_->SetCollisionExitCallback([this](const ColliderInfo& other) {OnCollisionExit(other); });
+	collider_->SetTag("testBoss");
+	collider_->SetWidth(0.5f);
+	collider_->SetDepth(0.5f);
+	collider_->SetHeight(0.5f);
 
-	
+	InitParameter();
 
-	//ChangeBehavior(std::make_unique<BossRoot>(this));
+	ChangeBehavior(std::make_unique<BossRoot>(this));
 }
 
 void Boss::Update() {
@@ -56,6 +64,10 @@ void Boss::ParameterGUI() {
 #ifdef _DEBUG
 
 #endif // _DEBUG
+}
+
+void Boss::InitParameter() {
+	attackCooldown_ = 300.0f;
 }
 
 ///= Behavior =================================================================*/

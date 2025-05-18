@@ -170,6 +170,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Scene\BaseScene.cpp" />
     <ClCompile Include="Engine\Scene\SceneManager.cpp" />
     <ClCompile Include="Engine\WinApp\MyWindow.cpp" />
+    <ClCompile Include="Game\GameObj\Enemy\Behavior\BossAttack.cpp" />
+    <ClCompile Include="Game\GameObj\Enemy\Behavior\BossRoot.cpp" />
     <ClCompile Include="Game\GameObj\Enemy\Boss.cpp" />
     <ClCompile Include="Game\GameObj\FollowCamera.cpp" />
     <ClCompile Include="Game\GameObj\LockOn.cpp" />
@@ -269,6 +271,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Scene\SceneManager.h" />
     <ClInclude Include="Engine\WinApp\MyWindow.h" />
     <ClInclude Include="Game\GameObj\Enemy\Behavior\BaseBossBehavior.h" />
+    <ClInclude Include="Game\GameObj\Enemy\Behavior\BossAttack.h" />
+    <ClInclude Include="Game\GameObj\Enemy\Behavior\BossRoot.h" />
     <ClInclude Include="Game\GameObj\Enemy\Boss.h" />
     <ClInclude Include="Game\GameObj\FollowCamera.h" />
     <ClInclude Include="Game\GameObj\LockOn.h" />

@@ -2,6 +2,7 @@
 #include "Scene/BaseScene.h"
 #include "Game/GameObj/FollowCamera.h"
 #include "Game/GameObj/Player/Player.h"
+#include "Game/GameObj/Enemy/Boss.h"
 #include "Game/TestBaseObj.h"
 #include "Game/Collider/CollisionManager.h"
 
@@ -29,9 +30,9 @@ private:
 	std::unique_ptr<Object3d> terrain = nullptr;
 	std::unique_ptr<Object3d> skydome_ = nullptr;
 	std::unique_ptr<Player> player_ = nullptr;
+	std::unique_ptr<Boss> boss_ = nullptr;
 	std::unique_ptr<FollowCamera> followCamera_;
 
-	std::unique_ptr<TestBaseObj> sphere_ = nullptr;
 
 	std::unique_ptr<Material> mate = nullptr;
 

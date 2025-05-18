@@ -54,12 +54,12 @@ void GameScene::Initialize() {
 	player_ = std::make_unique<Player>();
 	player_->Initialize();
 
+	boss_ = std::make_unique<Boss>();
+	boss_->Initialize();
+
 	followCamera_ = std::make_unique<FollowCamera>();
 	followCamera_->Initialize();
 	followCamera_->SetTarget(&player_->GetTrans());
-
-	sphere_ = std::make_unique<TestBaseObj>();
-	sphere_->Initialize();
 
 	mate = std::make_unique<Material>();
 	mate->SetTextureNamePath("grass.png");
@@ -91,12 +91,12 @@ void GameScene::Update() {
 
 	ApplyGlobalVariables();
 
-	player_->SetTargetPos(sphere_->GetWorldPos());
+	player_->SetTargetPos(boss_->GetWorldPos());
 	player_->Update();
 
 	followCamera_->Update();
 
-	sphere_->Update();
+	boss_->Update();
 
 #endif // _DEBUG
 
@@ -124,7 +124,7 @@ void GameScene::Update() {
 	if (player_->GetPlayerBullet()->GetIsLive()) {
 		cMane_->AddCollider(player_->GetPlayerBullet()->GetCollider());
 	}
-	cMane_->AddCollider(sphere_->GetCollider());
+	cMane_->AddCollider(boss_->GetCollider());
 	cMane_->CheckAllCollision();
 
 	ParticleManager::GetInstance()->Update();
@@ -145,7 +145,7 @@ void GameScene::Draw() {
 	terrain->Draw();
 	player_->Draw();
 
-	sphere_->Draw();
+	boss_->Draw();
 
 	ParticleManager::GetInstance()->Draw();
 
