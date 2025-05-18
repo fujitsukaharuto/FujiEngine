@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "Engine/Editor/ICommand.h"
+#include "Engine/Editor/PropertyCommand.h"
 
 
 class CommandManager {
@@ -28,6 +29,15 @@ public:
 	void CheckInputForUndoRedo();
 	void Reset();
 	void Finalize();
+
+
+	template<typename T>
+	static void TryCreatePropertyCommand(Trans& trans, const T& prevValue, T& currentValue, T Trans::* member) {
+		if (currentValue != prevValue) {
+			auto command = std::make_unique<PropertyCommand<T>>(trans, member, prevValue, currentValue);
+			GetInstance()->Execute(std::move(command));
+		}
+	}
 
 private:
 	std::stack<std::unique_ptr<ICommand>> undoStack;

@@ -6,17 +6,69 @@
 #include "Engine/ImGuiManager/ImGuiManager.h"
 #include "Engine/Editor/CommandManager.h"
 #include "Engine/Editor/PropertyCommand.h"
+#include "Engine/Editor/JsonSerializer.h"
 #ifdef _DEBUG
 #include "ImGuizmo.h"
+namespace ed = ax::NodeEditor;
 #endif // _DEBUG
+
 
 Object3d::Object3d() {
 	dxcommon_ = ModelManager::GetInstance()->ShareDXCom();
 	lightManager_ = ModelManager::GetInstance()->ShareLight();
+
+#ifdef _DEBUG
+	nodeEditorContext_ = ax::NodeEditor::CreateEditor();
+
+	MyNode texNode;
+	texNode.id = ImGuiManager::GetInstance()->GenerateNodeId();
+	texNode.name = "TextureInput";
+	texNode.type = MyNode::NodeType::Texture;
+	texNode.outputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), Pin::Type::Output });
+	texNode.evaluator = [](auto&&) {
+		Value v;
+		v.type = Value::Type::Texture;
+		v.textureName = "checkerBoard.png";
+		return v;
+		};
+	nodeGraph_.AddNode(texNode);
+
+	MyNode texNode2;
+	texNode2.id = ImGuiManager::GetInstance()->GenerateNodeId();
+	texNode2.name = "TextureInput2";
+	texNode2.type = MyNode::NodeType::Texture;
+	texNode2.outputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), Pin::Type::Output });
+	texNode2.evaluator = [](auto&&) {
+		Value v;
+		v.type = Value::Type::Texture;
+		v.textureName = "uvChecker.png";
+		return v;
+		};
+	nodeGraph_.AddNode(texNode2);
+
+	MyNode selNode;
+	selNode.id = ImGuiManager::GetInstance()->GenerateNodeId();
+	selNode.name = "Selector";
+	selNode.type = MyNode::NodeType::Selector;
+	selNode.inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), Pin::Type::Input });
+	selNode.evaluator = [](const std::vector<Value>& inputs) {
+		return !inputs.empty() ? inputs[0] : Value();
+		};
+	nodeGraph_.AddNode(selNode);
+
+	selectorNodeId_ = selNode.id;
+#endif // _DEBUG
 }
 
 Object3d::~Object3d() {
 	dxcommon_ = nullptr;
+#ifdef _DEBUG
+	if (nodeEditorContext_) {
+		ax::NodeEditor::DestroyEditor(nodeEditorContext_);
+		nodeEditorContext_ = nullptr;
+	}
+#endif // _DEBUG
+
 }
 
 void Object3d::Create(const std::string& fileName) {
@@ -101,6 +153,8 @@ void Object3d::DebugGUI() {
 		ImGui::RadioButton("TRANSLATE", &guizmoType_, 0); ImGui::SameLine();
 		ImGui::RadioButton("ROTATE", &guizmoType_, 1); ImGui::SameLine();
 		ImGui::RadioButton("SCALE", &guizmoType_, 2);
+		JsonSerializer::ShowSaveTransformPopup(transform); ImGui::SameLine();
+		JsonSerializer::ShowLoadTransformPopup(transform);
 		ImGuizmo::OPERATION operation;
 		switch (guizmoType_) {
 		case 0: operation = ImGuizmo::TRANSLATE; break;
@@ -166,6 +220,7 @@ void Object3d::DebugGUI() {
 		Vector4 color = model_->GetColor(0);
 		ImGui::ColorEdit4("color", &color.x);
 		SetColor(color);
+		SetTextureNode();
 		ImGui::TreePop();
 	}
 	ImGui::Unindent();
@@ -295,31 +350,44 @@ void Object3d::CreatePropertyCommand(int type) {
 	if (ImGui::IsItemDeactivatedAfterEdit()) { // 編集完了検出
 		switch (type) {
 		case 0:
-			if (transform.translate != prevPos_) {
-				auto command = std::make_unique<PropertyCommand<Vector3>>(
-					transform, &Trans::translate, prevPos_, transform.translate);
-				CommandManager::GetInstance()->Execute(std::move(command));
-				prevPos_ = transform.translate;
-			}
+			CommandManager::TryCreatePropertyCommand(transform, prevPos_, transform.translate, &Trans::translate);
+			prevPos_ = transform.translate;
 			break;
 		case 1:
-			if (transform.rotate != prevRotate_) {
-				auto command = std::make_unique<PropertyCommand<Vector3>>(
-					transform, &Trans::rotate, prevRotate_, transform.rotate);
-				CommandManager::GetInstance()->Execute(std::move(command));
-				prevRotate_ = transform.rotate;
-			}
+			CommandManager::TryCreatePropertyCommand(transform, prevRotate_, transform.rotate, &Trans::rotate);
+			prevRotate_ = transform.rotate;
 			break;
 		case 2:
-			if (transform.scale != prevScale_) {
-				auto command = std::make_unique<PropertyCommand<Vector3>>(
-					transform, &Trans::scale, prevScale_, transform.scale);
-				CommandManager::GetInstance()->Execute(std::move(command));
-				prevScale_ = transform.scale;
-			}
+			CommandManager::TryCreatePropertyCommand(transform, prevScale_, transform.scale, &Trans::scale);
+			prevScale_ = transform.scale;
 			break;
 		default: break;
 		}
 	}
+#endif // _DEBUG
+}
+
+void Object3d::SetTextureNode() {
+#ifdef _DEBUG
+	nodeGraph_.ClearResults();
+
+	// Selector ノードを探して評価
+	if (selectorNodeId_.Get() != 0) {
+		MyNode* selNode = nodeGraph_.FindNodeById(selectorNodeId_);
+		if (selNode) {
+			Value out = nodeGraph_.EvaluateNode(*selNode);
+			if (out.type == Value::Type::Texture) {
+				SetTexture(out.textureName);
+			}
+		}
+	}
+
+	if (!nodeEditorContext_) {
+		nodeEditorContext_ = ax::NodeEditor::CreateEditor();
+	}
+
+	ed::SetCurrentEditor(nodeEditorContext_);
+	ImGuiManager::GetInstance()->DrawNodeEditor(&nodeGraph_);
+	ed::SetCurrentEditor(nullptr);
 #endif // _DEBUG
 }

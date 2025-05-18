@@ -30,8 +30,17 @@ public:
 	Trans& GetTrans() { return model_->transform; }
 	Vector3 GetWorldPos()const { return model_->GetWorldPos(); }
 
+	void CreatePropertyCommand(int type);
+
 protected:
 
 	std::unique_ptr<Object3d> model_;
+
+
+	Vector3 prevPos_;
+	Vector3 prevRotate_;
+	Vector3 prevScale_;
+	int guizmoType_ = 0;
+	float IsUsingGuizmo_ = false;
 
 };

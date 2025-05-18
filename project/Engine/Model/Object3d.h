@@ -4,6 +4,11 @@
 #include "Model.h"
 #include "Camera.h"
 #include "Object3dCommon.h"
+#ifdef _DEBUG
+#include "imgui_node_editor.h"
+#include "Engine/ImGuiManager/NodeGraph.h"
+#endif
+
 
 class DXCom;
 class LightManager;
@@ -63,6 +68,8 @@ private:
 
 	void CreatePropertyCommand(int type);
 
+	void SetTextureNode();
+
 private:
 	Object3dCommon* common_;
 	std::unique_ptr<Model> model_ = nullptr;
@@ -88,4 +95,9 @@ private:
 	Vector3 prevScale_;
 	int guizmoType_ = 0;
 	float IsUsingGuizmo_ = false;
+#ifdef _DEBUG
+	ax::NodeEditor::EditorContext* nodeEditorContext_ = nullptr;
+	NodeGraph nodeGraph_;
+	ed::NodeId selectorNodeId_;
+#endif // _DEBUG
 };
