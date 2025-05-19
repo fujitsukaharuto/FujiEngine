@@ -170,6 +170,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Scene\BaseScene.cpp" />
     <ClCompile Include="Engine\Scene\SceneManager.cpp" />
     <ClCompile Include="Engine\WinApp\MyWindow.cpp" />
+    <ClCompile Include="externals\imgui\utilities\drawing.cpp" />
+    <ClCompile Include="externals\imgui\utilities\widgets.cpp" />
     <ClCompile Include="Game\GameObj\FollowCamera.cpp" />
     <ClCompile Include="Game\GameObj\LockOn.cpp" />
     <ClCompile Include="Game\GameObj\SkyDome\SkyBox.cpp" />
@@ -262,6 +264,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Scene\BaseScene.h" />
     <ClInclude Include="Engine\Scene\SceneManager.h" />
     <ClInclude Include="Engine\WinApp\MyWindow.h" />
+    <ClInclude Include="externals\imgui\utilities\drawing.h" />
+    <ClInclude Include="externals\imgui\utilities\widgets.h" />
     <ClInclude Include="Game\GameObj\FollowCamera.h" />
     <ClInclude Include="Game\GameObj\LockOn.h" />
     <ClInclude Include="Game\GameObj\SkyDome\SkyBox.h" />

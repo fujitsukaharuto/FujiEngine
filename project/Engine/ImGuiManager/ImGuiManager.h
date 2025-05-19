@@ -75,6 +75,7 @@ public:
 	void HandleDeleteLink(std::vector<Link>& links);
 	void DrawNode(const MyNode& node);
 	void DrawNodeEditor(NodeGraph* nodeGraph);
+	void DrawPinIcon(bool connected);
 
 #endif // _DEBUG
 

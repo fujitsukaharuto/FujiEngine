@@ -28,6 +28,7 @@ struct Value {
 
 struct Pin {
 	ed::PinId id;
+	bool isLinked = false;
 	enum class Type { Input, Output } type;
 };
 
@@ -81,6 +82,8 @@ public:
 
 	// ノードIDからノードを探す
 	MyNode* FindNodeById(ed::NodeId id);
+
+	bool IsPinLinked(ed::PinId pinId) const;
 
 	// キャッシュ（result）をクリアする
 	void ClearResults();

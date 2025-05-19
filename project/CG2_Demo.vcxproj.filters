@@ -230,6 +230,12 @@
     <ClCompile Include="Engine\ImGuiManager\NodeGraph.cpp">
       <Filter>Engine\ImGuiManager</Filter>
     </ClCompile>
+    <ClCompile Include="externals\imgui\utilities\drawing.cpp">
+      <Filter>Externals\imgui\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="externals\imgui\utilities\widgets.cpp">
+      <Filter>Externals\imgui\utilities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -505,6 +511,12 @@
     <ClInclude Include="Engine\ImGuiManager\NodeGraph.h">
       <Filter>Engine\ImGuiManager</Filter>
     </ClInclude>
+    <ClInclude Include="externals\imgui\utilities\drawing.h">
+      <Filter>Externals\imgui\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="externals\imgui\utilities\widgets.h">
+      <Filter>Externals\imgui\utilities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -611,6 +623,12 @@
     </Filter>
     <Filter Include="resource\Shaders\CS\Engine">
       <UniqueIdentifier>{a53b59b2-f85d-43ce-897a-0b92b392dcaf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Externals\imgui">
+      <UniqueIdentifier>{1d7ac97b-a66d-4b17-ae3e-18af557da005}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Externals\imgui\utilities">
+      <UniqueIdentifier>{94f6f261-20b1-4c47-a774-0143dd37d546}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
