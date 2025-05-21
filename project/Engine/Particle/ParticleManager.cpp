@@ -1024,7 +1024,7 @@ bool ParticleManager::InitEmitParticle(Particle& particle, const Vector3& pos, c
 
 		particle.type_ = grain.type_;
 		particle.startSize_ = grain.startSize_ + para.addRandomSize;
-		particle.endSize_ = grain.endSize_;
+		particle.endSize_ = grain.endSize_ + para.addRandomSize;
 		particle.isParent_ = grain.isParent_;
 
 		particle.isLive_ = true;
