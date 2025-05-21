@@ -15,6 +15,8 @@ struct RandomParametor {
 	Vector2 transy;
 	Vector2 transz;
 
+	Vector2 addRandomSize;
+
 	Vector4 colorMin = { 1.0f,1.0f,1.0f,1.0f };
 	Vector4 colorMax = { 1.0f,1.0f,1.0f,1.0f };
 };
@@ -73,6 +75,9 @@ public:
 	AnimeData animeData_{};
 	uint32_t count_;
 	RandomParametor para_;
+	bool isAddRandomSize_ = false;
+	Vector2 addRandomMax_;
+	Vector2 addRandomMin_;
 
 	const std::string kDirectoryPath_ = "resource/EmitterSaveFile/";
 
