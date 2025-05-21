@@ -4,6 +4,7 @@
 #include "MyWindow.h"
 #include "SRVManager.h"
 #include "Engine/Editor/JsonSerializer.h"
+#include "Engine/Model/TextureManager.h"
 #ifdef _DEBUG
 #include "imgui_impl_dx12.h"
 #include "imgui_impl_win32.h"
@@ -116,6 +117,12 @@ void ImGuiManager::UnSetFont() {
 #endif // _DEBUG
 }
 
+#ifdef _DEBUG
+void ImGuiManager::InitNodeTexture() {
+	backGroundHandle_ = TextureManager::GetInstance()->GetTexture("BlueprintBackground.png")->gpuHandle;
+}
+#endif // _DEBUG
+
 //void ImGuiManager::DrawNodeEditor() {
 //#ifdef _DEBUG
 //	using namespace ax::NodeEditor;
@@ -206,42 +213,51 @@ void ImGuiManager::HandleDeleteLink(std::vector<Link>& links) {
 	ed::EndDelete();
 }
 
-void ImGuiManager::DrawNode(const MyNode& node) {
-	ed::BeginNode(node.id);
+void ImGuiManager::DrawNode(const MyNode& node, ed::Utilities::BlueprintNodeBuilder& builder) {
+	builder.Begin(node.id);
+	builder.Header(ImColor(128, 195, 248));
 
 	ImGui::Text("%s", node.name.c_str());
+	builder.EndHeader();
 
+	ImGui::BeginGroup();
 	for (const auto& pin : node.inputs) {
-		ed::BeginPin(pin.id, ed::PinKind::Input);
+		builder.Input(pin.id);
+
+		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 0.8f);
 		ed::PinPivotAlignment(ImVec2(1.0f, 0.5f));
 		ed::PinPivotSize(ImVec2(0, 0));
-		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 0.8f);
 
 		DrawPinIcon(pin.isLinked);
 		ImGui::PopStyleVar();
-		ed::EndPin();
+		builder.EndInput();
 	}
+
+	ImGui::EndGroup();
+	ImGui::SameLine(70);
 
 	for (const auto& pin : node.outputs) {
+		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 0.8f);
+		builder.Output(pin.id);
 
-		ed::BeginPin(pin.id, ed::PinKind::Output);
 		ed::PinPivotAlignment(ImVec2(1.0f, 0.5f));
 		ed::PinPivotSize(ImVec2(0, 0));
-		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 0.8f);
 
 		DrawPinIcon(pin.isLinked);
 		ImGui::PopStyleVar();
-		ed::EndPin();
+		builder.EndOutput();
 	}
 
-	ed::EndNode();
+	builder.End();
 }
 
 void ImGuiManager::DrawNodeEditor(NodeGraph* nodeGraph) {
 	ed::Begin("My Node Editor");
 
+	ed::Utilities::BlueprintNodeBuilder builder((ImTextureID)backGroundHandle_.ptr, 126, 126);
+
 	for (const auto& node : nodeGraph->nodes) {
-		DrawNode(node);
+		DrawNode(node, builder);
 	}
 	for (const auto& link : nodeGraph->links) {
 		ed::Link(link.id, link.startPinId, link.endPinId);

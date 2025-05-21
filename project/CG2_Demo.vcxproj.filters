@@ -236,6 +236,9 @@
     <ClCompile Include="externals\imgui\utilities\widgets.cpp">
       <Filter>Externals\imgui\utilities</Filter>
     </ClCompile>
+    <ClCompile Include="externals\imgui\utilities\builders.cpp">
+      <Filter>Externals\imgui\utilities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -515,6 +518,9 @@
       <Filter>Externals\imgui\utilities</Filter>
     </ClInclude>
     <ClInclude Include="externals\imgui\utilities\widgets.h">
+      <Filter>Externals\imgui\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="externals\imgui\utilities\builders.h">
       <Filter>Externals\imgui\utilities</Filter>
     </ClInclude>
   </ItemGroup>

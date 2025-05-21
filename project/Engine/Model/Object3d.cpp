@@ -24,6 +24,7 @@ Object3d::Object3d() {
 	texNode.id = ImGuiManager::GetInstance()->GenerateNodeId();
 	texNode.name = "TextureInput";
 	texNode.type = MyNode::NodeType::Texture;
+	texNode.inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input });
 	texNode.outputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Output });
 	texNode.evaluator = [](auto&&) {
 		Value v;
@@ -37,6 +38,7 @@ Object3d::Object3d() {
 	texNode2.id = ImGuiManager::GetInstance()->GenerateNodeId();
 	texNode2.name = "TextureInput2";
 	texNode2.type = MyNode::NodeType::Texture;
+	texNode2.inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input });
 	texNode2.outputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Output });
 	texNode2.evaluator = [](auto&&) {
 		Value v;

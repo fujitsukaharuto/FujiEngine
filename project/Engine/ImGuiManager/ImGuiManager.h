@@ -10,6 +10,7 @@
 #include "imgui.h"
 #include "imgui_node_editor.h"
 #include "NodeGraph.h"
+#include "externals/imgui/utilities/builders.h"
 
 namespace ed = ax::NodeEditor;
 #endif // _DEBUG
@@ -63,6 +64,8 @@ public:
 
 #ifdef _DEBUG
 
+	void InitNodeTexture();
+
 	ed::NodeId GenerateNodeId() { return ed::NodeId(nextId++); }
 	ed::PinId GeneratePinId() { return ed::PinId(nextId++); }
 	ed::LinkId GenerateLinkId() { return ed::LinkId(nextId++); }
@@ -73,7 +76,7 @@ public:
 
 	void HandleCreateLink(std::vector<Link>& links, const std::vector<MyNode>& nodes);
 	void HandleDeleteLink(std::vector<Link>& links);
-	void DrawNode(const MyNode& node);
+	void DrawNode(const MyNode& node, ed::Utilities::BlueprintNodeBuilder& builder);
 	void DrawNodeEditor(NodeGraph* nodeGraph);
 	void DrawPinIcon(bool connected);
 
@@ -89,6 +92,8 @@ private:
 
 #ifdef _DEBUG
 	ImFont* font_japanese = nullptr;
+
+	D3D12_GPU_DESCRIPTOR_HANDLE backGroundHandle_;
 
 	int nextId = 1;
 	// ノードエディタのコンテキスト
