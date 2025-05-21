@@ -940,7 +940,7 @@ bool ParticleManager::InitEmitParticle(Particle& particle, const Vector3& pos, c
 		particle.transform_ = grain.transform_;
 		particle.transform_.translate = Random::GetVector3(para.transx, para.transy, para.transz);
 		particle.transform_.translate += pos;
-		particle.transform_.scale = { grain.startSize_.x,grain.startSize_.y,1.0f };
+		particle.transform_.scale = { grain.startSize_.x + para.addRandomSize.x,grain.startSize_.y + para.addRandomSize.y,1.0f };
 		if (grain.speedType_ == static_cast<int>(SpeedType::kCenter)) {
 			particle.speed_ = grain.speed_;
 		} else {
@@ -1023,7 +1023,7 @@ bool ParticleManager::InitEmitParticle(Particle& particle, const Vector3& pos, c
 		}
 
 		particle.type_ = grain.type_;
-		particle.startSize_ = grain.startSize_;
+		particle.startSize_ = grain.startSize_ + para.addRandomSize;
 		particle.endSize_ = grain.endSize_;
 		particle.isParent_ = grain.isParent_;
 

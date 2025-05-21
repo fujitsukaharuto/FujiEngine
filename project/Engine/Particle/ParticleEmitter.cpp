@@ -61,6 +61,14 @@ void ParticleEmitter::DebugGUI() {
 					ImGui::DragFloat2("StartSize", &grain_.startSize_.x, 0.01f);
 					ImGui::DragFloat2("EndSize", &grain_.endSize_.x, 0.01f);
 				}
+				ImGui::Checkbox("AddRandomSize", &isAddRandomSize_);
+				if (isAddRandomSize_) {
+					ImGui::DragFloat2("AddSizeMax", &addRandomMax_.x, 0.01f);
+					ImGui::DragFloat2("AddSizeMin", &addRandomMin_.x, 0.01f);
+
+					para_.addRandomSize.x = Random::GetFloat(addRandomMin_.x, addRandomMax_.x);
+					para_.addRandomSize.y = Random::GetFloat(addRandomMin_.y, addRandomMax_.y);
+				}
 				ImGui::TreePop();
 			}
 
@@ -266,7 +274,7 @@ void ParticleEmitter::Emit() {
 				if (grain_.isParent_) {
 					grain_.speed_ = (rPos - (posAddSize + rPos)) * grain_.returnPower_;
 				} else {
-					rPos = pos_ + Vector3{ worldMatrix_.m[3][0], worldMatrix_.m[3][1], worldMatrix_.m[3][2] };
+					//rPos = pos_ + Vector3{ worldMatrix_.m[3][0], worldMatrix_.m[3][1], worldMatrix_.m[3][2] };
 					grain_.speed_ = (rPos - posAddSize) * grain_.returnPower_;
 				}
 			}
