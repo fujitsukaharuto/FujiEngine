@@ -175,7 +175,7 @@ void Object3d::DebugGUI() {
 
 		ImGuizmo::Manipulate(
 			&view.m[0][0], &proj.m[0][0],         // カメラ
-			operation,                  // 操作モード
+			operation,                            // 操作モード
 			ImGuizmo::WORLD,                      // ローカル座標系
 			&model.m[0][0]                        // 行列
 		);
@@ -227,6 +227,10 @@ void Object3d::DebugGUI() {
 	}
 	ImGui::Unindent();
 #endif // _DEBUG
+}
+
+void Object3d::LoadTransformFromJson(const std::string& filename) {
+	JsonSerializer::DeserializeTransform(filename, transform);
 }
 
 void Object3d::SetColor(const Vector4& color) {

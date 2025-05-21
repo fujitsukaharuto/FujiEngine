@@ -2,15 +2,12 @@
 #include "Game/OriginGameObject.h"
 #include "Game/Collider/AABBCollider.h"
 
-#include "Game/GameObj/Enemy/Behavior/BaseBossBehavior.h"
+class Boss;
 
-#include "Game/GameObj/Enemy/BossCore.h"
-
-
-class Boss : public OriginGameObject {
+class BossCore : public OriginGameObject {
 public:
-	Boss();
-	~Boss() = default;
+	BossCore(Boss* pboss);
+	~BossCore() = default;
 
 	void Initialize()override;
 	void Update()override;
@@ -22,7 +19,7 @@ public:
 
 	//========================================================================*/
 	//* Behavior
-	void ChangeBehavior(std::unique_ptr<BaseBossBehavior>behavior);
+	//void ChangeBehavior(std::unique_ptr<BaseBossBehavior>behavior);
 
 	//========================================================================*/
 	//* Collision
@@ -32,22 +29,15 @@ public:
 
 
 	BaseCollider* GetCollider() { return collider_.get(); }
-	BaseCollider* GetCoreCollider() { return core_->GetCollider(); }
-	BossCore* GetBossCore() { return core_.get(); }
-	float GetAttackCooldown() { return attackCooldown_; }
 
 private:
 
 private:
 
-	std::unique_ptr<BaseBossBehavior> behavior_ = nullptr;
+	Boss* pBoss_;
 
-	std::unique_ptr<BossCore> core_;
+	//std::unique_ptr<BaseBossBehavior> behavior_ = nullptr;
 
-	std::unique_ptr<Object3d> shadow_;
 	std::unique_ptr<AABBCollider> collider_;
-
-
-	float attackCooldown_ = 0.0f;
 
 };

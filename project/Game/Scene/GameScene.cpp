@@ -149,6 +149,10 @@ void GameScene::Draw() {
 
 	ParticleManager::GetInstance()->Draw();
 
+#ifdef _DEBUG
+
+	Line3dDrawer::GetInstance()->Render();
+#endif // _DEBUG
 #pragma endregion
 
 
@@ -168,6 +172,8 @@ void GameScene::DebugGUI() {
 	ImGui::Indent();
 	
 	player_->DebugGUI();
+
+	boss_->DebugGUI();
 
 	ImGui::Unindent();
 #endif // _DEBUG
