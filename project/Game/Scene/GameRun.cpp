@@ -56,6 +56,10 @@ void GameRun::Initialize() {
 	pManager_->CreateParticleGroup("bulletHitSmoke", "smoke.png", 100);
 	pManager_->CreateParticleGroup("bulletHitCircle", "chargeCircle.png", 10);
 
+	// boss
+	pManager_->CreateParticleGroup("ShockRay", "chargeRay.png", 20);
+	pManager_->CreateParticleGroup("ShockWave", "chargeCircle.png", 10);
+	pManager_->CreateParticleGroup("ShockWaveGround", "smoke.png", 10);
 
 	// playerBullet用
 	pManager_->CreateParentParticleGroup("ChargeEffect1", "redCircle.png",40);
