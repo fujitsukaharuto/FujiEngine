@@ -46,6 +46,9 @@ void ParticleEmitter::DebugGUI() {
 				}
 				ImGui::Checkbox("IsColorFade", &grain_.isColorFade_);
 				ImGui::Checkbox("IsAutoUV", &grain_.isAutoUVMove_);
+				if (grain_.isAutoUVMove_) {
+					ImGui::DragFloat2("AutoUVSpeed", &grain_.autoUVSpeed_.x, 0.01f);
+				}
 				ImGui::TreePop();
 			}
 
