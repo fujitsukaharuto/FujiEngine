@@ -24,7 +24,8 @@ Object3d::Object3d() {
 	texNode.id = ImGuiManager::GetInstance()->GenerateNodeId();
 	texNode.name = "TextureInput";
 	texNode.type = MyNode::NodeType::Texture;
-	texNode.outputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), Pin::Type::Output });
+	texNode.inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input });
+	texNode.outputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Output });
 	texNode.evaluator = [](auto&&) {
 		Value v;
 		v.type = Value::Type::Texture;
@@ -37,7 +38,8 @@ Object3d::Object3d() {
 	texNode2.id = ImGuiManager::GetInstance()->GenerateNodeId();
 	texNode2.name = "TextureInput2";
 	texNode2.type = MyNode::NodeType::Texture;
-	texNode2.outputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), Pin::Type::Output });
+	texNode2.inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input });
+	texNode2.outputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Output });
 	texNode2.evaluator = [](auto&&) {
 		Value v;
 		v.type = Value::Type::Texture;
@@ -50,7 +52,7 @@ Object3d::Object3d() {
 	selNode.id = ImGuiManager::GetInstance()->GenerateNodeId();
 	selNode.name = "Selector";
 	selNode.type = MyNode::NodeType::Selector;
-	selNode.inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), Pin::Type::Input });
+	selNode.inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input });
 	selNode.evaluator = [](const std::vector<Value>& inputs) {
 		return !inputs.empty() ? inputs[0] : Value();
 		};
@@ -380,6 +382,17 @@ void Object3d::SetTextureNode() {
 				SetTexture(out.textureName);
 			}
 		}
+	}
+	// リンクしているかどうか
+	for (auto& node : nodeGraph_.nodes) {
+		for (auto& pin : node.inputs)
+			if (nodeGraph_.IsPinLinked(pin.id))
+				pin.isLinked = true;
+			else pin.isLinked = false;
+		for (auto& pin : node.outputs)
+			if (nodeGraph_.IsPinLinked(pin.id))
+				pin.isLinked = true;
+			else pin.isLinked = false;
 	}
 
 	if (!nodeEditorContext_) {

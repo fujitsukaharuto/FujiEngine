@@ -65,6 +65,7 @@ void Framework::Init() {
 	modelManager_ = ModelManager::GetInstance();
 	modelManager_->Initialize(dxcommon_.get(),lightManager_.get());
 
+
 	
 	// パーティクル管理
 	pManager_ = ParticleManager::GetInstance();

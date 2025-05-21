@@ -4,11 +4,13 @@
 #include "MyWindow.h"
 #include "SRVManager.h"
 #include "Engine/Editor/JsonSerializer.h"
+#include "Engine/Model/TextureManager.h"
 #ifdef _DEBUG
 #include "imgui_impl_dx12.h"
 #include "imgui_impl_win32.h"
 #include "ImGuizmo.h"
 #include "imgui_node_editor.h"
+#include "externals/imgui/utilities/widgets.h"
 
 namespace ed = ax::NodeEditor;
 #endif // _DEBUG
@@ -115,6 +117,12 @@ void ImGuiManager::UnSetFont() {
 #endif // _DEBUG
 }
 
+#ifdef _DEBUG
+void ImGuiManager::InitNodeTexture() {
+	backGroundHandle_ = TextureManager::GetInstance()->GetTexture("BlueprintBackground.png")->gpuHandle;
+}
+#endif // _DEBUG
+
 //void ImGuiManager::DrawNodeEditor() {
 //#ifdef _DEBUG
 //	using namespace ax::NodeEditor;
@@ -205,31 +213,51 @@ void ImGuiManager::HandleDeleteLink(std::vector<Link>& links) {
 	ed::EndDelete();
 }
 
-void ImGuiManager::DrawNode(const MyNode& node) {
-	ed::BeginNode(node.id);
+void ImGuiManager::DrawNode(const MyNode& node, ed::Utilities::BlueprintNodeBuilder& builder) {
+	builder.Begin(node.id);
+	builder.Header(ImColor(128, 195, 248));
 
 	ImGui::Text("%s", node.name.c_str());
+	builder.EndHeader();
 
+	ImGui::BeginGroup();
 	for (const auto& pin : node.inputs) {
-		ed::BeginPin(pin.id, ed::PinKind::Input);
-		ImGui::Text("->");
-		ed::EndPin();
+		builder.Input(pin.id);
+
+		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 0.8f);
+		ed::PinPivotAlignment(ImVec2(1.0f, 0.5f));
+		ed::PinPivotSize(ImVec2(0, 0));
+
+		DrawPinIcon(pin.isLinked);
+		ImGui::PopStyleVar();
+		builder.EndInput();
 	}
+
+	ImGui::EndGroup();
+	ImGui::SameLine(70);
 
 	for (const auto& pin : node.outputs) {
-		ed::BeginPin(pin.id, ed::PinKind::Output);
-		ImGui::Text("->");
-		ed::EndPin();
+		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 0.8f);
+		builder.Output(pin.id);
+
+		ed::PinPivotAlignment(ImVec2(1.0f, 0.5f));
+		ed::PinPivotSize(ImVec2(0, 0));
+
+		DrawPinIcon(pin.isLinked);
+		ImGui::PopStyleVar();
+		builder.EndOutput();
 	}
 
-	ed::EndNode();
+	builder.End();
 }
 
 void ImGuiManager::DrawNodeEditor(NodeGraph* nodeGraph) {
 	ed::Begin("My Node Editor");
 
+	ed::Utilities::BlueprintNodeBuilder builder((ImTextureID)backGroundHandle_.ptr, 126, 126);
+
 	for (const auto& node : nodeGraph->nodes) {
-		DrawNode(node);
+		DrawNode(node, builder);
 	}
 	for (const auto& link : nodeGraph->links) {
 		ed::Link(link.id, link.startPinId, link.endPinId);
@@ -240,6 +268,16 @@ void ImGuiManager::DrawNodeEditor(NodeGraph* nodeGraph) {
 	HandleDeleteLink(nodeGraph->links);
 
 	ed::End();
+}
+
+void ImGuiManager::DrawPinIcon(bool connected) {
+
+	ax::Widgets::IconType iconType;
+	ImColor  color = ImColor(147, 226, 74);
+	color.Value.w = 200.0f / 255.0f;
+	iconType = ax::Widgets::IconType::Circle;
+
+	ax::Widgets::Icon(ImVec2(static_cast<float>(24), static_cast<float>(24)), iconType, connected, color, ImColor(32, 32, 32, 200));
 }
 
 #endif // _DEBUG

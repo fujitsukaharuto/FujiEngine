@@ -67,6 +67,15 @@ MyNode* NodeGraph::FindNodeById(ed::NodeId id) {
 	return nullptr;
 }
 
+bool NodeGraph::IsPinLinked(ed::PinId pinId) const {
+	for (const auto& link : links) {
+		if (link.startPinId == pinId || link.endPinId == pinId) {
+			return true;
+		}
+	}
+	return false;
+}
+
 void NodeGraph::ClearResults() {
 	for (auto& node : nodes) {
 		node.result = Value(); // type = None にリセット

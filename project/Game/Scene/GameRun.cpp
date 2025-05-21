@@ -16,6 +16,7 @@ void GameRun::Initialize() {
 #pragma region テクスチャ読み込み
 	textureManager_->Load("uvChecker.png");
 	textureManager_->Load("checkerBoard.png");
+	textureManager_->Load("BlueprintBackground.png");
 #pragma endregion
 
 
@@ -78,6 +79,9 @@ void GameRun::Initialize() {
 
 #pragma endregion
 
+#ifdef _DEBUG
+	imguiManager_->InitNodeTexture();
+#endif // _DEBUG
 
 
 	GlobalVariables::GetInstance()->LoadFiles();
