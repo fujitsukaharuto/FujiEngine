@@ -251,6 +251,8 @@ void ParticleEmitter::Emit() {
 			if (isAddRandomSize_) {
 				para_.addRandomSize.x = Random::GetFloat(addRandomMin_.x, addRandomMax_.x);
 				para_.addRandomSize.y = Random::GetFloat(addRandomMin_.y, addRandomMax_.y);
+			} else {
+				para_.addRandomSize = { 0.0f,0.0f };
 			}
 
 			// 親の回転だけを取り出して適用する
