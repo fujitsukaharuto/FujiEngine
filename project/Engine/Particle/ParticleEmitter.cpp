@@ -66,9 +66,6 @@ void ParticleEmitter::DebugGUI() {
 				if (isAddRandomSize_) {
 					ImGui::DragFloat2("AddSizeMax", &addRandomMax_.x, 0.01f);
 					ImGui::DragFloat2("AddSizeMin", &addRandomMin_.x, 0.01f);
-
-					para_.addRandomSize.x = Random::GetFloat(addRandomMin_.x, addRandomMax_.x);
-					para_.addRandomSize.y = Random::GetFloat(addRandomMin_.y, addRandomMax_.y);
 				}
 				ImGui::TreePop();
 			}
@@ -251,6 +248,10 @@ void ParticleEmitter::Emit() {
 				{ emitSizeMin_.z, emitSizeMax_.z }
 			);
 
+			if (isAddRandomSize_) {
+				para_.addRandomSize.x = Random::GetFloat(addRandomMin_.x, addRandomMax_.x);
+				para_.addRandomSize.y = Random::GetFloat(addRandomMin_.y, addRandomMax_.y);
+			}
 
 			// 親の回転だけを取り出して適用する
 			Matrix4x4 parentRotationOnly = parent_ ? parent_->GetWorldMat() : Matrix4x4::MakeIdentity4x4();
