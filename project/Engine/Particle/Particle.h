@@ -76,6 +76,7 @@ public:
 	Vector2 uvScale_ = { 1.0f,1.0f };
 	bool isColorFade_ = true;
 	bool isAutoUVMove_ = false;
+	Vector2 autoUVSpeed_ = { 0.1f,0.0f };
 	bool isColorFadeIn_ = false;
 
 	//========================================================================*/

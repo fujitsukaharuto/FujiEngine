@@ -855,7 +855,7 @@ void ParticleManager::ParticleSizeUpdate(Particle& particle) {
 		particle.color_.w = Lerp(particle.startAlpha_, 0.0f, t * t);
 	}
 	if (particle.isAutoUVMove_) {
-		particle.uvTrans_.x += 0.1f;
+		particle.uvTrans_ += particle.autoUVSpeed_;
 	}
 
 	switch (sizeType) {
@@ -1023,6 +1023,7 @@ bool ParticleManager::InitEmitParticle(Particle& particle, const Vector3& pos, c
 		particle.uvTrans_ = grain.uvTrans_;
 		particle.uvScale_ = grain.uvScale_;
 		particle.isAutoUVMove_ = grain.isAutoUVMove_;
+		particle.autoUVSpeed_ = grain.autoUVSpeed_;
 		switch (particle.colorType_) {
 		case static_cast<int>(ColorType::kDefault):
 			particle.color_ = para.colorMax;
