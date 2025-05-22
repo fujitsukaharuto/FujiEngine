@@ -58,8 +58,7 @@ void GameRun::Initialize() {
 
 	// boss
 	pManager_->CreateParticleGroup("ShockRay", "chargeRay.png", 20);
-	pManager_->CreateParticleGroup("ShockWave", "shockWave.png", 10);
-	pManager_->CreateParticleGroup("ShockWaveGround", "smoke.png", 10);
+	pManager_->CreateParticleGroup("ShockWaveGround", "shockWaveGround.png", 10);
 	pManager_->CreateParticleGroup("ShockWaveParticle", "redCircle.png", 30);
 
 
@@ -71,6 +70,9 @@ void GameRun::Initialize() {
 	pManager_->CreateParentParticleGroup("ChargeRay", "chargeRay.png", 20);
 	pManager_->CreateParentParticleGroup("ChargeWave", "chargeCircle.png", 10);
 	pManager_->CreateParentParticleGroup("ChargeCircle", "chargeCircle.png", 10);
+
+	// 半透明になる
+	pManager_->CreateParticleGroup("ShockWave", "white.png", 10);
 
 
 	pManager_->CreateAnimeGroup("animetest", "uvChecker.png");
