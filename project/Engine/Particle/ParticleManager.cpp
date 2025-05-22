@@ -26,6 +26,7 @@ void ParticleManager::Initialize(DXCom* pDxcom, SRVManager* srvManager) {
 
 	InitPlaneVertex();
 	InitRingVertex();
+	InitSphereVertex();
 }
 
 void ParticleManager::Finalize() {
@@ -66,7 +67,8 @@ void ParticleManager::Finalize() {
 	iBuffer_.Reset();
 	ringVBuffer_.Reset();
 	ringIBuffer_.Reset();
-
+	sphereVBuffer_.Reset();
+	sphereIBuffer_.Reset();
 }
 
 void ParticleManager::Update() {
@@ -290,6 +292,8 @@ void ParticleManager::Draw() {
 				dxcommon_->GetCommandList()->IASetIndexBuffer(&ringIbView);
 				break;
 			case ShapeType::SPHERE:
+				dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &sphereVbView);
+				dxcommon_->GetCommandList()->IASetIndexBuffer(&sphereIbView);
 				break;
 			case ShapeType::TORUS:
 				break;
@@ -319,6 +323,7 @@ void ParticleManager::Draw() {
 			dxcommon_->GetCommandList()->DrawIndexedInstanced(static_cast<UINT>((ringIndex_.size())), group->drawCount_, 0, 0, 0);
 			break;
 		case ShapeType::SPHERE:
+			dxcommon_->GetCommandList()->DrawIndexedInstanced(static_cast<UINT>((sphereIndex_.size())), group->drawCount_, 0, 0, 0);
 			break;
 		case ShapeType::TORUS:
 			break;
@@ -372,7 +377,7 @@ void ParticleManager::ParticleDebugGUI() {
 	}
 	if (selectParticleGroup_) {
 		int shapeType = static_cast<int>(selectParticleGroup_->shapeType_);
-		ImGui::Combo("ShapeType##type", &shapeType, "Plane\0Ring\0");
+		ImGui::Combo("ShapeType##type", &shapeType, "Plane\0Ring\0sphere\0");
 		selectParticleGroup_->shapeType_ = static_cast<ShapeType>(shapeType);
 		ImGui::Text("count : %d", int(selectParticleGroup_->drawCount_));
 	}
@@ -801,6 +806,74 @@ void ParticleManager::InitRingVertex() {
 	ringIbView.Format = DXGI_FORMAT_R32_UINT;
 	ringIbView.SizeInBytes = static_cast<UINT>(sizeof(uint32_t) * ringIndex_.size());
 }
+
+void ParticleManager::InitSphereVertex() {
+	const float pi = 3.1415926535f;
+	const uint32_t kSubdivision = 16;
+
+	const float kLonEvery = (2.0f * pi) / static_cast<float>(kSubdivision);
+	const float kLatEvery = pi / static_cast<float>(kSubdivision);
+
+	// 頂点生成
+	for (uint32_t latIndex = 0; latIndex <= kSubdivision; ++latIndex) {
+		float lat = -pi / 2.0f + kLatEvery * latIndex;
+		float v = 1.0f - float(latIndex) / float(kSubdivision); // 上がv=0, 下がv=1になるように
+
+		for (uint32_t lonIndex = 0; lonIndex <= kSubdivision; ++lonIndex) {
+			// 経度ループ用に +1 まで回す
+			float lon = lonIndex * kLonEvery;
+			float u = float(lonIndex) / float(kSubdivision); // 経度でuを算出（0〜1）
+
+			float x = cosf(lat) * cosf(lon);
+			float y = sinf(lat);
+			float z = cosf(lat) * sinf(lon);
+
+			sphereVertex_.push_back({ {x, y, z, 1.0f},{u, v},{x, y, z} });
+		}
+	}
+
+	// インデックス生成
+	for (uint32_t latIndex = 0; latIndex < kSubdivision; ++latIndex) {
+		for (uint32_t lonIndex = 0; lonIndex < kSubdivision; ++lonIndex) {
+			uint32_t row1 = latIndex * (kSubdivision + 1);
+			uint32_t row2 = (latIndex + 1) * (kSubdivision + 1);
+
+			uint32_t v0 = row1 + lonIndex;
+			uint32_t v1 = row1 + lonIndex + 1;
+			uint32_t v2 = row2 + lonIndex;
+			uint32_t v3 = row2 + lonIndex + 1;
+
+			sphereIndex_.push_back(v0);
+			sphereIndex_.push_back(v2);
+			sphereIndex_.push_back(v1);
+
+			sphereIndex_.push_back(v1);
+			sphereIndex_.push_back(v2);
+			sphereIndex_.push_back(v3);
+		}
+	}
+
+
+	sphereVBuffer_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(VertexDate) * sphereVertex_.size());
+	sphereIBuffer_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(uint32_t) * sphereIndex_.size());
+
+	VertexDate* vData = nullptr;
+	sphereVBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&vData));
+	std::memcpy(vData, sphereVertex_.data(), sizeof(VertexDate) * sphereVertex_.size());
+
+	sphereVbView.BufferLocation = sphereVBuffer_->GetGPUVirtualAddress();
+	sphereVbView.SizeInBytes = static_cast<UINT>(sizeof(VertexDate) * sphereVertex_.size());
+	sphereVbView.StrideInBytes = static_cast<UINT>(sizeof(VertexDate));
+
+	uint32_t* iData = nullptr;
+	sphereIBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&iData));
+	std::memcpy(iData, sphereIndex_.data(), sizeof(uint32_t) * sphereIndex_.size());
+
+	sphereIbView.BufferLocation = sphereIBuffer_->GetGPUVirtualAddress();
+	sphereIbView.Format = DXGI_FORMAT_R32_UINT;
+	sphereIbView.SizeInBytes = static_cast<UINT>(sizeof(uint32_t) * sphereIndex_.size());
+}
+
 
 
 bool ParticleManager::LifeUpdate(Particle& particle) {
