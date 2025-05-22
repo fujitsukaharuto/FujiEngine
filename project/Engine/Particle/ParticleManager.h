@@ -114,6 +114,7 @@ private:
 
 	void InitPlaneVertex();
 	void InitRingVertex();
+	void InitSphereVertex();
 
 	bool LifeUpdate(Particle& particle);
 	void ParticleSizeUpdate(Particle& particle);
@@ -145,6 +146,14 @@ private:
 
 	std::vector<VertexDate> ringVertex_;
 	std::vector<uint32_t> ringIndex_;
+
+	ComPtr<ID3D12Resource> sphereVBuffer_;
+	ComPtr<ID3D12Resource> sphereIBuffer_;
+	D3D12_VERTEX_BUFFER_VIEW sphereVbView{};
+	D3D12_INDEX_BUFFER_VIEW sphereIbView{};
+
+	std::vector<VertexDate> sphereVertex_;
+	std::vector<uint32_t> sphereIndex_;
 
 
 	bool isBillBoard_ = true;

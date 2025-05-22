@@ -38,7 +38,7 @@ void GameRun::Initialize() {
 #pragma region パーティクル生成
 	pManager_->CreateParticleGroup("sphere", "redCircle.png");
 	pManager_->CreateParticleGroup("sphere2", "defaultParticle.png");
-	pManager_->CreateParticleGroup("sphere3", "blueParticle.png");
+	pManager_->CreateParticleGroup("sphere3", "white.png");
 	pManager_->CreateParticleGroup("ring", "gradationLine.png");
 	pManager_->CreateParticleGroup("ChargeEffect1", "redCircle.png", 40);
 	pManager_->CreateParticleGroup("ChargeEffect2", "redCircle.png", 40);
