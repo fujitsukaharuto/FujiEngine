@@ -266,6 +266,9 @@
     <ClCompile Include="Game\GameObj\Enemy\BossCore.cpp">
       <Filter>Game\GameObj\Enemy</Filter>
     </ClCompile>
+    <ClCompile Include="Game\GameObj\Enemy\BossItem\WaveWall.cpp">
+      <Filter>Game\GameObj\Enemy\BossItem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -586,6 +589,9 @@
     <ClInclude Include="Game\GameObj\Enemy\BossCore.h">
       <Filter>Game\GameObj\Enemy</Filter>
     </ClInclude>
+    <ClInclude Include="Game\GameObj\Enemy\BossItem\WaveWall.h">
+      <Filter>Game\GameObj\Enemy\BossItem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -707,6 +713,9 @@
     </Filter>
     <Filter Include="Externals\imgui\utilities">
       <UniqueIdentifier>{94f6f261-20b1-4c47-a774-0143dd37d546}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameObj\Enemy\BossItem">
+      <UniqueIdentifier>{6f67285b-3cf8-4b8c-8d42-5873aa75a24d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

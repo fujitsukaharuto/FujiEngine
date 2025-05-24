@@ -467,7 +467,7 @@ void ParticleManager::SelectEmitterSizeDraw() {
 #endif // _DEBUG
 }
 
-void ParticleManager::CreateParticleGroup(const std::string& name, const std::string& fileName, uint32_t count, bool subMode) {
+void ParticleManager::CreateParticleGroup(const std::string& name, const std::string& fileName, uint32_t count, ShapeType shape, bool subMode) {
 	ParticleManager* instance = GetInstance();
 
 	auto iterator = instance->particleGroups_.find(name);
@@ -479,6 +479,7 @@ void ParticleManager::CreateParticleGroup(const std::string& name, const std::st
 	ParticleGroup* newGroup = new ParticleGroup();
 
 	newGroup->isSubMode_ = subMode;
+	newGroup->shapeType_ = shape;
 	newGroup->emitter_.name_ = name;
 	newGroup->emitter_.Load(name);
 

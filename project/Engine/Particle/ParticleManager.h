@@ -92,7 +92,7 @@ public:
 	void SelectParticleUpdate();
 	void SelectEmitterSizeDraw();
 
-	static void CreateParticleGroup(const std::string& name, const std::string& fileName, uint32_t count = 20, bool subMode = false);
+	static void CreateParticleGroup(const std::string& name, const std::string& fileName, uint32_t count = 20, ShapeType shape = ShapeType::PLANE, bool subMode = false);
 
 	static void CreateParentParticleGroup(const std::string& name, const std::string& fileName, uint32_t count = 20);
 

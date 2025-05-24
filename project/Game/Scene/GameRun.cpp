@@ -28,6 +28,7 @@ void GameRun::Initialize() {
 	modelManager_->LoadOBJ("terrain.obj");
 	modelManager_->LoadOBJ("skydome.obj");
 	modelManager_->LoadOBJ("playerModel.obj");
+	modelManager_->LoadOBJ("bossWaveWall.obj");
 	modelManager_->LoadGLTF("AnimatedCube.gltf");
 	modelManager_->LoadGLTF("walk.gltf");
 	modelManager_->LoadGLTF("sneakWalk.gltf");
@@ -58,7 +59,7 @@ void GameRun::Initialize() {
 
 	// boss
 	pManager_->CreateParticleGroup("ShockRay", "chargeRay.png", 20);
-	pManager_->CreateParticleGroup("ShockWaveGround", "shockWaveGround.png", 10);
+	pManager_->CreateParticleGroup("ShockWaveGround", "shockWaveGround.png", 10, ShapeType::RING);
 	pManager_->CreateParticleGroup("ShockWaveParticle", "redCircle.png", 30);
 
 
@@ -72,7 +73,7 @@ void GameRun::Initialize() {
 	pManager_->CreateParentParticleGroup("ChargeCircle", "chargeCircle.png", 10);
 
 	// 半透明になる
-	pManager_->CreateParticleGroup("ShockWave", "white.png", 10);
+	pManager_->CreateParticleGroup("ShockWave", "white.png", 10, ShapeType::SPHERE);
 
 
 	pManager_->CreateAnimeGroup("animetest", "uvChecker.png");

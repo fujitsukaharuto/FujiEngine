@@ -56,6 +56,7 @@ void GameScene::Initialize() {
 
 	boss_ = std::make_unique<Boss>();
 	boss_->Initialize();
+	boss_->SetPlayer(player_.get());
 
 	followCamera_ = std::make_unique<FollowCamera>();
 	followCamera_->Initialize();

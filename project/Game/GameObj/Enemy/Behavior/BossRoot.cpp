@@ -18,8 +18,12 @@ void BossRoot::Update() {
 		/// 通常
 		///---------------------------------------------------------------------------------------
 	case BossRoot::Step::ROOT:
-
-
+		if (cooldown_ > 0.0f) {
+			cooldown_ -= FPSKeeper::DeltaTime();
+		} else if (cooldown_ <= 0.0f) {
+			step_ = Step::TOATTACK;
+			break;
+		}
 
 
 		break;
