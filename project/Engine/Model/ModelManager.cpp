@@ -288,6 +288,65 @@ void ModelManager::CreateSphere() {
 	instance->models_.insert(std::make_pair("Sphere", std::move(model)));
 }
 
+void ModelManager::CreateRing() {
+	ModelManager* instance = GetInstance();
+
+	auto iterator = instance->models_.find("Ring");
+	if (iterator != instance->models_.end()) {
+		return;
+	}
+
+	std::unique_ptr<Model> model;
+	model.reset(new Model());
+	ModelMesh newModelMesh{};
+
+	const uint32_t kRingDivide = 32;
+	const float kOuterRadius = 1.0f;
+	const float kInnerRadius = 0.2f;
+	const float radianPerDivide = 2.0f * std::numbers::pi_v<float> / float(kRingDivide);
+
+	for (uint32_t i = 0; i <= kRingDivide; i++) {
+		float angle = i * radianPerDivide;
+		float sinA = std::sin(angle);
+		float cosA = std::cos(angle);
+		float u = float(i) / float(kRingDivide);
+
+		// 外周
+		model->data_.vertices.push_back({ {-sinA * kOuterRadius, cosA * kOuterRadius, 0.0f, 1.0f}, {u, 0.0f}, {0,0,1} });
+		newModelMesh.vertices.push_back({ {-sinA * kOuterRadius, cosA * kOuterRadius, 0.0f, 1.0f}, {u, 0.0f}, {0,0,1} });
+		// 内周
+		model->data_.vertices.push_back({ {-sinA * kInnerRadius, cosA * kInnerRadius, 0.0f, 1.0f}, {u, 1.0f}, {0,0,1} });
+		newModelMesh.vertices.push_back({ {-sinA * kInnerRadius, cosA * kInnerRadius, 0.0f, 1.0f}, {u, 1.0f}, {0,0,1} });
+	}
+
+	// インデックス生成
+	for (uint32_t i = 0; i < kRingDivide; i++) {
+		uint32_t outer0 = i * 2;
+		uint32_t inner0 = outer0 + 1;
+		uint32_t outer1 = outer0 + 2;
+		uint32_t inner1 = outer0 + 3;
+
+		// 三角形1
+		model->data_.indicies.push_back(outer0);
+		newModelMesh.indicies.push_back(outer0);
+		model->data_.indicies.push_back(inner0);
+		newModelMesh.indicies.push_back(inner0);
+		model->data_.indicies.push_back(outer1);
+		newModelMesh.indicies.push_back(outer1);
+
+		// 三角形2
+		model->data_.indicies.push_back(outer1);
+		newModelMesh.indicies.push_back(outer1);
+		model->data_.indicies.push_back(inner0);
+		newModelMesh.indicies.push_back(inner0);
+		model->data_.indicies.push_back(inner1);
+		newModelMesh.indicies.push_back(inner1);
+	}
+	model->data_.meshes.push_back(newModelMesh);
+
+	instance->models_.insert(std::make_pair("Ring", std::move(model)));
+}
+
 
 void ModelManager::AddModel(const std::string& filename, Model* model) {
 	std::unique_ptr<Model> newModel;

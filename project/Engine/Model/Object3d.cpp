@@ -90,6 +90,14 @@ void Object3d::CreateSphere() {
 	CreateWVP();
 }
 
+void Object3d::CreateRing() {
+	this->camera_ = CameraManager::GetInstance()->GetCamera();
+	ModelManager::GetInstance()->CreateSphere();
+	SetModel("Ring");
+	transform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	CreateWVP();
+}
+
 void Object3d::Draw(Material* mate) {
 	SetWVP();
 

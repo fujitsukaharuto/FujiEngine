@@ -26,6 +26,8 @@ public:
 
 	void CreateSphere();
 
+	void CreateRing();
+
 	void Draw(Material* mate = nullptr);
 
 	void AnimeDraw();
