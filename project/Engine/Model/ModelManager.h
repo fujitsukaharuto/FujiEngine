@@ -31,6 +31,7 @@ public:
 	static ModelData FindModel(const std::string& filename);
 
 	static void CreateSphere();
+	static void CreateRing();
 
 	void AddModel(const std::string& filename, Model* model);
 
