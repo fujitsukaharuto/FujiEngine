@@ -221,7 +221,7 @@ void Object3d::DebugGUI() {
 				auto command = std::make_unique<PropertyCommand<Vector3>>(
 					transform, &Trans::rotate, prevRotate_, transform.rotate);
 				CommandManager::GetInstance()->Execute(std::move(command));
-			}else if (transform.scale != prevScale_) {
+			} else if (transform.scale != prevScale_) {
 				auto command = std::make_unique<PropertyCommand<Vector3>>(
 					transform, &Trans::scale, prevScale_, transform.scale);
 				CommandManager::GetInstance()->Execute(std::move(command));
@@ -234,7 +234,7 @@ void Object3d::DebugGUI() {
 		ImGui::TreePop();
 	}
 
-	if (ImGui::TreeNodeEx("color",flags)) {
+	if (ImGui::TreeNodeEx("color", flags)) {
 		Vector4 color = model_->GetColor(0);
 		ImGui::ColorEdit4("color", &color.x);
 		SetColor(color);
@@ -363,9 +363,9 @@ void Object3d::CreatePropertyCommand(int type) {
 #ifdef _DEBUG
 	if (ImGui::IsItemActivated()) {
 		switch (type) {
-		case 0: prevPos_    = transform.translate; break;
+		case 0: prevPos_ = transform.translate; break;
 		case 1: prevRotate_ = transform.rotate;    break;
-		case 2: prevScale_  = transform.scale;     break;
+		case 2: prevScale_ = transform.scale;     break;
 		default: break;
 		}
 	}
