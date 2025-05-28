@@ -363,7 +363,6 @@ void ModelManager::CreateCylinder(float topRadius, float bottomRadius, float hei
 	const float kTopRadius = topRadius;
 	const float kBottomRadius = bottomRadius;
 	const float kHeight = height;
-	const float halfHeight = kHeight / 2.0f;
 	const float radianPerDivide = 2.0f * std::numbers::pi_v<float> / float(kCylinderDivide);
 
 	for (uint32_t i = 0; i <= kCylinderDivide; i++) {
@@ -373,13 +372,13 @@ void ModelManager::CreateCylinder(float topRadius, float bottomRadius, float hei
 		float u = float(i) / float(kCylinderDivide);
 
 		// 下
-		Vector3 posBottom = { cosA * kBottomRadius, -halfHeight, sinA * kBottomRadius };
+		Vector3 posBottom = { cosA * kBottomRadius, 0.0f, sinA * kBottomRadius };
 		Vector3 normal = { cosA, 0.0f, sinA };
 		model->data_.vertices.push_back({ {posBottom.x, posBottom.y, posBottom.z, 1.0f}, {u, 1.0f}, normal });
 		newModelMesh.vertices.push_back({ {posBottom.x, posBottom.y, posBottom.z, 1.0f}, {u, 1.0f}, normal });
 
 		// 上
-		Vector3 posTop = { cosA * kTopRadius, +halfHeight, sinA * kTopRadius };
+		Vector3 posTop = { cosA * kTopRadius, kHeight, sinA * kTopRadius };
 		model->data_.vertices.push_back({ {posTop.x, posTop.y, posTop.z, 1.0f}, {u, 0.0f}, normal });
 		newModelMesh.vertices.push_back({ {posTop.x, posTop.y, posTop.z, 1.0f}, {u, 0.0f}, normal });
 
