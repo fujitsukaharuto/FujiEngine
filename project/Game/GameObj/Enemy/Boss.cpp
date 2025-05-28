@@ -40,6 +40,9 @@ void Boss::Initialize() {
 	core_ = std::make_unique<BossCore>(this);
 	core_->Initialize();
 
+	beam_ = std::make_unique<Beam>();
+	beam_->Initialize();
+
 	float parentRotate = std::numbers::pi_v<float> *0.25f;
 	for (int i = 0; i < 8; i++) {
 		std::unique_ptr<Object3d> chargeParent;
@@ -140,6 +143,7 @@ void Boss::Draw(Material* mate) {
 	}
 
 	core_->Draw();
+	beam_->Draw();
 	OriginGameObject::Draw(mate);
 }
 

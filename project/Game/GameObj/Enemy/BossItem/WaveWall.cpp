@@ -30,10 +30,12 @@ void WaveWall::Initialize() {
 	model_->transform.scale.y = 4.0f;
 	model_->transform.scale.z = 1.5f;
 	model_->SetColor({ 0.0f,0.7f,1.0f,1.0f });
+	model_->SetAlphaRef(0.25f);
 
 	underRing_->SetLightEnable(LightMode::kLightNone);
 	underRing_->SetTexture("underRing.png");
 	underRing_->SetColor({ 0.8f,0.8f,0.8f,1.0f });
+	underRing_->SetAlphaRef(0.25f);
 	underRing_->SetParent(model_.get());
 	underRing_->transform.translate.y = 0.001f;
 	underRing_->transform.rotate.x = 1.56f;
@@ -47,6 +49,7 @@ void WaveWall::Initialize() {
 	wave1_->transform.scale.x = scaleX;
 	wave1_->transform.scale.y = scaleY;
 	wave1_->SetColor({ 0.5f,0.2f,1.0f,1.0f });
+	wave1_->SetAlphaRef(0.25f);
 	wave1_->SetParent(model_.get());
 	wave1_->transform.translate.z = -0.05f;
 
@@ -56,6 +59,7 @@ void WaveWall::Initialize() {
 	wave2_->transform.scale.x = scaleX;
 	wave2_->transform.scale.y = scaleY;
 	wave2_->SetColor({ 0.0f,0.2f,0.6f,1.0f });
+	wave2_->SetAlphaRef(0.25f);
 	wave2_->SetParent(model_.get());
 	wave2_->transform.translate.z = -0.1f;
 
@@ -65,6 +69,7 @@ void WaveWall::Initialize() {
 	wave3_->transform.scale.x = scaleX;
 	wave3_->transform.scale.y = scaleY;
 	wave3_->SetColor({ 0.0f,0.2f,1.0f,1.0f });
+	wave3_->SetAlphaRef(0.25f);
 	wave3_->SetParent(model_.get());
 	wave3_->transform.translate.z = -0.15f;
 

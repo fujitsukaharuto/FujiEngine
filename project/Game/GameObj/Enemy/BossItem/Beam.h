@@ -42,8 +42,6 @@ private:
 
 	bool isLive_ = false;
 	float lifeTime_ = 300.0f;
-	float speed_;
-	Vector3 velocity_;
 
 	float uvTransX_;
 

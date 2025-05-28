@@ -7,6 +7,7 @@
 
 #include "Game/GameObj/Enemy/BossCore.h"
 #include "Game/GameObj/Enemy/BossItem/WaveWall.h"
+#include "Game/GameObj/Enemy/BossItem/Beam.h"
 
 class Player;
 
@@ -56,6 +57,7 @@ private:
 	std::unique_ptr<BaseBossBehavior> behavior_ = nullptr;
 
 	std::unique_ptr<BossCore> core_;
+	std::unique_ptr<Beam> beam_;
 	std::vector<std::unique_ptr<WaveWall>> walls_;
 
 	std::unique_ptr<Object3d> shadow_;
