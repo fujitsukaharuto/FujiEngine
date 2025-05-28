@@ -26,6 +26,10 @@ public:
 	void UpdateWaveWall();
 	void WaveWallAttack();
 
+	void InitBeam();
+	bool BeamCharge();
+	void BeamChargeComplete();
+
 	//========================================================================*/
 	//* Behavior
 	void ChangeBehavior(std::unique_ptr<BaseBossBehavior>behavior);
@@ -58,8 +62,11 @@ private:
 	std::unique_ptr<AABBCollider> collider_;
 
 	Player* pPlayer_;
+	std::vector<std::unique_ptr<Object3d>> chargeParents_;
 
 	float attackCooldown_ = 0.0f;
+	float chargeTime_ = 120.0f;
+	float chargeSize_ = 12.0f;
 
 
 	// emitter
@@ -68,7 +75,14 @@ private:
 	ParticleEmitter waveAttack3;
 	ParticleEmitter waveAttack4;
 
+	ParticleEmitter charges_[8];
 
+	ParticleEmitter charge9_;
+	ParticleEmitter charge10_;
+	ParticleEmitter charge11_;
+	ParticleEmitter charge12_;
+	ParticleEmitter charge13_;
+	ParticleEmitter charge14_;
 
 
 };

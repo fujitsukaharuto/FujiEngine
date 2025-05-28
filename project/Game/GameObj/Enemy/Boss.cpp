@@ -1,5 +1,7 @@
 #include "Boss.h"
 #include "Engine/Particle/ParticleManager.h"
+#include "Engine/Math/Random/Random.h"
+#include <numbers>
 
 #include "Game/GameObj/Enemy/Behavior/BossRoot.h"
 #include "Game/GameObj/Enemy/Behavior/BossAttack.h"
@@ -38,6 +40,31 @@ void Boss::Initialize() {
 	core_ = std::make_unique<BossCore>(this);
 	core_->Initialize();
 
+	float parentRotate = std::numbers::pi_v<float> *0.25f;
+	for (int i = 0; i < 8; i++) {
+		std::unique_ptr<Object3d> chargeParent;
+		chargeParent = std::make_unique<Object3d>();
+		chargeParent->Create("cube.obj");
+		chargeParent->transform.translate.y += 2.0f;
+		chargeParent->transform.translate.z += 10.0f;
+		chargeParent->transform.scale.x = 12.0f;
+		chargeParent->transform.scale.y = 12.0f;
+		chargeParent->transform.scale.z = 12.0f;
+		if (i != 0 && i != 4) {
+			if (i < 4) {
+				chargeParent->transform.rotate.x = Random::GetFloat(-std::numbers::pi_v<float>, std::numbers::pi_v<float>);
+				chargeParent->transform.rotate.y = Random::GetFloat(-1.56f, 1.56f);
+			} else {
+				chargeParent->transform.rotate.x = Random::GetFloat(-std::numbers::pi_v<float>, std::numbers::pi_v<float>);
+				chargeParent->transform.rotate.y = Random::GetFloat(-1.56f, 1.56f);
+			}
+		}
+		chargeParent->transform.rotate.z = parentRotate * i;
+		chargeParents_.push_back(std::move(chargeParent));
+	}
+
+
+
 	ParticleManager::Load(waveAttack1, "ShockRay");
 	ParticleManager::Load(waveAttack2, "ShockWaveGround");
 	ParticleManager::Load(waveAttack3, "ShockWaveParticle");
@@ -51,6 +78,40 @@ void Boss::Initialize() {
 	waveAttack1.isAddRandomSize_ = true;
 	waveAttack1.addRandomMax_ = { 0.75f,1.2f };
 	waveAttack1.addRandomMin_.y = -0.5f;
+
+
+	ParticleManager::Load(charges_[0], "BeamCharge1");
+	ParticleManager::Load(charges_[1], "BeamCharge2");
+	ParticleManager::Load(charges_[2], "BeamCharge3");
+	ParticleManager::Load(charges_[3], "BeamCharge4");
+	ParticleManager::Load(charges_[4], "BeamCharge1");
+	ParticleManager::Load(charges_[5], "BeamCharge2");
+	ParticleManager::Load(charges_[6], "BeamCharge3");
+	ParticleManager::Load(charges_[7], "BeamCharge4");
+	ParticleManager::Load(charge9_, "BeamCharge5");
+	ParticleManager::Load(charge10_, "BeamCharge9");
+	ParticleManager::Load(charge11_, "BeamCharge8");
+	ParticleManager::Load(charge12_, "BeamCharge6");
+	ParticleManager::Load(charge13_, "BeamCharge7");
+	ParticleManager::Load(charge14_, "BeamCharge10");
+
+
+
+	for (int i = 0; i < 8; i++) {
+		charges_[i].frequencyTime_ = 0.0f;
+		charges_[i].isDistanceComplement_ = true;
+		charges_[i].SetParent(chargeParents_[i].get());
+	}
+	charge12_.frequencyTime_ = 0.0f;
+	charge13_.frequencyTime_ = 0.0f;
+	charge14_.frequencyTime_ = 0.0f;
+
+	charge9_.SetParent(chargeParents_[0].get());
+	charge10_.SetParent(chargeParents_[0].get());
+	charge11_.SetParent(chargeParents_[0].get());
+	charge12_.SetParent(chargeParents_[0].get());
+	charge13_.SetParent(chargeParents_[0].get());
+	charge14_.SetParent(chargeParents_[0].get());
 
 
 	ChangeBehavior(std::make_unique<BossRoot>(this));
@@ -147,6 +208,109 @@ void Boss::WaveWallAttack() {
 	waveAttack3.Emit();
 	waveAttack4.Emit();
 
+}
+
+void Boss::InitBeam() {
+	float parentRotate = std::numbers::pi_v<float> *0.25f;
+	for (int i = 0; i < 8; i++) {
+		charges_[i].firstEmit_ = true;
+		charges_[i].grain_.lifeTime_ = 35.0f;
+		if (i != 0 && i != 4) {
+			if (i < 4) {
+				chargeParents_[i]->transform.rotate.x = Random::GetFloat(-std::numbers::pi_v<float>, std::numbers::pi_v<float>);
+				chargeParents_[i]->transform.rotate.y = Random::GetFloat(-1.56f, 1.56f);
+			} else {
+				chargeParents_[i]->transform.rotate.x = Random::GetFloat(-std::numbers::pi_v<float>, std::numbers::pi_v<float>);
+				chargeParents_[i]->transform.rotate.y = Random::GetFloat(-1.56f, 1.56f);
+			}
+		}
+		chargeParents_[i]->transform.rotate.z = parentRotate * i;
+	}
+
+	chargeTime_ = 120.0f;
+	chargeSize_ = 12.0f;
+
+	for (auto& chargeParent : chargeParents_) {
+		chargeParent->transform.scale.x = chargeSize_;
+		chargeParent->transform.scale.y = chargeSize_;
+		chargeParent->transform.scale.z = chargeSize_;
+	}
+}
+
+bool Boss::BeamCharge() {
+	bool result = false;
+
+	if (chargeSize_ > 0.0f) {
+		for (int i = 0; i < 8; i++) {
+			if (i > 2) {
+				if (!(chargeTime_ < 120.0f - i * 2.0f)) {
+					continue;
+				}
+			}
+
+			if (chargeParents_[i]->transform.scale.x > 0.0f) {
+				chargeParents_[i]->transform.scale.x -= 0.275f * FPSKeeper::DeltaTime();
+				chargeParents_[i]->transform.scale.y -= 0.275f * FPSKeeper::DeltaTime();
+				chargeParents_[i]->transform.scale.z -= 0.275f * FPSKeeper::DeltaTime();
+				chargeParents_[i]->transform.rotate.z += 0.045f * FPSKeeper::DeltaTime();
+			}
+			if (chargeParents_[i]->transform.scale.x <= 0.0f) {
+				if (i == 0) {
+					chargeSize_ -= 1.0f;
+					if (chargeSize_ <= 0.0f) {
+						chargeSize_ = 0.0f;
+					}
+				}
+				chargeParents_[i]->transform.scale.x = chargeSize_;
+				chargeParents_[i]->transform.scale.y = chargeSize_;
+				chargeParents_[i]->transform.scale.z = chargeSize_;
+				charges_[i].firstEmit_ = true;
+				charges_[i].grain_.lifeTime_ -= 2.5f;
+			}
+			float emitpos = chargeParents_[i]->transform.scale.x;
+			charges_[i].pos_ = { emitpos,emitpos,emitpos };
+			charges_[i].Emit();
+
+		}
+
+		charge9_.Emit();
+		charge10_.Emit();
+		charge11_.Emit();
+		chargeTime_ -= FPSKeeper::DeltaTime();
+	} else if (chargeSize_ <= 0.0f) {
+		result = true;
+		for (int i = 0; i < 8; i++) {
+			if (chargeParents_[i]->transform.scale.x > 0.0f) {
+				chargeParents_[i]->transform.scale.x -= 0.275f * FPSKeeper::DeltaTime();
+				chargeParents_[i]->transform.scale.y -= 0.275f * FPSKeeper::DeltaTime();
+				chargeParents_[i]->transform.scale.z -= 0.275f * FPSKeeper::DeltaTime();
+				chargeParents_[i]->transform.rotate.z += 0.045f * FPSKeeper::DeltaTime();
+				result = false;
+			}
+			if (chargeParents_[i]->transform.scale.x <= 0.0f) {
+				chargeParents_[i]->transform.scale.x = 0.0f;
+				chargeParents_[i]->transform.scale.y = 0.0f;
+				chargeParents_[i]->transform.scale.z = 0.0f;
+			}
+			if (!result) {
+				float emitpos = chargeParents_[i]->transform.scale.x;
+				charges_[i].pos_ = { emitpos,emitpos,emitpos };
+				charges_[i].Emit();
+			}
+		}
+	}
+
+	if (result) {
+		chargeParents_[0]->transform.scale = { 1.0f,1.0f,1.0f };
+	}
+
+	return result;
+}
+
+void Boss::BeamChargeComplete() {
+	charge12_.Emit();
+	charge13_.Emit();
+	charge14_.Emit();
 }
 
 ///= Behavior =================================================================*/

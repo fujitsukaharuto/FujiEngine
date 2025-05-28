@@ -2,6 +2,7 @@
 
 #include "Game/GameObj/Enemy/Boss.h"
 #include "BossAttack.h"
+#include "BossBeamAttack.h"
 
 BossRoot::BossRoot(Boss* pBoss) : BaseBossBehavior(pBoss) {
 	step_ = Step::ROOT;
@@ -31,7 +32,7 @@ void BossRoot::Update() {
 		/// 攻撃へ移行
 		///---------------------------------------------------------------------------------------
 	case BossRoot::Step::TOATTACK:
-		pBoss_->ChangeBehavior(std::make_unique<BossAttack>(pBoss_));
+		pBoss_->ChangeBehavior(std::make_unique<BossBeamAttack>(pBoss_));
 		break;
 	default:
 		break;

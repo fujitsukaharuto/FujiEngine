@@ -90,10 +90,18 @@ void Object3d::CreateSphere() {
 	CreateWVP();
 }
 
-void Object3d::CreateRing() {
+void Object3d::CreateRing(float out, float in, float radius) {
 	this->camera_ = CameraManager::GetInstance()->GetCamera();
-	ModelManager::GetInstance()->CreateSphere();
+	ModelManager::GetInstance()->CreateRing(out, in, radius);
 	SetModel("Ring");
+	transform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	CreateWVP();
+}
+
+void Object3d::CreateSylinder(float topRadius, float bottomRadius, float height) {
+	this->camera_ = CameraManager::GetInstance()->GetCamera();
+	ModelManager::GetInstance()->CreateSylinder(topRadius, bottomRadius, height);
+	SetModel("Cylinder");
 	transform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 	CreateWVP();
 }

@@ -1,4 +1,6 @@
 #include "WaveWall.h"
+#include "Engine/Particle/ParticleManager.h"
+
 
 WaveWall::WaveWall() {
 }
@@ -7,9 +9,11 @@ void WaveWall::Initialize() {
 	OriginGameObject::Initialize();
 	OriginGameObject::CreateModel("bossWaveWall.obj");
 
+	underRing_ = std::make_unique<Object3d>();
 	wave1_ = std::make_unique<Object3d>();
 	wave2_ = std::make_unique<Object3d>();
 	wave3_ = std::make_unique<Object3d>();
+	underRing_->CreateRing(1.2f, 0.6f, 1.0f);
 	wave1_->Create("bossWaveWall.obj");
 	wave2_->Create("bossWaveWall.obj");
 	wave3_->Create("bossWaveWall.obj");
@@ -20,12 +24,22 @@ void WaveWall::Initialize() {
 	collider_->SetCollisionExitCallback([this](const ColliderInfo& other) {OnCollisionExit(other); });
 
 	speed_ = 0.35f;
-	velocity_ = { 0.0f,0.0f,1.0f };
+	velocity_ = { 0.0f,0.0f,0.0f };
 
 	model_->SetLightEnable(LightMode::kLightNone);
 	model_->transform.scale.y = 4.0f;
 	model_->transform.scale.z = 1.5f;
 	model_->SetColor({ 0.0f,0.7f,1.0f,1.0f });
+
+	underRing_->SetLightEnable(LightMode::kLightNone);
+	underRing_->SetTexture("underRing.png");
+	underRing_->SetColor({ 0.8f,0.8f,0.8f,1.0f });
+	underRing_->SetParent(model_.get());
+	underRing_->transform.translate.y = 0.001f;
+	underRing_->transform.rotate.x = 1.56f;
+	underRing_->transform.rotate.y = 1.56f;
+	underRing_->transform.scale.x = 1.65f;
+	underRing_->transform.scale.y = 1.65f;
 
 	float scaleX = 0.9f;
 	float scaleY = 0.9f;
@@ -54,6 +68,22 @@ void WaveWall::Initialize() {
 	wave3_->SetParent(model_.get());
 	wave3_->transform.translate.z = -0.15f;
 
+
+	ParticleManager::Load(spark1_, "WaveWallSpark");
+	ParticleManager::Load(spark2_, "WaveWallSpark");
+
+	spark1_.SetParent(model_.get());
+	spark2_.SetParent(model_.get());
+
+	spark1_.pos_.x = 0.4f;
+	spark1_.pos_.z = 1.40f;
+	spark2_.pos_.x = -0.4f;
+	spark2_.pos_.z = 1.40f;
+
+	spark2_.emitSizeMax_.x = 0.0f;
+	spark2_.emitSizeMin_.x = -0.75f;
+	spark2_.para_.speedx = { -0.075f,0.0f };
+
 }
 
 void WaveWall::Update() {
@@ -67,12 +97,16 @@ void WaveWall::Update() {
 			isLive_ = false;
 		}
 
+		underRing_->SetUVScale({ 0.75,1.0f }, { uvTransX_ * 0.3f,0.0f });
 		model_->SetUVScale({ 0.75f,1.0f }, { uvTransX_,0.0f });
 		wave1_->SetUVScale({ 0.75f,1.0f }, { -uvTransX_ * 1.1f,0.0f });
 		wave2_->SetUVScale({ 0.75f,1.0f }, { uvTransX_ * 0.9f,0.0f });
 		wave3_->SetUVScale({ 0.75f,1.0f }, { -uvTransX_,0.0f });
 		
 		model_->transform.translate += (velocity_ * speed_) * FPSKeeper::DeltaTime();
+
+		spark1_.Emit();
+		spark2_.Emit();
 
 		collider_->SetPos(model_->GetWorldPos());
 		collider_->InfoUpdate();
@@ -81,6 +115,7 @@ void WaveWall::Update() {
 }
 
 void WaveWall::Draw(Material* mate) {
+	underRing_->Draw();
 	wave1_->Draw();
 	wave2_->Draw();
 	wave3_->Draw();
@@ -88,6 +123,7 @@ void WaveWall::Draw(Material* mate) {
 }
 
 void WaveWall::DebugGUI() {
+	underRing_->DebugGUI();
 }
 
 void WaveWall::ParameterGUI() {
@@ -109,9 +145,9 @@ void WaveWall::InitWave(const Vector3& pos, const Vector3& velo) {
 void WaveWall::CalculetionFollowVec(const Vector3& target) {
 	Vector3 currentPos = model_->transform.translate;
 	currentPos.y = 0.0f;
-	Vector3 targetZeroY = target;
+	Vector3 targetZeroY = target * 1.2f;
 	targetZeroY.y = 0.0f;
-	Vector3 toTarget = ((targetZeroY - currentPos) * 2.0f) .Normalize();
+	Vector3 toTarget = ((targetZeroY - currentPos)) .Normalize();
 	Vector3 forward = velocity_.Normalize();
 
 	// 現在の向きと目標の向きのクォータニオンを作成

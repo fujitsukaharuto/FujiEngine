@@ -5,10 +5,10 @@
 
 
 
-class WaveWall : public OriginGameObject {
+class Beam : public OriginGameObject {
 public:
-	WaveWall();
-	~WaveWall() = default;
+	Beam();
+	~Beam() = default;
 
 	void Initialize()override;
 	void Update()override;
@@ -18,8 +18,7 @@ public:
 
 	void InitParameter();
 
-	void InitWave(const Vector3& pos, const Vector3& velo);
-	void CalculetionFollowVec(const Vector3& target);
+	void InitBeam(const Vector3& pos, const Vector3& velo);
 
 	//========================================================================*/
 	//* Collision
@@ -37,10 +36,9 @@ private:
 
 private:
 
-	std::unique_ptr<Object3d> underRing_;
-	std::unique_ptr<Object3d> wave1_;
-	std::unique_ptr<Object3d> wave2_;
-	std::unique_ptr<Object3d> wave3_;
+	std::unique_ptr<Object3d> beam1_;
+	std::unique_ptr<Object3d> beam2_;
+	std::unique_ptr<Object3d> beam3_;
 
 	bool isLive_ = false;
 	float lifeTime_ = 300.0f;

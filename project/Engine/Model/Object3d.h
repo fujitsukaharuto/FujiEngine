@@ -26,7 +26,9 @@ public:
 
 	void CreateSphere();
 
-	void CreateRing();
+	void CreateRing(float out = 1.0f, float in = 0.2f, float radius = 2.0f);
+
+	void CreateSylinder(float topRadius = 1.0f, float bottomRadius = 1.0f, float height = 3.0f);
 
 	void Draw(Material* mate = nullptr);
 

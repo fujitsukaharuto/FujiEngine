@@ -258,13 +258,28 @@ void ParticleEmitter::Emit() {
 			// 親の回転だけを取り出して適用する
 			Matrix4x4 parentRotationOnly = parent_ ? parent_->GetWorldMat() : Matrix4x4::MakeIdentity4x4();
 			if (parent_) {
+				Matrix4x4 parentMat = parent_->GetWorldMat();
+
+				// 上位3x3から回転だけを取り出す
+				Vector3 right = Vector3::Normalize(Vector3(parentMat.m[0][0], parentMat.m[0][1], parentMat.m[0][2]));
+				Vector3 up = Vector3::Normalize(Vector3(parentMat.m[1][0], parentMat.m[1][1], parentMat.m[1][2]));
+				Vector3 forward = Vector3::Normalize(Vector3(parentMat.m[2][0], parentMat.m[2][1], parentMat.m[2][2]));
+				// 再構築（スケール成分なし）
+				parentRotationOnly.m[0][0] = right.x;
+				parentRotationOnly.m[0][1] = right.y;
+				parentRotationOnly.m[0][2] = right.z;
+
+				parentRotationOnly.m[1][0] = up.x;
+				parentRotationOnly.m[1][1] = up.y;
+				parentRotationOnly.m[1][2] = up.z;
+
+				parentRotationOnly.m[2][0] = forward.x;
+				parentRotationOnly.m[2][1] = forward.y;
+				parentRotationOnly.m[2][2] = forward.z;
+				// 平行移動成分をゼロ
 				parentRotationOnly.m[3][0] = 0.0f;
 				parentRotationOnly.m[3][1] = 0.0f;
 				parentRotationOnly.m[3][2] = 0.0f;
-				parentRotationOnly.m[0][3] = 0.0f;
-				parentRotationOnly.m[1][3] = 0.0f;
-				parentRotationOnly.m[2][3] = 0.0f;
-				parentRotationOnly.m[3][3] = 1.0f;
 			}
 			posAddSize = Transform(posAddSize, parentRotationOnly); // ← 回転だけ適用
 			if (!grain_.isParent_) {
@@ -274,7 +289,9 @@ void ParticleEmitter::Emit() {
 
 			if (grain_.speedType_ == static_cast<int>(SpeedType::kCenter)) {
 				Vector3 rPos = pos_;
-				rPos = Transform(rPos, parentRotationOnly);
+				if (parent_) {
+					rPos = Vector3{ worldMatrix_.m[3][0], worldMatrix_.m[3][1] ,worldMatrix_.m[3][2] };
+				}
 				if (grain_.isParent_) {
 					grain_.speed_ = (rPos - (posAddSize + rPos)) * grain_.returnPower_;
 				} else {
@@ -300,6 +317,9 @@ void ParticleEmitter::Emit() {
 				float t = (float)i / emitCount;
 				Vector3 emitPos = Lerp(previousWorldPos_, currentWorldPos_, t);
 				ParticleManager::Emit(name_, emitPos, particleRotate_, grain_, para_, 1);
+			}
+			if (emitCount == 0) {
+				ParticleManager::Emit(name_, currentWorldPos_, particleRotate_, grain_, para_, 1);
 			}
 		}
 

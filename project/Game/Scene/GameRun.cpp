@@ -16,7 +16,8 @@ void GameRun::Initialize() {
 #pragma region テクスチャ読み込み
 	textureManager_->Load("uvChecker.png");
 	textureManager_->Load("checkerBoard.png");
-	textureManager_->Load("BlueprintBackground.png");
+		textureManager_->Load("BlueprintBackground.png");
+	textureManager_->Load("underRing.png");
 #pragma endregion
 
 
@@ -61,6 +62,20 @@ void GameRun::Initialize() {
 	pManager_->CreateParticleGroup("ShockRay", "chargeRay.png", 20);
 	pManager_->CreateParticleGroup("ShockWaveGround", "shockWaveGround.png", 10, ShapeType::RING);
 	pManager_->CreateParticleGroup("ShockWaveParticle", "redCircle.png", 30);
+
+	pManager_->CreateParticleGroup("WaveWallSpark", "redCircle.png", 100);
+
+	pManager_->CreateParticleGroup("BeamCharge1", "redCircle.png", 1000);
+	pManager_->CreateParticleGroup("BeamCharge2", "redCircle.png", 1000);
+	pManager_->CreateParticleGroup("BeamCharge3", "redCircle.png", 1000);
+	pManager_->CreateParticleGroup("BeamCharge4", "redCircle.png", 1000);
+	pManager_->CreateParticleGroup("BeamCharge5", "redCircle.png", 40);
+	pManager_->CreateParticleGroup("BeamCharge6", "chargeCircle.png", 2);
+	pManager_->CreateParticleGroup("BeamCharge7", "chargeRay.png", 20);
+	pManager_->CreateParticleGroup("BeamCharge8", "redCircle.png", 20);
+	pManager_->CreateParticleGroup("BeamCharge9", "redCircle.png", 40);
+	pManager_->CreateParticleGroup("BeamCharge10", "redCircle.png", 10);
+
 
 
 	// playerBullet用
