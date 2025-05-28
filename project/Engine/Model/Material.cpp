@@ -24,6 +24,7 @@ void Material::CreateMaterial() {
 	materialDate_->enableLighting = static_cast<int32_t>(LightMode::kSpotLightON);
 	materialDate_->uvTransform = MakeIdentity4x4();
 	materialDate_->shininess = 50.0f;
+	materialDate_->AlphaRef = 0.5f;
 
 	if (textureNamePath_.textureFilePath.empty()) {
 		texture_ = TextureManager::GetInstance()->LoadTexture("uvChecker.png");

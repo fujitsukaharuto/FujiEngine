@@ -347,7 +347,7 @@ void ModelManager::CreateRing(float out, float in, float radius) {
 	instance->models_.insert(std::make_pair("Ring", std::move(model)));
 }
 
-void ModelManager::CreateSylinder(float topRadius, float bottomRadius, float height) {
+void ModelManager::CreateCylinder(float topRadius, float bottomRadius, float height) {
 	ModelManager* instance = GetInstance();
 
 	auto iterator = instance->models_.find("Cylinder");

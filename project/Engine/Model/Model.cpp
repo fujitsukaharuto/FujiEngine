@@ -80,6 +80,12 @@ void Model::SetUVScale(const Vector2& scale, const Vector2& uvTrans) {
 	}
 }
 
+void Model::SetAlphaRef(float ref) {
+	for (Material& material : material_) {
+		material.SetAlphaRef(ref);
+	}
+}
+
 void Model::SetTexture(const std::string& name) {
 	if (nowTextuer == name) {
 		return;

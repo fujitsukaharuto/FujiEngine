@@ -98,9 +98,9 @@ void Object3d::CreateRing(float out, float in, float radius) {
 	CreateWVP();
 }
 
-void Object3d::CreateSylinder(float topRadius, float bottomRadius, float height) {
+void Object3d::CreateCylinder(float topRadius, float bottomRadius, float height) {
 	this->camera_ = CameraManager::GetInstance()->GetCamera();
-	ModelManager::GetInstance()->CreateSylinder(topRadius, bottomRadius, height);
+	ModelManager::GetInstance()->CreateCylinder(topRadius, bottomRadius, height);
 	SetModel("Cylinder");
 	transform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 	CreateWVP();
@@ -255,6 +255,10 @@ void Object3d::SetColor(const Vector4& color) {
 
 void Object3d::SetUVScale(const Vector2& scale, const Vector2& uvTrans) {
 	model_->SetUVScale(scale, uvTrans);
+}
+
+void Object3d::SetAlphaRef(float ref) {
+	model_->SetAlphaRef(ref);
 }
 
 void Object3d::SetTexture(const std::string& name) {

@@ -28,7 +28,7 @@ public:
 
 	void CreateRing(float out = 1.0f, float in = 0.2f, float radius = 2.0f);
 
-	void CreateSylinder(float topRadius = 1.0f, float bottomRadius = 1.0f, float height = 3.0f);
+	void CreateCylinder(float topRadius = 1.0f, float bottomRadius = 1.0f, float height = 3.0f);
 
 	void Draw(Material* mate = nullptr);
 
@@ -47,6 +47,8 @@ public:
 	void SetColor(const Vector4& color);
 
 	void SetUVScale(const Vector2& scale, const Vector2& uvTrans);
+
+	void SetAlphaRef(float ref);
 
 	void SetCamera(Camera* camera) { this->camera_ = camera; }
 
