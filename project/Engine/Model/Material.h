@@ -23,6 +23,7 @@ public:
 		float padding[3];
 		Matrix4x4 uvTransform;
 		float shininess;
+		float AlphaRef = 0.5f;
 	};
 
 	struct MaterialEnvironment {
@@ -56,6 +57,8 @@ public:
 	void SetColor(const Vector4& color) { materialDate_->color = color; }
 
 	void SetUVScale(const Vector2& scale, const Vector2& uvTrans);
+
+	void SetAlphaRef(float ref) { materialDate_->AlphaRef = ref; }
 
 	void SetTexture(const std::string& name);
 

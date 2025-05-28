@@ -34,6 +34,8 @@ public:
 
 	void SetUVScale(const Vector2& scale, const Vector2& uvTrans);
 
+	void SetAlphaRef(float ref);
+
 	void SetTexture(const std::string& name);
 
 	void SetTextureName(const std::string& name);

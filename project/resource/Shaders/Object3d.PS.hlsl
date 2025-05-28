@@ -6,6 +6,7 @@ struct Material
     int enableLighting;
     float4x4 uvTransform;
     float shininess;
+    float alphaRef;
 };
 
 struct DirectionalLight
@@ -68,7 +69,7 @@ PixelShaderOutput main(VertxShaderOutput input)
     {
         discard;
     }
-    if (textureColor.a <= 0.5)
+    if (textureColor.a <= gMaterial.alphaRef)
     {
         discard;
     }
