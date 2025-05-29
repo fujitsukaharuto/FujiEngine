@@ -43,6 +43,7 @@ void PipelineManager::CreatePipeline() {
 
 
 	std::unique_ptr<Pipeline> pipeline = nullptr;
+	std::unique_ptr<Pipeline> pipelineAdd = nullptr;
 	std::unique_ptr<Line3dPipe> lLine = nullptr;
 	std::unique_ptr<ParticlePipeline> particlePipline = nullptr;
 	std::unique_ptr<ParticlePipeline> particlePiplineSub = nullptr;
@@ -70,6 +71,12 @@ void PipelineManager::CreatePipeline() {
 	pipeline.reset(new Pipeline());
 	pipeline->Initialize(dxcommon_);
 	pipelines_.push_back(std::move(pipeline));
+
+
+	pipelineAdd.reset(new Pipeline());
+	pipelineAdd->SetIsAddMode(true);
+	pipelineAdd->Initialize(dxcommon_);
+	pipelines_.push_back(std::move(pipelineAdd));
 
 
 	lLine.reset(new Line3dPipe());

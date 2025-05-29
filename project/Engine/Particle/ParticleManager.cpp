@@ -115,7 +115,8 @@ void ParticleManager::Update() {
 
 			Matrix4x4 worldViewProjectionMatrix;
 			Matrix4x4 worldMatrix = MakeIdentity4x4();
-			SRTUpdate(particle, worldMatrix, billboardMatrix);
+			SRTUpdate(particle);
+			Billboard(particle, worldMatrix, billboardMatrix, MakeIdentity4x4());
 
 			if (camera_) {
 				const Matrix4x4& viewProjectionMatrix = camera_->GetViewProjectionMatrix();
@@ -186,7 +187,26 @@ void ParticleManager::Update() {
 
 			Matrix4x4 worldViewProjectionMatrix;
 			Matrix4x4 worldMatrix = MakeIdentity4x4();
-			SRTUpdate(particle, worldMatrix, billboardMatrix);
+			Matrix4x4 parentRotate = MakeIdentity4x4();
+			SRTUpdate(particle);
+			if (particle.isParentRotate_) {
+				parentRotate = group->emitter_->worldMatrix_;
+				// スケールを除去する（上のコードと同様）
+				Vector3 xAxis = { parentRotate.m[0][0], parentRotate.m[1][0], parentRotate.m[2][0] };
+				Vector3 yAxis = { parentRotate.m[0][1], parentRotate.m[1][1], parentRotate.m[2][1] };
+				Vector3 zAxis = { parentRotate.m[0][2], parentRotate.m[1][2], parentRotate.m[2][2] };
+
+				float xLen = Vector3::Length(xAxis);
+				float yLen = Vector3::Length(yAxis);
+				float zLen = Vector3::Length(zAxis);
+
+				for (int i = 0; i < 3; ++i) {
+					parentRotate.m[i][0] /= xLen;
+					parentRotate.m[i][1] /= yLen;
+					parentRotate.m[i][2] /= zLen;
+				}
+			}
+			Billboard(particle, worldMatrix, billboardMatrix, parentRotate);
 
 			if (particle.isParent_) {
 				// 親行列のスケール・回転を取り除いた「平行移動のみマトリクス」を作る
@@ -963,7 +983,7 @@ void ParticleManager::ParticleSizeUpdate(Particle& particle) {
 	}
 }
 
-void ParticleManager::SRTUpdate(Particle& particle, Matrix4x4& worldMatrix, const Matrix4x4& billboardMatrix) {
+void ParticleManager::SRTUpdate(Particle& particle) {
 	if (particle.rotateType_ == static_cast<int>(RotateType::kRandomR)) {
 		if (particle.isContinuouslyRotate_) {
 			particle.transform_.rotate += Random::GetVector3({ -0.2f,0.2f }, { -0.2f,0.2f }, { -0.2f,0.2f }) * FPSKeeper::DeltaTime();
@@ -973,16 +993,23 @@ void ParticleManager::SRTUpdate(Particle& particle, Matrix4x4& worldMatrix, cons
 	particle.speed_ += particle.accele_ * FPSKeeper::DeltaTime();
 
 	particle.transform_.translate += particle.speed_ * FPSKeeper::DeltaTime();
+}
 
+void ParticleManager::Billboard(Particle& particle, Matrix4x4& worldMatrix, const Matrix4x4& billboardMatrix, const Matrix4x4& rotate) {
 	if (!particle.isBillBoard_) {
 		worldMatrix = MakeAffineMatrix(particle.transform_.scale, particle.transform_.rotate, particle.transform_.translate);
 	}
 	if (particle.isBillBoard_) {
 		switch (particle.pattern_) {
-		case BillBoardPattern::kXYZBillBoard:
+		case BillBoardPattern::kXYZBillBoard: {
+			Vector3 possition = particle.transform_.translate;
+			if (particle.isParentRotate_) {
+				possition = TransformNormal(possition, rotate);
+			}
 			worldMatrix = Multiply(MakeScaleMatrix(particle.transform_.scale), billboardMatrix);
-			worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform_.translate));
+			worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(possition));
 			break;
+		}
 		case BillBoardPattern::kXBillBoard: {
 
 			Matrix4x4 xBillboardMatrix;
@@ -1084,7 +1111,7 @@ bool ParticleManager::InitEmitParticle(Particle& particle, const Vector3& pos, c
 
 			break;
 		case static_cast<int>(RotateType::kRandomR):
-			particle.transform_.rotate = Random::GetVector3({ -1.0f,1.0f }, { -1.0f,1.0f }, { -1.0f,1.0f });
+			particle.transform_.rotate = Random::GetVector3({ -3.0f,3.0f }, { -3.0f,3.0f }, { -3.0f,3.0f });
 			break;
 		}
 
@@ -1131,6 +1158,7 @@ bool ParticleManager::InitEmitParticle(Particle& particle, const Vector3& pos, c
 		particle.startSize_ = grain.startSize_ + para.addRandomSize;
 		particle.endSize_ = grain.endSize_ + para.addRandomSize;
 		particle.isParent_ = grain.isParent_;
+		particle.isParentRotate_ = grain.isParentRotate_;
 
 		particle.isLive_ = true;
 		return true;

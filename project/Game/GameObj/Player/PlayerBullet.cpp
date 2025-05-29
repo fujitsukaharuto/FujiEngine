@@ -6,6 +6,9 @@
 PlayerBullet::PlayerBullet() {
 }
 
+PlayerBullet::~PlayerBullet() {
+}
+
 void PlayerBullet::Initialize() {
 	OriginGameObject::Initialize();
 	OriginGameObject::CreateModel("cube.obj");

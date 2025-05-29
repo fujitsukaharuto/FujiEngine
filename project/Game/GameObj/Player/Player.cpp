@@ -7,6 +7,9 @@
 Player::Player() {
 }
 
+Player::~Player() {
+}
+
 void Player::Initialize() {
 	OriginGameObject::Initialize();
 	OriginGameObject::CreateModel("playerModel.obj");
@@ -33,8 +36,12 @@ void Player::Initialize() {
 	collider_->SetCollisionStayCallback([this](const ColliderInfo& other) {OnCollisionStay(other); });
 	collider_->SetCollisionExitCallback([this](const ColliderInfo& other) {OnCollisionExit(other); });
 
-	bullet_ = std::make_unique<PlayerBullet>();
-	bullet_->Initialize();
+	for (int i = 0; i < 10; i++) {
+		std::unique_ptr<PlayerBullet> bullet;
+		bullet = std::make_unique<PlayerBullet>();
+		bullet->Initialize();
+		bullets_.push_back(std::move(bullet));
+	}
 
 	ChangeBehavior(std::make_unique<PlayerRoot>(this));
 	ChangeAttackBehavior(std::make_unique<PlayerAttackRoot>(this));
@@ -46,19 +53,21 @@ void Player::Update() {
 	behavior_->Update();
 	attackBehavior_->Update();
 
-	if (bullet_->GetIsLive()) {
+	for (auto& bullet : bullets_) {
+		if (bullet->GetIsLive()) {
 
-		if (bullet_->GetIsCharge()) {
-			Vector3 forward = { 0, 0, 1 };
-			Matrix4x4 rotateMatrix = MakeRotateXYZMatrix(model_->transform.rotate);
-			Vector3 worldForward = TransformNormal(forward, rotateMatrix);
-			Vector3 targetPos = model_->transform.translate + worldForward;
-			bullet_->Charge(targetPos, model_->transform.rotate);
-		} else {
-			bullet_->CalculetionFollowVec(targetPos_);
+			if (bullet->GetIsCharge()) {
+				Vector3 forward = { 0, 0, 1 };
+				Matrix4x4 rotateMatrix = MakeRotateXYZMatrix(model_->transform.rotate);
+				Vector3 worldForward = TransformNormal(forward, rotateMatrix);
+				Vector3 targetPos = model_->transform.translate + worldForward;
+				bullet->Charge(targetPos, model_->transform.rotate);
+			} else {
+				bullet->CalculetionFollowVec(targetPos_);
+			}
+
+			bullet->Update();
 		}
-
-		bullet_->Update();
 	}
 
 	shadow_->transform.translate = model_->transform.translate;
@@ -68,8 +77,10 @@ void Player::Update() {
 
 void Player::Draw(Material* mate) {
 
-	if (bullet_->GetIsLive()) {
-		bullet_->Draw();
+	for (auto& bullet : bullets_) {
+		if (bullet->GetIsLive()) {
+			bullet->Draw();
+		}
 	}
 
 	shadow_->Draw();
@@ -237,21 +248,30 @@ void Player::InitBullet() {
 	Matrix4x4 rotateMatrix = MakeRotateYMatrix(model_->transform.rotate.y);
 	Vector3 worldForward = TransformNormal(forward, rotateMatrix);
 	Vector3 targetPos = model_->transform.translate + worldForward;
-	bullet_->InitParameter(targetPos);
+	for (auto& bullet : bullets_) {
+		if (!bullet->GetIsLive()) {
+			bullet->InitParameter(targetPos);
+			return;
+		}
+	}
 }
 
 ///= Bullet ===================================================================*/
 void Player::ReleaseBullet() {
-	if (bullet_->GetIsLive()) {
-		Vector3 forward = { 0, 0, 1 };
-		Matrix4x4 rotateMatrix = MakeRotateXYZMatrix(model_->transform.rotate);
-		Vector3 worldForward = TransformNormal(forward, rotateMatrix);
-		bullet_->Release(0.5f, 10.0f, worldForward);
+	for (auto& bullet : bullets_) {
+		if (bullet->GetIsLive() && bullet->GetIsCharge()) {
+			Vector3 forward = { 0, 0, 1 };
+			Matrix4x4 rotateMatrix = MakeRotateXYZMatrix(model_->transform.rotate);
+			Vector3 worldForward = TransformNormal(forward, rotateMatrix);
+			bullet->Release(0.5f, 10.0f, worldForward);
+		}
 	}
 }
 
 void Player::StrngthBullet() {
-	if (bullet_->GetIsLive()) {
-		bullet_->StrnghtBullet();
+	for (auto& bullet : bullets_) {
+		if (bullet->GetIsLive() && bullet->GetIsCharge()) {
+			bullet->StrnghtBullet();
+		}
 	}
 }

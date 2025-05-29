@@ -4,14 +4,13 @@
 
 #include "Game/GameObj/Player/Behavior/BasePlayerBehavior.h"
 #include "Game/GameObj/Player/AttackBehavior/BasePlayerAttackBehavior.h"
-
-
-class PlayerBullet;
+#include "Game/GameObj/Player/PlayerBullet.h"
+#include <vector>
 
 class Player : public OriginGameObject{
 public:
 	Player();
-	~Player() = default;
+	~Player();
 
 	void Initialize()override;
 	void Update()override;
@@ -57,7 +56,7 @@ public:
 	bool GetIsFall() { return isFall_; }
 	BaseCollider* GetCollider() { return collider_.get(); }
 
-	PlayerBullet* GetPlayerBullet() { return bullet_.get(); }
+	std::vector<std::unique_ptr<PlayerBullet>>& GetPlayerBullet() { return bullets_; }
 
 	//========================================================================*/
 	//* Setter
@@ -73,7 +72,7 @@ private:
 
 	std::unique_ptr<BasePlayerBehavior> behavior_ = nullptr;
 	std::unique_ptr<BasePlayerAttackBehavior> attackBehavior_ = nullptr;
-	std::unique_ptr<PlayerBullet> bullet_ = nullptr;
+	std::vector<std::unique_ptr<PlayerBullet>> bullets_;
 
 	std::unique_ptr<Object3d> shadow_;
 	std::unique_ptr<AABBCollider> collider_;

@@ -7,7 +7,7 @@
 class PlayerBullet : public OriginGameObject {
 public:
 	PlayerBullet();
-	~PlayerBullet() = default;
+	~PlayerBullet();
 
 	void Initialize()override;
 	void Update()override;

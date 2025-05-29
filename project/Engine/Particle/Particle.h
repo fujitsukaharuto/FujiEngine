@@ -87,6 +87,7 @@ public:
 	//========================================================================*/
 	//* Parent
 	bool isParent_ = false;
+	bool isParentRotate_ = false;
 
 private:
 

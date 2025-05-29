@@ -30,6 +30,7 @@ public:
 	void InitBeam();
 	bool BeamCharge();
 	void BeamChargeComplete();
+	bool BeamAttack();
 
 	//========================================================================*/
 	//* Behavior
@@ -65,6 +66,7 @@ private:
 
 	Player* pPlayer_;
 	std::vector<std::unique_ptr<Object3d>> chargeParents_;
+	std::unique_ptr<Object3d> waveParent_;
 
 	float attackCooldown_ = 0.0f;
 	float chargeTime_ = 120.0f;
@@ -78,13 +80,14 @@ private:
 	ParticleEmitter waveAttack4;
 
 	ParticleEmitter charges_[8];
-
+	
 	ParticleEmitter charge9_;
 	ParticleEmitter charge10_;
 	ParticleEmitter charge11_;
 	ParticleEmitter charge12_;
 	ParticleEmitter charge13_;
 	ParticleEmitter charge14_;
+	ParticleEmitter charge15_;
 
 
 };

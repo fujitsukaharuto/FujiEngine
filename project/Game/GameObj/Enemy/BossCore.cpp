@@ -17,9 +17,9 @@ void BossCore::Initialize() {
 	collider_->SetCollisionStayCallback([this](const ColliderInfo& other) {OnCollisionStay(other); });
 	collider_->SetCollisionExitCallback([this](const ColliderInfo& other) {OnCollisionExit(other); });
 	collider_->SetTag("testBoss");
-	collider_->SetWidth(0.5f);
-	collider_->SetHeight(0.5f);
-	collider_->SetDepth(0.5f);
+	collider_->SetWidth(3.0f);
+	collider_->SetHeight(3.0f);
+	collider_->SetDepth(3.0f);
 
 	InitParameter();
 
@@ -33,7 +33,9 @@ void BossCore::Update() {
 }
 
 void BossCore::Draw(Material* mate) {
+#ifdef _DEBUG
 	collider_->DrawCollider();
+#endif // _DEBUG
 	OriginGameObject::Draw(mate);
 }
 

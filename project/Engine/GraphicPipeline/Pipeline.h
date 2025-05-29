@@ -17,7 +17,7 @@ public:
 
 public:
 
-
+	void SetIsAddMode(bool is) { isAddMode_ = is; }
 
 private:
 
@@ -27,5 +27,6 @@ private:
 
 private:
 
+	bool isAddMode_ = false;
 
 };

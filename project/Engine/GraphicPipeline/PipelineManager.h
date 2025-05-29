@@ -10,6 +10,7 @@ enum class Pipe : int {
 
 	None,
 	Normal,
+	NormalAdd,
 	Line3d,
 	particle,
 	particleSub,

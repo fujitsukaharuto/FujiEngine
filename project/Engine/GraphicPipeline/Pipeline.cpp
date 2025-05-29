@@ -112,14 +112,25 @@ void Pipeline::CreatePSO(ID3D12Device* device) {
 	layout.NumElements = _countof(element);
 
 	D3D12_BLEND_DESC blend{};
-	blend.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
-	blend.RenderTarget[0].BlendEnable = TRUE;
-	blend.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
-	blend.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
-	blend.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
-	blend.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
-	blend.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
-	blend.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
+	if (!isAddMode_) {
+		blend.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+		blend.RenderTarget[0].BlendEnable = TRUE;
+		blend.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
+		blend.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+		blend.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+		blend.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
+		blend.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
+		blend.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
+	} else {
+		blend.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+		blend.RenderTarget[0].BlendEnable = TRUE;
+		blend.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
+		blend.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+		blend.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
+		blend.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ZERO;
+		blend.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
+		blend.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
+	}
 
 	D3D12_RASTERIZER_DESC rasterizer{};
 	rasterizer.CullMode = D3D12_CULL_MODE_NONE;

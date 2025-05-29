@@ -46,10 +46,9 @@ void GameScene::Initialize() {
 	terrain->transform.scale = { 30.0f,30.0f,30.0f };
 	terrain->SetUVScale({ 25.0f,25.0f }, { 0.0f,0.0f });
 
-	skydome_ = std::make_unique<Object3d>();
-	skydome_->Create("skydome.obj");
-	skydome_->transform.scale = { 40.0f,40.0f,40.0f };
-	skydome_->SetLightEnable(LightMode::kLightNone);
+	skybox_ = std::make_unique<SkyBox>();
+	skybox_->SetCommonResources(dxcommon_, SRVManager::GetInstance(), CameraManager::GetInstance()->GetCamera());
+	skybox_->Initialize();
 
 	player_ = std::make_unique<Player>();
 	player_->Initialize();
@@ -92,14 +91,14 @@ void GameScene::Update() {
 
 	ApplyGlobalVariables();
 
-	player_->SetTargetPos(boss_->GetWorldPos());
+#endif // _DEBUG
+
+	player_->SetTargetPos(boss_->GetBossCore()->GetWorldPos());
 	player_->Update();
 
 	followCamera_->Update();
 
 	boss_->Update();
-
-#endif // _DEBUG
 
 	if (input_->TriggerKey(DIK_5)) {
 		emit.BurstAnime();
@@ -118,14 +117,16 @@ void GameScene::Update() {
 		audioPlayer_->SoundPlayWave(soundData2);
 	}
 
-
+	skybox_->Update();
 	BlackFade();
 
 	cMane_->AddCollider(player_->GetCollider());
-	if (player_->GetPlayerBullet()->GetIsLive()) {
-		cMane_->AddCollider(player_->GetPlayerBullet()->GetCollider());
+	for (auto& bullet : player_->GetPlayerBullet()) {
+		if (bullet->GetIsLive() && !bullet->GetIsCharge()) {
+			cMane_->AddCollider(bullet->GetCollider());
+		}
 	}
-	cMane_->AddCollider(boss_->GetCollider());
+	cMane_->AddCollider(boss_->GetCoreCollider());
 	cMane_->CheckAllCollision();
 
 	ParticleManager::GetInstance()->Update();
@@ -140,9 +141,12 @@ void GameScene::Draw() {
 
 
 #pragma region 3Dオブジェクト
+	skybox_->Draw();
+
+
 	obj3dCommon->PreDraw();
-	
-	skydome_->Draw();
+
+
 	terrain->Draw();
 	player_->Draw();
 

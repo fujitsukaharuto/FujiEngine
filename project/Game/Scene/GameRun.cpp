@@ -16,7 +16,9 @@ void GameRun::Initialize() {
 #pragma region テクスチャ読み込み
 	textureManager_->Load("uvChecker.png");
 	textureManager_->Load("checkerBoard.png");
-		textureManager_->Load("BlueprintBackground.png");
+	textureManager_->Load("BlueprintBackground.png");
+	textureManager_->Load("T_Noise04.jpg");
+	textureManager_->Load("Beam.png");
 	textureManager_->Load("underRing.png");
 #pragma endregion
 
@@ -24,11 +26,13 @@ void GameRun::Initialize() {
 #pragma region オブジェクト読み込み
 	ModelManager::GetInstance()->CreateSphere();
 	modelManager_->LoadOBJ("cube.obj");
+	modelManager_->LoadOBJ("plane_under.obj");
 	modelManager_->LoadOBJ("suzanne.obj");
 	modelManager_->LoadOBJ("Fence.obj");
 	modelManager_->LoadOBJ("terrain.obj");
 	modelManager_->LoadOBJ("skydome.obj");
 	modelManager_->LoadOBJ("playerModel.obj");
+	modelManager_->LoadOBJ("boss.obj");
 	modelManager_->LoadOBJ("bossWaveWall.obj");
 	modelManager_->LoadGLTF("AnimatedCube.gltf");
 	modelManager_->LoadGLTF("walk.gltf");
@@ -49,8 +53,8 @@ void GameRun::Initialize() {
 	pManager_->CreateParticleGroup("ChargeRay", "chargeRay.png", 20);
 	pManager_->CreateParticleGroup("ChargeWave", "chargeCircle.png", 2);
 	pManager_->CreateParticleGroup("ChargeCircle", "chargeCircle.png", 2);
-	pManager_->CreateParticleGroup("BulletTrajectory", "redCircle.png", 400);
-	pManager_->CreateParticleGroup("BulletTrajectory2", "redCircle.png",400);
+	pManager_->CreateParticleGroup("BulletTrajectory", "redCircle.png", 1000);
+	pManager_->CreateParticleGroup("BulletTrajectory2", "redCircle.png",1000);
 	
 	pManager_->CreateParticleGroup("bulletHit", "redCircle.png", 100);
 	pManager_->CreateParticleGroup("bulletHit2", "redCircle.png", 100);
@@ -75,6 +79,8 @@ void GameRun::Initialize() {
 	pManager_->CreateParticleGroup("BeamCharge8", "redCircle.png", 20);
 	pManager_->CreateParticleGroup("BeamCharge9", "redCircle.png", 40);
 	pManager_->CreateParticleGroup("BeamCharge10", "redCircle.png", 10);
+	pManager_->CreateParticleGroup("BeamCharge11", "redCircle.png", 40, ShapeType::RING);
+	pManager_->CreateParticleGroup("BeamParticle", "redCircle.png", 200);
 
 
 
@@ -86,6 +92,10 @@ void GameRun::Initialize() {
 	pManager_->CreateParentParticleGroup("ChargeRay", "chargeRay.png", 20);
 	pManager_->CreateParentParticleGroup("ChargeWave", "chargeCircle.png", 10);
 	pManager_->CreateParentParticleGroup("ChargeCircle", "chargeCircle.png", 10);
+
+
+	pManager_->CreateParentParticleGroup("BeamParticle", "redCircle.png", 200);
+
 
 	// 半透明になる
 	pManager_->CreateParticleGroup("ShockWave", "white.png", 10, ShapeType::SPHERE);

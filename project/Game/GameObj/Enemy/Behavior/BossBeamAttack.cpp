@@ -28,8 +28,9 @@ void BossBeamAttack::Update() {
 		///---------------------------------------------------------------------------------------
 	case BossBeamAttack::Step::ATTACK:
 
-		//pBoss_->WaveWallAttack();
-		step_ = Step::TOROOT;
+		if (pBoss_->BeamAttack()) {
+			step_ = Step::TOROOT;
+		}
 
 		break;
 		///---------------------------------------------------------------------------------------

@@ -14,7 +14,7 @@ Boss::Boss() {
 
 void Boss::Initialize() {
 	OriginGameObject::Initialize();
-	OriginGameObject::CreateModel("cube.obj");
+	OriginGameObject::CreateModel("boss.obj");
 
 	model_->LoadTransformFromJson("boss_transform.json");
 
@@ -42,6 +42,7 @@ void Boss::Initialize() {
 
 	beam_ = std::make_unique<Beam>();
 	beam_->Initialize();
+	beam_->SetBossParent(this);
 
 	float parentRotate = std::numbers::pi_v<float> *0.25f;
 	for (int i = 0; i < 8; i++) {
@@ -49,10 +50,11 @@ void Boss::Initialize() {
 		chargeParent = std::make_unique<Object3d>();
 		chargeParent->Create("cube.obj");
 		chargeParent->transform.translate.y += 2.0f;
-		chargeParent->transform.translate.z += 10.0f;
+		chargeParent->transform.translate.z += 4.0f;
 		chargeParent->transform.scale.x = 12.0f;
 		chargeParent->transform.scale.y = 12.0f;
 		chargeParent->transform.scale.z = 12.0f;
+		chargeParent->SetParent(model_.get());
 		if (i != 0 && i != 4) {
 			if (i < 4) {
 				chargeParent->transform.rotate.x = Random::GetFloat(-std::numbers::pi_v<float>, std::numbers::pi_v<float>);
@@ -65,7 +67,10 @@ void Boss::Initialize() {
 		chargeParent->transform.rotate.z = parentRotate * i;
 		chargeParents_.push_back(std::move(chargeParent));
 	}
-
+	waveParent_ = std::make_unique<Object3d>();
+	waveParent_->Create("cube.obj");
+	waveParent_->transform.translate.z += 4.0f;
+	waveParent_->SetParent(model_.get());
 
 
 	ParticleManager::Load(waveAttack1, "ShockRay");
@@ -82,6 +87,11 @@ void Boss::Initialize() {
 	waveAttack1.addRandomMax_ = { 0.75f,1.2f };
 	waveAttack1.addRandomMin_.y = -0.5f;
 
+	waveAttack1.SetParent(waveParent_.get());
+	waveAttack2.SetParent(waveParent_.get());
+	waveAttack3.SetParent(waveParent_.get());
+	waveAttack4.SetParent(waveParent_.get());
+
 
 	ParticleManager::Load(charges_[0], "BeamCharge1");
 	ParticleManager::Load(charges_[1], "BeamCharge2");
@@ -97,7 +107,7 @@ void Boss::Initialize() {
 	ParticleManager::Load(charge12_, "BeamCharge6");
 	ParticleManager::Load(charge13_, "BeamCharge7");
 	ParticleManager::Load(charge14_, "BeamCharge10");
-
+	ParticleManager::Load(charge15_, "BeamCharge11");
 
 
 	for (int i = 0; i < 8; i++) {
@@ -115,6 +125,7 @@ void Boss::Initialize() {
 	charge12_.SetParent(chargeParents_[0].get());
 	charge13_.SetParent(chargeParents_[0].get());
 	charge14_.SetParent(chargeParents_[0].get());
+	charge15_.SetParent(chargeParents_[0].get());
 
 
 	ChangeBehavior(std::make_unique<BossRoot>(this));
@@ -123,8 +134,19 @@ void Boss::Initialize() {
 void Boss::Update() {
 	behavior_->Update();
 
+	if (BossRoot* behavior = dynamic_cast<BossRoot*>(behavior_.get())) {
+		Vector3 dir = pPlayer_->GetWorldPos() - model_->transform.translate;
+		dir.y = 0.0f; // 水平方向だけに限定
+		dir = dir.Normalize();
+		Quaternion currentRotation = Quaternion::FromEuler(model_->transform.rotate);
+		Quaternion targetRotation = Quaternion::LookRotation(dir, Vector3::GetUpVec()); // Y軸を上に固定
+		Quaternion newRotation = Quaternion::Slerp(targetRotation, currentRotation, 0.01f);
+		model_->transform.rotate = Quaternion::QuaternionToEuler(newRotation);
+	}
+
 	core_->Update();
 
+	beam_->Update();
 	UpdateWaveWall();
 
 	shadow_->transform.translate = model_->transform.translate;
@@ -135,16 +157,17 @@ void Boss::Update() {
 
 void Boss::Draw(Material* mate) {
 	shadow_->Draw();
+#ifdef _DEBUG
 	collider_->DrawCollider();
+#endif // _DEBUG
 
+	OriginGameObject::Draw(mate);
+	core_->Draw();
 	for (auto& wall : walls_) {
 		if (!wall->GetIsLive())continue;
 		wall->Draw();
 	}
-
-	core_->Draw();
 	beam_->Draw();
-	OriginGameObject::Draw(mate);
 }
 
 void Boss::DebugGUI() {
@@ -198,14 +221,11 @@ void Boss::WaveWallAttack() {
 		Vector3 velocity = { 0.0f,0.0f,1.0f };
 		if (count == 1) velocity = Vector3(-1.0f, 0.0f, 1.0f).Normalize();
 		if (count == 2) velocity = Vector3(1.0f, 0.0f, 1.0f).Normalize();
+		velocity = TransformNormal(velocity, rotateMatrix);
 
 		wall->InitWave(wavePos, velocity);
 		count++;
 	}
-	waveAttack1.pos_ = wavePos;
-	waveAttack2.pos_ = wavePos;
-	waveAttack3.pos_ = wavePos;
-	waveAttack4.pos_ = wavePos;
 
 	waveAttack1.Emit();
 	waveAttack2.Emit();
@@ -233,6 +253,7 @@ void Boss::InitBeam() {
 
 	chargeTime_ = 120.0f;
 	chargeSize_ = 12.0f;
+	charge15_.grain_.startSize_ = { chargeSize_ * 2.0f,chargeSize_ * 4.0f };
 
 	for (auto& chargeParent : chargeParents_) {
 		chargeParent->transform.scale.x = chargeSize_;
@@ -277,9 +298,14 @@ bool Boss::BeamCharge() {
 
 		}
 
+		if (chargeSize_ > 3.0f) {
+			charge15_.grain_.startSize_ = { chargeSize_ * 2.0f,chargeSize_ * 4.0f };
+		}
+
 		charge9_.Emit();
 		charge10_.Emit();
 		charge11_.Emit();
+		charge15_.Emit();
 		chargeTime_ -= FPSKeeper::DeltaTime();
 	} else if (chargeSize_ <= 0.0f) {
 		result = true;
@@ -315,6 +341,17 @@ void Boss::BeamChargeComplete() {
 	charge12_.Emit();
 	charge13_.Emit();
 	charge14_.Emit();
+	beam_->InitBeam(Vector3(), Vector3());
+}
+
+bool Boss::BeamAttack() {
+	bool result = false;
+
+	if (beam_->BeamRotate()) {
+		result = true;
+	}
+
+	return result;
 }
 
 ///= Behavior =================================================================*/

@@ -1,5 +1,6 @@
 #pragma once
 #include "Scene/BaseScene.h"
+#include "Game/GameObj/SkyDome/SkyBox.h"
 #include "Game/GameObj/FollowCamera.h"
 #include "Game/GameObj/Player/Player.h"
 #include "Game/GameObj/Enemy/Boss.h"
@@ -28,7 +29,7 @@ private:
 	std::unique_ptr<CollisionManager> cMane_;
 
 	std::unique_ptr<Object3d> terrain = nullptr;
-	std::unique_ptr<Object3d> skydome_ = nullptr;
+	std::unique_ptr<SkyBox> skybox_;
 	std::unique_ptr<Player> player_ = nullptr;
 	std::unique_ptr<Boss> boss_ = nullptr;
 	std::unique_ptr<FollowCamera> followCamera_;

@@ -1,6 +1,16 @@
 #pragma once
 #include "BaseBossBehavior.h"
 
+enum class AttackPattern {
+	Beam,
+	Wave,
+	// 今後追加
+};
+
+struct AttackInfo {
+	AttackPattern pattern;
+	float weight;
+};
 
 class BossRoot : public BaseBossBehavior {
 public:
@@ -14,6 +24,7 @@ public:
 
 	void Update()override;
 	void Debug()override;
+	AttackPattern ChooseNextAttack();
 
 private:
 

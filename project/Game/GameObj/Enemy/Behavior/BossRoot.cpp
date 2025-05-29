@@ -1,4 +1,5 @@
 #include "BossRoot.h"
+#include "Engine/Math/Random/Random.h"
 
 #include "Game/GameObj/Enemy/Boss.h"
 #include "BossAttack.h"
@@ -31,9 +32,18 @@ void BossRoot::Update() {
 		///---------------------------------------------------------------------------------------
 		/// 攻撃へ移行
 		///---------------------------------------------------------------------------------------
-	case BossRoot::Step::TOATTACK:
-		pBoss_->ChangeBehavior(std::make_unique<BossBeamAttack>(pBoss_));
+	case BossRoot::Step::TOATTACK: {
+		AttackPattern pattern = ChooseNextAttack();
+		switch (pattern) {
+		case AttackPattern::Beam:
+			pBoss_->ChangeBehavior(std::make_unique<BossBeamAttack>(pBoss_));
+			break;
+		case AttackPattern::Wave:
+			pBoss_->ChangeBehavior(std::make_unique<BossAttack>(pBoss_));
+			break;
+		}
 		break;
+	}
 	default:
 		break;
 	}
@@ -41,4 +51,38 @@ void BossRoot::Update() {
 }
 
 void BossRoot::Debug() {
+}
+
+AttackPattern BossRoot::ChooseNextAttack() {
+	static AttackPattern previous = AttackPattern::Beam;
+
+	std::vector<AttackInfo> patterns = {
+	{ AttackPattern::Beam, 1.0f },   // レアなので低め
+	{ AttackPattern::Wave, 1.0f },
+	// ここに新しい攻撃を追加
+	};
+
+	// 同じ攻撃を避けるための重み調整
+	for (auto& info : patterns) {
+		if (info.pattern == previous) {
+			info.weight *= 0.2f; // 同じなら重みを下げる
+		}
+	}
+
+	// 重みに基づいてランダム選択
+	float totalWeight = 0.0f;
+	for (const auto& info : patterns) totalWeight += info.weight;
+
+	float r = Random::GetFloat(0.0f, totalWeight);
+	float acc = 0.0f;
+	for (const auto& info : patterns) {
+		acc += info.weight;
+		if (r <= acc) {
+			previous = info.pattern;
+			return info.pattern;
+		}
+	}
+
+	// 万が一失敗したら最初を返す
+	return patterns.front().pattern;
 }

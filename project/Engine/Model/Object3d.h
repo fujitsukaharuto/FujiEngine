@@ -30,7 +30,7 @@ public:
 
 	void CreateCylinder(float topRadius = 1.0f, float bottomRadius = 1.0f, float height = 3.0f);
 
-	void Draw(Material* mate = nullptr);
+	void Draw(Material* mate = nullptr, bool isAdd = false);
 
 	void AnimeDraw();
 
