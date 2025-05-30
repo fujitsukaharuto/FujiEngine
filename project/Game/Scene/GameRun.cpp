@@ -19,6 +19,9 @@ void GameRun::Initialize() {
 	textureManager_->Load("BlueprintBackground.png");
 	textureManager_->Load("T_Noise04.jpg");
 	textureManager_->Load("Beam.png");
+	textureManager_->Load("beamCore.png");
+	textureManager_->Load("beamCore2.png");
+	textureManager_->Load("beamCore3.png");
 	textureManager_->Load("underRing.png");
 #pragma endregion
 

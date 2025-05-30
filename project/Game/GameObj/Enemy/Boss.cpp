@@ -201,7 +201,7 @@ void Boss::ParameterGUI() {
 }
 
 void Boss::InitParameter() {
-	attackCooldown_ = 600.0f;
+	attackCooldown_ = 300.0f;
 
 	for (int i = 0; i < 3; i++) {
 		std::unique_ptr<WaveWall> wall;

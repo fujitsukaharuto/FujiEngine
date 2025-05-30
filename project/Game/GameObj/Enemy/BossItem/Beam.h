@@ -41,6 +41,7 @@ private:
 
 	std::unique_ptr<Object3d> beamCore1_;
 	std::unique_ptr<Object3d> beamCore2_;
+	std::unique_ptr<Object3d> beamCore3_;
 	std::unique_ptr<Object3d> beam1_;
 	std::unique_ptr<Object3d> beam2_;
 	std::unique_ptr<Object3d> beam3_;
