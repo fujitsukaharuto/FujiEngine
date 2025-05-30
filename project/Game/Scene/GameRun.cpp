@@ -81,6 +81,7 @@ void GameRun::Initialize() {
 	pManager_->CreateParticleGroup("BeamCharge10", "redCircle.png", 10);
 	pManager_->CreateParticleGroup("BeamCharge11", "redCircle.png", 40, ShapeType::RING);
 	pManager_->CreateParticleGroup("BeamParticle", "redCircle.png", 200);
+	pManager_->CreateParticleGroup("BeamLight", "redCircle.png", 40);
 
 
 
@@ -95,6 +96,7 @@ void GameRun::Initialize() {
 
 
 	pManager_->CreateParentParticleGroup("BeamParticle", "redCircle.png", 200);
+	pManager_->CreateParentParticleGroup("BeamLight", "redCircle.png", 40);
 
 
 	// 半透明になる

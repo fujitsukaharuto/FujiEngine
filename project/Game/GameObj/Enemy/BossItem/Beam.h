@@ -61,5 +61,6 @@ private:
 	ParticleEmitter spark1_;
 	ParticleEmitter spark2_;
 	ParticleEmitter* beamParticle_;
+	ParticleEmitter* beamLight_;
 
 };

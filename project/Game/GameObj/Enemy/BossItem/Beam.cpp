@@ -98,8 +98,10 @@ void Beam::Initialize() {
 	particleParent_->transform.translate = model_->transform.translate;
 
 	ParticleManager::LoadParentGroup(beamParticle_, "BeamParticle");
+	ParticleManager::LoadParentGroup(beamLight_, "BeamLight");
 	beamParticle_->SetParent(particleParent_.get());
 	beamParticle_->grain_.isParentRotate_ = true;
+	beamLight_->SetParent(particleParent_.get());
 
 }
 
@@ -186,6 +188,7 @@ bool Beam::BeamRotate() {
 		beamCore2_->transform.scale.x = std::lerp(0.0f, beam2BaseScale_, t);
 		beamCore2_->transform.scale.z = std::lerp(0.0f, beam2BaseScale_, t);
 		beamParticle_->Emit();
+		beamLight_->Emit();
 
 	} else if (lifeTime_ >= 60.0f) {
 		float frame = (lifeTime_ - 60.0f);
@@ -197,6 +200,7 @@ bool Beam::BeamRotate() {
 		particleParent_->transform.rotate.y = model_->transform.rotate.y;
 
 		beamParticle_->Emit();
+		beamLight_->Emit();
 
 	} else if (lifeTime_ > 0.0f) {
 		model_->transform.rotate.y = 0.0f;

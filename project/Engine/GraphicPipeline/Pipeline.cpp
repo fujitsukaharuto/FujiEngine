@@ -144,8 +144,13 @@ void Pipeline::CreatePSO(ID3D12Device* device) {
 
 	D3D12_DEPTH_STENCIL_DESC depth{};
 	depth.DepthEnable = true;
-	depth.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-	depth.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+	if (!isAddMode_) {
+		depth.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+		depth.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+	} else {
+		depth.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+		depth.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+	}
 
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC stateDesc{};
