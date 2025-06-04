@@ -5,6 +5,14 @@
 #include "Engine/Editor/ICommand.h"
 #include "Engine/Editor/PropertyCommand.h"
 
+#include "Engine/Model/Object3d.h"
+
+
+struct EditorObj {
+	int id;
+	std::unique_ptr<Object3d> obj;
+	bool isActive = true;
+};
 
 class CommandManager {
 public:
@@ -39,7 +47,16 @@ public:
 		}
 	}
 
+
+	std::shared_ptr<EditorObj> GetEditorObject(int id) const;
+	void GarbageCollect();
+
+	std::unordered_map<int, std::shared_ptr<EditorObj>> objectList;
+
 private:
 	std::stack<std::unique_ptr<ICommand>> undoStack;
 	std::stack<std::unique_ptr<ICommand>> redoStack;
+
+	int nextObjId = 0;
+
 };

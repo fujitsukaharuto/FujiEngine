@@ -49,4 +49,14 @@ void CommandManager::Reset() {
 void CommandManager::Finalize() {
 	undoStack = std::stack<std::unique_ptr<ICommand>>();
 	redoStack = std::stack<std::unique_ptr<ICommand>>();
+
+	objectList.clear();
+}
+
+std::shared_ptr<EditorObj> CommandManager::GetEditorObject(int id) const {
+	auto it = objectList.find(id);
+	return (it != objectList.end()) ? it->second : nullptr;
+}
+
+void CommandManager::GarbageCollect() {
 }
