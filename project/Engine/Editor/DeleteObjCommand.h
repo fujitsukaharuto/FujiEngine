@@ -1,29 +1,26 @@
 #pragma once
 #include "Engine/Editor/ICommand.h"
-#include "Engine/Math/Matrix/MatrixCalculation.h"
-#include "Engine/Math/Vector/Vector3.h"
+
+#include <memory>
+
+
+struct EditorObj;
 
 class DeleteObjCommand : public ICommand {
 public:
 
 
-	DeleteObjCommand(int id) : objId(id) {
-	}
+	DeleteObjCommand(int id);
 
-	void Do() override {
-		// オブジェクトを描画しないように
-	}
+	void Do() override;
 
-	void UnDo() override {
-		// 描画するように
-	}
+	void UnDo() override;
 
-	void ReDo() override {
-		Do();
-	}
+	void ReDo() override;
 
 private:
 
 	int objId;
+	std::shared_ptr<EditorObj> obj;
 
 };

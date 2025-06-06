@@ -8,6 +8,7 @@
 #include "Model/Line3dDrawer.h"
 #include "Particle/ParticleManager.h"
 #include "Scene/SceneManager.h"
+#include "Engine/Editor/CommandManager.h"
 
 
 TitleScene::TitleScene() {}
@@ -109,6 +110,11 @@ void TitleScene::Draw() {
 	sphere->Draw();
 	sphere2->Draw();
 	//test_->Draw();
+
+#ifdef _DEBUG
+	CommandManager::GetInstance()->Draw();
+#endif // _DEBUG
+
 
 	obj3dCommon->PreAnimationDraw();
 	cube_->Draw();

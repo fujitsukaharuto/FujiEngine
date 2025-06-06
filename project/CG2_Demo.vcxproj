@@ -121,6 +121,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\DX\SRVManager.cpp" />
     <ClCompile Include="Engine\Editor\CommandManager.cpp" />
     <ClCompile Include="Engine\Editor\CreateObjCommand.cpp" />
+    <ClCompile Include="Engine\Editor\DeleteObjCommand.cpp" />
     <ClCompile Include="Engine\Editor\JsonSerializer.cpp" />
     <ClCompile Include="Engine\GlobalVariables\GlobalVariables.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\AnimationPipeline.cpp" />

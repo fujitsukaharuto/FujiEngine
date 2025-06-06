@@ -18,7 +18,9 @@ Object3d::Object3d() {
 	lightManager_ = ModelManager::GetInstance()->ShareLight();
 
 #ifdef _DEBUG
-	nodeEditorContext_ = ax::NodeEditor::CreateEditor();
+	ax::NodeEditor::Config config;
+	config.SettingsFile = "resource/NodeEditor/NodeEditor.json";
+	nodeEditorContext_ = CreateEditor(&config);
 
 	MyNode texNode;
 	texNode.id = ImGuiManager::GetInstance()->GenerateNodeId();
