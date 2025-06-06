@@ -111,14 +111,14 @@ void CommandManager::DebugGUI() {
 					nameHashes[group.first] = std::hash<std::string>{}(newName);
 				}
 
+				obj->obj->DebugGUI();
+
 				std::string deleteButtonLabel = "Delete##" + std::to_string(group.first);
 				if (ImGui::Button(deleteButtonLabel.c_str())) {
 					auto deleteCommand = std::make_unique<DeleteObjCommand>(group.first);
 					Execute(std::move(deleteCommand));
 					continue;
 				}
-
-				obj->obj->DebugGUI();
 			}
 		}
 	}
