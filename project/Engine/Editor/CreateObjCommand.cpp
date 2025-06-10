@@ -9,7 +9,8 @@ void CreateObjCommand::Do() {
 	obj->isActive = true;
 	obj->name = objName;
 	obj->obj = std::make_unique<Object3d>();
-	obj->obj->CreateSphere();
+	obj->obj->Create(modelName);
+	obj->modelName = obj->obj->GetModelName();
 	CommandManager::GetInstance()->objectList[objId] = obj;
 
 	// ラベルとハッシュの登録もここでやっておく

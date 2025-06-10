@@ -38,6 +38,8 @@ public:
 
 	Vector3 GetWorldPos()const;
 
+	std::string GetModelName() { return modelName_; }
+
 	void UpdateWVP() { SetWVP(); }
 
 	void DebugGUI();
@@ -81,6 +83,7 @@ private:
 private:
 	Object3dCommon* common_;
 	std::unique_ptr<Model> model_ = nullptr;
+	std::string modelName_;
 
 	DXCom* dxcommon_;
 	LightManager* lightManager_;

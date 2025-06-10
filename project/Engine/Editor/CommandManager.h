@@ -17,6 +17,7 @@ struct EditorObj {
 	std::unique_ptr<Object3d> obj;
 	bool isActive = true;
 	std::string name;
+	std::string modelName;
 };
 
 class CommandManager {
@@ -63,9 +64,13 @@ public:
 	std::unordered_map<int, size_t> nameHashes;
 
 private:
+
+	void EditorOBJSave();
+
+private:
 	std::stack<std::unique_ptr<ICommand>> undoStack;
 	std::stack<std::unique_ptr<ICommand>> redoStack;
 
 	int nextObjId = 0;
-
+	std::unique_ptr<EditorObj> loadObj;
 };

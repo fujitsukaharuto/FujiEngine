@@ -1,5 +1,6 @@
 #include "CommandManager.h"
 #include "Engine/Input/Input.h"
+#include "Engine/Editor/JsonSerializer.h"
 
 CommandManager::~CommandManager() {
 }
@@ -54,6 +55,8 @@ void CommandManager::Finalize() {
 	undoStack = std::stack<std::unique_ptr<ICommand>>();
 	redoStack = std::stack<std::unique_ptr<ICommand>>();
 
+	loadObj.reset();
+
 	objectList.clear();
 	headerNames.clear();
 	nameHashes.clear();
@@ -91,12 +94,13 @@ void CommandManager::DebugGUI() {
 			// CollapsingHeader 表示
 			if (ImGui::CollapsingHeader(headerNames[group.first].c_str())) {
 				// 編集用のラベル（ImGui ID用）
-				std::string inputLabel = "Name##input" + std::to_string(group.first);
+				std::string inputLabel = "##input" + std::to_string(group.first);
 
 				// ImGuiの入力欄で名前編集（最大64文字くらい推奨）
 				static char nameBuffer[64]; // 固定長バッファ（使い回し可）
 				strncpy_s(nameBuffer, sizeof(nameBuffer), obj->name.c_str(), _TRUNCATE);
 
+				ImGui::Text("Name"); ImGui::SameLine();
 				if (ImGui::InputText(inputLabel.c_str(), nameBuffer, sizeof(nameBuffer),
 					ImGuiInputTextFlags_EnterReturnsTrue)) {
 					// Enterで確定された場合のみ name を更新
@@ -112,6 +116,8 @@ void CommandManager::DebugGUI() {
 				}
 
 				obj->obj->DebugGUI();
+
+				JsonSerializer::ShowSaveEditorObjPopup(*obj);
 
 				std::string deleteButtonLabel = "Delete##" + std::to_string(group.first);
 				if (ImGui::Button(deleteButtonLabel.c_str())) {
@@ -147,6 +153,18 @@ void CommandManager::DebugGUI() {
 		std::memset(newObjName, 0, sizeof(newObjName));
 	}
 
+	if (!loadObj) {
+		loadObj = std::make_unique<EditorObj>();
+		loadObj->obj = std::make_unique<Object3d>();
+		loadObj->obj->CreateSphere();
+	}
+	if (JsonSerializer::ShowLoadEditorObjPopup(*loadObj)) {
+		int newId = CommandManager::GetInstance()->nextObjId++;
+		auto command = std::make_unique<CreateObjCommand>(newId, loadObj->name, loadObj->modelName);
+		Execute(std::move(command));
+		objectList[newId]->obj->transform = loadObj->obj->transform;
+	}
+
 	GarbageCollect();
 	ImGui::Unindent();
 #endif // DEBUG
@@ -179,4 +197,8 @@ void CommandManager::GarbageCollect() {
 			++it;
 		}
 	}
+}
+
+void CommandManager::EditorOBJSave() {
+
 }
