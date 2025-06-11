@@ -115,7 +115,8 @@ void ParticleManager::Update() {
 
 			Matrix4x4 worldViewProjectionMatrix;
 			Matrix4x4 worldMatrix = MakeIdentity4x4();
-			SRTUpdate(particle, worldMatrix, billboardMatrix);
+			SRTUpdate(particle);
+			Billboard(particle, worldMatrix, billboardMatrix, MakeIdentity4x4());
 
 			if (camera_) {
 				const Matrix4x4& viewProjectionMatrix = camera_->GetViewProjectionMatrix();
@@ -186,7 +187,26 @@ void ParticleManager::Update() {
 
 			Matrix4x4 worldViewProjectionMatrix;
 			Matrix4x4 worldMatrix = MakeIdentity4x4();
-			SRTUpdate(particle, worldMatrix, billboardMatrix);
+			Matrix4x4 parentRotate = MakeIdentity4x4();
+			SRTUpdate(particle);
+			if (particle.isParentRotate_) {
+				parentRotate = group->emitter_->worldMatrix_;
+				// スケールを除去する（上のコードと同様）
+				Vector3 xAxis = { parentRotate.m[0][0], parentRotate.m[1][0], parentRotate.m[2][0] };
+				Vector3 yAxis = { parentRotate.m[0][1], parentRotate.m[1][1], parentRotate.m[2][1] };
+				Vector3 zAxis = { parentRotate.m[0][2], parentRotate.m[1][2], parentRotate.m[2][2] };
+
+				float xLen = Vector3::Length(xAxis);
+				float yLen = Vector3::Length(yAxis);
+				float zLen = Vector3::Length(zAxis);
+
+				for (int i = 0; i < 3; ++i) {
+					parentRotate.m[i][0] /= xLen;
+					parentRotate.m[i][1] /= yLen;
+					parentRotate.m[i][2] /= zLen;
+				}
+			}
+			Billboard(particle, worldMatrix, billboardMatrix, parentRotate);
 
 			if (particle.isParent_) {
 				// 親行列のスケール・回転を取り除いた「平行移動のみマトリクス」を作る
@@ -283,6 +303,13 @@ void ParticleManager::Draw() {
 	for (auto& groupPair : particleGroups_) {
 		ParticleGroup* group = groupPair.second.get();
 
+		if (group->isSubMode_) {
+			continue;
+		}
+		if (group->drawCount_ == 0) {
+			continue;
+		}
+
 		if (group->shapeType_ != ShapeType::PLANE) {
 			switch (group->shapeType_) {
 			case ShapeType::PLANE:
@@ -338,7 +365,7 @@ void ParticleManager::Draw() {
 		default:
 			break;
 		}
-		
+
 		if (group->shapeType_ != ShapeType::PLANE) {
 			dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vbView);
 			dxcommon_->GetCommandList()->IASetIndexBuffer(&ibView);
@@ -347,6 +374,29 @@ void ParticleManager::Draw() {
 
 	for (auto& groupPair : parentParticleGroups_) {
 		ParentParticleGroup* group = groupPair.second.get();
+
+		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group->srvIndex_));
+		dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, group->material_.GetMaterialResource()->GetGPUVirtualAddress());
+		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, group->material_.GetTexture()->gpuHandle);
+
+		dxcommon_->GetCommandList()->DrawIndexedInstanced(6, group->drawCount_, 0, 0, 0);
+	}
+
+	dxcommon_->GetDXCommand()->SetViewAndscissor();
+	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::particleSub);
+	dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vbView);
+	dxcommon_->GetCommandList()->IASetIndexBuffer(&ibView);
+
+	for (auto& groupPair : particleGroups_) {
+		ParticleGroup* group = groupPair.second.get();
+
+		if (!group->isSubMode_) {
+			continue;
+		}
+		if (group->drawCount_ == 0) {
+			continue;
+		}
 
 		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group->srvIndex_));
 		dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, group->material_.GetMaterialResource()->GetGPUVirtualAddress());
@@ -437,7 +487,7 @@ void ParticleManager::SelectEmitterSizeDraw() {
 #endif // _DEBUG
 }
 
-void ParticleManager::CreateParticleGroup(const std::string& name, const std::string& fileName, uint32_t count) {
+void ParticleManager::CreateParticleGroup(const std::string& name, const std::string& fileName, uint32_t count, ShapeType shape, bool subMode) {
 	ParticleManager* instance = GetInstance();
 
 	auto iterator = instance->particleGroups_.find(name);
@@ -448,6 +498,8 @@ void ParticleManager::CreateParticleGroup(const std::string& name, const std::st
 
 	ParticleGroup* newGroup = new ParticleGroup();
 
+	newGroup->isSubMode_ = subMode;
+	newGroup->shapeType_ = shape;
 	newGroup->emitter_.name_ = name;
 	newGroup->emitter_.Load(name);
 
@@ -563,32 +615,32 @@ void ParticleManager::Load(ParticleEmitter& emit, const std::string& name) {
 	auto iterator = instance->particleGroups_.find(name);
 	if (iterator != instance->particleGroups_.end()) {
 		ParticleGroup* group = iterator->second.get();
-		emit.pos_                 = group->emitter_.pos_;
-		emit.particleRotate_      = group->emitter_.particleRotate_;
-		emit.emitSizeMax_         = group->emitter_.emitSizeMax_;
-		emit.emitSizeMin_         = group->emitter_.emitSizeMin_;
-		emit.count_               = group->emitter_.count_;
-		emit.frequencyTime_       = group->emitter_.frequencyTime_;
-		emit.grain_.lifeTime_     = group->emitter_.grain_.lifeTime_;
-		emit.grain_.accele_       = group->emitter_.grain_.accele_;
-		emit.grain_.speed_        = group->emitter_.grain_.speed_;
-		emit.grain_.type_         = group->emitter_.grain_.type_;
-		emit.grain_.speedType_    = group->emitter_.grain_.speedType_;
-		emit.grain_.rotateType_   = group->emitter_.grain_.rotateType_;
-		emit.grain_.colorType_    = group->emitter_.grain_.colorType_;
-		emit.grain_.returnPower_  = group->emitter_.grain_.returnPower_;
-		emit.grain_.startSize_    = group->emitter_.grain_.startSize_;
-		emit.grain_.endSize_      = group->emitter_.grain_.endSize_;
-		emit.grain_.isBillBoard_  = group->emitter_.grain_.isBillBoard_;
-		emit.grain_.pattern_      = group->emitter_.grain_.pattern_;
-		emit.para_.speedx         = group->emitter_.para_.speedx;
-		emit.para_.speedy         = group->emitter_.para_.speedy;
-		emit.para_.speedz         = group->emitter_.para_.speedz;
-		emit.para_.transx         = group->emitter_.para_.transx;
-		emit.para_.transy         = group->emitter_.para_.transy;
-		emit.para_.transz         = group->emitter_.para_.transz;
-		emit.para_.colorMin       = group->emitter_.para_.colorMin;
-		emit.para_.colorMax       = group->emitter_.para_.colorMax;
+		emit.pos_ = group->emitter_.pos_;
+		emit.particleRotate_ = group->emitter_.particleRotate_;
+		emit.emitSizeMax_ = group->emitter_.emitSizeMax_;
+		emit.emitSizeMin_ = group->emitter_.emitSizeMin_;
+		emit.count_ = group->emitter_.count_;
+		emit.frequencyTime_ = group->emitter_.frequencyTime_;
+		emit.grain_.lifeTime_ = group->emitter_.grain_.lifeTime_;
+		emit.grain_.accele_ = group->emitter_.grain_.accele_;
+		emit.grain_.speed_ = group->emitter_.grain_.speed_;
+		emit.grain_.type_ = group->emitter_.grain_.type_;
+		emit.grain_.speedType_ = group->emitter_.grain_.speedType_;
+		emit.grain_.rotateType_ = group->emitter_.grain_.rotateType_;
+		emit.grain_.colorType_ = group->emitter_.grain_.colorType_;
+		emit.grain_.returnPower_ = group->emitter_.grain_.returnPower_;
+		emit.grain_.startSize_ = group->emitter_.grain_.startSize_;
+		emit.grain_.endSize_ = group->emitter_.grain_.endSize_;
+		emit.grain_.isBillBoard_ = group->emitter_.grain_.isBillBoard_;
+		emit.grain_.pattern_ = group->emitter_.grain_.pattern_;
+		emit.para_.speedx = group->emitter_.para_.speedx;
+		emit.para_.speedy = group->emitter_.para_.speedy;
+		emit.para_.speedz = group->emitter_.para_.speedz;
+		emit.para_.transx = group->emitter_.para_.transx;
+		emit.para_.transy = group->emitter_.para_.transy;
+		emit.para_.transz = group->emitter_.para_.transz;
+		emit.para_.colorMin = group->emitter_.para_.colorMin;
+		emit.para_.colorMax = group->emitter_.para_.colorMax;
 
 	} else {
 		return;
@@ -931,7 +983,7 @@ void ParticleManager::ParticleSizeUpdate(Particle& particle) {
 	}
 }
 
-void ParticleManager::SRTUpdate(Particle& particle, Matrix4x4& worldMatrix, const Matrix4x4& billboardMatrix) {
+void ParticleManager::SRTUpdate(Particle& particle) {
 	if (particle.rotateType_ == static_cast<int>(RotateType::kRandomR)) {
 		if (particle.isContinuouslyRotate_) {
 			particle.transform_.rotate += Random::GetVector3({ -0.2f,0.2f }, { -0.2f,0.2f }, { -0.2f,0.2f }) * FPSKeeper::DeltaTime();
@@ -941,16 +993,23 @@ void ParticleManager::SRTUpdate(Particle& particle, Matrix4x4& worldMatrix, cons
 	particle.speed_ += particle.accele_ * FPSKeeper::DeltaTime();
 
 	particle.transform_.translate += particle.speed_ * FPSKeeper::DeltaTime();
+}
 
+void ParticleManager::Billboard(Particle& particle, Matrix4x4& worldMatrix, const Matrix4x4& billboardMatrix, const Matrix4x4& rotate) {
 	if (!particle.isBillBoard_) {
 		worldMatrix = MakeAffineMatrix(particle.transform_.scale, particle.transform_.rotate, particle.transform_.translate);
 	}
 	if (particle.isBillBoard_) {
 		switch (particle.pattern_) {
-		case BillBoardPattern::kXYZBillBoard:
+		case BillBoardPattern::kXYZBillBoard: {
+			Vector3 possition = particle.transform_.translate;
+			if (particle.isParentRotate_) {
+				possition = TransformNormal(possition, rotate);
+			}
 			worldMatrix = Multiply(MakeScaleMatrix(particle.transform_.scale), billboardMatrix);
-			worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform_.translate));
+			worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(possition));
 			break;
+		}
 		case BillBoardPattern::kXBillBoard: {
 
 			Matrix4x4 xBillboardMatrix;
@@ -1052,7 +1111,7 @@ bool ParticleManager::InitEmitParticle(Particle& particle, const Vector3& pos, c
 
 			break;
 		case static_cast<int>(RotateType::kRandomR):
-			particle.transform_.rotate = Random::GetVector3({ -1.0f,1.0f }, { -1.0f,1.0f }, { -1.0f,1.0f });
+			particle.transform_.rotate = Random::GetVector3({ -3.0f,3.0f }, { -3.0f,3.0f }, { -3.0f,3.0f });
 			break;
 		}
 
@@ -1099,6 +1158,7 @@ bool ParticleManager::InitEmitParticle(Particle& particle, const Vector3& pos, c
 		particle.startSize_ = grain.startSize_ + para.addRandomSize;
 		particle.endSize_ = grain.endSize_ + para.addRandomSize;
 		particle.isParent_ = grain.isParent_;
+		particle.isParentRotate_ = grain.isParentRotate_;
 
 		particle.isLive_ = true;
 		return true;

@@ -46,6 +46,7 @@ public:
 		uint32_t drawCount_;
 		ParticleEmitter emitter_;
 		ShapeType shapeType_ = ShapeType::PLANE;
+		bool isSubMode_ = false;
 	};
 
 	struct ParentParticleGroup {
@@ -91,7 +92,7 @@ public:
 	void SelectParticleUpdate();
 	void SelectEmitterSizeDraw();
 
-	static void CreateParticleGroup(const std::string& name, const std::string& fileName, uint32_t count = 20);
+	static void CreateParticleGroup(const std::string& name, const std::string& fileName, uint32_t count = 20, ShapeType shape = ShapeType::PLANE, bool subMode = false);
 
 	static void CreateParentParticleGroup(const std::string& name, const std::string& fileName, uint32_t count = 20);
 
@@ -117,7 +118,8 @@ private:
 
 	bool LifeUpdate(Particle& particle);
 	void ParticleSizeUpdate(Particle& particle);
-	void SRTUpdate(Particle& particle, Matrix4x4& worldMatrix, const Matrix4x4& billboardMatrix);
+	void SRTUpdate(Particle& particle);
+	void Billboard(Particle& particle, Matrix4x4& worldMatrix, const Matrix4x4& billboardMatrix, const Matrix4x4& rotate);
 	bool InitEmitParticle(Particle& particle, const Vector3& pos, const Vector3& rotate, const Particle& grain, const RandomParametor& para);
 
 private:

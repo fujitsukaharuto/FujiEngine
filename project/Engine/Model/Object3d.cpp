@@ -108,15 +108,22 @@ void Object3d::CreateCylinder(float topRadius, float bottomRadius, float height)
 	CreateWVP();
 }
 
-void Object3d::Draw(Material* mate) {
+void Object3d::Draw(Material* mate, bool isAdd) {
 	SetWVP();
 
 	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
+	if (isAdd) {
+		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::NormalAdd);
+	}
 	cList->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
 	cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_->GetGPUVirtualAddress());
 
 	if (model_) {
 		model_->Draw(cList, mate);
+	}
+
+	if (isAdd) {
+		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Normal);
 	}
 }
 
