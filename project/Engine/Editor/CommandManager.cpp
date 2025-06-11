@@ -52,6 +52,11 @@ void CommandManager::Reset() {
 	nameHashes.clear();
 }
 
+void CommandManager::StackReset() {
+	undoStack = std::stack<std::unique_ptr<ICommand>>();
+	redoStack = std::stack<std::unique_ptr<ICommand>>();
+}
+
 void CommandManager::Finalize() {
 	undoStack = std::stack<std::unique_ptr<ICommand>>();
 	redoStack = std::stack<std::unique_ptr<ICommand>>();
@@ -289,6 +294,7 @@ void CommandManager::SaveAllEditorOBJ() {
 
 			EditorOBJSave(path);
 			showSuccessMessage = true;
+			StackReset();
 			ImGui::CloseCurrentPopup();
 		}
 
@@ -401,6 +407,7 @@ void CommandManager::LoadAllEditorOBJ() {
 
 			if (EditorOBJLoad(path)) {
 				showLoadSuccessMessage = true;
+				StackReset();
 			} else {
 				showLoadErrorMessage = true;
 			}
