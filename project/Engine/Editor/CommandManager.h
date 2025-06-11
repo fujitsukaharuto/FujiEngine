@@ -20,6 +20,12 @@ struct EditorObj {
 	std::string modelName;
 };
 
+struct LoadEditorObjData {
+	std::string name;
+	std::string modelName;
+	Trans trnasform;
+};
+
 class CommandManager {
 public:
 	CommandManager() = default;
@@ -65,7 +71,10 @@ public:
 
 private:
 
-	void EditorOBJSave();
+	void EditorOBJSave(const std::string& filePath);
+	void SaveAllEditorOBJ();
+	bool EditorOBJLoad(const std::string& filePath);
+	void LoadAllEditorOBJ();
 
 private:
 	std::stack<std::unique_ptr<ICommand>> undoStack;

@@ -29,7 +29,7 @@ void JsonSerializer::ShowSaveTransformPopup(const Trans& transform) {
 			if (path.empty()) {
 				path = "default_transform.json";
 			}
-			// 拡張子がなければ追加（任意）
+			// 拡張子がなければ追加
 			if (path.find('.') == std::string::npos) {
 				path += ".json";
 			}
@@ -48,18 +48,9 @@ void JsonSerializer::ShowSaveTransformPopup(const Trans& transform) {
 		ImGui::EndPopup();
 	}
 
-	// 保存完了後の通知（任意）
+	// 保存完了後の通知
 	if (showSuccessMessage) {
-		ImGui::OpenPopup("Saved!");
-	}
-
-	if (ImGui::BeginPopupModal("Saved!", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-		ImGui::Text("Transform saved successfully!");
-		if (ImGui::Button("OK")) {
-			ImGui::CloseCurrentPopup();
-			showSuccessMessage = false;
-		}
-		ImGui::EndPopup();
+		SavedPopup(showSuccessMessage);
 	}
 #endif // _DEBUG
 }
@@ -109,28 +100,12 @@ void JsonSerializer::ShowLoadTransformPopup(Trans& transform) {
 	}
 
 	if (showLoadSuccessMessage) {
-		ImGui::OpenPopup("Loaded!");
-	}
-	if (ImGui::BeginPopupModal("Loaded!", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-		ImGui::Text("Transform loaded successfully!");
-		if (ImGui::Button("OK")) {
-			ImGui::CloseCurrentPopup();
-			showLoadSuccessMessage = false;
-		}
-		ImGui::EndPopup();
+		LoadedPopup(showLoadSuccessMessage);
 	}
 
 	// エラーメッセージ（ファイルが存在しない）
 	if (showLoadErrorMessage) {
-		ImGui::OpenPopup("Load Error");
-	}
-	if (ImGui::BeginPopupModal("Load Error", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-		ImGui::Text("File not found:\n%s", fileName);
-		if (ImGui::Button("OK")) {
-			ImGui::CloseCurrentPopup();
-			showLoadErrorMessage = false;
-		}
-		ImGui::EndPopup();
+		LoadErrorPopup(showLoadErrorMessage, fileName);
 	}
 #endif // _DEBUG
 }
@@ -210,7 +185,7 @@ void JsonSerializer::ShowSaveEditorObjPopup(const EditorObj& obj) {
 		ImGui::Text("Enter file name to save the EditorObj:");
 		// 一時バッファにコピーして表示・編集
 		char buffer[128];
-		strncpy_s(buffer, sizeof(buffer), fileName.c_str(), _TRUNCATE);  // 安全
+		strncpy_s(buffer, sizeof(buffer), fileName.c_str(), _TRUNCATE);
 
 		// 編集
 		if (ImGui::InputText("##filename", buffer, IM_ARRAYSIZE(buffer))) {
@@ -224,7 +199,7 @@ void JsonSerializer::ShowSaveEditorObjPopup(const EditorObj& obj) {
 			if (path.empty()) {
 				path = "default_EditorObj.json";
 			}
-			// 拡張子がなければ追加（任意）
+			// 拡張子がなければ追加
 			if (path.find('.') == std::string::npos) {
 				path += ".json";
 			}
@@ -243,18 +218,9 @@ void JsonSerializer::ShowSaveEditorObjPopup(const EditorObj& obj) {
 		ImGui::EndPopup();
 	}
 
-	// 保存完了後の通知（任意）
+	// 保存完了後の通知
 	if (showSuccessMessage) {
-		ImGui::OpenPopup("Saved!");
-	}
-
-	if (ImGui::BeginPopupModal("Saved!", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-		ImGui::Text("EditorObj saved successfully!");
-		if (ImGui::Button("OK")) {
-			ImGui::CloseCurrentPopup();
-			showSuccessMessage = false;
-		}
-		ImGui::EndPopup();
+		SavedPopup(showSuccessMessage);
 	}
 #endif // _DEBUG
 }
@@ -306,28 +272,12 @@ bool JsonSerializer::ShowLoadEditorObjPopup(EditorObj& obj) {
 	}
 
 	if (showLoadSuccessMessage) {
-		ImGui::OpenPopup("Loaded!");
-	}
-	if (ImGui::BeginPopupModal("Loaded!", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-		ImGui::Text("EditorObj loaded successfully!");
-		if (ImGui::Button("OK")) {
-			ImGui::CloseCurrentPopup();
-			showLoadSuccessMessage = false;
-		}
-		ImGui::EndPopup();
+		LoadedPopup(showLoadSuccessMessage);
 	}
 
 	// エラーメッセージ（ファイルが存在しない）
 	if (showLoadErrorMessage) {
-		ImGui::OpenPopup("Load Error");
-	}
-	if (ImGui::BeginPopupModal("Load Error", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-		ImGui::Text("File not found:\n%s", fileName);
-		if (ImGui::Button("OK")) {
-			ImGui::CloseCurrentPopup();
-			showLoadErrorMessage = false;
-		}
-		ImGui::EndPopup();
+		LoadErrorPopup(showLoadErrorMessage, fileName);
 	}
 	return result;
 #endif // _DEBUG
@@ -367,7 +317,7 @@ bool JsonSerializer::DeserializeEditorObj(const std::string& filePath, EditorObj
 	ifs.close();
 
 
-	// 名前・モデル名の読み取り（あれば）
+	// 名前・モデル名の読み取り
 	if (json.contains("objectName")) {
 		obj.name = json["objectName"].get<std::string>();
 	}
@@ -403,4 +353,47 @@ bool JsonSerializer::DeserializeEditorObj(const std::string& filePath, EditorObj
 		CommandManager::TryCreatePropertyCommand(obj.obj->transform, prevTransform.scale, obj.obj->transform.scale, &Trans::scale);
 	}
 	return true;
+}
+
+void JsonSerializer::SavedPopup(bool& success) {
+	if (success) {
+		ImGui::OpenPopup("Saved!");
+	}
+
+	if (ImGui::BeginPopupModal("Saved!", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+		ImGui::Text("EditorObj saved successfully!");
+		if (ImGui::Button("OK")) {
+			ImGui::CloseCurrentPopup();
+			success = false;
+		}
+		ImGui::EndPopup();
+	}
+}
+
+void JsonSerializer::LoadedPopup(bool& success) {
+	if (success) {
+		ImGui::OpenPopup("Loaded!");
+	}
+	if (ImGui::BeginPopupModal("Loaded!", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+		ImGui::Text("EditorObj loaded successfully!");
+		if (ImGui::Button("OK")) {
+			ImGui::CloseCurrentPopup();
+			success = false;
+		}
+		ImGui::EndPopup();
+	}
+}
+
+void JsonSerializer::LoadErrorPopup(bool& error, const std::string& filePath) {
+	if (error) {
+		ImGui::OpenPopup("Load Error");
+	}
+	if (ImGui::BeginPopupModal("Load Error", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+		ImGui::Text("File not found:\n%s", filePath.c_str());
+		if (ImGui::Button("OK")) {
+			ImGui::CloseCurrentPopup();
+			error = false;
+		}
+		ImGui::EndPopup();
+	}
 }

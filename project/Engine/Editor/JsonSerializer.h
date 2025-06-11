@@ -23,4 +23,9 @@ public:
 	static bool DeserializeEditorObj(const std::string& filePath, EditorObj& obj, bool isCreateCommand = false);
 
 
+	// Popup
+	static void SavedPopup(bool& success);
+	static void LoadedPopup(bool& success);
+	static void LoadErrorPopup(bool& error, const std::string& filePath);
+
 };
