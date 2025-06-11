@@ -34,6 +34,11 @@ void TitleScene::Initialize() {
 	skybox_->SetCommonResources(dxcommon_, SRVManager::GetInstance(), CameraManager::GetInstance()->GetCamera());
 	skybox_->Initialize();
 
+	terrain_ = std::make_unique<Object3d>();
+	terrain_->Create("terrain.obj");
+	terrain_->LoadTransformFromJson("default_terrainTrnasform.json");
+	terrain_->SetUVScale({ 20.0f,20.0f }, { 0.0f,0.0f });
+
 	sphere = std::make_unique<Object3d>();
 	sphere->Create("Fence.obj");
 	sphere->transform.translate.x = 4.0f;
@@ -107,6 +112,8 @@ void TitleScene::Draw() {
 	skybox_->Draw();
 
 	obj3dCommon->PreDraw();
+	terrain_->Draw();
+
 	sphere->Draw();
 	sphere2->Draw();
 	//test_->Draw();

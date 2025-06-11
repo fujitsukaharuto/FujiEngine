@@ -20,6 +20,8 @@ DebugCamera* DebugCamera::GetInstance() {
 void DebugCamera::Initialize() {
 	matRot_ = MakeIdentity4x4();
 	viewMatrix_ = MakeIdentity4x4();
+	translation_ = { 0.0f,5.0f,-30.0f };
+	pitch_ = 0.15f;
 	projectionMatrix_ = MakePerspectiveFovMatrix(0.45f, float(MyWin::kWindowWidth) / float(MyWin::kWindowHeight), 0.1f, 100.0f);
 }
 
@@ -40,31 +42,32 @@ void DebugCamera::InputUpdate() {
 		moveTrans_.z += zoomSpeed * wheel; // ズームの方向
 	}
 
-	// マウスのドラッグで回転
 	Vector2 mousePos = Input::GetInstance()->GetMousePosition();
-	if (Input::GetInstance()->IsPressMouse(0)) {
-		// ドラッグによる角度の更新
-		float deltaX = mousePos.x - lastMousePos_.x;
-		float deltaY = mousePos.y - lastMousePos_.y;
+	// マウスのドラッグで回転
+	if (Input::GetInstance()->PushKey(DIK_LCONTROL)) {
+		if (Input::GetInstance()->IsPressMouse(0)) {
+			// ドラッグによる角度の更新
+			float deltaX = mousePos.x - lastMousePos_.x;
+			float deltaY = mousePos.y - lastMousePos_.y;
 
-		// ノイズを除去するための閾値を設定
-		const float threshold = 0.1f; // 調整可能な閾値
+			// ノイズを除去するための閾値を設定
+			const float threshold = 0.1f; // 調整可能な閾値
 
-		// 閾値以下の値を 0 とみなす
-		if (fabs(deltaY) < threshold) deltaY = 0.0f;
-		if (fabs(deltaX) < threshold) deltaX = 0.0f;
+			// 閾値以下の値を 0 とみなす
+			if (fabs(deltaY) < threshold) deltaY = 0.0f;
+			if (fabs(deltaX) < threshold) deltaX = 0.0f;
 
 
-		const float rotationSpeed = 0.01f;
-		yaw_ += deltaX * rotationSpeed;  // 横の回転
-		pitch_ += deltaY * rotationSpeed; // 縦の回転
+			const float rotationSpeed = 0.01f;
+			yaw_ += deltaX * rotationSpeed;  // 横の回転
+			pitch_ += deltaY * rotationSpeed; // 縦の回転
 
-		// pitch_の回転範囲を制限 (-89度～89度程度)
-		const float pitchLimit = 90.0f * (std::numbers::pi_v<float> / 180.0f); // ラジアン変換
-		if (pitch_ > pitchLimit) pitch_ = pitchLimit;
-		if (pitch_ < -pitchLimit) pitch_ = -pitchLimit;
+			// pitch_の回転範囲を制限 (-89度～89度程度)
+			const float pitchLimit = 90.0f * (std::numbers::pi_v<float> / 180.0f); // ラジアン変換
+			if (pitch_ > pitchLimit) pitch_ = pitchLimit;
+			if (pitch_ < -pitchLimit) pitch_ = -pitchLimit;
+		}
 	}
-
 	// マウスの位置を更新
 	lastMousePos_ = { mousePos.x, mousePos.y };
 }
