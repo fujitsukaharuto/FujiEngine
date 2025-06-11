@@ -90,7 +90,7 @@ void PipelineManager::CreatePipeline() {
 
 
 	particlePiplineSub.reset(new ParticlePipeline());
-	//particlePiplineSub->SetIsSubMode(true);
+	particlePiplineSub->SetIsSubMode(true);
 	particlePiplineSub->Initialize(dxcommon_);
 	pipelines_.push_back(std::move(particlePiplineSub));
 
