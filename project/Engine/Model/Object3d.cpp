@@ -247,6 +247,11 @@ void Object3d::DebugGUI() {
 		Vector4 color = model_->GetColor(0);
 		ImGui::ColorEdit4("color", &color.x);
 		SetColor(color);
+		Vector2 uvScale = model_->GetUVScale();
+		Vector2 uvTrans = model_->GetUVTrans();
+		ImGui::DragFloat2("uvScale", &uvScale.x, 0.1f);
+		ImGui::DragFloat2("uvTrans", &uvTrans.x, 0.1f);
+		SetUVScale(uvScale, uvTrans);
 		SetTextureNode();
 		ImGui::TreePop();
 	}

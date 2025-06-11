@@ -46,6 +46,10 @@ public:
 
 	Vector4 GetColor(int index) { return material_[index].GetColor(); }
 
+	Vector2 GetUVScale() { return uvScale_; }
+
+	Vector2 GetUVTrans() { return uvTrans_; }
+
 	void SetLightEnable(LightMode mode);
 
 	ModelData data_;
@@ -63,6 +67,9 @@ private:
 	std::vector<Material> material_;
 	std::vector<Mesh> mesh_;
 	std::string nowTextuer;
+
+	Vector2 uvScale_;
+	Vector2 uvTrans_;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> skinningInformation_;
 	SkinningInformation* infoData_;
