@@ -152,7 +152,7 @@ void CommandManager::DebugGUI() {
 
 		// 入力欄クリア
 		std::memset(newObjName, 0, sizeof(newObjName));
-	}
+	}ImGui::SameLine();
 
 	if (!loadObj) {
 		loadObj = std::make_unique<EditorObj>();
