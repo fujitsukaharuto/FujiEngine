@@ -120,6 +120,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\DX\OffscreenManager.cpp" />
     <ClCompile Include="Engine\DX\SRVManager.cpp" />
     <ClCompile Include="Engine\Editor\CommandManager.cpp" />
+    <ClCompile Include="Engine\Editor\CreateObjCommand.cpp" />
+    <ClCompile Include="Engine\Editor\DeleteObjCommand.cpp" />
     <ClCompile Include="Engine\Editor\JsonSerializer.cpp" />
     <ClCompile Include="Engine\GlobalVariables\GlobalVariables.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\AnimationPipeline.cpp" />
@@ -214,6 +216,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\DX\OffscreenManager.h" />
     <ClInclude Include="Engine\DX\SRVManager.h" />
     <ClInclude Include="Engine\Editor\CommandManager.h" />
+    <ClInclude Include="Engine\Editor\CreateObjCommand.h" />
+    <ClInclude Include="Engine\Editor\DeleteObjCommand.h" />
     <ClInclude Include="Engine\Editor\ICommand.h" />
     <ClInclude Include="Engine\Editor\JsonSerializer.h" />
     <ClInclude Include="Engine\Editor\PropertyCommand.h" />

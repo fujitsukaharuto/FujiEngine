@@ -8,6 +8,7 @@
 #include "Model/Line3dDrawer.h"
 #include "Particle/ParticleManager.h"
 #include "Scene/SceneManager.h"
+#include "Engine/Editor/CommandManager.h"
 
 
 TitleScene::TitleScene() {}
@@ -32,6 +33,11 @@ void TitleScene::Initialize() {
 	skybox_ = std::make_unique<SkyBox>();
 	skybox_->SetCommonResources(dxcommon_, SRVManager::GetInstance(), CameraManager::GetInstance()->GetCamera());
 	skybox_->Initialize();
+
+	terrain_ = std::make_unique<Object3d>();
+	terrain_->Create("terrain.obj");
+	terrain_->LoadTransformFromJson("default_terrainTrnasform.json");
+	terrain_->SetUVScale({ 20.0f,20.0f }, { 0.0f,0.0f });
 
 	sphere = std::make_unique<Object3d>();
 	sphere->Create("Fence.obj");
@@ -106,9 +112,16 @@ void TitleScene::Draw() {
 	skybox_->Draw();
 
 	obj3dCommon->PreDraw();
+	terrain_->Draw();
+
 	sphere->Draw();
 	sphere2->Draw();
 	//test_->Draw();
+
+#ifdef _DEBUG
+	CommandManager::GetInstance()->Draw();
+#endif // _DEBUG
+
 
 	obj3dCommon->PreAnimationDraw();
 	cube_->Draw();

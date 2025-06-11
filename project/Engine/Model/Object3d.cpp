@@ -18,7 +18,9 @@ Object3d::Object3d() {
 	lightManager_ = ModelManager::GetInstance()->ShareLight();
 
 #ifdef _DEBUG
-	nodeEditorContext_ = ax::NodeEditor::CreateEditor();
+	ax::NodeEditor::Config config;
+	config.SettingsFile = "resource/NodeEditor/NodeEditor.json";
+	nodeEditorContext_ = CreateEditor(&config);
 
 	MyNode texNode;
 	texNode.id = ImGuiManager::GetInstance()->GenerateNodeId();
@@ -248,6 +250,23 @@ void Object3d::DebugGUI() {
 		SetTextureNode();
 		ImGui::TreePop();
 	}
+
+	if (ImGui::TreeNodeEx("SetModel", flags)) {
+		static char modelNameBuf[128] = ""; // 入力用バッファ（初期は空）
+
+		ImGui::Text("Enter Model Name:");
+		if (ImGui::InputText("##ModelName", modelNameBuf, IM_ARRAYSIZE(modelNameBuf))) {
+			// 入力中もしくは確定時に毎フレームここに入る
+			// 必要ならここでリアルタイムに反映などもできる
+		}
+
+		if (ImGui::Button("Set Model")) {
+			// モデル名の設定を反映
+			SetModel(modelNameBuf);
+		}
+
+		ImGui::TreePop();
+	}
 	ImGui::Unindent();
 #endif // _DEBUG
 }
@@ -283,6 +302,7 @@ void Object3d::SetLightEnable(LightMode mode) {
 void Object3d::SetModel(const std::string& fileName) {
 	model_ = std::make_unique<Model>();
 	model_->data_ = ModelManager::FindModel(fileName);
+	modelName_ = fileName;
 
 	for (size_t i = 0; i < model_->data_.meshes.size(); i++) {
 		Mesh newMesh{};

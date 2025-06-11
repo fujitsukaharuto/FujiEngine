@@ -275,6 +275,12 @@
     <ClCompile Include="Game\GameObj\Enemy\Behavior\BossBeamAttack.cpp">
       <Filter>Game\GameObj\Enemy\Behavior</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Editor\CreateObjCommand.cpp">
+      <Filter>Engine\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Editor\DeleteObjCommand.cpp">
+      <Filter>Engine\Editor</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -603,6 +609,12 @@
     </ClInclude>
     <ClInclude Include="Game\GameObj\Enemy\Behavior\BossBeamAttack.h">
       <Filter>Game\GameObj\Enemy\Behavior</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Editor\CreateObjCommand.h">
+      <Filter>Engine\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Editor\DeleteObjCommand.h">
+      <Filter>Engine\Editor</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

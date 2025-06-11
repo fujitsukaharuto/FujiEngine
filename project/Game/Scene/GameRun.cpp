@@ -218,6 +218,10 @@ void GameRun::DebugGUI() {
 			sceneManager_->DebugGUI();
 			ImGui::EndTabItem();
 		}
+		if (ImGui::BeginTabItem("EditorObject")) {
+			commandManger_->DebugGUI();
+			ImGui::EndTabItem();
+		}
 		if (ImGui::BeginTabItem("Camera")) {
 			cameraManager_->GetCamera()->DebugGUI();
 			ImGui::EndTabItem();

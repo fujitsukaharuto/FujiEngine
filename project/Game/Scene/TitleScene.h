@@ -23,10 +23,10 @@ private:
 
 	std::unique_ptr<Object3dCommon> obj3dCommon = nullptr;
 	std::unique_ptr<SkyBox> skybox_;
+	std::unique_ptr<Object3d> terrain_ = nullptr;
 	std::unique_ptr<Object3d> sphere = nullptr;
 	std::unique_ptr<Object3d> sphere2 = nullptr;
 	std::unique_ptr<AnimationModel> cube_ = nullptr;
-	Vector3 rightDir = { 1.0f,0.0f,0.0f };
 
 	ParticleEmitter emit;
 

@@ -1,10 +1,30 @@
 #pragma once
 #include <stack>
 #include <memory>
+#include <string>
+#include <cstring>
 
 #include "Engine/Editor/ICommand.h"
 #include "Engine/Editor/PropertyCommand.h"
+#include "Engine/Editor/CreateObjCommand.h"
+#include "Engine/Editor/DeleteObjCommand.h"
 
+#include "Engine/Model/Object3d.h"
+
+
+struct EditorObj {
+	int id;
+	std::unique_ptr<Object3d> obj;
+	bool isActive = true;
+	std::string name;
+	std::string modelName;
+};
+
+struct LoadEditorObjData {
+	std::string name;
+	std::string modelName;
+	Trans trnasform;
+};
 
 class CommandManager {
 public:
@@ -39,7 +59,27 @@ public:
 		}
 	}
 
+
+	void Draw();
+	void DebugGUI();
+	std::shared_ptr<EditorObj> GetEditorObject(int id) const;
+	void GarbageCollect();
+
+	std::unordered_map<int, std::shared_ptr<EditorObj>> objectList;
+	std::unordered_map<int, std::string> headerNames;
+	std::unordered_map<int, size_t> nameHashes;
+
+private:
+
+	void EditorOBJSave(const std::string& filePath);
+	void SaveAllEditorOBJ();
+	bool EditorOBJLoad(const std::string& filePath);
+	void LoadAllEditorOBJ();
+
 private:
 	std::stack<std::unique_ptr<ICommand>> undoStack;
 	std::stack<std::unique_ptr<ICommand>> redoStack;
+
+	int nextObjId = 0;
+	std::unique_ptr<EditorObj> loadObj;
 };
