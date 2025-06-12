@@ -3,6 +3,7 @@
 #include "DXCom.h"
 #include "LightManager.h"
 #include "CameraManager.h"
+#include "Engine/Input/Input.h"
 #include "Engine/ImGuiManager/ImGuiManager.h"
 #include "Engine/Editor/CommandManager.h"
 #include "Engine/Editor/PropertyCommand.h"
@@ -23,38 +24,29 @@ Object3d::Object3d() {
 	nodeEditorContext_ = CreateEditor(&config);
 
 	MyNode texNode;
-	texNode.id = ImGuiManager::GetInstance()->GenerateNodeId();
-	texNode.name = "TextureInput";
-	texNode.type = MyNode::NodeType::Texture;
-	texNode.inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input });
-	texNode.outputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Output });
+	texNode.CreateNode(MyNode::NodeType::Texture);
+	texNode.texName = "checkerBoard.png";
 	texNode.evaluator = [](auto&&) {
 		Value v;
+		v = "checkerBoard.png";
 		v.type = Value::Type::Texture;
-		v.textureName = "checkerBoard.png";
 		return v;
 		};
 	nodeGraph_.AddNode(texNode);
 
 	MyNode texNode2;
-	texNode2.id = ImGuiManager::GetInstance()->GenerateNodeId();
-	texNode2.name = "TextureInput2";
-	texNode2.type = MyNode::NodeType::Texture;
-	texNode2.inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input });
-	texNode2.outputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Output });
+	texNode2.CreateNode(MyNode::NodeType::Texture);
+	texNode2.texName = "uvChecker.png";
 	texNode2.evaluator = [](auto&&) {
 		Value v;
+		v = "uvChecker.png";
 		v.type = Value::Type::Texture;
-		v.textureName = "uvChecker.png";
 		return v;
 		};
 	nodeGraph_.AddNode(texNode2);
 
 	MyNode selNode;
-	selNode.id = ImGuiManager::GetInstance()->GenerateNodeId();
-	selNode.name = "Selector";
-	selNode.type = MyNode::NodeType::Selector;
-	selNode.inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input });
+	selNode.CreateNode(MyNode::NodeType::Material);
 	selNode.evaluator = [](const std::vector<Value>& inputs) {
 		return !inputs.empty() ? inputs[0] : Value();
 		};
@@ -435,7 +427,7 @@ void Object3d::SetTextureNode() {
 		if (selNode) {
 			Value out = nodeGraph_.EvaluateNode(*selNode);
 			if (out.type == Value::Type::Texture) {
-				SetTexture(out.textureName);
+				SetTexture(out.Get<std::string>());
 			}
 		}
 	}
@@ -450,6 +442,26 @@ void Object3d::SetTextureNode() {
 				pin.isLinked = true;
 			else pin.isLinked = false;
 	}
+
+	/*auto openPopupPosition = ImGui::GetMousePos();
+	ed::Suspend();
+	if (ed::ShowBackgroundContextMenu()) {
+		if (Input::GetInstance()->IsTriggerMouse(1)) {
+
+		}
+		ImGui::OpenPopup("Create New Node");
+	}
+	ed::Resume();
+
+	ed::Suspend();
+	if (ImGui::BeginPopup("Create New Node")) {
+		if (ImGui::MenuItem("click")) {
+			int a = 1;
+			a = 2;
+		}
+			
+	}
+	ed::Resume();*/
 
 	if (!nodeEditorContext_) {
 		nodeEditorContext_ = ax::NodeEditor::CreateEditor();

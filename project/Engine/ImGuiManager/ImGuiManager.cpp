@@ -248,6 +248,11 @@ void ImGuiManager::DrawNode(const MyNode& node, ed::Utilities::BlueprintNodeBuil
 		builder.EndOutput();
 	}
 
+	if (node.type == MyNode::NodeType::Texture) {
+		ImGui::Dummy(ImVec2(5.0f, 0.0f)); ImGui::SameLine();
+		ImGui::Image((ImTextureID)TextureManager::GetInstance()->GetTexture(node.texName)->gpuHandle.ptr, { 70,70 });
+	}
+
 	builder.End();
 }
 

@@ -1,4 +1,5 @@
 #include "NodeGraph.h"
+#include "Engine/ImGuiManager/ImGuiManager.h"
 #ifdef _DEBUG
 #include "imgui_impl_dx12.h"
 #include "imgui_impl_win32.h"
@@ -84,4 +85,37 @@ void NodeGraph::ClearResults() {
 
 
 
+#endif // _DEBUG
+
+#ifdef _DEBUG
+void MyNode::CreateNode(NodeType nodeType) {
+
+	id = ImGuiManager::GetInstance()->GenerateNodeId();
+	switch (nodeType) {
+	case MyNode::NodeType::Texture:
+
+		name = "TextureInput";
+		type = MyNode::NodeType::Texture;
+		inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input });
+		outputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Output });
+
+		break;
+	case MyNode::NodeType::Float:
+		break;
+	case MyNode::NodeType::Add:
+		break;
+	case MyNode::NodeType::Material:
+
+		name = "Material";
+		type = MyNode::NodeType::Material;
+		inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input });
+		evaluator = [](const std::vector<Value>& inputs) {
+			return !inputs.empty() ? inputs[0] : Value();
+			};
+
+		break;
+	default:
+		break;
+	}
+}
 #endif // _DEBUG
