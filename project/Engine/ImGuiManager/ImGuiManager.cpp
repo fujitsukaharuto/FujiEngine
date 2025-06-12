@@ -3,6 +3,7 @@
 #include "DXCom.h"
 #include "MyWindow.h"
 #include "SRVManager.h"
+#include "Engine/Input/Input.h"
 #include "Engine/Editor/JsonSerializer.h"
 #include "Engine/Model/TextureManager.h"
 #ifdef _DEBUG
@@ -260,6 +261,29 @@ void ImGuiManager::DrawNodeEditor(NodeGraph* nodeGraph) {
 	ed::Begin("My Node Editor");
 
 	ed::Utilities::BlueprintNodeBuilder builder((ImTextureID)backGroundHandle_.ptr, 126, 126);
+
+	// 右クリックでMenuを出す
+	/*auto openPopupPosition = ImGui::GetMousePos();
+	ed::Suspend();
+	if (ed::ShowBackgroundContextMenu()) {
+		if (Input::GetInstance()->IsTriggerMouse(1)) {
+
+		}
+		ImGui::OpenPopup("Create New Node");
+	}
+	ed::Resume();
+
+	ed::Suspend();
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8, 8));
+	if (ImGui::BeginPopup("Create New Node")) {
+		if (ImGui::MenuItem("click")) {
+			int a = 1;
+			a = 2;
+		}
+		ImGui::EndPopup();
+	}
+	ImGui::PopStyleVar();
+	ed::Resume();*/
 
 	for (const auto& node : nodeGraph->nodes) {
 		DrawNode(node, builder);

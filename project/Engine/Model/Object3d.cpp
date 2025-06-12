@@ -3,7 +3,6 @@
 #include "DXCom.h"
 #include "LightManager.h"
 #include "CameraManager.h"
-#include "Engine/Input/Input.h"
 #include "Engine/ImGuiManager/ImGuiManager.h"
 #include "Engine/Editor/CommandManager.h"
 #include "Engine/Editor/PropertyCommand.h"
@@ -442,26 +441,6 @@ void Object3d::SetTextureNode() {
 				pin.isLinked = true;
 			else pin.isLinked = false;
 	}
-
-	/*auto openPopupPosition = ImGui::GetMousePos();
-	ed::Suspend();
-	if (ed::ShowBackgroundContextMenu()) {
-		if (Input::GetInstance()->IsTriggerMouse(1)) {
-
-		}
-		ImGui::OpenPopup("Create New Node");
-	}
-	ed::Resume();
-
-	ed::Suspend();
-	if (ImGui::BeginPopup("Create New Node")) {
-		if (ImGui::MenuItem("click")) {
-			int a = 1;
-			a = 2;
-		}
-			
-	}
-	ed::Resume();*/
 
 	if (!nodeEditorContext_) {
 		nodeEditorContext_ = ax::NodeEditor::CreateEditor();
