@@ -5,6 +5,8 @@
 
 Model::Model() {
 	data_.rootNode.local = MakeIdentity4x4();
+	uvScale_ = { 1.0f,1.0f };
+	uvTrans_ = { 0.0f,0.0f };
 }
 
 Model::~Model() {
@@ -75,6 +77,8 @@ void Model::SetColor(const Vector4& color) {
 }
 
 void Model::SetUVScale(const Vector2& scale, const Vector2& uvTrans) {
+	uvScale_ = scale;
+	uvTrans_ = uvTrans;
 	for (Material& material : material_) {
 		material.SetUVScale(scale, uvTrans);
 	}

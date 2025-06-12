@@ -23,38 +23,29 @@ Object3d::Object3d() {
 	nodeEditorContext_ = CreateEditor(&config);
 
 	MyNode texNode;
-	texNode.id = ImGuiManager::GetInstance()->GenerateNodeId();
-	texNode.name = "TextureInput";
-	texNode.type = MyNode::NodeType::Texture;
-	texNode.inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input });
-	texNode.outputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Output });
+	texNode.CreateNode(MyNode::NodeType::Texture);
+	texNode.texName = "checkerBoard.png";
 	texNode.evaluator = [](auto&&) {
 		Value v;
+		v = "checkerBoard.png";
 		v.type = Value::Type::Texture;
-		v.textureName = "checkerBoard.png";
 		return v;
 		};
 	nodeGraph_.AddNode(texNode);
 
 	MyNode texNode2;
-	texNode2.id = ImGuiManager::GetInstance()->GenerateNodeId();
-	texNode2.name = "TextureInput2";
-	texNode2.type = MyNode::NodeType::Texture;
-	texNode2.inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input });
-	texNode2.outputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Output });
+	texNode2.CreateNode(MyNode::NodeType::Texture);
+	texNode2.texName = "uvChecker.png";
 	texNode2.evaluator = [](auto&&) {
 		Value v;
+		v = "uvChecker.png";
 		v.type = Value::Type::Texture;
-		v.textureName = "uvChecker.png";
 		return v;
 		};
 	nodeGraph_.AddNode(texNode2);
 
 	MyNode selNode;
-	selNode.id = ImGuiManager::GetInstance()->GenerateNodeId();
-	selNode.name = "Selector";
-	selNode.type = MyNode::NodeType::Selector;
-	selNode.inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input });
+	selNode.CreateNode(MyNode::NodeType::Material);
 	selNode.evaluator = [](const std::vector<Value>& inputs) {
 		return !inputs.empty() ? inputs[0] : Value();
 		};
@@ -247,6 +238,11 @@ void Object3d::DebugGUI() {
 		Vector4 color = model_->GetColor(0);
 		ImGui::ColorEdit4("color", &color.x);
 		SetColor(color);
+		Vector2 uvScale = model_->GetUVScale();
+		Vector2 uvTrans = model_->GetUVTrans();
+		ImGui::DragFloat2("uvScale", &uvScale.x, 0.1f);
+		ImGui::DragFloat2("uvTrans", &uvTrans.x, 0.1f);
+		SetUVScale(uvScale, uvTrans);
 		SetTextureNode();
 		ImGui::TreePop();
 	}
@@ -430,7 +426,7 @@ void Object3d::SetTextureNode() {
 		if (selNode) {
 			Value out = nodeGraph_.EvaluateNode(*selNode);
 			if (out.type == Value::Type::Texture) {
-				SetTexture(out.textureName);
+				SetTexture(out.Get<std::string>());
 			}
 		}
 	}

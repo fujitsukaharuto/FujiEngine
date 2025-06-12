@@ -3,6 +3,9 @@
 #include <string>
 #include <functional>
 #include <cstdint>
+#include <variant>
+#include "Engine/Math/Vector/Vector2.h"
+#include "Engine/Math/Vector/Vector3.h"
 #ifdef _DEBUG
 #include "imgui.h"
 #include "imgui_node_editor.h"
@@ -12,24 +15,56 @@ namespace ed = ax::NodeEditor;
 
 #ifdef _DEBUG
 struct Value {
-	enum class Type { None, Int, Float, Vector2, Vector3, Texture } type = Type::None;
 
-	union {
-		int     intValue;
-		float   floatValue;
-		float   vec2Value[2];
-		float   vec3Value[3];
-	};
+	enum class Type { None, Int, Float, Vector2, Vector3, Texture };
 
-	std::string textureName;
+	// 実データ本体（variant にすべて詰め込む）
+	std::variant<std::monostate, int, float, Vector2, Vector3, std::string> data;
 
-	Value() : type(Type::None), intValue(0) {}
+	// タイプを明示的に持っておく（オプション）
+	Type type = Type::None;
+
+	// コンストラクタ（型推論対応）
+	Value() : data(std::monostate{}), type(Type::None) {}
+	Value(int v) : data(v), type(Type::Int) {}
+	Value(float v) : data(v), type(Type::Float) {}
+	Value(const Vector2& v) : data(v), type(Type::Vector2) {}
+	Value(const Vector3& v) : data(v), type(Type::Vector3) {}
+	Value(const std::string& texName) : data(texName), type(Type::Texture) {}
+	Value(const char* texName) : data(std::string(texName)), type(Type::Texture) {}
+
+	// ヘルパー関数
+	bool IsValid() const {
+		return type != Type::None;
+	}
+
+	// 型チェック（テンプレートベース）
+	template<typename T>
+	bool Is() const {
+		return std::holds_alternative<T>(data);
+	}
+
+	// 値取得（安全な参照取得、存在しなければ例外）
+	template<typename T>
+	const T& Get() const {
+		return std::get<T>(data);
+	}
+
+	// 値取得（デフォルト値付きで安全）
+	template<typename T>
+	T GetOr(const T& defaultValue) const {
+		if (std::holds_alternative<T>(data)) {
+			return std::get<T>(data);
+		}
+		return defaultValue;
+	}
 };
 
 struct Pin {
 	ed::PinId id;
 	bool isLinked = false;
 	enum class Type { Input, Output } type;
+	//enum class PinType { Texture, };
 };
 
 struct MyNode {
@@ -42,13 +77,17 @@ struct MyNode {
 		Texture,
 		Float,
 		Add,
-		Selector,
+		Material,
 		// 追加予定のノード種類…
 	} type;
 
 	Value result; // ← ★ これがノードの出力
 
+	std::string texName;
+
 	std::function<Value(const std::vector<Value>&)> evaluator; // 入力 → 出力
+
+	void CreateNode(NodeType nodeType);
 };
 
 struct Link {

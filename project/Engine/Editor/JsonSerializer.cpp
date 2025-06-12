@@ -356,6 +356,7 @@ bool JsonSerializer::DeserializeEditorObj(const std::string& filePath, EditorObj
 }
 
 void JsonSerializer::SavedPopup(bool& success) {
+#ifdef _DEBUG
 	if (success) {
 		ImGui::OpenPopup("Saved!");
 	}
@@ -368,9 +369,11 @@ void JsonSerializer::SavedPopup(bool& success) {
 		}
 		ImGui::EndPopup();
 	}
+#endif // _DEBUG
 }
 
 void JsonSerializer::LoadedPopup(bool& success) {
+#ifdef _DEBUG
 	if (success) {
 		ImGui::OpenPopup("Loaded!");
 	}
@@ -382,9 +385,11 @@ void JsonSerializer::LoadedPopup(bool& success) {
 		}
 		ImGui::EndPopup();
 	}
+#endif // _DEBUG
 }
 
 void JsonSerializer::LoadErrorPopup(bool& error, const std::string& filePath) {
+#ifdef _DEBUG
 	if (error) {
 		ImGui::OpenPopup("Load Error");
 	}
@@ -396,4 +401,5 @@ void JsonSerializer::LoadErrorPopup(bool& error, const std::string& filePath) {
 		}
 		ImGui::EndPopup();
 	}
+#endif // _DEBUG
 }

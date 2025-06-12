@@ -48,6 +48,7 @@ public:
 
 	void CheckInputForUndoRedo();
 	void Reset();
+	void StackReset();
 	void Finalize();
 
 

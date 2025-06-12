@@ -26,7 +26,7 @@ void OffscreenManager::Update() {
 
 void OffscreenManager::DebugGUI() {
 #ifdef _DEBUG
-	ImGui::Begin("debug");
+	ImGui::Begin("OffScreen Debug");
 
 
 	bool preIsGrayscale_ = isGrayscale_;

@@ -43,29 +43,8 @@
             }
         },
         {
-            "modelName": "suzanne.obj",
-            "objectName": "EditorObj2",
-            "transform": {
-                "rotate": [
-                    -3.1415908336639404,
-                    -0.4497814178466797,
-                    -3.1415908336639404
-                ],
-                "scale": [
-                    0.9999984502792358,
-                    1.0,
-                    0.9999984502792358
-                ],
-                "translate": [
-                    -0.2543068826198578,
-                    6.675440311431885,
-                    0.0
-                ]
-            }
-        },
-        {
-            "modelName": "terrain.obj",
-            "objectName": "EditorObj3",
+            "modelName": "Sphere",
+            "objectName": "NewObject",
             "transform": {
                 "rotate": [
                     0.0,
@@ -80,6 +59,27 @@
                 "translate": [
                     0.0,
                     0.0,
+                    0.0
+                ]
+            }
+        },
+        {
+            "modelName": "terrain.obj",
+            "objectName": "EditorObj5",
+            "transform": {
+                "rotate": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "translate": [
+                    -1.945447564125061,
+                    2.4666693210601807,
                     0.0
                 ]
             }
