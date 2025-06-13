@@ -24,6 +24,8 @@ public:
 
 	void InitParameter();
 
+	void Walk();
+
 	void UpdateWaveWall();
 	void WaveWallAttack();
 

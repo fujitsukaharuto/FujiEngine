@@ -134,29 +134,6 @@ void Boss::Initialize() {
 void Boss::Update() {
 	behavior_->Update();
 
-	if (BossRoot* behavior = dynamic_cast<BossRoot*>(behavior_.get())) {
-		Vector3 dir = pPlayer_->GetWorldPos() - model_->transform.translate;
-		dir.y = 0.0f; // 水平方向だけに限定
-		dir = dir.Normalize();
-
-		// 目標のY軸角度（ラジアン）
-		float targetAngle = std::atan2(dir.x, dir.z); // Z前方軸に対する角度
-
-		// 現在のY軸角度（モデルの回転）
-		float currentAngle = model_->transform.rotate.y;
-
-		// 角度差を -π〜+π にラップ
-		float delta = targetAngle - currentAngle;
-		if (delta > std::numbers::pi_v<float>) delta -= 2.0f * std::numbers::pi_v<float>;
-		if (delta < -std::numbers::pi_v<float>) delta += 2.0f * std::numbers::pi_v<float>;
-
-		// 角度補間（例えば線形補間）
-		float lerpFactor = 0.1f; // 追従の速さ
-		float newAngle = currentAngle + delta * lerpFactor;
-
-		model_->transform.rotate.y = newAngle;
-	}
-
 	core_->Update();
 
 	beam_->Update();
@@ -210,6 +187,35 @@ void Boss::InitParameter() {
 		walls_.push_back(std::move(wall));
 	}
 
+}
+
+void Boss::Walk() {
+	if (BossRoot* behavior = dynamic_cast<BossRoot*>(behavior_.get())) {
+		Vector3 dir = pPlayer_->GetWorldPos() - model_->transform.translate;
+		dir.y = 0.0f; // 水平方向だけに限定
+		dir = dir.Normalize();
+
+		// 目標のY軸角度（ラジアン）
+		float targetAngle = std::atan2(dir.x, dir.z); // Z前方軸に対する角度
+
+		Vector3 front = Vector3(0.0f, 0.0f, 1.0f) * 0.05f * FPSKeeper::DeltaTime();
+		front = TransformNormal(front, MakeRotateYMatrix(targetAngle));
+		model_->transform.translate += front;
+
+		// 現在のY軸角度（モデルの回転）
+		float currentAngle = model_->transform.rotate.y;
+
+		// 角度差を -π〜+π にラップ
+		float delta = targetAngle - currentAngle;
+		if (delta > std::numbers::pi_v<float>) delta -= 2.0f * std::numbers::pi_v<float>;
+		if (delta < -std::numbers::pi_v<float>) delta += 2.0f * std::numbers::pi_v<float>;
+
+		// 角度補間（例えば線形補間）
+		float lerpFactor = 0.1f; // 追従の速さ
+		float newAngle = currentAngle + delta * lerpFactor;
+
+		model_->transform.rotate.y = newAngle;
+	}
 }
 
 void Boss::UpdateWaveWall() {

@@ -22,6 +22,7 @@ void BossRoot::Update() {
 	case BossRoot::Step::ROOT:
 		if (cooldown_ > 0.0f) {
 			cooldown_ -= FPSKeeper::DeltaTime();
+			pBoss_->Walk();
 		} else if (cooldown_ <= 0.0f) {
 			step_ = Step::TOATTACK;
 			break;

@@ -96,7 +96,7 @@ void GameScene::Update() {
 	player_->SetTargetPos(boss_->GetBossCore()->GetWorldPos());
 	player_->Update();
 
-	followCamera_->Update();
+	followCamera_->Update(boss_->GetBossCore()->GetWorldPos());
 
 	boss_->Update();
 

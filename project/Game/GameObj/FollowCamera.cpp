@@ -14,7 +14,7 @@ void FollowCamera::Initialize() {
 	camera->transform.rotate.x = 0.13f;
 }
 
-void FollowCamera::Update() {
+void FollowCamera::Update(const Vector3& lockon) {
 
 	//XINPUT_STATE pad;
 	Camera* camera = CameraManager::GetInstance()->GetCamera();
@@ -37,7 +37,7 @@ void FollowCamera::Update() {
 	//	}
 	//}
 
-	Vector3 lockOnPosition = Vector3(0.0f, 4.0f, 5.0f);
+	Vector3 lockOnPosition = lockon;
 	Vector3 sub = lockOnPosition - target_->translate;
 
 	destinationAngleY_ = std::atan2(sub.x, sub.z);
