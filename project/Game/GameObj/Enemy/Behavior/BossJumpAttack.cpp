@@ -3,7 +3,7 @@
 #include "Game/GameObj/Enemy/Boss.h"
 #include "BossRoot.h"
 
-BossJumpAttack::BossJumpAttack(Boss* pBoss) : BaseBossBehavior(pBoss) {
+BossJumpAttack::BossJumpAttack(Boss* pBoss, int count) : BaseBossBehavior(pBoss), jumpCount_(count) {
 	step_ = Step::ATTACK;
 	pBoss_->InitJumpAttack();
 }
@@ -20,7 +20,12 @@ void BossJumpAttack::Update() {
 	case BossJumpAttack::Step::ATTACK:
 
 		if (pBoss_->JumpAttack()) {
-			step_ = Step::TOROOT;
+			nowJumpCount_++;
+			if (jumpCount_ == nowJumpCount_) {
+				step_ = Step::TOROOT;
+			} else {
+				pBoss_->InitJumpAttack();
+			}
 		}
 
 		break;

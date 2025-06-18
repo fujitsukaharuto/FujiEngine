@@ -104,6 +104,7 @@ void GameRun::Initialize() {
 
 	// 半透明になる
 	pManager_->CreateParticleGroup("ShockWave", "white.png", 10, ShapeType::SPHERE);
+	pManager_->CreateParticleGroup("JumpShockWave", "white.png", 10, ShapeType::SPHERE);
 
 
 	pManager_->CreateAnimeGroup("animetest", "uvChecker.png");

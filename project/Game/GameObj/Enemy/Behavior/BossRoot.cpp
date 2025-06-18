@@ -44,7 +44,7 @@ void BossRoot::Update() {
 			pBoss_->ChangeBehavior(std::make_unique<BossAttack>(pBoss_));
 			break;
 		case AttackPattern::JumpAttack:
-			pBoss_->ChangeBehavior(std::make_unique<BossJumpAttack>(pBoss_));
+			pBoss_->ChangeBehavior(std::make_unique<BossJumpAttack>(pBoss_, 2));
 			break;
 		}
 		break;

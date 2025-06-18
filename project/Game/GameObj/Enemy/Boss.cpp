@@ -77,11 +77,13 @@ void Boss::Initialize() {
 	ParticleManager::Load(waveAttack2, "ShockWaveGround");
 	ParticleManager::Load(waveAttack3, "ShockWaveParticle");
 	ParticleManager::Load(waveAttack4, "ShockWave");
+	ParticleManager::Load(jumpWave_, "JumpShockWave");
 
 	waveAttack1.frequencyTime_ = 0.0f;
 	waveAttack2.frequencyTime_ = 0.0f;
 	waveAttack3.frequencyTime_ = 0.0f;
 	waveAttack4.frequencyTime_ = 0.0f;
+	jumpWave_.frequencyTime_ = 0.0f;
 
 	waveAttack1.isAddRandomSize_ = true;
 	waveAttack1.addRandomMax_ = { 0.75f,1.2f };
@@ -387,6 +389,7 @@ bool Boss::BeamAttack() {
 
 void Boss::InitJumpAttack() {
 	jumpTime_ = 150.0f;
+	isJumpAttack_ = true;
 }
 
 bool Boss::JumpAttack() {
@@ -405,8 +408,16 @@ bool Boss::JumpAttack() {
 
 	} else if (jumpTime_ < 70.0f && jumpTime_ >= 40.0f) {//70~40 //30
 
-		float flyT = (jumpTime_ - 40.0f) / 30.0f;
-		model_->transform.translate.y = std::lerp(0.0f, jumpHeight_, (1.0f - powf(1.0f - flyT, 4.0f)));
+		float flyT = 1.0f - (jumpTime_ - 40.0f) / 30.0f;
+		model_->transform.translate.y = std::lerp(jumpHeight_, 0.0f, (1.0f - powf(1.0f - flyT, 4.0f)));
+
+		if (std::abs(model_->transform.translate.y) < 0.25f) {
+			if (isJumpAttack_) {
+				jumpWave_.pos_ = model_->transform.translate;
+				jumpWave_.Emit();
+				isJumpAttack_ = false;
+			}
+		}
 
 	} else if (jumpTime_ <= 0.0f) {
 		model_->transform.translate.y = 0.0f;

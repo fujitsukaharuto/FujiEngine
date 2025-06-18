@@ -83,6 +83,7 @@ private:
 
 	float jumpTime_ = 0.0f;
 	float jumpHeight_ = 0.0f;
+	bool isJumpAttack_ = true;
 
 	// emitter
 	ParticleEmitter waveAttack1;
@@ -100,5 +101,6 @@ private:
 	ParticleEmitter charge14_;
 	ParticleEmitter charge15_;
 
+	ParticleEmitter jumpWave_;
 
 };
