@@ -50,6 +50,7 @@ public:
 	//* Getter
 	float GetMoveSpeed() { return moveSpeed_; }
 	float GetJumpSpeed() { return jumpSpeed_; }
+	float GetSecoundJumpSpeed() { return secoundJumpSpeed_; }
 	float GetFallSpeed() { return fallSpeed_; }
 	float GetMaxChargeTime() { return maxChargeTime_; }
 	int GetGrabDir() { return dir_; }
@@ -81,6 +82,7 @@ private:
 
 	float moveSpeed_;
 	float jumpSpeed_;
+	float secoundJumpSpeed_;
 	float fallSpeed_;
 	float gravity_;
 	float maxFallSpeed_;

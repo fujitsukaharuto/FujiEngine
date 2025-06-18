@@ -175,7 +175,9 @@ void GameScene::Draw() {
 void GameScene::DebugGUI() {
 #ifdef _DEBUG
 	ImGui::Indent();
-	
+
+	followCamera_->DebugGUI();
+
 	player_->DebugGUI();
 
 	boss_->DebugGUI();

@@ -2,6 +2,7 @@
 #include "Engine/Input/Input.h"
 #include "Engine/Camera/CameraManager.h"
 #include "Engine/DX/FPSKeeper.h"
+#include "Engine/ImGuiManager/ImGuiManager.h"
 
 FollowCamera::FollowCamera() {
 }
@@ -12,6 +13,7 @@ FollowCamera::~FollowCamera() {
 void FollowCamera::Initialize() {
 	Camera* camera = CameraManager::GetInstance()->GetCamera();
 	camera->transform.rotate.x = 0.13f;
+	offset_ = { 0.0f, 4.0f, -25.0f };
 }
 
 void FollowCamera::Update(const Vector3& lockon) {
@@ -46,7 +48,7 @@ void FollowCamera::Update(const Vector3& lockon) {
 	// X軸
 	float horizontalDistance = std::sqrt(sub.x * sub.x + sub.z * sub.z);
 	float destinationAngleX = std::atan2(-sub.y, horizontalDistance);
-	if (destinationAngleX < -0.09f) {
+	if (destinationAngleX < -0.09f) {//上向きすぎないように
 		destinationAngleX = -0.09f;
 	}
 	camera->transform.rotate.x = LerpShortAngle(camera->transform.rotate.x, destinationAngleX, 0.3f);
@@ -78,11 +80,24 @@ void FollowCamera::Reset() {
 }
 
 Vector3 FollowCamera::OffsetCal() const {
-	Vector3 offset = { 0.0f, 4.0f, -25.0f };
+	Vector3 offset = offset_;
 
 	Camera* camera = CameraManager::GetInstance()->GetCamera();
 	Matrix4x4 rotateCamera = MakeRotateXYZMatrix(camera->transform.rotate);
 	offset = TransformNormal(offset, rotateCamera);
 
 	return offset;
+}
+
+void FollowCamera::DebugGUI() {
+#ifdef _DEBUG
+	if (ImGui::CollapsingHeader("FollowCamera")) {
+		ImGui::Indent();
+		if (target_) {
+			ImGui::Text("Target : X:%0.2f, Y:%0.2f, Z:%0.2f", target_->translate.x, target_->translate.y, target_->translate.z);
+		}
+		ImGui::DragFloat3("Offfset", &offset_.x, 0.1f);
+		ImGui::Unindent();
+	}
+#endif // _DEBUG
 }

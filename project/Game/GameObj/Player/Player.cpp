@@ -26,6 +26,7 @@ void Player::Initialize() {
 	shadow_->transform.scale.y = 0.1f;
 
 	moveSpeed_ = 0.2f;
+	secoundJumpSpeed_ = 0.1f;
 	jumpSpeed_ = 0.2f;
 	gravity_ = 0.005f;
 	maxFallSpeed_ = 2.0f;

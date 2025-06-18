@@ -24,6 +24,8 @@ public:
 
 	void InitParameter();
 
+	void ReduceBossHP(bool isStrong);
+
 	void Walk();
 
 	void UpdateWaveWall();
@@ -33,6 +35,9 @@ public:
 	bool BeamCharge();
 	void BeamChargeComplete();
 	bool BeamAttack();
+
+	void InitJumpAttack();
+	bool JumpAttack();
 
 	//========================================================================*/
 	//* Behavior
@@ -49,7 +54,7 @@ public:
 	BaseCollider* GetCoreCollider() { return core_->GetCollider(); }
 	BossCore* GetBossCore() { return core_.get(); }
 	float GetAttackCooldown() { return attackCooldown_; }
-
+	float GetBossHP() { return bossHp_; }
 
 	void SetPlayer(Player* player) { pPlayer_ = player; }
 
@@ -70,10 +75,14 @@ private:
 	std::vector<std::unique_ptr<Object3d>> chargeParents_;
 	std::unique_ptr<Object3d> waveParent_;
 
+	float bossHp_ = 0.0f;
+
 	float attackCooldown_ = 0.0f;
 	float chargeTime_ = 120.0f;
 	float chargeSize_ = 12.0f;
 
+	float jumpTime_ = 0.0f;
+	float jumpHeight_ = 0.0f;
 
 	// emitter
 	ParticleEmitter waveAttack1;

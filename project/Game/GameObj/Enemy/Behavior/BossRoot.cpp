@@ -4,6 +4,7 @@
 #include "Game/GameObj/Enemy/Boss.h"
 #include "BossAttack.h"
 #include "BossBeamAttack.h"
+#include "BossJumpAttack.h"
 
 BossRoot::BossRoot(Boss* pBoss) : BaseBossBehavior(pBoss) {
 	step_ = Step::ROOT;
@@ -42,6 +43,9 @@ void BossRoot::Update() {
 		case AttackPattern::Wave:
 			pBoss_->ChangeBehavior(std::make_unique<BossAttack>(pBoss_));
 			break;
+		case AttackPattern::JumpAttack:
+			pBoss_->ChangeBehavior(std::make_unique<BossJumpAttack>(pBoss_));
+			break;
 		}
 		break;
 	}
@@ -60,6 +64,7 @@ AttackPattern BossRoot::ChooseNextAttack() {
 	std::vector<AttackInfo> patterns = {
 	{ AttackPattern::Beam, 1.0f },   // レアなので低め
 	{ AttackPattern::Wave, 1.0f },
+	{ AttackPattern::JumpAttack, 1.0f },
 	// ここに新しい攻撃を追加
 	};
 

@@ -179,6 +179,10 @@ void Boss::ParameterGUI() {
 
 void Boss::InitParameter() {
 	attackCooldown_ = 300.0f;
+	bossHp_ = 40.0f;
+
+	jumpTime_ = 150.0f;
+	jumpHeight_ = 4.0f;
 
 	for (int i = 0; i < 3; i++) {
 		std::unique_ptr<WaveWall> wall;
@@ -187,6 +191,14 @@ void Boss::InitParameter() {
 		walls_.push_back(std::move(wall));
 	}
 
+}
+
+void Boss::ReduceBossHP(bool isStrong) {
+	if (isStrong) {
+		bossHp_ -= 3.0f;
+	} else {
+		bossHp_--;
+	}
 }
 
 void Boss::Walk() {
@@ -371,6 +383,37 @@ bool Boss::BeamAttack() {
 	}
 
 	return result;
+}
+
+void Boss::InitJumpAttack() {
+	jumpTime_ = 150.0f;
+}
+
+bool Boss::JumpAttack() {
+
+	if (jumpTime_ > 0.0f) {
+		jumpTime_ -= FPSKeeper::DeltaTime();
+		if (jumpTime_ < 0.0f) {
+			jumpTime_ = 0.0f;
+		}
+	}
+
+	if (jumpTime_ >= 90.0f) {//150~90 //60
+
+		float flyT = 1.0f - ((jumpTime_ - 90.0f) / 60.0f);
+		model_->transform.translate.y = std::lerp(0.0f, jumpHeight_, (1.0f - (1.0f - flyT) * (1.0f - flyT)));
+
+	} else if (jumpTime_ < 70.0f && jumpTime_ >= 40.0f) {//70~40 //30
+
+		float flyT = (jumpTime_ - 40.0f) / 30.0f;
+		model_->transform.translate.y = std::lerp(0.0f, jumpHeight_, (1.0f - powf(1.0f - flyT, 4.0f)));
+
+	} else if (jumpTime_ <= 0.0f) {
+		model_->transform.translate.y = 0.0f;
+		return true;
+	}
+
+	return false;
 }
 
 ///= Behavior =================================================================*/
