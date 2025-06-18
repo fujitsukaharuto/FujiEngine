@@ -62,7 +62,7 @@ AttackPattern BossRoot::ChooseNextAttack() {
 	static AttackPattern previous = AttackPattern::Beam;
 
 	std::vector<AttackInfo> patterns = {
-	{ AttackPattern::Beam, 1.0f },   // レアなので低め
+	{ AttackPattern::Beam, 1.0f },   // レアな行動はweight低めに
 	{ AttackPattern::Wave, 1.0f },
 	{ AttackPattern::JumpAttack, 1.0f },
 	// ここに新しい攻撃を追加
