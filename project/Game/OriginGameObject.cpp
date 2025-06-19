@@ -16,8 +16,8 @@ void OriginGameObject::Initialize() {
 void OriginGameObject::Update() {
 }
 
-void OriginGameObject::Draw(Material* mate) {
-	model_->Draw(mate);
+void OriginGameObject::Draw(Material* mate, bool is) {
+	model_->Draw(mate, is);
 }
 
 void OriginGameObject::DebugGUI() {

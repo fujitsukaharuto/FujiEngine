@@ -14,7 +14,7 @@ public:
 
 	virtual void Initialize();
 	virtual void Update();
-	virtual void Draw(Material* mate = nullptr);
+	virtual void Draw(Material* mate = nullptr, bool is = false);
 	virtual void DebugGUI();
 
 #ifdef _DEBUG

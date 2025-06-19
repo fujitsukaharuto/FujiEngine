@@ -13,7 +13,7 @@ public:
 
 	void Initialize()override;
 	void Update()override;
-	void Draw(Material* mate = nullptr)override;
+	void Draw(Material* mate = nullptr, bool is = false)override;
 	void DebugGUI()override;
 
 	void OnCollisionEnter(const ColliderInfo& other);
@@ -80,11 +80,11 @@ inline void TestBaseObj::Update() {
 	collider_->SetPos(model_->GetWorldPos());
 }
 
-inline void TestBaseObj::Draw([[maybe_unused]] Material* mate) {
+inline void TestBaseObj::Draw([[maybe_unused]] Material* mate, bool is) {
 
 	shadow_->Draw();
 
-	OriginGameObject::Draw(mate);
+	OriginGameObject::Draw(mate, is);
 }
 
 inline void TestBaseObj::DebugGUI() {
