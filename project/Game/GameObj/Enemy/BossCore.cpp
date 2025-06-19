@@ -24,6 +24,7 @@ void BossCore::Initialize() {
 	InitParameter();
 
 	model_->SetParent(pBoss_->GetModel());
+	model_->SetNoneScaleParent(true);
 
 }
 

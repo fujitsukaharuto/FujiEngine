@@ -263,5 +263,7 @@ void Beam::OnCollisionExit([[maybe_unused]] const ColliderInfo& other) {
 
 void Beam::SetBossParent(Boss* boss) {
 	model_->SetParent(boss->GetModel());
+	model_->SetNoneScaleParent(true);
 	particleParent_->SetParent(boss->GetModel());
+	particleParent_->SetNoneScaleParent(true);
 }

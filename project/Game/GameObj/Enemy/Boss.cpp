@@ -55,6 +55,7 @@ void Boss::Initialize() {
 		chargeParent->transform.scale.y = 12.0f;
 		chargeParent->transform.scale.z = 12.0f;
 		chargeParent->SetParent(model_.get());
+		chargeParent->SetNoneScaleParent(true);
 		if (i != 0 && i != 4) {
 			if (i < 4) {
 				chargeParent->transform.rotate.x = Random::GetFloat(-std::numbers::pi_v<float>, std::numbers::pi_v<float>);
@@ -71,6 +72,7 @@ void Boss::Initialize() {
 	waveParent_->Create("cube.obj");
 	waveParent_->transform.translate.z += 4.0f;
 	waveParent_->SetParent(model_.get());
+	waveParent_->SetNoneScaleParent(true);
 
 
 	ParticleManager::Load(waveAttack1, "ShockRay");
