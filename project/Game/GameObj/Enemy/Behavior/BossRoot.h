@@ -5,6 +5,7 @@ enum class AttackPattern {
 	Beam,
 	Wave,
 	JumpAttack,
+	SwordAttack,
 	// 今後追加
 };
 

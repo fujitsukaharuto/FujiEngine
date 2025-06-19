@@ -48,8 +48,8 @@ void TitleScene::Initialize() {
 	sphere2->transform.translate.x = 1.0f;
 
 	cube_ = std::make_unique<AnimationModel>();
-	cube_->Create("sneakWalk.gltf");
-	cube_->LoadAnimationFile("sneakWalk.gltf");
+	cube_->Create("boss.gltf");
+	cube_->LoadAnimationFile("boss.gltf");
 	cube_->transform.translate.y = 3.0f;
 
 	test_ = std::make_unique<TestBaseObj>();

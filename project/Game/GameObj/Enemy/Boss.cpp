@@ -14,7 +14,7 @@ Boss::Boss() {
 
 void Boss::Initialize() {
 	OriginGameObject::Initialize();
-	OriginGameObject::CreateModel("boss.obj");
+	OriginGameObject::CreateModel("boss.gltf");
 
 	model_->LoadTransformFromJson("boss_transform.json");
 
