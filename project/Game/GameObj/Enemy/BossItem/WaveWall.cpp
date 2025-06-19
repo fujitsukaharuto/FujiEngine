@@ -120,10 +120,10 @@ void WaveWall::Update() {
 }
 
 void WaveWall::Draw(Material* mate) {
-	underRing_->Draw();
-	wave1_->Draw();
-	wave2_->Draw();
-	wave3_->Draw();
+	underRing_->Draw(nullptr,true);
+	wave1_->Draw(nullptr, true);
+	wave2_->Draw(nullptr, true);
+	wave3_->Draw(nullptr, true);
 	OriginGameObject::Draw(mate);
 }
 
