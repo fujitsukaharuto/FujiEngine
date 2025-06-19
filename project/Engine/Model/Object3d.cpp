@@ -208,6 +208,35 @@ void Object3d::DebugGUI() {
 
 		// ギズモの表示
 		Matrix4x4 model = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
+		if (parent_) {
+			if (isNoneScaleParent_) {
+				const Matrix4x4& parentWorldMatrix = parent_->GetWorldMat();
+				// スケール成分を除去した親ワールド行列を作成
+				Matrix4x4 noScaleParentMatrix = parentWorldMatrix;
+
+				// 各軸ベクトルの長さ（スケール）を計算
+				Vector3 xAxis = { parentWorldMatrix.m[0][0], parentWorldMatrix.m[1][0], parentWorldMatrix.m[2][0] };
+				Vector3 yAxis = { parentWorldMatrix.m[0][1], parentWorldMatrix.m[1][1], parentWorldMatrix.m[2][1] };
+				Vector3 zAxis = { parentWorldMatrix.m[0][2], parentWorldMatrix.m[1][2], parentWorldMatrix.m[2][2] };
+
+				float xLen = Vector3::Length(xAxis);
+				float yLen = Vector3::Length(yAxis);
+				float zLen = Vector3::Length(zAxis);
+
+				// 正規化（スケールを除去）
+				for (int i = 0; i < 3; ++i) {
+					noScaleParentMatrix.m[i][0] /= xLen;
+					noScaleParentMatrix.m[i][1] /= yLen;
+					noScaleParentMatrix.m[i][2] /= zLen;
+				}
+
+				// 変換はそのまま（位置は影響受けてOKなら）
+				model = Multiply(model, noScaleParentMatrix);
+			} else {
+				const Matrix4x4& parentWorldMatrix = parent_->GetWorldMat();
+				model = Multiply(model, parentWorldMatrix);
+			}
+		}
 
 		Matrix4x4 view;
 		Matrix4x4 proj;
@@ -224,7 +253,7 @@ void Object3d::DebugGUI() {
 		// 編集中なら Transform に反映
 		if (ImGuizmo::IsUsing()) {
 			if (!IsUsingGuizmo_) {
-				prevPos_ = transform.translate; // 開始時の状態を保存
+				prevPos_ = transform.translate;
 				prevRotate_ = transform.rotate;
 				prevScale_ = transform.scale;
 			}
@@ -232,10 +261,35 @@ void Object3d::DebugGUI() {
 
 			Vector3 t, r, s;
 			ImGuizmo::DecomposeMatrixToComponents(&model.m[0][0], &t.x, &r.x, &s.x);
-			transform.translate = t;
 			constexpr float DegToRad = 3.14159265f / 180.0f;
-			transform.rotate = r * DegToRad;
-			transform.scale = s;
+			r = r * DegToRad;
+
+			if (parent_) {
+				// 親ワールド行列（スケールあり or スケールなし）
+				Matrix4x4 parentMatrix = parent_->GetWorldMat();
+				if (isNoneScaleParent_) {
+					// スケール除去（コードはそのまま流用）
+					for (int i = 0; i < 3; ++i) {
+						Vector3 axis = { parentMatrix.m[0][i], parentMatrix.m[1][i], parentMatrix.m[2][i] };
+						float len = Vector3::Length(axis);
+						for (int j = 0; j < 3; ++j)
+							parentMatrix.m[j][i] /= len;
+					}
+				}
+
+				// ワールド→ローカル変換
+				Matrix4x4 invParentMatrix = Inverse(parentMatrix);
+
+				Matrix4x4 worldMatrix = MakeAffineMatrix(s, r, t);
+				Matrix4x4 localMatrix = Multiply(worldMatrix, invParentMatrix);
+
+				ImGuizmo::DecomposeMatrixToComponents(&localMatrix.m[0][0], &transform.translate.x, &transform.rotate.x, &transform.scale.x);
+				transform.rotate = transform.rotate * DegToRad;
+			} else {
+				transform.translate = t;
+				transform.rotate = r;
+				transform.scale = s;
+			}
 		} else if (IsUsingGuizmo_) {
 			// 編集終了検出 → Command 発行
 			if (transform.translate != prevPos_) {
@@ -251,7 +305,6 @@ void Object3d::DebugGUI() {
 					transform, &Trans::scale, prevScale_, transform.scale);
 				CommandManager::GetInstance()->Execute(std::move(command));
 			}
-			// ※必要に応じて rotate/scale の比較と Command 追加も可
 
 			IsUsingGuizmo_ = false; // フラグリセット
 		}
