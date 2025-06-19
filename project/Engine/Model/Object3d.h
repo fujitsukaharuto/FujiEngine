@@ -56,6 +56,8 @@ public:
 
 	void SetParent(Object3d* parent) { parent_ = parent; }
 
+	void SetNoneScaleParent(bool is) { isNoneScaleParent_ = is; }
+
 	void SetCameraParent(bool is) { isCameraParent_ = is; }
 
 	void SetTexture(const std::string& name);
@@ -91,6 +93,7 @@ private:
 	Object3d* parent_ = nullptr;
 
 	bool isCameraParent_ = false;
+	bool isNoneScaleParent_ = false;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource_ = nullptr;
 	TransformationMatrix* wvpDate_ = nullptr;
