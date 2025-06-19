@@ -149,13 +149,13 @@ void Boss::Update() {
 	collider_->InfoUpdate();
 }
 
-void Boss::Draw(Material* mate) {
+void Boss::Draw(Material* mate, bool is) {
 	shadow_->Draw();
 #ifdef _DEBUG
 	collider_->DrawCollider();
 #endif // _DEBUG
 
-	OriginGameObject::Draw(mate);
+	OriginGameObject::Draw(mate, is);
 	core_->Draw();
 	for (auto& wall : walls_) {
 		if (!wall->GetIsLive())continue;

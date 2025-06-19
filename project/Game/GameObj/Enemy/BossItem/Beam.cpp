@@ -146,7 +146,7 @@ void Beam::Update() {
 	}
 }
 
-void Beam::Draw([[maybe_unused]] Material* mate) {
+void Beam::Draw([[maybe_unused]] Material* mate, [[maybe_unused]]bool is) {
 	if (isLive_) {
 		beamCore1_->Draw(nullptr, true);
 		beamCore2_->Draw(nullptr, true);

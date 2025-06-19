@@ -11,7 +11,7 @@ public:
 
 	void Initialize()override;
 	void Update()override;
-	void Draw(Material* mate = nullptr)override;
+	void Draw(Material* mate = nullptr, bool is = false)override;
 
 	void InitParameter(const Vector3& pos);
 	void CalculetionFollowVec(const Vector3& target);

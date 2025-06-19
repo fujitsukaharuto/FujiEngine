@@ -63,9 +63,9 @@ void PlayerBullet::Update() {
 	}
 }
 
-void PlayerBullet::Draw(Material* mate) {
+void PlayerBullet::Draw(Material* mate, bool is) {
 	if (isLive_) {
-		OriginGameObject::Draw(mate);
+		OriginGameObject::Draw(mate, is);
 	}
 }
 

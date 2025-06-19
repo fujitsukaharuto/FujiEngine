@@ -13,7 +13,7 @@ public:
 
 	void Initialize()override;
 	void Update()override;
-	void Draw(Material* mate = nullptr)override;
+	void Draw(Material* mate = nullptr, bool is = false)override;
 	void DebugGUI()override;
 	void ParameterGUI();
 

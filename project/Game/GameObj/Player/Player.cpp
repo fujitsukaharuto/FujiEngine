@@ -76,7 +76,7 @@ void Player::Update() {
 	collider_->SetPos(model_->GetWorldPos());
 }
 
-void Player::Draw(Material* mate) {
+void Player::Draw(Material* mate, bool is) {
 
 	for (auto& bullet : bullets_) {
 		if (bullet->GetIsLive()) {
@@ -86,7 +86,7 @@ void Player::Draw(Material* mate) {
 
 	shadow_->Draw();
 
-	OriginGameObject::Draw(mate);
+	OriginGameObject::Draw(mate, is);
 }
 
 void Player::DebugGUI() {
