@@ -41,7 +41,7 @@ void GameRun::Initialize() {
 	modelManager_->LoadGLTF("walk.gltf");
 	modelManager_->LoadGLTF("sneakWalk.gltf");
 	modelManager_->LoadGLTF("simpleSkin.gltf");
-	modelManager_->LoadGLTF("boss.gltf");
+	modelManager_->LoadGLTF("T_boss.gltf");
 #pragma endregion
 
 

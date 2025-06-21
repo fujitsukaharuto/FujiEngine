@@ -184,7 +184,7 @@ void ImGuiManager::HandleCreateLink(std::vector<Link>& links, const std::vector<
 			auto* inPin = FindPin(inputId, nodes);
 			auto* outPin = FindPin(outputId, nodes);
 
-			if (inPin && outPin && CanCreateLink(*outPin, *inPin)) {
+			if (inPin && outPin && CanCreateLink(*outPin, *inPin) && !inPin->isLinked) {
 				if (ed::AcceptNewItem()) {
 					links.push_back({ GenerateLinkId(), outputId, inputId });
 				}
