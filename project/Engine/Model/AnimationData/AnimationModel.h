@@ -96,6 +96,8 @@ private:
 
 	void JointDraw(const Matrix4x4& m);
 
+	Animation* GetCurrentAnimation();
+
 private:
 	const std::string kDirectoryPath_ = "resource/";
 	Object3dCommon* common_;
@@ -110,7 +112,8 @@ private:
 
 	bool isAnimation_ = true;
 	float animationTime_ = 0.0f;
-	Animation animation_;
+	std::string nowAnimationName_;
+	std::map<std::string, Animation> animations_;
 	Skeleton skeleton_;
 	SkinCluster skinCluster_;
 
