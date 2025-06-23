@@ -61,6 +61,8 @@ public:
 
 	void UpdateWVP() { SetWVP(); }
 
+	void LoadTransformFromJson(const std::string& filename);
+
 	void SetColor(const Vector4& color);
 
 	void SetUVScale(const Vector2& scale, const Vector2& uvTrans);
