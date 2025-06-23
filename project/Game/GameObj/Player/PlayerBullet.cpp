@@ -21,8 +21,8 @@ void PlayerBullet::Initialize() {
 	ParticleManager::Load(trajectory, "BulletTrajectory");
 	ParticleManager::Load(trajectory2, "BulletTrajectory2");
 
-	trajectory.SetParent(model_.get());
-	trajectory2.SetParent(model_.get());
+	trajectory.SetParent(&model_->transform);
+	trajectory2.SetParent(&model_->transform);
 
 	trajectory.frequencyTime_ = 0.0f;
 	trajectory2.frequencyTime_ = 0.0f;
@@ -39,11 +39,11 @@ void PlayerBullet::Initialize() {
 	ParticleManager::Load(hitSmoke_, "bulletHitSmoke");
 	ParticleManager::Load(hitcircle_, "bulletHitCircle");
 
-	hit_.SetParent(model_.get());
-	hit2_.SetParent(model_.get());
-	hit3_.SetParent(model_.get());
-	hitSmoke_.SetParent(model_.get());
-	hitcircle_.SetParent(model_.get());
+	hit_.SetParent(&model_->transform);
+	hit2_.SetParent(&model_->transform);
+	hit3_.SetParent(&model_->transform);
+	hitSmoke_.SetParent(&model_->transform);
+	hitcircle_.SetParent(&model_->transform);
 
 	hit_.frequencyTime_ = 0.0f;
 	hit2_.frequencyTime_ = 0.0f;

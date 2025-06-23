@@ -53,7 +53,7 @@ void Beam::Initialize() {
 	beam1_->transform.scale.z = 0.0f;
 	beam1_->SetColor({ 0.75f,0.0f,0.2f,0.75f });
 	beam1_->SetAlphaRef(0.25f);
-	beam1_->SetParent(model_.get());
+	beam1_->SetParent(&model_->transform);
 
 	scaleX = 1.75f;
 	beam2BaseScale_ = scaleX;
@@ -64,7 +64,7 @@ void Beam::Initialize() {
 	beam2_->transform.scale.z = 0.0f;
 	beam2_->SetColor({ 0.5f,0.0f,0.1f,0.75f });
 	beam2_->SetAlphaRef(0.25f);
-	beam2_->SetParent(model_.get());
+	beam2_->SetParent(&model_->transform);
 
 	beamCore1_->SetLightEnable(LightMode::kLightNone);
 	beamCore1_->transform.translate.y = 0.1f;
@@ -75,7 +75,7 @@ void Beam::Initialize() {
 	beamCore1_->transform.rotate.y = 0.75f;
 	beamCore1_->SetColor({ 1.0f,0.0f,0.4f,1.0f });
 	beamCore1_->SetAlphaRef(0.25f);
-	beamCore1_->SetParent(model_.get());
+	beamCore1_->SetParent(&model_->transform);
 
 	beamCore2_->SetLightEnable(LightMode::kLightNone);
 	beamCore2_->transform.translate.y = 0.1f;
@@ -86,7 +86,7 @@ void Beam::Initialize() {
 	beamCore2_->transform.rotate.y = -0.75f;
 	beamCore2_->SetColor({ 1.0f,0.0f,0.0f,1.0f });
 	beamCore2_->SetAlphaRef(0.25f);
-	beamCore2_->SetParent(model_.get());
+	beamCore2_->SetParent(&model_->transform);
 
 	beamCore3_->SetLightEnable(LightMode::kLightNone);
 	beamCore3_->transform.translate.y = 0.1f;
@@ -97,7 +97,7 @@ void Beam::Initialize() {
 	beamCore3_->transform.rotate.y = 1.56f;
 	beamCore3_->SetColor({ 1.0f,0.15f,0.75f,1.0f });
 	beamCore3_->SetAlphaRef(0.25f);
-	beamCore3_->SetParent(model_.get());
+	beamCore3_->SetParent(&model_->transform);
 
 	scaleX -= 0.25f;
 	beam3BaseScale_ = scaleX;
@@ -108,7 +108,7 @@ void Beam::Initialize() {
 	beam3_->transform.scale.z = 0.0f;
 	beam3_->SetColor({ 0.2f,0.0f,0.0f,0.75f });
 	beam3_->SetAlphaRef(0.25f);
-	beam3_->SetParent(model_.get());
+	beam3_->SetParent(&model_->transform);
 
 	particleParent_ = std::make_unique<Object3d>();
 	particleParent_->CreateSphere();
@@ -116,9 +116,9 @@ void Beam::Initialize() {
 
 	ParticleManager::LoadParentGroup(beamParticle_, "BeamParticle");
 	ParticleManager::LoadParentGroup(beamLight_, "BeamLight");
-	beamParticle_->SetParent(particleParent_.get());
+	beamParticle_->SetParent(&particleParent_->transform);
 	beamParticle_->grain_.isParentRotate_ = true;
-	beamLight_->SetParent(particleParent_.get());
+	beamLight_->SetParent(&particleParent_->transform);
 
 }
 
@@ -262,8 +262,8 @@ void Beam::OnCollisionExit([[maybe_unused]] const ColliderInfo& other) {
 }
 
 void Beam::SetBossParent(Boss* boss) {
-	model_->SetParent(boss->GetModel());
+	model_->SetParent(&boss->GetModel()->transform);
 	model_->SetNoneScaleParent(true);
-	particleParent_->SetParent(boss->GetModel());
+	particleParent_->SetParent(&boss->GetModel()->transform);
 	particleParent_->SetNoneScaleParent(true);
 }

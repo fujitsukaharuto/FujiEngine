@@ -54,7 +54,7 @@ void Boss::Initialize() {
 		chargeParent->transform.scale.x = 12.0f;
 		chargeParent->transform.scale.y = 12.0f;
 		chargeParent->transform.scale.z = 12.0f;
-		chargeParent->SetParent(model_.get());
+		chargeParent->SetParent(&model_->transform);
 		chargeParent->SetNoneScaleParent(true);
 		if (i != 0 && i != 4) {
 			if (i < 4) {
@@ -71,7 +71,7 @@ void Boss::Initialize() {
 	waveParent_ = std::make_unique<Object3d>();
 	waveParent_->Create("cube.obj");
 	waveParent_->transform.translate.z += 4.0f;
-	waveParent_->SetParent(model_.get());
+	waveParent_->SetParent(&model_->transform);
 	waveParent_->SetNoneScaleParent(true);
 
 
@@ -91,10 +91,10 @@ void Boss::Initialize() {
 	waveAttack1.addRandomMax_ = { 0.75f,1.2f };
 	waveAttack1.addRandomMin_.y = -0.5f;
 
-	waveAttack1.SetParent(waveParent_.get());
-	waveAttack2.SetParent(waveParent_.get());
-	waveAttack3.SetParent(waveParent_.get());
-	waveAttack4.SetParent(waveParent_.get());
+	waveAttack1.SetParent(&waveParent_->transform);
+	waveAttack2.SetParent(&waveParent_->transform);
+	waveAttack3.SetParent(&waveParent_->transform);
+	waveAttack4.SetParent(&waveParent_->transform);
 
 
 	ParticleManager::Load(charges_[0], "BeamCharge1");
@@ -117,19 +117,19 @@ void Boss::Initialize() {
 	for (int i = 0; i < 8; i++) {
 		charges_[i].frequencyTime_ = 0.0f;
 		charges_[i].isDistanceComplement_ = true;
-		charges_[i].SetParent(chargeParents_[i].get());
+		charges_[i].SetParent(&chargeParents_[i]->transform);
 	}
 	charge12_.frequencyTime_ = 0.0f;
 	charge13_.frequencyTime_ = 0.0f;
 	charge14_.frequencyTime_ = 0.0f;
 
-	charge9_.SetParent(chargeParents_[0].get());
-	charge10_.SetParent(chargeParents_[0].get());
-	charge11_.SetParent(chargeParents_[0].get());
-	charge12_.SetParent(chargeParents_[0].get());
-	charge13_.SetParent(chargeParents_[0].get());
-	charge14_.SetParent(chargeParents_[0].get());
-	charge15_.SetParent(chargeParents_[0].get());
+	charge9_.SetParent(&chargeParents_[0]->transform);
+	charge10_.SetParent(&chargeParents_[0]->transform);
+	charge11_.SetParent(&chargeParents_[0]->transform);
+	charge12_.SetParent(&chargeParents_[0]->transform);
+	charge13_.SetParent(&chargeParents_[0]->transform);
+	charge14_.SetParent(&chargeParents_[0]->transform);
+	charge15_.SetParent(&chargeParents_[0]->transform);
 
 
 	ChangeBehavior(std::make_unique<BossRoot>(this));
