@@ -54,11 +54,11 @@ public:
 
 	void SetCamera(Camera* camera) { this->camera_ = camera; }
 
-	void SetParent(Object3d* parent) { parent_ = parent; }
+	void SetParent(Trans* parent) { transform.parent = parent; }
 
-	void SetNoneScaleParent(bool is) { isNoneScaleParent_ = is; }
+	void SetNoneScaleParent(bool is) { transform.isNoneScaleParent = is; }
 
-	void SetCameraParent(bool is) { isCameraParent_ = is; }
+	void SetCameraParent(bool is) { transform.isCameraParent = is; }
 
 	void SetTexture(const std::string& name);
 
@@ -90,10 +90,6 @@ private:
 	DXCom* dxcommon_;
 	LightManager* lightManager_;
 	Camera* camera_;
-	Object3d* parent_ = nullptr;
-
-	bool isCameraParent_ = false;
-	bool isNoneScaleParent_ = false;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource_ = nullptr;
 	TransformationMatrix* wvpDate_ = nullptr;

@@ -2,6 +2,7 @@
 #include <memory>
 
 #include "Model/Object3d.h"
+#include "Model/AnimationData/AnimationModel.h"
 #include "Engine/DX/FPSKeeper.h"
 #include "Camera/CameraManager.h"
 #include "Input/Input.h"
@@ -25,16 +26,22 @@ public:
 
 	float ComparNum(float a, float b);
 	void CreateModel(const std::string& name);
+	void CreateAnimModel(const std::string& name);
 	void SetModel(const std::string& name);
+	void SetAnimModel(const std::string& name);
 	Object3d* GetModel() { return model_.get(); }
+	AnimationModel* GetAnimModel() { return animModel_.get(); }
 	Trans& GetTrans() { return model_->transform; }
+	Trans& GetAnimTrans() { return animModel_->transform; }
 	Vector3 GetWorldPos()const { return model_->GetWorldPos(); }
+	Vector3 GetAnimWorldPos()const { return animModel_->GetWorldPos(); }
 
 	void CreatePropertyCommand(int type);
 
 protected:
 
 	std::unique_ptr<Object3d> model_;
+	std::unique_ptr<AnimationModel> animModel_;
 
 
 	Vector3 prevPos_;

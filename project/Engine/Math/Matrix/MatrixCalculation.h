@@ -17,6 +17,14 @@ struct Trans {
 	Vector3 scale;
 	Vector3 rotate;
 	Vector3 translate;
+
+	void SetNoneScaleParent(bool is) { isNoneScaleParent = is; }
+	void SetCameraParent(bool is) { isCameraParent = is; }
+	Matrix4x4 GetWorldMat() const;
+	Trans* parent = nullptr;
+
+	bool isNoneScaleParent = false;
+	bool isCameraParent = false;
 };
 
 struct QuaternioonTrans {
