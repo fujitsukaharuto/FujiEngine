@@ -159,6 +159,9 @@ void TitleScene::DebugGUI() {
 	if (ImGui::CollapsingHeader("Sphere2")) {
 		sphere2->DebugGUI();
 	}
+	if (ImGui::CollapsingHeader("cube")) {
+		cube_->DebugGUI();
+	}
 
 	test_->DebugGUI();
 	test2_->DebugGUI();
