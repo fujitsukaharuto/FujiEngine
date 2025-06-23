@@ -19,6 +19,8 @@ public:
 	void Initialize()override;
 	void Update()override;
 	void Draw(Material* mate = nullptr, bool is = false)override;
+	void CSDispatch();
+	void AnimDraw();
 	void DebugGUI()override;
 	void ParameterGUI();
 

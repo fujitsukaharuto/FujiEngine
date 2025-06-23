@@ -135,6 +135,7 @@ void GameScene::Update() {
 void GameScene::Draw() {
 #pragma region 背景描画
 
+	boss_->CSDispatch();
 
 	dxcommon_->ClearDepthBuffer();
 #pragma endregion
@@ -151,6 +152,9 @@ void GameScene::Draw() {
 	player_->Draw();
 
 	boss_->Draw();
+
+	obj3dCommon->PreAnimationDraw();
+	boss_->AnimDraw();
 
 	ParticleManager::GetInstance()->Draw();
 

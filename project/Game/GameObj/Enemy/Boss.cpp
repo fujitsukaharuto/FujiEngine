@@ -14,15 +14,16 @@ Boss::Boss() {
 
 void Boss::Initialize() {
 	OriginGameObject::Initialize();
-	OriginGameObject::CreateModel("boss.gltf");
+	OriginGameObject::CreateAnimModel("T_boss.gltf");
+	animModel_->LoadAnimationFile("T_boss.gltf");
 
-	model_->LoadTransformFromJson("boss_transform.json");
+	animModel_->LoadTransformFromJson("boss_transform.json");
 
 	shadow_ = std::make_unique<Object3d>();
 	shadow_->Create("Sphere");
 	shadow_->SetColor({ 0.0f,0.0f,0.0f,1.0f });
 	shadow_->SetLightEnable(LightMode::kLightNone);
-	shadow_->transform.translate = model_->transform.translate;
+	shadow_->transform.translate = animModel_->transform.translate;
 	shadow_->transform.translate.y = 0.15f;
 	shadow_->transform.scale.y = 0.1f;
 
@@ -54,7 +55,7 @@ void Boss::Initialize() {
 		chargeParent->transform.scale.x = 12.0f;
 		chargeParent->transform.scale.y = 12.0f;
 		chargeParent->transform.scale.z = 12.0f;
-		chargeParent->SetParent(&model_->transform);
+		chargeParent->SetParent(&animModel_->transform);
 		chargeParent->SetNoneScaleParent(true);
 		if (i != 0 && i != 4) {
 			if (i < 4) {
@@ -71,7 +72,7 @@ void Boss::Initialize() {
 	waveParent_ = std::make_unique<Object3d>();
 	waveParent_->Create("cube.obj");
 	waveParent_->transform.translate.z += 4.0f;
-	waveParent_->SetParent(&model_->transform);
+	waveParent_->SetParent(&animModel_->transform);
 	waveParent_->SetNoneScaleParent(true);
 
 
@@ -143,19 +144,20 @@ void Boss::Update() {
 	beam_->Update();
 	UpdateWaveWall();
 
-	shadow_->transform.translate = model_->transform.translate;
+	animModel_->AnimationUpdate();
+	shadow_->transform.translate = animModel_->transform.translate;
 	shadow_->transform.translate.y = 0.15f;
-	collider_->SetPos(model_->GetWorldPos());
+	collider_->SetPos(animModel_->GetWorldPos());
 	collider_->InfoUpdate();
 }
 
-void Boss::Draw(Material* mate, bool is) {
+void Boss::Draw([[maybe_unused]] Material* mate, [[maybe_unused]] bool is) {
 	shadow_->Draw();
 #ifdef _DEBUG
 	collider_->DrawCollider();
 #endif // _DEBUG
 
-	OriginGameObject::Draw(mate, is);
+	//OriginGameObject::Draw(mate, is);
 	core_->Draw();
 	for (auto& wall : walls_) {
 		if (!wall->GetIsLive())continue;
@@ -164,11 +166,19 @@ void Boss::Draw(Material* mate, bool is) {
 	beam_->Draw();
 }
 
+void Boss::CSDispatch() {
+	animModel_->CSDispatch();
+}
+
+void Boss::AnimDraw() {
+	animModel_->Draw();
+}
+
 void Boss::DebugGUI() {
 #ifdef _DEBUG
 	if (ImGui::CollapsingHeader("Boss")) {
-		model_->DebugGUI();
-		collider_->SetPos(model_->GetWorldPos());
+		animModel_->DebugGUI();
+		collider_->SetPos(animModel_->GetWorldPos());
 		collider_->DebugGUI();
 	}
 	core_->DebugGUI();
@@ -207,7 +217,7 @@ void Boss::ReduceBossHP(bool isStrong) {
 
 void Boss::Walk() {
 	if (BossRoot* behavior = dynamic_cast<BossRoot*>(behavior_.get())) {
-		Vector3 dir = pPlayer_->GetWorldPos() - model_->transform.translate;
+		Vector3 dir = pPlayer_->GetWorldPos() - animModel_->transform.translate;
 		dir.y = 0.0f; // 水平方向だけに限定
 		dir = dir.Normalize();
 
@@ -216,10 +226,10 @@ void Boss::Walk() {
 
 		Vector3 front = Vector3(0.0f, 0.0f, 1.0f) * 0.05f * FPSKeeper::DeltaTime();
 		front = TransformNormal(front, MakeRotateYMatrix(targetAngle));
-		model_->transform.translate += front;
+		animModel_->transform.translate += front;
 
 		// 現在のY軸角度（モデルの回転）
-		float currentAngle = model_->transform.rotate.y;
+		float currentAngle = animModel_->transform.rotate.y;
 
 		// 角度差を -π〜+π にラップ
 		float delta = targetAngle - currentAngle;
@@ -230,7 +240,7 @@ void Boss::Walk() {
 		float lerpFactor = 0.1f; // 追従の速さ
 		float newAngle = currentAngle + delta * lerpFactor;
 
-		model_->transform.rotate.y = newAngle;
+		animModel_->transform.rotate.y = newAngle;
 	}
 }
 
@@ -246,9 +256,9 @@ void Boss::WaveWallAttack() {
 	int count = 0;
 
 	Vector3 wavePos = { 0.0f,0.0f,4.5f };
-	Matrix4x4 rotateMatrix = MakeRotateYMatrix(model_->transform.rotate.y);
+	Matrix4x4 rotateMatrix = MakeRotateYMatrix(animModel_->transform.rotate.y);
 	wavePos = TransformNormal(wavePos, rotateMatrix);
-	wavePos += model_->transform.translate;
+	wavePos += animModel_->transform.translate;
 	wavePos.y = 0.0f;
 	for (auto& wall : walls_) {
 		if (count == 3) break;
@@ -406,23 +416,23 @@ bool Boss::JumpAttack() {
 	if (jumpTime_ >= 90.0f) {//150~90 //60
 
 		float flyT = 1.0f - ((jumpTime_ - 90.0f) / 60.0f);
-		model_->transform.translate.y = std::lerp(0.0f, jumpHeight_, (1.0f - (1.0f - flyT) * (1.0f - flyT)));
+		animModel_->transform.translate.y = std::lerp(0.0f, jumpHeight_, (1.0f - (1.0f - flyT) * (1.0f - flyT)));
 
 	} else if (jumpTime_ < 70.0f && jumpTime_ >= 40.0f) {//70~40 //30
 
 		float flyT = 1.0f - (jumpTime_ - 40.0f) / 30.0f;
-		model_->transform.translate.y = std::lerp(jumpHeight_, 0.0f, (1.0f - powf(1.0f - flyT, 4.0f)));
+		animModel_->transform.translate.y = std::lerp(jumpHeight_, 0.0f, (1.0f - powf(1.0f - flyT, 4.0f)));
 
-		if (std::abs(model_->transform.translate.y) < 0.25f) {
+		if (std::abs(animModel_->transform.translate.y) < 0.25f) {
 			if (isJumpAttack_) {
-				jumpWave_.pos_ = model_->transform.translate;
+				jumpWave_.pos_ = animModel_->transform.translate;
 				jumpWave_.Emit();
 				isJumpAttack_ = false;
 			}
 		}
 
 	} else if (jumpTime_ <= 0.0f) {
-		model_->transform.translate.y = 0.0f;
+		animModel_->transform.translate.y = 0.0f;
 		return true;
 	}
 
