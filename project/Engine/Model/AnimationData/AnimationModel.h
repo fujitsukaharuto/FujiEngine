@@ -67,9 +67,11 @@ public:
 
 	void SetCamera(Camera* camera) { this->camera_ = camera; }
 
-	void SetParent(AnimationModel* parent) { parent_ = parent; }
+	void SetParent(Trans* parent) { transform.parent = parent; }
 
-	void SetCameraParent(bool is) { isCameraParent_ = is; }
+	void SetNoneScaleParent(bool is) { transform.isNoneScaleParent = is; }
+
+	void SetCameraParent(bool is) { transform.isCameraParent = is; }
 
 	void SetTexture(const std::string& name);
 
@@ -108,9 +110,6 @@ private:
 	DXCom* dxcommon_;
 	LightManager* lightManager_;
 	Camera* camera_;
-	AnimationModel* parent_ = nullptr;
-
-	bool isCameraParent_ = false;
 
 	bool isAnimation_ = true;
 	float animationTime_ = 0.0f;

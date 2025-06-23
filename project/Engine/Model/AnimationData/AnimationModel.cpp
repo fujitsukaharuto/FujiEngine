@@ -275,10 +275,10 @@ void AnimationModel::SkeletonDraw() {
 Matrix4x4 AnimationModel::GetWorldMat() const {
 	Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 
-	if (parent_) {
-		const Matrix4x4& parentWorldMatrix = parent_->GetWorldMat();
+	if (transform.parent) {
+		const Matrix4x4& parentWorldMatrix = transform.parent->GetWorldMat();
 		worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
-	} else if (isCameraParent_) {
+	} else if (transform.parent->isCameraParent) {
 		const Matrix4x4& parentWorldMatrix = camera_->GetWorldMatrix();
 		worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
 	}
@@ -409,10 +409,10 @@ void AnimationModel::SetWVP() {
 	Matrix4x4 worldViewProjectionMatrix;
 
 
-	if (parent_) {
-		const Matrix4x4& parentWorldMatrix = parent_->GetWorldMat();
+	if (transform.parent) {
+		const Matrix4x4& parentWorldMatrix = transform.parent->GetWorldMat();
 		worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
-	} else if (isCameraParent_) {
+	} else if (transform.isCameraParent) {
 		const Matrix4x4& parentWorldMatrix = camera_->GetWorldMatrix();
 		worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
 	}

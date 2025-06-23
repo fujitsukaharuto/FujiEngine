@@ -134,9 +134,9 @@ void Object3d::AnimeDraw() {
 Matrix4x4 Object3d::GetWorldMat() const {
 	Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 
-	if (parent_) {
-		if (isNoneScaleParent_) {
-			const Matrix4x4& parentWorldMatrix = parent_->GetWorldMat();
+	if (transform.parent) {
+		if (transform.isNoneScaleParent) {
+			const Matrix4x4& parentWorldMatrix = transform.parent->GetWorldMat();
 			// スケール成分を除去した親ワールド行列を作成
 			Matrix4x4 noScaleParentMatrix = parentWorldMatrix;
 
@@ -159,10 +159,10 @@ Matrix4x4 Object3d::GetWorldMat() const {
 			// 変換はそのまま（位置は影響受けてOKなら）
 			worldMatrix = Multiply(worldMatrix, noScaleParentMatrix);
 		} else {
-			const Matrix4x4& parentWorldMatrix = parent_->GetWorldMat();
+			const Matrix4x4& parentWorldMatrix = transform.parent->GetWorldMat();
 			worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
 		}
-	} else if (isCameraParent_) {
+	} else if (transform.isCameraParent) {
 		const Matrix4x4& parentWorldMatrix = camera_->GetWorldMatrix();
 		worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
 	}
@@ -208,9 +208,9 @@ void Object3d::DebugGUI() {
 
 		// ギズモの表示
 		Matrix4x4 model = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
-		if (parent_) {
-			if (isNoneScaleParent_) {
-				const Matrix4x4& parentWorldMatrix = parent_->GetWorldMat();
+		if (transform.parent) {
+			if (transform.isNoneScaleParent) {
+				const Matrix4x4& parentWorldMatrix = transform.parent->GetWorldMat();
 				// スケール成分を除去した親ワールド行列を作成
 				Matrix4x4 noScaleParentMatrix = parentWorldMatrix;
 
@@ -233,7 +233,7 @@ void Object3d::DebugGUI() {
 				// 変換はそのまま（位置は影響受けてOKなら）
 				model = Multiply(model, noScaleParentMatrix);
 			} else {
-				const Matrix4x4& parentWorldMatrix = parent_->GetWorldMat();
+				const Matrix4x4& parentWorldMatrix = transform.parent->GetWorldMat();
 				model = Multiply(model, parentWorldMatrix);
 			}
 		}
@@ -264,10 +264,10 @@ void Object3d::DebugGUI() {
 			constexpr float DegToRad = 3.14159265f / 180.0f;
 			r = r * DegToRad;
 
-			if (parent_) {
+			if (transform.parent) {
 				// 親ワールド行列（スケールあり or スケールなし）
-				Matrix4x4 parentMatrix = parent_->GetWorldMat();
-				if (isNoneScaleParent_) {
+				Matrix4x4 parentMatrix = transform.parent->GetWorldMat();
+				if (transform.isNoneScaleParent) {
 					// スケール除去（コードはそのまま流用）
 					for (int i = 0; i < 3; ++i) {
 						Vector3 axis = { parentMatrix.m[0][i], parentMatrix.m[1][i], parentMatrix.m[2][i] };
@@ -419,9 +419,9 @@ void Object3d::SetWVP() {
 	Matrix4x4 worldViewProjectionMatrix;
 
 
-	if (parent_) {
-		if (isNoneScaleParent_) {
-			const Matrix4x4& parentWorldMatrix = parent_->GetWorldMat();
+	if (transform.parent) {
+		if (transform.isNoneScaleParent) {
+			const Matrix4x4& parentWorldMatrix = transform.parent->GetWorldMat();
 			// スケール成分を除去した親ワールド行列を作成
 			Matrix4x4 noScaleParentMatrix = parentWorldMatrix;
 
@@ -444,10 +444,10 @@ void Object3d::SetWVP() {
 			// 変換はそのまま（位置は影響受けてOKなら）
 			worldMatrix = Multiply(worldMatrix, noScaleParentMatrix);
 		} else {
-			const Matrix4x4& parentWorldMatrix = parent_->GetWorldMat();
+			const Matrix4x4& parentWorldMatrix = transform.parent->GetWorldMat();
 			worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
 		}
-	} else if (isCameraParent_) {
+	} else if (transform.isCameraParent) {
 		const Matrix4x4& parentWorldMatrix = camera_->GetWorldMatrix();
 		worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
 	}

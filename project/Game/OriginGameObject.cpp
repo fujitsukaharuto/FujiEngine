@@ -11,13 +11,16 @@ OriginGameObject::OriginGameObject() {
 
 void OriginGameObject::Initialize() {
 	model_ = std::make_unique<Object3d>();
+	animModel_ = std::make_unique<AnimationModel>();
 }
 
 void OriginGameObject::Update() {
 }
 
 void OriginGameObject::Draw(Material* mate, bool is) {
-	model_->Draw(mate, is);
+	if (model_) {
+		model_->Draw(mate, is);
+	}
 }
 
 void OriginGameObject::DebugGUI() {
@@ -114,8 +117,16 @@ void OriginGameObject::CreateModel(const std::string& name) {
 	model_->Create(name);
 }
 
+void OriginGameObject::CreateAnimModel(const std::string& name) {
+	animModel_->Create(name);
+}
+
 void OriginGameObject::SetModel(const std::string& name) {
 	model_->SetModel(name);
+}
+
+void OriginGameObject::SetAnimModel(const std::string& name) {
+	animModel_->SetModel(name);
 }
 
 void OriginGameObject::CreatePropertyCommand(int type) {
