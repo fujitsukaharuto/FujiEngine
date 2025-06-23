@@ -27,6 +27,8 @@ public:
 
 public:
 
+	void DebugGUI();
+
 	void LoadAnimationFile(const std::string& filename);
 
 	void CreateSkeleton(const Node& rootNode);

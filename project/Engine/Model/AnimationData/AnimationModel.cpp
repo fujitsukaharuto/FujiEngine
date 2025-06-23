@@ -6,6 +6,7 @@
 #include "Engine/Model/Line3dDrawer.h"
 #include "CameraManager.h"
 #include "FPSKeeper.h"
+#include "Engine/ImGuiManager/ImGuiManager.h"
 
 #include <fstream>
 #include <assimp/Importer.hpp>
@@ -22,6 +23,46 @@ AnimationModel::AnimationModel() {
 AnimationModel::~AnimationModel() {
 	dxcommon_ = nullptr;
 	lightManager_ = nullptr;
+}
+
+void AnimationModel::DebugGUI() {
+#ifdef _DEBUG
+	ImGui::Indent();
+	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Selected;
+	if (ImGui::TreeNodeEx("animation", flags)) {
+
+		int currentIndex = -1;
+		std::vector<const char*> animationNames;
+		animationNames.reserve(animations_.size());
+
+		int index = 0;
+		for (const auto& [name, anim] : animations_) {
+			animationNames.push_back(name.c_str());
+			if (name == nowAnimationName_) {
+				currentIndex = index;
+			}
+			++index;
+		}
+
+		if (currentIndex == -1 && !animationNames.empty()) {
+			currentIndex = 0;
+			nowAnimationName_ = animationNames[0]; // デフォルトで先頭
+		}
+
+		if (!animationNames.empty()) {
+			if (ImGui::Combo("Animation Name", &currentIndex, animationNames.data(), static_cast<int>(animationNames.size()))) {
+				nowAnimationName_ = animationNames[currentIndex];
+			}
+		} else {
+			ImGui::Text("No animations available");
+		}
+
+		ImGui::DragFloat("Animation Time", &animationTime_, 0.01f, 0.0f, 100.0f);
+
+		ImGui::TreePop();
+	}
+	ImGui::Unindent();
+#endif // _DEBUG
 }
 
 void AnimationModel::LoadAnimationFile(const std::string& filename) {
