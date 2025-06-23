@@ -279,7 +279,7 @@ Matrix4x4 AnimationModel::GetWorldMat() const {
 	if (transform.parent) {
 		const Matrix4x4& parentWorldMatrix = transform.parent->GetWorldMat();
 		worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
-	} else if (transform.parent->isCameraParent) {
+	} else if (transform.isCameraParent) {
 		const Matrix4x4& parentWorldMatrix = camera_->GetWorldMatrix();
 		worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
 	}
