@@ -7,6 +7,7 @@
 #include "CameraManager.h"
 #include "FPSKeeper.h"
 #include "Engine/ImGuiManager/ImGuiManager.h"
+#include "Engine/Editor/JsonSerializer.h"
 
 #include <fstream>
 #include <assimp/Importer.hpp>
@@ -326,6 +327,10 @@ void AnimationModel::ApplyAnimation() {
 			}
 		}
 	}
+}
+
+void AnimationModel::LoadTransformFromJson(const std::string& filename) {
+	JsonSerializer::DeserializeTransform(filename, transform);
 }
 
 void AnimationModel::SetColor(const Vector4& color) {
