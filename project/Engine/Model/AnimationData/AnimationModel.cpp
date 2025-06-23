@@ -6,6 +6,7 @@
 #include "Engine/Model/Line3dDrawer.h"
 #include "CameraManager.h"
 #include "FPSKeeper.h"
+#include "Engine/ImGuiManager/ImGuiManager.h"
 
 #include <fstream>
 #include <assimp/Importer.hpp>
@@ -24,41 +25,106 @@ AnimationModel::~AnimationModel() {
 	lightManager_ = nullptr;
 }
 
+void AnimationModel::DebugGUI() {
+#ifdef _DEBUG
+	ImGui::Indent();
+	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Selected;
+	if (ImGui::TreeNodeEx("animation", flags)) {
+
+		int currentIndex = -1;
+		std::vector<const char*> animationNames;
+		animationNames.reserve(animations_.size());
+
+		int index = 0;
+		for (const auto& [name, anim] : animations_) {
+			animationNames.push_back(name.c_str());
+			if (name == nowAnimationName_) {
+				currentIndex = index;
+			}
+			++index;
+		}
+
+		if (currentIndex == -1 && !animationNames.empty()) {
+			currentIndex = 0;
+			nowAnimationName_ = animationNames[0]; // デフォルトで先頭
+		}
+
+		if (!animationNames.empty()) {
+			if (ImGui::Combo("Animation Name", &currentIndex, animationNames.data(), static_cast<int>(animationNames.size()))) {
+				nowAnimationName_ = animationNames[currentIndex];
+			}
+		} else {
+			ImGui::Text("No animations available");
+		}
+
+		ImGui::DragFloat("Animation Time", &animationTime_, 0.01f, 0.0f, 100.0f);
+
+		ImGui::TreePop();
+	}
+	ImGui::Unindent();
+#endif // _DEBUG
+}
+
 void AnimationModel::LoadAnimationFile(const std::string& filename) {
 	Assimp::Importer importer;
 
 	const aiScene* scene = importer.ReadFile(kDirectoryPath_ + filename.c_str(), 0);
 	assert(scene->mNumAnimations != 0);
-	aiAnimation* animationAssimp = scene->mAnimations[0];
-	animation_.duration = float(animationAssimp->mDuration / animationAssimp->mTicksPerSecond);
 
 	CreateSkeleton(model_->data_.rootNode);
 	skinCluster_ = CreateSkinCluster(skeleton_, model_->data_);
 
-	for (uint32_t channelIndex = 0; channelIndex < animationAssimp->mNumChannels; channelIndex++) {
-		aiNodeAnim* nodeAnimationAssimp = animationAssimp->mChannels[channelIndex];
-		NodeAnimation& nodeAnimation = animation_.nodeAnimations[nodeAnimationAssimp->mNodeName.C_Str()];
-		for (uint32_t keyIndex = 0; keyIndex < nodeAnimationAssimp->mNumPositionKeys; keyIndex++) {
-			aiVectorKey& keyAssimp = nodeAnimationAssimp->mPositionKeys[keyIndex];
-			KeyframeVector3 keyframe;
-			keyframe.time = float(keyAssimp.mTime / animationAssimp->mTicksPerSecond);
-			keyframe.value = { -keyAssimp.mValue.x,keyAssimp.mValue.y,keyAssimp.mValue.z };
-			nodeAnimation.translate.keyframes.push_back(keyframe);
+	animations_.clear();
+
+	for (uint32_t animIndex = 0; animIndex < scene->mNumAnimations; ++animIndex) {
+		aiAnimation* animationAssimp = scene->mAnimations[animIndex];
+		Animation animation;
+
+		// アニメーション名を取得（空なら仮の名前）
+		std::string animName;
+		if (animationAssimp->mName.length > 0) {
+			animName = animationAssimp->mName.C_Str();
+		} else {
+			animName = "Animation_" + std::to_string(animIndex);
 		}
-		for (uint32_t keyIndex = 0; keyIndex < nodeAnimationAssimp->mNumRotationKeys; keyIndex++) {
-			aiQuatKey& keyAssimp = nodeAnimationAssimp->mRotationKeys[keyIndex];
-			KeyframeQuaternion keyframe;
-			keyframe.time = float(keyAssimp.mTime / animationAssimp->mTicksPerSecond);
-			keyframe.value = { keyAssimp.mValue.x,-keyAssimp.mValue.y,-keyAssimp.mValue.z,keyAssimp.mValue.w };
-			nodeAnimation.rotate.keyframes.push_back(keyframe);
-		}for (uint32_t keyIndex = 0; keyIndex < nodeAnimationAssimp->mNumScalingKeys; keyIndex++) {
-			aiVectorKey& keyAssimp = nodeAnimationAssimp->mScalingKeys[keyIndex];
-			KeyframeVector3 keyframe;
-			keyframe.time = float(keyAssimp.mTime / animationAssimp->mTicksPerSecond);
-			keyframe.value = { keyAssimp.mValue.x,keyAssimp.mValue.y,keyAssimp.mValue.z };
-			nodeAnimation.scale.keyframes.push_back(keyframe);
+		animation.name = animName;
+		animation.duration = float(animationAssimp->mDuration / animationAssimp->mTicksPerSecond);
+
+		for (uint32_t channelIndex = 0; channelIndex < animationAssimp->mNumChannels; ++channelIndex) {
+			aiNodeAnim* nodeAnimationAssimp = animationAssimp->mChannels[channelIndex];
+			NodeAnimation& nodeAnimation = animation.nodeAnimations[nodeAnimationAssimp->mNodeName.C_Str()];
+
+			for (uint32_t keyIndex = 0; keyIndex < nodeAnimationAssimp->mNumPositionKeys; ++keyIndex) {
+				aiVectorKey& keyAssimp = nodeAnimationAssimp->mPositionKeys[keyIndex];
+				KeyframeVector3 keyframe;
+				keyframe.time = float(keyAssimp.mTime / animationAssimp->mTicksPerSecond);
+				keyframe.value = { -keyAssimp.mValue.x, keyAssimp.mValue.y, keyAssimp.mValue.z };
+				nodeAnimation.translate.keyframes.push_back(keyframe);
+			}
+
+			for (uint32_t keyIndex = 0; keyIndex < nodeAnimationAssimp->mNumRotationKeys; ++keyIndex) {
+				aiQuatKey& keyAssimp = nodeAnimationAssimp->mRotationKeys[keyIndex];
+				KeyframeQuaternion keyframe;
+				keyframe.time = float(keyAssimp.mTime / animationAssimp->mTicksPerSecond);
+				keyframe.value = { keyAssimp.mValue.x, -keyAssimp.mValue.y, -keyAssimp.mValue.z, keyAssimp.mValue.w };
+				nodeAnimation.rotate.keyframes.push_back(keyframe);
+			}
+
+			for (uint32_t keyIndex = 0; keyIndex < nodeAnimationAssimp->mNumScalingKeys; ++keyIndex) {
+				aiVectorKey& keyAssimp = nodeAnimationAssimp->mScalingKeys[keyIndex];
+				KeyframeVector3 keyframe;
+				keyframe.time = float(keyAssimp.mTime / animationAssimp->mTicksPerSecond);
+				keyframe.value = { keyAssimp.mValue.x, keyAssimp.mValue.y, keyAssimp.mValue.z };
+				nodeAnimation.scale.keyframes.push_back(keyframe);
+			}
 		}
+
+		// マップに追加
+		animations_[animName] = std::move(animation);
 	}
+
+	// 最初のアニメーションを再生対象にする（任意）
+	nowAnimationName_ = animations_.begin()->first;
 
 	model_->CreateEnvironment();
 	model_->CreateSkinningInformation(dxcommon_);
@@ -153,7 +219,9 @@ SkinCluster AnimationModel::CreateSkinCluster(const Skeleton& skeleton, const Mo
 
 void AnimationModel::AnimationUpdate() {
 	animationTime_ += FPSKeeper::DeltaTimeFrame();
-	animationTime_ = std::fmod(animationTime_, animation_.duration);
+	if (auto* anim = GetCurrentAnimation()) {
+		animationTime_ = std::fmod(animationTime_, anim->duration);
+	}
 	ApplyAnimation();
 	SkeletonUpdate();
 	SkinClusterUpdate();
@@ -249,11 +317,13 @@ void AnimationModel::SkinClusterUpdate() {
 
 void AnimationModel::ApplyAnimation() {
 	for (Joint& joint : skeleton_.joints) {
-		if (auto it = animation_.nodeAnimations.find(joint.name); it != animation_.nodeAnimations.end()) {
-			const NodeAnimation& rootNodeAnimation = (*it).second;
-			joint.transform.translate = CalculationValue(rootNodeAnimation.translate.keyframes, animationTime_);
-			joint.transform.rotate = CalculationValue(rootNodeAnimation.rotate.keyframes, animationTime_);
-			joint.transform.scale = CalculationValue(rootNodeAnimation.scale.keyframes, animationTime_);
+		if (auto* anim = GetCurrentAnimation()) {
+			if (auto it = anim->nodeAnimations.find(joint.name); it != anim->nodeAnimations.end()) {
+				const NodeAnimation& rootNodeAnimation = (*it).second;
+				joint.transform.translate = CalculationValue(rootNodeAnimation.translate.keyframes, animationTime_);
+				joint.transform.rotate = CalculationValue(rootNodeAnimation.rotate.keyframes, animationTime_);
+				joint.transform.scale = CalculationValue(rootNodeAnimation.scale.keyframes, animationTime_);
+			}
 		}
 	}
 }
@@ -473,4 +543,9 @@ void AnimationModel::JointDraw(const Matrix4x4& m) {
 		p1++;
 		p2++;
 	}
+}
+
+Animation* AnimationModel::GetCurrentAnimation() {
+	auto it = animations_.find(nowAnimationName_);
+	return (it != animations_.end()) ? &it->second : nullptr;
 }
