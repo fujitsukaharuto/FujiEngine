@@ -44,36 +44,36 @@ void DebugCamera::InputUpdate() {
 
 	Vector2 mousePos = Input::GetInstance()->GetMousePosition();
 	// マウスのドラッグで回転
-	if (Input::GetInstance()->PushKey(DIK_LSHIFT)) {
-		if (Input::GetInstance()->IsPressMouse(0)) {
-			// ドラッグによる角度の更新
-			float deltaX = mousePos.x - lastMousePos_.x;
-			float deltaY = mousePos.y - lastMousePos_.y;
+	
+	if (Input::GetInstance()->IsPressMouse(1)) {
+		const float moveSpeed = 0.1f; // 調整可
+		float deltaX = mousePos.x - lastMousePos_.x;
+		float deltaY = mousePos.y - lastMousePos_.y;
 
-			// ノイズを除去するための閾値を設定
-			const float threshold = 0.1f; // 調整可能な閾値
+		moveTrans_.x -= deltaX * moveSpeed;
+		moveTrans_.y += deltaY * moveSpeed;
 
-			// 閾値以下の値を 0 とみなす
-			if (fabs(deltaY) < threshold) deltaY = 0.0f;
-			if (fabs(deltaX) < threshold) deltaX = 0.0f;
+	} else if (Input::GetInstance()->IsPressMouse(2)) {
+		// ドラッグによる角度の更新
+		float deltaX = mousePos.x - lastMousePos_.x;
+		float deltaY = mousePos.y - lastMousePos_.y;
+
+		// ノイズを除去するための閾値を設定
+		const float threshold = 0.1f; // 調整可能な閾値
+
+		// 閾値以下の値を 0 とみなす
+		if (fabs(deltaY) < threshold) deltaY = 0.0f;
+		if (fabs(deltaX) < threshold) deltaX = 0.0f;
 
 
-			const float rotationSpeed = 0.01f;
-			yaw_ += deltaX * rotationSpeed;  // 横の回転
-			pitch_ += deltaY * rotationSpeed; // 縦の回転
+		const float rotationSpeed = 0.0025f;
+		yaw_ += deltaX * rotationSpeed;  // 横の回転
+		pitch_ += deltaY * rotationSpeed; // 縦の回転
 
-			// pitch_の回転範囲を制限 (-89度～89度程度)
-			const float pitchLimit = 90.0f * (std::numbers::pi_v<float> / 180.0f); // ラジアン変換
-			if (pitch_ > pitchLimit) pitch_ = pitchLimit;
-			if (pitch_ < -pitchLimit) pitch_ = -pitchLimit;
-		} else if (Input::GetInstance()->IsPressMouse(1)) {
-			const float moveSpeed = 0.05f; // 調整可
-			float deltaX = mousePos.x - lastMousePos_.x;
-			float deltaY = mousePos.y - lastMousePos_.y;
-
-			moveTrans_.x -= deltaX * moveSpeed;
-			moveTrans_.y += deltaY * moveSpeed;
-		}
+		// pitch_の回転範囲を制限 (-89度～89度程度)
+		const float pitchLimit = 90.0f * (std::numbers::pi_v<float> / 180.0f); // ラジアン変換
+		if (pitch_ > pitchLimit) pitch_ = pitchLimit;
+		if (pitch_ < -pitchLimit) pitch_ = -pitchLimit;
 	}
 	// マウスの位置を更新
 	lastMousePos_ = { mousePos.x, mousePos.y };
