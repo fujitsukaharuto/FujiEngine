@@ -7,6 +7,7 @@ BossSwordAttack::BossSwordAttack(Boss* pBoss) : BaseBossBehavior(pBoss) {
 	step_ = Step::ATTACK;
 	coolTime_ = 0.0f;
 	attackCount_ = 0;
+	pBoss_->GetAnimModel()->ChangeAnimation("punch");
 }
 
 BossSwordAttack::~BossSwordAttack() {

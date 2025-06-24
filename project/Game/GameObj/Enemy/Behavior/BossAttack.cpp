@@ -5,7 +5,7 @@
 
 BossAttack::BossAttack(Boss* pBoss) : BaseBossBehavior(pBoss) {
 	step_ = Step::ATTACK;
-
+	pBoss_->GetAnimModel()->ChangeAnimation("punch");
 }
 
 BossAttack::~BossAttack() {
@@ -19,8 +19,14 @@ void BossAttack::Update() {
 		///---------------------------------------------------------------------------------------
 	case BossAttack::Step::ATTACK:
 
-		pBoss_->WaveWallAttack();
-		step_ = Step::TOROOT;
+		if (isAttack_) {
+			pBoss_->WaveWallAttack();
+			isAttack_ = false;
+		}
+		coolTime_ -= FPSKeeper::DeltaTime();
+		if (coolTime_ < 0.0f) {
+			step_ = Step::TOROOT;
+		}
 
 		break;
 		///---------------------------------------------------------------------------------------

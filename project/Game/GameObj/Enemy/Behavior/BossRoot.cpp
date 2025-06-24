@@ -10,6 +10,7 @@
 BossRoot::BossRoot(Boss* pBoss) : BaseBossBehavior(pBoss) {
 	step_ = Step::ROOT;
 	cooldown_ = pBoss_->GetAttackCooldown();
+	pBoss_->GetAnimModel()->ChangeAnimation("walk");
 }
 
 BossRoot::~BossRoot() {
