@@ -119,12 +119,12 @@ void WaveWall::Update() {
 
 }
 
-void WaveWall::Draw(Material* mate, bool is) {
+void WaveWall::Draw([[maybe_unused]] Material* mate, [[maybe_unused]] bool is) {
 	underRing_->Draw(nullptr,true);
 	wave1_->Draw(nullptr, true);
 	wave2_->Draw(nullptr, true);
 	wave3_->Draw(nullptr, true);
-	OriginGameObject::Draw(mate, is);
+	OriginGameObject::Draw(nullptr, true);
 }
 
 void WaveWall::DebugGUI() {
