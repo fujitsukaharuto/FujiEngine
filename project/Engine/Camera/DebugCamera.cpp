@@ -44,7 +44,7 @@ void DebugCamera::InputUpdate() {
 
 	Vector2 mousePos = Input::GetInstance()->GetMousePosition();
 	// マウスのドラッグで回転
-	if (Input::GetInstance()->PushKey(DIK_LCONTROL)) {
+	if (Input::GetInstance()->PushKey(DIK_LSHIFT)) {
 		if (Input::GetInstance()->IsPressMouse(0)) {
 			// ドラッグによる角度の更新
 			float deltaX = mousePos.x - lastMousePos_.x;
@@ -66,6 +66,13 @@ void DebugCamera::InputUpdate() {
 			const float pitchLimit = 90.0f * (std::numbers::pi_v<float> / 180.0f); // ラジアン変換
 			if (pitch_ > pitchLimit) pitch_ = pitchLimit;
 			if (pitch_ < -pitchLimit) pitch_ = -pitchLimit;
+		} else if (Input::GetInstance()->IsPressMouse(1)) {
+			const float moveSpeed = 0.05f; // 調整可
+			float deltaX = mousePos.x - lastMousePos_.x;
+			float deltaY = mousePos.y - lastMousePos_.y;
+
+			moveTrans_.x -= deltaX * moveSpeed;
+			moveTrans_.y += deltaY * moveSpeed;
 		}
 	}
 	// マウスの位置を更新
