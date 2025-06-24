@@ -59,6 +59,8 @@ public:
 
 	void ApplyAnimation();
 
+	void ChangeAnimation(const std::string& newName);
+
 	void UpdateWVP() { SetWVP(); }
 
 	void LoadTransformFromJson(const std::string& filename);
@@ -103,6 +105,7 @@ private:
 	void JointDraw(const Matrix4x4& m);
 
 	Animation* GetCurrentAnimation();
+	Animation* GetPreviousAnimation();
 
 private:
 	const std::string kDirectoryPath_ = "resource/";
@@ -115,7 +118,11 @@ private:
 
 	bool isAnimation_ = true;
 	float animationTime_ = 0.0f;
+	float previousTime_ = 0.0f;
+	float blendTime_ = 0.3f;
+	float blendDuration_ = 0.3f;
 	std::string nowAnimationName_;
+	std::string preAnimationName_;
 	std::map<std::string, Animation> animations_;
 	Skeleton skeleton_;
 	SkinCluster skinCluster_;

@@ -48,8 +48,8 @@ void TitleScene::Initialize() {
 	sphere2->transform.translate.x = 1.0f;
 
 	cube_ = std::make_unique<AnimationModel>();
-	cube_->Create("sneakWalk.gltf");
-	cube_->LoadAnimationFile("sneakWalk.gltf");
+	cube_->Create("T_boss.gltf");
+	cube_->LoadAnimationFile("T_boss.gltf");
 	cube_->transform.translate.y = 3.0f;
 
 	test_ = std::make_unique<TestBaseObj>();
@@ -159,7 +159,9 @@ void TitleScene::DebugGUI() {
 	if (ImGui::CollapsingHeader("Sphere2")) {
 		sphere2->DebugGUI();
 	}
-
+	if (ImGui::CollapsingHeader("cube")) {
+		cube_->DebugGUI();
+	}
 	test_->DebugGUI();
 	test2_->DebugGUI();
 

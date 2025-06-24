@@ -28,9 +28,9 @@ struct Trans {
 };
 
 struct QuaternioonTrans {
-	Vector3 scale;
-	Quaternion rotate;
-	Vector3 translate;
+	Vector3 scale = { 1.0f,1.0f,1.0f };
+	Quaternion rotate = Quaternion();
+	Vector3 translate = { 0.0f,0.0f,0.0f };
 };
 
 struct VertexDate {
