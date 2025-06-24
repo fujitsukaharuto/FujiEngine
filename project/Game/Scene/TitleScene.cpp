@@ -162,7 +162,6 @@ void TitleScene::DebugGUI() {
 	if (ImGui::CollapsingHeader("cube")) {
 		cube_->DebugGUI();
 	}
-
 	test_->DebugGUI();
 	test2_->DebugGUI();
 

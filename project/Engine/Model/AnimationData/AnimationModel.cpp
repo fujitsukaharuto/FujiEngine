@@ -52,7 +52,7 @@ void AnimationModel::DebugGUI() {
 
 		if (!animationNames.empty()) {
 			if (ImGui::Combo("Animation Name", &currentIndex, animationNames.data(), static_cast<int>(animationNames.size()))) {
-				nowAnimationName_ = animationNames[currentIndex];
+				ChangeAnimation(animationNames[currentIndex]);
 			}
 		} else {
 			ImGui::Text("No animations available");
@@ -126,6 +126,7 @@ void AnimationModel::LoadAnimationFile(const std::string& filename) {
 
 	// 最初のアニメーションを再生対象にする（任意）
 	nowAnimationName_ = animations_.begin()->first;
+	preAnimationName_ = nowAnimationName_;
 
 	model_->CreateEnvironment();
 	model_->CreateSkinningInformation(dxcommon_);
@@ -220,6 +221,7 @@ SkinCluster AnimationModel::CreateSkinCluster(const Skeleton& skeleton, const Mo
 
 void AnimationModel::AnimationUpdate() {
 	animationTime_ += FPSKeeper::DeltaTimeFrame();
+	blendTime_ += FPSKeeper::DeltaTimeFrame();
 	if (auto* anim = GetCurrentAnimation()) {
 		animationTime_ = std::fmod(animationTime_, anim->duration);
 	}
@@ -317,16 +319,72 @@ void AnimationModel::SkinClusterUpdate() {
 }
 
 void AnimationModel::ApplyAnimation() {
-	for (Joint& joint : skeleton_.joints) {
-		if (auto* anim = GetCurrentAnimation()) {
-			if (auto it = anim->nodeAnimations.find(joint.name); it != anim->nodeAnimations.end()) {
-				const NodeAnimation& rootNodeAnimation = (*it).second;
-				joint.transform.translate = CalculationValue(rootNodeAnimation.translate.keyframes, animationTime_);
-				joint.transform.rotate = CalculationValue(rootNodeAnimation.rotate.keyframes, animationTime_);
-				joint.transform.scale = CalculationValue(rootNodeAnimation.scale.keyframes, animationTime_);
+	Animation* nowAnim = GetCurrentAnimation();
+	Animation* preAnim = GetPreviousAnimation();
+
+	float t = (blendDuration_ > 0.0f) ? std::clamp(blendTime_ / blendDuration_, 0.0f, 1.0f) : 1.0f;
+
+	if (t >= 1.0f) {
+		for (Joint& joint : skeleton_.joints) {
+			if (nowAnim) {
+				if (auto it = nowAnim->nodeAnimations.find(joint.name); it != nowAnim->nodeAnimations.end()) {
+					const NodeAnimation& rootNodeAnimation = (*it).second;
+					joint.transform.translate = CalculationValue(rootNodeAnimation.translate.keyframes, animationTime_);
+					joint.transform.rotate = CalculationValue(rootNodeAnimation.rotate.keyframes, animationTime_);
+					joint.transform.scale = CalculationValue(rootNodeAnimation.scale.keyframes, animationTime_);
+				}
+			}
+		}
+	} else {
+		for (Joint& joint : skeleton_.joints) {
+			// 現在のアニメーションの値
+			QuaternioonTrans current = joint.transform;
+			if (nowAnim) {
+				if (auto it = nowAnim->nodeAnimations.find(joint.name); it != nowAnim->nodeAnimations.end()) {
+					const NodeAnimation& na = it->second;
+					current.translate = CalculationValue(na.translate.keyframes, animationTime_);
+					current.rotate = CalculationValue(na.rotate.keyframes, animationTime_);
+					current.scale = CalculationValue(na.scale.keyframes, animationTime_);
+				}
+			}
+
+			// 補間中の場合：前のアニメーションの値も取得して補間
+			if (preAnim && blendTime_ < blendDuration_) {
+				QuaternioonTrans previous = joint.transform;
+				if (auto it = preAnim->nodeAnimations.find(joint.name); it != preAnim->nodeAnimations.end()) {
+					const NodeAnimation& naPrev = it->second;
+					float prevTime = std::fmod(previousTime_ + blendTime_, preAnim->duration); // 再生位置合わせ
+					previous.translate = CalculationValue(naPrev.translate.keyframes, prevTime);
+					previous.rotate = CalculationValue(naPrev.rotate.keyframes, prevTime);
+					previous.scale = CalculationValue(naPrev.scale.keyframes, prevTime);
+				}
+
+				// 線形補間・球面補間
+				joint.transform.translate = Lerp(previous.translate, current.translate, t);
+				joint.transform.scale = Lerp(previous.scale, current.scale, t);
+				joint.transform.rotate = Quaternion::Slerp(previous.rotate, current.rotate, t);
+			} else {
+				joint.transform = current;
 			}
 		}
 	}
+}
+
+void AnimationModel::ChangeAnimation(const std::string& newName) {
+	if (newName == nowAnimationName_) return;
+
+	// 補間用に現在のアニメーションを保存
+	if (animations_.count(nowAnimationName_) != 0) {
+		preAnimationName_ = nowAnimationName_;
+		previousTime_ = animationTime_; // 前アニメの時間も保存
+	} else {
+		preAnimationName_.clear();
+		previousTime_ = 0.0f;
+	}
+
+	nowAnimationName_ = newName;
+	animationTime_ = 0.0f; // Bは頭から再生
+	blendTime_ = 0.0f;
 }
 
 void AnimationModel::LoadTransformFromJson(const std::string& filename) {
@@ -552,5 +610,10 @@ void AnimationModel::JointDraw(const Matrix4x4& m) {
 
 Animation* AnimationModel::GetCurrentAnimation() {
 	auto it = animations_.find(nowAnimationName_);
+	return (it != animations_.end()) ? &it->second : nullptr;
+}
+
+Animation* AnimationModel::GetPreviousAnimation() {
+	auto it = animations_.find(preAnimationName_);
 	return (it != animations_.end()) ? &it->second : nullptr;
 }
