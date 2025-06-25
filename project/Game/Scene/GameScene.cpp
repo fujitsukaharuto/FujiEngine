@@ -153,9 +153,6 @@ void GameScene::Draw() {
 
 	boss_->Draw();
 
-	obj3dCommon->PreAnimationDraw();
-	boss_->AnimDraw();
-
 	ParticleManager::GetInstance()->Draw();
 
 #ifdef _DEBUG

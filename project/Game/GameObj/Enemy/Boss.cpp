@@ -157,6 +157,7 @@ void Boss::Draw([[maybe_unused]] Material* mate, [[maybe_unused]] bool is) {
 	collider_->DrawCollider();
 #endif // _DEBUG
 
+	animModel_->Draw();
 	//OriginGameObject::Draw(mate, is);
 	core_->Draw();
 	for (auto& wall : walls_) {
