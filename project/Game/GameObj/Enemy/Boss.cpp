@@ -199,7 +199,7 @@ void Boss::InitParameter() {
 	jumpTime_ = 150.0f;
 	jumpHeight_ = 4.0f;
 
-	for (int i = 0; i < 3; i++) {
+	for (int i = 0; i < 9; i++) {
 		std::unique_ptr<WaveWall> wall;
 		wall = std::make_unique<WaveWall>();
 		wall->Initialize();

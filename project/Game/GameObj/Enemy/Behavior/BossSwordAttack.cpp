@@ -22,7 +22,7 @@ void BossSwordAttack::Update() {
 	case BossSwordAttack::Step::ATTACK:
 
 		if (coolTime_ <= 0.0f) {
-			coolTime_ = 60.0f;
+			coolTime_ = 90.0f;
 			pBoss_->WaveWallAttack();
 			attackCount_++;
 			if (attackCount_ >= 3) {
