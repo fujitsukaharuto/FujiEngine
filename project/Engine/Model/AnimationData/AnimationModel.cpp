@@ -223,7 +223,13 @@ void AnimationModel::AnimationUpdate() {
 	animationTime_ += FPSKeeper::DeltaTimeFrame();
 	blendTime_ += FPSKeeper::DeltaTimeFrame();
 	if (auto* anim = GetCurrentAnimation()) {
-		animationTime_ = std::fmod(animationTime_, anim->duration);
+		if (isRoopAnimation_) {
+			animationTime_ = std::fmod(animationTime_, anim->duration);
+		} else {
+			if (anim->duration <= animationTime_) {
+				animationTime_ = anim->duration;
+			}
+		}
 	}
 	ApplyAnimation();
 	SkeletonUpdate();
