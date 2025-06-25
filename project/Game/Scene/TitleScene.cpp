@@ -112,7 +112,7 @@ void TitleScene::Draw() {
 	skybox_->Draw();
 
 	obj3dCommon->PreDraw();
-	terrain_->Draw();
+//	terrain_->Draw();
 
 	cube_->Draw();
 
