@@ -87,6 +87,8 @@ public:
 
 	void IsAnimation(bool is) { isAnimation_ = is; }
 
+	void IsRoopAnimation(bool is) { isRoopAnimation_ = is; }
+
 	Trans transform{};
 
 private:
@@ -117,6 +119,7 @@ private:
 	Camera* camera_;
 
 	bool isAnimation_ = true;
+	bool isRoopAnimation_ = true;
 	float animationTime_ = 0.0f;
 	float previousTime_ = 0.0f;
 	float blendTime_ = 0.3f;
