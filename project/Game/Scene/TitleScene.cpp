@@ -114,6 +114,9 @@ void TitleScene::Draw() {
 	obj3dCommon->PreDraw();
 	terrain_->Draw();
 
+	cube_->Draw();
+
+
 	sphere->Draw();
 	sphere2->Draw();
 	//test_->Draw();
@@ -121,10 +124,6 @@ void TitleScene::Draw() {
 #ifdef _DEBUG
 	CommandManager::GetInstance()->Draw();
 #endif // _DEBUG
-
-
-	obj3dCommon->PreAnimationDraw();
-	cube_->Draw();
 
 	ParticleManager::GetInstance()->Draw();
 

@@ -242,6 +242,11 @@ void AnimationModel::Draw(Material* mate) {
 	}
 
 	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
+	dxcommon_->GetDXCommand()->SetViewAndscissor();
+	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Animation);
+	dxcommon_->GetDXCommand()->GetList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	lightManager_->SetLightCommand(dxcommon_->GetCommandList());
+
 	cList->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
 	cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_->GetGPUVirtualAddress());
 	cList->SetGraphicsRootDescriptorTable(7, environment_->gpuHandle);
@@ -249,6 +254,11 @@ void AnimationModel::Draw(Material* mate) {
 	if (model_) {
 		model_->AnimationDraw(skinCluster_,cList, mate);
 	}
+
+	dxcommon_->GetDXCommand()->SetViewAndscissor();
+	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Normal);
+	dxcommon_->GetDXCommand()->GetList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	lightManager_->SetLightCommand(dxcommon_->GetCommandList());
 }
 
 void AnimationModel::AnimeDraw() {
