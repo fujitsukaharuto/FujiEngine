@@ -7,6 +7,7 @@ BossJumpAttack::BossJumpAttack(Boss* pBoss, int count) : BaseBossBehavior(pBoss)
 	step_ = Step::ATTACK;
 	pBoss_->InitJumpAttack();
 	pBoss_->GetAnimModel()->ChangeAnimation("jump");
+	pBoss_->GetAnimModel()->IsRoopAnimation(false);
 }
 
 BossJumpAttack::~BossJumpAttack() {
@@ -22,10 +23,12 @@ void BossJumpAttack::Update() {
 
 		if (pBoss_->JumpAttack()) {
 			nowJumpCount_++;
+			pBoss_->GetAnimModel()->IsRoopAnimation(false);
 			if (jumpCount_ == nowJumpCount_) {
 				step_ = Step::TOROOT;
 			} else {
 				pBoss_->InitJumpAttack();
+				pBoss_->GetAnimModel()->IsRoopAnimation(true);
 			}
 		}
 
@@ -34,6 +37,7 @@ void BossJumpAttack::Update() {
 		/// ジャンプへ移行
 		///---------------------------------------------------------------------------------------
 	case BossJumpAttack::Step::TOROOT:
+		pBoss_->GetAnimModel()->IsRoopAnimation(true);
 		pBoss_->ChangeBehavior(std::make_unique<BossRoot>(pBoss_));
 		break;
 	default:

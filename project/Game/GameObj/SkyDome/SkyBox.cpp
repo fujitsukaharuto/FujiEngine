@@ -9,7 +9,7 @@ SkyBox::~SkyBox() {
 void SkyBox::Initialize() {
 	ResourceCreate();
 
-	transform_.scale = { 100.0f,100.0f,100.0f };
+	transform_.scale = { 300.0f,300.0f,300.0f };
 }
 
 void SkyBox::Update() {

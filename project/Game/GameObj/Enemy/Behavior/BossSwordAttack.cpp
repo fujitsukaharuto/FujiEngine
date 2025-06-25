@@ -8,6 +8,7 @@ BossSwordAttack::BossSwordAttack(Boss* pBoss) : BaseBossBehavior(pBoss) {
 	coolTime_ = 0.0f;
 	attackCount_ = 0;
 	pBoss_->GetAnimModel()->ChangeAnimation("punch");
+	pBoss_->GetAnimModel()->IsRoopAnimation(false);
 }
 
 BossSwordAttack::~BossSwordAttack() {
@@ -22,13 +23,16 @@ void BossSwordAttack::Update() {
 	case BossSwordAttack::Step::ATTACK:
 
 		if (coolTime_ <= 0.0f) {
-			coolTime_ = 90.0f;
-			pBoss_->WaveWallAttack();
-			attackCount_++;
 			if (attackCount_ >= 3) {
 				step_ = Step::TOROOT;
+				break;
 			}
+			coolTime_ = 90.0f;
+			pBoss_->GetAnimModel()->IsRoopAnimation(true);
+			pBoss_->WaveWallAttack();
+			attackCount_++;
 		} else {
+			pBoss_->GetAnimModel()->IsRoopAnimation(false);
 			coolTime_ -= FPSKeeper::DeltaTime();
 		}
 
@@ -37,6 +41,7 @@ void BossSwordAttack::Update() {
 		/// ジャンプへ移行
 		///---------------------------------------------------------------------------------------
 	case BossSwordAttack::Step::TOROOT:
+		pBoss_->GetAnimModel()->IsRoopAnimation(true);
 		pBoss_->ChangeBehavior(std::make_unique<BossRoot>(pBoss_));
 		break;
 	default:

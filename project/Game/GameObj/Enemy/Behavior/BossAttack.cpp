@@ -6,6 +6,7 @@
 BossAttack::BossAttack(Boss* pBoss) : BaseBossBehavior(pBoss) {
 	step_ = Step::ATTACK;
 	pBoss_->GetAnimModel()->ChangeAnimation("punch");
+	pBoss_->GetAnimModel()->IsRoopAnimation(false);
 }
 
 BossAttack::~BossAttack() {
@@ -33,6 +34,7 @@ void BossAttack::Update() {
 		/// ジャンプへ移行
 		///---------------------------------------------------------------------------------------
 	case BossAttack::Step::TOROOT:
+		pBoss_->GetAnimModel()->IsRoopAnimation(true);
 		pBoss_->ChangeBehavior(std::make_unique<BossRoot>(pBoss_));
 		break;
 	default:

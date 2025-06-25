@@ -414,14 +414,14 @@ bool Boss::JumpAttack() {
 		}
 	}
 
-	if (jumpTime_ >= 90.0f) {//150~90 //60
+	if (jumpTime_ <= 120.0f && jumpTime_ >= 90.0f) {//120~90 //30
 
-		float flyT = 1.0f - ((jumpTime_ - 90.0f) / 60.0f);
+		float flyT = 1.0f - ((jumpTime_ - 90.0f) / 30.0f);
 		animModel_->transform.translate.y = std::lerp(0.0f, jumpHeight_, (1.0f - (1.0f - flyT) * (1.0f - flyT)));
 
-	} else if (jumpTime_ < 70.0f && jumpTime_ >= 40.0f) {//70~40 //30
+	} else if (jumpTime_ < 70.0f && jumpTime_ >= 50.0f) {//70~40 //30
 
-		float flyT = 1.0f - (jumpTime_ - 40.0f) / 30.0f;
+		float flyT = 1.0f - (jumpTime_ - 50.0f) / 20.0f;
 		animModel_->transform.translate.y = std::lerp(jumpHeight_, 0.0f, (1.0f - powf(1.0f - flyT, 4.0f)));
 
 		if (std::abs(animModel_->transform.translate.y) < 0.25f) {
