@@ -15,7 +15,7 @@ void Player::Initialize() {
 	OriginGameObject::CreateModel("playerModel.obj");
 
 	model_->transform.translate.y = 1.0f;
-	model_->transform.translate.z = -10.0f;
+	model_->transform.translate.z = -25.0f;
 
 	shadow_ = std::make_unique<Object3d>();
 	shadow_->Create("Sphere");
