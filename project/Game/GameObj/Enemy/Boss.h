@@ -2,6 +2,7 @@
 #include "Game/OriginGameObject.h"
 #include "Game/Collider/AABBCollider.h"
 #include "Engine/Particle/ParticleEmitter.h"
+#include "Engine/Model/Sprite.h"
 
 #include "Game/GameObj/Enemy/Behavior/BaseBossBehavior.h"
 
@@ -27,6 +28,7 @@ public:
 	void InitParameter();
 
 	void ReduceBossHP(bool isStrong);
+	void ShakeHP();
 
 	void Walk();
 
@@ -78,6 +80,17 @@ private:
 	std::unique_ptr<Object3d> waveParent_;
 
 	float bossHp_ = 0.0f;
+	std::vector<std::unique_ptr<Sprite>> hpSprites_;
+	bool isHpActive_ = true;
+	int nowHpIndex_ = 4;
+	bool isShakeSprite_ = false;
+	float shakeTime_ = 0.0f;
+	float baseShakeTime_ = 10.0f;
+	float shakeSize_ = 4.0f;
+	Vector2 hpSize_ = { 130.0f,35.0f };
+	Vector2 hpStartPos_ = { 660.0f,38.0f };
+	float hpIndent = 1.0f;
+
 
 	float attackCooldown_ = 0.0f;
 	float chargeTime_ = 120.0f;

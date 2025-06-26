@@ -76,6 +76,7 @@ void PlayerBullet::InitParameter(const Vector3& pos) {
 	collider_->SetWidth(0.3f);
 	collider_->SetDepth(0.3f);
 	collider_->SetHeight(0.3f);
+	collider_->SetTag("playerBullet");
 	trajectory.pos_ = { 0.0f,0.0f,0.0f };
 	model_->transform.scale = Vector3::FillVec(0.3f);
 	model_->transform.translate = pos;
@@ -151,6 +152,7 @@ void PlayerBullet::StrnghtBullet() {
 	collider_->SetWidth(0.6f);
 	collider_->SetDepth(0.6f);
 	collider_->SetHeight(0.6f);
+	collider_->SetTag("playerBullet_strng");
 	trajectory.pos_ = { -0.6f,0.0f,-0.6f };
 	model_->transform.scale = Vector3::FillVec(0.6f);
 }

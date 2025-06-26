@@ -144,6 +144,8 @@ void Boss::Update() {
 	beam_->Update();
 	UpdateWaveWall();
 
+	ShakeHP();
+
 	animModel_->AnimationUpdate();
 	shadow_->transform.translate = animModel_->transform.translate;
 	shadow_->transform.translate.y = 0.15f;
@@ -165,6 +167,15 @@ void Boss::Draw([[maybe_unused]] Material* mate, [[maybe_unused]] bool is) {
 		wall->Draw();
 	}
 	beam_->Draw();
+
+	if (bossHp_>= 0.0f) {
+		int texCount = 0;
+		for (auto& tex : hpSprites_) {
+			tex->Draw();
+			if (nowHpIndex_ == texCount) break;
+			texCount++;
+		}
+	}
 }
 
 void Boss::CSDispatch() {
@@ -181,6 +192,18 @@ void Boss::DebugGUI() {
 		animModel_->DebugGUI();
 		collider_->SetPos(animModel_->GetWorldPos());
 		collider_->DebugGUI();
+		ImGui::Indent();
+		if (ImGui::TreeNodeEx("hpSetting", ImGuiTreeNodeFlags_Selected)) {
+			ImGui::DragFloat2("hpsize", &hpSize_.x, 0.1f, 0.0f, 400.0f);
+			ImGui::DragFloat2("hpTexStartpos", &hpStartPos_.x, 0.1f, 0.0f, 1200.0f);
+			ImGui::DragFloat("hpIndent", &hpIndent, 0.1f, 0.0f, 100.0f);
+			for (int i = 0; i < 5; i++) {
+				hpSprites_[i]->SetPos({ hpStartPos_.x + (hpSize_.x * i) + (hpIndent * i), hpStartPos_.y, 0.0f });
+				hpSprites_[i]->SetSize(hpSize_);
+			}
+			ImGui::TreePop();
+		}
+		ImGui::Unindent();
 	}
 	core_->DebugGUI();
 #endif // _DEBUG
@@ -194,7 +217,7 @@ void Boss::ParameterGUI() {
 
 void Boss::InitParameter() {
 	attackCooldown_ = 300.0f;
-	bossHp_ = 40.0f;
+	bossHp_ = 50.0f;
 
 	jumpTime_ = 150.0f;
 	jumpHeight_ = 4.0f;
@@ -206,13 +229,78 @@ void Boss::InitParameter() {
 		walls_.push_back(std::move(wall));
 	}
 
+	for (int i = 0; i < 5; i++) {
+		std::unique_ptr<Sprite> hpTex;
+		hpTex = std::make_unique<Sprite>();
+		hpTex->Load("white2x2.png");
+		hpTex->SetColor({ 1.0f,0.0f,0.0f,1.0f });
+		hpSprites_.push_back(std::move(hpTex));
+	}
+	for (int i = 0; i < 5; i++) {
+		hpSprites_[i]->SetPos({ hpStartPos_.x + (hpSize_.x * i) + (hpIndent * i), hpStartPos_.y, 0.0f });
+		hpSprites_[i]->SetSize(hpSize_);
+	}
+
 }
 
 void Boss::ReduceBossHP(bool isStrong) {
-	if (isStrong) {
-		bossHp_ -= 3.0f;
-	} else {
-		bossHp_--;
+	if (isHpActive_) {
+		if (isStrong) {
+			bossHp_ -= 3.0f;
+		} else {
+			bossHp_--;
+		}
+		switch (nowHpIndex_) {
+		case 4:
+			if (bossHp_ < 40.0f) {
+				bossHp_ = 40.0f;
+				nowHpIndex_--;
+				return;
+			}
+			break;
+		case 3:
+			if (bossHp_ < 30.0f) {
+				bossHp_ = 30.0f;
+				nowHpIndex_--;
+				return;
+			}
+			break;
+		case 2:
+			if (bossHp_ < 20.0f) {
+				bossHp_ = 20.0f;
+				nowHpIndex_--;
+				return;
+			}
+			break;
+		case 1:
+			if (bossHp_ < 15.0f) {
+				bossHp_ = 15.0f;
+				nowHpIndex_--;
+				return;
+			}
+			break;
+		default:
+			break;
+		}
+		if (nowHpIndex_ < 0) nowHpIndex_ = 0;
+		isShakeSprite_ = true;
+		shakeTime_ = baseShakeTime_;
+	}
+}
+
+void Boss::ShakeHP() {
+	if (isShakeSprite_) {
+		shakeTime_ -= FPSKeeper::DeltaTime();
+		if (shakeTime_ < 0.0f) {
+			shakeTime_ = 0.0f;
+			isShakeSprite_ = false;
+		}
+		float t = shakeTime_ / baseShakeTime_; // 1.0 → 0.0 に減る
+		float theta = t * 2.0f * std::numbers::pi_v<float>; // sin/cos の周期は π（0→π）
+
+		float offsetX = std::cos(theta + std::numbers::pi_v<float> / 2.0f) *shakeSize_;
+		float offsetY = std::sin(theta + std::numbers::pi_v<float>) * shakeSize_;
+		hpSprites_[nowHpIndex_]->SetPos({ hpStartPos_.x + (hpSize_.x * nowHpIndex_) + (hpIndent * nowHpIndex_) + offsetX, hpStartPos_.y + offsetY, 0.0f });
 	}
 }
 
@@ -419,7 +507,7 @@ bool Boss::JumpAttack() {
 		float flyT = 1.0f - ((jumpTime_ - 90.0f) / 30.0f);
 		animModel_->transform.translate.y = std::lerp(0.0f, jumpHeight_, (1.0f - (1.0f - flyT) * (1.0f - flyT)));
 
-	} else if (jumpTime_ < 70.0f && jumpTime_ >= 50.0f) {//70~40 //30
+	} else if (jumpTime_ < 70.0f && jumpTime_ >= 50.0f) {//70~50 //20
 
 		float flyT = 1.0f - (jumpTime_ - 50.0f) / 20.0f;
 		animModel_->transform.translate.y = std::lerp(jumpHeight_, 0.0f, (1.0f - powf(1.0f - flyT, 4.0f)));

@@ -40,7 +40,8 @@ void FollowCamera::Update(const Vector3& lockon) {
 	//}
 
 	Vector3 lockOnPosition = lockon;
-	Vector3 sub = lockOnPosition - target_->translate;
+	lockOnPosition.y = lockOnPosition.y - 3.0f;
+	Vector3 sub = lockOnPosition - Vector3(target_->translate.x, target_->translate.y + 4.0f , target_->translate.z);
 
 	destinationAngleY_ = std::atan2(sub.x, sub.z);
 	camera->transform.rotate.y = LerpShortAngle(camera->transform.rotate.y, destinationAngleY_, 0.3f);

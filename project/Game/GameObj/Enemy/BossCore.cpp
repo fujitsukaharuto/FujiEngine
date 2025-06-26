@@ -62,6 +62,12 @@ void BossCore::InitParameter() {
 }
 
 void BossCore::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
+	if (other.tag == "playerBullet_strng") {
+		pBoss_->ReduceBossHP(true);
+	}
+	if (other.tag == "playerBullet") {
+		pBoss_->ReduceBossHP(false);
+	}
 }
 
 void BossCore::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
