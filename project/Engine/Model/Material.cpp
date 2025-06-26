@@ -44,7 +44,7 @@ void Material::CreateEnvironmentMaterial() {
 	materialEnvironment_->enableLighting = static_cast<int32_t>(LightMode::kSpotLightON);
 	materialEnvironment_->uvTransform = MakeIdentity4x4();
 	materialEnvironment_->shininess = 50.0f;
-	materialEnvironment_->environmentCoefficient = 1.0f;
+	materialEnvironment_->environmentCoefficient = 0.0f;
 }
 
 
