@@ -91,6 +91,37 @@ void Object3d::CreateRing(float out, float in, float radius) {
 	CreateWVP();
 }
 
+void Object3d::CreateRingEx(float out, float in, float radius, bool horizon) {
+	this->camera_ = CameraManager::GetInstance()->GetCamera();
+	
+	model_ = std::make_unique<Model>();
+	model_->data_ = ModelManager::GetInstance()->CreateRingEx(out, in, radius,horizon);
+	modelName_ = "Ring";
+
+	for (size_t i = 0; i < model_->data_.meshes.size(); i++) {
+		Mesh newMesh{};
+		Material newMaterial{};
+		newMaterial.SetTextureNamePath((model_->data_.meshes[i].material.textureFilePath));
+		newMaterial.CreateMaterial();
+		model_->AddMaterial(newMaterial);
+		model_->SetTextureName((model_->data_.meshes[i].material.textureFilePath));
+
+		for (size_t index = 0; index < model_->data_.meshes[i].vertices.size(); index++) {
+			VertexDate newVertex = model_->data_.meshes[i].vertices[index];
+			newMesh.AddVertex({ { newVertex.position },{newVertex.texcoord},{newVertex.normal} });
+		}
+		for (size_t index = 0; index < model_->data_.meshes[i].indicies.size(); index++) {
+			uint32_t newIndex = model_->data_.meshes[i].indicies[index];
+			newMesh.AddIndex(newIndex);
+		}
+		newMesh.CreateMesh();
+		model_->AddMesh(newMesh);
+	}
+
+	transform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	CreateWVP();
+}
+
 void Object3d::CreateCylinder(float topRadius, float bottomRadius, float height) {
 	this->camera_ = CameraManager::GetInstance()->GetCamera();
 	ModelManager::GetInstance()->CreateCylinder(topRadius, bottomRadius, height);
