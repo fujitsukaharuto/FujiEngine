@@ -372,11 +372,11 @@ ModelData ModelManager::CreateRingEx(float out, float in, float radius, bool hor
 			newModelMesh.vertices.push_back({ {-sinA * kInnerRadius, 0.0f, cosA * kInnerRadius, 1.0f}, {u, 1.0f}, {0,0,1} });
 		} else {
 			// 外周
-			model->data_.vertices.push_back({ {-sinA * kOuterRadius, 0.0f, cosA * kOuterRadius, 1.0f}, {u, 0.0f}, {0,0,1} });
-			newModelMesh.vertices.push_back({ {-sinA * kOuterRadius, 0.0f, cosA * kOuterRadius, 1.0f}, {u, 0.0f}, {0,0,1} });
+			model->data_.vertices.push_back({ {-sinA * kOuterRadius, cosA * kOuterRadius, 0.0f, 1.0f}, {u, 0.0f}, {0,0,1} });
+			newModelMesh.vertices.push_back({ {-sinA * kOuterRadius, cosA * kOuterRadius, 0.0f, 1.0f}, {u, 0.0f}, {0,0,1} });
 			// 内周
-			model->data_.vertices.push_back({ {-sinA * kInnerRadius, 0.0f, cosA * kInnerRadius, 1.0f}, {u, 1.0f}, {0,0,1} });
-			newModelMesh.vertices.push_back({ {-sinA * kInnerRadius, 0.0f, cosA * kInnerRadius, 1.0f}, {u, 1.0f}, {0,0,1} });
+			model->data_.vertices.push_back({ {-sinA * kInnerRadius, cosA * kInnerRadius, 0.0f, 1.0f}, {u, 1.0f}, {0,0,1} });
+			newModelMesh.vertices.push_back({ {-sinA * kInnerRadius, cosA * kInnerRadius, 0.0f, 1.0f}, {u, 1.0f}, {0,0,1} });
 		}
 	}
 
