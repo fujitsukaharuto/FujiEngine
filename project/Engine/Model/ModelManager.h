@@ -32,6 +32,7 @@ public:
 
 	static void CreateSphere();
 	static void CreateRing(float out = 1.0f, float in = 0.2f, float radius = 2.0f);
+	static ModelData CreateRingEx(float out = 1.0f, float in = 0.2f, float radius = 2.0f, bool horizon = false);
 	static void CreateCylinder(float topRadius = 1.0f, float bottomRadius = 1.0f, float height = 3.0f);
 
 
