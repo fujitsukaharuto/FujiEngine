@@ -6,7 +6,7 @@ UnderRing::UnderRing() {
 
 void UnderRing::Initialize() {
 	OriginGameObject::Initialize();
-	model_->CreateRing();
+	model_->CreateRingEx(1.0f,0.75f,1.0f,true);
 
 	collider_ = std::make_unique<AABBCollider>();
 	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
@@ -19,7 +19,7 @@ void UnderRing::Initialize() {
 	model_->SetTexture("gradationLine.png");
 	model_->SetColor({ 0.9f,0.9f,1.0f,1.0f });
 	model_->SetAlphaRef(0.25f);
-	model_->transform.rotate.x = std::numbers::pi_v<float> * 0.5f;
+	// model_->transform.rotate.x = std::numbers::pi_v<float> *0.5f;
 
 }
 
@@ -34,7 +34,7 @@ void UnderRing::Update() {
 		}
 
 		model_->SetUVScale({ 0.75f,1.0f }, { uvTransX_,0.0f });
-		model_->transform.scale += (Vector3(1.0f, 1.0f, 0.0f) * speed_) * FPSKeeper::DeltaTime();
+		model_->transform.scale += (Vector3(1.0f, 0.0f, 1.0f) * speed_) * FPSKeeper::DeltaTime();
 
 		collider_->SetPos(model_->GetWorldPos());
 		collider_->InfoUpdate();
