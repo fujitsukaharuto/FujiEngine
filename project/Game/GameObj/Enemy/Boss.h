@@ -7,6 +7,7 @@
 #include "Game/GameObj/Enemy/Behavior/BaseBossBehavior.h"
 
 #include "Game/GameObj/Enemy/BossCore.h"
+#include "Game/GameObj/Enemy/BossItem/UnderRing.h"
 #include "Game/GameObj/Enemy/BossItem/WaveWall.h"
 #include "Game/GameObj/Enemy/BossItem/Beam.h"
 
@@ -42,6 +43,7 @@ public:
 
 	void InitJumpAttack();
 	bool JumpAttack();
+	void UpdateUnderRing();
 
 	//========================================================================*/
 	//* Behavior
@@ -71,6 +73,7 @@ private:
 	std::unique_ptr<BossCore> core_;
 	std::unique_ptr<Beam> beam_;
 	std::vector<std::unique_ptr<WaveWall>> walls_;
+	std::vector<std::unique_ptr<UnderRing>> undderRings_;
 
 	std::unique_ptr<Object3d> shadow_;
 	std::unique_ptr<AABBCollider> collider_;

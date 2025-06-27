@@ -1,6 +1,7 @@
 #pragma once
 #include "Game/OriginGameObject.h"
 #include "Game/Collider/AABBCollider.h"
+#include "Engine/Model/Sprite.h"
 
 #include "Game/GameObj/Player/Behavior/BasePlayerBehavior.h"
 #include "Game/GameObj/Player/AttackBehavior/BasePlayerAttackBehavior.h"
@@ -79,6 +80,11 @@ private:
 	std::unique_ptr<AABBCollider> collider_;
 
 	Vector3 targetPos_;
+
+	float playerHP_;
+	std::unique_ptr<Sprite> hpSprite_;
+	Vector2 hpSize_ = { 275.0f,35.0f };
+	Vector2 hpStartPos_ = { 55.0f,650.0f };
 
 	float moveSpeed_;
 	float jumpSpeed_;

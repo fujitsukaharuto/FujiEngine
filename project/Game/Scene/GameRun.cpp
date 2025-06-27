@@ -37,6 +37,7 @@ void GameRun::Initialize() {
 	modelManager_->LoadOBJ("playerModel.obj");
 	modelManager_->LoadOBJ("boss.obj");
 	modelManager_->LoadOBJ("bossWaveWall.obj");
+	modelManager_->LoadOBJ("Star.obj");
 	modelManager_->LoadGLTF("AnimatedCube.gltf");
 	modelManager_->LoadGLTF("walk.gltf");
 	modelManager_->LoadGLTF("sneakWalk.gltf");

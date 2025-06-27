@@ -25,6 +25,14 @@ void Player::Initialize() {
 	shadow_->transform.translate.y = 0.15f;
 	shadow_->transform.scale.y = 0.1f;
 
+	playerHP_ = 100.0f;
+	hpSprite_ = std::make_unique<Sprite>();
+	hpSprite_->Load("white2x2.png");
+	hpSprite_->SetColor({ 1.0f,0.411f,0.705f,1.0f });
+	hpSprite_->SetAnchor({ 0.0f,0.5f });
+	hpSprite_->SetPos({ hpStartPos_.x, hpStartPos_.y, 0.0f });
+	hpSprite_->SetSize(hpSize_);
+
 	moveSpeed_ = 0.2f;
 	secoundJumpSpeed_ = 0.1f;
 	jumpSpeed_ = 0.2f;
@@ -87,6 +95,8 @@ void Player::Draw(Material* mate, bool is) {
 	shadow_->Draw();
 
 	OriginGameObject::Draw(mate, is);
+
+	hpSprite_->Draw();
 }
 
 void Player::DebugGUI() {

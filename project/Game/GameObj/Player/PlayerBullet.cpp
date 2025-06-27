@@ -11,7 +11,7 @@ PlayerBullet::~PlayerBullet() {
 
 void PlayerBullet::Initialize() {
 	OriginGameObject::Initialize();
-	OriginGameObject::CreateModel("cube.obj");
+	OriginGameObject::CreateModel("Star.obj");
 
 	collider_ = std::make_unique<AABBCollider>();
 	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
@@ -64,7 +64,7 @@ void PlayerBullet::Update() {
 }
 
 void PlayerBullet::Draw(Material* mate, bool is) {
-	if (isLive_) {
+	if (isLive_ && !isCharge_) {
 		OriginGameObject::Draw(mate, is);
 	}
 }
@@ -103,8 +103,12 @@ void PlayerBullet::CalculetionFollowVec(const Vector3& target) {
 
 	// 速度に反映
 	velocity_ = newForward * velocity_.Length();
-
-	zRotate_ += 0.2f * FPSKeeper::DeltaTime();
+	
+	if (isStrnght_) {
+		zRotate_ += 0.15f * FPSKeeper::DeltaTime();
+	} else {
+		zRotate_ += 0.075f * FPSKeeper::DeltaTime();
+	}
 	if (zRotate_ > (std::numbers::pi_v<float> *2.0f)) zRotate_ -= (std::numbers::pi_v<float> *2.0f);
 	Quaternion spinRot = Quaternion::AngleAxis(zRotate_, Vector3(0, 0, 1));
 	// スピン回転を補間後のクォータニオンに加える（Z軸にひねる）

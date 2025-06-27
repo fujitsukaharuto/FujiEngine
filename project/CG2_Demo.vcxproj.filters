@@ -287,6 +287,9 @@
     <ClCompile Include="Game\GameObj\Enemy\Behavior\BossSwordAttack.cpp">
       <Filter>Game\GameObj\Enemy\Behavior</Filter>
     </ClCompile>
+    <ClCompile Include="Game\GameObj\Enemy\BossItem\UnderRing.cpp">
+      <Filter>Game\GameObj\Enemy\BossItem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -627,6 +630,9 @@
     </ClInclude>
     <ClInclude Include="Game\GameObj\Enemy\Behavior\BossSwordAttack.h">
       <Filter>Game\GameObj\Enemy\Behavior</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\Enemy\BossItem\UnderRing.h">
+      <Filter>Game\GameObj\Enemy\BossItem</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -143,6 +143,7 @@ void Boss::Update() {
 
 	beam_->Update();
 	UpdateWaveWall();
+	UpdateUnderRing();
 
 	ShakeHP();
 
@@ -166,9 +167,13 @@ void Boss::Draw([[maybe_unused]] Material* mate, [[maybe_unused]] bool is) {
 		if (!wall->GetIsLive())continue;
 		wall->Draw();
 	}
+	for (auto& ring : undderRings_) {
+		if (!ring->GetIsLive())continue;
+		ring->Draw();
+	}
 	beam_->Draw();
 
-	if (bossHp_>= 0.0f) {
+	if (bossHp_ >= 0.0f) {
 		int texCount = 0;
 		for (auto& tex : hpSprites_) {
 			tex->Draw();
@@ -227,6 +232,13 @@ void Boss::InitParameter() {
 		wall = std::make_unique<WaveWall>();
 		wall->Initialize();
 		walls_.push_back(std::move(wall));
+	}
+
+	for (int i = 0; i < 3; i++) {
+		std::unique_ptr<UnderRing> ring;
+		ring = std::make_unique<UnderRing>();
+		ring->Initialize();
+		undderRings_.push_back(std::move(ring));
 	}
 
 	for (int i = 0; i < 5; i++) {
@@ -298,7 +310,7 @@ void Boss::ShakeHP() {
 		float t = shakeTime_ / baseShakeTime_; // 1.0 → 0.0 に減る
 		float theta = t * 2.0f * std::numbers::pi_v<float>; // sin/cos の周期は π（0→π）
 
-		float offsetX = std::cos(theta + std::numbers::pi_v<float> / 2.0f) *shakeSize_;
+		float offsetX = std::cos(theta + std::numbers::pi_v<float> / 2.0f) * shakeSize_;
 		float offsetY = std::sin(theta + std::numbers::pi_v<float>) * shakeSize_;
 		hpSprites_[nowHpIndex_]->SetPos({ hpStartPos_.x + (hpSize_.x * nowHpIndex_) + (hpIndent * nowHpIndex_) + offsetX, hpStartPos_.y + offsetY, 0.0f });
 	}
@@ -517,6 +529,13 @@ bool Boss::JumpAttack() {
 				jumpWave_.pos_ = animModel_->transform.translate;
 				jumpWave_.Emit();
 				isJumpAttack_ = false;
+				int count = 0;
+				for (auto& ring : undderRings_) {
+					if (count == 1) break;
+					if (ring->GetIsLive()) continue;
+					ring->InitRing(animModel_->transform.translate);
+					count++;
+				}
 			}
 		}
 
@@ -526,6 +545,13 @@ bool Boss::JumpAttack() {
 	}
 
 	return false;
+}
+
+void Boss::UpdateUnderRing() {
+	for (auto& ring : undderRings_) {
+		if (!ring->GetIsLive())continue;
+		ring->Update();
+	}
 }
 
 ///= Behavior =================================================================*/
