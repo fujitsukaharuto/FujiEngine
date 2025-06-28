@@ -41,6 +41,9 @@ void Player::Initialize() {
 	maxChargeTime_ = 60.0f;
 
 	collider_ = std::make_unique<AABBCollider>();
+	collider_->SetWidth(2.0f);
+	collider_->SetDepth(2.0f);
+	collider_->SetHeight(2.0f);
 	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
 	collider_->SetCollisionStayCallback([this](const ColliderInfo& other) {OnCollisionStay(other); });
 	collider_->SetCollisionExitCallback([this](const ColliderInfo& other) {OnCollisionExit(other); });
@@ -79,9 +82,12 @@ void Player::Update() {
 		}
 	}
 
+	HPUpdate();
+
 	shadow_->transform.translate = model_->transform.translate;
 	shadow_->transform.translate.y = 0.15f;
 	collider_->SetPos(model_->GetWorldPos());
+	collider_->InfoUpdate();
 }
 
 void Player::Draw(Material* mate, bool is) {
@@ -95,6 +101,10 @@ void Player::Draw(Material* mate, bool is) {
 	shadow_->Draw();
 
 	OriginGameObject::Draw(mate, is);
+
+#ifdef _DEBUG
+	collider_->DrawCollider();
+#endif // _DEBUG
 
 	hpSprite_->Draw();
 }
@@ -121,14 +131,21 @@ void Player::ParameterGUI() {
 		ImGui::DragFloat("jumpSpeedw", &jumpSpeed_, 0.01f);
 		ImGui::DragFloat("gravity", &gravity_, 0.01f);
 		ImGui::DragFloat("maxFallSpeed", &maxFallSpeed_, 0.01f);
+		ImGui::DragFloat("playerHP", &playerHP_, 0.01f);
 		ImGui::TreePop();
 	}
 	ImGui::Unindent();
 #endif // _DEBUG
 }
 
+void Player::HPUpdate() {
+	Vector2 hpSize = hpSize_;
+	float t = playerHP_ / 100.0f;
+	hpSprite_->SetSize({ hpSize.x * t, hpSize.y });
+}
+
 ///= Behavior =================================================================*/
-#pragma region Behavior
+#pragma region Behaviors
 void Player::ChangeBehavior(std::unique_ptr<BasePlayerBehavior>behavior) {
 	behavior_ = std::move(behavior);
 }
@@ -140,6 +157,12 @@ void Player::ChangeAttackBehavior(std::unique_ptr<BasePlayerAttackBehavior> beha
 
 ///= Collision ================================================================*/
 void Player::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
+	if (other.tag == "enemyAttack") {
+		playerHP_ -= 5.0f;
+		if (playerHP_ < 0.0f) {
+			playerHP_ = 0.0f;
+		}
+	}
 }
 void Player::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
 }

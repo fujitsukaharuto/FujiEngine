@@ -9,6 +9,8 @@ void UnderRing::Initialize() {
 	model_->CreateRingEx(1.0f,0.75f,2.0f,true);
 
 	collider_ = std::make_unique<AABBCollider>();
+	collider_->SetTag("enemyAttack");
+	collider_->SetParent(&model_->transform);
 	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
 	collider_->SetCollisionStayCallback([this](const ColliderInfo& other) {OnCollisionStay(other); });
 	collider_->SetCollisionExitCallback([this](const ColliderInfo& other) {OnCollisionExit(other); });
@@ -36,13 +38,19 @@ void UnderRing::Update() {
 		model_->SetUVScale({ 0.75f,1.0f }, { uvTransX_,0.0f });
 		model_->transform.scale += (Vector3(1.0f, 0.0f, 1.0f) * speed_) * FPSKeeper::DeltaTime();
 
-		collider_->SetPos(model_->GetWorldPos());
+		//collider_->SetPos(model_->GetWorldPos());
 		collider_->InfoUpdate();
 	}
 }
 
 void UnderRing::Draw([[maybe_unused]] Material* mate, [[maybe_unused]] bool is) {
 	OriginGameObject::Draw(nullptr, true);
+}
+
+void UnderRing::DrawCollider() {
+#ifdef _DEBUG
+	collider_->DrawCollider();
+#endif // _DEBUG
 }
 
 void UnderRing::DebugGUI() {

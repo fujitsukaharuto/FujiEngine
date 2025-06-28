@@ -19,6 +19,8 @@ public:
 	void DebugGUI()override;
 	void ParameterGUI();
 
+	void HPUpdate();
+
 	//========================================================================*/
 	//* Behavior
 	void ChangeBehavior(std::unique_ptr<BasePlayerBehavior>behavior);

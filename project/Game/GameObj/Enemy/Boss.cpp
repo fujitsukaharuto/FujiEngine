@@ -167,10 +167,16 @@ void Boss::Draw([[maybe_unused]] Material* mate, [[maybe_unused]] bool is) {
 	for (auto& wall : walls_) {
 		if (!wall->GetIsLive())continue;
 		wall->Draw();
+#ifdef _DEBUG
+		wall->DrawCollider();
+#endif // _DEBUG
 	}
 	for (auto& ring : undderRings_) {
 		if (!ring->GetIsLive())continue;
 		ring->Draw();
+#ifdef _DEBUG
+		ring->DrawCollider();
+#endif // _DEBUG
 	}
 	beam_->Draw();
 

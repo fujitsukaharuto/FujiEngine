@@ -60,6 +60,7 @@ void PlayerBullet::Update() {
 		model_->transform.translate += (velocity_ * speed_) * FPSKeeper::DeltaTime();
 
 		collider_->SetPos(model_->GetWorldPos());
+		collider_->InfoUpdate();
 	}
 }
 

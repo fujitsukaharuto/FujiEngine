@@ -127,6 +127,16 @@ void GameScene::Update() {
 		}
 	}
 	cMane_->AddCollider(boss_->GetCoreCollider());
+	for (auto& wall : boss_->GetWalls()) {
+		if (wall->GetIsLive()) {
+			cMane_->AddCollider(wall->GetCollider());
+		}
+	}
+	for (auto& ring : boss_->GetUnderRings()) {
+		if (ring->GetIsLive()) {
+			cMane_->AddCollider(ring->GetCollider());
+		}
+	}
 	cMane_->CheckAllCollision();
 
 	ParticleManager::GetInstance()->Update();

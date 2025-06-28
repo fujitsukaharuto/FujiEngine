@@ -19,6 +19,8 @@ void WaveWall::Initialize() {
 	wave3_->Create("bossWaveWall.obj");
 
 	collider_ = std::make_unique<AABBCollider>();
+	collider_->SetTag("enemyAttack");
+	collider_->SetParent(&model_->transform);
 	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
 	collider_->SetCollisionStayCallback([this](const ColliderInfo& other) {OnCollisionStay(other); });
 	collider_->SetCollisionExitCallback([this](const ColliderInfo& other) {OnCollisionExit(other); });
@@ -113,7 +115,6 @@ void WaveWall::Update() {
 		spark1_.Emit();
 		spark2_.Emit();
 
-		collider_->SetPos(model_->GetWorldPos());
 		collider_->InfoUpdate();
 	}
 
@@ -125,6 +126,12 @@ void WaveWall::Draw([[maybe_unused]] Material* mate, [[maybe_unused]] bool is) {
 	wave2_->Draw(nullptr, true);
 	wave3_->Draw(nullptr, true);
 	OriginGameObject::Draw(nullptr, true);
+}
+
+void WaveWall::DrawCollider() {
+#ifdef _DEBUG
+	collider_->DrawCollider();
+#endif // _DEBUG
 }
 
 void WaveWall::DebugGUI() {

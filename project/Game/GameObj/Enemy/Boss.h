@@ -59,6 +59,8 @@ public:
 	BaseCollider* GetCollider() { return collider_.get(); }
 	BaseCollider* GetCoreCollider() { return core_->GetCollider(); }
 	BossCore* GetBossCore() { return core_.get(); }
+	std::vector<std::unique_ptr<WaveWall>>& GetWalls() { return walls_; }
+	std::vector<std::unique_ptr<UnderRing>>& GetUnderRings() { return undderRings_; }
 	float GetAttackCooldown() { return attackCooldown_; }
 	float GetBossHP() { return bossHp_; }
 

@@ -32,6 +32,8 @@ void Beam::Initialize() {
 	beam3_->SetTexture("beamCore.png");
 
 	collider_ = std::make_unique<AABBCollider>();
+	collider_->SetTag("enemyAttack");
+	collider_->SetParent(&model_->transform);
 	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
 	collider_->SetCollisionStayCallback([this](const ColliderInfo& other) {OnCollisionStay(other); });
 	collider_->SetCollisionExitCallback([this](const ColliderInfo& other) {OnCollisionExit(other); });
