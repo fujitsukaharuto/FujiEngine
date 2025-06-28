@@ -94,7 +94,28 @@ std::array<Vector3, 8> AABBCollider::GetWorldVertices() const {
 
 	Matrix4x4 worldMatrix;
 	if (parent_) {
-		worldMatrix = parent_->GetWorldMat(); // 回転含む
+		const Matrix4x4& parentWorldMatrix = parent_->GetWorldMat();
+		// スケール成分を除去した親ワールド行列を作成
+		Matrix4x4 noScaleParentMatrix = parentWorldMatrix;
+
+		// 各軸ベクトルの長さ（スケール）を計算
+		Vector3 xAxis = { parentWorldMatrix.m[0][0], parentWorldMatrix.m[1][0], parentWorldMatrix.m[2][0] };
+		Vector3 yAxis = { parentWorldMatrix.m[0][1], parentWorldMatrix.m[1][1], parentWorldMatrix.m[2][1] };
+		Vector3 zAxis = { parentWorldMatrix.m[0][2], parentWorldMatrix.m[1][2], parentWorldMatrix.m[2][2] };
+
+		float xLen = Vector3::Length(xAxis);
+		float yLen = Vector3::Length(yAxis);
+		float zLen = Vector3::Length(zAxis);
+
+		// 正規化（スケールを除去）
+		for (int i = 0; i < 3; ++i) {
+			noScaleParentMatrix.m[i][0] /= xLen;
+			noScaleParentMatrix.m[i][1] /= yLen;
+			noScaleParentMatrix.m[i][2] /= zLen;
+		}
+
+		// 変換はそのまま（位置は影響受けてOKなら）
+		worldMatrix = Multiply(worldMatrix, noScaleParentMatrix);
 	} else {
 		worldMatrix = MakeIdentity4x4(); // 回転なし
 	}
@@ -139,5 +160,35 @@ void AABBCollider::DrawCollider() {
 	Line3dDrawer::GetInstance()->DrawLine3d(v[2], v[6], { 1.0f,1.0f,1.0f,1.0f });
 	Line3dDrawer::GetInstance()->DrawLine3d(v[3], v[7], { 1.0f,1.0f,1.0f,1.0f });
 
+	/*// 半サイズを計算
+	float halfWidth = width / 2.0f;
+	float halfHeight = height / 2.0f;
+	float halfDepth = depth / 2.0f;
+
+	// 8つの頂点を計算
+	Vector3 v1 = { info.worldPos.x - halfWidth, info.worldPos.y - halfHeight, info.worldPos.z - halfDepth };
+	Vector3 v2 = { info.worldPos.x + halfWidth, info.worldPos.y - halfHeight, info.worldPos.z - halfDepth };
+	Vector3 v3 = { info.worldPos.x + halfWidth, info.worldPos.y + halfHeight, info.worldPos.z - halfDepth };
+	Vector3 v4 = { info.worldPos.x - halfWidth, info.worldPos.y + halfHeight, info.worldPos.z - halfDepth };
+	Vector3 v5 = { info.worldPos.x - halfWidth, info.worldPos.y - halfHeight, info.worldPos.z + halfDepth };
+	Vector3 v6 = { info.worldPos.x + halfWidth, info.worldPos.y - halfHeight, info.worldPos.z + halfDepth };
+	Vector3 v7 = { info.worldPos.x + halfWidth, info.worldPos.y + halfHeight, info.worldPos.z + halfDepth };
+	Vector3 v8 = { info.worldPos.x - halfWidth, info.worldPos.y + halfHeight, info.worldPos.z + halfDepth };
+
+	// 線を描画
+	Line3dDrawer::GetInstance()->DrawLine3d(v1, v2, { 1.0f,1.0f,1.0f,1.0f }); // 底面の線
+	Line3dDrawer::GetInstance()->DrawLine3d(v2, v3, { 1.0f,1.0f,1.0f,1.0f });
+	Line3dDrawer::GetInstance()->DrawLine3d(v3, v4, { 1.0f,1.0f,1.0f,1.0f });
+	Line3dDrawer::GetInstance()->DrawLine3d(v4, v1, { 1.0f,1.0f,1.0f,1.0f });
+
+	Line3dDrawer::GetInstance()->DrawLine3d(v5, v6, { 1.0f,1.0f,1.0f,1.0f }); // 上面の線
+	Line3dDrawer::GetInstance()->DrawLine3d(v6, v7, { 1.0f,1.0f,1.0f,1.0f });
+	Line3dDrawer::GetInstance()->DrawLine3d(v7, v8, { 1.0f,1.0f,1.0f,1.0f });
+	Line3dDrawer::GetInstance()->DrawLine3d(v8, v5, { 1.0f,1.0f,1.0f,1.0f });
+
+	Line3dDrawer::GetInstance()->DrawLine3d(v1, v5, { 1.0f,1.0f,1.0f,1.0f }); // 側面の線
+	Line3dDrawer::GetInstance()->DrawLine3d(v2, v6, { 1.0f,1.0f,1.0f,1.0f });
+	Line3dDrawer::GetInstance()->DrawLine3d(v3, v7, { 1.0f,1.0f,1.0f,1.0f });
+	Line3dDrawer::GetInstance()->DrawLine3d(v4, v8, { 1.0f,1.0f,1.0f,1.0f });*/
 }
 #endif // _DEBUG
