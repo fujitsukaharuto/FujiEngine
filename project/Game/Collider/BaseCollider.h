@@ -35,7 +35,8 @@ public:
 
 	void SetParent(Object3d* parent) { parent_ = parent; }
 	void SetTag(const std::string& tag) { info.tag = tag; }
-	void SetPos(const Vector3& pos) { info.pos = pos; }
+	void SetOffset(const Vector3& pos) { offset_ = pos; }
+	void SetPos(const Vector3& pos) { info.pos = pos + offset_; }
 	void SetOwner(OriginGameObject* owner) { info.owner = owner; }
 	void SetIsCollisonCheck(bool is) { isCollisionCheck_ = is; }
 
@@ -51,4 +52,5 @@ protected:
 	ColliderInfo info;
 	Object3d* parent_ = nullptr;
 	bool isCollisionCheck_ = true;
+	Vector3 offset_ = { 0.0f,0.0f,0.0f };
 };

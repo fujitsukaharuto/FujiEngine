@@ -39,6 +39,7 @@ public:
 
 
 	CollisionState GetState()const { return state; }
+	std::array<Vector3, 8> GetWorldVertices() const;
 
 	float GetWidth() const { return width; }
 	float GetHeight() const { return height; }
