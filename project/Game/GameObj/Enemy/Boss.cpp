@@ -31,6 +31,7 @@ void Boss::Initialize() {
 	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
 	collider_->SetCollisionStayCallback([this](const ColliderInfo& other) {OnCollisionStay(other); });
 	collider_->SetCollisionExitCallback([this](const ColliderInfo& other) {OnCollisionExit(other); });
+	collider_->SetParent(&animModel_->transform);
 	collider_->SetTag("Boss");
 	collider_->SetWidth(4.0f);
 	collider_->SetHeight(8.0f);
@@ -150,7 +151,7 @@ void Boss::Update() {
 	animModel_->AnimationUpdate();
 	shadow_->transform.translate = animModel_->transform.translate;
 	shadow_->transform.translate.y = 0.15f;
-	collider_->SetPos(animModel_->GetWorldPos());
+	//collider_->SetPos(animModel_->GetWorldPos());
 	collider_->InfoUpdate();
 }
 

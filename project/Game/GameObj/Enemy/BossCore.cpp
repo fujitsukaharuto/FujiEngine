@@ -16,6 +16,7 @@ void BossCore::Initialize() {
 	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
 	collider_->SetCollisionStayCallback([this](const ColliderInfo& other) {OnCollisionStay(other); });
 	collider_->SetCollisionExitCallback([this](const ColliderInfo& other) {OnCollisionExit(other); });
+	collider_->SetParent(&model_->transform);
 	collider_->SetTag("testBoss");
 	collider_->SetWidth(3.0f);
 	collider_->SetHeight(3.0f);
@@ -29,7 +30,7 @@ void BossCore::Initialize() {
 }
 
 void BossCore::Update() {
-	collider_->SetPos(model_->GetWorldPos());
+	//collider_->SetPos(model_->GetWorldPos());
 	collider_->InfoUpdate();
 }
 
