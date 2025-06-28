@@ -33,7 +33,7 @@ public:
 
 	void InfoUpdate();
 
-	void SetParent(Object3d* parent) { parent_ = parent; }
+	void SetParent(Trans* parent) { parent_ = parent; }
 	void SetTag(const std::string& tag) { info.tag = tag; }
 	void SetOffset(const Vector3& pos) { offset_ = pos; }
 	void SetPos(const Vector3& pos) { info.pos = pos + offset_; }
@@ -50,7 +50,7 @@ public:
 
 protected:
 	ColliderInfo info;
-	Object3d* parent_ = nullptr;
+	Trans* parent_ = nullptr;
 	bool isCollisionCheck_ = true;
 	Vector3 offset_ = { 0.0f,0.0f,0.0f };
 };
