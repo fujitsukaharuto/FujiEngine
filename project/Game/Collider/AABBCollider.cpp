@@ -94,7 +94,7 @@ std::array<Vector3, 8> AABBCollider::GetWorldVertices() const {
 
 	Matrix4x4 worldMatrix = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, info.pos);
 	if (parent_) {
-		const Matrix4x4& parentWorldMatrix = parent_->GetWorldMat();
+		const Matrix4x4& parentWorldMatrix = parent_->GetNoneScaleWorldMat();
 		// スケール成分を除去した親ワールド行列を作成
 		Matrix4x4 noScaleParentMatrix = parentWorldMatrix;
 
