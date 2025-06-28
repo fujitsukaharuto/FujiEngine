@@ -92,9 +92,9 @@ std::array<Vector3, 8> AABBCollider::GetWorldVertices() const {
 
 	std::array<Vector3, 8> worldVertices;
 
-	Matrix4x4 worldMatrix = MakeIdentity4x4();
+	Matrix4x4 worldMatrix = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, info.pos);
 	if (parent_) {
-		const Matrix4x4& parentWorldMatrix = parent_->GetWorldMat();
+		const Matrix4x4& parentWorldMatrix = parent_->GetNoneScaleWorldMat();
 		// スケール成分を除去した親ワールド行列を作成
 		Matrix4x4 noScaleParentMatrix = parentWorldMatrix;
 
@@ -120,7 +120,7 @@ std::array<Vector3, 8> AABBCollider::GetWorldVertices() const {
 
 	// 各頂点をワールド空間に変換
 	for (int i = 0; i < 8; ++i) {
-		worldVertices[i] = Transform(localVertices[i] + info.pos, worldMatrix);
+		worldVertices[i] = Transform(localVertices[i], worldMatrix);
 	}
 
 	return worldVertices;
