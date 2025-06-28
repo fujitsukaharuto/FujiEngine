@@ -5,6 +5,22 @@
 
 class AABBCollider;
 
+struct OBB {
+
+	Vector3 size;
+	Vector3 center;
+	Vector3 rotate;
+
+	static OBB Default() {
+		OBB obb = {
+			.size = {1.0f,1.0f,1.0f},
+			.center = {0.0f,0.0f,0.0f},
+			.rotate = {0.0f,0.0f,0.0f}
+		};
+		return obb;
+	};
+};
+
 class CollisionManager {
 public:
 	CollisionManager();
@@ -21,7 +37,9 @@ public:
 
 private:
 
-	bool checkAABBCollision(AABBCollider* A, AABBCollider* B);
+	OBB ConvertAABBToOBB(const AABBCollider* aabb);
+
+	bool checkAABBCollision(AABBCollider* A, AABBCollider* B);// 一度OBBの当たり判定に変えている
 
 private:
 

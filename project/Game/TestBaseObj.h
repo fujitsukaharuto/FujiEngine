@@ -56,12 +56,13 @@ inline void TestBaseObj::Initialize() {
 	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
 	collider_->SetCollisionStayCallback([this](const ColliderInfo& other) {OnCollisionStay(other); });
 	collider_->SetCollisionExitCallback([this](const ColliderInfo& other) {OnCollisionExit(other); });
+	collider_->SetParent(&model_->transform);
 }
 
 inline void TestBaseObj::Update() {
 	isCollider_ = false;
 	
-	collider_->SetPos(model_->GetWorldPos());
+	//collider_->SetPos(model_->GetWorldPos());
 }
 
 inline void TestBaseObj::Draw([[maybe_unused]] Material* mate, bool is) {
@@ -72,7 +73,7 @@ inline void TestBaseObj::DebugGUI() {
 #ifdef _DEBUG
 	if (ImGui::CollapsingHeader(name_.c_str())) {
 		OriginGameObject::DebugGUI();
-		collider_->SetPos(model_->GetWorldPos());
+		//collider_->SetPos(model_->GetWorldPos());
 
 		collider_->DebugGUI();
 	}
@@ -118,36 +119,23 @@ inline void TestBaseObj::Debug() {
 }
 inline void TestBaseObj::DrawCollider() {
 
-	// 半サイズを計算
-	float halfWidth = collider_->GetWidth() / 2.0f;
-	float halfHeight = collider_->GetHeight() / 2.0f;
-	float halfDepth = collider_->GetDepth() / 2.0f;
-
-	// 8つの頂点を計算
-	Vector3 v1 = { collider_->GetPos().x - halfWidth, collider_->GetPos().y - halfHeight, collider_->GetPos().z - halfDepth};
-	Vector3 v2 = { collider_->GetPos().x + halfWidth, collider_->GetPos().y - halfHeight, collider_->GetPos().z - halfDepth };
-	Vector3 v3 = { collider_->GetPos().x + halfWidth, collider_->GetPos().y + halfHeight, collider_->GetPos().z - halfDepth };
-	Vector3 v4 = { collider_->GetPos().x - halfWidth, collider_->GetPos().y + halfHeight, collider_->GetPos().z - halfDepth };
-	Vector3 v5 = { collider_->GetPos().x - halfWidth, collider_->GetPos().y - halfHeight, collider_->GetPos().z + halfDepth };
-	Vector3 v6 = { collider_->GetPos().x + halfWidth, collider_->GetPos().y - halfHeight, collider_->GetPos().z + halfDepth };
-	Vector3 v7 = { collider_->GetPos().x + halfWidth, collider_->GetPos().y + halfHeight, collider_->GetPos().z + halfDepth };
-	Vector3 v8 = { collider_->GetPos().x - halfWidth, collider_->GetPos().y + halfHeight, collider_->GetPos().z + halfDepth };
+	std::array<Vector3, 8> v = collider_->GetWorldVertices();
 
 	// 線を描画
-	Line3dDrawer::GetInstance()->DrawLine3d(v1, v2, color_); // 底面の線
-	Line3dDrawer::GetInstance()->DrawLine3d(v2, v3, color_);
-	Line3dDrawer::GetInstance()->DrawLine3d(v3, v4, color_);
-	Line3dDrawer::GetInstance()->DrawLine3d(v4, v1, color_);
+	Line3dDrawer::GetInstance()->DrawLine3d(v[0], v[1], color_); // 底面の線
+	Line3dDrawer::GetInstance()->DrawLine3d(v[1], v[2], color_);
+	Line3dDrawer::GetInstance()->DrawLine3d(v[2], v[3], color_);
+	Line3dDrawer::GetInstance()->DrawLine3d(v[3], v[0], color_);
 
-	Line3dDrawer::GetInstance()->DrawLine3d(v5, v6, color_); // 上面の線
-	Line3dDrawer::GetInstance()->DrawLine3d(v6, v7, color_);
-	Line3dDrawer::GetInstance()->DrawLine3d(v7, v8, color_);
-	Line3dDrawer::GetInstance()->DrawLine3d(v8, v5, color_);
+	Line3dDrawer::GetInstance()->DrawLine3d(v[4], v[5], color_); // 上面の線
+	Line3dDrawer::GetInstance()->DrawLine3d(v[5], v[6], color_);
+	Line3dDrawer::GetInstance()->DrawLine3d(v[6], v[7], color_);
+	Line3dDrawer::GetInstance()->DrawLine3d(v[7], v[4], color_);
 
-	Line3dDrawer::GetInstance()->DrawLine3d(v1, v5, color_); // 側面の線
-	Line3dDrawer::GetInstance()->DrawLine3d(v2, v6, color_);
-	Line3dDrawer::GetInstance()->DrawLine3d(v3, v7, color_);
-	Line3dDrawer::GetInstance()->DrawLine3d(v4, v8, color_);
+	Line3dDrawer::GetInstance()->DrawLine3d(v[0], v[4], color_); // 側面の線
+	Line3dDrawer::GetInstance()->DrawLine3d(v[1], v[5], color_);
+	Line3dDrawer::GetInstance()->DrawLine3d(v[2], v[6], color_);
+	Line3dDrawer::GetInstance()->DrawLine3d(v[3], v[7], color_);
 
 }
 #endif // _DEBUG
