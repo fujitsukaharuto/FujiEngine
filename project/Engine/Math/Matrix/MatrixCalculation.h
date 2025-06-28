@@ -21,6 +21,7 @@ struct Trans {
 	void SetNoneScaleParent(bool is) { isNoneScaleParent = is; }
 	void SetCameraParent(bool is) { isCameraParent = is; }
 	Matrix4x4 GetWorldMat() const;
+	Matrix4x4 GetNoneScaleWorldMat() const;
 	Vector3 GetRotation();
 	Trans* parent = nullptr;
 

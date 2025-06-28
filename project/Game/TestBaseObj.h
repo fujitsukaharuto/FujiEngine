@@ -63,6 +63,7 @@ inline void TestBaseObj::Update() {
 	isCollider_ = false;
 	
 	//collider_->SetPos(model_->GetWorldPos());
+	collider_->InfoUpdate();
 }
 
 inline void TestBaseObj::Draw([[maybe_unused]] Material* mate, bool is) {
