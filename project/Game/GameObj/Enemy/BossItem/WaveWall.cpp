@@ -150,28 +150,29 @@ void WaveWall::InitWave(const Vector3& pos, const Vector3& velo) {
 void WaveWall::CalculetionFollowVec(const Vector3& target) {
 	Vector3 currentPos = model_->transform.translate;
 	currentPos.y = 0.0f;
-	Vector3 targetZeroY = target * 1.2f;
+	Vector3 targetZeroY = target;
 	targetZeroY.y = 0.0f;
 	Vector3 toTarget = ((targetZeroY - currentPos)) .Normalize();
 	Vector3 forward = velocity_.Normalize();
 
-	// 現在の向きと目標の向きのクォータニオンを作成
-	Quaternion currentRot = Quaternion::LookRotation(forward);  // ※LookRotation関数を追加する必要あり
-	Quaternion targetRot = Quaternion::LookRotation(toTarget);
+	if (lifeTime_ > 150.0f) {
+		// 現在の向きと目標の向きのクォータニオンを作成
+		Quaternion currentRot = Quaternion::LookRotation(forward);  // ※LookRotation関数を追加する必要あり
+		Quaternion targetRot = Quaternion::LookRotation(toTarget);
 
-	// 補間
-	Quaternion newRot = Quaternion::Slerp(currentRot, targetRot, 0.02f);
+		// 補間
+		Quaternion newRot = Quaternion::Slerp(currentRot, targetRot, 0.02f);
 
-	// 回転行列に変換して前方向を取得
-	Matrix4x4 rotMat = newRot.MakeRotateMatrix();
-	Vector3 newForward = Vector3(rotMat.m[2][0], rotMat.m[2][1], rotMat.m[2][2]);
+		// 回転行列に変換して前方向を取得
+		Matrix4x4 rotMat = newRot.MakeRotateMatrix();
+		Vector3 newForward = Vector3(rotMat.m[2][0], rotMat.m[2][1], rotMat.m[2][2]);
 
-	// 速度に反映
-	velocity_ = newForward * velocity_.Length();
+		// 速度に反映
+		velocity_ = newForward * velocity_.Length();
 
-	Quaternion finalRot = newRot;
-	model_->transform.rotate = Quaternion::QuaternionToEuler(finalRot);  // オプション：オイラー角に変換して代入
-
+		Quaternion finalRot = newRot;
+		model_->transform.rotate = Quaternion::QuaternionToEuler(finalRot);  // オプション：オイラー角に変換して代入
+	}
 }
 
 void WaveWall::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
