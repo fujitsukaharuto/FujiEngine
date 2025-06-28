@@ -72,6 +72,41 @@ void AABBCollider::OnCollisionExit(const ColliderInfo& other) {
 	state = CollisionState::None;
 }
 
+std::array<Vector3, 8> AABBCollider::GetWorldVertices() const {
+	// 半サイズ
+	float hw = width / 2.0f;
+	float hh = height / 2.0f;
+	float hd = depth / 2.0f;
+
+	// ローカル空間の8頂点
+	std::array<Vector3, 8> localVertices = {
+		Vector3{-hw, -hh, -hd},
+		Vector3{ hw, -hh, -hd},
+		Vector3{ hw,  hh, -hd},
+		Vector3{-hw,  hh, -hd},
+		Vector3{-hw, -hh,  hd},
+		Vector3{ hw, -hh,  hd},
+		Vector3{ hw,  hh,  hd},
+		Vector3{-hw,  hh,  hd},
+	};
+
+	std::array<Vector3, 8> worldVertices;
+
+	Matrix4x4 worldMatrix;
+	if (parent_) {
+		worldMatrix = parent_->GetWorldMat(); // 回転含む
+	} else {
+		worldMatrix = MakeIdentity4x4(); // 回転なし
+	}
+
+	// 各頂点をワールド空間に変換
+	for (int i = 0; i < 8; ++i) {
+		worldVertices[i] = Transform(localVertices[i] + info.pos, worldMatrix);
+	}
+
+	return worldVertices;
+}
+
 #ifdef _DEBUG
 void AABBCollider::Debug() {
 	std::string uniqueName = "AABBCollider##" + std::to_string(reinterpret_cast<uintptr_t>(this));
@@ -86,36 +121,23 @@ void AABBCollider::Debug() {
 
 void AABBCollider::DrawCollider() {
 
-	// 半サイズを計算
-	float halfWidth = width / 2.0f;
-	float halfHeight = height / 2.0f;
-	float halfDepth = depth / 2.0f;
-
-	// 8つの頂点を計算
-	Vector3 v1 = { info.worldPos.x - halfWidth, info.worldPos.y - halfHeight, info.worldPos.z - halfDepth };
-	Vector3 v2 = { info.worldPos.x + halfWidth, info.worldPos.y - halfHeight, info.worldPos.z - halfDepth };
-	Vector3 v3 = { info.worldPos.x + halfWidth, info.worldPos.y + halfHeight, info.worldPos.z - halfDepth };
-	Vector3 v4 = { info.worldPos.x - halfWidth, info.worldPos.y + halfHeight, info.worldPos.z - halfDepth };
-	Vector3 v5 = { info.worldPos.x - halfWidth, info.worldPos.y - halfHeight, info.worldPos.z + halfDepth };
-	Vector3 v6 = { info.worldPos.x + halfWidth, info.worldPos.y - halfHeight, info.worldPos.z + halfDepth };
-	Vector3 v7 = { info.worldPos.x + halfWidth, info.worldPos.y + halfHeight, info.worldPos.z + halfDepth };
-	Vector3 v8 = { info.worldPos.x - halfWidth, info.worldPos.y + halfHeight, info.worldPos.z + halfDepth };
+	std::array<Vector3, 8> v = GetWorldVertices();
 
 	// 線を描画
-	Line3dDrawer::GetInstance()->DrawLine3d(v1, v2, { 1.0f,1.0f,1.0f,1.0f }); // 底面の線
-	Line3dDrawer::GetInstance()->DrawLine3d(v2, v3, { 1.0f,1.0f,1.0f,1.0f });
-	Line3dDrawer::GetInstance()->DrawLine3d(v3, v4, { 1.0f,1.0f,1.0f,1.0f });
-	Line3dDrawer::GetInstance()->DrawLine3d(v4, v1, { 1.0f,1.0f,1.0f,1.0f });
+	Line3dDrawer::GetInstance()->DrawLine3d(v[0], v[1], { 1.0f,1.0f,1.0f,1.0f }); // 底面の線
+	Line3dDrawer::GetInstance()->DrawLine3d(v[1], v[2], { 1.0f,1.0f,1.0f,1.0f });
+	Line3dDrawer::GetInstance()->DrawLine3d(v[2], v[3], { 1.0f,1.0f,1.0f,1.0f });
+	Line3dDrawer::GetInstance()->DrawLine3d(v[3], v[0], { 1.0f,1.0f,1.0f,1.0f });
 
-	Line3dDrawer::GetInstance()->DrawLine3d(v5, v6, { 1.0f,1.0f,1.0f,1.0f }); // 上面の線
-	Line3dDrawer::GetInstance()->DrawLine3d(v6, v7, { 1.0f,1.0f,1.0f,1.0f });
-	Line3dDrawer::GetInstance()->DrawLine3d(v7, v8, { 1.0f,1.0f,1.0f,1.0f });
-	Line3dDrawer::GetInstance()->DrawLine3d(v8, v5, { 1.0f,1.0f,1.0f,1.0f });
+	Line3dDrawer::GetInstance()->DrawLine3d(v[4], v[5], { 1.0f,1.0f,1.0f,1.0f }); // 上面の線
+	Line3dDrawer::GetInstance()->DrawLine3d(v[5], v[6], { 1.0f,1.0f,1.0f,1.0f });
+	Line3dDrawer::GetInstance()->DrawLine3d(v[6], v[7], { 1.0f,1.0f,1.0f,1.0f });
+	Line3dDrawer::GetInstance()->DrawLine3d(v[7], v[4], { 1.0f,1.0f,1.0f,1.0f });
 
-	Line3dDrawer::GetInstance()->DrawLine3d(v1, v5, { 1.0f,1.0f,1.0f,1.0f }); // 側面の線
-	Line3dDrawer::GetInstance()->DrawLine3d(v2, v6, { 1.0f,1.0f,1.0f,1.0f });
-	Line3dDrawer::GetInstance()->DrawLine3d(v3, v7, { 1.0f,1.0f,1.0f,1.0f });
-	Line3dDrawer::GetInstance()->DrawLine3d(v4, v8, { 1.0f,1.0f,1.0f,1.0f });
+	Line3dDrawer::GetInstance()->DrawLine3d(v[0], v[4], { 1.0f,1.0f,1.0f,1.0f }); // 側面の線
+	Line3dDrawer::GetInstance()->DrawLine3d(v[1], v[5], { 1.0f,1.0f,1.0f,1.0f });
+	Line3dDrawer::GetInstance()->DrawLine3d(v[2], v[6], { 1.0f,1.0f,1.0f,1.0f });
+	Line3dDrawer::GetInstance()->DrawLine3d(v[3], v[7], { 1.0f,1.0f,1.0f,1.0f });
 
 }
 #endif // _DEBUG
