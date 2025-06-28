@@ -683,3 +683,12 @@ Matrix4x4 Trans::GetWorldMat() const {
 
 	return worldMatrix;
 }
+
+Vector3 Trans::GetRotation() {
+	Vector3 nowRotate = rotate;
+	if (parent) {
+		Matrix4x4 worldMat = GetWorldMat();
+		nowRotate = ExtractEulerAngles(worldMat);
+	}
+	return nowRotate;
+}

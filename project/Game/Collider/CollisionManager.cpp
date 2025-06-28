@@ -110,9 +110,28 @@ void CollisionManager::CheckAllCollision() {
 	}
 }
 
+OBB CollisionManager::ConvertAABBToOBB(const AABBCollider* aabb) {
+	OBB obb;
+
+	// ワールド中心座標
+	obb.center = aabb->GetInfo().worldPos;
+
+	// ハーフサイズ（AABBのサイズをOBB構造に）
+	obb.size = {
+		aabb->GetWidth() / 2.0f,
+		aabb->GetHeight() / 2.0f,
+		aabb->GetDepth() / 2.0f
+	};
+
+	// 回転（親が持つ回転をそのまま渡す）
+	obb.rotate = aabb->IsHaveParent() ? aabb->GetParentRotate() : Vector3(0.0f, 0.0f, 0.0f);
+
+	return obb;
+}
+
 bool CollisionManager::checkAABBCollision(AABBCollider* A, AABBCollider* B) {
 
-	// Aの情報を取得
+	/*// Aの情報を取得
 	Vector3 posA = A->GetPos();
 	float halfWidthA = A->GetWidth() / 2.0f;
 	float halfHeightA = A->GetHeight() / 2.0f;
@@ -129,5 +148,55 @@ bool CollisionManager::checkAABBCollision(AABBCollider* A, AABBCollider* B) {
 		std::abs(posA.x - posB.x) <= (halfWidthA + halfWidthB) &&
 		std::abs(posA.y - posB.y) <= (halfHeightA + halfHeightB) &&
 		std::abs(posA.z - posB.z) <= (halfDepthA + halfDepthB)
-		);
+		);*/
+
+	OBB obbA = ConvertAABBToOBB(A);
+	OBB obbB = ConvertAABBToOBB(B);
+
+	auto CalculateProjection =
+		[](const OBB& obb, const Vector3& axis, const Vector3* axes) -> float {
+		return std::abs(obb.size.x * Vector3::Dot(axes[0], axis)) +
+			std::abs(obb.size.y * Vector3::Dot(axes[1], axis)) +
+			std::abs(obb.size.z * Vector3::Dot(axes[2], axis));
+		};
+
+	auto GetOBBAxes = [](const OBB& obb) -> std::array<Vector3, 3> {
+		Matrix4x4 rotationMatrix = MakeRotateXYZMatrix(obb.rotate);
+		return {
+			Transform(Vector3(1.0f, 0.0f, 0.0f), rotationMatrix),
+			Transform(Vector3(0.0f, 1.0f, 0.0f), rotationMatrix),
+			Transform(Vector3(0.0f, 0.0f, 1.0f), rotationMatrix)
+		};
+		};
+
+	auto obbAxesA = GetOBBAxes(obbA);
+	auto obbAxesB = GetOBBAxes(obbB);
+
+	std::vector<Vector3> axes;
+	axes.insert(axes.end(), obbAxesA.begin(), obbAxesA.end());
+	axes.insert(axes.end(), obbAxesB.begin(), obbAxesB.end());
+	for (const auto& axisA : obbAxesA) {
+		for (const auto& axisB : obbAxesB) {
+			axes.push_back(Vector3::Cross(axisA, axisB));
+		}
+	}
+
+	for (const auto& axis : axes) {
+		if (axis.Length() < std::numeric_limits<float>::epsilon()) {
+			continue;
+		}
+
+		Vector3 normalizedAxis = axis.Normalize();
+
+		float obbAProjection = CalculateProjection(obbA, normalizedAxis, obbAxesA.data());
+		float obbBProjection = CalculateProjection(obbB, normalizedAxis, obbAxesB.data());
+		float distance = std::abs(Vector3::Dot(obbA.center - obbB.center, normalizedAxis));
+
+		if (distance > obbAProjection + obbBProjection) {
+			return false;
+		}
+	}
+
+	return true;
+
 }
