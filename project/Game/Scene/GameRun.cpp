@@ -22,6 +22,7 @@ void GameRun::Initialize() {
 	textureManager_->Load("beamCore.png");
 	textureManager_->Load("beamCore2.png");
 	textureManager_->Load("beamCore3.png");
+	textureManager_->Load("Atlas.png");
 	textureManager_->Load("underRing.png");
 #pragma endregion
 
@@ -38,6 +39,7 @@ void GameRun::Initialize() {
 	modelManager_->LoadOBJ("boss.obj");
 	modelManager_->LoadOBJ("bossWaveWall.obj");
 	modelManager_->LoadOBJ("Star.obj");
+	modelManager_->LoadOBJ("player.obj");
 	modelManager_->LoadGLTF("AnimatedCube.gltf");
 	modelManager_->LoadGLTF("walk.gltf");
 	modelManager_->LoadGLTF("sneakWalk.gltf");

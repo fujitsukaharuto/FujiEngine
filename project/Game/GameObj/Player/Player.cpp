@@ -12,10 +12,12 @@ Player::~Player() {
 
 void Player::Initialize() {
 	OriginGameObject::Initialize();
-	OriginGameObject::CreateModel("playerModel.obj");
+	OriginGameObject::CreateModel("player.obj");
 
+	model_->SetTexture("Atlas.png");
 	model_->transform.translate.y = 1.0f;
 	model_->transform.translate.z = -25.0f;
+	model_->transform.scale = { 0.3f,0.3f,0.3f };
 
 	shadow_ = std::make_unique<Object3d>();
 	shadow_->Create("Sphere");
@@ -142,6 +144,30 @@ void Player::HPUpdate() {
 	Vector2 hpSize = hpSize_;
 	float t = playerHP_ / 100.0f;
 	hpSprite_->SetSize({ hpSize.x * t, hpSize.y });
+
+	if (isDamage_) {
+		if (damageCoolTime_ > 0.0f) {
+			damageCoolTime_ -= FPSKeeper::DeltaTime();
+		}
+		if (damageCoolTime_ > 55.0f) {
+			model_->SetColor({ damageColor_.x,damageColor_.y ,damageColor_.z ,1.0f });
+		} else if (damageCoolTime_ > 45.0f && damageCoolTime_ < 50.0f) {
+			model_->SetColor({ damageColor_.x,damageColor_.y ,damageColor_.z ,1.0f });
+		} else if (damageCoolTime_ > 35.0f && damageCoolTime_ < 40.0f) {
+			model_->SetColor({ damageColor_.x,damageColor_.y ,damageColor_.z ,1.0f });
+		} else if (damageCoolTime_ > 25.0f && damageCoolTime_ < 30.0f) {
+			model_->SetColor({ damageColor_.x,damageColor_.y ,damageColor_.z ,1.0f });
+		} else if (damageCoolTime_ > 15.0f && damageCoolTime_ < 20.0f) {
+			model_->SetColor({ damageColor_.x,damageColor_.y ,damageColor_.z ,1.0f });
+		} else if (damageCoolTime_ > 5.0f && damageCoolTime_ < 10.0f) {
+			model_->SetColor({ damageColor_.x,damageColor_.y ,damageColor_.z ,1.0f });
+		} else {
+			model_->SetColor({ 1.0f,1.0f ,1.0f ,1.0f });
+		}
+		if (damageCoolTime_ < 0.0f) {
+			isDamage_ = false;
+		}
+	}
 }
 
 ///= Behavior =================================================================*/
@@ -158,9 +184,13 @@ void Player::ChangeAttackBehavior(std::unique_ptr<BasePlayerAttackBehavior> beha
 ///= Collision ================================================================*/
 void Player::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 	if (other.tag == "enemyAttack") {
-		playerHP_ -= 5.0f;
-		if (playerHP_ < 0.0f) {
-			playerHP_ = 0.0f;
+		if (!isDamage_) {
+			playerHP_ -= 5.0f;
+			isDamage_ = true;
+			damageCoolTime_ = 60.0f;
+			if (playerHP_ < 0.0f) {
+				playerHP_ = 0.0f;
+			}
 		}
 	}
 }

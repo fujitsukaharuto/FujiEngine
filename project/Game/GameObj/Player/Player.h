@@ -84,6 +84,9 @@ private:
 	Vector3 targetPos_;
 
 	float playerHP_;
+	Vector3 damageColor_ = { 1.5f,1.5f,5.0f };
+	bool isDamage_ = false;
+	float damageCoolTime_ = 30.0f;
 	std::unique_ptr<Sprite> hpSprite_;
 	Vector2 hpSize_ = { 275.0f,35.0f };
 	Vector2 hpStartPos_ = { 55.0f,650.0f };
