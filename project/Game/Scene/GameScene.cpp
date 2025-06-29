@@ -226,16 +226,16 @@ void GameScene::BlackFade() {
 		}
 	}
 	black_->SetColor({ 0.0f,0.0f,0.0f,Lerp(0.0f,1.0f,(1.0f / blackLimmite * blackTime)) });
-	XINPUT_STATE pad;
+#ifdef _DEBUG
 	if (Input::GetInstance()->TriggerKey(DIK_0)) {
 		if (blackTime == 0.0f) {
 			isChangeFase = true;
 		}
-	} else if (Input::GetInstance()->GetGamepadState(pad)) {
-		if (Input::GetInstance()->TriggerButton(PadInput::A)) {
-			if (blackTime == 0.0f) {
-				isChangeFase = true;
-			}
+	}
+#endif // _DEBUG
+	if (boss_->GetIsClear()) {
+		if (blackTime == 0.0f) {
+			isChangeFase = true;
 		}
 	}
 }

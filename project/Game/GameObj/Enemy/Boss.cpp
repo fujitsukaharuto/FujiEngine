@@ -138,15 +138,30 @@ void Boss::Initialize() {
 }
 
 void Boss::Update() {
-	behavior_->Update();
+	if (!isDying_ && isHpActive_) {
+		behavior_->Update();
 
-	core_->Update();
+		core_->Update();
 
-	beam_->Update();
-	UpdateWaveWall();
-	UpdateUnderRing();
+		beam_->Update();
+		UpdateWaveWall();
+		UpdateUnderRing();
 
-	ShakeHP();
+		ShakeHP();
+
+	} else if (!isHpActive_) {
+		hpCooltime_ -= FPSKeeper::DeltaTime();
+		if (hpCooltime_ < 0.0f) {
+			isHpActive_ = true;
+			ChangeBehavior(std::make_unique<BossRoot>(this));
+			animModel_->IsRoopAnimation(true);
+		}
+	} else {
+		dyingTime_ -= FPSKeeper::DeltaTime();
+		if (dyingTime_ < 0.0f) {
+			isClear_ = true;
+		}
+	}
 
 	animModel_->AnimationUpdate();
 	shadow_->transform.translate = animModel_->transform.translate;
@@ -274,6 +289,11 @@ void Boss::ReduceBossHP(bool isStrong) {
 			if (bossHp_ < 40.0f) {
 				bossHp_ = 40.0f;
 				nowHpIndex_--;
+				isHpActive_ = false;
+				SetDefaultBehavior();
+				animModel_->ChangeAnimation("hit");
+				animModel_->IsRoopAnimation(false);
+				hpCooltime_ = 60.0f;
 				return;
 			}
 			break;
@@ -281,6 +301,11 @@ void Boss::ReduceBossHP(bool isStrong) {
 			if (bossHp_ < 30.0f) {
 				bossHp_ = 30.0f;
 				nowHpIndex_--;
+				isHpActive_ = false;
+				SetDefaultBehavior();
+				animModel_->ChangeAnimation("hit");
+				animModel_->IsRoopAnimation(false);
+				hpCooltime_ = 60.0f;
 				return;
 			}
 			break;
@@ -288,6 +313,11 @@ void Boss::ReduceBossHP(bool isStrong) {
 			if (bossHp_ < 20.0f) {
 				bossHp_ = 20.0f;
 				nowHpIndex_--;
+				isHpActive_ = false;
+				SetDefaultBehavior();
+				animModel_->ChangeAnimation("hit");
+				animModel_->IsRoopAnimation(false);
+				hpCooltime_ = 60.0f;
 				return;
 			}
 			break;
@@ -295,6 +325,11 @@ void Boss::ReduceBossHP(bool isStrong) {
 			if (bossHp_ < 15.0f) {
 				bossHp_ = 15.0f;
 				nowHpIndex_--;
+				isHpActive_ = false;
+				SetDefaultBehavior();
+				animModel_->ChangeAnimation("hit");
+				animModel_->IsRoopAnimation(false);
+				hpCooltime_ = 60.0f;
 				return;
 			}
 			break;
@@ -304,6 +339,12 @@ void Boss::ReduceBossHP(bool isStrong) {
 		if (nowHpIndex_ < 0) nowHpIndex_ = 0;
 		isShakeSprite_ = true;
 		shakeTime_ = baseShakeTime_;
+		// ボスが死んだとき
+		if (bossHp_ < 0.0f && !isDying_) {
+			isDying_ = true;
+			SetDefaultBehavior();
+			animModel_->ChangeAnimation("dying");
+		}
 	}
 }
 
@@ -574,4 +615,31 @@ void Boss::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
 }
 
 void Boss::OnCollisionExit([[maybe_unused]] const ColliderInfo& other) {
+}
+
+void Boss::SetDefaultBehavior() {
+	for (auto& wave : walls_) {
+		wave->SetIsLive(false);
+	}
+	for (auto& ring : undderRings_) {
+		ring->SetIsLive(false);
+	}
+	ChangeBehavior(std::make_unique<BossRoot>(this));
+	animModel_->transform.translate.y = 0.0f;
+	Vector3 dir = pPlayer_->GetWorldPos() - animModel_->transform.translate;
+	dir.y = 0.0f; // 水平方向だけに限定
+	dir = dir.Normalize();
+	// 目標のY軸角度（ラジアン）
+	float targetAngle = std::atan2(dir.x, dir.z); // Z前方軸に対する角度
+	Vector3 front = Vector3(0.0f, 0.0f, 1.0f) * 0.05f * FPSKeeper::DeltaTime();
+	front = TransformNormal(front, MakeRotateYMatrix(targetAngle));
+	animModel_->transform.translate += front;
+	// 現在のY軸角度（モデルの回転）
+	float currentAngle = animModel_->transform.rotate.y;
+	// 角度差を -π〜+π にラップ
+	float delta = targetAngle - currentAngle;
+	if (delta > std::numbers::pi_v<float>) delta -= 2.0f * std::numbers::pi_v<float>;
+	if (delta < -std::numbers::pi_v<float>) delta += 2.0f * std::numbers::pi_v<float>;
+	float newAngle = currentAngle + delta;
+	animModel_->transform.rotate.y = newAngle;
 }

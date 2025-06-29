@@ -1,5 +1,6 @@
 #include "Player.h"
 
+#include "Engine/Particle/ParticleManager.h"
 #include "Game/GameObj/Player/Behavior/PlayerRoot.h"
 #include "Game/GameObj/Player/AttackBehavior/PlayerAttackRoot.h"
 #include "Game/GameObj/Player/PlayerBullet.h"
@@ -59,6 +60,15 @@ void Player::Initialize() {
 
 	ChangeBehavior(std::make_unique<PlayerRoot>(this));
 	ChangeAttackBehavior(std::make_unique<PlayerAttackRoot>(this));
+
+	ParticleManager::Load(hit_, "sphere");
+	ParticleManager::Load(hit2_, "bulletHit");
+
+	hit_.SetParent(&model_->transform);
+	hit2_.SetParent(&model_->transform);
+
+	hit_.frequencyTime_ = 0.0f;
+	hit2_.frequencyTime_ = 0.0f;
 
 }
 
@@ -191,6 +201,8 @@ void Player::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 			if (playerHP_ < 0.0f) {
 				playerHP_ = 0.0f;
 			}
+			hit_.Emit();
+			hit2_.Emit();
 		}
 	}
 }

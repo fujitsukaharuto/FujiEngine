@@ -63,10 +63,14 @@ public:
 	std::vector<std::unique_ptr<UnderRing>>& GetUnderRings() { return undderRings_; }
 	float GetAttackCooldown() { return attackCooldown_; }
 	float GetBossHP() { return bossHp_; }
+	bool GetIsClear() { return isClear_; }
+	int GetNowHpIndex() { return nowHpIndex_; }
 
 	void SetPlayer(Player* player) { pPlayer_ = player; }
 
 private:
+
+	void SetDefaultBehavior();
 
 private:
 
@@ -84,9 +88,13 @@ private:
 	std::vector<std::unique_ptr<Object3d>> chargeParents_;
 	std::unique_ptr<Object3d> waveParent_;
 
+	bool isClear_ = false;
+	float dyingTime_ = 240.0f;
+	bool isDying_ = false;
 	float bossHp_ = 0.0f;
 	std::vector<std::unique_ptr<Sprite>> hpSprites_;
 	bool isHpActive_ = true;
+	float hpCooltime_ = 60.0f;
 	int nowHpIndex_ = 4;
 	bool isShakeSprite_ = false;
 	float shakeTime_ = 0.0f;

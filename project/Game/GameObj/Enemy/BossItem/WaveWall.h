@@ -28,6 +28,7 @@ public:
 	void OnCollisionStay([[maybe_unused]] const ColliderInfo& other);
 	void OnCollisionExit([[maybe_unused]] const ColliderInfo& other);
 
+	void SetIsLive(bool is) { isLive_ = is; }
 
 	BaseCollider* GetCollider() { return collider_.get(); }
 	float GetLifeTime() { return lifeTime_; }

@@ -104,4 +104,7 @@ private:
 	Vector3 inputDirection_;
 	int dir_;
 
+	ParticleEmitter hit_;
+	ParticleEmitter hit2_;
+
 };
