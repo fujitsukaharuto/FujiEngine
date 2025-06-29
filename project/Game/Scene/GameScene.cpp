@@ -137,6 +137,9 @@ void GameScene::Update() {
 			cMane_->AddCollider(ring->GetCollider());
 		}
 	}
+	if (boss_->GetBeam()->GetIsLive()) {
+		cMane_->AddCollider(boss_->GetBeam()->GetCollider());
+	}
 	cMane_->CheckAllCollision();
 
 	ParticleManager::GetInstance()->Update();
@@ -234,6 +237,10 @@ void GameScene::BlackFade() {
 	}
 #endif // _DEBUG
 	if (boss_->GetIsClear()) {
+		if (blackTime == 0.0f) {
+			isChangeFase = true;
+		}
+	} else if (player_->GetIsGameOver()) {
 		if (blackTime == 0.0f) {
 			isChangeFase = true;
 		}

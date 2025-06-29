@@ -36,7 +36,7 @@ public:
 	void SetParent(Trans* parent) { parent_ = parent; }
 	void SetTag(const std::string& tag) { info.tag = tag; }
 	void SetOffset(const Vector3& pos) { offset_ = pos; }
-	void SetPos(const Vector3& pos) { info.pos = pos + offset_; }
+	void SetPos(const Vector3& pos) { info.pos = pos; }
 	void SetOwner(OriginGameObject* owner) { info.owner = owner; }
 	void SetIsCollisonCheck(bool is) { isCollisionCheck_ = is; }
 

@@ -4,6 +4,7 @@
 #include "Game/GameObj/Player/Behavior/PlayerRoot.h"
 #include "Game/GameObj/Player/AttackBehavior/PlayerAttackRoot.h"
 #include "Game/GameObj/Player/PlayerBullet.h"
+#include "Game/GameObj/Enemy/BossItem/UnderRing.h"
 
 Player::Player() {
 }
@@ -74,27 +75,34 @@ void Player::Initialize() {
 
 void Player::Update() {
 
-	behavior_->Update();
-	attackBehavior_->Update();
+	if (!isDeath_) {
+		behavior_->Update();
+		attackBehavior_->Update();
 
-	for (auto& bullet : bullets_) {
-		if (bullet->GetIsLive()) {
+		for (auto& bullet : bullets_) {
+			if (bullet->GetIsLive()) {
 
-			if (bullet->GetIsCharge()) {
-				Vector3 forward = { 0, 0, 1 };
-				Matrix4x4 rotateMatrix = MakeRotateXYZMatrix(model_->transform.rotate);
-				Vector3 worldForward = TransformNormal(forward, rotateMatrix);
-				Vector3 targetPos = model_->transform.translate + worldForward;
-				bullet->Charge(targetPos, model_->transform.rotate);
-			} else {
-				bullet->CalculetionFollowVec(targetPos_);
+				if (bullet->GetIsCharge()) {
+					Vector3 forward = { 0, 0, 1 };
+					Matrix4x4 rotateMatrix = MakeRotateXYZMatrix(model_->transform.rotate);
+					Vector3 worldForward = TransformNormal(forward, rotateMatrix);
+					Vector3 targetPos = model_->transform.translate + worldForward;
+					bullet->Charge(targetPos, model_->transform.rotate);
+				} else {
+					bullet->CalculetionFollowVec(targetPos_);
+				}
+
+				bullet->Update();
 			}
+		}
 
-			bullet->Update();
+		HPUpdate();
+	} else {
+		deathTime_ -= FPSKeeper::DeltaTime();
+		if (deathTime_ < 0.0f) {
+			isGameOver_ = true;
 		}
 	}
-
-	HPUpdate();
 
 	shadow_->transform.translate = model_->transform.translate;
 	shadow_->transform.translate.y = 0.15f;
@@ -200,13 +208,67 @@ void Player::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 			damageCoolTime_ = 60.0f;
 			if (playerHP_ < 0.0f) {
 				playerHP_ = 0.0f;
+				isDeath_ = true;
+				ReleaseBullet();
+			}
+			hit_.Emit();
+			hit2_.Emit();
+		}
+	} else if (other.tag == "enemyAttack_ring") {
+		if (!isDamage_) {
+			if (UnderRing* ring = dynamic_cast<UnderRing*>(other.owner)) {
+				float lng = Vector3(other.worldPos - model_->transform.translate).Length();
+				if (lng < ring->GetRingRadMax() && lng > ring->GetRingRadMin()) {
+					playerHP_ -= 5.0f;
+					isDamage_ = true;
+					damageCoolTime_ = 60.0f;
+					if (playerHP_ < 0.0f) {
+						playerHP_ = 0.0f;
+						isDeath_ = true;
+						ReleaseBullet();
+					}
+					hit_.Emit();
+					hit2_.Emit();
+				}
+			}
+		}
+	}
+
+}
+void Player::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
+	if (other.tag == "enemyAttack") {
+		if (!isDamage_) {
+			playerHP_ -= 5.0f;
+			isDamage_ = true;
+			damageCoolTime_ = 60.0f;
+			if (playerHP_ < 0.0f) {
+				playerHP_ = 0.0f;
+				isDeath_ = true;
+				ReleaseBullet();
 			}
 			hit_.Emit();
 			hit2_.Emit();
 		}
 	}
-}
-void Player::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
+	if (other.tag == "enemyAttack_ring") {
+		if (!isDamage_) {
+			if (UnderRing* ring = dynamic_cast<UnderRing*>(other.owner)) {
+				float lng = Vector3(other.worldPos - model_->transform.translate).Length();
+				if (lng < ring->GetRingRadMax() && lng > ring->GetRingRadMin()) {
+					playerHP_ -= 5.0f;
+					isDamage_ = true;
+					damageCoolTime_ = 60.0f;
+					if (playerHP_ < 0.0f) {
+						playerHP_ = 0.0f;
+						isDeath_ = true;
+						ReleaseBullet();
+					}
+					hit_.Emit();
+					hit2_.Emit();
+				}
+			}
+		}
+	}
 }
 void Player::OnCollisionExit([[maybe_unused]] const ColliderInfo& other) {
 }

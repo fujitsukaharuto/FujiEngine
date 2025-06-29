@@ -5,7 +5,7 @@ BaseCollider::BaseCollider() {
 }
 
 void BaseCollider::InfoUpdate() {
-	Matrix4x4 worldMatrix = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, info.pos);
+	Matrix4x4 worldMatrix = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, info.pos + offset_);
 
 	if (parent_) {
 		const Matrix4x4& parentWorldMatrix = parent_->GetWorldMat();
@@ -37,7 +37,7 @@ void BaseCollider::InfoUpdate() {
 }
 
 Vector3 BaseCollider::GetPos() {
-	Matrix4x4 worldMatrix = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, info.pos);
+	Matrix4x4 worldMatrix = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, info.pos + offset_);
 
 	if (parent_) {
 		const Matrix4x4& parentWorldMatrix = parent_->GetWorldMat();

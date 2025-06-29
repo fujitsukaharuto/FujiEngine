@@ -6,10 +6,11 @@ UnderRing::UnderRing() {
 
 void UnderRing::Initialize() {
 	OriginGameObject::Initialize();
-	model_->CreateRingEx(1.0f,0.75f,2.0f,true);
+	model_->CreateRingEx(0.5f,0.25f,2.0f,true);
 
 	collider_ = std::make_unique<AABBCollider>();
-	collider_->SetTag("enemyAttack");
+	collider_->SetTag("enemyAttack_ring");
+	collider_->SetOwner(this);
 	collider_->SetParent(&model_->transform);
 	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
 	collider_->SetCollisionStayCallback([this](const ColliderInfo& other) {OnCollisionStay(other); });
@@ -37,6 +38,12 @@ void UnderRing::Update() {
 
 		model_->SetUVScale({ 0.75f,1.0f }, { uvTransX_,0.0f });
 		model_->transform.scale += (Vector3(1.0f, 0.0f, 1.0f) * speed_) * FPSKeeper::DeltaTime();
+
+		ringRadMax_ = model_->transform.scale.x * 0.5f;
+		ringRadMin_ = model_->transform.scale.x * 0.4f;
+
+		collider_->SetWidth(model_->transform.scale.x);
+		collider_->SetDepth(model_->transform.scale.z);
 
 		//collider_->SetPos(model_->GetWorldPos());
 		collider_->InfoUpdate();

@@ -32,7 +32,8 @@ public:
 	BaseCollider* GetCollider() { return collider_.get(); }
 	float GetLifeTime() { return lifeTime_; }
 	bool GetIsLive() { return isLive_; }
-
+	float GetRingRadMax() { return ringRadMax_; }
+	float GetRingRadMin() { return ringRadMin_; }
 
 private:
 
@@ -42,6 +43,9 @@ private:
 	float lifeTime_ = 300.0f;
 	float speed_;
 	float ringSize_;
+
+	float ringRadMax_;
+	float ringRadMin_;
 
 	float uvTransX_;
 

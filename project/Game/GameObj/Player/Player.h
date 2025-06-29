@@ -58,6 +58,7 @@ public:
 	float GetMaxChargeTime() { return maxChargeTime_; }
 	int GetGrabDir() { return dir_; }
 	bool GetIsFall() { return isFall_; }
+	bool GetIsGameOver() { return isGameOver_; }
 	BaseCollider* GetCollider() { return collider_.get(); }
 
 	std::vector<std::unique_ptr<PlayerBullet>>& GetPlayerBullet() { return bullets_; }
@@ -99,6 +100,10 @@ private:
 	float maxFallSpeed_;
 	float maxChargeTime_;
 	bool isFall_;
+
+	bool isDeath_ = false;
+	float deathTime_ = 240.0f;
+	bool isGameOver_ = false;
 
 	Vector3 velocity_;
 	Vector3 inputDirection_;

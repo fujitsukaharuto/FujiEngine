@@ -33,11 +33,13 @@ void Beam::Initialize() {
 
 	collider_ = std::make_unique<AABBCollider>();
 	collider_->SetTag("enemyAttack");
-	collider_->SetParent(&model_->transform);
 	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
 	collider_->SetCollisionStayCallback([this](const ColliderInfo& other) {OnCollisionStay(other); });
 	collider_->SetCollisionExitCallback([this](const ColliderInfo& other) {OnCollisionExit(other); });
-
+	collider_->SetOffset({ 0.0f,0.0f,50.0f });
+	collider_->SetDepth(100.0f);
+	collider_->SetWidth(2.5f);
+	collider_->SetHeight(2.5f);
 
 	model_->SetLightEnable(LightMode::kLightNone);
 	model_->transform.translate.y = 2.0f;
@@ -115,6 +117,7 @@ void Beam::Initialize() {
 	particleParent_ = std::make_unique<Object3d>();
 	particleParent_->CreateSphere();
 	particleParent_->transform.translate = model_->transform.translate;
+	collider_->SetParent(&particleParent_->transform);
 
 	ParticleManager::LoadParentGroup(beamParticle_, "BeamParticle");
 	ParticleManager::LoadParentGroup(beamLight_, "BeamLight");
@@ -143,7 +146,7 @@ void Beam::Update() {
 
 		particleParent_->transform.translate = model_->transform.translate;
 
-		collider_->SetPos(model_->GetWorldPos());
+		//collider_->SetPos(model_->GetWorldPos());
 		collider_->InfoUpdate();
 	}
 }
@@ -156,6 +159,10 @@ void Beam::Draw([[maybe_unused]] Material* mate, [[maybe_unused]]bool is) {
 		beam3_->Draw(nullptr, true);
 		beam2_->Draw(nullptr, true);
 		beam1_->Draw(nullptr, true);
+#ifdef _DEBUG
+		collider_->DrawCollider();
+#endif // _DEBUG
+
 	}
 }
 

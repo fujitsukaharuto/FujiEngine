@@ -24,6 +24,9 @@ void WaveWall::Initialize() {
 	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
 	collider_->SetCollisionStayCallback([this](const ColliderInfo& other) {OnCollisionStay(other); });
 	collider_->SetCollisionExitCallback([this](const ColliderInfo& other) {OnCollisionExit(other); });
+	collider_->SetWidth(2.0f);
+	collider_->SetHeight(2.0f);
+	collider_->SetDepth(1.5f);
 
 	speed_ = 0.35f;
 	velocity_ = { 0.0f,0.0f,0.0f };
