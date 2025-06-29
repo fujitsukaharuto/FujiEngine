@@ -37,7 +37,7 @@ private:
 
 	std::unique_ptr<Material> mate = nullptr;
 
-	std::unique_ptr<Sprite> test = nullptr;
+	std::unique_ptr<Sprite> gameover_ = nullptr;
 	Vector4 color_ = { 1.0f,1.0f,1.0f,1.0f };
 	Vector3 rightDir = { 1.0f,0.0f,0.0f };
 

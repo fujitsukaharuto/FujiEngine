@@ -76,23 +76,25 @@ void Player::Initialize() {
 void Player::Update() {
 
 	if (!isDeath_) {
-		behavior_->Update();
-		attackBehavior_->Update();
+		if (!isStart_) {
+			behavior_->Update();
+			attackBehavior_->Update();
 
-		for (auto& bullet : bullets_) {
-			if (bullet->GetIsLive()) {
+			for (auto& bullet : bullets_) {
+				if (bullet->GetIsLive()) {
 
-				if (bullet->GetIsCharge()) {
-					Vector3 forward = { 0, 0, 1 };
-					Matrix4x4 rotateMatrix = MakeRotateXYZMatrix(model_->transform.rotate);
-					Vector3 worldForward = TransformNormal(forward, rotateMatrix);
-					Vector3 targetPos = model_->transform.translate + worldForward;
-					bullet->Charge(targetPos, model_->transform.rotate);
-				} else {
-					bullet->CalculetionFollowVec(targetPos_);
+					if (bullet->GetIsCharge()) {
+						Vector3 forward = { 0, 0, 1 };
+						Matrix4x4 rotateMatrix = MakeRotateXYZMatrix(model_->transform.rotate);
+						Vector3 worldForward = TransformNormal(forward, rotateMatrix);
+						Vector3 targetPos = model_->transform.translate + worldForward;
+						bullet->Charge(targetPos, model_->transform.rotate);
+					} else {
+						bullet->CalculetionFollowVec(targetPos_);
+					}
+
+					bullet->Update();
 				}
-
-				bullet->Update();
 			}
 		}
 
@@ -158,6 +160,17 @@ void Player::ParameterGUI() {
 #endif // _DEBUG
 }
 
+void Player::ReStart() {
+	isDeath_ = false;
+	isGameOver_ = false;
+	isStart_ = true;
+	playerHP_ = 100.0f;
+	model_->transform.translate.x = 0.0f;
+	model_->transform.translate.y = 1.0f;
+	model_->transform.translate.z = -25.0f;
+	ChangeBehavior(std::make_unique<PlayerRoot>(this));
+}
+
 void Player::HPUpdate() {
 	Vector2 hpSize = hpSize_;
 	float t = playerHP_ / 100.0f;
@@ -206,9 +219,10 @@ void Player::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 			playerHP_ -= 5.0f;
 			isDamage_ = true;
 			damageCoolTime_ = 60.0f;
-			if (playerHP_ < 0.0f) {
+			if (playerHP_ <= 0.0f) {
 				playerHP_ = 0.0f;
 				isDeath_ = true;
+				hpSprite_->SetSize({ 0.0f, hpSize_.y });
 				ReleaseBullet();
 			}
 			hit_.Emit();
@@ -222,9 +236,10 @@ void Player::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 					playerHP_ -= 5.0f;
 					isDamage_ = true;
 					damageCoolTime_ = 60.0f;
-					if (playerHP_ < 0.0f) {
+					if (playerHP_ <= 0.0f) {
 						playerHP_ = 0.0f;
 						isDeath_ = true;
+						hpSprite_->SetSize({ 0.0f, hpSize_.y });
 						ReleaseBullet();
 					}
 					hit_.Emit();
@@ -241,9 +256,10 @@ void Player::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
 			playerHP_ -= 5.0f;
 			isDamage_ = true;
 			damageCoolTime_ = 60.0f;
-			if (playerHP_ < 0.0f) {
+			if (playerHP_ <= 0.0f) {
 				playerHP_ = 0.0f;
 				isDeath_ = true;
+				hpSprite_->SetSize({ 0.0f, hpSize_.y });
 				ReleaseBullet();
 			}
 			hit_.Emit();
@@ -258,9 +274,10 @@ void Player::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
 					playerHP_ -= 5.0f;
 					isDamage_ = true;
 					damageCoolTime_ = 60.0f;
-					if (playerHP_ < 0.0f) {
+					if (playerHP_ <= 0.0f) {
 						playerHP_ = 0.0f;
 						isDeath_ = true;
+						hpSprite_->SetSize({ 0.0f, hpSize_.y });
 						ReleaseBullet();
 					}
 					hit_.Emit();

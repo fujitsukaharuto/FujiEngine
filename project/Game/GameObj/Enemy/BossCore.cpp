@@ -34,11 +34,11 @@ void BossCore::Update() {
 	collider_->InfoUpdate();
 }
 
-void BossCore::Draw(Material* mate, bool is) {
+void BossCore::Draw([[maybe_unused]] Material* mate, [[maybe_unused]] bool is) {
 #ifdef _DEBUG
 	collider_->DrawCollider();
 #endif // _DEBUG
-	OriginGameObject::Draw(mate, is);
+	//OriginGameObject::Draw(mate, is);
 }
 
 void BossCore::DebugGUI() {

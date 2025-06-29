@@ -27,6 +27,7 @@ public:
 	void ParameterGUI();
 
 	void InitParameter();
+	void ReStart();
 
 	void ReduceBossHP(bool isStrong);
 	void ShakeHP();
@@ -64,6 +65,7 @@ public:
 	std::vector<std::unique_ptr<UnderRing>>& GetUnderRings() { return undderRings_; }
 	float GetAttackCooldown() { return attackCooldown_; }
 	float GetBossHP() { return bossHp_; }
+	bool GetIsStart() { return isStart_; }
 	bool GetIsClear() { return isClear_; }
 	int GetNowHpIndex() { return nowHpIndex_; }
 
@@ -105,6 +107,8 @@ private:
 	Vector2 hpStartPos_ = { 660.0f,38.0f };
 	float hpIndent = 1.0f;
 
+	bool isStart_ = true;
+	float startTime_ = 300.0f;
 
 	float attackCooldown_ = 0.0f;
 	float chargeTime_ = 120.0f;

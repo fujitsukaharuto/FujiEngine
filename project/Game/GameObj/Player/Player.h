@@ -18,6 +18,7 @@ public:
 	void Draw(Material* mate = nullptr, bool is = false)override;
 	void DebugGUI()override;
 	void ParameterGUI();
+	void ReStart();
 
 	void HPUpdate();
 
@@ -59,6 +60,7 @@ public:
 	int GetGrabDir() { return dir_; }
 	bool GetIsFall() { return isFall_; }
 	bool GetIsGameOver() { return isGameOver_; }
+	bool GetIsStart() { return isStart_; }
 	BaseCollider* GetCollider() { return collider_.get(); }
 
 	std::vector<std::unique_ptr<PlayerBullet>>& GetPlayerBullet() { return bullets_; }
@@ -67,6 +69,7 @@ public:
 	//* Setter
 	void SetFallSpeed(float speed) { fallSpeed_ = speed; }
 	void SetIsFall(bool is) { isFall_ = is; }
+	void SetIsStart(bool is) { isStart_ = is; }
 	void SetTargetPos(const Vector3& pos) { targetPos_ = pos; }
 
 private:
@@ -101,6 +104,7 @@ private:
 	float maxChargeTime_;
 	bool isFall_;
 
+	bool isStart_ = true;
 	bool isDeath_ = false;
 	float deathTime_ = 240.0f;
 	bool isGameOver_ = false;

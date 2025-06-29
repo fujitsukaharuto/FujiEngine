@@ -21,6 +21,8 @@ void TitleScene::Initialize() {
 	obj3dCommon.reset(new Object3dCommon());
 	obj3dCommon->Initialize();
 
+	CameraManager::GetInstance()->GetCamera()->transform.rotate = { -1.02f,0.0f,0.0f };
+	CameraManager::GetInstance()->GetCamera()->transform.translate = { 0.0f, 3.5f, -20.0f };
 
 #pragma region シーン遷移用
 	black_ = std::make_unique<Sprite>();
@@ -46,6 +48,19 @@ void TitleScene::Initialize() {
 	sphere2 = std::make_unique<Object3d>();
 	sphere2->CreateSphere();
 	sphere2->transform.translate.x = 1.0f;
+
+	titlePlane_ = std::make_unique<Object3d>();
+	titlePlane_->Create("plane.obj");
+	titlePlane_->SetTexture("title_beta.png");
+	titlePlane_->transform.translate.y = 13.0f;
+	titlePlane_->transform.translate.z = -15.0f;
+	titlePlane_->transform.rotate.x = -2.291f;
+	titlePlane_->transform.rotate.z = 3.142f;
+
+	space_ = std::make_unique<Sprite>();
+	space_->Load("spaceKey.png");
+	space_->SetPos({ 640.0f,400.0f,0.0f });
+	space_->SetSize({ 256.0f,128.0f });
 
 	cube_ = std::make_unique<AnimationModel>();
 	cube_->Create("T_boss.gltf");
@@ -116,6 +131,9 @@ void TitleScene::Draw() {
 
 	cube_->Draw();
 
+	space_->Draw();
+
+	titlePlane_->Draw();
 
 	sphere->Draw();
 	sphere2->Draw();
@@ -157,6 +175,9 @@ void TitleScene::DebugGUI() {
 	}
 	if (ImGui::CollapsingHeader("Sphere2")) {
 		sphere2->DebugGUI();
+	}
+	if (ImGui::CollapsingHeader("titlePlane")) {
+		titlePlane_->DebugGUI();
 	}
 	if (ImGui::CollapsingHeader("cube")) {
 		cube_->DebugGUI();

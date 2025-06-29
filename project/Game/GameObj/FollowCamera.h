@@ -11,6 +11,7 @@ public:
 
 	void Initialize();
 	void Update(const Vector3& lockon);
+	void ReStart(const Vector3& lockon);
 
 	void SetTarget(const Trans* target);
 	void Reset();

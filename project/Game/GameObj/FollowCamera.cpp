@@ -63,6 +63,33 @@ void FollowCamera::Update(const Vector3& lockon) {
 	camera->UpdateMaterix();
 }
 
+void FollowCamera::ReStart(const Vector3& lockon) {
+	Camera* camera = CameraManager::GetInstance()->GetCamera();
+
+	Vector3 lockOnPosition = lockon;
+	lockOnPosition.y = lockOnPosition.y - 3.0f;
+	Vector3 sub = lockOnPosition - Vector3(target_->translate.x, target_->translate.y + 4.0f, target_->translate.z);
+
+	destinationAngleY_ = std::atan2(sub.x, sub.z);
+	camera->transform.rotate.y = LerpShortAngle(camera->transform.rotate.y, destinationAngleY_, 0.3f);
+
+	// X軸
+	float horizontalDistance = std::sqrt(sub.x * sub.x + sub.z * sub.z);
+	float destinationAngleX = std::atan2(-sub.y, horizontalDistance);
+	if (destinationAngleX < -0.09f) {//上向きすぎないように
+		destinationAngleX = -0.09f;
+	}
+	camera->transform.rotate.x = destinationAngleX;
+
+	if (target_) {
+		interTarget_ = { target_->translate.x,0.0f,target_->translate.z };
+	}
+
+	Vector3 offset = OffsetCal();
+	camera->transform.translate = interTarget_ + offset;
+	camera->UpdateMaterix();
+}
+
 void FollowCamera::SetTarget(const Trans* target) {
 	target_ = target;
 	Reset();

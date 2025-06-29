@@ -24,6 +24,8 @@ void GameRun::Initialize() {
 	textureManager_->Load("beamCore3.png");
 	textureManager_->Load("Atlas.png");
 	textureManager_->Load("underRing.png");
+	textureManager_->Load("title_beta.png");
+	textureManager_->Load("spaceKey.png");
 #pragma endregion
 
 

@@ -33,6 +33,7 @@ public:
 	float GetLifeTime() { return lifeTime_; }
 	bool GetIsLive() { return isLive_; }
 
+	void SetIsLive(bool is) { isLive_ = is; }
 	void SetBossParent(Boss* boss);
 
 private:

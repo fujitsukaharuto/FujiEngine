@@ -21,6 +21,8 @@ void ResultScene::Initialize() {
 	obj3dCommon.reset(new Object3dCommon());
 	obj3dCommon->Initialize();
 
+	CameraManager::GetInstance()->GetCamera()->transform.rotate = { -1.02f,0.0f,0.0f };
+	CameraManager::GetInstance()->GetCamera()->transform.translate = { 0.0f, 3.5f, -20.0f };
 
 #pragma region シーン遷移用
 	black_ = std::make_unique<Sprite>();
@@ -29,6 +31,11 @@ void ResultScene::Initialize() {
 	black_->SetSize({ 1280.0f,720.0f });
 	black_->SetAnchor({ 0.0f,0.0f });
 #pragma endregion
+
+	clear_ = std::make_unique<Sprite>();
+	clear_->Load("white2x2.png");
+	clear_->SetAnchor({ 0.0f,0.0f });
+	clear_->SetSize({ 1280.0f,720.0f });
 
 	sphere = std::make_unique<Object3d>();
 	sphere->CreateSphere();
@@ -65,6 +72,7 @@ void ResultScene::Draw() {
 	obj3dCommon->PreDraw();
 	sphere->Draw();
 
+	clear_->Draw();
 
 	ParticleManager::GetInstance()->Draw();
 

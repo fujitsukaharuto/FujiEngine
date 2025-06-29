@@ -26,7 +26,10 @@ private:
 	std::unique_ptr<Object3d> terrain_ = nullptr;
 	std::unique_ptr<Object3d> sphere = nullptr;
 	std::unique_ptr<Object3d> sphere2 = nullptr;
+	std::unique_ptr<Object3d> titlePlane_ = nullptr;
 	std::unique_ptr<AnimationModel> cube_ = nullptr;
+
+	std::unique_ptr<Sprite> space_;
 
 	ParticleEmitter emit;
 

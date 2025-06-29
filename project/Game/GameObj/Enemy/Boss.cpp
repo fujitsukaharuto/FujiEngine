@@ -1,6 +1,7 @@
 #include "Boss.h"
 #include "Engine/Particle/ParticleManager.h"
 #include "Engine/Math/Random/Random.h"
+#include "Engine/Camera/CameraManager.h"
 #include <numbers>
 
 #include "Game/GameObj/Enemy/Behavior/BossRoot.h"
@@ -18,6 +19,7 @@ void Boss::Initialize() {
 	animModel_->LoadAnimationFile("T_boss.gltf");
 
 	animModel_->LoadTransformFromJson("boss_transform.json");
+	animModel_->transform.rotate.y = 3.14f;
 
 	shadow_ = std::make_unique<Object3d>();
 	shadow_->Create("Sphere");
@@ -135,10 +137,11 @@ void Boss::Initialize() {
 
 
 	ChangeBehavior(std::make_unique<BossRoot>(this));
+	animModel_->ChangeAnimation("roaring");
 }
 
 void Boss::Update() {
-	if (!isDying_ && isHpActive_) {
+	if (!isDying_ && isHpActive_ && !isStart_) {
 		behavior_->Update();
 
 		core_->Update();
@@ -149,6 +152,12 @@ void Boss::Update() {
 
 		ShakeHP();
 
+	} else if (isStart_) {
+		startTime_ -= FPSKeeper::DeltaTime();
+		if (startTime_ < 0.0f) {
+			isStart_ = false;
+			ChangeBehavior(std::make_unique<BossRoot>(this));
+		}
 	} else if (!isHpActive_) {
 		hpCooltime_ -= FPSKeeper::DeltaTime();
 		if (hpCooltime_ < 0.0f) {
@@ -275,6 +284,19 @@ void Boss::InitParameter() {
 		hpSprites_[i]->SetSize(hpSize_);
 	}
 
+}
+
+void Boss::ReStart() {
+	SetDefaultBehavior();
+	isHpActive_ = true;
+	isDying_ = false;
+	isStart_ = true;
+	startTime_ = 300.0f;
+	animModel_->ChangeAnimation("roaring");
+	animModel_->LoadTransformFromJson("boss_transform.json");
+	animModel_->transform.rotate.y = 1.56f;
+	animModel_->IsRoopAnimation(true);
+	animModel_->ChangeAnimation("roaring");
 }
 
 void Boss::ReduceBossHP(bool isStrong) {
@@ -576,6 +598,7 @@ bool Boss::JumpAttack() {
 			if (isJumpAttack_) {
 				jumpWave_.pos_ = animModel_->transform.translate;
 				jumpWave_.Emit();
+				CameraManager::GetInstance()->GetCamera()->SetShakeTime(20.0f);
 				isJumpAttack_ = false;
 				int count = 0;
 				for (auto& ring : undderRings_) {
@@ -618,6 +641,7 @@ void Boss::OnCollisionExit([[maybe_unused]] const ColliderInfo& other) {
 }
 
 void Boss::SetDefaultBehavior() {
+	beam_->SetIsLive(false);
 	for (auto& wave : walls_) {
 		wave->SetIsLive(false);
 	}

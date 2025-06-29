@@ -66,8 +66,10 @@ void GameScene::Initialize() {
 	mate->CreateMaterial();
 	mate->SetColor({ 1.0f,0.0f,0.0f,1.0f });
 
-	test = std::make_unique<Sprite>();
-	test->Load("uvChecker.png");
+	gameover_ = std::make_unique<Sprite>();
+	gameover_->Load("uvChecker.png");
+	gameover_->SetAnchor({ 0.0f,0.0f });
+	gameover_->SetSize({ 1280.0f, 720.0f });
 
 
 	ApplyGlobalVariables();
@@ -93,12 +95,23 @@ void GameScene::Update() {
 
 #endif // _DEBUG
 
-	player_->SetTargetPos(boss_->GetBossCore()->GetWorldPos());
-	player_->Update();
+	if (!player_->GetIsGameOver()) {
+		player_->SetTargetPos(boss_->GetBossCore()->GetWorldPos());
+		player_->Update();
 
-	followCamera_->Update(boss_->GetBossCore()->GetWorldPos());
+		followCamera_->Update(boss_->GetBossCore()->GetWorldPos());
 
-	boss_->Update();
+		boss_->Update();
+		if (!boss_->GetIsStart() && player_->GetIsStart()) {
+			player_->SetIsStart(false);
+		}
+	} else {
+		if (input_->TriggerKey(DIK_R)) {
+			player_->ReStart();
+			boss_->ReStart();
+			followCamera_->ReStart(boss_->GetBossCore()->GetWorldPos());
+		}
+	}
 
 	if (input_->TriggerKey(DIK_5)) {
 		emit.BurstAnime();
@@ -120,27 +133,29 @@ void GameScene::Update() {
 	skybox_->Update();
 	BlackFade();
 
-	cMane_->AddCollider(player_->GetCollider());
-	for (auto& bullet : player_->GetPlayerBullet()) {
-		if (bullet->GetIsLive() && !bullet->GetIsCharge()) {
-			cMane_->AddCollider(bullet->GetCollider());
+	if (!player_->GetIsGameOver()) {
+		cMane_->AddCollider(player_->GetCollider());
+		for (auto& bullet : player_->GetPlayerBullet()) {
+			if (bullet->GetIsLive() && !bullet->GetIsCharge()) {
+				cMane_->AddCollider(bullet->GetCollider());
+			}
 		}
-	}
-	cMane_->AddCollider(boss_->GetCoreCollider());
-	for (auto& wall : boss_->GetWalls()) {
-		if (wall->GetIsLive()) {
-			cMane_->AddCollider(wall->GetCollider());
+		cMane_->AddCollider(boss_->GetCoreCollider());
+		for (auto& wall : boss_->GetWalls()) {
+			if (wall->GetIsLive()) {
+				cMane_->AddCollider(wall->GetCollider());
+			}
 		}
-	}
-	for (auto& ring : boss_->GetUnderRings()) {
-		if (ring->GetIsLive()) {
-			cMane_->AddCollider(ring->GetCollider());
+		for (auto& ring : boss_->GetUnderRings()) {
+			if (ring->GetIsLive()) {
+				cMane_->AddCollider(ring->GetCollider());
+			}
 		}
+		if (boss_->GetBeam()->GetIsLive()) {
+			cMane_->AddCollider(boss_->GetBeam()->GetCollider());
+		}
+		cMane_->CheckAllCollision();
 	}
-	if (boss_->GetBeam()->GetIsLive()) {
-		cMane_->AddCollider(boss_->GetBeam()->GetCollider());
-	}
-	cMane_->CheckAllCollision();
 
 	ParticleManager::GetInstance()->Update();
 }
@@ -178,6 +193,9 @@ void GameScene::Draw() {
 #pragma region 前景スプライト
 
 	dxcommon_->PreSpriteDraw();
+	if (player_->GetIsGameOver()) {
+		gameover_->Draw();
+	}
 	//test->Draw();
 	if (blackTime != 0.0f) {
 		black_->Draw();
@@ -237,10 +255,6 @@ void GameScene::BlackFade() {
 	}
 #endif // _DEBUG
 	if (boss_->GetIsClear()) {
-		if (blackTime == 0.0f) {
-			isChangeFase = true;
-		}
-	} else if (player_->GetIsGameOver()) {
 		if (blackTime == 0.0f) {
 			isChangeFase = true;
 		}
