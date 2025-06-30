@@ -119,5 +119,8 @@ private:
 
 	ParticleEmitter hit_;
 	ParticleEmitter hit2_;
-
+	ParticleEmitter moveParticleL_;
+	ParticleEmitter moveParticleR_;
+	ParticleEmitter deathSmoke_;
+	
 };

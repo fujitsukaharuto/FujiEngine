@@ -1,6 +1,7 @@
 #include "Player.h"
 
 #include "Engine/Particle/ParticleManager.h"
+#include "Engine/Math/Random/Random.h"
 #include "Game/GameObj/Player/Behavior/PlayerRoot.h"
 #include "Game/GameObj/Player/AttackBehavior/PlayerAttackRoot.h"
 #include "Game/GameObj/Player/PlayerBullet.h"
@@ -29,7 +30,7 @@ void Player::Initialize() {
 	shadow_->transform.translate.y = 0.15f;
 	shadow_->transform.scale.y = 0.1f;
 
-	playerHP_ = 1.0f;
+	playerHP_ = 100.0f;
 	hpSprite_ = std::make_unique<Sprite>();
 	hpSprite_->Load("white2x2.png");
 	hpSprite_->SetColor({ 0.7f,0.211f,0.505f,1.0f });
@@ -77,9 +78,20 @@ void Player::Initialize() {
 
 	ParticleManager::Load(hit_, "sphere");
 	ParticleManager::Load(hit2_, "bulletHit");
+	ParticleManager::Load(moveParticleL_, "playerTranjectory");
+	ParticleManager::Load(moveParticleR_, "playerTranjectory");
+	ParticleManager::Load(deathSmoke_, "bulletHitSmoke");
 
 	hit_.SetParent(&model_->transform);
 	hit2_.SetParent(&model_->transform);
+	moveParticleL_.SetParent(&model_->transform);
+	moveParticleR_.SetParent(&model_->transform);
+	deathSmoke_.SetParent(&model_->transform);
+
+	moveParticleL_.pos_ = { -0.4f,-0.4f,-0.3f };
+	moveParticleR_.pos_ = {  0.4f,-0.4f,-0.3f };
+	deathSmoke_.count_ = 1;
+	deathSmoke_.frequencyTime_ = 15.0f;
 
 	hit_.frequencyTime_ = 0.0f;
 	hit2_.frequencyTime_ = 0.0f;
@@ -111,9 +123,22 @@ void Player::Update() {
 			}
 		}
 
+		Vector3 particleSpeed = Random::GetVector3({ -0.01f,0.01f }, { -0.01f,0.01f }, { -0.3f,-0.2f });
+		particleSpeed = TransformNormal(particleSpeed, MakeRotateXYZMatrix(model_->transform.rotate));
+		moveParticleL_.para_.speedx = { particleSpeed.x,particleSpeed.x };
+		moveParticleL_.para_.speedy = { particleSpeed.y,particleSpeed.y };
+		moveParticleL_.para_.speedz = { particleSpeed.z,particleSpeed.z };
+		moveParticleL_.Emit();
+		particleSpeed = Random::GetVector3({ -0.01f,0.01f }, { -0.01f,0.01f }, { -0.3f,-0.2f });
+		particleSpeed = TransformNormal(particleSpeed, MakeRotateXYZMatrix(model_->transform.rotate));
+		moveParticleR_.para_.speedx = { particleSpeed.x,particleSpeed.x };
+		moveParticleR_.para_.speedy = { particleSpeed.y,particleSpeed.y };
+		moveParticleR_.para_.speedz = { particleSpeed.z,particleSpeed.z };
+		moveParticleR_.Emit();
 		HPUpdate();
 	} else {
 		deathTime_ -= FPSKeeper::DeltaTime();
+		deathSmoke_.Emit();
 		if (deathTime_ < 0.0f) {
 			isGameOver_ = true;
 		}

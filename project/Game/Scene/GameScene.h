@@ -38,6 +38,7 @@ private:
 	std::unique_ptr<Material> mate = nullptr;
 
 	std::unique_ptr<Sprite> gameover_ = nullptr;
+	bool isBackTitle_ = false;
 	std::unique_ptr<Sprite> gameoverSelector_ = nullptr;
 	int selectPoint_ = 0;
 	Vector4 color_ = { 1.0f,1.0f,1.0f,1.0f };

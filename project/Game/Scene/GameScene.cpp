@@ -126,6 +126,7 @@ void GameScene::Update() {
 			if (input_->TriggerKey(DIK_SPACE)) {
 				if (blackTime == 0.0f) {
 					isChangeFase = true;
+					isBackTitle_ = true;
 				}
 			}
 			if (input_->TriggerKey(DIK_A)) {
@@ -259,7 +260,11 @@ void GameScene::BlackFade() {
 				blackTime = blackLimmite;
 			}
 		} else {
-			ChangeScene("RESULT", 40.0f);
+			if (isBackTitle_) {
+				ChangeScene("TITLE", 40.0f);
+			} else {
+				ChangeScene("RESULT", 40.0f);
+			}
 		}
 	} else {
 		if (blackTime > 0.0f) {

@@ -110,7 +110,7 @@ private:
 	Animation* GetPreviousAnimation();
 
 private:
-	const std::string kDirectoryPath_ = "resource/";
+	const std::string kDirectoryPath_ = "resource/ModelandTexture/";
 	Object3dCommon* common_;
 	std::unique_ptr<Model> model_ = nullptr;
 

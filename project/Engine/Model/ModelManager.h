@@ -51,7 +51,7 @@ private:
 	DXCom* dxcommon_;
 	LightManager* lightManager_;
 
-	const std::string kDirectoryPath_ = "resource/";
+	const std::string kDirectoryPath_ = "resource/ModelandTexture/";
 
 	std::map<std::string, std::unique_ptr<Model>> models_;
 

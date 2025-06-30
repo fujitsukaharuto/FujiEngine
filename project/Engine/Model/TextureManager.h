@@ -60,5 +60,5 @@ private:
 
 	std::unordered_map<std::string, std::unique_ptr<Texture>> m_textureCache;
 
-	std::string directoryPath_ = "resource/";
+	std::string directoryPath_ = "resource/ModelandTexture/";
 };

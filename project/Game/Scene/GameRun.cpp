@@ -22,6 +22,7 @@ void GameRun::Initialize() {
 	textureManager_->Load("beamCore.png");
 	textureManager_->Load("beamCore2.png");
 	textureManager_->Load("beamCore3.png");
+	textureManager_->Load("kira.png");
 	textureManager_->Load("Atlas.png");
 	textureManager_->Load("underRing.png");
 	textureManager_->Load("boal16x16.png");
@@ -63,6 +64,7 @@ void GameRun::Initialize() {
 	pManager_->CreateParticleGroup("ChargeCircle", "chargeCircle.png", 2);
 	pManager_->CreateParticleGroup("BulletTrajectory", "redCircle.png", 1000);
 	pManager_->CreateParticleGroup("BulletTrajectory2", "redCircle.png",1000);
+	pManager_->CreateParticleGroup("playerTranjectory", "kira.png", 200);
 	
 	pManager_->CreateParticleGroup("bulletHit", "redCircle.png", 100);
 	pManager_->CreateParticleGroup("bulletHit2", "redCircle.png", 100);
