@@ -204,6 +204,9 @@ void Boss::Draw([[maybe_unused]] Material* mate, [[maybe_unused]] bool is) {
 	}
 	beam_->Draw();
 
+	for (auto& hpTex : hpFrame_) {
+		hpTex->Draw();
+	}
 	if (bossHp_ >= 0.0f) {
 		int texCount = 0;
 		for (auto& tex : hpSprites_) {
@@ -230,7 +233,7 @@ void Boss::DebugGUI() {
 		collider_->DebugGUI();
 		ImGui::Indent();
 		if (ImGui::TreeNodeEx("hpSetting", ImGuiTreeNodeFlags_Selected)) {
-			ImGui::DragFloat2("hpsize", &hpSize_.x, 0.1f, 0.0f, 400.0f);
+			ImGui::DragFloat2("hpsize", &hpSize_.x, 0.1f, 0.0f, 1000.0f);
 			ImGui::DragFloat2("hpTexStartpos", &hpStartPos_.x, 0.1f, 0.0f, 1200.0f);
 			ImGui::DragFloat("hpIndent", &hpIndent, 0.1f, 0.0f, 100.0f);
 			for (int i = 0; i < 5; i++) {
@@ -283,6 +286,19 @@ void Boss::InitParameter() {
 		hpSprites_[i]->SetPos({ hpStartPos_.x + (hpSize_.x * i) + (hpIndent * i), hpStartPos_.y, 0.0f });
 		hpSprites_[i]->SetSize(hpSize_);
 	}
+
+	for (int i = 0; i < 2; i++) {
+		std::unique_ptr<Sprite> hpTex;
+		hpTex = std::make_unique<Sprite>();
+		hpTex->Load("white2x2.png");
+		hpTex->SetColor({ 0.2f,0.05f,0.6f,1.0f });
+		hpFrame_.push_back(std::move(hpTex));
+	}
+	hpFrame_[0]->SetPos({ hpFrameStartPos_.x, hpFrameStartPos_.y, 0.0f });
+	hpFrame_[0]->SetSize(hpFrameSize_);
+	hpFrame_[1]->SetColor({ 0.1f,0.1f,0.1f,1.0f });
+	hpFrame_[1]->SetPos({ hpFrameStartPos_.x, hpFrameStartPos_.y, 0.0f });
+	hpFrame_[1]->SetSize(hpFrameInSize_);
 
 }
 

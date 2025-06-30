@@ -92,8 +92,12 @@ private:
 	bool isDamage_ = false;
 	float damageCoolTime_ = 30.0f;
 	std::unique_ptr<Sprite> hpSprite_;
+	std::vector<std::unique_ptr<Sprite>> hpFrame_;
 	Vector2 hpSize_ = { 275.0f,35.0f };
 	Vector2 hpStartPos_ = { 55.0f,650.0f };
+	Vector2 hpFrameSize_ = { 285.0f,42.5f };
+	Vector2 hpFrameInSize_ = { 275.0f,35.0f };
+	Vector2 hpFrameStartPos_ = { 192.5f,650.0f };
 
 	float moveSpeed_;
 	float jumpSpeed_;

@@ -96,6 +96,7 @@ private:
 	bool isDying_ = false;
 	float bossHp_ = 0.0f;
 	std::vector<std::unique_ptr<Sprite>> hpSprites_;
+	std::vector<std::unique_ptr<Sprite>> hpFrame_;
 	bool isHpActive_ = true;
 	float hpCooltime_ = 60.0f;
 	int nowHpIndex_ = 4;
@@ -105,6 +106,9 @@ private:
 	float shakeSize_ = 4.0f;
 	Vector2 hpSize_ = { 130.0f,35.0f };
 	Vector2 hpStartPos_ = { 660.0f,38.0f };
+	Vector2 hpFrameSize_ = { 670.6f,44.5f };
+	Vector2 hpFrameInSize_ = { 651.4f,34.3f };
+	Vector2 hpFrameStartPos_ = { 922.5f,38.0f };
 	float hpIndent = 1.0f;
 
 	bool isStart_ = true;

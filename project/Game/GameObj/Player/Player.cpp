@@ -32,10 +32,23 @@ void Player::Initialize() {
 	playerHP_ = 100.0f;
 	hpSprite_ = std::make_unique<Sprite>();
 	hpSprite_->Load("white2x2.png");
-	hpSprite_->SetColor({ 1.0f,0.411f,0.705f,1.0f });
+	hpSprite_->SetColor({ 0.7f,0.211f,0.505f,1.0f });
 	hpSprite_->SetAnchor({ 0.0f,0.5f });
 	hpSprite_->SetPos({ hpStartPos_.x, hpStartPos_.y, 0.0f });
 	hpSprite_->SetSize(hpSize_);
+
+	for (int i = 0; i < 2; i++) {
+		std::unique_ptr<Sprite> hpTex;
+		hpTex = std::make_unique<Sprite>();
+		hpTex->Load("white2x2.png");
+		hpTex->SetColor({ 0.9f,0.9f,1.0f,1.0f });
+		hpFrame_.push_back(std::move(hpTex));
+	}
+	hpFrame_[0]->SetPos({ hpFrameStartPos_.x, hpFrameStartPos_.y, 0.0f });
+	hpFrame_[0]->SetSize(hpFrameSize_);
+	hpFrame_[1]->SetColor({ 0.1f,0.1f,0.1f,1.0f });
+	hpFrame_[1]->SetPos({ hpFrameStartPos_.x, hpFrameStartPos_.y, 0.0f });
+	hpFrame_[1]->SetSize(hpFrameInSize_);
 
 	moveSpeed_ = 0.2f;
 	secoundJumpSpeed_ = 0.1f;
@@ -128,6 +141,9 @@ void Player::Draw(Material* mate, bool is) {
 	collider_->DrawCollider();
 #endif // _DEBUG
 
+	for (auto& hpTex : hpFrame_) {
+		hpTex->Draw();
+	}
 	hpSprite_->Draw();
 }
 
