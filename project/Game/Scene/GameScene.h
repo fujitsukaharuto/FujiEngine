@@ -34,8 +34,7 @@ private:
 	std::unique_ptr<Boss> boss_ = nullptr;
 	std::unique_ptr<FollowCamera> followCamera_;
 
-
-	std::unique_ptr<Material> mate = nullptr;
+	std::unique_ptr<Sprite> key_ = nullptr;
 
 	std::unique_ptr<Sprite> gameover_ = nullptr;
 	bool isBackTitle_ = false;

@@ -62,10 +62,11 @@ void GameScene::Initialize() {
 	followCamera_->Initialize();
 	followCamera_->SetTarget(&player_->GetTrans());
 
-	mate = std::make_unique<Material>();
-	mate->SetTextureNamePath("grass.png");
-	mate->CreateMaterial();
-	mate->SetColor({ 1.0f,0.0f,0.0f,1.0f });
+	key_ = std::make_unique<Sprite>();
+	key_->Load("key_beta.png");
+	key_->SetAnchor({ 1.0f,1.0f });
+	key_->SetPos({ 1280.0f, 730.0f, 0.0f });
+	key_->SetSize({ 400.0f, 300.0f });
 
 	gameover_ = std::make_unique<Sprite>();
 	gameover_->Load("gameover_beta.png");
@@ -206,6 +207,7 @@ void GameScene::Draw() {
 #pragma region 前景スプライト
 
 	dxcommon_->PreSpriteDraw();
+	key_->Draw();
 	if (player_->GetIsGameOver()) {
 		gameover_->Draw();
 		gameoverSelector_->Draw();

@@ -30,6 +30,7 @@ void GameRun::Initialize() {
 	textureManager_->Load("clear_beta.png");
 	textureManager_->Load("gameover_beta.png");
 	textureManager_->Load("spaceKey.png");
+	textureManager_->Load("key_beta.png");
 #pragma endregion
 
 
