@@ -33,7 +33,7 @@ void ResultScene::Initialize() {
 #pragma endregion
 
 	clear_ = std::make_unique<Sprite>();
-	clear_->Load("white2x2.png");
+	clear_->Load("clear_beta.png");
 	clear_->SetAnchor({ 0.0f,0.0f });
 	clear_->SetSize({ 1280.0f,720.0f });
 

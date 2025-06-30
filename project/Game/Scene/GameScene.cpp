@@ -67,10 +67,15 @@ void GameScene::Initialize() {
 	mate->SetColor({ 1.0f,0.0f,0.0f,1.0f });
 
 	gameover_ = std::make_unique<Sprite>();
-	gameover_->Load("uvChecker.png");
+	gameover_->Load("gameover_beta.png");
 	gameover_->SetAnchor({ 0.0f,0.0f });
 	gameover_->SetSize({ 1280.0f, 720.0f });
 
+	gameoverSelector_ = std::make_unique<Sprite>();
+	gameoverSelector_->Load("boal16x16.png");
+	gameoverSelector_->SetPos({ 240.0f, 500.0f, 0.0f });
+	gameoverSelector_->SetColor({ 0.7f, 0.7f, 0.1f, 1.0f });
+	gameoverSelector_->SetSize({ 40.0f, 40.0f });
 
 	ApplyGlobalVariables();
 
@@ -106,10 +111,26 @@ void GameScene::Update() {
 			player_->SetIsStart(false);
 		}
 	} else {
-		if (input_->TriggerKey(DIK_R)) {
-			player_->ReStart();
-			boss_->ReStart();
-			followCamera_->ReStart(boss_->GetBossCore()->GetWorldPos());
+		if (selectPoint_ == 0) {
+			if (input_->TriggerKey(DIK_SPACE)) {
+				player_->ReStart();
+				boss_->ReStart();
+				followCamera_->ReStart(boss_->GetBossCore()->GetWorldPos());
+			}
+			if (input_->TriggerKey(DIK_D)) {
+				selectPoint_ = 1;
+				gameoverSelector_->SetPos({ 800.0f,500.0f,0.0f });
+			}
+		} else {
+			if (input_->TriggerKey(DIK_SPACE)) {
+				if (blackTime == 0.0f) {
+					isChangeFase = true;
+				}
+			}
+			if (input_->TriggerKey(DIK_A)) {
+				selectPoint_ = 0;
+				gameoverSelector_->SetPos({ 240.0f,500.0f,0.0f });
+			}
 		}
 	}
 
@@ -195,6 +216,7 @@ void GameScene::Draw() {
 	dxcommon_->PreSpriteDraw();
 	if (player_->GetIsGameOver()) {
 		gameover_->Draw();
+		gameoverSelector_->Draw();
 	}
 	//test->Draw();
 	if (blackTime != 0.0f) {

@@ -279,7 +279,7 @@ void Boss::InitParameter() {
 		std::unique_ptr<Sprite> hpTex;
 		hpTex = std::make_unique<Sprite>();
 		hpTex->Load("white2x2.png");
-		hpTex->SetColor({ 1.0f,0.0f,0.0f,1.0f });
+		hpTex->SetColor(damageColor1_);
 		hpSprites_.push_back(std::move(hpTex));
 	}
 	for (int i = 0; i < 5; i++) {
@@ -324,6 +324,7 @@ void Boss::ReduceBossHP(bool isStrong) {
 		}
 		switch (nowHpIndex_) {
 		case 4:
+			HPColorSet(40.0f, 10.0f);
 			if (bossHp_ < 40.0f) {
 				bossHp_ = 40.0f;
 				nowHpIndex_--;
@@ -332,10 +333,12 @@ void Boss::ReduceBossHP(bool isStrong) {
 				animModel_->ChangeAnimation("hit");
 				animModel_->IsRoopAnimation(false);
 				hpCooltime_ = 60.0f;
+				hpSprites_[nowHpIndex_]->SetColor(damageColor1_);
 				return;
 			}
 			break;
 		case 3:
+			HPColorSet(30.0f, 10.0f);
 			if (bossHp_ < 30.0f) {
 				bossHp_ = 30.0f;
 				nowHpIndex_--;
@@ -344,10 +347,12 @@ void Boss::ReduceBossHP(bool isStrong) {
 				animModel_->ChangeAnimation("hit");
 				animModel_->IsRoopAnimation(false);
 				hpCooltime_ = 60.0f;
+				hpSprites_[nowHpIndex_]->SetColor(damageColor1_);
 				return;
 			}
 			break;
 		case 2:
+			HPColorSet(20.0f, 10.0f);
 			if (bossHp_ < 20.0f) {
 				bossHp_ = 20.0f;
 				nowHpIndex_--;
@@ -356,10 +361,12 @@ void Boss::ReduceBossHP(bool isStrong) {
 				animModel_->ChangeAnimation("hit");
 				animModel_->IsRoopAnimation(false);
 				hpCooltime_ = 60.0f;
+				hpSprites_[nowHpIndex_]->SetColor(damageColor1_);
 				return;
 			}
 			break;
 		case 1:
+			HPColorSet(15.0f, 5.0f);
 			if (bossHp_ < 15.0f) {
 				bossHp_ = 15.0f;
 				nowHpIndex_--;
@@ -368,8 +375,12 @@ void Boss::ReduceBossHP(bool isStrong) {
 				animModel_->ChangeAnimation("hit");
 				animModel_->IsRoopAnimation(false);
 				hpCooltime_ = 60.0f;
+				hpSprites_[nowHpIndex_]->SetColor(damageColor1_);
 				return;
 			}
+			break;
+		case 0:
+			HPColorSet(0.0f, 15.0f);
 			break;
 		default:
 			break;
@@ -383,6 +394,18 @@ void Boss::ReduceBossHP(bool isStrong) {
 			SetDefaultBehavior();
 			animModel_->ChangeAnimation("dying");
 		}
+	}
+}
+
+void Boss::HPColorSet(float under, float index) {
+	if (under + index * 0.75f < bossHp_) {
+		hpSprites_[nowHpIndex_]->SetColor(damageColor1_);
+	} else if (under + index * 0.5f < bossHp_) {
+		hpSprites_[nowHpIndex_]->SetColor(damageColor2_);
+	} else if (under + index * 0.25f < bossHp_) {
+		hpSprites_[nowHpIndex_]->SetColor(damageColor3_);
+	} else if (under + index * 0.0f < bossHp_) {
+		hpSprites_[nowHpIndex_]->SetColor(damageColor4_);
 	}
 }
 

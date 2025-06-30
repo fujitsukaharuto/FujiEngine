@@ -29,7 +29,7 @@ void Player::Initialize() {
 	shadow_->transform.translate.y = 0.15f;
 	shadow_->transform.scale.y = 0.1f;
 
-	playerHP_ = 100.0f;
+	playerHP_ = 1.0f;
 	hpSprite_ = std::make_unique<Sprite>();
 	hpSprite_->Load("white2x2.png");
 	hpSprite_->SetColor({ 0.7f,0.211f,0.505f,1.0f });

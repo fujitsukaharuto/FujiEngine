@@ -30,6 +30,7 @@ public:
 	void ReStart();
 
 	void ReduceBossHP(bool isStrong);
+	void HPColorSet(float under, float index);
 	void ShakeHP();
 
 	void Walk();
@@ -109,6 +110,10 @@ private:
 	Vector2 hpFrameSize_ = { 670.6f,44.5f };
 	Vector2 hpFrameInSize_ = { 651.4f,34.3f };
 	Vector2 hpFrameStartPos_ = { 922.5f,38.0f };
+	Vector4 damageColor1_ = { 0.550f,0.20f,0.25f,1.0f };
+	Vector4 damageColor2_ = { 0.500f,0.15f,0.20f,1.0f };
+	Vector4 damageColor3_ = { 0.450f,0.10f,0.15f,1.0f };
+	Vector4 damageColor4_ = { 0.400f,0.05f,0.10f,1.0f };
 	float hpIndent = 1.0f;
 
 	bool isStart_ = true;
