@@ -38,6 +38,8 @@ public:
 	float GetDamage() { return damage_; }
 	BaseCollider* GetCollider() { return collider_.get(); }
 
+	void SetIsLive(bool is) { isLive_ = is; }
+
 private:
 
 private:

@@ -42,9 +42,10 @@ void GameScene::Initialize() {
 #pragma endregion
 
 	terrain = std::make_unique<Object3d>();
-	terrain->Create("terrain.obj");
-	terrain->transform.scale = { 30.0f,30.0f,30.0f };
-	terrain->SetUVScale({ 25.0f,25.0f }, { 0.0f,0.0f });
+	terrain->Create("ground.obj");
+	terrain->SetTexture("grass.png");
+	terrain->transform.scale = { 1.0f,1.0f,1.0f };
+	terrain->SetUVScale({ 20.0f,20.0f }, { 0.0f,0.0f });
 
 	skybox_ = std::make_unique<SkyBox>();
 	skybox_->SetCommonResources(dxcommon_, SRVManager::GetInstance(), CameraManager::GetInstance()->GetCamera());

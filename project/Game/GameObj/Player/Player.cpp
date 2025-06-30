@@ -177,10 +177,15 @@ void Player::ParameterGUI() {
 }
 
 void Player::ReStart() {
+	for (auto& bullet : bullets_) {
+		bullet->SetIsLive(false);
+	}
 	isDeath_ = false;
 	isGameOver_ = false;
 	isStart_ = true;
 	playerHP_ = 100.0f;
+	isFall_ = false;
+	model_->transform.rotate.y = 0.0f;
 	model_->transform.translate.x = 0.0f;
 	model_->transform.translate.y = 1.0f;
 	model_->transform.translate.z = -25.0f;

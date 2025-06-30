@@ -310,7 +310,7 @@ void Boss::ReStart() {
 	startTime_ = 300.0f;
 	animModel_->ChangeAnimation("roaring");
 	animModel_->LoadTransformFromJson("boss_transform.json");
-	animModel_->transform.rotate.y = 1.56f;
+	animModel_->transform.rotate.y = 3.14f;
 	animModel_->IsRoopAnimation(true);
 	animModel_->ChangeAnimation("roaring");
 }

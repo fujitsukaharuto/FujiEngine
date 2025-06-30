@@ -12,6 +12,7 @@ PlayerBullet::~PlayerBullet() {
 void PlayerBullet::Initialize() {
 	OriginGameObject::Initialize();
 	OriginGameObject::CreateModel("Star.obj");
+	model_->SetColor({ 0.9f,0.85f,0.4f,1.0f });
 
 	collider_ = std::make_unique<AABBCollider>();
 	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
