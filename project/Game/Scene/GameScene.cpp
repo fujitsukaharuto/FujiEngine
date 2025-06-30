@@ -136,22 +136,12 @@ void GameScene::Update() {
 		}
 	}
 
-	if (input_->TriggerKey(DIK_5)) {
-		emit.BurstAnime();
-	}
+#ifdef _DEBUG
 	if (input_->TriggerKey(DIK_8)) {
 		SoundData& soundData1 = audioPlayer_->SoundLoadWave("xxx.wav");
 		audioPlayer_->SoundPlayWave(soundData1);
 	}
-	if (input_->TriggerKey(DIK_9)) {
-		SoundData& soundData1 = audioPlayer_->SoundLoadWave("xxx.wav");
-		audioPlayer_->SoundStopWave(soundData1);
-
-	}
- 	if (input_->TriggerKey(DIK_7)) {
-		SoundData& soundData2 = audioPlayer_->SoundLoadWave("mokugyo.wav");
-		audioPlayer_->SoundPlayWave(soundData2);
-	}
+#endif // _DEBUG
 
 	skybox_->Update();
 	BlackFade();
