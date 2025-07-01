@@ -578,50 +578,8 @@ Quaternion AnimationModel::CalculationValue(const std::vector<KeyframeQuaternion
 }
 
 void AnimationModel::JointDraw(const Matrix4x4& m) {
-	Vector3 jointCube[8] = {
-		Vector3( 0.075f, 0.075f, 0.075f),
-		Vector3(-0.075f, 0.075f, 0.075f),
-		Vector3(-0.075f, 0.075f,-0.075f),
-		Vector3( 0.075f, 0.075f,-0.075f),
-		
-		Vector3( 0.075f,-0.075f, 0.075f),
-		Vector3(-0.075f,-0.075f, 0.075f),
-		Vector3(-0.075f,-0.075f,-0.075f),
-		Vector3( 0.075f,-0.075f,-0.075f),
-	};
-
-	for (int i = 0; i < 8; i++) {
-		jointCube[i] = Transform(jointCube[i], m);
-	}
-
-	int p1 = 0;
-	int p2 = 1;
-	for (int i = 0; i < 4;  i++) {
-		Line3dDrawer::GetInstance()->DrawLine3d(jointCube[p1], jointCube[p2], { 1.0f,1.0f,1.0f,1.0f });
-
-		p1++;
-		p2++;
-		p1 = int(fmod(p1, 4));
-		p2 = int(fmod(p2, 4));
-	}
-	p1 = 4;
-	p2 = 5;
-	for (int i = 0; i < 4; i++) {
-		Line3dDrawer::GetInstance()->DrawLine3d(jointCube[p1], jointCube[p2], { 1.0f,1.0f,1.0f,1.0f });
-
-		p1++;
-		p2++;
-		p1 = 4 + int(fmod(p1, 4));
-		p2 = 4 + int(fmod(p2, 4));
-	}
-	p1 = 0;
-	p2 = 4;
-	for (int i = 0; i < 4; i++) {
-		Line3dDrawer::GetInstance()->DrawLine3d(jointCube[p1], jointCube[p2], { 1.0f,1.0f,1.0f,1.0f });
-
-		p1++;
-		p2++;
-	}
+	Vector3 jointPos = { m.m[3][0], m.m[3][1], m.m[3][2] };
+	Line3dDrawer::GetInstance()->DrawShereLine(jointPos, 0.025f, { 1.0f, 1.0f, 1.0f, 1.0f });
 }
 
 Animation* AnimationModel::GetCurrentAnimation() {

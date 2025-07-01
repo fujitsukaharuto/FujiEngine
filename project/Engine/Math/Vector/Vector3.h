@@ -40,6 +40,9 @@ public:
 
 	static Vector3 GetZeroVec() { return { 0.0f,0.0f,0.0f }; }
 	static Vector3 GetUpVec() { return { 0.0f,1.0f,0.0f }; }
+	static Vector3 Right() { return { 1.0f,0.0f,0.0f }; }
+	static Vector3 Up() { return { 0.0f,1.0f,0.0f }; }
+	static Vector3 Forward() { return { 0.0f,0.0f,1.0f }; }
 	static Vector3 FillVec(float k) { return { k,k,k }; }
 	static float Dot(const Vector3& a, const Vector3& b) { return a * b; }
 	static float Length(const Vector3& a) { return a.Length(); }

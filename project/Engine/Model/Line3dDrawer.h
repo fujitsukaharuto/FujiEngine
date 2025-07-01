@@ -47,6 +47,10 @@ public:
 
 	void DrawLine3d(const Vector3& p1, const Vector3& p2, const Vector4& color);
 
+	void DrawShereLine(const Vector3& center, float radius, const Vector4& color);
+
+	void DrawOctahedralBone(const Vector3& base, const Vector3& tip);
+
 	void Reset();
 
 	void Render();
