@@ -16,6 +16,14 @@ void UnderRing::Initialize() {
 	collider_->SetCollisionStayCallback([this](const ColliderInfo& other) {OnCollisionStay(other); });
 	collider_->SetCollisionExitCallback([this](const ColliderInfo& other) {OnCollisionExit(other); });
 
+	cylinder_ = std::make_unique<Object3d>();
+	cylinder_->CreateCylinderEx(0.5f, 0.5f, 1.5f);
+	cylinder_->transform.translate.y = -0.9f;
+	cylinder_->SetParent(&model_->transform);
+	cylinder_->SetLightEnable(LightMode::kLightNone);
+	cylinder_->SetTexture("shockWaveGround.png");
+	cylinder_->SetColor({ 0.9f,0.9f,1.0f,1.0f });
+
 	speed_ = 0.35f;
 
 	model_->SetLightEnable(LightMode::kLightNone);
@@ -36,8 +44,10 @@ void UnderRing::Update() {
 			isLive_ = false;
 		}
 
-		model_->SetUVScale({ 0.75f,1.0f }, { uvTransX_,0.0f });
+		model_->SetUVScale({ model_->transform.scale.x * 0.75f,1.0f }, { uvTransX_,0.0f });
+		cylinder_->SetUVScale({ model_->transform.scale.x * 0.15f,1.0f }, { uvTransX_ * 0.01f,0.0f });
 		model_->transform.scale += (Vector3(1.0f, 0.0f, 1.0f) * speed_) * FPSKeeper::DeltaTime();
+		model_->transform.scale.y = 1.0f;
 
 		ringRadMax_ = model_->transform.scale.x * 0.5f;
 		ringRadMin_ = model_->transform.scale.x * 0.4f;
@@ -52,6 +62,7 @@ void UnderRing::Update() {
 
 void UnderRing::Draw([[maybe_unused]] Material* mate, [[maybe_unused]] bool is) {
 	OriginGameObject::Draw(nullptr, true);
+	cylinder_->Draw(nullptr, true);
 }
 
 void UnderRing::DrawCollider() {

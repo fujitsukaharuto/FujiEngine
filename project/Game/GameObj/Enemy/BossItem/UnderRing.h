@@ -39,6 +39,8 @@ private:
 
 private:
 
+	std::unique_ptr<Object3d> cylinder_;
+
 	bool isLive_ = false;
 	float lifeTime_ = 300.0f;
 	float speed_;

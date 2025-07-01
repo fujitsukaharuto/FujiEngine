@@ -154,6 +154,9 @@ void Boss::Update() {
 
 	} else if (isStart_) {
 		startTime_ -= FPSKeeper::DeltaTime();
+		if (startTime_ > 40.0f && startTime_ < 200.0f) {
+			CameraManager::GetInstance()->GetCamera()->SetShakeTime(2.0f);
+		}
 		if (startTime_ < 0.0f) {
 			isStart_ = false;
 			ChangeBehavior(std::make_unique<BossRoot>(this));

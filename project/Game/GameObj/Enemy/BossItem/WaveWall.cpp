@@ -13,7 +13,7 @@ void WaveWall::Initialize() {
 	wave1_ = std::make_unique<Object3d>();
 	wave2_ = std::make_unique<Object3d>();
 	wave3_ = std::make_unique<Object3d>();
-	underRing_->CreateRing(1.2f, 0.6f, 1.0f);
+	underRing_->CreateRingEx(1.2f, 0.6f, 1.0f, true);
 	wave1_->Create("bossWaveWall.obj");
 	wave2_->Create("bossWaveWall.obj");
 	wave3_->Create("bossWaveWall.obj");
@@ -43,10 +43,9 @@ void WaveWall::Initialize() {
 	underRing_->SetAlphaRef(0.25f);
 	underRing_->SetParent(&model_->transform);
 	underRing_->transform.translate.y = 0.001f;
-	underRing_->transform.rotate.x = 1.56f;
 	underRing_->transform.rotate.y = 1.56f;
 	underRing_->transform.scale.x = 1.65f;
-	underRing_->transform.scale.y = 1.65f;
+	underRing_->transform.scale.z = 1.65f;
 
 	float scaleX = 0.9f;
 	float scaleY = 0.9f;

@@ -30,6 +30,7 @@ public:
 	void CreateRingEx(float out = 1.0f, float in = 0.2f, float radius = 2.0f, bool horizon = false);
 
 	void CreateCylinder(float topRadius = 1.0f, float bottomRadius = 1.0f, float height = 3.0f);
+	void CreateCylinderEx(float topRadius = 1.0f, float bottomRadius = 1.0f, float height = 3.0f);
 
 	void Draw(Material* mate = nullptr, bool isAdd = false);
 
