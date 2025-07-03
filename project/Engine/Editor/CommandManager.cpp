@@ -1,6 +1,7 @@
 #include "CommandManager.h"
 #include "Engine/Input/Input.h"
 #include "Engine/Editor/JsonSerializer.h"
+#include "Engine/ImGuiManager/ImGuiManager.h"
 #include <fstream>
 
 CommandManager::~CommandManager() {
@@ -72,8 +73,10 @@ void CommandManager::Draw() {
 #ifdef _DEBUG
 	for (auto& group : objectList) {
 		EditorObj* obj = group.second.get();
-		if (obj->isActive) {
-			obj->obj->Draw();
+		if (obj) {
+			if (obj->isActive) {
+				obj->obj->Draw();
+			}
 		}
 	}
 #endif // _DEBUG
@@ -85,59 +88,19 @@ void CommandManager::DebugGUI() {
 
 	for (auto& group: objectList) {
 		EditorObj* obj = group.second.get();
-
-		// 表示名（キャッシュが無ければ初期化）
-		if (headerNames.find(group.first) == headerNames.end()) {
-			std::string defaultName = obj->name.empty()
-				? "EditorObj" + std::to_string(group.first)
-				: obj->name;
-
-			headerNames[group.first] = defaultName + "##" + std::to_string(group.first);
-			nameHashes[group.first] = std::hash<std::string>{}(defaultName);
-		}
-
-		if (obj->isActive) {
-			// CollapsingHeader 表示
-			if (ImGui::CollapsingHeader(headerNames[group.first].c_str())) {
-				// 編集用のラベル（ImGui ID用）
-				std::string inputLabel = "##input" + std::to_string(group.first);
-
-				// ImGuiの入力欄で名前編集（最大64文字くらい推奨）
-				static char nameBuffer[64]; // 固定長バッファ（使い回し可）
-				strncpy_s(nameBuffer, sizeof(nameBuffer), obj->name.c_str(), _TRUNCATE);
-
-				ImGui::Text("Name"); ImGui::SameLine();
-				if (ImGui::InputText(inputLabel.c_str(), nameBuffer, sizeof(nameBuffer),
-					ImGuiInputTextFlags_EnterReturnsTrue)) {
-					// Enterで確定された場合のみ name を更新
-					obj->name = std::string(nameBuffer);
-
-					// ラベル再生成（空の場合はデフォルト）
-					std::string newName = obj->name.empty()
-						? "EditorObj" + std::to_string(group.first)
-						: obj->name;
-
-					headerNames[group.first] = newName + "##" + std::to_string(group.first);
-					nameHashes[group.first] = std::hash<std::string>{}(newName);
+		if (obj) {
+			if (obj->parent == -1) {
+				EditorObjGUI(*obj);
+			} else if (!objectList[obj->parent]) {
+				if (obj->obj->IsHaveParent()) {
+					obj->obj->SetParent(nullptr);
 				}
-
-				obj->obj->DebugGUI();
-
-				JsonSerializer::ShowSaveEditorObjPopup(*obj);
-
-				std::string deleteButtonLabel = "Delete##" + std::to_string(group.first);
-				if (ImGui::Button(deleteButtonLabel.c_str())) {
-					auto deleteCommand = std::make_unique<DeleteObjCommand>(group.first);
-					Execute(std::move(deleteCommand));
-					continue;
-				}
+				EditorObjGUI(*obj);
 			}
 		}
 	}
 
-	ImGui::Separator();
-	ImGui::Text("Add New Object");
-
+	ImGui::SeparatorText("Add New Object");
 	// 静的入力バッファ（入力欄）
 	static char newObjName[64] = "NewObject";
 
@@ -180,6 +143,124 @@ void CommandManager::DebugGUI() {
 #endif // DEBUG
 }
 
+void CommandManager::EditorObjGUI(EditorObj& obj) {
+#ifdef _DEBUG
+	// 表示名（キャッシュが無ければ初期化）
+	if (headerNames.find(obj.id) == headerNames.end()) {
+		std::string defaultName = obj.name.empty()
+			? "EditorObj" + std::to_string(obj.id)
+			: obj.name;
+
+		headerNames[obj.id] = defaultName + "##" + std::to_string(obj.id);
+		nameHashes[obj.id] = std::hash<std::string>{}(defaultName);
+	}
+
+	if (obj.isActive) {
+		bool isOpen = (openedHeaderID == obj.id);
+		if (isOpen) {
+			ImGui::SetNextItemOpen(true, ImGuiCond_Always);
+		} else {
+			ImGui::SetNextItemOpen(false, ImGuiCond_Always);
+		}
+
+		// CollapsingHeader 表示
+		ImGuiTreeNodeFlags base_flags = ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_SpanLabelWidth;
+		if (ImGui::CollapsingHeader(headerNames[obj.id].c_str(), base_flags)) {
+			ImGui::Indent();
+			if (!isOpen) {
+				openedHeaderID = obj.id;
+			}
+
+			// ImGuiの入力欄で名前編集（最大64文字くらい推奨）
+			static char nameBuffer[64]; // 固定長バッファ（使い回し可）
+			strncpy_s(nameBuffer, sizeof(nameBuffer), obj.name.c_str(), _TRUNCATE);
+
+			ImGui::Text("Name"); ImGui::SameLine();
+			if (ImGui::InputText(obj.inputLabel.c_str(), nameBuffer, sizeof(nameBuffer),
+				ImGuiInputTextFlags_EnterReturnsTrue)) {
+				// Enterで確定された場合のみ name を更新
+				obj.name = std::string(nameBuffer);
+
+				// ラベル再生成（空の場合はデフォルト）
+				std::string newName = obj.name.empty()
+					? "EditorObj" + std::to_string(obj.id)
+					: obj.name;
+
+				headerNames[obj.id] = newName + "##" + std::to_string(obj.id);
+				nameHashes[obj.id] = std::hash<std::string>{}(newName);
+			}
+
+			obj.obj->DebugGUI();
+			ImGuiManager::ImGuiDragDropButton("Child", "MY_INT",
+				[this, &obj](const ImGuiPayload* payload) {
+					int receivedValue = *(const int*)payload->Data;
+					if (ParentCheck(obj.parent, receivedValue)) {
+						obj.childlen.push_back(receivedValue);
+						objectList[receivedValue]->parent = obj.id;
+						objectList[receivedValue]->obj->SetParent(&obj.obj->transform);
+					}
+				},
+				[this, &obj](const ImGuiPayload* payload) {
+					int receivedValue = *(const int*)payload->Data;
+					if (ParentCheck(obj.parent, receivedValue)) {
+						ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
+						ImGui::SetTooltip("drop here!");
+					} else {
+						ImGui::SetMouseCursor(ImGuiMouseCursor_NotAllowed);
+						ImGui::SetTooltip("cannot drop here");
+					}
+				});
+
+			if (obj.childlen.size() != 0) {
+				for (auto& child : obj.childlen) {
+					if (objectList[child]) {
+						ImGui::Text(objectList[child]->name.c_str());
+					}
+				}
+			}
+
+			ImGui::Separator();
+			JsonSerializer::ShowSaveEditorObjPopup(obj);
+			ImGui::SameLine();
+			if (ImGui::Button(obj.deleteButtonLabel.c_str())) {
+				auto deleteCommand = std::make_unique<DeleteObjCommand>(obj.id);
+				Execute(std::move(deleteCommand));
+			}
+			ImGui::Unindent();
+		} else {
+			if (isOpen) {
+				openedHeaderID.reset();
+			}
+			ImGui::SameLine();
+			ImGuiManager::ImGuiDragButton(obj.dragButtonLabel.c_str(), &obj.id, sizeof(int), "MY_INT");
+		}
+		if (obj.childlen.size() != 0) {
+			ImGui::Indent();
+			std::erase_if(obj.childlen, [&](int child) {
+				if (objectList[child]) {
+					return objectList[child]->parent != obj.id;
+				}
+				return false;
+				});
+
+			for (auto& child : obj.childlen) {
+				if (objectList[child]) {
+					if (objectList[child]->parent == obj.id) {
+						if (!objectList[child]->obj->IsHaveParent()) {
+							objectList[child]->obj->SetParent(&obj.obj->transform);
+						}
+						EditorObjGUI(*objectList[child]);
+					}
+				}
+			}
+			ImGui::Unindent();
+		}
+	} else {
+
+	}
+#endif // _DEBUG
+}
+
 std::shared_ptr<EditorObj> CommandManager::GetEditorObject(int id) const {
 	auto it = objectList.find(id);
 	return (it != objectList.end()) ? it->second : nullptr;
@@ -188,7 +269,10 @@ std::shared_ptr<EditorObj> CommandManager::GetEditorObject(int id) const {
 void CommandManager::GarbageCollect() {
 	// 非アクティブなオブジェクトを削除
 	std::erase_if(objectList, [](const auto& pair) {
-		return !pair.second->isActive;
+		if (pair.second) {
+			return !pair.second->isActive;
+		}
+		return true;
 		});
 
 	// ヘッダー名やハッシュも削除しておく
@@ -214,29 +298,31 @@ void CommandManager::EditorOBJSave(const std::string& filePath) {
 
 	for (auto& group : objectList) {
 		EditorObj* obj = group.second.get();
-		nlohmann::json json;  // 各オブジェクトごとの JSON を作成
+		if (obj) {
+			nlohmann::json json;  // 各オブジェクトごとの JSON を作成
 
-		json["objectName"] = obj->name;
-		json["modelName"] = obj->obj->GetModelName();
+			json["objectName"] = obj->name;
+			json["modelName"] = obj->obj->GetModelName();
 
-		// Vector3を配列として保存
-		json["transform"]["translate"] = {
-			obj->obj->transform.translate.x,
-			obj->obj->transform.translate.y,
-			obj->obj->transform.translate.z
-		};
-		json["transform"]["rotate"] = {
-			obj->obj->transform.rotate.x,
-			obj->obj->transform.rotate.y,
-			obj->obj->transform.rotate.z
-		};
-		json["transform"]["scale"] = {
-			obj->obj->transform.scale.x,
-			obj->obj->transform.scale.y,
-			obj->obj->transform.scale.z
-		};
+			// Vector3を配列として保存
+			json["transform"]["translate"] = {
+				obj->obj->transform.translate.x,
+				obj->obj->transform.translate.y,
+				obj->obj->transform.translate.z
+			};
+			json["transform"]["rotate"] = {
+				obj->obj->transform.rotate.x,
+				obj->obj->transform.rotate.y,
+				obj->obj->transform.rotate.z
+			};
+			json["transform"]["scale"] = {
+				obj->obj->transform.scale.x,
+				obj->obj->transform.scale.y,
+				obj->obj->transform.scale.z
+			};
 
-		jsonList.push_back(json);  // 配列に追加
+			jsonList.push_back(json);  // 配列に追加
+		}
 	}
 
 	// 最終的なJSON出力
@@ -314,7 +400,7 @@ void CommandManager::SaveAllEditorOBJ() {
 #endif // _DEBUG
 }
 
-bool CommandManager::EditorOBJLoad(const std::string& filePath) {
+bool CommandManager::EditorOBJLoad(const std::string& filePath, bool deleteObj) {
 	std::filesystem::path fullPath = std::filesystem::path("resource/Json") / filePath;
 	// ファイルが存在しない場合は false を返す
 	if (!std::filesystem::exists(fullPath)) {
@@ -334,6 +420,10 @@ bool CommandManager::EditorOBJLoad(const std::string& filePath) {
 	ifs.close();
 	if (!json.contains("objects") || !json["objects"].is_array()) {
 		return false;
+	}
+
+	if (deleteObj) {
+		DeleteEditorObj();
 	}
 
 	for (const auto& objJson : json["objects"]) {
@@ -405,7 +495,7 @@ void CommandManager::LoadAllEditorOBJ() {
 				path += ".json";
 			}
 
-			if (EditorOBJLoad(path)) {
+			if (EditorOBJLoad(path, true)) {
 				showLoadSuccessMessage = true;
 				StackReset();
 			} else {
@@ -429,4 +519,26 @@ void CommandManager::LoadAllEditorOBJ() {
 		JsonSerializer::LoadErrorPopup(showLoadErrorMessage, fileName);
 	}
 #endif // _DEBUG
+}
+
+void CommandManager::DeleteEditorObj() {
+	for (auto& group : objectList) {
+		EditorObj* obj = group.second.get();
+		if (obj) {
+			obj->isActive = false;
+		}
+	}
+}
+
+bool CommandManager::ParentCheck(int parentID, int receiveID) {
+	if (parentID == receiveID) {
+		return false;
+	} else if (parentID == -1) {
+		return true;
+	} else {
+		if (objectList[parentID]) {
+			return ParentCheck(objectList[parentID]->parent, receiveID);
+		}
+		return true;
+	}
 }

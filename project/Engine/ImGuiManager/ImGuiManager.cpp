@@ -39,6 +39,8 @@ void ImGuiManager::Init([[maybe_unused]] MyWin* myWin, [[maybe_unused]] DXCom* d
 	ImGui::GetStyle().Colors[34] = { 0.091f,0.179f,0.299f,0.862f };
 	ImGui::GetStyle().Colors[35] = { 0.109f,0.522f,0.0f,1.0f };
 
+	ImGui::SetColorEditOptions(ImGuiColorEditFlags_Float | ImGuiColorEditFlags_DisplayHSV | ImGuiColorEditFlags_PickerHueBar);
+
 	/// font
 	ImGuiIO& io = ImGui::GetIO();
 	io.Fonts->AddFontFromFileTTF("imgui/FiraMono-Medium.ttf", 16.0f);
@@ -115,6 +117,48 @@ void ImGuiManager::SetFontJapanese() {
 void ImGuiManager::UnSetFont() {
 #ifdef _DEBUG
 	ImGui::PopFont();
+#endif // _DEBUG
+}
+
+void ImGuiManager::ImGuiDragDropButton(const char* buttonLabel, const char* payloadType, const std::function<void(const ImGuiPayload* payload)>& onDrop, const std::function<void(const ImGuiPayload* payload)>& onPreview) {
+#ifdef _DEBUG
+	if (ImGui::Button(buttonLabel)) {
+		// ボタンが押されたときの処理が必要なら追加
+	}
+
+	if (ImGui::BeginDragDropTarget()) {
+		ImGuiDragDropFlags flags = ImGuiDragDropFlags_AcceptBeforeDelivery | ImGuiDragDropFlags_AcceptNoPreviewTooltip;
+		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(payloadType, flags)) {
+			IM_UNUSED(payload);
+
+			if (payload->IsDelivery()) {
+				// ドロップされた瞬間にだけ処理を呼ぶ
+				if (onDrop) {
+					onDrop(payload);
+				}
+			} else {
+				// プレビュー中の処理（必要であればここも引数化できる）
+				if (onPreview) {
+					onPreview(payload);
+				}
+			}
+		}
+		ImGui::EndDragDropTarget();
+	}
+#endif // _DEBUG
+}
+
+void ImGuiManager::ImGuiDragButton(const char* label, const void* payloadData, size_t payloadSize, const char* payloadType) {
+#ifdef _DEBUG
+	if (ImGui::Button(label)) {
+		// ボタンが押された場合の処理（必要であれば追加）
+	}
+
+	if (ImGui::BeginDragDropSource()) {
+		ImGui::SetDragDropPayload(payloadType, payloadData, payloadSize);
+		ImGui::Text("Dragging Now");
+		ImGui::EndDragDropSource();
+	}
 #endif // _DEBUG
 }
 

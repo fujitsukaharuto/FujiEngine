@@ -62,6 +62,13 @@ public:
 	/// </summary>
 	void UnSetFont();
 
+	///---------------------------------------------------------------------------------------
+	/// ImGuiUtility
+	///---------------------------------------------------------------------------------------
+	static void ImGuiDragDropButton(const char* buttonLabel, const char* payloadType, const std::function<void(const ImGuiPayload* payload)>& onDrop, const std::function<void(const ImGuiPayload* payload)>& onPreview);
+	static void ImGuiDragButton(const char* label, const void* payloadData, size_t payloadSize, const char* payloadType);
+
+
 #ifdef _DEBUG
 
 	void InitNodeTexture();

@@ -24,8 +24,6 @@ private:
 	std::unique_ptr<Object3dCommon> obj3dCommon = nullptr;
 	std::unique_ptr<SkyBox> skybox_;
 	std::unique_ptr<Object3d> terrain_ = nullptr;
-	std::unique_ptr<Object3d> sphere = nullptr;
-	std::unique_ptr<Object3d> sphere2 = nullptr;
 	std::unique_ptr<Object3d> titlePlane_ = nullptr;
 	std::unique_ptr<AnimationModel> cube_ = nullptr;
 
@@ -33,10 +31,7 @@ private:
 
 	ParticleEmitter emit;
 
-	std::unique_ptr<TestBaseObj> test_;
-	std::unique_ptr<TestBaseObj> test2_;
 	std::unique_ptr<CollisionManager> cMane_;
-
 
 	// sceneChange
 	std::unique_ptr<Sprite> black_;

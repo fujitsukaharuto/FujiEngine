@@ -11,6 +11,11 @@ void CreateObjCommand::Do() {
 	obj->obj = std::make_unique<Object3d>();
 	obj->obj->Create(modelName);
 	obj->modelName = obj->obj->GetModelName();
+
+	obj->inputLabel = "##input" + std::to_string(obj->id);
+	obj->deleteButtonLabel = "Delete##" + std::to_string(obj->id);
+	obj->dragButtonLabel = "Drag##" + std::to_string(obj->id);
+
 	CommandManager::GetInstance()->objectList[objId] = obj;
 
 	// ラベルとハッシュの登録もここでやっておく

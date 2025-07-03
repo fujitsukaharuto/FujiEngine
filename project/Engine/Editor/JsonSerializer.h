@@ -5,10 +5,10 @@
 #include "Math/Matrix/MatrixCalculation.h"
 
 struct EditorObj;
+using json = nlohmann::json;
 
 class JsonSerializer {
 public:
-	using json = nlohmann::json;
 
 	// Transform
 	static void ShowSaveTransformPopup(const Trans& transform);
@@ -22,6 +22,9 @@ public:
 	static void SerializeEditorObj(const EditorObj& obj, const std::string& filePath);
 	static bool DeserializeEditorObj(const std::string& filePath, EditorObj& obj, bool isCreateCommand = false);
 
+	// JsonData
+	static void SerializeJsonData(const json& data, const std::string& filePath);
+	static json DeserializeJsonData(const std::string& filePath);
 
 	// Popup
 	static void SavedPopup(bool& success);

@@ -355,6 +355,32 @@ bool JsonSerializer::DeserializeEditorObj(const std::string& filePath, EditorObj
 	return true;
 }
 
+void JsonSerializer::SerializeJsonData([[maybe_unused]] const json& data, [[maybe_unused]]const std::string& filePath) {
+	std::string fullPath = filePath;
+	std::filesystem::path path(fullPath);
+	if (path.extension() != ".json") {
+
+		path.replace_extension(".json");
+		fullPath = path.string();
+	}
+	std::ofstream file(fullPath);
+	if (file.is_open()) {
+		file << data.dump(4);
+		file.close();
+	}
+}
+
+json JsonSerializer::DeserializeJsonData(const std::string& filePath) {
+	std::ifstream file(filePath);
+	if (!file.is_open()) {
+		return json();
+	}
+	json data;
+	file >> data;
+	file.close();
+	return data;
+}
+
 void JsonSerializer::SavedPopup(bool& success) {
 #ifdef _DEBUG
 	if (success) {

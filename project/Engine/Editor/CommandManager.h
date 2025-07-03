@@ -18,6 +18,12 @@ struct EditorObj {
 	bool isActive = true;
 	std::string name;
 	std::string modelName;
+	std::vector<int> childlen;
+	int parent = -1;
+
+	std::string inputLabel;
+	std::string deleteButtonLabel;
+	std::string dragButtonLabel;
 };
 
 struct LoadEditorObjData {
@@ -63,6 +69,7 @@ public:
 
 	void Draw();
 	void DebugGUI();
+	void EditorObjGUI(EditorObj& obj);
 	std::shared_ptr<EditorObj> GetEditorObject(int id) const;
 	void GarbageCollect();
 
@@ -74,8 +81,11 @@ private:
 
 	void EditorOBJSave(const std::string& filePath);
 	void SaveAllEditorOBJ();
-	bool EditorOBJLoad(const std::string& filePath);
+	bool EditorOBJLoad(const std::string& filePath, bool deleteObj = false);
 	void LoadAllEditorOBJ();
+
+	void DeleteEditorObj();
+	bool ParentCheck(int parentID, int receiveID);
 
 private:
 	std::stack<std::unique_ptr<ICommand>> undoStack;
@@ -83,4 +93,6 @@ private:
 
 	int nextObjId = 0;
 	std::unique_ptr<EditorObj> loadObj;
+
+	std::optional<int> openedHeaderID;
 };

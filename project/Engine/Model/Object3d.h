@@ -42,6 +42,8 @@ public:
 
 	std::string GetModelName() { return modelName_; }
 
+	bool IsHaveParent() { return transform.parent ? true : false; }
+
 	void UpdateWVP() { SetWVP(); }
 
 	void DebugGUI();

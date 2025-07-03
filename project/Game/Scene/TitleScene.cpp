@@ -41,14 +41,6 @@ void TitleScene::Initialize() {
 	terrain_->LoadTransformFromJson("default_terrainTrnasform.json");
 	terrain_->SetUVScale({ 20.0f,20.0f }, { 0.0f,0.0f });
 
-	sphere = std::make_unique<Object3d>();
-	sphere->Create("Fence.obj");
-	sphere->transform.translate.x = 4.0f;
-
-	sphere2 = std::make_unique<Object3d>();
-	sphere2->CreateSphere();
-	sphere2->transform.translate.x = 1.0f;
-
 	titlePlane_ = std::make_unique<Object3d>();
 	titlePlane_->Create("plane.obj");
 	titlePlane_->SetTexture("title_beta.png");
@@ -66,15 +58,6 @@ void TitleScene::Initialize() {
 	cube_->Create("T_boss.gltf");
 	cube_->LoadAnimationFile("T_boss.gltf");
 	cube_->transform.translate.y = 3.0f;
-
-	test_ = std::make_unique<TestBaseObj>();
-	test_->Initialize();
-	test_->name_ = "testObj";
-	//test_->GetCollider()->SetIsCollisonCheck(false);
-
-	test2_ = std::make_unique<TestBaseObj>();
-	test2_->Initialize();
-	test2_->name_ = "testObj2";
 
 	cMane_ = std::make_unique<CollisionManager>();
 
@@ -95,9 +78,6 @@ void TitleScene::Update() {
 	BlackFade();
 	skybox_->Update();
 
-	test_->Update();
-	test2_->Update();
-
 	cube_->AnimationUpdate();
 
 	if (input_->TriggerKey(DIK_5)) {
@@ -105,8 +85,6 @@ void TitleScene::Update() {
 	}
 	emit.Emit();
 
-	cMane_->AddCollider(test_->GetCollider());
-	cMane_->AddCollider(test2_->GetCollider());
 	cMane_->CheckAllCollision();
 
 	ParticleManager::GetInstance()->Update();
@@ -135,10 +113,6 @@ void TitleScene::Draw() {
 
 	titlePlane_->Draw();
 
-	sphere->Draw();
-	sphere2->Draw();
-	//test_->Draw();
-
 #ifdef _DEBUG
 	CommandManager::GetInstance()->Draw();
 #endif // _DEBUG
@@ -147,8 +121,6 @@ void TitleScene::Draw() {
 
 #ifdef _DEBUG
 	emit.DrawSize();
-	test_->DrawCollider();
-	test2_->DrawCollider();
 #endif // _DEBUG
 	cube_->SkeletonDraw();
 	Line3dDrawer::GetInstance()->Render();
@@ -170,20 +142,12 @@ void TitleScene::Draw() {
 void TitleScene::DebugGUI() {
 #ifdef _DEBUG
 	ImGui::Indent();
-	if (ImGui::CollapsingHeader("Sphere")) {
-		sphere->DebugGUI();
-	}
-	if (ImGui::CollapsingHeader("Sphere2")) {
-		sphere2->DebugGUI();
-	}
 	if (ImGui::CollapsingHeader("titlePlane")) {
 		titlePlane_->DebugGUI();
 	}
 	if (ImGui::CollapsingHeader("cube")) {
 		cube_->DebugGUI();
 	}
-	test_->DebugGUI();
-	test2_->DebugGUI();
 
 	ImGui::Unindent();
 #endif // _DEBUG
