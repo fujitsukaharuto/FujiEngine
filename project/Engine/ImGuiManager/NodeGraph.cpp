@@ -78,9 +78,7 @@ bool NodeGraph::IsPinLinked(ed::PinId pinId) const {
 }
 
 void NodeGraph::ClearResults() {
-	for (auto& node : nodes) {
-		node.result = Value(); // type = None にリセット
-	}
+
 }
 
 

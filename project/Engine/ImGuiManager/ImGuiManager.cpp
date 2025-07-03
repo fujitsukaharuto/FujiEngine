@@ -38,6 +38,7 @@ void ImGuiManager::Init([[maybe_unused]] MyWin* myWin, [[maybe_unused]] DXCom* d
 	ImGui::GetStyle().Colors[33] = { 0.55f,0.588f,0.632f,0.8f };
 	ImGui::GetStyle().Colors[34] = { 0.091f,0.179f,0.299f,0.862f };
 	ImGui::GetStyle().Colors[35] = { 0.109f,0.522f,0.0f,1.0f };
+	ImGui::GetStyle().Colors[ImGuiCol_ModalWindowDimBg] = { 0.8f,0.8f,0.8f,0.075f };
 
 	ImGui::SetColorEditOptions(ImGuiColorEditFlags_Float | ImGuiColorEditFlags_DisplayHSV | ImGuiColorEditFlags_PickerHueBar);
 
@@ -307,7 +308,7 @@ void ImGuiManager::DrawNodeEditor(NodeGraph* nodeGraph) {
 	ed::Utilities::BlueprintNodeBuilder builder((ImTextureID)backGroundHandle_.ptr, 126, 126);
 
 	// 右クリックでMenuを出す
-	/*auto openPopupPosition = ImGui::GetMousePos();
+	auto openPopupPosition = ImGui::GetMousePos();
 	ed::Suspend();
 	if (ed::ShowBackgroundContextMenu()) {
 		if (Input::GetInstance()->IsTriggerMouse(1)) {
@@ -327,7 +328,7 @@ void ImGuiManager::DrawNodeEditor(NodeGraph* nodeGraph) {
 		ImGui::EndPopup();
 	}
 	ImGui::PopStyleVar();
-	ed::Resume();*/
+	ed::Resume();
 
 	for (const auto& node : nodeGraph->nodes) {
 		DrawNode(node, builder);

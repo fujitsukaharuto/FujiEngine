@@ -382,7 +382,21 @@ void Object3d::DebugGUI() {
 		ImGui::DragFloat2("uvScale", &uvScale.x, 0.1f);
 		ImGui::DragFloat2("uvTrans", &uvTrans.x, 0.1f);
 		SetUVScale(uvScale, uvTrans);
-		SetTextureNode();
+		if (ImGui::Button("MaterialSetting")) {
+			ImGui::OpenPopup("Material Window");
+		}
+		ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+		ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+		if (ImGui::BeginPopupModal("Material Window", NULL)) {
+			SetTextureNode();
+			ImGui::Separator();
+			if (ImGui::Button("OK", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+			ImGui::SetItemDefaultFocus();
+			ImGui::SameLine();
+			if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+			ImGui::EndPopup();
+		}
+
 		ImGui::TreePop();
 	}
 
@@ -588,6 +602,7 @@ void Object3d::SetTextureNode() {
 	if (selectorNodeId_.Get() != 0) {
 		MyNode* selNode = nodeGraph_.FindNodeById(selectorNodeId_);
 		if (selNode) {
+			selNode->result = Value();
 			Value out = nodeGraph_.EvaluateNode(*selNode);
 			if (out.type == Value::Type::Texture) {
 				SetTexture(out.Get<std::string>());
