@@ -11,6 +11,93 @@ namespace ed = ax::NodeEditor;
 
 
 #ifdef _DEBUG
+void NodeGraph::Update(ax::NodeEditor::EditorContext* ctx) {
+	ClearResults();
+
+	// リンクしているかどうか
+	for (auto& node : nodes) {
+		for (auto& pin : node.inputs)
+			if (IsPinLinked(pin.id))
+				pin.isLinked = true;
+			else pin.isLinked = false;
+		for (auto& pin : node.outputs)
+			if (IsPinLinked(pin.id))
+				pin.isLinked = true;
+			else pin.isLinked = false;
+
+		node.isUpdated = false;
+	}
+
+	// リンクしている値を取得
+	for (auto& node : nodes) {
+		ValueUpdate(node);
+	}
+
+	if (!ctx) {
+		ctx = ax::NodeEditor::CreateEditor();
+	}
+
+	ed::SetCurrentEditor(ctx);
+	ImGuiManager::GetInstance()->DrawNodeEditor(this);
+	ed::SetCurrentEditor(nullptr);
+}
+
+void NodeGraph::ValueUpdate(MyNode& node) {
+	std::vector<Value> inputValues;
+
+	if (node.isUpdated) {
+		return;
+	} else {
+		for (const Pin& input : node.inputs) {
+			if (!input.isLinked) {
+				// 未接続ならNone値
+				inputValues.push_back(Value());
+				continue;
+			}
+
+			const Link* pLink = nullptr;
+			for (const Link& link : links) {
+				if (link.endPinId == input.id)
+					pLink = &link;
+			}
+			if (!pLink)
+				continue;
+			MyNode* srcNode = FindNodeByPinId(pLink->startPinId);
+			if (!srcNode)
+				continue;
+			ValueUpdate(*srcNode);
+
+			const Value* output = nullptr;
+			for (int i = 0; i < srcNode->outputs.size(); i++) {
+				if (pLink->startPinId == srcNode->outputs[i].id) {
+					output = &srcNode->outputValue[i];
+				}
+			}
+			if (output)
+				inputValues.push_back(*output);
+			else
+				inputValues.push_back(Value()); // 安全のためNone
+		}
+
+		node.outputValue.clear();
+		if (!inputValues.empty()) {
+			if (node.type == MyNode::NodeType::Material) {
+				node.outputValue.push_back(inputValues[0].type != Value::Type::Texture ? node.values[0] : inputValues[0]);
+			}
+
+			if (node.type == MyNode::NodeType::Texture) {
+				node.outputValue.push_back(inputValues[0].type != Value::Type::Texture ? node.values[0] : inputValues[0]);
+			}
+			// 随時追加
+
+
+		} else {
+			node.outputValue = node.values;
+		}
+		node.isUpdated = true;
+	}
+}
+
 MyNode& NodeGraph::AddNode(const MyNode& node) {
 	nodes.push_back(node);
 	return nodes.back();
@@ -49,8 +136,8 @@ Value NodeGraph::EvaluateNode(const MyNode& node) {
 	return node.result;
 }
 
-const MyNode* NodeGraph::FindNodeByPinId(ed::PinId pinId) const {
-	for (const auto& node : nodes) {
+MyNode* NodeGraph::FindNodeByPinId(ed::PinId pinId) {
+	for (MyNode& node : nodes) {
 		for (const auto& pin : node.outputs) {
 			if (pin.id == pinId) return &node;
 		}

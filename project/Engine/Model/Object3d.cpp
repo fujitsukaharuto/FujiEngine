@@ -24,31 +24,19 @@ Object3d::Object3d() {
 
 	MyNode texNode;
 	texNode.CreateNode(MyNode::NodeType::Texture);
+	texNode.values.push_back(Value("checkerBoard.png"));
 	texNode.texName = "checkerBoard.png";
-	texNode.evaluator = [](auto&&) {
-		Value v;
-		v = "checkerBoard.png";
-		v.type = Value::Type::Texture;
-		return v;
-		};
 	nodeGraph_.AddNode(texNode);
 
 	MyNode texNode2;
 	texNode2.CreateNode(MyNode::NodeType::Texture);
+	texNode2.values.push_back(Value("uvChecker.png"));
 	texNode2.texName = "uvChecker.png";
-	texNode2.evaluator = [](auto&&) {
-		Value v;
-		v = "uvChecker.png";
-		v.type = Value::Type::Texture;
-		return v;
-		};
 	nodeGraph_.AddNode(texNode2);
 
 	MyNode selNode;
 	selNode.CreateNode(MyNode::NodeType::Material);
-	selNode.evaluator = [](const std::vector<Value>& inputs) {
-		return !inputs.empty() ? inputs[0] : Value();
-		};
+	selNode.values.push_back(Value("white2x2.png"));
 	nodeGraph_.AddNode(selNode);
 
 	selectorNodeId_ = selNode.id;
@@ -72,6 +60,14 @@ void Object3d::Create(const std::string& fileName) {
 	SetModel(fileName);
 	transform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 	nowTextureName = model_->GetTextuerName();
+#ifdef _DEBUG
+	if (selectorNodeId_.Get() != 0) {
+		MyNode* selNode = nodeGraph_.FindNodeById(selectorNodeId_);
+		if (selNode) {
+			selNode->values[0] = Value(nowTextureName);
+		}
+	}
+#endif // _DEBUG
 	CreateWVP();
 }
 
@@ -442,6 +438,14 @@ void Object3d::SetTexture(const std::string& name) {
 	}
 	model_->SetTexture(name);
 	nowTextureName = name;
+#ifdef _DEBUG
+	if (selectorNodeId_.Get() != 0) {
+		MyNode* selNode = nodeGraph_.FindNodeById(selectorNodeId_);
+		if (selNode) {
+			selNode->values[0] = Value(nowTextureName);
+		}
+	}
+#endif // _DEBUG
 }
 
 void Object3d::SetLightEnable(LightMode mode) {
@@ -596,37 +600,16 @@ void Object3d::CreatePropertyCommand(int type) {
 
 void Object3d::SetTextureNode() {
 #ifdef _DEBUG
-	nodeGraph_.ClearResults();
+
+	nodeGraph_.Update(nodeEditorContext_);
 
 	// Selector ノードを探して評価
 	if (selectorNodeId_.Get() != 0) {
 		MyNode* selNode = nodeGraph_.FindNodeById(selectorNodeId_);
 		if (selNode) {
-			selNode->result = Value();
-			Value out = nodeGraph_.EvaluateNode(*selNode);
-			if (out.type == Value::Type::Texture) {
-				SetTexture(out.Get<std::string>());
-			}
+			SetTexture(selNode->outputValue[0].Get<std::string>());
 		}
 	}
-	// リンクしているかどうか
-	for (auto& node : nodeGraph_.nodes) {
-		for (auto& pin : node.inputs)
-			if (nodeGraph_.IsPinLinked(pin.id))
-				pin.isLinked = true;
-			else pin.isLinked = false;
-		for (auto& pin : node.outputs)
-			if (nodeGraph_.IsPinLinked(pin.id))
-				pin.isLinked = true;
-			else pin.isLinked = false;
-	}
 
-	if (!nodeEditorContext_) {
-		nodeEditorContext_ = ax::NodeEditor::CreateEditor();
-	}
-
-	ed::SetCurrentEditor(nodeEditorContext_);
-	ImGuiManager::GetInstance()->DrawNodeEditor(&nodeGraph_);
-	ed::SetCurrentEditor(nullptr);
 #endif // _DEBUG
 }

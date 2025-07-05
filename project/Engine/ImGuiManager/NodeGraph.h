@@ -60,11 +60,26 @@ struct Value {
 	}
 };
 
+enum class PinType {
+	Flow,
+	Bool,
+	Int,
+	Float,
+	String,
+	Object,
+	Function,
+	Delegate,
+};
+
+enum class PinKind {
+	Output,
+	Input
+};
+
 struct Pin {
 	ed::PinId id;
 	bool isLinked = false;
 	enum class Type { Input, Output } type;
-	//enum class PinType { Texture, };
 };
 
 struct MyNode {
@@ -72,6 +87,8 @@ struct MyNode {
 	std::string name;
 	std::vector<Pin> inputs;
 	std::vector<Pin> outputs;
+	std::vector<Value> values;
+	std::vector<Value> outputValue;
 
 	enum class NodeType {
 		Texture,
@@ -80,6 +97,8 @@ struct MyNode {
 		Material,
 		// 追加予定のノード種類…
 	} type;
+
+	bool isUpdated = false;
 
 	Value result; // ← ★ これがノードの出力
 
@@ -107,6 +126,9 @@ public:
 	std::vector<MyNode> nodes;
 	std::vector<Link> links;
 
+	void Update(ax::NodeEditor::EditorContext* ctx);
+	void ValueUpdate(MyNode& node);
+
 	// ノードの追加
 	MyNode& AddNode(const MyNode& node);
 
@@ -117,7 +139,7 @@ public:
 	Value EvaluateNode(const MyNode& node);
 
 	// ピンIDからノードを探す
-	const MyNode* FindNodeByPinId(ed::PinId pinId) const;
+	MyNode* FindNodeByPinId(ed::PinId pinId);
 
 	// ノードIDからノードを探す
 	MyNode* FindNodeById(ed::NodeId id);
