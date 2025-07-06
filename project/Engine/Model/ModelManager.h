@@ -42,6 +42,8 @@ public:
 	DXCom* ShareDXCom() { return dxcommon_; }
 	LightManager* ShareLight() { return lightManager_; }
 
+	void LoadModelFile();
+
 private:
 
 	static MaterialDataPath LoadMaterialFile(const std::string& filename);
@@ -56,5 +58,6 @@ private:
 
 	std::map<std::string, std::unique_ptr<Model>> models_;
 
+	std::vector<std::string> modelFileList;
 
 };

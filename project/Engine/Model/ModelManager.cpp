@@ -543,6 +543,12 @@ void ModelManager::AddModel(const std::string& filename, Model* model) {
 }
 
 
+void ModelManager::LoadModelFile() {
+#ifdef _DEBUG
+
+#endif // _DEBUG
+}
+
 MaterialDataPath ModelManager::LoadMaterialFile(const std::string& filename) {
 	MaterialDataPath materialData;
 	ModelManager* instance = GetInstance();

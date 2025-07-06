@@ -294,51 +294,63 @@ void CommandManager::GarbageCollect() {
 }
 
 void CommandManager::EditorOBJSave(const std::string& filePath) {
-	nlohmann::json jsonList = nlohmann::json::array();  // 配列として初期化
+	nlohmann::json jsonList = nlohmann::json::array();
 
-	for (auto& group : objectList) {
-		EditorObj* obj = group.second.get();
-		if (obj) {
-			nlohmann::json json;  // 各オブジェクトごとの JSON を作成
-
-			json["objectName"] = obj->name;
-			json["modelName"] = obj->obj->GetModelName();
-
-			// Vector3を配列として保存
-			json["transform"]["translate"] = {
-				obj->obj->transform.translate.x,
-				obj->obj->transform.translate.y,
-				obj->obj->transform.translate.z
-			};
-			json["transform"]["rotate"] = {
-				obj->obj->transform.rotate.x,
-				obj->obj->transform.rotate.y,
-				obj->obj->transform.rotate.z
-			};
-			json["transform"]["scale"] = {
-				obj->obj->transform.scale.x,
-				obj->obj->transform.scale.y,
-				obj->obj->transform.scale.z
-			};
-
-			jsonList.push_back(json);  // 配列に追加
+	for (auto& [id, objPtr] : objectList) {
+		if (objPtr->parent == -1) {
+			jsonList.push_back(ConvertObjToJson(objPtr.get()));
 		}
 	}
 
-	// 最終的なJSON出力
 	nlohmann::json finalJson;
 	finalJson["objects"] = jsonList;
 
 	std::filesystem::path dir = "resource/Json";
-	std::filesystem::create_directories(dir); // ディレクトリが無ければ作成
-	std::filesystem::path fullPath = dir / (filePath);
+	std::filesystem::create_directories(dir);
+	std::filesystem::path fullPath = dir / filePath;
 
-	// 書き込み
 	std::ofstream ofs(fullPath);
 	if (ofs.is_open()) {
-		ofs << finalJson.dump(4); // インデント付きで出力
+		ofs << finalJson.dump(4);
 		ofs.close();
 	}
+}
+
+nlohmann::json CommandManager::ConvertObjToJson(EditorObj* obj) {
+	nlohmann::json json;
+
+	json["objectName"] = obj->name;
+	json["modelName"] = obj->obj->GetModelName();
+
+	json["transform"]["translate"] = {
+		obj->obj->transform.translate.x,
+		obj->obj->transform.translate.y,
+		obj->obj->transform.translate.z
+	};
+	json["transform"]["rotate"] = {
+		obj->obj->transform.rotate.x,
+		obj->obj->transform.rotate.y,
+		obj->obj->transform.rotate.z
+	};
+	json["transform"]["scale"] = {
+		obj->obj->transform.scale.x,
+		obj->obj->transform.scale.y,
+		obj->obj->transform.scale.z
+	};
+
+	// 子供がいる場合は再帰的に追加
+	if (!obj->childlen.empty()) {
+		nlohmann::json childrenJson = nlohmann::json::array();
+		for (int32_t childId : obj->childlen) {
+			if (objectList.count(childId) > 0) {
+				EditorObj* childObj = objectList[childId].get();
+				childrenJson.push_back(ConvertObjToJson(childObj));  // 再帰呼び出し
+			}
+		}
+		json["children"] = childrenJson;
+	}
+
+	return json;
 }
 
 void CommandManager::SaveAllEditorOBJ() {
@@ -402,14 +414,11 @@ void CommandManager::SaveAllEditorOBJ() {
 
 bool CommandManager::EditorOBJLoad(const std::string& filePath, bool deleteObj) {
 	std::filesystem::path fullPath = std::filesystem::path("resource/Json") / filePath;
-	// ファイルが存在しない場合は false を返す
-	if (!std::filesystem::exists(fullPath)) {
-		return false;
-	}
+	if (!std::filesystem::exists(fullPath)) return false;
+
 	std::ifstream ifs(fullPath);
-	if (!ifs.is_open()) {
-		return false;
-	}
+	if (!ifs.is_open()) return false;
+
 	nlohmann::json json;
 	try {
 		ifs >> json;
@@ -418,51 +427,63 @@ bool CommandManager::EditorOBJLoad(const std::string& filePath, bool deleteObj) 
 		return false;
 	}
 	ifs.close();
-	if (!json.contains("objects") || !json["objects"].is_array()) {
-		return false;
-	}
+
+	if (!json.contains("objects") || !json["objects"].is_array()) return false;
 
 	if (deleteObj) {
 		DeleteEditorObj();
 	}
 
+	// 親を持たない root object から再帰的に読み込み
 	for (const auto& objJson : json["objects"]) {
-		// 基本情報の読み込み
-		std::string name = objJson.value("objectName", "Unnamed");
-		std::string modelName = objJson.value("modelName", "DefaultModel");
+		LoadObjRecursive(objJson, -1); // 親なしとして処理
+	}
 
-		// 新しいオブジェクトIDの取得
-		int newId = CommandManager::GetInstance()->nextObjId++;
+	return true;
+}
 
-		// 作成コマンドの生成と実行
-		auto command = std::make_unique<CreateObjCommand>(newId, name, modelName);
-		Execute(std::move(command));
+void CommandManager::LoadObjRecursive(const nlohmann::json& objJson, int parentId) {
+	std::string name = objJson.value("objectName", "Unnamed");
+	std::string modelName = objJson.value("modelName", "DefaultModel");
 
-		// トランスフォームの反映
-		auto& obj = objectList[newId]->obj;
+	int newId = CommandManager::GetInstance()->nextObjId++;
 
-		if (objJson.contains("transform")) {
-			const auto& t = objJson["transform"];
+	auto command = std::make_unique<CreateObjCommand>(newId, name, modelName);
+	Execute(std::move(command));
 
-			if (t.contains("translate")) {
-				obj->transform.translate.x = t["translate"][0];
-				obj->transform.translate.y = t["translate"][1];
-				obj->transform.translate.z = t["translate"][2];
-			}
-			if (t.contains("rotate")) {
-				obj->transform.rotate.x = t["rotate"][0];
-				obj->transform.rotate.y = t["rotate"][1];
-				obj->transform.rotate.z = t["rotate"][2];
-			}
-			if (t.contains("scale")) {
-				obj->transform.scale.x = t["scale"][0];
-				obj->transform.scale.y = t["scale"][1];
-				obj->transform.scale.z = t["scale"][2];
-			}
+	// 親子関係を構築
+	if (parentId != -1) {
+		objectList[newId]->parent = parentId;
+		objectList[parentId]->childlen.push_back(newId);
+	}
+
+	// トランスフォームの反映
+	auto& obj = objectList[newId]->obj;
+	if (objJson.contains("transform")) {
+		const auto& t = objJson["transform"];
+		if (t.contains("translate")) {
+			obj->transform.translate.x = t["translate"][0];
+			obj->transform.translate.y = t["translate"][1];
+			obj->transform.translate.z = t["translate"][2];
+		}
+		if (t.contains("rotate")) {
+			obj->transform.rotate.x = t["rotate"][0];
+			obj->transform.rotate.y = t["rotate"][1];
+			obj->transform.rotate.z = t["rotate"][2];
+		}
+		if (t.contains("scale")) {
+			obj->transform.scale.x = t["scale"][0];
+			obj->transform.scale.y = t["scale"][1];
+			obj->transform.scale.z = t["scale"][2];
 		}
 	}
 
-	return true; // 正常に読み込んだ
+	// 子オブジェクトの読み込み（再帰）
+	if (objJson.contains("children") && objJson["children"].is_array()) {
+		for (const auto& childJson : objJson["children"]) {
+			LoadObjRecursive(childJson, newId);
+		}
+	}
 }
 
 void CommandManager::LoadAllEditorOBJ() {

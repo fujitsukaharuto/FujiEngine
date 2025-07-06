@@ -3,6 +3,7 @@
 #include <memory>
 #include <string>
 #include <cstring>
+#include <json.hpp>
 
 #include "Engine/Editor/ICommand.h"
 #include "Engine/Editor/PropertyCommand.h"
@@ -80,8 +81,10 @@ public:
 private:
 
 	void EditorOBJSave(const std::string& filePath);
+	nlohmann::json ConvertObjToJson(EditorObj* obj);
 	void SaveAllEditorOBJ();
 	bool EditorOBJLoad(const std::string& filePath, bool deleteObj = false);
+	void LoadObjRecursive(const nlohmann::json& objJson, int parentId);
 	void LoadAllEditorOBJ();
 
 	void DeleteEditorObj();
