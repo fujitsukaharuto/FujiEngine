@@ -1,0 +1,28 @@
+{
+    "Phases": [
+        [
+            {
+                "name": "Wave",
+                "value": 1.0
+            },
+            {
+                "name": "Jump",
+                "value": 1.0
+            },
+            {
+                "name": "Sword",
+                "value": 1.0
+            }
+        ],
+        [
+            {
+                "name": "Sword",
+                "value": 1.0
+            },
+            {
+                "name": "Beam",
+                "value": 1.0
+            }
+        ]
+    ]
+}

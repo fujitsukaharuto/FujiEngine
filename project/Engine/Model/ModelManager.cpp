@@ -1,5 +1,7 @@
 #include "ModelManager.h"
 #include <fstream>
+#include <filesystem>
+#include <iostream>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
@@ -18,15 +20,28 @@ ModelManager* ModelManager::GetInstance() {
 void ModelManager::Initialize(DXCom* pDxcom, LightManager* pLight) {
 	dxcommon_ = pDxcom;
 	lightManager_ = pLight;
+	LoadModelFile();
 }
 
 
 void ModelManager::Finalize() {
 	dxcommon_ = nullptr;
 
+	modelFileList.clear();
 	models_.clear();
 }
 
+
+void ModelManager::LoadModelByExtension(const std::string& filename) {
+	std::filesystem::path path(filename);  // 拡張子の解析に便利
+	std::string ext = path.extension().string();
+
+	if (ext == ".obj") {
+		LoadOBJ(filename);
+	} else if (ext == ".gltf") {
+		LoadGLTF(filename);
+	}
+}
 
 void ModelManager::LoadOBJ(const std::string& filename) {
 	ModelManager* instance = GetInstance();
@@ -39,7 +54,7 @@ void ModelManager::LoadOBJ(const std::string& filename) {
 	model.reset(new Model());
 
 	Assimp::Importer importer;
-	std::string path = instance->kDirectoryPath_ + "/" + filename;
+	std::string path = instance->kDirectoryPath_ + filename;
 	const aiScene* scene = importer.ReadFile(path.c_str(), aiProcess_FlipWindingOrder | aiProcess_FlipUVs);
 	assert(scene->HasMeshes());
 
@@ -212,6 +227,7 @@ void ModelManager::LoadGLTF(const std::string& filename) {
 
 ModelData ModelManager::FindModel(const std::string& filename) {
 	ModelManager* instance = GetInstance();
+	instance->LoadModelByExtension(filename);
 	auto iterator = instance->models_.find(filename);
 	if (iterator != instance->models_.end()) {
 		return iterator->second->data_;
@@ -545,6 +561,18 @@ void ModelManager::AddModel(const std::string& filename, Model* model) {
 
 void ModelManager::LoadModelFile() {
 #ifdef _DEBUG
+	modelFileList.clear();
+
+	if (!std::filesystem::exists(kDirectoryPath_)) return;
+
+	for (const auto& entry : std::filesystem::directory_iterator(kDirectoryPath_)) {
+		if (entry.is_regular_file()) {
+			auto path = entry.path();
+			if (path.extension() == ".obj") {
+				modelFileList.push_back(path.filename().string());
+			}
+		}
+	}
 
 #endif // _DEBUG
 }

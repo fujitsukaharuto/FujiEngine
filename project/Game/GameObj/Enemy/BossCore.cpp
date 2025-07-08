@@ -30,7 +30,6 @@ void BossCore::Initialize() {
 }
 
 void BossCore::Update() {
-	//collider_->SetPos(model_->GetWorldPos());
 	collider_->InfoUpdate();
 }
 
@@ -45,10 +44,7 @@ void BossCore::DebugGUI() {
 #ifdef _DEBUG
 	if (ImGui::CollapsingHeader("BossCore")) {
 		model_->DebugGUI();
-		collider_->SetPos(model_->GetWorldPos());
-
 		collider_->DebugGUI();
-
 	}
 #endif // _DEBUG
 }

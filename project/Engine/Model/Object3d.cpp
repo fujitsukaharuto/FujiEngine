@@ -397,17 +397,34 @@ void Object3d::DebugGUI() {
 	}
 
 	if (ImGui::TreeNodeEx("SetModel", flags)) {
-		static char modelNameBuf[128] = ""; // 入力用バッファ（初期は空）
 
-		ImGui::Text("Enter Model Name:");
-		if (ImGui::InputText("##ModelName", modelNameBuf, IM_ARRAYSIZE(modelNameBuf))) {
-			// 入力中もしくは確定時に毎フレームここに入る
-			// 必要ならここでリアルタイムに反映などもできる
+		if (ImGui::Button("ModelFile")) {
+			ImGui::OpenPopup("ModelFile Window");
 		}
-
-		if (ImGui::Button("Set Model")) {
-			// モデル名の設定を反映
-			SetModel(modelNameBuf);
+		ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+		ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+		if (ImGui::BeginPopupModal("ModelFile Window", NULL)) {
+			if (ImGui::Button("Refresh")) {
+				ModelManager::GetInstance()->LoadModelFile();
+			}
+			int buttonCount = 0;
+			for (const auto& modelName : ModelManager::GetInstance()->GetModelFiles()) {
+				if (buttonCount > 0 && buttonCount < 5) {
+					ImGui::SameLine();
+				} else {
+					buttonCount = 0;
+				}
+				if (ImGui::Button(modelName.c_str(), ImVec2(100, 100))) {
+					SetModel(modelName.c_str());
+				}
+				buttonCount++;
+			}
+			ImGui::Separator();
+			if (ImGui::Button("OK", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+			ImGui::SetItemDefaultFocus();
+			ImGui::SameLine();
+			if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+			ImGui::EndPopup();
 		}
 
 		ImGui::TreePop();

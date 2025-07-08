@@ -64,13 +64,18 @@ public:
 	Beam* GetBeam() { return beam_.get(); }
 	std::vector<std::unique_ptr<WaveWall>>& GetWalls() { return walls_; }
 	std::vector<std::unique_ptr<UnderRing>>& GetUnderRings() { return undderRings_; }
+	const std::vector<std::pair<std::string, float>>& GetPhaseActionList(int phase) { return phaseList_[phase]; }
 	float GetAttackCooldown() { return attackCooldown_; }
+	int GetPhaseIndex() { return phaseIndex_; }
 	float GetBossHP() { return bossHp_; }
 	bool GetIsStart() { return isStart_; }
 	bool GetIsClear() { return isClear_; }
 	int GetNowHpIndex() { return nowHpIndex_; }
 
 	void SetPlayer(Player* player) { pPlayer_ = player; }
+
+	void SavePhase();
+	void LoadPhase();
 
 private:
 
@@ -79,6 +84,10 @@ private:
 private:
 
 	std::unique_ptr<BaseBossBehavior> behavior_ = nullptr;
+
+	std::vector<std::string> actionList_;
+	std::vector<std::vector<std::pair<std::string, float>>> phaseList_;
+	int phaseIndex_ = 0;
 
 	std::unique_ptr<BossCore> core_;
 	std::unique_ptr<Beam> beam_;

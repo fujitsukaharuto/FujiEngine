@@ -43,7 +43,7 @@ void GameScene::Initialize() {
 
 	terrain = std::make_unique<Object3d>();
 	terrain->Create("ground.obj");
-	terrain->SetTexture("grass.png");
+	terrain->SetTexture("grass.jpg");
 	terrain->transform.scale = { 1.0f,1.0f,1.0f };
 	terrain->SetUVScale({ 20.0f,20.0f }, { 0.0f,0.0f });
 

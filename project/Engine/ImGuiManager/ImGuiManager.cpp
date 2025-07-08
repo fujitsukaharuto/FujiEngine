@@ -121,6 +121,7 @@ void ImGuiManager::UnSetFont() {
 #endif // _DEBUG
 }
 
+#ifdef _DEBUG
 void ImGuiManager::ImGuiDragDropButton(const char* buttonLabel, const char* payloadType, const std::function<void(const ImGuiPayload* payload)>& onDrop, const std::function<void(const ImGuiPayload* payload)>& onPreview) {
 #ifdef _DEBUG
 	if (ImGui::Button(buttonLabel)) {
@@ -162,6 +163,7 @@ void ImGuiManager::ImGuiDragButton(const char* label, const void* payloadData, s
 	}
 #endif // _DEBUG
 }
+#endif // _DEBUG
 
 #ifdef _DEBUG
 void ImGuiManager::InitNodeTexture() {

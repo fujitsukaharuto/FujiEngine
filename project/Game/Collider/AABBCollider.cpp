@@ -1,6 +1,7 @@
 #include "AABBCollider.h"
 #include "Model/Line3dDrawer.h"
 #include "ImGuiManager/ImGuiManager.h"
+#include "Engine/Editor/JsonSerializer.h"
 
 AABBCollider::AABBCollider() {
 }
@@ -9,11 +10,25 @@ void AABBCollider::DebugGUI() {
 #ifdef _DEBUG
 	ImGui::Indent();
 	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Selected;
-	if (ImGui::TreeNodeEx("Collider",flags)) {
-	ImGui::DragFloat("width", &width, 0.1f);
-	ImGui::DragFloat("height", &height, 0.1f);
-	ImGui::DragFloat("depth", &depth, 0.1f);
-	ImGui::Checkbox("isCollision", &isCollisionCheck_);
+	if (ImGui::TreeNodeEx("Collider", flags)) {
+		ImGui::DragFloat3("position", &info.pos.x, 0.1f);
+		ImGui::DragFloat3("offset", &offset_.x, 0.1f);
+		ImGui::DragFloat("width", &width, 0.1f);
+		ImGui::DragFloat("height", &height, 0.1f);
+		ImGui::DragFloat("depth", &depth, 0.1f);
+		ImGui::Checkbox("isCollision", &isCollisionCheck_);
+		static std::string colliderFileName = "colliderData";
+		char buffer[128];
+		strncpy_s(buffer, sizeof(buffer), colliderFileName.c_str(), _TRUNCATE);
+		// 編集
+		if (ImGui::InputText("##filename", buffer, IM_ARRAYSIZE(buffer))) {
+			colliderFileName = buffer; // 編集結果を std::string に戻す
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("saveCollider")) {
+			SaveCollider(colliderFileName);
+		}
+		InfoUpdate();
 		ImGui::TreePop();
 	}
 	ImGui::Unindent();
@@ -70,6 +85,36 @@ void AABBCollider::OnCollisionExit(const ColliderInfo& other) {
 		onCollisionEvents_[static_cast<int>(CollisionState::CollisionExit)](other);
 	}
 	state = CollisionState::None;
+}
+
+void AABBCollider::SaveCollider(const std::string& filePath) {
+#ifdef _DEBUG
+	nlohmann::json json;
+
+	json["position"] = {
+		info.pos.x,
+		info.pos.y,
+		info.pos.z,
+	};
+	json["offset"] = {
+		offset_.x,
+		offset_.y,
+		offset_.z,
+	};
+
+	json["size"]["width"] = width;
+	json["size"]["height"] = height;
+	json["size"]["depth"] = depth;
+	
+
+	nlohmann::json finalJson;
+	finalJson["collider"] = json;
+
+	std::filesystem::create_directories(kDirectoryPath_);
+	std::filesystem::path fullPath = kDirectoryPath_ + filePath;
+
+	JsonSerializer::SerializeJsonData(finalJson, fullPath.string());
+#endif // _DEBUG
 }
 
 std::array<Vector3, 8> AABBCollider::GetWorldVertices() const {

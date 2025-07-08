@@ -17,6 +17,7 @@ void GameRun::Initialize() {
 	textureManager_->Load("uvChecker.png");
 	textureManager_->Load("checkerBoard.png");
 	textureManager_->Load("white2x2.png");
+	textureManager_->Load("grass.jpg");
 	textureManager_->Load("BlueprintBackground.png");
 	textureManager_->Load("T_Noise04.jpg");
 	textureManager_->Load("Beam.png");

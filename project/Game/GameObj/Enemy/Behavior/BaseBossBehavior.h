@@ -1,6 +1,19 @@
 #pragma once
 #include<string>
 
+enum class AttackPattern {
+	Beam,
+	Wave,
+	JumpAttack,
+	SwordAttack,
+	// 今後追加
+};
+
+struct AttackInfo {
+	AttackPattern pattern;
+	float weight;
+};
+
 class Boss;
 class BaseBossBehavior {
 public:

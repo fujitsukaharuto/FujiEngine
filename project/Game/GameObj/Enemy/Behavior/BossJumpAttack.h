@@ -4,7 +4,7 @@
 
 class BossJumpAttack : public BaseBossBehavior {
 public:
-	BossJumpAttack(Boss* pBoss,int count);
+	BossJumpAttack(Boss* pBoss,int count = 2);
 	~BossJumpAttack();
 
 	enum class Step {

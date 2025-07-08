@@ -66,13 +66,12 @@ void BossRoot::Debug() {
 AttackPattern BossRoot::ChooseNextAttack() {
 	static AttackPattern previous = AttackPattern::Beam;
 
-	std::vector<AttackInfo> patterns = {
-	{ AttackPattern::Beam, 1.0f },   // レアな行動はweight低めに
-	{ AttackPattern::Wave, 1.0f },
-	{ AttackPattern::JumpAttack, 1.0f },
-	{ AttackPattern::SwordAttack, 1.0f },
-	// ここに新しい攻撃を追加
-	};
+	std::vector<std::pair<std::string, float>> actions = pBoss_->GetPhaseActionList(pBoss_->GetPhaseIndex());
+	std::vector<AttackInfo> patterns;
+
+	for (const auto& action : actions) {
+		patterns.push_back({ ToAttackPattern(action.first), action.second });
+	}
 
 	// 同じ攻撃を避けるための重み調整
 	for (auto& info : patterns) {
@@ -97,4 +96,12 @@ AttackPattern BossRoot::ChooseNextAttack() {
 
 	// 万が一失敗したら最初を返す
 	return patterns.front().pattern;
+}
+
+AttackPattern BossRoot::ToAttackPattern(const std::string& name) {
+	if (name == "Beam") return AttackPattern::Beam;
+	if (name == "Wave") return AttackPattern::Wave;
+	if (name == "Jump") return AttackPattern::JumpAttack;
+	if (name == "Sword") return AttackPattern::SwordAttack;
+	throw std::invalid_argument("未知のAttackPattern名: " + name);
 }

@@ -20,6 +20,8 @@ public:
 	void OnCollisionStay(const ColliderInfo& other)override;
 	void OnCollisionExit(const ColliderInfo& other)override;
 
+	void SaveCollider(const std::string& filePath)override;
+
 	// イベントハンドラの設定
 	void SetCollisionEnterCallback(std::function<void(const ColliderInfo&)> callback) {
 		onCollisionEvents_[static_cast<int>(CollisionState::CollisionEnter)] = callback;

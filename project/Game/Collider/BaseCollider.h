@@ -31,6 +31,8 @@ public:
 	virtual void OnCollisionStay(const ColliderInfo& other) = 0;
 	virtual void OnCollisionExit(const ColliderInfo& other) = 0;
 
+	virtual void SaveCollider(const std::string& filePath) = 0;
+
 	void InfoUpdate();
 
 	void SetParent(Trans* parent) { parent_ = parent; }
@@ -53,4 +55,6 @@ protected:
 	Trans* parent_ = nullptr;
 	bool isCollisionCheck_ = true;
 	Vector3 offset_ = { 0.0f,0.0f,0.0f };
+
+	const std::string kDirectoryPath_ = "resource/Json/Collider/";
 };

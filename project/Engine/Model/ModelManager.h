@@ -25,6 +25,7 @@ public:
 
 	void Finalize();
 
+	static void LoadModelByExtension(const std::string& filename);
 	static void LoadOBJ(const std::string& filename);
 	static void LoadGLTF(const std::string& filename);
 
@@ -43,6 +44,7 @@ public:
 	LightManager* ShareLight() { return lightManager_; }
 
 	void LoadModelFile();
+	const std::vector<std::string>& GetModelFiles() { return modelFileList; }
 
 private:
 

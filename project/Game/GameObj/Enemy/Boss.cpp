@@ -2,10 +2,14 @@
 #include "Engine/Particle/ParticleManager.h"
 #include "Engine/Math/Random/Random.h"
 #include "Engine/Camera/CameraManager.h"
+#include "Engine/Editor/JsonSerializer.h"
 #include <numbers>
 
 #include "Game/GameObj/Enemy/Behavior/BossRoot.h"
 #include "Game/GameObj/Enemy/Behavior/BossAttack.h"
+#include "Game/GameObj/Enemy/Behavior/BossJumpAttack.h"
+#include "Game/GameObj/Enemy/Behavior/BossSwordAttack.h"
+#include "Game/GameObj/Enemy/Behavior/BossBeamAttack.h"
 
 #include "Game/GameObj/Player/Player.h"
 
@@ -136,6 +140,10 @@ void Boss::Initialize() {
 	charge15_.SetParent(&chargeParents_[0]->transform);
 
 
+	actionList_ = {
+		"Root","Wave","Beam","Jump","Sword"
+	};
+	LoadPhase();
 	ChangeBehavior(std::make_unique<BossRoot>(this));
 	animModel_->ChangeAnimation("roaring");
 }
@@ -178,7 +186,6 @@ void Boss::Update() {
 	animModel_->AnimationUpdate();
 	shadow_->transform.translate = animModel_->transform.translate;
 	shadow_->transform.translate.y = 0.15f;
-	//collider_->SetPos(animModel_->GetWorldPos());
 	collider_->InfoUpdate();
 }
 
@@ -189,7 +196,6 @@ void Boss::Draw([[maybe_unused]] Material* mate, [[maybe_unused]] bool is) {
 #endif // _DEBUG
 
 	animModel_->Draw();
-	//OriginGameObject::Draw(mate, is);
 	core_->Draw();
 	for (auto& wall : walls_) {
 		if (!wall->GetIsLive())continue;
@@ -230,30 +236,133 @@ void Boss::AnimDraw() {
 
 void Boss::DebugGUI() {
 #ifdef _DEBUG
-	if (ImGui::CollapsingHeader("Boss")) {
-		animModel_->DebugGUI();
-		collider_->SetPos(animModel_->GetWorldPos());
-		collider_->DebugGUI();
+	if (ImGui::CollapsingHeader("Boss##0")) {
 		ImGui::Indent();
-		if (ImGui::TreeNodeEx("hpSetting", ImGuiTreeNodeFlags_Selected)) {
-			ImGui::DragFloat2("hpsize", &hpSize_.x, 0.1f, 0.0f, 1000.0f);
-			ImGui::DragFloat2("hpTexStartpos", &hpStartPos_.x, 0.1f, 0.0f, 1200.0f);
-			ImGui::DragFloat("hpIndent", &hpIndent, 0.1f, 0.0f, 100.0f);
-			for (int i = 0; i < 5; i++) {
-				hpSprites_[i]->SetPos({ hpStartPos_.x + (hpSize_.x * i) + (hpIndent * i), hpStartPos_.y, 0.0f });
-				hpSprites_[i]->SetSize(hpSize_);
-			}
-			ImGui::TreePop();
+		if (ImGui::CollapsingHeader("Boss##1")) {
+			animModel_->DebugGUI();
+			collider_->DebugGUI();
+			ParameterGUI();
 		}
+		core_->DebugGUI();
 		ImGui::Unindent();
 	}
-	core_->DebugGUI();
+
 #endif // _DEBUG
 }
 
 void Boss::ParameterGUI() {
 #ifdef _DEBUG
+	ImGui::Indent();
+	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Selected;
+	if (ImGui::TreeNodeEx("BossBehavior", flags)) {
+		static int currentActionIndex = 0;
+		static std::string nowAction = actionList_[currentActionIndex];
+		// コンボボックスの表示に使うため、const char* の配列に変換
+		std::vector<const char*> actionCStrs;
+		for (const auto& str : actionList_) {
+			actionCStrs.push_back(str.c_str());
+		}
 
+		if (ImGui::Combo("Action", &currentActionIndex, actionCStrs.data(), static_cast<int>(actionCStrs.size()))) {
+			nowAction = actionList_[currentActionIndex];
+		}
+		if (ImGui::Button("SetAction")) {
+			SetDefaultBehavior();
+			static const std::unordered_map<std::string, std::function<std::unique_ptr<BaseBossBehavior>(Boss*)>> behaviorFactory = {
+				{ "Root",   [](Boss* b) { return std::make_unique<BossRoot>(b); } },
+				{ "Wave", [](Boss* b) { return std::make_unique<BossAttack>(b); } },
+				{ "Beam",   [](Boss* b) { return std::make_unique<BossBeamAttack>(b); } },
+				{ "Jump",   [](Boss* b) { return std::make_unique<BossJumpAttack>(b); } },
+				{ "Sword",   [](Boss* b) { return std::make_unique<BossSwordAttack>(b); } },
+				// 他も追加
+			};
+			auto it = behaviorFactory.find(nowAction);
+			if (it != behaviorFactory.end()) {
+				ChangeBehavior(it->second(this));
+			} else {
+				ImGui::Text("Unknown Action: %s", nowAction.c_str());
+			}
+		}
+		if (nowAction != "Root") {
+			ImGui::SameLine();
+			if (ImGui::Button("AddAction")) {
+				phaseList_[phaseIndex_].push_back({ nowAction, 1.0f });
+			}
+		}
+
+
+		int phase = int(phaseList_.size());
+		if (phase != 0) {
+			if (ImGui::BeginTable("table_Phase", phase, ImGuiTableFlags_Borders)) {
+				for (int i = 1; i < phase + 1; i++) {
+					ImGui::TableSetupColumn(("Phase" + std::to_string(i)).c_str());
+				}
+				ImGui::TableNextRow(ImGuiTableRowFlags_Headers);
+				for (int column = 0; column < phase; column++) {
+					ImGui::TableSetColumnIndex(column);
+					const char* column_name = ImGui::TableGetColumnName(column); // Retrieve name passed to TableSetupColumn()
+					ImGui::PushID(column);
+					ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+					ImGui::RadioButton("##checkall", &phaseIndex_, column);
+					ImGui::PopStyleVar();
+					ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
+					ImGui::TableHeader(column_name);
+					ImGui::PopID();
+				}
+
+				ImGui::TableNextRow();
+				for (int phaseCount = 0; phaseCount < phase; phaseCount++) {
+					ImGui::TableSetColumnIndex(phaseCount);
+					int tableCount = 2;
+					if (phaseList_[phaseCount].size() > 1) tableCount++;
+					if (ImGui::BeginTable("table_ActionList", tableCount, ImGuiTableFlags_Borders)) {
+						ImGui::TableSetupColumn("Action");
+						ImGui::TableSetupColumn("Weight");
+						if (tableCount == 3) ImGui::TableSetupColumn("Delete");
+						ImGui::TableHeadersRow();
+
+						for (int row = 0; row < phaseList_[phaseCount].size(); row++) {
+							ImGui::TableNextRow();
+							if (row == 0) {
+								ImGui::TableSetColumnIndex(1);
+								ImGui::PushItemWidth(50.0f);
+								if (tableCount == 3) {
+									ImGui::TableSetColumnIndex(2);
+									ImGui::PushItemWidth(50.0f);
+								}
+							}
+
+							// Draw our contents
+							ImGui::PushID(row);
+							ImGui::TableSetColumnIndex(0);
+							ImGui::Text(phaseList_[phaseCount][row].first.c_str());
+							ImGui::TableSetColumnIndex(1);
+							ImGui::SliderFloat(("##" + phaseList_[phaseCount][row].first + std::to_string(phaseCount)).c_str(), &phaseList_[phaseCount][row].second, 0.0f, 1.0f);
+							if (tableCount == 3) {
+								ImGui::TableSetColumnIndex(2);
+								if (ImGui::Button(("X##del" + phaseList_[phaseCount][row].first + std::to_string(phaseCount)).c_str())) {
+									phaseList_[phaseCount].erase(phaseList_[phaseCount].begin() + row);
+								}
+							}
+							ImGui::PopID();
+						}
+						ImGui::EndTable();
+					}
+				}
+
+				ImGui::EndTable();
+			}
+		}
+		if (ImGui::Button(("save##phase"))) {
+			SavePhase();
+		}ImGui::SameLine();
+		if (ImGui::Button(("load##phase"))) {
+			LoadPhase();
+		}
+
+		ImGui::TreePop();
+	}
+	ImGui::Unindent();
 #endif // _DEBUG
 }
 
@@ -680,6 +789,48 @@ void Boss::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
 }
 
 void Boss::OnCollisionExit([[maybe_unused]] const ColliderInfo& other) {
+}
+
+void Boss::SavePhase() {
+	json json;
+
+	for (int phase = 0; phase < phaseList_.size(); ++phase) {
+		json["Phases"][phase] = json::array();
+		for (const auto& action : phaseList_[phase]) {
+			json["Phases"][phase].push_back({
+				{ "name", action.first },
+				{ "value", action.second }
+				});
+		}
+	}
+
+	std::filesystem::create_directories("resource/Json/Phase/");
+	std::filesystem::path fullPath = "resource/Json/Phase/boss_phase.json";
+
+	JsonSerializer::SerializeJsonData(json, fullPath.string());
+}
+
+void Boss::LoadPhase() {
+	json json = JsonSerializer::DeserializeJsonData("resource/Json/Phase/boss_phase.json");
+
+	// 一度中身をクリア
+	phaseList_.clear();
+
+	if (json.contains("Phases") && json["Phases"].is_array()) {
+		for (const auto& actions : json["Phases"]) {
+			std::vector<std::pair<std::string, float>> phase;
+
+			for (const auto& action : actions) {
+				if (action.contains("name") && action.contains("value")) {
+					std::string name = action["name"];
+					float value = action["value"];
+					phase.emplace_back(name, value);
+				}
+			}
+
+			phaseList_.push_back(phase);
+		}
+	}
 }
 
 void Boss::SetDefaultBehavior() {
