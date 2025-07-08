@@ -9,7 +9,7 @@
 
 
 Camera::Camera() :transform({ { 1.0f,1.0f,1.0f }, { -1.02f,0.0f,0.0f }, { 0.0f,3.5f,-20.0f } })
-, fovY_(0.45f), aspect_(float(MyWin::kWindowWidth) / float(MyWin::kWindowHeight))
+, fovY_(0.6f), aspect_(float(MyWin::kWindowWidth) / float(MyWin::kWindowHeight))
 , nearClip_(0.1f), farClip_(100.0f), worldMatrix_(MakeAffineMatrix(transform.scale, transform.rotate, transform.translate))
 , viewMatrix_(Inverse(worldMatrix_))
 , projectionMatrix_(MakePerspectiveFovMatrix(fovY_, aspect_, nearClip_, farClip_))
@@ -77,6 +77,8 @@ void Camera::DebugGUI() {
 		ImGui::SeparatorText("Shake");
 		ImGui::DragFloat("shakeTime", &shakeTime_, 0.01f, 0.0f);
 		ImGui::DragFloat("shakeStrength", &shakeStrength_, 0.01f, 0.0f);
+		ImGui::SeparatorText("Parameter##camera");
+		ImGui::DragFloat("Fov", &fovY_, 0.01f, 0.0f, 5.0f);
 	}
 #endif // _DEBUG
 }
