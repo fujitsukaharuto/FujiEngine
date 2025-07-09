@@ -24,11 +24,11 @@ void Beam::Initialize() {
 	beamCore2_->SetTexture("beamCore2.png");
 	beamCore3_->Create("plane_under.obj");
 	beamCore3_->SetTexture("beamCore2.png");
-	beam1_->CreateCylinderEx();
+	beam1_->CreateCylinder();
 	beam1_->SetTexture("beamCore.png");
-	beam2_->CreateCylinderEx();
+	beam2_->CreateCylinder();
 	beam2_->SetTexture("beamCore.png");
-	beam3_->CreateCylinderEx();
+	beam3_->CreateCylinder();
 	beam3_->SetTexture("beamCore.png");
 
 	collider_ = std::make_unique<AABBCollider>();

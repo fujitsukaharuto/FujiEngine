@@ -9,7 +9,7 @@ OffscreenManager::~OffscreenManager() {
 	dxcommon_ = nullptr;
 }
 
-void OffscreenManager::Init(DXCom* pDxcom) {
+void OffscreenManager::Initialize(DXCom* pDxcom) {
 	dxcommon_ = pDxcom;
 }
 

@@ -13,23 +13,19 @@ public:
 public:
 
 	void Initialize(DXCom* pDxcom);
-
 	void Finalize();
-
 	void Update();
-
 	void Draw();
 
+	/// <summary>
+	/// 最初のシーンを決める
+	/// </summary>
 	void StartScene(const std::string& sceneName);
 
+	/// <summary>
+	/// 次シーンへ移行
+	/// </summary>
 	void ChangeScene(const std::string& sceneName, float extraTime);
-
-	void SetClear(bool is);
-	void SetGameOver(bool is);
-
-	bool GetClear()const { return Clear; }
-	bool GetGameover()const { return gameover; }
-
 
 	void SetFactory(AbstractSceneFactory* factory) { sceneFactory_ = factory; }
 

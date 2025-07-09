@@ -18,7 +18,7 @@ void DXCom::Initialize(MyWin* myWin) {
 	pipeManager_ = PipelineManager::GetInstance();
 	pipeManager_->Initialize(this);
 	offscreen_ = std::make_unique<OffscreenManager>();
-	offscreen_->Init(this);
+	offscreen_->Initialize(this);
 
 	CreateDevice();
 	CreateCommand();
@@ -343,17 +343,7 @@ void DXCom::ClearDepthBuffer() {
 }
 
 void DXCom::OffscreenUpDate() {
-	/*Tick();*/
-
 	offscreen_->Update();
-
-	/*transform.rotate.y += 0.05f;*/
-	/*Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);*/
-	/*Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));*/
-
-	/*wvpDate_->World = worldMatrix;
-	wvpDate_->WVP = worldViewProjectionMatrix;*/
-
 }
 
 void DXCom::OffscreenDebugGUI() {

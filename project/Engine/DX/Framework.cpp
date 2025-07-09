@@ -42,7 +42,7 @@ void Framework::Init() {
 #pragma region 汎用機能初期化
 	// ImGuiの初期化
 	imguiManager_ = ImGuiManager::GetInstance();
-	imguiManager_->Init(win_, dxcommon_.get());
+	imguiManager_->Initialize(win_, dxcommon_.get());
 
 	// 入力の初期化
 	input_ = Input::GetInstance();

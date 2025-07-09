@@ -71,14 +71,27 @@ public:
 
 	void SettingTexture();
 
-
+	/// <summary>
+	/// 描画開始時
+	/// </summary>
 	void PreDraw();
 	void Command();
+
+	/// <summary>
+	/// ポストエフェクト
+	/// </summary>
 	void PostEffect();
+
+	/// <summary>
+	/// 描画終了
+	/// </summary>
 	void PostDraw();
 
 	void PreSpriteDraw();
 
+	/// <summary>
+	/// 実行
+	/// </summary>
 	void CommandExecution();
 
 	void SetRenderTargets();
@@ -89,7 +102,12 @@ public:
 	void OffscreenUpDate();
 	void OffscreenDebugGUI();
 
-
+	/// <summary>
+	/// バリアの変更
+	/// </summary>
+	/// <param name="resource">リソース</param>
+	/// <param name="before">変更前の状態</param>
+	/// <param name="after">変更後の状態</param>
 	void TransitionResource(ID3D12Resource* resource, D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after);
 
 

@@ -23,6 +23,8 @@ public:
 	void SetPipelineState();
 	void SetPipelineCSState();
 
+	void CreatePipe();
+
 private:
 
 	virtual void CreateRootSignature(ID3D12Device* device);

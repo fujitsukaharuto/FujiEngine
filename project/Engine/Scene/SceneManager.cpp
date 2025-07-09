@@ -69,16 +69,6 @@ void SceneManager::ChangeScene(const std::string& sceneName, float extraTime) {
 	nextScene_ = sceneFactory_->CreateScene(sceneName);
 }
 
-void SceneManager::SetClear(bool is) {
-	Clear = is;
-	gameover = !is;
-}
-
-void SceneManager::SetGameOver(bool is) {
-	gameover = is;
-	Clear = !is;
-}
-
 void SceneManager::DebugGUI() {
 #ifdef _DEBUG
 	if (ImGui::CollapsingHeader("Scene")) {

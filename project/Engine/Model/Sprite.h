@@ -15,6 +15,9 @@ public:
 
 public:
 
+	/// <summary>
+	/// Textureのセット
+	/// </summary>
 	void Load(const std::string& fileName);
 
 	void Draw();
@@ -29,12 +32,24 @@ public:
 
 	void SetAngle(float rotate);
 
+	/// <summary>
+	/// スプライトの基準点
+	/// </summary>
 	void SetAnchor(const Vector2& anchor);
 
+	/// <summary>
+	/// 左右反転
+	/// </summary>
 	void SetFlipX(bool is) { isFlipX_ = is; }
 
+	/// <summary>
+	/// 上下反転
+	/// </summary>
 	void SetFlipY(bool is) { isFlipY_ = is; }
 
+	/// <summary>
+	/// スプライトの描画範囲指定
+	/// </summary>
 	void SetRange(const Vector2& leftTop, const Vector2& size);
 
 	Vector2 GetDefaultSize() const { return defaultSize_; }

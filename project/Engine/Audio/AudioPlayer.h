@@ -40,20 +40,13 @@ public:
 public:
 
 	/// <summary>
-	/// 初期化
-	/// </summary>
-	void Initialize();
-
-	/// <summary>
-	/// 終了処理
-	/// </summary>
-	void Finalize();
-
-	/// <summary>
 	/// インスタンス取得
 	/// </summary>
 	/// <returns>AudioPlayer*</returns>
 	static AudioPlayer* GetInstance();
+
+	void Initialize();
+	void Finalize();
 
 	/// <summary>
 	/// Waveファイルを読み込みコンテナに入れておく

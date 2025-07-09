@@ -62,6 +62,16 @@ void AnimationModel::DebugGUI() {
 
 		ImGui::TreePop();
 	}
+	if (ImGui::TreeNodeEx("joint", flags)) {
+		for (int i = 0; i < skeleton_.joints.size(); ++i) {
+			const std::string& jointName = skeleton_.joints[i].name;
+			bool isSelected = (i == selectedJointIndex_);
+			if (ImGui::Selectable(jointName.c_str(), isSelected)) {
+				selectedJointIndex_ = i;
+			}
+		}
+		ImGui::TreePop();
+	}
 	ImGui::Unindent();
 #endif // _DEBUG
 }
@@ -281,11 +291,28 @@ void AnimationModel::AnimeDraw() {
 }
 
 void AnimationModel::SkeletonDraw() {
-	for (Joint& joint : skeleton_.joints) {
-		Vector3 jointPos = { joint.skeletonSpaceMatrix.m[3][0],joint.skeletonSpaceMatrix.m[3][1],joint.skeletonSpaceMatrix.m[3][2] };
-		JointDraw(joint.skeletonSpaceMatrix);
+	for (size_t i = 0; i < skeleton_.joints.size(); ++i) {
+		Joint& joint = skeleton_.joints[i];
+		Vector3 jointPos = {
+			joint.skeletonSpaceMatrix.m[3][0],
+			joint.skeletonSpaceMatrix.m[3][1],
+			joint.skeletonSpaceMatrix.m[3][2]
+		};
+
+		// ハイライトの色判定
+		if (i == selectedJointIndex_) {
+			JointDraw(joint.skeletonSpaceMatrix, {1.0f, 0.0f, 0.0f, 1.0f}); // 赤で強調
+		} else {
+			JointDraw(joint.skeletonSpaceMatrix, {1.0f, 1.0f, 1.0f, 1.0f}); // 通常白
+		}
+
+		// 親子関係のライン
 		if (joint.parent) {
-			Vector3 parentPos = { skeleton_.joints[*joint.parent].skeletonSpaceMatrix.m[3][0],skeleton_.joints[*joint.parent].skeletonSpaceMatrix.m[3][1] ,skeleton_.joints[*joint.parent].skeletonSpaceMatrix.m[3][2] };
+			Vector3 parentPos = {
+				skeleton_.joints[*joint.parent].skeletonSpaceMatrix.m[3][0],
+				skeleton_.joints[*joint.parent].skeletonSpaceMatrix.m[3][1],
+				skeleton_.joints[*joint.parent].skeletonSpaceMatrix.m[3][2]
+			};
 			Line3dDrawer::GetInstance()->DrawLine3d(jointPos, parentPos, { 1.0f,1.0f,1.0f,1.0f });
 		}
 	}
@@ -577,9 +604,9 @@ Quaternion AnimationModel::CalculationValue(const std::vector<KeyframeQuaternion
 	return (*keyframe.rbegin()).value;
 }
 
-void AnimationModel::JointDraw(const Matrix4x4& m) {
+void AnimationModel::JointDraw(const Matrix4x4& m, Vector4 color) {
 	Vector3 jointPos = { m.m[3][0], m.m[3][1], m.m[3][2] };
-	Line3dDrawer::GetInstance()->DrawShereLine(jointPos, 0.025f, { 1.0f, 1.0f, 1.0f, 1.0f });
+	Line3dDrawer::GetInstance()->DrawShereLine(jointPos, 0.025f, color);
 }
 
 Animation* AnimationModel::GetCurrentAnimation() {

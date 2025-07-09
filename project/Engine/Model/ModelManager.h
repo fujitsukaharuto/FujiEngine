@@ -32,10 +32,8 @@ public:
 	static ModelData FindModel(const std::string& filename);
 
 	static void CreateSphere();
-	static void CreateRing(float out = 1.0f, float in = 0.2f, float radius = 2.0f);
-	static ModelData CreateRingEx(float out = 1.0f, float in = 0.2f, float radius = 2.0f, bool horizon = false);
-	static void CreateCylinder(float topRadius = 1.0f, float bottomRadius = 1.0f, float height = 3.0f);
-	static ModelData CreateCylinderEx(float topRadius = 1.0f, float bottomRadius = 1.0f, float height = 3.0f);
+	static ModelData CreateRing(float out = 1.0f, float in = 0.2f, float radius = 2.0f, bool horizon = false);
+	static ModelData CreateCylinder(float topRadius = 1.0f, float bottomRadius = 1.0f, float height = 3.0f);
 
 
 	void AddModel(const std::string& filename, Model* model);

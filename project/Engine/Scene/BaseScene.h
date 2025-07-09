@@ -20,9 +20,7 @@ public:
 public:
 
 	virtual void Initialize();
-
 	virtual void Update();
-
 	virtual void Draw();
 
 	void Init(DXCom* pDxcom, SceneManager* pSceneManager);

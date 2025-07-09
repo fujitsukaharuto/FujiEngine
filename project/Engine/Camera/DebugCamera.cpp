@@ -71,7 +71,7 @@ void DebugCamera::InputUpdate() {
 		pitch_ += deltaY * rotationSpeed; // 縦の回転
 
 		// pitch_の回転範囲を制限 (-89度～89度程度)
-		const float pitchLimit = 90.0f * (std::numbers::pi_v<float> / 180.0f); // ラジアン変換
+		const float pitchLimit = 90.0f * (std::numbers::pi_v<float> / 180.0f);
 		if (pitch_ > pitchLimit) pitch_ = pitchLimit;
 		if (pitch_ < -pitchLimit) pitch_ = -pitchLimit;
 	}

@@ -81,7 +81,7 @@ public:
 
 public:
 
-	void Init(DXCom* dxcom);
+	void Initialize(DXCom* dxcom);
 	void Update();
 	void DebugGUI();
 

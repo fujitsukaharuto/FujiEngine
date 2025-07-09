@@ -11,19 +11,61 @@
 
 class DXCom;
 
+struct Node {
+	QuaternioonTrans transform;
+	Matrix4x4 local;
+	std::string name;
+	std::vector<Node> children;
+};
+
+struct VertexWeightData {
+	float weight;
+	uint32_t vertexIndex;
+};
+
+struct SkinningInformation {
+	uint32_t numVertices;
+};
+
+struct JointWeightData {
+	Matrix4x4 inverseBindPoseMatrix;
+	std::vector<VertexWeightData> vertexWeights;
+};
+
+struct ModelMesh {
+	std::vector<VertexDate> vertices;
+	std::vector<uint32_t> indicies;
+	MaterialDataPath material;
+};
+
+struct ModelData {
+	std::map<std::string, JointWeightData> skinClusterData;
+	std::vector<VertexDate> vertices;
+	std::vector<uint32_t> indicies;
+	MaterialDataPath material;
+	Node rootNode;
+	std::vector<ModelMesh> meshes;
+};
+
+
 class Model {
 public:
 	Model();
 	~Model();
 
+	/// <summary>
+	/// 普通モデル用描画
+	/// </summary>
 	void Draw(ID3D12GraphicsCommandList* commandList, Material* mate);
 
+	/// <summary>
+	/// アニメーションモデル用描画
+	/// </summary>
 	void AnimationDraw(const SkinCluster& skinCluster, ID3D12GraphicsCommandList* commandList, Material* mate);
 
 	void TransBarrier();
 
 	void AddMaterial(const Material& material);
-
 	void AddMesh(const Mesh& mesh);
 
 	void CreateEnvironment();
@@ -34,6 +76,9 @@ public:
 
 	void SetUVScale(const Vector2& scale, const Vector2& uvTrans);
 
+	/// <summary>
+	/// α値の閾値
+	/// </summary>
 	void SetAlphaRef(float ref);
 
 	void SetTexture(const std::string& name);

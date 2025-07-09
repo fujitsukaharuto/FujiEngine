@@ -4,6 +4,16 @@
 
 class DXCom;
 
+struct VertexDate {
+	Vector4 position;
+	Vector2 texcoord;
+	Vector3 normal;
+};
+
+struct MaterialDataPath {
+	std::string textureFilePath;
+};
+
 enum class LightMode {
 	kLightNone,
 	kLightHalfLambert,
@@ -13,7 +23,6 @@ enum class LightMode {
 	kPointLightON,
 	kSpotLightON,
 };
-
 
 class Material {
 public:

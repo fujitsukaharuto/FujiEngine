@@ -35,12 +35,6 @@ struct QuaternioonTrans {
 	Vector3 translate = { 0.0f,0.0f,0.0f };
 };
 
-struct VertexDate {
-	Vector4 position;
-	Vector2 texcoord;
-	Vector3 normal;
-};
-
 struct AABB {
 	Vector3 min;
 	Vector3 max;
@@ -52,21 +46,6 @@ struct TransformationMatrix {
 	Matrix4x4 WorldInverseTransPose;
 };
 
-struct TransformationParticleMatrix {
-	Matrix4x4 WVP;
-	Matrix4x4 World;
-	Vector4 color;
-	Vector2 uvTrans = { 0.0f,0.0f };
-	Vector2 uvScale = { 1.0f,1.0f };
-};
-
-struct Materials {
-	Vector4 color;
-	int32_t enableLighting;
-	float padding[3];
-	Matrix4x4 uvTransform;
-};
-
 struct CameraForGPU {
 	Vector3 worldPosition;
 };
@@ -75,59 +54,6 @@ struct Sphere {
 	Vector3 center;
 	float radius;
 };
-
-struct MaterialDataPath {
-	std::string textureFilePath;
-};
-
-struct Node {
-	QuaternioonTrans transform;
-	Matrix4x4 local;
-	std::string name;
-	std::vector<Node> children;
-};
-
-struct VertexWeightData {
-	float weight;
-	uint32_t vertexIndex;
-};
-
-struct SkinningInformation {
-	uint32_t numVertices;
-};
-
-struct JointWeightData {
-	Matrix4x4 inverseBindPoseMatrix;
-	std::vector<VertexWeightData> vertexWeights;
-};
-
-struct ModelMesh {
-	std::vector<VertexDate> vertices;
-	std::vector<uint32_t> indicies;
-	MaterialDataPath material;
-};
-
-struct ModelData {
-	std::map<std::string, JointWeightData> skinClusterData;
-	std::vector<VertexDate> vertices;
-	std::vector<uint32_t> indicies;
-	MaterialDataPath material;
-	Node rootNode;
-	std::vector<ModelMesh> meshes;
-};
-
-struct ParticleDate {
-	Vector4 center[400];
-	Vector4 radius[400];
-	int particleCount;
-	float threshold;
-	float padding[2];
-};
-
-/// <summary>
-/// 2次元ベクトルのスカラー倍を求める
-/// </summary>
-Vector2 Multiply(const Vector2& vec, const float& num);
 
 /// <summary>
 /// アフィン行列

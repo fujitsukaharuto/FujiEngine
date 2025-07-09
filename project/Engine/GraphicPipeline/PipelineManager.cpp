@@ -41,6 +41,9 @@ void PipelineManager::Finalize() {
 
 void PipelineManager::CreatePipeline() {
 
+	//----------------
+	// ここどうにかしたい
+	//----------------
 
 	std::unique_ptr<Pipeline> pipeline = nullptr;
 	std::unique_ptr<Pipeline> pipelineAdd = nullptr;

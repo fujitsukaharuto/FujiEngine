@@ -9,6 +9,11 @@ AudioPlayer::AudioPlayer() {
 AudioPlayer::~AudioPlayer() {
 }
 
+AudioPlayer* AudioPlayer::GetInstance() {
+	static AudioPlayer instance;
+	return &instance;
+}
+
 void AudioPlayer::Initialize() {
 	XAudio2Create(&xAudio2_, 0, XAUDIO2_DEFAULT_PROCESSOR);
 	xAudio2_->CreateMasteringVoice(&masterVoice_);
@@ -28,11 +33,6 @@ void AudioPlayer::Finalize() {
 		xAudio2_.Reset();
 		xAudio2_ = nullptr;
 	}
-}
-
-AudioPlayer* AudioPlayer::GetInstance() {
-	static AudioPlayer instance;
-	return &instance;
 }
 
 void AudioPlayer::LoadWave(const char* filename) {
@@ -111,7 +111,7 @@ SoundData& AudioPlayer::SoundLoadWave(const char* filename) {
 	LoadWave(filename);
 
 	it = container_.find(filename);
-	assert(it != container_.end()); // データが必ず存在することを確認
+	assert(it != container_.end()); // データが必ず存在するか
 	return it->second;
 }
 

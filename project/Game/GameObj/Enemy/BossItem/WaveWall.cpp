@@ -13,7 +13,7 @@ void WaveWall::Initialize() {
 	wave1_ = std::make_unique<Object3d>();
 	wave2_ = std::make_unique<Object3d>();
 	wave3_ = std::make_unique<Object3d>();
-	underRing_->CreateRingEx(1.2f, 0.6f, 1.0f, true);
+	underRing_->CreateRing(1.2f, 0.6f, 1.0f, true);
 	wave1_->Create("bossWaveWall.obj");
 	wave2_->Create("bossWaveWall.obj");
 	wave3_->Create("bossWaveWall.obj");

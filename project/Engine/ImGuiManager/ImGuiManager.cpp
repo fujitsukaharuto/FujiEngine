@@ -21,7 +21,7 @@ ImGuiManager* ImGuiManager::GetInstance() {
 	return &instance;
 }
 
-void ImGuiManager::Init([[maybe_unused]] MyWin* myWin, [[maybe_unused]] DXCom* dxComon) {
+void ImGuiManager::Initialize([[maybe_unused]] MyWin* myWin, [[maybe_unused]] DXCom* dxComon) {
 	dxCommon_ = dxComon;
 #ifdef _DEBUG
 

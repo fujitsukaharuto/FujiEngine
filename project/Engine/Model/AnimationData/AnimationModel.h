@@ -104,7 +104,7 @@ private:
 	Vector3 CalculationValue(const std::vector<KeyframeVector3>& keyframe, float time);
 	Quaternion CalculationValue(const std::vector<KeyframeQuaternion>& keyframe, float time);
 
-	void JointDraw(const Matrix4x4& m);
+	void JointDraw(const Matrix4x4& m, Vector4 color);
 
 	Animation* GetCurrentAnimation();
 	Animation* GetPreviousAnimation();
@@ -139,4 +139,6 @@ private:
 	std::string nowTextureName;
 
 	Texture* environment_;
+
+	int selectedJointIndex_ = -1;
 };

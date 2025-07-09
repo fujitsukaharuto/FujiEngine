@@ -30,7 +30,7 @@ public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Init(MyWin* myWin, DXCom* dxComon);
+	void Initialize(MyWin* myWin, DXCom* dxComon);
 
 	/// <summary>
 	/// 終了

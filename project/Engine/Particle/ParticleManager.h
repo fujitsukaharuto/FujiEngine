@@ -9,6 +9,13 @@
 
 using namespace Microsoft::WRL;
 
+struct TransformationParticleMatrix {
+	Matrix4x4 WVP;
+	Matrix4x4 World;
+	Vector4 color;
+	Vector2 uvTrans = { 0.0f,0.0f };
+	Vector2 uvScale = { 1.0f,1.0f };
+};
 
 struct AcceleFiled {
 	Vector3 Accele;
@@ -81,21 +88,27 @@ public:
 	static ParticleManager* GetInstance();
 
 	void Initialize(DXCom* pDxcom, SRVManager* srvManager);
-
 	void Finalize();
-
 	void Update();
-
 	void Draw();
 
 	void ParticleDebugGUI();
 	void SelectParticleUpdate();
 	void SelectEmitterSizeDraw();
 
+	/// <summary>
+	/// 通常パーティクル
+	/// </summary>
 	static void CreateParticleGroup(const std::string& name, const std::string& fileName, uint32_t count = 20, ShapeType shape = ShapeType::PLANE, bool subMode = false);
 
+	/// <summary>
+	/// ペアレントパーティクル
+	/// </summary>
 	static void CreateParentParticleGroup(const std::string& name, const std::string& fileName, uint32_t count = 20);
 
+	/// <summary>
+	/// 連番のパーティクル
+	/// </summary>
 	static void CreateAnimeGroup(const std::string& name, const std::string& fileName);
 
 	static void Load(ParticleEmitter& emit, const std::string& name);

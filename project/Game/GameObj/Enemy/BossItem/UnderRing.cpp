@@ -6,7 +6,7 @@ UnderRing::UnderRing() {
 
 void UnderRing::Initialize() {
 	OriginGameObject::Initialize();
-	model_->CreateRingEx(0.5f,0.25f,2.0f,true);
+	model_->CreateRing(0.5f,0.25f,2.0f,true);
 
 	collider_ = std::make_unique<AABBCollider>();
 	collider_->SetTag("enemyAttack_ring");
@@ -17,7 +17,7 @@ void UnderRing::Initialize() {
 	collider_->SetCollisionExitCallback([this](const ColliderInfo& other) {OnCollisionExit(other); });
 
 	cylinder_ = std::make_unique<Object3d>();
-	cylinder_->CreateCylinderEx(0.5f, 0.5f, 1.5f);
+	cylinder_->CreateCylinder(0.5f, 0.5f, 1.5f);
 	cylinder_->transform.translate.y = -0.9f;
 	cylinder_->SetParent(&model_->transform);
 	cylinder_->SetLightEnable(LightMode::kLightNone);

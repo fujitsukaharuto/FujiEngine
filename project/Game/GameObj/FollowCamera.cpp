@@ -18,9 +18,10 @@ void FollowCamera::Initialize() {
 
 void FollowCamera::Update(const Vector3& lockon) {
 
-	//XINPUT_STATE pad;
+
 	Camera* camera = CameraManager::GetInstance()->GetCamera();
 
+	//XINPUT_STATE pad;
 	//if (Input::GetInstance()->GetGamepadState(pad)) {
 	//	const float kRotateSpeed = 0.05f;
 

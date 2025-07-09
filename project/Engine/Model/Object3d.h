@@ -26,14 +26,28 @@ public:
 
 	void CreateSphere();
 
-	void CreateRing(float out = 1.0f, float in = 0.2f, float radius = 2.0f);
-	void CreateRingEx(float out = 1.0f, float in = 0.2f, float radius = 2.0f, bool horizon = false);
+	/// <summary>
+	/// Ringの作成
+	/// </summary>
+	/// <param name="out">外側の半径(デフォルトは1.0f)</param>
+	/// <param name="in">内側の半径(デフォルトは0.2f)</param>
+	/// <param name="radius">円周(デフォルトは2.0f)</param>
+	/// <param name="horizon">水平にするか(デフォルトはfalse)</param>
+	void CreateRing(float out = 1.0f, float in = 0.2f, float radius = 2.0f, bool horizon = false);
 
+	/// <summary>
+	/// Cylinderの作成
+	/// </summary>
+	/// <param name="topRadius">上の半径(デフォルトは1.0f)</param>
+	/// <param name="bottomRadius">下の半径(デフォルトは1.0f)</param>
+	/// <param name="height">高さ(デフォルトは3.0f)</param>
 	void CreateCylinder(float topRadius = 1.0f, float bottomRadius = 1.0f, float height = 3.0f);
-	void CreateCylinderEx(float topRadius = 1.0f, float bottomRadius = 1.0f, float height = 3.0f);
 
 	void Draw(Material* mate = nullptr, bool isAdd = false);
 
+	/// <summary>
+	/// 連番用描画
+	/// </summary>
 	void AnimeDraw();
 
 	Matrix4x4 GetWorldMat() const;
@@ -48,18 +62,27 @@ public:
 
 	void DebugGUI();
 
+	/// <summary>
+	/// jsonからTransform初期化
+	/// </summary>
 	void LoadTransformFromJson(const std::string& filename);
 
 	void SetColor(const Vector4& color);
 
 	void SetUVScale(const Vector2& scale, const Vector2& uvTrans);
 
+	/// <summary>
+	/// α値の閾値
+	/// </summary>
 	void SetAlphaRef(float ref);
 
 	void SetCamera(Camera* camera) { this->camera_ = camera; }
 
 	void SetParent(Trans* parent) { transform.parent = parent; }
 
+	/// <summary>
+	/// 非スケーリング継承
+	/// </summary>
 	void SetNoneScaleParent(bool is) { transform.isNoneScaleParent = is; }
 
 	void SetCameraParent(bool is) { transform.isCameraParent = is; }

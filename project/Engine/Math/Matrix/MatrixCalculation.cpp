@@ -4,10 +4,6 @@
 #include <cmath>
 #include <assert.h>
 
-Vector2 Multiply(const Vector2& vec, const float& num) {
-	return { vec.x * num,vec.y * num };
-}
-
 Matrix3x3 MakeAffineMat(Vector2 scale, float rotate, Vector2 translate) {
 	Matrix3x3 result{};
 	for (int y = 0; y < 2; y++) {
