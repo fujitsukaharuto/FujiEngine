@@ -10,7 +10,7 @@ public:
 public:
 
 	void Initialize();
-	void Update(const Vector3& lockon);
+	void Update();
 	void ReStart(const Vector3& lockon);
 
 	void SetTarget(const Trans* target);

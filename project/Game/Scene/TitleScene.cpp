@@ -41,23 +41,12 @@ void TitleScene::Initialize() {
 	terrain_->LoadTransformFromJson("default_terrainTrnasform.json");
 	terrain_->SetUVScale({ 20.0f,20.0f }, { 0.0f,0.0f });
 
-	titlePlane_ = std::make_unique<Object3d>();
-	titlePlane_->Create("plane.obj");
-	titlePlane_->SetTexture("title_beta.png");
-	titlePlane_->transform.translate.y = 13.0f;
-	titlePlane_->transform.translate.z = -15.0f;
-	titlePlane_->transform.rotate.x = -2.291f;
-	titlePlane_->transform.rotate.z = 3.142f;
+	boss_ = std::make_unique<Boss>();
+	boss_->Initialize();
 
-	space_ = std::make_unique<Sprite>();
-	space_->Load("spaceKey.png");
-	space_->SetPos({ 640.0f,400.0f,0.0f });
-	space_->SetSize({ 256.0f,128.0f });
-
-	cube_ = std::make_unique<AnimationModel>();
-	cube_->Create("T_boss.gltf");
-	cube_->LoadAnimationFile("T_boss.gltf");
-	cube_->transform.translate.y = 3.0f;
+	followCamera_ = std::make_unique<FollowCamera>();
+	followCamera_->Initialize();
+	followCamera_->SetTarget(&boss_->GetTrans());
 
 	cMane_ = std::make_unique<CollisionManager>();
 
@@ -75,10 +64,11 @@ void TitleScene::Update() {
 
 #endif // _DEBUG
 
+	followCamera_->Update();
+	boss_->Update();
+
 	BlackFade();
 	skybox_->Update();
-
-	cube_->AnimationUpdate();
 
 	if (input_->TriggerKey(DIK_5)) {
 		emit.Emit();
@@ -92,7 +82,7 @@ void TitleScene::Update() {
 
 void TitleScene::Draw() {
 
-	cube_->CSDispatch();
+	boss_->CSDispatch();
 
 #pragma region 背景描画
 
@@ -105,13 +95,9 @@ void TitleScene::Draw() {
 	skybox_->Draw();
 
 	obj3dCommon->PreDraw();
-//	terrain_->Draw();
+	terrain_->Draw();
 
-	cube_->Draw();
-
-	space_->Draw();
-
-	titlePlane_->Draw();
+	boss_->Draw();
 
 #ifdef _DEBUG
 	CommandManager::GetInstance()->Draw();
@@ -122,7 +108,7 @@ void TitleScene::Draw() {
 #ifdef _DEBUG
 	emit.DrawSize();
 #endif // _DEBUG
-	cube_->SkeletonDraw();
+	boss_->GetAnimModel()->SkeletonDraw();
 	Line3dDrawer::GetInstance()->Render();
 
 #pragma endregion
@@ -142,11 +128,8 @@ void TitleScene::Draw() {
 void TitleScene::DebugGUI() {
 #ifdef _DEBUG
 	ImGui::Indent();
-	if (ImGui::CollapsingHeader("titlePlane")) {
-		titlePlane_->DebugGUI();
-	}
 	if (ImGui::CollapsingHeader("cube")) {
-		cube_->DebugGUI();
+		boss_->DebugGUI();
 	}
 
 	ImGui::Unindent();
@@ -184,7 +167,7 @@ void TitleScene::BlackFade() {
 		}
 	}
 	black_->SetColor({ 0.0f,0.0f,0.0f,Lerp(0.0f,1.0f,(1.0f / blackLimmite * blackTime)) });
-	XINPUT_STATE pad;
+	/*XINPUT_STATE pad;
 	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
 		if (blackTime == 0.0f) {
 			isChangeFase = true;
@@ -195,7 +178,7 @@ void TitleScene::BlackFade() {
 				isChangeFase = true;
 			}
 		}
-	}
+	}*/
 #ifdef _DEBUG
 	if (Input::GetInstance()->PushKey(DIK_RETURN) && Input::GetInstance()->PushKey(DIK_P) && Input::GetInstance()->PushKey(DIK_D) && Input::GetInstance()->TriggerKey(DIK_S)) {
 		if (blackTime == 0.0f) {

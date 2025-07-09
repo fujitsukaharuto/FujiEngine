@@ -23,10 +23,8 @@ void BossRoot::Update() {
 		/// 通常
 		///---------------------------------------------------------------------------------------
 	case BossRoot::Step::ROOT:
-		if (cooldown_ > 0.0f) {
-			cooldown_ -= FPSKeeper::DeltaTime();
-			pBoss_->Walk();
-		} else if (cooldown_ <= 0.0f) {
+		pBoss_->Walk();
+		if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
 			step_ = Step::TOATTACK;
 			break;
 		}
@@ -37,7 +35,8 @@ void BossRoot::Update() {
 		/// 攻撃へ移行
 		///---------------------------------------------------------------------------------------
 	case BossRoot::Step::TOATTACK: {
-		AttackPattern pattern = ChooseNextAttack();
+		pBoss_->ChangeBehavior(std::make_unique<BossJumpAttack>(pBoss_, 1));
+		/*AttackPattern pattern = ChooseNextAttack();
 		switch (pattern) {
 		case AttackPattern::Beam:
 			pBoss_->ChangeBehavior(std::make_unique<BossBeamAttack>(pBoss_));
@@ -51,7 +50,7 @@ void BossRoot::Update() {
 		case AttackPattern::SwordAttack:
 			pBoss_->ChangeBehavior(std::make_unique<BossSwordAttack>(pBoss_));
 			break;
-		}
+		}*/
 		break;
 	}
 	default:

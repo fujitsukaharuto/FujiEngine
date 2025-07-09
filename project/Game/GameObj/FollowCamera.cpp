@@ -16,44 +16,30 @@ void FollowCamera::Initialize() {
 	offset_ = { 0.0f, 4.0f, -25.0f };
 }
 
-void FollowCamera::Update(const Vector3& lockon) {
+void FollowCamera::Update() {
 
 
 	Camera* camera = CameraManager::GetInstance()->GetCamera();
 
-	//XINPUT_STATE pad;
-	//if (Input::GetInstance()->GetGamepadState(pad)) {
-	//	const float kRotateSpeed = 0.05f;
+	XINPUT_STATE pad;
+	const float kRotateSpeed = 0.05f;
+	if (Input::GetInstance()->GetGamepadState(pad)) {
+		destinationAngleY_ += (Input::GetInstance()->GetRStick().x / SHRT_MAX * kRotateSpeed) * FPSKeeper::DeltaTime();
 
-	//	destinationAngleY_ += (Input::GetInstance()->GetRStick().x / SHRT_MAX * kRotateSpeed) * FPSKeeper::DeltaTime();
-
-	//	if (Input::GetInstance()->TriggerButton(PadInput::RStick)) {
-	//		//destinationAngleY_ = target_->rotate.y;
-	//	}
-	//} else {
-	//	const float kRotateSpeed = 0.05f;
-	//	if (Input::GetInstance()->PushKey(DIK_LEFTARROW)) {
-	//		destinationAngleY_ += (0.5f * kRotateSpeed) * FPSKeeper::DeltaTime();
-	//	}
-	//	if (Input::GetInstance()->PushKey(DIK_RIGHTARROW)) {
-	//		destinationAngleY_ -= (0.5f * kRotateSpeed) * FPSKeeper::DeltaTime();
-	//	}
-	//}
-
-	Vector3 lockOnPosition = lockon;
-	lockOnPosition.y = lockOnPosition.y - 3.0f;
-	Vector3 sub = lockOnPosition - Vector3(target_->translate.x, target_->translate.y + 4.0f , target_->translate.z);
-
-	destinationAngleY_ = std::atan2(sub.x, sub.z);
-	camera->transform.rotate.y = LerpShortAngle(camera->transform.rotate.y, destinationAngleY_, 0.3f);
-
-	// X軸
-	float horizontalDistance = std::sqrt(sub.x * sub.x + sub.z * sub.z);
-	float destinationAngleX = std::atan2(-sub.y, horizontalDistance);
-	if (destinationAngleX < -0.09f) {//上向きすぎないように
-		destinationAngleX = -0.09f;
+		if (Input::GetInstance()->TriggerButton(PadInput::RStick)) {
+			// target_->rotate.y を向かせる処理なども可能（必要に応じて）
+		}
+	} else {
+		if (Input::GetInstance()->PushKey(DIK_LEFTARROW)) {
+			destinationAngleY_ += (0.5f * kRotateSpeed) * FPSKeeper::DeltaTime();
+		}
+		if (Input::GetInstance()->PushKey(DIK_RIGHTARROW)) {
+			destinationAngleY_ -= (0.5f * kRotateSpeed) * FPSKeeper::DeltaTime();
+		}
 	}
-	camera->transform.rotate.x = LerpShortAngle(camera->transform.rotate.x, destinationAngleX, 0.3f);
+
+	// 回転の補間（Y軸のみ。X軸は固定で良ければそのまま）
+	camera->transform.rotate.y = LerpShortAngle(camera->transform.rotate.y, destinationAngleY_, 0.3f);
 
 	if (target_) {
 		interTarget_ = Lerp(interTarget_, { target_->translate.x,0.0f,target_->translate.z }, 0.05f);

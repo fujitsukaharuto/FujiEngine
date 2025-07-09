@@ -3,6 +3,8 @@
 #include "Game/TestBaseObj.h"
 #include "Game/GameObj/SkyDome/SkyBox.h"
 #include "Game/Collider/CollisionManager.h"
+#include "Game/GameObj/FollowCamera.h"
+#include "Game/GameObj/Enemy/Boss.h"
 
 class TitleScene:public BaseScene {
 public:
@@ -24,10 +26,9 @@ private:
 	std::unique_ptr<Object3dCommon> obj3dCommon = nullptr;
 	std::unique_ptr<SkyBox> skybox_;
 	std::unique_ptr<Object3d> terrain_ = nullptr;
-	std::unique_ptr<Object3d> titlePlane_ = nullptr;
-	std::unique_ptr<AnimationModel> cube_ = nullptr;
 
-	std::unique_ptr<Sprite> space_;
+	std::unique_ptr<Boss> boss_ = nullptr;
+	std::unique_ptr<FollowCamera> followCamera_;
 
 	ParticleEmitter emit;
 

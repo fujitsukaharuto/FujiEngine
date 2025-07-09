@@ -145,43 +145,12 @@ void Boss::Initialize() {
 	};
 	LoadPhase();
 	ChangeBehavior(std::make_unique<BossRoot>(this));
-	animModel_->ChangeAnimation("roaring");
+	animModel_->ChangeAnimation("idle");
 }
 
 void Boss::Update() {
-	if (!isDying_ && isHpActive_ && !isStart_) {
-		behavior_->Update();
 
-		core_->Update();
-
-		beam_->Update();
-		UpdateWaveWall();
-		UpdateUnderRing();
-
-		ShakeHP();
-
-	} else if (isStart_) {
-		startTime_ -= FPSKeeper::DeltaTime();
-		if (startTime_ > 40.0f && startTime_ < 200.0f) {
-			CameraManager::GetInstance()->GetCamera()->SetShakeTime(2.0f);
-		}
-		if (startTime_ < 0.0f) {
-			isStart_ = false;
-			ChangeBehavior(std::make_unique<BossRoot>(this));
-		}
-	} else if (!isHpActive_) {
-		hpCooltime_ -= FPSKeeper::DeltaTime();
-		if (hpCooltime_ < 0.0f) {
-			isHpActive_ = true;
-			ChangeBehavior(std::make_unique<BossRoot>(this));
-			animModel_->IsRoopAnimation(true);
-		}
-	} else {
-		dyingTime_ -= FPSKeeper::DeltaTime();
-		if (dyingTime_ < 0.0f) {
-			isClear_ = true;
-		}
-	}
+	behavior_->Update();
 
 	animModel_->AnimationUpdate();
 	shadow_->transform.translate = animModel_->transform.translate;
@@ -196,34 +165,6 @@ void Boss::Draw([[maybe_unused]] Material* mate, [[maybe_unused]] bool is) {
 #endif // _DEBUG
 
 	animModel_->Draw();
-	core_->Draw();
-	for (auto& wall : walls_) {
-		if (!wall->GetIsLive())continue;
-		wall->Draw();
-#ifdef _DEBUG
-		wall->DrawCollider();
-#endif // _DEBUG
-	}
-	for (auto& ring : undderRings_) {
-		if (!ring->GetIsLive())continue;
-		ring->Draw();
-#ifdef _DEBUG
-		ring->DrawCollider();
-#endif // _DEBUG
-	}
-	beam_->Draw();
-
-	for (auto& hpTex : hpFrame_) {
-		hpTex->Draw();
-	}
-	if (bossHp_ >= 0.0f) {
-		int texCount = 0;
-		for (auto& tex : hpSprites_) {
-			tex->Draw();
-			if (nowHpIndex_ == texCount) break;
-			texCount++;
-		}
-	}
 }
 
 void Boss::CSDispatch() {
@@ -241,9 +182,7 @@ void Boss::DebugGUI() {
 		if (ImGui::CollapsingHeader("Boss##1")) {
 			animModel_->DebugGUI();
 			collider_->DebugGUI();
-			ParameterGUI();
 		}
-		core_->DebugGUI();
 		ImGui::Unindent();
 	}
 
@@ -538,32 +477,57 @@ void Boss::ShakeHP() {
 }
 
 void Boss::Walk() {
-	if (BossRoot* behavior = dynamic_cast<BossRoot*>(behavior_.get())) {
-		Vector3 dir = pPlayer_->GetWorldPos() - animModel_->transform.translate;
-		dir.y = 0.0f; // 水平方向だけに限定
+
+	Vector3 dir = { 0.0f,0.0f,0.0f };
+	Input* input = Input::GetInstance();
+
+	if (input->PushKey(DIK_A) || input->PushKey(DIK_D) || input->PushKey(DIK_W) || input->PushKey(DIK_S)) {
+		if (input->PushKey(DIK_A)) {
+			dir.x -= 1.0f;
+		} else if (input->PushKey(DIK_D)) {
+			dir.x += 1.0f;
+		}
+		if (input->PushKey(DIK_S)) {
+			dir.z -= 1.0f;
+		} else if (input->PushKey(DIK_W)) {
+			dir.z += 1.0f;
+		}
+	}
+	dir.y = 0.0f; // 水平方向だけに限定
+	if (dir.Length() > 0.0f) {
+		if (!isJumpAttack_) {
+			animModel_->ChangeAnimation("walk");
+		}
 		dir = dir.Normalize();
 
-		// 目標のY軸角度（ラジアン）
-		float targetAngle = std::atan2(dir.x, dir.z); // Z前方軸に対する角度
+		dir = dir * 0.2f;
+		Matrix4x4 rotateMatrix = MakeRotateYMatrix(CameraManager::GetInstance()->GetCamera()->transform.rotate.y);
+		dir = TransformNormal(dir, rotateMatrix);
+		// 位置を更新
+		animModel_->transform.translate += dir * FPSKeeper::DeltaTime();
 
-		Vector3 front = Vector3(0.0f, 0.0f, 1.0f) * 0.05f * FPSKeeper::DeltaTime();
-		front = TransformNormal(front, MakeRotateYMatrix(targetAngle));
-		animModel_->transform.translate += front;
+		Vector3 forward = dir.Normalize();
+		Quaternion targetRotation = Quaternion::LookRotation(forward); // Y軸を上とした視線方向
+		Quaternion newRotation = targetRotation;
 
-		// 現在のY軸角度（モデルの回転）
-		float currentAngle = animModel_->transform.rotate.y;
-
-		// 角度差を -π〜+π にラップ
-		float delta = targetAngle - currentAngle;
-		if (delta > std::numbers::pi_v<float>) delta -= 2.0f * std::numbers::pi_v<float>;
-		if (delta < -std::numbers::pi_v<float>) delta += 2.0f * std::numbers::pi_v<float>;
-
-		// 角度補間（例えば線形補間）
-		float lerpFactor = 0.1f; // 追従の速さ
-		float newAngle = currentAngle + delta * lerpFactor;
-
-		animModel_->transform.rotate.y = newAngle;
+		float zRotate_ = 0.0f;
+		if (dir.x == -1.0f) {
+			zRotate_ = 0.2f;
+		} else if (dir.x == 1.0f) {
+			zRotate_ = -0.2f;
+		}
+		if (zRotate_ != 0.0f) {
+			Quaternion spinRot = Quaternion::AngleAxis(zRotate_, Vector3(0, 0, 1));
+			newRotation = newRotation * spinRot;
+		}
+		// 新しい回転からY軸角度を抽出（回転更新）
+		animModel_->transform.rotate = Quaternion::QuaternionToEuler(newRotation);
+	} else {
+		if (!isJumpAttack_) {
+			animModel_->ChangeAnimation("idle");
+		}
 	}
+
 }
 
 void Boss::UpdateWaveWall() {
@@ -734,34 +698,28 @@ bool Boss::JumpAttack() {
 			jumpTime_ = 0.0f;
 		}
 	}
+	if (jumpTime_ <= 120.0f && jumpTime_ >= 50.0f) {
+		Walk();
 
+	}
 	if (jumpTime_ <= 120.0f && jumpTime_ >= 90.0f) {//120~90 //30
 
 		float flyT = 1.0f - ((jumpTime_ - 90.0f) / 30.0f);
 		animModel_->transform.translate.y = std::lerp(0.0f, jumpHeight_, (1.0f - (1.0f - flyT) * (1.0f - flyT)));
 
 	} else if (jumpTime_ < 70.0f && jumpTime_ >= 50.0f) {//70~50 //20
-
 		float flyT = 1.0f - (jumpTime_ - 50.0f) / 20.0f;
 		animModel_->transform.translate.y = std::lerp(jumpHeight_, 0.0f, (1.0f - powf(1.0f - flyT, 4.0f)));
 
 		if (std::abs(animModel_->transform.translate.y) < 0.25f) {
 			if (isJumpAttack_) {
 				jumpWave_.pos_ = animModel_->transform.translate;
-				jumpWave_.Emit();
-				CameraManager::GetInstance()->GetCamera()->SetShakeTime(20.0f);
 				isJumpAttack_ = false;
-				int count = 0;
-				for (auto& ring : undderRings_) {
-					if (count == 1) break;
-					if (ring->GetIsLive()) continue;
-					ring->InitRing(animModel_->transform.translate);
-					count++;
-				}
 			}
 		}
 
-	} else if (jumpTime_ <= 0.0f) {
+	} else if (jumpTime_ <= 50.0f) {
+
 		animModel_->transform.translate.y = 0.0f;
 		return true;
 	}

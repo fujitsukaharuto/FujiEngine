@@ -102,40 +102,7 @@ void GameScene::Update() {
 
 #endif // _DEBUG
 
-	if (!player_->GetIsGameOver()) {
-		player_->SetTargetPos(boss_->GetBossCore()->GetWorldPos());
-		player_->Update();
-
-		followCamera_->Update(boss_->GetBossCore()->GetWorldPos());
-
-		boss_->Update();
-		if (!boss_->GetIsStart() && player_->GetIsStart()) {
-			player_->SetIsStart(false);
-		}
-	} else {
-		if (selectPoint_ == 0) {
-			if (input_->TriggerKey(DIK_SPACE)) {
-				player_->ReStart();
-				boss_->ReStart();
-				followCamera_->ReStart(boss_->GetBossCore()->GetWorldPos());
-			}
-			if (input_->TriggerKey(DIK_D)) {
-				selectPoint_ = 1;
-				gameoverSelector_->SetPos({ 800.0f,500.0f,0.0f });
-			}
-		} else {
-			if (input_->TriggerKey(DIK_SPACE)) {
-				if (blackTime == 0.0f) {
-					isChangeFase = true;
-					isBackTitle_ = true;
-				}
-			}
-			if (input_->TriggerKey(DIK_A)) {
-				selectPoint_ = 0;
-				gameoverSelector_->SetPos({ 240.0f,500.0f,0.0f });
-			}
-		}
-	}
+	
 
 #ifdef _DEBUG
 	if (input_->TriggerKey(DIK_8)) {
@@ -147,29 +114,7 @@ void GameScene::Update() {
 	skybox_->Update();
 	BlackFade();
 
-	if (!player_->GetIsGameOver()) {
-		cMane_->AddCollider(player_->GetCollider());
-		for (auto& bullet : player_->GetPlayerBullet()) {
-			if (bullet->GetIsLive() && !bullet->GetIsCharge()) {
-				cMane_->AddCollider(bullet->GetCollider());
-			}
-		}
-		cMane_->AddCollider(boss_->GetCoreCollider());
-		for (auto& wall : boss_->GetWalls()) {
-			if (wall->GetIsLive()) {
-				cMane_->AddCollider(wall->GetCollider());
-			}
-		}
-		for (auto& ring : boss_->GetUnderRings()) {
-			if (ring->GetIsLive()) {
-				cMane_->AddCollider(ring->GetCollider());
-			}
-		}
-		if (boss_->GetBeam()->GetIsLive()) {
-			cMane_->AddCollider(boss_->GetBeam()->GetCollider());
-		}
-		cMane_->CheckAllCollision();
-	}
+	
 
 	ParticleManager::GetInstance()->Update();
 }
