@@ -145,6 +145,7 @@ void Boss::Initialize() {
 	};
 	LoadPhase();
 	ChangeBehavior(std::make_unique<BossRoot>(this));
+	isJumpAttack_ = false;
 	animModel_->ChangeAnimation("idle");
 }
 
@@ -714,12 +715,11 @@ bool Boss::JumpAttack() {
 		if (std::abs(animModel_->transform.translate.y) < 0.25f) {
 			if (isJumpAttack_) {
 				jumpWave_.pos_ = animModel_->transform.translate;
-				isJumpAttack_ = false;
 			}
 		}
 
-	} else if (jumpTime_ <= 50.0f) {
-
+	} else if (jumpTime_ <= 0.0f) {
+		isJumpAttack_ = false;
 		animModel_->transform.translate.y = 0.0f;
 		return true;
 	}
