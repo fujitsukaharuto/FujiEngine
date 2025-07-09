@@ -46,7 +46,7 @@ void TitleScene::Initialize() {
 
 	followCamera_ = std::make_unique<FollowCamera>();
 	followCamera_->Initialize();
-	followCamera_->SetTarget(&boss_->GetTrans());
+	followCamera_->SetTarget(&boss_->GetAnimTrans());
 
 	cMane_ = std::make_unique<CollisionManager>();
 

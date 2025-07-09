@@ -718,8 +718,9 @@ bool Boss::JumpAttack() {
 			}
 		}
 
-	} else if (jumpTime_ <= 0.0f) {
+	} else if (jumpTime_ <= 50.0f) {
 		isJumpAttack_ = false;
+		animModel_->IsRoopAnimation(true);
 		animModel_->transform.translate.y = 0.0f;
 		return true;
 	}
