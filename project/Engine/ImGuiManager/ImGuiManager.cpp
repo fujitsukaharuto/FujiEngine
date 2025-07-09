@@ -309,27 +309,43 @@ void ImGuiManager::DrawNodeEditor(NodeGraph* nodeGraph) {
 
 	ed::Utilities::BlueprintNodeBuilder builder((ImTextureID)backGroundHandle_.ptr, 126, 126);
 
-	// 右クリックでMenuを出す
-	auto openPopupPosition = ImGui::GetMousePos();
 	ed::Suspend();
-	if (ed::ShowBackgroundContextMenu()) {
-		if (Input::GetInstance()->IsTriggerMouse(1)) {
-
-		}
-		ImGui::OpenPopup("Create New Node");
+	ed::NodeId nodeId;
+	if (ed::ShowNodeContextMenu(&nodeId)) {
+		ImGui::OpenPopup("Node Context Menu");
+	} else if (ed::ShowBackgroundContextMenu()) {
+		ImGui::OpenPopup("Background Context Menu");
 	}
 	ed::Resume();
 
-	ed::Suspend();
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8, 8));
-	if (ImGui::BeginPopup("Create New Node")) {
-		if (ImGui::MenuItem("click")) {
-			int a = 1;
-			a = 2;
+	ed::Suspend(); // ノードの右クリックメニュー
+	if (ImGui::BeginPopup("Node Context Menu")) {
+		if (ImGui::MenuItem("Delete Node")) {
+			// nodeId を削除
+		}
+		if (ImGui::MenuItem("Change Texture")) {
+			// nodeId に対応する Texture を変更
 		}
 		ImGui::EndPopup();
 	}
-	ImGui::PopStyleVar();
+	ed::Resume();
+
+	ed::Suspend(); // 背景の右クリックメニュー
+	if (ImGui::BeginPopup("Background Context Menu")) {
+		if (ImGui::BeginMenu("Add Node")) {
+			if (ImGui::MenuItem("Blueprint Node")) {
+				// Blueprintノード追加処理
+			}
+			if (ImGui::MenuItem("Texture Node")) {
+				// Textureノード追加処理
+			}
+			if (ImGui::MenuItem("Float Node")) {
+				// Floatノード追加処理
+			}
+			ImGui::EndMenu();
+		}
+		ImGui::EndPopup();
+	}
 	ed::Resume();
 
 	for (const auto& node : nodeGraph->nodes) {
