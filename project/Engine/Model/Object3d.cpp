@@ -34,9 +34,12 @@ Object3d::Object3d() {
 	texNode2.texName = "uvChecker.png";
 	nodeGraph_.AddNode(texNode2);
 
+	MyNode colorNode;
+	colorNode.CreateNode(MyNode::NodeType::Color);
+	nodeGraph_.AddNode(colorNode);
+
 	MyNode selNode;
 	selNode.CreateNode(MyNode::NodeType::Material);
-	selNode.values.push_back(Value("white2x2.png"));
 	nodeGraph_.AddNode(selNode);
 
 	selectorNodeId_ = selNode.id;
@@ -527,6 +530,34 @@ void Object3d::SetWVP() {
 			const Matrix4x4& parentWorldMatrix = transform.parent->GetWorldMat();
 			worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
 		}
+	} else if (transform.animParent) {
+		if (transform.isNoneScaleParent) {
+			const Matrix4x4& parentWorldMatrix = *transform.animParent;
+			// スケール成分を除去した親ワールド行列を作成
+			Matrix4x4 noScaleParentMatrix = parentWorldMatrix;
+
+			// 各軸ベクトルの長さ（スケール）を計算
+			Vector3 xAxis = { parentWorldMatrix.m[0][0], parentWorldMatrix.m[1][0], parentWorldMatrix.m[2][0] };
+			Vector3 yAxis = { parentWorldMatrix.m[0][1], parentWorldMatrix.m[1][1], parentWorldMatrix.m[2][1] };
+			Vector3 zAxis = { parentWorldMatrix.m[0][2], parentWorldMatrix.m[1][2], parentWorldMatrix.m[2][2] };
+
+			float xLen = Vector3::Length(xAxis);
+			float yLen = Vector3::Length(yAxis);
+			float zLen = Vector3::Length(zAxis);
+
+			// 正規化（スケールを除去）
+			for (int i = 0; i < 3; ++i) {
+				noScaleParentMatrix.m[i][0] /= xLen;
+				noScaleParentMatrix.m[i][1] /= yLen;
+				noScaleParentMatrix.m[i][2] /= zLen;
+			}
+
+			// 変換はそのまま（位置は影響受けてOKなら）
+			worldMatrix = Multiply(worldMatrix, noScaleParentMatrix);
+		} else {
+			const Matrix4x4& parentWorldMatrix = *transform.animParent;
+			worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
+		}
 	} else if (transform.isCameraParent) {
 		const Matrix4x4& parentWorldMatrix = camera_->GetWorldMatrix();
 		worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
@@ -609,6 +640,7 @@ void Object3d::SetTextureNode() {
 		MyNode* selNode = nodeGraph_.FindNodeById(selectorNodeId_);
 		if (selNode) {
 			SetTexture(selNode->outputValue[0].Get<std::string>());
+			SetColor(selNode->outputValue[1].Get<Vector4>());
 		}
 	}
 

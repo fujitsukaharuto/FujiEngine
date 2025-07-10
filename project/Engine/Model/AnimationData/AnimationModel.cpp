@@ -19,6 +19,7 @@
 AnimationModel::AnimationModel() {
 	dxcommon_ = ModelManager::GetInstance()->ShareDXCom();
 	lightManager_ = ModelManager::GetInstance()->ShareLight();
+	skeltonParent_ = MakeIdentity4x4();
 }
 
 AnimationModel::~AnimationModel() {
@@ -340,6 +341,11 @@ Vector3 AnimationModel::GetWorldPos() const {
 	return worldPos;
 }
 
+Matrix4x4* AnimationModel::GetJointTrans(const std::string& jointName) {
+	parentJointName_ = jointName;
+	return &skeltonParent_;
+}
+
 void AnimationModel::SkeletonUpdate() {
 	for (Joint& joint : skeleton_.joints) {
 		joint.loaclMatrix = MakeAffineMatrix(joint.transform.scale, joint.transform.rotate, joint.transform.translate);
@@ -347,6 +353,11 @@ void AnimationModel::SkeletonUpdate() {
 			joint.skeletonSpaceMatrix = Multiply(joint.loaclMatrix, skeleton_.joints[*joint.parent].skeletonSpaceMatrix);
 		} else {
 			joint.skeletonSpaceMatrix = joint.loaclMatrix;
+		}
+		if (!parentJointName_.empty()) {
+			if (joint.name == parentJointName_) {
+				skeltonParent_ = Multiply(joint.skeletonSpaceMatrix, GetWorldMat());
+			}
 		}
 	}
 }

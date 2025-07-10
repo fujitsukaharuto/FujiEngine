@@ -25,6 +25,7 @@ private:
 	std::unique_ptr<SkyBox> skybox_;
 	std::unique_ptr<Object3d> terrain_ = nullptr;
 	std::unique_ptr<Object3d> titlePlane_ = nullptr;
+	std::unique_ptr<Object3d> animParentObj_ = nullptr;
 	std::unique_ptr<AnimationModel> cube_ = nullptr;
 
 	std::unique_ptr<Sprite> space_;

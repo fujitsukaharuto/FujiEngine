@@ -83,6 +83,7 @@ void NodeGraph::ValueUpdate(MyNode& node) {
 		if (!inputValues.empty()) {
 			if (node.type == MyNode::NodeType::Material) {
 				node.outputValue.push_back(inputValues[0].type != Value::Type::Texture ? node.values[0] : inputValues[0]);
+				node.outputValue.push_back(inputValues[1].type != Value::Type::Color ? node.values[1] : inputValues[1]);
 			}
 
 			if (node.type == MyNode::NodeType::Texture) {
@@ -181,8 +182,8 @@ void MyNode::CreateNode(NodeType nodeType) {
 
 		name = "TextureInput";
 		type = MyNode::NodeType::Texture;
-		inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input });
-		outputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Output });
+		inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input, PinType::Texture });
+		outputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Output, PinType::Texture });
 
 		break;
 	case MyNode::NodeType::Float:
@@ -193,7 +194,20 @@ void MyNode::CreateNode(NodeType nodeType) {
 
 		name = "Material";
 		type = MyNode::NodeType::Material;
-		inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input });
+		inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input, PinType::Texture });
+		inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input, PinType::Color });
+		values.push_back(Value("white2x2.png"));
+		values.push_back(Value(Vector4(1.0f, 1.0f, 1.0f, 1.0f)));
+		evaluator = [](const std::vector<Value>& inputs) {
+			return !inputs.empty() ? inputs[0] : Value();
+			};
+		break;
+	case MyNode::NodeType::Color:
+
+		name = "Color";
+		type = MyNode::NodeType::Color;
+		outputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Output, PinType::Color });
+		values.push_back(Value(Vector4(1.0f, 1.0f, 1.0f, 1.0f)));
 		evaluator = [](const std::vector<Value>& inputs) {
 			return !inputs.empty() ? inputs[0] : Value();
 			};

@@ -59,6 +59,12 @@ void TitleScene::Initialize() {
 	cube_->LoadAnimationFile("T_boss.gltf");
 	cube_->transform.translate.y = 3.0f;
 
+	animParentObj_ = std::make_unique<Object3d>();
+	animParentObj_->Create("boss.obj");
+	animParentObj_->SetAnimParent(cube_->GetJointTrans("mixamorig:LeftHandIndex1"));
+	animParentObj_->SetNoneScaleParent(true);
+	animParentObj_->LoadTransformFromJson("AnimParent_transform.json");
+
 	cMane_ = std::make_unique<CollisionManager>();
 
 	ParticleManager::Load(emit, "sphere");
@@ -108,6 +114,7 @@ void TitleScene::Draw() {
 //	terrain_->Draw();
 
 	cube_->Draw();
+	animParentObj_->Draw();
 
 	space_->Draw();
 
@@ -147,6 +154,9 @@ void TitleScene::DebugGUI() {
 	}
 	if (ImGui::CollapsingHeader("cube")) {
 		cube_->DebugGUI();
+	}
+	if (ImGui::CollapsingHeader("animParent")) {
+		animParentObj_->DebugGUI();
 	}
 
 	ImGui::Unindent();

@@ -6,6 +6,7 @@
 #include <variant>
 #include "Engine/Math/Vector/Vector2.h"
 #include "Engine/Math/Vector/Vector3.h"
+#include "Engine/Math/Vector/Vector4.h"
 #ifdef _DEBUG
 #include "imgui.h"
 #include "imgui_node_editor.h"
@@ -16,10 +17,10 @@ namespace ed = ax::NodeEditor;
 #ifdef _DEBUG
 struct Value {
 
-	enum class Type { None, Int, Float, Vector2, Vector3, Texture };
+	enum class Type { None, Int, Float, Vector2, Vector3, Color, Texture };
 
 	// 実データ本体（variant にすべて詰め込む）
-	std::variant<std::monostate, int, float, Vector2, Vector3, std::string> data;
+	std::variant<std::monostate, int, float, Vector2, Vector3, Vector4, std::string> data;
 
 	// タイプを明示的に持っておく（オプション）
 	Type type = Type::None;
@@ -30,6 +31,7 @@ struct Value {
 	Value(float v) : data(v), type(Type::Float) {}
 	Value(const Vector2& v) : data(v), type(Type::Vector2) {}
 	Value(const Vector3& v) : data(v), type(Type::Vector3) {}
+	Value(const Vector4& v) : data(v), type(Type::Color) {}
 	Value(const std::string& texName) : data(texName), type(Type::Texture) {}
 	Value(const char* texName) : data(std::string(texName)), type(Type::Texture) {}
 
@@ -47,6 +49,10 @@ struct Value {
 	// 値取得（安全な参照取得、存在しなければ例外）
 	template<typename T>
 	const T& Get() const {
+		return std::get<T>(data);
+	}
+	template<typename T>
+	T& Get() {
 		return std::get<T>(data);
 	}
 
@@ -69,6 +75,8 @@ enum class PinType {
 	Object,
 	Function,
 	Delegate,
+	Color,
+	Texture,
 };
 
 enum class PinKind {
@@ -80,6 +88,7 @@ struct Pin {
 	ed::PinId id;
 	bool isLinked = false;
 	enum class Type { Input, Output } type;
+	PinType pinType;
 };
 
 struct MyNode {
@@ -95,6 +104,7 @@ struct MyNode {
 		Float,
 		Add,
 		Material,
+		Color,
 		// 追加予定のノード種類…
 	} type;
 

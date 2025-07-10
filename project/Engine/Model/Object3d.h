@@ -79,6 +79,7 @@ public:
 	void SetCamera(Camera* camera) { this->camera_ = camera; }
 
 	void SetParent(Trans* parent) { transform.parent = parent; }
+	void SetAnimParent(Matrix4x4* parent) { transform.animParent = parent; }
 
 	/// <summary>
 	/// 非スケーリング継承
