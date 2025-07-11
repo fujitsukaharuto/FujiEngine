@@ -335,9 +335,9 @@ void AnimationModel::SkeletonDraw() {
 
 		// ハイライトの色判定
 		if (i == selectedJointIndex_) {
-			JointDraw(worldJointPos, {1.0f, 0.0f, 0.0f, 1.0f}); // 赤で強調
+			JointDraw(worldJointPos, { 1.0f, 0.0f, 0.0f, 1.0f }); // 赤で強調
 		} else {
-			JointDraw(worldJointPos, {0.3f, 1.0f, 0.3f, 1.0f}); // 通常白
+			JointDraw(worldJointPos, { 0.3f, 1.0f, 0.3f, 1.0f }); // 通常白
 		}
 
 		if (!joint.children.empty()) {

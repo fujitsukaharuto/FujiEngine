@@ -59,6 +59,7 @@ public:
 
 	void TimeReset() { time_ = frequencyTime_; }
 	void SetParent(Trans* parent) { parent_ = parent; }
+	void SetAnimParent(Matrix4x4* parent) { animParent_ = parent; }
 	void SetIsUpdatedMatrix(bool is) { isUpDatedMatrix_ = is; }
 	Vector3 GetWorldPos();
 	Matrix4x4 GetParentMatrix();
@@ -100,6 +101,7 @@ private:
 	float time_;
 
 	Trans* parent_ = nullptr;
+	Matrix4x4* animParent_ = nullptr;
 
 	bool isUpDatedMatrix_ = false;
 };

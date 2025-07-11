@@ -134,8 +134,8 @@ void ParticleEmitter::DrawSize() {
 
 
 		worldMatrix_ = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, pos_);
-		if (parent_) {
-			const Matrix4x4& parentWorldMatrix = parent_->GetWorldMat();
+		if (parent_ || animParent_) {
+			const Matrix4x4& parentWorldMatrix= animParent_ ? *animParent_ : parent_->GetWorldMat();
 			// スケール成分を除去した親ワールド行列を作成
 			Matrix4x4 noScaleParentMatrix = parentWorldMatrix;
 
@@ -205,8 +205,8 @@ void ParticleEmitter::Emit() {
 		}
 
 		worldMatrix_ = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, pos_);
-		if (parent_) {
-			const Matrix4x4& parentWorldMatrix = parent_->GetWorldMat();
+		if (parent_ || animParent_) {
+			const Matrix4x4& parentWorldMatrix = animParent_ ? *animParent_ : parent_->GetWorldMat();
 			// スケール成分を除去した親ワールド行列を作成
 			Matrix4x4 noScaleParentMatrix = parentWorldMatrix;
 
@@ -256,9 +256,10 @@ void ParticleEmitter::Emit() {
 			}
 
 			// 親の回転だけを取り出して適用する
-			Matrix4x4 parentRotationOnly = parent_ ? parent_->GetWorldMat() : Matrix4x4::MakeIdentity4x4();
-			if (parent_) {
-				Matrix4x4 parentMat = parent_->GetWorldMat();
+			Matrix4x4 parentRotationOnly = Matrix4x4::MakeIdentity4x4();
+			if (parent_ || animParent_) {
+				parentRotationOnly = animParent_ ? *animParent_ : parent_->GetWorldMat();
+				Matrix4x4 parentMat = animParent_ ? *animParent_ : parent_->GetWorldMat();
 
 				// 上位3x3から回転だけを取り出す
 				Vector3 right = Vector3::Normalize(Vector3(parentMat.m[0][0], parentMat.m[0][1], parentMat.m[0][2]));
@@ -331,8 +332,8 @@ void ParticleEmitter::Emit() {
 
 void ParticleEmitter::Burst() {
 	worldMatrix_ = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, pos_);
-	if (parent_) {
-		const Matrix4x4& parentWorldMatrix = parent_->GetWorldMat();
+	if (parent_ || animParent_) {
+		const Matrix4x4& parentWorldMatrix = animParent_ ? *animParent_ : parent_->GetWorldMat();
 		worldMatrix_ = Multiply(worldMatrix_, parentWorldMatrix);
 	}
 
@@ -492,8 +493,8 @@ void ParticleEmitter::Load(const std::string& filename) {
 
 Vector3 ParticleEmitter::GetWorldPos() {
 	worldMatrix_ = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, pos_);
-	if (parent_) {
-		const Matrix4x4& parentWorldMatrix = parent_->GetWorldMat();
+	if (parent_ || animParent_) {
+		const Matrix4x4& parentWorldMatrix = animParent_ ? *animParent_ : parent_->GetWorldMat();
 		worldMatrix_ = Multiply(worldMatrix_, parentWorldMatrix);
 	}
 	return Vector3{ worldMatrix_.m[3][0], worldMatrix_.m[3][1], worldMatrix_.m[3][2] };
@@ -502,6 +503,9 @@ Vector3 ParticleEmitter::GetWorldPos() {
 Matrix4x4 ParticleEmitter::GetParentMatrix() {
 	if (parent_) {
 		return parent_->GetWorldMat();
+	}
+	if (animParent_) {
+		return *animParent_;
 	}
 	return Matrix4x4::MakeIdentity4x4();
 }
