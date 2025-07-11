@@ -120,8 +120,8 @@ private:
 	LightManager* lightManager_;
 	Camera* camera_;
 
-	std::string parentJointName_;
-	Matrix4x4 skeltonParent_;
+	std::list<std::string> parentJointName_;
+	std::list<Matrix4x4> skeltonParents_;
 
 	bool isAnimation_ = true;
 	bool isRoopAnimation_ = true;

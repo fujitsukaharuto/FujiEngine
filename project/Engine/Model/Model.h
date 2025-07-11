@@ -36,6 +36,7 @@ struct ModelMesh {
 	std::vector<VertexDate> vertices;
 	std::vector<uint32_t> indicies;
 	MaterialDataPath material;
+	Vector4 baseColor;
 };
 
 struct ModelData {
@@ -72,7 +73,7 @@ public:
 
 	void CreateSkinningInformation(DXCom* pDxcom);
 
-	void SetColor(const Vector4& color);
+	void SetColor(const Vector4& color, int index = 0);
 
 	void SetUVScale(const Vector2& scale, const Vector2& uvTrans);
 

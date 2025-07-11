@@ -40,7 +40,7 @@ void Material::CreateEnvironmentMaterial() {
 	materialEnvironment_ = nullptr;
 	materialEnvironmentResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialEnvironment_));
 	//色変えるやつ（Resource）
-	materialEnvironment_->color = { 1.0f,1.0f,1.0f,1.0f };
+	materialEnvironment_->color = materialDate_->color;
 	materialEnvironment_->enableLighting = static_cast<int32_t>(LightMode::kSpotLightON);
 	materialEnvironment_->uvTransform = MakeIdentity4x4();
 	materialEnvironment_->shininess = 50.0f;
