@@ -160,9 +160,9 @@ void Boss::Update() {
 }
 
 void Boss::Draw([[maybe_unused]] Material* mate, [[maybe_unused]] bool is) {
-	shadow_->Draw();
+	//shadow_->Draw();
 #ifdef _DEBUG
-	collider_->DrawCollider();
+	//collider_->DrawCollider();
 #endif // _DEBUG
 
 	animModel_->Draw();

@@ -326,25 +326,31 @@ void AnimationModel::AnimeDraw() {
 void AnimationModel::SkeletonDraw() {
 	for (size_t i = 0; i < skeleton_.joints.size(); ++i) {
 		Joint& joint = skeleton_.joints[i];
+		Matrix4x4 worldJointPos = Multiply(joint.skeletonSpaceMatrix, GetWorldMat());
 		Vector3 jointPos = {
-			joint.skeletonSpaceMatrix.m[3][0],
-			joint.skeletonSpaceMatrix.m[3][1],
-			joint.skeletonSpaceMatrix.m[3][2]
+			worldJointPos.m[3][0],
+			worldJointPos.m[3][1],
+			worldJointPos.m[3][2]
 		};
 
 		// ハイライトの色判定
 		if (i == selectedJointIndex_) {
-			JointDraw(joint.skeletonSpaceMatrix, {1.0f, 0.0f, 0.0f, 1.0f}); // 赤で強調
+			JointDraw(worldJointPos, {1.0f, 0.0f, 0.0f, 1.0f}); // 赤で強調
 		} else {
-			JointDraw(joint.skeletonSpaceMatrix, {1.0f, 1.0f, 1.0f, 1.0f}); // 通常白
+			JointDraw(worldJointPos, {0.3f, 1.0f, 0.3f, 1.0f}); // 通常白
+		}
+
+		if (!joint.children.empty()) {
+
 		}
 
 		// 親子関係のライン
 		if (joint.parent) {
+			Matrix4x4 worldParentJointPos = Multiply(skeleton_.joints[*joint.parent].skeletonSpaceMatrix, GetWorldMat());
 			Vector3 parentPos = {
-				skeleton_.joints[*joint.parent].skeletonSpaceMatrix.m[3][0],
-				skeleton_.joints[*joint.parent].skeletonSpaceMatrix.m[3][1],
-				skeleton_.joints[*joint.parent].skeletonSpaceMatrix.m[3][2]
+				worldParentJointPos.m[3][0],
+				worldParentJointPos.m[3][1],
+				worldParentJointPos.m[3][2]
 			};
 			Line3dDrawer::GetInstance()->DrawLine3d(jointPos, parentPos, { 1.0f,1.0f,1.0f,1.0f });
 		}
@@ -649,7 +655,7 @@ Quaternion AnimationModel::CalculationValue(const std::vector<KeyframeQuaternion
 
 void AnimationModel::JointDraw(const Matrix4x4& m, Vector4 color) {
 	Vector3 jointPos = { m.m[3][0], m.m[3][1], m.m[3][2] };
-	Line3dDrawer::GetInstance()->DrawShereLine(jointPos, 0.025f, color);
+	Line3dDrawer::GetInstance()->DrawShereLine(jointPos, 0.05f, color);
 }
 
 Animation* AnimationModel::GetCurrentAnimation() {
