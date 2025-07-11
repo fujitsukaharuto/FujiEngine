@@ -50,9 +50,13 @@ void TitleScene::Initialize() {
 
 	animParentObj_ = std::make_unique<Object3d>();
 	animParentObj_->Create("boss.obj");
-	animParentObj_->SetAnimParent(cube_->GetJointTrans("mixamorig:LeftHandIndex1"));
+	animParentObj_->SetAnimParent(boss_->GetAnimModel()->GetJointTrans("mixamorig:LeftHandIndex1"));
 	animParentObj_->SetNoneScaleParent(true);
 	animParentObj_->LoadTransformFromJson("AnimParent_transform.json");
+
+	multiSikn_ = std::make_unique<AnimationModel>();
+	multiSikn_->Create("run.gltf");
+	multiSikn_->LoadAnimationFile("run.gltf");
 
 	cMane_ = std::make_unique<CollisionManager>();
 
@@ -73,6 +77,8 @@ void TitleScene::Update() {
 	followCamera_->Update();
 	boss_->Update();
 
+	multiSikn_->AnimationUpdate();
+
 	BlackFade();
 	skybox_->Update();
 
@@ -89,6 +95,7 @@ void TitleScene::Update() {
 void TitleScene::Draw() {
 
 	boss_->CSDispatch();
+	multiSikn_->CSDispatch();
 
 #pragma region 背景描画
 
@@ -103,7 +110,10 @@ void TitleScene::Draw() {
 	obj3dCommon->PreDraw();
 	terrain_->Draw();
 
+	animParentObj_->Draw();
+
 	boss_->Draw();
+	multiSikn_->Draw();
 
 #ifdef _DEBUG
 	CommandManager::GetInstance()->Draw();
@@ -115,6 +125,7 @@ void TitleScene::Draw() {
 	emit.DrawSize();
 #endif // _DEBUG
 	boss_->GetAnimModel()->SkeletonDraw();
+	//multiSikn_->SkeletonDraw();
 	Line3dDrawer::GetInstance()->Render();
 
 #pragma endregion
