@@ -40,7 +40,7 @@ void ImGuiManager::Initialize([[maybe_unused]] MyWin* myWin, [[maybe_unused]] DX
 	ImGui::GetStyle().Colors[35] = { 0.109f,0.522f,0.0f,1.0f };
 	ImGui::GetStyle().Colors[ImGuiCol_ModalWindowDimBg] = { 0.8f,0.8f,0.8f,0.075f };
 
-	ImGui::SetColorEditOptions(ImGuiColorEditFlags_Float | ImGuiColorEditFlags_DisplayHSV | ImGuiColorEditFlags_PickerHueBar);
+	ImGui::SetColorEditOptions(ImGuiColorEditFlags_Float | ImGuiColorEditFlags_PickerHueBar);
 
 	/// font
 	ImGuiIO& io = ImGui::GetIO();
@@ -195,7 +195,7 @@ void ImGuiManager::InitNodeTexture() {
 #ifdef _DEBUG
 bool ImGuiManager::CanCreateLink(const Pin& a, const Pin& b) {
 	// 出力 → 入力 のみに限定する例
-	if (a.type == b.type)
+	if (a.type == b.type || a.pinType != b.pinType)
 		return false;
 	return (a.type == Pin::Type::Output) ? true : false;
 }
@@ -261,7 +261,7 @@ void ImGuiManager::HandleDeleteLink(std::vector<Link>& links) {
 	ed::EndDelete();
 }
 
-void ImGuiManager::DrawNode(const MyNode& node, ed::Utilities::BlueprintNodeBuilder& builder) {
+void ImGuiManager::DrawNode(MyNode& node, ed::Utilities::BlueprintNodeBuilder& builder) {
 	builder.Begin(node.id);
 	builder.Header(ImColor(128, 195, 248));
 
@@ -299,6 +299,14 @@ void ImGuiManager::DrawNode(const MyNode& node, ed::Utilities::BlueprintNodeBuil
 	if (node.type == MyNode::NodeType::Texture) {
 		ImGui::Dummy(ImVec2(5.0f, 0.0f)); ImGui::SameLine();
 		ImGui::Image((ImTextureID)TextureManager::GetInstance()->GetTexture(node.texName)->gpuHandle.ptr, { 70,70 });
+	}
+
+	if (node.type == MyNode::NodeType::Color) {
+		ImGui::Dummy(ImVec2(5.0f, 0.0f)); ImGui::SameLine();
+		ImGui::ColorEdit4(("##Color" + std::to_string(static_cast<uintptr_t>(node.id))).c_str(), &node.values[0].Get<Vector4>().x);
+		/*ed::Suspend();
+
+		ed::Resume();*/
 	}
 
 	builder.End();
@@ -348,7 +356,7 @@ void ImGuiManager::DrawNodeEditor(NodeGraph* nodeGraph) {
 	}
 	ed::Resume();
 
-	for (const auto& node : nodeGraph->nodes) {
+	for (auto& node : nodeGraph->nodes) {
 		DrawNode(node, builder);
 	}
 	for (const auto& link : nodeGraph->links) {

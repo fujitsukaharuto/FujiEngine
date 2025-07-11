@@ -33,7 +33,7 @@ public:
 
 	void Draw(ID3D12GraphicsCommandList* commandList);
 
-	void AnimationDraw(const SkinCluster& skinCluster, ID3D12GraphicsCommandList* commandList);
+	void AnimationDraw(const SkinCluster& skinCluster, ID3D12GraphicsCommandList* commandList, int index);
 
 	void TransBarrier();
 

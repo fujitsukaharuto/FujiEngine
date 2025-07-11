@@ -48,6 +48,12 @@ void TitleScene::Initialize() {
 	followCamera_->Initialize();
 	followCamera_->SetTarget(&boss_->GetAnimTrans());
 
+	animParentObj_ = std::make_unique<Object3d>();
+	animParentObj_->Create("boss.obj");
+	animParentObj_->SetAnimParent(cube_->GetJointTrans("mixamorig:LeftHandIndex1"));
+	animParentObj_->SetNoneScaleParent(true);
+	animParentObj_->LoadTransformFromJson("AnimParent_transform.json");
+
 	cMane_ = std::make_unique<CollisionManager>();
 
 	ParticleManager::Load(emit, "sphere");
@@ -130,6 +136,9 @@ void TitleScene::DebugGUI() {
 	ImGui::Indent();
 	if (ImGui::CollapsingHeader("cube")) {
 		boss_->DebugGUI();
+	}
+	if (ImGui::CollapsingHeader("animParent")) {
+		animParentObj_->DebugGUI();
 	}
 
 	ImGui::Unindent();

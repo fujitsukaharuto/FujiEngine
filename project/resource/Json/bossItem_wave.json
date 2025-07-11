@@ -1,0 +1,90 @@
+{
+    "objects": [
+        {
+            "children": [
+                {
+                    "modelName": "bossWaveWall.obj",
+                    "objectName": "EditorObj1",
+                    "transform": {
+                        "rotate": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "scale": [
+                            0.8999999761581421,
+                            0.8999999761581421,
+                            1.0
+                        ],
+                        "translate": [
+                            0.0,
+                            0.0,
+                            -0.05000000074505806
+                        ]
+                    }
+                },
+                {
+                    "modelName": "bossWaveWall.obj",
+                    "objectName": "EditorObj2",
+                    "transform": {
+                        "rotate": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "scale": [
+                            0.8500000238418579,
+                            0.8500000238418579,
+                            1.0
+                        ],
+                        "translate": [
+                            0.0,
+                            0.0,
+                            -0.10000000149011612
+                        ]
+                    }
+                },
+                {
+                    "modelName": "bossWaveWall.obj",
+                    "objectName": "EditorObj3",
+                    "transform": {
+                        "rotate": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "scale": [
+                            0.800000011920929,
+                            0.800000011920929,
+                            1.0
+                        ],
+                        "translate": [
+                            0.0,
+                            0.0,
+                            -0.15000000596046448
+                        ]
+                    }
+                }
+            ],
+            "modelName": "bossWaveWall.obj",
+            "objectName": "NewObject",
+            "transform": {
+                "rotate": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    4.0,
+                    1.5
+                ],
+                "translate": [
+                    0.0,
+                    0.0,
+                    0.0
+                ]
+            }
+        }
+    ]
+}

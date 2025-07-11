@@ -98,7 +98,7 @@ void ModelManager::LoadOBJ(const std::string& filename) {
 			for (uint32_t element = 0; element < face.mNumIndices; element++) {
 				uint32_t vertexIndex = face.mIndices[element];
 				//newMesh.AddIndex(vertexIndex + meshVertexCount);
-				model->data_.indicies.push_back(vertexIndex + meshVertexCount);
+				model->data_.indicies.push_back(vertexIndex);
 				newModelMesh.indicies.push_back(vertexIndex);
 			}
 		}
@@ -140,10 +140,10 @@ void ModelManager::LoadGLTF(const std::string& filename) {
 	const aiScene* scene = importer.ReadFile(path.c_str(), aiProcess_FlipWindingOrder | aiProcess_FlipUVs);
 	assert(scene->HasMeshes());
 
-	ModelMesh newModelMesh{};
 	// Mesh解析
 	uint32_t meshVertexCount = 0;
 	for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; meshIndex++) {
+		ModelMesh newModelMesh{};
 		aiMesh* mesh = scene->mMeshes[meshIndex];
 		assert(mesh->HasNormals());
 		bool hasTexcoord = mesh->HasTextureCoords(0);
@@ -177,11 +177,10 @@ void ModelManager::LoadGLTF(const std::string& filename) {
 
 			for (uint32_t element = 0; element < face.mNumIndices; element++) {
 				uint32_t vertexIndex = face.mIndices[element];
-				model->data_.indicies.push_back(vertexIndex + meshVertexCount);
+				model->data_.indicies.push_back(vertexIndex);
 				newModelMesh.indicies.push_back(vertexIndex);
 			}
 		}
-		meshVertexCount += mesh->mNumVertices;
 
 		// === メッシュに対応するマテリアルを取得 ===
 		uint32_t materialIndex = mesh->mMaterialIndex;
@@ -215,9 +214,16 @@ void ModelManager::LoadGLTF(const std::string& filename) {
 			jointWeightData.inverseBindPoseMatrix = Inverse(bindPoseMatrix);
 
 			for (uint32_t weightIndex = 0; weightIndex < bone->mNumWeights; weightIndex++) {
-				jointWeightData.vertexWeights.push_back({ bone->mWeights[weightIndex].mWeight,bone->mWeights[weightIndex].mVertexId });
+				uint32_t localIndex = bone->mWeights[weightIndex].mVertexId;
+				uint32_t globalIndex = meshVertexCount + localIndex;
+
+				jointWeightData.vertexWeights.push_back({
+					bone->mWeights[weightIndex].mWeight,
+					globalIndex
+					});
 			}
 		}
+		meshVertexCount += mesh->mNumVertices;
 	}
 	model->data_.rootNode = ReadNode(scene->mRootNode);
 

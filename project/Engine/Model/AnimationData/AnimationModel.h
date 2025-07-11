@@ -53,6 +53,8 @@ public:
 
 	Vector3 GetWorldPos()const;
 
+	Matrix4x4* GetJointTrans(const std::string& jointName);
+
 	void SkeletonUpdate();
 
 	void SkinClusterUpdate();
@@ -117,6 +119,9 @@ private:
 	DXCom* dxcommon_;
 	LightManager* lightManager_;
 	Camera* camera_;
+
+	std::string parentJointName_;
+	Matrix4x4 skeltonParent_;
 
 	bool isAnimation_ = true;
 	bool isRoopAnimation_ = true;

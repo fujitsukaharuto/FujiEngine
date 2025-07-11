@@ -20,8 +20,22 @@ struct WellForGPU {
 	Matrix4x4 skeletonSpaceInverseTransposeMatrix;
 };
 
+struct MeshSection {
+	uint32_t  vertexOffset;
+	uint32_t  vertexCount;
+	uint32_t  matrixPaletteOffset;
+	uint32_t  materialIndex;
+};
+
 struct SkinCluster {
 	std::vector<Matrix4x4> inverseBindPoseMatrices;
+
+	std::vector<MeshSection> meshSections;
+
+	// MeshSection用リソースとSRVハンドルを追加
+	Microsoft::WRL::ComPtr<ID3D12Resource> meshSectionResource;
+	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> meshSectionSrvHandle;
+
 	Microsoft::WRL::ComPtr<ID3D12Resource> influenceResource;
 	D3D12_VERTEX_BUFFER_VIEW influenceBuffreView;
 	std::span<VertexInfluence> mappedInfluece;

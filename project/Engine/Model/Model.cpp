@@ -28,6 +28,7 @@ void Model::Draw(ID3D12GraphicsCommandList* commandList, Material* mate = nullpt
 }
 
 void Model::AnimationDraw(const SkinCluster& skinCluster, ID3D12GraphicsCommandList* commandList, Material* mate) {
+	int vertexOffset = 0;
 	for (uint32_t index = 0; index < mesh_.size(); ++index) {
 		if (mate) {
 			commandList->SetGraphicsRootConstantBufferView(0, mate->GetMaterialResource()->GetGPUVirtualAddress());
@@ -36,7 +37,9 @@ void Model::AnimationDraw(const SkinCluster& skinCluster, ID3D12GraphicsCommandL
 			commandList->SetGraphicsRootConstantBufferView(0, material_[index].GetMaterialResource()->GetGPUVirtualAddress());
 			commandList->SetGraphicsRootDescriptorTable(2, material_[index].GetTexture()->gpuHandle);
 		}
-		mesh_[index].AnimationDraw(skinCluster,commandList);
+		mesh_[index].AnimationDraw(skinCluster, commandList, vertexOffset);
+		vertexOffset = 0;
+		vertexOffset += int(mesh_[index].GetVertexDataSize());
 	}
 }
 
@@ -67,7 +70,9 @@ void Model::CreateSkinningInformation(DXCom* pDxcom) {
 	skinningInformation_ = pDxcom->CreateBufferResource(pDxcom->GetDevice(), sizeof(SkinningInformation));
 	infoData_ = nullptr;
 	skinningInformation_->Map(0, nullptr, reinterpret_cast<void**>(&infoData_));
-	infoData_->numVertices = static_cast<int32_t>(mesh_.front().GetVertexDataSize());
+	for (int i = 0; i < mesh_.size(); i++) {
+		infoData_->numVertices += static_cast<int32_t>(mesh_[i].GetVertexDataSize());
+	}
 }
 
 void Model::SetColor(const Vector4& color) {
@@ -112,9 +117,22 @@ void Model::SetLightEnable(LightMode mode) {
 
 void Model::CSDispatch(const SkinCluster& skinCluster, ID3D12GraphicsCommandList* commandList) {
 	PipelineManager::GetInstance()->SetCSPipeline(Pipe::SkinningCS);
-	commandList->SetComputeRootDescriptorTable(0, skinCluster.paletteSrvHandle.second);
-	commandList->SetComputeRootDescriptorTable(2, skinCluster.influenceSrvHandle.second);
-	mesh_.front().CSDispatch(commandList);
-	commandList->SetComputeRootConstantBufferView(4, skinningInformation_->GetGPUVirtualAddress());
-	commandList->Dispatch(static_cast<UINT>(mesh_.front().GetVertexDataSize() + 1023) / 1024, 1, 1);
+	commandList->SetComputeRootDescriptorTable(0, skinCluster.paletteSrvHandle.second);        // t0
+	commandList->SetComputeRootDescriptorTable(2, skinCluster.influenceSrvHandle.second);      // t1, t2
+	commandList->SetComputeRootDescriptorTable(5, skinCluster.meshSectionSrvHandle.second);    // t3
+	commandList->SetComputeRootConstantBufferView(4, skinningInformation_->GetGPUVirtualAddress()); // b0
+
+	// 各メッシュセクションごとにDispatch
+	for (uint32_t i = 0; i < static_cast<uint32_t>(skinCluster.meshSections.size()); ++i) {
+		// メッシュ側でSRVなどセット（頂点バッファやスキン出力先）
+		mesh_[i].CSDispatch(commandList);
+
+		// RootConstantで meshIndex を送信（b1）
+		commandList->SetComputeRoot32BitConstants(6, 1, &i, 0);
+
+		uint32_t vertexCount = skinCluster.meshSections[i].vertexCount;
+		uint32_t dispatchCount = (vertexCount + 1023) / 1024;
+
+		commandList->Dispatch(dispatchCount, 1, 1);
+	}
 }

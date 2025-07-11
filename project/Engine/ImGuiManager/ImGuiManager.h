@@ -85,7 +85,7 @@ public:
 
 	void HandleCreateLink(std::vector<Link>& links, const std::vector<MyNode>& nodes);
 	void HandleDeleteLink(std::vector<Link>& links);
-	void DrawNode(const MyNode& node, ed::Utilities::BlueprintNodeBuilder& builder);
+	void DrawNode(MyNode& node, ed::Utilities::BlueprintNodeBuilder& builder);
 	void DrawNodeEditor(NodeGraph* nodeGraph);
 	void DrawPinIcon(bool connected);
 

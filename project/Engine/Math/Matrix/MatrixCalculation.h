@@ -13,9 +13,16 @@
 #include "Matrix/Matrix4x4.h"
 #include "Quaternion/Quaternion.h"
 
+
+struct QuaternioonTrans {
+	Vector3 scale = { 1.0f,1.0f,1.0f };
+	Quaternion rotate = Quaternion();
+	Vector3 translate = { 0.0f,0.0f,0.0f };
+};
+
 struct Trans {
 	Vector3 scale;
-	Vector3 rotate;
+	Vector3 rotate; // Quater
 	Vector3 translate;
 
 	void SetNoneScaleParent(bool is) { isNoneScaleParent = is; }
@@ -24,15 +31,10 @@ struct Trans {
 	Matrix4x4 GetNoneScaleWorldMat() const;
 	Vector3 GetRotation();
 	Trans* parent = nullptr;
+	Matrix4x4* animParent = nullptr;
 
 	bool isNoneScaleParent = false;
 	bool isCameraParent = false;
-};
-
-struct QuaternioonTrans {
-	Vector3 scale = { 1.0f,1.0f,1.0f };
-	Quaternion rotate = Quaternion();
-	Vector3 translate = { 0.0f,0.0f,0.0f };
 };
 
 struct AABB {

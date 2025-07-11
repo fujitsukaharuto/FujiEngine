@@ -32,8 +32,7 @@ void WaveWall::Initialize() {
 	velocity_ = { 0.0f,0.0f,0.0f };
 
 	model_->SetLightEnable(LightMode::kLightNone);
-	model_->transform.scale.y = 4.0f;
-	model_->transform.scale.z = 1.5f;
+	model_->LoadTransformFromJson("bossItem_wave0.json");
 	model_->SetColor({ 0.0f,0.7f,1.0f,1.0f });
 	model_->SetAlphaRef(0.25f);
 
@@ -50,33 +49,26 @@ void WaveWall::Initialize() {
 	float scaleX = 0.9f;
 	float scaleY = 0.9f;
 	wave1_->SetLightEnable(LightMode::kLightNone);
-	wave1_->transform.scale.x = scaleX;
-	wave1_->transform.scale.y = scaleY;
+	wave1_->LoadTransformFromJson("bossItem_wave1.json");
 	wave1_->SetColor({ 0.5f,0.2f,1.0f,1.0f });
 	wave1_->SetAlphaRef(0.25f);
 	wave1_->SetParent(&model_->transform);
-	wave1_->transform.translate.z = -0.05f;
 
 	scaleX -= 0.05f;
 	scaleY -= 0.05f;
 	wave2_->SetLightEnable(LightMode::kLightNone);
-	wave2_->transform.scale.x = scaleX;
-	wave2_->transform.scale.y = scaleY;
+	wave2_->LoadTransformFromJson("bossItem_wave2.json");
 	wave2_->SetColor({ 0.0f,0.2f,0.6f,1.0f });
 	wave2_->SetAlphaRef(0.25f);
 	wave2_->SetParent(&model_->transform);
-	wave2_->transform.translate.z = -0.1f;
 
 	scaleX -= 0.05f;
 	scaleY -= 0.05f;
 	wave3_->SetLightEnable(LightMode::kLightNone);
-	wave3_->transform.scale.x = scaleX;
-	wave3_->transform.scale.y = scaleY;
+	wave3_->LoadTransformFromJson("bossItem_wave3.json");
 	wave3_->SetColor({ 0.0f,0.2f,1.0f,1.0f });
 	wave3_->SetAlphaRef(0.25f);
 	wave3_->SetParent(&model_->transform);
-	wave3_->transform.translate.z = -0.15f;
-
 
 	ParticleManager::Load(spark1_, "WaveWallSpark");
 	ParticleManager::Load(spark2_, "WaveWallSpark");
