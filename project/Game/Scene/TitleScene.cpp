@@ -57,6 +57,7 @@ void TitleScene::Initialize() {
 	multiSikn_ = std::make_unique<AnimationModel>();
 	multiSikn_->Create("run.gltf");
 	multiSikn_->LoadAnimationFile("run.gltf");
+	multiSikn_->transform.scale = { 3.0f,3.0f,3.0f };
 
 	cMane_ = std::make_unique<CollisionManager>();
 
@@ -125,7 +126,7 @@ void TitleScene::Draw() {
 	emit.DrawSize();
 #endif // _DEBUG
 	boss_->GetAnimModel()->SkeletonDraw();
-	//multiSikn_->SkeletonDraw();
+	multiSikn_->SkeletonDraw();
 	Line3dDrawer::GetInstance()->Render();
 
 #pragma endregion
