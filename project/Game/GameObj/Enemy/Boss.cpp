@@ -48,9 +48,7 @@ void Boss::Initialize() {
 	core_ = std::make_unique<BossCore>(this);
 	core_->Initialize();
 
-	beam_ = std::make_unique<Beam>();
-	beam_->Initialize();
-	beam_->SetBossParent(this);
+	
 
 	float parentRotate = std::numbers::pi_v<float> *0.25f;
 	for (int i = 0; i < 8; i++) {
@@ -83,24 +81,30 @@ void Boss::Initialize() {
 	waveParent_->SetNoneScaleParent(true);
 
 
-	ParticleManager::Load(waveAttack1, "ShockRay");
-	ParticleManager::Load(waveAttack2, "ShockWaveGround");
+	ParticleManager::Load(waveAttack1, "BulletTrajectory");
+	ParticleManager::Load(waveAttack2, "BulletTrajectory2");
+	
 	ParticleManager::Load(waveAttack3, "ShockWaveParticle");
 	ParticleManager::Load(waveAttack4, "ShockWave");
 	ParticleManager::Load(jumpWave_, "JumpShockWave");
 
+
+	waveAttack1.SetAnimParent(animModel_->GetJointTrans("mixamorig:LeftHandIndex1"));
+	waveAttack2.SetAnimParent(animModel_->GetJointTrans("mixamorig:RightHandIndex1"));
+
 	waveAttack1.frequencyTime_ = 0.0f;
 	waveAttack2.frequencyTime_ = 0.0f;
+
+	waveAttack1.pos_ = { 0.0f,0.0f,0.0f };
+	waveAttack2.pos_ = { 0.0f,0.0f,0.0f };
+
+	waveAttack1.isDistanceComplement_ = true;
+	waveAttack2.isDistanceComplement_ = true;
+
+
 	waveAttack3.frequencyTime_ = 0.0f;
 	waveAttack4.frequencyTime_ = 0.0f;
 	jumpWave_.frequencyTime_ = 0.0f;
-
-	waveAttack1.isAddRandomSize_ = true;
-	waveAttack1.addRandomMax_ = { 0.75f,1.2f };
-	waveAttack1.addRandomMin_.y = -0.5f;
-
-	waveAttack1.SetParent(&waveParent_->transform);
-	waveAttack2.SetParent(&waveParent_->transform);
 	waveAttack3.SetParent(&waveParent_->transform);
 	waveAttack4.SetParent(&waveParent_->transform);
 
@@ -154,6 +158,9 @@ void Boss::Update() {
 	behavior_->Update();
 
 	animModel_->AnimationUpdate();
+
+	waveAttack1.Emit();
+	waveAttack2.Emit();
 	shadow_->transform.translate = animModel_->transform.translate;
 	shadow_->transform.translate.y = 0.15f;
 	collider_->InfoUpdate();
@@ -312,20 +319,6 @@ void Boss::InitParameter() {
 
 	jumpTime_ = 150.0f;
 	jumpHeight_ = 4.0f;
-
-	for (int i = 0; i < 9; i++) {
-		std::unique_ptr<WaveWall> wall;
-		wall = std::make_unique<WaveWall>();
-		wall->Initialize();
-		walls_.push_back(std::move(wall));
-	}
-
-	for (int i = 0; i < 3; i++) {
-		std::unique_ptr<UnderRing> ring;
-		ring = std::make_unique<UnderRing>();
-		ring->Initialize();
-		undderRings_.push_back(std::move(ring));
-	}
 
 	for (int i = 0; i < 5; i++) {
 		std::unique_ptr<Sprite> hpTex;
@@ -494,6 +487,22 @@ void Boss::Walk() {
 			dir.z += 1.0f;
 		}
 	}
+	bool ismoving = false;
+	XINPUT_STATE pad;
+	Vector3 velo = Vector3();
+	if (Input::GetInstance()->GetGamepadState(pad)) {
+		const float threshold = 0.7f;
+		Vector2 padStickL = Input::GetInstance()->GetLStick();
+		velo = { padStickL.x / SHRT_MAX, 0.0f, padStickL.y / SHRT_MAX };
+
+		if (velo.Length() > threshold) {
+			ismoving = true;
+		}
+	}
+	if (ismoving == true) {
+		dir = velo;
+	}
+
 	dir.y = 0.0f; // 水平方向だけに限定
 	if (dir.Length() > 0.0f) {
 		if (!isJumpAttack_) {
@@ -532,32 +541,17 @@ void Boss::Walk() {
 }
 
 void Boss::UpdateWaveWall() {
-	for (auto& wall : walls_) {
-		if (!wall->GetIsLive())continue;
-		wall->CalculetionFollowVec(pPlayer_->GetWorldPos());
-		wall->Update();
-	}
+
 }
 
 void Boss::WaveWallAttack() {
-	int count = 0;
 
 	Vector3 wavePos = { 0.0f,0.0f,4.5f };
 	Matrix4x4 rotateMatrix = MakeRotateYMatrix(animModel_->transform.rotate.y);
 	wavePos = TransformNormal(wavePos, rotateMatrix);
 	wavePos += animModel_->transform.translate;
 	wavePos.y = 0.0f;
-	for (auto& wall : walls_) {
-		if (count == 3) break;
-		if (wall->GetIsLive()) continue;
-		Vector3 velocity = { 0.0f,0.0f,1.0f };
-		if (count == 1) velocity = Vector3(-1.0f, 0.0f, 1.0f).Normalize();
-		if (count == 2) velocity = Vector3(1.0f, 0.0f, 1.0f).Normalize();
-		velocity = TransformNormal(velocity, rotateMatrix);
 
-		wall->InitWave(wavePos, velocity);
-		count++;
-	}
 
 	waveAttack1.Emit();
 	waveAttack2.Emit();
@@ -673,15 +667,11 @@ void Boss::BeamChargeComplete() {
 	charge12_.Emit();
 	charge13_.Emit();
 	charge14_.Emit();
-	beam_->InitBeam(Vector3(), Vector3());
 }
 
 bool Boss::BeamAttack() {
 	bool result = false;
 
-	if (beam_->BeamRotate()) {
-		result = true;
-	}
 
 	return result;
 }
@@ -729,10 +719,7 @@ bool Boss::JumpAttack() {
 }
 
 void Boss::UpdateUnderRing() {
-	for (auto& ring : undderRings_) {
-		if (!ring->GetIsLive())continue;
-		ring->Update();
-	}
+	
 }
 
 ///= Behavior =================================================================*/
@@ -793,13 +780,7 @@ void Boss::LoadPhase() {
 }
 
 void Boss::SetDefaultBehavior() {
-	beam_->SetIsLive(false);
-	for (auto& wave : walls_) {
-		wave->SetIsLive(false);
-	}
-	for (auto& ring : undderRings_) {
-		ring->SetIsLive(false);
-	}
+
 	ChangeBehavior(std::make_unique<BossRoot>(this));
 	animModel_->transform.translate.y = 0.0f;
 	Vector3 dir = pPlayer_->GetWorldPos() - animModel_->transform.translate;

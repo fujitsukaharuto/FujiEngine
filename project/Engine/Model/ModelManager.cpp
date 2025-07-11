@@ -111,10 +111,17 @@ void ModelManager::LoadOBJ(const std::string& filename) {
 		aiString textureFileName;
 		std::string texturePath;
 
+		aiColor3D diffuseColor(1.0f, 1.0f, 1.0f);
 		if (material->GetTextureCount(aiTextureType_DIFFUSE) > 0 &&
 			material->GetTexture(aiTextureType_DIFFUSE, 0, &textureFileName) == AI_SUCCESS) {
 			texturePath = textureFileName.C_Str();
+			newModelMesh.baseColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 		} else {
+			if (material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor) == AI_SUCCESS) {
+				newModelMesh.baseColor = { diffuseColor.r, diffuseColor.g, diffuseColor.b, 1.0f };
+			} else {
+				newModelMesh.baseColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+			}
 			texturePath = "white2x2.png";  // デフォルト
 		}
 		newModelMesh.material.textureFilePath = texturePath;
@@ -189,10 +196,17 @@ void ModelManager::LoadGLTF(const std::string& filename) {
 		aiString textureFileName;
 		std::string texturePath;
 
+		aiColor3D diffuseColor(1.0f, 1.0f, 1.0f);
 		if (material->GetTextureCount(aiTextureType_DIFFUSE) > 0 &&
 			material->GetTexture(aiTextureType_DIFFUSE, 0, &textureFileName) == AI_SUCCESS) {
 			texturePath = textureFileName.C_Str();
+			newModelMesh.baseColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 		} else {
+			if (material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor) == AI_SUCCESS) {
+				newModelMesh.baseColor = { diffuseColor.r, diffuseColor.g, diffuseColor.b, 1.0f };
+			} else {
+				newModelMesh.baseColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+			}
 			texturePath = "white2x2.png";  // デフォルト
 		}
 		newModelMesh.material.textureFilePath = texturePath;

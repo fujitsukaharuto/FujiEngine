@@ -49,7 +49,7 @@ void TitleScene::Initialize() {
 	followCamera_->SetTarget(&boss_->GetAnimTrans());
 
 	animParentObj_ = std::make_unique<Object3d>();
-	animParentObj_->Create("boss.obj");
+	animParentObj_->Create("Sword.obj");
 	animParentObj_->SetAnimParent(boss_->GetAnimModel()->GetJointTrans("mixamorig:LeftHandIndex1"));
 	animParentObj_->SetNoneScaleParent(true);
 	animParentObj_->LoadTransformFromJson("AnimParent_transform.json");

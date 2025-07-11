@@ -43,12 +43,9 @@ void GameRun::Initialize() {
 	modelManager_->LoadOBJ("suzanne.obj");
 	modelManager_->LoadOBJ("Fence.obj");
 	modelManager_->LoadOBJ("terrain.obj");
-	modelManager_->LoadOBJ("skydome.obj");
-	modelManager_->LoadOBJ("playerModel.obj");
-	modelManager_->LoadOBJ("boss.obj");
-	modelManager_->LoadOBJ("bossWaveWall.obj");
-	modelManager_->LoadOBJ("Star.obj");
-	modelManager_->LoadOBJ("player.obj");
+
+
+	modelManager_->LoadOBJ("Sword.obj");
 	modelManager_->LoadGLTF("T_boss.gltf");
 	modelManager_->LoadGLTF("run.gltf");
 #pragma endregion

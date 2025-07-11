@@ -23,7 +23,7 @@ void BossRoot::Update() {
 		///---------------------------------------------------------------------------------------
 	case BossRoot::Step::ROOT:
 		pBoss_->Walk();
-		if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
+		if (Input::GetInstance()->TriggerKey(DIK_SPACE)|| Input::GetInstance()->TriggerButton(PadInput::A)) {
 			step_ = Step::TOATTACK;
 			break;
 		}

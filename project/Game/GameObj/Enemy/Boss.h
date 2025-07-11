@@ -61,9 +61,9 @@ public:
 	BaseCollider* GetCollider() { return collider_.get(); }
 	BaseCollider* GetCoreCollider() { return core_->GetCollider(); }
 	BossCore* GetBossCore() { return core_.get(); }
-	Beam* GetBeam() { return beam_.get(); }
-	std::vector<std::unique_ptr<WaveWall>>& GetWalls() { return walls_; }
-	std::vector<std::unique_ptr<UnderRing>>& GetUnderRings() { return undderRings_; }
+	//Beam* GetBeam() { return beam_.get(); }
+	//std::vector<std::unique_ptr<WaveWall>>& GetWalls() { return walls_; }
+	//std::vector<std::unique_ptr<UnderRing>>& GetUnderRings() { return undderRings_; }
 	const std::vector<std::pair<std::string, float>>& GetPhaseActionList(int phase) { return phaseList_[phase]; }
 	float GetAttackCooldown() { return attackCooldown_; }
 	int GetPhaseIndex() { return phaseIndex_; }
@@ -90,9 +90,9 @@ private:
 	int phaseIndex_ = 0;
 
 	std::unique_ptr<BossCore> core_;
-	std::unique_ptr<Beam> beam_;
-	std::vector<std::unique_ptr<WaveWall>> walls_;
-	std::vector<std::unique_ptr<UnderRing>> undderRings_;
+	//std::unique_ptr<Beam> beam_;
+	//std::vector<std::unique_ptr<WaveWall>> walls_;
+	//std::vector<std::unique_ptr<UnderRing>> undderRings_;
 
 	std::unique_ptr<Object3d> shadow_;
 	std::unique_ptr<AABBCollider> collider_;

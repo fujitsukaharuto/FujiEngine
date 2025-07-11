@@ -75,10 +75,8 @@ void Model::CreateSkinningInformation(DXCom* pDxcom) {
 	}
 }
 
-void Model::SetColor(const Vector4& color) {
-	for (Material& material : material_) {
-		material.SetColor(color);
-	}
+void Model::SetColor(const Vector4& color, int index) {
+	material_[index].SetColor(color);
 }
 
 void Model::SetUVScale(const Vector2& scale, const Vector2& uvTrans) {

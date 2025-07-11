@@ -24,11 +24,21 @@ void FollowCamera::Update() {
 	XINPUT_STATE pad;
 	const float kRotateSpeed = 0.05f;
 	if (Input::GetInstance()->GetGamepadState(pad)) {
-		destinationAngleY_ += (Input::GetInstance()->GetRStick().x / SHRT_MAX * kRotateSpeed) * FPSKeeper::DeltaTime();
 
-		if (Input::GetInstance()->TriggerButton(PadInput::RStick)) {
-			// target_->rotate.y を向かせる処理なども可能（必要に応じて）
+		bool ismoving = false;
+		Vector3 velo = Vector3();
+
+		const float threshold = 0.7f;
+		Vector2 padStickL = Input::GetInstance()->GetRStick();
+		velo = { padStickL.x / SHRT_MAX, 0.0f, 0.0f };
+
+		if (velo.Length() > threshold) {
+			ismoving = true;
 		}
+		if (ismoving == true) {
+			destinationAngleY_ += (Input::GetInstance()->GetRStick().x / SHRT_MAX * kRotateSpeed) * FPSKeeper::DeltaTime();
+		}
+
 	} else {
 		if (Input::GetInstance()->PushKey(DIK_LEFTARROW)) {
 			destinationAngleY_ += (0.5f * kRotateSpeed) * FPSKeeper::DeltaTime();

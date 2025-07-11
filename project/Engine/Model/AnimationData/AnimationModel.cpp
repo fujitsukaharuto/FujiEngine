@@ -19,7 +19,6 @@
 AnimationModel::AnimationModel() {
 	dxcommon_ = ModelManager::GetInstance()->ShareDXCom();
 	lightManager_ = ModelManager::GetInstance()->ShareLight();
-	skeltonParent_ = MakeIdentity4x4();
 }
 
 AnimationModel::~AnimationModel() {
@@ -153,7 +152,7 @@ void AnimationModel::CreateSkeleton(const Node& rootNode) {
 
 void AnimationModel::Create(const std::string& fileName) {
 	this->camera_ = CameraManager::GetInstance()->GetCamera();
-	ModelManager::GetInstance()->LoadOBJ(fileName);
+	ModelManager::GetInstance()->LoadGLTF(fileName);
 	SetModel(fileName);
 	transform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 	nowTextureName = model_->GetTextuerName();
@@ -380,8 +379,12 @@ Vector3 AnimationModel::GetWorldPos() const {
 }
 
 Matrix4x4* AnimationModel::GetJointTrans(const std::string& jointName) {
-	parentJointName_ = jointName;
-	return &skeltonParent_;
+	parentJointName_.push_back(jointName);
+	skeltonParents_.push_back(Matrix4x4::MakeIdentity4x4());
+
+	auto it = skeltonParents_.end();
+	--it;
+	return &(*it);
 }
 
 void AnimationModel::SkeletonUpdate() {
@@ -392,11 +395,15 @@ void AnimationModel::SkeletonUpdate() {
 		} else {
 			joint.skeletonSpaceMatrix = joint.loaclMatrix;
 		}
-		if (!parentJointName_.empty()) {
-			if (joint.name == parentJointName_) {
-				skeltonParent_ = Multiply(joint.skeletonSpaceMatrix, GetWorldMat());
+		auto nameIt = parentJointName_.begin();
+		auto matIt = skeltonParents_.begin();
+
+		for (; nameIt != parentJointName_.end() && matIt != skeltonParents_.end(); ++nameIt, ++matIt) {
+			if (joint.name == *nameIt) {
+				*matIt = Multiply(joint.skeletonSpaceMatrix, GetWorldMat());
 			}
 		}
+
 	}
 }
 
@@ -512,6 +519,7 @@ void AnimationModel::SetModel(const std::string& fileName) {
 		Material newMaterial{};
 		newMaterial.SetTextureNamePath((model_->data_.meshes[i].material.textureFilePath));
 		newMaterial.CreateMaterial();
+		newMaterial.SetColor(model_->data_.meshes[i].baseColor);
 		model_->AddMaterial(newMaterial);
 		model_->SetTextureName((model_->data_.meshes[i].material.textureFilePath));
 

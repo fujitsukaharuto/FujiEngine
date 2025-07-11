@@ -7,16 +7,16 @@ WaveWall::WaveWall() {
 
 void WaveWall::Initialize() {
 	OriginGameObject::Initialize();
-	OriginGameObject::CreateModel("bossWaveWall.obj");
+	//OriginGameObject::CreateModel("bossWaveWall.obj");
 
 	underRing_ = std::make_unique<Object3d>();
 	wave1_ = std::make_unique<Object3d>();
 	wave2_ = std::make_unique<Object3d>();
 	wave3_ = std::make_unique<Object3d>();
 	underRing_->CreateRing(1.2f, 0.6f, 1.0f, true);
-	wave1_->Create("bossWaveWall.obj");
-	wave2_->Create("bossWaveWall.obj");
-	wave3_->Create("bossWaveWall.obj");
+	//wave1_->Create("bossWaveWall.obj");
+	//wave2_->Create("bossWaveWall.obj");
+	//wave3_->Create("bossWaveWall.obj");
 
 	collider_ = std::make_unique<AABBCollider>();
 	collider_->SetTag("enemyAttack");
