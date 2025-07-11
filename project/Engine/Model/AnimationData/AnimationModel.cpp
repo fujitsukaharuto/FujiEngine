@@ -201,7 +201,7 @@ SkinCluster AnimationModel::CreateSkinCluster(const Skeleton& skeleton, const Mo
 	skinCluster.influenceSrvHandle.second = srv->GetGPUDescriptorHandle(influenceIndex);
 	// SRV作成
 	srv->CreateStructuredSRV(influenceIndex, skinCluster.influenceResource.Get(),
-		static_cast<UINT>(model_->GetVertexSize()), static_cast<UINT>(sizeof(VertexInfluence)));
+		static_cast<UINT>(modelData.vertices.size()), static_cast<UINT>(sizeof(VertexInfluence)));
 
 
 	skinCluster.inverseBindPoseMatrices.resize(skeleton.joints.size());
@@ -226,6 +226,38 @@ SkinCluster AnimationModel::CreateSkinCluster(const Skeleton& skeleton, const Mo
 			}
 		}
 	}
+
+	uint32_t vertexOffset = 0;
+	for (size_t i = 0; i < modelData.meshes.size(); ++i) {
+		const auto& mesh = modelData.meshes[i];
+
+		MeshSection section;
+		section.vertexOffset = vertexOffset;
+		section.vertexCount = static_cast<uint32_t>(mesh.vertices.size());
+		section.matrixPaletteOffset = 0; // 通常は0（スケルトン共有なら）
+		section.materialIndex = uint32_t(i); // または別途持ってるmaterial index
+
+		skinCluster.meshSections.push_back(section);
+
+		vertexOffset += section.vertexCount;
+	}
+
+	uint32_t elementSize = sizeof(MeshSection);
+	uint32_t elementCount = static_cast<uint32_t>(skinCluster.meshSections.size());
+	uint32_t bufferSize = elementSize * elementCount;
+
+	skinCluster.meshSectionResource = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), bufferSize);
+
+	// マップして meshSections のデータをコピー
+	MeshSection* mapped = nullptr;
+	skinCluster.meshSectionResource->Map(0, nullptr, reinterpret_cast<void**>(&mapped));
+	memcpy(mapped, skinCluster.meshSections.data(), bufferSize);
+	skinCluster.meshSectionResource->Unmap(0, nullptr);
+	uint32_t srvIndex = srv->Allocate();
+
+	skinCluster.meshSectionSrvHandle.first = srv->GetCPUDescriptorHandle(srvIndex);
+	skinCluster.meshSectionSrvHandle.second = srv->GetGPUDescriptorHandle(srvIndex);
+	srv->CreateStructuredSRV(srvIndex, skinCluster.meshSectionResource.Get(), elementCount, elementSize);
 
 	return skinCluster;
 }

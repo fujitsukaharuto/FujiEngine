@@ -12,19 +12,20 @@ SkinningCSPipe::~SkinningCSPipe() {
 void SkinningCSPipe::CreateRootSignature(ID3D12Device* device) {
 	HRESULT hr;
 
-	CD3DX12_DESCRIPTOR_RANGE rangeSRV[3] = {};
+	CD3DX12_DESCRIPTOR_RANGE rangeSRV[4] = {};
 	// t0: matrix palette
 	rangeSRV[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
 	// t1: input vertices
 	rangeSRV[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1);
 	// t2: vertex influences
 	rangeSRV[2].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 2);
+	rangeSRV[3].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 3);
 
 	CD3DX12_DESCRIPTOR_RANGE rangeUAV;
 	// u0: output vertices
 	rangeUAV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 0);
 
-	D3D12_ROOT_PARAMETER rootParams[5] = {};
+	D3D12_ROOT_PARAMETER rootParams[7] = {};
 
 	rootParams[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
 	rootParams[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
@@ -49,6 +50,17 @@ void SkinningCSPipe::CreateRootSignature(ID3D12Device* device) {
 	rootParams[4].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParams[4].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
 	rootParams[4].Descriptor.ShaderRegister = 0; // b0
+
+	rootParams[5].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParams[5].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	rootParams[5].DescriptorTable.NumDescriptorRanges = 1;
+	rootParams[5].DescriptorTable.pDescriptorRanges = &rangeSRV[3];
+
+	rootParams[6].ParameterType = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;
+	rootParams[6].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	rootParams[6].Constants.Num32BitValues = 1;
+	rootParams[6].Constants.ShaderRegister = 1;  // b1
+	rootParams[6].Constants.RegisterSpace = 0;
 
 	D3D12_ROOT_SIGNATURE_DESC rootSigDesc = {};
 	rootSigDesc.NumParameters = _countof(rootParams);

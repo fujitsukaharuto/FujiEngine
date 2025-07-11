@@ -99,7 +99,7 @@ public:
 
 	ModelData data_;
 
-	size_t GetVertexSize() { return mesh_.front().GetVertexDataSize(); }
+	size_t GetVertexSize(int i) { return mesh_[i].GetVertexDataSize(); }
 
 	void CSDispatch(const SkinCluster& skinCluster, ID3D12GraphicsCommandList* commandList);
 

@@ -77,7 +77,7 @@ void Mesh::Draw(ID3D12GraphicsCommandList* commandList) {
 	commandList->DrawIndexedInstanced(static_cast<UINT>((indexData_.size())), 1, 0, 0, 0);
 }
 
-void Mesh::AnimationDraw([[maybe_unused]]const SkinCluster& skinCluster, ID3D12GraphicsCommandList* commandList) {
+void Mesh::AnimationDraw([[maybe_unused]]const SkinCluster& skinCluster, ID3D12GraphicsCommandList* commandList, [[maybe_unused]] int index) {
 
 	commandList->IASetVertexBuffers(0, 1, &skinnedVBV_);
 	commandList->IASetIndexBuffer(&indexBufferView_);
