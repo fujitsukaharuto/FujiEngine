@@ -18,6 +18,7 @@ enum class Pipe : int {
 	Skybox,
 	Gray,
 	Gauss,
+	Outline,
 	MetaBall,
 	ShockWave,
 	Fire,

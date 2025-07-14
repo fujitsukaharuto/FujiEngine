@@ -109,7 +109,8 @@ public:
 	/// <param name="before">変更前の状態</param>
 	/// <param name="after">変更後の状態</param>
 	void TransitionResource(ID3D12Resource* resource, D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after);
-
+	void PreOutline();
+	void PostOutline();
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(Microsoft::WRL::ComPtr<ID3D12Device> device, size_t sizeInBytes);
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
@@ -125,6 +126,7 @@ public:
 	DXCompil* GetDXCompil() const { return compiler_.get(); }
 	PipelineManager* GetPipelineManager()const { return pipeManager_; }
 	D3D12_CPU_DESCRIPTOR_HANDLE GetRTVHandle() { return rtvHandles_[2]; }
+	D3D12_GPU_DESCRIPTOR_HANDLE GetDepthTexGPUHandle() { return depthTexSrvHandle_.second; }
 
 	/*void Tick();*/
 
@@ -186,6 +188,9 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap_ = nullptr;
 	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc_{};
+	D3D12_SHADER_RESOURCE_VIEW_DESC depthTextureSrvDesc_{};
+	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> depthTexSrvHandle_;
+
 
 	std::unique_ptr<DXCompil> compiler_ = nullptr;
 

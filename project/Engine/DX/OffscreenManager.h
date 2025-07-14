@@ -55,6 +55,10 @@ struct CRTElemnt {
 	Vector2 resolution;
 };
 
+struct OutlineElement {
+	Matrix4x4 projectionInverse;
+};
+
 struct LightningElement {
 	Vector2 startPos;
 	Vector2 endPos;
@@ -128,6 +132,9 @@ private:
 	ComPtr<ID3D12Resource> cRTResource_ = nullptr;
 	CRTElemnt* crtData_;
 
+	ComPtr<ID3D12Resource> outlineResource_ = nullptr;
+	OutlineElement* outlineData_;
+
 	Texture* baseTex_;
 	Texture* voronoTex_;
 	Texture* noiseTex_;
@@ -156,5 +163,6 @@ private:
 	bool isFire_ = true;
 	bool isThunder_ = true;
 	bool isCRT_ = true;
+	bool isOutline_ = true;
 
 };

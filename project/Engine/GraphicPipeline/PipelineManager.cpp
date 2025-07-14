@@ -7,6 +7,7 @@
 #include "AnimationPipeline.h"
 #include "SkyboxPipe.h"
 #include "GrayPipeline.h"
+#include "OutlinePipe.h"
 #include "MetaBallPipeline.h"
 #include "GaussPipeline.h"
 #include "NonePipeline.h"
@@ -53,8 +54,9 @@ void PipelineManager::CreatePipeline() {
 	std::unique_ptr<AnimationPipeline> animationPipline = nullptr;
 	std::unique_ptr<SkyboxPipe> skyboxPipline = nullptr;
 	std::unique_ptr<GrayPipeline> grayPipeline = nullptr;
-	std::unique_ptr<MetaBallPipeline> metaballPipeline = nullptr;
 	std::unique_ptr<GaussPipeline> gaussPipeline = nullptr;
+	std::unique_ptr<OutlinePipe> outlinePipe = nullptr;
+	std::unique_ptr<MetaBallPipeline> metaballPipeline = nullptr;
 	std::unique_ptr<NonePipeline> nonePipeline = nullptr;
 	std::unique_ptr<ShockWavePipe> shockWave = nullptr;
 	std::unique_ptr<FirePipe> firePipe = nullptr;
@@ -117,6 +119,9 @@ void PipelineManager::CreatePipeline() {
 	gaussPipeline->Initialize(dxcommon_);
 	pipelines_.push_back(std::move(gaussPipeline));
 
+	outlinePipe.reset(new OutlinePipe());
+	outlinePipe->Initialize(dxcommon_);
+	pipelines_.push_back(std::move(outlinePipe));
 
 	metaballPipeline.reset(new MetaBallPipeline());
 	metaballPipeline->Initialize(dxcommon_);

@@ -4,6 +4,7 @@
 #include "ImGuiManager/ImGuiManager.h"
 #include "MyWindow.h"
 #include "PipelineManager.h"
+#include "Engine/Camera/CameraManager.h"
 
 OffscreenManager::~OffscreenManager() {
 	dxcommon_ = nullptr;
@@ -22,6 +23,8 @@ void OffscreenManager::Update() {
 	thunderData_->progres = thunderData_->time / 1.5f;
 
 	crtData_->crtTime += 0.025f;
+
+	outlineData_->projectionInverse = Inverse(CameraManager::GetInstance()->GetCamera()->GetProjectionMatrix());
 }
 
 void OffscreenManager::DebugGUI() {
@@ -29,14 +32,15 @@ void OffscreenManager::DebugGUI() {
 	ImGui::Begin("OffScreen Debug");
 
 
-	bool preIsGrayscale_ = isGrayscale_;
-	bool preIsNonePost_ = isNonePost_;
-	bool preIsMetaBall_ = isMetaBall_;
-	bool preIsGaussian_ = isGaussian_;
-	bool preIsShock_ = isShockWave_;
-	bool preIsFire_ = isFire_;
-	bool preIsThunder_ = isThunder_;
-	bool preIsCRT_ = isCRT_;
+	bool preIsGrayscale = isGrayscale_;
+	bool preIsNonePost = isNonePost_;
+	bool preIsMetaBall = isMetaBall_;
+	bool preIsGaussian = isGaussian_;
+	bool preIsShock = isShockWave_;
+	bool preIsFire = isFire_;
+	bool preIsThunder = isThunder_;
+	bool preIsCRT = isCRT_;
+	bool preIsOutline = isOutline_;
 
 	if (ImGui::TreeNode("OffScreen ShaderPath")) {
 		ImGui::Checkbox("Gray", &isGrayscale_);
@@ -47,9 +51,10 @@ void OffscreenManager::DebugGUI() {
 		ImGui::Checkbox("fire", &isFire_);
 		ImGui::Checkbox("thunder", &isThunder_);
 		ImGui::Checkbox("crt", &isCRT_);
+		ImGui::Checkbox("outline", &isOutline_);
 		ImGui::TreePop();
 	}
-	if (isGrayscale_ && !(preIsGrayscale_)) {
+	if (isGrayscale_ && !(preIsGrayscale)) {
 		isNonePost_ = false;
 		isMetaBall_ = false;
 		isGaussian_ = false;
@@ -57,8 +62,9 @@ void OffscreenManager::DebugGUI() {
 		isFire_ = false;
 		isThunder_ = false;
 		isCRT_ = false;
+		isOutline_ = false;
 	}
-	if (isNonePost_ && !(preIsNonePost_)) {
+	if (isNonePost_ && !(preIsNonePost)) {
 		isGrayscale_ = false;
 		isMetaBall_ = false;
 		isGaussian_ = false;
@@ -66,8 +72,9 @@ void OffscreenManager::DebugGUI() {
 		isFire_ = false;
 		isThunder_ = false;
 		isCRT_ = false;
+		isOutline_ = false;
 	}
-	if (isMetaBall_ && !(preIsMetaBall_)) {
+	if (isMetaBall_ && !(preIsMetaBall)) {
 		isGrayscale_ = false;
 		isNonePost_ = false;
 		isGaussian_ = false;
@@ -75,8 +82,9 @@ void OffscreenManager::DebugGUI() {
 		isFire_ = false;
 		isThunder_ = false;
 		isCRT_ = false;
+		isOutline_ = false;
 	}
-	if (isGaussian_ && !(preIsGaussian_)) {
+	if (isGaussian_ && !(preIsGaussian)) {
 		isGrayscale_ = false;
 		isNonePost_ = false;
 		isMetaBall_ = false;
@@ -84,8 +92,9 @@ void OffscreenManager::DebugGUI() {
 		isFire_ = false;
 		isThunder_ = false;
 		isCRT_ = false;
+		isOutline_ = false;
 	}
-	if (isShockWave_ && !(preIsShock_)) {
+	if (isShockWave_ && !(preIsShock)) {
 		isGrayscale_ = false;
 		isNonePost_ = false;
 		isMetaBall_ = false;
@@ -93,8 +102,9 @@ void OffscreenManager::DebugGUI() {
 		isFire_ = false;
 		isThunder_ = false;
 		isCRT_ = false;
+		isOutline_ = false;
 	}
-	if (isFire_ && !(preIsFire_)) {
+	if (isFire_ && !(preIsFire)) {
 		isGrayscale_ = false;
 		isNonePost_ = false;
 		isMetaBall_ = false;
@@ -102,8 +112,9 @@ void OffscreenManager::DebugGUI() {
 		isShockWave_ = false;
 		isThunder_ = false;
 		isCRT_ = false;
+		isOutline_ = false;
 	}
-	if (isThunder_ && !(preIsThunder_)) {
+	if (isThunder_ && !(preIsThunder)) {
 		isGrayscale_ = false;
 		isNonePost_ = false;
 		isMetaBall_ = false;
@@ -111,8 +122,9 @@ void OffscreenManager::DebugGUI() {
 		isShockWave_ = false;
 		isFire_ = false;
 		isCRT_ = false;
+		isOutline_ = false;
 	}
-	if (isCRT_ && !(preIsCRT_)) {
+	if (isCRT_ && !(preIsCRT)) {
 		isGrayscale_ = false;
 		isNonePost_ = false;
 		isMetaBall_ = false;
@@ -120,6 +132,17 @@ void OffscreenManager::DebugGUI() {
 		isShockWave_ = false;
 		isFire_ = false;
 		isThunder_ = false;
+		isOutline_ = false;
+	}
+	if (isOutline_ && !(preIsOutline)) {
+		isGrayscale_ = false;
+		isNonePost_ = false;
+		isMetaBall_ = false;
+		isGaussian_ = false;
+		isShockWave_ = false;
+		isFire_ = false;
+		isThunder_ = false;
+		isCRT_ = false;
 	}
 
 
@@ -265,6 +288,10 @@ void OffscreenManager::CreateResource() {
 	crtData_->crtTime = 0.0f;
 	crtData_->resolution = { 1280.0f, 720.0f };
 
+	outlineResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(OutlineElement));
+	outlineData_ = nullptr;
+	outlineResource_->Map(0, nullptr, reinterpret_cast<void**>(&outlineData_));
+	outlineData_->projectionInverse = MakeIdentity4x4();
 
 	isGrayscale_ = false;
 	isNonePost_ = true;
@@ -274,6 +301,7 @@ void OffscreenManager::CreateResource() {
 	isFire_ = false;
 	isThunder_ = false;
 	isCRT_ = false;
+	isOutline_ = false;
 
 }
 
@@ -473,6 +501,20 @@ void OffscreenManager::Command() {
 		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
 		dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(1, cRTResource_->GetGPUVirtualAddress());
 		dxcommon_->GetCommandList()->DrawInstanced(3, 1, 0, 0);
+	}
+
+	if (isOutline_) {
+		dxcommon_->PreOutline();
+		dxcommon_->GetDXCommand()->SetViewAndscissor();
+		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Outline);
+
+		dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
+		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
+		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, dxcommon_->GetDepthTexGPUHandle());
+		dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(2, outlineResource_->GetGPUVirtualAddress());
+		dxcommon_->GetCommandList()->DrawInstanced(3, 1, 0, 0);
+		dxcommon_->PostOutline();
 	}
 }
 

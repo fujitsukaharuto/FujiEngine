@@ -198,8 +198,6 @@ void DXCom::CreateDepthBuffer() {
 	dsvDesc_.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	dsvDesc_.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
 	device_->CreateDepthStencilView(depthStencilResource_.Get(), &dsvDesc_, dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart());
-
-
 }
 
 void DXCom::CreateCompiler() {
@@ -252,6 +250,15 @@ void DXCom::SettingTexture() {
 	//const uint32_t descriptorSizeRTV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	//const uint32_t descriptorSizeDSV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
+	depthTextureSrvDesc_.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+	depthTextureSrvDesc_.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	depthTextureSrvDesc_.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	depthTextureSrvDesc_.Texture2D.MipLevels = 1;
+	uint32_t depthTexIndex = SRVManager::GetInstance()->Allocate();
+	depthTexSrvHandle_.first = SRVManager::GetInstance()->GetCPUDescriptorHandle(depthTexIndex);
+	depthTexSrvHandle_.second = SRVManager::GetInstance()->GetGPUDescriptorHandle(depthTexIndex);
+	device_->CreateShaderResourceView(depthStencilResource_.Get(), &depthTextureSrvDesc_, depthTexSrvHandle_.first);
+
 	offscreen_->SettingTexture();
 
 	CommandExecution();
@@ -288,7 +295,7 @@ void DXCom::PostEffect() {
 
 	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
 	commandList->OMSetRenderTargets(1, &rtvHandles_[backBufferIndex], false, &dsvHandle);
-	commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+	/*commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);*/
 
 	float clearColor[] = { 0.1f,0.25f,0.5f,1.0f };
 	commandList->ClearRenderTargetView(rtvHandles_[backBufferIndex], clearColor, 0, nullptr);
@@ -363,6 +370,16 @@ void DXCom::TransitionResource(ID3D12Resource* resource, D3D12_RESOURCE_STATES b
 	barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 
 	command_->GetList()->ResourceBarrier(1, &barrier);
+}
+
+void DXCom::PreOutline() {
+	TransitionResource(depthStencilResource_.Get(),
+		D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+}
+
+void DXCom::PostOutline() {
+	TransitionResource(depthStencilResource_.Get(),
+		D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_DEPTH_WRITE);
 }
 
 

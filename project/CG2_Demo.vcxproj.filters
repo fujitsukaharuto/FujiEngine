@@ -290,6 +290,9 @@
     <ClCompile Include="Game\GameObj\Enemy\BossItem\UnderRing.cpp">
       <Filter>Game\GameObj\Enemy\BossItem</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\GraphicPipeline\OutlinePipe.cpp">
+      <Filter>Engine\GraphicPipeline</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -634,6 +637,9 @@
     <ClInclude Include="Game\GameObj\Enemy\BossItem\UnderRing.h">
       <Filter>Game\GameObj\Enemy\BossItem</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\GraphicPipeline\OutlinePipe.h">
+      <Filter>Engine\GraphicPipeline</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -847,6 +853,9 @@
     </FxCompile>
     <FxCompile Include="resource\Shaders\CS\Engine\Skinning.CS.hlsl">
       <Filter>resource\Shaders\CS\Engine</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\DepthBasedOutline.PS.hlsl">
+      <Filter>resource\Shaders</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
