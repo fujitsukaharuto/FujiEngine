@@ -369,13 +369,13 @@ void ParticleEmitter::RandomTranslate(const Vector2& x, const Vector2& y, const 
 void ParticleEmitter::Save() {
 	json j;
 
-	j.push_back(json::array({ pos_.x,pos_.y,pos_.z }));
-	j.push_back(json::array({ particleRotate_.x,particleRotate_.y,particleRotate_.z }));
-	j.push_back(json::array({ emitSizeMax_.x,emitSizeMax_.y,emitSizeMax_.z }));
-	j.push_back(json::array({ emitSizeMin_.x,emitSizeMin_.y,emitSizeMin_.z }));
+	j["position"]         = { pos_.x, pos_.y, pos_.z };
+	j["rotate"]           = { particleRotate_.x,particleRotate_.y,particleRotate_.z };
+	j["emitMaxSize"]      = { emitSizeMax_.x,emitSizeMax_.y,emitSizeMax_.z };
+	j["emitMinSize"]      = { emitSizeMin_.x,emitSizeMin_.y,emitSizeMin_.z };
 
-	j.push_back(count_);
-	j.push_back(frequencyTime_);
+	j["count"]            = count_;
+	j["frequencyTime"]    = frequencyTime_;
 
 	j.push_back(grain_.lifeTime_);
 	j.push_back(json::array({ grain_.accele_.x,grain_.accele_.y,grain_.accele_.z }));
