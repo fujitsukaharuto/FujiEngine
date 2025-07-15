@@ -497,3 +497,73 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DXCom::CreateUAVResource(ID3D12Device* de
 
 	return bufferResource;
 }
+
+Microsoft::WRL::ComPtr<ID3D12Resource> DXCom::CreateReadbackResource(ID3D12Device* device, size_t sizeInBytes) {
+	HRESULT hr;
+
+	// CPUから読み取れるヒープ設定
+	D3D12_HEAP_PROPERTIES heapProps{};
+	heapProps.Type = D3D12_HEAP_TYPE_READBACK;
+
+	D3D12_RESOURCE_DESC resourceDesc{};
+	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+	resourceDesc.Width = sizeInBytes;
+	resourceDesc.Height = 1;
+	resourceDesc.DepthOrArraySize = 1;
+	resourceDesc.MipLevels = 1;
+	resourceDesc.SampleDesc.Count = 1;
+	resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+	resourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> readbackResource = nullptr;
+	hr = device->CreateCommittedResource(
+		&heapProps,
+		D3D12_HEAP_FLAG_NONE,
+		&resourceDesc,
+		D3D12_RESOURCE_STATE_COPY_DEST, // CPUから読む用
+		nullptr,
+		IID_PPV_ARGS(&readbackResource)
+	);
+	assert(SUCCEEDED(hr));
+
+	return readbackResource;
+}
+
+Microsoft::WRL::ComPtr<ID3D12Resource> DXCom::CreateUploadBuffer(size_t sizeInBytes, const void* initData) {
+	HRESULT hr;
+
+	D3D12_HEAP_PROPERTIES heapProps = {};
+	heapProps.Type = D3D12_HEAP_TYPE_UPLOAD;
+
+	D3D12_RESOURCE_DESC resourceDesc = {};
+	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+	resourceDesc.Width = sizeInBytes;
+	resourceDesc.Height = 1;
+	resourceDesc.DepthOrArraySize = 1;
+	resourceDesc.MipLevels = 1;
+	resourceDesc.SampleDesc.Count = 1;
+	resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> uploadBuffer;
+	hr = device_->CreateCommittedResource(
+		&heapProps,
+		D3D12_HEAP_FLAG_NONE,
+		&resourceDesc,
+		D3D12_RESOURCE_STATE_GENERIC_READ,
+		nullptr,
+		IID_PPV_ARGS(&uploadBuffer)
+	);
+	assert(SUCCEEDED(hr));
+
+	// 初期データがある場合はコピー
+	if (initData) {
+		void* mapped = nullptr;
+		D3D12_RANGE range = { 0, 0 }; // 読み取りはしない
+		hr = uploadBuffer->Map(0, &range, &mapped);
+		assert(SUCCEEDED(hr));
+		memcpy(mapped, initData, sizeInBytes);
+		uploadBuffer->Unmap(0, nullptr);
+	}
+
+	return uploadBuffer;
+}

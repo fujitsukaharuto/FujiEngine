@@ -143,7 +143,7 @@ void TitleScene::Draw() {
 	}
 
 #pragma endregion
-
+	ModelManager::GetInstance()->PickingDataCopy();
 }
 
 void TitleScene::DebugGUI() {

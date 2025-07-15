@@ -43,6 +43,12 @@ struct SpotLight
     float cosStart;
 };
 
+struct PickingBuffer
+{
+    int objID;
+    float depth;
+};
+
 ConstantBuffer<Material> gMaterial : register(b0);
 Texture2D<float4> gTexture : register(t0);
 SamplerState gSampler : register(s0);
@@ -52,7 +58,19 @@ ConstantBuffer<DirectionalLight> gDirectionnalLight : register(b1);
 ConstantBuffer<Camera> gCamera : register(b2);
 ConstantBuffer<PointLight> gPointLight : register(b3);
 ConstantBuffer<SpotLight> gSpotLight : register(b4);
+RWStructuredBuffer<PickingBuffer> gPickingBuffer : register(u0);
 
+// ピッキング制御用データ（CPU → GPU）
+cbuffer PickingData : register(b5)
+{
+    int2 pickingPixelCoord;
+    uint pickingEnable;
+};
+
+cbuffer ObjIDData : register(b6)
+{
+    uint objID;
+};
 
 
 struct PixelShaderOutput
@@ -73,6 +91,16 @@ PixelShaderOutput main(VertxShaderOutput input)
     {
         discard;
     }
+    
+    if (pickingEnable != 0 && all(int2(input.position.xy) == pickingPixelCoord))
+    {
+        if (objID != -1)
+        {
+            gPickingBuffer[0].objID = objID;
+            gPickingBuffer[0].depth = input.position.z;
+        }
+    }
+    
     if (gMaterial.enableLighting != 0)
     {
         if (gMaterial.enableLighting == 1)

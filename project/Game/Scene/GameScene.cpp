@@ -4,6 +4,7 @@
 #include "FPSKeeper.h"
 #include "Game/GameObj/FollowCamera.h"
 #include "Game/GameObj/Player/PlayerBullet.h"
+#include "Engine/Model/ModelManager.h"
 
 #include "Particle/ParticleManager.h"
 #include "Scene/SceneManager.h"
@@ -218,6 +219,7 @@ void GameScene::Draw() {
 	}
 
 #pragma endregion
+	ModelManager::GetInstance()->PickingDataCopy();
 }
 
 void GameScene::DebugGUI() {

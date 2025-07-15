@@ -170,6 +170,7 @@ void GameRun::Update() {
 	input_->Update();
 	cameraManager_->Update();
 	dxcommon_->OffscreenUpDate();
+	modelManager_->PickingUpdate();
 
 #ifdef _DEBUG
 	if (input_->TriggerKey(DIK_F12)) {
@@ -229,7 +230,13 @@ void GameRun::DebugGUI() {
 			sceneManager_->DebugGUI();
 			ImGui::EndTabItem();
 		}
+		if (ModelManager::GetInstance()->GetPickedID() > 1000) {
+			ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+		}
 		if (ImGui::BeginTabItem("EditorObject")) {
+			if (ModelManager::GetInstance()->GetPickedID() > 1000) {
+				ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+			}
 			commandManger_->DebugGUI();
 			ImGui::EndTabItem();
 		}
@@ -243,7 +250,8 @@ void GameRun::DebugGUI() {
 		}
 		ImGui::EndTabBar();
 	}
-
+	ImGui::Text("%d", modelManager_->GetPickedID());
+	ImGui::Text("%d,%d", modelManager_->GetPickedCoord(0), modelManager_->GetPickedCoord(1));
 	ImGui::End();
 #endif // _DEBUG
 }

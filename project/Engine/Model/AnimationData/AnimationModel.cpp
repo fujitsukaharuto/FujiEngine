@@ -307,6 +307,7 @@ void AnimationModel::Draw(Material* mate) {
 	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Normal);
 	dxcommon_->GetDXCommand()->GetList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	lightManager_->SetLightCommand(dxcommon_->GetCommandList());
+	ModelManager::GetInstance()->PickingCommand();
 }
 
 void AnimationModel::AnimeDraw() {

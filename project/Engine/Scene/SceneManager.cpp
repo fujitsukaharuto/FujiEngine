@@ -7,6 +7,7 @@
 #include "Game/Scene/GameScene.h"
 #include "Game/Scene/ResultScene.h"
 #include "ImGuiManager.h"
+#include "Engine/Model/ModelManager.h"
 
 
 SceneManager::SceneManager() {

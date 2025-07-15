@@ -87,7 +87,7 @@ void ResultScene::Draw() {
 	}
 
 #pragma endregion
-
+	ModelManager::GetInstance()->PickingDataCopy();
 }
 
 void ResultScene::DebugGUI() {

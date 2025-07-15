@@ -1,18 +1,11 @@
 #pragma once
+#include <wrl/client.h>
+#include <d3d12.h>
+#include <vector>
 #include "Engine/Math/Vector/Vector2.h"
 
 class DXCom;
 class LightManager;
-
-struct PickingBuffer {
-	int objID;
-	float depth;
-};
-
-struct PickingData {
-	Vector2 pickingPixelCoord;
-	uint32_t pickingEnable;
-};
 
 
 class Object3dCommon {

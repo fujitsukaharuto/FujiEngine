@@ -2,6 +2,7 @@
 #include "Engine/DX/DXCom.h"
 #include "LightManager.h"
 #include "TextureManager.h"
+#include "Engine/Model/ModelManager.h"
 
 Sprite::Sprite() {
 	dxcommon_ = TextureManager::GetInstance()->ShareDXCom();
@@ -21,7 +22,9 @@ void Sprite::Load(const std::string& fileName) {
 
 void Sprite::Draw() {
 	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
-
+	
+	ModelManager::GetInstance()->PickingCommand();
+	cList->SetGraphicsRootConstantBufferView(9, objIDDataResource_->GetGPUVirtualAddress());
 	cList->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	cList->IASetIndexBuffer(&indexBufferView_);
 	cList->SetGraphicsRootConstantBufferView(0, material_.GetMaterialResource()->GetGPUVirtualAddress());
@@ -142,6 +145,11 @@ void Sprite::InitializeBuffer() {
 	cameraPosData_ = nullptr;
 	cameraPosResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraPosData_));
 	cameraPosData_->worldPosition = { 0.0f,0.0f,0.0f };
+
+	objIDDataResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(ObjIDData));
+	objIDData_ = nullptr;
+	objIDDataResource_->Map(0, nullptr, reinterpret_cast<void**>(&objIDData_));
+	objIDData_->objID = -1;
 }
 
 void Sprite::AdjustTextureSize() {

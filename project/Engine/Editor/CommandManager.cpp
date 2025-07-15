@@ -2,6 +2,7 @@
 #include "Engine/Input/Input.h"
 #include "Engine/Editor/JsonSerializer.h"
 #include "Engine/ImGuiManager/ImGuiManager.h"
+#include "Engine/Model/ModelManager.h"
 #include <fstream>
 
 CommandManager::~CommandManager() {
@@ -89,6 +90,9 @@ void CommandManager::DebugGUI() {
 	for (auto& group: objectList) {
 		EditorObj* obj = group.second.get();
 		if (obj) {
+			if (ModelManager::GetInstance()->GetPickedID() == obj->obj->GetObjID() && ModelManager::GetInstance()->GetIsOnce()) {
+				openedHeaderID = obj->id;
+			}
 			if (obj->parent == -1) {
 				EditorObjGUI(*obj);
 			} else if (!objectList[obj->parent]) {

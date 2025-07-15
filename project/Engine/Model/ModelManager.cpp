@@ -5,6 +5,13 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include "Engine/DX/SRVManager.h"
+#include "Engine/ImGuiManager/ImGuiManager.h"
+#include "Engine/Input/Input.h"
+#ifdef _DEBUG
+#include "ImGuizmo.h"
+#endif // _DEBUG
+
 
 
 ModelManager::~ModelManager() {
@@ -21,11 +28,42 @@ void ModelManager::Initialize(DXCom* pDxcom, LightManager* pLight) {
 	dxcommon_ = pDxcom;
 	lightManager_ = pLight;
 	LoadModelFile();
+
+	pickingBufferResource_ = dxcommon_->CreateUAVResource(dxcommon_->GetDevice(), sizeof(PickingBuffer));
+
+	uint32_t srvIndex = SRVManager::GetInstance()->Allocate();
+	pickBufferHandle_.first = SRVManager::GetInstance()->GetCPUDescriptorHandle(srvIndex);
+	pickBufferHandle_.second = SRVManager::GetInstance()->GetGPUDescriptorHandle(srvIndex);
+	SRVManager::GetInstance()->CreateStructuredUAV(srvIndex, pickingBufferResource_.Get(),
+		static_cast<UINT>(1), static_cast<UINT>(sizeof(PickingBuffer)));
+
+	pickingBufferReadBack_ = dxcommon_->CreateReadbackResource(dxcommon_->GetDevice(), sizeof(PickingBuffer));
+
+
+	pickingDataResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(PickingData));
+	pickingData_ = nullptr;
+	pickingDataResource_->Map(0, nullptr, reinterpret_cast<void**>(&pickingData_));
+	pickingData_->pickingEnable = 0;
+	pickingData_->pickingPixelCoord[0] = -1;
+	pickingData_->pickingPixelCoord[1] = -1;
+
+
+	PickingBuffer init{};
+	init.objID = -1;
+	init.depth = 1.0f;
+	ComPtr<ID3D12Resource> initUploadBuffer = dxcommon_->CreateUploadBuffer(sizeof(PickingBuffer), &init);
+
+	dxcommon_->GetCommandList()->CopyResource(pickingBufferResource_.Get(), initUploadBuffer.Get());
+	dxcommon_->CommandExecution();
 }
 
 
 void ModelManager::Finalize() {
 	dxcommon_ = nullptr;
+
+	pickingBufferResource_.Reset();
+	pickingBufferReadBack_.Reset();
+	pickingDataResource_.Reset();
 
 	modelFileList.clear();
 	models_.clear();
@@ -469,6 +507,54 @@ void ModelManager::LoadModelFile() {
 	}
 
 #endif // _DEBUG
+}
+
+void ModelManager::PickingUpdate() {
+#ifdef _DEBUG
+	if (!pickingData_ || !dxcommon_) return;
+
+	ImGuiIO& io = ImGui::GetIO();
+
+	Vector2 mousePos = { io.MousePos.x, io.MousePos.y };
+	bool isMouseOnGUI = io.WantCaptureMouse || ImGuizmo::IsOver() || ImGuizmo::IsUsing();
+
+	// === ピッキング有効／無効の設定 ===
+	if (isMouseOnGUI) {
+		pickingData_->pickingEnable = 0;
+		pickingData_->pickingPixelCoord[0] = -1;
+		pickingData_->pickingPixelCoord[1] = -1;
+	} else if (Input::GetInstance()->IsTriggerMouse(0)){
+		isPicked_ = true;
+		pickingData_->pickingEnable = 1;
+		pickingData_->pickingPixelCoord[0] = int(mousePos.x);
+		pickingData_->pickingPixelCoord[1] = int(mousePos.y);
+	} else {
+		pickingData_->pickingEnable = 0;
+	}
+
+	PickingBuffer* mapped = nullptr;
+	D3D12_RANGE readRange{ 0, sizeof(PickingBuffer) }; // 読み取り範囲
+	if (SUCCEEDED(pickingBufferReadBack_->Map(0, &readRange, reinterpret_cast<void**>(&mapped)))) {
+		lastPicked_.objID = mapped->objID;
+		lastPicked_.depth = mapped->depth;
+		pickingBufferReadBack_->Unmap(0, nullptr);
+	}
+
+#endif // _DEBUG
+}
+
+void ModelManager::PickingCommand() {
+	dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(7, pickBufferHandle_.second);
+	dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(8, pickingDataResource_->GetGPUVirtualAddress());
+}
+
+void ModelManager::PickingDataCopy() {
+	if (isOnce_) isOnce_ = false;
+	if (isPicked_) {
+		isPicked_ = false;
+		isOnce_ = true;
+	}
+	dxcommon_->GetCommandList()->CopyResource(pickingBufferReadBack_.Get(), pickingBufferResource_.Get());
 }
 
 MaterialDataPath ModelManager::LoadMaterialFile(const std::string& filename) {

@@ -10,6 +10,7 @@ void CreateObjCommand::Do() {
 	obj->name = objName;
 	obj->obj = std::make_unique<Object3d>();
 	obj->obj->Create(modelName);
+	obj->obj->SetEditorObjParameter();
 	obj->modelName = obj->obj->GetModelName();
 
 	obj->inputLabel = "##input" + std::to_string(obj->id);

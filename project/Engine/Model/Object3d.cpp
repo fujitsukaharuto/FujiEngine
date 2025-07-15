@@ -12,6 +12,7 @@
 namespace ed = ax::NodeEditor;
 #endif // _DEBUG
 
+int Object3d::useObjID_ = 0;
 
 Object3d::Object3d() {
 	dxcommon_ = ModelManager::GetInstance()->ShareDXCom();
@@ -152,6 +153,8 @@ void Object3d::Draw(Material* mate, bool isAdd) {
 	}
 	cList->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
 	cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_->GetGPUVirtualAddress());
+	cList->SetGraphicsRootConstantBufferView(9, objIDDataResource_->GetGPUVirtualAddress());
+	ModelManager::GetInstance()->PickingCommand();
 
 	if (model_) {
 		model_->Draw(cList, mate);
@@ -227,6 +230,9 @@ Vector3 Object3d::GetWorldPos() const {
 void Object3d::DebugGUI() {
 #ifdef _DEBUG
 	ImGui::Indent();
+	if (ModelManager::GetInstance()->GetPickedID() == objIDData_->objID && objIDData_->objID != -1) {
+		ImGui::SetNextItemOpen(true, ImGuiCond_Always);
+	}
 	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Selected;
 	if (ImGui::TreeNodeEx("Trans", flags)) {
 		ImGui::DragFloat3("position", &transform.translate.x, 0.01f);
@@ -483,6 +489,10 @@ void Object3d::SetModel(const std::string& fileName) {
 
 }
 
+void Object3d::SetEditorObjParameter() {
+	objIDData_->objID += 1000;
+}
+
 void Object3d::CreateWVP() {
 	wvpResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(TransformationMatrix));
 	wvpDate_ = nullptr;
@@ -495,6 +505,11 @@ void Object3d::CreateWVP() {
 	cameraPosData_ = nullptr;
 	cameraPosResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraPosData_));
 	cameraPosData_->worldPosition = camera_->transform.translate;
+
+	objIDDataResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(ObjIDData));
+	objIDData_ = nullptr;
+	objIDDataResource_->Map(0, nullptr, reinterpret_cast<void**>(&objIDData_));
+	objIDData_->objID = ++useObjID_;
 }
 
 void Object3d::SetWVP() {

@@ -2,7 +2,10 @@
 #include <wrl/client.h>
 #include "Math/Matrix/MatrixCalculation.h"
 #include "Material.h"
+#include "Object3d.h"
 
+
+// Pipe別にしたい
 
 class DXCom;
 class PointLight;
@@ -87,6 +90,9 @@ private:
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> cameraPosResource_ = nullptr;
 	CameraForGPU* cameraPosData_ = nullptr;
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> objIDDataResource_ = nullptr;
+	ObjIDData* objIDData_ = nullptr;
 
 	Material material_;
 	std::string nowtexture;

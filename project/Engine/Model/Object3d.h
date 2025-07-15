@@ -15,6 +15,11 @@ class LightManager;
 class PointLight;
 class SpotLight;
 
+struct ObjIDData {
+	int objID;
+	uint32_t padding[3];
+};
+
 class Object3d {
 public:
 	Object3d();
@@ -98,6 +103,10 @@ public:
 
 	Trans transform{};
 
+	int GetObjID() { return objIDData_->objID; }
+
+	void SetEditorObjParameter();
+
 private:
 
 	void CreateWVP();
@@ -111,7 +120,6 @@ private:
 	void SetTextureNode();
 
 private:
-	Object3dCommon* common_;
 	std::unique_ptr<Model> model_ = nullptr;
 	std::string modelName_;
 
@@ -124,6 +132,10 @@ private:
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> cameraPosResource_ = nullptr;
 	CameraForGPU* cameraPosData_ = nullptr;
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> objIDDataResource_ = nullptr;
+	ObjIDData* objIDData_ = nullptr;
+	static int useObjID_;
 
 	Matrix4x4 billboardMatrix_;
 	std::string nowTextureName;

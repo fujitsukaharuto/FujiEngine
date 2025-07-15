@@ -80,7 +80,7 @@ void ParticleDebugScene::Draw() {
 	}
 
 #pragma endregion
-
+	ModelManager::GetInstance()->PickingDataCopy();
 }
 
 void ParticleDebugScene::DebugGUI() {

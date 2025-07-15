@@ -1,8 +1,10 @@
 #pragma once
 #include <string>
 #include <memory>
+#include <vector>
 #include <map>
 #include "Model.h"
+#include "Engine/Math/Vector/Vector2.h"
 #include <assimp/scene.h>
 
 #include "externals/DirectXTex/DirectXTex.h"
@@ -11,6 +13,20 @@
 
 class DXCom;
 class LightManager;
+
+
+struct PickingBuffer {
+	int objID;
+	float depth;
+	uint32_t padding[2] = { 0,0 };
+};
+
+struct PickingData {
+	int pickingPixelCoord[2];
+	uint32_t pickingEnable;
+	uint32_t padding = 0;
+};
+
 
 class ModelManager {
 public:
@@ -44,6 +60,13 @@ public:
 	void LoadModelFile();
 	const std::vector<std::string>& GetModelFiles() { return modelFileList; }
 
+	void PickingUpdate();
+	void PickingCommand();
+	void PickingDataCopy();
+	int GetPickedID() { return lastPicked_.objID; }
+	int GetPickedCoord(int i) { return pickingData_->pickingPixelCoord[i]; }
+	bool GetIsOnce() { return isOnce_; }
+
 private:
 
 	static MaterialDataPath LoadMaterialFile(const std::string& filename);
@@ -60,4 +83,15 @@ private:
 
 	std::vector<std::string> modelFileList;
 
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> pickingBufferResource_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> pickingBufferReadBack_ = nullptr;
+	PickingBuffer lastPicked_;
+
+	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> pickBufferHandle_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> pickingDataResource_ = nullptr;
+	PickingData* pickingData_ = nullptr;
+
+	bool isPicked_ = false;
+	bool isOnce_ = false;
 };
