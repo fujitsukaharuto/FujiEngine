@@ -29,6 +29,9 @@ AnimationModel::~AnimationModel() {
 void AnimationModel::DebugGUI() {
 #ifdef _DEBUG
 	ImGui::Indent();
+	if (ImGui::DragFloat("EnvironmentCoeff", &environmentCoeff_, 0.01f, 0.0f, 1.0f)) {
+		model_->SetEnvironment(environmentCoeff_);
+	}
 	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Selected;
 	if (ImGui::TreeNodeEx("animation", flags)) {
 
@@ -285,7 +288,7 @@ void AnimationModel::CSDispatch() {
 void AnimationModel::Draw(Material* mate) {
 	SetWVP();
 
-	if (model_) {
+	if (model_ && !isMirrorObj_) {
 		model_->TransBarrier();
 	}
 
@@ -299,8 +302,10 @@ void AnimationModel::Draw(Material* mate) {
 	cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_->GetGPUVirtualAddress());
 	cList->SetGraphicsRootDescriptorTable(7, environment_->gpuHandle);
 
-	if (model_) {
+	if (model_ && !isMirrorObj_) {
 		model_->AnimationDraw(skinCluster_, cList, mate);
+	} else if (isMirrorObj_) {
+		model_->Draw(cList, mate);
 	}
 
 	dxcommon_->GetDXCommand()->SetViewAndscissor();
@@ -511,6 +516,11 @@ void AnimationModel::SetLightEnable(LightMode mode) {
 	model_->SetLightEnable(mode);
 }
 
+void AnimationModel::SetEnvironmentCoeff(float environment) {
+	environmentCoeff_ = environment;
+	model_->SetEnvironment(environment);
+}
+
 void AnimationModel::SetModel(const std::string& fileName) {
 	model_ = std::make_unique<Model>();
 	model_->data_ = ModelManager::FindModel(fileName);
@@ -535,6 +545,12 @@ void AnimationModel::SetModel(const std::string& fileName) {
 		newMesh.CreateMesh();
 		model_->AddMesh(newMesh);
 	}
+}
+
+void AnimationModel::IsMirrorOBJ(bool is) {
+	isMirrorObj_ = is;
+	model_->CreateEnvironment();
+	environment_ = TextureManager::GetInstance()->LoadTexture("skyboxTexture.dds");
 }
 
 int32_t AnimationModel::CreateJoint(const Node& node, const std::optional<int32_t>& parent, std::vector<Joint>& joints) {

@@ -85,7 +85,11 @@ public:
 
 	void SetLightEnable(LightMode mode);
 
+	void SetEnvironmentCoeff(float environment);
+
 	void SetModel(const std::string& fileName);
+
+	void IsMirrorOBJ(bool is);
 
 	void IsAnimation(bool is) { isAnimation_ = is; }
 
@@ -119,6 +123,9 @@ private:
 	DXCom* dxcommon_;
 	LightManager* lightManager_;
 	Camera* camera_;
+
+	bool isMirrorObj_ = false;
+	float environmentCoeff_ = 0.0f;
 
 	std::list<std::string> parentJointName_;
 	std::list<Matrix4x4> skeltonParents_;

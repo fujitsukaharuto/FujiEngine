@@ -82,6 +82,8 @@ public:
 	/// </summary>
 	void SetAlphaRef(float ref);
 
+	void SetEnvironment(float env);
+
 	void SetTexture(const std::string& name);
 
 	void SetTextureName(const std::string& name);

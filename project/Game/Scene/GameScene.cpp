@@ -42,8 +42,10 @@ void GameScene::Initialize() {
 	black_->SetAnchor({ 0.0f,0.0f });
 #pragma endregion
 
-	terrain = std::make_unique<Object3d>();
+	terrain = std::make_unique<AnimationModel>();
 	terrain->Create("ground.obj");
+	terrain->IsMirrorOBJ(true);
+	terrain->SetEnvironmentCoeff(0.3f);
 	terrain->SetTexture("grass.jpg");
 	terrain->transform.scale = { 1.0f,1.0f,1.0f };
 	terrain->SetUVScale({ 20.0f,20.0f }, { 0.0f,0.0f });
@@ -231,6 +233,10 @@ void GameScene::DebugGUI() {
 	player_->DebugGUI();
 
 	boss_->DebugGUI();
+
+	if (ImGui::CollapsingHeader("terrain")) {
+		terrain->DebugGUI();
+	}
 
 	ImGui::Unindent();
 #endif // _DEBUG

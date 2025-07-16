@@ -93,6 +93,12 @@ void Model::SetAlphaRef(float ref) {
 	}
 }
 
+void Model::SetEnvironment(float env) {
+	for (Material& material : material_) {
+		material.SetEnvironment(env);
+	}
+}
+
 void Model::SetTexture(const std::string& name) {
 	if (nowTextuer == name) {
 		return;

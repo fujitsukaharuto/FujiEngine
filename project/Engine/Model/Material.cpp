@@ -81,6 +81,14 @@ void Material::SetLightEnable(LightMode mode) {
 	materialDate_->enableLighting = static_cast<int32_t>(mode);
 }
 
+void Material::SetEnvironment(float env) {
+	if (isEnvironment_) {
+		materialEnvironment_->environmentCoefficient = env;
+	} else {
+		materialDate_->shininess = env;
+	}
+}
+
 Matrix4x4 Material::MakeScale4x4(const Vector3& scale) {
 	Matrix4x4 scaleMatrix = MakeIdentity4x4();
 

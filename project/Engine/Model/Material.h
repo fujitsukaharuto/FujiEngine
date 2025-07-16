@@ -73,6 +73,8 @@ public:
 
 	void SetLightEnable(LightMode mode);
 
+	void SetEnvironment(float env);
+
 private:
 
 	DXCom* dxcommon_;
