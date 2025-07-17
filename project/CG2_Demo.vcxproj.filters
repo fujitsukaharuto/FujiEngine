@@ -20,12 +20,6 @@
     <ClCompile Include="Engine\GraphicPipeline\BasePipeline.cpp">
       <Filter>Engine\GraphicPipeline</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\GraphicPipeline\GaussPipeline.cpp">
-      <Filter>Engine\GraphicPipeline</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\GraphicPipeline\GrayPipeline.cpp">
-      <Filter>Engine\GraphicPipeline</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\GraphicPipeline\MetaBallPipeline.cpp">
       <Filter>Engine\GraphicPipeline</Filter>
     </ClCompile>
@@ -176,9 +170,6 @@
     <ClCompile Include="Engine\DX\OffscreenManager.cpp">
       <Filter>Engine\DX</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\GraphicPipeline\GrayCSPipe.cpp">
-      <Filter>Engine\GraphicPipeline</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Model\AnimationData\AnimationModel.cpp">
       <Filter>Engine\Model\AnimationData</Filter>
     </ClCompile>
@@ -223,9 +214,6 @@
     </ClCompile>
     <ClCompile Include="Game\GameObj\Player\PlayerBullet.cpp">
       <Filter>Game\GameObj\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\GraphicPipeline\CRTCSPipe.cpp">
-      <Filter>Engine\GraphicPipeline</Filter>
     </ClCompile>
     <ClCompile Include="Game\GameObj\Enemy\Boss.cpp">
       <Filter>Game\GameObj\Enemy</Filter>
@@ -290,11 +278,20 @@
     <ClCompile Include="Game\GameObj\Enemy\BossItem\UnderRing.cpp">
       <Filter>Game\GameObj\Enemy\BossItem</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\GraphicPipeline\OutlinePipe.cpp">
-      <Filter>Engine\GraphicPipeline</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\GraphicPipeline\SpritePipe.cpp">
       <Filter>Engine\GraphicPipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\GraphicPipeline\CSPipe\OutlineCSPipe.cpp">
+      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\GraphicPipeline\CSPipe\GaussCSPipe.cpp">
+      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\GraphicPipeline\CSPipe\CRTCSPipe.cpp">
+      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\GraphicPipeline\CSPipe\GrayCSPipe.cpp">
+      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -314,12 +311,6 @@
       <Filter>Engine\DX</Filter>
     </ClInclude>
     <ClInclude Include="Engine\GraphicPipeline\BasePipeline.h">
-      <Filter>Engine\GraphicPipeline</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\GaussPipeline.h">
-      <Filter>Engine\GraphicPipeline</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\GrayPipeline.h">
       <Filter>Engine\GraphicPipeline</Filter>
     </ClInclude>
     <ClInclude Include="Engine\GraphicPipeline\MetaBallPipeline.h">
@@ -481,9 +472,6 @@
     <ClInclude Include="Engine\DX\OffscreenManager.h">
       <Filter>Engine\DX</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\GrayCSPipe.h">
-      <Filter>Engine\GraphicPipeline</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\Math\Animation\Keyframe.h">
       <Filter>Engine\Math\Animation</Filter>
     </ClInclude>
@@ -565,9 +553,6 @@
     <ClInclude Include="Game\GameObj\Player\PlayerBullet.h">
       <Filter>Game\GameObj\Player</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\CRTCSPipe.h">
-      <Filter>Engine\GraphicPipeline</Filter>
-    </ClInclude>
     <ClInclude Include="Game\GameObj\Enemy\Boss.h">
       <Filter>Game\GameObj\Enemy</Filter>
     </ClInclude>
@@ -640,11 +625,23 @@
     <ClInclude Include="Game\GameObj\Enemy\BossItem\UnderRing.h">
       <Filter>Game\GameObj\Enemy\BossItem</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\OutlinePipe.h">
-      <Filter>Engine\GraphicPipeline</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\GraphicPipeline\SpritePipe.h">
       <Filter>Engine\GraphicPipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\GraphicPipeline\PipeKind.h">
+      <Filter>Engine\GraphicPipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\GraphicPipeline\CSPipe\OutlineCSPipe.h">
+      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\GraphicPipeline\CSPipe\GaussCSPipe.h">
+      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\GraphicPipeline\CSPipe\CRTCSPipe.h">
+      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\GraphicPipeline\CSPipe\GrayCSPipe.h">
+      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -771,6 +768,9 @@
     <Filter Include="Game\GameObj\Enemy\BossItem">
       <UniqueIdentifier>{6f67285b-3cf8-4b8c-8d42-5873aa75a24d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\GraphicPipeline\CSPipe">
+      <UniqueIdentifier>{d918235d-47db-4aad-82b9-b5ab9d7beab9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resource\Shaders\GaussianBlur.PS.hlsl">
@@ -847,6 +847,12 @@
     </FxCompile>
     <FxCompile Include="resource\Shaders\Sprite.PS.hlsl">
       <Filter>resource\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\CS\Outline.CS.hlsl">
+      <Filter>resource\Shaders\CS</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\CS\Gaussian.CS.hlsl">
+      <Filter>resource\Shaders\CS</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>

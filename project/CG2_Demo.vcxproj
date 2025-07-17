@@ -126,16 +126,15 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\GlobalVariables\GlobalVariables.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\AnimationPipeline.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\BasePipeline.cpp" />
-    <ClCompile Include="Engine\GraphicPipeline\CRTCSPipe.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\CRTPipe.cpp" />
+    <ClCompile Include="Engine\GraphicPipeline\CSPipe\CRTCSPipe.cpp" />
+    <ClCompile Include="Engine\GraphicPipeline\CSPipe\GaussCSPipe.cpp" />
+    <ClCompile Include="Engine\GraphicPipeline\CSPipe\GrayCSPipe.cpp" />
+    <ClCompile Include="Engine\GraphicPipeline\CSPipe\OutlineCSPipe.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\FirePipe.cpp" />
-    <ClCompile Include="Engine\GraphicPipeline\GaussPipeline.cpp" />
-    <ClCompile Include="Engine\GraphicPipeline\GrayCSPipe.cpp" />
-    <ClCompile Include="Engine\GraphicPipeline\GrayPipeline.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\Line3dPipe.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\MetaBallPipeline.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\NonePipeline.cpp" />
-    <ClCompile Include="Engine\GraphicPipeline\OutlinePipe.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\ParticlePipeline.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\Pipeline.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\PipelineManager.cpp" />
@@ -229,17 +228,17 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\GlobalVariables\GlobalVariables.h" />
     <ClInclude Include="Engine\GraphicPipeline\AnimationPipeline.h" />
     <ClInclude Include="Engine\GraphicPipeline\BasePipeline.h" />
-    <ClInclude Include="Engine\GraphicPipeline\CRTCSPipe.h" />
     <ClInclude Include="Engine\GraphicPipeline\CRTPipe.h" />
+    <ClInclude Include="Engine\GraphicPipeline\CSPipe\CRTCSPipe.h" />
+    <ClInclude Include="Engine\GraphicPipeline\CSPipe\GaussCSPipe.h" />
+    <ClInclude Include="Engine\GraphicPipeline\CSPipe\GrayCSPipe.h" />
+    <ClInclude Include="Engine\GraphicPipeline\CSPipe\OutlineCSPipe.h" />
     <ClInclude Include="Engine\GraphicPipeline\FirePipe.h" />
-    <ClInclude Include="Engine\GraphicPipeline\GaussPipeline.h" />
-    <ClInclude Include="Engine\GraphicPipeline\GrayCSPipe.h" />
-    <ClInclude Include="Engine\GraphicPipeline\GrayPipeline.h" />
     <ClInclude Include="Engine\GraphicPipeline\Line3dPipe.h" />
     <ClInclude Include="Engine\GraphicPipeline\MetaBallPipeline.h" />
     <ClInclude Include="Engine\GraphicPipeline\NonePipeline.h" />
-    <ClInclude Include="Engine\GraphicPipeline\OutlinePipe.h" />
     <ClInclude Include="Engine\GraphicPipeline\ParticlePipeline.h" />
+    <ClInclude Include="Engine\GraphicPipeline\PipeKind.h" />
     <ClInclude Include="Engine\GraphicPipeline\Pipeline.h" />
     <ClInclude Include="Engine\GraphicPipeline\PipelineManager.h" />
     <ClInclude Include="Engine\GraphicPipeline\ShockWavePipe.h" />
@@ -357,7 +356,23 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
+    <FxCompile Include="resource\Shaders\CS\Gaussian.CS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.0</ShaderModel>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="resource\Shaders\CS\Grayscale.CS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.0</ShaderModel>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\CS\Outline.CS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>

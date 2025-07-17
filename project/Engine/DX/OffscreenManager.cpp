@@ -35,114 +35,76 @@ void OffscreenManager::DebugGUI() {
 	bool preIsGrayscale = isGrayscale_;
 	bool preIsNonePost = isNonePost_;
 	bool preIsMetaBall = isMetaBall_;
-	bool preIsGaussian = isGaussian_;
 	bool preIsShock = isShockWave_;
 	bool preIsFire = isFire_;
 	bool preIsThunder = isThunder_;
 	bool preIsCRT = isCRT_;
-	bool preIsOutline = isOutline_;
 
 	if (ImGui::TreeNode("OffScreen ShaderPath")) {
 		ImGui::Checkbox("Gray", &isGrayscale_);
 		ImGui::Checkbox("None", &isNonePost_);
 		ImGui::Checkbox("Meta", &isMetaBall_);
-		ImGui::Checkbox("Blur", &isGaussian_);
 		ImGui::Checkbox("shock", &isShockWave_);
 		ImGui::Checkbox("fire", &isFire_);
 		ImGui::Checkbox("thunder", &isThunder_);
 		ImGui::Checkbox("crt", &isCRT_);
-		ImGui::Checkbox("outline", &isOutline_);
 		ImGui::TreePop();
 	}
 	if (isGrayscale_ && !(preIsGrayscale)) {
 		isNonePost_ = false;
 		isMetaBall_ = false;
-		isGaussian_ = false;
 		isShockWave_ = false;
 		isFire_ = false;
 		isThunder_ = false;
 		isCRT_ = false;
-		isOutline_ = false;
 	}
 	if (isNonePost_ && !(preIsNonePost)) {
 		isGrayscale_ = false;
 		isMetaBall_ = false;
-		isGaussian_ = false;
 		isShockWave_ = false;
 		isFire_ = false;
 		isThunder_ = false;
 		isCRT_ = false;
-		isOutline_ = false;
 	}
 	if (isMetaBall_ && !(preIsMetaBall)) {
 		isGrayscale_ = false;
 		isNonePost_ = false;
-		isGaussian_ = false;
 		isShockWave_ = false;
 		isFire_ = false;
 		isThunder_ = false;
 		isCRT_ = false;
-		isOutline_ = false;
-	}
-	if (isGaussian_ && !(preIsGaussian)) {
-		isGrayscale_ = false;
-		isNonePost_ = false;
-		isMetaBall_ = false;
-		isShockWave_ = false;
-		isFire_ = false;
-		isThunder_ = false;
-		isCRT_ = false;
-		isOutline_ = false;
 	}
 	if (isShockWave_ && !(preIsShock)) {
 		isGrayscale_ = false;
 		isNonePost_ = false;
 		isMetaBall_ = false;
-		isGaussian_ = false;
 		isFire_ = false;
 		isThunder_ = false;
 		isCRT_ = false;
-		isOutline_ = false;
 	}
 	if (isFire_ && !(preIsFire)) {
 		isGrayscale_ = false;
 		isNonePost_ = false;
 		isMetaBall_ = false;
-		isGaussian_ = false;
 		isShockWave_ = false;
 		isThunder_ = false;
 		isCRT_ = false;
-		isOutline_ = false;
 	}
 	if (isThunder_ && !(preIsThunder)) {
 		isGrayscale_ = false;
 		isNonePost_ = false;
 		isMetaBall_ = false;
-		isGaussian_ = false;
 		isShockWave_ = false;
 		isFire_ = false;
 		isCRT_ = false;
-		isOutline_ = false;
 	}
 	if (isCRT_ && !(preIsCRT)) {
 		isGrayscale_ = false;
 		isNonePost_ = false;
 		isMetaBall_ = false;
-		isGaussian_ = false;
 		isShockWave_ = false;
 		isFire_ = false;
 		isThunder_ = false;
-		isOutline_ = false;
-	}
-	if (isOutline_ && !(preIsOutline)) {
-		isGrayscale_ = false;
-		isNonePost_ = false;
-		isMetaBall_ = false;
-		isGaussian_ = false;
-		isShockWave_ = false;
-		isFire_ = false;
-		isThunder_ = false;
-		isCRT_ = false;
 	}
 
 
@@ -296,12 +258,10 @@ void OffscreenManager::CreateResource() {
 	isGrayscale_ = false;
 	isNonePost_ = true;
 	isMetaBall_ = false;
-	isGaussian_ = false;
 	isShockWave_ = false;
 	isFire_ = false;
 	isThunder_ = false;
 	isCRT_ = false;
-	isOutline_ = false;
 
 }
 
@@ -332,6 +292,8 @@ void OffscreenManager::SettingTexture() {
 	noiseDirTex_ = TextureManager::GetInstance()->LoadTexture("worley_Noise.jpg");
 	noiseDirTex_ = TextureManager::GetInstance()->LoadTexture("perlin_Noise.png");
 	nowTex = 2;
+
+	InitializePostEffects();
 }
 
 void OffscreenManager::Command() {
@@ -364,35 +326,47 @@ void OffscreenManager::Command() {
 					D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 			}
 
-
-			if (i == 0) {
-				dxcommon_->GetPipelineManager()->SetCSPipeline(Pipe::GrayCS);
-				// 3. SRVとUAVをセット
-				dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(0, inputSRVHandle);   // 入力テクスチャ
-				dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(1, outputUAVHandle);  // 出力テクスチャ
-				// 4. 定数バッファ(CBV)をバインド
-				dxcommon_->GetCommandList()->SetComputeRootConstantBufferView(2, grayCSResource_->GetGPUVirtualAddress());    // b0 レジスタ
-				// 5. コンピュートシェーダーを実行 (Dispatch)
-				dxcommon_->GetCommandList()->Dispatch(
-					(MyWin::kWindowWidth + 7) / 8,  // スレッドグループ数 (8x8x1の場合)
-					(MyWin::kWindowHeight + 7) / 8,
-					1
-				);
+			if (i==0) {
+				dxcommon_->PreOutline();
+				dxcommon_->GetPipelineManager()->SetCSPipeline(postEffects[3].pipeline);
+				postEffects[3].setup(dxcommon_->GetCommandList(), inputSRVHandle, outputUAVHandle);
+				dxcommon_->GetCommandList()->Dispatch((MyWin::kWindowWidth + 7) / 8, (MyWin::kWindowHeight + 7) / 8, 1);
+				dxcommon_->PostOutline();
 			}
 			if (i == 1) {
-				dxcommon_->GetPipelineManager()->SetCSPipeline(Pipe::CRTCS);
-				// 3. SRVとUAVをセット
-				dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(0, inputSRVHandle);   // 入力テクスチャ
-				dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(1, outputUAVHandle);  // 出力テクスチャ
-				// 4. 定数バッファ(CBV)をバインド
-				dxcommon_->GetCommandList()->SetComputeRootConstantBufferView(2, cRTResource_->GetGPUVirtualAddress());    // b0 レジスタ
-				// 5. コンピュートシェーダーを実行 (Dispatch)
-				dxcommon_->GetCommandList()->Dispatch(
-					(MyWin::kWindowWidth + 7) / 8,  // スレッドグループ数 (8x8x1の場合)
-					(MyWin::kWindowHeight + 7) / 8,
-					1
-				);
+				dxcommon_->GetPipelineManager()->SetCSPipeline(postEffects[1].pipeline);
+				postEffects[1].setup(dxcommon_->GetCommandList(), inputSRVHandle, outputUAVHandle);
+				dxcommon_->GetCommandList()->Dispatch((MyWin::kWindowWidth + 7) / 8, (MyWin::kWindowHeight + 7) / 8, 1);
 			}
+
+			//if (i == 0) {
+			//	dxcommon_->GetPipelineManager()->SetCSPipeline(Pipe::GrayCS);
+			//	// 3. SRVとUAVをセット
+			//	dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(0, inputSRVHandle);   // 入力テクスチャ
+			//	dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(1, outputUAVHandle);  // 出力テクスチャ
+			//	// 4. 定数バッファ(CBV)をバインド
+			//	dxcommon_->GetCommandList()->SetComputeRootConstantBufferView(2, grayCSResource_->GetGPUVirtualAddress());    // b0 レジスタ
+			//	// 5. コンピュートシェーダーを実行 (Dispatch)
+			//	dxcommon_->GetCommandList()->Dispatch(
+			//		(MyWin::kWindowWidth + 7) / 8,  // スレッドグループ数 (8x8x1の場合)
+			//		(MyWin::kWindowHeight + 7) / 8,
+			//		1
+			//	);
+			//}
+			//if (i == 1) {
+			//	dxcommon_->GetPipelineManager()->SetCSPipeline(Pipe::CRTCS);
+			//	// 3. SRVとUAVをセット
+			//	dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(0, inputSRVHandle);   // 入力テクスチャ
+			//	dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(1, outputUAVHandle);  // 出力テクスチャ
+			//	// 4. 定数バッファ(CBV)をバインド
+			//	dxcommon_->GetCommandList()->SetComputeRootConstantBufferView(2, cRTResource_->GetGPUVirtualAddress());    // b0 レジスタ
+			//	// 5. コンピュートシェーダーを実行 (Dispatch)
+			//	dxcommon_->GetCommandList()->Dispatch(
+			//		(MyWin::kWindowWidth + 7) / 8,  // スレッドグループ数 (8x8x1の場合)
+			//		(MyWin::kWindowHeight + 7) / 8,
+			//		1
+			//	);
+			//}
 
 			isUsePing = !isUsePing;
 		}
@@ -431,17 +405,6 @@ void OffscreenManager::Command() {
 	} else {
 		dxcommon_->TransitionResource(offscreenrt_.Get(),
 			D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_GENERIC_READ);
-	}
-
-
-	if (isGaussian_) {
-		dxcommon_->GetDXCommand()->SetViewAndscissor();
-		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Gauss);
-
-		dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
-		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
-		dxcommon_->GetCommandList()->DrawInstanced(3, 1, 0, 0);
 	}
 
 	if (isNonePost_ || isMetaBall_) {
@@ -503,19 +466,6 @@ void OffscreenManager::Command() {
 		dxcommon_->GetCommandList()->DrawInstanced(3, 1, 0, 0);
 	}
 
-	if (isOutline_) {
-		dxcommon_->PreOutline();
-		dxcommon_->GetDXCommand()->SetViewAndscissor();
-		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Outline);
-
-		dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
-		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
-		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, dxcommon_->GetDepthTexGPUHandle());
-		dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(2, outlineResource_->GetGPUVirtualAddress());
-		dxcommon_->GetCommandList()->DrawInstanced(3, 1, 0, 0);
-		dxcommon_->PostOutline();
-	}
 }
 
 void OffscreenManager::SettingVertex() {
@@ -581,4 +531,43 @@ void OffscreenManager::SettingVertex() {
 	uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
 
 	device->CreateUnorderedAccessView(outputTexture_.Get(), nullptr, &uavDesc, outputUAVHandleCPU_);
+}
+
+void OffscreenManager::InitializePostEffects() {
+	postEffects.push_back({
+		Pipe::GrayCS,
+		[=](auto* cmd, auto input, auto output) {
+			cmd->SetComputeRootDescriptorTable(0, input);
+			cmd->SetComputeRootDescriptorTable(1, output);
+			cmd->SetComputeRootConstantBufferView(2, grayCSResource_->GetGPUVirtualAddress());
+		}
+		});
+
+	postEffects.push_back({
+	   Pipe::CRTCS,
+	   [=](auto* cmd, auto input, auto output) {
+		   cmd->SetComputeRootDescriptorTable(0, input);
+		   cmd->SetComputeRootDescriptorTable(1, output);
+		   cmd->SetComputeRootConstantBufferView(2, cRTResource_->GetGPUVirtualAddress());
+	   }
+		});
+
+	postEffects.push_back({
+	   Pipe::GaussCS,
+	   [=](auto* cmd, auto input, [[maybe_unused]] auto output) {
+		   cmd->SetComputeRootDescriptorTable(0, input);
+		   cmd->SetComputeRootDescriptorTable(1, output);
+	   }
+		});
+
+	postEffects.push_back({
+	   Pipe::OutlineCS,
+	   [=](auto* cmd, auto input, [[maybe_unused]] auto output) {
+		   cmd->SetComputeRootDescriptorTable(0, input);
+		   cmd->SetComputeRootDescriptorTable(2, output);
+		   cmd->SetComputeRootDescriptorTable(1, dxcommon_->GetDepthTexGPUHandle());
+		   cmd->SetComputeRootConstantBufferView(3, outlineResource_->GetGPUVirtualAddress());
+	   }
+		});
+
 }

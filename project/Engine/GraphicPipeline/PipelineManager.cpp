@@ -7,17 +7,16 @@
 #include "ParticlePipeline.h"
 #include "AnimationPipeline.h"
 #include "SkyboxPipe.h"
-#include "GrayPipeline.h"
-#include "OutlinePipe.h"
 #include "MetaBallPipeline.h"
-#include "GaussPipeline.h"
 #include "NonePipeline.h"
 #include "ShockWavePipe.h"
 #include "FirePipe.h"
 #include "ThunderPipe.h"
 #include "CRTPipe.h"
-#include "GrayCSPipe.h"
-#include "CRTCSPipe.h"
+#include "CSPipe/GrayCSPipe.h"
+#include "CSPipe/GaussCSPipe.h"
+#include "CSPipe/CRTCSPipe.h"
+#include "CSPipe/OutlineCSPipe.h"
 #include "SkinningCSPipe.h"
 
 
@@ -55,9 +54,6 @@ void PipelineManager::CreatePipeline() {
 	std::unique_ptr<ParticlePipeline> particlePiplineSub = nullptr;
 	std::unique_ptr<AnimationPipeline> animationPipline = nullptr;
 	std::unique_ptr<SkyboxPipe> skyboxPipline = nullptr;
-	std::unique_ptr<GrayPipeline> grayPipeline = nullptr;
-	std::unique_ptr<GaussPipeline> gaussPipeline = nullptr;
-	std::unique_ptr<OutlinePipe> outlinePipe = nullptr;
 	std::unique_ptr<MetaBallPipeline> metaballPipeline = nullptr;
 	std::unique_ptr<NonePipeline> nonePipeline = nullptr;
 	std::unique_ptr<ShockWavePipe> shockWave = nullptr;
@@ -65,7 +61,9 @@ void PipelineManager::CreatePipeline() {
 	std::unique_ptr<ThunderPipe> thunderPipe = nullptr;
 	std::unique_ptr<CRTPipe> crtPipe = nullptr;
 	std::unique_ptr<GrayCSPipe> grayCS = nullptr;
+	std::unique_ptr<GaussCSPipe> gaussCS = nullptr;
 	std::unique_ptr<CRTCSPipe> crtCS = nullptr;
+	std::unique_ptr<OutlineCSPipe> outlineCS = nullptr;
 	std::unique_ptr<SkinningCSPipe> skinningCS = nullptr;
 
 
@@ -117,19 +115,6 @@ void PipelineManager::CreatePipeline() {
 	pipelines_.push_back(std::move(skyboxPipline));
 
 
-	grayPipeline.reset(new GrayPipeline());
-	grayPipeline->Initialize(dxcommon_);
-	pipelines_.push_back(std::move(grayPipeline));
-
-
-	gaussPipeline.reset(new GaussPipeline());
-	gaussPipeline->Initialize(dxcommon_);
-	pipelines_.push_back(std::move(gaussPipeline));
-
-	outlinePipe.reset(new OutlinePipe());
-	outlinePipe->Initialize(dxcommon_);
-	pipelines_.push_back(std::move(outlinePipe));
-
 	metaballPipeline.reset(new MetaBallPipeline());
 	metaballPipeline->Initialize(dxcommon_);
 	pipelines_.push_back(std::move(metaballPipeline));
@@ -156,9 +141,17 @@ void PipelineManager::CreatePipeline() {
 	grayCS->Initialize(dxcommon_);
 	pipelines_.push_back(std::move(grayCS));
 
+	gaussCS.reset(new GaussCSPipe);
+	gaussCS->Initialize(dxcommon_);
+	pipelines_.push_back(std::move(gaussCS));
+
 	crtCS.reset(new CRTCSPipe);
 	crtCS->Initialize(dxcommon_);
 	pipelines_.push_back(std::move(crtCS));
+
+	outlineCS.reset(new OutlineCSPipe);
+	outlineCS->Initialize(dxcommon_);
+	pipelines_.push_back(std::move(outlineCS));
 
 	skinningCS.reset(new SkinningCSPipe);
 	skinningCS->Initialize(dxcommon_);

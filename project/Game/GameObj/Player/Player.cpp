@@ -123,18 +123,6 @@ void Player::Update() {
 			}
 		}
 
-		Vector3 particleSpeed = Random::GetVector3({ -0.01f,0.01f }, { -0.01f,0.01f }, { -0.3f,-0.2f });
-		particleSpeed = TransformNormal(particleSpeed, MakeRotateXYZMatrix(model_->transform.rotate));
-		moveParticleL_.para_.speedx = { particleSpeed.x,particleSpeed.x };
-		moveParticleL_.para_.speedy = { particleSpeed.y,particleSpeed.y };
-		moveParticleL_.para_.speedz = { particleSpeed.z,particleSpeed.z };
-		moveParticleL_.Emit();
-		particleSpeed = Random::GetVector3({ -0.01f,0.01f }, { -0.01f,0.01f }, { -0.3f,-0.2f });
-		particleSpeed = TransformNormal(particleSpeed, MakeRotateXYZMatrix(model_->transform.rotate));
-		moveParticleR_.para_.speedx = { particleSpeed.x,particleSpeed.x };
-		moveParticleR_.para_.speedy = { particleSpeed.y,particleSpeed.y };
-		moveParticleR_.para_.speedz = { particleSpeed.z,particleSpeed.z };
-		moveParticleR_.Emit();
 		HPUpdate();
 	} else {
 		deathTime_ -= FPSKeeper::DeltaTime();
@@ -347,6 +335,19 @@ void Player::Move(const float& speed) {
 		velocity_ = TransformNormal(velocity_, rotateMatrix);
 		// 位置を更新
 		model_->transform.translate += velocity_;
+
+		Vector3 particleSpeed = Random::GetVector3({ -0.01f,0.01f }, { -0.01f,0.01f }, { -0.3f,-0.2f });
+		particleSpeed = TransformNormal(particleSpeed, MakeRotateXYZMatrix(model_->transform.rotate));
+		moveParticleL_.para_.speedx = { particleSpeed.x,particleSpeed.x };
+		moveParticleL_.para_.speedy = { particleSpeed.y,particleSpeed.y };
+		moveParticleL_.para_.speedz = { particleSpeed.z,particleSpeed.z };
+		moveParticleL_.Emit();
+		particleSpeed = Random::GetVector3({ -0.01f,0.01f }, { -0.01f,0.01f }, { -0.3f,-0.2f });
+		particleSpeed = TransformNormal(particleSpeed, MakeRotateXYZMatrix(model_->transform.rotate));
+		moveParticleR_.para_.speedx = { particleSpeed.x,particleSpeed.x };
+		moveParticleR_.para_.speedy = { particleSpeed.y,particleSpeed.y };
+		moveParticleR_.para_.speedz = { particleSpeed.z,particleSpeed.z };
+		moveParticleR_.Emit();
 	}
 
 	Vector3 forward = (targetPos_ - model_->transform.translate).Normalize();

@@ -1,35 +1,11 @@
 #pragma once
 #include "BasePipeline.h"
+#include "PipeKind.h"
 #include <memory>
 #include <vector>
 
 
 class DXCom;
-
-enum class Pipe : int {
-
-	None,
-	Normal,
-	NormalAdd,
-	Sprite,
-	Line3d,
-	particle,
-	particleSub,
-	Animation,
-	Skybox,
-	Gray,
-	Gauss,
-	Outline,
-	MetaBall,
-	ShockWave,
-	Fire,
-	Thunder,
-	CRT,
-	GrayCS,
-	CRTCS,
-	SkinningCS,
-};
-
 
 class PipelineManager {
 public:

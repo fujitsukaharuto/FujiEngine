@@ -9,6 +9,13 @@ SamplerState samplerState : register(s0);
 RWTexture2D<float4> outputTex : register(u0); // 出力先
 
 
+float3 LinearToSRGB(float3 linearColor)
+{
+    float3 srgbColor = linearColor;
+    srgbColor = (linearColor <= 0.0031308f) ? (12.92f * linearColor) : (1.055f * pow(linearColor, 1.0f / 2.4f) - 0.055f);
+    return saturate(srgbColor);
+}
+
 float3 scanline(float2 coord, float3 screen)
 {
     screen.rgb -= sin(coord.y + (iTime * 29.0)) * 0.02;
@@ -61,7 +68,7 @@ void main( uint3 DTid : SV_DispatchThreadID )
 
     float2 screenSpace = crtCoords * iResolution;
     color = scanline(screenSpace, color);
-
-    outputTex[DTid.xy] = float4(color, 1.0);
+    color.rgb = LinearToSRGB(color.rgb);
     
+    outputTex[DTid.xy] = float4(color, 1.0);
 }

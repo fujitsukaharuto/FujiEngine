@@ -11,6 +11,7 @@
 #include "DXCommand.h"
 #include "DXCompil.h"
 #include "Math/Matrix/MatrixCalculation.h"
+#include "PipeKind.h"
 #include "TextureManager.h"
 
 
@@ -76,6 +77,13 @@ struct LightningElement {
 	float boltCount;
 	float progres;
 };
+
+struct PostEffectPass {
+	Pipe pipeline; // 使用するパイプライン名
+
+	// SRV/UAV/CBVのセット処理
+	std::function<void(ID3D12GraphicsCommandList* cmdList, D3D12_GPU_DESCRIPTOR_HANDLE input, D3D12_GPU_DESCRIPTOR_HANDLE output)> setup;
+};
 #pragma endregion
 
 class OffscreenManager {
@@ -100,6 +108,7 @@ public:
 private:
 
 	void SettingVertex();
+	void InitializePostEffects();
 
 private:
 
@@ -154,15 +163,15 @@ private:
 	D3D12_CPU_DESCRIPTOR_HANDLE outputUAVHandleCPU_;
 	D3D12_GPU_DESCRIPTOR_HANDLE outputUAVHandle_;
 
+	std::vector<PostEffectPass> postEffects;
+	std::vector<PostEffectPass> validPostEffects;
 
 	bool isGrayscale_ = true;
 	bool isNonePost_ = true;
 	bool isMetaBall_ = true;
-	bool isGaussian_ = true;
 	bool isShockWave_ = true;
 	bool isFire_ = true;
 	bool isThunder_ = true;
 	bool isCRT_ = true;
-	bool isOutline_ = true;
 
 };
