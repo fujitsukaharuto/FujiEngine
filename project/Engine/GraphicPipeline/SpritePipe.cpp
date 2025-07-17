@@ -1,4 +1,4 @@
-#include "CRTPipe.h"
+#include "SpritePipe.h"
 #include "Engine/DX/DXCom.h"
 #include "DXCommand.h"
 #include "DXCompil.h"
@@ -7,10 +7,10 @@
 
 
 
-CRTPipe::~CRTPipe() {}
+SpritePipe::~SpritePipe() {}
 
 
-void CRTPipe::CreateRootSignature(ID3D12Device* device) {
+void SpritePipe::CreateRootSignature(ID3D12Device* device) {
 
 	HRESULT hr;
 
@@ -18,18 +18,26 @@ void CRTPipe::CreateRootSignature(ID3D12Device* device) {
 	rootDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
 
-	CD3DX12_DESCRIPTOR_RANGE descriptorRange[1] = {};
-	descriptorRange[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
+	D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
+	descriptorRange[0].BaseShaderRegister = 0;
+	descriptorRange[0].NumDescriptors = 1;
+	descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
-	D3D12_ROOT_PARAMETER rootParameters[2] = {};
-	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+
+	D3D12_ROOT_PARAMETER rootParameters[3] = {};
+	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	rootParameters[0].DescriptorTable.pDescriptorRanges = descriptorRange;
-	rootParameters[0].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);
+	rootParameters[0].Descriptor.ShaderRegister = 0;
 
 	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
 	rootParameters[1].Descriptor.ShaderRegister = 0;
+
+	rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[2].DescriptorTable.pDescriptorRanges = &descriptorRange[0];
+	rootParameters[2].DescriptorTable.NumDescriptorRanges = 1;
 
 	rootDesc.pParameters = rootParameters;
 	rootDesc.NumParameters = _countof(rootParameters);
@@ -40,7 +48,7 @@ void CRTPipe::CreateRootSignature(ID3D12Device* device) {
 	staticSamplers[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
 	staticSamplers[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
 	staticSamplers[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-	staticSamplers[0].ComparisonFunc = D3D12_COMPARISON_FUNC_ALWAYS;
+	staticSamplers[0].ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
 	staticSamplers[0].MaxLOD = D3D12_FLOAT32_MAX;
 	staticSamplers[0].ShaderRegister = 0;
 	staticSamplers[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
@@ -64,11 +72,11 @@ void CRTPipe::CreateRootSignature(ID3D12Device* device) {
 }
 
 
-void CRTPipe::CreatePSO(ID3D12Device* device) {
+void SpritePipe::CreatePSO(ID3D12Device* device) {
 
 	HRESULT hr;
 
-	D3D12_INPUT_ELEMENT_DESC element[2] = {};
+	D3D12_INPUT_ELEMENT_DESC element[3] = {};
 	element[0].SemanticName = "POSITION";
 	element[0].SemanticIndex = 0;
 	element[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
@@ -79,20 +87,38 @@ void CRTPipe::CreatePSO(ID3D12Device* device) {
 	element[1].Format = DXGI_FORMAT_R32G32_FLOAT;
 	element[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
 
+	element[2].SemanticName = "NORMAL";
+	element[2].SemanticIndex = 0;
+	element[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+	element[2].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+
 	D3D12_INPUT_LAYOUT_DESC layout{};
 	layout.pInputElementDescs = element;
 	layout.NumElements = _countof(element);
 
+	D3D12_BLEND_DESC blend{};
+	blend.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	blend.RenderTarget[0].BlendEnable = TRUE;
+	blend.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
+	blend.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+	blend.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+	blend.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
+	blend.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
+	blend.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
 
-	vs = dxcommon_->GetDXCompil()->CompileShader(kDirectoryPath_ + L"NonePost.VS.hlsl", L"vs_6_0");
+
+	D3D12_RASTERIZER_DESC rasterizer{};
+	rasterizer.CullMode = D3D12_CULL_MODE_NONE;
+	rasterizer.FillMode = D3D12_FILL_MODE_SOLID;
+
+	vs = dxcommon_->GetDXCompil()->CompileShader(kDirectoryPath_ + L"Object3d.VS.hlsl", L"vs_6_0");
 	assert(vs != nullptr);
-	ps = dxcommon_->GetDXCompil()->CompileShader(kDirectoryPath_ + L"CRTEffect.PS.hlsl", L"ps_6_0");
+	ps = dxcommon_->GetDXCompil()->CompileShader(kDirectoryPath_ + L"Sprite.PS.hlsl", L"ps_6_0");
 	assert(ps != nullptr);
 
 
 	D3D12_DEPTH_STENCIL_DESC depth{};
-	depth.DepthEnable = FALSE;
-	depth.StencilEnable = FALSE;
+	depth.DepthEnable = true;
 	depth.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
 	depth.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 
@@ -104,8 +130,8 @@ void CRTPipe::CreatePSO(ID3D12Device* device) {
 	stateDesc.PS = { ps->GetBufferPointer(),ps->GetBufferSize() };
 	stateDesc.DepthStencilState = depth;
 	stateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	stateDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-	stateDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+	stateDesc.BlendState = blend;
+	stateDesc.RasterizerState = rasterizer;
 
 	stateDesc.NumRenderTargets = 1;
 	stateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;

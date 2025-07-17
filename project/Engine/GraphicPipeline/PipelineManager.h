@@ -11,6 +11,7 @@ enum class Pipe : int {
 	None,
 	Normal,
 	NormalAdd,
+	Sprite,
 	Line3d,
 	particle,
 	particleSub,

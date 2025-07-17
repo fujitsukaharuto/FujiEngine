@@ -60,6 +60,8 @@ public:
 	void LoadModelFile();
 	const std::vector<std::string>& GetModelFiles() { return modelFileList; }
 
+	void NormalCommand();
+
 	void PickingUpdate();
 	void PickingCommand();
 	void PickingDataCopy();

@@ -1,13 +1,7 @@
-struct VS_INPUT
+struct PSInput
 {
-    float4 pos : POSITION; // 頂点位置
-    float2 uv : TEXCOORD; // UV座標
-};
-
-struct VS_OUTPUT
-{
-    float4 pos : SV_POSITION; // スクリーン空間座標
-    float2 uv : TEXCOORD0; // UV座標
+    float4 position : SV_POSITION;
+    float2 texcoord : TEXCOORD0;
 };
 
 cbuffer Constants : register(b0)
@@ -56,9 +50,9 @@ float3 sampleSplit(Texture2D tex, float2 coord)
     return frag;
 }
 
-float4 main(VS_OUTPUT input) : SV_Target
+float4 main(PSInput input) : SV_Target
 {
-    float2 crtCoords = crt(input.uv, 4.0);
+    float2 crtCoords = crt(input.texcoord, 4.0);
 
     // テクスチャ範囲外をチェック
     if (crtCoords.x < 0.0 || crtCoords.x > 1.0 || crtCoords.y < 0.0 || crtCoords.y > 1.0)
@@ -71,7 +65,7 @@ float4 main(VS_OUTPUT input) : SV_Target
     float2 screenSpace = crtCoords * iResolution.xy;
     color = scanline(screenSpace, color);
 
-    float2 centeredUV = input.uv - 0.5;
+    float2 centeredUV = input.texcoord - 0.5;
     float vignette = 1.0 - dot(centeredUV, centeredUV) * 2.2;
     vignette = saturate(pow(vignette, 1.5)); // 減光の強さ調整
     color *= vignette;

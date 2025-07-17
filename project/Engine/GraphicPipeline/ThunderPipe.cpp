@@ -96,7 +96,7 @@ void ThunderPipe::CreatePSO(ID3D12Device* device) {
 	layout.NumElements = _countof(element);
 
 
-	vs = dxcommon_->GetDXCompil()->CompileShader(kDirectoryPath_ + L"Thunder.VS.hlsl", L"vs_6_0");
+	vs = dxcommon_->GetDXCompil()->CompileShader(kDirectoryPath_ + L"NonePost.VS.hlsl", L"vs_6_0");
 	assert(vs != nullptr);
 	ps = dxcommon_->GetDXCompil()->CompileShader(kDirectoryPath_ + L"Thunder.PS.hlsl", L"ps_6_0");
 	assert(ps != nullptr);

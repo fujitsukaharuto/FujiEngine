@@ -8,6 +8,7 @@
 #include "Engine/DX/SRVManager.h"
 #include "Engine/ImGuiManager/ImGuiManager.h"
 #include "Engine/Input/Input.h"
+#include "Engine/Light/LightManager.h"
 #ifdef _DEBUG
 #include "ImGuizmo.h"
 #endif // _DEBUG
@@ -507,6 +508,14 @@ void ModelManager::LoadModelFile() {
 	}
 
 #endif // _DEBUG
+}
+
+void ModelManager::NormalCommand() {
+	dxcommon_->GetDXCommand()->SetViewAndscissor();
+	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Normal);
+	dxcommon_->GetDXCommand()->GetList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	lightManager_->SetLightCommand(dxcommon_->GetCommandList());
+	PickingCommand();
 }
 
 void ModelManager::PickingUpdate() {

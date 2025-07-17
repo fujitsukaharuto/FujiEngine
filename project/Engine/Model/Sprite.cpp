@@ -3,6 +3,7 @@
 #include "LightManager.h"
 #include "TextureManager.h"
 #include "Engine/Model/ModelManager.h"
+#include "Engine/Light/LightManager.h"
 
 Sprite::Sprite() {
 	dxcommon_ = TextureManager::GetInstance()->ShareDXCom();
@@ -23,15 +24,18 @@ void Sprite::Load(const std::string& fileName) {
 void Sprite::Draw() {
 	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
 	
-	ModelManager::GetInstance()->PickingCommand();
-	cList->SetGraphicsRootConstantBufferView(9, objIDDataResource_->GetGPUVirtualAddress());
+	dxcommon_->GetDXCommand()->SetViewAndscissor();
+	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Sprite);
+	dxcommon_->GetDXCommand()->GetList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
 	cList->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	cList->IASetIndexBuffer(&indexBufferView_);
 	cList->SetGraphicsRootConstantBufferView(0, material_.GetMaterialResource()->GetGPUVirtualAddress());
 	cList->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
-	cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_->GetGPUVirtualAddress());
 	cList->SetGraphicsRootDescriptorTable(2, material_.GetTexture()->gpuHandle);
 	cList->DrawIndexedInstanced(6, 1, 0, 0, 0);
+
+	ModelManager::GetInstance()->NormalCommand();
 }
 
 void Sprite::SetColor(const Vector4& color) {
