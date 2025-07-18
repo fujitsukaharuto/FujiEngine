@@ -27,11 +27,6 @@ void main(uint3 dispatchThreadID : SV_DispatchThreadID)
     if (coord.x >= width || coord.y >= height)
         return;
 
-    float2 texcoord = (coord + 0.5f) / float2(width, height);
-    float2 uvStepSize = float2(1.0f / width, 1.0f / height);
-
-    float2 difference = float2(0.0f, 0.0f);
-
     static const float2 kIndex3x3[3][3] =
     {
         { { -1.0f, -1.0f }, { 0.0f, -1.0f }, { 1.0f, -1.0f } },
@@ -52,6 +47,11 @@ void main(uint3 dispatchThreadID : SV_DispatchThreadID)
         { 1.0f / 6.0f, 1.0f / 6.0f, 1.0f / 6.0f },
     };
 
+    float2 texcoord = (coord + 0.5f) / float2(width, height);
+    float2 uvStepSize = float2(rcp(float(width)), rcp(float(height)));
+
+    float2 difference = float2(0.0f, 0.0f);
+
     for (int x = 0; x < 3; ++x)
     {
         for (int y = 0; y < 3; ++y)
@@ -59,19 +59,18 @@ void main(uint3 dispatchThreadID : SV_DispatchThreadID)
             float2 offset = kIndex3x3[x][y] * uvStepSize;
             float2 sampleUV = texcoord + offset;
 
-            // サンプリング範囲外のチェック（必要なら）
             sampleUV = clamp(sampleUV, float2(0.0f, 0.0f), float2(1.0f, 1.0f));
 
             float ndcDepth = gDepthTexture.SampleLevel(gSamplerPoint, sampleUV, 0);
             float4 viewSpace = mul(float4(0.0f, 0.0f, ndcDepth, 1.0f), projectionInverse);
-            float viewZ = viewSpace.z / viewSpace.w;
+            float viewZ = viewSpace.z * rcp(viewSpace.w);
 
             difference.x += viewZ * kPrewittHorizontalKernel[x][y];
             difference.y += viewZ * kPrewittVerticalKernel[x][y];
         }
     }
 
-    float weight = saturate(length(difference) * 6.0f);
+    float weight = saturate(length(difference));
 
     float3 baseColor = gTexture.SampleLevel(gSampler, texcoord, 0).rgb;
     float3 finalColor = (1.0f - weight) * baseColor;

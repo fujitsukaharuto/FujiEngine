@@ -10,7 +10,7 @@
 
 Camera::Camera() :transform({ { 1.0f,1.0f,1.0f }, { -1.02f,0.0f,0.0f }, { 0.0f,3.5f,-20.0f } })
 , fovY_(0.6f), aspect_(float(MyWin::kWindowWidth) / float(MyWin::kWindowHeight))
-, nearClip_(0.1f), farClip_(100.0f), worldMatrix_(MakeAffineMatrix(transform.scale, transform.rotate, transform.translate))
+, nearClip_(0.1f), farClip_(1000.0f), worldMatrix_(MakeAffineMatrix(transform.scale, transform.rotate, transform.translate))
 , viewMatrix_(Inverse(worldMatrix_))
 , projectionMatrix_(MakePerspectiveFovMatrix(fovY_, aspect_, nearClip_, farClip_))
 , viewProjectionMatrix_(Multiply(viewMatrix_, projectionMatrix_)), shakeMode_(ShakeMode::RandomShake)

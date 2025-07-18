@@ -310,7 +310,7 @@ void OffscreenManager::Command() {
 		bool isUsePing = true;
 
 
-		for (int i = 0; i < 2; i++) {
+		for (int i = 0; i < 1; i++) {
 			auto inputResource = isUsePing ? ping : pong;
 			auto outputResource = isUsePing ? pong : ping;
 
