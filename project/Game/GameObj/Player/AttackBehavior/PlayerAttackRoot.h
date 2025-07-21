@@ -20,6 +20,7 @@ private:
 
 	Step step_;
 	float chargeTime_;
+	float coolTime_;
 
 	// Emitter
 	ParticleEmitter* charge1_;

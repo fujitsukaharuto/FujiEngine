@@ -23,7 +23,6 @@ void Boss::Initialize() {
 	animModel_->LoadAnimationFile("T_boss.gltf");
 
 	animModel_->LoadTransformFromJson("boss_transform.json");
-	animModel_->transform.rotate.y = 3.14f;
 
 	shadow_ = std::make_unique<Object3d>();
 	shadow_->Create("Sphere");
@@ -39,9 +38,10 @@ void Boss::Initialize() {
 	collider_->SetCollisionExitCallback([this](const ColliderInfo& other) {OnCollisionExit(other); });
 	collider_->SetParent(&animModel_->transform);
 	collider_->SetTag("Boss");
-	collider_->SetWidth(4.0f);
-	collider_->SetHeight(8.0f);
-	collider_->SetDepth(3.0f);
+	collider_->SetOffset({ 0.0f,7.0f,0.0f });
+	collider_->SetWidth(7.5f);
+	collider_->SetHeight(15.0f);
+	collider_->SetDepth(7.0f);
 
 	InitParameter();
 

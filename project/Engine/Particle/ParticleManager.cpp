@@ -521,9 +521,9 @@ void ParticleManager::CreateParticleGroup(const std::string& name, const std::st
 	float add = 0.1f;
 	for (int i = 0; i < int(max); i++) {
 		Particle p{};
-		p.transform_.scale = { 1.0f,1.0f,1.0f };
-		p.transform_.translate.x += add;
-		p.transform_.translate.y += add;
+		p.scale = { 1.0f,1.0f,1.0f };
+		p.translate.x += add;
+		p.translate.y += add;
 		newGroup->particles_.push_back(p);
 		add += 0.1f;
 	}
@@ -566,9 +566,9 @@ void ParticleManager::CreateParentParticleGroup(const std::string& name, const s
 	float add = 0.1f;
 	for (int i = 0; i < int(max); i++) {
 		Particle p{};
-		p.transform_.scale = { 1.0f,1.0f,1.0f };
-		p.transform_.translate.x += add;
-		p.transform_.translate.y += add;
+		p.scale = { 1.0f,1.0f,1.0f };
+		p.translate.x += add;
+		p.translate.y += add;
 		newGroup->particles_.push_back(p);
 		add += 0.1f;
 	}
@@ -957,8 +957,8 @@ void ParticleManager::ParticleSizeUpdate(Particle& particle) {
 		break;
 	case SizeType::kShift:
 
-		particle.transform_.scale.x = Lerp(particle.startSize_.x, particle.endSize_.x, t);
-		particle.transform_.scale.y = Lerp(particle.startSize_.y, particle.endSize_.y, t);
+		particle.scale.x = Lerp(particle.startSize_.x, particle.endSize_.x, t);
+		particle.scale.y = Lerp(particle.startSize_.y, particle.endSize_.y, t);
 
 		break;
 	case SizeType::kSin:
@@ -976,8 +976,8 @@ void ParticleManager::ParticleSizeUpdate(Particle& particle) {
 
 		Vector2 sizeSin = minSize + (maxSize - minSize) * 0.5f * (1.0f + sin(particle.lifeTime_));
 
-		particle.transform_.scale.x = sizeSin.x;
-		particle.transform_.scale.y = sizeSin.y;
+		particle.scale.x = sizeSin.x;
+		particle.scale.y = sizeSin.y;
 
 		break;
 	}
@@ -986,27 +986,27 @@ void ParticleManager::ParticleSizeUpdate(Particle& particle) {
 void ParticleManager::SRTUpdate(Particle& particle) {
 	if (particle.rotateType_ == static_cast<int>(RotateType::kRandomR)) {
 		if (particle.isContinuouslyRotate_) {
-			particle.transform_.rotate += Random::GetVector3({ -0.2f,0.2f }, { -0.2f,0.2f }, { -0.2f,0.2f }) * FPSKeeper::DeltaTime();
+			particle.rotate += Random::GetVector3({ -0.2f,0.2f }, { -0.2f,0.2f }, { -0.2f,0.2f }) * FPSKeeper::DeltaTime();
 		}
 	}
 
 	particle.speed_ += particle.accele_ * FPSKeeper::DeltaTime();
 
-	particle.transform_.translate += particle.speed_ * FPSKeeper::DeltaTime();
+	particle.translate += particle.speed_ * FPSKeeper::DeltaTime();
 }
 
 void ParticleManager::Billboard(Particle& particle, Matrix4x4& worldMatrix, const Matrix4x4& billboardMatrix, const Matrix4x4& rotate) {
 	if (!particle.isBillBoard_) {
-		worldMatrix = MakeAffineMatrix(particle.transform_.scale, particle.transform_.rotate, particle.transform_.translate);
+		worldMatrix = MakeAffineMatrix(particle.scale, particle.rotate, particle.translate);
 	}
 	if (particle.isBillBoard_) {
 		switch (particle.pattern_) {
 		case BillBoardPattern::kXYZBillBoard: {
-			Vector3 possition = particle.transform_.translate;
+			Vector3 possition = particle.translate;
 			if (particle.isParentRotate_) {
 				possition = TransformNormal(possition, rotate);
 			}
-			worldMatrix = Multiply(MakeScaleMatrix(particle.transform_.scale), billboardMatrix);
+			worldMatrix = Multiply(MakeScaleMatrix(particle.scale), billboardMatrix);
 			worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(possition));
 			break;
 		}
@@ -1017,9 +1017,9 @@ void ParticleManager::Billboard(Particle& particle, Matrix4x4& worldMatrix, cons
 			xBillboardMatrix.m[1][0] = 0.0f; // Y軸成分をゼロにする
 			xBillboardMatrix.m[2][0] = 0.0f; // Z軸成分をゼロにする
 
-			worldMatrix = Multiply(MakeScaleMatrix(particle.transform_.scale), MakeRotateXYZMatrix({ 0.0f,particle.transform_.rotate.y,particle.transform_.rotate.z }));
+			worldMatrix = Multiply(MakeScaleMatrix(particle.scale), MakeRotateXYZMatrix({ 0.0f,particle.rotate.y,particle.rotate.z }));
 			worldMatrix = Multiply(worldMatrix, xBillboardMatrix);
-			worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform_.translate));
+			worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.translate));
 			break;
 		}
 		case BillBoardPattern::kYBillBoard: {
@@ -1028,9 +1028,9 @@ void ParticleManager::Billboard(Particle& particle, Matrix4x4& worldMatrix, cons
 				yBillboardMatrix.m[0][1] = 0.0f; // X軸成分をゼロにする
 				yBillboardMatrix.m[2][1] = 0.0f; // Z軸成分をゼロにする
 
-				worldMatrix = Multiply(MakeScaleMatrix(particle.transform_.scale), MakeRotateXYZMatrix({ particle.transform_.rotate.x,0.0f,particle.transform_.rotate.z }));
+				worldMatrix = Multiply(MakeScaleMatrix(particle.scale), MakeRotateXYZMatrix({ particle.rotate.x,0.0f,particle.rotate.z }));
 				worldMatrix = Multiply(worldMatrix, yBillboardMatrix);
-				worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform_.translate));
+				worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.translate));
 
 			}
 			break;
@@ -1041,9 +1041,9 @@ void ParticleManager::Billboard(Particle& particle, Matrix4x4& worldMatrix, cons
 			zBillboardMatrix.m[0][2] = 0.0f; // X軸成分をゼロにする
 			zBillboardMatrix.m[1][2] = 0.0f; // Y軸成分をゼロにする
 
-			worldMatrix = Multiply(MakeScaleMatrix(particle.transform_.scale), MakeRotateXYZMatrix({ particle.transform_.rotate.x,particle.transform_.rotate.y,0.0f }));
+			worldMatrix = Multiply(MakeScaleMatrix(particle.scale), MakeRotateXYZMatrix({ particle.rotate.x,particle.rotate.y,0.0f }));
 			worldMatrix = Multiply(worldMatrix, zBillboardMatrix);
-			worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform_.translate));
+			worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.translate));
 
 			break;
 		}
@@ -1054,9 +1054,9 @@ void ParticleManager::Billboard(Particle& particle, Matrix4x4& worldMatrix, cons
 			xyBillboardMatrix.m[1][0] = 0.0f; // Y軸成分をゼロにする
 			xyBillboardMatrix.m[2][0] = 0.0f; // Z軸成分をゼロにする
 
-			worldMatrix = Multiply(MakeScaleMatrix(particle.transform_.scale), MakeRotateXYZMatrix({ particle.transform_.rotate.x,0.0f,particle.transform_.rotate.z }));
+			worldMatrix = Multiply(MakeScaleMatrix(particle.scale), MakeRotateXYZMatrix({ particle.rotate.x,0.0f,particle.rotate.z }));
 			worldMatrix = Multiply(worldMatrix, xyBillboardMatrix);
-			worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.transform_.translate));
+			worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(particle.translate));
 
 			break;
 		}
@@ -1069,10 +1069,12 @@ void ParticleManager::Billboard(Particle& particle, Matrix4x4& worldMatrix, cons
 bool ParticleManager::InitEmitParticle(Particle& particle, const Vector3& pos, const Vector3& rotate, const Particle& grain, const RandomParametor& para) {
 
 	if (particle.isLive_ == false) {
-		particle.transform_ = grain.transform_;
-		particle.transform_.translate = Random::GetVector3(para.transx, para.transy, para.transz);
-		particle.transform_.translate += pos;
-		particle.transform_.scale = { grain.startSize_.x + para.addRandomSize.x,grain.startSize_.y + para.addRandomSize.y,1.0f };
+		particle.translate = grain.translate;
+		particle.scale = grain.scale;
+		particle.rotate = grain.rotate;
+		particle.translate = Random::GetVector3(para.transx, para.transy, para.transz);
+		particle.translate += pos;
+		particle.scale = { grain.startSize_.x + para.addRandomSize.x,grain.startSize_.y + para.addRandomSize.y,1.0f };
 		if (grain.speedType_ == static_cast<int>(SpeedType::kCenter)) {
 			particle.speed_ = grain.speed_;
 		} else {
@@ -1092,7 +1094,7 @@ bool ParticleManager::InitEmitParticle(Particle& particle, const Vector3& pos, c
 
 		switch (particle.rotateType_) {
 		case static_cast<int>(RotateType::kUsually):
-			particle.transform_.rotate = rotate;
+			particle.rotate = rotate;
 			break;
 		case static_cast<int>(RotateType::kVelocityR):
 
@@ -1107,11 +1109,11 @@ bool ParticleManager::InitEmitParticle(Particle& particle, const Vector3& pos, c
 
 			dToD = DirectionToDirection(defo, veloSpeed.Normalize());
 			angleDToD = ExtractEulerAngles(dToD);
-			particle.transform_.rotate = angleDToD;
+			particle.rotate = angleDToD;
 
 			break;
 		case static_cast<int>(RotateType::kRandomR):
-			particle.transform_.rotate = Random::GetVector3({ -3.0f,3.0f }, { -3.0f,3.0f }, { -3.0f,3.0f });
+			particle.rotate = Random::GetVector3({ -3.0f,3.0f }, { -3.0f,3.0f }, { -3.0f,3.0f });
 			break;
 		}
 

@@ -44,13 +44,16 @@ void PlayerAttackRoot::Update() {
 		///---------------------------------------------------------------------------------------
 	case PlayerAttackRoot::Step::ROOT:
 
-		if (Input::GetInstance()->TriggerKey(DIK_J)) {
+		if (Input::GetInstance()->PushKey(DIK_J) && coolTime_ <= 0.0f) {
 			pPlayer_->InitBullet();
 			chargeTime_ = 0.0f;
+			coolTime_ = 30.0f;
 			step_ = Step::CHAREGE;
 			break;
 		}
-
+		if (coolTime_ > 0.0f) {
+			coolTime_ -= FPSKeeper::DeltaTime();
+		}
 
 
 		break;

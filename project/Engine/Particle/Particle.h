@@ -33,17 +33,14 @@ enum class BillBoardPattern {
 	kXYBillBoard,
 };
 
-class Particle {
-public:
-	Particle();
-	~Particle();
-
-public:
+struct Particle {
 
 	bool isLive_ = false;
 	float lifeTime_ = 0;
 	float startLifeTime_ = 0;
-	Trans transform_{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{ 0.0f,0.0f,0.0f } };
+	Vector3 translate;
+	Vector3 scale;
+	Vector3 rotate;
 
 	//========================================================================*/
 	//* Size
@@ -89,12 +86,13 @@ public:
 	bool isParent_ = false;
 	bool isParentRotate_ = false;
 
-private:
+};
 
-
-
-
-private:
-
-
+struct ParticleCS {
+	Vector3 translate;
+	Vector3 scale;
+	float lifeTime;
+	Vector3 velocity;
+	float currentTime;
+	Vector4 color;
 };

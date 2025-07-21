@@ -106,7 +106,7 @@ void GameScene::Update() {
 #endif // _DEBUG
 
 	if (!player_->GetIsGameOver()) {
-		player_->SetTargetPos(boss_->GetBossCore()->GetWorldPos());
+		player_->SetTargetPos(boss_->GetBossCore()->GetCollider()->GetWorldPos());
 		player_->Update();
 
 		followCamera_->Update(boss_->GetBossCore()->GetWorldPos());
