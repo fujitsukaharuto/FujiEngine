@@ -77,7 +77,7 @@ void Player::Initialize() {
 	ChangeAttackBehavior(std::make_unique<PlayerAttackRoot>(this));
 
 	ParticleManager::Load(hit_, "sphere");
-	ParticleManager::Load(hit2_, "bulletHit");
+	ParticleManager::Load(hit2_, "playerhit");
 	ParticleManager::Load(moveParticleL_, "playerTranjectory");
 	ParticleManager::Load(moveParticleR_, "playerTranjectory");
 	ParticleManager::Load(deathSmoke_, "bulletHitSmoke");
@@ -95,6 +95,20 @@ void Player::Initialize() {
 
 	hit_.frequencyTime_ = 0.0f;
 	hit2_.frequencyTime_ = 0.0f;
+
+	ParticleManager::LoadParentGroup(moveBurnerL_, "playerAfterBurner");
+	ParticleManager::LoadParentGroup(moveBurnerR_, "playerAfterBurner2");
+	ParticleManager::LoadParentGroup(moveBurnerLT_, "playerAfterBurner3");
+	ParticleManager::LoadParentGroup(moveBurnerRT_, "playerAfterBurner4");
+	moveBurnerL_->SetParent(&model_->transform);
+	moveBurnerR_->SetParent(&model_->transform);
+	moveBurnerLT_->SetParent(&model_->transform);
+	moveBurnerRT_->SetParent(&model_->transform);
+	moveBurnerL_->pos_ = { -0.35f,-0.4f,-0.3f };
+	moveBurnerR_->pos_ = { 0.35f,-0.4f,-0.3f };
+	moveBurnerLT_->pos_ = { -0.35f,0.4f,-0.3f };
+	moveBurnerRT_->pos_ = { 0.35f,0.4f,-0.3f };
+
 
 }
 
@@ -348,6 +362,24 @@ void Player::Move(const float& speed) {
 		moveParticleR_.para_.speedy = { particleSpeed.y,particleSpeed.y };
 		moveParticleR_.para_.speedz = { particleSpeed.z,particleSpeed.z };
 		moveParticleR_.Emit();
+		particleSpeed = { 0.0f,0.0f,-0.1f };
+		particleSpeed = TransformNormal(particleSpeed, MakeRotateXYZMatrix(model_->transform.rotate));
+		moveBurnerL_->para_.speedx = { particleSpeed.x,particleSpeed.x };
+		moveBurnerL_->para_.speedy = { particleSpeed.y,particleSpeed.y };
+		moveBurnerL_->para_.speedz = { particleSpeed.z,particleSpeed.z };
+		moveBurnerR_->para_.speedx = { particleSpeed.x,particleSpeed.x };
+		moveBurnerR_->para_.speedy = { particleSpeed.y,particleSpeed.y };
+		moveBurnerR_->para_.speedz = { particleSpeed.z,particleSpeed.z };
+		moveBurnerLT_->para_.speedx = { particleSpeed.x,particleSpeed.x };
+		moveBurnerLT_->para_.speedy = { particleSpeed.y,particleSpeed.y };
+		moveBurnerLT_->para_.speedz = { particleSpeed.z,particleSpeed.z };
+		moveBurnerRT_->para_.speedx = { particleSpeed.x,particleSpeed.x };
+		moveBurnerRT_->para_.speedy = { particleSpeed.y,particleSpeed.y };
+		moveBurnerRT_->para_.speedz = { particleSpeed.z,particleSpeed.z };
+		moveBurnerL_->Emit();
+		moveBurnerR_->Emit();
+		moveBurnerLT_->Emit();
+		moveBurnerRT_->Emit();
 	}
 
 	Vector3 forward = (targetPos_ - model_->transform.translate).Normalize();
@@ -465,7 +497,7 @@ void Player::ReleaseBullet() {
 			Vector3 forward = { 0, 0, 1 };
 			Matrix4x4 rotateMatrix = MakeRotateXYZMatrix(model_->transform.rotate);
 			Vector3 worldForward = TransformNormal(forward, rotateMatrix);
-			bullet->Release(0.5f, 10.0f, worldForward);
+			bullet->Release(0.75f, 10.0f, worldForward);
 		}
 	}
 }

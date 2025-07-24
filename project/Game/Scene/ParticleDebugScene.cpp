@@ -22,6 +22,7 @@ void ParticleDebugScene::Initialize() {
 	obj3dCommon.reset(new Object3dCommon());
 	obj3dCommon->Initialize();
 
+	CameraManager::GetInstance()->GetCamera()->transform.rotate = { 0.0f,0.0f,0.0f };
 
 #pragma region シーン遷移用
 	black_ = std::make_unique<Sprite>();

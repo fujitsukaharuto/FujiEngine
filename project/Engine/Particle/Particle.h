@@ -48,6 +48,7 @@ struct Particle {
 
 	Vector2 startSize_ = { 1.0f,1.0f };
 	Vector2 endSize_ = { 1.0f,1.0f };
+	bool isZandX_ = false;
 
 	//========================================================================*/
 	//* Speed

@@ -111,9 +111,9 @@ void ParticlePipeline::CreatePSO(ID3D12Device* device) {
 		blend.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
 		blend.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
 	} else {
-		blend.RenderTarget[0].SrcBlend = D3D12_BLEND_ZERO;
-		blend.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
-		blend.RenderTarget[0].DestBlend = D3D12_BLEND_SRC_COLOR;
+		blend.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
+		blend.RenderTarget[0].BlendOp = D3D12_BLEND_OP_SUBTRACT;
+		blend.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
 		blend.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ZERO;
 		blend.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
 		blend.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;

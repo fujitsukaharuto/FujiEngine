@@ -123,4 +123,9 @@ private:
 	ParticleEmitter moveParticleR_;
 	ParticleEmitter deathSmoke_;
 	
+	ParticleEmitter* moveBurnerL_;
+	ParticleEmitter* moveBurnerR_;
+	ParticleEmitter* moveBurnerLT_;
+	ParticleEmitter* moveBurnerRT_;
+
 };

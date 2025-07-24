@@ -26,10 +26,12 @@ void Boss::Initialize() {
 
 	shadow_ = std::make_unique<Object3d>();
 	shadow_->Create("Sphere");
-	shadow_->SetColor({ 0.0f,0.0f,0.0f,1.0f });
+	shadow_->SetTexture("white2x2.png");
+	shadow_->SetColor({ 0.02f,0.02f,0.02f,0.5f });
 	shadow_->SetLightEnable(LightMode::kLightNone);
 	shadow_->transform.translate = animModel_->transform.translate;
 	shadow_->transform.translate.y = 0.15f;
+	shadow_->transform.scale = { 3.0f,0.0f,3.0f };
 	shadow_->transform.scale.y = 0.1f;
 
 	collider_ = std::make_unique<AABBCollider>();
@@ -78,7 +80,7 @@ void Boss::Initialize() {
 	}
 	waveParent_ = std::make_unique<Object3d>();
 	waveParent_->Create("cube.obj");
-	waveParent_->transform.translate.z += 4.0f;
+	waveParent_->transform.translate.z += 8.0f;
 	waveParent_->SetParent(&animModel_->transform);
 	waveParent_->SetNoneScaleParent(true);
 
@@ -139,6 +141,18 @@ void Boss::Initialize() {
 	charge14_.SetParent(&chargeParents_[0]->transform);
 	charge15_.SetParent(&chargeParents_[0]->transform);
 
+	ParticleManager::Load(roringWave_, "roringWave");
+	ParticleManager::Load(roringParticle_, "roringParticle");
+	ParticleManager::Load(roringring_, "roringring");
+	roringWave_.pos_ = animModel_->transform.translate;
+	roringWave_.grain_.isAutoUVMove_ = true;
+	roringWave_.grain_.autoUVSpeed_.x = 0.01f;
+	roringWave_.grain_.isZandX_ = true;
+	roringring_.SetAnimParent(animModel_->GetJointTrans("mixamorig:Head"));
+	roringring_.pos_.y = -7.0f;
+	roringParticle_.SetAnimParent(animModel_->GetJointTrans("mixamorig:Head"));
+	roringParticle_.pos_.y = -6.5f;
+	roringParticle_.pos_.z = 5.0f;
 
 	actionList_ = {
 		"Root","Wave","Beam","Jump","Sword"
@@ -164,6 +178,9 @@ void Boss::Update() {
 		startTime_ -= FPSKeeper::DeltaTime();
 		if (startTime_ > 40.0f && startTime_ < 200.0f) {
 			CameraManager::GetInstance()->GetCamera()->SetShakeTime(2.0f);
+			roringWave_.Emit();
+			roringParticle_.Emit();
+			roringring_.Emit();
 		}
 		if (startTime_ < 0.0f) {
 			isStart_ = false;

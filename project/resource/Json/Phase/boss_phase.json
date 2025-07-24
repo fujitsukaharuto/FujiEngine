@@ -12,6 +12,10 @@
             {
                 "name": "Sword",
                 "value": 1.0
+            },
+            {
+                "name": "Beam",
+                "value": 1.0
             }
         ],
         [

@@ -28,7 +28,7 @@ void WaveWall::Initialize() {
 	collider_->SetHeight(2.0f);
 	collider_->SetDepth(1.5f);
 
-	speed_ = 0.35f;
+	speed_ = 0.5f;
 	velocity_ = { 0.0f,0.0f,0.0f };
 
 	model_->SetLightEnable(LightMode::kLightNone);

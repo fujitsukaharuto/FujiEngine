@@ -104,7 +104,7 @@ public:
 	/// <summary>
 	/// ペアレントパーティクル
 	/// </summary>
-	static void CreateParentParticleGroup(const std::string& name, const std::string& fileName, uint32_t count = 20);
+	static void CreateParentParticleGroup(const std::string& name, const std::string& fileName, uint32_t count = 20, ShapeType shape = ShapeType::PLANE);
 
 	/// <summary>
 	/// 連番のパーティクル
@@ -128,6 +128,7 @@ private:
 	void InitPlaneVertex();
 	void InitRingVertex();
 	void InitSphereVertex();
+	void InitCylinderVertex();
 
 	bool LifeUpdate(Particle& particle);
 	void ParticleSizeUpdate(Particle& particle);
@@ -168,6 +169,15 @@ private:
 
 	std::vector<VertexDate> sphereVertex_;
 	std::vector<uint32_t> sphereIndex_;
+
+
+	ComPtr<ID3D12Resource> cylinderVBuffer_;
+	ComPtr<ID3D12Resource> cylinderIBuffer_;
+	D3D12_VERTEX_BUFFER_VIEW cylinderVbView{};
+	D3D12_INDEX_BUFFER_VIEW cylinderIbView{};
+
+	std::vector<VertexDate> cylinderVertex_;
+	std::vector<uint32_t> cylinderIndex_;
 
 
 	bool isBillBoard_ = true;

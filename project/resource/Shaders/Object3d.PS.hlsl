@@ -60,11 +60,11 @@ ConstantBuffer<PointLight> gPointLight : register(b3);
 ConstantBuffer<SpotLight> gSpotLight : register(b4);
 RWStructuredBuffer<PickingBuffer> gPickingBuffer : register(u0);
 
-// ピッキング制御用データ（CPU → GPU）
+// マウスの位置とクリックしたか
 cbuffer PickingData : register(b5)
 {
-    int2 pickingPixelCoord;
-    uint pickingEnable;
+    int2 pickingPixelCoord;// マウスの位置
+    uint pickingEnable;    // クリックしたか
 };
 
 cbuffer ObjIDData : register(b6)

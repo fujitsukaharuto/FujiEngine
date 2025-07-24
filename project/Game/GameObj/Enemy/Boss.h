@@ -154,4 +154,7 @@ private:
 
 	ParticleEmitter jumpWave_;
 
+	ParticleEmitter roringWave_;
+	ParticleEmitter roringParticle_;
+	ParticleEmitter roringring_;
 };

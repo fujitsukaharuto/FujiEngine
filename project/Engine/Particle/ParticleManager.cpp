@@ -27,6 +27,7 @@ void ParticleManager::Initialize(DXCom* pDxcom, SRVManager* srvManager) {
 	InitPlaneVertex();
 	InitRingVertex();
 	InitSphereVertex();
+	InitCylinderVertex();
 }
 
 void ParticleManager::Finalize() {
@@ -69,6 +70,8 @@ void ParticleManager::Finalize() {
 	ringIBuffer_.Reset();
 	sphereVBuffer_.Reset();
 	sphereIBuffer_.Reset();
+	cylinderIBuffer_.Reset();
+	cylinderVBuffer_.Reset();
 }
 
 void ParticleManager::Update() {
@@ -325,6 +328,8 @@ void ParticleManager::Draw() {
 			case ShapeType::TORUS:
 				break;
 			case ShapeType::CYLINDER:
+				dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &cylinderVbView);
+				dxcommon_->GetCommandList()->IASetIndexBuffer(&cylinderIbView);
 				break;
 			case ShapeType::CONE:
 				break;
@@ -355,6 +360,7 @@ void ParticleManager::Draw() {
 		case ShapeType::TORUS:
 			break;
 		case ShapeType::CYLINDER:
+			dxcommon_->GetCommandList()->DrawIndexedInstanced(static_cast<UINT>((cylinderIndex_.size())), group->drawCount_, 0, 0, 0);
 			break;
 		case ShapeType::CONE:
 			break;
@@ -375,11 +381,72 @@ void ParticleManager::Draw() {
 	for (auto& groupPair : parentParticleGroups_) {
 		ParentParticleGroup* group = groupPair.second.get();
 
+		if (group->drawCount_ == 0) {
+			continue;
+		}
+
+		if (group->shapeType_ != ShapeType::PLANE) {
+			switch (group->shapeType_) {
+			case ShapeType::PLANE:
+				break;
+			case ShapeType::RING:
+				dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &ringVbView);
+				dxcommon_->GetCommandList()->IASetIndexBuffer(&ringIbView);
+				break;
+			case ShapeType::SPHERE:
+				dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &sphereVbView);
+				dxcommon_->GetCommandList()->IASetIndexBuffer(&sphereIbView);
+				break;
+			case ShapeType::TORUS:
+				break;
+			case ShapeType::CYLINDER:
+				dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &cylinderVbView);
+				dxcommon_->GetCommandList()->IASetIndexBuffer(&cylinderIbView);
+				break;
+			case ShapeType::CONE:
+				break;
+			case ShapeType::TRIANGLE:
+				break;
+			case ShapeType::BOX:
+				break;
+			default:
+				break;
+			}
+		}
+
 		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group->srvIndex_));
 		dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, group->material_.GetMaterialResource()->GetGPUVirtualAddress());
 		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, group->material_.GetTexture()->gpuHandle);
 
-		dxcommon_->GetCommandList()->DrawIndexedInstanced(6, group->drawCount_, 0, 0, 0);
+		switch (group->shapeType_) {
+		case ShapeType::PLANE:
+			dxcommon_->GetCommandList()->DrawIndexedInstanced(static_cast<UINT>((index_.size())), group->drawCount_, 0, 0, 0);
+			break;
+		case ShapeType::RING:
+			dxcommon_->GetCommandList()->DrawIndexedInstanced(static_cast<UINT>((ringIndex_.size())), group->drawCount_, 0, 0, 0);
+			break;
+		case ShapeType::SPHERE:
+			dxcommon_->GetCommandList()->DrawIndexedInstanced(static_cast<UINT>((sphereIndex_.size())), group->drawCount_, 0, 0, 0);
+			break;
+		case ShapeType::TORUS:
+			break;
+		case ShapeType::CYLINDER:
+			dxcommon_->GetCommandList()->DrawIndexedInstanced(static_cast<UINT>((cylinderIndex_.size())), group->drawCount_, 0, 0, 0);
+			break;
+		case ShapeType::CONE:
+			break;
+		case ShapeType::TRIANGLE:
+			break;
+		case ShapeType::BOX:
+			break;
+		default:
+			break;
+		}
+
+		if (group->shapeType_ != ShapeType::PLANE) {
+			dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vbView);
+			dxcommon_->GetCommandList()->IASetIndexBuffer(&ibView);
+		}
 	}
 
 	dxcommon_->GetDXCommand()->SetViewAndscissor();
@@ -427,7 +494,7 @@ void ParticleManager::ParticleDebugGUI() {
 	}
 	if (selectParticleGroup_) {
 		int shapeType = static_cast<int>(selectParticleGroup_->shapeType_);
-		ImGui::Combo("ShapeType##type", &shapeType, "Plane\0Ring\0sphere\0");
+		ImGui::Combo("ShapeType##type", &shapeType, "Plane\0Ring\0sphere\0Torus\0Cylinder\0");
 		selectParticleGroup_->shapeType_ = static_cast<ShapeType>(shapeType);
 		ImGui::Text("count : %d", int(selectParticleGroup_->drawCount_));
 	}
@@ -532,7 +599,7 @@ void ParticleManager::CreateParticleGroup(const std::string& name, const std::st
 	instance->particleGroups_.insert(std::make_pair(name, newGroup));
 }
 
-void ParticleManager::CreateParentParticleGroup(const std::string& name, const std::string& fileName, uint32_t count) {
+void ParticleManager::CreateParentParticleGroup(const std::string& name, const std::string& fileName, uint32_t count, ShapeType shape) {
 
 	ParticleManager* instance = GetInstance();
 
@@ -545,6 +612,7 @@ void ParticleManager::CreateParentParticleGroup(const std::string& name, const s
 
 	// 必要な初期化処理
 	newGroup->emitter_ = std::make_unique<ParticleEmitter>();
+	newGroup->shapeType_ = shape;
 	newGroup->emitter_->name_ = name;
 	newGroup->emitter_->Load(name);
 
@@ -631,6 +699,7 @@ void ParticleManager::Load(ParticleEmitter& emit, const std::string& name) {
 		emit.grain_.returnPower_ = group->emitter_.grain_.returnPower_;
 		emit.grain_.startSize_ = group->emitter_.grain_.startSize_;
 		emit.grain_.endSize_ = group->emitter_.grain_.endSize_;
+		emit.grain_.isZandX_ = group->emitter_.grain_.isZandX_;
 		emit.grain_.isBillBoard_ = group->emitter_.grain_.isBillBoard_;
 		emit.grain_.pattern_ = group->emitter_.grain_.pattern_;
 		emit.para_.speedx = group->emitter_.para_.speedx;
@@ -926,6 +995,69 @@ void ParticleManager::InitSphereVertex() {
 	sphereIbView.SizeInBytes = static_cast<UINT>(sizeof(uint32_t) * sphereIndex_.size());
 }
 
+void ParticleManager::InitCylinderVertex() {
+	const uint32_t kCylinderDivide = 32;
+	const float kTopRadius = 1.0f;
+	const float kBottomRadius = 1.0f;
+	const float kHeight = 2.0f;
+	const float radianPerDivide = 2.0f * std::numbers::pi_v<float> / float(kCylinderDivide);
+
+	for (uint32_t i = 0; i <= kCylinderDivide; i++) {
+		float angle = i * radianPerDivide;
+		float sinA = std::sin(angle);
+		float cosA = std::cos(angle);
+		float u = float(i) / float(kCylinderDivide);
+
+		// 下
+		Vector3 posBottom = { cosA * kBottomRadius, 0.0f, sinA * kBottomRadius };
+		Vector3 normal = { cosA, 0.0f, sinA };
+		cylinderVertex_.push_back({ {posBottom.x, posBottom.y, posBottom.z, 1.0f}, {u, 1.0f}, normal });
+
+		// 上
+		Vector3 posTop = { cosA * kTopRadius, kHeight, sinA * kTopRadius };
+		cylinderVertex_.push_back({ {posTop.x, posTop.y, posTop.z, 1.0f}, {u, 0.0f}, normal });
+
+	}
+
+	// インデックス生成
+	for (uint32_t i = 0; i < kCylinderDivide; i++) {
+		uint32_t bottom0 = i * 2;
+		uint32_t top0 = bottom0 + 1;
+		uint32_t bottom1 = bottom0 + 2;
+		uint32_t top1 = bottom0 + 3;
+
+		// 三角形1
+		cylinderIndex_.push_back(bottom0);
+		cylinderIndex_.push_back(top0);
+		cylinderIndex_.push_back(bottom1);
+
+		// 三角形2
+		cylinderIndex_.push_back(bottom1);
+		cylinderIndex_.push_back(top0);
+		cylinderIndex_.push_back(top1);
+	}
+
+
+	cylinderVBuffer_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(VertexDate) * cylinderVertex_.size());
+	cylinderIBuffer_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(uint32_t) * cylinderIndex_.size());
+
+	VertexDate* vData = nullptr;
+	cylinderVBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&vData));
+	std::memcpy(vData, cylinderVertex_.data(), sizeof(VertexDate) * cylinderVertex_.size());
+
+	cylinderVbView.BufferLocation = cylinderVBuffer_->GetGPUVirtualAddress();
+	cylinderVbView.SizeInBytes = static_cast<UINT>(sizeof(VertexDate) * cylinderVertex_.size());
+	cylinderVbView.StrideInBytes = static_cast<UINT>(sizeof(VertexDate));
+
+	uint32_t* iData = nullptr;
+	cylinderIBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&iData));
+	std::memcpy(iData, cylinderIndex_.data(), sizeof(uint32_t) * cylinderIndex_.size());
+
+	cylinderIbView.BufferLocation = cylinderIBuffer_->GetGPUVirtualAddress();
+	cylinderIbView.Format = DXGI_FORMAT_R32_UINT;
+	cylinderIbView.SizeInBytes = static_cast<UINT>(sizeof(uint32_t) * cylinderIndex_.size());
+}
+
 
 
 bool ParticleManager::LifeUpdate(Particle& particle) {
@@ -959,6 +1091,9 @@ void ParticleManager::ParticleSizeUpdate(Particle& particle) {
 
 		particle.scale.x = Lerp(particle.startSize_.x, particle.endSize_.x, t);
 		particle.scale.y = Lerp(particle.startSize_.y, particle.endSize_.y, t);
+		if (particle.isZandX_) {
+			particle.scale.z = Lerp(particle.startSize_.x, particle.endSize_.x, t);
+		}
 
 		break;
 	case SizeType::kSin:
@@ -1159,6 +1294,7 @@ bool ParticleManager::InitEmitParticle(Particle& particle, const Vector3& pos, c
 		particle.type_ = grain.type_;
 		particle.startSize_ = grain.startSize_ + para.addRandomSize;
 		particle.endSize_ = grain.endSize_ + para.addRandomSize;
+		particle.isZandX_ = grain.isZandX_;
 		particle.isParent_ = grain.isParent_;
 		particle.isParentRotate_ = grain.isParentRotate_;
 

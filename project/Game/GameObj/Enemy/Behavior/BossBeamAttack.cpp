@@ -7,7 +7,7 @@ BossBeamAttack::BossBeamAttack(Boss* pBoss) : BaseBossBehavior(pBoss) {
 	step_ = Step::CHARGE;
 
 	pBoss_->InitBeam();
-	pBoss_->GetAnimModel()->ChangeAnimation("T_pose");
+	pBoss_->GetAnimModel()->ChangeAnimation("idle");
 }
 
 BossBeamAttack::~BossBeamAttack() {

@@ -24,7 +24,7 @@ void UnderRing::Initialize() {
 	cylinder_->SetTexture("shockWaveGround.png");
 	cylinder_->SetColor({ 0.9f,0.9f,1.0f,1.0f });
 
-	speed_ = 0.35f;
+	speed_ = 0.5f;
 
 	model_->SetLightEnable(LightMode::kLightNone);
 	model_->SetTexture("gradationLine.png");

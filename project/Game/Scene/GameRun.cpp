@@ -68,6 +68,12 @@ void GameRun::Initialize() {
 	pManager_->CreateParticleGroup("BulletTrajectory", "redCircle.png", 1000);
 	pManager_->CreateParticleGroup("BulletTrajectory2", "redCircle.png",1000);
 	pManager_->CreateParticleGroup("playerTranjectory", "kira.png", 200);
+	pManager_->CreateParticleGroup("playerhit", "redCircle.png", 100);
+
+	/*pManager_->CreateParticleGroup("playerAfterBurner", "shockWaveGround.png", 200, ShapeType::RING);
+	pManager_->CreateParticleGroup("playerAfterBurner2", "shockWaveGround.png", 200, ShapeType::RING);
+	pManager_->CreateParticleGroup("playerAfterBurner3", "shockWaveGround.png", 200, ShapeType::RING);
+	pManager_->CreateParticleGroup("playerAfterBurner4", "shockWaveGround.png", 200, ShapeType::RING);*/
 	
 	pManager_->CreateParticleGroup("bulletHit", "redCircle.png", 100);
 	pManager_->CreateParticleGroup("bulletHit2", "redCircle.png", 100);
@@ -96,6 +102,10 @@ void GameRun::Initialize() {
 	pManager_->CreateParticleGroup("BeamParticle", "redCircle.png", 200);
 	pManager_->CreateParticleGroup("BeamLight", "redCircle.png", 40);
 
+	pManager_->CreateParticleGroup("roringWave", "underRing.png", 20, ShapeType::CYLINDER);
+	pManager_->CreateParticleGroup("roringParticle", "redCircle.png", 80);
+	pManager_->CreateParticleGroup("roringring", "gradationLine.png", 20, ShapeType::RING);
+
 
 
 	// playerBullet用
@@ -106,6 +116,12 @@ void GameRun::Initialize() {
 	pManager_->CreateParentParticleGroup("ChargeRay", "chargeRay.png", 20);
 	pManager_->CreateParentParticleGroup("ChargeWave", "chargeCircle.png", 10);
 	pManager_->CreateParentParticleGroup("ChargeCircle", "chargeCircle.png", 10);
+
+
+	pManager_->CreateParentParticleGroup("playerAfterBurner", "shockWaveGround.png", 200, ShapeType::RING);
+	pManager_->CreateParentParticleGroup("playerAfterBurner2", "shockWaveGround.png", 200, ShapeType::RING);
+	pManager_->CreateParentParticleGroup("playerAfterBurner3", "shockWaveGround.png", 200, ShapeType::RING);
+	pManager_->CreateParentParticleGroup("playerAfterBurner4", "shockWaveGround.png", 200, ShapeType::RING);
 
 
 	pManager_->CreateParentParticleGroup("BeamParticle", "redCircle.png", 200);
