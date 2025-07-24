@@ -137,6 +137,9 @@ void Player::Update() {
 			}
 		}
 
+		if (avoidCoolTime_ > 0.0f) {
+			avoidCoolTime_ -= FPSKeeper::DeltaTime();
+		}
 		HPUpdate();
 	} else {
 		deathTime_ -= FPSKeeper::DeltaTime();
@@ -344,44 +347,52 @@ void Player::Move(const float& speed) {
 	velocity_ = GetInputDirection();
 
 	if (GetIsMove()) {
-		velocity_ = velocity_.Normalize() * speed;
-		Matrix4x4 rotateMatrix = MakeRotateYMatrix(CameraManager::GetInstance()->GetCamera()->transform.rotate.y);
-		velocity_ = TransformNormal(velocity_, rotateMatrix);
-		// 位置を更新
-		model_->transform.translate += velocity_;
-
-		Vector3 particleSpeed = Random::GetVector3({ -0.01f,0.01f }, { -0.01f,0.01f }, { -0.3f,-0.2f });
-		particleSpeed = TransformNormal(particleSpeed, MakeRotateXYZMatrix(model_->transform.rotate));
-		moveParticleL_.para_.speedx = { particleSpeed.x,particleSpeed.x };
-		moveParticleL_.para_.speedy = { particleSpeed.y,particleSpeed.y };
-		moveParticleL_.para_.speedz = { particleSpeed.z,particleSpeed.z };
-		moveParticleL_.Emit();
-		particleSpeed = Random::GetVector3({ -0.01f,0.01f }, { -0.01f,0.01f }, { -0.3f,-0.2f });
-		particleSpeed = TransformNormal(particleSpeed, MakeRotateXYZMatrix(model_->transform.rotate));
-		moveParticleR_.para_.speedx = { particleSpeed.x,particleSpeed.x };
-		moveParticleR_.para_.speedy = { particleSpeed.y,particleSpeed.y };
-		moveParticleR_.para_.speedz = { particleSpeed.z,particleSpeed.z };
-		moveParticleR_.Emit();
-		particleSpeed = { 0.0f,0.0f,-0.1f };
-		particleSpeed = TransformNormal(particleSpeed, MakeRotateXYZMatrix(model_->transform.rotate));
-		moveBurnerL_->para_.speedx = { particleSpeed.x,particleSpeed.x };
-		moveBurnerL_->para_.speedy = { particleSpeed.y,particleSpeed.y };
-		moveBurnerL_->para_.speedz = { particleSpeed.z,particleSpeed.z };
-		moveBurnerR_->para_.speedx = { particleSpeed.x,particleSpeed.x };
-		moveBurnerR_->para_.speedy = { particleSpeed.y,particleSpeed.y };
-		moveBurnerR_->para_.speedz = { particleSpeed.z,particleSpeed.z };
-		moveBurnerLT_->para_.speedx = { particleSpeed.x,particleSpeed.x };
-		moveBurnerLT_->para_.speedy = { particleSpeed.y,particleSpeed.y };
-		moveBurnerLT_->para_.speedz = { particleSpeed.z,particleSpeed.z };
-		moveBurnerRT_->para_.speedx = { particleSpeed.x,particleSpeed.x };
-		moveBurnerRT_->para_.speedy = { particleSpeed.y,particleSpeed.y };
-		moveBurnerRT_->para_.speedz = { particleSpeed.z,particleSpeed.z };
-		moveBurnerL_->Emit();
-		moveBurnerR_->Emit();
-		moveBurnerLT_->Emit();
-		moveBurnerRT_->Emit();
+		MoveTrans(speed);
 	}
 
+	MoveRotate();
+}
+
+void Player::MoveTrans(const float& speed) {
+	velocity_ = velocity_.Normalize() * speed;
+	Matrix4x4 rotateMatrix = MakeRotateYMatrix(CameraManager::GetInstance()->GetCamera()->transform.rotate.y);
+	velocity_ = TransformNormal(velocity_, rotateMatrix);
+	// 位置を更新
+	model_->transform.translate += velocity_;
+
+	Vector3 particleSpeed = Random::GetVector3({ -0.01f,0.01f }, { -0.01f,0.01f }, { -0.3f,-0.2f });
+	particleSpeed = TransformNormal(particleSpeed, MakeRotateXYZMatrix(model_->transform.rotate));
+	moveParticleL_.para_.speedx = { particleSpeed.x,particleSpeed.x };
+	moveParticleL_.para_.speedy = { particleSpeed.y,particleSpeed.y };
+	moveParticleL_.para_.speedz = { particleSpeed.z,particleSpeed.z };
+	moveParticleL_.Emit();
+	particleSpeed = Random::GetVector3({ -0.01f,0.01f }, { -0.01f,0.01f }, { -0.3f,-0.2f });
+	particleSpeed = TransformNormal(particleSpeed, MakeRotateXYZMatrix(model_->transform.rotate));
+	moveParticleR_.para_.speedx = { particleSpeed.x,particleSpeed.x };
+	moveParticleR_.para_.speedy = { particleSpeed.y,particleSpeed.y };
+	moveParticleR_.para_.speedz = { particleSpeed.z,particleSpeed.z };
+	moveParticleR_.Emit();
+	particleSpeed = { 0.0f,0.0f,-0.1f };
+	particleSpeed = TransformNormal(particleSpeed, MakeRotateXYZMatrix(model_->transform.rotate));
+	moveBurnerL_->para_.speedx = { particleSpeed.x,particleSpeed.x };
+	moveBurnerL_->para_.speedy = { particleSpeed.y,particleSpeed.y };
+	moveBurnerL_->para_.speedz = { particleSpeed.z,particleSpeed.z };
+	moveBurnerR_->para_.speedx = { particleSpeed.x,particleSpeed.x };
+	moveBurnerR_->para_.speedy = { particleSpeed.y,particleSpeed.y };
+	moveBurnerR_->para_.speedz = { particleSpeed.z,particleSpeed.z };
+	moveBurnerLT_->para_.speedx = { particleSpeed.x,particleSpeed.x };
+	moveBurnerLT_->para_.speedy = { particleSpeed.y,particleSpeed.y };
+	moveBurnerLT_->para_.speedz = { particleSpeed.z,particleSpeed.z };
+	moveBurnerRT_->para_.speedx = { particleSpeed.x,particleSpeed.x };
+	moveBurnerRT_->para_.speedy = { particleSpeed.y,particleSpeed.y };
+	moveBurnerRT_->para_.speedz = { particleSpeed.z,particleSpeed.z };
+	moveBurnerL_->Emit();
+	moveBurnerR_->Emit();
+	moveBurnerLT_->Emit();
+	moveBurnerRT_->Emit();
+}
+
+void Player::MoveRotate() {
 	Vector3 forward = (targetPos_ - model_->transform.translate).Normalize();
 	Quaternion targetRotation = Quaternion::LookRotation(forward); // Y軸を上とした視線方向
 	// 現在の回転（Y軸回転からクォータニオンを構成する）
@@ -390,19 +401,19 @@ void Player::Move(const float& speed) {
 	Quaternion newRotation = targetRotation;
 	//Quaternion newRotation = Quaternion::Slerp(targetRotation, currentRotation, 0.01f); // なんかバグっちゃってる
 
-	float zRotate_ = 0.0f;
+	float zRotate = 0.0f;
 	if (inputDirection_.x == -1.0f) {
-		zRotate_ = 0.2f;
+		zRotate = 0.2f;
 	} else if (inputDirection_.x == 1.0f) {
-		zRotate_ = -0.2f;
+		zRotate = -0.2f;
 	}
-	if (zRotate_ != 0.0f) {
-		Quaternion spinRot = Quaternion::AngleAxis(zRotate_, Vector3(0, 0, 1));
+	zRotate += avoidRotate_;
+	if (zRotate != 0.0f) {
+		Quaternion spinRot = Quaternion::AngleAxis(zRotate, Vector3(0, 0, 1));
 		newRotation = newRotation * spinRot;
 	}
 	// 新しい回転からY軸角度を抽出（回転更新）
 	model_->transform.rotate = Quaternion::QuaternionToEuler(newRotation);
-
 }
 
 Vector3 Player::GetInputDirection() {
@@ -412,8 +423,10 @@ Vector3 Player::GetInputDirection() {
 	if (input->PushKey(DIK_A) || input->PushKey(DIK_D) || input->PushKey(DIK_W) || input->PushKey(DIK_S)) {
 		if (input->PushKey(DIK_A)) {
 			inputDirection_.x -= 1.0f;
+			avoidDirection_ = -1.0f;
 		} else if (input->PushKey(DIK_D)) {
 			inputDirection_.x += 1.0f;
+			avoidDirection_ = 1.0f;
 		}
 		if (input->PushKey(DIK_S)) {
 			inputDirection_.z -= 1.0f;
@@ -475,6 +488,32 @@ void Player::Fall(float& speed) {
 	fallSpeed_ = speed;
 }
 #pragma endregion
+
+///= Avoid ====================================================================*/
+void Player::Avoid([[maybe_unused]]float& avoidTime) {
+	if (avoidTime < 30.0f) {
+		avoidTime += FPSKeeper::DeltaTime();
+		if (avoidTime >= 30.0f) {
+			avoidTime = 30.0f;
+		}
+
+		float t = avoidTime / 30.0f;
+		t = 1.0f - powf(1.0f - t, 2);
+		if (avoidDirection_ > 0.0f) {
+			avoidRotate_ = std::lerp(0.0f, -std::numbers::pi_v<float>*4.0f, t);
+		} else {
+			avoidRotate_ = std::lerp(0.0f, std::numbers::pi_v<float>*4.0f, t);
+		}
+
+		velocity_ = { avoidDirection_,0.0f,0.0f };
+		MoveTrans(0.25f);
+		MoveRotate();
+	}
+	if (avoidTime == 30.0f) {
+		avoidRotate_ = 0.0f;
+		avoidCoolTime_ = 30.0f;
+	}
+}
 
 
 void Player::InitBullet() {

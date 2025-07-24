@@ -4,6 +4,7 @@
 
 #include "Game/GameObj/Player/Player.h"
 #include "Game/GameObj/Player/Behavior/PlayerJump.h"
+#include "Game/GameObj/Player/Behavior/PlayerAvoid.h"
 
 PlayerRoot::PlayerRoot(Player* pPlayer) : BasePlayerBehavior(pPlayer) {
 	step_ = Step::ROOT;
@@ -24,6 +25,10 @@ void PlayerRoot::Update() {
 			step_ = Step::TOJUMP;
 			break;
 		}
+		if (Input::GetInstance()->PushKey(DIK_K) && !pPlayer_->GetIsFall() && pPlayer_->GetAvoidCoolTime() <= 0.0f) {
+			step_ = Step::TOAVOID;
+			break;
+		}
 
 		pPlayer_->Move(pPlayer_->GetMoveSpeed());
 
@@ -33,6 +38,9 @@ void PlayerRoot::Update() {
 		///---------------------------------------------------------------------------------------
 	case PlayerRoot::Step::TOJUMP:
 		pPlayer_->ChangeBehavior(std::make_unique<PlayerJump>(pPlayer_));
+		break;
+	case PlayerRoot::Step::TOAVOID:
+		pPlayer_->ChangeBehavior(std::make_unique<PlayerAvoid>(pPlayer_));
 		break;
 	default:
 		break;

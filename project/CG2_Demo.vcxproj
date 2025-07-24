@@ -189,6 +189,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\GameObj\FollowCamera.cpp" />
     <ClCompile Include="Game\GameObj\LockOn.cpp" />
     <ClCompile Include="Game\GameObj\Player\AttackBehavior\PlayerAttackRoot.cpp" />
+    <ClCompile Include="Game\GameObj\Player\Behavior\PlayerAvoid.cpp" />
     <ClCompile Include="Game\GameObj\Player\Behavior\PlayerJump.cpp" />
     <ClCompile Include="Game\GameObj\Player\Behavior\PlayerRoot.cpp" />
     <ClCompile Include="Game\GameObj\Player\Player.cpp" />
@@ -306,6 +307,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Game\GameObj\Player\AttackBehavior\BasePlayerAttackBehavior.h" />
     <ClInclude Include="Game\GameObj\Player\AttackBehavior\PlayerAttackRoot.h" />
     <ClInclude Include="Game\GameObj\Player\Behavior\BasePlayerBehavior.h" />
+    <ClInclude Include="Game\GameObj\Player\Behavior\PlayerAvoid.h" />
     <ClInclude Include="Game\GameObj\Player\Behavior\PlayerJump.h" />
     <ClInclude Include="Game\GameObj\Player\Behavior\PlayerRoot.h" />
     <ClInclude Include="Game\GameObj\Player\Player.h" />

@@ -36,6 +36,8 @@ public:
 	//========================================================================*/
 	//* Move
 	void Move(const float& speed);
+	void MoveTrans(const float& speed);
+	void MoveRotate();
 	Vector3 GetInputDirection();
 	bool GetIsMove();
 
@@ -43,6 +45,10 @@ public:
 	//* Jump
 	void Jump(float& speed);
 	void Fall(float& speed);
+
+	//========================================================================*/
+	//* Avoid
+	void Avoid(float& avoidTime);
 
 	//========================================================================*/
 	//* Bullet
@@ -57,6 +63,7 @@ public:
 	float GetSecoundJumpSpeed() { return secoundJumpSpeed_; }
 	float GetFallSpeed() { return fallSpeed_; }
 	float GetMaxChargeTime() { return maxChargeTime_; }
+	float GetAvoidCoolTime() { return avoidCoolTime_; }
 	int GetGrabDir() { return dir_; }
 	bool GetIsFall() { return isFall_; }
 	bool GetIsGameOver() { return isGameOver_; }
@@ -107,6 +114,10 @@ private:
 	float maxFallSpeed_;
 	float maxChargeTime_;
 	bool isFall_;
+
+	float avoidRotate_;
+	float avoidDirection_ = 1.0f;
+	float avoidCoolTime_;
 
 	bool isStart_ = true;
 	bool isDeath_ = false;

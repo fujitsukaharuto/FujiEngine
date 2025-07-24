@@ -44,6 +44,8 @@ public:
 	/// <param name="frame">フレーム数</param>
 	static void SetHitStopFrame(float frame);
 
+
+
 	void Debug();
 
 private:

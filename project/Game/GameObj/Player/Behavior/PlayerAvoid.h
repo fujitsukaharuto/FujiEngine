@@ -2,15 +2,14 @@
 #include "BasePlayerBehavior.h"
 
 
-class PlayerRoot : public BasePlayerBehavior {
+class PlayerAvoid : public BasePlayerBehavior {
 public:
-	PlayerRoot(Player* pPlayer);
-	~PlayerRoot();
+	PlayerAvoid(Player* pPlayer);
+	~PlayerAvoid();
 
 	enum class Step {
-		ROOT,
-		TOJUMP,
-		TOAVOID,
+		AVOID,
+		TOROOT,
 	};
 
 	void Update()override;
@@ -19,6 +18,6 @@ public:
 private:
 
 	Step step_;
-	float speed_;
+	float avoidTime_;
 
 };
