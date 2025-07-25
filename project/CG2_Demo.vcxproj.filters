@@ -311,6 +311,9 @@
     <ClCompile Include="Engine\GraphicPipeline\CSPipe\LuminanceOutlineCSPipe.cpp">
       <Filter>Engine\GraphicPipeline\CSPipe</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\GraphicPipeline\CSPipe\RetroTVCSPipe.cpp">
+      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -679,6 +682,9 @@
     <ClInclude Include="Engine\GraphicPipeline\CSPipe\LuminanceOutlineCSPipe.h">
       <Filter>Engine\GraphicPipeline\CSPipe</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\GraphicPipeline\CSPipe\RetroTVCSPipe.h">
+      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -906,6 +912,9 @@
       <Filter>resource\Shaders\CS</Filter>
     </FxCompile>
     <FxCompile Include="resource\Shaders\CS\LuminanceBasedOutline.CS.hlsl">
+      <Filter>resource\Shaders\CS</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\CS\RetroTV.CS.hlsl">
       <Filter>resource\Shaders\CS</Filter>
     </FxCompile>
   </ItemGroup>

@@ -136,6 +136,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\GraphicPipeline\CSPipe\OutlineCSPipe.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\CSPipe\RadialBlurCSPipe.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\CSPipe\RandomCSPipe.cpp" />
+    <ClCompile Include="Engine\GraphicPipeline\CSPipe\RetroTVCSPipe.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\FirePipe.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\Line3dPipe.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\MetaBallPipeline.cpp" />
@@ -244,6 +245,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\GraphicPipeline\CSPipe\OutlineCSPipe.h" />
     <ClInclude Include="Engine\GraphicPipeline\CSPipe\RadialBlurCSPipe.h" />
     <ClInclude Include="Engine\GraphicPipeline\CSPipe\RandomCSPipe.h" />
+    <ClInclude Include="Engine\GraphicPipeline\CSPipe\RetroTVCSPipe.h" />
     <ClInclude Include="Engine\GraphicPipeline\FirePipe.h" />
     <ClInclude Include="Engine\GraphicPipeline\Line3dPipe.h" />
     <ClInclude Include="Engine\GraphicPipeline\MetaBallPipeline.h" />
@@ -433,6 +435,14 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="resource\Shaders\CS\Random.CS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.0</ShaderModel>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\CS\RetroTV.CS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>

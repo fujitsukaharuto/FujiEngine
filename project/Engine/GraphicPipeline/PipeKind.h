@@ -20,6 +20,7 @@ enum class Pipe : int {
 	BoxFilterCS,
 	RadialCS,
 	CRTCS,
+	RetroTVCS,
 	OutlineCS,
 	LuminanceOutlineCS,
 	BloomCS,

@@ -185,10 +185,8 @@ private:
 
 	bool isGrayscale_ = true;
 	bool isNonePost_ = true;
-	bool isMetaBall_ = true;
 	bool isShockWave_ = true;
 	bool isFire_ = true;
 	bool isThunder_ = true;
-	bool isCRT_ = true;
 
 };

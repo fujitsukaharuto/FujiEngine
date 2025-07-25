@@ -34,84 +34,54 @@ void OffscreenManager::DebugGUI() {
 
 	bool preIsGrayscale = isGrayscale_;
 	bool preIsNonePost = isNonePost_;
-	bool preIsMetaBall = isMetaBall_;
 	bool preIsShock = isShockWave_;
 	bool preIsFire = isFire_;
 	bool preIsThunder = isThunder_;
-	bool preIsCRT = isCRT_;
 
 	if (ImGui::TreeNode("OffScreen ShaderPath")) {
-		ImGui::Checkbox("Gray", &isGrayscale_);
+		ImGui::Checkbox("PostEffect##checkPost", &isGrayscale_);
 		ImGui::Checkbox("None", &isNonePost_);
-		ImGui::Checkbox("Meta", &isMetaBall_);
-		ImGui::Checkbox("shock", &isShockWave_);
+		/*ImGui::Checkbox("shock", &isShockWave_);
 		ImGui::Checkbox("fire", &isFire_);
-		ImGui::Checkbox("thunder", &isThunder_);
-		ImGui::Checkbox("crt", &isCRT_);
+		ImGui::Checkbox("thunder", &isThunder_);*/
 		ImGui::TreePop();
 	}
 	if (isGrayscale_ && !(preIsGrayscale)) {
 		isNonePost_ = false;
-		isMetaBall_ = false;
 		isShockWave_ = false;
 		isFire_ = false;
 		isThunder_ = false;
-		isCRT_ = false;
 	}
 	if (isNonePost_ && !(preIsNonePost)) {
 		isGrayscale_ = false;
-		isMetaBall_ = false;
 		isShockWave_ = false;
 		isFire_ = false;
 		isThunder_ = false;
-		isCRT_ = false;
-	}
-	if (isMetaBall_ && !(preIsMetaBall)) {
-		isGrayscale_ = false;
-		isNonePost_ = false;
-		isShockWave_ = false;
-		isFire_ = false;
-		isThunder_ = false;
-		isCRT_ = false;
 	}
 	if (isShockWave_ && !(preIsShock)) {
 		isGrayscale_ = false;
 		isNonePost_ = false;
-		isMetaBall_ = false;
 		isFire_ = false;
 		isThunder_ = false;
-		isCRT_ = false;
 	}
 	if (isFire_ && !(preIsFire)) {
 		isGrayscale_ = false;
 		isNonePost_ = false;
-		isMetaBall_ = false;
 		isShockWave_ = false;
 		isThunder_ = false;
-		isCRT_ = false;
 	}
 	if (isThunder_ && !(preIsThunder)) {
 		isGrayscale_ = false;
 		isNonePost_ = false;
-		isMetaBall_ = false;
 		isShockWave_ = false;
 		isFire_ = false;
-		isCRT_ = false;
-	}
-	if (isCRT_ && !(preIsCRT)) {
-		isGrayscale_ = false;
-		isNonePost_ = false;
-		isMetaBall_ = false;
-		isShockWave_ = false;
-		isFire_ = false;
-		isThunder_ = false;
 	}
 
 	EffectListGUI();
 
-	if (ImGui::Button("shock")) {
+	/*if (ImGui::Button("shock")) {
 		shockData_->shockTime = 0.0f;
-	}
+	}*/
 
 	if (ImGui::TreeNode("Gray")) {
 		ImGui::ColorEdit3("gray", &grayCSData_->gray_.x);
@@ -130,7 +100,7 @@ void OffscreenManager::DebugGUI() {
 		ImGui::TreePop();
 	}
 
-	if (ImGui::TreeNode("FireData")) {
+	/*if (ImGui::TreeNode("FireData")) {
 		ImGui::DragFloat("animeTime", &fireData_->animeTime, 0.1f, 0.0f, 60.0f);
 		ImGui::DragFloat2("resolution", &fireData_->resolution.x);
 		ImGui::DragFloat("distortionStrength", &fireData_->distortionStrength, 0.01f);
@@ -143,10 +113,10 @@ void OffscreenManager::DebugGUI() {
 		ImGui::DragFloat("noiseSpeed", &fireData_->noiseSpeed, 0.01f);
 		ImGui::DragFloat("blend", &fireData_->blendStrength, 0.01f);
 		ImGui::TreePop();
-	}
+	}*/
 
 
-	if (ImGui::TreeNode("ThunderData")) {
+	/*if (ImGui::TreeNode("ThunderData")) {
 		ImGui::DragFloat2("startPos", &thunderData_->startPos.x, 0.01f);
 		ImGui::DragFloat2("endPos", &thunderData_->endPos.x, 0.01f);
 		ImGui::DragFloat("time", &thunderData_->time, 0.1f, 0.0f, 60.0f);
@@ -182,7 +152,7 @@ void OffscreenManager::DebugGUI() {
 
 
 		ImGui::TreePop();
-	}
+	}*/
 
 	ImGui::End();
 #endif // _DEBUG
@@ -191,10 +161,12 @@ void OffscreenManager::DebugGUI() {
 
 void OffscreenManager::EffectListGUI() {
 #ifdef _DEBUG
+	ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+
 	if (ImGui::TreeNode("PostEffectList")) {
 		static int currentOffscreenIndex = 0;
 		ImGui::Combo("PostEffect##offType", &currentOffscreenIndex,
-			"GrayScale\0CRT\0Gauss\0BoxFilter\0RadialBlur\0Outline\0LuminanceOutline\0Bloom\0Random\0");
+			"GrayScale\0CRT\0RetroTV\0Gauss\0BoxFilter\0RadialBlur\0Outline\0LuminanceOutline\0Bloom\0Random\0");
 		if (ImGui::Button("Push##offPush")) {
 			validPostEffects.push_back(postEffects[currentOffscreenIndex]);
 		}ImGui::SameLine();
@@ -229,6 +201,9 @@ void OffscreenManager::EffectListGUI() {
 						break;
 					case Pipe::CRTCS:
 						ImGui::Text("CRT");
+						break;
+					case Pipe::RetroTVCS:
+						ImGui::Text("RetroTV");
 						break;
 					case Pipe::OutlineCS:
 						ImGui::Text("Outline");
@@ -349,11 +324,9 @@ void OffscreenManager::CreateResource() {
 
 	isGrayscale_ = true;
 	isNonePost_ = false;
-	isMetaBall_ = false;
 	isShockWave_ = false;
 	isFire_ = false;
 	isThunder_ = false;
-	isCRT_ = false;
 
 }
 
@@ -478,7 +451,7 @@ void OffscreenManager::Command() {
 			D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_GENERIC_READ);
 	}
 
-	if (isNonePost_ || isMetaBall_) {
+	if (isNonePost_) {
 		dxcommon_->GetDXCommand()->SetViewAndscissor();
 		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::None);
 
@@ -523,17 +496,6 @@ void OffscreenManager::Command() {
 		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
 		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, noiseDirTex_->gpuHandle);
 		dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(2, thunderResource_->GetGPUVirtualAddress());
-		dxcommon_->GetCommandList()->DrawInstanced(3, 1, 0, 0);
-	}
-
-	if (isCRT_) {
-		dxcommon_->GetDXCommand()->SetViewAndscissor();
-		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::CRT);
-
-		dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
-		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
-		dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(1, cRTResource_->GetGPUVirtualAddress());
 		dxcommon_->GetCommandList()->DrawInstanced(3, 1, 0, 0);
 	}
 
@@ -616,6 +578,15 @@ void OffscreenManager::InitializePostEffects() {
 
 	postEffects.push_back({
 	   Pipe::CRTCS,
+	   [=](auto* cmd, auto input, auto output) {
+		   cmd->SetComputeRootDescriptorTable(0, input);
+		   cmd->SetComputeRootDescriptorTable(1, output);
+		   cmd->SetComputeRootConstantBufferView(2, cRTResource_->GetGPUVirtualAddress());
+	   }
+		});
+
+	postEffects.push_back({
+	   Pipe::RetroTVCS,
 	   [=](auto* cmd, auto input, auto output) {
 		   cmd->SetComputeRootDescriptorTable(0, input);
 		   cmd->SetComputeRootDescriptorTable(1, output);
