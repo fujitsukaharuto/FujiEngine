@@ -1,5 +1,6 @@
 #pragma once
 #include "Scene/BaseScene.h"
+#include "Game/GameObj/SkyDome/SkyBox.h"
 
 
 class ParticleDebugScene :public BaseScene {
@@ -19,6 +20,7 @@ public:
 private:
 
 	std::unique_ptr<Object3dCommon> obj3dCommon = nullptr;
+	std::unique_ptr<SkyBox> skybox_;
 
 	// sceneChange
 	std::unique_ptr<Sprite> black_;

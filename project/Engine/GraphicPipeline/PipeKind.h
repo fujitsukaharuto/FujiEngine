@@ -17,7 +17,12 @@ enum class Pipe : int {
 	CRT,
 	GrayCS,
 	GaussCS,
+	BoxFilterCS,
+	RadialCS,
 	CRTCS,
 	OutlineCS,
+	LuminanceOutlineCS,
+	BloomCS,
+	RandomCS,
 	SkinningCS,
 };

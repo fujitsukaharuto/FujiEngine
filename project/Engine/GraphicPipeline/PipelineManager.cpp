@@ -15,8 +15,13 @@
 #include "CRTPipe.h"
 #include "CSPipe/GrayCSPipe.h"
 #include "CSPipe/GaussCSPipe.h"
+#include "CSPipe/BoxFilterCSPipe.h"
+#include "CSPipe/RadialBlurCSPipe.h"
 #include "CSPipe/CRTCSPipe.h"
 #include "CSPipe/OutlineCSPipe.h"
+#include "CSPipe/LuminanceOutlineCSPipe.h"
+#include "CSPipe/BloomCSPipe.h"
+#include "CSPipe/RandomCSPipe.h"
 #include "SkinningCSPipe.h"
 
 
@@ -62,8 +67,13 @@ void PipelineManager::CreatePipeline() {
 	std::unique_ptr<CRTPipe> crtPipe = nullptr;
 	std::unique_ptr<GrayCSPipe> grayCS = nullptr;
 	std::unique_ptr<GaussCSPipe> gaussCS = nullptr;
+	std::unique_ptr<BoxFilterCSPipe> boxCS = nullptr;
+	std::unique_ptr<RadialBlurCSPipe> radialCS = nullptr;
 	std::unique_ptr<CRTCSPipe> crtCS = nullptr;
 	std::unique_ptr<OutlineCSPipe> outlineCS = nullptr;
+	std::unique_ptr<LuminanceOutlineCSPipe> luminanceOutCS = nullptr;
+	std::unique_ptr<BloomCSPipe> bloomCS = nullptr;
+	std::unique_ptr<RandomCSPipe> randomCS = nullptr;
 	std::unique_ptr<SkinningCSPipe> skinningCS = nullptr;
 
 
@@ -145,6 +155,14 @@ void PipelineManager::CreatePipeline() {
 	gaussCS->Initialize(dxcommon_);
 	pipelines_.push_back(std::move(gaussCS));
 
+	boxCS.reset(new BoxFilterCSPipe);
+	boxCS->Initialize(dxcommon_);
+	pipelines_.push_back(std::move(boxCS));
+
+	radialCS.reset(new RadialBlurCSPipe);
+	radialCS->Initialize(dxcommon_);
+	pipelines_.push_back(std::move(radialCS));
+
 	crtCS.reset(new CRTCSPipe);
 	crtCS->Initialize(dxcommon_);
 	pipelines_.push_back(std::move(crtCS));
@@ -152,6 +170,18 @@ void PipelineManager::CreatePipeline() {
 	outlineCS.reset(new OutlineCSPipe);
 	outlineCS->Initialize(dxcommon_);
 	pipelines_.push_back(std::move(outlineCS));
+
+	luminanceOutCS.reset(new LuminanceOutlineCSPipe);
+	luminanceOutCS->Initialize(dxcommon_);
+	pipelines_.push_back(std::move(luminanceOutCS));
+
+	bloomCS.reset(new BloomCSPipe);
+	bloomCS->Initialize(dxcommon_);
+	pipelines_.push_back(std::move(bloomCS));
+
+	randomCS.reset(new RandomCSPipe);
+	randomCS->Initialize(dxcommon_);
+	pipelines_.push_back(std::move(randomCS));
 
 	skinningCS.reset(new SkinningCSPipe);
 	skinningCS->Initialize(dxcommon_);

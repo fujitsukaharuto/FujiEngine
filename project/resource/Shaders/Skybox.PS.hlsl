@@ -35,10 +35,11 @@ PixelShaderOutput main(VertxShaderOutput input)
 
     float3 litColor = textureColor.rgb * gMaterial.color.rgb;
 
-    float exposure = 0.4;
+    float exposure = 0.25;
     litColor *= exposure;
     litColor = ToneMapACES(litColor);
 
     output.color = float4(litColor, textureColor.a * gMaterial.color.a);
+    //output.color = textureColor * gMaterial.color;
     return output;
 }

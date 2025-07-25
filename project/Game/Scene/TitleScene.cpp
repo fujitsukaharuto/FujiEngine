@@ -54,6 +54,11 @@ void TitleScene::Initialize() {
 	space_->SetPos({ 640.0f,400.0f,0.0f });
 	space_->SetSize({ 256.0f,128.0f });
 
+	star_ = std::make_unique<Object3d>();
+	star_->Create("Star.obj");
+	star_->SetColor({ 0.9f,0.7f,0.0f,1.0f });
+	star_->LoadTransformFromJson("titleStar_transform.json");
+
 	cube_ = std::make_unique<AnimationModel>();
 	cube_->Create("T_boss.gltf");
 	cube_->LoadAnimationFile("T_boss.gltf");
@@ -115,6 +120,8 @@ void TitleScene::Draw() {
 
 	cube_->Draw();
 	animParentObj_->Draw();
+
+	star_->Draw();
 
 	space_->Draw();
 

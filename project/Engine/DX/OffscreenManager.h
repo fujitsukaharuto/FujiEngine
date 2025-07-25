@@ -60,6 +60,16 @@ struct OutlineElement {
 	Matrix4x4 projectionInverse;
 };
 
+struct BloomParams {
+	float bloomThreshold; // しきい値（例：1.0）
+	float bloomIntensity; // ブルーム強度（例：1.2）
+};
+
+struct RadialParams {
+	Vector2 center;
+	float blurWidth;
+};
+
 struct LightningElement {
 	Vector2 startPos;
 	Vector2 endPos;
@@ -96,6 +106,7 @@ public:
 	void Initialize(DXCom* dxcom);
 	void Update();
 	void DebugGUI();
+	void EffectListGUI();
 
 	void CreateResource();
 	void SettingTexture();
@@ -143,6 +154,12 @@ private:
 
 	ComPtr<ID3D12Resource> outlineResource_ = nullptr;
 	OutlineElement* outlineData_;
+
+	ComPtr<ID3D12Resource> bloomResource_ = nullptr;
+	BloomParams* bloomData_;
+
+	ComPtr<ID3D12Resource> radialResource_ = nullptr;
+	RadialParams* radialData_;
 
 	Texture* baseTex_;
 	Texture* voronoTex_;

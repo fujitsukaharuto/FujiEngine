@@ -32,9 +32,15 @@ void ParticleDebugScene::Initialize() {
 	black_->SetAnchor({ 0.0f,0.0f });
 #pragma endregion
 
+	skybox_ = std::make_unique<SkyBox>();
+	skybox_->SetCommonResources(dxcommon_, SRVManager::GetInstance(), CameraManager::GetInstance()->GetCamera());
+	skybox_->Initialize();
+
 }
 
 void ParticleDebugScene::Update() {
+
+	skybox_->Update();
 
 #ifdef _DEBUG
 
@@ -55,6 +61,7 @@ void ParticleDebugScene::Draw() {
 	dxcommon_->ClearDepthBuffer();
 #pragma endregion
 
+	skybox_->Draw();
 
 #pragma region 3Dオブジェクト
 	obj3dCommon->PreDraw();

@@ -296,6 +296,21 @@
     <ClCompile Include="Game\GameObj\Player\Behavior\PlayerAvoid.cpp">
       <Filter>Game\GameObj\Player\Behavior</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\GraphicPipeline\CSPipe\BloomCSPipe.cpp">
+      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\GraphicPipeline\CSPipe\BoxFilterCSPipe.cpp">
+      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\GraphicPipeline\CSPipe\RandomCSPipe.cpp">
+      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\GraphicPipeline\CSPipe\RadialBlurCSPipe.cpp">
+      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\GraphicPipeline\CSPipe\LuminanceOutlineCSPipe.cpp">
+      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -649,6 +664,21 @@
     <ClInclude Include="Game\GameObj\Player\Behavior\PlayerAvoid.h">
       <Filter>Game\GameObj\Player\Behavior</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\GraphicPipeline\CSPipe\BloomCSPipe.h">
+      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\GraphicPipeline\CSPipe\BoxFilterCSPipe.h">
+      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\GraphicPipeline\CSPipe\RandomCSPipe.h">
+      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\GraphicPipeline\CSPipe\RadialBlurCSPipe.h">
+      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\GraphicPipeline\CSPipe\LuminanceOutlineCSPipe.h">
+      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -862,6 +892,21 @@
     </FxCompile>
     <FxCompile Include="resource\Shaders\CS\Engine\Particle.CS.hlsl">
       <Filter>resource\Shaders\CS\Engine</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\CS\Bloom.CS.hlsl">
+      <Filter>resource\Shaders\CS</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\CS\BoxFilter.CS.hlsl">
+      <Filter>resource\Shaders\CS</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\CS\RadialBlur.CS.hlsl">
+      <Filter>resource\Shaders\CS</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\CS\Random.CS.hlsl">
+      <Filter>resource\Shaders\CS</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\CS\LuminanceBasedOutline.CS.hlsl">
+      <Filter>resource\Shaders\CS</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>

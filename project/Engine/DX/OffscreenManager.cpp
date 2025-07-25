@@ -107,7 +107,7 @@ void OffscreenManager::DebugGUI() {
 		isThunder_ = false;
 	}
 
-
+	EffectListGUI();
 
 	if (ImGui::Button("shock")) {
 		shockData_->shockTime = 0.0f;
@@ -115,6 +115,18 @@ void OffscreenManager::DebugGUI() {
 
 	if (ImGui::TreeNode("Gray")) {
 		ImGui::ColorEdit3("gray", &grayCSData_->gray_.x);
+		ImGui::TreePop();
+	}
+
+	if (ImGui::TreeNode("Bloom##settingBloom")) {
+		ImGui::DragFloat("bloomIntensity", &bloomData_->bloomIntensity, 0.01f);
+		ImGui::DragFloat("bloomThreshold", &bloomData_->bloomThreshold, 0.01f);
+		ImGui::TreePop();
+	}
+
+	if (ImGui::TreeNode("RadialBlur##settingRadialBlur")) {
+		ImGui::DragFloat2("center##radialpara1", &radialData_->center.x, 0.01f);
+		ImGui::DragFloat("blurWidth##radialpara2", &radialData_->blurWidth, 0.01f);
 		ImGui::TreePop();
 	}
 
@@ -175,6 +187,72 @@ void OffscreenManager::DebugGUI() {
 	ImGui::End();
 #endif // _DEBUG
 
+}
+
+void OffscreenManager::EffectListGUI() {
+	if (ImGui::TreeNode("PostEffectList")) {
+		static int currentOffscreenIndex = 0;
+		ImGui::Combo("PostEffect##offType", &currentOffscreenIndex,
+			"GrayScale\0CRT\0Gauss\0BoxFilter\0RadialBlur\0Outline\0LuminanceOutline\0Bloom\0Random\0");
+		if (ImGui::Button("Push##offPush")) {
+			validPostEffects.push_back(postEffects[currentOffscreenIndex]);
+		}ImGui::SameLine();
+		if (ImGui::Button("Pop##offPop")) {
+			if (validPostEffects.size() != 0) {
+				validPostEffects.pop_back();
+			}
+		}
+
+		if (ImGui::BeginTable("NowPostEffect##offsc", 1, ImGuiTableFlags_None)) {
+			ImGui::TableSetupColumn("NowPostEffect##posteff", ImGuiTableColumnFlags_WidthStretch);
+			ImGui::TableNextRow();
+
+			ImGui::TableHeadersRow();
+			ImGui::TableNextRow();
+
+			ImGui::TableSetColumnIndex(0);
+			if (ImGui::BeginListBox("##PostEffectNowList", ImVec2(-FLT_MIN, 100.0f))) {
+				for (const auto& effect : validPostEffects) {
+					switch (effect.pipeline) {
+					case Pipe::GrayCS:
+						ImGui::Text("GrayScale");
+						break;
+					case Pipe::GaussCS:
+						ImGui::Text("Gauss");
+						break;
+					case Pipe::BoxFilterCS:
+						ImGui::Text("BoxFilter");
+						break;
+					case Pipe::RadialCS:
+						ImGui::Text("RadialBlur");
+						break;
+					case Pipe::CRTCS:
+						ImGui::Text("CRT");
+						break;
+					case Pipe::OutlineCS:
+						ImGui::Text("Outline");
+						break;
+					case Pipe::LuminanceOutlineCS:
+						ImGui::Text("LuminanceOutline");
+						break;
+					case Pipe::BloomCS:
+						ImGui::Text("Bloom");
+						break;
+					case Pipe::RandomCS:
+						ImGui::Text("Random");
+						break;
+					default:
+						break;
+					}
+				}
+				ImGui::EndListBox();
+			}
+
+			ImGui::EndTable();
+		}
+
+		ImGui::TreePop();
+	}
 }
 
 void OffscreenManager::CreateResource() {
@@ -255,8 +333,20 @@ void OffscreenManager::CreateResource() {
 	outlineResource_->Map(0, nullptr, reinterpret_cast<void**>(&outlineData_));
 	outlineData_->projectionInverse = MakeIdentity4x4();
 
-	isGrayscale_ = false;
-	isNonePost_ = true;
+	bloomResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(BloomParams));
+	bloomData_ = nullptr;
+	bloomResource_->Map(0, nullptr, reinterpret_cast<void**>(&bloomData_));
+	bloomData_->bloomIntensity = 1.0f;
+	bloomData_->bloomThreshold = 0.6f;
+
+	radialResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(RadialParams));
+	radialData_ = nullptr;
+	radialResource_->Map(0, nullptr, reinterpret_cast<void**>(&radialData_));
+	radialData_->center = Vector2(0.5f, 0.5f);
+	radialData_->blurWidth = 0.01f;
+
+	isGrayscale_ = true;
+	isNonePost_ = false;
 	isMetaBall_ = false;
 	isShockWave_ = false;
 	isFire_ = false;
@@ -310,7 +400,7 @@ void OffscreenManager::Command() {
 		bool isUsePing = true;
 
 
-		for (int i = 0; i < 1; i++) {
+		for (int i = 0; i < validPostEffects.size(); i++) {
 			auto inputResource = isUsePing ? ping : pong;
 			auto outputResource = isUsePing ? pong : ping;
 
@@ -326,47 +416,17 @@ void OffscreenManager::Command() {
 					D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 			}
 
-			if (i==0) {
+			if (validPostEffects[i].pipeline == Pipe::OutlineCS) {
 				dxcommon_->PreOutline();
-				dxcommon_->GetPipelineManager()->SetCSPipeline(postEffects[3].pipeline);
-				postEffects[3].setup(dxcommon_->GetCommandList(), inputSRVHandle, outputUAVHandle);
+				dxcommon_->GetPipelineManager()->SetCSPipeline(validPostEffects[i].pipeline);
+				validPostEffects[i].setup(dxcommon_->GetCommandList(), inputSRVHandle, outputUAVHandle);
 				dxcommon_->GetCommandList()->Dispatch((MyWin::kWindowWidth + 7) / 8, (MyWin::kWindowHeight + 7) / 8, 1);
 				dxcommon_->PostOutline();
-			}
-			if (i == 1) {
-				dxcommon_->GetPipelineManager()->SetCSPipeline(postEffects[1].pipeline);
-				postEffects[1].setup(dxcommon_->GetCommandList(), inputSRVHandle, outputUAVHandle);
+			} else {
+				dxcommon_->GetPipelineManager()->SetCSPipeline(validPostEffects[i].pipeline);
+				validPostEffects[i].setup(dxcommon_->GetCommandList(), inputSRVHandle, outputUAVHandle);
 				dxcommon_->GetCommandList()->Dispatch((MyWin::kWindowWidth + 7) / 8, (MyWin::kWindowHeight + 7) / 8, 1);
 			}
-
-			//if (i == 0) {
-			//	dxcommon_->GetPipelineManager()->SetCSPipeline(Pipe::GrayCS);
-			//	// 3. SRVとUAVをセット
-			//	dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(0, inputSRVHandle);   // 入力テクスチャ
-			//	dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(1, outputUAVHandle);  // 出力テクスチャ
-			//	// 4. 定数バッファ(CBV)をバインド
-			//	dxcommon_->GetCommandList()->SetComputeRootConstantBufferView(2, grayCSResource_->GetGPUVirtualAddress());    // b0 レジスタ
-			//	// 5. コンピュートシェーダーを実行 (Dispatch)
-			//	dxcommon_->GetCommandList()->Dispatch(
-			//		(MyWin::kWindowWidth + 7) / 8,  // スレッドグループ数 (8x8x1の場合)
-			//		(MyWin::kWindowHeight + 7) / 8,
-			//		1
-			//	);
-			//}
-			//if (i == 1) {
-			//	dxcommon_->GetPipelineManager()->SetCSPipeline(Pipe::CRTCS);
-			//	// 3. SRVとUAVをセット
-			//	dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(0, inputSRVHandle);   // 入力テクスチャ
-			//	dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(1, outputUAVHandle);  // 出力テクスチャ
-			//	// 4. 定数バッファ(CBV)をバインド
-			//	dxcommon_->GetCommandList()->SetComputeRootConstantBufferView(2, cRTResource_->GetGPUVirtualAddress());    // b0 レジスタ
-			//	// 5. コンピュートシェーダーを実行 (Dispatch)
-			//	dxcommon_->GetCommandList()->Dispatch(
-			//		(MyWin::kWindowWidth + 7) / 8,  // スレッドグループ数 (8x8x1の場合)
-			//		(MyWin::kWindowHeight + 7) / 8,
-			//		1
-			//	);
-			//}
 
 			isUsePing = !isUsePing;
 		}
@@ -376,8 +436,13 @@ void OffscreenManager::Command() {
 		auto finalOutput = isUsePing ? pong : ping;
 		auto finalSRVHandle = isUsePing ? outputSRVHandle_ : offTextureHandle_;
 
-		dxcommon_->TransitionResource(finalOutput.Get(),
-			D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_GENERIC_READ);
+		if (validPostEffects.size() != 0) {
+			dxcommon_->TransitionResource(finalOutput.Get(),
+				D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_GENERIC_READ);
+		} else {
+			dxcommon_->TransitionResource(finalOutput.Get(),
+				D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_GENERIC_READ);
+		}
 
 		dxcommon_->GetDXCommand()->SetViewAndscissor();
 		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::None);
@@ -395,8 +460,12 @@ void OffscreenManager::Command() {
 			dxcommon_->TransitionResource(pong.Get(),
 				D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 		} else {
-			dxcommon_->TransitionResource(pong.Get(),
-				D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+			if (validPostEffects.size() != 0) {
+				dxcommon_->TransitionResource(pong.Get(),
+					D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+			} else {
+
+			}
 
 			/*dxcommon_->TransitionResource(ping.Get(),
 				D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);*/
@@ -561,12 +630,55 @@ void OffscreenManager::InitializePostEffects() {
 		});
 
 	postEffects.push_back({
+	   Pipe::BoxFilterCS,
+	   [=](auto* cmd, auto input, [[maybe_unused]] auto output) {
+		   cmd->SetComputeRootDescriptorTable(0, input);
+		   cmd->SetComputeRootDescriptorTable(1, output);
+	   }
+		});
+
+	postEffects.push_back({
+	   Pipe::RadialCS,
+	   [=](auto* cmd, auto input, [[maybe_unused]] auto output) {
+		   cmd->SetComputeRootDescriptorTable(0, input);
+		   cmd->SetComputeRootDescriptorTable(1, output);
+		   cmd->SetComputeRootConstantBufferView(2, radialResource_->GetGPUVirtualAddress());
+	   }
+		});
+
+	postEffects.push_back({
 	   Pipe::OutlineCS,
 	   [=](auto* cmd, auto input, [[maybe_unused]] auto output) {
 		   cmd->SetComputeRootDescriptorTable(0, input);
 		   cmd->SetComputeRootDescriptorTable(2, output);
 		   cmd->SetComputeRootDescriptorTable(1, dxcommon_->GetDepthTexGPUHandle());
 		   cmd->SetComputeRootConstantBufferView(3, outlineResource_->GetGPUVirtualAddress());
+	   }
+		});
+
+	postEffects.push_back({
+	   Pipe::LuminanceOutlineCS,
+	   [=](auto* cmd, auto input, [[maybe_unused]] auto output) {
+		   cmd->SetComputeRootDescriptorTable(0, input);
+		   cmd->SetComputeRootDescriptorTable(1, output);
+	   }
+		});
+
+	postEffects.push_back({
+	   Pipe::BloomCS,
+	   [=](auto* cmd, auto input, [[maybe_unused]] auto output) {
+		   cmd->SetComputeRootDescriptorTable(0, input);
+		   cmd->SetComputeRootDescriptorTable(1, output);
+		   cmd->SetComputeRootConstantBufferView(2, bloomResource_->GetGPUVirtualAddress());
+	   }
+		});
+
+	postEffects.push_back({
+	   Pipe::RandomCS,
+	   [=](auto* cmd, auto input, [[maybe_unused]] auto output) {
+		   cmd->SetComputeRootDescriptorTable(0, input);
+		   cmd->SetComputeRootDescriptorTable(1, output);
+		   cmd->SetComputeRootConstantBufferView(2, cRTResource_->GetGPUVirtualAddress());
 	   }
 		});
 

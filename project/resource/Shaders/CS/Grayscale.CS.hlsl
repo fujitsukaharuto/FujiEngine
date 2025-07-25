@@ -10,7 +10,7 @@ Texture2D InputTexture : register(t0);
 SamplerState InputSampler : register(s0);
 
 // 出力テクスチャ (UAV)
-RWTexture2D<float4> OutputTexture : register(u0);
+RWTexture2D<float4> outputTexture : register(u0);
 
 
 float3 LinearToSRGB(float3 linearColor)
@@ -28,7 +28,7 @@ void main(uint3 dispatchThreadID : SV_DispatchThreadID)
 
     // 出力テクスチャのサイズを取得
     int width, height;
-    OutputTexture.GetDimensions(width, height);
+    outputTexture.GetDimensions(width, height);
 
     // 入力テクスチャから色を読み込む
     float4 color = InputTexture.SampleLevel(InputSampler, (float2) coords / float2(width, height), 0.0f);
@@ -41,5 +41,5 @@ void main(uint3 dispatchThreadID : SV_DispatchThreadID)
     grayscaleColor.rgb = LinearToSRGB(grayscaleColor.rgb);
     
     // 結果を出力テクスチャに書き込む
-    OutputTexture[coords] = float4(grayscaleColor, 1.0);
+    outputTexture[coords] = float4(grayscaleColor, 1.0);
 }
