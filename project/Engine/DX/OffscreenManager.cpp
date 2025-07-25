@@ -190,6 +190,7 @@ void OffscreenManager::DebugGUI() {
 }
 
 void OffscreenManager::EffectListGUI() {
+#ifdef _DEBUG
 	if (ImGui::TreeNode("PostEffectList")) {
 		static int currentOffscreenIndex = 0;
 		ImGui::Combo("PostEffect##offType", &currentOffscreenIndex,
@@ -253,6 +254,7 @@ void OffscreenManager::EffectListGUI() {
 
 		ImGui::TreePop();
 	}
+#endif // _DEBUG
 }
 
 void OffscreenManager::CreateResource() {
