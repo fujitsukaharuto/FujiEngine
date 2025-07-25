@@ -127,6 +127,7 @@ public:
 	DXCommand* GetDXCommand() const { return command_.get(); }
 	DXCompil* GetDXCompil() const { return compiler_.get(); }
 	PipelineManager* GetPipelineManager()const { return pipeManager_; }
+	OffscreenManager* GetOffscreenManager()const { return offscreen_.get(); }
 	D3D12_CPU_DESCRIPTOR_HANDLE GetRTVHandle() { return rtvHandles_[2]; }
 	D3D12_GPU_DESCRIPTOR_HANDLE GetDepthTexGPUHandle() { return depthTexSrvHandle_.second; }
 

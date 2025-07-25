@@ -33,6 +33,8 @@ void GameScene::Initialize() {
 	obj3dCommon.reset(new Object3dCommon());
 	obj3dCommon->Initialize();
 
+	dxcommon_->GetOffscreenManager()->ResetPostEffect();
+	dxcommon_->GetOffscreenManager()->AddPostEffect(PostEffectList::RetroTV);
 
 #pragma region シーン遷移用
 	black_ = std::make_unique<Sprite>();

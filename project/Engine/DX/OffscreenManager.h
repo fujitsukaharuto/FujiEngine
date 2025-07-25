@@ -94,6 +94,19 @@ struct PostEffectPass {
 	// SRV/UAV/CBVのセット処理
 	std::function<void(ID3D12GraphicsCommandList* cmdList, D3D12_GPU_DESCRIPTOR_HANDLE input, D3D12_GPU_DESCRIPTOR_HANDLE output)> setup;
 };
+
+enum class PostEffectList : int {
+	Gray,
+	CRT,
+	RetroTV,
+	Gauss,
+	BoxFilter,
+	Radial,
+	Outline,
+	LuminanceOutline,
+	Bloom,
+	Random,
+};
 #pragma endregion
 
 class OffscreenManager {
@@ -115,6 +128,9 @@ public:
 
 	ComPtr<ID3D12Resource>& GetOffscreenResource() { return offscreenrt_; }
 	const D3D12_CLEAR_VALUE& GetClearColorValue() const { return clearColorValue_; }
+
+	void ResetPostEffect() { validPostEffects.clear(); }
+	void AddPostEffect(PostEffectList effect) { validPostEffects.push_back(postEffects[int(effect)]); }
 
 private:
 
