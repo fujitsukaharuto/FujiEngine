@@ -10,6 +10,7 @@
 #include "Game/GameObj/Enemy/Behavior/BossJumpAttack.h"
 #include "Game/GameObj/Enemy/Behavior/BossSwordAttack.h"
 #include "Game/GameObj/Enemy/Behavior/BossBeamAttack.h"
+#include "Game/GameObj/Enemy/Behavior/BossAreaAttack.h"
 
 #include "Game/GameObj/Player/Player.h"
 
@@ -155,7 +156,7 @@ void Boss::Initialize() {
 	roringParticle_.pos_.z = 5.0f;
 
 	actionList_ = {
-		"Root","Wave","Beam","Jump","Sword"
+		"Root","Wave","Beam","Jump","Sword","Area"
 	};
 	LoadPhase();
 	ChangeBehavior(std::make_unique<BossRoot>(this));
@@ -291,6 +292,7 @@ void Boss::ParameterGUI() {
 				{ "Beam",   [](Boss* b) { return std::make_unique<BossBeamAttack>(b); } },
 				{ "Jump",   [](Boss* b) { return std::make_unique<BossJumpAttack>(b); } },
 				{ "Sword",   [](Boss* b) { return std::make_unique<BossSwordAttack>(b); } },
+				{ "Area",   [](Boss* b) { return std::make_unique<BossAreaAttack>(b); } },
 				// 他も追加
 			};
 			auto it = behaviorFactory.find(nowAction);

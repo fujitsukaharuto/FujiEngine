@@ -6,6 +6,7 @@
 #include "BossBeamAttack.h"
 #include "BossJumpAttack.h"
 #include "BossSwordAttack.h"
+#include "BossAreaAttack.h"
 
 BossRoot::BossRoot(Boss* pBoss) : BaseBossBehavior(pBoss) {
 	step_ = Step::ROOT;
@@ -50,6 +51,9 @@ void BossRoot::Update() {
 			break;
 		case AttackPattern::SwordAttack:
 			pBoss_->ChangeBehavior(std::make_unique<BossSwordAttack>(pBoss_));
+			break;
+		case AttackPattern::AreaAttack:
+			pBoss_->ChangeBehavior(std::make_unique<BossAreaAttack>(pBoss_));
 			break;
 		}
 		break;
@@ -103,5 +107,6 @@ AttackPattern BossRoot::ToAttackPattern(const std::string& name) {
 	if (name == "Wave") return AttackPattern::Wave;
 	if (name == "Jump") return AttackPattern::JumpAttack;
 	if (name == "Sword") return AttackPattern::SwordAttack;
+	if (name == "Area") return AttackPattern::AreaAttack;
 	throw std::invalid_argument("未知のAttackPattern名: " + name);
 }
