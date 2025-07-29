@@ -24,6 +24,9 @@ void TitleScene::Initialize() {
 	CameraManager::GetInstance()->GetCamera()->transform.rotate = { -1.02f,0.0f,0.0f };
 	CameraManager::GetInstance()->GetCamera()->transform.translate = { 0.0f, 3.5f, -20.0f };
 
+	dxcommon_->GetOffscreenManager()->ResetPostEffect();
+	dxcommon_->GetOffscreenManager()->AddPostEffect(PostEffectList::Bloom);
+
 #pragma region シーン遷移用
 	black_ = std::make_unique<Sprite>();
 	black_->Load("white2x2.png");
@@ -62,7 +65,7 @@ void TitleScene::Initialize() {
 	cube_ = std::make_unique<AnimationModel>();
 	cube_->Create("T_boss.gltf");
 	cube_->LoadAnimationFile("T_boss.gltf");
-	cube_->transform.translate.y = 3.0f;
+	cube_->LoadTransformFromJson("boss_transform.json");
 
 	animParentObj_ = std::make_unique<Object3d>();
 	animParentObj_->Create("boss.obj");

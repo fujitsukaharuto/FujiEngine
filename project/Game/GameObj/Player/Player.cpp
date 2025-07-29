@@ -1,6 +1,7 @@
 #include "Player.h"
 
 #include "Engine/Particle/ParticleManager.h"
+#include "Engine/Editor/JsonSerializer.h"
 #include "Engine/Math/Random/Random.h"
 #include "Game/GameObj/Player/Behavior/PlayerRoot.h"
 #include "Game/GameObj/Player/AttackBehavior/PlayerAttackRoot.h"
@@ -15,12 +16,9 @@ Player::~Player() {
 
 void Player::Initialize() {
 	OriginGameObject::Initialize();
-	OriginGameObject::CreateModel("player.obj");
+	OriginGameObject::CreateFromJson("resource/Json/Game_Player.json");
 
 	model_->SetTexture("Atlas.png");
-	model_->transform.translate.y = 1.0f;
-	model_->transform.translate.z = -25.0f;
-	model_->transform.scale = { 0.3f,0.3f,0.3f };
 
 	shadow_ = std::make_unique<Object3d>();
 	shadow_->Create("Sphere");
@@ -76,38 +74,7 @@ void Player::Initialize() {
 	ChangeBehavior(std::make_unique<PlayerRoot>(this));
 	ChangeAttackBehavior(std::make_unique<PlayerAttackRoot>(this));
 
-	ParticleManager::Load(hit_, "sphere");
-	ParticleManager::Load(hit2_, "playerhit");
-	ParticleManager::Load(moveParticleL_, "playerTranjectory");
-	ParticleManager::Load(moveParticleR_, "playerTranjectory");
-	ParticleManager::Load(deathSmoke_, "bulletHitSmoke");
-
-	hit_.SetParent(&model_->transform);
-	hit2_.SetParent(&model_->transform);
-	moveParticleL_.SetParent(&model_->transform);
-	moveParticleR_.SetParent(&model_->transform);
-	deathSmoke_.SetParent(&model_->transform);
-
-	moveParticleL_.pos_ = { -0.4f,-0.4f,-0.3f };
-	moveParticleR_.pos_ = {  0.4f,-0.4f,-0.3f };
-	deathSmoke_.count_ = 1;
-	deathSmoke_.frequencyTime_ = 15.0f;
-
-	hit_.frequencyTime_ = 0.0f;
-	hit2_.frequencyTime_ = 0.0f;
-
-	ParticleManager::LoadParentGroup(moveBurnerL_, "playerAfterBurner");
-	ParticleManager::LoadParentGroup(moveBurnerR_, "playerAfterBurner2");
-	ParticleManager::LoadParentGroup(moveBurnerLT_, "playerAfterBurner3");
-	ParticleManager::LoadParentGroup(moveBurnerRT_, "playerAfterBurner4");
-	moveBurnerL_->SetParent(&model_->transform);
-	moveBurnerR_->SetParent(&model_->transform);
-	moveBurnerLT_->SetParent(&model_->transform);
-	moveBurnerRT_->SetParent(&model_->transform);
-	moveBurnerL_->pos_ = { -0.35f,-0.4f,-0.3f };
-	moveBurnerR_->pos_ = { 0.35f,-0.4f,-0.3f };
-	moveBurnerLT_->pos_ = { -0.35f,0.4f,-0.3f };
-	moveBurnerRT_->pos_ = { 0.35f,0.4f,-0.3f };
+	EmitterSetting();
 
 
 }
@@ -210,6 +177,9 @@ void Player::ReStart() {
 	for (auto& bullet : bullets_) {
 		bullet->SetIsLive(false);
 	}
+	isNowAvoid_ = false;
+	isStrongState_ = false;
+	isCanStrongState_ = false;
 	isDeath_ = false;
 	isGameOver_ = false;
 	isStart_ = true;
@@ -267,34 +237,52 @@ void Player::ChangeAttackBehavior(std::unique_ptr<BasePlayerAttackBehavior> beha
 void Player::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 	if (other.tag == "enemyAttack") {
 		if (!isDamage_) {
-			playerHP_ -= 5.0f;
-			isDamage_ = true;
-			damageCoolTime_ = 60.0f;
-			if (playerHP_ <= 0.0f) {
-				playerHP_ = 0.0f;
-				isDeath_ = true;
-				hpSprite_->SetSize({ 0.0f, hpSize_.y });
-				ReleaseBullet();
+			if (isNowAvoid_) {
+				if (!isCanStrongState_) {
+					isCanStrongState_ = true;
+				}
+				avoidEmitter01_->Emit();
+				avoidEmitter02_->Emit();
+				avoidEmitter03_->Emit();
+			} else {
+				playerHP_ -= 5.0f;
+				isDamage_ = true;
+				damageCoolTime_ = 60.0f;
+				if (playerHP_ <= 0.0f) {
+					playerHP_ = 0.0f;
+					isDeath_ = true;
+					hpSprite_->SetSize({ 0.0f, hpSize_.y });
+					ReleaseBullet();
+				}
+				hit_.Emit();
+				hit2_.Emit();
 			}
-			hit_.Emit();
-			hit2_.Emit();
 		}
 	} else if (other.tag == "enemyAttack_ring") {
 		if (!isDamage_) {
 			if (UnderRing* ring = dynamic_cast<UnderRing*>(other.owner)) {
 				float lng = Vector3(other.worldPos - model_->transform.translate).Length();
 				if (lng < ring->GetRingRadMax() && lng > ring->GetRingRadMin()) {
-					playerHP_ -= 5.0f;
-					isDamage_ = true;
-					damageCoolTime_ = 60.0f;
-					if (playerHP_ <= 0.0f) {
-						playerHP_ = 0.0f;
-						isDeath_ = true;
-						hpSprite_->SetSize({ 0.0f, hpSize_.y });
-						ReleaseBullet();
+					if (isNowAvoid_) {
+						if (!isCanStrongState_) {
+							isCanStrongState_ = true;
+						}
+						avoidEmitter01_->Emit();
+						avoidEmitter02_->Emit();
+						avoidEmitter03_->Emit();
+					} else {
+						playerHP_ -= 5.0f;
+						isDamage_ = true;
+						damageCoolTime_ = 60.0f;
+						if (playerHP_ <= 0.0f) {
+							playerHP_ = 0.0f;
+							isDeath_ = true;
+							hpSprite_->SetSize({ 0.0f, hpSize_.y });
+							ReleaseBullet();
+						}
+						hit_.Emit();
+						hit2_.Emit();
 					}
-					hit_.Emit();
-					hit2_.Emit();
 				}
 			}
 		}
@@ -303,7 +291,7 @@ void Player::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 }
 void Player::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
 	if (other.tag == "enemyAttack") {
-		if (!isDamage_) {
+		if (!isDamage_ && !isNowAvoid_) {
 			playerHP_ -= 5.0f;
 			isDamage_ = true;
 			damageCoolTime_ = 60.0f;
@@ -322,17 +310,27 @@ void Player::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
 			if (UnderRing* ring = dynamic_cast<UnderRing*>(other.owner)) {
 				float lng = Vector3(other.worldPos - model_->transform.translate).Length();
 				if (lng < ring->GetRingRadMax() && lng > ring->GetRingRadMin()) {
-					playerHP_ -= 5.0f;
-					isDamage_ = true;
-					damageCoolTime_ = 60.0f;
-					if (playerHP_ <= 0.0f) {
-						playerHP_ = 0.0f;
-						isDeath_ = true;
-						hpSprite_->SetSize({ 0.0f, hpSize_.y });
-						ReleaseBullet();
+					if (isNowAvoid_) {
+						if (!isCanStrongState_) {
+							isCanStrongState_ = true;
+							avoidEmitter01_->Emit();
+							avoidEmitter02_->Emit();
+							avoidEmitter03_->Emit();
+						}
+					} else {
+						playerHP_ -= 5.0f;
+						isDamage_ = true;
+						isCanStrongState_ = false;
+						damageCoolTime_ = 60.0f;
+						if (playerHP_ <= 0.0f) {
+							playerHP_ = 0.0f;
+							isDeath_ = true;
+							hpSprite_->SetSize({ 0.0f, hpSize_.y });
+							ReleaseBullet();
+						}
+						hit_.Emit();
+						hit2_.Emit();
 					}
-					hit_.Emit();
-					hit2_.Emit();
 				}
 			}
 		}
@@ -512,6 +510,13 @@ void Player::Avoid([[maybe_unused]]float& avoidTime) {
 	if (avoidTime == 30.0f) {
 		avoidRotate_ = 0.0f;
 		avoidCoolTime_ = 30.0f;
+		if (isCanStrongState_) {
+			isCanStrongState_ = false;
+			isStrongState_ = true;
+			avoidEmitter1_->Emit();
+			avoidEmitter2_->Emit();
+			avoidEmitter3_->Emit();
+		}
 	}
 }
 
@@ -547,4 +552,60 @@ void Player::StrngthBullet() {
 			bullet->StrnghtBullet();
 		}
 	}
+}
+
+void Player::EmitterSetting() {
+	ParticleManager::Load(hit_, "sphere");
+	ParticleManager::Load(hit2_, "playerhit");
+	ParticleManager::Load(moveParticleL_, "playerTranjectory");
+	ParticleManager::Load(moveParticleR_, "playerTranjectory");
+	ParticleManager::Load(deathSmoke_, "bulletHitSmoke");
+
+	hit_.SetParent(&model_->transform);
+	hit2_.SetParent(&model_->transform);
+	moveParticleL_.SetParent(&model_->transform);
+	moveParticleR_.SetParent(&model_->transform);
+	deathSmoke_.SetParent(&model_->transform);
+
+	moveParticleL_.pos_ = { -0.4f,-0.4f,-0.3f };
+	moveParticleR_.pos_ = { 0.4f,-0.4f,-0.3f };
+	deathSmoke_.count_ = 1;
+	deathSmoke_.frequencyTime_ = 15.0f;
+
+	hit_.frequencyTime_ = 0.0f;
+	hit2_.frequencyTime_ = 0.0f;
+
+	ParticleManager::LoadParentGroup(moveBurnerL_, "playerAfterBurner");
+	ParticleManager::LoadParentGroup(moveBurnerR_, "playerAfterBurner2");
+	ParticleManager::LoadParentGroup(moveBurnerLT_, "playerAfterBurner3");
+	ParticleManager::LoadParentGroup(moveBurnerRT_, "playerAfterBurner4");
+	moveBurnerL_->SetParent(&model_->transform);
+	moveBurnerR_->SetParent(&model_->transform);
+	moveBurnerLT_->SetParent(&model_->transform);
+	moveBurnerRT_->SetParent(&model_->transform);
+	moveBurnerL_->pos_ = { -0.35f,-0.4f,-0.3f };
+	moveBurnerR_->pos_ = { 0.35f,-0.4f,-0.3f };
+	moveBurnerLT_->pos_ = { -0.35f,0.4f,-0.3f };
+	moveBurnerRT_->pos_ = { 0.35f,0.4f,-0.3f };
+
+
+	ParticleManager::LoadParentGroup(avoidEmitter01_, "playerAvoid01");
+	ParticleManager::LoadParentGroup(avoidEmitter02_, "playerAvoid02");
+	ParticleManager::LoadParentGroup(avoidEmitter03_, "playerAvoid03");
+	avoidEmitter01_->SetParent(&model_->transform);
+	avoidEmitter02_->SetParent(&model_->transform);
+	avoidEmitter03_->SetParent(&model_->transform);
+	avoidEmitter01_->frequencyTime_ = 0.0f;
+	avoidEmitter02_->frequencyTime_ = 0.0f;
+	avoidEmitter03_->frequencyTime_ = 0.0f;
+
+	ParticleManager::LoadParentGroup(avoidEmitter1_, "playerAvoid1");
+	ParticleManager::LoadParentGroup(avoidEmitter2_, "playerAvoid2");
+	ParticleManager::LoadParentGroup(avoidEmitter3_, "playerAvoid3");
+	avoidEmitter1_->SetParent(&model_->transform);
+	avoidEmitter2_->SetParent(&model_->transform);
+	avoidEmitter3_->SetParent(&model_->transform);
+	avoidEmitter1_->frequencyTime_ = 0.0f;
+	avoidEmitter2_->frequencyTime_ = 0.0f;
+	avoidEmitter3_->frequencyTime_ = 0.0f;
 }

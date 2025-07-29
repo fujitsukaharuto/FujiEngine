@@ -314,7 +314,7 @@ void OffscreenManager::CreateResource() {
 	bloomData_ = nullptr;
 	bloomResource_->Map(0, nullptr, reinterpret_cast<void**>(&bloomData_));
 	bloomData_->bloomIntensity = 1.0f;
-	bloomData_->bloomThreshold = 0.6f;
+	bloomData_->bloomThreshold = 0.75f;
 
 	radialResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(RadialParams));
 	radialData_ = nullptr;

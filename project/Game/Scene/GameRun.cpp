@@ -25,6 +25,7 @@ void GameRun::Initialize() {
 	textureManager_->Load("beamCore2.png");
 	textureManager_->Load("beamCore3.png");
 	textureManager_->Load("kira.png");
+	textureManager_->Load("ringOutline.png");
 	textureManager_->Load("Atlas.png");
 	textureManager_->Load("underRing.png");
 	textureManager_->Load("boal16x16.png");
@@ -70,10 +71,14 @@ void GameRun::Initialize() {
 	pManager_->CreateParticleGroup("playerTranjectory", "kira.png", 200);
 	pManager_->CreateParticleGroup("playerhit", "redCircle.png", 100);
 
-	/*pManager_->CreateParticleGroup("playerAfterBurner", "shockWaveGround.png", 200, ShapeType::RING);
-	pManager_->CreateParticleGroup("playerAfterBurner2", "shockWaveGround.png", 200, ShapeType::RING);
-	pManager_->CreateParticleGroup("playerAfterBurner3", "shockWaveGround.png", 200, ShapeType::RING);
-	pManager_->CreateParticleGroup("playerAfterBurner4", "shockWaveGround.png", 200, ShapeType::RING);*/
+	pManager_->CreateParticleGroup("playerAvoid01", "ringOutline.png", 100, ShapeType::RING);
+	pManager_->CreateParticleGroup("playerAvoid02", "redCircle.png", 100);
+	pManager_->CreateParticleGroup("playerAvoid03", "redCircle.png", 100);
+
+	pManager_->CreateParticleGroup("playerAvoid1", "redCircle.png", 100);
+	pManager_->CreateParticleGroup("playerAvoid2", "redCircle.png", 100);
+	pManager_->CreateParticleGroup("playerAvoid3", "redCircle.png", 100);
+
 	
 	pManager_->CreateParticleGroup("bulletHit", "redCircle.png", 100);
 	pManager_->CreateParticleGroup("bulletHit2", "redCircle.png", 100);
@@ -122,6 +127,14 @@ void GameRun::Initialize() {
 	pManager_->CreateParentParticleGroup("playerAfterBurner2", "shockWaveGround.png", 200, ShapeType::RING);
 	pManager_->CreateParentParticleGroup("playerAfterBurner3", "shockWaveGround.png", 200, ShapeType::RING);
 	pManager_->CreateParentParticleGroup("playerAfterBurner4", "shockWaveGround.png", 200, ShapeType::RING);
+
+	pManager_->CreateParentParticleGroup("playerAvoid01", "ringOutline.png", 10, ShapeType::RING);
+	pManager_->CreateParentParticleGroup("playerAvoid02", "redCircle.png", 150);
+	pManager_->CreateParentParticleGroup("playerAvoid03", "redCircle.png", 150);
+
+	pManager_->CreateParentParticleGroup("playerAvoid1", "redCircle.png", 100);
+	pManager_->CreateParentParticleGroup("playerAvoid2", "redCircle.png", 100);
+	pManager_->CreateParentParticleGroup("playerAvoid3", "redCircle.png", 100);
 
 
 	pManager_->CreateParentParticleGroup("BeamParticle", "redCircle.png", 200);

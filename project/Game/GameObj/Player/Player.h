@@ -68,6 +68,7 @@ public:
 	bool GetIsFall() { return isFall_; }
 	bool GetIsGameOver() { return isGameOver_; }
 	bool GetIsStart() { return isStart_; }
+	bool GetIsStrongState() { return isStrongState_; }
 	BaseCollider* GetCollider() { return collider_.get(); }
 
 	std::vector<std::unique_ptr<PlayerBullet>>& GetPlayerBullet() { return bullets_; }
@@ -78,10 +79,11 @@ public:
 	void SetIsFall(bool is) { isFall_ = is; }
 	void SetIsStart(bool is) { isStart_ = is; }
 	void SetTargetPos(const Vector3& pos) { targetPos_ = pos; }
+	void SetIsNowAvoid(bool is) { isNowAvoid_ = is; }
 
 private:
 
-
+	void EmitterSetting();
 
 private:
 
@@ -118,6 +120,9 @@ private:
 	float avoidRotate_;
 	float avoidDirection_ = 1.0f;
 	float avoidCoolTime_;
+	bool isNowAvoid_ = false;
+	bool isCanStrongState_ = false;
+	bool isStrongState_ = false;
 
 	bool isStart_ = true;
 	bool isDeath_ = false;
@@ -138,5 +143,14 @@ private:
 	ParticleEmitter* moveBurnerR_;
 	ParticleEmitter* moveBurnerLT_;
 	ParticleEmitter* moveBurnerRT_;
+
+	ParticleEmitter* avoidEmitter01_;
+	ParticleEmitter* avoidEmitter02_;
+	ParticleEmitter* avoidEmitter03_;
+
+	ParticleEmitter* avoidEmitter1_;
+	ParticleEmitter* avoidEmitter2_;
+	ParticleEmitter* avoidEmitter3_;
+
 
 };

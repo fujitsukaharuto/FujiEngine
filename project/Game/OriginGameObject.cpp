@@ -121,6 +121,30 @@ void OriginGameObject::CreateAnimModel(const std::string& name) {
 	animModel_->Create(name);
 }
 
+void OriginGameObject::CreateFromJson(const std::string& name) {
+	nlohmann::json objJson = JsonSerializer::DeserializeJsonData(name);
+	std::string modelName = objJson.value("modelName", "DefaultModel");
+	model_->Create(modelName);
+	if (objJson.contains("transform")) {
+		const auto& t = objJson["transform"];
+		if (t.contains("translate")) {
+			model_->transform.translate.x = t["translate"][0];
+			model_->transform.translate.y = t["translate"][1];
+			model_->transform.translate.z = t["translate"][2];
+		}
+		if (t.contains("rotate")) {
+			model_->transform.rotate.x = t["rotate"][0];
+			model_->transform.rotate.y = t["rotate"][1];
+			model_->transform.rotate.z = t["rotate"][2];
+		}
+		if (t.contains("scale")) {
+			model_->transform.scale.x = t["scale"][0];
+			model_->transform.scale.y = t["scale"][1];
+			model_->transform.scale.z = t["scale"][2];
+		}
+	}
+}
+
 void OriginGameObject::SetModel(const std::string& name) {
 	model_->SetModel(name);
 }

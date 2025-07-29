@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <json.hpp>
 
 #include "Model/Object3d.h"
 #include "Model/AnimationData/AnimationModel.h"
@@ -27,6 +28,7 @@ public:
 	float ComparNum(float a, float b);
 	void CreateModel(const std::string& name);
 	void CreateAnimModel(const std::string& name);
+	void CreateFromJson(const std::string& name);
 	void SetModel(const std::string& name);
 	void SetAnimModel(const std::string& name);
 	Object3d* GetModel() { return model_.get(); }
@@ -49,5 +51,7 @@ protected:
 	Vector3 prevScale_;
 	int guizmoType_ = 0;
 	float IsUsingGuizmo_ = false;
+
+private:
 
 };
