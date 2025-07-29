@@ -1,5 +1,6 @@
 #pragma once
 #include "Engine/DX/DXCom.h"
+#include "Engine/Editor/JsonSerializer.h"
 #include "Input.h"
 #include "AudioPlayer.h"
 #include "DebugCamera.h"
@@ -24,6 +25,7 @@ public:
 	virtual void Draw();
 
 	void Init(DXCom* pDxcom, SceneManager* pSceneManager);
+	virtual void LoadSceneLevelData(const std::string& name);
 
 	virtual void DebugGUI();
 	virtual void ParticleDebugGUI();
@@ -43,7 +45,7 @@ protected:
 	SceneManager* sceneManager_;
 	Input* input_ = nullptr;
 	AudioPlayer* audioPlayer_ = nullptr;
-	
+	nlohmann::json sceneData_;
 
 private:
 

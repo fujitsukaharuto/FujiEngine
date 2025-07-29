@@ -3,6 +3,7 @@
         {
             "modelName": "ground.obj",
             "objectName": "Terrain",
+            "objectType": "None",
             "transform": {
                 "rotate": [
                     0.0,
@@ -24,6 +25,7 @@
         {
             "modelName": "player.obj",
             "objectName": "Player",
+            "objectType": "Player",
             "transform": {
                 "rotate": [
                     0.0,

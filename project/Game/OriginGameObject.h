@@ -29,8 +29,10 @@ public:
 	void CreateModel(const std::string& name);
 	void CreateAnimModel(const std::string& name);
 	void CreateFromJson(const std::string& name);
+	void CreateFromJson();
 	void SetModel(const std::string& name);
 	void SetAnimModel(const std::string& name);
+	void SetModelDataJson(const nlohmann::json& jsonData);
 	Object3d* GetModel() { return model_.get(); }
 	AnimationModel* GetAnimModel() { return animModel_.get(); }
 	Trans& GetTrans() { return model_->transform; }
@@ -51,6 +53,8 @@ protected:
 	Vector3 prevScale_;
 	int guizmoType_ = 0;
 	float IsUsingGuizmo_ = false;
+
+	nlohmann::json modelDataJson_;
 
 private:
 

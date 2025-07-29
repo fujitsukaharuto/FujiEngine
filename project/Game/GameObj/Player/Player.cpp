@@ -16,7 +16,7 @@ Player::~Player() {
 
 void Player::Initialize() {
 	OriginGameObject::Initialize();
-	OriginGameObject::CreateFromJson("resource/Json/Game_Player.json");
+	OriginGameObject::CreateFromJson();
 
 	model_->SetTexture("Atlas.png");
 

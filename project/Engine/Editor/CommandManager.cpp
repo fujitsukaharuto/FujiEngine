@@ -194,6 +194,10 @@ void CommandManager::EditorObjGUI(EditorObj& obj) {
 				nameHashes[obj.id] = std::hash<std::string>{}(newName);
 			}
 
+			int objType = static_cast<int>(obj.objType);
+			ImGui::Combo("objectType##type", &objType, "Normal\0Player\0Boss\0None\0");
+			obj.objType = static_cast<ObjectType>(objType);
+
 			obj.obj->DebugGUI();
 			ImGuiManager::ImGuiDragDropButton("Child", "MY_INT",
 				[this, &obj](const ImGuiPayload* payload) {
@@ -325,6 +329,22 @@ nlohmann::json CommandManager::ConvertObjToJson(EditorObj* obj) {
 
 	json["objectName"] = obj->name;
 	json["modelName"] = obj->obj->GetModelName();
+	switch (obj->objType) {
+	case ObjectType::Normal:
+		json["objectType"] = "Normal";
+		break;
+	case ObjectType::Player:
+		json["objectType"] = "Player";
+		break;
+	case ObjectType::Boss:
+		json["objectType"] = "Boss";
+		break;
+	case ObjectType::None:
+		json["objectType"] = "None";
+		break;
+	default:
+		break;
+	}
 
 	json["transform"]["translate"] = {
 		obj->obj->transform.translate.x,
@@ -461,6 +481,17 @@ void CommandManager::LoadObjRecursive(const nlohmann::json& objJson, int parentI
 		objectList[parentId]->childlen.push_back(newId);
 	}
 
+	if (objJson.contains("objectType")) {
+		if (objJson["objectType"] == "Normal") {
+			objectList[newId]->objType = ObjectType::Normal;
+		} else if (objJson["objectType"] == "Player") {
+			objectList[newId]->objType = ObjectType::Player;
+		} else if (objJson["objectType"] == "Boss") {
+			objectList[newId]->objType = ObjectType::Boss;
+		} else if (objJson["objectType"] == "None") {
+			objectList[newId]->objType = ObjectType::None;
+		}
+	}
 	// トランスフォームの反映
 	auto& obj = objectList[newId]->obj;
 	if (objJson.contains("transform")) {

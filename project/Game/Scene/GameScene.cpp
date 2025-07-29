@@ -33,8 +33,6 @@ void GameScene::Initialize() {
 	obj3dCommon.reset(new Object3dCommon());
 	obj3dCommon->Initialize();
 
-	/*dxcommon_->GetOffscreenManager()->ResetPostEffect();
-	dxcommon_->GetOffscreenManager()->AddPostEffect(PostEffectList::RetroTV);*/
 
 #pragma region シーン遷移用
 	black_ = std::make_unique<Sprite>();
@@ -57,11 +55,15 @@ void GameScene::Initialize() {
 	skybox_->Initialize();
 
 	player_ = std::make_unique<Player>();
+	boss_ = std::make_unique<Boss>();
+
+	LoadSceneLevelData("resource/Json/GameScene_position.json");
+
 	player_->Initialize();
 
-	boss_ = std::make_unique<Boss>();
 	boss_->Initialize();
 	boss_->SetPlayer(player_.get());
+
 
 	followCamera_ = std::make_unique<FollowCamera>();
 	followCamera_->Initialize();
@@ -287,6 +289,21 @@ void GameScene::BlackFade() {
 	if (boss_->GetIsClear()) {
 		if (blackTime == 0.0f) {
 			isChangeFase = true;
+		}
+	}
+}
+
+void GameScene::LoadSceneLevelData(const std::string& name) {
+	BaseScene::LoadSceneLevelData(name);
+	for (const auto& objJson : sceneData_["objects"]) {
+		if (objJson.contains("objectType")) {
+			if (objJson["objectType"] == "Normal") {
+				
+			} else if (objJson["objectType"] == "Player") {
+				player_->SetModelDataJson(objJson);
+			} else if (objJson["objectType"] == "Boss") {
+				
+			}
 		}
 	}
 }

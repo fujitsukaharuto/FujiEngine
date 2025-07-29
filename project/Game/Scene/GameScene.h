@@ -21,6 +21,7 @@ public:
 	void ParticleDebugGUI()override;
 
 	void BlackFade();
+	void LoadSceneLevelData(const std::string& name)override;
 
 private:
 

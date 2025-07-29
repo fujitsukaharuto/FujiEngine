@@ -22,6 +22,10 @@ void BaseScene::Init(DXCom* pDxcom, SceneManager* pSceneManager) {
 	audioPlayer_ = AudioPlayer::GetInstance();
 }
 
+void BaseScene::LoadSceneLevelData(const std::string& name) {
+	sceneData_ = JsonSerializer::DeserializeJsonData(name);
+}
+
 void BaseScene::DebugGUI() {
 #ifdef _DEBUG
 

@@ -12,10 +12,17 @@
 
 #include "Engine/Model/Object3d.h"
 
+enum class ObjectType{
+	Normal,
+	Player,
+	Boss,
+	None,
+};
 
 struct EditorObj {
 	int id;
 	std::unique_ptr<Object3d> obj;
+	ObjectType objType;
 	bool isActive = true;
 	std::string name;
 	std::string modelName;
@@ -31,6 +38,7 @@ struct LoadEditorObjData {
 	std::string name;
 	std::string modelName;
 	Trans trnasform;
+	ObjectType objType;
 };
 
 class CommandManager {
