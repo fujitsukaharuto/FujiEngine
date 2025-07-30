@@ -41,11 +41,11 @@ public:
 
 	void Finalize();
 
-	static void LoadModelByExtension(const std::string& filename);
-	static void LoadOBJ(const std::string& filename);
-	static void LoadGLTF(const std::string& filename);
+	static void LoadModelByExtension(const std::string& filename, bool overWrite = false);
+	static void LoadOBJ(const std::string& filename, bool overWrite = false);
+	static void LoadGLTF(const std::string& filename, bool overWrite = false);
 
-	static ModelData FindModel(const std::string& filename);
+	static ModelData FindModel(const std::string& filename, bool overWrite = false);
 
 	static void CreateSphere();
 	static ModelData CreateRing(float out = 1.0f, float in = 0.2f, float radius = 2.0f, bool horizon = false);
@@ -57,8 +57,9 @@ public:
 	DXCom* ShareDXCom() { return dxcommon_; }
 	LightManager* ShareLight() { return lightManager_; }
 
-	void LoadModelFile();
-	const std::vector<std::string>& GetModelFiles() { return modelFileList; }
+	void LoadModelFile(bool overWrite = false);
+	const std::vector<std::pair<std::string, bool>>& GetModelFiles() { return modelFileList; }
+	void SetModelFileOnceLoad(const std::string& name);
 
 	void NormalCommand();
 
@@ -68,6 +69,7 @@ public:
 	int GetPickedID() { return lastPicked_.objID; }
 	int GetPickedCoord(int i) { return pickingData_->pickingPixelCoord[i]; }
 	bool GetIsOnce() { return isOnce_; }
+	bool GetIsPicked() { return isPicked_; }
 
 private:
 
@@ -83,7 +85,7 @@ private:
 
 	std::map<std::string, std::unique_ptr<Model>> models_;
 
-	std::vector<std::string> modelFileList;
+	std::vector<std::pair<std::string, bool>> modelFileList;
 
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> pickingBufferResource_ = nullptr;
@@ -94,6 +96,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> pickingDataResource_ = nullptr;
 	PickingData* pickingData_ = nullptr;
 
+	int preObjId_ = -1;
 	bool isPicked_ = false;
 	bool isOnce_ = false;
 };

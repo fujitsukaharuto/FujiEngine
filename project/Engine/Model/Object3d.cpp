@@ -398,7 +398,7 @@ void Object3d::DebugGUI() {
 		ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 		if (ImGui::BeginPopupModal("ModelFile Window", NULL)) {
 			if (ImGui::Button("Refresh")) {
-				ModelManager::GetInstance()->LoadModelFile();
+				ModelManager::GetInstance()->LoadModelFile(true);
 			}
 			int buttonCount = 0;
 			for (const auto& modelName : ModelManager::GetInstance()->GetModelFiles()) {
@@ -407,8 +407,11 @@ void Object3d::DebugGUI() {
 				} else {
 					buttonCount = 0;
 				}
-				if (ImGui::Button(modelName.c_str(), ImVec2(100, 100))) {
-					SetModel(modelName.c_str());
+				if (ImGui::Button(modelName.first.c_str(), ImVec2(100, 100))) {
+					SetModel(modelName.first.c_str(), modelName.second);
+					if (modelName.second) {
+						ModelManager::GetInstance()->SetModelFileOnceLoad(modelName.first.c_str());
+					}
 				}
 				buttonCount++;
 			}
@@ -462,9 +465,9 @@ void Object3d::SetLightEnable(LightMode mode) {
 	model_->SetLightEnable(mode);
 }
 
-void Object3d::SetModel(const std::string& fileName) {
+void Object3d::SetModel(const std::string& fileName, bool overWrite) {
 	model_ = std::make_unique<Model>();
-	model_->data_ = ModelManager::FindModel(fileName);
+	model_->data_ = ModelManager::FindModel(fileName, overWrite);
 	modelName_ = fileName;
 
 	for (size_t i = 0; i < model_->data_.meshes.size(); i++) {

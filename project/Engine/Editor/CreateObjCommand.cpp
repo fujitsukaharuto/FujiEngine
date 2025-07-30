@@ -15,7 +15,7 @@ void CreateObjCommand::Do() {
 
 	obj->inputLabel = "##input" + std::to_string(obj->id);
 	obj->deleteButtonLabel = "Delete##" + std::to_string(obj->id);
-	obj->dragButtonLabel = "Drag##" + std::to_string(obj->id);
+	obj->dragButtonLabel = "p##" + std::to_string(obj->id);
 
 	CommandManager::GetInstance()->objectList[objId] = obj;
 

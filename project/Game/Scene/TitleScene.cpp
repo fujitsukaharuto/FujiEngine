@@ -97,7 +97,7 @@ void TitleScene::Update() {
 	if (input_->TriggerKey(DIK_5)) {
 		emit.Emit();
 	}
-	emit.Emit();
+	//emit.Emit();
 
 	cMane_->CheckAllCollision();
 
@@ -121,12 +121,12 @@ void TitleScene::Draw() {
 	obj3dCommon->PreDraw();
 //	terrain_->Draw();
 
-	cube_->Draw();
-	animParentObj_->Draw();
+	//cube_->Draw();
+	//animParentObj_->Draw();
 
 	star_->Draw();
 
-	space_->Draw();
+	//space_->Draw();
 
 	titlePlane_->Draw();
 
@@ -139,7 +139,7 @@ void TitleScene::Draw() {
 #ifdef _DEBUG
 	emit.DrawSize();
 #endif // _DEBUG
-	cube_->SkeletonDraw();
+	//cube_->SkeletonDraw();
 	Line3dDrawer::GetInstance()->Render();
 
 #pragma endregion

@@ -90,6 +90,9 @@ void CommandManager::DebugGUI() {
 	for (auto& group: objectList) {
 		EditorObj* obj = group.second.get();
 		if (obj) {
+			if (ModelManager::GetInstance()->GetPickedID() == obj->obj->GetObjID() && ModelManager::GetInstance()->GetIsPicked()) {
+				openedHeaderID = obj->id;
+			}
 			if (ModelManager::GetInstance()->GetPickedID() == obj->obj->GetObjID() && ModelManager::GetInstance()->GetIsOnce()) {
 				openedHeaderID = obj->id;
 			}

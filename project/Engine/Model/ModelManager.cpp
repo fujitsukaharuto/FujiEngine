@@ -6,6 +6,7 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include "Engine/DX/SRVManager.h"
+#include "Engine/WinApp/MyWindow.h"
 #include "Engine/ImGuiManager/ImGuiManager.h"
 #include "Engine/Input/Input.h"
 #include "Engine/Light/LightManager.h"
@@ -49,6 +50,8 @@ void ModelManager::Initialize(DXCom* pDxcom, LightManager* pLight) {
 	pickingData_->pickingPixelCoord[1] = -1;
 
 
+	lastPicked_.objID = -1;
+	lastPicked_.depth = 1.0f;
 	PickingBuffer init{};
 	init.objID = -1;
 	init.depth = 1.0f;
@@ -71,22 +74,24 @@ void ModelManager::Finalize() {
 }
 
 
-void ModelManager::LoadModelByExtension(const std::string& filename) {
+void ModelManager::LoadModelByExtension(const std::string& filename, bool overWrite) {
 	std::filesystem::path path(filename);  // 拡張子の解析に便利
 	std::string ext = path.extension().string();
 
 	if (ext == ".obj") {
-		LoadOBJ(filename);
+		LoadOBJ(filename, overWrite);
 	} else if (ext == ".gltf") {
-		LoadGLTF(filename);
+		LoadGLTF(filename, overWrite);
 	}
 }
 
-void ModelManager::LoadOBJ(const std::string& filename) {
+void ModelManager::LoadOBJ(const std::string& filename, bool overWrite) {
 	ModelManager* instance = GetInstance();
-	auto iterator = instance->models_.find(filename);
-	if (iterator != instance->models_.end()) {
-		return;
+	if (!overWrite) {
+		auto iterator = instance->models_.find(filename);
+		if (iterator != instance->models_.end()) {
+			return;
+		}
 	}
 
 	std::unique_ptr<Model> model;
@@ -168,14 +173,20 @@ void ModelManager::LoadOBJ(const std::string& filename) {
 		model->data_.meshes.push_back(newModelMesh);
 	}
 
-	instance->models_.insert(std::make_pair(filename, std::move(model)));
+	if (overWrite) {
+		instance->models_[filename] = std::move(model);
+	} else {
+		instance->models_.insert(std::make_pair(filename, std::move(model)));
+	}
 }
 
-void ModelManager::LoadGLTF(const std::string& filename) {
+void ModelManager::LoadGLTF(const std::string& filename, bool overWrite) {
 	ModelManager* instance = GetInstance();
-	auto iterator = instance->models_.find(filename);
-	if (iterator != instance->models_.end()) {
-		return;
+	if (!overWrite) {
+		auto iterator = instance->models_.find(filename);
+		if (iterator != instance->models_.end()) {
+			return;
+		}
 	}
 
 	std::unique_ptr<Model> model;
@@ -280,13 +291,17 @@ void ModelManager::LoadGLTF(const std::string& filename) {
 	}
 	model->data_.rootNode = ReadNode(scene->mRootNode);
 
-	instance->models_.insert(std::make_pair(filename, std::move(model)));
+	if (overWrite) {
+		instance->models_[filename] = std::move(model);
+	} else {
+		instance->models_.insert(std::make_pair(filename, std::move(model)));
+	}
 }
 
 
-ModelData ModelManager::FindModel(const std::string& filename) {
+ModelData ModelManager::FindModel(const std::string& filename, bool overWrite) {
 	ModelManager* instance = GetInstance();
-	instance->LoadModelByExtension(filename);
+	instance->LoadModelByExtension(filename, overWrite);
 	auto iterator = instance->models_.find(filename);
 	if (iterator != instance->models_.end()) {
 		return iterator->second->data_;
@@ -492,7 +507,7 @@ void ModelManager::AddModel(const std::string& filename, Model* model) {
 }
 
 
-void ModelManager::LoadModelFile() {
+void ModelManager::LoadModelFile(bool overWrite) {
 #ifdef _DEBUG
 	modelFileList.clear();
 
@@ -502,12 +517,25 @@ void ModelManager::LoadModelFile() {
 		if (entry.is_regular_file()) {
 			auto path = entry.path();
 			if (path.extension() == ".obj") {
-				modelFileList.push_back(path.filename().string());
+				if (overWrite) {
+					modelFileList.push_back(std::make_pair(path.filename().string(), true));
+				} else {
+					modelFileList.push_back(std::make_pair(path.filename().string(), false));
+				}
 			}
 		}
 	}
 
 #endif // _DEBUG
+}
+
+void ModelManager::SetModelFileOnceLoad(const std::string& name) {
+	for (auto& pair : modelFileList) {
+		if (pair.first == name) {
+			pair.second = false;
+			break; // 名前がユニークなら break でOK
+		}
+	}
 }
 
 void ModelManager::NormalCommand() {
@@ -526,9 +554,12 @@ void ModelManager::PickingUpdate() {
 
 	Vector2 mousePos = { io.MousePos.x, io.MousePos.y };
 	bool isMouseOnGUI = io.WantCaptureMouse || ImGuizmo::IsOver() || ImGuizmo::IsUsing();
+	bool isMouseInWindow =
+		(mousePos.x >= 0 && mousePos.y >= 0 &&
+			mousePos.x < MyWin::kWindowWidth && mousePos.y < MyWin::kWindowHeight);
 
 	// === ピッキング有効／無効の設定 ===
-	if (isMouseOnGUI) {
+	if (isMouseOnGUI || !isMouseInWindow) {
 		pickingData_->pickingEnable = 0;
 		pickingData_->pickingPixelCoord[0] = -1;
 		pickingData_->pickingPixelCoord[1] = -1;
@@ -561,6 +592,9 @@ void ModelManager::PickingDataCopy() {
 	if (isOnce_) isOnce_ = false;
 	if (isPicked_) {
 		isPicked_ = false;
+	}
+	if (preObjId_ != lastPicked_.objID) {
+		preObjId_ = lastPicked_.objID;
 		isOnce_ = true;
 	}
 	dxcommon_->GetCommandList()->CopyResource(pickingBufferReadBack_.Get(), pickingBufferResource_.Get());

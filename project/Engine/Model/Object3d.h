@@ -99,7 +99,7 @@ public:
 
 	void SetLightEnable(LightMode mode);
 
-	void SetModel(const std::string& fileName);
+	void SetModel(const std::string& fileName, bool overWrite = false);
 
 	Trans transform{};
 
