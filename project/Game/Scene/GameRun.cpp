@@ -227,6 +227,7 @@ void GameRun::Update() {
 }
 
 void GameRun::Draw() {
+	// PickingのUAVのDepthを初期化
 	modelManager_->PickingDataReset();
 
 	// 描画開始
