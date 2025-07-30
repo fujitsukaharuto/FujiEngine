@@ -65,6 +65,7 @@ public:
 
 	void PickingUpdate();
 	void PickingCommand();
+	void PickingDataReset();
 	void PickingDataCopy();
 	int GetPickedID() { return lastPicked_.objID; }
 	int GetPickedCoord(int i) { return pickingData_->pickingPixelCoord[i]; }
@@ -95,6 +96,7 @@ private:
 	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> pickBufferHandle_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> pickingDataResource_ = nullptr;
 	PickingData* pickingData_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> initUploadBuffer_;
 
 	int preObjId_ = -1;
 	bool isPicked_ = false;

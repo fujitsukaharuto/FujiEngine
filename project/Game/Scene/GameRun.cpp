@@ -227,6 +227,7 @@ void GameRun::Update() {
 }
 
 void GameRun::Draw() {
+	modelManager_->PickingDataReset();
 
 	// 描画開始
 	dxcommon_->PreDraw();

@@ -55,9 +55,9 @@ void ModelManager::Initialize(DXCom* pDxcom, LightManager* pLight) {
 	PickingBuffer init{};
 	init.objID = -1;
 	init.depth = 1.0f;
-	ComPtr<ID3D12Resource> initUploadBuffer = dxcommon_->CreateUploadBuffer(sizeof(PickingBuffer), &init);
+	initUploadBuffer_ = dxcommon_->CreateUploadBuffer(sizeof(PickingBuffer), &init);
 
-	dxcommon_->GetCommandList()->CopyResource(pickingBufferResource_.Get(), initUploadBuffer.Get());
+	dxcommon_->GetCommandList()->CopyResource(pickingBufferResource_.Get(), initUploadBuffer_.Get());
 	dxcommon_->CommandExecution();
 }
 
@@ -68,6 +68,7 @@ void ModelManager::Finalize() {
 	pickingBufferResource_.Reset();
 	pickingBufferReadBack_.Reset();
 	pickingDataResource_.Reset();
+	initUploadBuffer_.Reset();
 
 	modelFileList.clear();
 	models_.clear();
@@ -588,6 +589,27 @@ void ModelManager::PickingCommand() {
 	dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(8, pickingDataResource_->GetGPUVirtualAddress());
 }
 
+void ModelManager::PickingDataReset() {
+#ifdef _DEBUG
+
+	PickingBuffer init{};
+	init.objID = lastPicked_.objID; // 前回の objID
+	init.depth = 1.0f;              // Depth をリセット
+
+	// マップしてデータを書き換える
+	void* mapped = nullptr;
+	D3D12_RANGE range = { 0, 0 }; // 読み取りはしない
+	HRESULT hr = initUploadBuffer_->Map(0, &range, &mapped);
+	assert(SUCCEEDED(hr));
+	memcpy(mapped, &init, sizeof(PickingBuffer));
+	initUploadBuffer_->Unmap(0, nullptr);
+
+	// UAV にコピー
+	dxcommon_->GetCommandList()->CopyResource(pickingBufferResource_.Get(), initUploadBuffer_.Get());
+
+#endif // _DEBUG
+}
+
 void ModelManager::PickingDataCopy() {
 	if (isOnce_) isOnce_ = false;
 	if (isPicked_) {
@@ -597,7 +619,10 @@ void ModelManager::PickingDataCopy() {
 		preObjId_ = lastPicked_.objID;
 		isOnce_ = true;
 	}
+
+	dxcommon_->TransitionResource(pickingBufferResource_.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_COPY_SOURCE);
 	dxcommon_->GetCommandList()->CopyResource(pickingBufferReadBack_.Get(), pickingBufferResource_.Get());
+
 }
 
 MaterialDataPath ModelManager::LoadMaterialFile(const std::string& filename) {

@@ -94,7 +94,7 @@ PixelShaderOutput main(VertxShaderOutput input)
     
     if (pickingEnable != 0 && all(int2(input.position.xy) == pickingPixelCoord))
     {
-        if (objID != -1)
+        if (objID != -1 && input.position.z < gPickingBuffer[0].depth)
         {
             gPickingBuffer[0].objID = objID;
             gPickingBuffer[0].depth = input.position.z;
