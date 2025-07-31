@@ -28,6 +28,8 @@ void ParticleManager::Initialize(DXCom* pDxcom, SRVManager* srvManager) {
 	InitRingVertex();
 	InitSphereVertex();
 	InitCylinderVertex();
+	InitParticleCS();
+	InitGPUEmitter();
 }
 
 void ParticleManager::Finalize() {
@@ -72,6 +74,13 @@ void ParticleManager::Finalize() {
 	sphereIBuffer_.Reset();
 	cylinderIBuffer_.Reset();
 	cylinderVBuffer_.Reset();
+	particleCSInstancing_.Reset();
+	freeCountResource_.Reset();
+	perViewResource_.Reset();
+	perFrameResource_.Reset();
+	particleCSMaterial_.Finalize();
+
+	csEmitters_.clear();
 }
 
 void ParticleManager::Update() {
@@ -93,6 +102,8 @@ void ParticleManager::Update() {
 		billboardMatrix.m[2][2] = viewMatrix.m[2][2];
 	}
 
+	UpdatePerViewData(billboardMatrix);
+	UpdateGPUEmitter();
 
 	for (auto& groupPair : particleGroups_) {
 
@@ -281,6 +292,10 @@ void ParticleManager::Update() {
 }
 
 void ParticleManager::Draw() {
+	EmitterDispatch();
+	dxcommon_->InsertUAVBarrier(particleCSInstancing_.Get());
+	UpdateParticleCSDispatch();
+
 	dxcommon_->GetDXCommand()->SetViewAndscissor();
 	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Normal);
 	dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -471,6 +486,8 @@ void ParticleManager::Draw() {
 
 		dxcommon_->GetCommandList()->DrawIndexedInstanced(6, group->drawCount_, 0, 0, 0);
 	}
+
+	DrawParticleCS();
 }
 
 void ParticleManager::ParticleDebugGUI() {
@@ -1058,7 +1075,127 @@ void ParticleManager::InitCylinderVertex() {
 	cylinderIbView.SizeInBytes = static_cast<UINT>(sizeof(uint32_t) * cylinderIndex_.size());
 }
 
+void ParticleManager::InitParticleCS() {
 
+	particleCSInsstanceCount_ = 1024;
+	particleCSInstancing_= dxcommon_->CreateUAVResource(dxcommon_->GetDevice(), (sizeof(ParticleCS) * particleCSInsstanceCount_));
+
+	particleCSMaterial_.SetTextureNamePath("redCircle.png");
+	particleCSMaterial_.CreateMaterial();
+
+	uint32_t particleCSSRVIndex = srvManager_->Allocate();
+	uint32_t particleCSUAVIndex = srvManager_->Allocate();
+	srvManager_->CreateStructuredSRV(particleCSSRVIndex, particleCSInstancing_.Get(), particleCSInsstanceCount_, sizeof(ParticleCS));
+	srvManager_->CreateStructuredUAV(particleCSUAVIndex, particleCSInstancing_.Get(), particleCSInsstanceCount_, sizeof(ParticleCS));
+	particleCSSRVHandle_.first = srvManager_->GetCPUDescriptorHandle(particleCSSRVIndex);
+	particleCSSRVHandle_.second = srvManager_->GetGPUDescriptorHandle(particleCSSRVIndex);
+	particleCSUAVHandle_.first = srvManager_->GetCPUDescriptorHandle(particleCSUAVIndex);
+	particleCSUAVHandle_.second = srvManager_->GetGPUDescriptorHandle(particleCSUAVIndex);
+
+	freeCountResource_ = dxcommon_->CreateUAVResource(dxcommon_->GetDevice(), (sizeof(int32_t)));
+	uint32_t freeCountUAVIndex = srvManager_->Allocate();
+	srvManager_->CreateStructuredUAV(freeCountUAVIndex, freeCountResource_.Get(), 1, sizeof(int32_t));
+	freeCountUAVHandle_.first = srvManager_->GetCPUDescriptorHandle(freeCountUAVIndex);
+	freeCountUAVHandle_.second = srvManager_->GetGPUDescriptorHandle(freeCountUAVIndex);
+
+
+	srvManager_->SetDescriptorHeap();
+	dxcommon_->GetPipelineManager()->SetCSPipeline(Pipe::InitParticleCS);
+	dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(0, particleCSUAVHandle_.second);
+	dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(1, freeCountUAVHandle_.second);
+	dxcommon_->GetCommandList()->Dispatch(1,1,1);
+	dxcommon_->CommandExecution();
+
+	perViewResource_ =dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), (sizeof(PerView)));
+	perViewResource_->Map(0, nullptr, reinterpret_cast<void**>(&perViewData_));
+	perViewData_->viewProjection = MakeIdentity4x4();
+	perViewData_->billboardMatrix = MakeIdentity4x4();
+
+
+	perFrameResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), (sizeof(PerFrame)));
+	perFrameResource_->Map(0, nullptr, reinterpret_cast<void**>(&perFrameData_));
+	perFrameData_->time = 0.0f;
+	perFrameData_->deltaTime = 0.0f;
+
+}
+
+void ParticleManager::UpdatePerViewData(const Matrix4x4& billboardMatrix) {
+	perViewData_->viewProjection = camera_->GetViewProjectionMatrix();
+	perViewData_->billboardMatrix = billboardMatrix;
+
+	perFrameData_->deltaTime = FPSKeeper::DeltaTime();
+	perFrameData_->time += perFrameData_->deltaTime;
+}
+
+void ParticleManager::DrawParticleCS() {
+	dxcommon_->GetDXCommand()->SetViewAndscissor();
+	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::particleCS);
+	dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vbView);
+	dxcommon_->GetCommandList()->IASetIndexBuffer(&ibView);
+
+	dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, particleCSSRVHandle_.second);
+	dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, perViewResource_->GetGPUVirtualAddress());
+	dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(1, particleCSMaterial_.GetMaterialResource()->GetGPUVirtualAddress());
+	dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(3, particleCSMaterial_.GetTexture()->gpuHandle);
+
+	dxcommon_->GetCommandList()->DrawIndexedInstanced(6, 1024, 0, 0, 0);
+}
+
+int ParticleManager::InitGPUEmitter() {
+	GPUParticleEmitter CSEmitter;
+	CSEmitter.isEmit = true;
+
+	CSEmitter.emitterResource = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), (sizeof(EmitterSphere)));
+	CSEmitter.emitterResource->Map(0, nullptr, reinterpret_cast<void**>(&CSEmitter.emitter));
+	CSEmitter.emitter->count = 10;
+	CSEmitter.emitter->frequency = 60.0f;
+	CSEmitter.emitter->frequencyTime = 0.0f;
+	CSEmitter.emitter->translate = Vector3(0.0f, 0.0f, 0.0f);
+	CSEmitter.emitter->radius = 1.0f;
+	CSEmitter.emitter->emit = 0;
+
+	CSEmitter.emitterIndex = csEmitterIndex_;
+	csEmitters_.push_back(CSEmitter);
+	int result = csEmitterIndex_;
+	csEmitterIndex_++;
+	return result;
+}
+
+void ParticleManager::UpdateGPUEmitter() {
+	for (int i = 0; i < csEmitters_.size(); i++) {
+		if (csEmitters_[i].isEmit) {
+			csEmitters_[i].emitter->frequencyTime += FPSKeeper::DeltaTime();
+			if (csEmitters_[i].emitter->frequency <= csEmitters_[i].emitter->frequencyTime) {
+				csEmitters_[i].emitter->frequencyTime -= csEmitters_[i].emitter->frequency;
+				csEmitters_[i].emitter->emit = 1;
+			} else {
+				csEmitters_[i].emitter->emit = 0;
+			}
+		} else {
+			csEmitters_[i].emitter->emit = 0;
+			csEmitters_[i].emitter->frequencyTime = 0.0f;
+		}
+	}
+}
+
+void ParticleManager::UpdateParticleCSDispatch() {
+	dxcommon_->GetPipelineManager()->SetCSPipeline(Pipe::UpdateParticleCS);
+	dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(0, particleCSUAVHandle_.second);
+	dxcommon_->GetCommandList()->SetComputeRootConstantBufferView(1, perFrameResource_->GetGPUVirtualAddress());
+	dxcommon_->GetCommandList()->Dispatch(1, 1, 1);
+}
+
+void ParticleManager::EmitterDispatch() {
+	for (int i = 0; i < csEmitters_.size(); i++) {
+		dxcommon_->GetPipelineManager()->SetCSPipeline(Pipe::EmitParticleCS);
+		dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(0, particleCSUAVHandle_.second);
+		dxcommon_->GetCommandList()->SetComputeRootConstantBufferView(1, csEmitters_[i].emitterResource->GetGPUVirtualAddress());
+		dxcommon_->GetCommandList()->SetComputeRootConstantBufferView(2, perFrameResource_->GetGPUVirtualAddress());
+		dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(3, freeCountUAVHandle_.second);
+		dxcommon_->GetCommandList()->Dispatch(1, 1, 1);
+	}
+}
 
 bool ParticleManager::LifeUpdate(Particle& particle) {
 	if (particle.lifeTime_ <= 0) {

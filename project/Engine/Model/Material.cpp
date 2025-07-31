@@ -14,6 +14,13 @@ Material::~Material() {
 
 }
 
+void Material::Finalize() {
+	dxcommon_ = nullptr;
+
+	materialResource_.Reset();
+	materialEnvironmentResource_.Reset();
+}
+
 
 void Material::CreateMaterial() {
 	materialResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(MaterialDate));

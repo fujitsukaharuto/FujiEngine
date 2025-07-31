@@ -372,6 +372,15 @@ void DXCom::TransitionResource(ID3D12Resource* resource, D3D12_RESOURCE_STATES b
 	command_->GetList()->ResourceBarrier(1, &barrier);
 }
 
+void DXCom::InsertUAVBarrier(ID3D12Resource* resource) {
+	D3D12_RESOURCE_BARRIER barrier{};
+	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
+	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	barrier.UAV.pResource = resource;
+
+	command_->GetList()->ResourceBarrier(1, &barrier);
+}
+
 void DXCom::PreOutline() {
 	TransitionResource(depthStencilResource_.Get(),
 		D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);

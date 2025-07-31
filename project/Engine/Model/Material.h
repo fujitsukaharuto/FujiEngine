@@ -47,7 +47,7 @@ public:
 public:
 	Material();
 	~Material();
-
+	void Finalize();
 
 	void CreateMaterial();
 

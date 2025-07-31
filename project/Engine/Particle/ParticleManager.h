@@ -17,6 +17,25 @@ struct TransformationParticleMatrix {
 	Vector2 uvScale = { 1.0f,1.0f };
 };
 
+struct PerView {
+	Matrix4x4 viewProjection;
+	Matrix4x4 billboardMatrix;
+};
+
+struct PerFrame {
+	float time;
+	float deltaTime;
+};
+
+struct EmitterSphere {
+	Vector3 translate;
+	float radius;
+	uint32_t count;
+	float frequency;
+	float frequencyTime;
+	uint32_t emit;
+};
+
 struct AcceleFiled {
 	Vector3 Accele;
 	AABB area;
@@ -84,6 +103,12 @@ public:
 		std::map<std::string, float> anime_;
 	};
 
+	struct GPUParticleEmitter {
+		EmitterSphere* emitter;
+		ComPtr<ID3D12Resource> emitterResource;
+		bool isEmit = false;
+		int emitterIndex = 0;
+	};
 
 	static ParticleManager* GetInstance();
 
@@ -129,6 +154,15 @@ private:
 	void InitRingVertex();
 	void InitSphereVertex();
 	void InitCylinderVertex();
+
+	void InitParticleCS();
+	void UpdatePerViewData(const Matrix4x4& billboardMatrix);
+	void DrawParticleCS();
+
+	int InitGPUEmitter();
+	void UpdateGPUEmitter();
+	void UpdateParticleCSDispatch();
+	void EmitterDispatch();
 
 	bool LifeUpdate(Particle& particle);
 	void ParticleSizeUpdate(Particle& particle);
@@ -178,6 +212,22 @@ private:
 
 	std::vector<VertexDate> cylinderVertex_;
 	std::vector<uint32_t> cylinderIndex_;
+
+	//ParticleCS
+	ComPtr<ID3D12Resource> particleCSInstancing_;
+	uint32_t particleCSInsstanceCount_;
+	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> particleCSSRVHandle_;
+	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> particleCSUAVHandle_;
+	Material particleCSMaterial_;
+	ComPtr<ID3D12Resource> perViewResource_;
+	PerView* perViewData_;
+
+	std::vector<GPUParticleEmitter> csEmitters_;
+	ComPtr<ID3D12Resource> perFrameResource_;
+	PerFrame* perFrameData_;
+	ComPtr<ID3D12Resource> freeCountResource_;
+	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> freeCountUAVHandle_;
+	int csEmitterIndex_ = 0;
 
 
 	bool isBillBoard_ = true;

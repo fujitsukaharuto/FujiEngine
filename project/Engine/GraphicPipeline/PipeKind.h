@@ -8,6 +8,7 @@ enum class Pipe : int {
 	Line3d,
 	particle,
 	particleSub,
+	particleCS,
 	Animation,
 	Skybox,
 	MetaBall,
@@ -26,4 +27,7 @@ enum class Pipe : int {
 	BloomCS,
 	RandomCS,
 	SkinningCS,
+	InitParticleCS,
+	EmitParticleCS,
+	UpdateParticleCS,
 };

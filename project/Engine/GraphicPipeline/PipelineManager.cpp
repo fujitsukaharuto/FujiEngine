@@ -5,6 +5,7 @@
 #include "Line3dPipe.h"
 #include "SpritePipe.h"
 #include "ParticlePipeline.h"
+#include "ParticleCSPipe.h"
 #include "AnimationPipeline.h"
 #include "SkyboxPipe.h"
 #include "MetaBallPipeline.h"
@@ -24,6 +25,9 @@
 #include "CSPipe/BloomCSPipe.h"
 #include "CSPipe/RandomCSPipe.h"
 #include "SkinningCSPipe.h"
+#include "CSPipe/InitParticleCSPipe.h"
+#include "CSPipe/EmitterParticleCSPipe.h"
+#include "CSPipe/UpdateParticleCSPipe.h"
 
 
 PipelineManager::~PipelineManager() {
@@ -58,6 +62,7 @@ void PipelineManager::CreatePipeline() {
 	std::unique_ptr<Line3dPipe> lLine = nullptr;
 	std::unique_ptr<ParticlePipeline> particlePipline = nullptr;
 	std::unique_ptr<ParticlePipeline> particlePiplineSub = nullptr;
+	std::unique_ptr<ParticleCSPipe> particleCSPipe = nullptr;
 	std::unique_ptr<AnimationPipeline> animationPipline = nullptr;
 	std::unique_ptr<SkyboxPipe> skyboxPipline = nullptr;
 	std::unique_ptr<MetaBallPipeline> metaballPipeline = nullptr;
@@ -77,6 +82,9 @@ void PipelineManager::CreatePipeline() {
 	std::unique_ptr<BloomCSPipe> bloomCS = nullptr;
 	std::unique_ptr<RandomCSPipe> randomCS = nullptr;
 	std::unique_ptr<SkinningCSPipe> skinningCS = nullptr;
+	std::unique_ptr<InitParticleCSPipe> initParticleCS = nullptr;
+	std::unique_ptr<EmitterParticleCSPipe> emitParticleCS = nullptr;
+	std::unique_ptr<UpdateParticleCSPipe> updateParticleCS = nullptr;
 
 
 
@@ -116,6 +124,9 @@ void PipelineManager::CreatePipeline() {
 	particlePiplineSub->Initialize(dxcommon_);
 	pipelines_.push_back(std::move(particlePiplineSub));
 
+	particleCSPipe.reset(new ParticleCSPipe());
+	particleCSPipe->Initialize(dxcommon_);
+	pipelines_.push_back(std::move(particleCSPipe));
 
 	animationPipline.reset(new AnimationPipeline());
 	animationPipline->Initialize(dxcommon_);
@@ -192,6 +203,18 @@ void PipelineManager::CreatePipeline() {
 	skinningCS.reset(new SkinningCSPipe);
 	skinningCS->Initialize(dxcommon_);
 	pipelines_.push_back(std::move(skinningCS));
+
+	initParticleCS.reset(new InitParticleCSPipe);
+	initParticleCS->Initialize(dxcommon_);
+	pipelines_.push_back(std::move(initParticleCS));
+
+	emitParticleCS.reset(new EmitterParticleCSPipe);
+	emitParticleCS->Initialize(dxcommon_);
+	pipelines_.push_back(std::move(emitParticleCS));
+
+	updateParticleCS.reset(new UpdateParticleCSPipe);
+	updateParticleCS->Initialize(dxcommon_);
+	pipelines_.push_back(std::move(updateParticleCS));
 
 }
 

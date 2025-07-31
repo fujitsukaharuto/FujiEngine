@@ -109,6 +109,7 @@ public:
 	/// <param name="before">変更前の状態</param>
 	/// <param name="after">変更後の状態</param>
 	void TransitionResource(ID3D12Resource* resource, D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after);
+	void InsertUAVBarrier(ID3D12Resource* resource);
 	void PreOutline();
 	void PostOutline();
 
