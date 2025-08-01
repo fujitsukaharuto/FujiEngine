@@ -30,6 +30,7 @@ void ParticleManager::Initialize(DXCom* pDxcom, SRVManager* srvManager) {
 	InitCylinderVertex();
 	InitParticleCS();
 	InitGPUEmitter();
+	InitGPUEmitter();
 }
 
 void ParticleManager::Finalize() {
@@ -556,6 +557,31 @@ void ParticleManager::ParticleDebugGUI() {
 #endif // _DEBUG
 }
 
+void ParticleManager::ParticleCSDebugGUI() {
+#ifdef _DEBUG
+	if (ImGui::CollapsingHeader("GPU Particle Emitter")) {
+		if (ImGui::TreeNode("ParticleCS Emit Control")) {
+
+			ImGui::Checkbox("isEmit", &csEmitters_[0].isEmit);
+
+			int dragCount = int(csEmitters_[0].emitter->count);
+			ImGui::DragInt("emitCount", &dragCount, 1, 0, 1000);
+			csEmitters_[0].emitter->count = uint32_t(dragCount);
+
+			ImGui::DragFloat("frequency", &csEmitters_[0].emitter->frequency, 0.1f, 0.0f, 300.0f);
+
+			ImGui::DragFloat3("translate", &csEmitters_[0].emitter->translate.x, 0.1f);
+
+			ImGui::DragFloat("radius", &csEmitters_[0].emitter->radius, 0.1f, 0.0f, 300.0f);
+
+			ImGui::Text("DeltaTime1:%f", FPSKeeper::DeltaTime());
+			ImGui::Text("DeltaTime2:%f", FPSKeeper::DeltaTimeFrame());
+			ImGui::TreePop();
+		}
+	}
+#endif // _DEBUG
+}
+
 void ParticleManager::SelectParticleUpdate() {
 #ifdef _DEBUG
 	if (selectParticleGroup_) {
@@ -853,6 +879,17 @@ void ParticleManager::AddAnime(const std::string& name, const std::string& fileN
 	}
 }
 
+uint32_t ParticleManager::GetParticleCSEmitterSize() {
+	ParticleManager* instance = GetInstance();
+	return uint32_t(instance->csEmitters_.size());
+}
+
+ParticleManager::GPUParticleEmitter& ParticleManager::GetParticleCSEmitter(int index) {
+	ParticleManager* instance = GetInstance();
+	assert(index >= 0 && index < instance->csEmitters_.size()); // 範囲チェック（任意）
+	return instance->csEmitters_[index];
+}
+
 void ParticleManager::InitPlaneVertex() {
 	vertex_.push_back({ {-1.0f,1.0f,0.0f,1.0f},{0.0f,0.0f},{0.0f,0.0f,-1.0f} });
 	vertex_.push_back({ {-1.0f,-1.0f,0.0f,1.0f},{0.0f,1.0f},{0.0f,0.0f,-1.0f} });
@@ -1078,7 +1115,7 @@ void ParticleManager::InitCylinderVertex() {
 
 void ParticleManager::InitParticleCS() {
 
-	particleCSInsstanceCount_ = 1024;
+	particleCSInsstanceCount_ = numParticles;
 	particleCSInstancing_= dxcommon_->CreateUAVResource(dxcommon_->GetDevice(), (sizeof(ParticleCS) * particleCSInsstanceCount_));
 
 	particleCSMaterial_.SetTextureNamePath("redCircle.png");
@@ -1111,7 +1148,8 @@ void ParticleManager::InitParticleCS() {
 	dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(0, particleCSUAVHandle_.second);
 	dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(1, freeListIndexUAVHandle_.second);
 	dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(2, freeListUAVHandle_.second);
-	dxcommon_->GetCommandList()->Dispatch(1,1,1);
+	int dispatchCount = (numParticles + threadsPerGroup - 1) / threadsPerGroup;
+	dxcommon_->GetCommandList()->Dispatch(dispatchCount,1,1);
 	dxcommon_->CommandExecution();
 
 	perViewResource_ =dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), (sizeof(PerView)));
@@ -1133,6 +1171,9 @@ void ParticleManager::UpdatePerViewData(const Matrix4x4& billboardMatrix) {
 
 	perFrameData_->deltaTime = FPSKeeper::DeltaTime();
 	perFrameData_->time += perFrameData_->deltaTime;
+	if (perFrameData_->time > 420.0f) {
+		perFrameData_->time = 0.0f;
+	}
 }
 
 void ParticleManager::DrawParticleCS() {
@@ -1147,7 +1188,7 @@ void ParticleManager::DrawParticleCS() {
 	dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(1, particleCSMaterial_.GetMaterialResource()->GetGPUVirtualAddress());
 	dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(3, particleCSMaterial_.GetTexture()->gpuHandle);
 
-	dxcommon_->GetCommandList()->DrawIndexedInstanced(6, 1024, 0, 0, 0);
+	dxcommon_->GetCommandList()->DrawIndexedInstanced(6, particleCSInsstanceCount_, 0, 0, 0);
 }
 
 int ParticleManager::InitGPUEmitter() {
@@ -1156,11 +1197,11 @@ int ParticleManager::InitGPUEmitter() {
 
 	CSEmitter.emitterResource = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), (sizeof(EmitterSphere)));
 	CSEmitter.emitterResource->Map(0, nullptr, reinterpret_cast<void**>(&CSEmitter.emitter));
-	CSEmitter.emitter->count = 10;
-	CSEmitter.emitter->frequency = 60.0f;
+	CSEmitter.emitter->count = 500;
+	CSEmitter.emitter->frequency = 0.5f;
 	CSEmitter.emitter->frequencyTime = 0.0f;
 	CSEmitter.emitter->translate = Vector3(0.0f, 0.0f, 0.0f);
-	CSEmitter.emitter->radius = 1.0f;
+	CSEmitter.emitter->radius = 2.5f;
 	CSEmitter.emitter->emit = 0;
 
 	CSEmitter.emitterIndex = csEmitterIndex_;
@@ -1172,17 +1213,19 @@ int ParticleManager::InitGPUEmitter() {
 
 void ParticleManager::UpdateGPUEmitter() {
 	for (int i = 0; i < csEmitters_.size(); i++) {
-		if (csEmitters_[i].isEmit) {
-			csEmitters_[i].emitter->frequencyTime += FPSKeeper::DeltaTime();
-			if (csEmitters_[i].emitter->frequency <= csEmitters_[i].emitter->frequencyTime) {
-				csEmitters_[i].emitter->frequencyTime -= csEmitters_[i].emitter->frequency;
-				csEmitters_[i].emitter->emit = 1;
+		auto& emitter = csEmitters_[i];
+		if (emitter.isEmit) {
+			emitter.emitter->frequencyTime += FPSKeeper::DeltaTime();
+			if (emitter.emitter->frequency <= emitter.emitter->frequencyTime) {
+				emitter.emitter->frequencyTime -= emitter.emitter->frequency;
+				emitter.emitter->emit = 1;
 			} else {
-				csEmitters_[i].emitter->emit = 0;
+				emitter.emitter->emit = 0;
 			}
 		} else {
-			csEmitters_[i].emitter->emit = 0;
-			csEmitters_[i].emitter->frequencyTime = 0.0f;
+			emitter.emitter->emit = 0;
+			emitter.emitter->frequencyTime = 0.0f;
+			perFrameData_->time = 0.0f;
 		}
 	}
 }
@@ -1193,7 +1236,8 @@ void ParticleManager::UpdateParticleCSDispatch() {
 	dxcommon_->GetCommandList()->SetComputeRootConstantBufferView(1, perFrameResource_->GetGPUVirtualAddress());
 	dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(2, freeListIndexUAVHandle_.second);
 	dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(3, freeListUAVHandle_.second);
-	dxcommon_->GetCommandList()->Dispatch(1, 1, 1);
+	int dispatchCount = (numParticles + threadsPerGroup - 1) / threadsPerGroup;
+	dxcommon_->GetCommandList()->Dispatch(dispatchCount, 1, 1);
 }
 
 void ParticleManager::EmitterDispatch() {
@@ -1204,7 +1248,8 @@ void ParticleManager::EmitterDispatch() {
 		dxcommon_->GetCommandList()->SetComputeRootConstantBufferView(2, perFrameResource_->GetGPUVirtualAddress());
 		dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(3, freeListIndexUAVHandle_.second);
 		dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(4, freeListUAVHandle_.second);
-		dxcommon_->GetCommandList()->Dispatch(1, 1, 1);
+		int dispatchCount = (csEmitters_[i].emitter->count + threadGroupSize_ - 1) / threadGroupSize_;
+		dxcommon_->GetCommandList()->Dispatch(dispatchCount, 1, 1);
 	}
 }
 

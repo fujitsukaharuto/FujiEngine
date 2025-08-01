@@ -1,7 +1,6 @@
 #include "../../CSParticle.hlsli"
 #include "../Random.hlsli"
 
-static const uint kMakParticles = 1024;
 RWStructuredBuffer<Particle> gParticle : register(u0);
 struct EmitterSphere
 {
@@ -23,25 +22,50 @@ RWStructuredBuffer<int> gFreeListIndex : register(u1);
 RWStructuredBuffer<uint> gFreeList : register(u2);
 
 
-[numthreads(1, 1, 1)]
+float3 RandomUnitVector(RandomGenerator gen)
+{
+    float3 v;
+    v = gen.Generate3d(); // [-1, 1]
+    if (length(v) < 0.0001f)
+    {
+        v = gen.Generate3d();
+    }
+    if (length(v) > 1.0f)
+    {
+        v = gen.Generate3d();
+    }
+    return normalize(v);
+}
+
+
+[numthreads(64, 1, 1)]
 void main(uint3 DTid : SV_DispatchThreadID)
 {
     if (gEmitter.emit != 0)
     {
         RandomGenerator generator;
-        generator.seed = (DTid + gPerFrame.time) * gPerFrame.time;
-        for (uint countIndex = 0; countIndex < gEmitter.count; ++countIndex)
+        generator.InitSeed(DTid, gPerFrame.time);
+
+        uint threadID = DTid.x;
+        uint threadCount = 64;
+        uint emitCount = gEmitter.count;
+    
+        for (uint i = threadID; i < emitCount; i += threadCount)
         {
             int freeListIndex;
             InterlockedAdd(gFreeListIndex[0], -1, freeListIndex);
-            if (0 <= freeListIndex && freeListIndex < kMakParticles)
+            if (0 <= freeListIndex && freeListIndex < kMaxParticles)
             {
+                float3 dir = RandomUnitVector(generator);
+                float3 pos = gEmitter.translate + dir * gEmitter.radius;
+
                 uint particleIndex = gFreeList[freeListIndex];
-                gParticle[particleIndex].scale = generator.Generate3d();
-                gParticle[particleIndex].translate = generator.Generate3d();
-                gParticle[particleIndex].color.rgb = generator.Generate3d();
+                gParticle[particleIndex].scale = float3(0.1f, 0.1f, 0.1f);
+                gParticle[particleIndex].translate = pos;
+                gParticle[particleIndex].color.rgb = (generator.Generate3d() + 1) * 0.5f;
                 gParticle[particleIndex].color.a = 1.0f;
-                gParticle[particleIndex].velocity = (generator.Generate3d() * 0.1f) - 0.05f;
+                float3 velocityOffset = (generator.Generate3d()) * 0.01f;
+                gParticle[particleIndex].velocity = normalize(dir) * 0.01f + velocityOffset;
                 gParticle[particleIndex].lifeTime = 60.0f;
                 gParticle[particleIndex].currentTime = 0.0f;
             }

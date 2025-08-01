@@ -34,6 +34,8 @@ private:
 
 	ParticleEmitter emit;
 
+	float csEmitterMoveTime_;
+
 	std::unique_ptr<CollisionManager> cMane_;
 
 	// sceneChange

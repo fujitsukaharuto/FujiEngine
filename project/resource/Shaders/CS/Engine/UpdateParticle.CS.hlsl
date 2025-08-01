@@ -1,6 +1,5 @@
 #include "../../CSParticle.hlsli"
 
-static const uint kMakParticles = 1024;
 RWStructuredBuffer<Particle> gParticle : register(u0);
 struct PerFrame
 {
@@ -15,7 +14,7 @@ RWStructuredBuffer<uint> gFreeList : register(u2);
 void main( uint3 DTid : SV_DispatchThreadID )
 {
     uint particleIndex = DTid.x;
-    if (particleIndex < kMakParticles)
+    if (particleIndex < kMaxParticles)
     {
         if (gParticle[particleIndex].color.a != 0)
         {
@@ -24,13 +23,13 @@ void main( uint3 DTid : SV_DispatchThreadID )
             float alpha = 1.0f - (gParticle[particleIndex].currentTime / gParticle[particleIndex].lifeTime);
             gParticle[particleIndex].color.a = saturate(alpha);
         }
-        if (gParticle[particleIndex].color.a == 0)
+        if (gParticle[particleIndex].color.a == 0.0f)
         {
             gParticle[particleIndex].scale = float3(0.0f, 0.0f, 0.0f);
             int freeListIndex;
             InterlockedAdd(gFreeListIndex[0], 1, freeListIndex);
             
-            if ((freeListIndex + 1) < kMakParticles)
+            if ((freeListIndex + 1) < kMaxParticles)
             {
                 gFreeList[freeListIndex + 1] = particleIndex;
             }

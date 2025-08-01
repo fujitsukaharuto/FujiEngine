@@ -118,6 +118,7 @@ public:
 	void Draw();
 
 	void ParticleDebugGUI();
+	void ParticleCSDebugGUI();
 	void SelectParticleUpdate();
 	void SelectEmitterSizeDraw();
 
@@ -147,6 +148,10 @@ public:
 	static void EmitAnime(const std::string& name, const Vector3& pos, const AnimeData& data, const RandomParametor& para, uint32_t count);
 
 	static void AddAnime(const std::string& name, const std::string& fileName, float animeChangeTime);
+
+	static uint32_t GetParticleCSEmitterSize();
+
+	static GPUParticleEmitter& GetParticleCSEmitter(int index);
 
 private:
 
@@ -230,6 +235,10 @@ private:
 	ComPtr<ID3D12Resource> freeListResource_;
 	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> freeListUAVHandle_;
 	int csEmitterIndex_ = 0;
+
+	uint32_t numParticles = 1048576;
+	uint32_t threadsPerGroup = 1024;
+	int threadGroupSize_ = 64;
 
 
 	bool isBillBoard_ = true;

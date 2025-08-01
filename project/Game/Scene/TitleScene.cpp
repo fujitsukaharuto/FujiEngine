@@ -94,9 +94,24 @@ void TitleScene::Update() {
 
 	cube_->AnimationUpdate();
 
-	if (input_->TriggerKey(DIK_5)) {
-		emit.Emit();
+	csEmitterMoveTime_ += FPSKeeper::DeltaTime();
+	int csSize = int(ParticleManager::GetParticleCSEmitterSize());
+	for (int i = 0; i < csSize; i++) {
+		if (i == 1) {
+			float speed = 0.05f;       // 周期（回転スピード）
+			float radius = 20.0f;      // 半径
+			float angle = csEmitterMoveTime_ * speed + i * (std::numbers::pi_v<float>*2.0f) / float(csSize);
+
+			ParticleManager::GetParticleCSEmitter(i).emitter->translate.x = std::cos(angle) * radius;
+			ParticleManager::GetParticleCSEmitter(i).emitter->translate.y = 5.0f;
+			ParticleManager::GetParticleCSEmitter(i).emitter->translate.z = std::sin(angle) * radius;
+		} else {
+			ParticleManager::GetParticleCSEmitter(i).emitter->count = 2000;
+			ParticleManager::GetParticleCSEmitter(i).emitter->frequency = 1.0f;
+			ParticleManager::GetParticleCSEmitter(i).emitter->radius = 30.0f;
+		}
 	}
+
 	//emit.Emit();
 
 	cMane_->CheckAllCollision();

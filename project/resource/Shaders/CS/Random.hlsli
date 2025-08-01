@@ -78,18 +78,32 @@ float3 rand1dTo3d(float value)
     );
 }
 
+
 class RandomGenerator
 {
-    float3 seed;
-    float3 Generate3d()
+    uint seed;
+
+    void InitSeed(uint3 baseSeed,float perTime)
     {
-        seed = rand3dTo3d(seed);
+        seed = baseSeed.x * 73856093 ^ baseSeed.y * 19349663 ^ baseSeed.z * 83492791;
+        seed ^= asuint(perTime * 1000.0f);
+    }
+
+    uint XorShift()
+    {
+        seed ^= (seed << 13);
+        seed ^= (seed >> 17);
+        seed ^= (seed << 5);
         return seed;
     }
+
     float Generate1d()
     {
-        float result = rand3dTo1d(seed);
-        seed.x = result;
-        return result;
+        return float(XorShift() & 0x00FFFFFF) / 16777216.0f; // [0,1)
+    }
+
+    float3 Generate3d()
+    {
+        return float3(Generate1d(), Generate1d(), Generate1d()) * 2.0f - 1.0f; // [-1,1]
     }
 };
