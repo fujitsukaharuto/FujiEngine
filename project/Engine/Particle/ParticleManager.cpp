@@ -75,7 +75,8 @@ void ParticleManager::Finalize() {
 	cylinderIBuffer_.Reset();
 	cylinderVBuffer_.Reset();
 	particleCSInstancing_.Reset();
-	freeCountResource_.Reset();
+	freeListIndexResource_.Reset();
+	freeListResource_.Reset();
 	perViewResource_.Reset();
 	perFrameResource_.Reset();
 	particleCSMaterial_.Finalize();
@@ -1092,17 +1093,24 @@ void ParticleManager::InitParticleCS() {
 	particleCSUAVHandle_.first = srvManager_->GetCPUDescriptorHandle(particleCSUAVIndex);
 	particleCSUAVHandle_.second = srvManager_->GetGPUDescriptorHandle(particleCSUAVIndex);
 
-	freeCountResource_ = dxcommon_->CreateUAVResource(dxcommon_->GetDevice(), (sizeof(int32_t)));
+	freeListIndexResource_ = dxcommon_->CreateUAVResource(dxcommon_->GetDevice(), (sizeof(int32_t)));
 	uint32_t freeCountUAVIndex = srvManager_->Allocate();
-	srvManager_->CreateStructuredUAV(freeCountUAVIndex, freeCountResource_.Get(), 1, sizeof(int32_t));
-	freeCountUAVHandle_.first = srvManager_->GetCPUDescriptorHandle(freeCountUAVIndex);
-	freeCountUAVHandle_.second = srvManager_->GetGPUDescriptorHandle(freeCountUAVIndex);
+	srvManager_->CreateStructuredUAV(freeCountUAVIndex, freeListIndexResource_.Get(), 1, sizeof(int32_t));
+	freeListIndexUAVHandle_.first = srvManager_->GetCPUDescriptorHandle(freeCountUAVIndex);
+	freeListIndexUAVHandle_.second = srvManager_->GetGPUDescriptorHandle(freeCountUAVIndex);
+
+	freeListResource_ = dxcommon_->CreateUAVResource(dxcommon_->GetDevice(), (sizeof(uint32_t)* particleCSInsstanceCount_));
+	uint32_t freeListUAVIndex = srvManager_->Allocate();
+	srvManager_->CreateStructuredUAV(freeListUAVIndex, freeListResource_.Get(), particleCSInsstanceCount_, sizeof(uint32_t));
+	freeListUAVHandle_.first = srvManager_->GetCPUDescriptorHandle(freeListUAVIndex);
+	freeListUAVHandle_.second = srvManager_->GetGPUDescriptorHandle(freeListUAVIndex);
 
 
 	srvManager_->SetDescriptorHeap();
 	dxcommon_->GetPipelineManager()->SetCSPipeline(Pipe::InitParticleCS);
 	dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(0, particleCSUAVHandle_.second);
-	dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(1, freeCountUAVHandle_.second);
+	dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(1, freeListIndexUAVHandle_.second);
+	dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(2, freeListUAVHandle_.second);
 	dxcommon_->GetCommandList()->Dispatch(1,1,1);
 	dxcommon_->CommandExecution();
 
@@ -1183,6 +1191,8 @@ void ParticleManager::UpdateParticleCSDispatch() {
 	dxcommon_->GetPipelineManager()->SetCSPipeline(Pipe::UpdateParticleCS);
 	dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(0, particleCSUAVHandle_.second);
 	dxcommon_->GetCommandList()->SetComputeRootConstantBufferView(1, perFrameResource_->GetGPUVirtualAddress());
+	dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(2, freeListIndexUAVHandle_.second);
+	dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(3, freeListUAVHandle_.second);
 	dxcommon_->GetCommandList()->Dispatch(1, 1, 1);
 }
 
@@ -1192,7 +1202,8 @@ void ParticleManager::EmitterDispatch() {
 		dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(0, particleCSUAVHandle_.second);
 		dxcommon_->GetCommandList()->SetComputeRootConstantBufferView(1, csEmitters_[i].emitterResource->GetGPUVirtualAddress());
 		dxcommon_->GetCommandList()->SetComputeRootConstantBufferView(2, perFrameResource_->GetGPUVirtualAddress());
-		dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(3, freeCountUAVHandle_.second);
+		dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(3, freeListIndexUAVHandle_.second);
+		dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(4, freeListUAVHandle_.second);
 		dxcommon_->GetCommandList()->Dispatch(1, 1, 1);
 	}
 }

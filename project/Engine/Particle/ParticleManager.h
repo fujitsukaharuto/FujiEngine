@@ -225,8 +225,10 @@ private:
 	std::vector<GPUParticleEmitter> csEmitters_;
 	ComPtr<ID3D12Resource> perFrameResource_;
 	PerFrame* perFrameData_;
-	ComPtr<ID3D12Resource> freeCountResource_;
-	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> freeCountUAVHandle_;
+	ComPtr<ID3D12Resource> freeListIndexResource_;
+	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> freeListIndexUAVHandle_;
+	ComPtr<ID3D12Resource> freeListResource_;
+	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> freeListUAVHandle_;
 	int csEmitterIndex_ = 0;
 
 

@@ -19,7 +19,8 @@ struct PerFrame
     float deltaTime;
 };
 ConstantBuffer<PerFrame> gPerFrame : register(b1);
-RWStructuredBuffer<int> gFreeCount : register(u1);
+RWStructuredBuffer<int> gFreeListIndex : register(u1);
+RWStructuredBuffer<uint> gFreeList : register(u2);
 
 
 [numthreads(1, 1, 1)]
@@ -31,10 +32,11 @@ void main(uint3 DTid : SV_DispatchThreadID)
         generator.seed = (DTid + gPerFrame.time) * gPerFrame.time;
         for (uint countIndex = 0; countIndex < gEmitter.count; ++countIndex)
         {
-            int particleIndex;
-            InterlockedAdd(gFreeCount[0], 1, particleIndex);
-            if (particleIndex < kMakParticles)
+            int freeListIndex;
+            InterlockedAdd(gFreeListIndex[0], -1, freeListIndex);
+            if (0 <= freeListIndex && freeListIndex < kMakParticles)
             {
+                uint particleIndex = gFreeList[freeListIndex];
                 gParticle[particleIndex].scale = generator.Generate3d();
                 gParticle[particleIndex].translate = generator.Generate3d();
                 gParticle[particleIndex].color.rgb = generator.Generate3d();
@@ -43,8 +45,11 @@ void main(uint3 DTid : SV_DispatchThreadID)
                 gParticle[particleIndex].lifeTime = 60.0f;
                 gParticle[particleIndex].currentTime = 0.0f;
             }
+            else
+            {
+                InterlockedAdd(gFreeListIndex[0], 1);
+                break;
+            }
         }
-
     }
-
 }
