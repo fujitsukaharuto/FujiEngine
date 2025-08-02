@@ -141,7 +141,7 @@ void TitleScene::Draw() {
 
 	star_->Draw();
 
-	//space_->Draw();
+	space_->Draw();
 
 	titlePlane_->Draw();
 

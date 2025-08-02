@@ -19,6 +19,6 @@ private:
 
 	Step step_;
 	bool isAttack_ = true;
-	float coolTime_ = 30.0f;
+	float coolTime_ = 80.0f;
 
 };

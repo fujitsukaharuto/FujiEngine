@@ -19,11 +19,11 @@ void Beam::Initialize() {
 	beam2_ = std::make_unique<Object3d>();
 	beam3_ = std::make_unique<Object3d>();
 	beamCore1_->Create("plane_under.obj");
-	beamCore1_->SetTexture("beamCore3.png");
+	beamCore1_->SetTexture("beamCore2.png");
 	beamCore2_->Create("plane_under.obj");
 	beamCore2_->SetTexture("beamCore2.png");
 	beamCore3_->Create("plane_under.obj");
-	beamCore3_->SetTexture("beamCore2.png");
+	beamCore3_->SetTexture("beamCore3.png");
 	beam1_->CreateCylinder();
 	beam1_->SetTexture("beamCore.png");
 	beam2_->CreateCylinder();
@@ -38,35 +38,35 @@ void Beam::Initialize() {
 	collider_->SetCollisionExitCallback([this](const ColliderInfo& other) {OnCollisionExit(other); });
 	collider_->SetOffset({ 0.0f,0.0f,50.0f });
 	collider_->SetDepth(100.0f);
-	collider_->SetWidth(2.5f);
-	collider_->SetHeight(2.5f);
+	collider_->SetWidth(7.5f);
+	collider_->SetHeight(7.5f);
 
 	model_->SetLightEnable(LightMode::kLightNone);
-	model_->transform.translate.y = 2.0f;
+	model_->transform.translate.y = 5.0f;
 	model_->transform.scale.y = 30.0f;
 	model_->transform.rotate.x = 1.56f;
 	model_->SetColor({ 0.0f,0.0f,0.0f,0.0f });
 	model_->SetAlphaRef(0.25f);
 
-	float scaleX = 2.0f;
+	float scaleX = 5.0f;
 	beam1BaseScale_ = scaleX;
 	beam1_->SetLightEnable(LightMode::kLightNone);
 	beam1_->transform.translate.y = 0.1f;
 	beam1_->transform.translate.z = 0.5f;
 	beam1_->transform.scale.x = 0.0f;
 	beam1_->transform.scale.z = 0.0f;
-	beam1_->SetColor({ 0.75f,0.0f,0.2f,0.75f });
+	beam1_->SetColor({ 0.75f,0.2f,0.2f,0.75f });
 	beam1_->SetAlphaRef(0.25f);
 	beam1_->SetParent(&model_->transform);
 
-	scaleX = 1.75f;
+	scaleX = 4.5f;
 	beam2BaseScale_ = scaleX;
 	beam2_->SetLightEnable(LightMode::kLightNone);
 	beam2_->transform.translate.y = 0.1f;
 	beam2_->transform.translate.z = 0.5f;
 	beam2_->transform.scale.x = 0.0f;
 	beam2_->transform.scale.z = 0.0f;
-	beam2_->SetColor({ 0.5f,0.0f,0.1f,0.75f });
+	beam2_->SetColor({ 0.5f,0.0f,0.4f,0.75f });
 	beam2_->SetAlphaRef(0.25f);
 	beam2_->SetParent(&model_->transform);
 
@@ -77,8 +77,8 @@ void Beam::Initialize() {
 	beamCore1_->transform.scale.y = 3.0f;
 	beamCore1_->transform.scale.z = 0.0f;
 	beamCore1_->transform.rotate.y = 0.75f;
-	beamCore1_->SetColor({ 1.0f,0.0f,0.4f,1.0f });
-	beamCore1_->SetAlphaRef(0.25f);
+	beamCore1_->SetColor({ 5.0f,0.f,0.0f,1.0f });
+	beamCore1_->SetAlphaRef(0.1f);
 	beamCore1_->SetParent(&model_->transform);
 
 	beamCore2_->SetLightEnable(LightMode::kLightNone);
@@ -88,8 +88,8 @@ void Beam::Initialize() {
 	beamCore2_->transform.scale.y = 3.0f;
 	beamCore2_->transform.scale.z = 0.0f;
 	beamCore2_->transform.rotate.y = -0.75f;
-	beamCore2_->SetColor({ 1.0f,0.0f,0.0f,1.0f });
-	beamCore2_->SetAlphaRef(0.25f);
+	beamCore2_->SetColor({ 0.5f,0.0f,0.5f,1.0f });
+	beamCore2_->SetAlphaRef(0.1f);
 	beamCore2_->SetParent(&model_->transform);
 
 	beamCore3_->SetLightEnable(LightMode::kLightNone);
@@ -99,18 +99,18 @@ void Beam::Initialize() {
 	beamCore3_->transform.scale.y = 3.0f;
 	beamCore3_->transform.scale.z = 0.0f;
 	beamCore3_->transform.rotate.y = 1.56f;
-	beamCore3_->SetColor({ 1.0f,0.15f,0.75f,1.0f });
+	beamCore3_->SetColor({ 0.5f,0.25f,0.15f,1.0f });
 	beamCore3_->SetAlphaRef(0.25f);
 	beamCore3_->SetParent(&model_->transform);
 
-	scaleX -= 0.25f;
+	scaleX -= 0.5f;
 	beam3BaseScale_ = scaleX;
 	beam3_->SetLightEnable(LightMode::kLightNone);
 	beam3_->transform.translate.y = 0.1f;
 	beam3_->transform.translate.z = 0.5f;
 	beam3_->transform.scale.x = 0.0f;
 	beam3_->transform.scale.z = 0.0f;
-	beam3_->SetColor({ 0.2f,0.0f,0.0f,0.75f });
+	beam3_->SetColor({ 0.45f,0.0f,0.0f,0.75f });
 	beam3_->SetAlphaRef(0.25f);
 	beam3_->SetParent(&model_->transform);
 
@@ -137,7 +137,7 @@ void Beam::Update() {
 			isLive_ = false;
 		}
 
-		beam1_->SetUVScale({ 0.75f,0.75f }, { -uvTransX_ * 1.1f,uvTransX_ });
+		beam1_->SetUVScale({ 0.65f,0.65f }, { -uvTransX_ * 1.1f,uvTransX_ });
 		beam2_->SetUVScale({ 1.0f,0.5f }, { uvTransX_ * 0.9f,uvTransX_ * 2.0f });
 		beam3_->SetUVScale({ 1.5f,1.0f }, { -uvTransX_,uvTransX_ * 5.0f });
 		beamCore1_->SetUVScale({ 1.0f,3.0f }, { 0.0f,uvTransX_ * 0.5f });
@@ -213,12 +213,12 @@ bool Beam::BeamRotate() {
 		beam2_->transform.scale.z = std::lerp(0.0f, beam2BaseScale_, t);
 		beam3_->transform.scale.x = std::lerp(0.0f, beam3BaseScale_, t);
 		beam3_->transform.scale.z = std::lerp(0.0f, beam3BaseScale_, t);
-		beamCore1_->transform.scale.x = std::lerp(0.0f, beam2BaseScale_ * 1.5f, t);
-		beamCore1_->transform.scale.z = std::lerp(0.0f, beam2BaseScale_ * 1.5f, t);
-		beamCore2_->transform.scale.x = std::lerp(0.0f, beam2BaseScale_ * 1.75f, t);
-		beamCore2_->transform.scale.z = std::lerp(0.0f, beam2BaseScale_ * 1.75f, t);
-		beamCore3_->transform.scale.x = std::lerp(0.0f, beam2BaseScale_ * 1.75f, t);
-		beamCore3_->transform.scale.z = std::lerp(0.0f, beam2BaseScale_ * 1.75f, t);
+		beamCore1_->transform.scale.x = std::lerp(0.0f, beam2BaseScale_ * 2.0f, t);
+		beamCore1_->transform.scale.z = std::lerp(0.0f, beam2BaseScale_ * 2.0f, t);
+		beamCore2_->transform.scale.x = std::lerp(0.0f, beam2BaseScale_ * 2.05f, t);
+		beamCore2_->transform.scale.z = std::lerp(0.0f, beam2BaseScale_ * 2.05f, t);
+		beamCore3_->transform.scale.x = std::lerp(0.0f, beam2BaseScale_ * 2.05f, t);
+		beamCore3_->transform.scale.z = std::lerp(0.0f, beam2BaseScale_ * 2.05f, t);
 		beamParticle_->Emit();
 		beamLight_->Emit();
 

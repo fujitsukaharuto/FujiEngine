@@ -20,13 +20,16 @@ void BossAreaAttack::Update() {
 		///---------------------------------------------------------------------------------------
 	case BossAreaAttack::Step::ATTACK:
 
-		if (isAttack_) {
-			pBoss_->WaveWallAttack();
-			isAttack_ = false;
-		}
 		coolTime_ -= FPSKeeper::DeltaTime();
 		if (coolTime_ < 0.0f) {
-			step_ = Step::TOROOT;
+			if (isAttack_) {
+				pBoss_->WaveWallAttack();
+				pBoss_->UnderRingEmit();
+				isAttack_ = false;
+			} else {
+				step_ = Step::TOROOT;
+			}
+			coolTime_ = 30.0f;
 		}
 
 		break;

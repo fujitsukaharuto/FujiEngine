@@ -19,6 +19,9 @@ struct RandomParametor {
 
 	Vector4 colorMin = { 1.0f,1.0f,1.0f,1.0f };
 	Vector4 colorMax = { 1.0f,1.0f,1.0f,1.0f };
+
+	Vector2 autoUVMax = { 0.1f,0.0f };
+	Vector2 autoUVMin = { 0.1f,0.0f };
 };
 
 struct AnimeData {

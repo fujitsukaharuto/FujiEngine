@@ -60,11 +60,11 @@ void Boss::Initialize() {
 		std::unique_ptr<Object3d> chargeParent;
 		chargeParent = std::make_unique<Object3d>();
 		chargeParent->Create("cube.obj");
-		chargeParent->transform.translate.y += 2.0f;
+		chargeParent->transform.translate.y += 5.0f;
 		chargeParent->transform.translate.z += 4.0f;
-		chargeParent->transform.scale.x = 12.0f;
-		chargeParent->transform.scale.y = 12.0f;
-		chargeParent->transform.scale.z = 12.0f;
+		chargeParent->transform.scale.x = baseChargeSize_;
+		chargeParent->transform.scale.y = baseChargeSize_;
+		chargeParent->transform.scale.z = baseChargeSize_;
 		chargeParent->SetParent(&animModel_->transform);
 		chargeParent->SetNoneScaleParent(true);
 		if (i != 0 && i != 4) {
@@ -96,6 +96,10 @@ void Boss::Initialize() {
 	waveAttack2.frequencyTime_ = 0.0f;
 	waveAttack3.frequencyTime_ = 0.0f;
 	waveAttack4.frequencyTime_ = 0.0f;
+	waveAttack1.pos_.z = 4.0f;
+	waveAttack2.pos_.z = 4.0f;
+	waveAttack3.pos_.z = 4.0f;
+	waveAttack4.pos_.z = 4.0f;
 	jumpWave_.frequencyTime_ = 0.0f;
 
 	waveAttack1.isAddRandomSize_ = true;
@@ -438,6 +442,7 @@ void Boss::ReStart() {
 	isHpActive_ = true;
 	isDying_ = false;
 	isStart_ = true;
+	phaseIndex_ = 0;
 	startTime_ = 300.0f;
 	animModel_->ChangeAnimation("roaring");
 	animModel_->LoadTransformFromJson("boss_transform.json");
@@ -479,6 +484,7 @@ void Boss::ReduceBossHP(bool isStrong) {
 				animModel_->IsRoopAnimation(false);
 				hpCooltime_ = 60.0f;
 				hpSprites_[nowHpIndex_]->SetColor(damageColor1_);
+				phaseIndex_++;
 				return;
 			}
 			break;
@@ -638,8 +644,8 @@ void Boss::InitBeam() {
 	}
 
 	chargeTime_ = 120.0f;
-	chargeSize_ = 12.0f;
-	charge15_.grain_.startSize_ = { chargeSize_ * 2.0f,chargeSize_ * 4.0f };
+	chargeSize_ = baseChargeSize_;
+	charge15_.grain_.startSize_ = { chargeSize_ * 3.0f,chargeSize_ * 6.0f };
 
 	for (auto& chargeParent : chargeParents_) {
 		chargeParent->transform.scale.x = chargeSize_;
@@ -685,7 +691,7 @@ bool Boss::BeamCharge() {
 		}
 
 		if (chargeSize_ > 3.0f) {
-			charge15_.grain_.startSize_ = { chargeSize_ * 2.0f,chargeSize_ * 4.0f };
+			charge15_.grain_.startSize_ = { chargeSize_ * 3.0f,chargeSize_ * 6.0f };
 		}
 
 		charge9_.Emit();
@@ -768,15 +774,7 @@ bool Boss::JumpAttack() {
 			if (isJumpAttack_) {
 				jumpWave_.pos_ = animModel_->transform.translate;
 				jumpWave_.Emit();
-				CameraManager::GetInstance()->GetCamera()->SetShakeTime(20.0f);
-				isJumpAttack_ = false;
-				int count = 0;
-				for (auto& ring : undderRings_) {
-					if (count == 1) break;
-					if (ring->GetIsLive()) continue;
-					ring->InitRing(animModel_->transform.translate);
-					count++;
-				}
+				UnderRingEmit();
 			}
 		}
 
@@ -792,6 +790,18 @@ void Boss::UpdateUnderRing() {
 	for (auto& ring : undderRings_) {
 		if (!ring->GetIsLive())continue;
 		ring->Update();
+	}
+}
+
+void Boss::UnderRingEmit() {
+	CameraManager::GetInstance()->GetCamera()->SetShakeTime(20.0f);
+	isJumpAttack_ = false;
+	int count = 0;
+	for (auto& ring : undderRings_) {
+		if (count == 1) break;
+		if (ring->GetIsLive()) continue;
+		ring->InitRing(animModel_->transform.translate);
+		count++;
 	}
 }
 

@@ -46,6 +46,7 @@ public:
 	void InitJumpAttack();
 	bool JumpAttack();
 	void UpdateUnderRing();
+	void UnderRingEmit();
 
 	//========================================================================*/
 	//* Behavior
@@ -131,6 +132,7 @@ private:
 	float attackCooldown_ = 0.0f;
 	float chargeTime_ = 120.0f;
 	float chargeSize_ = 12.0f;
+	float baseChargeSize_ = 12.0f;
 
 	float jumpTime_ = 0.0f;
 	float jumpHeight_ = 0.0f;

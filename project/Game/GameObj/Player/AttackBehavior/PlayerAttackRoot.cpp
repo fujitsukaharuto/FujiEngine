@@ -65,8 +65,11 @@ void PlayerAttackRoot::Update() {
 		if (Input::GetInstance()->PushKey(DIK_J)) {
 			chargeTime_ += FPSKeeper::DeltaTime();
 		}
-		if (!Input::GetInstance()->PushKey(DIK_J)) {
+		if (!Input::GetInstance()->PushKey(DIK_J) || pPlayer_->GetIsStrongState()) {
 			step_ = Step::ROOT;
+			if (pPlayer_->GetIsStrongState()) {
+				pPlayer_->StrngthBullet();
+			}
 			pPlayer_->ReleaseBullet();
 		}
 		if (chargeTime_ > 10.0f) {

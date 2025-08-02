@@ -92,6 +92,7 @@ private:
 	std::vector<std::unique_ptr<PlayerBullet>> bullets_;
 
 	std::unique_ptr<Object3d> shadow_;
+	std::unique_ptr<Object3d> strongStatePos_;
 	std::unique_ptr<AABBCollider> collider_;
 
 	Vector3 targetPos_;
@@ -152,5 +153,7 @@ private:
 	ParticleEmitter* avoidEmitter2_;
 	ParticleEmitter* avoidEmitter3_;
 
+	ParticleEmitter* storongStateEmitter1_;
+	ParticleEmitter storongStateEmitter2_;
 
 };

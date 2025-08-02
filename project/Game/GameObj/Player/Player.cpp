@@ -28,6 +28,11 @@ void Player::Initialize() {
 	shadow_->transform.translate.y = 0.15f;
 	shadow_->transform.scale.y = 0.1f;
 
+	strongStatePos_ = std::make_unique<Object3d>();
+	strongStatePos_->Create("Sphere");
+	strongStatePos_->SetColor({ 0.0f,0.0f,0.0f,0.0f });
+
+
 	playerHP_ = 100.0f;
 	hpSprite_ = std::make_unique<Sprite>();
 	hpSprite_->Load("white2x2.png");
@@ -86,6 +91,11 @@ void Player::Update() {
 			behavior_->Update();
 			attackBehavior_->Update();
 
+			if (isStrongState_) {
+				storongStateEmitter1_->Emit();
+				storongStateEmitter2_.Emit();
+			}
+
 			for (auto& bullet : bullets_) {
 				if (bullet->GetIsLive()) {
 
@@ -118,6 +128,8 @@ void Player::Update() {
 
 	shadow_->transform.translate = model_->transform.translate;
 	shadow_->transform.translate.y = 0.15f;
+	strongStatePos_->transform.translate = model_->transform.translate;
+	strongStatePos_->transform.translate.y -= 0.65f;
 	collider_->SetPos(model_->GetWorldPos());
 	collider_->InfoUpdate();
 }
@@ -542,6 +554,7 @@ void Player::ReleaseBullet() {
 			Matrix4x4 rotateMatrix = MakeRotateXYZMatrix(model_->transform.rotate);
 			Vector3 worldForward = TransformNormal(forward, rotateMatrix);
 			bullet->Release(0.75f, 10.0f, worldForward);
+			isStrongState_ = false;
 		}
 	}
 }
@@ -608,4 +621,16 @@ void Player::EmitterSetting() {
 	avoidEmitter1_->frequencyTime_ = 0.0f;
 	avoidEmitter2_->frequencyTime_ = 0.0f;
 	avoidEmitter3_->frequencyTime_ = 0.0f;
+
+	ParticleManager::LoadParentGroup(storongStateEmitter1_, "playerStrongState1");
+	ParticleManager::Load(storongStateEmitter2_, "playerStrongState2");
+	storongStateEmitter1_->SetParent(&strongStatePos_->transform);
+	storongStateEmitter2_.SetParent(&model_->transform);
+	storongStateEmitter1_->grain_.isAutoUVMove_ = true;
+	storongStateEmitter1_->para_.autoUVMax = {  0.02f,0.003f };
+	storongStateEmitter1_->para_.autoUVMin = { -0.02f,0.001f };
+	storongStateEmitter2_.grain_.isAutoUVMove_ = true;
+	storongStateEmitter2_.para_.autoUVMax = {  0.02f,0.003f };
+	storongStateEmitter2_.para_.autoUVMin = { -0.02f,0.001f };
+
 }

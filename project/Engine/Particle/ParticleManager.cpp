@@ -29,8 +29,8 @@ void ParticleManager::Initialize(DXCom* pDxcom, SRVManager* srvManager) {
 	InitSphereVertex();
 	InitCylinderVertex();
 	InitParticleCS();
-	InitGPUEmitter();
-	InitGPUEmitter();
+	//InitGPUEmitter();
+	//InitGPUEmitter();
 }
 
 void ParticleManager::Finalize() {
@@ -1454,7 +1454,7 @@ bool ParticleManager::InitEmitParticle(Particle& particle, const Vector3& pos, c
 		particle.uvTrans_ = grain.uvTrans_;
 		particle.uvScale_ = grain.uvScale_;
 		particle.isAutoUVMove_ = grain.isAutoUVMove_;
-		particle.autoUVSpeed_ = grain.autoUVSpeed_;
+		particle.autoUVSpeed_ = Vector2((Random::GetFloat(para.autoUVMin.x, para.autoUVMax.x)), (Random::GetFloat(para.autoUVMin.y, para.autoUVMax.y)));
 		switch (particle.colorType_) {
 		case static_cast<int>(ColorType::kDefault):
 			particle.color_ = para.colorMax;
