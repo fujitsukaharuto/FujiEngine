@@ -29,7 +29,7 @@ void ParticleManager::Initialize(DXCom* pDxcom, SRVManager* srvManager) {
 	InitSphereVertex();
 	InitCylinderVertex();
 	InitParticleCS();
-	InitGPUEmitter();
+	//InitGPUEmitter();
 	//InitGPUEmitter();
 }
 
