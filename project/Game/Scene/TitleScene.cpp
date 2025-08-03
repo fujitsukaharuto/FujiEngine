@@ -51,6 +51,7 @@ void TitleScene::Initialize() {
 	titlePlane_->transform.translate.z = -15.0f;
 	titlePlane_->transform.rotate.x = -2.291f;
 	titlePlane_->transform.rotate.z = 3.142f;
+	titlePlane_->transform.scale.x = 1.5f;
 
 	space_ = std::make_unique<Sprite>();
 	space_->Load("spaceKey.png");
