@@ -38,7 +38,7 @@ float3 RandomUnitVector(RandomGenerator gen)
 }
 
 
-[numthreads(64, 1, 1)]
+[numthreads(1024, 1, 1)]
 void main(uint3 DTid : SV_DispatchThreadID)
 {
     if (gEmitter.emit != 0)
@@ -46,34 +46,32 @@ void main(uint3 DTid : SV_DispatchThreadID)
         RandomGenerator generator;
         generator.InitSeed(DTid, gPerFrame.time);
 
-        uint threadID = DTid.x;
-        uint threadCount = 64;
-        uint emitCount = gEmitter.count;
-    
-        for (uint i = threadID; i < emitCount; i += threadCount)
+        if (DTid.x >= gEmitter.count)
         {
-            int freeListIndex;
-            InterlockedAdd(gFreeListIndex[0], -1, freeListIndex);
-            if (0 <= freeListIndex && freeListIndex < kMaxParticles)
-            {
-                float3 dir = RandomUnitVector(generator);
-                float3 pos = gEmitter.translate + dir * gEmitter.radius;
-
-                uint particleIndex = gFreeList[freeListIndex];
-                gParticle[particleIndex].scale = float3(0.1f, 0.1f, 0.1f);
-                gParticle[particleIndex].translate = pos;
-                gParticle[particleIndex].color.rgb = (generator.Generate3d() + 1) * 0.5f;
-                gParticle[particleIndex].color.a = 1.0f;
-                float3 velocityOffset = (generator.Generate3d()) * 0.01f;
-                gParticle[particleIndex].velocity = normalize(dir) * 0.01f + velocityOffset;
-                gParticle[particleIndex].lifeTime = 60.0f;
-                gParticle[particleIndex].currentTime = 0.0f;
-            }
-            else
-            {
-                InterlockedAdd(gFreeListIndex[0], 1);
-                break;
-            }
+            return;
         }
+
+            int freeListIndex;
+        InterlockedAdd(gFreeListIndex[0], -1, freeListIndex);
+        if (0 <= freeListIndex && freeListIndex < kMaxParticles)
+        {
+            float3 dir = RandomUnitVector(generator);
+            float3 pos = gEmitter.translate + dir * gEmitter.radius;
+
+            uint particleIndex = gFreeList[freeListIndex];
+            gParticle[particleIndex].scale = float3(0.1f, 0.1f, 0.1f);
+            gParticle[particleIndex].translate = pos;
+            gParticle[particleIndex].color.rgb = (generator.Generate3d() + 1) * 0.5f;
+            gParticle[particleIndex].color.a = 1.0f;
+            float3 velocityOffset = (generator.Generate3d()) * 0.01f;
+            gParticle[particleIndex].velocity = normalize(dir) * 0.01f + velocityOffset;
+            gParticle[particleIndex].lifeTime = 60.0f;
+            gParticle[particleIndex].currentTime = 0.0f;
+        }
+        else
+        {
+            InterlockedAdd(gFreeListIndex[0], 1);
+        }
+        
     }
 }

@@ -107,9 +107,9 @@ void TitleScene::Update() {
 			ParticleManager::GetParticleCSEmitter(i).emitter->translate.y = 5.0f;
 			ParticleManager::GetParticleCSEmitter(i).emitter->translate.z = std::sin(angle) * radius;
 		} else {
-			ParticleManager::GetParticleCSEmitter(i).emitter->count = 2000;
+			ParticleManager::GetParticleCSEmitter(i).emitter->count = 11000;
 			ParticleManager::GetParticleCSEmitter(i).emitter->frequency = 1.0f;
-			ParticleManager::GetParticleCSEmitter(i).emitter->radius = 30.0f;
+			ParticleManager::GetParticleCSEmitter(i).emitter->radius = 18.0f;
 		}
 	}
 

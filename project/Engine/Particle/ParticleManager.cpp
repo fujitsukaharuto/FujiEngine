@@ -29,7 +29,7 @@ void ParticleManager::Initialize(DXCom* pDxcom, SRVManager* srvManager) {
 	InitSphereVertex();
 	InitCylinderVertex();
 	InitParticleCS();
-	//InitGPUEmitter();
+	InitGPUEmitter();
 	//InitGPUEmitter();
 }
 
@@ -565,7 +565,7 @@ void ParticleManager::ParticleCSDebugGUI() {
 			ImGui::Checkbox("isEmit", &csEmitters_[0].isEmit);
 
 			int dragCount = int(csEmitters_[0].emitter->count);
-			ImGui::DragInt("emitCount", &dragCount, 1, 0, 1000);
+			ImGui::DragInt("emitCount", &dragCount, 1, 0, 100000);
 			csEmitters_[0].emitter->count = uint32_t(dragCount);
 
 			ImGui::DragFloat("frequency", &csEmitters_[0].emitter->frequency, 0.1f, 0.0f, 300.0f);
@@ -1248,6 +1248,7 @@ void ParticleManager::EmitterDispatch() {
 		dxcommon_->GetCommandList()->SetComputeRootConstantBufferView(2, perFrameResource_->GetGPUVirtualAddress());
 		dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(3, freeListIndexUAVHandle_.second);
 		dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(4, freeListUAVHandle_.second);
+		if (csEmitters_[i].emitter->count == 0) continue;
 		int dispatchCount = (csEmitters_[i].emitter->count + threadGroupSize_ - 1) / threadGroupSize_;
 		dxcommon_->GetCommandList()->Dispatch(dispatchCount, 1, 1);
 	}
