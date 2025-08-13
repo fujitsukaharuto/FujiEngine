@@ -69,6 +69,11 @@ void Camera::UpdateMaterix() {
 	viewProjectionMatrix_ = Multiply(viewMatrix_, projectionMatrix_);
 }
 
+void Camera::IssuanceShake(float strength, float time) {
+	shakeTime_ = time;
+	shakeStrength_ = strength;
+}
+
 void Camera::DebugGUI() {
 #ifdef _DEBUG
 	if (ImGui::CollapsingHeader("Camera")) {

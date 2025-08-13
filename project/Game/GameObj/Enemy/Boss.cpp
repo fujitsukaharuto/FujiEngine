@@ -182,7 +182,7 @@ void Boss::Update() {
 	} else if (isStart_) {
 		startTime_ -= FPSKeeper::DeltaTime();
 		if (startTime_ > 40.0f && startTime_ < 200.0f) {
-			CameraManager::GetInstance()->GetCamera()->SetShakeTime(2.0f);
+			CameraManager::GetInstance()->GetCamera()->IssuanceShake(0.2f, 2.0f);
 			roringWave_.Emit();
 			roringParticle_.Emit();
 			roringring_.Emit();
@@ -602,6 +602,8 @@ void Boss::UpdateWaveWall() {
 void Boss::WaveWallAttack() {
 	int count = 0;
 
+	CameraManager::GetInstance()->GetCamera()->IssuanceShake(0.1f, 20.0f);
+
 	Vector3 wavePos = { 0.0f,0.0f,4.5f };
 	Matrix4x4 rotateMatrix = MakeRotateYMatrix(animModel_->transform.rotate.y);
 	wavePos = TransformNormal(wavePos, rotateMatrix);
@@ -794,7 +796,7 @@ void Boss::UpdateUnderRing() {
 }
 
 void Boss::UnderRingEmit() {
-	CameraManager::GetInstance()->GetCamera()->SetShakeTime(20.0f);
+	CameraManager::GetInstance()->GetCamera()->IssuanceShake(0.3f, 30.0f);
 	isJumpAttack_ = false;
 	int count = 0;
 	for (auto& ring : undderRings_) {

@@ -63,6 +63,8 @@ public:
 	/// <param name="strength">シェイク強度</param>
 	void SetShakeStrength(float strength) { shakeStrength_ = strength; }
 
+	void IssuanceShake(float strength = 0.1f, float time = 20.0f);
+
 	/// <summary>
 	/// ワールド行列の取得
 	/// </summary>

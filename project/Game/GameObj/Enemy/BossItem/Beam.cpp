@@ -222,6 +222,8 @@ bool Beam::BeamRotate() {
 		beamParticle_->Emit();
 		beamLight_->Emit();
 
+		CameraManager::GetInstance()->GetCamera()->IssuanceShake(0.1f, 2.0f);
+
 	} else if (lifeTime_ >= 60.0f) {
 		float frame = (lifeTime_ - 60.0f);
 		float angleDegrees = (frame / 300.0f) * 360.0f;
