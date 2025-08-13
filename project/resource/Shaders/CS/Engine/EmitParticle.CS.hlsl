@@ -7,9 +7,20 @@ struct EmitterSphere
     float3 translate;
     float radius;
     uint count;
+    float lifeTime;
     float frequency;
     float frequencyTime;
     uint emit;
+    
+    float3 colorMax;
+    float3 colorMin;
+    
+    float3 baseVelocity;
+    float velocityRandMax;
+    float velocityRandMin;
+
+    float3 prevTranslate;
+
 };
 ConstantBuffer<EmitterSphere> gEmitter : register(b0);
 struct PerFrame
@@ -47,31 +58,42 @@ void main(uint3 DTid : SV_DispatchThreadID)
         generator.InitSeed(DTid, gPerFrame.time);
 
         if (DTid.x >= gEmitter.count)
-        {
             return;
-        }
 
-            int freeListIndex;
+        int freeListIndex;
         InterlockedAdd(gFreeListIndex[0], -1, freeListIndex);
         if (0 <= freeListIndex && freeListIndex < kMaxParticles)
         {
             float3 dir = RandomUnitVector(generator);
-            float3 pos = gEmitter.translate + dir * gEmitter.radius;
+
+            // 補間係数（0〜1）: スレッドIDをcountで割る
+            float lerpT = gEmitter.count > 1 ? (float) DTid.x / (gEmitter.count - 1) : 0.0f;
+
+            // 位置の補間
+            float3 interpPos = lerp(gEmitter.prevTranslate, gEmitter.translate, lerpT);
+            float3 pos = interpPos + dir * gEmitter.radius;
 
             uint particleIndex = gFreeList[freeListIndex];
             gParticle[particleIndex].scale = float3(0.1f, 0.1f, 0.1f);
+            gParticle[particleIndex].startScale = float3(0.1f, 0.1f, 0.1f);
             gParticle[particleIndex].translate = pos;
-            gParticle[particleIndex].color.rgb = (generator.Generate3d() + 1) * 0.5f;
+
+            float3 t = (generator.Generate3d() + 1) * 0.5f;
+            gParticle[particleIndex].color.rgb = lerp(gEmitter.colorMin, gEmitter.colorMax, t);
             gParticle[particleIndex].color.a = 1.0f;
-            float3 velocityOffset = (generator.Generate3d()) * 0.01f;
-            gParticle[particleIndex].velocity = normalize(dir) * 0.01f + velocityOffset;
-            gParticle[particleIndex].lifeTime = 60.0f;
+
+            float veloT = generator.Generate1d();
+            float3 dirRand = generator.GenerateUnitSphereDirection();
+            float speed = lerp(gEmitter.velocityRandMin, gEmitter.velocityRandMax, veloT);
+            float3 velocityOffset = gEmitter.baseVelocity + dirRand * speed;
+            gParticle[particleIndex].velocity = velocityOffset;
+
+            gParticle[particleIndex].lifeTime = gEmitter.lifeTime;
             gParticle[particleIndex].currentTime = 0.0f;
         }
         else
         {
             InterlockedAdd(gFreeListIndex[0], 1);
         }
-        
     }
 }

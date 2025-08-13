@@ -63,6 +63,10 @@ void TitleScene::Initialize() {
 	star_->SetColor({ 0.9f,0.7f,0.0f,1.0f });
 	star_->LoadTransformFromJson("titleStar_transform.json");
 
+	particleTest_ = std::make_unique<Object3d>();
+	particleTest_->CreateSphere();
+	particleTest_->SetColor({ 0.0f,0.0f,0.0f,0.0f });
+
 	cube_ = std::make_unique<AnimationModel>();
 	cube_->Create("T_boss.gltf");
 	cube_->LoadAnimationFile("T_boss.gltf");
@@ -107,9 +111,12 @@ void TitleScene::Update() {
 			ParticleManager::GetParticleCSEmitter(i).emitter->translate.y = 5.0f;
 			ParticleManager::GetParticleCSEmitter(i).emitter->translate.z = std::sin(angle) * radius;
 		} else {
-			ParticleManager::GetParticleCSEmitter(i).emitter->count = 11000;
-			ParticleManager::GetParticleCSEmitter(i).emitter->frequency = 1.0f;
-			ParticleManager::GetParticleCSEmitter(i).emitter->radius = 18.0f;
+			ParticleManager::GetParticleCSEmitter(i).emitter->prevTranslate = ParticleManager::GetParticleCSEmitter(i).emitter->translate;
+			ParticleManager::GetParticleCSEmitter(i).emitter->translate = particleTest_->GetWorldPos();
+
+			//ParticleManager::GetParticleCSEmitter(i).emitter->count = 11000;
+			//ParticleManager::GetParticleCSEmitter(i).emitter->frequency = 1.0f;
+			//ParticleManager::GetParticleCSEmitter(i).emitter->radius = 18.0f;
 		}
 	}
 
@@ -135,7 +142,7 @@ void TitleScene::Draw() {
 	skybox_->Draw();
 
 	obj3dCommon->PreDraw();
-//	terrain_->Draw();
+	//terrain_->Draw();
 
 	//cube_->Draw();
 	//animParentObj_->Draw();
@@ -155,6 +162,7 @@ void TitleScene::Draw() {
 #ifdef _DEBUG
 	emit.DrawSize();
 #endif // _DEBUG
+
 	//cube_->SkeletonDraw();
 	Line3dDrawer::GetInstance()->Render();
 
@@ -177,6 +185,9 @@ void TitleScene::DebugGUI() {
 	ImGui::Indent();
 	if (ImGui::CollapsingHeader("titlePlane")) {
 		titlePlane_->DebugGUI();
+	}
+	if (ImGui::CollapsingHeader("particleTest")) {
+		particleTest_->DebugGUI();
 	}
 	if (ImGui::CollapsingHeader("cube")) {
 		cube_->DebugGUI();

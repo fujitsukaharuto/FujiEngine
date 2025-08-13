@@ -92,6 +92,7 @@ struct Particle {
 struct ParticleCS {
 	Vector3 translate;
 	Vector3 scale;
+	Vector3 startScale;
 	float lifeTime;
 	Vector3 velocity;
 	float currentTime;

@@ -20,8 +20,12 @@ void main( uint3 DTid : SV_DispatchThreadID )
         {
             gParticle[particleIndex].translate += gParticle[particleIndex].velocity;
             gParticle[particleIndex].currentTime += gPerFrame.deltaTime;
-            float alpha = 1.0f - (gParticle[particleIndex].currentTime / gParticle[particleIndex].lifeTime);
+            float lifeRatio = gParticle[particleIndex].currentTime / gParticle[particleIndex].lifeTime;
+
+            float alpha = 1.0f - lifeRatio;
             gParticle[particleIndex].color.a = saturate(alpha);
+
+            gParticle[particleIndex].scale = gParticle[particleIndex].startScale * (1.0f - lifeRatio);
         }
         if (gParticle[particleIndex].color.a == 0.0f)
         {

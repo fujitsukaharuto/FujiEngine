@@ -31,9 +31,26 @@ struct EmitterSphere {
 	Vector3 translate;
 	float radius;
 	uint32_t count;
+	float lifeTime;
 	float frequency;
 	float frequencyTime;
 	uint32_t emit;
+
+	// color
+	Vector3 colorMax;
+	//float padding;
+	Vector3 colorMin;
+	float padding2;
+
+	// velocity
+	Vector3 baseVelocity;
+	float velocityRandMax;
+	float velocityRandMin;
+
+	// distanceEmit
+	Vector3 prevTranslate;
+	float padding4;
+
 };
 
 struct AcceleFiled {

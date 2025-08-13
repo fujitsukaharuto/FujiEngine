@@ -29,6 +29,9 @@ private:
 	std::unique_ptr<Object3d> star_ = nullptr;
 
 
+	std::unique_ptr<Object3d> particleTest_ = nullptr;
+
+
 	std::unique_ptr<Object3d> animParentObj_ = nullptr;
 	std::unique_ptr<AnimationModel> cube_ = nullptr;
 

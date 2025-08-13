@@ -106,4 +106,19 @@ class RandomGenerator
     {
         return float3(Generate1d(), Generate1d(), Generate1d()) * 2.0f - 1.0f; // [-1,1]
     }
+    
+    float3 GenerateUnitSphereDirection()
+    {
+        float u = Generate1d(); // [0,1)
+        float v = Generate1d(); // [0,1)
+
+        float theta = 2.0f * 3.14159265f * u; // [0, 2π)
+        float phi = acos(2.0f * v - 1.0f); // [0, π]
+
+        float x = sin(phi) * cos(theta);
+        float y = sin(phi) * sin(theta);
+        float z = cos(phi);
+
+        return float3(x, y, z);
+    }
 };
