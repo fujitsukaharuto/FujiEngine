@@ -88,13 +88,6 @@ struct LightningElement {
 	float progres;
 };
 
-struct PostEffectPass {
-	Pipe pipeline; // 使用するパイプライン名
-
-	// SRV/UAV/CBVのセット処理
-	std::function<void(ID3D12GraphicsCommandList* cmdList, D3D12_GPU_DESCRIPTOR_HANDLE input, D3D12_GPU_DESCRIPTOR_HANDLE output)> setup;
-};
-
 enum class PostEffectList : int {
 	Gray,
 	CRT,
@@ -106,6 +99,14 @@ enum class PostEffectList : int {
 	LuminanceOutline,
 	Bloom,
 	Random,
+};
+
+struct PostEffectPass {
+	Pipe pipeline; // 使用するパイプライン名
+	PostEffectList effectName;
+
+	// SRV/UAV/CBVのセット処理
+	std::function<void(ID3D12GraphicsCommandList* cmdList, D3D12_GPU_DESCRIPTOR_HANDLE input, D3D12_GPU_DESCRIPTOR_HANDLE output)> setup;
 };
 #pragma endregion
 
@@ -131,6 +132,11 @@ public:
 
 	void ResetPostEffect() { validPostEffects.clear(); }
 	void AddPostEffect(PostEffectList effect) { validPostEffects.push_back(postEffects[int(effect)]); }
+	void PopPostEffect(PostEffectList effect);
+
+	// Radial
+	void SetRadialParamsCenter(Vector2 center) { radialData_->center = center; }
+	void SetRadialParamsWidth(float width) { radialData_->blurWidth = width; }
 
 private:
 

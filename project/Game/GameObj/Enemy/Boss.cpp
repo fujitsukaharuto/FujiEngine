@@ -193,6 +193,7 @@ void Boss::Update() {
 		}
 	} else if (!isHpActive_) {
 		hpCooltime_ -= FPSKeeper::DeltaTime();
+		RadialUpdate();
 		if (hpCooltime_ < 0.0f) {
 			isHpActive_ = true;
 			ChangeBehavior(std::make_unique<BossRoot>(this));
@@ -468,6 +469,9 @@ void Boss::ReduceBossHP(bool isStrong) {
 				SetDefaultBehavior();
 				animModel_->ChangeAnimation("hit");
 				animModel_->IsRoopAnimation(false);
+
+				RadialSetting();
+
 				hpCooltime_ = 60.0f;
 				hpSprites_[nowHpIndex_]->SetColor(damageColor1_);
 				return;
@@ -482,6 +486,9 @@ void Boss::ReduceBossHP(bool isStrong) {
 				SetDefaultBehavior();
 				animModel_->ChangeAnimation("hit");
 				animModel_->IsRoopAnimation(false);
+
+				RadialSetting();
+
 				hpCooltime_ = 60.0f;
 				hpSprites_[nowHpIndex_]->SetColor(damageColor1_);
 				phaseIndex_++;
@@ -497,6 +504,9 @@ void Boss::ReduceBossHP(bool isStrong) {
 				SetDefaultBehavior();
 				animModel_->ChangeAnimation("hit");
 				animModel_->IsRoopAnimation(false);
+
+				RadialSetting();
+
 				hpCooltime_ = 60.0f;
 				hpSprites_[nowHpIndex_]->SetColor(damageColor1_);
 				return;
@@ -511,6 +521,9 @@ void Boss::ReduceBossHP(bool isStrong) {
 				SetDefaultBehavior();
 				animModel_->ChangeAnimation("hit");
 				animModel_->IsRoopAnimation(false);
+
+				RadialSetting();
+
 				hpCooltime_ = 60.0f;
 				hpSprites_[nowHpIndex_]->SetColor(damageColor1_);
 				return;
@@ -890,4 +903,24 @@ void Boss::SetDefaultBehavior() {
 	if (delta < -std::numbers::pi_v<float>) delta += 2.0f * std::numbers::pi_v<float>;
 	float newAngle = currentAngle + delta;
 	animModel_->transform.rotate.y = newAngle;
+}
+
+void Boss::RadialSetting() {
+	radialtime_ = baseRadialtime_;
+	radialwidth_ = 0.5f;
+	dxcommon_->GetOffscreenManager()->AddPostEffect(PostEffectList::Radial);
+	dxcommon_->GetOffscreenManager()->SetRadialParamsWidth(radialwidth_);
+}
+
+void Boss::RadialUpdate() {
+	if (radialtime_ > 0.0f) {
+		radialtime_ -= FPSKeeper::DeltaTime();
+		if (radialtime_ <= 0.0f) {
+			radialtime_ = 0.0f;
+			dxcommon_->GetOffscreenManager()->PopPostEffect(PostEffectList::Radial);
+		}
+		float t = radialtime_ / baseRadialtime_;
+		radialwidth_ = std::lerp(0.0f, 0.005f, 1.0f - powf(1.0f - t, 3.0f));
+		dxcommon_->GetOffscreenManager()->SetRadialParamsWidth(radialwidth_);
+	}
 }

@@ -74,6 +74,7 @@ public:
 	int GetNowHpIndex() { return nowHpIndex_; }
 
 	void SetPlayer(Player* player) { pPlayer_ = player; }
+	void SetDXCom(DXCom* dxcommon) { dxcommon_ = dxcommon; }
 
 	void SavePhase();
 	void LoadPhase();
@@ -81,6 +82,10 @@ public:
 private:
 
 	void SetDefaultBehavior();
+
+	// radial
+	void RadialSetting();
+	void RadialUpdate();
 
 private:
 
@@ -159,4 +164,12 @@ private:
 	ParticleEmitter roringWave_;
 	ParticleEmitter roringParticle_;
 	ParticleEmitter roringring_;
+
+
+	// post effect
+	float radialwidth_ = 0.0f;
+	float radialtime_ = 0.0f;
+	float baseRadialtime_ = 40.0f;
+	DXCom* dxcommon_;
+
 };

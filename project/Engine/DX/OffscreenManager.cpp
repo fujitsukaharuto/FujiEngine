@@ -501,6 +501,18 @@ void OffscreenManager::Command() {
 
 }
 
+void OffscreenManager::PopPostEffect(PostEffectList effect) {
+	int popNumber = -1;
+	for (int i = 0; i < validPostEffects.size(); i++) {
+		if (validPostEffects[i].effectName == effect) {
+			popNumber = i;
+			break;
+		}
+	}
+	if (popNumber == -1)return;
+	validPostEffects.erase(validPostEffects.begin() + size_t(popNumber));
+}
+
 void OffscreenManager::SettingVertex() {
 	vertexGrayResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(GrayscaleVertex) * 3);
 
@@ -569,6 +581,7 @@ void OffscreenManager::SettingVertex() {
 void OffscreenManager::InitializePostEffects() {
 	postEffects.push_back({
 		Pipe::GrayCS,
+		PostEffectList::Gray,
 		[=](auto* cmd, auto input, auto output) {
 			cmd->SetComputeRootDescriptorTable(0, input);
 			cmd->SetComputeRootDescriptorTable(1, output);
@@ -578,6 +591,7 @@ void OffscreenManager::InitializePostEffects() {
 
 	postEffects.push_back({
 	   Pipe::CRTCS,
+		PostEffectList::CRT,
 	   [=](auto* cmd, auto input, auto output) {
 		   cmd->SetComputeRootDescriptorTable(0, input);
 		   cmd->SetComputeRootDescriptorTable(1, output);
@@ -587,6 +601,7 @@ void OffscreenManager::InitializePostEffects() {
 
 	postEffects.push_back({
 	   Pipe::RetroTVCS,
+		PostEffectList::RetroTV,
 	   [=](auto* cmd, auto input, auto output) {
 		   cmd->SetComputeRootDescriptorTable(0, input);
 		   cmd->SetComputeRootDescriptorTable(1, output);
@@ -596,6 +611,7 @@ void OffscreenManager::InitializePostEffects() {
 
 	postEffects.push_back({
 	   Pipe::GaussCS,
+		PostEffectList::Gauss,
 	   [=](auto* cmd, auto input, [[maybe_unused]] auto output) {
 		   cmd->SetComputeRootDescriptorTable(0, input);
 		   cmd->SetComputeRootDescriptorTable(1, output);
@@ -604,6 +620,7 @@ void OffscreenManager::InitializePostEffects() {
 
 	postEffects.push_back({
 	   Pipe::BoxFilterCS,
+		PostEffectList::BoxFilter,
 	   [=](auto* cmd, auto input, [[maybe_unused]] auto output) {
 		   cmd->SetComputeRootDescriptorTable(0, input);
 		   cmd->SetComputeRootDescriptorTable(1, output);
@@ -612,6 +629,7 @@ void OffscreenManager::InitializePostEffects() {
 
 	postEffects.push_back({
 	   Pipe::RadialCS,
+		PostEffectList::Radial,
 	   [=](auto* cmd, auto input, [[maybe_unused]] auto output) {
 		   cmd->SetComputeRootDescriptorTable(0, input);
 		   cmd->SetComputeRootDescriptorTable(1, output);
@@ -621,6 +639,7 @@ void OffscreenManager::InitializePostEffects() {
 
 	postEffects.push_back({
 	   Pipe::OutlineCS,
+		PostEffectList::Outline,
 	   [=](auto* cmd, auto input, [[maybe_unused]] auto output) {
 		   cmd->SetComputeRootDescriptorTable(0, input);
 		   cmd->SetComputeRootDescriptorTable(2, output);
@@ -631,6 +650,7 @@ void OffscreenManager::InitializePostEffects() {
 
 	postEffects.push_back({
 	   Pipe::LuminanceOutlineCS,
+		PostEffectList::LuminanceOutline,
 	   [=](auto* cmd, auto input, [[maybe_unused]] auto output) {
 		   cmd->SetComputeRootDescriptorTable(0, input);
 		   cmd->SetComputeRootDescriptorTable(1, output);
@@ -639,6 +659,7 @@ void OffscreenManager::InitializePostEffects() {
 
 	postEffects.push_back({
 	   Pipe::BloomCS,
+		PostEffectList::Bloom,
 	   [=](auto* cmd, auto input, [[maybe_unused]] auto output) {
 		   cmd->SetComputeRootDescriptorTable(0, input);
 		   cmd->SetComputeRootDescriptorTable(1, output);
@@ -648,6 +669,7 @@ void OffscreenManager::InitializePostEffects() {
 
 	postEffects.push_back({
 	   Pipe::RandomCS,
+		PostEffectList::Random,
 	   [=](auto* cmd, auto input, [[maybe_unused]] auto output) {
 		   cmd->SetComputeRootDescriptorTable(0, input);
 		   cmd->SetComputeRootDescriptorTable(1, output);

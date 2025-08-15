@@ -62,6 +62,7 @@ void GameScene::Initialize() {
 	player_->Initialize();
 
 	boss_->Initialize();
+	boss_->SetDXCom(dxcommon_);
 	boss_->SetPlayer(player_.get());
 
 
