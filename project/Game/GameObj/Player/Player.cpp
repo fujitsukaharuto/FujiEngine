@@ -555,6 +555,9 @@ void Player::ReleaseBullet() {
 			Vector3 worldForward = TransformNormal(forward, rotateMatrix);
 			bullet->Release(0.75f, 10.0f, worldForward);
 			isStrongState_ = false;
+			if (bullet->GetIsStrnght()) {
+				strongShotWave_.Emit();
+			}
 		}
 	}
 }
@@ -573,12 +576,14 @@ void Player::EmitterSetting() {
 	ParticleManager::Load(moveParticleL_, "playerTranjectory");
 	ParticleManager::Load(moveParticleR_, "playerTranjectory");
 	ParticleManager::Load(deathSmoke_, "bulletHitSmoke");
+	ParticleManager::Load(strongShotWave_, "strongShotWave");
 
 	hit_.SetParent(&model_->transform);
 	hit2_.SetParent(&model_->transform);
 	moveParticleL_.SetParent(&model_->transform);
 	moveParticleR_.SetParent(&model_->transform);
 	deathSmoke_.SetParent(&model_->transform);
+	strongShotWave_.SetParent(&model_->transform);
 
 	moveParticleL_.pos_ = { -0.4f,-0.4f,-0.3f };
 	moveParticleR_.pos_ = { 0.4f,-0.4f,-0.3f };
@@ -587,6 +592,8 @@ void Player::EmitterSetting() {
 
 	hit_.frequencyTime_ = 0.0f;
 	hit2_.frequencyTime_ = 0.0f;
+
+	strongShotWave_.frequencyTime_ = 0.0f;
 
 	ParticleManager::LoadParentGroup(moveBurnerL_, "playerAfterBurner");
 	ParticleManager::LoadParentGroup(moveBurnerR_, "playerAfterBurner2");

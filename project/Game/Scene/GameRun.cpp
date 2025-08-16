@@ -82,6 +82,8 @@ void GameRun::Initialize() {
 	pManager_->CreateParticleGroup("playerStrongState1", "beamCore.png", 100, ShapeType::CYLINDER);
 	pManager_->CreateParticleGroup("playerStrongState2", "redCircle.png", 100);
 
+	pManager_->CreateParticleGroup("strongShotWave", "gradationLine.png", 20, ShapeType::RING);
+
 	
 	pManager_->CreateParticleGroup("bulletHit", "redCircle.png", 100);
 	pManager_->CreateParticleGroup("bulletHit2", "redCircle.png", 100);

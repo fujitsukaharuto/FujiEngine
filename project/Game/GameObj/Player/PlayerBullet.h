@@ -35,6 +35,7 @@ public:
 	//* Getter
 	bool GetIsLive() { return isLive_; }
 	bool GetIsCharge() { return isCharge_; }
+	bool GetIsStrnght() { return isStrnght_; }
 	float GetDamage() { return damage_; }
 	BaseCollider* GetCollider() { return collider_.get(); }
 
