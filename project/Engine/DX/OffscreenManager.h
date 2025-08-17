@@ -24,6 +24,10 @@ struct GrayCS {
 	Vector3 gray_;
 };
 
+struct VignetteData {
+	Vector3 color_;
+};
+
 struct GrayscaleVertex {
 	Vector4 position;
 	Vector2 texcoord;
@@ -95,6 +99,7 @@ enum class PostEffectList : int {
 	Gauss,
 	BoxFilter,
 	Radial,
+	Vignette,
 	Outline,
 	LuminanceOutline,
 	Bloom,
@@ -182,6 +187,9 @@ private:
 
 	ComPtr<ID3D12Resource> radialResource_ = nullptr;
 	RadialParams* radialData_;
+
+	ComPtr<ID3D12Resource> vignetteResource_ = nullptr;
+	VignetteData* vignetteData_;
 
 	Texture* baseTex_;
 	Texture* voronoTex_;

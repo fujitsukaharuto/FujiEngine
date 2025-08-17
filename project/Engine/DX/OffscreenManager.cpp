@@ -166,7 +166,7 @@ void OffscreenManager::EffectListGUI() {
 	if (ImGui::TreeNode("PostEffectList")) {
 		static int currentOffscreenIndex = 0;
 		ImGui::Combo("PostEffect##offType", &currentOffscreenIndex,
-			"GrayScale\0CRT\0RetroTV\0Gauss\0BoxFilter\0RadialBlur\0Outline\0LuminanceOutline\0Bloom\0Random\0");
+			"GrayScale\0CRT\0RetroTV\0Gauss\0BoxFilter\0RadialBlur\0Vignette\0Outline\0LuminanceOutline\0Bloom\0Random\0");
 		if (ImGui::Button("Push##offPush")) {
 			validPostEffects.push_back(postEffects[currentOffscreenIndex]);
 		}ImGui::SameLine();
@@ -198,6 +198,9 @@ void OffscreenManager::EffectListGUI() {
 						break;
 					case Pipe::RadialCS:
 						ImGui::Text("RadialBlur");
+						break;
+					case Pipe::VignetteCS:
+						ImGui::Text("Vignette");
 						break;
 					case Pipe::CRTCS:
 						ImGui::Text("CRT");
@@ -321,6 +324,11 @@ void OffscreenManager::CreateResource() {
 	radialResource_->Map(0, nullptr, reinterpret_cast<void**>(&radialData_));
 	radialData_->center = Vector2(0.5f, 0.5f);
 	radialData_->blurWidth = 0.01f;
+
+	vignetteResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(VignetteData));
+	vignetteData_ = nullptr;
+	vignetteResource_->Map(0, nullptr, reinterpret_cast<void**>(&vignetteData_));
+	vignetteData_->color_ = { 0.8f,0.0f,0.0f };
 
 	isGrayscale_ = true;
 	isNonePost_ = false;
@@ -634,6 +642,16 @@ void OffscreenManager::InitializePostEffects() {
 		   cmd->SetComputeRootDescriptorTable(0, input);
 		   cmd->SetComputeRootDescriptorTable(1, output);
 		   cmd->SetComputeRootConstantBufferView(2, radialResource_->GetGPUVirtualAddress());
+	   }
+		});
+
+	postEffects.push_back({
+	   Pipe::VignetteCS,
+		PostEffectList::Vignette,
+	   [=](auto* cmd, auto input, [[maybe_unused]] auto output) {
+		   cmd->SetComputeRootDescriptorTable(0, input);
+		   cmd->SetComputeRootDescriptorTable(1, output);
+		   cmd->SetComputeRootConstantBufferView(2, vignetteResource_->GetGPUVirtualAddress());
 	   }
 		});
 

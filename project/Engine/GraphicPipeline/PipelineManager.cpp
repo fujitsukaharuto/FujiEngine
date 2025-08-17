@@ -18,6 +18,7 @@
 #include "CSPipe/GaussCSPipe.h"
 #include "CSPipe/BoxFilterCSPipe.h"
 #include "CSPipe/RadialBlurCSPipe.h"
+#include "CSPipe/VignetteCSPipe.h"
 #include "CSPipe/CRTCSPipe.h"
 #include "CSPipe/RetroTVCSPipe.h"
 #include "CSPipe/OutlineCSPipe.h"
@@ -75,6 +76,7 @@ void PipelineManager::CreatePipeline() {
 	std::unique_ptr<GaussCSPipe> gaussCS = nullptr;
 	std::unique_ptr<BoxFilterCSPipe> boxCS = nullptr;
 	std::unique_ptr<RadialBlurCSPipe> radialCS = nullptr;
+	std::unique_ptr<VignetteCSPipe> vignetteCS = nullptr;
 	std::unique_ptr<CRTCSPipe> crtCS = nullptr;
 	std::unique_ptr<RetroTVCSPipe> retroCS = nullptr;
 	std::unique_ptr<OutlineCSPipe> outlineCS = nullptr;
@@ -175,6 +177,10 @@ void PipelineManager::CreatePipeline() {
 	radialCS.reset(new RadialBlurCSPipe);
 	radialCS->Initialize(dxcommon_);
 	pipelines_.push_back(std::move(radialCS));
+
+	vignetteCS.reset(new VignetteCSPipe);
+	vignetteCS->Initialize(dxcommon_);
+	pipelines_.push_back(std::move(vignetteCS));
 
 	crtCS.reset(new CRTCSPipe);
 	crtCS->Initialize(dxcommon_);
