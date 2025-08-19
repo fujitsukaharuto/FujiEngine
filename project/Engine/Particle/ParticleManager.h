@@ -53,6 +53,28 @@ struct EmitterSphere {
 
 };
 
+struct EmitterTexture {
+	Vector3 translate;
+	float radius;
+	uint32_t count;
+	float lifeTime;
+	float frequency;
+	float frequencyTime;
+	uint32_t emit;
+
+	// color
+	Vector3 colorMax;
+	//float padding;
+	Vector3 colorMin;
+	float padding2;
+
+	// velocity
+	Vector3 baseVelocity;
+	float velocityRandMax;
+	float velocityRandMin;
+
+};
+
 struct AcceleFiled {
 	Vector3 Accele;
 	AABB area;
@@ -127,6 +149,14 @@ public:
 		int emitterIndex = 0;
 	};
 
+	struct GPUParticleEmitterTexture {
+		EmitterTexture* emitter;
+		ComPtr<ID3D12Resource> emitterResource;
+		Texture* textureForEmit;
+		bool isEmit = false;
+		int emitterIndex = 0;
+	};
+
 	static ParticleManager* GetInstance();
 
 	void Initialize(DXCom* pDxcom, SRVManager* srvManager);
@@ -136,6 +166,7 @@ public:
 
 	void ParticleDebugGUI();
 	void ParticleCSDebugGUI();
+	void ParticleTexCSDebugGUI();
 	void SelectParticleUpdate();
 	void SelectEmitterSizeDraw();
 
@@ -185,6 +216,10 @@ private:
 	void UpdateGPUEmitter();
 	void UpdateParticleCSDispatch();
 	void EmitterDispatch();
+
+	int InitGPUEmitterTexture();
+	void UpdateGPUEmitterTexture();
+	void EmitterTextureDispatch();
 
 	bool LifeUpdate(Particle& particle);
 	void ParticleSizeUpdate(Particle& particle);
@@ -245,6 +280,7 @@ private:
 	PerView* perViewData_;
 
 	std::vector<GPUParticleEmitter> csEmitters_;
+	std::vector<GPUParticleEmitterTexture> csEmitterTexs_;
 	ComPtr<ID3D12Resource> perFrameResource_;
 	PerFrame* perFrameData_;
 	ComPtr<ID3D12Resource> freeListIndexResource_;

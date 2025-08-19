@@ -290,6 +290,7 @@ void GameRun::DebugGUI() {
 		ImGui::EndTabBar();
 	}
 	ParticleManager::GetInstance()->ParticleCSDebugGUI();
+	ParticleManager::GetInstance()->ParticleTexCSDebugGUI();
 	ImGui::Text("%d", modelManager_->GetPickedID());
 	ImGui::Text("%d,%d", modelManager_->GetPickedCoord(0), modelManager_->GetPickedCoord(1));
 	ImGui::End();

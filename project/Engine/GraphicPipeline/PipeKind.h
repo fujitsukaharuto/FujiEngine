@@ -30,5 +30,6 @@ enum class Pipe : int {
 	SkinningCS,
 	InitParticleCS,
 	EmitParticleCS,
+	EmitTexParticleCS,
 	UpdateParticleCS,
 };

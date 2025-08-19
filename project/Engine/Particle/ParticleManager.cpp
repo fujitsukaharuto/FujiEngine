@@ -31,6 +31,7 @@ void ParticleManager::Initialize(DXCom* pDxcom, SRVManager* srvManager) {
 	InitParticleCS();
 	InitGPUEmitter();
 	//InitGPUEmitter();
+	InitGPUEmitterTexture();
 }
 
 void ParticleManager::Finalize() {
@@ -83,6 +84,7 @@ void ParticleManager::Finalize() {
 	particleCSMaterial_.Finalize();
 
 	csEmitters_.clear();
+	csEmitterTexs_.clear();
 }
 
 void ParticleManager::Update() {
@@ -106,6 +108,7 @@ void ParticleManager::Update() {
 
 	UpdatePerViewData(billboardMatrix);
 	UpdateGPUEmitter();
+	UpdateGPUEmitterTexture();
 
 	for (auto& groupPair : particleGroups_) {
 
@@ -295,6 +298,8 @@ void ParticleManager::Update() {
 
 void ParticleManager::Draw() {
 	EmitterDispatch();
+	dxcommon_->InsertUAVBarrier(particleCSInstancing_.Get());
+	EmitterTextureDispatch();
 	dxcommon_->InsertUAVBarrier(particleCSInstancing_.Get());
 	UpdateParticleCSDispatch();
 
@@ -559,6 +564,7 @@ void ParticleManager::ParticleDebugGUI() {
 
 void ParticleManager::ParticleCSDebugGUI() {
 #ifdef _DEBUG
+	if (csEmitters_.size() == 0) return;
 	if (ImGui::CollapsingHeader("GPU Particle Emitter")) {
 		if (ImGui::TreeNode("ParticleCS Emit Control")) {
 
@@ -585,6 +591,42 @@ void ParticleManager::ParticleCSDebugGUI() {
 			ImGui::DragFloat3("baseVelocity", &csEmitters_[0].emitter->baseVelocity.x, 0.01f, 0.0f, 1.0f);
 			ImGui::DragFloat("velocityRandMax", &csEmitters_[0].emitter->velocityRandMax, 0.01f, -1.0f, 1.0f);
 			ImGui::DragFloat("velocityRandMin", &csEmitters_[0].emitter->velocityRandMin, 0.01f, -1.0f, 1.0f);
+
+			ImGui::Text("DeltaTime1:%f", FPSKeeper::DeltaTime());
+			ImGui::Text("DeltaTime2:%f", FPSKeeper::DeltaTimeFrame());
+			ImGui::TreePop();
+		}
+	}
+#endif // _DEBUG
+}
+
+void ParticleManager::ParticleTexCSDebugGUI() {
+#ifdef _DEBUG
+	if (csEmitterTexs_.size() == 0) return;
+	if (ImGui::CollapsingHeader("GPU ParticleTex Emitter")) {
+		if (ImGui::TreeNode("ParticleCS Emit Control")) {
+
+			ImGui::Checkbox("isEmit", &csEmitterTexs_[0].isEmit);
+
+			int dragCount = int(csEmitterTexs_[0].emitter->count);
+			ImGui::DragInt("emitCount", &dragCount, 1, 0, 100000);
+			csEmitterTexs_[0].emitter->count = uint32_t(dragCount);
+
+			ImGui::DragFloat("lifeTime", &csEmitterTexs_[0].emitter->lifeTime, 0.1f, 1.0f, 300.0f);
+			ImGui::DragFloat("frequency", &csEmitterTexs_[0].emitter->frequency, 0.1f, 0.0f, 300.0f);
+
+			ImGui::DragFloat3("translate", &csEmitterTexs_[0].emitter->translate.x, 0.1f);
+
+			ImGui::DragFloat("radius", &csEmitterTexs_[0].emitter->radius, 0.1f, 0.0f, 300.0f);
+
+			ImGui::SeparatorText("Color");
+			ImGui::DragFloat3("colorMax", &csEmitterTexs_[0].emitter->colorMax.x, 0.01f, 0.0f, 1.0f);
+			ImGui::DragFloat3("colorMin", &csEmitterTexs_[0].emitter->colorMin.x, 0.01f, 0.0f, 1.0f);
+
+			ImGui::SeparatorText("Velocity");
+			ImGui::DragFloat3("baseVelocity", &csEmitterTexs_[0].emitter->baseVelocity.x, 0.01f, 0.0f, 1.0f);
+			ImGui::DragFloat("velocityRandMax", &csEmitterTexs_[0].emitter->velocityRandMax, 0.01f, -1.0f, 1.0f);
+			ImGui::DragFloat("velocityRandMin", &csEmitterTexs_[0].emitter->velocityRandMin, 0.01f, -1.0f, 1.0f);
 
 			ImGui::Text("DeltaTime1:%f", FPSKeeper::DeltaTime());
 			ImGui::Text("DeltaTime2:%f", FPSKeeper::DeltaTimeFrame());
@@ -1245,7 +1287,6 @@ void ParticleManager::UpdateGPUEmitter() {
 		} else {
 			emitter.emitter->emit = 0;
 			emitter.emitter->frequencyTime = 0.0f;
-			perFrameData_->time = 0.0f;
 		}
 	}
 }
@@ -1273,6 +1314,69 @@ void ParticleManager::EmitterDispatch() {
 		dxcommon_->GetCommandList()->Dispatch(dispatchCount, 1, 1);
 	}
 }
+
+int ParticleManager::InitGPUEmitterTexture() {
+	GPUParticleEmitterTexture CSEmitter;
+	CSEmitter.isEmit = true;
+
+	CSEmitter.emitterResource = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), (sizeof(EmitterSphere)));
+	CSEmitter.emitterResource->Map(0, nullptr, reinterpret_cast<void**>(&CSEmitter.emitter));
+	CSEmitter.emitter->count = 500;
+	CSEmitter.emitter->lifeTime = 10.0f;
+	CSEmitter.emitter->frequency = 2.0f;
+	CSEmitter.emitter->frequencyTime = 0.0f;
+	CSEmitter.emitter->translate = Vector3(0.0f, 0.5f, 0.0f);
+	CSEmitter.emitter->radius = 10.0f;
+	CSEmitter.emitter->emit = 0;
+	CSEmitter.emitter->colorMax = { 1.0f,0.0f,1.0f };
+	CSEmitter.emitter->colorMin = { 0.0f,0.0f,0.0f };
+	CSEmitter.emitter->baseVelocity = { 0.0f,0.0f,0.0f };
+	CSEmitter.emitter->velocityRandMax = 0.01f;
+	CSEmitter.emitter->velocityRandMin = 0.0f;
+
+	CSEmitter.textureForEmit = TextureManager::GetInstance()->LoadTexture("magicCircle.png");
+
+	CSEmitter.emitterIndex = csEmitterIndex_;
+	csEmitterTexs_.push_back(CSEmitter);
+	int result = csEmitterIndex_;
+	csEmitterIndex_++;
+	return result;
+}
+
+void ParticleManager::UpdateGPUEmitterTexture() {
+	for (int i = 0; i < csEmitterTexs_.size(); i++) {
+		auto& emitter = csEmitterTexs_[i];
+		if (emitter.isEmit) {
+			emitter.emitter->frequencyTime += FPSKeeper::DeltaTime();
+			if (emitter.emitter->frequency <= emitter.emitter->frequencyTime) {
+				emitter.emitter->frequencyTime -= emitter.emitter->frequency;
+				emitter.emitter->emit = 1;
+			} else {
+				emitter.emitter->emit = 0;
+			}
+		} else {
+			emitter.emitter->emit = 0;
+			emitter.emitter->frequencyTime = 0.0f;
+		}
+	}
+}
+
+void ParticleManager::EmitterTextureDispatch() {
+	for (int i = 0; i < csEmitterTexs_.size(); i++) {
+		dxcommon_->GetPipelineManager()->SetCSPipeline(Pipe::EmitTexParticleCS);
+		dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(0, particleCSUAVHandle_.second);
+		dxcommon_->GetCommandList()->SetComputeRootConstantBufferView(1, csEmitterTexs_[i].emitterResource->GetGPUVirtualAddress());
+		dxcommon_->GetCommandList()->SetComputeRootConstantBufferView(2, perFrameResource_->GetGPUVirtualAddress());
+		dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(3, freeListIndexUAVHandle_.second);
+		dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(4, freeListUAVHandle_.second);
+		dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(5, csEmitterTexs_[i].textureForEmit->gpuHandle);
+		if (csEmitterTexs_[i].emitter->count == 0) continue;
+		int dispatchCountX = (int(csEmitterTexs_[i].textureForEmit->meta.width)  + 32 - 1) / 32;
+		int dispatchCountY = (int(csEmitterTexs_[i].textureForEmit->meta.height) + 32 - 1) / 32;
+		dxcommon_->GetCommandList()->Dispatch(dispatchCountX, dispatchCountY, 1);
+	}
+}
+
 
 bool ParticleManager::LifeUpdate(Particle& particle) {
 	if (particle.lifeTime_ <= 0) {

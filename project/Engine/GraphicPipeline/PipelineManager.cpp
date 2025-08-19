@@ -28,6 +28,7 @@
 #include "SkinningCSPipe.h"
 #include "CSPipe/InitParticleCSPipe.h"
 #include "CSPipe/EmitterParticleCSPipe.h"
+#include "CSPipe/EmitterTexParticleCSPipe.h"
 #include "CSPipe/UpdateParticleCSPipe.h"
 
 
@@ -86,6 +87,7 @@ void PipelineManager::CreatePipeline() {
 	std::unique_ptr<SkinningCSPipe> skinningCS = nullptr;
 	std::unique_ptr<InitParticleCSPipe> initParticleCS = nullptr;
 	std::unique_ptr<EmitterParticleCSPipe> emitParticleCS = nullptr;
+	std::unique_ptr<EmitterTexParticleCSPipe> emitTexParticleCS = nullptr;
 	std::unique_ptr<UpdateParticleCSPipe> updateParticleCS = nullptr;
 
 
@@ -217,6 +219,10 @@ void PipelineManager::CreatePipeline() {
 	emitParticleCS.reset(new EmitterParticleCSPipe);
 	emitParticleCS->Initialize(dxcommon_);
 	pipelines_.push_back(std::move(emitParticleCS));
+
+	emitTexParticleCS.reset(new EmitterTexParticleCSPipe);
+	emitTexParticleCS->Initialize(dxcommon_);
+	pipelines_.push_back(std::move(emitTexParticleCS));
 
 	updateParticleCS.reset(new UpdateParticleCSPipe);
 	updateParticleCS->Initialize(dxcommon_);

@@ -67,8 +67,16 @@ void main(uint3 DTid : SV_DispatchThreadID)
             float3 dir = RandomUnitVector(generator);
 
             // 補間係数（0〜1）: スレッドIDをcountで割る
-            float lerpT = gEmitter.count > 1 ? (float) DTid.x / (gEmitter.count - 1) : 0.0f;
-
+            float lerpT;
+            if (gEmitter.count > 1)
+            {
+                lerpT = (float) DTid.x / (gEmitter.count - 1);
+            }
+            else
+            {
+                lerpT = 0.0f;
+            }
+            
             // 位置の補間
             float3 interpPos = lerp(gEmitter.prevTranslate, gEmitter.translate, lerpT);
             float3 pos = interpPos + dir * gEmitter.radius;

@@ -332,6 +332,9 @@
     <ClCompile Include="Engine\GraphicPipeline\CSPipe\VignetteCSPipe.cpp">
       <Filter>Engine\GraphicPipeline\CSPipe</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\GraphicPipeline\CSPipe\EmitterTexParticleCSPipe.cpp">
+      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -721,6 +724,9 @@
     <ClInclude Include="Engine\GraphicPipeline\CSPipe\VignetteCSPipe.h">
       <Filter>Engine\GraphicPipeline\CSPipe</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\GraphicPipeline\CSPipe\EmitterTexParticleCSPipe.h">
+      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -967,6 +973,9 @@
     </FxCompile>
     <FxCompile Include="resource\Shaders\CS\Vignette.CS.hlsl">
       <Filter>resource\Shaders\CS</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\CS\Engine\EmitTexParticle.CS.hlsl">
+      <Filter>resource\Shaders\CS\Engine</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
