@@ -60,6 +60,7 @@ void GameScene::Initialize() {
 	LoadSceneLevelData("resource/Json/GameScene_position.json");
 
 	player_->Initialize();
+	player_->SetDXCom(dxcommon_);
 
 	boss_->Initialize();
 	boss_->SetDXCom(dxcommon_);

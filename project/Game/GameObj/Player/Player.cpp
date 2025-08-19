@@ -216,6 +216,7 @@ void Player::HPUpdate() {
 		if (damageCoolTime_ > 55.0f) {
 			model_->SetColor({ damageColor_.x,damageColor_.y ,damageColor_.z ,1.0f });
 		} else if (damageCoolTime_ > 45.0f && damageCoolTime_ < 50.0f) {
+			dxcommon_->GetOffscreenManager()->PopPostEffect(PostEffectList::Vignette);
 			model_->SetColor({ damageColor_.x,damageColor_.y ,damageColor_.z ,1.0f });
 		} else if (damageCoolTime_ > 35.0f && damageCoolTime_ < 40.0f) {
 			model_->SetColor({ damageColor_.x,damageColor_.y ,damageColor_.z ,1.0f });
@@ -257,6 +258,7 @@ void Player::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 				avoidEmitter02_->Emit();
 				avoidEmitter03_->Emit();
 			} else {
+				dxcommon_->GetOffscreenManager()->AddPostEffect(PostEffectList::Vignette);
 				playerHP_ -= 5.0f;
 				isDamage_ = true;
 				damageCoolTime_ = 60.0f;
@@ -283,6 +285,7 @@ void Player::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 						avoidEmitter02_->Emit();
 						avoidEmitter03_->Emit();
 					} else {
+						dxcommon_->GetOffscreenManager()->AddPostEffect(PostEffectList::Vignette);
 						playerHP_ -= 5.0f;
 						isDamage_ = true;
 						damageCoolTime_ = 60.0f;
@@ -304,6 +307,7 @@ void Player::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 void Player::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
 	if (other.tag == "enemyAttack") {
 		if (!isDamage_ && !isNowAvoid_) {
+			dxcommon_->GetOffscreenManager()->AddPostEffect(PostEffectList::Vignette);
 			playerHP_ -= 5.0f;
 			isDamage_ = true;
 			damageCoolTime_ = 60.0f;
@@ -330,6 +334,7 @@ void Player::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
 							avoidEmitter03_->Emit();
 						}
 					} else {
+						dxcommon_->GetOffscreenManager()->AddPostEffect(PostEffectList::Vignette);
 						playerHP_ -= 5.0f;
 						isDamage_ = true;
 						isCanStrongState_ = false;

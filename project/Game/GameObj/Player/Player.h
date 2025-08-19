@@ -80,6 +80,7 @@ public:
 	void SetIsStart(bool is) { isStart_ = is; }
 	void SetTargetPos(const Vector3& pos) { targetPos_ = pos; }
 	void SetIsNowAvoid(bool is) { isNowAvoid_ = is; }
+	void SetDXCom(DXCom* dxcom) { dxcommon_ = dxcom; }
 
 private:
 
@@ -133,6 +134,8 @@ private:
 	Vector3 velocity_;
 	Vector3 inputDirection_;
 	int dir_;
+
+	DXCom* dxcommon_;
 
 	ParticleEmitter hit_;
 	ParticleEmitter hit2_;

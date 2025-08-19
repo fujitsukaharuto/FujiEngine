@@ -53,7 +53,7 @@ void main(uint3 dispatchThreadID : SV_DispatchThreadID)
     float dist = distance(uv, center);
 
     // ビネット係数を計算
-    float vignette = 1.0 - smoothstep(0.4, 0.9, dist);
+    float vignette = 1.0 - smoothstep(0.5, 0.9, dist);
     vignette = lerp(1.0, vignette, 0.8);
 
     // 元の色取得
