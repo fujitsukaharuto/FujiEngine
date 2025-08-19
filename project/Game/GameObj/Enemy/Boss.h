@@ -72,6 +72,7 @@ public:
 	bool GetIsStart() { return isStart_; }
 	bool GetIsClear() { return isClear_; }
 	int GetNowHpIndex() { return nowHpIndex_; }
+	float GetChainRate() { return chainRate_; }
 
 	void SetPlayer(Player* player) { pPlayer_ = player; }
 	void SetDXCom(DXCom* dxcommon) { dxcommon_ = dxcommon; }
@@ -142,6 +143,7 @@ private:
 	float jumpTime_ = 0.0f;
 	float jumpHeight_ = 0.0f;
 	bool isJumpAttack_ = true;
+	float chainRate_ = 0.65f;
 
 	// emitter
 	ParticleEmitter waveAttack1;
