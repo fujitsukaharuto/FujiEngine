@@ -60,10 +60,12 @@ void Arrow::DrawCollider() {
 }
 
 void Arrow::DebugGUI() {
+#ifdef _DEBUG
 	if (ImGui::CollapsingHeader("Arrow")) {
 		collider_->DebugGUI();
 		ParameterGUI();
 	}
+#endif // _DEBUG
 }
 
 void Arrow::ParameterGUI() {
