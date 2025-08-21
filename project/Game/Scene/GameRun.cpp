@@ -50,6 +50,7 @@ void GameRun::Initialize() {
 	modelManager_->LoadOBJ("bossWaveWall.obj");
 	modelManager_->LoadOBJ("Star.obj");
 	modelManager_->LoadOBJ("player.obj");
+	modelManager_->LoadOBJ("Boss_Arrow.obj");
 	modelManager_->LoadGLTF("T_boss.gltf");
 #pragma endregion
 

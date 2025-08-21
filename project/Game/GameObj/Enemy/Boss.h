@@ -10,6 +10,7 @@
 #include "Game/GameObj/Enemy/BossItem/UnderRing.h"
 #include "Game/GameObj/Enemy/BossItem/WaveWall.h"
 #include "Game/GameObj/Enemy/BossItem/Beam.h"
+#include "Game/GameObj/Enemy/BossItem/Arrow.h"
 
 class Player;
 
@@ -38,6 +39,9 @@ public:
 	void UpdateWaveWall();
 	void WaveWallAttack();
 
+	void UpdateArrows();
+	void ArrowAttack();
+
 	void InitBeam();
 	bool BeamCharge();
 	void BeamChargeComplete();
@@ -64,6 +68,7 @@ public:
 	BossCore* GetBossCore() { return core_.get(); }
 	Beam* GetBeam() { return beam_.get(); }
 	std::vector<std::unique_ptr<WaveWall>>& GetWalls() { return walls_; }
+	std::vector<std::unique_ptr<Arrow>>& GetArrows() { return arrows_; }
 	std::vector<std::unique_ptr<UnderRing>>& GetUnderRings() { return undderRings_; }
 	const std::vector<std::pair<std::string, float>>& GetPhaseActionList(int phase) { return phaseList_[phase]; }
 	float GetAttackCooldown() { return attackCooldown_; }
@@ -99,6 +104,7 @@ private:
 	std::unique_ptr<BossCore> core_;
 	std::unique_ptr<Beam> beam_;
 	std::vector<std::unique_ptr<WaveWall>> walls_;
+	std::vector<std::unique_ptr<Arrow>> arrows_;
 	std::vector<std::unique_ptr<UnderRing>> undderRings_;
 
 	std::unique_ptr<Object3d> shadow_;
@@ -107,6 +113,7 @@ private:
 	Player* pPlayer_;
 	std::vector<std::unique_ptr<Object3d>> chargeParents_;
 	std::unique_ptr<Object3d> waveParent_;
+	std::vector<std::unique_ptr<Object3d>> arrowParents_;
 
 	bool isClear_ = false;
 	float dyingTime_ = 240.0f;

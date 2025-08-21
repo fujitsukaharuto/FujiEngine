@@ -169,6 +169,11 @@ void GameScene::Update() {
 				cMane_->AddCollider(wall->GetCollider());
 			}
 		}
+		for (auto& arrow : boss_->GetArrows()) {
+			if (arrow->GetIsLive()) {
+				cMane_->AddCollider(arrow->GetCollider());
+			}
+		}
 		for (auto& ring : boss_->GetUnderRings()) {
 			if (ring->GetIsLive()) {
 				cMane_->AddCollider(ring->GetCollider());

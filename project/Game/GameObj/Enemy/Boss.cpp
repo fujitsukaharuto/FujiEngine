@@ -11,6 +11,7 @@
 #include "Game/GameObj/Enemy/Behavior/BossSwordAttack.h"
 #include "Game/GameObj/Enemy/Behavior/BossBeamAttack.h"
 #include "Game/GameObj/Enemy/Behavior/BossAreaAttack.h"
+#include "Game/GameObj/Enemy/Behavior/BossArrowAttack.h"
 
 #include "Game/GameObj/Player/Player.h"
 
@@ -85,6 +86,23 @@ void Boss::Initialize() {
 	waveParent_->SetParent(&animModel_->transform);
 	waveParent_->SetNoneScaleParent(true);
 
+	for (int i = 0; i < 4; i++) {
+		std::unique_ptr<Object3d> arrowParent;
+
+		arrowParent = std::make_unique<Object3d>();
+		arrowParent->Create("cube.obj");
+
+		arrowParent->transform.translate.x = 12.0f - float(i) * 5.0f;
+		if (i > 1) {
+			arrowParent->transform.translate.x = -12.0f + float(i - 2) * 5.0f;
+		}
+		arrowParent->transform.translate.y += 6.0f;
+		arrowParent->transform.translate.z -= 2.0f;
+		arrowParent->SetParent(&animModel_->transform);
+		arrowParent->SetNoneScaleParent(true);
+
+		arrowParents_.push_back(std::move(arrowParent));
+	}
 
 	ParticleManager::Load(waveAttack1, "ShockRay");
 	ParticleManager::Load(waveAttack2, "ShockWaveGround");
@@ -160,7 +178,7 @@ void Boss::Initialize() {
 	roringParticle_.pos_.z = 5.0f;
 
 	actionList_ = {
-		"Root","Wave","Beam","Jump","Sword","Area"
+		"Root","Wave","Beam","Jump","Sword","Area","Arrow"
 	};
 	LoadPhase();
 	ChangeBehavior(std::make_unique<BossRoot>(this));
@@ -175,6 +193,7 @@ void Boss::Update() {
 
 		beam_->Update();
 		UpdateWaveWall();
+		UpdateArrows();
 		UpdateUnderRing();
 
 		ShakeHP();
@@ -225,6 +244,13 @@ void Boss::Draw([[maybe_unused]] Material* mate, [[maybe_unused]] bool is) {
 		wall->Draw();
 #ifdef _DEBUG
 		wall->DrawCollider();
+#endif // _DEBUG
+	}
+	for (auto& arrow : arrows_) {
+		if (!arrow->GetIsLive())continue;
+		arrow->Draw();
+#ifdef _DEBUG
+		arrow->DrawCollider();
 #endif // _DEBUG
 	}
 	for (auto& ring : undderRings_) {
@@ -298,6 +324,7 @@ void Boss::ParameterGUI() {
 				{ "Jump",   [](Boss* b) { return std::make_unique<BossJumpAttack>(b); } },
 				{ "Sword",   [](Boss* b) { return std::make_unique<BossSwordAttack>(b); } },
 				{ "Area",   [](Boss* b) { return std::make_unique<BossAreaAttack>(b); } },
+				{ "Arrow",   [](Boss* b) { return std::make_unique<BossArrowAttack>(b); } },
 				// 他も追加
 			};
 			auto it = behaviorFactory.find(nowAction);
@@ -402,6 +429,13 @@ void Boss::InitParameter() {
 		wall = std::make_unique<WaveWall>();
 		wall->Initialize();
 		walls_.push_back(std::move(wall));
+	}
+
+	for (int i = 0; i < 10; i++) {
+		std::unique_ptr<Arrow> arrow;
+		arrow = std::make_unique<Arrow>();
+		arrow->Initialize();
+		arrows_.push_back(std::move(arrow));
 	}
 
 	for (int i = 0; i < 3; i++) {
@@ -639,6 +673,32 @@ void Boss::WaveWallAttack() {
 	waveAttack3.Emit();
 	waveAttack4.Emit();
 
+}
+
+void Boss::UpdateArrows() {
+	for (auto& arrow : arrows_) {
+		if (!arrow->GetIsLive())continue;
+		arrow->TargetSetting(pPlayer_->GetWorldPos());
+		arrow->Update();
+	}
+}
+
+void Boss::ArrowAttack() {
+	int count = 0;
+
+	for (auto& arrow : arrows_) {
+		if (count == 4) break;
+		if (arrow->GetIsLive()) continue;
+
+		Vector3 arrowPos = arrowParents_[count]->GetWorldPos();
+		float emittTime = 50.0f;
+		if (count == 0) emittTime = 50.0f;
+		if (count == 1) emittTime = 80.0f;
+		if (count == 2) emittTime = 110.0f;
+		if (count == 3) emittTime = 140.0f;
+		arrow->InitArrow(arrowPos, emittTime);
+		count++;
+	}
 }
 
 void Boss::InitBeam() {
@@ -881,6 +941,9 @@ void Boss::SetDefaultBehavior() {
 	beam_->SetIsLive(false);
 	for (auto& wave : walls_) {
 		wave->SetIsLive(false);
+	}
+	for (auto& arrow : arrows_) {
+		arrow->SetIsLive(false);
 	}
 	for (auto& ring : undderRings_) {
 		ring->SetIsLive(false);

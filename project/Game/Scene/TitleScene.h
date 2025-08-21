@@ -2,6 +2,7 @@
 #include "Scene/BaseScene.h"
 #include "Game/TestBaseObj.h"
 #include "Game/GameObj/SkyDome/SkyBox.h"
+#include "Game/GameObj/Enemy/BossItem/Arrow.h"
 #include "Game/Collider/CollisionManager.h"
 
 class TitleScene:public BaseScene {
@@ -30,6 +31,7 @@ private:
 
 
 	std::unique_ptr<Object3d> particleTest_ = nullptr;
+	std::unique_ptr<Arrow> arrowTest_ = nullptr;
 
 
 	std::unique_ptr<Object3d> animParentObj_ = nullptr;

@@ -1,6 +1,8 @@
 #include "BossAttack.h"
 
+#include "Engine/Math/Random/Random.h"
 #include "Game/GameObj/Enemy/Boss.h"
+#include "Game/GameObj/Enemy/Behavior/BossArrowAttack.h"
 #include "BossRoot.h"
 
 BossAttack::BossAttack(Boss* pBoss) : BaseBossBehavior(pBoss) {
@@ -34,9 +36,16 @@ void BossAttack::Update() {
 		/// ジャンプへ移行
 		///---------------------------------------------------------------------------------------
 	case BossAttack::Step::TOROOT:
+	{
 		pBoss_->GetAnimModel()->IsRoopAnimation(true);
-		pBoss_->ChangeBehavior(std::make_unique<BossRoot>(pBoss_));
+		float randomSeed = Random::GetFloat(0.0f, 1.0f);
+		if (randomSeed > pBoss_->GetChainRate()) {
+			pBoss_->ChangeBehavior(std::make_unique<BossArrowAttack>(pBoss_));
+		} else {
+			pBoss_->ChangeBehavior(std::make_unique<BossRoot>(pBoss_));
+		}
 		break;
+	}
 	default:
 		break;
 	}

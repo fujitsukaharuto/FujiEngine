@@ -67,6 +67,9 @@ void TitleScene::Initialize() {
 	particleTest_->CreateSphere();
 	particleTest_->SetColor({ 0.0f,0.0f,0.0f,0.0f });
 
+	arrowTest_ = std::make_unique<Arrow>();
+	arrowTest_->Initialize();
+
 	cube_ = std::make_unique<AnimationModel>();
 	cube_->Create("T_boss.gltf");
 	cube_->LoadAnimationFile("T_boss.gltf");
@@ -98,6 +101,8 @@ void TitleScene::Update() {
 	skybox_->Update();
 
 	cube_->AnimationUpdate();
+
+	arrowTest_->Update();
 
 	csEmitterMoveTime_ += FPSKeeper::DeltaTime();
 	int csSize = int(ParticleManager::GetParticleCSEmitterSize());
@@ -144,6 +149,8 @@ void TitleScene::Draw() {
 	obj3dCommon->PreDraw();
 	//terrain_->Draw();
 
+	arrowTest_->Draw();
+
 	//cube_->Draw();
 	//animParentObj_->Draw();
 
@@ -161,6 +168,7 @@ void TitleScene::Draw() {
 
 #ifdef _DEBUG
 	emit.DrawSize();
+	arrowTest_->DrawCollider();
 #endif // _DEBUG
 
 	//cube_->SkeletonDraw();
@@ -195,6 +203,7 @@ void TitleScene::DebugGUI() {
 	if (ImGui::CollapsingHeader("animParent")) {
 		animParentObj_->DebugGUI();
 	}
+	arrowTest_->DebugGUI();
 
 	ImGui::Unindent();
 #endif // _DEBUG
