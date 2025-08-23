@@ -575,6 +575,77 @@ void Player::StrngthBullet() {
 	}
 }
 
+void Player::TitleUpdate([[maybe_unused]]float titleTime) {
+
+	if (titleTime >= 0.0f) {
+		TitleStartUpdate(titleTime);
+	}
+
+	preTitleTime_ = titleTime;
+
+	collider_->SetPos(model_->GetWorldPos());
+	collider_->InfoUpdate();
+}
+
+void Player::TitleDraw() {
+	OriginGameObject::Draw();
+}
+
+void Player::SettingTitleStartPosition(const Vector3& start, const Vector3& center, const Vector3& end) {
+	titleStartP_ = start;
+	titleCenterP_ = center;
+	titleEndP_ = end;
+}
+
+void Player::TitleStartUpdate([[maybe_unused]] float titleTime) {
+
+	float t = (std::min)((1.0f - titleTime / 90.0f), 1.0f);
+	float pret = (std::min)((1.0f - preTitleTime_ / 90.0f), 1.0f);
+	Vector3 pos = (1.0f - t) * (1.0f - t) * titleStartP_ + 2.0f * (1.0f - t) * t * titleCenterP_ + t * t * titleEndP_;
+	model_->transform.translate = pos;
+	Vector3 dir = (2.0f * (1.0f - t)) * (titleCenterP_ - titleStartP_) + (2.0f * t) * (titleEndP_ - titleCenterP_);
+	dir = dir.Normalize();
+	Vector3 predir = (2.0f * (1.0f - pret)) * (titleCenterP_ - titleStartP_) + (2.0f * pret) * (titleEndP_ - titleCenterP_);
+	predir = predir.Normalize();
+
+	Quaternion rot = Quaternion::LookRotation(dir);
+	Quaternion prerot = Quaternion::LookRotation(predir);
+	Quaternion newRot = Quaternion::Slerp(prerot, rot, 0.1f);
+
+	model_->transform.rotate = Quaternion::QuaternionToEuler(newRot);
+
+	Vector3 particleSpeed = Random::GetVector3({ -0.01f,0.01f }, { -0.01f,0.01f }, { -0.3f,-0.2f });
+	particleSpeed = TransformNormal(particleSpeed, MakeRotateXYZMatrix(model_->transform.rotate));
+	moveParticleL_.para_.speedx = { particleSpeed.x,particleSpeed.x };
+	moveParticleL_.para_.speedy = { particleSpeed.y,particleSpeed.y };
+	moveParticleL_.para_.speedz = { particleSpeed.z,particleSpeed.z };
+	moveParticleL_.Emit();
+	particleSpeed = Random::GetVector3({ -0.01f,0.01f }, { -0.01f,0.01f }, { -0.3f,-0.2f });
+	particleSpeed = TransformNormal(particleSpeed, MakeRotateXYZMatrix(model_->transform.rotate));
+	moveParticleR_.para_.speedx = { particleSpeed.x,particleSpeed.x };
+	moveParticleR_.para_.speedy = { particleSpeed.y,particleSpeed.y };
+	moveParticleR_.para_.speedz = { particleSpeed.z,particleSpeed.z };
+	moveParticleR_.Emit();
+	particleSpeed = { 0.0f,0.0f,-0.1f };
+	particleSpeed = TransformNormal(particleSpeed, MakeRotateXYZMatrix(model_->transform.rotate));
+	moveBurnerL_->para_.speedx = { particleSpeed.x,particleSpeed.x };
+	moveBurnerL_->para_.speedy = { particleSpeed.y,particleSpeed.y };
+	moveBurnerL_->para_.speedz = { particleSpeed.z,particleSpeed.z };
+	moveBurnerR_->para_.speedx = { particleSpeed.x,particleSpeed.x };
+	moveBurnerR_->para_.speedy = { particleSpeed.y,particleSpeed.y };
+	moveBurnerR_->para_.speedz = { particleSpeed.z,particleSpeed.z };
+	moveBurnerLT_->para_.speedx = { particleSpeed.x,particleSpeed.x };
+	moveBurnerLT_->para_.speedy = { particleSpeed.y,particleSpeed.y };
+	moveBurnerLT_->para_.speedz = { particleSpeed.z,particleSpeed.z };
+	moveBurnerRT_->para_.speedx = { particleSpeed.x,particleSpeed.x };
+	moveBurnerRT_->para_.speedy = { particleSpeed.y,particleSpeed.y };
+	moveBurnerRT_->para_.speedz = { particleSpeed.z,particleSpeed.z };
+	moveBurnerL_->Emit();
+	moveBurnerR_->Emit();
+	moveBurnerLT_->Emit();
+	moveBurnerRT_->Emit();
+}
+
 void Player::EmitterSetting() {
 	ParticleManager::Load(hit_, "sphere");
 	ParticleManager::Load(hit2_, "playerhit");

@@ -29,6 +29,8 @@ struct PerFrame {
 
 struct EmitterSphere {
 	Vector3 translate;
+	float padding;
+	Vector3 scale;
 	float radius;
 	uint32_t count;
 	float lifeTime;
@@ -38,7 +40,6 @@ struct EmitterSphere {
 
 	// color
 	Vector3 colorMax;
-	//float padding;
 	Vector3 colorMin;
 	float padding2;
 
@@ -201,6 +202,8 @@ public:
 
 	static GPUParticleEmitter& GetParticleCSEmitter(int index);
 
+	int InitGPUEmitter();
+
 private:
 
 	void InitPlaneVertex();
@@ -212,7 +215,6 @@ private:
 	void UpdatePerViewData(const Matrix4x4& billboardMatrix);
 	void DrawParticleCS();
 
-	int InitGPUEmitter();
 	void UpdateGPUEmitter();
 	void UpdateParticleCSDispatch();
 	void EmitterDispatch();
@@ -288,6 +290,7 @@ private:
 	ComPtr<ID3D12Resource> freeListResource_;
 	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> freeListUAVHandle_;
 	int csEmitterIndex_ = 0;
+	int csEmitterTexIndex_ = 0;
 
 	uint32_t numParticles = 1048576;
 	uint32_t threadsPerGroup = 1024;

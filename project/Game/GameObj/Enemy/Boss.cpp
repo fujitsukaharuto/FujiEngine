@@ -435,6 +435,9 @@ void Boss::InitParameter() {
 		std::unique_ptr<Arrow> arrow;
 		arrow = std::make_unique<Arrow>();
 		arrow->Initialize();
+		int numEmitter = ParticleManager::GetInstance()->InitGPUEmitter();
+		arrow->SetEmitterNumber(numEmitter);
+		arrow->GPUEmitterSetting();
 		arrows_.push_back(std::move(arrow));
 	}
 

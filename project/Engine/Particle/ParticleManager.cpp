@@ -297,9 +297,9 @@ void ParticleManager::Update() {
 }
 
 void ParticleManager::Draw() {
-	EmitterDispatch();
-	dxcommon_->InsertUAVBarrier(particleCSInstancing_.Get());
 	EmitterTextureDispatch();
+	dxcommon_->InsertUAVBarrier(particleCSInstancing_.Get());
+	EmitterDispatch();
 	dxcommon_->InsertUAVBarrier(particleCSInstancing_.Get());
 	UpdateParticleCSDispatch();
 
@@ -944,6 +944,35 @@ ParticleManager::GPUParticleEmitter& ParticleManager::GetParticleCSEmitter(int i
 	return instance->csEmitters_[index];
 }
 
+int ParticleManager::InitGPUEmitter() {
+	GPUParticleEmitter CSEmitter;
+	CSEmitter.isEmit = false;
+
+	CSEmitter.emitterResource = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), (sizeof(EmitterSphere)));
+	CSEmitter.emitterResource->Map(0, nullptr, reinterpret_cast<void**>(&CSEmitter.emitter));
+	CSEmitter.emitter->count = 500;
+	CSEmitter.emitter->lifeTime = 60.0f;
+	CSEmitter.emitter->frequency = 0.5f;
+	CSEmitter.emitter->frequencyTime = 0.0f;
+	CSEmitter.emitter->translate = Vector3(0.0f, 0.0f, 0.0f);
+	CSEmitter.emitter->scale = Vector3(0.1f, 0.1f, 0.1f);
+	CSEmitter.emitter->radius = 2.5f;
+	CSEmitter.emitter->emit = 0;
+	CSEmitter.emitter->colorMax = { 1.0f,1.0f,1.0f };
+	CSEmitter.emitter->colorMin = { 0.0f,0.0f,0.0f };
+	CSEmitter.emitter->baseVelocity = { 0.0f,0.0f,0.0f };
+	CSEmitter.emitter->velocityRandMax = 0.0f;
+	CSEmitter.emitter->velocityRandMin = 0.0f;
+
+	CSEmitter.emitter->prevTranslate = Vector3(0.0f, 0.0f, 0.0f);
+
+	CSEmitter.emitterIndex = csEmitterIndex_;
+	csEmitters_.push_back(CSEmitter);
+	int result = csEmitterIndex_;
+	csEmitterIndex_++;
+	return result;
+}
+
 void ParticleManager::InitPlaneVertex() {
 	vertex_.push_back({ {-1.0f,1.0f,0.0f,1.0f},{0.0f,0.0f},{0.0f,0.0f,-1.0f} });
 	vertex_.push_back({ {-1.0f,-1.0f,0.0f,1.0f},{0.0f,1.0f},{0.0f,0.0f,-1.0f} });
@@ -1245,34 +1274,6 @@ void ParticleManager::DrawParticleCS() {
 	dxcommon_->GetCommandList()->DrawIndexedInstanced(6, particleCSInsstanceCount_, 0, 0, 0);
 }
 
-int ParticleManager::InitGPUEmitter() {
-	GPUParticleEmitter CSEmitter;
-	CSEmitter.isEmit = true;
-
-	CSEmitter.emitterResource = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), (sizeof(EmitterSphere)));
-	CSEmitter.emitterResource->Map(0, nullptr, reinterpret_cast<void**>(&CSEmitter.emitter));
-	CSEmitter.emitter->count = 500;
-	CSEmitter.emitter->lifeTime = 60.0f;
-	CSEmitter.emitter->frequency = 0.5f;
-	CSEmitter.emitter->frequencyTime = 0.0f;
-	CSEmitter.emitter->translate = Vector3(0.0f, 0.0f, 0.0f);
-	CSEmitter.emitter->radius = 2.5f;
-	CSEmitter.emitter->emit = 0;
-	CSEmitter.emitter->colorMax = { 1.0f,1.0f,1.0f };
-	CSEmitter.emitter->colorMin = { 0.0f,0.0f,0.0f };
-	CSEmitter.emitter->baseVelocity = { 0.0f,0.0f,0.0f };
-	CSEmitter.emitter->velocityRandMax = 0.0f;
-	CSEmitter.emitter->velocityRandMin = 0.0f;
-
-	CSEmitter.emitter->prevTranslate = Vector3(0.0f, 0.0f, 0.0f);
-
-	CSEmitter.emitterIndex = csEmitterIndex_;
-	csEmitters_.push_back(CSEmitter);
-	int result = csEmitterIndex_;
-	csEmitterIndex_++;
-	return result;
-}
-
 void ParticleManager::UpdateGPUEmitter() {
 	for (int i = 0; i < csEmitters_.size(); i++) {
 		auto& emitter = csEmitters_[i];
@@ -1336,10 +1337,10 @@ int ParticleManager::InitGPUEmitterTexture() {
 
 	CSEmitter.textureForEmit = TextureManager::GetInstance()->LoadTexture("magicCircle.png");
 
-	CSEmitter.emitterIndex = csEmitterIndex_;
+	CSEmitter.emitterIndex = csEmitterTexIndex_;
 	csEmitterTexs_.push_back(CSEmitter);
-	int result = csEmitterIndex_;
-	csEmitterIndex_++;
+	int result = csEmitterTexIndex_;
+	csEmitterTexIndex_++;
 	return result;
 }
 

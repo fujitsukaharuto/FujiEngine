@@ -82,6 +82,16 @@ public:
 	void SetIsNowAvoid(bool is) { isNowAvoid_ = is; }
 	void SetDXCom(DXCom* dxcom) { dxcommon_ = dxcom; }
 
+
+	//========================================================================*/
+	//* Title
+	void TitleUpdate(float titleTime);
+	void TitleDraw();
+	void SettingTitleStartPosition(const Vector3& start, const Vector3& center, const Vector3& end);
+
+	void TitleStartUpdate(float titleTime);
+
+
 private:
 
 	void EmitterSetting();
@@ -159,5 +169,12 @@ private:
 
 	ParticleEmitter* storongStateEmitter1_;
 	ParticleEmitter storongStateEmitter2_;
+
+
+	// Title
+	Vector3 titleStartP_;
+	Vector3 titleCenterP_;
+	Vector3 titleEndP_;
+	float preTitleTime_ = 300.0f;
 
 };

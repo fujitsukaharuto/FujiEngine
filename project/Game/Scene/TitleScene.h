@@ -3,6 +3,7 @@
 #include "Game/TestBaseObj.h"
 #include "Game/GameObj/SkyDome/SkyBox.h"
 #include "Game/GameObj/Enemy/BossItem/Arrow.h"
+#include "Game/GameObj/Player/Player.h"
 #include "Game/Collider/CollisionManager.h"
 
 class TitleScene:public BaseScene {
@@ -24,18 +25,27 @@ private:
 
 	std::unique_ptr<Object3dCommon> obj3dCommon = nullptr;
 	std::unique_ptr<SkyBox> skybox_;
-	std::unique_ptr<Object3d> terrain_ = nullptr;
-	std::unique_ptr<Object3d> titlePlane_ = nullptr;
+	std::unique_ptr<AnimationModel> terrain_ = nullptr;
+
+	std::unique_ptr<Sprite> title_;
 	std::unique_ptr<Sprite> space_;
-	std::unique_ptr<Object3d> star_ = nullptr;
+
+	float startTime_ = 90.0f;
+	float startMaxTime_ = 90.0f;
+	std::unique_ptr<Player> player_;
+	Vector3 playerStart_;
+	Vector3 playerCenter_;
+	Vector3 playerEnd_;
+
+	float cameraStartRotateX_ = -0.5f;
+	float cameraEndRotateX_ = 0.15f;
+
+	float titleCanMoveTime_ = 30.0f;
+	float titleStartX_ = -640.0f;
+	float titleEmdX_ = 640.0f;
 
 
 	std::unique_ptr<Object3d> particleTest_ = nullptr;
-	std::unique_ptr<Arrow> arrowTest_ = nullptr;
-
-
-	std::unique_ptr<Object3d> animParentObj_ = nullptr;
-	std::unique_ptr<AnimationModel> cube_ = nullptr;
 
 	ParticleEmitter emit;
 

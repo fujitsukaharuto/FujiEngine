@@ -107,10 +107,13 @@ void Arrow::InitArrow(const Vector3& pos, float emitTime) {
 	startP_ = pos;
 
 	isLive_ = true;
+
+	ParticleManager::GetParticleCSEmitter(emitterNumber_).emitter->prevTranslate = model_->transform.translate;
+	ParticleManager::GetParticleCSEmitter(emitterNumber_).emitter->translate = model_->transform.translate;
 }
 
 void Arrow::TargetSetting(const Vector3& target) {
-	if (animationTime_ < 10.0f && animationTime_ > 5.0f) {
+	if (animationTime_ <= 5.0f && arrivalTime_ >= totalAnimationTime_) {
 		endP_ = target;
 		if (endP_.z == startP_.z) {
 			startP_.z -= 0.001f;
@@ -138,17 +141,24 @@ void Arrow::AnimaTimeUpdate() {
 		model_->transform.rotate.y = rotationAmount;
 		if (animationTime_ == 0.0f)
 			model_->transform.rotate.y = 0.0f;
+		if (animationTime_ <= 0.0f) {
+			ParticleManager::GetParticleCSEmitter(emitterNumber_).isEmit = true;
+		}
 	}
 }
 
 void Arrow::ArrivalTimeUpdate() {
 	if (emitTime_ > 0.0f || animationTime_ > 0.0f) return;
 	if (arrivalTime_ > 0.0f) {
+
+		ParticleManager::GetParticleCSEmitter(emitterNumber_).emitter->prevTranslate = model_->transform.translate;
+
 		float pret = (std::min)((1.0f - arrivalTime_ / totalArrivalTime_), 1.0f);
 		arrivalTime_ -= FPSKeeper::DeltaTime();
 		float t = (std::min)((1.0f - arrivalTime_ / totalArrivalTime_), 1.0f);
 		Vector3 pos = (1.0f - t) * (1.0f - t) * startP_ + 2.0f * (1.0f - t) * t * midtermP_ + t * t * endP_;
 		model_->transform.translate = pos;
+		ParticleManager::GetParticleCSEmitter(emitterNumber_).emitter->translate = model_->transform.translate;
 
 		Vector3 dir = (2.0f * (1.0f - t)) * (midtermP_ - startP_) + (2.0f * t) * (endP_ - midtermP_);
 		dir = dir.Normalize();
@@ -162,7 +172,17 @@ void Arrow::ArrivalTimeUpdate() {
 		model_->transform.rotate = Quaternion::QuaternionToEuler(newRot);
 	} else {
 		isLive_ = false;
+		ParticleManager::GetParticleCSEmitter(emitterNumber_).isEmit = false;
 	}
+}
+
+void Arrow::GPUEmitterSetting() {
+	ParticleManager::GetParticleCSEmitter(emitterNumber_).emitter->count = 300;
+	ParticleManager::GetParticleCSEmitter(emitterNumber_).emitter->lifeTime = 30.0f;
+	ParticleManager::GetParticleCSEmitter(emitterNumber_).emitter->radius = 0.0f;
+	ParticleManager::GetParticleCSEmitter(emitterNumber_).emitter->scale = { 1.0f,1.0f,1.0f };
+	ParticleManager::GetParticleCSEmitter(emitterNumber_).emitter->colorMax = { 1.0f,0.0f,0.0f };
+	ParticleManager::GetParticleCSEmitter(emitterNumber_).emitter->colorMin = { 1.0f,0.0f,0.0f };
 }
 
 void Arrow::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
@@ -172,4 +192,9 @@ void Arrow::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
 }
 
 void Arrow::OnCollisionExit([[maybe_unused]] const ColliderInfo& other) {
+}
+
+void Arrow::SetIsLive(bool is) {
+	isLive_ = is;
+	ParticleManager::GetParticleCSEmitter(emitterNumber_).isEmit = false;
 }

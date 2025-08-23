@@ -5,6 +5,7 @@ RWStructuredBuffer<Particle> gParticle : register(u0);
 struct EmitterSphere
 {
     float3 translate;
+    float3 scale;
     float radius;
     uint count;
     float lifeTime;
@@ -82,8 +83,8 @@ void main(uint3 DTid : SV_DispatchThreadID)
             float3 pos = interpPos + dir * gEmitter.radius;
 
             uint particleIndex = gFreeList[freeListIndex];
-            gParticle[particleIndex].scale = float3(0.1f, 0.1f, 0.1f);
-            gParticle[particleIndex].startScale = float3(0.1f, 0.1f, 0.1f);
+            gParticle[particleIndex].scale = gEmitter.scale;
+            gParticle[particleIndex].startScale = gEmitter.scale;
             gParticle[particleIndex].translate = pos;
 
             float3 t = (generator.Generate3d() + 1) * 0.5f;

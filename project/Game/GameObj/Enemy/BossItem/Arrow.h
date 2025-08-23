@@ -26,13 +26,16 @@ public:
 	void AnimaTimeUpdate();
 	void ArrivalTimeUpdate();
 
+	void GPUEmitterSetting();
+
 	//========================================================================*/
 	//* Collision
 	void OnCollisionEnter([[maybe_unused]] const ColliderInfo& other);
 	void OnCollisionStay([[maybe_unused]] const ColliderInfo& other);
 	void OnCollisionExit([[maybe_unused]] const ColliderInfo& other);
 
-	void SetIsLive(bool is) { isLive_ = is; }
+	void SetIsLive(bool is);
+	void SetEmitterNumber(int num) { emitterNumber_ = num; }
 
 	BaseCollider* GetCollider() { return collider_.get(); }
 	bool GetIsLive() { return isLive_; }
@@ -54,7 +57,7 @@ private:
 	Vector3 startP_;
 	Vector3 midtermP_;
 	Vector3 endP_;
-	float controlHeight_ = 15.0f;
+	float controlHeight_ = 20.0f;
 
 	std::unique_ptr<AABBCollider> collider_;
 
@@ -62,5 +65,7 @@ private:
 	ParticleEmitter spark1_;
 	ParticleEmitter spark2_;
 
+	// Gpu Particle
+	int emitterNumber_;
 
 };
