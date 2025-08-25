@@ -12,6 +12,7 @@
 #include "Game/GameObj/Enemy/Behavior/BossBeamAttack.h"
 #include "Game/GameObj/Enemy/Behavior/BossAreaAttack.h"
 #include "Game/GameObj/Enemy/Behavior/BossArrowAttack.h"
+#include "Game/GameObj/Enemy/Behavior/BossRodFall.h"
 
 #include "Game/GameObj/Player/Player.h"
 
@@ -178,7 +179,7 @@ void Boss::Initialize() {
 	roringParticle_.pos_.z = 5.0f;
 
 	actionList_ = {
-		"Root","Wave","Beam","Jump","Sword","Area","Arrow"
+		"Root","Wave","Beam","Jump","Sword","Area","Arrow","FallRod",
 	};
 	LoadPhase();
 	ChangeBehavior(std::make_unique<BossRoot>(this));
@@ -194,6 +195,7 @@ void Boss::Update() {
 		beam_->Update();
 		UpdateWaveWall();
 		UpdateArrows();
+		UpdateRod();
 		UpdateUnderRing();
 
 		ShakeHP();
@@ -246,6 +248,7 @@ void Boss::Draw([[maybe_unused]] Material* mate, [[maybe_unused]] bool is) {
 		wall->DrawCollider();
 #endif // _DEBUG
 	}
+
 	for (auto& arrow : arrows_) {
 		if (!arrow->GetIsLive())continue;
 		arrow->Draw();
@@ -253,6 +256,11 @@ void Boss::Draw([[maybe_unused]] Material* mate, [[maybe_unused]] bool is) {
 		arrow->DrawCollider();
 #endif // _DEBUG
 	}
+	for (auto& rod : rods_) {
+		if (!rod->GetIsLive())continue;
+		rod->Draw();
+	}
+
 	for (auto& ring : undderRings_) {
 		if (!ring->GetIsLive())continue;
 		ring->Draw();
@@ -260,6 +268,7 @@ void Boss::Draw([[maybe_unused]] Material* mate, [[maybe_unused]] bool is) {
 		ring->DrawCollider();
 #endif // _DEBUG
 	}
+
 	beam_->Draw();
 
 	for (auto& hpTex : hpFrame_) {
@@ -325,6 +334,7 @@ void Boss::ParameterGUI() {
 				{ "Sword",   [](Boss* b) { return std::make_unique<BossSwordAttack>(b); } },
 				{ "Area",   [](Boss* b) { return std::make_unique<BossAreaAttack>(b); } },
 				{ "Arrow",   [](Boss* b) { return std::make_unique<BossArrowAttack>(b); } },
+				{ "FallRod",   [](Boss* b) { return std::make_unique<BossRodFall>(b); } },
 				// 他も追加
 			};
 			auto it = behaviorFactory.find(nowAction);
@@ -441,7 +451,14 @@ void Boss::InitParameter() {
 		arrows_.push_back(std::move(arrow));
 	}
 
-	for (int i = 0; i < 3; i++) {
+	for (int i = 0; i < 10; i++) {
+		std::unique_ptr<Arrow> rod;
+		rod = std::make_unique<Arrow>();
+		rod->Initialize();
+		rods_.push_back(std::move(rod));
+	}
+
+	for (int i = 0; i < 10; i++) {
 		std::unique_ptr<UnderRing> ring;
 		ring = std::make_unique<UnderRing>();
 		ring->Initialize();
@@ -700,6 +717,41 @@ void Boss::ArrowAttack() {
 		if (count == 2) emittTime = 110.0f;
 		if (count == 3) emittTime = 140.0f;
 		arrow->InitArrow(arrowPos, emittTime);
+		count++;
+	}
+}
+
+void Boss::UpdateRod() {
+	for (auto& rod : rods_) {
+		if (rod->GetIsBroke()) RodUnderRing(rod->GetWorldPos());
+		if (!rod->GetIsLive())continue;
+		rod->RodUpdate();
+	}
+}
+
+void Boss::RodFall() {
+	int count = 0;
+
+	for (auto& rod : rods_) {
+		if (count == 6) break;
+		if (rod->GetIsLive()) continue;
+
+		Vector3 rodPos = animModel_->transform.translate;
+		rodPos.x += Random::GetFloat(-70.0f, 70.0f);
+		rodPos.y = 20.0f;
+		rodPos.z += Random::GetFloat(-70.0f, 70.0f);
+		float emittTime = 140.0f;
+		rod->InitRod(rodPos, emittTime);
+		count++;
+	}
+}
+
+void Boss::RodUnderRing(const Vector3& emitPos) {
+	int count = 0;
+	for (auto& ring : undderRings_) {
+		if (count == 1) break;
+		if (ring->GetIsLive()) continue;
+		ring->InitRing(emitPos);
 		count++;
 	}
 }

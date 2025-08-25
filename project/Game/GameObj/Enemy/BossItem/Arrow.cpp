@@ -185,6 +185,66 @@ void Arrow::GPUEmitterSetting() {
 	ParticleManager::GetParticleCSEmitter(emitterNumber_).emitter->colorMin = { 1.0f,0.0f,0.0f };
 }
 
+void Arrow::RodUpdate() {
+	if (!isLive_) return;
+
+	FlyTimeUpdate();
+	FallTimeUpdate();
+	BrokeTimeUpdate();
+
+}
+
+void Arrow::InitRod(const Vector3& pos, float time) {
+	model_->transform.translate = pos;
+	model_->transform.rotate = Vector3::GetZeroVec();
+	model_->transform.rotate.x = 1.565f;
+
+	flyTime_ = time;
+	fallTime_ = maxFallTime_;
+	brokeTime_ = maxBrokeTime_;
+
+	isLive_ = true;
+}
+
+void Arrow::FlyTimeUpdate() {
+	if (flyTime_ > 0.0f) {
+		flyTime_ -= FPSKeeper::DeltaTime();
+	}
+}
+
+void Arrow::FallTimeUpdate() {
+	if (flyTime_ > 0.0f) return;
+	if (fallTime_ > 0.0f) {
+		fallTime_ -= FPSKeeper::DeltaTime();
+		if (fallTime_ < 0.0f)
+			fallTime_ = 0.0f;
+
+		float t = 1.0f - (fallTime_ / maxFallTime_);
+		float fallPos = std::lerp(9.0f, 1.0f, t);
+		model_->transform.translate.y = fallPos;
+	}
+}
+
+void Arrow::BrokeTimeUpdate() {
+	if (flyTime_ > 0.0f || fallTime_ > 0.0f) return;
+	if (brokeTime_ > 0.0f) {
+		brokeTime_ -= FPSKeeper::DeltaTime();
+		if (brokeTime_ <= 0.0f) {
+			isBroke_ = true;
+		}
+	} else {
+		isLive_ = false;
+	}
+}
+
+bool Arrow::GetIsBroke() {
+	bool result = isBroke_;
+	if (isBroke_) {
+		isBroke_ = false;
+	}
+	return result;
+}
+
 void Arrow::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 }
 

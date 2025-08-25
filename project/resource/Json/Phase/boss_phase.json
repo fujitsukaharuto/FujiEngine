@@ -34,6 +34,10 @@
             {
                 "name": "Arrow",
                 "value": 1.0
+            },
+            {
+                "name": "FallRod",
+                "value": 1.0
             }
         ]
     ]

@@ -42,6 +42,10 @@ public:
 	void UpdateArrows();
 	void ArrowAttack();
 
+	void UpdateRod();
+	void RodFall();
+	void RodUnderRing(const Vector3& emitPos);
+
 	void InitBeam();
 	bool BeamCharge();
 	void BeamChargeComplete();
@@ -105,6 +109,7 @@ private:
 	std::unique_ptr<Beam> beam_;
 	std::vector<std::unique_ptr<WaveWall>> walls_;
 	std::vector<std::unique_ptr<Arrow>> arrows_;
+	std::vector<std::unique_ptr<Arrow>> rods_;
 	std::vector<std::unique_ptr<UnderRing>> undderRings_;
 
 	std::unique_ptr<Object3d> shadow_;

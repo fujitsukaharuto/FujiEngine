@@ -28,6 +28,16 @@ public:
 
 	void GPUEmitterSetting();
 
+	// lightningRod
+	void RodUpdate();
+	void InitRod(const Vector3& pos, float time);
+
+	void FlyTimeUpdate();
+	void FallTimeUpdate();
+	void BrokeTimeUpdate();
+
+	bool GetIsBroke();
+
 	//========================================================================*/
 	//* Collision
 	void OnCollisionEnter([[maybe_unused]] const ColliderInfo& other);
@@ -67,5 +77,15 @@ private:
 
 	// Gpu Particle
 	int emitterNumber_;
+
+
+	// Rod
+	float flyTime_ = 0.0f;
+	float fallTime_ = 0.0f;
+	float maxFallTime_ = 10.0f;
+	float brokeTime_ = 0.0f;
+	float maxBrokeTime_ = 120.0f;
+
+	bool isBroke_ = false;
 
 };
