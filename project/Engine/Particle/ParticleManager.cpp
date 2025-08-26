@@ -28,6 +28,7 @@ void ParticleManager::Initialize(DXCom* pDxcom, SRVManager* srvManager) {
 	InitRingVertex();
 	InitSphereVertex();
 	InitCylinderVertex();
+	InitLighningVertex();
 	InitParticleCS();
 	InitGPUEmitter();
 	//InitGPUEmitter();
@@ -82,6 +83,7 @@ void ParticleManager::Finalize() {
 	perViewResource_.Reset();
 	perFrameResource_.Reset();
 	particleCSMaterial_.Finalize();
+	lightning_.reset();
 
 	csEmitters_.clear();
 	csEmitterTexs_.clear();
@@ -334,6 +336,9 @@ void ParticleManager::Draw() {
 		if (group->drawCount_ == 0) {
 			continue;
 		}
+		if (group->shapeType_ == ShapeType::Lightning) {
+			continue;
+		}
 
 		if (group->shapeType_ != ShapeType::PLANE) {
 			switch (group->shapeType_) {
@@ -399,11 +404,36 @@ void ParticleManager::Draw() {
 			dxcommon_->GetCommandList()->IASetIndexBuffer(&ibView);
 		}
 	}
+	for (auto& groupPair : particleGroups_) {
+		ParticleGroup* group = groupPair.second.get();
+
+		if (group->isSubMode_) {
+			continue;
+		}
+		if (group->drawCount_ == 0) {
+			continue;
+		}
+		if (group->shapeType_ != ShapeType::Lightning) {
+			continue;
+		}
+
+		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group->srvIndex_));
+		lightning_->MeshDraw(&group->material_, group->drawCount_);
+
+		if (group->shapeType_ != ShapeType::PLANE) {
+			dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vbView);
+			dxcommon_->GetCommandList()->IASetIndexBuffer(&ibView);
+		}
+	}
+
 
 	for (auto& groupPair : parentParticleGroups_) {
 		ParentParticleGroup* group = groupPair.second.get();
 
 		if (group->drawCount_ == 0) {
+			continue;
+		}
+		if (group->shapeType_ == ShapeType::Lightning) {
 			continue;
 		}
 
@@ -464,6 +494,24 @@ void ParticleManager::Draw() {
 		default:
 			break;
 		}
+
+		if (group->shapeType_ != ShapeType::PLANE) {
+			dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vbView);
+			dxcommon_->GetCommandList()->IASetIndexBuffer(&ibView);
+		}
+	}
+	for (auto& groupPair : parentParticleGroups_) {
+		ParentParticleGroup* group = groupPair.second.get();
+
+		if (group->drawCount_ == 0) {
+			continue;
+		}
+		if (group->shapeType_ != ShapeType::Lightning) {
+			continue;
+		}
+
+		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group->srvIndex_));
+		lightning_->MeshDraw(&group->material_, group->drawCount_);
 
 		if (group->shapeType_ != ShapeType::PLANE) {
 			dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vbView);
@@ -518,7 +566,7 @@ void ParticleManager::ParticleDebugGUI() {
 	}
 	if (selectParticleGroup_) {
 		int shapeType = static_cast<int>(selectParticleGroup_->shapeType_);
-		ImGui::Combo("ShapeType##type", &shapeType, "Plane\0Ring\0sphere\0Torus\0Cylinder\0");
+		ImGui::Combo("ShapeType##type", &shapeType, "Plane\0Ring\0sphere\0Torus\0Cylinder\0Cone\0Triangle\0Box\0Lightning\0");
 		selectParticleGroup_->shapeType_ = static_cast<ShapeType>(shapeType);
 		ImGui::Text("count : %d", int(selectParticleGroup_->drawCount_));
 	}
@@ -1194,6 +1242,11 @@ void ParticleManager::InitCylinderVertex() {
 	cylinderIbView.BufferLocation = cylinderIBuffer_->GetGPUVirtualAddress();
 	cylinderIbView.Format = DXGI_FORMAT_R32_UINT;
 	cylinderIbView.SizeInBytes = static_cast<UINT>(sizeof(uint32_t) * cylinderIndex_.size());
+}
+
+void ParticleManager::InitLighningVertex() {
+	lightning_ = std::make_unique<Object3d>();
+	lightning_->Create("lightning.obj");
 }
 
 void ParticleManager::InitParticleCS() {

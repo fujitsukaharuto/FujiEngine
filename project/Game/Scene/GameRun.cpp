@@ -34,6 +34,7 @@ void GameRun::Initialize() {
 	textureManager_->Load("gameover_beta.png");
 	textureManager_->Load("spaceKey.png");
 	textureManager_->Load("key_beta.png");
+	textureManager_->Load("FX12_Lightning_01.png");
 #pragma endregion
 
 
@@ -45,6 +46,7 @@ void GameRun::Initialize() {
 	modelManager_->LoadOBJ("Fence.obj");
 	modelManager_->LoadOBJ("terrain.obj");
 	modelManager_->LoadOBJ("skydome.obj");
+	modelManager_->LoadOBJ("lightning.obj");
 	modelManager_->LoadOBJ("playerModel.obj");
 	modelManager_->LoadOBJ("boss.obj");
 	modelManager_->LoadOBJ("bossWaveWall.obj");
@@ -116,6 +118,8 @@ void GameRun::Initialize() {
 	pManager_->CreateParticleGroup("roringWave", "underRing.png", 20, ShapeType::CYLINDER);
 	pManager_->CreateParticleGroup("roringParticle", "redCircle.png", 80);
 	pManager_->CreateParticleGroup("roringring", "gradationLine.png", 20, ShapeType::RING);
+
+	pManager_->CreateParticleGroup("lightning", "FX12_Lightning_01.png", 20, ShapeType::Lightning);
 
 
 

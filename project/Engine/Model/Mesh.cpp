@@ -96,3 +96,9 @@ void Mesh::CSDispatch(ID3D12GraphicsCommandList* commandList) {
 	commandList->SetComputeRootDescriptorTable(1, srvHandle.second);
 	commandList->SetComputeRootDescriptorTable(3, skinnedSrvHandle.second);
 }
+
+void Mesh::MeshDraw(ID3D12GraphicsCommandList* commandList, int drawCount) {
+	commandList->IASetVertexBuffers(0, 1, &vertexBufferView_);
+	commandList->IASetIndexBuffer(&indexBufferView_);
+	commandList->DrawIndexedInstanced(static_cast<UINT>((indexData_.size())), drawCount, 0, 0, 0);
+}

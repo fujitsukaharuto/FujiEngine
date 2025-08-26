@@ -140,3 +140,16 @@ void Model::CSDispatch(const SkinCluster& skinCluster, ID3D12GraphicsCommandList
 		commandList->Dispatch(dispatchCount, 1, 1);
 	}
 }
+
+void Model::MeshDraw(ID3D12GraphicsCommandList* commandList, Material* mate, int drawCount) {
+	for (uint32_t index = 0; index < mesh_.size(); ++index) {
+		if (mate) {
+			commandList->SetGraphicsRootConstantBufferView(0, mate->GetMaterialResource()->GetGPUVirtualAddress());
+			commandList->SetGraphicsRootDescriptorTable(2, mate->GetTexture()->gpuHandle);
+		} else {
+			commandList->SetGraphicsRootConstantBufferView(0, material_[index].GetMaterialResource()->GetGPUVirtualAddress());
+			commandList->SetGraphicsRootDescriptorTable(2, material_[index].GetTexture()->gpuHandle);
+		}
+		mesh_[index].MeshDraw(commandList, drawCount);
+	}
+}

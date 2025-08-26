@@ -87,5 +87,6 @@ private:
 	float maxBrokeTime_ = 120.0f;
 
 	bool isBroke_ = false;
+	bool isLightNing_ = true;
 
 };

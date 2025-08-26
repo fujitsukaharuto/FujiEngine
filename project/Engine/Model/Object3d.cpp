@@ -496,6 +496,11 @@ void Object3d::SetEditorObjParameter() {
 	objIDData_->objID += 1000;
 }
 
+void Object3d::MeshDraw(Material* mate, int drawCount) {
+	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
+	model_->MeshDraw(cList, mate, drawCount);
+}
+
 void Object3d::CreateWVP() {
 	wvpResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(TransformationMatrix));
 	wvpDate_ = nullptr;

@@ -90,6 +90,7 @@ enum class ShapeType {
 	CONE,
 	TRIANGLE,
 	BOX,
+	Lightning,
 };
 
 class DXCom;
@@ -210,6 +211,7 @@ private:
 	void InitRingVertex();
 	void InitSphereVertex();
 	void InitCylinderVertex();
+	void InitLighningVertex();
 
 	void InitParticleCS();
 	void UpdatePerViewData(const Matrix4x4& billboardMatrix);
@@ -271,6 +273,8 @@ private:
 
 	std::vector<VertexDate> cylinderVertex_;
 	std::vector<uint32_t> cylinderIndex_;
+
+	std::unique_ptr<Object3d> lightning_;
 
 	//ParticleCS
 	ComPtr<ID3D12Resource> particleCSInstancing_;

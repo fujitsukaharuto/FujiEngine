@@ -106,6 +106,9 @@ public:
 
 	void CSDispatch(const SkinCluster& skinCluster, ID3D12GraphicsCommandList* commandList);
 
+	// MeshDraw
+	void MeshDraw(ID3D12GraphicsCommandList* commandList, Material* mate, int drawCount = 1);
+
 private:
 
 

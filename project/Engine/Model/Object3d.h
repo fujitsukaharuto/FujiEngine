@@ -107,6 +107,9 @@ public:
 
 	void SetEditorObjParameter();
 
+	// MeshDraw
+	void MeshDraw(Material* mate = nullptr, int drawCount = 1);
+
 private:
 
 	void CreateWVP();

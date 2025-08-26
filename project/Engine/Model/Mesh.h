@@ -41,6 +41,9 @@ public:
 
 	size_t GetVertexDataSize() { return vertexData_.size(); }
 
+	// MeshDraw
+	void MeshDraw(ID3D12GraphicsCommandList* commandList, int drawCount = 1);
+
 private:
 
 	DXCom* dxcommon_;

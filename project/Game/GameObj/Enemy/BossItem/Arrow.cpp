@@ -1,5 +1,6 @@
 #include "Arrow.h"
 #include "Engine/Particle/ParticleManager.h"
+#include "Engine/Math/Random/Random.h"
 #include <algorithm>
 
 Arrow::Arrow() {
@@ -22,14 +23,13 @@ void Arrow::Initialize() {
 	velocity_ = { 0.0f,0.0f,0.0f };
 	model_->transform.scale = { 5.0f,5.0f,5.0f };
 
-	ParticleManager::Load(spark1_, "WaveWallSpark");
+	ParticleManager::Load(spark1_, "lightning");
 	ParticleManager::Load(spark2_, "WaveWallSpark");
 
-	spark1_.SetParent(&model_->transform);
+	spark1_.frequencyTime_ = 0.0f;
+
 	spark2_.SetParent(&model_->transform);
 
-	spark1_.pos_.x = 0.4f;
-	spark1_.pos_.z = 1.40f;
 	spark2_.pos_.x = -0.4f;
 	spark2_.pos_.z = 1.40f;
 
@@ -204,6 +204,7 @@ void Arrow::InitRod(const Vector3& pos, float time) {
 	brokeTime_ = maxBrokeTime_;
 
 	isLive_ = true;
+	isLightNing_ = true;
 }
 
 void Arrow::FlyTimeUpdate() {
@@ -231,6 +232,16 @@ void Arrow::BrokeTimeUpdate() {
 		brokeTime_ -= FPSKeeper::DeltaTime();
 		if (brokeTime_ <= 0.0f) {
 			isBroke_ = true;
+		}
+		if (brokeTime_ <= 5.0f) {
+			if (isLightNing_) {
+				spark1_.pos_ = model_->transform.translate;
+				spark1_.pos_.y += 40.0f;
+				spark1_.particleRotate_.y = Random::GetFloat(-3.14f, 3.14f);
+
+				spark1_.Emit();
+				isLightNing_ = false;
+			}
 		}
 	} else {
 		isLive_ = false;
