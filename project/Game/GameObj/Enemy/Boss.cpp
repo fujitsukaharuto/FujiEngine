@@ -20,6 +20,10 @@
 Boss::Boss() {
 }
 
+Boss::~Boss() {
+	ParticleManager::GetParticleCSEmitterTexture(summonIndex_).isEmit = false;
+}
+
 void Boss::Initialize() {
 	OriginGameObject::Initialize();
 	OriginGameObject::CreateAnimModel("T_boss.gltf");
@@ -30,7 +34,7 @@ void Boss::Initialize() {
 	shadow_ = std::make_unique<Object3d>();
 	shadow_->Create("Sphere");
 	shadow_->SetTexture("white2x2.png");
-	shadow_->SetColor({ 0.02f,0.02f,0.02f,0.5f });
+	shadow_->SetColor({ 0.02f,0.02f,0.02f,0.0f });
 	shadow_->SetLightEnable(LightMode::kLightNone);
 	shadow_->transform.translate = animModel_->transform.translate;
 	shadow_->transform.translate.y = 0.15f;
@@ -183,7 +187,8 @@ void Boss::Initialize() {
 	};
 	LoadPhase();
 	ChangeBehavior(std::make_unique<BossRoot>(this));
-	animModel_->ChangeAnimation("roaring");
+	InitSummon();
+	animModel_->ChangeAnimation("idle");
 }
 
 void Boss::Update() {
@@ -201,16 +206,18 @@ void Boss::Update() {
 		ShakeHP();
 
 	} else if (isStart_) {
-		startTime_ -= FPSKeeper::DeltaTime();
-		if (startTime_ > 40.0f && startTime_ < 200.0f) {
-			CameraManager::GetInstance()->GetCamera()->IssuanceShake(0.2f, 2.0f);
-			roringWave_.Emit();
-			roringParticle_.Emit();
-			roringring_.Emit();
-		}
-		if (startTime_ < 0.0f) {
-			isStart_ = false;
-			ChangeBehavior(std::make_unique<BossRoot>(this));
+		if (EnergyUpdate()) {
+			startTime_ -= FPSKeeper::DeltaTime();
+			if (startTime_ > 40.0f && startTime_ < 200.0f) {
+				CameraManager::GetInstance()->GetCamera()->IssuanceShake(0.2f, 2.0f);
+				roringWave_.Emit();
+				roringParticle_.Emit();
+				roringring_.Emit();
+			}
+			if (startTime_ < 0.0f) {
+				isStart_ = false;
+				ChangeBehavior(std::make_unique<BossRoot>(this));
+			}
 		}
 	} else if (!isHpActive_) {
 		hpCooltime_ -= FPSKeeper::DeltaTime();
@@ -1000,6 +1007,9 @@ void Boss::SetDefaultBehavior() {
 	for (auto& arrow : arrows_) {
 		arrow->SetIsLive(false);
 	}
+	for (auto& rod : rods_) {
+		rod->SetIsLive(false);
+	}
 	for (auto& ring : undderRings_) {
 		ring->SetIsLive(false);
 	}
@@ -1040,5 +1050,95 @@ void Boss::RadialUpdate() {
 		float t = radialtime_ / baseRadialtime_;
 		radialwidth_ = std::lerp(0.0f, 0.005f, 1.0f - powf(1.0f - t, 3.0f));
 		dxcommon_->GetOffscreenManager()->SetRadialParamsWidth(radialwidth_);
+	}
+}
+
+bool Boss::EnergyUpdate() {
+	ExpandSummon();
+	EnergyTimeUpdate();
+	bool result = false;
+	if (energyCoolTime_ <= 0.0f) {
+		result = true;
+	}
+	return result;
+}
+
+void Boss::InitSummon() {
+	summonIndex_ = ParticleManager::GetInstance()->InitGPUEmitterTexture();
+
+	ParticleManager::GetParticleCSEmitterTexture(summonIndex_).isEmit = true;
+	ParticleManager::GetParticleCSEmitterTexture(summonIndex_).emitter->lifeTime = 50.0f;
+	ParticleManager::GetParticleCSEmitterTexture(summonIndex_).emitter->radius = 0.0f;
+	ParticleManager::GetParticleCSEmitterTexture(summonIndex_).emitter->frequency = 1.0f;
+	ParticleManager::GetParticleCSEmitterTexture(summonIndex_).emitter->translate = animModel_->transform.translate;
+	ParticleManager::GetParticleCSEmitterTexture(summonIndex_).emitter->baseVelocity = { 0.0f,0.01f,0.0f };
+
+	bossYPos_ = animModel_->transform.translate.y;
+	defaultCorePos_ = core_->GetWorldPos();
+	animModel_->transform.translate.y = -30.0f;
+
+	ParticleManager::Load(summonLightning_, "summonLightning_");
+	ParticleManager::Load(energySphere_, "energySphere");
+	ParticleManager::Load(energyParticle_, "energyParticle");
+
+	summonLightning_.grain_.isZandX_ = true;
+	energySphere_.grain_.isZandX_ = true;
+
+	summonLightning_.pos_ = animModel_->transform.translate;
+	summonLightning_.pos_.y = 40.0f;
+	energySphere_.pos_ = animModel_->transform.translate;
+	energySphere_.pos_.y = 0.0f;
+	energyParticle_.pos_ = animModel_->transform.translate;
+	energyParticle_.pos_.y = 0.0f;
+
+	energySphere_.grain_.isAutoUVMove_ = true;
+	energySphere_.grain_.autoUVSpeed_ = { 0.01f,0.01f };
+	energySphere_.para_.autoUVMax = { 0.02f,0.01f };
+	energySphere_.para_.autoUVMin = { -0.02f,-0.01f };
+
+}
+
+void Boss::ExpandSummon() {
+	if (FPSKeeper::DeltaTime() > 1.2f) return;
+	if (summonCircleExpandTime_ > 0.0f) {
+		summonCircleExpandTime_ -= FPSKeeper::DeltaTime();
+		float t = (std::max)(summonCircleExpandTime_ / 50.0f, 0.0f);
+		summonRadius_ = std::lerp(25.0f, 0.0f, t);
+		ParticleManager::GetParticleCSEmitterTexture(summonIndex_).emitter->radius = summonRadius_;
+		energyParticle_.Emit();
+	}
+}
+
+void Boss::EnergyTimeUpdate() {
+	if (summonCircleExpandTime_ > 0.0f) return;
+	if (energyTime_ > 0.0f) {
+		if (energyTime_ >= 115.0f) {
+			energySphere_.Emit();
+		}
+		energyTime_ -= FPSKeeper::DeltaTime();
+		if (energyTime_ >= 60.0f) {
+			float t = (std::max)((energyTime_ - 60.0f) / 60.0f, 0.0f);
+			animModel_->transform.translate.y = std::lerp(bossYPos_, -30.0f, t);
+		}
+		energyParticle_.Emit();
+
+		summonLightning_.particleRotate_.x = Random::GetFloat(-0.15f, 0.15f);
+		summonLightning_.particleRotate_.y = Random::GetFloat(-3.14f, 3.14f);
+		summonLightning_.particleRotate_.z = Random::GetFloat(-0.15f, 0.15f);
+		summonLightning_.Emit();
+	}
+	if (summonCircleExpandTime_ > 0.0f || energyTime_ > 0.0f) return;
+	if (energyCoolTime_ > 0.0f) {
+		energyCoolTime_ -= FPSKeeper::DeltaTime();
+		if (energyCoolTime_ <= 0.0f) {
+			animModel_->transform.translate.y = bossYPos_;
+			animModel_->ChangeAnimation("roaring");
+			ParticleManager::GetParticleCSEmitterTexture(summonIndex_).isEmit = false;
+			shadow_->SetColor({ 0.02f,0.02f,0.02f,0.5f });
+		}
+		summonLightning_.particleRotate_.x = Random::GetFloat(-0.15f, 0.15f);
+		summonLightning_.particleRotate_.y = Random::GetFloat(-3.14f, 3.14f);
+		summonLightning_.particleRotate_.z = Random::GetFloat(-0.15f, 0.15f);
+		summonLightning_.Emit();
 	}
 }

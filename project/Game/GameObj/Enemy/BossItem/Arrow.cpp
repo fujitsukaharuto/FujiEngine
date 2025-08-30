@@ -6,6 +6,10 @@
 Arrow::Arrow() {
 }
 
+Arrow::~Arrow() {
+	ParticleManager::GetParticleCSEmitter(emitterNumber_).isEmit = false;
+}
+
 void Arrow::Initialize() {
 	OriginGameObject::Initialize();
 	OriginGameObject::CreateModel("Boss_Arrow.obj");
@@ -24,18 +28,15 @@ void Arrow::Initialize() {
 	model_->transform.scale = { 5.0f,5.0f,5.0f };
 
 	ParticleManager::Load(spark1_, "lightning");
-	ParticleManager::Load(spark2_, "WaveWallSpark");
+	ParticleManager::Load(spark2_, "lightningSphere");
+	ParticleManager::Load(spark3_, "lightningParticle");
 
 	spark1_.frequencyTime_ = 0.0f;
+	spark1_.grain_.isZandX_ = true;
 
-	spark2_.SetParent(&model_->transform);
+	spark2_.grain_.isZandX_ = true;
 
-	spark2_.pos_.x = -0.4f;
-	spark2_.pos_.z = 1.40f;
-
-	spark2_.emitSizeMax_.x = 0.0f;
-	spark2_.emitSizeMin_.x = -0.75f;
-	spark2_.para_.speedx = { -0.075f,0.0f };
+	spark3_.frequencyTime_ = 0.0f;
 
 }
 
@@ -232,6 +233,13 @@ void Arrow::BrokeTimeUpdate() {
 		brokeTime_ -= FPSKeeper::DeltaTime();
 		if (brokeTime_ <= 0.0f) {
 			isBroke_ = true;
+
+			spark2_.pos_ = model_->transform.translate;
+			spark2_.pos_.y = 0.0f;
+			spark3_.pos_ = model_->transform.translate;
+			spark3_.pos_.y = 0.0f;
+			spark2_.Emit();
+			spark3_.Emit();
 		}
 		if (brokeTime_ <= 5.0f) {
 			if (isLightNing_) {

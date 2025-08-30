@@ -4,7 +4,7 @@
 #include "Engine/DX/DXCom.h"
 
 
-const uint32_t SRVManager::kMaxSRVCount_ = 512;
+const uint32_t SRVManager::kMaxSRVCount_ = 4096;
 
 
 SRVManager::SRVManager() {

@@ -17,7 +17,7 @@ class Player;
 class Boss : public OriginGameObject {
 public:
 	Boss();
-	~Boss() = default;
+	~Boss();
 
 	void Initialize()override;
 	void Update()override;
@@ -82,6 +82,7 @@ public:
 	bool GetIsClear() { return isClear_; }
 	int GetNowHpIndex() { return nowHpIndex_; }
 	float GetChainRate() { return chainRate_; }
+	Vector3 GetDefoultPos() { return defaultCorePos_; }
 
 	void SetPlayer(Player* player) { pPlayer_ = player; }
 	void SetDXCom(DXCom* dxcommon) { dxcommon_ = dxcommon; }
@@ -96,6 +97,11 @@ private:
 	// radial
 	void RadialSetting();
 	void RadialUpdate();
+
+	bool EnergyUpdate();
+	void InitSummon();
+	void ExpandSummon();
+	void EnergyTimeUpdate();
 
 private:
 
@@ -147,6 +153,14 @@ private:
 	bool isStart_ = true;
 	float startTime_ = 300.0f;
 
+	float summonCircleExpandTime_ = 50.0f;
+	float energyTime_ = 120.0f;
+	float energyCoolTime_ = 30.0f;
+	int summonIndex_ = 0;
+	float summonRadius_ = 0.0f;
+	float bossYPos_ = 0.0f;
+	Vector3 defaultCorePos_;
+
 	float attackCooldown_ = 0.0f;
 	float chargeTime_ = 120.0f;
 	float chargeSize_ = 12.0f;
@@ -178,6 +192,11 @@ private:
 	ParticleEmitter roringWave_;
 	ParticleEmitter roringParticle_;
 	ParticleEmitter roringring_;
+
+	ParticleEmitter summonLightning_;;
+	ParticleEmitter energySphere_;
+	ParticleEmitter energyParticle_;
+
 
 
 	// post effect

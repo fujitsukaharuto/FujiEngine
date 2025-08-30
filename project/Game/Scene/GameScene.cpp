@@ -115,7 +115,11 @@ void GameScene::Update() {
 		player_->SetTargetPos(boss_->GetBossCore()->GetCollider()->GetWorldPos());
 		player_->Update();
 
-		followCamera_->Update(boss_->GetBossCore()->GetWorldPos());
+		if (boss_->GetIsStart()) {
+			followCamera_->Update(boss_->GetDefoultPos());
+		} else {
+			followCamera_->Update(boss_->GetBossCore()->GetWorldPos());
+		}
 
 		boss_->Update();
 		if (!boss_->GetIsStart() && player_->GetIsStart()) {

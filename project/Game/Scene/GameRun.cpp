@@ -120,7 +120,12 @@ void GameRun::Initialize() {
 	pManager_->CreateParticleGroup("roringring", "gradationLine.png", 20, ShapeType::RING);
 
 	pManager_->CreateParticleGroup("lightning", "FX12_Lightning_01.png", 20, ShapeType::Lightning);
+	pManager_->CreateParticleGroup("lightningSphere", "white.png", 20, ShapeType::SPHERE);
+	pManager_->CreateParticleGroup("lightningParticle", "redCircle.png", 80);
 
+	pManager_->CreateParticleGroup("summonLightning_", "FX12_Lightning_01.png", 40, ShapeType::Lightning);
+	pManager_->CreateParticleGroup("energySphere", "T_Noise04.jpg", 40, ShapeType::SPHERE);
+	pManager_->CreateParticleGroup("energyParticle", "redCircle.png", 80);
 
 
 	// playerBullet用

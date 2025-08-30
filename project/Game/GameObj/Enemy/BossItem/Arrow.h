@@ -8,7 +8,7 @@
 class Arrow : public OriginGameObject {
 public:
 	Arrow();
-	~Arrow() = default;
+	~Arrow();
 
 	void Initialize()override;
 	void Update()override;
@@ -74,6 +74,7 @@ private:
 	// emitter
 	ParticleEmitter spark1_;
 	ParticleEmitter spark2_;
+	ParticleEmitter spark3_;
 
 	// Gpu Particle
 	int emitterNumber_;

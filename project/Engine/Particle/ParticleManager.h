@@ -202,8 +202,11 @@ public:
 	static uint32_t GetParticleCSEmitterSize();
 
 	static GPUParticleEmitter& GetParticleCSEmitter(int index);
+	static GPUParticleEmitterTexture& GetParticleCSEmitterTexture(int index);
 
 	int InitGPUEmitter();
+
+	int InitGPUEmitterTexture();
 
 private:
 
@@ -221,7 +224,6 @@ private:
 	void UpdateParticleCSDispatch();
 	void EmitterDispatch();
 
-	int InitGPUEmitterTexture();
 	void UpdateGPUEmitterTexture();
 	void EmitterTextureDispatch();
 

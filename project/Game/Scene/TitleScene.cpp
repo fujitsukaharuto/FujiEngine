@@ -84,7 +84,7 @@ void TitleScene::Initialize() {
 
 	cMane_ = std::make_unique<CollisionManager>();
 
-	ParticleManager::Load(emit, "sphere");
+	ParticleManager::Load(emit, "lightning");
 
 }
 
