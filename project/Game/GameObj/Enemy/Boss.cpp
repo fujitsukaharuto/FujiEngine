@@ -520,8 +520,8 @@ void Boss::ReduceBossHP(bool isStrong) {
 		} else {
 			bossHp_--;
 		}
-		switch (nowHpIndex_) {
-		case 4:
+		switch (BossHPState(nowHpIndex_)) {
+		case BossHPState::Max:
 			HPColorSet(40.0f, 10.0f);
 			if (bossHp_ < 40.0f) {
 				bossHp_ = 40.0f;
@@ -538,7 +538,7 @@ void Boss::ReduceBossHP(bool isStrong) {
 				return;
 			}
 			break;
-		case 3:
+		case BossHPState::High:
 			HPColorSet(30.0f, 10.0f);
 			if (bossHp_ < 30.0f) {
 				bossHp_ = 30.0f;
@@ -556,7 +556,7 @@ void Boss::ReduceBossHP(bool isStrong) {
 				return;
 			}
 			break;
-		case 2:
+		case BossHPState::Half:
 			HPColorSet(20.0f, 10.0f);
 			if (bossHp_ < 20.0f) {
 				bossHp_ = 20.0f;
@@ -573,7 +573,7 @@ void Boss::ReduceBossHP(bool isStrong) {
 				return;
 			}
 			break;
-		case 1:
+		case BossHPState::Low:
 			HPColorSet(15.0f, 5.0f);
 			if (bossHp_ < 15.0f) {
 				bossHp_ = 15.0f;
@@ -590,7 +590,7 @@ void Boss::ReduceBossHP(bool isStrong) {
 				return;
 			}
 			break;
-		case 0:
+		case BossHPState::Empty:
 			HPColorSet(0.0f, 15.0f);
 			break;
 		default:

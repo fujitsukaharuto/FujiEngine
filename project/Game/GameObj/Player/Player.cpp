@@ -259,7 +259,7 @@ void Player::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 				avoidEmitter03_->Emit();
 			} else {
 				dxcommon_->GetOffscreenManager()->AddPostEffect(PostEffectList::Vignette);
-				playerHP_ -= 5.0f;
+				playerHP_ -= 10.0f;
 				isDamage_ = true;
 				damageCoolTime_ = 60.0f;
 				if (playerHP_ <= 0.0f) {
@@ -286,7 +286,7 @@ void Player::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 						avoidEmitter03_->Emit();
 					} else {
 						dxcommon_->GetOffscreenManager()->AddPostEffect(PostEffectList::Vignette);
-						playerHP_ -= 5.0f;
+						playerHP_ -= 10.0f;
 						isDamage_ = true;
 						damageCoolTime_ = 60.0f;
 						if (playerHP_ <= 0.0f) {
@@ -308,7 +308,7 @@ void Player::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
 	if (other.tag == "enemyAttack") {
 		if (!isDamage_ && !isNowAvoid_) {
 			dxcommon_->GetOffscreenManager()->AddPostEffect(PostEffectList::Vignette);
-			playerHP_ -= 5.0f;
+			playerHP_ -= 10.0f;
 			isDamage_ = true;
 			damageCoolTime_ = 60.0f;
 			if (playerHP_ <= 0.0f) {
@@ -335,7 +335,7 @@ void Player::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
 						}
 					} else {
 						dxcommon_->GetOffscreenManager()->AddPostEffect(PostEffectList::Vignette);
-						playerHP_ -= 5.0f;
+						playerHP_ -= 10.0f;
 						isDamage_ = true;
 						isCanStrongState_ = false;
 						damageCoolTime_ = 60.0f;

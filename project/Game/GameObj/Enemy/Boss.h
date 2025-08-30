@@ -14,6 +14,14 @@
 
 class Player;
 
+enum class BossHPState {
+	Max = 4,
+	High = 3,
+	Half = 2,
+	Low = 1,
+	Empty = 0
+};
+
 class Boss : public OriginGameObject {
 public:
 	Boss();
