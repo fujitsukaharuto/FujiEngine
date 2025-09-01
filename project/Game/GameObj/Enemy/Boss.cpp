@@ -1099,7 +1099,7 @@ void Boss::InitSummon() {
 }
 
 void Boss::ExpandSummon() {
-	if (FPSKeeper::DeltaTime() > 1.2f) return;
+	if (FPSKeeper::DeltaTime() > 2.2f) return;
 	if (summonCircleExpandTime_ > 0.0f) {
 		summonCircleExpandTime_ -= FPSKeeper::DeltaTime();
 		float t = (std::max)(summonCircleExpandTime_ / 50.0f, 0.0f);

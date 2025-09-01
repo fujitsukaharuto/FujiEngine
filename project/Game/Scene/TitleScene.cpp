@@ -102,7 +102,7 @@ void TitleScene::Update() {
 	skybox_->Update();
 
 
-	if (FPSKeeper::DeltaTime() < 1.2f) {
+	if (FPSKeeper::DeltaTime() < 2.2f) {
 		startTime_ -= FPSKeeper::DeltaTime();
 	}
 	if (startTime_ <= titleCanMoveTime_) {
