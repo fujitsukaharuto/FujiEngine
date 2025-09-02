@@ -409,42 +409,55 @@ void ParticleEmitter::Save() {
 	j.push_back(json::array({ para_.colorMin.x,para_.colorMin.y,para_.colorMin.z,para_.colorMin.w }));
 	j.push_back(json::array({ para_.colorMax.x,para_.colorMax.y,para_.colorMax.z,para_.colorMax.w }));
 
-	/*j["position"]         = { pos_.x, pos_.y, pos_.z };
-	j["rotate"]           = { particleRotate_.x,particleRotate_.y,particleRotate_.z };
-	j["emitMaxSize"]      = { emitSizeMax_.x,emitSizeMax_.y,emitSizeMax_.z };
-	j["emitMinSize"]      = { emitSizeMin_.x,emitSizeMin_.y,emitSizeMin_.z };
+	/*j["position"]             = {pos_.x, pos_.y, pos_.z};
+	j["rotate"]               = { particleRotate_.x,particleRotate_.y,particleRotate_.z };
+	j["emitMaxSize"]          = { emitSizeMax_.x,emitSizeMax_.y,emitSizeMax_.z };
+	j["emitMinSize"]          = { emitSizeMin_.x,emitSizeMin_.y,emitSizeMin_.z };
 
-	j["count"]            = count_;
-	j["frequencyTime"]    = frequencyTime_;
+	j["count"]                = count_;
+	j["frequencyTime"]        = frequencyTime_;
 
-	j["lifeTime"]         = (grain_.lifeTime_);
-	j["accele"]           = { grain_.accele_.x,grain_.accele_.y,grain_.accele_.z };
-	j["speed"]            = { grain_.speed_.x,grain_.speed_.y,grain_.speed_.z };
+	j["lifeTime"]             = (grain_.lifeTime_);
+	j["accele"]               = { grain_.accele_.x,grain_.accele_.y,grain_.accele_.z };
+	j["speed"]                = { grain_.speed_.x,grain_.speed_.y,grain_.speed_.z };
 
-	j["grainType"]        = (grain_.type_);
-	j["speedType"]        = (grain_.speedType_);
-	j["rotateType"]       = (grain_.rotateType_);
-	j["colorType"]        = (grain_.colorType_);
+	j["grainType"]            = (grain_.type_);
+	j["speedType"]            = (grain_.speedType_);
+	j["rotateType"]           = (grain_.rotateType_);
+	j["colorType"]            = (grain_.colorType_);
 
-	j["returnPower"]      = (grain_.returnPower_);
+	j["returnPower"]          = (grain_.returnPower_);
 
-	j["startSize"]        = { grain_.startSize_.x,grain_.startSize_.y };
-	j["endSize"]          = { grain_.endSize_.x,grain_.endSize_.y };
+	j["startSize"]            = { grain_.startSize_.x,grain_.startSize_.y };
+	j["endSize"]              = { grain_.endSize_.x,grain_.endSize_.y };
 
-	j["isBillBoard"]      = (grain_.isBillBoard_);
+	j["isBillBoard"]          = (grain_.isBillBoard_);
 
-	j["grainPattern"]     = (static_cast<int>(grain_.pattern_));
+	j["grainPattern"]         = (static_cast<int>(grain_.pattern_));
 
-	j["Para_speedx"]      = { para_.speedx.x,para_.speedx.y };
-	j["Para_speedy"]      = { para_.speedy.x,para_.speedy.y };
-	j["Para_speedz"]      = { para_.speedz.x,para_.speedz.y };
+	j["isZandX"]              = (grain_.isZandX_);
+	j["isAutoUVMove"]         = (grain_.isAutoUVMove_);
+	j["autoUVSpeed"]          = { autoUVSpeed_.x, autoUVSpeed.y };
 
-	j["Para_transx"]      = { para_.transx.x,para_.transx.y };
-	j["Para_transy"]      = { para_.transy.x,para_.transy.y };
-	j["Para_transz"]      = { para_.transz.x,para_.transz.y };
+	j["Para_speedx"]          = { para_.speedx.x,para_.speedx.y };
+	j["Para_speedy"]          = { para_.speedy.x,para_.speedy.y };
+	j["Para_speedz"]          = { para_.speedz.x,para_.speedz.y };
 
-	j["Para_colorMin"]    = { para_.colorMin.x,para_.colorMin.y,para_.colorMin.z,para_.colorMin.w };
-	j["Para_colorMax"]    = { para_.colorMax.x,para_.colorMax.y,para_.colorMax.z,para_.colorMax.w };*/
+	j["Para_transx"]          = { para_.transx.x,para_.transx.y };
+	j["Para_transy"]          = { para_.transy.x,para_.transy.y };
+	j["Para_transz"]          = { para_.transz.x,para_.transz.y };
+
+	j["Para_colorMin"]        = { para_.colorMin.x,para_.colorMin.y,para_.colorMin.z,para_.colorMin.w };
+	j["Para_colorMax"]        = { para_.colorMax.x,para_.colorMax.y,para_.colorMax.z,para_.colorMax.w };
+	
+	j["Para_autoUVMax"]       = { para_.autoUVMax.x, para_.autoUVMax.y };
+	j["Para_autoUVMin"]       = { para_.autoUVMin.x, para_.autoUVMin.y };
+	
+	j["addRandomMax"]         = { addRandomMax_.x, addRandomMax_.y };
+	j["addRandomMin"]         = { addRandomMin_.x, addRandomMin_.y };
+	j["isAddRandomSize"]      = (isAddRandomSize_);
+
+	j["isDistanceComplement"] = (isDistanceComplement_);*/
 
 	std::ofstream file(kDirectoryPath_ + name_ + ".json");
 	if (file.is_open()) {

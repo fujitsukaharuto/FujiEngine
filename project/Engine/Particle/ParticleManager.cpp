@@ -398,7 +398,6 @@ void ParticleManager::CreateParentParticleGroup(const std::string& name, const s
 
 void ParticleManager::CreateAnimeGroup(const std::string& name, const std::string& fileName) {
 	ParticleManager* instance = GetInstance();
-
 	auto iterator = instance->animeGroups_.find(name);
 	if (iterator != instance->animeGroups_.end()) {
 		return;
@@ -1138,7 +1137,6 @@ void ParticleManager::InitCylinderVertex() {
 		// 上
 		Vector3 posTop = { cosA * kTopRadius, kHeight, sinA * kTopRadius };
 		cylinderVertex_.push_back({ {posTop.x, posTop.y, posTop.z, 1.0f}, {u, 0.0f}, normal });
-
 	}
 
 	// インデックス生成
