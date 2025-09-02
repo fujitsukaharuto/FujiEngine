@@ -188,11 +188,9 @@ public:
 	static void CreateAnimeGroup(const std::string& name, const std::string& fileName);
 
 	static void Load(ParticleEmitter& emit, const std::string& name);
-
 	static void LoadParentGroup(ParticleEmitter*& emit, const std::string& name);
 
 	static void Emit(const std::string& name, const Vector3& pos, const Vector3& rotate, const Particle& grain, const RandomParametor& para, uint32_t count);
-
 	static void ParentEmit(const std::string& name, const Vector3& pos, const Vector3& rotate, const Particle& grain, const RandomParametor& para, uint32_t count);
 
 	static void EmitAnime(const std::string& name, const Vector3& pos, const AnimeData& data, const RandomParametor& para, uint32_t count);
@@ -200,15 +198,22 @@ public:
 	static void AddAnime(const std::string& name, const std::string& fileName, float animeChangeTime);
 
 	static uint32_t GetParticleCSEmitterSize();
-
 	static GPUParticleEmitter& GetParticleCSEmitter(int index);
 	static GPUParticleEmitterTexture& GetParticleCSEmitterTexture(int index);
 
 	int InitGPUEmitter();
-
 	int InitGPUEmitterTexture();
 
 private:
+
+	void UpdateParticleGroup(const Matrix4x4& billboardMatrix);
+	void UpdateParentParticleGroup(const Matrix4x4& billboardMatrix);
+	void UpdateAnimeGroup(const Matrix4x4& billboardMatrix);
+
+	void DrawParticleGroup();
+	void DrawParentParticleGroup();
+	void ShapeTypeCommand(const ShapeType& type);
+	void ShapeTypeDrawCommand(const ShapeType& type, uint32_t count);
 
 	void InitPlaneVertex();
 	void InitRingVertex();
@@ -243,6 +248,8 @@ private:
 	std::unordered_map<std::string, std::unique_ptr<ParentParticleGroup>> parentParticleGroups_;
 	std::unordered_map<std::string, std::unique_ptr<AnimeGroup>> animeGroups_;
 
+
+	// VertexData
 	ComPtr<ID3D12Resource> vBuffer_;
 	ComPtr<ID3D12Resource> iBuffer_;
 	D3D12_VERTEX_BUFFER_VIEW vbView{};
@@ -267,7 +274,6 @@ private:
 	std::vector<VertexDate> sphereVertex_;
 	std::vector<uint32_t> sphereIndex_;
 
-
 	ComPtr<ID3D12Resource> cylinderVBuffer_;
 	ComPtr<ID3D12Resource> cylinderIBuffer_;
 	D3D12_VERTEX_BUFFER_VIEW cylinderVbView{};
@@ -278,7 +284,8 @@ private:
 
 	std::unique_ptr<Object3d> lightning_;
 
-	//ParticleCS
+
+	// ParticleCS
 	ComPtr<ID3D12Resource> particleCSInstancing_;
 	uint32_t particleCSInsstanceCount_;
 	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> particleCSSRVHandle_;
@@ -295,15 +302,13 @@ private:
 	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> freeListIndexUAVHandle_;
 	ComPtr<ID3D12Resource> freeListResource_;
 	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> freeListUAVHandle_;
+
 	int csEmitterIndex_ = 0;
 	int csEmitterTexIndex_ = 0;
 
 	uint32_t numParticles = 1048576;
 	uint32_t threadsPerGroup = 1024;
 	int threadGroupSize_ = 1024;
-
-
-	bool isBillBoard_ = true;
 
 #ifdef _DEBUG
 	ParticleGroup* selectParticleGroup_ = nullptr;
