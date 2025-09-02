@@ -194,8 +194,9 @@ public:
 	static void ParentEmit(const std::string& name, const Vector3& pos, const Vector3& rotate, const Particle& grain, const RandomParametor& para, uint32_t count);
 
 	static void EmitAnime(const std::string& name, const Vector3& pos, const AnimeData& data, const RandomParametor& para, uint32_t count);
-
 	static void AddAnime(const std::string& name, const std::string& fileName, float animeChangeTime);
+
+	static void ParentReset();
 
 	static uint32_t GetParticleCSEmitterSize();
 	static GPUParticleEmitter& GetParticleCSEmitter(int index);

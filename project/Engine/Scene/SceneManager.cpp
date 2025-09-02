@@ -8,6 +8,7 @@
 #include "Game/Scene/ResultScene.h"
 #include "ImGuiManager.h"
 #include "Engine/Model/ModelManager.h"
+#include "Engine/Particle/ParticleManager.h"
 
 
 SceneManager::SceneManager() {
@@ -90,7 +91,7 @@ void SceneManager::ParticleGroupDebugGUI() {
 void SceneManager::SceneSet() {
 	if (nextScene_) {
 		if (scene_) {
-
+			ParticleManager::ParentReset();
 			delete scene_;
 		}
 

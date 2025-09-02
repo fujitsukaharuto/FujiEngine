@@ -586,6 +586,16 @@ void ParticleManager::AddAnime(const std::string& name, const std::string& fileN
 	}
 }
 
+void ParticleManager::ParentReset() {
+	ParticleManager* instance = GetInstance();
+	for (auto& groupPair : instance->parentParticleGroups_) {
+		ParentParticleGroup* group = groupPair.second.get();
+		if (group->emitter_->HaveParent()) {
+			group->emitter_->SetParent(nullptr);
+		}
+	}
+}
+
 uint32_t ParticleManager::GetParticleCSEmitterSize() {
 	ParticleManager* instance = GetInstance();
 	return uint32_t(instance->csEmitters_.size());
