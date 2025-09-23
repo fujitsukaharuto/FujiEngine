@@ -1,6 +1,6 @@
 #pragma once
 #include <cmath>
-
+#include "Vector3.h"
 
 class Vector4 {
 public:
@@ -24,4 +24,7 @@ public:
 		return *this;
 	}
 
+	Vector3 xyz() const {
+		return Vector3(x, y, z);
+	}
 };

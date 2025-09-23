@@ -1,5 +1,5 @@
-﻿<?xml version="1.0" encoding="Shift-JIS"?>
-<!--あい-->
+<?xml version="1.0" encoding="us-ascii"?>
+<!--??-->
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
@@ -134,6 +134,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\GraphicPipeline\CSPipe\BoxFilterCSPipe.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\CSPipe\CRTCSPipe.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\CSPipe\EmitterParticleCSPipe.cpp" />
+    <ClCompile Include="Engine\GraphicPipeline\CSPipe\EmitterSurfaceParticleCSPipe.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\CSPipe\EmitterTexParticleCSPipe.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\CSPipe\GaussCSPipe.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\CSPipe\GrayCSPipe.cpp" />
@@ -253,6 +254,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\GraphicPipeline\CSPipe\BoxFilterCSPipe.h" />
     <ClInclude Include="Engine\GraphicPipeline\CSPipe\CRTCSPipe.h" />
     <ClInclude Include="Engine\GraphicPipeline\CSPipe\EmitterParticleCSPipe.h" />
+    <ClInclude Include="Engine\GraphicPipeline\CSPipe\EmitterSurfaceParticleCSPipe.h" />
     <ClInclude Include="Engine\GraphicPipeline\CSPipe\EmitterTexParticleCSPipe.h" />
     <ClInclude Include="Engine\GraphicPipeline\CSPipe\GaussCSPipe.h" />
     <ClInclude Include="Engine\GraphicPipeline\CSPipe\GrayCSPipe.h" />
@@ -420,6 +422,14 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.0</ShaderModel>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\CS\Engine\EmitSurfaceParticle.CS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.0</ShaderModel>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="resource\Shaders\CS\Engine\EmitTexParticle.CS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>

@@ -29,6 +29,7 @@
 #include "CSPipe/InitParticleCSPipe.h"
 #include "CSPipe/EmitterParticleCSPipe.h"
 #include "CSPipe/EmitterTexParticleCSPipe.h"
+#include "CSPipe/EmitterSurfaceParticleCSPipe.h"
 #include "CSPipe/UpdateParticleCSPipe.h"
 
 
@@ -88,6 +89,7 @@ void PipelineManager::CreatePipeline() {
 	std::unique_ptr<InitParticleCSPipe> initParticleCS = nullptr;
 	std::unique_ptr<EmitterParticleCSPipe> emitParticleCS = nullptr;
 	std::unique_ptr<EmitterTexParticleCSPipe> emitTexParticleCS = nullptr;
+	std::unique_ptr<EmitterSurfaceParticleCSPipe> emitSurfaceParticleCS = nullptr;
 	std::unique_ptr<UpdateParticleCSPipe> updateParticleCS = nullptr;
 
 
@@ -223,6 +225,10 @@ void PipelineManager::CreatePipeline() {
 	emitTexParticleCS.reset(new EmitterTexParticleCSPipe);
 	emitTexParticleCS->Initialize(dxcommon_);
 	pipelines_.push_back(std::move(emitTexParticleCS));
+
+	emitSurfaceParticleCS.reset(new EmitterSurfaceParticleCSPipe);
+	emitSurfaceParticleCS->Initialize(dxcommon_);
+	pipelines_.push_back(std::move(emitSurfaceParticleCS));
 
 	updateParticleCS.reset(new UpdateParticleCSPipe);
 	updateParticleCS->Initialize(dxcommon_);

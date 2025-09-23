@@ -344,6 +344,9 @@
     <ClCompile Include="Game\GameObj\Enemy\Behavior\BossRodFall.cpp">
       <Filter>Game\GameObj\Enemy\Behavior</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\GraphicPipeline\CSPipe\EmitterSurfaceParticleCSPipe.cpp">
+      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -745,6 +748,9 @@
     <ClInclude Include="Game\GameObj\Enemy\Behavior\BossRodFall.h">
       <Filter>Game\GameObj\Enemy\Behavior</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\GraphicPipeline\CSPipe\EmitterSurfaceParticleCSPipe.h">
+      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -993,6 +999,9 @@
       <Filter>resource\Shaders\CS</Filter>
     </FxCompile>
     <FxCompile Include="resource\Shaders\CS\Engine\EmitTexParticle.CS.hlsl">
+      <Filter>resource\Shaders\CS\Engine</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\CS\Engine\EmitSurfaceParticle.CS.hlsl">
       <Filter>resource\Shaders\CS\Engine</Filter>
     </FxCompile>
   </ItemGroup>

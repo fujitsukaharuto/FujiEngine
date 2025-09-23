@@ -53,6 +53,7 @@ void GameRun::Initialize() {
 	modelManager_->LoadOBJ("Star.obj");
 	modelManager_->LoadOBJ("player.obj");
 	modelManager_->LoadOBJ("Boss_Arrow.obj");
+	modelManager_->LoadOBJ("DeadTree_2.obj");
 	modelManager_->LoadGLTF("T_boss.gltf");
 #pragma endregion
 
@@ -301,6 +302,7 @@ void GameRun::DebugGUI() {
 	}
 	ParticleManager::GetInstance()->ParticleCSDebugGUI();
 	ParticleManager::GetInstance()->ParticleTexCSDebugGUI();
+	ParticleManager::GetInstance()->ParticleSurfaceCSDebugGUI();
 	ImGui::Text("%d", modelManager_->GetPickedID());
 	ImGui::Text("%d,%d", modelManager_->GetPickedCoord(0), modelManager_->GetPickedCoord(1));
 	ImGui::End();

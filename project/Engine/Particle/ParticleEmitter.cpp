@@ -372,7 +372,7 @@ void ParticleEmitter::RandomTranslate(const Vector2& x, const Vector2& y, const 
 void ParticleEmitter::Save() {
 	json j;
 
-	j.push_back(json::array({ pos_.x, pos_.y, pos_.z }));
+	/*j.push_back(json::array({ pos_.x, pos_.y, pos_.z }));
 	j.push_back(json::array({ particleRotate_.x,particleRotate_.y,particleRotate_.z }));
 	j.push_back(json::array({ emitSizeMax_.x,emitSizeMax_.y,emitSizeMax_.z }));
 	j.push_back(json::array({ emitSizeMin_.x,emitSizeMin_.y,emitSizeMin_.z }));
@@ -407,9 +407,9 @@ void ParticleEmitter::Save() {
 	j.push_back(json::array({ para_.transz.x,para_.transz.y }));
 
 	j.push_back(json::array({ para_.colorMin.x,para_.colorMin.y,para_.colorMin.z,para_.colorMin.w }));
-	j.push_back(json::array({ para_.colorMax.x,para_.colorMax.y,para_.colorMax.z,para_.colorMax.w }));
+	j.push_back(json::array({ para_.colorMax.x,para_.colorMax.y,para_.colorMax.z,para_.colorMax.w }));*/
 
-	/*j["position"]             = {pos_.x, pos_.y, pos_.z};
+	j["position"]             = { pos_.x, pos_.y, pos_.z };
 	j["rotate"]               = { particleRotate_.x,particleRotate_.y,particleRotate_.z };
 	j["emitMaxSize"]          = { emitSizeMax_.x,emitSizeMax_.y,emitSizeMax_.z };
 	j["emitMinSize"]          = { emitSizeMin_.x,emitSizeMin_.y,emitSizeMin_.z };
@@ -437,7 +437,7 @@ void ParticleEmitter::Save() {
 
 	j["isZandX"]              = (grain_.isZandX_);
 	j["isAutoUVMove"]         = (grain_.isAutoUVMove_);
-	j["autoUVSpeed"]          = { autoUVSpeed_.x, autoUVSpeed.y };
+	j["autoUVSpeed"]          = { grain_.autoUVSpeed_.x, grain_.autoUVSpeed_.y };
 
 	j["Para_speedx"]          = { para_.speedx.x,para_.speedx.y };
 	j["Para_speedy"]          = { para_.speedy.x,para_.speedy.y };
@@ -452,12 +452,12 @@ void ParticleEmitter::Save() {
 	
 	j["Para_autoUVMax"]       = { para_.autoUVMax.x, para_.autoUVMax.y };
 	j["Para_autoUVMin"]       = { para_.autoUVMin.x, para_.autoUVMin.y };
-	
+
 	j["addRandomMax"]         = { addRandomMax_.x, addRandomMax_.y };
 	j["addRandomMin"]         = { addRandomMin_.x, addRandomMin_.y };
 	j["isAddRandomSize"]      = (isAddRandomSize_);
 
-	j["isDistanceComplement"] = (isDistanceComplement_);*/
+	j["isDistanceComplement"] = (isDistanceComplement_);
 
 	std::ofstream file(kDirectoryPath_ + name_ + ".json");
 	if (file.is_open()) {
@@ -476,71 +476,96 @@ void ParticleEmitter::Load(const std::string& filename) {
 	file >> j;
 	file.close();
 
-	// データをロードしてメンバーに復元
-	int index = 0;
-	pos_ = Vector3(j[index][0], j[index][1], j[index][2]);
-	index++;
-	particleRotate_ = Vector3(j[index][0], j[index][1], j[index][2]);
-	index++;
+	if (j.is_object()) {
+		if (j.contains("position"))             pos_ = Vector3(j["position"][0], j["position"][1], j["position"][2]);
+		if (j.contains("rotate"))               particleRotate_ = Vector3(j["rotate"][0], j["rotate"][1], j["rotate"][2]);
+		if (j.contains("emitMaxSize"))          emitSizeMax_ = Vector3(j["emitMaxSize"][0], j["emitMaxSize"][1], j["emitMaxSize"][2]);
+		if (j.contains("emitMinSize"))          emitSizeMin_ = Vector3(j["emitMinSize"][0], j["emitMinSize"][1], j["emitMinSize"][2]);
 
-	emitSizeMax_ = Vector3(j[index][0], j[index][1], j[index][2]);
-	index++;
-	emitSizeMin_ = Vector3(j[index][0], j[index][1], j[index][2]);
-	index++;
+		if (j.contains("count"))                count_ = j["count"].get<int>();
+		if (j.contains("frequencyTime"))        frequencyTime_ = j["frequencyTime"].get<float>();
 
-	count_ = j[index].get<int>();
-	index++;
-	frequencyTime_ = j[index].get<float>();
-	index++;
-	grain_.lifeTime_ = j[index].get<float>();
-	index++;
+		if (j.contains("lifeTime"))             grain_.lifeTime_ = j["lifeTime"].get<float>();
+		if (j.contains("accele"))               grain_.accele_ = Vector3(j["accele"][0], j["accele"][1], j["accele"][2]);
+		if (j.contains("speed"))                grain_.speed_ = Vector3(j["speed"][0], j["speed"][1], j["speed"][2]);
 
-	grain_.accele_ = Vector3(j[index][0], j[index][1], j[index][2]);
-	index++;
-	grain_.speed_ = Vector3(j[index][0], j[index][1], j[index][2]);
-	index++;
+		if (j.contains("grainType"))            grain_.type_ = j["grainType"].get<int>();
+		if (j.contains("speedType"))            grain_.speedType_ = j["speedType"].get<int>();
+		if (j.contains("rotateType"))           grain_.rotateType_ = j["rotateType"].get<int>();
+		if (j.contains("colorType"))            grain_.colorType_ = j["colorType"].get<int>();
 
-	grain_.type_ = j[index].get<int>();
-	index++;
-	grain_.speedType_ = j[index].get<int>();
-	index++;
-	grain_.rotateType_ = j[index].get<int>();
-	index++;
-	grain_.colorType_ = j[index].get<int>();
-	index++;
+		if (j.contains("returnPower"))          grain_.returnPower_ = j["returnPower"].get<float>();
 
-	grain_.returnPower_ = j[index].get<float>();
-	index++;
+		if (j.contains("startSize"))            grain_.startSize_ = Vector2(j["startSize"][0], j["startSize"][1]);
+		if (j.contains("endSize"))              grain_.endSize_ = Vector2(j["endSize"][0], j["endSize"][1]);
 
-	grain_.startSize_ = Vector2(j[index][0], j[index][1]);
-	index++;
-	grain_.endSize_ = Vector2(j[index][0], j[index][1]);
-	index++;
+		if (j.contains("isBillBoard"))          grain_.isBillBoard_ = j["isBillBoard"].get<bool>();
 
-	grain_.isBillBoard_ = j[index].get<bool>();
-	index++;
+		if (j.contains("grainPattern"))         grain_.pattern_ = static_cast<BillBoardPattern>(j["grainPattern"].get<int>());
 
-	grain_.pattern_ = static_cast<BillBoardPattern>(j[index].get<int>());
-	index++;
+		if (j.contains("isZandX"))              grain_.isZandX_ = j["isZandX"].get<bool>();
+		if (j.contains("isAutoUVMove"))         grain_.isAutoUVMove_ = j["isAutoUVMove"].get<bool>();
+		if (j.contains("autoUVSpeed"))          grain_.autoUVSpeed_ = Vector2(j["autoUVSpeed"][0], j["autoUVSpeed"][1]);
 
-	para_.speedx = Vector2(j[index][0], j[index][1]);
-	index++;
-	para_.speedy = Vector2(j[index][0], j[index][1]);
-	index++;
-	para_.speedz = Vector2(j[index][0], j[index][1]);
-	index++;
+		if (j.contains("Para_speedx"))          para_.speedx = Vector2(j["Para_speedx"][0], j["Para_speedx"][1]);
+		if (j.contains("Para_speedy"))          para_.speedy = Vector2(j["Para_speedy"][0], j["Para_speedy"][1]);
+		if (j.contains("Para_speedz"))          para_.speedz = Vector2(j["Para_speedz"][0], j["Para_speedz"][1]);
 
-	para_.transx = Vector2(j[index][0], j[index][1]);
-	index++;
-	para_.transy = Vector2(j[index][0], j[index][1]);
-	index++;
-	para_.transz = Vector2(j[index][0], j[index][1]);
-	index++;
+		if (j.contains("Para_transx"))          para_.transx = Vector2(j["Para_transx"][0], j["Para_transx"][1]);
+		if (j.contains("Para_transy"))          para_.transy = Vector2(j["Para_transy"][0], j["Para_transy"][1]);
+		if (j.contains("Para_transz"))          para_.transz = Vector2(j["Para_transz"][0], j["Para_transz"][1]);
 
-	para_.colorMin = Vector4(j[index][0], j[index][1], j[index][2], j[index][3]);
-	index++;
-	para_.colorMax = Vector4(j[index][0], j[index][1], j[index][2], j[index][3]);
-	index++;
+		if (j.contains("Para_colorMin"))        para_.colorMin = Vector4(j["Para_colorMin"][0], j["Para_colorMin"][1], j["Para_colorMin"][2], j["Para_colorMin"][3]);
+		if (j.contains("Para_colorMax"))        para_.colorMax = Vector4(j["Para_colorMax"][0], j["Para_colorMax"][1], j["Para_colorMax"][2], j["Para_colorMax"][3]);
+
+		if (j.contains("Para_autoUVMax"))       para_.autoUVMax = Vector2(j["Para_autoUVMax"][0], j["Para_autoUVMax"][1]);
+		if (j.contains("Para_autoUVMin"))       para_.autoUVMin = Vector2(j["Para_autoUVMin"][0], j["Para_autoUVMin"][1]);
+
+		if (j.contains("addRandomMax"))         addRandomMax_ = Vector2(j["addRandomMax"][0], j["addRandomMax"][1]);
+		if (j.contains("addRandomMin"))         addRandomMin_ = Vector2(j["addRandomMin"][0], j["addRandomMin"][1]);
+		if (j.contains("isAddRandomSize"))      isAddRandomSize_ = j["isAddRandomSize"].get<bool>();
+
+		if (j.contains("isDistanceComplement")) isDistanceComplement_ = j["isDistanceComplement"].get<bool>();
+	} else if (j.is_array()) {
+		int index = 0;
+		pos_ =                Vector3(j[index][0], j[index][1], j[index][2]); index++;
+		particleRotate_ =     Vector3(j[index][0], j[index][1], j[index][2]); index++;
+
+		emitSizeMax_ =        Vector3(j[index][0], j[index][1], j[index][2]); index++;
+		emitSizeMin_ =        Vector3(j[index][0], j[index][1], j[index][2]); index++;
+
+		count_ =              j[index].get<int>(); index++;
+		frequencyTime_ =      j[index].get<float>(); index++;
+		grain_.lifeTime_ =    j[index].get<float>(); index++;
+
+		grain_.accele_ =      Vector3(j[index][0], j[index][1], j[index][2]); index++;
+		grain_.speed_ =       Vector3(j[index][0], j[index][1], j[index][2]); index++;
+
+		grain_.type_ =        j[index].get<int>(); index++;
+		grain_.speedType_ =   j[index].get<int>(); index++;
+		grain_.rotateType_ =  j[index].get<int>(); index++;
+		grain_.colorType_ =   j[index].get<int>(); index++;
+
+		grain_.returnPower_ = j[index].get<float>(); index++;
+
+		grain_.startSize_ =   Vector2(j[index][0], j[index][1]); index++;
+		grain_.endSize_ =     Vector2(j[index][0], j[index][1]); index++;
+
+		grain_.isBillBoard_ = j[index].get<bool>(); index++;
+
+		grain_.pattern_ =     static_cast<BillBoardPattern>(j[index].get<int>()); index++;
+
+		para_.speedx =        Vector2(j[index][0], j[index][1]); index++;
+		para_.speedy =        Vector2(j[index][0], j[index][1]); index++;
+		para_.speedz =        Vector2(j[index][0], j[index][1]); index++;
+
+		para_.transx =        Vector2(j[index][0], j[index][1]); index++;
+		para_.transy =        Vector2(j[index][0], j[index][1]); index++;
+		para_.transz =        Vector2(j[index][0], j[index][1]); index++;
+
+		para_.colorMin =      Vector4(j[index][0], j[index][1], j[index][2], j[index][3]); index++;
+		para_.colorMax =      Vector4(j[index][0], j[index][1], j[index][2], j[index][3]); index++;
+	}
 }
 
 Vector3 ParticleEmitter::GetWorldPos() {

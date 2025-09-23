@@ -5,6 +5,7 @@
 #include "Particle.h"
 #include "Math/Random/Random.h"
 #include "Engine/DX/FPSKeeper.h"
+#include "Engine/Model/ModelManager.h"
 #include "ImGuiManager/ImGuiManager.h"
 
 
@@ -31,7 +32,8 @@ void ParticleManager::Initialize(DXCom* pDxcom, SRVManager* srvManager) {
 	InitLighningVertex();
 	InitParticleCS();
 	InitGPUEmitter();
-	//InitGPUEmitter();
+	InitGPUEmitterSurface();
+	InitGPUEmitter();
 	//InitGPUEmitterTexture();
 }
 
@@ -86,6 +88,7 @@ void ParticleManager::Finalize() {
 
 	csEmitters_.clear();
 	csEmitterTexs_.clear();
+	csEmitterSurfces_.clear();
 }
 
 void ParticleManager::Update() {
@@ -109,6 +112,7 @@ void ParticleManager::Update() {
 	UpdatePerViewData(billboardMatrix);
 	UpdateGPUEmitter();
 	UpdateGPUEmitterTexture();
+	UpdateGPUEmitterSurface();
 
 	UpdateParticleGroup(billboardMatrix);
 	UpdateParentParticleGroup(billboardMatrix);
@@ -117,6 +121,8 @@ void ParticleManager::Update() {
 
 void ParticleManager::Draw() {
 	EmitterTextureDispatch();
+	dxcommon_->InsertUAVBarrier(particleCSInstancing_.Get());
+	EmitterSurfaceDispatch();
 	dxcommon_->InsertUAVBarrier(particleCSInstancing_.Get());
 	EmitterDispatch();
 	dxcommon_->InsertUAVBarrier(particleCSInstancing_.Get());
@@ -230,31 +236,34 @@ void ParticleManager::ParticleCSDebugGUI() {
 #ifdef _DEBUG
 	if (csEmitters_.size() == 0) return;
 	if (ImGui::CollapsingHeader("GPU Particle Emitter")) {
+		ImGui::DragInt("emitIndex", &editCSEmitInd_, 1.0f, 0, int(csEmitters_.size() - 1));
+		int idx = std::min(editCSEmitInd_, static_cast<int>(csEmitters_.size()) - 1);
+		editCSEmitInd_ = idx;
 		if (ImGui::TreeNode("ParticleCS Emit Control")) {
 
-			ImGui::Checkbox("isEmit", &csEmitters_[0].isEmit);
+			ImGui::Checkbox("isEmit", &csEmitters_[idx].isEmit);
 
-			int dragCount = int(csEmitters_[0].emitter->count);
+			int dragCount = int(csEmitters_[idx].emitter->count);
 			ImGui::DragInt("emitCount", &dragCount, 1, 0, 100000);
-			csEmitters_[0].emitter->count = uint32_t(dragCount);
+			csEmitters_[idx].emitter->count = uint32_t(dragCount);
 
-			ImGui::DragFloat("lifeTime", &csEmitters_[0].emitter->lifeTime, 0.1f, 1.0f, 300.0f);
-			ImGui::DragFloat("frequency", &csEmitters_[0].emitter->frequency, 0.1f, 0.0f, 300.0f);
+			ImGui::DragFloat("lifeTime", &csEmitters_[idx].emitter->lifeTime, 0.1f, 1.0f, 300.0f);
+			ImGui::DragFloat("frequency", &csEmitters_[idx].emitter->frequency, 0.1f, 0.0f, 300.0f);
 
-			Vector3 prePos = csEmitters_[0].emitter->translate;
-			ImGui::DragFloat3("translate", &csEmitters_[0].emitter->translate.x, 0.1f);
-			csEmitters_[0].emitter->prevTranslate = prePos;
+			Vector3 prePos = csEmitters_[idx].emitter->translate;
+			ImGui::DragFloat3("translate", &csEmitters_[idx].emitter->translate.x, 0.1f);
+			csEmitters_[idx].emitter->prevTranslate = prePos;
 
-			ImGui::DragFloat("radius", &csEmitters_[0].emitter->radius, 0.1f, 0.0f, 300.0f);
+			ImGui::DragFloat("radius", &csEmitters_[idx].emitter->radius, 0.1f, 0.0f, 300.0f);
 
 			ImGui::SeparatorText("Color");
-			ImGui::DragFloat3("colorMax", &csEmitters_[0].emitter->colorMax.x, 0.01f, 0.0f, 1.0f);
-			ImGui::DragFloat3("colorMin", &csEmitters_[0].emitter->colorMin.x, 0.01f, 0.0f, 1.0f);
+			ImGui::DragFloat3("colorMax", &csEmitters_[idx].emitter->colorMax.x, 0.01f, 0.0f, 1.0f);
+			ImGui::DragFloat3("colorMin", &csEmitters_[idx].emitter->colorMin.x, 0.01f, 0.0f, 1.0f);
 
 			ImGui::SeparatorText("Velocity");
-			ImGui::DragFloat3("baseVelocity", &csEmitters_[0].emitter->baseVelocity.x, 0.01f, 0.0f, 1.0f);
-			ImGui::DragFloat("velocityRandMax", &csEmitters_[0].emitter->velocityRandMax, 0.01f, -1.0f, 1.0f);
-			ImGui::DragFloat("velocityRandMin", &csEmitters_[0].emitter->velocityRandMin, 0.01f, -1.0f, 1.0f);
+			ImGui::DragFloat3("baseVelocity", &csEmitters_[idx].emitter->baseVelocity.x, 0.01f, 0.0f, 1.0f);
+			ImGui::DragFloat("velocityRandMax", &csEmitters_[idx].emitter->velocityRandMax, 0.01f, -1.0f, 1.0f);
+			ImGui::DragFloat("velocityRandMin", &csEmitters_[idx].emitter->velocityRandMin, 0.01f, -1.0f, 1.0f);
 
 			ImGui::Text("DeltaTime1:%f", FPSKeeper::DeltaTime());
 			ImGui::Text("DeltaTime2:%f", FPSKeeper::DeltaTimeFrame());
@@ -268,29 +277,71 @@ void ParticleManager::ParticleTexCSDebugGUI() {
 #ifdef _DEBUG
 	if (csEmitterTexs_.size() == 0) return;
 	if (ImGui::CollapsingHeader("GPU ParticleTex Emitter")) {
+		ImGui::DragInt("emitIndex", &editCSEmitTexInd_, 1.0f, 0, int(csEmitterTexs_.size() - 1));
+		int idx = std::min(editCSEmitTexInd_, static_cast<int>(csEmitterTexs_.size()) - 1);
+		editCSEmitTexInd_ = idx;
 		if (ImGui::TreeNode("ParticleCS Emit Control")) {
 
-			ImGui::Checkbox("isEmit", &csEmitterTexs_[0].isEmit);
+			ImGui::Checkbox("isEmit", &csEmitterTexs_[idx].isEmit);
 
-			int dragCount = int(csEmitterTexs_[0].emitter->count);
+			int dragCount = int(csEmitterTexs_[idx].emitter->count);
 			ImGui::DragInt("emitCount", &dragCount, 1, 0, 100000);
-			csEmitterTexs_[0].emitter->count = uint32_t(dragCount);
+			csEmitterTexs_[idx].emitter->count = uint32_t(dragCount);
 
-			ImGui::DragFloat("lifeTime", &csEmitterTexs_[0].emitter->lifeTime, 0.1f, 1.0f, 300.0f);
-			ImGui::DragFloat("frequency", &csEmitterTexs_[0].emitter->frequency, 0.1f, 0.0f, 300.0f);
+			ImGui::DragFloat("lifeTime", &csEmitterTexs_[idx].emitter->lifeTime, 0.1f, 1.0f, 300.0f);
+			ImGui::DragFloat("frequency", &csEmitterTexs_[idx].emitter->frequency, 0.1f, 0.0f, 300.0f);
 
-			ImGui::DragFloat3("translate", &csEmitterTexs_[0].emitter->translate.x, 0.1f);
+			ImGui::DragFloat3("translate", &csEmitterTexs_[idx].emitter->translate.x, 0.1f);
 
-			ImGui::DragFloat("radius", &csEmitterTexs_[0].emitter->radius, 0.1f, 0.0f, 300.0f);
+			ImGui::DragFloat("radius", &csEmitterTexs_[idx].emitter->radius, 0.1f, 0.0f, 300.0f);
 
 			ImGui::SeparatorText("Color");
-			ImGui::DragFloat3("colorMax", &csEmitterTexs_[0].emitter->colorMax.x, 0.01f, 0.0f, 1.0f);
-			ImGui::DragFloat3("colorMin", &csEmitterTexs_[0].emitter->colorMin.x, 0.01f, 0.0f, 1.0f);
+			ImGui::DragFloat3("colorMax", &csEmitterTexs_[idx].emitter->colorMax.x, 0.01f, 0.0f, 1.0f);
+			ImGui::DragFloat3("colorMin", &csEmitterTexs_[idx].emitter->colorMin.x, 0.01f, 0.0f, 1.0f);
 
 			ImGui::SeparatorText("Velocity");
-			ImGui::DragFloat3("baseVelocity", &csEmitterTexs_[0].emitter->baseVelocity.x, 0.01f, 0.0f, 1.0f);
-			ImGui::DragFloat("velocityRandMax", &csEmitterTexs_[0].emitter->velocityRandMax, 0.01f, -1.0f, 1.0f);
-			ImGui::DragFloat("velocityRandMin", &csEmitterTexs_[0].emitter->velocityRandMin, 0.01f, -1.0f, 1.0f);
+			ImGui::DragFloat3("baseVelocity", &csEmitterTexs_[idx].emitter->baseVelocity.x, 0.01f, 0.0f, 1.0f);
+			ImGui::DragFloat("velocityRandMax", &csEmitterTexs_[idx].emitter->velocityRandMax, 0.01f, -1.0f, 1.0f);
+			ImGui::DragFloat("velocityRandMin", &csEmitterTexs_[idx].emitter->velocityRandMin, 0.01f, -1.0f, 1.0f);
+
+			ImGui::Text("DeltaTime1:%f", FPSKeeper::DeltaTime());
+			ImGui::Text("DeltaTime2:%f", FPSKeeper::DeltaTimeFrame());
+			ImGui::TreePop();
+		}
+	}
+#endif // _DEBUG
+}
+
+void ParticleManager::ParticleSurfaceCSDebugGUI() {
+#ifdef _DEBUG
+	if (csEmitterSurfces_.size() == 0) return;
+	if (ImGui::CollapsingHeader("GPU Particle Surface Emitter")) {
+		ImGui::DragInt("emitIndex", &editCSEmitSurfaceInd_, 1.0f, 0, int(csEmitterSurfces_.size() - 1));
+		int idx = std::min(editCSEmitSurfaceInd_, static_cast<int>(csEmitterSurfces_.size()) - 1);
+		editCSEmitSurfaceInd_ = idx;
+		if (ImGui::TreeNode("ParticleCS Emit Control")) {
+
+			ImGui::Checkbox("isEmit", &csEmitterSurfces_[idx].isEmit);
+
+			int dragCount = int(csEmitterSurfces_[idx].emitter->count);
+			ImGui::DragInt("emitCount", &dragCount, 1, 0, 100000);
+			csEmitterSurfces_[idx].emitter->count = uint32_t(dragCount);
+
+			ImGui::DragFloat("lifeTime", &csEmitterSurfces_[idx].emitter->lifeTime, 0.1f, 1.0f, 300.0f);
+			ImGui::DragFloat("frequency", &csEmitterSurfces_[idx].emitter->frequency, 0.1f, 0.0f, 300.0f);
+
+			ImGui::DragFloat3("translate", &csEmitterSurfces_[idx].emitter->translate.x, 0.1f);
+
+			ImGui::DragFloat("radius", &csEmitterSurfces_[idx].emitter->radius, 0.1f, 0.0f, 300.0f);
+
+			ImGui::SeparatorText("Color");
+			ImGui::DragFloat3("colorMax", &csEmitterSurfces_[idx].emitter->colorMax.x, 0.01f, 0.0f, 1.0f);
+			ImGui::DragFloat3("colorMin", &csEmitterSurfces_[idx].emitter->colorMin.x, 0.01f, 0.0f, 1.0f);
+
+			ImGui::SeparatorText("Velocity");
+			ImGui::DragFloat3("baseVelocity", &csEmitterSurfces_[idx].emitter->baseVelocity.x, 0.01f, 0.0f, 1.0f);
+			ImGui::DragFloat("velocityRandMax", &csEmitterSurfces_[idx].emitter->velocityRandMax, 0.01f, -1.0f, 1.0f);
+			ImGui::DragFloat("velocityRandMin", &csEmitterSurfces_[idx].emitter->velocityRandMin, 0.01f, -1.0f, 1.0f);
 
 			ImGui::Text("DeltaTime1:%f", FPSKeeper::DeltaTime());
 			ImGui::Text("DeltaTime2:%f", FPSKeeper::DeltaTimeFrame());
@@ -669,6 +720,93 @@ int ParticleManager::InitGPUEmitterTexture() {
 	csEmitterTexIndex_++;
 	return result;
 }
+
+int ParticleManager::InitGPUEmitterSurface() {
+	GPUParticleEmitterSurface CSEmitter;
+	CSEmitter.isEmit = true;
+
+	CSEmitter.emitterResource = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), (sizeof(EmitterSphere)));
+	CSEmitter.emitterResource->Map(0, nullptr, reinterpret_cast<void**>(&CSEmitter.emitter));
+	CSEmitter.emitter->count = 500;
+	CSEmitter.emitter->lifeTime = 60.0f;
+	CSEmitter.emitter->frequency = 0.5f;
+	CSEmitter.emitter->frequencyTime = 0.0f;
+	CSEmitter.emitter->translate = Vector3(0.0f, 0.0f, 0.0f);
+	CSEmitter.emitter->scale = Vector3(0.1f, 0.1f, 0.1f);
+	CSEmitter.emitter->radius = 2.5f;
+	CSEmitter.emitter->emit = 0;
+	CSEmitter.emitter->colorMax = { 1.0f,1.0f,1.0f };
+	CSEmitter.emitter->colorMin = { 0.0f,0.0f,0.0f };
+	CSEmitter.emitter->baseVelocity = { 0.0f,0.0f,0.0f };
+	CSEmitter.emitter->velocityRandMax = 0.0f;
+	CSEmitter.emitter->velocityRandMin = 0.0f;
+
+
+	ModelData data = ModelManager::GetInstance()->FindModel("DeadTree_2.obj");
+	CSEmitter.verticesResource = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), (sizeof(VertexDate) * data.vertices.size()));
+	CSEmitter.indiciesResource = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), (sizeof(uint32_t) * data.indicies.size()));
+	VertexDate* vtx = nullptr;
+	CSEmitter.verticesResource->Map(0, nullptr, reinterpret_cast<void**>(&vtx));
+	memcpy(vtx, data.vertices.data(), sizeof(VertexDate) * data.vertices.size());
+	CSEmitter.verticesResource->Unmap(0, nullptr);
+	uint32_t* idx = nullptr;
+	CSEmitter.indiciesResource->Map(0, nullptr, reinterpret_cast<void**>(&idx));
+	memcpy(idx, data.indicies.data(), sizeof(uint32_t) * data.indicies.size());
+	CSEmitter.indiciesResource->Unmap(0, nullptr);
+
+
+	CSEmitter.verticesIndex = srvManager_->Allocate();
+	CSEmitter.indiciesIndex = srvManager_->Allocate();
+
+	srvManager_->CreateStructuredSRV(CSEmitter.verticesIndex, CSEmitter.verticesResource.Get(), static_cast<UINT>(data.vertices.size()), sizeof(VertexDate));
+	srvManager_->CreateStructuredSRV(CSEmitter.indiciesIndex, CSEmitter.indiciesResource.Get(), static_cast<UINT>(data.indicies.size()), sizeof(uint32_t));
+
+
+	// 面積リストとCDFを作る
+	std::vector<float> triangleAreas;
+	triangleAreas.reserve(data.indicies.size() / 3);
+	float totalArea = 0.0f;
+	for (size_t i = 0; i < data.indicies.size(); i += 3) {
+		uint32_t i0 = data.indicies[i + 0];
+		uint32_t i1 = data.indicies[i + 1];
+		uint32_t i2 = data.indicies[i + 2];
+
+		Vector3 v0 = data.vertices[i0].position.xyz();
+		Vector3 v1 = data.vertices[i1].position.xyz();
+		Vector3 v2 = data.vertices[i2].position.xyz();
+
+		float area = Vector3::Length(Cross(v1 - v0, v2 - v0)) * 0.5f;
+		totalArea += area;
+		triangleAreas.push_back(area);
+	}
+	// CDF化
+	std::vector<float> cdf(triangleAreas.size());
+	float accum = 0.0f;
+	for (size_t i = 0; i < triangleAreas.size(); i++) {
+		accum += triangleAreas[i] / totalArea;
+		cdf[i] = accum;
+	}
+	// 面積CDFをGPUに送る
+	CSEmitter.areasResource = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(float) * cdf.size());
+	float* areaMap = nullptr;
+	CSEmitter.areasResource->Map(0, nullptr, reinterpret_cast<void**>(&areaMap));
+	memcpy(areaMap, cdf.data(), sizeof(float) * cdf.size());
+	CSEmitter.areasResource->Unmap(0, nullptr);
+
+	CSEmitter.areasIndex = srvManager_->Allocate();
+
+	srvManager_->CreateStructuredSRV(CSEmitter.areasIndex, CSEmitter.areasResource.Get(), static_cast<UINT>(cdf.size()), sizeof(float));
+
+	// これで面の数を送っとく
+	CSEmitter.emitter->triangleCount = int(cdf.size());
+
+	CSEmitter.emitterIndex = csEmitterSurIndex_;
+	csEmitterSurfces_.push_back(CSEmitter);
+	int result = csEmitterSurIndex_;
+	csEmitterSurIndex_++;
+	return result;
+}
+
 
 void ParticleManager::UpdateParticleGroup(const Matrix4x4& billboardMatrix) {
 	for (auto& groupPair : particleGroups_) {
@@ -1339,6 +1477,41 @@ void ParticleManager::EmitterTextureDispatch() {
 		int dispatchCountX = (int(csEmitterTexs_[i].textureForEmit->meta.width)  + 32 - 1) / 32;
 		int dispatchCountY = (int(csEmitterTexs_[i].textureForEmit->meta.height) + 32 - 1) / 32;
 		dxcommon_->GetCommandList()->Dispatch(dispatchCountX, dispatchCountY, 1);
+	}
+}
+
+void ParticleManager::UpdateGPUEmitterSurface() {
+	for (int i = 0; i < csEmitterSurfces_.size(); i++) {
+		auto& emitter = csEmitterSurfces_[i];
+		if (emitter.isEmit) {
+			emitter.emitter->frequencyTime += FPSKeeper::DeltaTime();
+			if (emitter.emitter->frequency <= emitter.emitter->frequencyTime) {
+				emitter.emitter->frequencyTime -= emitter.emitter->frequency;
+				emitter.emitter->emit = 1;
+			} else {
+				emitter.emitter->emit = 0;
+			}
+		} else {
+			emitter.emitter->emit = 0;
+			emitter.emitter->frequencyTime = 0.0f;
+		}
+	}
+}
+
+void ParticleManager::EmitterSurfaceDispatch() {
+	for (int i = 0; i < csEmitterSurfces_.size(); i++) {
+		dxcommon_->GetPipelineManager()->SetCSPipeline(Pipe::EmitSurfaceParticleCS);
+		dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(0, particleCSUAVHandle_.second);
+		dxcommon_->GetCommandList()->SetComputeRootConstantBufferView(1, csEmitterSurfces_[i].emitterResource->GetGPUVirtualAddress());
+		dxcommon_->GetCommandList()->SetComputeRootConstantBufferView(2, perFrameResource_->GetGPUVirtualAddress());
+		dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(3, freeListIndexUAVHandle_.second);
+		dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(4, freeListUAVHandle_.second);
+		dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(5, srvManager_->GetGPUDescriptorHandle(csEmitterSurfces_[i].verticesIndex));
+		dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(6, srvManager_->GetGPUDescriptorHandle(csEmitterSurfces_[i].indiciesIndex));
+		dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(7, srvManager_->GetGPUDescriptorHandle(csEmitterSurfces_[i].areasIndex));
+		if (csEmitterSurfces_[i].emitter->count == 0) continue;
+		int dispatchCount = (csEmitterSurfces_[i].emitter->count + threadGroupSize_ - 1) / threadGroupSize_;
+		dxcommon_->GetCommandList()->Dispatch(dispatchCount, 1, 1);
 	}
 }
 

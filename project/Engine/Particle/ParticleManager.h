@@ -76,6 +76,30 @@ struct EmitterTexture {
 
 };
 
+struct EmitterSurface {
+	Vector3 translate;
+	float padding;
+	Vector3 scale;
+	float radius;
+	uint32_t count;
+	float lifeTime;
+	float frequency;
+	float frequencyTime;
+	uint32_t emit;
+
+	// color
+	Vector3 colorMax;
+	Vector3 colorMin;
+	float padding2;
+
+	// velocity
+	Vector3 baseVelocity;
+	float velocityRandMax;
+	float velocityRandMin;
+
+	int triangleCount;
+};
+
 struct AcceleFiled {
 	Vector3 Accele;
 	AABB area;
@@ -159,6 +183,20 @@ public:
 		int emitterIndex = 0;
 	};
 
+	struct GPUParticleEmitterSurface {
+		EmitterSurface* emitter;
+		ComPtr<ID3D12Resource> emitterResource;
+		ComPtr<ID3D12Resource> verticesResource;
+		ComPtr<ID3D12Resource> indiciesResource;
+		ComPtr<ID3D12Resource> areasResource;
+		uint32_t verticesIndex;
+		uint32_t indiciesIndex;
+		uint32_t areasIndex;
+
+		bool isEmit = false;
+		int emitterIndex = 0;
+	};
+
 	static ParticleManager* GetInstance();
 
 	void Initialize(DXCom* pDxcom, SRVManager* srvManager);
@@ -169,6 +207,7 @@ public:
 	void ParticleDebugGUI();
 	void ParticleCSDebugGUI();
 	void ParticleTexCSDebugGUI();
+	void ParticleSurfaceCSDebugGUI();
 	void SelectParticleUpdate();
 	void SelectEmitterSizeDraw();
 
@@ -204,6 +243,7 @@ public:
 
 	int InitGPUEmitter();
 	int InitGPUEmitterTexture();
+	int InitGPUEmitterSurface();
 
 private:
 
@@ -232,6 +272,9 @@ private:
 
 	void UpdateGPUEmitterTexture();
 	void EmitterTextureDispatch();
+
+	void UpdateGPUEmitterSurface();
+	void EmitterSurfaceDispatch();
 
 	bool LifeUpdate(Particle& particle);
 	void ParticleSizeUpdate(Particle& particle);
@@ -297,6 +340,7 @@ private:
 
 	std::vector<GPUParticleEmitter> csEmitters_;
 	std::vector<GPUParticleEmitterTexture> csEmitterTexs_;
+	std::vector<GPUParticleEmitterSurface> csEmitterSurfces_;
 	ComPtr<ID3D12Resource> perFrameResource_;
 	PerFrame* perFrameData_;
 	ComPtr<ID3D12Resource> freeListIndexResource_;
@@ -306,6 +350,7 @@ private:
 
 	int csEmitterIndex_ = 0;
 	int csEmitterTexIndex_ = 0;
+	int csEmitterSurIndex_ = 0;
 
 	uint32_t numParticles = 1048576;
 	uint32_t threadsPerGroup = 1024;
@@ -315,5 +360,9 @@ private:
 	ParticleGroup* selectParticleGroup_ = nullptr;
 	int currentIndex_ = 0;
 	std::string currentKey_;
+
+	int editCSEmitInd_;
+	int editCSEmitTexInd_;
+	int editCSEmitSurfaceInd_;
 #endif // _DEBUG
 };
