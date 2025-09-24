@@ -76,6 +76,8 @@ public:
 
 	void SetUVScale(const Vector2& scale, const Vector2& uvTrans);
 
+	void SetUVTrans(const Vector2& uvTrans);
+
 	/// <summary>
 	/// α値の閾値
 	/// </summary>

@@ -309,6 +309,13 @@ void ImGuiManager::DrawNode(MyNode& node, ed::Utilities::BlueprintNodeBuilder& b
 		ed::Resume();*/
 	}
 
+	if (node.type == MyNode::NodeType::Vector2) {
+		ImGui::Dummy(ImVec2(5.0f, 0.0f)); ImGui::SameLine();
+		ImGui::DragFloat(("X##Vector2x" + std::to_string(static_cast<uintptr_t>(node.id))).c_str(), &node.values[0].Get<Vector2>().x, 0.01f);
+		ImGui::Dummy(ImVec2(5.0f, 0.0f)); ImGui::SameLine();
+		ImGui::DragFloat(("Y##Vector2y" + std::to_string(static_cast<uintptr_t>(node.id))).c_str(), &node.values[0].Get<Vector2>().y, 0.01f);
+	}
+
 	builder.End();
 }
 

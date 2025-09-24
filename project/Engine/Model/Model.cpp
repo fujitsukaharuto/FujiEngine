@@ -87,6 +87,13 @@ void Model::SetUVScale(const Vector2& scale, const Vector2& uvTrans) {
 	}
 }
 
+void Model::SetUVTrans(const Vector2& uvTrans) {
+	uvTrans_ = uvTrans;
+	for (Material& material : material_) {
+		material.SetUVScale(uvScale_, uvTrans_);
+	}
+}
+
 void Model::SetAlphaRef(float ref) {
 	for (Material& material : material_) {
 		material.SetAlphaRef(ref);

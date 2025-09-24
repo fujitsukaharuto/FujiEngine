@@ -39,6 +39,10 @@ Object3d::Object3d() {
 	colorNode.CreateNode(MyNode::NodeType::Color);
 	nodeGraph_.AddNode(colorNode);
 
+	MyNode v2Node;
+	v2Node.CreateNode(MyNode::NodeType::Vector2);
+	nodeGraph_.AddNode(v2Node);
+
 	MyNode selNode;
 	selNode.CreateNode(MyNode::NodeType::Material);
 	nodeGraph_.AddNode(selNode);
@@ -441,6 +445,10 @@ void Object3d::SetUVScale(const Vector2& scale, const Vector2& uvTrans) {
 	model_->SetUVScale(scale, uvTrans);
 }
 
+void Object3d::SetUVTrans(const Vector2& uvTrans) {
+	model_->SetUVTrans(uvTrans);
+}
+
 void Object3d::SetAlphaRef(float ref) {
 	model_->SetAlphaRef(ref);
 }
@@ -664,6 +672,7 @@ void Object3d::SetTextureNode() {
 		if (selNode) {
 			SetTexture(selNode->outputValue[0].Get<std::string>());
 			SetColor(selNode->outputValue[1].Get<Vector4>());
+			SetUVTrans(selNode->outputValue[2].Get<Vector2>());
 		}
 	}
 

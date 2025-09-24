@@ -75,6 +75,7 @@ enum class PinType {
 	Object,
 	Function,
 	Delegate,
+	Vector2,
 	Color,
 	Texture,
 };
@@ -105,6 +106,7 @@ struct MyNode {
 		Add,
 		Material,
 		Color,
+		Vector2,
 		// 追加予定のノード種類…
 	} type;
 

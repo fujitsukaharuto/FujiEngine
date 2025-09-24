@@ -84,10 +84,18 @@ void NodeGraph::ValueUpdate(MyNode& node) {
 			if (node.type == MyNode::NodeType::Material) {
 				node.outputValue.push_back(inputValues[0].type != Value::Type::Texture ? node.values[0] : inputValues[0]);
 				node.outputValue.push_back(inputValues[1].type != Value::Type::Color ? node.values[1] : inputValues[1]);
+				node.outputValue.push_back(inputValues[2].type != Value::Type::Vector2 ? node.values[2] : inputValues[2]);
 			}
 
 			if (node.type == MyNode::NodeType::Texture) {
 				node.outputValue.push_back(inputValues[0].type != Value::Type::Texture ? node.values[0] : inputValues[0]);
+			}
+
+			if (node.type == MyNode::NodeType::Vector2) {
+				Value out = node.values[0];
+				if (inputValues[0].type == Value::Type::Float) out.Get<Vector2>().x = inputValues[0].Get<float>();
+				if (inputValues[1].type == Value::Type::Float) out.Get<Vector2>().y = inputValues[1].Get<float>();
+				node.outputValue.push_back(out);
 			}
 			// 随時追加
 
@@ -196,8 +204,10 @@ void MyNode::CreateNode(NodeType nodeType) {
 		type = MyNode::NodeType::Material;
 		inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input, PinType::Texture });
 		inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input, PinType::Color });
+		inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input, PinType::Vector2 });
 		values.push_back(Value("white2x2.png"));
 		values.push_back(Value(Vector4(1.0f, 1.0f, 1.0f, 1.0f)));
+		values.push_back(Value(Vector2(0.0f, 0.0f)));
 		evaluator = [](const std::vector<Value>& inputs) {
 			return !inputs.empty() ? inputs[0] : Value();
 			};
@@ -208,6 +218,19 @@ void MyNode::CreateNode(NodeType nodeType) {
 		type = MyNode::NodeType::Color;
 		outputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Output, PinType::Color });
 		values.push_back(Value(Vector4(1.0f, 1.0f, 1.0f, 1.0f)));
+		evaluator = [](const std::vector<Value>& inputs) {
+			return !inputs.empty() ? inputs[0] : Value();
+			};
+
+		break;
+	case MyNode::NodeType::Vector2:
+
+		name = "Vec2Node";
+		type = MyNode::NodeType::Vector2;
+		inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input, PinType::Float });
+		inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input, PinType::Float });
+		outputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Output, PinType::Vector2 });
+		values.push_back(Value(Vector2(0.0f, 0.0f)));
 		evaluator = [](const std::vector<Value>& inputs) {
 			return !inputs.empty() ? inputs[0] : Value();
 			};
