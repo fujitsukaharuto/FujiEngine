@@ -55,7 +55,7 @@ private:
 
 
 	ParticleEmitter emit;
-
+	ParticleEmitter field;
 
 	// sceneChange
 	std::unique_ptr<Sprite> black_;

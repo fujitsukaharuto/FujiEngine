@@ -32,8 +32,11 @@ void ParticleManager::Initialize(DXCom* pDxcom, SRVManager* srvManager) {
 	InitLighningVertex();
 	InitParticleCS();
 	InitGPUEmitter();
-	InitGPUEmitterSurface();
 	InitGPUEmitter();
+	InitGPUEmitter();
+	InitGPUEmitter();
+	InitGPUEmitter();
+	InitGPUEmitterSurface();
 	//InitGPUEmitterTexture();
 }
 
@@ -664,13 +667,19 @@ ParticleManager::GPUParticleEmitterTexture& ParticleManager::GetParticleCSEmitte
 	return instance->csEmitterTexs_[index];
 }
 
+ParticleManager::GPUParticleEmitterSurface& ParticleManager::GetParticleCSEmitterSurface(int index) {
+	ParticleManager* instance = GetInstance();
+	assert(index >= 0 && index < instance->csEmitterSurfces_.size());
+	return instance->csEmitterSurfces_[index];
+}
+
 int ParticleManager::InitGPUEmitter() {
 	GPUParticleEmitter CSEmitter;
 	CSEmitter.isEmit = false;
 
 	CSEmitter.emitterResource = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), (sizeof(EmitterSphere)));
 	CSEmitter.emitterResource->Map(0, nullptr, reinterpret_cast<void**>(&CSEmitter.emitter));
-	CSEmitter.emitter->count = 500;
+	CSEmitter.emitter->count = 300;
 	CSEmitter.emitter->lifeTime = 60.0f;
 	CSEmitter.emitter->frequency = 0.5f;
 	CSEmitter.emitter->frequencyTime = 0.0f;

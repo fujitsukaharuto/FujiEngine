@@ -177,6 +177,88 @@ void NodeGraph::ClearResults() {
 
 }
 
+std::string NodeGraph::NodeTypeToString(MyNode::NodeType t) {
+	switch (t) {
+	case MyNode::NodeType::Texture: return "Texture";
+	case MyNode::NodeType::Float: return "Float";
+	case MyNode::NodeType::Add: return "Add";
+	case MyNode::NodeType::Material: return "Material";
+	case MyNode::NodeType::Color: return "Color";
+	case MyNode::NodeType::Vector2: return "Vector2";
+	default: return "Unknown";
+	}
+}
+
+json NodeGraph::SaveNodeData() {
+	json root;
+	root["Nodes"] = json::array();
+	for (const auto& n : nodes) root["Nodes"].push_back(SerializeNode(n));
+	return root;
+}
+
+json NodeGraph::SerializeValue(const Value& v) {
+	json j;
+	switch (v.type) {
+	case Value::Type::None:
+		j["type"] = "None";
+		j["value"] = nullptr;
+		break;
+	case Value::Type::Int:
+		j["type"] = "Int";
+		j["value"] = std::get<int>(v.data);
+		break;
+	case Value::Type::Float:
+		j["type"] = "Float";
+		j["value"] = std::get<float>(v.data);
+		break;
+	case Value::Type::Vector2: {
+		const auto& vv = std::get<Vector2>(v.data);
+		j["type"] = "Vector2";
+		j["value"] = { vv.x, vv.y };
+		break;
+	}
+	case Value::Type::Vector3: {
+		const auto& vv = std::get<Vector3>(v.data);
+		j["type"] = "Vector3";
+		j["value"] = { vv.x, vv.y, vv.z };
+		break;
+	}
+	case Value::Type::Color: {
+		const auto& vv = std::get<Vector4>(v.data);
+		j["type"] = "Color";
+		j["value"] = { vv.x, vv.y, vv.z, vv.w };
+		break;
+	}
+	case Value::Type::Texture:
+		j["type"] = "Texture";
+		j["value"] = std::get<std::string>(v.data);
+		break;
+	}
+	return j;
+}
+
+json NodeGraph::SerializeNode(const MyNode& node) {
+	json j;
+	j["id"] = static_cast<uintptr_t>(node.id);
+	j["name"] = node.name;
+	j["nodeType"] = NodeTypeToString(node.type);
+
+	// values を配列で
+	j["values"] = json::array();
+	for (const auto& v : node.values) j["values"].push_back(SerializeValue(v));
+
+	// Texture 型のときのみ texName を出す
+	if (node.type == MyNode::NodeType::Texture) {
+		j["texName"] = node.texName;
+	}
+
+	// ピン情報（必要なら）
+	j["inputs_count"] = node.inputs.size();
+	j["outputs_count"] = node.outputs.size();
+
+	return j;
+}
+
 
 
 #endif // _DEBUG

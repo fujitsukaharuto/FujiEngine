@@ -387,6 +387,8 @@ void Object3d::DebugGUI() {
 			ImGui::SetItemDefaultFocus();
 			ImGui::SameLine();
 			if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+			ImGui::SameLine();
+			if (ImGui::Button("Save", ImVec2(120, 0))) { JsonSerializer::SerializeJsonData(nodeGraph_.SaveNodeData(),"resource/abcTest.json"); }
 			ImGui::EndPopup();
 		}
 

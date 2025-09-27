@@ -435,7 +435,7 @@ void Boss::ParameterGUI() {
 }
 
 void Boss::InitParameter() {
-	attackCooldown_ = 300.0f;
+	attackCooldown_ = 150.0f;
 	bossHp_ = 50.0f;
 
 	jumpTime_ = 150.0f;

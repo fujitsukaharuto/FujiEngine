@@ -128,6 +128,8 @@ void GameRun::Initialize() {
 	pManager_->CreateParticleGroup("energySphere", "T_Noise04.jpg", 40, ShapeType::SPHERE);
 	pManager_->CreateParticleGroup("energyParticle", "redCircle.png", 80);
 
+	pManager_->CreateParticleGroup("fieldParticle", "redCircle.png", 400);
+
 
 	// playerBullet用
 	pManager_->CreateParentParticleGroup("ChargeEffect1", "redCircle.png",40);

@@ -7,6 +7,7 @@
 #include "Engine/Math/Vector/Vector2.h"
 #include "Engine/Math/Vector/Vector3.h"
 #include "Engine/Math/Vector/Vector4.h"
+#include "Engine/Editor/JsonSerializer.h"
 #ifdef _DEBUG
 #include "imgui.h"
 #include "imgui_node_editor.h"
@@ -160,5 +161,13 @@ public:
 
 	// キャッシュ（result）をクリアする
 	void ClearResults();
+
+
+	std::string NodeTypeToString(MyNode::NodeType t);
+
+	json SaveNodeData();
+	json SerializeValue(const Value& v);
+	json SerializeNode(const MyNode& node);
+
 };
 #endif // _DEBUG

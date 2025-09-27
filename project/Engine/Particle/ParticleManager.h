@@ -240,6 +240,7 @@ public:
 	static uint32_t GetParticleCSEmitterSize();
 	static GPUParticleEmitter& GetParticleCSEmitter(int index);
 	static GPUParticleEmitterTexture& GetParticleCSEmitterTexture(int index);
+	static GPUParticleEmitterSurface& GetParticleCSEmitterSurface(int index);
 
 	int InitGPUEmitter();
 	int InitGPUEmitterTexture();

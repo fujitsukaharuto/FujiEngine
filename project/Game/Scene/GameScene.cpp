@@ -99,6 +99,9 @@ void GameScene::Initialize() {
 	emit.animeData_.lifeTime = 40.0f;
 	emit.RandomSpeed({ -0.1f,0.1f }, { -0.1f,0.1f }, { -0.1f,0.1f });
 	emit.RandomTranslate({ -0.1f,0.1f }, { -0.1f,0.1f }, { -0.1f,0.1f });
+
+	ParticleManager::Load(field, "fieldParticle");
+
 }
 
 void GameScene::Update() {
@@ -149,6 +152,8 @@ void GameScene::Update() {
 			}
 		}
 	}
+
+	field.Emit();
 
 #ifdef _DEBUG
 	if (input_->TriggerKey(DIK_8)) {
