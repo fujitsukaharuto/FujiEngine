@@ -676,7 +676,7 @@ void Boss::UpdateWaveWall() {
 void Boss::WaveWallAttack() {
 	int count = 0;
 
-	CameraManager::GetInstance()->GetCamera()->IssuanceShake(0.1f, 20.0f);
+	CameraManager::GetInstance()->GetCamera()->IssuanceShake(0.2f, 15.0f);
 
 	Vector3 wavePos = { 0.0f,0.0f,4.5f };
 	Matrix4x4 rotateMatrix = MakeRotateYMatrix(animModel_->transform.rotate.y);

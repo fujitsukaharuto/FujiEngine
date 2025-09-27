@@ -132,6 +132,7 @@ void PlayerBullet::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) 
 			hitSmoke_.Emit();
 			hitcircle_.Emit();
 			hit3_.Emit();
+			CameraManager::GetInstance()->GetCamera()->IssuanceShake(0.1f, 15.0f);
 		}
 		hit_.Emit();
 		hit2_.Emit();
