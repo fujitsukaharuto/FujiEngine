@@ -9,6 +9,7 @@ BossSwordAttack::BossSwordAttack(Boss* pBoss) : BaseBossBehavior(pBoss) {
 	attackCount_ = 0;
 	pBoss_->GetAnimModel()->ChangeAnimation("punch");
 	pBoss_->GetAnimModel()->IsRoopAnimation(false);
+	pBoss_->ChainCount();
 }
 
 BossSwordAttack::~BossSwordAttack() {

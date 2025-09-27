@@ -9,6 +9,7 @@ BossAreaAttack::BossAreaAttack(Boss* pBoss) : BaseBossBehavior(pBoss) {
 	step_ = Step::ATTACK;
 	pBoss_->GetAnimModel()->ChangeAnimation("swordLeft");
 	pBoss_->GetAnimModel()->IsRoopAnimation(false);
+	pBoss_->ChainCount();
 }
 
 BossAreaAttack::~BossAreaAttack() {

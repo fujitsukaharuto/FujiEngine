@@ -14,6 +14,7 @@ BossRoot::BossRoot(Boss* pBoss) : BaseBossBehavior(pBoss) {
 	step_ = Step::ROOT;
 	cooldown_ = pBoss_->GetAttackCooldown();
 	pBoss_->GetAnimModel()->ChangeAnimation("walk");
+	pBoss_->ResetChainCount();
 }
 
 BossRoot::~BossRoot() {
@@ -49,7 +50,11 @@ void BossRoot::Update() {
 			pBoss_->ChangeBehavior(std::make_unique<BossAttack>(pBoss_));
 			break;
 		case AttackPattern::JumpAttack:
-			pBoss_->ChangeBehavior(std::make_unique<BossJumpAttack>(pBoss_, 2));
+		{
+			int count = 2;
+			if (pBoss_->GetPhaseIndex() > 0 || Random::GetFloat(0.0f, 1.0f) > 0.75f) count = 3;
+			pBoss_->ChangeBehavior(std::make_unique<BossJumpAttack>(pBoss_, count));
+		}
 			break;
 		case AttackPattern::SwordAttack:
 			pBoss_->ChangeBehavior(std::make_unique<BossSwordAttack>(pBoss_));

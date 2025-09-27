@@ -8,6 +8,7 @@ BossBeamAttack::BossBeamAttack(Boss* pBoss) : BaseBossBehavior(pBoss) {
 
 	pBoss_->InitBeam();
 	pBoss_->GetAnimModel()->ChangeAnimation("idle");
+	pBoss_->ChainCount();
 }
 
 BossBeamAttack::~BossBeamAttack() {

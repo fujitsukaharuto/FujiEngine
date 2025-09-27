@@ -10,6 +10,7 @@ BossJumpAttack::BossJumpAttack(Boss* pBoss, int count) : BaseBossBehavior(pBoss)
 	pBoss_->InitJumpAttack();
 	pBoss_->GetAnimModel()->ChangeAnimation("jump");
 	pBoss_->GetAnimModel()->IsRoopAnimation(false);
+	pBoss_->ChainCount();
 }
 
 BossJumpAttack::~BossJumpAttack() {

@@ -504,7 +504,7 @@ void Boss::ReStart() {
 	isHpActive_ = true;
 	isDying_ = false;
 	isStart_ = true;
-	phaseIndex_ = 0;
+	//phaseIndex_ = 0;
 	startTime_ = 300.0f;
 	animModel_->ChangeAnimation("roaring");
 	animModel_->LoadTransformFromJson("boss_transform.json");
@@ -955,6 +955,10 @@ void Boss::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
 }
 
 void Boss::OnCollisionExit([[maybe_unused]] const ColliderInfo& other) {
+}
+
+float Boss::GetChainRate() {
+	return chainRate_ + (chainCount_ - 1) * 0.05f;
 }
 
 void Boss::SavePhase() {

@@ -8,6 +8,7 @@ BossRodFall::BossRodFall(Boss* pBoss) : BaseBossBehavior(pBoss) {
 	step_ = Step::ATTACK;
 	pBoss_->GetAnimModel()->ChangeAnimation("idle");
 	pBoss_->GetAnimModel()->IsRoopAnimation(false);
+	pBoss_->ChainCount();
 }
 
 BossRodFall::~BossRodFall() {

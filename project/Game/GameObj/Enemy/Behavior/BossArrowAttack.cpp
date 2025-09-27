@@ -3,6 +3,7 @@
 #include "Engine/Math/Random/Random.h"
 #include "Game/GameObj/Enemy/Boss.h"
 #include "Game/GameObj/Enemy/Behavior/BossSwordAttack.h"
+#include "Game/GameObj/Enemy/Behavior/BossAreaAttack.h"
 #include "BossRoot.h"
 
 BossArrowAttack::BossArrowAttack(Boss* pBoss,bool beforArrow) : BaseBossBehavior(pBoss) {
@@ -10,7 +11,11 @@ BossArrowAttack::BossArrowAttack(Boss* pBoss,bool beforArrow) : BaseBossBehavior
 	pBoss_->GetAnimModel()->ChangeAnimation("idle");
 	pBoss_->GetAnimModel()->IsRoopAnimation(false);
 	isbeforArrow_ = beforArrow;
-	if (beforArrow) beforWait_ = 60.0f;
+	if (beforArrow) {
+		beforWait_ = 60.0f;
+		coolTime_ = 30.0f;
+	}
+	pBoss_->ChainCount();
 }
 
 BossArrowAttack::~BossArrowAttack() {
@@ -46,7 +51,9 @@ void BossArrowAttack::Update() {
 		float randomSeed = Random::GetFloat(0.0f, 1.0f);
 		if (randomSeed > pBoss_->GetChainRate() + 0.05f && !isbeforArrow_) {
 			pBoss_->ChangeBehavior(std::make_unique<BossArrowAttack>(pBoss_, true));
-		}else if (randomSeed > pBoss_->GetChainRate() - 0.15f && randomSeed < pBoss_->GetChainRate() + 0.05f) {
+		} else if (randomSeed > pBoss_->GetChainRate() - 0.15f && randomSeed < pBoss_->GetChainRate() + 0.05f) {
+			pBoss_->ChangeBehavior(std::make_unique<BossAreaAttack>(pBoss_));
+		} else if (isbeforArrow_ && randomSeed > pBoss_->GetChainRate() - 0.3f) {
 			pBoss_->ChangeBehavior(std::make_unique<BossSwordAttack>(pBoss_));
 		} else {
 			pBoss_->ChangeBehavior(std::make_unique<BossRoot>(pBoss_));

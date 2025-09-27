@@ -42,6 +42,9 @@ public:
 	void HPColorSet(float under, float index);
 	void ShakeHP();
 
+	void ResetChainCount() { chainCount_ = 0; }
+	void ChainCount() { chainCount_++; }
+
 	void Walk();
 
 	void UpdateWaveWall();
@@ -89,7 +92,7 @@ public:
 	bool GetIsStart() { return isStart_; }
 	bool GetIsClear() { return isClear_; }
 	int GetNowHpIndex() { return nowHpIndex_; }
-	float GetChainRate() { return chainRate_; }
+	float GetChainRate();
 	Vector3 GetDefoultPos() { return defaultCorePos_; }
 
 	void SetPlayer(Player* player) { pPlayer_ = player; }
@@ -178,6 +181,7 @@ private:
 	float jumpHeight_ = 0.0f;
 	bool isJumpAttack_ = true;
 	float chainRate_ = 0.65f;
+	int chainCount_ = 0;
 
 	// emitter
 	ParticleEmitter waveAttack1;
