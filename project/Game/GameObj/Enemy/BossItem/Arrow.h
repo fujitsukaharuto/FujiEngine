@@ -76,6 +76,10 @@ private:
 	ParticleEmitter spark2_;
 	ParticleEmitter spark3_;
 
+	ParticleEmitter hit_;
+	ParticleEmitter hitParticle_;
+
+
 	// Gpu Particle
 	int emitterNumber_;
 

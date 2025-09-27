@@ -1,0 +1,110 @@
+{
+    "Para_autoUVMax": [
+        0.10000000149011612,
+        0.0
+    ],
+    "Para_autoUVMin": [
+        0.10000000149011612,
+        0.0
+    ],
+    "Para_colorMax": [
+        0.7088607549667358,
+        0.11963896453380585,
+        0.2837260365486145,
+        0.800000011920929
+    ],
+    "Para_colorMin": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+    ],
+    "Para_speedx": [
+        0.0,
+        0.0
+    ],
+    "Para_speedy": [
+        0.0,
+        0.0
+    ],
+    "Para_speedz": [
+        0.0,
+        0.0
+    ],
+    "Para_transx": [
+        0.0,
+        0.0
+    ],
+    "Para_transy": [
+        0.0,
+        0.0
+    ],
+    "Para_transz": [
+        0.0,
+        0.0
+    ],
+    "accele": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "addRandomMax": [
+        0.0,
+        0.0
+    ],
+    "addRandomMin": [
+        0.0,
+        0.0
+    ],
+    "autoUVSpeed": [
+        0.10000000149011612,
+        0.0
+    ],
+    "colorType": 0,
+    "count": 1,
+    "emitMaxSize": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "emitMinSize": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "endSize": [
+        3.0,
+        3.0
+    ],
+    "frequencyTime": 0.0,
+    "grainPattern": 0,
+    "grainType": 1,
+    "isAddRandomSize": false,
+    "isAutoUVMove": false,
+    "isBillBoard": true,
+    "isDistanceComplement": false,
+    "isZandX": true,
+    "lifeTime": 15.0,
+    "position": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "returnPower": -0.05000000074505806,
+    "rotate": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "rotateType": 0,
+    "speed": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "speedType": 0,
+    "startSize": [
+        0.10000000149011612,
+        0.10000000149011612
+    ]
+}

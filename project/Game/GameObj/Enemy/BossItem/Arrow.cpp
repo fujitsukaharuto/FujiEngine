@@ -31,6 +31,9 @@ void Arrow::Initialize() {
 	ParticleManager::Load(spark2_, "lightningSphere");
 	ParticleManager::Load(spark3_, "lightningParticle");
 
+	ParticleManager::Load(hit_, "arrowHit");
+	ParticleManager::Load(hitParticle_, "arrowParticle");
+
 	spark1_.frequencyTime_ = 0.0f;
 	spark1_.grain_.isZandX_ = true;
 
@@ -173,6 +176,10 @@ void Arrow::ArrivalTimeUpdate() {
 		model_->transform.rotate = Quaternion::QuaternionToEuler(newRot);
 	} else {
 		isLive_ = false;
+		hitParticle_.pos_ = model_->transform.translate;
+		hitParticle_.Emit();
+		hit_.pos_ = model_->transform.translate;
+		hit_.Emit();
 		ParticleManager::GetParticleCSEmitter(emitterNumber_).isEmit = false;
 	}
 }
@@ -224,6 +231,14 @@ void Arrow::FallTimeUpdate() {
 		float t = 1.0f - (fallTime_ / maxFallTime_);
 		float fallPos = std::lerp(9.0f, 1.0f, t);
 		model_->transform.translate.y = fallPos;
+		if (fallTime_ == 0.0f) {
+			hitParticle_.pos_ = model_->transform.translate;
+			hitParticle_.pos_.y -= 1.0f;
+			hitParticle_.Emit();
+			hit_.pos_ = model_->transform.translate;
+			hit_.pos_.y -= 1.0f;
+			hit_.Emit();
+		}
 	}
 }
 

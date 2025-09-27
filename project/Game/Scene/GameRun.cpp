@@ -35,6 +35,7 @@ void GameRun::Initialize() {
 	textureManager_->Load("spaceKey.png");
 	textureManager_->Load("key_beta.png");
 	textureManager_->Load("FX12_Lightning_01.png");
+	textureManager_->Load("Gradient02.jpg");
 #pragma endregion
 
 
@@ -127,6 +128,10 @@ void GameRun::Initialize() {
 	pManager_->CreateParticleGroup("summonLightning_", "FX12_Lightning_01.png", 40, ShapeType::Lightning);
 	pManager_->CreateParticleGroup("energySphere", "T_Noise04.jpg", 40, ShapeType::SPHERE);
 	pManager_->CreateParticleGroup("energyParticle", "redCircle.png", 80);
+
+	pManager_->CreateParticleGroup("arrowHit", "white.png", 30, ShapeType::SPHERE);
+	pManager_->CreateParticleGroup("arrowParticle", "redCircle.png", 100);
+
 
 	pManager_->CreateParticleGroup("fieldParticle", "redCircle.png", 400);
 
