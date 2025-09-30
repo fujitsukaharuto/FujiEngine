@@ -244,7 +244,7 @@ public:
 
 	int InitGPUEmitter();
 	int InitGPUEmitterTexture();
-	int InitGPUEmitterSurface();
+	int InitGPUEmitterSurface(const std::string& fileName);
 
 private:
 

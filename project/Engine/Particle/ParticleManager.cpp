@@ -36,7 +36,8 @@ void ParticleManager::Initialize(DXCom* pDxcom, SRVManager* srvManager) {
 	InitGPUEmitter();
 	InitGPUEmitter();
 	InitGPUEmitter();
-	InitGPUEmitterSurface();
+	InitGPUEmitterSurface("DeadTree_2.obj");
+	InitGPUEmitterSurface("BeamCrystal.obj");
 	//InitGPUEmitterTexture();
 }
 
@@ -730,9 +731,9 @@ int ParticleManager::InitGPUEmitterTexture() {
 	return result;
 }
 
-int ParticleManager::InitGPUEmitterSurface() {
+int ParticleManager::InitGPUEmitterSurface(const std::string& fileName) {
 	GPUParticleEmitterSurface CSEmitter;
-	CSEmitter.isEmit = true;
+	CSEmitter.isEmit = false;
 
 	CSEmitter.emitterResource = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), (sizeof(EmitterSphere)));
 	CSEmitter.emitterResource->Map(0, nullptr, reinterpret_cast<void**>(&CSEmitter.emitter));
@@ -751,7 +752,7 @@ int ParticleManager::InitGPUEmitterSurface() {
 	CSEmitter.emitter->velocityRandMin = 0.0f;
 
 
-	ModelData data = ModelManager::GetInstance()->FindModel("DeadTree_2.obj");
+	ModelData data = ModelManager::GetInstance()->FindModel(fileName);
 	CSEmitter.verticesResource = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), (sizeof(VertexDate) * data.vertices.size()));
 	CSEmitter.indiciesResource = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), (sizeof(uint32_t) * data.indicies.size()));
 	VertexDate* vtx = nullptr;

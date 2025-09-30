@@ -22,6 +22,9 @@ Boss::Boss() {
 
 Boss::~Boss() {
 	ParticleManager::GetParticleCSEmitterTexture(summonIndex_).isEmit = false;
+	for (int i = 0; i < 8; i++) {
+		ParticleManager::GetParticleCSEmitter(traceEmitterIndexes_[i]).isEmit = false;
+	}
 }
 
 void Boss::Initialize() {
@@ -66,8 +69,7 @@ void Boss::Initialize() {
 		std::unique_ptr<Object3d> chargeParent;
 		chargeParent = std::make_unique<Object3d>();
 		chargeParent->Create("cube.obj");
-		chargeParent->transform.translate.y += 5.0f;
-		chargeParent->transform.translate.z += 4.0f;
+		chargeParent->transform.translate.y += 20.0f;
 		chargeParent->transform.scale.x = baseChargeSize_;
 		chargeParent->transform.scale.y = baseChargeSize_;
 		chargeParent->transform.scale.z = baseChargeSize_;
@@ -85,6 +87,25 @@ void Boss::Initialize() {
 		chargeParent->transform.rotate.z = parentRotate * i;
 		chargeParents_.push_back(std::move(chargeParent));
 	}
+	for (int i = 0; i < 8; i++) {
+		std::unique_ptr<Object3d> anchor;
+		anchor = std::make_unique<Object3d>();
+		anchor->Create("cube.obj");
+		anchor->SetParent(&chargeParents_[i]->transform);
+		anchor->SetNoneScaleParent(true);
+		traceAnchors_.push_back(std::move(anchor));
+
+		int numEmitter = ParticleManager::GetInstance()->InitGPUEmitter();
+		ParticleManager::GetParticleCSEmitter(numEmitter).isEmit = false;
+		ParticleManager::GetParticleCSEmitter(numEmitter).emitter->colorMax = { 1.0f,0.0f,0.0f };
+		ParticleManager::GetParticleCSEmitter(numEmitter).emitter->colorMin = { 1.0f,0.0f,0.0f };
+		ParticleManager::GetParticleCSEmitter(numEmitter).emitter->frequency = 0.0f;
+		ParticleManager::GetParticleCSEmitter(numEmitter).emitter->radius = 0.0f;
+		ParticleManager::GetParticleCSEmitter(numEmitter).emitter->scale = { 1.5f,1.5f,1.5f };
+		ParticleManager::GetParticleCSEmitter(numEmitter).emitter->lifeTime = 35.0f;
+		traceEmitterIndexes_.push_back(numEmitter);
+	}
+
 	waveParent_ = std::make_unique<Object3d>();
 	waveParent_->Create("cube.obj");
 	waveParent_->transform.translate.z += 8.0f;
@@ -766,16 +787,11 @@ void Boss::RodUnderRing(const Vector3& emitPos) {
 void Boss::InitBeam() {
 	float parentRotate = std::numbers::pi_v<float> *0.25f;
 	for (int i = 0; i < 8; i++) {
-		charges_[i].firstEmit_ = true;
-		charges_[i].grain_.lifeTime_ = 35.0f;
+		//charges_[i].firstEmit_ = true;
+		//charges_[i].grain_.lifeTime_ = 35.0f;
 		if (i != 0 && i != 4) {
-			if (i < 4) {
-				chargeParents_[i]->transform.rotate.x = Random::GetFloat(-std::numbers::pi_v<float>, std::numbers::pi_v<float>);
-				chargeParents_[i]->transform.rotate.y = Random::GetFloat(-1.56f, 1.56f);
-			} else {
-				chargeParents_[i]->transform.rotate.x = Random::GetFloat(-std::numbers::pi_v<float>, std::numbers::pi_v<float>);
-				chargeParents_[i]->transform.rotate.y = Random::GetFloat(-1.56f, 1.56f);
-			}
+			chargeParents_[i]->transform.rotate.x = Random::GetFloat(-std::numbers::pi_v<float>, std::numbers::pi_v<float>);
+			chargeParents_[i]->transform.rotate.y = Random::GetFloat(-1.56f, 1.56f);
 		}
 		chargeParents_[i]->transform.rotate.z = parentRotate * i;
 	}
@@ -785,16 +801,32 @@ void Boss::InitBeam() {
 	charge15_.grain_.startSize_ = { chargeSize_ * 3.0f,chargeSize_ * 6.0f };
 
 	for (auto& chargeParent : chargeParents_) {
-		chargeParent->transform.scale.x = chargeSize_;
-		chargeParent->transform.scale.y = chargeSize_;
-		chargeParent->transform.scale.z = chargeSize_;
+		chargeParent->transform.scale = Vector3::FillVec(chargeSize_);
+	}
+
+	for (int i = 0; i < 8; i++) {
+		ParticleManager::GetParticleCSEmitter(traceEmitterIndexes_[i]).isEmit = true;
+		ParticleManager::GetParticleCSEmitter(traceEmitterIndexes_[i]).emitter->lifeTime = 35.0f;
+		UpdateEmitterPos(i);
+		ParticleManager::GetParticleCSEmitter(traceEmitterIndexes_[i]).emitter->prevTranslate = traceAnchors_[i]->GetWorldPos();
+
+		Vector3 randColor = Random::GetVector3({ 0.3f,1.0f }, { 0.0f,0.2f }, { 0.0f,0.5f });
+		ParticleManager::GetParticleCSEmitter(traceEmitterIndexes_[i]).emitter->colorMax = randColor;
+		ParticleManager::GetParticleCSEmitter(traceEmitterIndexes_[i]).emitter->colorMin = randColor;
 	}
 }
 
 bool Boss::BeamCharge() {
 	bool result = false;
+	if (ParticleManager::GetParticleCSEmitterSurface(1).isEmit == false) {
+		ParticleManager::GetParticleCSEmitterSurface(1).isEmit = true;
+		ParticleManager::GetParticleCSEmitterSurface(1).emitter->radius = 0.0f;
+		ParticleManager::GetParticleCSEmitterSurface(1).emitter->translate = animModel_->transform.translate;
+		ParticleManager::GetParticleCSEmitterSurface(1).emitter->translate.y = 20.0f;
+	}
 
 	if (chargeSize_ > 0.0f) {
+		ParticleManager::GetParticleCSEmitterSurface(1).emitter->radius += 0.075f * FPSKeeper::DeltaTime();
 		for (int i = 0; i < 8; i++) {
 			if (i > 2) {
 				if (!(chargeTime_ < 120.0f - i * 2.0f)) {
@@ -802,29 +834,30 @@ bool Boss::BeamCharge() {
 				}
 			}
 
+			ParticleManager::GetParticleCSEmitter(traceEmitterIndexes_[i]).emitter->prevTranslate = traceAnchors_[i]->GetWorldPos();
 			if (chargeParents_[i]->transform.scale.x > 0.0f) {
-				chargeParents_[i]->transform.scale.x -= 0.275f * FPSKeeper::DeltaTime();
-				chargeParents_[i]->transform.scale.y -= 0.275f * FPSKeeper::DeltaTime();
-				chargeParents_[i]->transform.scale.z -= 0.275f * FPSKeeper::DeltaTime();
-				chargeParents_[i]->transform.rotate.z += 0.045f * FPSKeeper::DeltaTime();
+				ShrinkScale(i, 0.55f * FPSKeeper::DeltaTime());
+				chargeParents_[i]->transform.rotate.z += 0.0225f * FPSKeeper::DeltaTime();
 			}
 			if (chargeParents_[i]->transform.scale.x <= 0.0f) {
 				if (i == 0) {
-					chargeSize_ -= 1.0f;
+					chargeSize_ -= 2.0f;
 					if (chargeSize_ <= 0.0f) {
 						chargeSize_ = 0.0f;
 					}
 				}
-				chargeParents_[i]->transform.scale.x = chargeSize_;
-				chargeParents_[i]->transform.scale.y = chargeSize_;
-				chargeParents_[i]->transform.scale.z = chargeSize_;
-				charges_[i].firstEmit_ = true;
-				charges_[i].grain_.lifeTime_ -= 2.5f;
-			}
-			float emitpos = chargeParents_[i]->transform.scale.x;
-			charges_[i].pos_ = { emitpos,emitpos,emitpos };
-			charges_[i].Emit();
+				chargeParents_[i]->transform.scale = Vector3::FillVec(chargeSize_);
+				//charges_[i].firstEmit_ = true;
+				//charges_[i].grain_.lifeTime_ -= 2.5f;
+				float emitpos = chargeParents_[i]->transform.scale.x;
+				traceAnchors_[i]->transform.translate = { emitpos,emitpos,emitpos };
+				ParticleManager::GetParticleCSEmitter(traceEmitterIndexes_[i]).emitter->lifeTime -= 2.5f;
+				ParticleManager::GetParticleCSEmitter(traceEmitterIndexes_[i]).emitter->prevTranslate = traceAnchors_[i]->GetWorldPos();
 
+			}
+			//charges_[i].pos_ = { emitpos,emitpos,emitpos };
+			//charges_[i].Emit();
+			UpdateEmitterPos(i);
 		}
 
 		if (chargeSize_ > 3.0f) {
@@ -840,21 +873,15 @@ bool Boss::BeamCharge() {
 		result = true;
 		for (int i = 0; i < 8; i++) {
 			if (chargeParents_[i]->transform.scale.x > 0.0f) {
-				chargeParents_[i]->transform.scale.x -= 0.275f * FPSKeeper::DeltaTime();
-				chargeParents_[i]->transform.scale.y -= 0.275f * FPSKeeper::DeltaTime();
-				chargeParents_[i]->transform.scale.z -= 0.275f * FPSKeeper::DeltaTime();
-				chargeParents_[i]->transform.rotate.z += 0.045f * FPSKeeper::DeltaTime();
+				ParticleManager::GetParticleCSEmitter(traceEmitterIndexes_[i]).emitter->prevTranslate = traceAnchors_[i]->GetWorldPos();
+				ShrinkScale(i, 0.55f * FPSKeeper::DeltaTime());
+				chargeParents_[i]->transform.rotate.z += 0.0225f * FPSKeeper::DeltaTime();
 				result = false;
 			}
-			if (chargeParents_[i]->transform.scale.x <= 0.0f) {
-				chargeParents_[i]->transform.scale.x = 0.0f;
-				chargeParents_[i]->transform.scale.y = 0.0f;
-				chargeParents_[i]->transform.scale.z = 0.0f;
-			}
 			if (!result) {
-				float emitpos = chargeParents_[i]->transform.scale.x;
-				charges_[i].pos_ = { emitpos,emitpos,emitpos };
-				charges_[i].Emit();
+				//charges_[i].pos_ = { emitpos,emitpos,emitpos };
+				//charges_[i].Emit();
+				UpdateEmitterPos(i);
 			}
 		}
 	}
@@ -867,6 +894,9 @@ bool Boss::BeamCharge() {
 }
 
 void Boss::BeamChargeComplete() {
+	for (int i = 0; i < 8; i++) {
+		ParticleManager::GetParticleCSEmitter(traceEmitterIndexes_[i]).isEmit = false;
+	}
 	charge12_.Emit();
 	charge13_.Emit();
 	charge14_.Emit();
@@ -876,7 +906,7 @@ void Boss::BeamChargeComplete() {
 bool Boss::BeamAttack() {
 	bool result = false;
 
-	if (beam_->BeamRotate()) {
+	if (beam_->BeamAttackUpdate()) {
 		result = true;
 	}
 
@@ -1145,4 +1175,18 @@ void Boss::EnergyTimeUpdate() {
 		summonLightning_.particleRotate_.z = Random::GetFloat(-0.15f, 0.15f);
 		summonLightning_.Emit();
 	}
+}
+
+void Boss::UpdateEmitterPos(int i) {
+	float emitpos = chargeParents_[i]->transform.scale.x;
+	traceAnchors_[i]->transform.translate = { emitpos, emitpos, emitpos };
+	auto& emitter = ParticleManager::GetParticleCSEmitter(traceEmitterIndexes_[i]).emitter;
+	emitter->translate = traceAnchors_[i]->GetWorldPos();
+}
+
+void Boss::ShrinkScale(int i, float delta) {
+	auto& s = chargeParents_[i]->transform.scale;
+	s.x = (std::max)(0.0f, s.x - delta);
+	s.y = (std::max)(0.0f, s.y - delta);
+	s.z = (std::max)(0.0f, s.z - delta);
 }

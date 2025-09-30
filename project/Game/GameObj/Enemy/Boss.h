@@ -114,6 +114,9 @@ private:
 	void ExpandSummon();
 	void EnergyTimeUpdate();
 
+	void UpdateEmitterPos(int i);
+	void ShrinkScale(int i, float delta);
+
 private:
 
 	std::unique_ptr<BaseBossBehavior> behavior_ = nullptr;
@@ -134,6 +137,8 @@ private:
 
 	Player* pPlayer_;
 	std::vector<std::unique_ptr<Object3d>> chargeParents_;
+	std::vector<std::unique_ptr<Object3d>> traceAnchors_;
+	std::vector<int> traceEmitterIndexes_;
 	std::unique_ptr<Object3d> waveParent_;
 	std::vector<std::unique_ptr<Object3d>> arrowParents_;
 
@@ -174,8 +179,8 @@ private:
 
 	float attackCooldown_ = 0.0f;
 	float chargeTime_ = 120.0f;
-	float chargeSize_ = 12.0f;
-	float baseChargeSize_ = 12.0f;
+	float chargeSize_ = 24.0f;
+	float baseChargeSize_ = 24.0f;
 
 	float jumpTime_ = 0.0f;
 	float jumpHeight_ = 0.0f;

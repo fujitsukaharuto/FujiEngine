@@ -188,8 +188,17 @@ void GameScene::Update() {
 				cMane_->AddCollider(ring->GetCollider());
 			}
 		}
-		if (boss_->GetBeam()->GetIsLive()) {
-			cMane_->AddCollider(boss_->GetBeam()->GetCollider());
+		int beamCount = 0;
+		for (auto& beam : boss_->GetBeam()->GetBeams()) {
+			if (boss_->GetBeam()->GetIsLive() && boss_->GetBeam()->GetChangeTime() <= 0.0f) {
+				cMane_->AddCollider(beam.collider.get());
+				if (boss_->GetBeam()->GetStep() == BeamStep::RotateBeam) {
+					beamCount++;
+				}
+				if (beamCount > 0) {
+					break;
+				}
+			}
 		}
 		cMane_->CheckAllCollision();
 	}

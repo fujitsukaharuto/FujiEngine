@@ -123,6 +123,8 @@ void TitleScene::Initialize() {
 		ParticleManager::GetParticleCSEmitter(i).emitter->velocityRandMin = Random::GetFloat(-0.03f, 0.03f);
 
 	}
+
+	ParticleManager::GetParticleCSEmitterSurface(0).isEmit = true;
 }
 
 void TitleScene::Update() {

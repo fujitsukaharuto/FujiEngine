@@ -4,12 +4,29 @@
 #include "Engine/Particle/ParticleEmitter.h"
 
 
+enum class BeamStep{
+	AroundAttack,
+	RotateBeam,
+};
+
+struct OneBeam {
+	std::unique_ptr<Object3d> beamCore1;
+	std::unique_ptr<Object3d> beamCore2;
+	std::unique_ptr<Object3d> beamCore3;
+	std::unique_ptr<Object3d> beam1;
+	std::unique_ptr<Object3d> beam2;
+	std::unique_ptr<Object3d> beam3;
+	std::unique_ptr<AABBCollider> collider;
+	std::unique_ptr<Object3d> model;
+	std::unique_ptr<Object3d> particleParent;
+};
+
 class Boss;
 
 class Beam : public OriginGameObject {
 public:
 	Beam();
-	~Beam() = default;
+	~Beam();
 
 	void Initialize()override;
 	void Update()override;
@@ -22,6 +39,8 @@ public:
 	void InitBeam(const Vector3& pos, const Vector3& velo);
 	bool BeamRotate();
 
+	bool BeamAttackUpdate();
+
 	//========================================================================*/
 	//* Collision
 	void OnCollisionEnter([[maybe_unused]] const ColliderInfo& other);
@@ -29,16 +48,27 @@ public:
 	void OnCollisionExit([[maybe_unused]] const ColliderInfo& other);
 
 
-	BaseCollider* GetCollider() { return collider_.get(); }
+	BaseCollider* GetCollider() { return beams_[0].collider.get(); }
+	std::vector<OneBeam>& GetBeams() { return beams_; }
 	float GetLifeTime() { return lifeTime_; }
 	bool GetIsLive() { return isLive_; }
+	BeamStep GetStep() { return step_; }
+	float GetChangeTime() { return changeTime_; }
 
-	void SetIsLive(bool is) { isLive_ = is; }
+	void SetIsLive(bool is);
 	void SetBossParent(Boss* boss);
 
 private:
 
+	void ChangeBeamStep();
+	void BeamExpand(BeamStep step);
+	void BeamMove(BeamStep step);
+	void BeamShrink(BeamStep step);
+
 private:
+
+	BeamStep step_ = BeamStep::AroundAttack;
+	std::vector<OneBeam> beams_;
 
 	std::unique_ptr<Object3d> beamCore1_;
 	std::unique_ptr<Object3d> beamCore2_;
@@ -49,7 +79,15 @@ private:
 	std::unique_ptr<Object3d> particleParent_;
 
 	bool isLive_ = false;
-	float lifeTime_ = 420.0f;
+	float lifeTime_ = 780.0f;
+
+	float expandTime_ = 60.0f;
+	float beamAttackTime_ = 240.0f;
+	float shrinkTime_ = 60.0f;
+
+	float changeTime_ = 0.0f;
+	Vector3 prePos_;
+	Vector3 targetPos_;
 
 	float uvTransX_;
 
