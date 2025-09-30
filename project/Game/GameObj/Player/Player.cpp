@@ -22,7 +22,7 @@ void Player::Initialize() {
 
 	shadow_ = std::make_unique<Object3d>();
 	shadow_->Create("Sphere");
-	shadow_->SetColor({ 0.0f,0.0f,0.0f,1.0f });
+	shadow_->SetColor({ 0.02f,0.02f,0.02f,0.5f });
 	shadow_->SetLightEnable(LightMode::kLightNone);
 	shadow_->transform.translate = model_->transform.translate;
 	shadow_->transform.translate.y = 0.15f;
