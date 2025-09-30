@@ -1806,6 +1806,7 @@ bool ParticleManager::InitEmitParticle(Particle& particle, const Vector3& pos, c
 }
 
 void ParticleManager::SaveGroupData() {
+#ifdef _DEBUG
 	json data{};
 	data["name"] = currentKey_;
 	data["texName"] = selectParticleGroup_->material_.GetPathName();
@@ -1813,4 +1814,5 @@ void ParticleManager::SaveGroupData() {
 	data["Shape"] = static_cast<int>(selectParticleGroup_->shapeType_);
 	data["subMode"] = selectParticleGroup_->isSubMode_;
 	JsonSerializer::SerializeJsonData(data, ("resource/ParticleGroups/" + currentKey_ + ".json").c_str());
+#endif // _DEBUG
 }
