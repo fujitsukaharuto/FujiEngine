@@ -214,7 +214,7 @@ public:
 	/// <summary>
 	/// 通常パーティクル
 	/// </summary>
-	static void CreateParticleGroup(const std::string& name, const std::string& fileName, uint32_t count = 20, ShapeType shape = ShapeType::PLANE, bool subMode = false);
+	static void CreateParticleGroup(const std::string& name, const std::string& fileName = "white2x2.png", uint32_t count = 20, ShapeType shape = ShapeType::PLANE, bool subMode = false);
 
 	/// <summary>
 	/// ペアレントパーティクル
@@ -247,6 +247,8 @@ public:
 	int InitGPUEmitterSurface(const std::string& fileName);
 
 private:
+
+	void InternalCreateParticleGroup(const std::string& name, const std::string& fileName, uint32_t count, ShapeType shape, bool subMode);
 
 	void UpdateParticleGroup(const Matrix4x4& billboardMatrix);
 	void UpdateParentParticleGroup(const Matrix4x4& billboardMatrix);
@@ -282,6 +284,8 @@ private:
 	void SRTUpdate(Particle& particle);
 	void Billboard(Particle& particle, Matrix4x4& worldMatrix, const Matrix4x4& billboardMatrix, const Matrix4x4& rotate);
 	bool InitEmitParticle(Particle& particle, const Vector3& pos, const Vector3& rotate, const Particle& grain, const RandomParametor& para);
+
+	void SaveGroupData();
 
 private:
 

@@ -7,6 +7,7 @@
 #include "Engine/DX/FPSKeeper.h"
 #include "Engine/Model/ModelManager.h"
 #include "ImGuiManager/ImGuiManager.h"
+#include "Engine/Editor/JsonSerializer.h"
 
 
 ParticleManager::ParticleManager() {
@@ -195,6 +196,9 @@ void ParticleManager::ParticleDebugGUI() {
 		ImGui::Combo("ShapeType##type", &shapeType, "Plane\0Ring\0sphere\0Torus\0Cylinder\0Cone\0Triangle\0Box\0Lightning\0");
 		selectParticleGroup_->shapeType_ = static_cast<ShapeType>(shapeType);
 		ImGui::Text("count : %d", int(selectParticleGroup_->drawCount_));
+		if (ImGui::Button("SaveGroup")) {
+			SaveGroupData();
+		}
 	}
 
 	ImGui::SeparatorText("SelectGroup");
@@ -378,37 +382,31 @@ void ParticleManager::CreateParticleGroup(const std::string& name, const std::st
 		return;
 	}
 
-	ParticleGroup* newGroup = new ParticleGroup();
-	newGroup->isSubMode_ = subMode;
-	newGroup->shapeType_ = shape;
-	newGroup->emitter_.name_ = name;
-	newGroup->emitter_.Load(name);
+	std::string path = "resource/ParticleGroups/" + name + ".json";
 
-	newGroup->insstanceCount_ = count;
-	newGroup->instancing_ = instance->dxcommon_->CreateBufferResource(instance->dxcommon_->GetDevice(), (sizeof(TransformationParticleMatrix) * newGroup->insstanceCount_));
-	newGroup->instancing_->Map(0, nullptr, reinterpret_cast<void**>(&newGroup->instancingData_));
-	uint32_t max = newGroup->insstanceCount_;
-	for (uint32_t index = 0; index < max; ++index) {
-		newGroup->instancingData_[index].WVP = MakeIdentity4x4();
-		newGroup->instancingData_[index].World = MakeIdentity4x4();
+	// JSON があるかチェック
+	if (std::filesystem::exists(path)) {
+		// JSON を読み込んでパラメータを設定
+		json data = JsonSerializer::DeserializeJsonData(path.c_str());
+
+		// パラメータ取得
+		std::string texName = data["texName"];
+		uint32_t maxCount = data["count"];
+		ShapeType shapeType = static_cast<ShapeType>(data["Shape"].get<int>());
+		bool isSubMode = data["subMode"];
+
+		instance->InternalCreateParticleGroup(name, texName, maxCount, shapeType, isSubMode);
+	} else {
+		instance->InternalCreateParticleGroup(name, fileName, count, shape, subMode);
+
+		json data{};
+		data["name"] = name;
+		data["texName"] = fileName;
+		data["count"] = count;
+		data["Shape"] = static_cast<int>(shape);
+		data["subMode"] = subMode;
+		JsonSerializer::SerializeJsonData(data, path.c_str());
 	}
-	newGroup->material_.SetTextureNamePath(fileName);
-	newGroup->material_.CreateMaterial();
-	newGroup->srvIndex_ = instance->srvManager_->Allocate();
-	instance->srvManager_->CreateStructuredSRV(newGroup->srvIndex_, newGroup->instancing_.Get(), newGroup->insstanceCount_, sizeof(TransformationParticleMatrix));
-
-	//ここでパーティクルをあらかじめ作る
-	float add = 0.1f;
-	for (int i = 0; i < int(max); i++) {
-		Particle p{};
-		p.scale = { 1.0f,1.0f,1.0f };
-		p.translate.x += add;
-		p.translate.y += add;
-		newGroup->particles_.push_back(p);
-		add += 0.1f;
-	}
-
-	instance->particleGroups_.insert(std::make_pair(name, newGroup));
 }
 
 void ParticleManager::CreateParentParticleGroup(const std::string& name, const std::string& fileName, uint32_t count, ShapeType shape) {
@@ -817,6 +815,48 @@ int ParticleManager::InitGPUEmitterSurface(const std::string& fileName) {
 	return result;
 }
 
+
+void ParticleManager::InternalCreateParticleGroup(const std::string& name, const std::string& fileName, uint32_t count, ShapeType shape, bool subMode) {
+	auto iterator = particleGroups_.find(name);
+	if (iterator != particleGroups_.end()) {
+		return;
+	}
+
+	ParticleGroup* newGroup = new ParticleGroup();
+	newGroup->isSubMode_ = subMode;
+	newGroup->shapeType_ = shape;
+	newGroup->emitter_.name_ = name;
+	newGroup->emitter_.Load(name);
+
+	newGroup->insstanceCount_ = count;
+	newGroup->instancing_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(),
+		sizeof(TransformationParticleMatrix) * newGroup->insstanceCount_);
+	newGroup->instancing_->Map(0, nullptr, reinterpret_cast<void**>(&newGroup->instancingData_));
+
+	for (uint32_t index = 0; index < count; ++index) {
+		newGroup->instancingData_[index].WVP = MakeIdentity4x4();
+		newGroup->instancingData_[index].World = MakeIdentity4x4();
+	}
+
+	newGroup->material_.SetTextureNamePath(fileName);
+	newGroup->material_.CreateMaterial();
+	newGroup->srvIndex_ = srvManager_->Allocate();
+	srvManager_->CreateStructuredSRV(newGroup->srvIndex_, newGroup->instancing_.Get(),
+		newGroup->insstanceCount_, sizeof(TransformationParticleMatrix));
+
+	// 仮の粒子を入れる（デバッグ用途）
+	float add = 0.1f;
+	for (uint32_t i = 0; i < count; ++i) {
+		Particle p{};
+		p.scale = { 1.0f,1.0f,1.0f };
+		p.translate.x += add;
+		p.translate.y += add;
+		newGroup->particles_.push_back(p);
+		add += 0.1f;
+	}
+
+	particleGroups_.insert(std::make_pair(name, newGroup));
+}
 
 void ParticleManager::UpdateParticleGroup(const Matrix4x4& billboardMatrix) {
 	for (auto& groupPair : particleGroups_) {
@@ -1763,4 +1803,14 @@ bool ParticleManager::InitEmitParticle(Particle& particle, const Vector3& pos, c
 		return true;
 	}
 	return false;
+}
+
+void ParticleManager::SaveGroupData() {
+	json data{};
+	data["name"] = currentKey_;
+	data["texName"] = selectParticleGroup_->material_.GetPathName();
+	data["count"] = selectParticleGroup_->insstanceCount_;
+	data["Shape"] = static_cast<int>(selectParticleGroup_->shapeType_);
+	data["subMode"] = selectParticleGroup_->isSubMode_;
+	JsonSerializer::SerializeJsonData(data, ("resource/ParticleGroups/" + currentKey_ + ".json").c_str());
 }

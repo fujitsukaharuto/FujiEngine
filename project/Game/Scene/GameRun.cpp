@@ -60,15 +60,15 @@ void GameRun::Initialize() {
 
 
 #pragma region パーティクル生成
-	pManager_->CreateParticleGroup("sphere", "redCircle.png");
-	pManager_->CreateParticleGroup("sphere2", "defaultParticle.png");
-	pManager_->CreateParticleGroup("sphere3", "white.png");
-	pManager_->CreateParticleGroup("ring", "gradationLine.png");
+	pManager_->CreateParticleGroup("sphere");
+	pManager_->CreateParticleGroup("sphere2");
+	pManager_->CreateParticleGroup("sphere3");
+	pManager_->CreateParticleGroup("ring");
 	pManager_->CreateParticleGroup("ChargeEffect1", "redCircle.png", 40);
 	pManager_->CreateParticleGroup("ChargeEffect2", "redCircle.png", 40);
 	pManager_->CreateParticleGroup("ChargeEffect3", "redCircle.png", 40);
 	pManager_->CreateParticleGroup("ChargeLight", "redCircle.png", 40);
-	pManager_->CreateParticleGroup("ChargeRay", "chargeRay.png", 20);
+	pManager_->CreateParticleGroup("ChargeRay");
 	pManager_->CreateParticleGroup("ChargeWave", "chargeCircle.png", 2);
 	pManager_->CreateParticleGroup("ChargeCircle", "chargeCircle.png", 2);
 	pManager_->CreateParticleGroup("BulletTrajectory", "redCircle.png", 1000);
@@ -87,7 +87,7 @@ void GameRun::Initialize() {
 	pManager_->CreateParticleGroup("playerStrongState1", "beamCore.png", 100, ShapeType::CYLINDER);
 	pManager_->CreateParticleGroup("playerStrongState2", "redCircle.png", 100);
 
-	pManager_->CreateParticleGroup("strongShotWave", "gradationLine.png", 20, ShapeType::RING);
+	pManager_->CreateParticleGroup("strongShotWave");
 
 	
 	pManager_->CreateParticleGroup("bulletHit", "redCircle.png", 100);
@@ -97,7 +97,7 @@ void GameRun::Initialize() {
 	pManager_->CreateParticleGroup("bulletHitCircle", "chargeCircle.png", 10);
 
 	// boss
-	pManager_->CreateParticleGroup("ShockRay", "chargeRay.png", 20);
+	pManager_->CreateParticleGroup("ShockRay");
 	pManager_->CreateParticleGroup("ShockWaveGround", "shockWaveGround.png", 10, ShapeType::RING);
 	pManager_->CreateParticleGroup("ShockWaveParticle", "redCircle.png", 30);
 
@@ -109,20 +109,20 @@ void GameRun::Initialize() {
 	pManager_->CreateParticleGroup("BeamCharge4", "redCircle.png", 1000);
 	pManager_->CreateParticleGroup("BeamCharge5", "redCircle.png", 40);
 	pManager_->CreateParticleGroup("BeamCharge6", "chargeCircle.png", 2);
-	pManager_->CreateParticleGroup("BeamCharge7", "chargeRay.png", 20);
-	pManager_->CreateParticleGroup("BeamCharge8", "redCircle.png", 20);
+	pManager_->CreateParticleGroup("BeamCharge7");
+	pManager_->CreateParticleGroup("BeamCharge8");
 	pManager_->CreateParticleGroup("BeamCharge9", "redCircle.png", 40);
 	pManager_->CreateParticleGroup("BeamCharge10", "redCircle.png", 10);
 	pManager_->CreateParticleGroup("BeamCharge11", "redCircle.png", 40, ShapeType::RING);
 	pManager_->CreateParticleGroup("BeamParticle", "redCircle.png", 200);
 	pManager_->CreateParticleGroup("BeamLight", "redCircle.png", 40);
 
-	pManager_->CreateParticleGroup("roringWave", "underRing.png", 20, ShapeType::CYLINDER);
+	pManager_->CreateParticleGroup("roringWave");
 	pManager_->CreateParticleGroup("roringParticle", "redCircle.png", 80);
-	pManager_->CreateParticleGroup("roringring", "gradationLine.png", 20, ShapeType::RING);
+	pManager_->CreateParticleGroup("roringring");
 
-	pManager_->CreateParticleGroup("lightning", "FX12_Lightning_01.png", 20, ShapeType::Lightning);
-	pManager_->CreateParticleGroup("lightningSphere", "white.png", 20, ShapeType::SPHERE);
+	pManager_->CreateParticleGroup("lightning");
+	pManager_->CreateParticleGroup("lightningSphere");
 	pManager_->CreateParticleGroup("lightningParticle", "redCircle.png", 80);
 
 	pManager_->CreateParticleGroup("summonLightning_", "FX12_Lightning_01.png", 40, ShapeType::Lightning);
