@@ -256,6 +256,7 @@ void Beam::InitBeam([[maybe_unused]] const Vector3& pos, [[maybe_unused]] const 
 		beam.beam3->transform.scale.x = 0.0f;
 		beam.beam3->transform.scale.z = 0.0f;
 		beam.particleParent->transform.rotate.y = beam.model->transform.rotate.y;
+		beam.particleParent->transform.rotate.x = 0.873f;
 		rad += radDis;
 	}
 }
