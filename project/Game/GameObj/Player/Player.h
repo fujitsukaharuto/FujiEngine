@@ -2,6 +2,7 @@
 #include "Game/OriginGameObject.h"
 #include "Game/Collider/AABBCollider.h"
 #include "Engine/Model/Sprite.h"
+#include "Engine/Audio/AudioPlayer.h"
 
 #include "Game/GameObj/Player/Behavior/BasePlayerBehavior.h"
 #include "Game/GameObj/Player/AttackBehavior/BasePlayerAttackBehavior.h"
@@ -170,6 +171,7 @@ private:
 	ParticleEmitter* storongStateEmitter1_;
 	ParticleEmitter storongStateEmitter2_;
 
+	SoundData* shotSE_;
 
 	// Title
 	Vector3 titleStartP_;

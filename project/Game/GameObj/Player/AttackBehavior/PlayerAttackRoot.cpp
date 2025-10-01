@@ -1,5 +1,5 @@
 #include "PlayerAttackRoot.h"
-
+#include "Engine/Audio/AudioPlayer.h"
 #include "Engine/Particle/ParticleManager.h"
 #include "Engine/Input/Input.h"
 
@@ -31,9 +31,14 @@ PlayerAttackRoot::PlayerAttackRoot(Player* pPlayer) : BasePlayerAttackBehavior(p
 	chargeRay_->frequencyTime_ = 0.0f;
 	chargeWave_->frequencyTime_ = 0.0f;
 
+	chargeSE_ = &AudioPlayer::GetInstance()->SoundLoadWave("chargeSE.wav");
+	chargeCompleteSE_ = &AudioPlayer::GetInstance()->SoundLoadWave("chargeCompleteSE.wav");
+
 }
 
 PlayerAttackRoot::~PlayerAttackRoot() {
+	AudioPlayer::GetInstance()->SoundStopWave(*chargeSE_);
+	AudioPlayer::GetInstance()->SoundStopWave(*chargeCompleteSE_);
 }
 
 void PlayerAttackRoot::Update() {
@@ -71,8 +76,13 @@ void PlayerAttackRoot::Update() {
 				pPlayer_->StrngthBullet();
 			}
 			pPlayer_->ReleaseBullet();
+			AudioPlayer::GetInstance()->SoundStopWave(*chargeSE_);
 		}
 		if (chargeTime_ > 10.0f) {
+			if (!isCharegSEStart_) {
+				AudioPlayer::GetInstance()->SoundLoop(*chargeSE_, 0.04f);
+				isCharegSEStart_ = true;
+			}
 			charge1_->Emit();
 			charge2_->Emit();
 			charge3_->Emit();
@@ -82,6 +92,7 @@ void PlayerAttackRoot::Update() {
 			step_ = Step::STRONGSHOT;
 			chargeRay_->Emit();
 			chargeWave_->Emit();
+			AudioPlayer::GetInstance()->SoundPlayWave(*chargeCompleteSE_,0.4f);
 			pPlayer_->StrngthBullet();
 		}
 
@@ -96,7 +107,9 @@ void PlayerAttackRoot::Update() {
 
 		if (!Input::GetInstance()->PushKey(DIK_J)) {
 			step_ = Step::ROOT;
+			AudioPlayer::GetInstance()->SoundStopWave(*chargeSE_);
 			pPlayer_->ReleaseBullet();
+			isCharegSEStart_ = false;
 		}
 
 		break;

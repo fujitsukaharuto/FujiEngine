@@ -12,6 +12,7 @@ Player::Player() {
 }
 
 Player::~Player() {
+	AudioPlayer::GetInstance()->SoundStopWave(*shotSE_);
 }
 
 void Player::Initialize() {
@@ -75,6 +76,8 @@ void Player::Initialize() {
 		bullet->Initialize();
 		bullets_.push_back(std::move(bullet));
 	}
+
+	shotSE_ = &AudioPlayer::GetInstance()->SoundLoadWave("shot.wav");
 
 	ChangeBehavior(std::make_unique<PlayerRoot>(this));
 	ChangeAttackBehavior(std::make_unique<PlayerAttackRoot>(this));
@@ -559,6 +562,9 @@ void Player::ReleaseBullet() {
 			Matrix4x4 rotateMatrix = MakeRotateXYZMatrix(model_->transform.rotate);
 			Vector3 worldForward = TransformNormal(forward, rotateMatrix);
 			bullet->Release(0.75f, 10.0f, worldForward);
+
+			AudioPlayer::GetInstance()->SoundPlayWave(*shotSE_, 0.1f);
+
 			isStrongState_ = false;
 			if (bullet->GetIsStrnght()) {
 				strongShotWave_.Emit();

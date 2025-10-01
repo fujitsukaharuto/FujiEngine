@@ -1,5 +1,6 @@
 #pragma once
 #include "BasePlayerAttackBehavior.h"
+#include "Engine/Audio/AudioPlayer.h"
 #include "Engine/Particle/ParticleEmitter.h"
 
 class PlayerAttackRoot : public BasePlayerAttackBehavior {
@@ -18,6 +19,8 @@ public:
 
 private:
 
+	bool isCharegSEStart_ = false;
+
 	Step step_;
 	float chargeTime_;
 	float coolTime_;
@@ -31,4 +34,6 @@ private:
 	ParticleEmitter* chargeWave_;
 	ParticleEmitter* chargeCircle_;
 
+	SoundData* chargeSE_;
+	SoundData* chargeCompleteSE_;
 };
