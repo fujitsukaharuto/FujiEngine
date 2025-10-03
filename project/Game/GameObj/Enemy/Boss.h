@@ -77,7 +77,8 @@ public:
 	void OnCollisionStay([[maybe_unused]] const ColliderInfo& other);
 	void OnCollisionExit([[maybe_unused]] const ColliderInfo& other);
 
-
+	//========================================================================*/
+	//* Getter
 	BaseCollider* GetCollider() { return collider_.get(); }
 	BaseCollider* GetCoreCollider() { return core_->GetCollider(); }
 	BossCore* GetBossCore() { return core_.get(); }
@@ -95,6 +96,8 @@ public:
 	float GetChainRate();
 	Vector3 GetDefoultPos() { return defaultCorePos_; }
 
+	//========================================================================*/
+	//* Setter
 	void SetPlayer(Player* player) { pPlayer_ = player; }
 	void SetDXCom(DXCom* dxcommon) { dxcommon_ = dxcommon; }
 
