@@ -39,9 +39,13 @@ public:
 	float GetDamage() { return damage_; }
 	BaseCollider* GetCollider() { return collider_.get(); }
 
+	//========================================================================*/
+	//* Setter
 	void SetIsLive(bool is) { isLive_ = is; }
 
 private:
+
+	void ParticleEmitterSetting();
 
 private:
 

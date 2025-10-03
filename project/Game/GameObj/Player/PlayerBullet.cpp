@@ -19,44 +19,10 @@ void PlayerBullet::Initialize() {
 	collider_->SetCollisionStayCallback([this](const ColliderInfo& other) {OnCollisionStay(other); });
 	collider_->SetCollisionExitCallback([this](const ColliderInfo& other) {OnCollisionExit(other); });
 
-	ParticleManager::Load(trajectory, "BulletTrajectory");
-	ParticleManager::Load(trajectory2, "BulletTrajectory2");
-
-	trajectory.SetParent(&model_->transform);
-	trajectory2.SetParent(&model_->transform);
-
-	trajectory.frequencyTime_ = 0.0f;
-	trajectory2.frequencyTime_ = 0.0f;
-
-	trajectory.pos_ = { 0.0f,0.0f,0.0f };
-	trajectory2.pos_ = { 0.6f,0.0f,0.6f };
-
-	trajectory.isDistanceComplement_ = true;
-	trajectory2.isDistanceComplement_ = true;
-
-	ParticleManager::Load(hit_, "bulletHit");
-	ParticleManager::Load(hit2_, "bulletHit2");
-	ParticleManager::Load(hit3_, "bulletHit3");
-	ParticleManager::Load(hitSmoke_, "bulletHitSmoke");
-	ParticleManager::Load(hitcircle_, "bulletHitCircle");
-
-	hit_.SetParent(&model_->transform);
-	hit2_.SetParent(&model_->transform);
-	hit3_.SetParent(&model_->transform);
-	hitSmoke_.SetParent(&model_->transform);
-	hitcircle_.SetParent(&model_->transform);
-
-	hit_.frequencyTime_ = 0.0f;
-	hit2_.frequencyTime_ = 0.0f;
-	hit3_.frequencyTime_ = 0.0f;
-	hitSmoke_.frequencyTime_ = 0.0f;
-	hitcircle_.frequencyTime_ = 0.0f;
-
-
+	ParticleEmitterSetting();
 }
 
 void PlayerBullet::Update() {
-
 	if (isLive_) {
 		model_->transform.translate += (velocity_ * speed_) * FPSKeeper::DeltaTime();
 
@@ -115,13 +81,10 @@ void PlayerBullet::CalculetionFollowVec(const Vector3& target) {
 	Quaternion spinRot = Quaternion::AngleAxis(zRotate_, Vector3(0, 0, 1));
 	// スピン回転を補間後のクォータニオンに加える（Z軸にひねる）
 	Quaternion finalRot = newRot * spinRot;
-	model_->transform.rotate = Quaternion::QuaternionToEuler(finalRot);  // オプション：オイラー角に変換して代入
+	model_->transform.rotate = Quaternion::QuaternionToEuler(finalRot);
 
 	trajectory.Emit();
-	if (isStrnght_) {
-		trajectory2.Emit();
-	}
-
+	if (isStrnght_) trajectory2.Emit();
 }
 
 ///= Collision ================================================================*/
@@ -151,10 +114,9 @@ void PlayerBullet::Charge(const Vector3& pos, const Vector3& rot) {
 
 	model_->transform.translate = pos;
 	model_->transform.rotate = rot;
-
 }
 
-void PlayerBullet::StrnghtBullet() {
+void PlayerBullet::StrnghtBullet() { // 強化弾に変更する
 	isStrnght_ = true;
 	collider_->SetWidth(0.6f);
 	collider_->SetDepth(0.6f);
@@ -165,7 +127,7 @@ void PlayerBullet::StrnghtBullet() {
 }
 
 ///= Release ==================================================================*/
-void PlayerBullet::Release(float speed, float damage, const Vector3& velo) {
+void PlayerBullet::Release(float speed, float damage, const Vector3& velo) { // 発射処理
 	isCharge_ = false;
 	speed_ = speed;
 	damage_ = damage;
@@ -173,4 +135,33 @@ void PlayerBullet::Release(float speed, float damage, const Vector3& velo) {
 
 	trajectory.firstEmit_ = true;
 	trajectory2.firstEmit_ = true;
+}
+
+void PlayerBullet::ParticleEmitterSetting() {
+	ParticleManager::Load(trajectory, "BulletTrajectory");
+	ParticleManager::Load(trajectory2, "BulletTrajectory2");
+
+	trajectory.SetParent(&model_->transform);
+	trajectory2.SetParent(&model_->transform);
+
+	trajectory.pos_ = { 0.0f,0.0f,0.0f };
+	trajectory2.pos_ = { 0.6f,0.0f,0.6f };
+
+	ParticleManager::Load(hit_, "bulletHit");
+	ParticleManager::Load(hit2_, "bulletHit2");
+	ParticleManager::Load(hit3_, "bulletHit3");
+	ParticleManager::Load(hitSmoke_, "bulletHitSmoke");
+	ParticleManager::Load(hitcircle_, "bulletHitCircle");
+
+	hit_.SetParent(&model_->transform);
+	hit2_.SetParent(&model_->transform);
+	hit3_.SetParent(&model_->transform);
+	hitSmoke_.SetParent(&model_->transform);
+	hitcircle_.SetParent(&model_->transform);
+
+	hit_.frequencyTime_ = 0.0f;
+	hit2_.frequencyTime_ = 0.0f;
+	hit3_.frequencyTime_ = 0.0f;
+	hitSmoke_.frequencyTime_ = 0.0f;
+	hitcircle_.frequencyTime_ = 0.0f;
 }
