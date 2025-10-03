@@ -47,7 +47,8 @@ public:
 	void OnCollisionStay([[maybe_unused]] const ColliderInfo& other);
 	void OnCollisionExit([[maybe_unused]] const ColliderInfo& other);
 
-
+	//========================================================================*/
+	//* Getter
 	BaseCollider* GetCollider() { return beams_[0].collider.get(); }
 	std::vector<OneBeam>& GetBeams() { return beams_; }
 	float GetLifeTime() { return lifeTime_; }
@@ -55,6 +56,8 @@ public:
 	BeamStep GetStep() { return step_; }
 	float GetChangeTime() { return changeTime_; }
 
+	//========================================================================*/
+	//* Setter
 	void SetIsLive(bool is);
 	void SetBossParent(Boss* boss);
 

@@ -35,12 +35,7 @@ void Arrow::Initialize() {
 	ParticleManager::Load(hitParticle_, "arrowParticle");
 
 	spark1_.frequencyTime_ = 0.0f;
-	spark1_.grain_.isZandX_ = true;
-
-	spark2_.grain_.isZandX_ = true;
-
 	spark3_.frequencyTime_ = 0.0f;
-
 }
 
 void Arrow::Update() {

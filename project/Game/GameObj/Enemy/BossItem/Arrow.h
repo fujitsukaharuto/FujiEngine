@@ -44,9 +44,13 @@ public:
 	void OnCollisionStay([[maybe_unused]] const ColliderInfo& other);
 	void OnCollisionExit([[maybe_unused]] const ColliderInfo& other);
 
+	//========================================================================*/
+	//* Setter
 	void SetIsLive(bool is);
 	void SetEmitterNumber(int num) { emitterNumber_ = num; }
 
+	//========================================================================*/
+	//* Getter
 	BaseCollider* GetCollider() { return collider_.get(); }
 	bool GetIsLive() { return isLive_; }
 
