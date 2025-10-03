@@ -192,7 +192,15 @@ std::string NodeGraph::NodeTypeToString(MyNode::NodeType t) {
 json NodeGraph::SaveNodeData() {
 	json root;
 	root["Nodes"] = json::array();
-	for (const auto& n : nodes) root["Nodes"].push_back(SerializeNode(n));
+	for (const auto& n : nodes) {
+		if (n.outputs.size() != 0) {
+			if (n.outputs[0].isLinked == true) {
+				continue;
+			}
+		}
+		// outputがどこにも繋がってない、もしくはないノードのみを書く
+		root["Nodes"].push_back(SerializeNode(n));
+	}
 	return root;
 }
 
@@ -252,9 +260,24 @@ json NodeGraph::SerializeNode(const MyNode& node) {
 		j["texName"] = node.texName;
 	}
 
-	// ピン情報（必要なら）
-	j["inputs_count"] = node.inputs.size();
-	j["outputs_count"] = node.outputs.size();
+	// ピン情報から繋がっているノード探して再帰的に保存していく
+	if (node.inputs.size() != 0) {
+		for (int i = 0; i < node.inputs.size(); i++) {
+			if (node.inputs[i].isLinked == true) {
+				const Link* pLink = nullptr;
+				for (const Link& link : links) {
+					if (link.endPinId == node.inputs[i].id)
+						pLink = &link;
+				}
+				if (!pLink)
+					continue;
+				MyNode* srcNode = FindNodeByPinId(pLink->startPinId);
+				if (!srcNode)
+					continue;
+				j["child"][i] = SerializeNode(*srcNode); // ["child"][i]がなかった場合はnullとして保存される
+			}
+		}
+	} // もし["child"]が何もなければ["child"]欄ができない
 
 	return j;
 }

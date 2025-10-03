@@ -261,6 +261,7 @@ void ParticleManager::ParticleCSDebugGUI() {
 			Vector3 prePos = csEmitters_[idx].emitter->translate;
 			ImGui::DragFloat3("translate", &csEmitters_[idx].emitter->translate.x, 0.1f);
 			csEmitters_[idx].emitter->prevTranslate = prePos;
+			ImGui::DragFloat3("preTranslate", &csEmitters_[idx].emitter->prevTranslate.x, 0.1f);
 
 			ImGui::DragFloat("radius", &csEmitters_[idx].emitter->radius, 0.1f, 0.0f, 300.0f);
 
