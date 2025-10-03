@@ -82,7 +82,7 @@ void Player::Initialize() {
 	ChangeBehavior(std::make_unique<PlayerRoot>(this));
 	ChangeAttackBehavior(std::make_unique<PlayerAttackRoot>(this));
 
-	EmitterSetting();
+	ParticleEmitterSetting();
 
 
 }
@@ -652,7 +652,7 @@ void Player::TitleStartUpdate([[maybe_unused]] float titleTime) {
 	moveBurnerRT_->Emit();
 }
 
-void Player::EmitterSetting() {
+void Player::ParticleEmitterSetting() {
 	ParticleManager::Load(hit_, "sphere");
 	ParticleManager::Load(hit2_, "playerhit");
 	ParticleManager::Load(moveParticleL_, "playerTranjectory");
@@ -715,11 +715,5 @@ void Player::EmitterSetting() {
 	ParticleManager::Load(storongStateEmitter2_, "playerStrongState2");
 	storongStateEmitter1_->SetParent(&strongStatePos_->transform);
 	storongStateEmitter2_.SetParent(&model_->transform);
-	storongStateEmitter1_->grain_.isAutoUVMove_ = true;
-	storongStateEmitter1_->para_.autoUVMax = {  0.02f,0.003f };
-	storongStateEmitter1_->para_.autoUVMin = { -0.02f,0.001f };
-	storongStateEmitter2_.grain_.isAutoUVMove_ = true;
-	storongStateEmitter2_.para_.autoUVMax = {  0.02f,0.003f };
-	storongStateEmitter2_.para_.autoUVMin = { -0.02f,0.001f };
 
 }

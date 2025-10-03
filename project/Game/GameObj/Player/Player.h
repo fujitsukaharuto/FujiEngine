@@ -95,7 +95,7 @@ public:
 
 private:
 
-	void EmitterSetting();
+	void ParticleEmitterSetting();
 
 private:
 
