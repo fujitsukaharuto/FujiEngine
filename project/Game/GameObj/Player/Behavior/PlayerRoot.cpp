@@ -39,6 +39,9 @@ void PlayerRoot::Update() {
 	case PlayerRoot::Step::TOJUMP:
 		pPlayer_->ChangeBehavior(std::make_unique<PlayerJump>(pPlayer_));
 		break;
+		///---------------------------------------------------------------------------------------
+		/// 回避へ移行
+		///---------------------------------------------------------------------------------------
 	case PlayerRoot::Step::TOAVOID:
 		pPlayer_->ChangeBehavior(std::make_unique<PlayerAvoid>(pPlayer_));
 		break;

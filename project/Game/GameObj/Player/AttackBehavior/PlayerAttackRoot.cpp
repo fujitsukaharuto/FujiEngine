@@ -17,7 +17,6 @@ PlayerAttackRoot::PlayerAttackRoot(Player* pPlayer) : BasePlayerAttackBehavior(p
 	ParticleManager::LoadParentGroup(chargeWave_, "ChargeWave");
 	ParticleManager::LoadParentGroup(chargeCircle_, "ChargeCircle");
 
-
 	charge1_->SetParent(&pPlayer_->GetModel()->transform);
 	charge2_->SetParent(&pPlayer_->GetModel()->transform);
 	charge3_->SetParent(&pPlayer_->GetModel()->transform);
@@ -33,10 +32,10 @@ PlayerAttackRoot::PlayerAttackRoot(Player* pPlayer) : BasePlayerAttackBehavior(p
 
 	chargeSE_ = &AudioPlayer::GetInstance()->SoundLoadWave("chargeSE.wav");
 	chargeCompleteSE_ = &AudioPlayer::GetInstance()->SoundLoadWave("chargeCompleteSE.wav");
-
 }
 
 PlayerAttackRoot::~PlayerAttackRoot() {
+	// いちおう音を安全のため止めておく
 	AudioPlayer::GetInstance()->SoundStopWave(*chargeSE_);
 	AudioPlayer::GetInstance()->SoundStopWave(*chargeCompleteSE_);
 }
@@ -63,7 +62,7 @@ void PlayerAttackRoot::Update() {
 
 		break;
 		///---------------------------------------------------------------------------------------
-		/// ジャンプへ移行
+		/// チャージ状態
 		///---------------------------------------------------------------------------------------
 	case PlayerAttackRoot::Step::CHAREGE:
 		
@@ -97,6 +96,9 @@ void PlayerAttackRoot::Update() {
 		}
 
 		break;
+		///---------------------------------------------------------------------------------------
+		/// 強化弾状態
+		///---------------------------------------------------------------------------------------
 	case PlayerAttackRoot::Step::STRONGSHOT:
 
 		charge1_->Emit();

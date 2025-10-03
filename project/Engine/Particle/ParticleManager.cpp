@@ -1585,6 +1585,7 @@ void ParticleManager::ParticleSizeUpdate(Particle& particle) {
 	SizeType sizeType = SizeType(particle.type_);
 	float t = (1.0f - float(float(particle.lifeTime_) / float(particle.startLifeTime_)));
 
+	// ToDo:colorFadeInの処理も追加する
 	if (particle.isColorFade_) {
 		particle.color_.w = Lerp(particle.startAlpha_, 0.0f, t * t);
 	}
@@ -1761,6 +1762,7 @@ bool ParticleManager::InitEmitParticle(Particle& particle, const Vector3& pos, c
 		particle.pattern_ = grain.pattern_;
 		particle.colorType_ = grain.colorType_;
 		particle.isColorFade_ = grain.isColorFade_;
+		particle.isColorFadeIn_ = grain.isColorFadeIn_;
 		particle.uvTrans_ = grain.uvTrans_;
 		particle.uvScale_ = grain.uvScale_;
 		particle.isAutoUVMove_ = grain.isAutoUVMove_;
