@@ -10,7 +10,7 @@ BossArrowAttack::BossArrowAttack(Boss* pBoss,bool beforArrow) : BaseBossBehavior
 	step_ = Step::ATTACK;
 	pBoss_->GetAnimModel()->ChangeAnimation("idle");
 	pBoss_->GetAnimModel()->IsRoopAnimation(false);
-	isbeforArrow_ = beforArrow;
+	isbeforArrow_ = beforArrow; // 1つ前がarrowだったら次はarrowにならないように
 	if (beforArrow) {
 		beforWait_ = 60.0f;
 		coolTime_ = 30.0f;
@@ -25,7 +25,7 @@ void BossArrowAttack::Update() {
 
 	switch (step_) {
 		///---------------------------------------------------------------------------------------
-		/// 通常
+		/// 攻撃
 		///---------------------------------------------------------------------------------------
 	case BossArrowAttack::Step::ATTACK:
 
@@ -43,7 +43,7 @@ void BossArrowAttack::Update() {
 
 		break;
 		///---------------------------------------------------------------------------------------
-		/// ジャンプへ移行
+		/// 通常or攻撃へ移行
 		///---------------------------------------------------------------------------------------
 	case BossArrowAttack::Step::TOROOT:
 	{

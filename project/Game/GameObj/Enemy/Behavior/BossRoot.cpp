@@ -52,7 +52,7 @@ void BossRoot::Update() {
 			break;
 		case AttackPattern::JumpAttack:
 		{
-			int count = 2;
+			int count = 2; // ジャンプ攻撃の回数は確率かフェーズによって増える
 			if (pBoss_->GetPhaseIndex() > 0 || Random::GetFloat(0.0f, 1.0f) > 0.75f) count = 3;
 			pBoss_->ChangeBehavior(std::make_unique<BossJumpAttack>(pBoss_, count));
 		}
