@@ -7,7 +7,7 @@ BossBeamAttack::BossBeamAttack(Boss* pBoss) : BaseBossBehavior(pBoss) {
 	step_ = Step::CHARGE;
 
 	pBoss_->InitBeam();
-	pBoss_->GetAnimModel()->ChangeAnimation("idle");
+	pBoss_->GetAnimModel()->ChangeAnimation("BeamChargePose");
 	pBoss_->ChainCount();
 }
 

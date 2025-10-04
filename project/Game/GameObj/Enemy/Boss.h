@@ -83,9 +83,9 @@ public:
 	BaseCollider* GetCoreCollider() { return core_->GetCollider(); }
 	BossCore* GetBossCore() { return core_.get(); }
 	Beam* GetBeam() { return beam_.get(); }
-	std::vector<std::unique_ptr<WaveWall>>& GetWalls() { return walls_; }
-	std::vector<std::unique_ptr<Arrow>>& GetArrows() { return arrows_; }
-	std::vector<std::unique_ptr<UnderRing>>& GetUnderRings() { return undderRings_; }
+	const  std::vector<std::unique_ptr<WaveWall>>& GetWalls() { return walls_; }
+	const std::vector<std::unique_ptr<Arrow>>& GetArrows() { return arrows_; }
+	const std::vector<std::unique_ptr<UnderRing>>& GetUnderRings() { return undderRings_; }
 	const std::vector<std::pair<std::string, float>>& GetPhaseActionList(int phase) { return phaseList_[phase]; }
 	float GetAttackCooldown() { return attackCooldown_; }
 	int GetPhaseIndex() { return phaseIndex_; }
@@ -100,6 +100,7 @@ public:
 	//* Setter
 	void SetPlayer(Player* player) { pPlayer_ = player; }
 	void SetDXCom(DXCom* dxcommon) { dxcommon_ = dxcommon; }
+	void SetSatrtWait(float waitT) { startWaiting_ = waitT; }
 
 	void SavePhase();
 	void LoadPhase();
@@ -172,6 +173,7 @@ private:
 	bool isStart_ = true;
 	float startTime_ = 300.0f;
 
+	float startWaiting_ = 0.0f;
 	float summonCircleExpandTime_ = 50.0f;
 	float energyTime_ = 120.0f;
 	float energyCoolTime_ = 30.0f;

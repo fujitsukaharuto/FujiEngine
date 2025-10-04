@@ -53,9 +53,12 @@ private:
 
 	bool isDebugCameraMode_ = false;
 
+	float startPlayerLandingTime_ = 300.0f;
 
 	ParticleEmitter emit;
 	ParticleEmitter field;
+
+	SoundData* bgm_;
 
 	// sceneChange
 	std::unique_ptr<Sprite> black_;

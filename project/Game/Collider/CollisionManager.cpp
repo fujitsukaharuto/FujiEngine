@@ -163,9 +163,9 @@ bool CollisionManager::checkAABBCollision(AABBCollider* A, AABBCollider* B) {
 	auto GetOBBAxes = [](const OBB& obb) -> std::array<Vector3, 3> {
 		Matrix4x4 rotationMatrix = MakeRotateXYZMatrix(obb.rotate);
 		return {
-			Transform(Vector3(1.0f, 0.0f, 0.0f), rotationMatrix),
-			Transform(Vector3(0.0f, 1.0f, 0.0f), rotationMatrix),
-			Transform(Vector3(0.0f, 0.0f, 1.0f), rotationMatrix)
+			TransformDirection(Vector3(1.0f, 0.0f, 0.0f), rotationMatrix),
+			TransformDirection(Vector3(0.0f, 1.0f, 0.0f), rotationMatrix),
+			TransformDirection(Vector3(0.0f, 0.0f, 1.0f), rotationMatrix)
 		};
 		};
 

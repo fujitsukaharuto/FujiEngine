@@ -15,6 +15,7 @@
 GameScene::GameScene() {}
 
 GameScene::~GameScene() {
+	AudioPlayer::GetInstance()->SoundStopWave(*bgm_);
 }
 
 void GameScene::Initialize() {
@@ -58,19 +59,22 @@ void GameScene::Initialize() {
 	player_ = std::make_unique<Player>();
 	boss_ = std::make_unique<Boss>();
 
-	LoadSceneLevelData("resource/Json/GameScene_position.json");
+	LoadSceneLevelData("resource/Json/GameScene_position.json"); // ここで座標読み込むけど現在プレイヤー別で設定しているので直す
 
 	player_->Initialize();
 	player_->SetDXCom(dxcommon_);
+	player_->SetLandingTime(startPlayerLandingTime_);
 
 	boss_->Initialize();
 	boss_->SetDXCom(dxcommon_);
 	boss_->SetPlayer(player_.get());
-
+	boss_->SetSatrtWait(startPlayerLandingTime_ + 60.0f);
 
 	followCamera_ = std::make_unique<FollowCamera>();
 	followCamera_->Initialize();
 	followCamera_->SetTarget(&player_->GetTrans());
+	followCamera_->SetTranslate(player_->GetLandingStartPos());
+	followCamera_->PreRotateUpdate(boss_->GetDefoultPos());
 
 	key_ = std::make_unique<Sprite>();
 	key_->Load("key_beta.png");
@@ -102,6 +106,7 @@ void GameScene::Initialize() {
 	emit.RandomTranslate({ -0.1f,0.1f }, { -0.1f,0.1f }, { -0.1f,0.1f });
 
 	ParticleManager::Load(field, "fieldParticle");
+	bgm_ = &AudioPlayer::GetInstance()->SoundLoadWave("UrbanBGM_01.wav");
 
 }
 
@@ -116,7 +121,11 @@ void GameScene::Update() {
 #endif // _DEBUG
 
 	if (!player_->GetIsGameOver()) {
-		player_->SetTargetPos(boss_->GetBossCore()->GetCollider()->GetWorldPos());
+		if (boss_->GetIsStart()) {
+			player_->SetTargetPos(boss_->GetDefoultPos());
+		} else {
+			player_->SetTargetPos(boss_->GetBossCore()->GetCollider()->GetWorldPos());
+		}
 		player_->Update();
 
 		if (boss_->GetIsStart()) {
@@ -128,8 +137,10 @@ void GameScene::Update() {
 		boss_->Update();
 		if (!boss_->GetIsStart() && player_->GetIsStart()) {
 			player_->SetIsStart(false);
+			AudioPlayer::GetInstance()->SoundLoop(*bgm_, 0.025f);
 		}
 	} else {
+		AudioPlayer::GetInstance()->SoundStopWave(*bgm_);
 		if (selectPoint_ == 0) {
 			if (input_->TriggerKey(DIK_SPACE)) {
 				player_->ReStart();
@@ -158,7 +169,7 @@ void GameScene::Update() {
 
 #ifdef _DEBUG
 	if (input_->TriggerKey(DIK_8)) {
-		SoundData& soundData1 = audioPlayer_->SoundLoadWave("xxx.wav");
+		SoundData& soundData1 = audioPlayer_->SoundLoadWave("shot.wav");
 		audioPlayer_->SoundPlayWave(soundData1);
 	}
 #endif // _DEBUG

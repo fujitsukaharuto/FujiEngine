@@ -104,6 +104,8 @@ Vector2 Transform(const Vector2& vector, const Matrix3x3& matrix);
 
 Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix);
 
+Vector3 TransformDirection(const Vector3& vector, const Matrix4x4& matrix);
+
 Matrix4x4 Multiply(const Matrix4x4& matrix1, const Matrix4x4& matrix2);
 
 Matrix4x4 Transpose(const Matrix4x4& m);

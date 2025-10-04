@@ -63,6 +63,7 @@ void Player::Initialize() {
 	maxChargeTime_ = 60.0f;
 
 	collider_ = std::make_unique<AABBCollider>();
+	collider_->SetTag("player");
 	collider_->SetWidth(2.0f);
 	collider_->SetDepth(2.0f);
 	collider_->SetHeight(2.0f);
@@ -85,6 +86,11 @@ void Player::Initialize() {
 	ParticleEmitterSetting();
 
 
+	titleEndP_ = model_->GetWorldPos();
+
+	titleStartP_ = { 50.0f,10.0f,80.0f };
+	titleCenterP_ = { 6.0f,3.0f,-80.0f };
+	model_->transform.translate = titleStartP_;
 }
 
 void Player::Update() {
@@ -114,6 +120,10 @@ void Player::Update() {
 
 					bullet->Update();
 				}
+			}
+		} else {
+			if (startLandingTime_ > 0.0f) {
+				LandingUpdate();
 			}
 		}
 
@@ -200,6 +210,7 @@ void Player::ReStart() {
 	isStart_ = true;
 	playerHP_ = 100.0f;
 	isFall_ = false;
+	deathTime_ = 240.0f;
 	model_->transform.rotate.y = 0.0f;
 	model_->transform.translate.x = 0.0f;
 	model_->transform.translate.y = 1.0f;
@@ -378,36 +389,7 @@ void Player::MoveTrans(const float& speed) {
 	// 位置を更新
 	model_->transform.translate += velocity_;
 
-	Vector3 particleSpeed = Random::GetVector3({ -0.01f,0.01f }, { -0.01f,0.01f }, { -0.3f,-0.2f });
-	particleSpeed = TransformNormal(particleSpeed, MakeRotateXYZMatrix(model_->transform.rotate));
-	moveParticleL_.para_.speedx = { particleSpeed.x,particleSpeed.x };
-	moveParticleL_.para_.speedy = { particleSpeed.y,particleSpeed.y };
-	moveParticleL_.para_.speedz = { particleSpeed.z,particleSpeed.z };
-	moveParticleL_.Emit();
-	particleSpeed = Random::GetVector3({ -0.01f,0.01f }, { -0.01f,0.01f }, { -0.3f,-0.2f });
-	particleSpeed = TransformNormal(particleSpeed, MakeRotateXYZMatrix(model_->transform.rotate));
-	moveParticleR_.para_.speedx = { particleSpeed.x,particleSpeed.x };
-	moveParticleR_.para_.speedy = { particleSpeed.y,particleSpeed.y };
-	moveParticleR_.para_.speedz = { particleSpeed.z,particleSpeed.z };
-	moveParticleR_.Emit();
-	particleSpeed = { 0.0f,0.0f,-0.1f };
-	particleSpeed = TransformNormal(particleSpeed, MakeRotateXYZMatrix(model_->transform.rotate));
-	moveBurnerL_->para_.speedx = { particleSpeed.x,particleSpeed.x };
-	moveBurnerL_->para_.speedy = { particleSpeed.y,particleSpeed.y };
-	moveBurnerL_->para_.speedz = { particleSpeed.z,particleSpeed.z };
-	moveBurnerR_->para_.speedx = { particleSpeed.x,particleSpeed.x };
-	moveBurnerR_->para_.speedy = { particleSpeed.y,particleSpeed.y };
-	moveBurnerR_->para_.speedz = { particleSpeed.z,particleSpeed.z };
-	moveBurnerLT_->para_.speedx = { particleSpeed.x,particleSpeed.x };
-	moveBurnerLT_->para_.speedy = { particleSpeed.y,particleSpeed.y };
-	moveBurnerLT_->para_.speedz = { particleSpeed.z,particleSpeed.z };
-	moveBurnerRT_->para_.speedx = { particleSpeed.x,particleSpeed.x };
-	moveBurnerRT_->para_.speedy = { particleSpeed.y,particleSpeed.y };
-	moveBurnerRT_->para_.speedz = { particleSpeed.z,particleSpeed.z };
-	moveBurnerL_->Emit();
-	moveBurnerR_->Emit();
-	moveBurnerLT_->Emit();
-	moveBurnerRT_->Emit();
+	MoveEngineParticle();
 }
 
 void Player::MoveRotate() {
@@ -581,6 +563,43 @@ void Player::StrngthBullet() {
 	}
 }
 
+void Player::LandingUpdate() {
+	float delta= FPSKeeper::DeltaTime();
+	if (delta > 2.2f) return;
+	if (startLandingTime_ > 0.0f) {
+		startLandingTime_ -= delta;
+		startLandingTime_ = (std::max)(0.0f, startLandingTime_);
+
+		float t = (std::min)((1.0f - startLandingTime_ / startLandingMax_), 1.0f);
+		Vector3 pos = (1.0f - t) * (1.0f - t) * titleStartP_ + 2.0f * (1.0f - t) * t * titleCenterP_ + t * t * titleEndP_;
+		model_->transform.translate = pos;
+
+		if (startLandingTime_ > startLandingMax_ * 0.025f) {
+			float pret = (std::min)((1.0f - (startLandingTime_ + delta) / startLandingMax_), 1.0f);
+			Vector3 dir = (2.0f * (1.0f - t)) * (titleCenterP_ - titleStartP_) + (2.0f * t) * (titleEndP_ - titleCenterP_);
+			dir = dir.Normalize();
+			Vector3 predir = (2.0f * (1.0f - pret)) * (titleCenterP_ - titleStartP_) + (2.0f * pret) * (titleEndP_ - titleCenterP_);
+			predir = predir.Normalize();
+
+			Quaternion rot = Quaternion::LookRotation(dir);
+			Quaternion prerot = Quaternion::LookRotation(predir);
+			Quaternion newRot = Quaternion::Slerp(prerot, rot, 0.1f);
+
+			model_->transform.rotate = Quaternion::QuaternionToEuler(newRot);
+		} else {
+			MoveRotate();
+		}
+
+		MoveEngineParticle();
+	}
+
+}
+
+void Player::SetLandingTime(float landTime) {
+	startLandingTime_ = landTime;
+	startLandingMax_ = landTime;
+}
+
 void Player::TitleUpdate([[maybe_unused]]float titleTime) {
 
 	if (titleTime >= 0.0f) {
@@ -620,36 +639,7 @@ void Player::TitleStartUpdate([[maybe_unused]] float titleTime) {
 
 	model_->transform.rotate = Quaternion::QuaternionToEuler(newRot);
 
-	Vector3 particleSpeed = Random::GetVector3({ -0.01f,0.01f }, { -0.01f,0.01f }, { -0.3f,-0.2f });
-	particleSpeed = TransformNormal(particleSpeed, MakeRotateXYZMatrix(model_->transform.rotate));
-	moveParticleL_.para_.speedx = { particleSpeed.x,particleSpeed.x };
-	moveParticleL_.para_.speedy = { particleSpeed.y,particleSpeed.y };
-	moveParticleL_.para_.speedz = { particleSpeed.z,particleSpeed.z };
-	moveParticleL_.Emit();
-	particleSpeed = Random::GetVector3({ -0.01f,0.01f }, { -0.01f,0.01f }, { -0.3f,-0.2f });
-	particleSpeed = TransformNormal(particleSpeed, MakeRotateXYZMatrix(model_->transform.rotate));
-	moveParticleR_.para_.speedx = { particleSpeed.x,particleSpeed.x };
-	moveParticleR_.para_.speedy = { particleSpeed.y,particleSpeed.y };
-	moveParticleR_.para_.speedz = { particleSpeed.z,particleSpeed.z };
-	moveParticleR_.Emit();
-	particleSpeed = { 0.0f,0.0f,-0.1f };
-	particleSpeed = TransformNormal(particleSpeed, MakeRotateXYZMatrix(model_->transform.rotate));
-	moveBurnerL_->para_.speedx = { particleSpeed.x,particleSpeed.x };
-	moveBurnerL_->para_.speedy = { particleSpeed.y,particleSpeed.y };
-	moveBurnerL_->para_.speedz = { particleSpeed.z,particleSpeed.z };
-	moveBurnerR_->para_.speedx = { particleSpeed.x,particleSpeed.x };
-	moveBurnerR_->para_.speedy = { particleSpeed.y,particleSpeed.y };
-	moveBurnerR_->para_.speedz = { particleSpeed.z,particleSpeed.z };
-	moveBurnerLT_->para_.speedx = { particleSpeed.x,particleSpeed.x };
-	moveBurnerLT_->para_.speedy = { particleSpeed.y,particleSpeed.y };
-	moveBurnerLT_->para_.speedz = { particleSpeed.z,particleSpeed.z };
-	moveBurnerRT_->para_.speedx = { particleSpeed.x,particleSpeed.x };
-	moveBurnerRT_->para_.speedy = { particleSpeed.y,particleSpeed.y };
-	moveBurnerRT_->para_.speedz = { particleSpeed.z,particleSpeed.z };
-	moveBurnerL_->Emit();
-	moveBurnerR_->Emit();
-	moveBurnerLT_->Emit();
-	moveBurnerRT_->Emit();
+	MoveEngineParticle();
 }
 
 void Player::ParticleEmitterSetting() {
@@ -716,4 +706,37 @@ void Player::ParticleEmitterSetting() {
 	storongStateEmitter1_->SetParent(&strongStatePos_->transform);
 	storongStateEmitter2_.SetParent(&model_->transform);
 
+}
+
+void Player::MoveEngineParticle() {
+	Vector3 particleSpeed = Random::GetVector3({ -0.01f,0.01f }, { -0.01f,0.01f }, { -0.3f,-0.2f });
+	particleSpeed = TransformNormal(particleSpeed, MakeRotateXYZMatrix(model_->transform.rotate));
+	moveParticleL_.para_.speedx = { particleSpeed.x,particleSpeed.x };
+	moveParticleL_.para_.speedy = { particleSpeed.y,particleSpeed.y };
+	moveParticleL_.para_.speedz = { particleSpeed.z,particleSpeed.z };
+	moveParticleL_.Emit();
+	particleSpeed = Random::GetVector3({ -0.01f,0.01f }, { -0.01f,0.01f }, { -0.3f,-0.2f });
+	particleSpeed = TransformNormal(particleSpeed, MakeRotateXYZMatrix(model_->transform.rotate));
+	moveParticleR_.para_.speedx = { particleSpeed.x,particleSpeed.x };
+	moveParticleR_.para_.speedy = { particleSpeed.y,particleSpeed.y };
+	moveParticleR_.para_.speedz = { particleSpeed.z,particleSpeed.z };
+	moveParticleR_.Emit();
+	particleSpeed = { 0.0f,0.0f,-0.1f };
+	particleSpeed = TransformNormal(particleSpeed, MakeRotateXYZMatrix(model_->transform.rotate));
+	moveBurnerL_->para_.speedx = { particleSpeed.x,particleSpeed.x };
+	moveBurnerL_->para_.speedy = { particleSpeed.y,particleSpeed.y };
+	moveBurnerL_->para_.speedz = { particleSpeed.z,particleSpeed.z };
+	moveBurnerR_->para_.speedx = { particleSpeed.x,particleSpeed.x };
+	moveBurnerR_->para_.speedy = { particleSpeed.y,particleSpeed.y };
+	moveBurnerR_->para_.speedz = { particleSpeed.z,particleSpeed.z };
+	moveBurnerLT_->para_.speedx = { particleSpeed.x,particleSpeed.x };
+	moveBurnerLT_->para_.speedy = { particleSpeed.y,particleSpeed.y };
+	moveBurnerLT_->para_.speedz = { particleSpeed.z,particleSpeed.z };
+	moveBurnerRT_->para_.speedx = { particleSpeed.x,particleSpeed.x };
+	moveBurnerRT_->para_.speedy = { particleSpeed.y,particleSpeed.y };
+	moveBurnerRT_->para_.speedz = { particleSpeed.z,particleSpeed.z };
+	moveBurnerL_->Emit();
+	moveBurnerR_->Emit();
+	moveBurnerLT_->Emit();
+	moveBurnerRT_->Emit();
 }

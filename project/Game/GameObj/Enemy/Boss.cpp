@@ -1035,6 +1035,9 @@ void Boss::LoadPhase() {
 
 void Boss::SetDefaultBehavior() {
 	beam_->SetIsLive(false);
+	for (int i = 0; i < 8; i++) {
+		ParticleManager::GetParticleCSEmitter(traceEmitterIndexes_[i]).isEmit = false;
+	}
 	for (auto& wave : walls_) {
 		wave->SetIsLive(false);
 	}
@@ -1102,7 +1105,7 @@ void Boss::InitSummon() {
 
 	ParticleManager::GetParticleCSEmitterTexture(summonIndex_).isEmit = true;
 	ParticleManager::GetParticleCSEmitterTexture(summonIndex_).emitter->lifeTime = 50.0f;
-	ParticleManager::GetParticleCSEmitterTexture(summonIndex_).emitter->radius = 0.0f;
+	ParticleManager::GetParticleCSEmitterTexture(summonIndex_).emitter->radius = 10.0f;
 	ParticleManager::GetParticleCSEmitterTexture(summonIndex_).emitter->frequency = 1.0f;
 	ParticleManager::GetParticleCSEmitterTexture(summonIndex_).emitter->translate = animModel_->transform.translate;
 	ParticleManager::GetParticleCSEmitterTexture(summonIndex_).emitter->baseVelocity = { 0.0f,0.01f,0.0f };
@@ -1134,10 +1137,14 @@ void Boss::InitSummon() {
 
 void Boss::ExpandSummon() {
 	if (FPSKeeper::DeltaTime() > 2.2f) return;
+	if (startWaiting_ > 0.0f) {
+		startWaiting_ -= FPSKeeper::DeltaTime();
+		return;
+	}
 	if (summonCircleExpandTime_ > 0.0f) {
 		summonCircleExpandTime_ -= FPSKeeper::DeltaTime();
 		float t = (std::max)(summonCircleExpandTime_ / 50.0f, 0.0f);
-		summonRadius_ = std::lerp(25.0f, 0.0f, t);
+		summonRadius_ = std::lerp(30.0f, 10.0f, t);
 		ParticleManager::GetParticleCSEmitterTexture(summonIndex_).emitter->radius = summonRadius_;
 		energyParticle_.Emit();
 	}

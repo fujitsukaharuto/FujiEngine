@@ -9,6 +9,7 @@ Beam::Beam() {
 }
 
 Beam::~Beam() {
+	ParticleManager::GetParticleCSEmitterSurface(1).isEmit = false;
 }
 
 void Beam::Initialize() {
@@ -255,6 +256,7 @@ void Beam::InitBeam([[maybe_unused]] const Vector3& pos, [[maybe_unused]] const 
 		beam.beam2->transform.scale.z = 0.0f;
 		beam.beam3->transform.scale.x = 0.0f;
 		beam.beam3->transform.scale.z = 0.0f;
+		beam.particleParent->transform.translate = beam.model->transform.translate;
 		beam.particleParent->transform.rotate.y = beam.model->transform.rotate.y;
 		beam.particleParent->transform.rotate.x = 0.873f;
 		rad += radDis;
@@ -455,7 +457,7 @@ void Beam::BeamMove(BeamStep step) {
 		case BeamStep::AroundAttack:
 		{
 			float frame = (beamAttackTime_);
-			float angleDegrees = (frame / 240.0f) * 120.0f + 20.0f;
+			float angleDegrees = (frame / 240.0f) * 50.0f + 90.0f;
 			float angleRadians = angleDegrees * (std::numbers::pi_v<float> / 180.0f);
 			float angleRadiansParent = (angleDegrees - 90.0f) * (std::numbers::pi_v<float> / 180.0f);
 

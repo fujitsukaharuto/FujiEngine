@@ -91,7 +91,8 @@ void TitleScene::Initialize() {
 
 	ParticleManager::Load(emit, "lightning");
 
-	ParticleManager::GetParticleCSEmitterSurface(0).isEmit = true;
+	// GPU Particle確認用
+	/*ParticleManager::GetParticleCSEmitterSurface(0).isEmit = true;
 	ParticleManager::GetParticleCSEmitterSurface(0).emitter->translate = { 16.0f,0.0f,14.0f };
 	for (int i = 0; i < 5; i++) {
 		ParticleManager::GetParticleCSEmitter(i).isEmit = true;
@@ -124,7 +125,7 @@ void TitleScene::Initialize() {
 
 	}
 
-	ParticleManager::GetParticleCSEmitterSurface(0).isEmit = true;
+	ParticleManager::GetParticleCSEmitterSurface(0).isEmit = true;*/
 }
 
 void TitleScene::Update() {

@@ -58,6 +58,10 @@ public:
 	void StrngthBullet();
 
 	//========================================================================*/
+	//* Landing
+	void LandingUpdate();
+
+	//========================================================================*/
 	//* Getter
 	float GetMoveSpeed() { return moveSpeed_; }
 	float GetJumpSpeed() { return jumpSpeed_; }
@@ -66,6 +70,7 @@ public:
 	float GetMaxChargeTime() { return maxChargeTime_; }
 	float GetAvoidCoolTime() { return avoidCoolTime_; }
 	int GetGrabDir() { return dir_; }
+	const Vector3& GetLandingStartPos() { return titleStartP_; }
 	bool GetIsFall() { return isFall_; }
 	bool GetIsGameOver() { return isGameOver_; }
 	bool GetIsStart() { return isStart_; }
@@ -82,7 +87,7 @@ public:
 	void SetTargetPos(const Vector3& pos) { targetPos_ = pos; }
 	void SetIsNowAvoid(bool is) { isNowAvoid_ = is; }
 	void SetDXCom(DXCom* dxcom) { dxcommon_ = dxcom; }
-
+	void SetLandingTime(float landTime);
 
 	//========================================================================*/
 	//* Title
@@ -96,6 +101,7 @@ public:
 private:
 
 	void ParticleEmitterSetting();
+	void MoveEngineParticle();
 
 private:
 
@@ -145,6 +151,9 @@ private:
 	Vector3 velocity_;
 	Vector3 inputDirection_;
 	int dir_;
+
+	float startLandingTime_ = 0.0f;
+	float startLandingMax_ = 0.0f;
 
 	DXCom* dxcommon_;
 

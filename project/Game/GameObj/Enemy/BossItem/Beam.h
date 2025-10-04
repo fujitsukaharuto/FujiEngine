@@ -98,7 +98,7 @@ private:
 	float beam2BaseScale_;
 	float beam3BaseScale_;
 
-	std::unique_ptr<AABBCollider> collider_;
+	//std::unique_ptr<AABBCollider> collider_;
 
 	// emitter
 	ParticleEmitter spark1_;

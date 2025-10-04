@@ -13,7 +13,9 @@ public:
 	void Update(const Vector3& lockon);
 	void ReStart(const Vector3& lockon);
 
+	void SetTranslate(const Vector3& pos);
 	void SetTarget(const Trans* target);
+	void PreRotateUpdate(const Vector3& lockon);
 	void Reset();
 
 
