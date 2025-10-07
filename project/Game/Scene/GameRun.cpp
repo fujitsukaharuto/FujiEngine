@@ -276,7 +276,7 @@ void GameRun::DebugGUI() {
 #ifdef _DEBUG
 	dxcommon_->OffscreenDebugGUI();
 	sceneManager_->ParticleGroupDebugGUI();
-
+	
 	ImGui::Begin("SceneDebug");
 
 	fpsKeeper_->Debug();

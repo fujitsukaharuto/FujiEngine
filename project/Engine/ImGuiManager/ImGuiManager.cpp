@@ -11,7 +11,7 @@
 #include "imgui_impl_win32.h"
 #include "ImGuizmo.h"
 #include "imgui_node_editor.h"
-#include "externals/imgui/utilities/widgets.h"
+#include "utilities/widgets.h"
 
 namespace ed = ax::NodeEditor;
 #endif // _DEBUG
@@ -44,11 +44,11 @@ void ImGuiManager::Initialize([[maybe_unused]] MyWin* myWin, [[maybe_unused]] DX
 
 	/// font
 	ImGuiIO& io = ImGui::GetIO();
-	io.Fonts->AddFontFromFileTTF("imgui/FiraMono-Medium.ttf", 16.0f);
+	io.Fonts->AddFontFromFileTTF("externals/imgui/FiraMono-Medium.ttf", 16.0f);
 
 	ImFontConfig font_config;
 	font_config.SizePixels = 18.0f;
-	font_japanese = io.Fonts->AddFontFromFileTTF("imgui/NotoSansJP-Regular.ttf", 18.0f, &font_config, io.Fonts->GetGlyphRangesJapanese());
+	font_japanese = io.Fonts->AddFontFromFileTTF("externals/imgui/NotoSansJP-Regular.ttf", 18.0f, &font_config, io.Fonts->GetGlyphRangesJapanese());
 
 
 	ImGui_ImplWin32_Init(myWin->GetHwnd());

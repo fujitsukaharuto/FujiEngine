@@ -45,12 +45,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(ProjectDir)externals\\nlohmann;$(SolutionDir)imgui;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)externals\\nlohmann;$(ProjectDir)externals\\imgui;$(IncludePath)</IncludePath>
     <IntDir>$(SolutionDir)..\generated\obj\$(ProjectName)\$(Configuration)\</IntDir>
     <OutDir>$(SolutionDir)..\generated\outputs\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(ProjectDir)externals\\nlohmann;$(SolutionDir)imgui;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)externals\\nlohmann;$(ProjectDir)externals\\imgui;$(IncludePath)</IncludePath>
     <IntDir>$(SolutionDir)..\generated\obj\$(ProjectName)\$(Configuration)\</IntDir>
     <OutDir>$(SolutionDir)..\generated\outputs\$(Configuration)\</OutDir>
   </PropertyGroup>
@@ -368,8 +368,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">
       <Project>{371b9fa9-4c90-4ac6-a123-aced756d6c77}</Project>
     </ProjectReference>
-    <ProjectReference Include="imgui\imgui.vcxproj">
-      <Project>{2f982886-63f0-44eb-8e63-444fa9381d38}</Project>
+    <ProjectReference Include="externals\imgui\imgui.vcxproj">
+      <Project>{b7ee80a7-e1e2-453c-8c48-26cd97ca67e0}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -3,7 +3,7 @@
 #include "Engine/Editor/PropertyCommand.h"
 #include "Engine/Editor/JsonSerializer.h"
 #ifdef _DEBUG
-#include "ImGuizmo.h"
+#include "externals/imgui/ImGuizmo.h"
 #endif // _DEBUG
 
 OriginGameObject::OriginGameObject() {
