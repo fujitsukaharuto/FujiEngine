@@ -2,10 +2,7 @@
 #include <memory>
 
 // やること
-// オフスクリーンのかんり
-// モデルマネージャー、スプライトマネージャー
-// wave対応
-// クラス分け
+// ToDo:クラス分け
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
