@@ -69,7 +69,7 @@ public:
 
 	void SetAlphaRef(float ref) { materialDate_->AlphaRef = ref; }
 
-	void SetTexture(const std::string& name);
+	void SetTexture(const std::string& name, bool overWrite = false);
 
 	void SetLightEnable(LightMode mode);
 

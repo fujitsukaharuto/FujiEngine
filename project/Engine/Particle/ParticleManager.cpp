@@ -195,6 +195,8 @@ void ParticleManager::ParticleDebugGUI() {
 		int shapeType = static_cast<int>(selectParticleGroup_->shapeType_);
 		ImGui::Combo("ShapeType##type", &shapeType, "Plane\0Ring\0sphere\0Torus\0Cylinder\0Cone\0Triangle\0Box\0Lightning\0");
 		selectParticleGroup_->shapeType_ = static_cast<ShapeType>(shapeType);
+		ImGui::Image((ImTextureID)TextureManager::GetInstance()->GetTexture(selectParticleGroup_->material_.GetPathName().c_str())->gpuHandle.ptr, { 100,100 });
+		ParticleTexurePopUp();
 		ImGui::Text("count : %d", int(selectParticleGroup_->drawCount_));
 		if (ImGui::Button("SaveGroup")) {
 			SaveGroupData();
@@ -1807,6 +1809,45 @@ bool ParticleManager::InitEmitParticle(Particle& particle, const Vector3& pos, c
 		return true;
 	}
 	return false;
+}
+
+void ParticleManager::ParticleTexurePopUp() {
+#ifdef _DEBUG
+	if (ImGui::Button("TextureFile")) {
+		ImGui::OpenPopup("TextureFile Window");
+	}
+	ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+	ImGui::PushStyleColor(ImGuiCol_ModalWindowDimBg, ImVec4(0, 0, 0, 0.25f));
+	if (ImGui::BeginPopupModal("TextureFile Window", NULL)) {
+		if (ImGui::Button("Refresh")) {
+			TextureManager::GetInstance()->LoadTextureFile(true);
+		}
+		int buttonCount = 0;
+		for (const auto& TexName : TextureManager::GetInstance()->GetTextureFiles()) {
+			if (buttonCount > 0 && buttonCount < 5) {
+				ImGui::SameLine();
+			} else {
+				buttonCount = 0;
+			}
+			if (ImGui::ImageButton(("##"+ TexName.first).c_str(), (ImTextureID)TextureManager::GetInstance()->GetTexture(TexName.first.c_str())->gpuHandle.ptr, ImVec2(100, 100))) {
+				selectParticleGroup_->material_.SetTextureNamePath(TexName.first.c_str());
+				selectParticleGroup_->material_.SetTexture(TexName.first.c_str(), TexName.second);
+				if (TexName.second) {
+					TextureManager::GetInstance()->SetTextureFileOnceLoad(TexName.first.c_str());
+				}
+			}
+			buttonCount++;
+		}
+		ImGui::Separator();
+		if (ImGui::Button("OK", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+		ImGui::SetItemDefaultFocus();
+		ImGui::SameLine();
+		if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+		ImGui::EndPopup();
+	}
+	ImGui::PopStyleColor();
+#endif // _DEBUG
 }
 
 void ParticleManager::SaveGroupData() {

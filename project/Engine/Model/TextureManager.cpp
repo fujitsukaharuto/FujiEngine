@@ -2,6 +2,9 @@
 #include "Engine/DX/DXCom.h"
 #include "Logger.h"
 #include "SRVManager.h"
+#include <fstream>
+#include <filesystem>
+#include <iostream>
 
 #include "externals/DirectXTex/DirectXTex.h"
 #include "externals/DirectXTex/d3dx12.h"
@@ -9,7 +12,9 @@
 
 TextureManager::TextureManager() {}
 
-TextureManager::~TextureManager() {}
+TextureManager::~TextureManager() {
+	textureFileList_.clear();
+}
 
 TextureManager* TextureManager::GetInstance() {
 	static TextureManager instance;
@@ -19,6 +24,10 @@ TextureManager* TextureManager::GetInstance() {
 
 void TextureManager::Initialize(DXCom* pDxcom) {
 	dxcommon_ = pDxcom;
+	LoadTextureFile();
+	for (auto& pair : textureFileList_) {
+		Load(pair.first.c_str());
+	}
 }
 
 void TextureManager::Finalize() {
@@ -39,42 +48,78 @@ Texture* TextureManager::LoadTexture(const std::string& filename) {
 	return it->second.get();
 }
 
-void TextureManager::Load(const std::string& filename) {
-	// 既にロードされているかチェック
-	if (m_textureCache.find(filename) != m_textureCache.end()) {
-		return;
-	}
-
+void TextureManager::Load(const std::string& filename, bool overWrite) {
 	SRVManager* srvManager = SRVManager::GetInstance();
 
+	// すでにある場合
+	auto it = m_textureCache.find(filename);
+	Texture* texture = nullptr;
+	if (it != m_textureCache.end()) {
+		if (!overWrite) {
+			return; // 上書きしない指定ならそのまま終了
+		}
+		texture = it->second.get(); // 既存のポインタを再利用
+	} else {
+		m_textureCache[filename] = std::move(std::make_unique<Texture>());
+		texture = m_textureCache[filename].get();
+		texture->srvIndex = UINT_MAX;
+	}
+
+	// 新しいデータ読み込み
 	DirectX::ScratchImage mipImages = LoadTextureFile(directoryPath_ + filename);
-	std::unique_ptr<Texture> texture = std::make_unique<Texture>();
-	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
-	texture->meta = metadata;
-	texture->textureResource = CreateTextureResource(dxcommon_->GetDevice(), metadata);
-	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource;
+	texture->meta = mipImages.GetMetadata();
 
-	intermediateResource.Reset();
-	intermediateResource = UploadTextureData(texture->textureResource, mipImages, dxcommon_->GetDevice(), dxcommon_->GetCommandList());
+	texture->textureResource = CreateTextureResource(dxcommon_->GetDevice(), texture->meta);
 
-	texture->srvIndex = srvManager->Allocate();
+	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource =
+		UploadTextureData(texture->textureResource, mipImages, dxcommon_->GetDevice(), dxcommon_->GetCommandList());
 
-	srvManager->CreateTextureSRV(texture->srvIndex, texture->textureResource.Get(), texture->meta.format, UINT(texture->meta.mipLevels), texture->meta.IsCubemap());
+	// すでにSRVを持っていなければ割り当て
+	if (texture->srvIndex == UINT_MAX) {
+		texture->srvIndex = srvManager->Allocate();
+	}
+
+	srvManager->CreateTextureSRV(
+		texture->srvIndex,
+		texture->textureResource.Get(),
+		texture->meta.format,
+		UINT(texture->meta.mipLevels),
+		texture->meta.IsCubemap()
+	);
 
 	texture->cpuHandle = srvManager->GetCPUDescriptorHandle(texture->srvIndex);
 	texture->gpuHandle = srvManager->GetGPUDescriptorHandle(texture->srvIndex);
 
 	dxcommon_->CommandExecution();
-
-	m_textureCache[filename] = std::move(texture);
 }
 
-Texture* TextureManager::GetTexture(const std::string& filename) const {
+void TextureManager::LoadTextureFile(bool overWrite) {
+#ifdef _DEBUG
+	textureFileList_.clear();
+	if (!std::filesystem::exists(directoryPath_)) return;
+
+	for (const auto& entry : std::filesystem::directory_iterator(directoryPath_)) {
+		if (entry.is_regular_file()) {
+			auto path = entry.path();
+			if (path.extension() == ".png" || path.extension() == ".jpg") {
+				if (overWrite) {
+					textureFileList_.push_back(std::make_pair(path.filename().string(), true));
+				} else {
+					textureFileList_.push_back(std::make_pair(path.filename().string(), false));
+				}
+			}
+		}
+	}
+#endif // _DEBUG
+}
+
+Texture* TextureManager::GetTexture(const std::string& filename) {
 	auto it = m_textureCache.find(filename);
 	if (it != m_textureCache.end()) {
 		return it->second.get();
 	}
-	return nullptr;
+	Texture* tex = TextureManager::LoadTexture(filename);
+	return tex;
 }
 
 const DirectX::TexMetadata& TextureManager::GetMetaData(const std::string& filename) {
@@ -82,6 +127,15 @@ const DirectX::TexMetadata& TextureManager::GetMetaData(const std::string& filen
 		return m_textureCache[filename]->meta;
 	} else {
 		throw std::runtime_error("Texture metadata not found for: " + filename);
+	}
+}
+
+void TextureManager::SetTextureFileOnceLoad(const std::string& name) {
+	for (auto& pair : textureFileList_) {
+		if (pair.first == name) {
+			pair.second = false;
+			break; // 名前がユニークなら break でOK
+		}
 	}
 }
 

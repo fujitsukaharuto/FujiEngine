@@ -80,7 +80,10 @@ void Material::SetUVScale(const Vector2& scale, const Vector2& uvTrans) {
 	materialDate_->uvTransform = Multiply(uvTransMatrix, uvScaleMatrix);
 }
 
-void Material::SetTexture(const std::string& name) {
+void Material::SetTexture(const std::string& name, bool overWrite) {
+	if (overWrite) {
+		TextureManager::GetInstance()->Load(name, overWrite);
+	}
 	texture_ = TextureManager::GetInstance()->GetTexture(name);
 }
 

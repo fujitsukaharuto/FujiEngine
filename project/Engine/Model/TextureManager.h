@@ -35,12 +35,15 @@ public:
 
 	// テクスチャのロード
 	Texture* LoadTexture(const std::string& filename);
-	void Load(const std::string& filename);
+	void Load(const std::string& filename, bool overWrite = false);
+	void LoadTextureFile(bool overWrite = false);
 
 	// テクスチャの取得
-	Texture* GetTexture(const std::string& filename) const;
-
+	Texture* GetTexture(const std::string& filename);
+	const std::vector<std::pair<std::string, bool>>& GetTextureFiles() { return textureFileList_; }
 	const DirectX::TexMetadata& GetMetaData(const std::string& filename);
+
+	void SetTextureFileOnceLoad(const std::string& name);
 
 	void ReleaseTexture(const std::string& filename);
 
@@ -59,6 +62,8 @@ private:
 	DXCom* dxcommon_;
 
 	std::unordered_map<std::string, std::unique_ptr<Texture>> m_textureCache;
+
+	std::vector<std::pair<std::string, bool>> textureFileList_;
 
 	std::string directoryPath_ = "resource/ModelandTexture/";
 };
