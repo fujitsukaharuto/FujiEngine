@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34525.116
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CG2_Demo", "CG2_Demo.vcxproj", "{2C5A9BA1-45AC-4AF7-8DFB-577E9757148C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FujiEngine", "FujiEngine.vcxproj", "{2C5A9BA1-45AC-4AF7-8DFB-577E9757148C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ソリューション項目", "ソリューション項目", "{F0F6CCD0-C914-4ACC-AB32-4EAD24B86EB3}"
 	ProjectSection(SolutionItems) = preProject
