@@ -197,6 +197,9 @@ void ParticleManager::ParticleDebugGUI() {
 		selectParticleGroup_->shapeType_ = static_cast<ShapeType>(shapeType);
 		ImGui::Image((ImTextureID)TextureManager::GetInstance()->GetTexture(selectParticleGroup_->material_.GetPathName().c_str())->gpuHandle.ptr, { 100,100 });
 		ParticleTexurePopUp();
+		int maxCount = static_cast<uint32_t>(selectParticleGroup_->insstanceCount_);
+		ImGui::DragInt("maxCount", &maxCount, 1, 1, 3000);
+		selectParticleGroup_->insstanceCount_ = static_cast<uint32_t>(maxCount);
 		ImGui::Text("count : %d", int(selectParticleGroup_->drawCount_));
 		if (ImGui::Button("SaveGroup")) {
 			SaveGroupData();

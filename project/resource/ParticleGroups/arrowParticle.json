@@ -1,7 +1,7 @@
 {
     "Shape": 0,
-    "count": 100,
+    "count": 250,
     "name": "arrowParticle",
     "subMode": false,
-    "texName": "redCircle.png"
+    "texName": "smoke.png"
 }

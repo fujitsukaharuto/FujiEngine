@@ -189,6 +189,16 @@ std::string NodeGraph::NodeTypeToString(MyNode::NodeType t) {
 	}
 }
 
+MyNode::NodeType NodeGraph::StringToNodeType(const std::string& str) {
+	if (str == "Texture") return MyNode::NodeType::Texture;
+	if (str == "Float") return MyNode::NodeType::Float;
+	if (str == "Add") return MyNode::NodeType::Add;
+	if (str == "Material") return MyNode::NodeType::Material;
+	if (str == "Color") return MyNode::NodeType::Color;
+	if (str == "Vector2") return MyNode::NodeType::Vector2;
+	return MyNode::NodeType::Vector2;
+}
+
 json NodeGraph::SaveNodeData() {
 	json root;
 	root["Nodes"] = json::array();
@@ -280,6 +290,93 @@ json NodeGraph::SerializeNode(const MyNode& node) {
 	} // もし["child"]が何もなければ["child"]欄ができない
 
 	return j;
+}
+
+void NodeGraph::DeserializeNodeData(const std::string& filePath) {
+	json data = JsonSerializer::DeserializeJsonData(filePath);
+	nodes.clear();
+	links.clear();
+
+	if (!data.contains("Nodes") || !data["Nodes"].is_array()) {
+		return;
+	}
+
+	for (const auto& nodeData : data["Nodes"]) {
+		MyNode node = DeserializeNode(nodeData);
+		nodes.push_back(node);
+	}
+}
+
+MyNode NodeGraph::DeserializeNode(const json& j) {
+	MyNode node;
+
+	node.CreateNode(StringToNodeType(j.value("nodeType", "Unknown")));
+
+	// values の復元
+	if (j.contains("values") && j["values"].is_array()) {
+		for (const auto& v : j["values"]) {
+			node.values.push_back(DeserializeValue(v));
+		}
+	}
+
+	// Textureノード専用
+	if (j.contains("texName")) {
+		node.texName = j["texName"].get<std::string>();
+	}
+
+	// child ノード（入力側に繋がっているノード）を再帰的に復元
+	if (j.contains("child")) {
+		for (auto& [key, value] : j["child"].items()) {
+			//MyNode childNode = DeserializeNode(value);
+			//nodes.push_back(childNode);
+
+			//// 入力ピンと子ノードの出力ピンをリンクで接続
+			//int inputIndex = std::stoi(key);
+			//if (inputIndex < node.inputs.size() && !childNode.outputs.empty()) {
+			//	Link link;
+			//	link.startPinId = childNode.outputs[0].id;
+			//	link.endPinId = node.inputs[inputIndex].id;
+			//	links.push_back(link);
+
+			//	node.inputs[inputIndex].isLinked = true;
+			//	childNode.outputs[0].isLinked = true;
+			//}
+		}
+	}
+
+	return node;
+}
+
+Value NodeGraph::DeserializeValue(const json& j) {
+	Value v;
+	std::string type = j.value("type", "None");
+
+	if (type == "Int") {
+		v.type = Value::Type::Int;
+		v.data = j["value"].get<int>();
+	} else if (type == "Float") {
+		v.type = Value::Type::Float;
+		v.data = j["value"].get<float>();
+	} else if (type == "Vector2") {
+		v.type = Value::Type::Vector2;
+		auto arr = j["value"];
+		v.data = Vector2{ arr[0], arr[1] };
+	} else if (type == "Vector3") {
+		v.type = Value::Type::Vector3;
+		auto arr = j["value"];
+		v.data = Vector3{ arr[0], arr[1], arr[2] };
+	} else if (type == "Color") {
+		v.type = Value::Type::Color;
+		auto arr = j["value"];
+		v.data = Vector4{ arr[0], arr[1], arr[2], arr[3] };
+	} else if (type == "Texture") {
+		v.type = Value::Type::Texture;
+		v.data = j["value"].get<std::string>();
+	} else {
+		v.type = Value::Type::None;
+	}
+
+	return v;
 }
 
 
