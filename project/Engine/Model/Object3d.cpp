@@ -23,31 +23,8 @@ Object3d::Object3d() {
 	config.SettingsFile = "resource/NodeEditor/NodeEditor.json";
 	nodeEditorContext_ = CreateEditor(&config);
 
-	MyNode texNode;
-	texNode.CreateNode(MyNode::NodeType::Texture);
-	texNode.values.push_back(Value("checkerBoard.png"));
-	texNode.texName = "checkerBoard.png";
-	nodeGraph_.AddNode(texNode);
+	selectorNodeId_ = nodeGraph_.DeserializeNodeData("resource/JsonNodeDataTest.json");
 
-	MyNode texNode2;
-	texNode2.CreateNode(MyNode::NodeType::Texture);
-	texNode2.values.push_back(Value("uvChecker.png"));
-	texNode2.texName = "uvChecker.png";
-	nodeGraph_.AddNode(texNode2);
-
-	MyNode colorNode;
-	colorNode.CreateNode(MyNode::NodeType::Color);
-	nodeGraph_.AddNode(colorNode);
-
-	MyNode v2Node;
-	v2Node.CreateNode(MyNode::NodeType::Vector2);
-	nodeGraph_.AddNode(v2Node);
-
-	MyNode selNode;
-	selNode.CreateNode(MyNode::NodeType::Material);
-	nodeGraph_.AddNode(selNode);
-
-	selectorNodeId_ = selNode.id;
 #endif // _DEBUG
 }
 
@@ -388,7 +365,7 @@ void Object3d::DebugGUI() {
 			ImGui::SameLine();
 			if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
 			ImGui::SameLine();
-			if (ImGui::Button("Save", ImVec2(120, 0))) { JsonSerializer::SerializeJsonData(nodeGraph_.SaveNodeData(),"resource/abcTest.json"); }
+			if (ImGui::Button("Save", ImVec2(120, 0))) { JsonSerializer::SerializeJsonData(nodeGraph_.SaveNodeData(),"resource/JsonNodeDataTest.json"); }
 			ImGui::EndPopup();
 		}
 

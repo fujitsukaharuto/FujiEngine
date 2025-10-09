@@ -273,11 +273,14 @@ json NodeGraph::SerializeNode(const MyNode& node) {
 	// ピン情報から繋がっているノード探して再帰的に保存していく
 	if (node.inputs.size() != 0) {
 		for (int i = 0; i < node.inputs.size(); i++) {
+			j["child"][i] = nullptr;
 			if (node.inputs[i].isLinked == true) {
 				const Link* pLink = nullptr;
 				for (const Link& link : links) {
-					if (link.endPinId == node.inputs[i].id)
+					if (link.endPinId == node.inputs[i].id) {
 						pLink = &link;
+						break; // 見つかったら即終了
+					}
 				}
 				if (!pLink)
 					continue;
@@ -287,24 +290,26 @@ json NodeGraph::SerializeNode(const MyNode& node) {
 				j["child"][i] = SerializeNode(*srcNode); // ["child"][i]がなかった場合はnullとして保存される
 			}
 		}
-	} // もし["child"]が何もなければ["child"]欄ができない
+	} // もし["child"]が何もなければ["child"]欄ができない->変更:Inputがあれば繋がっていない場合はnull返しておく
 
 	return j;
 }
 
-void NodeGraph::DeserializeNodeData(const std::string& filePath) {
+ed::NodeId NodeGraph::DeserializeNodeData(const std::string& filePath) {
 	json data = JsonSerializer::DeserializeJsonData(filePath);
 	nodes.clear();
 	links.clear();
 
 	if (!data.contains("Nodes") || !data["Nodes"].is_array()) {
-		return;
+		return materialNodeId_;
 	}
 
 	for (const auto& nodeData : data["Nodes"]) {
 		MyNode node = DeserializeNode(nodeData);
 		nodes.push_back(node);
 	}
+
+	return materialNodeId_;
 }
 
 MyNode NodeGraph::DeserializeNode(const json& j) {
@@ -312,10 +317,16 @@ MyNode NodeGraph::DeserializeNode(const json& j) {
 
 	node.CreateNode(StringToNodeType(j.value("nodeType", "Unknown")));
 
+	if (node.type == MyNode::NodeType::Material) {
+		materialNodeId_ = node.id;
+	}
+
 	// values の復元
 	if (j.contains("values") && j["values"].is_array()) {
-		for (const auto& v : j["values"]) {
-			node.values.push_back(DeserializeValue(v));
+		node.values.clear();
+		node.values.resize(j["values"].size());
+		for (size_t i = 0; i < j["values"].size(); ++i) {
+			node.values[i] = DeserializeValue(j["values"][i]);
 		}
 	}
 
@@ -325,22 +336,16 @@ MyNode NodeGraph::DeserializeNode(const json& j) {
 	}
 
 	// child ノード（入力側に繋がっているノード）を再帰的に復元
-	if (j.contains("child")) {
-		for (auto& [key, value] : j["child"].items()) {
-			//MyNode childNode = DeserializeNode(value);
-			//nodes.push_back(childNode);
+	if (j.contains("child") && j["child"].is_array()) {
+		for (int i = 0; i < j["child"].size(); i++) {
+			const auto& value = j["child"][i];
+			if (value.is_null()) {
+				continue; // null の場合はスキップ
+			}
+			MyNode childNode = DeserializeNode(value);
+			nodes.push_back(childNode);
 
-			//// 入力ピンと子ノードの出力ピンをリンクで接続
-			//int inputIndex = std::stoi(key);
-			//if (inputIndex < node.inputs.size() && !childNode.outputs.empty()) {
-			//	Link link;
-			//	link.startPinId = childNode.outputs[0].id;
-			//	link.endPinId = node.inputs[inputIndex].id;
-			//	links.push_back(link);
-
-			//	node.inputs[inputIndex].isLinked = true;
-			//	childNode.outputs[0].isLinked = true;
-			//}
+			ImGuiManager::GetInstance()->CreateLink(links, node.inputs[i], childNode.outputs[0]);
 		}
 	}
 

@@ -170,8 +170,11 @@ public:
 	json SerializeValue(const Value& v);
 	json SerializeNode(const MyNode& node);
 
-	void DeserializeNodeData(const std::string& filePath);
+	ed::NodeId DeserializeNodeData(const std::string& filePath);
 	MyNode DeserializeNode(const json& j);
 	Value DeserializeValue(const json& j);
+
+private:
+	ed::NodeId materialNodeId_;
 };
 #endif // _DEBUG

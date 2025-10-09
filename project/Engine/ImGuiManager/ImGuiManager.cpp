@@ -261,6 +261,12 @@ void ImGuiManager::HandleDeleteLink(std::vector<Link>& links) {
 	ed::EndDelete();
 }
 
+void ImGuiManager::CreateLink(std::vector<Link>& links, const Pin& input, const Pin& output) {
+	if (CanCreateLink(output, input) && !input.isLinked) {
+		links.push_back({ GenerateLinkId(), output.id, input.id });
+	}
+}
+
 void ImGuiManager::DrawNode(MyNode& node, ed::Utilities::BlueprintNodeBuilder& builder) {
 	builder.Begin(node.id);
 	builder.Header(ImColor(128, 195, 248));
@@ -348,13 +354,13 @@ void ImGuiManager::DrawNodeEditor(NodeGraph* nodeGraph) {
 	ed::Suspend(); // 背景の右クリックメニュー
 	if (ImGui::BeginPopup("Background Context Menu")) {
 		if (ImGui::BeginMenu("Add Node")) {
-			if (ImGui::MenuItem("Blueprint Node")) {
+			if (ImGui::MenuItem("Texture Node")) {
 				// Blueprintノード追加処理
 			}
-			if (ImGui::MenuItem("Texture Node")) {
+			if (ImGui::MenuItem("Vector2 Node")) {
 				// Textureノード追加処理
 			}
-			if (ImGui::MenuItem("Float Node")) {
+			if (ImGui::MenuItem("Color Node")) {
 				// Floatノード追加処理
 			}
 			ImGui::EndMenu();
