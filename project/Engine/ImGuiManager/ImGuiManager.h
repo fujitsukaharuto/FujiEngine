@@ -68,6 +68,8 @@ public:
 #ifdef _DEBUG
 	static void ImGuiDragDropButton(const char* buttonLabel, const char* payloadType, const std::function<void(const ImGuiPayload* payload)>& onDrop, const std::function<void(const ImGuiPayload* payload)>& onPreview);
 	static void ImGuiDragButton(const char* label, const void* payloadData, size_t payloadSize, const char* payloadType);
+
+	static void ImGuiPopUpButton(const char* buttonLabel, const char* popupName, std::function<void()> contentFunc);
 #endif // _DEBUG
 
 

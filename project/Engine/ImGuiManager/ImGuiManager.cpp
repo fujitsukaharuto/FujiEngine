@@ -163,6 +163,28 @@ void ImGuiManager::ImGuiDragButton(const char* label, const void* payloadData, s
 	}
 #endif // _DEBUG
 }
+void ImGuiManager::ImGuiPopUpButton(const char* buttonLabel, const char* popupName, std::function<void()> contentFunc) {
+#ifdef _DEBUG
+	if (ImGui::Button(buttonLabel)) {
+		ImGui::OpenPopup(popupName);
+	}
+
+	ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+	ImGui::PushStyleColor(ImGuiCol_ModalWindowDimBg, ImVec4(0, 0, 0, 0.25f));
+
+	if (ImGui::BeginPopupModal(popupName, NULL)) {
+		contentFunc();
+
+		ImGui::Separator();
+		if (ImGui::Button("OK", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+		ImGui::SameLine();
+		if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+		ImGui::EndPopup();
+	}
+	ImGui::PopStyleColor();
+#endif // _DEBUG
+}
 #endif // _DEBUG
 
 #ifdef _DEBUG
@@ -355,10 +377,10 @@ void ImGuiManager::DrawNodeEditor(NodeGraph* nodeGraph) {
 	if (ImGui::BeginPopup("Background Context Menu")) {
 		if (ImGui::BeginMenu("Add Node")) {
 			if (ImGui::MenuItem("Texture Node")) {
-				// Blueprintノード追加処理
+				// Textureノード追加処理
 			}
 			if (ImGui::MenuItem("Vector2 Node")) {
-				// Textureノード追加処理
+
 			}
 			if (ImGui::MenuItem("Color Node")) {
 				// Floatノード追加処理
