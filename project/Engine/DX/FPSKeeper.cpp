@@ -14,10 +14,8 @@ FPSKeeper* FPSKeeper::GetInstance() {
 }
 
 void FPSKeeper::Initialize() {
-
 	reference_ = std::chrono::steady_clock::now();
 	lastTime_ = std::chrono::steady_clock::now();
-
 }
 
 void FPSKeeper::FixFPS() {
@@ -39,20 +37,30 @@ void FPSKeeper::FixFPS() {
 
 
 void FPSKeeper::Update() {
-
 	auto currentTime = std::chrono::steady_clock::now();
-	std::chrono::duration<float> deltaTime = currentTime - lastTime_;
+	std::chrono::duration<float> delta = currentTime - lastTime_;
 	lastTime_ = currentTime;
-	deltaTime_ = deltaTime.count();
 
+	float dTime = delta.count();
+	deltaTime_ = dTime;
 	if (deltaTime_ > 0.0f) {
 		fps_ = 1.0f / deltaTime_;
 	}
 
+	// --- スローモーション処理 ---
+	if (slowFrame_ > 0.0f) {
+		slowFrame_ -= dTime;
+		isSlowMotion_ = true;
+		deltaTime_ *= slowRate_;
+	} else {
+		isSlowMotion_ = false;
+	}
+
+	// --- ヒットストップ処理 ---
 	if (stopFrame_ > 0.0f) {
-		stopFrame_--;
+		stopFrame_ -= dTime;
 		isHitStop_ = true;
-		deltaTime_ = deltaTime_ * stopRate_;
+		deltaTime_ *= stopRate_;
 	} else {
 		isHitStop_ = false;
 	}
@@ -71,12 +79,22 @@ void FPSKeeper::SetHitStopRate(float rate) {
 }
 
 void FPSKeeper::SetHitStopFrame(float frame) {
-	GetInstance()->stopFrame_ = frame;
-	GetInstance()->isHitStop_ = true;
+	auto* inst = GetInstance();
+	inst->stopFrame_ = frame;
+	inst->isHitStop_ = true;
+}
+
+void FPSKeeper::SetSlowMotion(float frame, float rate) {
+	auto* inst = GetInstance();
+	inst->slowFrame_ = frame;
+	inst->slowRate_ = rate;
+	inst->isSlowMotion_ = true;
 }
 
 void FPSKeeper::Debug() {
 #ifdef _DEBUG
 	ImGui::Text("FPS: %.1f", fps_);
+	if (isHitStop_)     ImGui::Text("HitStop: %.1f frames left", stopFrame_);
+	if (isSlowMotion_)  ImGui::Text("SlowMotion: %.1f frames left (x%.2f)", slowFrame_, slowRate_);
 #endif // _DEBUG
 }

@@ -15,6 +15,7 @@ public:
 	~Player();
 
 	void Initialize()override;
+	void Finalize();
 	void Update()override;
 	void Draw(Material* mate = nullptr, bool is = false)override;
 	void DebugGUI()override;
@@ -102,6 +103,8 @@ private:
 
 	void ParticleEmitterSetting();
 	void MoveEngineParticle();
+	void InitAvoidPostEffect();
+	void AvoidPostEffect();
 
 private:
 
@@ -139,6 +142,8 @@ private:
 	float avoidRotate_;
 	float avoidDirection_ = 1.0f;
 	float avoidCoolTime_;
+	float avoidEffectTime_;
+	float avoidEffectBaseTime_ = 15.0f;
 	bool isNowAvoid_ = false;
 	bool isCanStrongState_ = false;
 	bool isStrongState_ = false;

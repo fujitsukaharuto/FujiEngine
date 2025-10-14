@@ -15,6 +15,7 @@
 GameScene::GameScene() {}
 
 GameScene::~GameScene() {
+	player_->Finalize();
 	AudioPlayer::GetInstance()->SoundStopWave(*bgm_);
 }
 

@@ -12,7 +12,6 @@ Player::Player() {
 }
 
 Player::~Player() {
-	AudioPlayer::GetInstance()->SoundStopWave(*shotSE_);
 }
 
 void Player::Initialize() {
@@ -61,6 +60,7 @@ void Player::Initialize() {
 	gravity_ = 0.005f;
 	maxFallSpeed_ = 2.0f;
 	maxChargeTime_ = 60.0f;
+	avoidEffectTime_ = 0.0f;
 
 	collider_ = std::make_unique<AABBCollider>();
 	collider_->SetTag("player");
@@ -91,6 +91,11 @@ void Player::Initialize() {
 	titleStartP_ = { 50.0f,10.0f,80.0f };
 	titleCenterP_ = { 6.0f,3.0f,-80.0f };
 	model_->transform.translate = titleStartP_;
+}
+
+void Player::Finalize() {
+	AudioPlayer::GetInstance()->SoundStopWave(*shotSE_);
+	dxcommon_->GetOffscreenManager()->PopPostEffect(PostEffectList::Radial);
 }
 
 void Player::Update() {
@@ -139,6 +144,7 @@ void Player::Update() {
 		}
 	}
 
+	AvoidPostEffect();
 	shadow_->transform.translate = model_->transform.translate;
 	shadow_->transform.translate.y = 0.15f;
 	strongStatePos_->transform.translate = model_->transform.translate;
@@ -211,6 +217,7 @@ void Player::ReStart() {
 	playerHP_ = 100.0f;
 	isFall_ = false;
 	deathTime_ = 240.0f;
+	avoidEffectTime_ = 0.0f;
 	model_->transform.rotate.y = 0.0f;
 	model_->transform.translate.x = 0.0f;
 	model_->transform.translate.y = 1.0f;
@@ -267,6 +274,8 @@ void Player::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 			if (isNowAvoid_) {
 				if (!isCanStrongState_) {
 					isCanStrongState_ = true;
+					InitAvoidPostEffect();
+					FPSKeeper::SetSlowMotion(0.6f, 0.2f);
 				}
 				avoidEmitter01_->Emit();
 				avoidEmitter02_->Emit();
@@ -294,6 +303,8 @@ void Player::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 					if (isNowAvoid_) {
 						if (!isCanStrongState_) {
 							isCanStrongState_ = true;
+							InitAvoidPostEffect();
+							FPSKeeper::SetSlowMotion(0.6f, 0.2f);
 						}
 						avoidEmitter01_->Emit();
 						avoidEmitter02_->Emit();
@@ -343,6 +354,8 @@ void Player::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
 					if (isNowAvoid_) {
 						if (!isCanStrongState_) {
 							isCanStrongState_ = true;
+							InitAvoidPostEffect();
+							FPSKeeper::SetSlowMotion(0.6f, 0.2f);
 							avoidEmitter01_->Emit();
 							avoidEmitter02_->Emit();
 							avoidEmitter03_->Emit();
@@ -739,4 +752,24 @@ void Player::MoveEngineParticle() {
 	moveBurnerR_->Emit();
 	moveBurnerLT_->Emit();
 	moveBurnerRT_->Emit();
+}
+
+void Player::InitAvoidPostEffect() {
+	avoidEffectTime_ = avoidEffectBaseTime_;
+	float radialwidth = 0.0035f;
+	dxcommon_->GetOffscreenManager()->AddPostEffect(PostEffectList::Radial);
+	dxcommon_->GetOffscreenManager()->SetRadialParamsWidth(radialwidth);
+}
+
+void Player::AvoidPostEffect() {
+	if (avoidEffectTime_ > 0.0f) {
+		avoidEffectTime_ -= FPSKeeper::DeltaTime();
+		if (avoidEffectTime_ <= 0.0f) {
+			dxcommon_->GetOffscreenManager()->PopPostEffect(PostEffectList::Radial);
+			avoidEffectTime_ = 0.0f;
+		}
+		float t = avoidEffectTime_ / avoidEffectBaseTime_;
+		float radialwidth = std::lerp(0.0f, 0.0035f, 1.0f - powf(1.0f - t, 3.0f));
+		dxcommon_->GetOffscreenManager()->SetRadialParamsWidth(radialwidth);
+	}
 }
