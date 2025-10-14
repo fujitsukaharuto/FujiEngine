@@ -5,7 +5,7 @@
 #include "Game/GameObj/FollowCamera.h"
 #include "Game/GameObj/Player/Player.h"
 #include "Game/GameObj/Enemy/Boss.h"
-#include "Game/TestBaseObj.h"
+#include "Game/OriginObject/TestBaseObj.h"
 #include "Game/Collider/CollisionManager.h"
 
 

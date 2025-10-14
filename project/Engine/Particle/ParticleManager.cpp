@@ -1582,7 +1582,7 @@ bool ParticleManager::LifeUpdate(Particle& particle) {
 		return true;
 	}
 
-	particle.lifeTime_--;
+	particle.lifeTime_ -= FPSKeeper::DeltaTime();
 	return false;
 }
 

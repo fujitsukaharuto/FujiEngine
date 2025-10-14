@@ -1,5 +1,5 @@
 #include "BaseCollider.h"
-#include "Game/OriginGameObject.h"
+#include "Game/OriginObject/OriginGameObject.h"
 
 BaseCollider::BaseCollider() {
 }

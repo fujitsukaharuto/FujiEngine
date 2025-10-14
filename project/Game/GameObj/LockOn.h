@@ -1,7 +1,7 @@
 #pragma once
 #include "Model/Sprite.h"
 
-#include "Game/OriginGameObject.h"
+#include "Game/OriginObject/OriginGameObject.h"
 
 #include <memory>
 #include <list>

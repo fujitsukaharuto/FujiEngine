@@ -122,9 +122,6 @@
     <ClCompile Include="Engine\GraphicPipeline\ThunderPipe.cpp">
       <Filter>Engine\GraphicPipeline</Filter>
     </ClCompile>
-    <ClCompile Include="Game\OriginGameObject.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Model\Line3dDrawer.cpp">
       <Filter>Engine\Model</Filter>
     </ClCompile>
@@ -347,6 +344,9 @@
     <ClCompile Include="Engine\GraphicPipeline\CSPipe\EmitterSurfaceParticleCSPipe.cpp">
       <Filter>Engine\GraphicPipeline\CSPipe</Filter>
     </ClCompile>
+    <ClCompile Include="Game\OriginObject\OriginGameObject.cpp">
+      <Filter>Game\OriginObject</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -472,17 +472,11 @@
     <ClInclude Include="Engine\Scene\AbstractSceneFactory.h">
       <Filter>Engine\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Game\OriginGameObject.h">
-      <Filter>Game</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\Model\Line3dDrawer.h">
       <Filter>Engine\Model</Filter>
     </ClInclude>
     <ClInclude Include="Engine\GraphicPipeline\Line3dPipe.h">
       <Filter>Engine\GraphicPipeline</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\TestBaseObj.h">
-      <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Camera\Camera.h">
       <Filter>Engine\Camera</Filter>
@@ -516,9 +510,6 @@
     </ClInclude>
     <ClInclude Include="Game\Collider\CollisionManager.h">
       <Filter>Game\Collider</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\OriginState.h">
-      <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="Engine\GraphicPipeline\CRTPipe.h">
       <Filter>Engine\GraphicPipeline</Filter>
@@ -751,6 +742,15 @@
     <ClInclude Include="Engine\GraphicPipeline\CSPipe\EmitterSurfaceParticleCSPipe.h">
       <Filter>Engine\GraphicPipeline\CSPipe</Filter>
     </ClInclude>
+    <ClInclude Include="Game\OriginObject\OriginGameObject.h">
+      <Filter>Game\OriginObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\OriginObject\OriginState.h">
+      <Filter>Game\OriginObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\OriginObject\TestBaseObj.h">
+      <Filter>Game\OriginObject</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -878,6 +878,9 @@
     </Filter>
     <Filter Include="Engine\GraphicPipeline\CSPipe">
       <UniqueIdentifier>{d918235d-47db-4aad-82b9-b5ab9d7beab9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\OriginObject">
+      <UniqueIdentifier>{582d5b3b-3b7d-4005-9981-1c1a7472245f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

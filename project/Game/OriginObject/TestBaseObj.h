@@ -1,5 +1,5 @@
 #pragma once
-#include "Game/OriginGameObject.h"
+#include "Game/OriginObject/OriginGameObject.h"
 #include "ImGuiManager/ImGuiManager.h"
 #include <numbers>
 #include "Game/Collider/BaseCollider.h"

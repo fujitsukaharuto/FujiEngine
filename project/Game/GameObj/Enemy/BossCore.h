@@ -1,5 +1,5 @@
 #pragma once
-#include "Game/OriginGameObject.h"
+#include "Game/OriginObject/OriginGameObject.h"
 #include "Game/Collider/AABBCollider.h"
 
 class Boss;

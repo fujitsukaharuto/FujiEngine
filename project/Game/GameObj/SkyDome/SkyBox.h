@@ -1,5 +1,5 @@
 #pragma once
-#include "Game/OriginGameObject.h"
+#include "Game/OriginObject/OriginGameObject.h"
 #include "ImGuiManager/ImGuiManager.h"
 #include "Engine/DX/DXCom.h"
 #include "Engine/DX/SRVManager.h"
