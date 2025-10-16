@@ -4,7 +4,7 @@
             "child": [
                 null
             ],
-            "id": 361,
+            "id": 381,
             "name": "TextureInput",
             "nodeType": "Texture",
             "texName": "checkerBoard.png",
@@ -21,7 +21,7 @@
                     "child": [
                         null
                     ],
-                    "id": 364,
+                    "id": 388,
                     "name": "TextureInput",
                     "nodeType": "Texture",
                     "texName": "uvChecker.png",
@@ -33,14 +33,14 @@
                     ]
                 },
                 {
-                    "id": 371,
+                    "id": 392,
                     "name": "Color",
                     "nodeType": "Color",
                     "values": [
                         {
                             "type": "Color",
                             "value": [
-                                1.0,
+                                0.7799999713897705,
                                 1.0,
                                 1.0,
                                 1.0
@@ -50,24 +50,35 @@
                 },
                 {
                     "child": [
-                        null,
+                        {
+                            "addType": 0,
+                            "id": 400,
+                            "name": "AddNode",
+                            "nodeType": "Add",
+                            "values": [
+                                {
+                                    "type": "Float",
+                                    "value": 0.0010000000474974513
+                                }
+                            ]
+                        },
                         null
                     ],
-                    "id": 374,
+                    "id": 395,
                     "name": "Vec2Node",
                     "nodeType": "Vector2",
                     "values": [
                         {
                             "type": "Vector2",
                             "value": [
-                                0.0,
+                                4.73599100112915,
                                 0.0
                             ]
                         }
                     ]
                 }
             ],
-            "id": 367,
+            "id": 384,
             "name": "Material",
             "nodeType": "Material",
             "values": [

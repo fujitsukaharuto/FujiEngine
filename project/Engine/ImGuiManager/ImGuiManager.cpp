@@ -329,6 +329,23 @@ void ImGuiManager::DrawNode(MyNode& node, ed::Utilities::BlueprintNodeBuilder& b
 		ImGui::Image((ImTextureID)TextureManager::GetInstance()->GetTexture(node.texName)->gpuHandle.ptr, { 70,70 });
 	}
 
+	if (node.type == MyNode::NodeType::Add) {
+		ImGui::Text("AddType");
+		int addType = static_cast<int>(node.addType);
+		if (ImGui::RadioButton("Increment", addType == static_cast<int>(AddType::Increment))) {
+			addType = static_cast<int>(AddType::Increment);
+		}
+		ImGui::SameLine();
+		if (ImGui::RadioButton("DeltaTime", addType == static_cast<int>(AddType::DeltaTime))) {
+			addType = static_cast<int>(AddType::DeltaTime);
+		}
+		node.addType = static_cast<AddType>(addType);
+
+		if (node.addType == AddType::Increment) {
+			ImGui::DragFloat(("Add##Add" + std::to_string(static_cast<uintptr_t>(node.id))).c_str(), &node.values[0].Get<float>(), 0.01f);
+		}
+	}
+
 	if (node.type == MyNode::NodeType::Color) {
 		ImGui::Dummy(ImVec2(5.0f, 0.0f)); ImGui::SameLine();
 		ImGui::ColorEdit4(("##Color" + std::to_string(static_cast<uintptr_t>(node.id))).c_str(), &node.values[0].Get<Vector4>().x);
@@ -376,14 +393,23 @@ void ImGuiManager::DrawNodeEditor(NodeGraph* nodeGraph) {
 	ed::Suspend(); // 背景の右クリックメニュー
 	if (ImGui::BeginPopup("Background Context Menu")) {
 		if (ImGui::BeginMenu("Add Node")) {
-			if (ImGui::MenuItem("Texture Node")) {
-				// Textureノード追加処理
+			TextureSelectMenu(nodeGraph);
+			if (ImGui::MenuItem("Float Node")) {
 			}
-			if (ImGui::MenuItem("Vector2 Node")) {
-
+			if (ImGui::MenuItem("Add Node")) {
+				MyNode node;
+				node.CreateNode(MyNode::NodeType::Add);
+				nodeGraph->AddNode(node);
 			}
 			if (ImGui::MenuItem("Color Node")) {
-				// Floatノード追加処理
+				MyNode node;
+				node.CreateNode(MyNode::NodeType::Color);
+				nodeGraph->AddNode(node);
+			}
+			if (ImGui::MenuItem("Vector2 Node")) {
+				MyNode node;
+				node.CreateNode(MyNode::NodeType::Vector2);
+				nodeGraph->AddNode(node);
 			}
 			ImGui::EndMenu();
 		}
@@ -414,7 +440,23 @@ void ImGuiManager::DrawPinIcon(bool connected) {
 
 	ax::Widgets::Icon(ImVec2(static_cast<float>(24), static_cast<float>(24)), iconType, connected, color, ImColor(32, 32, 32, 200));
 }
+#endif // _DEBUG
 
+#ifdef _DEBUG
+void ImGuiManager::TextureSelectMenu(NodeGraph* nodeGraph) {
+	if (ImGui::BeginMenu("Texture Node")) {
+		for (auto& pair : TextureManager::GetInstance()->GetTextureFiles()) {
+			if (ImGui::MenuItem(pair.first.c_str())) {
+				MyNode node;
+				node.CreateNode(MyNode::NodeType::Texture);
+				node.values.push_back(Value(pair.first.c_str()));
+				node.texName = pair.first.c_str();
+				nodeGraph->AddNode(node);
+			}
+		}
+		ImGui::EndMenu();
+	}
+}
 #endif // _DEBUG
 
 

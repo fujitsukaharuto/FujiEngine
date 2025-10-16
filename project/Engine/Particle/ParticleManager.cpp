@@ -1051,7 +1051,7 @@ void ParticleManager::DrawParticleGroup() {
 		ParticleGroup* group = groupPair.second.get();
 		if (group->isSubMode_) continue;
 		if (group->drawCount_ == 0) continue;
-		if (group->shapeType_ == ShapeType::Lightning) continue;
+		if (group->shapeType_ == ShapeType::LIGHTNING) continue;
 
 		ShapeTypeCommand(group->shapeType_);
 		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group->srvIndex_));
@@ -1063,7 +1063,7 @@ void ParticleManager::DrawParticleGroup() {
 		ParticleGroup* group = groupPair.second.get();
 		if (group->isSubMode_) continue;
 		if (group->drawCount_ == 0) continue;
-		if (group->shapeType_ != ShapeType::Lightning) continue;
+		if (group->shapeType_ != ShapeType::LIGHTNING) continue;
 
 		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group->srvIndex_));
 		lightning_->MeshDraw(&group->material_, group->drawCount_);
@@ -1079,7 +1079,7 @@ void ParticleManager::DrawParentParticleGroup() {
 	for (auto& groupPair : parentParticleGroups_) {
 		ParentParticleGroup* group = groupPair.second.get();
 		if (group->drawCount_ == 0) continue;
-		if (group->shapeType_ == ShapeType::Lightning) continue;
+		if (group->shapeType_ == ShapeType::LIGHTNING) continue;
 
 		ShapeTypeCommand(group->shapeType_);
 		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group->srvIndex_));
@@ -1090,7 +1090,7 @@ void ParticleManager::DrawParentParticleGroup() {
 	for (auto& groupPair : parentParticleGroups_) {
 		ParentParticleGroup* group = groupPair.second.get();
 		if (group->drawCount_ == 0) continue;
-		if (group->shapeType_ != ShapeType::Lightning) continue;
+		if (group->shapeType_ != ShapeType::LIGHTNING) continue;
 
 		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group->srvIndex_));
 		lightning_->MeshDraw(&group->material_, group->drawCount_);

@@ -1,5 +1,6 @@
 #include "NodeGraph.h"
 #include "Engine/ImGuiManager/ImGuiManager.h"
+#include "Engine/DX/FPSKeeper.h"
 #ifdef _DEBUG
 #include "imgui_impl_dx12.h"
 #include "imgui_impl_win32.h"
@@ -71,6 +72,10 @@ void NodeGraph::ValueUpdate(MyNode& node) {
 			for (int i = 0; i < srcNode->outputs.size(); i++) {
 				if (pLink->startPinId == srcNode->outputs[i].id) {
 					output = &srcNode->outputValue[i];
+					if (srcNode->addType == AddType::DeltaTime) { // AddNodeのAddTypeがDeltaTimeの時に通る
+						Value deltaValue = Value(FPSKeeper::DeltaTimeFrame());
+						output = std::move(&deltaValue);
+					}
 				}
 			}
 			if (output)
@@ -93,8 +98,9 @@ void NodeGraph::ValueUpdate(MyNode& node) {
 
 			if (node.type == MyNode::NodeType::Vector2) {
 				Value out = node.values[0];
-				if (inputValues[0].type == Value::Type::Float) out.Get<Vector2>().x = inputValues[0].Get<float>();
-				if (inputValues[1].type == Value::Type::Float) out.Get<Vector2>().y = inputValues[1].Get<float>();
+				if (inputValues[0].type == Value::Type::Float) out.Get<Vector2>().x += inputValues[0].Get<float>();
+				if (inputValues[1].type == Value::Type::Float) out.Get<Vector2>().y += inputValues[1].Get<float>();
+				node.values[0] = out;
 				node.outputValue.push_back(out);
 			}
 			// 随時追加
@@ -269,6 +275,9 @@ json NodeGraph::SerializeNode(const MyNode& node) {
 	if (node.type == MyNode::NodeType::Texture) {
 		j["texName"] = node.texName;
 	}
+	if (node.type == MyNode::NodeType::Add) {
+		j["addType"] = node.addType;
+	}
 
 	// ピン情報から繋がっているノード探して再帰的に保存していく
 	if (node.inputs.size() != 0) {
@@ -333,6 +342,9 @@ MyNode NodeGraph::DeserializeNode(const json& j) {
 	// Textureノード専用
 	if (j.contains("texName")) {
 		node.texName = j["texName"].get<std::string>();
+	}
+	if (j.contains("addType")) {
+		node.addType = static_cast<AddType>(j["addType"]);
 	}
 
 	// child ノード（入力側に繋がっているノード）を再帰的に復元
@@ -404,6 +416,13 @@ void MyNode::CreateNode(NodeType nodeType) {
 	case MyNode::NodeType::Float:
 		break;
 	case MyNode::NodeType::Add:
+		name = "AddNode";
+		type = MyNode::NodeType::Add;
+		outputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Output, PinType::Float });
+		values.push_back(Value(0.0f));
+		evaluator = [](const std::vector<Value>& inputs) {
+			return !inputs.empty() ? inputs[0] : Value();
+			};
 		break;
 	case MyNode::NodeType::Material:
 

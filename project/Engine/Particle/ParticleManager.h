@@ -114,7 +114,7 @@ enum class ShapeType {
 	CONE,
 	TRIANGLE,
 	BOX,
-	Lightning,
+	LIGHTNING,
 };
 
 class DXCom;

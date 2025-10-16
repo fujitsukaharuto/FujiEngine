@@ -86,6 +86,11 @@ enum class PinKind {
 	Input
 };
 
+enum class AddType {
+	Increment,
+	DeltaTime,
+};
+
 struct Pin {
 	ed::PinId id;
 	bool isLinked = false;
@@ -115,7 +120,9 @@ struct MyNode {
 
 	Value result; // ← ★ これがノードの出力
 
+	// NodeTypeによって必要になるもの
 	std::string texName;
+	AddType addType = AddType::Increment;
 
 	std::function<Value(const std::vector<Value>&)> evaluator; // 入力 → 出力
 

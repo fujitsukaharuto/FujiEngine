@@ -93,6 +93,12 @@ public:
 	void DrawPinIcon(bool connected);
 
 #endif // _DEBUG
+private:
+#ifdef _DEBUG
+
+	void TextureSelectMenu(NodeGraph* nodeGraph);
+
+#endif // _DEBUG
 
 
 private:

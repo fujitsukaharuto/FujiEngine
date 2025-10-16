@@ -125,7 +125,7 @@ void GameRun::Initialize() {
 	pManager_->CreateParticleGroup("lightningSphere");
 	pManager_->CreateParticleGroup("lightningParticle", "redCircle.png", 80);
 
-	pManager_->CreateParticleGroup("summonLightning_", "FX12_Lightning_01.png", 40, ShapeType::Lightning);
+	pManager_->CreateParticleGroup("summonLightning_", "FX12_Lightning_01.png", 40, ShapeType::LIGHTNING);
 	pManager_->CreateParticleGroup("energySphere", "T_Noise04.jpg", 40, ShapeType::SPHERE);
 	pManager_->CreateParticleGroup("energyParticle", "redCircle.png", 80);
 
