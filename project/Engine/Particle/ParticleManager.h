@@ -3,11 +3,12 @@
 #include <map>
 #include "Particle.h"
 #include "ParticleEmitter.h"
+#include "GPUParticleSystem.h"
 #include "Model.h"
 #include "Object3d.h"
 #include "Math/Matrix/MatrixCalculation.h"
 
-using namespace Microsoft::WRL;
+using Microsoft::WRL::ComPtr;
 
 struct TransformationParticleMatrix {
 	Matrix4x4 WVP;
@@ -15,94 +16,6 @@ struct TransformationParticleMatrix {
 	Vector4 color;
 	Vector2 uvTrans = { 0.0f,0.0f };
 	Vector2 uvScale = { 1.0f,1.0f };
-};
-
-struct PerView {
-	Matrix4x4 viewProjection;
-	Matrix4x4 billboardMatrix;
-};
-
-struct PerFrame {
-	float time;
-	float deltaTime;
-};
-
-struct EmitterSphere {
-	Vector3 translate;
-	float padding;
-	Vector3 scale;
-	float radius;
-	uint32_t count;
-	float lifeTime;
-	float frequency;
-	float frequencyTime;
-	uint32_t emit;
-
-	// color
-	Vector3 colorMax;
-	Vector3 colorMin;
-	float padding2;
-
-	// velocity
-	Vector3 baseVelocity;
-	float velocityRandMax;
-	float velocityRandMin;
-
-	// distanceEmit
-	Vector3 prevTranslate;
-	float padding4;
-
-};
-
-struct EmitterTexture {
-	Vector3 translate;
-	float radius;
-	uint32_t count;
-	float lifeTime;
-	float frequency;
-	float frequencyTime;
-	uint32_t emit;
-
-	// color
-	Vector3 colorMax;
-	//float padding;
-	Vector3 colorMin;
-	float padding2;
-
-	// velocity
-	Vector3 baseVelocity;
-	float velocityRandMax;
-	float velocityRandMin;
-
-};
-
-struct EmitterSurface {
-	Vector3 translate;
-	float padding;
-	Vector3 scale;
-	float radius;
-	uint32_t count;
-	float lifeTime;
-	float frequency;
-	float frequencyTime;
-	uint32_t emit;
-
-	// color
-	Vector3 colorMax;
-	Vector3 colorMin;
-	float padding2;
-
-	// velocity
-	Vector3 baseVelocity;
-	float velocityRandMax;
-	float velocityRandMin;
-
-	int triangleCount;
-};
-
-struct AcceleFiled {
-	Vector3 Accele;
-	AABB area;
 };
 
 enum class ShapeType {
@@ -168,35 +81,6 @@ public:
 		std::map<std::string, float> anime_;
 	};
 
-	struct GPUParticleEmitter {
-		EmitterSphere* emitter;
-		ComPtr<ID3D12Resource> emitterResource;
-		bool isEmit = false;
-		int emitterIndex = 0;
-	};
-
-	struct GPUParticleEmitterTexture {
-		EmitterTexture* emitter;
-		ComPtr<ID3D12Resource> emitterResource;
-		Texture* textureForEmit;
-		bool isEmit = false;
-		int emitterIndex = 0;
-	};
-
-	struct GPUParticleEmitterSurface {
-		EmitterSurface* emitter;
-		ComPtr<ID3D12Resource> emitterResource;
-		ComPtr<ID3D12Resource> verticesResource;
-		ComPtr<ID3D12Resource> indiciesResource;
-		ComPtr<ID3D12Resource> areasResource;
-		uint32_t verticesIndex;
-		uint32_t indiciesIndex;
-		uint32_t areasIndex;
-
-		bool isEmit = false;
-		int emitterIndex = 0;
-	};
-
 	static ParticleManager* GetInstance();
 
 	void Initialize(DXCom* pDxcom, SRVManager* srvManager);
@@ -206,8 +90,6 @@ public:
 
 	void ParticleDebugGUI();
 	void ParticleCSDebugGUI();
-	void ParticleTexCSDebugGUI();
-	void ParticleSurfaceCSDebugGUI();
 	void SelectParticleUpdate();
 	void SelectEmitterSizeDraw();
 
@@ -237,10 +119,9 @@ public:
 
 	static void ParentReset();
 
-	static uint32_t GetParticleCSEmitterSize();
-	static GPUParticleEmitter& GetParticleCSEmitter(int index);
-	static GPUParticleEmitterTexture& GetParticleCSEmitterTexture(int index);
-	static GPUParticleEmitterSurface& GetParticleCSEmitterSurface(int index);
+	static GPUParticleSystem::GPUParticleEmitter& GetParticleCSEmitter(int index);
+	static GPUParticleSystem::GPUParticleEmitterTexture& GetParticleCSEmitterTexture(int index);
+	static GPUParticleSystem::GPUParticleEmitterSurface& GetParticleCSEmitterSurface(int index);
 
 	int InitGPUEmitter();
 	int InitGPUEmitterTexture();
@@ -264,20 +145,6 @@ private:
 	void InitSphereVertex();
 	void InitCylinderVertex();
 	void InitLighningVertex();
-
-	void InitParticleCS();
-	void UpdatePerViewData(const Matrix4x4& billboardMatrix);
-	void DrawParticleCS();
-
-	void UpdateGPUEmitter();
-	void UpdateParticleCSDispatch();
-	void EmitterDispatch();
-
-	void UpdateGPUEmitterTexture();
-	void EmitterTextureDispatch();
-
-	void UpdateGPUEmitterSurface();
-	void EmitterSurfaceDispatch();
 
 	bool LifeUpdate(Particle& particle);
 	void ParticleSizeUpdate(Particle& particle);
@@ -335,41 +202,12 @@ private:
 
 	std::unique_ptr<Object3d> lightning_;
 
-
 	// ParticleCS
-	ComPtr<ID3D12Resource> particleCSInstancing_;
-	uint32_t particleCSInsstanceCount_;
-	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> particleCSSRVHandle_;
-	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> particleCSUAVHandle_;
-	Material particleCSMaterial_;
-	ComPtr<ID3D12Resource> perViewResource_;
-	PerView* perViewData_;
-
-	std::vector<GPUParticleEmitter> csEmitters_;
-	std::vector<GPUParticleEmitterTexture> csEmitterTexs_;
-	std::vector<GPUParticleEmitterSurface> csEmitterSurfces_;
-	ComPtr<ID3D12Resource> perFrameResource_;
-	PerFrame* perFrameData_;
-	ComPtr<ID3D12Resource> freeListIndexResource_;
-	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> freeListIndexUAVHandle_;
-	ComPtr<ID3D12Resource> freeListResource_;
-	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> freeListUAVHandle_;
-
-	int csEmitterIndex_ = 0;
-	int csEmitterTexIndex_ = 0;
-	int csEmitterSurIndex_ = 0;
-
-	uint32_t numParticles = 1048576;
-	uint32_t threadsPerGroup = 1024;
-	int threadGroupSize_ = 1024;
+	std::unique_ptr<GPUParticleSystem> gpuParticleSystem_;
 
 #ifdef _DEBUG
 	ParticleGroup* selectParticleGroup_ = nullptr;
 	int currentIndex_ = 0;
 	std::string currentKey_;
-
-	int editCSEmitInd_;
-	int editCSEmitTexInd_;
-	int editCSEmitSurfaceInd_;
 #endif // _DEBUG
 };

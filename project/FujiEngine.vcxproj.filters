@@ -347,6 +347,9 @@
     <ClCompile Include="Game\OriginObject\OriginGameObject.cpp">
       <Filter>Game\OriginObject</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Particle\GPUParticleSystem.cpp">
+      <Filter>Engine\Particle</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -750,6 +753,9 @@
     </ClInclude>
     <ClInclude Include="Game\OriginObject\TestBaseObj.h">
       <Filter>Game\OriginObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Particle\GPUParticleSystem.h">
+      <Filter>Engine\Particle</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
