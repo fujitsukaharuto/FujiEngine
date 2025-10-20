@@ -7,6 +7,9 @@
 
 class DXCom;
 
+/// <summary>
+/// パイプライン管理クラス
+/// </summary>
 class PipelineManager {
 public:
 	PipelineManager() = default;

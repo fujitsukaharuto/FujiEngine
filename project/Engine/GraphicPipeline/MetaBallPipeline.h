@@ -9,7 +9,9 @@
 using namespace Microsoft::WRL;
 
 
-
+/// <summary>
+/// メタボールエフェクト用パイプライン
+/// </summary>
 class MetaBallPipeline :public BasePipeline {
 public:
 	MetaBallPipeline() = default;

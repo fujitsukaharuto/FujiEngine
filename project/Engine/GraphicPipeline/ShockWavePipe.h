@@ -9,7 +9,9 @@
 using namespace Microsoft::WRL;
 
 
-
+/// <summary>
+/// 衝撃波エフェクト用パイプライン
+/// </summary>
 class ShockWavePipe :public BasePipeline {
 public:
 	ShockWavePipe() = default;

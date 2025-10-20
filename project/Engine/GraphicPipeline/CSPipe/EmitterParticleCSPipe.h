@@ -9,7 +9,9 @@
 using namespace Microsoft::WRL;
 
 
-
+/// <summary>
+/// GPUパーティクルEmit用パイプライン(CS)
+/// </summary>
 class EmitterParticleCSPipe :public BasePipeline {
 public:
 	EmitterParticleCSPipe() = default;

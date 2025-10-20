@@ -1,4 +1,8 @@
 #pragma once
+
+/// <summary>
+/// パイプラインの種類
+/// </summary>
 enum class Pipe : int {
 
 	None,

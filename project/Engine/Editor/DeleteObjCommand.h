@@ -6,6 +6,9 @@
 
 struct EditorObj;
 
+/// <summary>
+/// EditorObjectを削除するコマンドクラス
+/// </summary>
 class DeleteObjCommand : public ICommand {
 public:
 

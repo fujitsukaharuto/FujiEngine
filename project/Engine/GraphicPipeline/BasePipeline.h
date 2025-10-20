@@ -13,6 +13,9 @@ using namespace Microsoft::WRL;
 
 class DXCom;
 
+/// <summary>
+/// パイプラインの基底クラス
+/// </summary>
 class BasePipeline {
 public:
 	BasePipeline() = default;

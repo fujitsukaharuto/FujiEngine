@@ -9,7 +9,9 @@
 using namespace Microsoft::WRL;
 
 
-
+/// <summary>
+/// レトロテレビエフェクト用パイプライン(CS)
+/// </summary>
 class RetroTVCSPipe :public BasePipeline {
 public:
 	RetroTVCSPipe() = default;

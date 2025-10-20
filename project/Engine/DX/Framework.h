@@ -16,6 +16,9 @@
 #include "Model/Line3dDrawer.h"
 #include "Engine/Editor/CommandManager.h"
 
+/// <summary>
+/// フレームワークのクラス
+/// </summary>
 class Framework {
 public:
 	Framework();

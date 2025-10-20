@@ -9,7 +9,9 @@
 using namespace Microsoft::WRL;
 
 
-
+/// <summary>
+/// 輝度ベースアウトライン用パイプライン(CS)
+/// </summary>
 class LuminanceOutlineCSPipe :public BasePipeline {
 public:
 	LuminanceOutlineCSPipe() = default;

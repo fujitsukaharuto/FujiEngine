@@ -9,7 +9,9 @@
 using namespace Microsoft::WRL;
 
 
-
+/// <summary>
+/// GPUパーティクルUpdate用パイプライン(CS)
+/// </summary>
 class UpdateParticleCSPipe :public BasePipeline {
 public:
 	UpdateParticleCSPipe() = default;

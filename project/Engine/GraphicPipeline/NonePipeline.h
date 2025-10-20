@@ -9,7 +9,9 @@
 using namespace Microsoft::WRL;
 
 
-
+/// <summary>
+/// 何もオフスクリーンかけない用パイプライン
+/// </summary>
 class NonePipeline :public BasePipeline {
 public:
 	NonePipeline() = default;

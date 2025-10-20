@@ -6,7 +6,9 @@
 using namespace Microsoft::WRL;
 
 
-
+/// <summary>
+/// コマンド関連のクラス
+/// </summary>
 class DXCommand {
 public:
 	DXCommand() = default;

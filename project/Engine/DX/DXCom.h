@@ -26,6 +26,9 @@
 const int particleIndex = 400;
 const UINT instanceCount_ = 10;
 
+/// <summary>
+/// リークチェック
+/// </summary>
 struct D3DResourceLeakChecker {
 	~D3DResourceLeakChecker() {
 		Microsoft::WRL::ComPtr<IDXGIDebug1> debug;
@@ -38,7 +41,9 @@ struct D3DResourceLeakChecker {
 };
 
 
-
+/// <summary>
+/// ブレンドモード
+/// </summary>
 enum class BlendMode {
 	// ブレンド無し
 	kBlendModeNone,
@@ -56,10 +61,9 @@ enum class BlendMode {
 
 
 
-
-class DebugCamera;//今だけ、後から消す
-
-
+/// <summary>
+/// DXComクラス
+/// </summary>
 class DXCom {
 public:
 	DXCom() = default;

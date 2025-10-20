@@ -115,6 +115,10 @@ struct PostEffectPass {
 };
 #pragma endregion
 
+
+/// <summary>
+/// オフスクリーン管理クラス
+/// </summary>
 class OffscreenManager {
 public:
 	OffscreenManager() = default;

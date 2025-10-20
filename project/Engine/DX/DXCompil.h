@@ -8,7 +8,9 @@
 using namespace Microsoft::WRL;
 
 
-
+/// <summary>
+/// コンパイラー関係
+/// </summary>
 class DXCompil {
 public:
 	DXCompil() = default;

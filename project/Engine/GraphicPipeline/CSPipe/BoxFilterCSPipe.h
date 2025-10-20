@@ -9,7 +9,9 @@
 using namespace Microsoft::WRL;
 
 
-
+/// <summary>
+/// ボックスフィルタ用パイプライン(CS)
+/// </summary>
 class BoxFilterCSPipe :public BasePipeline {
 public:
 	BoxFilterCSPipe() = default;

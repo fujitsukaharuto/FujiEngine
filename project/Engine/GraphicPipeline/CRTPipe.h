@@ -9,7 +9,9 @@
 using namespace Microsoft::WRL;
 
 
-
+/// <summary>
+/// CRTエフェクト用パイプライン
+/// </summary>
 class CRTPipe :public BasePipeline {
 public:
 	CRTPipe() = default;

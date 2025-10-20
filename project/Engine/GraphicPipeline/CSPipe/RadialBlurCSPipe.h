@@ -9,7 +9,9 @@
 using namespace Microsoft::WRL;
 
 
-
+/// <summary>
+/// ラジアルブラー用パイプライン(CS)
+/// </summary>
 class RadialBlurCSPipe :public BasePipeline {
 public:
 	RadialBlurCSPipe() = default;

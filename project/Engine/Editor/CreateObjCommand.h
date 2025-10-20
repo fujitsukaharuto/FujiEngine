@@ -7,6 +7,9 @@
 
 struct EditorObj;
 
+/// <summary>
+/// EditorObjectを生み出すコマンドクラス
+/// </summary>
 class CreateObjCommand : public ICommand {
 public:
 	CreateObjCommand(int id, const std::string& name, const std::string& mName = "Sphere")

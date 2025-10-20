@@ -8,7 +8,9 @@
 
 using namespace Microsoft::WRL;
 
-
+/// <summary>
+/// 雷エフェクト用パイプライン
+/// </summary>
 class ThunderPipe :public BasePipeline {
 public:
 	ThunderPipe() = default;

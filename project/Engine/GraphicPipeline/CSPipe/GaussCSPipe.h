@@ -9,7 +9,9 @@
 using namespace Microsoft::WRL;
 
 
-
+/// <summary>
+/// ガウスエフェクト用パイプライン(CS)
+/// </summary>
 class GaussCSPipe :public BasePipeline {
 public:
 	GaussCSPipe() = default;

@@ -9,7 +9,9 @@
 using namespace Microsoft::WRL;
 
 
-
+/// <summary>
+/// 深度ベースアウトライン用パイプライン(CS)
+/// </summary>
 class OutlineCSPipe :public BasePipeline {
 public:
 	OutlineCSPipe() = default;

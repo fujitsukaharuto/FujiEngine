@@ -9,7 +9,9 @@
 using namespace Microsoft::WRL;
 
 
-
+/// <summary>
+/// 通常描画用パイプライン
+/// </summary>
 class Pipeline :public BasePipeline {
 public:
 	Pipeline() = default;

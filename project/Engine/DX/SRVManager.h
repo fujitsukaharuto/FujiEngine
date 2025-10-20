@@ -7,6 +7,9 @@
 
 class DXCom;
 
+/// <summary>
+/// SRVの管理クラス
+/// </summary>
 class SRVManager {
 public:
 	SRVManager();

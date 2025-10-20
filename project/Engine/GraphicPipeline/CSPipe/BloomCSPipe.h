@@ -9,7 +9,9 @@
 using namespace Microsoft::WRL;
 
 
-
+/// <summary>
+/// ブルームエフェクト用パイプライン(CS)
+/// </summary>
 class BloomCSPipe :public BasePipeline {
 public:
 	BloomCSPipe() = default;

@@ -9,7 +9,9 @@
 using namespace Microsoft::WRL;
 
 
-
+/// <summary>
+/// ランダムエフェクト用パイプライン(CS)
+/// </summary>
 class RandomCSPipe :public BasePipeline {
 public:
 	RandomCSPipe() = default;

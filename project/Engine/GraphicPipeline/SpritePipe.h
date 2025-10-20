@@ -9,7 +9,9 @@
 using namespace Microsoft::WRL;
 
 
-
+/// <summary>
+/// スプライト描画用パイプライン
+/// </summary>
 class SpritePipe :public BasePipeline {
 public:
 	SpritePipe() = default;

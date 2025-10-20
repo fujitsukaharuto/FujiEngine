@@ -9,7 +9,9 @@
 using namespace Microsoft::WRL;
 
 
-
+/// <summary>
+/// グレースケール用パイプライン(CS)
+/// </summary>
 class GrayCSPipe :public BasePipeline {
 public:
 	GrayCSPipe() = default;

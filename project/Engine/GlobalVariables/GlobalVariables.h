@@ -4,7 +4,9 @@
 #include <json.hpp>
 #include "Math/Matrix/MatrixCalculation.h"
 
-
+/// <summary>
+/// グローバル変数を管理するクラス
+/// </summary>
 class GlobalVariables {
 public:
 	static GlobalVariables* GetInstance();

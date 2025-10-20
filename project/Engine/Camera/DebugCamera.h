@@ -1,7 +1,9 @@
 #pragma once
 #include "Math/Matrix/MatrixCalculation.h"
 
-
+/// <summary>
+/// デバッグカメラクラス
+/// </summary>
 class DebugCamera {
 public:
 	DebugCamera();

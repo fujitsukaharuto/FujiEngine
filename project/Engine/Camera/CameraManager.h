@@ -4,7 +4,9 @@
 
 
 
-
+/// <summary>
+/// カメラ管理クラス
+/// </summary>
 class CameraManager {
 public:
 	CameraManager() = default;

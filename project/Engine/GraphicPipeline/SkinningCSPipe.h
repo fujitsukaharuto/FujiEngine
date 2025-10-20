@@ -9,7 +9,9 @@
 using namespace Microsoft::WRL;
 
 
-
+/// <summary>
+/// スキニング用パイプライン
+/// </summary>
 class SkinningCSPipe :public BasePipeline {
 public:
 	SkinningCSPipe() = default;

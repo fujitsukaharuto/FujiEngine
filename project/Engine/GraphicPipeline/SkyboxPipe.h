@@ -6,7 +6,9 @@
 #include <string>
 #include "BasePipeline.h"
 
-
+/// <summary>
+/// スカイボックス描画用パイプライン
+/// </summary>
 class SkyboxPipe :public BasePipeline {
 public:
 	SkyboxPipe() = default;

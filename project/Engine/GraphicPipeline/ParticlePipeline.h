@@ -9,7 +9,9 @@
 using namespace Microsoft::WRL;
 
 
-
+/// <summary>
+/// パーティクル用パイプライン
+/// </summary>
 class ParticlePipeline :public BasePipeline {
 public:
 	ParticlePipeline() = default;

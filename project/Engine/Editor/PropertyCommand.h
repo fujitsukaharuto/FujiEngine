@@ -3,6 +3,9 @@
 #include "Engine/Math/Matrix/MatrixCalculation.h"
 #include "Engine/Math/Vector/Vector3.h"
 
+/// <summary>
+/// 任意のメンバ変数の変更をコマンドとして扱うためのテンプレートクラス
+/// </summary>
 template<typename T>
 class PropertyCommand : public ICommand {
 public:

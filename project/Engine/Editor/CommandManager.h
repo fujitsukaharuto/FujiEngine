@@ -41,6 +41,9 @@ struct LoadEditorObjData {
 	ObjectType objType;
 };
 
+/// <summary>
+/// EditorObjectのUndo、Redoをするためのクラス
+/// </summary>
 class CommandManager {
 public:
 	CommandManager() = default;

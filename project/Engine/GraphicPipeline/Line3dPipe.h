@@ -9,7 +9,9 @@
 using namespace Microsoft::WRL;
 
 
-
+/// <summary>
+/// 線描画用パイプライン
+/// </summary>
 class Line3dPipe :public BasePipeline {
 public:
 	Line3dPipe() = default;

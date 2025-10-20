@@ -7,6 +7,9 @@
 struct EditorObj;
 using json = nlohmann::json;
 
+/// <summary>
+/// Json出力、読み込みのクラス
+/// </summary>
 class JsonSerializer {
 public:
 

@@ -9,7 +9,9 @@
 using namespace Microsoft::WRL;
 
 
-
+/// <summary>
+/// アニメーション用パイプライン
+/// </summary>
 class AnimationPipeline :public BasePipeline {
 public:
 	AnimationPipeline() = default;

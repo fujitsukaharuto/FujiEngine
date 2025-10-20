@@ -1,6 +1,8 @@
 #pragma once
 
-
+/// <summary>
+/// コマンドパターンの基底クラス
+/// </summary>
 class ICommand {
 public:
 

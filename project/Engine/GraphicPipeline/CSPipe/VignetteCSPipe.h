@@ -9,7 +9,9 @@
 using namespace Microsoft::WRL;
 
 
-
+/// <summary>
+/// ビネット用パイプライン(CS)
+/// </summary>
 class VignetteCSPipe :public BasePipeline {
 public:
 	VignetteCSPipe() = default;

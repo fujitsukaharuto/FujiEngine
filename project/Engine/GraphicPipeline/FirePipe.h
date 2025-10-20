@@ -8,7 +8,9 @@
 
 using namespace Microsoft::WRL;
 
-
+/// <summary>
+/// 炎エフェクト用パイプライン
+/// </summary>
 class FirePipe :public BasePipeline {
 public:
 	FirePipe() = default;
