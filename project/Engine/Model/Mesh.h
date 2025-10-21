@@ -10,6 +10,9 @@
 
 class DXCom;
 
+/// <summary>
+/// メッシュクラス
+/// </summary>
 class Mesh {
 public:
 

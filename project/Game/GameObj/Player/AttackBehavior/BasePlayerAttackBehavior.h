@@ -2,6 +2,10 @@
 #include<string>
 
 class Player;
+
+/// <summary>
+/// PlayerAttackBehavior基底クラス
+/// </summary>
 class BasePlayerAttackBehavior {
 public:
 	BasePlayerAttackBehavior(Player* player) :pPlayer_(player) {}

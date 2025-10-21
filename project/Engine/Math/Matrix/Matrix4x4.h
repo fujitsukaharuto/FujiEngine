@@ -2,6 +2,9 @@
 #include <cmath>
 #include <cstring>
 
+/// <summary>
+/// Matrix4x4クラス
+/// </summary>
 class Matrix4x4 final {
 public:
 

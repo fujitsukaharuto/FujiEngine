@@ -23,6 +23,9 @@ struct Texture {
 };
 
 
+/// <summary>
+/// Texture管理クラス
+/// </summary>
 class TextureManager {
 public:
 	TextureManager();

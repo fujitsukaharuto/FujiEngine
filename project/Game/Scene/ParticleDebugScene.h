@@ -2,7 +2,9 @@
 #include "Scene/BaseScene.h"
 #include "Game/GameObj/SkyDome/SkyBox.h"
 
-
+/// <summary>
+/// パーティクルデバッグシーンクラス
+/// </summary>
 class ParticleDebugScene :public BaseScene {
 public:
 	ParticleDebugScene();

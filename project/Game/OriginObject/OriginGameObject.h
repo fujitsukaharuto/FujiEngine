@@ -9,6 +9,9 @@
 #include "Input/Input.h"
 #include "Engine/ImGuiManager/ImGuiManager.h"
 
+/// <summary>
+/// ゲームオブジェクトの基底クラス
+/// </summary>
 class OriginGameObject {
 public:
 	OriginGameObject();

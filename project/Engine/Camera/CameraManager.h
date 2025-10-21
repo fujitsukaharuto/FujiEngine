@@ -19,6 +19,10 @@ public:
 	void Finalize();
 	void Update();
 
+
+	//========================================================================*/
+	//* Getter
+
 	/// <summary>
 	/// カメラの取得
 	/// </summary>
@@ -30,6 +34,9 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	bool GetDebugMode()const { return debugMode_; }
+
+	//========================================================================*/
+	//* Setter
 
 	/// <summary>
 	/// Debugモードを設定

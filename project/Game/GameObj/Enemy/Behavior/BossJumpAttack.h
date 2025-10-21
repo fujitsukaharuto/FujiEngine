@@ -1,7 +1,9 @@
 #pragma once
 #include "BaseBossBehavior.h"
 
-
+/// <summary>
+/// Bossのジャンプ攻撃の行動クラス
+/// </summary>
 class BossJumpAttack : public BaseBossBehavior {
 public:
 	BossJumpAttack(Boss* pBoss,int count = 2);

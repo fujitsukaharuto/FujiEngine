@@ -21,7 +21,9 @@ enum class CollisionState {
 	None,
 };
 
-
+/// <summary>
+/// あたり判定用基底クラス
+/// </summary>
 class BaseCollider {
 public:
 	BaseCollider();

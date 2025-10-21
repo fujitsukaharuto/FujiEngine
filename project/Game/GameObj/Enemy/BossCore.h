@@ -4,6 +4,9 @@
 
 class Boss;
 
+/// <summary>
+/// Bossのあたり判定になるコア部分のクラス
+/// </summary>
 class BossCore : public OriginGameObject {
 public:
 	BossCore(Boss* pboss);

@@ -23,6 +23,9 @@ struct OneBeam {
 
 class Boss;
 
+/// <summary>
+/// BossItem:Beamクラス
+/// </summary>
 class Beam : public OriginGameObject {
 public:
 	Beam();

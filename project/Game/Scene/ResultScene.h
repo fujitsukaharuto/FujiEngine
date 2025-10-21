@@ -1,7 +1,9 @@
 #pragma once
 #include "Scene/BaseScene.h"
 
-
+/// <summary>
+/// リザルトシーンクラス
+/// </summary>
 class ResultScene :public BaseScene {
 public:
 	ResultScene();

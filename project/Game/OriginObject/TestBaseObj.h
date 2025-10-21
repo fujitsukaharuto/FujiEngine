@@ -6,6 +6,9 @@
 #include "Game/Collider/AABBCollider.h"
 #include "Model/Line3dDrawer.h"
 
+/// <summary>
+/// テストオブジェクトクラス
+/// </summary>
 class TestBaseObj : public OriginGameObject {
 public:
 	TestBaseObj();

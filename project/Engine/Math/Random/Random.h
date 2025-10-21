@@ -3,6 +3,9 @@
 #include "Math/Vector/Vector3.h"
 #include "Math/Vector/Vector2.h"
 
+/// <summary>
+/// ランダム生成クラス
+/// </summary>
 class Random {
 public:
 	Random() = default;

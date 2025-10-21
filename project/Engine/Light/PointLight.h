@@ -14,6 +14,9 @@ struct PointLightData {
 	float pading[2];
 };
 
+/// <summary>
+/// ポイントライトのクラス
+/// </summary>
 class PointLight {
 public:
 	PointLight() = default;

@@ -2,7 +2,9 @@
 #include <array>
 #include "Game/Collider/BaseCollider.h"
 
-
+/// <summary>
+/// あたり判定用クラス(AABB型)
+/// </summary>
 class AABBCollider : public BaseCollider {
 public:
 	AABBCollider();

@@ -1,7 +1,9 @@
 #pragma once
 #include "BaseBossBehavior.h"
 
-
+/// <summary>
+/// Bossの範囲攻撃の行動クラス
+/// </summary>
 class BossAreaAttack : public BaseBossBehavior {
 public:
 	BossAreaAttack(Boss* pBoss);

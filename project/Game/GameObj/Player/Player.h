@@ -9,6 +9,10 @@
 #include "Game/GameObj/Player/PlayerBullet.h"
 #include <vector>
 
+
+/// <summary>
+/// Playerクラス
+/// </summary>
 class Player : public OriginGameObject{
 public:
 	Player();

@@ -27,7 +27,9 @@ struct PickingData {
 	uint32_t padding = 0;
 };
 
-
+/// <summary>
+/// モデル管理クラス(読み込み、読み込みデータ等)
+/// </summary>
 class ModelManager {
 public:
 	ModelManager() = default;

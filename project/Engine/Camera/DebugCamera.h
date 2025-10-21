@@ -36,15 +36,19 @@ public:
 	void MatrixUpdate();
 
 	/// <summary>
+	/// マウスの事前変更
+	/// </summary>
+	void PreChange();
+
+
+	//========================================================================*/
+	//* Getter
+
+	/// <summary>
 	/// ビュー行列の取得
 	/// </summary>
 	/// <returns></returns>
 	Matrix4x4 GetViewMatrix()const;
-
-	/// <summary>
-	/// マウスの事前変更
-	/// </summary>
-	void PreChange();
 
 	Vector3 GetTranslate() { return translation_; }
 

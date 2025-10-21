@@ -6,6 +6,9 @@
 #include "Game/GameObj/Player/Player.h"
 #include "Game/Collider/CollisionManager.h"
 
+/// <summary>
+/// タイトルシーンクラス
+/// </summary>
 class TitleScene:public BaseScene {
 public:
 	TitleScene();

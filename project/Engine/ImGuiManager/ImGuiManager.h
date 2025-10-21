@@ -20,6 +20,9 @@ namespace ed = ax::NodeEditor;
 class MyWin;
 class DXCom;
 
+/// <summary>
+/// ImGui関連の管理クラス
+/// </summary>
 class ImGuiManager {
 public:
 	ImGuiManager() = default;

@@ -8,7 +8,9 @@
 #include "Game/OriginObject/TestBaseObj.h"
 #include "Game/Collider/CollisionManager.h"
 
-
+/// <summary>
+/// ゲームシーンクラス
+/// </summary>
 class GameScene :public BaseScene {
 public:
 	GameScene();

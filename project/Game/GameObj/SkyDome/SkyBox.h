@@ -6,6 +6,9 @@
 #include "Engine/Camera/CameraManager.h"
 
 
+/// <summary>
+/// SkyBox用クラス
+/// </summary>
 class SkyBox{
 public:
 	SkyBox();

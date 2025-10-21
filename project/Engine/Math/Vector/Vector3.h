@@ -1,6 +1,9 @@
 #pragma once
 #include <cmath>
 
+/// <summary>
+/// Vector3クラス
+/// </summary>
 class Vector3 {
 public:
 

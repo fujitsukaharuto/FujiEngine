@@ -7,7 +7,9 @@
 class DXCom;
 class LightManager;
 
-
+/// <summary>
+/// Object関連の汎用処理をするクラス
+/// </summary>
 class Object3dCommon {
 public:
 	Object3dCommon() = default;

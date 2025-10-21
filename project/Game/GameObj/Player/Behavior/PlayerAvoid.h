@@ -1,7 +1,9 @@
 #pragma once
 #include "BasePlayerBehavior.h"
 
-
+/// <summary>
+/// Player回避状態
+/// </summary>
 class PlayerAvoid : public BasePlayerBehavior {
 public:
 	PlayerAvoid(Player* pPlayer);

@@ -9,6 +9,9 @@ struct AnimationCurve {
 	std::vector<Keyframe<tValue>> keyframes;
 };
 
+/// <summary>
+/// ノードアニメーション構造体
+/// </summary>
 struct NodeAnimation {
 	AnimationCurve<Vector3> translate;
 	AnimationCurve<Quaternion> rotate;

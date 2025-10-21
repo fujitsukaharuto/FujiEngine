@@ -19,7 +19,9 @@ class LightManager;
 class PointLight;
 class SpotLight;
 
-
+/// <summary>
+/// アニメーションモデルクラス
+/// </summary>
 class AnimationModel {
 public:
 	AnimationModel();

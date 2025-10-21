@@ -5,6 +5,9 @@
 class DXCom;
 class BaseScene;
 
+/// <summary>
+/// シーン管理クラス
+/// </summary>
 class SceneManager {
 public:
 	SceneManager();

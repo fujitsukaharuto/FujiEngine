@@ -2,6 +2,9 @@
 #include <cmath>
 #include "Vector3.h"
 
+/// <summary>
+/// Vector4クラス
+/// </summary>
 class Vector4 {
 public:
 

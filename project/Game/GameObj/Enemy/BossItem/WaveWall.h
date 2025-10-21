@@ -4,7 +4,9 @@
 #include "Engine/Particle/ParticleEmitter.h"
 
 
-
+/// <summary>
+/// BossItem:WaveWallクラス
+/// </summary>
 class WaveWall : public OriginGameObject {
 public:
 	WaveWall();

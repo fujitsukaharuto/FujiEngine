@@ -2,7 +2,9 @@
 
 
 
-
+/// <summary>
+/// ステイトの基底クラス
+/// </summary>
 class OriginState {
 public:
 	OriginState() = default;

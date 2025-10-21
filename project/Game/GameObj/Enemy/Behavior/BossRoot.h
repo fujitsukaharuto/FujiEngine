@@ -1,6 +1,9 @@
 #pragma once
 #include "BaseBossBehavior.h"
 
+/// <summary>
+/// Bossの基本状態クラス
+/// </summary>
 class BossRoot : public BaseBossBehavior {
 public:
 	BossRoot(Boss* pBoss);

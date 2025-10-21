@@ -17,6 +17,9 @@ struct SpotLightData {
 	float pading[1];
 };
 
+/// <summary>
+/// スポットライトのクラス
+/// </summary>
 class SpotLight {
 public:
 	SpotLight() = default;

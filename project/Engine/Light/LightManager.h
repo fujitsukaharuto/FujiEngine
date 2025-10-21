@@ -7,6 +7,9 @@
 
 class DXCom;
 
+/// <summary>
+/// ライト管理クラス
+/// </summary>
 class LightManager {
 public:
 	LightManager() = default;

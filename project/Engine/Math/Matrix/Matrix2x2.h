@@ -1,5 +1,8 @@
 #pragma once
 
+/// <summary>
+/// Matrix2x2クラス
+/// </summary>
 class Matrix2x2 final {
 public:
 

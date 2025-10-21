@@ -2,6 +2,9 @@
 #include <Windows.h>
 #include <cstdint>
 
+/// <summary>
+/// Windowsアプリケーションのウィンドウ管理のクラス
+/// </summary>
 class MyWin {
 public:
 	MyWin() = default;

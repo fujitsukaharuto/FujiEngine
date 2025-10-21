@@ -2,6 +2,9 @@
 #include <string>
 #include <format>
 
+/// <summary>
+/// Log用
+/// </summary>
 namespace Logger {
 
 	void Log(const std::string& outputString);

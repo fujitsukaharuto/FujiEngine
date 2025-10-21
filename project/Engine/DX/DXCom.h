@@ -73,12 +73,19 @@ public:
 	void Initialize(MyWin* myWin);
 	void Finalize();
 
+	/// <summary>
+	/// PostEffect用Texture等の初期化
+	/// </summary>
 	void SettingTexture();
 
 	/// <summary>
 	/// 描画開始時
 	/// </summary>
 	void PreDraw();
+
+	/// <summary>
+	/// 基本パイプラインにする関数
+	/// </summary>
 	void Command();
 
 	/// <summary>
@@ -91,6 +98,9 @@ public:
 	/// </summary>
 	void PostDraw();
 
+	/// <summary>
+	/// スプライト描画前に呼び出す関数
+	/// </summary>
 	void PreSpriteDraw();
 
 	/// <summary>
@@ -98,11 +108,14 @@ public:
 	/// </summary>
 	void CommandExecution();
 
+	//========================================================================*/
+	//* Frameの描画前に呼び出す関数群
 	void SetRenderTargets();
 	void ClearRenderTarget();
 	void ClearDepthBuffer();
 
-
+	//========================================================================*/
+	//* オフスクリーンの処理を行う関数群
 	void OffscreenUpDate();
 	void OffscreenDebugGUI();
 
@@ -113,19 +126,60 @@ public:
 	/// <param name="before">変更前の状態</param>
 	/// <param name="after">変更後の状態</param>
 	void TransitionResource(ID3D12Resource* resource, D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after);
+
+	/// <summary>
+	/// UAV（Unordered Access View）バリアを挿入する
+	/// </summary>
 	void InsertUAVBarrier(ID3D12Resource* resource);
+
+	/// <summary>
+	/// OutLine実行前に呼び出す関数
+	/// </summary>
 	void PreOutline();
+
+	/// <summary>
+	/// OutLine実行後に呼び出す関数
+	/// </summary>
 	void PostOutline();
 
+
+	/// <summary>
+	/// 指定されたサイズのバッファリソースを生成する。
+	/// </summary>
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(Microsoft::WRL::ComPtr<ID3D12Device> device, size_t sizeInBytes);
+
+	/// <summary>
+	/// 指定されたタイプ・数でディスクリプタヒープを生成する。
+	/// </summary>
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
+
+	/// <summary>
+	/// 深度ステンシル用のテクスチャリソースを生成する。
+	/// </summary>
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateDepthStencilTextureResource(Microsoft::WRL::ComPtr<ID3D12Device> device, int32_t width, int32_t height);
+
+	/// <summary>
+	/// オフスクリーン描画用のテクスチャリソースを生成する。
+	/// </summary>
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateOffscreenTextureResource(Microsoft::WRL::ComPtr<ID3D12Device> device, int32_t width, int32_t height, D3D12_CLEAR_VALUE color);
+
+	/// <summary>
+	/// UAV（Unordered Access View）として使用可能なバッファリソースを生成する。
+	/// </summary>
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateUAVResource(ID3D12Device* device, size_t sizeInBytes);
+
+	/// <summary>
+	/// GPUからCPUへのデータ読み戻しに使用するリードバックリソースを生成する。
+	/// </summary>
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateReadbackResource(ID3D12Device* device, size_t sizeInBytes);
+
+	/// <summary>
+	/// CPUからGPUへデータ転送するためのアップロードバッファを生成する。
+	/// </summary>
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateUploadBuffer(size_t sizeInBytes, const void* initData);
 
-
+	//========================================================================*/
+	//* Getter
 	ID3D12Device* GetDevice() const { return device_.Get(); }
 	size_t GetBackBufferCount() const { return swapChainDesc_.BufferCount; }
 	ID3D12GraphicsCommandList* GetCommandList() const { return command_->GetList(); }

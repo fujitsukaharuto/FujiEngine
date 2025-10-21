@@ -11,6 +11,9 @@ using namespace Microsoft::WRL;
 class DXCom;
 class Camera;
 
+/// <summary>
+/// 線描画管理クラス
+/// </summary>
 class Line3dDrawer {
 public:
 	Line3dDrawer();

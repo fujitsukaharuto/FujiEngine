@@ -4,6 +4,9 @@
 
 #include "Engine/Particle/ParticleEmitter.h"
 
+/// <summary>
+/// Playerの弾クラス
+/// </summary>
 class PlayerBullet : public OriginGameObject {
 public:
 	PlayerBullet();

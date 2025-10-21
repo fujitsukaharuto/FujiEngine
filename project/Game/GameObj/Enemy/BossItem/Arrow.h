@@ -4,7 +4,9 @@
 #include "Engine/Particle/ParticleEmitter.h"
 
 
-
+/// <summary>
+/// BossItem:Arrowクラス
+/// </summary>
 class Arrow : public OriginGameObject {
 public:
 	Arrow();

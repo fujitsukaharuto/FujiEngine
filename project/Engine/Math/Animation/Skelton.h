@@ -4,6 +4,9 @@
 #include <optional>
 #include <map>
 
+/// <summary>
+/// ジョイント構造体
+/// </summary>
 struct Joint {
 	QuaternioonTrans transform;
 	Matrix4x4 loaclMatrix;
@@ -14,6 +17,9 @@ struct Joint {
 	std::optional<int32_t> parent;
 };
 
+/// <summary>
+/// スケルトン構造体
+/// </summary>
 struct Skeleton {
 	int32_t root;
 	std::map<std::string, int32_t> jointMap;

@@ -6,6 +6,9 @@
 #include "Math/Vector/Vector4.h"
 #include "Math/Matrix/Matrix4x4.h"
 
+/// <summary>
+/// Quaternionクラス
+/// </summary>
 class Quaternion {
 public:
 

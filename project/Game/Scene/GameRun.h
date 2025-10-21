@@ -1,7 +1,9 @@
 #pragma once
 #include "Framework.h"
 
-
+/// <summary>
+/// ゲームランクラス
+/// </summary>
 class GameRun : public Framework {
 public:
 	GameRun();

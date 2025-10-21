@@ -2,6 +2,10 @@
 #include<string>
 
 class Player;
+
+/// <summary>
+/// PlayerBehavior基底クラス
+/// </summary>
 class BasePlayerBehavior {
 public:
 	BasePlayerBehavior(Player* player) :pPlayer_(player) {}

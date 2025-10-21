@@ -4,7 +4,9 @@
 #include "Engine/Particle/ParticleEmitter.h"
 
 
-
+/// <summary>
+/// BossItem:UnderRingクラス
+/// </summary>
 class UnderRing : public OriginGameObject {
 public:
 	UnderRing();

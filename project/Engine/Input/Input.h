@@ -43,7 +43,9 @@ struct GamePad {
 	bool isConnected_ = false;
 };
 
-
+/// <summary>
+/// Inputの管理クラス
+/// </summary>
 class Input {
 public:
 

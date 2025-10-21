@@ -102,6 +102,9 @@ struct AcceleFiled {
 class DXCom;
 class SRVManager;
 
+/// <summary>
+/// GPUパーティクル管理クラス
+/// </summary>
 class GPUParticleSystem {
 public:
 	GPUParticleSystem();

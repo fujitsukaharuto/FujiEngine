@@ -17,6 +17,9 @@ struct AttackInfo {
 	float weight;
 };
 
+/// <summary>
+/// BossBehaviorの基底クラス
+/// </summary>
 class Boss;
 class BaseBossBehavior {
 public:

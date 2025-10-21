@@ -6,7 +6,9 @@
 #include <memory>
 #include <list>
 
-
+/// <summary>
+/// ロックオンの処理クラス
+/// </summary>
 class LockOn {
 public:
 	LockOn() = default;

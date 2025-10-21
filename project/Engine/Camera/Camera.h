@@ -97,6 +97,8 @@ public:
 
 	void DebugGUI();
 
+	//========================================================================*/
+	//* Getter
 	Vector3 GetTranslate();
 
 	Trans transform;

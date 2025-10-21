@@ -140,6 +140,9 @@ struct Link {
 
 // NodeEditor
 #ifdef _DEBUG
+/// <summary>
+/// NodeGraphのクラス
+/// </summary>
 class NodeGraph {
 public:
 	// ノードとリンクのリスト

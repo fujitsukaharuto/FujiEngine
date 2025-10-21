@@ -137,11 +137,11 @@ void DebugCamera::MatrixUpdate() {
 	viewMatrix_ = Inverse(matWorld);
 }
 
-Matrix4x4 DebugCamera::GetViewMatrix() const {
-	return viewMatrix_;
-}
-
 void DebugCamera::PreChange() {
 	Vector2 mousePos = Input::GetInstance()->GetMousePosition();
 	lastMousePos_ = { mousePos.x, mousePos.y };
+}
+
+Matrix4x4 DebugCamera::GetViewMatrix() const {
+	return viewMatrix_;
 }

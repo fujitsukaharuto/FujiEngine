@@ -1,7 +1,9 @@
 #pragma once
 #include "BaseBossBehavior.h"
 
-
+/// <summary>
+/// Bossの落雷攻撃の行動クラス
+/// </summary>
 class BossRodFall : public BaseBossBehavior {
 public:
 	BossRodFall(Boss* pBoss);

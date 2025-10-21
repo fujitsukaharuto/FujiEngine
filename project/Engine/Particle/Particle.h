@@ -33,6 +33,9 @@ enum class BillBoardPattern {
 	kXYBillBoard,
 };
 
+/// <summary>
+/// パーティクル構造体
+/// </summary>
 struct Particle {
 
 	bool isLive_ = false;
@@ -89,6 +92,9 @@ struct Particle {
 
 };
 
+/// <summary>
+/// GPUパーティクル構造体
+/// </summary>
 struct ParticleCS {
 	Vector3 translate;
 	Vector3 scale;

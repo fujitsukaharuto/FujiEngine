@@ -1,7 +1,9 @@
 #pragma once
 #include "Scene/AbstractSceneFactory.h"
 
-
+/// <summary>
+/// シーンファクトリー
+/// </summary>
 class SceneFactory : public AbstractSceneFactory {
 public:
 	SceneFactory();

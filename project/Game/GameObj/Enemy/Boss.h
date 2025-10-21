@@ -22,6 +22,9 @@ enum class BossHPState {
 	Empty = 0
 };
 
+/// <summary>
+/// Bossクラス
+/// </summary>
 class Boss : public OriginGameObject {
 public:
 	Boss();

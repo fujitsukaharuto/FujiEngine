@@ -36,6 +36,9 @@ struct AnimeData {
 };
 
 
+/// <summary>
+/// パーティクルエミッタークラス
+/// </summary>
 class ParticleEmitter {
 public:
 	ParticleEmitter();

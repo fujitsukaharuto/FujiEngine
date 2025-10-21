@@ -3,6 +3,9 @@
 #include "Engine/Audio/AudioPlayer.h"
 #include "Engine/Particle/ParticleEmitter.h"
 
+/// <summary>
+/// PlayerAttack基本クラス
+/// </summary>
 class PlayerAttackRoot : public BasePlayerAttackBehavior {
 public:
 	PlayerAttackRoot(Player* pPlayer);

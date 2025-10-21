@@ -33,6 +33,10 @@ enum class ShapeType {
 class DXCom;
 class SRVManager;
 
+
+/// <summary>
+/// パーティクル管理クラス
+/// </summary>
 class ParticleManager {
 public:
 	ParticleManager();

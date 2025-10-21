@@ -49,6 +49,9 @@ struct ModelData {
 };
 
 
+/// <summary>
+/// モデルクラス
+/// </summary>
 class Model {
 public:
 	Model();

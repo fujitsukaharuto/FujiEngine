@@ -10,16 +10,25 @@
 #include "Engine/Math/Matrix/MatrixCalculation.h"
 
 const uint32_t kNumMaxInfluence = 4;
+/// <summary>
+/// ボーン重み構造体
+/// </summary>
 struct VertexInfluence {
 	std::array<float, kNumMaxInfluence> weights;
 	std::array<int32_t, kNumMaxInfluence> jointIndices;
 };
 
+/// <summary>
+/// GPUに送るスケルトンデータ構造体
+/// </summary>
 struct WellForGPU {
 	Matrix4x4 skeltonSpaceMatrix;
 	Matrix4x4 skeletonSpaceInverseTransposeMatrix;
 };
 
+/// <summary>
+/// メッシュセクション構造体
+/// </summary>
 struct MeshSection {
 	uint32_t  vertexOffset;
 	uint32_t  vertexCount;
@@ -27,6 +36,9 @@ struct MeshSection {
 	uint32_t  materialIndex;
 };
 
+/// <summary>
+/// スキンクラスター構造体
+/// </summary>
 struct SkinCluster {
 	std::vector<Matrix4x4> inverseBindPoseMatrices;
 

@@ -2,6 +2,9 @@
 #include "Engine/Math/Matrix/MatrixCalculation.h"
 
 
+/// <summary>
+/// 追従カメラのクラス
+/// </summary>
 class FollowCamera {
 public:
 	FollowCamera();

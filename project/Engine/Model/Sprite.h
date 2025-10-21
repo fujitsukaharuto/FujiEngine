@@ -11,6 +11,9 @@ class DXCom;
 class PointLight;
 class SpotLight;
 
+/// <summary>
+/// スプライト描画クラス
+/// </summary>
 class Sprite {
 public:
 	Sprite();

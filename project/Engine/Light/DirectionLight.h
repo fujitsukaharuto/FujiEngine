@@ -14,7 +14,9 @@ struct DirectionalLight {
 
 };
 
-
+/// <summary>
+/// ディレクションライトのクラス
+/// </summary>
 class DirectionLight {
 public:
 	DirectionLight() = default;

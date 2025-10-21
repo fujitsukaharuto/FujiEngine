@@ -2,7 +2,9 @@
 #include "BaseBossBehavior.h"
 #include "Engine/Particle/ParticleEmitter.h"
 
-
+/// <summary>
+/// Bossのビーム攻撃の行動クラス
+/// </summary>
 class BossBeamAttack : public BaseBossBehavior {
 public:
 	BossBeamAttack(Boss* pBoss);

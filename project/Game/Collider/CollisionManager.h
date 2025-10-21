@@ -21,6 +21,9 @@ struct OBB {
 	};
 };
 
+/// <summary>
+/// あたり判定管理クラス
+/// </summary>
 class CollisionManager {
 public:
 	CollisionManager();

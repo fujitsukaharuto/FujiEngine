@@ -24,6 +24,9 @@ enum class LightMode {
 	kSpotLightON,
 };
 
+/// <summary>
+/// マテリアルクラス
+/// </summary>
 class Material {
 public:
 	struct MaterialDate {
