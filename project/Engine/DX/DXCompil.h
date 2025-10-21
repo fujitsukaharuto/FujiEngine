@@ -20,8 +20,10 @@ public:
 
 	void Initialize();
 
+	/// <summary>
+	/// シェーダーのコンパイル関数
+	/// </summary>
 	ComPtr<IDxcBlob> CompileShader(const std::wstring& filePath, const wchar_t* profile);
-
 
 private:
 

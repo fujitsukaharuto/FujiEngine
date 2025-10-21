@@ -13,8 +13,10 @@ public:
 
 public:
 
+	/// <summary>Int型のランダム生成</summary>
 	static int GetInt(int min, int max);
 
+	/// <summary>Float型のランダム生成</summary>
 	static float GetFloat(float min, float max);
 
 

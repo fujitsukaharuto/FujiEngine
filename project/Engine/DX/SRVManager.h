@@ -22,15 +22,38 @@ public:
 	void Initialize(DXCom* pDxcom);
 	void Finalize();
 
+	/// <summary>
+	/// テクスチャ用のSRV（Shader Resource View）を生成する
+	/// </summary>
 	void CreateTextureSRV(uint32_t srvIndex, ID3D12Resource* resource, DXGI_FORMAT format, UINT mipLevels, bool isCube);
+
+	/// <summary>
+	/// 構造化バッファ用のSRV（Shader Resource View）を生成する
+	/// </summary>
 	void CreateStructuredSRV(uint32_t srvIndex, ID3D12Resource* resource, UINT numElements, UINT structureByteStride);
+
+	/// <summary>
+	/// 構造化バッファ用のUAV（Unordered Access View）を生成する
+	/// </summary>
 	void CreateStructuredUAV(uint32_t uavIndex, ID3D12Resource* resource, UINT numElements, UINT structureByteStride);
 
+	/// <summary>
+	/// 現在のディスクリプタヒープをコマンドリストへセットする
+	/// </summary>
 	void SetDescriptorHeap();
+
+	/// <summary>
+	/// グラフィックスパイプラインにSRVテーブルをバインドする
+	/// </summary>
 	void SetGraphicsRootDescriptorTable(UINT rootIndex, uint32_t srvIndex);
 
+	/// <summary>
+	/// ディスクリプタヒープ内の新しいスロットを割り当てる
+	/// </summary>
 	uint32_t Allocate();
 
+	//========================================================================*/
+	//* Getter
 	D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(uint32_t index);
 	D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(uint32_t index);
 	ID3D12DescriptorHeap* GetSRVHeap() { return descriptorHeap.Get(); }

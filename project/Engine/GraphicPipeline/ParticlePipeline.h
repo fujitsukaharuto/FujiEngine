@@ -19,6 +19,9 @@ public:
 
 public:
 
+	/// <summary>
+	/// 減算合成にするかどうか
+	/// </summary>
 	void SetIsSubMode(bool is) { isSubMode_ = is; }
 
 private:

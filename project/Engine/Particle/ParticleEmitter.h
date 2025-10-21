@@ -5,7 +5,9 @@
 
 using json = nlohmann::json;
 
-
+/// <summary>
+/// ランダムパラメーターのデータ
+/// </summary>
 struct RandomParametor {
 	Vector2 speedx;
 	Vector2 speedy;
@@ -24,6 +26,9 @@ struct RandomParametor {
 	Vector2 autoUVMin = { 0.1f,0.0f };
 };
 
+/// <summary>
+/// アニメーションパーティクルのデータ
+/// </summary>
 struct AnimeData {
 	float lifeTime = 20.0f;
 	float startLifeTime = 20.0f;
@@ -49,24 +54,38 @@ public:
 	void DebugGUI();
 	void DrawSize();
 
+	/// <summary>パーティクル発生</summary>
 	void Emit();
-
+	/// <summary>間隔を無視したパーティクル発生</summary>
 	void Burst();
-
+	/// <summary>間隔を無視したアニメーションパーティクル発生</summary>
 	void BurstAnime();
 
+	/// <summary>ランダムな速度</summary>
 	void RandomSpeed(const Vector2& x, const Vector2& y, const Vector2& z);
+	/// <summary>ランダムな位置</summary>
 	void RandomTranslate(const Vector2& x, const Vector2& y, const Vector2& z);
 
+	/// <summary>エミッター情報の出力</summary>
 	void Save();
+	/// <summary>エミッター情報の読み込み</summary>
 	void Load(const std::string& filename);
 
 	float frequencyTime_ = 0;
 
+
+	//========================================================================*/
+	//* Setter
+	/// <summary>frequencyTimeの状態にする</summary>
 	void TimeReset() { time_ = frequencyTime_; }
+	/// <summary>ペアレントの設定</summary>
 	void SetParent(Trans* parent) { parent_ = parent; }
+	/// <summary>アニメーションモデルにペアレントする設定</summary>
 	void SetAnimParent(Matrix4x4* parent) { animParent_ = parent; }
 	void SetIsUpdatedMatrix(bool is) { isUpDatedMatrix_ = is; }
+
+	//========================================================================*/
+	//* Getter
 	Vector3 GetWorldPos();
 	Matrix4x4 GetParentMatrix();
 	bool HaveParent() { return parent_ ? true : false; }

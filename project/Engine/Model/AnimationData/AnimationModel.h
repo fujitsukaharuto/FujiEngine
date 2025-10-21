@@ -31,70 +31,96 @@ public:
 
 	void DebugGUI();
 
+	/// <summary>
+	/// アニメーションデータの読み込み
+	/// </summary>
 	void LoadAnimationFile(const std::string& filename);
 
+	/// <summary>
+	/// スケルトンの生成
+	/// </summary>
 	void CreateSkeleton(const Node& rootNode);
 
+	/// <summary>
+	/// モデルの生成
+	/// </summary>
 	void Create(const std::string& fileName);
 
 	void CreateSphere();
 
+	/// <summary>
+	/// スキンクラスターの生成
+	/// </summary>
 	SkinCluster CreateSkinCluster(const Skeleton& skeleton, const ModelData& modelData);
 
 	void AnimationUpdate();
 
+	/// <summary>
+	/// ディスパッチ処理
+	/// </summary>
 	void CSDispatch();
 
 	void Draw(Material* mate = nullptr);
-
 	void AnimeDraw();
-
 	void SkeletonDraw();
 
+	//========================================================================*/
+	//* Getter
 	Matrix4x4 GetWorldMat() const;
-
 	Vector3 GetWorldPos()const;
-
 	Matrix4x4* GetJointTrans(const std::string& jointName);
 
-	void SkeletonUpdate();
 
+	void SkeletonUpdate();
 	void SkinClusterUpdate();
 
+	/// <summary>
+	/// アニメーションの適用
+	/// </summary>
 	void ApplyAnimation();
 
+	/// <summary>
+	/// アニメーションの変更
+	/// </summary>
 	void ChangeAnimation(const std::string& newName);
 
 	void UpdateWVP() { SetWVP(); }
 
+	/// <summary>
+	/// JsonからTransformを設定
+	/// </summary>
 	void LoadTransformFromJson(const std::string& filename);
 
+	//========================================================================*/
+	//* Setter
+	/// <summary>色の変更</summary>
 	void SetColor(const Vector4& color);
-
+	/// <summary>UVスケールの変更</summary>
 	void SetUVScale(const Vector2& scale, const Vector2& uvTrans);
-
+	/// <summary>カメラの設定</summary>
 	void SetCamera(Camera* camera) { this->camera_ = camera; }
-
+	/// <summary>ペアレントの設定</summary>
 	void SetParent(Trans* parent) { transform.parent = parent; }
-
+	/// <summary>ペアレントの仕方の設定</summary>
 	void SetNoneScaleParent(bool is) { transform.isNoneScaleParent = is; }
-
+	/// <summary>カメラにペアレントするか</summary>
 	void SetCameraParent(bool is) { transform.isCameraParent = is; }
-
+	/// <summary>テクスチャの変更</summary>
 	void SetTexture(const std::string& name);
-
+	/// <summary>ビルボードMatrixの設定</summary>
 	void SetBillboardMat(const Matrix4x4& mat) { billboardMatrix_ = mat; }
-
+	/// <summary>ライトモードの設定</summary>
 	void SetLightEnable(LightMode mode);
-
+	/// <summary>環境マップの設定</summary>
 	void SetEnvironmentCoeff(float environment);
-
+	/// <summary>モデルの変更</summary>
 	void SetModel(const std::string& fileName);
 
+	/// <summary>反射するObjectにするか</summary>
 	void IsMirrorOBJ(bool is);
-
+	/// <summary>アニメーションで動かすか</summary>
 	void IsAnimation(bool is) { isAnimation_ = is; }
-
+	/// <summary>アニメーションをループさせるか</summary>
 	void IsRoopAnimation(bool is) { isRoopAnimation_ = is; }
 
 	Trans transform{};

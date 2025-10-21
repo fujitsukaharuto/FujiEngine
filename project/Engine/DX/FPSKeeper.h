@@ -13,13 +13,11 @@ public:
 
 	static FPSKeeper* GetInstance();
 
-	/// <summary>初期化</summary>
 	void Initialize();
 
 	/// <summary>60FPSに固定</summary>
 	void FixFPS();
 
-	/// <summary>毎フレームの更新</summary>
 	void Update();
 
 	/// <summary>

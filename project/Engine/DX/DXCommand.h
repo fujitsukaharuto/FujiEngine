@@ -18,20 +18,29 @@ public:
 
 	void Initialize(ID3D12Device* device);
 
+	/// <summary>
+	/// コマンドリストをクローズし、コマンドキューに実行を送信する
+	/// </summary>
 	void Close();
 
+	/// <summary>
+	/// GPU実行キューへ送信する
+	/// </summary>
 	void Execution();
 
+	/// <summary>
+	/// コマンドアロケータおよびコマンドリストをリセットする
+	/// </summary>
 	void Reset();
 
+	/// <summary>
+	/// ViewとScissorをセットする
+	/// </summary>
 	void SetViewAndscissor();
 
-	/// ==========================================
-	/// Getter
-	/// ==========================================
-
+	//========================================================================*/
+	//* Getter
 	ID3D12CommandQueue* GetQueue() const { return queue_.Get(); }
-
 	ID3D12GraphicsCommandList* GetList() const { return list_.Get(); }
 
 

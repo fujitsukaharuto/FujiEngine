@@ -16,6 +16,9 @@ class DXCom;
 class Mesh {
 public:
 
+	/// <summary>
+	/// メッシュのVertexDeta
+	/// </summary>
 	struct VertexData {
 		Vector4 pos;    // xyz座標
 		Vector2 uv;     // uv座標
@@ -26,20 +29,26 @@ public:
 	Mesh();
 	~Mesh();
 
+	/// <summary>メッシュの生成</summary>
 	void CreateMesh();
 
+	/// <summary>UAVの生成</summary>
 	void CreateUAV();
 
+	/// <summary>Vertexの追加</summary>
 	void AddVertex(const VertexData& vertex);
 
+	/// <summary>Indexの追加</summary>
 	void AddIndex(uint32_t index);
 
 	void Draw(ID3D12GraphicsCommandList* commandList);
 
 	void AnimationDraw(const SkinCluster& skinCluster, ID3D12GraphicsCommandList* commandList, int index);
 
+	/// <summary>バリアの変更</summary>
 	void TransBarrier();
 
+	/// <summary>ディスパッチ処理</summary>
 	void CSDispatch(ID3D12GraphicsCommandList* commandList);
 
 	size_t GetVertexDataSize() { return vertexData_.size(); }

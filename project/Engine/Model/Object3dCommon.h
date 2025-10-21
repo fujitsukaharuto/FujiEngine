@@ -19,8 +19,10 @@ public:
 
 	void Initialize();
 
+	/// <summary>オブジェクト描画前</summary>
 	void PreDraw();
 
+	/// <summary>アニメーション描画前</summary>
 	void PreAnimationDraw();
 
 private:

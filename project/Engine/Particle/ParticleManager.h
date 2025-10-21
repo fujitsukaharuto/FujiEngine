@@ -10,6 +10,9 @@
 
 using Microsoft::WRL::ComPtr;
 
+/// <summary>
+/// パーティクルの行列等のデータ
+/// </summary>
 struct TransformationParticleMatrix {
 	Matrix4x4 WVP;
 	Matrix4x4 World;
@@ -44,6 +47,9 @@ public:
 
 public:
 
+	/// <summary>
+	/// パーティクルグループのデータ
+	/// </summary>
 	struct ParticleGroup {
 		Material material_;
 		std::list<Particle> particles_;
@@ -57,6 +63,9 @@ public:
 		bool isSubMode_ = false;
 	};
 
+	/// <summary>
+	/// ペアレントするパーティクルグループのデータ
+	/// </summary>
 	struct ParentParticleGroup {
 		Material material_;
 		std::list<Particle> particles_;
@@ -69,6 +78,9 @@ public:
 		ShapeType shapeType_ = ShapeType::PLANE;
 	};
 
+	/// <summary>
+	/// アニメーションパーティクルグループのデータ
+	/// </summary>
 	struct AnimeGroup {
 		std::string farst;
 		std::vector<std::unique_ptr<Object3d>> objects_;
@@ -97,32 +109,31 @@ public:
 	void SelectParticleUpdate();
 	void SelectEmitterSizeDraw();
 
-	/// <summary>
-	/// 通常パーティクル
-	/// </summary>
+	/// <summary>通常パーティクル生成</summary>
 	static void CreateParticleGroup(const std::string& name, const std::string& fileName = "white2x2.png", uint32_t count = 20, ShapeType shape = ShapeType::PLANE, bool subMode = false);
-
-	/// <summary>
-	/// ペアレントパーティクル
-	/// </summary>
+	/// <summary>ペアレントパーティクル生成</summary>
 	static void CreateParentParticleGroup(const std::string& name, const std::string& fileName, uint32_t count = 20, ShapeType shape = ShapeType::PLANE);
-
-	/// <summary>
-	/// 連番のパーティクル
-	/// </summary>
+	/// <summary>連番のパーティクル生成</summary>
 	static void CreateAnimeGroup(const std::string& name, const std::string& fileName);
 
+	/// <summary>グループ情報の読み込み</summary>
 	static void Load(ParticleEmitter& emit, const std::string& name);
+	/// <summary>ペアレントグループ情報の読み込み</summary>
 	static void LoadParentGroup(ParticleEmitter*& emit, const std::string& name);
 
+	/// <summary>パーティクルの発生</summary>
 	static void Emit(const std::string& name, const Vector3& pos, const Vector3& rotate, const Particle& grain, const RandomParametor& para, uint32_t count);
+	/// <summary>ペアレントパーティクルの発生</summary>
 	static void ParentEmit(const std::string& name, const Vector3& pos, const Vector3& rotate, const Particle& grain, const RandomParametor& para, uint32_t count);
-
+	/// <summary>アニメーションパーティクルの発生</summary>
 	static void EmitAnime(const std::string& name, const Vector3& pos, const AnimeData& data, const RandomParametor& para, uint32_t count);
+	/// <summary>アニメーションパーティクルの設定</summary>
 	static void AddAnime(const std::string& name, const std::string& fileName, float animeChangeTime);
 
 	static void ParentReset();
 
+	//========================================================================*/
+	//* Getter
 	static GPUParticleSystem::GPUParticleEmitter& GetParticleCSEmitter(int index);
 	static GPUParticleSystem::GPUParticleEmitterTexture& GetParticleCSEmitterTexture(int index);
 	static GPUParticleSystem::GPUParticleEmitterSurface& GetParticleCSEmitterSurface(int index);
@@ -133,6 +144,7 @@ public:
 
 private:
 
+	/// <summary>グループの作成を行う</summary>
 	void InternalCreateParticleGroup(const std::string& name, const std::string& fileName, uint32_t count, ShapeType shape, bool subMode);
 
 	void UpdateParticleGroup(const Matrix4x4& billboardMatrix);
@@ -141,7 +153,9 @@ private:
 
 	void DrawParticleGroup();
 	void DrawParentParticleGroup();
+	/// <summary>ShapeType変更時にコマンドを発行</summary>
 	void ShapeTypeCommand(const ShapeType& type);
+	/// <summary>ShapeType別のコマンドを発行</summary>
 	void ShapeTypeDrawCommand(const ShapeType& type, uint32_t count);
 
 	void InitPlaneVertex();
@@ -150,14 +164,19 @@ private:
 	void InitCylinderVertex();
 	void InitLighningVertex();
 
+	/// <summary>パーティクルの寿命の処理</summary>
 	bool LifeUpdate(Particle& particle);
+	/// <summary>パーティクルのサイズのアップデート</summary>
 	void ParticleSizeUpdate(Particle& particle);
+	/// <summary>パーティクルのSRTのアップデート</summary>
 	void SRTUpdate(Particle& particle);
+	/// <summary>パーティクルのビルボード処理</summary>
 	void Billboard(Particle& particle, Matrix4x4& worldMatrix, const Matrix4x4& billboardMatrix, const Matrix4x4& rotate);
 	bool InitEmitParticle(Particle& particle, const Vector3& pos, const Vector3& rotate, const Particle& grain, const RandomParametor& para);
 
+	/// <summary>パーティクルに使用するテクスチャのセレクトポップアップ</summary>
 	void ParticleTexurePopUp();
-
+	/// <summary>グループのデータを出力</summary>
 	void SaveGroupData();
 
 private:

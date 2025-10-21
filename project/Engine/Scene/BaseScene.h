@@ -34,6 +34,7 @@ public:
 	virtual void ParticleDebugGUI();
 	virtual void ParticleGroupDebugGUI();
 
+	/// <summary>シーンの変更</summary>
 	void ChangeScene(const std::string& sceneName, float extraTime);
 
 private:

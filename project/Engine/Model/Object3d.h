@@ -15,11 +15,17 @@ class LightManager;
 class PointLight;
 class SpotLight;
 
+/// <summary>
+/// ピッキングで使うObjectの番号データ
+/// </summary>
 struct ObjIDData {
 	int objID;
 	uint32_t padding[3];
 };
 
+/// <summary>
+/// ３Dオブジェクトのクラス
+/// </summary>
 class Object3d {
 public:
 	Object3d();
@@ -29,10 +35,13 @@ public:
 
 	void Create(const std::string& fileName);
 
+	/// <summary>
+	/// 球の作成
+	/// </summary>
 	void CreateSphere();
 
 	/// <summary>
-	/// Ringの作成
+	/// リングの作成
 	/// </summary>
 	/// <param name="out">外側の半径(デフォルトは1.0f)</param>
 	/// <param name="in">内側の半径(デフォルトは0.2f)</param>
@@ -41,7 +50,7 @@ public:
 	void CreateRing(float out = 1.0f, float in = 0.2f, float radius = 2.0f, bool horizon = false);
 
 	/// <summary>
-	/// Cylinderの作成
+	/// シリンダーの作成
 	/// </summary>
 	/// <param name="topRadius">上の半径(デフォルトは1.0f)</param>
 	/// <param name="bottomRadius">下の半径(デフォルトは1.0f)</param>
@@ -55,12 +64,15 @@ public:
 	/// </summary>
 	void AnimeDraw();
 
+	//========================================================================*/
+	//* Getter
 	Matrix4x4 GetWorldMat() const;
-
 	Vector3 GetWorldPos()const;
-
 	std::string GetModelName() { return modelName_; }
+	int GetObjID() { return objIDData_->objID; }
 
+
+	/// <summary>親がいるかどうか</summary>
 	bool IsHaveParent() { return transform.parent ? true : false; }
 
 	void UpdateWVP() { SetWVP(); }
@@ -72,45 +84,38 @@ public:
 	/// </summary>
 	void LoadTransformFromJson(const std::string& filename);
 
+	//========================================================================*/
+	//* Setter
+	/// <summary>色の設定</summary>
 	void SetColor(const Vector4& color);
-
+	/// <summary>UVスケールの設定</summary>
 	void SetUVScale(const Vector2& scale, const Vector2& uvTrans);
-
+	/// <summary>UVトランスフォームの設定</summary>
 	void SetUVTrans(const Vector2& uvTrans);
-
-	/// <summary>
-	/// α値の閾値
-	/// </summary>
+	/// <summary>α値の閾値</summary>
 	void SetAlphaRef(float ref);
-
 	void SetCamera(Camera* camera) { this->camera_ = camera; }
-
+	/// <summary>ペアレントの設定</summary>
 	void SetParent(Trans* parent) { transform.parent = parent; }
 	void SetAnimParent(Matrix4x4* parent) { transform.animParent = parent; }
-
-	/// <summary>
-	/// 非スケーリング継承
-	/// </summary>
+	/// <summary>非スケーリング継承</summary>
 	void SetNoneScaleParent(bool is) { transform.isNoneScaleParent = is; }
-
 	void SetCameraParent(bool is) { transform.isCameraParent = is; }
-
+	/// <summary>テクスチャの設定</summary>
 	void SetTexture(const std::string& name);
-
+	/// <summary>ビルボード行列の設定</summary>
 	void SetBillboardMat(const Matrix4x4& mat) { billboardMatrix_ = mat; }
-
+	/// <summary>ライトモードの設定</summary>
 	void SetLightEnable(LightMode mode);
-
+	/// <summary>モデルの設定</summary>
 	void SetModel(const std::string& fileName, bool overWrite = false);
-
-	Trans transform{};
-
-	int GetObjID() { return objIDData_->objID; }
-
+	/// <summary>ピッキング用にIDの調整</summary>
 	void SetEditorObjParameter();
 
 	// MeshDraw
 	void MeshDraw(Material* mate = nullptr, int drawCount = 1);
+
+	Trans transform{};
 
 private:
 
@@ -120,8 +125,10 @@ private:
 
 	void SetBillboardWVP();
 
+	/// <summary>コマンドの生成</summary>
 	void CreatePropertyCommand(int type);
 
+	/// <summary>テクスチャをNodeから設定</summary>
 	void SetTextureNode();
 
 private:

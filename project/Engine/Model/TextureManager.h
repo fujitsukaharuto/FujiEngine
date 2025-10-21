@@ -14,6 +14,9 @@
 
 class DXCom;
 
+/// <summary>
+/// テクスチャのデータ
+/// </summary>
 struct Texture {
 	Microsoft::WRL::ComPtr<ID3D12Resource> textureResource; // テクスチャリソース
 	uint32_t srvIndex;

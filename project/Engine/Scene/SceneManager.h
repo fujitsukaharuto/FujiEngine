@@ -20,16 +20,13 @@ public:
 	void Update();
 	void Draw();
 
-	/// <summary>
-	/// 最初のシーンを決める
-	/// </summary>
+	/// <summary>最初のシーンを決める</summary>
 	void StartScene(const std::string& sceneName);
 
-	/// <summary>
-	/// 次シーンへ移行
-	/// </summary>
+	/// <summary>次シーンへ移行</summary>
 	void ChangeScene(const std::string& sceneName, float extraTime);
 
+	/// <summary>シーンファクトリーの設定</summary>
 	void SetFactory(AbstractSceneFactory* factory) { sceneFactory_ = factory; }
 
 	void DebugGUI();
@@ -37,6 +34,7 @@ public:
 
 private:
 
+	/// <summary>シーンの設定</summary>
 	void SceneSet();
 
 private:

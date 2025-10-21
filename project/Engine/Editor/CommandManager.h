@@ -19,6 +19,9 @@ enum class ObjectType{
 	None,
 };
 
+/// <summary>
+/// EditorObject用のデータ構造体
+/// </summary>
 struct EditorObj {
 	int id;
 	std::unique_ptr<Object3d> obj;
@@ -34,12 +37,16 @@ struct EditorObj {
 	std::string dragButtonLabel;
 };
 
+/// <summary>
+/// EditorObjectのLoad時用のデータ
+/// </summary>
 struct LoadEditorObjData {
 	std::string name;
 	std::string modelName;
 	Trans trnasform;
 	ObjectType objType;
 };
+
 
 /// <summary>
 /// EditorObjectのUndo、Redoをするためのクラス
@@ -61,15 +68,31 @@ public:
 	void Undo();
 	void Redo();
 
+	/// <summary>
+	/// Undoができるのかのチェック
+	/// </summary>
 	bool CanUndo() const { return !undoStack.empty(); }
+
+	/// <summary>
+	/// Redoできるのかのチェック
+	/// </summary>
 	bool CanRedo() const { return !redoStack.empty(); }
 
+
+	/// <summary>
+	/// 入力状態を確認し、Undo / Redo 操作を実行する
+	/// </summary>
 	void CheckInputForUndoRedo();
+
+	//========================================================================*/
+	//* データリセット用関数群
 	void Reset();
 	void StackReset();
 	void Finalize();
 
-
+	/// <summary>
+	/// Commandの作成テンプレート
+	/// </summary>
 	template<typename T>
 	static void TryCreatePropertyCommand(Trans& trans, const T& prevValue, T& currentValue, T Trans::* member) {
 		if (currentValue != prevValue) {
@@ -91,14 +114,44 @@ public:
 
 private:
 
+	/// <summary>
+	/// データのセーブ
+	/// </summary>
 	void EditorOBJSave(const std::string& filePath);
+
+	/// <summary>
+	/// ObjectのデータをJsonに書き込む
+	/// </summary>
 	nlohmann::json ConvertObjToJson(EditorObj* obj);
+
+	/// <summary>
+	/// EditorObjectのセーブ
+	/// </summary>
 	void SaveAllEditorOBJ();
+
+	/// <summary>
+	/// EditorObjectのロード
+	/// </summary>
 	bool EditorOBJLoad(const std::string& filePath, bool deleteObj = false);
+
+	/// <summary>
+	/// JSONデータからエディタ用オブジェクトを再帰的に読み込む
+	/// </summary>
 	void LoadObjRecursive(const nlohmann::json& objJson, int parentId);
+
+	/// <summary>
+	/// すべてのエディタ用オブジェクトをロード
+	/// </summary>
 	void LoadAllEditorOBJ();
 
+	/// <summary>
+	/// エディタ上に存在するすべてのオブジェクトを削除
+	/// </summary>
 	void DeleteEditorObj();
+
+	/// <summary>
+	/// 指定したオブジェクトが、他のオブジェクトの親子関係上で不正な関連を持たないか確認
+	/// </summary>
 	bool ParentCheck(int parentID, int receiveID);
 
 private:

@@ -30,9 +30,20 @@ public:
 	virtual void Finalize();
 	virtual void Update();
 	virtual void Draw() = 0;
+
+	/// <summary>
+	/// 実行終了を知らせる
+	/// </summary>
 	virtual bool IsEndRequest() { return endRequest_; }
 
+	/// <summary>
+	/// システムの初期化
+	/// </summary>
 	void Init();
+
+	/// <summary>
+	/// ゲームループ
+	/// </summary>
 	void Run();
 
 

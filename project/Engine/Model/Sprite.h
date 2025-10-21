@@ -5,8 +5,6 @@
 #include "Object3d.h"
 
 
-// Pipe別にしたい
-
 class DXCom;
 class PointLight;
 class SpotLight;
@@ -28,36 +26,29 @@ public:
 
 	void Draw();
 
+	//========================================================================*/
+	//* Setter
+	/// <summary>スプライトの色の設定</summary>
 	void SetColor(const Vector4& color);
-
+	/// <summary>スプライトの位置の設定</summary>
 	void SetPos(const Vector3& pos);
-
+	/// <summary>スプライトのスケールの設定</summary>
 	void SetScale(const Vector2& scale);
-
+	/// <summary>スプライトのサイズの設定</summary>
 	void SetSize(const Vector2& size);
-
+	/// <summary>スプライトの回転の設定</summary>
 	void SetAngle(float rotate);
-
-	/// <summary>
-	/// スプライトの基準点
-	/// </summary>
+	/// <summary>スプライトの基準点</summary>
 	void SetAnchor(const Vector2& anchor);
-
-	/// <summary>
-	/// 左右反転
-	/// </summary>
+	/// <summary>左右反転</summary>
 	void SetFlipX(bool is) { isFlipX_ = is; }
-
-	/// <summary>
-	/// 上下反転
-	/// </summary>
+	/// <summary>上下反転</summary>
 	void SetFlipY(bool is) { isFlipY_ = is; }
-
-	/// <summary>
-	/// スプライトの描画範囲指定
-	/// </summary>
+	/// <summary>スプライトの描画範囲指定</summary>
 	void SetRange(const Vector2& leftTop, const Vector2& size);
 
+	//========================================================================*/
+	//* Getter
 	Vector2 GetDefaultSize() const { return defaultSize_; }
 
 	/*void SetPointLight(PointLight* light) { pointLight_ = light; }

@@ -10,16 +10,25 @@
 using Microsoft::WRL::ComPtr;
 
 
+/// <summary>
+/// GPUパーティクル用行列データ
+/// </summary>
 struct PerView {
 	Matrix4x4 viewProjection;
 	Matrix4x4 billboardMatrix;
 };
 
+/// <summary>
+/// GPUパーティクル用フレームデータ
+/// </summary>
 struct PerFrame {
 	float time;
 	float deltaTime;
 };
 
+/// <summary>
+/// GPUパーティクルエミッター
+/// </summary>
 struct EmitterSphere {
 	Vector3 translate;
 	float padding;
@@ -47,6 +56,9 @@ struct EmitterSphere {
 
 };
 
+/// <summary>
+/// GPUパーティクルTextureエミッター
+/// </summary>
 struct EmitterTexture {
 	Vector3 translate;
 	float radius;
@@ -69,6 +81,10 @@ struct EmitterTexture {
 
 };
 
+
+/// <summary>
+/// GPUパーティクル表面エミッター
+/// </summary>
 struct EmitterSurface {
 	Vector3 translate;
 	float padding;
@@ -93,6 +109,9 @@ struct EmitterSurface {
 	int triangleCount;
 };
 
+/// <summary>
+/// 加速場
+/// </summary>
 struct AcceleFiled {
 	Vector3 Accele;
 	AABB area;
@@ -112,6 +131,9 @@ public:
 
 public:
 
+	/// <summary>
+	/// エミッターデータ
+	/// </summary>
 	struct GPUParticleEmitter {
 		EmitterSphere* emitter;
 		ComPtr<ID3D12Resource> emitterResource;
@@ -119,6 +141,9 @@ public:
 		int emitterIndex = 0;
 	};
 
+	/// <summary>
+	/// Textureエミッターデータ
+	/// </summary>
 	struct GPUParticleEmitterTexture {
 		EmitterTexture* emitter;
 		ComPtr<ID3D12Resource> emitterResource;
@@ -127,6 +152,9 @@ public:
 		int emitterIndex = 0;
 	};
 
+	/// <summary>
+	/// 表面エミッターデータ
+	/// </summary>
 	struct GPUParticleEmitterSurface {
 		EmitterSurface* emitter;
 		ComPtr<ID3D12Resource> emitterResource;
@@ -155,6 +183,8 @@ public:
 	void ParticleTexCSDebugGUI();
 	void ParticleSurfaceCSDebugGUI();
 
+	//========================================================================*/
+	//* Getter
 	GPUParticleEmitter& GetParticleCSEmitter(int index);
 	GPUParticleEmitterTexture& GetParticleCSEmitterTexture(int index);
 	GPUParticleEmitterSurface& GetParticleCSEmitterSurface(int index);
@@ -169,6 +199,8 @@ private:
 	void UpdateGPUEmitterTexture();
 	void UpdateGPUEmitterSurface();
 
+	//========================================================================*/
+	//* Dispatch
 	void UpdateParticleCSDispatch();
 	void EmitterDispatch();
 	void EmitterTextureDispatch();

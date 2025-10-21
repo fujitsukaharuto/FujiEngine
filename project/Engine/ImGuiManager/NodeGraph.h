@@ -16,6 +16,9 @@ namespace ed = ax::NodeEditor;
 #endif // _DEBUG
 
 #ifdef _DEBUG
+/// <summary>
+/// ノードが持つ値
+/// </summary>
 struct Value {
 
 	enum class Type { None, Int, Float, Vector2, Vector3, Color, Texture };
@@ -91,6 +94,9 @@ enum class AddType {
 	DeltaTime,
 };
 
+/// <summary>
+/// NodeのPin
+/// </summary>
 struct Pin {
 	ed::PinId id;
 	bool isLinked = false;
@@ -98,6 +104,9 @@ struct Pin {
 	PinType pinType;
 };
 
+/// <summary>
+/// Nodeのデータ
+/// </summary>
 struct MyNode {
 	ed::NodeId id;
 	std::string name;
@@ -129,6 +138,9 @@ struct MyNode {
 	void CreateNode(NodeType nodeType);
 };
 
+/// <summary>
+/// NodeのLinkデータ
+/// </summary>
 struct Link {
 	ed::LinkId id;
 	ed::PinId startPinId; // output
@@ -152,36 +164,45 @@ public:
 	void Update(ax::NodeEditor::EditorContext* ctx);
 	void ValueUpdate(MyNode& node);
 
-	// ノードの追加
+	/// <summary>Nodeの追加</summary>
 	MyNode& AddNode(const MyNode& node);
 
-	// リンクの追加
+	/// <summary>リンクの追加</summary>
 	void AddLink(const Link& link);
 
-	// 指定ノードを評価して出力を得る（再帰的）
+	/// <summary>指定ノードを評価して出力を得る（再帰的）</summary>
 	Value EvaluateNode(const MyNode& node);
 
-	// ピンIDからノードを探す
+	/// <summary>ピンIDからノードを探す</summary>
 	MyNode* FindNodeByPinId(ed::PinId pinId);
 
-	// ノードIDからノードを探す
+	/// <summary>ノードIDからノードを探す</summary>
 	MyNode* FindNodeById(ed::NodeId id);
 
+	/// <summary>ピンが既に繋がっているか</summary>
 	bool IsPinLinked(ed::PinId pinId) const;
 
-	// キャッシュ（result）をクリアする
+	/// <summary>キャッシュをクリアする</summary>
 	void ClearResults();
 
 
+	/// <summary>NodeTypeを文字列に</summary>
 	std::string NodeTypeToString(MyNode::NodeType t);
+	/// <summary>文字列をNodeTypeに</summary>
 	MyNode::NodeType StringToNodeType(const std::string& str);
 
+	/// <summary>NodeDetaを出力</summary>
 	json SaveNodeData();
+	/// <summary>Valueを出力</summary>
 	json SerializeValue(const Value& v);
+	/// <summary>Nodeを出力</summary>
 	json SerializeNode(const MyNode& node);
 
+	/// <summary>NodeDetaを読み込み</summary>
 	ed::NodeId DeserializeNodeData(const std::string& filePath);
+	/// <summary>Nodeを読み込み</summary>
 	MyNode DeserializeNode(const json& j);
+	/// <summary>Valueを出力</summary>
 	Value DeserializeValue(const json& j);
 
 private:

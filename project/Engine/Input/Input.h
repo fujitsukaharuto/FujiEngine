@@ -34,6 +34,9 @@ enum class PadInput : WORD {
 	Y = XINPUT_GAMEPAD_Y
 };
 
+/// <summary>
+/// ゲームパッドのデータ
+/// </summary>
 struct GamePad {
 	Microsoft::WRL::ComPtr<IDirectInputDevice8> device_;
 	int32_t deadZoneL_;
@@ -198,6 +201,7 @@ private:
 	void KeyboardUpdate();
 	void GamepadUpdate();
 
+	/// <summary>DeadZoneの適用</summary>
 	Vector2 ApplyDeadZone(int32_t x, int32_t y, int32_t deadZone) const;
 
 private:

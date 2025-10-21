@@ -22,12 +22,12 @@ public:
 
 	~Quaternion() = default;
 
-	// 単位クォータニオン
+	/// <summary>単位クォータニオン</summary>
 	static Quaternion IdentityQuaternion() {
 		return Quaternion(0.0f, 0.0f, 0.0f, 1.0f);
 	}
 
-	// 軸と角度(ラジアン)からクォータニオン
+	/// <summary>軸と角度(ラジアン)からクォータニオン</summary>
 	static Quaternion AngleAxis(float angle, const Vector3& axis) {
 		float halfAngle = angle * 0.5f;
 		float sinHalfAngle = std::sin(halfAngle);
@@ -41,7 +41,7 @@ public:
 		);
 	}
 
-	// クォータニオンの乗算
+	/// <summary>クォータニオンの乗算</summary>
 	static Quaternion Multiply(const Quaternion& lhs, const Quaternion& rhs) {
 		return Quaternion(
 			lhs.w * rhs.x + lhs.x * rhs.w + lhs.y * rhs.z - lhs.z * rhs.y, // x
@@ -51,6 +51,7 @@ public:
 		);
 	}
 
+	/// <summary>Vectorをクォータニオンで回転</summary>
 	static Vector3 RotateVector(const Vector3& vector, const Quaternion& quaternion) {
 		Quaternion vecQ(vector.x, vector.y, vector.z, 0.0f);
 		Quaternion invQ = quaternion.Inverse();
@@ -58,14 +59,17 @@ public:
 		return Vector3(result.x, result.y, result.z);
 	}
 
+	/// <summary>2つのクォータニオンの内積を求める</summary>
 	static float Dot(const Quaternion& q1, const Quaternion& q2) {
 		return q1.x * q2.x + q1.y * q2.y + q1.z * q2.z + q1.w * q2.w;
 	}
 
+	/// <summary>クォータニオンのノルム（長さ）を求める</summary>
 	float Norm() const {
 		return std::sqrtf(x * x + y * y + z * z + w * w);
 	}
 
+	/// <summary>クォータニオンを正規化する</summary>
 	Quaternion Normalize() const {
 		float norm = Norm();
 		if (norm > 0.0f) {
@@ -75,10 +79,12 @@ public:
 		return IdentityQuaternion();
 	}
 
+	/// <summary>クォータニオンの共役を求める</summary>
 	Quaternion Conjugate() const {
 		return Quaternion(-x, -y, -z, w);
 	}
 
+	/// <summary>クォータニオンの逆を求める</summary>
 	Quaternion Inverse() const {
 		float normSquared = x * x + y * y + z * z + w * w;
 		if (normSquared > 0.0f) {
@@ -88,6 +94,7 @@ public:
 		return IdentityQuaternion();
 	}
 
+	/// <summary>2つのクォータニオン間を球面線形補間（Slerp）する</summary>
 	static Quaternion Slerp(const Quaternion& q0, const Quaternion& q1, float t) {
 		Quaternion q0_0 = q0;
 		// q0とq1の内積
@@ -117,6 +124,7 @@ public:
 		return q0_0 * scale0 + q1 * scale1;
 	}
 
+	/// <summary>クォータニオンから回転行列を生成する</summary>
 	Matrix4x4 MakeRotateMatrix() const {
 
 		Matrix4x4 result;
@@ -154,6 +162,7 @@ public:
 		return result;
 	}
 
+	/// <summary>回転行列をクォータニオンに変換する</summary>
 	static Quaternion MatrixToQuaternion(const Matrix4x4& m) {
 		float trace = m.m[0][0] + m.m[1][1] + m.m[2][2];
 		Quaternion q;
@@ -187,6 +196,7 @@ public:
 		return q.Normalize(); // 念のため正規化
 	}
 
+	/// <summary>前方ベクトルと上方向ベクトルから回転クォータニオンを作成する</summary>
 	static Quaternion LookRotation(const Vector3& forward, const Vector3& up = Vector3(0, 1, 0)) {
 		Vector3 z = forward.Normalize();
 		Vector3 x = up.Cross(z).Normalize();
@@ -202,6 +212,7 @@ public:
 		return MatrixToQuaternion(m);
 	}
 
+	/// <summary>オイラー角からクォータニオンを生成する</summary>
 	static Quaternion FromEuler(const Vector3& euler) {
 		float pitch = euler.x; // X軸（上下）
 		float yaw = euler.y; // Y軸（左右）
@@ -215,6 +226,7 @@ public:
 		return qy * qx * qz; // 例：Yaw → Pitch → Roll
 	}
 
+	/// <summary>クォータニオンをオイラー角に変換する</summary>
 	static Vector3 QuaternionToEuler(const Quaternion& q) {
 		Vector3 euler;
 
@@ -238,6 +250,7 @@ public:
 		return euler;
 	}
 
+	/// <summary>ある方向ベクトルから別の方向ベクトルへの回転を表すクォータニオンを求める</summary>
 	Quaternion DirectionToDirection(const Vector3& from, const Vector3& to) {
 		Vector3 f = from.Normalize();
 		Vector3 t = to.Normalize();

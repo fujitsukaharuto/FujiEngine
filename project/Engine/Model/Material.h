@@ -4,12 +4,18 @@
 
 class DXCom;
 
+/// <summary>
+/// TextureのVertexDeta
+/// </summary>
 struct VertexDate {
 	Vector4 position;
 	Vector2 texcoord;
 	Vector3 normal;
 };
 
+/// <summary>
+/// Textureのファイルパス
+/// </summary>
 struct MaterialDataPath {
 	std::string textureFilePath;
 };
@@ -29,6 +35,9 @@ enum class LightMode {
 /// </summary>
 class Material {
 public:
+	/// <summary>
+	/// マテリアルのデータ
+	/// </summary>
 	struct MaterialDate {
 		Vector4 color;
 		int32_t enableLighting;
@@ -37,7 +46,10 @@ public:
 		float shininess;
 		float AlphaRef = 0.5f;
 	};
-
+	
+	/// <summary>
+	/// 環境マップのデータ
+	/// </summary>
 	struct MaterialEnvironment {
 		Vector4 color;
 		int32_t enableLighting;
@@ -52,30 +64,34 @@ public:
 	~Material();
 	void Finalize();
 
+	/// <summary>マテリアルの生成</summary>
 	void CreateMaterial();
 
+	/// <summary>環境マップの生成</summary>
 	void CreateEnvironmentMaterial();
 
+	//========================================================================*/
+	//* Getter
 	Texture* GetTexture();
-
 	ID3D12Resource* GetMaterialResource();
-
 	std::string GetPathName() const { return textureNamePath_.textureFilePath; }
-
 	Vector4 GetColor() { return materialDate_->color; }
 
+	//========================================================================*/
+	//* Setter
+	/// <summary>パスの設定</summary>
 	void SetTextureNamePath(const std::string& pathName);
-
+	/// <summary>色の設定</summary>
 	void SetColor(const Vector4& color) { materialDate_->color = color; }
-
+	/// <summary>UVスケールの設定</summary>
 	void SetUVScale(const Vector2& scale, const Vector2& uvTrans);
-
+	/// <summary>アルファ閾値の設定</summary>
 	void SetAlphaRef(float ref) { materialDate_->AlphaRef = ref; }
-
+	/// <summary>テクスチャの設定</summary>
 	void SetTexture(const std::string& name, bool overWrite = false);
-
+	/// <summary>ライトモードの設定</summary>
 	void SetLightEnable(LightMode mode);
-
+	/// <summary>環境マップの設定</summary>
 	void SetEnvironment(float env);
 
 private:

@@ -25,11 +25,17 @@ public:
 	static const UINT kVertexCountLine = 2;
 	static const UINT kIndexCountLine = 0;
 
+	/// <summary>
+	/// 線を構成するためのデータ
+	/// </summary>
 	struct VertexPosColor {
 		Vector3 pos;
 		Vector4 color;
 	};
 
+	/// <summary>
+	/// 線のデータ
+	/// </summary>
 	struct LineData {
 		ComPtr<ID3D12Resource> vertBuffer;
 		ComPtr<ID3D12Resource> indexBuffer;
@@ -50,8 +56,10 @@ public:
 
 	void DrawLine3d(const Vector3& p1, const Vector3& p2, const Vector4& color);
 
+	/// <summary>球を線で描画する</summary>
 	void DrawShereLine(const Vector3& center, float radius, const Vector4& color);
 
+	/// <summary>ボーンを線で描画する</summary>
 	void DrawOctahedralBone(const Vector3& base, const Vector3& tip);
 
 	void Reset();

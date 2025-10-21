@@ -27,6 +27,8 @@ public:
 	bool ProcessMessage();
 
 
+	//========================================================================*/
+	//* Getter
 	const HWND& GetHwnd() const { return hwnd_; }
 	const WNDCLASS& GetWNDCLASS() const { return wc_; }
 	const RECT& GetRECT() const { return wrc_; }
@@ -35,10 +37,13 @@ public:
 
 private:
 
+	/// <summary>ウィンドウプロシージャ関数</summary>
 	static LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 
+	/// <summary>指定された名前とサイズでゲーム用ウィンドウを生成</summary>
 	void CreateGWindow(const wchar_t* name, uint32_t windowSizeX, uint32_t windowSizeY);
 
+	/// <summary>ウィンドウを破棄し、関連リソースを解放</summary>
 	void ThrowAwayWindow();
 
 

@@ -20,19 +20,31 @@ using namespace Microsoft::WRL;
 class DXCom;
 
 #pragma region 構造体群
+/// <summary>
+/// グレースケールの色
+/// </summary>
 struct GrayCS {
 	Vector3 gray_;
 };
 
+/// <summary>
+/// ヴィネットの色
+/// </summary>
 struct VignetteData {
 	Vector3 color_;
 };
 
+/// <summary>
+/// グレースケールのポストエフェクトTextureのvertexData
+/// </summary>
 struct GrayscaleVertex {
 	Vector4 position;
 	Vector2 texcoord;
 };
 
+/// <summary>
+/// 衝撃波のデータ
+/// </summary>
 struct ShockWaveData {
 	Vector4 center;
 	float shockTime;
@@ -41,6 +53,9 @@ struct ShockWaveData {
 	float padding;
 };
 
+/// <summary>
+/// 炎エフェクトのデータ
+/// </summary>
 struct FireElement {
 	float animeTime; // アニメーション時間
 	Vector2 resolution; // 画面解像度
@@ -55,25 +70,40 @@ struct FireElement {
 	float blendStrength;// どれくらい混ぜるか
 };
 
+/// <summary>
+/// CRTエフェクトのデータ
+/// </summary>
 struct CRTElemnt {
 	float crtTime;
 	Vector2 resolution;
 };
 
+/// <summary>
+/// OutLineのポストエフェクト時に送るデータ
+/// </summary>
 struct OutlineElement {
 	Matrix4x4 projectionInverse;
 };
 
+/// <summary>
+/// ブルームのデータ
+/// </summary>
 struct BloomParams {
 	float bloomThreshold; // しきい値（例：1.0）
 	float bloomIntensity; // ブルーム強度（例：1.2）
 };
 
+/// <summary>
+/// ラジアルブラーのデータ
+/// </summary>
 struct RadialParams {
 	Vector2 center;
 	float blurWidth;
 };
 
+/// <summary>
+/// 雷エフェクトのデータ
+/// </summary>
 struct LightningElement {
 	Vector2 startPos;
 	Vector2 endPos;
@@ -106,6 +136,9 @@ enum class PostEffectList : int {
 	Random,
 };
 
+/// <summary>
+/// ポストエフェクトの1パス分の情報を管理する構造体
+/// </summary>
 struct PostEffectPass {
 	Pipe pipeline; // 使用するパイプライン名
 	PostEffectList effectName;
@@ -135,15 +168,28 @@ public:
 	void SettingTexture();
 	void Command();
 
+	/// <summary>
+	/// ポストエフェクトのリセット
+	/// </summary>
+	void ResetPostEffect() { validPostEffects.clear(); }
 
+	/// <summary>
+	/// ポストエフェクトの追加
+	/// </summary>
+	void AddPostEffect(PostEffectList effect) { validPostEffects.push_back(postEffects[int(effect)]); }
+
+	/// <summary>
+	/// 特定のポストエフェクトのポップ
+	/// </summary>
+	void PopPostEffect(PostEffectList effect);
+
+	//========================================================================*/
+	//* Getter
 	ComPtr<ID3D12Resource>& GetOffscreenResource() { return offscreenrt_; }
 	const D3D12_CLEAR_VALUE& GetClearColorValue() const { return clearColorValue_; }
 
-	void ResetPostEffect() { validPostEffects.clear(); }
-	void AddPostEffect(PostEffectList effect) { validPostEffects.push_back(postEffects[int(effect)]); }
-	void PopPostEffect(PostEffectList effect);
-
-	// Radial
+	//========================================================================*/
+	//* Setter
 	void SetRadialParamsCenter(Vector2 center) { radialData_->center = center; }
 	void SetRadialParamsWidth(float width) { radialData_->blurWidth = width; }
 

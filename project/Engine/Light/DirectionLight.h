@@ -6,6 +6,9 @@
 
 class DXCom;
 
+/// <summary>
+/// ディレクションライトのデータ
+/// </summary>
 struct DirectionalLight {
 
 	Vector4 color;
@@ -27,6 +30,9 @@ public:
 	void Initialize(DXCom* pDxcom);
 	void Finalize();
 
+	/// <summary>
+	/// データをコマンドリストに送る
+	/// </summary>
 	void SetLightCommand(ID3D12GraphicsCommandList* commandList);
 
 	DirectionalLight* directionLightData_ = nullptr;

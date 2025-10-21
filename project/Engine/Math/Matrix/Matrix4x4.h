@@ -30,6 +30,7 @@ public:
 	}
 
 	/*----- 関数 ------------------------------------------------------------------*/
+	/// <summary>単位行列を生成する</summary>
 	static Matrix4x4 MakeIdentity4x4() {
 		Matrix4x4 result;
 		for (int i = 0; i < 4; ++i) {
@@ -38,6 +39,7 @@ public:
 		return result;
 	}
 
+	/// <summary>この行列を転置する</summary>
 	Matrix4x4 Transpose() const {
 		Matrix4x4 result;
 		for (int row = 0; row < 4; ++row) {

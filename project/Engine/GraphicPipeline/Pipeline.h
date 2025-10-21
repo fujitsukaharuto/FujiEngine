@@ -19,6 +19,9 @@ public:
 
 public:
 
+	/// <summary>
+	/// 減算合成にするかどうか
+	/// </summary>
 	void SetIsAddMode(bool is) { isAddMode_ = is; }
 
 private:

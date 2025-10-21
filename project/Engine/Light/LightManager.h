@@ -21,12 +21,28 @@ public:
 	void Finalize();
 	void Update();
 
+	/// <summary>
+	/// ライトの作成
+	/// </summary>
 	void CreateLight();
+
+	/// <summary>
+	/// ポイントライトの追加
+	/// </summary>
 	void AddPointLight();
+
+	/// <summary>
+	/// スポットライトの追加
+	/// </summary>
 	void AddSpotLight();
 
+	/// <summary>
+	/// データをコマンドリストに送る
+	/// </summary>
 	void SetLightCommand(ID3D12GraphicsCommandList* commandList);
 
+	//========================================================================*/
+	//* Getter
 	PointLight* GetPointLight(int num) { return pointLights_[num].get(); }
 	SpotLight* GetSpotLight(int num) { return spotLights_[num].get(); }
 

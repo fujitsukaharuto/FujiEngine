@@ -20,14 +20,21 @@ public:
 	static PipelineManager* GetInstance();
 
 	void Initialize(DXCom* pDxcom);
-
 	void Finalize();
 
+	/// <summary>
+	/// パイプラインを作成
+	/// </summary>
 	void CreatePipeline();
 
-
-
+	/// <summary>
+	/// グラフィックスパイプラインのセット
+	/// </summary>
 	void SetPipeline(Pipe type);
+
+	/// <summary>
+	/// コンピュートシェーダ用のパイプラインのセット
+	/// </summary>
 	void SetCSPipeline(Pipe type);
 
 

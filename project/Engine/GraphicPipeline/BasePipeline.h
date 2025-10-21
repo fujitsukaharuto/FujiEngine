@@ -23,15 +23,31 @@ public:
 
 	void Initialize(DXCom* pDxcom);
 
+	/// <summary>
+	/// グラフィックスパイプラインステートを設定
+	/// </summary>
 	void SetPipelineState();
+
+	/// <summary>
+	/// コンピュートシェーダ用のパイプラインステートを設定
+	/// </summary>
 	void SetPipelineCSState();
 
+	/// <summary>
+	/// パイプラインを生成する
+	/// </summary>
 	void CreatePipe();
 
 private:
 
+	/// <summary>
+	/// ルートシグネチャを生成
+	/// </summary>
 	virtual void CreateRootSignature(ID3D12Device* device);
 
+	/// <summary>
+	/// PSOを生成
+	/// </summary>
 	virtual void CreatePSO(ID3D12Device* device);
 
 protected:

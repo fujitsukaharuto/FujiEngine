@@ -30,6 +30,9 @@ public:
 	void Initialize(DXCom* pDxcom);
 	void Finalize();
 
+	/// <summary>
+	/// データをコマンドリストに送る
+	/// </summary>
 	void SetLightCommand(ID3D12GraphicsCommandList* commandList);
 
 	SpotLightData* spotLightData_ = nullptr;
