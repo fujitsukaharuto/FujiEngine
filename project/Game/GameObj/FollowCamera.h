@@ -16,12 +16,20 @@ public:
 	void Update(const Vector3& lockon);
 	void ReStart(const Vector3& lockon);
 
+	//========================================================================*/
+	//* Setter
 	void SetTranslate(const Vector3& pos);
 	void SetTarget(const Trans* target);
+	
+	/// <summary>
+	///	カメラ回転の計算
+	/// </summary>
 	void PreRotateUpdate(const Vector3& lockon);
 	void Reset();
 
-
+	/// <summary>
+	/// オフセットの計算
+	/// </summary>
 	Vector3 OffsetCal() const;
 
 	void DebugGUI();

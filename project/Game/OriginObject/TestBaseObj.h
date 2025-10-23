@@ -19,11 +19,15 @@ public:
 	void Draw(Material* mate = nullptr, bool is = false)override;
 	void DebugGUI()override;
 
+	//========================================================================*/
+	//* 衝突判定
 	void OnCollisionEnter(const ColliderInfo& other);
 	void OnCollisionStay(const ColliderInfo& other);
 	void OnCollisionExit(const ColliderInfo& other);
 
-
+	/// <summary>
+	///	コライダーの取得
+	/// </summary>
 	BaseCollider* GetCollider() { return collider_.get(); }
 
 	std::string name_;

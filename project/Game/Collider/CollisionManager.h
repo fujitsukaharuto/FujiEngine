@@ -5,6 +5,9 @@
 
 class AABBCollider;
 
+/// <summary>
+/// OBBのデータ
+/// </summary>
 struct OBB {
 
 	Vector3 size;
@@ -30,18 +33,32 @@ public:
 	~CollisionManager();
 
 public:
-
+	/// <summary>
+	/// 衝突のチェック
+	/// </summary>
 	void CheckCollisionPair(BaseCollider* A, BaseCollider* B);
+	/// <summary>
+	///	全ての衝突判定チェック
+	/// </summary>
 	void CheckAllCollision();
 
+	/// <summary>
+	/// Listに追加
+	/// </summary>
 	void AddCollider(BaseCollider* collider) { colliders_.push_back(collider); }
 
 	void Reset() { colliders_.clear(); }
 
 private:
 
+	/// <summary>
+	/// AABBをOBBに変換
+	/// </summary>
 	OBB ConvertAABBToOBB(const AABBCollider* aabb);
 
+	/// <summary>
+	/// 衝突のチェック
+	/// </summary>
 	bool checkAABBCollision(AABBCollider* A, AABBCollider* B);// 一度OBBの当たり判定に変えている
 
 private:

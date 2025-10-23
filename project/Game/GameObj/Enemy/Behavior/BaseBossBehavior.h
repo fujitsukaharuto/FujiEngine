@@ -12,6 +12,9 @@ enum class AttackPattern {
 	// 今後追加
 };
 
+/// <summary>
+/// 攻撃パターンの重み付け用
+/// </summary>
 struct AttackInfo {
 	AttackPattern pattern;
 	float weight;

@@ -19,9 +19,12 @@ public:
 	void DebugGUI()override;
 	void ParameterGUI();
 
+	/// <summary>値の初期化</summary>
 	void InitParameter();
 
+	/// <summary>波攻撃の初期化</summary>
 	void InitWave(const Vector3& pos, const Vector3& velo);
+	/// <summary>波攻撃の進行方向更新</summary>
 	void CalculetionFollowVec(const Vector3& target);
 
 	//========================================================================*/

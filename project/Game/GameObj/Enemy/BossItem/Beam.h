@@ -9,6 +9,9 @@ enum class BeamStep{
 	RotateBeam,
 };
 
+/// <summary>
+/// ビームを構成するオブジェクト
+/// </summary>
 struct OneBeam {
 	std::unique_ptr<Object3d> beamCore1;
 	std::unique_ptr<Object3d> beamCore2;
@@ -37,11 +40,15 @@ public:
 	void DebugGUI()override;
 	void ParameterGUI();
 
+	/// <summary>値の初期化</summary>
 	void InitParameter();
 
+	/// <summary>ビームの初期化</summary>
 	void InitBeam(const Vector3& pos, const Vector3& velo);
+	/// <summary>ビームの回転</summary>
 	bool BeamRotate();
 
+	/// <summary>ビームの更新</summary>
 	bool BeamAttackUpdate();
 
 	//========================================================================*/

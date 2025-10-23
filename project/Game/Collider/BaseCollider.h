@@ -7,6 +7,9 @@
 
 class OriginGameObject;
 
+/// <summary>
+/// コライダーの情報
+/// </summary>
 struct ColliderInfo {
 	std::string tag;
 	Vector3 pos;
@@ -14,6 +17,9 @@ struct ColliderInfo {
 	OriginGameObject* owner = nullptr; //コライダーを持つオブジェクトのポインタ
 };
 
+/// <summary>
+/// 衝突状態
+/// </summary>
 enum class CollisionState {
 	CollisionEnter,
 	CollisionStay,
@@ -29,14 +35,21 @@ public:
 	BaseCollider();
 	virtual ~BaseCollider() = default;
 
+	//========================================================================*/
+	//* 衝突判定
 	virtual void OnCollisionEnter(const ColliderInfo& other) = 0;
 	virtual void OnCollisionStay(const ColliderInfo& other) = 0;
 	virtual void OnCollisionExit(const ColliderInfo& other) = 0;
 
 	virtual void SaveCollider(const std::string& filePath) = 0;
 
+	/// <summary>
+	/// 情報の更新
+	/// </summary>
 	void InfoUpdate();
 
+	//========================================================================*/
+	//* Setter
 	void SetParent(Trans* parent) { parent_ = parent; }
 	void SetTag(const std::string& tag) { info.tag = tag; }
 	void SetOffset(const Vector3& pos) { offset_ = pos; }
@@ -44,6 +57,8 @@ public:
 	void SetOwner(OriginGameObject* owner) { info.owner = owner; }
 	void SetIsCollisonCheck(bool is) { isCollisionCheck_ = is; }
 
+	//========================================================================*/
+	//* Getter
 	const std::string GetTag()const { return info.tag; }
 	Vector3 GetPos();
 	Vector3 GetWorldPos();

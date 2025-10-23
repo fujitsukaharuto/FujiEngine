@@ -30,7 +30,9 @@ public:
 	void OnCollisionStay([[maybe_unused]] const ColliderInfo& other);
 	void OnCollisionExit([[maybe_unused]] const ColliderInfo& other);
 
-
+	/// <summary>
+	///	コライダーの取得
+	/// </summary>
 	BaseCollider* GetCollider() { return collider_.get(); }
 
 private:

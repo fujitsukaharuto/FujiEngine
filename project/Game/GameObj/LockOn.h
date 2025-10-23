@@ -31,15 +31,33 @@ public:
 	/// </summary>
 	void Draw();
 
+	/// <summary>
+	/// ロックオン対象の探索
+	/// </summary>
 	void Search(const std::list<std::unique_ptr<OriginGameObject>>& enemies);
+
+	/// <summary>
+	///	ロックオン変更時の探索
+	/// </summary>
 	void ChangeSearch(const std::list<std::unique_ptr<OriginGameObject>>& enemies, bool isRight);
 
+	/// <summary>
+	///	ロックオン範囲の計算
+	/// </summary>
 	bool SearchAreaAngle();
 
+	/// <summary>
+	///	スクリーン座標に変換
+	/// </summary>
 	Vector3 WorldToScreen(Vector3 worldPosition);
 
+	/// <summary>
+	///	ターゲットの変更
+	/// </summary>
 	void SetTarget(const OriginGameObject* target) { target_ = target; }
 
+	//========================================================================*/
+	//* Getter
 	const OriginGameObject* GetTarget() { return target_; }
 	Vector3 GetTargetPosition() const;
 

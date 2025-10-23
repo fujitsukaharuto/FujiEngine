@@ -19,8 +19,14 @@ public:
 	void Draw();
 	void DebugGUI();
 
+	/// <summary>
+	/// 行列更新
+	/// </summary>
 	void UpdateWVP();
 
+	/// <summary>
+	/// 必要なクラスのSetter
+	/// </summary>
 	void SetCommonResources(DXCom* dxcommon, SRVManager* srvManager, Camera* camera);
 
 private:

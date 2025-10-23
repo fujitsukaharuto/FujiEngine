@@ -22,7 +22,13 @@ public:
 	void DebugGUI()override;
 	void ParticleDebugGUI()override;
 
+	/// <summary>
+	/// シーンチェンジ
+	/// </summary>
 	void BlackFade();
+	/// <summary>
+	/// JsonからObject作る
+	/// </summary>
 	void LoadSceneLevelData(const std::string& name)override;
 
 private:

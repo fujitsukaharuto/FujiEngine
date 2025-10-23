@@ -14,17 +14,24 @@ public:
 
 	void DebugGUI();
 
-	// stateによって呼び出す関数を決める
+	/// <summary>
+	///	衝突判定時に呼び出される関数
+	/// </summary>
 	void OnCollision(const ColliderInfo& other);
 
-	// 衝突判定
+	//========================================================================*/
+	//* 衝突判定
 	void OnCollisionEnter(const ColliderInfo& other)override;
 	void OnCollisionStay(const ColliderInfo& other)override;
 	void OnCollisionExit(const ColliderInfo& other)override;
 
+	/// <summary>
+	///	衝突判定のデータ出力
+	/// </summary>
 	void SaveCollider(const std::string& filePath)override;
 
-	// イベントハンドラの設定
+	//========================================================================*/
+	//* イベントハンドラの設定
 	void SetCollisionEnterCallback(std::function<void(const ColliderInfo&)> callback) {
 		onCollisionEvents_[static_cast<int>(CollisionState::CollisionEnter)] = callback;
 	}
@@ -35,12 +42,20 @@ public:
 		onCollisionEvents_[static_cast<int>(CollisionState::CollisionExit)] = callback;
 	}
 
+	/// <summary>
+	///	衝突状態の変更
+	/// </summary>
 	void SetState(CollisionState change) { state = change; }
 
+	//========================================================================*/
+	//* Setter
 	void SetWidth(float w) { width = w; }
 	void SetHeight(float h) { height = h; }
 	void SetDepth(float d) { depth = d; }
 
+	//========================================================================*/
+	//* Getter
+	/// <summary>衝突判定のデータ</summary>
 	ColliderInfo GetInfo() const { return info; }
 	Vector3 GetParentRotate() const { return parent_ ? parent_->GetRotation() : Vector3(0.0f, 0.0f, 0.0f); } // obb用に試し
 	CollisionState GetState()const { return state; }

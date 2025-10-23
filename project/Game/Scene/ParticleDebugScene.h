@@ -17,6 +17,9 @@ public:
 	void ParticleDebugGUI()override;
 	void ParticleGroupDebugGUI()override;
 
+	/// <summary>
+	/// シーンチェンジ
+	/// </summary>
 	void BlackFade();
 
 private:

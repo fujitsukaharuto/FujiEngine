@@ -38,36 +38,58 @@ public:
 	void DebugGUI()override;
 	void ParameterGUI();
 
+	/// <summary>値の初期化</summary>
 	void InitParameter();
 	void ReStart();
 
+	/// <summary>HPの減少処理</summary>
 	void ReduceBossHP(bool isStrong);
+	/// <summary>HPバーの色処理</summary>
 	void HPColorSet(float under, float index);
+	/// <summary>HPバーのシェイク処理</summary>
 	void ShakeHP();
 
+	/// <summary>行動回数のリセット</summary>
 	void ResetChainCount() { chainCount_ = 0; }
+	/// <summary>行動連続時のカウンター</summary>
 	void ChainCount() { chainCount_++; }
 
+	/// <summary>移動処理</summary>
 	void Walk();
 
+	/// <summary>波攻撃の更新</summary>
 	void UpdateWaveWall();
+	/// <summary>波攻撃時の処理</summary>
 	void WaveWallAttack();
 
+	/// <summary>追尾攻撃の更新</summary>
 	void UpdateArrows();
+	/// <summary>追尾攻撃時の処理</summary>
 	void ArrowAttack();
 
+	/// <summary>雷攻撃の更新</summary>
 	void UpdateRod();
+	/// <summary>雷攻撃時の避雷針の処理</summary>
 	void RodFall();
+	/// <summary>避雷針のリング攻撃</summary>
 	void RodUnderRing(const Vector3& emitPos);
 
+	/// <summary>ビームの初期化</summary>
 	void InitBeam();
+	/// <summary>ビームのチャージ処理</summary>
 	bool BeamCharge();
+	/// <summary>ビームのチャージ完了時処理</summary>
 	void BeamChargeComplete();
+	/// <summary>ビーム攻撃の処理</summary>
 	bool BeamAttack();
 
+	/// <summary>ジャンプ攻撃の初期化</summary>
 	void InitJumpAttack();
+	/// <summary>ジャンプ攻撃の処理</summary>
 	bool JumpAttack();
+	/// <summary>リングの更新</summary>
 	void UpdateUnderRing();
+	/// <summary>リングの発生処理</summary>
 	void UnderRingEmit();
 
 	//========================================================================*/
@@ -105,20 +127,28 @@ public:
 	void SetDXCom(DXCom* dxcommon) { dxcommon_ = dxcommon; }
 	void SetSatrtWait(float waitT) { startWaiting_ = waitT; }
 
+	/// <summary>攻撃フェーズの出力</summary>
 	void SavePhase();
+	/// <summary>攻撃フェーズの読み込み</summary>
 	void LoadPhase();
 
 private:
 
+	/// <summary>デフォルト状態にする</summary>
 	void SetDefaultBehavior();
 
-	// radial
+	//========================================================================*/
+	//* radial
 	void RadialSetting();
 	void RadialUpdate();
 
+	/// <summary>出現時エフェクトの更新</summary>
 	bool EnergyUpdate();
+	/// <summary>出現時の初期化</summary>
 	void InitSummon();
+	/// <summary>召喚陣の拡大処理</summary>
 	void ExpandSummon();
+	/// <summary>出現時間の更新</summary>
 	void EnergyTimeUpdate();
 
 	void UpdateEmitterPos(int i);

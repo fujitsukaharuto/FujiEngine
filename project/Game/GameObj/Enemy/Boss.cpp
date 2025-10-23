@@ -457,7 +457,7 @@ void Boss::ParameterGUI() {
 
 void Boss::InitParameter() {
 	attackCooldown_ = 150.0f;
-	bossHp_ = 50.0f;
+	bossHp_ = 100.0f;
 
 	jumpTime_ = 150.0f;
 	jumpHeight_ = 4.0f;
@@ -543,9 +543,9 @@ void Boss::ReduceBossHP(bool isStrong) {
 		}
 		switch (BossHPState(nowHpIndex_)) {
 		case BossHPState::Max:
-			HPColorSet(40.0f, 10.0f);
-			if (bossHp_ < 40.0f) {
-				bossHp_ = 40.0f;
+			HPColorSet(80.0f, 20.0f);
+			if (bossHp_ < 80.0f) {
+				bossHp_ = 80.0f;
 				nowHpIndex_--;
 				isHpActive_ = false;
 				SetDefaultBehavior();
@@ -560,9 +560,9 @@ void Boss::ReduceBossHP(bool isStrong) {
 			}
 			break;
 		case BossHPState::High:
-			HPColorSet(30.0f, 10.0f);
-			if (bossHp_ < 30.0f) {
-				bossHp_ = 30.0f;
+			HPColorSet(60.0f, 20.0f);
+			if (bossHp_ < 60.0f) {
+				bossHp_ = 60.0f;
 				nowHpIndex_--;
 				isHpActive_ = false;
 				SetDefaultBehavior();
@@ -578,9 +578,9 @@ void Boss::ReduceBossHP(bool isStrong) {
 			}
 			break;
 		case BossHPState::Half:
-			HPColorSet(20.0f, 10.0f);
-			if (bossHp_ < 20.0f) {
-				bossHp_ = 20.0f;
+			HPColorSet(40.0f, 20.0f);
+			if (bossHp_ < 40.0f) {
+				bossHp_ = 40.0f;
 				nowHpIndex_--;
 				isHpActive_ = false;
 				SetDefaultBehavior();
@@ -595,9 +595,9 @@ void Boss::ReduceBossHP(bool isStrong) {
 			}
 			break;
 		case BossHPState::Low:
-			HPColorSet(15.0f, 5.0f);
-			if (bossHp_ < 15.0f) {
-				bossHp_ = 15.0f;
+			HPColorSet(30.0f, 10.0f);
+			if (bossHp_ < 30.0f) {
+				bossHp_ = 30.0f;
 				nowHpIndex_--;
 				isHpActive_ = false;
 				SetDefaultBehavior();
@@ -612,7 +612,7 @@ void Boss::ReduceBossHP(bool isStrong) {
 			}
 			break;
 		case BossHPState::Empty:
-			HPColorSet(0.0f, 15.0f);
+			HPColorSet(0.0f, 30.0f);
 			break;
 		default:
 			break;

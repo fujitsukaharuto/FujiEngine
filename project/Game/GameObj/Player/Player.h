@@ -26,6 +26,9 @@ public:
 	void ParameterGUI();
 	void ReStart();
 
+	/// <summary>
+	///	HPバーの処理
+	/// </summary>
 	void HPUpdate();
 
 	//========================================================================*/
@@ -41,29 +44,40 @@ public:
 
 	//========================================================================*/
 	//* Move
+	/// <summary>移動処理</summary>
 	void Move(const float& speed);
+	/// <summary>移動の詳しい処理</summary>
 	void MoveTrans(const float& speed);
+	/// <summary>移動時の回転</summary>
 	void MoveRotate();
+	/// <summary>移動する方向</summary>
 	Vector3 GetInputDirection();
+	/// <summary>移動するかどうか</summary>
 	bool GetIsMove();
 
 	//========================================================================*/
 	//* Jump
+	/// <summary>ジャンプの処理</summary>
 	void Jump(float& speed);
+	/// <summary>落下</summary>
 	void Fall(float& speed);
 
 	//========================================================================*/
 	//* Avoid
+	/// <summary>回避時の処理</summary>
 	void Avoid(float& avoidTime);
 
 	//========================================================================*/
 	//* Bullet
 	void InitBullet();
+	/// <summary>発射時の処理</summary>
 	void ReleaseBullet();
+	/// <summary>弾の強化</summary>
 	void StrngthBullet();
 
 	//========================================================================*/
 	//* Landing
+	/// <summary>着陸処理</summary>
 	void LandingUpdate();
 
 	//========================================================================*/

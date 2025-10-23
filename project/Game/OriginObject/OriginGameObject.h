@@ -28,14 +28,24 @@ public:
 
 public:
 
+	/// <summary>値比較</summary>
 	float ComparNum(float a, float b);
+	/// <summary>モデル作成</summary>
 	void CreateModel(const std::string& name);
+	/// <summary>アニメーションモデル作成</summary>
 	void CreateAnimModel(const std::string& name);
+	/// <summary>Jsonから作成</summary>
 	void CreateFromJson(const std::string& name);
 	void CreateFromJson();
+
+	//========================================================================*/
+	//* Setter
 	void SetModel(const std::string& name);
 	void SetAnimModel(const std::string& name);
 	void SetModelDataJson(const nlohmann::json& jsonData);
+
+	//========================================================================*/
+	//* Getter
 	Object3d* GetModel() { return model_.get(); }
 	AnimationModel* GetAnimModel() { return animModel_.get(); }
 	Trans& GetTrans() { return model_->transform; }

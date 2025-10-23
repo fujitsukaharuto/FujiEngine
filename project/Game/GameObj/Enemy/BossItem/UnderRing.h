@@ -19,8 +19,10 @@ public:
 	void DebugGUI()override;
 	void ParameterGUI();
 
+	/// <summary>値の初期化</summary>
 	void InitParameter();
 
+	/// <summary>リングの初期化</summary>
 	void InitRing(const Vector3& pos);
 
 	//========================================================================*/

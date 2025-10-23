@@ -16,7 +16,13 @@ public:
 	void Update()override;
 	void Draw(Material* mate = nullptr, bool is = false)override;
 
+	/// <summary>
+	/// パラメーターの初期化
+	/// </summary>
 	void InitParameter(const Vector3& pos);
+	/// <summary>
+	/// 弾の進行方向の変更
+	/// </summary>
 	void CalculetionFollowVec(const Vector3& target);
 
 	//========================================================================*/
@@ -27,11 +33,20 @@ public:
 
 	//========================================================================*/
 	//* Charge
+	/// <summary>
+	///	チャージの処理
+	/// </summary>
 	void Charge(const Vector3& pos, const Vector3& rot);
+	/// <summary>
+	///	弾の強化
+	/// </summary>
 	void StrnghtBullet();
 
 	//========================================================================*/
 	//* Release
+	/// <summary>
+	///	弾が発射される時の処理
+	/// </summary>
 	void Release(float speed,float damage,const Vector3& velo);
 
 	//========================================================================*/
