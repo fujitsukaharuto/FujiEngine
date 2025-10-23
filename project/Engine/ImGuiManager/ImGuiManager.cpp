@@ -446,6 +446,8 @@ void ImGuiManager::DrawPinIcon(bool connected) {
 void ImGuiManager::TextureSelectMenu(NodeGraph* nodeGraph) {
 	if (ImGui::BeginMenu("Texture Node")) {
 		for (auto& pair : TextureManager::GetInstance()->GetTextureFiles()) {
+			ImGui::Image((ImTextureID)TextureManager::GetInstance()->GetTexture(pair.first.c_str())->gpuHandle.ptr, { 30,30 });
+			ImGui::SameLine();
 			if (ImGui::MenuItem(pair.first.c_str())) {
 				MyNode node;
 				node.CreateNode(MyNode::NodeType::Texture);
