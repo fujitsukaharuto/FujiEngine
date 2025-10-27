@@ -478,6 +478,7 @@ void Boss::InitParameter() {
 		int numEmitter = ParticleManager::GetInstance()->InitGPUEmitter();
 		arrow->SetEmitterNumber(numEmitter);
 		arrow->GPUEmitterSetting();
+		arrow->SetArrowMode();
 		arrows_.push_back(std::move(arrow));
 	}
 

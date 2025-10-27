@@ -21,26 +21,6 @@ void FollowCamera::Update(const Vector3& lockon) {
 
 	Camera* camera = CameraManager::GetInstance()->GetCamera();
 
-	// 360度見渡す時用のもの
-	/*XINPUT_STATE pad;
-	if (Input::GetInstance()->GetGamepadState(pad)) {
-		const float kRotateSpeed = 0.05f;
-
-		destinationAngleY_ += (Input::GetInstance()->GetRStick().x / SHRT_MAX * kRotateSpeed) * FPSKeeper::DeltaTime();
-
-		if (Input::GetInstance()->TriggerButton(PadInput::RStick)) {
-			//destinationAngleY_ = target_->rotate.y;
-		}
-	} else {
-		const float kRotateSpeed = 0.05f;
-		if (Input::GetInstance()->PushKey(DIK_LEFTARROW)) {
-			destinationAngleY_ += (0.5f * kRotateSpeed) * FPSKeeper::DeltaTime();
-		}
-		if (Input::GetInstance()->PushKey(DIK_RIGHTARROW)) {
-			destinationAngleY_ -= (0.5f * kRotateSpeed) * FPSKeeper::DeltaTime();
-		}
-	}*/
-
 	Vector3 lockOnPosition = lockon;
 	lockOnPosition.y = lockOnPosition.y - 3.0f;
 	Vector3 sub = lockOnPosition - Vector3(target_->translate.x, target_->translate.y + 4.0f , target_->translate.z);
@@ -90,6 +70,27 @@ void FollowCamera::ReStart(const Vector3& lockon) {
 	Vector3 offset = OffsetCal();
 	camera->transform.translate = interTarget_ + offset;
 	camera->UpdateMaterix();
+}
+
+void FollowCamera::CalDestinationAngle() {
+	XINPUT_STATE pad;
+	if (Input::GetInstance()->GetGamepadState(pad)) {
+		const float kRotateSpeed = 0.05f;
+
+		destinationAngleY_ += (Input::GetInstance()->GetRStick().x / SHRT_MAX * kRotateSpeed) * FPSKeeper::DeltaTime();
+
+		if (Input::GetInstance()->TriggerButton(PadInput::RStick)) {
+			//destinationAngleY_ = target_->rotate.y;
+		}
+	} else {
+		const float kRotateSpeed = 0.05f;
+		if (Input::GetInstance()->PushKey(DIK_LEFTARROW)) {
+			destinationAngleY_ += (0.5f * kRotateSpeed) * FPSKeeper::DeltaTime();
+		}
+		if (Input::GetInstance()->PushKey(DIK_RIGHTARROW)) {
+			destinationAngleY_ -= (0.5f * kRotateSpeed) * FPSKeeper::DeltaTime();
+		}
+	}
 }
 
 void FollowCamera::SetTranslate(const Vector3& pos) {

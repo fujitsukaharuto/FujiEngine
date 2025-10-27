@@ -16,6 +16,11 @@ public:
 	void Update(const Vector3& lockon);
 	void ReStart(const Vector3& lockon);
 
+	/// <summary>
+	///	DestinationAngleの計算
+	/// </summary>
+	void CalDestinationAngle();
+
 	//========================================================================*/
 	//* Setter
 	void SetTranslate(const Vector3& pos);

@@ -29,6 +29,10 @@ private:
 
 	void ApplyGlobalVariables();//値読み込みテスト用今度Objectクラス作って継承で使えるようにする
 
+#ifdef _DEBUG
+	bool uiInvisible_ = false;
+#endif // _DEBUG
+
 	std::unique_ptr<Object3dCommon> obj3dCommon = nullptr;
 	std::unique_ptr<SkyBox> skybox_;
 	std::unique_ptr<AnimationModel> terrain_ = nullptr;

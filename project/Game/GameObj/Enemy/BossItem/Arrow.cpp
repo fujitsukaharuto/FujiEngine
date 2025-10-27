@@ -1,5 +1,6 @@
 #include "Arrow.h"
 #include "Engine/Particle/ParticleManager.h"
+#include "Engine/Model/Object3d.h"
 #include "Engine/Math/Random/Random.h"
 #include <algorithm>
 
@@ -7,7 +8,9 @@ Arrow::Arrow() {
 }
 
 Arrow::~Arrow() {
-	ParticleManager::GetParticleCSEmitter(emitterNumber_).isEmit = false;
+	if (isArrow_) {
+		ParticleManager::GetParticleCSEmitter(emitterNumber_).isEmit = false;
+	}
 }
 
 void Arrow::Initialize() {
@@ -23,6 +26,14 @@ void Arrow::Initialize() {
 	collider_->SetWidth(2.0f);
 	collider_->SetHeight(3.0f);
 	collider_->SetDepth(2.0f);
+
+	arrivalWarningPotion_ = std::make_unique<Object3d>();
+	arrivalWarningPotion_->Create("Sphere");
+	arrivalWarningPotion_->SetTexture("white2x2.png");
+	arrivalWarningPotion_->SetColor({ 0.8f,0.0f,0.0f,0.4f });
+	arrivalWarningPotion_->SetLightEnable(LightMode::kLightNone);
+	arrivalWarningPotion_->transform.scale = { 2.0f,0.0f,2.0f };
+	arrivalWarningPotion_->transform.scale.y = 0.1f;
 
 	velocity_ = { 0.0f,0.0f,0.0f };
 	model_->transform.scale = { 5.0f,5.0f,5.0f };
@@ -52,6 +63,9 @@ void Arrow::Update() {
 
 void Arrow::Draw([[maybe_unused]] Material* mate, [[maybe_unused]] bool is) {
 	OriginGameObject::Draw();
+	if (isArrow_ && arrivalTime_ > 0.0f && animationTime_ < totalAnimationTime_) {
+		arrivalWarningPotion_->Draw();
+	}
 }
 
 void Arrow::DrawCollider() {
@@ -114,12 +128,14 @@ void Arrow::InitArrow(const Vector3& pos, float emitTime) {
 }
 
 void Arrow::TargetSetting(const Vector3& target) {
-	if (animationTime_ <= 5.0f && arrivalTime_ >= totalAnimationTime_) {
+	if (animationTime_ <= totalAnimationTime_ && arrivalTime_ >= totalArrivalTime_) {
 		endP_ = target;
 		if (endP_.z == startP_.z) {
 			startP_.z -= 0.001f;
 		}
 		endP_.y = 0.0f;
+		arrivalWarningPotion_->transform.translate = endP_;
+		arrivalWarningPotion_->transform.translate.y += 0.1f;
 		midtermP_ = startP_ * 0.5f + endP_ * 0.5f + Vector3(0.0f, controlHeight_, 0.0f);
 	}
 }
@@ -288,5 +304,7 @@ void Arrow::OnCollisionExit([[maybe_unused]] const ColliderInfo& other) {
 
 void Arrow::SetIsLive(bool is) {
 	isLive_ = is;
-	ParticleManager::GetParticleCSEmitter(emitterNumber_).isEmit = false;
+	if (isArrow_) {
+		ParticleManager::GetParticleCSEmitter(emitterNumber_).isEmit = false;
+	}
 }

@@ -63,6 +63,7 @@ public:
 	//* Setter
 	void SetIsLive(bool is);
 	void SetEmitterNumber(int num) { emitterNumber_ = num; }
+	void SetArrowMode() { isArrow_ = true; }
 
 	//========================================================================*/
 	//* Getter
@@ -74,6 +75,7 @@ private:
 
 private:
 
+	bool isArrow_ = false;
 	bool isLive_ = false;
 	Vector3 velocity_;
 
@@ -89,6 +91,7 @@ private:
 	float controlHeight_ = 20.0f;
 
 	std::unique_ptr<AABBCollider> collider_;
+	std::unique_ptr<Object3d> arrivalWarningPotion_;
 
 	// emitter
 	ParticleEmitter spark1_;

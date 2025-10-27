@@ -187,8 +187,16 @@ void TitleScene::Draw() {
 	//cube_->Draw();
 	//animParentObj_->Draw();
 
+#ifdef _DEBUG
+	if (!uiInvisible_) {
+		space_->Draw();
+		title_->Draw();
+	}
+#else
 	space_->Draw();
 	title_->Draw();
+#endif // _DEBUG
+
 
 #ifdef _DEBUG
 	CommandManager::GetInstance()->Draw();
@@ -219,6 +227,7 @@ void TitleScene::Draw() {
 
 void TitleScene::DebugGUI() {
 #ifdef _DEBUG
+	ImGui::Checkbox("UI Invisible", &uiInvisible_);
 	ImGui::Indent();
 	if (ImGui::CollapsingHeader("particleTest")) {
 		particleTest_->DebugGUI();
