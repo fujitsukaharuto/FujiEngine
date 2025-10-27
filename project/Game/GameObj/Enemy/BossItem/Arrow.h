@@ -2,6 +2,7 @@
 #include "Game/OriginObject/OriginGameObject.h"
 #include "Game/Collider/AABBCollider.h"
 #include "Engine/Particle/ParticleEmitter.h"
+#include "Engine/Audio/AudioPlayer.h"
 
 
 /// <summary>
@@ -97,9 +98,10 @@ private:
 	ParticleEmitter hit_;
 	ParticleEmitter hitParticle_;
 
+	SoundData* throwSE_ = nullptr;
 
 	// Gpu Particle
-	int emitterNumber_;
+	int emitterNumber_ = -1;
 
 
 	// Rod

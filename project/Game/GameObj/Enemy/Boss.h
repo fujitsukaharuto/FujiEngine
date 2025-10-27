@@ -3,6 +3,7 @@
 #include "Game/Collider/AABBCollider.h"
 #include "Engine/Particle/ParticleEmitter.h"
 #include "Engine/Model/Sprite.h"
+#include "Engine/Audio/AudioPlayer.h"
 
 #include "Game/GameObj/Enemy/Behavior/BaseBossBehavior.h"
 
@@ -252,6 +253,7 @@ private:
 	ParticleEmitter energySphere_;
 	ParticleEmitter energyParticle_;
 
+	SoundData* jumpAttackSE_;
 
 
 	// post effect

@@ -36,6 +36,8 @@ void Arrow::Initialize() {
 
 	spark1_.frequencyTime_ = 0.0f;
 	spark3_.frequencyTime_ = 0.0f;
+
+	throwSE_ = &AudioPlayer::GetInstance()->SoundLoadWave("arrowThrowSE.wav");
 }
 
 void Arrow::Update() {
@@ -142,6 +144,7 @@ void Arrow::AnimaTimeUpdate() {
 			model_->transform.rotate.y = 0.0f;
 		if (animationTime_ <= 0.0f) {
 			ParticleManager::GetParticleCSEmitter(emitterNumber_).isEmit = true;
+			AudioPlayer::GetInstance()->SoundPlayWave(*throwSE_, 0.2f);
 		}
 	}
 }

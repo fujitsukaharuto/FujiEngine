@@ -1,5 +1,6 @@
 #pragma once
 #include<string>
+#include "Engine/Audio/AudioPlayer.h"
 
 enum class AttackPattern {
 	Beam,

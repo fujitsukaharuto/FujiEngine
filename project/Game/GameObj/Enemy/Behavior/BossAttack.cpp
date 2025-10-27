@@ -1,6 +1,7 @@
 #include "BossAttack.h"
 
 #include "Engine/Math/Random/Random.h"
+#include "Engine/Audio/AudioPlayer.h"
 #include "Game/GameObj/Enemy/Boss.h"
 #include "Game/GameObj/Enemy/Behavior/BossArrowAttack.h"
 #include "BossRoot.h"
@@ -10,6 +11,7 @@ BossAttack::BossAttack(Boss* pBoss) : BaseBossBehavior(pBoss) {
 	pBoss_->GetAnimModel()->ChangeAnimation("punch");
 	pBoss_->GetAnimModel()->IsRoopAnimation(false);
 	pBoss_->ChainCount();
+	attackSE_ = &AudioPlayer::GetInstance()->SoundLoadWave("attackSE.wav");
 }
 
 BossAttack::~BossAttack() {
@@ -25,6 +27,7 @@ void BossAttack::Update() {
 
 		if (isAttack_) {
 			pBoss_->WaveWallAttack();
+			AudioPlayer::GetInstance()->SoundPlayWave(*attackSE_, 0.2f);
 			isAttack_ = false;
 		}
 		coolTime_ -= FPSKeeper::DeltaTime();

@@ -210,6 +210,8 @@ void Boss::Initialize() {
 	ChangeBehavior(std::make_unique<BossRoot>(this));
 	InitSummon();
 	animModel_->ChangeAnimation("idle");
+
+	jumpAttackSE_ = &AudioPlayer::GetInstance()->SoundLoadWave("jumpAttackSE.wav");
 }
 
 void Boss::Update() {
@@ -941,6 +943,7 @@ bool Boss::JumpAttack() {
 			if (isJumpAttack_) {
 				jumpWave_.pos_ = animModel_->transform.translate;
 				jumpWave_.Emit();
+				AudioPlayer::GetInstance()->SoundPlayWave(*jumpAttackSE_, 0.4f);
 				UnderRingEmit();
 			}
 		}

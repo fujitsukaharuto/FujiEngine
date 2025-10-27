@@ -1,6 +1,7 @@
 #include "BossAreaAttack.h"
 
 #include "Engine/Math/Random/Random.h"
+#include "Engine/Audio/AudioPlayer.h"
 #include "Game/GameObj/Enemy/Boss.h"
 #include "Game/GameObj/Enemy/Behavior/BossArrowAttack.h"
 #include "BossRoot.h"
@@ -10,6 +11,7 @@ BossAreaAttack::BossAreaAttack(Boss* pBoss) : BaseBossBehavior(pBoss) {
 	pBoss_->GetAnimModel()->ChangeAnimation("swordLeft");
 	pBoss_->GetAnimModel()->IsRoopAnimation(false);
 	pBoss_->ChainCount();
+	areaAttackSE_ = &AudioPlayer::GetInstance()->SoundLoadWave("areaAttackSE.wav");
 }
 
 BossAreaAttack::~BossAreaAttack() {
@@ -28,6 +30,7 @@ void BossAreaAttack::Update() {
 			if (isAttack_) {
 				pBoss_->WaveWallAttack();
 				pBoss_->UnderRingEmit();
+				AudioPlayer::GetInstance()->SoundPlayWave(*areaAttackSE_, 0.2f);
 				isAttack_ = false;
 			} else {
 				step_ = Step::TOROOT;

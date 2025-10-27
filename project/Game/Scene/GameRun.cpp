@@ -184,6 +184,10 @@ void GameRun::Initialize() {
 	audioPlayer_->LoadWave("shot.wav");
 	audioPlayer_->LoadWave("chargeSE.wav");
 	audioPlayer_->LoadWave("chargeCompleteSE.wav");
+	audioPlayer_->LoadWave("jumpAttackSE.wav");
+	audioPlayer_->LoadWave("areaAttackSE.wav");
+	audioPlayer_->LoadWave("attackSE.wav");
+	audioPlayer_->LoadWave("arrowThrowSE.wav");
 
 #pragma endregion
 

@@ -10,6 +10,7 @@ BossSwordAttack::BossSwordAttack(Boss* pBoss) : BaseBossBehavior(pBoss) {
 	pBoss_->GetAnimModel()->ChangeAnimation("punch");
 	pBoss_->GetAnimModel()->IsRoopAnimation(false);
 	pBoss_->ChainCount();
+	attackSE_ = &AudioPlayer::GetInstance()->SoundLoadWave("attackSE.wav");
 }
 
 BossSwordAttack::~BossSwordAttack() {
@@ -30,6 +31,7 @@ void BossSwordAttack::Update() {
 			}
 			coolTime_ = 90.0f;
 			pBoss_->GetAnimModel()->IsRoopAnimation(true);
+			AudioPlayer::GetInstance()->SoundPlayWave(*attackSE_, 0.2f);
 			pBoss_->WaveWallAttack();
 			attackCount_++;
 		} else {
