@@ -253,7 +253,10 @@ void ImGuiManager::HandleCreateLink(std::vector<Link>& links, const std::vector<
 			auto* inPin = FindPin(inputId, nodes);
 			auto* outPin = FindPin(outputId, nodes);
 
-			if (inPin && outPin && CanCreateLink(*outPin, *inPin) && !inPin->isLinked) {
+			const MyNode* inNode = FindNodeByPinId(inputId, nodes);
+			const MyNode* outNode = FindNodeByPinId(outputId, nodes);
+
+			if (inPin && outPin && inNode != outNode && CanCreateLink(*outPin, *inPin) && !inPin->isLinked && !outPin->isLinked) {
 				if (ed::AcceptNewItem()) {
 					links.push_back({ GenerateLinkId(), outputId, inputId });
 				}
@@ -304,7 +307,11 @@ void ImGuiManager::DrawNode(MyNode& node, ed::Utilities::BlueprintNodeBuilder& b
 		ed::PinPivotAlignment(ImVec2(1.0f, 0.5f));
 		ed::PinPivotSize(ImVec2(0, 0));
 
-		DrawPinIcon(pin.isLinked);
+		if (pin.pinType == PinType::Mateial) {
+			DrawPinIcon(pin.isLinked, ax::Widgets::IconType::Square);
+		} else {
+			DrawPinIcon(pin.isLinked);
+		}
 		ImGui::PopStyleVar();
 		builder.EndInput();
 	}
@@ -319,7 +326,11 @@ void ImGuiManager::DrawNode(MyNode& node, ed::Utilities::BlueprintNodeBuilder& b
 		ed::PinPivotAlignment(ImVec2(1.0f, 0.5f));
 		ed::PinPivotSize(ImVec2(0, 0));
 
-		DrawPinIcon(pin.isLinked);
+		if (pin.pinType == PinType::Mateial) {
+			DrawPinIcon(pin.isLinked,ax::Widgets::IconType::Square);
+		} else {
+			DrawPinIcon(pin.isLinked);
+		}
 		ImGui::PopStyleVar();
 		builder.EndOutput();
 	}
@@ -342,12 +353,14 @@ void ImGuiManager::DrawNode(MyNode& node, ed::Utilities::BlueprintNodeBuilder& b
 		node.addType = static_cast<AddType>(addType);
 
 		if (node.addType == AddType::Increment) {
+			ImGui::SetNextItemWidth(100.0f);
 			ImGui::DragFloat(("Add##Add" + std::to_string(static_cast<uintptr_t>(node.id))).c_str(), &node.values[0].Get<float>(), 0.01f);
 		}
 	}
 
 	if (node.type == MyNode::NodeType::Color) {
 		ImGui::Dummy(ImVec2(5.0f, 0.0f)); ImGui::SameLine();
+		ImGui::SetNextItemWidth(200.0f);
 		ImGui::ColorEdit4(("##Color" + std::to_string(static_cast<uintptr_t>(node.id))).c_str(), &node.values[0].Get<Vector4>().x);
 		/*ed::Suspend();
 
@@ -356,8 +369,10 @@ void ImGuiManager::DrawNode(MyNode& node, ed::Utilities::BlueprintNodeBuilder& b
 
 	if (node.type == MyNode::NodeType::Vector2) {
 		ImGui::Dummy(ImVec2(5.0f, 0.0f)); ImGui::SameLine();
+		ImGui::SetNextItemWidth(100.0f);
 		ImGui::DragFloat(("X##Vector2x" + std::to_string(static_cast<uintptr_t>(node.id))).c_str(), &node.values[0].Get<Vector2>().x, 0.01f);
 		ImGui::Dummy(ImVec2(5.0f, 0.0f)); ImGui::SameLine();
+		ImGui::SetNextItemWidth(100.0f);
 		ImGui::DragFloat(("Y##Vector2y" + std::to_string(static_cast<uintptr_t>(node.id))).c_str(), &node.values[0].Get<Vector2>().y, 0.01f);
 	}
 
@@ -431,14 +446,12 @@ void ImGuiManager::DrawNodeEditor(NodeGraph* nodeGraph) {
 	ed::End();
 }
 
-void ImGuiManager::DrawPinIcon(bool connected) {
+void ImGuiManager::DrawPinIcon(bool connected, ax::Widgets::IconType icon) {
 
-	ax::Widgets::IconType iconType;
 	ImColor  color = ImColor(147, 226, 74);
 	color.Value.w = 200.0f / 255.0f;
-	iconType = ax::Widgets::IconType::Circle;
 
-	ax::Widgets::Icon(ImVec2(static_cast<float>(24), static_cast<float>(24)), iconType, connected, color, ImColor(32, 32, 32, 200));
+	ax::Widgets::Icon(ImVec2(static_cast<float>(24), static_cast<float>(24)), icon, connected, color, ImColor(32, 32, 32, 200));
 }
 #endif // _DEBUG
 

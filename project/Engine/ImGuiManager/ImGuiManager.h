@@ -11,6 +11,7 @@
 #include "imgui_node_editor.h"
 #include "NodeGraph.h"
 #include "utilities/builders.h"
+#include "utilities/widgets.h"
 
 namespace ed = ax::NodeEditor;
 #endif // _DEBUG
@@ -103,7 +104,7 @@ public:
 	/// <summary>NodeEditorの描画</summary>
 	void DrawNodeEditor(NodeGraph* nodeGraph);
 	/// <summary>Pinの描画</summary>
-	void DrawPinIcon(bool connected);
+	void DrawPinIcon(bool connected, ax::Widgets::IconType icon = ax::Widgets::IconType::Circle);
 
 #endif // _DEBUG
 private:

@@ -82,6 +82,7 @@ enum class PinType {
 	Vector2,
 	Color,
 	Texture,
+	Mateial,
 };
 
 enum class PinKind {
@@ -132,6 +133,7 @@ struct MyNode {
 	// NodeTypeによって必要になるもの
 	std::string texName;
 	AddType addType = AddType::Increment;
+
 
 	std::function<Value(const std::vector<Value>&)> evaluator; // 入力 → 出力
 

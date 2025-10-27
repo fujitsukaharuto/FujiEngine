@@ -431,6 +431,8 @@ void MyNode::CreateNode(NodeType nodeType) {
 		inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input, PinType::Texture });
 		inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input, PinType::Color });
 		inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input, PinType::Vector2 });
+		inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input, PinType::Mateial });
+		outputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Output, PinType::Mateial });
 		values.push_back(Value("white2x2.png"));
 		values.push_back(Value(Vector4(1.0f, 1.0f, 1.0f, 1.0f)));
 		values.push_back(Value(Vector2(0.0f, 0.0f)));
