@@ -76,6 +76,21 @@ cbuffer ObjIDData : register(b6)
 Texture2D<float4> gMaskTexture : register(t1);
 ConstantBuffer<Material> gMaskMaterial : register(b7);
 
+
+float4 ApplyMaskTexture(float4 baseColor, float2 texcoord)
+{
+    float4 maskUV = mul(float4(texcoord, 0.0f, 1.0f), gMaskMaterial.uvTransform);
+    float4 maskTexColor = gMaskTexture.Sample(gSampler, maskUV.xy);
+
+    float mask = maskTexColor.r;
+
+    float3 color = baseColor.rgb * gMaskMaterial.color.rgb * mask;
+    float alpha = baseColor.a * mask;
+
+    return float4(color, alpha);
+}
+
+
 struct PixelShaderOutput
 {
     float4 color : SV_TARGET0;
@@ -112,6 +127,7 @@ PixelShaderOutput main(VertxShaderOutput input)
             float cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
             output.color.rgb = gMaterial.color.rgb * textureColor.rgb * gDirectionnalLight.color.rgb * cos * gDirectionnalLight.intensity;
             output.color.a = gMaterial.color.a * textureColor.a;
+            output.color = ApplyMaskTexture(output.color, input.texcoord);
             if (output.color.a == 0.0)
             {
                 discard;
@@ -122,6 +138,7 @@ PixelShaderOutput main(VertxShaderOutput input)
             float cos = saturate(dot(normalize(input.normal), -gDirectionnalLight.direction));
             output.color.rgb = gMaterial.color.rgb * textureColor.rgb * gDirectionnalLight.color.rgb * cos * gDirectionnalLight.intensity;
             output.color.a = gMaterial.color.a * textureColor.a;
+            output.color = ApplyMaskTexture(output.color, input.texcoord);
             if (output.color.a == 0.0)
             {
                 discard;
@@ -141,6 +158,7 @@ PixelShaderOutput main(VertxShaderOutput input)
             
             output.color.rgb = diffuse + specular;
             output.color.a = gMaterial.color.a * textureColor.a;
+            output.color = ApplyMaskTexture(output.color, input.texcoord);
             if (output.color.a == 0.0)
             {
                 discard;
@@ -160,6 +178,7 @@ PixelShaderOutput main(VertxShaderOutput input)
             
             output.color.rgb = diffuse + specular;
             output.color.a = gMaterial.color.a * textureColor.a;
+            output.color = ApplyMaskTexture(output.color, input.texcoord);
             if (output.color.a == 0.0)
             {
                 discard;
@@ -193,6 +212,7 @@ PixelShaderOutput main(VertxShaderOutput input)
             
             output.color.rgb = diffuse + specular + diffusePoint + specularPoint;
             output.color.a = gMaterial.color.a * textureColor.a;
+            output.color = ApplyMaskTexture(output.color, input.texcoord);
             if (output.color.a == 0.0)
             {
                 discard;
@@ -230,6 +250,7 @@ PixelShaderOutput main(VertxShaderOutput input)
             
             output.color.rgb = diffuse + specular + diffuseSpot + specularSpot;
             output.color.a = gMaterial.color.a * textureColor.a;
+            output.color = ApplyMaskTexture(output.color, input.texcoord);
             if (output.color.a == 0.0)
             {
                 discard;
@@ -240,6 +261,7 @@ PixelShaderOutput main(VertxShaderOutput input)
     {
         textureColor.rgb = pow(textureColor.rgb, 2.2);
         output.color = gMaterial.color * textureColor;
+        output.color = ApplyMaskTexture(output.color, input.texcoord);
         if (output.color.a == 0.0)
         {
             discard;

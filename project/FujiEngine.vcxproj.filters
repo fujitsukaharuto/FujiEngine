@@ -350,6 +350,9 @@
     <ClCompile Include="Engine\Particle\GPUParticleSystem.cpp">
       <Filter>Engine\Particle</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\GraphicPipeline\PipelineNode.cpp">
+      <Filter>Engine\GraphicPipeline</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -756,6 +759,9 @@
     </ClInclude>
     <ClInclude Include="Engine\Particle\GPUParticleSystem.h">
       <Filter>Engine\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\GraphicPipeline\PipelineNode.h">
+      <Filter>Engine\GraphicPipeline</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

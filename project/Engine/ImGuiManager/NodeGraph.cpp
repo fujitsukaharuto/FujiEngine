@@ -52,7 +52,11 @@ void NodeGraph::ValueUpdate(MyNode& node) {
 		for (const Pin& input : node.inputs) {
 			if (!input.isLinked) {
 				// 未接続ならNone値
-				inputValues.push_back(Value());
+				if (input.pinType != PinType::Mateial) {
+					inputValues.push_back(Value());
+				} else {
+					node.child = nullptr;
+				}
 				continue;
 			}
 
@@ -68,6 +72,11 @@ void NodeGraph::ValueUpdate(MyNode& node) {
 				continue;
 			ValueUpdate(*srcNode);
 
+			if (input.pinType == PinType::Mateial) {
+				node.child = srcNode;
+				continue;
+			}
+
 			const Value* output = nullptr;
 			for (int i = 0; i < srcNode->outputs.size(); i++) {
 				if (pLink->startPinId == srcNode->outputs[i].id) {
@@ -78,10 +87,15 @@ void NodeGraph::ValueUpdate(MyNode& node) {
 					}
 				}
 			}
+
+			if (input.pinType == PinType::Mateial)
+				continue;
+
 			if (output)
 				inputValues.push_back(*output);
 			else
 				inputValues.push_back(Value()); // 安全のためNone
+
 		}
 
 		node.outputValue.clear();

@@ -134,7 +134,7 @@ struct MyNode {
 	std::string texName;
 	AddType addType = AddType::Increment;
 
-
+	MyNode* child = nullptr;
 	std::function<Value(const std::vector<Value>&)> evaluator; // 入力 → 出力
 
 	void CreateNode(NodeType nodeType);

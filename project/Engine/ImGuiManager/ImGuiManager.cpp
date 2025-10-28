@@ -407,7 +407,7 @@ void ImGuiManager::DrawNodeEditor(NodeGraph* nodeGraph) {
 
 	ed::Suspend(); // 背景の右クリックメニュー
 	if (ImGui::BeginPopup("Background Context Menu")) {
-		if (ImGui::BeginMenu("Add Node")) {
+		if (ImGui::BeginMenu("Create Node")) {
 			TextureSelectMenu(nodeGraph);
 			if (ImGui::MenuItem("Float Node")) {
 			}
@@ -424,6 +424,11 @@ void ImGuiManager::DrawNodeEditor(NodeGraph* nodeGraph) {
 			if (ImGui::MenuItem("Vector2 Node")) {
 				MyNode node;
 				node.CreateNode(MyNode::NodeType::Vector2);
+				nodeGraph->AddNode(node);
+			}
+			if (ImGui::MenuItem("Material Node")) {
+				MyNode node;
+				node.CreateNode(MyNode::NodeType::Material);
 				nodeGraph->AddNode(node);
 			}
 			ImGui::EndMenu();

@@ -85,6 +85,8 @@ public:
 	void SetColor(const Vector4& color) { materialDate_->color = color; }
 	/// <summary>UVスケールの設定</summary>
 	void SetUVScale(const Vector2& scale, const Vector2& uvTrans);
+	/// <summary>UVトランスの設定</summary>
+	void SetUVTrans(const Vector2& uvTrans);
 	/// <summary>アルファ閾値の設定</summary>
 	void SetAlphaRef(float ref) { materialDate_->AlphaRef = ref; }
 	/// <summary>テクスチャの設定</summary>
@@ -106,6 +108,9 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialEnvironmentResource_ = nullptr;
 	MaterialEnvironment* materialEnvironment_ = nullptr;
 	bool isEnvironment_ = false;
+
+	Vector2 scale_;
+	Vector2 uvTrans_;
 
 	Texture* texture_ = nullptr;
 	MaterialDataPath textureNamePath_;

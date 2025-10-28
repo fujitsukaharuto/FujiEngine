@@ -45,6 +45,8 @@ void Object3d::Create(const std::string& fileName) {
 	SetModel(fileName);
 	transform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 	nowTextureName = model_->GetTextuerName();
+	maskMateral_.SetTextureNamePath("white2x2.png");
+	maskMateral_.CreateMaterial();
 #ifdef _DEBUG
 	if (selectorNodeId_.Get() != 0) {
 		MyNode* selNode = nodeGraph_.FindNodeById(selectorNodeId_);
@@ -129,20 +131,37 @@ void Object3d::Draw(Material* mate, bool isAdd) {
 	SetWVP();
 
 	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
-	if (isAdd) {
-		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::NormalAdd);
+	if (isMaskMode_) {
+		if (isAdd) {
+			dxcommon_->GetPipelineManager()->SetPipeline(Pipe::NormalNodeAdd);
+		} else {
+			dxcommon_->GetPipelineManager()->SetPipeline(Pipe::NormalNode);
+		}
+		lightManager_->SetLightCommand(cList);
+	} else {
+		if (isAdd) {
+			dxcommon_->GetPipelineManager()->SetPipeline(Pipe::NormalAdd);
+		}
 	}
 	cList->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
 	cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_->GetGPUVirtualAddress());
 	cList->SetGraphicsRootConstantBufferView(9, objIDDataResource_->GetGPUVirtualAddress());
 	ModelManager::GetInstance()->PickingCommand();
 
+	if (isMaskMode_) {
+		cList->SetGraphicsRootConstantBufferView(11, maskMateral_.GetMaterialResource()->GetGPUVirtualAddress());
+		cList->SetGraphicsRootDescriptorTable(10, maskMateral_.GetTexture()->gpuHandle);
+	}
+
 	if (model_) {
 		model_->Draw(cList, mate);
 	}
 
-	if (isAdd) {
+	if (isAdd||isMaskMode_) {
 		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Normal);
+		if (isMaskMode_) {
+			lightManager_->SetLightCommand(cList);
+		}
 	}
 }
 
@@ -652,6 +671,16 @@ void Object3d::SetTextureNode() {
 			SetTexture(selNode->outputValue[0].Get<std::string>());
 			SetColor(selNode->outputValue[1].Get<Vector4>());
 			SetUVTrans(selNode->outputValue[2].Get<Vector2>());
+			if (selNode->child) {
+				isMaskMode_ = true;
+				if (selNode->child->outputValue.size() > 0) {
+					maskMateral_.SetTexture(selNode->child->outputValue[0].Get<std::string>());
+					maskMateral_.SetColor(selNode->child->outputValue[1].Get<Vector4>());
+					maskMateral_.SetUVTrans(selNode->child->outputValue[2].Get<Vector2>());
+				}
+			} else {
+				isMaskMode_ = false;
+			}
 		}
 	}
 

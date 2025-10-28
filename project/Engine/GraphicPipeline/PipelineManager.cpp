@@ -2,6 +2,7 @@
 
 #include "Engine/DX/DXCom.h"
 #include "Pipeline.h"
+#include "PipelineNode.h"
 #include "Line3dPipe.h"
 #include "SpritePipe.h"
 #include "ParticlePipeline.h"
@@ -61,6 +62,8 @@ void PipelineManager::CreatePipeline() {
 
 	std::unique_ptr<Pipeline> pipeline = nullptr;
 	std::unique_ptr<Pipeline> pipelineAdd = nullptr;
+	std::unique_ptr<PipelineNode> pipelineNode = nullptr;
+	std::unique_ptr<PipelineNode> pipelineNodeAdd = nullptr;
 	std::unique_ptr<SpritePipe> spritePipe = nullptr;
 	std::unique_ptr<Line3dPipe> lLine = nullptr;
 	std::unique_ptr<ParticlePipeline> particlePipline = nullptr;
@@ -108,6 +111,17 @@ void PipelineManager::CreatePipeline() {
 	pipelineAdd->SetIsAddMode(true);
 	pipelineAdd->Initialize(dxcommon_);
 	pipelines_.push_back(std::move(pipelineAdd));
+
+
+	pipelineNode.reset(new PipelineNode());
+	pipelineNode->Initialize(dxcommon_);
+	pipelines_.push_back(std::move(pipelineNode));
+
+
+	pipelineNodeAdd.reset(new PipelineNode());
+	pipelineNodeAdd->SetIsAddMode(true);
+	pipelineNodeAdd->Initialize(dxcommon_);
+	pipelines_.push_back(std::move(pipelineNodeAdd));
 
 
 	spritePipe.reset(new SpritePipe());

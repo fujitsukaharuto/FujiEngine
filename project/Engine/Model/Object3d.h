@@ -152,6 +152,9 @@ private:
 	Matrix4x4 billboardMatrix_;
 	std::string nowTextureName;
 
+	bool isMaskMode_ = false;
+	Material maskMateral_;
+
 	Vector3 prevPos_;
 	Vector3 prevRotate_;
 	Vector3 prevScale_;

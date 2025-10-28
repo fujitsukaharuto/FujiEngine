@@ -33,6 +33,9 @@ void Material::CreateMaterial() {
 	materialDate_->shininess = 50.0f;
 	materialDate_->AlphaRef = 0.5f;
 
+	scale_ = { 1.0f,1.0f };
+	uvTrans_ = { 0.0f,0.0f };
+
 	if (textureNamePath_.textureFilePath.empty()) {
 		texture_ = TextureManager::GetInstance()->LoadTexture("uvChecker.png");
 	} else {
@@ -76,6 +79,16 @@ void Material::SetTextureNamePath(const std::string& pathName) {
 void Material::SetUVScale(const Vector2& scale, const Vector2& uvTrans) {
 	Matrix4x4 uvScaleMatrix = MakeScale4x4(Vector3(scale.x, scale.y, 1.0f));
 	Matrix4x4 uvTransMatrix = MakeTranslateMatrix(Vector3(uvTrans.x, uvTrans.y, 0.0f));
+	scale_ = scale;
+	uvTrans_ = uvTrans;
+	materialDate_->uvTransform = MakeIdentity4x4();
+	materialDate_->uvTransform = Multiply(uvTransMatrix, uvScaleMatrix);
+}
+
+void Material::SetUVTrans(const Vector2& uvTrans) {
+	Matrix4x4 uvScaleMatrix = MakeScale4x4(Vector3(scale_.x, scale_.y, 1.0f));
+	Matrix4x4 uvTransMatrix = MakeTranslateMatrix(Vector3(uvTrans.x, uvTrans.y, 0.0f));
+	uvTrans_ = uvTrans;
 	materialDate_->uvTransform = MakeIdentity4x4();
 	materialDate_->uvTransform = Multiply(uvTransMatrix, uvScaleMatrix);
 }

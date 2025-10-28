@@ -8,6 +8,8 @@ enum class Pipe : int {
 	None,
 	Normal,
 	NormalAdd,
+	NormalNode,
+	NormalNodeAdd,
 	Sprite,
 	Line3d,
 	particle,
