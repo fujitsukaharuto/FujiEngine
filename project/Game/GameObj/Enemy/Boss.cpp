@@ -944,7 +944,7 @@ bool Boss::JumpAttack() {
 			if (isJumpAttack_) {
 				jumpWave_.pos_ = animModel_->transform.translate;
 				jumpWave_.Emit();
-				AudioPlayer::GetInstance()->SoundPlayWave(*jumpAttackSE_, 0.4f);
+				AudioPlayer::GetInstance()->SoundPlayWave(*jumpAttackSE_, 0.6f);
 				UnderRingEmit();
 			}
 		}

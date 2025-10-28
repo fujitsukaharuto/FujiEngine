@@ -30,7 +30,7 @@ void BossAreaAttack::Update() {
 			if (isAttack_) {
 				pBoss_->WaveWallAttack();
 				pBoss_->UnderRingEmit();
-				AudioPlayer::GetInstance()->SoundPlayWave(*areaAttackSE_, 0.2f);
+				AudioPlayer::GetInstance()->SoundPlayWave(*areaAttackSE_, 0.35f);
 				isAttack_ = false;
 			} else {
 				step_ = Step::TOROOT;

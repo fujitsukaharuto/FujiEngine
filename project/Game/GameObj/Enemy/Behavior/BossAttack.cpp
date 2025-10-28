@@ -27,7 +27,7 @@ void BossAttack::Update() {
 
 		if (isAttack_) {
 			pBoss_->WaveWallAttack();
-			AudioPlayer::GetInstance()->SoundPlayWave(*attackSE_, 0.2f);
+			AudioPlayer::GetInstance()->SoundPlayWave(*attackSE_, 0.35f);
 			isAttack_ = false;
 		}
 		coolTime_ -= FPSKeeper::DeltaTime();

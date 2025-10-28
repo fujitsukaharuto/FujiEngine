@@ -31,7 +31,7 @@ void BossSwordAttack::Update() {
 			}
 			coolTime_ = 90.0f;
 			pBoss_->GetAnimModel()->IsRoopAnimation(true);
-			AudioPlayer::GetInstance()->SoundPlayWave(*attackSE_, 0.2f);
+			AudioPlayer::GetInstance()->SoundPlayWave(*attackSE_, 0.35f);
 			pBoss_->WaveWallAttack();
 			attackCount_++;
 		} else {
