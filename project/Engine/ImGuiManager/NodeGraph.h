@@ -121,6 +121,7 @@ struct MyNode {
 		Float,
 		Add,
 		Material,
+		SubMaterial,
 		Color,
 		Vector2,
 		// 追加予定のノード種類…
@@ -165,6 +166,7 @@ public:
 
 	void Update(ax::NodeEditor::EditorContext* ctx);
 	void ValueUpdate(MyNode& node);
+	void NameUpdate(MyNode& parentNode, MyNode& node,int inputNum);
 
 	/// <summary>Nodeの追加</summary>
 	MyNode& AddNode(const MyNode& node);
@@ -211,3 +213,13 @@ private:
 	ed::NodeId materialNodeId_;
 };
 #endif // _DEBUG
+
+
+struct NodeContent {
+
+	bool isMoveUV_ = false;
+	bool isAddDeltaUV_ = false;
+
+	Vector2 incrementUV_;
+
+};

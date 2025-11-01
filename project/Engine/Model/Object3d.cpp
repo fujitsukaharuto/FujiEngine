@@ -7,6 +7,7 @@
 #include "Engine/Editor/CommandManager.h"
 #include "Engine/Editor/PropertyCommand.h"
 #include "Engine/Editor/JsonSerializer.h"
+#include "Engine/ImGuiManager/NodeGraph.h"
 #ifdef _DEBUG
 #include "ImGuizmo.h"
 namespace ed = ax::NodeEditor;
@@ -17,15 +18,6 @@ int Object3d::useObjID_ = 0;
 Object3d::Object3d() {
 	dxcommon_ = ModelManager::GetInstance()->ShareDXCom();
 	lightManager_ = ModelManager::GetInstance()->ShareLight();
-
-#ifdef _DEBUG
-	ax::NodeEditor::Config config;
-	config.SettingsFile = "resource/NodeEditor/NodeEditor.json";
-	nodeEditorContext_ = CreateEditor(&config);
-
-	selectorNodeId_ = nodeGraph_.DeserializeNodeData("resource/JsonNodeDataTest.json");
-
-#endif // _DEBUG
 }
 
 Object3d::~Object3d() {
@@ -45,16 +37,6 @@ void Object3d::Create(const std::string& fileName) {
 	SetModel(fileName);
 	transform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 	nowTextureName = model_->GetTextuerName();
-	maskMateral_.SetTextureNamePath("white2x2.png");
-	maskMateral_.CreateMaterial();
-#ifdef _DEBUG
-	if (selectorNodeId_.Get() != 0) {
-		MyNode* selNode = nodeGraph_.FindNodeById(selectorNodeId_);
-		if (selNode) {
-			selNode->values[0] = Value(nowTextureName);
-		}
-	}
-#endif // _DEBUG
 	CreateWVP();
 }
 
@@ -371,24 +353,42 @@ void Object3d::DebugGUI() {
 		ImGui::DragFloat2("uvScale", &uvScale.x, 0.1f);
 		ImGui::DragFloat2("uvTrans", &uvTrans.x, 0.1f);
 		SetUVScale(uvScale, uvTrans);
-		if (ImGui::Button("MaterialSetting")) {
-			ImGui::OpenPopup("Material Window");
-		}
-		ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-		ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-		if (ImGui::BeginPopupModal("Material Window", NULL)) {
-			SetTextureNode();
-			ImGui::Separator();
-			if (ImGui::Button("OK", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
-			ImGui::SetItemDefaultFocus();
-			ImGui::SameLine();
-			if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
-			ImGui::SameLine();
-			if (ImGui::Button("Save", ImVec2(120, 0))) { JsonSerializer::SerializeJsonData(nodeGraph_.SaveNodeData(),"resource/JsonNodeDataTest.json"); }
-			ImGui::EndPopup();
-		}
+		if (nodeEditorContext_) {
+			if (ImGui::Button("MaterialSetting")) {
+				ImGui::OpenPopup("Material Window");
+			}
+			ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+			ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+			if (ImGui::BeginPopupModal("Material Window", NULL)) {
+				SetTextureNode();
+				ImGui::Separator();
+				if (ImGui::Button("OK", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+				ImGui::SetItemDefaultFocus();
+				ImGui::SameLine();
+				if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+				ImGui::SameLine();
+				if (ImGui::Button("Save", ImVec2(120, 0))) { JsonSerializer::SerializeJsonData(nodeGraph_.SaveNodeData(), nodeFileName_); }
+				ImGui::EndPopup();
+			}
+		} else {
+			ImGui::SeparatorText("Add New NodeEditor");
+			// 静的入力バッファ（入力欄）
+			static char newEditorName[64] = "NewEditor";
 
+			ImGui::InputText("Editor Name", newEditorName, sizeof(newEditorName));
+
+			// 追加ボタンが押されたら
+			if (ImGui::Button("Add")) {
+				std::string newname = "resource/NodeEditorData/";
+				CreateNodeEditor(newname+newEditorName + ".json");
+				// 入力欄クリア
+				std::memset(newEditorName, 0, sizeof(newEditorName));
+				strcpy_s(newEditorName, "NewEditor");
+			}
+		}
 		ImGui::TreePop();
+	} else {
+		NodeContentsUpdate();
 	}
 
 	if (ImGui::TreeNodeEx("SetModel", flags)) {
@@ -429,10 +429,50 @@ void Object3d::DebugGUI() {
 	}
 	ImGui::Unindent();
 #endif // _DEBUG
+
+#ifdef _RELEASE
+	NodeContentsUpdate();
+#endif // _RELEASE
+
 }
 
 void Object3d::LoadTransformFromJson(const std::string& filename) {
 	JsonSerializer::DeserializeTransform(filename, transform);
+}
+
+void Object3d::LoadNodeEditorData(const std::string& filename) {
+	json data = JsonSerializer::DeserializeJsonData(filename);
+
+	if (!data.contains("Nodes") || !data["Nodes"].is_array()) {
+		return;
+	}
+
+	for (const auto& nodeData : data["Nodes"]) {
+		AnalysisNode(nodeData, -1);
+	}
+}
+
+void Object3d::CreateNodeEditor(const std::string& filename) {
+#ifdef _DEBUG
+	ax::NodeEditor::Config config;
+	config.SettingsFile = filename.c_str();
+	nodeEditorContext_ = CreateEditor(&config);
+
+	selectorNodeId_ = nodeGraph_.DeserializeNodeData(filename);
+
+#endif // _DEBUG
+	maskMateral_.SetTextureNamePath("white2x2.png");
+	maskMateral_.CreateMaterial();
+	LoadNodeEditorData(filename);
+	nodeFileName_ = filename;
+#ifdef _DEBUG
+	if (selectorNodeId_.Get() != 0) {
+		MyNode* selNode = nodeGraph_.FindNodeById(selectorNodeId_);
+		if (selNode) {
+			selNode->values[0] = Value(nowTextureName);
+		}
+	}
+#endif // _DEBUG
 }
 
 void Object3d::SetColor(const Vector4& color) {
@@ -657,6 +697,115 @@ void Object3d::CreatePropertyCommand(int type) {
 		}
 	}
 #endif // _DEBUG
+}
+
+void Object3d::NodeContentsUpdate() {
+	//SetColor(selNode->outputValue[1].Get<Vector4>());
+	if (nodeContentDeta_.size() == 0) {
+		return;
+	}
+
+	if (nodeContentDeta_[0].isMoveUV_) {
+		Vector2 newUV = model_->GetUVTrans();
+		if (nodeContentDeta_[0].isAddDeltaUV_) {
+			newUV.x += FPSKeeper::DeltaTimeFrame();
+			newUV.y += FPSKeeper::DeltaTimeFrame();
+		} else {
+			newUV += nodeContentDeta_[0].incrementUV_;
+		}
+		SetUVTrans(newUV);
+	}
+
+	if (isMaskMode_) {
+		if (nodeContentDeta_[1].isMoveUV_) {
+			Vector2 newUV = maskMateral_.GetUVTrans();
+			if (nodeContentDeta_[1].isAddDeltaUV_) {
+				newUV.x += FPSKeeper::DeltaTimeFrame();
+				newUV.y += FPSKeeper::DeltaTimeFrame();
+			} else {
+				newUV += nodeContentDeta_[1].incrementUV_;
+			}
+			maskMateral_.SetUVTrans(newUV);
+		}
+	}
+}
+
+void Object3d::AnalysisNode(const json& j, int index) {
+	std::string nodeType = j.value("nodeType", "Unknown");
+	if (nodeType == "Material") {
+		index++;
+		NodeContent content;
+		nodeContentDeta_.push_back(content);
+	}
+	if (index == -1) {
+		return;
+	}
+	if (nodeType == "SubMaterial") {
+		index++;
+		if (!maskMateral_.GetMaterialResource()) {
+			maskMateral_.SetTextureNamePath("white2x2.png");
+			maskMateral_.CreateMaterial();
+		}
+		isMaskMode_ = true;
+		NodeContent content;
+		nodeContentDeta_.push_back(content);
+	}
+	// indexが0なら親(このオブジェクトのメインのマテリアル)、1以上ならサブのマテリアル
+
+	if (nodeType != "Material" && nodeType != "SubMaterial") {
+		// values の復元
+		if (j.contains("values") && j["values"].is_array()) {
+			for (size_t i = 0; i < j["values"].size(); ++i) {
+				AnalysisValue(j["values"][i], index, j.value("name", "Unknown"));
+			}
+		}
+	}
+
+	// Textureノード専用
+	if (j.contains("texName")) {
+		if (index == 0) {
+			SetTexture(j["texName"].get<std::string>());
+		} else {
+			maskMateral_.SetTexture(j["texName"].get<std::string>());
+		}
+	}
+	if (j.contains("addType")) {
+		nodeContentDeta_[index].isAddDeltaUV_ = j["addType"] == 0 ? false : true;
+	}
+
+	// child ノード（入力側に繋がっているノード）を再帰的に復元
+	if (j.contains("child") && j["child"].is_array()) {
+		for (int i = 0; i < j["child"].size(); i++) {
+			const auto& value = j["child"][i];
+			if (value.is_null()) {
+				continue; // null の場合はスキップ
+			}
+			AnalysisNode(value, index);
+		}
+	}
+}
+
+void Object3d::AnalysisValue(const json& j, int index, const std::string& typeName) {
+	if (typeName == "UVVector2") {
+		nodeContentDeta_[index].isMoveUV_ = true;
+		auto arr = j["value"];
+		if (index == 0) {
+			SetUVTrans(Vector2{ arr[0], arr[1] });
+		} else {
+			maskMateral_.SetUVTrans(Vector2{ arr[0], arr[1] });
+		}
+	} else if (typeName == "Color") {
+		auto arr = j["value"];
+		if (index == 0) {
+			SetColor(Vector4{ arr[0], arr[1], arr[2], arr[3] });
+		} else {
+			maskMateral_.SetColor(Vector4{ arr[0], arr[1], arr[2], arr[3] });
+		}
+	} else if (typeName == "UVAddx") {
+		nodeContentDeta_[index].incrementUV_.x = j["value"].get<float>();
+	} else if (typeName == "UVAddy") {
+		nodeContentDeta_[index].incrementUV_.y = j["value"].get<float>();
+	}// UVScaleなどをこの後追加した時に
 }
 
 void Object3d::SetTextureNode() {

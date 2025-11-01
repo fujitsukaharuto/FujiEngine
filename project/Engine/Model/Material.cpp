@@ -65,8 +65,14 @@ Texture* Material::GetTexture() {
 
 ID3D12Resource* Material::GetMaterialResource() {
 	if (isEnvironment_) {
+		if (!materialEnvironmentResource_) {
+			return nullptr;
+		}
 		return materialEnvironmentResource_.Get();
 	} else {
+		if (!materialResource_) {
+			return nullptr;
+		}
 		return materialResource_.Get();
 	}
 }

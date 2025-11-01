@@ -49,6 +49,7 @@ void NodeGraph::ValueUpdate(MyNode& node) {
 	if (node.isUpdated) {
 		return;
 	} else {
+		int inputNum = 0;
 		for (const Pin& input : node.inputs) {
 			if (!input.isLinked) {
 				// 未接続ならNone値
@@ -70,6 +71,7 @@ void NodeGraph::ValueUpdate(MyNode& node) {
 			MyNode* srcNode = FindNodeByPinId(pLink->startPinId);
 			if (!srcNode)
 				continue;
+			NameUpdate(node, *srcNode, inputNum);
 			ValueUpdate(*srcNode);
 
 			if (input.pinType == PinType::Mateial) {
@@ -95,12 +97,12 @@ void NodeGraph::ValueUpdate(MyNode& node) {
 				inputValues.push_back(*output);
 			else
 				inputValues.push_back(Value()); // 安全のためNone
-
+			inputNum++;
 		}
 
 		node.outputValue.clear();
 		if (!inputValues.empty()) {
-			if (node.type == MyNode::NodeType::Material) {
+			if (node.type == MyNode::NodeType::Material || node.type == MyNode::NodeType::SubMaterial) {
 				node.outputValue.push_back(inputValues[0].type != Value::Type::Texture ? node.values[0] : inputValues[0]);
 				node.outputValue.push_back(inputValues[1].type != Value::Type::Color ? node.values[1] : inputValues[1]);
 				node.outputValue.push_back(inputValues[2].type != Value::Type::Vector2 ? node.values[2] : inputValues[2]);
@@ -124,6 +126,24 @@ void NodeGraph::ValueUpdate(MyNode& node) {
 			node.outputValue = node.values;
 		}
 		node.isUpdated = true;
+	}
+}
+
+void NodeGraph::NameUpdate(MyNode& parentNode, MyNode& node, int inputNum) {
+	if (node.type == MyNode::NodeType::Vector2) {
+		if (parentNode.type==MyNode::NodeType::Material || parentNode.type == MyNode::NodeType::SubMaterial) {
+			if (inputNum == 2 && node.name != "UVVector2") {
+				node.name = "UVVector2";
+			}
+		}
+
+	} else if(node.type == MyNode::NodeType::Add) {
+		if (parentNode.name == "UVVector2" && inputNum == 0 && node.name != "UVAddx") {
+			node.name = "UVAddx";
+		} else if (parentNode.name == "UVVector2" && inputNum == 1 && node.name != "UVAddy") {
+			node.name = "UVAddy";
+		}
+
 	}
 }
 
@@ -203,6 +223,7 @@ std::string NodeGraph::NodeTypeToString(MyNode::NodeType t) {
 	case MyNode::NodeType::Float: return "Float";
 	case MyNode::NodeType::Add: return "Add";
 	case MyNode::NodeType::Material: return "Material";
+	case MyNode::NodeType::SubMaterial: return "SubMaterial";
 	case MyNode::NodeType::Color: return "Color";
 	case MyNode::NodeType::Vector2: return "Vector2";
 	default: return "Unknown";
@@ -214,6 +235,7 @@ MyNode::NodeType NodeGraph::StringToNodeType(const std::string& str) {
 	if (str == "Float") return MyNode::NodeType::Float;
 	if (str == "Add") return MyNode::NodeType::Add;
 	if (str == "Material") return MyNode::NodeType::Material;
+	if (str == "SubMaterial") return MyNode::NodeType::SubMaterial;
 	if (str == "Color") return MyNode::NodeType::Color;
 	if (str == "Vector2") return MyNode::NodeType::Vector2;
 	return MyNode::NodeType::Vector2;
@@ -421,7 +443,7 @@ void MyNode::CreateNode(NodeType nodeType) {
 	switch (nodeType) {
 	case MyNode::NodeType::Texture:
 
-		name = "TextureInput";
+		name = "Texture";
 		type = MyNode::NodeType::Texture;
 		inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input, PinType::Texture });
 		outputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Output, PinType::Texture });
@@ -430,7 +452,7 @@ void MyNode::CreateNode(NodeType nodeType) {
 	case MyNode::NodeType::Float:
 		break;
 	case MyNode::NodeType::Add:
-		name = "AddNode";
+		name = "Add";
 		type = MyNode::NodeType::Add;
 		outputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Output, PinType::Float });
 		values.push_back(Value(0.0f));
@@ -442,6 +464,21 @@ void MyNode::CreateNode(NodeType nodeType) {
 
 		name = "Material";
 		type = MyNode::NodeType::Material;
+		inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input, PinType::Texture });
+		inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input, PinType::Color });
+		inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input, PinType::Vector2 });
+		inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input, PinType::Mateial });
+		values.push_back(Value("white2x2.png"));
+		values.push_back(Value(Vector4(1.0f, 1.0f, 1.0f, 1.0f)));
+		values.push_back(Value(Vector2(0.0f, 0.0f)));
+		evaluator = [](const std::vector<Value>& inputs) {
+			return !inputs.empty() ? inputs[0] : Value();
+			};
+		break;
+	case MyNode::NodeType::SubMaterial:
+
+		name = "SubMaterial";
+		type = MyNode::NodeType::SubMaterial;
 		inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input, PinType::Texture });
 		inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input, PinType::Color });
 		inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input, PinType::Vector2 });
@@ -467,7 +504,7 @@ void MyNode::CreateNode(NodeType nodeType) {
 		break;
 	case MyNode::NodeType::Vector2:
 
-		name = "Vec2Node";
+		name = "Vector2";
 		type = MyNode::NodeType::Vector2;
 		inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input, PinType::Float });
 		inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input, PinType::Float });

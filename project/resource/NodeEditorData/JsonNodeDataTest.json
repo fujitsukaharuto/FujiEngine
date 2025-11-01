@@ -2,27 +2,12 @@
     "Nodes": [
         {
             "child": [
-                null
-            ],
-            "id": 381,
-            "name": "TextureInput",
-            "nodeType": "Texture",
-            "texName": "checkerBoard.png",
-            "values": [
-                {
-                    "type": "Texture",
-                    "value": "checkerBoard.png"
-                }
-            ]
-        },
-        {
-            "child": [
                 {
                     "child": [
                         null
                     ],
-                    "id": 388,
-                    "name": "TextureInput",
+                    "id": 626,
+                    "name": "Texture",
                     "nodeType": "Texture",
                     "texName": "uvChecker.png",
                     "values": [
@@ -33,7 +18,7 @@
                     ]
                 },
                 {
-                    "id": 392,
+                    "id": 630,
                     "name": "Color",
                     "nodeType": "Color",
                     "values": [
@@ -52,8 +37,8 @@
                     "child": [
                         {
                             "addType": 0,
-                            "id": 400,
-                            "name": "AddNode",
+                            "id": 637,
+                            "name": "UVAddx",
                             "nodeType": "Add",
                             "values": [
                                 {
@@ -64,21 +49,68 @@
                         },
                         null
                     ],
-                    "id": 395,
-                    "name": "Vec2Node",
+                    "id": 633,
+                    "name": "UVVector2",
                     "nodeType": "Vector2",
                     "values": [
                         {
                             "type": "Vector2",
                             "value": [
-                                4.73599100112915,
+                                8.582989692687988,
+                                0.0
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "child": [
+                        {
+                            "child": [
+                                null
+                            ],
+                            "id": 647,
+                            "name": "Texture",
+                            "nodeType": "Texture",
+                            "texName": "checkerBoard.png",
+                            "values": [
+                                {
+                                    "type": "Texture",
+                                    "value": "checkerBoard.png"
+                                }
+                            ]
+                        },
+                        null,
+                        null,
+                        null
+                    ],
+                    "id": 641,
+                    "name": "SubMaterial",
+                    "nodeType": "SubMaterial",
+                    "values": [
+                        {
+                            "type": "Texture",
+                            "value": "white2x2.png"
+                        },
+                        {
+                            "type": "Color",
+                            "value": [
+                                1.0,
+                                1.0,
+                                1.0,
+                                1.0
+                            ]
+                        },
+                        {
+                            "type": "Vector2",
+                            "value": [
+                                0.0,
                                 0.0
                             ]
                         }
                     ]
                 }
             ],
-            "id": 384,
+            "id": 621,
             "name": "Material",
             "nodeType": "Material",
             "values": [

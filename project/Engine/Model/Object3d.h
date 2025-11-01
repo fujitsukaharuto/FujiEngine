@@ -4,9 +4,10 @@
 #include "Model.h"
 #include "Camera.h"
 #include "Object3dCommon.h"
+#include "Engine/Editor/JsonSerializer.h"
+#include "Engine/ImGuiManager/NodeGraph.h"
 #ifdef _DEBUG
 #include "imgui_node_editor.h"
-#include "Engine/ImGuiManager/NodeGraph.h"
 #endif
 
 
@@ -84,6 +85,13 @@ public:
 	/// </summary>
 	void LoadTransformFromJson(const std::string& filename);
 
+	/// <summary>
+	/// ReleaseでNodeの内容道理に動くように
+	/// </summary>
+	void LoadNodeEditorData(const std::string& filename);
+
+	void CreateNodeEditor(const std::string& filename);
+
 	//========================================================================*/
 	//* Setter
 	/// <summary>色の設定</summary>
@@ -128,6 +136,12 @@ private:
 	/// <summary>コマンドの生成</summary>
 	void CreatePropertyCommand(int type);
 
+	void NodeContentsUpdate();
+
+	void AnalysisNode(const json& j,int index);
+
+	void AnalysisValue(const json& j, int index,const std::string& typeName);
+
 	/// <summary>テクスチャをNodeから設定</summary>
 	void SetTextureNode();
 
@@ -154,12 +168,14 @@ private:
 
 	bool isMaskMode_ = false;
 	Material maskMateral_;
+	std::vector<NodeContent> nodeContentDeta_;
 
 	Vector3 prevPos_;
 	Vector3 prevRotate_;
 	Vector3 prevScale_;
 	int guizmoType_ = 0;
 	float IsUsingGuizmo_ = false;
+	std::string nodeFileName_;
 #ifdef _DEBUG
 	ax::NodeEditor::EditorContext* nodeEditorContext_ = nullptr;
 	NodeGraph nodeGraph_;

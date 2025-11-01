@@ -428,7 +428,7 @@ void ImGuiManager::DrawNodeEditor(NodeGraph* nodeGraph) {
 			}
 			if (ImGui::MenuItem("Material Node")) {
 				MyNode node;
-				node.CreateNode(MyNode::NodeType::Material);
+				node.CreateNode(MyNode::NodeType::SubMaterial);
 				nodeGraph->AddNode(node);
 			}
 			ImGui::EndMenu();

@@ -76,6 +76,7 @@ public:
 	ID3D12Resource* GetMaterialResource();
 	std::string GetPathName() const { return textureNamePath_.textureFilePath; }
 	Vector4 GetColor() { return materialDate_->color; }
+	Vector2 GetUVTrans() { return uvTrans_; }
 
 	//========================================================================*/
 	//* Setter
