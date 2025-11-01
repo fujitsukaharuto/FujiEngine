@@ -20,7 +20,6 @@ class LightManager;
 struct PickingBuffer {
 	int objID;
 	float depth;
-	uint32_t padding[2] = { 0,0 };
 };
 
 /// <summary>

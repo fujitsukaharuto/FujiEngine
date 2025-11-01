@@ -82,9 +82,10 @@ float4 ApplyMaskTexture(float4 baseColor, float2 texcoord)
     float4 maskUV = mul(float4(texcoord, 0.0f, 1.0f), gMaskMaterial.uvTransform);
     float4 maskTexColor = gMaskTexture.Sample(gSampler, maskUV.xy);
 
-    float mask = maskTexColor.r;
+    // RGBの輝度（明るさ）をマスク強度として使用
+    float mask = dot(maskTexColor.rgb, float3(0.299, 0.587, 0.114));
 
-    float3 color = baseColor.rgb * gMaskMaterial.color.rgb * mask;
+    float3 color = baseColor.rgb * gMaskMaterial.color.rgb;
     float alpha = baseColor.a * mask;
 
     return float4(color, alpha);
