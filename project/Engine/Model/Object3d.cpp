@@ -822,10 +822,12 @@ void Object3d::SetTextureNode() {
 			SetUVTrans(selNode->outputValue[2].Get<Vector2>());
 			if (selNode->child) {
 				isMaskMode_ = true;
-				if (selNode->child->outputValue.size() > 0) {
-					maskMateral_.SetTexture(selNode->child->outputValue[0].Get<std::string>());
-					maskMateral_.SetColor(selNode->child->outputValue[1].Get<Vector4>());
-					maskMateral_.SetUVTrans(selNode->child->outputValue[2].Get<Vector2>());
+				if (selNode->child->inputs.size() > 0 || selNode->child->outputs.size() > 0) {
+					if (selNode->child->outputValue.size() > 0) {
+						maskMateral_.SetTexture(selNode->child->outputValue[0].Get<std::string>());
+						maskMateral_.SetColor(selNode->child->outputValue[1].Get<Vector4>());
+						maskMateral_.SetUVTrans(selNode->child->outputValue[2].Get<Vector2>());
+					}
 				}
 			} else {
 				isMaskMode_ = false;
