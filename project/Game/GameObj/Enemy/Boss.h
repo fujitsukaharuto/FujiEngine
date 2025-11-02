@@ -136,7 +136,7 @@ public:
 private:
 
 	/// <summary>デフォルト状態にする</summary>
-	void SetDefaultBehavior();
+	void SetDefaultBehavior(bool isInvisibleItem = false);
 
 	//========================================================================*/
 	//* radial

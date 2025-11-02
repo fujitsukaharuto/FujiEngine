@@ -245,6 +245,11 @@ void Boss::Update() {
 	} else if (!isHpActive_) {
 		hpCooltime_ -= FPSKeeper::DeltaTime();
 		RadialUpdate();
+
+		UpdateWaveWall();
+		UpdateArrows();
+		UpdateRod();
+		UpdateUnderRing();
 		if (hpCooltime_ < 0.0f) {
 			isHpActive_ = true;
 			ChangeBehavior(std::make_unique<BossRoot>(this));
@@ -355,7 +360,7 @@ void Boss::ParameterGUI() {
 			nowAction = actionList_[currentActionIndex];
 		}
 		if (ImGui::Button("SetAction")) {
-			SetDefaultBehavior();
+			SetDefaultBehavior(true);
 			static const std::unordered_map<std::string, std::function<std::unique_ptr<BaseBossBehavior>(Boss*)>> behaviorFactory = {
 				{ "Root",   [](Boss* b) { return std::make_unique<BossRoot>(b); } },
 				{ "Wave", [](Boss* b) { return std::make_unique<BossAttack>(b); } },
@@ -524,7 +529,7 @@ void Boss::InitParameter() {
 }
 
 void Boss::ReStart() {
-	SetDefaultBehavior();
+	SetDefaultBehavior(true);
 	isHpActive_ = true;
 	isDying_ = false;
 	isStart_ = true;
@@ -626,7 +631,7 @@ void Boss::ReduceBossHP(bool isStrong) {
 		// ボスが死んだとき
 		if (bossHp_ < 0.0f && !isDying_) {
 			isDying_ = true;
-			SetDefaultBehavior();
+			SetDefaultBehavior(true);
 			animModel_->ChangeAnimation("dying");
 		}
 	}
@@ -1037,22 +1042,24 @@ void Boss::LoadPhase() {
 	}
 }
 
-void Boss::SetDefaultBehavior() {
+void Boss::SetDefaultBehavior(bool isInvisibleItem) {
 	beam_->SetIsLive(false);
 	for (int i = 0; i < 8; i++) {
 		ParticleManager::GetParticleCSEmitter(traceEmitterIndexes_[i]).isEmit = false;
 	}
-	for (auto& wave : walls_) {
-		wave->SetIsLive(false);
-	}
-	for (auto& arrow : arrows_) {
-		arrow->SetIsLive(false);
-	}
-	for (auto& rod : rods_) {
-		rod->SetIsLive(false);
-	}
-	for (auto& ring : undderRings_) {
-		ring->SetIsLive(false);
+	if (isInvisibleItem) {
+		for (auto& wave : walls_) {
+			wave->SetIsLive(false);
+		}
+		for (auto& arrow : arrows_) {
+			arrow->SetIsLive(false);
+		}
+		for (auto& rod : rods_) {
+			rod->SetIsLive(false);
+		}
+		for (auto& ring : undderRings_) {
+			ring->SetIsLive(false);
+		}
 	}
 	ChangeBehavior(std::make_unique<BossRoot>(this));
 	animModel_->transform.translate.y = 0.0f;
