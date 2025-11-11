@@ -15,9 +15,6 @@ TitleScene::TitleScene() {}
 
 TitleScene::~TitleScene() {
 	ParticleManager::GetParticleCSEmitterSurface(0).isEmit = false;
-	for (int i = 0; i < 5; i++) {
-		ParticleManager::GetParticleCSEmitter(i).isEmit = false;
-	}
 }
 
 void TitleScene::Initialize() {
@@ -76,56 +73,9 @@ void TitleScene::Initialize() {
 	particleTest_->transform.translate={ 11.37f,7.557f,14.83f};
 	particleTest_->SetColor({ 0.0f,0.0f,0.0f,0.0f });
 
-	/*cube_ = std::make_unique<AnimationModel>();
-	cube_->Create("T_boss.gltf");
-	cube_->LoadAnimationFile("T_boss.gltf");
-	cube_->LoadTransformFromJson("boss_transform.json");
-
-	animParentObj_ = std::make_unique<Object3d>();
-	animParentObj_->Create("boss.obj");
-	animParentObj_->SetAnimParent(cube_->GetJointTrans("mixamorig:LeftHandIndex1"));
-	animParentObj_->SetNoneScaleParent(true);
-	animParentObj_->LoadTransformFromJson("AnimParent_transform.json");*/
-
 	cMane_ = std::make_unique<CollisionManager>();
 
 	ParticleManager::Load(emit, "lightning");
-
-	// GPU Particle確認用
-	/*ParticleManager::GetParticleCSEmitterSurface(0).isEmit = true;
-	ParticleManager::GetParticleCSEmitterSurface(0).emitter->translate = { 16.0f,0.0f,14.0f };
-	for (int i = 0; i < 5; i++) {
-		ParticleManager::GetParticleCSEmitter(i).isEmit = true;
-		ParticleManager::GetParticleCSEmitter(i).emitter->count = 800;
-		ParticleManager::GetParticleCSEmitter(i).emitter->lifeTime = 60.0f;
-		if (i == 0) {
-			ParticleManager::GetParticleCSEmitter(i).emitter->translate = { 11.37f,7.557f,14.83f };
-			ParticleManager::GetParticleCSEmitter(i).emitter->prevTranslate = { 11.37f,7.557f,14.83f };
-		}
-		if (i == 1) {
-			ParticleManager::GetParticleCSEmitter(i).emitter->translate = { 16.3f,7.0f,12.5f };
-			ParticleManager::GetParticleCSEmitter(i).emitter->prevTranslate = { 14.3f,8.0f,12.5f };
-		}
-		if (i == 2) {
-			ParticleManager::GetParticleCSEmitter(i).emitter->translate = { 15.3f,9.3f,14.5f };
-			ParticleManager::GetParticleCSEmitter(i).emitter->prevTranslate = { 13.5f,9.7f,14.5f };
-		}
-		if (i == 3) {
-			ParticleManager::GetParticleCSEmitter(i).emitter->translate = { 14.0f,6.0f,15.0f };
-			ParticleManager::GetParticleCSEmitter(i).emitter->prevTranslate = { 12.0f,9.7f,13.5f };
-		}
-		if (i == 4) {
-			ParticleManager::GetParticleCSEmitter(i).emitter->translate = { 14.0f,8.0f,13.5f };
-			ParticleManager::GetParticleCSEmitter(i).emitter->prevTranslate = { 12.0f,7.0f,13.5f };
-		}
-		ParticleManager::GetParticleCSEmitter(i).emitter->colorMax = { 1.0f,0.0f,1.0f };
-		ParticleManager::GetParticleCSEmitter(i).emitter->colorMin = { 0.0f,0.0f,0.0f };
-		ParticleManager::GetParticleCSEmitter(i).emitter->velocityRandMax = Random::GetFloat(-0.03f, 0.03f);
-		ParticleManager::GetParticleCSEmitter(i).emitter->velocityRandMin = Random::GetFloat(-0.03f, 0.03f);
-
-	}
-
-	ParticleManager::GetParticleCSEmitterSurface(0).isEmit = true;*/
 }
 
 void TitleScene::Update() {
@@ -156,11 +106,12 @@ void TitleScene::Update() {
 	player_->TitleUpdate(startTime_);
 
 
-	ParticleManager::GetParticleCSEmitter(0).emitter->prevTranslate = ParticleManager::GetParticleCSEmitter(0).emitter->translate;
-	ParticleManager::GetParticleCSEmitter(0).emitter->translate = particleTest_->GetWorldPos();
-
-
-	//emit.Emit();
+	auto& emitterBase = ParticleManager::GetParticleCSEmitter(0);
+	// dynamic_castで派生クラス型に変換を試みる
+	if (auto* emitter = dynamic_cast<SphereEmitter*>(&emitterBase)) {
+		emitter->data_->prevTranslate = emitter->data_->translate;
+		emitter->data_->translate = particleTest_->GetWorldPos();
+	}
 
 	cMane_->CheckAllCollision();
 
@@ -184,8 +135,7 @@ void TitleScene::Draw() {
 
 	player_->TitleDraw();
 
-	//cube_->Draw();
-	//animParentObj_->Draw();
+	//particleTest_->Draw();
 
 #ifdef _DEBUG
 	if (!uiInvisible_) {

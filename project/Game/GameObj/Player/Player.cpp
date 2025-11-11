@@ -127,6 +127,7 @@ void Player::Update() {
 				}
 			}
 		} else {
+			// 開始時の自動移動処理
 			if (startLandingTime_ > 0.0f) {
 				LandingUpdate();
 			}
@@ -231,6 +232,7 @@ void Player::HPUpdate() {
 	hpSprite_->SetSize({ hpSize.x * t, hpSize.y });
 
 	if (isDamage_) {
+		// ダメージ喰らった時の色処理
 		if (damageCoolTime_ > 0.0f) {
 			damageCoolTime_ -= FPSKeeper::DeltaTime();
 		}
@@ -271,7 +273,7 @@ void Player::ChangeAttackBehavior(std::unique_ptr<BasePlayerAttackBehavior> beha
 void Player::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 	if (other.tag == "enemyAttack") {
 		if (!isDamage_) {
-			if (isNowAvoid_) {
+			if (isNowAvoid_) { // 回避しているなら
 				if (!isCanStrongState_) {
 					isCanStrongState_ = true;
 					InitAvoidPostEffect();
@@ -300,7 +302,7 @@ void Player::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 			if (UnderRing* ring = dynamic_cast<UnderRing*>(other.owner)) {
 				float lng = Vector3(other.worldPos - model_->transform.translate).Length();
 				if (lng < ring->GetRingRadMax() && lng > ring->GetRingRadMin()) {
-					if (isNowAvoid_) {
+					if (isNowAvoid_) { // 回避しているなら
 						if (!isCanStrongState_) {
 							isCanStrongState_ = true;
 							InitAvoidPostEffect();
@@ -351,7 +353,7 @@ void Player::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
 			if (UnderRing* ring = dynamic_cast<UnderRing*>(other.owner)) {
 				float lng = Vector3(other.worldPos - model_->transform.translate).Length();
 				if (lng < ring->GetRingRadMax() && lng > ring->GetRingRadMin()) {
-					if (isNowAvoid_) {
+					if (isNowAvoid_) { // 回避しているなら
 						if (!isCanStrongState_) {
 							isCanStrongState_ = true;
 							InitAvoidPostEffect();
@@ -407,7 +409,7 @@ void Player::MoveTrans(const float& speed) {
 
 void Player::MoveRotate() {
 	Vector3 forward = (targetPos_ - model_->transform.translate).Normalize();
-	Quaternion targetRotation = Quaternion::LookRotation(forward); // Y軸を上とした視線方向
+	Quaternion targetRotation = Quaternion::LookRotation(forward);
 	// 現在の回転（Y軸回転からクォータニオンを構成する）
 	//Quaternion currentRotation = Quaternion::FromEuler(model_->transform.rotate);
 	// 最短経路で補間
@@ -415,6 +417,7 @@ void Player::MoveRotate() {
 	//Quaternion newRotation = Quaternion::Slerp(targetRotation, currentRotation, 0.01f); // なんかバグっちゃってる
 
 	float zRotate = 0.0f;
+	// 移動方向によって傾きを加える
 	if (inputDirection_.x == -1.0f) {
 		zRotate = 0.2f;
 	} else if (inputDirection_.x == 1.0f) {
@@ -488,6 +491,7 @@ void Player::Fall(float& speed) {
 	if (!isFall_) speed = 0.0f;
 	model_->transform.translate.y += speed * FPSKeeper::DeltaTime();
 	if (isFall_) {
+		// スピードの更新
 		speed = ComparNum(-(speed - (gravity_ * FPSKeeper::DeltaTime())), maxFallSpeed_);
 		speed = -speed;
 	}
@@ -512,6 +516,7 @@ void Player::Avoid([[maybe_unused]]float& avoidTime) {
 
 		float t = avoidTime / 30.0f;
 		t = 1.0f - powf(1.0f - t, 2);
+		// 回避方向によって回転する
 		if (avoidDirection_ > 0.0f) {
 			avoidRotate_ = std::lerp(0.0f, -std::numbers::pi_v<float>*4.0f, t);
 		} else {
@@ -523,6 +528,7 @@ void Player::Avoid([[maybe_unused]]float& avoidTime) {
 		MoveRotate();
 	}
 	if (avoidTime == 30.0f) {
+		// しっかりデフォルトに戻す
 		avoidRotate_ = 0.0f;
 		avoidCoolTime_ = 30.0f;
 		if (isCanStrongState_) {
@@ -553,6 +559,7 @@ void Player::InitBullet() {
 void Player::ReleaseBullet() {
 	for (auto& bullet : bullets_) {
 		if (bullet->GetIsLive() && bullet->GetIsCharge()) {
+			// 発射方向をきめる
 			Vector3 forward = { 0, 0, 1 };
 			Matrix4x4 rotateMatrix = MakeRotateXYZMatrix(model_->transform.rotate);
 			Vector3 worldForward = TransformNormal(forward, rotateMatrix);
@@ -583,6 +590,7 @@ void Player::LandingUpdate() {
 		startLandingTime_ -= delta;
 		startLandingTime_ = (std::max)(0.0f, startLandingTime_);
 
+		// 3点を使って位置を決める
 		float t = (std::min)((1.0f - startLandingTime_ / startLandingMax_), 1.0f);
 		Vector3 pos = (1.0f - t) * (1.0f - t) * titleStartP_ + 2.0f * (1.0f - t) * t * titleCenterP_ + t * t * titleEndP_;
 		model_->transform.translate = pos;
@@ -594,6 +602,7 @@ void Player::LandingUpdate() {
 			Vector3 predir = (2.0f * (1.0f - pret)) * (titleCenterP_ - titleStartP_) + (2.0f * pret) * (titleEndP_ - titleCenterP_);
 			predir = predir.Normalize();
 
+			// 前方向と現在方向から回転を取得
 			Quaternion rot = Quaternion::LookRotation(dir);
 			Quaternion prerot = Quaternion::LookRotation(predir);
 			Quaternion newRot = Quaternion::Slerp(prerot, rot, 0.1f);
@@ -636,7 +645,7 @@ void Player::SettingTitleStartPosition(const Vector3& start, const Vector3& cent
 }
 
 void Player::TitleStartUpdate([[maybe_unused]] float titleTime) {
-
+	// 3点から位置を取得
 	float t = (std::min)((1.0f - titleTime / 90.0f), 1.0f);
 	float pret = (std::min)((1.0f - preTitleTime_ / 90.0f), 1.0f);
 	Vector3 pos = (1.0f - t) * (1.0f - t) * titleStartP_ + 2.0f * (1.0f - t) * t * titleCenterP_ + t * t * titleEndP_;
@@ -646,6 +655,7 @@ void Player::TitleStartUpdate([[maybe_unused]] float titleTime) {
 	Vector3 predir = (2.0f * (1.0f - pret)) * (titleCenterP_ - titleStartP_) + (2.0f * pret) * (titleEndP_ - titleCenterP_);
 	predir = predir.Normalize();
 
+	// 前方向と現在方向から回転を取得
 	Quaternion rot = Quaternion::LookRotation(dir);
 	Quaternion prerot = Quaternion::LookRotation(predir);
 	Quaternion newRot = Quaternion::Slerp(prerot, rot, 0.1f);

@@ -520,7 +520,7 @@ void ParticleManager::ParentReset() {
 	}
 }
 
-GPUParticleSystem::GPUParticleEmitter& ParticleManager::GetParticleCSEmitter(int index) {
+IGPUEmitter& ParticleManager::GetParticleCSEmitter(int index) {
 	ParticleManager* instance = GetInstance();
 	return instance->gpuParticleSystem_->GetParticleCSEmitter(index);
 }

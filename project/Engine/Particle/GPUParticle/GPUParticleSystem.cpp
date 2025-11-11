@@ -20,10 +20,6 @@ void GPUParticleSystem::Initialize(DXCom* pDxcom, SRVManager* srvManager) {
 
 	InitParticleCS();
 	InitGPUEmitter();
-	InitGPUEmitter();
-	InitGPUEmitter();
-	InitGPUEmitter();
-	InitGPUEmitter();
 	InitGPUEmitterSurface("DeadTree_2.obj");
 	InitGPUEmitterSurface("BeamCrystal.obj");
 	//InitGPUEmitterTexture();
@@ -66,29 +62,10 @@ void GPUParticleSystem::Draw(const D3D12_VERTEX_BUFFER_VIEW& vbView, const D3D12
 }
 
 int GPUParticleSystem::InitGPUEmitter() {
-	GPUParticleEmitter CSEmitter;
-	CSEmitter.isEmit = false;
-
-	CSEmitter.emitterResource = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), (sizeof(EmitterSphere)));
-	CSEmitter.emitterResource->Map(0, nullptr, reinterpret_cast<void**>(&CSEmitter.emitter));
-	CSEmitter.emitter->count = 300;
-	CSEmitter.emitter->lifeTime = 60.0f;
-	CSEmitter.emitter->frequency = 0.5f;
-	CSEmitter.emitter->frequencyTime = 0.0f;
-	CSEmitter.emitter->translate = Vector3(0.0f, 0.0f, 0.0f);
-	CSEmitter.emitter->scale = Vector3(0.1f, 0.1f, 0.1f);
-	CSEmitter.emitter->radius = 2.5f;
-	CSEmitter.emitter->emit = 0;
-	CSEmitter.emitter->colorMax = { 1.0f,1.0f,1.0f };
-	CSEmitter.emitter->colorMin = { 0.0f,0.0f,0.0f };
-	CSEmitter.emitter->baseVelocity = { 0.0f,0.0f,0.0f };
-	CSEmitter.emitter->velocityRandMax = 0.0f;
-	CSEmitter.emitter->velocityRandMin = 0.0f;
-
-	CSEmitter.emitter->prevTranslate = Vector3(0.0f, 0.0f, 0.0f);
-
-	CSEmitter.emitterIndex = csEmitterIndex_;
-	csEmitters_.push_back(CSEmitter);
+	std::unique_ptr<SphereEmitter> CSEmitter;
+	CSEmitter = std::make_unique<SphereEmitter>(dxcommon_);
+	CSEmitter->isEmit_ = false;
+	csEmitters_.push_back(std::move(CSEmitter));
 	int result = csEmitterIndex_;
 	csEmitterIndex_++;
 	return result;
@@ -215,37 +192,7 @@ void GPUParticleSystem::ParticleCSDebugGUI() {
 		ImGui::DragInt("emitIndex", &editCSEmitInd_, 1.0f, 0, int(csEmitters_.size() - 1));
 		int idx = std::min(editCSEmitInd_, static_cast<int>(csEmitters_.size()) - 1);
 		editCSEmitInd_ = idx;
-		if (ImGui::TreeNode("ParticleCS Emit Control")) {
-
-			ImGui::Checkbox("isEmit", &csEmitters_[idx].isEmit);
-
-			int dragCount = int(csEmitters_[idx].emitter->count);
-			ImGui::DragInt("emitCount", &dragCount, 1, 0, 100000);
-			csEmitters_[idx].emitter->count = uint32_t(dragCount);
-
-			ImGui::DragFloat("lifeTime", &csEmitters_[idx].emitter->lifeTime, 0.1f, 1.0f, 300.0f);
-			ImGui::DragFloat("frequency", &csEmitters_[idx].emitter->frequency, 0.1f, 0.0f, 300.0f);
-
-			Vector3 prePos = csEmitters_[idx].emitter->translate;
-			ImGui::DragFloat3("translate", &csEmitters_[idx].emitter->translate.x, 0.1f);
-			csEmitters_[idx].emitter->prevTranslate = prePos;
-			ImGui::DragFloat3("preTranslate", &csEmitters_[idx].emitter->prevTranslate.x, 0.1f);
-
-			ImGui::DragFloat("radius", &csEmitters_[idx].emitter->radius, 0.1f, 0.0f, 300.0f);
-
-			ImGui::SeparatorText("Color");
-			ImGui::DragFloat3("colorMax", &csEmitters_[idx].emitter->colorMax.x, 0.01f, 0.0f, 1.0f);
-			ImGui::DragFloat3("colorMin", &csEmitters_[idx].emitter->colorMin.x, 0.01f, 0.0f, 1.0f);
-
-			ImGui::SeparatorText("Velocity");
-			ImGui::DragFloat3("baseVelocity", &csEmitters_[idx].emitter->baseVelocity.x, 0.01f, 0.0f, 1.0f);
-			ImGui::DragFloat("velocityRandMax", &csEmitters_[idx].emitter->velocityRandMax, 0.01f, -1.0f, 1.0f);
-			ImGui::DragFloat("velocityRandMin", &csEmitters_[idx].emitter->velocityRandMin, 0.01f, -1.0f, 1.0f);
-
-			ImGui::Text("DeltaTime1:%f", FPSKeeper::DeltaTime());
-			ImGui::Text("DeltaTime2:%f", FPSKeeper::DeltaTimeFrame());
-			ImGui::TreePop();
-		}
+		csEmitters_[idx]->DebugGUI();
 	}
 #endif // _DEBUG
 }
@@ -328,9 +275,9 @@ void GPUParticleSystem::ParticleSurfaceCSDebugGUI() {
 #endif // _DEBUG
 }
 
-GPUParticleSystem::GPUParticleEmitter& GPUParticleSystem::GetParticleCSEmitter(int index) {
+IGPUEmitter& GPUParticleSystem::GetParticleCSEmitter(int index) {
 	assert(index >= 0 && index < csEmitters_.size());
-	return csEmitters_[index];
+	return *csEmitters_[index].get();
 }
 
 GPUParticleSystem::GPUParticleEmitterTexture& GPUParticleSystem::GetParticleCSEmitterTexture(int index) {
@@ -419,19 +366,7 @@ void GPUParticleSystem::DrawParticleCS(const D3D12_VERTEX_BUFFER_VIEW& vbView, c
 
 void GPUParticleSystem::UpdateGPUEmitter() {
 	for (int i = 0; i < csEmitters_.size(); i++) {
-		auto& emitter = csEmitters_[i];
-		if (emitter.isEmit) {
-			emitter.emitter->frequencyTime += FPSKeeper::DeltaTime();
-			if (emitter.emitter->frequency <= emitter.emitter->frequencyTime) {
-				emitter.emitter->frequencyTime -= emitter.emitter->frequency;
-				emitter.emitter->emit = 1;
-			} else {
-				emitter.emitter->emit = 0;
-			}
-		} else {
-			emitter.emitter->emit = 0;
-			emitter.emitter->frequencyTime = 0.0f;
-		}
+		csEmitters_[i]->Update(FPSKeeper::DeltaTime());
 	}
 }
 
@@ -482,16 +417,16 @@ void GPUParticleSystem::UpdateParticleCSDispatch() {
 }
 
 void GPUParticleSystem::EmitterDispatch() {
+	ParticleCSHandles handles = {
+	particleCSUAVHandle_.second,
+	perFrameResource_->GetGPUVirtualAddress(),
+	freeListIndexUAVHandle_.second,
+	freeListUAVHandle_.second
+	};
+
 	for (int i = 0; i < csEmitters_.size(); i++) {
-		dxcommon_->GetPipelineManager()->SetCSPipeline(Pipe::EmitParticleCS);
-		dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(0, particleCSUAVHandle_.second);
-		dxcommon_->GetCommandList()->SetComputeRootConstantBufferView(1, csEmitters_[i].emitterResource->GetGPUVirtualAddress());
-		dxcommon_->GetCommandList()->SetComputeRootConstantBufferView(2, perFrameResource_->GetGPUVirtualAddress());
-		dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(3, freeListIndexUAVHandle_.second);
-		dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(4, freeListUAVHandle_.second);
-		if (csEmitters_[i].emitter->count == 0) continue;
-		int dispatchCount = (csEmitters_[i].emitter->count + threadGroupSize_ - 1) / threadGroupSize_;
-		dxcommon_->GetCommandList()->Dispatch(dispatchCount, 1, 1);
+		csEmitters_[i]->Dispatch(dxcommon_->GetCommandList(),
+			dxcommon_, srvManager_, handles);
 	}
 }
 

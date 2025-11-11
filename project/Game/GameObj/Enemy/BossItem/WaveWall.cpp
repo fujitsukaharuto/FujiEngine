@@ -90,6 +90,7 @@ void WaveWall::Initialize() {
 void WaveWall::Update() {
 
 	if (isLive_) {
+		// LifeTimeの更新
 		if (lifeTime_ > 0.0f) {
 			lifeTime_ -= FPSKeeper::DeltaTime();
 			uvTransX_ += 0.05f * FPSKeeper::DeltaTime();
@@ -158,7 +159,7 @@ void WaveWall::CalculetionFollowVec(const Vector3& target) {
 
 	if (lifeTime_ > 150.0f) {
 		// 現在の向きと目標の向きのクォータニオンを作成
-		Quaternion currentRot = Quaternion::LookRotation(forward);  // ※LookRotation関数を追加する必要あり
+		Quaternion currentRot = Quaternion::LookRotation(forward);
 		Quaternion targetRot = Quaternion::LookRotation(toTarget);
 
 		// 補間
@@ -172,7 +173,7 @@ void WaveWall::CalculetionFollowVec(const Vector3& target) {
 		velocity_ = newForward * velocity_.Length();
 
 		Quaternion finalRot = newRot;
-		model_->transform.rotate = Quaternion::QuaternionToEuler(finalRot);  // オプション：オイラー角に変換して代入
+		model_->transform.rotate = Quaternion::QuaternionToEuler(finalRot);
 	}
 }
 

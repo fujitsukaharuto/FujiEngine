@@ -167,6 +167,7 @@ private:
 	std::string nowTextureName;
 
 	bool isMaskMode_ = false;
+	bool isUseNodeGraph_ = false;
 	Material maskMateral_;
 	std::vector<NodeContent> nodeContentDeta_;
 

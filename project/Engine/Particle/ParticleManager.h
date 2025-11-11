@@ -3,7 +3,7 @@
 #include <map>
 #include "Particle.h"
 #include "ParticleEmitter.h"
-#include "GPUParticleSystem.h"
+#include "GPUParticle/GPUParticleSystem.h"
 #include "Model.h"
 #include "Object3d.h"
 #include "Math/Matrix/MatrixCalculation.h"
@@ -134,7 +134,7 @@ public:
 
 	//========================================================================*/
 	//* Getter
-	static GPUParticleSystem::GPUParticleEmitter& GetParticleCSEmitter(int index);
+	static IGPUEmitter& GetParticleCSEmitter(int index);
 	static GPUParticleSystem::GPUParticleEmitterTexture& GetParticleCSEmitterTexture(int index);
 	static GPUParticleSystem::GPUParticleEmitterSurface& GetParticleCSEmitterSurface(int index);
 

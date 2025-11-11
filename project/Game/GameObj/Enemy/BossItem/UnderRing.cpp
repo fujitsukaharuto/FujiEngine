@@ -37,6 +37,7 @@ void UnderRing::Initialize() {
 
 void UnderRing::Update() {
 	if (isLive_) {
+		// LifeTimeの更新
 		if (lifeTime_ > 0.0f) {
 			lifeTime_ -= FPSKeeper::DeltaTime();
 			uvTransX_ += 0.05f * FPSKeeper::DeltaTime();

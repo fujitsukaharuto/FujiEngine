@@ -111,6 +111,14 @@ void Object3d::CreateCylinder(float topRadius, float bottomRadius, float height)
 
 void Object3d::Draw(Material* mate, bool isAdd) {
 	SetWVP();
+#ifdef _DEBUG
+	if (!isUseNodeGraph_) {
+		NodeContentsUpdate();
+	}
+#endif // _DEBUG
+#ifdef _RELEASE
+	NodeContentsUpdate();
+#endif // _RELEASE
 
 	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
 	if (isMaskMode_) {
@@ -360,6 +368,7 @@ void Object3d::DebugGUI() {
 			ImVec2 center = ImGui::GetMainViewport()->GetCenter();
 			ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 			if (ImGui::BeginPopupModal("Material Window", NULL)) {
+				isUseNodeGraph_ = true;
 				SetTextureNode();
 				ImGui::Separator();
 				if (ImGui::Button("OK", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
@@ -369,6 +378,8 @@ void Object3d::DebugGUI() {
 				ImGui::SameLine();
 				if (ImGui::Button("Save", ImVec2(120, 0))) { JsonSerializer::SerializeJsonData(nodeGraph_.SaveNodeData(), nodeFileName_); }
 				ImGui::EndPopup();
+			} else {
+				isUseNodeGraph_ = false;
 			}
 		} else {
 			ImGui::SeparatorText("Add New NodeEditor");
@@ -387,8 +398,6 @@ void Object3d::DebugGUI() {
 			}
 		}
 		ImGui::TreePop();
-	} else {
-		NodeContentsUpdate();
 	}
 
 	if (ImGui::TreeNodeEx("SetModel", flags)) {

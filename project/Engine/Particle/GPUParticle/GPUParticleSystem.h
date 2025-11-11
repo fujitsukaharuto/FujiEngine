@@ -2,7 +2,9 @@
 #include <wrl/client.h>
 #include <d3d12.h>
 #include <map>
-#include "Particle.h"
+#include "../Particle.h"
+#include "GPUEmitter/SphereEmitter.h"
+
 #include "Model.h"
 #include "Object3d.h"
 #include "Math/Matrix/MatrixCalculation.h"
@@ -24,36 +26,6 @@ struct PerView {
 struct PerFrame {
 	float time;
 	float deltaTime;
-};
-
-/// <summary>
-/// GPUパーティクルエミッター
-/// </summary>
-struct EmitterSphere {
-	Vector3 translate;
-	float padding;
-	Vector3 scale;
-	float radius;
-	uint32_t count;
-	float lifeTime;
-	float frequency;
-	float frequencyTime;
-	uint32_t emit;
-
-	// color
-	Vector3 colorMax;
-	Vector3 colorMin;
-	float padding2;
-
-	// velocity
-	Vector3 baseVelocity;
-	float velocityRandMax;
-	float velocityRandMin;
-
-	// distanceEmit
-	Vector3 prevTranslate;
-	float padding4;
-
 };
 
 /// <summary>
@@ -132,16 +104,6 @@ public:
 public:
 
 	/// <summary>
-	/// エミッターデータ
-	/// </summary>
-	struct GPUParticleEmitter {
-		EmitterSphere* emitter;
-		ComPtr<ID3D12Resource> emitterResource;
-		bool isEmit = false;
-		int emitterIndex = 0;
-	};
-
-	/// <summary>
 	/// Textureエミッターデータ
 	/// </summary>
 	struct GPUParticleEmitterTexture {
@@ -185,7 +147,7 @@ public:
 
 	//========================================================================*/
 	//* Getter
-	GPUParticleEmitter& GetParticleCSEmitter(int index);
+	IGPUEmitter& GetParticleCSEmitter(int index);
 	GPUParticleEmitterTexture& GetParticleCSEmitterTexture(int index);
 	GPUParticleEmitterSurface& GetParticleCSEmitterSurface(int index);
 
@@ -229,7 +191,7 @@ private:
 	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> freeListUAVHandle_;
 
 
-	std::vector<GPUParticleEmitter> csEmitters_;
+	std::vector<std::unique_ptr<IGPUEmitter>> csEmitters_;
 	std::vector<GPUParticleEmitterTexture> csEmitterTexs_;
 	std::vector<GPUParticleEmitterSurface> csEmitterSurfces_;
 	

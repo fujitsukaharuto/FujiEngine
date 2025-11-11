@@ -24,6 +24,7 @@ void PlayerBullet::Initialize() {
 
 void PlayerBullet::Update() {
 	if (isLive_) {
+		// 位置の更新
 		model_->transform.translate += (velocity_ * speed_) * FPSKeeper::DeltaTime();
 
 		collider_->SetPos(model_->GetWorldPos());
@@ -59,7 +60,7 @@ void PlayerBullet::CalculetionFollowVec(const Vector3& target) {
 	Vector3 forward = velocity_.Normalize();
 
 	// 現在の向きと目標の向きのクォータニオンを作成
-	Quaternion currentRot = Quaternion::LookRotation(forward);  // ※LookRotation関数を追加する必要あり
+	Quaternion currentRot = Quaternion::LookRotation(forward);
 	Quaternion targetRot = Quaternion::LookRotation(toTarget);
 
 	// 補間
@@ -91,7 +92,7 @@ void PlayerBullet::CalculetionFollowVec(const Vector3& target) {
 void PlayerBullet::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 	if (other.tag == "testBoss") {
 		isLive_ = false;
-		if (isStrnght_) {
+		if (isStrnght_) { // 強化弾だった時の処理
 			hitSmoke_.Emit();
 			hitcircle_.Emit();
 			hit3_.Emit();
