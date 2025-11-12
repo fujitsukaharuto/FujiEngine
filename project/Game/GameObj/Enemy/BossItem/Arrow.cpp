@@ -134,7 +134,7 @@ void Arrow::InitArrow(const Vector3& pos, float emitTime) {
 void Arrow::TargetSetting(const Vector3& target) {
 	if (animationTime_ <= totalAnimationTime_ && arrivalTime_ >= totalArrivalTime_) {
 		endP_ = target;
-		if (endP_.z == startP_.z) {
+		if (endP_.z == startP_.z) { // ｚ軸が同じになり回転がおかしくならないようにする
 			startP_.z -= 0.001f;
 		}
 		endP_.y = 0.0f;
@@ -152,7 +152,7 @@ void Arrow::EmitTimeUpdate() {
 
 void Arrow::AnimaTimeUpdate() {
 	if (emitTime_ > 0.0f) return;
-	if (animationTime_ > 0.0f) {
+	if (animationTime_ > 0.0f) { // 発射前の回転を行う
 		animationTime_ -= FPSKeeper::DeltaTime();
 		if (animationTime_ < 0.0f)
 			animationTime_ = 0.0f;
@@ -184,6 +184,7 @@ void Arrow::ArrivalTimeUpdate() {
 		}
 		float pret = (std::min)((1.0f - arrivalTime_ / totalArrivalTime_), 1.0f);
 		arrivalTime_ -= FPSKeeper::DeltaTime();
+		// 放物線の挙動を制御する
 		float t = (std::min)((1.0f - arrivalTime_ / totalArrivalTime_), 1.0f);
 		Vector3 pos = (1.0f - t) * (1.0f - t) * startP_ + 2.0f * (1.0f - t) * t * midtermP_ + t * t * endP_;
 		model_->transform.translate = pos;
@@ -191,6 +192,7 @@ void Arrow::ArrivalTimeUpdate() {
 			emitter->data_->translate = model_->transform.translate;
 		}
 
+		// 回転を決める
 		Vector3 dir = (2.0f * (1.0f - t)) * (midtermP_ - startP_) + (2.0f * t) * (endP_ - midtermP_);
 		dir = dir.Normalize();
 		Vector3 predir = (2.0f * (1.0f - pret)) * (midtermP_ - startP_) + (2.0f * pret) * (endP_ - midtermP_);

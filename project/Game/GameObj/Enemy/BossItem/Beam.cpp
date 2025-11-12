@@ -274,6 +274,7 @@ bool Beam::BeamRotate() {// これは今使ってない後から無くすつも�
 		if (lifeTime_ > 400.0f) {
 			t = 1.0f - ((lifeTime_ - 400.0f) / 20.0f);
 		}
+		// ビームの回転
 		beam1_->transform.scale.x = std::lerp(0.0f, beam1BaseScale_, t);
 		beam1_->transform.scale.z = std::lerp(0.0f, beam1BaseScale_, t);
 		beam2_->transform.scale.x = std::lerp(0.0f, beam2BaseScale_, t);
@@ -383,7 +384,7 @@ void Beam::SetBossParent(Boss* boss) {
 }
 
 void Beam::ChangeBeamStep() {
-	if (changeTime_ >= 40.0f) {
+	if (changeTime_ >= 40.0f) { // ビームの段階を変える為の処理、位置回転を元に
 		model_->transform.translate.y = 5.0f;
 		model_->transform.rotate.x = 1.56f;
 
@@ -428,7 +429,7 @@ void Beam::BeamExpand(BeamStep step) {
 			beamParticle_->Emit();
 		}
 
-		for (auto& beam : beams_) {
+		for (auto& beam : beams_) { // 拡大を行う
 			beam.beam1->transform.scale.x = std::lerp(0.0f, beam1BaseScale_ * sizeRate, t);
 			beam.beam1->transform.scale.z = std::lerp(0.0f, beam1BaseScale_ * sizeRate, t);
 			beam.beam2->transform.scale.x = std::lerp(0.0f, beam2BaseScale_ * sizeRate, t);
@@ -518,7 +519,7 @@ void Beam::BeamShrink(BeamStep step) {
 			sizeRate = 0.75f;
 		}
 
-		for (auto& beam : beams_) {
+		for (auto& beam : beams_) { // ビームの縮小を行う
 			beam.beam1->transform.scale.x = std::lerp(beam1BaseScale_ * sizeRate, 0.0f, t);
 			beam.beam1->transform.scale.z = std::lerp(beam1BaseScale_ * sizeRate, 0.0f, t);
 			beam.beam2->transform.scale.x = std::lerp(beam2BaseScale_ * sizeRate, 0.0f, t);

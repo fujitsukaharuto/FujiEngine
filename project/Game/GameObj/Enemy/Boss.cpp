@@ -232,7 +232,7 @@ void Boss::Update() {
 
 		ShakeHP();
 
-	} else if (isStart_) {
+	} else if (isStart_) { // 開始時の召喚処理
 		if (EnergyUpdate()) {
 			startTime_ -= FPSKeeper::DeltaTime();
 			if (startTime_ > 40.0f && startTime_ < 200.0f) {
@@ -246,7 +246,7 @@ void Boss::Update() {
 				ChangeBehavior(std::make_unique<BossRoot>(this));
 			}
 		}
-	} else if (!isHpActive_) {
+	} else if (!isHpActive_) { // HPの段階が切り替わった際の処理
 		hpCooltime_ -= FPSKeeper::DeltaTime();
 		RadialUpdate();
 
@@ -553,6 +553,7 @@ void Boss::ReduceBossHP(bool isStrong) {
 		} else {
 			bossHp_--;
 		}
+		// フェーズやHPの段階を切り替える為の処理
 		switch (BossHPState(nowHpIndex_)) {
 		case BossHPState::Max:
 			HPColorSet(80.0f, 20.0f);
@@ -655,6 +656,7 @@ void Boss::HPColorSet(float under, float index) {
 
 void Boss::ShakeHP() {
 	if (isShakeSprite_) {
+		// ダメージ喰らった際にHPバーの色を変えていく
 		shakeTime_ -= FPSKeeper::DeltaTime();
 		if (shakeTime_ < 0.0f) {
 			shakeTime_ = 0.0f;
@@ -711,6 +713,7 @@ void Boss::WaveWallAttack() {
 
 	CameraManager::GetInstance()->GetCamera()->IssuanceShake(0.2f, 15.0f);
 
+	// 波攻撃の出現位置を決める
 	Vector3 wavePos = { 0.0f,0.0f,4.5f };
 	Matrix4x4 rotateMatrix = MakeRotateYMatrix(animModel_->transform.rotate.y);
 	wavePos = TransformNormal(wavePos, rotateMatrix);
@@ -750,6 +753,7 @@ void Boss::ArrowAttack() {
 		if (count == 4) break;
 		if (arrow->GetIsLive()) continue;
 
+		// 矢の位置と飛ぶまでの時間を決める
 		Vector3 arrowPos = arrowParents_[count]->GetWorldPos();
 		float emittTime = 50.0f;
 		if (count == 0) emittTime = 50.0f;
@@ -776,6 +780,7 @@ void Boss::RodFall() {
 		if (count == 6) break;
 		if (rod->GetIsLive()) continue;
 
+		// ロッドの出現位置を決める
 		Vector3 rodPos = animModel_->transform.translate;
 		rodPos.x += Random::GetFloat(-70.0f, 70.0f);
 		rodPos.y = 20.0f;
@@ -860,7 +865,7 @@ bool Boss::BeamCharge() {
 			if (emitter) {
 				emitter->data_->prevTranslate = traceAnchors_[i]->GetWorldPos();
 			}
-			if (chargeParents_[i]->transform.scale.x > 0.0f) {
+			if (chargeParents_[i]->transform.scale.x > 0.0f) { // チャージのサイズを縮小していく
 				ShrinkScale(i, 0.55f * FPSKeeper::DeltaTime());
 				chargeParents_[i]->transform.rotate.z += 0.0225f * FPSKeeper::DeltaTime();
 			}
@@ -898,7 +903,7 @@ bool Boss::BeamCharge() {
 	} else if (chargeSize_ <= 0.0f) {
 		result = true;
 		for (int i = 0; i < 8; i++) {
-			if (chargeParents_[i]->transform.scale.x > 0.0f) {
+			if (chargeParents_[i]->transform.scale.x > 0.0f) { // 完全に真ん中に集結するようにする
 				auto& emitterBase = ParticleManager::GetParticleCSEmitter(traceEmitterIndexes_[i]);
 				if (auto* emitter = dynamic_cast<SphereEmitter*>(&emitterBase)) {
 					emitter->data_->prevTranslate = traceAnchors_[i]->GetWorldPos();
@@ -957,6 +962,7 @@ bool Boss::JumpAttack() {
 		}
 	}
 
+	// 時間でジャンプの挙動を制御する
 	if (jumpTime_ <= 120.0f && jumpTime_ >= 90.0f) {//120~90 //30
 
 		float flyT = 1.0f - ((jumpTime_ - 90.0f) / 30.0f);
@@ -1174,7 +1180,7 @@ void Boss::ExpandSummon() {
 		startWaiting_ -= FPSKeeper::DeltaTime();
 		return;
 	}
-	if (summonCircleExpandTime_ > 0.0f) {
+	if (summonCircleExpandTime_ > 0.0f) { // 召喚陣の拡大
 		summonCircleExpandTime_ -= FPSKeeper::DeltaTime();
 		float t = (std::max)(summonCircleExpandTime_ / 50.0f, 0.0f);
 		summonRadius_ = std::lerp(30.0f, 10.0f, t);
@@ -1185,12 +1191,12 @@ void Boss::ExpandSummon() {
 
 void Boss::EnergyTimeUpdate() {
 	if (summonCircleExpandTime_ > 0.0f) return;
-	if (energyTime_ > 0.0f) {
+	if (energyTime_ > 0.0f) { // 召喚時の更新処理
 		if (energyTime_ >= 115.0f) {
 			energySphere_.Emit();
 		}
 		energyTime_ -= FPSKeeper::DeltaTime();
-		if (energyTime_ >= 60.0f) {
+		if (energyTime_ >= 60.0f) { // ボスの位置更新
 			float t = (std::max)((energyTime_ - 60.0f) / 60.0f, 0.0f);
 			animModel_->transform.translate.y = std::lerp(bossYPos_, -30.0f, t);
 		}
