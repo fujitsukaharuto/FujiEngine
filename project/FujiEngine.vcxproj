@@ -185,6 +185,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Model\Sprite.cpp" />
     <ClCompile Include="Engine\Model\TextureManager.cpp" />
     <ClCompile Include="Engine\Particle\GPUParticle\GPUEmitter\SphereEmitter.cpp" />
+    <ClCompile Include="Engine\Particle\GPUParticle\GPUEmitter\TextureBasedEmitter.cpp" />
     <ClCompile Include="Engine\Particle\GPUParticle\GPUParticleSystem.cpp" />
     <ClCompile Include="Engine\Particle\ParticleEmitter.cpp" />
     <ClCompile Include="Engine\Particle\ParticleManager.cpp" />
@@ -318,6 +319,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Model\Sprite.h" />
     <ClInclude Include="Engine\Model\TextureManager.h" />
     <ClInclude Include="Engine\Particle\GPUParticle\GPUEmitter\SphereEmitter.h" />
+    <ClInclude Include="Engine\Particle\GPUParticle\GPUEmitter\TextureBasedEmitter.h" />
     <ClInclude Include="Engine\Particle\GPUParticle\GPUParticleSystem.h" />
     <ClInclude Include="Engine\Particle\GPUParticle\IGPUParticleEmitter.h" />
     <ClInclude Include="Engine\Particle\Particle.h" />

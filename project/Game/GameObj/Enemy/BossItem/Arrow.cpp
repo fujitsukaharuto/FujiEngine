@@ -9,7 +9,7 @@ Arrow::Arrow() {
 
 Arrow::~Arrow() {
 	if (isArrow_) {
-		ParticleManager::GetParticleCSEmitter(emitterNumber_).SetEmit(false);
+		ParticleManager::GetSphereEmitter(emitterNumber_).SetEmit(false);
 	}
 }
 
@@ -123,12 +123,9 @@ void Arrow::InitArrow(const Vector3& pos, float emitTime) {
 
 	isLive_ = true;
 
-	auto& emitterBase = ParticleManager::GetParticleCSEmitter(emitterNumber_);
-	// dynamic_castで派生クラス型に変換を試みる
-	if (auto* emitter = dynamic_cast<SphereEmitter*>(&emitterBase)) {
-		emitter->data_->prevTranslate = model_->transform.translate;
-		emitter->data_->translate = model_->transform.translate;
-	}
+	auto& emitter = ParticleManager::GetSphereEmitter(emitterNumber_);
+	emitter.data_->prevTranslate = model_->transform.translate;
+	emitter.data_->translate = model_->transform.translate;
 }
 
 void Arrow::TargetSetting(const Vector3& target) {
@@ -163,7 +160,7 @@ void Arrow::AnimaTimeUpdate() {
 		if (animationTime_ == 0.0f)
 			model_->transform.rotate.y = 0.0f;
 		if (animationTime_ <= 0.0f) {
-			ParticleManager::GetParticleCSEmitter(emitterNumber_).SetEmit(true);
+			ParticleManager::GetSphereEmitter(emitterNumber_).SetEmit(true);
 			AudioPlayer::GetInstance()->SoundPlayWave(*throwSE_, 0.2f);
 		}
 	}
@@ -172,25 +169,16 @@ void Arrow::AnimaTimeUpdate() {
 void Arrow::ArrivalTimeUpdate() {
 	if (emitTime_ > 0.0f || animationTime_ > 0.0f) return;
 	if (arrivalTime_ > 0.0f) {
-		auto& emitterBase = ParticleManager::GetParticleCSEmitter(emitterNumber_);
-		// dynamic_castで派生クラス型に変換を試みる
-		SphereEmitter* emitter = nullptr;
-		if (auto* emitterCast = dynamic_cast<SphereEmitter*>(&emitterBase)) {
-			emitter = emitterCast;
-		}
-
-		if (emitter) {
-			emitter->data_->prevTranslate = model_->transform.translate;
-		}
+		auto& emitter = ParticleManager::GetSphereEmitter(emitterNumber_);
+		emitter.data_->prevTranslate = model_->transform.translate;
+		
 		float pret = (std::min)((1.0f - arrivalTime_ / totalArrivalTime_), 1.0f);
 		arrivalTime_ -= FPSKeeper::DeltaTime();
 		// 放物線の挙動を制御する
 		float t = (std::min)((1.0f - arrivalTime_ / totalArrivalTime_), 1.0f);
 		Vector3 pos = (1.0f - t) * (1.0f - t) * startP_ + 2.0f * (1.0f - t) * t * midtermP_ + t * t * endP_;
 		model_->transform.translate = pos;
-		if (emitter) {
-			emitter->data_->translate = model_->transform.translate;
-		}
+		emitter.data_->translate = model_->transform.translate;
 
 		// 回転を決める
 		Vector3 dir = (2.0f * (1.0f - t)) * (midtermP_ - startP_) + (2.0f * t) * (endP_ - midtermP_);
@@ -209,21 +197,18 @@ void Arrow::ArrivalTimeUpdate() {
 		hitParticle_.Emit();
 		hit_.pos_ = model_->transform.translate;
 		hit_.Emit();
-		ParticleManager::GetParticleCSEmitter(emitterNumber_).SetEmit(false);
+		ParticleManager::GetSphereEmitter(emitterNumber_).SetEmit(false);
 	}
 }
 
 void Arrow::GPUEmitterSetting() {
-	auto& emitterBase = ParticleManager::GetParticleCSEmitter(emitterNumber_);
-	// dynamic_castで派生クラス型に変換を試みる
-	if (auto* emitter = dynamic_cast<SphereEmitter*>(&emitterBase)) {
-		emitter->data_->count = 300;
-		emitter->data_->lifeTime = 30.0f;
-		emitter->data_->radius = 0.0f;
-		emitter->data_->scale = { 1.0f,1.0f,1.0f };
-		emitter->data_->colorMax = { 1.0f,0.0f,0.0f };
-		emitter->data_->colorMin = { 1.0f,0.0f,0.0f };
-	}
+	auto& emitter = ParticleManager::GetSphereEmitter(emitterNumber_);
+	emitter.data_->count = 300;
+	emitter.data_->lifeTime = 30.0f;
+	emitter.data_->radius = 0.0f;
+	emitter.data_->scale = { 1.0f,1.0f,1.0f };
+	emitter.data_->colorMax = { 1.0f,0.0f,0.0f };
+	emitter.data_->colorMin = { 1.0f,0.0f,0.0f };
 }
 
 void Arrow::RodUpdate() {
@@ -324,6 +309,6 @@ void Arrow::OnCollisionExit([[maybe_unused]] const ColliderInfo& other) {
 void Arrow::SetIsLive(bool is) {
 	isLive_ = is;
 	if (isArrow_) {
-		ParticleManager::GetParticleCSEmitter(emitterNumber_).SetEmit(false);
+		ParticleManager::GetSphereEmitter(emitterNumber_).SetEmit(false);
 	}
 }

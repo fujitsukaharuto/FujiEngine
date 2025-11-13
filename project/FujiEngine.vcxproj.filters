@@ -353,6 +353,9 @@
     <ClCompile Include="Engine\Particle\GPUParticle\GPUEmitter\SphereEmitter.cpp">
       <Filter>Engine\Particle\GPUParticle\GPUEmitter</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Particle\GPUParticle\GPUEmitter\TextureBasedEmitter.cpp">
+      <Filter>Engine\Particle\GPUParticle\GPUEmitter</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -767,6 +770,9 @@
       <Filter>Engine\Particle\GPUParticle</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Particle\GPUParticle\GPUEmitter\SphereEmitter.h">
+      <Filter>Engine\Particle\GPUParticle\GPUEmitter</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Particle\GPUParticle\GPUEmitter\TextureBasedEmitter.h">
       <Filter>Engine\Particle\GPUParticle\GPUEmitter</Filter>
     </ClInclude>
   </ItemGroup>

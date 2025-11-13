@@ -105,13 +105,9 @@ void TitleScene::Update() {
 	CameraManager::GetInstance()->GetCamera()->transform.rotate = { rotateX,0.0f,0.0f };
 	player_->TitleUpdate(startTime_);
 
-
-	auto& emitterBase = ParticleManager::GetParticleCSEmitter(0);
-	// dynamic_castで派生クラス型に変換を試みる
-	if (auto* emitter = dynamic_cast<SphereEmitter*>(&emitterBase)) {
-		emitter->data_->prevTranslate = emitter->data_->translate;
-		emitter->data_->translate = particleTest_->GetWorldPos();
-	}
+	auto& emitter = ParticleManager::GetSphereEmitter(0);
+	emitter.data_->prevTranslate = emitter.data_->translate;
+	emitter.data_->translate = particleTest_->GetWorldPos();
 
 	cMane_->CheckAllCollision();
 

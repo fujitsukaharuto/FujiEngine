@@ -22,7 +22,7 @@ void GPUParticleSystem::Initialize(DXCom* pDxcom, SRVManager* srvManager) {
 	InitGPUEmitter();
 	InitGPUEmitterSurface("DeadTree_2.obj");
 	InitGPUEmitterSurface("BeamCrystal.obj");
-	//InitGPUEmitterTexture();
+	//InitGPUEmitterTexture("magicCircle.png");
 }
 
 void GPUParticleSystem::Finalize() {
@@ -37,65 +37,58 @@ void GPUParticleSystem::Finalize() {
 	perFrameResource_.Reset();
 	particleCSMaterial_.Finalize();
 
+	sphereEmitters_.clear();
+	textureBasedEmitters_.clear();
+	MeshSurefaceEmitters_.clear();
 	csEmitters_.clear();
-	csEmitterTexs_.clear();
 	csEmitterSurfces_.clear();
 }
 
 void GPUParticleSystem::Update(const Matrix4x4& billboardMatrix) {
 	UpdatePerViewData(billboardMatrix);
 	UpdateGPUEmitter();
-	UpdateGPUEmitterTexture();
 	UpdateGPUEmitterSurface();
 }
 
 void GPUParticleSystem::Draw(const D3D12_VERTEX_BUFFER_VIEW& vbView, const D3D12_INDEX_BUFFER_VIEW& ibView) {
-	EmitterTextureDispatch();
-	dxcommon_->InsertUAVBarrier(particleCSInstancing_.Get());
 	EmitterSurfaceDispatch();
 	dxcommon_->InsertUAVBarrier(particleCSInstancing_.Get());
 	EmitterDispatch();
-	dxcommon_->InsertUAVBarrier(particleCSInstancing_.Get());
 	UpdateParticleCSDispatch();
 
 	DrawParticleCS(vbView,ibView);
 }
 
 int GPUParticleSystem::InitGPUEmitter() {
-	std::unique_ptr<SphereEmitter> CSEmitter;
-	CSEmitter = std::make_unique<SphereEmitter>(dxcommon_);
-	CSEmitter->isEmit_ = false;
-	csEmitters_.push_back(std::move(CSEmitter));
-	int result = csEmitterIndex_;
+	std::unique_ptr<SphereEmitter> emitter;
+	emitter = std::make_unique<SphereEmitter>(dxcommon_);
+	emitter->isEmit_ = false;
+
+	EmitterInfo info;
+	info.phase = PipelinePhase::Sphere;
+	info.emitter = std::move(emitter);
+	csEmitters_.push_back(std::move(info));
+	sphereEmitters_.push_back(csEmitterIndex_);
+	int result = sphereEmitterIndex_;
+	sphereEmitterIndex_++;
 	csEmitterIndex_++;
 	return result;
 }
 
-int GPUParticleSystem::InitGPUEmitterTexture() {
-	GPUParticleEmitterTexture CSEmitter;
-	CSEmitter.isEmit = true;
+int GPUParticleSystem::InitGPUEmitterTexture(const std::string& fileName) {
+	std::unique_ptr<TextureBasedEmitter> emitter;
+	emitter = std::make_unique<TextureBasedEmitter>(dxcommon_);
+	emitter->InitTextureData(fileName);
+	emitter->isEmit_ = false;
 
-	CSEmitter.emitterResource = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), (sizeof(EmitterSphere)));
-	CSEmitter.emitterResource->Map(0, nullptr, reinterpret_cast<void**>(&CSEmitter.emitter));
-	CSEmitter.emitter->count = 500;
-	CSEmitter.emitter->lifeTime = 10.0f;
-	CSEmitter.emitter->frequency = 2.0f;
-	CSEmitter.emitter->frequencyTime = 0.0f;
-	CSEmitter.emitter->translate = Vector3(0.0f, 0.5f, 0.0f);
-	CSEmitter.emitter->radius = 10.0f;
-	CSEmitter.emitter->emit = 0;
-	CSEmitter.emitter->colorMax = { 1.0f,0.0f,1.0f };
-	CSEmitter.emitter->colorMin = { 0.0f,0.0f,0.0f };
-	CSEmitter.emitter->baseVelocity = { 0.0f,0.0f,0.0f };
-	CSEmitter.emitter->velocityRandMax = 0.01f;
-	CSEmitter.emitter->velocityRandMin = 0.0f;
-
-	CSEmitter.textureForEmit = TextureManager::GetInstance()->LoadTexture("magicCircle.png");
-
-	CSEmitter.emitterIndex = csEmitterTexIndex_;
-	csEmitterTexs_.push_back(CSEmitter);
-	int result = csEmitterTexIndex_;
-	csEmitterTexIndex_++;
+	EmitterInfo info;
+	info.phase = PipelinePhase::Texture;
+	info.emitter = std::move(emitter);
+	csEmitters_.push_back(std::move(info));
+	textureBasedEmitters_.push_back(csEmitterIndex_);
+	int result = textureBasedEmitterIndex_;
+	textureBasedEmitterIndex_++;
+	csEmitterIndex_++;
 	return result;
 }
 
@@ -103,7 +96,7 @@ int GPUParticleSystem::InitGPUEmitterSurface(const std::string& fileName) {
 	GPUParticleEmitterSurface CSEmitter;
 	CSEmitter.isEmit = false;
 
-	CSEmitter.emitterResource = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), (sizeof(EmitterSphere)));
+	CSEmitter.emitterResource = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), (sizeof(EmitterSurface)));
 	CSEmitter.emitterResource->Map(0, nullptr, reinterpret_cast<void**>(&CSEmitter.emitter));
 	CSEmitter.emitter->count = 500;
 	CSEmitter.emitter->lifeTime = 60.0f;
@@ -178,60 +171,33 @@ int GPUParticleSystem::InitGPUEmitterSurface(const std::string& fileName) {
 	// これで面の数を送っとく
 	CSEmitter.emitter->triangleCount = int(cdf.size());
 
-	CSEmitter.emitterIndex = csEmitterSurIndex_;
+	CSEmitter.emitterIndex = MeshSurefaceEmitterIndex_;
 	csEmitterSurfces_.push_back(CSEmitter);
-	int result = csEmitterSurIndex_;
-	csEmitterSurIndex_++;
+	int result = MeshSurefaceEmitterIndex_;
+	MeshSurefaceEmitterIndex_++;
 	return result;
 }
 
 void GPUParticleSystem::ParticleCSDebugGUI() {
 #ifdef _DEBUG
-	if (csEmitters_.size() == 0) return;
+	if (csEmitters_.size() == 0 || sphereEmitters_.size() == 0) return;
 	if (ImGui::CollapsingHeader("GPU Particle Emitter")) {
-		ImGui::DragInt("emitIndex", &editCSEmitInd_, 1.0f, 0, int(csEmitters_.size() - 1));
-		int idx = std::min(editCSEmitInd_, static_cast<int>(csEmitters_.size()) - 1);
+		ImGui::DragInt("emitIndex", &editCSEmitInd_, 1.0f, 0, int(sphereEmitters_.size() - 1));
+		int idx = std::min(editCSEmitInd_, static_cast<int>(sphereEmitters_.size()) - 1);
 		editCSEmitInd_ = idx;
-		csEmitters_[idx]->DebugGUI();
+		csEmitters_[sphereEmitters_[idx]].emitter->DebugGUI();
 	}
 #endif // _DEBUG
 }
 
 void GPUParticleSystem::ParticleTexCSDebugGUI() {
 #ifdef _DEBUG
-	if (csEmitterTexs_.size() == 0) return;
+	if (csEmitters_.size() == 0 || textureBasedEmitters_.size() == 0) return;
 	if (ImGui::CollapsingHeader("GPU ParticleTex Emitter")) {
-		ImGui::DragInt("emitIndex", &editCSEmitTexInd_, 1.0f, 0, int(csEmitterTexs_.size() - 1));
-		int idx = std::min(editCSEmitTexInd_, static_cast<int>(csEmitterTexs_.size()) - 1);
+		ImGui::DragInt("emitIndex", &editCSEmitTexInd_, 1.0f, 0, int(textureBasedEmitters_.size() - 1));
+		int idx = std::min(editCSEmitTexInd_, static_cast<int>(textureBasedEmitters_.size()) - 1);
 		editCSEmitTexInd_ = idx;
-		if (ImGui::TreeNode("ParticleCS Emit Control")) {
-
-			ImGui::Checkbox("isEmit", &csEmitterTexs_[idx].isEmit);
-
-			int dragCount = int(csEmitterTexs_[idx].emitter->count);
-			ImGui::DragInt("emitCount", &dragCount, 1, 0, 100000);
-			csEmitterTexs_[idx].emitter->count = uint32_t(dragCount);
-
-			ImGui::DragFloat("lifeTime", &csEmitterTexs_[idx].emitter->lifeTime, 0.1f, 1.0f, 300.0f);
-			ImGui::DragFloat("frequency", &csEmitterTexs_[idx].emitter->frequency, 0.1f, 0.0f, 300.0f);
-
-			ImGui::DragFloat3("translate", &csEmitterTexs_[idx].emitter->translate.x, 0.1f);
-
-			ImGui::DragFloat("radius", &csEmitterTexs_[idx].emitter->radius, 0.1f, 0.0f, 300.0f);
-
-			ImGui::SeparatorText("Color");
-			ImGui::DragFloat3("colorMax", &csEmitterTexs_[idx].emitter->colorMax.x, 0.01f, 0.0f, 1.0f);
-			ImGui::DragFloat3("colorMin", &csEmitterTexs_[idx].emitter->colorMin.x, 0.01f, 0.0f, 1.0f);
-
-			ImGui::SeparatorText("Velocity");
-			ImGui::DragFloat3("baseVelocity", &csEmitterTexs_[idx].emitter->baseVelocity.x, 0.01f, 0.0f, 1.0f);
-			ImGui::DragFloat("velocityRandMax", &csEmitterTexs_[idx].emitter->velocityRandMax, 0.01f, -1.0f, 1.0f);
-			ImGui::DragFloat("velocityRandMin", &csEmitterTexs_[idx].emitter->velocityRandMin, 0.01f, -1.0f, 1.0f);
-
-			ImGui::Text("DeltaTime1:%f", FPSKeeper::DeltaTime());
-			ImGui::Text("DeltaTime2:%f", FPSKeeper::DeltaTimeFrame());
-			ImGui::TreePop();
-		}
+		csEmitters_[textureBasedEmitters_[idx]].emitter->DebugGUI();
 	}
 #endif // _DEBUG
 }
@@ -277,12 +243,23 @@ void GPUParticleSystem::ParticleSurfaceCSDebugGUI() {
 
 IGPUEmitter& GPUParticleSystem::GetParticleCSEmitter(int index) {
 	assert(index >= 0 && index < csEmitters_.size());
-	return *csEmitters_[index].get();
+	return *csEmitters_[index].emitter.get();
 }
 
-GPUParticleSystem::GPUParticleEmitterTexture& GPUParticleSystem::GetParticleCSEmitterTexture(int index) {
-	assert(index >= 0 && index < csEmitterTexs_.size());
-	return csEmitterTexs_[index];
+SphereEmitter& GPUParticleSystem::GetSphereEmitter(int index) {
+	assert(index >= 0 && index < sphereEmitters_.size());
+	IGPUEmitter* emitterBase = csEmitters_[sphereEmitters_[index]].emitter.get();
+	auto* emitter = dynamic_cast<SphereEmitter*>(emitterBase);
+	assert(emitter);
+	return *emitter;
+}
+
+TextureBasedEmitter& GPUParticleSystem::GetParticleCSEmitterTexture(int index) {
+	assert(index >= 0 && index < textureBasedEmitters_.size());
+	IGPUEmitter* emitterBase = csEmitters_[textureBasedEmitters_[index]].emitter.get();
+	auto* emitter = dynamic_cast<TextureBasedEmitter*>(emitterBase);
+	assert(emitter);
+	return *emitter;
 }
 
 GPUParticleSystem::GPUParticleEmitterSurface& GPUParticleSystem::GetParticleCSEmitterSurface(int index) {
@@ -365,26 +342,9 @@ void GPUParticleSystem::DrawParticleCS(const D3D12_VERTEX_BUFFER_VIEW& vbView, c
 }
 
 void GPUParticleSystem::UpdateGPUEmitter() {
+	const float deltaTime = FPSKeeper::DeltaTime();
 	for (int i = 0; i < csEmitters_.size(); i++) {
-		csEmitters_[i]->Update(FPSKeeper::DeltaTime());
-	}
-}
-
-void GPUParticleSystem::UpdateGPUEmitterTexture() {
-	for (int i = 0; i < csEmitterTexs_.size(); i++) {
-		auto& emitter = csEmitterTexs_[i];
-		if (emitter.isEmit) {
-			emitter.emitter->frequencyTime += FPSKeeper::DeltaTime();
-			if (emitter.emitter->frequency <= emitter.emitter->frequencyTime) {
-				emitter.emitter->frequencyTime -= emitter.emitter->frequency;
-				emitter.emitter->emit = 1;
-			} else {
-				emitter.emitter->emit = 0;
-			}
-		} else {
-			emitter.emitter->emit = 0;
-			emitter.emitter->frequencyTime = 0.0f;
-		}
+		csEmitters_[i].emitter->Update(deltaTime);
 	}
 }
 
@@ -424,27 +384,30 @@ void GPUParticleSystem::EmitterDispatch() {
 	freeListUAVHandle_.second
 	};
 
-	for (int i = 0; i < csEmitters_.size(); i++) {
-		csEmitters_[i]->Dispatch(dxcommon_->GetCommandList(),
-			dxcommon_, srvManager_, handles);
+	for (PipelinePhase phase : {PipelinePhase::Texture, PipelinePhase::Surface, PipelinePhase::Sphere}) {
+		for (auto& info : csEmitters_) {
+			if (info.phase == phase) {
+				info.emitter->Dispatch(dxcommon_->GetCommandList(),
+					dxcommon_, srvManager_, handles);
+			}
+		}
+		dxcommon_->InsertUAVBarrier(particleCSInstancing_.Get());
 	}
 }
 
-void GPUParticleSystem::EmitterTextureDispatch() {
-	for (int i = 0; i < csEmitterTexs_.size(); i++) {
-		dxcommon_->GetPipelineManager()->SetCSPipeline(Pipe::EmitTexParticleCS);
-		dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(0, particleCSUAVHandle_.second);
-		dxcommon_->GetCommandList()->SetComputeRootConstantBufferView(1, csEmitterTexs_[i].emitterResource->GetGPUVirtualAddress());
-		dxcommon_->GetCommandList()->SetComputeRootConstantBufferView(2, perFrameResource_->GetGPUVirtualAddress());
-		dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(3, freeListIndexUAVHandle_.second);
-		dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(4, freeListUAVHandle_.second);
-		dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(5, csEmitterTexs_[i].textureForEmit->gpuHandle);
-		if (csEmitterTexs_[i].emitter->count == 0) continue;
-		int dispatchCountX = (int(csEmitterTexs_[i].textureForEmit->meta.width) + 32 - 1) / 32;
-		int dispatchCountY = (int(csEmitterTexs_[i].textureForEmit->meta.height) + 32 - 1) / 32;
-		dxcommon_->GetCommandList()->Dispatch(dispatchCountX, dispatchCountY, 1);
-	}
-}
+//void GPUParticleSystem::EmitterTextureDispatch() {
+//	ParticleCSHandles handles = {
+//	particleCSUAVHandle_.second,
+//	perFrameResource_->GetGPUVirtualAddress(),
+//	freeListIndexUAVHandle_.second,
+//	freeListUAVHandle_.second
+//	};
+//
+//	for (int i = 0; i < textureBasedEmitters_.size(); i++) {
+//		csEmitters_[textureBasedEmitters_[i]].emitter->Dispatch(dxcommon_->GetCommandList(),
+//			dxcommon_, srvManager_, handles);
+//	}
+//}
 
 void GPUParticleSystem::EmitterSurfaceDispatch() {
 	for (int i = 0; i < csEmitterSurfces_.size(); i++) {

@@ -135,11 +135,12 @@ public:
 	//========================================================================*/
 	//* Getter
 	static IGPUEmitter& GetParticleCSEmitter(int index);
-	static GPUParticleSystem::GPUParticleEmitterTexture& GetParticleCSEmitterTexture(int index);
+	static SphereEmitter& GetSphereEmitter(int index);
+	static TextureBasedEmitter& GetParticleCSEmitterTexture(int index);
 	static GPUParticleSystem::GPUParticleEmitterSurface& GetParticleCSEmitterSurface(int index);
 
 	int InitGPUEmitter();
-	int InitGPUEmitterTexture();
+	int InitGPUEmitterTexture(const std::string& fileName);
 	int InitGPUEmitterSurface(const std::string& fileName);
 
 private:

@@ -525,7 +525,12 @@ IGPUEmitter& ParticleManager::GetParticleCSEmitter(int index) {
 	return instance->gpuParticleSystem_->GetParticleCSEmitter(index);
 }
 
-GPUParticleSystem::GPUParticleEmitterTexture& ParticleManager::GetParticleCSEmitterTexture(int index) {
+SphereEmitter& ParticleManager::GetSphereEmitter(int index) {
+	ParticleManager* instance = GetInstance();
+	return instance->gpuParticleSystem_->GetSphereEmitter(index);
+}
+
+TextureBasedEmitter& ParticleManager::GetParticleCSEmitterTexture(int index) {
 	ParticleManager* instance = GetInstance();
 	return instance->gpuParticleSystem_->GetParticleCSEmitterTexture(index);
 }
@@ -539,8 +544,8 @@ int ParticleManager::InitGPUEmitter() {
 	return gpuParticleSystem_->InitGPUEmitter();
 }
 
-int ParticleManager::InitGPUEmitterTexture() {
-	return gpuParticleSystem_->InitGPUEmitterTexture();
+int ParticleManager::InitGPUEmitterTexture(const std::string& fileName) {
+	return gpuParticleSystem_->InitGPUEmitterTexture(fileName);
 }
 
 int ParticleManager::InitGPUEmitterSurface(const std::string& fileName) {
