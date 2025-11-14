@@ -9,19 +9,20 @@ Beam::Beam() {
 }
 
 Beam::~Beam() {
-	ParticleManager::GetParticleCSEmitterSurface(1).isEmit = false;
+	ParticleManager::GetParticleCSEmitterSurface(1).SetEmit(false);
 }
 
 void Beam::Initialize() {
 	OriginGameObject::Initialize();
 	OriginGameObject::CreateModel("cube.obj");
 
-	ParticleManager::GetParticleCSEmitterSurface(1).isEmit = false;
-	ParticleManager::GetParticleCSEmitterSurface(1).emitter->count = 5000;
-	ParticleManager::GetParticleCSEmitterSurface(1).emitter->colorMax = { 1.0f,0.0f,0.25f };
-	ParticleManager::GetParticleCSEmitterSurface(1).emitter->colorMin = { 0.5f,0.0f,0.0f };
-	ParticleManager::GetParticleCSEmitterSurface(1).emitter->velocityRandMax = 0.04f;
-	ParticleManager::GetParticleCSEmitterSurface(1).emitter->velocityRandMin = -0.04f;
+	auto& emitter = ParticleManager::GetParticleCSEmitterSurface(1);
+	emitter.isEmit_ = false;
+	emitter.data_->count = 5000;
+	emitter.data_->colorMax = { 1.0f,0.0f,0.25f };
+	emitter.data_->colorMin = { 0.5f,0.0f,0.0f };
+	emitter.data_->velocityRandMax = 0.04f;
+	emitter.data_->velocityRandMin = -0.04f;
 
 	model_->SetLightEnable(LightMode::kLightNone);
 	model_->transform.translate.y = 25.0f;
@@ -171,7 +172,7 @@ void Beam::Update() {
 		} else if (lifeTime_ <= 0.0f) {
 			lifeTime_ = 0.0f;
 			isLive_ = false;
-			ParticleManager::GetParticleCSEmitterSurface(1).isEmit = false;
+			ParticleManager::GetParticleCSEmitterSurface(1).SetEmit(false);
 		}
 
 		for (auto& beam : beams_) {
@@ -367,7 +368,7 @@ void Beam::OnCollisionExit([[maybe_unused]] const ColliderInfo& other) {
 
 void Beam::SetIsLive(bool is) { 
 	isLive_ = is;
-	ParticleManager::GetParticleCSEmitterSurface(1).isEmit = false;
+	ParticleManager::GetParticleCSEmitterSurface(1).SetEmit(false);
 }
 
 void Beam::SetBossParent(Boss* boss) {
@@ -405,7 +406,7 @@ void Beam::ChangeBeamStep() {
 		changeTime_ -= FPSKeeper::DeltaTime();
 		float t = 1.0f - (changeTime_ / 40.0f);
 		Vector3 emitPos = Lerp(prePos_, targetPos_, t);
-		ParticleManager::GetParticleCSEmitterSurface(1).emitter->translate = emitPos;
+		ParticleManager::GetParticleCSEmitterSurface(1).data_->translate = emitPos;
 	}
 	if (changeTime_ <= 0.0f) {
 		expandTime_ = 60.0f;

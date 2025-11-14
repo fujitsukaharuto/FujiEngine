@@ -49,7 +49,7 @@ void TextureBasedEmitter::Dispatch(ID3D12GraphicsCommandList* cmd,
 	cmd->SetComputeRootConstantBufferView(2, shared.perFrameCBV);
 	int dispatchCountX = (int(textureForEmit_->meta.width) + 32 - 1) / 32;
 	int dispatchCountY = (int(textureForEmit_->meta.height) + 32 - 1) / 32;
-	dx->GetCommandList()->Dispatch(dispatchCountX, dispatchCountY, 1);
+	cmd->Dispatch(dispatchCountX, dispatchCountY, 1);
 }
 
 void TextureBasedEmitter::DebugGUI() {

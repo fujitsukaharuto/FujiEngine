@@ -14,7 +14,7 @@
 TitleScene::TitleScene() {}
 
 TitleScene::~TitleScene() {
-	ParticleManager::GetParticleCSEmitterSurface(0).isEmit = false;
+	ParticleManager::GetParticleCSEmitterSurface(0).SetEmit(false);
 }
 
 void TitleScene::Initialize() {

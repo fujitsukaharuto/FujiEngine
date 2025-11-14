@@ -535,7 +535,7 @@ TextureBasedEmitter& ParticleManager::GetParticleCSEmitterTexture(int index) {
 	return instance->gpuParticleSystem_->GetParticleCSEmitterTexture(index);
 }
 
-GPUParticleSystem::GPUParticleEmitterSurface& ParticleManager::GetParticleCSEmitterSurface(int index) {
+MeshSurefaceEmitter& ParticleManager::GetParticleCSEmitterSurface(int index) {
 	ParticleManager* instance = GetInstance();
 	return instance->gpuParticleSystem_->GetParticleCSEmitterSurface(index);
 }

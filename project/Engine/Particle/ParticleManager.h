@@ -137,7 +137,7 @@ public:
 	static IGPUEmitter& GetParticleCSEmitter(int index);
 	static SphereEmitter& GetSphereEmitter(int index);
 	static TextureBasedEmitter& GetParticleCSEmitterTexture(int index);
-	static GPUParticleSystem::GPUParticleEmitterSurface& GetParticleCSEmitterSurface(int index);
+	static MeshSurefaceEmitter& GetParticleCSEmitterSurface(int index);
 
 	int InitGPUEmitter();
 	int InitGPUEmitterTexture(const std::string& fileName);

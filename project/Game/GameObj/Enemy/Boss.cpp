@@ -833,15 +833,16 @@ void Boss::InitBeam() {
 
 bool Boss::BeamCharge() {
 	bool result = false;
-	if (ParticleManager::GetParticleCSEmitterSurface(1).isEmit == false) {
-		ParticleManager::GetParticleCSEmitterSurface(1).isEmit = true;
-		ParticleManager::GetParticleCSEmitterSurface(1).emitter->radius = 0.0f;
-		ParticleManager::GetParticleCSEmitterSurface(1).emitter->translate = animModel_->transform.translate;
-		ParticleManager::GetParticleCSEmitterSurface(1).emitter->translate.y = 20.0f;
+	if (ParticleManager::GetParticleCSEmitterSurface(1).IsEmit() == false) {
+		auto& emitter = ParticleManager::GetParticleCSEmitterSurface(1);
+		emitter.isEmit_ = true;
+		emitter.data_->radius = 0.0f;
+		emitter.data_->translate = animModel_->transform.translate;
+		emitter.data_->translate.y = 20.0f;
 	}
 
 	if (chargeSize_ > 0.0f) {
-		ParticleManager::GetParticleCSEmitterSurface(1).emitter->radius += 0.075f * FPSKeeper::DeltaTime();
+		ParticleManager::GetParticleCSEmitterSurface(1).data_->radius += 0.075f * FPSKeeper::DeltaTime();
 		for (int i = 0; i < 8; i++) {
 			if (i > 2) {
 				if (!(chargeTime_ < 120.0f - i * 2.0f)) {
