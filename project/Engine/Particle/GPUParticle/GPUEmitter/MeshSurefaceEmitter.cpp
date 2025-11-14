@@ -106,6 +106,7 @@ void MeshSurefaceEmitter::Dispatch(ID3D12GraphicsCommandList* cmd,
 }
 
 void MeshSurefaceEmitter::DebugGUI() {
+#ifdef _DEBUG
 	if (ImGui::TreeNode("ParticleCS Emit Control")) {
 		ImGui::Checkbox("IsEmit", &isEmit_);
 
@@ -133,4 +134,5 @@ void MeshSurefaceEmitter::DebugGUI() {
 		ImGui::Text("DeltaTime2:%f", FPSKeeper::DeltaTimeFrame());
 		ImGui::TreePop();
 	}
+#endif // _DEBUG
 }
