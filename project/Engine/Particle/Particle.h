@@ -34,6 +34,30 @@ enum class BillBoardPattern {
 };
 
 /// <summary>
+/// パーティクルの行列等のデータ
+/// </summary>
+struct TransformationParticleMatrix {
+	Matrix4x4 WVP;
+	Matrix4x4 World;
+	Vector4 color;
+	Vector2 uvTrans = { 0.0f,0.0f };
+	Vector2 uvScale = { 1.0f,1.0f };
+};
+
+enum class ShapeType {
+	PLANE,
+	RING,
+	SPHERE,
+	TORUS,
+	CYLINDER,
+	CONE,
+	TRIANGLE,
+	BOX,
+	LIGHTNING,
+};
+
+
+/// <summary>
 /// パーティクル構造体
 /// </summary>
 struct Particle {

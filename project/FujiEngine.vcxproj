@@ -189,6 +189,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Particle\GPUParticle\GPUEmitter\TextureBasedEmitter.cpp" />
     <ClCompile Include="Engine\Particle\GPUParticle\GPUParticleSystem.cpp" />
     <ClCompile Include="Engine\Particle\ParticleEmitter.cpp" />
+    <ClCompile Include="Engine\Particle\ParticleGroup\IParticleGroup.cpp" />
+    <ClCompile Include="Engine\Particle\ParticleGroup\ParentParticleGroup.cpp" />
+    <ClCompile Include="Engine\Particle\ParticleGroup\ParticleGroup.cpp" />
     <ClCompile Include="Engine\Particle\ParticleManager.cpp" />
     <ClCompile Include="Engine\Scene\BaseScene.cpp" />
     <ClCompile Include="Engine\Scene\SceneManager.cpp" />
@@ -326,6 +329,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Particle\GPUParticle\IGPUParticleEmitter.h" />
     <ClInclude Include="Engine\Particle\Particle.h" />
     <ClInclude Include="Engine\Particle\ParticleEmitter.h" />
+    <ClInclude Include="Engine\Particle\ParticleGroup\IParticleGroup.h" />
+    <ClInclude Include="Engine\Particle\ParticleGroup\ParentParticleGroup.h" />
+    <ClInclude Include="Engine\Particle\ParticleGroup\ParticleGroup.h" />
     <ClInclude Include="Engine\Particle\ParticleManager.h" />
     <ClInclude Include="Engine\Scene\AbstractSceneFactory.h" />
     <ClInclude Include="Engine\Scene\BaseScene.h" />

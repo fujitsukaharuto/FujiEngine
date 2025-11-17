@@ -359,6 +359,15 @@
     <ClCompile Include="Engine\Particle\GPUParticle\GPUEmitter\MeshSurefaceEmitter.cpp">
       <Filter>Engine\Particle\GPUParticle\GPUEmitter</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Particle\ParticleGroup\IParticleGroup.cpp">
+      <Filter>Engine\Particle\ParticleGroup</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Particle\ParticleGroup\ParticleGroup.cpp">
+      <Filter>Engine\Particle\ParticleGroup</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Particle\ParticleGroup\ParentParticleGroup.cpp">
+      <Filter>Engine\Particle\ParticleGroup</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -781,6 +790,15 @@
     <ClInclude Include="Engine\Particle\GPUParticle\GPUEmitter\MeshSurefaceEmitter.h">
       <Filter>Engine\Particle\GPUParticle\GPUEmitter</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Particle\ParticleGroup\IParticleGroup.h">
+      <Filter>Engine\Particle\ParticleGroup</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Particle\ParticleGroup\ParticleGroup.h">
+      <Filter>Engine\Particle\ParticleGroup</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Particle\ParticleGroup\ParentParticleGroup.h">
+      <Filter>Engine\Particle\ParticleGroup</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -917,6 +935,9 @@
     </Filter>
     <Filter Include="Engine\Particle\GPUParticle\GPUEmitter">
       <UniqueIdentifier>{37635143-d44c-4167-a8a8-41e9c7257570}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Particle\ParticleGroup">
+      <UniqueIdentifier>{246db227-4e53-40f4-a155-ac14d20d5b6c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

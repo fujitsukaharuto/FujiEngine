@@ -3,35 +3,14 @@
 #include <map>
 #include "Particle.h"
 #include "ParticleEmitter.h"
+#include "ParticleGroup/ParticleGroup.h"
+#include "ParticleGroup/ParentParticleGroup.h"
 #include "GPUParticle/GPUParticleSystem.h"
 #include "Model.h"
 #include "Object3d.h"
 #include "Math/Matrix/MatrixCalculation.h"
 
 using Microsoft::WRL::ComPtr;
-
-/// <summary>
-/// パーティクルの行列等のデータ
-/// </summary>
-struct TransformationParticleMatrix {
-	Matrix4x4 WVP;
-	Matrix4x4 World;
-	Vector4 color;
-	Vector2 uvTrans = { 0.0f,0.0f };
-	Vector2 uvScale = { 1.0f,1.0f };
-};
-
-enum class ShapeType {
-	PLANE,
-	RING,
-	SPHERE,
-	TORUS,
-	CYLINDER,
-	CONE,
-	TRIANGLE,
-	BOX,
-	LIGHTNING,
-};
 
 class DXCom;
 class SRVManager;
@@ -46,37 +25,6 @@ public:
 	~ParticleManager();
 
 public:
-
-	/// <summary>
-	/// パーティクルグループのデータ
-	/// </summary>
-	struct ParticleGroup {
-		Material material_;
-		std::list<Particle> particles_;
-		uint32_t srvIndex_;
-		ComPtr<ID3D12Resource> instancing_ = nullptr;
-		uint32_t insstanceCount_;
-		TransformationParticleMatrix* instancingData_ = nullptr;
-		uint32_t drawCount_;
-		ParticleEmitter emitter_;
-		ShapeType shapeType_ = ShapeType::PLANE;
-		bool isSubMode_ = false;
-	};
-
-	/// <summary>
-	/// ペアレントするパーティクルグループのデータ
-	/// </summary>
-	struct ParentParticleGroup {
-		Material material_;
-		std::list<Particle> particles_;
-		uint32_t srvIndex_;
-		ComPtr<ID3D12Resource> instancing_ = nullptr;
-		uint32_t insstanceCount_;
-		TransformationParticleMatrix* instancingData_ = nullptr;
-		uint32_t drawCount_;
-		std::unique_ptr<ParticleEmitter> emitter_;
-		ShapeType shapeType_ = ShapeType::PLANE;
-	};
 
 	/// <summary>
 	/// アニメーションパーティクルグループのデータ
@@ -164,16 +112,6 @@ private:
 	void InitSphereVertex();
 	void InitCylinderVertex();
 	void InitLighningVertex();
-
-	/// <summary>パーティクルの寿命の処理</summary>
-	bool LifeUpdate(Particle& particle);
-	/// <summary>パーティクルのサイズのアップデート</summary>
-	void ParticleSizeUpdate(Particle& particle);
-	/// <summary>パーティクルのSRTのアップデート</summary>
-	void SRTUpdate(Particle& particle);
-	/// <summary>パーティクルのビルボード処理</summary>
-	void Billboard(Particle& particle, Matrix4x4& worldMatrix, const Matrix4x4& billboardMatrix, const Matrix4x4& rotate);
-	bool InitEmitParticle(Particle& particle, const Vector3& pos, const Vector3& rotate, const Particle& grain, const RandomParametor& para);
 
 	/// <summary>パーティクルに使用するテクスチャのセレクトポップアップ</summary>
 	void ParticleTexurePopUp();
