@@ -12,29 +12,31 @@ using Microsoft::WRL::ComPtr;
 /// </summary>
 struct EmitterSphere {
 	Vector3 translate;
-	float padding;
-	Vector3 scale;
 	float radius;
+
+	Vector3 scale;
 	uint32_t count;
-	float lifeTime;
-	float frequency;
-	float frequencyTime;
-	uint32_t emit;
 
-	// color
 	Vector3 colorMax;
-	Vector3 colorMin;
-	float padding2;
+	float  lifeTime;
 
-	// velocity
+	Vector3 colorMin;
+	float frequency;
+
 	Vector3 baseVelocity;
 	float velocityRandMax;
+
 	float velocityRandMin;
+	uint32_t emit;
+	uint32_t isDistance;
+	float frequencyTime;
 
-	// distanceEmit
 	Vector3 prevTranslate;
-	float padding4;
+	uint32_t emitShapeType;
 
+	Quaternion rotation;
+
+	uint32_t emitVeloType;
 };
 
 class SphereEmitter : public IGPUEmitter {

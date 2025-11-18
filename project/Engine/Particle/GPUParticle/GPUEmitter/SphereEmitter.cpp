@@ -15,6 +15,8 @@ SphereEmitter::SphereEmitter(DXCom* dx) {
 	data_->emit = 0;
 	data_->colorMax = { 1.0f,1.0f,1.0f };
 	data_->colorMin = { 0.0f,0.0f,0.0f };
+	data_->isDistance = 1;
+	data_->rotation = Quaternion::IdentityQuaternion();
 }
 
 void SphereEmitter::Update(float deltaTime) {
@@ -51,27 +53,37 @@ void SphereEmitter::DebugGUI() {
 		ImGui::Checkbox("IsEmit", &isEmit_);
 
 		int dragCount = int(data_->count);
-		ImGui::DragInt("emitCount", &dragCount, 1, 0, 100000);
+		ImGui::DragInt("EmitCount", &dragCount, 1, 0, 100000);
 		data_->count = uint32_t(dragCount);
 
-		ImGui::DragFloat("lifeTime", &data_->lifeTime, 0.1f, 1.0f, 300.0f);
-		ImGui::DragFloat("frequency", &data_->frequency, 0.1f, 0.0f, 300.0f);
+		ImGui::DragFloat("LifeTime", &data_->lifeTime, 0.1f, 1.0f, 300.0f);
+		ImGui::DragFloat("Frequency", &data_->frequency, 0.1f, 0.0f, 300.0f);
 
 		Vector3 prePos = data_->translate;
-		ImGui::DragFloat3("translate", &data_->translate.x, 0.1f);
+		ImGui::DragFloat3("Translate", &data_->translate.x, 0.1f);
 		data_->prevTranslate = prePos;
-		ImGui::DragFloat3("preTranslate", &data_->prevTranslate.x, 0.1f);
+		ImGui::DragFloat3("PreTranslate", &data_->prevTranslate.x, 0.1f);
+		bool isDistance = bool(data_->isDistance);
+		ImGui::Checkbox("IsDistance", &isDistance);
+		data_->isDistance = uint32_t(isDistance);
 
-		ImGui::DragFloat("radius", &data_->radius, 0.1f, 0.0f, 300.0f);
+		ImGui::DragFloat("Scale", &data_->radius, 0.1f, 0.01f, 300.0f);
+
+		int shapeType = int(data_->emitShapeType);
+		ImGui::DragInt("EmitShapeType", &shapeType, 0.1f, 0, 6);
+		data_->emitShapeType = uint32_t(shapeType);
 
 		ImGui::SeparatorText("Color");
-		ImGui::DragFloat3("colorMax", &data_->colorMax.x, 0.01f, 0.0f, 1.0f);
-		ImGui::DragFloat3("colorMin", &data_->colorMin.x, 0.01f, 0.0f, 1.0f);
+		ImGui::DragFloat3("ColorMax", &data_->colorMax.x, 0.01f, 0.0f, 1.0f);
+		ImGui::DragFloat3("ColorMin", &data_->colorMin.x, 0.01f, 0.0f, 1.0f);
 
 		ImGui::SeparatorText("Velocity");
-		ImGui::DragFloat3("baseVelocity", &data_->baseVelocity.x, 0.01f, 0.0f, 1.0f);
-		ImGui::DragFloat("velocityRandMax", &data_->velocityRandMax, 0.01f, -1.0f, 1.0f);
-		ImGui::DragFloat("velocityRandMin", &data_->velocityRandMin, 0.01f, -1.0f, 1.0f);
+		ImGui::DragFloat3("BaseVelocity", &data_->baseVelocity.x, 0.01f, 0.0f, 1.0f);
+		ImGui::DragFloat("VelocityRandMax", &data_->velocityRandMax, 0.01f, -1.0f, 1.0f);
+		ImGui::DragFloat("VelocityRandMin", &data_->velocityRandMin, 0.01f, -1.0f, 1.0f);
+		int veloType = int(data_->emitVeloType);
+		ImGui::DragInt("EmitVelocityType", &veloType, 0.1f, 0, 5);
+		data_->emitVeloType = uint32_t(veloType);
 
 		ImGui::Text("DeltaTime1:%f", FPSKeeper::DeltaTime());
 		ImGui::Text("DeltaTime2:%f", FPSKeeper::DeltaTimeFrame());
