@@ -127,4 +127,7 @@ struct ParticleCS {
 	Vector3 velocity;
 	float currentTime;
 	Vector4 color;
+	Vector3 prevTranslate;
+	uint32_t isRandomMove;
+	uint32_t isTrailEmit;
 };

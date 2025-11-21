@@ -121,4 +121,10 @@ class RandomGenerator
 
         return float3(x, y, z);
     }
+    
+    float GenerateRange1d(float minValue, float maxValue)
+    {
+        float r = Generate1d(); // [0,1)
+        return lerp(minValue, maxValue, r);
+    }
 };

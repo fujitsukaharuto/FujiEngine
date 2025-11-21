@@ -30,6 +30,8 @@ struct EmitterSphere
     float4 rotation;
 
     uint emitVeloType;
+    uint isRandomMove;
+    uint isTrailEmit;
 };
 ConstantBuffer<EmitterSphere> gEmitter : register(b0);
 struct PerFrame
@@ -42,7 +44,7 @@ RWStructuredBuffer<int> gFreeListIndex : register(u1);
 RWStructuredBuffer<uint> gFreeList : register(u2);
 
 
-float3 RandomUnitVector(RandomGenerator gen)
+float3 RandomUnitVector(inout RandomGenerator gen)
 {
     float3 v;
     v = gen.Generate3d(); // [-1, 1]
@@ -171,6 +173,52 @@ float3 RotateVector(float3 v, float4 q)
 }
 
 
+int PopFreeListIndex()
+{
+    int oldTop;
+    int newTop;
+    int original;
+
+    do
+    {
+        oldTop = gFreeListIndex[0];
+        if (oldTop <= 0)
+            return -1;
+
+        newTop = oldTop - 1;
+
+        // InterlockedCompareExchange は out パラメータで元の値を返す
+        InterlockedCompareExchange(gFreeListIndex[0], oldTop, newTop, original);
+
+        // original != oldTop の場合は別スレッドが先に書き換えたので再試行
+    } while (original != oldTop);
+
+    return newTop; // 取り出したインデックス
+}
+
+void PushFreeList(uint particleIndex)
+{
+    int oldTop;
+    int newTop;
+    int original;
+
+    do
+    {
+        oldTop = gFreeListIndex[0];
+        newTop = oldTop + 1;
+
+        if (newTop >= kMaxParticles)
+            return;
+
+        InterlockedCompareExchange(gFreeListIndex[0], oldTop, newTop, original);
+
+    } while (original != oldTop);
+
+    // 安全に書き込める場所が oldTop に確保されている
+    gFreeList[oldTop] = particleIndex;
+}
+
+
 [numthreads(1024, 1, 1)]
 void main(uint3 DTid : SV_DispatchThreadID)
 {
@@ -182,11 +230,9 @@ void main(uint3 DTid : SV_DispatchThreadID)
         if (DTid.x >= gEmitter.count)
             return;
 
-        int freeListIndex;
-        InterlockedAdd(gFreeListIndex[0], -1, freeListIndex);
+        int freeListIndex = PopFreeListIndex();
         if (0 <= freeListIndex && freeListIndex < kMaxParticles)
         {
-
             // 補間係数（0〜1）: スレッドIDをcountで割る
             float lerpT;
             if (gEmitter.count > 1)
@@ -212,6 +258,7 @@ void main(uint3 DTid : SV_DispatchThreadID)
             gParticle[particleIndex].scale = gEmitter.scale;
             gParticle[particleIndex].startScale = gEmitter.scale;
             gParticle[particleIndex].translate = pos;
+            gParticle[particleIndex].prevTranslate = pos;
 
             float3 t = (generator.Generate3d() + 1) * 0.5f;
             gParticle[particleIndex].color.rgb = lerp(gEmitter.colorMin, gEmitter.colorMax, t);
@@ -224,10 +271,8 @@ void main(uint3 DTid : SV_DispatchThreadID)
 
             gParticle[particleIndex].lifeTime = gEmitter.lifeTime;
             gParticle[particleIndex].currentTime = 0.0f;
-        }
-        else
-        {
-            InterlockedAdd(gFreeListIndex[0], 1);
+            gParticle[particleIndex].isRandomMove = gEmitter.isRandomMove;
+            gParticle[particleIndex].isTrailEmit = gEmitter.isTrailEmit;
         }
     }
 }

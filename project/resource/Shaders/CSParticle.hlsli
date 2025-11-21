@@ -21,9 +21,12 @@ struct Particle
     float3 scale;
     float3 startScale;
     
-    
     float lifeTime;
     float3 velocity;
     float currentTime;
     float4 color;
+    
+    float3 prevTranslate;
+    uint isRandomMove;
+    uint isTrailEmit;
 };

@@ -1090,5 +1090,8 @@
     <None Include="resource\Shaders\CS\Random.hlsli">
       <Filter>resource\Shaders\CS</Filter>
     </None>
+    <None Include="resource\Shaders\CS\Noise.hlsli">
+      <Filter>resource\Shaders\CS</Filter>
+    </None>
   </ItemGroup>
 </Project>

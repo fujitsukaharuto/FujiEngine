@@ -259,6 +259,7 @@ void GPUParticleSystem::UpdateParticleCSDispatch() {
 	dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(3, freeListUAVHandle_.second);
 	int dispatchCount = (numParticles + threadsPerGroup - 1) / threadsPerGroup;
 	dxcommon_->GetCommandList()->Dispatch(dispatchCount, 1, 1);
+	dxcommon_->InsertUAVBarrier(particleCSInstancing_.Get());
 }
 
 void GPUParticleSystem::EmitterDispatch() {

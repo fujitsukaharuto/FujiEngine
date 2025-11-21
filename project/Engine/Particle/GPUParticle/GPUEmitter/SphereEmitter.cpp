@@ -84,6 +84,12 @@ void SphereEmitter::DebugGUI() {
 		int veloType = int(data_->emitVeloType);
 		ImGui::DragInt("EmitVelocityType", &veloType, 0.1f, 0, 5);
 		data_->emitVeloType = uint32_t(veloType);
+		bool isRandomMove = bool(data_->isRandomMove);
+		ImGui::Checkbox("IsRandomMove", &isRandomMove);
+		data_->isRandomMove = uint32_t(isRandomMove);
+		bool isTrailEmit = bool(data_->isTrailEmit);
+		ImGui::Checkbox("IsTrailEmit", &isTrailEmit);
+		data_->isTrailEmit = uint32_t(isTrailEmit);
 
 		ImGui::Text("DeltaTime1:%f", FPSKeeper::DeltaTime());
 		ImGui::Text("DeltaTime2:%f", FPSKeeper::DeltaTimeFrame());

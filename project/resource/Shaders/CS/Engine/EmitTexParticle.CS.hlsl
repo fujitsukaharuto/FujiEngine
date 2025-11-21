@@ -50,6 +50,29 @@ float3 RandomUnitVector(RandomGenerator gen)
     return normalize(v);
 }
 
+int PopFreeListIndex()
+{
+    int oldTop;
+    int newTop;
+    int original;
+
+    do
+    {
+        oldTop = gFreeListIndex[0];
+        if (oldTop <= 0)
+            return -1;
+
+        newTop = oldTop - 1;
+
+        // InterlockedCompareExchange は out パラメータで元の値を返す
+        InterlockedCompareExchange(gFreeListIndex[0], oldTop, newTop, original);
+
+        // original != oldTop の場合は別スレッドが先に書き換えたので再試行
+    } while (original != oldTop);
+
+    return newTop; // 取り出したインデックス
+}
+
 
 [numthreads(32, 32, 1)]
 void main(uint3 DTid : SV_DispatchThreadID)
@@ -74,8 +97,7 @@ void main(uint3 DTid : SV_DispatchThreadID)
         return; // ここでフィルタリング
 
     // FreeListからインデックス確保
-    int freeListIndex;
-    InterlockedAdd(gFreeListIndex[0], -1, freeListIndex);
+    int freeListIndex = PopFreeListIndex();
     if (0 <= freeListIndex && freeListIndex < kMaxParticles)
     {
         uint particleIndex = gFreeList[freeListIndex];
@@ -106,9 +128,5 @@ void main(uint3 DTid : SV_DispatchThreadID)
 
         gParticle[particleIndex].lifeTime = gEmitter.lifeTime;
         gParticle[particleIndex].currentTime = 0.0f;
-    }
-    else
-    {
-        InterlockedAdd(gFreeListIndex[0], 1);
     }
 }

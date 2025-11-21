@@ -8,7 +8,6 @@ RWStructuredBuffer<uint> gFreeList : register(u2);
 [numthreads(1024, 1, 1)]
 void main( uint3 DTid : SV_DispatchThreadID )
 {
-    gFreeListIndex[0] = 0;
     uint particleIndex = DTid.x;
     if (particleIndex < kMaxParticles)
     {

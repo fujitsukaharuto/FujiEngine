@@ -37,6 +37,8 @@ struct EmitterSphere {
 	Quaternion rotation;
 
 	uint32_t emitVeloType;
+	uint32_t isRandomMove;
+	uint32_t isTrailEmit;
 };
 
 class SphereEmitter : public IGPUEmitter {
