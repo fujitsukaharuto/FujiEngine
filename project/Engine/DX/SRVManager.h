@@ -35,7 +35,7 @@ public:
 	/// <summary>
 	/// 構造化バッファ用のUAV（Unordered Access View）を生成する
 	/// </summary>
-	void CreateStructuredUAV(uint32_t uavIndex, ID3D12Resource* resource, UINT numElements, UINT structureByteStride);
+	void CreateStructuredUAV(uint32_t uavIndex, ID3D12Resource* resource, UINT numElements, UINT structureByteStride,D3D12_BUFFER_UAV_FLAGS flag = D3D12_BUFFER_UAV_FLAG_NONE);
 
 	/// <summary>
 	/// 現在のディスクリプタヒープをコマンドリストへセットする

@@ -11,52 +11,6 @@ ConstantBuffer<PerFrame> gPerFrame : register(b0);
 RWStructuredBuffer<int> gFreeListIndex : register(u1);
 RWStructuredBuffer<uint> gFreeList : register(u2);
 
-
-int PopFreeListIndex()
-{
-    int oldTop;
-    int newTop;
-    int original;
-
-    do
-    {
-        oldTop = gFreeListIndex[0];
-        if (oldTop <= 0)
-            return -1;
-
-        newTop = oldTop - 1;
-
-        // InterlockedCompareExchange は out パラメータで元の値を返す
-        InterlockedCompareExchange(gFreeListIndex[0], oldTop, newTop, original);
-
-        // original != oldTop の場合は別スレッドが先に書き換えたので再試行
-    } while (original != oldTop);
-
-    return newTop; // 取り出したインデックス
-}
-
-void PushFreeList(uint particleIndex)
-{
-    int oldTop;
-    int newTop;
-    int original;
-
-    do
-    {
-        oldTop = gFreeListIndex[0];
-        newTop = oldTop + 1;
-
-        if (newTop >= kMaxParticles)
-            return;
-
-        InterlockedCompareExchange(gFreeListIndex[0], oldTop, newTop, original);
-
-    } while (original != oldTop);
-
-    // 安全に書き込める場所が oldTop に確保されている
-    gFreeList[oldTop] = particleIndex;
-}
-
 void MoveMode(uint pIndex)
 {
     if (gParticle[pIndex].isRandomMove == 1)
@@ -105,12 +59,13 @@ void EmitTrail(uint pIndex)
     float dist = length(gParticle[pIndex].translate - gParticle[pIndex].prevTranslate);
     if (dist > 0.01f)
     {
-    // トレイル粒子生成回数 (距離に応じて 1~n 個)
+        // トレイル粒子生成回数 (距離に応じて 1~n 個)
         int numTrail = (int) (dist * 100.0f * 1.0f);
         numTrail = clamp(numTrail, 0, 10);
         for (int t = 0; t < numTrail; t++)
         {
-            int freeListIndex = PopFreeListIndex();
+            int freeListIndex;
+            InterlockedAdd(gFreeListIndex[0], -1, freeListIndex);
             if (freeListIndex >= 0 && freeListIndex < kMaxParticles)
             {
                 uint trailIndex = gFreeList[freeListIndex];
@@ -129,6 +84,10 @@ void EmitTrail(uint pIndex)
                 gParticle[trailIndex].currentTime = 0;
                 gParticle[trailIndex].isRandomMove = 0;
                 gParticle[trailIndex].isTrailEmit = 0;
+            }
+            else
+            {
+                InterlockedAdd(gFreeListIndex[0], 1);
             }
         }
     }
@@ -166,7 +125,17 @@ void main( uint3 DTid : SV_DispatchThreadID )
         if (gParticle[particleIndex].color.a == 0.0f)
         {
             gParticle[particleIndex].scale = float3(0.0f, 0.0f, 0.0f);
-            PushFreeList(particleIndex);
+            
+            int freeListIndex;
+            InterlockedAdd(gFreeListIndex[0], 1, freeListIndex);
+            if ((freeListIndex + 1) < kMaxParticles)
+            {
+                gFreeList[freeListIndex + 1] = particleIndex;
+            }
+            else
+            {
+                InterlockedAdd(gFreeListIndex[0], -1, freeListIndex);
+            }
         }
     }
 }

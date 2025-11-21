@@ -74,30 +74,6 @@ float3 RandomPointOnTriangle(RandomGenerator gen, float3 v0, float3 v1, float3 v
     return p;
 }
 
-int PopFreeListIndex()
-{
-    int oldTop;
-    int newTop;
-    int original;
-
-    do
-    {
-        oldTop = gFreeListIndex[0];
-        if (oldTop <= 0)
-            return -1;
-
-        newTop = oldTop - 1;
-
-        // InterlockedCompareExchange は out パラメータで元の値を返す
-        InterlockedCompareExchange(gFreeListIndex[0], oldTop, newTop, original);
-
-        // original != oldTop の場合は別スレッドが先に書き換えたので再試行
-    } while (original != oldTop);
-
-    return newTop; // 取り出したインデックス
-}
-
-
 [numthreads(1024, 1, 1)]
 void main(uint3 DTid : SV_DispatchThreadID)
 {
@@ -109,7 +85,8 @@ void main(uint3 DTid : SV_DispatchThreadID)
         if (DTid.x >= gEmitter.count)
             return;
 
-        int freeListIndex = PopFreeListIndex();
+        int freeListIndex;
+        InterlockedAdd(gFreeListIndex[0], -1, freeListIndex);
         if (0 <= freeListIndex && freeListIndex < kMaxParticles)
         {
             float r = generator.Generate1d();
@@ -161,6 +138,10 @@ void main(uint3 DTid : SV_DispatchThreadID)
 
             gParticle[particleIndex].lifeTime = gEmitter.lifeTime;
             gParticle[particleIndex].currentTime = 0.0f;
+        }
+        else
+        {
+            InterlockedAdd(gFreeListIndex[0], 1);
         }
     }
 }

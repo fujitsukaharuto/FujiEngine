@@ -63,7 +63,7 @@ void SRVManager::CreateStructuredSRV(uint32_t srvIndex, ID3D12Resource* resource
 	dxcommon_->GetDevice()->CreateShaderResourceView(resource, &instancingSrvDesc, GetCPUDescriptorHandle(srvIndex));
 }
 
-void SRVManager::CreateStructuredUAV(uint32_t uavIndex, ID3D12Resource* resource, UINT numElements, UINT structureByteStride) {
+void SRVManager::CreateStructuredUAV(uint32_t uavIndex, ID3D12Resource* resource, UINT numElements, UINT structureByteStride, D3D12_BUFFER_UAV_FLAGS flag) {
 	D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
 	uavDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
 	uavDesc.Format = DXGI_FORMAT_UNKNOWN;
@@ -71,7 +71,7 @@ void SRVManager::CreateStructuredUAV(uint32_t uavIndex, ID3D12Resource* resource
 	uavDesc.Buffer.NumElements = numElements;
 	uavDesc.Buffer.StructureByteStride = structureByteStride;
 	uavDesc.Buffer.CounterOffsetInBytes = 0;
-	uavDesc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
+	uavDesc.Buffer.Flags = flag;
 
 	dxcommon_->GetDevice()->CreateUnorderedAccessView(
 		resource,
