@@ -57,6 +57,49 @@ void PushFreeList(uint particleIndex)
     gFreeList[oldTop] = particleIndex;
 }
 
+void MoveMode(uint pIndex)
+{
+    if (gParticle[pIndex].isRandomMove == 1)
+    {
+        float3 pos = gParticle[pIndex].translate;
+        float time = gPerFrame.time;
+
+        float3 samplePos = pos * 0.4 + float3(0, time * pIndex, 0);
+        float3 curl = CurlNoise(samplePos);
+
+        float3 vel0 = gParticle[pIndex].velocity;
+        if (length(vel0) < 0.0001f)
+        {
+            float3 seed = pos * 0.3 + float3(1.234, 5.678, 9.1011);
+            float3 rnd = CurlNoise(seed);
+            vel0 = normalize(rnd + float3(0.1, 0.2, 0.1)) * 0.005f;
+        }
+
+        float baseSpeed = length(vel0);
+        if (baseSpeed < 0.0001f)
+            baseSpeed = 0.01f;
+
+        float3 baseDir = normalize(vel0);
+        float3 force = curl * 0.2;
+        float3 vel = baseDir + force;
+
+        vel = normalize(vel);
+        gParticle[pIndex].velocity = vel * baseSpeed;
+    }
+    else if (gParticle[pIndex].isRandomMove == 2)
+    {
+        float3 pos = gParticle[pIndex].translate;
+        float3 curl = CurlNoise(pos * 0.5);
+
+        float noisePower = 0.2f; // ノイズ強度
+        float speed = length(gParticle[pIndex].velocity);
+
+        gParticle[pIndex].velocity =
+        normalize(gParticle[pIndex].velocity + curl * noisePower) * speed;
+    }
+
+}
+
 void EmitTrail(uint pIndex)
 {
     float dist = length(gParticle[pIndex].translate - gParticle[pIndex].prevTranslate);
@@ -99,41 +142,9 @@ void main( uint3 DTid : SV_DispatchThreadID )
     {
         if (gParticle[particleIndex].color.a != 0)
         {
-            if (gParticle[particleIndex].isRandomMove == 1)
+            if (gParticle[particleIndex].isRandomMove != 0)
             {
-                //float3 pos = gParticle[particleIndex].translate;
-
-                //float3 curl = CurlNoise(pos * 0.5);
-
-                //float noisePower = 0.2f; // ノイズ強度
-                //float speed = length(gParticle[particleIndex].velocity);
-
-                //gParticle[particleIndex].velocity =
-                //normalize(gParticle[particleIndex].velocity + curl * noisePower) * speed;
-                float3 pos = gParticle[particleIndex].translate;
-                float time = gPerFrame.time;
-
-                float3 samplePos = pos * 0.4 + float3(0, time * DTid.x, 0);
-                float3 curl = CurlNoise(samplePos);
-
-                float3 vel0 = gParticle[particleIndex].velocity;
-                if (length(vel0) < 0.0001f)
-                {
-                    float3 seed = pos * 0.3 + float3(1.234, 5.678, 9.1011);
-                    float3 rnd = CurlNoise(seed);
-                    vel0 = normalize(rnd + float3(0.1, 0.2, 0.1)) * 0.005f;
-                }
-
-                float baseSpeed = length(vel0);
-                if (baseSpeed < 0.0001f)
-                    baseSpeed = 0.01f;
-
-                float3 baseDir = normalize(vel0);
-                float3 force = curl * 0.2;
-                float3 vel = baseDir + force;
-
-                vel = normalize(vel);
-                gParticle[particleIndex].velocity = vel * baseSpeed;
+                MoveMode(particleIndex);
             }
 
             gParticle[particleIndex].prevTranslate = gParticle[particleIndex].translate;
