@@ -4,6 +4,7 @@
 RWStructuredBuffer<Particle> gParticle : register(u0);
 RWStructuredBuffer<int> gFreeListIndex : register(u1);
 RWStructuredBuffer<uint> gFreeList : register(u2);
+RWStructuredBuffer<int> gFreeListTailIndex : register(u3);
 
 [numthreads(1024, 1, 1)]
 void main( uint3 DTid : SV_DispatchThreadID )
@@ -15,7 +16,8 @@ void main( uint3 DTid : SV_DispatchThreadID )
         gFreeList[particleIndex] = particleIndex;
         if (particleIndex == 0)
         {
-            gFreeListIndex[0] = kMaxParticles - 1;
+            gFreeListIndex[0] = 0;
+            gFreeListTailIndex[0] = kMaxParticles;
         }
     }
 }

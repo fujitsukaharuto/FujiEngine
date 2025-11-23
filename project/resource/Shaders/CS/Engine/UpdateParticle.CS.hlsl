@@ -10,6 +10,7 @@ struct PerFrame
 ConstantBuffer<PerFrame> gPerFrame : register(b0);
 RWStructuredBuffer<int> gFreeListIndex : register(u1);
 RWStructuredBuffer<uint> gFreeList : register(u2);
+RWStructuredBuffer<int> gFreeListTailIndex : register(u3);
 
 void MoveMode(uint pIndex)
 {
@@ -61,34 +62,40 @@ void EmitTrail(uint pIndex)
     {
         // トレイル粒子生成回数 (距離に応じて 1~n 個)
         int numTrail = (int) (dist * 100.0f * 1.0f);
-        numTrail = clamp(numTrail, 0, 10);
-        for (int t = 0; t < numTrail; t++)
+        numTrail = clamp(numTrail, 0, 60);
+        if (numTrail == 0)
+            return;
+
+        uint originalHead;
+        InterlockedAdd(gFreeListIndex[0], numTrail, originalHead);
+        uint newHead = originalHead + (numTrail - 1);
+        uint capacity = kMaxParticles;
+        uint tail = gFreeListTailIndex[0];
+        if (newHead >= tail)
         {
-            int freeListIndex;
-            InterlockedAdd(gFreeListIndex[0], -1, freeListIndex);
-            if (freeListIndex >= 0 && freeListIndex < kMaxParticles)
-            {
-                uint trailIndex = gFreeList[freeListIndex];
+            uint dummy;
+            InterlockedAdd(gFreeListIndex[0], -numTrail, dummy);
+            return;
+        }
 
-                float k = (float) t / max(1, numTrail);
-                float3 trailPos = lerp(gParticle[pIndex].prevTranslate, gParticle[pIndex].translate, k);
+        for (int t = 0; t < numTrail; ++t)
+        {
+            int slot = (originalHead + t) % capacity;
+            uint trailIndex = gFreeList[slot];
 
-                gParticle[trailIndex].translate = trailPos;
-                gParticle[trailIndex].scale = gParticle[pIndex].scale * 0.75f;
-                gParticle[trailIndex].startScale = gParticle[pIndex].scale * 0.75f;
-
-                gParticle[trailIndex].velocity = float3(0, 0, 0);
-                gParticle[trailIndex].color = gParticle[pIndex].color;
-                gParticle[trailIndex].color.a = 1.0f;
-                gParticle[trailIndex].lifeTime = gParticle[pIndex].lifeTime * 0.5f;
-                gParticle[trailIndex].currentTime = 0;
-                gParticle[trailIndex].isRandomMove = 0;
-                gParticle[trailIndex].isTrailEmit = 0;
-            }
-            else
-            {
-                InterlockedAdd(gFreeListIndex[0], 1);
-            }
+            float k = (float) t / max(1, numTrail);
+            float3 trailPos = lerp(gParticle[pIndex].prevTranslate,gParticle[pIndex].translate,k);
+            Particle src = gParticle[pIndex];
+            gParticle[trailIndex].translate = trailPos;
+            gParticle[trailIndex].scale = src.scale * 0.75f;
+            gParticle[trailIndex].startScale = src.scale * 0.75f;
+            gParticle[trailIndex].velocity = float3(0, 0, 0);
+            gParticle[trailIndex].color = src.color;
+            gParticle[trailIndex].color.a = 1.0f;
+            gParticle[trailIndex].lifeTime = src.lifeTime * 0.5f;
+            gParticle[trailIndex].currentTime = 0;
+            gParticle[trailIndex].isRandomMove = 0;
+            gParticle[trailIndex].isTrailEmit = 0;
         }
     }
 }
@@ -121,20 +128,18 @@ void main( uint3 DTid : SV_DispatchThreadID )
             gParticle[particleIndex].color.a = saturate(alpha);
 
             gParticle[particleIndex].scale = gParticle[particleIndex].startScale * (1.0f - lifeRatio);
-        }
-        if (gParticle[particleIndex].color.a == 0.0f)
-        {
-            gParticle[particleIndex].scale = float3(0.0f, 0.0f, 0.0f);
-            
-            int freeListIndex;
-            InterlockedAdd(gFreeListIndex[0], 1, freeListIndex);
-            if ((freeListIndex + 1) < kMaxParticles)
+
+            if (gParticle[particleIndex].color.a == 0.0f)
             {
-                gFreeList[freeListIndex + 1] = particleIndex;
-            }
-            else
-            {
-                InterlockedAdd(gFreeListIndex[0], -1, freeListIndex);
+                gParticle[particleIndex].scale = float3(0.0f, 0.0f, 0.0f);
+
+                // tailを1増やし、古いtail値を取得（atomic +1）
+                int oldTail;
+                InterlockedAdd(gFreeListTailIndex[0], 1, oldTail);
+                // リングバッファ化
+                int slot = oldTail % kMaxParticles;
+                // 空きスロットにパーティクル番号を保存
+                gFreeList[slot] = particleIndex;
             }
         }
     }

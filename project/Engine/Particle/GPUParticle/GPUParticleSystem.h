@@ -111,6 +111,8 @@ private:
 
 	ComPtr<ID3D12Resource> freeListIndexResource_;
 	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> freeListIndexUAVHandle_;
+	ComPtr<ID3D12Resource> freeListTailIndexResource_;
+	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> freeListTailIndexUAVHandle_;
 	ComPtr<ID3D12Resource> freeListResource_;
 	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> freeListUAVHandle_;
 

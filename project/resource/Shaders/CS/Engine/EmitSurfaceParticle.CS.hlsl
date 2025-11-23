@@ -41,6 +41,7 @@ struct PerFrame
 ConstantBuffer<PerFrame> gPerFrame : register(b1);
 RWStructuredBuffer<int> gFreeListIndex : register(u1);
 RWStructuredBuffer<uint> gFreeList : register(u2);
+RWStructuredBuffer<int> gFreeListTailIndex : register(u3);
 
 
 float3 RandomUnitVector(RandomGenerator gen)
@@ -85,63 +86,64 @@ void main(uint3 DTid : SV_DispatchThreadID)
         if (DTid.x >= gEmitter.count)
             return;
 
-        int freeListIndex;
-        InterlockedAdd(gFreeListIndex[0], -1, freeListIndex);
-        if (0 <= freeListIndex && freeListIndex < kMaxParticles)
+        uint headOld;
+        InterlockedAdd(gFreeListIndex[0], 1, headOld);
+        uint freePos = headOld % kMaxParticles;
+        uint particleIndex = gFreeList[freePos];
+        // もし freeList が枯渇している場合のチェック
+        // headOld と tailの差で検出できる
+        uint tailVal = gFreeListTailIndex[0];
+        if (headOld >= tailVal)
         {
-            float r = generator.Generate1d();
-            uint triIndex = 0;
+            // 空き無し → 元に戻す
+            InterlockedAdd(gFreeListIndex[0], -1);
+            return;
+        }
+        
+        float r = generator.Generate1d();
+        uint triIndex = 0;
             
-            uint left = 0;
-            uint right = gEmitter.triangleCount - 1;
-            while (left < right)
-            {
-                uint mid = (left + right) / 2;
-                if (r <= gTriangleCDF[mid])
-                {
-                    right = mid;
-                }
-                else
-                {
-                    left = mid + 1;
-                }
-            }
-            triIndex = left;
-
-
-            uint i0 = gIndices[triIndex * 3 + 0];
-            uint i1 = gIndices[triIndex * 3 + 1];
-            uint i2 = gIndices[triIndex * 3 + 2];
-            float3 p0 = gVertices[i0].position.xyz;
-            float3 p1 = gVertices[i1].position.xyz;
-            float3 p2 = gVertices[i2].position.xyz;
-            // 三角形内のランダム点
-            float3 pos = RandomPointOnTriangle(generator, p0, p1, p2);
-            // エミッタ座標系
-            pos = pos * gEmitter.radius + gEmitter.translate;
-
-
-            uint particleIndex = gFreeList[freeListIndex];
-            gParticle[particleIndex].scale = gEmitter.scale;
-            gParticle[particleIndex].startScale = gEmitter.scale;
-            gParticle[particleIndex].translate = pos;
-
-            float3 t = (generator.Generate3d() + 1) * 0.5f;
-            gParticle[particleIndex].color.rgb = lerp(gEmitter.colorMin, gEmitter.colorMax, t);
-            gParticle[particleIndex].color.a = 1.0f;
-
-            float veloT = generator.Generate1d();
-            float3 dirRand = generator.GenerateUnitSphereDirection();
-            float speed = lerp(gEmitter.velocityRandMin, gEmitter.velocityRandMax, veloT);
-            float3 velocityOffset = gEmitter.baseVelocity + dirRand * speed;
-            gParticle[particleIndex].velocity = velocityOffset;
-
-            gParticle[particleIndex].lifeTime = gEmitter.lifeTime;
-            gParticle[particleIndex].currentTime = 0.0f;
-        }
-        else
+        uint left = 0;
+        uint right = gEmitter.triangleCount - 1;
+        while (left < right)
         {
-            InterlockedAdd(gFreeListIndex[0], 1);
+            uint mid = (left + right) / 2;
+            if (r <= gTriangleCDF[mid])
+            {
+                right = mid;
+            }
+            else
+            {
+                left = mid + 1;
+            }
         }
+        triIndex = left;
+
+        uint i0 = gIndices[triIndex * 3 + 0];
+        uint i1 = gIndices[triIndex * 3 + 1];
+        uint i2 = gIndices[triIndex * 3 + 2];
+        float3 p0 = gVertices[i0].position.xyz;
+        float3 p1 = gVertices[i1].position.xyz;
+        float3 p2 = gVertices[i2].position.xyz;
+        // 三角形内のランダム点
+        float3 pos = RandomPointOnTriangle(generator, p0, p1, p2);
+        // エミッタ座標系
+        pos = pos * gEmitter.radius + gEmitter.translate;
+
+        gParticle[particleIndex].scale = gEmitter.scale;
+        gParticle[particleIndex].startScale = gEmitter.scale;
+        gParticle[particleIndex].translate = pos;
+
+        float3 t = (generator.Generate3d() + 1) * 0.5f;
+        gParticle[particleIndex].color.rgb = lerp(gEmitter.colorMin, gEmitter.colorMax, t);
+        gParticle[particleIndex].color.a = 1.0f;
+
+        float veloT = generator.Generate1d();
+        float3 dirRand = generator.GenerateUnitSphereDirection();
+        float speed = lerp(gEmitter.velocityRandMin, gEmitter.velocityRandMax, veloT);
+        float3 velocityOffset = gEmitter.baseVelocity + dirRand * speed;
+        gParticle[particleIndex].velocity = velocityOffset;
+        gParticle[particleIndex].lifeTime = gEmitter.lifeTime;
+        gParticle[particleIndex].currentTime = 0.0f;
     }
 }

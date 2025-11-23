@@ -42,6 +42,7 @@ void SphereEmitter::Dispatch(ID3D12GraphicsCommandList* cmd,
 	cmd->SetComputeRootDescriptorTable(0, shared.particleCSUAVHandle);
 	cmd->SetComputeRootDescriptorTable(3, shared.freeListIndexUAVHandle);
 	cmd->SetComputeRootDescriptorTable(4, shared.freeListUAVHandle);
+	cmd->SetComputeRootDescriptorTable(5, shared.freeListTailIndexUAVHandle);
 	cmd->SetComputeRootConstantBufferView(2, shared.perFrameCBV);
 	cmd->SetComputeRootConstantBufferView(1, resource_->GetGPUVirtualAddress());
 	cmd->Dispatch((data_->count + 1024 - 1) / 1024, 1, 1);
@@ -72,6 +73,8 @@ void SphereEmitter::DebugGUI() {
 		int shapeType = int(data_->emitShapeType);
 		ImGui::DragInt("EmitShapeType", &shapeType, 0.1f, 0, 6);
 		data_->emitShapeType = uint32_t(shapeType);
+
+		ImGui::DragFloat3("ParticleScale", &data_->scale.x, 0.01f, 0.01f, 300.0f);
 
 		ImGui::SeparatorText("Color");
 		ImGui::DragFloat3("ColorMax", &data_->colorMax.x, 0.01f, 0.0f, 1.0f);

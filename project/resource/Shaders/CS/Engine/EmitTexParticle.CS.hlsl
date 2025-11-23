@@ -31,6 +31,7 @@ struct PerFrame
 ConstantBuffer<PerFrame> gPerFrame : register(b1);
 RWStructuredBuffer<int> gFreeListIndex : register(u1);
 RWStructuredBuffer<uint> gFreeList : register(u2);
+RWStructuredBuffer<int> gFreeListTailIndex : register(u3);
 
 Texture2D<float4> gMaskTex : register(t0);
 SamplerState gSampler : register(s0);
@@ -73,42 +74,43 @@ void main(uint3 DTid : SV_DispatchThreadID)
     if (luminance < 0.6f)
         return; // ここでフィルタリング
 
-    // FreeListからインデックス確保
-    int freeListIndex;
-    InterlockedAdd(gFreeListIndex[0], -1, freeListIndex);
-    if (0 <= freeListIndex && freeListIndex < kMaxParticles)
+    uint headOld;
+    InterlockedAdd(gFreeListIndex[0], 1, headOld);
+    uint freePos = headOld % kMaxParticles;
+    uint particleIndex = gFreeList[freePos];
+        // もし freeList が枯渇している場合のチェック
+        // headOld と tailの差で検出できる
+    uint tailVal = gFreeListTailIndex[0];
+    if (headOld >= tailVal)
     {
-        uint particleIndex = gFreeList[freeListIndex];
-
-        // テクスチャ座標をワールド位置にマッピング
-        float3 worldPos = gEmitter.translate 
-                        + float3((uv.x - 0.5f) * gEmitter.radius * 2.0f,
-                                 0,
-                                 (uv.y - 0.5f) * gEmitter.radius * 2.0f);
-
-        gParticle[particleIndex].translate = worldPos;
-
-        gParticle[particleIndex].scale = float3(0.1f, 0.1f, 0.1f);
-        gParticle[particleIndex].startScale = gParticle[particleIndex].scale;
-
-        // 色はマスク色 or ランダム
-        RandomGenerator generator;
-        generator.InitSeed(DTid, gPerFrame.time);
-        float3 t = (generator.Generate3d() + 1) * 0.5f;
-        gParticle[particleIndex].color.rgb = lerp(gEmitter.colorMin, gEmitter.colorMax, t);
-        gParticle[particleIndex].color.a = 1.0f;
-
-
-        float veloT = generator.Generate1d();
-        float3 dirRand = generator.GenerateUnitSphereDirection();
-        float speed = lerp(gEmitter.velocityRandMin, gEmitter.velocityRandMax, veloT);
-        gParticle[particleIndex].velocity = gEmitter.baseVelocity + dirRand * speed;
-
-        gParticle[particleIndex].lifeTime = gEmitter.lifeTime;
-        gParticle[particleIndex].currentTime = 0.0f;
+            // 空き無し → 元に戻す
+        InterlockedAdd(gFreeListIndex[0], -1);
+        return;
     }
-    else
-    {
-        InterlockedAdd(gFreeListIndex[0], 1);
-    }
+
+    // テクスチャ座標をワールド位置にマッピング
+    float3 worldPos = gEmitter.translate + 
+    float3((uv.x - 0.5f) * gEmitter.radius * 2.0f,
+    0,
+    (uv.y - 0.5f) * gEmitter.radius * 2.0f);
+
+    gParticle[particleIndex].translate = worldPos;
+
+    gParticle[particleIndex].scale = float3(0.1f, 0.1f, 0.1f);
+    gParticle[particleIndex].startScale = gParticle[particleIndex].scale;
+
+    // 色はマスク色 or ランダム
+    RandomGenerator generator;
+    generator.InitSeed(DTid, gPerFrame.time);
+    float3 t = (generator.Generate3d() + 1) * 0.5f;
+    gParticle[particleIndex].color.rgb = lerp(gEmitter.colorMin, gEmitter.colorMax, t);
+    gParticle[particleIndex].color.a = 1.0f;
+
+    float veloT = generator.Generate1d();
+    float3 dirRand = generator.GenerateUnitSphereDirection();
+    float speed = lerp(gEmitter.velocityRandMin, gEmitter.velocityRandMax, veloT);
+    gParticle[particleIndex].velocity = gEmitter.baseVelocity + dirRand * speed;
+
+    gParticle[particleIndex].lifeTime = gEmitter.lifeTime;
+    gParticle[particleIndex].currentTime = 0.0f;
 }

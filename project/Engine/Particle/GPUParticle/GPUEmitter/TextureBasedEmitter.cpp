@@ -45,6 +45,7 @@ void TextureBasedEmitter::Dispatch(ID3D12GraphicsCommandList* cmd,
 	cmd->SetComputeRootDescriptorTable(3, shared.freeListIndexUAVHandle);
 	cmd->SetComputeRootDescriptorTable(4, shared.freeListUAVHandle);
 	cmd->SetComputeRootDescriptorTable(5, textureForEmit_->gpuHandle);
+	cmd->SetComputeRootDescriptorTable(6, shared.freeListTailIndexUAVHandle);
 	cmd->SetComputeRootConstantBufferView(1, resource_->GetGPUVirtualAddress());
 	cmd->SetComputeRootConstantBufferView(2, shared.perFrameCBV);
 	int dispatchCountX = (int(textureForEmit_->meta.width) + 32 - 1) / 32;

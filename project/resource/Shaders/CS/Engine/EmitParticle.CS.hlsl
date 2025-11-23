@@ -42,6 +42,7 @@ struct PerFrame
 ConstantBuffer<PerFrame> gPerFrame : register(b1);
 RWStructuredBuffer<int> gFreeListIndex : register(u1);
 RWStructuredBuffer<uint> gFreeList : register(u2);
+RWStructuredBuffer<int> gFreeListTailIndex : register(u3);
 
 
 float3 RandomUnitVector(inout RandomGenerator gen)
@@ -184,54 +185,58 @@ void main(uint3 DTid : SV_DispatchThreadID)
         if (DTid.x >= gEmitter.count)
             return;
 
-        int freeListIndex;
-        InterlockedAdd(gFreeListIndex[0], -1, freeListIndex);
-        if (0 <= freeListIndex && freeListIndex < kMaxParticles)
+        uint headOld;
+        InterlockedAdd(gFreeListIndex[0], 1, headOld);
+        uint freePos = headOld % kMaxParticles;
+        uint particleIndex = gFreeList[freePos];
+        // もし freeList が枯渇している場合のチェック
+        // headOld と tailの差で検出できる
+        uint tailVal = gFreeListTailIndex[0];
+        if (headOld >= tailVal)
         {
-            // 補間係数（0〜1）: スレッドIDをcountで割る
-            float lerpT;
-            if (gEmitter.count > 1)
-            {
-                lerpT = (float) DTid.x / (gEmitter.count - 1);
-            }
-            else
-            {
-                lerpT = 0.0f;
-            }
-
-            float3 interpPos = gEmitter.translate;
-            if (gEmitter.isDistance == 1)
-            {
-                interpPos = lerp(gEmitter.prevTranslate, gEmitter.translate, lerpT);
-            }
-
-            float3 localPos = GenerateEmitPosition(gEmitter.emitShapeType, generator);
-            localPos = RotateVector(localPos, gEmitter.rotation);
-            float3 pos = interpPos + localPos;
-
-            uint particleIndex = gFreeList[freeListIndex];
-            gParticle[particleIndex].scale = gEmitter.scale;
-            gParticle[particleIndex].startScale = gEmitter.scale;
-            gParticle[particleIndex].translate = pos;
-            gParticle[particleIndex].prevTranslate = pos;
-
-            float3 t = (generator.Generate3d() + 1) * 0.5f;
-            gParticle[particleIndex].color.rgb = lerp(gEmitter.colorMin, gEmitter.colorMax, t);
-            gParticle[particleIndex].color.a = 1.0f;
-
-            float veloT = generator.Generate1d();
-            float speed = lerp(gEmitter.velocityRandMin, gEmitter.velocityRandMax, veloT);
-            float3 velDir = GenerateEmitVelocity(gEmitter.emitVeloType, localPos, generator);
-            gParticle[particleIndex].velocity = gEmitter.baseVelocity + velDir * speed;
-
-            gParticle[particleIndex].lifeTime = gEmitter.lifeTime;
-            gParticle[particleIndex].currentTime = 0.0f;
-            gParticle[particleIndex].isRandomMove = gEmitter.isRandomMove;
-            gParticle[particleIndex].isTrailEmit = gEmitter.isTrailEmit;
+            // 空き無し → 元に戻す
+            InterlockedAdd(gFreeListIndex[0], -1);
+            return;
+        }
+        
+        // 補間係数（0〜1）: スレッドIDをcountで割る
+        float lerpT;
+        if (gEmitter.count > 1)
+        {
+            lerpT = (float) DTid.x / (gEmitter.count - 1);
         }
         else
         {
-            InterlockedAdd(gFreeListIndex[0], 1);
+            lerpT = 0.0f;
         }
+
+        float3 interpPos = gEmitter.translate;
+        if (gEmitter.isDistance == 1)
+        {
+            interpPos = lerp(gEmitter.prevTranslate, gEmitter.translate, lerpT);
+        }
+
+        float3 localPos = GenerateEmitPosition(gEmitter.emitShapeType, generator);
+        localPos = RotateVector(localPos, gEmitter.rotation);
+        float3 pos = interpPos + localPos;
+
+        gParticle[particleIndex].scale = gEmitter.scale;
+        gParticle[particleIndex].startScale = gEmitter.scale;
+        gParticle[particleIndex].translate = pos;
+        gParticle[particleIndex].prevTranslate = pos;
+
+        float3 t = (generator.Generate3d() + 1) * 0.5f;
+        gParticle[particleIndex].color.rgb = lerp(gEmitter.colorMin, gEmitter.colorMax, t);
+        gParticle[particleIndex].color.a = 1.0f;
+
+        float veloT = generator.Generate1d();
+        float speed = lerp(gEmitter.velocityRandMin, gEmitter.velocityRandMax, veloT);
+        float3 velDir = GenerateEmitVelocity(gEmitter.emitVeloType, localPos, generator);
+        gParticle[particleIndex].velocity = gEmitter.baseVelocity + velDir * speed;
+
+        gParticle[particleIndex].lifeTime = gEmitter.lifeTime;
+        gParticle[particleIndex].currentTime = 0.0f;
+        gParticle[particleIndex].isRandomMove = gEmitter.isRandomMove;
+        gParticle[particleIndex].isTrailEmit = gEmitter.isTrailEmit;
     }
 }

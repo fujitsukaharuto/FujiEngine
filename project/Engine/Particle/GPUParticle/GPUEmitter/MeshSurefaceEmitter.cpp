@@ -100,6 +100,7 @@ void MeshSurefaceEmitter::Dispatch(ID3D12GraphicsCommandList* cmd,
 	cmd->SetComputeRootDescriptorTable(5, srv->GetGPUDescriptorHandle(verticesIndex));
 	cmd->SetComputeRootDescriptorTable(6, srv->GetGPUDescriptorHandle(indiciesIndex));
 	cmd->SetComputeRootDescriptorTable(7, srv->GetGPUDescriptorHandle(areasIndex));
+	cmd->SetComputeRootDescriptorTable(8, shared.freeListTailIndexUAVHandle);
 	cmd->SetComputeRootConstantBufferView(1, resource_->GetGPUVirtualAddress());
 	cmd->SetComputeRootConstantBufferView(2, shared.perFrameCBV);
 	cmd->Dispatch((data_->count + 1024 - 1) / 1024, 1, 1);

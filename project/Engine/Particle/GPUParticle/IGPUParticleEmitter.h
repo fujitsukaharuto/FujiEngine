@@ -12,6 +12,7 @@ struct ParticleCSHandles {
 	D3D12_GPU_DESCRIPTOR_HANDLE particleCSUAVHandle{};
 	D3D12_GPU_VIRTUAL_ADDRESS   perFrameCBV{};
 	D3D12_GPU_DESCRIPTOR_HANDLE freeListIndexUAVHandle{};
+	D3D12_GPU_DESCRIPTOR_HANDLE freeListTailIndexUAVHandle{};
 	D3D12_GPU_DESCRIPTOR_HANDLE freeListUAVHandle{};
 };
 

@@ -32,6 +32,7 @@ void GPUParticleSystem::Finalize() {
 	
 	particleCSInstancing_.Reset();
 	freeListIndexResource_.Reset();
+	freeListTailIndexResource_.Reset();
 	freeListResource_.Reset();
 	perViewResource_.Reset();
 	perFrameResource_.Reset();
@@ -192,6 +193,12 @@ void GPUParticleSystem::InitParticleCS() {
 	freeListIndexUAVHandle_.first = srvManager_->GetCPUDescriptorHandle(freeCountUAVIndex);
 	freeListIndexUAVHandle_.second = srvManager_->GetGPUDescriptorHandle(freeCountUAVIndex);
 
+	freeListTailIndexResource_ = dxcommon_->CreateUAVResource(dxcommon_->GetDevice(), (sizeof(int32_t)));
+	uint32_t freeTailCountUAVIndex = srvManager_->Allocate();
+	srvManager_->CreateStructuredUAV(freeTailCountUAVIndex, freeListTailIndexResource_.Get(), 1, sizeof(int32_t));
+	freeListTailIndexUAVHandle_.first = srvManager_->GetCPUDescriptorHandle(freeTailCountUAVIndex);
+	freeListTailIndexUAVHandle_.second = srvManager_->GetGPUDescriptorHandle(freeTailCountUAVIndex);
+
 	freeListResource_ = dxcommon_->CreateUAVResource(dxcommon_->GetDevice(), (sizeof(uint32_t) * particleCSInsstanceCount_));
 	uint32_t freeListUAVIndex = srvManager_->Allocate();
 	srvManager_->CreateStructuredUAV(freeListUAVIndex, freeListResource_.Get(), particleCSInsstanceCount_, sizeof(uint32_t));
@@ -203,6 +210,7 @@ void GPUParticleSystem::InitParticleCS() {
 	dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(0, particleCSUAVHandle_.second);
 	dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(1, freeListIndexUAVHandle_.second);
 	dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(2, freeListUAVHandle_.second);
+	dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(3, freeListTailIndexUAVHandle_.second);
 	int dispatchCount = (numParticles + threadsPerGroup - 1) / threadsPerGroup;
 	dxcommon_->GetCommandList()->Dispatch(dispatchCount, 1, 1);
 	dxcommon_->CommandExecution();
@@ -257,6 +265,7 @@ void GPUParticleSystem::UpdateParticleCSDispatch() {
 	dxcommon_->GetCommandList()->SetComputeRootConstantBufferView(1, perFrameResource_->GetGPUVirtualAddress());
 	dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(2, freeListIndexUAVHandle_.second);
 	dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(3, freeListUAVHandle_.second);
+	dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(4, freeListTailIndexUAVHandle_.second);
 	int dispatchCount = (numParticles + threadsPerGroup - 1) / threadsPerGroup;
 	dxcommon_->GetCommandList()->Dispatch(dispatchCount, 1, 1);
 	dxcommon_->InsertUAVBarrier(particleCSInstancing_.Get());
@@ -267,6 +276,7 @@ void GPUParticleSystem::EmitterDispatch() {
 	particleCSUAVHandle_.second,
 	perFrameResource_->GetGPUVirtualAddress(),
 	freeListIndexUAVHandle_.second,
+	freeListTailIndexUAVHandle_.second,
 	freeListUAVHandle_.second
 	};
 
