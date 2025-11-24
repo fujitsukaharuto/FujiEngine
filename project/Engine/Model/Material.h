@@ -1,5 +1,6 @@
 #pragma once
 #include "Math/Matrix/MatrixCalculation.h"
+#include "Engine/Math/Vector/Vector4.h"
 #include "TextureManager.h"
 
 class DXCom;
@@ -29,6 +30,14 @@ enum class LightMode {
 	kPointLightON,
 	kSpotLightON,
 };
+
+namespace Colors {
+	constexpr Vector4 Black = { 0.0f, 0.0f, 0.0f, 1.0f };
+	constexpr Vector4 White = { 1.0f, 1.0f, 1.0f, 1.0f };
+	constexpr Vector4 Red = { 1.0f, 0.0f, 0.0f, 1.0f };
+	constexpr Vector4 Blue = { 0.0f, 0.0f, 1.0f, 1.0f };
+	constexpr Vector4 Transparent = { 0.0f, 0.0f, 0.0f, 0.0f };
+}
 
 /// <summary>
 /// マテリアルクラス

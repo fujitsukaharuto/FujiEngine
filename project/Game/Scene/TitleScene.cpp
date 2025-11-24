@@ -31,8 +31,8 @@ void TitleScene::Initialize() {
 #pragma region シーン遷移用
 	black_ = std::make_unique<Sprite>();
 	black_->Load("white2x2.png");
-	black_->SetColor({ 0.0f,0.0f,0.0f,1.0f });
-	black_->SetSize({ 1280.0f,720.0f });
+	black_->SetColor(Colors::Black);
+	black_->SetSize({ float(MyWin::kWindowWidth),float(MyWin::kWindowHeight) });
 	black_->SetAnchor({ 0.0f,0.0f });
 #pragma endregion
 
@@ -45,7 +45,6 @@ void TitleScene::Initialize() {
 	terrain_->IsMirrorOBJ(true);
 	terrain_->SetEnvironmentCoeff(0.3f);
 	terrain_->SetTexture("grass.jpg");
-	terrain_->transform.scale = { 1.0f,1.0f,1.0f };
 	terrain_->SetUVScale({ 20.0f,20.0f }, { 0.0f,0.0f });
 
 	space_ = std::make_unique<Sprite>();
@@ -62,16 +61,13 @@ void TitleScene::Initialize() {
 	json playerData = JsonSerializer::DeserializeJsonData("resource/Json/Game_Player.json");
 	player_->SetModelDataJson(playerData);
 	player_->Initialize();
-	playerStart_ = { -3.5f,10.0f,-26.0f };
-	playerCenter_ = { -3.9f,3.0f,-25.0f };
-	playerEnd_ = { 14.2f,6.0f,-14.0f };
+	TitleLoadPlayerPoint();
 	player_->SettingTitleStartPosition(playerStart_, playerCenter_, playerEnd_);
 
 
 	particleTest_ = std::make_unique<Object3d>();
 	particleTest_->CreateSphere();
-	particleTest_->transform.translate={ 11.37f,7.557f,14.83f};
-	particleTest_->SetColor({ 0.0f,0.0f,0.0f,0.0f });
+	particleTest_->SetColor(Colors::Transparent);
 
 	cMane_ = std::make_unique<CollisionManager>();
 
@@ -174,6 +170,19 @@ void TitleScene::Draw() {
 void TitleScene::DebugGUI() {
 #ifdef _DEBUG
 	ImGui::Checkbox("UI Invisible", &uiInvisible_);
+	if (ImGui::TreeNode("PlayerMovePoint")) {
+		ImGui::DragFloat3("StartPoint", &playerStart_.x, 0.01f);
+		ImGui::DragFloat3("CenterPoint", &playerCenter_.x, 0.01f);
+		ImGui::DragFloat3("EndPoint", &playerEnd_.x, 0.01f);
+		if (ImGui::Button("Test")) {
+			startTime_ = startMaxTime_;
+		}ImGui::SameLine();
+		if (ImGui::Button("Save##player3Point")) {
+			TitleSavePlayerPoint();
+		}
+		ImGui::TreePop();
+	}
+	ImGui::Separator();
 	ImGui::Indent();
 	if (ImGui::CollapsingHeader("particleTest")) {
 		particleTest_->DebugGUI();
@@ -236,6 +245,26 @@ void TitleScene::BlackFade() {
 }
 
 void TitleScene::ApplyGlobalVariables() {
+}
 
+void TitleScene::TitleLoadPlayerPoint() {
+#ifdef _DEBUG
+	json data = JsonSerializer::DeserializeJsonData("resource/Json/Title/PlayerPoint.json");
 
+	playerStart_ = Vector3(data["start"][0], data["start"][1], data["start"][2]);
+	playerCenter_ = Vector3(data["center"][0], data["center"][1], data["center"][2]);
+	playerEnd_ = Vector3(data["end"][0], data["end"][1], data["end"][2]);
+#endif // _DEBUG
+}
+
+void TitleScene::TitleSavePlayerPoint() {
+#ifdef _DEBUG
+	json data;
+
+	data["start"] = { playerStart_.x,playerStart_.y,playerStart_.z };
+	data["center"] = { playerCenter_.x,playerCenter_.y,playerCenter_.z };
+	data["end"] = { playerEnd_.x,playerEnd_.y,playerEnd_.z };
+
+	JsonSerializer::SerializeJsonData(data, "resource/Json/Title/PlayerPoint.json");
+#endif // _DEBUG
 }
