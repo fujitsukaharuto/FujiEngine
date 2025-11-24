@@ -1,6 +1,7 @@
 #pragma once
 #include <d3d12.h>
 #include <functional>
+#include <string>
 
 class DXCom;
 class SRVManager;
@@ -24,7 +25,11 @@ public:
 		DXCom* dx, SRVManager* srv, const ParticleCSHandles& shared) = 0;
 
 	virtual void DebugGUI() = 0;
+	virtual void Save(const std::string& fileName) = 0;
+	virtual void Load(const std::string& fileName) = 0;
 	virtual bool IsEmit() const = 0;
 	virtual void SetEmit(bool state) = 0;
 	virtual ~IGPUEmitter() = default;
+protected:
+	const std::string kDirectoryPath_ = "resource/EmitterSaveFile/GPUEmitter/";
 };

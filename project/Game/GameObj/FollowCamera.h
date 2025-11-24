@@ -25,7 +25,8 @@ public:
 	//* Setter
 	void SetTranslate(const Vector3& pos);
 	void SetTarget(const Trans* target);
-	
+	void SetOffset(float addZRang, float changeTime);
+
 	/// <summary>
 	///	カメラ回転の計算
 	/// </summary>
@@ -36,6 +37,7 @@ public:
 	/// オフセットの計算
 	/// </summary>
 	Vector3 OffsetCal() const;
+	void OffsetChangeCal();
 
 	void DebugGUI();
 
@@ -44,9 +46,16 @@ private:
 
 private:
 
+	bool isLockOnFollow_ = true;
+	Vector3 preLockOnPos_ = {};
 	const Trans* target_ = nullptr;
 	Vector3 interTarget_ = {};
-	float destinationAngleY_ = 0;
+	float destinationAngleY_ = 0.0f;
 	Vector3 offset_;
+	Vector3 preOffset_;
+	Vector3 changeOffset_;
+	float offsetChangeBaseTime_ = 0.0f;
+	float offsetChangeTime_ = 0.0f;
 
+	float followSpeed_ = 0.25f;
 };

@@ -13,7 +13,7 @@ FollowCamera::~FollowCamera() {
 void FollowCamera::Initialize() {
 	Camera* camera = CameraManager::GetInstance()->GetCamera();
 	camera->transform.rotate.x = 0.13f;
-	offset_ = { 0.0f, 4.0f, -25.0f };
+	offset_ = { 0.0f, 4.0f, -27.5f };
 }
 
 void FollowCamera::Update(const Vector3& lockon) {
@@ -21,12 +21,18 @@ void FollowCamera::Update(const Vector3& lockon) {
 
 	Camera* camera = CameraManager::GetInstance()->GetCamera();
 
-	Vector3 lockOnPosition = lockon;
+	Vector3 lockOnPosition;
+	if (isLockOnFollow_) {
+		lockOnPosition = lockon;
+		preLockOnPos_ = lockon;
+	} else {
+		lockOnPosition = preLockOnPos_;
+	}
 	lockOnPosition.y = lockOnPosition.y - 3.0f;
 	Vector3 sub = lockOnPosition - Vector3(target_->translate.x, target_->translate.y + 4.0f , target_->translate.z);
 
 	destinationAngleY_ = std::atan2(sub.x, sub.z);
-	camera->transform.rotate.y = LerpShortAngle(camera->transform.rotate.y, destinationAngleY_, 0.3f);
+	camera->transform.rotate.y = LerpShortAngle(camera->transform.rotate.y, destinationAngleY_, followSpeed_);
 
 	// X軸
 	float horizontalDistance = std::sqrt(sub.x * sub.x + sub.z * sub.z);
@@ -34,12 +40,13 @@ void FollowCamera::Update(const Vector3& lockon) {
 	if (destinationAngleX < -0.09f) {//上向きすぎないように
 		destinationAngleX = -0.09f;
 	}
-	camera->transform.rotate.x = LerpShortAngle(camera->transform.rotate.x, destinationAngleX, 0.3f);
+	camera->transform.rotate.x = LerpShortAngle(camera->transform.rotate.x, destinationAngleX, followSpeed_);
 
 	if (target_) {
 		interTarget_ = Lerp(interTarget_, { target_->translate.x,0.0f,target_->translate.z }, 0.05f);
 	}
 
+	OffsetChangeCal();
 	Vector3 offset = OffsetCal();
 	camera->transform.translate = interTarget_ + offset;
 	camera->UpdateMaterix();
@@ -103,6 +110,14 @@ void FollowCamera::SetTarget(const Trans* target) {
 	Reset();
 }
 
+void FollowCamera::SetOffset(float addZRang, float changeTime) {
+	preOffset_ = offset_;
+	changeOffset_ = offset_;
+	changeOffset_.z += addZRang;
+	offsetChangeTime_ = changeTime;
+	offsetChangeBaseTime_ = changeTime;
+}
+
 void FollowCamera::PreRotateUpdate(const Vector3& lockon) {
 	Camera* camera = CameraManager::GetInstance()->GetCamera();
 
@@ -136,6 +151,17 @@ Vector3 FollowCamera::OffsetCal() const {
 	return offset;
 }
 
+void FollowCamera::OffsetChangeCal() {
+	if (offsetChangeTime_ > 0.0f) {
+		offsetChangeTime_ -= FPSKeeper::DeltaTime();
+		if (offsetChangeTime_ <= 0.0f) {
+			offsetChangeTime_ = 0.0f;
+		}
+		float t = offsetChangeTime_ / offsetChangeBaseTime_;
+		offset_ = Lerp(changeOffset_, preOffset_, t);
+	}
+}
+
 void FollowCamera::DebugGUI() {
 #ifdef _DEBUG
 	if (ImGui::CollapsingHeader("FollowCamera")) {
@@ -144,6 +170,8 @@ void FollowCamera::DebugGUI() {
 			ImGui::Text("Target : X:%0.2f, Y:%0.2f, Z:%0.2f", target_->translate.x, target_->translate.y, target_->translate.z);
 		}
 		ImGui::DragFloat3("Offfset", &offset_.x, 0.1f);
+		ImGui::Checkbox("IsFollowLockOn", &isLockOnFollow_);
+		ImGui::DragFloat("FollowSpeed", &followSpeed_, 0.01f, 0.01f, 1.0f);
 		ImGui::Unindent();
 	}
 #endif // _DEBUG

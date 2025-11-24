@@ -340,7 +340,6 @@ void Boss::DebugGUI() {
 		core_->DebugGUI();
 		ImGui::Unindent();
 	}
-
 #endif // _DEBUG
 }
 

@@ -21,7 +21,7 @@ private:
 
 	Step step_;
 	bool isAttack_ = true;
-	float coolTime_ = 120.0f;
+	float coolTime_ = 100.0f;
 
 	bool isbeforArrow_ = false;
 	float beforWait_ = 0.0f;

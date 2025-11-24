@@ -47,7 +47,11 @@ public:
 	void Dispatch(ID3D12GraphicsCommandList* cmd,
 		DXCom* dx, SRVManager* srv, const ParticleCSHandles& shared) override;
 	void DebugGUI() override;
+	void Save(const std::string& fileName) override;
+	void Load(const std::string& fileName) override;
 
 	bool IsEmit() const override { return isEmit_; }
 	void SetEmit(bool state) override { isEmit_ = state; }
+private:
+	char saveName_[64] = "default";
 };

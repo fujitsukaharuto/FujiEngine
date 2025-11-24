@@ -121,8 +121,8 @@ void GameScene::Update() {
 
 #endif // _DEBUG
 
-	if (!player_->GetIsGameOver()) {
-		if (boss_->GetIsStart()) {
+	if (!player_->GetIsGameOver()) {// GameOverかどうか
+		if (boss_->GetIsStart()) {//ボスが召喚時
 			player_->SetTargetPos(boss_->GetDefoultPos());
 		} else {
 			player_->SetTargetPos(boss_->GetBossCore()->GetCollider()->GetWorldPos());
