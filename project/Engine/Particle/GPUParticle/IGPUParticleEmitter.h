@@ -2,6 +2,7 @@
 #include <d3d12.h>
 #include <functional>
 #include <string>
+#include "Engine/Math/Vector/Vector3.h"
 
 class DXCom;
 class SRVManager;
@@ -27,7 +28,9 @@ public:
 	virtual void DebugGUI() = 0;
 	virtual void Save(const std::string& fileName) = 0;
 	virtual void Load(const std::string& fileName) = 0;
+	virtual void Emit() = 0;
 	virtual bool IsEmit() const = 0;
+	virtual void SetPos(const Vector3& pos) = 0;
 	virtual void SetEmit(bool state) = 0;
 	virtual ~IGPUEmitter() = default;
 protected:

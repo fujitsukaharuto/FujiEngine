@@ -7,12 +7,12 @@
 #include "BossRoot.h"
 
 BossDushAttack::BossDushAttack(Boss* pBoss,bool is) : BaseBossBehavior(pBoss) {
-	step_ = Step::ATTACK;
+	step_ = Step::CHARGE;
 	cameraRang_ = -37.5f;
 	cameraFollowSpeed_ = 0.03f;
 	pBoss_->SetCameraRang(cameraRang_);
 	pBoss_->SetCameraFollowSpeed(cameraFollowSpeed_);
-	pBoss_->GetAnimModel()->ChangeAnimation("idle");
+	pBoss_->GetAnimModel()->ChangeAnimation("DushPose");
 	pBoss_->GetAnimModel()->IsRoopAnimation(false);
 	pBoss_->ChainCount();
 	isPreDush_ = is;
@@ -27,13 +27,23 @@ BossDushAttack::~BossDushAttack() {
 void BossDushAttack::Update() {
 
 	switch (step_) {
+	case BossDushAttack::Step::CHARGE:
+
+		if (pBoss_->DushCharge(chargeTime_, maxCharegeTime_, isNear_, stopReng_)) {
+			step_ = Step::ATTACK;
+		}
+
+		break;
 		///---------------------------------------------------------------------------------------
 		/// 攻撃
 		///---------------------------------------------------------------------------------------
 	case BossDushAttack::Step::ATTACK:
+		if (startWaitTime_ < maxStartWaitTime_) {
+			startWaitTime_ += FPSKeeper::DeltaTime();
+			break;
+		}
 
-
-		if (pBoss_->DushCharge(chargeTime_, maxCharegeTime_, isNear_, stopReng_)) {
+		if (isAttack_) {
 			if (pBoss_->DushAttack(isNear_, dushReng_, stopReng_)) {
 				isAttack_ = false;
 			}

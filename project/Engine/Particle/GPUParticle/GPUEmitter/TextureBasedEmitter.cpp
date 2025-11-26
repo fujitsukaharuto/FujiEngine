@@ -22,6 +22,12 @@ void TextureBasedEmitter::InitTextureData(const std::string& fileName) {
 }
 
 void TextureBasedEmitter::Update(float deltaTime) {
+	if (isOnceEmit_) {
+		data_->emit = 1;
+		data_->frequencyTime = 0.0f;
+		isOnceEmit_ = false;
+		return;
+	}
 	if (!isEmit_) {
 		data_->emit = 0;
 		data_->frequencyTime = 0.0f;
@@ -142,4 +148,12 @@ void TextureBasedEmitter::Load(const std::string& fileName) {
 
 	data_->velocityRandMax = j.value("velRandMax", data_->velocityRandMax);
 	data_->velocityRandMin = j.value("velRandMin", data_->velocityRandMin);
+}
+
+void TextureBasedEmitter::Emit() {
+	isOnceEmit_ = true;
+}
+
+void TextureBasedEmitter::SetPos(const Vector3& pos) {
+	data_->translate = pos;
 }

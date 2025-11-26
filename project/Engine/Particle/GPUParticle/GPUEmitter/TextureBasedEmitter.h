@@ -37,8 +37,6 @@ struct EmitterTexture {
 class TextureBasedEmitter : public IGPUEmitter {
 public:
 	EmitterTexture* data_ = nullptr;
-	ComPtr<ID3D12Resource> resource_;
-	Texture* textureForEmit_;
 	bool isEmit_ = false;
 
 	TextureBasedEmitter(DXCom* dx);
@@ -51,8 +49,13 @@ public:
 	void Save(const std::string& fileName) override;
 	void Load(const std::string& fileName) override;
 
+	void Emit() override;
 	bool IsEmit() const override { return isEmit_; }
+	void SetPos(const Vector3& pos) override;
 	void SetEmit(bool state) override { isEmit_ = state; }
 private:
 	char saveName_[64] = "default";
+	ComPtr<ID3D12Resource> resource_;
+	Texture* textureForEmit_;
+	bool isOnceEmit_ = false;
 };

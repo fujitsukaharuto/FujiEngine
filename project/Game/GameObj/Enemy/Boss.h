@@ -242,6 +242,9 @@ private:
 	float cameraRang_ = -25.0f;
 	float cameraFollowSpeed_ = 0.2f;
 
+	int dushChargeIndex_ = 0;
+	int dushTrailIndex_ = 0;
+
 	// emitter
 	ParticleEmitter waveAttack1;
 	ParticleEmitter waveAttack2;
@@ -267,6 +270,9 @@ private:
 	ParticleEmitter summonLightning_;;
 	ParticleEmitter energySphere_;
 	ParticleEmitter energyParticle_;
+
+	ParticleEmitter dushStartParticle_;
+	ParticleEmitter dushSmoke_;
 
 	SoundData* jumpAttackSE_;
 

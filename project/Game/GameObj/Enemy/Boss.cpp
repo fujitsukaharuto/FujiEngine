@@ -23,6 +23,8 @@ Boss::Boss() {
 
 Boss::~Boss() {
 	ParticleManager::GetParticleCSEmitterTexture(summonIndex_).SetEmit(false);
+	ParticleManager::GetParticleCSEmitter(dushTrailIndex_).SetEmit(false);
+
 	for (int i = 0; i < 8; i++) {
 		ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]).SetEmit(false);
 	}
@@ -204,6 +206,14 @@ void Boss::Initialize() {
 	roringParticle_.SetAnimParent(animModel_->GetJointTrans("mixamorig:Head"));
 	roringParticle_.pos_.y = -6.5f;
 	roringParticle_.pos_.z = 5.0f;
+
+	ParticleManager::Load(dushStartParticle_, "duahChargeCompleteParticle");
+	ParticleManager::Load(dushSmoke_, "dushGroundSmoke");
+	dushStartParticle_.frequencyTime_ = 0.0f;
+	dushChargeIndex_ = ParticleManager::GetInstance()->InitGPUEmitter();
+	dushTrailIndex_ = ParticleManager::GetInstance()->InitGPUEmitter();
+	ParticleManager::GetParticleCSEmitter(dushChargeIndex_).Load("dushCharge");
+	ParticleManager::GetParticleCSEmitter(dushTrailIndex_).Load("DushTrail");
 
 	actionList_ = {
 		"Root","Wave","Beam","Jump","Sword","Area","Arrow","FallRod","Dush",
@@ -709,7 +719,16 @@ void Boss::CaluModelDir() {
 }
 
 bool Boss::DushCharge(float& t, float maxT, bool& isNear,float reng) {
-	if (t <= maxT * 0.25f) {
+	if (t <= 0.0f) {
+		Vector3 emitPos = { 0.0f,0.0f,6.5f };
+		Matrix4x4 rotateMatrix = MakeRotateYMatrix(animModel_->transform.rotate.y);
+		emitPos = TransformNormal(emitPos, rotateMatrix);
+		emitPos += animModel_->transform.translate;
+		emitPos.y = 2.0f;
+		ParticleManager::GetParticleCSEmitter(dushChargeIndex_).SetPos(emitPos);
+		ParticleManager::GetParticleCSEmitter(dushChargeIndex_).Emit();
+	}
+	if (t <= maxT * 0.2f) {
 		CaluModelDir();
 	}
 	t += FPSKeeper::DeltaTime();
@@ -719,19 +738,44 @@ bool Boss::DushCharge(float& t, float maxT, bool& isNear,float reng) {
 		false;
 	}
 	if (t > maxT) {
+		Vector3 emitPos = { 0.0f,0.0f,6.5f };
+		Matrix4x4 rotateMatrix = MakeRotateYMatrix(animModel_->transform.rotate.y);
+		emitPos = TransformNormal(emitPos, rotateMatrix);
+		emitPos += animModel_->transform.translate;
+		emitPos.y = 2.0f;
+		dushStartParticle_.pos_ = emitPos;
+		dushStartParticle_.Emit();
 		return true;
 	}
 	return false;
 }
 
 bool Boss::DushAttack(bool isNear, float& dushReng, float stopReng) {
+	if (dushReng == 0.0f) {
+		ParticleManager::GetParticleCSEmitter(dushTrailIndex_).SetEmit(true);
+		ParticleManager::GetParticleCSEmitter(dushTrailIndex_).SetPos(animModel_->transform.translate);
+	}
 	Vector3 front = Vector3(0.0f, 0.0f, 1.0f) * 1.5f * FPSKeeper::DeltaTime();
-	front = TransformNormal(front, MakeRotateYMatrix(animModel_->transform.rotate.y));
+	Matrix4x4 rotateMatrix = MakeRotateYMatrix(animModel_->transform.rotate.y);
+	front = TransformNormal(front, rotateMatrix);
 	animModel_->transform.translate += front;
 	dushReng += front.Length();
+	Vector3 emitPos = { 0.0f,0.0f,8.5f };
+	emitPos = TransformNormal(emitPos, rotateMatrix);
+	emitPos += animModel_->transform.translate;
+	emitPos.y = 3.0f;
+	ParticleManager::GetParticleCSEmitter(dushTrailIndex_).SetPos(emitPos);
+	emitPos = { 0.0f,0.0f,5.5f };
+	emitPos = TransformNormal(emitPos, rotateMatrix);
+	emitPos += animModel_->transform.translate;
+	emitPos.y = 1.0f;
+	dushSmoke_.pos_ = emitPos;
+	dushSmoke_.Emit();
 	if (!isNear && dushReng >= stopReng * 1.5f) {
+		ParticleManager::GetParticleCSEmitter(dushTrailIndex_).SetEmit(false);
 		return true;
-	} else if (isNear&& dushReng >= stopReng) {
+	} else if (isNear && dushReng >= stopReng) {
+		ParticleManager::GetParticleCSEmitter(dushTrailIndex_).SetEmit(false);
 		return true;
 	}
 	return false;

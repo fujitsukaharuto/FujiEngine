@@ -21,6 +21,11 @@ SphereEmitter::SphereEmitter(DXCom* dx) {
 }
 
 void SphereEmitter::Update(float deltaTime) {
+	if (isOnceEmit_) {
+		data_->emit = 1;
+		data_->frequencyTime = 0.0f;
+		return;
+	}
 	if (!isEmit_) {
 		data_->emit = 0;
 		data_->frequencyTime = 0.0f;
@@ -38,7 +43,7 @@ void SphereEmitter::Update(float deltaTime) {
 
 void SphereEmitter::Dispatch(ID3D12GraphicsCommandList* cmd,
 	DXCom* dx, [[maybe_unused]] SRVManager* srv, const ParticleCSHandles& shared) {
-	if (!isEmit_ || data_->count == 0) return;
+	if (data_->emit == 0 || data_->count == 0) return;
 	dx->GetPipelineManager()->SetCSPipeline(Pipe::EmitParticleCS);
 	cmd->SetComputeRootDescriptorTable(0, shared.particleCSUAVHandle);
 	cmd->SetComputeRootDescriptorTable(3, shared.freeListIndexUAVHandle);
@@ -47,6 +52,7 @@ void SphereEmitter::Dispatch(ID3D12GraphicsCommandList* cmd,
 	cmd->SetComputeRootConstantBufferView(2, shared.perFrameCBV);
 	cmd->SetComputeRootConstantBufferView(1, resource_->GetGPUVirtualAddress());
 	cmd->Dispatch((data_->count + 1024 - 1) / 1024, 1, 1);
+	isOnceEmit_ = false;
 }
 
 void SphereEmitter::DebugGUI() {
@@ -191,4 +197,17 @@ void SphereEmitter::Load(const std::string& fileName) {
 	data_->emitVeloType = j.value("velType", data_->emitVeloType);
 	data_->isRandomMove = j.value("moveType", data_->isRandomMove);
 	data_->isTrailEmit = j.value("isTrailEmit", data_->isTrailEmit);
+}
+
+void SphereEmitter::Emit() {
+	isOnceEmit_ = true;
+}
+
+void SphereEmitter::SetPos(const Vector3& pos) {
+	data_->prevTranslate = data_->translate;
+	data_->translate = pos;
+}
+
+void SphereEmitter::SetEmit(bool state) {
+	isEmit_ = state;
 }

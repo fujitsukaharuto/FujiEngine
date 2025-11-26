@@ -10,6 +10,7 @@ public:
 	~BossDushAttack();
 
 	enum class Step {
+		CHARGE,
 		ATTACK,
 		TOROOT,
 	};
@@ -23,10 +24,13 @@ private:
 	bool isAttack_ = true;
 	bool isPreDush_ = false;
 	bool isNear_ = false;
-	float stopReng_ = 20.0f;
+	float stopReng_ = 70.0f;
 	float dushReng_ = 0.0f;
 	float coolTime_ = 30.0f;
 
 	float chargeTime_ = 0.0f;
 	float maxCharegeTime_ = 90.0f;
+	float startWaitTime_ = 0.0f;
+	float maxStartWaitTime_ = 10.0f;
+
 };
