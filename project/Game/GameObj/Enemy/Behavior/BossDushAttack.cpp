@@ -1,40 +1,47 @@
-#include "BossJumpAttack.h"
+#include "BossDushAttack.h"
 
 #include "Engine/Math/Random/Random.h"
+#include "Engine/Audio/AudioPlayer.h"
 #include "Game/GameObj/Enemy/Boss.h"
-#include "Game/GameObj/Enemy/Behavior/BossAttack.h"
+#include "Game/GameObj/Enemy/Behavior/BossArrowAttack.h"
 #include "BossRoot.h"
 
-BossJumpAttack::BossJumpAttack(Boss* pBoss, int count) : BaseBossBehavior(pBoss), jumpCount_(count) {
+BossDushAttack::BossDushAttack(Boss* pBoss,bool is) : BaseBossBehavior(pBoss) {
 	step_ = Step::ATTACK;
-	cameraRang_ = -30.0f;
+	cameraRang_ = -37.5f;
+	cameraFollowSpeed_ = 0.03f;
 	pBoss_->SetCameraRang(cameraRang_);
 	pBoss_->SetCameraFollowSpeed(cameraFollowSpeed_);
-	pBoss_->InitJumpAttack();
-	pBoss_->GetAnimModel()->ChangeAnimation("jump");
+	pBoss_->GetAnimModel()->ChangeAnimation("idle");
 	pBoss_->GetAnimModel()->IsRoopAnimation(false);
 	pBoss_->ChainCount();
+	isPreDush_ = is;
+	if (is) {
+		coolTime_ = 60.0f;
+	}
 }
 
-BossJumpAttack::~BossJumpAttack() {
+BossDushAttack::~BossDushAttack() {
 }
 
-void BossJumpAttack::Update() {
+void BossDushAttack::Update() {
 
 	switch (step_) {
 		///---------------------------------------------------------------------------------------
-		/// ジャンプ攻撃
+		/// 攻撃
 		///---------------------------------------------------------------------------------------
-	case BossJumpAttack::Step::ATTACK:
+	case BossDushAttack::Step::ATTACK:
 
-		if (pBoss_->JumpAttack()) {
-			nowJumpCount_++;
-			pBoss_->GetAnimModel()->IsRoopAnimation(false);
-			if (jumpCount_ == nowJumpCount_) {
+
+		if (pBoss_->DushCharge(chargeTime_, maxCharegeTime_, isNear_, stopReng_)) {
+			if (pBoss_->DushAttack(isNear_, dushReng_, stopReng_)) {
+				isAttack_ = false;
+			}
+		}
+		if (!isAttack_) {
+			coolTime_ -= FPSKeeper::DeltaTime();
+			if (coolTime_ < 0.0f) {
 				step_ = Step::TOROOT;
-			} else {
-				pBoss_->InitJumpAttack();
-				pBoss_->GetAnimModel()->IsRoopAnimation(true);
 			}
 		}
 
@@ -42,22 +49,22 @@ void BossJumpAttack::Update() {
 		///---------------------------------------------------------------------------------------
 		/// 通常or攻撃へ移行
 		///---------------------------------------------------------------------------------------
-	case BossJumpAttack::Step::TOROOT:
+	case BossDushAttack::Step::TOROOT:
 	{
 		pBoss_->GetAnimModel()->IsRoopAnimation(true);
 		float randomSeed = Random::GetFloat(0.0f, 1.0f);
-		if (randomSeed > pBoss_->GetChainRate()) {
-			pBoss_->ChangeBehavior(std::make_unique<BossAttack>(pBoss_));
+		if (randomSeed > pBoss_->GetChainRate() && !isPreDush_) {
+			pBoss_->ChangeBehavior(std::make_unique<BossDushAttack>(pBoss_, true));
 		} else {
 			pBoss_->ChangeBehavior(std::make_unique<BossRoot>(pBoss_));
 		}
-	}
 		break;
+	}
 	default:
 		break;
 	}
 
 }
 
-void BossJumpAttack::Debug() {
+void BossDushAttack::Debug() {
 }

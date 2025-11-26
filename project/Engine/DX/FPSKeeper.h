@@ -47,6 +47,8 @@ public:
 
 	void Debug();
 
+	static float GetClampFrame();
+
 private:
 
 
@@ -55,6 +57,8 @@ private:
 
 	std::chrono::steady_clock::time_point reference_;
 	std::chrono::steady_clock::time_point lastTime_;
+
+	const float clampFrame_ = 2.2f;
 
 	float fps_ = 0.0f;
 	float deltaTime_ = 0.0f;

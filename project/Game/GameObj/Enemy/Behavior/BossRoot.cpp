@@ -9,9 +9,12 @@
 #include "BossAreaAttack.h"
 #include "BossArrowAttack.h"
 #include "BossRodFall.h"
+#include "BossDushAttack.h"
 
 BossRoot::BossRoot(Boss* pBoss) : BaseBossBehavior(pBoss) {
 	step_ = Step::ROOT;
+	pBoss_->SetCameraRang(cameraRang_);
+	pBoss_->SetCameraFollowSpeed(cameraFollowSpeed_);
 	cooldown_ = pBoss_->GetAttackCooldown();
 	pBoss_->GetAnimModel()->ChangeAnimation("walk");
 	pBoss_->GetAnimModel()->IsRoopAnimation(true);
@@ -69,6 +72,9 @@ void BossRoot::Update() {
 		case AttackPattern::FallRod:
 			pBoss_->ChangeBehavior(std::make_unique<BossRodFall>(pBoss_));
 			break;
+		case AttackPattern::Dush:
+			pBoss_->ChangeBehavior(std::make_unique<BossDushAttack>(pBoss_));
+			break;
 		}
 		break;
 	}
@@ -124,5 +130,6 @@ AttackPattern BossRoot::ToAttackPattern(const std::string& name) {
 	if (name == "Area") return AttackPattern::AreaAttack;
 	if (name == "Arrow") return AttackPattern::ArrowAttack;
 	if (name == "FallRod") return AttackPattern::FallRod;
+	if (name == "Dush") return AttackPattern::Dush;
 	throw std::invalid_argument("未知のAttackPattern名: " + name);
 }

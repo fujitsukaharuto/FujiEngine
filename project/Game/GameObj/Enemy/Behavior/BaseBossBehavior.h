@@ -10,6 +10,7 @@ enum class AttackPattern {
 	AreaAttack,
 	ArrowAttack,
 	FallRod,
+	Dush,
 	// 今後追加
 };
 
@@ -35,5 +36,6 @@ public:
 protected:
 
 	Boss* pBoss_ = nullptr;
-
+	float cameraRang_ = -25.0f;
+	float cameraFollowSpeed_ = 0.2f;
 };

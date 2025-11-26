@@ -132,6 +132,8 @@ void GameScene::Update() {
 		if (boss_->GetIsStart()) {
 			followCamera_->Update(boss_->GetDefoultPos());
 		} else {
+			//followCamera_->SetOffset(boss_->GetCameraRang(), 30.0f);
+			followCamera_->SetFollowSpeed(boss_->GetCameraFollowSpeed());
 			followCamera_->Update(boss_->GetBossCore()->GetWorldPos());
 		}
 

@@ -98,3 +98,8 @@ void FPSKeeper::Debug() {
 	if (isSlowMotion_)  ImGui::Text("SlowMotion: %.1f frames left (x%.2f)", slowFrame_, slowRate_);
 #endif // _DEBUG
 }
+
+float FPSKeeper::GetClampFrame() {
+	auto* inst = GetInstance();
+	return inst->clampFrame_;
+}

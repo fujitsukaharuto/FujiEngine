@@ -8,6 +8,8 @@
 
 BossAreaAttack::BossAreaAttack(Boss* pBoss) : BaseBossBehavior(pBoss) {
 	step_ = Step::ATTACK;
+	pBoss_->SetCameraRang(cameraRang_);
+	pBoss_->SetCameraFollowSpeed(cameraFollowSpeed_);
 	pBoss_->GetAnimModel()->ChangeAnimation("swordLeft");
 	pBoss_->GetAnimModel()->IsRoopAnimation(false);
 	pBoss_->ChainCount();

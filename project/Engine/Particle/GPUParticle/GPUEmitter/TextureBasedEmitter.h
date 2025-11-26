@@ -4,6 +4,7 @@
 #include "../IGPUParticleEmitter.h"
 #include "Math/Matrix/MatrixCalculation.h"
 #include "Engine/Model/TextureManager.h"
+#include "Engine/Editor/JsonSerializer.h"
 
 using Microsoft::WRL::ComPtr;
 

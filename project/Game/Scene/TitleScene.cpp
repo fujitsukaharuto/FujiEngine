@@ -88,7 +88,7 @@ void TitleScene::Update() {
 	skybox_->Update();
 
 
-	if (FPSKeeper::DeltaTime() < 2.2f) {
+	if (FPSKeeper::DeltaTime() < FPSKeeper::GetClampFrame()) {
 		startTime_ -= FPSKeeper::DeltaTime();
 	}
 	if (startTime_ <= titleCanMoveTime_) {
@@ -248,13 +248,11 @@ void TitleScene::ApplyGlobalVariables() {
 }
 
 void TitleScene::TitleLoadPlayerPoint() {
-#ifdef _DEBUG
 	json data = JsonSerializer::DeserializeJsonData("resource/Json/Title/PlayerPoint.json");
 
 	playerStart_ = Vector3(data["start"][0], data["start"][1], data["start"][2]);
 	playerCenter_ = Vector3(data["center"][0], data["center"][1], data["center"][2]);
 	playerEnd_ = Vector3(data["end"][0], data["end"][1], data["end"][2]);
-#endif // _DEBUG
 }
 
 void TitleScene::TitleSavePlayerPoint() {

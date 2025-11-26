@@ -23,7 +23,7 @@ public:
 	void InitParameter();
 
 	/// <summary>リングの初期化</summary>
-	void InitRing(const Vector3& pos);
+	void InitRing(const Vector3& pos, float lifeT = 300.0f);
 
 	//========================================================================*/
 	//* Collision

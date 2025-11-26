@@ -3,6 +3,7 @@
 #include "Engine/DX/SRVManager.h"
 #include "Engine/Model/ModelManager.h"
 #include "ImGuiManager/ImGuiManager.h"
+#include "Engine/Editor/JsonSerializer.h"
 
 MeshSurefaceEmitter::MeshSurefaceEmitter(DXCom* dx) {
 	resource_ = dx->CreateBufferResource(dx->GetDevice(), sizeof(EmitterSurface));

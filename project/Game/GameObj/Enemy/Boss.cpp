@@ -13,6 +13,7 @@
 #include "Game/GameObj/Enemy/Behavior/BossAreaAttack.h"
 #include "Game/GameObj/Enemy/Behavior/BossArrowAttack.h"
 #include "Game/GameObj/Enemy/Behavior/BossRodFall.h"
+#include "Game/GameObj/Enemy/Behavior/BossDushAttack.h"
 
 #include "Game/GameObj/Player/Player.h"
 
@@ -205,7 +206,7 @@ void Boss::Initialize() {
 	roringParticle_.pos_.z = 5.0f;
 
 	actionList_ = {
-		"Root","Wave","Beam","Jump","Sword","Area","Arrow","FallRod",
+		"Root","Wave","Beam","Jump","Sword","Area","Arrow","FallRod","Dush",
 	};
 	LoadPhase();
 	ChangeBehavior(std::make_unique<BossRoot>(this));
@@ -370,6 +371,7 @@ void Boss::ParameterGUI() {
 				{ "Area",   [](Boss* b) { return std::make_unique<BossAreaAttack>(b); } },
 				{ "Arrow",   [](Boss* b) { return std::make_unique<BossArrowAttack>(b); } },
 				{ "FallRod",   [](Boss* b) { return std::make_unique<BossRodFall>(b); } },
+				{ "Dush",   [](Boss* b) { return std::make_unique<BossDushAttack>(b); } },
 				// 他も追加
 			};
 			auto it = behaviorFactory.find(nowAction);
@@ -463,7 +465,7 @@ void Boss::ParameterGUI() {
 }
 
 void Boss::InitParameter() {
-	attackCooldown_ = 150.0f;
+	attackCooldown_ = 120.0f;
 	bossHp_ = 100.0f;
 
 	jumpTime_ = 150.0f;
@@ -680,20 +682,59 @@ void Boss::Walk() {
 		front = TransformNormal(front, MakeRotateYMatrix(targetAngle));
 		animModel_->transform.translate += front;
 
-		// 現在のY軸角度（モデルの回転）
-		float currentAngle = animModel_->transform.rotate.y;
-
-		// 角度差を -π〜+π にラップ
-		float delta = targetAngle - currentAngle;
-		if (delta > std::numbers::pi_v<float>) delta -= 2.0f * std::numbers::pi_v<float>;
-		if (delta < -std::numbers::pi_v<float>) delta += 2.0f * std::numbers::pi_v<float>;
-
-		// 角度補間（例えば線形補間）
-		float lerpFactor = 0.1f; // 追従の速さ
-		float newAngle = currentAngle + delta * lerpFactor;
-
-		animModel_->transform.rotate.y = newAngle;
+		CaluModelDir();
 	}
+}
+
+void Boss::CaluModelDir() {
+	Vector3 dir = pPlayer_->GetWorldPos() - animModel_->transform.translate;
+	dir.y = 0.0f; // 水平方向だけに限定
+	dir = dir.Normalize();
+
+	// 目標のY軸角度（ラジアン）
+	float targetAngle = std::atan2(dir.x, dir.z); // Z前方軸に対する角度
+	// 現在のY軸角度（モデルの回転）
+	float currentAngle = animModel_->transform.rotate.y;
+
+	// 角度差を -π〜+π にラップ
+	float delta = targetAngle - currentAngle;
+	if (delta > std::numbers::pi_v<float>) delta -= 2.0f * std::numbers::pi_v<float>;
+	if (delta < -std::numbers::pi_v<float>) delta += 2.0f * std::numbers::pi_v<float>;
+
+	// 角度補間（例えば線形補間）
+	float lerpFactor = 0.1f; // 追従の速さ
+	float newAngle = currentAngle + delta * lerpFactor;
+
+	animModel_->transform.rotate.y = newAngle;
+}
+
+bool Boss::DushCharge(float& t, float maxT, bool& isNear,float reng) {
+	if (t <= maxT * 0.25f) {
+		CaluModelDir();
+	}
+	t += FPSKeeper::DeltaTime();
+	if (Vector3(pPlayer_->GetWorldPos() - animModel_->transform.translate).Length() < reng) {
+		isNear = true;
+	} else {
+		false;
+	}
+	if (t > maxT) {
+		return true;
+	}
+	return false;
+}
+
+bool Boss::DushAttack(bool isNear, float& dushReng, float stopReng) {
+	Vector3 front = Vector3(0.0f, 0.0f, 1.0f) * 1.5f * FPSKeeper::DeltaTime();
+	front = TransformNormal(front, MakeRotateYMatrix(animModel_->transform.rotate.y));
+	animModel_->transform.translate += front;
+	dushReng += front.Length();
+	if (!isNear && dushReng >= stopReng * 1.5f) {
+		return true;
+	} else if (isNear&& dushReng >= stopReng) {
+		return true;
+	}
+	return false;
 }
 
 void Boss::UpdateWaveWall() {
@@ -778,9 +819,9 @@ void Boss::RodFall() {
 
 		// ロッドの出現位置を決める
 		Vector3 rodPos = animModel_->transform.translate;
-		rodPos.x += Random::GetFloat(-70.0f, 70.0f);
+		rodPos.x += Random::GetFloat(-60.0f, 60.0f);
 		rodPos.y = 20.0f;
-		rodPos.z += Random::GetFloat(-70.0f, 70.0f);
+		rodPos.z += Random::GetFloat(-60.0f, 60.0f);
 		float emittTime = 140.0f;
 		rod->InitRod(rodPos, emittTime);
 		count++;
@@ -792,7 +833,7 @@ void Boss::RodUnderRing(const Vector3& emitPos) {
 	for (auto& ring : undderRings_) {
 		if (count == 1) break;
 		if (ring->GetIsLive()) continue;
-		ring->InitRing(emitPos);
+		ring->InitRing(emitPos, 120.0f);
 		count++;
 	}
 }

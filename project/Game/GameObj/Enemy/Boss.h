@@ -57,6 +57,14 @@ public:
 
 	/// <summary>移動処理</summary>
 	void Walk();
+	
+	void CaluModelDir();
+
+	/// <summary>
+	/// Dush攻撃について
+	/// </summary>
+	bool DushCharge(float& t, float maxT,bool& isNear,float reng);
+	bool DushAttack(bool isNear, float& dushReng, float stopReng);
 
 	/// <summary>波攻撃の更新</summary>
 	void UpdateWaveWall();
@@ -121,12 +129,16 @@ public:
 	int GetNowHpIndex() { return nowHpIndex_; }
 	float GetChainRate();
 	Vector3 GetDefoultPos() { return defaultCorePos_; }
+	float GetCameraRang() { return cameraRang_; }
+	float GetCameraFollowSpeed() { return cameraFollowSpeed_; }
 
 	//========================================================================*/
 	//* Setter
 	void SetPlayer(Player* player) { pPlayer_ = player; }
 	void SetDXCom(DXCom* dxcommon) { dxcommon_ = dxcommon; }
 	void SetSatrtWait(float waitT) { startWaiting_ = waitT; }
+	void SetCameraRang(float rang) { cameraRang_ = rang; }
+	void SetCameraFollowSpeed(float speed) { cameraFollowSpeed_ = speed; }
 
 	/// <summary>攻撃フェーズの出力</summary>
 	void SavePhase();
@@ -226,6 +238,9 @@ private:
 	bool isJumpAttack_ = true;
 	float chainRate_ = 0.65f;
 	int chainCount_ = 0;
+
+	float cameraRang_ = -25.0f;
+	float cameraFollowSpeed_ = 0.2f;
 
 	// emitter
 	ParticleEmitter waveAttack1;

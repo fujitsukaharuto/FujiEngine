@@ -200,6 +200,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\GameObj\Enemy\Behavior\BossArrowAttack.cpp" />
     <ClCompile Include="Game\GameObj\Enemy\Behavior\BossAttack.cpp" />
     <ClCompile Include="Game\GameObj\Enemy\Behavior\BossBeamAttack.cpp" />
+    <ClCompile Include="Game\GameObj\Enemy\Behavior\BossDushAttack.cpp" />
     <ClCompile Include="Game\GameObj\Enemy\Behavior\BossJumpAttack.cpp" />
     <ClCompile Include="Game\GameObj\Enemy\Behavior\BossRodFall.cpp" />
     <ClCompile Include="Game\GameObj\Enemy\Behavior\BossRoot.cpp" />
@@ -342,6 +343,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Game\GameObj\Enemy\Behavior\BossArrowAttack.h" />
     <ClInclude Include="Game\GameObj\Enemy\Behavior\BossAttack.h" />
     <ClInclude Include="Game\GameObj\Enemy\Behavior\BossBeamAttack.h" />
+    <ClInclude Include="Game\GameObj\Enemy\Behavior\BossDushAttack.h" />
     <ClInclude Include="Game\GameObj\Enemy\Behavior\BossJumpAttack.h" />
     <ClInclude Include="Game\GameObj\Enemy\Behavior\BossRodFall.h" />
     <ClInclude Include="Game\GameObj\Enemy\Behavior\BossRoot.h" />

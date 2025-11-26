@@ -82,13 +82,13 @@ void UnderRing::ParameterGUI() {
 void UnderRing::InitParameter() {
 }
 
-void UnderRing::InitRing(const Vector3& pos) {
+void UnderRing::InitRing(const Vector3& pos,float lifeT) {
 	model_->transform.translate = pos;
 	model_->transform.translate.y += 0.4f;
 	model_->transform.scale = { 1.0f,1.0f,1.0f };
 
 	isLive_ = true;
-	lifeTime_ = 300.0f;
+	lifeTime_ = lifeT;
 }
 
 void UnderRing::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {

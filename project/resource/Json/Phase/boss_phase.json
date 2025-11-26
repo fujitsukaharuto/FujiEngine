@@ -3,33 +3,41 @@
         [
             {
                 "name": "Wave",
-                "value": 1.0
+                "value": 0.6169999837875366
             },
             {
                 "name": "Jump",
-                "value": 1.0
+                "value": 0.41200000047683716
             },
             {
                 "name": "Sword",
-                "value": 1.0
+                "value": 0.3529999852180481
             },
             {
                 "name": "Arrow",
-                "value": 1.0
+                "value": 0.8240000009536743
+            },
+            {
+                "name": "FallRod",
+                "value": 0.26499998569488525
+            },
+            {
+                "name": "Dush",
+                "value": 0.7639999985694885
             }
         ],
         [
             {
                 "name": "Sword",
-                "value": 1.0
+                "value": 0.6470000147819519
             },
             {
                 "name": "Beam",
-                "value": 1.0
+                "value": 0.5289999842643738
             },
             {
                 "name": "Area",
-                "value": 1.0
+                "value": 0.6759999990463257
             },
             {
                 "name": "Arrow",
@@ -37,7 +45,11 @@
             },
             {
                 "name": "FallRod",
-                "value": 1.0
+                "value": 0.7350000143051147
+            },
+            {
+                "name": "Dush",
+                "value": 0.7940000295639038
             }
         ]
     ]
