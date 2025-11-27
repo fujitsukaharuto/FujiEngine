@@ -87,7 +87,7 @@ public:
 	static TextureBasedEmitter& GetParticleCSEmitterTexture(int index);
 	static MeshSurefaceEmitter& GetParticleCSEmitterSurface(int index);
 
-	int InitGPUEmitter();
+	int InitGPUEmitter(int returnMod = 0);
 	int InitGPUEmitterTexture(const std::string& fileName);
 	int InitGPUEmitterSurface(const std::string& fileName);
 

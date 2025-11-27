@@ -63,6 +63,7 @@ public:
 	/// <summary>
 	/// Dush攻撃について
 	/// </summary>
+	void DushInit();
 	bool DushCharge(float& t, float maxT,bool& isNear,float reng);
 	bool DushAttack(bool isNear, float& dushReng, float stopReng);
 
@@ -272,6 +273,7 @@ private:
 	ParticleEmitter energyParticle_;
 
 	ParticleEmitter dushStartParticle_;
+	ParticleEmitter dushStartCircle_;
 	ParticleEmitter dushSmoke_;
 
 	SoundData* jumpAttackSE_;

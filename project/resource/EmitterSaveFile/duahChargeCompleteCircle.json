@@ -8,9 +8,9 @@
         0.0
     ],
     "Para_colorMax": [
-        0.11400000005960464,
-        0.07304693013429642,
-        0.057240501046180725,
+        0.6319500207901001,
+        0.8691077828407288,
+        0.9789029359817505,
         1.0
     ],
     "Para_colorMin": [
@@ -24,7 +24,7 @@
         0.0
     ],
     "Para_speedy": [
-        -0.019999999552965164,
+        0.0,
         0.0
     ],
     "Para_speedz": [
@@ -73,10 +73,10 @@
         0.0
     ],
     "endSize": [
-        1.0,
-        1.0
+        0.10000000149011612,
+        0.10000000149011612
     ],
-    "frequencyTime": 0.0,
+    "frequencyTime": 40.0,
     "grainPattern": 0,
     "grainType": 1,
     "isAddRandomSize": false,
@@ -84,7 +84,7 @@
     "isBillBoard": true,
     "isDistanceComplement": false,
     "isZandX": false,
-    "lifeTime": 60.0,
+    "lifeTime": 15.0,
     "position": [
         0.0,
         0.0,
@@ -96,15 +96,15 @@
         0.0,
         0.0
     ],
-    "rotateType": 2,
+    "rotateType": 0,
     "speed": [
         0.0,
         0.0,
         0.0
     ],
-    "speedType": 1,
+    "speedType": 0,
     "startSize": [
-        10.0,
-        9.0
+        30.0,
+        30.0
     ]
 }

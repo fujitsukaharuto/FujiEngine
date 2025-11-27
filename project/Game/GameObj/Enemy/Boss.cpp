@@ -208,11 +208,11 @@ void Boss::Initialize() {
 	roringParticle_.pos_.z = 5.0f;
 
 	ParticleManager::Load(dushStartParticle_, "duahChargeCompleteParticle");
+	ParticleManager::Load(dushStartCircle_, "duahChargeCompleteCircle");
 	ParticleManager::Load(dushSmoke_, "dushGroundSmoke");
 	dushStartParticle_.frequencyTime_ = 0.0f;
-	dushChargeIndex_ = ParticleManager::GetInstance()->InitGPUEmitter();
-	dushTrailIndex_ = ParticleManager::GetInstance()->InitGPUEmitter();
-	ParticleManager::GetParticleCSEmitter(dushChargeIndex_).Load("dushCharge");
+	dushStartCircle_.frequencyTime_ = 0.0f;
+	dushTrailIndex_ = ParticleManager::GetInstance()->InitGPUEmitter(1);
 	ParticleManager::GetParticleCSEmitter(dushTrailIndex_).Load("DushTrail");
 
 	actionList_ = {
@@ -718,33 +718,74 @@ void Boss::CaluModelDir() {
 	animModel_->transform.rotate.y = newAngle;
 }
 
-bool Boss::DushCharge(float& t, float maxT, bool& isNear,float reng) {
+void Boss::DushInit() {
+	float parentRotate = std::numbers::pi_v<float> *0.25f;
+	for (int i = 0; i < 8; i++) {
+		if (i != 0 && i != 4) {
+			chargeParents_[i]->transform.rotate.x = Random::GetFloat(-std::numbers::pi_v<float>, std::numbers::pi_v<float>);
+			chargeParents_[i]->transform.rotate.y = Random::GetFloat(-std::numbers::pi_v<float>*0.5f, std::numbers::pi_v<float>*0.5f);
+		}
+		chargeParents_[i]->transform.translate.y = 4.0f;
+		chargeParents_[i]->transform.rotate.z = parentRotate * i;
+	}
+	chargeTime_ = 70.0f;
+	chargeSize_ = baseChargeSize_;
+	charge15_.grain_.startSize_ = { chargeSize_ * 3.0f,chargeSize_ * 6.0f };
+	for (auto& chargeParent : chargeParents_) {
+		chargeParent->transform.scale = Vector3::FillVec(chargeSize_);
+	}
+
+	for (int i = 0; i < 8; i++) {
+		auto& emitter = ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]);
+		emitter.isEmit_ = true;
+		emitter.data_->lifeTime = 35.0f;
+		UpdateEmitterPos(i);
+		emitter.data_->prevTranslate = traceAnchors_[i]->GetWorldPos();
+
+		Vector3 randColor = Random::GetVector3({ 0.0f,0.0f }, { 0.2f,0.8f }, { 0.2f,1.0f });
+		emitter.data_->colorMax = randColor;
+		emitter.data_->colorMin = randColor;
+	}
+}
+
+bool Boss::DushCharge(float& t, float maxT, bool& isNear, float reng) {
 	if (t <= 0.0f) {
-		Vector3 emitPos = { 0.0f,0.0f,6.5f };
-		Matrix4x4 rotateMatrix = MakeRotateYMatrix(animModel_->transform.rotate.y);
-		emitPos = TransformNormal(emitPos, rotateMatrix);
-		emitPos += animModel_->transform.translate;
-		emitPos.y = 2.0f;
-		ParticleManager::GetParticleCSEmitter(dushChargeIndex_).SetPos(emitPos);
-		ParticleManager::GetParticleCSEmitter(dushChargeIndex_).Emit();
+		DushInit();
 	}
 	if (t <= maxT * 0.2f) {
 		CaluModelDir();
 	}
 	t += FPSKeeper::DeltaTime();
+
+	for (int i = 0; i < 8; i++) {
+		auto& emitter = ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]);
+		emitter.data_->prevTranslate = traceAnchors_[i]->GetWorldPos();
+
+		if (chargeParents_[i]->transform.scale.x > 0.0f) { // チャージのサイズを縮小していく
+			ShrinkScale(i, chargeSize_ / chargeTime_);
+			chargeParents_[i]->transform.rotate.z += 0.05f * FPSKeeper::DeltaTime();
+		}
+		UpdateEmitterPos(i);
+	}
+
 	if (Vector3(pPlayer_->GetWorldPos() - animModel_->transform.translate).Length() < reng) {
 		isNear = true;
 	} else {
 		false;
 	}
 	if (t > maxT) {
-		Vector3 emitPos = { 0.0f,0.0f,6.5f };
+		Vector3 emitPos = { 0.0f,0.0f,8.5f };
 		Matrix4x4 rotateMatrix = MakeRotateYMatrix(animModel_->transform.rotate.y);
 		emitPos = TransformNormal(emitPos, rotateMatrix);
 		emitPos += animModel_->transform.translate;
-		emitPos.y = 2.0f;
+		emitPos.y = 4.0f;
 		dushStartParticle_.pos_ = emitPos;
+		dushStartCircle_.pos_ = emitPos;
 		dushStartParticle_.Emit();
+		dushStartCircle_.Emit();
+		for (int i = 0; i < 8; i++) {
+			ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]).SetEmit(false);
+		}
 		return true;
 	}
 	return false;
@@ -891,6 +932,7 @@ void Boss::InitBeam() {
 			chargeParents_[i]->transform.rotate.x = Random::GetFloat(-std::numbers::pi_v<float>, std::numbers::pi_v<float>);
 			chargeParents_[i]->transform.rotate.y = Random::GetFloat(-1.56f, 1.56f);
 		}
+		chargeParents_[i]->transform.translate.y = 20.0f;
 		chargeParents_[i]->transform.rotate.z = parentRotate * i;
 	}
 

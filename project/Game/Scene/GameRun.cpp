@@ -133,6 +133,7 @@ void GameRun::Initialize() {
 	pManager_->CreateParticleGroup("arrowParticle", "redCircle.png", 100);
 
 	pManager_->CreateParticleGroup("duahChargeCompleteParticle", "redCircle.png", 100);
+	pManager_->CreateParticleGroup("duahChargeCompleteCircle", "chargeCircle.png", 10);
 	pManager_->CreateParticleGroup("dushGroundSmoke", "smoke.png", 100);
 	pManager_->CreateParticleGroup("dushGroundLight", "chargeRay.png", 100);
 

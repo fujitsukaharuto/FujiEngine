@@ -528,8 +528,8 @@ MeshSurefaceEmitter& ParticleManager::GetParticleCSEmitterSurface(int index) {
 	return instance->gpuParticleSystem_->GetParticleCSEmitterSurface(index);
 }
 
-int ParticleManager::InitGPUEmitter() {
-	return gpuParticleSystem_->InitGPUEmitter();
+int ParticleManager::InitGPUEmitter(int returnMod) {
+	return gpuParticleSystem_->InitGPUEmitter(returnMod);
 }
 
 int ParticleManager::InitGPUEmitterTexture(const std::string& fileName) {

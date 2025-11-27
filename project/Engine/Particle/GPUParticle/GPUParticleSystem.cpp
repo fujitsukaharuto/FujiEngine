@@ -56,7 +56,7 @@ void GPUParticleSystem::Draw(const D3D12_VERTEX_BUFFER_VIEW& vbView, const D3D12
 	DrawParticleCS(vbView,ibView);
 }
 
-int GPUParticleSystem::InitGPUEmitter() {
+int GPUParticleSystem::InitGPUEmitter(int returnMod) {
 	std::unique_ptr<SphereEmitter> emitter;
 	emitter = std::make_unique<SphereEmitter>(dxcommon_);
 	emitter->isEmit_ = false;
@@ -67,6 +67,7 @@ int GPUParticleSystem::InitGPUEmitter() {
 	csEmitters_.push_back(std::move(info));
 	sphereEmitters_.push_back(csEmitterIndex_);
 	int result = sphereEmitterIndex_;
+	if (returnMod == 1) result = csEmitterIndex_;
 	sphereEmitterIndex_++;
 	csEmitterIndex_++;
 	return result;
