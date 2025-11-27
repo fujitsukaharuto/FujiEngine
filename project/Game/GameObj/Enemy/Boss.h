@@ -23,6 +23,63 @@ enum class BossHPState {
 	Empty = 0
 };
 
+struct JumpParams {
+	float jumpTotalTime = 150.0f;
+	float upStart = 120.0f;
+	float upEnd = 90.0f;
+	float downStart = 70.0f;
+	float downEnd = 50.0f;
+	float height = 4.0f;
+	float groundJudgeHeight = 0.25f;
+};
+
+struct BeamParams {
+	float chargeTime = 120.0f;
+	float parentRotateStep;
+
+	float parentY = 20.0f;                // 親オブジェクトの高さ
+	float randomRotYMin = -1.56f;
+	float randomRotYMax = 1.56f;
+
+	float emitterLifeTime = 35.0f;        // 各トレースの寿命
+	float radiusGrowSpeed = 0.075f;       // チャージサークルの拡大速度
+	float baseChargeSize = 24.0f;
+
+	float shrinkSpeed = 0.55f;            // 縮小スピード
+	float rotateSpeedZ = 0.0225f;         // 回転速度
+	float sizeDecrease = 2.0f;            // 縮小後のサイズ減衰量
+	float lifeTimeDecrease = 2.5f;        // ライフ減衰量
+
+	float startSizeMulX = 3.0f;
+	float startSizeMulY = 6.0f;
+
+	float minRecalcSize = 3.0f;
+};
+
+struct BossRadialParams {
+	float baseTime = 40.0f;
+	float widthStart = 0.0f;
+	float widthEnd = 0.005f;
+};
+
+struct SummonParams {
+	float summonExpandTime = 50.0f;
+	float summonRadiusStart = 30.0f;
+	float summonRadiusEnd = 10.0f;
+	float energyTime = 120.0f;
+	float energySphereEmitStart = 115.0f;
+	float bossRiseStartTime = 60.0f;
+	float bossDownPos = -30.0f;
+};
+
+struct BossParams {
+	JumpParams jump;
+	BeamParams beam;
+	BossRadialParams radial;
+	SummonParams summon;
+};
+
+
 /// <summary>
 /// Bossクラス
 /// </summary>
@@ -167,6 +224,9 @@ private:
 
 	void UpdateEmitterPos(int i);
 	void ShrinkScale(int i, float delta);
+	void ChangePhase(float threshold, int indexInc);
+
+	Vector3 GetFrontOffset(const Vector3& distance, float angle);
 
 private:
 
@@ -194,18 +254,20 @@ private:
 	std::vector<std::unique_ptr<Object3d>> arrowParents_;
 
 	bool isClear_ = false;
-	float dyingTime_ = 240.0f;
 	bool isDying_ = false;
-	float bossHp_ = 0.0f;
-	std::vector<std::unique_ptr<Sprite>> hpSprites_;
-	std::vector<std::unique_ptr<Sprite>> hpFrame_;
+	float dyingTime_ = 240.0f;
+
 	bool isHpActive_ = true;
+	bool isShakeSprite_ = false;
+	float bossHp_ = 0.0f;
 	float hpCooltime_ = 60.0f;
 	int nowHpIndex_ = 4;
-	bool isShakeSprite_ = false;
 	float shakeTime_ = 0.0f;
 	float baseShakeTime_ = 10.0f;
 	float shakeSize_ = 4.0f;
+	float hpIndent = 1.0f;
+	std::vector<std::unique_ptr<Sprite>> hpSprites_;
+	std::vector<std::unique_ptr<Sprite>> hpFrame_;
 	Vector2 hpSize_ = { 130.0f,35.0f };
 	Vector2 hpStartPos_ = { 660.0f,38.0f };
 	Vector2 hpFrameSize_ = { 670.6f,44.5f };
@@ -215,7 +277,8 @@ private:
 	Vector4 damageColor2_ = { 0.500f,0.15f,0.20f,1.0f };
 	Vector4 damageColor3_ = { 0.450f,0.10f,0.15f,1.0f };
 	Vector4 damageColor4_ = { 0.400f,0.05f,0.10f,1.0f };
-	float hpIndent = 1.0f;
+
+	BossParams params_;
 
 	bool isStart_ = true;
 	float startTime_ = 300.0f;
@@ -225,17 +288,14 @@ private:
 	float energyTime_ = 120.0f;
 	float energyCoolTime_ = 30.0f;
 	int summonIndex_ = 0;
-	float summonRadius_ = 0.0f;
 	float bossYPos_ = 0.0f;
 	Vector3 defaultCorePos_;
 
 	float attackCooldown_ = 0.0f;
 	float chargeTime_ = 120.0f;
 	float chargeSize_ = 24.0f;
-	float baseChargeSize_ = 24.0f;
 
 	float jumpTime_ = 0.0f;
-	float jumpHeight_ = 0.0f;
 	bool isJumpAttack_ = true;
 	float chainRate_ = 0.65f;
 	int chainCount_ = 0;
@@ -251,8 +311,6 @@ private:
 	ParticleEmitter waveAttack2;
 	ParticleEmitter waveAttack3;
 	ParticleEmitter waveAttack4;
-
-	ParticleEmitter charges_[8];
 	
 	ParticleEmitter charge9_;
 	ParticleEmitter charge10_;
@@ -280,9 +338,7 @@ private:
 
 
 	// post effect
-	float radialwidth_ = 0.0f;
 	float radialtime_ = 0.0f;
-	float baseRadialtime_ = 40.0f;
 	DXCom* dxcommon_;
 
 };
