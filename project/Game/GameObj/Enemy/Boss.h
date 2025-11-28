@@ -183,12 +183,14 @@ public:
 	int GetPhaseIndex() { return phaseIndex_; }
 	float GetBossHP() { return bossHp_; }
 	bool GetIsStart() { return isStart_; }
+	bool GetIsSummon() { return isSummon_; }
 	bool GetIsClear() { return isClear_; }
 	int GetNowHpIndex() { return nowHpIndex_; }
 	float GetChainRate();
 	Vector3 GetDefoultPos() { return defaultCorePos_; }
 	float GetCameraRang() { return cameraRang_; }
 	float GetCameraFollowSpeed() { return cameraFollowSpeed_; }
+	const Vector3& GetSummonCameraRotate() { return summonCameraRotate_; }
 
 	//========================================================================*/
 	//* Setter
@@ -281,6 +283,7 @@ private:
 	BossParams params_;
 
 	bool isStart_ = true;
+	bool isSummon_ = false;
 	float startTime_ = 300.0f;
 
 	float startWaiting_ = 0.0f;
@@ -289,6 +292,9 @@ private:
 	float energyCoolTime_ = 30.0f;
 	int summonIndex_ = 0;
 	float bossYPos_ = 0.0f;
+	Vector3 summonCameraRotate_ = { 0.15f, 0.6f, 0.0f };
+	float summonCameraRotateStart_ = 0.15f;
+	float summonCameraRotateEnd_ = -0.20f;
 	Vector3 defaultCorePos_;
 
 	float attackCooldown_ = 0.0f;

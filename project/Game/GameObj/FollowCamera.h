@@ -24,9 +24,15 @@ public:
 	//========================================================================*/
 	//* Setter
 	void SetTranslate(const Vector3& pos);
+	void SetInterTarget(const Vector3& interTarget);
 	void SetTarget(const Trans* target);
 	void SetOffset(float zRang, float changeTime);
+	void SetOffsetSoon(float zRang);
 	void SetFollowSpeed(float speed) { followSpeed_ = speed; }
+	void SetTargetSpeed(float speed) { targetSpeed_ = speed; }
+
+	void ResetFollowSpeed() { followSpeed_ = 0.2f; }
+	void ResetTargetSpeed() { targetSpeed_ = 0.045f; }
 
 	/// <summary>
 	///	カメラ回転の計算
@@ -59,4 +65,5 @@ private:
 	float offsetChangeTime_ = 0.0f;
 
 	float followSpeed_ = 0.2f;
+	float targetSpeed_ = 0.045f;
 };

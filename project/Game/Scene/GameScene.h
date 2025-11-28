@@ -53,11 +53,8 @@ private:
 	Vector4 color_ = { 1.0f,1.0f,1.0f,1.0f };
 	Vector3 rightDir = { 1.0f,0.0f,0.0f };
 
-	float spherePara = 10;
-	Vector3 spherevec = { 0.0f,1.0f,0.0f };
-
-	float fencePara = 10;
-	Vector3 fencevec = { -2.0f,-1.0f,1.0f };
+	Vector3 summonCameraPos = { -25.0f,5.0f,-25.0f };
+	float panSpeed_ = 0.01f;
 
 	bool isDebugCameraMode_ = false;
 

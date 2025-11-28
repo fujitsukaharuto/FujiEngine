@@ -40,10 +40,11 @@ void FollowCamera::Update(const Vector3& lockon) {
 	if (destinationAngleX < -0.09f) {//上向きすぎないように
 		destinationAngleX = -0.09f;
 	}
-	camera->transform.rotate.x = LerpShortAngle(camera->transform.rotate.x, destinationAngleX, followSpeed_);
+	float xRotate= LerpShortAngle(camera->transform.rotate.x, destinationAngleX, followSpeed_);
+	camera->transform.rotate.x = xRotate;
 
 	if (target_) {
-		interTarget_ = Lerp(interTarget_, { target_->translate.x,0.0f,target_->translate.z }, 0.045f);
+		interTarget_ = Lerp(interTarget_, { target_->translate.x,0.0f,target_->translate.z }, targetSpeed_);
 	}
 
 	OffsetChangeCal();
@@ -105,6 +106,10 @@ void FollowCamera::SetTranslate(const Vector3& pos) {
 	camera->transform.translate = pos + offset_;
 }
 
+void FollowCamera::SetInterTarget(const Vector3& interTarget) {
+	interTarget_ = interTarget;
+}
+
 void FollowCamera::SetTarget(const Trans* target) {
 	target_ = target;
 	Reset();
@@ -118,6 +123,10 @@ void FollowCamera::SetOffset(float zRang, float changeTime) {
 		offsetChangeTime_ = changeTime;
 		offsetChangeBaseTime_ = changeTime;
 	}
+}
+
+void FollowCamera::SetOffsetSoon(float zRang) {
+	offset_.z = zRang;
 }
 
 void FollowCamera::PreRotateUpdate(const Vector3& lockon) {

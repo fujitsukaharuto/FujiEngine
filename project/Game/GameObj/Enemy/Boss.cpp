@@ -1215,6 +1215,7 @@ void Boss::ExpandSummon() {
 		return;
 	}
 	if (summonCircleExpandTime_ > 0.0f) { // 召喚陣の拡大
+		isSummon_ = true;
 		auto& sp = params_.summon;
 
 		summonCircleExpandTime_ -= FPSKeeper::DeltaTime();
@@ -1236,6 +1237,7 @@ void Boss::EnergyTimeUpdate() {
 		if (energyTime_ >= sp.bossRiseStartTime) { // ボスの位置更新
 			float t = (std::max)((energyTime_ - sp.bossRiseStartTime) / sp.bossRiseStartTime, 0.0f);
 			animModel_->transform.translate.y = std::lerp(bossYPos_, sp.bossDownPos, t);
+			summonCameraRotate_.x = std::lerp(summonCameraRotateStart_, summonCameraRotateEnd_, 1.0f - t);
 		}
 		energyParticle_.Emit();
 
@@ -1248,6 +1250,7 @@ void Boss::EnergyTimeUpdate() {
 	if (energyCoolTime_ > 0.0f) {
 		energyCoolTime_ -= FPSKeeper::DeltaTime();
 		if (energyCoolTime_ <= 0.0f) {
+			isSummon_ = false;
 			animModel_->transform.translate.y = bossYPos_;
 			animModel_->ChangeAnimation("roaring");
 			ParticleManager::GetParticleCSEmitterTexture(summonIndex_).SetEmit(false);

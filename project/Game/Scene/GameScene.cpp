@@ -21,18 +21,6 @@ GameScene::~GameScene() {
 
 void GameScene::Initialize() {
 
-	GlobalVariables* globalvariables = GlobalVariables::GetInstance();
-	const char* groupName = "Sphere";
-	const char* groupName2 = "Fence";
-
-	globalvariables->CreateGroup(groupName);
-	globalvariables->AddItem(groupName, "parametar", spherePara);
-	globalvariables->AddItem(groupName, "Position", spherevec);
-
-	globalvariables->CreateGroup(groupName2);
-	globalvariables->AddItem(groupName2, "parametar", fencePara);
-	globalvariables->AddItem(groupName2, "Position", fencevec);
-
 	obj3dCommon.reset(new Object3dCommon());
 	obj3dCommon->Initialize();
 
@@ -130,9 +118,18 @@ void GameScene::Update() {
 		player_->Update();
 
 		if (boss_->GetIsStart()) {
-			followCamera_->Update(boss_->GetDefoultPos());
+			if (boss_->GetIsSummon()) {
+				followCamera_->SetTargetSpeed(panSpeed_ * 0.1f);
+				followCamera_->SetFollowSpeed(panSpeed_ * 2.0f);
+				followCamera_->SetOffsetSoon(0.0f);
+				followCamera_->SetOffset(boss_->GetCameraRang(), 30.0f);
+				CameraManager::GetInstance()->GetCamera()->transform.rotate = boss_->GetSummonCameraRotate();
+				CameraManager::GetInstance()->GetCamera()->transform.translate = summonCameraPos;
+			} else {
+				followCamera_->Update(boss_->GetDefoultPos());
+			}
 		} else {
-			//followCamera_->SetOffset(boss_->GetCameraRang(), 30.0f);
+			followCamera_->SetOffset(boss_->GetCameraRang(), 30.0f);
 			followCamera_->SetFollowSpeed(boss_->GetCameraFollowSpeed());
 			followCamera_->Update(boss_->GetBossCore()->GetWorldPos());
 		}
@@ -140,6 +137,8 @@ void GameScene::Update() {
 		boss_->Update();
 		if (!boss_->GetIsStart() && player_->GetIsStart()) {
 			player_->SetIsStart(false);
+			followCamera_->ResetTargetSpeed();
+			followCamera_->ResetFollowSpeed();
 			AudioPlayer::GetInstance()->SoundLoop(*bgm_, 0.025f);
 		}
 	} else {
@@ -349,13 +348,4 @@ void GameScene::LoadSceneLevelData(const std::string& name) {
 }
 
 void GameScene::ApplyGlobalVariables() {
-	GlobalVariables* globalVariables = GlobalVariables::GetInstance();
-	const char* groupName = "Sphere";
-	const char* groupName2 = "Fence";
-
-	spherePara = globalVariables->GetFloatValue(groupName, "parametar");
-	spherevec = globalVariables->GetVector3Value(groupName, "Position");
-
-	fencePara = globalVariables->GetFloatValue(groupName2, "parametar");
-	fencevec = globalVariables->GetVector3Value(groupName2, "Position");
 }
