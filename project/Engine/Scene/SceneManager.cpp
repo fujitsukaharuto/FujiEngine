@@ -17,8 +17,9 @@ SceneManager::SceneManager() {
 SceneManager::~SceneManager() {
 }
 
-void SceneManager::Initialize(DXCom* pDxcom) {
+void SceneManager::Initialize(DXCom* pDxcom, LightManager* pLightManager) {
 	dxcommon_ = pDxcom;
+	lightManager_ = pLightManager;
 }
 
 void SceneManager::Finalize() {
@@ -51,7 +52,7 @@ void SceneManager::StartScene(const std::string& sceneName) {
 	assert(sceneFactory_);
 
 	scene_ = sceneFactory_->CreateScene(sceneName);
-	scene_->Init(dxcommon_, this);
+	scene_->Init(dxcommon_, this, lightManager_);
 	scene_->Initialize();
 }
 
@@ -98,7 +99,7 @@ void SceneManager::SceneSet() {
 		scene_ = nextScene_;
 		nextScene_ = nullptr;
 
-		scene_->Init(dxcommon_, this);
+		scene_->Init(dxcommon_, this, lightManager_);
 		scene_->Initialize();
 		isChange_ = false;
 	}

@@ -78,7 +78,7 @@ void GameScene::Initialize() {
 
 	gameoverSelector_ = std::make_unique<Sprite>();
 	gameoverSelector_->Load("boal16x16.png");
-	gameoverSelector_->SetPos({ 240.0f, 500.0f, 0.0f });
+	gameoverSelector_->SetPos(selectPointL_);
 	gameoverSelector_->SetColor({ 0.7f, 0.7f, 0.1f, 1.0f });
 	gameoverSelector_->SetSize({ 40.0f, 40.0f });
 
@@ -143,29 +143,9 @@ void GameScene::Update() {
 		}
 	} else {
 		AudioPlayer::GetInstance()->SoundStopWave(*bgm_);
-		if (selectPoint_ == 0) {
-			if (input_->TriggerKey(DIK_SPACE)) {
-				player_->ReStart();
-				boss_->ReStart();
-				followCamera_->ReStart(boss_->GetBossCore()->GetWorldPos());
-			}
-			if (input_->TriggerKey(DIK_D)) {
-				selectPoint_ = 1;
-				gameoverSelector_->SetPos({ 800.0f,500.0f,0.0f });
-			}
-		} else {
-			if (input_->TriggerKey(DIK_SPACE)) {
-				if (blackTime == 0.0f) {
-					isChangeFase = true;
-					isBackTitle_ = true;
-				}
-			}
-			if (input_->TriggerKey(DIK_A)) {
-				selectPoint_ = 0;
-				gameoverSelector_->SetPos({ 240.0f,500.0f,0.0f });
-			}
-		}
+		GameoverUpdate();
 	}
+	ContinueUpdate();
 
 	field.Emit();
 
@@ -185,6 +165,9 @@ void GameScene::Update() {
 			if (bullet->GetIsLive() && !bullet->GetIsCharge()) {
 				cMane_->AddCollider(bullet->GetCollider());
 			}
+		}
+		if (boss_->GetIsNowDush()) {
+			cMane_->AddCollider(boss_->GetCollider());
 		}
 		cMane_->AddCollider(boss_->GetCoreCollider());
 		for (auto& wall : boss_->GetWalls()) {
@@ -254,12 +237,14 @@ void GameScene::Draw() {
 
 	dxcommon_->PreSpriteDraw();
 	key_->Draw();
-	if (player_->GetIsGameOver()) {
+	if (isGameover_) {
 		gameover_->Draw();
 		gameoverSelector_->Draw();
 	}
 	//test->Draw();
-	if (blackTime != 0.0f) {
+	if (blackTime_ != 0.0f) {
+		black_->Draw();
+	} else if (isContiuneFade_ || isGameoverFade_) {
 		black_->Draw();
 	}
 
@@ -296,11 +281,11 @@ void GameScene::ParticleDebugGUI() {
 }
 
 void GameScene::BlackFade() {
-	if (isChangeFase) {
-		if (blackTime < blackLimmite) {
-			blackTime += FPSKeeper::DeltaTime();
-			if (blackTime >= blackLimmite) {
-				blackTime = blackLimmite;
+	if (isChangeFase_) {
+		if (blackTime_ < blackLimmite_) {
+			blackTime_ += FPSKeeper::DeltaTime();
+			if (blackTime_ >= blackLimmite_) {
+				blackTime_ = blackLimmite_;
 			}
 		} else {
 			if (isBackTitle_) {
@@ -309,25 +294,28 @@ void GameScene::BlackFade() {
 				ChangeScene("RESULT", 40.0f);
 			}
 		}
+		black_->SetColor({ 0.0f,0.0f,0.0f,Lerp(0.0f,1.0f,(1.0f / blackLimmite_ * blackTime_)) });
 	} else {
-		if (blackTime > 0.0f) {
-			blackTime -= FPSKeeper::DeltaTime();
-			if (blackTime <= 0.0f) {
-				blackTime = 0.0f;
+		if (blackTime_ > 0.0f) {
+			if (FPSKeeper::DeltaTime() < FPSKeeper::GetClampFrame()) {
+				blackTime_ -= FPSKeeper::DeltaTime();
 			}
+			if (blackTime_ <= 0.0f) {
+				blackTime_ = 0.0f;
+			}
+			black_->SetColor({ 0.0f,0.0f,0.0f,Lerp(0.0f,1.0f,(1.0f / blackLimmite_ * blackTime_)) });
 		}
 	}
-	black_->SetColor({ 0.0f,0.0f,0.0f,Lerp(0.0f,1.0f,(1.0f / blackLimmite * blackTime)) });
 #ifdef _DEBUG
 	if (Input::GetInstance()->TriggerKey(DIK_0)) {
-		if (blackTime == 0.0f) {
-			isChangeFase = true;
+		if (blackTime_ == 0.0f) {
+			isChangeFase_ = true;
 		}
 	}
 #endif // _DEBUG
 	if (boss_->GetIsClear()) {
-		if (blackTime == 0.0f) {
-			isChangeFase = true;
+		if (blackTime_ == 0.0f) {
+			isChangeFase_ = true;
 		}
 	}
 }
@@ -348,4 +336,72 @@ void GameScene::LoadSceneLevelData(const std::string& name) {
 }
 
 void GameScene::ApplyGlobalVariables() {
+}
+
+void GameScene::GameoverUpdate() {
+	if (!isGameoverFade_ && gameoverFadeTime_ == 0.0f) {
+		isGameoverFade_ = true;
+	}
+
+	if (isGameoverFade_) {
+		gameoverFadeTime_ += FPSKeeper::DeltaTime();
+		float v = std::fmodf(gameoverFadeTime_ / fadeBaseTime_, 2.0f);
+		if (v <= 1.0f) {
+			black_->SetColor({ 0.0f,0.0f,0.0f,v });
+		} else {
+			isGameover_ = true;
+			black_->SetColor({ 0.0f,0.0f,0.0f,2.0f - v });
+		}
+		if (gameoverFadeTime_ > fadeBaseTime_ * 2.0f) {
+			isGameoverFade_ = false;
+			black_->SetColor({ 0.0f,0.0f,0.0f,0.0f });
+		}
+	}
+
+	if (isGameover_ && !isGameoverFade_ && !isContiuneFade_ && !isChangeFase_) {
+		if (selectPoint_ == 0) {
+			if (input_->TriggerKey(DIK_SPACE)) {
+				isRestartOnce_ = true;
+				isContiuneFade_ = true;
+			}
+			if (input_->TriggerKey(DIK_D)) {
+				selectPoint_ = 1;
+				gameoverSelector_->SetPos(selectPointR_);
+			}
+		} else {
+			if (input_->TriggerKey(DIK_SPACE)) {
+				if (blackTime_ == 0.0f) {
+					isChangeFase_ = true;
+					isBackTitle_ = true;
+				}
+			}
+			if (input_->TriggerKey(DIK_A)) {
+				selectPoint_ = 0;
+				gameoverSelector_->SetPos(selectPointL_);
+			}
+		}
+	}
+}
+
+void GameScene::ContinueUpdate() {
+	if (isContiuneFade_) {
+		contiuneFadeTime_ += FPSKeeper::DeltaTime();
+		float v = std::fmodf(contiuneFadeTime_ / fadeBaseTime_, 2.0f);
+		if (v <= 1.0f) {
+			black_->SetColor({ 0.0f,0.0f,0.0f,v });
+		} else {
+			isGameover_ = false;
+			if (isRestartOnce_) {
+				isRestartOnce_ = false;
+				player_->ReStart();
+				boss_->ReStart();
+				followCamera_->ReStart(boss_->GetBossCore()->GetWorldPos());
+			}
+			black_->SetColor({ 0.0f,0.0f,0.0f,2.0f - v });
+		}
+		if (contiuneFadeTime_ > fadeBaseTime_ * 2.0f) {
+			isContiuneFade_ = false;
+			black_->SetColor({ 0.0f,0.0f,0.0f,0.0f });
+		}
+	}
 }

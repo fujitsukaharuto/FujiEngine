@@ -1,0 +1,21 @@
+{
+    "modelName": "player.obj",
+    "objectName": "NewObject",
+    "transform": {
+        "rotate": [
+            0.0,
+            3.140000104904175,
+            0.0
+        ],
+        "scale": [
+            0.5,
+            0.5,
+            0.5
+        ],
+        "translate": [
+            0.0,
+            2.5,
+            0.0
+        ]
+    }
+}

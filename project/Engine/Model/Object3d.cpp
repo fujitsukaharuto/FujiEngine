@@ -40,6 +40,30 @@ void Object3d::Create(const std::string& fileName) {
 	CreateWVP();
 }
 
+void Object3d::CreateFromJson(const std::string& name) {
+	nlohmann::json objJson = JsonSerializer::DeserializeJsonData(name);
+	std::string modelName = objJson.value("modelName", "DefaultModel");
+	Create(modelName);
+	if (objJson.contains("transform")) {
+		const auto& t = objJson["transform"];
+		if (t.contains("translate")) {
+			transform.translate.x = t["translate"][0];
+			transform.translate.y = t["translate"][1];
+			transform.translate.z = t["translate"][2];
+		}
+		if (t.contains("rotate")) {
+			transform.rotate.x = t["rotate"][0];
+			transform.rotate.y = t["rotate"][1];
+			transform.rotate.z = t["rotate"][2];
+		}
+		if (t.contains("scale")) {
+			transform.scale.x = t["scale"][0];
+			transform.scale.y = t["scale"][1];
+			transform.scale.z = t["scale"][2];
+		}
+	}
+}
+
 void Object3d::CreateSphere() {
 	this->camera_ = CameraManager::GetInstance()->GetCamera();
 	ModelManager::GetInstance()->CreateSphere();

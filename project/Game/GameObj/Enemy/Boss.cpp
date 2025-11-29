@@ -690,7 +690,7 @@ bool Boss::DushCharge(float& t, float maxT, bool& isNear, float reng) {
 	if (t <= 0.0f) {
 		DushInit();
 	}
-	if (t <= maxT * 0.2f) {
+	if (t <= maxT * 0.75f) {
 		CaluModelDir();
 	}
 	t += FPSKeeper::DeltaTime();
@@ -732,6 +732,7 @@ bool Boss::DushAttack(bool isNear, float& dushReng, float stopReng) {
 		ParticleManager::GetParticleCSEmitter(dushTrailIndex_).SetEmit(true);
 		ParticleManager::GetParticleCSEmitter(dushTrailIndex_).SetPos(animModel_->transform.translate);
 	}
+	isNowDush_ = true;
 	Vector3 front = GetFrontOffset(Vector3(0.0f, 0.0f, 2.5f), animModel_->transform.rotate.y);
 	animModel_->transform.translate += front;
 	dushReng += front.Length();
@@ -746,9 +747,11 @@ bool Boss::DushAttack(bool isNear, float& dushReng, float stopReng) {
 	dushSmoke_.Emit();
 	if (!isNear && dushReng >= stopReng * 1.5f) {
 		ParticleManager::GetParticleCSEmitter(dushTrailIndex_).SetEmit(false);
+		isNowDush_ = false;
 		return true;
 	} else if (isNear && dushReng >= stopReng) {
 		ParticleManager::GetParticleCSEmitter(dushTrailIndex_).SetEmit(false);
+		isNowDush_ = false;
 		return true;
 	}
 	return false;
@@ -1110,6 +1113,7 @@ void Boss::SetDefaultBehavior(bool isInvisibleItem) {
 	for (int i = 0; i < 8; i++) {
 		ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]).SetEmit(false);
 	}
+	ParticleManager::GetParticleCSEmitter(dushTrailIndex_).SetEmit(false);
 	if (isInvisibleItem) {
 		for (auto& wave : walls_) {
 			wave->SetIsLive(false);
@@ -1124,6 +1128,8 @@ void Boss::SetDefaultBehavior(bool isInvisibleItem) {
 			ring->SetIsLive(false);
 		}
 	}
+	cameraRang_ = -25.0f;
+	cameraFollowSpeed_ = 0.2f;
 	ChangeBehavior(std::make_unique<BossRoot>(this));
 	animModel_->transform.translate.y = 0.0f;
 	Vector3 dir = pPlayer_->GetWorldPos() - animModel_->transform.translate;

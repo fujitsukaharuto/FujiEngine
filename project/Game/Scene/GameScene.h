@@ -35,6 +35,9 @@ private:
 
 	void ApplyGlobalVariables();//値読み込みテスト用今度Objectクラス作って継承で使えるようにする
 
+	void GameoverUpdate();
+	void ContinueUpdate();
+
 	std::unique_ptr<Object3dCommon> obj3dCommon = nullptr;
 	std::unique_ptr<CollisionManager> cMane_;
 
@@ -50,8 +53,8 @@ private:
 	bool isBackTitle_ = false;
 	std::unique_ptr<Sprite> gameoverSelector_ = nullptr;
 	int selectPoint_ = 0;
-	Vector4 color_ = { 1.0f,1.0f,1.0f,1.0f };
-	Vector3 rightDir = { 1.0f,0.0f,0.0f };
+	Vector3 selectPointL_ = { 180.0f,450.0f,0.0f };
+	Vector3 selectPointR_ = { 810.0f,450.0f,0.0f };
 
 	Vector3 summonCameraPos = { -25.0f,5.0f,-25.0f };
 	float panSpeed_ = 0.01f;
@@ -65,9 +68,17 @@ private:
 
 	SoundData* bgm_;
 
+	float gameoverFadeTime_ = 0.0f;
+	float contiuneFadeTime_ = 0.0f;
+	float fadeBaseTime_ = 30.0f;
+	bool isGameoverFade_ = false;
+	bool isContiuneFade_ = false;
+	bool isRestartOnce_ = false;
+	bool isGameover_ = false;
+
 	// sceneChange
 	std::unique_ptr<Sprite> black_;
-	float blackLimmite = 20.0f;
-	float blackTime = 20.0f;
-	bool isChangeFase = false;
+	float blackLimmite_ = 20.0f;
+	float blackTime_ = 20.0f;
+	bool isChangeFase_ = false;
 };

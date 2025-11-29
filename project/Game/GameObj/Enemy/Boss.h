@@ -185,6 +185,7 @@ public:
 	bool GetIsStart() { return isStart_; }
 	bool GetIsSummon() { return isSummon_; }
 	bool GetIsClear() { return isClear_; }
+	bool GetIsNowDush() { return isNowDush_; }
 	int GetNowHpIndex() { return nowHpIndex_; }
 	float GetChainRate();
 	Vector3 GetDefoultPos() { return defaultCorePos_; }
@@ -309,6 +310,7 @@ private:
 	float cameraRang_ = -25.0f;
 	float cameraFollowSpeed_ = 0.2f;
 
+	bool isNowDush_ = false;
 	int dushChargeIndex_ = 0;
 	int dushTrailIndex_ = 0;
 

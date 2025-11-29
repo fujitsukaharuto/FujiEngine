@@ -15,7 +15,7 @@ public:
 
 public:
 
-	void Initialize(DXCom* pDxcom);
+	void Initialize(DXCom* pDxcom, LightManager* pLightManager);
 	void Finalize();
 	void Update();
 	void Draw();
@@ -40,6 +40,7 @@ private:
 private:
 
 	DXCom* dxcommon_;
+	LightManager* lightManager_;
 	AbstractSceneFactory* sceneFactory_ = nullptr;
 
 	BaseScene* scene_ = nullptr;

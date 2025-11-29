@@ -15,11 +15,12 @@ void BaseScene::Update() {
 void BaseScene::Draw() {
 }
 
-void BaseScene::Init(DXCom* pDxcom, SceneManager* pSceneManager) {
+void BaseScene::Init(DXCom* pDxcom, SceneManager* pSceneManager, LightManager* pLightMamager) {
 	dxcommon_ = pDxcom;
 	sceneManager_ = pSceneManager;
 	input_ = Input::GetInstance();
 	audioPlayer_ = AudioPlayer::GetInstance();
+	lightManager_ = pLightMamager;
 }
 
 void BaseScene::LoadSceneLevelData(const std::string& name) {

@@ -27,7 +27,7 @@ public:
 	virtual void Update();
 	virtual void Draw();
 
-	void Init(DXCom* pDxcom, SceneManager* pSceneManager);
+	void Init(DXCom* pDxcom, SceneManager* pSceneManager, LightManager* pLightMamager);
 	virtual void LoadSceneLevelData(const std::string& name);
 
 	virtual void DebugGUI();
@@ -49,6 +49,7 @@ protected:
 	SceneManager* sceneManager_;
 	Input* input_ = nullptr;
 	AudioPlayer* audioPlayer_ = nullptr;
+	LightManager* lightManager_ = nullptr;
 	nlohmann::json sceneData_;
 
 private:

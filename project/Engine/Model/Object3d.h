@@ -35,6 +35,7 @@ public:
 public:
 
 	void Create(const std::string& fileName);
+	void CreateFromJson(const std::string& name);
 
 	/// <summary>
 	/// 球の作成
