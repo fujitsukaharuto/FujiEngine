@@ -76,6 +76,8 @@ void PlayerAttackRoot::Update() {
 			}
 			pPlayer_->ReleaseBullet();
 			AudioPlayer::GetInstance()->SoundStopWave(*chargeSE_);
+			isCharegSEStart_ = false;
+			chargeTime_ = 0.0f;
 		}
 		if (chargeTime_ > 10.0f) {
 			if (!isCharegSEStart_) {
@@ -122,4 +124,12 @@ void PlayerAttackRoot::Update() {
 }
 
 void PlayerAttackRoot::Debug() {
+}
+
+void PlayerAttackRoot::ResetParam() {
+}
+
+void PlayerAttackRoot::StopSE() {
+	AudioPlayer::GetInstance()->SoundStopWave(*chargeSE_);
+	AudioPlayer::GetInstance()->SoundStopWave(*chargeCompleteSE_);
 }

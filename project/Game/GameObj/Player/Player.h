@@ -123,6 +123,9 @@ private:
 	void MoveEngineParticle();
 	void InitAvoidPostEffect();
 	void AvoidPostEffect();
+	void AvoidSetting();
+	void DamageSetting();
+	void HPUnderZeroSetting();
 
 private:
 

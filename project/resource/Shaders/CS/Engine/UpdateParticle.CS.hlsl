@@ -96,6 +96,7 @@ void EmitTrail(uint pIndex)
             gParticle[trailIndex].currentTime = 0;
             gParticle[trailIndex].isRandomMove = 0;
             gParticle[trailIndex].isTrailEmit = 0;
+            gParticle[trailIndex].isGravity = 0;
         }
     }
 }
@@ -113,7 +114,12 @@ void main( uint3 DTid : SV_DispatchThreadID )
                 MoveMode(particleIndex);
             }
 
-            gParticle[particleIndex].prevTranslate = gParticle[particleIndex].translate;
+            if (gParticle[particleIndex].isGravity == 1)
+            {
+                gParticle[particleIndex].velocity += kGravity * gPerFrame.deltaTime;
+            }
+
+                gParticle[particleIndex].prevTranslate = gParticle[particleIndex].translate;
             gParticle[particleIndex].translate += gParticle[particleIndex].velocity;
             
             if (gParticle[particleIndex].isTrailEmit == 1)

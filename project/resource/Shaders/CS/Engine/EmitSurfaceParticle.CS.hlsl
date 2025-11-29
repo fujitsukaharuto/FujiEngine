@@ -145,5 +145,9 @@ void main(uint3 DTid : SV_DispatchThreadID)
         gParticle[particleIndex].velocity = velocityOffset;
         gParticle[particleIndex].lifeTime = gEmitter.lifeTime;
         gParticle[particleIndex].currentTime = 0.0f;
+        
+        gParticle[particleIndex].isRandomMove = 0;
+        gParticle[particleIndex].isTrailEmit = 0;
+        gParticle[particleIndex].isGravity = 0;
     }
 }

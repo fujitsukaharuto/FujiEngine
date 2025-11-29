@@ -17,6 +17,9 @@ enum class DanceState {
 	Finish,                 // 9
 };
 
+/// <summary>
+/// ダンスのステップそれぞれの基本時間
+/// </summary>
 struct DanceStepTime {
 	float turnLeftBaseTime = 25.0f;
 	float turnRightBaseTime = 20.0f;
@@ -26,13 +29,23 @@ struct DanceStepTime {
 	float fastSpinBaseTime = 20.0f;
 	float finishSpinBaseTime = 30.0f;
 	float lastBaseTime = 10.0f;
+	float hanabiWaitTime = 30.0f;
 };
 
+/// <summary>
+/// ダンス時の高さの基準
+/// </summary>
 struct DanceStepHight {
 	float jumpHeight = 1.0f;
 	float spinHeight = 1.5f;
 	float finishHeight = 2.2f;
 	float lastHeight = 0.3f;
+};
+
+struct HanabiPopReng {
+	Vector2 xMinMax = { -8.0f, 8.0f };
+	Vector2 yMinMax = {  5.5f,10.0f };
+	Vector2 zMinMax = {  4.5f,12.0f };
 };
 
 /// <summary>
@@ -59,6 +72,8 @@ private:
 	void ApplyGlobalVariables();//値読み込みテスト用今度Objectクラス作って継承で使えるようにする
 
 	void KirbyDance();
+
+	void HanabiUpdate();
 
 	std::unique_ptr<Object3dCommon> obj3dCommon = nullptr;
 	std::unique_ptr<SkyBox> skybox_;
@@ -88,6 +103,9 @@ private:
 	float cameraStartRotateX_ = -0.1f;
 	Vector3 lightDir_ = { 0.0f,-0.907f,0.42f };
 	float lightIntens_ = 0.6f;
+
+	int hanabiIndex_ = 0;
+	HanabiPopReng popPos_;
 
 	// sceneChange
 	std::unique_ptr<Sprite> black_;

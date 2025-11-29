@@ -8,7 +8,7 @@
 
 BossDushAttack::BossDushAttack(Boss* pBoss,bool is) : BaseBossBehavior(pBoss) {
 	step_ = Step::CHARGE;
-	cameraRang_ = -37.5f;
+	cameraRang_ = -40.0f;
 	cameraFollowSpeed_ = 0.03f;
 	pBoss_->SetCameraRang(cameraRang_);
 	pBoss_->SetCameraFollowSpeed(cameraFollowSpeed_);

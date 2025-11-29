@@ -108,6 +108,10 @@ void SphereEmitter::DebugGUI() {
 		ImGui::Checkbox("IsTrailEmit", &isTrailEmit);
 		data_->isTrailEmit = uint32_t(isTrailEmit);
 
+		bool isGravity = bool(data_->isGravity);
+		ImGui::Checkbox("IsGravity", &isGravity);
+		data_->isGravity = uint32_t(isGravity);
+
 		ImGui::SetNextItemWidth(100);
 		ImGui::InputText(".json", saveName_, sizeof(saveName_));
 		ImGui::SameLine();
@@ -145,6 +149,7 @@ void SphereEmitter::Save(const std::string& fileName) {
 	j["velType"] = data_->emitVeloType;
 	j["moveType"] = data_->isRandomMove;
 	j["isTrailEmit"] = data_->isTrailEmit;
+	j["isGravity"] = data_->isTrailEmit;
 
 	JsonSerializer::SerializeJsonData(j, (kDirectoryPath_ + fileName + ".json").c_str());
 }
@@ -197,6 +202,7 @@ void SphereEmitter::Load(const std::string& fileName) {
 	data_->emitVeloType = j.value("velType", data_->emitVeloType);
 	data_->isRandomMove = j.value("moveType", data_->isRandomMove);
 	data_->isTrailEmit = j.value("isTrailEmit", data_->isTrailEmit);
+	data_->isGravity = j.value("isGravity", data_->isGravity);
 }
 
 void SphereEmitter::Emit() {

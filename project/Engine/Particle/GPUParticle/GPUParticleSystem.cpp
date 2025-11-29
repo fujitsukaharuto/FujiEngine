@@ -291,31 +291,3 @@ void GPUParticleSystem::EmitterDispatch() {
 		dxcommon_->InsertUAVBarrier(particleCSInstancing_.Get());
 	}
 }
-
-//void GPUParticleSystem::EmitterTextureDispatch() {
-//	ParticleCSHandles handles = {
-//	particleCSUAVHandle_.second,
-//	perFrameResource_->GetGPUVirtualAddress(),
-//	freeListIndexUAVHandle_.second,
-//	freeListUAVHandle_.second
-//	};
-//
-//	for (int i = 0; i < textureBasedEmitters_.size(); i++) {
-//		csEmitters_[textureBasedEmitters_[i]].emitter->Dispatch(dxcommon_->GetCommandList(),
-//			dxcommon_, srvManager_, handles);
-//	}
-//}
-
-//void GPUParticleSystem::EmitterSurfaceDispatch() {
-//	ParticleCSHandles handles = {
-//	particleCSUAVHandle_.second,
-//	perFrameResource_->GetGPUVirtualAddress(),
-//	freeListIndexUAVHandle_.second,
-//	freeListUAVHandle_.second
-//	};
-//
-//	for (int i = 0; i < MeshSurefaceEmitters_.size(); i++) {
-//		csEmitters_[MeshSurefaceEmitters_[i]].emitter->Dispatch(dxcommon_->GetCommandList(),
-//			dxcommon_, srvManager_, handles);
-//	}
-//}

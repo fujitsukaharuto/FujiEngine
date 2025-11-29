@@ -5,7 +5,7 @@
 
 BossBeamAttack::BossBeamAttack(Boss* pBoss) : BaseBossBehavior(pBoss) {
 	step_ = Step::CHARGE;
-	cameraRang_ = -35.0f;
+	cameraRang_ = -40.0f;
 	pBoss_->SetCameraRang(cameraRang_);
 	pBoss_->SetCameraFollowSpeed(cameraFollowSpeed_);
 	pBoss_->InitBeam();

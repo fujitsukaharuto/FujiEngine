@@ -32,6 +32,7 @@ struct EmitterSphere
     uint emitVeloType;
     uint isRandomMove;
     uint isTrailEmit;
+    uint isGravity;
 };
 ConstantBuffer<EmitterSphere> gEmitter : register(b0);
 struct PerFrame
@@ -238,5 +239,6 @@ void main(uint3 DTid : SV_DispatchThreadID)
         gParticle[particleIndex].currentTime = 0.0f;
         gParticle[particleIndex].isRandomMove = gEmitter.isRandomMove;
         gParticle[particleIndex].isTrailEmit = gEmitter.isTrailEmit;
+        gParticle[particleIndex].isGravity = gEmitter.isGravity;
     }
 }

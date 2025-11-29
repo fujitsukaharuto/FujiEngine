@@ -19,6 +19,7 @@ ResultScene::ResultScene() {}
 ResultScene::~ResultScene() {
 	lightManager_->GetDirectionLight()->directionLightData_->direction = { 0.0f,-1.0f,0.0f };
 	lightManager_->GetDirectionLight()->directionLightData_->intensity = 0.3f;
+	ParticleManager::GetInstance()->GetParticleCSEmitter(hanabiIndex_).SetEmit(false);
 }
 
 void ResultScene::Initialize() {
@@ -72,6 +73,8 @@ void ResultScene::Initialize() {
 		}
 		players_.push_back(std::move(player));
 	}
+
+	ParticleManager::GetInstance()->GetParticleCSEmitter(hanabiIndex_).Load("hanabi");
 }
 
 void ResultScene::Update() {
@@ -271,12 +274,18 @@ void ResultScene::KirbyDance() {
 		rotate.y -= lastRotateY_ * t;  // Y軸：右に20°
 		rotate.x = -lastRotateX_ * t;
 
-		if (t >= 1.0f) { danceTime_ = 0.0f; state_ = DanceState::Finish; }
+		if (t >= 1.0f) {
+			danceTime_ = 0.0f;
+			state_ = DanceState::Finish;
+			ParticleManager::GetInstance()->GetParticleCSEmitter(hanabiIndex_).SetEmit(true);
+			ParticleManager::GetInstance()->GetParticleCSEmitter(hanabiIndex_).Emit();
+		}
 		break;
 
 	case DanceState::Finish:
 		rotate.y -= lastRotateY_;
 		rotate.x = -lastRotateX_;
+		HanabiUpdate();
 		break;
 	}
 
@@ -291,4 +300,9 @@ void ResultScene::KirbyDance() {
 			players_[i]->transform.translate.z += zDiff_;
 		}
 	}
+}
+
+void ResultScene::HanabiUpdate() {
+	Vector3 popPos = Random::GetVector3(popPos_.xMinMax, popPos_.yMinMax, popPos_.zMinMax);
+	ParticleManager::GetInstance()->GetParticleCSEmitter(hanabiIndex_).SetPos(popPos);
 }

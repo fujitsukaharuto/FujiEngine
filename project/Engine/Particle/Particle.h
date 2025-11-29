@@ -130,4 +130,5 @@ struct ParticleCS {
 	Vector3 prevTranslate;
 	uint32_t isRandomMove;
 	uint32_t isTrailEmit;
+	uint32_t isGravity;
 };

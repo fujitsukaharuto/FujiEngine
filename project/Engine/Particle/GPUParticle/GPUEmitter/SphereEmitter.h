@@ -39,6 +39,7 @@ struct EmitterSphere {
 	uint32_t emitVeloType;
 	uint32_t isRandomMove;
 	uint32_t isTrailEmit;
+	uint32_t isGravity;
 };
 
 class SphereEmitter : public IGPUEmitter {

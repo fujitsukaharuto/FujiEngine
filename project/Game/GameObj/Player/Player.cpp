@@ -274,28 +274,9 @@ void Player::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 	if (other.tag == "enemyAttack") {
 		if (!isDamage_) {
 			if (isNowAvoid_) { // 回避しているなら
-				if (!isCanStrongState_) {
-					isCanStrongState_ = true;
-					InitAvoidPostEffect();
-					FPSKeeper::SetSlowMotion(0.6f, 0.2f);
-				}
-				avoidEmitter01_->Emit();
-				avoidEmitter02_->Emit();
-				avoidEmitter03_->Emit();
+				AvoidSetting();
 			} else {
-				dxcommon_->GetOffscreenManager()->AddPostEffect(PostEffectList::Vignette);
-				playerHP_ -= 10.0f;
-				isDamage_ = true;
-				damageCoolTime_ = 60.0f;
-				if (playerHP_ <= 0.0f) {
-					playerHP_ = 0.0f;
-					isDeath_ = true;
-					dxcommon_->GetOffscreenManager()->PopPostEffect(PostEffectList::Vignette);
-					hpSprite_->SetSize({ 0.0f, hpSize_.y });
-					ReleaseBullet();
-				}
-				hit_.Emit();
-				hit2_.Emit();
+				DamageSetting();
 			}
 		}
 	} else if (other.tag == "enemyAttack_ring") {
@@ -304,28 +285,9 @@ void Player::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 				float lng = Vector3(other.worldPos - model_->transform.translate).Length();
 				if (lng < ring->GetRingRadMax() && lng > ring->GetRingRadMin()) {
 					if (isNowAvoid_) { // 回避しているなら
-						if (!isCanStrongState_) {
-							isCanStrongState_ = true;
-							InitAvoidPostEffect();
-							FPSKeeper::SetSlowMotion(0.6f, 0.2f);
-						}
-						avoidEmitter01_->Emit();
-						avoidEmitter02_->Emit();
-						avoidEmitter03_->Emit();
+						AvoidSetting();
 					} else {
-						dxcommon_->GetOffscreenManager()->AddPostEffect(PostEffectList::Vignette);
-						playerHP_ -= 10.0f;
-						isDamage_ = true;
-						damageCoolTime_ = 60.0f;
-						if (playerHP_ <= 0.0f) {
-							playerHP_ = 0.0f;
-							dxcommon_->GetOffscreenManager()->PopPostEffect(PostEffectList::Vignette);
-							isDeath_ = true;
-							hpSprite_->SetSize({ 0.0f, hpSize_.y });
-							ReleaseBullet();
-						}
-						hit_.Emit();
-						hit2_.Emit();
+						DamageSetting();
 					}
 				}
 			}
@@ -333,28 +295,9 @@ void Player::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 	} else if (other.tag == "Boss") {
 		if (!isDamage_) {
 			if (isNowAvoid_) { // 回避しているなら
-				if (!isCanStrongState_) {
-					isCanStrongState_ = true;
-					InitAvoidPostEffect();
-					FPSKeeper::SetSlowMotion(0.6f, 0.2f);
-				}
-				avoidEmitter01_->Emit();
-				avoidEmitter02_->Emit();
-				avoidEmitter03_->Emit();
+				AvoidSetting();
 			} else {
-				dxcommon_->GetOffscreenManager()->AddPostEffect(PostEffectList::Vignette);
-				playerHP_ -= 10.0f;
-				isDamage_ = true;
-				damageCoolTime_ = 60.0f;
-				if (playerHP_ <= 0.0f) {
-					playerHP_ = 0.0f;
-					isDeath_ = true;
-					dxcommon_->GetOffscreenManager()->PopPostEffect(PostEffectList::Vignette);
-					hpSprite_->SetSize({ 0.0f, hpSize_.y });
-					ReleaseBullet();
-				}
-				hit_.Emit();
-				hit2_.Emit();
+				DamageSetting();
 			}
 		}
 	}
@@ -363,19 +306,7 @@ void Player::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 void Player::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
 	if (other.tag == "enemyAttack") {
 		if (!isDamage_ && !isNowAvoid_) {
-			dxcommon_->GetOffscreenManager()->AddPostEffect(PostEffectList::Vignette);
-			playerHP_ -= 10.0f;
-			isDamage_ = true;
-			damageCoolTime_ = 60.0f;
-			if (playerHP_ <= 0.0f) {
-				playerHP_ = 0.0f;
-				dxcommon_->GetOffscreenManager()->PopPostEffect(PostEffectList::Vignette);
-				isDeath_ = true;
-				hpSprite_->SetSize({ 0.0f, hpSize_.y });
-				ReleaseBullet();
-			}
-			hit_.Emit();
-			hit2_.Emit();
+			DamageSetting();
 		}
 	}
 	if (other.tag == "enemyAttack_ring") {
@@ -393,20 +324,8 @@ void Player::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
 							avoidEmitter03_->Emit();
 						}
 					} else {
-						dxcommon_->GetOffscreenManager()->AddPostEffect(PostEffectList::Vignette);
-						playerHP_ -= 10.0f;
-						isDamage_ = true;
 						isCanStrongState_ = false;
-						damageCoolTime_ = 60.0f;
-						if (playerHP_ <= 0.0f) {
-							playerHP_ = 0.0f;
-							dxcommon_->GetOffscreenManager()->PopPostEffect(PostEffectList::Vignette);
-							isDeath_ = true;
-							hpSprite_->SetSize({ 0.0f, hpSize_.y });
-							ReleaseBullet();
-						}
-						hit_.Emit();
-						hit2_.Emit();
+						DamageSetting();
 					}
 				}
 			}
@@ -812,5 +731,38 @@ void Player::AvoidPostEffect() {
 		float t = avoidEffectTime_ / avoidEffectBaseTime_;
 		float radialwidth = std::lerp(0.0f, 0.0035f, 1.0f - powf(1.0f - t, 3.0f));
 		dxcommon_->GetOffscreenManager()->SetRadialParamsWidth(radialwidth);
+	}
+}
+
+void Player::AvoidSetting() {
+	if (!isCanStrongState_) {
+		isCanStrongState_ = true;
+		InitAvoidPostEffect();
+		FPSKeeper::SetSlowMotion(0.6f, 0.2f);
+	}
+	avoidEmitter01_->Emit();
+	avoidEmitter02_->Emit();
+	avoidEmitter03_->Emit();
+}
+
+void Player::DamageSetting() {
+	dxcommon_->GetOffscreenManager()->AddPostEffect(PostEffectList::Vignette);
+	playerHP_ -= 10.0f;
+	isDamage_ = true;
+	damageCoolTime_ = 60.0f;
+	HPUnderZeroSetting();
+	hit_.Emit();
+	hit2_.Emit();
+}
+
+void Player::HPUnderZeroSetting() {
+	if (playerHP_ <= 0.0f) {
+		playerHP_ = 0.0f;
+		isDeath_ = true;
+		attackBehavior_->ResetParam();
+		attackBehavior_->StopSE();
+		dxcommon_->GetOffscreenManager()->PopPostEffect(PostEffectList::Vignette);
+		hpSprite_->SetSize({ 0.0f, hpSize_.y });
+		ReleaseBullet();
 	}
 }

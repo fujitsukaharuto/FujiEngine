@@ -7,7 +7,7 @@
 
 BossJumpAttack::BossJumpAttack(Boss* pBoss, int count) : BaseBossBehavior(pBoss), jumpCount_(count) {
 	step_ = Step::ATTACK;
-	cameraRang_ = -30.0f;
+	cameraRang_ = -35.0f;
 	pBoss_->SetCameraRang(cameraRang_);
 	pBoss_->SetCameraFollowSpeed(cameraFollowSpeed_);
 	pBoss_->InitJumpAttack();

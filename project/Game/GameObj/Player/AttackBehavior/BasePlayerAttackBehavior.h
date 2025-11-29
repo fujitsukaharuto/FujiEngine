@@ -13,6 +13,9 @@ public:
 	virtual void Update() = 0;
 	virtual void Debug() = 0;
 
+	virtual void ResetParam() = 0;
+	virtual void StopSE() = 0;
+
 protected:
 
 	Player* pPlayer_ = nullptr;
