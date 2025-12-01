@@ -188,7 +188,7 @@ void ResultScene::BlackFade() {
 			isChangeFase = true;
 		}
 	} else if (Input::GetInstance()->GetGamepadState(pad)) {
-		if (Input::GetInstance()->TriggerButton(PadInput::A)) {
+		if (Input::GetInstance()->TriggerButton(PadInput::A) && state_ == DanceState::Finish) {
 			if (blackTime == 0.0f) {
 				isChangeFase = true;
 			}

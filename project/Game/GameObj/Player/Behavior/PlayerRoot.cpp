@@ -15,17 +15,17 @@ PlayerRoot::~PlayerRoot() {
 
 void PlayerRoot::Update() {
 
+	Input* input = Input::GetInstance();
 	switch (step_) {
 		///---------------------------------------------------------------------------------------
 		/// 通常
 		///---------------------------------------------------------------------------------------
 	case PlayerRoot::Step::ROOT:
-
-		if (Input::GetInstance()->PushKey(DIK_SPACE) && !pPlayer_->GetIsFall()) {
+		if ((input->PushKey(DIK_SPACE) || input->PressButton(PadInput::X)) && !pPlayer_->GetIsFall()) {
 			step_ = Step::TOJUMP;
 			break;
 		}
-		if (Input::GetInstance()->PushKey(DIK_K) && !pPlayer_->GetIsFall() && pPlayer_->GetAvoidCoolTime() <= 0.0f) {
+		if ((input->PushKey(DIK_K) || input->IsLTriggerPressed() || input->IsRTriggerPressed()) && !pPlayer_->GetIsFall() && pPlayer_->GetAvoidCoolTime() <= 0.0f) {
 			step_ = Step::TOAVOID;
 			break;
 		}

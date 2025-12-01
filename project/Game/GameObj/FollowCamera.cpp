@@ -85,7 +85,7 @@ void FollowCamera::CalDestinationAngle() {
 	if (Input::GetInstance()->GetGamepadState(pad)) {
 		const float kRotateSpeed = 0.05f;
 
-		destinationAngleY_ += (Input::GetInstance()->GetRStick().x / SHRT_MAX * kRotateSpeed) * FPSKeeper::DeltaTime();
+		destinationAngleY_ += (Input::GetInstance()->GetRStick().x * kRotateSpeed) * FPSKeeper::DeltaTime();
 
 		if (Input::GetInstance()->TriggerButton(PadInput::RStick)) {
 			//destinationAngleY_ = target_->rotate.y;

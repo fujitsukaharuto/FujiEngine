@@ -42,13 +42,14 @@ PlayerAttackRoot::~PlayerAttackRoot() {
 
 void PlayerAttackRoot::Update() {
 
+	Input* input = Input::GetInstance();
 	switch (step_) {
 		///---------------------------------------------------------------------------------------
 		/// 通常
 		///---------------------------------------------------------------------------------------
 	case PlayerAttackRoot::Step::ROOT:
 
-		if (Input::GetInstance()->PushKey(DIK_J) && coolTime_ <= 0.0f) {
+		if ((input->PushKey(DIK_J) || input->PressButton(PadInput::A)) && coolTime_ <= 0.0f) {
 			pPlayer_->InitBullet();
 			chargeTime_ = 0.0f;
 			coolTime_ = 30.0f;
@@ -66,10 +67,10 @@ void PlayerAttackRoot::Update() {
 		///---------------------------------------------------------------------------------------
 	case PlayerAttackRoot::Step::CHAREGE:
 		
-		if (Input::GetInstance()->PushKey(DIK_J)) {
+		if ((input->PushKey(DIK_J) || input->PressButton(PadInput::A))) {
 			chargeTime_ += FPSKeeper::DeltaTime();
 		}
-		if (!Input::GetInstance()->PushKey(DIK_J) || pPlayer_->GetIsStrongState()) {
+		if (!(input->PushKey(DIK_J) || input->PressButton(PadInput::A)) || pPlayer_->GetIsStrongState()) {
 			step_ = Step::ROOT;
 			if (pPlayer_->GetIsStrongState()) {
 				pPlayer_->StrngthBullet();
@@ -109,7 +110,7 @@ void PlayerAttackRoot::Update() {
 		chargeLight_->Emit();
 		chargeCircle_->Emit();
 
-		if (!Input::GetInstance()->PushKey(DIK_J)) {
+		if (!(input->PushKey(DIK_J) || input->PressButton(PadInput::A))) {
 			step_ = Step::ROOT;
 			AudioPlayer::GetInstance()->SoundStopWave(*chargeSE_);
 			pPlayer_->ReleaseBullet();

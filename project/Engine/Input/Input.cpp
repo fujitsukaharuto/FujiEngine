@@ -4,6 +4,7 @@
 #include "MyWindow.h"
 
 
+const uint8_t Input::kTriggerThreshold = 30;
 
 Input* Input::GetInstance() {
 	static Input instance;
@@ -54,6 +55,9 @@ void Input::Initialize() {
 
 	ZeroMemory(&pad_.state_, sizeof(XINPUT_STATE));
 	ZeroMemory(&pad_.statePre_, sizeof(XINPUT_STATE));
+
+	pad_.deadZoneL_ = 7849;
+	pad_.deadZoneR_ = 8689;
 
 }
 
@@ -134,8 +138,16 @@ uint8_t Input::GetLTrigger() const {
 	return pad_.state_.Gamepad.bLeftTrigger;
 }
 
+bool Input::IsLTriggerPressed() const {
+	return GetLTrigger() > kTriggerThreshold;
+}
+
 uint8_t Input::GetRTrigger() const {
 	return pad_.state_.Gamepad.bRightTrigger;
+}
+
+bool Input::IsRTriggerPressed() const {
+	return GetRTrigger() > kTriggerThreshold;
 }
 
 bool Input::PressButton(PadInput padInput) const {
@@ -218,12 +230,11 @@ Vector2 Input::ApplyDeadZone(int32_t x, int32_t y, int32_t deadZone) const {
 
 	float magnitude = sqrtf(static_cast<float>(x) * static_cast<float>(x) + static_cast<float>(y) * static_cast<float>(y));
 	if (magnitude < deadZone) {
-		stick.x = 0.0f;
-		stick.y = 0.0f;
-	} else {
-		stick.x = static_cast<float>(x);
-		stick.y = static_cast<float>(y);
+		return { 0.0f, 0.0f };
 	}
+
+	stick.x = x / 32767.0f;
+	stick.y = y / 32767.0f;
 
 	return stick;
 }

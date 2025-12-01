@@ -16,13 +16,15 @@ PlayerJump::~PlayerJump() {
 }
 
 void PlayerJump::Update() {
+
+	Input* input = Input::GetInstance();
 	switch (step_) {
 		///---------------------------------------------------------------------------------------
 		/// ジャンプ
 		///---------------------------------------------------------------------------------------
 	case PlayerJump::Step::JUMP:
 
-		if (Input::GetInstance()->TriggerKey(DIK_SPACE) && isSecoundJump_) {
+		if ((input->TriggerKey(DIK_SPACE) || input->TriggerButton(PadInput::X)) && isSecoundJump_) {
 			if (speed_ > 0.0f) {
 				speed_ += pPlayer_->GetSecoundJumpSpeed();
 			} else {

@@ -62,6 +62,7 @@ public:
 	void Finalize();
 	void Update();
 
+	static const uint8_t kTriggerThreshold;
 
 	/// Mouse-------------------------------------
 
@@ -168,11 +169,15 @@ public:
 	/// <returns></returns>
 	uint8_t GetLTrigger()const;
 
+	bool IsLTriggerPressed() const;
+
 	/// <summary>
 	/// 右トリガーを取得
 	/// </summary>
 	/// <returns></returns>
 	uint8_t GetRTrigger()const;
+
+	bool IsRTriggerPressed() const;
 
 	/// <summary>
 	/// ボタンが押されているか

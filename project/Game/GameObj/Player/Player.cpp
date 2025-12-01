@@ -401,6 +401,21 @@ Vector3 Player::GetInputDirection() {
 		}
 	}
 
+	XINPUT_STATE pad;
+	if (input->GetGamepadState(pad)) {
+		Vector2 lstick = input->GetLStick();
+		if (fabsf(lstick.x) > 0.01f || fabsf(lstick.y) > 0.01f) {
+			inputDirection_.x += lstick.x;
+			inputDirection_.z += lstick.y;
+			// 回避方向
+			if (lstick.x < 0) {
+				avoidDirection_ = -1.0f;
+			} else if (lstick.x > 0) {
+				avoidDirection_ = 1.0f;
+			}
+		}
+	}
+
 	return inputDirection_;
 }
 
@@ -423,6 +438,11 @@ bool Player::GetIsMove() {
 		if ((keyLength).Length() > 0) {
 			isMove = true;
 		};
+	}
+
+	Vector2 lstick = input->GetLStick();
+	if (fabs(lstick.x) > 0.01f || fabs(lstick.y) > 0.01f) {
+		isMove = true;
 	}
 
 	return isMove;
