@@ -30,16 +30,17 @@ void Player::Initialize() {
 
 	strongStatePos_ = std::make_unique<Object3d>();
 	strongStatePos_->Create("Sphere");
-	strongStatePos_->SetColor({ 0.0f,0.0f,0.0f,0.0f });
+	strongStatePos_->SetColor(Colors::Transparent);
 
+	InitParameter();
 
-	playerHP_ = 100.0f;
+	auto& hpSprite = params_.hpSprite;
 	hpSprite_ = std::make_unique<Sprite>();
 	hpSprite_->Load("white2x2.png");
-	hpSprite_->SetColor({ 0.7f,0.211f,0.505f,1.0f });
+	hpSprite_->SetColor(hpSprite.color);
 	hpSprite_->SetAnchor({ 0.0f,0.5f });
-	hpSprite_->SetPos({ hpStartPos_.x, hpStartPos_.y, 0.0f });
-	hpSprite_->SetSize(hpSize_);
+	hpSprite_->SetPos({ hpSprite.hpStartPos.x, hpSprite.hpStartPos.y, 0.0f });
+	hpSprite_->SetSize(hpSprite.hpSize);
 
 	for (int i = 0; i < 2; i++) {
 		std::unique_ptr<Sprite> hpTex;
@@ -48,11 +49,11 @@ void Player::Initialize() {
 		hpTex->SetColor({ 0.9f,0.9f,1.0f,1.0f });
 		hpFrame_.push_back(std::move(hpTex));
 	}
-	hpFrame_[0]->SetPos({ hpFrameStartPos_.x, hpFrameStartPos_.y, 0.0f });
-	hpFrame_[0]->SetSize(hpFrameSize_);
+	hpFrame_[0]->SetPos({ hpSprite.hpFrameStartPos.x, hpSprite.hpFrameStartPos.y, 0.0f });
+	hpFrame_[0]->SetSize(hpSprite.hpFrameSize);
 	hpFrame_[1]->SetColor({ 0.1f,0.1f,0.1f,1.0f });
-	hpFrame_[1]->SetPos({ hpFrameStartPos_.x, hpFrameStartPos_.y, 0.0f });
-	hpFrame_[1]->SetSize(hpFrameInSize_);
+	hpFrame_[1]->SetPos({ hpSprite.hpFrameStartPos.x, hpSprite.hpFrameStartPos.y, 0.0f });
+	hpFrame_[1]->SetSize(hpSprite.hpFrameInSize);
 
 	moveSpeed_ = 0.2f;
 	secoundJumpSpeed_ = 0.1f;
@@ -198,11 +199,27 @@ void Player::ParameterGUI() {
 		ImGui::DragFloat("jumpSpeedw", &jumpSpeed_, 0.01f);
 		ImGui::DragFloat("gravity", &gravity_, 0.01f);
 		ImGui::DragFloat("maxFallSpeed", &maxFallSpeed_, 0.01f);
-		ImGui::DragFloat("playerHP", &playerHP_, 0.01f);
+		ImGui::DragFloat("playerHP", &params_.hp.hp, 0.01f);
 		ImGui::TreePop();
 	}
 	ImGui::Unindent();
 #endif // _DEBUG
+}
+
+void Player::InitParameter() {
+	params_.hp.hp = 100.0f;
+	params_.hp.maxHp = 100.0f;
+	params_.hp.damageStep =
+	{
+		{55.0f, 100.0f, false},
+		{45.0f, 50.0f,  true},
+		{35.0f, 40.0f,  false},
+		{25.0f, 30.0f,  false},
+		{15.0f, 20.0f,  false},
+		{ 5.0f, 10.0f,  false},
+	};
+
+
 }
 
 void Player::ReStart() {
@@ -215,7 +232,7 @@ void Player::ReStart() {
 	isDeath_ = false;
 	isGameOver_ = false;
 	isStart_ = true;
-	playerHP_ = 100.0f;
+	params_.hp.hp = params_.hp.maxHp;
 	isFall_ = false;
 	deathTime_ = 240.0f;
 	avoidEffectTime_ = 0.0f;
@@ -227,34 +244,30 @@ void Player::ReStart() {
 }
 
 void Player::HPUpdate() {
-	Vector2 hpSize = hpSize_;
-	float t = playerHP_ / 100.0f;
+	Vector2 hpSize = params_.hpSprite.hpSize;
+	auto& hp = params_.hp;
+	float t = hp.hp / hp.maxHp;
 	hpSprite_->SetSize({ hpSize.x * t, hpSize.y });
 
-	if (isDamage_) {
-		// ダメージ喰らった時の色処理
-		if (damageCoolTime_ > 0.0f) {
-			damageCoolTime_ -= FPSKeeper::DeltaTime();
+	if (!isDamage_) return;
+	damageCoolTime_ -= FPSKeeper::DeltaTime();
+	bool effectApplied = false;
+	for (auto& step : hp.damageStep) {
+		if (damageCoolTime_ > step.start && damageCoolTime_ < step.end) {
+			if (step.popVignette) {
+				dxcommon_->GetOffscreenManager()->PopPostEffect(PostEffectList::Vignette);
+			}
+			model_->SetColor({ damageColor_.x, damageColor_.y, damageColor_.z, 1.0f });
+			effectApplied = true;
+			break;
 		}
-		if (damageCoolTime_ > 55.0f) {
-			model_->SetColor({ damageColor_.x,damageColor_.y ,damageColor_.z ,1.0f });
-		} else if (damageCoolTime_ > 45.0f && damageCoolTime_ < 50.0f) {
-			dxcommon_->GetOffscreenManager()->PopPostEffect(PostEffectList::Vignette);
-			model_->SetColor({ damageColor_.x,damageColor_.y ,damageColor_.z ,1.0f });
-		} else if (damageCoolTime_ > 35.0f && damageCoolTime_ < 40.0f) {
-			model_->SetColor({ damageColor_.x,damageColor_.y ,damageColor_.z ,1.0f });
-		} else if (damageCoolTime_ > 25.0f && damageCoolTime_ < 30.0f) {
-			model_->SetColor({ damageColor_.x,damageColor_.y ,damageColor_.z ,1.0f });
-		} else if (damageCoolTime_ > 15.0f && damageCoolTime_ < 20.0f) {
-			model_->SetColor({ damageColor_.x,damageColor_.y ,damageColor_.z ,1.0f });
-		} else if (damageCoolTime_ > 5.0f && damageCoolTime_ < 10.0f) {
-			model_->SetColor({ damageColor_.x,damageColor_.y ,damageColor_.z ,1.0f });
-		} else {
-			model_->SetColor({ 1.0f,1.0f ,1.0f ,1.0f });
-		}
-		if (damageCoolTime_ < 0.0f) {
-			isDamage_ = false;
-		}
+	}
+
+	if (!effectApplied) {
+		model_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
+	}
+	if (damageCoolTime_ < 0.0f) {
+		isDamage_ = false;
 	}
 }
 
@@ -767,22 +780,22 @@ void Player::AvoidSetting() {
 
 void Player::DamageSetting() {
 	dxcommon_->GetOffscreenManager()->AddPostEffect(PostEffectList::Vignette);
-	playerHP_ -= 10.0f;
+	params_.hp.hp -= 10.0f;
 	isDamage_ = true;
-	damageCoolTime_ = 60.0f;
+	damageCoolTime_ = params_.hp.damageCoolTime;
 	HPUnderZeroSetting();
 	hit_.Emit();
 	hit2_.Emit();
 }
 
 void Player::HPUnderZeroSetting() {
-	if (playerHP_ <= 0.0f) {
-		playerHP_ = 0.0f;
+	if (params_.hp.hp <= 0.0f) {
+		params_.hp.hp = 0.0f;
 		isDeath_ = true;
 		attackBehavior_->ResetParam();
 		attackBehavior_->StopSE();
 		dxcommon_->GetOffscreenManager()->PopPostEffect(PostEffectList::Vignette);
-		hpSprite_->SetSize({ 0.0f, hpSize_.y });
+		hpSprite_->SetSize({ 0.0f, params_.hpSprite.hpSize.y });
 		ReleaseBullet();
 	}
 }

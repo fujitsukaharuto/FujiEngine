@@ -10,10 +10,37 @@
 #include <vector>
 
 
+struct DamageStepTime {
+	float start;      // この時間以上
+	float end;        // この時間未満
+	bool popVignette; // ヴィネットを出すステップかどうか
+};
+
+struct PlayerHPParams {
+	std::vector<DamageStepTime> damageStep;
+	float hp;
+	float maxHp;
+	float damageCoolTime = 60.0f;
+};
+
+struct PlayerHPSpritParms {
+	Vector4 color = { 0.7f,0.211f,0.505f,1.0f };
+	Vector2 hpSize = { 275.0f,35.0f };
+	Vector2 hpStartPos = { 55.0f,650.0f };
+	Vector2 hpFrameSize = { 285.0f,42.5f };
+	Vector2 hpFrameInSize = { 275.0f,35.0f };
+	Vector2 hpFrameStartPos = { 192.5f,650.0f };
+};
+
+struct PlayerParams {
+	PlayerHPParams hp;
+	PlayerHPSpritParms hpSprite;
+};
+
 /// <summary>
 /// Playerクラス
 /// </summary>
-class Player : public OriginGameObject{
+class Player : public OriginGameObject {
 public:
 	Player();
 	~Player();
@@ -24,6 +51,7 @@ public:
 	void Draw(Material* mate = nullptr, bool is = false)override;
 	void DebugGUI()override;
 	void ParameterGUI();
+	void InitParameter();
 	void ReStart();
 
 	/// <summary>
@@ -139,31 +167,27 @@ private:
 
 	Vector3 targetPos_;
 
-	float playerHP_;
-	Vector3 damageColor_ = { 1.5f,1.5f,5.0f };
+	PlayerParams params_;
+
 	bool isDamage_ = false;
 	float damageCoolTime_ = 30.0f;
 	std::unique_ptr<Sprite> hpSprite_;
 	std::vector<std::unique_ptr<Sprite>> hpFrame_;
-	Vector2 hpSize_ = { 275.0f,35.0f };
-	Vector2 hpStartPos_ = { 55.0f,650.0f };
-	Vector2 hpFrameSize_ = { 285.0f,42.5f };
-	Vector2 hpFrameInSize_ = { 275.0f,35.0f };
-	Vector2 hpFrameStartPos_ = { 192.5f,650.0f };
+	Vector3 damageColor_ = { 1.5f,1.5f,5.0f };
 
-	float moveSpeed_;
-	float jumpSpeed_;
-	float secoundJumpSpeed_;
-	float fallSpeed_;
-	float gravity_;
-	float maxFallSpeed_;
-	float maxChargeTime_;
-	bool isFall_;
+	float moveSpeed_ = 0.0f;
+	float jumpSpeed_ = 0.0f;
+	float secoundJumpSpeed_ = 0.0f;
+	float fallSpeed_ = 0.0f;
+	float gravity_ = 0.0f;
+	float maxFallSpeed_ = 0.0f;
+	float maxChargeTime_ = 0.0f;
+	bool isFall_ = false;
 
-	float avoidRotate_;
+	float avoidRotate_ = 0.0f;
 	float avoidDirection_ = 1.0f;
-	float avoidCoolTime_;
-	float avoidEffectTime_;
+	float avoidCoolTime_ = 0.0f;
+	float avoidEffectTime_ = 0.0f;
 	float avoidEffectBaseTime_ = 15.0f;
 	bool isNowAvoid_ = false;
 	bool isCanStrongState_ = false;
@@ -174,44 +198,44 @@ private:
 	float deathTime_ = 240.0f;
 	bool isGameOver_ = false;
 
-	Vector3 velocity_;
-	Vector3 inputDirection_;
-	int dir_;
+	Vector3 velocity_{};
+	Vector3 inputDirection_{};
+	int dir_ = 0;
 
 	float startLandingTime_ = 0.0f;
 	float startLandingMax_ = 0.0f;
 
-	DXCom* dxcommon_;
+	DXCom* dxcommon_ = nullptr;
 
-	ParticleEmitter hit_;
-	ParticleEmitter hit2_;
-	ParticleEmitter moveParticleL_;
-	ParticleEmitter moveParticleR_;
-	ParticleEmitter deathSmoke_;
-	ParticleEmitter strongShotWave_;
-	
-	ParticleEmitter* moveBurnerL_;
-	ParticleEmitter* moveBurnerR_;
-	ParticleEmitter* moveBurnerLT_;
-	ParticleEmitter* moveBurnerRT_;
+	ParticleEmitter hit_{};
+	ParticleEmitter hit2_{};
+	ParticleEmitter moveParticleL_{};
+	ParticleEmitter moveParticleR_{};
+	ParticleEmitter deathSmoke_{};
+	ParticleEmitter strongShotWave_{};
 
-	ParticleEmitter* avoidEmitter01_;
-	ParticleEmitter* avoidEmitter02_;
-	ParticleEmitter* avoidEmitter03_;
+	ParticleEmitter* moveBurnerL_{};
+	ParticleEmitter* moveBurnerR_{};
+	ParticleEmitter* moveBurnerLT_{};
+	ParticleEmitter* moveBurnerRT_{};
 
-	ParticleEmitter* avoidEmitter1_;
-	ParticleEmitter* avoidEmitter2_;
-	ParticleEmitter* avoidEmitter3_;
+	ParticleEmitter* avoidEmitter01_{};
+	ParticleEmitter* avoidEmitter02_{};
+	ParticleEmitter* avoidEmitter03_{};
 
-	ParticleEmitter* storongStateEmitter1_;
-	ParticleEmitter storongStateEmitter2_;
+	ParticleEmitter* avoidEmitter1_{};
+	ParticleEmitter* avoidEmitter2_{};
+	ParticleEmitter* avoidEmitter3_{};
 
-	SoundData* shotSE_;
+	ParticleEmitter* storongStateEmitter1_{};
+	ParticleEmitter storongStateEmitter2_{};
+
+	SoundData* shotSE_{};
 
 	// Title
-	Vector3 titleStartP_;
-	Vector3 titleCenterP_;
-	Vector3 titleEndP_;
+	Vector3 titleStartP_{};
+	Vector3 titleCenterP_{};
+	Vector3 titleEndP_{};
 	float preTitleTime_ = 300.0f;
 
 };

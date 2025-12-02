@@ -536,9 +536,9 @@ void Boss::ReStart() {
 void Boss::ReduceBossHP(bool isStrong) {
 	if (isHpActive_) {
 		if (isStrong) {
-			bossHp_ -= 3.0f;
+			bossHp_ -= 4.0f;
 		} else {
-			bossHp_--;
+			bossHp_ -= 2.0f;
 		}
 		// フェーズやHPの段階を切り替える為の処理
 		switch (BossHPState(nowHpIndex_)) {
