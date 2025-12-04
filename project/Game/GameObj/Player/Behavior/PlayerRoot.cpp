@@ -25,7 +25,7 @@ void PlayerRoot::Update() {
 			step_ = Step::TOJUMP;
 			break;
 		}
-		if ((input->PushKey(DIK_K) || input->IsLTriggerPressed() || input->IsRTriggerPressed()) && !pPlayer_->GetIsFall() && pPlayer_->GetAvoidCoolTime() <= 0.0f) {
+		if ((input->PushKey(DIK_K) || input->IsLTriggerPressed() || input->IsRTriggerPressed() || input->PressButton(PadInput::LeftShoulder) || input->PressButton(PadInput::RightShoulder)) && !pPlayer_->GetIsFall() && pPlayer_->GetAvoidCoolTime() <= 0.0f) {
 			step_ = Step::TOAVOID;
 			break;
 		}

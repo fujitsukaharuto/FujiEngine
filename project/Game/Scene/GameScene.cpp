@@ -71,6 +71,12 @@ void GameScene::Initialize() {
 	key_->SetPos({ 1280.0f, 730.0f, 0.0f });
 	key_->SetSize({ 400.0f, 300.0f });
 
+	pad_ = std::make_unique<Sprite>();
+	pad_->Load("keyPad_beta.png");
+	pad_->SetAnchor({ 1.0f,1.0f });
+	pad_->SetPos({ 1280.0f, 730.0f, 0.0f });
+	pad_->SetSize({ 400.0f, 300.0f });
+
 	gameover_ = std::make_unique<Sprite>();
 	gameover_->Load("gameover_beta.png");
 	gameover_->SetAnchor({ 0.0f,0.0f });
@@ -102,6 +108,7 @@ void GameScene::Initialize() {
 void GameScene::Update() {
 
 	cMane_->Reset();
+	PadSwitch();
 
 #ifdef _DEBUG
 
@@ -236,7 +243,11 @@ void GameScene::Draw() {
 #pragma region 前景スプライト
 
 	dxcommon_->PreSpriteDraw();
-	key_->Draw();
+	if (isPadDraw_) {
+		pad_->Draw();
+	} else {
+		key_->Draw();
+	}
 	if (isGameover_) {
 		gameover_->Draw();
 		gameoverSelector_->Draw();
@@ -403,5 +414,21 @@ void GameScene::ContinueUpdate() {
 			isContiuneFade_ = false;
 			black_->SetColor({ 0.0f,0.0f,0.0f,0.0f });
 		}
+	}
+}
+
+void GameScene::PadSwitch() {
+	Input* input = Input::GetInstance();
+	Vector2 lstick = input->GetLStick();
+	if (fabsf(lstick.x) > 0.01f || fabsf(lstick.y) > 0.01f) {
+		isPadDraw_ = true;
+	}
+
+	if (input->PressButton(PadInput::A) || input->PressButton(PadInput::X) || input->PressButton(PadInput::B) || input->PressButton(PadInput::Y) || input->IsLTriggerPressed() || input->IsRTriggerPressed()) {
+		isPadDraw_ = true;
+	}
+
+	if (input->TriggerKey(DIK_SPACE) || input->PushKey(DIK_K) || input->PushKey(DIK_J) || input->PushKey(DIK_A) || input->PushKey(DIK_D) || input->PushKey(DIK_W) || input->PushKey(DIK_S)) {
+		isPadDraw_ = false;
 	}
 }

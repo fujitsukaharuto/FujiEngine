@@ -34,6 +34,7 @@ void GameRun::Initialize() {
 	textureManager_->Load("gameover_beta.png");
 	textureManager_->Load("spaceKey.png");
 	textureManager_->Load("key_beta.png");
+	textureManager_->Load("keyPad_beta.png");
 	textureManager_->Load("FX12_Lightning_01.png");
 	textureManager_->Load("Gradient02.jpg");
 #pragma endregion

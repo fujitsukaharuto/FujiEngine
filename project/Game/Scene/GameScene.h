@@ -37,6 +37,7 @@ private:
 
 	void GameoverUpdate();
 	void ContinueUpdate();
+	void PadSwitch();
 
 	std::unique_ptr<Object3dCommon> obj3dCommon = nullptr;
 	std::unique_ptr<CollisionManager> cMane_;
@@ -48,6 +49,8 @@ private:
 	std::unique_ptr<FollowCamera> followCamera_;
 
 	std::unique_ptr<Sprite> key_ = nullptr;
+	bool isPadDraw_ = false;
+	std::unique_ptr<Sprite> pad_ = nullptr;
 
 	std::unique_ptr<Sprite> gameover_ = nullptr;
 	bool isBackTitle_ = false;

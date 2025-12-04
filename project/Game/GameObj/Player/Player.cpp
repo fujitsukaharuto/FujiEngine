@@ -568,7 +568,7 @@ void Player::StrngthBullet() {
 
 void Player::LandingUpdate() {
 	float delta= FPSKeeper::DeltaTime();
-	if (delta > 2.2f) return;
+	if (delta > FPSKeeper::GetClampFrame()) return;
 	if (startLandingTime_ > 0.0f) {
 		startLandingTime_ -= delta;
 		startLandingTime_ = (std::max)(0.0f, startLandingTime_);
