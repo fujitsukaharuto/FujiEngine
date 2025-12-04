@@ -83,27 +83,27 @@ struct Sphere {
 /// <summary>
 /// アフィン行列
 /// </summary>
-Matrix3x3 MakeAffineMat(Vector2 scale, float rotate, Vector2 translate);
+Matrix3x3 MakeAffineMat(const Vector2& scale, float rotate, const Vector2& translate);
 
 /// <summary>
 /// 3x3行列の積
 /// </summary>
-Matrix3x3 Multiply(Matrix3x3 matrix1, Matrix3x3 matrix2);
+Matrix3x3 Multiply(const Matrix3x3& matrix1, const Matrix3x3& matrix2);
 
 /// <summary>
 /// ベクトルと2x2行列の積
 /// </summary>
-Vector2 Multiply(Vector2 vector, Matrix2x2 matrix);
+Vector2 Multiply(const Vector2& vector, const Matrix2x2& matrix);
 
 /// <summary>
 /// 2x2行列の逆行列
 /// </summary>
-Matrix2x2 Inverse(Matrix2x2 matrix);
+Matrix2x2 Inverse(const Matrix2x2& matrix);
 
 /// <summary>
 /// 3x3行列の逆行列
 /// </summary>
-Matrix3x3 Inverse(Matrix3x3 matrix);
+Matrix3x3 Inverse(const Matrix3x3& matrix);
 
 /// <summary>
 /// 正射影行列

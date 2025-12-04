@@ -4,7 +4,7 @@
 #include <cmath>
 #include <assert.h>
 
-Matrix3x3 MakeAffineMat(Vector2 scale, float rotate, Vector2 translate) {
+Matrix3x3 MakeAffineMat(const Vector2& scale, float rotate, const Vector2& translate) {
 	Matrix3x3 result{};
 	for (int y = 0; y < 2; y++) {
 		for (int x = 0; x < 3; x++) {
@@ -19,7 +19,7 @@ Matrix3x3 MakeAffineMat(Vector2 scale, float rotate, Vector2 translate) {
 	return result;
 }
 
-Matrix3x3 Multiply(Matrix3x3 matrix1, Matrix3x3 matrix2) {
+Matrix3x3 Multiply(const Matrix3x3& matrix1, const Matrix3x3& matrix2) {
 	Matrix3x3 result{};
 
 	for (int row = 0; row < 3; row++) {
@@ -33,7 +33,7 @@ Matrix3x3 Multiply(Matrix3x3 matrix1, Matrix3x3 matrix2) {
 	return result;
 }
 
-Vector2 Multiply(Vector2 vector, Matrix2x2 matrix) {
+Vector2 Multiply(const Vector2& vector, const Matrix2x2& matrix) {
 	Vector2 result{};
 
 	result.x = vector.x * matrix.m[0][0] + vector.y * matrix.m[1][0];
@@ -42,7 +42,7 @@ Vector2 Multiply(Vector2 vector, Matrix2x2 matrix) {
 	return result;
 }
 
-Matrix2x2 Inverse(Matrix2x2 matrix) {
+Matrix2x2 Inverse(const Matrix2x2& matrix) {
 	Matrix2x2 result{};
 	Matrix2x2 m{};
 	m.m[0][0] = matrix.m[1][1]; m.m[0][1] = -(matrix.m[0][1]);
@@ -62,7 +62,7 @@ Matrix2x2 Inverse(Matrix2x2 matrix) {
 	return result;
 }
 
-Matrix3x3 Inverse(Matrix3x3 matrix) {
+Matrix3x3 Inverse(const Matrix3x3& matrix) {
 	Matrix3x3 m{};
 	m.m[0][0] = matrix.m[1][1] * matrix.m[2][2] - matrix.m[1][2] * matrix.m[2][1];
 	m.m[0][1] = -(matrix.m[0][1] * matrix.m[2][2] - matrix.m[0][2] * matrix.m[2][1]);

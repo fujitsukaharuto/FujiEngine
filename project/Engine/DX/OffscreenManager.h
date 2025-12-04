@@ -190,7 +190,7 @@ public:
 
 	//========================================================================*/
 	//* Setter
-	void SetRadialParamsCenter(Vector2 center) { radialData_->center = center; }
+	void SetRadialParamsCenter(const Vector2& center) { radialData_->center = center; }
 	void SetRadialParamsWidth(float width) { radialData_->blurWidth = width; }
 
 private:
