@@ -68,19 +68,19 @@ void GameScene::Initialize() {
 	key_ = std::make_unique<Sprite>();
 	key_->Load("key_beta.png");
 	key_->SetAnchor({ 1.0f,1.0f });
-	key_->SetPos({ 1280.0f, 730.0f, 0.0f });
+	key_->SetPos({ MyWin::kWindowWidth, MyWin::kWindowHeight, 0.0f });
 	key_->SetSize({ 400.0f, 300.0f });
 
 	pad_ = std::make_unique<Sprite>();
 	pad_->Load("keyPad_beta.png");
 	pad_->SetAnchor({ 1.0f,1.0f });
-	pad_->SetPos({ 1280.0f, 730.0f, 0.0f });
+	pad_->SetPos({ MyWin::kWindowWidth, MyWin::kWindowHeight, 0.0f });
 	pad_->SetSize({ 400.0f, 300.0f });
 
 	gameover_ = std::make_unique<Sprite>();
 	gameover_->Load("gameover_beta.png");
 	gameover_->SetAnchor({ 0.0f,0.0f });
-	gameover_->SetSize({ 1280.0f, 720.0f });
+	gameover_->SetSize({ MyWin::kWindowWidth, MyWin::kWindowHeight });
 
 	gameoverSelector_ = std::make_unique<Sprite>();
 	gameoverSelector_->Load("boal16x16.png");
