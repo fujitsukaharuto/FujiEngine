@@ -23,14 +23,20 @@ void MoveMode(uint pIndex)
         float3 curl = CurlNoise(samplePos);
 
         float3 vel0 = gParticle[pIndex].velocity;
-        if (length(vel0) < 0.0001f)
+        float len0 = length(vel0);
+        if (len0 < 0.0001f)
         {
             float3 seed = pos * 0.3 + float3(1.234, 5.678, 9.1011);
             float3 rnd = CurlNoise(seed);
-            vel0 = normalize(rnd + float3(0.1, 0.2, 0.1)) * 0.005f;
+            float3 v = rnd + float3(0.1, 0.2, 0.1);
+            float l = length(v);
+            if (l < 0.0001f)
+                v = float3(0.3, 0.1, 0.2);
+            vel0 = v / length(v) * 0.005f;
+            len0 = 0.005f;
         }
 
-        float baseSpeed = length(vel0);
+        float baseSpeed = len0;
         if (baseSpeed < 0.0001f)
             baseSpeed = 0.01f;
 

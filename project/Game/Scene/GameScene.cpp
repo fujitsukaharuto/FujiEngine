@@ -371,22 +371,22 @@ void GameScene::GameoverUpdate() {
 
 	if (isGameover_ && !isGameoverFade_ && !isContiuneFade_ && !isChangeFase_) {
 		if (selectPoint_ == 0) {
-			if (input_->TriggerKey(DIK_SPACE)) {
+			if (input_->TriggerKey(DIK_SPACE) || input_->PressButton(PadInput::A)) {
 				isRestartOnce_ = true;
 				isContiuneFade_ = true;
 			}
-			if (input_->TriggerKey(DIK_D)) {
+			if (input_->TriggerKey(DIK_D) || input_->PressButton(PadInput::Right)) {
 				selectPoint_ = 1;
 				gameoverSelector_->SetPos(selectPointR_);
 			}
 		} else {
-			if (input_->TriggerKey(DIK_SPACE)) {
+			if (input_->TriggerKey(DIK_SPACE) || input_->PressButton(PadInput::A)) {
 				if (blackTime_ == 0.0f) {
 					isChangeFase_ = true;
 					isBackTitle_ = true;
 				}
 			}
-			if (input_->TriggerKey(DIK_A)) {
+			if (input_->TriggerKey(DIK_A) || input_->PressButton(PadInput::Left)) {
 				selectPoint_ = 0;
 				gameoverSelector_->SetPos(selectPointL_);
 			}

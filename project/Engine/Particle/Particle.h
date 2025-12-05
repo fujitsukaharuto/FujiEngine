@@ -91,6 +91,7 @@ struct Particle {
 	//* Rotate
 	int rotateType_ = static_cast<int>(RotateType::kUsually);
 	bool isContinuouslyRotate_ = false;
+	Vector3 continuouslyR_ = {};
 
 	//========================================================================*/
 	//* Color

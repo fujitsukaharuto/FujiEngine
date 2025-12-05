@@ -64,7 +64,7 @@ void IParticleGroup::ParticleSizeUpdate(Particle& particle) {
 void IParticleGroup::SRTUpdate(Particle& particle) {
 	if (particle.rotateType_ == static_cast<int>(RotateType::kRandomR)) {
 		if (particle.isContinuouslyRotate_) {
-			particle.rotate += Random::GetVector3({ -0.2f,0.2f }, { -0.2f,0.2f }, { -0.2f,0.2f }) * FPSKeeper::DeltaTime();
+			particle.rotate += particle.continuouslyR_ * FPSKeeper::DeltaTime();
 		}
 	}
 
@@ -159,6 +159,9 @@ bool IParticleGroup::InitEmitParticle(Particle& particle, const Vector3& pos, co
 
 		particle.rotateType_ = grain.rotateType_;
 		particle.isContinuouslyRotate_ = grain.isContinuouslyRotate_;
+		if (particle.isContinuouslyRotate_) {
+			particle.continuouslyR_ += Random::GetVector3({ -0.02f,0.02f }, { -0.02f,0.02f }, { -0.02f,0.02f });
+		}
 		Vector3 veloSpeed = particle.speed_.Normalize();
 		Vector3 cameraR{};
 		Vector3 defo = { 0.0f,1.0f,0.0f };
