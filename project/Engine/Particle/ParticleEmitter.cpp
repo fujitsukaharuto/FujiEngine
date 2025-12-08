@@ -432,6 +432,7 @@ void ParticleEmitter::Save() {
 	j["endSize"]              = { grain_.endSize_.x,grain_.endSize_.y };
 
 	j["isBillBoard"]          = (grain_.isBillBoard_);
+	j["isContinuouslyR_"]     = (grain_.isContinuouslyRotate_);
 
 	j["grainPattern"]         = (static_cast<int>(grain_.pattern_));
 
@@ -500,6 +501,7 @@ void ParticleEmitter::Load(const std::string& filename) {
 		if (j.contains("endSize"))              grain_.endSize_ = Vector2(j["endSize"][0], j["endSize"][1]);
 
 		if (j.contains("isBillBoard"))          grain_.isBillBoard_ = j["isBillBoard"].get<bool>();
+		if (j.contains("isContinuouslyR_"))     grain_.isContinuouslyRotate_ = j["isContinuouslyR_"].get<bool>();
 
 		if (j.contains("grainPattern"))         grain_.pattern_ = static_cast<BillBoardPattern>(j["grainPattern"].get<int>());
 

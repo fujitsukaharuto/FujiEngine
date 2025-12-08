@@ -44,6 +44,7 @@ void Arrow::Initialize() {
 
 	ParticleManager::Load(hit_, "arrowHit");
 	ParticleManager::Load(hitParticle_, "arrowParticle");
+	ParticleManager::Load(hitExpand_, "arrowExpandParticle");
 
 	spark1_.frequencyTime_ = 0.0f;
 	spark3_.frequencyTime_ = 0.0f;
@@ -194,7 +195,9 @@ void Arrow::ArrivalTimeUpdate() {
 	} else {
 		isLive_ = false;
 		hitParticle_.pos_ = model_->transform.translate;
+		hitExpand_.pos_ = model_->transform.translate;
 		hitParticle_.Emit();
+		hitExpand_.Emit();
 		hit_.pos_ = model_->transform.translate;
 		hit_.Emit();
 		ParticleManager::GetSphereEmitter(emitterNumber_).SetEmit(false);

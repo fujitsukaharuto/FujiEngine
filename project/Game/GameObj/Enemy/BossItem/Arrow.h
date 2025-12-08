@@ -100,6 +100,7 @@ private:
 
 	ParticleEmitter hit_;
 	ParticleEmitter hitParticle_;
+	ParticleEmitter hitExpand_;
 
 	SoundData* throwSE_ = nullptr;
 

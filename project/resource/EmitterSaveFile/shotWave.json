@@ -8,9 +8,9 @@
         0.0
     ],
     "Para_colorMax": [
-        0.3799999952316284,
-        0.06413491815328598,
-        0.15209762752056122,
+        0.6940000057220459,
+        0.6940000057220459,
+        0.6940000057220459,
         1.0
     ],
     "Para_colorMin": [
@@ -73,8 +73,8 @@
         0.0
     ],
     "endSize": [
-        3.0,
-        3.0
+        7.0,
+        7.0
     ],
     "frequencyTime": 0.0,
     "grainPattern": 0,
@@ -82,9 +82,8 @@
     "isAddRandomSize": false,
     "isAutoUVMove": false,
     "isBillBoard": true,
-    "isContinuouslyR_": false,
     "isDistanceComplement": false,
-    "isZandX": true,
+    "isZandX": false,
     "lifeTime": 15.0,
     "position": [
         0.0,
@@ -105,7 +104,7 @@
     ],
     "speedType": 0,
     "startSize": [
-        0.10000000149011612,
-        0.10000000149011612
+        1.0,
+        1.0
     ]
 }

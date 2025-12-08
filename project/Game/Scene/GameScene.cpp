@@ -374,6 +374,7 @@ void GameScene::GameoverUpdate() {
 			if (input_->TriggerKey(DIK_SPACE) || input_->PressButton(PadInput::A)) {
 				isRestartOnce_ = true;
 				isContiuneFade_ = true;
+				contiuneFadeTime_ = 0.0f;
 			}
 			if (input_->TriggerKey(DIK_D) || input_->PressButton(PadInput::Right)) {
 				selectPoint_ = 1;
@@ -412,6 +413,7 @@ void GameScene::ContinueUpdate() {
 		}
 		if (contiuneFadeTime_ > fadeBaseTime_ * 2.0f) {
 			isContiuneFade_ = false;
+			gameoverFadeTime_ = 0.0f;
 			black_->SetColor({ 0.0f,0.0f,0.0f,0.0f });
 		}
 	}

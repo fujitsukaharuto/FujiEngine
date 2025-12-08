@@ -89,6 +89,8 @@ void GameRun::Initialize() {
 	pManager_->CreateParticleGroup("playerStrongState2", "redCircle.png", 100);
 
 	pManager_->CreateParticleGroup("strongShotWave");
+	pManager_->CreateParticleGroup("shotWave");
+	pManager_->CreateParticleGroup("shotSpark");
 
 	
 	pManager_->CreateParticleGroup("bulletHit", "redCircle.png", 100);
@@ -132,6 +134,7 @@ void GameRun::Initialize() {
 
 	pManager_->CreateParticleGroup("arrowHit", "white.png", 30, ShapeType::SPHERE);
 	pManager_->CreateParticleGroup("arrowParticle", "redCircle.png", 100);
+	pManager_->CreateParticleGroup("arrowExpandParticle");
 
 	pManager_->CreateParticleGroup("duahChargeCompleteParticle", "redCircle.png", 100);
 	pManager_->CreateParticleGroup("duahChargeCompleteCircle", "chargeCircle.png", 10);

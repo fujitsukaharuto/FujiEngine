@@ -553,7 +553,10 @@ void Player::ReleaseBullet() {
 			isStrongState_ = false;
 			if (bullet->GetIsStrnght()) {
 				strongShotWave_.Emit();
+			} else {
+				shotWave_.Emit();
 			}
+			shotSpark_.Emit();
 		}
 	}
 }
@@ -654,6 +657,8 @@ void Player::ParticleEmitterSetting() {
 	ParticleManager::Load(moveParticleL_, "playerTranjectory");
 	ParticleManager::Load(moveParticleR_, "playerTranjectory");
 	ParticleManager::Load(deathSmoke_, "bulletHitSmoke");
+	ParticleManager::Load(shotSpark_, "shotSpark");
+	ParticleManager::Load(shotWave_, "shotWave");
 	ParticleManager::Load(strongShotWave_, "strongShotWave");
 
 	hit_.SetParent(&model_->transform);
@@ -661,6 +666,8 @@ void Player::ParticleEmitterSetting() {
 	moveParticleL_.SetParent(&model_->transform);
 	moveParticleR_.SetParent(&model_->transform);
 	deathSmoke_.SetParent(&model_->transform);
+	shotSpark_.SetParent(&model_->transform);
+	shotWave_.SetParent(&model_->transform);
 	strongShotWave_.SetParent(&model_->transform);
 
 	moveParticleL_.pos_ = { -0.4f,-0.4f,-0.3f };

@@ -212,6 +212,8 @@ private:
 	ParticleEmitter moveParticleL_{};
 	ParticleEmitter moveParticleR_{};
 	ParticleEmitter deathSmoke_{};
+	ParticleEmitter shotSpark_{};
+	ParticleEmitter shotWave_{};
 	ParticleEmitter strongShotWave_{};
 
 	ParticleEmitter* moveBurnerL_{};
