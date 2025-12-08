@@ -18,7 +18,7 @@ void BossCore::Initialize() {
 	collider_->SetCollisionExitCallback([this](const ColliderInfo& other) {OnCollisionExit(other); });
 	collider_->SetParent(&model_->transform);
 	collider_->SetTag("testBoss");
-	collider_->SetOffset({ 0.0f,5.0f, -1.5f });
+	collider_->SetOffset({ 0.0f,2.0f, -1.5f });
 	collider_->SetWidth(5.0f);
 	collider_->SetHeight(5.0f);
 	collider_->SetDepth(5.0f);
