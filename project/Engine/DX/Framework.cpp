@@ -1,5 +1,10 @@
 #include "Framework.h"
 
+using namespace Audio;
+using namespace Core;
+using namespace Graphics;
+
+
 Framework::Framework() {
 }
 
@@ -53,7 +58,7 @@ void Framework::Init() {
 	audioPlayer_->Initialize();
 
 	// ライト管理
-	lightManager_ = std::make_unique<LightManager>();
+	lightManager_ = std::make_unique<Graphics::LightManager>();
 	lightManager_->Initialize(dxcommon_.get());
 	lightManager_->CreateLight();
 	lightManager_->AddPointLight();

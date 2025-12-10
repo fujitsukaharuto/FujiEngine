@@ -1,6 +1,11 @@
 #include "UnderRing.h"
 #include "Engine/Particle/ParticleManager.h"
 
+using namespace Core;
+using namespace Graphics;
+using namespace Math;
+
+
 UnderRing::UnderRing() {
 }
 

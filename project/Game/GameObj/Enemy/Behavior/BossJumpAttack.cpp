@@ -5,6 +5,10 @@
 #include "Game/GameObj/Enemy/Behavior/BossAttack.h"
 #include "BossRoot.h"
 
+using namespace Graphics;
+using namespace Math;
+
+
 BossJumpAttack::BossJumpAttack(Boss* pBoss, int count) : BaseBossBehavior(pBoss), jumpCount_(count) {
 	step_ = Step::ATTACK;
 	cameraRang_ = -35.0f;

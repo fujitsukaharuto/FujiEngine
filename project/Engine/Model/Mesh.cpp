@@ -3,6 +3,9 @@
 #include "Engine/Model/ModelManager.h"
 #include "Engine/DX/SRVManager.h"
 
+using namespace Graphics;
+
+
 Mesh::Mesh() {
 	dxcommon_ = ModelManager::GetInstance()->ShareDXCom();
 }

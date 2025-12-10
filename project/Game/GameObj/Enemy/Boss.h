@@ -90,7 +90,7 @@ public:
 
 	void Initialize()override;
 	void Update()override;
-	void Draw(Material* mate = nullptr, bool is = false)override;
+	void Draw(Graphics::Material* mate = nullptr, bool is = false)override;
 	void CSDispatch();
 	void AnimDraw();
 	void DebugGUI()override;
@@ -139,7 +139,7 @@ public:
 	/// <summary>雷攻撃時の避雷針の処理</summary>
 	void RodFall();
 	/// <summary>避雷針のリング攻撃</summary>
-	void RodUnderRing(const Vector3& emitPos);
+	void RodUnderRing(const Math::Vector3& emitPos);
 
 	/// <summary>ビームの初期化</summary>
 	void InitBeam();
@@ -188,10 +188,10 @@ public:
 	bool GetIsNowDush() { return isNowDush_; }
 	int GetNowHpIndex() { return nowHpIndex_; }
 	float GetChainRate();
-	Vector3 GetDefoultPos() { return defaultCorePos_; }
+	Math::Vector3 GetDefoultPos() { return defaultCorePos_; }
 	float GetCameraRang() { return cameraRang_; }
 	float GetCameraFollowSpeed() { return cameraFollowSpeed_; }
-	const Vector3& GetSummonCameraRotate() { return summonCameraRotate_; }
+	const Math::Vector3& GetSummonCameraRotate() { return summonCameraRotate_; }
 
 	//========================================================================*/
 	//* Setter
@@ -229,7 +229,7 @@ private:
 	void ShrinkScale(int i, float delta);
 	void ChangePhase(float threshold, int indexInc);
 
-	Vector3 GetFrontOffset(const Vector3& distance, float angle);
+	Math::Vector3 GetFrontOffset(const Math::Vector3& distance, float angle);
 
 private:
 
@@ -246,15 +246,15 @@ private:
 	std::vector<std::unique_ptr<Arrow>> rods_;
 	std::vector<std::unique_ptr<UnderRing>> undderRings_;
 
-	std::unique_ptr<Object3d> shadow_;
+	std::unique_ptr<Graphics::Object3d> shadow_;
 	std::unique_ptr<AABBCollider> collider_;
 
 	Player* pPlayer_;
-	std::vector<std::unique_ptr<Object3d>> chargeParents_;
-	std::vector<std::unique_ptr<Object3d>> traceAnchors_;
+	std::vector<std::unique_ptr<Graphics::Object3d>> chargeParents_;
+	std::vector<std::unique_ptr<Graphics::Object3d>> traceAnchors_;
 	std::vector<int> traceEmitterIndexes_;
-	std::unique_ptr<Object3d> waveParent_;
-	std::vector<std::unique_ptr<Object3d>> arrowParents_;
+	std::unique_ptr<Graphics::Object3d> waveParent_;
+	std::vector<std::unique_ptr<Graphics::Object3d>> arrowParents_;
 
 	bool isClear_ = false;
 	bool isDying_ = false;
@@ -269,17 +269,17 @@ private:
 	float baseShakeTime_ = 10.0f;
 	float shakeSize_ = 4.0f;
 	float hpIndent = 1.0f;
-	std::vector<std::unique_ptr<Sprite>> hpSprites_;
-	std::vector<std::unique_ptr<Sprite>> hpFrame_;
-	Vector2 hpSize_ = { 130.0f,35.0f };
-	Vector2 hpStartPos_ = { 660.0f,38.0f };
-	Vector2 hpFrameSize_ = { 670.6f,44.5f };
-	Vector2 hpFrameInSize_ = { 651.4f,34.3f };
-	Vector2 hpFrameStartPos_ = { 922.5f,38.0f };
-	Vector4 damageColor1_ = { 0.550f,0.20f,0.25f,1.0f };
-	Vector4 damageColor2_ = { 0.500f,0.15f,0.20f,1.0f };
-	Vector4 damageColor3_ = { 0.450f,0.10f,0.15f,1.0f };
-	Vector4 damageColor4_ = { 0.400f,0.05f,0.10f,1.0f };
+	std::vector<std::unique_ptr<Graphics::Sprite>> hpSprites_;
+	std::vector<std::unique_ptr<Graphics::Sprite>> hpFrame_;
+	Math::Vector2 hpSize_ = { 130.0f,35.0f };
+	Math::Vector2 hpStartPos_ = { 660.0f,38.0f };
+	Math::Vector2 hpFrameSize_ = { 670.6f,44.5f };
+	Math::Vector2 hpFrameInSize_ = { 651.4f,34.3f };
+	Math::Vector2 hpFrameStartPos_ = { 922.5f,38.0f };
+	Math::Vector4 damageColor1_ = { 0.550f,0.20f,0.25f,1.0f };
+	Math::Vector4 damageColor2_ = { 0.500f,0.15f,0.20f,1.0f };
+	Math::Vector4 damageColor3_ = { 0.450f,0.10f,0.15f,1.0f };
+	Math::Vector4 damageColor4_ = { 0.400f,0.05f,0.10f,1.0f };
 
 	BossParams params_;
 
@@ -293,10 +293,10 @@ private:
 	float energyCoolTime_ = 30.0f;
 	int summonIndex_ = 0;
 	float bossYPos_ = 0.0f;
-	Vector3 summonCameraRotate_ = { 0.15f, 0.6f, 0.0f };
+	Math::Vector3 summonCameraRotate_ = { 0.15f, 0.6f, 0.0f };
 	float summonCameraRotateStart_ = 0.15f;
 	float summonCameraRotateEnd_ = -0.20f;
-	Vector3 defaultCorePos_;
+	Math::Vector3 defaultCorePos_;
 
 	float attackCooldown_ = 0.0f;
 	float chargeTime_ = 120.0f;

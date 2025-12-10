@@ -5,33 +5,37 @@
 #include "Engine/Math/Vector/Vector2.h"
 
 class DXCom;
-class LightManager;
+namespace Graphics {
+	class LightManager;
+}
 
-/// <summary>
-/// Object関連の汎用処理をするクラス
-/// </summary>
-class Object3dCommon {
-public:
-	Object3dCommon() = default;
-	~Object3dCommon() = default;
+namespace Graphics {
+	/// <summary>
+	/// Object関連の汎用処理をするクラス
+	/// </summary>
+	class Object3dCommon {
+	public:
+		Object3dCommon() = default;
+		~Object3dCommon() = default;
 
-public:
+	public:
 
-	void Initialize();
+		void Initialize();
 
-	/// <summary>オブジェクト描画前</summary>
-	void PreDraw();
+		/// <summary>オブジェクト描画前</summary>
+		void PreDraw();
 
-	/// <summary>アニメーション描画前</summary>
-	void PreAnimationDraw();
+		/// <summary>アニメーション描画前</summary>
+		void PreAnimationDraw();
 
-private:
+	private:
 
 
 
-private:
+	private:
 
-	DXCom* dxcommon_ = nullptr;
-	LightManager* lightManager_;
+		DXCom* dxcommon_ = nullptr;
+		Graphics::LightManager* lightManager_;
 
-};
+	};
+}

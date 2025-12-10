@@ -3,6 +3,10 @@
 #include "Engine/Scene/SceneManager.h"
 #include "Engine/Editor/CommandManager.h"
 
+using namespace Audio;
+using namespace Core;
+
+
 BaseScene::BaseScene() {
 }
 
@@ -15,7 +19,7 @@ void BaseScene::Update() {
 void BaseScene::Draw() {
 }
 
-void BaseScene::Init(DXCom* pDxcom, SceneManager* pSceneManager, LightManager* pLightMamager) {
+void BaseScene::Init(DXCom* pDxcom, SceneManager* pSceneManager, Graphics::LightManager* pLightMamager) {
 	dxcommon_ = pDxcom;
 	sceneManager_ = pSceneManager;
 	input_ = Input::GetInstance();

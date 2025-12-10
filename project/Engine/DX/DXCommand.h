@@ -5,59 +5,60 @@
 
 using namespace Microsoft::WRL;
 
-
-/// <summary>
-/// コマンド関連のクラス
-/// </summary>
-class DXCommand {
-public:
-	DXCommand() = default;
-	~DXCommand();
-
-public:
-
-	void Initialize(ID3D12Device* device);
-
+namespace DXC {
 	/// <summary>
-	/// コマンドリストをクローズし、コマンドキューに実行を送信する
+	/// コマンド関連のクラス
 	/// </summary>
-	void Close();
+	class DXCommand {
+	public:
+		DXCommand() = default;
+		~DXCommand();
 
-	/// <summary>
-	/// GPU実行キューへ送信する
-	/// </summary>
-	void Execution();
+	public:
 
-	/// <summary>
-	/// コマンドアロケータおよびコマンドリストをリセットする
-	/// </summary>
-	void Reset();
+		void Initialize(ID3D12Device* device);
 
-	/// <summary>
-	/// ViewとScissorをセットする
-	/// </summary>
-	void SetViewAndscissor();
+		/// <summary>
+		/// コマンドリストをクローズし、コマンドキューに実行を送信する
+		/// </summary>
+		void Close();
 
-	//========================================================================*/
-	//* Getter
-	ID3D12CommandQueue* GetQueue() const { return queue_.Get(); }
-	ID3D12GraphicsCommandList* GetList() const { return list_.Get(); }
+		/// <summary>
+		/// GPU実行キューへ送信する
+		/// </summary>
+		void Execution();
+
+		/// <summary>
+		/// コマンドアロケータおよびコマンドリストをリセットする
+		/// </summary>
+		void Reset();
+
+		/// <summary>
+		/// ViewとScissorをセットする
+		/// </summary>
+		void SetViewAndscissor();
+
+		//========================================================================*/
+		//* Getter
+		ID3D12CommandQueue* GetQueue() const { return queue_.Get(); }
+		ID3D12GraphicsCommandList* GetList() const { return list_.Get(); }
 
 
-private:
+	private:
 
 
 
-private:
+	private:
 
-	ComPtr<ID3D12CommandQueue> queue_ = nullptr;
-	ComPtr<ID3D12CommandAllocator> allocator_ = nullptr;
-	ComPtr<ID3D12GraphicsCommandList> list_ = nullptr;
+		ComPtr<ID3D12CommandQueue> queue_ = nullptr;
+		ComPtr<ID3D12CommandAllocator> allocator_ = nullptr;
+		ComPtr<ID3D12GraphicsCommandList> list_ = nullptr;
 
-	ComPtr<ID3D12Fence> fence_ = nullptr;
-	uint64_t fenceValue_ = 0;
+		ComPtr<ID3D12Fence> fence_ = nullptr;
+		uint64_t fenceValue_ = 0;
 
-	D3D12_VIEWPORT viewport_{};
-	D3D12_RECT scissor_{};
+		D3D12_VIEWPORT viewport_{};
+		D3D12_RECT scissor_{};
 
-};
+	};
+}

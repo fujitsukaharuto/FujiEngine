@@ -1,6 +1,7 @@
 #include "Model.h"
 
-
+using namespace Graphics;
+using namespace Math;
 
 
 Model::Model() {

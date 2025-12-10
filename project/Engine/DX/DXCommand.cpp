@@ -2,6 +2,8 @@
 #include "MyWindow.h"
 #include <cassert>
 
+using namespace DXC;
+using namespace Core;
 
 
 DXCommand::~DXCommand() {

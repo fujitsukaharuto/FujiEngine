@@ -3,6 +3,10 @@
 #include "Engine/Math/Random/Random.h"
 #include "Engine/Camera/CameraManager.h"
 
+using namespace Core;
+using namespace Math;
+
+
 bool IParticleGroup::LifeUpdate(Particle& particle) {
 	if (particle.lifeTime_ <= 0) {
 		particle.isLive_ = false;

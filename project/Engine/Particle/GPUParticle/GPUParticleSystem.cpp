@@ -7,6 +7,11 @@
 #include "Engine/Model/ModelManager.h"
 #include "ImGuiManager/ImGuiManager.h"
 
+using namespace Core;
+using namespace Graphics;
+using namespace Math;
+
+
 GPUParticleSystem::GPUParticleSystem() {
 }
 

@@ -5,6 +5,11 @@
 #include "Engine/Model/ModelManager.h"
 #include "Engine/Light/LightManager.h"
 
+using namespace Core;
+using namespace Graphics;
+using namespace Math;
+
+
 Sprite::Sprite() {
 	dxcommon_ = TextureManager::GetInstance()->ShareDXCom();
 }

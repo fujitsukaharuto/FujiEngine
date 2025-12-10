@@ -5,6 +5,7 @@
 
 #pragma comment(lib,"dxcompiler.lib")
 
+using namespace DXC;
 
 
 DXCompil::~DXCompil() {

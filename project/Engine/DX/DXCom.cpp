@@ -11,6 +11,10 @@
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
 
+using namespace DXC;
+using namespace Core;
+using namespace Graphics;
+
 
 void DXCom::Initialize(MyWin* myWin) {
 	assert(myWin);

@@ -50,7 +50,7 @@ public:
 	~DXCom() = default;
 public:
 
-	void Initialize(MyWin* myWin);
+	void Initialize(Core::MyWin* myWin);
 	void Finalize();
 
 	/// <summary>
@@ -163,10 +163,10 @@ public:
 	ID3D12Device* GetDevice() const { return device_.Get(); }
 	size_t GetBackBufferCount() const { return swapChainDesc_.BufferCount; }
 	ID3D12GraphicsCommandList* GetCommandList() const { return command_->GetList(); }
-	DXCommand* GetDXCommand() const { return command_.get(); }
-	DXCompil* GetDXCompil() const { return compiler_.get(); }
-	PipelineManager* GetPipelineManager()const { return pipeManager_; }
-	OffscreenManager* GetOffscreenManager()const { return offscreen_.get(); }
+	DXC::DXCommand* GetDXCommand() const { return command_.get(); }
+	DXC::DXCompil* GetDXCompil() const { return compiler_.get(); }
+	Graphics::PipelineManager* GetPipelineManager()const { return pipeManager_; }
+	Graphics::OffscreenManager* GetOffscreenManager()const { return offscreen_.get(); }
 	D3D12_CPU_DESCRIPTOR_HANDLE GetRTVHandle() { return rtvHandles_[2]; }
 	D3D12_GPU_DESCRIPTOR_HANDLE GetDepthTexGPUHandle() { return depthTexSrvHandle_.second; }
 
@@ -203,7 +203,7 @@ private:
 
 	D3DResourceLeakChecker leakCheck_;
 
-	MyWin* myWin_;
+	Core::MyWin* myWin_;
 
 
 #ifdef _DEBUG
@@ -216,7 +216,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Device> device_;
 
 
-	std::unique_ptr<DXCommand> command_ = nullptr;
+	std::unique_ptr<DXC::DXCommand> command_ = nullptr;
 
 
 	Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain_ = nullptr;
@@ -234,12 +234,12 @@ private:
 	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> depthTexSrvHandle_;
 
 
-	std::unique_ptr<DXCompil> compiler_ = nullptr;
+	std::unique_ptr<DXC::DXCompil> compiler_ = nullptr;
 
-	FPSKeeper* fpsKeeper_ = nullptr;
+	Core::FPSKeeper* fpsKeeper_ = nullptr;
 
-	PipelineManager* pipeManager_;
+	Graphics::PipelineManager* pipeManager_;
 
-	std::unique_ptr<OffscreenManager> offscreen_;
+	std::unique_ptr<Graphics::OffscreenManager> offscreen_;
 
 };

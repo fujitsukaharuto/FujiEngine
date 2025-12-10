@@ -6,6 +6,11 @@
 #include "PipelineManager.h"
 #include "Engine/Camera/CameraManager.h"
 
+using namespace Core;
+using namespace Graphics;
+using namespace Math;
+
+
 OffscreenManager::~OffscreenManager() {
 	dxcommon_ = nullptr;
 }

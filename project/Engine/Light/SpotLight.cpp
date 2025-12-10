@@ -3,6 +3,9 @@
 #include <numbers>
 #include "ImGuiManager/ImGuiManager.h"
 
+using namespace Math;
+
+
 void SpotLight::Initialize(DXCom* pDxcom) {
 
 	dxcommon_ = pDxcom;

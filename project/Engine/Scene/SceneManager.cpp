@@ -10,6 +10,8 @@
 #include "Engine/Model/ModelManager.h"
 #include "Engine/Particle/ParticleManager.h"
 
+using namespace Core;
+
 
 SceneManager::SceneManager() {
 }
@@ -17,7 +19,7 @@ SceneManager::SceneManager() {
 SceneManager::~SceneManager() {
 }
 
-void SceneManager::Initialize(DXCom* pDxcom, LightManager* pLightManager) {
+void SceneManager::Initialize(DXCom* pDxcom, Graphics::LightManager* pLightManager) {
 	dxcommon_ = pDxcom;
 	lightManager_ = pLightManager;
 }

@@ -11,6 +11,11 @@
 #include "BossRodFall.h"
 #include "BossDushAttack.h"
 
+using namespace Core;
+using namespace Graphics;
+using namespace Math;
+
+
 BossRoot::BossRoot(Boss* pBoss) : BaseBossBehavior(pBoss) {
 	step_ = Step::ROOT;
 	pBoss_->SetCameraRang(cameraRang_);

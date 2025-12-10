@@ -24,7 +24,7 @@ enum class ObjectType{
 /// </summary>
 struct EditorObj {
 	int id;
-	std::unique_ptr<Object3d> obj;
+	std::unique_ptr<Graphics::Object3d> obj;
 	ObjectType objType;
 	bool isActive = true;
 	std::string name;
@@ -43,7 +43,7 @@ struct EditorObj {
 struct LoadEditorObjData {
 	std::string name;
 	std::string modelName;
-	Trans trnasform;
+	Math::Trans trnasform;
 	ObjectType objType;
 };
 
@@ -94,7 +94,7 @@ public:
 	/// Commandの作成テンプレート
 	/// </summary>
 	template<typename T>
-	static void TryCreatePropertyCommand(Trans& trans, const T& prevValue, T& currentValue, T Trans::* member) {
+	static void TryCreatePropertyCommand(Math::Trans& trans, const T& prevValue, T& currentValue, T Math::Trans::* member) {
 		if (currentValue != prevValue) {
 			auto command = std::make_unique<PropertyCommand<T>>(trans, member, prevValue, currentValue);
 			GetInstance()->Execute(std::move(command));

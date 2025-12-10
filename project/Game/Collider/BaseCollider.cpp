@@ -1,6 +1,9 @@
 #include "BaseCollider.h"
 #include "Game/OriginObject/OriginGameObject.h"
 
+using namespace Math;
+
+
 BaseCollider::BaseCollider() {
 }
 

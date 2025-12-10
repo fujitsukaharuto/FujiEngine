@@ -31,17 +31,17 @@ public:
 	/// </summary>
 	struct AnimeGroup {
 		std::string farst;
-		std::vector<std::unique_ptr<Object3d>> objects_;
+		std::vector<std::unique_ptr<Graphics::Object3d>> objects_;
 		std::vector<float> lifeTime;
 		std::vector<float> animeTime;
 		std::vector<float> startLifeTime_;
 		std::vector<bool> isLive_;
-		std::vector<Vector3> accele{};
-		std::vector<Vector3> speed{};
+		std::vector<Math::Vector3> accele{};
+		std::vector<Math::Vector3> speed{};
 		int type = static_cast<int>(SizeType::kNormal);
 		int speedType = static_cast<int>(SpeedType::kConstancy);
-		Vector2 startSize = { 1.0f,1.0f };
-		Vector2 endSize = { 1.0f,1.0f };
+		Math::Vector2 startSize = { 1.0f,1.0f };
+		Math::Vector2 endSize = { 1.0f,1.0f };
 		std::map<std::string, float> anime_;
 	};
 
@@ -70,11 +70,11 @@ public:
 	static void LoadParentGroup(ParticleEmitter*& emit, const std::string& name);
 
 	/// <summary>パーティクルの発生</summary>
-	static void Emit(const std::string& name, const Vector3& pos, const Vector3& rotate, const Particle& grain, const RandomParametor& para, uint32_t count);
+	static void Emit(const std::string& name, const Math::Vector3& pos, const Math::Vector3& rotate, const Particle& grain, const RandomParametor& para, uint32_t count);
 	/// <summary>ペアレントパーティクルの発生</summary>
-	static void ParentEmit(const std::string& name, const Vector3& pos, const Vector3& rotate, const Particle& grain, const RandomParametor& para, uint32_t count);
+	static void ParentEmit(const std::string& name, const Math::Vector3& pos, const Math::Vector3& rotate, const Particle& grain, const RandomParametor& para, uint32_t count);
 	/// <summary>アニメーションパーティクルの発生</summary>
-	static void EmitAnime(const std::string& name, const Vector3& pos, const AnimeData& data, const RandomParametor& para, uint32_t count);
+	static void EmitAnime(const std::string& name, const Math::Vector3& pos, const AnimeData& data, const RandomParametor& para, uint32_t count);
 	/// <summary>アニメーションパーティクルの設定</summary>
 	static void AddAnime(const std::string& name, const std::string& fileName, float animeChangeTime);
 
@@ -96,9 +96,9 @@ private:
 	/// <summary>グループの作成を行う</summary>
 	void InternalCreateParticleGroup(const std::string& name, const std::string& fileName, uint32_t count, ShapeType shape, BlendType blendType, bool isParent = false);
 
-	void UpdateParticleGroup(const Matrix4x4& billboardMatrix);
-	void UpdateParentParticleGroup(const Matrix4x4& billboardMatrix);
-	void UpdateAnimeGroup(const Matrix4x4& billboardMatrix);
+	void UpdateParticleGroup(const Math::Matrix4x4& billboardMatrix);
+	void UpdateParentParticleGroup(const Math::Matrix4x4& billboardMatrix);
+	void UpdateAnimeGroup(const Math::Matrix4x4& billboardMatrix);
 
 	void DrawParticleGroup();
 	void DrawParentParticleGroup();
@@ -164,7 +164,7 @@ private:
 	std::vector<VertexDate> cylinderVertex_;
 	std::vector<uint32_t> cylinderIndex_;
 
-	std::unique_ptr<Object3d> lightning_;
+	std::unique_ptr<Graphics::Object3d> lightning_;
 
 	BlendType preType_ = BlendType::ADD;
 

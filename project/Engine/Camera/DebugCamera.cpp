@@ -5,6 +5,8 @@
 #include "Input/Input.h"
 #include "WinApp/MyWindow.h"
 
+using namespace Core;
+using namespace Math;
 
 DebugCamera::DebugCamera() {
 }

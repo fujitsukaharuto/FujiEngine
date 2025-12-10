@@ -40,7 +40,7 @@ private:
 	SRVManager* srvManager_;
 	Camera* camera_;
 
-	Trans transform_;
+	Math::Trans transform_;
 
 	ComPtr<ID3D12Resource> vBuffer_;
 	ComPtr<ID3D12Resource> iBuffer_;
@@ -50,9 +50,9 @@ private:
 	std::vector<VertexDate> vertex_;
 	std::vector<uint32_t> index_;
 
-	Material material_;
+	Graphics::Material material_;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource_ = nullptr;
-	TransformationMatrix* wvpDate_ = nullptr;
+	Math::TransformationMatrix* wvpDate_ = nullptr;
 
 };

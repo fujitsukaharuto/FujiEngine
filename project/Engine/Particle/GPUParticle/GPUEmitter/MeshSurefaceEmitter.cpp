@@ -5,6 +5,11 @@
 #include "ImGuiManager/ImGuiManager.h"
 #include "Engine/Editor/JsonSerializer.h"
 
+using namespace Core;
+using namespace Graphics;
+using namespace Math;
+
+
 MeshSurefaceEmitter::MeshSurefaceEmitter(DXCom* dx) {
 	resource_ = dx->CreateBufferResource(dx->GetDevice(), sizeof(EmitterSurface));
 	resource_->Map(0, nullptr, reinterpret_cast<void**>(&data_));

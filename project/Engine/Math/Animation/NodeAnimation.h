@@ -13,7 +13,7 @@ struct AnimationCurve {
 /// ノードアニメーション構造体
 /// </summary>
 struct NodeAnimation {
-	AnimationCurve<Vector3> translate;
-	AnimationCurve<Quaternion> rotate;
-	AnimationCurve<Vector3> scale;
+	AnimationCurve<Math::Vector3> translate;
+	AnimationCurve<Math::Quaternion> rotate;
+	AnimationCurve<Math::Vector3> scale;
 };

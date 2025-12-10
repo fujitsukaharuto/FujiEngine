@@ -9,9 +9,9 @@
 template<typename T>
 class PropertyCommand : public ICommand {
 public:
-	using MemberPtr = T Trans::*;
+	using MemberPtr = T Math::Trans::*;
 
-	PropertyCommand(Trans& target, MemberPtr member, const T& oldValue, const T& newValue)
+	PropertyCommand(Math::Trans& target, MemberPtr member, const T& oldValue, const T& newValue)
 		: target_(target), member_(member), oldValue_(oldValue), newValue_(newValue) {
 	}
 
@@ -28,7 +28,7 @@ public:
 	}
 
 private:
-	Trans& target_;
+	Math::Trans& target_;
 	MemberPtr member_;
 	T oldValue_;
 	T newValue_;

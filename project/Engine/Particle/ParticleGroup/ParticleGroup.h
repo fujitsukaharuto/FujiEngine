@@ -6,7 +6,7 @@ public:
 	ParticleGroup();
 	~ParticleGroup();
 
-	void Update(const Matrix4x4& billboardMatrix, Camera* camera) override;
+	void Update(const Math::Matrix4x4& billboardMatrix, Camera* camera) override;
 
 	ParticleEmitter emitter_;
 	BlendType type_ = BlendType::ADD;

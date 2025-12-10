@@ -13,6 +13,11 @@
 namespace ed = ax::NodeEditor;
 #endif // _DEBUG
 
+using namespace Core;
+using namespace Graphics;
+using namespace Math;
+
+
 int Object3d::useObjID_ = 0;
 
 Object3d::Object3d() {

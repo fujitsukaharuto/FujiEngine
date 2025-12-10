@@ -6,6 +6,12 @@
 #include "Game/GameObj/Enemy/Behavior/BossArrowAttack.h"
 #include "BossRoot.h"
 
+using namespace Audio;
+using namespace Core;
+using namespace Graphics;
+using namespace Math;
+
+
 BossAreaAttack::BossAreaAttack(Boss* pBoss) : BaseBossBehavior(pBoss) {
 	step_ = Step::ATTACK;
 	pBoss_->SetCameraRang(cameraRang_);

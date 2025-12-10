@@ -13,7 +13,7 @@ using Microsoft::WRL::ComPtr;
 /// GPUパーティクルTextureエミッター
 /// </summary>
 struct EmitterTexture {
-	Vector3 translate;
+	Math::Vector3 translate;
 	float radius;
 	uint32_t count;
 	float lifeTime;
@@ -22,13 +22,13 @@ struct EmitterTexture {
 	uint32_t emit;
 
 	// color
-	Vector3 colorMax;
+	Math::Vector3 colorMax;
 	//float padding;
-	Vector3 colorMin;
+	Math::Vector3 colorMin;
 	float padding2;
 
 	// velocity
-	Vector3 baseVelocity;
+	Math::Vector3 baseVelocity;
 	float velocityRandMax;
 	float velocityRandMin;
 
@@ -51,7 +51,7 @@ public:
 
 	void Emit() override;
 	bool IsEmit() const override { return isEmit_; }
-	void SetPos(const Vector3& pos) override;
+	void SetPos(const Math::Vector3& pos) override;
 	void SetEmit(bool state) override { isEmit_ = state; }
 private:
 	char saveName_[64] = "default";

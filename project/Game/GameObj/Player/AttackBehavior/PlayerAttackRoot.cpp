@@ -5,6 +5,11 @@
 
 #include "Game/GameObj/Player/Player.h"
 
+using namespace Audio;
+using namespace Core;
+using namespace Graphics;
+
+
 PlayerAttackRoot::PlayerAttackRoot(Player* pPlayer) : BasePlayerAttackBehavior(pPlayer) {
 	step_ = Step::ROOT;
 	chargeTime_ = 0.0f;

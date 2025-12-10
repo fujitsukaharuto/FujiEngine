@@ -2,6 +2,9 @@
 #include <thread>
 #include "ImGuiManager/ImGuiManager.h"
 
+using namespace Core;
+
+
 FPSKeeper::FPSKeeper() {
 }
 

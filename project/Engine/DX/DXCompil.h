@@ -7,32 +7,33 @@
 
 using namespace Microsoft::WRL;
 
-
-/// <summary>
-/// コンパイラー関係
-/// </summary>
-class DXCompil {
-public:
-	DXCompil() = default;
-	~DXCompil();
-
-public:
-
-	void Initialize();
-
+namespace DXC {
 	/// <summary>
-	/// シェーダーのコンパイル関数
+	/// コンパイラー関係
 	/// </summary>
-	ComPtr<IDxcBlob> CompileShader(const std::wstring& filePath, const wchar_t* profile);
+	class DXCompil {
+	public:
+		DXCompil() = default;
+		~DXCompil();
 
-private:
+	public:
+
+		void Initialize();
+
+		/// <summary>
+		/// シェーダーのコンパイル関数
+		/// </summary>
+		ComPtr<IDxcBlob> CompileShader(const std::wstring& filePath, const wchar_t* profile);
+
+	private:
 
 
-private:
+	private:
 
-	ComPtr<IDxcUtils> dxcUtils_;
-	ComPtr<IDxcCompiler3> dxcCompiler_;
-	ComPtr<IDxcIncludeHandler> includeHandler_;
+		ComPtr<IDxcUtils> dxcUtils_;
+		ComPtr<IDxcCompiler3> dxcCompiler_;
+		ComPtr<IDxcIncludeHandler> includeHandler_;
 
 
-};
+	};
+}

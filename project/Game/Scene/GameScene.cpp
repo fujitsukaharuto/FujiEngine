@@ -9,7 +9,10 @@
 #include "Particle/ParticleManager.h"
 #include "Scene/SceneManager.h"
 
-
+using namespace Audio;
+using namespace Core;
+using namespace Graphics;
+using namespace Math;
 
 
 GameScene::GameScene() {}

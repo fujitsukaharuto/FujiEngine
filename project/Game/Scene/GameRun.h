@@ -4,7 +4,7 @@
 /// <summary>
 /// ゲームランクラス
 /// </summary>
-class GameRun : public Framework {
+class GameRun : public Core::Framework {
 public:
 	GameRun();
 	~GameRun()override;

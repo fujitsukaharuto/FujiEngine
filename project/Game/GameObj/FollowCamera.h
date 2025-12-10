@@ -13,8 +13,8 @@ public:
 public:
 
 	void Initialize();
-	void Update(const Vector3& lockon);
-	void ReStart(const Vector3& lockon);
+	void Update(const Math::Vector3& lockon);
+	void ReStart(const Math::Vector3& lockon);
 
 	/// <summary>
 	///	DestinationAngleの計算
@@ -23,9 +23,9 @@ public:
 
 	//========================================================================*/
 	//* Setter
-	void SetTranslate(const Vector3& pos);
-	void SetInterTarget(const Vector3& interTarget);
-	void SetTarget(const Trans* target);
+	void SetTranslate(const Math::Vector3& pos);
+	void SetInterTarget(const Math::Vector3& interTarget);
+	void SetTarget(const Math::Trans* target);
 	void SetOffset(float zRang, float changeTime);
 	void SetOffsetSoon(float zRang);
 	void SetFollowSpeed(float speed) { followSpeed_ = speed; }
@@ -37,13 +37,13 @@ public:
 	/// <summary>
 	///	カメラ回転の計算
 	/// </summary>
-	void PreRotateUpdate(const Vector3& lockon);
+	void PreRotateUpdate(const Math::Vector3& lockon);
 	void Reset();
 
 	/// <summary>
 	/// オフセットの計算
 	/// </summary>
-	Vector3 OffsetCal() const;
+	Math::Vector3 OffsetCal() const;
 	void OffsetChangeCal();
 
 	void DebugGUI();
@@ -54,13 +54,13 @@ private:
 private:
 
 	bool isLockOnFollow_ = true;
-	Vector3 preLockOnPos_ = {};
-	const Trans* target_ = nullptr;
-	Vector3 interTarget_ = {};
+	Math::Vector3 preLockOnPos_ = {};
+	const Math::Trans* target_ = nullptr;
+	Math::Vector3 interTarget_ = {};
 	float destinationAngleY_ = 0.0f;
-	Vector3 offset_;
-	Vector3 preOffset_;
-	Vector3 changeOffset_;
+	Math::Vector3 offset_;
+	Math::Vector3 preOffset_;
+	Math::Vector3 changeOffset_;
 	float offsetChangeBaseTime_ = 0.0f;
 	float offsetChangeTime_ = 0.0f;
 

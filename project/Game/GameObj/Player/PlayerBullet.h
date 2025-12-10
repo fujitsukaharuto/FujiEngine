@@ -14,16 +14,16 @@ public:
 
 	void Initialize()override;
 	void Update()override;
-	void Draw(Material* mate = nullptr, bool is = false)override;
+	void Draw(Graphics::Material* mate = nullptr, bool is = false)override;
 
 	/// <summary>
 	/// パラメーターの初期化
 	/// </summary>
-	void InitParameter(const Vector3& pos);
+	void InitParameter(const Math::Vector3& pos);
 	/// <summary>
 	/// 弾の進行方向の変更
 	/// </summary>
-	void CalculetionFollowVec(const Vector3& target);
+	void CalculetionFollowVec(const Math::Vector3& target);
 
 	//========================================================================*/
 	//* Collision
@@ -36,7 +36,7 @@ public:
 	/// <summary>
 	///	チャージの処理
 	/// </summary>
-	void Charge(const Vector3& pos, const Vector3& rot);
+	void Charge(const Math::Vector3& pos, const Math::Vector3& rot);
 	/// <summary>
 	///	弾の強化
 	/// </summary>
@@ -47,7 +47,7 @@ public:
 	/// <summary>
 	///	弾が発射される時の処理
 	/// </summary>
-	void Release(float speed,float damage,const Vector3& velo);
+	void Release(float speed,float damage,const Math::Vector3& velo);
 
 	//========================================================================*/
 	//* Getter
@@ -83,7 +83,7 @@ private:
 	bool isCharge_ = false;
 	bool isStrnght_ = false;
 
-	Vector3 velocity_;
+	Math::Vector3 velocity_;
 	float speed_;
 	float damage_;
 

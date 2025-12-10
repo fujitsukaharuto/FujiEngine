@@ -9,6 +9,8 @@
 #include "externals/DirectXTex/DirectXTex.h"
 #include "externals/DirectXTex/d3dx12.h"
 
+using namespace Graphics;
+
 
 TextureManager::TextureManager() {}
 

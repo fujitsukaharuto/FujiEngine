@@ -14,7 +14,7 @@ public:
 
 	void Initialize()override;
 	void Update()override;
-	void Draw(Material* mate = nullptr, bool is = false)override;
+	void Draw(Graphics::Material* mate = nullptr, bool is = false)override;
 	void DrawCollider();
 	void DebugGUI()override;
 	void ParameterGUI();
@@ -23,7 +23,7 @@ public:
 	void InitParameter();
 
 	/// <summary>リングの初期化</summary>
-	void InitRing(const Vector3& pos, float lifeT = 300.0f);
+	void InitRing(const Math::Vector3& pos, float lifeT = 300.0f);
 
 	//========================================================================*/
 	//* Collision
@@ -47,7 +47,7 @@ private:
 
 private:
 
-	std::unique_ptr<Object3d> cylinder_;
+	std::unique_ptr<Graphics::Object3d> cylinder_;
 
 	bool isLive_ = false;
 	float lifeTime_ = 300.0f;

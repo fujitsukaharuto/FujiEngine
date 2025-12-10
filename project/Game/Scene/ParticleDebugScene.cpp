@@ -10,6 +10,9 @@
 #include "Particle/ParticleManager.h"
 #include "Scene/SceneManager.h"
 
+using namespace Core;
+using namespace Graphics;
+using namespace Math;
 
 
 ParticleDebugScene::ParticleDebugScene() {}

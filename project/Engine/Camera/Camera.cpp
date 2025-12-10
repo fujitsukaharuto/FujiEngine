@@ -7,6 +7,8 @@
 #include "Math/Random/Random.h"
 #include "ImGuiManager.h"
 
+using namespace Core;
+using namespace Math;
 
 Camera::Camera() :transform({ { 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, { 0.0f,5.0f,-30.0f } })
 , fovY_(0.6f), aspect_(float(MyWin::kWindowWidth) / float(MyWin::kWindowHeight))

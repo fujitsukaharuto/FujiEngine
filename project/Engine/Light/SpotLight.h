@@ -6,10 +6,10 @@
 class DXCom;
 
 struct SpotLightData {
-	Vector4 color;
-	Vector3 position;
+	Math::Vector4 color;
+	Math::Vector3 position;
 	float intensity;
-	Vector3 direction;
+	Math::Vector3 direction;
 	float distance;
 	float decay;
 	float cosAngle;

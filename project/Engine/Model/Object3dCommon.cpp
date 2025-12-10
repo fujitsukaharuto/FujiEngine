@@ -4,6 +4,9 @@
 #include "Light/LightManager.h"
 #include "Engine/DX/SRVManager.h"
 
+using namespace Graphics;
+
+
 void Object3dCommon::Initialize() {
 	dxcommon_ = ModelManager::GetInstance()->ShareDXCom();
 	lightManager_ = ModelManager::GetInstance()->ShareLight();

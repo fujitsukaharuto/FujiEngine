@@ -4,7 +4,9 @@
 #include <cmath>
 #include <assert.h>
 
-Matrix3x3 MakeAffineMat(const Vector2& scale, float rotate, const Vector2& translate) {
+using namespace Math;
+
+Matrix3x3 Math::MakeAffineMat(const Vector2& scale, float rotate, const Vector2& translate) {
 	Matrix3x3 result{};
 	for (int y = 0; y < 2; y++) {
 		for (int x = 0; x < 3; x++) {
@@ -19,7 +21,7 @@ Matrix3x3 MakeAffineMat(const Vector2& scale, float rotate, const Vector2& trans
 	return result;
 }
 
-Matrix3x3 Multiply(const Matrix3x3& matrix1, const Matrix3x3& matrix2) {
+Matrix3x3 Math::Multiply(const Matrix3x3& matrix1, const Matrix3x3& matrix2) {
 	Matrix3x3 result{};
 
 	for (int row = 0; row < 3; row++) {
@@ -33,7 +35,7 @@ Matrix3x3 Multiply(const Matrix3x3& matrix1, const Matrix3x3& matrix2) {
 	return result;
 }
 
-Vector2 Multiply(const Vector2& vector, const Matrix2x2& matrix) {
+Vector2 Math::Multiply(const Vector2& vector, const Matrix2x2& matrix) {
 	Vector2 result{};
 
 	result.x = vector.x * matrix.m[0][0] + vector.y * matrix.m[1][0];
@@ -42,7 +44,7 @@ Vector2 Multiply(const Vector2& vector, const Matrix2x2& matrix) {
 	return result;
 }
 
-Matrix2x2 Inverse(const Matrix2x2& matrix) {
+Matrix2x2 Math::Inverse(const Matrix2x2& matrix) {
 	Matrix2x2 result{};
 	Matrix2x2 m{};
 	m.m[0][0] = matrix.m[1][1]; m.m[0][1] = -(matrix.m[0][1]);
@@ -62,7 +64,7 @@ Matrix2x2 Inverse(const Matrix2x2& matrix) {
 	return result;
 }
 
-Matrix3x3 Inverse(const Matrix3x3& matrix) {
+Matrix3x3 Math::Inverse(const Matrix3x3& matrix) {
 	Matrix3x3 m{};
 	m.m[0][0] = matrix.m[1][1] * matrix.m[2][2] - matrix.m[1][2] * matrix.m[2][1];
 	m.m[0][1] = -(matrix.m[0][1] * matrix.m[2][2] - matrix.m[0][2] * matrix.m[2][1]);
@@ -90,7 +92,7 @@ Matrix3x3 Inverse(const Matrix3x3& matrix) {
 	return result;
 }
 
-Matrix3x3 MakeOrthographicMat(float left, float top, float right, float bottom) {
+Matrix3x3 Math::MakeOrthographicMat(float left, float top, float right, float bottom) {
 	Matrix3x3 result{};
 
 	result.m[0][0] = 2.0f / (right - left);
@@ -102,7 +104,7 @@ Matrix3x3 MakeOrthographicMat(float left, float top, float right, float bottom) 
 	return result;
 }
 
-Matrix3x3 MakeViewportMat(float left, float top, float width, float hight) {
+Matrix3x3 Math::MakeViewportMat(float left, float top, float width, float hight) {
 	Matrix3x3 result{};
 
 	result.m[0][0] = width / 2;
@@ -114,7 +116,7 @@ Matrix3x3 MakeViewportMat(float left, float top, float width, float hight) {
 	return result;
 }
 
-Matrix3x3 MakeWvpVpMat(const Matrix3x3& world, const Matrix3x3& view, const Matrix3x3& ortho, const Matrix3x3& viewPort) {
+Matrix3x3 Math::MakeWvpVpMat(const Matrix3x3& world, const Matrix3x3& view, const Matrix3x3& ortho, const Matrix3x3& viewPort) {
 	Matrix3x3 result{};
 
 	result = Multiply(world, view);
@@ -124,7 +126,7 @@ Matrix3x3 MakeWvpVpMat(const Matrix3x3& world, const Matrix3x3& view, const Matr
 	return result;
 }
 
-Vector2 Transform(const Vector2& vector, const Matrix3x3& matrix) {
+Vector2 Math::Transform(const Vector2& vector, const Matrix3x3& matrix) {
 	Vector2 result{};
 	result.x = vector.x * matrix.m[0][0] + vector.y * matrix.m[1][0] + matrix.m[2][0];
 	result.y = vector.x * matrix.m[0][1] + vector.y * matrix.m[1][1] + matrix.m[2][1];
@@ -136,7 +138,7 @@ Vector2 Transform(const Vector2& vector, const Matrix3x3& matrix) {
 	return result;
 }
 
-Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix) {
+Vector3 Math::Transform(const Vector3& vector, const Matrix4x4& matrix) {
 	Vector3 result{};
 	result.x = vector.x * matrix.m[0][0] + vector.y * matrix.m[1][0] + vector.z * matrix.m[2][0] + matrix.m[3][0];
 	result.y = vector.x * matrix.m[0][1] + vector.y * matrix.m[1][1] + vector.z * matrix.m[2][1] + matrix.m[3][1];
@@ -150,7 +152,7 @@ Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix) {
 	return result;
 }
 
-Vector3 TransformDirection(const Vector3& vector, const Matrix4x4& matrix) {
+Vector3 Math::TransformDirection(const Vector3& vector, const Matrix4x4& matrix) {
 	Vector3 result{};
 	result.x = vector.x * matrix.m[0][0] + vector.y * matrix.m[1][0] + vector.z * matrix.m[2][0];
 	result.y = vector.x * matrix.m[0][1] + vector.y * matrix.m[1][1] + vector.z * matrix.m[2][1];
@@ -158,7 +160,7 @@ Vector3 TransformDirection(const Vector3& vector, const Matrix4x4& matrix) {
 	return result.Normalize();
 }
 
-Matrix4x4 Multiply(const Matrix4x4& matrix1, const Matrix4x4& matrix2) {
+Matrix4x4 Math::Multiply(const Matrix4x4& matrix1, const Matrix4x4& matrix2) {
 	Matrix4x4 result{};
 
 	for (int row = 0; row < 4; row++) {
@@ -172,7 +174,7 @@ Matrix4x4 Multiply(const Matrix4x4& matrix1, const Matrix4x4& matrix2) {
 	return result;
 }
 
-Matrix4x4 Transpose(const Matrix4x4& m) {
+Matrix4x4 Math::Transpose(const Matrix4x4& m) {
 	Matrix4x4 result{};
 
 	for (int row = 0; row < 4; row++) {
@@ -184,7 +186,7 @@ Matrix4x4 Transpose(const Matrix4x4& m) {
 	return result;
 }
 
-Matrix4x4 Inverse(const Matrix4x4& matrix) {
+Matrix4x4 Math::Inverse(const Matrix4x4& matrix) {
 	Matrix4x4 m{};
 	m.m[0][0] = matrix.m[1][1] * matrix.m[2][2] * matrix.m[3][3] + matrix.m[1][2] * matrix.m[2][3] * matrix.m[3][1] + matrix.m[1][3] * matrix.m[2][1] * matrix.m[3][2]
 		- matrix.m[1][3] * matrix.m[2][2] * matrix.m[3][1] - matrix.m[1][2] * matrix.m[2][1] * matrix.m[3][3] - matrix.m[1][1] * matrix.m[2][3] * matrix.m[3][2];
@@ -260,7 +262,7 @@ Matrix4x4 Inverse(const Matrix4x4& matrix) {
 	return result;
 }
 
-Matrix4x4 MakeIdentity4x4() {
+Matrix4x4 Math::MakeIdentity4x4() {
 	Matrix4x4 result{};
 
 	for (int i = 0; i < 4; i++) {
@@ -270,7 +272,7 @@ Matrix4x4 MakeIdentity4x4() {
 	return result;
 }
 
-Matrix4x4 MakeTranslateMatrix(const Vector3& translate) {
+Matrix4x4 Math::MakeTranslateMatrix(const Vector3& translate) {
 	Matrix4x4 result = MakeIdentity4x4();
 
 	result.m[3][0] = translate.x;
@@ -280,7 +282,7 @@ Matrix4x4 MakeTranslateMatrix(const Vector3& translate) {
 	return result;
 }
 
-Matrix4x4 MakeScaleMatrix(const Vector3& scale) {
+Matrix4x4 Math::MakeScaleMatrix(const Vector3& scale) {
 	Matrix4x4 result = MakeIdentity4x4();
 
 	result.m[0][0] = scale.x;
@@ -290,7 +292,7 @@ Matrix4x4 MakeScaleMatrix(const Vector3& scale) {
 	return result;
 }
 
-Matrix4x4 MakeRotateXMatrix(float rad) {
+Matrix4x4 Math::MakeRotateXMatrix(float rad) {
 	Matrix4x4 result = MakeIdentity4x4();
 
 	result.m[1][1] = std::cosf(rad);
@@ -301,7 +303,7 @@ Matrix4x4 MakeRotateXMatrix(float rad) {
 	return result;
 }
 
-Matrix4x4 MakeRotateYMatrix(float rad) {
+Matrix4x4 Math::MakeRotateYMatrix(float rad) {
 	Matrix4x4 result = MakeIdentity4x4();
 
 	result.m[0][0] = std::cosf(rad);
@@ -312,7 +314,7 @@ Matrix4x4 MakeRotateYMatrix(float rad) {
 	return result;
 }
 
-Matrix4x4 MakeRotateZMatrix(float rad) {
+Matrix4x4 Math::MakeRotateZMatrix(float rad) {
 	Matrix4x4 result = MakeIdentity4x4();
 
 	result.m[0][0] = std::cosf(rad);
@@ -323,7 +325,7 @@ Matrix4x4 MakeRotateZMatrix(float rad) {
 	return result;
 }
 
-Matrix4x4 MakeRotateXYZMatrix(const Vector3& rota) {
+Matrix4x4 Math::MakeRotateXYZMatrix(const Vector3& rota) {
 	Matrix4x4 result = MakeIdentity4x4();
 	Matrix4x4 rotaxM = MakeRotateXMatrix(rota.x);
 	Matrix4x4 rotayM = MakeRotateYMatrix(rota.y);
@@ -334,7 +336,7 @@ Matrix4x4 MakeRotateXYZMatrix(const Vector3& rota) {
 	return result;
 }
 
-Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Vector3& translate) {
+Matrix4x4 Math::MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Vector3& translate) {
 	Matrix4x4 result = MakeIdentity4x4();
 	Matrix4x4 S = MakeScaleMatrix(scale);
 	Matrix4x4 R = MakeRotateXYZMatrix(rotate);
@@ -352,7 +354,7 @@ Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Ve
 	return result;
 }
 
-Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Quaternion& rotate, const Vector3& translate) {
+Matrix4x4 Math::MakeAffineMatrix(const Vector3& scale, const Quaternion& rotate, const Vector3& translate) {
 	Matrix4x4 result = MakeIdentity4x4();
 	Matrix4x4 S = MakeScaleMatrix(scale);
 	Matrix4x4 R = (rotate.MakeRotateMatrix());
@@ -370,7 +372,7 @@ Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Quaternion& rotate, const
 	return result;
 }
 
-Matrix4x4 MakePerspectiveFovMatrix(float fovy, float aspectRation, float nearClip, float farClip) {
+Matrix4x4 Math::MakePerspectiveFovMatrix(float fovy, float aspectRation, float nearClip, float farClip) {
 	Matrix4x4 result{};
 
 	result.m[0][0] = (1 / aspectRation) * (1 / std::tan(fovy / 2));
@@ -382,7 +384,7 @@ Matrix4x4 MakePerspectiveFovMatrix(float fovy, float aspectRation, float nearCli
 	return result;
 }
 
-Matrix4x4 MakeOrthographicMatrix(float left, float top, float right, float bottom, float nearClip, float farClip) {
+Matrix4x4 Math::MakeOrthographicMatrix(float left, float top, float right, float bottom, float nearClip, float farClip) {
 	Matrix4x4 result = MakeIdentity4x4();
 
 	result.m[0][0] = 2.0f / (right - left);
@@ -395,7 +397,7 @@ Matrix4x4 MakeOrthographicMatrix(float left, float top, float right, float botto
 	return result;
 }
 
-Matrix4x4 MakeViewportMat(float left, float top, float width, float height, float minDepth, float maxDepth) {
+Matrix4x4 Math::MakeViewportMat(float left, float top, float width, float height, float minDepth, float maxDepth) {
 	Matrix4x4 result = MakeIdentity4x4();
 
 	result.m[0][0] = width / 2;
@@ -408,20 +410,20 @@ Matrix4x4 MakeViewportMat(float left, float top, float width, float height, floa
 	return result;
 }
 
-Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m) {
+Vector3 Math::TransformNormal(const Vector3& v, const Matrix4x4& m) {
 	Vector3 result{ v.x * m.m[0][0] + v.y * m.m[1][0] + v.z * m.m[2][0], v.x * m.m[0][1] + v.y * m.m[1][1] + v.z * m.m[2][1], v.x * m.m[0][2] + v.y * m.m[1][2] + v.z * m.m[2][2] };
 	return result;
 }
 
-float Lerp(float v1, float v2, float t) { return (1.0f - t) * v1 + t * v2; }
+float Math::Lerp(float v1, float v2, float t) { return (1.0f - t) * v1 + t * v2; }
 
-Vector3 Lerp(const Vector3& v1, const Vector3& v2, float t) {
+Vector3 Math::Lerp(const Vector3& v1, const Vector3& v2, float t) {
 	Vector3 result;
 	result = v1 + (v2 - v1) * t;
 	return result;
 }
 
-Vector3 Cross(const Vector3& a, const Vector3& b) {
+Vector3 Math::Cross(const Vector3& a, const Vector3& b) {
 	return Vector3(
 		a.y * b.z - a.z * b.y,  // X成分
 		a.z * b.x - a.x * b.z,  // Y成分
@@ -429,11 +431,11 @@ Vector3 Cross(const Vector3& a, const Vector3& b) {
 	);
 }
 
-float Clamp(float x, float min, float max) {
+float Math::Clamp(float x, float min, float max) {
 	return x < min ? min : (x > max ? max : x);
 }
 
-Vector3 CatmullRomPoint(const Vector3& p0, const Vector3& p1, const Vector3& p2, const Vector3& p3, float t) {
+Vector3 Math::CatmullRomPoint(const Vector3& p0, const Vector3& p1, const Vector3& p2, const Vector3& p3, float t) {
 	const float s = 0.5f;
 	float t2 = t * t;
 	float t3 = t2 * t;
@@ -446,7 +448,7 @@ Vector3 CatmullRomPoint(const Vector3& p0, const Vector3& p1, const Vector3& p2,
 	return (e3 * t3 + e2 * t2 + e1 * t + e0) * s;
 }
 
-Vector3 CatmullRom(const std::vector<Vector3>& control, float t) {
+Vector3 Math::CatmullRom(const std::vector<Vector3>& control, float t) {
 	assert(control.size() >= 4 && "制御点が4以下");
 
 	size_t division = control.size() - 1;
@@ -476,7 +478,7 @@ Vector3 CatmullRom(const std::vector<Vector3>& control, float t) {
 	return CatmullRomPoint(p0, p1, p2, p3, t_2);
 }
 
-Vector3 ExtractEulerAngles(const Matrix4x4& rotationMatrix) {
+Vector3 Math::ExtractEulerAngles(const Matrix4x4& rotationMatrix) {
 	Vector3 eulerAngles;
 
 	if (rotationMatrix.m[2][0] < 1) {
@@ -498,7 +500,7 @@ Vector3 ExtractEulerAngles(const Matrix4x4& rotationMatrix) {
 	return eulerAngles;
 }
 
-float LerpShortAngle(float a, float b, float t) {
+float Math::LerpShortAngle(float a, float b, float t) {
 	const float TWO_PI = 2.0f * (float)std::numbers::pi; // 2π (6.283185307179586)
 	const float PI = (float)std::numbers::pi;            // π (3.141592653589793)
 
@@ -517,7 +519,7 @@ float LerpShortAngle(float a, float b, float t) {
 	return Lerp(a, a + diff, t);
 }
 
-Matrix4x4 MakeLookAtMatrix(const Vector3& forward, const Vector3& up) {
+Matrix4x4 Math::MakeLookAtMatrix(const Vector3& forward, const Vector3& up) {
 	Vector3 zAxis = forward.Normalize();  // 視線方向
 	Vector3 xAxis = Cross(up, zAxis).Normalize();  // 右方向
 	Vector3 yAxis = Cross(zAxis, xAxis);  // 上方向
@@ -537,7 +539,7 @@ Matrix4x4 MakeLookAtMatrix(const Vector3& forward, const Vector3& up) {
 	return rotationMatrix;
 }
 
-Matrix4x4 MakeRotationAxisAngle(const Vector3& axis, float angle) {
+Matrix4x4 Math::MakeRotationAxisAngle(const Vector3& axis, float angle) {
 	float cosA = cosf(angle);
 	float sinA = sinf(angle);
 	Vector3 normalizedAxis = axis.Normalize();
@@ -560,14 +562,14 @@ Matrix4x4 MakeRotationAxisAngle(const Vector3& axis, float angle) {
 	return rotationMatrix;
 }
 
-bool IsCollision(const AABB& aabb, const Vector3& point) {
+bool Math::IsCollision(const AABB& aabb, const Vector3& point) {
 	// 各軸方向でpointがAABBの範囲内にあるかをチェック
 	return (point.x >= aabb.min.x && point.x <= aabb.max.x) &&
 		(point.y >= aabb.min.y && point.y <= aabb.max.y) &&
 		(point.z >= aabb.min.z && point.z <= aabb.max.z);
 }
 
-Matrix4x4 MakeRotateAxisAngle(const Vector3& axis, float angle) {
+Matrix4x4 Math::MakeRotateAxisAngle(const Vector3& axis, float angle) {
 	Matrix4x4 result{};
 
 	float length = std::sqrt(axis.x * axis.x + axis.y * axis.y + axis.z * axis.z);
@@ -605,7 +607,7 @@ Matrix4x4 MakeRotateAxisAngle(const Vector3& axis, float angle) {
 	return result;
 }
 
-Matrix4x4 DirectionToDirection(const Vector3& from, const Vector3& to) {
+Matrix4x4 Math::DirectionToDirection(const Vector3& from, const Vector3& to) {
 	Matrix4x4 result{};
 	Vector3 fromNorm = from.Normalize();
 	Vector3 toNorm = to.Normalize();
@@ -630,7 +632,7 @@ Matrix4x4 DirectionToDirection(const Vector3& from, const Vector3& to) {
 	return MakeRotateAxisAngle(axis, angle);
 }
 
-void ToFloatArray(const Matrix4x4& m, float out[16]) {
+void Math::ToFloatArray(const Matrix4x4& m, float out[16]) {
 	for (int row = 0; row < 4; ++row) {
 		for (int col = 0; col < 4; ++col) {
 			out[col * 4 + row] = m.m[row][col]; // 転置
@@ -638,7 +640,7 @@ void ToFloatArray(const Matrix4x4& m, float out[16]) {
 	}
 }
 
-Matrix4x4 FromFloatArray(const float in[16]) {
+Matrix4x4 Math::FromFloatArray(const float in[16]) {
 	Matrix4x4 mat;
 	for (int row = 0; row < 4; ++row) {
 		for (int col = 0; col < 4; ++col) {

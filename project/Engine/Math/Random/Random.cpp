@@ -1,5 +1,8 @@
 #include "Random.h"
 
+using namespace Math;
+
+
 std::mt19937 Random::generator_(std::random_device{}());
 
 int Random::GetInt(int min, int max) {

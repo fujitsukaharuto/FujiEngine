@@ -43,9 +43,9 @@ struct DanceStepHight {
 };
 
 struct HanabiPopReng {
-	Vector2 xMinMax = { -8.0f, 8.0f };
-	Vector2 yMinMax = {  5.5f,10.0f };
-	Vector2 zMinMax = {  4.5f,12.0f };
+	Math::Vector2 xMinMax = { -8.0f, 8.0f };
+	Math::Vector2 yMinMax = {  5.5f,10.0f };
+	Math::Vector2 zMinMax = {  4.5f,12.0f };
 };
 
 /// <summary>
@@ -75,15 +75,15 @@ private:
 
 	void HanabiUpdate();
 
-	std::unique_ptr<Object3dCommon> obj3dCommon = nullptr;
+	std::unique_ptr<Graphics::Object3dCommon> obj3dCommon = nullptr;
 	std::unique_ptr<SkyBox> skybox_;
-	std::unique_ptr<AnimationModel> terrain_ = nullptr;
+	std::unique_ptr<Graphics::AnimationModel> terrain_ = nullptr;
 
-	Vector3 rightDir = { 1.0f,0.0f,0.0f };
+	Math::Vector3 rightDir = { 1.0f,0.0f,0.0f };
 
-	std::unique_ptr<Sprite> clear_;
+	std::unique_ptr<Graphics::Sprite> clear_;
 
-	std::vector<std::unique_ptr<Object3d>> players_;
+	std::vector<std::unique_ptr<Graphics::Object3d>> players_;
 	float xDiff_ = 5.0f;
 	float zDiff_ = 2.0f;
 
@@ -101,14 +101,14 @@ private:
 	float defoRotateY_ = 0.0f;
 
 	float cameraStartRotateX_ = -0.1f;
-	Vector3 lightDir_ = { 0.0f,-0.907f,0.42f };
+	Math::Vector3 lightDir_ = { 0.0f,-0.907f,0.42f };
 	float lightIntens_ = 0.6f;
 
 	int hanabiIndex_ = 0;
 	HanabiPopReng popPos_;
 
 	// sceneChange
-	std::unique_ptr<Sprite> black_;
+	std::unique_ptr<Graphics::Sprite> black_;
 	float blackLimmite = 20.0f;
 	float blackTime = 20.0f;
 	bool isChangeFase = false;

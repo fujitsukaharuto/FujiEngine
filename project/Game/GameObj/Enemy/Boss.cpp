@@ -17,6 +17,11 @@
 
 #include "Game/GameObj/Player/Player.h"
 
+using namespace Audio;
+using namespace Core;
+using namespace Graphics;
+using namespace Math;
+
 
 Boss::Boss() {
 }

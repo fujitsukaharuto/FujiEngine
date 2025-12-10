@@ -2,6 +2,9 @@
 #include "Engine/DX/DXCom.h"
 #include "ImGuiManager/ImGuiManager.h"
 
+using namespace Math;
+
+
 void DirectionLight::Initialize(DXCom* pDxcom) {
 
 	dxcommon_ = pDxcom;

@@ -14,9 +14,9 @@ public:
 	IParticleGroup() = default;
 	virtual ~IParticleGroup() = default;
 
-	virtual void Update(const Matrix4x4& billboardMatrix,Camera* camera) = 0;
+	virtual void Update(const Math::Matrix4x4& billboardMatrix,Camera* camera) = 0;
 
-	Material material_;
+	Graphics::Material material_;
 	std::list<Particle> particles_;
 	uint32_t srvIndex_;
 	ComPtr<ID3D12Resource> instancing_ = nullptr;
@@ -32,6 +32,6 @@ public:
 	/// <summary>パーティクルのSRTのアップデート</summary>
 	void SRTUpdate(Particle& particle);
 	/// <summary>パーティクルのビルボード処理</summary>
-	void Billboard(Particle& particle, Matrix4x4& worldMatrix, const Matrix4x4& billboardMatrix, const Matrix4x4& rotate, Camera* camera);
-	bool InitEmitParticle(Particle& particle, const Vector3& pos, const Vector3& rotate, const Particle& grain, const RandomParametor& para);
+	void Billboard(Particle& particle, Math::Matrix4x4& worldMatrix, const Math::Matrix4x4& billboardMatrix, const Math::Matrix4x4& rotate, Camera* camera);
+	bool InitEmitParticle(Particle& particle, const Math::Vector3& pos, const Math::Vector3& rotate, const Particle& grain, const RandomParametor& para);
 };

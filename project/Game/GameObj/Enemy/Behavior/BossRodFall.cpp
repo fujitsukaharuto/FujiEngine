@@ -4,6 +4,10 @@
 #include "Game/GameObj/Enemy/Boss.h"
 #include "BossRoot.h"
 
+using namespace Core;
+using namespace Graphics;
+
+
 BossRodFall::BossRodFall(Boss* pBoss) : BaseBossBehavior(pBoss) {
 	step_ = Step::ATTACK;
 	cameraRang_ = -35.0f;

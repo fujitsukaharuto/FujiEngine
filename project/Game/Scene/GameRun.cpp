@@ -1,6 +1,11 @@
 #include "GameRun.h"
 #include "SceneFactory.h"
 
+using namespace Audio;
+using namespace Core;
+using namespace Graphics;
+
+
 GameRun::GameRun() {
 }
 

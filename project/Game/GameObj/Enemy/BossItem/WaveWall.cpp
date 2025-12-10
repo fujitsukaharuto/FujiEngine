@@ -1,6 +1,10 @@
 #include "WaveWall.h"
 #include "Engine/Particle/ParticleManager.h"
 
+using namespace Core;
+using namespace Graphics;
+using namespace Math;
+
 
 WaveWall::WaveWall() {
 }

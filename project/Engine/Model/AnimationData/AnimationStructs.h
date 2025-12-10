@@ -22,8 +22,8 @@ struct VertexInfluence {
 /// GPUに送るスケルトンデータ構造体
 /// </summary>
 struct WellForGPU {
-	Matrix4x4 skeltonSpaceMatrix;
-	Matrix4x4 skeletonSpaceInverseTransposeMatrix;
+	Math::Matrix4x4 skeltonSpaceMatrix;
+	Math::Matrix4x4 skeletonSpaceInverseTransposeMatrix;
 };
 
 /// <summary>
@@ -40,7 +40,7 @@ struct MeshSection {
 /// スキンクラスター構造体
 /// </summary>
 struct SkinCluster {
-	std::vector<Matrix4x4> inverseBindPoseMatrices;
+	std::vector<Math::Matrix4x4> inverseBindPoseMatrices;
 
 	std::vector<MeshSection> meshSections;
 

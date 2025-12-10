@@ -3,6 +3,9 @@
 #include <fstream>
 #include <iostream>
 
+using namespace Math;
+
+
 GlobalVariables* GlobalVariables::GetInstance() {
 
 	static GlobalVariables instance;

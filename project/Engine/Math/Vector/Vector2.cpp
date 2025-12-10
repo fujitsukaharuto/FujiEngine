@@ -1,5 +1,8 @@
 #include "Vector2.h"
 
+using namespace Math;
+
+
 /*----- オペレーター -----------------------------------------------------------*/
 Vector2& Vector2::operator = (const Vector2& v) {
 	x = v.x;

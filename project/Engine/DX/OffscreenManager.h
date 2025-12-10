@@ -24,29 +24,29 @@ class DXCom;
 /// グレースケールの色
 /// </summary>
 struct GrayCS {
-	Vector3 gray_;
+	Math::Vector3 gray_;
 };
 
 /// <summary>
 /// ヴィネットの色
 /// </summary>
 struct VignetteData {
-	Vector3 color_;
+	Math::Vector3 color_;
 };
 
 /// <summary>
 /// グレースケールのポストエフェクトTextureのvertexData
 /// </summary>
 struct GrayscaleVertex {
-	Vector4 position;
-	Vector2 texcoord;
+	Math::Vector4 position;
+	Math::Vector2 texcoord;
 };
 
 /// <summary>
 /// 衝撃波のデータ
 /// </summary>
 struct ShockWaveData {
-	Vector4 center;
+	Math::Vector4 center;
 	float shockTime;
 	float radius;
 	float intensity;// 歪みの強さ
@@ -58,12 +58,12 @@ struct ShockWaveData {
 /// </summary>
 struct FireElement {
 	float animeTime; // アニメーション時間
-	Vector2 resolution; // 画面解像度
+	Math::Vector2 resolution; // 画面解像度
 	float distortionStrength; // UVディストーションの強度
 	float highlightStrength; // ハイライトの強度
 	float detailScale; // 細かいノイズのスケール
-	Vector2 rangeMin; // 炎の描画範囲（最小UV）
-	Vector2 rangeMax; // 炎の描画範囲（最大UV）
+	Math::Vector2 rangeMin; // 炎の描画範囲（最小UV）
+	Math::Vector2 rangeMax; // 炎の描画範囲（最大UV）
 	float scale; // Voronoiノイズのスケール
 	float speed; // 炎の揺らぎ速度
 	float noiseSpeed; // 細かいノイズの移動速度
@@ -75,14 +75,14 @@ struct FireElement {
 /// </summary>
 struct CRTElemnt {
 	float crtTime;
-	Vector2 resolution;
+	Math::Vector2 resolution;
 };
 
 /// <summary>
 /// OutLineのポストエフェクト時に送るデータ
 /// </summary>
 struct OutlineElement {
-	Matrix4x4 projectionInverse;
+	Math::Matrix4x4 projectionInverse;
 };
 
 /// <summary>
@@ -97,7 +97,7 @@ struct BloomParams {
 /// ラジアルブラーのデータ
 /// </summary>
 struct RadialParams {
-	Vector2 center;
+	Math::Vector2 center;
 	float blurWidth;
 };
 
@@ -105,11 +105,11 @@ struct RadialParams {
 /// 雷エフェクトのデータ
 /// </summary>
 struct LightningElement {
-	Vector2 startPos;
-	Vector2 endPos;
-	Vector2 rangeMin; // 描画範囲（最小UV）
-	Vector2 rangeMax; // 描画範囲（最大UV）
-	Vector2 resolution; // 画面解像度
+	Math::Vector2 startPos;
+	Math::Vector2 endPos;
+	Math::Vector2 rangeMin; // 描画範囲（最小UV）
+	Math::Vector2 rangeMax; // 描画範囲（最大UV）
+	Math::Vector2 resolution; // 画面解像度
 	float time; // アニメーション時間
 	float mainBranchStrength; // 主幹の強度
 	float branchCount; // 分岐の数
@@ -148,125 +148,126 @@ struct PostEffectPass {
 };
 #pragma endregion
 
-
-/// <summary>
-/// オフスクリーン管理クラス
-/// </summary>
-class OffscreenManager {
-public:
-	OffscreenManager() = default;
-	~OffscreenManager();
-
-public:
-
-	void Initialize(DXCom* dxcom);
-	void Update();
-	void DebugGUI();
-	void EffectListGUI();
-
-	void CreateResource();
-	void SettingTexture();
-	void Command();
-
+namespace Graphics {
 	/// <summary>
-	/// ポストエフェクトのリセット
+	/// オフスクリーン管理クラス
 	/// </summary>
-	void ResetPostEffect() { validPostEffects.clear(); }
+	class OffscreenManager {
+	public:
+		OffscreenManager() = default;
+		~OffscreenManager();
 
-	/// <summary>
-	/// ポストエフェクトの追加
-	/// </summary>
-	void AddPostEffect(PostEffectList effect) { validPostEffects.push_back(postEffects[int(effect)]); }
+	public:
 
-	/// <summary>
-	/// 特定のポストエフェクトのポップ
-	/// </summary>
-	void PopPostEffect(PostEffectList effect);
+		void Initialize(DXCom* dxcom);
+		void Update();
+		void DebugGUI();
+		void EffectListGUI();
 
-	//========================================================================*/
-	//* Getter
-	ComPtr<ID3D12Resource>& GetOffscreenResource() { return offscreenrt_; }
-	const D3D12_CLEAR_VALUE& GetClearColorValue() const { return clearColorValue_; }
+		void CreateResource();
+		void SettingTexture();
+		void Command();
 
-	//========================================================================*/
-	//* Setter
-	void SetRadialParamsCenter(const Vector2& center) { radialData_->center = center; }
-	void SetRadialParamsWidth(float width) { radialData_->blurWidth = width; }
+		/// <summary>
+		/// ポストエフェクトのリセット
+		/// </summary>
+		void ResetPostEffect() { validPostEffects.clear(); }
 
-private:
+		/// <summary>
+		/// ポストエフェクトの追加
+		/// </summary>
+		void AddPostEffect(PostEffectList effect) { validPostEffects.push_back(postEffects[int(effect)]); }
 
-	void SettingVertex();
-	void InitializePostEffects();
+		/// <summary>
+		/// 特定のポストエフェクトのポップ
+		/// </summary>
+		void PopPostEffect(PostEffectList effect);
 
-private:
+		//========================================================================*/
+		//* Getter
+		ComPtr<ID3D12Resource>& GetOffscreenResource() { return offscreenrt_; }
+		const D3D12_CLEAR_VALUE& GetClearColorValue() const { return clearColorValue_; }
 
-	DXCom* dxcommon_ = nullptr;
+		//========================================================================*/
+		//* Setter
+		void SetRadialParamsCenter(const Math::Vector2& center) { radialData_->center = center; }
+		void SetRadialParamsWidth(float width) { radialData_->blurWidth = width; }
 
-	ComPtr<ID3D12Resource> offscreenrt_ = nullptr;
-	D3D12_RENDER_TARGET_VIEW_DESC offscreenrtvDesc_{};
-	D3D12_CLEAR_VALUE clearColorValue_{};
-	uint32_t offscreenSRVIndex_;
-	uint32_t offscreenIndex_;
-	D3D12_GPU_DESCRIPTOR_HANDLE offTextureHandle_;
-	D3D12_CPU_DESCRIPTOR_HANDLE offTextureHandleCPU_;
-	D3D12_CPU_DESCRIPTOR_HANDLE offTextureUAVHandleCPU_;
-	D3D12_GPU_DESCRIPTOR_HANDLE offTextureUAVHandle_;
+	private:
 
+		void SettingVertex();
+		void InitializePostEffects();
 
-	ComPtr<ID3D12Resource> grayCSResource_ = nullptr;
-	GrayCS* grayCSData_;
+	private:
 
-	ComPtr<ID3D12Resource> shockResource_ = nullptr;
-	ShockWaveData* shockData_;
+		DXCom* dxcommon_ = nullptr;
 
-	ComPtr<ID3D12Resource> fireResource_ = nullptr;
-	FireElement* fireData_;
-
-	ComPtr<ID3D12Resource> thunderResource_ = nullptr;
-	LightningElement* thunderData_;
-	int nowTex;
-
-	ComPtr<ID3D12Resource> cRTResource_ = nullptr;
-	CRTElemnt* crtData_;
-
-	ComPtr<ID3D12Resource> outlineResource_ = nullptr;
-	OutlineElement* outlineData_;
-
-	ComPtr<ID3D12Resource> bloomResource_ = nullptr;
-	BloomParams* bloomData_;
-
-	ComPtr<ID3D12Resource> radialResource_ = nullptr;
-	RadialParams* radialData_;
-
-	ComPtr<ID3D12Resource> vignetteResource_ = nullptr;
-	VignetteData* vignetteData_;
-
-	Texture* baseTex_;
-	Texture* voronoTex_;
-	Texture* noiseTex_;
-	Texture* noiseDirTex_;
+		ComPtr<ID3D12Resource> offscreenrt_ = nullptr;
+		D3D12_RENDER_TARGET_VIEW_DESC offscreenrtvDesc_{};
+		D3D12_CLEAR_VALUE clearColorValue_{};
+		uint32_t offscreenSRVIndex_;
+		uint32_t offscreenIndex_;
+		D3D12_GPU_DESCRIPTOR_HANDLE offTextureHandle_;
+		D3D12_CPU_DESCRIPTOR_HANDLE offTextureHandleCPU_;
+		D3D12_CPU_DESCRIPTOR_HANDLE offTextureUAVHandleCPU_;
+		D3D12_GPU_DESCRIPTOR_HANDLE offTextureUAVHandle_;
 
 
-	ComPtr<ID3D12Resource> vertexGrayResource_ = nullptr;
-	D3D12_VERTEX_BUFFER_VIEW vertexGrayBufferView_{};
-	GrayscaleVertex* grayVertexDate_ = nullptr;
-	
+		ComPtr<ID3D12Resource> grayCSResource_ = nullptr;
+		GrayCS* grayCSData_;
 
-	ComPtr<ID3D12Resource> outputTexture_;
-	uint32_t outputIndex_;
-	uint32_t outputSRVIndex_;
-	D3D12_CPU_DESCRIPTOR_HANDLE outputSRVHandleCPU_;
-	D3D12_GPU_DESCRIPTOR_HANDLE outputSRVHandle_;
-	D3D12_CPU_DESCRIPTOR_HANDLE outputUAVHandleCPU_;
-	D3D12_GPU_DESCRIPTOR_HANDLE outputUAVHandle_;
+		ComPtr<ID3D12Resource> shockResource_ = nullptr;
+		ShockWaveData* shockData_;
 
-	std::vector<PostEffectPass> postEffects;
-	std::vector<PostEffectPass> validPostEffects;
+		ComPtr<ID3D12Resource> fireResource_ = nullptr;
+		FireElement* fireData_;
 
-	bool isGrayscale_ = true;
-	bool isNonePost_ = true;
-	bool isShockWave_ = true;
-	bool isFire_ = true;
-	bool isThunder_ = true;
+		ComPtr<ID3D12Resource> thunderResource_ = nullptr;
+		LightningElement* thunderData_;
+		int nowTex;
 
-};
+		ComPtr<ID3D12Resource> cRTResource_ = nullptr;
+		CRTElemnt* crtData_;
+
+		ComPtr<ID3D12Resource> outlineResource_ = nullptr;
+		OutlineElement* outlineData_;
+
+		ComPtr<ID3D12Resource> bloomResource_ = nullptr;
+		BloomParams* bloomData_;
+
+		ComPtr<ID3D12Resource> radialResource_ = nullptr;
+		RadialParams* radialData_;
+
+		ComPtr<ID3D12Resource> vignetteResource_ = nullptr;
+		VignetteData* vignetteData_;
+
+		Texture* baseTex_;
+		Texture* voronoTex_;
+		Texture* noiseTex_;
+		Texture* noiseDirTex_;
+
+
+		ComPtr<ID3D12Resource> vertexGrayResource_ = nullptr;
+		D3D12_VERTEX_BUFFER_VIEW vertexGrayBufferView_{};
+		GrayscaleVertex* grayVertexDate_ = nullptr;
+
+
+		ComPtr<ID3D12Resource> outputTexture_;
+		uint32_t outputIndex_;
+		uint32_t outputSRVIndex_;
+		D3D12_CPU_DESCRIPTOR_HANDLE outputSRVHandleCPU_;
+		D3D12_GPU_DESCRIPTOR_HANDLE outputSRVHandle_;
+		D3D12_CPU_DESCRIPTOR_HANDLE outputUAVHandleCPU_;
+		D3D12_GPU_DESCRIPTOR_HANDLE outputUAVHandle_;
+
+		std::vector<PostEffectPass> postEffects;
+		std::vector<PostEffectPass> validPostEffects;
+
+		bool isGrayscale_ = true;
+		bool isNonePost_ = true;
+		bool isShockWave_ = true;
+		bool isFire_ = true;
+		bool isThunder_ = true;
+
+	};
+}

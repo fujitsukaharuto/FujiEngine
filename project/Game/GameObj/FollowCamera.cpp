@@ -4,6 +4,10 @@
 #include "Engine/DX/FPSKeeper.h"
 #include "Engine/ImGuiManager/ImGuiManager.h"
 
+using namespace Core;
+using namespace Math;
+
+
 FollowCamera::FollowCamera() {
 }
 

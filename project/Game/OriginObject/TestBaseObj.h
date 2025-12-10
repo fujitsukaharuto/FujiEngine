@@ -16,7 +16,7 @@ public:
 
 	void Initialize()override;
 	void Update()override;
-	void Draw(Material* mate = nullptr, bool is = false)override;
+	void Draw(Graphics::Material* mate = nullptr, bool is = false)override;
 	void DebugGUI()override;
 
 	//========================================================================*/
@@ -41,9 +41,9 @@ private:
 
 	float time_;
 	float omega_;
-	Vector4 color_ = { 1.0f,1.0f,1.0f,1.0f };
+	Math::Vector4 color_ = { 1.0f,1.0f,1.0f,1.0f };
 
-	std::unique_ptr<Object3d> shadow_;
+	std::unique_ptr<Graphics::Object3d> shadow_;
 	std::unique_ptr<AABBCollider> collider_ = nullptr;
 	bool isCollider_ = false;
 
@@ -59,10 +59,10 @@ inline TestBaseObj::~TestBaseObj() {
 inline void TestBaseObj::Initialize() {
 	OriginGameObject::Initialize();
 	model_->Create("Sphere");
-	model_->transform.translate = Vector3(0.0f, 4.0f, 5.0f);
-	model_->transform.scale = Vector3(0.5f, 0.5f, 0.5f);
+	model_->transform.translate = Math::Vector3(0.0f, 4.0f, 5.0f);
+	model_->transform.scale = Math::Vector3(0.5f, 0.5f, 0.5f);
 
-	shadow_ = std::make_unique<Object3d>();
+	shadow_ = std::make_unique<Graphics::Object3d>();
 	shadow_->Create("Sphere");
 	shadow_->SetColor({ 0.0f,0.0f,0.0f,1.0f });
 	shadow_->SetLightEnable(LightMode::kLightNone);
@@ -88,7 +88,7 @@ inline void TestBaseObj::Update() {
 	collider_->InfoUpdate();
 }
 
-inline void TestBaseObj::Draw([[maybe_unused]] Material* mate, bool is) {
+inline void TestBaseObj::Draw([[maybe_unused]] Graphics::Material* mate, bool is) {
 
 	shadow_->Draw();
 
@@ -145,23 +145,23 @@ inline void TestBaseObj::Debug() {
 }
 inline void TestBaseObj::DrawCollider() {
 
-	std::array<Vector3, 8> v = collider_->GetWorldVertices();
+	std::array<Math::Vector3, 8> v = collider_->GetWorldVertices();
 
 	// 線を描画
-	Line3dDrawer::GetInstance()->DrawLine3d(v[0], v[1], color_); // 底面の線
-	Line3dDrawer::GetInstance()->DrawLine3d(v[1], v[2], color_);
-	Line3dDrawer::GetInstance()->DrawLine3d(v[2], v[3], color_);
-	Line3dDrawer::GetInstance()->DrawLine3d(v[3], v[0], color_);
+	Graphics::Line3dDrawer::GetInstance()->DrawLine3d(v[0], v[1], color_); // 底面の線
+	Graphics::Line3dDrawer::GetInstance()->DrawLine3d(v[1], v[2], color_);
+	Graphics::Line3dDrawer::GetInstance()->DrawLine3d(v[2], v[3], color_);
+	Graphics::Line3dDrawer::GetInstance()->DrawLine3d(v[3], v[0], color_);
 
-	Line3dDrawer::GetInstance()->DrawLine3d(v[4], v[5], color_); // 上面の線
-	Line3dDrawer::GetInstance()->DrawLine3d(v[5], v[6], color_);
-	Line3dDrawer::GetInstance()->DrawLine3d(v[6], v[7], color_);
-	Line3dDrawer::GetInstance()->DrawLine3d(v[7], v[4], color_);
+	Graphics::Line3dDrawer::GetInstance()->DrawLine3d(v[4], v[5], color_); // 上面の線
+	Graphics::Line3dDrawer::GetInstance()->DrawLine3d(v[5], v[6], color_);
+	Graphics::Line3dDrawer::GetInstance()->DrawLine3d(v[6], v[7], color_);
+	Graphics::Line3dDrawer::GetInstance()->DrawLine3d(v[7], v[4], color_);
 
-	Line3dDrawer::GetInstance()->DrawLine3d(v[0], v[4], color_); // 側面の線
-	Line3dDrawer::GetInstance()->DrawLine3d(v[1], v[5], color_);
-	Line3dDrawer::GetInstance()->DrawLine3d(v[2], v[6], color_);
-	Line3dDrawer::GetInstance()->DrawLine3d(v[3], v[7], color_);
+	Graphics::Line3dDrawer::GetInstance()->DrawLine3d(v[0], v[4], color_); // 側面の線
+	Graphics::Line3dDrawer::GetInstance()->DrawLine3d(v[1], v[5], color_);
+	Graphics::Line3dDrawer::GetInstance()->DrawLine3d(v[2], v[6], color_);
+	Graphics::Line3dDrawer::GetInstance()->DrawLine3d(v[3], v[7], color_);
 
 }
 #endif // _DEBUG

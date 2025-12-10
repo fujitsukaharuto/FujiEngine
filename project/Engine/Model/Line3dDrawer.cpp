@@ -2,6 +2,10 @@
 #include "Engine/DX/DXCom.h"
 #include "Camera.h"
 
+using namespace Graphics;
+using namespace Math;
+
+
 Line3dDrawer::Line3dDrawer() {
 }
 

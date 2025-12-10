@@ -30,7 +30,7 @@ public:
 	virtual void Load(const std::string& fileName) = 0;
 	virtual void Emit() = 0;
 	virtual bool IsEmit() const = 0;
-	virtual void SetPos(const Vector3& pos) = 0;
+	virtual void SetPos(const Math::Vector3& pos) = 0;
 	virtual void SetEmit(bool state) = 0;
 	virtual ~IGPUEmitter() = default;
 protected:

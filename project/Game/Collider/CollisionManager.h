@@ -10,9 +10,9 @@ class AABBCollider;
 /// </summary>
 struct OBB {
 
-	Vector3 size;
-	Vector3 center;
-	Vector3 rotate;
+	Math::Vector3 size;
+	Math::Vector3 center;
+	Math::Vector3 rotate;
 
 	static OBB Default() {
 		OBB obb = {

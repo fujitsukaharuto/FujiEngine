@@ -24,12 +24,12 @@ struct PlayerHPParams {
 };
 
 struct PlayerHPSpritParms {
-	Vector4 color = { 0.7f,0.211f,0.505f,1.0f };
-	Vector2 hpSize = { 275.0f,35.0f };
-	Vector2 hpStartPos = { 55.0f,650.0f };
-	Vector2 hpFrameSize = { 285.0f,42.5f };
-	Vector2 hpFrameInSize = { 275.0f,35.0f };
-	Vector2 hpFrameStartPos = { 192.5f,650.0f };
+	Math::Vector4 color = { 0.7f,0.211f,0.505f,1.0f };
+	Math::Vector2 hpSize = { 275.0f,35.0f };
+	Math::Vector2 hpStartPos = { 55.0f,650.0f };
+	Math::Vector2 hpFrameSize = { 285.0f,42.5f };
+	Math::Vector2 hpFrameInSize = { 275.0f,35.0f };
+	Math::Vector2 hpFrameStartPos = { 192.5f,650.0f };
 };
 
 struct PlayerParams {
@@ -48,7 +48,7 @@ public:
 	void Initialize()override;
 	void Finalize();
 	void Update()override;
-	void Draw(Material* mate = nullptr, bool is = false)override;
+	void Draw(Graphics::Material* mate = nullptr, bool is = false)override;
 	void DebugGUI()override;
 	void ParameterGUI();
 	void InitParameter();
@@ -79,7 +79,7 @@ public:
 	/// <summary>移動時の回転</summary>
 	void MoveRotate();
 	/// <summary>移動する方向</summary>
-	Vector3 GetInputDirection();
+	Math::Vector3 GetInputDirection();
 	/// <summary>移動するかどうか</summary>
 	bool GetIsMove();
 
@@ -117,7 +117,7 @@ public:
 	float GetMaxChargeTime() { return maxChargeTime_; }
 	float GetAvoidCoolTime() { return avoidCoolTime_; }
 	int GetGrabDir() { return dir_; }
-	const Vector3& GetLandingStartPos() { return titleStartP_; }
+	const Math::Vector3& GetLandingStartPos() { return titleStartP_; }
 	bool GetIsFall() { return isFall_; }
 	bool GetIsGameOver() { return isGameOver_; }
 	bool GetIsStart() { return isStart_; }
@@ -131,7 +131,7 @@ public:
 	void SetFallSpeed(float speed) { fallSpeed_ = speed; }
 	void SetIsFall(bool is) { isFall_ = is; }
 	void SetIsStart(bool is) { isStart_ = is; }
-	void SetTargetPos(const Vector3& pos) { targetPos_ = pos; }
+	void SetTargetPos(const Math::Vector3& pos) { targetPos_ = pos; }
 	void SetIsNowAvoid(bool is) { isNowAvoid_ = is; }
 	void SetDXCom(DXCom* dxcom) { dxcommon_ = dxcom; }
 	void SetLandingTime(float landTime);
@@ -140,7 +140,7 @@ public:
 	//* Title
 	void TitleUpdate(float titleTime);
 	void TitleDraw();
-	void SettingTitleStartPosition(const Vector3& start, const Vector3& center, const Vector3& end);
+	void SettingTitleStartPosition(const Math::Vector3& start, const Math::Vector3& center, const Math::Vector3& end);
 
 	void TitleStartUpdate(float titleTime);
 
@@ -161,19 +161,19 @@ private:
 	std::unique_ptr<BasePlayerAttackBehavior> attackBehavior_ = nullptr;
 	std::vector<std::unique_ptr<PlayerBullet>> bullets_;
 
-	std::unique_ptr<Object3d> shadow_;
-	std::unique_ptr<Object3d> strongStatePos_;
+	std::unique_ptr<Graphics::Object3d> shadow_;
+	std::unique_ptr<Graphics::Object3d> strongStatePos_;
 	std::unique_ptr<AABBCollider> collider_;
 
-	Vector3 targetPos_;
+	Math::Vector3 targetPos_;
 
 	PlayerParams params_;
 
 	bool isDamage_ = false;
 	float damageCoolTime_ = 30.0f;
-	std::unique_ptr<Sprite> hpSprite_;
-	std::vector<std::unique_ptr<Sprite>> hpFrame_;
-	Vector3 damageColor_ = { 1.5f,1.5f,5.0f };
+	std::unique_ptr<Graphics::Sprite> hpSprite_;
+	std::vector<std::unique_ptr<Graphics::Sprite>> hpFrame_;
+	Math::Vector3 damageColor_ = { 1.5f,1.5f,5.0f };
 
 	float moveSpeed_ = 0.0f;
 	float jumpSpeed_ = 0.0f;
@@ -198,8 +198,8 @@ private:
 	float deathTime_ = 240.0f;
 	bool isGameOver_ = false;
 
-	Vector3 velocity_{};
-	Vector3 inputDirection_{};
+	Math::Vector3 velocity_{};
+	Math::Vector3 inputDirection_{};
 	int dir_ = 0;
 
 	float startLandingTime_ = 0.0f;
@@ -236,9 +236,9 @@ private:
 	SoundData* shotSE_{};
 
 	// Title
-	Vector3 titleStartP_{};
-	Vector3 titleCenterP_{};
-	Vector3 titleEndP_{};
+	Math::Vector3 titleStartP_{};
+	Math::Vector3 titleCenterP_{};
+	Math::Vector3 titleEndP_{};
 	float preTitleTime_ = 300.0f;
 
 };

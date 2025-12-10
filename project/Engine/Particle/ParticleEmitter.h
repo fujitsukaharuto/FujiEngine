@@ -9,21 +9,21 @@ using json = nlohmann::json;
 /// ランダムパラメーターのデータ
 /// </summary>
 struct RandomParametor {
-	Vector2 speedx;
-	Vector2 speedy;
-	Vector2 speedz;
+	Math::Vector2 speedx;
+	Math::Vector2 speedy;
+	Math::Vector2 speedz;
 
-	Vector2 transx;
-	Vector2 transy;
-	Vector2 transz;
+	Math::Vector2 transx;
+	Math::Vector2 transy;
+	Math::Vector2 transz;
 
-	Vector2 addRandomSize;
+	Math::Vector2 addRandomSize;
 
-	Vector4 colorMin = { 1.0f,1.0f,1.0f,1.0f };
-	Vector4 colorMax = { 1.0f,1.0f,1.0f,1.0f };
+	Math::Vector4 colorMin = { 1.0f,1.0f,1.0f,1.0f };
+	Math::Vector4 colorMax = { 1.0f,1.0f,1.0f,1.0f };
 
-	Vector2 autoUVMax = { 0.1f,0.0f };
-	Vector2 autoUVMin = { 0.1f,0.0f };
+	Math::Vector2 autoUVMax = { 0.1f,0.0f };
+	Math::Vector2 autoUVMin = { 0.1f,0.0f };
 };
 
 /// <summary>
@@ -33,11 +33,11 @@ struct AnimeData {
 	float lifeTime = 20.0f;
 	float startLifeTime = 20.0f;
 	bool isLive = true;
-	Vector3 accele{};
+	Math::Vector3 accele{};
 	int type = static_cast<int>(SizeType::kNormal);
 	int speedType = static_cast<int>(SpeedType::kConstancy);
-	Vector2 startSize = { 1.0f,1.0f };
-	Vector2 endSize = { 1.0f,1.0f };
+	Math::Vector2 startSize = { 1.0f,1.0f };
+	Math::Vector2 endSize = { 1.0f,1.0f };
 };
 
 
@@ -62,9 +62,9 @@ public:
 	void BurstAnime();
 
 	/// <summary>ランダムな速度</summary>
-	void RandomSpeed(const Vector2& x, const Vector2& y, const Vector2& z);
+	void RandomSpeed(const Math::Vector2& x, const Math::Vector2& y, const Math::Vector2& z);
 	/// <summary>ランダムな位置</summary>
-	void RandomTranslate(const Vector2& x, const Vector2& y, const Vector2& z);
+	void RandomTranslate(const Math::Vector2& x, const Math::Vector2& y, const Math::Vector2& z);
 
 	/// <summary>エミッター情報の出力</summary>
 	void Save();
@@ -79,42 +79,42 @@ public:
 	/// <summary>frequencyTimeの状態にする</summary>
 	void TimeReset() { time_ = frequencyTime_; }
 	/// <summary>ペアレントの設定</summary>
-	void SetParent(Trans* parent) { parent_ = parent; }
+	void SetParent(Math::Trans* parent) { parent_ = parent; }
 	/// <summary>アニメーションモデルにペアレントする設定</summary>
-	void SetAnimParent(Matrix4x4* parent) { animParent_ = parent; }
+	void SetAnimParent(Math::Matrix4x4* parent) { animParent_ = parent; }
 	void SetIsUpdatedMatrix(bool is) { isUpDatedMatrix_ = is; }
 	
 	//========================================================================*/
 	//* Getter
-	Vector3 GetWorldPos();
-	Matrix4x4 GetParentMatrix();
+	Math::Vector3 GetWorldPos();
+	Math::Matrix4x4 GetParentMatrix();
 	bool HaveParent() { return parent_ ? true : false; }
 	bool GetIsUpdatedMatrix() { return isUpDatedMatrix_; }
 
 	std::string name_;
-	Vector3 pos_;
-	Vector3 particleRotate_;
-	Vector3 emitSizeMax_{};
-	Vector3 emitSizeMin_{};
+	Math::Vector3 pos_;
+	Math::Vector3 particleRotate_;
+	Math::Vector3 emitSizeMax_{};
+	Math::Vector3 emitSizeMin_{};
 
 	Particle grain_{};
 	AnimeData animeData_{};
 	uint32_t count_;
 	RandomParametor para_;
 	bool isAddRandomSize_ = false;
-	Vector2 addRandomMax_;
-	Vector2 addRandomMin_;
+	Math::Vector2 addRandomMax_;
+	Math::Vector2 addRandomMin_;
 
 	const std::string kDirectoryPath_ = "resource/EmitterSaveFile/";
 
 	bool isDrawSize_ = false;
 	bool isEmit_ = false;
 
-	Matrix4x4 worldMatrix_;
+	Math::Matrix4x4 worldMatrix_;
 
 	bool isDistanceComplement_ = false;
-	Vector3 currentWorldPos_;
-	Vector3 previousWorldPos_;
+	Math::Vector3 currentWorldPos_;
+	Math::Vector3 previousWorldPos_;
 	bool firstEmit_ = false;
 
 private:
@@ -125,8 +125,8 @@ private:
 
 	float time_;
 
-	Trans* parent_ = nullptr;
-	Matrix4x4* animParent_ = nullptr;
+	Math::Trans* parent_ = nullptr;
+	Math::Matrix4x4* animParent_ = nullptr;
 
 	bool isUpDatedMatrix_ = false;
 };

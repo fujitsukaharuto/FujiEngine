@@ -7,44 +7,46 @@
 
 class DXCom;
 
-/// <summary>
-/// パイプライン管理クラス
-/// </summary>
-class PipelineManager {
-public:
-	PipelineManager() = default;
-	~PipelineManager();
-
-public:
-
-	static PipelineManager* GetInstance();
-
-	void Initialize(DXCom* pDxcom);
-	void Finalize();
-
+namespace Graphics {
 	/// <summary>
-	/// パイプラインを作成
+	/// パイプライン管理クラス
 	/// </summary>
-	void CreatePipeline();
+	class PipelineManager {
+	public:
+		PipelineManager() = default;
+		~PipelineManager();
 
-	/// <summary>
-	/// グラフィックスパイプラインのセット
-	/// </summary>
-	void SetPipeline(Pipe type);
+	public:
 
-	/// <summary>
-	/// コンピュートシェーダ用のパイプラインのセット
-	/// </summary>
-	void SetCSPipeline(Pipe type);
+		static PipelineManager* GetInstance();
+
+		void Initialize(DXCom* pDxcom);
+		void Finalize();
+
+		/// <summary>
+		/// パイプラインを作成
+		/// </summary>
+		void CreatePipeline();
+
+		/// <summary>
+		/// グラフィックスパイプラインのセット
+		/// </summary>
+		void SetPipeline(Pipe type);
+
+		/// <summary>
+		/// コンピュートシェーダ用のパイプラインのセット
+		/// </summary>
+		void SetCSPipeline(Pipe type);
 
 
-private:
+	private:
 
 
-private:
+	private:
 
-	DXCom* dxcommon_;
-	std::vector<std::unique_ptr<BasePipeline>> pipelines_;
+		DXCom* dxcommon_;
+		std::vector<std::unique_ptr<BasePipeline>> pipelines_;
 
 
-};
+	};
+}

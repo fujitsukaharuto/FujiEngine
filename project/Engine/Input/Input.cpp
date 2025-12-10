@@ -3,6 +3,9 @@
 
 #include "MyWindow.h"
 
+using namespace Core;
+using namespace Math;
+
 
 const uint8_t Input::kTriggerThreshold = 30;
 

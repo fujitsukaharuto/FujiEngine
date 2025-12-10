@@ -10,6 +10,10 @@
 #include "Scene/SceneManager.h"
 #include "Engine/Editor/CommandManager.h"
 
+using namespace Core;
+using namespace Graphics;
+using namespace Math;
+
 
 TitleScene::TitleScene() {}
 

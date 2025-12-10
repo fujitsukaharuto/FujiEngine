@@ -1,5 +1,8 @@
 #include "ParentParticleGroup.h"
 
+using namespace Math;
+
+
 ParentParticleGroup::ParentParticleGroup() {
 }
 

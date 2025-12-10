@@ -9,6 +9,10 @@
 #include "ImGuiManager/ImGuiManager.h"
 #include "Engine/Editor/JsonSerializer.h"
 
+using namespace Core;
+using namespace Graphics;
+using namespace Math;
+
 
 ParticleManager::ParticleManager() {
 }

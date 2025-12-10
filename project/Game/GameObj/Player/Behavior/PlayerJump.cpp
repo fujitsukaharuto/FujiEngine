@@ -3,6 +3,9 @@
 #include "Game/GameObj/Player/Player.h"
 #include "Game/GameObj/Player/Behavior/PlayerRoot.h"
 
+using namespace Core;
+
+
 PlayerJump::PlayerJump(Player* pPlayer) : BasePlayerBehavior(pPlayer) {
 
 	step_ = Step::JUMP;

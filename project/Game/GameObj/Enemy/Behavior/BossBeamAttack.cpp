@@ -3,6 +3,9 @@
 #include "Game/GameObj/Enemy/Boss.h"
 #include "BossRoot.h"
 
+using namespace Graphics;
+
+
 BossBeamAttack::BossBeamAttack(Boss* pBoss) : BaseBossBehavior(pBoss) {
 	step_ = Step::CHARGE;
 	cameraRang_ = -40.0f;

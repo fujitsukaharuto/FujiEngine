@@ -49,7 +49,7 @@ public:
 	/// <summary>
 	///	スクリーン座標に変換
 	/// </summary>
-	Vector3 WorldToScreen(Vector3 worldPosition);
+	Math::Vector3 WorldToScreen(Math::Vector3 worldPosition);
 
 	/// <summary>
 	///	ターゲットの変更
@@ -59,12 +59,12 @@ public:
 	//========================================================================*/
 	//* Getter
 	const OriginGameObject* GetTarget() { return target_; }
-	Vector3 GetTargetPosition() const;
+	Math::Vector3 GetTargetPosition() const;
 
 	bool ExistTarget() const;
 
 private:
-	std::unique_ptr<Sprite> lockOnMark_;
+	std::unique_ptr<Graphics::Sprite> lockOnMark_;
 
 	const OriginGameObject* target_ = nullptr;
 

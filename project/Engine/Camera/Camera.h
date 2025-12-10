@@ -75,54 +75,54 @@ public:
 	/// ワールド行列の取得
 	/// </summary>
 	/// <returns></returns>
-	const Matrix4x4& GetWorldMatrix() const { return worldMatrix_; }
+	const Math::Matrix4x4& GetWorldMatrix() const { return worldMatrix_; }
 
 	/// <summary>
 	/// ビュー行列の取得
 	/// </summary>
 	/// <returns></returns>
-	const Matrix4x4& GetViewMatrix() const { return viewMatrix_; }
+	const Math::Matrix4x4& GetViewMatrix() const { return viewMatrix_; }
 
 	/// <summary>
 	/// 射影行列の取得
 	/// </summary>
 	/// <returns></returns>
-	const Matrix4x4& GetProjectionMatrix() const { return projectionMatrix_; }
+	const Math::Matrix4x4& GetProjectionMatrix() const { return projectionMatrix_; }
 
 	/// <summary>
 	/// ViewProjection行列の取得
 	/// </summary>
 	/// <returns></returns>
-	const Matrix4x4& GetViewProjectionMatrix() const { return viewProjectionMatrix_; }
+	const Math::Matrix4x4& GetViewProjectionMatrix() const { return viewProjectionMatrix_; }
 
 	void DebugGUI();
 
 	//========================================================================*/
 	//* Getter
-	Vector3 GetTranslate();
+	Math::Vector3 GetTranslate();
 
-	Trans transform;
-
-private:
-
-
+	Math::Trans transform;
 
 private:
 
-	Matrix4x4 worldMatrix_;
-	Matrix4x4 viewMatrix_;
 
-	Matrix4x4 projectionMatrix_;
+
+private:
+
+	Math::Matrix4x4 worldMatrix_;
+	Math::Matrix4x4 viewMatrix_;
+
+	Math::Matrix4x4 projectionMatrix_;
 	float fovY_;
 	float aspect_;
 	float nearClip_;
 	float farClip_;
 
-	Matrix4x4 viewProjectionMatrix_;
+	Math::Matrix4x4 viewProjectionMatrix_;
 
 	ShakeMode shakeMode_;
 	float shakeTime_;
 	float shakeStrength_;
-	Vector3 shakeGap_;
+	Math::Vector3 shakeGap_;
 	float rollingTime_;
 };

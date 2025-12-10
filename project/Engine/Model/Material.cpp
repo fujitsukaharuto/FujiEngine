@@ -1,6 +1,8 @@
 #include "Material.h"
 #include "Engine/DX/DXCom.h"
 
+using namespace Graphics;
+using namespace Math;
 
 
 Material::Material() {

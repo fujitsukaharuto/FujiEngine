@@ -12,6 +12,9 @@
 #include "Engine/Light/LightManager.h"
 #include "Engine/Editor/CommandManager.h"
 
+using namespace Core;
+using namespace Graphics;
+using namespace Math;
 
 
 ResultScene::ResultScene() {}

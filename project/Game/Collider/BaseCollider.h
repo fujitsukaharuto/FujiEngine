@@ -12,8 +12,8 @@ class OriginGameObject;
 /// </summary>
 struct ColliderInfo {
 	std::string tag;
-	Vector3 pos;
-	Vector3 worldPos;
+	Math::Vector3 pos;
+	Math::Vector3 worldPos;
 	OriginGameObject* owner = nullptr; //コライダーを持つオブジェクトのポインタ
 };
 
@@ -50,18 +50,18 @@ public:
 
 	//========================================================================*/
 	//* Setter
-	void SetParent(Trans* parent) { parent_ = parent; }
+	void SetParent(Math::Trans* parent) { parent_ = parent; }
 	void SetTag(const std::string& tag) { info.tag = tag; }
-	void SetOffset(const Vector3& pos) { offset_ = pos; }
-	void SetPos(const Vector3& pos) { info.pos = pos; }
+	void SetOffset(const Math::Vector3& pos) { offset_ = pos; }
+	void SetPos(const Math::Vector3& pos) { info.pos = pos; }
 	void SetOwner(OriginGameObject* owner) { info.owner = owner; }
 	void SetIsCollisonCheck(bool is) { isCollisionCheck_ = is; }
 
 	//========================================================================*/
 	//* Getter
 	const std::string GetTag()const { return info.tag; }
-	Vector3 GetPos();
-	Vector3 GetWorldPos();
+	Math::Vector3 GetPos();
+	Math::Vector3 GetWorldPos();
 	OriginGameObject* GetOwner();
 	bool GetIsCollisonCheck() { return isCollisionCheck_; }
 
@@ -69,9 +69,9 @@ public:
 
 protected:
 	ColliderInfo info;
-	Trans* parent_ = nullptr;
+	Math::Trans* parent_ = nullptr;
 	bool isCollisionCheck_ = true;
-	Vector3 offset_ = { 0.0f,0.0f,0.0f };
+	Math::Vector3 offset_ = { 0.0f,0.0f,0.0f };
 
 	const std::string kDirectoryPath_ = "resource/Json/Collider/";
 };

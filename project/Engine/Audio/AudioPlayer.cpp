@@ -1,6 +1,7 @@
 #include "AudioPlayer.h"
-
 #include <cassert>
+
+using namespace Audio;
 
 
 AudioPlayer::AudioPlayer() {

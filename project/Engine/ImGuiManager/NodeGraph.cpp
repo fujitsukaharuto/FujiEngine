@@ -10,6 +10,9 @@
 namespace ed = ax::NodeEditor;
 #endif // _DEBUG
 
+using namespace Core;
+using namespace Math;
+
 
 #ifdef _DEBUG
 void NodeGraph::Update(ax::NodeEditor::EditorContext* ctx) {

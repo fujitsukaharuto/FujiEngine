@@ -1,5 +1,9 @@
 #include "SkyBox.h"
 
+using namespace Graphics;
+using namespace Math;
+
+
 SkyBox::SkyBox() {
 }
 

@@ -15,8 +15,8 @@ class DXCom;
 /// スケルトンのNodeのデータ
 /// </summary>
 struct Node {
-	QuaternioonTrans transform;
-	Matrix4x4 local;
+	Math::QuaternioonTrans transform;
+	Math::Matrix4x4 local;
 	std::string name;
 	std::vector<Node> children;
 };
@@ -40,7 +40,7 @@ struct SkinningInformation {
 /// ジョイントごとの重みのデータ
 /// </summary>
 struct JointWeightData {
-	Matrix4x4 inverseBindPoseMatrix;
+	Math::Matrix4x4 inverseBindPoseMatrix;
 	std::vector<VertexWeightData> vertexWeights;
 };
 
@@ -51,7 +51,7 @@ struct ModelMesh {
 	std::vector<VertexDate> vertices;
 	std::vector<uint32_t> indicies;
 	MaterialDataPath material;
-	Vector4 baseColor;
+	Math::Vector4 baseColor;
 };
 
 /// <summary>
@@ -66,85 +66,86 @@ struct ModelData {
 	std::vector<ModelMesh> meshes;
 };
 
+namespace Graphics {
+	/// <summary>
+	/// モデルクラス
+	/// </summary>
+	class Model {
+	public:
+		Model();
+		~Model();
 
-/// <summary>
-/// モデルクラス
-/// </summary>
-class Model {
-public:
-	Model();
-	~Model();
+		/// <summary>普通モデル用描画</summary>
+		void Draw(ID3D12GraphicsCommandList* commandList, Material* mate);
 
-	/// <summary>普通モデル用描画</summary>
-	void Draw(ID3D12GraphicsCommandList* commandList, Material* mate);
+		/// <summary>アニメーションモデル用描画</summary>
+		void AnimationDraw(const SkinCluster& skinCluster, ID3D12GraphicsCommandList* commandList, Material* mate);
 
-	/// <summary>アニメーションモデル用描画</summary>
-	void AnimationDraw(const SkinCluster& skinCluster, ID3D12GraphicsCommandList* commandList, Material* mate);
+		/// <summary>バリアの変更</summary>
+		void TransBarrier();
 
-	/// <summary>バリアの変更</summary>
-	void TransBarrier();
+		/// <summary>マテリアルの追加</summary>
+		void AddMaterial(const Material& material);
+		/// <summary>メッシュの追加</summary>
+		void AddMesh(const Mesh& mesh);
 
-	/// <summary>マテリアルの追加</summary>
-	void AddMaterial(const Material& material);
-	/// <summary>メッシュの追加</summary>
-	void AddMesh(const Mesh& mesh);
+		/// <summary>環境マップの生成</summary>
+		void CreateEnvironment();
 
-	/// <summary>環境マップの生成</summary>
-	void CreateEnvironment();
+		/// <summary>SkinningInformationの生成</summary>
+		void CreateSkinningInformation(DXCom* pDxcom);
 
-	/// <summary>SkinningInformationの生成</summary>
-	void CreateSkinningInformation(DXCom* pDxcom);
+		//========================================================================*/
+		//* Setter
+		/// <summary>色の設定</summary>
+		void SetColor(const Math::Vector4& color, int index = 0);
+		/// <summary>UVスケールの設定</summary>
+		void SetUVScale(const Math::Vector2& scale, const Math::Vector2& uvTrans);
+		/// <summary>UVトランスフォームの設定</summary>
+		void SetUVTrans(const Math::Vector2& uvTrans);
+		/// <summary>α値の閾値</summary>
+		void SetAlphaRef(float ref);
+		/// <summary>環境マップの設定</summary>
+		void SetEnvironment(float env);
+		/// <summary>Textureの設定</summary>
+		void SetTexture(const std::string& name);
+		/// <summary>Textureのファイルパスの設定</summary>
+		void SetTextureName(const std::string& name);
+		/// <summary>ライトモードの設定</summary>
+		void SetLightEnable(LightMode mode);
 
-	//========================================================================*/
-	//* Setter
-	/// <summary>色の設定</summary>
-	void SetColor(const Vector4& color, int index = 0);
-	/// <summary>UVスケールの設定</summary>
-	void SetUVScale(const Vector2& scale, const Vector2& uvTrans);
-	/// <summary>UVトランスフォームの設定</summary>
-	void SetUVTrans(const Vector2& uvTrans);
-	/// <summary>α値の閾値</summary>
-	void SetAlphaRef(float ref);
-	/// <summary>環境マップの設定</summary>
-	void SetEnvironment(float env);
-	/// <summary>Textureの設定</summary>
-	void SetTexture(const std::string& name);
-	/// <summary>Textureのファイルパスの設定</summary>
-	void SetTextureName(const std::string& name);
-	/// <summary>ライトモードの設定</summary>
-	void SetLightEnable(LightMode mode);
-
-	//========================================================================*/
-	//* Getter
-	std::string GetTextuerName() { return nowTextuer; }
-	int GetMaterialSize() { return int(material_.size()); }
-	Vector4 GetColor(int index) { return material_[index].GetColor(); }
-	Vector2 GetUVScale() { return uvScale_; }
-	Vector2 GetUVTrans() { return uvTrans_; }
-	size_t GetVertexSize(int i) { return mesh_[i].GetVertexDataSize(); }
-
-
-	void CSDispatch(const SkinCluster& skinCluster, ID3D12GraphicsCommandList* commandList);
-	void MeshDraw(ID3D12GraphicsCommandList* commandList, Material* mate, int drawCount = 1);
-
-	ModelData data_;
-
-private:
+		//========================================================================*/
+		//* Getter
+		std::string GetTextuerName() { return nowTextuer; }
+		int GetMaterialSize() { return int(material_.size()); }
+		Math::Vector4 GetColor(int index) { return material_[index].GetColor(); }
+		Math::Vector2 GetUVScale() { return uvScale_; }
+		Math::Vector2 GetUVTrans() { return uvTrans_; }
+		size_t GetVertexSize(int i) { return mesh_[i].GetVertexDataSize(); }
 
 
-private:
+		void CSDispatch(const SkinCluster& skinCluster, ID3D12GraphicsCommandList* commandList);
+		void MeshDraw(ID3D12GraphicsCommandList* commandList, Material* mate, int drawCount = 1);
+
+		ModelData data_;
+
+	private:
 
 
-	std::vector<Material> material_;
-	std::vector<Mesh> mesh_;
-	std::string nowTextuer;
-
-	Vector2 uvScale_;
-	Vector2 uvTrans_;
-
-	Microsoft::WRL::ComPtr<ID3D12Resource> skinningInformation_;
-	SkinningInformation* infoData_;
+	private:
 
 
+		std::vector<Material> material_;
+		std::vector<Mesh> mesh_;
+		std::string nowTextuer;
 
-};
+		Math::Vector2 uvScale_;
+		Math::Vector2 uvTrans_;
+
+		Microsoft::WRL::ComPtr<ID3D12Resource> skinningInformation_;
+		SkinningInformation* infoData_;
+
+
+
+	};
+}

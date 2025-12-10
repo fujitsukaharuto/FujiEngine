@@ -24,7 +24,7 @@ struct Value {
 	enum class Type { None, Int, Float, Vector2, Vector3, Color, Texture };
 
 	// 実データ本体（variant にすべて詰め込む）
-	std::variant<std::monostate, int, float, Vector2, Vector3, Vector4, std::string> data;
+	std::variant<std::monostate, int, float, Math::Vector2, Math::Vector3, Math::Vector4, std::string> data;
 
 	// タイプを明示的に持っておく（オプション）
 	Type type = Type::None;
@@ -33,9 +33,9 @@ struct Value {
 	Value() : data(std::monostate{}), type(Type::None) {}
 	Value(int v) : data(v), type(Type::Int) {}
 	Value(float v) : data(v), type(Type::Float) {}
-	Value(const Vector2& v) : data(v), type(Type::Vector2) {}
-	Value(const Vector3& v) : data(v), type(Type::Vector3) {}
-	Value(const Vector4& v) : data(v), type(Type::Color) {}
+	Value(const Math::Vector2& v) : data(v), type(Type::Vector2) {}
+	Value(const Math::Vector3& v) : data(v), type(Type::Vector3) {}
+	Value(const Math::Vector4& v) : data(v), type(Type::Color) {}
 	Value(const std::string& texName) : data(texName), type(Type::Texture) {}
 	Value(const char* texName) : data(std::string(texName)), type(Type::Texture) {}
 
@@ -152,74 +152,74 @@ struct Link {
 #endif // _DEBUG
 
 
-
-// NodeEditor
+namespace Core {
+	// NodeEditor
 #ifdef _DEBUG
 /// <summary>
 /// NodeGraphのクラス
 /// </summary>
-class NodeGraph {
-public:
-	// ノードとリンクのリスト
-	std::vector<MyNode> nodes;
-	std::vector<Link> links;
+	class NodeGraph {
+	public:
+		// ノードとリンクのリスト
+		std::vector<MyNode> nodes;
+		std::vector<Link> links;
 
-	void Update(ax::NodeEditor::EditorContext* ctx);
-	void ValueUpdate(MyNode& node);
-	void NameUpdate(MyNode& parentNode, MyNode& node,int inputNum);
+		void Update(ax::NodeEditor::EditorContext* ctx);
+		void ValueUpdate(MyNode& node);
+		void NameUpdate(MyNode& parentNode, MyNode& node, int inputNum);
 
-	/// <summary>Nodeの追加</summary>
-	MyNode& AddNode(const MyNode& node);
+		/// <summary>Nodeの追加</summary>
+		MyNode& AddNode(const MyNode& node);
 
-	/// <summary>リンクの追加</summary>
-	void AddLink(const Link& link);
+		/// <summary>リンクの追加</summary>
+		void AddLink(const Link& link);
 
-	/// <summary>指定ノードを評価して出力を得る（再帰的）</summary>
-	Value EvaluateNode(const MyNode& node);
+		/// <summary>指定ノードを評価して出力を得る（再帰的）</summary>
+		Value EvaluateNode(const MyNode& node);
 
-	/// <summary>ピンIDからノードを探す</summary>
-	MyNode* FindNodeByPinId(ed::PinId pinId);
+		/// <summary>ピンIDからノードを探す</summary>
+		MyNode* FindNodeByPinId(ed::PinId pinId);
 
-	/// <summary>ノードIDからノードを探す</summary>
-	MyNode* FindNodeById(ed::NodeId id);
+		/// <summary>ノードIDからノードを探す</summary>
+		MyNode* FindNodeById(ed::NodeId id);
 
-	/// <summary>ピンが既に繋がっているか</summary>
-	bool IsPinLinked(ed::PinId pinId) const;
+		/// <summary>ピンが既に繋がっているか</summary>
+		bool IsPinLinked(ed::PinId pinId) const;
 
-	/// <summary>キャッシュをクリアする</summary>
-	void ClearResults();
+		/// <summary>キャッシュをクリアする</summary>
+		void ClearResults();
 
 
-	/// <summary>NodeTypeを文字列に</summary>
-	std::string NodeTypeToString(MyNode::NodeType t);
-	/// <summary>文字列をNodeTypeに</summary>
-	MyNode::NodeType StringToNodeType(const std::string& str);
+		/// <summary>NodeTypeを文字列に</summary>
+		std::string NodeTypeToString(MyNode::NodeType t);
+		/// <summary>文字列をNodeTypeに</summary>
+		MyNode::NodeType StringToNodeType(const std::string& str);
 
-	/// <summary>NodeDetaを出力</summary>
-	json SaveNodeData();
-	/// <summary>Valueを出力</summary>
-	json SerializeValue(const Value& v);
-	/// <summary>Nodeを出力</summary>
-	json SerializeNode(const MyNode& node);
+		/// <summary>NodeDetaを出力</summary>
+		json SaveNodeData();
+		/// <summary>Valueを出力</summary>
+		json SerializeValue(const Value& v);
+		/// <summary>Nodeを出力</summary>
+		json SerializeNode(const MyNode& node);
 
-	/// <summary>NodeDetaを読み込み</summary>
-	ed::NodeId DeserializeNodeData(const std::string& filePath);
-	/// <summary>Nodeを読み込み</summary>
-	MyNode DeserializeNode(const json& j);
-	/// <summary>Valueを出力</summary>
-	Value DeserializeValue(const json& j);
+		/// <summary>NodeDetaを読み込み</summary>
+		ed::NodeId DeserializeNodeData(const std::string& filePath);
+		/// <summary>Nodeを読み込み</summary>
+		MyNode DeserializeNode(const json& j);
+		/// <summary>Valueを出力</summary>
+		Value DeserializeValue(const json& j);
 
-private:
-	ed::NodeId materialNodeId_;
-};
+	private:
+		ed::NodeId materialNodeId_;
+	};
 #endif // _DEBUG
-
+}
 
 struct NodeContent {
 
 	bool isMoveUV_ = false;
 	bool isAddDeltaUV_ = false;
 
-	Vector2 incrementUV_;
+	Math::Vector2 incrementUV_;
 
 };

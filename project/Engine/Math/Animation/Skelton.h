@@ -8,9 +8,9 @@
 /// ジョイント構造体
 /// </summary>
 struct Joint {
-	QuaternioonTrans transform;
-	Matrix4x4 loaclMatrix;
-	Matrix4x4 skeletonSpaceMatrix;
+	Math::QuaternioonTrans transform;
+	Math::Matrix4x4 loaclMatrix;
+	Math::Matrix4x4 skeletonSpaceMatrix;
 	std::string name;
 	std::vector<int32_t> children;
 	int32_t index;

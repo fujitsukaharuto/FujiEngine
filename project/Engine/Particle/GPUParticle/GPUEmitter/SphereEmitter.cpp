@@ -4,6 +4,10 @@
 #include "ImGuiManager/ImGuiManager.h"
 #include "Engine/Editor/JsonSerializer.h"
 
+using namespace Core;
+using namespace Math;
+
+
 SphereEmitter::SphereEmitter(DXCom* dx) {
 	resource_ = dx->CreateBufferResource(dx->GetDevice(), sizeof(EmitterSphere));
 	resource_->Map(0, nullptr, reinterpret_cast<void**>(&data_));

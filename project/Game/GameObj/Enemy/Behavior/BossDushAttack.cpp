@@ -6,6 +6,11 @@
 #include "Game/GameObj/Enemy/Behavior/BossArrowAttack.h"
 #include "BossRoot.h"
 
+using namespace Core;
+using namespace Graphics;
+using namespace Math;
+
+
 BossDushAttack::BossDushAttack(Boss* pBoss,bool is) : BaseBossBehavior(pBoss) {
 	step_ = Step::CHARGE;
 	cameraRang_ = -40.0f;

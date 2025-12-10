@@ -3,6 +3,11 @@
 #include "Engine/DX/SRVManager.h"
 #include "ImGuiManager/ImGuiManager.h"
 
+using namespace Core;
+using namespace Graphics;
+using namespace Math;
+
+
 TextureBasedEmitter::TextureBasedEmitter(DXCom* dx) {
 	resource_ = dx->CreateBufferResource(dx->GetDevice(), sizeof(EmitterTexture));
 	resource_->Map(0, nullptr, reinterpret_cast<void**>(&data_));

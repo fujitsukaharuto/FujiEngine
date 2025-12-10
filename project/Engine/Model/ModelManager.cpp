@@ -14,6 +14,9 @@
 #include "ImGuizmo.h"
 #endif // _DEBUG
 
+using namespace Core;
+using namespace Graphics;
+using namespace Math;
 
 
 ModelManager::~ModelManager() {
@@ -26,7 +29,7 @@ ModelManager* ModelManager::GetInstance() {
 }
 
 
-void ModelManager::Initialize(DXCom* pDxcom, LightManager* pLight) {
+void ModelManager::Initialize(DXCom* pDxcom, Graphics::LightManager* pLight) {
 	dxcommon_ = pDxcom;
 	lightManager_ = pLight;
 	LoadModelFile();

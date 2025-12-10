@@ -9,96 +9,98 @@ class DXCom;
 class PointLight;
 class SpotLight;
 
-/// <summary>
-/// スプライト描画クラス
-/// </summary>
-class Sprite {
-public:
-	Sprite();
-	~Sprite();
-
-public:
-
+namespace Graphics {
 	/// <summary>
-	/// Textureのセット
+	/// スプライト描画クラス
 	/// </summary>
-	void Load(const std::string& fileName);
+	class Sprite {
+	public:
+		Sprite();
+		~Sprite();
 
-	void Draw();
+	public:
 
-	//========================================================================*/
-	//* Setter
-	/// <summary>スプライトの色の設定</summary>
-	void SetColor(const Vector4& color);
-	/// <summary>スプライトの位置の設定</summary>
-	void SetPos(const Vector3& pos);
-	/// <summary>スプライトのスケールの設定</summary>
-	void SetScale(const Vector2& scale);
-	/// <summary>スプライトのサイズの設定</summary>
-	void SetSize(const Vector2& size);
-	/// <summary>スプライトの回転の設定</summary>
-	void SetAngle(float rotate);
-	/// <summary>スプライトの基準点</summary>
-	void SetAnchor(const Vector2& anchor);
-	/// <summary>左右反転</summary>
-	void SetFlipX(bool is) { isFlipX_ = is; }
-	/// <summary>上下反転</summary>
-	void SetFlipY(bool is) { isFlipY_ = is; }
-	/// <summary>スプライトの描画範囲指定</summary>
-	void SetRange(const Vector2& leftTop, const Vector2& size);
+		/// <summary>
+		/// Textureのセット
+		/// </summary>
+		void Load(const std::string& fileName);
 
-	//========================================================================*/
-	//* Getter
-	Vector2 GetDefaultSize() const { return defaultSize_; }
+		void Draw();
 
-	/*void SetPointLight(PointLight* light) { pointLight_ = light; }
+		//========================================================================*/
+		//* Setter
+		/// <summary>スプライトの色の設定</summary>
+		void SetColor(const Math::Vector4& color);
+		/// <summary>スプライトの位置の設定</summary>
+		void SetPos(const Math::Vector3& pos);
+		/// <summary>スプライトのスケールの設定</summary>
+		void SetScale(const Math::Vector2& scale);
+		/// <summary>スプライトのサイズの設定</summary>
+		void SetSize(const Math::Vector2& size);
+		/// <summary>スプライトの回転の設定</summary>
+		void SetAngle(float rotate);
+		/// <summary>スプライトの基準点</summary>
+		void SetAnchor(const Math::Vector2& anchor);
+		/// <summary>左右反転</summary>
+		void SetFlipX(bool is) { isFlipX_ = is; }
+		/// <summary>上下反転</summary>
+		void SetFlipY(bool is) { isFlipY_ = is; }
+		/// <summary>スプライトの描画範囲指定</summary>
+		void SetRange(const Math::Vector2& leftTop, const Math::Vector2& size);
 
-	void SetSpotLight(SpotLight* light) { spotLight_ = light; }*/
+		//========================================================================*/
+		//* Getter
+		Math::Vector2 GetDefaultSize() const { return defaultSize_; }
 
-private:
+		/*void SetPointLight(PointLight* light) { pointLight_ = light; }
 
-	void InitializeBuffer();
+		void SetSpotLight(SpotLight* light) { spotLight_ = light; }*/
 
-	void AdjustTextureSize();
+	private:
 
-	void SetWvp();
+		void InitializeBuffer();
 
-private:
+		void AdjustTextureSize();
 
-	DXCom* dxcommon_;
+		void SetWvp();
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_ = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_ = nullptr;
+	private:
 
-	VertexDate* vData;
+		DXCom* dxcommon_;
 
-	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
-	D3D12_INDEX_BUFFER_VIEW indexBufferView_{};
+		Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_ = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_ = nullptr;
 
-	std::vector<VertexDate> vertex_;
-	std::vector<uint32_t> index_;
+		VertexDate* vData;
+
+		D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
+		D3D12_INDEX_BUFFER_VIEW indexBufferView_{};
+
+		std::vector<VertexDate> vertex_;
+		std::vector<uint32_t> index_;
 
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource_ = nullptr;
-	TransformationMatrix* wvpData_;
+		Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource_ = nullptr;
+		Math::TransformationMatrix* wvpData_;
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> cameraPosResource_ = nullptr;
-	CameraForGPU* cameraPosData_ = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12Resource> cameraPosResource_ = nullptr;
+		Math::CameraForGPU* cameraPosData_ = nullptr;
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> objIDDataResource_ = nullptr;
-	ObjIDData* objIDData_ = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12Resource> objIDDataResource_ = nullptr;
+		ObjIDData* objIDData_ = nullptr;
 
-	Material material_;
-	std::string nowtexture;
+		Material material_;
+		std::string nowtexture;
 
-	Vector2 anchorPoint_{ 0.5f,0.5f };
-	Vector3 position_ = { 0,0,0 };
-	Vector2 defaultSize_ = {};
-	Vector2 size_ = { 200, 200 };
-	Vector2 scale_ = { 1.0f,1.0f };
-	float rotate_ = 0.0f;
+		Math::Vector2 anchorPoint_{ 0.5f,0.5f };
+		Math::Vector3 position_ = { 0,0,0 };
+		Math::Vector2 defaultSize_ = {};
+		Math::Vector2 size_ = { 200, 200 };
+		Math::Vector2 scale_ = { 1.0f,1.0f };
+		float rotate_ = 0.0f;
 
-	bool isFlipX_ = false;
-	bool isFlipY_ = false;
+		bool isFlipX_ = false;
+		bool isFlipY_ = false;
 
-};
+	};
+}

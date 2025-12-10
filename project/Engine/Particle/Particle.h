@@ -37,11 +37,11 @@ enum class BillBoardPattern {
 /// パーティクルの行列等のデータ
 /// </summary>
 struct TransformationParticleMatrix {
-	Matrix4x4 WVP;
-	Matrix4x4 World;
-	Vector4 color;
-	Vector2 uvTrans = { 0.0f,0.0f };
-	Vector2 uvScale = { 1.0f,1.0f };
+	Math::Matrix4x4 WVP;
+	Math::Matrix4x4 World;
+	Math::Vector4 color;
+	Math::Vector2 uvTrans = { 0.0f,0.0f };
+	Math::Vector2 uvScale = { 1.0f,1.0f };
 };
 
 enum class ShapeType {
@@ -65,44 +65,44 @@ struct Particle {
 	bool isLive_ = false;
 	float lifeTime_ = 0;
 	float startLifeTime_ = 0;
-	Vector3 translate;
-	Vector3 scale;
-	Vector3 rotate;
+	Math::Vector3 translate;
+	Math::Vector3 scale;
+	Math::Vector3 rotate;
 
 	//========================================================================*/
 	//* Size
 	int type_ = static_cast<int>(SizeType::kNormal);
 
-	Vector2 startSize_ = { 1.0f,1.0f };
-	Vector2 endSize_ = { 1.0f,1.0f };
+	Math::Vector2 startSize_ = { 1.0f,1.0f };
+	Math::Vector2 endSize_ = { 1.0f,1.0f };
 	bool isZandX_ = false;
 
 	//========================================================================*/
 	//* Speed
 	int speedType_ = static_cast<int>(SpeedType::kConstancy);
 
-	Vector3 accele_{};
-	Vector3 speed_{};
+	Math::Vector3 accele_{};
+	Math::Vector3 speed_{};
 
-	Vector3 returnPosition_{};
+	Math::Vector3 returnPosition_{};
 	float returnPower_ = -0.05f;
 
 	//========================================================================*/
 	//* Rotate
 	int rotateType_ = static_cast<int>(RotateType::kUsually);
 	bool isContinuouslyRotate_ = false;
-	Vector3 continuouslyR_ = {};
+	Math::Vector3 continuouslyR_ = {};
 
 	//========================================================================*/
 	//* Color
 	int colorType_ = static_cast<int>(ColorType::kDefault);
-	Vector4 color_ = { 1.0f,1.0f,1.0f,1.0f };
+	Math::Vector4 color_ = { 1.0f,1.0f,1.0f,1.0f };
 	float startAlpha_ = 1.0f;
-	Vector2 uvTrans_ = { 0.0f,0.0f };
-	Vector2 uvScale_ = { 1.0f,1.0f };
+	Math::Vector2 uvTrans_ = { 0.0f,0.0f };
+	Math::Vector2 uvScale_ = { 1.0f,1.0f };
 	bool isColorFade_ = true;
 	bool isAutoUVMove_ = false;
-	Vector2 autoUVSpeed_ = { 0.1f,0.0f };
+	Math::Vector2 autoUVSpeed_ = { 0.1f,0.0f };
 	bool isColorFadeIn_ = false;
 
 	//========================================================================*/
@@ -121,14 +121,14 @@ struct Particle {
 /// GPUパーティクル構造体
 /// </summary>
 struct ParticleCS {
-	Vector3 translate;
-	Vector3 scale;
-	Vector3 startScale;
+	Math::Vector3 translate;
+	Math::Vector3 scale;
+	Math::Vector3 startScale;
 	float lifeTime;
-	Vector3 velocity;
+	Math::Vector3 velocity;
 	float currentTime;
-	Vector4 color;
-	Vector3 prevTranslate;
+	Math::Vector4 color;
+	Math::Vector3 prevTranslate;
 	uint32_t isRandomMove;
 	uint32_t isTrailEmit;
 	uint32_t isGravity;

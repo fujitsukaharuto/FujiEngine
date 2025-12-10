@@ -4,6 +4,12 @@
 #include "Engine/Math/Random/Random.h"
 #include <algorithm>
 
+using namespace Audio;
+using namespace Core;
+using namespace Graphics;
+using namespace Math;
+
+
 Arrow::Arrow() {
 }
 

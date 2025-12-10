@@ -39,27 +39,27 @@ private:
 	void ContinueUpdate();
 	void PadSwitch();
 
-	std::unique_ptr<Object3dCommon> obj3dCommon = nullptr;
+	std::unique_ptr<Graphics::Object3dCommon> obj3dCommon = nullptr;
 	std::unique_ptr<CollisionManager> cMane_;
 
-	std::unique_ptr<AnimationModel> terrain = nullptr;
+	std::unique_ptr<Graphics::AnimationModel> terrain = nullptr;
 	std::unique_ptr<SkyBox> skybox_;
 	std::unique_ptr<Player> player_ = nullptr;
 	std::unique_ptr<Boss> boss_ = nullptr;
 	std::unique_ptr<FollowCamera> followCamera_;
 
-	std::unique_ptr<Sprite> key_ = nullptr;
+	std::unique_ptr<Graphics::Sprite> key_ = nullptr;
 	bool isPadDraw_ = false;
-	std::unique_ptr<Sprite> pad_ = nullptr;
+	std::unique_ptr<Graphics::Sprite> pad_ = nullptr;
 
-	std::unique_ptr<Sprite> gameover_ = nullptr;
+	std::unique_ptr<Graphics::Sprite> gameover_ = nullptr;
 	bool isBackTitle_ = false;
-	std::unique_ptr<Sprite> gameoverSelector_ = nullptr;
+	std::unique_ptr<Graphics::Sprite> gameoverSelector_ = nullptr;
 	int selectPoint_ = 0;
-	Vector3 selectPointL_ = { 180.0f,450.0f,0.0f };
-	Vector3 selectPointR_ = { 810.0f,450.0f,0.0f };
+	Math::Vector3 selectPointL_ = { 180.0f,450.0f,0.0f };
+	Math::Vector3 selectPointR_ = { 810.0f,450.0f,0.0f };
 
-	Vector3 summonCameraPos = { -25.0f,5.0f,-25.0f };
+	Math::Vector3 summonCameraPos = { -25.0f,5.0f,-25.0f };
 	float panSpeed_ = 0.01f;
 
 	bool isDebugCameraMode_ = false;
@@ -80,7 +80,7 @@ private:
 	bool isGameover_ = false;
 
 	// sceneChange
-	std::unique_ptr<Sprite> black_;
+	std::unique_ptr<Graphics::Sprite> black_;
 	float blackLimmite_ = 20.0f;
 	float blackTime_ = 20.0f;
 	bool isChangeFase_ = false;

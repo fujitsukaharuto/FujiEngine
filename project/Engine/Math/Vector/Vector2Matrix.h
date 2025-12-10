@@ -5,8 +5,8 @@
 /// 4つ角構造体
 /// </summary>
 struct Quad final {
-	Vector2 lt;
-	Vector2 rt;
-	Vector2 lb;
-	Vector2 rb;
+	Math::Vector2 lt;
+	Math::Vector2 rt;
+	Math::Vector2 lb;
+	Math::Vector2 rb;
 };

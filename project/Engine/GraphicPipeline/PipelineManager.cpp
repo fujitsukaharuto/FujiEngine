@@ -33,6 +33,8 @@
 #include "CSPipe/EmitterSurfaceParticleCSPipe.h"
 #include "CSPipe/UpdateParticleCSPipe.h"
 
+using namespace Graphics;
+
 
 PipelineManager::~PipelineManager() {
 }

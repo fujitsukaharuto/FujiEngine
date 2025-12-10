@@ -6,8 +6,8 @@
 class DXCom;
 
 struct PointLightData {
-	Vector4 color;
-	Vector3 position;
+	Math::Vector4 color;
+	Math::Vector3 position;
 	float intensity;
 	float radius;
 	float decay;

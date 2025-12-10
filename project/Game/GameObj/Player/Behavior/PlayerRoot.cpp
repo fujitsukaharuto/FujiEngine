@@ -6,6 +6,9 @@
 #include "Game/GameObj/Player/Behavior/PlayerJump.h"
 #include "Game/GameObj/Player/Behavior/PlayerAvoid.h"
 
+using namespace Core;
+
+
 PlayerRoot::PlayerRoot(Player* pPlayer) : BasePlayerBehavior(pPlayer) {
 	step_ = Step::ROOT;
 }

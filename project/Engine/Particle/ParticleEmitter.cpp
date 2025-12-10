@@ -6,6 +6,10 @@
 #include <iostream>
 #include <fstream>
 
+using namespace Graphics;
+using namespace Math;
+
+
 ParticleEmitter::ParticleEmitter() {
 }
 

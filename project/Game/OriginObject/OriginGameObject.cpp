@@ -6,6 +6,11 @@
 #include "externals/imgui/ImGuizmo.h"
 #endif // _DEBUG
 
+using namespace Core;
+using namespace Graphics;
+using namespace Math;
+
+
 OriginGameObject::OriginGameObject() {
 }
 

@@ -6,7 +6,7 @@ public:
 	ParentParticleGroup();
 	~ParentParticleGroup();
 
-	void Update(const Matrix4x4& billboardMatrix, Camera* camera) override;
+	void Update(const Math::Matrix4x4& billboardMatrix, Camera* camera) override;
 
 	std::unique_ptr<ParticleEmitter> emitter_;
 

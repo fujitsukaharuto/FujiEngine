@@ -15,6 +15,10 @@
 #include <assimp/postprocess.h>
 #include "Math/Animation/NodeAnimation.h"
 
+using namespace Core;
+using namespace Graphics;
+using namespace Math;
+
 
 AnimationModel::AnimationModel() {
 	dxcommon_ = ModelManager::GetInstance()->ShareDXCom();

@@ -15,7 +15,7 @@ public:
 
 	void Initialize()override;
 	void Update()override;
-	void Draw(Material* mate = nullptr, bool is = false)override;
+	void Draw(Graphics::Material* mate = nullptr, bool is = false)override;
 	void DrawCollider();
 	void DebugGUI()override;
 	void ParameterGUI();
@@ -24,9 +24,9 @@ public:
 	void InitParameter();
 
 	/// <summary>追尾攻撃の初期化</summary>
-	void InitArrow(const Vector3& pos,float emitTime);
+	void InitArrow(const Math::Vector3& pos,float emitTime);
 	/// <summary>追尾先の設定</summary>
-	void TargetSetting(const Vector3& target);
+	void TargetSetting(const Math::Vector3& target);
 
 	/// <summary>出現時の処理</summary>
 	void EmitTimeUpdate();
@@ -42,7 +42,7 @@ public:
 	/// <summary>避雷針の更新</summary>
 	void RodUpdate();
 	/// <summary>避雷針の初期化</summary>
-	void InitRod(const Vector3& pos, float time);
+	void InitRod(const Math::Vector3& pos, float time);
 
 	/// <summary>避雷針の出現</summary>
 	void FlyTimeUpdate();
@@ -77,7 +77,7 @@ private:
 
 	bool isArrow_ = false;
 	bool isLive_ = false;
-	Vector3 velocity_;
+	Math::Vector3 velocity_;
 
 	float animationTime_ = 0.0f;
 	float totalAnimationTime_ = 30.0f;
@@ -85,13 +85,13 @@ private:
 	float arrivalTime_ = 0.0f;
 	float totalArrivalTime_ = 30.0f;
 
-	Vector3 startP_;
-	Vector3 midtermP_;
-	Vector3 endP_;
+	Math::Vector3 startP_;
+	Math::Vector3 midtermP_;
+	Math::Vector3 endP_;
 	float controlHeight_ = 20.0f;
 
 	std::unique_ptr<AABBCollider> collider_;
-	std::unique_ptr<Object3d> arrivalWarningPotion_;
+	std::unique_ptr<Graphics::Object3d> arrivalWarningPotion_;
 
 	// emitter
 	ParticleEmitter spark1_;

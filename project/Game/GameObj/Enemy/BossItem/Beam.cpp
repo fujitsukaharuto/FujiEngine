@@ -5,6 +5,11 @@
 
 #include "Game/GameObj/Enemy/Boss.h"
 
+using namespace Core;
+using namespace Graphics;
+using namespace Math;
+
+
 Beam::Beam() {
 }
 

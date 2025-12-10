@@ -2,26 +2,28 @@
 #include <cmath>
 #include <cstring>
 
-/// <summary>
-/// Matrix3x3クラス
-/// </summary>
-class Matrix3x3 final {
-public:
+namespace Math {
+	/// <summary>
+	/// Matrix3x3クラス
+	/// </summary>
+	class Matrix3x3 final {
+	public:
 
-	float m[3][3];
+		float m[3][3];
 
-	/*----- コンストラクタ ----------------------------------------------------------*/
-	Matrix3x3() {
-		std::memset(m, 0, sizeof(m));
-	}
-
-	// 単位行列を生成
-	static Matrix3x3 MakeIdentity3x3() {
-		Matrix3x3 result;
-		for (int i = 0; i < 3; ++i) {
-			result.m[i][i] = 1.0f;
+		/*----- コンストラクタ ----------------------------------------------------------*/
+		Matrix3x3() {
+			std::memset(m, 0, sizeof(m));
 		}
-		return result;
-	}
 
-};
+		// 単位行列を生成
+		static Matrix3x3 MakeIdentity3x3() {
+			Matrix3x3 result;
+			for (int i = 0; i < 3; ++i) {
+				result.m[i][i] = 1.0f;
+			}
+			return result;
+		}
+
+	};
+}

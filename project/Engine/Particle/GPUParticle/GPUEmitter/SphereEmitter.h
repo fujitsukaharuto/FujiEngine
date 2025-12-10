@@ -11,19 +11,19 @@ using Microsoft::WRL::ComPtr;
 /// GPUパーティクルエミッター
 /// </summary>
 struct EmitterSphere {
-	Vector3 translate;
+	Math::Vector3 translate;
 	float radius;
 
-	Vector3 scale;
+	Math::Vector3 scale;
 	uint32_t count;
 
-	Vector3 colorMax;
+	Math::Vector3 colorMax;
 	float  lifeTime;
 
-	Vector3 colorMin;
+	Math::Vector3 colorMin;
 	float frequency;
 
-	Vector3 baseVelocity;
+	Math::Vector3 baseVelocity;
 	float velocityRandMax;
 
 	float velocityRandMin;
@@ -31,10 +31,10 @@ struct EmitterSphere {
 	uint32_t isDistance;
 	float frequencyTime;
 
-	Vector3 prevTranslate;
+	Math::Vector3 prevTranslate;
 	uint32_t emitShapeType;
 
-	Quaternion rotation;
+	Math::Quaternion rotation;
 
 	uint32_t emitVeloType;
 	uint32_t isRandomMove;
@@ -58,7 +58,7 @@ public:
 
 	void Emit() override;
 	bool IsEmit() const override { return isEmit_; }
-	void SetPos(const Vector3& pos) override;
+	void SetPos(const Math::Vector3& pos) override;
 	void SetEmit(bool state) override;
 private:
 	char saveName_[64] = "default";

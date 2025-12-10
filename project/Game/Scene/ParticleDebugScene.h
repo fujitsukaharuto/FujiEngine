@@ -24,12 +24,12 @@ public:
 
 private:
 
-	std::unique_ptr<Object3dCommon> obj3dCommon = nullptr;
+	std::unique_ptr<Graphics::Object3dCommon> obj3dCommon = nullptr;
 	std::unique_ptr<SkyBox> skybox_;
-	std::unique_ptr<AnimationModel> terrain_ = nullptr;
+	std::unique_ptr<Graphics::AnimationModel> terrain_ = nullptr;
 
 	// sceneChange
-	std::unique_ptr<Sprite> black_;
+	std::unique_ptr<Graphics::Sprite> black_;
 	float blackLimmite = 20.0f;
 	float blackTime = 20.0f;
 	bool isChangeFase = false;

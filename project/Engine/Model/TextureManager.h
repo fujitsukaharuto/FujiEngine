@@ -26,50 +26,52 @@ struct Texture {
 };
 
 
-/// <summary>
-/// Texture管理クラス
-/// </summary>
-class TextureManager {
-public:
-	TextureManager();
-	~TextureManager();
+namespace Graphics {
+	/// <summary>
+	/// Texture管理クラス
+	/// </summary>
+	class TextureManager {
+	public:
+		TextureManager();
+		~TextureManager();
 
-	static TextureManager* GetInstance();
+		static TextureManager* GetInstance();
 
-	void Initialize(DXCom* pDxcom);
-	void Finalize();
+		void Initialize(DXCom* pDxcom);
+		void Finalize();
 
-	// テクスチャのロード
-	Texture* LoadTexture(const std::string& filename);
-	void Load(const std::string& filename, bool overWrite = false);
-	void LoadTextureFile(bool overWrite = false);
+		// テクスチャのロード
+		Texture* LoadTexture(const std::string& filename);
+		void Load(const std::string& filename, bool overWrite = false);
+		void LoadTextureFile(bool overWrite = false);
 
-	// テクスチャの取得
-	Texture* GetTexture(const std::string& filename);
-	const std::vector<std::pair<std::string, bool>>& GetTextureFiles() { return textureFileList_; }
-	const DirectX::TexMetadata& GetMetaData(const std::string& filename);
+		// テクスチャの取得
+		Texture* GetTexture(const std::string& filename);
+		const std::vector<std::pair<std::string, bool>>& GetTextureFiles() { return textureFileList_; }
+		const DirectX::TexMetadata& GetMetaData(const std::string& filename);
 
-	void SetTextureFileOnceLoad(const std::string& name);
+		void SetTextureFileOnceLoad(const std::string& name);
 
-	void ReleaseTexture(const std::string& filename);
+		void ReleaseTexture(const std::string& filename);
 
-	DXCom* ShareDXCom() { return dxcommon_; }
+		DXCom* ShareDXCom() { return dxcommon_; }
 
-private:
+	private:
 
-	DirectX::ScratchImage LoadTextureFile(const std::string& filePath);
-	Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResource(Microsoft::WRL::ComPtr<ID3D12Device> device, const DirectX::TexMetadata& metadata);
+		DirectX::ScratchImage LoadTextureFile(const std::string& filePath);
+		Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResource(Microsoft::WRL::ComPtr<ID3D12Device> device, const DirectX::TexMetadata& metadata);
 
-	[[nodiscard]]
-	Microsoft::WRL::ComPtr<ID3D12Resource> UploadTextureData(Microsoft::WRL::ComPtr<ID3D12Resource> texture, const DirectX::ScratchImage& mipImages, Microsoft::WRL::ComPtr<ID3D12Device> device, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList);
+		[[nodiscard]]
+		Microsoft::WRL::ComPtr<ID3D12Resource> UploadTextureData(Microsoft::WRL::ComPtr<ID3D12Resource> texture, const DirectX::ScratchImage& mipImages, Microsoft::WRL::ComPtr<ID3D12Device> device, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList);
 
-private:
+	private:
 
-	DXCom* dxcommon_;
+		DXCom* dxcommon_;
 
-	std::unordered_map<std::string, std::unique_ptr<Texture>> m_textureCache;
+		std::unordered_map<std::string, std::unique_ptr<Texture>> m_textureCache;
 
-	std::vector<std::pair<std::string, bool>> textureFileList_;
+		std::vector<std::pair<std::string, bool>> textureFileList_;
 
-	std::string directoryPath_ = "resource/ModelandTexture/";
-};
+		std::string directoryPath_ = "resource/ModelandTexture/";
+	};
+}

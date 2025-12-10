@@ -13,15 +13,15 @@ enum class BeamStep{
 /// ビームを構成するオブジェクト
 /// </summary>
 struct OneBeam {
-	std::unique_ptr<Object3d> beamCore1;
-	std::unique_ptr<Object3d> beamCore2;
-	std::unique_ptr<Object3d> beamCore3;
-	std::unique_ptr<Object3d> beam1;
-	std::unique_ptr<Object3d> beam2;
-	std::unique_ptr<Object3d> beam3;
+	std::unique_ptr<Graphics::Object3d> beamCore1;
+	std::unique_ptr<Graphics::Object3d> beamCore2;
+	std::unique_ptr<Graphics::Object3d> beamCore3;
+	std::unique_ptr<Graphics::Object3d> beam1;
+	std::unique_ptr<Graphics::Object3d> beam2;
+	std::unique_ptr<Graphics::Object3d> beam3;
 	std::unique_ptr<AABBCollider> collider;
-	std::unique_ptr<Object3d> model;
-	std::unique_ptr<Object3d> particleParent;
+	std::unique_ptr<Graphics::Object3d> model;
+	std::unique_ptr<Graphics::Object3d> particleParent;
 };
 
 class Boss;
@@ -36,7 +36,7 @@ public:
 
 	void Initialize()override;
 	void Update()override;
-	void Draw(Material* mate = nullptr, bool is = false)override;
+	void Draw(Graphics::Material* mate = nullptr, bool is = false)override;
 	void DebugGUI()override;
 	void ParameterGUI();
 
@@ -44,7 +44,7 @@ public:
 	void InitParameter();
 
 	/// <summary>ビームの初期化</summary>
-	void InitBeam(const Vector3& pos, const Vector3& velo);
+	void InitBeam(const Math::Vector3& pos, const Math::Vector3& velo);
 	/// <summary>ビームの回転</summary>
 	bool BeamRotate();
 
@@ -83,13 +83,13 @@ private:
 	BeamStep step_ = BeamStep::AroundAttack;
 	std::vector<OneBeam> beams_;
 
-	std::unique_ptr<Object3d> beamCore1_;
-	std::unique_ptr<Object3d> beamCore2_;
-	std::unique_ptr<Object3d> beamCore3_;
-	std::unique_ptr<Object3d> beam1_;
-	std::unique_ptr<Object3d> beam2_;
-	std::unique_ptr<Object3d> beam3_;
-	std::unique_ptr<Object3d> particleParent_;
+	std::unique_ptr<Graphics::Object3d> beamCore1_;
+	std::unique_ptr<Graphics::Object3d> beamCore2_;
+	std::unique_ptr<Graphics::Object3d> beamCore3_;
+	std::unique_ptr<Graphics::Object3d> beam1_;
+	std::unique_ptr<Graphics::Object3d> beam2_;
+	std::unique_ptr<Graphics::Object3d> beam3_;
+	std::unique_ptr<Graphics::Object3d> particleParent_;
 
 	bool isLive_ = false;
 	float lifeTime_ = 780.0f;
@@ -99,8 +99,8 @@ private:
 	float shrinkTime_ = 60.0f;
 
 	float changeTime_ = 0.0f;
-	Vector3 prePos_;
-	Vector3 targetPos_;
+	Math::Vector3 prePos_;
+	Math::Vector3 targetPos_;
 
 	float uvTransX_;
 

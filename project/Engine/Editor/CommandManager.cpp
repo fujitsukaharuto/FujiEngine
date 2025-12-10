@@ -5,6 +5,11 @@
 #include "Engine/Model/ModelManager.h"
 #include <fstream>
 
+using namespace Core;
+using namespace Graphics;
+using namespace Math;
+
+
 CommandManager::~CommandManager() {
 }
 

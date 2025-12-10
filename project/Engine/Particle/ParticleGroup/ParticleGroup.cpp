@@ -1,5 +1,8 @@
 #include "ParticleGroup.h"
 
+using namespace Math;
+
+
 ParticleGroup::ParticleGroup() {
 }
 

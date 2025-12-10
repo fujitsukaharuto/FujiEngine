@@ -8,6 +8,12 @@
 #include "Game/GameObj/Player/PlayerBullet.h"
 #include "Game/GameObj/Enemy/BossItem/UnderRing.h"
 
+using namespace Audio;
+using namespace Core;
+using namespace Graphics;
+using namespace Math;
+
+
 Player::Player() {
 }
 

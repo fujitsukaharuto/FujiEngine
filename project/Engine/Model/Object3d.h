@@ -12,7 +12,9 @@
 
 
 class DXCom;
-class LightManager;
+namespace Graphics {
+	class LightManager;
+}
 class PointLight;
 class SpotLight;
 
@@ -24,163 +26,165 @@ struct ObjIDData {
 	uint32_t padding[3];
 };
 
-/// <summary>
-/// ３Dオブジェクトのクラス
-/// </summary>
-class Object3d {
-public:
-	Object3d();
-	~Object3d();
-
-public:
-
-	void Create(const std::string& fileName);
-	void CreateFromJson(const std::string& name);
-
+namespace Graphics {
 	/// <summary>
-	/// 球の作成
+	/// ３Dオブジェクトのクラス
 	/// </summary>
-	void CreateSphere();
+	class Object3d {
+	public:
+		Object3d();
+		~Object3d();
 
-	/// <summary>
-	/// リングの作成
-	/// </summary>
-	/// <param name="out">外側の半径(デフォルトは1.0f)</param>
-	/// <param name="in">内側の半径(デフォルトは0.2f)</param>
-	/// <param name="radius">円周(デフォルトは2.0f)</param>
-	/// <param name="horizon">水平にするか(デフォルトはfalse)</param>
-	void CreateRing(float out = 1.0f, float in = 0.2f, float radius = 2.0f, bool horizon = false);
+	public:
 
-	/// <summary>
-	/// シリンダーの作成
-	/// </summary>
-	/// <param name="topRadius">上の半径(デフォルトは1.0f)</param>
-	/// <param name="bottomRadius">下の半径(デフォルトは1.0f)</param>
-	/// <param name="height">高さ(デフォルトは3.0f)</param>
-	void CreateCylinder(float topRadius = 1.0f, float bottomRadius = 1.0f, float height = 3.0f);
+		void Create(const std::string& fileName);
+		void CreateFromJson(const std::string& name);
 
-	void Draw(Material* mate = nullptr, bool isAdd = false);
+		/// <summary>
+		/// 球の作成
+		/// </summary>
+		void CreateSphere();
 
-	/// <summary>
-	/// 連番用描画
-	/// </summary>
-	void AnimeDraw();
+		/// <summary>
+		/// リングの作成
+		/// </summary>
+		/// <param name="out">外側の半径(デフォルトは1.0f)</param>
+		/// <param name="in">内側の半径(デフォルトは0.2f)</param>
+		/// <param name="radius">円周(デフォルトは2.0f)</param>
+		/// <param name="horizon">水平にするか(デフォルトはfalse)</param>
+		void CreateRing(float out = 1.0f, float in = 0.2f, float radius = 2.0f, bool horizon = false);
 
-	//========================================================================*/
-	//* Getter
-	Matrix4x4 GetWorldMat() const;
-	Vector3 GetWorldPos()const;
-	std::string GetModelName() { return modelName_; }
-	int GetObjID() { return objIDData_->objID; }
+		/// <summary>
+		/// シリンダーの作成
+		/// </summary>
+		/// <param name="topRadius">上の半径(デフォルトは1.0f)</param>
+		/// <param name="bottomRadius">下の半径(デフォルトは1.0f)</param>
+		/// <param name="height">高さ(デフォルトは3.0f)</param>
+		void CreateCylinder(float topRadius = 1.0f, float bottomRadius = 1.0f, float height = 3.0f);
+
+		void Draw(Material* mate = nullptr, bool isAdd = false);
+
+		/// <summary>
+		/// 連番用描画
+		/// </summary>
+		void AnimeDraw();
+
+		//========================================================================*/
+		//* Getter
+		Math::Matrix4x4 GetWorldMat() const;
+		Math::Vector3 GetWorldPos()const;
+		std::string GetModelName() { return modelName_; }
+		int GetObjID() { return objIDData_->objID; }
 
 
-	/// <summary>親がいるかどうか</summary>
-	bool IsHaveParent() { return transform.parent ? true : false; }
+		/// <summary>親がいるかどうか</summary>
+		bool IsHaveParent() { return transform.parent ? true : false; }
 
-	void UpdateWVP() { SetWVP(); }
+		void UpdateWVP() { SetWVP(); }
 
-	void DebugGUI();
+		void DebugGUI();
 
-	/// <summary>
-	/// jsonからTransform初期化
-	/// </summary>
-	void LoadTransformFromJson(const std::string& filename);
+		/// <summary>
+		/// jsonからTransform初期化
+		/// </summary>
+		void LoadTransformFromJson(const std::string& filename);
 
-	/// <summary>
-	/// ReleaseでNodeの内容道理に動くように
-	/// </summary>
-	void LoadNodeEditorData(const std::string& filename);
+		/// <summary>
+		/// ReleaseでNodeの内容道理に動くように
+		/// </summary>
+		void LoadNodeEditorData(const std::string& filename);
 
-	void CreateNodeEditor(const std::string& filename);
+		void CreateNodeEditor(const std::string& filename);
 
-	//========================================================================*/
-	//* Setter
-	/// <summary>色の設定</summary>
-	void SetColor(const Vector4& color);
-	/// <summary>UVスケールの設定</summary>
-	void SetUVScale(const Vector2& scale, const Vector2& uvTrans);
-	/// <summary>UVトランスフォームの設定</summary>
-	void SetUVTrans(const Vector2& uvTrans);
-	/// <summary>α値の閾値</summary>
-	void SetAlphaRef(float ref);
-	void SetCamera(Camera* camera) { this->camera_ = camera; }
-	/// <summary>ペアレントの設定</summary>
-	void SetParent(Trans* parent) { transform.parent = parent; }
-	void SetAnimParent(Matrix4x4* parent) { transform.animParent = parent; }
-	/// <summary>非スケーリング継承</summary>
-	void SetNoneScaleParent(bool is) { transform.isNoneScaleParent = is; }
-	void SetCameraParent(bool is) { transform.isCameraParent = is; }
-	/// <summary>テクスチャの設定</summary>
-	void SetTexture(const std::string& name);
-	/// <summary>ビルボード行列の設定</summary>
-	void SetBillboardMat(const Matrix4x4& mat) { billboardMatrix_ = mat; }
-	/// <summary>ライトモードの設定</summary>
-	void SetLightEnable(LightMode mode);
-	/// <summary>モデルの設定</summary>
-	void SetModel(const std::string& fileName, bool overWrite = false);
-	/// <summary>ピッキング用にIDの調整</summary>
-	void SetEditorObjParameter();
+		//========================================================================*/
+		//* Setter
+		/// <summary>色の設定</summary>
+		void SetColor(const Math::Vector4& color);
+		/// <summary>UVスケールの設定</summary>
+		void SetUVScale(const Math::Vector2& scale, const Math::Vector2& uvTrans);
+		/// <summary>UVトランスフォームの設定</summary>
+		void SetUVTrans(const Math::Vector2& uvTrans);
+		/// <summary>α値の閾値</summary>
+		void SetAlphaRef(float ref);
+		void SetCamera(Camera* camera) { this->camera_ = camera; }
+		/// <summary>ペアレントの設定</summary>
+		void SetParent(Math::Trans* parent) { transform.parent = parent; }
+		void SetAnimParent(Math::Matrix4x4* parent) { transform.animParent = parent; }
+		/// <summary>非スケーリング継承</summary>
+		void SetNoneScaleParent(bool is) { transform.isNoneScaleParent = is; }
+		void SetCameraParent(bool is) { transform.isCameraParent = is; }
+		/// <summary>テクスチャの設定</summary>
+		void SetTexture(const std::string& name);
+		/// <summary>ビルボード行列の設定</summary>
+		void SetBillboardMat(const Math::Matrix4x4& mat) { billboardMatrix_ = mat; }
+		/// <summary>ライトモードの設定</summary>
+		void SetLightEnable(LightMode mode);
+		/// <summary>モデルの設定</summary>
+		void SetModel(const std::string& fileName, bool overWrite = false);
+		/// <summary>ピッキング用にIDの調整</summary>
+		void SetEditorObjParameter();
 
-	// MeshDraw
-	void MeshDraw(Material* mate = nullptr, int drawCount = 1);
+		// MeshDraw
+		void MeshDraw(Material* mate = nullptr, int drawCount = 1);
 
-	Trans transform{};
+		Math::Trans transform{};
 
-private:
+	private:
 
-	void CreateWVP();
+		void CreateWVP();
 
-	void SetWVP();
+		void SetWVP();
 
-	void SetBillboardWVP();
+		void SetBillboardWVP();
 
-	/// <summary>コマンドの生成</summary>
-	void CreatePropertyCommand(int type);
+		/// <summary>コマンドの生成</summary>
+		void CreatePropertyCommand(int type);
 
-	void NodeContentsUpdate();
+		void NodeContentsUpdate();
 
-	void AnalysisNode(const json& j,int index);
+		void AnalysisNode(const json& j, int index);
 
-	void AnalysisValue(const json& j, int index,const std::string& typeName);
+		void AnalysisValue(const json& j, int index, const std::string& typeName);
 
-	/// <summary>テクスチャをNodeから設定</summary>
-	void SetTextureNode();
+		/// <summary>テクスチャをNodeから設定</summary>
+		void SetTextureNode();
 
-private:
-	std::unique_ptr<Model> model_ = nullptr;
-	std::string modelName_;
+	private:
+		std::unique_ptr<Model> model_ = nullptr;
+		std::string modelName_;
 
-	DXCom* dxcommon_;
-	LightManager* lightManager_;
-	Camera* camera_;
+		DXCom* dxcommon_;
+		LightManager* lightManager_;
+		Camera* camera_;
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource_ = nullptr;
-	TransformationMatrix* wvpDate_ = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource_ = nullptr;
+		Math::TransformationMatrix* wvpDate_ = nullptr;
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> cameraPosResource_ = nullptr;
-	CameraForGPU* cameraPosData_ = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12Resource> cameraPosResource_ = nullptr;
+		Math::CameraForGPU* cameraPosData_ = nullptr;
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> objIDDataResource_ = nullptr;
-	ObjIDData* objIDData_ = nullptr;
-	static int useObjID_;
+		Microsoft::WRL::ComPtr<ID3D12Resource> objIDDataResource_ = nullptr;
+		ObjIDData* objIDData_ = nullptr;
+		static int useObjID_;
 
-	Matrix4x4 billboardMatrix_;
-	std::string nowTextureName;
+		Math::Matrix4x4 billboardMatrix_;
+		std::string nowTextureName;
 
-	bool isMaskMode_ = false;
-	bool isUseNodeGraph_ = false;
-	Material maskMateral_;
-	std::vector<NodeContent> nodeContentDeta_;
+		bool isMaskMode_ = false;
+		bool isUseNodeGraph_ = false;
+		Material maskMateral_;
+		std::vector<NodeContent> nodeContentDeta_;
 
-	Vector3 prevPos_;
-	Vector3 prevRotate_;
-	Vector3 prevScale_;
-	int guizmoType_ = 0;
-	float IsUsingGuizmo_ = false;
-	std::string nodeFileName_;
+		Math::Vector3 prevPos_;
+		Math::Vector3 prevRotate_;
+		Math::Vector3 prevScale_;
+		int guizmoType_ = 0;
+		float IsUsingGuizmo_ = false;
+		std::string nodeFileName_;
 #ifdef _DEBUG
-	ax::NodeEditor::EditorContext* nodeEditorContext_ = nullptr;
-	NodeGraph nodeGraph_;
-	ed::NodeId selectorNodeId_;
+		ax::NodeEditor::EditorContext* nodeEditorContext_ = nullptr;
+		Core::NodeGraph nodeGraph_;
+		ed::NodeId selectorNodeId_;
 #endif // _DEBUG
-};
+	};
+}

@@ -4,6 +4,11 @@
 #include <fstream>
 #include <iostream>
 
+using namespace Core;
+using namespace Graphics;
+using namespace Math;
+
+
 void JsonSerializer::ShowSaveTransformPopup(const Trans& transform) {
 #ifdef _DEBUG
 	// Save ボタンを押すとポップアップを開く

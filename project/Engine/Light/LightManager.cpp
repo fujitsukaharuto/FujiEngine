@@ -3,6 +3,9 @@
 
 #include "Engine/DX/DXCom.h"
 
+using namespace Graphics;
+
+
 void LightManager::Initialize(DXCom* pDxcom) {
 	dxcommon_ = pDxcom;
 }

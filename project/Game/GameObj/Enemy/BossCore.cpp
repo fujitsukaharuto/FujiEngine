@@ -2,6 +2,9 @@
 
 #include "Game/GameObj/Enemy/Boss.h"
 
+using namespace Graphics;
+
+
 BossCore::BossCore(Boss* pboss) {
 	pBoss_ = pboss;
 }

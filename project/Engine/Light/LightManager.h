@@ -7,55 +7,57 @@
 
 class DXCom;
 
-/// <summary>
-/// ライト管理クラス
-/// </summary>
-class LightManager {
-public:
-	LightManager() = default;
-	~LightManager() = default;
-
-public:
-
-	void Initialize(DXCom* pDxcom);
-	void Finalize();
-	void Update();
-
+namespace Graphics {
 	/// <summary>
-	/// ライトの作成
+	/// ライト管理クラス
 	/// </summary>
-	void CreateLight();
+	class LightManager {
+	public:
+		LightManager() = default;
+		~LightManager() = default;
 
-	/// <summary>
-	/// ポイントライトの追加
-	/// </summary>
-	void AddPointLight();
+	public:
 
-	/// <summary>
-	/// スポットライトの追加
-	/// </summary>
-	void AddSpotLight();
+		void Initialize(DXCom* pDxcom);
+		void Finalize();
+		void Update();
 
-	/// <summary>
-	/// データをコマンドリストに送る
-	/// </summary>
-	void SetLightCommand(ID3D12GraphicsCommandList* commandList);
+		/// <summary>
+		/// ライトの作成
+		/// </summary>
+		void CreateLight();
 
-	//========================================================================*/
-	//* Getter
-	DirectionLight* GetDirectionLight() { return directionLight_.get(); }
-	PointLight* GetPointLight(int num) { return pointLights_[num].get(); }
-	SpotLight* GetSpotLight(int num) { return spotLights_[num].get(); }
+		/// <summary>
+		/// ポイントライトの追加
+		/// </summary>
+		void AddPointLight();
 
-	void DebugGUI();
+		/// <summary>
+		/// スポットライトの追加
+		/// </summary>
+		void AddSpotLight();
 
-private:
+		/// <summary>
+		/// データをコマンドリストに送る
+		/// </summary>
+		void SetLightCommand(ID3D12GraphicsCommandList* commandList);
 
-private:
+		//========================================================================*/
+		//* Getter
+		DirectionLight* GetDirectionLight() { return directionLight_.get(); }
+		PointLight* GetPointLight(int num) { return pointLights_[num].get(); }
+		SpotLight* GetSpotLight(int num) { return spotLights_[num].get(); }
 
-	DXCom* dxcommon_;
-	std::unique_ptr<DirectionLight> directionLight_;
-	std::vector <std::unique_ptr<PointLight>> pointLights_;
-	std::vector<std::unique_ptr<SpotLight>> spotLights_;
+		void DebugGUI();
 
-};
+	private:
+
+	private:
+
+		DXCom* dxcommon_;
+		std::unique_ptr<DirectionLight> directionLight_;
+		std::vector <std::unique_ptr<PointLight>> pointLights_;
+		std::vector<std::unique_ptr<SpotLight>> spotLights_;
+
+	};
+}

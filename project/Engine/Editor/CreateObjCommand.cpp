@@ -2,6 +2,9 @@
 #include "Engine/Editor/CommandManager.h"
 #include "Engine/Model/Object3d.h"
 
+using namespace Graphics;
+
+
 void CreateObjCommand::Do() {
 	// オブジェクトを作ってListへ
 	obj = std::make_shared<EditorObj>();

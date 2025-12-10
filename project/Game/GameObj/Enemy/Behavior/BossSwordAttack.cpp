@@ -3,6 +3,11 @@
 #include "Game/GameObj/Enemy/Boss.h"
 #include "BossRoot.h"
 
+using namespace Audio;
+using namespace Core;
+using namespace Graphics;
+
+
 BossSwordAttack::BossSwordAttack(Boss* pBoss) : BaseBossBehavior(pBoss) {
 	step_ = Step::ATTACK;
 	coolTime_ = 0.0f;

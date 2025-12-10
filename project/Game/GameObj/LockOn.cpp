@@ -7,6 +7,11 @@
 
 #include <cmath>
 
+using namespace Core;
+using namespace Graphics;
+using namespace Math;
+
+
 void LockOn::Initialize() {
 
 	lockOnMark_ = std::make_unique<Sprite>();

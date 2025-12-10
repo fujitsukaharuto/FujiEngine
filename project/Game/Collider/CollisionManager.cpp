@@ -1,6 +1,9 @@
 #include "CollisionManager.h"
 #include "AABBCollider.h"
 
+using namespace Math;
+
+
 CollisionManager::CollisionManager() {
 }
 

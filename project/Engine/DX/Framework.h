@@ -16,59 +16,61 @@
 #include "Model/Line3dDrawer.h"
 #include "Engine/Editor/CommandManager.h"
 
-/// <summary>
-/// フレームワークのクラス
-/// </summary>
-class Framework {
-public:
-	Framework();
-	virtual ~Framework() = default;
-
-public:
-
-	virtual void Initialize();
-	virtual void Finalize();
-	virtual void Update();
-	virtual void Draw() = 0;
-
+namespace Core {
 	/// <summary>
-	/// 実行終了を知らせる
+	/// フレームワークのクラス
 	/// </summary>
-	virtual bool IsEndRequest() { return endRequest_; }
+	class Framework {
+	public:
+		Framework();
+		virtual ~Framework() = default;
 
-	/// <summary>
-	/// システムの初期化
-	/// </summary>
-	void Init();
+	public:
 
-	/// <summary>
-	/// ゲームループ
-	/// </summary>
-	void Run();
+		virtual void Initialize();
+		virtual void Finalize();
+		virtual void Update();
+		virtual void Draw() = 0;
+
+		/// <summary>
+		/// 実行終了を知らせる
+		/// </summary>
+		virtual bool IsEndRequest() { return endRequest_; }
+
+		/// <summary>
+		/// システムの初期化
+		/// </summary>
+		void Init();
+
+		/// <summary>
+		/// ゲームループ
+		/// </summary>
+		void Run();
 
 
-private:
+	private:
 
 
-protected:
+	protected:
 
-	bool endRequest_ = false;
+		bool endRequest_ = false;
 
-	MyWin* win_ = nullptr;
-	std::unique_ptr<DXCom> dxcommon_ = nullptr;
-	SRVManager* srvManager_ = nullptr;
-	// 汎用
-	Input* input_ = nullptr;
-	AudioPlayer* audioPlayer_ = nullptr;
-	FPSKeeper* fpsKeeper_ = nullptr;
-	std::unique_ptr<AbstractSceneFactory> sceneFactory_ = nullptr;
-	std::unique_ptr<SceneManager> sceneManager_ = nullptr;
-	TextureManager* textureManager_ = nullptr;
-	ModelManager* modelManager_ = nullptr;
-	CameraManager* cameraManager_ = nullptr;
-	ImGuiManager* imguiManager_ = nullptr;
-	std::unique_ptr<LightManager> lightManager_ = nullptr;
-	ParticleManager* pManager_ = nullptr;
-	Line3dDrawer* line3dDrawer_ = nullptr;
-	CommandManager* commandManger_;
-};
+		Core::MyWin* win_ = nullptr;
+		std::unique_ptr<DXCom> dxcommon_ = nullptr;
+		SRVManager* srvManager_ = nullptr;
+		// 汎用
+		Input* input_ = nullptr;
+		Audio::AudioPlayer* audioPlayer_ = nullptr;
+		FPSKeeper* fpsKeeper_ = nullptr;
+		std::unique_ptr<AbstractSceneFactory> sceneFactory_ = nullptr;
+		std::unique_ptr<SceneManager> sceneManager_ = nullptr;
+		Graphics::TextureManager* textureManager_ = nullptr;
+		Graphics::ModelManager* modelManager_ = nullptr;
+		CameraManager* cameraManager_ = nullptr;
+		ImGuiManager* imguiManager_ = nullptr;
+		std::unique_ptr<Graphics::LightManager> lightManager_ = nullptr;
+		ParticleManager* pManager_ = nullptr;
+		Graphics::Line3dDrawer* line3dDrawer_ = nullptr;
+		CommandManager* commandManger_;
+	};
+}

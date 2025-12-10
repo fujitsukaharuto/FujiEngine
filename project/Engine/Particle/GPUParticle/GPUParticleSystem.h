@@ -18,8 +18,8 @@ using Microsoft::WRL::ComPtr;
 /// GPUパーティクル用行列データ
 /// </summary>
 struct PerView {
-	Matrix4x4 viewProjection;
-	Matrix4x4 billboardMatrix;
+	Math::Matrix4x4 viewProjection;
+	Math::Matrix4x4 billboardMatrix;
 };
 
 /// <summary>
@@ -34,8 +34,8 @@ struct PerFrame {
 /// 加速場
 /// </summary>
 struct AcceleFiled {
-	Vector3 Accele;
-	AABB area;
+	Math::Vector3 Accele;
+	Math::AABB area;
 };
 
 enum class PipelinePhase { Texture, Surface, Sphere };
@@ -61,7 +61,7 @@ public:
 
 	void Initialize(DXCom* pDxcom, SRVManager* srvManager);
 	void Finalize();
-	void Update(const Matrix4x4& billboardMatrix);
+	void Update(const Math::Matrix4x4& billboardMatrix);
 	void Draw(const D3D12_VERTEX_BUFFER_VIEW& vbView, const D3D12_INDEX_BUFFER_VIEW& ibView);
 
 	int InitGPUEmitter(int returnMod = 0);
@@ -82,7 +82,7 @@ public:
 private:
 
 	void InitParticleCS();
-	void UpdatePerViewData(const Matrix4x4& billboardMatrix);
+	void UpdatePerViewData(const Math::Matrix4x4& billboardMatrix);
 	void DrawParticleCS(const D3D12_VERTEX_BUFFER_VIEW& vbView, const D3D12_INDEX_BUFFER_VIEW& ibView);
 
 	void UpdateGPUEmitter();
@@ -103,7 +103,7 @@ private:
 	uint32_t particleCSInsstanceCount_;
 	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> particleCSSRVHandle_;
 	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> particleCSUAVHandle_;
-	Material particleCSMaterial_;
+	Graphics::Material particleCSMaterial_;
 	ComPtr<ID3D12Resource> perViewResource_;
 	PerView* perViewData_;
 	ComPtr<ID3D12Resource> perFrameResource_;

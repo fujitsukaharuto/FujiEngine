@@ -3,6 +3,11 @@
 #include "Engine/Particle/ParticleManager.h"
 #include "Engine/Math/Quaternion/Quaternion.h"
 
+using namespace Core;
+using namespace Graphics;
+using namespace Math;
+
+
 PlayerBullet::PlayerBullet() {
 }
 
