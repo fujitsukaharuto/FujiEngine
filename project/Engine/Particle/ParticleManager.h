@@ -58,9 +58,9 @@ public:
 	void SelectEmitterSizeDraw();
 
 	/// <summary>通常パーティクル生成</summary>
-	static void CreateParticleGroup(const std::string& name, const std::string& fileName = "white2x2.png", uint32_t count = 20, ShapeType shape = ShapeType::PLANE, bool subMode = false);
+	static void CreateParticleGroup(const std::string& name, const std::string& fileName = "white2x2.png", uint32_t count = 20, ShapeType shape = ShapeType::PLANE, BlendType blendType = BlendType::ADD);
 	/// <summary>ペアレントパーティクル生成</summary>
-	static void CreateParentParticleGroup(const std::string& name, const std::string& fileName, uint32_t count = 20, ShapeType shape = ShapeType::PLANE);
+	static void CreateParentParticleGroup(const std::string& name, const std::string& fileName = "white2x2.png", uint32_t count = 20, ShapeType shape = ShapeType::PLANE, BlendType blendType = BlendType::ADD);
 	/// <summary>連番のパーティクル生成</summary>
 	static void CreateAnimeGroup(const std::string& name, const std::string& fileName);
 
@@ -94,7 +94,7 @@ public:
 private:
 
 	/// <summary>グループの作成を行う</summary>
-	void InternalCreateParticleGroup(const std::string& name, const std::string& fileName, uint32_t count, ShapeType shape, bool subMode);
+	void InternalCreateParticleGroup(const std::string& name, const std::string& fileName, uint32_t count, ShapeType shape, BlendType blendType, bool isParent = false);
 
 	void UpdateParticleGroup(const Matrix4x4& billboardMatrix);
 	void UpdateParentParticleGroup(const Matrix4x4& billboardMatrix);
@@ -117,6 +117,8 @@ private:
 	void ParticleTexurePopUp();
 	/// <summary>グループのデータを出力</summary>
 	void SaveGroupData();
+	/// <summary>Jsonがあるかチェックあるならそこから作る</summary>
+	void JsonCheckForGroup(const std::string& name, const std::string& fileName, uint32_t count, ShapeType shape, BlendType blendType, bool isParnt = false);
 
 private:
 
@@ -163,6 +165,8 @@ private:
 	std::vector<uint32_t> cylinderIndex_;
 
 	std::unique_ptr<Object3d> lightning_;
+
+	BlendType preType_ = BlendType::ADD;
 
 	// ParticleCS
 	std::unique_ptr<GPUParticleSystem> gpuParticleSystem_;

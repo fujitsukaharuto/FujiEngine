@@ -22,7 +22,7 @@ public:
 	/// <summary>
 	/// 減算合成にするかどうか
 	/// </summary>
-	void SetIsSubMode(bool is) { isSubMode_ = is; }
+	void SetBlendType(BlendType type) { type_ = type; }
 
 private:
 
@@ -32,6 +32,6 @@ private:
 
 private:
 
-	bool isSubMode_ = false;
+	BlendType type_ = BlendType::ADD;
 
 };

@@ -228,6 +228,7 @@ private:
 	ParticleEmitter* avoidEmitter1_{};
 	ParticleEmitter* avoidEmitter2_{};
 	ParticleEmitter* avoidEmitter3_{};
+	ParticleEmitter* avoidEmitter4_{};
 
 	ParticleEmitter* storongStateEmitter1_{};
 	ParticleEmitter storongStateEmitter2_{};

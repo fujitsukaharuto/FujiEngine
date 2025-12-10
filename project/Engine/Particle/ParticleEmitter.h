@@ -83,7 +83,7 @@ public:
 	/// <summary>アニメーションモデルにペアレントする設定</summary>
 	void SetAnimParent(Matrix4x4* parent) { animParent_ = parent; }
 	void SetIsUpdatedMatrix(bool is) { isUpDatedMatrix_ = is; }
-
+	
 	//========================================================================*/
 	//* Getter
 	Vector3 GetWorldPos();

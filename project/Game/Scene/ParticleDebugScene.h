@@ -26,6 +26,7 @@ private:
 
 	std::unique_ptr<Object3dCommon> obj3dCommon = nullptr;
 	std::unique_ptr<SkyBox> skybox_;
+	std::unique_ptr<AnimationModel> terrain_ = nullptr;
 
 	// sceneChange
 	std::unique_ptr<Sprite> black_;

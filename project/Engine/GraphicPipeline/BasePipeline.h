@@ -10,6 +10,18 @@
 
 using namespace Microsoft::WRL;
 
+/// <summary>
+/// 合成モード
+/// </summary>
+enum class BlendType {
+	ALPHA,
+	ADD,
+	SUBTRACT,
+	SCREEN,
+	MULTIPLY,
+	SOFT_ADD,
+	PREMULTIPLIED_ALPHA
+};
 
 class DXCom;
 

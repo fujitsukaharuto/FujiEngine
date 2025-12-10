@@ -160,7 +160,7 @@ bool IParticleGroup::InitEmitParticle(Particle& particle, const Vector3& pos, co
 		particle.rotateType_ = grain.rotateType_;
 		particle.isContinuouslyRotate_ = grain.isContinuouslyRotate_;
 		if (particle.isContinuouslyRotate_) {
-			particle.continuouslyR_ += Random::GetVector3({ -0.02f,0.02f }, { -0.02f,0.02f }, { -0.02f,0.02f });
+			particle.continuouslyR_ = Random::GetVector3({ -0.02f,0.02f }, { -0.02f,0.02f }, { -0.02f,0.02f });
 		}
 		Vector3 veloSpeed = particle.speed_.Normalize();
 		Vector3 cameraR{};

@@ -112,28 +112,12 @@ void ParticleManager::Draw() {
 
 	dxcommon_->GetDXCommand()->SetViewAndscissor();
 	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::particle);
+	preType_ = BlendType::ADD;
 	dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vbView);
 	dxcommon_->GetCommandList()->IASetIndexBuffer(&ibView);
 	DrawParticleGroup();
 	DrawParentParticleGroup();
-
-	dxcommon_->GetDXCommand()->SetViewAndscissor();
-	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::particleSub);
-	dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vbView);
-	dxcommon_->GetCommandList()->IASetIndexBuffer(&ibView);
-	for (auto& groupPair : particleGroups_) {
-		ParticleGroup* group = groupPair.second.get();
-		if (!group->isSubMode_) continue;
-		if (group->drawCount_ == 0) continue;
-
-		ShapeTypeCommand(group->shapeType_);
-		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group->srvIndex_));
-		dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, group->material_.GetMaterialResource()->GetGPUVirtualAddress());
-		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, group->material_.GetTexture()->gpuHandle);
-		ShapeTypeDrawCommand(group->shapeType_, group->drawCount_);
-	}
 }
 
 void ParticleManager::ParticleDebugGUI() {
@@ -165,6 +149,9 @@ void ParticleManager::ParticleDebugGUI() {
 		ImGui::DragInt("maxCount", &maxCount, 1, 1, 3000);
 		selectParticleGroup_->insstanceCount_ = static_cast<uint32_t>(maxCount);
 		ImGui::Text("count : %d", int(selectParticleGroup_->drawCount_));
+		int blendType = static_cast<int>(selectParticleGroup_->type_);
+		ImGui::Combo("BlendType##blendtype", &blendType, "Alpha\0Add\0Subtract\0Screen\0Multiply\0SoftAdd\0PreMulAlpha\0");
+		selectParticleGroup_->type_ = static_cast<BlendType>(blendType);
 		if (ImGui::Button("SaveGroup")) {
 			SaveGroupData();
 		}
@@ -233,78 +220,24 @@ void ParticleManager::SelectEmitterSizeDraw() {
 #endif // _DEBUG
 }
 
-void ParticleManager::CreateParticleGroup(const std::string& name, const std::string& fileName, uint32_t count, ShapeType shape, bool subMode) {
+void ParticleManager::CreateParticleGroup(const std::string& name, const std::string& fileName, uint32_t count, ShapeType shape, BlendType blendType) {
 	ParticleManager* instance = GetInstance();
 	auto iterator = instance->particleGroups_.find(name);
 	if (iterator != instance->particleGroups_.end()) {
 		return;
 	}
 
-	std::string path = "resource/ParticleGroups/" + name + ".json";
-
-	// JSON があるかチェック
-	if (std::filesystem::exists(path)) {
-		// JSON を読み込んでパラメータを設定
-		json data = JsonSerializer::DeserializeJsonData(path.c_str());
-
-		// パラメータ取得
-		std::string texName = data["texName"];
-		uint32_t maxCount = data["count"];
-		ShapeType shapeType = static_cast<ShapeType>(data["Shape"].get<int>());
-		bool isSubMode = data["subMode"];
-
-		instance->InternalCreateParticleGroup(name, texName, maxCount, shapeType, isSubMode);
-	} else {
-		instance->InternalCreateParticleGroup(name, fileName, count, shape, subMode);
-
-		json data{};
-		data["name"] = name;
-		data["texName"] = fileName;
-		data["count"] = count;
-		data["Shape"] = static_cast<int>(shape);
-		data["subMode"] = subMode;
-		JsonSerializer::SerializeJsonData(data, path.c_str());
-	}
+	instance->JsonCheckForGroup(name, fileName, count, shape, blendType);
 }
 
-void ParticleManager::CreateParentParticleGroup(const std::string& name, const std::string& fileName, uint32_t count, ShapeType shape) {
+void ParticleManager::CreateParentParticleGroup(const std::string& name, const std::string& fileName, uint32_t count, ShapeType shape, BlendType blendType) {
 	ParticleManager* instance = GetInstance();
 	auto iterator = instance->parentParticleGroups_.find(name);
 	if (iterator != instance->parentParticleGroups_.end()) {
 		return;
 	}
 
-	auto newGroup = std::make_unique<ParentParticleGroup>();
-	newGroup->emitter_ = std::make_unique<ParticleEmitter>();
-	newGroup->shapeType_ = shape;
-	newGroup->emitter_->name_ = name;
-	newGroup->emitter_->Load(name);
-
-	newGroup->insstanceCount_ = count;
-	newGroup->instancing_ = instance->dxcommon_->CreateBufferResource(instance->dxcommon_->GetDevice(), (sizeof(TransformationParticleMatrix) * newGroup->insstanceCount_));
-	newGroup->instancing_->Map(0, nullptr, reinterpret_cast<void**>(&newGroup->instancingData_));
-	uint32_t max = newGroup->insstanceCount_;
-	for (uint32_t index = 0; index < max; ++index) {
-		newGroup->instancingData_[index].WVP = MakeIdentity4x4();
-		newGroup->instancingData_[index].World = MakeIdentity4x4();
-	}
-	newGroup->material_.SetTextureNamePath(fileName);
-	newGroup->material_.CreateMaterial();
-	newGroup->srvIndex_ = instance->srvManager_->Allocate();
-	instance->srvManager_->CreateStructuredSRV(newGroup->srvIndex_, newGroup->instancing_.Get(), newGroup->insstanceCount_, sizeof(TransformationParticleMatrix));
-
-	//ここでパーティクルをあらかじめ作る
-	float add = 0.1f;
-	for (int i = 0; i < int(max); i++) {
-		Particle p{};
-		p.scale = { 1.0f,1.0f,1.0f };
-		p.translate.x += add;
-		p.translate.y += add;
-		newGroup->particles_.push_back(p);
-		add += 0.1f;
-	}
-
-	instance->parentParticleGroups_.emplace(name, std::move(newGroup));
+	instance->JsonCheckForGroup(name, fileName, count, shape, blendType, true);
 }
 
 void ParticleManager::CreateAnimeGroup(const std::string& name, const std::string& fileName) {
@@ -540,46 +473,85 @@ int ParticleManager::InitGPUEmitterSurface(const std::string& fileName) {
 	return gpuParticleSystem_->InitGPUEmitterSurface(fileName);
 }
 
-void ParticleManager::InternalCreateParticleGroup(const std::string& name, const std::string& fileName, uint32_t count, ShapeType shape, bool subMode) {
-	auto iterator = particleGroups_.find(name);
-	if (iterator != particleGroups_.end()) {
-		return;
+void ParticleManager::InternalCreateParticleGroup(const std::string& name, const std::string& fileName, uint32_t count, ShapeType shape, BlendType blendType, bool isParent) {
+	if (isParent) {
+		auto iterator = parentParticleGroups_.find(name);
+		if (iterator != parentParticleGroups_.end()) {
+			return;
+		}
+
+		auto newGroup = std::make_unique<ParentParticleGroup>();
+		newGroup->emitter_ = std::make_unique<ParticleEmitter>();
+		newGroup->shapeType_ = shape;
+		newGroup->emitter_->name_ = name;
+		newGroup->emitter_->Load(name);
+
+		newGroup->insstanceCount_ = count;
+		newGroup->instancing_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), (sizeof(TransformationParticleMatrix) * newGroup->insstanceCount_));
+		newGroup->instancing_->Map(0, nullptr, reinterpret_cast<void**>(&newGroup->instancingData_));
+		uint32_t max = newGroup->insstanceCount_;
+		for (uint32_t index = 0; index < max; ++index) {
+			newGroup->instancingData_[index].WVP = MakeIdentity4x4();
+			newGroup->instancingData_[index].World = MakeIdentity4x4();
+		}
+		newGroup->material_.SetTextureNamePath(fileName);
+		newGroup->material_.CreateMaterial();
+		newGroup->srvIndex_ = srvManager_->Allocate();
+		srvManager_->CreateStructuredSRV(newGroup->srvIndex_, newGroup->instancing_.Get(), newGroup->insstanceCount_, sizeof(TransformationParticleMatrix));
+
+		//ここでパーティクルをあらかじめ作る
+		float add = 0.1f;
+		for (int i = 0; i < int(max); i++) {
+			Particle p{};
+			p.scale = { 1.0f,1.0f,1.0f };
+			p.translate.x += add;
+			p.translate.y += add;
+			newGroup->particles_.push_back(p);
+			add += 0.1f;
+		}
+
+		parentParticleGroups_.emplace(name, std::move(newGroup));
+	} else {
+		auto iterator = particleGroups_.find(name);
+		if (iterator != particleGroups_.end()) {
+			return;
+		}
+
+		auto newGroup = std::make_unique<ParticleGroup>();
+		newGroup->type_ = blendType;
+		newGroup->shapeType_ = shape;
+		newGroup->emitter_.name_ = name;
+		newGroup->emitter_.Load(name);
+
+		newGroup->insstanceCount_ = count;
+		newGroup->instancing_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(),
+			sizeof(TransformationParticleMatrix) * newGroup->insstanceCount_);
+		newGroup->instancing_->Map(0, nullptr, reinterpret_cast<void**>(&newGroup->instancingData_));
+
+		for (uint32_t index = 0; index < count; ++index) {
+			newGroup->instancingData_[index].WVP = MakeIdentity4x4();
+			newGroup->instancingData_[index].World = MakeIdentity4x4();
+		}
+
+		newGroup->material_.SetTextureNamePath(fileName);
+		newGroup->material_.CreateMaterial();
+		newGroup->srvIndex_ = srvManager_->Allocate();
+		srvManager_->CreateStructuredSRV(newGroup->srvIndex_, newGroup->instancing_.Get(),
+			newGroup->insstanceCount_, sizeof(TransformationParticleMatrix));
+
+		// 仮の粒子を入れる（デバッグ用途）
+		float add = 0.1f;
+		for (uint32_t i = 0; i < count; ++i) {
+			Particle p{};
+			p.scale = { 1.0f,1.0f,1.0f };
+			p.translate.x += add;
+			p.translate.y += add;
+			newGroup->particles_.push_back(p);
+			add += 0.1f;
+		}
+
+		particleGroups_.insert(std::make_pair(name, std::move(newGroup)));
 	}
-
-	ParticleGroup* newGroup = new ParticleGroup();
-	newGroup->isSubMode_ = subMode;
-	newGroup->shapeType_ = shape;
-	newGroup->emitter_.name_ = name;
-	newGroup->emitter_.Load(name);
-
-	newGroup->insstanceCount_ = count;
-	newGroup->instancing_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(),
-		sizeof(TransformationParticleMatrix) * newGroup->insstanceCount_);
-	newGroup->instancing_->Map(0, nullptr, reinterpret_cast<void**>(&newGroup->instancingData_));
-
-	for (uint32_t index = 0; index < count; ++index) {
-		newGroup->instancingData_[index].WVP = MakeIdentity4x4();
-		newGroup->instancingData_[index].World = MakeIdentity4x4();
-	}
-
-	newGroup->material_.SetTextureNamePath(fileName);
-	newGroup->material_.CreateMaterial();
-	newGroup->srvIndex_ = srvManager_->Allocate();
-	srvManager_->CreateStructuredSRV(newGroup->srvIndex_, newGroup->instancing_.Get(),
-		newGroup->insstanceCount_, sizeof(TransformationParticleMatrix));
-
-	// 仮の粒子を入れる（デバッグ用途）
-	float add = 0.1f;
-	for (uint32_t i = 0; i < count; ++i) {
-		Particle p{};
-		p.scale = { 1.0f,1.0f,1.0f };
-		p.translate.x += add;
-		p.translate.y += add;
-		newGroup->particles_.push_back(p);
-		add += 0.1f;
-	}
-
-	particleGroups_.insert(std::make_pair(name, newGroup));
 }
 
 void ParticleManager::UpdateParticleGroup(const Matrix4x4& billboardMatrix) {
@@ -646,21 +618,78 @@ void ParticleManager::UpdateAnimeGroup(const Matrix4x4& billboardMatrix) {
 void ParticleManager::DrawParticleGroup() {
 	for (auto& groupPair : particleGroups_) {
 		ParticleGroup* group = groupPair.second.get();
-		if (group->isSubMode_) continue;
 		if (group->drawCount_ == 0) continue;
 		if (group->shapeType_ == ShapeType::LIGHTNING) continue;
+		if (preType_ != group->type_) {
+			switch (group->type_) {
+			case BlendType::ALPHA:
+				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::particleAlpha);
+				break;
+			case BlendType::ADD:
+				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::particle);
+				break;
+			case BlendType::SUBTRACT:
+				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::particleSub);
+				break;
+			case BlendType::SCREEN:
+				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::particleScreen);
+				break;
+			case BlendType::MULTIPLY:
+				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::particleMultiply);
+				break;
+			case BlendType::SOFT_ADD:
+				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::particleSoftAdd);
+				break;
+			case BlendType::PREMULTIPLIED_ALPHA:
+				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::particlePreMulAlpha);
+				break;
+			default:
+				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::particle);
+				break;
+			}
+		}
 
 		ShapeTypeCommand(group->shapeType_);
 		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group->srvIndex_));
 		dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, group->material_.GetMaterialResource()->GetGPUVirtualAddress());
 		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, group->material_.GetTexture()->gpuHandle);
 		ShapeTypeDrawCommand(group->shapeType_, group->drawCount_);
+
+		preType_ = group->type_;
 	}
+
+
 	for (auto& groupPair : particleGroups_) {
 		ParticleGroup* group = groupPair.second.get();
-		if (group->isSubMode_) continue;
 		if (group->drawCount_ == 0) continue;
 		if (group->shapeType_ != ShapeType::LIGHTNING) continue;
+		if (preType_ != group->type_) {
+			switch (group->type_) {
+			case BlendType::ALPHA:
+				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::particleAlpha);
+				break;
+			case BlendType::ADD:
+				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::particle);
+				break;
+			case BlendType::SUBTRACT:
+				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::particleSub);
+				break;
+			case BlendType::SCREEN:
+				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::particleScreen);
+				break;
+			case BlendType::MULTIPLY:
+				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::particleMultiply);
+				break;
+			case BlendType::SOFT_ADD:
+				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::particleSoftAdd);
+				break;
+			case BlendType::PREMULTIPLIED_ALPHA:
+				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::particlePreMulAlpha);
+				break;
+			default:
+				break;
+			}
+		}
 
 		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group->srvIndex_));
 		lightning_->MeshDraw(&group->material_, group->drawCount_);
@@ -669,6 +698,8 @@ void ParticleManager::DrawParticleGroup() {
 			dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vbView);
 			dxcommon_->GetCommandList()->IASetIndexBuffer(&ibView);
 		}
+
+		preType_ = group->type_;
 	}
 }
 
@@ -1033,4 +1064,32 @@ void ParticleManager::SaveGroupData() {
 	data["subMode"] = selectParticleGroup_->isSubMode_;
 	JsonSerializer::SerializeJsonData(data, ("resource/ParticleGroups/" + currentKey_ + ".json").c_str());
 #endif // _DEBUG
+}
+
+void ParticleManager::JsonCheckForGroup(const std::string& name, const std::string& fileName, uint32_t count, ShapeType shape, BlendType blendType, bool isParnt) {
+	std::string path = "resource/ParticleGroups/" + name + ".json";
+
+	// JSON があるかチェック
+	if (std::filesystem::exists(path)) {
+		// JSON を読み込んでパラメータを設定
+		json data = JsonSerializer::DeserializeJsonData(path.c_str());
+
+		// パラメータ取得
+		std::string texName = data["texName"];
+		uint32_t maxCount = data["count"];
+		ShapeType shapeType = static_cast<ShapeType>(data["Shape"].get<int>());
+		BlendType type = static_cast<BlendType>(data.value("blendType", 1));
+
+		InternalCreateParticleGroup(name, texName, maxCount, shapeType, type, isParnt);
+	} else {
+		InternalCreateParticleGroup(name, fileName, count, shape, blendType, isParnt);
+		
+		json data{};
+		data["name"] = name;
+		data["texName"] = fileName;
+		data["count"] = count;
+		data["Shape"] = static_cast<int>(shape);
+		data["blendType"] = blendType;
+		JsonSerializer::SerializeJsonData(data, path.c_str());
+	}
 }

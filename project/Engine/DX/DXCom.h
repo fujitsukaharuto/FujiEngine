@@ -42,26 +42,6 @@ struct D3DResourceLeakChecker {
 
 
 /// <summary>
-/// ブレンドモード
-/// </summary>
-enum class BlendMode {
-	// ブレンド無し
-	kBlendModeNone,
-	// 通常αブレンド
-	kBlendModeNormal,
-	// 加算
-	kBlendModeAdd,
-	// 現在
-	kBlendModeSubtract,
-	// 乗算
-	kBlendModeMultiply,
-	// スクリーン
-	kBlendModeScreen,
-};
-
-
-
-/// <summary>
 /// DXComクラス
 /// </summary>
 class DXCom {

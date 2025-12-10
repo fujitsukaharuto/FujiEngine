@@ -114,7 +114,7 @@ void Arrow::InitParameter() {
 void Arrow::InitArrow(const Vector3& pos, float emitTime) {
 	model_->transform.translate = pos;
 	model_->transform.rotate = Vector3::GetZeroVec();
-	model_->transform.rotate.x = -1.565f;
+	model_->transform.rotate.x = -std::numbers::pi_v<float> * 0.5f;
 
 	animationTime_ = totalAnimationTime_;
 	emitTime_ = emitTime;
@@ -226,7 +226,7 @@ void Arrow::RodUpdate() {
 void Arrow::InitRod(const Vector3& pos, float time) {
 	model_->transform.translate = pos;
 	model_->transform.rotate = Vector3::GetZeroVec();
-	model_->transform.rotate.x = 1.565f;
+	model_->transform.rotate.x = std::numbers::pi_v<float> * 0.5f;;
 
 	flyTime_ = time;
 	fallTime_ = maxFallTime_;
@@ -281,7 +281,7 @@ void Arrow::BrokeTimeUpdate() {
 			if (isLightNing_) {
 				spark1_.pos_ = model_->transform.translate;
 				spark1_.pos_.y += 40.0f;
-				spark1_.particleRotate_.y = Random::GetFloat(-3.14f, 3.14f);
+				spark1_.particleRotate_.y = Random::GetFloat(-std::numbers::pi_v<float>, std::numbers::pi_v<float>);
 
 				spark1_.Emit();
 				isLightNing_ = false;

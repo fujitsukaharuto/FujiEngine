@@ -67,7 +67,12 @@ void PipelineManager::CreatePipeline() {
 	std::unique_ptr<SpritePipe> spritePipe = nullptr;
 	std::unique_ptr<Line3dPipe> lLine = nullptr;
 	std::unique_ptr<ParticlePipeline> particlePipline = nullptr;
+	std::unique_ptr<ParticlePipeline> particlePiplineAlpha = nullptr;
 	std::unique_ptr<ParticlePipeline> particlePiplineSub = nullptr;
+	std::unique_ptr<ParticlePipeline> particlePiplineScr = nullptr;
+	std::unique_ptr<ParticlePipeline> particlePiplineMul = nullptr;
+	std::unique_ptr<ParticlePipeline> particlePiplineSoftAdd = nullptr;
+	std::unique_ptr<ParticlePipeline> particlePiplinePreMulAlpha = nullptr;
 	std::unique_ptr<ParticleCSPipe> particleCSPipe = nullptr;
 	std::unique_ptr<AnimationPipeline> animationPipline = nullptr;
 	std::unique_ptr<SkyboxPipe> skyboxPipline = nullptr;
@@ -138,11 +143,36 @@ void PipelineManager::CreatePipeline() {
 	particlePipline->Initialize(dxcommon_);
 	pipelines_.push_back(std::move(particlePipline));
 
+	particlePiplineAlpha.reset(new ParticlePipeline());
+	particlePiplineAlpha->SetBlendType(BlendType::ALPHA);
+	particlePiplineAlpha->Initialize(dxcommon_);
+	pipelines_.push_back(std::move(particlePiplineAlpha));
 
 	particlePiplineSub.reset(new ParticlePipeline());
-	particlePiplineSub->SetIsSubMode(true);
+	particlePiplineSub->SetBlendType(BlendType::SUBTRACT);
 	particlePiplineSub->Initialize(dxcommon_);
 	pipelines_.push_back(std::move(particlePiplineSub));
+
+	particlePiplineScr.reset(new ParticlePipeline());
+	particlePiplineScr->SetBlendType(BlendType::SCREEN);
+	particlePiplineScr->Initialize(dxcommon_);
+	pipelines_.push_back(std::move(particlePiplineScr));
+
+	particlePiplineMul.reset(new ParticlePipeline());
+	particlePiplineMul->SetBlendType(BlendType::MULTIPLY);
+	particlePiplineMul->Initialize(dxcommon_);
+	pipelines_.push_back(std::move(particlePiplineMul));
+
+	particlePiplineSoftAdd.reset(new ParticlePipeline());
+	particlePiplineSoftAdd->SetBlendType(BlendType::SOFT_ADD);
+	particlePiplineSoftAdd->Initialize(dxcommon_);
+	pipelines_.push_back(std::move(particlePiplineSoftAdd));
+
+	particlePiplinePreMulAlpha.reset(new ParticlePipeline());
+	particlePiplinePreMulAlpha->SetBlendType(BlendType::PREMULTIPLIED_ALPHA);
+	particlePiplinePreMulAlpha->Initialize(dxcommon_);
+	pipelines_.push_back(std::move(particlePiplinePreMulAlpha));
+
 
 	particleCSPipe.reset(new ParticleCSPipe());
 	particleCSPipe->Initialize(dxcommon_);

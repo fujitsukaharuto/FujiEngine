@@ -492,6 +492,9 @@ void Player::Fall(float& speed) {
 ///= Avoid ====================================================================*/
 void Player::Avoid([[maybe_unused]]float& avoidTime) {
 	if (avoidTime < 30.0f) {
+		if (avoidTime == 0.0f) {
+			avoidEmitter4_->Emit();
+		}
 		avoidTime += FPSKeeper::DeltaTime();
 		if (avoidTime >= 30.0f) {
 			avoidTime = 30.0f;
@@ -707,9 +710,11 @@ void Player::ParticleEmitterSetting() {
 	ParticleManager::LoadParentGroup(avoidEmitter1_, "playerAvoid1");
 	ParticleManager::LoadParentGroup(avoidEmitter2_, "playerAvoid2");
 	ParticleManager::LoadParentGroup(avoidEmitter3_, "playerAvoid3");
+	ParticleManager::LoadParentGroup(avoidEmitter4_, "playerAvoid4");
 	avoidEmitter1_->SetParent(&model_->transform);
 	avoidEmitter2_->SetParent(&model_->transform);
 	avoidEmitter3_->SetParent(&model_->transform);
+	avoidEmitter4_->SetParent(&model_->transform);
 	avoidEmitter1_->frequencyTime_ = 0.0f;
 	avoidEmitter2_->frequencyTime_ = 0.0f;
 	avoidEmitter3_->frequencyTime_ = 0.0f;

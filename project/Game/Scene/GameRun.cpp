@@ -85,6 +85,8 @@ void GameRun::Initialize() {
 	pManager_->CreateParticleGroup("playerAvoid2", "redCircle.png", 100);
 	pManager_->CreateParticleGroup("playerAvoid3", "redCircle.png", 100);
 
+	pManager_->CreateParticleGroup("playerAvoid4");
+
 	pManager_->CreateParticleGroup("playerStrongState1", "beamCore.png", 100, ShapeType::CYLINDER);
 	pManager_->CreateParticleGroup("playerStrongState2", "redCircle.png", 100);
 
@@ -167,6 +169,7 @@ void GameRun::Initialize() {
 	pManager_->CreateParentParticleGroup("playerAvoid1", "redCircle.png", 100);
 	pManager_->CreateParentParticleGroup("playerAvoid2", "redCircle.png", 100);
 	pManager_->CreateParentParticleGroup("playerAvoid3", "redCircle.png", 100);
+	pManager_->CreateParentParticleGroup("playerAvoid4");
 
 	pManager_->CreateParentParticleGroup("playerStrongState1", "beamCore.png", 100, ShapeType::CYLINDER);
 	pManager_->CreateParentParticleGroup("playerStrongState2", "redCircle.png", 100);
