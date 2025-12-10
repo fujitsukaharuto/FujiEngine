@@ -53,7 +53,7 @@ void ImGuiManager::Initialize([[maybe_unused]] MyWin* myWin, [[maybe_unused]] DX
 
 	ImFontConfig font_config;
 	font_config.SizePixels = 18.0f;
-	font_japanese = io.Fonts->AddFontFromFileTTF("externals/imgui/NotoSansJP-Regular.ttf", 18.0f, &font_config, io.Fonts->GetGlyphRangesJapanese());
+	font_japanese = io.Fonts->AddFontFromFileTTF("externals/imgui/MPLUS1p-Medium.ttf", 18.0f, &font_config, io.Fonts->GetGlyphRangesJapanese());
 
 
 	ImGui_ImplWin32_Init(myWin->GetHwnd());

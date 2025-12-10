@@ -295,6 +295,8 @@ void GameRun::Draw() {
 
 void GameRun::DebugGUI() {
 #ifdef _DEBUG
+	imguiManager_->SetFontJapanese();
+
 	dxcommon_->OffscreenDebugGUI();
 	sceneManager_->ParticleGroupDebugGUI();
 	
@@ -334,6 +336,9 @@ void GameRun::DebugGUI() {
 	ParticleManager::GetInstance()->ParticleCSDebugGUI();
 	ImGui::Text("%d", modelManager_->GetPickedID());
 	ImGui::Text("%d,%d", modelManager_->GetPickedCoord(0), modelManager_->GetPickedCoord(1));
+
 	ImGui::End();
+
+	imguiManager_->UnSetFont();
 #endif // _DEBUG
 }

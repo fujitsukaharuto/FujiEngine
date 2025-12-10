@@ -145,16 +145,16 @@ void ParticleManager::ParticleDebugGUI() {
 	}
 	if (selectParticleGroup_) {
 		int shapeType = static_cast<int>(selectParticleGroup_->shapeType_);
-		ImGui::Combo("ShapeType##type", &shapeType, "Plane\0Ring\0sphere\0Torus\0Cylinder\0Cone\0Triangle\0Box\0Lightning\0");
+		ImGui::Combo("形状##type", &shapeType, "平面\0リング\0球\0トーラス\0円柱\0コーン\0三角形\0キューブ\0雷\0");
 		selectParticleGroup_->shapeType_ = static_cast<ShapeType>(shapeType);
 		ImGui::Image((ImTextureID)TextureManager::GetInstance()->GetTexture(selectParticleGroup_->material_.GetPathName().c_str())->gpuHandle.ptr, { 100,100 });
 		ParticleTexurePopUp();
 		int maxCount = static_cast<uint32_t>(selectParticleGroup_->insstanceCount_);
-		ImGui::DragInt("maxCount", &maxCount, 1, 1, 3000);
+		ImGui::DragInt("最大パーティクル数", &maxCount, 1, 1, 3000);
 		selectParticleGroup_->insstanceCount_ = static_cast<uint32_t>(maxCount);
-		ImGui::Text("count : %d", int(selectParticleGroup_->drawCount_));
+		ImGui::Text("生存数 : %d", int(selectParticleGroup_->drawCount_));
 		int blendType = static_cast<int>(selectParticleGroup_->type_);
-		ImGui::Combo("BlendType##blendtype", &blendType, "Alpha\0Add\0Subtract\0Screen\0Multiply\0SoftAdd\0PreMulAlpha\0");
+		ImGui::Combo("BlendType##blendtype", &blendType, "アルファ\0加算合成\0減算合成\0スクリーン\0乗算合成\0ソフト加算\0プリマルチプライド\0");
 		selectParticleGroup_->type_ = static_cast<BlendType>(blendType);
 		if (ImGui::Button("SaveGroup")) {
 			SaveGroupData();

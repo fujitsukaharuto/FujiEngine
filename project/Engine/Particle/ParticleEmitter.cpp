@@ -20,26 +20,26 @@ void ParticleEmitter::DebugGUI() {
 #ifdef _DEBUG
 	if (ImGui::CollapsingHeader(name_.c_str())) {
 		ImGui::Indent();
-		if (ImGui::CollapsingHeader("Emitter")) {
+		if (ImGui::CollapsingHeader("エミッター情報")) {
 			ImGui::Indent();
 
-			ImGui::DragFloat3("Pos", &pos_.x, 0.01f);
+			ImGui::DragFloat3("中心", &pos_.x, 0.01f);
 			int im_Count = int(count_);
-			ImGui::DragInt("Count", &im_Count, 1, 0, 10);
+			ImGui::DragInt("発生数", &im_Count, 1, 0, 10);
 			count_ = uint32_t(im_Count);
-			ImGui::DragFloat("FrenquencyTime", &frequencyTime_, 0.1f, 1.0f, 600.0f);
-			ImGui::DragFloat("LifeTime", &grain_.lifeTime_, 0.1f);
-			ImGui::SeparatorText("EmitterSize");
-			ImGui::DragFloat3("EmitSizeMax", &emitSizeMax_.x, 0.01f);
-			ImGui::DragFloat3("EmitSizeMin", &emitSizeMin_.x, 0.01f);
+			ImGui::DragFloat("発生間隔", &frequencyTime_, 0.1f, 1.0f, 600.0f);
+			ImGui::DragFloat("寿命", &grain_.lifeTime_, 0.1f);
+			ImGui::SeparatorText("エミッターサイズ");
+			ImGui::DragFloat3("範囲 最大座標", &emitSizeMax_.x, 0.01f);
+			ImGui::DragFloat3("範囲 最小座標", &emitSizeMin_.x, 0.01f);
 
 			ImGui::Unindent();
 		}
 
-		if (ImGui::CollapsingHeader("Particle")) {
+		if (ImGui::CollapsingHeader("パーティクル情報")) {
 			ImGui::Indent();
 			ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Selected;
-			if (ImGui::TreeNodeEx("Color", flags)) {
+			if (ImGui::TreeNodeEx("色", flags)) {
 				ImGui::Combo("ColorType##type", &grain_.colorType_, "kDefault\0kRandom\0");
 				ImGui::Separator();
 				if (grain_.colorType_ != static_cast<int>(ColorType::kRandom)) {
@@ -59,58 +59,58 @@ void ParticleEmitter::DebugGUI() {
 				ImGui::TreePop();
 			}
 
-			if (ImGui::TreeNodeEx("Size", flags)) {
-				ImGui::Combo("SizeType##type", &grain_.type_, "kNormal\0kShift\0kSin\0");
+			if (ImGui::TreeNodeEx("サイズ", flags)) {
+				ImGui::Combo("サイズ変化タイプ##type", &grain_.type_, "一定\0補間\0Sin波\0");
 				ImGui::Separator();
 				if (grain_.type_ == static_cast<int>(SizeType::kNormal)) {
-					ImGui::DragFloat2("Size", &grain_.startSize_.x, 0.01f);
+					ImGui::DragFloat2("サイズ", &grain_.startSize_.x, 0.01f);
 				} else {
-					ImGui::DragFloat2("StartSize", &grain_.startSize_.x, 0.01f);
-					ImGui::DragFloat2("EndSize", &grain_.endSize_.x, 0.01f);
-					ImGui::Checkbox("isZandX", &grain_.isZandX_);
+					ImGui::DragFloat2("初期サイズ", &grain_.startSize_.x, 0.01f);
+					ImGui::DragFloat2("終了サイズ", &grain_.endSize_.x, 0.01f);
+					ImGui::Checkbox("X,Z軸連携", &grain_.isZandX_);
 				}
-				ImGui::Checkbox("AddRandomSize", &isAddRandomSize_);
+				ImGui::Checkbox("サイズにランダム幅を追加", &isAddRandomSize_);
 				if (isAddRandomSize_) {
-					ImGui::DragFloat2("AddSizeMax", &addRandomMax_.x, 0.01f);
-					ImGui::DragFloat2("AddSizeMin", &addRandomMin_.x, 0.01f);
+					ImGui::DragFloat2("ランダム幅 最大", &addRandomMax_.x, 0.01f);
+					ImGui::DragFloat2("ランダム幅 最小", &addRandomMin_.x, 0.01f);
 				}
 				ImGui::TreePop();
 			}
 
-			if (ImGui::TreeNodeEx("Rotate", flags)) {
-				ImGui::Combo("RotateType##type", &grain_.rotateType_, "kUsually\0kVelocityR\0kRandomR\0");
+			if (ImGui::TreeNodeEx("回転", flags)) {
+				ImGui::Combo("回転タイプ##type", &grain_.rotateType_, "通常\0速度方向\0ランダム\0");
 				ImGui::Separator();
-				ImGui::DragFloat3("Rotate", &particleRotate_.x, 0.01f);
-				if (grain_.rotateType_ == static_cast<int>(RotateType::kRandomR)) {
-					ImGui::Checkbox("ContinuouslyRotate", &grain_.isContinuouslyRotate_);
-				}
-				ImGui::SeparatorText("BillBoard");
-				ImGui::Checkbox("BillBoard", &grain_.isBillBoard_);
+				ImGui::DragFloat3("回転角", &particleRotate_.x, 0.01f);
+
+				ImGui::Checkbox("継続回転有効化", &grain_.isContinuouslyRotate_);
+
+				ImGui::SeparatorText("ビルボード");
+				ImGui::Checkbox("ビルボード有効化", &grain_.isBillBoard_);
 				if (grain_.isBillBoard_) {
 					int billPattern = static_cast<int>(grain_.pattern_);
 					ImGui::RadioButton("XYZ", &billPattern, 0); ImGui::SameLine();
-					ImGui::RadioButton("X", &billPattern, 1); ImGui::SameLine();
-					ImGui::RadioButton("Y", &billPattern, 2); ImGui::SameLine();
-					ImGui::RadioButton("Z", &billPattern, 3); ImGui::SameLine();
-					ImGui::RadioButton("XY", &billPattern, 4);
+					ImGui::RadioButton("X固定", &billPattern, 1); ImGui::SameLine();
+					ImGui::RadioButton("Y固定", &billPattern, 2); ImGui::SameLine();
+					ImGui::RadioButton("Z固定", &billPattern, 3); ImGui::SameLine();
+					ImGui::RadioButton("XY固定", &billPattern, 4);
 					grain_.pattern_ = static_cast<BillBoardPattern>(billPattern);
 				}
 				ImGui::TreePop();
 			}
 
-			if (ImGui::TreeNodeEx("Speed", flags)) {
-				ImGui::Combo("SpeedType##type", &grain_.speedType_, "kConstancy\0kChange\0kReturn\0kCenter\0");
+			if (ImGui::TreeNodeEx("速度", flags)) {
+				ImGui::Combo("速度タイプ##type", &grain_.speedType_, "一定\0変化\0戻り\0中心へ\0");
 				ImGui::Separator();
 
-				ImGui::DragFloat2("SpeedX", &para_.speedx.x, 0.01f);
-				ImGui::DragFloat2("SpeedY", &para_.speedy.x, 0.01f);
-				ImGui::DragFloat2("SpeedZ", &para_.speedz.x, 0.01f);
+				ImGui::DragFloat2("速度 X 範囲", &para_.speedx.x, 0.01f);
+				ImGui::DragFloat2("速度 Y 範囲", &para_.speedy.x, 0.01f);
+				ImGui::DragFloat2("速度 Z 範囲", &para_.speedz.x, 0.01f);
 				if (grain_.speedType_ == static_cast<int>(SpeedType::kReturn) || grain_.speedType_ == static_cast<int>(SpeedType::kCenter)) {
-					ImGui::DragFloat("ReturnPower", &grain_.returnPower_, 0.001f);
+					ImGui::DragFloat("戻る力", &grain_.returnPower_, 0.001f);
 				}
 				if (grain_.speedType_ == static_cast<int>(SpeedType::kReturn)) {
-					ImGui::SeparatorText("Accele");
-					ImGui::DragFloat3("Accele", &grain_.accele_.x, 0.01f);
+					ImGui::SeparatorText("加速度");
+					ImGui::DragFloat3("加速度", &grain_.accele_.x, 0.01f);
 				}
 				ImGui::TreePop();
 			}
@@ -127,7 +127,7 @@ void ParticleEmitter::DebugGUI() {
 		ImGui::Checkbox("IsEmitte", &isEmit_);
 		ImGui::Checkbox("IsDistance", &isDistanceComplement_);
 
-		if (ImGui::Button("save")) {
+		if (ImGui::Button("セーブ")) {
 			Save();
 		}
 		ImGui::Unindent();
