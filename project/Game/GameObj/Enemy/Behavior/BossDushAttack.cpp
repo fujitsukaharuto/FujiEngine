@@ -44,7 +44,7 @@ void BossDushAttack::Update() {
 		///---------------------------------------------------------------------------------------
 	case BossDushAttack::Step::ATTACK:
 		if (startWaitTime_ < maxStartWaitTime_) {
-			startWaitTime_ += FPSKeeper::DeltaTime();
+			startWaitTime_ += FPSKeeper::DeltaTimeFrame();
 			break;
 		}
 
@@ -54,7 +54,7 @@ void BossDushAttack::Update() {
 			}
 		}
 		if (!isAttack_) {
-			coolTime_ -= FPSKeeper::DeltaTime();
+			coolTime_ -= FPSKeeper::DeltaTimeFrame();
 			if (coolTime_ < 0.0f) {
 				step_ = Step::TOROOT;
 			}

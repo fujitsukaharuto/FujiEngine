@@ -17,10 +17,10 @@
     "emitCount": 20,
     "emitterScale": 0.10999999940395355,
     "emitterShape": 3,
-    "frequency": 1.0,
+    "frequency": 0.016,
     "isDistance": 1,
     "isTrailEmit": 0,
-    "lifeTime": 75.0,
+    "lifeTime": 1.25,
     "moveType": 2,
     "particleScale": [
         12.0,
@@ -32,7 +32,7 @@
         3.0,
         15.195069313049316
     ],
-    "velRandMax": 0.019999999552965164,
-    "velRandMin": 0.029999999329447746,
+    "velRandMax": 1.2,
+    "velRandMin": 1.8,
     "velType": 0
 }

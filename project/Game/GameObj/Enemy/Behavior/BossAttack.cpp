@@ -38,7 +38,7 @@ void BossAttack::Update() {
 			AudioPlayer::GetInstance()->SoundPlayWave(*attackSE_, 0.35f);
 			isAttack_ = false;
 		}
-		coolTime_ -= FPSKeeper::DeltaTime();
+		coolTime_ -= FPSKeeper::DeltaTimeFrame();
 		if (coolTime_ < 0.0f) {
 			step_ = Step::TOROOT;
 		}

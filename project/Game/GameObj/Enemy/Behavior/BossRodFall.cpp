@@ -35,7 +35,7 @@ void BossRodFall::Update() {
 			isChange_ = true;
 		}
 		if (!isAttack_) {
-			coolTime_ -= FPSKeeper::DeltaTime();
+			coolTime_ -= FPSKeeper::DeltaTimeFrame();
 			if (coolTime_ < 100.0f && isChange_) {
 				isChange_ = false;
 				pBoss_->GetAnimModel()->ChangeAnimation("swordLeft");

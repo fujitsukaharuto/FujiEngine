@@ -13,8 +13,8 @@ TextureBasedEmitter::TextureBasedEmitter(DXCom* dx) {
 	resource_->Map(0, nullptr, reinterpret_cast<void**>(&data_));
 	*data_ = {};
 	data_->count = 300;
-	data_->lifeTime = 60.0f;
-	data_->frequency = 0.5f;
+	data_->lifeTime = 1.0f;
+	data_->frequency = 0.008f;
 	data_->translate = Vector3(0.0f, 0.5f, 0.0f);
 	data_->radius = 10.0f;
 	data_->emit = 0;
@@ -74,8 +74,8 @@ void TextureBasedEmitter::DebugGUI() {
 		ImGui::DragInt("emitCount", &dragCount, 1, 0, 100000);
 		data_->count = uint32_t(dragCount);
 
-		ImGui::DragFloat("lifeTime", &data_->lifeTime, 0.1f, 1.0f, 300.0f);
-		ImGui::DragFloat("frequency", &data_->frequency, 0.1f, 0.0f, 300.0f);
+		ImGui::DragFloat("lifeTime", &data_->lifeTime, 0.01f, 0.01f, 300.0f);
+		ImGui::DragFloat("frequency", &data_->frequency, 0.001f, 0.0f, 300.0f);
 
 		ImGui::DragFloat3("translate", &data_->translate.x, 0.1f);
 
@@ -86,12 +86,12 @@ void TextureBasedEmitter::DebugGUI() {
 		ImGui::DragFloat3("colorMin", &data_->colorMin.x, 0.01f, 0.0f, 1.0f);
 
 		ImGui::SeparatorText("Velocity");
-		ImGui::DragFloat3("baseVelocity", &data_->baseVelocity.x, 0.01f, 0.0f, 1.0f);
-		ImGui::DragFloat("velocityRandMax", &data_->velocityRandMax, 0.01f, -1.0f, 1.0f);
-		ImGui::DragFloat("velocityRandMin", &data_->velocityRandMin, 0.01f, -1.0f, 1.0f);
+		ImGui::DragFloat3("baseVelocity", &data_->baseVelocity.x, 0.1f, -10.0f, 10.0f);
+		ImGui::DragFloat("velocityRandMax", &data_->velocityRandMax, 0.1f, -10.0f, 10.0f);
+		ImGui::DragFloat("velocityRandMin", &data_->velocityRandMin, 0.1f, -10.0f, 10.0f);
 
-		ImGui::Text("DeltaTime1:%f", FPSKeeper::DeltaTime());
-		ImGui::Text("DeltaTime2:%f", FPSKeeper::DeltaTimeFrame());
+		ImGui::Text("DeltaTime1:%f", FPSKeeper::DeltaTimeFrame());
+		ImGui::Text("DeltaTime2:%f", FPSKeeper::DeltaTime());
 		ImGui::TreePop();
 	}
 #endif // _DEBUG

@@ -127,7 +127,7 @@ void ParticleDebugScene::ParticleGroupDebugGUI() {
 void ParticleDebugScene::BlackFade() {
 	if (isChangeFase) {
 		if (blackTime < blackLimmite) {
-			blackTime += FPSKeeper::DeltaTime();
+			blackTime += FPSKeeper::DeltaTimeFrame();
 			if (blackTime >= blackLimmite) {
 				blackTime = blackLimmite;
 			}
@@ -136,7 +136,7 @@ void ParticleDebugScene::BlackFade() {
 		}
 	} else {
 		if (blackTime > 0.0f) {
-			blackTime -= FPSKeeper::DeltaTime();
+			blackTime -= FPSKeeper::DeltaTimeFrame();
 			if (blackTime <= 0.0f) {
 				blackTime = 0.0f;
 			}

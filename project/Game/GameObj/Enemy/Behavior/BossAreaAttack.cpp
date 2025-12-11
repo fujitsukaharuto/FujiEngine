@@ -33,7 +33,7 @@ void BossAreaAttack::Update() {
 		///---------------------------------------------------------------------------------------
 	case BossAreaAttack::Step::ATTACK:
 
-		coolTime_ -= FPSKeeper::DeltaTime();
+		coolTime_ -= FPSKeeper::DeltaTimeFrame();
 		if (coolTime_ < 0.0f) {
 			if (isAttack_) {
 				pBoss_->WaveWallAttack();

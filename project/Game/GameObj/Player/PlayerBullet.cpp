@@ -30,7 +30,7 @@ void PlayerBullet::Initialize() {
 void PlayerBullet::Update() {
 	if (isLive_) {
 		// 位置の更新
-		model_->transform.translate += (velocity_ * speed_) * FPSKeeper::DeltaTime();
+		model_->transform.translate += (velocity_ * speed_) * FPSKeeper::DeltaTimeFrame();
 
 		collider_->SetPos(model_->GetWorldPos());
 		collider_->InfoUpdate();
@@ -79,9 +79,9 @@ void PlayerBullet::CalculetionFollowVec(const Vector3& target) {
 	velocity_ = newForward * velocity_.Length();
 	
 	if (isStrnght_) {
-		zRotate_ += 0.15f * FPSKeeper::DeltaTime();
+		zRotate_ += 0.15f * FPSKeeper::DeltaTimeFrame();
 	} else {
-		zRotate_ += 0.075f * FPSKeeper::DeltaTime();
+		zRotate_ += 0.075f * FPSKeeper::DeltaTimeFrame();
 	}
 	if (zRotate_ > (std::numbers::pi_v<float> *2.0f)) zRotate_ -= (std::numbers::pi_v<float> *2.0f);
 	Quaternion spinRot = Quaternion::AngleAxis(zRotate_, Vector3(0, 0, 1));

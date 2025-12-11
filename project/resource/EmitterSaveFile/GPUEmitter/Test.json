@@ -17,10 +17,10 @@
     "emitCount": 300,
     "emitterScale": 2.5,
     "emitterShape": 0,
-    "frequency": 0.5,
+    "frequency": 0.008,
     "isDistance": 1,
     "isTrailEmit": 0,
-    "lifeTime": 60.0,
+    "lifeTime": 1.0,
     "moveType": 0,
     "particleScale": [
         0.10000000149011612,

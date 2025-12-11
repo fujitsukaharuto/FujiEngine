@@ -82,6 +82,7 @@
     "isAddRandomSize": false,
     "isAutoUVMove": false,
     "isBillBoard": false,
+    "isContinuouslyR_": false,
     "isDistanceComplement": false,
     "isZandX": true,
     "lifeTime": 10.0,

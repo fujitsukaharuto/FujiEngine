@@ -6,6 +6,7 @@
 #include <iostream>
 #include <fstream>
 
+using namespace Core;
 using namespace Graphics;
 using namespace Math;
 
@@ -404,7 +405,7 @@ void ParticleEmitter::Emit() {
 
 		time_ = frequencyTime_;
 	} else {
-		time_--;
+		time_ -= FPSKeeper::DeltaTime();
 	}
 }
 

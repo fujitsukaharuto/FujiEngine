@@ -90,9 +90,9 @@ void ResultScene::Update() {
 	BlackFade();
 	skybox_->Update();
 
-	if (FPSKeeper::DeltaTime() < FPSKeeper::GetClampFrame()) {
+	if (FPSKeeper::DeltaTimeFrame() < FPSKeeper::GetClampFrame()) {
 		if (waitTime_ > 0.0f) {
-			waitTime_ -= FPSKeeper::DeltaTime();
+			waitTime_ -= FPSKeeper::DeltaTimeFrame();
 		} else {
 			KirbyDance();
 		}
@@ -169,7 +169,7 @@ void ResultScene::ParticleDebugGUI() {
 void ResultScene::BlackFade() {
 	if (isChangeFase) {
 		if (blackTime < blackLimmite) {
-			blackTime += FPSKeeper::DeltaTime();
+			blackTime += FPSKeeper::DeltaTimeFrame();
 			if (blackTime >= blackLimmite) {
 				blackTime = blackLimmite;
 			}
@@ -178,7 +178,7 @@ void ResultScene::BlackFade() {
 		}
 	} else {
 		if (blackTime > 0.0f) {
-			blackTime -= FPSKeeper::DeltaTime();
+			blackTime -= FPSKeeper::DeltaTimeFrame();
 			if (blackTime <= 0.0f) {
 				blackTime = 0.0f;
 			}
@@ -210,7 +210,7 @@ void ResultScene::KirbyDance() {
 	transform.y = defoTransY_;
 	Vector3 rotate = {};
 	rotate.y = defoRotateY_;
-	danceTime_ += FPSKeeper::DeltaTime();
+	danceTime_ += FPSKeeper::DeltaTimeFrame();
 	float t = 0.0f;
 	switch (state_) {
 	case DanceState::TurnLeftMoveToLeft:

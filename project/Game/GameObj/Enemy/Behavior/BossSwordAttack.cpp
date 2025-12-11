@@ -43,7 +43,7 @@ void BossSwordAttack::Update() {
 			attackCount_++;
 		} else {
 			pBoss_->GetAnimModel()->IsRoopAnimation(false);
-			coolTime_ -= FPSKeeper::DeltaTime();
+			coolTime_ -= FPSKeeper::DeltaTimeFrame();
 		}
 
 		break;

@@ -746,8 +746,8 @@ void Object3d::NodeContentsUpdate() {
 	if (nodeContentDeta_[0].isMoveUV_) {
 		Vector2 newUV = model_->GetUVTrans();
 		if (nodeContentDeta_[0].isAddDeltaUV_) {
-			newUV.x += FPSKeeper::DeltaTimeFrame();
-			newUV.y += FPSKeeper::DeltaTimeFrame();
+			newUV.x += FPSKeeper::DeltaTime();
+			newUV.y += FPSKeeper::DeltaTime();
 		} else {
 			newUV += nodeContentDeta_[0].incrementUV_;
 		}
@@ -758,8 +758,8 @@ void Object3d::NodeContentsUpdate() {
 		if (nodeContentDeta_[1].isMoveUV_) {
 			Vector2 newUV = maskMateral_.GetUVTrans();
 			if (nodeContentDeta_[1].isAddDeltaUV_) {
-				newUV.x += FPSKeeper::DeltaTimeFrame();
-				newUV.y += FPSKeeper::DeltaTimeFrame();
+				newUV.x += FPSKeeper::DeltaTime();
+				newUV.y += FPSKeeper::DeltaTime();
 			} else {
 				newUV += nodeContentDeta_[1].incrementUV_;
 			}

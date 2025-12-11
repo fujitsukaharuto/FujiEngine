@@ -141,11 +141,11 @@ void Player::Update() {
 		}
 
 		if (avoidCoolTime_ > 0.0f) {
-			avoidCoolTime_ -= FPSKeeper::DeltaTime();
+			avoidCoolTime_ -= FPSKeeper::DeltaTimeFrame();
 		}
 		HPUpdate();
 	} else {
-		deathTime_ -= FPSKeeper::DeltaTime();
+		deathTime_ -= FPSKeeper::DeltaTimeFrame();
 		deathSmoke_.Emit();
 		if (deathTime_ < 0.0f) {
 			isGameOver_ = true;
@@ -256,7 +256,7 @@ void Player::HPUpdate() {
 	hpSprite_->SetSize({ hpSize.x * t, hpSize.y });
 
 	if (!isDamage_) return;
-	damageCoolTime_ -= FPSKeeper::DeltaTime();
+	damageCoolTime_ -= FPSKeeper::DeltaTimeFrame();
 	bool effectApplied = false;
 	for (auto& step : hp.damageStep) {
 		if (damageCoolTime_ > step.start && damageCoolTime_ < step.end) {
@@ -478,10 +478,10 @@ void Player::Jump(float& speed) {
 
 void Player::Fall(float& speed) {
 	if (!isFall_) speed = 0.0f;
-	model_->transform.translate.y += speed * FPSKeeper::DeltaTime();
+	model_->transform.translate.y += speed * FPSKeeper::DeltaTimeFrame();
 	if (isFall_) {
 		// スピードの更新
-		speed = ComparNum(-(speed - (gravity_ * FPSKeeper::DeltaTime())), maxFallSpeed_);
+		speed = ComparNum(-(speed - (gravity_ * FPSKeeper::DeltaTimeFrame())), maxFallSpeed_);
 		speed = -speed;
 	}
 
@@ -501,7 +501,7 @@ void Player::Avoid([[maybe_unused]]float& avoidTime) {
 		if (avoidTime == 0.0f) {
 			avoidEmitter4_->Emit();
 		}
-		avoidTime += FPSKeeper::DeltaTime();
+		avoidTime += FPSKeeper::DeltaTimeFrame();
 		if (avoidTime >= 30.0f) {
 			avoidTime = 30.0f;
 		}
@@ -579,7 +579,7 @@ void Player::StrngthBullet() {
 }
 
 void Player::LandingUpdate() {
-	float delta= FPSKeeper::DeltaTime();
+	float delta= FPSKeeper::DeltaTimeFrame();
 	if (delta > FPSKeeper::GetClampFrame()) return;
 	if (startLandingTime_ > 0.0f) {
 		startLandingTime_ -= delta;
@@ -774,7 +774,7 @@ void Player::InitAvoidPostEffect() {
 
 void Player::AvoidPostEffect() {
 	if (avoidEffectTime_ > 0.0f) {
-		avoidEffectTime_ -= FPSKeeper::DeltaTime();
+		avoidEffectTime_ -= FPSKeeper::DeltaTimeFrame();
 		if (avoidEffectTime_ <= 0.0f) {
 			dxcommon_->GetOffscreenManager()->PopPostEffect(PostEffectList::Radial);
 			avoidEffectTime_ = 0.0f;

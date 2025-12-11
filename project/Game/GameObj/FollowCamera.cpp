@@ -89,7 +89,7 @@ void FollowCamera::CalDestinationAngle() {
 	if (Input::GetInstance()->GetGamepadState(pad)) {
 		const float kRotateSpeed = 0.05f;
 
-		destinationAngleY_ += (Input::GetInstance()->GetRStick().x * kRotateSpeed) * FPSKeeper::DeltaTime();
+		destinationAngleY_ += (Input::GetInstance()->GetRStick().x * kRotateSpeed) * FPSKeeper::DeltaTimeFrame();
 
 		if (Input::GetInstance()->TriggerButton(PadInput::RStick)) {
 			//destinationAngleY_ = target_->rotate.y;
@@ -97,10 +97,10 @@ void FollowCamera::CalDestinationAngle() {
 	} else {
 		const float kRotateSpeed = 0.05f;
 		if (Input::GetInstance()->PushKey(DIK_LEFTARROW)) {
-			destinationAngleY_ += (0.5f * kRotateSpeed) * FPSKeeper::DeltaTime();
+			destinationAngleY_ += (0.5f * kRotateSpeed) * FPSKeeper::DeltaTimeFrame();
 		}
 		if (Input::GetInstance()->PushKey(DIK_RIGHTARROW)) {
-			destinationAngleY_ -= (0.5f * kRotateSpeed) * FPSKeeper::DeltaTime();
+			destinationAngleY_ -= (0.5f * kRotateSpeed) * FPSKeeper::DeltaTimeFrame();
 		}
 	}
 }
@@ -168,7 +168,7 @@ Vector3 FollowCamera::OffsetCal() const {
 
 void FollowCamera::OffsetChangeCal() {
 	if (offsetChangeTime_ > 0.0f) {
-		offsetChangeTime_ -= FPSKeeper::DeltaTime();
+		offsetChangeTime_ -= FPSKeeper::DeltaTimeFrame();
 		if (offsetChangeTime_ <= 0.0f) {
 			offsetChangeTime_ = 0.0f;
 		}

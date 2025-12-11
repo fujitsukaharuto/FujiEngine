@@ -62,7 +62,7 @@ void PlayerAttackRoot::Update() {
 			break;
 		}
 		if (coolTime_ > 0.0f) {
-			coolTime_ -= FPSKeeper::DeltaTime();
+			coolTime_ -= FPSKeeper::DeltaTimeFrame();
 		}
 
 
@@ -73,7 +73,7 @@ void PlayerAttackRoot::Update() {
 	case PlayerAttackRoot::Step::CHAREGE:
 		
 		if ((input->PushKey(DIK_J) || input->PressButton(PadInput::A))) {
-			chargeTime_ += FPSKeeper::DeltaTime();
+			chargeTime_ += FPSKeeper::DeltaTimeFrame();
 		}
 		if (!(input->PushKey(DIK_J) || input->PressButton(PadInput::A)) || pPlayer_->GetIsStrongState()) {
 			step_ = Step::ROOT;

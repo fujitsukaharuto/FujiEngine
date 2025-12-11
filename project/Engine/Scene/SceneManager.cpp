@@ -32,13 +32,13 @@ void SceneManager::Update() {
 	if (!isChange_) {
 		scene_->Update();
 		if (isFinifh_) {
-			finishTime -= FPSKeeper::DeltaTime();
+			finishTime -= FPSKeeper::DeltaTimeFrame();
 			if (finishTime <= 0.0f) {
 
 			}
 		}
 	} else {
-		changeExtraTime -= FPSKeeper::DeltaTime();
+		changeExtraTime -= FPSKeeper::DeltaTimeFrame();
 		if (changeExtraTime <= 0.0f) {
 			SceneSet();
 

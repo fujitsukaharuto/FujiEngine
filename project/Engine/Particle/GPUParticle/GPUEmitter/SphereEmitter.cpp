@@ -13,8 +13,8 @@ SphereEmitter::SphereEmitter(DXCom* dx) {
 	resource_->Map(0, nullptr, reinterpret_cast<void**>(&data_));
 	*data_ = {};
 	data_->count = 300;
-	data_->lifeTime = 60.0f;
-	data_->frequency = 0.5f;
+	data_->lifeTime = 1.0f;
+	data_->frequency = 0.008f;
 	data_->radius = 2.5f;
 	data_->scale = Vector3(0.1f, 0.1f, 0.1f);
 	data_->emit = 0;
@@ -68,8 +68,8 @@ void SphereEmitter::DebugGUI() {
 		ImGui::DragInt("EmitCount", &dragCount, 1, 0, 100000);
 		data_->count = uint32_t(dragCount);
 
-		ImGui::DragFloat("LifeTime", &data_->lifeTime, 0.1f, 1.0f, 300.0f);
-		ImGui::DragFloat("Frequency", &data_->frequency, 0.1f, 0.0f, 300.0f);
+		ImGui::DragFloat("LifeTime", &data_->lifeTime, 0.01f, 0.01f, 300.0f);
+		ImGui::DragFloat("Frequency", &data_->frequency, 0.001f, 0.0f, 300.0f);
 
 		Vector3 prePos = data_->translate;
 		ImGui::DragFloat3("Translate", &data_->translate.x, 0.1f);
@@ -92,9 +92,9 @@ void SphereEmitter::DebugGUI() {
 		ImGui::DragFloat3("ColorMin", &data_->colorMin.x, 0.01f, 0.0f, 1.0f);
 
 		ImGui::SeparatorText("Velocity");
-		ImGui::DragFloat3("BaseVelocity", &data_->baseVelocity.x, 0.01f, 0.0f, 1.0f);
-		ImGui::DragFloat("VelocityRandMax", &data_->velocityRandMax, 0.01f, -1.0f, 1.0f);
-		ImGui::DragFloat("VelocityRandMin", &data_->velocityRandMin, 0.01f, -1.0f, 1.0f);
+		ImGui::DragFloat3("BaseVelocity", &data_->baseVelocity.x, 0.1f, -10.0f, 10.0f);
+		ImGui::DragFloat("VelocityRandMax", &data_->velocityRandMax, 0.1f, -10.0f, 10.0f);
+		ImGui::DragFloat("VelocityRandMin", &data_->velocityRandMin, 0.1f, -10.0f, 10.0f);
 		int veloType = int(data_->emitVeloType);
 		ImGui::DragInt("EmitVelocityType", &veloType, 0.1f, 0, 5);
 		data_->emitVeloType = uint32_t(veloType);
@@ -123,8 +123,8 @@ void SphereEmitter::DebugGUI() {
 			Save(saveName_);
 		}
 
-		ImGui::Text("DeltaTime1:%f", FPSKeeper::DeltaTime());
-		ImGui::Text("DeltaTime2:%f", FPSKeeper::DeltaTimeFrame());
+		ImGui::Text("DeltaTime1:%f", FPSKeeper::DeltaTimeFrame());
+		ImGui::Text("DeltaTime2:%f", FPSKeeper::DeltaTime());
 		ImGui::TreePop();
 
 	}

@@ -40,9 +40,9 @@ void BossArrowAttack::Update() {
 			pBoss_->ArrowAttack();
 			isAttack_ = false;
 		}
-		beforWait_ -= FPSKeeper::DeltaTime();
+		beforWait_ -= FPSKeeper::DeltaTimeFrame();
 		if (!isAttack_) {
-			coolTime_ -= FPSKeeper::DeltaTime();
+			coolTime_ -= FPSKeeper::DeltaTimeFrame();
 			if (coolTime_ < 0.0f) {
 				step_ = Step::TOROOT;
 			}

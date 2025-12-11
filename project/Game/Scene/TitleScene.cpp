@@ -93,8 +93,8 @@ void TitleScene::Update() {
 	skybox_->Update();
 
 
-	if (FPSKeeper::DeltaTime() < FPSKeeper::GetClampFrame()) {
-		startTime_ -= FPSKeeper::DeltaTime();
+	if (FPSKeeper::DeltaTimeFrame() < FPSKeeper::GetClampFrame()) {
+		startTime_ -= FPSKeeper::DeltaTimeFrame();
 	}
 	if (startTime_ <= titleCanMoveTime_) {
 		float titlemoveT = (std::max)(startTime_ / titleCanMoveTime_, 0.0f);
@@ -211,7 +211,7 @@ void TitleScene::ParticleDebugGUI() {
 void TitleScene::BlackFade() {
 	if (isChangeFase) {
 		if (blackTime < blackLimmite) {
-			blackTime += FPSKeeper::DeltaTime();
+			blackTime += FPSKeeper::DeltaTimeFrame();
 			if (blackTime >= blackLimmite) {
 				blackTime = blackLimmite;
 			}
@@ -224,7 +224,7 @@ void TitleScene::BlackFade() {
 		}
 	} else {
 		if (blackTime > 0.0f) {
-			blackTime -= FPSKeeper::DeltaTime();
+			blackTime -= FPSKeeper::DeltaTimeFrame();
 			if (blackTime <= 0.0f) {
 				blackTime = 0.0f;
 			}

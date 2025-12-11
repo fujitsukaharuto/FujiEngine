@@ -22,12 +22,12 @@ namespace Core {
 		void Update();
 
 		/// <summary>
-		/// 60FPS基準の時間倍率
+		/// 実時間ベースのDeltaTime
 		/// </summary>
 		static float DeltaTime();
 
 		/// <summary>
-		/// 実時間ベースのDeltaTime
+		/// 60FPS基準の時間倍率
 		/// </summary>
 		static float DeltaTimeFrame();
 

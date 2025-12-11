@@ -26,8 +26,8 @@ void Beam::Initialize() {
 	emitter.data_->count = 5000;
 	emitter.data_->colorMax = { 1.0f,0.0f,0.25f };
 	emitter.data_->colorMin = { 0.5f,0.0f,0.0f };
-	emitter.data_->velocityRandMax = 0.04f;
-	emitter.data_->velocityRandMin = -0.04f;
+	emitter.data_->velocityRandMax = 2.4f;
+	emitter.data_->velocityRandMin = -2.4f;
 
 	model_->SetLightEnable(LightMode::kLightNone);
 	model_->transform.translate.y = 25.0f;
@@ -172,8 +172,8 @@ void Beam::Initialize() {
 void Beam::Update() {
 	if (isLive_) {
 		if (lifeTime_ > 0.0f) {
-			lifeTime_ -= FPSKeeper::DeltaTime();
-			uvTransX_ += 0.01f * FPSKeeper::DeltaTime();
+			lifeTime_ -= FPSKeeper::DeltaTimeFrame();
+			uvTransX_ += 0.01f * FPSKeeper::DeltaTimeFrame();
 		} else if (lifeTime_ <= 0.0f) {
 			lifeTime_ = 0.0f;
 			isLive_ = false;
@@ -408,7 +408,7 @@ void Beam::ChangeBeamStep() {
 	}
 
 	if (changeTime_ > 0.0f) {
-		changeTime_ -= FPSKeeper::DeltaTime();
+		changeTime_ -= FPSKeeper::DeltaTimeFrame();
 		float t = 1.0f - (changeTime_ / 40.0f);
 		Vector3 emitPos = Lerp(prePos_, targetPos_, t);
 		ParticleManager::GetParticleCSEmitterSurface(1).data_->translate = emitPos;
@@ -423,7 +423,7 @@ void Beam::ChangeBeamStep() {
 
 void Beam::BeamExpand(BeamStep step) {
 	if (expandTime_ > 0.0f) {
-		expandTime_ -= FPSKeeper::DeltaTime();
+		expandTime_ -= FPSKeeper::DeltaTimeFrame();
 		float t = 1.0f;
 		if (expandTime_ > 40.0f) {
 			t = 1.0f - ((expandTime_ - 40.0f) / 20.0f);
@@ -458,7 +458,7 @@ void Beam::BeamExpand(BeamStep step) {
 void Beam::BeamMove(BeamStep step) {
 	if (expandTime_ > 0.0f) return;
 	if (beamAttackTime_ > 0.0f) {
-		beamAttackTime_ -= FPSKeeper::DeltaTime();
+		beamAttackTime_ -= FPSKeeper::DeltaTimeFrame();
 
 		switch (step) {
 		case BeamStep::AroundAttack:
@@ -514,7 +514,7 @@ void Beam::BeamShrink(BeamStep step) {
 		beams_[0].particleParent->transform.rotate.y = beams_[0].model->transform.rotate.y;
 
 
-		shrinkTime_ -= FPSKeeper::DeltaTime();
+		shrinkTime_ -= FPSKeeper::DeltaTimeFrame();
 		float t = 1.0f;
 		if (shrinkTime_ >= 30.0f) {
 			t = 1.0f - ((shrinkTime_ - 30.0f) / 30.0f);

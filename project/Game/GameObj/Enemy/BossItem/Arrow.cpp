@@ -150,14 +150,14 @@ void Arrow::TargetSetting(const Vector3& target) {
 
 void Arrow::EmitTimeUpdate() {
 	if (emitTime_ > 0.0f) {
-		emitTime_ -= FPSKeeper::DeltaTime();
+		emitTime_ -= FPSKeeper::DeltaTimeFrame();
 	}
 }
 
 void Arrow::AnimaTimeUpdate() {
 	if (emitTime_ > 0.0f) return;
 	if (animationTime_ > 0.0f) { // 発射前の回転を行う
-		animationTime_ -= FPSKeeper::DeltaTime();
+		animationTime_ -= FPSKeeper::DeltaTimeFrame();
 		if (animationTime_ < 0.0f)
 			animationTime_ = 0.0f;
 
@@ -180,7 +180,7 @@ void Arrow::ArrivalTimeUpdate() {
 		emitter.data_->prevTranslate = model_->transform.translate;
 		
 		float pret = (std::min)((1.0f - arrivalTime_ / totalArrivalTime_), 1.0f);
-		arrivalTime_ -= FPSKeeper::DeltaTime();
+		arrivalTime_ -= FPSKeeper::DeltaTimeFrame();
 		// 放物線の挙動を制御する
 		float t = (std::min)((1.0f - arrivalTime_ / totalArrivalTime_), 1.0f);
 		Vector3 pos = (1.0f - t) * (1.0f - t) * startP_ + 2.0f * (1.0f - t) * t * midtermP_ + t * t * endP_;
@@ -213,7 +213,7 @@ void Arrow::ArrivalTimeUpdate() {
 void Arrow::GPUEmitterSetting() {
 	auto& emitter = ParticleManager::GetSphereEmitter(emitterNumber_);
 	emitter.data_->count = 300;
-	emitter.data_->lifeTime = 30.0f;
+	emitter.data_->lifeTime = 0.5f;
 	emitter.data_->radius = 0.0f;
 	emitter.data_->scale = { 1.0f,1.0f,1.0f };
 	emitter.data_->colorMax = { 1.0f,0.0f,0.0f };
@@ -244,14 +244,14 @@ void Arrow::InitRod(const Vector3& pos, float time) {
 
 void Arrow::FlyTimeUpdate() {
 	if (flyTime_ > 0.0f) {
-		flyTime_ -= FPSKeeper::DeltaTime();
+		flyTime_ -= FPSKeeper::DeltaTimeFrame();
 	}
 }
 
 void Arrow::FallTimeUpdate() {
 	if (flyTime_ > 0.0f) return;
 	if (fallTime_ > 0.0f) {
-		fallTime_ -= FPSKeeper::DeltaTime();
+		fallTime_ -= FPSKeeper::DeltaTimeFrame();
 		if (fallTime_ < 0.0f)
 			fallTime_ = 0.0f;
 
@@ -272,7 +272,7 @@ void Arrow::FallTimeUpdate() {
 void Arrow::BrokeTimeUpdate() {
 	if (flyTime_ > 0.0f || fallTime_ > 0.0f) return;
 	if (brokeTime_ > 0.0f) {
-		brokeTime_ -= FPSKeeper::DeltaTime();
+		brokeTime_ -= FPSKeeper::DeltaTimeFrame();
 		if (brokeTime_ <= 0.0f) {
 			isBroke_ = true;
 

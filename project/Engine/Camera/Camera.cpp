@@ -34,12 +34,12 @@ void Camera::Update() {
 		case Camera::ShakeMode::RollingShake:
 			gap = std::sin(rollingTime_);
 			shakeGap_.x = gap * shakeStrength_;
-			rollingTime_ -= FPSKeeper::DeltaTime();
+			rollingTime_ -= FPSKeeper::DeltaTimeFrame();
 			break;
 		default:
 			break;
 		}
-		shakeTime_ -= FPSKeeper::DeltaTime();
+		shakeTime_ -= FPSKeeper::DeltaTimeFrame();
 	} else {
 		rollingTime_ = 0.0f;
 	}

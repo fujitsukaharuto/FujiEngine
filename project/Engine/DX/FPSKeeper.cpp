@@ -70,11 +70,11 @@ void FPSKeeper::Update() {
 }
 
 float FPSKeeper::DeltaTime() {
-	return ((GetInstance()->deltaTime_) * 60.0f); // 治す
+	return (GetInstance()->deltaTime_); // 治す
 }
 
 float FPSKeeper::DeltaTimeFrame() { 
-	return (GetInstance()->deltaTime_);// 上のと逆にする
+	return ((GetInstance()->deltaTime_) * 60.0f);// 上のと逆にする
 }
 
 void FPSKeeper::SetHitStopRate(float rate) {

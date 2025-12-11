@@ -269,8 +269,8 @@ SkinCluster AnimationModel::CreateSkinCluster(const Skeleton& skeleton, const Mo
 }
 
 void AnimationModel::AnimationUpdate() {
-	animationTime_ += FPSKeeper::DeltaTimeFrame();
-	blendTime_ += FPSKeeper::DeltaTimeFrame();
+	animationTime_ += FPSKeeper::DeltaTime();
+	blendTime_ += FPSKeeper::DeltaTime();
 	if (auto* anim = GetCurrentAnimation()) {
 		if (isRoopAnimation_) {
 			animationTime_ = std::fmod(animationTime_, anim->duration);

@@ -96,8 +96,8 @@ void WaveWall::Update() {
 	if (isLive_) {
 		// LifeTimeの更新
 		if (lifeTime_ > 0.0f) {
-			lifeTime_ -= FPSKeeper::DeltaTime();
-			uvTransX_ += 0.05f * FPSKeeper::DeltaTime();
+			lifeTime_ -= FPSKeeper::DeltaTimeFrame();
+			uvTransX_ += 0.05f * FPSKeeper::DeltaTimeFrame();
 		} else if (lifeTime_ <= 0.0f) {
 			lifeTime_ = 0.0f;
 			isLive_ = false;
@@ -109,7 +109,7 @@ void WaveWall::Update() {
 		wave2_->SetUVScale({ 0.75f,1.0f }, { uvTransX_ * 0.9f,0.0f });
 		wave3_->SetUVScale({ 0.75f,1.0f }, { -uvTransX_,0.0f });
 		
-		model_->transform.translate += (velocity_ * speed_) * FPSKeeper::DeltaTime();
+		model_->transform.translate += (velocity_ * speed_) * FPSKeeper::DeltaTimeFrame();
 
 		spark1_.Emit();
 		spark2_.Emit();

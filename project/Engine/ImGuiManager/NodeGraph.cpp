@@ -87,7 +87,7 @@ void NodeGraph::ValueUpdate(MyNode& node) {
 				if (pLink->startPinId == srcNode->outputs[i].id) {
 					output = &srcNode->outputValue[i];
 					if (srcNode->addType == AddType::DeltaTime) { // AddNodeのAddTypeがDeltaTimeの時に通る
-						Value deltaValue = Value(FPSKeeper::DeltaTimeFrame());
+						Value deltaValue = Value(FPSKeeper::DeltaTime());
 						output = std::move(&deltaValue);
 					}
 				}

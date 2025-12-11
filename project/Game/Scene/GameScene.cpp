@@ -297,7 +297,7 @@ void GameScene::ParticleDebugGUI() {
 void GameScene::BlackFade() {
 	if (isChangeFase_) {
 		if (blackTime_ < blackLimmite_) {
-			blackTime_ += FPSKeeper::DeltaTime();
+			blackTime_ += FPSKeeper::DeltaTimeFrame();
 			if (blackTime_ >= blackLimmite_) {
 				blackTime_ = blackLimmite_;
 			}
@@ -311,8 +311,8 @@ void GameScene::BlackFade() {
 		black_->SetColor({ 0.0f,0.0f,0.0f,Lerp(0.0f,1.0f,(1.0f / blackLimmite_ * blackTime_)) });
 	} else {
 		if (blackTime_ > 0.0f) {
-			if (FPSKeeper::DeltaTime() < FPSKeeper::GetClampFrame()) {
-				blackTime_ -= FPSKeeper::DeltaTime();
+			if (FPSKeeper::DeltaTimeFrame() < FPSKeeper::GetClampFrame()) {
+				blackTime_ -= FPSKeeper::DeltaTimeFrame();
 			}
 			if (blackTime_ <= 0.0f) {
 				blackTime_ = 0.0f;
@@ -358,7 +358,7 @@ void GameScene::GameoverUpdate() {
 	}
 
 	if (isGameoverFade_) {
-		gameoverFadeTime_ += FPSKeeper::DeltaTime();
+		gameoverFadeTime_ += FPSKeeper::DeltaTimeFrame();
 		float v = std::fmodf(gameoverFadeTime_ / fadeBaseTime_, 2.0f);
 		if (v <= 1.0f) {
 			black_->SetColor({ 0.0f,0.0f,0.0f,v });
@@ -400,7 +400,7 @@ void GameScene::GameoverUpdate() {
 
 void GameScene::ContinueUpdate() {
 	if (isContiuneFade_) {
-		contiuneFadeTime_ += FPSKeeper::DeltaTime();
+		contiuneFadeTime_ += FPSKeeper::DeltaTimeFrame();
 		float v = std::fmodf(contiuneFadeTime_ / fadeBaseTime_, 2.0f);
 		if (v <= 1.0f) {
 			black_->SetColor({ 0.0f,0.0f,0.0f,v });

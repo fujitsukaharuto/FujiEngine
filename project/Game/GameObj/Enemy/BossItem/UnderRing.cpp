@@ -44,8 +44,8 @@ void UnderRing::Update() {
 	if (isLive_) {
 		// LifeTimeの更新
 		if (lifeTime_ > 0.0f) {
-			lifeTime_ -= FPSKeeper::DeltaTime();
-			uvTransX_ += 0.05f * FPSKeeper::DeltaTime();
+			lifeTime_ -= FPSKeeper::DeltaTimeFrame();
+			uvTransX_ += 0.05f * FPSKeeper::DeltaTimeFrame();
 		} else if (lifeTime_ <= 0.0f) {
 			lifeTime_ = 0.0f;
 			isLive_ = false;
@@ -53,7 +53,7 @@ void UnderRing::Update() {
 
 		model_->SetUVScale({ model_->transform.scale.x * 0.75f,1.0f }, { uvTransX_,0.0f });
 		cylinder_->SetUVScale({ model_->transform.scale.x * 0.15f,1.0f }, { uvTransX_ * 0.01f,0.0f });
-		model_->transform.scale += (Vector3(1.0f, 0.0f, 1.0f) * speed_) * FPSKeeper::DeltaTime();
+		model_->transform.scale += (Vector3(1.0f, 0.0f, 1.0f) * speed_) * FPSKeeper::DeltaTimeFrame();
 		model_->transform.scale.y = 1.0f;
 
 		ringRadMax_ = model_->transform.scale.x * 0.5f;

@@ -41,14 +41,14 @@ struct BeamParams {
 	float randomRotYMin = -1.56f;
 	float randomRotYMax = 1.56f;
 
-	float emitterLifeTime = 35.0f;        // 各トレースの寿命
+	float emitterLifeTime = 0.6f;        // 各トレースの寿命
 	float radiusGrowSpeed = 0.075f;       // チャージサークルの拡大速度
 	float baseChargeSize = 24.0f;
 
 	float shrinkSpeed = 0.55f;            // 縮小スピード
 	float rotateSpeedZ = 0.0225f;         // 回転速度
 	float sizeDecrease = 2.0f;            // 縮小後のサイズ減衰量
-	float lifeTimeDecrease = 2.5f;        // ライフ減衰量
+	float lifeTimeDecrease = 0.04f;        // ライフ減衰量
 
 	float startSizeMulX = 3.0f;
 	float startSizeMulY = 6.0f;

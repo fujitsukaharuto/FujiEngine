@@ -13,7 +13,7 @@ struct VertexShaderInput
     float3 normal : NORMAL0;
 };
 
-static const float3 kGravity = float3(0.0f, -0.0016f, 0.0f);
+static const float3 kGravity = float3(0.0f, -8.0f, 0.0f);
 static const uint kMaxParticles = 1048576;
 struct Particle
 {

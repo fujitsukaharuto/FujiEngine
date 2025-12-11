@@ -111,7 +111,7 @@ void Boss::Initialize() {
 		emitter.data_->frequency = 0.0f;
 		emitter.data_->radius = 0.0f;
 		emitter.data_->scale = { 1.5f,1.5f,1.5f };
-		emitter.data_->lifeTime = 35.0f;
+		emitter.data_->lifeTime = 0.6f;
 		traceEmitterIndexes_.push_back(numEmitter);
 	}
 
@@ -233,7 +233,7 @@ void Boss::Update() {
 
 	} else if (isStart_) { // 開始時の召喚処理
 		if (EnergyUpdate()) {
-			startTime_ -= FPSKeeper::DeltaTime();
+			startTime_ -= FPSKeeper::DeltaTimeFrame();
 			if (startTime_ > 40.0f && startTime_ < 200.0f) {
 				CameraManager::GetInstance()->GetCamera()->IssuanceShake(0.2f, 2.0f);
 				roringWave_.Emit();
@@ -246,7 +246,7 @@ void Boss::Update() {
 			}
 		}
 	} else if (!isHpActive_) { // HPの段階が切り替わった際の処理
-		hpCooltime_ -= FPSKeeper::DeltaTime();
+		hpCooltime_ -= FPSKeeper::DeltaTimeFrame();
 		RadialUpdate();
 
 		UpdateWaveWall();
@@ -259,7 +259,7 @@ void Boss::Update() {
 			animModel_->IsRoopAnimation(true);
 		}
 	} else {
-		dyingTime_ -= FPSKeeper::DeltaTime();
+		dyingTime_ -= FPSKeeper::DeltaTimeFrame();
 		if (dyingTime_ < 0.0f) {
 			isClear_ = true;
 		}
@@ -609,7 +609,7 @@ void Boss::HPColorSet(float under, float index) {
 void Boss::ShakeHP() {
 	if (isShakeSprite_) {
 		// ダメージ喰らった際にHPバーの色を変えていく
-		shakeTime_ -= FPSKeeper::DeltaTime();
+		shakeTime_ -= FPSKeeper::DeltaTimeFrame();
 		if (shakeTime_ < 0.0f) {
 			shakeTime_ = 0.0f;
 			isShakeSprite_ = false;
@@ -632,7 +632,7 @@ void Boss::Walk() {
 		// 目標のY軸角度（ラジアン）
 		float targetAngle = std::atan2(dir.x, dir.z); // Z前方軸に対する角度
 
-		Vector3 front = GetFrontOffset(Vector3(0.0f, 0.0f, 1.0f) * 0.05f * FPSKeeper::DeltaTime(), targetAngle);
+		Vector3 front = GetFrontOffset(Vector3(0.0f, 0.0f, 1.0f) * 0.05f * FPSKeeper::DeltaTimeFrame(), targetAngle);
 		animModel_->transform.translate += front;
 
 		CaluModelDir();
@@ -681,7 +681,7 @@ void Boss::DushInit() {
 	for (int i = 0; i < 8; i++) {
 		auto& emitter = ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]);
 		emitter.isEmit_ = true;
-		emitter.data_->lifeTime = 35.0f;
+		emitter.data_->lifeTime = 0.6f;
 		UpdateEmitterPos(i);
 		emitter.data_->prevTranslate = traceAnchors_[i]->GetWorldPos();
 
@@ -698,7 +698,7 @@ bool Boss::DushCharge(float& t, float maxT, bool& isNear, float reng) {
 	if (t <= maxT * 0.75f) {
 		CaluModelDir();
 	}
-	t += FPSKeeper::DeltaTime();
+	t += FPSKeeper::DeltaTimeFrame();
 
 	for (int i = 0; i < 8; i++) {
 		auto& emitter = ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]);
@@ -706,7 +706,7 @@ bool Boss::DushCharge(float& t, float maxT, bool& isNear, float reng) {
 
 		if (chargeParents_[i]->transform.scale.x > 0.0f) { // チャージのサイズを縮小していく
 			ShrinkScale(i, chargeSize_ / chargeTime_);
-			chargeParents_[i]->transform.rotate.z += 0.05f * FPSKeeper::DeltaTime();
+			chargeParents_[i]->transform.rotate.z += 0.05f * FPSKeeper::DeltaTimeFrame();
 		}
 		UpdateEmitterPos(i);
 	}
@@ -906,7 +906,7 @@ bool Boss::BeamCharge() {
 	}
 
 	if (chargeSize_ > 0.0f) {
-		ParticleManager::GetParticleCSEmitterSurface(1).data_->radius += bp.radiusGrowSpeed * FPSKeeper::DeltaTime();
+		ParticleManager::GetParticleCSEmitterSurface(1).data_->radius += bp.radiusGrowSpeed * FPSKeeper::DeltaTimeFrame();
 		for (int i = 0; i < 8; i++) {
 			if (i > 2) {
 				if (!(chargeTime_ < bp.chargeTime - i * 2.0f)) {
@@ -918,8 +918,8 @@ bool Boss::BeamCharge() {
 			emitter.data_->prevTranslate = traceAnchors_[i]->GetWorldPos();
 
 			if (chargeParents_[i]->transform.scale.x > 0.0f) { // チャージのサイズを縮小していく
-				ShrinkScale(i, bp.shrinkSpeed * FPSKeeper::DeltaTime());
-				chargeParents_[i]->transform.rotate.z += bp.rotateSpeedZ * FPSKeeper::DeltaTime();
+				ShrinkScale(i, bp.shrinkSpeed * FPSKeeper::DeltaTimeFrame());
+				chargeParents_[i]->transform.rotate.z += bp.rotateSpeedZ * FPSKeeper::DeltaTimeFrame();
 			}
 			if (chargeParents_[i]->transform.scale.x <= 0.0f) {
 				if (i == 0) {
@@ -946,7 +946,7 @@ bool Boss::BeamCharge() {
 		charge10_.Emit();
 		charge11_.Emit();
 		charge15_.Emit();
-		chargeTime_ -= FPSKeeper::DeltaTime();
+		chargeTime_ -= FPSKeeper::DeltaTimeFrame();
 	} else if (chargeSize_ <= 0.0f) {
 		result = true;
 		for (int i = 0; i < 8; i++) {
@@ -954,8 +954,8 @@ bool Boss::BeamCharge() {
 				auto& emitter = ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]);
 				emitter.data_->prevTranslate = traceAnchors_[i]->GetWorldPos();
 
-				ShrinkScale(i, bp.shrinkSpeed * FPSKeeper::DeltaTime());
-				chargeParents_[i]->transform.rotate.z += bp.rotateSpeedZ * FPSKeeper::DeltaTime();
+				ShrinkScale(i, bp.shrinkSpeed * FPSKeeper::DeltaTimeFrame());
+				chargeParents_[i]->transform.rotate.z += bp.rotateSpeedZ * FPSKeeper::DeltaTimeFrame();
 				result = false;
 			}
 			if (!result) {
@@ -999,7 +999,7 @@ void Boss::InitJumpAttack() {
 bool Boss::JumpAttack() {
 
 	if (jumpTime_ > 0.0f) {
-		jumpTime_ -= FPSKeeper::DeltaTime();
+		jumpTime_ -= FPSKeeper::DeltaTimeFrame();
 		if (jumpTime_ < 0.0f) {
 			jumpTime_ = 0.0f;
 		}
@@ -1142,7 +1142,7 @@ void Boss::SetDefaultBehavior(bool isInvisibleItem) {
 	dir = dir.Normalize();
 	// 目標のY軸角度（ラジアン）
 	float targetAngle = std::atan2(dir.x, dir.z); // Z前方軸に対する角度
-	animModel_->transform.translate += GetFrontOffset(Vector3(0.0f, 0.0f, 1.0f) * 0.05f * FPSKeeper::DeltaTime(), targetAngle);
+	animModel_->transform.translate += GetFrontOffset(Vector3(0.0f, 0.0f, 1.0f) * 0.05f * FPSKeeper::DeltaTimeFrame(), targetAngle);
 	// 現在のY軸角度（モデルの回転）
 	float currentAngle = animModel_->transform.rotate.y;
 	// 角度差を -π〜+π にラップ
@@ -1161,7 +1161,7 @@ void Boss::RadialSetting() {
 
 void Boss::RadialUpdate() {
 	if (radialtime_ > 0.0f) {
-		radialtime_ -= FPSKeeper::DeltaTime();
+		radialtime_ -= FPSKeeper::DeltaTimeFrame();
 		if (radialtime_ <= 0.0f) {
 			radialtime_ = 0.0f;
 			dxcommon_->GetOffscreenManager()->PopPostEffect(PostEffectList::Radial);
@@ -1188,11 +1188,11 @@ void Boss::InitSummon() {
 
 	auto& emitter = ParticleManager::GetParticleCSEmitterTexture(summonIndex_);
 	emitter.SetEmit(true);
-	emitter.data_->lifeTime = 50.0f;
+	emitter.data_->lifeTime = 0.8f;
 	emitter.data_->radius = 10.0f;
-	emitter.data_->frequency = 1.0f;
+	emitter.data_->frequency = 0.01f;
 	emitter.data_->translate = animModel_->transform.translate;
-	emitter.data_->baseVelocity = { 0.0f,0.01f,0.0f };
+	emitter.data_->baseVelocity = { 0.0f,0.6f,0.0f };
 
 	bossYPos_ = animModel_->transform.translate.y;
 	defaultCorePos_ = core_->GetWorldPos();
@@ -1220,16 +1220,16 @@ void Boss::InitSummon() {
 }
 
 void Boss::ExpandSummon() {
-	if (FPSKeeper::DeltaTime() > FPSKeeper::GetClampFrame()) return;
+	if (FPSKeeper::DeltaTimeFrame() > FPSKeeper::GetClampFrame()) return;
 	if (startWaiting_ > 0.0f) {
-		startWaiting_ -= FPSKeeper::DeltaTime();
+		startWaiting_ -= FPSKeeper::DeltaTimeFrame();
 		return;
 	}
 	if (summonCircleExpandTime_ > 0.0f) { // 召喚陣の拡大
 		isSummon_ = true;
 		auto& sp = params_.summon;
 
-		summonCircleExpandTime_ -= FPSKeeper::DeltaTime();
+		summonCircleExpandTime_ -= FPSKeeper::DeltaTimeFrame();
 		float t = (std::max)(summonCircleExpandTime_ / sp.summonExpandTime, 0.0f);
 		float summonRadius = std::lerp(sp.summonRadiusStart, sp.summonRadiusEnd, t);
 		ParticleManager::GetParticleCSEmitterTexture(summonIndex_).data_->radius = summonRadius;
@@ -1244,7 +1244,7 @@ void Boss::EnergyTimeUpdate() {
 		if (energyTime_ >= sp.energySphereEmitStart) {
 			energySphere_.Emit();
 		}
-		energyTime_ -= FPSKeeper::DeltaTime();
+		energyTime_ -= FPSKeeper::DeltaTimeFrame();
 		if (energyTime_ >= sp.bossRiseStartTime) { // ボスの位置更新
 			float t = (std::max)((energyTime_ - sp.bossRiseStartTime) / sp.bossRiseStartTime, 0.0f);
 			animModel_->transform.translate.y = std::lerp(bossYPos_, sp.bossDownPos, t);
@@ -1259,7 +1259,7 @@ void Boss::EnergyTimeUpdate() {
 	}
 	if (summonCircleExpandTime_ > 0.0f || energyTime_ > 0.0f) return;
 	if (energyCoolTime_ > 0.0f) {
-		energyCoolTime_ -= FPSKeeper::DeltaTime();
+		energyCoolTime_ -= FPSKeeper::DeltaTimeFrame();
 		if (energyCoolTime_ <= 0.0f) {
 			isSummon_ = false;
 			animModel_->transform.translate.y = bossYPos_;

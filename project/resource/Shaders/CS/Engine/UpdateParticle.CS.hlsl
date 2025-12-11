@@ -52,7 +52,7 @@ void MoveMode(uint pIndex)
         float3 pos = gParticle[pIndex].translate;
         float3 curl = CurlNoise(pos * 0.5);
 
-        float noisePower = 0.2f; // ノイズ強度
+        float noisePower = 4.0f; // ノイズ強度
         float speed = length(gParticle[pIndex].velocity);
 
         gParticle[pIndex].velocity =
@@ -126,7 +126,7 @@ void main( uint3 DTid : SV_DispatchThreadID )
             }
 
                 gParticle[particleIndex].prevTranslate = gParticle[particleIndex].translate;
-            gParticle[particleIndex].translate += gParticle[particleIndex].velocity;
+            gParticle[particleIndex].translate += gParticle[particleIndex].velocity * gPerFrame.deltaTime;
             
             if (gParticle[particleIndex].isTrailEmit == 1)
             {

@@ -705,11 +705,11 @@ void ParticleManager::UpdateAnimeGroup(const Matrix4x4& billboardMatrix) {
 				continue;
 			}
 
-			group->lifeTime[i] -= FPSKeeper::DeltaTime();
-			group->animeTime[i] += FPSKeeper::DeltaTime();
+			group->lifeTime[i] -= FPSKeeper::DeltaTimeFrame();
+			group->animeTime[i] += FPSKeeper::DeltaTimeFrame();
 
 			for (auto& animeChange : group->anime_) {
-				if (group->animeTime[i] >= animeChange.second * FPSKeeper::DeltaTime()) {
+				if (group->animeTime[i] >= animeChange.second * FPSKeeper::DeltaTimeFrame()) {
 					group->objects_[i]->SetTexture(animeChange.first);
 				}
 			}
@@ -727,9 +727,9 @@ void ParticleManager::UpdateAnimeGroup(const Matrix4x4& billboardMatrix) {
 				break;
 			}
 
-			group->speed[i] += group->accele[i] * FPSKeeper::DeltaTime();
+			group->speed[i] += group->accele[i] * FPSKeeper::DeltaTimeFrame();
 
-			group->objects_[i]->transform.translate += group->speed[i] * FPSKeeper::DeltaTime();
+			group->objects_[i]->transform.translate += group->speed[i] * FPSKeeper::DeltaTimeFrame();
 			group->objects_[i]->SetBillboardMat(billboardMatrix);
 		}
 	}
