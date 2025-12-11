@@ -181,6 +181,19 @@ void ParticleManager::ParticleDebugGUI() {
 					groupPair.second->emitter_.TimeReset();
 				}
 			}
+			if (ImGui::Button(isStopped_ ? "Start" : "Stop", ImVec2(80, 0))) {
+				isStopped_ ? FPSKeeper::SetUnStopped() : FPSKeeper::SetStopped();
+				isStopped_ = !isStopped_;
+			}
+
+			ImGui::SameLine();
+			// コマ送り（>>）
+			if (FPSKeeper::GetFrameByFrame()) {
+				FPSKeeper::SetFrameByFrame(false);
+			}
+			if (ImGui::Button(">>", ImVec2(40, 0))) {
+				FPSKeeper::SetFrameByFrame(true);
+			}
 
 			ImGui::Spacing();
 
@@ -579,6 +592,11 @@ TextureBasedEmitter& ParticleManager::GetParticleCSEmitterTexture(int index) {
 MeshSurefaceEmitter& ParticleManager::GetParticleCSEmitterSurface(int index) {
 	ParticleManager* instance = GetInstance();
 	return instance->gpuParticleSystem_->GetParticleCSEmitterSurface(index);
+}
+
+void ParticleManager::SetIsStopped(bool flag) {
+	ParticleManager* instance = GetInstance();
+	instance->isStopped_ = flag;
 }
 
 int ParticleManager::InitGPUEmitter(int returnMod) {

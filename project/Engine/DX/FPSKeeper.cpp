@@ -70,11 +70,23 @@ void FPSKeeper::Update() {
 }
 
 float FPSKeeper::DeltaTime() {
-	return (GetInstance()->deltaTime_); // 治す
+	return (GetInstance()->deltaTime_);
 }
 
 float FPSKeeper::DeltaTimeFrame() { 
-	return ((GetInstance()->deltaTime_) * 60.0f);// 上のと逆にする
+	return ((GetInstance()->deltaTime_) * 60.0f);
+}
+
+float Core::FPSKeeper::DeltaTimeForEffect() {
+	auto* inst = GetInstance();
+	if (inst->isStopped_) {
+		if (inst->isFrameByFrame_) {
+			return inst->deltaTime_;
+		}
+		return 0.0f;
+	} else {
+		return (inst->deltaTime_);
+	}
 }
 
 void FPSKeeper::SetHitStopRate(float rate) {
@@ -105,4 +117,23 @@ void FPSKeeper::Debug() {
 float FPSKeeper::GetClampFrame() {
 	auto* inst = GetInstance();
 	return inst->clampFrame_;
+}
+
+void Core::FPSKeeper::SetStopped() {
+	auto* inst = GetInstance();
+	inst->isStopped_ = true;
+}
+
+void Core::FPSKeeper::SetUnStopped() {
+	auto* inst = GetInstance();
+	inst->isStopped_ = false;
+}
+
+void Core::FPSKeeper::SetFrameByFrame(bool flag) {
+	auto* inst = GetInstance();
+	inst->isFrameByFrame_ = flag;
+}
+
+bool Core::FPSKeeper::GetFrameByFrame() {
+	return GetInstance()->isFrameByFrame_;
 }

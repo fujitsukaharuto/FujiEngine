@@ -87,6 +87,8 @@ public:
 	static TextureBasedEmitter& GetParticleCSEmitterTexture(int index);
 	static MeshSurefaceEmitter& GetParticleCSEmitterSurface(int index);
 
+	static void SetIsStopped(bool flag);
+
 	int InitGPUEmitter(int returnMod = 0);
 	int InitGPUEmitterTexture(const std::string& fileName);
 	int InitGPUEmitterSurface(const std::string& fileName);
@@ -167,6 +169,8 @@ private:
 	std::unique_ptr<Graphics::Object3d> lightning_;
 
 	BlendType preType_ = BlendType::ADD;
+
+	bool isStopped_ = false;
 
 	// ParticleCS
 	std::unique_ptr<GPUParticleSystem> gpuParticleSystem_;

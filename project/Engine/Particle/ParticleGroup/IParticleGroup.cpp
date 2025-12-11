@@ -16,7 +16,7 @@ bool IParticleGroup::LifeUpdate(Particle& particle) {
 		return true;
 	}
 
-	particle.lifeTime_ -= FPSKeeper::DeltaTime();
+	particle.lifeTime_ -= FPSKeeper::DeltaTimeForEffect();
 	return false;
 }
 
@@ -29,7 +29,7 @@ void IParticleGroup::ParticleSizeUpdate(Particle& particle) {
 		particle.color_.w = Lerp(particle.startAlpha_, 0.0f, t * t);
 	}
 	if (particle.isAutoUVMove_) {
-		particle.uvTrans_ += particle.autoUVSpeed_;
+		particle.uvTrans_ += particle.autoUVSpeed_ * FPSKeeper::DeltaTimeForEffect();
 	}
 
 	switch (sizeType) {
@@ -68,12 +68,12 @@ void IParticleGroup::ParticleSizeUpdate(Particle& particle) {
 void IParticleGroup::SRTUpdate(Particle& particle) {
 	if (particle.rotateType_ == static_cast<int>(RotateType::kRandomR)) {
 		if (particle.isContinuouslyRotate_) {
-			particle.rotate += particle.continuouslyR_ * FPSKeeper::DeltaTime();
+			particle.rotate += particle.continuouslyR_ * FPSKeeper::DeltaTimeForEffect();
 		}
 	}
 
-	particle.speed_ += particle.accele_ * FPSKeeper::DeltaTime();
-	particle.translate += particle.speed_ * FPSKeeper::DeltaTime();
+	particle.speed_ += particle.accele_ * FPSKeeper::DeltaTimeForEffect();
+	particle.translate += particle.speed_ * FPSKeeper::DeltaTimeForEffect();
 }
 
 void IParticleGroup::Billboard(Particle& particle, Matrix4x4& worldMatrix, const Matrix4x4& billboardMatrix, const Matrix4x4& rotate, Camera* camera) {

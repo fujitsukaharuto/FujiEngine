@@ -18,6 +18,8 @@ using namespace Math;
 ParticleDebugScene::ParticleDebugScene() {}
 
 ParticleDebugScene::~ParticleDebugScene() {
+	FPSKeeper::SetUnStopped();
+	ParticleManager::SetIsStopped(false);
 }
 
 void ParticleDebugScene::Initialize() {

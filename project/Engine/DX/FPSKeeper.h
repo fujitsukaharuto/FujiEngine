@@ -32,6 +32,11 @@ namespace Core {
 		static float DeltaTimeFrame();
 
 		/// <summary>
+		/// コマ送り対応のエフェクト用実時間ベースのDeltaTime
+		/// </summary>
+		static float DeltaTimeForEffect();
+
+		/// <summary>
 		/// ヒットストップのレートを設定(どれくらい遅くするか)
 		/// </summary>
 		static void SetHitStopRate(float rate);
@@ -49,6 +54,11 @@ namespace Core {
 		void Debug();
 
 		static float GetClampFrame();
+
+		static void SetStopped();
+		static void SetUnStopped();
+		static void SetFrameByFrame(bool flag);
+		static bool GetFrameByFrame();
 
 	private:
 
@@ -72,6 +82,8 @@ namespace Core {
 
 		bool isHitStop_ = false;
 		bool isSlowMotion_ = false;
+		bool isStopped_ = false;
+		bool isFrameByFrame_ = false;
 
 	};
 }

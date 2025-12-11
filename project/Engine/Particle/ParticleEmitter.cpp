@@ -405,7 +405,7 @@ void ParticleEmitter::Emit() {
 
 		time_ = frequencyTime_;
 	} else {
-		time_ -= FPSKeeper::DeltaTime();
+		time_ -= FPSKeeper::DeltaTimeForEffect();
 	}
 }
 
