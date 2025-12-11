@@ -76,21 +76,22 @@
         0.0,
         30.0
     ],
-    "frequencyTime": 60.0,
+    "frequencyTime": 1.0,
     "grainPattern": 2,
     "grainType": 1,
     "isAddRandomSize": false,
     "isAutoUVMove": false,
     "isBillBoard": true,
+    "isContinuouslyR_": false,
     "isDistanceComplement": false,
     "isZandX": false,
-    "lifeTime": 15.0,
+    "lifeTime": 0.25,
     "position": [
         0.0,
         0.0,
         0.0
     ],
-    "returnPower": -0.44999998807907104,
+    "returnPower": -27.0,
     "rotate": [
         0.0,
         0.0,
@@ -98,8 +99,8 @@
     ],
     "rotateType": 1,
     "speed": [
-        0.4154694378376007,
-        0.14128251373767853,
+        24.928165435791016,
+        8.476950645446777,
         -0.0
     ],
     "speedType": 3,

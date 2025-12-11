@@ -82,15 +82,16 @@
     "isAddRandomSize": false,
     "isAutoUVMove": false,
     "isBillBoard": false,
+    "isContinuouslyR_": false,
     "isDistanceComplement": false,
     "isZandX": true,
-    "lifeTime": 15.0,
+    "lifeTime": 0.25,
     "position": [
         0.0,
         0.0,
         0.0
     ],
-    "returnPower": -0.05000000074505806,
+    "returnPower": -3.0,
     "rotate": [
         0.0,
         0.0,

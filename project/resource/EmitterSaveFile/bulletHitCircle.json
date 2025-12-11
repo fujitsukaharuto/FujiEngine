@@ -76,21 +76,22 @@
         26.0,
         26.0
     ],
-    "frequencyTime": 60.0,
+    "frequencyTime": 1.0,
     "grainPattern": 2,
     "grainType": 1,
     "isAddRandomSize": false,
     "isAutoUVMove": false,
     "isBillBoard": true,
+    "isContinuouslyR_": false,
     "isDistanceComplement": false,
     "isZandX": false,
-    "lifeTime": 30.0,
+    "lifeTime": 0.5,
     "position": [
         0.0,
         0.0,
         0.0
     ],
-    "returnPower": -0.05000000074505806,
+    "returnPower": -3.0,
     "rotate": [
         0.0,
         0.0,

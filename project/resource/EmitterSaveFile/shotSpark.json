@@ -85,13 +85,13 @@
     "isContinuouslyR_": true,
     "isDistanceComplement": false,
     "isZandX": false,
-    "lifeTime": 20.0,
+    "lifeTime": 0.3333333432674408,
     "position": [
         0.0,
         0.0,
         0.0
     ],
-    "returnPower": -0.05000000074505806,
+    "returnPower": -3.0,
     "rotate": [
         0.0,
         0.0,

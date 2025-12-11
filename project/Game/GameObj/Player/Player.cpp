@@ -733,19 +733,19 @@ void Player::ParticleEmitterSetting() {
 }
 
 void Player::MoveEngineParticle() {
-	Vector3 particleSpeed = Random::GetVector3({ -0.01f,0.01f }, { -0.01f,0.01f }, { -0.3f,-0.2f });
+	Vector3 particleSpeed = Random::GetVector3({ -0.6f,0.6f }, { -0.6f,0.6f }, { -18.0f,-12.0f });
 	particleSpeed = TransformNormal(particleSpeed, MakeRotateXYZMatrix(model_->transform.rotate));
 	moveParticleL_.para_.speedx = { particleSpeed.x,particleSpeed.x };
 	moveParticleL_.para_.speedy = { particleSpeed.y,particleSpeed.y };
 	moveParticleL_.para_.speedz = { particleSpeed.z,particleSpeed.z };
 	moveParticleL_.Emit();
-	particleSpeed = Random::GetVector3({ -0.01f,0.01f }, { -0.01f,0.01f }, { -0.3f,-0.2f });
+	particleSpeed = Random::GetVector3({ -0.6f,0.6f }, { -0.6f,0.6f }, { -18.0f,-12.0f });
 	particleSpeed = TransformNormal(particleSpeed, MakeRotateXYZMatrix(model_->transform.rotate));
 	moveParticleR_.para_.speedx = { particleSpeed.x,particleSpeed.x };
 	moveParticleR_.para_.speedy = { particleSpeed.y,particleSpeed.y };
 	moveParticleR_.para_.speedz = { particleSpeed.z,particleSpeed.z };
 	moveParticleR_.Emit();
-	particleSpeed = { 0.0f,0.0f,-0.1f };
+	particleSpeed = { 0.0f,0.0f,-6.0f };
 	particleSpeed = TransformNormal(particleSpeed, MakeRotateXYZMatrix(model_->transform.rotate));
 	moveBurnerL_->para_.speedx = { particleSpeed.x,particleSpeed.x };
 	moveBurnerL_->para_.speedy = { particleSpeed.y,particleSpeed.y };

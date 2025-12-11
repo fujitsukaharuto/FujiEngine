@@ -8,9 +8,9 @@
         0.0
     ],
     "Para_colorMax": [
-        0.7850000262260437,
-        0.5011115074157715,
-        0.17886120080947876,
+        0.8939999938011169,
+        0.5578547120094299,
+        0.0,
         1.0
     ],
     "Para_colorMin": [
@@ -81,17 +81,17 @@
     "grainType": 1,
     "isAddRandomSize": false,
     "isAutoUVMove": false,
-    "isBillBoard": true,
+    "isBillBoard": false,
     "isContinuouslyR_": true,
     "isDistanceComplement": false,
     "isZandX": false,
-    "lifeTime": 20.0,
+    "lifeTime": 0.3333333432674408,
     "position": [
         0.0,
         0.0,
         0.0
     ],
-    "returnPower": -0.05000000074505806,
+    "returnPower": -3.0,
     "rotate": [
         0.0,
         0.0,

@@ -76,7 +76,7 @@
         20.0,
         20.0
     ],
-    "frequencyTime": 20.0,
+    "frequencyTime": 0.3333333432674408,
     "grainPattern": 4,
     "grainType": 1,
     "isAddRandomSize": false,
@@ -85,13 +85,13 @@
     "isContinuouslyR_": false,
     "isDistanceComplement": false,
     "isZandX": true,
-    "lifeTime": 10.0,
+    "lifeTime": 0.1666666716337204,
     "position": [
         0.0,
         40.0,
         0.0
     ],
-    "returnPower": -0.05000000074505806,
+    "returnPower": -3.0,
     "rotate": [
         0.0,
         -0.800000011920929,

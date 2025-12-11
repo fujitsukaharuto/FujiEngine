@@ -24,8 +24,8 @@
         0.0
     ],
     "Para_speedy": [
-        0.03999999910593033,
-        0.04500000178813934
+        2.3999998569488525,
+        2.700000047683716
     ],
     "Para_speedz": [
         0.0,
@@ -76,21 +76,22 @@
         2.0,
         1.5
     ],
-    "frequencyTime": 1.0,
+    "frequencyTime": 0.01666666753590107,
     "grainPattern": 2,
     "grainType": 1,
     "isAddRandomSize": false,
     "isAutoUVMove": true,
     "isBillBoard": true,
+    "isContinuouslyR_": false,
     "isDistanceComplement": false,
     "isZandX": false,
-    "lifeTime": 10.0,
+    "lifeTime": 0.1666666716337204,
     "position": [
         0.0,
         0.0,
         0.0
     ],
-    "returnPower": -0.05000000074505806,
+    "returnPower": -3.0,
     "rotate": [
         0.0,
         0.0,
