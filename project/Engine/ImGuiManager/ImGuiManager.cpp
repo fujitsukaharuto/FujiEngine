@@ -304,6 +304,9 @@ void ImGuiManager::DrawNode(MyNode& node, ed::Utilities::BlueprintNodeBuilder& b
 	ImGui::Text("%s", node.name.c_str());
 	builder.EndHeader();
 
+	// ---------------------------------------------------------
+	// 1. Left Column: Inputs
+	// ---------------------------------------------------------
 	ImGui::BeginGroup();
 	for (const auto& pin : node.inputs) {
 		builder.Input(pin.id);
@@ -320,10 +323,76 @@ void ImGuiManager::DrawNode(MyNode& node, ed::Utilities::BlueprintNodeBuilder& b
 		ImGui::PopStyleVar();
 		builder.EndInput();
 	}
-
 	ImGui::EndGroup();
-	ImGui::SameLine(70);
 
+	// ---------------------------------------------------------
+	// 2. Middle Column: Node Contents (Widgets)
+	// ---------------------------------------------------------
+	ImGui::SameLine();
+	ImGui::BeginGroup();
+
+	// コンテンツがある場合のみ右横に移動、なければ余白のみ
+	if (node.type != MyNode::NodeType::Texture &&
+		node.type != MyNode::NodeType::Add &&
+		node.type != MyNode::NodeType::Color &&
+		node.type != MyNode::NodeType::Vector2) {
+		// コンテンツがないノードの場合、ピン同士がくっつきすぎないように最小幅を確保
+		ImGui::SameLine();
+		ImGui::Dummy(ImVec2(20.0f, 0.0f));
+	}
+
+	// === Texture Node ===
+	if (node.type == MyNode::NodeType::Texture) {
+		ImGui::Image((ImTextureID)TextureManager::GetInstance()->GetTexture(node.texName)->gpuHandle.ptr, { 70,70 });
+	}
+
+	// === Add Node ===
+	if (node.type == MyNode::NodeType::Add) {
+		ImGui::Text("AddType");
+		int addType = static_cast<int>(node.addType);
+		if (ImGui::RadioButton("Increment", addType == static_cast<int>(AddType::Increment))) {
+			addType = static_cast<int>(AddType::Increment);
+		}
+		// RadioButtonは改行されるのでSameLineは不要（縦に並べる場合）
+		if (ImGui::RadioButton("DeltaTime", addType == static_cast<int>(AddType::DeltaTime))) {
+			addType = static_cast<int>(AddType::DeltaTime);
+		}
+		node.addType = static_cast<AddType>(addType);
+
+		if (node.addType == AddType::Increment) {
+			ImGui::SetNextItemWidth(100.0f);
+			ImGui::DragFloat(("##Add" + std::to_string(static_cast<uintptr_t>(node.id))).c_str(), &node.values[0].Get<float>(), 0.01f);
+		}
+	}
+
+	// === Color Node ===
+	if (node.type == MyNode::NodeType::Color) {
+		ImGui::SetNextItemWidth(150.0f); // 少し幅を調整
+		ImGui::ColorEdit4(("##Color" + std::to_string(static_cast<uintptr_t>(node.id))).c_str(), &node.values[0].Get<Vector4>().x);
+	}
+
+	// === Vector2 Node ===
+	if (node.type == MyNode::NodeType::Vector2) {
+		// ピンの高さと合わせるために少し下げるなどの微調整が必要ならDummyを入れる
+		ImGui::Text("X"); ImGui::SameLine();
+		ImGui::SetNextItemWidth(100.0f);
+		ImGui::DragFloat(("##Vector2x" + std::to_string(static_cast<uintptr_t>(node.id))).c_str(), &node.values[0].Get<Vector2>().x, 0.01f);
+
+		ImGui::Text("Y"); ImGui::SameLine();
+		ImGui::SetNextItemWidth(100.0f);
+		ImGui::DragFloat(("##Vector2y" + std::to_string(static_cast<uintptr_t>(node.id))).c_str(), &node.values[0].Get<Vector2>().y, 0.01f);
+	}
+
+	// 右側のピンとの余白
+	ImGui::Dummy(ImVec2(10.0f, 0.0f));
+	ImGui::EndGroup();
+
+
+	// ---------------------------------------------------------
+	// 3. Right Column: Outputs
+	// ---------------------------------------------------------
+	ImGui::SameLine();
+	ImGui::BeginGroup();
 	for (const auto& pin : node.outputs) {
 		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 0.8f);
 		builder.Output(pin.id);
@@ -332,54 +401,14 @@ void ImGuiManager::DrawNode(MyNode& node, ed::Utilities::BlueprintNodeBuilder& b
 		ed::PinPivotSize(ImVec2(0, 0));
 
 		if (pin.pinType == PinType::Mateial) {
-			DrawPinIcon(pin.isLinked,ax::Widgets::IconType::Square);
+			DrawPinIcon(pin.isLinked, ax::Widgets::IconType::Square);
 		} else {
 			DrawPinIcon(pin.isLinked);
 		}
 		ImGui::PopStyleVar();
 		builder.EndOutput();
 	}
-
-	if (node.type == MyNode::NodeType::Texture) {
-		ImGui::Dummy(ImVec2(5.0f, 0.0f)); ImGui::SameLine();
-		ImGui::Image((ImTextureID)TextureManager::GetInstance()->GetTexture(node.texName)->gpuHandle.ptr, { 70,70 });
-	}
-
-	if (node.type == MyNode::NodeType::Add) {
-		ImGui::Text("AddType");
-		int addType = static_cast<int>(node.addType);
-		if (ImGui::RadioButton("Increment", addType == static_cast<int>(AddType::Increment))) {
-			addType = static_cast<int>(AddType::Increment);
-		}
-		ImGui::SameLine();
-		if (ImGui::RadioButton("DeltaTime", addType == static_cast<int>(AddType::DeltaTime))) {
-			addType = static_cast<int>(AddType::DeltaTime);
-		}
-		node.addType = static_cast<AddType>(addType);
-
-		if (node.addType == AddType::Increment) {
-			ImGui::SetNextItemWidth(100.0f);
-			ImGui::DragFloat(("Add##Add" + std::to_string(static_cast<uintptr_t>(node.id))).c_str(), &node.values[0].Get<float>(), 0.01f);
-		}
-	}
-
-	if (node.type == MyNode::NodeType::Color) {
-		ImGui::Dummy(ImVec2(5.0f, 0.0f)); ImGui::SameLine();
-		ImGui::SetNextItemWidth(200.0f);
-		ImGui::ColorEdit4(("##Color" + std::to_string(static_cast<uintptr_t>(node.id))).c_str(), &node.values[0].Get<Vector4>().x);
-		/*ed::Suspend();
-
-		ed::Resume();*/
-	}
-
-	if (node.type == MyNode::NodeType::Vector2) {
-		ImGui::Dummy(ImVec2(5.0f, 0.0f)); ImGui::SameLine();
-		ImGui::SetNextItemWidth(100.0f);
-		ImGui::DragFloat(("X##Vector2x" + std::to_string(static_cast<uintptr_t>(node.id))).c_str(), &node.values[0].Get<Vector2>().x, 0.01f);
-		ImGui::Dummy(ImVec2(5.0f, 0.0f)); ImGui::SameLine();
-		ImGui::SetNextItemWidth(100.0f);
-		ImGui::DragFloat(("Y##Vector2y" + std::to_string(static_cast<uintptr_t>(node.id))).c_str(), &node.values[0].Get<Vector2>().y, 0.01f);
-	}
+	ImGui::EndGroup();
 
 	builder.End();
 }
@@ -393,17 +422,27 @@ void ImGuiManager::DrawNodeEditor(NodeGraph* nodeGraph) {
 	ed::NodeId nodeId;
 	if (ed::ShowNodeContextMenu(&nodeId)) {
 		ImGui::OpenPopup("Node Context Menu");
+		selectNodeID_ = nodeId;
 	} else if (ed::ShowBackgroundContextMenu()) {
 		ImGui::OpenPopup("Background Context Menu");
 	}
 	ed::Resume();
 
-	ed::Suspend(); // ノードの右クリックメニュー
+	ed::Suspend();
 	if (ImGui::BeginPopup("Node Context Menu")) {
 		if (ImGui::MenuItem("Delete Node")) {
 			// nodeId を削除
 		}
-		if (ImGui::MenuItem("Change Texture")) {
+		if (ImGui::BeginMenu("Change Texture")) {
+			MyNode* selectNode = nodeGraph->FindNodeById(selectNodeID_);
+			for (auto& pair : TextureManager::GetInstance()->GetTextureFiles()) {
+				ImGui::Image((ImTextureID)TextureManager::GetInstance()->GetTexture(pair.first.c_str())->gpuHandle.ptr, { 30,30 });
+				ImGui::SameLine();
+				if (ImGui::MenuItem(pair.first.c_str())) {
+					selectNode->texName = pair.first.c_str();
+				}
+			}
+			ImGui::EndMenu();
 			// nodeId に対応する Texture を変更
 		}
 		ImGui::EndPopup();

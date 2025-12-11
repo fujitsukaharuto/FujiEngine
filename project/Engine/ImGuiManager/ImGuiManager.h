@@ -133,6 +133,7 @@ namespace Core {
 		int nextId = 1;
 		// ノードエディタのコンテキスト
 		ax::NodeEditor::EditorContext* nodeEditorContext_ = nullptr;
+		ed::NodeId selectNodeID_;
 #endif // _DEBUG
 	private:
 		ImGuiManager(const ImGuiManager&) = delete;
