@@ -207,6 +207,18 @@ void ParticleEmitter::DebugGUI() {
 #endif // _DEBUG
 }
 
+void ParticleEmitter::EmitProgressGUI() {
+#ifdef _DEBUG
+	float t = 1.0f;
+	if (frequencyTime_ != 0.0f) {
+		t = 1.0f - (time_ / frequencyTime_);
+	}
+	ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "発生まで:");
+	ImGui::ProgressBar(t, ImVec2(0, 0));
+
+#endif // _DEBUG
+}
+
 void ParticleEmitter::DrawSize() {
 #ifdef _DEBUG
 	if (isDrawSize_) {

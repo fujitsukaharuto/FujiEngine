@@ -52,6 +52,7 @@ public:
 public:
 
 	void DebugGUI();
+	void EmitProgressGUI();
 	void DrawSize();
 
 	/// <summary>パーティクル発生</summary>

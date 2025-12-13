@@ -297,6 +297,8 @@ void ParticleManager::ParticleDebugGUI() {
 
 					ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "生存数: %d", int(selectParticleGroup_->drawCount_));
 
+					selectParticleGroup_->emitter_.EmitProgressGUI();
+
 					ImGui::Spacing();
 					if (ImGui::Button("Save Group Config", ImVec2(-FLT_MIN, 0))) {
 						SaveGroupData();
