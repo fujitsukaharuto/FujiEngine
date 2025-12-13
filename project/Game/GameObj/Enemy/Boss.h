@@ -23,62 +23,6 @@ enum class BossHPState {
 	Empty = 0
 };
 
-struct JumpParams {
-	float jumpTotalTime = 150.0f;
-	float upStart = 120.0f;
-	float upEnd = 90.0f;
-	float downStart = 70.0f;
-	float downEnd = 50.0f;
-	float height = 4.0f;
-	float groundJudgeHeight = 0.25f;
-};
-
-struct BeamParams {
-	float chargeTime = 120.0f;
-	float parentRotateStep;
-
-	float parentY = 20.0f;                // 親オブジェクトの高さ
-	float randomRotYMin = -1.56f;
-	float randomRotYMax = 1.56f;
-
-	float emitterLifeTime = 0.6f;        // 各トレースの寿命
-	float radiusGrowSpeed = 0.075f;       // チャージサークルの拡大速度
-	float baseChargeSize = 24.0f;
-
-	float shrinkSpeed = 0.55f;            // 縮小スピード
-	float rotateSpeedZ = 0.0225f;         // 回転速度
-	float sizeDecrease = 2.0f;            // 縮小後のサイズ減衰量
-	float lifeTimeDecrease = 0.04f;        // ライフ減衰量
-
-	float startSizeMulX = 3.0f;
-	float startSizeMulY = 6.0f;
-
-	float minRecalcSize = 3.0f;
-};
-
-struct BossRadialParams {
-	float baseTime = 40.0f;
-	float widthStart = 0.0f;
-	float widthEnd = 0.005f;
-};
-
-struct SummonParams {
-	float summonExpandTime = 50.0f;
-	float summonRadiusStart = 30.0f;
-	float summonRadiusEnd = 10.0f;
-	float energyTime = 120.0f;
-	float energySphereEmitStart = 115.0f;
-	float bossRiseStartTime = 60.0f;
-	float bossDownPos = -30.0f;
-};
-
-struct BossParams {
-	JumpParams jump;
-	BeamParams beam;
-	BossRadialParams radial;
-	SummonParams summon;
-};
-
 
 /// <summary>
 /// Bossクラス
@@ -87,6 +31,63 @@ class Boss : public OriginGameObject {
 public:
 	Boss();
 	~Boss();
+
+	struct JumpParams {
+		float jumpTotalTime = 150.0f;
+		float upStart = 120.0f;
+		float upEnd = 90.0f;
+		float downStart = 70.0f;
+		float downEnd = 50.0f;
+		float height = 4.0f;
+		float groundJudgeHeight = 0.25f;
+	};
+
+	struct BeamParams {
+		float chargeTime = 120.0f;
+		float parentRotateStep;
+
+		float parentY = 20.0f;                // 親オブジェクトの高さ
+		float randomRotYMin = -1.56f;
+		float randomRotYMax = 1.56f;
+
+		float emitterLifeTime = 0.6f;        // 各トレースの寿命
+		float radiusGrowSpeed = 0.075f;       // チャージサークルの拡大速度
+		float baseChargeSize = 24.0f;
+
+		float shrinkSpeed = 0.55f;            // 縮小スピード
+		float rotateSpeedZ = 0.0225f;         // 回転速度
+		float sizeDecrease = 2.0f;            // 縮小後のサイズ減衰量
+		float lifeTimeDecrease = 0.04f;        // ライフ減衰量
+
+		float startSizeMulX = 3.0f;
+		float startSizeMulY = 6.0f;
+
+		float minRecalcSize = 3.0f;
+	};
+
+	struct BossRadialParams {
+		float baseTime = 40.0f;
+		float widthStart = 0.0f;
+		float widthEnd = 0.005f;
+	};
+
+	struct SummonParams {
+		float summonExpandTime = 50.0f;
+		float summonRadiusStart = 30.0f;
+		float summonRadiusEnd = 10.0f;
+		float energyTime = 120.0f;
+		float energySphereEmitStart = 115.0f;
+		float bossRiseStartTime = 60.0f;
+		float bossDownPos = -30.0f;
+	};
+
+	struct BossParams {
+		JumpParams jump;
+		BeamParams beam;
+		BossRadialParams radial;
+		SummonParams summon;
+	};
+
 
 	void Initialize()override;
 	void Update()override;

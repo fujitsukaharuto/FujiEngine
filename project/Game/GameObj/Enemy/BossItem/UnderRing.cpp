@@ -56,8 +56,8 @@ void UnderRing::Update() {
 		model_->transform.scale += (Vector3(1.0f, 0.0f, 1.0f) * speed_) * FPSKeeper::DeltaTimeFrame();
 		model_->transform.scale.y = 1.0f;
 
-		ringRadMax_ = model_->transform.scale.x * 0.5f;
-		ringRadMin_ = model_->transform.scale.x * 0.435f;
+		ringRadMax_ = model_->transform.scale.x * maxScale_;
+		ringRadMin_ = model_->transform.scale.x * minScale_;
 
 		collider_->SetWidth(model_->transform.scale.x);
 		collider_->SetDepth(model_->transform.scale.z);

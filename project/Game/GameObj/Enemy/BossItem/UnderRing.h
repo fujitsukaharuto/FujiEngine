@@ -56,6 +56,8 @@ private:
 
 	float ringRadMax_;
 	float ringRadMin_;
+	float maxScale_ = 0.5f;
+	float minScale_ = 0.435f;
 
 	float uvTransX_;
 

@@ -21,6 +21,8 @@ void Beam::Initialize() {
 	OriginGameObject::Initialize();
 	OriginGameObject::CreateModel("cube.obj");
 
+	halfPi_ = std::numbers::pi_v<float> / 2.0f;
+
 	auto& emitter = ParticleManager::GetParticleCSEmitterSurface(1);
 	emitter.isEmit_ = false;
 	emitter.data_->count = 5000;
@@ -32,19 +34,19 @@ void Beam::Initialize() {
 	model_->SetLightEnable(LightMode::kLightNone);
 	model_->transform.translate.y = 25.0f;
 	model_->transform.scale.y = 30.0f;
-	model_->transform.rotate.x = 1.56f;
+	model_->transform.rotate.x = halfPi_;
 	model_->SetColor({ 0.0f,0.0f,0.0f,0.0f });
 	model_->SetAlphaRef(0.25f);
 
 	float rad = 0.0f;
-	float radDis = 60.0f * (std::numbers::pi_v<float> / 180.0f);
+	float radDis = params_.radDis * (std::numbers::pi_v<float> / 180.0f);
 	for (int i = 0; i < 6; i++) {
 		OneBeam beam;
 		beam.model = std::make_unique<Object3d>();
 		beam.model->Create("cube.obj");
 		beam.model->transform.translate.y = 25.0f;
 		beam.model->transform.scale.y = 30.0f;
-		beam.model->transform.rotate.x = 1.56f;
+		beam.model->transform.rotate.x = halfPi_;
 		beam.model->transform.rotate.y = rad;
 
 		beam.beamCore1 = std::make_unique<Object3d>();
@@ -137,7 +139,7 @@ void Beam::Initialize() {
 		beam.beamCore3->transform.scale.x = 0.0f;
 		beam.beamCore3->transform.scale.y = 3.0f;
 		beam.beamCore3->transform.scale.z = 0.0f;
-		beam.beamCore3->transform.rotate.y = 1.56f;
+		beam.beamCore3->transform.rotate.y = halfPi_;
 		beam.beamCore3->SetColor({ 0.5f,0.25f,0.15f,1.0f });
 		beam.beamCore3->SetAlphaRef(0.25f);
 		beam.beamCore3->SetParent(&beam.model->transform);
@@ -231,23 +233,23 @@ void Beam::InitBeam([[maybe_unused]] const Vector3& pos, [[maybe_unused]] const 
 	model_->transform.rotate.y = 0.0f;
 	model_->transform.translate.y = 17.0f;
 	particleParent_->transform.translate = model_->transform.translate;
-	particleParent_->transform.rotate.x = 2.443f;
+	particleParent_->transform.rotate.x = params_.initRotateX;
 
 	isLive_ = true;
-	lifeTime_ = 780.0f;
+	lifeTime_ = params_.lifeBaseTime;
 
-	expandTime_ = 60.0f;
-	beamAttackTime_ = 240.0f;
-	shrinkTime_ = 60.0f;
+	expandTime_ = params_.expandBaseTime;
+	beamAttackTime_ = params_.beamAttackBaseTimeAround;
+	shrinkTime_ = params_.shrinkBaseTime;
 	prePos_ = model_->GetWorldPos();
 
 	step_ = BeamStep::AroundAttack;
 
 	float rad = 0.0f;
-	float radDis = 60.0f * (std::numbers::pi_v<float> / 180.0f);
+	float radDis = params_.radDis * (std::numbers::pi_v<float> / 180.0f);
 	for (auto& beam : beams_) {
 		beam.model->transform.rotate.y = rad;
-		beam.model->transform.rotate.x = 2.443f;
+		beam.model->transform.rotate.x = params_.initRotateX;
 		beam.model->transform.translate.y = 20.0f;
 
 		beam.beamCore1->transform.scale.x = 0.0f;
@@ -264,7 +266,7 @@ void Beam::InitBeam([[maybe_unused]] const Vector3& pos, [[maybe_unused]] const 
 		beam.beam3->transform.scale.z = 0.0f;
 		beam.particleParent->transform.translate = beam.model->transform.translate;
 		beam.particleParent->transform.rotate.y = beam.model->transform.rotate.y;
-		beam.particleParent->transform.rotate.x = 0.873f;
+		beam.particleParent->transform.rotate.x = params_.initPParentRotateX;
 		rad += radDis;
 	}
 }
@@ -346,7 +348,7 @@ bool Beam::BeamAttackUpdate() {
 
 	if (step_ == BeamStep::AroundAttack) {
 		if (shrinkTime_ < 0.0f) {
-			changeTime_ = 40.0f;
+			changeTime_ = params_.changeBaseTime_;
 			ChangeBeamStep();
 		}
 	}
@@ -390,16 +392,16 @@ void Beam::SetBossParent(Boss* boss) {
 }
 
 void Beam::ChangeBeamStep() {
-	if (changeTime_ >= 40.0f) { // ビームの段階を変える為の処理、位置回転を元に
+	if (changeTime_ >= params_.changeBaseTime_) { // ビームの段階を変える為の処理、位置回転を元に
 		model_->transform.translate.y = 5.0f;
-		model_->transform.rotate.x = 1.56f;
+		model_->transform.rotate.x = halfPi_;
 
 		particleParent_->transform.translate = model_->transform.translate;
 		particleParent_->transform.rotate.x = 0.0f;
 
 		for (auto& beam : beams_) {
 			beam.model->transform.translate.y = 5.0f;
-			beam.model->transform.rotate.x = 1.56f;
+			beam.model->transform.rotate.x = halfPi_;
 			beam.particleParent->transform.translate = model_->transform.translate;
 			beam.particleParent->transform.rotate.x = 0.0f;
 		}
@@ -409,14 +411,14 @@ void Beam::ChangeBeamStep() {
 
 	if (changeTime_ > 0.0f) {
 		changeTime_ -= FPSKeeper::DeltaTimeFrame();
-		float t = 1.0f - (changeTime_ / 40.0f);
+		float t = 1.0f - (changeTime_ / params_.changeBaseTime_);
 		Vector3 emitPos = Lerp(prePos_, targetPos_, t);
 		ParticleManager::GetParticleCSEmitterSurface(1).data_->translate = emitPos;
 	}
 	if (changeTime_ <= 0.0f) {
-		expandTime_ = 60.0f;
-		beamAttackTime_ = 300.0f;
-		shrinkTime_ = 60.0f;
+		expandTime_ = params_.expandBaseTime;
+		beamAttackTime_ = params_.beamAttackBaseTimeRotate;
+		shrinkTime_ = params_.shrinkBaseTime;
 	}
 
 }
@@ -425,8 +427,9 @@ void Beam::BeamExpand(BeamStep step) {
 	if (expandTime_ > 0.0f) {
 		expandTime_ -= FPSKeeper::DeltaTimeFrame();
 		float t = 1.0f;
-		if (expandTime_ > 40.0f) {
-			t = 1.0f - ((expandTime_ - 40.0f) / 20.0f);
+		float lerpT = params_.expandBaseTime - params_.expandLerpTime;
+		if (expandTime_ > lerpT) {
+			t = 1.0f - ((expandTime_ - lerpT) / params_.expandLerpTime);
 		}
 		float sizeRate = 1.0f;
 		if (step == BeamStep::AroundAttack) {
@@ -464,7 +467,7 @@ void Beam::BeamMove(BeamStep step) {
 		case BeamStep::AroundAttack:
 		{
 			float frame = (beamAttackTime_);
-			float angleDegrees = (frame / 240.0f) * 50.0f + 90.0f;
+			float angleDegrees = (frame / params_.beamAttackBaseTimeAround) * 50.0f + 90.0f;
 			float angleRadians = angleDegrees * (std::numbers::pi_v<float> / 180.0f);
 			float angleRadiansParent = (angleDegrees - 90.0f) * (std::numbers::pi_v<float> / 180.0f);
 
@@ -483,7 +486,7 @@ void Beam::BeamMove(BeamStep step) {
 		case BeamStep::RotateBeam:
 		{
 			float frame = (beamAttackTime_);
-			float angleDegrees = (frame / 300.0f) * 360.0f;
+			float angleDegrees = (frame / params_.beamAttackBaseTimeRotate) * 360.0f;
 			float angleRadians = angleDegrees * (std::numbers::pi_v<float> / 180.0f);
 
 			// Y軸回転の行列（右手系前提）
@@ -516,8 +519,9 @@ void Beam::BeamShrink(BeamStep step) {
 
 		shrinkTime_ -= FPSKeeper::DeltaTimeFrame();
 		float t = 1.0f;
-		if (shrinkTime_ >= 30.0f) {
-			t = 1.0f - ((shrinkTime_ - 30.0f) / 30.0f);
+		float lerpT = params_.shrinkBaseTime - params_.shrinkLerpTime;
+		if (shrinkTime_ >= lerpT) {
+			t = 1.0f - ((shrinkTime_ - lerpT) / params_.shrinkLerpTime);
 			beamLight_->Emit();
 		}
 		float sizeRate = 1.0f;

@@ -34,6 +34,21 @@ public:
 	Beam();
 	~Beam();
 
+	struct BeamParams {
+		float initRotateX = 2.443f;
+		float initPParentRotateX = 0.873f;
+		float radDis = 60.0f;
+
+		float lifeBaseTime = 780.0f;
+		float expandBaseTime = 60.0f;
+		float expandLerpTime = 20.0f;
+		float beamAttackBaseTimeAround = 240.0f;
+		float beamAttackBaseTimeRotate = 300.0f;
+		float shrinkBaseTime = 60.0f;
+		float shrinkLerpTime = 30.0f;
+		float changeBaseTime_ = 40.0f;
+	};
+
 	void Initialize()override;
 	void Update()override;
 	void Draw(Graphics::Material* mate = nullptr, bool is = false)override;
@@ -93,6 +108,7 @@ private:
 
 	bool isLive_ = false;
 	float lifeTime_ = 780.0f;
+	BeamParams params_;
 
 	float expandTime_ = 60.0f;
 	float beamAttackTime_ = 240.0f;
@@ -107,6 +123,8 @@ private:
 	float beam1BaseScale_;
 	float beam2BaseScale_;
 	float beam3BaseScale_;
+
+	float halfPi_ = 0.0f;
 
 	//std::unique_ptr<AABBCollider> collider_;
 
