@@ -29,6 +29,7 @@ Boss::Boss() {
 Boss::~Boss() {
 	ParticleManager::GetParticleCSEmitterTexture(summonIndex_).SetEmit(false);
 	ParticleManager::GetParticleCSEmitter(dushTrailIndex_).SetEmit(false);
+	ParticleManager::GetInstance()->GetSphereEmitter(waveCSEmitIndex_).SetEmit(false);
 
 	for (int i = 0; i < 8; i++) {
 		ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]).SetEmit(false);
@@ -144,6 +145,8 @@ void Boss::Initialize() {
 	ParticleManager::Load(waveAttack3, "ShockWaveParticle");
 	ParticleManager::Load(waveAttack4, "ShockWave");
 	ParticleManager::Load(jumpWave_, "JumpShockWave");
+	waveCSEmitIndex_ = ParticleManager::GetInstance()->InitGPUEmitter();
+	ParticleManager::GetInstance()->GetSphereEmitter(waveCSEmitIndex_).Load("shockWaveCS");
 
 	waveAttack1.frequencyTime_ = 0.0f;
 	waveAttack2.frequencyTime_ = 0.0f;
@@ -795,6 +798,8 @@ void Boss::WaveWallAttack() {
 	waveAttack2.Emit();
 	waveAttack3.Emit();
 	waveAttack4.Emit();
+	ParticleManager::GetInstance()->GetSphereEmitter(waveCSEmitIndex_).SetPos(wavePos);
+	ParticleManager::GetInstance()->GetSphereEmitter(waveCSEmitIndex_).Emit();
 
 }
 

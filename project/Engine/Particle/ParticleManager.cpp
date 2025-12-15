@@ -8,6 +8,8 @@
 #include "Engine/Model/ModelManager.h"
 #include "ImGuiManager/ImGuiManager.h"
 #include "Engine/Editor/JsonSerializer.h"
+#include <fstream>
+#include <filesystem>
 
 using namespace Core;
 using namespace Graphics;
@@ -39,6 +41,7 @@ void ParticleManager::Initialize(DXCom* pDxcom, SRVManager* srvManager) {
 	gpuParticleSystem_ = std::make_unique<GPUParticleSystem>();
 	gpuParticleSystem_->Initialize(pDxcom, srvManager);
 	
+	LoadCSEmitterFileDir();
 }
 
 void ParticleManager::Finalize() {
@@ -611,6 +614,37 @@ int ParticleManager::InitGPUEmitterTexture(const std::string& fileName) {
 
 int ParticleManager::InitGPUEmitterSurface(const std::string& fileName) {
 	return gpuParticleSystem_->InitGPUEmitterSurface(fileName);
+}
+
+void ParticleManager::ResetCSEmitters() {
+	gpuParticleSystem_->ResetEmitters();
+}
+
+void ParticleManager::InitDefoultCSEmitter() {
+	gpuParticleSystem_->InitDefoultEmitter();
+}
+
+void ParticleManager::LoadCSEmitterFileDir() {
+	csEmitterFileNames_.clear();
+	const std::filesystem::path dirPath = "resource/EmitterSaveFile/GPUEmitter";
+	if (!std::filesystem::exists(dirPath) || !std::filesystem::is_directory(dirPath)) {
+		return;
+	}
+
+	for (const auto& entry : std::filesystem::directory_iterator(dirPath)) {
+		if (!entry.is_regular_file()) {
+			continue;
+		}
+		const std::filesystem::path& path = entry.path();
+
+		// 拡張子が .json のみ
+		if (path.extension() == ".json") {
+			// 拡張子なしのファイル名を取得
+			csEmitterFileNames_.push_back(
+				path.stem().string()
+			);
+		}
+	}
 }
 
 void ParticleManager::InternalCreateParticleGroup(const std::string& name, const std::string& fileName, uint32_t count, ShapeType shape, BlendType blendType, bool isParent) {

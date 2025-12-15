@@ -61,73 +61,71 @@ void SphereEmitter::Dispatch(ID3D12GraphicsCommandList* cmd,
 
 void SphereEmitter::DebugGUI() {
 #ifdef _DEBUG
-	if (ImGui::TreeNode("ParticleCS Emit Control")) {
-		ImGui::Checkbox("IsEmit", &isEmit_);
 
-		int dragCount = int(data_->count);
-		ImGui::DragInt("EmitCount", &dragCount, 1, 0, 100000);
-		data_->count = uint32_t(dragCount);
+	ImGui::Checkbox("IsEmit", &isEmit_);
 
-		ImGui::DragFloat("LifeTime", &data_->lifeTime, 0.01f, 0.01f, 300.0f);
-		ImGui::DragFloat("Frequency", &data_->frequency, 0.001f, 0.0f, 300.0f);
+	int dragCount = int(data_->count);
+	ImGui::DragInt("EmitCount", &dragCount, 1, 0, 100000);
+	data_->count = uint32_t(dragCount);
 
-		Vector3 prePos = data_->translate;
-		ImGui::DragFloat3("Translate", &data_->translate.x, 0.1f);
-		data_->prevTranslate = prePos;
-		ImGui::DragFloat3("PreTranslate", &data_->prevTranslate.x, 0.1f);
-		bool isDistance = bool(data_->isDistance);
-		ImGui::Checkbox("IsDistance", &isDistance);
-		data_->isDistance = uint32_t(isDistance);
+	ImGui::DragFloat("LifeTime", &data_->lifeTime, 0.01f, 0.01f, 300.0f);
+	ImGui::DragFloat("Frequency", &data_->frequency, 0.001f, 0.0f, 300.0f);
 
-		ImGui::DragFloat("Scale", &data_->radius, 0.1f, 0.01f, 300.0f);
+	Vector3 prePos = data_->translate;
+	ImGui::DragFloat3("Translate", &data_->translate.x, 0.1f);
+	data_->prevTranslate = prePos;
+	ImGui::DragFloat3("PreTranslate", &data_->prevTranslate.x, 0.1f);
+	bool isDistance = bool(data_->isDistance);
+	ImGui::Checkbox("IsDistance", &isDistance);
+	data_->isDistance = uint32_t(isDistance);
 
-		int shapeType = int(data_->emitShapeType);
-		ImGui::DragInt("EmitShapeType", &shapeType, 0.1f, 0, 6);
-		data_->emitShapeType = uint32_t(shapeType);
+	ImGui::DragFloat("Scale", &data_->radius, 0.1f, 0.01f, 300.0f);
 
-		ImGui::DragFloat3("ParticleScale", &data_->scale.x, 0.01f, 0.01f, 300.0f);
+	int shapeType = int(data_->emitShapeType);
+	ImGui::DragInt("EmitShapeType", &shapeType, 0.1f, 0, 6);
+	data_->emitShapeType = uint32_t(shapeType);
 
-		ImGui::SeparatorText("Color");
-		ImGui::DragFloat3("ColorMax", &data_->colorMax.x, 0.01f, 0.0f, 1.0f);
-		ImGui::DragFloat3("ColorMin", &data_->colorMin.x, 0.01f, 0.0f, 1.0f);
+	ImGui::DragFloat3("ParticleScale", &data_->scale.x, 0.01f, 0.01f, 300.0f);
 
-		ImGui::SeparatorText("Velocity");
-		ImGui::DragFloat3("BaseVelocity", &data_->baseVelocity.x, 0.1f, -10.0f, 10.0f);
-		ImGui::DragFloat("VelocityRandMax", &data_->velocityRandMax, 0.1f, -10.0f, 10.0f);
-		ImGui::DragFloat("VelocityRandMin", &data_->velocityRandMin, 0.1f, -10.0f, 10.0f);
-		int veloType = int(data_->emitVeloType);
-		ImGui::DragInt("EmitVelocityType", &veloType, 0.1f, 0, 5);
-		data_->emitVeloType = uint32_t(veloType);
-		int moveType = static_cast<int>(data_->isRandomMove);
-		const char* items[] = {
-			"None",     // 0
-			"Gradiate", // 1
-			"Curl"      // 2
-		};
-		if (ImGui::Combo("MoveType", &moveType, items, IM_ARRAYSIZE(items))) {
-			data_->isRandomMove = static_cast<uint32_t>(moveType);
-		}
+	ImGui::SeparatorText("Color");
+	ImGui::DragFloat3("ColorMax", &data_->colorMax.x, 0.01f, 0.0f, 1.0f);
+	ImGui::DragFloat3("ColorMin", &data_->colorMin.x, 0.01f, 0.0f, 1.0f);
 
-		bool isTrailEmit = bool(data_->isTrailEmit);
-		ImGui::Checkbox("IsTrailEmit", &isTrailEmit);
-		data_->isTrailEmit = uint32_t(isTrailEmit);
-
-		bool isGravity = bool(data_->isGravity);
-		ImGui::Checkbox("IsGravity", &isGravity);
-		data_->isGravity = uint32_t(isGravity);
-
-		ImGui::SetNextItemWidth(100);
-		ImGui::InputText(".json", saveName_, sizeof(saveName_));
-		ImGui::SameLine();
-		if (ImGui::Button("Save")) {
-			Save(saveName_);
-		}
-
-		ImGui::Text("DeltaTime1:%f", FPSKeeper::DeltaTimeFrame());
-		ImGui::Text("DeltaTime2:%f", FPSKeeper::DeltaTime());
-		ImGui::TreePop();
-
+	ImGui::SeparatorText("Velocity");
+	ImGui::DragFloat3("BaseVelocity", &data_->baseVelocity.x, 0.1f, -10.0f, 10.0f);
+	ImGui::DragFloat("VelocityRandMax", &data_->velocityRandMax, 0.1f, -10.0f, 10.0f);
+	ImGui::DragFloat("VelocityRandMin", &data_->velocityRandMin, 0.1f, -10.0f, 10.0f);
+	int veloType = int(data_->emitVeloType);
+	ImGui::DragInt("EmitVelocityType", &veloType, 0.1f, 0, 5);
+	data_->emitVeloType = uint32_t(veloType);
+	int moveType = static_cast<int>(data_->isRandomMove);
+	const char* items[] = {
+		"None",     // 0
+		"Gradiate", // 1
+		"Curl"      // 2
+	};
+	if (ImGui::Combo("MoveType", &moveType, items, IM_ARRAYSIZE(items))) {
+		data_->isRandomMove = static_cast<uint32_t>(moveType);
 	}
+
+	bool isTrailEmit = bool(data_->isTrailEmit);
+	ImGui::Checkbox("IsTrailEmit", &isTrailEmit);
+	data_->isTrailEmit = uint32_t(isTrailEmit);
+
+	bool isGravity = bool(data_->isGravity);
+	ImGui::Checkbox("IsGravity", &isGravity);
+	data_->isGravity = uint32_t(isGravity);
+
+	ImGui::SetNextItemWidth(100);
+	ImGui::InputText(".json", saveName_, sizeof(saveName_));
+	ImGui::SameLine();
+	if (ImGui::Button("Save")) {
+		Save(saveName_);
+	}
+
+	ImGui::Text("DeltaTime1:%f", FPSKeeper::DeltaTimeFrame());
+	ImGui::Text("DeltaTime2:%f", FPSKeeper::DeltaTime());
+
 #endif // _DEBUG
 }
 

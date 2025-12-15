@@ -320,7 +320,8 @@ private:
 	ParticleEmitter waveAttack2;
 	ParticleEmitter waveAttack3;
 	ParticleEmitter waveAttack4;
-	
+	int waveCSEmitIndex_ = 0;
+
 	ParticleEmitter charge9_;
 	ParticleEmitter charge10_;
 	ParticleEmitter charge11_;

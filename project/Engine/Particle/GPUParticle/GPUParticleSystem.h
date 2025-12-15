@@ -63,6 +63,8 @@ public:
 	void Finalize();
 	void Update(const Math::Matrix4x4& billboardMatrix);
 	void Draw(const D3D12_VERTEX_BUFFER_VIEW& vbView, const D3D12_INDEX_BUFFER_VIEW& ibView);
+	void ResetEmitters();
+	void InitDefoultEmitter();
 
 	int InitGPUEmitter(int returnMod = 0);
 	int InitGPUEmitterTexture(const std::string& fileName = "white2x2.png");

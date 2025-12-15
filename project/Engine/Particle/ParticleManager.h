@@ -93,6 +93,12 @@ public:
 	int InitGPUEmitterTexture(const std::string& fileName);
 	int InitGPUEmitterSurface(const std::string& fileName);
 
+	void ResetCSEmitters();
+	void InitDefoultCSEmitter();
+
+	void LoadCSEmitterFileDir();
+	const std::vector<std::string>& GetCSEmitterFileNames() { return csEmitterFileNames_; }
+
 private:
 
 	/// <summary>グループの作成を行う</summary>
@@ -174,6 +180,7 @@ private:
 
 	// ParticleCS
 	std::unique_ptr<GPUParticleSystem> gpuParticleSystem_;
+	std::vector<std::string> csEmitterFileNames_;
 
 #ifdef _DEBUG
 	ParticleGroup* selectParticleGroup_ = nullptr;

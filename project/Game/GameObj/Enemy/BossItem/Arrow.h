@@ -101,6 +101,7 @@ private:
 	ParticleEmitter hit_;
 	ParticleEmitter hitParticle_;
 	ParticleEmitter hitExpand_;
+	int hitEmitIndex_ = 0;
 
 	SoundData* throwSE_ = nullptr;
 

@@ -23,6 +23,8 @@ ResultScene::~ResultScene() {
 	lightManager_->GetDirectionLight()->directionLightData_->direction = { 0.0f,-1.0f,0.0f };
 	lightManager_->GetDirectionLight()->directionLightData_->intensity = 0.3f;
 	ParticleManager::GetInstance()->GetParticleCSEmitter(hanabiIndex_).SetEmit(false);
+	ParticleManager::GetInstance()->ResetCSEmitters();
+	ParticleManager::GetInstance()->InitDefoultCSEmitter();
 }
 
 void ResultScene::Initialize() {
