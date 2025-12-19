@@ -19,7 +19,7 @@ void MoveMode(uint pIndex)
         float3 pos = gParticle[pIndex].translate;
         float time = gPerFrame.time;
 
-        float3 samplePos = pos * 0.4 + float3(0, time * pIndex, 0);
+        float3 samplePos = pos * 0.4 + float3(0, time * 0.5 + frac(pIndex * 0.012) * 10.0, 0);// pIndexが大きくなった時に値がでかくなりすぎないように
         float3 curl = CurlNoise(samplePos);
 
         float3 vel0 = gParticle[pIndex].velocity;
@@ -31,20 +31,39 @@ void MoveMode(uint pIndex)
             float3 v = rnd + float3(0.1, 0.2, 0.1);
             float l = length(v);
             if (l < 0.0001f)
+            {
                 v = float3(0.3, 0.1, 0.2);
-            vel0 = v / length(v) * 0.005f;
+                l = length(v);
+            }
+            vel0 = v / l * 0.005f;
             len0 = 0.005f;
         }
-
-        float baseSpeed = len0;
-        if (baseSpeed < 0.0001f)
-            baseSpeed = 0.01f;
-
-        float3 baseDir = normalize(vel0);
-        float3 force = curl * 0.2;
+        float baseSpeed = max(len0, 0.01f);
+        float baseLen = length(vel0);
+        float3 baseDir;
+        if (baseLen < 0.0001f)
+        {
+            baseDir = float3(0.0f, 1.0f, 0.0f);
+        }
+        else
+        {
+            baseDir = vel0 / baseLen;
+        }
+        float3 force = curl * 0.2;// ノイズに強度をつける
         float3 vel = baseDir + force;
+        float vlen = length(vel);
+        if (vlen < 0.0001f)
+        {
+            vel = baseDir;
+            vlen = length(vel);
+            if (vlen < 0.0001f)
+            {
+                vel = float3(0.0f, 1.0f, 0.0f);
+                vlen = 1.0f;
+            }
+        }
 
-        vel = normalize(vel);
+        vel /= vlen;
         gParticle[pIndex].velocity = vel * baseSpeed;
     }
     else if (gParticle[pIndex].isRandomMove == 2)

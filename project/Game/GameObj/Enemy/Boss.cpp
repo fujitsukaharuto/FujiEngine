@@ -30,6 +30,7 @@ Boss::~Boss() {
 	ParticleManager::GetParticleCSEmitterTexture(summonIndex_).SetEmit(false);
 	ParticleManager::GetParticleCSEmitter(dushTrailIndex_).SetEmit(false);
 	ParticleManager::GetInstance()->GetSphereEmitter(waveCSEmitIndex_).SetEmit(false);
+	ParticleManager::GetInstance()->GetSphereEmitter(jumpCSEmitIndex_).SetEmit(false);
 
 	for (int i = 0; i < 8; i++) {
 		ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]).SetEmit(false);
@@ -146,7 +147,9 @@ void Boss::Initialize() {
 	ParticleManager::Load(waveAttack4, "ShockWave");
 	ParticleManager::Load(jumpWave_, "JumpShockWave");
 	waveCSEmitIndex_ = ParticleManager::GetInstance()->InitGPUEmitter();
-	ParticleManager::GetInstance()->GetSphereEmitter(waveCSEmitIndex_).Load("shockWaveCS");
+	jumpCSEmitIndex_ = ParticleManager::GetInstance()->InitGPUEmitter();
+	ParticleManager::GetSphereEmitter(waveCSEmitIndex_).Load("shockWaveCS");
+	ParticleManager::GetSphereEmitter(jumpCSEmitIndex_).Load("jumpCSEmit");
 
 	waveAttack1.frequencyTime_ = 0.0f;
 	waveAttack2.frequencyTime_ = 0.0f;
@@ -1026,6 +1029,8 @@ bool Boss::JumpAttack() {
 			if (isJumpAttack_) {
 				jumpWave_.pos_ = animModel_->transform.translate;
 				jumpWave_.Emit();
+				ParticleManager::GetSphereEmitter(jumpCSEmitIndex_).SetPos(jumpWave_.pos_);
+				ParticleManager::GetSphereEmitter(jumpCSEmitIndex_).Emit();
 				AudioPlayer::GetInstance()->SoundPlayWave(*jumpAttackSE_, 0.6f);
 				UnderRingEmit();
 			}

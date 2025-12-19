@@ -15,6 +15,7 @@ Arrow::Arrow() {
 
 Arrow::~Arrow() {
 	ParticleManager::GetSphereEmitter(hitEmitIndex_).SetEmit(false);
+	ParticleManager::GetSphereEmitter(hitEmitTrailIndex_).SetEmit(false);
 	if (isArrow_) {
 		ParticleManager::GetSphereEmitter(emitterNumber_).SetEmit(false);
 	}
@@ -53,7 +54,9 @@ void Arrow::Initialize() {
 	ParticleManager::Load(hitParticle_, "arrowParticle");
 	ParticleManager::Load(hitExpand_, "arrowExpandParticle");
 	hitEmitIndex_ = ParticleManager::GetInstance()->InitGPUEmitter();
+	hitEmitTrailIndex_ = ParticleManager::GetInstance()->InitGPUEmitter();
 	ParticleManager::GetSphereEmitter(hitEmitIndex_).Load("arrowHitCS");
+	ParticleManager::GetSphereEmitter(hitEmitTrailIndex_).Load("arrowHitTrailCS");
 
 	spark1_.frequencyTime_ = 0.0f;
 	spark3_.frequencyTime_ = 0.0f;
@@ -211,6 +214,8 @@ void Arrow::ArrivalTimeUpdate() {
 		hit_.Emit();
 		ParticleManager::GetSphereEmitter(hitEmitIndex_).SetPos(model_->transform.translate);
 		ParticleManager::GetSphereEmitter(hitEmitIndex_).Emit();
+		ParticleManager::GetSphereEmitter(hitEmitTrailIndex_).SetPos(model_->transform.translate);
+		ParticleManager::GetSphereEmitter(hitEmitTrailIndex_).Emit();
 		ParticleManager::GetSphereEmitter(emitterNumber_).SetEmit(false);
 	}
 }

@@ -331,6 +331,7 @@ private:
 	ParticleEmitter charge15_;
 
 	ParticleEmitter jumpWave_;
+	int jumpCSEmitIndex_ = 0;
 
 	ParticleEmitter roringWave_;
 	ParticleEmitter roringParticle_;
