@@ -9,7 +9,9 @@ using namespace Core;
 DXCommand::~DXCommand() {
 
 	list_.Reset();
-	allocator_.Reset();
+	for (uint32_t i = 0; i < kFrameCount; ++i) {
+		allocator_[i].Reset();
+	}
 	queue_.Reset();
 
 }
@@ -28,15 +30,18 @@ void DXCommand::Initialize(ID3D12Device* device) {
 
 
 	/// allocator---------------------------------
-	hr = device->CreateCommandAllocator(
-		D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&allocator_));
-	assert(SUCCEEDED(hr));
+	for (uint32_t i = 0; i < kFrameCount; ++i) {
+		hr = device->CreateCommandAllocator(
+			D3D12_COMMAND_LIST_TYPE_DIRECT,
+			IID_PPV_ARGS(&allocator_[i]));
+		assert(SUCCEEDED(hr));
+	}
 
 
 	/// list--------------------------------------
 	hr = device->CreateCommandList(
 		0, D3D12_COMMAND_LIST_TYPE_DIRECT,
-		allocator_.Get(), nullptr, IID_PPV_ARGS(&list_));
+		allocator_[0].Get(), nullptr, IID_PPV_ARGS(&list_));
 	assert(SUCCEEDED(hr));
 
 
@@ -94,15 +99,17 @@ void DXCommand::Execution() {
 }
 
 
-void DXCommand::Reset() {
+void DXCommand::Reset(uint32_t frameIndex) {
 
 	HRESULT hr;
 
-	hr = allocator_->Reset();
-	assert(SUCCEEDED(hr));
-	hr = list_->Reset(allocator_.Get(), nullptr);
+	frameIndex_ = frameIndex;
+
+	hr = allocator_[frameIndex_]->Reset();
 	assert(SUCCEEDED(hr));
 
+	hr = list_->Reset(allocator_[frameIndex_].Get(), nullptr);
+	assert(SUCCEEDED(hr));
 }
 
 void DXCommand::SetViewAndscissor() {

@@ -31,7 +31,7 @@ namespace DXC {
 		/// <summary>
 		/// コマンドアロケータおよびコマンドリストをリセットする
 		/// </summary>
-		void Reset();
+		void Reset(uint32_t frameIndex);
 
 		/// <summary>
 		/// ViewとScissorをセットする
@@ -46,16 +46,18 @@ namespace DXC {
 
 	private:
 
-
+		static constexpr uint32_t kFrameCount = 2;
 
 	private:
 
 		ComPtr<ID3D12CommandQueue> queue_ = nullptr;
-		ComPtr<ID3D12CommandAllocator> allocator_ = nullptr;
+		ComPtr<ID3D12CommandAllocator> allocator_[kFrameCount];
 		ComPtr<ID3D12GraphicsCommandList> list_ = nullptr;
 
 		ComPtr<ID3D12Fence> fence_ = nullptr;
 		uint64_t fenceValue_ = 0;
+
+		uint32_t frameIndex_ = 0;
 
 		D3D12_VIEWPORT viewport_{};
 		D3D12_RECT scissor_{};

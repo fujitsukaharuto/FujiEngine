@@ -318,7 +318,7 @@ void DXCom::PostDraw() {
 	swapChain_->Present(1, 0);
 	command_->Execution();
 	fpsKeeper_->FixFPS();
-	command_->Reset();
+	command_->Reset(swapChain_->GetCurrentBackBufferIndex());
 }
 
 
@@ -333,7 +333,7 @@ void DXCom::CommandExecution() {
 
 	command_->Execution();
 
-	command_->Reset();
+	command_->Reset(swapChain_->GetCurrentBackBufferIndex());
 }
 
 void DXCom::SetRenderTargets() {
