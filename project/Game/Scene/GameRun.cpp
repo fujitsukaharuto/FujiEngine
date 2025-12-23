@@ -223,6 +223,8 @@ void GameRun::Initialize() {
 }
 
 void GameRun::Finalize() {
+	dxcommon_->Flush();
+
 	commandManger_->Finalize();
 	sceneFactory_.reset();
 	sceneManager_->Finalize();

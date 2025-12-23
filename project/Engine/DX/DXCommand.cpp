@@ -9,9 +9,10 @@ using namespace Core;
 DXCommand::~DXCommand() {
 
 	list_.Reset();
-	for (uint32_t i = 0; i < kFrameCount; ++i) {
+	for (uint32_t i = 0; i < kFrameCount_; ++i) {
 		allocator_[i].Reset();
 	}
+	fence_.Reset();
 	queue_.Reset();
 
 }
@@ -30,7 +31,7 @@ void DXCommand::Initialize(ID3D12Device* device) {
 
 
 	/// allocator---------------------------------
-	for (uint32_t i = 0; i < kFrameCount; ++i) {
+	for (uint32_t i = 0; i < kFrameCount_; ++i) {
 		hr = device->CreateCommandAllocator(
 			D3D12_COMMAND_LIST_TYPE_DIRECT,
 			IID_PPV_ARGS(&allocator_[i]));
@@ -46,8 +47,10 @@ void DXCommand::Initialize(ID3D12Device* device) {
 
 
 	/// fence-------------------------------------
-	fenceValue_ = 0;
-	hr = device->CreateFence(fenceValue_, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence_));
+	for (uint32_t i = 0; i < kFrameCount_; ++i) {
+		fenceValue_[i] = 0;
+	}
+	hr = device->CreateFence(fenceValue_[0], D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence_));
 	assert(SUCCEEDED(hr));
 
 
@@ -68,34 +71,43 @@ void DXCommand::Initialize(ID3D12Device* device) {
 
 }
 
+void DXCommand::Flush() {
+	const uint64_t fenceToWait = ++fenceValue_[frameIndex_];
+	queue_->Signal(fence_.Get(), fenceToWait);
+
+	HANDLE fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+	fence_->SetEventOnCompletion(fenceToWait, fenceEvent);
+	WaitForSingleObject(fenceEvent, INFINITE);
+	CloseHandle(fenceEvent);
+}
 
 void DXCommand::Close() {
 
 	HRESULT hr;
-
 	hr = list_->Close();
 	assert(SUCCEEDED(hr));
-
-	ComPtr<ID3D12CommandList> commandLists[] = { list_.Get() };
-	queue_->ExecuteCommandLists(1, commandLists->GetAddressOf());
-
 }
-
 
 void DXCommand::Execution() {
 
-	// コマンドリストの実行完了を待つ
-	fenceValue_++;
-	queue_->Signal(fence_.Get(), fenceValue_);
-	if (fence_->GetCompletedValue() < fenceValue_) {
+	ComPtr<ID3D12CommandList> commandLists[] = { list_.Get() };
+	queue_->ExecuteCommandLists(1, commandLists->GetAddressOf());
+}
 
-		HANDLE fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+
+void DXC::DXCommand::WaitForGPU() {
+	// コマンドリストの実行完了を待つ
+	const uint64_t fenceToWait = ++fenceValue_[frameIndex_];
+	queue_->Signal(fence_.Get(), fenceToWait);
+	if (fence_->GetCompletedValue() < fenceToWait) {
+
+		HANDLE fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 		assert(fenceEvent != nullptr);
-		fence_->SetEventOnCompletion(fenceValue_, fenceEvent);
+
+		fence_->SetEventOnCompletion(fenceToWait, fenceEvent);
 		WaitForSingleObject(fenceEvent, INFINITE);
 		CloseHandle(fenceEvent);
 	}
-
 }
 
 

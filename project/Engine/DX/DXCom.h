@@ -52,6 +52,7 @@ public:
 
 	void Initialize(Core::MyWin* myWin);
 	void Finalize();
+	void Flush();
 
 	/// <summary>
 	/// PostEffect用Texture等の初期化

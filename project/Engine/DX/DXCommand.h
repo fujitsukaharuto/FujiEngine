@@ -17,6 +17,7 @@ namespace DXC {
 	public:
 
 		void Initialize(ID3D12Device* device);
+		void Flush();
 
 		/// <summary>
 		/// コマンドリストをクローズし、コマンドキューに実行を送信する
@@ -27,6 +28,11 @@ namespace DXC {
 		/// GPU実行キューへ送信する
 		/// </summary>
 		void Execution();
+
+		/// <summary>
+		/// GPUの実行をまつ
+		/// </summary>
+		void WaitForGPU();
 
 		/// <summary>
 		/// コマンドアロケータおよびコマンドリストをリセットする
@@ -46,16 +52,16 @@ namespace DXC {
 
 	private:
 
-		static constexpr uint32_t kFrameCount = 2;
+		static constexpr uint32_t kFrameCount_ = 2;
 
 	private:
 
 		ComPtr<ID3D12CommandQueue> queue_ = nullptr;
-		ComPtr<ID3D12CommandAllocator> allocator_[kFrameCount];
+		ComPtr<ID3D12CommandAllocator> allocator_[kFrameCount_];
 		ComPtr<ID3D12GraphicsCommandList> list_ = nullptr;
 
 		ComPtr<ID3D12Fence> fence_ = nullptr;
-		uint64_t fenceValue_ = 0;
+		uint64_t fenceValue_[kFrameCount_];
 
 		uint32_t frameIndex_ = 0;
 

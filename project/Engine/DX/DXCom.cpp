@@ -68,6 +68,10 @@ void DXCom::Finalize() {
 #endif
 }
 
+void DXCom::Flush() {
+	command_->Flush();
+}
+
 void DXCom::CreateDevice() {
 
 #ifdef _DEBUG
@@ -315,8 +319,9 @@ void DXCom::PostDraw() {
 	// 命令のクローズ
 	command_->Close();
 	// コマンドリストの実行
-	swapChain_->Present(1, 0);
 	command_->Execution();
+	swapChain_->Present(1, 0);
+	command_->WaitForGPU();
 	fpsKeeper_->FixFPS();
 	command_->Reset(swapChain_->GetCurrentBackBufferIndex());
 }
@@ -332,6 +337,8 @@ void DXCom::CommandExecution() {
 	command_->Close();
 
 	command_->Execution();
+
+	command_->WaitForGPU();
 
 	command_->Reset(swapChain_->GetCurrentBackBufferIndex());
 }
