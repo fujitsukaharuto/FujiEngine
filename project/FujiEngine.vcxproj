@@ -245,6 +245,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\DX\DXCommand.h" />
     <ClInclude Include="Engine\DX\DXCompil.h" />
     <ClInclude Include="Engine\DX\FPSKeeper.h" />
+    <ClInclude Include="Engine\DX\FrameCount.h" />
     <ClInclude Include="Engine\DX\Framework.h" />
     <ClInclude Include="Engine\DX\OffscreenManager.h" />
     <ClInclude Include="Engine\DX\SRVManager.h" />

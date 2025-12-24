@@ -2,6 +2,7 @@
 #include <wrl/client.h>
 #include <d3d12.h>
 #include <cmath>
+#include "Engine/DX/FrameCount.h"
 
 using namespace Microsoft::WRL;
 
@@ -52,7 +53,6 @@ namespace DXC {
 
 	private:
 
-		static constexpr uint32_t kFrameCount_ = 2;
 
 	private:
 

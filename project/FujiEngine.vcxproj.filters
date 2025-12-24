@@ -805,6 +805,9 @@
     <ClInclude Include="Game\GameObj\Enemy\Behavior\BossDushAttack.h">
       <Filter>Game\GameObj\Enemy\Behavior</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\DX\FrameCount.h">
+      <Filter>Engine\DX</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
