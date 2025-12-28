@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <d3d12.h>
 #include <memory>
+#include "Engine/DX/FrameCount.h"
 
 using namespace Microsoft::WRL;
 
@@ -38,11 +39,11 @@ namespace Graphics {
 		/// 線のデータ
 		/// </summary>
 		struct LineData {
-			ComPtr<ID3D12Resource> vertBuffer;
+			ComPtr<ID3D12Resource> vertBuffer[DXC::kFrameCount_];
 			ComPtr<ID3D12Resource> indexBuffer;
 			D3D12_VERTEX_BUFFER_VIEW vbView{};
 			D3D12_INDEX_BUFFER_VIEW ibView{};
-			VertexPosColor* vertMap = nullptr;
+			VertexPosColor* vertMap[DXC::kFrameCount_];
 			uint16_t* indexMap = nullptr;
 		};
 
@@ -89,8 +90,8 @@ namespace Graphics {
 			Math::Matrix4x4 viewProject;
 		};
 
-		ComPtr<ID3D12Resource> cBufferResource_ = nullptr;
-		CBuffer* cBufferData_ = nullptr;
+		ComPtr<ID3D12Resource> cBufferResource_[DXC::kFrameCount_];
+		CBuffer* cBufferData_[DXC::kFrameCount_];
 
 	};
 }

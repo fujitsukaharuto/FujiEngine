@@ -179,16 +179,18 @@ SkinCluster AnimationModel::CreateSkinCluster(const Skeleton& skeleton, const Mo
 	SRVManager* srv = SRVManager::GetInstance();
 
 	// MatrixPalette
-	skinCluster.paletteResource = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(WellForGPU) * skeleton.joints.size());
-	WellForGPU* mappedPallette = nullptr;
-	skinCluster.paletteResource->Map(0, nullptr, reinterpret_cast<void**>(&mappedPallette));
-	skinCluster.mappedPalette = { mappedPallette,skeleton.joints.size() };
+	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
+		skinCluster.paletteResource[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(WellForGPU) * skeleton.joints.size());
+		WellForGPU* mappedPallette = nullptr;
+		skinCluster.paletteResource[i]->Map(0, nullptr, reinterpret_cast<void**>(&mappedPallette));
+		skinCluster.mappedPalette[i] = { mappedPallette,skeleton.joints.size() };
 
-	uint32_t paletteIndex = srv->Allocate();
-	skinCluster.paletteSrvHandle.first = srv->GetCPUDescriptorHandle(paletteIndex);
-	skinCluster.paletteSrvHandle.second = srv->GetGPUDescriptorHandle(paletteIndex);
-	srv->CreateStructuredSRV(paletteIndex, skinCluster.paletteResource.Get(),
-		static_cast<UINT>(skeleton.joints.size()), static_cast<UINT>(sizeof(WellForGPU)));
+		uint32_t paletteIndex = srv->Allocate();
+		skinCluster.paletteSrvHandle[i].first = srv->GetCPUDescriptorHandle(paletteIndex);
+		skinCluster.paletteSrvHandle[i].second = srv->GetGPUDescriptorHandle(paletteIndex);
+		srv->CreateStructuredSRV(paletteIndex, skinCluster.paletteResource[i].Get(),
+			static_cast<UINT>(skeleton.joints.size()), static_cast<UINT>(sizeof(WellForGPU)));
+	}
 
 
 	// InfluenceResource
@@ -286,7 +288,7 @@ void AnimationModel::AnimationUpdate() {
 }
 
 void AnimationModel::CSDispatch() {
-	model_->CSDispatch(skinCluster_, dxcommon_->GetCommandList());
+	model_->CSDispatch(skinCluster_, dxcommon_->GetCommandList(), dxcommon_->GetNowFrameCount());
 }
 
 void AnimationModel::Draw(Material* mate) {
@@ -302,8 +304,10 @@ void AnimationModel::Draw(Material* mate) {
 	dxcommon_->GetDXCommand()->GetList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	lightManager_->SetLightCommand(dxcommon_->GetCommandList());
 
-	cList->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
-	cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_->GetGPUVirtualAddress());
+	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
+
+	cList->SetGraphicsRootConstantBufferView(1, wvpResource_[frameIndex]->GetGPUVirtualAddress());
+	cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_[frameIndex]->GetGPUVirtualAddress());
 	cList->SetGraphicsRootDescriptorTable(7, environment_->gpuHandle);
 
 	if (model_ && !isMirrorObj_) {
@@ -318,9 +322,11 @@ void AnimationModel::Draw(Material* mate) {
 void AnimationModel::AnimeDraw() {
 	SetBillboardWVP();
 
+	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
+
 	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
-	cList->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
-	cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_->GetGPUVirtualAddress());
+	cList->SetGraphicsRootConstantBufferView(1, wvpResource_[frameIndex]->GetGPUVirtualAddress());
+	cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_[frameIndex]->GetGPUVirtualAddress());
 	lightManager_->SetLightCommand(cList);
 
 	if (model_) {
@@ -414,12 +420,13 @@ void AnimationModel::SkeletonUpdate() {
 }
 
 void AnimationModel::SkinClusterUpdate() {
+	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 	for (size_t jointIndex = 0; jointIndex < skeleton_.joints.size(); jointIndex++) {
 		assert(jointIndex < skinCluster_.inverseBindPoseMatrices.size());
-		skinCluster_.mappedPalette[jointIndex].skeltonSpaceMatrix =
+		skinCluster_.mappedPalette[frameIndex][jointIndex].skeltonSpaceMatrix =
 			Multiply(skinCluster_.inverseBindPoseMatrices[jointIndex], skeleton_.joints[jointIndex].skeletonSpaceMatrix);
-		skinCluster_.mappedPalette[jointIndex].skeletonSpaceInverseTransposeMatrix =
-			Transpose(Inverse(skinCluster_.mappedPalette[jointIndex].skeltonSpaceMatrix));
+		skinCluster_.mappedPalette[frameIndex][jointIndex].skeletonSpaceInverseTransposeMatrix =
+			Transpose(Inverse(skinCluster_.mappedPalette[frameIndex][jointIndex].skeltonSpaceMatrix));
 	}
 }
 
@@ -571,17 +578,19 @@ int32_t AnimationModel::CreateJoint(const Node& node, const std::optional<int32_
 }
 
 void AnimationModel::CreateWVP() {
-	wvpResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(TransformationMatrix));
-	wvpDate_ = nullptr;
-	wvpResource_->Map(0, nullptr, reinterpret_cast<void**>(&wvpDate_));
-	wvpDate_->WVP = MakeIdentity4x4();
-	wvpDate_->World = MakeIdentity4x4();
-	wvpDate_->WorldInverseTransPose = Transpose(Inverse(wvpDate_->World));
+	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
+		wvpResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(TransformationMatrix));
+		wvpDate_[i] = nullptr;
+		wvpResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&wvpDate_[i]));
+		wvpDate_[i]->WVP = MakeIdentity4x4();
+		wvpDate_[i]->World = MakeIdentity4x4();
+		wvpDate_[i]->WorldInverseTransPose = Transpose(Inverse(wvpDate_[i]->World));
 
-	cameraPosResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(DirectionalLight));
-	cameraPosData_ = nullptr;
-	cameraPosResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraPosData_));
-	cameraPosData_->worldPosition = camera_->transform.translate;
+		cameraPosResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(DirectionalLight));
+		cameraPosData_[i] = nullptr;
+		cameraPosResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&cameraPosData_[i]));
+		cameraPosData_[i]->worldPosition = camera_->transform.translate;
+	}
 }
 
 void AnimationModel::SetWVP() {
@@ -618,11 +627,13 @@ void AnimationModel::SetWVP() {
 	wvpDate_->WVP = Multiply(localMatrix, worldViewProjectionMatrix);
 	wvpDate_->WorldInverseTransPose = Transpose(Inverse(wvpDate_->World));*/
 
-	wvpDate_->World = worldMatrix;
-	wvpDate_->WVP = worldViewProjectionMatrix;
-	wvpDate_->WorldInverseTransPose = Transpose(Inverse(wvpDate_->World));
+	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 
-	cameraPosData_->worldPosition = camera_->GetTranslate();
+	wvpDate_[frameIndex]->World = worldMatrix;
+	wvpDate_[frameIndex]->WVP = worldViewProjectionMatrix;
+	wvpDate_[frameIndex]->WorldInverseTransPose = Transpose(Inverse(wvpDate_[frameIndex]->World));
+
+	cameraPosData_[frameIndex]->worldPosition = camera_->GetTranslate();
 }
 
 void AnimationModel::SetBillboardWVP() {
@@ -641,9 +652,11 @@ void AnimationModel::SetBillboardWVP() {
 		worldViewProjectionMatrix = worldMatrix;
 	}
 
-	wvpDate_->World = worldMatrix;
-	wvpDate_->WVP = worldViewProjectionMatrix;
-	wvpDate_->WorldInverseTransPose = Transpose(Inverse(wvpDate_->World));
+	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
+
+	wvpDate_[frameIndex]->World = worldMatrix;
+	wvpDate_[frameIndex]->WVP = worldViewProjectionMatrix;
+	wvpDate_[frameIndex]->WorldInverseTransPose = Transpose(Inverse(wvpDate_[frameIndex]->World));
 }
 
 Vector3 AnimationModel::CalculationValue(const std::vector<KeyframeVector3>& keyframe, float time) {

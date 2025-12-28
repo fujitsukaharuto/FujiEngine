@@ -245,6 +245,7 @@ void GameRun::Finalize() {
 }
 
 void GameRun::Update() {
+	dxcommon_->BeginFrame();
 	fpsKeeper_->Update();
 
 	// 入力関連の毎フレーム処理
@@ -252,6 +253,7 @@ void GameRun::Update() {
 	cameraManager_->Update();
 	dxcommon_->OffscreenUpDate();
 	modelManager_->PickingUpdate();
+	lightManager_->Update();
 
 #ifdef _DEBUG
 	if (input_->TriggerKey(DIK_F12)) {

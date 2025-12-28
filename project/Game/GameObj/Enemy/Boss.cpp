@@ -108,12 +108,12 @@ void Boss::Initialize() {
 		int numEmitter = ParticleManager::GetInstance()->InitGPUEmitter();
 		auto& emitter = ParticleManager::GetSphereEmitter(numEmitter);
 		emitter.isEmit_ = false;
-		emitter.data_->colorMax = { 1.0f,0.0f,0.0f };
-		emitter.data_->colorMin = { 1.0f,0.0f,0.0f };
-		emitter.data_->frequency = 0.0f;
-		emitter.data_->radius = 0.0f;
-		emitter.data_->scale = { 1.5f,1.5f,1.5f };
-		emitter.data_->lifeTime = 0.6f;
+		emitter.data_.colorMax = { 1.0f,0.0f,0.0f };
+		emitter.data_.colorMin = { 1.0f,0.0f,0.0f };
+		emitter.data_.frequency = 0.0f;
+		emitter.data_.radius = 0.0f;
+		emitter.data_.scale = { 1.5f,1.5f,1.5f };
+		emitter.data_.lifeTime = 0.6f;
 		traceEmitterIndexes_.push_back(numEmitter);
 	}
 
@@ -687,13 +687,13 @@ void Boss::DushInit() {
 	for (int i = 0; i < 8; i++) {
 		auto& emitter = ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]);
 		emitter.isEmit_ = true;
-		emitter.data_->lifeTime = 0.6f;
+		emitter.data_.lifeTime = 0.6f;
 		UpdateEmitterPos(i);
-		emitter.data_->prevTranslate = traceAnchors_[i]->GetWorldPos();
+		emitter.data_.prevTranslate = traceAnchors_[i]->GetWorldPos();
 
 		Vector3 randColor = Random::GetVector3({ 0.0f,0.0f }, { 0.2f,0.8f }, { 0.2f,1.0f });
-		emitter.data_->colorMax = randColor;
-		emitter.data_->colorMin = randColor;
+		emitter.data_.colorMax = randColor;
+		emitter.data_.colorMin = randColor;
 	}
 }
 
@@ -708,7 +708,7 @@ bool Boss::DushCharge(float& t, float maxT, bool& isNear, float reng) {
 
 	for (int i = 0; i < 8; i++) {
 		auto& emitter = ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]);
-		emitter.data_->prevTranslate = traceAnchors_[i]->GetWorldPos();
+		emitter.data_.prevTranslate = traceAnchors_[i]->GetWorldPos();
 
 		if (chargeParents_[i]->transform.scale.x > 0.0f) { // チャージのサイズを縮小していく
 			ShrinkScale(i, chargeSize_ / chargeTime_);
@@ -892,13 +892,13 @@ void Boss::InitBeam() {
 	for (int i = 0; i < 8; i++) {
 		auto& emitter = ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]);
 		emitter.isEmit_ = true;
-		emitter.data_->lifeTime = bp.emitterLifeTime;
+		emitter.data_.lifeTime = bp.emitterLifeTime;
 		UpdateEmitterPos(i);
-		emitter.data_->prevTranslate = traceAnchors_[i]->GetWorldPos();
+		emitter.data_.prevTranslate = traceAnchors_[i]->GetWorldPos();
 
 		Vector3 randColor = Random::GetVector3({ 0.3f,1.0f }, { 0.0f,0.2f }, { 0.0f,0.5f });
-		emitter.data_->colorMax = randColor;
-		emitter.data_->colorMin = randColor;
+		emitter.data_.colorMax = randColor;
+		emitter.data_.colorMin = randColor;
 	}
 }
 
@@ -908,13 +908,13 @@ bool Boss::BeamCharge() {
 	if (ParticleManager::GetParticleCSEmitterSurface(1).IsEmit() == false) {
 		auto& emitter = ParticleManager::GetParticleCSEmitterSurface(1);
 		emitter.isEmit_ = true;
-		emitter.data_->radius = 0.0f;
-		emitter.data_->translate = animModel_->transform.translate;
-		emitter.data_->translate.y = bp.parentY;
+		emitter.data_.radius = 0.0f;
+		emitter.data_.translate = animModel_->transform.translate;
+		emitter.data_.translate.y = bp.parentY;
 	}
 
 	if (chargeSize_ > 0.0f) {
-		ParticleManager::GetParticleCSEmitterSurface(1).data_->radius += bp.radiusGrowSpeed * FPSKeeper::DeltaTimeFrame();
+		ParticleManager::GetParticleCSEmitterSurface(1).data_.radius += bp.radiusGrowSpeed * FPSKeeper::DeltaTimeFrame();
 		for (int i = 0; i < 8; i++) {
 			if (i > 2) {
 				if (!(chargeTime_ < bp.chargeTime - i * 2.0f)) {
@@ -923,7 +923,7 @@ bool Boss::BeamCharge() {
 			}
 
 			auto& emitter = ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]);
-			emitter.data_->prevTranslate = traceAnchors_[i]->GetWorldPos();
+			emitter.data_.prevTranslate = traceAnchors_[i]->GetWorldPos();
 
 			if (chargeParents_[i]->transform.scale.x > 0.0f) { // チャージのサイズを縮小していく
 				ShrinkScale(i, bp.shrinkSpeed * FPSKeeper::DeltaTimeFrame());
@@ -940,8 +940,8 @@ bool Boss::BeamCharge() {
 				float emitpos = chargeParents_[i]->transform.scale.x;
 				traceAnchors_[i]->transform.translate = { emitpos,emitpos,emitpos };
 
-				emitter.data_->prevTranslate = traceAnchors_[i]->GetWorldPos();
-				emitter.data_->lifeTime -= bp.lifeTimeDecrease;
+				emitter.data_.prevTranslate = traceAnchors_[i]->GetWorldPos();
+				emitter.data_.lifeTime -= bp.lifeTimeDecrease;
 			}
 			UpdateEmitterPos(i);
 		}
@@ -960,7 +960,7 @@ bool Boss::BeamCharge() {
 		for (int i = 0; i < 8; i++) {
 			if (chargeParents_[i]->transform.scale.x > 0.0f) { // 完全に真ん中に集結するようにする
 				auto& emitter = ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]);
-				emitter.data_->prevTranslate = traceAnchors_[i]->GetWorldPos();
+				emitter.data_.prevTranslate = traceAnchors_[i]->GetWorldPos();
 
 				ShrinkScale(i, bp.shrinkSpeed * FPSKeeper::DeltaTimeFrame());
 				chargeParents_[i]->transform.rotate.z += bp.rotateSpeedZ * FPSKeeper::DeltaTimeFrame();
@@ -1198,11 +1198,11 @@ void Boss::InitSummon() {
 
 	auto& emitter = ParticleManager::GetParticleCSEmitterTexture(summonIndex_);
 	emitter.SetEmit(true);
-	emitter.data_->lifeTime = 0.8f;
-	emitter.data_->radius = 10.0f;
-	emitter.data_->frequency = 0.01f;
-	emitter.data_->translate = animModel_->transform.translate;
-	emitter.data_->baseVelocity = { 0.0f,0.6f,0.0f };
+	emitter.data_.lifeTime = 0.8f;
+	emitter.data_.radius = 10.0f;
+	emitter.data_.frequency = 0.01f;
+	emitter.data_.translate = animModel_->transform.translate;
+	emitter.data_.baseVelocity = { 0.0f,0.6f,0.0f };
 
 	bossYPos_ = animModel_->transform.translate.y;
 	defaultCorePos_ = core_->GetWorldPos();
@@ -1242,7 +1242,7 @@ void Boss::ExpandSummon() {
 		summonCircleExpandTime_ -= FPSKeeper::DeltaTimeFrame();
 		float t = (std::max)(summonCircleExpandTime_ / sp.summonExpandTime, 0.0f);
 		float summonRadius = std::lerp(sp.summonRadiusStart, sp.summonRadiusEnd, t);
-		ParticleManager::GetParticleCSEmitterTexture(summonIndex_).data_->radius = summonRadius;
+		ParticleManager::GetParticleCSEmitterTexture(summonIndex_).data_.radius = summonRadius;
 		energyParticle_.Emit();
 	}
 }
@@ -1288,7 +1288,7 @@ void Boss::UpdateEmitterPos(int i) {
 	float emitpos = chargeParents_[i]->transform.scale.x;
 	traceAnchors_[i]->transform.translate = { emitpos, emitpos, emitpos };
 	auto& emitter = ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]);
-	emitter.data_->translate = traceAnchors_[i]->GetWorldPos();
+	emitter.data_.translate = traceAnchors_[i]->GetWorldPos();
 }
 
 void Boss::ShrinkScale(int i, float delta) {

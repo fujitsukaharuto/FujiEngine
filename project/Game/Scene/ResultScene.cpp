@@ -20,8 +20,8 @@ using namespace Math;
 ResultScene::ResultScene() {}
 
 ResultScene::~ResultScene() {
-	lightManager_->GetDirectionLight()->directionLightData_->direction = { 0.0f,-1.0f,0.0f };
-	lightManager_->GetDirectionLight()->directionLightData_->intensity = 0.3f;
+	lightManager_->GetDirectionLight()->SetLightDirection({ 0.0f,-1.0f,0.0f });
+	lightManager_->GetDirectionLight()->SetLightIntensity(0.3f);
 	ParticleManager::GetInstance()->GetParticleCSEmitter(hanabiIndex_).SetEmit(false);
 	ParticleManager::GetInstance()->ResetCSEmitters();
 	ParticleManager::GetInstance()->InitDefoultCSEmitter();
@@ -34,8 +34,8 @@ void ResultScene::Initialize() {
 
 	CameraManager::GetInstance()->GetCamera()->transform.rotate = { cameraStartRotateX_,0.0f,0.0f };
 	CameraManager::GetInstance()->GetCamera()->transform.translate = { 0.0f, 2.0f, -20.0f };
-	lightManager_->GetDirectionLight()->directionLightData_->direction = lightDir_;
-	lightManager_->GetDirectionLight()->directionLightData_->intensity = lightIntens_;
+	lightManager_->GetDirectionLight()->SetLightDirection(lightDir_);
+	lightManager_->GetDirectionLight()->SetLightIntensity(lightIntens_);
 
 #pragma region シーン遷移用
 	black_ = std::make_unique<Sprite>();

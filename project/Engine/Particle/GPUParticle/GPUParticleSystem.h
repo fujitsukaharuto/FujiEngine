@@ -10,6 +10,7 @@
 #include "Model.h"
 #include "Object3d.h"
 #include "Math/Matrix/MatrixCalculation.h"
+#include "Engine/DX/FrameCount.h"
 
 using Microsoft::WRL::ComPtr;
 
@@ -106,10 +107,11 @@ private:
 	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> particleCSSRVHandle_;
 	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> particleCSUAVHandle_;
 	Graphics::Material particleCSMaterial_;
-	ComPtr<ID3D12Resource> perViewResource_;
-	PerView* perViewData_;
-	ComPtr<ID3D12Resource> perFrameResource_;
-	PerFrame* perFrameData_;
+	ComPtr<ID3D12Resource> perViewResource_[DXC::kFrameCount_];
+	PerView* perViewData_[DXC::kFrameCount_];
+	ComPtr<ID3D12Resource> perFrameResource_[DXC::kFrameCount_];
+	PerFrame* perFrameDataGPU_[DXC::kFrameCount_];
+	PerFrame perFrameData_;
 
 	ComPtr<ID3D12Resource> freeListIndexResource_;
 	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> freeListIndexUAVHandle_;

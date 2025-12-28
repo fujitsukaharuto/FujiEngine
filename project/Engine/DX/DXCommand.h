@@ -23,22 +23,24 @@ namespace DXC {
 		/// <summary>
 		/// コマンドリストをクローズし、コマンドキューに実行を送信する
 		/// </summary>
-		void Close();
+		void Close(uint32_t index = 0);
 
 		/// <summary>
 		/// GPU実行キューへ送信する
 		/// </summary>
-		void Execution();
+		void Execution(uint32_t index = 0);
+
+		void GPUSignal(uint32_t index = 0);
 
 		/// <summary>
 		/// GPUの実行をまつ
 		/// </summary>
-		void WaitForGPU();
+		void WaitForGPU(uint32_t frameIndex, uint32_t index = 0);
 
 		/// <summary>
 		/// コマンドアロケータおよびコマンドリストをリセットする
 		/// </summary>
-		void Reset(uint32_t frameIndex);
+		void Reset(uint32_t index = 0);
 
 		/// <summary>
 		/// ViewとScissorをセットする
@@ -49,7 +51,8 @@ namespace DXC {
 		//* Getter
 		ID3D12CommandQueue* GetQueue() const { return queue_.Get(); }
 		ID3D12GraphicsCommandList* GetList() const { return list_.Get(); }
-
+		ID3D12GraphicsCommandList* GetImmediateList() const { return immediateList_.Get(); }
+		uint32_t GetNowFrameIndex() { return frameIndex_; }
 
 	private:
 
@@ -62,11 +65,18 @@ namespace DXC {
 
 		ComPtr<ID3D12Fence> fence_ = nullptr;
 		uint64_t fenceValue_[kFrameCount_];
+		uint64_t globalFenceValue_ = 0;
 
 		uint32_t frameIndex_ = 0;
 
 		D3D12_VIEWPORT viewport_{};
 		D3D12_RECT scissor_{};
 
+
+		ComPtr<ID3D12CommandAllocator> immediateAllocator_;
+		ComPtr<ID3D12GraphicsCommandList> immediateList_;
+
+		ComPtr<ID3D12Fence> immediateFence_;
+		uint64_t immediateFenceValue_ = 0;
 	};
 }

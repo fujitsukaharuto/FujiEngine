@@ -36,7 +36,7 @@ namespace Graphics {
 		/// <summary>
 		/// コンピュートシェーダ用のパイプラインのセット
 		/// </summary>
-		void SetCSPipeline(Pipe type);
+		void SetCSPipeline(Pipe type, uint32_t index = 0);
 
 
 	private:

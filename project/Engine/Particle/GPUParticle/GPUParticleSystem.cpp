@@ -40,8 +40,11 @@ void GPUParticleSystem::Finalize() {
 	freeListIndexResource_.Reset();
 	freeListTailIndexResource_.Reset();
 	freeListResource_.Reset();
-	perViewResource_.Reset();
-	perFrameResource_.Reset();
+	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
+		perViewResource_[i].Reset();
+		perFrameResource_[i].Reset();
+	}
+
 	particleCSMaterial_.Finalize();
 
 	sphereEmitters_.clear();
@@ -292,36 +295,43 @@ void GPUParticleSystem::InitParticleCS() {
 	freeListUAVHandle_.first = srvManager_->GetCPUDescriptorHandle(freeListUAVIndex);
 	freeListUAVHandle_.second = srvManager_->GetGPUDescriptorHandle(freeListUAVIndex);
 
-	srvManager_->SetDescriptorHeap();
-	dxcommon_->GetPipelineManager()->SetCSPipeline(Pipe::InitParticleCS);
-	dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(0, particleCSUAVHandle_.second);
-	dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(1, freeListIndexUAVHandle_.second);
-	dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(2, freeListUAVHandle_.second);
-	dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(3, freeListTailIndexUAVHandle_.second);
+	srvManager_->SetDescriptorHeap(1);
+	dxcommon_->GetPipelineManager()->SetCSPipeline(Pipe::InitParticleCS, 1);
+	dxcommon_->GetImmediateList()->SetComputeRootDescriptorTable(0, particleCSUAVHandle_.second);
+	dxcommon_->GetImmediateList()->SetComputeRootDescriptorTable(1, freeListIndexUAVHandle_.second);
+	dxcommon_->GetImmediateList()->SetComputeRootDescriptorTable(2, freeListUAVHandle_.second);
+	dxcommon_->GetImmediateList()->SetComputeRootDescriptorTable(3, freeListTailIndexUAVHandle_.second);
 	int dispatchCount = (numParticles + threadsPerGroup - 1) / threadsPerGroup;
-	dxcommon_->GetCommandList()->Dispatch(dispatchCount, 1, 1);
+	dxcommon_->GetImmediateList()->Dispatch(dispatchCount, 1, 1);
 	dxcommon_->CommandExecution();
 
-	perViewResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), (sizeof(PerView)));
-	perViewResource_->Map(0, nullptr, reinterpret_cast<void**>(&perViewData_));
-	perViewData_->viewProjection = MakeIdentity4x4();
-	perViewData_->billboardMatrix = MakeIdentity4x4();
+	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
+		perViewResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), (sizeof(PerView)));
+		perViewResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&perViewData_[i]));
+		perViewData_[i]->viewProjection = MakeIdentity4x4();
+		perViewData_[i]->billboardMatrix = MakeIdentity4x4();
 
-	perFrameResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), (sizeof(PerFrame)));
-	perFrameResource_->Map(0, nullptr, reinterpret_cast<void**>(&perFrameData_));
-	perFrameData_->time = 0.0f;
-	perFrameData_->deltaTime = 0.0f;
+		perFrameResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), (sizeof(PerFrame)));
+		perFrameResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&perFrameDataGPU_[i]));
+		perFrameDataGPU_[i]->time = 0.0f;
+		perFrameDataGPU_[i]->deltaTime = 0.0f;
+		perFrameData_.time = 0.0f;
+		perFrameData_.deltaTime = 0.0f;
+	}
 }
 
 void GPUParticleSystem::UpdatePerViewData(const Matrix4x4& billboardMatrix) {
-	perViewData_->viewProjection = camera_->GetViewProjectionMatrix();
-	perViewData_->billboardMatrix = billboardMatrix;
+	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
+	perViewData_[frameIndex]->viewProjection = camera_->GetViewProjectionMatrix();
+	perViewData_[frameIndex]->billboardMatrix = billboardMatrix;
 
-	perFrameData_->deltaTime = FPSKeeper::DeltaTime();
-	perFrameData_->time += perFrameData_->deltaTime;
-	if (perFrameData_->time > 420.0f) {
-		perFrameData_->time = 0.0f;
+	perFrameData_.deltaTime = FPSKeeper::DeltaTime();
+	perFrameData_.time += perFrameData_.deltaTime;
+	if (perFrameData_.time > 420.0f) {
+		perFrameData_.time = 0.0f;
 	}
+	perFrameDataGPU_[frameIndex]->time = perFrameData_.time;
+	perFrameDataGPU_[frameIndex]->deltaTime = perFrameData_.deltaTime;
 }
 
 void GPUParticleSystem::DrawParticleCS(const D3D12_VERTEX_BUFFER_VIEW& vbView, const D3D12_INDEX_BUFFER_VIEW& ibView) {
@@ -331,8 +341,9 @@ void GPUParticleSystem::DrawParticleCS(const D3D12_VERTEX_BUFFER_VIEW& vbView, c
 	dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vbView);
 	dxcommon_->GetCommandList()->IASetIndexBuffer(&ibView);
 
+	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 	dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, particleCSSRVHandle_.second);
-	dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, perViewResource_->GetGPUVirtualAddress());
+	dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, perViewResource_[frameIndex]->GetGPUVirtualAddress());
 	dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(1, particleCSMaterial_.GetMaterialResource()->GetGPUVirtualAddress());
 	dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(3, particleCSMaterial_.GetTexture()->gpuHandle);
 
@@ -347,9 +358,10 @@ void GPUParticleSystem::UpdateGPUEmitter() {
 }
 
 void GPUParticleSystem::UpdateParticleCSDispatch() {
+	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 	dxcommon_->GetPipelineManager()->SetCSPipeline(Pipe::UpdateParticleCS);
 	dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(0, particleCSUAVHandle_.second);
-	dxcommon_->GetCommandList()->SetComputeRootConstantBufferView(1, perFrameResource_->GetGPUVirtualAddress());
+	dxcommon_->GetCommandList()->SetComputeRootConstantBufferView(1, perFrameResource_[frameIndex]->GetGPUVirtualAddress());
 	dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(2, freeListIndexUAVHandle_.second);
 	dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(3, freeListUAVHandle_.second);
 	dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(4, freeListTailIndexUAVHandle_.second);
@@ -359,9 +371,10 @@ void GPUParticleSystem::UpdateParticleCSDispatch() {
 }
 
 void GPUParticleSystem::EmitterDispatch() {
+	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 	ParticleCSHandles handles = {
 	particleCSUAVHandle_.second,
-	perFrameResource_->GetGPUVirtualAddress(),
+	perFrameResource_[frameIndex]->GetGPUVirtualAddress(),
 	freeListIndexUAVHandle_.second,
 	freeListTailIndexUAVHandle_.second,
 	freeListUAVHandle_.second

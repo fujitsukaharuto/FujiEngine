@@ -12,6 +12,7 @@
 #include "Model/Object3dCommon.h"
 #include "Math/Animation/Animation.h"
 #include "Math/Animation/Skelton.h"
+#include "Engine/DX/FrameCount.h"
 
 
 class DXCom;
@@ -173,10 +174,10 @@ namespace Graphics {
 		Skeleton skeleton_;
 		SkinCluster skinCluster_;
 
-		Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource_ = nullptr;
-		Math::TransformationMatrix* wvpDate_ = nullptr;
-		Microsoft::WRL::ComPtr<ID3D12Resource> cameraPosResource_ = nullptr;
-		Math::CameraForGPU* cameraPosData_ = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource_[DXC::kFrameCount_];
+		Math::TransformationMatrix* wvpDate_[DXC::kFrameCount_];
+		Microsoft::WRL::ComPtr<ID3D12Resource> cameraPosResource_[DXC::kFrameCount_];
+		Math::CameraForGPU* cameraPosData_[DXC::kFrameCount_];
 
 		Math::Matrix4x4 billboardMatrix_;
 		std::string nowTextureName;

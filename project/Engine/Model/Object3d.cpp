@@ -162,8 +162,9 @@ void Object3d::Draw(Material* mate, bool isAdd) {
 			dxcommon_->GetPipelineManager()->SetPipeline(Pipe::NormalAdd);
 		}
 	}
-	cList->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
-	cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_->GetGPUVirtualAddress());
+	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
+	cList->SetGraphicsRootConstantBufferView(1, wvpResource_[frameIndex]->GetGPUVirtualAddress());
+	cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_[frameIndex]->GetGPUVirtualAddress());
 	cList->SetGraphicsRootConstantBufferView(9, objIDDataResource_->GetGPUVirtualAddress());
 	ModelManager::GetInstance()->PickingCommand();
 
@@ -187,9 +188,10 @@ void Object3d::Draw(Material* mate, bool isAdd) {
 void Object3d::AnimeDraw() {
 	SetBillboardWVP();
 
+	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
-	cList->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
-	cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_->GetGPUVirtualAddress());
+	cList->SetGraphicsRootConstantBufferView(1, wvpResource_[frameIndex]->GetGPUVirtualAddress());
+	cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_[frameIndex]->GetGPUVirtualAddress());
 	lightManager_->SetLightCommand(cList);
 
 	if (model_) {
@@ -586,17 +588,19 @@ void Object3d::MeshDraw(Material* mate, int drawCount) {
 }
 
 void Object3d::CreateWVP() {
-	wvpResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(TransformationMatrix));
-	wvpDate_ = nullptr;
-	wvpResource_->Map(0, nullptr, reinterpret_cast<void**>(&wvpDate_));
-	wvpDate_->WVP = MakeIdentity4x4();
-	wvpDate_->World = MakeIdentity4x4();
-	wvpDate_->WorldInverseTransPose = Transpose(Inverse(wvpDate_->World));
+	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
+		wvpResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(TransformationMatrix));
+		wvpDateGPU_[i] = nullptr;
+		wvpResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&wvpDateGPU_[i]));
+		wvpDateGPU_[i]->WVP = MakeIdentity4x4();
+		wvpDateGPU_[i]->World = MakeIdentity4x4();
+		wvpDateGPU_[i]->WorldInverseTransPose = Transpose(Inverse(wvpDateGPU_[i]->World));
 
-	cameraPosResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(DirectionalLight));
-	cameraPosData_ = nullptr;
-	cameraPosResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraPosData_));
-	cameraPosData_->worldPosition = camera_->transform.translate;
+		cameraPosResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(DirectionalLight));
+		cameraPosDataGPU_[i] = nullptr;
+		cameraPosResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&cameraPosDataGPU_[i]));
+		cameraPosDataGPU_[i]->worldPosition = camera_->transform.translate;
+	}
 
 	objIDDataResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(ObjIDData));
 	objIDData_ = nullptr;
@@ -678,11 +682,12 @@ void Object3d::SetWVP() {
 		worldViewProjectionMatrix = worldMatrix;
 	}
 
-	wvpDate_->World = Multiply(model_->data_.rootNode.local, worldMatrix);
-	wvpDate_->WVP = Multiply(model_->data_.rootNode.local, worldViewProjectionMatrix);
-	wvpDate_->WorldInverseTransPose = Transpose(Inverse(wvpDate_->World));
+	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
+	wvpDateGPU_[frameIndex]->World = Multiply(model_->data_.rootNode.local, worldMatrix);
+	wvpDateGPU_[frameIndex]->WVP = Multiply(model_->data_.rootNode.local, worldViewProjectionMatrix);
+	wvpDateGPU_[frameIndex]->WorldInverseTransPose = Transpose(Inverse(wvpDateGPU_[frameIndex]->World));
 
-	cameraPosData_->worldPosition = camera_->GetTranslate();
+	cameraPosDataGPU_[frameIndex]->worldPosition = camera_->GetTranslate();
 
 }
 
@@ -702,9 +707,10 @@ void Object3d::SetBillboardWVP() {
 		worldViewProjectionMatrix = worldMatrix;
 	}
 
-	wvpDate_->World = worldMatrix;
-	wvpDate_->WVP = worldViewProjectionMatrix;
-	wvpDate_->WorldInverseTransPose = Transpose(Inverse(wvpDate_->World));
+	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
+	wvpDateGPU_[frameIndex]->World = worldMatrix;
+	wvpDateGPU_[frameIndex]->WVP = worldViewProjectionMatrix;
+	wvpDateGPU_[frameIndex]->WorldInverseTransPose = Transpose(Inverse(wvpDateGPU_[frameIndex]->World));
 }
 
 void Object3d::CreatePropertyCommand(int type) {

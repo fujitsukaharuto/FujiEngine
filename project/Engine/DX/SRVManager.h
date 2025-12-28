@@ -40,7 +40,7 @@ public:
 	/// <summary>
 	/// 現在のディスクリプタヒープをコマンドリストへセットする
 	/// </summary>
-	void SetDescriptorHeap();
+	void SetDescriptorHeap(uint32_t index = 0);
 
 	/// <summary>
 	/// グラフィックスパイプラインにSRVテーブルをバインドする

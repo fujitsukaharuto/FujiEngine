@@ -8,12 +8,14 @@ ParentParticleGroup::ParentParticleGroup() {
 
 ParentParticleGroup::~ParentParticleGroup() {
 	if (instancing_) {
-		instancing_->Unmap(0, nullptr);
-		instancingData_ = nullptr;
+		for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
+			instancing_[i]->Unmap(0, nullptr);
+			instancingDataGPU_[i] = nullptr;
+		}
 	}
 }
 
-void ParentParticleGroup::Update(const Matrix4x4& billboardMatrix, Camera* camera) {
+void ParentParticleGroup::Update(const Matrix4x4& billboardMatrix, Camera* camera, uint32_t frameIndex) {
 	for (auto& particle : particles_) {
 		if (!particle.isLive_) {
 			continue;
@@ -96,11 +98,11 @@ void ParentParticleGroup::Update(const Matrix4x4& billboardMatrix, Camera* camer
 			worldViewProjectionMatrix = worldMatrix;
 		}
 
-		instancingData_[particleCount].World = worldMatrix;
-		instancingData_[particleCount].WVP = worldViewProjectionMatrix;
-		instancingData_[particleCount].color = particle.color_;
-		instancingData_[particleCount].uvTrans = particle.uvTrans_;
-		instancingData_[particleCount].uvScale = particle.uvScale_;
+		instancingDataGPU_[frameIndex][particleCount].World = worldMatrix;
+		instancingDataGPU_[frameIndex][particleCount].WVP = worldViewProjectionMatrix;
+		instancingDataGPU_[frameIndex][particleCount].color = particle.color_;
+		instancingDataGPU_[frameIndex][particleCount].uvTrans = particle.uvTrans_;
+		instancingDataGPU_[frameIndex][particleCount].uvScale = particle.uvScale_;
 
 		particleCount++;
 		drawCount_++;

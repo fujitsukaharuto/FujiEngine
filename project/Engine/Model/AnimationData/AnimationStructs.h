@@ -8,6 +8,7 @@
 
 #include "Engine/DX/DXCom.h"
 #include "Engine/Math/Matrix/MatrixCalculation.h"
+#include "Engine/DX/FrameCount.h"
 
 const uint32_t kNumMaxInfluence = 4;
 /// <summary>
@@ -52,7 +53,7 @@ struct SkinCluster {
 	D3D12_VERTEX_BUFFER_VIEW influenceBuffreView;
 	std::span<VertexInfluence> mappedInfluece;
 	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> influenceSrvHandle;
-	Microsoft::WRL::ComPtr<ID3D12Resource> paletteResource;
-	std::span<WellForGPU> mappedPalette;
-	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> paletteSrvHandle;
+	Microsoft::WRL::ComPtr<ID3D12Resource> paletteResource[DXC::kFrameCount_];
+	std::span<WellForGPU> mappedPalette[DXC::kFrameCount_];
+	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> paletteSrvHandle[DXC::kFrameCount_];
 };

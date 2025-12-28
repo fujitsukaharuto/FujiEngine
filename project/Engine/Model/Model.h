@@ -124,7 +124,7 @@ namespace Graphics {
 		size_t GetVertexSize(int i) { return mesh_[i].GetVertexDataSize(); }
 
 
-		void CSDispatch(const SkinCluster& skinCluster, ID3D12GraphicsCommandList* commandList);
+		void CSDispatch(const SkinCluster& skinCluster, ID3D12GraphicsCommandList* commandList, uint32_t frameIndex);
 		void MeshDraw(ID3D12GraphicsCommandList* commandList, Material* mate, int drawCount = 1);
 
 		ModelData data_;

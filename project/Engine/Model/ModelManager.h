@@ -6,6 +6,7 @@
 #include "Model.h"
 #include "Engine/Math/Vector/Vector2.h"
 #include <assimp/scene.h>
+#include "Engine/DX/FrameCount.h"
 
 #include "externals/DirectXTex/DirectXTex.h"
 #include "externals/DirectXTex/d3dx12.h"
@@ -86,7 +87,7 @@ namespace Graphics {
 		void PickingDataReset();
 		void PickingDataCopy();
 		int GetPickedID() { return lastPicked_.objID; }
-		int GetPickedCoord(int i) { return pickingData_->pickingPixelCoord[i]; }
+		int GetPickedCoord(int i) { return pickingData_.pickingPixelCoord[i]; }
 		bool GetIsOnce() { return isOnce_; }
 		bool GetIsPicked() { return isPicked_; }
 
@@ -94,6 +95,7 @@ namespace Graphics {
 
 		static MaterialDataPath LoadMaterialFile(const std::string& filename);
 		static Node ReadNode(aiNode* node);
+		void CopyData(uint32_t frameIndex = 0);
 
 	private:
 
@@ -107,14 +109,15 @@ namespace Graphics {
 		std::vector<std::pair<std::string, bool>> modelFileList;
 
 
-		Microsoft::WRL::ComPtr<ID3D12Resource> pickingBufferResource_ = nullptr;
-		Microsoft::WRL::ComPtr<ID3D12Resource> pickingBufferReadBack_ = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12Resource> pickingBufferResource_[DXC::kFrameCount_];
+		Microsoft::WRL::ComPtr<ID3D12Resource> pickingBufferReadBack_[DXC::kFrameCount_];
 		PickingBuffer lastPicked_;
 
-		std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> pickBufferHandle_;
-		Microsoft::WRL::ComPtr<ID3D12Resource> pickingDataResource_ = nullptr;
-		PickingData* pickingData_ = nullptr;
-		Microsoft::WRL::ComPtr<ID3D12Resource> initUploadBuffer_;
+		std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> pickBufferHandle_[DXC::kFrameCount_];
+		Microsoft::WRL::ComPtr<ID3D12Resource> pickingDataResource_[DXC::kFrameCount_];
+		PickingData* pickingDataGPU_[DXC::kFrameCount_];
+		PickingData pickingData_;
+		Microsoft::WRL::ComPtr<ID3D12Resource> initUploadBuffer_[DXC::kFrameCount_];
 
 		int preObjId_ = -1;
 		bool isPicked_ = false;

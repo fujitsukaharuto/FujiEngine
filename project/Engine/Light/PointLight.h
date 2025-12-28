@@ -2,6 +2,7 @@
 #include <wrl/client.h>
 #include <d3d12.h>
 #include "Math/Matrix/MatrixCalculation.h"
+#include "Engine/DX/FrameCount.h"
 
 class DXCom;
 
@@ -32,15 +33,20 @@ public:
 	/// </summary>
 	void SetLightCommand(ID3D12GraphicsCommandList* commandList);
 
-	PointLightData* pointLightData_ = nullptr;
+	void SetIsOnceCopy(bool is) { isOnceCopy_ = is; }
 
 	void Debug();
 
 private:
 
+	void CopyData(uint32_t frameIndex = 0);
+
 private:
 
 	DXCom* dxcommon_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> pointLightResource_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> pointLightResource_[DXC::kFrameCount_];
+	PointLightData* pointLightDataGPU_[DXC::kFrameCount_];
+	PointLightData pointLightData_;
 
+	bool isOnceCopy_ = true;
 };

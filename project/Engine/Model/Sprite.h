@@ -3,6 +3,7 @@
 #include "Math/Matrix/MatrixCalculation.h"
 #include "Material.h"
 #include "Object3d.h"
+#include "Engine/DX/FrameCount.h"
 
 
 class DXCom;
@@ -80,11 +81,11 @@ namespace Graphics {
 		std::vector<uint32_t> index_;
 
 
-		Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource_ = nullptr;
-		Math::TransformationMatrix* wvpData_;
+		Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource_[DXC::kFrameCount_];
+		Math::TransformationMatrix* wvpDataGPU_[DXC::kFrameCount_];
 
-		Microsoft::WRL::ComPtr<ID3D12Resource> cameraPosResource_ = nullptr;
-		Math::CameraForGPU* cameraPosData_ = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12Resource> cameraPosResource_[DXC::kFrameCount_];
+		Math::CameraForGPU* cameraPosData_[DXC::kFrameCount_];
 
 		Microsoft::WRL::ComPtr<ID3D12Resource> objIDDataResource_ = nullptr;
 		ObjIDData* objIDData_ = nullptr;

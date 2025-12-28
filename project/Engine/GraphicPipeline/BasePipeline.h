@@ -43,7 +43,7 @@ public:
 	/// <summary>
 	/// コンピュートシェーダ用のパイプラインステートを設定
 	/// </summary>
-	void SetPipelineCSState();
+	void SetPipelineCSState(uint32_t index = 0);
 
 	/// <summary>
 	/// パイプラインを生成する

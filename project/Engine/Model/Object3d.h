@@ -6,6 +6,7 @@
 #include "Object3dCommon.h"
 #include "Engine/Editor/JsonSerializer.h"
 #include "Engine/ImGuiManager/NodeGraph.h"
+#include "Engine/DX/FrameCount.h"
 #ifdef _DEBUG
 #include "imgui_node_editor.h"
 #endif
@@ -157,11 +158,11 @@ namespace Graphics {
 		LightManager* lightManager_;
 		Camera* camera_;
 
-		Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource_ = nullptr;
-		Math::TransformationMatrix* wvpDate_ = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource_[DXC::kFrameCount_];
+		Math::TransformationMatrix* wvpDateGPU_[DXC::kFrameCount_];
 
-		Microsoft::WRL::ComPtr<ID3D12Resource> cameraPosResource_ = nullptr;
-		Math::CameraForGPU* cameraPosData_ = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12Resource> cameraPosResource_[DXC::kFrameCount_];
+		Math::CameraForGPU* cameraPosDataGPU_[DXC::kFrameCount_];
 
 		Microsoft::WRL::ComPtr<ID3D12Resource> objIDDataResource_ = nullptr;
 		ObjIDData* objIDData_ = nullptr;

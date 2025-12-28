@@ -286,6 +286,6 @@ void PipelineManager::SetPipeline(Pipe type) {
 	pipelines_[static_cast<int>(type)]->SetPipelineState();
 }
 
-void PipelineManager::SetCSPipeline(Pipe type) {
-	pipelines_[static_cast<int>(type)]->SetPipelineCSState();
+void PipelineManager::SetCSPipeline(Pipe type, uint32_t index) {
+	pipelines_[static_cast<int>(type)]->SetPipelineCSState(index);
 }

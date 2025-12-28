@@ -27,11 +27,10 @@ void LightManager::Finalize() {
 
 void LightManager::Update() {
 #ifdef _DEBUG
-
-
-
+	directionLight_->SetIsOnceCopy(true);
+	pointLights_[0]->SetIsOnceCopy(true);
+	spotLights_[0]->SetIsOnceCopy(true);
 #endif // _DEBUG
-
 }
 
 void LightManager::CreateLight() {

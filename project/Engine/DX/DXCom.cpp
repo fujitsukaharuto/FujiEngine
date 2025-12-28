@@ -312,8 +312,6 @@ void DXCom::PostEffect() {
 }
 
 void DXCom::PostDraw() {
-
-
 	CreateBarrier(D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 
 	// 命令のクローズ
@@ -321,11 +319,14 @@ void DXCom::PostDraw() {
 	// コマンドリストの実行
 	command_->Execution();
 	swapChain_->Present(1, 0);
-	command_->WaitForGPU();
-	fpsKeeper_->FixFPS();
-	command_->Reset(swapChain_->GetCurrentBackBufferIndex());
+	command_->GPUSignal();
 }
 
+void DXCom::BeginFrame() {
+	command_->WaitForGPU(swapChain_->GetCurrentBackBufferIndex());
+	fpsKeeper_->FixFPS();
+	command_->Reset();
+}
 
 void DXCom::PreSpriteDraw() {
 	command_->SetViewAndscissor();
@@ -334,13 +335,15 @@ void DXCom::PreSpriteDraw() {
 }
 
 void DXCom::CommandExecution() {
-	command_->Close();
+	command_->Close(1);
 
-	command_->Execution();
+	command_->Execution(1);
 
-	command_->WaitForGPU();
+	command_->GPUSignal(1);
 
-	command_->Reset(swapChain_->GetCurrentBackBufferIndex());
+	command_->WaitForGPU(swapChain_->GetCurrentBackBufferIndex(), 1);
+
+	command_->Reset(1);
 }
 
 void DXCom::SetRenderTargets() {

@@ -27,8 +27,9 @@ void SkyBox::Draw() {
 	dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vbView);
 	dxcommon_->GetCommandList()->IASetIndexBuffer(&ibView);
 
+	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 	dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, material_.GetMaterialResource()->GetGPUVirtualAddress());
-	dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
+	dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(1, wvpResource_[frameIndex]->GetGPUVirtualAddress());
 	dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, material_.GetTexture()->gpuHandle);
 	
 	dxcommon_->GetCommandList()->DrawIndexedInstanced(static_cast<UINT>((index_.size())), 1, 0, 0, 0);
@@ -49,9 +50,10 @@ void SkyBox::UpdateWVP() {
 		worldViewProjectionMatrix = worldMatrix;
 	}
 
-	wvpDate_->World = worldMatrix;
-	wvpDate_->WVP = worldViewProjectionMatrix;
-	wvpDate_->WorldInverseTransPose = Transpose(Inverse(wvpDate_->World));
+	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
+	wvpDateGPU_[frameIndex]->World = worldMatrix;
+	wvpDateGPU_[frameIndex]->WVP = worldViewProjectionMatrix;
+	wvpDateGPU_[frameIndex]->WorldInverseTransPose = Transpose(Inverse(wvpDateGPU_[frameIndex]->World));
 
 }
 
@@ -63,12 +65,15 @@ void SkyBox::SetCommonResources(DXCom* dxcommon, SRVManager* srvManager, Camera*
 
 void SkyBox::ResourceCreate() {
 
-	wvpResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(TransformationMatrix));
-	wvpDate_ = nullptr;
-	wvpResource_->Map(0, nullptr, reinterpret_cast<void**>(&wvpDate_));
-	wvpDate_->WVP = MakeIdentity4x4();
-	wvpDate_->World = MakeIdentity4x4();
-	wvpDate_->WorldInverseTransPose = Transpose(Inverse(wvpDate_->World));
+	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
+		wvpResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(TransformationMatrix));
+		wvpDateGPU_[i] = nullptr;
+		wvpResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&wvpDateGPU_[i]));
+	
+		wvpDateGPU_[i]->WVP = MakeIdentity4x4();
+		wvpDateGPU_[i]->World = MakeIdentity4x4();
+		wvpDateGPU_[i]->WorldInverseTransPose = Transpose(Inverse(wvpDateGPU_[i]->World));
+	}
 
 	material_.SetTextureNamePath("skyboxTexture.dds");
 	material_.CreateMaterial();

@@ -74,7 +74,7 @@ void TextureManager::Load(const std::string& filename, bool overWrite) {
 	texture->textureResource = CreateTextureResource(dxcommon_->GetDevice(), texture->meta);
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource =
-		UploadTextureData(texture->textureResource, mipImages, dxcommon_->GetDevice(), dxcommon_->GetCommandList());
+		UploadTextureData(texture->textureResource, mipImages, dxcommon_->GetDevice(), dxcommon_->GetImmediateList());
 
 	// すでにSRVを持っていなければ割り当て
 	if (texture->srvIndex == UINT_MAX) {

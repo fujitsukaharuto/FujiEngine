@@ -3,6 +3,7 @@
 #include <d3d12.h>
 #include "../IGPUParticleEmitter.h"
 #include "Math/Matrix/MatrixCalculation.h"
+#include "Engine/DX/FrameCount.h"
 
 using Microsoft::WRL::ComPtr;
 
@@ -44,7 +45,7 @@ struct EmitterSphere {
 
 class SphereEmitter : public IGPUEmitter {
 public:
-	EmitterSphere* data_ = nullptr;
+	EmitterSphere data_;
 	bool isEmit_ = false;
 
 	SphereEmitter(DXCom* dx);
@@ -61,7 +62,10 @@ public:
 	void SetPos(const Math::Vector3& pos) override;
 	void SetEmit(bool state) override;
 private:
+	void CopyData(uint32_t frameIndex = 0);
+
 	char saveName_[64] = "default";
-	ComPtr<ID3D12Resource> resource_;
+	EmitterSphere* dataGPU_[DXC::kFrameCount_];
+	ComPtr<ID3D12Resource> resource_[DXC::kFrameCount_];
 	bool isOnceEmit_ = false;
 };

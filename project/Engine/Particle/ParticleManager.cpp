@@ -8,6 +8,7 @@
 #include "Engine/Model/ModelManager.h"
 #include "ImGuiManager/ImGuiManager.h"
 #include "Engine/Editor/JsonSerializer.h"
+#include "Engine/DX/FrameCount.h"
 #include <fstream>
 #include <filesystem>
 
@@ -661,17 +662,21 @@ void ParticleManager::InternalCreateParticleGroup(const std::string& name, const
 		newGroup->emitter_->Load(name);
 
 		newGroup->insstanceCount_ = count;
-		newGroup->instancing_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), (sizeof(TransformationParticleMatrix) * newGroup->insstanceCount_));
-		newGroup->instancing_->Map(0, nullptr, reinterpret_cast<void**>(&newGroup->instancingData_));
 		uint32_t max = newGroup->insstanceCount_;
-		for (uint32_t index = 0; index < max; ++index) {
-			newGroup->instancingData_[index].WVP = MakeIdentity4x4();
-			newGroup->instancingData_[index].World = MakeIdentity4x4();
+		for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
+			newGroup->instancing_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), (sizeof(TransformationParticleMatrix) * newGroup->insstanceCount_));
+			newGroup->instancing_[i]->Map(0, nullptr, reinterpret_cast<void**>(&newGroup->instancingDataGPU_[i]));
+			for (uint32_t index = 0; index < max; ++index) {
+				newGroup->instancingDataGPU_[i][index].WVP = MakeIdentity4x4();
+				newGroup->instancingDataGPU_[i][index].World = MakeIdentity4x4();
+			}
 		}
 		newGroup->material_.SetTextureNamePath(fileName);
 		newGroup->material_.CreateMaterial();
-		newGroup->srvIndex_ = srvManager_->Allocate();
-		srvManager_->CreateStructuredSRV(newGroup->srvIndex_, newGroup->instancing_.Get(), newGroup->insstanceCount_, sizeof(TransformationParticleMatrix));
+		for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
+			newGroup->srvIndex_[i] = srvManager_->Allocate();
+			srvManager_->CreateStructuredSRV(newGroup->srvIndex_[i], newGroup->instancing_[i].Get(), newGroup->insstanceCount_, sizeof(TransformationParticleMatrix));
+		}
 
 		//ここでパーティクルをあらかじめ作る
 		float add = 0.1f;
@@ -698,20 +703,23 @@ void ParticleManager::InternalCreateParticleGroup(const std::string& name, const
 		newGroup->emitter_.Load(name);
 
 		newGroup->insstanceCount_ = count;
-		newGroup->instancing_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(),
-			sizeof(TransformationParticleMatrix) * newGroup->insstanceCount_);
-		newGroup->instancing_->Map(0, nullptr, reinterpret_cast<void**>(&newGroup->instancingData_));
-
-		for (uint32_t index = 0; index < count; ++index) {
-			newGroup->instancingData_[index].WVP = MakeIdentity4x4();
-			newGroup->instancingData_[index].World = MakeIdentity4x4();
+		for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
+			newGroup->instancing_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(),
+				sizeof(TransformationParticleMatrix) * newGroup->insstanceCount_);
+			newGroup->instancing_[i]->Map(0, nullptr, reinterpret_cast<void**>(&newGroup->instancingDataGPU_[i]));
+			for (uint32_t index = 0; index < count; ++index) {
+				newGroup->instancingDataGPU_[i][index].WVP = MakeIdentity4x4();
+				newGroup->instancingDataGPU_[i][index].World = MakeIdentity4x4();
+			}
 		}
 
 		newGroup->material_.SetTextureNamePath(fileName);
 		newGroup->material_.CreateMaterial();
-		newGroup->srvIndex_ = srvManager_->Allocate();
-		srvManager_->CreateStructuredSRV(newGroup->srvIndex_, newGroup->instancing_.Get(),
-			newGroup->insstanceCount_, sizeof(TransformationParticleMatrix));
+		for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
+			newGroup->srvIndex_[i] = srvManager_->Allocate();
+			srvManager_->CreateStructuredSRV(newGroup->srvIndex_[i], newGroup->instancing_[i].Get(),
+				newGroup->insstanceCount_, sizeof(TransformationParticleMatrix));
+		}
 
 		// 仮の粒子を入れる（デバッグ用途）
 		float add = 0.1f;
@@ -739,14 +747,14 @@ void ParticleManager::UpdateParticleGroup(const Matrix4x4& billboardMatrix) {
 		}
 #endif // _DEBUG
 
-		group->Update(billboardMatrix, camera_);
+		group->Update(billboardMatrix, camera_, dxcommon_->GetNowFrameCount());
 	}
 }
 
 void ParticleManager::UpdateParentParticleGroup(const Matrix4x4& billboardMatrix) {
 	for (auto& groupPair : parentParticleGroups_) {
 		ParentParticleGroup* group = groupPair.second.get();
-		group->Update(billboardMatrix, camera_);
+		group->Update(billboardMatrix, camera_, dxcommon_->GetNowFrameCount());
 	}
 }
 
@@ -790,6 +798,7 @@ void ParticleManager::UpdateAnimeGroup(const Matrix4x4& billboardMatrix) {
 }
 
 void ParticleManager::DrawParticleGroup() {
+	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 	for (auto& groupPair : particleGroups_) {
 		ParticleGroup* group = groupPair.second.get();
 		if (group->drawCount_ == 0) continue;
@@ -824,7 +833,7 @@ void ParticleManager::DrawParticleGroup() {
 		}
 
 		ShapeTypeCommand(group->shapeType_);
-		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group->srvIndex_));
+		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group->srvIndex_[frameIndex]));
 		dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, group->material_.GetMaterialResource()->GetGPUVirtualAddress());
 		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, group->material_.GetTexture()->gpuHandle);
 		ShapeTypeDrawCommand(group->shapeType_, group->drawCount_);
@@ -865,7 +874,7 @@ void ParticleManager::DrawParticleGroup() {
 			}
 		}
 
-		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group->srvIndex_));
+		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group->srvIndex_[frameIndex]));
 		lightning_->MeshDraw(&group->material_, group->drawCount_);
 
 		if (group->shapeType_ != ShapeType::PLANE) {
@@ -878,13 +887,14 @@ void ParticleManager::DrawParticleGroup() {
 }
 
 void ParticleManager::DrawParentParticleGroup() {
+	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 	for (auto& groupPair : parentParticleGroups_) {
 		ParentParticleGroup* group = groupPair.second.get();
 		if (group->drawCount_ == 0) continue;
 		if (group->shapeType_ == ShapeType::LIGHTNING) continue;
 
 		ShapeTypeCommand(group->shapeType_);
-		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group->srvIndex_));
+		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group->srvIndex_[frameIndex]));
 		dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, group->material_.GetMaterialResource()->GetGPUVirtualAddress());
 		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, group->material_.GetTexture()->gpuHandle);
 		ShapeTypeDrawCommand(group->shapeType_, group->drawCount_);
@@ -894,7 +904,7 @@ void ParticleManager::DrawParentParticleGroup() {
 		if (group->drawCount_ == 0) continue;
 		if (group->shapeType_ != ShapeType::LIGHTNING) continue;
 
-		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group->srvIndex_));
+		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group->srvIndex_[frameIndex]));
 		lightning_->MeshDraw(&group->material_, group->drawCount_);
 
 		if (group->shapeType_ != ShapeType::PLANE) {

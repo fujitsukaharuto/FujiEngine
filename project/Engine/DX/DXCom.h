@@ -79,6 +79,8 @@ public:
 	/// </summary>
 	void PostDraw();
 
+	void BeginFrame();
+
 	/// <summary>
 	/// スプライト描画前に呼び出す関数
 	/// </summary>
@@ -163,7 +165,9 @@ public:
 	//* Getter
 	ID3D12Device* GetDevice() const { return device_.Get(); }
 	size_t GetBackBufferCount() const { return swapChainDesc_.BufferCount; }
+	uint32_t GetNowFrameCount() const { return command_->GetNowFrameIndex(); }
 	ID3D12GraphicsCommandList* GetCommandList() const { return command_->GetList(); }
+	ID3D12GraphicsCommandList* GetImmediateList() const { return command_->GetImmediateList(); }
 	DXC::DXCommand* GetDXCommand() const { return command_.get(); }
 	DXC::DXCompil* GetDXCompil() const { return compiler_.get(); }
 	Graphics::PipelineManager* GetPipelineManager()const { return pipeManager_; }

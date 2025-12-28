@@ -34,33 +34,42 @@ void ModelManager::Initialize(DXCom* pDxcom, Graphics::LightManager* pLight) {
 	lightManager_ = pLight;
 	LoadModelFile();
 
-	pickingBufferResource_ = dxcommon_->CreateUAVResource(dxcommon_->GetDevice(), sizeof(PickingBuffer));
+	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
+		pickingBufferResource_[i] = dxcommon_->CreateUAVResource(dxcommon_->GetDevice(), sizeof(PickingBuffer));
 
-	uint32_t srvIndex = SRVManager::GetInstance()->Allocate();
-	pickBufferHandle_.first = SRVManager::GetInstance()->GetCPUDescriptorHandle(srvIndex);
-	pickBufferHandle_.second = SRVManager::GetInstance()->GetGPUDescriptorHandle(srvIndex);
-	SRVManager::GetInstance()->CreateStructuredUAV(srvIndex, pickingBufferResource_.Get(),
-		static_cast<UINT>(1), static_cast<UINT>(sizeof(PickingBuffer)));
+		uint32_t srvIndex = SRVManager::GetInstance()->Allocate();
+		pickBufferHandle_[i].first = SRVManager::GetInstance()->GetCPUDescriptorHandle(srvIndex);
+		pickBufferHandle_[i].second = SRVManager::GetInstance()->GetGPUDescriptorHandle(srvIndex);
+		SRVManager::GetInstance()->CreateStructuredUAV(srvIndex, pickingBufferResource_[i].Get(),
+			static_cast<UINT>(1), static_cast<UINT>(sizeof(PickingBuffer)));
 
-	pickingBufferReadBack_ = dxcommon_->CreateReadbackResource(dxcommon_->GetDevice(), sizeof(PickingBuffer));
+		pickingBufferReadBack_[i] = dxcommon_->CreateReadbackResource(dxcommon_->GetDevice(), sizeof(PickingBuffer));
 
 
-	pickingDataResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(PickingData));
-	pickingData_ = nullptr;
-	pickingDataResource_->Map(0, nullptr, reinterpret_cast<void**>(&pickingData_));
-	pickingData_->pickingEnable = 0;
-	pickingData_->pickingPixelCoord[0] = -1;
-	pickingData_->pickingPixelCoord[1] = -1;
+		pickingDataResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(PickingData));
+		pickingDataGPU_[i] = nullptr;
+		pickingDataResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&pickingDataGPU_[i]));
+	}
 
+	pickingData_.pickingEnable = 0;
+	pickingData_.pickingPixelCoord[0] = -1;
+	pickingData_.pickingPixelCoord[1] = -1;
+
+	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
+		CopyData(i);
+	}
 
 	lastPicked_.objID = -1;
 	lastPicked_.depth = 1.0f;
 	PickingBuffer init{};
 	init.objID = -1;
 	init.depth = 1.0f;
-	initUploadBuffer_ = dxcommon_->CreateUploadBuffer(sizeof(PickingBuffer), &init);
 
-	dxcommon_->GetCommandList()->CopyResource(pickingBufferResource_.Get(), initUploadBuffer_.Get());
+	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
+		initUploadBuffer_[i] = dxcommon_->CreateUploadBuffer(sizeof(PickingBuffer), &init);
+
+		dxcommon_->GetImmediateList()->CopyResource(pickingBufferResource_[i].Get(), initUploadBuffer_[i].Get());
+	}
 	dxcommon_->CommandExecution();
 }
 
@@ -68,10 +77,12 @@ void ModelManager::Initialize(DXCom* pDxcom, Graphics::LightManager* pLight) {
 void ModelManager::Finalize() {
 	dxcommon_ = nullptr;
 
-	pickingBufferResource_.Reset();
-	pickingBufferReadBack_.Reset();
-	pickingDataResource_.Reset();
-	initUploadBuffer_.Reset();
+	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
+		pickingBufferResource_[i].Reset();
+		pickingBufferReadBack_[i].Reset();
+		pickingDataResource_[i].Reset();
+		initUploadBuffer_[i].Reset();
+	}
 
 	modelFileList.clear();
 	models_.clear();
@@ -552,7 +563,7 @@ void ModelManager::NormalCommand() {
 
 void ModelManager::PickingUpdate() {
 #ifdef _DEBUG
-	if (!pickingData_ || !dxcommon_) return;
+	if (!pickingDataGPU_ || !dxcommon_) return;
 
 	ImGuiIO& io = ImGui::GetIO();
 
@@ -564,32 +575,38 @@ void ModelManager::PickingUpdate() {
 
 	// === ピッキング有効／無効の設定 ===
 	if (isMouseOnGUI || !isMouseInWindow) {
-		pickingData_->pickingEnable = 0;
-		pickingData_->pickingPixelCoord[0] = -1;
-		pickingData_->pickingPixelCoord[1] = -1;
+		pickingData_.pickingEnable = 0;
+		pickingData_.pickingPixelCoord[0] = -1;
+		pickingData_.pickingPixelCoord[1] = -1;
 	} else if (Input::GetInstance()->IsTriggerMouse(0)){
 		isPicked_ = true;
-		pickingData_->pickingEnable = 1;
-		pickingData_->pickingPixelCoord[0] = int(mousePos.x);
-		pickingData_->pickingPixelCoord[1] = int(mousePos.y);
+		pickingData_.pickingEnable = 1;
+		pickingData_.pickingPixelCoord[0] = int(mousePos.x);
+		pickingData_.pickingPixelCoord[1] = int(mousePos.y);
 	} else {
-		pickingData_->pickingEnable = 0;
+		pickingData_.pickingEnable = 0;
 	}
 
+	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
+	CopyData(frameIndex);
+
+	uint32_t readIndex =
+		(frameIndex + DXC::kFrameCount_ - 1) % DXC::kFrameCount_;// 1フレーム前を読むこと
 	PickingBuffer* mapped = nullptr;
 	D3D12_RANGE readRange{ 0, sizeof(PickingBuffer) }; // 読み取り範囲
-	if (SUCCEEDED(pickingBufferReadBack_->Map(0, &readRange, reinterpret_cast<void**>(&mapped)))) {
+	if (SUCCEEDED(pickingBufferReadBack_[readIndex]->Map(0, &readRange, reinterpret_cast<void**>(&mapped)))) {
 		lastPicked_.objID = mapped->objID;
 		lastPicked_.depth = mapped->depth;
-		pickingBufferReadBack_->Unmap(0, nullptr);
+		pickingBufferReadBack_[readIndex]->Unmap(0, nullptr);
 	}
 
 #endif // _DEBUG
 }
 
 void ModelManager::PickingCommand() {
-	dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(7, pickBufferHandle_.second);
-	dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(8, pickingDataResource_->GetGPUVirtualAddress());
+	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
+	dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(7, pickBufferHandle_[frameIndex].second);
+	dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(8, pickingDataResource_[frameIndex]->GetGPUVirtualAddress());
 }
 
 void ModelManager::PickingDataReset() {
@@ -599,16 +616,18 @@ void ModelManager::PickingDataReset() {
 	init.objID = lastPicked_.objID; // 前回の objID
 	init.depth = 1.0f;              // Depth をリセット
 
+	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
+
 	// マップしてデータを書き換える
 	void* mapped = nullptr;
 	D3D12_RANGE range = { 0, 0 }; // 読み取りはしない
-	HRESULT hr = initUploadBuffer_->Map(0, &range, &mapped);
+	HRESULT hr = initUploadBuffer_[frameIndex]->Map(0, &range, &mapped);
 	assert(SUCCEEDED(hr));
 	memcpy(mapped, &init, sizeof(PickingBuffer));
-	initUploadBuffer_->Unmap(0, nullptr);
+	initUploadBuffer_[frameIndex]->Unmap(0, nullptr);
 
 	// UAV にコピー
-	dxcommon_->GetCommandList()->CopyResource(pickingBufferResource_.Get(), initUploadBuffer_.Get());
+	dxcommon_->GetCommandList()->CopyResource(pickingBufferResource_[frameIndex].Get(), initUploadBuffer_[frameIndex].Get());
 
 #endif // _DEBUG
 }
@@ -622,9 +641,10 @@ void ModelManager::PickingDataCopy() {
 		preObjId_ = lastPicked_.objID;
 		isOnce_ = true;
 	}
+	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 
-	dxcommon_->TransitionResource(pickingBufferResource_.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_COPY_SOURCE);
-	dxcommon_->GetCommandList()->CopyResource(pickingBufferReadBack_.Get(), pickingBufferResource_.Get());
+	dxcommon_->TransitionResource(pickingBufferResource_[frameIndex].Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_COPY_SOURCE);
+	dxcommon_->GetCommandList()->CopyResource(pickingBufferReadBack_[frameIndex].Get(), pickingBufferResource_[frameIndex].Get());
 
 }
 
@@ -672,4 +692,10 @@ Node ModelManager::ReadNode(aiNode* node) {
 	}
 
 	return result;
+}
+
+void ModelManager::CopyData(uint32_t frameIndex) {
+	pickingDataGPU_[frameIndex]->pickingEnable = pickingData_.pickingEnable;
+	pickingDataGPU_[frameIndex]->pickingPixelCoord[0] = pickingData_.pickingPixelCoord[0];
+	pickingDataGPU_[frameIndex]->pickingPixelCoord[1] = pickingData_.pickingPixelCoord[1];
 }

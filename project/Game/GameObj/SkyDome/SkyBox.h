@@ -4,6 +4,7 @@
 #include "Engine/DX/DXCom.h"
 #include "Engine/DX/SRVManager.h"
 #include "Engine/Camera/CameraManager.h"
+#include "Engine/DX/FrameCount.h"
 
 
 /// <summary>
@@ -52,7 +53,7 @@ private:
 
 	Graphics::Material material_;
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource_ = nullptr;
-	Math::TransformationMatrix* wvpDate_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource_[DXC::kFrameCount_];
+	Math::TransformationMatrix* wvpDateGPU_[DXC::kFrameCount_];
 
 };

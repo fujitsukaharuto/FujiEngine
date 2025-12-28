@@ -13,6 +13,7 @@
 #include "Math/Matrix/MatrixCalculation.h"
 #include "PipeKind.h"
 #include "TextureManager.h"
+#include "Engine/DX/FrameCount.h"
 
 
 using namespace Microsoft::WRL;
@@ -190,13 +191,14 @@ namespace Graphics {
 
 		//========================================================================*/
 		//* Setter
-		void SetRadialParamsCenter(const Math::Vector2& center) { radialData_->center = center; }
-		void SetRadialParamsWidth(float width) { radialData_->blurWidth = width; }
+		void SetRadialParamsCenter(const Math::Vector2& center) { radialData_.center = center; }
+		void SetRadialParamsWidth(float width) { radialData_.blurWidth = width; }
 
 	private:
 
 		void SettingVertex();
 		void InitializePostEffects();
+		void CopyData(uint32_t frameIndex = 0);
 
 	private:
 
@@ -213,33 +215,42 @@ namespace Graphics {
 		D3D12_GPU_DESCRIPTOR_HANDLE offTextureUAVHandle_;
 
 
-		ComPtr<ID3D12Resource> grayCSResource_ = nullptr;
-		GrayCS* grayCSData_;
+		ComPtr<ID3D12Resource> grayCSResource_[DXC::kFrameCount_];
+		GrayCS* grayCSDataGPU_[DXC::kFrameCount_];
+		GrayCS grayCSData_;
 
-		ComPtr<ID3D12Resource> shockResource_ = nullptr;
-		ShockWaveData* shockData_;
+		ComPtr<ID3D12Resource> shockResource_[DXC::kFrameCount_];
+		ShockWaveData* shockDataGPU_[DXC::kFrameCount_];
+		ShockWaveData shockData_;
 
-		ComPtr<ID3D12Resource> fireResource_ = nullptr;
-		FireElement* fireData_;
+		ComPtr<ID3D12Resource> fireResource_[DXC::kFrameCount_];
+		FireElement* fireDataGPU_[DXC::kFrameCount_];
+		FireElement fireData_;
 
-		ComPtr<ID3D12Resource> thunderResource_ = nullptr;
-		LightningElement* thunderData_;
+		ComPtr<ID3D12Resource> thunderResource_[DXC::kFrameCount_];
+		LightningElement* thunderDataGPU_[DXC::kFrameCount_];
+		LightningElement thunderData_;
 		int nowTex;
 
-		ComPtr<ID3D12Resource> cRTResource_ = nullptr;
-		CRTElemnt* crtData_;
+		ComPtr<ID3D12Resource> cRTResource_[DXC::kFrameCount_];
+		CRTElemnt* crtDataGPU_[DXC::kFrameCount_];
+		CRTElemnt crtData_;
 
-		ComPtr<ID3D12Resource> outlineResource_ = nullptr;
-		OutlineElement* outlineData_;
+		ComPtr<ID3D12Resource> outlineResource_[DXC::kFrameCount_];
+		OutlineElement* outlineDataGPU_[DXC::kFrameCount_];
+		OutlineElement outlineData_;
 
-		ComPtr<ID3D12Resource> bloomResource_ = nullptr;
-		BloomParams* bloomData_;
+		ComPtr<ID3D12Resource> bloomResource_[DXC::kFrameCount_];
+		BloomParams* bloomDataGPU_[DXC::kFrameCount_];
+		BloomParams bloomData_;
 
-		ComPtr<ID3D12Resource> radialResource_ = nullptr;
-		RadialParams* radialData_;
+		ComPtr<ID3D12Resource> radialResource_[DXC::kFrameCount_];
+		RadialParams* radialDataGPU_[DXC::kFrameCount_];
+		RadialParams radialData_;
 
-		ComPtr<ID3D12Resource> vignetteResource_ = nullptr;
-		VignetteData* vignetteData_;
+		ComPtr<ID3D12Resource> vignetteResource_[DXC::kFrameCount_];
+		VignetteData* vignetteDataGPU_[DXC::kFrameCount_];
+		VignetteData vignetteData_;
 
 		Texture* baseTex_;
 		Texture* voronoTex_;

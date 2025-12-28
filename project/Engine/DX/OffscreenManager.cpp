@@ -20,16 +20,16 @@ void OffscreenManager::Initialize(DXCom* pDxcom) {
 }
 
 void OffscreenManager::Update() {
-	shockData_->shockTime += 0.025f;
-	fireData_->animeTime += 0.025f;
-	thunderData_->time += 0.005f;
+	shockData_.shockTime += 0.025f;
+	fireData_.animeTime += 0.025f;
+	thunderData_.time += 0.005f;
 
-	thunderData_->time = std::fmodf(thunderData_->time, 1.5f);
-	thunderData_->progres = thunderData_->time / 1.5f;
+	thunderData_.time = std::fmodf(thunderData_.time, 1.5f);
+	thunderData_.progres = thunderData_.time / 1.5f;
 
-	crtData_->crtTime += 0.025f;
+	crtData_.crtTime += 0.025f;
 
-	outlineData_->projectionInverse = Inverse(CameraManager::GetInstance()->GetCamera()->GetProjectionMatrix());
+	outlineData_.projectionInverse = Inverse(CameraManager::GetInstance()->GetCamera()->GetProjectionMatrix());
 }
 
 void OffscreenManager::DebugGUI() {
@@ -89,19 +89,19 @@ void OffscreenManager::DebugGUI() {
 	}*/
 
 	if (ImGui::TreeNode("Gray")) {
-		ImGui::ColorEdit3("gray", &grayCSData_->gray_.x);
+		ImGui::ColorEdit3("gray", &grayCSData_.gray_.x);
 		ImGui::TreePop();
 	}
 
 	if (ImGui::TreeNode("Bloom##settingBloom")) {
-		ImGui::DragFloat("bloomIntensity", &bloomData_->bloomIntensity, 0.01f);
-		ImGui::DragFloat("bloomThreshold", &bloomData_->bloomThreshold, 0.01f);
+		ImGui::DragFloat("bloomIntensity", &bloomData_.bloomIntensity, 0.01f);
+		ImGui::DragFloat("bloomThreshold", &bloomData_.bloomThreshold, 0.01f);
 		ImGui::TreePop();
 	}
 
 	if (ImGui::TreeNode("RadialBlur##settingRadialBlur")) {
-		ImGui::DragFloat2("center##radialpara1", &radialData_->center.x, 0.01f);
-		ImGui::DragFloat("blurWidth##radialpara2", &radialData_->blurWidth, 0.01f);
+		ImGui::DragFloat2("center##radialpara1", &radialData_.center.x, 0.01f);
+		ImGui::DragFloat("blurWidth##radialpara2", &radialData_.blurWidth, 0.01f);
 		ImGui::TreePop();
 	}
 
@@ -256,84 +256,95 @@ void OffscreenManager::CreateResource() {
 	dxcommon_->GetDevice()->CreateRenderTargetView(offscreenrt_.Get(), &offscreenrtvDesc_, dxcommon_->GetRTVHandle());
 
 
-	grayCSResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(GrayCS));
-	grayCSData_ = nullptr;
-	grayCSResource_->Map(0, nullptr, reinterpret_cast<void**>(&grayCSData_));
-	grayCSData_->gray_ = { 0.2f,0.4f,0.2f };
+	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
+		grayCSResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(GrayCS));
+		grayCSDataGPU_[i] = nullptr;
+		grayCSResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&grayCSDataGPU_[i]));
 
+		shockResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(ShockWaveData));
+		shockDataGPU_[i] = nullptr;
+		shockResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&shockDataGPU_[i]));
 
-	shockResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(ShockWaveData));
-	shockData_ = nullptr;
-	shockResource_->Map(0, nullptr, reinterpret_cast<void**>(&shockData_));
-	shockData_->center = { 0.5f,0.5f,0.0f,0.0f };
-	shockData_->shockTime = 0.0f;
-	shockData_->radius = 1.0f;
-	shockData_->intensity = 0.15f;
-	shockData_->padding = 0.0f;
+		fireResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(FireElement));
+		fireDataGPU_[i] = nullptr;
+		fireResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&fireDataGPU_[i]));
 
+		thunderResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(LightningElement));
+		thunderDataGPU_[i] = nullptr;
+		thunderResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&thunderDataGPU_[i]));
 
-	fireResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(FireElement));
-	fireData_ = nullptr;
-	fireResource_->Map(0, nullptr, reinterpret_cast<void**>(&fireData_));
-	fireData_->animeTime = 0.0f;
-	fireData_->resolution = { 1280.0f, 720.0f };
-	fireData_->distortionStrength = 0.18f;
-	fireData_->highlightStrength = 0.6f;
-	fireData_->detailScale = 7.99f;
-	fireData_->rangeMin = { 0.05f,0.3f };
-	fireData_->rangeMax = { 0.93f,2.82f };
-	fireData_->scale = 1.20f;
-	fireData_->speed = 4.01f;
-	fireData_->noiseSpeed = -0.12f;
-	fireData_->blendStrength = 2.0f;
+		cRTResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(CRTElemnt));
+		crtDataGPU_[i] = nullptr;
+		cRTResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&crtDataGPU_[i]));
 
+		outlineResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(OutlineElement));
+		outlineDataGPU_[i] = nullptr;
+		outlineResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&outlineDataGPU_[i]));
 
-	thunderResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(LightningElement));
-	thunderData_ = nullptr;
-	thunderResource_->Map(0, nullptr, reinterpret_cast<void**>(&thunderData_));
-	thunderData_->time = 0.0f;
-	thunderData_->resolution = { 1280.0f, 720.0f };
-	thunderData_->mainBranchStrength = 25.0f;
-	thunderData_->branchCount = 4.0f;
-	thunderData_->branchFade = 20.0f;
-	thunderData_->highlightStrength = 15.0f;
-	thunderData_->noiseScale = 0.2f;
-	thunderData_->noiseSpeed = 5.0f;
-	thunderData_->rangeMin = { 0.0f,0.0f };
-	thunderData_->rangeMax = { 1.0f,1.0f };
-	thunderData_->startPos = { 0.5f,0.3f };
-	thunderData_->endPos = { 0.5f,0.8f };
-	thunderData_->branchStrngth = 4.0f;
-	thunderData_->boltCount = 3.0f;
+		bloomResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(BloomParams));
+		bloomDataGPU_[i] = nullptr;
+		bloomResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&bloomDataGPU_[i]));
 
+		radialResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(RadialParams));
+		radialDataGPU_[i] = nullptr;
+		radialResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&radialDataGPU_[i]));
 
-	cRTResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(CRTElemnt));
-	crtData_ = nullptr;
-	cRTResource_->Map(0, nullptr, reinterpret_cast<void**>(&crtData_));
-	crtData_->crtTime = 0.0f;
-	crtData_->resolution = { 1280.0f, 720.0f };
+		vignetteResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(VignetteData));
+		vignetteDataGPU_[i] = nullptr;
+		vignetteResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&vignetteDataGPU_[i]));
+	}
 
-	outlineResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(OutlineElement));
-	outlineData_ = nullptr;
-	outlineResource_->Map(0, nullptr, reinterpret_cast<void**>(&outlineData_));
-	outlineData_->projectionInverse = MakeIdentity4x4();
+	grayCSData_.gray_ = { 0.2f,0.4f,0.2f };
 
-	bloomResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(BloomParams));
-	bloomData_ = nullptr;
-	bloomResource_->Map(0, nullptr, reinterpret_cast<void**>(&bloomData_));
-	bloomData_->bloomIntensity = 1.0f;
-	bloomData_->bloomThreshold = 0.75f;
+	shockData_.center = { 0.5f,0.5f,0.0f,0.0f };
+	shockData_.shockTime = 0.0f;
+	shockData_.radius = 1.0f;
+	shockData_.intensity = 0.15f;
+	shockData_.padding = 0.0f;
 
-	radialResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(RadialParams));
-	radialData_ = nullptr;
-	radialResource_->Map(0, nullptr, reinterpret_cast<void**>(&radialData_));
-	radialData_->center = Vector2(0.5f, 0.5f);
-	radialData_->blurWidth = 0.01f;
+	fireData_.animeTime = 0.0f;
+	fireData_.resolution = { 1280.0f, 720.0f };
+	fireData_.distortionStrength = 0.18f;
+	fireData_.highlightStrength = 0.6f;
+	fireData_.detailScale = 7.99f;
+	fireData_.rangeMin = { 0.05f,0.3f };
+	fireData_.rangeMax = { 0.93f,2.82f };
+	fireData_.scale = 1.20f;
+	fireData_.speed = 4.01f;
+	fireData_.noiseSpeed = -0.12f;
+	fireData_.blendStrength = 2.0f;
 
-	vignetteResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(VignetteData));
-	vignetteData_ = nullptr;
-	vignetteResource_->Map(0, nullptr, reinterpret_cast<void**>(&vignetteData_));
-	vignetteData_->color_ = { 0.8f,0.0f,0.0f };
+	thunderData_.time = 0.0f;
+	thunderData_.resolution = { 1280.0f, 720.0f };
+	thunderData_.mainBranchStrength = 25.0f;
+	thunderData_.branchCount = 4.0f;
+	thunderData_.branchFade = 20.0f;
+	thunderData_.highlightStrength = 15.0f;
+	thunderData_.noiseScale = 0.2f;
+	thunderData_.noiseSpeed = 5.0f;
+	thunderData_.rangeMin = { 0.0f,0.0f };
+	thunderData_.rangeMax = { 1.0f,1.0f };
+	thunderData_.startPos = { 0.5f,0.3f };
+	thunderData_.endPos = { 0.5f,0.8f };
+	thunderData_.branchStrngth = 4.0f;
+	thunderData_.boltCount = 3.0f;
+
+	crtData_.crtTime = 0.0f;
+	crtData_.resolution = { 1280.0f, 720.0f };
+
+	outlineData_.projectionInverse = MakeIdentity4x4();
+
+	bloomData_.bloomIntensity = 1.0f;
+	bloomData_.bloomThreshold = 0.75f;
+
+	radialData_.center = Vector2(0.5f, 0.5f);
+	radialData_.blurWidth = 0.01f;
+
+	vignetteData_.color_ = { 0.8f,0.0f,0.0f };
+
+	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
+		CopyData(i);
+	}
 
 	isGrayscale_ = true;
 	isNonePost_ = false;
@@ -375,6 +386,8 @@ void OffscreenManager::SettingTexture() {
 }
 
 void OffscreenManager::Command() {
+
+	CopyData(dxcommon_->GetNowFrameCount());
 
 	if (isGrayscale_) {
 
@@ -481,7 +494,7 @@ void OffscreenManager::Command() {
 		dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
 		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
-		dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(1, shockResource_->GetGPUVirtualAddress());
+		dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(1, shockResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
 		dxcommon_->GetCommandList()->DrawInstanced(3, 1, 0, 0);
 	}
 
@@ -495,7 +508,7 @@ void OffscreenManager::Command() {
 		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, baseTex_->gpuHandle);
 		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, voronoTex_->gpuHandle);
 		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(3, noiseTex_->gpuHandle);
-		dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(4, fireResource_->GetGPUVirtualAddress());
+		dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(4, fireResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
 		dxcommon_->GetCommandList()->DrawInstanced(3, 1, 0, 0);
 	}
 
@@ -508,7 +521,7 @@ void OffscreenManager::Command() {
 		dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
 		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
 		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, noiseDirTex_->gpuHandle);
-		dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(2, thunderResource_->GetGPUVirtualAddress());
+		dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(2, thunderResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
 		dxcommon_->GetCommandList()->DrawInstanced(3, 1, 0, 0);
 	}
 
@@ -598,7 +611,7 @@ void OffscreenManager::InitializePostEffects() {
 		[=](auto* cmd, auto input, auto output) {
 			cmd->SetComputeRootDescriptorTable(0, input);
 			cmd->SetComputeRootDescriptorTable(1, output);
-			cmd->SetComputeRootConstantBufferView(2, grayCSResource_->GetGPUVirtualAddress());
+			cmd->SetComputeRootConstantBufferView(2, grayCSResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
 		}
 		});
 
@@ -608,7 +621,7 @@ void OffscreenManager::InitializePostEffects() {
 	   [=](auto* cmd, auto input, auto output) {
 		   cmd->SetComputeRootDescriptorTable(0, input);
 		   cmd->SetComputeRootDescriptorTable(1, output);
-		   cmd->SetComputeRootConstantBufferView(2, cRTResource_->GetGPUVirtualAddress());
+		   cmd->SetComputeRootConstantBufferView(2, cRTResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
 	   }
 		});
 
@@ -618,7 +631,7 @@ void OffscreenManager::InitializePostEffects() {
 	   [=](auto* cmd, auto input, auto output) {
 		   cmd->SetComputeRootDescriptorTable(0, input);
 		   cmd->SetComputeRootDescriptorTable(1, output);
-		   cmd->SetComputeRootConstantBufferView(2, cRTResource_->GetGPUVirtualAddress());
+		   cmd->SetComputeRootConstantBufferView(2, cRTResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
 	   }
 		});
 
@@ -646,7 +659,7 @@ void OffscreenManager::InitializePostEffects() {
 	   [=](auto* cmd, auto input, [[maybe_unused]] auto output) {
 		   cmd->SetComputeRootDescriptorTable(0, input);
 		   cmd->SetComputeRootDescriptorTable(1, output);
-		   cmd->SetComputeRootConstantBufferView(2, radialResource_->GetGPUVirtualAddress());
+		   cmd->SetComputeRootConstantBufferView(2, radialResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
 	   }
 		});
 
@@ -656,7 +669,7 @@ void OffscreenManager::InitializePostEffects() {
 	   [=](auto* cmd, auto input, [[maybe_unused]] auto output) {
 		   cmd->SetComputeRootDescriptorTable(0, input);
 		   cmd->SetComputeRootDescriptorTable(1, output);
-		   cmd->SetComputeRootConstantBufferView(2, vignetteResource_->GetGPUVirtualAddress());
+		   cmd->SetComputeRootConstantBufferView(2, vignetteResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
 	   }
 		});
 
@@ -667,7 +680,7 @@ void OffscreenManager::InitializePostEffects() {
 		   cmd->SetComputeRootDescriptorTable(0, input);
 		   cmd->SetComputeRootDescriptorTable(2, output);
 		   cmd->SetComputeRootDescriptorTable(1, dxcommon_->GetDepthTexGPUHandle());
-		   cmd->SetComputeRootConstantBufferView(3, outlineResource_->GetGPUVirtualAddress());
+		   cmd->SetComputeRootConstantBufferView(3, outlineResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
 	   }
 		});
 
@@ -686,7 +699,7 @@ void OffscreenManager::InitializePostEffects() {
 	   [=](auto* cmd, auto input, [[maybe_unused]] auto output) {
 		   cmd->SetComputeRootDescriptorTable(0, input);
 		   cmd->SetComputeRootDescriptorTable(1, output);
-		   cmd->SetComputeRootConstantBufferView(2, bloomResource_->GetGPUVirtualAddress());
+		   cmd->SetComputeRootConstantBufferView(2, bloomResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
 	   }
 		});
 
@@ -696,8 +709,67 @@ void OffscreenManager::InitializePostEffects() {
 	   [=](auto* cmd, auto input, [[maybe_unused]] auto output) {
 		   cmd->SetComputeRootDescriptorTable(0, input);
 		   cmd->SetComputeRootDescriptorTable(1, output);
-		   cmd->SetComputeRootConstantBufferView(2, cRTResource_->GetGPUVirtualAddress());
+		   cmd->SetComputeRootConstantBufferView(2, cRTResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
 	   }
 		});
 
+}
+
+void OffscreenManager::CopyData(uint32_t frameIndex) {
+
+	grayCSDataGPU_[frameIndex]->gray_ = grayCSData_.gray_;
+
+
+	vignetteDataGPU_[frameIndex]->color_ = vignetteData_.color_;
+
+
+	shockDataGPU_[frameIndex]->center = shockData_.center;
+	shockDataGPU_[frameIndex]->shockTime = shockData_.shockTime;
+	shockDataGPU_[frameIndex]->radius = shockData_.radius;
+	shockDataGPU_[frameIndex]->intensity = shockData_.intensity;
+
+
+	fireDataGPU_[frameIndex]->animeTime = fireData_.animeTime;
+	fireDataGPU_[frameIndex]->resolution =fireData_.resolution;
+	fireDataGPU_[frameIndex]->distortionStrength =fireData_.distortionStrength;
+	fireDataGPU_[frameIndex]->highlightStrength =fireData_.highlightStrength;
+	fireDataGPU_[frameIndex]->detailScale =fireData_.detailScale;
+	fireDataGPU_[frameIndex]->rangeMin =fireData_.rangeMin;
+	fireDataGPU_[frameIndex]->rangeMax =fireData_.rangeMax;
+	fireDataGPU_[frameIndex]->scale =fireData_.scale;
+	fireDataGPU_[frameIndex]->speed =fireData_.speed;
+	fireDataGPU_[frameIndex]->noiseSpeed =fireData_.noiseSpeed;
+	fireDataGPU_[frameIndex]->blendStrength =fireData_.blendStrength;
+
+
+	crtDataGPU_[frameIndex]->crtTime = crtData_.crtTime;
+	crtDataGPU_[frameIndex]->resolution = crtData_.resolution;
+
+
+	outlineDataGPU_[frameIndex]->projectionInverse = outlineData_.projectionInverse;
+
+
+	bloomDataGPU_[frameIndex]->bloomThreshold = bloomData_.bloomThreshold;
+	bloomDataGPU_[frameIndex]->bloomIntensity = bloomData_.bloomIntensity;
+
+
+	radialDataGPU_[frameIndex]->center = radialData_.center;
+	radialDataGPU_[frameIndex]->blurWidth = radialData_.blurWidth;
+
+
+	thunderDataGPU_[frameIndex]->startPos = thunderData_.startPos;
+	thunderDataGPU_[frameIndex]->endPos = thunderData_.endPos;
+	thunderDataGPU_[frameIndex]->rangeMin = thunderData_.rangeMin;
+	thunderDataGPU_[frameIndex]->rangeMax = thunderData_.rangeMax;
+	thunderDataGPU_[frameIndex]->resolution = thunderData_.resolution;
+	thunderDataGPU_[frameIndex]->time = thunderData_.time;
+	thunderDataGPU_[frameIndex]->mainBranchStrength = thunderData_.mainBranchStrength;
+	thunderDataGPU_[frameIndex]->branchCount = thunderData_.branchCount;
+	thunderDataGPU_[frameIndex]->branchFade = thunderData_.branchFade;
+	thunderDataGPU_[frameIndex]->highlightStrength = thunderData_.highlightStrength;
+	thunderDataGPU_[frameIndex]->noiseScale = thunderData_.noiseScale;
+	thunderDataGPU_[frameIndex]->noiseSpeed = thunderData_.noiseSpeed;
+	thunderDataGPU_[frameIndex]->branchStrngth = thunderData_.branchStrngth;
+	thunderDataGPU_[frameIndex]->boltCount = thunderData_.boltCount;
+	thunderDataGPU_[frameIndex]->progres = thunderData_.progres;
 }

@@ -5,6 +5,7 @@
 #include "Math/Matrix/MatrixCalculation.h"
 #include "Engine/Model/TextureManager.h"
 #include "Engine/Editor/JsonSerializer.h"
+#include "Engine/DX/FrameCount.h"
 
 using Microsoft::WRL::ComPtr;
 
@@ -36,7 +37,7 @@ struct EmitterTexture {
 
 class TextureBasedEmitter : public IGPUEmitter {
 public:
-	EmitterTexture* data_ = nullptr;
+	EmitterTexture data_;
 	bool isEmit_ = false;
 
 	TextureBasedEmitter(DXCom* dx);
@@ -54,8 +55,11 @@ public:
 	void SetPos(const Math::Vector3& pos) override;
 	void SetEmit(bool state) override { isEmit_ = state; }
 private:
+	void CopyData(uint32_t frameIndex = 0);
+
 	char saveName_[64] = "default";
-	ComPtr<ID3D12Resource> resource_;
+	EmitterTexture* dataGPU_[DXC::kFrameCount_];
+	ComPtr<ID3D12Resource> resource_[DXC::kFrameCount_];
 	Texture* textureForEmit_;
 	bool isOnceEmit_ = false;
 };

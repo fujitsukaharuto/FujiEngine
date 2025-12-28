@@ -127,9 +127,9 @@ void Model::SetLightEnable(LightMode mode) {
 	}
 }
 
-void Model::CSDispatch(const SkinCluster& skinCluster, ID3D12GraphicsCommandList* commandList) {
+void Model::CSDispatch(const SkinCluster& skinCluster, ID3D12GraphicsCommandList* commandList, uint32_t frameIndex) {
 	PipelineManager::GetInstance()->SetCSPipeline(Pipe::SkinningCS);
-	commandList->SetComputeRootDescriptorTable(0, skinCluster.paletteSrvHandle.second);        // t0
+	commandList->SetComputeRootDescriptorTable(0, skinCluster.paletteSrvHandle[frameIndex].second);        // t0
 	commandList->SetComputeRootDescriptorTable(2, skinCluster.influenceSrvHandle.second);      // t1, t2
 	commandList->SetComputeRootDescriptorTable(5, skinCluster.meshSectionSrvHandle.second);    // t3
 	commandList->SetComputeRootConstantBufferView(4, skinningInformation_->GetGPUVirtualAddress()); // b0

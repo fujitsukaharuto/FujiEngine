@@ -9,32 +9,62 @@ void DirectionLight::Initialize(DXCom* pDxcom) {
 
 	dxcommon_ = pDxcom;
 
-	drectionLightResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(DirectionalLight));
-	directionLightData_ = nullptr;
-	drectionLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&directionLightData_));
-	directionLightData_->color = { 1.0f,1.0f,1.0f,1.0f };
-	directionLightData_->direction = { 0.0f,-1.0f,0.0f };
-	directionLightData_->intensity = 0.3f;
+	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
+		drectionLightResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(DirectionalLight));
+		directionLightDataGPU_[i] = nullptr;
+		drectionLightResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&directionLightDataGPU_[i]));
+	}
+
+	directionLightData_.color = { 1.0f,1.0f,1.0f,1.0f };
+	directionLightData_.direction = { 0.0f,-1.0f,0.0f };
+	directionLightData_.intensity = 0.3f;
+
+	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
+		CopyData(i);
+	}
 }
 
 void DirectionLight::Finalize() {
-	drectionLightResource_.Reset();
+	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
+		drectionLightResource_[i].Reset();
+	}
 }
 
 void DirectionLight::SetLightCommand(ID3D12GraphicsCommandList* commandList) {
-	commandList->SetGraphicsRootConstantBufferView(3, drectionLightResource_->GetGPUVirtualAddress());
+	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
+	if (isOnceCopy_) {
+		CopyData(frameIndex);
+		isOnceCopy_ = false;
+	}
+	commandList->SetGraphicsRootConstantBufferView(3, drectionLightResource_[frameIndex]->GetGPUVirtualAddress());
 }
 
+void DirectionLight::SetLightColor(const Vector4& color) {
+	directionLightData_.color = color;
+}
+
+void DirectionLight::SetLightDirection(const Vector3& direction) {
+	directionLightData_.direction = direction;
+}
+
+void DirectionLight::SetLightIntensity(float intensity) {
+	directionLightData_.intensity = intensity;
+}
 
 void DirectionLight::Debug() {
 #ifdef _DEBUG
 	if (ImGui::CollapsingHeader("directionLight")) {
 
-		ImGui::ColorEdit4("color##direction", &directionLightData_->color.x);
-		ImGui::DragFloat("intensity##direction", &directionLightData_->intensity, 0.01f);
-		ImGui::DragFloat3("direction##direction", &directionLightData_->direction.x, 0.1f);
-		directionLightData_->direction = directionLightData_->direction.Normalize();
-
+		ImGui::ColorEdit4("color##direction", &directionLightData_.color.x);
+		ImGui::DragFloat("intensity##direction", &directionLightData_.intensity, 0.01f);
+		ImGui::DragFloat3("direction##direction", &directionLightData_.direction.x, 0.1f);
+		directionLightData_.direction = directionLightData_.direction.Normalize();
 	}
 #endif // _DEBUG
+}
+
+void DirectionLight::CopyData(uint32_t frameIndex) {
+	directionLightDataGPU_[frameIndex]->color = directionLightData_.color;
+	directionLightDataGPU_[frameIndex]->direction = directionLightData_.direction;
+	directionLightDataGPU_[frameIndex]->intensity = directionLightData_.intensity;
 }

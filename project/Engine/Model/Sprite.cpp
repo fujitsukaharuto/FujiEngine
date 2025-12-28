@@ -29,14 +29,17 @@ void Sprite::Load(const std::string& fileName) {
 void Sprite::Draw() {
 	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
 	
+	SetWvp();
+
 	dxcommon_->GetDXCommand()->SetViewAndscissor();
 	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Sprite);
 	dxcommon_->GetDXCommand()->GetList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
+	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 	cList->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	cList->IASetIndexBuffer(&indexBufferView_);
 	cList->SetGraphicsRootConstantBufferView(0, material_.GetMaterialResource()->GetGPUVirtualAddress());
-	cList->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
+	cList->SetGraphicsRootConstantBufferView(1, wvpResource_[frameIndex]->GetGPUVirtualAddress());
 	cList->SetGraphicsRootDescriptorTable(2, material_.GetTexture()->gpuHandle);
 	cList->DrawIndexedInstanced(6, 1, 0, 0, 0);
 
@@ -49,22 +52,18 @@ void Sprite::SetColor(const Vector4& color) {
 
 void Sprite::SetPos(const Vector3& pos) {
 	position_ = pos;
-	SetWvp();
 }
 
 void Sprite::SetScale(const Vector2& scale) {
 	scale_ = scale;
-	SetWvp();
 }
 
 void Sprite::SetSize(const Vector2& size) {
 	size_ = size;
-	SetWvp();
 }
 
 void Sprite::SetAngle(float rotate) {
 	rotate_ = rotate;
-	SetWvp();
 }
 
 void Sprite::SetAnchor(const Vector2& anchor) {
@@ -145,15 +144,17 @@ void Sprite::InitializeBuffer() {
 	material_.SetLightEnable(LightMode::kLightNone);
 
 
-	wvpResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(TransformationMatrix));
-	wvpData_ = nullptr;
-	wvpResource_->Map(0, nullptr, reinterpret_cast<void**>(&wvpData_));
-	SetWvp();
+	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
+		wvpResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(TransformationMatrix));
+		wvpDataGPU_[i] = nullptr;
+		wvpResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&wvpDataGPU_[i]));
 
-	cameraPosResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(DirectionalLight));
-	cameraPosData_ = nullptr;
-	cameraPosResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraPosData_));
-	cameraPosData_->worldPosition = { 0.0f,0.0f,0.0f };
+		cameraPosResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(DirectionalLight));
+		cameraPosData_[i] = nullptr;
+		cameraPosResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&cameraPosData_[i]));
+		cameraPosData_[i]->worldPosition = {0.0f,0.0f,0.0f};
+	}
+	SetWvp();
 
 	objIDDataResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(ObjIDData));
 	objIDData_ = nullptr;
@@ -176,7 +177,8 @@ void Sprite::SetWvp() {
 	Matrix4x4 projectionMatrix = MakeOrthographicMatrix(0.0f, 0.0f, float(MyWin::kWindowWidth), float(MyWin::kWindowHeight), 0.0f, 100.0f);
 	Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
 
-	wvpData_->World = worldMatrix;
-	wvpData_->WVP = worldViewProjectionMatrix;
-	wvpData_->WorldInverseTransPose = Transpose(Inverse(wvpData_->World));
+	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
+	wvpDataGPU_[frameIndex]->World = worldMatrix;
+	wvpDataGPU_[frameIndex]->WVP = worldViewProjectionMatrix;
+	wvpDataGPU_[frameIndex]->WorldInverseTransPose = Transpose(Inverse(wvpDataGPU_[frameIndex]->World));
 }
