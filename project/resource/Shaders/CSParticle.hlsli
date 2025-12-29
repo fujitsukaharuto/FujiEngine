@@ -32,3 +32,38 @@ struct Particle
     uint isTrailEmit;
     uint isGravity;
 };
+
+struct Particle_Translate
+{
+    float3 translate;
+    float3 prevTranslate;
+};
+
+struct Particle_Scale
+{
+    float3 scale;
+    float3 startScale;
+};
+
+struct Particle_Time
+{
+    float lifetime;
+    float currentTime;
+};
+
+struct Particle_Velocity
+{
+    float3 velocity;
+};
+
+struct Particle_color
+{
+    float4 color;
+};
+
+struct Particle_Flags
+{
+    uint isRandomMove;
+    uint isTrailEmit;
+    uint isGravity;
+};
