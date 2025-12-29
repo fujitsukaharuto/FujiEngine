@@ -172,8 +172,8 @@ public:
 	DXC::DXCompil* GetDXCompil() const { return compiler_.get(); }
 	Graphics::PipelineManager* GetPipelineManager()const { return pipeManager_; }
 	Graphics::OffscreenManager* GetOffscreenManager()const { return offscreen_.get(); }
-	D3D12_CPU_DESCRIPTOR_HANDLE GetRTVHandle() { return rtvHandles_[2]; }
-	D3D12_GPU_DESCRIPTOR_HANDLE GetDepthTexGPUHandle() { return depthTexSrvHandle_.second; }
+	D3D12_CPU_DESCRIPTOR_HANDLE GetRTVHandle(uint32_t index) { return rtvHandles_[2 + index]; }
+	D3D12_GPU_DESCRIPTOR_HANDLE GetDepthTexGPUHandle() { return depthTexSrvHandle_[GetNowFrameCount()].second; }
 
 	/*void Tick();*/
 
@@ -228,15 +228,15 @@ private:
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc_{};
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap_ = nullptr;
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc_{};
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles_[3];
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles_[4];
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> swapChainResources_[2] = { nullptr };
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource_[DXC::kFrameCount_];
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap_ = nullptr;
 	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc_{};
 	D3D12_SHADER_RESOURCE_VIEW_DESC depthTextureSrvDesc_{};
-	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> depthTexSrvHandle_;
+	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> depthTexSrvHandle_[DXC::kFrameCount_];
 
 
 	std::unique_ptr<DXC::DXCompil> compiler_ = nullptr;

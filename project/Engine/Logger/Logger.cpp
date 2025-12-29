@@ -12,6 +12,18 @@ void Logger::Log(const std::wstring& outputString) {
 	OutputDebugStringA((ConvertString(outputString) + "\n").c_str());
 }
 
+void Logger::LogF(const char* format, ...) {
+	char buffer[1024];
+
+	va_list args;
+	va_start(args, format);
+	vsnprintf(buffer, sizeof(buffer), format, args);
+	va_end(args);
+
+	OutputDebugStringA(buffer);
+	OutputDebugStringA("\n");
+}
+
 std::string Logger::ConvertString(const std::wstring& str) {
 	if (str.empty()) {
 		return std::string();

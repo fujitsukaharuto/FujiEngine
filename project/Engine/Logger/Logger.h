@@ -17,6 +17,8 @@ namespace Logger {
 	/// </summary>
 	void Log(const std::wstring& outputString);
 
+	void LogF(const char* format, ...);
+
 	/// <summary>
 	/// ワイド文字列（UTF-16）を通常の文字列（UTF-8）へ変換する
 	/// </summary>

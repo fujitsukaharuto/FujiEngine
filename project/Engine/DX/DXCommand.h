@@ -35,7 +35,7 @@ namespace DXC {
 		/// <summary>
 		/// GPUの実行をまつ
 		/// </summary>
-		void WaitForGPU(uint32_t frameIndex, uint32_t index = 0);
+		void WaitForGPU(uint32_t index = 0);
 
 		/// <summary>
 		/// コマンドアロケータおよびコマンドリストをリセットする
@@ -53,6 +53,8 @@ namespace DXC {
 		ID3D12GraphicsCommandList* GetList() const { return list_.Get(); }
 		ID3D12GraphicsCommandList* GetImmediateList() const { return immediateList_.Get(); }
 		uint32_t GetNowFrameIndex() { return frameIndex_; }
+
+		void SetFrameIndex(uint32_t frameIndex) { frameIndex_ = frameIndex; }
 
 	private:
 

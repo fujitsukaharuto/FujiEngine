@@ -53,7 +53,9 @@ void DXCom::Finalize() {
 		command_.reset();
 	}
 	compiler_.reset();
-	depthStencilResource_.Reset();
+	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
+		depthStencilResource_[i].Reset();
+	}
 	dsvDescriptorHeap_.Reset();
 	for (auto& res : swapChainResources_) {
 		res.Reset();
@@ -174,7 +176,7 @@ void DXCom::CreateSwapChain() {
 
 void DXCom::CreateRenderTargets() {
 
-	rtvDescriptorHeap_ = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 3, false);
+	rtvDescriptorHeap_ = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 4, false);
 
 	HRESULT hr = swapChain_->GetBuffer(0, IID_PPV_ARGS(&swapChainResources_[0]));
 	assert(SUCCEEDED(hr));
@@ -191,21 +193,35 @@ void DXCom::CreateRenderTargets() {
 	device_->CreateRenderTargetView(swapChainResources_[1].Get(), &rtvDesc_, rtvHandles_[1]);
 
 	rtvHandles_[2].ptr = rtvHandles_[1].ptr + device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	rtvHandles_[3].ptr = rtvHandles_[2].ptr + device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 
 	offscreen_->CreateResource();
 
 }
 
 void DXCom::CreateDepthBuffer() {
+	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
+		depthStencilResource_[i] = CreateDepthStencilTextureResource(
+			device_.Get(), MyWin::kWindowWidth, MyWin::kWindowHeight);
+	}
 
-	depthStencilResource_ = CreateDepthStencilTextureResource(
-		device_.Get(), MyWin::kWindowWidth, MyWin::kWindowHeight);
+	dsvDescriptorHeap_ = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 2, false);
 
-	dsvDescriptorHeap_ = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
+	D3D12_CPU_DESCRIPTOR_HANDLE dsvStartHandle = dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
+
+	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
+	UINT handleIncrementSize = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
 	dsvDesc_.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	dsvDesc_.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
-	device_->CreateDepthStencilView(depthStencilResource_.Get(), &dsvDesc_, dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart());
+	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
+
+		// 正しく CPU ハンドルをオフセット
+		D3D12_CPU_DESCRIPTOR_HANDLE currentHandle = {};
+		currentHandle.ptr = dsvHandle.ptr + i * handleIncrementSize;
+
+		device_->CreateDepthStencilView(depthStencilResource_[i].Get(), &dsvDesc_, currentHandle);
+	}
 }
 
 void DXCom::CreateCompiler() {
@@ -262,10 +278,12 @@ void DXCom::SettingTexture() {
 	depthTextureSrvDesc_.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 	depthTextureSrvDesc_.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 	depthTextureSrvDesc_.Texture2D.MipLevels = 1;
-	uint32_t depthTexIndex = SRVManager::GetInstance()->Allocate();
-	depthTexSrvHandle_.first = SRVManager::GetInstance()->GetCPUDescriptorHandle(depthTexIndex);
-	depthTexSrvHandle_.second = SRVManager::GetInstance()->GetGPUDescriptorHandle(depthTexIndex);
-	device_->CreateShaderResourceView(depthStencilResource_.Get(), &depthTextureSrvDesc_, depthTexSrvHandle_.first);
+	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
+		uint32_t depthTexIndex = SRVManager::GetInstance()->Allocate();
+		depthTexSrvHandle_[i].first = SRVManager::GetInstance()->GetCPUDescriptorHandle(depthTexIndex);
+		depthTexSrvHandle_[i].second = SRVManager::GetInstance()->GetGPUDescriptorHandle(depthTexIndex);
+		device_->CreateShaderResourceView(depthStencilResource_[i].Get(), &depthTextureSrvDesc_, depthTexSrvHandle_[i].first);
+	}
 
 	offscreen_->SettingTexture();
 
@@ -274,7 +292,7 @@ void DXCom::SettingTexture() {
 
 
 void DXCom::PreDraw() {
-	TransitionResource(offscreen_->GetOffscreenResource().Get(),
+	TransitionResource(offscreen_->GetOffscreenResource(GetNowFrameCount()),
 		D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
 	SRVManager::GetInstance()->SetDescriptorHeap();
@@ -301,7 +319,10 @@ void DXCom::PostEffect() {
 
 	CreateBarrier(D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
+	UINT frameIndex = GetNowFrameCount();
 	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
+	UINT dsvIncrement = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+	dsvHandle.ptr += frameIndex * dsvIncrement;
 	commandList->OMSetRenderTargets(1, &rtvHandles_[backBufferIndex], false, &dsvHandle);
 	/*commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);*/
 
@@ -318,12 +339,12 @@ void DXCom::PostDraw() {
 	command_->Close();
 	// コマンドリストの実行
 	command_->Execution();
-	swapChain_->Present(1, 0);
 	command_->GPUSignal();
+	swapChain_->Present(0, 0);// 垂直同期はOFF
 }
 
 void DXCom::BeginFrame() {
-	command_->WaitForGPU(swapChain_->GetCurrentBackBufferIndex());
+	command_->SetFrameIndex(swapChain_->GetCurrentBackBufferIndex());
 	fpsKeeper_->FixFPS();
 	command_->Reset();
 }
@@ -341,25 +362,31 @@ void DXCom::CommandExecution() {
 
 	command_->GPUSignal(1);
 
-	command_->WaitForGPU(swapChain_->GetCurrentBackBufferIndex(), 1);
+	command_->WaitForGPU(1);
 
 	command_->Reset(1);
 }
 
 void DXCom::SetRenderTargets() {
 
+	UINT frameIndex = GetNowFrameCount();
 	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
-	command_->GetList()->OMSetRenderTargets(1, &rtvHandles_[2], false, &dsvHandle);
+	UINT dsvIncrement = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+	dsvHandle.ptr += frameIndex * dsvIncrement;
+	command_->GetList()->OMSetRenderTargets(1, &rtvHandles_[2 + GetNowFrameCount()], false, &dsvHandle);
 }
 
 void DXCom::ClearRenderTarget() {
 
-	command_->GetList()->ClearRenderTargetView(rtvHandles_[2], offscreen_->GetClearColorValue().Color, 0, nullptr);
+	command_->GetList()->ClearRenderTargetView(rtvHandles_[2 + GetNowFrameCount()], offscreen_->GetClearColorValue().Color, 0, nullptr);
 }
 
 void DXCom::ClearDepthBuffer() {
 
+	UINT frameIndex = GetNowFrameCount();
 	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
+	UINT dsvIncrement = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+	dsvHandle.ptr += frameIndex * dsvIncrement;
 	command_->GetList()->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 }
 
@@ -396,12 +423,12 @@ void DXCom::InsertUAVBarrier(ID3D12Resource* resource) {
 }
 
 void DXCom::PreOutline() {
-	TransitionResource(depthStencilResource_.Get(),
+	TransitionResource(depthStencilResource_[GetNowFrameCount()].Get(),
 		D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
 }
 
 void DXCom::PostOutline() {
-	TransitionResource(depthStencilResource_.Get(),
+	TransitionResource(depthStencilResource_[GetNowFrameCount()].Get(),
 		D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_DEPTH_WRITE);
 }
 

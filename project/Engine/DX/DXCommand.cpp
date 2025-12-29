@@ -1,5 +1,6 @@
 #include "DXCommand.h"
 #include "MyWindow.h"
+#include "Engine/Logger/Logger.h"
 #include <cassert>
 
 using namespace DXC;
@@ -136,27 +137,32 @@ void DXC::DXCommand::GPUSignal(uint32_t index) {
 	// コマンドリストの実行完了を待つ
 	if (index == 0) {
 		globalFenceValue_++;
+		queue_->Signal(fence_.Get(), globalFenceValue_);
 		fenceValue_[frameIndex_] = globalFenceValue_;
-		const uint64_t fenceToWait = fenceValue_[frameIndex_];
-		queue_->Signal(fence_.Get(), fenceToWait);
 	} else {
 		const uint64_t fenceToWait = ++immediateFenceValue_;
 		queue_->Signal(immediateFence_.Get(), fenceToWait);
 	}
 }
 
-void DXC::DXCommand::WaitForGPU(uint32_t frameIndex, uint32_t index) {
-	frameIndex_ = frameIndex;
+void DXC::DXCommand::WaitForGPU(uint32_t index) {
 
 	if (index == 0) {
-		if (fence_->GetCompletedValue() < fenceValue_[frameIndex_]) {
+		if (fenceValue_[frameIndex_] != 0) {
+			if (fence_->GetCompletedValue() < fenceValue_[frameIndex_]) {
 
-			HANDLE fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-			assert(fenceEvent != nullptr);
+				HANDLE fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+				assert(fenceEvent != nullptr);
 
-			fence_->SetEventOnCompletion(fenceValue_[frameIndex_], fenceEvent);
-			WaitForSingleObject(fenceEvent, INFINITE);
-			CloseHandle(fenceEvent);
+				fence_->SetEventOnCompletion(fenceValue_[frameIndex_], fenceEvent);
+				WaitForSingleObject(fenceEvent, INFINITE);
+				CloseHandle(fenceEvent);
+				Logger::LogF("frame=%llu idx=%u fence=%llu completed=%llu",
+					globalFenceValue_,
+					frameIndex_,
+					fenceValue_[frameIndex_],
+					fence_->GetCompletedValue());
+			}
 		}
 	} else {
 		if (immediateFence_->GetCompletedValue() < immediateFenceValue_) {
@@ -176,6 +182,7 @@ void DXCommand::Reset(uint32_t index) {
 
 	HRESULT hr;
 
+	WaitForGPU();
 	if (index == 0) {
 		hr = allocator_[frameIndex_]->Reset();
 		assert(SUCCEEDED(hr));

@@ -186,7 +186,7 @@ namespace Graphics {
 
 		//========================================================================*/
 		//* Getter
-		ComPtr<ID3D12Resource>& GetOffscreenResource() { return offscreenrt_; }
+		ID3D12Resource* GetOffscreenResource(uint32_t index) { return offscreenrt_[index].Get(); }
 		const D3D12_CLEAR_VALUE& GetClearColorValue() const { return clearColorValue_; }
 
 		//========================================================================*/
@@ -204,15 +204,15 @@ namespace Graphics {
 
 		DXCom* dxcommon_ = nullptr;
 
-		ComPtr<ID3D12Resource> offscreenrt_ = nullptr;
+		ComPtr<ID3D12Resource> offscreenrt_[DXC::kFrameCount_];
 		D3D12_RENDER_TARGET_VIEW_DESC offscreenrtvDesc_{};
 		D3D12_CLEAR_VALUE clearColorValue_{};
-		uint32_t offscreenSRVIndex_;
-		uint32_t offscreenIndex_;
-		D3D12_GPU_DESCRIPTOR_HANDLE offTextureHandle_;
-		D3D12_CPU_DESCRIPTOR_HANDLE offTextureHandleCPU_;
-		D3D12_CPU_DESCRIPTOR_HANDLE offTextureUAVHandleCPU_;
-		D3D12_GPU_DESCRIPTOR_HANDLE offTextureUAVHandle_;
+		uint32_t offscreenSRVIndex_[DXC::kFrameCount_];
+		uint32_t offscreenIndex_[DXC::kFrameCount_];
+		D3D12_GPU_DESCRIPTOR_HANDLE offTextureHandle_[DXC::kFrameCount_];
+		D3D12_CPU_DESCRIPTOR_HANDLE offTextureHandleCPU_[DXC::kFrameCount_];
+		D3D12_CPU_DESCRIPTOR_HANDLE offTextureUAVHandleCPU_[DXC::kFrameCount_];
+		D3D12_GPU_DESCRIPTOR_HANDLE offTextureUAVHandle_[DXC::kFrameCount_];
 
 
 		ComPtr<ID3D12Resource> grayCSResource_[DXC::kFrameCount_];
@@ -263,13 +263,13 @@ namespace Graphics {
 		GrayscaleVertex* grayVertexDate_ = nullptr;
 
 
-		ComPtr<ID3D12Resource> outputTexture_;
-		uint32_t outputIndex_;
-		uint32_t outputSRVIndex_;
-		D3D12_CPU_DESCRIPTOR_HANDLE outputSRVHandleCPU_;
-		D3D12_GPU_DESCRIPTOR_HANDLE outputSRVHandle_;
-		D3D12_CPU_DESCRIPTOR_HANDLE outputUAVHandleCPU_;
-		D3D12_GPU_DESCRIPTOR_HANDLE outputUAVHandle_;
+		ComPtr<ID3D12Resource> outputTexture_[DXC::kFrameCount_];
+		uint32_t outputIndex_[DXC::kFrameCount_];
+		uint32_t outputSRVIndex_[DXC::kFrameCount_];
+		D3D12_CPU_DESCRIPTOR_HANDLE outputSRVHandleCPU_[DXC::kFrameCount_];
+		D3D12_GPU_DESCRIPTOR_HANDLE outputSRVHandle_[DXC::kFrameCount_];
+		D3D12_CPU_DESCRIPTOR_HANDLE outputUAVHandleCPU_[DXC::kFrameCount_];
+		D3D12_GPU_DESCRIPTOR_HANDLE outputUAVHandle_[DXC::kFrameCount_];
 
 		std::vector<PostEffectPass> postEffects;
 		std::vector<PostEffectPass> validPostEffects;

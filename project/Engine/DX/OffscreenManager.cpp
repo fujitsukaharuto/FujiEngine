@@ -251,9 +251,11 @@ void OffscreenManager::CreateResource() {
 	clearColorValue_.Color[2] = 0.5f;
 	clearColorValue_.Color[3] = 1.0f;
 
-	offscreenrt_ = dxcommon_->CreateOffscreenTextureResource(dxcommon_->GetDevice(), MyWin::kWindowWidth, MyWin::kWindowHeight, clearColorValue_);
+	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
+		offscreenrt_[i] = dxcommon_->CreateOffscreenTextureResource(dxcommon_->GetDevice(), MyWin::kWindowWidth, MyWin::kWindowHeight, clearColorValue_);
 
-	dxcommon_->GetDevice()->CreateRenderTargetView(offscreenrt_.Get(), &offscreenrtvDesc_, dxcommon_->GetRTVHandle());
+		dxcommon_->GetDevice()->CreateRenderTargetView(offscreenrt_[i].Get(), &offscreenrtvDesc_, dxcommon_->GetRTVHandle(i));
+	}
 
 
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
@@ -358,20 +360,22 @@ void OffscreenManager::SettingTexture() {
 	SettingVertex();
 
 	SRVManager* srvManager = SRVManager::GetInstance();
-	offscreenSRVIndex_ = srvManager->Allocate();
-	offscreenIndex_ = srvManager->Allocate();
+	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
+		offscreenSRVIndex_[i] = srvManager->Allocate();
+		offscreenIndex_[i] = srvManager->Allocate();
 
-	srvManager->CreateTextureSRV(offscreenSRVIndex_, offscreenrt_.Get(), DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, 1, false);
+		srvManager->CreateTextureSRV(offscreenSRVIndex_[i], offscreenrt_[i].Get(), DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, 1, false);
 
-	offTextureHandleCPU_ = srvManager->GetCPUDescriptorHandle(offscreenSRVIndex_);
-	offTextureHandle_ = srvManager->GetGPUDescriptorHandle(offscreenSRVIndex_);
-	offTextureUAVHandleCPU_ = srvManager->GetCPUDescriptorHandle(offscreenIndex_);
-	offTextureUAVHandle_ = srvManager->GetGPUDescriptorHandle(offscreenIndex_);
+		offTextureHandleCPU_[i] = srvManager->GetCPUDescriptorHandle(offscreenSRVIndex_[i]);
+		offTextureHandle_[i] = srvManager->GetGPUDescriptorHandle(offscreenSRVIndex_[i]);
+		offTextureUAVHandleCPU_[i] = srvManager->GetCPUDescriptorHandle(offscreenIndex_[i]);
+		offTextureUAVHandle_[i] = srvManager->GetGPUDescriptorHandle(offscreenIndex_[i]);
 
-	D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
-	uavDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
-	dxcommon_->GetDevice()->CreateUnorderedAccessView(offscreenrt_.Get(), nullptr, &uavDesc, offTextureUAVHandleCPU_);
+		D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
+		uavDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
+		dxcommon_->GetDevice()->CreateUnorderedAccessView(offscreenrt_[i].Get(), nullptr, &uavDesc, offTextureUAVHandleCPU_[i]);
+	}
 
 
 	baseTex_ = TextureManager::GetInstance()->LoadTexture("Gradient02.jpg");
@@ -387,17 +391,17 @@ void OffscreenManager::SettingTexture() {
 
 void OffscreenManager::Command() {
 
-	CopyData(dxcommon_->GetNowFrameCount());
+	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
+	CopyData(frameIndex);
 
 	if (isGrayscale_) {
 
-
-		dxcommon_->TransitionResource(offscreenrt_.Get(),
+		dxcommon_->TransitionResource(offscreenrt_[frameIndex].Get(),
 			D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
 
 
-		ComPtr<ID3D12Resource> ping = offscreenrt_;
-		ComPtr<ID3D12Resource> pong = outputTexture_;
+		ComPtr<ID3D12Resource> ping = offscreenrt_[frameIndex];
+		ComPtr<ID3D12Resource> pong = outputTexture_[frameIndex];
 		bool isUsePing = true;
 
 
@@ -405,8 +409,8 @@ void OffscreenManager::Command() {
 			auto inputResource = isUsePing ? ping : pong;
 			auto outputResource = isUsePing ? pong : ping;
 
-			auto inputSRVHandle = isUsePing ? offTextureHandle_ : outputSRVHandle_;
-			auto outputUAVHandle = isUsePing ? outputUAVHandle_ : offTextureUAVHandle_;
+			auto inputSRVHandle = isUsePing ? offTextureHandle_[frameIndex] : outputSRVHandle_[frameIndex];
+			auto outputUAVHandle = isUsePing ? outputUAVHandle_[frameIndex] : offTextureUAVHandle_[frameIndex];
 
 
 			if (i != 0) {
@@ -435,7 +439,7 @@ void OffscreenManager::Command() {
 
 
 		auto finalOutput = isUsePing ? pong : ping;
-		auto finalSRVHandle = isUsePing ? outputSRVHandle_ : offTextureHandle_;
+		auto finalSRVHandle = isUsePing ? outputSRVHandle_[frameIndex] : offTextureHandle_[frameIndex];
 
 		if (validPostEffects.size() != 0) {
 			dxcommon_->TransitionResource(finalOutput.Get(),
@@ -473,7 +477,7 @@ void OffscreenManager::Command() {
 		}
 
 	} else {
-		dxcommon_->TransitionResource(offscreenrt_.Get(),
+		dxcommon_->TransitionResource(offscreenrt_[frameIndex].Get(),
 			D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_GENERIC_READ);
 	}
 
@@ -483,7 +487,7 @@ void OffscreenManager::Command() {
 
 		dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
-		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
+		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, offTextureHandle_[frameIndex]);
 		dxcommon_->GetCommandList()->DrawInstanced(3, 1, 0, 0);
 	}
 
@@ -493,7 +497,7 @@ void OffscreenManager::Command() {
 
 		dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
-		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
+		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, offTextureHandle_[frameIndex]);
 		dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(1, shockResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
 		dxcommon_->GetCommandList()->DrawInstanced(3, 1, 0, 0);
 	}
@@ -504,7 +508,7 @@ void OffscreenManager::Command() {
 
 		dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
-		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
+		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, offTextureHandle_[frameIndex]);
 		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, baseTex_->gpuHandle);
 		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, voronoTex_->gpuHandle);
 		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(3, noiseTex_->gpuHandle);
@@ -519,7 +523,7 @@ void OffscreenManager::Command() {
 
 		dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
-		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, offTextureHandle_);
+		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, offTextureHandle_[frameIndex]);
 		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, noiseDirTex_->gpuHandle);
 		dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(2, thunderResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
 		dxcommon_->GetCommandList()->DrawInstanced(3, 1, 0, 0);
@@ -570,24 +574,6 @@ void OffscreenManager::SettingVertex() {
 
 	CD3DX12_HEAP_PROPERTIES heapProps(D3D12_HEAP_TYPE_DEFAULT);
 	textureDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
-	device->CreateCommittedResource(
-		&heapProps,
-		D3D12_HEAP_FLAG_NONE,
-		&textureDesc,
-		D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
-		nullptr,
-		IID_PPV_ARGS(&outputTexture_));
-
-
-	// SRV/UAVの作成
-	SRVManager* srvManager = SRVManager::GetInstance();
-	outputSRVIndex_ = srvManager->Allocate();
-	outputIndex_ = srvManager->Allocate();
-
-	outputSRVHandleCPU_ = srvManager->GetCPUDescriptorHandle(outputSRVIndex_);
-	outputSRVHandle_ = srvManager->GetGPUDescriptorHandle(outputSRVIndex_);
-	outputUAVHandleCPU_ = srvManager->GetCPUDescriptorHandle(outputIndex_);
-	outputUAVHandle_ = srvManager->GetGPUDescriptorHandle(outputIndex_);
 
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 	srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
@@ -595,13 +581,33 @@ void OffscreenManager::SettingVertex() {
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 	srvDesc.Texture2D.MipLevels = 1;
 
-	device->CreateShaderResourceView(outputTexture_.Get(), &srvDesc, outputSRVHandleCPU_);
-
 	D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
 	uavDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
 
-	device->CreateUnorderedAccessView(outputTexture_.Get(), nullptr, &uavDesc, outputUAVHandleCPU_);
+	SRVManager* srvManager = SRVManager::GetInstance();
+
+	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
+		device->CreateCommittedResource(
+			&heapProps,
+			D3D12_HEAP_FLAG_NONE,
+			&textureDesc,
+			D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+			nullptr,
+			IID_PPV_ARGS(&outputTexture_[i]));
+
+		// SRV/UAVの作成
+		outputSRVIndex_[i] = srvManager->Allocate();
+		outputIndex_[i] = srvManager->Allocate();
+
+		outputSRVHandleCPU_[i] = srvManager->GetCPUDescriptorHandle(outputSRVIndex_[i]);
+		outputSRVHandle_[i] = srvManager->GetGPUDescriptorHandle(outputSRVIndex_[i]);
+		outputUAVHandleCPU_[i] = srvManager->GetCPUDescriptorHandle(outputIndex_[i]);
+		outputUAVHandle_[i] = srvManager->GetGPUDescriptorHandle(outputIndex_[i]);
+
+		device->CreateShaderResourceView(outputTexture_[i].Get(), &srvDesc, outputSRVHandleCPU_[i]);
+		device->CreateUnorderedAccessView(outputTexture_[i].Get(), nullptr, &uavDesc, outputUAVHandleCPU_[i]);
+	}
 }
 
 void OffscreenManager::InitializePostEffects() {
