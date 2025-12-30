@@ -1,7 +1,12 @@
 #include "../../CSParticle.hlsli"
 #include "../Random.hlsli"
 
-RWStructuredBuffer<Particle> gParticle : register(u0);
+RWStructuredBuffer<Particle_Translate> gParticles_Trans : register(u0);
+RWStructuredBuffer<Particle_Scale> gParticles_Scale : register(u1);
+RWStructuredBuffer<Particle_Time> gParticles_Time : register(u2);
+RWStructuredBuffer<Particle_Velocity> gParticles_Velocity : register(u3);
+RWStructuredBuffer<Particle_Color> gParticles_Color : register(u4);
+RWStructuredBuffer<Particle_Flags> gParticles_Flags : register(u5);
 struct EmitterSphere
 {
     float3 translate;
@@ -29,9 +34,9 @@ struct PerFrame
     float deltaTime;
 };
 ConstantBuffer<PerFrame> gPerFrame : register(b1);
-RWStructuredBuffer<int> gFreeListIndex : register(u1);
-RWStructuredBuffer<uint> gFreeList : register(u2);
-RWStructuredBuffer<int> gFreeListTailIndex : register(u3);
+RWStructuredBuffer<int> gFreeListIndex : register(u6);
+RWStructuredBuffer<uint> gFreeList : register(u7);
+RWStructuredBuffer<int> gFreeListTailIndex : register(u8);
 
 Texture2D<float4> gMaskTex : register(t0);
 SamplerState gSampler : register(s0);
@@ -94,27 +99,27 @@ void main(uint3 DTid : SV_DispatchThreadID)
     0,
     (uv.y - 0.5f) * gEmitter.radius * 2.0f);
 
-    gParticle[particleIndex].translate = worldPos;
+    gParticles_Trans[particleIndex].translate = worldPos;
 
-    gParticle[particleIndex].scale = float3(0.1f, 0.1f, 0.1f);
-    gParticle[particleIndex].startScale = gParticle[particleIndex].scale;
+    gParticles_Scale[particleIndex].scale = float3(0.1f, 0.1f, 0.1f);
+    gParticles_Scale[particleIndex].startScale = gParticles_Scale[particleIndex].scale;
 
     // 色はマスク色 or ランダム
     RandomGenerator generator;
     generator.InitSeed(DTid, gPerFrame.time);
     float3 t = (generator.Generate3d() + 1) * 0.5f;
-    gParticle[particleIndex].color.rgb = lerp(gEmitter.colorMin, gEmitter.colorMax, t);
-    gParticle[particleIndex].color.a = 1.0f;
+    gParticles_Color[particleIndex].color.rgb = lerp(gEmitter.colorMin, gEmitter.colorMax, t);
+    gParticles_Color[particleIndex].color.a = 1.0f;
 
     float veloT = generator.Generate1d();
     float3 dirRand = generator.GenerateUnitSphereDirection();
     float speed = lerp(gEmitter.velocityRandMin, gEmitter.velocityRandMax, veloT);
-    gParticle[particleIndex].velocity = gEmitter.baseVelocity + dirRand * speed;
+    gParticles_Velocity[particleIndex].velocity = gEmitter.baseVelocity + dirRand * speed;
 
-    gParticle[particleIndex].lifeTime = gEmitter.lifeTime;
-    gParticle[particleIndex].currentTime = 0.0f;
+    gParticles_Time[particleIndex].lifeTime = gEmitter.lifeTime;
+    gParticles_Time[particleIndex].currentTime = 0.0f;
     
-    gParticle[particleIndex].isRandomMove = 0;
-    gParticle[particleIndex].isTrailEmit = 0;
-    gParticle[particleIndex].isGravity = 0;
+    gParticles_Flags[particleIndex].isRandomMove = 0;
+    gParticles_Flags[particleIndex].isTrailEmit = 0;
+    gParticles_Flags[particleIndex].isGravity = 0;
 }

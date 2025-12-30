@@ -57,12 +57,17 @@ void SphereEmitter::Dispatch(ID3D12GraphicsCommandList* cmd,
 	uint32_t frameIndex = dx->GetNowFrameCount();
 	CopyData(frameIndex);
 	dx->GetPipelineManager()->SetCSPipeline(Pipe::EmitParticleCS);
-	cmd->SetComputeRootDescriptorTable(0, shared.particleCSUAVHandle);
-	cmd->SetComputeRootDescriptorTable(3, shared.freeListIndexUAVHandle);
-	cmd->SetComputeRootDescriptorTable(4, shared.freeListUAVHandle);
-	cmd->SetComputeRootDescriptorTable(5, shared.freeListTailIndexUAVHandle);
-	cmd->SetComputeRootConstantBufferView(2, shared.perFrameCBV);
-	cmd->SetComputeRootConstantBufferView(1, resource_[frameIndex]->GetGPUVirtualAddress());
+	cmd->SetComputeRootDescriptorTable(0, shared.transCSUAVHandle);
+	cmd->SetComputeRootDescriptorTable(1, shared.scaleCSUAVHandle);
+	cmd->SetComputeRootDescriptorTable(2, shared.timeCSUAVHandle);
+	cmd->SetComputeRootDescriptorTable(3, shared.velocityCSUAVHandle);
+	cmd->SetComputeRootDescriptorTable(4, shared.colorCSUAVHandle);
+	cmd->SetComputeRootDescriptorTable(5, shared.flagsCSUAVHandle);
+	cmd->SetComputeRootDescriptorTable(8, shared.freeListIndexUAVHandle);
+	cmd->SetComputeRootDescriptorTable(9, shared.freeListUAVHandle);
+	cmd->SetComputeRootDescriptorTable(10, shared.freeListTailIndexUAVHandle);
+	cmd->SetComputeRootConstantBufferView(7, shared.perFrameCBV);
+	cmd->SetComputeRootConstantBufferView(6, resource_[frameIndex]->GetGPUVirtualAddress());
 	cmd->Dispatch((data_.count + 1024 - 1) / 1024, 1, 1);
 	isOnceEmit_ = false;
 }

@@ -47,7 +47,7 @@ struct Particle_Scale
 
 struct Particle_Time
 {
-    float lifetime;
+    float lifeTime;
     float currentTime;
 };
 
@@ -56,7 +56,7 @@ struct Particle_Velocity
     float3 velocity;
 };
 
-struct Particle_color
+struct Particle_Color
 {
     float4 color;
 };

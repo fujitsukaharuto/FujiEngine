@@ -114,15 +114,20 @@ void MeshSurefaceEmitter::Dispatch(ID3D12GraphicsCommandList* cmd,
 	uint32_t frameIndex = dx->GetNowFrameCount();
 	CopyData(frameIndex);
 	dx->GetPipelineManager()->SetCSPipeline(Pipe::EmitSurfaceParticleCS);
-	cmd->SetComputeRootDescriptorTable(0, shared.particleCSUAVHandle);
-	cmd->SetComputeRootDescriptorTable(3, shared.freeListIndexUAVHandle);
-	cmd->SetComputeRootDescriptorTable(4, shared.freeListUAVHandle);
-	cmd->SetComputeRootDescriptorTable(5, srv->GetGPUDescriptorHandle(verticesIndex));
-	cmd->SetComputeRootDescriptorTable(6, srv->GetGPUDescriptorHandle(indiciesIndex));
-	cmd->SetComputeRootDescriptorTable(7, srv->GetGPUDescriptorHandle(areasIndex));
-	cmd->SetComputeRootDescriptorTable(8, shared.freeListTailIndexUAVHandle);
-	cmd->SetComputeRootConstantBufferView(1, resource_[frameIndex]->GetGPUVirtualAddress());
-	cmd->SetComputeRootConstantBufferView(2, shared.perFrameCBV);
+	cmd->SetComputeRootDescriptorTable(0, shared.transCSUAVHandle);
+	cmd->SetComputeRootDescriptorTable(1, shared.scaleCSUAVHandle);
+	cmd->SetComputeRootDescriptorTable(2, shared.timeCSUAVHandle);
+	cmd->SetComputeRootDescriptorTable(3, shared.velocityCSUAVHandle);
+	cmd->SetComputeRootDescriptorTable(4, shared.colorCSUAVHandle);
+	cmd->SetComputeRootDescriptorTable(5, shared.flagsCSUAVHandle);
+	cmd->SetComputeRootDescriptorTable(8, shared.freeListIndexUAVHandle);
+	cmd->SetComputeRootDescriptorTable(9, shared.freeListUAVHandle);
+	cmd->SetComputeRootDescriptorTable(10, srv->GetGPUDescriptorHandle(verticesIndex));
+	cmd->SetComputeRootDescriptorTable(11, srv->GetGPUDescriptorHandle(indiciesIndex));
+	cmd->SetComputeRootDescriptorTable(12, srv->GetGPUDescriptorHandle(areasIndex));
+	cmd->SetComputeRootDescriptorTable(13, shared.freeListTailIndexUAVHandle);
+	cmd->SetComputeRootConstantBufferView(6, resource_[frameIndex]->GetGPUVirtualAddress());
+	cmd->SetComputeRootConstantBufferView(7, shared.perFrameCBV);
 	cmd->Dispatch((data_.count + 1024 - 1) / 1024, 1, 1);
 }
 

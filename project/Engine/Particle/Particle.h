@@ -133,3 +133,33 @@ struct ParticleCS {
 	uint32_t isTrailEmit;
 	uint32_t isGravity;
 };
+
+
+struct ParticleCS_Translate {
+	Math::Vector3 translate;
+	Math::Vector3 prevTranslate;
+};
+
+struct ParticleCS_Scale {
+	Math::Vector3 scale;
+	Math::Vector3 startScale;
+};
+
+struct ParticleCS_Time {
+	float lifeTime;
+	float currentTime;
+};
+
+struct ParticleCS_Velocity {
+	Math::Vector3 velocity;
+};
+
+struct ParticleCS_Color {
+	Math::Vector4 color;
+};
+
+struct ParticleCS_Flags {
+	uint32_t isRandomMove;
+	uint32_t isTrailEmit;
+	uint32_t isGravity;
+};

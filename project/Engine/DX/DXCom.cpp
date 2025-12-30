@@ -345,7 +345,7 @@ void DXCom::PostDraw() {
 
 void DXCom::BeginFrame() {
 	command_->SetFrameIndex(swapChain_->GetCurrentBackBufferIndex());
-	fpsKeeper_->FixFPS();
+	//fpsKeeper_->FixFPS();
 	command_->Reset();
 }
 

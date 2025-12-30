@@ -12,32 +12,62 @@ InitParticleCSPipe::~InitParticleCSPipe() {
 void InitParticleCSPipe::CreateRootSignature(ID3D12Device* device) {
 	HRESULT hr;
 
-	CD3DX12_DESCRIPTOR_RANGE descriptorRangeUAV[4] = {};
-	descriptorRangeUAV[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 0);
-	descriptorRangeUAV[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 1);
-	descriptorRangeUAV[2].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 2);
-	descriptorRangeUAV[3].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 3);
+	CD3DX12_DESCRIPTOR_RANGE descriptorRanges[9] = {};
+	descriptorRanges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 0);
+	descriptorRanges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 1);
+	descriptorRanges[2].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 2);
+	descriptorRanges[3].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 3);
+	descriptorRanges[4].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 4);
+	descriptorRanges[5].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 5);
+	descriptorRanges[6].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 6);
+	descriptorRanges[7].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 7);
+	descriptorRanges[8].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 8);
 
-	CD3DX12_ROOT_PARAMETER rootParameters[4];
+	CD3DX12_ROOT_PARAMETER rootParameters[9];
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
 	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-	rootParameters[0].DescriptorTable.pDescriptorRanges = &descriptorRangeUAV[0];
+	rootParameters[0].DescriptorTable.pDescriptorRanges = &descriptorRanges[0];
 	rootParameters[0].DescriptorTable.NumDescriptorRanges = 1;
 
 	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
 	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-	rootParameters[1].DescriptorTable.pDescriptorRanges = &descriptorRangeUAV[1];
+	rootParameters[1].DescriptorTable.pDescriptorRanges = &descriptorRanges[1];
 	rootParameters[1].DescriptorTable.NumDescriptorRanges = 1;
 
 	rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
 	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-	rootParameters[2].DescriptorTable.pDescriptorRanges = &descriptorRangeUAV[2];
+	rootParameters[2].DescriptorTable.pDescriptorRanges = &descriptorRanges[2];
 	rootParameters[2].DescriptorTable.NumDescriptorRanges = 1;
 
 	rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
 	rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-	rootParameters[3].DescriptorTable.pDescriptorRanges = &descriptorRangeUAV[3];
+	rootParameters[3].DescriptorTable.pDescriptorRanges = &descriptorRanges[3];
 	rootParameters[3].DescriptorTable.NumDescriptorRanges = 1;
+
+	rootParameters[4].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[4].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	rootParameters[4].DescriptorTable.pDescriptorRanges = &descriptorRanges[4];
+	rootParameters[4].DescriptorTable.NumDescriptorRanges = 1;
+
+	rootParameters[5].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[5].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	rootParameters[5].DescriptorTable.pDescriptorRanges = &descriptorRanges[5];
+	rootParameters[5].DescriptorTable.NumDescriptorRanges = 1;
+
+	rootParameters[6].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[6].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	rootParameters[6].DescriptorTable.pDescriptorRanges = &descriptorRanges[6];
+	rootParameters[6].DescriptorTable.NumDescriptorRanges = 1;
+
+	rootParameters[7].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[7].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	rootParameters[7].DescriptorTable.pDescriptorRanges = &descriptorRanges[7];
+	rootParameters[7].DescriptorTable.NumDescriptorRanges = 1;
+
+	rootParameters[8].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[8].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	rootParameters[8].DescriptorTable.pDescriptorRanges = &descriptorRanges[8];
+	rootParameters[8].DescriptorTable.NumDescriptorRanges = 1;
 
 	// Compute専用なのでフラグは0でOK
 	D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc{};

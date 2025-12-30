@@ -46,9 +46,14 @@ struct EmitterInfo {
 	PipelinePhase phase;
 };
 
-
 class DXCom;
 class SRVManager;
+
+struct ParticleCSInsstance {
+	ComPtr<ID3D12Resource> particleCSInstancing_;
+	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> particleCSSRVHandle_;
+	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> particleCSUAVHandle_;
+};
 
 /// <summary>
 /// GPUパーティクル管理クラス
@@ -85,6 +90,7 @@ public:
 private:
 
 	void InitParticleCS();
+	void InitInstance(ParticleCSInsstance& CSInstance, size_t instanceSize);
 	void UpdatePerViewData(const Math::Matrix4x4& billboardMatrix);
 	void DrawParticleCS(const D3D12_VERTEX_BUFFER_VIEW& vbView, const D3D12_INDEX_BUFFER_VIEW& ibView);
 
@@ -101,11 +107,15 @@ private:
 	SRVManager* srvManager_;
 	Camera* camera_;
 
-
-	ComPtr<ID3D12Resource> particleCSInstancing_;
 	uint32_t particleCSInsstanceCount_;
-	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> particleCSSRVHandle_;
-	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> particleCSUAVHandle_;
+
+	ParticleCSInsstance transCSInstance_;
+	ParticleCSInsstance scaleCSInstance_;
+	ParticleCSInsstance timeCSInstance_;
+	ParticleCSInsstance velocityCSInstance_;
+	ParticleCSInsstance colorCSInstance_;
+	ParticleCSInsstance flagsCSInstance_;
+
 	Graphics::Material particleCSMaterial_;
 	ComPtr<ID3D12Resource> perViewResource_[DXC::kFrameCount_];
 	PerView* perViewData_[DXC::kFrameCount_];

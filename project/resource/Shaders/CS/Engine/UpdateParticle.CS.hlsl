@@ -1,28 +1,33 @@
 #include "../../CSParticle.hlsli"
 #include "../Noise.hlsli"
 
-RWStructuredBuffer<Particle> gParticle : register(u0);
+RWStructuredBuffer<Particle_Translate> gParticles_Trans : register(u0);
+RWStructuredBuffer<Particle_Scale> gParticles_Scale : register(u1);
+RWStructuredBuffer<Particle_Time> gParticles_Time : register(u2);
+RWStructuredBuffer<Particle_Velocity> gParticles_Velocity : register(u3);
+RWStructuredBuffer<Particle_Color> gParticles_Color : register(u4);
+RWStructuredBuffer<Particle_Flags> gParticles_Flags : register(u5);
 struct PerFrame
 {
     float time;
     float deltaTime;
 };
 ConstantBuffer<PerFrame> gPerFrame : register(b0);
-RWStructuredBuffer<int> gFreeListIndex : register(u1);
-RWStructuredBuffer<uint> gFreeList : register(u2);
-RWStructuredBuffer<int> gFreeListTailIndex : register(u3);
+RWStructuredBuffer<int> gFreeListIndex : register(u6);
+RWStructuredBuffer<uint> gFreeList : register(u7);
+RWStructuredBuffer<int> gFreeListTailIndex : register(u8);
 
 void MoveMode(uint pIndex)
 {
-    if (gParticle[pIndex].isRandomMove == 1)
+    if (gParticles_Flags[pIndex].isRandomMove == 1)
     {
-        float3 pos = gParticle[pIndex].translate;
+        float3 pos = gParticles_Trans[pIndex].translate;
         float time = gPerFrame.time;
 
         float3 samplePos = pos * 0.4 + float3(0, time * 0.5 + frac(pIndex * 0.012) * 10.0, 0);// pIndexが大きくなった時に値がでかくなりすぎないように
         float3 curl = CurlNoise(samplePos);
 
-        float3 vel0 = gParticle[pIndex].velocity;
+        float3 vel0 = gParticles_Velocity[pIndex].velocity;
         float len0 = length(vel0);
         if (len0 < 0.0001f)
         {
@@ -64,25 +69,25 @@ void MoveMode(uint pIndex)
         }
 
         vel /= vlen;
-        gParticle[pIndex].velocity = vel * baseSpeed;
+        gParticles_Velocity[pIndex].velocity = vel * baseSpeed;
     }
-    else if (gParticle[pIndex].isRandomMove == 2)
+    else if (gParticles_Flags[pIndex].isRandomMove == 2)
     {
-        float3 pos = gParticle[pIndex].translate;
+        float3 pos = gParticles_Trans[pIndex].translate;
         float3 curl = CurlNoise(pos * 0.5);
 
         float noisePower = 4.0f; // ノイズ強度
-        float speed = length(gParticle[pIndex].velocity);
+        float speed = length(gParticles_Velocity[pIndex].velocity);
 
-        gParticle[pIndex].velocity =
-        normalize(gParticle[pIndex].velocity + curl * noisePower) * speed;
+        gParticles_Velocity[pIndex].velocity =
+        normalize(gParticles_Velocity[pIndex].velocity + curl * noisePower) * speed;
     }
 
 }
 
 void EmitTrail(uint pIndex)
 {
-    float dist = length(gParticle[pIndex].translate - gParticle[pIndex].prevTranslate);
+    float dist = length(gParticles_Trans[pIndex].translate - gParticles_Trans[pIndex].prevTranslate);
     if (dist > 0.01f)
     {
         // トレイル粒子生成回数 (距離に応じて 1~n 個)
@@ -109,19 +114,20 @@ void EmitTrail(uint pIndex)
             uint trailIndex = gFreeList[slot];
 
             float k = (float) t / max(1, numTrail);
-            float3 trailPos = lerp(gParticle[pIndex].prevTranslate,gParticle[pIndex].translate,k);
-            Particle src = gParticle[pIndex];
-            gParticle[trailIndex].translate = trailPos;
-            gParticle[trailIndex].scale = src.scale * 0.75f;
-            gParticle[trailIndex].startScale = src.scale * 0.75f;
-            gParticle[trailIndex].velocity = float3(0, 0, 0);
-            gParticle[trailIndex].color = src.color;
-            gParticle[trailIndex].color.a = 1.0f;
-            gParticle[trailIndex].lifeTime = src.lifeTime * 0.5f;
-            gParticle[trailIndex].currentTime = 0;
-            gParticle[trailIndex].isRandomMove = 0;
-            gParticle[trailIndex].isTrailEmit = 0;
-            gParticle[trailIndex].isGravity = 0;
+            float3 trailPos = lerp(gParticles_Trans[pIndex].prevTranslate,gParticles_Trans[pIndex].translate,k);
+
+            gParticles_Trans[trailIndex].translate = trailPos;
+            gParticles_Trans[trailIndex].prevTranslate = trailPos;
+            gParticles_Scale[trailIndex].scale = gParticles_Scale[pIndex].scale * 0.75f;
+            gParticles_Scale[trailIndex].startScale = gParticles_Scale[pIndex].scale * 0.75f;
+            gParticles_Time[trailIndex].lifeTime = gParticles_Time[pIndex].lifeTime * 0.5f;
+            gParticles_Time[trailIndex].currentTime = 0;
+            gParticles_Velocity[trailIndex].velocity = float3(0, 0, 0);
+            gParticles_Color[trailIndex].color = gParticles_Color[pIndex].color;
+            gParticles_Color[trailIndex].color.a = 1.0f;
+            gParticles_Flags[trailIndex].isRandomMove = 0;
+            gParticles_Flags[trailIndex].isTrailEmit = 0;
+            gParticles_Flags[trailIndex].isGravity = 0;
         }
     }
 }
@@ -132,37 +138,37 @@ void main( uint3 DTid : SV_DispatchThreadID )
     uint particleIndex = DTid.x;
     if (particleIndex < kMaxParticles)
     {
-        if (gParticle[particleIndex].color.a != 0)
+        if (gParticles_Color[particleIndex].color.a != 0)
         {
-            if (gParticle[particleIndex].isRandomMove != 0)
+            if (gParticles_Flags[particleIndex].isRandomMove != 0)
             {
                 MoveMode(particleIndex);
             }
 
-            if (gParticle[particleIndex].isGravity == 1)
+            if (gParticles_Flags[particleIndex].isGravity == 1)
             {
-                gParticle[particleIndex].velocity += kGravity * gPerFrame.deltaTime;
+                gParticles_Velocity[particleIndex].velocity += kGravity * gPerFrame.deltaTime;
             }
 
-                gParticle[particleIndex].prevTranslate = gParticle[particleIndex].translate;
-            gParticle[particleIndex].translate += gParticle[particleIndex].velocity * gPerFrame.deltaTime;
+            gParticles_Trans[particleIndex].prevTranslate = gParticles_Trans[particleIndex].translate;
+            gParticles_Trans[particleIndex].translate += gParticles_Velocity[particleIndex].velocity * gPerFrame.deltaTime;
             
-            if (gParticle[particleIndex].isTrailEmit == 1)
+            if (gParticles_Flags[particleIndex].isTrailEmit == 1)
             {
                 EmitTrail(particleIndex);
             }
             
-            gParticle[particleIndex].currentTime += gPerFrame.deltaTime;
-            float lifeRatio = gParticle[particleIndex].currentTime / gParticle[particleIndex].lifeTime;
+            gParticles_Time[particleIndex].currentTime += gPerFrame.deltaTime;
+            float lifeRatio = gParticles_Time[particleIndex].currentTime / gParticles_Time[particleIndex].lifeTime;
 
             float alpha = 1.0f - lifeRatio;
-            gParticle[particleIndex].color.a = saturate(alpha);
+            gParticles_Color[particleIndex].color.a = saturate(alpha);
 
-            gParticle[particleIndex].scale = gParticle[particleIndex].startScale * (1.0f - lifeRatio);
+            gParticles_Scale[particleIndex].scale = gParticles_Scale[particleIndex].startScale * (1.0f - lifeRatio);
 
-            if (gParticle[particleIndex].color.a == 0.0f)
+            if (gParticles_Color[particleIndex].color.a == 0.0f)
             {
-                gParticle[particleIndex].scale = float3(0.0f, 0.0f, 0.0f);
+                gParticles_Scale[particleIndex].scale = float3(0.0f, 0.0f, 0.0f);
 
                 // tailを1増やし、古いtail値を取得（atomic +1）
                 int oldTail;
