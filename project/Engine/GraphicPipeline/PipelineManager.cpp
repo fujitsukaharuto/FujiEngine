@@ -32,6 +32,8 @@
 #include "CSPipe/EmitterTexParticleCSPipe.h"
 #include "CSPipe/EmitterSurfaceParticleCSPipe.h"
 #include "CSPipe/UpdateParticleCSPipe.h"
+#include "CSPipe/InitArgsCSPipe.h"
+#include "CSPipe/AliveCountCSPipe.h"
 
 using namespace Graphics;
 
@@ -101,6 +103,8 @@ void PipelineManager::CreatePipeline() {
 	std::unique_ptr<EmitterTexParticleCSPipe> emitTexParticleCS = nullptr;
 	std::unique_ptr<EmitterSurfaceParticleCSPipe> emitSurfaceParticleCS = nullptr;
 	std::unique_ptr<UpdateParticleCSPipe> updateParticleCS = nullptr;
+	std::unique_ptr<InitArgsCSPipe> initArgsCS = nullptr;
+	std::unique_ptr<AliveCountCSPipe> aliveCountCS = nullptr;
 
 
 
@@ -280,6 +284,13 @@ void PipelineManager::CreatePipeline() {
 	updateParticleCS->Initialize(dxcommon_);
 	pipelines_.push_back(std::move(updateParticleCS));
 
+	initArgsCS.reset(new InitArgsCSPipe);
+	initArgsCS->Initialize(dxcommon_);
+	pipelines_.push_back(std::move(initArgsCS));
+
+	aliveCountCS.reset(new AliveCountCSPipe);
+	aliveCountCS->Initialize(dxcommon_);
+	pipelines_.push_back(std::move(aliveCountCS));
 }
 
 void PipelineManager::SetPipeline(Pipe type) {
@@ -288,4 +299,8 @@ void PipelineManager::SetPipeline(Pipe type) {
 
 void PipelineManager::SetCSPipeline(Pipe type, uint32_t index) {
 	pipelines_[static_cast<int>(type)]->SetPipelineCSState(index);
+}
+
+ID3D12RootSignature* Graphics::PipelineManager::GetRootSignature(Pipe type) {
+	return pipelines_[static_cast<int>(type)]->GetRootSignature();
 }

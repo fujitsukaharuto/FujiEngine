@@ -130,6 +130,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\GraphicPipeline\AnimationPipeline.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\BasePipeline.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\CRTPipe.cpp" />
+    <ClCompile Include="Engine\GraphicPipeline\CSPipe\AliveCountCSPipe.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\CSPipe\BloomCSPipe.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\CSPipe\BoxFilterCSPipe.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\CSPipe\CRTCSPipe.cpp" />
@@ -138,6 +139,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\GraphicPipeline\CSPipe\EmitterTexParticleCSPipe.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\CSPipe\GaussCSPipe.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\CSPipe\GrayCSPipe.cpp" />
+    <ClCompile Include="Engine\GraphicPipeline\CSPipe\InitArgsCSPipe.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\CSPipe\InitParticleCSPipe.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\CSPipe\LuminanceOutlineCSPipe.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\CSPipe\OutlineCSPipe.cpp" />
@@ -259,6 +261,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\GraphicPipeline\AnimationPipeline.h" />
     <ClInclude Include="Engine\GraphicPipeline\BasePipeline.h" />
     <ClInclude Include="Engine\GraphicPipeline\CRTPipe.h" />
+    <ClInclude Include="Engine\GraphicPipeline\CSPipe\AliveCountCSPipe.h" />
     <ClInclude Include="Engine\GraphicPipeline\CSPipe\BloomCSPipe.h" />
     <ClInclude Include="Engine\GraphicPipeline\CSPipe\BoxFilterCSPipe.h" />
     <ClInclude Include="Engine\GraphicPipeline\CSPipe\CRTCSPipe.h" />
@@ -267,6 +270,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\GraphicPipeline\CSPipe\EmitterTexParticleCSPipe.h" />
     <ClInclude Include="Engine\GraphicPipeline\CSPipe\GaussCSPipe.h" />
     <ClInclude Include="Engine\GraphicPipeline\CSPipe\GrayCSPipe.h" />
+    <ClInclude Include="Engine\GraphicPipeline\CSPipe\InitArgsCSPipe.h" />
     <ClInclude Include="Engine\GraphicPipeline\CSPipe\InitParticleCSPipe.h" />
     <ClInclude Include="Engine\GraphicPipeline\CSPipe\LuminanceOutlineCSPipe.h" />
     <ClInclude Include="Engine\GraphicPipeline\CSPipe\OutlineCSPipe.h" />
@@ -434,6 +438,14 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
+    <FxCompile Include="resource\Shaders\CS\Engine\AliveParticleCount.CS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.0</ShaderModel>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="resource\Shaders\CS\Engine\EmitParticle.CS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
@@ -451,6 +463,14 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="resource\Shaders\CS\Engine\EmitTexParticle.CS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.0</ShaderModel>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\CS\Engine\InitArgs.CS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>

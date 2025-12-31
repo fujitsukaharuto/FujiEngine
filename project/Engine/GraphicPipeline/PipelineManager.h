@@ -38,6 +38,7 @@ namespace Graphics {
 		/// </summary>
 		void SetCSPipeline(Pipe type, uint32_t index = 0);
 
+		ID3D12RootSignature* GetRootSignature(Pipe type);
 
 	private:
 

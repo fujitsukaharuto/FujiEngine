@@ -198,6 +198,26 @@ void DXCommand::Reset(uint32_t index) {
 	}
 }
 
+void DXCommand::PerFrameWait() {
+	uint32_t waitFrame = (frameIndex_ - 1) % kFrameCount_;
+	if (fenceValue_[waitFrame] != 0) {
+		if (fence_->GetCompletedValue() < fenceValue_[waitFrame]) {
+
+			HANDLE fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+			assert(fenceEvent != nullptr);
+
+			fence_->SetEventOnCompletion(fenceValue_[waitFrame], fenceEvent);
+			WaitForSingleObject(fenceEvent, INFINITE);
+			CloseHandle(fenceEvent);
+			Logger::LogF("frame=%llu idx=%u fence=%llu completed=%llu",
+				globalFenceValue_,
+				waitFrame,
+				fenceValue_[waitFrame],
+				fence_->GetCompletedValue());
+		}
+	}
+}
+
 void DXCommand::SetViewAndscissor() {
 
 	list_->RSSetViewports(1, &viewport_);

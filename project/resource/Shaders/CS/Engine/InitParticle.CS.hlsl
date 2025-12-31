@@ -10,6 +10,7 @@ RWStructuredBuffer<Particle_Flags> gParticles_Flags : register(u5);
 RWStructuredBuffer<int> gFreeListIndex : register(u6);
 RWStructuredBuffer<uint> gFreeList : register(u7);
 RWStructuredBuffer<int> gFreeListTailIndex : register(u8);
+RWStructuredBuffer<int> gDrawParticleIndex : register(u9);
 
 [numthreads(1024, 1, 1)]
 void main( uint3 DTid : SV_DispatchThreadID )
@@ -24,6 +25,7 @@ void main( uint3 DTid : SV_DispatchThreadID )
         gParticles_Color[particleIndex] = (Particle_Color) 0;
         gParticles_Flags[particleIndex] = (Particle_Flags) 0;
         gFreeList[particleIndex] = particleIndex;
+        gDrawParticleIndex[particleIndex] = 0;
         if (particleIndex == 0)
         {
             gFreeListIndex[0] = 0;

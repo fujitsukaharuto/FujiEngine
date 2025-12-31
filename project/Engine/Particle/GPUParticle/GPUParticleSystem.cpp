@@ -51,6 +51,10 @@ void GPUParticleSystem::Finalize() {
 		perFrameResource_[i].Reset();
 	}
 
+	drawIndexedSignature_.Reset();
+	aliveDrawArgs_.Reset();
+	drawAliveIndex_.Reset();
+
 	particleCSMaterial_.Finalize();
 
 	sphereEmitters_.clear();
@@ -297,6 +301,16 @@ void GPUParticleSystem::InitParticleCS() {
 	freeListUAVHandle_.first = srvManager_->GetCPUDescriptorHandle(freeListUAVIndex);
 	freeListUAVHandle_.second = srvManager_->GetGPUDescriptorHandle(freeListUAVIndex);
 
+	drawAliveIndex_ = dxcommon_->CreateUAVResource(dxcommon_->GetDevice(), (sizeof(int32_t) * particleCSInsstanceCount_));
+	uint32_t drawIndexUAVIndex = srvManager_->Allocate();
+	uint32_t drawIndexSRVIndex = srvManager_->Allocate();
+	srvManager_->CreateStructuredUAV(drawIndexUAVIndex, drawAliveIndex_.Get(), particleCSInsstanceCount_, sizeof(int32_t));
+	srvManager_->CreateStructuredSRV(drawIndexSRVIndex, drawAliveIndex_.Get(), particleCSInsstanceCount_, sizeof(int32_t));
+	drawAliveUAVHandle_.first = srvManager_->GetCPUDescriptorHandle(drawIndexUAVIndex);
+	drawAliveUAVHandle_.second = srvManager_->GetGPUDescriptorHandle(drawIndexUAVIndex);
+	drawAliveSRVHandle_.first = srvManager_->GetCPUDescriptorHandle(drawIndexSRVIndex);
+	drawAliveSRVHandle_.second = srvManager_->GetGPUDescriptorHandle(drawIndexSRVIndex);
+
 	srvManager_->SetDescriptorHeap(1);
 	dxcommon_->GetPipelineManager()->SetCSPipeline(Pipe::InitParticleCS, 1);
 	dxcommon_->GetImmediateList()->SetComputeRootDescriptorTable(0, transCSInstance_.particleCSUAVHandle_.second);
@@ -308,6 +322,7 @@ void GPUParticleSystem::InitParticleCS() {
 	dxcommon_->GetImmediateList()->SetComputeRootDescriptorTable(6, freeListIndexUAVHandle_.second);
 	dxcommon_->GetImmediateList()->SetComputeRootDescriptorTable(7, freeListUAVHandle_.second);
 	dxcommon_->GetImmediateList()->SetComputeRootDescriptorTable(8, freeListTailIndexUAVHandle_.second);
+	dxcommon_->GetImmediateList()->SetComputeRootDescriptorTable(9, drawAliveUAVHandle_.second);
 	int dispatchCount = (numParticles + threadsPerGroup - 1) / threadsPerGroup;
 	dxcommon_->GetImmediateList()->Dispatch(dispatchCount, 1, 1);
 	dxcommon_->CommandExecution();
@@ -325,6 +340,25 @@ void GPUParticleSystem::InitParticleCS() {
 		perFrameData_.time = 0.0f;
 		perFrameData_.deltaTime = 0.0f;
 	}
+
+	D3D12_INDIRECT_ARGUMENT_DESC argDesc{};
+	argDesc.Type = D3D12_INDIRECT_ARGUMENT_TYPE_DRAW_INDEXED;
+
+	D3D12_COMMAND_SIGNATURE_DESC sigDesc{};
+	sigDesc.pArgumentDescs = &argDesc;
+	sigDesc.NumArgumentDescs = 1;
+	sigDesc.ByteStride = sizeof(D3D12_DRAW_INDEXED_ARGUMENTS);
+
+	HRESULT hr = dxcommon_->GetDevice()->CreateCommandSignature(&sigDesc,
+		nullptr, IID_PPV_ARGS(&drawIndexedSignature_)
+	);
+	assert(SUCCEEDED(hr));
+
+	aliveDrawArgs_ = dxcommon_->CreateUAVResource(dxcommon_->GetDevice(), (sizeof(DrawIndexedArgs)));
+	uint32_t ArgsUAVIndex = srvManager_->Allocate();
+	srvManager_->CreateStructuredUAV(ArgsUAVIndex, aliveDrawArgs_.Get(), 1, sizeof(DrawIndexedArgs));
+	ArgsUAVHandle_.first = srvManager_->GetCPUDescriptorHandle(ArgsUAVIndex);
+	ArgsUAVHandle_.second = srvManager_->GetGPUDescriptorHandle(ArgsUAVIndex);
 }
 
 void GPUParticleSystem::InitInstance(ParticleCSInsstance& CSInstance, size_t instanceSize) {
@@ -354,6 +388,19 @@ void GPUParticleSystem::UpdatePerViewData(const Matrix4x4& billboardMatrix) {
 }
 
 void GPUParticleSystem::DrawParticleCS(const D3D12_VERTEX_BUFFER_VIEW& vbView, const D3D12_INDEX_BUFFER_VIEW& ibView) {
+	dxcommon_->GetPipelineManager()->SetCSPipeline(Pipe::InitArgsCS);
+	dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(0, ArgsUAVHandle_.second);
+	dxcommon_->GetCommandList()->Dispatch(1, 1, 1);
+	dxcommon_->InsertUAVBarrier(aliveDrawArgs_.Get());
+
+	dxcommon_->GetPipelineManager()->SetCSPipeline(Pipe::AliveCountCS);
+	dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(0, colorCSInstance_.particleCSUAVHandle_.second);
+	dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(1, ArgsUAVHandle_.second);
+	dxcommon_->GetCommandList()->SetComputeRootDescriptorTable(2, drawAliveUAVHandle_.second);
+	int dispatchCount = (numParticles + threadsPerGroup - 1) / threadsPerGroup;
+	dxcommon_->GetCommandList()->Dispatch(dispatchCount, 1, 1);
+	dxcommon_->InsertUAVBarrier(aliveDrawArgs_.Get());
+
 	dxcommon_->GetDXCommand()->SetViewAndscissor();
 	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::particleCS);
 	dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -366,9 +413,10 @@ void GPUParticleSystem::DrawParticleCS(const D3D12_VERTEX_BUFFER_VIEW& vbView, c
 	dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, transCSInstance_.particleCSSRVHandle_.second);
 	dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(3, scaleCSInstance_.particleCSSRVHandle_.second);
 	dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(4, colorCSInstance_.particleCSSRVHandle_.second);
-	dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(5, particleCSMaterial_.GetTexture()->gpuHandle);
+	dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(5, drawAliveSRVHandle_.second);
+	dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(6, particleCSMaterial_.GetTexture()->gpuHandle);
 
-	dxcommon_->GetCommandList()->DrawIndexedInstanced(6, particleCSInsstanceCount_, 0, 0, 0);
+	dxcommon_->GetCommandList()->ExecuteIndirect(drawIndexedSignature_.Get(), 1, aliveDrawArgs_.Get(), 0, nullptr, 0);
 }
 
 void GPUParticleSystem::UpdateGPUEmitter() {

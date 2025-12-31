@@ -40,6 +40,10 @@ void BasePipeline::SetPipelineCSState(uint32_t index) {
 	}
 }
 
+ID3D12RootSignature* BasePipeline::GetRootSignature() {
+	return rootSignature_.Get();
+}
+
 void BasePipeline::CreateRootSignature([[maybe_unused]] ID3D12Device* device) {
 }
 

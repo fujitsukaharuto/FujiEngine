@@ -48,7 +48,7 @@ public:
 	/// <summary>
 	/// パイプラインを生成する
 	/// </summary>
-	void CreatePipe();
+	ID3D12RootSignature* GetRootSignature();
 
 private:
 

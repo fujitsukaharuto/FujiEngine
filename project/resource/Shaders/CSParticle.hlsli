@@ -13,8 +13,17 @@ struct VertexShaderInput
     float3 normal : NORMAL0;
 };
 
+struct DrawIndexedArgs
+{
+    uint IndexCountPerInstance; // 6
+    uint InstanceCount; // 生存数
+    uint StartIndexLocation;
+    int BaseVertexLocation;
+    uint StartInstanceLocation;
+};
+
 static const float3 kGravity = float3(0.0f, -8.0f, 0.0f);
-static const uint kMaxParticles = 10485760;
+static const uint kMaxParticles = 1048576;
 struct Particle
 {
     float3 translate;

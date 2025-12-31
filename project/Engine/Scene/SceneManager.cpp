@@ -95,6 +95,7 @@ void SceneManager::SceneSet() {
 	if (nextScene_) {
 		if (scene_) {
 			ParticleManager::ParentReset();
+			dxcommon_->PerFrameWait();
 			delete scene_;
 		}
 

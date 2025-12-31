@@ -81,6 +81,8 @@ public:
 
 	void BeginFrame();
 
+	void PerFrameWait();
+
 	/// <summary>
 	/// スプライト描画前に呼び出す関数
 	/// </summary>

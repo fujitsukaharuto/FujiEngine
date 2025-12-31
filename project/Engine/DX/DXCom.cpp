@@ -349,6 +349,10 @@ void DXCom::BeginFrame() {
 	command_->Reset();
 }
 
+void DXCom::PerFrameWait() {
+	command_->PerFrameWait();
+}
+
 void DXCom::PreSpriteDraw() {
 	command_->SetViewAndscissor();
 	pipeManager_->SetPipeline(Pipe::Normal);

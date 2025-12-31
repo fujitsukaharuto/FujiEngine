@@ -371,6 +371,12 @@
     <ClCompile Include="Game\GameObj\Enemy\Behavior\BossDushAttack.cpp">
       <Filter>Game\GameObj\Enemy\Behavior</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\GraphicPipeline\CSPipe\AliveCountCSPipe.cpp">
+      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\GraphicPipeline\CSPipe\InitArgsCSPipe.cpp">
+      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -808,6 +814,12 @@
     <ClInclude Include="Engine\DX\FrameCount.h">
       <Filter>Engine\DX</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\GraphicPipeline\CSPipe\AliveCountCSPipe.h">
+      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\GraphicPipeline\CSPipe\InitArgsCSPipe.h">
+      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -1075,6 +1087,12 @@
     </FxCompile>
     <FxCompile Include="resource\Shaders\Object3dNode.PS.hlsl">
       <Filter>resource\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\CS\Engine\AliveParticleCount.CS.hlsl">
+      <Filter>resource\Shaders\CS\Engine</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\CS\Engine\InitArgs.CS.hlsl">
+      <Filter>resource\Shaders\CS\Engine</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>

@@ -31,6 +31,14 @@ struct PerFrame {
 	float deltaTime;
 };
 
+struct DrawIndexedArgs {
+	uint32_t IndexCountPerInstance;
+	uint32_t InstanceCount;
+	uint32_t StartIndexLocation;
+	int32_t  BaseVertexLocation;
+	uint32_t StartInstanceLocation;
+};
+
 /// <summary>
 /// 加速場
 /// </summary>
@@ -130,6 +138,12 @@ private:
 	ComPtr<ID3D12Resource> freeListResource_;
 	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> freeListUAVHandle_;
 
+	ComPtr<ID3D12CommandSignature> drawIndexedSignature_;
+	ComPtr<ID3D12Resource> aliveDrawArgs_;
+	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> ArgsUAVHandle_;
+	ComPtr<ID3D12Resource> drawAliveIndex_;
+	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> drawAliveUAVHandle_;
+	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> drawAliveSRVHandle_;
 
 	std::vector<EmitterInfo> csEmitters_;
 
@@ -143,7 +157,7 @@ private:
 	int textureBasedEmitterIndex_ = 0;
 	int MeshSurefaceEmitterIndex_ = 0;
 
-	uint32_t numParticles = 10485760;
+	uint32_t numParticles = 1048576;
 	uint32_t threadsPerGroup = 1024;
 	int threadGroupSize_ = 1024;
 

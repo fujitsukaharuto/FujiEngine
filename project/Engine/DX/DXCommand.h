@@ -42,6 +42,8 @@ namespace DXC {
 		/// </summary>
 		void Reset(uint32_t index = 0);
 
+		void PerFrameWait();
+
 		/// <summary>
 		/// ViewとScissorをセットする
 		/// </summary>

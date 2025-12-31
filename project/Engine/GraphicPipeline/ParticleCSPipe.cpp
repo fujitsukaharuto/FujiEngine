@@ -17,15 +17,16 @@ void ParticleCSPipe::CreateRootSignature(ID3D12Device* device) {
 	D3D12_ROOT_SIGNATURE_DESC rootDesc{};
 	rootDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
-	CD3DX12_DESCRIPTOR_RANGE descriptorRangesVS[3] = {};
+	CD3DX12_DESCRIPTOR_RANGE descriptorRangesVS[4] = {};
 	descriptorRangesVS[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
 	descriptorRangesVS[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1);
 	descriptorRangesVS[2].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 2);
+	descriptorRangesVS[3].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 3);
 
 	CD3DX12_DESCRIPTOR_RANGE descriptorRangesPS[1] = {};
 	descriptorRangesPS[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
 
-	CD3DX12_ROOT_PARAMETER rootParameters[6]{};
+	CD3DX12_ROOT_PARAMETER rootParameters[7]{};
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
 	rootParameters[0].Descriptor.ShaderRegister = 0;
@@ -52,9 +53,14 @@ void ParticleCSPipe::CreateRootSignature(ID3D12Device* device) {
 	rootParameters[4].DescriptorTable.NumDescriptorRanges = 1;
 
 	rootParameters[5].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-	rootParameters[5].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	rootParameters[5].DescriptorTable.pDescriptorRanges = &descriptorRangesPS[0];
+	rootParameters[5].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+	rootParameters[5].DescriptorTable.pDescriptorRanges = &descriptorRangesVS[3];
 	rootParameters[5].DescriptorTable.NumDescriptorRanges = 1;
+
+	rootParameters[6].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[6].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[6].DescriptorTable.pDescriptorRanges = &descriptorRangesPS[0];
+	rootParameters[6].DescriptorTable.NumDescriptorRanges = 1;
 
 
 	rootDesc.pParameters = rootParameters;
