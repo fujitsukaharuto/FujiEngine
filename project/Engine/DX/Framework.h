@@ -42,6 +42,8 @@ namespace Core {
 		/// </summary>
 		void Init();
 
+		void BeginUpdate();
+
 		/// <summary>
 		/// ゲームループ
 		/// </summary>

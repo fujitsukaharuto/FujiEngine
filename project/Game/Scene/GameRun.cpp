@@ -245,15 +245,7 @@ void GameRun::Finalize() {
 }
 
 void GameRun::Update() {
-	dxcommon_->BeginFrame();
-	fpsKeeper_->Update();
-
-	// 入力関連の毎フレーム処理
-	input_->Update();
-	cameraManager_->Update();
-	dxcommon_->OffscreenUpDate();
-	modelManager_->PickingUpdate();
-	lightManager_->Update();
+	BeginUpdate();
 
 #ifdef _DEBUG
 	if (input_->TriggerKey(DIK_F12)) {
@@ -263,7 +255,6 @@ void GameRun::Update() {
 			cameraManager_->SetDebugMode(true);
 		}
 	}
-
 #endif // _DEBUG
 
 	// ゲームシーンの毎フレーム処理
@@ -294,7 +285,6 @@ void GameRun::Draw() {
 	imguiManager_->Draw();
 	// 描画終了
 	dxcommon_->PostDraw();
-
 }
 
 void GameRun::DebugGUI() {

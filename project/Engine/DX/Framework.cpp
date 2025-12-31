@@ -87,6 +87,18 @@ void Framework::Init() {
 	commandManger_ = CommandManager::GetInstance();
 }
 
+void Core::Framework::BeginUpdate() {
+	dxcommon_->BeginFrame();
+	fpsKeeper_->Update();
+
+	// 入力関連の毎フレーム処理
+	input_->Update();
+	cameraManager_->Update();
+	dxcommon_->OffscreenUpDate();
+	modelManager_->PickingUpdate();
+	lightManager_->Update();
+}
+
 void Framework::Run() {
 	Initialize();
 	while (true) {
