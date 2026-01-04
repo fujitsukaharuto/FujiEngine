@@ -177,10 +177,12 @@ void Player::Draw(Material* mate, bool is) {
 	collider_->DrawCollider();
 #endif // _DEBUG
 
-	for (auto& hpTex : hpFrame_) {
-		hpTex->Draw();
+	if (!isStart_) {
+		for (auto& hpTex : hpFrame_) {
+			hpTex->Draw();
+		}
+		hpSprite_->Draw();
 	}
-	hpSprite_->Draw();
 }
 
 void Player::DebugGUI() {
@@ -682,7 +684,7 @@ void Player::ParticleEmitterSetting() {
 	moveParticleL_.pos_ = { -0.4f,-0.4f,-0.3f };
 	moveParticleR_.pos_ = { 0.4f,-0.4f,-0.3f };
 	deathSmoke_.count_ = 1;
-	deathSmoke_.frequencyTime_ = 15.0f;
+	deathSmoke_.frequencyTime_ = 0.2f;
 
 	hit_.frequencyTime_ = 0.0f;
 	hit2_.frequencyTime_ = 0.0f;

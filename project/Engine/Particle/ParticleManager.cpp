@@ -465,6 +465,22 @@ void ParticleManager::LoadParentGroup(ParticleEmitter*& emit, const std::string&
 	}
 }
 
+void ParticleManager::LoadAllFileData() {
+	std::string path = "resource/ParticleGroups/";
+	if (!std::filesystem::exists(path)) return;
+	//std::string path = "resource/ParticleGroups/" + name + ".json";
+
+	for (const auto& entry : std::filesystem::directory_iterator(path)) {
+		if (entry.is_regular_file()) {
+			const auto& filePath = entry.path();
+			if (filePath.extension() == ".json") {
+				// .json を除いたファイル名
+				CreateParticleGroup(filePath.stem().string());
+			}
+		}
+	}
+}
+
 void ParticleManager::Emit(const std::string& name, const Vector3& pos, const Vector3& rotate, const Particle& grain, const RandomParametor& para, uint32_t count) {
 	ParticleManager* instance = GetInstance();
 

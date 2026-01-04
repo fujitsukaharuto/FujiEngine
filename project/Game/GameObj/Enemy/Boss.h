@@ -263,6 +263,7 @@ private:
 
 	bool isHpActive_ = true;
 	bool isShakeSprite_ = false;
+	bool isActiveSprite_ = false;
 	float bossHp_ = 0.0f;
 	float hpCooltime_ = 60.0f;
 	int nowHpIndex_ = 4;
@@ -344,6 +345,9 @@ private:
 	ParticleEmitter dushStartParticle_;
 	ParticleEmitter dushStartCircle_;
 	ParticleEmitter dushSmoke_;
+
+	int halfAuraCS_ = 0;
+	int halfSmallAuraCS_ = 0;
 
 	SoundData* jumpAttackSE_;
 

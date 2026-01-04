@@ -246,10 +246,12 @@ void GameScene::Draw() {
 #pragma region 前景スプライト
 
 	dxcommon_->PreSpriteDraw();
-	if (isPadDraw_) {
-		pad_->Draw();
-	} else {
-		key_->Draw();
+	if (!player_->GetIsStart()) {
+		if (isPadDraw_) {
+			pad_->Draw();
+		} else {
+			key_->Draw();
+		}
 	}
 	if (isGameover_) {
 		gameover_->Draw();

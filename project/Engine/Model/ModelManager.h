@@ -73,6 +73,7 @@ namespace Graphics {
 
 		/// <summary>モデルのファイルディレクトリを読み込み</summary>
 		void LoadModelFile(bool overWrite = false);
+		void LoadAllFileData();
 		const std::vector<std::pair<std::string, bool>>& GetModelFiles() { return modelFileList; }
 		void SetModelFileOnceLoad(const std::string& name);
 

@@ -47,110 +47,13 @@ void GameRun::Initialize() {
 
 #pragma region オブジェクト読み込み
 	ModelManager::GetInstance()->CreateSphere();
-	modelManager_->LoadOBJ("cube.obj");
-	modelManager_->LoadOBJ("plane_under.obj");
-	modelManager_->LoadOBJ("suzanne.obj");
-	modelManager_->LoadOBJ("Fence.obj");
-	modelManager_->LoadOBJ("terrain.obj");
-	modelManager_->LoadOBJ("skydome.obj");
-	modelManager_->LoadOBJ("lightning.obj");
-	modelManager_->LoadOBJ("playerModel.obj");
-	modelManager_->LoadOBJ("boss.obj");
-	modelManager_->LoadOBJ("bossWaveWall.obj");
-	modelManager_->LoadOBJ("Star.obj");
-	modelManager_->LoadOBJ("player.obj");
-	modelManager_->LoadOBJ("Boss_Arrow.obj");
-	modelManager_->LoadOBJ("DeadTree_2.obj");
+	modelManager_->LoadAllFileData();
 	modelManager_->LoadGLTF("T_boss.gltf");
 #pragma endregion
 
 
 #pragma region パーティクル生成
-	pManager_->CreateParticleGroup("sphere");
-	pManager_->CreateParticleGroup("sphere2");
-	pManager_->CreateParticleGroup("sphere3");
-	pManager_->CreateParticleGroup("ring");
-	pManager_->CreateParticleGroup("ChargeEffect1", "redCircle.png", 40);
-	pManager_->CreateParticleGroup("ChargeEffect2", "redCircle.png", 40);
-	pManager_->CreateParticleGroup("ChargeEffect3", "redCircle.png", 40);
-	pManager_->CreateParticleGroup("ChargeLight", "redCircle.png", 40);
-	pManager_->CreateParticleGroup("ChargeRay");
-	pManager_->CreateParticleGroup("ChargeWave", "chargeCircle.png", 2);
-	pManager_->CreateParticleGroup("ChargeCircle", "chargeCircle.png", 2);
-	pManager_->CreateParticleGroup("BulletTrajectory", "redCircle.png", 1000);
-	pManager_->CreateParticleGroup("BulletTrajectory2", "redCircle.png",1000);
-	pManager_->CreateParticleGroup("playerTranjectory", "kira.png", 200);
-	pManager_->CreateParticleGroup("playerhit", "redCircle.png", 100);
-
-	pManager_->CreateParticleGroup("playerAvoid01", "ringOutline.png", 100, ShapeType::RING);
-	pManager_->CreateParticleGroup("playerAvoid02", "redCircle.png", 100);
-	pManager_->CreateParticleGroup("playerAvoid03", "redCircle.png", 100);
-
-	pManager_->CreateParticleGroup("playerAvoid1", "redCircle.png", 100);
-	pManager_->CreateParticleGroup("playerAvoid2", "redCircle.png", 100);
-	pManager_->CreateParticleGroup("playerAvoid3", "redCircle.png", 100);
-
-	pManager_->CreateParticleGroup("playerAvoid4");
-
-	pManager_->CreateParticleGroup("playerStrongState1", "beamCore.png", 100, ShapeType::CYLINDER);
-	pManager_->CreateParticleGroup("playerStrongState2", "redCircle.png", 100);
-
-	pManager_->CreateParticleGroup("strongShotWave");
-	pManager_->CreateParticleGroup("shotWave");
-	pManager_->CreateParticleGroup("shotSpark");
-
-	
-	pManager_->CreateParticleGroup("bulletHit", "redCircle.png", 100);
-	pManager_->CreateParticleGroup("bulletHit2", "redCircle.png", 100);
-	pManager_->CreateParticleGroup("bulletHit3", "redCircle.png", 100);
-	pManager_->CreateParticleGroup("bulletHitSmoke", "smoke.png", 100);
-	pManager_->CreateParticleGroup("bulletHitCircle", "chargeCircle.png", 10);
-
-	// boss
-	pManager_->CreateParticleGroup("ShockRay");
-	pManager_->CreateParticleGroup("ShockWaveGround", "shockWaveGround.png", 10, ShapeType::RING);
-	pManager_->CreateParticleGroup("ShockWaveParticle", "redCircle.png", 30);
-
-	pManager_->CreateParticleGroup("WaveWallSpark", "redCircle.png", 100);
-
-	pManager_->CreateParticleGroup("BeamCharge1", "redCircle.png", 1000);
-	pManager_->CreateParticleGroup("BeamCharge2", "redCircle.png", 1000);
-	pManager_->CreateParticleGroup("BeamCharge3", "redCircle.png", 1000);
-	pManager_->CreateParticleGroup("BeamCharge4", "redCircle.png", 1000);
-	pManager_->CreateParticleGroup("BeamCharge5", "redCircle.png", 40);
-	pManager_->CreateParticleGroup("BeamCharge6", "chargeCircle.png", 2);
-	pManager_->CreateParticleGroup("BeamCharge7");
-	pManager_->CreateParticleGroup("BeamCharge8");
-	pManager_->CreateParticleGroup("BeamCharge9", "redCircle.png", 40);
-	pManager_->CreateParticleGroup("BeamCharge10", "redCircle.png", 10);
-	pManager_->CreateParticleGroup("BeamCharge11", "redCircle.png", 40, ShapeType::RING);
-	pManager_->CreateParticleGroup("BeamParticle", "redCircle.png", 200);
-	pManager_->CreateParticleGroup("BeamLight", "redCircle.png", 40);
-
-	pManager_->CreateParticleGroup("roringWave");
-	pManager_->CreateParticleGroup("roringParticle", "redCircle.png", 80);
-	pManager_->CreateParticleGroup("roringring");
-
-	pManager_->CreateParticleGroup("lightning");
-	pManager_->CreateParticleGroup("lightningSphere");
-	pManager_->CreateParticleGroup("lightningParticle", "redCircle.png", 80);
-
-	pManager_->CreateParticleGroup("summonLightning_", "FX12_Lightning_01.png", 40, ShapeType::LIGHTNING);
-	pManager_->CreateParticleGroup("energySphere", "T_Noise04.jpg", 40, ShapeType::SPHERE);
-	pManager_->CreateParticleGroup("energyParticle", "redCircle.png", 80);
-
-	pManager_->CreateParticleGroup("arrowHit", "white.png", 30, ShapeType::SPHERE);
-	pManager_->CreateParticleGroup("arrowParticle", "redCircle.png", 100);
-	pManager_->CreateParticleGroup("arrowExpandParticle");
-
-	pManager_->CreateParticleGroup("duahChargeCompleteParticle", "redCircle.png", 100);
-	pManager_->CreateParticleGroup("duahChargeCompleteCircle", "chargeCircle.png", 10);
-	pManager_->CreateParticleGroup("dushGroundSmoke", "smoke.png", 100);
-	pManager_->CreateParticleGroup("dushGroundLight", "chargeRay.png", 100);
-
-
-	pManager_->CreateParticleGroup("fieldParticle", "redCircle.png", 400);
-
+	pManager_->LoadAllFileData();
 
 	// playerBullet用
 	pManager_->CreateParentParticleGroup("ChargeEffect1", "redCircle.png",40);

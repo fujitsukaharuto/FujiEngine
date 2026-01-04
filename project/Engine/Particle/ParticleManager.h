@@ -68,6 +68,7 @@ public:
 	static void Load(ParticleEmitter& emit, const std::string& name);
 	/// <summary>ペアレントグループ情報の読み込み</summary>
 	static void LoadParentGroup(ParticleEmitter*& emit, const std::string& name);
+	static void LoadAllFileData();
 
 	/// <summary>パーティクルの発生</summary>
 	static void Emit(const std::string& name, const Math::Vector3& pos, const Math::Vector3& rotate, const Particle& grain, const RandomParametor& para, uint32_t count);

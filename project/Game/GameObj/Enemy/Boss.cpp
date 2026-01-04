@@ -31,6 +31,8 @@ Boss::~Boss() {
 	ParticleManager::GetParticleCSEmitter(dushTrailIndex_).SetEmit(false);
 	ParticleManager::GetInstance()->GetSphereEmitter(waveCSEmitIndex_).SetEmit(false);
 	ParticleManager::GetInstance()->GetSphereEmitter(jumpCSEmitIndex_).SetEmit(false);
+	ParticleManager::GetSphereEmitter(halfAuraCS_).SetEmit(false);
+	ParticleManager::GetSphereEmitter(halfSmallAuraCS_).SetEmit(false);
 
 	for (int i = 0; i < 8; i++) {
 		ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]).SetEmit(false);
@@ -148,8 +150,12 @@ void Boss::Initialize() {
 	ParticleManager::Load(jumpWave_, "JumpShockWave");
 	waveCSEmitIndex_ = ParticleManager::GetInstance()->InitGPUEmitter();
 	jumpCSEmitIndex_ = ParticleManager::GetInstance()->InitGPUEmitter();
+	halfAuraCS_ = ParticleManager::GetInstance()->InitGPUEmitter();
+	halfSmallAuraCS_ = ParticleManager::GetInstance()->InitGPUEmitter();
 	ParticleManager::GetSphereEmitter(waveCSEmitIndex_).Load("shockWaveCS");
 	ParticleManager::GetSphereEmitter(jumpCSEmitIndex_).Load("jumpCSEmit");
+	ParticleManager::GetSphereEmitter(halfAuraCS_).Load("bossAura");
+	ParticleManager::GetSphereEmitter(halfSmallAuraCS_).Load("bossSmallAura");
 
 	waveAttack1.frequencyTime_ = 0.0f;
 	waveAttack2.frequencyTime_ = 0.0f;
@@ -248,6 +254,7 @@ void Boss::Update() {
 			}
 			if (startTime_ < 0.0f) {
 				isStart_ = false;
+				isActiveSprite_ = true;
 				ChangeBehavior(std::make_unique<BossRoot>(this));
 			}
 		}
@@ -271,6 +278,8 @@ void Boss::Update() {
 		}
 	}
 
+	ParticleManager::GetSphereEmitter(halfAuraCS_).SetPos({ animModel_->transform.translate.x,animModel_->transform.translate.y + params_.jump.height,animModel_->transform.translate.z });
+	ParticleManager::GetSphereEmitter(halfSmallAuraCS_).SetPos({ animModel_->transform.translate.x,animModel_->transform.translate.y + params_.jump.height,animModel_->transform.translate.z });
 	animModel_->AnimationUpdate();
 	shadow_->transform.translate = animModel_->transform.translate;
 	shadow_->transform.translate.y = 0.15f;
@@ -315,15 +324,17 @@ void Boss::Draw([[maybe_unused]] Material* mate, [[maybe_unused]] bool is) {
 
 	beam_->Draw();
 
-	for (auto& hpTex : hpFrame_) {
-		hpTex->Draw();
-	}
-	if (bossHp_ >= 0.0f) {
-		int texCount = 0;
-		for (auto& tex : hpSprites_) {
-			tex->Draw();
-			if (nowHpIndex_ == texCount) break;
-			texCount++;
+	if (isActiveSprite_) {
+		for (auto& hpTex : hpFrame_) {
+			hpTex->Draw();
+		}
+		if (bossHp_ >= 0.0f) {
+			int texCount = 0;
+			for (auto& tex : hpSprites_) {
+				tex->Draw();
+				if (nowHpIndex_ == texCount) break;
+				texCount++;
+			}
 		}
 	}
 }
@@ -535,6 +546,7 @@ void Boss::ReStart() {
 	isHpActive_ = true;
 	isDying_ = false;
 	isStart_ = true;
+	isActiveSprite_ = false;
 	//phaseIndex_ = 0;
 	startTime_ = 300.0f;
 	animModel_->ChangeAnimation("roaring");
@@ -565,6 +577,8 @@ void Boss::ReduceBossHP(bool isStrong) {
 			if (bossHp_ < 60.0f) {
 				ChangePhase(60.0f, 1);
 				phaseIndex_++;
+				ParticleManager::GetSphereEmitter(halfAuraCS_).SetEmit(true);
+				ParticleManager::GetSphereEmitter(halfSmallAuraCS_).SetEmit(true);
 				return;
 			}
 			break;

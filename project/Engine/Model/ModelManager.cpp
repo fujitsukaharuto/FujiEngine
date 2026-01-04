@@ -544,6 +544,12 @@ void ModelManager::LoadModelFile(bool overWrite) {
 #endif // _DEBUG
 }
 
+void Graphics::ModelManager::LoadAllFileData() {
+	for (auto& pair : modelFileList) {
+		LoadOBJ(pair.first);
+	}
+}
+
 void ModelManager::SetModelFileOnceLoad(const std::string& name) {
 	for (auto& pair : modelFileList) {
 		if (pair.first == name) {
