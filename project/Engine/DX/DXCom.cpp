@@ -340,12 +340,12 @@ void DXCom::PostDraw() {
 	// コマンドリストの実行
 	command_->Execution();
 	command_->GPUSignal();
-	swapChain_->Present(0, 0);// 垂直同期はOFF
+	swapChain_->Present(1, 0);// 第一引数、垂直同期は1がON、0がOFF
 }
 
 void DXCom::BeginFrame() {
 	command_->SetFrameIndex((command_->GetNowFrameIndex() + 1) % kFrameCount_);
-	//fpsKeeper_->FixFPS();
+	fpsKeeper_->FixFPS();
 	command_->Reset();
 }
 
