@@ -77,6 +77,28 @@ void TitleScene::Initialize() {
 	cMane_ = std::make_unique<CollisionManager>();
 
 	ParticleManager::Load(emit, "lightning");
+	
+	const float radius = 200.0f;
+	const int division = 12;
+	const float PI = 3.14159265359f;
+
+	for (int i = 0; i < division; i++) {
+		float angle = (2.0f * PI / division) * i;
+
+		float x = radius * std::cos(angle);
+		float z = radius * std::sin(angle);
+
+		int emitNum = ParticleManager::GetInstance()->InitGPUEmitterSurface("PointyTower.obj");
+		auto& emitterCS = ParticleManager::GetParticleCSEmitterSurface(emitNum);
+		emitterCS.SetEmit(true);
+		emitterCS.SetPos({ x,0.0f,z });
+		emitterCS.data_.count = 4000;
+		emitterCS.data_.radius = 9.0f;
+		emitterCS.data_.colorMax = { 0.5f,0.35f,0.0f };
+		emitterCS.data_.colorMin = { 0.5f,0.35f,0.0f };
+		csEmitterNums_.push_back(emitNum);
+	}
+
 }
 
 void TitleScene::Update() {
