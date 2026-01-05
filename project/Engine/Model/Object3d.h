@@ -175,6 +175,7 @@ namespace Graphics {
 		bool isUseNodeGraph_ = false;
 		Material maskMateral_;
 		std::vector<NodeContent> nodeContentDeta_;
+		//std::vector<Material> nodeMaterials_;
 
 		Math::Vector3 prevPos_;
 		Math::Vector3 prevRotate_;
