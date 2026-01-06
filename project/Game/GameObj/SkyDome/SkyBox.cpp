@@ -72,6 +72,10 @@ void SkyBox::SetCommonResources(DXCom* dxcommon, SRVManager* srvManager, Camera*
 	camera_ = camera;
 }
 
+void SkyBox::SetColor(const Math::Vector4& color) {
+	material_.SetColor(color);
+}
+
 void SkyBox::ResourceCreate() {
 
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {

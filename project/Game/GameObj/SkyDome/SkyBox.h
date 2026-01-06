@@ -4,6 +4,7 @@
 #include "Engine/DX/DXCom.h"
 #include "Engine/DX/SRVManager.h"
 #include "Engine/Camera/CameraManager.h"
+#include "Engine/Math/Vector/Vector4.h"
 #include "Engine/DX/FrameCount.h"
 
 
@@ -29,6 +30,8 @@ public:
 	/// 必要なクラスのSetter
 	/// </summary>
 	void SetCommonResources(DXCom* dxcommon, SRVManager* srvManager, Camera* camera);
+
+	void SetColor(const Math::Vector4& color);
 
 private:
 

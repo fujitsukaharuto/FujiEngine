@@ -36,17 +36,18 @@ void GameScene::Initialize() {
 	black_->SetAnchor({ 0.0f,0.0f });
 #pragma endregion
 
-	terrain = std::make_unique<AnimationModel>();
-	terrain->Create("ground.obj");
-	terrain->IsMirrorOBJ(true);
-	terrain->SetEnvironmentCoeff(0.3f);
-	terrain->SetTexture("grass.jpg");
-	terrain->transform.scale = { 1.0f,1.0f,1.0f };
-	terrain->SetUVScale({ 20.0f,20.0f }, { 0.0f,0.0f });
-
 	skybox_ = std::make_unique<SkyBox>();
 	skybox_->SetCommonResources(dxcommon_, SRVManager::GetInstance(), CameraManager::GetInstance()->GetCamera());
 	skybox_->Initialize();
+	skybox_->SetColor(skyBoxColor_);
+
+	terrain_ = std::make_unique<AnimationModel>();
+	terrain_->Create("ground.obj");
+	terrain_->IsMirrorOBJ(true);
+	terrain_->SetEnvironmentCoeff(0.3f);
+	terrain_->SetTexture("grass.jpg");
+	terrain_->SetUVScale({ 2.0f,2.0f }, { 0.0f,0.0f });
+	terrain_->SetColor(terrainColor_);
 
 	player_ = std::make_unique<Player>();
 	boss_ = std::make_unique<Boss>();
@@ -229,7 +230,7 @@ void GameScene::Draw() {
 	obj3dCommon->PreDraw();
 
 
-	terrain->Draw();
+	terrain_->Draw();
 	player_->Draw();
 
 	boss_->Draw();
@@ -279,7 +280,7 @@ void GameScene::DebugGUI() {
 	boss_->DebugGUI();
 
 	if (ImGui::CollapsingHeader("terrain")) {
-		terrain->DebugGUI();
+		terrain_->DebugGUI();
 	}
 
 	ImGui::Unindent();

@@ -40,6 +40,7 @@ void ParticleDebugScene::Initialize() {
 	skybox_ = std::make_unique<SkyBox>();
 	skybox_->SetCommonResources(dxcommon_, SRVManager::GetInstance(), CameraManager::GetInstance()->GetCamera());
 	skybox_->Initialize();
+	skybox_->SetColor(skyBoxColor_);
 
 	terrain_ = std::make_unique<AnimationModel>();
 	terrain_->Create("ground.obj");
@@ -47,7 +48,8 @@ void ParticleDebugScene::Initialize() {
 	terrain_->transform.translate.y = -5.0f;
 	terrain_->SetEnvironmentCoeff(0.3f);
 	terrain_->SetTexture("grass.jpg");
-	terrain_->SetUVScale({ 20.0f,20.0f }, { 0.0f,0.0f });
+	terrain_->SetUVScale({ 2.0f,2.0f }, { 0.0f,0.0f });
+	terrain_->SetColor(terrainColor_);
 
 }
 
