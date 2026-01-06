@@ -60,7 +60,6 @@ void ResultScene::Initialize() {
 	terrain_->IsMirrorOBJ(true);
 	terrain_->SetEnvironmentCoeff(0.3f);
 	terrain_->SetTexture("grass.jpg");
-	terrain_->SetUVScale({ 2.0f,2.0f }, { 0.0f,0.0f });
 	terrain_->SetColor(terrainColor_);
 
 	for (int i = 0; i < 3; i++) {

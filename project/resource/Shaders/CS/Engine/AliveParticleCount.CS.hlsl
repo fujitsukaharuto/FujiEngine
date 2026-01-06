@@ -10,7 +10,7 @@ void main( uint3 DTid : SV_DispatchThreadID )
     uint particleIndex = DTid.x;
     if (particleIndex >= kMaxParticles)
         return;
-    if (gParticles_Color[particleIndex].color.a != 0)
+    if (gParticles_Color[particleIndex].color.a >= 0.15)
     {
         uint writeIndex;
         InterlockedAdd(gDrawArgs[0].InstanceCount, 1, writeIndex);

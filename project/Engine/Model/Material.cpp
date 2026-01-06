@@ -148,7 +148,11 @@ void Material::SetTexture(const std::string& name, bool overWrite) {
 }
 
 void Material::SetLightEnable(LightMode mode) {
-	materialDate_.enableLighting = static_cast<int32_t>(mode);
+	if (isEnvironment_) {
+		materialEnvironment_.enableLighting = static_cast<int32_t>(mode);;
+	} else {
+		materialDate_.enableLighting = static_cast<int32_t>(mode);
+	}
 }
 
 void Material::SetEnvironment(float env) {

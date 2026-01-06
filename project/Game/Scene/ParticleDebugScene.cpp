@@ -48,7 +48,6 @@ void ParticleDebugScene::Initialize() {
 	terrain_->transform.translate.y = -5.0f;
 	terrain_->SetEnvironmentCoeff(0.3f);
 	terrain_->SetTexture("grass.jpg");
-	terrain_->SetUVScale({ 2.0f,2.0f }, { 0.0f,0.0f });
 	terrain_->SetColor(terrainColor_);
 
 }

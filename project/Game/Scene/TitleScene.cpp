@@ -51,7 +51,6 @@ void TitleScene::Initialize() {
 	terrain_->IsMirrorOBJ(true);
 	terrain_->SetEnvironmentCoeff(0.3f);
 	terrain_->SetTexture("grass.jpg");
-	terrain_->SetUVScale({ 2.0f,2.0f }, { 0.0f,0.0f });
 	terrain_->SetColor(terrainColor_);
 
 	space_ = std::make_unique<Sprite>();
@@ -96,8 +95,8 @@ void TitleScene::Initialize() {
 		emitterCS.SetPos({ x,0.0f,z });
 		emitterCS.data_.count = 4000;
 		emitterCS.data_.radius = 9.0f;
-		emitterCS.data_.colorMax = { 0.5f,0.35f,0.0f };
-		emitterCS.data_.colorMin = { 0.5f,0.35f,0.0f };
+		emitterCS.data_.colorMax = { 0.0f,0.8f,0.4f };
+		emitterCS.data_.colorMin = { 0.0f,0.8f,0.4f };
 		csEmitterNums_.push_back(emitNum);
 	}
 

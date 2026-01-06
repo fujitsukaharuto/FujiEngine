@@ -46,7 +46,6 @@ void GameScene::Initialize() {
 	terrain_->IsMirrorOBJ(true);
 	terrain_->SetEnvironmentCoeff(0.3f);
 	terrain_->SetTexture("grass.jpg");
-	terrain_->SetUVScale({ 2.0f,2.0f }, { 0.0f,0.0f });
 	terrain_->SetColor(terrainColor_);
 
 	player_ = std::make_unique<Player>();

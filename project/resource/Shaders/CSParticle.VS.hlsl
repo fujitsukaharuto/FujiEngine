@@ -15,13 +15,15 @@ ConstantBuffer<PerView> gPerView : register(b0);
 VertxShaderOutput main(VertexShaderInput input, uint instanceId : SV_InstanceID)
 {
     VertxShaderOutput output;
+    uint idx = gDrawParticleIndex[instanceId];
+    float3 scale = gParticles_Scale[idx].scale;
     float4x4 worldMatrix = gPerView.billboardMatrix;
-    worldMatrix[0] *= gParticles_Scale[gDrawParticleIndex[instanceId]].scale.x;
-    worldMatrix[1] *= gParticles_Scale[gDrawParticleIndex[instanceId]].scale.y;
-    worldMatrix[2] *= gParticles_Scale[gDrawParticleIndex[instanceId]].scale.z;
-    worldMatrix[3].xyz = gParticles_Trans[gDrawParticleIndex[instanceId]].translate;
+    worldMatrix[0] *= scale.x;
+    worldMatrix[1] *= scale.y;
+    worldMatrix[2] *= scale.z;
+    worldMatrix[3].xyz = gParticles_Trans[idx].translate;
     output.position = mul(input.position, mul(worldMatrix, gPerView.viewProjection));
     output.texcoord = input.texcoord;
-    output.color = gParticles_Color[gDrawParticleIndex[instanceId]].color;
+    output.color = gParticles_Color[idx].color;
     return output;
 }

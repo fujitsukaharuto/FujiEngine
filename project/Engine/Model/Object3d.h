@@ -62,7 +62,7 @@ namespace Graphics {
 		/// <param name="bottomRadius">下の半径(デフォルトは1.0f)</param>
 		/// <param name="height">高さ(デフォルトは3.0f)</param>
 		void CreateCylinder(float topRadius = 1.0f, float bottomRadius = 1.0f, float height = 3.0f);
-
+		
 		void Draw(Material* mate = nullptr, bool isAdd = false);
 
 		/// <summary>

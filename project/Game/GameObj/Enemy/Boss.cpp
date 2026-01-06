@@ -216,7 +216,7 @@ void Boss::Initialize() {
 	dushStartParticle_.frequencyTime_ = 0.0f;
 	dushStartCircle_.frequencyTime_ = 0.0f;
 	dushTrailIndex_ = ParticleManager::GetInstance()->InitGPUEmitter(1);
-	ParticleManager::GetParticleCSEmitter(dushTrailIndex_).Load("DushTrail");
+	ParticleManager::GetParticleCSEmitter(dushTrailIndex_).Load("DushTrail2");
 
 	actionList_ = {
 		"Root","Wave","Beam","Jump","Sword","Area","Arrow","FallRod","Dush",
