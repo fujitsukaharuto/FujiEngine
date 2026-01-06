@@ -36,6 +36,15 @@ void SkyBox::Draw() {
 }
 
 void SkyBox::DebugGUI() {
+#ifdef _DEBUG
+	if (ImGui::CollapsingHeader("SkyBox")) {
+		ImGui::Indent();
+		Vector4 color = material_.GetColor();
+		ImGui::ColorEdit3("color##SkyBoxColor", &color.x);
+		material_.SetColor(color);
+		ImGui::Unindent();
+	}
+#endif // _DEBUG
 }
 
 void SkyBox::UpdateWVP() {

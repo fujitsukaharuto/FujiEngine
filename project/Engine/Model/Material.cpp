@@ -98,9 +98,24 @@ ID3D12Resource* Material::GetMaterialResource() {
 	}
 }
 
+Vector4 Material::GetColor() {
+	if (isEnvironment_) {
+		return materialEnvironment_.color;
+	} else {
+		return materialDate_.color;
+	}
+}
 
 void Material::SetTextureNamePath(const std::string& pathName) {
 	textureNamePath_.textureFilePath = pathName;
+}
+
+void Material::SetColor(const Math::Vector4& color) {
+	if (isEnvironment_) {
+		materialEnvironment_.color = color;
+	} else {
+		materialDate_.color = color;
+	}
 }
 
 void Material::SetUVScale(const Vector2& scale, const Vector2& uvTrans) {

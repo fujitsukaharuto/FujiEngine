@@ -86,7 +86,7 @@ namespace Graphics {
 		Texture* GetTexture();
 		ID3D12Resource* GetMaterialResource();
 		std::string GetPathName() const { return textureNamePath_.textureFilePath; }
-		Math::Vector4 GetColor() { return materialDate_.color; }
+		Math::Vector4 GetColor();
 		Math::Vector2 GetUVTrans() { return uvTrans_; }
 
 		//========================================================================*/
@@ -94,7 +94,7 @@ namespace Graphics {
 		/// <summary>パスの設定</summary>
 		void SetTextureNamePath(const std::string& pathName);
 		/// <summary>色の設定</summary>
-		void SetColor(const Math::Vector4& color) { materialDate_.color = color; }
+		void SetColor(const Math::Vector4& color);
 		/// <summary>UVスケールの設定</summary>
 		void SetUVScale(const Math::Vector2& scale, const Math::Vector2& uvTrans);
 		/// <summary>UVトランスの設定</summary>

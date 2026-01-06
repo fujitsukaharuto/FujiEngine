@@ -218,6 +218,10 @@ void TitleScene::DebugGUI() {
 	if (ImGui::CollapsingHeader("particleTest")) {
 		particleTest_->DebugGUI();
 	}
+	skybox_->DebugGUI();
+	if (ImGui::CollapsingHeader("terrain")) {
+		terrain_->DebugGUI();
+	}
 	ImGui::Unindent();
 #endif // _DEBUG
 }

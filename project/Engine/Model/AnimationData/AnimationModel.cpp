@@ -36,6 +36,13 @@ void AnimationModel::DebugGUI() {
 	if (ImGui::DragFloat("EnvironmentCoeff", &environmentCoeff_, 0.01f, 0.0f, 1.0f)) {
 		model_->SetEnvironment(environmentCoeff_);
 	}
+	Vector4 color = model_->GetColor(0);
+	ImGui::ColorEdit3("color", &color.x);
+	SetColor(color);
+	if (animations_.size() == 0) {
+		ImGui::Unindent();
+		return;
+	}
 	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Selected;
 	if (ImGui::TreeNodeEx("animation", flags)) {
 
