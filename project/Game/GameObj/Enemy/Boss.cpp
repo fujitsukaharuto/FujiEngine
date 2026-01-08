@@ -33,6 +33,8 @@ Boss::~Boss() {
 	ParticleManager::GetInstance()->GetSphereEmitter(jumpCSEmitIndex_).SetEmit(false);
 	ParticleManager::GetSphereEmitter(halfAuraCS_).SetEmit(false);
 	ParticleManager::GetSphereEmitter(halfSmallAuraCS_).SetEmit(false);
+	ParticleManager::GetSphereEmitter(leftHandAuraCS_).SetEmit(false);
+	ParticleManager::GetSphereEmitter(rightHandAuraCS_).SetEmit(false);
 
 	for (int i = 0; i < 8; i++) {
 		ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]).SetEmit(false);
@@ -208,6 +210,9 @@ void Boss::Initialize() {
 	roringWave_.grain_.isAutoUVMove_ = true;
 	roringWave_.grain_.autoUVSpeed_.x = 0.01f;
 	roringWave_.grain_.isZandX_ = true;
+	animModel_->RegisterJointWorld("mixamorig:Head");
+	animModel_->RegisterJointWorld("mixamorig:LeftHand");
+	animModel_->RegisterJointWorld("mixamorig:RightHand");
 	roringring_.SetAnimParent(animModel_->GetJointTrans("mixamorig:Head"));
 	roringring_.pos_.y = -7.0f;
 	roringParticle_.SetAnimParent(animModel_->GetJointTrans("mixamorig:Head"));
@@ -284,8 +289,8 @@ void Boss::Update() {
 
 	ParticleManager::GetSphereEmitter(halfAuraCS_).SetPos({ animModel_->transform.translate.x,animModel_->transform.translate.y + params_.jump.height,animModel_->transform.translate.z });
 	ParticleManager::GetSphereEmitter(halfSmallAuraCS_).SetPos({ animModel_->transform.translate.x,animModel_->transform.translate.y + params_.jump.height,animModel_->transform.translate.z });
-	ParticleManager::GetSphereEmitter(leftHandAuraCS_).SetPos({ animModel_->transform.translate.x,animModel_->transform.translate.y + params_.jump.height,animModel_->transform.translate.z });
-	ParticleManager::GetSphereEmitter(rightHandAuraCS_).SetPos({ animModel_->transform.translate.x,animModel_->transform.translate.y + params_.jump.height,animModel_->transform.translate.z });
+	ParticleManager::GetSphereEmitter(leftHandAuraCS_).SetPos(animModel_->GetJointWorldPos("mixamorig:LeftHand"));
+	ParticleManager::GetSphereEmitter(rightHandAuraCS_).SetPos(animModel_->GetJointWorldPos("mixamorig:RightHand"));
 	animModel_->AnimationUpdate();
 	shadow_->transform.translate = animModel_->transform.translate;
 	shadow_->transform.translate.y = 0.15f;
@@ -585,6 +590,8 @@ void Boss::ReduceBossHP(bool isStrong) {
 				phaseIndex_++;
 				ParticleManager::GetSphereEmitter(halfAuraCS_).SetEmit(true);
 				ParticleManager::GetSphereEmitter(halfSmallAuraCS_).SetEmit(true);
+				ParticleManager::GetSphereEmitter(leftHandAuraCS_).SetEmit(true);
+				ParticleManager::GetSphereEmitter(rightHandAuraCS_).SetEmit(true);
 				return;
 			}
 			break;
@@ -618,6 +625,8 @@ void Boss::ReduceBossHP(bool isStrong) {
 			animModel_->ChangeAnimation("dying");
 			ParticleManager::GetSphereEmitter(halfAuraCS_).SetEmit(false);
 			ParticleManager::GetSphereEmitter(halfSmallAuraCS_).SetEmit(false);
+			ParticleManager::GetSphereEmitter(leftHandAuraCS_).SetEmit(false);
+			ParticleManager::GetSphereEmitter(rightHandAuraCS_).SetEmit(false);
 		}
 	}
 }

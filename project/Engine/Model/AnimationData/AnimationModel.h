@@ -73,7 +73,9 @@ namespace Graphics {
 		Math::Matrix4x4 GetWorldMat() const;
 		Math::Vector3 GetWorldPos()const;
 		Math::Matrix4x4* GetJointTrans(const std::string& jointName);
+		Math::Vector3 GetJointWorldPos(const std::string& jointName);
 
+		void RegisterJointWorld(const std::string& jointName);
 
 		void SkeletonUpdate();
 		void SkinClusterUpdate();
@@ -159,8 +161,7 @@ namespace Graphics {
 		bool isMirrorObj_ = false;
 		float environmentCoeff_ = 0.0f;
 
-		std::list<std::string> parentJointName_;
-		std::list<Math::Matrix4x4> skeltonParents_;
+		std::unordered_map<std::string, std::unique_ptr<Math::Matrix4x4>> jointWorldCache_;
 
 		bool isAnimation_ = true;
 		bool isRoopAnimation_ = true;

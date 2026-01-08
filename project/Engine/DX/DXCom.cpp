@@ -34,7 +34,6 @@ void DXCom::Initialize(MyWin* myWin) {
 	CreateCompiler();
 	InitializeFPSKeeper();
 	SettingRootSignature();
-	SettingGraphicPipeline();
 
 	//SettingTexture();
 	//SettingImgui();
@@ -240,19 +239,6 @@ void DXCom::SettingRootSignature() {
 
 	pipeManager_->CreatePipeline();
 
-
-}
-
-void DXCom::SettingGraphicPipeline() {
-
-	/*for (uint32_t index = 0; index < instanceCount_; ++index)
-	{
-		particles_[index].transform.scale = { 1.0f,1.0f,1.0f };
-		particles_[index].transform.rotate = { 0.0f,0.0f,0.0f };
-		particles_[index].transform.translate = { index * 0.1f,index * 0.1f,index * 0.1f };
-
-		particles_[index].velocity = { 0.0f,1.0f,0.0f };
-	}*/
 
 }
 

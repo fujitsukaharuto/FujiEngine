@@ -26,6 +26,7 @@ AnimationModel::AnimationModel() {
 }
 
 AnimationModel::~AnimationModel() {
+	jointWorldCache_.clear();
 	dxcommon_ = nullptr;
 	lightManager_ = nullptr;
 }
@@ -398,12 +399,29 @@ Vector3 AnimationModel::GetWorldPos() const {
 }
 
 Matrix4x4* AnimationModel::GetJointTrans(const std::string& jointName) {
-	parentJointName_.push_back(jointName);
-	skeltonParents_.push_back(Matrix4x4::MakeIdentity4x4());
+	auto it = jointWorldCache_.find(jointName);
+	if (it == jointWorldCache_.end()) {
+		return nullptr;
+	}
+	return it->second.get();
+}
 
-	auto it = skeltonParents_.end();
-	--it;
-	return &(*it);
+Math::Vector3 Graphics::AnimationModel::GetJointWorldPos(const std::string& jointName) {
+	auto it = jointWorldCache_.find(jointName);
+	if (it == jointWorldCache_.end() || !it->second) {
+		return {};
+	}
+
+	const auto& m = *it->second;
+	return { m.m[3][0], m.m[3][1], m.m[3][2] };
+}
+
+void Graphics::AnimationModel::RegisterJointWorld(const std::string& jointName) {
+	// すでに登録済みなら何もしない
+	if (jointWorldCache_.contains(jointName)) {
+		return;
+	}
+	jointWorldCache_[jointName] = std::make_unique<Math::Matrix4x4>(Math::Matrix4x4::MakeIdentity4x4());
 }
 
 void AnimationModel::SkeletonUpdate() {
@@ -414,15 +432,11 @@ void AnimationModel::SkeletonUpdate() {
 		} else {
 			joint.skeletonSpaceMatrix = joint.loaclMatrix;
 		}
-		auto nameIt = parentJointName_.begin();
-		auto matIt = skeltonParents_.begin();
 
-		for (; nameIt != parentJointName_.end() && matIt != skeltonParents_.end(); ++nameIt, ++matIt) {
-			if (joint.name == *nameIt) {
-				*matIt = Multiply(joint.skeletonSpaceMatrix, GetWorldMat());
-			}
+		auto it = jointWorldCache_.find(joint.name);
+		if (it != jointWorldCache_.end()) {
+			*it->second = Multiply(joint.skeletonSpaceMatrix, GetWorldMat());
 		}
-
 	}
 }
 

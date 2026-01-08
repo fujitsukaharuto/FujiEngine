@@ -196,7 +196,6 @@ private:
 	void InitializeFPSKeeper();
 
 	void SettingRootSignature();
-	void SettingGraphicPipeline();
 
 	/// <summary>
 	/// swapchainのバリア
