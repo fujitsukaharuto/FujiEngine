@@ -3,6 +3,10 @@
 
 using namespace Audio;
 
+namespace WaveConst {
+	constexpr uint32_t kChunkIdSize = 4;
+	constexpr uint32_t kRiffFmtSizePCM = 16;
+}
 
 AudioPlayer::AudioPlayer() {
 }
@@ -21,15 +25,27 @@ void AudioPlayer::Initialize() {
 }
 
 void AudioPlayer::Finalize() {
+	for (auto& [name, sound] : container_) {
+		for (auto* voice : sound.pSourceVoices) {
+			if (voice) {
+				voice->Stop();
+				voice->FlushSourceBuffers();
+				voice->DestroyVoice();
+			}
+		}
+		sound.pSourceVoices.clear();
+		sound.buffer.clear();
+	}
+
+	container_.clear();
+
+	// MasterVoice
 	if (masterVoice_) {
 		masterVoice_->DestroyVoice();
 		masterVoice_ = nullptr;
 	}
 
-	if (container_.size() > 0) {
-		container_.clear();
-	}
-
+	// XAudio2
 	if (xAudio2_) {
 		xAudio2_.Reset();
 		xAudio2_ = nullptr;
@@ -49,10 +65,10 @@ void AudioPlayer::LoadWave(const char* filename) {
 	RiffHeader riff;
 	file.read(reinterpret_cast<char*>(&riff), sizeof(riff));
 
-	if (strncmp(riff.chunk.id, "RIFF", 4) != 0) {
+	if (strncmp(riff.chunk.id, "RIFF", WaveConst::kChunkIdSize) != 0) {
 		assert(0);
 	}
-	if (strncmp(riff.type, "WAVE", 4) != 0) {
+	if (strncmp(riff.type, "WAVE", WaveConst::kChunkIdSize) != 0) {
 		assert(0);
 	}
 
@@ -66,17 +82,17 @@ void AudioPlayer::LoadWave(const char* filename) {
 
 	while (file.read(reinterpret_cast<char*>(&chunk), sizeof(chunk))) {
 
-		if (strncmp(chunk.id, "fmt ", 4) == 0) {
-			assert(chunk.size >= 16);
-			file.read(reinterpret_cast<char*>(&format.fmt), 16);
+		if (strncmp(chunk.id, "fmt ", WaveConst::kChunkIdSize) == 0) {
+			assert(chunk.size >= WaveConst::kRiffFmtSizePCM);
+			file.read(reinterpret_cast<char*>(&format.fmt), WaveConst::kRiffFmtSizePCM);
 
 
-			if (chunk.size > 16) {
-				file.seekg(chunk.size - 16, std::ios_base::cur);
+			if (chunk.size > WaveConst::kRiffFmtSizePCM) {
+				file.seekg(chunk.size - WaveConst::kRiffFmtSizePCM, std::ios_base::cur);
 			}
 			formatFound = true;
 
-		} else if (strncmp(chunk.id, "data", 4) == 0) {
+		} else if (strncmp(chunk.id, "data", WaveConst::kChunkIdSize) == 0) {
 
 			soundData.buffer.resize(chunk.size);
 			file.read(reinterpret_cast<char*>(soundData.buffer.data()), chunk.size);
