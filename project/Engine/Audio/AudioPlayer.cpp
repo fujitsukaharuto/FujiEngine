@@ -47,7 +47,7 @@ void AudioPlayer::LoadWave(const char* filename) {
 	assert(file.is_open());
 
 	RiffHeader riff;
-	file.read((char*)&riff, sizeof(riff));
+	file.read(reinterpret_cast<char*>(&riff), sizeof(riff));
 
 	if (strncmp(riff.chunk.id, "RIFF", 4) != 0) {
 		assert(0);
@@ -56,35 +56,34 @@ void AudioPlayer::LoadWave(const char* filename) {
 		assert(0);
 	}
 
-	FormatChunk format = {};
-	ChunkHeader data;
+	FormatChunk format{};
+	ChunkHeader chunk{};
 
 	bool formatFound = false;
 	bool dataFound = false;
-	char* pBuffer = nullptr;
 
-	while (file.read((char*)&data, sizeof(data))) {
+	SoundData soundData{};
 
-		if (strncmp(data.id, "fmt ", 4) == 0) {
-			assert(data.size >= 16);
-			file.read((char*)&format.fmt, 16);
+	while (file.read(reinterpret_cast<char*>(&chunk), sizeof(chunk))) {
+
+		if (strncmp(chunk.id, "fmt ", 4) == 0) {
+			assert(chunk.size >= 16);
+			file.read(reinterpret_cast<char*>(&format.fmt), 16);
 
 
-			if (data.size > 16) {
-				BYTE* extraBytes = new BYTE[data.size - 16];
-				file.read((char*)extraBytes, data.size - 16);
-				delete[] extraBytes;
+			if (chunk.size > 16) {
+				file.seekg(chunk.size - 16, std::ios_base::cur);
 			}
 			formatFound = true;
 
-		} else if (strncmp(data.id, "data", 4) == 0) {
+		} else if (strncmp(chunk.id, "data", 4) == 0) {
 
-			pBuffer = new char[data.size];
-			file.read(pBuffer, data.size);
+			soundData.buffer.resize(chunk.size);
+			file.read(reinterpret_cast<char*>(soundData.buffer.data()), chunk.size);
 			dataFound = true;
 
 		} else {
-			file.seekg(data.size, std::ios_base::cur);
+			file.seekg(chunk.size, std::ios_base::cur);
 		}
 
 		if (formatFound && dataFound) {
@@ -95,12 +94,8 @@ void AudioPlayer::LoadWave(const char* filename) {
 	file.close();
 	assert(formatFound && dataFound);
 
-	SoundData soundData = {};
 	soundData.wfex = format.fmt;
-	soundData.pBuffer = reinterpret_cast<BYTE*>(pBuffer);
-	soundData.bufferSize = data.size;
-
-	container_.insert(std::make_pair(filename, soundData));
+	container_.insert(std::make_pair(filename, std::move(soundData)));
 }
 
 SoundData& AudioPlayer::SoundLoadWave(const char* filename) {
@@ -117,10 +112,10 @@ SoundData& AudioPlayer::SoundLoadWave(const char* filename) {
 }
 
 void AudioPlayer::SoundUnload(SoundData* soundData) {
-	delete[] soundData->pBuffer;
+	if (!soundData) return;
 
-	soundData->pBuffer = 0;
-	soundData->bufferSize = 0;
+	soundData->buffer.clear();
+	soundData->pSourceVoices.clear();
 	soundData->wfex = {};
 }
 
@@ -134,12 +129,12 @@ void AudioPlayer::SoundPlayWave(SoundData& soundData, float volume) {
 	assert(SUCCEEDED(result));
 
 	XAUDIO2_BUFFER buf{};
-	buf.pAudioData = soundData.pBuffer;
-	buf.AudioBytes = soundData.bufferSize;
+	buf.pAudioData = soundData.buffer.data();
+	buf.AudioBytes = buf.AudioBytes = static_cast<UINT32>(soundData.buffer.size());
 	buf.Flags = XAUDIO2_END_OF_STREAM;
 
-	result = pSourceVoice->SubmitSourceBuffer(&buf);
-	result = pSourceVoice->Start();
+	pSourceVoice->SubmitSourceBuffer(&buf);
+	pSourceVoice->Start();
 	soundData.pSourceVoices.push_back(pSourceVoice);
 }
 
@@ -153,8 +148,8 @@ void AudioPlayer::SoundLoop(SoundData& soundData, float volume) {
 	assert(SUCCEEDED(result));
 
 	XAUDIO2_BUFFER buf{};
-	buf.pAudioData = soundData.pBuffer;
-	buf.AudioBytes = soundData.bufferSize;
+	buf.pAudioData = soundData.buffer.data();
+	buf.AudioBytes = static_cast<UINT32>(soundData.buffer.size());
 	buf.Flags = XAUDIO2_END_OF_STREAM;
 	buf.LoopCount = XAUDIO2_LOOP_INFINITE; // ループする
 

@@ -54,7 +54,7 @@ void FollowCamera::Update(const Vector3& lockon) {
 	OffsetChangeCal();
 	Vector3 offset = OffsetCal();
 	camera->transform.translate = interTarget_ + offset;
-	camera->UpdateMaterix();
+	camera->UpdateMatrix();
 }
 
 void FollowCamera::ReStart(const Vector3& lockon) {
@@ -81,7 +81,7 @@ void FollowCamera::ReStart(const Vector3& lockon) {
 
 	Vector3 offset = OffsetCal();
 	camera->transform.translate = interTarget_ + offset;
-	camera->UpdateMaterix();
+	camera->UpdateMatrix();
 }
 
 void FollowCamera::CalDestinationAngle() {

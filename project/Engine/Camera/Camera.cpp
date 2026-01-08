@@ -57,7 +57,7 @@ void Camera::Update() {
 	viewProjectionMatrix_ = Multiply(viewMatrix_, projectionMatrix_);
 }
 
-void Camera::UpdateMaterix() {
+void Camera::UpdateMatrix() {
 	worldMatrix_ = MakeAffineMatrix(transform.scale, transform.rotate, (transform.translate + shakeGap_));
 	viewMatrix_ = Inverse(worldMatrix_);
 

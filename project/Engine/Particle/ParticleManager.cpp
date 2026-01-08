@@ -292,11 +292,11 @@ void ParticleManager::ParticleDebugGUI() {
 					ImGui::Spacing();
 
 					// Counts
-					int maxCount = static_cast<uint32_t>(selectParticleGroup_->insstanceCount_);
+					int maxCount = static_cast<uint32_t>(selectParticleGroup_->instanceCount_);
 					ImGui::Text("最大パーティクル数");
 					ImGui::SetNextItemWidth(-FLT_MIN);
 					if (ImGui::DragInt("##MaxCount", &maxCount, 10, 1, 10000)) {
-						selectParticleGroup_->insstanceCount_ = static_cast<uint32_t>(maxCount);
+						selectParticleGroup_->instanceCount_ = static_cast<uint32_t>(maxCount);
 					}
 
 					ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "生存数: %d", int(selectParticleGroup_->drawCount_));
@@ -677,10 +677,10 @@ void ParticleManager::InternalCreateParticleGroup(const std::string& name, const
 		newGroup->emitter_->name_ = name;
 		newGroup->emitter_->Load(name);
 
-		newGroup->insstanceCount_ = count;
-		uint32_t max = newGroup->insstanceCount_;
+		newGroup->instanceCount_ = count;
+		uint32_t max = newGroup->instanceCount_;
 		for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
-			newGroup->instancing_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), (sizeof(TransformationParticleMatrix) * newGroup->insstanceCount_));
+			newGroup->instancing_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), (sizeof(TransformationParticleMatrix) * newGroup->instanceCount_));
 			newGroup->instancing_[i]->Map(0, nullptr, reinterpret_cast<void**>(&newGroup->instancingDataGPU_[i]));
 			for (uint32_t index = 0; index < max; ++index) {
 				newGroup->instancingDataGPU_[i][index].WVP = MakeIdentity4x4();
@@ -691,7 +691,7 @@ void ParticleManager::InternalCreateParticleGroup(const std::string& name, const
 		newGroup->material_.CreateMaterial();
 		for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
 			newGroup->srvIndex_[i] = srvManager_->Allocate();
-			srvManager_->CreateStructuredSRV(newGroup->srvIndex_[i], newGroup->instancing_[i].Get(), newGroup->insstanceCount_, sizeof(TransformationParticleMatrix));
+			srvManager_->CreateStructuredSRV(newGroup->srvIndex_[i], newGroup->instancing_[i].Get(), newGroup->instanceCount_, sizeof(TransformationParticleMatrix));
 		}
 
 		//ここでパーティクルをあらかじめ作る
@@ -718,10 +718,10 @@ void ParticleManager::InternalCreateParticleGroup(const std::string& name, const
 		newGroup->emitter_.name_ = name;
 		newGroup->emitter_.Load(name);
 
-		newGroup->insstanceCount_ = count;
+		newGroup->instanceCount_ = count;
 		for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
 			newGroup->instancing_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(),
-				sizeof(TransformationParticleMatrix) * newGroup->insstanceCount_);
+				sizeof(TransformationParticleMatrix) * newGroup->instanceCount_);
 			newGroup->instancing_[i]->Map(0, nullptr, reinterpret_cast<void**>(&newGroup->instancingDataGPU_[i]));
 			for (uint32_t index = 0; index < count; ++index) {
 				newGroup->instancingDataGPU_[i][index].WVP = MakeIdentity4x4();
@@ -734,7 +734,7 @@ void ParticleManager::InternalCreateParticleGroup(const std::string& name, const
 		for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
 			newGroup->srvIndex_[i] = srvManager_->Allocate();
 			srvManager_->CreateStructuredSRV(newGroup->srvIndex_[i], newGroup->instancing_[i].Get(),
-				newGroup->insstanceCount_, sizeof(TransformationParticleMatrix));
+				newGroup->instanceCount_, sizeof(TransformationParticleMatrix));
 		}
 
 		// 仮の粒子を入れる（デバッグ用途）
@@ -1259,7 +1259,7 @@ void ParticleManager::SaveGroupData() {
 	json data{};
 	data["name"] = currentKey_;
 	data["texName"] = selectParticleGroup_->material_.GetPathName();
-	data["count"] = selectParticleGroup_->insstanceCount_;
+	data["count"] = selectParticleGroup_->instanceCount_;
 	data["Shape"] = static_cast<int>(selectParticleGroup_->shapeType_);
 	data["subMode"] = selectParticleGroup_->isSubMode_;
 	JsonSerializer::SerializeJsonData(data, ("resource/ParticleGroups/" + currentKey_ + ".json").c_str());

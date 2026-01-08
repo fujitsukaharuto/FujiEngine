@@ -24,7 +24,7 @@ public:
 	/// <summary>
 	/// 行列の更新
 	/// </summary>
-	void UpdateMaterix();
+	void UpdateMatrix();
 
 	/// <summary>
 	/// 視野角(Y)の設定

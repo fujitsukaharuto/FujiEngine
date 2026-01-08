@@ -211,7 +211,7 @@ void CommandManager::EditorObjGUI(EditorObj& obj) {
 				[this, &obj](const ImGuiPayload* payload) {
 					int receivedValue = *(const int*)payload->Data;
 					if (ParentCheck(obj.parent, receivedValue)) {
-						obj.childlen.push_back(receivedValue);
+						obj.children.push_back(receivedValue);
 						objectList[receivedValue]->parent = obj.id;
 						objectList[receivedValue]->obj->SetParent(&obj.obj->transform);
 					}
@@ -227,8 +227,8 @@ void CommandManager::EditorObjGUI(EditorObj& obj) {
 					}
 				});
 
-			if (obj.childlen.size() != 0) {
-				for (auto& child : obj.childlen) {
+			if (obj.children.size() != 0) {
+				for (auto& child : obj.children) {
 					if (objectList[child]) {
 						ImGui::Text(objectList[child]->name.c_str());
 					}
@@ -250,16 +250,16 @@ void CommandManager::EditorObjGUI(EditorObj& obj) {
 			ImGui::SameLine();
 			ImGuiManager::ImGuiDragButton(obj.dragButtonLabel.c_str(), &obj.id, sizeof(int), "MY_INT");
 		}
-		if (obj.childlen.size() != 0) {
+		if (obj.children.size() != 0) {
 			ImGui::Indent();
-			std::erase_if(obj.childlen, [&](int child) {
+			std::erase_if(obj.children, [&](int child) {
 				if (objectList[child]) {
 					return objectList[child]->parent != obj.id;
 				}
 				return false;
 				});
 
-			for (auto& child : obj.childlen) {
+			for (auto& child : obj.children) {
 				if (objectList[child]) {
 					if (objectList[child]->parent == obj.id) {
 						if (!objectList[child]->obj->IsHaveParent()) {
@@ -371,9 +371,9 @@ nlohmann::json CommandManager::ConvertObjToJson(EditorObj* obj) {
 	};
 
 	// 子供がいる場合は再帰的に追加
-	if (!obj->childlen.empty()) {
+	if (!obj->children.empty()) {
 		nlohmann::json childrenJson = nlohmann::json::array();
-		for (int32_t childId : obj->childlen) {
+		for (int32_t childId : obj->children) {
 			if (objectList.count(childId) > 0) {
 				EditorObj* childObj = objectList[childId].get();
 				childrenJson.push_back(ConvertObjToJson(childObj));  // 再帰呼び出し
@@ -486,7 +486,7 @@ void CommandManager::LoadObjRecursive(const nlohmann::json& objJson, int parentI
 	// 親子関係を構築
 	if (parentId != -1) {
 		objectList[newId]->parent = parentId;
-		objectList[parentId]->childlen.push_back(newId);
+		objectList[parentId]->children.push_back(newId);
 	}
 
 	if (objJson.contains("objectType")) {

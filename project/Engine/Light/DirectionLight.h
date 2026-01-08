@@ -51,7 +51,7 @@ private:
 private:
 
 	DXCom* dxcommon_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> drectionLightResource_[DXC::kFrameCount_];
+	Microsoft::WRL::ComPtr<ID3D12Resource> directionLightResource_[DXC::kFrameCount_];
 	DirectionalLight* directionLightDataGPU_[DXC::kFrameCount_];
 	DirectionalLight directionLightData_;
 

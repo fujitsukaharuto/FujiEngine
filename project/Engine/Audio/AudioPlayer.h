@@ -37,7 +37,7 @@ struct FormatChunk {
 struct SoundData {
 	WAVEFORMATEX wfex;
 	// バッファの先頭アドレス
-	BYTE* pBuffer;
+	std::vector<BYTE> buffer;
 	unsigned int bufferSize;
 	std::vector<IXAudio2SourceVoice*> pSourceVoices;
 };

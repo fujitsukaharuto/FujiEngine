@@ -152,10 +152,14 @@ void Boss::Initialize() {
 	jumpCSEmitIndex_ = ParticleManager::GetInstance()->InitGPUEmitter();
 	halfAuraCS_ = ParticleManager::GetInstance()->InitGPUEmitter();
 	halfSmallAuraCS_ = ParticleManager::GetInstance()->InitGPUEmitter();
+	leftHandAuraCS_ = ParticleManager::GetInstance()->InitGPUEmitter();
+	rightHandAuraCS_ = ParticleManager::GetInstance()->InitGPUEmitter();
 	ParticleManager::GetSphereEmitter(waveCSEmitIndex_).Load("shockWaveCS");
 	ParticleManager::GetSphereEmitter(jumpCSEmitIndex_).Load("jumpCSEmit");
 	ParticleManager::GetSphereEmitter(halfAuraCS_).Load("bossAura");
 	ParticleManager::GetSphereEmitter(halfSmallAuraCS_).Load("bossSmallAura");
+	ParticleManager::GetSphereEmitter(leftHandAuraCS_).Load("bossHandAura");
+	ParticleManager::GetSphereEmitter(rightHandAuraCS_).Load("bossHandAura");
 
 	waveAttack1.frequencyTime_ = 0.0f;
 	waveAttack2.frequencyTime_ = 0.0f;
@@ -280,6 +284,8 @@ void Boss::Update() {
 
 	ParticleManager::GetSphereEmitter(halfAuraCS_).SetPos({ animModel_->transform.translate.x,animModel_->transform.translate.y + params_.jump.height,animModel_->transform.translate.z });
 	ParticleManager::GetSphereEmitter(halfSmallAuraCS_).SetPos({ animModel_->transform.translate.x,animModel_->transform.translate.y + params_.jump.height,animModel_->transform.translate.z });
+	ParticleManager::GetSphereEmitter(leftHandAuraCS_).SetPos({ animModel_->transform.translate.x,animModel_->transform.translate.y + params_.jump.height,animModel_->transform.translate.z });
+	ParticleManager::GetSphereEmitter(rightHandAuraCS_).SetPos({ animModel_->transform.translate.x,animModel_->transform.translate.y + params_.jump.height,animModel_->transform.translate.z });
 	animModel_->AnimationUpdate();
 	shadow_->transform.translate = animModel_->transform.translate;
 	shadow_->transform.translate.y = 0.15f;
@@ -610,6 +616,8 @@ void Boss::ReduceBossHP(bool isStrong) {
 			isDying_ = true;
 			SetDefaultBehavior(true);
 			animModel_->ChangeAnimation("dying");
+			ParticleManager::GetSphereEmitter(halfAuraCS_).SetEmit(false);
+			ParticleManager::GetSphereEmitter(halfSmallAuraCS_).SetEmit(false);
 		}
 	}
 }

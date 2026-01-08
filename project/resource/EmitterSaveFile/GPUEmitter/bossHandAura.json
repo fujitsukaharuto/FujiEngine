@@ -1,0 +1,39 @@
+{
+    "baseVelocity": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "colorMax": [
+        1.0,
+        0.0,
+        0.4000000059604645
+    ],
+    "colorMin": [
+        1.0,
+        0.0,
+        0.0
+    ],
+    "emitCount": 2000,
+    "emitterScale": 0.5,
+    "emitterShape": 0,
+    "frequency": 0.00800000037997961,
+    "isDistance": 1,
+    "isGravity": 0,
+    "isTrailEmit": 0,
+    "lifeTime": 1.0,
+    "moveType": 2,
+    "particleScale": [
+        0.10000000149011612,
+        0.10000000149011612,
+        0.10000000149011612
+    ],
+    "translate": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "velRandMax": 4.0,
+    "velRandMin": 0.5,
+    "velType": 0
+}

@@ -21,7 +21,7 @@ public:
 	std::list<Particle> particles_;
 	uint32_t srvIndex_[DXC::kFrameCount_];
 	ComPtr<ID3D12Resource> instancing_[DXC::kFrameCount_];
-	uint32_t insstanceCount_;
+	uint32_t instanceCount_;
 	TransformationParticleMatrix* instancingDataGPU_[DXC::kFrameCount_];
 	uint32_t drawCount_;
 	ShapeType shapeType_ = ShapeType::PLANE;

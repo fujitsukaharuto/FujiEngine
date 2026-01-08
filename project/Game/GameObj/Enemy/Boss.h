@@ -348,6 +348,8 @@ private:
 
 	int halfAuraCS_ = 0;
 	int halfSmallAuraCS_ = 0;
+	int leftHandAuraCS_ = 0;
+	int rightHandAuraCS_ = 0;
 
 	SoundData* jumpAttackSE_;
 

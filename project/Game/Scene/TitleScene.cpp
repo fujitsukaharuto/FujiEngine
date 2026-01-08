@@ -100,6 +100,11 @@ void TitleScene::Initialize() {
 		csEmitterNums_.push_back(emitNum);
 	}
 
+	int emitNum = ParticleManager::GetInstance()->InitGPUEmitter();
+	auto& emitterCS = ParticleManager::GetSphereEmitter(emitNum);
+	emitterCS.Load("skyStar");
+	emitterCS.SetEmit(true);
+
 }
 
 void TitleScene::Update() {

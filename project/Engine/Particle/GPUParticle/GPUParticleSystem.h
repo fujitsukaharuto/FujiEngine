@@ -157,7 +157,7 @@ private:
 	int textureBasedEmitterIndex_ = 0;
 	int MeshSurefaceEmitterIndex_ = 0;
 
-	uint32_t numParticles = 10485760;
+	uint32_t numParticles = 20485760;
 	uint32_t threadsPerGroup = 1024;
 	int threadGroupSize_ = 1024;
 

@@ -29,7 +29,7 @@ struct EditorObj {
 	bool isActive = true;
 	std::string name;
 	std::string modelName;
-	std::vector<int> childlen;
+	std::vector<int> children;
 	int parent = -1;
 
 	std::string inputLabel;
@@ -43,7 +43,7 @@ struct EditorObj {
 struct LoadEditorObjData {
 	std::string name;
 	std::string modelName;
-	Math::Trans trnasform;
+	Math::Trans transform;
 	ObjectType objType;
 };
 

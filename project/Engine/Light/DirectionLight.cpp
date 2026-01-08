@@ -10,9 +10,9 @@ void DirectionLight::Initialize(DXCom* pDxcom) {
 	dxcommon_ = pDxcom;
 
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
-		drectionLightResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(DirectionalLight));
+		directionLightResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(DirectionalLight));
 		directionLightDataGPU_[i] = nullptr;
-		drectionLightResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&directionLightDataGPU_[i]));
+		directionLightResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&directionLightDataGPU_[i]));
 	}
 
 	directionLightData_.color = { 1.0f,1.0f,1.0f,1.0f };
@@ -26,7 +26,7 @@ void DirectionLight::Initialize(DXCom* pDxcom) {
 
 void DirectionLight::Finalize() {
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
-		drectionLightResource_[i].Reset();
+		directionLightResource_[i].Reset();
 	}
 }
 
@@ -36,7 +36,7 @@ void DirectionLight::SetLightCommand(ID3D12GraphicsCommandList* commandList) {
 		CopyData(frameIndex);
 		isOnceCopy_ = false;
 	}
-	commandList->SetGraphicsRootConstantBufferView(3, drectionLightResource_[frameIndex]->GetGPUVirtualAddress());
+	commandList->SetGraphicsRootConstantBufferView(3, directionLightResource_[frameIndex]->GetGPUVirtualAddress());
 }
 
 void DirectionLight::SetLightColor(const Vector4& color) {
