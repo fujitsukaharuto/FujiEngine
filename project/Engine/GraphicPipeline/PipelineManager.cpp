@@ -54,251 +54,91 @@ void PipelineManager::Finalize() {
 	for (auto& pipe : pipelines_) {
 		pipe.reset();
 	}
-	pipelines_.clear();
 	dxcommon_ = nullptr;
 }
 
 void PipelineManager::CreatePipeline() {
 
-	//----------------
-	// ここどうにかしたい
-	//----------------
+	CreatePipe<NonePipeline>(Pipe::None);
+	CreatePipe<Pipeline>(Pipe::Normal);
 
-	std::unique_ptr<Pipeline> pipeline = nullptr;
-	std::unique_ptr<Pipeline> pipelineAdd = nullptr;
-	std::unique_ptr<PipelineNode> pipelineNode = nullptr;
-	std::unique_ptr<PipelineNode> pipelineNodeAdd = nullptr;
-	std::unique_ptr<SpritePipe> spritePipe = nullptr;
-	std::unique_ptr<Line3dPipe> lLine = nullptr;
-	std::unique_ptr<ParticlePipeline> particlePipline = nullptr;
-	std::unique_ptr<ParticlePipeline> particlePiplineAlpha = nullptr;
-	std::unique_ptr<ParticlePipeline> particlePiplineSub = nullptr;
-	std::unique_ptr<ParticlePipeline> particlePiplineScr = nullptr;
-	std::unique_ptr<ParticlePipeline> particlePiplineMul = nullptr;
-	std::unique_ptr<ParticlePipeline> particlePiplineSoftAdd = nullptr;
-	std::unique_ptr<ParticlePipeline> particlePiplinePreMulAlpha = nullptr;
-	std::unique_ptr<ParticleCSPipe> particleCSPipe = nullptr;
-	std::unique_ptr<AnimationPipeline> animationPipline = nullptr;
-	std::unique_ptr<SkyboxPipe> skyboxPipline = nullptr;
-	std::unique_ptr<MetaBallPipeline> metaballPipeline = nullptr;
-	std::unique_ptr<NonePipeline> nonePipeline = nullptr;
-	std::unique_ptr<ShockWavePipe> shockWave = nullptr;
-	std::unique_ptr<FirePipe> firePipe = nullptr;
-	std::unique_ptr<ThunderPipe> thunderPipe = nullptr;
-	std::unique_ptr<CRTPipe> crtPipe = nullptr;
-	std::unique_ptr<GrayCSPipe> grayCS = nullptr;
-	std::unique_ptr<GaussCSPipe> gaussCS = nullptr;
-	std::unique_ptr<BoxFilterCSPipe> boxCS = nullptr;
-	std::unique_ptr<RadialBlurCSPipe> radialCS = nullptr;
-	std::unique_ptr<VignetteCSPipe> vignetteCS = nullptr;
-	std::unique_ptr<CRTCSPipe> crtCS = nullptr;
-	std::unique_ptr<RetroTVCSPipe> retroCS = nullptr;
-	std::unique_ptr<OutlineCSPipe> outlineCS = nullptr;
-	std::unique_ptr<LuminanceOutlineCSPipe> luminanceOutCS = nullptr;
-	std::unique_ptr<BloomCSPipe> bloomCS = nullptr;
-	std::unique_ptr<RandomCSPipe> randomCS = nullptr;
-	std::unique_ptr<SkinningCSPipe> skinningCS = nullptr;
-	std::unique_ptr<InitParticleCSPipe> initParticleCS = nullptr;
-	std::unique_ptr<EmitterParticleCSPipe> emitParticleCS = nullptr;
-	std::unique_ptr<EmitterTexParticleCSPipe> emitTexParticleCS = nullptr;
-	std::unique_ptr<EmitterSurfaceParticleCSPipe> emitSurfaceParticleCS = nullptr;
-	std::unique_ptr<UpdateParticleCSPipe> updateParticleCS = nullptr;
-	std::unique_ptr<InitArgsCSPipe> initArgsCS = nullptr;
-	std::unique_ptr<AliveCountCSPipe> aliveCountCS = nullptr;
+	CreatePipe<Pipeline>(Pipe::NormalAdd, [](Pipeline& p) {
+		p.SetIsAddMode(true);
+		});
 
 
-
-	nonePipeline.reset(new NonePipeline());
-	nonePipeline->Initialize(dxcommon_);
-	pipelines_.push_back(std::move(nonePipeline));
-
-
-	pipeline.reset(new Pipeline());
-	pipeline->Initialize(dxcommon_);
-	pipelines_.push_back(std::move(pipeline));
+	CreatePipe<PipelineNode>(Pipe::NormalNode);
+	CreatePipe<PipelineNode>(Pipe::NormalNodeAdd, [](PipelineNode& p) {
+		p.SetIsAddMode(true);
+		});
 
 
-	pipelineAdd.reset(new Pipeline());
-	pipelineAdd->SetIsAddMode(true);
-	pipelineAdd->Initialize(dxcommon_);
-	pipelines_.push_back(std::move(pipelineAdd));
+	CreatePipe<SpritePipe>(Pipe::Sprite);
+	CreatePipe<Line3dPipe>(Pipe::Line3d);
 
 
-	pipelineNode.reset(new PipelineNode());
-	pipelineNode->Initialize(dxcommon_);
-	pipelines_.push_back(std::move(pipelineNode));
+	CreatePipe<ParticlePipeline>(Pipe::Particle);
+	CreatePipe<ParticlePipeline>(Pipe::ParticleAlpha, [](auto& p) {
+		p.SetBlendType(BlendType::ALPHA);
+		});
+	CreatePipe<ParticlePipeline>(Pipe::ParticleSub, [](auto& p) {
+		p.SetBlendType(BlendType::SUBTRACT);
+		});
+	CreatePipe<ParticlePipeline>(Pipe::ParticleScreen, [](auto& p) {
+		p.SetBlendType(BlendType::SCREEN);
+		});
+	CreatePipe<ParticlePipeline>(Pipe::ParticleMultiply, [](auto& p) {
+		p.SetBlendType(BlendType::MULTIPLY);
+		});
+	CreatePipe<ParticlePipeline>(Pipe::ParticleSoftAdd, [](auto& p) {
+		p.SetBlendType(BlendType::SOFT_ADD);
+		});
+	CreatePipe<ParticlePipeline>(Pipe::ParticlePreMulAlpha, [](auto& p) {
+		p.SetBlendType(BlendType::PREMULTIPLIED_ALPHA);
+		});
 
 
-	pipelineNodeAdd.reset(new PipelineNode());
-	pipelineNodeAdd->SetIsAddMode(true);
-	pipelineNodeAdd->Initialize(dxcommon_);
-	pipelines_.push_back(std::move(pipelineNodeAdd));
+	CreatePipe<ParticleCSPipe>(Pipe::ParticleCS);
+	CreatePipe<AnimationPipeline>(Pipe::Animation);
+	CreatePipe<SkyboxPipe>(Pipe::Skybox);
+	CreatePipe<MetaBallPipeline>(Pipe::MetaBall);
+	CreatePipe<ShockWavePipe>(Pipe::ShockWave);
+	CreatePipe<FirePipe>(Pipe::Fire);
+	CreatePipe<ThunderPipe>(Pipe::Thunder);
+	CreatePipe<CRTPipe>(Pipe::CRT);
 
+	CreatePipe<GrayCSPipe>(Pipe::GrayCS);
+	CreatePipe<GaussCSPipe>(Pipe::GaussCS);
+	CreatePipe<BoxFilterCSPipe>(Pipe::BoxFilterCS);
+	CreatePipe<RadialBlurCSPipe>(Pipe::RadialCS);
+	CreatePipe<VignetteCSPipe>(Pipe::VignetteCS);
+	CreatePipe<CRTCSPipe>(Pipe::CRTCS);
+	CreatePipe<RetroTVCSPipe>(Pipe::RetroTVCS);
+	CreatePipe<OutlineCSPipe>(Pipe::OutlineCS);
+	CreatePipe<LuminanceOutlineCSPipe>(Pipe::LuminanceOutlineCS);
+	CreatePipe<BloomCSPipe>(Pipe::BloomCS);
+	CreatePipe<RandomCSPipe>(Pipe::RandomCS);
+	CreatePipe<SkinningCSPipe>(Pipe::SkinningCS);
 
-	spritePipe.reset(new SpritePipe());
-	spritePipe->Initialize(dxcommon_);
-	pipelines_.push_back(std::move(spritePipe));
-
-
-	lLine.reset(new Line3dPipe());
-	lLine->Initialize(dxcommon_);
-	pipelines_.push_back(std::move(lLine));
-
-
-	particlePipline.reset(new ParticlePipeline());
-	particlePipline->Initialize(dxcommon_);
-	pipelines_.push_back(std::move(particlePipline));
-
-	particlePiplineAlpha.reset(new ParticlePipeline());
-	particlePiplineAlpha->SetBlendType(BlendType::ALPHA);
-	particlePiplineAlpha->Initialize(dxcommon_);
-	pipelines_.push_back(std::move(particlePiplineAlpha));
-
-	particlePiplineSub.reset(new ParticlePipeline());
-	particlePiplineSub->SetBlendType(BlendType::SUBTRACT);
-	particlePiplineSub->Initialize(dxcommon_);
-	pipelines_.push_back(std::move(particlePiplineSub));
-
-	particlePiplineScr.reset(new ParticlePipeline());
-	particlePiplineScr->SetBlendType(BlendType::SCREEN);
-	particlePiplineScr->Initialize(dxcommon_);
-	pipelines_.push_back(std::move(particlePiplineScr));
-
-	particlePiplineMul.reset(new ParticlePipeline());
-	particlePiplineMul->SetBlendType(BlendType::MULTIPLY);
-	particlePiplineMul->Initialize(dxcommon_);
-	pipelines_.push_back(std::move(particlePiplineMul));
-
-	particlePiplineSoftAdd.reset(new ParticlePipeline());
-	particlePiplineSoftAdd->SetBlendType(BlendType::SOFT_ADD);
-	particlePiplineSoftAdd->Initialize(dxcommon_);
-	pipelines_.push_back(std::move(particlePiplineSoftAdd));
-
-	particlePiplinePreMulAlpha.reset(new ParticlePipeline());
-	particlePiplinePreMulAlpha->SetBlendType(BlendType::PREMULTIPLIED_ALPHA);
-	particlePiplinePreMulAlpha->Initialize(dxcommon_);
-	pipelines_.push_back(std::move(particlePiplinePreMulAlpha));
-
-
-	particleCSPipe.reset(new ParticleCSPipe());
-	particleCSPipe->Initialize(dxcommon_);
-	pipelines_.push_back(std::move(particleCSPipe));
-
-	animationPipline.reset(new AnimationPipeline());
-	animationPipline->Initialize(dxcommon_);
-	pipelines_.push_back(std::move(animationPipline));
-
-
-	skyboxPipline.reset(new SkyboxPipe());
-	skyboxPipline->Initialize(dxcommon_);
-	pipelines_.push_back(std::move(skyboxPipline));
-
-
-	metaballPipeline.reset(new MetaBallPipeline());
-	metaballPipeline->Initialize(dxcommon_);
-	pipelines_.push_back(std::move(metaballPipeline));
-
-
-	shockWave.reset(new ShockWavePipe);
-	shockWave->Initialize(dxcommon_);
-	pipelines_.push_back(std::move(shockWave));
-
-	firePipe.reset(new FirePipe);
-	firePipe->Initialize(dxcommon_);
-	pipelines_.push_back(std::move(firePipe));
-
-
-	thunderPipe.reset(new ThunderPipe);
-	thunderPipe->Initialize(dxcommon_);
-	pipelines_.push_back(std::move(thunderPipe));
-
-	crtPipe.reset(new CRTPipe);
-	crtPipe->Initialize(dxcommon_);
-	pipelines_.push_back(std::move(crtPipe));
-
-	grayCS.reset(new GrayCSPipe);
-	grayCS->Initialize(dxcommon_);
-	pipelines_.push_back(std::move(grayCS));
-
-	gaussCS.reset(new GaussCSPipe);
-	gaussCS->Initialize(dxcommon_);
-	pipelines_.push_back(std::move(gaussCS));
-
-	boxCS.reset(new BoxFilterCSPipe);
-	boxCS->Initialize(dxcommon_);
-	pipelines_.push_back(std::move(boxCS));
-
-	radialCS.reset(new RadialBlurCSPipe);
-	radialCS->Initialize(dxcommon_);
-	pipelines_.push_back(std::move(radialCS));
-
-	vignetteCS.reset(new VignetteCSPipe);
-	vignetteCS->Initialize(dxcommon_);
-	pipelines_.push_back(std::move(vignetteCS));
-
-	crtCS.reset(new CRTCSPipe);
-	crtCS->Initialize(dxcommon_);
-	pipelines_.push_back(std::move(crtCS));
-
-	retroCS.reset(new RetroTVCSPipe);
-	retroCS->Initialize(dxcommon_);
-	pipelines_.push_back(std::move(retroCS));
-
-	outlineCS.reset(new OutlineCSPipe);
-	outlineCS->Initialize(dxcommon_);
-	pipelines_.push_back(std::move(outlineCS));
-
-	luminanceOutCS.reset(new LuminanceOutlineCSPipe);
-	luminanceOutCS->Initialize(dxcommon_);
-	pipelines_.push_back(std::move(luminanceOutCS));
-
-	bloomCS.reset(new BloomCSPipe);
-	bloomCS->Initialize(dxcommon_);
-	pipelines_.push_back(std::move(bloomCS));
-
-	randomCS.reset(new RandomCSPipe);
-	randomCS->Initialize(dxcommon_);
-	pipelines_.push_back(std::move(randomCS));
-
-	skinningCS.reset(new SkinningCSPipe);
-	skinningCS->Initialize(dxcommon_);
-	pipelines_.push_back(std::move(skinningCS));
-
-	initParticleCS.reset(new InitParticleCSPipe);
-	initParticleCS->Initialize(dxcommon_);
-	pipelines_.push_back(std::move(initParticleCS));
-
-	emitParticleCS.reset(new EmitterParticleCSPipe);
-	emitParticleCS->Initialize(dxcommon_);
-	pipelines_.push_back(std::move(emitParticleCS));
-
-	emitTexParticleCS.reset(new EmitterTexParticleCSPipe);
-	emitTexParticleCS->Initialize(dxcommon_);
-	pipelines_.push_back(std::move(emitTexParticleCS));
-
-	emitSurfaceParticleCS.reset(new EmitterSurfaceParticleCSPipe);
-	emitSurfaceParticleCS->Initialize(dxcommon_);
-	pipelines_.push_back(std::move(emitSurfaceParticleCS));
-
-	updateParticleCS.reset(new UpdateParticleCSPipe);
-	updateParticleCS->Initialize(dxcommon_);
-	pipelines_.push_back(std::move(updateParticleCS));
-
-	initArgsCS.reset(new InitArgsCSPipe);
-	initArgsCS->Initialize(dxcommon_);
-	pipelines_.push_back(std::move(initArgsCS));
-
-	aliveCountCS.reset(new AliveCountCSPipe);
-	aliveCountCS->Initialize(dxcommon_);
-	pipelines_.push_back(std::move(aliveCountCS));
+	CreatePipe<InitParticleCSPipe>(Pipe::InitParticleCS);
+	CreatePipe<EmitterParticleCSPipe>(Pipe::EmitParticleCS);
+	CreatePipe<EmitterTexParticleCSPipe>(Pipe::EmitTexParticleCS);
+	CreatePipe<EmitterSurfaceParticleCSPipe>(Pipe::EmitSurfaceParticleCS);
+	CreatePipe<UpdateParticleCSPipe>(Pipe::UpdateParticleCS);
+	CreatePipe<InitArgsCSPipe>(Pipe::InitArgsCS);
+	CreatePipe<AliveCountCSPipe>(Pipe::AliveCountCS);
 }
 
 void PipelineManager::SetPipeline(Pipe type) {
-	pipelines_[static_cast<int>(type)]->SetPipelineState();
+	auto& pipe = pipelines_[static_cast<size_t>(type)];
+	assert(pipe);
+	pipe->SetPipelineState();
 }
 
 void PipelineManager::SetCSPipeline(Pipe type, uint32_t index) {
-	pipelines_[static_cast<int>(type)]->SetPipelineCSState(index);
+	auto& pipe = pipelines_[static_cast<size_t>(type)];
+	assert(pipe);
+	pipe->SetPipelineCSState(index);
 }
 
 ID3D12RootSignature* Graphics::PipelineManager::GetRootSignature(Pipe type) {

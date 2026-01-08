@@ -404,7 +404,7 @@ void GPUParticleSystem::DrawParticleCS(const D3D12_VERTEX_BUFFER_VIEW& vbView, c
 	dxcommon_->InsertUAVBarrier(aliveDrawArgs_.Get());
 
 	dxcommon_->GetDXCommand()->SetViewAndscissor();
-	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::particleCS);
+	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::ParticleCS);
 	dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vbView);
 	dxcommon_->GetCommandList()->IASetIndexBuffer(&ibView);

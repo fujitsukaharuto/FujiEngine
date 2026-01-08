@@ -2,8 +2,8 @@
 #include "BasePipeline.h"
 #include "PipeKind.h"
 #include <memory>
-#include <vector>
-
+#include <array>
+#include <functional>
 
 class DXCom;
 
@@ -42,12 +42,35 @@ namespace Graphics {
 
 	private:
 
+		template<class T>
+		void CreatePipe(Pipe type);
+
+		template<class T>
+		void CreatePipe(Pipe type, std::function<void(T&)> setup);
 
 	private:
 
 		DXCom* dxcommon_;
-		std::vector<std::unique_ptr<BasePipeline>> pipelines_;
-
+		std::array<std::unique_ptr<BasePipeline>, static_cast<size_t>(Pipe::Count)> pipelines_;
 
 	};
+
+
+	template<class T>
+	void PipelineManager::CreatePipe(Pipe type) {
+		auto pipe = std::make_unique<T>();
+		pipe->Initialize(dxcommon_);
+		pipelines_[static_cast<size_t>(type)] = std::move(pipe);
+	}
+
+	template<class T>
+	void PipelineManager::CreatePipe(
+		Pipe type,
+		std::function<void(T&)> setup
+	) {
+		auto pipe = std::make_unique<T>();
+		setup(*pipe);
+		pipe->Initialize(dxcommon_);
+		pipelines_[static_cast<size_t>(type)] = std::move(pipe);
+	}
 }

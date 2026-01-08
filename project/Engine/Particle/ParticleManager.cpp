@@ -119,7 +119,7 @@ void ParticleManager::Draw() {
 	}
 
 	dxcommon_->GetDXCommand()->SetViewAndscissor();
-	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::particle);
+	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Particle);
 	preType_ = BlendType::ADD;
 	dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vbView);
@@ -822,28 +822,28 @@ void ParticleManager::DrawParticleGroup() {
 		if (preType_ != group->type_) {
 			switch (group->type_) {
 			case BlendType::ALPHA:
-				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::particleAlpha);
+				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::ParticleAlpha);
 				break;
 			case BlendType::ADD:
-				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::particle);
+				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Particle);
 				break;
 			case BlendType::SUBTRACT:
-				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::particleSub);
+				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::ParticleSub);
 				break;
 			case BlendType::SCREEN:
-				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::particleScreen);
+				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::ParticleScreen);
 				break;
 			case BlendType::MULTIPLY:
-				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::particleMultiply);
+				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::ParticleMultiply);
 				break;
 			case BlendType::SOFT_ADD:
-				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::particleSoftAdd);
+				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::ParticleSoftAdd);
 				break;
 			case BlendType::PREMULTIPLIED_ALPHA:
-				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::particlePreMulAlpha);
+				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::ParticlePreMulAlpha);
 				break;
 			default:
-				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::particle);
+				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Particle);
 				break;
 			}
 		}
@@ -865,25 +865,25 @@ void ParticleManager::DrawParticleGroup() {
 		if (preType_ != group->type_) {
 			switch (group->type_) {
 			case BlendType::ALPHA:
-				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::particleAlpha);
+				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::ParticleAlpha);
 				break;
 			case BlendType::ADD:
-				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::particle);
+				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Particle);
 				break;
 			case BlendType::SUBTRACT:
-				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::particleSub);
+				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::ParticleSub);
 				break;
 			case BlendType::SCREEN:
-				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::particleScreen);
+				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::ParticleScreen);
 				break;
 			case BlendType::MULTIPLY:
-				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::particleMultiply);
+				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::ParticleMultiply);
 				break;
 			case BlendType::SOFT_ADD:
-				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::particleSoftAdd);
+				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::ParticleSoftAdd);
 				break;
 			case BlendType::PREMULTIPLIED_ALPHA:
-				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::particlePreMulAlpha);
+				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::ParticlePreMulAlpha);
 				break;
 			default:
 				break;
