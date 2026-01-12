@@ -66,14 +66,14 @@ void ParticleManager::Finalize() {
 	}
 	animeGroups_.clear();
 
-	vBuffer_.Reset();
-	iBuffer_.Reset();
-	ringVBuffer_.Reset();
-	ringIBuffer_.Reset();
-	sphereVBuffer_.Reset();
-	sphereIBuffer_.Reset();
-	cylinderIBuffer_.Reset();
-	cylinderVBuffer_.Reset();
+	plane_.vBuffer.Reset();
+	plane_.iBuffer.Reset();
+	ring_.vBuffer.Reset();
+	ring_.iBuffer.Reset();
+	sphere_.vBuffer.Reset();
+	sphere_.iBuffer.Reset();
+	cylinder_.vBuffer.Reset();
+	cylinder_.iBuffer.Reset();
 	lightning_.reset();
 
 	gpuParticleSystem_->Finalize();
@@ -105,7 +105,7 @@ void ParticleManager::Update() {
 }
 
 void ParticleManager::Draw() {
-	gpuParticleSystem_->Draw(vbView, ibView);
+	gpuParticleSystem_->Draw(plane_.vbView, plane_.ibView);
 
 	dxcommon_->GetDXCommand()->SetViewAndscissor();
 	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Normal);
@@ -122,8 +122,8 @@ void ParticleManager::Draw() {
 	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Particle);
 	preType_ = BlendType::ADD;
 	dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vbView);
-	dxcommon_->GetCommandList()->IASetIndexBuffer(&ibView);
+	dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &plane_.vbView);
+	dxcommon_->GetCommandList()->IASetIndexBuffer(&plane_.ibView);
 	DrawParticleGroup();
 	DrawParentParticleGroup();
 }
@@ -886,8 +886,8 @@ void ParticleManager::DrawParticleGroup() {
 		lightning_->MeshDraw(&group->material_, group->drawCount_);
 
 		if (group->shapeType_ != ShapeType::PLANE) {
-			dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vbView);
-			dxcommon_->GetCommandList()->IASetIndexBuffer(&ibView);
+			dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &plane_.vbView);
+			dxcommon_->GetCommandList()->IASetIndexBuffer(&plane_.ibView);
 		}
 
 		preType_ = group->type_;
@@ -916,8 +916,8 @@ void ParticleManager::DrawParentParticleGroup() {
 		lightning_->MeshDraw(&group->material_, group->drawCount_);
 
 		if (group->shapeType_ != ShapeType::PLANE) {
-			dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vbView);
-			dxcommon_->GetCommandList()->IASetIndexBuffer(&ibView);
+			dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &plane_.vbView);
+			dxcommon_->GetCommandList()->IASetIndexBuffer(&plane_.ibView);
 		}
 	}
 }
@@ -928,18 +928,18 @@ void ParticleManager::ShapeTypeCommand(const ShapeType& type) {
 		case ShapeType::PLANE:
 			break;
 		case ShapeType::RING:
-			dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &ringVbView);
-			dxcommon_->GetCommandList()->IASetIndexBuffer(&ringIbView);
+			dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &ring_.vbView);
+			dxcommon_->GetCommandList()->IASetIndexBuffer(&ring_.ibView);
 			break;
 		case ShapeType::SPHERE:
-			dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &sphereVbView);
-			dxcommon_->GetCommandList()->IASetIndexBuffer(&sphereIbView);
+			dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &sphere_.vbView);
+			dxcommon_->GetCommandList()->IASetIndexBuffer(&sphere_.ibView);
 			break;
 		case ShapeType::TORUS:
 			break;
 		case ShapeType::CYLINDER:
-			dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &cylinderVbView);
-			dxcommon_->GetCommandList()->IASetIndexBuffer(&cylinderIbView);
+			dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &cylinder_.vbView);
+			dxcommon_->GetCommandList()->IASetIndexBuffer(&cylinder_.ibView);
 			break;
 		case ShapeType::CONE:
 			break;
@@ -956,18 +956,18 @@ void ParticleManager::ShapeTypeCommand(const ShapeType& type) {
 void ParticleManager::ShapeTypeDrawCommand(const ShapeType& type, uint32_t count) {
 	switch (type) {
 	case ShapeType::PLANE:
-		dxcommon_->GetCommandList()->DrawIndexedInstanced(static_cast<UINT>((index_.size())), count, 0, 0, 0);
+		dxcommon_->GetCommandList()->DrawIndexedInstanced(static_cast<UINT>((plane_.indices.size())), count, 0, 0, 0);
 		break;
 	case ShapeType::RING:
-		dxcommon_->GetCommandList()->DrawIndexedInstanced(static_cast<UINT>((ringIndex_.size())), count, 0, 0, 0);
+		dxcommon_->GetCommandList()->DrawIndexedInstanced(static_cast<UINT>((ring_.indices.size())), count, 0, 0, 0);
 		break;
 	case ShapeType::SPHERE:
-		dxcommon_->GetCommandList()->DrawIndexedInstanced(static_cast<UINT>((sphereIndex_.size())), count, 0, 0, 0);
+		dxcommon_->GetCommandList()->DrawIndexedInstanced(static_cast<UINT>((sphere_.indices.size())), count, 0, 0, 0);
 		break;
 	case ShapeType::TORUS:
 		break;
 	case ShapeType::CYLINDER:
-		dxcommon_->GetCommandList()->DrawIndexedInstanced(static_cast<UINT>((cylinderIndex_.size())), count, 0, 0, 0);
+		dxcommon_->GetCommandList()->DrawIndexedInstanced(static_cast<UINT>((cylinder_.indices.size())), count, 0, 0, 0);
 		break;
 	case ShapeType::CONE:
 		break;
@@ -980,43 +980,43 @@ void ParticleManager::ShapeTypeDrawCommand(const ShapeType& type, uint32_t count
 	}
 
 	if (type != ShapeType::PLANE) {
-		dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vbView);
-		dxcommon_->GetCommandList()->IASetIndexBuffer(&ibView);
+		dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &plane_.vbView);
+		dxcommon_->GetCommandList()->IASetIndexBuffer(&plane_.ibView);
 	}
 }
 
 void ParticleManager::InitPlaneVertex() {
-	vertex_.push_back({ {-1.0f,1.0f,0.0f,1.0f},{0.0f,0.0f},{0.0f,0.0f,-1.0f} });
-	vertex_.push_back({ {-1.0f,-1.0f,0.0f,1.0f},{0.0f,1.0f},{0.0f,0.0f,-1.0f} });
-	vertex_.push_back({ {1.0f,-1.0f,0.0f,1.0f},{1.0f,1.0f},{0.0f,0.0f,-1.0f} });
-	vertex_.push_back({ {1.0f,1.0f,0.0f,1.0f},{1.0f,0.0f},{0.0f,0.0f,-1.0f} });
+	plane_.vertices.push_back({ {-1.0f,1.0f,0.0f,1.0f},{0.0f,0.0f},{0.0f,0.0f,-1.0f} });
+	plane_.vertices.push_back({ {-1.0f,-1.0f,0.0f,1.0f},{0.0f,1.0f},{0.0f,0.0f,-1.0f} });
+	plane_.vertices.push_back({ {1.0f,-1.0f,0.0f,1.0f},{1.0f,1.0f},{0.0f,0.0f,-1.0f} });
+	plane_.vertices.push_back({ {1.0f,1.0f,0.0f,1.0f},{1.0f,0.0f},{0.0f,0.0f,-1.0f} });
 
-	index_.push_back(0);
-	index_.push_back(3);
-	index_.push_back(1);
+	plane_.indices.push_back(0);
+	plane_.indices.push_back(3);
+	plane_.indices.push_back(1);
 
-	index_.push_back(1);
-	index_.push_back(3);
-	index_.push_back(2);
+	plane_.indices.push_back(1);
+	plane_.indices.push_back(3);
+	plane_.indices.push_back(2);
 
-	vBuffer_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(VertexDate) * vertex_.size());
-	iBuffer_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(uint32_t) * index_.size());
+	plane_.vBuffer = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(VertexDate) * plane_.vertices.size());
+	plane_.iBuffer = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(uint32_t) * plane_.indices.size());
 
 	VertexDate* vData = nullptr;
-	vBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&vData));
-	std::memcpy(vData, vertex_.data(), sizeof(VertexDate) * vertex_.size());
+	plane_.vBuffer->Map(0, nullptr, reinterpret_cast<void**>(&vData));
+	std::memcpy(vData, plane_.vertices.data(), sizeof(VertexDate) * plane_.vertices.size());
 
-	vbView.BufferLocation = vBuffer_->GetGPUVirtualAddress();
-	vbView.SizeInBytes = static_cast<UINT>(sizeof(VertexDate) * vertex_.size());
-	vbView.StrideInBytes = static_cast<UINT>(sizeof(VertexDate));
+	plane_.vbView.BufferLocation = plane_.vBuffer->GetGPUVirtualAddress();
+	plane_.vbView.SizeInBytes = static_cast<UINT>(sizeof(VertexDate) * plane_.vertices.size());
+	plane_.vbView.StrideInBytes = static_cast<UINT>(sizeof(VertexDate));
 
 	uint32_t* iData = nullptr;
-	iBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&iData));
-	std::memcpy(iData, index_.data(), sizeof(uint32_t) * index_.size());
+	plane_.iBuffer->Map(0, nullptr, reinterpret_cast<void**>(&iData));
+	std::memcpy(iData, plane_.indices.data(), sizeof(uint32_t) * plane_.indices.size());
 
-	ibView.BufferLocation = iBuffer_->GetGPUVirtualAddress();
-	ibView.Format = DXGI_FORMAT_R32_UINT;
-	ibView.SizeInBytes = static_cast<UINT>(sizeof(uint32_t) * index_.size());
+	plane_.ibView.BufferLocation = plane_.iBuffer->GetGPUVirtualAddress();
+	plane_.ibView.Format = DXGI_FORMAT_R32_UINT;
+	plane_.ibView.SizeInBytes = static_cast<UINT>(sizeof(uint32_t) * plane_.indices.size());
 }
 
 void ParticleManager::InitRingVertex() {
@@ -1032,9 +1032,9 @@ void ParticleManager::InitRingVertex() {
 		float u = float(i) / float(kRingDivide);
 
 		// 外周
-		ringVertex_.push_back({ {-sinA * kOuterRadius, cosA * kOuterRadius, 0.0f, 1.0f}, {u, 0.0f}, {0,0,1} });
+		ring_.vertices.push_back({ {-sinA * kOuterRadius, cosA * kOuterRadius, 0.0f, 1.0f}, {u, 0.0f}, {0,0,1} });
 		// 内周
-		ringVertex_.push_back({ {-sinA * kInnerRadius, cosA * kInnerRadius, 0.0f, 1.0f}, {u, 1.0f}, {0,0,1} });
+		ring_.vertices.push_back({ {-sinA * kInnerRadius, cosA * kInnerRadius, 0.0f, 1.0f}, {u, 1.0f}, {0,0,1} });
 	}
 
 	// インデックス生成
@@ -1045,34 +1045,34 @@ void ParticleManager::InitRingVertex() {
 		uint32_t inner1 = outer0 + 3;
 
 		// 三角形1
-		ringIndex_.push_back(outer0);
-		ringIndex_.push_back(inner0);
-		ringIndex_.push_back(outer1);
+		ring_.indices.push_back(outer0);
+		ring_.indices.push_back(inner0);
+		ring_.indices.push_back(outer1);
 
 		// 三角形2
-		ringIndex_.push_back(outer1);
-		ringIndex_.push_back(inner0);
-		ringIndex_.push_back(inner1);
+		ring_.indices.push_back(outer1);
+		ring_.indices.push_back(inner0);
+		ring_.indices.push_back(inner1);
 	}
 
-	ringVBuffer_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(VertexDate) * ringVertex_.size());
-	ringIBuffer_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(uint32_t) * ringIndex_.size());
+	ring_.vBuffer = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(VertexDate) * ring_.vertices.size());
+	ring_.iBuffer = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(uint32_t) * ring_.indices.size());
 
 	VertexDate* vData = nullptr;
-	ringVBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&vData));
-	std::memcpy(vData, ringVertex_.data(), sizeof(VertexDate) * ringVertex_.size());
+	ring_.vBuffer->Map(0, nullptr, reinterpret_cast<void**>(&vData));
+	std::memcpy(vData, ring_.vertices.data(), sizeof(VertexDate) * ring_.vertices.size());
 
-	ringVbView.BufferLocation = ringVBuffer_->GetGPUVirtualAddress();
-	ringVbView.SizeInBytes = static_cast<UINT>(sizeof(VertexDate) * ringVertex_.size());
-	ringVbView.StrideInBytes = static_cast<UINT>(sizeof(VertexDate));
+	ring_.vbView.BufferLocation = ring_.vBuffer->GetGPUVirtualAddress();
+	ring_.vbView.SizeInBytes = static_cast<UINT>(sizeof(VertexDate) * ring_.vertices.size());
+	ring_.vbView.StrideInBytes = static_cast<UINT>(sizeof(VertexDate));
 
 	uint32_t* iData = nullptr;
-	ringIBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&iData));
-	std::memcpy(iData, ringIndex_.data(), sizeof(uint32_t) * ringIndex_.size());
+	ring_.iBuffer->Map(0, nullptr, reinterpret_cast<void**>(&iData));
+	std::memcpy(iData, ring_.indices.data(), sizeof(uint32_t) * ring_.indices.size());
 
-	ringIbView.BufferLocation = ringIBuffer_->GetGPUVirtualAddress();
-	ringIbView.Format = DXGI_FORMAT_R32_UINT;
-	ringIbView.SizeInBytes = static_cast<UINT>(sizeof(uint32_t) * ringIndex_.size());
+	ring_.ibView.BufferLocation = ring_.iBuffer->GetGPUVirtualAddress();
+	ring_.ibView.Format = DXGI_FORMAT_R32_UINT;
+	ring_.ibView.SizeInBytes = static_cast<UINT>(sizeof(uint32_t) * ring_.indices.size());
 }
 
 void ParticleManager::InitSphereVertex() {
@@ -1096,7 +1096,7 @@ void ParticleManager::InitSphereVertex() {
 			float y = sinf(lat);
 			float z = cosf(lat) * sinf(lon);
 
-			sphereVertex_.push_back({ {x, y, z, 1.0f},{u, v},{x, y, z} });
+			sphere_.vertices.push_back({ {x, y, z, 1.0f},{u, v},{x, y, z} });
 		}
 	}
 
@@ -1111,34 +1111,34 @@ void ParticleManager::InitSphereVertex() {
 			uint32_t v2 = row2 + lonIndex;
 			uint32_t v3 = row2 + lonIndex + 1;
 
-			sphereIndex_.push_back(v0);
-			sphereIndex_.push_back(v2);
-			sphereIndex_.push_back(v1);
+			sphere_.indices.push_back(v0);
+			sphere_.indices.push_back(v2);
+			sphere_.indices.push_back(v1);
 
-			sphereIndex_.push_back(v1);
-			sphereIndex_.push_back(v2);
-			sphereIndex_.push_back(v3);
+			sphere_.indices.push_back(v1);
+			sphere_.indices.push_back(v2);
+			sphere_.indices.push_back(v3);
 		}
 	}
 
-	sphereVBuffer_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(VertexDate) * sphereVertex_.size());
-	sphereIBuffer_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(uint32_t) * sphereIndex_.size());
+	sphere_.vBuffer = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(VertexDate) * sphere_.vertices.size());
+	sphere_.iBuffer = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(uint32_t) * sphere_.indices.size());
 
 	VertexDate* vData = nullptr;
-	sphereVBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&vData));
-	std::memcpy(vData, sphereVertex_.data(), sizeof(VertexDate) * sphereVertex_.size());
+	sphere_.vBuffer->Map(0, nullptr, reinterpret_cast<void**>(&vData));
+	std::memcpy(vData, sphere_.vertices.data(), sizeof(VertexDate) * sphere_.vertices.size());
 
-	sphereVbView.BufferLocation = sphereVBuffer_->GetGPUVirtualAddress();
-	sphereVbView.SizeInBytes = static_cast<UINT>(sizeof(VertexDate) * sphereVertex_.size());
-	sphereVbView.StrideInBytes = static_cast<UINT>(sizeof(VertexDate));
+	sphere_.vbView.BufferLocation = sphere_.vBuffer->GetGPUVirtualAddress();
+	sphere_.vbView.SizeInBytes = static_cast<UINT>(sizeof(VertexDate) * sphere_.vertices.size());
+	sphere_.vbView.StrideInBytes = static_cast<UINT>(sizeof(VertexDate));
 
 	uint32_t* iData = nullptr;
-	sphereIBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&iData));
-	std::memcpy(iData, sphereIndex_.data(), sizeof(uint32_t) * sphereIndex_.size());
+	sphere_.iBuffer->Map(0, nullptr, reinterpret_cast<void**>(&iData));
+	std::memcpy(iData, sphere_.indices.data(), sizeof(uint32_t) * sphere_.indices.size());
 
-	sphereIbView.BufferLocation = sphereIBuffer_->GetGPUVirtualAddress();
-	sphereIbView.Format = DXGI_FORMAT_R32_UINT;
-	sphereIbView.SizeInBytes = static_cast<UINT>(sizeof(uint32_t) * sphereIndex_.size());
+	sphere_.ibView.BufferLocation = sphere_.iBuffer->GetGPUVirtualAddress();
+	sphere_.ibView.Format = DXGI_FORMAT_R32_UINT;
+	sphere_.ibView.SizeInBytes = static_cast<UINT>(sizeof(uint32_t) * sphere_.indices.size());
 }
 
 void ParticleManager::InitCylinderVertex() {
@@ -1157,11 +1157,11 @@ void ParticleManager::InitCylinderVertex() {
 		// 下
 		Vector3 posBottom = { cosA * kBottomRadius, 0.0f, sinA * kBottomRadius };
 		Vector3 normal = { cosA, 0.0f, sinA };
-		cylinderVertex_.push_back({ {posBottom.x, posBottom.y, posBottom.z, 1.0f}, {u, 1.0f}, normal });
+		cylinder_.vertices.push_back({ {posBottom.x, posBottom.y, posBottom.z, 1.0f}, {u, 1.0f}, normal });
 
 		// 上
 		Vector3 posTop = { cosA * kTopRadius, kHeight, sinA * kTopRadius };
-		cylinderVertex_.push_back({ {posTop.x, posTop.y, posTop.z, 1.0f}, {u, 0.0f}, normal });
+		cylinder_.vertices.push_back({ {posTop.x, posTop.y, posTop.z, 1.0f}, {u, 0.0f}, normal });
 	}
 
 	// インデックス生成
@@ -1172,34 +1172,34 @@ void ParticleManager::InitCylinderVertex() {
 		uint32_t top1 = bottom0 + 3;
 
 		// 三角形1
-		cylinderIndex_.push_back(bottom0);
-		cylinderIndex_.push_back(top0);
-		cylinderIndex_.push_back(bottom1);
+		cylinder_.indices.push_back(bottom0);
+		cylinder_.indices.push_back(top0);
+		cylinder_.indices.push_back(bottom1);
 
 		// 三角形2
-		cylinderIndex_.push_back(bottom1);
-		cylinderIndex_.push_back(top0);
-		cylinderIndex_.push_back(top1);
+		cylinder_.indices.push_back(bottom1);
+		cylinder_.indices.push_back(top0);
+		cylinder_.indices.push_back(top1);
 	}
 
-	cylinderVBuffer_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(VertexDate) * cylinderVertex_.size());
-	cylinderIBuffer_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(uint32_t) * cylinderIndex_.size());
+	cylinder_.vBuffer = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(VertexDate) * cylinder_.vertices.size());
+	cylinder_.iBuffer = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(uint32_t) * cylinder_.indices.size());
 
 	VertexDate* vData = nullptr;
-	cylinderVBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&vData));
-	std::memcpy(vData, cylinderVertex_.data(), sizeof(VertexDate) * cylinderVertex_.size());
+	cylinder_.vBuffer->Map(0, nullptr, reinterpret_cast<void**>(&vData));
+	std::memcpy(vData, cylinder_.vertices.data(), sizeof(VertexDate) * cylinder_.vertices.size());
 
-	cylinderVbView.BufferLocation = cylinderVBuffer_->GetGPUVirtualAddress();
-	cylinderVbView.SizeInBytes = static_cast<UINT>(sizeof(VertexDate) * cylinderVertex_.size());
-	cylinderVbView.StrideInBytes = static_cast<UINT>(sizeof(VertexDate));
+	cylinder_.vbView.BufferLocation = cylinder_.vBuffer->GetGPUVirtualAddress();
+	cylinder_.vbView.SizeInBytes = static_cast<UINT>(sizeof(VertexDate) * cylinder_.vertices.size());
+	cylinder_.vbView.StrideInBytes = static_cast<UINT>(sizeof(VertexDate));
 
 	uint32_t* iData = nullptr;
-	cylinderIBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&iData));
-	std::memcpy(iData, cylinderIndex_.data(), sizeof(uint32_t) * cylinderIndex_.size());
+	cylinder_.iBuffer->Map(0, nullptr, reinterpret_cast<void**>(&iData));
+	std::memcpy(iData, cylinder_.indices.data(), sizeof(uint32_t) * cylinder_.indices.size());
 
-	cylinderIbView.BufferLocation = cylinderIBuffer_->GetGPUVirtualAddress();
-	cylinderIbView.Format = DXGI_FORMAT_R32_UINT;
-	cylinderIbView.SizeInBytes = static_cast<UINT>(sizeof(uint32_t) * cylinderIndex_.size());
+	cylinder_.ibView.BufferLocation = cylinder_.iBuffer->GetGPUVirtualAddress();
+	cylinder_.ibView.Format = DXGI_FORMAT_R32_UINT;
+	cylinder_.ibView.SizeInBytes = static_cast<UINT>(sizeof(uint32_t) * cylinder_.indices.size());
 }
 
 void ParticleManager::InitLighningVertex() {

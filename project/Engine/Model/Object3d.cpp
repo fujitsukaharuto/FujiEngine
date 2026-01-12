@@ -509,7 +509,7 @@ void Object3d::CreateNodeEditor(const std::string& filename) {
 	if (selectorNodeId_.Get() != 0) {
 		MyNode* selNode = nodeGraph_.FindNodeById(selectorNodeId_);
 		if (selNode) {
-			selNode->values[0] = Value(nowTextureName);
+			selNode->values[0] = NodeValue(nowTextureName);
 		}
 	}
 #endif // _DEBUG
@@ -541,7 +541,7 @@ void Object3d::SetTexture(const std::string& name) {
 	if (selectorNodeId_.Get() != 0) {
 		MyNode* selNode = nodeGraph_.FindNodeById(selectorNodeId_);
 		if (selNode) {
-			selNode->values[0] = Value(nowTextureName);
+			selNode->values[0] = NodeValue(nowTextureName);
 		}
 	}
 #endif // _DEBUG

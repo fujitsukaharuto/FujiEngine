@@ -47,7 +47,7 @@ void NodeGraph::Update(ax::NodeEditor::EditorContext* ctx) {
 }
 
 void NodeGraph::ValueUpdate(MyNode& node) {
-	std::vector<Value> inputValues;
+	std::vector<NodeValue> inputValues;
 
 	if (node.isUpdated) {
 		return;
@@ -57,7 +57,7 @@ void NodeGraph::ValueUpdate(MyNode& node) {
 			if (!input.isLinked) {
 				// 未接続ならNone値
 				if (input.pinType != PinType::Mateial) {
-					inputValues.push_back(Value());
+					inputValues.push_back(NodeValue());
 				} else {
 					node.child = nullptr;
 				}
@@ -82,12 +82,12 @@ void NodeGraph::ValueUpdate(MyNode& node) {
 				continue;
 			}
 
-			const Value* output = nullptr;
+			const NodeValue* output = nullptr;
 			for (int i = 0; i < srcNode->outputs.size(); i++) {
 				if (pLink->startPinId == srcNode->outputs[i].id) {
 					output = &srcNode->outputValue[i];
 					if (srcNode->addType == AddType::DeltaTime) { // AddNodeのAddTypeがDeltaTimeの時に通る
-						Value deltaValue = Value(FPSKeeper::DeltaTime());
+						NodeValue deltaValue = NodeValue(FPSKeeper::DeltaTime());
 						output = std::move(&deltaValue);
 					}
 				}
@@ -99,26 +99,26 @@ void NodeGraph::ValueUpdate(MyNode& node) {
 			if (output)
 				inputValues.push_back(*output);
 			else
-				inputValues.push_back(Value()); // 安全のためNone
+				inputValues.push_back(NodeValue()); // 安全のためNone
 			inputNum++;
 		}
 
 		node.outputValue.clear();
 		if (!inputValues.empty()) {
 			if (node.type == MyNode::NodeType::Material || node.type == MyNode::NodeType::SubMaterial) {
-				node.outputValue.push_back(inputValues[0].type != Value::Type::Texture ? node.values[0] : inputValues[0]);
-				node.outputValue.push_back(inputValues[1].type != Value::Type::Color ? node.values[1] : inputValues[1]);
-				node.outputValue.push_back(inputValues[2].type != Value::Type::Vector2 ? node.values[2] : inputValues[2]);
+				node.outputValue.push_back(inputValues[0].type != NodeValue::Type::Texture ? node.values[0] : inputValues[0]);
+				node.outputValue.push_back(inputValues[1].type != NodeValue::Type::Color ? node.values[1] : inputValues[1]);
+				node.outputValue.push_back(inputValues[2].type != NodeValue::Type::Vector2 ? node.values[2] : inputValues[2]);
 			}
 
 			if (node.type == MyNode::NodeType::Texture) {
-				node.outputValue.push_back(inputValues[0].type != Value::Type::Texture ? node.values[0] : inputValues[0]);
+				node.outputValue.push_back(inputValues[0].type != NodeValue::Type::Texture ? node.values[0] : inputValues[0]);
 			}
 
 			if (node.type == MyNode::NodeType::Vector2) {
-				Value out = node.values[0];
-				if (inputValues[0].type == Value::Type::Float) out.Get<Vector2>().x += inputValues[0].Get<float>();
-				if (inputValues[1].type == Value::Type::Float) out.Get<Vector2>().y += inputValues[1].Get<float>();
+				NodeValue out = node.values[0];
+				if (inputValues[0].type == NodeValue::Type::Float) out.Get<Vector2>().x += inputValues[0].Get<float>();
+				if (inputValues[1].type == NodeValue::Type::Float) out.Get<Vector2>().y += inputValues[1].Get<float>();
 				node.values[0] = out;
 				node.outputValue.push_back(out);
 			}
@@ -159,13 +159,13 @@ void NodeGraph::AddLink(const Link& link) {
 	links.push_back(link);
 }
 
-Value NodeGraph::EvaluateNode(const MyNode& node) {
+NodeValue NodeGraph::EvaluateNode(const MyNode& node) {
 	// すでに値が入っていればそれを返す（キャッシュ的な使い方）
-	if (node.result.type != Value::Type::None) {
+	if (node.result.type != NodeValue::Type::None) {
 		return node.result;
 	}
 
-	std::vector<Value> inputValues;
+	std::vector<NodeValue> inputValues;
 
 	for (const Pin& input : node.inputs) {
 		// 入力ピンに繋がっているリンクを探す
@@ -173,7 +173,7 @@ Value NodeGraph::EvaluateNode(const MyNode& node) {
 			if (link.endPinId == input.id) {
 				const MyNode* srcNode = FindNodeByPinId(link.startPinId);
 				if (srcNode) {
-					Value v = EvaluateNode(*srcNode);
+					NodeValue v = EvaluateNode(*srcNode);
 					inputValues.push_back(v);
 				}
 			}
@@ -259,40 +259,40 @@ json NodeGraph::SaveNodeData() {
 	return root;
 }
 
-json NodeGraph::SerializeValue(const Value& v) {
+json NodeGraph::SerializeValue(const NodeValue& v) {
 	json j;
 	switch (v.type) {
-	case Value::Type::None:
+	case NodeValue::Type::None:
 		j["type"] = "None";
 		j["value"] = nullptr;
 		break;
-	case Value::Type::Int:
+	case NodeValue::Type::Int:
 		j["type"] = "Int";
 		j["value"] = std::get<int>(v.data);
 		break;
-	case Value::Type::Float:
+	case NodeValue::Type::Float:
 		j["type"] = "Float";
 		j["value"] = std::get<float>(v.data);
 		break;
-	case Value::Type::Vector2: {
+	case NodeValue::Type::Vector2: {
 		const auto& vv = std::get<Vector2>(v.data);
 		j["type"] = "Vector2";
 		j["value"] = { vv.x, vv.y };
 		break;
 	}
-	case Value::Type::Vector3: {
+	case NodeValue::Type::Vector3: {
 		const auto& vv = std::get<Vector3>(v.data);
 		j["type"] = "Vector3";
 		j["value"] = { vv.x, vv.y, vv.z };
 		break;
 	}
-	case Value::Type::Color: {
+	case NodeValue::Type::Color: {
 		const auto& vv = std::get<Vector4>(v.data);
 		j["type"] = "Color";
 		j["value"] = { vv.x, vv.y, vv.z, vv.w };
 		break;
 	}
-	case Value::Type::Texture:
+	case NodeValue::Type::Texture:
 		j["type"] = "Texture";
 		j["value"] = std::get<std::string>(v.data);
 		break;
@@ -403,33 +403,33 @@ MyNode NodeGraph::DeserializeNode(const json& j) {
 	return node;
 }
 
-Value NodeGraph::DeserializeValue(const json& j) {
-	Value v;
+NodeValue NodeGraph::DeserializeValue(const json& j) {
+	NodeValue v;
 	std::string type = j.value("type", "None");
 
 	if (type == "Int") {
-		v.type = Value::Type::Int;
+		v.type = NodeValue::Type::Int;
 		v.data = j["value"].get<int>();
 	} else if (type == "Float") {
-		v.type = Value::Type::Float;
+		v.type = NodeValue::Type::Float;
 		v.data = j["value"].get<float>();
 	} else if (type == "Vector2") {
-		v.type = Value::Type::Vector2;
+		v.type = NodeValue::Type::Vector2;
 		auto arr = j["value"];
 		v.data = Vector2{ arr[0], arr[1] };
 	} else if (type == "Vector3") {
-		v.type = Value::Type::Vector3;
+		v.type = NodeValue::Type::Vector3;
 		auto arr = j["value"];
 		v.data = Vector3{ arr[0], arr[1], arr[2] };
 	} else if (type == "Color") {
-		v.type = Value::Type::Color;
+		v.type = NodeValue::Type::Color;
 		auto arr = j["value"];
 		v.data = Vector4{ arr[0], arr[1], arr[2], arr[3] };
 	} else if (type == "Texture") {
-		v.type = Value::Type::Texture;
+		v.type = NodeValue::Type::Texture;
 		v.data = j["value"].get<std::string>();
 	} else {
-		v.type = Value::Type::None;
+		v.type = NodeValue::Type::None;
 	}
 
 	return v;
@@ -458,9 +458,9 @@ void MyNode::CreateNode(NodeType nodeType) {
 		name = "Add";
 		type = MyNode::NodeType::Add;
 		outputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Output, PinType::Float });
-		values.push_back(Value(0.0f));
-		evaluator = [](const std::vector<Value>& inputs) {
-			return !inputs.empty() ? inputs[0] : Value();
+		values.push_back(NodeValue(0.0f));
+		evaluator = [](const std::vector<NodeValue>& inputs) {
+			return !inputs.empty() ? inputs[0] : NodeValue();
 			};
 		break;
 	case MyNode::NodeType::Material:
@@ -471,11 +471,11 @@ void MyNode::CreateNode(NodeType nodeType) {
 		inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input, PinType::Color });
 		inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input, PinType::Vector2 });
 		inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input, PinType::Mateial });
-		values.push_back(Value("white2x2.png"));
-		values.push_back(Value(Vector4(1.0f, 1.0f, 1.0f, 1.0f)));
-		values.push_back(Value(Vector2(0.0f, 0.0f)));
-		evaluator = [](const std::vector<Value>& inputs) {
-			return !inputs.empty() ? inputs[0] : Value();
+		values.push_back(NodeValue("white2x2.png"));
+		values.push_back(NodeValue(Vector4(1.0f, 1.0f, 1.0f, 1.0f)));
+		values.push_back(NodeValue(Vector2(0.0f, 0.0f)));
+		evaluator = [](const std::vector<NodeValue>& inputs) {
+			return !inputs.empty() ? inputs[0] : NodeValue();
 			};
 		break;
 	case MyNode::NodeType::SubMaterial:
@@ -487,11 +487,11 @@ void MyNode::CreateNode(NodeType nodeType) {
 		inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input, PinType::Vector2 });
 		inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input, PinType::Mateial });
 		outputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Output, PinType::Mateial });
-		values.push_back(Value("white2x2.png"));
-		values.push_back(Value(Vector4(1.0f, 1.0f, 1.0f, 1.0f)));
-		values.push_back(Value(Vector2(0.0f, 0.0f)));
-		evaluator = [](const std::vector<Value>& inputs) {
-			return !inputs.empty() ? inputs[0] : Value();
+		values.push_back(NodeValue("white2x2.png"));
+		values.push_back(NodeValue(Vector4(1.0f, 1.0f, 1.0f, 1.0f)));
+		values.push_back(NodeValue(Vector2(0.0f, 0.0f)));
+		evaluator = [](const std::vector<NodeValue>& inputs) {
+			return !inputs.empty() ? inputs[0] : NodeValue();
 			};
 		break;
 	case MyNode::NodeType::Color:
@@ -499,9 +499,9 @@ void MyNode::CreateNode(NodeType nodeType) {
 		name = "Color";
 		type = MyNode::NodeType::Color;
 		outputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Output, PinType::Color });
-		values.push_back(Value(Vector4(1.0f, 1.0f, 1.0f, 1.0f)));
-		evaluator = [](const std::vector<Value>& inputs) {
-			return !inputs.empty() ? inputs[0] : Value();
+		values.push_back(NodeValue(Vector4(1.0f, 1.0f, 1.0f, 1.0f)));
+		evaluator = [](const std::vector<NodeValue>& inputs) {
+			return !inputs.empty() ? inputs[0] : NodeValue();
 			};
 
 		break;
@@ -512,9 +512,9 @@ void MyNode::CreateNode(NodeType nodeType) {
 		inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input, PinType::Float });
 		inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input, PinType::Float });
 		outputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Output, PinType::Vector2 });
-		values.push_back(Value(Vector2(0.0f, 0.0f)));
-		evaluator = [](const std::vector<Value>& inputs) {
-			return !inputs.empty() ? inputs[0] : Value();
+		values.push_back(NodeValue(Vector2(0.0f, 0.0f)));
+		evaluator = [](const std::vector<NodeValue>& inputs) {
+			return !inputs.empty() ? inputs[0] : NodeValue();
 			};
 
 		break;

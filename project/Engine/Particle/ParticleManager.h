@@ -142,7 +142,11 @@ private:
 
 
 	// VertexData
-	ComPtr<ID3D12Resource> vBuffer_;
+	Graphics::Mesh::MeshBuffer plane_;
+	Graphics::Mesh::MeshBuffer ring_;
+	Graphics::Mesh::MeshBuffer sphere_;
+	Graphics::Mesh::MeshBuffer cylinder_;
+	/*ComPtr<ID3D12Resource> vBuffer_;
 	ComPtr<ID3D12Resource> iBuffer_;
 	D3D12_VERTEX_BUFFER_VIEW vbView{};
 	D3D12_INDEX_BUFFER_VIEW ibView{};
@@ -172,7 +176,7 @@ private:
 	D3D12_INDEX_BUFFER_VIEW cylinderIbView{};
 
 	std::vector<VertexDate> cylinderVertex_;
-	std::vector<uint32_t> cylinderIndex_;
+	std::vector<uint32_t> cylinderIndex_;*/
 
 	std::unique_ptr<Graphics::Object3d> lightning_;
 

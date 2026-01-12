@@ -513,7 +513,7 @@ void ImGuiManager::TextureSelectMenu(NodeGraph* nodeGraph) {
 			if (ImGui::MenuItem(pair.first.c_str())) {
 				MyNode node;
 				node.CreateNode(MyNode::NodeType::Texture);
-				node.values.push_back(Value(pair.first.c_str()));
+				node.values.push_back(NodeValue(pair.first.c_str()));
 				node.texName = pair.first.c_str();
 				nodeGraph->AddNode(node);
 			}

@@ -26,6 +26,17 @@ namespace Graphics {
 			Math::Vector3 normal; // 法線ベクトル
 		};
 
+		struct MeshBuffer {
+			Microsoft::WRL::ComPtr<ID3D12Resource> vBuffer;
+			Microsoft::WRL::ComPtr<ID3D12Resource> iBuffer;
+
+			D3D12_VERTEX_BUFFER_VIEW vbView{};
+			D3D12_INDEX_BUFFER_VIEW  ibView{};
+
+			std::vector<VertexData> vertices;
+			std::vector<uint32_t>   indices;
+		};
+
 	public:
 		Mesh();
 		~Mesh();

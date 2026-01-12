@@ -19,7 +19,7 @@ namespace ed = ax::NodeEditor;
 /// <summary>
 /// ノードが持つ値
 /// </summary>
-struct Value {
+struct NodeValue {
 
 	enum class Type { None, Int, Float, Vector2, Vector3, Color, Texture };
 
@@ -30,14 +30,14 @@ struct Value {
 	Type type = Type::None;
 
 	// コンストラクタ（型推論対応）
-	Value() : data(std::monostate{}), type(Type::None) {}
-	Value(int v) : data(v), type(Type::Int) {}
-	Value(float v) : data(v), type(Type::Float) {}
-	Value(const Math::Vector2& v) : data(v), type(Type::Vector2) {}
-	Value(const Math::Vector3& v) : data(v), type(Type::Vector3) {}
-	Value(const Math::Vector4& v) : data(v), type(Type::Color) {}
-	Value(const std::string& texName) : data(texName), type(Type::Texture) {}
-	Value(const char* texName) : data(std::string(texName)), type(Type::Texture) {}
+	NodeValue() : data(std::monostate{}), type(Type::None) {}
+	NodeValue(int v) : data(v), type(Type::Int) {}
+	NodeValue(float v) : data(v), type(Type::Float) {}
+	NodeValue(const Math::Vector2& v) : data(v), type(Type::Vector2) {}
+	NodeValue(const Math::Vector3& v) : data(v), type(Type::Vector3) {}
+	NodeValue(const Math::Vector4& v) : data(v), type(Type::Color) {}
+	NodeValue(const std::string& texName) : data(texName), type(Type::Texture) {}
+	NodeValue(const char* texName) : data(std::string(texName)), type(Type::Texture) {}
 
 	// ヘルパー関数
 	bool IsValid() const {
@@ -113,8 +113,8 @@ struct MyNode {
 	std::string name;
 	std::vector<Pin> inputs;
 	std::vector<Pin> outputs;
-	std::vector<Value> values;
-	std::vector<Value> outputValue;
+	std::vector<NodeValue> values;
+	std::vector<NodeValue> outputValue;
 
 	enum class NodeType {
 		Texture,
@@ -129,14 +129,14 @@ struct MyNode {
 
 	bool isUpdated = false;
 
-	Value result; // ← ★ これがノードの出力
+	NodeValue result; // ← ★ これがノードの出力
 
 	// NodeTypeによって必要になるもの
 	std::string texName;
 	AddType addType = AddType::Increment;
 
 	MyNode* child = nullptr;
-	std::function<Value(const std::vector<Value>&)> evaluator; // 入力 → 出力
+	std::function<NodeValue(const std::vector<NodeValue>&)> evaluator; // 入力 → 出力
 
 	void CreateNode(NodeType nodeType);
 };
@@ -175,7 +175,7 @@ namespace Core {
 		void AddLink(const Link& link);
 
 		/// <summary>指定ノードを評価して出力を得る（再帰的）</summary>
-		Value EvaluateNode(const MyNode& node);
+		NodeValue EvaluateNode(const MyNode& node);
 
 		/// <summary>ピンIDからノードを探す</summary>
 		MyNode* FindNodeByPinId(ed::PinId pinId);
@@ -198,7 +198,7 @@ namespace Core {
 		/// <summary>NodeDetaを出力</summary>
 		json SaveNodeData();
 		/// <summary>Valueを出力</summary>
-		json SerializeValue(const Value& v);
+		json SerializeValue(const NodeValue& v);
 		/// <summary>Nodeを出力</summary>
 		json SerializeNode(const MyNode& node);
 
@@ -207,7 +207,7 @@ namespace Core {
 		/// <summary>Nodeを読み込み</summary>
 		MyNode DeserializeNode(const json& j);
 		/// <summary>Valueを出力</summary>
-		Value DeserializeValue(const json& j);
+		NodeValue DeserializeValue(const json& j);
 
 	private:
 		ed::NodeId materialNodeId_;
