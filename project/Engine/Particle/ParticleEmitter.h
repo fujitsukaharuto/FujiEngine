@@ -5,6 +5,8 @@
 
 using json = nlohmann::json;
 
+class IParticleGroup;
+
 /// <summary>
 /// ランダムパラメーターのデータ
 /// </summary>
@@ -84,6 +86,7 @@ public:
 	/// <summary>アニメーションモデルにペアレントする設定</summary>
 	void SetAnimParent(Math::Matrix4x4* parent) { animParent_ = parent; }
 	void SetIsUpdatedMatrix(bool is) { isUpDatedMatrix_ = is; }
+	void SetGroup(IParticleGroup* group) { group_ = group; }
 	
 	//========================================================================*/
 	//* Getter
@@ -130,4 +133,6 @@ private:
 	Math::Matrix4x4* animParent_ = nullptr;
 
 	bool isUpDatedMatrix_ = false;
+
+	IParticleGroup* group_;
 };

@@ -3,6 +3,7 @@
 #include <map>
 #include "Particle.h"
 #include "ParticleEmitter.h"
+#include "ParticleGroup/IParticleGroup.h"
 #include "ParticleGroup/ParticleGroup.h"
 #include "ParticleGroup/ParentParticleGroup.h"
 #include "GPUParticle/GPUParticleSystem.h"
@@ -71,9 +72,9 @@ public:
 	static void LoadAllFileData();
 
 	/// <summary>パーティクルの発生</summary>
-	static void Emit(const std::string& name, const Math::Vector3& pos, const Math::Vector3& rotate, const Particle& grain, const RandomParametor& para, uint32_t count);
+	static void Emit(IParticleGroup* group, const Math::Vector3& pos, const Math::Vector3& rotate, const Particle& grain, const RandomParametor& para, uint32_t count);
 	/// <summary>ペアレントパーティクルの発生</summary>
-	static void ParentEmit(const std::string& name, const Math::Vector3& pos, const Math::Vector3& rotate, const Particle& grain, const RandomParametor& para, uint32_t count);
+	static void ParentEmit(IParticleGroup* group, const Math::Vector3& pos, const Math::Vector3& rotate, const Particle& grain, const RandomParametor& para, uint32_t count);
 	/// <summary>アニメーションパーティクルの発生</summary>
 	static void EmitAnime(const std::string& name, const Math::Vector3& pos, const AnimeData& data, const RandomParametor& para, uint32_t count);
 	/// <summary>アニメーションパーティクルの設定</summary>

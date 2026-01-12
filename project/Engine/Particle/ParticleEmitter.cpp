@@ -2,6 +2,7 @@
 #include "ParticleManager.h"
 #include "Math/Random/Random.h"
 #include "ImGuiManager.h"
+#include "ParticleGroup/IParticleGroup.h"
 #include "Model/Line3dDrawer.h"
 #include <iostream>
 #include <fstream>
@@ -394,9 +395,9 @@ void ParticleEmitter::Emit() {
 
 			if (!isDistanceComplement_) {
 				if (grain_.isParent_) {
-					ParticleManager::ParentEmit(name_, posAddSize, particleRotate_, grain_, para_, 1);
+					ParticleManager::ParentEmit(group_, posAddSize, particleRotate_, grain_, para_, 1);
 				} else {
-					ParticleManager::Emit(name_, posAddSize, particleRotate_, grain_, para_, 1);
+					ParticleManager::Emit(group_, posAddSize, particleRotate_, grain_, para_, 1);
 				}
 			}
 		}
@@ -408,10 +409,10 @@ void ParticleEmitter::Emit() {
 			for (int i = 0; i < emitCount; ++i) {
 				float t = (float)i / emitCount;
 				Vector3 emitPos = Lerp(previousWorldPos_, currentWorldPos_, t);
-				ParticleManager::Emit(name_, emitPos, particleRotate_, grain_, para_, 1);
+				ParticleManager::Emit(group_, emitPos, particleRotate_, grain_, para_, 1);
 			}
 			if (emitCount == 0) {
-				ParticleManager::Emit(name_, currentWorldPos_, particleRotate_, grain_, para_, 1);
+				ParticleManager::Emit(group_, currentWorldPos_, particleRotate_, grain_, para_, 1);
 			}
 		}
 
@@ -437,7 +438,7 @@ void ParticleEmitter::Burst() {
 			grain_.speed_ = (pos_ - posAddSize).Normalize() * grain_.returnPower_;
 		}
 
-		ParticleManager::Emit(name_, posAddSize, particleRotate_, grain_, para_, 1);
+		ParticleManager::Emit(group_, posAddSize, particleRotate_, grain_, para_, 1);
 	}
 }
 

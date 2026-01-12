@@ -446,6 +446,7 @@ void ParticleManager::Load(ParticleEmitter& emit, const std::string& name) {
 		emit.grain_.isBillBoard_          = group->emitter_.grain_.isBillBoard_;
 		emit.grain_.pattern_              = group->emitter_.grain_.pattern_;
 		emit.para_                        = group->emitter_.para_;
+		emit.SetGroup(group);
 	} else {
 		return;
 	}
@@ -459,6 +460,7 @@ void ParticleManager::LoadParentGroup(ParticleEmitter*& emit, const std::string&
 		ParentParticleGroup* group = iterator->second.get();
 		emit = group->emitter_.get();
 		emit->grain_.isParent_ = true;
+		emit->SetGroup(group);
 
 	} else {
 		return;
@@ -481,14 +483,9 @@ void ParticleManager::LoadAllFileData() {
 	}
 }
 
-void ParticleManager::Emit(const std::string& name, const Vector3& pos, const Vector3& rotate, const Particle& grain, const RandomParametor& para, uint32_t count) {
-	ParticleManager* instance = GetInstance();
-
-	auto iterator = instance->particleGroups_.find(name);
-	if (iterator != instance->particleGroups_.end()) {
+void ParticleManager::Emit(IParticleGroup* group, const Vector3& pos, const Vector3& rotate, const Particle& grain, const RandomParametor& para, uint32_t count) {
+	if (group) {
 		uint32_t newCount = 0;
-
-		ParticleGroup* group = iterator->second.get();
 		for (auto& particle : group->particles_) {
 
 			if (group->InitEmitParticle(particle, pos, rotate, grain, para)) {
@@ -503,14 +500,9 @@ void ParticleManager::Emit(const std::string& name, const Vector3& pos, const Ve
 	}
 }
 
-void ParticleManager::ParentEmit(const std::string& name, const Vector3& pos, const Vector3& rotate, const Particle& grain, const RandomParametor& para, uint32_t count) {
-	ParticleManager* instance = GetInstance();
-
-	auto iterator = instance->parentParticleGroups_.find(name);
-	if (iterator != instance->parentParticleGroups_.end()) {
+void ParticleManager::ParentEmit(IParticleGroup* group, const Vector3& pos, const Vector3& rotate, const Particle& grain, const RandomParametor& para, uint32_t count) {
+	if (group) {
 		uint32_t newCount = 0;
-
-		ParentParticleGroup* group = iterator->second.get();
 		for (auto& particle : group->particles_) {
 
 			if (group->InitEmitParticle(particle, pos, rotate, grain, para)) {
