@@ -104,8 +104,6 @@ void TextureBasedEmitter::DebugGUI() {
 		ImGui::DragFloat("velocityRandMax", &data_.velocityRandMax, 0.1f, -10.0f, 10.0f);
 		ImGui::DragFloat("velocityRandMin", &data_.velocityRandMin, 0.1f, -10.0f, 10.0f);
 
-		ImGui::Text("DeltaTime1:%f", FPSKeeper::DeltaTimeFrame());
-		ImGui::Text("DeltaTime2:%f", FPSKeeper::DeltaTime());
 		ImGui::TreePop();
 	}
 #endif // _DEBUG

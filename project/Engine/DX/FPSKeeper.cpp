@@ -108,7 +108,7 @@ void FPSKeeper::SetSlowMotion(float frame, float rate) {
 
 void FPSKeeper::Debug() {
 #ifdef _DEBUG
-	ImGui::Text("FPS: %.1f", fps_);
+	ImGui::Text("FPS(現在): %.1f", fps_);
 	if (isHitStop_)     ImGui::Text("HitStop: %.1f frames left", stopFrame_);
 	if (isSlowMotion_)  ImGui::Text("SlowMotion: %.1f frames left (x%.2f)", slowFrame_, slowRate_);
 #endif // _DEBUG

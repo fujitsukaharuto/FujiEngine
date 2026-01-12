@@ -136,9 +136,6 @@ void SphereEmitter::DebugGUI() {
 		Save(saveName_);
 	}
 
-	ImGui::Text("DeltaTime1:%f", FPSKeeper::DeltaTimeFrame());
-	ImGui::Text("DeltaTime2:%f", FPSKeeper::DeltaTime());
-
 #endif // _DEBUG
 }
 

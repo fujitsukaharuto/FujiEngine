@@ -200,7 +200,7 @@ void GameRun::DebugGUI() {
 	ImGui::Begin("SceneDebug");
 
 	fpsKeeper_->Debug();
-	ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
+	ImGui::Text("FPS(平均): %.1f", ImGui::GetIO().Framerate);
 	ImGui::Text("DeltaTime: %.3f", ImGui::GetIO().DeltaTime);
 
 	ImGui::Separator();

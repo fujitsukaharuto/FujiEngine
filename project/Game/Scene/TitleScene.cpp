@@ -91,7 +91,7 @@ void TitleScene::Initialize() {
 
 		int emitNum = ParticleManager::GetInstance()->InitGPUEmitterSurface("PointyTower.obj");
 		auto& emitterCS = ParticleManager::GetParticleCSEmitterSurface(emitNum);
-		emitterCS.SetEmit(true);
+		//emitterCS.SetEmit(true);
 		emitterCS.SetPos({ x,0.0f,z });
 		emitterCS.data_.count = 4000;
 		emitterCS.data_.radius = 9.0f;
@@ -103,7 +103,7 @@ void TitleScene::Initialize() {
 	int emitNum = ParticleManager::GetInstance()->InitGPUEmitter();
 	auto& emitterCS = ParticleManager::GetSphereEmitter(emitNum);
 	emitterCS.Load("skyStar");
-	emitterCS.SetEmit(true);
+	//emitterCS.SetEmit(true);
 
 }
 
