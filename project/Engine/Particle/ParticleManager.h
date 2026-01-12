@@ -146,37 +146,6 @@ private:
 	Graphics::Mesh::MeshBuffer ring_;
 	Graphics::Mesh::MeshBuffer sphere_;
 	Graphics::Mesh::MeshBuffer cylinder_;
-	/*ComPtr<ID3D12Resource> vBuffer_;
-	ComPtr<ID3D12Resource> iBuffer_;
-	D3D12_VERTEX_BUFFER_VIEW vbView{};
-	D3D12_INDEX_BUFFER_VIEW ibView{};
-
-	std::vector<VertexDate> vertex_;
-	std::vector<uint32_t> index_;
-
-	ComPtr<ID3D12Resource> ringVBuffer_;
-	ComPtr<ID3D12Resource> ringIBuffer_;
-	D3D12_VERTEX_BUFFER_VIEW ringVbView{};
-	D3D12_INDEX_BUFFER_VIEW ringIbView{};
-
-	std::vector<VertexDate> ringVertex_;
-	std::vector<uint32_t> ringIndex_;
-
-	ComPtr<ID3D12Resource> sphereVBuffer_;
-	ComPtr<ID3D12Resource> sphereIBuffer_;
-	D3D12_VERTEX_BUFFER_VIEW sphereVbView{};
-	D3D12_INDEX_BUFFER_VIEW sphereIbView{};
-
-	std::vector<VertexDate> sphereVertex_;
-	std::vector<uint32_t> sphereIndex_;
-
-	ComPtr<ID3D12Resource> cylinderVBuffer_;
-	ComPtr<ID3D12Resource> cylinderIBuffer_;
-	D3D12_VERTEX_BUFFER_VIEW cylinderVbView{};
-	D3D12_INDEX_BUFFER_VIEW cylinderIbView{};
-
-	std::vector<VertexDate> cylinderVertex_;
-	std::vector<uint32_t> cylinderIndex_;*/
 
 	std::unique_ptr<Graphics::Object3d> lightning_;
 
