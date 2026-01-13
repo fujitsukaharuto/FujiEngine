@@ -258,14 +258,14 @@ SphereEmitter& GPUParticleSystem::GetSphereEmitter(int index) {
 
 TextureBasedEmitter& GPUParticleSystem::GetParticleCSEmitterTexture(int index) {
 	assert(index >= 0 && index < textureBasedEmitters_.size());
-	auto& info = csEmitters_[sphereEmitters_[index]];
+	auto& info = csEmitters_[textureBasedEmitters_[index]];
 	assert(info.phase == PipelinePhase::Texture);
 	return static_cast<TextureBasedEmitter&>(*info.emitter);
 }
 
 MeshSurefaceEmitter& GPUParticleSystem::GetParticleCSEmitterSurface(int index) {
 	assert(index >= 0 && index < MeshSurefaceEmitters_.size());
-	auto& info = csEmitters_[sphereEmitters_[index]];
+	auto& info = csEmitters_[MeshSurefaceEmitters_[index]];
 	assert(info.phase == PipelinePhase::Surface);
 	return static_cast<MeshSurefaceEmitter&>(*info.emitter);
 }
