@@ -222,12 +222,11 @@ void Arrow::ArrivalTimeUpdate() {
 
 void Arrow::GPUEmitterSetting() {
 	auto& emitter = ParticleManager::GetSphereEmitter(emitterNumber_);
-	emitter.data_.count = 300;
-	emitter.data_.lifeTime = 0.5f;
-	emitter.data_.radius = 0.0f;
-	emitter.data_.scale = { 1.0f,1.0f,1.0f };
-	emitter.data_.colorMax = { 1.0f,0.0f,0.0f };
-	emitter.data_.colorMin = { 1.0f,0.0f,0.0f };
+	emitter.SetCount(300);
+	emitter.SetLifeTime(0.5f);
+	emitter.SetRadius(0.0f);
+	emitter.SetScale({ 1.0f,1.0f,1.0f });
+	emitter.SetColorRandom({1.0f,0.0f,0.0f}, { 1.0f,0.0f,0.0f });
 }
 
 void Arrow::RodUpdate() {

@@ -135,8 +135,7 @@ void TitleScene::Update() {
 	player_->TitleUpdate(startTime_);
 
 	auto& emitter = ParticleManager::GetSphereEmitter(0);
-	emitter.data_.prevTranslate = emitter.data_.translate;
-	emitter.data_.translate = particleTest_->GetWorldPos();
+	emitter.SetPos(particleTest_->GetWorldPos());
 
 	cMane_->CheckAllCollision();
 

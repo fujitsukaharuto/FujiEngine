@@ -175,6 +175,27 @@ void TextureBasedEmitter::SetPos(const Vector3& pos) {
 	data_.translate = pos;
 }
 
+void TextureBasedEmitter::SetCount(int count) {
+	data_.count = count;
+}
+
+void TextureBasedEmitter::SetLifeTime(float lifeTime) {
+	data_.lifeTime = lifeTime;
+}
+
+void TextureBasedEmitter::SetScale([[maybe_unused]]const Math::Vector3& scale) {
+	//data_.scale = scale;
+}
+
+void TextureBasedEmitter::SetRadius(float radius) {
+	data_.radius = radius;
+}
+
+void TextureBasedEmitter::SetColorRandom(const Math::Vector3& max, const Math::Vector3& min) {
+	data_.colorMax = max;
+	data_.colorMin = min;
+}
+
 void TextureBasedEmitter::CopyData(uint32_t frameIndex) {
 	dataGPU_[frameIndex]->translate = data_.translate;
 	dataGPU_[frameIndex]->radius =data_.radius;

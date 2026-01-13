@@ -54,6 +54,11 @@ public:
 	bool IsEmit() const override { return isEmit_; }
 	void SetPos(const Math::Vector3& pos) override;
 	void SetEmit(bool state) override { isEmit_ = state; }
+	void SetCount(int count) override;
+	void SetLifeTime(float lifeTime) override;
+	void SetScale(const Math::Vector3& scale) override;
+	void SetRadius(float radius) override;
+	void SetColorRandom(const Math::Vector3& max, const Math::Vector3& min = Math::Vector3(0.0f, 0.0f, 0.0f)) override;
 private:
 	void CopyData(uint32_t frameIndex = 0);
 

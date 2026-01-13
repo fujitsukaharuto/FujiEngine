@@ -234,6 +234,27 @@ void MeshSurefaceEmitter::SetPos(const Vector3& pos) {
 	data_.translate = pos;
 }
 
+void MeshSurefaceEmitter::SetCount(int count) {
+	data_.count = count;
+}
+
+void MeshSurefaceEmitter::SetLifeTime(float lifeTime) {
+	data_.lifeTime = lifeTime;
+}
+
+void MeshSurefaceEmitter::SetScale(const Math::Vector3& scale) {
+	data_.scale = scale;
+}
+
+void MeshSurefaceEmitter::SetRadius(float radius) {
+	data_.radius = radius;
+}
+
+void MeshSurefaceEmitter::SetColorRandom(const Math::Vector3& max, const Math::Vector3& min) {
+	data_.colorMax = max;
+	data_.colorMin = min;
+}
+
 void MeshSurefaceEmitter::CopyData(uint32_t frameIndex) {
 	dataGPU_[frameIndex]->translate = data_.translate;
 	dataGPU_[frameIndex]->scale = data_.scale;

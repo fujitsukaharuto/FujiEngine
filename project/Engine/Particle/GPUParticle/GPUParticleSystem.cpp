@@ -251,26 +251,23 @@ IGPUEmitter& GPUParticleSystem::GetParticleCSEmitter(int index) {
 
 SphereEmitter& GPUParticleSystem::GetSphereEmitter(int index) {
 	assert(index >= 0 && index < sphereEmitters_.size());
-	IGPUEmitter* emitterBase = csEmitters_[sphereEmitters_[index]].emitter.get();
-	auto* emitter = dynamic_cast<SphereEmitter*>(emitterBase);
-	assert(emitter);
-	return *emitter;
+	auto& info = csEmitters_[sphereEmitters_[index]];
+	assert(info.phase == PipelinePhase::Sphere);
+	return static_cast<SphereEmitter&>(*info.emitter);
 }
 
 TextureBasedEmitter& GPUParticleSystem::GetParticleCSEmitterTexture(int index) {
 	assert(index >= 0 && index < textureBasedEmitters_.size());
-	IGPUEmitter* emitterBase = csEmitters_[textureBasedEmitters_[index]].emitter.get();
-	auto* emitter = dynamic_cast<TextureBasedEmitter*>(emitterBase);
-	assert(emitter);
-	return *emitter;
+	auto& info = csEmitters_[sphereEmitters_[index]];
+	assert(info.phase == PipelinePhase::Texture);
+	return static_cast<TextureBasedEmitter&>(*info.emitter);
 }
 
 MeshSurefaceEmitter& GPUParticleSystem::GetParticleCSEmitterSurface(int index) {
 	assert(index >= 0 && index < MeshSurefaceEmitters_.size());
-	IGPUEmitter* emitterBase = csEmitters_[MeshSurefaceEmitters_[index]].emitter.get();
-	auto* emitter = dynamic_cast<MeshSurefaceEmitter*>(emitterBase);
-	assert(emitter);
-	return *emitter;
+	auto& info = csEmitters_[sphereEmitters_[index]];
+	assert(info.phase == PipelinePhase::Surface);
+	return static_cast<MeshSurefaceEmitter&>(*info.emitter);
 }
 
 void GPUParticleSystem::InitParticleCS() {

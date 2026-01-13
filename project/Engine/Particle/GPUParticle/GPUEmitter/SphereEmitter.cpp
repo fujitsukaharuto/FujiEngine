@@ -230,6 +230,27 @@ void SphereEmitter::SetEmit(bool state) {
 	isEmit_ = state;
 }
 
+void SphereEmitter::SetCount(int count) {
+	data_.count = count;
+}
+
+void SphereEmitter::SetLifeTime(float lifeTime) {
+	data_.lifeTime = lifeTime;
+}
+
+void SphereEmitter::SetScale(const Math::Vector3& scale) {
+	data_.scale = scale;
+}
+
+void SphereEmitter::SetRadius(float radius) {
+	data_.radius = radius;
+}
+
+void SphereEmitter::SetColorRandom(const Math::Vector3& max, const Math::Vector3& min) {
+	data_.colorMax = max;
+	data_.colorMin = min;
+}
+
 void SphereEmitter::CopyData(uint32_t frameIndex) {
 	dataGPU_[frameIndex]->translate = data_.translate;
 	dataGPU_[frameIndex]->radius = data_.radius;
