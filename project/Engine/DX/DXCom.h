@@ -118,6 +118,11 @@ public:
 	void InsertUAVBarrier(ID3D12Resource* resource);
 
 	/// <summary>
+	/// UAV（Unordered Access View）バリアをComputeへ挿入する
+	/// </summary>
+	void InsertUAVBarrierForCompute(ID3D12Resource* resource);
+
+	/// <summary>
 	/// OutLine実行前に呼び出す関数
 	/// </summary>
 	void PreOutline();
@@ -169,6 +174,7 @@ public:
 	size_t GetBackBufferCount() const { return swapChainDesc_.BufferCount; }
 	uint32_t GetNowFrameCount() const { return command_->GetNowFrameIndex(); }
 	ID3D12GraphicsCommandList* GetCommandList() const { return command_->GetList(); }
+	ID3D12GraphicsCommandList* GetComputeCommandList() const { return command_->GetComputeList(); }
 	ID3D12GraphicsCommandList* GetImmediateList() const { return command_->GetImmediateList(); }
 	DXC::DXCommand* GetDXCommand() const { return command_.get(); }
 	DXC::DXCompil* GetDXCompil() const { return compiler_.get(); }

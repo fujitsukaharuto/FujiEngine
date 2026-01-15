@@ -84,8 +84,10 @@ void SRVManager::CreateStructuredUAV(uint32_t uavIndex, ID3D12Resource* resource
 void SRVManager::SetDescriptorHeap(uint32_t index) {
 	if (index == 0) {
 		ID3D12GraphicsCommandList* commandList = dxcommon_->GetCommandList();
+		ID3D12GraphicsCommandList* computeList = dxcommon_->GetComputeCommandList();
 		ID3D12DescriptorHeap* descriptorHeaps[] = { descriptorHeap.Get() };
 		commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
+		computeList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 	} else {
 		ID3D12GraphicsCommandList* commandList = dxcommon_->GetImmediateList();
 		ID3D12DescriptorHeap* descriptorHeaps[] = { descriptorHeap.Get() };

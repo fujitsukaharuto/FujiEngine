@@ -33,8 +33,12 @@ void BasePipeline::SetPipelineCSState(uint32_t index) {
 		ID3D12GraphicsCommandList* commandList = dxcommon_->GetDXCommand()->GetList();
 		commandList->SetComputeRootSignature(rootSignature_.Get());
 		commandList->SetPipelineState(pso_.Get());
-	} else {
+	} else if (index == 1) {
 		ID3D12GraphicsCommandList* commandList = dxcommon_->GetDXCommand()->GetImmediateList();
+		commandList->SetComputeRootSignature(rootSignature_.Get());
+		commandList->SetPipelineState(pso_.Get());
+	} else {
+		ID3D12GraphicsCommandList* commandList = dxcommon_->GetDXCommand()->GetComputeList();
 		commandList->SetComputeRootSignature(rootSignature_.Get());
 		commandList->SetPipelineState(pso_.Get());
 	}

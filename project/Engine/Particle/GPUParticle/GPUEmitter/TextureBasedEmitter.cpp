@@ -59,7 +59,7 @@ void TextureBasedEmitter::Dispatch(ID3D12GraphicsCommandList* cmd,
 	if (!isEmit_ || data_.count == 0) return;
 	uint32_t frameIndex = dx->GetNowFrameCount();
 	CopyData(frameIndex);
-	dx->GetPipelineManager()->SetCSPipeline(Pipe::EmitTexParticleCS);
+	dx->GetPipelineManager()->SetCSPipeline(Pipe::EmitTexParticleCS, 2);
 	cmd->SetComputeRootDescriptorTable(0, shared.transCSUAVHandle);
 	cmd->SetComputeRootDescriptorTable(1, shared.scaleCSUAVHandle);
 	cmd->SetComputeRootDescriptorTable(2, shared.timeCSUAVHandle);

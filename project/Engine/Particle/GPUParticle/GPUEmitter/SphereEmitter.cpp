@@ -56,7 +56,7 @@ void SphereEmitter::Dispatch(ID3D12GraphicsCommandList* cmd,
 	if (data_.emit == 0 || data_.count == 0) return;
 	uint32_t frameIndex = dx->GetNowFrameCount();
 	CopyData(frameIndex);
-	dx->GetPipelineManager()->SetCSPipeline(Pipe::EmitParticleCS);
+	dx->GetPipelineManager()->SetCSPipeline(Pipe::EmitParticleCS, 2);
 	cmd->SetComputeRootDescriptorTable(0, shared.transCSUAVHandle);
 	cmd->SetComputeRootDescriptorTable(1, shared.scaleCSUAVHandle);
 	cmd->SetComputeRootDescriptorTable(2, shared.timeCSUAVHandle);

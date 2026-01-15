@@ -325,6 +325,7 @@ void DXCom::PostDraw() {
 	command_->Close();
 	// コマンドリストの実行
 	command_->Execution();
+	command_->GPUComputeSignal();
 	command_->GPUSignal();
 	swapChain_->Present(1, 0);// 第一引数、垂直同期は1がON、0がOFF
 }
@@ -410,6 +411,15 @@ void DXCom::InsertUAVBarrier(ID3D12Resource* resource) {
 	barrier.UAV.pResource = resource;
 
 	command_->GetList()->ResourceBarrier(1, &barrier);
+}
+
+void DXCom::InsertUAVBarrierForCompute(ID3D12Resource* resource) {
+	D3D12_RESOURCE_BARRIER barrier{};
+	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
+	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	barrier.UAV.pResource = resource;
+
+	command_->GetComputeList()->ResourceBarrier(1, &barrier);
 }
 
 void DXCom::PreOutline() {

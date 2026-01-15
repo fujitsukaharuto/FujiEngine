@@ -113,7 +113,7 @@ void MeshSurefaceEmitter::Dispatch(ID3D12GraphicsCommandList* cmd,
 	if (!isEmit_ || data_.count == 0) return;
 	uint32_t frameIndex = dx->GetNowFrameCount();
 	CopyData(frameIndex);
-	dx->GetPipelineManager()->SetCSPipeline(Pipe::EmitSurfaceParticleCS);
+	dx->GetPipelineManager()->SetCSPipeline(Pipe::EmitSurfaceParticleCS, 2);
 	cmd->SetComputeRootDescriptorTable(0, shared.transCSUAVHandle);
 	cmd->SetComputeRootDescriptorTable(1, shared.scaleCSUAVHandle);
 	cmd->SetComputeRootDescriptorTable(2, shared.timeCSUAVHandle);

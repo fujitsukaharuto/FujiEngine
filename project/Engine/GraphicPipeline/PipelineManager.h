@@ -36,6 +36,8 @@ namespace Graphics {
 		/// <summary>
 		/// コンピュートシェーダ用のパイプラインのセット
 		/// </summary>
+		/// <param name="type"> パイプラインのタイプ </param>
+		/// <param name="index"> 0=Normal/1=Immediate/2=Compute </param>
 		void SetCSPipeline(Pipe type, uint32_t index = 0);
 
 		ID3D12RootSignature* GetRootSignature(Pipe type);
