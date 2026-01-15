@@ -401,6 +401,7 @@ void GPUParticleSystem::DrawParticleCS(const D3D12_VERTEX_BUFFER_VIEW& vbView, c
 	computeList->Dispatch(dispatchCount, 1, 1);
 	dxcommon_->InsertUAVBarrierForCompute(aliveDrawArgs_.Get());
 
+	dxcommon_->GetDXCommand()->ComputeExecution();
 	dxcommon_->GetDXCommand()->GPUComputeSignal();
 	dxcommon_->GetDXCommand()->WaitComputeInGraphicsQueue();
 

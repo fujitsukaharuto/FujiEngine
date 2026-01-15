@@ -325,7 +325,6 @@ void DXCom::PostDraw() {
 	command_->Close();
 	// コマンドリストの実行
 	command_->Execution();
-	command_->GPUComputeSignal();
 	command_->GPUSignal();
 	swapChain_->Present(1, 0);// 第一引数、垂直同期は1がON、0がOFF
 }

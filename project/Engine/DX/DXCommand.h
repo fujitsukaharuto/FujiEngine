@@ -30,6 +30,8 @@ namespace DXC {
 		/// </summary>
 		void Execution(uint32_t index = 0);
 
+		void ComputeExecution();
+
 		void GPUSignal(uint32_t index = 0);
 
 		void GPUComputeSignal();

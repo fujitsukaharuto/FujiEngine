@@ -159,8 +159,6 @@ void DXCommand::Close(uint32_t index) {
 	if (index == 0) {
 		hr = list_->Close();
 		assert(SUCCEEDED(hr));
-		hr = computeList_->Close();
-		assert(SUCCEEDED(hr));
 	} else {
 		hr = immediateList_->Close();
 		assert(SUCCEEDED(hr));
@@ -170,14 +168,20 @@ void DXCommand::Close(uint32_t index) {
 void DXCommand::Execution(uint32_t index) {
 
 	if (index == 0) {
-		ComPtr<ID3D12CommandList> computeCommandLists[] = { computeList_.Get() };
-		computeQueue_->ExecuteCommandLists(1, computeCommandLists->GetAddressOf());
 		ComPtr<ID3D12CommandList> commandLists[] = { list_.Get() };
 		queue_->ExecuteCommandLists(1, commandLists->GetAddressOf());
 	} else {
 		ComPtr<ID3D12CommandList> commandLists[] = { immediateList_.Get() };
 		queue_->ExecuteCommandLists(1, commandLists->GetAddressOf());
 	}
+}
+
+void DXC::DXCommand::ComputeExecution() {
+	HRESULT hr;
+	hr = computeList_->Close();
+	assert(SUCCEEDED(hr));
+	ComPtr<ID3D12CommandList> computeCommandLists[] = { computeList_.Get() };
+	computeQueue_->ExecuteCommandLists(1, computeCommandLists->GetAddressOf());
 }
 
 void DXC::DXCommand::GPUSignal(uint32_t index) {
