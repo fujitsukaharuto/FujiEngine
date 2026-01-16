@@ -120,6 +120,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\DX\DXCompil.cpp" />
     <ClCompile Include="Engine\DX\FPSKeeper.cpp" />
     <ClCompile Include="Engine\DX\Framework.cpp" />
+    <ClCompile Include="Engine\DX\GPUTimer.cpp" />
     <ClCompile Include="Engine\DX\OffscreenManager.cpp" />
     <ClCompile Include="Engine\DX\SRVManager.cpp" />
     <ClCompile Include="Engine\Editor\CommandManager.cpp" />
@@ -249,6 +250,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\DX\FPSKeeper.h" />
     <ClInclude Include="Engine\DX\FrameCount.h" />
     <ClInclude Include="Engine\DX\Framework.h" />
+    <ClInclude Include="Engine\DX\GPUTimer.h" />
     <ClInclude Include="Engine\DX\OffscreenManager.h" />
     <ClInclude Include="Engine\DX\SRVManager.h" />
     <ClInclude Include="Engine\Editor\CommandManager.h" />

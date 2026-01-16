@@ -58,6 +58,7 @@ namespace DXC {
 		//========================================================================*/
 		//* Getter
 		ID3D12CommandQueue* GetQueue() const { return queue_.Get(); }
+		ID3D12CommandQueue* GetComputeQueue() const { return computeQueue_.Get(); }
 		ID3D12GraphicsCommandList* GetList() const { return list_.Get(); }
 		ID3D12GraphicsCommandList* GetComputeList() const { return computeList_.Get(); }
 		ID3D12GraphicsCommandList* GetImmediateList() const { return immediateList_.Get(); }

@@ -24,6 +24,7 @@ void GPUParticleSystem::Initialize(DXCom* pDxcom, SRVManager* srvManager) {
 	srvManager_ = srvManager;
 	this->camera_ = CameraManager::GetInstance()->GetCamera();
 
+	InitGPUTimer();
 	InitParticleCS();
 	InitGPUEmitter();
 	InitGPUEmitterSurface("DeadTree_2.obj");
@@ -63,6 +64,9 @@ void GPUParticleSystem::Finalize() {
 	textureBasedEmitters_.clear();
 	MeshSurefaceEmitters_.clear();
 	csEmitters_.clear();
+
+	gpuTimerGraphics.Finalize();
+	gpuTimerCompute.Finalize();
 }
 
 void GPUParticleSystem::Update(const Matrix4x4& billboardMatrix) {
@@ -144,6 +148,25 @@ int GPUParticleSystem::InitGPUEmitterSurface(const std::string& fileName) {
 	MeshSurefaceEmitterIndex_++;
 	csEmitterIndex_++;
 	return result;
+}
+
+void GPUParticleSystem::DebugGUI() {
+#ifdef _DEBUG
+	if (ImGui::CollapsingHeader("GPUTimer##GPUParticleSystem")) {
+		uint32_t frameIndex = dxcommon_->GetNowFrameCount();
+		uint32_t finishedFrame = (frameIndex + DXC::kFrameCount_ - 1) % DXC::kFrameCount_;
+
+		double drawTime = gpuTimerGraphics.GetElapsedMS(finishedFrame, kTimer_DrawExecuteIndirect);
+		double particleTime = gpuTimerCompute.GetElapsedMS(finishedFrame, kTimer_ParticleUpdate);
+		double emitterDispatchTime = gpuTimerCompute.GetElapsedMS(finishedFrame, kTimer_EmitterDispatch);
+		double aliveCountTime = gpuTimerCompute.GetElapsedMS(finishedFrame, kTimer_AliveCountDispatch);
+
+		ImGui::Text("ParticleDraw: %.3f ms", drawTime);
+		ImGui::Text("ParticleUpdate: %.3f ms", particleTime);
+		ImGui::Text("Emit: %.3f ms", emitterDispatchTime);
+		ImGui::Text("AliveCount: %.3f ms", aliveCountTime);
+	}
+#endif // _DEBUG
 }
 
 void GPUParticleSystem::ParticleCSDebugGUI() {
@@ -372,6 +395,11 @@ void GPUParticleSystem::InitInstance(ParticleCSInsstance& CSInstance, size_t ins
 	CSInstance.particleCSUAVHandle_.second = srvManager_->GetGPUDescriptorHandle(particleCSUAVIndex);
 }
 
+void GPUParticleSystem::InitGPUTimer() {
+	gpuTimerGraphics.Initialize(dxcommon_->GetDevice(), dxcommon_->GetDXCommand()->GetQueue());
+	gpuTimerCompute.Initialize(dxcommon_->GetDevice(), dxcommon_->GetDXCommand()->GetComputeQueue());
+}
+
 void GPUParticleSystem::UpdatePerViewData(const Matrix4x4& billboardMatrix) {
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 	perViewData_[frameIndex]->viewProjection = camera_->GetViewProjectionMatrix();
@@ -387,6 +415,8 @@ void GPUParticleSystem::UpdatePerViewData(const Matrix4x4& billboardMatrix) {
 }
 
 void GPUParticleSystem::DrawParticleCS(const D3D12_VERTEX_BUFFER_VIEW& vbView, const D3D12_INDEX_BUFFER_VIEW& ibView) {
+	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
+	gpuTimerCompute.Begin(dxcommon_->GetComputeCommandList(), frameIndex, kTimer_AliveCountDispatch);
 	ID3D12GraphicsCommandList* computeList = dxcommon_->GetComputeCommandList();
 	dxcommon_->GetPipelineManager()->SetCSPipeline(Pipe::InitArgsCS, 2);
 	computeList->SetComputeRootDescriptorTable(0, ArgsUAVHandle_.second);
@@ -400,19 +430,22 @@ void GPUParticleSystem::DrawParticleCS(const D3D12_VERTEX_BUFFER_VIEW& vbView, c
 	int dispatchCount = (numParticles + threadsPerGroup - 1) / threadsPerGroup;
 	computeList->Dispatch(dispatchCount, 1, 1);
 	dxcommon_->InsertUAVBarrierForCompute(aliveDrawArgs_.Get());
+	gpuTimerCompute.End(dxcommon_->GetComputeCommandList(), frameIndex, kTimer_AliveCountDispatch);
+
+	gpuTimerCompute.Resolve(computeList, frameIndex,kTimer_AliveCountDispatch);
 
 	dxcommon_->GetDXCommand()->ComputeExecution();
 	dxcommon_->GetDXCommand()->GPUComputeSignal();
 	dxcommon_->GetDXCommand()->WaitComputeInGraphicsQueue();
 
 	ID3D12GraphicsCommandList* graphicsList = dxcommon_->GetCommandList();
+	gpuTimerGraphics.Begin(graphicsList, frameIndex, kTimer_DrawExecuteIndirect);
 	dxcommon_->GetDXCommand()->SetViewAndscissor();
 	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::ParticleCS);
 	graphicsList->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	graphicsList->IASetVertexBuffers(0, 1, &vbView);
 	graphicsList->IASetIndexBuffer(&ibView);
 
-	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 	graphicsList->SetGraphicsRootConstantBufferView(0, perViewResource_[frameIndex]->GetGPUVirtualAddress());
 	graphicsList->SetGraphicsRootConstantBufferView(1, particleCSMaterial_.GetMaterialResource()->GetGPUVirtualAddress());
 	graphicsList->SetGraphicsRootDescriptorTable(2, transCSInstance_.particleCSSRVHandle_.second);
@@ -422,6 +455,8 @@ void GPUParticleSystem::DrawParticleCS(const D3D12_VERTEX_BUFFER_VIEW& vbView, c
 	graphicsList->SetGraphicsRootDescriptorTable(6, particleCSMaterial_.GetTexture()->gpuHandle);
 
 	graphicsList->ExecuteIndirect(drawIndexedSignature_.Get(), 1, aliveDrawArgs_.Get(), 0, nullptr, 0);
+	gpuTimerGraphics.End(graphicsList, frameIndex, kTimer_DrawExecuteIndirect);
+	gpuTimerGraphics.Resolve(graphicsList, frameIndex, kTimer_DrawExecuteIndirect);
 }
 
 void GPUParticleSystem::UpdateGPUEmitter() {
@@ -433,6 +468,7 @@ void GPUParticleSystem::UpdateGPUEmitter() {
 
 void GPUParticleSystem::UpdateParticleCSDispatch() {
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
+	gpuTimerCompute.Begin(dxcommon_->GetComputeCommandList(), frameIndex, kTimer_ParticleUpdate);
 	dxcommon_->GetPipelineManager()->SetCSPipeline(Pipe::UpdateParticleCS, 2);
 	ID3D12GraphicsCommandList* cList = dxcommon_->GetComputeCommandList();
 	cList->SetComputeRootDescriptorTable(0, transCSInstance_.particleCSUAVHandle_.second);
@@ -448,6 +484,8 @@ void GPUParticleSystem::UpdateParticleCSDispatch() {
 	int dispatchCount = (numParticles + threadsPerGroup - 1) / threadsPerGroup;
 	cList->Dispatch(dispatchCount, 1, 1);
 	dxcommon_->InsertUAVBarrierForCompute(transCSInstance_.particleCSInstancing_.Get());
+	gpuTimerCompute.End(dxcommon_->GetComputeCommandList(), frameIndex, kTimer_ParticleUpdate);
+	gpuTimerCompute.Resolve(cList, frameIndex, kTimer_ParticleUpdate);
 }
 
 void GPUParticleSystem::EmitterDispatch() {
@@ -464,7 +502,7 @@ void GPUParticleSystem::EmitterDispatch() {
 	freeListTailIndexUAVHandle_.second,
 	freeListUAVHandle_.second
 	};
-
+	gpuTimerCompute.Begin(dxcommon_->GetComputeCommandList(), frameIndex, kTimer_EmitterDispatch);
 	for (PipelinePhase phase : {PipelinePhase::Texture, PipelinePhase::Surface, PipelinePhase::Sphere}) {
 		for (auto& info : csEmitters_) {
 			if (info.phase == phase) {
@@ -474,4 +512,6 @@ void GPUParticleSystem::EmitterDispatch() {
 		}
 		dxcommon_->InsertUAVBarrierForCompute(transCSInstance_.particleCSInstancing_.Get());
 	}
+	gpuTimerCompute.End(dxcommon_->GetComputeCommandList(), frameIndex, kTimer_EmitterDispatch);
+	gpuTimerCompute.Resolve(dxcommon_->GetComputeCommandList(), frameIndex, kTimer_EmitterDispatch);
 }

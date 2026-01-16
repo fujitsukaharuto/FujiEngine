@@ -337,9 +337,14 @@ void ParticleManager::ParticleDebugGUI() {
 
 void ParticleManager::ParticleCSDebugGUI() {
 #ifdef _DEBUG
-	gpuParticleSystem_->ParticleCSDebugGUI();
-	gpuParticleSystem_->ParticleTexCSDebugGUI();
-	gpuParticleSystem_->ParticleSurfaceCSDebugGUI();
+	if (ImGui::CollapsingHeader("GPU Particle System")) {
+		ImGui::Indent();
+		gpuParticleSystem_->DebugGUI();
+		gpuParticleSystem_->ParticleCSDebugGUI();
+		gpuParticleSystem_->ParticleTexCSDebugGUI();
+		gpuParticleSystem_->ParticleSurfaceCSDebugGUI();
+		ImGui::Unindent();
+	}
 #endif // _DEBUG
 }
 

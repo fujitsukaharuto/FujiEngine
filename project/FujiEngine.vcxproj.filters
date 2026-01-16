@@ -377,6 +377,9 @@
     <ClCompile Include="Engine\GraphicPipeline\CSPipe\InitArgsCSPipe.cpp">
       <Filter>Engine\GraphicPipeline\CSPipe</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\DX\GPUTimer.cpp">
+      <Filter>Engine\DX</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -819,6 +822,9 @@
     </ClInclude>
     <ClInclude Include="Engine\GraphicPipeline\CSPipe\InitArgsCSPipe.h">
       <Filter>Engine\GraphicPipeline\CSPipe</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\DX\GPUTimer.h">
+      <Filter>Engine\DX</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

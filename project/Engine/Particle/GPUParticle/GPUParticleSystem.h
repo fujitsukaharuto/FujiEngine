@@ -11,6 +11,7 @@
 #include "Object3d.h"
 #include "Math/Matrix/MatrixCalculation.h"
 #include "Engine/DX/FrameCount.h"
+#include "Engine/DX/GPUTimer.h"
 
 using Microsoft::WRL::ComPtr;
 
@@ -73,6 +74,16 @@ public:
 
 public:
 
+	enum TimerID {
+		kTimer_DrawExecuteIndirect = 0,
+	};
+
+	enum ComputeTimerID {
+		kTimer_ParticleUpdate = 0,
+		kTimer_EmitterDispatch = 1,
+		kTimer_AliveCountDispatch = 2,
+	};
+
 	void Initialize(DXCom* pDxcom, SRVManager* srvManager);
 	void Finalize();
 	void Update(const Math::Matrix4x4& billboardMatrix);
@@ -84,6 +95,7 @@ public:
 	int InitGPUEmitterTexture(const std::string& fileName = "white2x2.png");
 	int InitGPUEmitterSurface(const std::string& fileName);
 
+	void DebugGUI();
 	void ParticleCSDebugGUI();
 	void ParticleTexCSDebugGUI();
 	void ParticleSurfaceCSDebugGUI();
@@ -99,6 +111,7 @@ private:
 
 	void InitParticleCS();
 	void InitInstance(ParticleCSInsstance& CSInstance, size_t instanceSize);
+	void InitGPUTimer();
 	void UpdatePerViewData(const Math::Matrix4x4& billboardMatrix);
 	void DrawParticleCS(const D3D12_VERTEX_BUFFER_VIEW& vbView, const D3D12_INDEX_BUFFER_VIEW& ibView);
 
@@ -160,6 +173,9 @@ private:
 	uint32_t numParticles = 20485760;
 	uint32_t threadsPerGroup = 1024;
 	int threadGroupSize_ = 1024;
+
+	DXC::GPUTimer gpuTimerGraphics;
+	DXC::GPUTimer gpuTimerCompute;
 
 #ifdef _DEBUG
 	int editCSEmitInd_;
