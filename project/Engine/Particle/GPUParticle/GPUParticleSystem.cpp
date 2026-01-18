@@ -52,6 +52,7 @@ void GPUParticleSystem::Finalize() {
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
 		perViewResource_[i].Reset();
 		perFrameResource_[i].Reset();
+		aliveReadback_[i].Reset();
 	}
 
 	drawIndexedSignature_.Reset();
@@ -160,11 +161,13 @@ void GPUParticleSystem::DebugGUI() {
 		double particleTime = gpuTimerCompute.GetElapsedMS(finishedFrame, kTimer_ParticleUpdate);
 		double emitterDispatchTime = gpuTimerCompute.GetElapsedMS(finishedFrame, kTimer_EmitterDispatch);
 		double aliveCountTime = gpuTimerCompute.GetElapsedMS(finishedFrame, kTimer_AliveCountDispatch);
+		AliveCountDataReadBack();
 
 		ImGui::Text("ParticleDraw: %.3f ms", drawTime);
 		ImGui::Text("ParticleUpdate: %.3f ms", particleTime);
 		ImGui::Text("Emit: %.3f ms", emitterDispatchTime);
-		ImGui::Text("AliveCount: %.3f ms", aliveCountTime);
+		ImGui::Text("AliveCountDispatch: %.3f ms", aliveCountTime);
+		ImGui::Text("AliveCount: %d", aliveCount_);
 	}
 #endif // _DEBUG
 }
@@ -381,6 +384,12 @@ void GPUParticleSystem::InitParticleCS() {
 	srvManager_->CreateStructuredUAV(ArgsUAVIndex, aliveDrawArgs_.Get(), 1, sizeof(DrawIndexedArgs));
 	ArgsUAVHandle_.first = srvManager_->GetCPUDescriptorHandle(ArgsUAVIndex);
 	ArgsUAVHandle_.second = srvManager_->GetGPUDescriptorHandle(ArgsUAVIndex);
+
+	const size_t readbackSize = sizeof(DrawIndexedArgs);
+
+	for (int i = 0; i < DXC::kFrameCount_; i++) {
+		aliveReadback_[i] = dxcommon_->CreateReadbackResource(dxcommon_->GetDevice(), readbackSize);
+	}
 }
 
 void GPUParticleSystem::InitInstance(ParticleCSInsstance& CSInstance, size_t instanceSize) {
@@ -398,6 +407,16 @@ void GPUParticleSystem::InitInstance(ParticleCSInsstance& CSInstance, size_t ins
 void GPUParticleSystem::InitGPUTimer() {
 	gpuTimerGraphics.Initialize(dxcommon_->GetDevice(), dxcommon_->GetDXCommand()->GetQueue());
 	gpuTimerCompute.Initialize(dxcommon_->GetDevice(), dxcommon_->GetDXCommand()->GetComputeQueue());
+}
+
+void GPUParticleSystem::AliveCountDataReadBack() {
+	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
+	DrawIndexedArgs* args = nullptr;
+	aliveReadback_[frameIndex]->Map(
+		0, nullptr, reinterpret_cast<void**>(&args)
+	);
+	aliveCount_ = int(args[0].InstanceCount);
+	aliveReadback_[frameIndex]->Unmap(0, nullptr);
 }
 
 void GPUParticleSystem::UpdatePerViewData(const Matrix4x4& billboardMatrix) {
@@ -430,6 +449,7 @@ void GPUParticleSystem::DrawParticleCS(const D3D12_VERTEX_BUFFER_VIEW& vbView, c
 	int dispatchCount = (numParticles + threadsPerGroup - 1) / threadsPerGroup;
 	computeList->Dispatch(dispatchCount, 1, 1);
 	dxcommon_->InsertUAVBarrierForCompute(aliveDrawArgs_.Get());
+	computeList->CopyResource(aliveReadback_[frameIndex].Get(), aliveDrawArgs_.Get());
 	gpuTimerCompute.End(dxcommon_->GetComputeCommandList(), frameIndex, kTimer_AliveCountDispatch);
 
 	gpuTimerCompute.Resolve(computeList, frameIndex,kTimer_AliveCountDispatch);

@@ -45,14 +45,16 @@ void GPUTimer::Initialize(ID3D12Device* device, ID3D12CommandQueue* commandQueue
 	resDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 	resDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
-	hr = device->CreateCommittedResource(
-		&heapProps,
-		D3D12_HEAP_FLAG_NONE,
-		&resDesc,
-		D3D12_RESOURCE_STATE_COPY_DEST,
-		nullptr,
-		IID_PPV_ARGS(&queryBuffer_)
-	);
+	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
+		hr = device->CreateCommittedResource(
+			&heapProps,
+			D3D12_HEAP_FLAG_NONE,
+			&resDesc,
+			D3D12_RESOURCE_STATE_COPY_DEST,
+			nullptr,
+			IID_PPV_ARGS(&queryBuffer_[i])
+		);
+	}
 	assert(SUCCEEDED(hr));
 
 	// 3. 周波数取得
@@ -62,7 +64,9 @@ void GPUTimer::Initialize(ID3D12Device* device, ID3D12CommandQueue* commandQueue
 
 void GPUTimer::Finalize() {
 	queryHeap_.Reset();
-	queryBuffer_.Reset();
+	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
+		queryBuffer_[i].Reset();
+	}
 }
 
 void GPUTimer::Begin(ID3D12GraphicsCommandList* list, uint32_t frameIndex, uint32_t timerId) {
@@ -94,7 +98,7 @@ void GPUTimer::Resolve(ID3D12GraphicsCommandList* list, uint32_t frameIndex, uin
 		D3D12_QUERY_TYPE_TIMESTAMP,
 		startIndex,
 		count,
-		queryBuffer_.Get(),
+		queryBuffer_[frameIndex].Get(),
 		dstOffset
 	);
 }
@@ -109,7 +113,7 @@ double GPUTimer::GetElapsedMS(uint32_t frameIndex, uint32_t timerId) {
 	readRange.Begin = 0;
 	readRange.End = sizeof(uint64_t) * kFrameCount_ * maxTimerCount_ * kTimestampsPerTimer;
 
-	HRESULT hr = queryBuffer_->Map(0, &readRange, reinterpret_cast<void**>(&data));
+	HRESULT hr = queryBuffer_[frameIndex]->Map(0, &readRange, reinterpret_cast<void**>(&data));
 	if (FAILED(hr)) {
 		return 0.0;
 	}
@@ -118,7 +122,7 @@ double GPUTimer::GetElapsedMS(uint32_t frameIndex, uint32_t timerId) {
 	uint64_t startTick = data[index];
 	uint64_t endTick = data[index + 1];
 
-	queryBuffer_->Unmap(0, nullptr);
+	queryBuffer_[frameIndex]->Unmap(0, nullptr);
 
 	// どちらかが0なら計測されていない or バグ
 	if (startTick == 0 || endTick == 0) {

@@ -112,6 +112,7 @@ private:
 	void InitParticleCS();
 	void InitInstance(ParticleCSInsstance& CSInstance, size_t instanceSize);
 	void InitGPUTimer();
+	void AliveCountDataReadBack();
 	void UpdatePerViewData(const Math::Matrix4x4& billboardMatrix);
 	void DrawParticleCS(const D3D12_VERTEX_BUFFER_VIEW& vbView, const D3D12_INDEX_BUFFER_VIEW& ibView);
 
@@ -157,6 +158,7 @@ private:
 	ComPtr<ID3D12Resource> drawAliveIndex_;
 	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> drawAliveUAVHandle_;
 	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> drawAliveSRVHandle_;
+	ComPtr<ID3D12Resource> aliveReadback_[DXC::kFrameCount_];
 
 	std::vector<EmitterInfo> csEmitters_;
 
@@ -165,6 +167,7 @@ private:
 	std::vector<int> MeshSurefaceEmitters_;
 
 	int csEmitterIndex_ = 0;
+	int aliveCount_ = 0;
 
 	int sphereEmitterIndex_ = 0;
 	int textureBasedEmitterIndex_ = 0;

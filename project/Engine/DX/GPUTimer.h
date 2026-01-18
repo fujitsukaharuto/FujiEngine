@@ -52,7 +52,7 @@ namespace DXC {
 		static constexpr uint32_t kTimestampsPerTimer = 2;
 
 		Microsoft::WRL::ComPtr<ID3D12QueryHeap> queryHeap_;
-		Microsoft::WRL::ComPtr<ID3D12Resource> queryBuffer_;
+		Microsoft::WRL::ComPtr<ID3D12Resource> queryBuffer_[DXC::kFrameCount_];
 
 		uint64_t gpuFrequency_ = 0;
 		uint32_t maxTimerCount_ = 10;
