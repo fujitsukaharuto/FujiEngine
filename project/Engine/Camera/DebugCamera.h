@@ -47,7 +47,7 @@ public:
 	/// <summary>
 	/// ビュー行列の取得
 	/// </summary>
-	/// <returns></returns>
+	/// <returns>Matrix4x4</returns>
 	Math::Matrix4x4 GetViewMatrix()const;
 
 	Math::Vector3 GetTranslate() { return translation_; }

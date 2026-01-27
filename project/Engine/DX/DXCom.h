@@ -125,11 +125,13 @@ public:
 	/// <summary>
 	/// UAV（Unordered Access View）バリアを挿入する
 	/// </summary>
+	/// <param name="resource">リソース</param>
 	void InsertUAVBarrier(ID3D12Resource* resource);
 
 	/// <summary>
 	/// UAV（Unordered Access View）バリアをComputeへ挿入する
 	/// </summary>
+	/// <param name="resource">リソース</param>
 	void InsertUAVBarrierForCompute(ID3D12Resource* resource);
 
 	/// <summary>
@@ -146,36 +148,61 @@ public:
 	/// <summary>
 	/// 指定されたサイズのバッファリソースを生成する。
 	/// </summary>
+	/// <param name="device">デバイス</param>
+	/// <param name="sizeInBytes">サイズ</param>
+	/// <returns>ID3D12Resource*</returns>
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(Microsoft::WRL::ComPtr<ID3D12Device> device, size_t sizeInBytes);
 
 	/// <summary>
 	/// 指定されたタイプ・数でディスクリプタヒープを生成する。
 	/// </summary>
+	/// <param name="heapType">ヒープタイプ</param>
+	/// <param name="numDescriptors">数</param>
+	/// <param name="shaderVisible">shaderVisible</param>
+	/// <returns>ID3D12Resource*</returns>
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
 
 	/// <summary>
 	/// 深度ステンシル用のテクスチャリソースを生成する。
 	/// </summary>
+	/// <param name="device">デバイス</param>
+	/// <param name="width">横</param>
+	/// <param name="height">縦</param>
+	/// <returns>ID3D12Resource*</returns>
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateDepthStencilTextureResource(Microsoft::WRL::ComPtr<ID3D12Device> device, int32_t width, int32_t height);
 
 	/// <summary>
 	/// オフスクリーン描画用のテクスチャリソースを生成する。
 	/// </summary>
+	/// <param name="device">デバイス</param>
+	/// <param name="width">横</param>
+	/// <param name="height">縦</param>
+	/// <param name="color">色</param>
+	/// <returns>ID3D12Resource*</returns>
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateOffscreenTextureResource(Microsoft::WRL::ComPtr<ID3D12Device> device, int32_t width, int32_t height, D3D12_CLEAR_VALUE color);
 
 	/// <summary>
 	/// UAV（Unordered Access View）として使用可能なバッファリソースを生成する。
 	/// </summary>
+	/// <param name="device">デバイス</param>
+	/// <param name="sizeInBytes">サイズ</param>
+	/// <returns>ID3D12Resource*</returns>
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateUAVResource(ID3D12Device* device, size_t sizeInBytes);
 
 	/// <summary>
 	/// GPUからCPUへのデータ読み戻しに使用するリードバックリソースを生成する。
 	/// </summary>
+	/// <param name="device">デバイス</param>
+	/// <param name="sizeInBytes">サイズ</param>
+	/// <returns>ID3D12Resource*</returns>
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateReadbackResource(ID3D12Device* device, size_t sizeInBytes);
 
 	/// <summary>
 	/// CPUからGPUへデータ転送するためのアップロードバッファを生成する。
 	/// </summary>
+	/// <param name="sizeInBytes">サイズ</param>
+	/// <param name="initData">データ</param>
+	/// <returns>ID3D12Resource*</returns>
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateUploadBuffer(size_t sizeInBytes, const void* initData);
 
 	//========================================================================*/
@@ -196,28 +223,51 @@ public:
 	/*void Tick();*/
 
 private:
-
+	/// <summary>
+	/// デバイス作成
+	/// </summary>
 	void CreateDevice();
 
+	/// <summary>
+	/// コマンド作成
+	/// </summary>
 	void CreateCommand();
 
+	/// <summary>
+	/// スワップチェイン作成
+	/// </summary>
 	void CreateSwapChain();
 
+	/// <summary>
+	/// レンダーターゲット作成
+	/// </summary>
 	void CreateRenderTargets();
 
+	/// <summary>
+	/// 深度バッファ作成
+	/// </summary>
 	void CreateDepthBuffer();
 
+	/// <summary>
+	/// コンパイラー作成
+	/// </summary>
 	void CreateCompiler();
 
+	/// <summary>
+	/// FPSKeeperの作成
+	/// </summary>
 	void InitializeFPSKeeper();
 
+	/// <summary>
+	/// ルートシグネーチャーの設定
+	/// </summary>
 	void SettingRootSignature();
 
 	/// <summary>
 	/// swapChainのバリア
 	/// </summary>
-	/// <param name="before"></param>
-	/// <param name="after"></param>
+	/// <param name="before">前</param>
+	/// <param name="after">後</param>
 	void CreateBarrier(D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after);
 
 

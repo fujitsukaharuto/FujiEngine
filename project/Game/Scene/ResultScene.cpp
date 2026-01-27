@@ -24,7 +24,7 @@ ResultScene::~ResultScene() {
 	lightManager_->GetDirectionLight()->SetLightIntensity(0.3f);
 	ParticleManager::GetInstance()->GetParticleCSEmitter(hanabiIndex_).SetEmit(false);
 	ParticleManager::GetInstance()->ResetCSEmitters();
-	ParticleManager::GetInstance()->InitDefoultCSEmitter();
+	ParticleManager::GetInstance()->InitDefaultCSEmitter();
 }
 
 void ResultScene::Initialize() {

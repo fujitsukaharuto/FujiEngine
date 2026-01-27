@@ -95,6 +95,19 @@ void TextureManager::Load(const std::string& filename, bool overWrite) {
 	dxcommon_->CommandExecution();
 }
 
+void Graphics::TextureManager::LoadAll() {
+	if (!std::filesystem::exists(directoryPath_)) return;
+
+	for (const auto& entry : std::filesystem::directory_iterator(directoryPath_)) {
+		if (entry.is_regular_file()) {
+			auto path = entry.path();
+			if (path.extension() == ".png" || path.extension() == ".jpg") {
+				Load(path.filename().string());
+			}
+		}
+	}
+}
+
 void TextureManager::LoadTextureFile(bool overWrite) {
 #ifdef _DEBUG
 	textureFileList_.clear();

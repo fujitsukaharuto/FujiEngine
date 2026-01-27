@@ -461,43 +461,6 @@ void ParticleEmitter::RandomTranslate(const Vector2& x, const Vector2& y, const 
 void ParticleEmitter::Save() {
 	json j;
 
-	/*j.push_back(json::array({ pos_.x, pos_.y, pos_.z }));
-	j.push_back(json::array({ particleRotate_.x,particleRotate_.y,particleRotate_.z }));
-	j.push_back(json::array({ emitSizeMax_.x,emitSizeMax_.y,emitSizeMax_.z }));
-	j.push_back(json::array({ emitSizeMin_.x,emitSizeMin_.y,emitSizeMin_.z }));
-
-	j.push_back(count_);
-	j.push_back(frequencyTime_);
-
-	j.push_back(grain_.lifeTime_);
-	j.push_back(json::array({ grain_.accele_.x,grain_.accele_.y,grain_.accele_.z }));
-	j.push_back(json::array({ grain_.speed_.x,grain_.speed_.y,grain_.speed_.z }));
-
-	j.push_back(grain_.type_);
-	j.push_back(grain_.speedType_);
-	j.push_back(grain_.rotateType_);
-	j.push_back(grain_.colorType_);
-
-	j.push_back(grain_.returnPower_);
-
-	j.push_back(json::array({ grain_.startSize_.x,grain_.startSize_.y }));
-	j.push_back(json::array({ grain_.endSize_.x,grain_.endSize_.y }));
-
-	j.push_back(grain_.isBillBoard_);
-
-	j.push_back(static_cast<int>(grain_.pattern_));
-
-	j.push_back(json::array({ para_.speedx.x,para_.speedx.y }));
-	j.push_back(json::array({ para_.speedy.x,para_.speedy.y }));
-	j.push_back(json::array({ para_.speedz.x,para_.speedz.y }));
-
-	j.push_back(json::array({ para_.transx.x,para_.transx.y }));
-	j.push_back(json::array({ para_.transy.x,para_.transy.y }));
-	j.push_back(json::array({ para_.transz.x,para_.transz.y }));
-
-	j.push_back(json::array({ para_.colorMin.x,para_.colorMin.y,para_.colorMin.z,para_.colorMin.w }));
-	j.push_back(json::array({ para_.colorMax.x,para_.colorMax.y,para_.colorMax.z,para_.colorMax.w }));*/
-
 	j["position"]             = { pos_.x, pos_.y, pos_.z };
 	j["rotate"]               = { particleRotate_.x,particleRotate_.y,particleRotate_.z };
 	j["emitMaxSize"]          = { emitSizeMax_.x,emitSizeMax_.y,emitSizeMax_.z };

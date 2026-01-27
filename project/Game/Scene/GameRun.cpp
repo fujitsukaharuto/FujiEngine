@@ -19,29 +19,7 @@ void GameRun::Initialize() {
 #pragma region リソース読み込み
 
 #pragma region テクスチャ読み込み
-	textureManager_->Load("uvChecker.png");
-	textureManager_->Load("checkerBoard.png");
-	textureManager_->Load("white2x2.png");
-	textureManager_->Load("grass.jpg");
-	textureManager_->Load("BlueprintBackground.png");
-	textureManager_->Load("T_Noise04.jpg");
-	textureManager_->Load("Beam.png");
-	textureManager_->Load("beamCore.png");
-	textureManager_->Load("beamCore2.png");
-	textureManager_->Load("beamCore3.png");
-	textureManager_->Load("kira.png");
-	textureManager_->Load("ringOutline.png");
-	textureManager_->Load("Atlas.png");
-	textureManager_->Load("underRing.png");
-	textureManager_->Load("boal16x16.png");
-	textureManager_->Load("Title.png");
-	textureManager_->Load("clear_beta.png");
-	textureManager_->Load("gameover_beta.png");
-	textureManager_->Load("spaceKey.png");
-	textureManager_->Load("key_beta.png");
-	textureManager_->Load("keyPad_beta.png");
-	textureManager_->Load("FX12_Lightning_01.png");
-	textureManager_->Load("Gradient02.jpg");
+	textureManager_->LoadAll();
 #pragma endregion
 
 

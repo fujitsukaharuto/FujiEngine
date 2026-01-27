@@ -35,6 +35,7 @@ namespace Core {
 		/// <summary>
 		/// 実行終了を知らせる
 		/// </summary>
+		/// <returns>bool</returns>
 		virtual bool IsEndRequest() { return endRequest_; }
 
 		/// <summary>

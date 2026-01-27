@@ -96,7 +96,7 @@ public:
 	int InitGPUEmitterSurface(const std::string& fileName);
 
 	void ResetCSEmitters();
-	void InitDefoultCSEmitter();
+	void InitDefaultCSEmitter();
 
 	void LoadCSEmitterFileDir();
 	const std::vector<std::string>& GetCSEmitterFileNames() { return csEmitterFileNames_; }
@@ -121,10 +121,10 @@ private:
 	void InitRingVertex();
 	void InitSphereVertex();
 	void InitCylinderVertex();
-	void InitLighningVertex();
+	void InitLightningVertex();
 
 	/// <summary>パーティクルに使用するテクスチャのセレクトポップアップ</summary>
-	void ParticleTexurePopUp();
+	void ParticleTexturePopUp();
 	/// <summary>グループのデータを出力</summary>
 	void SaveGroupData();
 	/// <summary>Jsonがあるかチェックあるならそこから作る</summary>

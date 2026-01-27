@@ -23,6 +23,9 @@ namespace DXC {
 		/// <summary>
 		/// シェーダーのコンパイル関数
 		/// </summary>
+		/// <param name="filePath">ファイルパス</param>
+		/// <param name="profile">シェーダーレベル</param>
+		/// <returns>IDxcBlob*</returns>
 		ComPtr<IDxcBlob> CompileShader(const std::wstring& filePath, const wchar_t* profile);
 
 	private:

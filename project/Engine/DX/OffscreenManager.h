@@ -177,11 +177,13 @@ namespace Graphics {
 		/// <summary>
 		/// ポストエフェクトの追加
 		/// </summary>
+		/// <param name="effect">種類</param>
 		void AddPostEffect(PostEffectList effect) { validPostEffects_.push_back(postEffects_[int(effect)]); }
 
 		/// <summary>
 		/// 特定のポストエフェクトのポップ
 		/// </summary>
+		/// <param name="effect">種類</param>
 		void PopPostEffect(PostEffectList effect);
 
 		//========================================================================*/

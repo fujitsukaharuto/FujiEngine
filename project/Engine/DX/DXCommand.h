@@ -23,29 +23,46 @@ namespace DXC {
 		/// <summary>
 		/// コマンドリストをクローズし、コマンドキューに実行を送信する
 		/// </summary>
+		/// <param name="index">どのコマンドリストか</param>
 		void Close(uint32_t index = 0);
 
 		/// <summary>
 		/// GPU実行キューへ送信する
 		/// </summary>
+		/// <param name="index">どのコマンドリストか</param>
 		void Execution(uint32_t index = 0);
 
+		/// <summary>
+		/// Compute側の実行
+		/// </summary>
 		void ComputeExecution();
 
+		/// <summary>
+		/// シグナルを出す
+		/// </summary>
+		/// <param name="index">どのコマンドリストか</param>
 		void GPUSignal(uint32_t index = 0);
 
+		/// <summary>
+		/// Compute側のシグナル
+		/// </summary>
 		void GPUComputeSignal();
 
 		/// <summary>
 		/// GPUの実行をまつ
 		/// </summary>
+		/// <param name="index">どのコマンドリストか</param>
 		void WaitForGPU(uint32_t index = 0);
 
+		/// <summary>
+		/// Computeを待つ
+		/// </summary>
 		void WaitComputeInGraphicsQueue();
 
 		/// <summary>
 		/// コマンドアロケータおよびコマンドリストをリセットする
 		/// </summary>
+		/// <param name="index">どのコマンドリストか</param>
 		void Reset(uint32_t index = 0);
 
 		void PerFrameWait();

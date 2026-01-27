@@ -72,7 +72,7 @@ namespace Audio {
 		/// Waveファイルの読み込みとSoundDataの生成
 		/// </summary>
 		/// <param name="filename">ファイル名</param>
-		/// <returns>SoundData&</returns>
+		/// <returns>SoundData</returns>
 		SoundData& SoundLoadWave(const char* filename);
 
 		/// <summary>

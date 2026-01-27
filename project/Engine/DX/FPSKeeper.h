@@ -24,31 +24,38 @@ namespace Core {
 		/// <summary>
 		/// 実時間ベースのDeltaTime
 		/// </summary>
+		/// <returns>float</returns>
 		static float DeltaTime();
 
 		/// <summary>
 		/// 60FPS基準の時間倍率
 		/// </summary>
+		/// <returns>float</returns>
 		static float DeltaTimeFrame();
 
 		/// <summary>
 		/// コマ送り対応のエフェクト用実時間ベースのDeltaTime
 		/// </summary>
+		/// <returns>float</returns>
 		static float DeltaTimeForEffect();
 
 		/// <summary>
 		/// ヒットストップのレートを設定(どれくらい遅くするか)
 		/// </summary>
+		/// <param name="rate">レート</param>
 		static void SetHitStopRate(float rate);
 
 		/// <summary>
 		/// ヒットストップのフレーム数を設定する
 		/// </summary>
+		/// <param name="rate">フレーム数</param>
 		static void SetHitStopFrame(float frame);
 
 		/// <summary>
 		/// スローモーションの設定
 		/// </summary>
+		/// <param name="frame">フレーム数</param>
+		/// <param name="rate">レート</param>
 		static void SetSlowMotion(float frame = 0.5f, float rate = 0.5f);
 
 		void Debug();

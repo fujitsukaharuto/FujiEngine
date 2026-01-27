@@ -93,6 +93,11 @@ public:
 	/// <summary>
 	/// Commandの作成テンプレート
 	/// </summary>
+	/// <typeparam name="T"></typeparam>
+	/// <param name="trans">位置</param>
+	/// <param name="prevValue">前の値</param>
+	/// <param name="currentValue">今の値</param>
+	/// <param name="member">メンバーの位置</param>
 	template<typename T>
 	static void TryCreatePropertyCommand(Math::Trans& trans, const T& prevValue, T& currentValue, T Math::Trans::* member) {
 		if (currentValue != prevValue) {

@@ -26,13 +26,13 @@ public:
 	/// <summary>
 	/// カメラの取得
 	/// </summary>
-	/// <returns></returns>
+	/// <returns>Camera</returns>
 	Camera* GetCamera()const { return camera_.get(); }
 
 	/// <summary>
 	/// Debugモードかどうかの取得
 	/// </summary>
-	/// <returns></returns>
+	/// <returns>bool</returns>
 	bool GetDebugMode()const { return debugMode_; }
 
 	//========================================================================*/

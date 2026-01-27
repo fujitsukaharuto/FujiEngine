@@ -29,7 +29,6 @@ void GPUParticleSystem::Initialize(DXCom* pDxcom, SRVManager* srvManager) {
 	InitGPUEmitter();
 	InitGPUEmitterSurface("DeadTree_2.obj");
 	InitGPUEmitterSurface("BeamCrystal.obj");
-	//InitGPUEmitterTexture("magicCircle.png");
 	csEmitters_[0].emitter->Load("titleDefoult");
 	csEmitters_[0].emitter->Emit();// 初回に一度エミットしておく
 }

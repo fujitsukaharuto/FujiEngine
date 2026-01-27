@@ -37,7 +37,7 @@ void ParticleManager::Initialize(DXCom* pDxcom, SRVManager* srvManager) {
 	InitRingVertex();
 	InitSphereVertex();
 	InitCylinderVertex();
-	InitLighningVertex();
+	InitLightningVertex();
 
 	gpuParticleSystem_ = std::make_unique<GPUParticleSystem>();
 	gpuParticleSystem_->Initialize(pDxcom, srvManager);
@@ -257,7 +257,7 @@ void ParticleManager::ParticleDebugGUI() {
 				ImGui::BeginGroup();
 				{
 					ImGui::Text("Material:");
-					ParticleTexurePopUp();
+					ParticleTexturePopUp();
 					ImGui::Spacing();
 					ImGui::TextDisabled("Path: %s", selectParticleGroup_->material_.GetPathName().c_str());
 				}
@@ -634,7 +634,7 @@ void ParticleManager::ResetCSEmitters() {
 	gpuParticleSystem_->ResetEmitters();
 }
 
-void ParticleManager::InitDefoultCSEmitter() {
+void ParticleManager::InitDefaultCSEmitter() {
 	gpuParticleSystem_->InitDefoultEmitter();
 }
 
@@ -745,6 +745,7 @@ void ParticleManager::InternalCreateParticleGroup(const std::string& name, const
 			add += 0.1f;
 		}
 
+		newGroup->emitter_.SetGroup(newGroup.get());
 		particleGroups_.insert(std::make_pair(name, std::move(newGroup)));
 	}
 }
@@ -1207,12 +1208,12 @@ void ParticleManager::InitCylinderVertex() {
 	cylinder_.ibView.SizeInBytes = static_cast<UINT>(sizeof(uint32_t) * cylinder_.indices.size());
 }
 
-void ParticleManager::InitLighningVertex() {
+void ParticleManager::InitLightningVertex() {
 	lightning_ = std::make_unique<Object3d>();
 	lightning_->Create("lightning.obj");
 }
 
-void ParticleManager::ParticleTexurePopUp() {
+void ParticleManager::ParticleTexturePopUp() {
 #ifdef _DEBUG
 	if (ImGui::Button("TextureFile")) {
 		ImGui::OpenPopup("TextureFile Window");

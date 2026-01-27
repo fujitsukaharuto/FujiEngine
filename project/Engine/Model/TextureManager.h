@@ -43,6 +43,7 @@ namespace Graphics {
 		// テクスチャのロード
 		Texture* LoadTexture(const std::string& filename);
 		void Load(const std::string& filename, bool overWrite = false);
+		void LoadAll();
 		void LoadTextureFile(bool overWrite = false);
 
 		// テクスチャの取得

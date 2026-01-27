@@ -69,30 +69,35 @@ public:
 	/// <param name="strength">シェイク強度</param>
 	void SetShakeStrength(float strength) { shakeStrength_ = strength; }
 
+	/// <summary>
+	/// シェイクのパラメーター設定
+	/// </summary>
+	/// <param name="strength">シェイク強度</param>
+	/// <param name="time">シェイク時間</param>
 	void IssuanceShake(float strength = 0.1f, float time = 20.0f);
 
 	/// <summary>
 	/// ワールド行列の取得
 	/// </summary>
-	/// <returns></returns>
+	/// <returns>Matrix4x4</returns>
 	const Math::Matrix4x4& GetWorldMatrix() const { return worldMatrix_; }
 
 	/// <summary>
 	/// ビュー行列の取得
 	/// </summary>
-	/// <returns></returns>
+	/// <returns>Matrix4x4</returns>
 	const Math::Matrix4x4& GetViewMatrix() const { return viewMatrix_; }
 
 	/// <summary>
 	/// 射影行列の取得
 	/// </summary>
-	/// <returns></returns>
+	/// <returns>Matrix4x4</returns>
 	const Math::Matrix4x4& GetProjectionMatrix() const { return projectionMatrix_; }
 
 	/// <summary>
 	/// ViewProjection行列の取得
 	/// </summary>
-	/// <returns></returns>
+	/// <returns>Matrix4x4</returns>
 	const Math::Matrix4x4& GetViewProjectionMatrix() const { return viewProjectionMatrix_; }
 
 	void DebugGUI();
