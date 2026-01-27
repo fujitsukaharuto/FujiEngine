@@ -1,11 +1,11 @@
 {
     "Para_autoUVMax": [
-        6.0,
-        0.0
+        0.20000000298023224,
+        0.4000000059604645
     ],
     "Para_autoUVMin": [
-        6.0,
-        0.0
+        -0.20000000298023224,
+        -0.10000000149011612
     ],
     "Para_colorMax": [
         0.800000011920929,
@@ -57,8 +57,8 @@
         0.0
     ],
     "autoUVSpeed": [
-        0.10000000149011612,
-        0.0
+        -0.07000000029802322,
+        0.009999999776482582
     ],
     "colorType": 1,
     "count": 1,
@@ -76,11 +76,11 @@
         27.5,
         27.5
     ],
-    "frequencyTime": 0.03333333507180214,
+    "frequencyTime": 0.003000000026077032,
     "grainPattern": 0,
     "grainType": 1,
     "isAddRandomSize": false,
-    "isAutoUVMove": false,
+    "isAutoUVMove": true,
     "isBillBoard": false,
     "isContinuouslyR_": false,
     "isDistanceComplement": false,

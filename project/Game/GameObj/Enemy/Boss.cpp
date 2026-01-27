@@ -1253,11 +1253,6 @@ void Boss::InitSummon() {
 	energyParticle_.pos_ = animeModel_->transform.translate;
 	energyParticle_.pos_.y = 0.0f;
 
-	energySphere_.grain_.isAutoUVMove_ = true;
-	energySphere_.grain_.autoUVSpeed_ = { 0.01f,0.01f };
-	energySphere_.para_.autoUVMax = { 0.02f,0.01f };
-	energySphere_.para_.autoUVMin = { -0.02f,-0.01f };
-
 }
 
 void Boss::ExpandSummon() {
