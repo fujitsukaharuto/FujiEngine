@@ -43,17 +43,17 @@ Boss::~Boss() {
 
 void Boss::Initialize() {
 	OriginGameObject::Initialize();
-	OriginGameObject::CreateAnimModel("T_boss.gltf");
-	animModel_->LoadAnimationFile("T_boss.gltf");
+	OriginGameObject::CreateAnimeModel("T_boss.gltf");
+	animeModel_->LoadAnimationFile("T_boss.gltf");
 
-	animModel_->LoadTransformFromJson("boss_transform.json");
+	animeModel_->LoadTransformFromJson("boss_transform.json");
 
 	shadow_ = std::make_unique<Object3d>();
 	shadow_->Create("Sphere");
 	shadow_->SetTexture("white2x2.png");
 	shadow_->SetColor({ 0.02f,0.02f,0.02f,0.0f });
 	shadow_->SetLightEnable(LightMode::kLightNone);
-	shadow_->transform.translate = animModel_->transform.translate;
+	shadow_->transform.translate = animeModel_->transform.translate;
 	shadow_->transform.translate.y = 0.15f;
 	shadow_->transform.scale = { 3.0f,0.0f,3.0f };
 	shadow_->transform.scale.y = 0.1f;
@@ -62,7 +62,7 @@ void Boss::Initialize() {
 	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
 	collider_->SetCollisionStayCallback([this](const ColliderInfo& other) {OnCollisionStay(other); });
 	collider_->SetCollisionExitCallback([this](const ColliderInfo& other) {OnCollisionExit(other); });
-	collider_->SetParent(&animModel_->transform);
+	collider_->SetParent(&animeModel_->transform);
 	collider_->SetTag("Boss");
 	collider_->SetOffset({ 0.0f,7.0f,0.0f });
 	collider_->SetWidth(7.5f);
@@ -87,7 +87,7 @@ void Boss::Initialize() {
 		chargeParent->transform.scale.x = params_.beam.baseChargeSize;
 		chargeParent->transform.scale.y = params_.beam.baseChargeSize;
 		chargeParent->transform.scale.z = params_.beam.baseChargeSize;
-		chargeParent->SetParent(&animModel_->transform);
+		chargeParent->SetParent(&animeModel_->transform);
 		chargeParent->SetNoneScaleParent(true);
 		if (i != 0 && i != 4) {
 			if (i < 4) {
@@ -124,7 +124,7 @@ void Boss::Initialize() {
 	waveParent_ = std::make_unique<Object3d>();
 	waveParent_->Create("cube.obj");
 	waveParent_->transform.translate.z += 8.0f;
-	waveParent_->SetParent(&animModel_->transform);
+	waveParent_->SetParent(&animeModel_->transform);
 	waveParent_->SetNoneScaleParent(true);
 
 	for (int i = 0; i < 4; i++) {
@@ -139,7 +139,7 @@ void Boss::Initialize() {
 		}
 		arrowParent->transform.translate.y += 6.0f;
 		arrowParent->transform.translate.z -= 2.0f;
-		arrowParent->SetParent(&animModel_->transform);
+		arrowParent->SetParent(&animeModel_->transform);
 		arrowParent->SetNoneScaleParent(true);
 
 		arrowParents_.push_back(std::move(arrowParent));
@@ -206,16 +206,16 @@ void Boss::Initialize() {
 	ParticleManager::Load(roringWave_, "roringWave");
 	ParticleManager::Load(roringParticle_, "roringParticle");
 	ParticleManager::Load(roringring_, "roringring");
-	roringWave_.pos_ = animModel_->transform.translate;
+	roringWave_.pos_ = animeModel_->transform.translate;
 	roringWave_.grain_.isAutoUVMove_ = true;
 	roringWave_.grain_.autoUVSpeed_.x = 0.01f;
 	roringWave_.grain_.isZandX_ = true;
-	animModel_->RegisterJointWorld("mixamorig:Head");
-	animModel_->RegisterJointWorld("mixamorig:LeftHand");
-	animModel_->RegisterJointWorld("mixamorig:RightHand");
-	roringring_.SetAnimParent(animModel_->GetJointTrans("mixamorig:Head"));
+	animeModel_->RegisterJointWorld("mixamorig:Head");
+	animeModel_->RegisterJointWorld("mixamorig:LeftHand");
+	animeModel_->RegisterJointWorld("mixamorig:RightHand");
+	roringring_.SetAnimeParent(animeModel_->GetJointTrans("mixamorig:Head"));
 	roringring_.pos_.y = -7.0f;
-	roringParticle_.SetAnimParent(animModel_->GetJointTrans("mixamorig:Head"));
+	roringParticle_.SetAnimeParent(animeModel_->GetJointTrans("mixamorig:Head"));
 	roringParticle_.pos_.y = -6.5f;
 	roringParticle_.pos_.z = 5.0f;
 
@@ -233,7 +233,7 @@ void Boss::Initialize() {
 	LoadPhase();
 	ChangeBehavior(std::make_unique<BossRoot>(this));
 	InitSummon();
-	animModel_->ChangeAnimation("idle");
+	animeModel_->ChangeAnimation("idle");
 
 	jumpAttackSE_ = &AudioPlayer::GetInstance()->SoundLoadWave("jumpAttackSE.wav");
 }
@@ -278,7 +278,7 @@ void Boss::Update() {
 		if (hpCooltime_ < 0.0f) {
 			isHpActive_ = true;
 			ChangeBehavior(std::make_unique<BossRoot>(this));
-			animModel_->IsRoopAnimation(true);
+			animeModel_->IsLoopAnimation(true);
 		}
 	} else {
 		dyingTime_ -= FPSKeeper::DeltaTimeFrame();
@@ -287,12 +287,12 @@ void Boss::Update() {
 		}
 	}
 
-	ParticleManager::GetSphereEmitter(halfAuraCS_).SetPos({ animModel_->transform.translate.x,animModel_->transform.translate.y + params_.jump.height,animModel_->transform.translate.z });
-	ParticleManager::GetSphereEmitter(halfSmallAuraCS_).SetPos({ animModel_->transform.translate.x,animModel_->transform.translate.y + params_.jump.height,animModel_->transform.translate.z });
-	ParticleManager::GetSphereEmitter(leftHandAuraCS_).SetPos(animModel_->GetJointWorldPos("mixamorig:LeftHand"));
-	ParticleManager::GetSphereEmitter(rightHandAuraCS_).SetPos(animModel_->GetJointWorldPos("mixamorig:RightHand"));
-	animModel_->AnimationUpdate();
-	shadow_->transform.translate = animModel_->transform.translate;
+	ParticleManager::GetSphereEmitter(halfAuraCS_).SetPos({ animeModel_->transform.translate.x,animeModel_->transform.translate.y + params_.jump.height,animeModel_->transform.translate.z });
+	ParticleManager::GetSphereEmitter(halfSmallAuraCS_).SetPos({ animeModel_->transform.translate.x,animeModel_->transform.translate.y + params_.jump.height,animeModel_->transform.translate.z });
+	ParticleManager::GetSphereEmitter(leftHandAuraCS_).SetPos(animeModel_->GetJointWorldPos("mixamorig:LeftHand"));
+	ParticleManager::GetSphereEmitter(rightHandAuraCS_).SetPos(animeModel_->GetJointWorldPos("mixamorig:RightHand"));
+	animeModel_->AnimationUpdate();
+	shadow_->transform.translate = animeModel_->transform.translate;
 	shadow_->transform.translate.y = 0.15f;
 	collider_->InfoUpdate();
 }
@@ -303,7 +303,7 @@ void Boss::Draw([[maybe_unused]] Material* mate, [[maybe_unused]] bool is) {
 	collider_->DrawCollider();
 #endif // _DEBUG
 
-	animModel_->Draw();
+	animeModel_->Draw();
 	core_->Draw();
 	for (auto& wall : walls_) {
 		if (!wall->GetIsLive())continue;
@@ -325,7 +325,7 @@ void Boss::Draw([[maybe_unused]] Material* mate, [[maybe_unused]] bool is) {
 		rod->Draw();
 	}
 
-	for (auto& ring : undderRings_) {
+	for (auto& ring : underRings_) {
 		if (!ring->GetIsLive())continue;
 		ring->Draw();
 #ifdef _DEBUG
@@ -351,11 +351,11 @@ void Boss::Draw([[maybe_unused]] Material* mate, [[maybe_unused]] bool is) {
 }
 
 void Boss::CSDispatch() {
-	animModel_->CSDispatch();
+	animeModel_->CSDispatch();
 }
 
 void Boss::AnimDraw() {
-	animModel_->Draw();
+	animeModel_->Draw();
 }
 
 void Boss::DebugGUI() {
@@ -363,7 +363,7 @@ void Boss::DebugGUI() {
 	if (ImGui::CollapsingHeader("Boss##0")) {
 		ImGui::Indent();
 		if (ImGui::CollapsingHeader("Boss##1")) {
-			animModel_->DebugGUI();
+			animeModel_->DebugGUI();
 			collider_->DebugGUI();
 			ParameterGUI();
 		}
@@ -524,7 +524,7 @@ void Boss::InitParameter() {
 		std::unique_ptr<UnderRing> ring;
 		ring = std::make_unique<UnderRing>();
 		ring->Initialize();
-		undderRings_.push_back(std::move(ring));
+		underRings_.push_back(std::move(ring));
 	}
 
 	for (int i = 0; i < 5; i++) {
@@ -560,11 +560,11 @@ void Boss::ReStart() {
 	isActiveSprite_ = false;
 	//phaseIndex_ = 0;
 	startTime_ = 300.0f;
-	animModel_->ChangeAnimation("roaring");
-	animModel_->LoadTransformFromJson("boss_transform.json");
-	animModel_->transform.rotate.y = 3.14f;
-	animModel_->IsRoopAnimation(true);
-	animModel_->ChangeAnimation("roaring");
+	animeModel_->ChangeAnimation("roaring");
+	animeModel_->LoadTransformFromJson("boss_transform.json");
+	animeModel_->transform.rotate.y = 3.14f;
+	animeModel_->IsLoopAnimation(true);
+	animeModel_->ChangeAnimation("roaring");
 }
 
 void Boss::ReduceBossHP(bool isStrong) {
@@ -622,7 +622,7 @@ void Boss::ReduceBossHP(bool isStrong) {
 		if (bossHp_ < 0.0f && !isDying_) {
 			isDying_ = true;
 			SetDefaultBehavior(true);
-			animModel_->ChangeAnimation("dying");
+			animeModel_->ChangeAnimation("dying");
 			ParticleManager::GetSphereEmitter(halfAuraCS_).SetEmit(false);
 			ParticleManager::GetSphereEmitter(halfSmallAuraCS_).SetEmit(false);
 			ParticleManager::GetSphereEmitter(leftHandAuraCS_).SetEmit(false);
@@ -662,7 +662,7 @@ void Boss::ShakeHP() {
 
 void Boss::Walk() {
 	if (BossRoot* behavior = dynamic_cast<BossRoot*>(behavior_.get())) {
-		Vector3 dir = pPlayer_->GetWorldPos() - animModel_->transform.translate;
+		Vector3 dir = pPlayer_->GetWorldPos() - animeModel_->transform.translate;
 		dir.y = 0.0f; // 水平方向だけに限定
 		dir = dir.Normalize();
 
@@ -670,21 +670,21 @@ void Boss::Walk() {
 		float targetAngle = std::atan2(dir.x, dir.z); // Z前方軸に対する角度
 
 		Vector3 front = GetFrontOffset(Vector3(0.0f, 0.0f, 1.0f) * 0.05f * FPSKeeper::DeltaTimeFrame(), targetAngle);
-		animModel_->transform.translate += front;
+		animeModel_->transform.translate += front;
 
 		CaluModelDir();
 	}
 }
 
 void Boss::CaluModelDir() {
-	Vector3 dir = pPlayer_->GetWorldPos() - animModel_->transform.translate;
+	Vector3 dir = pPlayer_->GetWorldPos() - animeModel_->transform.translate;
 	dir.y = 0.0f; // 水平方向だけに限定
 	dir = dir.Normalize();
 
 	// 目標のY軸角度（ラジアン）
 	float targetAngle = std::atan2(dir.x, dir.z); // Z前方軸に対する角度
 	// 現在のY軸角度（モデルの回転）
-	float currentAngle = animModel_->transform.rotate.y;
+	float currentAngle = animeModel_->transform.rotate.y;
 
 	// 角度差を -π〜+π にラップ
 	float delta = targetAngle - currentAngle;
@@ -695,7 +695,7 @@ void Boss::CaluModelDir() {
 	float lerpFactor = 0.1f; // 追従の速さ
 	float newAngle = currentAngle + delta * lerpFactor;
 
-	animModel_->transform.rotate.y = newAngle;
+	animeModel_->transform.rotate.y = newAngle;
 }
 
 void Boss::DushInit() {
@@ -748,14 +748,14 @@ bool Boss::DushCharge(float& t, float maxT, bool& isNear, float reng) {
 		UpdateEmitterPos(i);
 	}
 
-	if (Vector3(pPlayer_->GetWorldPos() - animModel_->transform.translate).Length() < reng) {
+	if (Vector3(pPlayer_->GetWorldPos() - animeModel_->transform.translate).Length() < reng) {
 		isNear = true;
 	} else {
 		isNear = false;
 	}
 	if (t > maxT) {
-		Vector3 emitPos = GetFrontOffset(Vector3(0.0f, 0.0f, 8.5f), animModel_->transform.rotate.y);
-		emitPos += animModel_->transform.translate;
+		Vector3 emitPos = GetFrontOffset(Vector3(0.0f, 0.0f, 8.5f), animeModel_->transform.rotate.y);
+		emitPos += animeModel_->transform.translate;
 		emitPos.y = 4.0f;
 		dushStartParticle_.pos_ = emitPos;
 		dushStartCircle_.pos_ = emitPos;
@@ -772,18 +772,18 @@ bool Boss::DushCharge(float& t, float maxT, bool& isNear, float reng) {
 bool Boss::DushAttack(bool isNear, float& dushReng, float stopReng) {
 	if (dushReng == 0.0f) {
 		ParticleManager::GetParticleCSEmitter(dushTrailIndex_).SetEmit(true);
-		ParticleManager::GetParticleCSEmitter(dushTrailIndex_).SetPos(animModel_->transform.translate);
+		ParticleManager::GetParticleCSEmitter(dushTrailIndex_).SetPos(animeModel_->transform.translate);
 	}
 	isNowDush_ = true;
-	Vector3 front = GetFrontOffset(Vector3(0.0f, 0.0f, 2.5f), animModel_->transform.rotate.y);
-	animModel_->transform.translate += front;
+	Vector3 front = GetFrontOffset(Vector3(0.0f, 0.0f, 2.5f), animeModel_->transform.rotate.y);
+	animeModel_->transform.translate += front;
 	dushReng += front.Length();
-	Vector3 emitPos = GetFrontOffset(Vector3(0.0f, 0.0f, 8.5f), animModel_->transform.rotate.y);
-	emitPos += animModel_->transform.translate;
+	Vector3 emitPos = GetFrontOffset(Vector3(0.0f, 0.0f, 8.5f), animeModel_->transform.rotate.y);
+	emitPos += animeModel_->transform.translate;
 	emitPos.y = 3.0f;
 	ParticleManager::GetParticleCSEmitter(dushTrailIndex_).SetPos(emitPos);
-	emitPos = GetFrontOffset(Vector3(0.0f, 0.0f, 5.5f), animModel_->transform.rotate.y);
-	emitPos += animModel_->transform.translate;
+	emitPos = GetFrontOffset(Vector3(0.0f, 0.0f, 5.5f), animeModel_->transform.rotate.y);
+	emitPos += animeModel_->transform.translate;
 	emitPos.y = 1.0f;
 	dushSmoke_.pos_ = emitPos;
 	dushSmoke_.Emit();
@@ -813,8 +813,8 @@ void Boss::WaveWallAttack() {
 	CameraManager::GetInstance()->GetCamera()->IssuanceShake(0.2f, 15.0f);
 
 	// 波攻撃の出現位置を決める
-	Vector3 wavePos = GetFrontOffset(Vector3(0.0f, 0.0f, 4.5f), animModel_->transform.rotate.y);
-	wavePos += animModel_->transform.translate;
+	Vector3 wavePos = GetFrontOffset(Vector3(0.0f, 0.0f, 4.5f), animeModel_->transform.rotate.y);
+	wavePos += animeModel_->transform.translate;
 	wavePos.y = 0.0f;
 	for (auto& wall : walls_) {
 		if (count == 3) break;
@@ -822,7 +822,7 @@ void Boss::WaveWallAttack() {
 		Vector3 velocity = { 0.0f,0.0f,1.0f };
 		if (count == 1) velocity = Vector3(-1.0f, 0.0f, 1.0f).Normalize();
 		if (count == 2) velocity = Vector3(1.0f, 0.0f, 1.0f).Normalize();
-		velocity = GetFrontOffset(velocity, animModel_->transform.rotate.y);
+		velocity = GetFrontOffset(velocity, animeModel_->transform.rotate.y);
 
 		wall->InitWave(wavePos, velocity);
 		count++;
@@ -880,7 +880,7 @@ void Boss::RodFall() {
 		if (rod->GetIsLive()) continue;
 
 		// ロッドの出現位置を決める
-		Vector3 rodPos = animModel_->transform.translate;
+		Vector3 rodPos = animeModel_->transform.translate;
 		rodPos.x += Random::GetFloat(-60.0f, 60.0f);
 		rodPos.y = 20.0f;
 		rodPos.z += Random::GetFloat(-60.0f, 60.0f);
@@ -892,7 +892,7 @@ void Boss::RodFall() {
 
 void Boss::RodUnderRing(const Vector3& emitPos) {
 	int count = 0;
-	for (auto& ring : undderRings_) {
+	for (auto& ring : underRings_) {
 		if (count == 1) break;
 		if (ring->GetIsLive()) continue;
 		ring->InitRing(emitPos, 120.0f);
@@ -940,7 +940,7 @@ bool Boss::BeamCharge() {
 		auto& emitter = ParticleManager::GetParticleCSEmitterSurface(1);
 		emitter.isEmit_ = true;
 		emitter.data_.radius = 0.0f;
-		emitter.data_.translate = animModel_->transform.translate;
+		emitter.data_.translate = animeModel_->transform.translate;
 		emitter.data_.translate.y = bp.parentY;
 	}
 
@@ -1050,15 +1050,15 @@ bool Boss::JumpAttack() {
 
 		float upTime = jp.upStart - jp.upEnd;
 		float flyT = 1.0f - ((jumpTime_ - jp.upEnd) / upTime);
-		animModel_->transform.translate.y = std::lerp(0.0f, jp.height, (1.0f - (1.0f - flyT) * (1.0f - flyT)));
+		animeModel_->transform.translate.y = std::lerp(0.0f, jp.height, (1.0f - (1.0f - flyT) * (1.0f - flyT)));
 	} else if (jumpTime_ < jp.downStart && jumpTime_ >= jp.downEnd) {//70~50 //20
 
 		float downTime = jp.downStart - jp.downEnd;
 		float flyT = 1.0f - (jumpTime_ - jp.downEnd) / downTime;
-		animModel_->transform.translate.y = std::lerp(jp.height, 0.0f, (1.0f - powf(1.0f - flyT, 4.0f)));
-		if (std::abs(animModel_->transform.translate.y) < jp.groundJudgeHeight) {
+		animeModel_->transform.translate.y = std::lerp(jp.height, 0.0f, (1.0f - powf(1.0f - flyT, 4.0f)));
+		if (std::abs(animeModel_->transform.translate.y) < jp.groundJudgeHeight) {
 			if (isJumpAttack_) {
-				jumpWave_.pos_ = animModel_->transform.translate;
+				jumpWave_.pos_ = animeModel_->transform.translate;
 				jumpWave_.Emit();
 				ParticleManager::GetSphereEmitter(jumpCSEmitIndex_).SetPos(jumpWave_.pos_);
 				ParticleManager::GetSphereEmitter(jumpCSEmitIndex_).Emit();
@@ -1067,7 +1067,7 @@ bool Boss::JumpAttack() {
 			}
 		}
 	} else if (jumpTime_ <= 0.0f) {
-		animModel_->transform.translate.y = 0.0f;
+		animeModel_->transform.translate.y = 0.0f;
 		return true;
 	}
 
@@ -1075,7 +1075,7 @@ bool Boss::JumpAttack() {
 }
 
 void Boss::UpdateUnderRing() {
-	for (auto& ring : undderRings_) {
+	for (auto& ring : underRings_) {
 		if (!ring->GetIsLive())continue;
 		ring->Update();
 	}
@@ -1085,10 +1085,10 @@ void Boss::UnderRingEmit() {
 	CameraManager::GetInstance()->GetCamera()->IssuanceShake(0.3f, 30.0f);
 	isJumpAttack_ = false;
 	int count = 0;
-	for (auto& ring : undderRings_) {
+	for (auto& ring : underRings_) {
 		if (count == 1) break;
 		if (ring->GetIsLive()) continue;
-		ring->InitRing(animModel_->transform.translate);
+		ring->InitRing(animeModel_->transform.translate);
 		count++;
 	}
 }
@@ -1170,28 +1170,28 @@ void Boss::SetDefaultBehavior(bool isInvisibleItem) {
 		for (auto& rod : rods_) {
 			rod->SetIsLive(false);
 		}
-		for (auto& ring : undderRings_) {
+		for (auto& ring : underRings_) {
 			ring->SetIsLive(false);
 		}
 	}
 	cameraRang_ = -25.0f;
 	cameraFollowSpeed_ = 0.2f;
 	ChangeBehavior(std::make_unique<BossRoot>(this));
-	animModel_->transform.translate.y = 0.0f;
-	Vector3 dir = pPlayer_->GetWorldPos() - animModel_->transform.translate;
+	animeModel_->transform.translate.y = 0.0f;
+	Vector3 dir = pPlayer_->GetWorldPos() - animeModel_->transform.translate;
 	dir.y = 0.0f; // 水平方向だけに限定
 	dir = dir.Normalize();
 	// 目標のY軸角度（ラジアン）
 	float targetAngle = std::atan2(dir.x, dir.z); // Z前方軸に対する角度
-	animModel_->transform.translate += GetFrontOffset(Vector3(0.0f, 0.0f, 1.0f) * 0.05f * FPSKeeper::DeltaTimeFrame(), targetAngle);
+	animeModel_->transform.translate += GetFrontOffset(Vector3(0.0f, 0.0f, 1.0f) * 0.05f * FPSKeeper::DeltaTimeFrame(), targetAngle);
 	// 現在のY軸角度（モデルの回転）
-	float currentAngle = animModel_->transform.rotate.y;
+	float currentAngle = animeModel_->transform.rotate.y;
 	// 角度差を -π〜+π にラップ
 	float delta = targetAngle - currentAngle;
 	if (delta > std::numbers::pi_v<float>) delta -= 2.0f * std::numbers::pi_v<float>;
 	if (delta < -std::numbers::pi_v<float>) delta += 2.0f * std::numbers::pi_v<float>;
 	float newAngle = currentAngle + delta;
-	animModel_->transform.rotate.y = newAngle;
+	animeModel_->transform.rotate.y = newAngle;
 }
 
 void Boss::RadialSetting() {
@@ -1232,12 +1232,12 @@ void Boss::InitSummon() {
 	emitter.data_.lifeTime = 0.8f;
 	emitter.data_.radius = 10.0f;
 	emitter.data_.frequency = 0.01f;
-	emitter.data_.translate = animModel_->transform.translate;
+	emitter.data_.translate = animeModel_->transform.translate;
 	emitter.data_.baseVelocity = { 0.0f,0.6f,0.0f };
 
-	bossYPos_ = animModel_->transform.translate.y;
+	bossYPos_ = animeModel_->transform.translate.y;
 	defaultCorePos_ = core_->GetWorldPos();
-	animModel_->transform.translate.y = -30.0f;
+	animeModel_->transform.translate.y = -30.0f;
 
 	ParticleManager::Load(summonLightning_, "summonLightning_");
 	ParticleManager::Load(energySphere_, "energySphere");
@@ -1246,11 +1246,11 @@ void Boss::InitSummon() {
 	summonLightning_.grain_.isZandX_ = true;
 	energySphere_.grain_.isZandX_ = true;
 
-	summonLightning_.pos_ = animModel_->transform.translate;
+	summonLightning_.pos_ = animeModel_->transform.translate;
 	summonLightning_.pos_.y = 40.0f;
-	energySphere_.pos_ = animModel_->transform.translate;
+	energySphere_.pos_ = animeModel_->transform.translate;
 	energySphere_.pos_.y = 0.0f;
-	energyParticle_.pos_ = animModel_->transform.translate;
+	energyParticle_.pos_ = animeModel_->transform.translate;
 	energyParticle_.pos_.y = 0.0f;
 
 	energySphere_.grain_.isAutoUVMove_ = true;
@@ -1288,7 +1288,7 @@ void Boss::EnergyTimeUpdate() {
 		energyTime_ -= FPSKeeper::DeltaTimeFrame();
 		if (energyTime_ >= sp.bossRiseStartTime) { // ボスの位置更新
 			float t = (std::max)((energyTime_ - sp.bossRiseStartTime) / sp.bossRiseStartTime, 0.0f);
-			animModel_->transform.translate.y = std::lerp(bossYPos_, sp.bossDownPos, t);
+			animeModel_->transform.translate.y = std::lerp(bossYPos_, sp.bossDownPos, t);
 			summonCameraRotate_.x = std::lerp(summonCameraRotateStart_, summonCameraRotateEnd_, 1.0f - t);
 		}
 		energyParticle_.Emit();
@@ -1303,8 +1303,8 @@ void Boss::EnergyTimeUpdate() {
 		energyCoolTime_ -= FPSKeeper::DeltaTimeFrame();
 		if (energyCoolTime_ <= 0.0f) {
 			isSummon_ = false;
-			animModel_->transform.translate.y = bossYPos_;
-			animModel_->ChangeAnimation("roaring");
+			animeModel_->transform.translate.y = bossYPos_;
+			animeModel_->ChangeAnimation("roaring");
 			ParticleManager::GetParticleCSEmitterTexture(summonIndex_).SetEmit(false);
 			shadow_->SetColor({ 0.02f,0.02f,0.02f,0.5f });
 		}
@@ -1316,8 +1316,8 @@ void Boss::EnergyTimeUpdate() {
 }
 
 void Boss::UpdateEmitterPos(int i) {
-	float emitpos = chargeParents_[i]->transform.scale.x;
-	traceAnchors_[i]->transform.translate = { emitpos, emitpos, emitpos };
+	float emitPos = chargeParents_[i]->transform.scale.x;
+	traceAnchors_[i]->transform.translate = { emitPos, emitPos, emitPos };
 	auto& emitter = ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]);
 	emitter.data_.translate = traceAnchors_[i]->GetWorldPos();
 }
@@ -1334,8 +1334,8 @@ void Boss::ChangePhase(float threshold, int indexInc) {
 	nowHpIndex_ -= indexInc;
 	isHpActive_ = false;
 	SetDefaultBehavior();
-	animModel_->ChangeAnimation("hit");
-	animModel_->IsRoopAnimation(false);
+	animeModel_->ChangeAnimation("hit");
+	animeModel_->IsLoopAnimation(false);
 	RadialSetting();
 	hpCooltime_ = 60.0f;
 	hpSprites_[nowHpIndex_]->SetColor(damageColor1_);

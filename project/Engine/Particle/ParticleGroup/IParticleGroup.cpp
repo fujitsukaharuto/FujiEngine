@@ -24,7 +24,6 @@ void IParticleGroup::ParticleSizeUpdate(Particle& particle) {
 	SizeType sizeType = SizeType(particle.type_);
 	float t = (1.0f - float(float(particle.lifeTime_) / float(particle.startLifeTime_)));
 
-	// ToDo:colorFadeInの処理も追加する
 	if (particle.isColorFade_) {
 		particle.color_.w = Lerp(particle.startAlpha_, 0.0f, t * t);
 	}

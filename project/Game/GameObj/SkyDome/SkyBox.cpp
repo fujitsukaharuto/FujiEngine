@@ -21,7 +21,7 @@ void SkyBox::Update() {
 }
 
 void SkyBox::Draw() {
-	dxcommon_->GetDXCommand()->SetViewAndscissor();
+	dxcommon_->GetDXCommand()->SetViewAndScissor();
 	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Skybox);
 	dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vbView);

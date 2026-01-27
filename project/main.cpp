@@ -1,9 +1,6 @@
 #include "Game/Scene/GameRun.h"
 #include <memory>
 
-// やること
-// ToDo:クラス分け
-
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	std::unique_ptr<Core::Framework> game = std::make_unique<GameRun>();

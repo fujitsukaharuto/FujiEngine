@@ -15,7 +15,7 @@ class DXCom;
 /// スケルトンのNodeのデータ
 /// </summary>
 struct Node {
-	Math::QuaternioonTrans transform;
+	Math::QuaternionTrans transform;
 	Math::Matrix4x4 local;
 	std::string name;
 	std::vector<Node> children;

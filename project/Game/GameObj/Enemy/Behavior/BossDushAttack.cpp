@@ -17,8 +17,8 @@ BossDushAttack::BossDushAttack(Boss* pBoss,bool is) : BaseBossBehavior(pBoss) {
 	cameraFollowSpeed_ = 0.03f;
 	pBoss_->SetCameraRang(cameraRang_);
 	pBoss_->SetCameraFollowSpeed(cameraFollowSpeed_);
-	pBoss_->GetAnimModel()->ChangeAnimation("DushPose");
-	pBoss_->GetAnimModel()->IsRoopAnimation(false);
+	pBoss_->GetAnimeModel()->ChangeAnimation("DushPose");
+	pBoss_->GetAnimeModel()->IsLoopAnimation(false);
 	pBoss_->ChainCount();
 	isPreDush_ = is;
 	if (is) {
@@ -66,7 +66,7 @@ void BossDushAttack::Update() {
 		///---------------------------------------------------------------------------------------
 	case BossDushAttack::Step::TOROOT:
 	{
-		pBoss_->GetAnimModel()->IsRoopAnimation(true);
+		pBoss_->GetAnimeModel()->IsLoopAnimation(true);
 		float randomSeed = Random::GetFloat(0.0f, 1.0f);
 		if (randomSeed > pBoss_->GetChainRate() && !isPreDush_) {
 			pBoss_->ChangeBehavior(std::make_unique<BossDushAttack>(pBoss_, true));

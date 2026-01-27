@@ -28,7 +28,7 @@ void BossCore::Initialize() {
 
 	InitParameter();
 
-	model_->SetParent(&pBoss_->GetAnimModel()->transform);
+	model_->SetParent(&pBoss_->GetAnimeModel()->transform);
 	model_->SetNoneScaleParent(true);
 
 }

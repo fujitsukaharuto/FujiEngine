@@ -32,8 +32,8 @@ public:
 	/// <summary>
 	/// csvファイル読み込み
 	/// </summary>
-	/// <param name="filiPath"></param>
-	void LoadMapChipCsv(const std::string& filiPath);
+	/// <param name="filePath"></param>
+	void LoadMapChipCsv(const std::string& filePath);
 
 	/// <summary>
 	/// マップチップ種別の取得

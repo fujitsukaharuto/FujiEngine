@@ -42,7 +42,7 @@ void PointLight::SetLightCommand(ID3D12GraphicsCommandList* commandList) {
 
 void PointLight::Debug() {
 #ifdef _DEBUG
-	if (ImGui::CollapsingHeader("pointlight")) {
+	if (ImGui::CollapsingHeader("pointLight")) {
 
 		ImGui::ColorEdit4("color##point", &pointLightData_.color.x);
 		ImGui::DragFloat3("position##point", &pointLightData_.position.x, 0.1f);

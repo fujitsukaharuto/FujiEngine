@@ -13,8 +13,8 @@ BossRodFall::BossRodFall(Boss* pBoss) : BaseBossBehavior(pBoss) {
 	cameraRang_ = -35.0f;
 	pBoss_->SetCameraRang(cameraRang_);
 	pBoss_->SetCameraFollowSpeed(cameraFollowSpeed_);
-	pBoss_->GetAnimModel()->ChangeAnimation("idle");
-	pBoss_->GetAnimModel()->IsRoopAnimation(false);
+	pBoss_->GetAnimeModel()->ChangeAnimation("idle");
+	pBoss_->GetAnimeModel()->IsLoopAnimation(false);
 	pBoss_->ChainCount();
 }
 
@@ -38,7 +38,7 @@ void BossRodFall::Update() {
 			coolTime_ -= FPSKeeper::DeltaTimeFrame();
 			if (coolTime_ < 100.0f && isChange_) {
 				isChange_ = false;
-				pBoss_->GetAnimModel()->ChangeAnimation("swordLeft");
+				pBoss_->GetAnimeModel()->ChangeAnimation("swordLeft");
 			}
 			if (coolTime_ < 0.0f) {
 				step_ = Step::TOROOT;
@@ -51,7 +51,7 @@ void BossRodFall::Update() {
 		///---------------------------------------------------------------------------------------
 	case BossRodFall::Step::TOROOT:
 	{
-		pBoss_->GetAnimModel()->IsRoopAnimation(true);
+		pBoss_->GetAnimeModel()->IsLoopAnimation(true);
 		pBoss_->ChangeBehavior(std::make_unique<BossRoot>(pBoss_));
 		break;
 	}

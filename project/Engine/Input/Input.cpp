@@ -126,7 +126,6 @@ bool Input::GetGamepadStatePrevious(XINPUT_STATE& out) const {
 void Input::SetPadDeadZone(int32_t deadZoneL, int32_t deadZoneR) {
 	pad_.deadZoneL_ = deadZoneL;
 	pad_.deadZoneR_ = deadZoneR;
-	//pad = pad_;
 }
 
 Vector2 Input::GetLStick() const {

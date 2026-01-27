@@ -109,7 +109,6 @@ double GPUTimer::GetElapsedMS(uint32_t frameIndex, uint32_t timerId) {
 	uint64_t* data = nullptr;
 	D3D12_RANGE readRange = {};
 	// 全体をマップして安全に読む
-	// (最適化するならResolveした範囲だけMapするのもありだが、Readbackなので全体でもコストは低い)
 	readRange.Begin = 0;
 	readRange.End = sizeof(uint64_t) * kFrameCount_ * maxTimerCount_ * kTimestampsPerTimer;
 

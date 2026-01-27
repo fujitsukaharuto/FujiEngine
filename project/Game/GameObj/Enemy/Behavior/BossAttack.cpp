@@ -16,8 +16,8 @@ BossAttack::BossAttack(Boss* pBoss) : BaseBossBehavior(pBoss) {
 	step_ = Step::ATTACK;
 	pBoss_->SetCameraRang(cameraRang_);
 	pBoss_->SetCameraFollowSpeed(cameraFollowSpeed_);
-	pBoss_->GetAnimModel()->ChangeAnimation("punch");
-	pBoss_->GetAnimModel()->IsRoopAnimation(false);
+	pBoss_->GetAnimeModel()->ChangeAnimation("punch");
+	pBoss_->GetAnimeModel()->IsLoopAnimation(false);
 	pBoss_->ChainCount();
 	attackSE_ = &AudioPlayer::GetInstance()->SoundLoadWave("attackSE.wav");
 }
@@ -49,7 +49,7 @@ void BossAttack::Update() {
 		///---------------------------------------------------------------------------------------
 	case BossAttack::Step::TOROOT:
 	{
-		pBoss_->GetAnimModel()->IsRoopAnimation(true);
+		pBoss_->GetAnimeModel()->IsLoopAnimation(true);
 		float randomSeed = Random::GetFloat(0.0f, 1.0f);
 		if (randomSeed > pBoss_->GetChainRate()) {
 			pBoss_->ChangeBehavior(std::make_unique<BossArrowAttack>(pBoss_));

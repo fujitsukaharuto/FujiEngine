@@ -198,27 +198,6 @@ void ImGuiManager::InitNodeTexture() {
 }
 #endif // _DEBUG
 
-//void ImGuiManager::DrawNodeEditor() {
-//#ifdef _DEBUG
-//	using namespace ax::NodeEditor;
-//
-//	if (!nodeEditorContext_) {
-//		Config config;
-//		config.SettingsFile = "resource/NodeEditor/NodeEditor.json";
-//		nodeEditorContext_ = CreateEditor(&config);
-//	}
-//
-//	SetCurrentEditor(nodeEditorContext_);
-//	ed::Begin("My Node Editor");
-//
-//	// 簡単なノード描画（省略）
-//
-//	ed::End();
-//	SetCurrentEditor(nullptr);
-//#endif // _DEBUG
-//}
-
-
 #ifdef _DEBUG
 bool ImGuiManager::CanCreateLink(const Pin& a, const Pin& b) {
 	// 出力 → 入力 のみに限定する例
@@ -554,10 +533,6 @@ void ParticleGroupSelector::Show(std::function<void(const std::string&, bool)> o
 		// --- 中央列（ボタン） ---
 		ImGui::TableSetColumnIndex(1);
 		{
-			//// 中央揃えするためにダミースペースを使う
-			//float buttonHeight = ImGui::GetFrameHeight();
-			//float spacing = (listBoxHeight - buttonHeight * 2.0f - ImGui::GetStyle().ItemSpacing.y) * 0.5f;
-			//ImGui::Dummy(ImVec2(0.0f, spacing));
 
 			if (ImGui::Button(">")) {
 				if (!selected[0].empty()) {

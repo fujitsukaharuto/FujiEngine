@@ -127,7 +127,7 @@ namespace Graphics {
 		/// <summary>アニメーションで動かすか</summary>
 		void IsAnimation(bool is) { isAnimation_ = is; }
 		/// <summary>アニメーションをループさせるか</summary>
-		void IsRoopAnimation(bool is) { isRoopAnimation_ = is; }
+		void IsLoopAnimation(bool is) { isLoopAnimation_ = is; }
 
 		Math::Trans transform{};
 
@@ -164,7 +164,7 @@ namespace Graphics {
 		std::unordered_map<std::string, std::unique_ptr<Math::Matrix4x4>> jointWorldCache_;
 
 		bool isAnimation_ = true;
-		bool isRoopAnimation_ = true;
+		bool isLoopAnimation_ = true;
 		float animationTime_ = 0.0f;
 		float previousTime_ = 0.0f;
 		float blendTime_ = 0.3f;

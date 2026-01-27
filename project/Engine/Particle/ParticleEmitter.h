@@ -84,7 +84,7 @@ public:
 	/// <summary>ペアレントの設定</summary>
 	void SetParent(Math::Trans* parent) { parent_ = parent; }
 	/// <summary>アニメーションモデルにペアレントする設定</summary>
-	void SetAnimParent(Math::Matrix4x4* parent) { animParent_ = parent; }
+	void SetAnimeParent(Math::Matrix4x4* parent) { animeParent_ = parent; }
 	void SetIsUpdatedMatrix(bool is) { isUpDatedMatrix_ = is; }
 	void SetGroup(IParticleGroup* group) { group_ = group; }
 	
@@ -130,7 +130,7 @@ private:
 	float time_;
 
 	Math::Trans* parent_ = nullptr;
-	Math::Matrix4x4* animParent_ = nullptr;
+	Math::Matrix4x4* animeParent_ = nullptr;
 
 	bool isUpDatedMatrix_ = false;
 

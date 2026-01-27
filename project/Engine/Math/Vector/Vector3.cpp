@@ -28,8 +28,8 @@ Vector3& Vector3::operator -= (const Vector3& v) {
 
 /*----- 関数 ------------------------------------------------------------------*/
 Vector3 Vector3::Normalize() const {
-	const float leng = Length();
-	return leng == 0 ? *this : *this / leng;
+	const float len = Length();
+	return len == 0 ? *this : *this / len;
 }
 
 Vector3 Vector3::Cross(const Vector3& other) const {

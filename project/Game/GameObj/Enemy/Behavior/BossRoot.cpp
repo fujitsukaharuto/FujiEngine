@@ -21,8 +21,8 @@ BossRoot::BossRoot(Boss* pBoss) : BaseBossBehavior(pBoss) {
 	pBoss_->SetCameraRang(cameraRang_);
 	pBoss_->SetCameraFollowSpeed(cameraFollowSpeed_);
 	cooldown_ = pBoss_->GetAttackCooldown();
-	pBoss_->GetAnimModel()->ChangeAnimation("walk");
-	pBoss_->GetAnimModel()->IsRoopAnimation(true);
+	pBoss_->GetAnimeModel()->ChangeAnimation("walk");
+	pBoss_->GetAnimeModel()->IsLoopAnimation(true);
 	pBoss_->ResetChainCount();
 }
 

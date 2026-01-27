@@ -12,7 +12,7 @@ struct PointLightData {
 	float intensity;
 	float radius;
 	float decay;
-	float pading[2];
+	float padding[2];
 };
 
 /// <summary>

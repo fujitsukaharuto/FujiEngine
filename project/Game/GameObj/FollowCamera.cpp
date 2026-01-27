@@ -20,15 +20,15 @@ void FollowCamera::Initialize() {
 	offset_ = { 0.0f, 4.0f, -27.5f };
 }
 
-void FollowCamera::Update(const Vector3& lockon) {
+void FollowCamera::Update(const Vector3& lockOn) {
 
 
 	Camera* camera = CameraManager::GetInstance()->GetCamera();
 
 	Vector3 lockOnPosition;
 	if (isLockOnFollow_) {
-		lockOnPosition = lockon;
-		preLockOnPos_ = lockon;
+		lockOnPosition = lockOn;
+		preLockOnPos_ = lockOn;
 	} else {
 		lockOnPosition = preLockOnPos_;
 	}
@@ -184,7 +184,7 @@ void FollowCamera::DebugGUI() {
 		if (target_) {
 			ImGui::Text("Target : X:%0.2f, Y:%0.2f, Z:%0.2f", target_->translate.x, target_->translate.y, target_->translate.z);
 		}
-		ImGui::DragFloat3("Offfset", &offset_.x, 0.1f);
+		ImGui::DragFloat3("Offset", &offset_.x, 0.1f);
 		ImGui::Checkbox("IsFollowLockOn", &isLockOnFollow_);
 		ImGui::DragFloat("FollowSpeed", &followSpeed_, 0.01f, 0.01f, 1.0f);
 		ImGui::Unindent();

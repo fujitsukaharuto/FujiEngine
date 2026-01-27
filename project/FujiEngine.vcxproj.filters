@@ -781,9 +781,6 @@
     <ClInclude Include="Game\OriginObject\OriginState.h">
       <Filter>Game\OriginObject</Filter>
     </ClInclude>
-    <ClInclude Include="Game\OriginObject\TestBaseObj.h">
-      <Filter>Game\OriginObject</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\GraphicPipeline\PipelineNode.h">
       <Filter>Engine\GraphicPipeline</Filter>
     </ClInclude>

@@ -23,8 +23,8 @@ TitleScene::~TitleScene() {
 
 void TitleScene::Initialize() {
 
-	obj3dCommon.reset(new Object3dCommon());
-	obj3dCommon->Initialize();
+	obj3dCommon_.reset(new Object3dCommon());
+	obj3dCommon_->Initialize();
 
 	CameraManager::GetInstance()->GetCamera()->transform.rotate = { cameraStartRotateX_,0.0f,0.0f };
 	CameraManager::GetInstance()->GetCamera()->transform.translate = { 0.0f, 5.0f, -30.0f };
@@ -77,7 +77,7 @@ void TitleScene::Initialize() {
 
 	cMane_ = std::make_unique<CollisionManager>();
 
-	ParticleManager::Load(emit, "lightning");
+	ParticleManager::Load(emit_, "lightning");
 	
 	const float radius = 200.0f;
 	const int division = 12;
@@ -154,7 +154,7 @@ void TitleScene::Draw() {
 #pragma region 3Dオブジェクト
 	skybox_->Draw();
 
-	obj3dCommon->PreDraw();
+	obj3dCommon_->PreDraw();
 	terrain_->Draw();
 
 	player_->TitleDraw();
@@ -183,7 +183,7 @@ void TitleScene::Draw() {
 	ParticleManager::GetInstance()->Draw();
 
 #ifdef _DEBUG
-	emit.DrawSize();
+	emit_.DrawSize();
 #endif // _DEBUG
 
 	//cube_->SkeletonDraw();
@@ -195,7 +195,7 @@ void TitleScene::Draw() {
 #pragma region 前景スプライト
 
 	dxcommon_->PreSpriteDraw();
-	if (blackTime != 0.0f) {
+	if (blackTime_ != 0.0f) {
 		black_->Draw();
 	}
 
@@ -234,17 +234,17 @@ void TitleScene::DebugGUI() {
 void TitleScene::ParticleDebugGUI() {
 #ifdef _DEBUG
 	ImGui::Indent();
-	emit.DebugGUI();
+	emit_.DebugGUI();
 	ImGui::Unindent();
 #endif // _DEBUG
 }
 
 void TitleScene::BlackFade() {
-	if (isChangeFase) {
-		if (blackTime < blackLimmite) {
-			blackTime += FPSKeeper::DeltaTimeFrame();
-			if (blackTime >= blackLimmite) {
-				blackTime = blackLimmite;
+	if (isChangePhase_) {
+		if (blackTime_ < blackLimit_) {
+			blackTime_ += FPSKeeper::DeltaTimeFrame();
+			if (blackTime_ >= blackLimit_) {
+				blackTime_ = blackLimit_;
 			}
 		} else {
 			if (!isParticleDebugScene_) {
@@ -254,30 +254,30 @@ void TitleScene::BlackFade() {
 			}
 		}
 	} else {
-		if (blackTime > 0.0f) {
-			blackTime -= FPSKeeper::DeltaTimeFrame();
-			if (blackTime <= 0.0f) {
-				blackTime = 0.0f;
+		if (blackTime_ > 0.0f) {
+			blackTime_ -= FPSKeeper::DeltaTimeFrame();
+			if (blackTime_ <= 0.0f) {
+				blackTime_ = 0.0f;
 			}
 		}
 	}
-	black_->SetColor({ 0.0f,0.0f,0.0f,Lerp(0.0f,1.0f,(1.0f / blackLimmite * blackTime)) });
+	black_->SetColor({ 0.0f,0.0f,0.0f,Lerp(0.0f,1.0f,(1.0f / blackLimit_ * blackTime_)) });
 	XINPUT_STATE pad;
 	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
-		if (blackTime == 0.0f) {
-			isChangeFase = true;
+		if (blackTime_ == 0.0f) {
+			isChangePhase_ = true;
 		}
 	} else if (Input::GetInstance()->GetGamepadState(pad)) {
 		if (Input::GetInstance()->TriggerButton(PadInput::A)) {
-			if (blackTime == 0.0f) {
-				isChangeFase = true;
+			if (blackTime_ == 0.0f) {
+				isChangePhase_ = true;
 			}
 		}
 	}
 #ifdef _DEBUG
 	if (Input::GetInstance()->PushKey(DIK_RETURN) && Input::GetInstance()->PushKey(DIK_P) && Input::GetInstance()->PushKey(DIK_D) && Input::GetInstance()->TriggerKey(DIK_S)) {
-		if (blackTime == 0.0f) {
-			isChangeFase = true;
+		if (blackTime_ == 0.0f) {
+			isChangePhase_ = true;
 			isParticleDebugScene_ = true;
 		}
 	}

@@ -14,8 +14,8 @@ BossSwordAttack::BossSwordAttack(Boss* pBoss) : BaseBossBehavior(pBoss) {
 	attackCount_ = 0;
 	pBoss_->SetCameraRang(cameraRang_);
 	pBoss_->SetCameraFollowSpeed(cameraFollowSpeed_);
-	pBoss_->GetAnimModel()->ChangeAnimation("punch");
-	pBoss_->GetAnimModel()->IsRoopAnimation(false);
+	pBoss_->GetAnimeModel()->ChangeAnimation("punch");
+	pBoss_->GetAnimeModel()->IsLoopAnimation(false);
 	pBoss_->ChainCount();
 	attackSE_ = &AudioPlayer::GetInstance()->SoundLoadWave("attackSE.wav");
 }
@@ -37,12 +37,12 @@ void BossSwordAttack::Update() {
 				break;
 			}
 			coolTime_ = 90.0f;
-			pBoss_->GetAnimModel()->IsRoopAnimation(true);
+			pBoss_->GetAnimeModel()->IsLoopAnimation(true);
 			AudioPlayer::GetInstance()->SoundPlayWave(*attackSE_, 0.35f);
 			pBoss_->WaveWallAttack();
 			attackCount_++;
 		} else {
-			pBoss_->GetAnimModel()->IsRoopAnimation(false);
+			pBoss_->GetAnimeModel()->IsLoopAnimation(false);
 			coolTime_ -= FPSKeeper::DeltaTimeFrame();
 		}
 
@@ -51,7 +51,7 @@ void BossSwordAttack::Update() {
 		/// 通常へ移行
 		///---------------------------------------------------------------------------------------
 	case BossSwordAttack::Step::TOROOT:
-		pBoss_->GetAnimModel()->IsRoopAnimation(true);
+		pBoss_->GetAnimeModel()->IsLoopAnimation(true);
 		pBoss_->ChangeBehavior(std::make_unique<BossRoot>(pBoss_));
 		break;
 	default:

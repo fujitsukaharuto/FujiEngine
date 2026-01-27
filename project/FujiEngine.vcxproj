@@ -382,7 +382,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Game\Field\MapChipField.h" />
     <ClInclude Include="Game\OriginObject\OriginGameObject.h" />
     <ClInclude Include="Game\OriginObject\OriginState.h" />
-    <ClInclude Include="Game\OriginObject\TestBaseObj.h" />
     <ClInclude Include="Game\Scene\GameRun.h" />
     <ClInclude Include="Game\Scene\GameScene.h" />
     <ClInclude Include="Game\Scene\ParticleDebugScene.h" />

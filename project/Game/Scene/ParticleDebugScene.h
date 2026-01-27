@@ -24,7 +24,7 @@ public:
 
 private:
 
-	std::unique_ptr<Graphics::Object3dCommon> obj3dCommon = nullptr;
+	std::unique_ptr<Graphics::Object3dCommon> obj3dCommon_ = nullptr;
 	std::unique_ptr<SkyBox> skybox_;
 	std::unique_ptr<Graphics::AnimationModel> terrain_ = nullptr;
 	Math::Vector4 terrainColor_ = { 0.85f,0.15f,0.1f,1.0f };
@@ -32,7 +32,7 @@ private:
 
 	// sceneChange
 	std::unique_ptr<Graphics::Sprite> black_;
-	float blackLimmite = 20.0f;
-	float blackTime = 20.0f;
-	bool isChangeFase = false;
+	float blackLimit_ = 20.0f;
+	float blackTime_ = 20.0f;
+	bool isChangePhase_ = false;
 };

@@ -75,7 +75,7 @@ void Line3dDrawer::DrawLine3d(const Vector3& p1, const Vector3& p2, const Vector
 	}
 }
 
-void Line3dDrawer::DrawShereLine(const Vector3& center, float radius, const Vector4& color) {
+void Line3dDrawer::DrawSphereLine(const Vector3& center, float radius, const Vector4& color) {
 	const int segments = 16;
 	for (int i = 0; i < segments; i++) {
 		float theta1 = ((float)i / (float)segments) * 2.0f * std::numbers::pi_v<float>;

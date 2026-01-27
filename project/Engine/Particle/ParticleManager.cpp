@@ -107,7 +107,7 @@ void ParticleManager::Update() {
 void ParticleManager::Draw() {
 	gpuParticleSystem_->Draw(plane_.vbView, plane_.ibView);
 
-	dxcommon_->GetDXCommand()->SetViewAndscissor();
+	dxcommon_->GetDXCommand()->SetViewAndScissor();
 	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Normal);
 	dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	for (auto& groupPair : animeGroups_) {
@@ -118,7 +118,7 @@ void ParticleManager::Draw() {
 		}
 	}
 
-	dxcommon_->GetDXCommand()->SetViewAndscissor();
+	dxcommon_->GetDXCommand()->SetViewAndScissor();
 	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Particle);
 	preType_ = BlendType::ADD;
 	dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);

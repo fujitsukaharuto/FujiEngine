@@ -10,20 +10,20 @@ SceneFactory::SceneFactory() {
 SceneFactory::~SceneFactory() {
 }
 
-BaseScene* SceneFactory::CreateScene(const std::string& sceneName) {
-	BaseScene* newScene = nullptr;
+std::unique_ptr<BaseScene> SceneFactory::CreateScene(const std::string& sceneName) {
+	std::unique_ptr<BaseScene> newScene = nullptr;
 
 	if (sceneName == "TITLE") {
-		newScene = new TitleScene();
+		newScene = std::make_unique<TitleScene>();
 
 	} else if (sceneName == "GAME") {
-		newScene = new GameScene();
+		newScene = std::make_unique<GameScene>();
 
 	} else if (sceneName == "RESULT") {
-		newScene = new ResultScene();
+		newScene = std::make_unique<ResultScene>();
 
 	} else if (sceneName == "PARTICLEDEBUG") {
-		newScene = new ParticleDebugScene();
+		newScene = std::make_unique<ParticleDebugScene>();
 	}
 
 	return newScene;

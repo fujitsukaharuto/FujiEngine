@@ -22,12 +22,12 @@ SRVManager* SRVManager::GetInstance() {
 void SRVManager::Initialize(DXCom* pDxcom) {
 	dxcommon_ = pDxcom;
 
-	descriptorHeap = dxcommon_->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, kMaxSRVCount_, true);
+	descriptorHeap_ = dxcommon_->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, kMaxSRVCount_, true);
 	descriptorSize_ = dxcommon_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 }
 
 void SRVManager::Finalize() {
-	descriptorHeap.Reset();
+	descriptorHeap_.Reset();
 	dxcommon_ = nullptr;
 }
 
@@ -85,12 +85,12 @@ void SRVManager::SetDescriptorHeap(uint32_t index) {
 	if (index == 0) {
 		ID3D12GraphicsCommandList* commandList = dxcommon_->GetCommandList();
 		ID3D12GraphicsCommandList* computeList = dxcommon_->GetComputeCommandList();
-		ID3D12DescriptorHeap* descriptorHeaps[] = { descriptorHeap.Get() };
+		ID3D12DescriptorHeap* descriptorHeaps[] = { descriptorHeap_.Get() };
 		commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 		computeList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 	} else {
 		ID3D12GraphicsCommandList* commandList = dxcommon_->GetImmediateList();
-		ID3D12DescriptorHeap* descriptorHeaps[] = { descriptorHeap.Get() };
+		ID3D12DescriptorHeap* descriptorHeaps[] = { descriptorHeap_.Get() };
 		commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 	}
 }
@@ -101,23 +101,23 @@ void SRVManager::SetGraphicsRootDescriptorTable(UINT rootIndex, uint32_t srvInde
 
 
 uint32_t SRVManager::Allocate() {
-	assert(kMaxSRVCount_ != useIndex);
+	assert(kMaxSRVCount_ != useIndex_);
 
-	int index = useIndex;
-	useIndex++;
+	int index = useIndex_;
+	useIndex_++;
 	return index;
 }
 
 
 D3D12_CPU_DESCRIPTOR_HANDLE SRVManager::GetCPUDescriptorHandle(uint32_t index) {
-	D3D12_CPU_DESCRIPTOR_HANDLE CPUHandle = descriptorHeap->GetCPUDescriptorHandleForHeapStart();
+	D3D12_CPU_DESCRIPTOR_HANDLE CPUHandle = descriptorHeap_->GetCPUDescriptorHandleForHeapStart();
 	CPUHandle.ptr += (descriptorSize_ * index);
 	return CPUHandle;
 }
 
 
 D3D12_GPU_DESCRIPTOR_HANDLE SRVManager::GetGPUDescriptorHandle(uint32_t index) {
-	D3D12_GPU_DESCRIPTOR_HANDLE GPUHandle = descriptorHeap->GetGPUDescriptorHandleForHeapStart();
+	D3D12_GPU_DESCRIPTOR_HANDLE GPUHandle = descriptorHeap_->GetGPUDescriptorHandleForHeapStart();
 	GPUHandle.ptr += (descriptorSize_ * index);
 	return GPUHandle;
 }

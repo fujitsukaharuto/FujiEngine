@@ -18,7 +18,7 @@ namespace Graphics {
 	public:
 
 		/// <summary>
-		/// メッシュのVertexDeta
+		/// メッシュのVertexData
 		/// </summary>
 		struct VertexData {
 			Math::Vector4 pos;    // xyz座標
@@ -81,7 +81,7 @@ namespace Graphics {
 		D3D12_VERTEX_BUFFER_VIEW skinnedVBV_;
 		std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> skinnedSrvHandle;
 
-		Microsoft::WRL::ComPtr<ID3D12Resource> indexResourece_ = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_ = nullptr;
 		D3D12_INDEX_BUFFER_VIEW indexBufferView_{};
 		std::vector<uint32_t> indexData_;
 

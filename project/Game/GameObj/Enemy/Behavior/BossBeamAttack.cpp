@@ -12,7 +12,7 @@ BossBeamAttack::BossBeamAttack(Boss* pBoss) : BaseBossBehavior(pBoss) {
 	pBoss_->SetCameraRang(cameraRang_);
 	pBoss_->SetCameraFollowSpeed(cameraFollowSpeed_);
 	pBoss_->InitBeam();
-	pBoss_->GetAnimModel()->ChangeAnimation("BeamChargePose");
+	pBoss_->GetAnimeModel()->ChangeAnimation("BeamChargePose");
 	pBoss_->ChainCount();
 }
 

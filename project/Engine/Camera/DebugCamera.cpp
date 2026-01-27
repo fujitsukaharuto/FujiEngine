@@ -30,7 +30,7 @@ void DebugCamera::Initialize() {
 void DebugCamera::Update() {
 	InputUpdate();
 	TransUpdate();
-	ViewUpadate();
+	ViewUpdate();
 	MatrixUpdate();
 }
 
@@ -109,7 +109,7 @@ void DebugCamera::TransUpdate() {
 	}
 }
 
-void DebugCamera::ViewUpadate() {
+void DebugCamera::ViewUpdate() {
 	// 初期状態の回転行列
 	Matrix4x4 rotation = MakeIdentity4x4();
 	// 縦回転（Pitch）をローカルX軸に基づいて適用
@@ -121,14 +121,6 @@ void DebugCamera::ViewUpadate() {
 }
 
 void DebugCamera::MatrixUpdate() {
-	/*Matrix4x4 matPivotTrans = MakeTranslateMatrix(pivot_);
-	Matrix4x4 matPivotTransInv = MakeTranslateMatrix(-pivot_);
-
-	Matrix4x4 matTrans = MakeTranslateMatrix(translation_);
-	Matrix4x4 matWorld = Multiply(matPivotTransInv, Multiply(matRot_, matPivotTrans));
-	matWorld = Multiply(matWorld, matTrans);
-	viewMatrix_ = Inverse(matWorld);*/
-
 	// ワールド座標系でのカメラの位置を表す行列
 	Matrix4x4 matTrans = MakeTranslateMatrix(translation_);
 

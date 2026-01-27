@@ -34,10 +34,6 @@ void DXCom::Initialize(MyWin* myWin) {
 	CreateCompiler();
 	InitializeFPSKeeper();
 	SettingRootSignature();
-
-	//SettingTexture();
-	//SettingImgui();
-
 }
 
 void DXCom::Finalize() {
@@ -256,9 +252,6 @@ void DXCom::CreateBarrier(D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES af
 
 
 void DXCom::SettingTexture() {
-	//const uint32_t descriptorSizeSRV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-	//const uint32_t descriptorSizeRTV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-	//const uint32_t descriptorSizeDSV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
 	depthTextureSrvDesc_.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
 	depthTextureSrvDesc_.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -291,7 +284,7 @@ void DXCom::PreDraw() {
 void DXCom::Command() {
 
 
-	command_->SetViewAndscissor();
+	command_->SetViewAndScissor();
 	pipeManager_->SetPipeline(Pipe::Normal);
 
 
@@ -310,7 +303,6 @@ void DXCom::PostEffect() {
 	UINT dsvIncrement = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 	dsvHandle.ptr += frameIndex * dsvIncrement;
 	commandList->OMSetRenderTargets(1, &rtvHandles_[backBufferIndex], false, &dsvHandle);
-	/*commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);*/
 
 	float clearColor[] = { 0.1f,0.25f,0.5f,1.0f };
 	commandList->ClearRenderTargetView(rtvHandles_[backBufferIndex], clearColor, 0, nullptr);
@@ -340,7 +332,7 @@ void DXCom::PerFrameWait() {
 }
 
 void DXCom::PreSpriteDraw() {
-	command_->SetViewAndscissor();
+	command_->SetViewAndScissor();
 	pipeManager_->SetPipeline(Pipe::Normal);
 	command_->GetList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }

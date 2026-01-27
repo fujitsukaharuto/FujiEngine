@@ -59,7 +59,7 @@ namespace Graphics {
 		void DrawLine3d(const Math::Vector3& p1, const Math::Vector3& p2, const Math::Vector4& color);
 
 		/// <summary>球を線で描画する</summary>
-		void DrawShereLine(const Math::Vector3& center, float radius, const Math::Vector4& color);
+		void DrawSphereLine(const Math::Vector3& center, float radius, const Math::Vector4& color);
 
 		/// <summary>ボーンを線で描画する</summary>
 		void DrawOctahedralBone(const Math::Vector3& base, const Math::Vector3& tip);

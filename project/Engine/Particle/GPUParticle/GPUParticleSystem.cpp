@@ -460,7 +460,7 @@ void GPUParticleSystem::DrawParticleCS(const D3D12_VERTEX_BUFFER_VIEW& vbView, c
 
 	ID3D12GraphicsCommandList* graphicsList = dxcommon_->GetCommandList();
 	gpuTimerGraphics.Begin(graphicsList, frameIndex, kTimer_DrawExecuteIndirect);
-	dxcommon_->GetDXCommand()->SetViewAndscissor();
+	dxcommon_->GetDXCommand()->SetViewAndScissor();
 	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::ParticleCS);
 	graphicsList->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	graphicsList->IASetVertexBuffers(0, 1, &vbView);

@@ -23,7 +23,7 @@ struct VertexInfluence {
 /// GPUに送るスケルトンデータ構造体
 /// </summary>
 struct WellForGPU {
-	Math::Matrix4x4 skeltonSpaceMatrix;
+	Math::Matrix4x4 skeletonSpaceMatrix;
 	Math::Matrix4x4 skeletonSpaceInverseTransposeMatrix;
 };
 

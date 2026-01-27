@@ -28,7 +28,7 @@ public:
 	/// <summary>
 	/// ビュー更新
 	/// </summary>
-	void ViewUpadate();
+	void ViewUpdate();
 
 	/// <summary>
 	/// 行列更新

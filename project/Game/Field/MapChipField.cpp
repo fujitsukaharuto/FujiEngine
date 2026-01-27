@@ -19,13 +19,13 @@ void MapChipField::ResetMapChipData(){
 	}
 }
 
-void MapChipField::LoadMapChipCsv(const std::string& filiPath){
+void MapChipField::LoadMapChipCsv(const std::string& filePath){
 	//マップチップデータをリセット
 	ResetMapChipData();
 
 	//ファイルを開く
 	std::ifstream file;
-	file.open(filiPath);
+	file.open(filePath);
 	assert(file.is_open());
 
 	//マップチップcsv

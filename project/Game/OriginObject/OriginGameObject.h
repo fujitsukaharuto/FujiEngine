@@ -33,7 +33,7 @@ public:
 	/// <summary>モデル作成</summary>
 	void CreateModel(const std::string& name);
 	/// <summary>アニメーションモデル作成</summary>
-	void CreateAnimModel(const std::string& name);
+	void CreateAnimeModel(const std::string& name);
 	/// <summary>Jsonから作成</summary>
 	void CreateFromJson(const std::string& name);
 	void CreateFromJson();
@@ -41,31 +41,31 @@ public:
 	//========================================================================*/
 	//* Setter
 	void SetModel(const std::string& name);
-	void SetAnimModel(const std::string& name);
+	void SetAnimeModel(const std::string& name);
 	void SetModelDataJson(const nlohmann::json& jsonData);
 
 	//========================================================================*/
 	//* Getter
 	Graphics::Object3d* GetModel() { return model_.get(); }
-	Graphics::AnimationModel* GetAnimModel() { return animModel_.get(); }
+	Graphics::AnimationModel* GetAnimeModel() { return animeModel_.get(); }
 	Math::Trans& GetTrans() { return model_->transform; }
-	Math::Trans& GetAnimTrans() { return animModel_->transform; }
+	Math::Trans& GetAnimeTrans() { return animeModel_->transform; }
 	Math::Vector3 GetWorldPos()const { return model_->GetWorldPos(); }
-	Math::Vector3 GetAnimWorldPos()const { return animModel_->GetWorldPos(); }
+	Math::Vector3 GetAnimeWorldPos()const { return animeModel_->GetWorldPos(); }
 
 	void CreatePropertyCommand(int type);
 
 protected:
 
 	std::unique_ptr<Graphics::Object3d> model_;
-	std::unique_ptr<Graphics::AnimationModel> animModel_;
+	std::unique_ptr<Graphics::AnimationModel> animeModel_;
 
 
 	Math::Vector3 prevPos_;
 	Math::Vector3 prevRotate_;
 	Math::Vector3 prevScale_;
-	int guizmoType_ = 0;
-	float IsUsingGuizmo_ = false;
+	int gizmoType_ = 0;
+	float IsUsingGizmo_ = false;
 
 	nlohmann::json modelDataJson_;
 

@@ -37,7 +37,7 @@ Vector2& Vector2::operator /= (float k) {
 
 
 /*----- 関数 ------------------------------------------------------------------*/
-Vector2 Vector2::NormaliZe() const {
-	const float leng = Length();
-	return leng == 0 ? *this : *this / leng;
+Vector2 Vector2::Normalize() const {
+	const float len = Length();
+	return len == 0 ? *this : *this / len;
 }

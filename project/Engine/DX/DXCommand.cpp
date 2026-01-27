@@ -111,7 +111,7 @@ void DXCommand::Initialize(ID3D12Device* device) {
 	immediateFenceValue_ = 0;
 
 
-	/// viewscissor-------------------------------
+	/// viewScissor-------------------------------
 
 	viewport_.Width = MyWin::kWindowWidth;
 	viewport_.Height = MyWin::kWindowHeight;
@@ -301,7 +301,7 @@ void DXCommand::PerFrameWait() {
 	}
 }
 
-void DXCommand::SetViewAndscissor() {
+void DXCommand::SetViewAndScissor() {
 
 	list_->RSSetViewports(1, &viewport_);
 	list_->RSSetScissorRects(1, &scissor_);

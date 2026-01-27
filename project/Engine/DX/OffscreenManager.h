@@ -172,12 +172,12 @@ namespace Graphics {
 		/// <summary>
 		/// ポストエフェクトのリセット
 		/// </summary>
-		void ResetPostEffect() { validPostEffects.clear(); }
+		void ResetPostEffect() { validPostEffects_.clear(); }
 
 		/// <summary>
 		/// ポストエフェクトの追加
 		/// </summary>
-		void AddPostEffect(PostEffectList effect) { validPostEffects.push_back(postEffects[int(effect)]); }
+		void AddPostEffect(PostEffectList effect) { validPostEffects_.push_back(postEffects_[int(effect)]); }
 
 		/// <summary>
 		/// 特定のポストエフェクトのポップ
@@ -230,7 +230,7 @@ namespace Graphics {
 		ComPtr<ID3D12Resource> thunderResource_[DXC::kFrameCount_];
 		LightningElement* thunderDataGPU_[DXC::kFrameCount_];
 		LightningElement thunderData_;
-		int nowTex;
+		int nowTex_;
 
 		ComPtr<ID3D12Resource> cRTResource_[DXC::kFrameCount_];
 		CRTElemnt* crtDataGPU_[DXC::kFrameCount_];
@@ -271,8 +271,8 @@ namespace Graphics {
 		D3D12_CPU_DESCRIPTOR_HANDLE outputUAVHandleCPU_[DXC::kFrameCount_];
 		D3D12_GPU_DESCRIPTOR_HANDLE outputUAVHandle_[DXC::kFrameCount_];
 
-		std::vector<PostEffectPass> postEffects;
-		std::vector<PostEffectPass> validPostEffects;
+		std::vector<PostEffectPass> postEffects_;
+		std::vector<PostEffectPass> validPostEffects_;
 
 		bool isGrayscale_ = true;
 		bool isNonePost_ = true;

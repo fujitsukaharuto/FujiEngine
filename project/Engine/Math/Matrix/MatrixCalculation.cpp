@@ -682,9 +682,9 @@ Matrix4x4 Trans::GetWorldMat() const {
 			const Matrix4x4& parentWorldMatrix = parent->GetWorldMat();
 			worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
 		}
-	} else if (animParent) {
+	} else if (animeParent) {
 		if (isNoneScaleParent) {
-			const Matrix4x4& parentWorldMatrix = *animParent;
+			const Matrix4x4& parentWorldMatrix = *animeParent;
 			// スケール成分を除去した親ワールド行列を作成
 			Matrix4x4 noScaleParentMatrix = parentWorldMatrix;
 
@@ -707,7 +707,7 @@ Matrix4x4 Trans::GetWorldMat() const {
 			// 変換はそのまま（位置は影響受けてOKなら）
 			worldMatrix = Multiply(worldMatrix, noScaleParentMatrix);
 		} else {
-			const Matrix4x4& parentWorldMatrix = *animParent;
+			const Matrix4x4& parentWorldMatrix = *animeParent;
 			worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
 		}
 	} else if (isCameraParent) {
@@ -749,9 +749,9 @@ Matrix4x4 Trans::GetNoneScaleWorldMat() const {
 			const Matrix4x4& parentWorldMatrix = parent->GetWorldMat();
 			worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
 		}
-	} else if (animParent) {
+	} else if (animeParent) {
 		if (isNoneScaleParent) {
-			const Matrix4x4& parentWorldMatrix = *animParent;
+			const Matrix4x4& parentWorldMatrix = *animeParent;
 			// スケール成分を除去した親ワールド行列を作成
 			Matrix4x4 noScaleParentMatrix = parentWorldMatrix;
 
@@ -774,7 +774,7 @@ Matrix4x4 Trans::GetNoneScaleWorldMat() const {
 			// 変換はそのまま（位置は影響受けてOKなら）
 			worldMatrix = Multiply(worldMatrix, noScaleParentMatrix);
 		} else {
-			const Matrix4x4& parentWorldMatrix = *animParent;
+			const Matrix4x4& parentWorldMatrix = *animeParent;
 			worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
 		}
 	} else if (isCameraParent) {

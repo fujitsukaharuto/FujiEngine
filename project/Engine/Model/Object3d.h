@@ -110,7 +110,7 @@ namespace Graphics {
 		void SetCamera(Camera* camera) { this->camera_ = camera; }
 		/// <summary>ペアレントの設定</summary>
 		void SetParent(Math::Trans* parent) { transform.parent = parent; }
-		void SetAnimParent(Math::Matrix4x4* parent) { transform.animParent = parent; }
+		void SetAnimeParent(Math::Matrix4x4* parent) { transform.animeParent = parent; }
 		/// <summary>非スケーリング継承</summary>
 		void SetNoneScaleParent(bool is) { transform.isNoneScaleParent = is; }
 		void SetCameraParent(bool is) { transform.isCameraParent = is; }
@@ -173,15 +173,15 @@ namespace Graphics {
 
 		bool isMaskMode_ = false;
 		bool isUseNodeGraph_ = false;
-		Material maskMateral_;
-		std::vector<NodeContent> nodeContentDeta_;
+		Material maskMaterial_;
+		std::vector<NodeContent> nodeContentData_;
 		//std::vector<Material> nodeMaterials_;
 
 		Math::Vector3 prevPos_;
 		Math::Vector3 prevRotate_;
 		Math::Vector3 prevScale_;
-		int guizmoType_ = 0;
-		float IsUsingGuizmo_ = false;
+		int gizmoType_ = 0;
+		float IsUsingGizmo_ = false;
 		std::string nodeFileName_;
 #ifdef _DEBUG
 		ax::NodeEditor::EditorContext* nodeEditorContext_ = nullptr;

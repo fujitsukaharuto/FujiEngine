@@ -80,7 +80,7 @@ void MyWin::CreateGWindow(const wchar_t* name, uint32_t windowSizeX, uint32_t wi
 
 	//ウィンドウサイズを表す構造体にクライアント領域を入れる
 	wrc_ = { 0,0,kClientWidth,kClientHeight };
-	//クライアント領域を元に実際のサイズにｗｒｃを変更してもらう
+	//クライアント領域を元に実際のサイズをwrcを変更してもらう
 	AdjustWindowRect(&wrc_, WS_OVERLAPPEDWINDOW, false);
 
 	hwnd_ = CreateWindow(

@@ -25,12 +25,14 @@ void SceneManager::Initialize(DXCom* pDxcom, Graphics::LightManager* pLightManag
 }
 
 void SceneManager::Finalize() {
-	delete scene_;
+	scene_.reset();
 }
 
 void SceneManager::Update() {
 	if (!isChange_) {
-		scene_->Update();
+		if (scene_) {
+			scene_->Update();
+		}
 		if (isFinifh_) {
 			finishTime -= FPSKeeper::DeltaTimeFrame();
 			if (finishTime <= 0.0f) {
@@ -47,12 +49,15 @@ void SceneManager::Update() {
 }
 
 void SceneManager::Draw() {
-	scene_->Draw();
+	if (scene_) {
+		scene_->Draw();
+	}
 }
 
 void SceneManager::StartScene(const std::string& sceneName) {
 	assert(sceneFactory_);
 
+	// Factoryから unique_ptr を受け取る
 	scene_ = sceneFactory_->CreateScene(sceneName);
 	scene_->Init(dxcommon_, this, lightManager_);
 	scene_->Initialize();
@@ -71,22 +76,27 @@ void SceneManager::ChangeScene(const std::string& sceneName, float extraTime) {
 
 	isFinifh_ = true;;
 
+	// 次のシーンを作成
 	nextScene_ = sceneFactory_->CreateScene(sceneName);
 }
 
 void SceneManager::DebugGUI() {
 #ifdef _DEBUG
 	if (ImGui::CollapsingHeader("Scene")) {
-		scene_->DebugGUI();
-		ImGui::SeparatorText("Particle");
-		scene_->ParticleDebugGUI();
+		if (scene_) {
+			scene_->DebugGUI();
+			ImGui::SeparatorText("Particle");
+			scene_->ParticleDebugGUI();
+		}
 	}
 #endif // _DEBUG
 }
 
 void SceneManager::ParticleGroupDebugGUI() {
 #ifdef _DEBUG
-	scene_->ParticleGroupDebugGUI();
+	if (scene_) {
+		scene_->ParticleGroupDebugGUI();
+	}
 #endif // _DEBUG
 
 }
@@ -96,11 +106,10 @@ void SceneManager::SceneSet() {
 		if (scene_) {
 			ParticleManager::ParentReset();
 			dxcommon_->PerFrameWait();
-			delete scene_;
 		}
 
-		scene_ = nextScene_;
-		nextScene_ = nullptr;
+		// 所有権を nextScene_ から scene_ へ移動
+		scene_ = std::move(nextScene_);
 
 		scene_->Init(dxcommon_, this, lightManager_);
 		scene_->Initialize();

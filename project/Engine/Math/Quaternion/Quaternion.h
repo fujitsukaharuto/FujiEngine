@@ -95,8 +95,8 @@ namespace Math {
 			return IdentityQuaternion();
 		}
 
-		/// <summary>2つのクォータニオン間を球面線形補間（Slerp）する</summary>
-		static Quaternion Slerp(const Quaternion& q0, const Quaternion& q1, float t) {
+		/// <summary>2つのクォータニオン間を球面線形補間（SLerp）する</summary>
+		static Quaternion SLerp(const Quaternion& q0, const Quaternion& q1, float t) {
 			Quaternion q0_0 = q0;
 			// q0とq1の内積
 			float dot = Dot(q0_0, q1);

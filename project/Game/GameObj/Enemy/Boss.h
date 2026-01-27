@@ -178,7 +178,7 @@ public:
 	Beam* GetBeam() { return beam_.get(); }
 	const  std::vector<std::unique_ptr<WaveWall>>& GetWalls() { return walls_; }
 	const std::vector<std::unique_ptr<Arrow>>& GetArrows() { return arrows_; }
-	const std::vector<std::unique_ptr<UnderRing>>& GetUnderRings() { return undderRings_; }
+	const std::vector<std::unique_ptr<UnderRing>>& GetUnderRings() { return underRings_; }
 	const std::vector<std::pair<std::string, float>>& GetPhaseActionList(int phase) { return phaseList_[phase]; }
 	float GetAttackCooldown() { return attackCooldown_; }
 	int GetPhaseIndex() { return phaseIndex_; }
@@ -245,7 +245,7 @@ private:
 	std::vector<std::unique_ptr<WaveWall>> walls_;
 	std::vector<std::unique_ptr<Arrow>> arrows_;
 	std::vector<std::unique_ptr<Arrow>> rods_;
-	std::vector<std::unique_ptr<UnderRing>> undderRings_;
+	std::vector<std::unique_ptr<UnderRing>> underRings_;
 
 	std::unique_ptr<Graphics::Object3d> shadow_;
 	std::unique_ptr<AABBCollider> collider_;

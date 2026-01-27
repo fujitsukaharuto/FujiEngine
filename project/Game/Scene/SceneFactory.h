@@ -12,7 +12,7 @@ public:
 	/// <summary>
 	/// シーンの作成を行う
 	/// </summary>
-	BaseScene* CreateScene(const std::string& sceneName)override;
+	std::unique_ptr<BaseScene> CreateScene(const std::string& sceneName) override;
 
 private:
 

@@ -15,8 +15,8 @@ BossArrowAttack::BossArrowAttack(Boss* pBoss,bool beforArrow) : BaseBossBehavior
 	step_ = Step::ATTACK;
 	pBoss_->SetCameraRang(cameraRang_);
 	pBoss_->SetCameraFollowSpeed(cameraFollowSpeed_);
-	pBoss_->GetAnimModel()->ChangeAnimation("idle");
-	pBoss_->GetAnimModel()->IsRoopAnimation(false);
+	pBoss_->GetAnimeModel()->ChangeAnimation("idle");
+	pBoss_->GetAnimeModel()->IsLoopAnimation(false);
 	isbeforArrow_ = beforArrow; // 1つ前がarrowだったら次はarrowにならないように
 	if (beforArrow) {
 		beforWait_ = 60.0f;
@@ -54,7 +54,7 @@ void BossArrowAttack::Update() {
 		///---------------------------------------------------------------------------------------
 	case BossArrowAttack::Step::TOROOT:
 	{
-		pBoss_->GetAnimModel()->IsRoopAnimation(true);
+		pBoss_->GetAnimeModel()->IsLoopAnimation(true);
 		float randomSeed = Random::GetFloat(0.0f, 1.0f);
 		if (randomSeed > pBoss_->GetChainRate() + 0.05f && !isbeforArrow_) {
 			pBoss_->ChangeBehavior(std::make_unique<BossArrowAttack>(pBoss_, true));

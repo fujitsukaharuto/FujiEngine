@@ -56,7 +56,7 @@ public:
 	//* Getter
 	D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(uint32_t index);
 	D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(uint32_t index);
-	ID3D12DescriptorHeap* GetSRVHeap() { return descriptorHeap.Get(); }
+	ID3D12DescriptorHeap* GetSRVHeap() { return descriptorHeap_.Get(); }
 
 private:
 
@@ -67,8 +67,8 @@ private:
 
 	static const uint32_t kMaxSRVCount_;
 	uint32_t descriptorSize_;
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap_;
 
-	uint32_t useIndex = 0;
+	uint32_t useIndex_ = 0;
 
 };

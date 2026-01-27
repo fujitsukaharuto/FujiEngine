@@ -16,7 +16,7 @@ OriginGameObject::OriginGameObject() {
 
 void OriginGameObject::Initialize() {
 	model_ = std::make_unique<Object3d>();
-	animModel_ = std::make_unique<AnimationModel>();
+	animeModel_ = std::make_unique<AnimationModel>();
 }
 
 void OriginGameObject::Update() {
@@ -41,13 +41,13 @@ void OriginGameObject::DebugGUI() {
 		CreatePropertyCommand(2);
 
 		ImGui::Separator();
-		ImGui::RadioButton("TRANSLATE", &guizmoType_, 0); ImGui::SameLine();
-		ImGui::RadioButton("ROTATE", &guizmoType_, 1); ImGui::SameLine();
-		ImGui::RadioButton("SCALE", &guizmoType_, 2);
+		ImGui::RadioButton("TRANSLATE", &gizmoType_, 0); ImGui::SameLine();
+		ImGui::RadioButton("ROTATE", &gizmoType_, 1); ImGui::SameLine();
+		ImGui::RadioButton("SCALE", &gizmoType_, 2);
 		JsonSerializer::ShowSaveTransformPopup(model_->transform); ImGui::SameLine();
 		JsonSerializer::ShowLoadTransformPopup(model_->transform);
 		ImGuizmo::OPERATION operation;
-		switch (guizmoType_) {
+		switch (gizmoType_) {
 		case 0: operation = ImGuizmo::TRANSLATE; break;
 		case 1: operation = ImGuizmo::ROTATE;    break;
 		case 2: operation = ImGuizmo::SCALE;     break;
@@ -71,12 +71,12 @@ void OriginGameObject::DebugGUI() {
 
 		// 編集中なら Transform に反映
 		if (ImGuizmo::IsUsing()) {
-			if (!IsUsingGuizmo_) {
+			if (!IsUsingGizmo_) {
 				prevPos_ = model_->transform.translate; // 開始時の状態を保存
 				prevRotate_ = model_->transform.rotate;
 				prevScale_ = model_->transform.scale;
 			}
-			IsUsingGuizmo_ = true;
+			IsUsingGizmo_ = true;
 
 			Vector3 t, r, s;
 			ImGuizmo::DecomposeMatrixToComponents(&model.m[0][0], &t.x, &r.x, &s.x);
@@ -84,7 +84,7 @@ void OriginGameObject::DebugGUI() {
 			constexpr float DegToRad = 3.14159265f / 180.0f;
 			model_->transform.rotate = r * DegToRad;
 			model_->transform.scale = s;
-		} else if (IsUsingGuizmo_) {
+		} else if (IsUsingGizmo_) {
 			// 編集終了検出 → Command 発行
 			if (model_->transform.translate != prevPos_) {
 				auto command = std::make_unique<PropertyCommand<Vector3>>(
@@ -101,7 +101,7 @@ void OriginGameObject::DebugGUI() {
 			}
 			// ※必要に応じて rotate/scale の比較と Command 追加も可
 
-			IsUsingGuizmo_ = false; // フラグリセット
+			IsUsingGizmo_ = false; // フラグリセット
 		}
 		ImGui::TreePop();
 	}
@@ -122,8 +122,8 @@ void OriginGameObject::CreateModel(const std::string& name) {
 	model_->Create(name);
 }
 
-void OriginGameObject::CreateAnimModel(const std::string& name) {
-	animModel_->Create(name);
+void OriginGameObject::CreateAnimeModel(const std::string& name) {
+	animeModel_->Create(name);
 }
 
 void OriginGameObject::CreateFromJson(const std::string& name) {
@@ -177,8 +177,8 @@ void OriginGameObject::SetModel(const std::string& name) {
 	model_->SetModel(name);
 }
 
-void OriginGameObject::SetAnimModel(const std::string& name) {
-	animModel_->SetModel(name);
+void OriginGameObject::SetAnimeModel(const std::string& name) {
+	animeModel_->SetModel(name);
 }
 
 void OriginGameObject::SetModelDataJson(const nlohmann::json& jsonData) {

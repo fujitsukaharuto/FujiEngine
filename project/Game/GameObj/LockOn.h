@@ -68,16 +68,16 @@ private:
 
 	const OriginGameObject* target_ = nullptr;
 
-	float mpi = 3.14159265358f;
-	const float kDegreeToRadian = mpi / 180.0f;
+	float mpi_ = 3.14159265358f;
+	const float kDegreeToRadian_ = mpi_ / 180.0f;
 
 	// 最小距離
 	float minDistance_ = 10.0f;
 	// 最大距離
 	float maxDistance_ = 30.0f;
 	// 角度範囲
-	float angleRange_ = 20.0f * kDegreeToRadian;
+	float angleRange_ = 20.0f * kDegreeToRadian_;
 
-	bool prebutton_ = false;
+	bool preButton_ = false;
 
 };

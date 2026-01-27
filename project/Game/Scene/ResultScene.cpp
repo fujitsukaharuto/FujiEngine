@@ -29,13 +29,13 @@ ResultScene::~ResultScene() {
 
 void ResultScene::Initialize() {
 
-	obj3dCommon.reset(new Object3dCommon());
-	obj3dCommon->Initialize();
+	obj3dCommon_.reset(new Object3dCommon());
+	obj3dCommon_->Initialize();
 
 	CameraManager::GetInstance()->GetCamera()->transform.rotate = { cameraStartRotateX_,0.0f,0.0f };
 	CameraManager::GetInstance()->GetCamera()->transform.translate = { 0.0f, 2.0f, -20.0f };
 	lightManager_->GetDirectionLight()->SetLightDirection(lightDir_);
-	lightManager_->GetDirectionLight()->SetLightIntensity(lightIntens_);
+	lightManager_->GetDirectionLight()->SetLightIntensity(lightIntensity_);
 
 #pragma region シーン遷移用
 	black_ = std::make_unique<Sprite>();
@@ -116,7 +116,7 @@ void ResultScene::Draw() {
 #pragma region 3Dオブジェクト
 	skybox_->Draw();
 
-	obj3dCommon->PreDraw();
+	obj3dCommon_->PreDraw();
 	terrain_->Draw();
 
 	for (auto& player : players_) {
@@ -137,7 +137,7 @@ void ResultScene::Draw() {
 #pragma region 前景スプライト
 
 	dxcommon_->PreSpriteDraw();
-	if (blackTime != 0.0f) {
+	if (blackTime_ != 0.0f) {
 		black_->Draw();
 	}
 
@@ -149,10 +149,7 @@ void ResultScene::DebugGUI() {
 #ifdef _DEBUG
 	ImGui::Indent();
 
-	/*if (ImGui::CollapsingHeader("Sphere")) {
-		ImGui::DragFloat3("scale", &sphere->transform.scale.x, 0.01f);
-		ImGui::DragFloat3("rotate", &sphere->transform.rotate.x, 0.01f);
-	}*/
+
 
 	ImGui::Unindent();
 #endif // _DEBUG
@@ -170,33 +167,33 @@ void ResultScene::ParticleDebugGUI() {
 }
 
 void ResultScene::BlackFade() {
-	if (isChangeFase) {
-		if (blackTime < blackLimmite) {
-			blackTime += FPSKeeper::DeltaTimeFrame();
-			if (blackTime >= blackLimmite) {
-				blackTime = blackLimmite;
+	if (isChangePhase_) {
+		if (blackTime_ < blackLimit_) {
+			blackTime_ += FPSKeeper::DeltaTimeFrame();
+			if (blackTime_ >= blackLimit_) {
+				blackTime_ = blackLimit_;
 			}
 		} else {
 			ChangeScene("TITLE", 40.0f);
 		}
 	} else {
-		if (blackTime > 0.0f) {
-			blackTime -= FPSKeeper::DeltaTimeFrame();
-			if (blackTime <= 0.0f) {
-				blackTime = 0.0f;
+		if (blackTime_ > 0.0f) {
+			blackTime_ -= FPSKeeper::DeltaTimeFrame();
+			if (blackTime_ <= 0.0f) {
+				blackTime_ = 0.0f;
 			}
 		}
 	}
-	black_->SetColor({ 0.0f,0.0f,0.0f,Lerp(0.0f,1.0f,(1.0f / blackLimmite * blackTime)) });
+	black_->SetColor({ 0.0f,0.0f,0.0f,Lerp(0.0f,1.0f,(1.0f / blackLimit_ * blackTime_)) });
 	XINPUT_STATE pad;
 	if (Input::GetInstance()->TriggerKey(DIK_SPACE) && state_ == DanceState::Finish) {
-		if (blackTime == 0.0f) {
-			isChangeFase = true;
+		if (blackTime_ == 0.0f) {
+			isChangePhase_ = true;
 		}
 	} else if (Input::GetInstance()->GetGamepadState(pad)) {
 		if (Input::GetInstance()->TriggerButton(PadInput::A) && state_ == DanceState::Finish) {
-			if (blackTime == 0.0f) {
-				isChangeFase = true;
+			if (blackTime_ == 0.0f) {
+				isChangePhase_ = true;
 			}
 		}
 	}
@@ -227,7 +224,7 @@ void ResultScene::KirbyDance() {
 	case DanceState::TurnRightMoveToCenter:
 		t = danceTime_ / stepTime_.turnRightBaseTime;
 		transform.x = Lerp(-danceDistanceX_, 0.0f, t);
-		transform.y += hight_.jumpHeight * 4.0f * t * (1.0f - t);
+		transform.y += height_.jumpHeight * 4.0f * t * (1.0f - t);
 		rotate.z = -std::numbers::pi_v<float> * 2.0f * t;
 
 		if (t >= 1.0f) { danceTime_ = 0.0f; state_ = DanceState::JumpLeft; }
@@ -236,7 +233,7 @@ void ResultScene::KirbyDance() {
 	case DanceState::JumpLeft:
 		t = danceTime_ / stepTime_.jumpLeftBaseTime;
 		transform.x = -1.0f * std::sin(t * std::numbers::pi_v<float>);
-		transform.y += hight_.jumpHeight * 4.0f * t * (1.0f - t);
+		transform.y += height_.jumpHeight * 4.0f * t * (1.0f - t);
 		rotate.z = jumpRotateZ_;
 
 		if (t >= 1.0f) { danceTime_ = 0.0f; state_ = DanceState::JumpRight; }
@@ -245,7 +242,7 @@ void ResultScene::KirbyDance() {
 	case DanceState::JumpRight:
 		t = danceTime_ / stepTime_.jumpRightBaseTime;
 		transform.x = 1.0f * sin(t * std::numbers::pi_v<float>);
-		transform.y += hight_.jumpHeight * 4.0f * t * (1.0f - t);
+		transform.y += height_.jumpHeight * 4.0f * t * (1.0f - t);
 		rotate.z = -jumpRotateZ_;
 
 		if (t >= 1.0f) { danceTime_ = 0.0f; state_ = DanceState::JumpUPSpin; }
@@ -254,7 +251,7 @@ void ResultScene::KirbyDance() {
 	case DanceState::JumpUPSpin:
 		t = danceTime_ / stepTime_.jumpUpBaseTime;
 		rotate.y += std::numbers::pi_v<float> *2.0f * t;
-		transform.y += hight_.finishHeight * std::sin(t * std::numbers::pi_v<float>);
+		transform.y += height_.finishHeight * std::sin(t * std::numbers::pi_v<float>);
 
 		if (t >= 1.0f) { danceTime_ = 0.0f; state_ = DanceState::FastSpin; }
 		break;
@@ -262,21 +259,21 @@ void ResultScene::KirbyDance() {
 	case DanceState::FastSpin:
 		t = danceTime_ / stepTime_.fastSpinBaseTime;
 		rotate.x = std::numbers::pi_v<float> * 2.0f * t;
-		transform.y += hight_.spinHeight * std::sin(t * std::numbers::pi_v<float>);
+		transform.y += height_.spinHeight * std::sin(t * std::numbers::pi_v<float>);
 
 		if (t >= 1.0f) { danceTime_ = 0.0f; state_ = DanceState::FinishSpin; }
 		break;
 	case DanceState::FinishSpin:
 		t = danceTime_ / stepTime_.finishSpinBaseTime;
 		rotate.x = std::numbers::pi_v<float> * 2.0f *t;
-		transform.y += hight_.finishHeight * std::sin(t * std::numbers::pi_v<float>);
+		transform.y += height_.finishHeight * std::sin(t * std::numbers::pi_v<float>);
 
 		if (t >= 1.0f) { danceTime_ = 0.0f; state_ = DanceState::LastPose; }
 		break;
 
 	case DanceState::LastPose:
 		t = danceTime_ / stepTime_.lastBaseTime;
-		transform.y += hight_.lastHeight * std::sin(t * std::numbers::pi_v<float>);
+		transform.y += height_.lastHeight * std::sin(t * std::numbers::pi_v<float>);
 		rotate.y -= lastRotateY_ * t;  // Y軸：右に20°
 		rotate.x = -lastRotateX_ * t;
 

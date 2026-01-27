@@ -5,6 +5,7 @@
 #include "Game/GameObj/FollowCamera.h"
 #include "Game/GameObj/Player/PlayerBullet.h"
 #include "Engine/Model/ModelManager.h"
+#include "Engine/Model/Line3dDrawer.h"
 
 #include "Particle/ParticleManager.h"
 #include "Scene/SceneManager.h"
@@ -24,8 +25,8 @@ GameScene::~GameScene() {
 
 void GameScene::Initialize() {
 
-	obj3dCommon.reset(new Object3dCommon());
-	obj3dCommon->Initialize();
+	obj3dCommon_.reset(new Object3dCommon());
+	obj3dCommon_->Initialize();
 
 
 #pragma region シーン遷移用
@@ -80,30 +81,30 @@ void GameScene::Initialize() {
 	pad_->SetPos({ MyWin::kWindowWidth, MyWin::kWindowHeight, 0.0f });
 	pad_->SetSize({ 400.0f, 300.0f });
 
-	gameover_ = std::make_unique<Sprite>();
-	gameover_->Load("gameover_beta.png");
-	gameover_->SetAnchor({ 0.0f,0.0f });
-	gameover_->SetSize({ MyWin::kWindowWidth, MyWin::kWindowHeight });
+	gameOver_ = std::make_unique<Sprite>();
+	gameOver_->Load("gameover_beta.png");
+	gameOver_->SetAnchor({ 0.0f,0.0f });
+	gameOver_->SetSize({ MyWin::kWindowWidth, MyWin::kWindowHeight });
 
-	gameoverSelector_ = std::make_unique<Sprite>();
-	gameoverSelector_->Load("boal16x16.png");
-	gameoverSelector_->SetPos(selectPointL_);
-	gameoverSelector_->SetColor({ 0.7f, 0.7f, 0.1f, 1.0f });
-	gameoverSelector_->SetSize({ 40.0f, 40.0f });
+	gameOverSelector_ = std::make_unique<Sprite>();
+	gameOverSelector_->Load("boal16x16.png");
+	gameOverSelector_->SetPos(selectPointL_);
+	gameOverSelector_->SetColor({ 0.7f, 0.7f, 0.1f, 1.0f });
+	gameOverSelector_->SetSize({ 40.0f, 40.0f });
 
 	ApplyGlobalVariables();
 
 	cMane_ = std::make_unique<CollisionManager>();
 
-	emit.count_ = 3;
-	emit.frequencyTime_ = 20.0f;
-	emit.name_ = "animetest";
-	emit.pos_ = { 0.0f,2.0f,0.0f };
-	emit.animeData_.lifeTime = 40.0f;
-	emit.RandomSpeed({ -0.1f,0.1f }, { -0.1f,0.1f }, { -0.1f,0.1f });
-	emit.RandomTranslate({ -0.1f,0.1f }, { -0.1f,0.1f }, { -0.1f,0.1f });
+	emit_.count_ = 3;
+	emit_.frequencyTime_ = 20.0f;
+	emit_.name_ = "animetest";
+	emit_.pos_ = { 0.0f,2.0f,0.0f };
+	emit_.animeData_.lifeTime = 40.0f;
+	emit_.RandomSpeed({ -0.1f,0.1f }, { -0.1f,0.1f }, { -0.1f,0.1f });
+	emit_.RandomTranslate({ -0.1f,0.1f }, { -0.1f,0.1f }, { -0.1f,0.1f });
 
-	ParticleManager::Load(field, "fieldParticle");
+	ParticleManager::Load(field_, "fieldParticle");
 	bgm_ = &AudioPlayer::GetInstance()->SoundLoadWave("UrbanBGM_01.wav");
 
 }
@@ -134,7 +135,7 @@ void GameScene::Update() {
 				followCamera_->SetOffsetSoon(0.0f);
 				followCamera_->SetOffset(boss_->GetCameraRang(), 30.0f);
 				CameraManager::GetInstance()->GetCamera()->transform.rotate = boss_->GetSummonCameraRotate();
-				CameraManager::GetInstance()->GetCamera()->transform.translate = summonCameraPos;
+				CameraManager::GetInstance()->GetCamera()->transform.translate = summonCameraPos_;
 			} else {
 				followCamera_->Update(boss_->GetDefoultPos());
 			}
@@ -153,11 +154,11 @@ void GameScene::Update() {
 		}
 	} else {
 		AudioPlayer::GetInstance()->SoundStopWave(*bgm_);
-		GameoverUpdate();
+		GameOverUpdate();
 	}
 	ContinueUpdate();
 
-	field.Emit();
+	field_.Emit();
 
 #ifdef _DEBUG
 	if (input_->TriggerKey(DIK_8)) {
@@ -226,7 +227,7 @@ void GameScene::Draw() {
 	skybox_->Draw();
 
 
-	obj3dCommon->PreDraw();
+	obj3dCommon_->PreDraw();
 
 
 	terrain_->Draw();
@@ -253,14 +254,14 @@ void GameScene::Draw() {
 			key_->Draw();
 		}
 	}
-	if (isGameover_) {
-		gameover_->Draw();
-		gameoverSelector_->Draw();
+	if (isGameOver_) {
+		gameOver_->Draw();
+		gameOverSelector_->Draw();
 	}
 	//test->Draw();
 	if (blackTime_ != 0.0f) {
 		black_->Draw();
-	} else if (isContiuneFade_ || isGameoverFade_) {
+	} else if (isContinueFade_ || isGameOverFade_) {
 		black_->Draw();
 	}
 
@@ -290,18 +291,18 @@ void GameScene::ParticleDebugGUI() {
 #ifdef _DEBUG
 	ImGui::Indent();
 	
-	emit.DebugGUI();
+	emit_.DebugGUI();
 
 	ImGui::Unindent();
 #endif // _DEBUG
 }
 
 void GameScene::BlackFade() {
-	if (isChangeFase_) {
-		if (blackTime_ < blackLimmite_) {
+	if (isChangePhase_) {
+		if (blackTime_ < blackLimit_) {
 			blackTime_ += FPSKeeper::DeltaTimeFrame();
-			if (blackTime_ >= blackLimmite_) {
-				blackTime_ = blackLimmite_;
+			if (blackTime_ >= blackLimit_) {
+				blackTime_ = blackLimit_;
 			}
 		} else {
 			if (isBackTitle_) {
@@ -310,7 +311,7 @@ void GameScene::BlackFade() {
 				ChangeScene("RESULT", 40.0f);
 			}
 		}
-		black_->SetColor({ 0.0f,0.0f,0.0f,Lerp(0.0f,1.0f,(1.0f / blackLimmite_ * blackTime_)) });
+		black_->SetColor({ 0.0f,0.0f,0.0f,Lerp(0.0f,1.0f,(1.0f / blackLimit_ * blackTime_)) });
 	} else {
 		if (blackTime_ > 0.0f) {
 			if (FPSKeeper::DeltaTimeFrame() < FPSKeeper::GetClampFrame()) {
@@ -319,19 +320,19 @@ void GameScene::BlackFade() {
 			if (blackTime_ <= 0.0f) {
 				blackTime_ = 0.0f;
 			}
-			black_->SetColor({ 0.0f,0.0f,0.0f,Lerp(0.0f,1.0f,(1.0f / blackLimmite_ * blackTime_)) });
+			black_->SetColor({ 0.0f,0.0f,0.0f,Lerp(0.0f,1.0f,(1.0f / blackLimit_ * blackTime_)) });
 		}
 	}
 #ifdef _DEBUG
 	if (Input::GetInstance()->TriggerKey(DIK_0)) {
 		if (blackTime_ == 0.0f) {
-			isChangeFase_ = true;
+			isChangePhase_ = true;
 		}
 	}
 #endif // _DEBUG
 	if (boss_->GetIsClear()) {
 		if (blackTime_ == 0.0f) {
-			isChangeFase_ = true;
+			isChangePhase_ = true;
 		}
 	}
 }
@@ -354,60 +355,60 @@ void GameScene::LoadSceneLevelData(const std::string& name) {
 void GameScene::ApplyGlobalVariables() {
 }
 
-void GameScene::GameoverUpdate() {
-	if (!isGameoverFade_ && gameoverFadeTime_ == 0.0f) {
-		isGameoverFade_ = true;
+void GameScene::GameOverUpdate() {
+	if (!isGameOverFade_ && gameOverFadeTime_ == 0.0f) {
+		isGameOverFade_ = true;
 	}
 
-	if (isGameoverFade_) {
-		gameoverFadeTime_ += FPSKeeper::DeltaTimeFrame();
-		float v = std::fmodf(gameoverFadeTime_ / fadeBaseTime_, 2.0f);
+	if (isGameOverFade_) {
+		gameOverFadeTime_ += FPSKeeper::DeltaTimeFrame();
+		float v = std::fmodf(gameOverFadeTime_ / fadeBaseTime_, 2.0f);
 		if (v <= 1.0f) {
 			black_->SetColor({ 0.0f,0.0f,0.0f,v });
 		} else {
-			isGameover_ = true;
+			isGameOver_ = true;
 			black_->SetColor({ 0.0f,0.0f,0.0f,2.0f - v });
 		}
-		if (gameoverFadeTime_ > fadeBaseTime_ * 2.0f) {
-			isGameoverFade_ = false;
+		if (gameOverFadeTime_ > fadeBaseTime_ * 2.0f) {
+			isGameOverFade_ = false;
 			black_->SetColor({ 0.0f,0.0f,0.0f,0.0f });
 		}
 	}
 
-	if (isGameover_ && !isGameoverFade_ && !isContiuneFade_ && !isChangeFase_) {
+	if (isGameOver_ && !isGameOverFade_ && !isContinueFade_ && !isChangePhase_) {
 		if (selectPoint_ == 0) {
 			if (input_->TriggerKey(DIK_SPACE) || input_->PressButton(PadInput::A)) {
 				isRestartOnce_ = true;
-				isContiuneFade_ = true;
-				contiuneFadeTime_ = 0.0f;
+				isContinueFade_ = true;
+				continueFadeTime_ = 0.0f;
 			}
 			if (input_->TriggerKey(DIK_D) || input_->PressButton(PadInput::Right)) {
 				selectPoint_ = 1;
-				gameoverSelector_->SetPos(selectPointR_);
+				gameOverSelector_->SetPos(selectPointR_);
 			}
 		} else {
 			if (input_->TriggerKey(DIK_SPACE) || input_->PressButton(PadInput::A)) {
 				if (blackTime_ == 0.0f) {
-					isChangeFase_ = true;
+					isChangePhase_ = true;
 					isBackTitle_ = true;
 				}
 			}
 			if (input_->TriggerKey(DIK_A) || input_->PressButton(PadInput::Left)) {
 				selectPoint_ = 0;
-				gameoverSelector_->SetPos(selectPointL_);
+				gameOverSelector_->SetPos(selectPointL_);
 			}
 		}
 	}
 }
 
 void GameScene::ContinueUpdate() {
-	if (isContiuneFade_) {
-		contiuneFadeTime_ += FPSKeeper::DeltaTimeFrame();
-		float v = std::fmodf(contiuneFadeTime_ / fadeBaseTime_, 2.0f);
+	if (isContinueFade_) {
+		continueFadeTime_ += FPSKeeper::DeltaTimeFrame();
+		float v = std::fmodf(continueFadeTime_ / fadeBaseTime_, 2.0f);
 		if (v <= 1.0f) {
 			black_->SetColor({ 0.0f,0.0f,0.0f,v });
 		} else {
-			isGameover_ = false;
+			isGameOver_ = false;
 			if (isRestartOnce_) {
 				isRestartOnce_ = false;
 				player_->ReStart();
@@ -416,9 +417,9 @@ void GameScene::ContinueUpdate() {
 			}
 			black_->SetColor({ 0.0f,0.0f,0.0f,2.0f - v });
 		}
-		if (contiuneFadeTime_ > fadeBaseTime_ * 2.0f) {
-			isContiuneFade_ = false;
-			gameoverFadeTime_ = 0.0f;
+		if (continueFadeTime_ > fadeBaseTime_ * 2.0f) {
+			isContinueFade_ = false;
+			gameOverFadeTime_ = 0.0f;
 			black_->SetColor({ 0.0f,0.0f,0.0f,0.0f });
 		}
 	}
@@ -426,8 +427,8 @@ void GameScene::ContinueUpdate() {
 
 void GameScene::PadSwitch() {
 	Input* input = Input::GetInstance();
-	Vector2 lstick = input->GetLStick();
-	if (fabsf(lstick.x) > 0.01f || fabsf(lstick.y) > 0.01f) {
+	Vector2 lStick = input->GetLStick();
+	if (fabsf(lStick.x) > 0.01f || fabsf(lStick.y) > 0.01f) {
 		isPadDraw_ = true;
 	}
 

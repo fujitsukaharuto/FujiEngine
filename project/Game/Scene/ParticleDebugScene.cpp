@@ -24,8 +24,8 @@ ParticleDebugScene::~ParticleDebugScene() {
 
 void ParticleDebugScene::Initialize() {
 
-	obj3dCommon.reset(new Object3dCommon());
-	obj3dCommon->Initialize();
+	obj3dCommon_.reset(new Object3dCommon());
+	obj3dCommon_->Initialize();
 
 	CameraManager::GetInstance()->GetCamera()->transform.rotate = { 0.0f,0.0f,0.0f };
 
@@ -78,7 +78,7 @@ void ParticleDebugScene::Draw() {
 	skybox_->Draw();
 
 #pragma region 3Dオブジェクト
-	obj3dCommon->PreDraw();
+	obj3dCommon_->PreDraw();
 	terrain_->Draw();
 
 	ParticleManager::GetInstance()->Draw();
@@ -97,7 +97,7 @@ void ParticleDebugScene::Draw() {
 #pragma region 前景スプライト
 
 	dxcommon_->PreSpriteDraw();
-	if (blackTime != 0.0f) {
+	if (blackTime_ != 0.0f) {
 		black_->Draw();
 	}
 
@@ -128,28 +128,28 @@ void ParticleDebugScene::ParticleGroupDebugGUI() {
 }
 
 void ParticleDebugScene::BlackFade() {
-	if (isChangeFase) {
-		if (blackTime < blackLimmite) {
-			blackTime += FPSKeeper::DeltaTimeFrame();
-			if (blackTime >= blackLimmite) {
-				blackTime = blackLimmite;
+	if (isChangePhase_) {
+		if (blackTime_ < blackLimit_) {
+			blackTime_ += FPSKeeper::DeltaTimeFrame();
+			if (blackTime_ >= blackLimit_) {
+				blackTime_ = blackLimit_;
 			}
 		} else {
 			ChangeScene("TITLE", 40.0f);
 		}
 	} else {
-		if (blackTime > 0.0f) {
-			blackTime -= FPSKeeper::DeltaTimeFrame();
-			if (blackTime <= 0.0f) {
-				blackTime = 0.0f;
+		if (blackTime_ > 0.0f) {
+			blackTime_ -= FPSKeeper::DeltaTimeFrame();
+			if (blackTime_ <= 0.0f) {
+				blackTime_ = 0.0f;
 			}
 		}
 	}
-	black_->SetColor({ 0.0f,0.0f,0.0f,Lerp(0.0f,1.0f,(1.0f / blackLimmite * blackTime)) });
+	black_->SetColor({ 0.0f,0.0f,0.0f,Lerp(0.0f,1.0f,(1.0f / blackLimit_ * blackTime_)) });
 	
 	if (Input::GetInstance()->PushKey(DIK_RETURN) && Input::GetInstance()->PushKey(DIK_P) && Input::GetInstance()->PushKey(DIK_D) && Input::GetInstance()->TriggerKey(DIK_S)) {
-		if (blackTime == 0.0f) {
-			isChangeFase = true;
+		if (blackTime_ == 0.0f) {
+			isChangePhase_ = true;
 		}
 	}
 

@@ -53,7 +53,7 @@ namespace DXC {
 		/// <summary>
 		/// ViewとScissorをセットする
 		/// </summary>
-		void SetViewAndscissor();
+		void SetViewAndScissor();
 
 		//========================================================================*/
 		//* Getter

@@ -13,8 +13,8 @@ public:
 public:
 
 	void Initialize();
-	void Update(const Math::Vector3& lockon);
-	void ReStart(const Math::Vector3& lockon);
+	void Update(const Math::Vector3& lockOn);
+	void ReStart(const Math::Vector3& lockOn);
 
 	/// <summary>
 	///	DestinationAngleの計算

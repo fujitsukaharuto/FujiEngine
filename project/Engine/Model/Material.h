@@ -7,7 +7,7 @@
 class DXCom;
 
 /// <summary>
-/// TextureのVertexDeta
+/// TextureのVertexData
 /// </summary>
 struct VertexDate {
 	Math::Vector4 position;

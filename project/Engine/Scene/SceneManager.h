@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <memory>
 #include "AbstractSceneFactory.h"
 
 class DXCom;
@@ -43,8 +44,8 @@ private:
 	Graphics::LightManager* lightManager_;
 	AbstractSceneFactory* sceneFactory_ = nullptr;
 
-	BaseScene* scene_ = nullptr;
-	BaseScene* nextScene_ = nullptr;
+	std::unique_ptr<BaseScene> scene_ = nullptr;
+	std::unique_ptr<BaseScene> nextScene_ = nullptr;
 
 	std::string nowScene;
 

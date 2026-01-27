@@ -30,7 +30,7 @@ void LockOn::Update(const std::list<std::unique_ptr<OriginGameObject>>& enemies)
 		if (Input::GetInstance()->GetGamepadState(pad)) {
 			if (Input::GetInstance()->TriggerButton(PadInput::RStick)) {
 				target_ = nullptr;
-				prebutton_ = true;
+				preButton_ = true;
 			} else if (Input::GetInstance()->TriggerButton(PadInput::RightShoulder)) {
 				ChangeSearch(enemies, true);
 			} else if (Input::GetInstance()->TriggerButton(PadInput::LeftShoulder)) {
@@ -45,7 +45,7 @@ void LockOn::Update(const std::list<std::unique_ptr<OriginGameObject>>& enemies)
 		if (Input::GetInstance()->GetGamepadState(pad)) {
 			if (Input::GetInstance()->TriggerButton(PadInput::RStick)) {
 				Search(enemies);
-				prebutton_ = true;
+				preButton_ = true;
 			}
 		}
 	}

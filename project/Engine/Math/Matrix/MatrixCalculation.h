@@ -17,7 +17,7 @@ namespace Math {
 	/// <summary>
 	/// QuaternionベースのTransform
 	/// </summary>
-	struct QuaternioonTrans {
+	struct QuaternionTrans {
 		Vector3 scale = { 1.0f,1.0f,1.0f };
 		Quaternion rotate = Quaternion();
 		Vector3 translate = { 0.0f,0.0f,0.0f };
@@ -28,7 +28,7 @@ namespace Math {
 	/// </summary>
 	struct Trans {
 		Vector3 scale;
-		Vector3 rotate; // Quater
+		Vector3 rotate; // Quaternion
 		Vector3 translate;
 
 		/// <summary>スケールを適用しないペアレント</summary>
@@ -43,7 +43,7 @@ namespace Math {
 		Vector3 GetRotation();
 
 		Trans* parent = nullptr;
-		Matrix4x4* animParent = nullptr;
+		Matrix4x4* animeParent = nullptr;
 
 		bool isNoneScaleParent = false;
 		bool isCameraParent = false;
@@ -282,7 +282,7 @@ namespace Math {
 	Matrix4x4 DirectionToDirection(const Vector3& from, const Vector3& to);
 
 	/// <summary>
-	/// 行列の値をfloat配列に変換する。
+	/// 行列の値を float配列に変換する。
 	/// </summary>
 	void ToFloatArray(const Matrix4x4& m, float out[16]);
 

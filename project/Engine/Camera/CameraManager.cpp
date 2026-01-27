@@ -2,8 +2,8 @@
 #include "DebugCamera.h"
 
 CameraManager* CameraManager::GetInstance() {
-	static CameraManager instatnce;
-	return &instatnce;
+	static CameraManager instance;
+	return &instance;
 }
 
 void CameraManager::Initialize() {

@@ -52,6 +52,10 @@ public:
 
 	void Initialize(Core::MyWin* myWin);
 	void Finalize();
+
+	/// <summary>
+	/// Finalize前に先にGPUが処理終わるように
+	/// </summary>
 	void Flush();
 
 	/// <summary>
@@ -79,8 +83,14 @@ public:
 	/// </summary>
 	void PostDraw();
 
+	/// <summary>
+	/// フレームの最初に入れる処理
+	/// </summary>
 	void BeginFrame();
 
+	/// <summary>
+	/// シーンを変える前に1フレ前を待つ
+	/// </summary>
 	void PerFrameWait();
 
 	/// <summary>
@@ -95,14 +105,14 @@ public:
 
 	//========================================================================*/
 	//* Frameの描画前に呼び出す関数群
-	void SetRenderTargets();
-	void ClearRenderTarget();
-	void ClearDepthBuffer();
+	void SetRenderTargets(); // レンダーターゲットのセット
+	void ClearRenderTarget(); // レンダーターゲットのクリア
+	void ClearDepthBuffer(); // 深度バッファのクリア
 
 	//========================================================================*/
 	//* オフスクリーンの処理を行う関数群
-	void OffscreenUpDate();
-	void OffscreenDebugGUI();
+	void OffscreenUpDate(); // オフスクリーンの処理Update
+	void OffscreenDebugGUI(); // オフスクリーン用DebugGUI
 
 	/// <summary>
 	/// バリアの変更
@@ -204,7 +214,7 @@ private:
 	void SettingRootSignature();
 
 	/// <summary>
-	/// swapchainのバリア
+	/// swapChainのバリア
 	/// </summary>
 	/// <param name="before"></param>
 	/// <param name="after"></param>

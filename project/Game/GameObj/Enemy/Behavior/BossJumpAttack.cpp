@@ -15,8 +15,8 @@ BossJumpAttack::BossJumpAttack(Boss* pBoss, int count) : BaseBossBehavior(pBoss)
 	pBoss_->SetCameraRang(cameraRang_);
 	pBoss_->SetCameraFollowSpeed(cameraFollowSpeed_);
 	pBoss_->InitJumpAttack();
-	pBoss_->GetAnimModel()->ChangeAnimation("jump");
-	pBoss_->GetAnimModel()->IsRoopAnimation(false);
+	pBoss_->GetAnimeModel()->ChangeAnimation("jump");
+	pBoss_->GetAnimeModel()->IsLoopAnimation(false);
 	pBoss_->ChainCount();
 }
 
@@ -33,12 +33,12 @@ void BossJumpAttack::Update() {
 
 		if (pBoss_->JumpAttack()) {
 			nowJumpCount_++;
-			pBoss_->GetAnimModel()->IsRoopAnimation(false);
+			pBoss_->GetAnimeModel()->IsLoopAnimation(false);
 			if (jumpCount_ == nowJumpCount_) {
 				step_ = Step::TOROOT;
 			} else {
 				pBoss_->InitJumpAttack();
-				pBoss_->GetAnimModel()->IsRoopAnimation(true);
+				pBoss_->GetAnimeModel()->IsLoopAnimation(true);
 			}
 		}
 
@@ -48,7 +48,7 @@ void BossJumpAttack::Update() {
 		///---------------------------------------------------------------------------------------
 	case BossJumpAttack::Step::TOROOT:
 	{
-		pBoss_->GetAnimModel()->IsRoopAnimation(true);
+		pBoss_->GetAnimeModel()->IsLoopAnimation(true);
 		float randomSeed = Random::GetFloat(0.0f, 1.0f);
 		if (randomSeed > pBoss_->GetChainRate()) {
 			pBoss_->ChangeBehavior(std::make_unique<BossAttack>(pBoss_));

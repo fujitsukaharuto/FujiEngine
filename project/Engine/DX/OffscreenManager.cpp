@@ -46,9 +46,6 @@ void OffscreenManager::DebugGUI() {
 	if (ImGui::TreeNode("OffScreen ShaderPath")) {
 		ImGui::Checkbox("PostEffect##checkPost", &isGrayscale_);
 		ImGui::Checkbox("None", &isNonePost_);
-		/*ImGui::Checkbox("shock", &isShockWave_);
-		ImGui::Checkbox("fire", &isFire_);
-		ImGui::Checkbox("thunder", &isThunder_);*/
 		ImGui::TreePop();
 	}
 	if (isGrayscale_ && !(preIsGrayscale)) {
@@ -84,10 +81,6 @@ void OffscreenManager::DebugGUI() {
 
 	EffectListGUI();
 
-	/*if (ImGui::Button("shock")) {
-		shockData_->shockTime = 0.0f;
-	}*/
-
 	if (ImGui::TreeNode("Gray")) {
 		ImGui::ColorEdit3("gray", &grayCSData_.gray_.x);
 		ImGui::TreePop();
@@ -105,60 +98,6 @@ void OffscreenManager::DebugGUI() {
 		ImGui::TreePop();
 	}
 
-	/*if (ImGui::TreeNode("FireData")) {
-		ImGui::DragFloat("animeTime", &fireData_->animeTime, 0.1f, 0.0f, 60.0f);
-		ImGui::DragFloat2("resolution", &fireData_->resolution.x);
-		ImGui::DragFloat("distortionStrength", &fireData_->distortionStrength, 0.01f);
-		ImGui::DragFloat("highlightStrength", &fireData_->highlightStrength, 0.01f);
-		ImGui::DragFloat("detailScale", &fireData_->detailScale, 0.01f);
-		ImGui::DragFloat2("rangeMin", &fireData_->rangeMin.x, 0.01f);
-		ImGui::DragFloat2("rangeMax", &fireData_->rangeMax.x, 0.01f);
-		ImGui::DragFloat("scale", &fireData_->scale, 0.01f);
-		ImGui::DragFloat("speed", &fireData_->speed, 0.01f);
-		ImGui::DragFloat("noiseSpeed", &fireData_->noiseSpeed, 0.01f);
-		ImGui::DragFloat("blend", &fireData_->blendStrength, 0.01f);
-		ImGui::TreePop();
-	}*/
-
-
-	/*if (ImGui::TreeNode("ThunderData")) {
-		ImGui::DragFloat2("startPos", &thunderData_->startPos.x, 0.01f);
-		ImGui::DragFloat2("endPos", &thunderData_->endPos.x, 0.01f);
-		ImGui::DragFloat("time", &thunderData_->time, 0.1f, 0.0f, 60.0f);
-		ImGui::DragFloat2("resolution", &thunderData_->resolution.x);
-		ImGui::DragFloat("mainBranchStrength", &thunderData_->mainBranchStrength, 0.1f);
-		ImGui::DragFloat("branchStrength", &thunderData_->branchStrngth, 0.1f);
-		ImGui::DragFloat("branchCount", &thunderData_->branchCount, 1);
-		ImGui::DragFloat("branchFade", &thunderData_->branchFade, 0.1f);
-		ImGui::DragFloat("highlightStrength", &thunderData_->highlightStrength, 0.1f);
-		ImGui::DragFloat("noiseScale", &thunderData_->noiseScale, 0.01f);
-		ImGui::DragFloat("noiseSpeed", &thunderData_->noiseSpeed, 0.1f);
-		ImGui::DragFloat2("rangeMin", &thunderData_->rangeMin.x, 0.01f);
-		ImGui::DragFloat2("rangeMax", &thunderData_->rangeMax.x, 0.01f);
-		ImGui::DragFloat("boltCount", &thunderData_->boltCount, 0.1f);
-		ImGui::DragFloat("progres", &thunderData_->progres, 0.1f, 0.0f, 1.0f);
-
-		int tex = nowTex;
-		ImGui::Combo("sizeType##type", &tex, "Noise_Dir.jpg\0worley_Noise.jpg\0perlin_Noise.png\0");
-		if (tex != nowTex) {
-			if (tex == 0) {
-				noiseDirTex_ = TextureManager::GetInstance()->LoadTexture("Noise_Dir.jpg");
-				nowTex = tex;
-			}
-			if (tex == 1) {
-				noiseDirTex_ = TextureManager::GetInstance()->LoadTexture("worley_Noise.jpg");
-				nowTex = tex;
-			}
-			if (tex == 2) {
-				noiseDirTex_ = TextureManager::GetInstance()->LoadTexture("perlin_Noise.png");
-				nowTex = tex;
-			}
-		}
-
-
-		ImGui::TreePop();
-	}*/
-
 	ImGui::End();
 #endif // _DEBUG
 
@@ -173,11 +112,11 @@ void OffscreenManager::EffectListGUI() {
 		ImGui::Combo("PostEffect##offType", &currentOffscreenIndex,
 			"GrayScale\0CRT\0RetroTV\0Gauss\0BoxFilter\0RadialBlur\0Vignette\0Outline\0LuminanceOutline\0Bloom\0Random\0");
 		if (ImGui::Button("Push##offPush")) {
-			validPostEffects.push_back(postEffects[currentOffscreenIndex]);
+			validPostEffects_.push_back(postEffects_[currentOffscreenIndex]);
 		}ImGui::SameLine();
 		if (ImGui::Button("Pop##offPop")) {
-			if (validPostEffects.size() != 0) {
-				validPostEffects.pop_back();
+			if (validPostEffects_.size() != 0) {
+				validPostEffects_.pop_back();
 			}
 		}
 
@@ -190,7 +129,7 @@ void OffscreenManager::EffectListGUI() {
 
 			ImGui::TableSetColumnIndex(0);
 			if (ImGui::BeginListBox("##PostEffectNowList", ImVec2(-FLT_MIN, 100.0f))) {
-				for (const auto& effect : validPostEffects) {
+				for (const auto& effect : validPostEffects_) {
 					switch (effect.pipeline) {
 					case Pipe::GrayCS:
 						ImGui::Text("GrayScale");
@@ -384,7 +323,7 @@ void OffscreenManager::SettingTexture() {
 	noiseDirTex_ = TextureManager::GetInstance()->LoadTexture("Noise_Dir.jpg");
 	noiseDirTex_ = TextureManager::GetInstance()->LoadTexture("worley_Noise.jpg");
 	noiseDirTex_ = TextureManager::GetInstance()->LoadTexture("perlin_Noise.png");
-	nowTex = 2;
+	nowTex_ = 2;
 
 	InitializePostEffects();
 }
@@ -405,7 +344,7 @@ void OffscreenManager::Command() {
 		bool isUsePing = true;
 
 
-		for (int i = 0; i < validPostEffects.size(); i++) {
+		for (int i = 0; i < validPostEffects_.size(); i++) {
 			auto inputResource = isUsePing ? ping : pong;
 			auto outputResource = isUsePing ? pong : ping;
 
@@ -421,15 +360,15 @@ void OffscreenManager::Command() {
 					D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 			}
 
-			if (validPostEffects[i].pipeline == Pipe::OutlineCS) {
+			if (validPostEffects_[i].pipeline == Pipe::OutlineCS) {
 				dxcommon_->PreOutline();
-				dxcommon_->GetPipelineManager()->SetCSPipeline(validPostEffects[i].pipeline);
-				validPostEffects[i].setup(dxcommon_->GetCommandList(), inputSRVHandle, outputUAVHandle);
+				dxcommon_->GetPipelineManager()->SetCSPipeline(validPostEffects_[i].pipeline);
+				validPostEffects_[i].setup(dxcommon_->GetCommandList(), inputSRVHandle, outputUAVHandle);
 				dxcommon_->GetCommandList()->Dispatch((MyWin::kWindowWidth + 7) / 8, (MyWin::kWindowHeight + 7) / 8, 1);
 				dxcommon_->PostOutline();
 			} else {
-				dxcommon_->GetPipelineManager()->SetCSPipeline(validPostEffects[i].pipeline);
-				validPostEffects[i].setup(dxcommon_->GetCommandList(), inputSRVHandle, outputUAVHandle);
+				dxcommon_->GetPipelineManager()->SetCSPipeline(validPostEffects_[i].pipeline);
+				validPostEffects_[i].setup(dxcommon_->GetCommandList(), inputSRVHandle, outputUAVHandle);
 				dxcommon_->GetCommandList()->Dispatch((MyWin::kWindowWidth + 7) / 8, (MyWin::kWindowHeight + 7) / 8, 1);
 			}
 
@@ -441,7 +380,7 @@ void OffscreenManager::Command() {
 		auto finalOutput = isUsePing ? pong : ping;
 		auto finalSRVHandle = isUsePing ? outputSRVHandle_[frameIndex] : offTextureHandle_[frameIndex];
 
-		if (validPostEffects.size() != 0) {
+		if (validPostEffects_.size() != 0) {
 			dxcommon_->TransitionResource(finalOutput.Get(),
 				D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_GENERIC_READ);
 		} else {
@@ -449,7 +388,7 @@ void OffscreenManager::Command() {
 				D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_GENERIC_READ);
 		}
 
-		dxcommon_->GetDXCommand()->SetViewAndscissor();
+		dxcommon_->GetDXCommand()->SetViewAndScissor();
 		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::None);
 
 		dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -465,15 +404,12 @@ void OffscreenManager::Command() {
 			dxcommon_->TransitionResource(pong.Get(),
 				D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 		} else {
-			if (validPostEffects.size() != 0) {
+			if (validPostEffects_.size() != 0) {
 				dxcommon_->TransitionResource(pong.Get(),
 					D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 			} else {
 
 			}
-
-			/*dxcommon_->TransitionResource(ping.Get(),
-				D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);*/
 		}
 
 	} else {
@@ -482,7 +418,7 @@ void OffscreenManager::Command() {
 	}
 
 	if (isNonePost_) {
-		dxcommon_->GetDXCommand()->SetViewAndscissor();
+		dxcommon_->GetDXCommand()->SetViewAndScissor();
 		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::None);
 
 		dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -492,7 +428,7 @@ void OffscreenManager::Command() {
 	}
 
 	if (isShockWave_) {
-		dxcommon_->GetDXCommand()->SetViewAndscissor();
+		dxcommon_->GetDXCommand()->SetViewAndScissor();
 		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::ShockWave);
 
 		dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -503,7 +439,7 @@ void OffscreenManager::Command() {
 	}
 
 	if (isFire_) {
-		dxcommon_->GetDXCommand()->SetViewAndscissor();
+		dxcommon_->GetDXCommand()->SetViewAndScissor();
 		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Fire);
 
 		dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -518,7 +454,7 @@ void OffscreenManager::Command() {
 
 
 	if (isThunder_) {
-		dxcommon_->GetDXCommand()->SetViewAndscissor();
+		dxcommon_->GetDXCommand()->SetViewAndScissor();
 		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Thunder);
 
 		dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -533,14 +469,14 @@ void OffscreenManager::Command() {
 
 void OffscreenManager::PopPostEffect(PostEffectList effect) {
 	int popNumber = -1;
-	for (int i = 0; i < validPostEffects.size(); i++) {
-		if (validPostEffects[i].effectName == effect) {
+	for (int i = 0; i < validPostEffects_.size(); i++) {
+		if (validPostEffects_[i].effectName == effect) {
 			popNumber = i;
 			break;
 		}
 	}
 	if (popNumber == -1)return;
-	validPostEffects.erase(validPostEffects.begin() + size_t(popNumber));
+	validPostEffects_.erase(validPostEffects_.begin() + size_t(popNumber));
 }
 
 void OffscreenManager::SettingVertex() {
@@ -611,7 +547,7 @@ void OffscreenManager::SettingVertex() {
 }
 
 void OffscreenManager::InitializePostEffects() {
-	postEffects.push_back({
+	postEffects_.push_back({
 		Pipe::GrayCS,
 		PostEffectList::Gray,
 		[=](auto* cmd, auto input, auto output) {
@@ -621,102 +557,102 @@ void OffscreenManager::InitializePostEffects() {
 		}
 		});
 
-	postEffects.push_back({
-	   Pipe::CRTCS,
+	postEffects_.push_back({
+		Pipe::CRTCS,
 		PostEffectList::CRT,
-	   [=](auto* cmd, auto input, auto output) {
-		   cmd->SetComputeRootDescriptorTable(0, input);
-		   cmd->SetComputeRootDescriptorTable(1, output);
-		   cmd->SetComputeRootConstantBufferView(2, cRTResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
-	   }
+		[=](auto* cmd, auto input, auto output) {
+			cmd->SetComputeRootDescriptorTable(0, input);
+			cmd->SetComputeRootDescriptorTable(1, output);
+			cmd->SetComputeRootConstantBufferView(2, cRTResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
+		}
 		});
 
-	postEffects.push_back({
-	   Pipe::RetroTVCS,
+	postEffects_.push_back({
+		Pipe::RetroTVCS,
 		PostEffectList::RetroTV,
-	   [=](auto* cmd, auto input, auto output) {
-		   cmd->SetComputeRootDescriptorTable(0, input);
-		   cmd->SetComputeRootDescriptorTable(1, output);
-		   cmd->SetComputeRootConstantBufferView(2, cRTResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
-	   }
+		[=](auto* cmd, auto input, auto output) {
+			cmd->SetComputeRootDescriptorTable(0, input);
+			cmd->SetComputeRootDescriptorTable(1, output);
+			cmd->SetComputeRootConstantBufferView(2, cRTResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
+		}
 		});
 
-	postEffects.push_back({
-	   Pipe::GaussCS,
+	postEffects_.push_back({
+		Pipe::GaussCS,
 		PostEffectList::Gauss,
-	   [=](auto* cmd, auto input, [[maybe_unused]] auto output) {
-		   cmd->SetComputeRootDescriptorTable(0, input);
-		   cmd->SetComputeRootDescriptorTable(1, output);
-	   }
+		[=](auto* cmd, auto input, [[maybe_unused]] auto output) {
+			cmd->SetComputeRootDescriptorTable(0, input);
+			cmd->SetComputeRootDescriptorTable(1, output);
+		}
 		});
 
-	postEffects.push_back({
-	   Pipe::BoxFilterCS,
+	postEffects_.push_back({
+		Pipe::BoxFilterCS,
 		PostEffectList::BoxFilter,
-	   [=](auto* cmd, auto input, [[maybe_unused]] auto output) {
-		   cmd->SetComputeRootDescriptorTable(0, input);
-		   cmd->SetComputeRootDescriptorTable(1, output);
-	   }
+		[=](auto* cmd, auto input, [[maybe_unused]] auto output) {
+			cmd->SetComputeRootDescriptorTable(0, input);
+			cmd->SetComputeRootDescriptorTable(1, output);
+		}
 		});
 
-	postEffects.push_back({
-	   Pipe::RadialCS,
+	postEffects_.push_back({
+		Pipe::RadialCS,
 		PostEffectList::Radial,
-	   [=](auto* cmd, auto input, [[maybe_unused]] auto output) {
-		   cmd->SetComputeRootDescriptorTable(0, input);
-		   cmd->SetComputeRootDescriptorTable(1, output);
-		   cmd->SetComputeRootConstantBufferView(2, radialResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
-	   }
+		[=](auto* cmd, auto input, [[maybe_unused]] auto output) {
+			cmd->SetComputeRootDescriptorTable(0, input);
+			cmd->SetComputeRootDescriptorTable(1, output);
+			cmd->SetComputeRootConstantBufferView(2, radialResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
+		}
 		});
 
-	postEffects.push_back({
-	   Pipe::VignetteCS,
+	postEffects_.push_back({
+		Pipe::VignetteCS,
 		PostEffectList::Vignette,
-	   [=](auto* cmd, auto input, [[maybe_unused]] auto output) {
-		   cmd->SetComputeRootDescriptorTable(0, input);
-		   cmd->SetComputeRootDescriptorTable(1, output);
-		   cmd->SetComputeRootConstantBufferView(2, vignetteResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
-	   }
+		[=](auto* cmd, auto input, [[maybe_unused]] auto output) {
+			cmd->SetComputeRootDescriptorTable(0, input);
+			cmd->SetComputeRootDescriptorTable(1, output);
+			cmd->SetComputeRootConstantBufferView(2, vignetteResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
+		}
 		});
 
-	postEffects.push_back({
-	   Pipe::OutlineCS,
+	postEffects_.push_back({
+		Pipe::OutlineCS,
 		PostEffectList::Outline,
-	   [=](auto* cmd, auto input, [[maybe_unused]] auto output) {
-		   cmd->SetComputeRootDescriptorTable(0, input);
-		   cmd->SetComputeRootDescriptorTable(2, output);
-		   cmd->SetComputeRootDescriptorTable(1, dxcommon_->GetDepthTexGPUHandle());
-		   cmd->SetComputeRootConstantBufferView(3, outlineResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
-	   }
+		[=](auto* cmd, auto input, [[maybe_unused]] auto output) {
+			cmd->SetComputeRootDescriptorTable(0, input);
+			cmd->SetComputeRootDescriptorTable(2, output);
+			cmd->SetComputeRootDescriptorTable(1, dxcommon_->GetDepthTexGPUHandle());
+			cmd->SetComputeRootConstantBufferView(3, outlineResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
+		}
 		});
 
-	postEffects.push_back({
-	   Pipe::LuminanceOutlineCS,
+	postEffects_.push_back({
+		Pipe::LuminanceOutlineCS,
 		PostEffectList::LuminanceOutline,
-	   [=](auto* cmd, auto input, [[maybe_unused]] auto output) {
-		   cmd->SetComputeRootDescriptorTable(0, input);
-		   cmd->SetComputeRootDescriptorTable(1, output);
-	   }
+		[=](auto* cmd, auto input, [[maybe_unused]] auto output) {
+			cmd->SetComputeRootDescriptorTable(0, input);
+			cmd->SetComputeRootDescriptorTable(1, output);
+		}
 		});
 
-	postEffects.push_back({
-	   Pipe::BloomCS,
+	postEffects_.push_back({
+		Pipe::BloomCS,
 		PostEffectList::Bloom,
-	   [=](auto* cmd, auto input, [[maybe_unused]] auto output) {
-		   cmd->SetComputeRootDescriptorTable(0, input);
-		   cmd->SetComputeRootDescriptorTable(1, output);
-		   cmd->SetComputeRootConstantBufferView(2, bloomResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
-	   }
+		[=](auto* cmd, auto input, [[maybe_unused]] auto output) {
+			cmd->SetComputeRootDescriptorTable(0, input);
+			cmd->SetComputeRootDescriptorTable(1, output);
+			cmd->SetComputeRootConstantBufferView(2, bloomResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
+		}
 		});
 
-	postEffects.push_back({
-	   Pipe::RandomCS,
+	postEffects_.push_back({
+		Pipe::RandomCS,
 		PostEffectList::Random,
-	   [=](auto* cmd, auto input, [[maybe_unused]] auto output) {
-		   cmd->SetComputeRootDescriptorTable(0, input);
-		   cmd->SetComputeRootDescriptorTable(1, output);
-		   cmd->SetComputeRootConstantBufferView(2, cRTResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
-	   }
+		[=](auto* cmd, auto input, [[maybe_unused]] auto output) {
+			cmd->SetComputeRootDescriptorTable(0, input);
+			cmd->SetComputeRootDescriptorTable(1, output);
+			cmd->SetComputeRootConstantBufferView(2, cRTResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
+		}
 		});
 
 }
@@ -736,16 +672,16 @@ void OffscreenManager::CopyData(uint32_t frameIndex) {
 
 
 	fireDataGPU_[frameIndex]->animeTime = fireData_.animeTime;
-	fireDataGPU_[frameIndex]->resolution =fireData_.resolution;
-	fireDataGPU_[frameIndex]->distortionStrength =fireData_.distortionStrength;
-	fireDataGPU_[frameIndex]->highlightStrength =fireData_.highlightStrength;
-	fireDataGPU_[frameIndex]->detailScale =fireData_.detailScale;
-	fireDataGPU_[frameIndex]->rangeMin =fireData_.rangeMin;
-	fireDataGPU_[frameIndex]->rangeMax =fireData_.rangeMax;
-	fireDataGPU_[frameIndex]->scale =fireData_.scale;
-	fireDataGPU_[frameIndex]->speed =fireData_.speed;
-	fireDataGPU_[frameIndex]->noiseSpeed =fireData_.noiseSpeed;
-	fireDataGPU_[frameIndex]->blendStrength =fireData_.blendStrength;
+	fireDataGPU_[frameIndex]->resolution = fireData_.resolution;
+	fireDataGPU_[frameIndex]->distortionStrength = fireData_.distortionStrength;
+	fireDataGPU_[frameIndex]->highlightStrength = fireData_.highlightStrength;
+	fireDataGPU_[frameIndex]->detailScale = fireData_.detailScale;
+	fireDataGPU_[frameIndex]->rangeMin = fireData_.rangeMin;
+	fireDataGPU_[frameIndex]->rangeMax = fireData_.rangeMax;
+	fireDataGPU_[frameIndex]->scale = fireData_.scale;
+	fireDataGPU_[frameIndex]->speed = fireData_.speed;
+	fireDataGPU_[frameIndex]->noiseSpeed = fireData_.noiseSpeed;
+	fireDataGPU_[frameIndex]->blendStrength = fireData_.blendStrength;
 
 
 	crtDataGPU_[frameIndex]->crtTime = crtData_.crtTime;

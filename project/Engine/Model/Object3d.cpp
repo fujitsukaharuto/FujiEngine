@@ -169,8 +169,8 @@ void Object3d::Draw(Material* mate, bool isAdd) {
 	ModelManager::GetInstance()->PickingCommand();
 
 	if (isMaskMode_) {
-		cList->SetGraphicsRootConstantBufferView(11, maskMateral_.GetMaterialResource()->GetGPUVirtualAddress());
-		cList->SetGraphicsRootDescriptorTable(10, maskMateral_.GetTexture()->gpuHandle);
+		cList->SetGraphicsRootConstantBufferView(11, maskMaterial_.GetMaterialResource()->GetGPUVirtualAddress());
+		cList->SetGraphicsRootDescriptorTable(10, maskMaterial_.GetTexture()->gpuHandle);
 	}
 
 	if (model_) {
@@ -264,13 +264,13 @@ void Object3d::DebugGUI() {
 		CreatePropertyCommand(2);
 
 		ImGui::Separator();
-		ImGui::RadioButton("TRANSLATE", &guizmoType_, 0); ImGui::SameLine();
-		ImGui::RadioButton("ROTATE", &guizmoType_, 1); ImGui::SameLine();
-		ImGui::RadioButton("SCALE", &guizmoType_, 2);
+		ImGui::RadioButton("TRANSLATE", &gizmoType_, 0); ImGui::SameLine();
+		ImGui::RadioButton("ROTATE", &gizmoType_, 1); ImGui::SameLine();
+		ImGui::RadioButton("SCALE", &gizmoType_, 2);
 		JsonSerializer::ShowSaveTransformPopup(transform); ImGui::SameLine();
 		JsonSerializer::ShowLoadTransformPopup(transform);
 		ImGuizmo::OPERATION operation;
-		switch (guizmoType_) {
+		switch (gizmoType_) {
 		case 0: operation = ImGuizmo::TRANSLATE; break;
 		case 1: operation = ImGuizmo::ROTATE;    break;
 		case 2: operation = ImGuizmo::SCALE;     break;
@@ -323,12 +323,12 @@ void Object3d::DebugGUI() {
 
 		// 編集中なら Transform に反映
 		if (ImGuizmo::IsUsing()) {
-			if (!IsUsingGuizmo_) {
+			if (!IsUsingGizmo_) {
 				prevPos_ = transform.translate;
 				prevRotate_ = transform.rotate;
 				prevScale_ = transform.scale;
 			}
-			IsUsingGuizmo_ = true;
+			IsUsingGizmo_ = true;
 
 			Vector3 t, r, s;
 			ImGuizmo::DecomposeMatrixToComponents(&model.m[0][0], &t.x, &r.x, &s.x);
@@ -361,7 +361,7 @@ void Object3d::DebugGUI() {
 				transform.rotate = r;
 				transform.scale = s;
 			}
-		} else if (IsUsingGuizmo_) {
+		} else if (IsUsingGizmo_) {
 			// 編集終了検出 → Command 発行
 			if (transform.translate != prevPos_) {
 				auto command = std::make_unique<PropertyCommand<Vector3>>(
@@ -377,7 +377,7 @@ void Object3d::DebugGUI() {
 				CommandManager::GetInstance()->Execute(std::move(command));
 			}
 
-			IsUsingGuizmo_ = false; // フラグリセット
+			IsUsingGizmo_ = false; // フラグリセット
 		}
 
 		ImGui::TreePop();
@@ -501,8 +501,8 @@ void Object3d::CreateNodeEditor(const std::string& filename) {
 	selectorNodeId_ = nodeGraph_.DeserializeNodeData(filename);
 
 #endif // _DEBUG
-	maskMateral_.SetTextureNamePath("white2x2.png");
-	maskMateral_.CreateMaterial();
+	maskMaterial_.SetTextureNamePath("white2x2.png");
+	maskMaterial_.CreateMaterial();
 	LoadNodeEditorData(filename);
 	nodeFileName_ = filename;
 #ifdef _DEBUG
@@ -641,9 +641,9 @@ void Object3d::SetWVP() {
 			const Matrix4x4& parentWorldMatrix = transform.parent->GetWorldMat();
 			worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
 		}
-	} else if (transform.animParent) {
+	} else if (transform.animeParent) {
 		if (transform.isNoneScaleParent) {
-			const Matrix4x4& parentWorldMatrix = *transform.animParent;
+			const Matrix4x4& parentWorldMatrix = *transform.animeParent;
 			// スケール成分を除去した親ワールド行列を作成
 			Matrix4x4 noScaleParentMatrix = parentWorldMatrix;
 
@@ -666,7 +666,7 @@ void Object3d::SetWVP() {
 			// 変換はそのまま（位置は影響受けてOKなら）
 			worldMatrix = Multiply(worldMatrix, noScaleParentMatrix);
 		} else {
-			const Matrix4x4& parentWorldMatrix = *transform.animParent;
+			const Matrix4x4& parentWorldMatrix = *transform.animeParent;
 			worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
 		}
 	} else if (transform.isCameraParent) {
@@ -745,31 +745,31 @@ void Object3d::CreatePropertyCommand(int type) {
 
 void Object3d::NodeContentsUpdate() {
 	//SetColor(selNode->outputValue[1].Get<Vector4>());
-	if (nodeContentDeta_.size() == 0) {
+	if (nodeContentData_.size() == 0) {
 		return;
 	}
 
-	if (nodeContentDeta_[0].isMoveUV_) {
+	if (nodeContentData_[0].isMoveUV_) {
 		Vector2 newUV = model_->GetUVTrans();
-		if (nodeContentDeta_[0].isAddDeltaUV_) {
+		if (nodeContentData_[0].isAddDeltaUV_) {
 			newUV.x += FPSKeeper::DeltaTime();
 			newUV.y += FPSKeeper::DeltaTime();
 		} else {
-			newUV += nodeContentDeta_[0].incrementUV_;
+			newUV += nodeContentData_[0].incrementUV_;
 		}
 		SetUVTrans(newUV);
 	}
 
 	if (isMaskMode_) {
-		if (nodeContentDeta_[1].isMoveUV_) {
-			Vector2 newUV = maskMateral_.GetUVTrans();
-			if (nodeContentDeta_[1].isAddDeltaUV_) {
+		if (nodeContentData_[1].isMoveUV_) {
+			Vector2 newUV = maskMaterial_.GetUVTrans();
+			if (nodeContentData_[1].isAddDeltaUV_) {
 				newUV.x += FPSKeeper::DeltaTime();
 				newUV.y += FPSKeeper::DeltaTime();
 			} else {
-				newUV += nodeContentDeta_[1].incrementUV_;
+				newUV += nodeContentData_[1].incrementUV_;
 			}
-			maskMateral_.SetUVTrans(newUV);
+			maskMaterial_.SetUVTrans(newUV);
 		}
 	}
 }
@@ -779,20 +779,20 @@ void Object3d::AnalysisNode(const json& j, int index) {
 	if (nodeType == "Material") {
 		index++;
 		NodeContent content;
-		nodeContentDeta_.push_back(content);
+		nodeContentData_.push_back(content);
 	}
 	if (index == -1) {
 		return;
 	}
 	if (nodeType == "SubMaterial") {
 		index++;
-		if (!maskMateral_.GetMaterialResource()) {
-			maskMateral_.SetTextureNamePath("white2x2.png");
-			maskMateral_.CreateMaterial();
+		if (!maskMaterial_.GetMaterialResource()) {
+			maskMaterial_.SetTextureNamePath("white2x2.png");
+			maskMaterial_.CreateMaterial();
 		}
 		isMaskMode_ = true;
 		NodeContent content;
-		nodeContentDeta_.push_back(content);
+		nodeContentData_.push_back(content);
 	}
 	// indexが0なら親(このオブジェクトのメインのマテリアル)、1以上ならサブのマテリアル
 
@@ -810,11 +810,11 @@ void Object3d::AnalysisNode(const json& j, int index) {
 		if (index == 0) {
 			SetTexture(j["texName"].get<std::string>());
 		} else {
-			maskMateral_.SetTexture(j["texName"].get<std::string>());
+			maskMaterial_.SetTexture(j["texName"].get<std::string>());
 		}
 	}
 	if (j.contains("addType")) {
-		nodeContentDeta_[index].isAddDeltaUV_ = j["addType"] == 0 ? false : true;
+		nodeContentData_[index].isAddDeltaUV_ = j["addType"] == 0 ? false : true;
 	}
 
 	// child ノード（入力側に繋がっているノード）を再帰的に復元
@@ -831,24 +831,24 @@ void Object3d::AnalysisNode(const json& j, int index) {
 
 void Object3d::AnalysisValue(const json& j, int index, const std::string& typeName) {
 	if (typeName == "UVVector2") {
-		nodeContentDeta_[index].isMoveUV_ = true;
+		nodeContentData_[index].isMoveUV_ = true;
 		auto arr = j["value"];
 		if (index == 0) {
 			SetUVTrans(Vector2{ arr[0], arr[1] });
 		} else {
-			maskMateral_.SetUVTrans(Vector2{ arr[0], arr[1] });
+			maskMaterial_.SetUVTrans(Vector2{ arr[0], arr[1] });
 		}
 	} else if (typeName == "Color") {
 		auto arr = j["value"];
 		if (index == 0) {
 			SetColor(Vector4{ arr[0], arr[1], arr[2], arr[3] });
 		} else {
-			maskMateral_.SetColor(Vector4{ arr[0], arr[1], arr[2], arr[3] });
+			maskMaterial_.SetColor(Vector4{ arr[0], arr[1], arr[2], arr[3] });
 		}
 	} else if (typeName == "UVAddx") {
-		nodeContentDeta_[index].incrementUV_.x = j["value"].get<float>();
+		nodeContentData_[index].incrementUV_.x = j["value"].get<float>();
 	} else if (typeName == "UVAddy") {
-		nodeContentDeta_[index].incrementUV_.y = j["value"].get<float>();
+		nodeContentData_[index].incrementUV_.y = j["value"].get<float>();
 	}// UVScaleなどをこの後追加した時に
 }
 
@@ -868,9 +868,9 @@ void Object3d::SetTextureNode() {
 				isMaskMode_ = true;
 				if (selNode->child->inputs.size() > 0 || selNode->child->outputs.size() > 0) {
 					if (selNode->child->outputValue.size() > 0) {
-						maskMateral_.SetTexture(selNode->child->outputValue[0].Get<std::string>());
-						maskMateral_.SetColor(selNode->child->outputValue[1].Get<Vector4>());
-						maskMateral_.SetUVTrans(selNode->child->outputValue[2].Get<Vector2>());
+						maskMaterial_.SetTexture(selNode->child->outputValue[0].Get<std::string>());
+						maskMaterial_.SetColor(selNode->child->outputValue[1].Get<Vector4>());
+						maskMaterial_.SetUVTrans(selNode->child->outputValue[2].Get<Vector2>());
 					}
 				}
 			} else {

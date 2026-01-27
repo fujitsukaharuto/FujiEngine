@@ -44,7 +44,7 @@ namespace Math {
 		/*----- 関数 ------------------------------------------------------------------*/
 		float Length() const { return std::sqrtf((*this) * (*this)); }
 		float Angle() const { return std::atan2f(y, x); }
-		Vector2 NormaliZe()const;
+		Vector2 Normalize()const;
 
 	};
 }
