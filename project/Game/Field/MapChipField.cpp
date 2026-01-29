@@ -13,7 +13,7 @@ namespace {
 
 void MapChipField::ResetMapChipData(){
 	mapChipData_.data.clear();
-	mapChipData_.data.resize(kNumBlockVirtical);
+	mapChipData_.data.resize(kNumBlockVertical);
 	for (std::vector<MapChipType>& mapChipDataLine:mapChipData_.data){
 		mapChipDataLine.resize(kNumBlockHorizontal);
 	}
@@ -36,7 +36,7 @@ void MapChipField::LoadMapChipCsv(const std::string& filePath){
 	file.close();
 
 	//csvからマップチップデータを読み込む
-	for (uint32_t i = 0; i < kNumBlockVirtical; i++){
+	for (uint32_t i = 0; i < kNumBlockVertical; i++){
 		std::string line;
 		std::getline(mapChipCsv,line);
 

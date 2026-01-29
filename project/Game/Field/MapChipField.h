@@ -48,7 +48,7 @@ public:
 	static inline const float kBlockWidth = 1.0f;
 	static inline const float kBlockHeight = 1.0f;
 	//ブロックの個数
-	static inline const uint32_t kNumBlockVirtical = 2;
+	static inline const uint32_t kNumBlockVertical = 2;
 	static inline const uint32_t kNumBlockHorizontal = 50;
 
 public:
