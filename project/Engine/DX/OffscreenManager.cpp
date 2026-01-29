@@ -93,8 +93,8 @@ void OffscreenManager::DebugGUI() {
 	}
 
 	if (ImGui::TreeNode("RadialBlur##settingRadialBlur")) {
-		ImGui::DragFloat2("center##radialpara1", &radialData_.center.x, 0.01f);
-		ImGui::DragFloat("blurWidth##radialpara2", &radialData_.blurWidth, 0.01f);
+		ImGui::DragFloat2("center##RadialPara1", &radialData_.center.x, 0.01f);
+		ImGui::DragFloat("blurWidth##RadialPara2", &radialData_.blurWidth, 0.01f);
 		ImGui::TreePop();
 	}
 
@@ -120,8 +120,8 @@ void OffscreenManager::EffectListGUI() {
 			}
 		}
 
-		if (ImGui::BeginTable("NowPostEffect##offsc", 1, ImGuiTableFlags_None)) {
-			ImGui::TableSetupColumn("NowPostEffect##posteff", ImGuiTableColumnFlags_WidthStretch);
+		if (ImGui::BeginTable("NowPostEffect##OffSc", 1, ImGuiTableFlags_None)) {
+			ImGui::TableSetupColumn("NowPostEffect##PostEff", ImGuiTableColumnFlags_WidthStretch);
 			ImGui::TableNextRow();
 
 			ImGui::TableHeadersRow();

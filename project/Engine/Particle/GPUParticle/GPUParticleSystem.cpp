@@ -62,7 +62,7 @@ void GPUParticleSystem::Finalize() {
 
 	sphereEmitters_.clear();
 	textureBasedEmitters_.clear();
-	MeshSurefaceEmitters_.clear();
+	MeshSurfaceEmitters_.clear();
 	csEmitters_.clear();
 
 	gpuTimerGraphics.Finalize();
@@ -84,16 +84,16 @@ void GPUParticleSystem::Draw(const D3D12_VERTEX_BUFFER_VIEW& vbView, const D3D12
 void GPUParticleSystem::ResetEmitters() {
 	sphereEmitters_.clear();
 	textureBasedEmitters_.clear();
-	MeshSurefaceEmitters_.clear();
+	MeshSurfaceEmitters_.clear();
 	csEmitters_.clear();
 
 	csEmitterIndex_ = 0;
 	sphereEmitterIndex_ = 0;
 	textureBasedEmitterIndex_ = 0;
-	MeshSurefaceEmitterIndex_ = 0;
+	MeshSurfaceEmitterIndex_ = 0;
 }
 
-void GPUParticleSystem::InitDefoultEmitter() {
+void GPUParticleSystem::InitDefaultEmitter() {
 	InitGPUEmitter();
 	InitGPUEmitterSurface("DeadTree_2.obj");
 	InitGPUEmitterSurface("BeamCrystal.obj");
@@ -143,9 +143,9 @@ int GPUParticleSystem::InitGPUEmitterSurface(const std::string& fileName) {
 	info.phase = PipelinePhase::Surface;
 	info.emitter = std::move(emitter);
 	csEmitters_.push_back(std::move(info));
-	MeshSurefaceEmitters_.push_back(csEmitterIndex_);
-	int result = MeshSurefaceEmitterIndex_;
-	MeshSurefaceEmitterIndex_++;
+	MeshSurfaceEmitters_.push_back(csEmitterIndex_);
+	int result = MeshSurfaceEmitterIndex_;
+	MeshSurfaceEmitterIndex_++;
 	csEmitterIndex_++;
 	return result;
 }
@@ -259,12 +259,12 @@ void GPUParticleSystem::ParticleTexCSDebugGUI() {
 
 void GPUParticleSystem::ParticleSurfaceCSDebugGUI() {
 #ifdef _DEBUG
-	if (csEmitters_.size() == 0 || MeshSurefaceEmitters_.size() == 0) return;
+	if (csEmitters_.size() == 0 || MeshSurfaceEmitters_.size() == 0) return;
 	if (ImGui::CollapsingHeader("GPU Particle Surface Emitter")) {
-		ImGui::DragInt("emitIndex", &editCSEmitSurfaceInd_, 1.0f, 0, int(MeshSurefaceEmitters_.size() - 1));
-		int idx = std::min(editCSEmitSurfaceInd_, static_cast<int>(MeshSurefaceEmitters_.size()) - 1);
+		ImGui::DragInt("emitIndex", &editCSEmitSurfaceInd_, 1.0f, 0, int(MeshSurfaceEmitters_.size() - 1));
+		int idx = std::min(editCSEmitSurfaceInd_, static_cast<int>(MeshSurfaceEmitters_.size()) - 1);
 		editCSEmitSurfaceInd_ = idx;
-		csEmitters_[MeshSurefaceEmitters_[idx]].emitter->DebugGUI();
+		csEmitters_[MeshSurfaceEmitters_[idx]].emitter->DebugGUI();
 	}
 #endif // _DEBUG
 }
@@ -289,14 +289,14 @@ TextureBasedEmitter& GPUParticleSystem::GetParticleCSEmitterTexture(int index) {
 }
 
 MeshSurefaceEmitter& GPUParticleSystem::GetParticleCSEmitterSurface(int index) {
-	assert(index >= 0 && index < MeshSurefaceEmitters_.size());
-	auto& info = csEmitters_[MeshSurefaceEmitters_[index]];
+	assert(index >= 0 && index < MeshSurfaceEmitters_.size());
+	auto& info = csEmitters_[MeshSurfaceEmitters_[index]];
 	assert(info.phase == PipelinePhase::Surface);
 	return static_cast<MeshSurefaceEmitter&>(*info.emitter);
 }
 
 void GPUParticleSystem::InitParticleCS() {
-	particleCSInsstanceCount_ = numParticles;
+	particleCSInstanceCount_ = numParticles;
 	particleCSMaterial_.SetTextureNamePath("redCircle.png");
 	particleCSMaterial_.CreateMaterial();
 
@@ -319,17 +319,17 @@ void GPUParticleSystem::InitParticleCS() {
 	freeListTailIndexUAVHandle_.first = srvManager_->GetCPUDescriptorHandle(freeTailCountUAVIndex);
 	freeListTailIndexUAVHandle_.second = srvManager_->GetGPUDescriptorHandle(freeTailCountUAVIndex);
 
-	freeListResource_ = dxcommon_->CreateUAVResource(dxcommon_->GetDevice(), (sizeof(uint32_t) * particleCSInsstanceCount_));
+	freeListResource_ = dxcommon_->CreateUAVResource(dxcommon_->GetDevice(), (sizeof(uint32_t) * particleCSInstanceCount_));
 	uint32_t freeListUAVIndex = srvManager_->Allocate();
-	srvManager_->CreateStructuredUAV(freeListUAVIndex, freeListResource_.Get(), particleCSInsstanceCount_, sizeof(uint32_t));
+	srvManager_->CreateStructuredUAV(freeListUAVIndex, freeListResource_.Get(), particleCSInstanceCount_, sizeof(uint32_t));
 	freeListUAVHandle_.first = srvManager_->GetCPUDescriptorHandle(freeListUAVIndex);
 	freeListUAVHandle_.second = srvManager_->GetGPUDescriptorHandle(freeListUAVIndex);
 
-	drawAliveIndex_ = dxcommon_->CreateUAVResource(dxcommon_->GetDevice(), (sizeof(int32_t) * particleCSInsstanceCount_));
+	drawAliveIndex_ = dxcommon_->CreateUAVResource(dxcommon_->GetDevice(), (sizeof(int32_t) * particleCSInstanceCount_));
 	uint32_t drawIndexUAVIndex = srvManager_->Allocate();
 	uint32_t drawIndexSRVIndex = srvManager_->Allocate();
-	srvManager_->CreateStructuredUAV(drawIndexUAVIndex, drawAliveIndex_.Get(), particleCSInsstanceCount_, sizeof(int32_t));
-	srvManager_->CreateStructuredSRV(drawIndexSRVIndex, drawAliveIndex_.Get(), particleCSInsstanceCount_, sizeof(int32_t));
+	srvManager_->CreateStructuredUAV(drawIndexUAVIndex, drawAliveIndex_.Get(), particleCSInstanceCount_, sizeof(int32_t));
+	srvManager_->CreateStructuredSRV(drawIndexSRVIndex, drawAliveIndex_.Get(), particleCSInstanceCount_, sizeof(int32_t));
 	drawAliveUAVHandle_.first = srvManager_->GetCPUDescriptorHandle(drawIndexUAVIndex);
 	drawAliveUAVHandle_.second = srvManager_->GetGPUDescriptorHandle(drawIndexUAVIndex);
 	drawAliveSRVHandle_.first = srvManager_->GetCPUDescriptorHandle(drawIndexSRVIndex);
@@ -391,12 +391,12 @@ void GPUParticleSystem::InitParticleCS() {
 	}
 }
 
-void GPUParticleSystem::InitInstance(ParticleCSInsstance& CSInstance, size_t instanceSize) {
-	CSInstance.particleCSInstancing_ = dxcommon_->CreateUAVResource(dxcommon_->GetDevice(), (instanceSize * particleCSInsstanceCount_));
+void GPUParticleSystem::InitInstance(ParticleCSInstance& CSInstance, size_t instanceSize) {
+	CSInstance.particleCSInstancing_ = dxcommon_->CreateUAVResource(dxcommon_->GetDevice(), (instanceSize * particleCSInstanceCount_));
 	uint32_t particleCSSRVIndex = srvManager_->Allocate();
 	uint32_t particleCSUAVIndex = srvManager_->Allocate();
-	srvManager_->CreateStructuredSRV(particleCSSRVIndex, CSInstance.particleCSInstancing_.Get(), particleCSInsstanceCount_, UINT(instanceSize));
-	srvManager_->CreateStructuredUAV(particleCSUAVIndex, CSInstance.particleCSInstancing_.Get(), particleCSInsstanceCount_, UINT(instanceSize));
+	srvManager_->CreateStructuredSRV(particleCSSRVIndex, CSInstance.particleCSInstancing_.Get(), particleCSInstanceCount_, UINT(instanceSize));
+	srvManager_->CreateStructuredUAV(particleCSUAVIndex, CSInstance.particleCSInstancing_.Get(), particleCSInstanceCount_, UINT(instanceSize));
 	CSInstance.particleCSSRVHandle_.first = srvManager_->GetCPUDescriptorHandle(particleCSSRVIndex);
 	CSInstance.particleCSSRVHandle_.second = srvManager_->GetGPUDescriptorHandle(particleCSSRVIndex);
 	CSInstance.particleCSUAVHandle_.first = srvManager_->GetCPUDescriptorHandle(particleCSUAVIndex);

@@ -635,7 +635,7 @@ void ParticleManager::ResetCSEmitters() {
 }
 
 void ParticleManager::InitDefaultCSEmitter() {
-	gpuParticleSystem_->InitDefoultEmitter();
+	gpuParticleSystem_->InitDefaultEmitter();
 }
 
 void ParticleManager::LoadCSEmitterFileDir() {

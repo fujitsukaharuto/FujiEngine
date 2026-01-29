@@ -58,7 +58,7 @@ struct EmitterInfo {
 class DXCom;
 class SRVManager;
 
-struct ParticleCSInsstance {
+struct ParticleCSInstance {
 	ComPtr<ID3D12Resource> particleCSInstancing_;
 	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> particleCSSRVHandle_;
 	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> particleCSUAVHandle_;
@@ -89,7 +89,7 @@ public:
 	void Update(const Math::Matrix4x4& billboardMatrix);
 	void Draw(const D3D12_VERTEX_BUFFER_VIEW& vbView, const D3D12_INDEX_BUFFER_VIEW& ibView);
 	void ResetEmitters();
-	void InitDefoultEmitter();
+	void InitDefaultEmitter();
 
 	int InitGPUEmitter(int returnMod = 0);
 	int InitGPUEmitterTexture(const std::string& fileName = "white2x2.png");
@@ -110,7 +110,7 @@ public:
 private:
 
 	void InitParticleCS();
-	void InitInstance(ParticleCSInsstance& CSInstance, size_t instanceSize);
+	void InitInstance(ParticleCSInstance& CSInstance, size_t instanceSize);
 	void InitGPUTimer();
 	void AliveCountDataReadBack();
 	void UpdatePerViewData(const Math::Matrix4x4& billboardMatrix);
@@ -129,14 +129,14 @@ private:
 	SRVManager* srvManager_;
 	Camera* camera_;
 
-	uint32_t particleCSInsstanceCount_;
+	uint32_t particleCSInstanceCount_;
 
-	ParticleCSInsstance transCSInstance_;
-	ParticleCSInsstance scaleCSInstance_;
-	ParticleCSInsstance timeCSInstance_;
-	ParticleCSInsstance velocityCSInstance_;
-	ParticleCSInsstance colorCSInstance_;
-	ParticleCSInsstance flagsCSInstance_;
+	ParticleCSInstance transCSInstance_;
+	ParticleCSInstance scaleCSInstance_;
+	ParticleCSInstance timeCSInstance_;
+	ParticleCSInstance velocityCSInstance_;
+	ParticleCSInstance colorCSInstance_;
+	ParticleCSInstance flagsCSInstance_;
 
 	Graphics::Material particleCSMaterial_;
 	ComPtr<ID3D12Resource> perViewResource_[DXC::kFrameCount_];
@@ -164,14 +164,14 @@ private:
 
 	std::vector<int> sphereEmitters_;
 	std::vector<int> textureBasedEmitters_;
-	std::vector<int> MeshSurefaceEmitters_;
+	std::vector<int> MeshSurfaceEmitters_;
 
 	int csEmitterIndex_ = 0;
 	int aliveCount_ = 0;
 
 	int sphereEmitterIndex_ = 0;
 	int textureBasedEmitterIndex_ = 0;
-	int MeshSurefaceEmitterIndex_ = 0;
+	int MeshSurfaceEmitterIndex_ = 0;
 
 	uint32_t numParticles = 20485760;
 	uint32_t threadsPerGroup = 1024;

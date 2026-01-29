@@ -635,18 +635,8 @@ void AnimationModel::SetWVP() {
 		worldViewProjectionMatrix = worldMatrix;
 	}
 
-	Matrix4x4 localMatrix = model_->data_.rootNode.local;
-	if (isAnimation_) {
-		/*NodeAnimation& rootNodeAnimation = animation_.nodeAnimations[model_->data_.rootNode.name];
-		Vector3 translate = CalculationValue(rootNodeAnimation.translate.keyframes, animationTime_);
-		Quaternion rotate = CalculationValue(rootNodeAnimation.rotate.keyframes, animationTime_);
-		Vector3 scale = CalculationValue(rootNodeAnimation.scale.keyframes, animationTime_);
-		localMatrix = MakeAffineMatrix(scale, rotate, translate);*/
-	}
-
-	/*wvpDate_->World = Multiply(localMatrix, worldMatrix);
-	wvpDate_->WVP = Multiply(localMatrix, worldViewProjectionMatrix);
-	wvpDate_->WorldInverseTransPose = Transpose(Inverse(wvpDate_->World));*/
+	Matrix4x4 localMatrix;
+	localMatrix = model_->data_.rootNode.local;
 
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 
