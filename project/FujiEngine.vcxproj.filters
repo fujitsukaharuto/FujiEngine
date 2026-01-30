@@ -380,6 +380,15 @@
     <ClCompile Include="Engine\DX\GPUTimer.cpp">
       <Filter>Engine\DX</Filter>
     </ClCompile>
+    <ClCompile Include="Game\GameObj\Enemy\Boss_Debug.cpp">
+      <Filter>Game\GameObj\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameObj\Enemy\Boss_Init.cpp">
+      <Filter>Game\GameObj\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameObj\Enemy\BossItem\BossItemManager.cpp">
+      <Filter>Game\GameObj\Enemy\BossItem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -822,6 +831,9 @@
     </ClInclude>
     <ClInclude Include="Engine\DX\GPUTimer.h">
       <Filter>Engine\DX</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameObj\Enemy\BossItem\BossItemManager.h">
+      <Filter>Game\GameObj\Enemy\BossItem</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

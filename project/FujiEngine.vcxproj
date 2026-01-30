@@ -216,8 +216,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\GameObj\Enemy\BossCore.cpp" />
     <ClCompile Include="Game\GameObj\Enemy\BossItem\Arrow.cpp" />
     <ClCompile Include="Game\GameObj\Enemy\BossItem\Beam.cpp" />
+    <ClCompile Include="Game\GameObj\Enemy\BossItem\BossItemManager.cpp" />
     <ClCompile Include="Game\GameObj\Enemy\BossItem\UnderRing.cpp" />
     <ClCompile Include="Game\GameObj\Enemy\BossItem\WaveWall.cpp" />
+    <ClCompile Include="Game\GameObj\Enemy\Boss_Debug.cpp" />
+    <ClCompile Include="Game\GameObj\Enemy\Boss_Init.cpp" />
     <ClCompile Include="Game\GameObj\FollowCamera.cpp" />
     <ClCompile Include="Game\GameObj\LockOn.cpp" />
     <ClCompile Include="Game\GameObj\Player\AttackBehavior\PlayerAttackRoot.cpp" />
@@ -363,6 +366,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Game\GameObj\Enemy\BossCore.h" />
     <ClInclude Include="Game\GameObj\Enemy\BossItem\Arrow.h" />
     <ClInclude Include="Game\GameObj\Enemy\BossItem\Beam.h" />
+    <ClInclude Include="Game\GameObj\Enemy\BossItem\BossItemManager.h" />
     <ClInclude Include="Game\GameObj\Enemy\BossItem\UnderRing.h" />
     <ClInclude Include="Game\GameObj\Enemy\BossItem\WaveWall.h" />
     <ClInclude Include="Game\GameObj\FollowCamera.h" />

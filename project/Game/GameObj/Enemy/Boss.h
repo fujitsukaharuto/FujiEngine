@@ -8,6 +8,7 @@
 #include "Game/GameObj/Enemy/Behavior/BaseBossBehavior.h"
 
 #include "Game/GameObj/Enemy/BossCore.h"
+#include "Game/GameObj/Enemy/BossItem/BossItemManager.h"
 #include "Game/GameObj/Enemy/BossItem/UnderRing.h"
 #include "Game/GameObj/Enemy/BossItem/WaveWall.h"
 #include "Game/GameObj/Enemy/BossItem/Beam.h"
@@ -99,6 +100,7 @@ public:
 
 	/// <summary>値の初期化</summary>
 	void InitParameter();
+	void InitEmitter();
 	void ReStart();
 
 	/// <summary>HPの減少処理</summary>
@@ -125,22 +127,12 @@ public:
 	bool DushCharge(float& t, float maxT,bool& isNear,float range);
 	bool DushAttack(bool isNear, float& dushRange, float stopRange);
 
-	/// <summary>波攻撃の更新</summary>
-	void UpdateWaveWall();
 	/// <summary>波攻撃時の処理</summary>
 	void WaveWallAttack();
-
-	/// <summary>追尾攻撃の更新</summary>
-	void UpdateArrows();
 	/// <summary>追尾攻撃時の処理</summary>
 	void ArrowAttack();
-
-	/// <summary>雷攻撃の更新</summary>
-	void UpdateRod();
 	/// <summary>雷攻撃時の避雷針の処理</summary>
 	void RodFall();
-	/// <summary>避雷針のリング攻撃</summary>
-	void RodUnderRing(const Math::Vector3& emitPos);
 
 	/// <summary>ビームの初期化</summary>
 	void InitBeam();
@@ -155,8 +147,6 @@ public:
 	void InitJumpAttack();
 	/// <summary>ジャンプ攻撃の処理</summary>
 	bool JumpAttack();
-	/// <summary>リングの更新</summary>
-	void UpdateUnderRing();
 	/// <summary>リングの発生処理</summary>
 	void UnderRingEmit();
 
@@ -176,9 +166,9 @@ public:
 	BaseCollider* GetCoreCollider() { return core_->GetCollider(); }
 	BossCore* GetBossCore() { return core_.get(); }
 	Beam* GetBeam() { return beam_.get(); }
-	const  std::vector<std::unique_ptr<WaveWall>>& GetWalls() { return walls_; }
-	const std::vector<std::unique_ptr<Arrow>>& GetArrows() { return arrows_; }
-	const std::vector<std::unique_ptr<UnderRing>>& GetUnderRings() { return underRings_; }
+	const  std::vector<std::unique_ptr<WaveWall>>& GetWalls() { return itemManager_->GetWalls(); }
+	const std::vector<std::unique_ptr<Arrow>>& GetArrows() { return itemManager_->GetArrows(); }
+	const std::vector<std::unique_ptr<UnderRing>>& GetUnderRings() { return itemManager_->GetUnderRings(); }
 	const std::vector<std::pair<std::string, float>>& GetPhaseActionList(int phase) { return phaseList_[phase]; }
 	float GetAttackCooldown() { return attackCooldown_; }
 	int GetPhaseIndex() { return phaseIndex_; }
@@ -196,7 +186,7 @@ public:
 
 	//========================================================================*/
 	//* Setter
-	void SetPlayer(Player* player) { pPlayer_ = player; }
+	void SetPlayer(Player* player) { pPlayer_ = player; itemManager_->SetPlayer(player); }
 	void SetDXCom(DXCom* dxcommon) { dxcommon_ = dxcommon; }
 	void SetStartWait(float waitT) { startWaiting_ = waitT; }
 	void SetCameraRange(float range) { cameraRange_ = range; }
@@ -235,6 +225,7 @@ private:
 private:
 
 	std::unique_ptr<BaseBossBehavior> behavior_ = nullptr;
+	std::unique_ptr<BossItemManager> itemManager_ = nullptr;
 
 	std::vector<std::string> actionList_;
 	std::vector<std::vector<std::pair<std::string, float>>> phaseList_;
@@ -242,10 +233,6 @@ private:
 
 	std::unique_ptr<BossCore> core_;
 	std::unique_ptr<Beam> beam_;
-	std::vector<std::unique_ptr<WaveWall>> walls_;
-	std::vector<std::unique_ptr<Arrow>> arrows_;
-	std::vector<std::unique_ptr<Arrow>> rods_;
-	std::vector<std::unique_ptr<UnderRing>> underRings_;
 
 	std::unique_ptr<Graphics::Object3d> shadow_;
 	std::unique_ptr<AABBCollider> collider_;
@@ -303,6 +290,8 @@ private:
 	float attackCooldown_ = 0.0f;
 	float chargeTime_ = 120.0f;
 	float chargeSize_ = 24.0f;
+
+	int arrowSpawnNum_ = 4;
 
 	float jumpTime_ = 0.0f;
 	bool isJumpAttack_ = true;

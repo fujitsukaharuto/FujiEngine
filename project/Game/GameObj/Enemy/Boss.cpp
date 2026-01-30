@@ -41,203 +41,6 @@ Boss::~Boss() {
 	}
 }
 
-void Boss::Initialize() {
-	OriginGameObject::Initialize();
-	OriginGameObject::CreateAnimeModel("T_boss.gltf");
-	animeModel_->LoadAnimationFile("T_boss.gltf");
-
-	animeModel_->LoadTransformFromJson("boss_transform.json");
-
-	shadow_ = std::make_unique<Object3d>();
-	shadow_->Create("Sphere");
-	shadow_->SetTexture("white2x2.png");
-	shadow_->SetColor({ 0.02f,0.02f,0.02f,0.0f });
-	shadow_->SetLightEnable(LightMode::kLightNone);
-	shadow_->transform.translate = animeModel_->transform.translate;
-	shadow_->transform.translate.y = 0.15f;
-	shadow_->transform.scale = { 3.0f,0.0f,3.0f };
-	shadow_->transform.scale.y = 0.1f;
-
-	collider_ = std::make_unique<AABBCollider>();
-	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
-	collider_->SetCollisionStayCallback([this](const ColliderInfo& other) {OnCollisionStay(other); });
-	collider_->SetCollisionExitCallback([this](const ColliderInfo& other) {OnCollisionExit(other); });
-	collider_->SetParent(&animeModel_->transform);
-	collider_->SetTag("Boss");
-	collider_->SetOffset({ 0.0f,7.0f,0.0f });
-	collider_->SetWidth(7.5f);
-	collider_->SetHeight(15.0f);
-	collider_->SetDepth(7.0f);
-
-	InitParameter();
-
-	core_ = std::make_unique<BossCore>(this);
-	core_->Initialize();
-
-	beam_ = std::make_unique<Beam>();
-	beam_->Initialize();
-	beam_->SetBossParent(this);
-
-	float parentRotate = std::numbers::pi_v<float> *0.25f;
-	for (int i = 0; i < 8; i++) {
-		std::unique_ptr<Object3d> chargeParent;
-		chargeParent = std::make_unique<Object3d>();
-		chargeParent->Create("cube.obj");
-		chargeParent->transform.translate.y += 20.0f;
-		chargeParent->transform.scale.x = params_.beam.baseChargeSize;
-		chargeParent->transform.scale.y = params_.beam.baseChargeSize;
-		chargeParent->transform.scale.z = params_.beam.baseChargeSize;
-		chargeParent->SetParent(&animeModel_->transform);
-		chargeParent->SetNoneScaleParent(true);
-		if (i != 0 && i != 4) {
-			if (i < 4) {
-				chargeParent->transform.rotate.x = Random::GetFloat(-std::numbers::pi_v<float>, std::numbers::pi_v<float>);
-				chargeParent->transform.rotate.y = Random::GetFloat(-1.56f, 1.56f);
-			} else {
-				chargeParent->transform.rotate.x = Random::GetFloat(-std::numbers::pi_v<float>, std::numbers::pi_v<float>);
-				chargeParent->transform.rotate.y = Random::GetFloat(-1.56f, 1.56f);
-			}
-		}
-		chargeParent->transform.rotate.z = parentRotate * i;
-		chargeParents_.push_back(std::move(chargeParent));
-	}
-	for (int i = 0; i < 8; i++) {
-		std::unique_ptr<Object3d> anchor;
-		anchor = std::make_unique<Object3d>();
-		anchor->Create("cube.obj");
-		anchor->SetParent(&chargeParents_[i]->transform);
-		anchor->SetNoneScaleParent(true);
-		traceAnchors_.push_back(std::move(anchor));
-
-		int numEmitter = ParticleManager::GetInstance()->InitGPUEmitter();
-		auto& emitter = ParticleManager::GetSphereEmitter(numEmitter);
-		emitter.isEmit_ = false;
-		emitter.data_.colorMax = { 1.0f,0.0f,0.0f };
-		emitter.data_.colorMin = { 1.0f,0.0f,0.0f };
-		emitter.data_.frequency = 0.0f;
-		emitter.data_.radius = 0.0f;
-		emitter.data_.scale = { 1.5f,1.5f,1.5f };
-		emitter.data_.lifeTime = 0.6f;
-		traceEmitterIndexes_.push_back(numEmitter);
-	}
-
-	waveParent_ = std::make_unique<Object3d>();
-	waveParent_->Create("cube.obj");
-	waveParent_->transform.translate.z += 8.0f;
-	waveParent_->SetParent(&animeModel_->transform);
-	waveParent_->SetNoneScaleParent(true);
-
-	for (int i = 0; i < 4; i++) {
-		std::unique_ptr<Object3d> arrowParent;
-
-		arrowParent = std::make_unique<Object3d>();
-		arrowParent->Create("cube.obj");
-
-		arrowParent->transform.translate.x = 12.0f - float(i) * 5.0f;
-		if (i > 1) {
-			arrowParent->transform.translate.x = -12.0f + float(i - 2) * 5.0f;
-		}
-		arrowParent->transform.translate.y += 6.0f;
-		arrowParent->transform.translate.z -= 2.0f;
-		arrowParent->SetParent(&animeModel_->transform);
-		arrowParent->SetNoneScaleParent(true);
-
-		arrowParents_.push_back(std::move(arrowParent));
-	}
-
-	ParticleManager::Load(waveAttack1, "ShockRay");
-	ParticleManager::Load(waveAttack2, "ShockWaveGround");
-	ParticleManager::Load(waveAttack3, "ShockWaveParticle");
-	ParticleManager::Load(waveAttack4, "ShockWave");
-	ParticleManager::Load(jumpWave_, "JumpShockWave");
-	waveCSEmitIndex_ = ParticleManager::GetInstance()->InitGPUEmitter();
-	jumpCSEmitIndex_ = ParticleManager::GetInstance()->InitGPUEmitter();
-	halfAuraCS_ = ParticleManager::GetInstance()->InitGPUEmitter();
-	halfSmallAuraCS_ = ParticleManager::GetInstance()->InitGPUEmitter();
-	leftHandAuraCS_ = ParticleManager::GetInstance()->InitGPUEmitter();
-	rightHandAuraCS_ = ParticleManager::GetInstance()->InitGPUEmitter();
-	ParticleManager::GetSphereEmitter(waveCSEmitIndex_).Load("shockWaveCS");
-	ParticleManager::GetSphereEmitter(jumpCSEmitIndex_).Load("jumpCSEmit");
-	ParticleManager::GetSphereEmitter(halfAuraCS_).Load("bossAura");
-	ParticleManager::GetSphereEmitter(halfSmallAuraCS_).Load("bossSmallAura");
-	ParticleManager::GetSphereEmitter(leftHandAuraCS_).Load("bossHandAura");
-	ParticleManager::GetSphereEmitter(rightHandAuraCS_).Load("bossHandAura");
-
-	waveAttack1.frequencyTime_ = 0.0f;
-	waveAttack2.frequencyTime_ = 0.0f;
-	waveAttack3.frequencyTime_ = 0.0f;
-	waveAttack4.frequencyTime_ = 0.0f;
-	waveAttack1.pos_.z = 4.0f;
-	waveAttack2.pos_.z = 4.0f;
-	waveAttack3.pos_.z = 4.0f;
-	waveAttack4.pos_.z = 4.0f;
-	jumpWave_.frequencyTime_ = 0.0f;
-
-	waveAttack1.isAddRandomSize_ = true;
-	waveAttack1.addRandomMax_ = { 0.75f,1.2f };
-	waveAttack1.addRandomMin_.y = -0.5f;
-
-	waveAttack1.SetParent(&waveParent_->transform);
-	waveAttack2.SetParent(&waveParent_->transform);
-	waveAttack3.SetParent(&waveParent_->transform);
-	waveAttack4.SetParent(&waveParent_->transform);
-
-	ParticleManager::Load(charge9_, "BeamCharge5");
-	ParticleManager::Load(charge10_, "BeamCharge9");
-	ParticleManager::Load(charge11_, "BeamCharge8");
-	ParticleManager::Load(charge12_, "BeamCharge6");
-	ParticleManager::Load(charge13_, "BeamCharge7");
-	ParticleManager::Load(charge14_, "BeamCharge10");
-	ParticleManager::Load(charge15_, "BeamCharge11");
-
-
-	charge12_.frequencyTime_ = 0.0f;
-	charge13_.frequencyTime_ = 0.0f;
-	charge14_.frequencyTime_ = 0.0f;
-
-	charge9_.SetParent(&chargeParents_[0]->transform);
-	charge10_.SetParent(&chargeParents_[0]->transform);
-	charge11_.SetParent(&chargeParents_[0]->transform);
-	charge12_.SetParent(&chargeParents_[0]->transform);
-	charge13_.SetParent(&chargeParents_[0]->transform);
-	charge14_.SetParent(&chargeParents_[0]->transform);
-	charge15_.SetParent(&chargeParents_[0]->transform);
-
-	ParticleManager::Load(roaringWave_, "roringWave");
-	ParticleManager::Load(roaringParticle_, "roringParticle");
-	ParticleManager::Load(roaringRing_, "roringring");
-	roaringWave_.pos_ = animeModel_->transform.translate;
-	roaringWave_.grain_.isAutoUVMove_ = true;
-	roaringWave_.grain_.autoUVSpeed_.x = 0.01f;
-	roaringWave_.grain_.isZandX_ = true;
-	animeModel_->RegisterJointWorld("mixamorig:Head");
-	animeModel_->RegisterJointWorld("mixamorig:LeftHand");
-	animeModel_->RegisterJointWorld("mixamorig:RightHand");
-	roaringRing_.SetAnimeParent(animeModel_->GetJointTrans("mixamorig:Head"));
-	roaringRing_.pos_.y = -7.0f;
-	roaringParticle_.SetAnimeParent(animeModel_->GetJointTrans("mixamorig:Head"));
-	roaringParticle_.pos_.y = -6.5f;
-	roaringParticle_.pos_.z = 5.0f;
-
-	ParticleManager::Load(dushStartParticle_, "duahChargeCompleteParticle");
-	ParticleManager::Load(dushStartCircle_, "duahChargeCompleteCircle");
-	ParticleManager::Load(dushSmoke_, "dushGroundSmoke");
-	dushStartParticle_.frequencyTime_ = 0.0f;
-	dushStartCircle_.frequencyTime_ = 0.0f;
-	dushTrailIndex_ = ParticleManager::GetInstance()->InitGPUEmitter(1);
-	ParticleManager::GetParticleCSEmitter(dushTrailIndex_).Load("DushTrail2");
-
-	actionList_ = {
-		"Root","Wave","Beam","Jump","Sword","Area","Arrow","FallRod","Dush",
-	};
-	LoadPhase();
-	ChangeBehavior(std::make_unique<BossRoot>(this));
-	InitSummon();
-	animeModel_->ChangeAnimation("idle");
-
-	jumpAttackSE_ = &AudioPlayer::GetInstance()->SoundLoadWave("jumpAttackSE.wav");
-}
-
 void Boss::Update() {
 	if (!isDying_ && isHpActive_ && !isStart_) {
 		behavior_->Update();
@@ -245,10 +48,7 @@ void Boss::Update() {
 		core_->Update();
 
 		beam_->Update();
-		UpdateWaveWall();
-		UpdateArrows();
-		UpdateRod();
-		UpdateUnderRing();
+		itemManager_->Update();
 
 		ShakeHP();
 
@@ -271,10 +71,7 @@ void Boss::Update() {
 		hpCoolTime_ -= FPSKeeper::DeltaTimeFrame();
 		RadialUpdate();
 
-		UpdateWaveWall();
-		UpdateArrows();
-		UpdateRod();
-		UpdateUnderRing();
+		itemManager_->Update();
 		if (hpCoolTime_ < 0.0f) {
 			isHpActive_ = true;
 			ChangeBehavior(std::make_unique<BossRoot>(this));
@@ -305,33 +102,7 @@ void Boss::Draw([[maybe_unused]] Material* mate, [[maybe_unused]] bool is) {
 
 	animeModel_->Draw();
 	core_->Draw();
-	for (auto& wall : walls_) {
-		if (!wall->GetIsLive())continue;
-		wall->Draw();
-#ifdef _DEBUG
-		wall->DrawCollider();
-#endif // _DEBUG
-	}
-
-	for (auto& arrow : arrows_) {
-		if (!arrow->GetIsLive())continue;
-		arrow->Draw();
-#ifdef _DEBUG
-		arrow->DrawCollider();
-#endif // _DEBUG
-	}
-	for (auto& rod : rods_) {
-		if (!rod->GetIsLive())continue;
-		rod->Draw();
-	}
-
-	for (auto& ring : underRings_) {
-		if (!ring->GetIsLive())continue;
-		ring->Draw();
-#ifdef _DEBUG
-		ring->DrawCollider();
-#endif // _DEBUG
-	}
+	itemManager_->Draw();
 
 	beam_->Draw();
 
@@ -356,200 +127,6 @@ void Boss::CSDispatch() {
 
 void Boss::AnimeDraw() {
 	animeModel_->Draw();
-}
-
-void Boss::DebugGUI() {
-#ifdef _DEBUG
-	if (ImGui::CollapsingHeader("Boss##0")) {
-		ImGui::Indent();
-		if (ImGui::CollapsingHeader("Boss##1")) {
-			animeModel_->DebugGUI();
-			collider_->DebugGUI();
-			ParameterGUI();
-		}
-		core_->DebugGUI();
-		ImGui::Unindent();
-	}
-#endif // _DEBUG
-}
-
-void Boss::ParameterGUI() {
-#ifdef _DEBUG
-	ImGui::Indent();
-	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Selected;
-	if (ImGui::TreeNodeEx("BossBehavior", flags)) {
-		static int currentActionIndex = 0;
-		static std::string nowAction = actionList_[currentActionIndex];
-		// コンボボックスの表示に使うため、const char* の配列に変換
-		std::vector<const char*> actionCStrs;
-		for (const auto& str : actionList_) {
-			actionCStrs.push_back(str.c_str());
-		}
-
-		if (ImGui::Combo("Action", &currentActionIndex, actionCStrs.data(), static_cast<int>(actionCStrs.size()))) {
-			nowAction = actionList_[currentActionIndex];
-		}
-		if (ImGui::Button("SetAction")) {
-			SetDefaultBehavior(true);
-			static const std::unordered_map<std::string, std::function<std::unique_ptr<BaseBossBehavior>(Boss*)>> behaviorFactory = {
-				{ "Root",   [](Boss* b) { return std::make_unique<BossRoot>(b); } },
-				{ "Wave", [](Boss* b) { return std::make_unique<BossAttack>(b); } },
-				{ "Beam",   [](Boss* b) { return std::make_unique<BossBeamAttack>(b); } },
-				{ "Jump",   [](Boss* b) { return std::make_unique<BossJumpAttack>(b); } },
-				{ "Sword",   [](Boss* b) { return std::make_unique<BossSwordAttack>(b); } },
-				{ "Area",   [](Boss* b) { return std::make_unique<BossAreaAttack>(b); } },
-				{ "Arrow",   [](Boss* b) { return std::make_unique<BossArrowAttack>(b); } },
-				{ "FallRod",   [](Boss* b) { return std::make_unique<BossRodFall>(b); } },
-				{ "Dush",   [](Boss* b) { return std::make_unique<BossDushAttack>(b); } },
-				// 他も追加
-			};
-			auto it = behaviorFactory.find(nowAction);
-			if (it != behaviorFactory.end()) {
-				ChangeBehavior(it->second(this));
-			} else {
-				ImGui::Text("Unknown Action: %s", nowAction.c_str());
-			}
-		}
-		if (nowAction != "Root") {
-			ImGui::SameLine();
-			if (ImGui::Button("AddAction")) {
-				phaseList_[phaseIndex_].push_back({ nowAction, 1.0f });
-			}
-		}
-
-
-		int phase = int(phaseList_.size());
-		if (phase != 0) {
-			if (ImGui::BeginTable("table_Phase", phase, ImGuiTableFlags_Borders)) {
-				for (int i = 1; i < phase + 1; i++) {
-					ImGui::TableSetupColumn(("Phase" + std::to_string(i)).c_str());
-				}
-				ImGui::TableNextRow(ImGuiTableRowFlags_Headers);
-				for (int column = 0; column < phase; column++) {
-					ImGui::TableSetColumnIndex(column);
-					const char* column_name = ImGui::TableGetColumnName(column); // Retrieve name passed to TableSetupColumn()
-					ImGui::PushID(column);
-					ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
-					ImGui::RadioButton("##checkAll", &phaseIndex_, column);
-					ImGui::PopStyleVar();
-					ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
-					ImGui::TableHeader(column_name);
-					ImGui::PopID();
-				}
-
-				ImGui::TableNextRow();
-				for (int phaseCount = 0; phaseCount < phase; phaseCount++) {
-					ImGui::TableSetColumnIndex(phaseCount);
-					int tableCount = 2;
-					if (phaseList_[phaseCount].size() > 1) tableCount++;
-					if (ImGui::BeginTable("table_ActionList", tableCount, ImGuiTableFlags_Borders)) {
-						ImGui::TableSetupColumn("Action");
-						ImGui::TableSetupColumn("Weight");
-						if (tableCount == 3) ImGui::TableSetupColumn("Delete");
-						ImGui::TableHeadersRow();
-
-						for (int row = 0; row < phaseList_[phaseCount].size(); row++) {
-							ImGui::TableNextRow();
-							if (row == 0) {
-								ImGui::TableSetColumnIndex(1);
-								ImGui::PushItemWidth(50.0f);
-								if (tableCount == 3) {
-									ImGui::TableSetColumnIndex(2);
-									ImGui::PushItemWidth(50.0f);
-								}
-							}
-
-							// Draw our contents
-							ImGui::PushID(row);
-							ImGui::TableSetColumnIndex(0);
-							ImGui::Text(phaseList_[phaseCount][row].first.c_str());
-							ImGui::TableSetColumnIndex(1);
-							ImGui::SliderFloat(("##" + phaseList_[phaseCount][row].first + std::to_string(phaseCount)).c_str(), &phaseList_[phaseCount][row].second, 0.0f, 1.0f);
-							if (tableCount == 3) {
-								ImGui::TableSetColumnIndex(2);
-								if (ImGui::Button(("X##del" + phaseList_[phaseCount][row].first + std::to_string(phaseCount)).c_str())) {
-									phaseList_[phaseCount].erase(phaseList_[phaseCount].begin() + row);
-								}
-							}
-							ImGui::PopID();
-						}
-						ImGui::EndTable();
-					}
-				}
-
-				ImGui::EndTable();
-			}
-		}
-		if (ImGui::Button(("save##phase"))) {
-			SavePhase();
-		}ImGui::SameLine();
-		if (ImGui::Button(("load##phase"))) {
-			LoadPhase();
-		}
-
-		ImGui::TreePop();
-	}
-	ImGui::Unindent();
-#endif // _DEBUG
-}
-
-void Boss::InitParameter() {
-	attackCooldown_ = 120.0f;
-	bossHp_ = 100.0f;
-
-	params_.beam.parentRotateStep = std::numbers::pi_v<float>*0.25f;
-
-	for (int i = 0; i < 9; i++) {
-		std::unique_ptr<WaveWall> wall;
-		wall = std::make_unique<WaveWall>();
-		wall->Initialize();
-		walls_.push_back(std::move(wall));
-	}
-
-	for (int i = 0; i < 10; i++) {
-		std::unique_ptr<Arrow> arrow;
-		arrow = std::make_unique<Arrow>();
-		arrow->Initialize();
-		int numEmitter = ParticleManager::GetInstance()->InitGPUEmitter();
-		arrow->SetEmitterNumber(numEmitter);
-		arrow->GPUEmitterSetting();
-		arrow->SetArrowMode();
-		arrows_.push_back(std::move(arrow));
-	
-		std::unique_ptr<Arrow> rod;
-		rod = std::make_unique<Arrow>();
-		rod->Initialize();
-		rods_.push_back(std::move(rod));
-
-		std::unique_ptr<UnderRing> ring;
-		ring = std::make_unique<UnderRing>();
-		ring->Initialize();
-		underRings_.push_back(std::move(ring));
-	}
-
-	for (int i = 0; i < 5; i++) {
-		std::unique_ptr<Sprite> hpTex;
-		hpTex = std::make_unique<Sprite>();
-		hpTex->Load("white2x2.png");
-		hpTex->SetColor(damageColor1_);
-		hpSprites_.push_back(std::move(hpTex));
-		hpSprites_[i]->SetPos({ hpStartPos_.x + (hpSize_.x * i) + (hpIndent * i), hpStartPos_.y, 0.0f });
-		hpSprites_[i]->SetSize(hpSize_);
-	}
-
-	for (int i = 0; i < 2; i++) {
-		std::unique_ptr<Sprite> hpTex;
-		hpTex = std::make_unique<Sprite>();
-		hpTex->Load("white2x2.png");
-		hpTex->SetColor({ 0.2f,0.05f,0.6f,1.0f });
-		hpFrame_.push_back(std::move(hpTex));
-	}
-	hpFrame_[0]->SetPos({ hpFrameStartPos_.x, hpFrameStartPos_.y, 0.0f });
-	hpFrame_[0]->SetSize(hpFrameSize_);
-	hpFrame_[1]->SetColor({ 0.1f,0.1f,0.1f,1.0f });
-	hpFrame_[1]->SetPos({ hpFrameStartPos_.x, hpFrameStartPos_.y, 0.0f });
-	hpFrame_[1]->SetSize(hpFrameInSize_);
-
 }
 
 void Boss::ReStart() {
@@ -698,36 +275,6 @@ void Boss::CalcModelDir() {
 	animeModel_->transform.rotate.y = newAngle;
 }
 
-void Boss::DushInit() {
-	float parentRotate = std::numbers::pi_v<float> *0.25f;
-	for (int i = 0; i < 8; i++) {
-		if (i != 0 && i != 4) {
-			chargeParents_[i]->transform.rotate.x = Random::GetFloat(-std::numbers::pi_v<float>, std::numbers::pi_v<float>);
-			chargeParents_[i]->transform.rotate.y = Random::GetFloat(-std::numbers::pi_v<float>*0.5f, std::numbers::pi_v<float>*0.5f);
-		}
-		chargeParents_[i]->transform.translate.y = 4.0f;
-		chargeParents_[i]->transform.rotate.z = parentRotate * i;
-	}
-	chargeTime_ = 70.0f;
-	chargeSize_ = params_.beam.baseChargeSize;
-	charge15_.grain_.startSize_ = { chargeSize_ * 3.0f,chargeSize_ * 6.0f };
-	for (auto& chargeParent : chargeParents_) {
-		chargeParent->transform.scale = Vector3::FillVec(chargeSize_);
-	}
-
-	for (int i = 0; i < 8; i++) {
-		auto& emitter = ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]);
-		emitter.isEmit_ = true;
-		emitter.data_.lifeTime = 0.6f;
-		UpdateEmitterPos(i);
-		emitter.data_.prevTranslate = traceAnchors_[i]->GetWorldPos();
-
-		Vector3 randColor = Random::GetVector3({ 0.0f,0.0f }, { 0.2f,0.8f }, { 0.2f,1.0f });
-		emitter.data_.colorMax = randColor;
-		emitter.data_.colorMin = randColor;
-	}
-}
-
 bool Boss::DushCharge(float& t, float maxT, bool& isNear, float range) {
 	if (t <= 0.0f) {
 		DushInit();
@@ -799,34 +346,10 @@ bool Boss::DushAttack(bool isNear, float& dushRange, float stopRange) {
 	return false;
 }
 
-void Boss::UpdateWaveWall() {
-	for (auto& wall : walls_) {
-		if (!wall->GetIsLive())continue;
-		wall->CalculationFollowVec(pPlayer_->GetWorldPos());
-		wall->Update();
-	}
-}
-
 void Boss::WaveWallAttack() {
-	int count = 0;
-
-	CameraManager::GetInstance()->GetCamera()->IssuanceShake(0.2f, 15.0f);
-
-	// 波攻撃の出現位置を決める
 	Vector3 wavePos = GetFrontOffset(Vector3(0.0f, 0.0f, 4.5f), animeModel_->transform.rotate.y);
 	wavePos += animeModel_->transform.translate;
-	wavePos.y = 0.0f;
-	for (auto& wall : walls_) {
-		if (count == 3) break;
-		if (wall->GetIsLive()) continue;
-		Vector3 velocity = { 0.0f,0.0f,1.0f };
-		if (count == 1) velocity = Vector3(-1.0f, 0.0f, 1.0f).Normalize();
-		if (count == 2) velocity = Vector3(1.0f, 0.0f, 1.0f).Normalize();
-		velocity = GetFrontOffset(velocity, animeModel_->transform.rotate.y);
-
-		wall->InitWave(wavePos, velocity);
-		count++;
-	}
+	itemManager_->WaveWallAttack(wavePos, animeModel_->transform.rotate.y);
 
 	waveAttack1.Emit();
 	waveAttack2.Emit();
@@ -834,103 +357,18 @@ void Boss::WaveWallAttack() {
 	waveAttack4.Emit();
 	ParticleManager::GetInstance()->GetSphereEmitter(waveCSEmitIndex_).SetPos(wavePos);
 	ParticleManager::GetInstance()->GetSphereEmitter(waveCSEmitIndex_).Emit();
-
-}
-
-void Boss::UpdateArrows() {
-	for (auto& arrow : arrows_) {
-		if (!arrow->GetIsLive())continue;
-		arrow->TargetSetting(pPlayer_->GetWorldPos());
-		arrow->Update();
-	}
 }
 
 void Boss::ArrowAttack() {
-	int count = 0;
-
-	for (auto& arrow : arrows_) {
-		if (count == 4) break;
-		if (arrow->GetIsLive()) continue;
-
-		// 矢の位置と飛ぶまでの時間を決める
-		Vector3 arrowPos = arrowParents_[count]->GetWorldPos();
-		float emittTime = 50.0f;
-		if (count == 0) emittTime = 50.0f;
-		if (count == 1) emittTime = 80.0f;
-		if (count == 2) emittTime = 110.0f;
-		if (count == 3) emittTime = 140.0f;
-		arrow->InitArrow(arrowPos, emittTime);
-		count++;
+	std::vector<Vector3> pos;
+	for (int i = 0; i < arrowSpawnNum_; i++) {
+		pos.push_back(arrowParents_[i]->GetWorldPos());
 	}
-}
-
-void Boss::UpdateRod() {
-	for (auto& rod : rods_) {
-		if (rod->GetIsBroke()) RodUnderRing(rod->GetWorldPos());
-		if (!rod->GetIsLive())continue;
-		rod->RodUpdate();
-	}
+	itemManager_->ArrowAttack(pos,arrowSpawnNum_);
 }
 
 void Boss::RodFall() {
-	int count = 0;
-
-	for (auto& rod : rods_) {
-		if (count == 6) break;
-		if (rod->GetIsLive()) continue;
-
-		// ロッドの出現位置を決める
-		Vector3 rodPos = animeModel_->transform.translate;
-		rodPos.x += Random::GetFloat(-60.0f, 60.0f);
-		rodPos.y = 20.0f;
-		rodPos.z += Random::GetFloat(-60.0f, 60.0f);
-		float emittTime = 140.0f;
-		rod->InitRod(rodPos, emittTime);
-		count++;
-	}
-}
-
-void Boss::RodUnderRing(const Vector3& emitPos) {
-	int count = 0;
-	for (auto& ring : underRings_) {
-		if (count == 1) break;
-		if (ring->GetIsLive()) continue;
-		ring->InitRing(emitPos, 120.0f);
-		count++;
-	}
-}
-
-void Boss::InitBeam() {
-	auto& bp = params_.beam;
-	float parentRotate = bp.parentRotateStep;
-	for (int i = 0; i < 8; i++) {
-		if (i != 0 && i != 4) {
-			chargeParents_[i]->transform.rotate.x = Random::GetFloat(-std::numbers::pi_v<float>, std::numbers::pi_v<float>);
-			chargeParents_[i]->transform.rotate.y = Random::GetFloat(-std::numbers::pi_v<float>*0.5f, std::numbers::pi_v<float>*0.5f);
-		}
-		chargeParents_[i]->transform.translate.y = bp.parentY;
-		chargeParents_[i]->transform.rotate.z = parentRotate * i;
-	}
-
-	chargeTime_ = bp.chargeTime;
-	chargeSize_ = bp.baseChargeSize;
-	charge15_.grain_.startSize_ = { chargeSize_ * bp.startSizeMulX,chargeSize_ * bp.startSizeMulY };
-
-	for (auto& chargeParent : chargeParents_) {
-		chargeParent->transform.scale = Vector3::FillVec(chargeSize_);
-	}
-
-	for (int i = 0; i < 8; i++) {
-		auto& emitter = ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]);
-		emitter.isEmit_ = true;
-		emitter.data_.lifeTime = bp.emitterLifeTime;
-		UpdateEmitterPos(i);
-		emitter.data_.prevTranslate = traceAnchors_[i]->GetWorldPos();
-
-		Vector3 randColor = Random::GetVector3({ 0.3f,1.0f }, { 0.0f,0.2f }, { 0.0f,0.5f });
-		emitter.data_.colorMax = randColor;
-		emitter.data_.colorMin = randColor;
-	}
+	itemManager_->RodFall(animeModel_->transform.translate);
 }
 
 bool Boss::BeamCharge() {
@@ -1030,11 +468,6 @@ bool Boss::BeamAttack() {
 	return result;
 }
 
-void Boss::InitJumpAttack() {
-	jumpTime_ = params_.jump.jumpTotalTime;
-	isJumpAttack_ = true;
-}
-
 bool Boss::JumpAttack() {
 
 	if (jumpTime_ > 0.0f) {
@@ -1074,23 +507,9 @@ bool Boss::JumpAttack() {
 	return false;
 }
 
-void Boss::UpdateUnderRing() {
-	for (auto& ring : underRings_) {
-		if (!ring->GetIsLive())continue;
-		ring->Update();
-	}
-}
-
 void Boss::UnderRingEmit() {
-	CameraManager::GetInstance()->GetCamera()->IssuanceShake(0.3f, 30.0f);
 	isJumpAttack_ = false;
-	int count = 0;
-	for (auto& ring : underRings_) {
-		if (count == 1) break;
-		if (ring->GetIsLive()) continue;
-		ring->InitRing(animeModel_->transform.translate);
-		count++;
-	}
+	itemManager_->UnderRingEmit(animeModel_->transform.translate);
 }
 
 ///= Behavior =================================================================*/
@@ -1161,18 +580,7 @@ void Boss::SetDefaultBehavior(bool isInvisibleItem) {
 	}
 	ParticleManager::GetParticleCSEmitter(dushTrailIndex_).SetEmit(false);
 	if (isInvisibleItem) {
-		for (auto& wave : walls_) {
-			wave->SetIsLive(false);
-		}
-		for (auto& arrow : arrows_) {
-			arrow->SetIsLive(false);
-		}
-		for (auto& rod : rods_) {
-			rod->SetIsLive(false);
-		}
-		for (auto& ring : underRings_) {
-			ring->SetIsLive(false);
-		}
+		itemManager_->ReStart();
 	}
 	cameraRange_ = -25.0f;
 	cameraFollowSpeed_ = 0.2f;
@@ -1222,37 +630,6 @@ bool Boss::EnergyUpdate() {
 		result = true;
 	}
 	return result;
-}
-
-void Boss::InitSummon() {
-	summonIndex_ = ParticleManager::GetInstance()->InitGPUEmitterTexture("magicCircle.png");
-
-	auto& emitter = ParticleManager::GetParticleCSEmitterTexture(summonIndex_);
-	emitter.SetEmit(true);
-	emitter.data_.lifeTime = 0.8f;
-	emitter.data_.radius = 10.0f;
-	emitter.data_.frequency = 0.01f;
-	emitter.data_.translate = animeModel_->transform.translate;
-	emitter.data_.baseVelocity = { 0.0f,0.6f,0.0f };
-
-	bossYPos_ = animeModel_->transform.translate.y;
-	defaultCorePos_ = core_->GetWorldPos();
-	animeModel_->transform.translate.y = -30.0f;
-
-	ParticleManager::Load(summonLightning_, "summonLightning_");
-	ParticleManager::Load(energySphere_, "energySphere");
-	ParticleManager::Load(energyParticle_, "energyParticle");
-
-	summonLightning_.grain_.isZandX_ = true;
-	energySphere_.grain_.isZandX_ = true;
-
-	summonLightning_.pos_ = animeModel_->transform.translate;
-	summonLightning_.pos_.y = 40.0f;
-	energySphere_.pos_ = animeModel_->transform.translate;
-	energySphere_.pos_.y = 0.0f;
-	energyParticle_.pos_ = animeModel_->transform.translate;
-	energyParticle_.pos_.y = 0.0f;
-
 }
 
 void Boss::ExpandSummon() {

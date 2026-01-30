@@ -146,7 +146,7 @@ void DXCom::CreateDevice() {
 
 void DXCom::CreateCommand() {
 
-	command_.reset(new DXCommand());
+	command_=std::make_unique<DXCommand>();
 	command_->Initialize(device_.Get());
 
 }
@@ -171,7 +171,7 @@ void DXCom::CreateSwapChain() {
 
 void DXCom::CreateRenderTargets() {
 
-	rtvDescriptorHeap_ = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 4, false);
+	rtvDescriptorHeap_ = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, numRTVHandle_, false);
 
 	HRESULT hr = swapChain_->GetBuffer(0, IID_PPV_ARGS(&swapChainResources_[0]));
 	assert(SUCCEEDED(hr));
@@ -221,7 +221,7 @@ void DXCom::CreateDepthBuffer() {
 
 void DXCom::CreateCompiler() {
 
-	compiler_.reset(new DXCompil());
+	compiler_ = std::make_unique<DXCompil>();
 	compiler_->Initialize();
 
 }
