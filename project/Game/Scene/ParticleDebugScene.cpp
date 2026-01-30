@@ -24,7 +24,7 @@ ParticleDebugScene::~ParticleDebugScene() {
 
 void ParticleDebugScene::Initialize() {
 
-	obj3dCommon_.reset(new Object3dCommon());
+	obj3dCommon_ = std::make_unique<Object3dCommon>();
 	obj3dCommon_->Initialize();
 
 	CameraManager::GetInstance()->GetCamera()->GetTransform().rotate = { 0.0f,0.0f,0.0f };

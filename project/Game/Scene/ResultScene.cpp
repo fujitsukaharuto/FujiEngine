@@ -29,7 +29,7 @@ ResultScene::~ResultScene() {
 
 void ResultScene::Initialize() {
 
-	obj3dCommon_.reset(new Object3dCommon());
+	obj3dCommon_=std::make_unique<Object3dCommon>();
 	obj3dCommon_->Initialize();
 
 	CameraManager::GetInstance()->GetCamera()->GetTransform().rotate = { cameraStartRotateX_,0.0f,0.0f };

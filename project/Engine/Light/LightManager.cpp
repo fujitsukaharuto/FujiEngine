@@ -40,14 +40,14 @@ void LightManager::CreateLight() {
 
 void LightManager::AddPointLight() {
 	std::unique_ptr<PointLight> newPoint;
-	newPoint.reset(new PointLight());
+	newPoint = std::make_unique<PointLight>();
 	newPoint->Initialize(dxcommon_);
 	pointLights_.push_back(std::move(newPoint));
 }
 
 void LightManager::AddSpotLight() {
 	std::unique_ptr<SpotLight> newSpot;
-	newSpot.reset(new SpotLight());
+	newSpot = std::make_unique<SpotLight>();
 	newSpot->Initialize(dxcommon_);
 	spotLights_.push_back(std::move(newSpot));
 }

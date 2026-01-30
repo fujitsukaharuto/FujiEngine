@@ -25,7 +25,7 @@ GameScene::~GameScene() {
 
 void GameScene::Initialize() {
 
-	obj3dCommon_.reset(new Object3dCommon());
+	obj3dCommon_ = std::make_unique<Object3dCommon>();
 	obj3dCommon_->Initialize();
 
 

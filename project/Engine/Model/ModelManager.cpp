@@ -110,7 +110,7 @@ void ModelManager::LoadOBJ(const std::string& filename, bool overWrite) {
 	}
 
 	std::unique_ptr<Model> model;
-	model.reset(new Model());
+	model = std::make_unique<Model>();
 
 	Assimp::Importer importer;
 	std::string path = instance->kDirectoryPath_ + filename;
@@ -203,7 +203,7 @@ void ModelManager::LoadGLTF(const std::string& filename, bool overWrite) {
 	}
 
 	std::unique_ptr<Model> model;
-	model.reset(new Model());
+	model = std::make_unique<Model>();
 
 	Assimp::Importer importer;
 	std::string path = instance->kDirectoryPath_ + "/" + filename;
@@ -332,7 +332,7 @@ void ModelManager::CreateSphere() {
 	}
 
 	std::unique_ptr<Model> model;
-	model.reset(new Model());
+	model = std::make_unique<Model>();
 	ModelMesh newModelMesh{};
 
 	const float pi = 3.1415926535f;
@@ -393,7 +393,7 @@ void ModelManager::CreateSphere() {
 
 ModelData ModelManager::CreateRing(float out, float in, float radius, bool horizon) {
 	std::unique_ptr<Model> model;
-	model.reset(new Model());
+	model = std::make_unique<Model>();
 	ModelMesh newModelMesh{};
 
 	const uint32_t kRingDivide = 32;
@@ -454,7 +454,7 @@ ModelData ModelManager::CreateRing(float out, float in, float radius, bool horiz
 
 ModelData ModelManager::CreateCylinder(float topRadius, float bottomRadius, float height) {
 	std::unique_ptr<Model> model;
-	model.reset(new Model());
+	model = std::make_unique<Model>();
 	ModelMesh newModelMesh{};
 
 	const uint32_t kCylinderDivide = 32;
@@ -511,14 +511,6 @@ ModelData ModelManager::CreateCylinder(float topRadius, float bottomRadius, floa
 
 	return model->data_;
 }
-
-
-void ModelManager::AddModel(const std::string& filename, Model* model) {
-	std::unique_ptr<Model> newModel;
-	newModel.reset(new Model(*model));
-	models_.insert(std::make_pair(filename, std::move(newModel)));
-}
-
 
 void ModelManager::LoadModelFile(bool overWrite) {
 #ifdef _DEBUG

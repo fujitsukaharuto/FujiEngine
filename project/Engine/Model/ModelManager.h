@@ -64,10 +64,6 @@ namespace Graphics {
 		/// <summary>シリンダーのモデルを生成</summary>
 		static ModelData CreateCylinder(float topRadius = 1.0f, float bottomRadius = 1.0f, float height = 3.0f);
 
-
-		/// <summary>モデルを追加</summary>
-		void AddModel(const std::string& filename, Model* model);
-
 		DXCom* ShareDXCom() { return dxcommon_; }
 		Graphics::LightManager* ShareLight() { return lightManager_; }
 
