@@ -26,8 +26,8 @@ void TitleScene::Initialize() {
 	obj3dCommon_.reset(new Object3dCommon());
 	obj3dCommon_->Initialize();
 
-	CameraManager::GetInstance()->GetCamera()->transform.rotate = { cameraStartRotateX_,0.0f,0.0f };
-	CameraManager::GetInstance()->GetCamera()->transform.translate = { 0.0f, 5.0f, -30.0f };
+	CameraManager::GetInstance()->GetCamera()->GetTransform().rotate = { cameraStartRotateX_,0.0f,0.0f };
+	CameraManager::GetInstance()->GetCamera()->GetTransform().translate = { 0.0f, 5.0f, -30.0f };
 	
 
 	dxcommon_->GetOffscreenManager()->ResetPostEffect();
@@ -131,7 +131,7 @@ void TitleScene::Update() {
 	}
 	float cameraT = (std::max)(startTime_ / startMaxTime_, 0.0f);
 	float rotateX = std::lerp(cameraEndRotateX_, cameraStartRotateX_, cameraT);
-	CameraManager::GetInstance()->GetCamera()->transform.rotate = { rotateX,0.0f,0.0f };
+	CameraManager::GetInstance()->GetCamera()->GetTransform().rotate = { rotateX,0.0f,0.0f };
 	player_->TitleUpdate(startTime_);
 
 	auto& emitter = ParticleManager::GetSphereEmitter(0);

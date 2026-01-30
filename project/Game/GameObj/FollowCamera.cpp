@@ -16,14 +16,13 @@ FollowCamera::~FollowCamera() {
 
 void FollowCamera::Initialize() {
 	Camera* camera = CameraManager::GetInstance()->GetCamera();
-	camera->transform.rotate.x = 0.13f;
+	camera->GetTransform().rotate.x = 0.13f;
 	offset_ = { 0.0f, 4.0f, -27.5f };
 }
 
 void FollowCamera::Update(const Vector3& lockOn) {
-
-
 	Camera* camera = CameraManager::GetInstance()->GetCamera();
+	auto& transform = camera->GetTransform();
 
 	Vector3 lockOnPosition;
 	if (isLockOnFollow_) {
@@ -36,7 +35,7 @@ void FollowCamera::Update(const Vector3& lockOn) {
 	Vector3 sub = lockOnPosition - Vector3(target_->translate.x, target_->translate.y + 4.0f , target_->translate.z);
 
 	destinationAngleY_ = std::atan2(sub.x, sub.z);
-	camera->transform.rotate.y = LerpShortAngle(camera->transform.rotate.y, destinationAngleY_, followSpeed_);
+	transform.rotate.y = LerpShortAngle(transform.rotate.y, destinationAngleY_, followSpeed_);
 
 	// X軸
 	float horizontalDistance = std::sqrt(sub.x * sub.x + sub.z * sub.z);
@@ -44,8 +43,8 @@ void FollowCamera::Update(const Vector3& lockOn) {
 	if (destinationAngleX < -0.09f) {//上向きすぎないように
 		destinationAngleX = -0.09f;
 	}
-	float xRotate= LerpShortAngle(camera->transform.rotate.x, destinationAngleX, followSpeed_);
-	camera->transform.rotate.x = xRotate;
+	float xRotate= LerpShortAngle(transform.rotate.x, destinationAngleX, followSpeed_);
+	transform.rotate.x = xRotate;
 
 	if (target_) {
 		interTarget_ = Lerp(interTarget_, { target_->translate.x,0.0f,target_->translate.z }, targetSpeed_);
@@ -53,19 +52,20 @@ void FollowCamera::Update(const Vector3& lockOn) {
 
 	OffsetChangeCal();
 	Vector3 offset = OffsetCal();
-	camera->transform.translate = interTarget_ + offset;
+	transform.translate = interTarget_ + offset;
 	camera->UpdateMatrix();
 }
 
 void FollowCamera::ReStart(const Vector3& lockon) {
 	Camera* camera = CameraManager::GetInstance()->GetCamera();
+	auto& transform = camera->GetTransform();
 
 	Vector3 lockOnPosition = lockon;
 	lockOnPosition.y = lockOnPosition.y - 3.0f;
 	Vector3 sub = lockOnPosition - Vector3(target_->translate.x, target_->translate.y + 4.0f, target_->translate.z);
 
 	destinationAngleY_ = std::atan2(sub.x, sub.z);
-	camera->transform.rotate.y = LerpShortAngle(camera->transform.rotate.y, destinationAngleY_, 0.3f);
+	transform.rotate.y = LerpShortAngle(transform.rotate.y, destinationAngleY_, 0.3f);
 
 	// X軸
 	float horizontalDistance = std::sqrt(sub.x * sub.x + sub.z * sub.z);
@@ -73,14 +73,14 @@ void FollowCamera::ReStart(const Vector3& lockon) {
 	if (destinationAngleX < -0.09f) {//上向きすぎないように
 		destinationAngleX = -0.09f;
 	}
-	camera->transform.rotate.x = destinationAngleX;
+	transform.rotate.x = destinationAngleX;
 
 	if (target_) {
 		interTarget_ = { target_->translate.x,0.0f,target_->translate.z };
 	}
 
 	Vector3 offset = OffsetCal();
-	camera->transform.translate = interTarget_ + offset;
+	transform.translate = interTarget_ + offset;
 	camera->UpdateMatrix();
 }
 
@@ -107,7 +107,7 @@ void FollowCamera::CalDestinationAngle() {
 
 void FollowCamera::SetTranslate(const Vector3& pos) {
 	Camera* camera = CameraManager::GetInstance()->GetCamera();
-	camera->transform.translate = pos + offset_;
+	camera->GetTransform().translate = pos + offset_;
 }
 
 void FollowCamera::SetInterTarget(const Vector3& interTarget) {
@@ -135,32 +135,34 @@ void FollowCamera::SetOffsetSoon(float zRang) {
 
 void FollowCamera::PreRotateUpdate(const Vector3& lockon) {
 	Camera* camera = CameraManager::GetInstance()->GetCamera();
+	auto& transform = camera->GetTransform();
 
 	Vector3 lockOnPosition = lockon;
 	lockOnPosition.y = lockOnPosition.y - 3.0f;
 	Vector3 sub = lockOnPosition - Vector3(target_->translate.x, target_->translate.y + 4.0f, target_->translate.z);
 
 	destinationAngleY_ = std::atan2(sub.x, sub.z);
-	camera->transform.rotate.y = LerpShortAngle(camera->transform.rotate.y, destinationAngleY_, 1.0f);
+	transform.rotate.y = LerpShortAngle(transform.rotate.y, destinationAngleY_, 1.0f);
 }
 
 void FollowCamera::Reset() {
 	Camera* camera = CameraManager::GetInstance()->GetCamera();
+	auto& transform = camera->GetTransform();
 	if (target_) {
 		interTarget_ = target_->translate;
-		camera->transform.rotate.y = target_->rotate.y;
+		transform.rotate.y = target_->rotate.y;
 	}
-	destinationAngleY_ = camera->transform.rotate.y;
+	destinationAngleY_ = transform.rotate.y;
 
 	Vector3 offset = OffsetCal();
-	camera->transform.translate = interTarget_ + offset;
+	transform.translate = interTarget_ + offset;
 }
 
 Vector3 FollowCamera::OffsetCal() const {
 	Vector3 offset = offset_;
 
 	Camera* camera = CameraManager::GetInstance()->GetCamera();
-	Matrix4x4 rotateCamera = MakeRotateXYZMatrix(camera->transform.rotate);
+	Matrix4x4 rotateCamera = MakeRotateXYZMatrix(camera->GetTransform().rotate);
 	offset = TransformNormal(offset, rotateCamera);
 
 	return offset;

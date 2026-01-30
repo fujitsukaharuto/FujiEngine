@@ -134,8 +134,8 @@ void GameScene::Update() {
 				followCamera_->SetFollowSpeed(panSpeed_ * 2.0f);
 				followCamera_->SetOffsetSoon(0.0f);
 				followCamera_->SetOffset(boss_->GetCameraRange(), 30.0f);
-				CameraManager::GetInstance()->GetCamera()->transform.rotate = boss_->GetSummonCameraRotate();
-				CameraManager::GetInstance()->GetCamera()->transform.translate = summonCameraPos_;
+				CameraManager::GetInstance()->GetCamera()->GetTransform().rotate = boss_->GetSummonCameraRotate();
+				CameraManager::GetInstance()->GetCamera()->GetTransform().translate = summonCameraPos_;
 			} else {
 				followCamera_->Update(boss_->GetDefaultPos());
 			}

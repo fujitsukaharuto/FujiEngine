@@ -610,7 +610,7 @@ void AnimationModel::CreateWVP() {
 		cameraPosResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(DirectionalLight));
 		cameraPosData_[i] = nullptr;
 		cameraPosResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&cameraPosData_[i]));
-		cameraPosData_[i]->worldPosition = camera_->transform.translate;
+		cameraPosData_[i]->worldPosition = camera_->GetTranslate();
 	}
 }
 

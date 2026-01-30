@@ -32,8 +32,8 @@ void ResultScene::Initialize() {
 	obj3dCommon_.reset(new Object3dCommon());
 	obj3dCommon_->Initialize();
 
-	CameraManager::GetInstance()->GetCamera()->transform.rotate = { cameraStartRotateX_,0.0f,0.0f };
-	CameraManager::GetInstance()->GetCamera()->transform.translate = { 0.0f, 2.0f, -20.0f };
+	CameraManager::GetInstance()->GetCamera()->GetTransform().rotate = { cameraStartRotateX_,0.0f,0.0f };
+	CameraManager::GetInstance()->GetCamera()->GetTransform().translate = { 0.0f, 2.0f, -20.0f };
 	lightManager_->GetDirectionLight()->SetLightDirection(lightDir_);
 	lightManager_->GetDirectionLight()->SetLightIntensity(lightIntensity_);
 

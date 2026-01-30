@@ -104,15 +104,15 @@ public:
 
 	//========================================================================*/
 	//* Getter
+	Math::Trans& GetTransform() { return transform_; };
 	Math::Vector3 GetTranslate();
 
-	Math::Trans transform;
-
 private:
 
 
 
 private:
+	Math::Trans transform_;
 
 	Math::Matrix4x4 worldMatrix_;
 	Math::Matrix4x4 viewMatrix_;

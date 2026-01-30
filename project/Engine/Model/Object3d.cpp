@@ -599,7 +599,7 @@ void Object3d::CreateWVP() {
 		cameraPosResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(DirectionalLight));
 		cameraPosDataGPU_[i] = nullptr;
 		cameraPosResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&cameraPosDataGPU_[i]));
-		cameraPosDataGPU_[i]->worldPosition = camera_->transform.translate;
+		cameraPosDataGPU_[i]->worldPosition = camera_->GetTranslate();
 	}
 
 	objIDDataResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(ObjIDData));

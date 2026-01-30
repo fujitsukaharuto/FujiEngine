@@ -370,7 +370,7 @@ void Player::Move(const float& speed) {
 
 void Player::MoveTrans(const float& speed) {
 	velocity_ = velocity_.Normalize() * speed;
-	Matrix4x4 rotateMatrix = MakeRotateYMatrix(CameraManager::GetInstance()->GetCamera()->transform.rotate.y);
+	Matrix4x4 rotateMatrix = MakeRotateYMatrix(CameraManager::GetInstance()->GetCamera()->GetTransform().rotate.y);
 	velocity_ = TransformNormal(velocity_, rotateMatrix);
 	// 位置を更新
 	model_->transform.translate += velocity_;

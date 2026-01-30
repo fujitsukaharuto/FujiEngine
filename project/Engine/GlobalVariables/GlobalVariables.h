@@ -19,9 +19,6 @@ public:
 		std::map<std::string, Item> items;
 	};
 
-	// 全データ
-	std::map<std::string, Group> datas_;
-
 	/// <summary>
 	/// グループの作成
 	/// </summary>
@@ -83,4 +80,7 @@ private:
 
 	using json = nlohmann::json;
 
+
+	// 全データ
+	std::map<std::string, Group> datas_;
 };

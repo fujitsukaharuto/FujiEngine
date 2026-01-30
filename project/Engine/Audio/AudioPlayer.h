@@ -38,7 +38,6 @@ struct SoundData {
 	WAVEFORMATEX wfex;
 	// バッファの先頭アドレス
 	std::vector<BYTE> buffer;
-	unsigned int bufferSize;
 	std::vector<IXAudio2SourceVoice*> pSourceVoices;
 };
 

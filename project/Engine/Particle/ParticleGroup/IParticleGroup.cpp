@@ -181,7 +181,7 @@ bool IParticleGroup::InitEmitParticle(Particle& particle, const Vector3& pos, co
 			veloSpeed = particle.speed_.Normalize();
 
 			// カメラの回転を考慮して速度ベクトルを変換
-			cameraR = CameraManager::GetInstance()->GetCamera()->transform.rotate;
+			cameraR = CameraManager::GetInstance()->GetCamera()->GetTranslate();
 			rotateCamera = MakeRotateXYZMatrix(-cameraR);
 			veloSpeed = TransformNormal(veloSpeed, rotateCamera);
 

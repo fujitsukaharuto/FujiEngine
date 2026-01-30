@@ -10,9 +10,9 @@
 using namespace Core;
 using namespace Math;
 
-Camera::Camera() :transform({ { 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, { 0.0f,5.0f,-30.0f } })
+Camera::Camera() :transform_({ { 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, { 0.0f,5.0f,-30.0f } })
 , fovY_(0.6f), aspect_(float(MyWin::kWindowWidth) / float(MyWin::kWindowHeight))
-, nearClip_(0.1f), farClip_(1000.0f), worldMatrix_(MakeAffineMatrix(transform.scale, transform.rotate, transform.translate))
+, nearClip_(0.1f), farClip_(1000.0f), worldMatrix_(MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate))
 , viewMatrix_(Inverse(worldMatrix_))
 , projectionMatrix_(MakePerspectiveFovMatrix(fovY_, aspect_, nearClip_, farClip_))
 , viewProjectionMatrix_(Multiply(viewMatrix_, projectionMatrix_)), shakeMode_(ShakeMode::RandomShake)
@@ -44,7 +44,7 @@ void Camera::Update() {
 		rollingTime_ = 0.0f;
 	}
 
-	worldMatrix_ = MakeAffineMatrix(transform.scale, transform.rotate, (transform.translate + shakeGap_));
+	worldMatrix_ = MakeAffineMatrix(transform_.scale, transform_.rotate, (transform_.translate + shakeGap_));
 	viewMatrix_ = Inverse(worldMatrix_);
 
 #ifdef _DEBUG
@@ -58,7 +58,7 @@ void Camera::Update() {
 }
 
 void Camera::UpdateMatrix() {
-	worldMatrix_ = MakeAffineMatrix(transform.scale, transform.rotate, (transform.translate + shakeGap_));
+	worldMatrix_ = MakeAffineMatrix(transform_.scale, transform_.rotate, (transform_.translate + shakeGap_));
 	viewMatrix_ = Inverse(worldMatrix_);
 
 #ifdef _DEBUG
@@ -79,8 +79,8 @@ void Camera::IssuanceShake(float strength, float time) {
 void Camera::DebugGUI() {
 #ifdef _DEBUG
 	if (ImGui::CollapsingHeader("Camera")) {
-		ImGui::DragFloat3("pos", &transform.translate.x, 0.01f);
-		ImGui::DragFloat3("rotate", &transform.rotate.x, 0.01f);
+		ImGui::DragFloat3("pos", &transform_.translate.x, 0.01f);
+		ImGui::DragFloat3("rotate", &transform_.rotate.x, 0.01f);
 		ImGui::SeparatorText("Shake");
 		ImGui::DragFloat("shakeTime", &shakeTime_, 0.01f, 0.0f);
 		ImGui::DragFloat("shakeStrength", &shakeStrength_, 0.01f, 0.0f);
@@ -94,6 +94,6 @@ Vector3 Camera::GetTranslate() {
 	if (CameraManager::GetInstance()->GetDebugMode()) {
 		return DebugCamera::GetInstance()->GetTranslate();
 	} else {
-		return transform.translate;
+		return transform_.translate;
 	}
 }
