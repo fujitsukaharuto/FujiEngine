@@ -27,7 +27,7 @@ public:
 	virtual void Update();
 	virtual void Draw();
 
-	void Init(DXCom* pDxcom, SceneManager* pSceneManager, Graphics::LightManager* pLightMamager);
+	void Init(DXCom* pDxcom, SceneManager* pSceneManager, Graphics::LightManager* pLightManager);
 	virtual void LoadSceneLevelData(const std::string& name);
 
 	virtual void DebugGUI();

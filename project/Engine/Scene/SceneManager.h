@@ -53,9 +53,5 @@ private:
 	float changeExtraTime = 0.0f;
 	float finishTime = 0.0f;
 
-	bool isFinifh_ = false;
-
-	bool Clear = true;
-	bool gameover = false;
-
+	bool isFinish_ = false;
 };

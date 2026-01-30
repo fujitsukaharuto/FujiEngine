@@ -31,7 +31,7 @@ public:
 	/// アニメーションパーティクルグループのデータ
 	/// </summary>
 	struct AnimeGroup {
-		std::string farst;
+		std::string first;
 		std::vector<std::unique_ptr<Graphics::Object3d>> objects_;
 		std::vector<float> lifeTime;
 		std::vector<float> animeTime;

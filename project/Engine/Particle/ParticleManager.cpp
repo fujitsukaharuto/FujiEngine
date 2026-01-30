@@ -394,7 +394,7 @@ void ParticleManager::CreateAnimeGroup(const std::string& name, const std::strin
 	std::unique_ptr<AnimeGroup> newGroup;
 	newGroup = std::make_unique<AnimeGroup>();
 
-	newGroup->farst = fileName;
+	newGroup->first = fileName;
 	TextureManager::GetInstance()->LoadTexture(fileName);
 	for (int i = 0; i < 6; i++) {
 		std::unique_ptr<Object3d> newobj = std::make_unique<Object3d>();
@@ -555,7 +555,7 @@ void ParticleManager::EmitAnime(const std::string& name, const Vector3& pos, con
 					break;
 				}
 
-				group->objects_[i]->SetTexture(group->farst);
+				group->objects_[i]->SetTexture(group->first);
 				group->isLive_[i] = true;
 				newCount++;
 			}

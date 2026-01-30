@@ -33,7 +33,7 @@ void SceneManager::Update() {
 		if (scene_) {
 			scene_->Update();
 		}
-		if (isFinifh_) {
+		if (isFinish_) {
 			finishTime -= FPSKeeper::DeltaTimeFrame();
 			if (finishTime <= 0.0f) {
 
@@ -74,7 +74,7 @@ void SceneManager::ChangeScene(const std::string& sceneName, float extraTime) {
 		finishTime = 60.0f;
 	}
 
-	isFinifh_ = true;;
+	isFinish_ = true;
 
 	// 次のシーンを作成
 	nextScene_ = sceneFactory_->CreateScene(sceneName);
