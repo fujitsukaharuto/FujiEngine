@@ -69,7 +69,7 @@ namespace Graphics {
 
 		DXCom* dxcommon_;
 
-		std::unordered_map<std::string, std::unique_ptr<Texture>> m_textureCache;
+		std::unordered_map<std::string, std::unique_ptr<Texture>> textureCache_;
 
 		std::vector<std::pair<std::string, bool>> textureFileList_;
 

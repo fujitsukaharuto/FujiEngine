@@ -35,18 +35,18 @@ void TextureManager::Initialize(DXCom* pDxcom) {
 void TextureManager::Finalize() {
 	dxcommon_ = nullptr;
 
-	m_textureCache.clear();
+	textureCache_.clear();
 }
 
 Texture* TextureManager::LoadTexture(const std::string& filename) {
 	// 既にロードされているかチェック
-	if (m_textureCache.find(filename) != m_textureCache.end()) {
-		return m_textureCache[filename].get();
+	if (textureCache_.find(filename) != textureCache_.end()) {
+		return textureCache_[filename].get();
 	}
 
 	Load(filename);
 
-	auto it = m_textureCache.find(filename);
+	auto it = textureCache_.find(filename);
 	return it->second.get();
 }
 
@@ -54,16 +54,16 @@ void TextureManager::Load(const std::string& filename, bool overWrite) {
 	SRVManager* srvManager = SRVManager::GetInstance();
 
 	// すでにある場合
-	auto it = m_textureCache.find(filename);
+	auto it = textureCache_.find(filename);
 	Texture* texture = nullptr;
-	if (it != m_textureCache.end()) {
+	if (it != textureCache_.end()) {
 		if (!overWrite) {
 			return; // 上書きしない指定ならそのまま終了
 		}
 		texture = it->second.get(); // 既存のポインタを再利用
 	} else {
-		m_textureCache[filename] = std::move(std::make_unique<Texture>());
-		texture = m_textureCache[filename].get();
+		textureCache_[filename] = std::move(std::make_unique<Texture>());
+		texture = textureCache_[filename].get();
 		texture->srvIndex = UINT_MAX;
 	}
 
@@ -129,8 +129,8 @@ void TextureManager::LoadTextureFile(bool overWrite) {
 }
 
 Texture* TextureManager::GetTexture(const std::string& filename) {
-	auto it = m_textureCache.find(filename);
-	if (it != m_textureCache.end()) {
+	auto it = textureCache_.find(filename);
+	if (it != textureCache_.end()) {
 		return it->second.get();
 	}
 	Texture* tex = TextureManager::LoadTexture(filename);
@@ -138,8 +138,8 @@ Texture* TextureManager::GetTexture(const std::string& filename) {
 }
 
 const DirectX::TexMetadata& TextureManager::GetMetaData(const std::string& filename) {
-	if (m_textureCache.find(filename) != m_textureCache.end()) {
-		return m_textureCache[filename]->meta;
+	if (textureCache_.find(filename) != textureCache_.end()) {
+		return textureCache_[filename]->meta;
 	} else {
 		throw std::runtime_error("Texture metadata not found for: " + filename);
 	}
@@ -155,7 +155,7 @@ void TextureManager::SetTextureFileOnceLoad(const std::string& name) {
 }
 
 void TextureManager::ReleaseTexture(const std::string& filename) {
-	m_textureCache.erase(filename);
+	textureCache_.erase(filename);
 }
 
 DirectX::ScratchImage TextureManager::LoadTextureFile(const std::string& filePath) {
