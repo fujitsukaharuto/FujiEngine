@@ -563,7 +563,7 @@ Matrix4x4 Math::MakeRotationAxisAngle(const Vector3& axis, float angle) {
 }
 
 bool Math::IsCollision(const AABB& aabb, const Vector3& point) {
-	// 各軸方向でpointがAABBの範囲内にあるかをチェック
+	// 各軸方向でPointがAABBの範囲内にあるかをチェック
 	return (point.x >= aabb.min.x && point.x <= aabb.max.x) &&
 		(point.y >= aabb.min.y && point.y <= aabb.max.y) &&
 		(point.z >= aabb.min.z && point.z <= aabb.max.z);
@@ -650,7 +650,7 @@ Matrix4x4 Math::FromFloatArray(const float in[16]) {
 	return mat;
 }
 
-// Trnas
+// Transform
 Matrix4x4 Trans::GetWorldMat() const {
 	Matrix4x4 worldMatrix = MakeAffineMatrix(scale, rotate, translate);
 

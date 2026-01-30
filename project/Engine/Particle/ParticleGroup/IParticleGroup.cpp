@@ -145,7 +145,7 @@ void IParticleGroup::Billboard(Particle& particle, Matrix4x4& worldMatrix, const
 	}
 }
 
-bool IParticleGroup::InitEmitParticle(Particle& particle, const Vector3& pos, const Vector3& rotate, const Particle& grain, const RandomParametor& para) {
+bool IParticleGroup::InitEmitParticle(Particle& particle, const Vector3& pos, const Vector3& rotate, const Particle& grain, const RandomParameter& para) {
 	if (particle.isLive_ == false) {
 		particle.translate = grain.translate;
 		particle.scale = grain.scale;
@@ -167,7 +167,7 @@ bool IParticleGroup::InitEmitParticle(Particle& particle, const Vector3& pos, co
 		}
 		Vector3 veloSpeed = particle.speed_.Normalize();
 		Vector3 cameraR{};
-		Vector3 defo = { 0.0f,1.0f,0.0f };
+		Vector3 defa = { 0.0f,1.0f,0.0f };
 		Vector3 angleDToD{};
 		Matrix4x4 rotateCamera;
 		Matrix4x4 dToD;
@@ -185,8 +185,8 @@ bool IParticleGroup::InitEmitParticle(Particle& particle, const Vector3& pos, co
 			rotateCamera = MakeRotateXYZMatrix(-cameraR);
 			veloSpeed = TransformNormal(veloSpeed, rotateCamera);
 
-			defo = TransformNormal(defo, rotateCamera);
-			dToD = DirectionToDirection(defo, veloSpeed.Normalize());
+			defa = TransformNormal(defa, rotateCamera);
+			dToD = DirectionToDirection(defa, veloSpeed.Normalize());
 			angleDToD = ExtractEulerAngles(dToD);
 			particle.rotate = angleDToD;
 

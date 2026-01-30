@@ -137,6 +137,9 @@ void AudioPlayer::SoundUnload(SoundData* soundData) {
 
 void AudioPlayer::SoundPlayWave(SoundData& soundData, float volume) {
 	HRESULT result;
+	// 冒頭などで掃除を行う
+	SoundResourceCleaning(soundData);
+
 	IXAudio2SourceVoice* pSourceVoice = nullptr;
 	result = xAudio2_->CreateSourceVoice(&pSourceVoice, &soundData.wfex);
 	assert(SUCCEEDED(result));
@@ -156,6 +159,8 @@ void AudioPlayer::SoundPlayWave(SoundData& soundData, float volume) {
 
 void AudioPlayer::SoundLoop(SoundData& soundData, float volume) {
 	HRESULT result;
+	SoundResourceCleaning(soundData);
+
 	IXAudio2SourceVoice* pSourceVoice = nullptr;
 	result = xAudio2_->CreateSourceVoice(&pSourceVoice, &soundData.wfex);
 	assert(SUCCEEDED(result));
@@ -183,4 +188,18 @@ void AudioPlayer::SoundStopWave(SoundData& soundData) {
 		}
 	}
 	soundData.pSourceVoices.clear();
+}
+
+void Audio::AudioPlayer::SoundResourceCleaning(SoundData& soundData) {
+	for (auto it = soundData.pSourceVoices.begin(); it != soundData.pSourceVoices.end(); ) {
+		XAUDIO2_VOICE_STATE state;
+		(*it)->GetState(&state);
+		// バッファキューが空 = 再生終わってる
+		if (state.BuffersQueued == 0) {
+			(*it)->DestroyVoice();
+			it = soundData.pSourceVoices.erase(it);
+		} else {
+			++it;
+		}
+	}
 }

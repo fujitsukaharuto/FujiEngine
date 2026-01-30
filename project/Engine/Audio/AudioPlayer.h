@@ -102,6 +102,8 @@ namespace Audio {
 
 	private:
 
+		void SoundResourceCleaning(SoundData& soundData);
+
 		Microsoft::WRL::ComPtr<IXAudio2> xAudio2_;
 		IXAudio2MasteringVoice* masterVoice_;
 		std::unordered_map<std::string, SoundData> container_;

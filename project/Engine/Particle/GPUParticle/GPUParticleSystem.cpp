@@ -29,7 +29,7 @@ void GPUParticleSystem::Initialize(DXCom* pDxcom, SRVManager* srvManager) {
 	InitGPUEmitter();
 	InitGPUEmitterSurface("DeadTree_2.obj");
 	InitGPUEmitterSurface("BeamCrystal.obj");
-	csEmitters_[0].emitter->Load("titleDefoult");
+	csEmitters_[0].emitter->Load("titleDefault");
 	csEmitters_[0].emitter->Emit();// 初回に一度エミットしておく
 }
 
@@ -134,8 +134,8 @@ int GPUParticleSystem::InitGPUEmitterTexture(const std::string& fileName) {
 }
 
 int GPUParticleSystem::InitGPUEmitterSurface(const std::string& fileName) {
-	std::unique_ptr<MeshSurefaceEmitter> emitter;
-	emitter = std::make_unique<MeshSurefaceEmitter>(dxcommon_);
+	std::unique_ptr<MeshSurfaceEmitter> emitter;
+	emitter = std::make_unique<MeshSurfaceEmitter>(dxcommon_);
 	emitter->InitMeshData(fileName,dxcommon_,srvManager_);
 	emitter->isEmit_ = false;
 
@@ -288,11 +288,11 @@ TextureBasedEmitter& GPUParticleSystem::GetParticleCSEmitterTexture(int index) {
 	return static_cast<TextureBasedEmitter&>(*info.emitter);
 }
 
-MeshSurefaceEmitter& GPUParticleSystem::GetParticleCSEmitterSurface(int index) {
+MeshSurfaceEmitter& GPUParticleSystem::GetParticleCSEmitterSurface(int index) {
 	assert(index >= 0 && index < MeshSurfaceEmitters_.size());
 	auto& info = csEmitters_[MeshSurfaceEmitters_[index]];
 	assert(info.phase == PipelinePhase::Surface);
-	return static_cast<MeshSurefaceEmitter&>(*info.emitter);
+	return static_cast<MeshSurfaceEmitter&>(*info.emitter);
 }
 
 void GPUParticleSystem::InitParticleCS() {

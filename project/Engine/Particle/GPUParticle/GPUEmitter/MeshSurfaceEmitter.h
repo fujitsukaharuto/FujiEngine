@@ -35,12 +35,12 @@ struct EmitterSurface {
 	int triangleCount;
 };
 
-class MeshSurefaceEmitter : public IGPUEmitter {
+class MeshSurfaceEmitter : public IGPUEmitter {
 public:
 	EmitterSurface data_;
 	bool isEmit_ = false;
 
-	MeshSurefaceEmitter(DXCom* dx);
+	MeshSurfaceEmitter(DXCom* dx);
 	void InitMeshData(const std::string& fileName, DXCom* dx, SRVManager* srv);
 
 	void Update(float deltaTime) override;

@@ -22,10 +22,6 @@
 #include "Camera.h"
 
 
-
-const int particleIndex = 400;
-const UINT instanceCount_ = 10;
-
 /// <summary>
 /// リークチェック
 /// </summary>

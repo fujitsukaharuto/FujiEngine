@@ -176,9 +176,6 @@
     <ClCompile Include="Engine\Math\Random\Random.cpp">
       <Filter>Engine\Math\Random</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Math\Quaternion\Quaternion.cpp">
-      <Filter>Engine\Math\Quaternion</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Math\Vector\Vector3.cpp">
       <Filter>Engine\Math\Vector</Filter>
     </ClCompile>
@@ -356,7 +353,7 @@
     <ClCompile Include="Engine\Particle\GPUParticle\GPUEmitter\TextureBasedEmitter.cpp">
       <Filter>Engine\Particle\GPUParticle\GPUEmitter</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Particle\GPUParticle\GPUEmitter\MeshSurefaceEmitter.cpp">
+    <ClCompile Include="Engine\Particle\GPUParticle\GPUEmitter\MeshSurfaceEmitter.cpp">
       <Filter>Engine\Particle\GPUParticle\GPUEmitter</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Particle\ParticleGroup\IParticleGroup.cpp">
@@ -388,6 +385,9 @@
     </ClCompile>
     <ClCompile Include="Game\GameObj\Enemy\BossItem\BossItemManager.cpp">
       <Filter>Game\GameObj\Enemy\BossItem</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Math\Quaternion\Quaternion.cpp">
+      <Filter>Engine\Math\Quaternion</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -805,7 +805,7 @@
     <ClInclude Include="Engine\Particle\GPUParticle\GPUEmitter\TextureBasedEmitter.h">
       <Filter>Engine\Particle\GPUParticle\GPUEmitter</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Particle\GPUParticle\GPUEmitter\MeshSurefaceEmitter.h">
+    <ClInclude Include="Engine\Particle\GPUParticle\GPUEmitter\MeshSurfaceEmitter.h">
       <Filter>Engine\Particle\GPUParticle\GPUEmitter</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Particle\ParticleGroup\IParticleGroup.h">

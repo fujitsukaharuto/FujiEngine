@@ -95,11 +95,11 @@ namespace Core {
 		/// <summary>Pinを探す</summary>
 		const Pin* FindPin(const ed::PinId& id, const std::vector<MyNode>& nodes);
 
-		/// <summary>Limkを結ぶのか確認</summary>
+		/// <summary>Linkを結ぶのか確認</summary>
 		void HandleCreateLink(std::vector<Link>& links, const std::vector<MyNode>& nodes);
-		/// <summary>Limkを削除するのか確認</summary>
+		/// <summary>Linkを削除するのか確認</summary>
 		void HandleDeleteLink(std::vector<Link>& links);
-		/// <summary>Limkを結ぶ処理</summary>
+		/// <summary>Linkを結ぶ処理</summary>
 		void CreateLink(std::vector<Link>& links, const Pin& input, const Pin& output);
 		/// <summary>Nodeの描画</summary>
 		void DrawNode(MyNode& node, ed::Utilities::BlueprintNodeBuilder& builder);
@@ -126,7 +126,7 @@ namespace Core {
 		float winSizeY_ = 0.0f;
 
 #ifdef _DEBUG
-		ImFont* font_japanese = nullptr;
+		ImFont* font_japanese_ = nullptr;
 
 		D3D12_GPU_DESCRIPTOR_HANDLE backGroundHandle_;
 

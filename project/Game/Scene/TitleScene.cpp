@@ -186,7 +186,6 @@ void TitleScene::Draw() {
 	emit_.DrawSize();
 #endif // _DEBUG
 
-	//cube_->SkeletonDraw();
 	Line3dDrawer::GetInstance()->Render();
 
 #pragma endregion

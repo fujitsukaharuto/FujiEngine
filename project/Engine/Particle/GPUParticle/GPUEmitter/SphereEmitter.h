@@ -41,10 +41,6 @@ struct EmitterSphere {
 	uint32_t isRandomMove;
 	uint32_t isTrailEmit;
 	uint32_t isGravity;
-
-	/*uint32_t isColorFadeIn;
-	uint32_t isAddRandomSize;
-	uint32_t isTwinkle;*/
 };
 
 class SphereEmitter : public IGPUEmitter {

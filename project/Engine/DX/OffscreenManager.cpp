@@ -20,14 +20,14 @@ void OffscreenManager::Initialize(DXCom* pDxcom) {
 }
 
 void OffscreenManager::Update() {
-	shockData_.shockTime += 0.025f;
-	fireData_.animeTime += 0.025f;
-	thunderData_.time += 0.005f;
+	shockData_.shockTime += FPSKeeper::DeltaTime();
+	fireData_.animeTime += FPSKeeper::DeltaTime();
+	thunderData_.time += FPSKeeper::DeltaTime();
 
-	thunderData_.time = std::fmodf(thunderData_.time, 1.5f);
-	thunderData_.progres = thunderData_.time / 1.5f;
+	thunderData_.time = std::fmodf(thunderData_.time, maxThunderTime_);
+	thunderData_.progress = thunderData_.time / maxThunderTime_;
 
-	crtData_.crtTime += 0.025f;
+	crtData_.crtTime += FPSKeeper::DeltaTime();
 
 	outlineData_.projectionInverse = Inverse(CameraManager::GetInstance()->GetCamera()->GetProjectionMatrix());
 }
@@ -181,8 +181,8 @@ void OffscreenManager::EffectListGUI() {
 
 void OffscreenManager::CreateResource() {
 
-	offscreenrtvDesc_.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-	offscreenrtvDesc_.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+	offscreenRTVDesc_.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	offscreenRTVDesc_.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 
 	clearColorValue_.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 	clearColorValue_.Color[0] = 0.1f;
@@ -191,9 +191,9 @@ void OffscreenManager::CreateResource() {
 	clearColorValue_.Color[3] = 1.0f;
 
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
-		offscreenrt_[i] = dxcommon_->CreateOffscreenTextureResource(dxcommon_->GetDevice(), MyWin::kWindowWidth, MyWin::kWindowHeight, clearColorValue_);
+		offscreenRt_[i] = dxcommon_->CreateOffscreenTextureResource(dxcommon_->GetDevice(), MyWin::kWindowWidth, MyWin::kWindowHeight, clearColorValue_);
 
-		dxcommon_->GetDevice()->CreateRenderTargetView(offscreenrt_[i].Get(), &offscreenrtvDesc_, dxcommon_->GetRTVHandle(i));
+		dxcommon_->GetDevice()->CreateRenderTargetView(offscreenRt_[i].Get(), &offscreenRTVDesc_, dxcommon_->GetRTVHandle(i));
 	}
 
 
@@ -235,53 +235,7 @@ void OffscreenManager::CreateResource() {
 		vignetteResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&vignetteDataGPU_[i]));
 	}
 
-	grayCSData_.gray_ = { 0.2f,0.4f,0.2f };
-
-	shockData_.center = { 0.5f,0.5f,0.0f,0.0f };
-	shockData_.shockTime = 0.0f;
-	shockData_.radius = 1.0f;
-	shockData_.intensity = 0.15f;
-	shockData_.padding = 0.0f;
-
-	fireData_.animeTime = 0.0f;
-	fireData_.resolution = { 1280.0f, 720.0f };
-	fireData_.distortionStrength = 0.18f;
-	fireData_.highlightStrength = 0.6f;
-	fireData_.detailScale = 7.99f;
-	fireData_.rangeMin = { 0.05f,0.3f };
-	fireData_.rangeMax = { 0.93f,2.82f };
-	fireData_.scale = 1.20f;
-	fireData_.speed = 4.01f;
-	fireData_.noiseSpeed = -0.12f;
-	fireData_.blendStrength = 2.0f;
-
-	thunderData_.time = 0.0f;
-	thunderData_.resolution = { 1280.0f, 720.0f };
-	thunderData_.mainBranchStrength = 25.0f;
-	thunderData_.branchCount = 4.0f;
-	thunderData_.branchFade = 20.0f;
-	thunderData_.highlightStrength = 15.0f;
-	thunderData_.noiseScale = 0.2f;
-	thunderData_.noiseSpeed = 5.0f;
-	thunderData_.rangeMin = { 0.0f,0.0f };
-	thunderData_.rangeMax = { 1.0f,1.0f };
-	thunderData_.startPos = { 0.5f,0.3f };
-	thunderData_.endPos = { 0.5f,0.8f };
-	thunderData_.branchStrngth = 4.0f;
-	thunderData_.boltCount = 3.0f;
-
-	crtData_.crtTime = 0.0f;
-	crtData_.resolution = { 1280.0f, 720.0f };
-
-	outlineData_.projectionInverse = MakeIdentity4x4();
-
-	bloomData_.bloomIntensity = 1.0f;
-	bloomData_.bloomThreshold = 0.75f;
-
-	radialData_.center = Vector2(0.5f, 0.5f);
-	radialData_.blurWidth = 0.01f;
-
-	vignetteData_.color_ = { 0.8f,0.0f,0.0f };
+	InitData();
 
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
 		CopyData(i);
@@ -303,7 +257,7 @@ void OffscreenManager::SettingTexture() {
 		offscreenSRVIndex_[i] = srvManager->Allocate();
 		offscreenIndex_[i] = srvManager->Allocate();
 
-		srvManager->CreateTextureSRV(offscreenSRVIndex_[i], offscreenrt_[i].Get(), DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, 1, false);
+		srvManager->CreateTextureSRV(offscreenSRVIndex_[i], offscreenRt_[i].Get(), DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, 1, false);
 
 		offTextureHandleCPU_[i] = srvManager->GetCPUDescriptorHandle(offscreenSRVIndex_[i]);
 		offTextureHandle_[i] = srvManager->GetGPUDescriptorHandle(offscreenSRVIndex_[i]);
@@ -313,12 +267,12 @@ void OffscreenManager::SettingTexture() {
 		D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
 		uavDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 		uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
-		dxcommon_->GetDevice()->CreateUnorderedAccessView(offscreenrt_[i].Get(), nullptr, &uavDesc, offTextureUAVHandleCPU_[i]);
+		dxcommon_->GetDevice()->CreateUnorderedAccessView(offscreenRt_[i].Get(), nullptr, &uavDesc, offTextureUAVHandleCPU_[i]);
 	}
 
 
 	baseTex_ = TextureManager::GetInstance()->LoadTexture("Gradient02.jpg");
-	voronoTex_ = TextureManager::GetInstance()->LoadTexture("T_Noise04.jpg");
+	vNoiseTex_ = TextureManager::GetInstance()->LoadTexture("T_Noise04.jpg");
 	noiseTex_ = TextureManager::GetInstance()->LoadTexture("T_Noise02-300x300.jpg");
 	noiseDirTex_ = TextureManager::GetInstance()->LoadTexture("Noise_Dir.jpg");
 	noiseDirTex_ = TextureManager::GetInstance()->LoadTexture("worley_Noise.jpg");
@@ -335,11 +289,11 @@ void OffscreenManager::Command() {
 
 	if (isGrayscale_) {
 
-		dxcommon_->TransitionResource(offscreenrt_[frameIndex].Get(),
+		dxcommon_->TransitionResource(offscreenRt_[frameIndex].Get(),
 			D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
 
 
-		ComPtr<ID3D12Resource> ping = offscreenrt_[frameIndex];
+		ComPtr<ID3D12Resource> ping = offscreenRt_[frameIndex];
 		ComPtr<ID3D12Resource> pong = outputTexture_[frameIndex];
 		bool isUsePing = true;
 
@@ -413,58 +367,11 @@ void OffscreenManager::Command() {
 		}
 
 	} else {
-		dxcommon_->TransitionResource(offscreenrt_[frameIndex].Get(),
+		dxcommon_->TransitionResource(offscreenRt_[frameIndex].Get(),
 			D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_GENERIC_READ);
 	}
 
-	if (isNonePost_) {
-		dxcommon_->GetDXCommand()->SetViewAndScissor();
-		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::None);
-
-		dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
-		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, offTextureHandle_[frameIndex]);
-		dxcommon_->GetCommandList()->DrawInstanced(3, 1, 0, 0);
-	}
-
-	if (isShockWave_) {
-		dxcommon_->GetDXCommand()->SetViewAndScissor();
-		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::ShockWave);
-
-		dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
-		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, offTextureHandle_[frameIndex]);
-		dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(1, shockResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
-		dxcommon_->GetCommandList()->DrawInstanced(3, 1, 0, 0);
-	}
-
-	if (isFire_) {
-		dxcommon_->GetDXCommand()->SetViewAndScissor();
-		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Fire);
-
-		dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
-		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, offTextureHandle_[frameIndex]);
-		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, baseTex_->gpuHandle);
-		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, voronoTex_->gpuHandle);
-		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(3, noiseTex_->gpuHandle);
-		dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(4, fireResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
-		dxcommon_->GetCommandList()->DrawInstanced(3, 1, 0, 0);
-	}
-
-
-	if (isThunder_) {
-		dxcommon_->GetDXCommand()->SetViewAndScissor();
-		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Thunder);
-
-		dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
-		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, offTextureHandle_[frameIndex]);
-		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, noiseDirTex_->gpuHandle);
-		dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(2, thunderResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
-		dxcommon_->GetCommandList()->DrawInstanced(3, 1, 0, 0);
-	}
-
+	OtherPipeLineCommand();
 }
 
 void OffscreenManager::PopPostEffect(PostEffectList effect) {
@@ -546,8 +453,25 @@ void OffscreenManager::SettingVertex() {
 	}
 }
 
+void Graphics::OffscreenManager::InitData() {
+	shockData_.shockTime = 0.0f;
+
+	fireData_.animeTime = 0.0f;
+	fireData_.resolution = { MyWin::kWindowWidth, MyWin::kWindowHeight };
+
+	thunderData_.time = 0.0f;
+	thunderData_.resolution = { MyWin::kWindowWidth, MyWin::kWindowHeight };
+
+	crtData_.crtTime = 0.0f;
+	crtData_.resolution = { MyWin::kWindowWidth, MyWin::kWindowHeight };
+
+	outlineData_.projectionInverse = MakeIdentity4x4();
+
+	vignetteData_.color_ = { 0.8f,0.0f,0.0f };
+}
+
 void OffscreenManager::InitializePostEffects() {
-	postEffects_.push_back({
+	postEffects_.push_back({//Grayのセッティング
 		Pipe::GrayCS,
 		PostEffectList::Gray,
 		[=](auto* cmd, auto input, auto output) {
@@ -557,7 +481,7 @@ void OffscreenManager::InitializePostEffects() {
 		}
 		});
 
-	postEffects_.push_back({
+	postEffects_.push_back({//CRTのセッティング
 		Pipe::CRTCS,
 		PostEffectList::CRT,
 		[=](auto* cmd, auto input, auto output) {
@@ -567,7 +491,7 @@ void OffscreenManager::InitializePostEffects() {
 		}
 		});
 
-	postEffects_.push_back({
+	postEffects_.push_back({//RetroTVのセッティング
 		Pipe::RetroTVCS,
 		PostEffectList::RetroTV,
 		[=](auto* cmd, auto input, auto output) {
@@ -577,7 +501,7 @@ void OffscreenManager::InitializePostEffects() {
 		}
 		});
 
-	postEffects_.push_back({
+	postEffects_.push_back({//Gaussのセッティング
 		Pipe::GaussCS,
 		PostEffectList::Gauss,
 		[=](auto* cmd, auto input, [[maybe_unused]] auto output) {
@@ -586,7 +510,7 @@ void OffscreenManager::InitializePostEffects() {
 		}
 		});
 
-	postEffects_.push_back({
+	postEffects_.push_back({//BoxFilterのセッティング
 		Pipe::BoxFilterCS,
 		PostEffectList::BoxFilter,
 		[=](auto* cmd, auto input, [[maybe_unused]] auto output) {
@@ -595,7 +519,7 @@ void OffscreenManager::InitializePostEffects() {
 		}
 		});
 
-	postEffects_.push_back({
+	postEffects_.push_back({//Radialのセッティング
 		Pipe::RadialCS,
 		PostEffectList::Radial,
 		[=](auto* cmd, auto input, [[maybe_unused]] auto output) {
@@ -605,7 +529,7 @@ void OffscreenManager::InitializePostEffects() {
 		}
 		});
 
-	postEffects_.push_back({
+	postEffects_.push_back({//Vignetteのセッティング
 		Pipe::VignetteCS,
 		PostEffectList::Vignette,
 		[=](auto* cmd, auto input, [[maybe_unused]] auto output) {
@@ -615,7 +539,7 @@ void OffscreenManager::InitializePostEffects() {
 		}
 		});
 
-	postEffects_.push_back({
+	postEffects_.push_back({//OutLineのセッティング
 		Pipe::OutlineCS,
 		PostEffectList::Outline,
 		[=](auto* cmd, auto input, [[maybe_unused]] auto output) {
@@ -626,7 +550,7 @@ void OffscreenManager::InitializePostEffects() {
 		}
 		});
 
-	postEffects_.push_back({
+	postEffects_.push_back({//LuminanceOutLineのセッティング
 		Pipe::LuminanceOutlineCS,
 		PostEffectList::LuminanceOutline,
 		[=](auto* cmd, auto input, [[maybe_unused]] auto output) {
@@ -635,7 +559,7 @@ void OffscreenManager::InitializePostEffects() {
 		}
 		});
 
-	postEffects_.push_back({
+	postEffects_.push_back({//Bloomのセッティング
 		Pipe::BloomCS,
 		PostEffectList::Bloom,
 		[=](auto* cmd, auto input, [[maybe_unused]] auto output) {
@@ -645,7 +569,7 @@ void OffscreenManager::InitializePostEffects() {
 		}
 		});
 
-	postEffects_.push_back({
+	postEffects_.push_back({//Randomのセッティング
 		Pipe::RandomCS,
 		PostEffectList::Random,
 		[=](auto* cmd, auto input, [[maybe_unused]] auto output) {
@@ -655,6 +579,58 @@ void OffscreenManager::InitializePostEffects() {
 		}
 		});
 
+}
+
+void Graphics::OffscreenManager::OtherPipeLineCommand() {
+	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
+
+	if (isNonePost_) {
+		dxcommon_->GetDXCommand()->SetViewAndScissor();
+		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::None);
+
+		dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
+		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, offTextureHandle_[frameIndex]);
+		dxcommon_->GetCommandList()->DrawInstanced(3, 1, 0, 0);
+	}
+
+	if (isShockWave_) {
+		dxcommon_->GetDXCommand()->SetViewAndScissor();
+		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::ShockWave);
+
+		dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
+		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, offTextureHandle_[frameIndex]);
+		dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(1, shockResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
+		dxcommon_->GetCommandList()->DrawInstanced(3, 1, 0, 0);
+	}
+
+	if (isFire_) {
+		dxcommon_->GetDXCommand()->SetViewAndScissor();
+		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Fire);
+
+		dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
+		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, offTextureHandle_[frameIndex]);
+		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, baseTex_->gpuHandle);
+		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, vNoiseTex_->gpuHandle);
+		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(3, noiseTex_->gpuHandle);
+		dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(4, fireResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
+		dxcommon_->GetCommandList()->DrawInstanced(3, 1, 0, 0);
+	}
+
+
+	if (isThunder_) {
+		dxcommon_->GetDXCommand()->SetViewAndScissor();
+		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Thunder);
+
+		dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
+		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, offTextureHandle_[frameIndex]);
+		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, noiseDirTex_->gpuHandle);
+		dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(2, thunderResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
+		dxcommon_->GetCommandList()->DrawInstanced(3, 1, 0, 0);
+	}
 }
 
 void OffscreenManager::CopyData(uint32_t frameIndex) {
@@ -711,7 +687,7 @@ void OffscreenManager::CopyData(uint32_t frameIndex) {
 	thunderDataGPU_[frameIndex]->highlightStrength = thunderData_.highlightStrength;
 	thunderDataGPU_[frameIndex]->noiseScale = thunderData_.noiseScale;
 	thunderDataGPU_[frameIndex]->noiseSpeed = thunderData_.noiseSpeed;
-	thunderDataGPU_[frameIndex]->branchStrngth = thunderData_.branchStrngth;
+	thunderDataGPU_[frameIndex]->branchStrength = thunderData_.branchStrength;
 	thunderDataGPU_[frameIndex]->boltCount = thunderData_.boltCount;
-	thunderDataGPU_[frameIndex]->progres = thunderData_.progres;
+	thunderDataGPU_[frameIndex]->progress = thunderData_.progress;
 }

@@ -106,7 +106,7 @@ void GameRun::Initialize() {
 void GameRun::Finalize() {
 	dxcommon_->Flush();
 
-	commandManger_->Finalize();
+	commandManager_->Finalize();
 	sceneFactory_.reset();
 	sceneManager_->Finalize();
 	audioPlayer_->Finalize();
@@ -148,7 +148,7 @@ void GameRun::Update() {
 	GlobalVariables::GetInstance()->Update();
 	// ImGui受付
 	imguiManager_->End();
-	commandManger_->CheckInputForUndoRedo();
+	commandManager_->CheckInputForUndoRedo();
 #endif // _DEBUG
 }
 
@@ -195,7 +195,7 @@ void GameRun::DebugGUI() {
 			if (ModelManager::GetInstance()->GetPickedID() > 1000) {
 				ImGui::SetNextItemOpen(true, ImGuiCond_Once);
 			}
-			commandManger_->DebugGUI();
+			commandManager_->DebugGUI();
 			ImGui::EndTabItem();
 		}
 		if (ImGui::BeginTabItem("Camera")) {

@@ -84,7 +84,7 @@ void Framework::Init() {
 	sceneManager_ = std::make_unique<SceneManager>();
 	sceneManager_->Initialize(dxcommon_.get(), lightManager_.get());
 
-	commandManger_ = CommandManager::GetInstance();
+	commandManager_ = CommandManager::GetInstance();
 }
 
 void Core::Framework::BeginUpdate() {

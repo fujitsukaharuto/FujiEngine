@@ -5,7 +5,7 @@
 #include "../Particle.h"
 #include "GPUEmitter/SphereEmitter.h"
 #include "GPUEmitter/TextureBasedEmitter.h"
-#include "GPUEmitter/MeshSurefaceEmitter.h"
+#include "GPUEmitter/MeshSurfaceEmitter.h"
 
 #include "Model.h"
 #include "Object3d.h"
@@ -105,7 +105,7 @@ public:
 	IGPUEmitter& GetParticleCSEmitter(int index);
 	SphereEmitter& GetSphereEmitter(int index);
 	TextureBasedEmitter& GetParticleCSEmitterTexture(int index);
-	MeshSurefaceEmitter& GetParticleCSEmitterSurface(int index);
+	MeshSurfaceEmitter& GetParticleCSEmitterSurface(int index);
 
 private:
 

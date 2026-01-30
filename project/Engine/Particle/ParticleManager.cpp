@@ -475,7 +475,6 @@ void ParticleManager::LoadParentGroup(ParticleEmitter*& emit, const std::string&
 void ParticleManager::LoadAllFileData() {
 	std::string path = "resource/ParticleGroups/";
 	if (!std::filesystem::exists(path)) return;
-	//std::string path = "resource/ParticleGroups/" + name + ".json";
 
 	for (const auto& entry : std::filesystem::directory_iterator(path)) {
 		if (entry.is_regular_file()) {
@@ -488,7 +487,7 @@ void ParticleManager::LoadAllFileData() {
 	}
 }
 
-void ParticleManager::Emit(IParticleGroup* group, const Vector3& pos, const Vector3& rotate, const Particle& grain, const RandomParametor& para, uint32_t count) {
+void ParticleManager::Emit(IParticleGroup* group, const Vector3& pos, const Vector3& rotate, const Particle& grain, const RandomParameter& para, uint32_t count) {
 	if (group) {
 		uint32_t newCount = 0;
 		for (auto& particle : group->particles_) {
@@ -505,7 +504,7 @@ void ParticleManager::Emit(IParticleGroup* group, const Vector3& pos, const Vect
 	}
 }
 
-void ParticleManager::ParentEmit(IParticleGroup* group, const Vector3& pos, const Vector3& rotate, const Particle& grain, const RandomParametor& para, uint32_t count) {
+void ParticleManager::ParentEmit(IParticleGroup* group, const Vector3& pos, const Vector3& rotate, const Particle& grain, const RandomParameter& para, uint32_t count) {
 	if (group) {
 		uint32_t newCount = 0;
 		for (auto& particle : group->particles_) {
@@ -522,7 +521,7 @@ void ParticleManager::ParentEmit(IParticleGroup* group, const Vector3& pos, cons
 	}
 }
 
-void ParticleManager::EmitAnime(const std::string& name, const Vector3& pos, const AnimeData& data, const RandomParametor& para, uint32_t count) {
+void ParticleManager::EmitAnime(const std::string& name, const Vector3& pos, const AnimeData& data, const RandomParameter& para, uint32_t count) {
 	ParticleManager* instance = GetInstance();
 
 	auto iterator = instance->animeGroups_.find(name);
@@ -608,7 +607,7 @@ TextureBasedEmitter& ParticleManager::GetParticleCSEmitterTexture(int index) {
 	return instance->gpuParticleSystem_->GetParticleCSEmitterTexture(index);
 }
 
-MeshSurefaceEmitter& ParticleManager::GetParticleCSEmitterSurface(int index) {
+MeshSurfaceEmitter& ParticleManager::GetParticleCSEmitterSurface(int index) {
 	ParticleManager* instance = GetInstance();
 	return instance->gpuParticleSystem_->GetParticleCSEmitterSurface(index);
 }

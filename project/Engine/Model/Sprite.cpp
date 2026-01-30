@@ -20,7 +20,7 @@ Sprite::~Sprite() {
 
 void Sprite::Load(const std::string& fileName) {
 	material_.SetTextureNamePath(fileName);
-	nowtexture = fileName;
+	nowTexture = fileName;
 	InitializeBuffer();
 	SetAnchor({ 0.5f, 0.5f });
 	AdjustTextureSize();
@@ -91,7 +91,7 @@ void Sprite::SetAnchor(const Vector2& anchor) {
 }
 
 void Sprite::SetRange(const Vector2& leftTop, const Vector2& size) {
-	const DirectX::TexMetadata& meta = TextureManager::GetInstance()->GetMetaData(nowtexture);
+	const DirectX::TexMetadata& meta = TextureManager::GetInstance()->GetMetaData(nowTexture);
 
 	float left = leftTop.x / meta.width;
 	float right = (leftTop.x + size.x) / meta.width;
@@ -163,7 +163,7 @@ void Sprite::InitializeBuffer() {
 }
 
 void Sprite::AdjustTextureSize() {
-	const DirectX::TexMetadata& meta = TextureManager::GetInstance()->GetMetaData(nowtexture);
+	const DirectX::TexMetadata& meta = TextureManager::GetInstance()->GetMetaData(nowTexture);
 
 	size_ = { static_cast<float>(meta.width),static_cast<float>(meta.height) };
 	defaultSize_ = size_;

@@ -37,14 +37,14 @@ void DXCom::Initialize(MyWin* myWin) {
 }
 
 void DXCom::Finalize() {
-	if (pipeManager_) {
+	if (pipeManager_) {//パイプの終了処理
 		pipeManager_->Finalize();
 		pipeManager_ = nullptr;
 	}
-	if (offscreen_) {
+	if (offscreen_) {//オフスクリーンの終了処理
 		offscreen_.reset();
 	}
-	if (command_) {
+	if (command_) {//コマンドの終了処理
 		command_.reset();
 	}
 	compiler_.reset();
@@ -118,7 +118,7 @@ void DXCom::CreateDevice() {
 		}
 	}
 	assert(device_ != nullptr);
-	Logger::Log("Complete creat D3D12Device!!\n");
+	Logger::Log("Complete create D3D12Device!!\n");
 
 #ifdef _DEBUG
 	ID3D12InfoQueue* infoQueue = nullptr;
@@ -152,7 +152,7 @@ void DXCom::CreateCommand() {
 }
 
 void DXCom::CreateSwapChain() {
-	swapChain_ = nullptr;
+	swapChain_ = nullptr;// スワップチェインのデータ設定
 	swapChainDesc_.Width = MyWin::kWindowWidth;
 	swapChainDesc_.Height = MyWin::kWindowHeight;
 	swapChainDesc_.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -178,7 +178,7 @@ void DXCom::CreateRenderTargets() {
 	hr = swapChain_->GetBuffer(1, IID_PPV_ARGS(&swapChainResources_[1]));
 	assert(SUCCEEDED(hr));
 
-
+	// スワップチェイン用RTV
 	rtvDesc_.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 	rtvDesc_.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvStartHandle = rtvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
@@ -187,6 +187,7 @@ void DXCom::CreateRenderTargets() {
 	rtvHandles_[1].ptr = rtvHandles_[0].ptr + device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	device_->CreateRenderTargetView(swapChainResources_[1].Get(), &rtvDesc_, rtvHandles_[1]);
 
+	// ここより下はオフスクリーンで使う用
 	rtvHandles_[2].ptr = rtvHandles_[1].ptr + device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	rtvHandles_[3].ptr = rtvHandles_[2].ptr + device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 
@@ -544,7 +545,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DXCom::CreateReadbackResource(ID3D12Devic
 
 	// CPUから読み取れるヒープ設定
 	D3D12_HEAP_PROPERTIES heapProps{};
-	heapProps.Type = D3D12_HEAP_TYPE_READBACK;
+	heapProps.Type = D3D12_HEAP_TYPE_READBACK;// ReadBackのフラグ
 
 	D3D12_RESOURCE_DESC resourceDesc{};
 	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
@@ -574,7 +575,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DXCom::CreateUploadBuffer(size_t sizeInBy
 	HRESULT hr;
 
 	D3D12_HEAP_PROPERTIES heapProps = {};
-	heapProps.Type = D3D12_HEAP_TYPE_UPLOAD;
+	heapProps.Type = D3D12_HEAP_TYPE_UPLOAD;// Uploadのフラグ
 
 	D3D12_RESOURCE_DESC resourceDesc = {};
 	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;

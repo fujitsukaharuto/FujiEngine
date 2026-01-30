@@ -56,7 +56,7 @@ void NodeGraph::ValueUpdate(MyNode& node) {
 		for (const Pin& input : node.inputs) {
 			if (!input.isLinked) {
 				// 未接続ならNone値
-				if (input.pinType != PinType::Mateial) {
+				if (input.pinType != PinType::Material) {
 					inputValues.push_back(NodeValue());
 				} else {
 					node.child = nullptr;
@@ -77,7 +77,7 @@ void NodeGraph::ValueUpdate(MyNode& node) {
 			NameUpdate(node, *srcNode, inputNum);
 			ValueUpdate(*srcNode);
 
-			if (input.pinType == PinType::Mateial) {
+			if (input.pinType == PinType::Material) {
 				node.child = srcNode;
 				continue;
 			}
@@ -93,7 +93,7 @@ void NodeGraph::ValueUpdate(MyNode& node) {
 				}
 			}
 
-			if (input.pinType == PinType::Mateial)
+			if (input.pinType == PinType::Material)
 				continue;
 
 			if (output)
@@ -470,7 +470,7 @@ void MyNode::CreateNode(NodeType nodeType) {
 		inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input, PinType::Texture });
 		inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input, PinType::Color });
 		inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input, PinType::Vector2 });
-		inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input, PinType::Mateial });
+		inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input, PinType::Material });
 		values.push_back(NodeValue("white2x2.png"));
 		values.push_back(NodeValue(Vector4(1.0f, 1.0f, 1.0f, 1.0f)));
 		values.push_back(NodeValue(Vector2(0.0f, 0.0f)));
@@ -485,8 +485,8 @@ void MyNode::CreateNode(NodeType nodeType) {
 		inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input, PinType::Texture });
 		inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input, PinType::Color });
 		inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input, PinType::Vector2 });
-		inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input, PinType::Mateial });
-		outputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Output, PinType::Mateial });
+		inputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Input, PinType::Material });
+		outputs.push_back({ ImGuiManager::GetInstance()->GeneratePinId(), false, Pin::Type::Output, PinType::Material });
 		values.push_back(NodeValue("white2x2.png"));
 		values.push_back(NodeValue(Vector4(1.0f, 1.0f, 1.0f, 1.0f)));
 		values.push_back(NodeValue(Vector2(0.0f, 0.0f)));

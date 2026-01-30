@@ -744,7 +744,6 @@ void Object3d::CreatePropertyCommand(int type) {
 }
 
 void Object3d::NodeContentsUpdate() {
-	//SetColor(selNode->outputValue[1].Get<Vector4>());
 	if (nodeContentData_.size() == 0) {
 		return;
 	}

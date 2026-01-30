@@ -53,7 +53,7 @@ void ImGuiManager::Initialize([[maybe_unused]] MyWin* myWin, [[maybe_unused]] DX
 
 	ImFontConfig font_config;
 	font_config.SizePixels = 18.0f;
-	font_japanese = io.Fonts->AddFontFromFileTTF("externals/imgui/MPLUS1p-Medium.ttf", 18.0f, &font_config, io.Fonts->GetGlyphRangesJapanese());
+	font_japanese_ = io.Fonts->AddFontFromFileTTF("externals/imgui/MPLUS1p-Medium.ttf", 18.0f, &font_config, io.Fonts->GetGlyphRangesJapanese());
 
 
 	ImGui_ImplWin32_Init(myWin->GetHwnd());
@@ -116,7 +116,7 @@ void ImGuiManager::Draw() {
 
 void ImGuiManager::SetFontJapanese() {
 #ifdef _DEBUG
-	ImGui::PushFont(font_japanese);
+	ImGui::PushFont(font_japanese_);
 #endif // _DEBUG
 }
 
@@ -294,7 +294,7 @@ void ImGuiManager::DrawNode(MyNode& node, ed::Utilities::BlueprintNodeBuilder& b
 		ed::PinPivotAlignment(ImVec2(1.0f, 0.5f));
 		ed::PinPivotSize(ImVec2(0, 0));
 
-		if (pin.pinType == PinType::Mateial) {
+		if (pin.pinType == PinType::Material) {
 			DrawPinIcon(pin.isLinked, ax::Widgets::IconType::Square);
 		} else {
 			DrawPinIcon(pin.isLinked);
@@ -379,7 +379,7 @@ void ImGuiManager::DrawNode(MyNode& node, ed::Utilities::BlueprintNodeBuilder& b
 		ed::PinPivotAlignment(ImVec2(1.0f, 0.5f));
 		ed::PinPivotSize(ImVec2(0, 0));
 
-		if (pin.pinType == PinType::Mateial) {
+		if (pin.pinType == PinType::Material) {
 			DrawPinIcon(pin.isLinked, ax::Widgets::IconType::Square);
 		} else {
 			DrawPinIcon(pin.isLinked);
@@ -510,9 +510,9 @@ void ParticleGroupSelector::Show(std::function<void(const std::string&, bool)> o
 	const float listBoxHeight = 200.0f;
 
 	if (ImGui::BeginTable("ParticleGroupTable", 3, ImGuiTableFlags_None)) {
-		ImGui::TableSetupColumn("Emitte: False", ImGuiTableColumnFlags_WidthStretch);    // Left side
+		ImGui::TableSetupColumn("Emit: False", ImGuiTableColumnFlags_WidthStretch);    // Left side
 		ImGui::TableSetupColumn("", ImGuiTableColumnFlags_WidthFixed);      // Buttons
-		ImGui::TableSetupColumn("Emitte: True", ImGuiTableColumnFlags_WidthStretch);    // Right side
+		ImGui::TableSetupColumn("Emit: True", ImGuiTableColumnFlags_WidthStretch);    // Right side
 		ImGui::TableNextRow();
 
 		ImGui::TableHeadersRow();

@@ -25,7 +25,7 @@ class DXCom;
 /// グレースケールの色
 /// </summary>
 struct GrayCS {
-	Math::Vector3 gray_;
+	Math::Vector3 gray_= { 0.2f,0.4f,0.2f };
 };
 
 /// <summary>
@@ -47,10 +47,10 @@ struct GrayscaleVertex {
 /// 衝撃波のデータ
 /// </summary>
 struct ShockWaveData {
-	Math::Vector4 center;
+	Math::Vector4 center = { 0.5f,0.5f,0.0f,0.0f };
 	float shockTime;
-	float radius;
-	float intensity;// 歪みの強さ
+	float radius = 1.0f;
+	float intensity = 0.15f;// 歪みの強さ
 	float padding;
 };
 
@@ -60,15 +60,15 @@ struct ShockWaveData {
 struct FireElement {
 	float animeTime; // アニメーション時間
 	Math::Vector2 resolution; // 画面解像度
-	float distortionStrength; // UVディストーションの強度
-	float highlightStrength; // ハイライトの強度
-	float detailScale; // 細かいノイズのスケール
-	Math::Vector2 rangeMin; // 炎の描画範囲（最小UV）
-	Math::Vector2 rangeMax; // 炎の描画範囲（最大UV）
-	float scale; // Voronoiノイズのスケール
-	float speed; // 炎の揺らぎ速度
-	float noiseSpeed; // 細かいノイズの移動速度
-	float blendStrength;// どれくらい混ぜるか
+	float distortionStrength = 0.18f; // UVディストーションの強度
+	float highlightStrength = 0.6f; // ハイライトの強度
+	float detailScale = 7.99f; // 細かいノイズのスケール
+	Math::Vector2 rangeMin = { 0.05f,0.3f };  // 炎の描画範囲（最小UV）
+	Math::Vector2 rangeMax = { 0.93f,2.82f }; // 炎の描画範囲（最大UV）
+	float scale = 1.20f; // Voronoiノイズのスケール
+	float speed = 4.01f; // 炎の揺らぎ速度
+	float noiseSpeed = -0.12f; // 細かいノイズの移動速度
+	float blendStrength = 2.0f;// どれくらい混ぜるか
 };
 
 /// <summary>
@@ -90,37 +90,37 @@ struct OutlineElement {
 /// ブルームのデータ
 /// </summary>
 struct BloomParams {
-	float bloomThreshold; // しきい値（例：1.0）
-	float bloomIntensity; // ブルーム強度（例：1.2）
+	float bloomThreshold = 0.75f; // しきい値（例：1.0）
+	float bloomIntensity = 1.0f; // ブルーム強度（例：1.2）
 };
 
 /// <summary>
 /// ラジアルブラーのデータ
 /// </summary>
 struct RadialParams {
-	Math::Vector2 center;
-	float blurWidth;
+	Math::Vector2 center = { 0.5f, 0.5f };
+	float blurWidth = 0.01f;
 };
 
 /// <summary>
 /// 雷エフェクトのデータ
 /// </summary>
 struct LightningElement {
-	Math::Vector2 startPos;
-	Math::Vector2 endPos;
-	Math::Vector2 rangeMin; // 描画範囲（最小UV）
-	Math::Vector2 rangeMax; // 描画範囲（最大UV）
+	Math::Vector2 startPos = { 0.5f,0.3f };
+	Math::Vector2 endPos = { 0.5f,0.8f };
+	Math::Vector2 rangeMin = { 0.0f,0.0f }; // 描画範囲（最小UV）
+	Math::Vector2 rangeMax = { 1.0f,1.0f }; // 描画範囲（最大UV）
 	Math::Vector2 resolution; // 画面解像度
 	float time; // アニメーション時間
-	float mainBranchStrength; // 主幹の強度
-	float branchCount; // 分岐の数
-	float branchFade; // 分岐のフェード率
-	float highlightStrength; // ハイライトの強度
-	float noiseScale; // ノイズのスケール
-	float noiseSpeed; // ノイズの移動速度
-	float branchStrngth;
-	float boltCount;
-	float progres;
+	float mainBranchStrength = 25.0f; // 主幹の強度
+	float branchCount = 4.0f; // 分岐の数
+	float branchFade = 20.0f; // 分岐のフェード率
+	float highlightStrength = 15.0f; // ハイライトの強度
+	float noiseScale = 0.2f; // ノイズのスケール
+	float noiseSpeed = 5.0f; // ノイズの移動速度
+	float branchStrength = 4.0f;
+	float boltCount = 3.0f;
+	float progress;
 };
 
 enum class PostEffectList : int {
@@ -188,7 +188,7 @@ namespace Graphics {
 
 		//========================================================================*/
 		//* Getter
-		ID3D12Resource* GetOffscreenResource(uint32_t index) { return offscreenrt_[index].Get(); }
+		ID3D12Resource* GetOffscreenResource(uint32_t index) { return offscreenRt_[index].Get(); }
 		const D3D12_CLEAR_VALUE& GetClearColorValue() const { return clearColorValue_; }
 
 		//========================================================================*/
@@ -199,15 +199,17 @@ namespace Graphics {
 	private:
 
 		void SettingVertex();
+		void InitData();
 		void InitializePostEffects();
+		void OtherPipeLineCommand();
 		void CopyData(uint32_t frameIndex = 0);
 
 	private:
 
 		DXCom* dxcommon_ = nullptr;
 
-		ComPtr<ID3D12Resource> offscreenrt_[DXC::kFrameCount_];
-		D3D12_RENDER_TARGET_VIEW_DESC offscreenrtvDesc_{};
+		ComPtr<ID3D12Resource> offscreenRt_[DXC::kFrameCount_];
+		D3D12_RENDER_TARGET_VIEW_DESC offscreenRTVDesc_{};
 		D3D12_CLEAR_VALUE clearColorValue_{};
 		uint32_t offscreenSRVIndex_[DXC::kFrameCount_];
 		uint32_t offscreenIndex_[DXC::kFrameCount_];
@@ -255,7 +257,7 @@ namespace Graphics {
 		VignetteData vignetteData_;
 
 		Texture* baseTex_;
-		Texture* voronoTex_;
+		Texture* vNoiseTex_;
 		Texture* noiseTex_;
 		Texture* noiseDirTex_;
 
@@ -282,5 +284,6 @@ namespace Graphics {
 		bool isFire_ = true;
 		bool isThunder_ = true;
 
+		float maxThunderTime_ = 1.5f;
 	};
 }

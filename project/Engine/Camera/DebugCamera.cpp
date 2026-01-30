@@ -22,9 +22,8 @@ DebugCamera* DebugCamera::GetInstance() {
 void DebugCamera::Initialize() {
 	matRot_ = MakeIdentity4x4();
 	viewMatrix_ = MakeIdentity4x4();
-	translation_ = { 0.0f,5.0f,-30.0f };
-	pitch_ = 0.15f;
-	projectionMatrix_ = MakePerspectiveFovMatrix(0.45f, float(MyWin::kWindowWidth) / float(MyWin::kWindowHeight), 0.1f, 100.0f);
+	translation_ = params_.initPos;
+	projectionMatrix_ = MakePerspectiveFovMatrix(params_.fovY, float(MyWin::kWindowWidth) / float(MyWin::kWindowHeight), params_.nearClip, params_.farClip);
 }
 
 void DebugCamera::Update() {
@@ -38,22 +37,20 @@ void DebugCamera::InputUpdate() {
 
 	moveTrans_ = Vector3::GetZeroVec();
 	// ホイールでズーム
-	const float zoomSpeed = 0.1f;
 	float wheel = Input::GetInstance()->GetWheel();
 	if (wheel != 0.0f) {
-		moveTrans_.z += zoomSpeed * wheel; // ズームの方向
+		moveTrans_.z += params_.zoomSpeed * wheel; // ズームの方向
 	}
 
 	Vector2 mousePos = Input::GetInstance()->GetMousePosition();
 	// マウスのドラッグで回転
 	
 	if (Input::GetInstance()->IsPressMouse(1)) {
-		const float moveSpeed = 0.1f; // 調整可
 		float deltaX = mousePos.x - lastMousePos_.x;
 		float deltaY = mousePos.y - lastMousePos_.y;
 
-		moveTrans_.x -= deltaX * moveSpeed;
-		moveTrans_.y += deltaY * moveSpeed;
+		moveTrans_.x -= deltaX * params_.moveSpeed;
+		moveTrans_.y += deltaY * params_.moveSpeed;
 
 	} else if (Input::GetInstance()->IsPressMouse(2)) {
 		// ドラッグによる角度の更新
@@ -68,14 +65,13 @@ void DebugCamera::InputUpdate() {
 		if (fabs(deltaX) < threshold) deltaX = 0.0f;
 
 
-		const float rotationSpeed = 0.0025f;
-		yaw_ += deltaX * rotationSpeed;  // 横の回転
-		pitch_ += deltaY * rotationSpeed; // 縦の回転
+		params_.yaw += deltaX * params_.rotateSpeed;  // 横の回転
+		params_.pitch += deltaY * params_.rotateSpeed; // 縦の回転
 
-		// pitch_の回転範囲を制限 (-89度～89度程度)
+		// pitchの回転範囲を制限 (-89度～89度程度)
 		const float pitchLimit = 90.0f * (std::numbers::pi_v<float> / 180.0f);
-		if (pitch_ > pitchLimit) pitch_ = pitchLimit;
-		if (pitch_ < -pitchLimit) pitch_ = -pitchLimit;
+		if (params_.pitch > pitchLimit) params_.pitch = pitchLimit;
+		if (params_.pitch < -pitchLimit) params_.pitch = -pitchLimit;
 	}
 	// マウスの位置を更新
 	lastMousePos_ = { mousePos.x, mousePos.y };
@@ -83,8 +79,7 @@ void DebugCamera::InputUpdate() {
 
 void DebugCamera::TransUpdate() {
 	if (moveTrans_.z != 0.0f) {
-		const float speed = 0.1f;
-		Vector3 move = { 0.0f,0.0f,speed * moveTrans_.z };
+		Vector3 move = { 0.0f,0.0f,params_.moveSpeed * moveTrans_.z };
 		move = TransformNormal(move, matRot_);
 		translation_ += move;
 		pivot_ += move;
@@ -92,8 +87,7 @@ void DebugCamera::TransUpdate() {
 
 
 	if (moveTrans_.x != 0.0f) {
-		const float speed = 0.1f;
-		Vector3 move = { speed * moveTrans_.x,0.0f,0.0f };
+		Vector3 move = { params_.moveSpeed * moveTrans_.x,0.0f,0.0f };
 		move = TransformNormal(move, matRot_);
 		translation_ += move;
 		pivot_ += move;
@@ -101,8 +95,7 @@ void DebugCamera::TransUpdate() {
 
 
 	if (moveTrans_.y != 0.0f) {
-		const float speed = 0.1f;
-		Vector3 move = { 0.0f,speed * moveTrans_.y,0.0f };
+		Vector3 move = { 0.0f,params_.moveSpeed * moveTrans_.y,0.0f };
 		move = TransformNormal(move, matRot_);
 		translation_ += move;
 		pivot_ += move;
@@ -113,9 +106,9 @@ void DebugCamera::ViewUpdate() {
 	// 初期状態の回転行列
 	Matrix4x4 rotation = MakeIdentity4x4();
 	// 縦回転（Pitch）をローカルX軸に基づいて適用
-	rotation = Multiply(rotation, MakeRotateXMatrix(pitch_));
+	rotation = Multiply(rotation, MakeRotateXMatrix(params_.pitch));
 	// 横回転（Yaw）をローカルY軸に基づいて適用
-	rotation = Multiply(rotation, MakeRotateYMatrix(yaw_));
+	rotation = Multiply(rotation, MakeRotateYMatrix(params_.yaw));
 	// 最終的な回転行列を更新
 	matRot_ = rotation;
 }

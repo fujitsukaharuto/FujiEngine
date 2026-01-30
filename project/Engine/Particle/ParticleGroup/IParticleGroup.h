@@ -34,6 +34,6 @@ public:
 	void SRTUpdate(Particle& particle);
 	/// <summary>パーティクルのビルボード処理</summary>
 	void Billboard(Particle& particle, Math::Matrix4x4& worldMatrix, const Math::Matrix4x4& billboardMatrix, const Math::Matrix4x4& rotate, Camera* camera);
-	bool InitEmitParticle(Particle& particle, const Math::Vector3& pos, const Math::Vector3& rotate, const Particle& grain, const RandomParametor& para);
+	bool InitEmitParticle(Particle& particle, const Math::Vector3& pos, const Math::Vector3& rotate, const Particle& grain, const RandomParameter& para);
 
 };

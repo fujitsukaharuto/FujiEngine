@@ -87,7 +87,7 @@ void GameScene::Initialize() {
 	gameOver_->SetSize({ MyWin::kWindowWidth, MyWin::kWindowHeight });
 
 	gameOverSelector_ = std::make_unique<Sprite>();
-	gameOverSelector_->Load("boal16x16.png");
+	gameOverSelector_->Load("ball16x16.png");
 	gameOverSelector_->SetPos(selectPointL_);
 	gameOverSelector_->SetColor({ 0.7f, 0.7f, 0.1f, 1.0f });
 	gameOverSelector_->SetSize({ 40.0f, 40.0f });

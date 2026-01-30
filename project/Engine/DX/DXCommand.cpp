@@ -129,6 +129,7 @@ void DXCommand::Initialize(ID3D12Device* device) {
 }
 
 void DXCommand::Flush() {
+	// Compute側のQueueのGPU実行を待つ
 	{
 		globalComputeFenceValue_++;
 		computeFenceValue_[frameIndex_] = globalComputeFenceValue_;
@@ -140,6 +141,7 @@ void DXCommand::Flush() {
 		WaitForSingleObject(fenceEvent, INFINITE);
 		CloseHandle(fenceEvent);
 	}
+	// Graphics側のQueueのGPU実行を待つ
 	{
 		globalFenceValue_++;
 		fenceValue_[frameIndex_] = globalFenceValue_;

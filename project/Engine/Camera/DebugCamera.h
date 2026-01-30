@@ -11,6 +11,20 @@ public:
 
 public:
 
+	struct DebugCameraParam {
+		Math::Vector3 initPos = { 0.0f,5.0f,-30.0f };
+		float fovY = 0.45f;
+		float nearClip = 0.1f;
+		float farClip = 100.0f;
+
+		float zoomSpeed = 0.1f;
+		float moveSpeed = 0.1f;
+		float rotateSpeed = 0.0025f;
+
+		float pitch = 0.15f;
+		float yaw= 0.0f;
+	};
+
 	static DebugCamera* GetInstance();
 	void Initialize();
 	void Update();
@@ -62,7 +76,7 @@ private:
 	Math::Matrix4x4 projectionMatrix_;
 
 	Math::Vector3 moveTrans_ = { 0.0f,0.0f,0.0f };
-	float pitch_ = 0.0f;
-	float yaw_ = 0.0f;
 	Math::Vector2 lastMousePos_{};
+
+	DebugCameraParam params_;
 };

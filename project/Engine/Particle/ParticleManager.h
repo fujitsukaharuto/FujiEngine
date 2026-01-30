@@ -72,11 +72,11 @@ public:
 	static void LoadAllFileData();
 
 	/// <summary>パーティクルの発生</summary>
-	static void Emit(IParticleGroup* group, const Math::Vector3& pos, const Math::Vector3& rotate, const Particle& grain, const RandomParametor& para, uint32_t count);
+	static void Emit(IParticleGroup* group, const Math::Vector3& pos, const Math::Vector3& rotate, const Particle& grain, const RandomParameter& para, uint32_t count);
 	/// <summary>ペアレントパーティクルの発生</summary>
-	static void ParentEmit(IParticleGroup* group, const Math::Vector3& pos, const Math::Vector3& rotate, const Particle& grain, const RandomParametor& para, uint32_t count);
+	static void ParentEmit(IParticleGroup* group, const Math::Vector3& pos, const Math::Vector3& rotate, const Particle& grain, const RandomParameter& para, uint32_t count);
 	/// <summary>アニメーションパーティクルの発生</summary>
-	static void EmitAnime(const std::string& name, const Math::Vector3& pos, const AnimeData& data, const RandomParametor& para, uint32_t count);
+	static void EmitAnime(const std::string& name, const Math::Vector3& pos, const AnimeData& data, const RandomParameter& para, uint32_t count);
 	/// <summary>アニメーションパーティクルの設定</summary>
 	static void AddAnime(const std::string& name, const std::string& fileName, float animeChangeTime);
 
@@ -87,7 +87,7 @@ public:
 	static IGPUEmitter& GetParticleCSEmitter(int index);
 	static SphereEmitter& GetSphereEmitter(int index);
 	static TextureBasedEmitter& GetParticleCSEmitterTexture(int index);
-	static MeshSurefaceEmitter& GetParticleCSEmitterSurface(int index);
+	static MeshSurfaceEmitter& GetParticleCSEmitterSurface(int index);
 
 	static void SetIsStopped(bool flag);
 

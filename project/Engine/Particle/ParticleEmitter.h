@@ -10,7 +10,7 @@ class IParticleGroup;
 /// <summary>
 /// ランダムパラメーターのデータ
 /// </summary>
-struct RandomParametor {
+struct RandomParameter {
 	Math::Vector2 speedx;
 	Math::Vector2 speedy;
 	Math::Vector2 speedz;
@@ -104,7 +104,7 @@ public:
 	Particle grain_{};
 	AnimeData animeData_{};
 	uint32_t count_;
-	RandomParametor para_;
+	RandomParameter para_;
 	bool isAddRandomSize_ = false;
 	Math::Vector2 addRandomMax_;
 	Math::Vector2 addRandomMin_;

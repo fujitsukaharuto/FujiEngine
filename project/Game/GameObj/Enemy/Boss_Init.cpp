@@ -248,8 +248,8 @@ void Boss::InitEmitter() {
 	roaringParticle_.pos_.y = -6.5f;
 	roaringParticle_.pos_.z = 5.0f;
 
-	ParticleManager::Load(dushStartParticle_, "duahChargeCompleteParticle");
-	ParticleManager::Load(dushStartCircle_, "duahChargeCompleteCircle");
+	ParticleManager::Load(dushStartParticle_, "dushChargeCompleteParticle");
+	ParticleManager::Load(dushStartCircle_, "dushChargeCompleteCircle");
 	ParticleManager::Load(dushSmoke_, "dushGroundSmoke");
 	dushStartParticle_.frequencyTime_ = 0.0f;
 	dushStartCircle_.frequencyTime_ = 0.0f;

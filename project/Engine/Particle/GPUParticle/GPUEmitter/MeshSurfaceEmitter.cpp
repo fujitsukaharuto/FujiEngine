@@ -1,4 +1,4 @@
-#include "MeshSurefaceEmitter.h"
+#include "MeshSurfaceEmitter.h"
 #include "Engine/DX/DXCom.h"
 #include "Engine/DX/SRVManager.h"
 #include "Engine/Model/ModelManager.h"
@@ -10,7 +10,7 @@ using namespace Graphics;
 using namespace Math;
 
 
-MeshSurefaceEmitter::MeshSurefaceEmitter(DXCom* dx) {
+MeshSurfaceEmitter::MeshSurfaceEmitter(DXCom* dx) {
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
 		resource_[i] = dx->CreateBufferResource(dx->GetDevice(), sizeof(EmitterSurface));
 		dataGPU_[i] = nullptr;
@@ -30,7 +30,7 @@ MeshSurefaceEmitter::MeshSurefaceEmitter(DXCom* dx) {
 	}
 }
 
-void MeshSurefaceEmitter::InitMeshData(const std::string& fileName, DXCom* dx, SRVManager* srv) {
+void MeshSurfaceEmitter::InitMeshData(const std::string& fileName, DXCom* dx, SRVManager* srv) {
 	ModelData data = ModelManager::GetInstance()->FindModel(fileName);
 	verticesResource = dx->CreateBufferResource(dx->GetDevice(), (sizeof(VertexDate) * data.vertices.size()));
 	indiciesResource = dx->CreateBufferResource(dx->GetDevice(), (sizeof(uint32_t) * data.indicies.size()));
@@ -86,7 +86,7 @@ void MeshSurefaceEmitter::InitMeshData(const std::string& fileName, DXCom* dx, S
 	data_.triangleCount = int(cdf.size());
 }
 
-void MeshSurefaceEmitter::Update(float deltaTime) {
+void MeshSurfaceEmitter::Update(float deltaTime) {
 	if (isOnceEmit_) {
 		data_.emit = 1;
 		data_.frequencyTime = 0.0f;
@@ -108,7 +108,7 @@ void MeshSurefaceEmitter::Update(float deltaTime) {
 	}
 }
 
-void MeshSurefaceEmitter::Dispatch(ID3D12GraphicsCommandList* cmd,
+void MeshSurfaceEmitter::Dispatch(ID3D12GraphicsCommandList* cmd,
 	DXCom* dx, SRVManager* srv, const ParticleCSHandles& shared) {
 	if (!isEmit_ || data_.count == 0) return;
 	uint32_t frameIndex = dx->GetNowFrameCount();
@@ -131,7 +131,7 @@ void MeshSurefaceEmitter::Dispatch(ID3D12GraphicsCommandList* cmd,
 	cmd->Dispatch((data_.count + 1024 - 1) / 1024, 1, 1);
 }
 
-void MeshSurefaceEmitter::DebugGUI() {
+void MeshSurfaceEmitter::DebugGUI() {
 #ifdef _DEBUG
 	if (ImGui::TreeNode("ParticleCS Emit Control")) {
 		ImGui::Checkbox("IsEmit", &isEmit_);
@@ -161,7 +161,7 @@ void MeshSurefaceEmitter::DebugGUI() {
 #endif // _DEBUG
 }
 
-void MeshSurefaceEmitter::Save(const std::string& fileName) {
+void MeshSurfaceEmitter::Save(const std::string& fileName) {
 	json j;
 
 	j["emitCount"] = data_.count;
@@ -181,7 +181,7 @@ void MeshSurefaceEmitter::Save(const std::string& fileName) {
 	JsonSerializer::SerializeJsonData(j, (kDirectoryPath_ + fileName + ".json").c_str());
 }
 
-void MeshSurefaceEmitter::Load(const std::string& fileName) {
+void MeshSurfaceEmitter::Load(const std::string& fileName) {
 	std::string path = kDirectoryPath_ + fileName + ".json";
 	json j = JsonSerializer::DeserializeJsonData(path);
 	strcpy_s(saveName_, sizeof(saveName_), fileName.c_str());
@@ -226,36 +226,36 @@ void MeshSurefaceEmitter::Load(const std::string& fileName) {
 	data_.velocityRandMin = j.value("velRandMin", data_.velocityRandMin);
 }
 
-void MeshSurefaceEmitter::Emit() {
+void MeshSurfaceEmitter::Emit() {
 	isOnceEmit_ = true;
 }
 
-void MeshSurefaceEmitter::SetPos(const Vector3& pos) {
+void MeshSurfaceEmitter::SetPos(const Vector3& pos) {
 	data_.translate = pos;
 }
 
-void MeshSurefaceEmitter::SetCount(int count) {
+void MeshSurfaceEmitter::SetCount(int count) {
 	data_.count = count;
 }
 
-void MeshSurefaceEmitter::SetLifeTime(float lifeTime) {
+void MeshSurfaceEmitter::SetLifeTime(float lifeTime) {
 	data_.lifeTime = lifeTime;
 }
 
-void MeshSurefaceEmitter::SetScale(const Math::Vector3& scale) {
+void MeshSurfaceEmitter::SetScale(const Math::Vector3& scale) {
 	data_.scale = scale;
 }
 
-void MeshSurefaceEmitter::SetRadius(float radius) {
+void MeshSurfaceEmitter::SetRadius(float radius) {
 	data_.radius = radius;
 }
 
-void MeshSurefaceEmitter::SetColorRandom(const Math::Vector3& max, const Math::Vector3& min) {
+void MeshSurfaceEmitter::SetColorRandom(const Math::Vector3& max, const Math::Vector3& min) {
 	data_.colorMax = max;
 	data_.colorMin = min;
 }
 
-void MeshSurefaceEmitter::CopyData(uint32_t frameIndex) {
+void MeshSurfaceEmitter::CopyData(uint32_t frameIndex) {
 	dataGPU_[frameIndex]->translate = data_.translate;
 	dataGPU_[frameIndex]->scale = data_.scale;
 	dataGPU_[frameIndex]->radius = data_.radius;

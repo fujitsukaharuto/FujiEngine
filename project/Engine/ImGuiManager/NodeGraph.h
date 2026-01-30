@@ -82,7 +82,7 @@ enum class PinType {
 	Vector2,
 	Color,
 	Texture,
-	Mateial,
+	Material,
 };
 
 enum class PinKind {

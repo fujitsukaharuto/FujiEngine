@@ -15,7 +15,7 @@ struct SpotLightData {
 	float decay;
 	float cosAngle;
 	float cosFalloffStart;
-	float pading[1];
+	float padding[1];
 };
 
 /// <summary>

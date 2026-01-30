@@ -183,8 +183,8 @@ void TextureBasedEmitter::SetLifeTime(float lifeTime) {
 	data_.lifeTime = lifeTime;
 }
 
-void TextureBasedEmitter::SetScale([[maybe_unused]]const Math::Vector3& scale) {
-	//data_.scale = scale;
+void TextureBasedEmitter::SetScale(const Math::Vector3& scale) {
+	data_.radius = scale.x;
 }
 
 void TextureBasedEmitter::SetRadius(float radius) {

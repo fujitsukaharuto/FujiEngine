@@ -145,7 +145,6 @@ void ModelManager::LoadOBJ(const std::string& filename, bool overWrite) {
 			vertex.position.x *= -1.0f;
 			vertex.normal.x *= -1.0f;
 
-			//newMesh.AddVertex({ {vertex.position},{vertex.texcoord},{vertex.normal} });
 			model->data_.vertices.push_back({ {vertex.position},{vertex.texcoord},{vertex.normal} });
 			newModelMesh.vertices.push_back({ {vertex.position},{vertex.texcoord},{vertex.normal} });
 		}
@@ -156,7 +155,6 @@ void ModelManager::LoadOBJ(const std::string& filename, bool overWrite) {
 
 			for (uint32_t element = 0; element < face.mNumIndices; element++) {
 				uint32_t vertexIndex = face.mIndices[element];
-				//newMesh.AddIndex(vertexIndex + meshVertexCount);
 				model->data_.indicies.push_back(vertexIndex);
 				newModelMesh.indicies.push_back(vertexIndex);
 			}

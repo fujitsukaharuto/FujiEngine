@@ -114,7 +114,7 @@ void SphereEmitter::DebugGUI() {
 	int moveType = static_cast<int>(data_.isRandomMove);
 	const char* items[] = {
 		"None",     // 0
-		"Gradiate", // 1
+		"Gradate", // 1
 		"Curl"      // 2
 	};
 	if (ImGui::Combo("MoveType", &moveType, items, IM_ARRAYSIZE(items))) {

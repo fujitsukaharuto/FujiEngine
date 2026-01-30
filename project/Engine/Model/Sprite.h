@@ -53,10 +53,6 @@ namespace Graphics {
 		//* Getter
 		Math::Vector2 GetDefaultSize() const { return defaultSize_; }
 
-		/*void SetPointLight(PointLight* light) { pointLight_ = light; }
-
-		void SetSpotLight(SpotLight* light) { spotLight_ = light; }*/
-
 	private:
 
 		void InitializeBuffer();
@@ -91,7 +87,7 @@ namespace Graphics {
 		ObjIDData* objIDData_ = nullptr;
 
 		Material material_;
-		std::string nowtexture;
+		std::string nowTexture;
 
 		Math::Vector2 anchorPoint_{ 0.5f,0.5f };
 		Math::Vector3 position_ = { 0,0,0 };

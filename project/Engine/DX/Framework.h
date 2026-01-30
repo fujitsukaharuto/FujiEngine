@@ -74,6 +74,6 @@ namespace Core {
 		std::unique_ptr<Graphics::LightManager> lightManager_ = nullptr;
 		ParticleManager* pManager_ = nullptr;
 		Graphics::Line3dDrawer* line3dDrawer_ = nullptr;
-		CommandManager* commandManger_;
+		CommandManager* commandManager_;
 	};
 }
