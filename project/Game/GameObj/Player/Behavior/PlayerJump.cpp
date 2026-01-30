@@ -29,9 +29,9 @@ void PlayerJump::Update() {
 
 		if ((input->TriggerKey(DIK_SPACE) || input->TriggerButton(PadInput::X)) && isSecoundJump_) {
 			if (speed_ > 0.0f) {
-				speed_ += pPlayer_->GetSecoundJumpSpeed();
+				speed_ += pPlayer_->GetSecondJumpSpeed();
 			} else {
-				speed_ = pPlayer_->GetSecoundJumpSpeed();
+				speed_ = pPlayer_->GetSecondJumpSpeed();
 			}
 			speed_ = pPlayer_->GetJumpSpeed();
 			pPlayer_->SetFallSpeed(speed_);

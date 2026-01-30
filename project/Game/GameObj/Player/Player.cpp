@@ -62,7 +62,7 @@ void Player::Initialize() {
 	hpFrame_[1]->SetSize(hpSprite.hpFrameInSize);
 
 	moveSpeed_ = 0.2f;
-	secoundJumpSpeed_ = 0.1f;
+	secondJumpSpeed_ = 0.1f;
 	jumpSpeed_ = 0.2f;
 	gravity_ = 0.005f;
 	maxFallSpeed_ = 2.0f;
@@ -113,8 +113,8 @@ void Player::Update() {
 			attackBehavior_->Update();
 
 			if (isStrongState_) {
-				storongStateEmitter1_->Emit();
-				storongStateEmitter2_.Emit();
+				strengthStateEmitter1_->Emit();
+				strengthStateEmitter2_.Emit();
 			}
 
 			for (auto& bullet : bullets_) {
@@ -127,7 +127,7 @@ void Player::Update() {
 						Vector3 targetPos = model_->transform.translate + worldForward;
 						bullet->Charge(targetPos, model_->transform.rotate);
 					} else {
-						bullet->CalculetionFollowVec(targetPos_);
+						bullet->CalculationFollowVec(targetPos_);
 					}
 
 					bullet->Update();
@@ -202,9 +202,9 @@ void Player::ParameterGUI() {
 #ifdef _DEBUG
 	ImGui::Indent();
 	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Selected;
-	if (ImGui::TreeNodeEx("Paramater", flags)) {
+	if (ImGui::TreeNodeEx("Parameter", flags)) {
 		ImGui::DragFloat("moveSpeed", &moveSpeed_, 0.01f);
-		ImGui::DragFloat("jumpSpeedw", &jumpSpeed_, 0.01f);
+		ImGui::DragFloat("jumpSpeedW", &jumpSpeed_, 0.01f);
 		ImGui::DragFloat("gravity", &gravity_, 0.01f);
 		ImGui::DragFloat("maxFallSpeed", &maxFallSpeed_, 0.01f);
 		ImGui::DragFloat("playerHP", &params_.hp.hp, 0.01f);
@@ -381,11 +381,8 @@ void Player::MoveTrans(const float& speed) {
 void Player::MoveRotate() {
 	Vector3 forward = (targetPos_ - model_->transform.translate).Normalize();
 	Quaternion targetRotation = Quaternion::LookRotation(forward);
-	// 現在の回転（Y軸回転からクォータニオンを構成する）
-	//Quaternion currentRotation = Quaternion::FromEuler(model_->transform.rotate);
 	// 最短経路で補間
 	Quaternion newRotation = targetRotation;
-	//Quaternion newRotation = Quaternion::Slerp(targetRotation, currentRotation, 0.01f); // なんかバグっちゃってる
 
 	float zRotate = 0.0f;
 	// 移動方向によって傾きを加える
@@ -424,14 +421,14 @@ Vector3 Player::GetInputDirection() {
 
 	XINPUT_STATE pad;
 	if (input->GetGamepadState(pad)) {
-		Vector2 lstick = input->GetLStick();
-		if (fabsf(lstick.x) > 0.01f || fabsf(lstick.y) > 0.01f) {
-			inputDirection_.x += lstick.x;
-			inputDirection_.z += lstick.y;
+		Vector2 lStick = input->GetLStick();
+		if (fabsf(lStick.x) > 0.01f || fabsf(lStick.y) > 0.01f) {
+			inputDirection_.x += lStick.x;
+			inputDirection_.z += lStick.y;
 			// 回避方向
-			if (lstick.x < 0) {
+			if (lStick.x < 0) {
 				avoidDirection_ = -1.0f;
-			} else if (lstick.x > 0) {
+			} else if (lStick.x > 0) {
 				avoidDirection_ = 1.0f;
 			}
 		}
@@ -461,8 +458,8 @@ bool Player::GetIsMove() {
 		};
 	}
 
-	Vector2 lstick = input->GetLStick();
-	if (fabs(lstick.x) > 0.01f || fabs(lstick.y) > 0.01f) {
+	Vector2 lStick = input->GetLStick();
+	if (fabs(lStick.x) > 0.01f || fabs(lStick.y) > 0.01f) {
 		isMove = true;
 	}
 
@@ -562,7 +559,7 @@ void Player::ReleaseBullet() {
 			AudioPlayer::GetInstance()->SoundPlayWave(*shotSE_, 0.1f);
 
 			isStrongState_ = false;
-			if (bullet->GetIsStrnght()) {
+			if (bullet->GetIsStrength()) {
 				strongShotWave_.Emit();
 			} else {
 				shotWave_.Emit();
@@ -572,10 +569,10 @@ void Player::ReleaseBullet() {
 	}
 }
 
-void Player::StrngthBullet() {
+void Player::StrengthBullet() {
 	for (auto& bullet : bullets_) {
 		if (bullet->GetIsLive() && bullet->GetIsCharge()) {
-			bullet->StrnghtBullet();
+			bullet->StrengthBullet();
 		}
 	}
 }
@@ -593,16 +590,16 @@ void Player::LandingUpdate() {
 		model_->transform.translate = pos;
 
 		if (startLandingTime_ > startLandingMax_ * 0.025f) {
-			float pret = (std::min)((1.0f - (startLandingTime_ + delta) / startLandingMax_), 1.0f);
+			float preT = (std::min)((1.0f - (startLandingTime_ + delta) / startLandingMax_), 1.0f);
 			Vector3 dir = (2.0f * (1.0f - t)) * (titleCenterP_ - titleStartP_) + (2.0f * t) * (titleEndP_ - titleCenterP_);
 			dir = dir.Normalize();
-			Vector3 predir = (2.0f * (1.0f - pret)) * (titleCenterP_ - titleStartP_) + (2.0f * pret) * (titleEndP_ - titleCenterP_);
-			predir = predir.Normalize();
+			Vector3 preDir = (2.0f * (1.0f - preT)) * (titleCenterP_ - titleStartP_) + (2.0f * preT) * (titleEndP_ - titleCenterP_);
+			preDir = preDir.Normalize();
 
 			// 前方向と現在方向から回転を取得
 			Quaternion rot = Quaternion::LookRotation(dir);
-			Quaternion prerot = Quaternion::LookRotation(predir);
-			Quaternion newRot = Quaternion::SLerp(prerot, rot, 0.1f);
+			Quaternion preRot = Quaternion::LookRotation(preDir);
+			Quaternion newRot = Quaternion::SLerp(preRot, rot, 0.1f);
 
 			model_->transform.rotate = Quaternion::QuaternionToEuler(newRot);
 		} else {
@@ -727,10 +724,10 @@ void Player::ParticleEmitterSetting() {
 	avoidEmitter2_->frequencyTime_ = 0.0f;
 	avoidEmitter3_->frequencyTime_ = 0.0f;
 
-	ParticleManager::LoadParentGroup(storongStateEmitter1_, "playerStrongState1");
-	ParticleManager::Load(storongStateEmitter2_, "playerStrongState2");
-	storongStateEmitter1_->SetParent(&strongStatePos_->transform);
-	storongStateEmitter2_.SetParent(&model_->transform);
+	ParticleManager::LoadParentGroup(strengthStateEmitter1_, "playerStrongState1");
+	ParticleManager::Load(strengthStateEmitter2_, "playerStrongState2");
+	strengthStateEmitter1_->SetParent(&strongStatePos_->transform);
+	strengthStateEmitter2_.SetParent(&model_->transform);
 
 }
 

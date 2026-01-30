@@ -23,7 +23,7 @@ struct PlayerHPParams {
 	float damageCoolTime = 60.0f;
 };
 
-struct PlayerHPSpritParms {
+struct PlayerHPSpritParams {
 	Math::Vector4 color = { 0.7f,0.211f,0.505f,1.0f };
 	Math::Vector2 hpSize = { 275.0f,35.0f };
 	Math::Vector2 hpStartPos = { 55.0f,650.0f };
@@ -34,7 +34,7 @@ struct PlayerHPSpritParms {
 
 struct PlayerParams {
 	PlayerHPParams hp;
-	PlayerHPSpritParms hpSprite;
+	PlayerHPSpritParams hpSprite;
 };
 
 /// <summary>
@@ -101,7 +101,7 @@ public:
 	/// <summary>発射時の処理</summary>
 	void ReleaseBullet();
 	/// <summary>弾の強化</summary>
-	void StrngthBullet();
+	void StrengthBullet();
 
 	//========================================================================*/
 	//* Landing
@@ -112,7 +112,7 @@ public:
 	//* Getter
 	float GetMoveSpeed() { return moveSpeed_; }
 	float GetJumpSpeed() { return jumpSpeed_; }
-	float GetSecoundJumpSpeed() { return secoundJumpSpeed_; }
+	float GetSecondJumpSpeed() { return secondJumpSpeed_; }
 	float GetFallSpeed() { return fallSpeed_; }
 	float GetMaxChargeTime() { return maxChargeTime_; }
 	float GetAvoidCoolTime() { return avoidCoolTime_; }
@@ -177,7 +177,7 @@ private:
 
 	float moveSpeed_ = 0.0f;
 	float jumpSpeed_ = 0.0f;
-	float secoundJumpSpeed_ = 0.0f;
+	float secondJumpSpeed_ = 0.0f;
 	float fallSpeed_ = 0.0f;
 	float gravity_ = 0.0f;
 	float maxFallSpeed_ = 0.0f;
@@ -230,8 +230,8 @@ private:
 	ParticleEmitter* avoidEmitter3_{};
 	ParticleEmitter* avoidEmitter4_{};
 
-	ParticleEmitter* storongStateEmitter1_{};
-	ParticleEmitter storongStateEmitter2_{};
+	ParticleEmitter* strengthStateEmitter1_{};
+	ParticleEmitter strengthStateEmitter2_{};
 
 	SoundData* shotSE_{};
 

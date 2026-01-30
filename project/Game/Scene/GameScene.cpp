@@ -61,13 +61,13 @@ void GameScene::Initialize() {
 	boss_->Initialize();
 	boss_->SetDXCom(dxcommon_);
 	boss_->SetPlayer(player_.get());
-	boss_->SetSatrtWait(startPlayerLandingTime_ + 60.0f);
+	boss_->SetStartWait(startPlayerLandingTime_ + 60.0f);
 
 	followCamera_ = std::make_unique<FollowCamera>();
 	followCamera_->Initialize();
 	followCamera_->SetTarget(&player_->GetTrans());
 	followCamera_->SetTranslate(player_->GetLandingStartPos());
-	followCamera_->PreRotateUpdate(boss_->GetDefoultPos());
+	followCamera_->PreRotateUpdate(boss_->GetDefaultPos());
 
 	key_ = std::make_unique<Sprite>();
 	key_->Load("key_beta.png");
@@ -122,7 +122,7 @@ void GameScene::Update() {
 
 	if (!player_->GetIsGameOver()) {// GameOverかどうか
 		if (boss_->GetIsStart()) {//ボスが召喚時
-			player_->SetTargetPos(boss_->GetDefoultPos());
+			player_->SetTargetPos(boss_->GetDefaultPos());
 		} else {
 			player_->SetTargetPos(boss_->GetBossCore()->GetCollider()->GetWorldPos());
 		}
@@ -133,14 +133,14 @@ void GameScene::Update() {
 				followCamera_->SetTargetSpeed(panSpeed_ * 0.1f);
 				followCamera_->SetFollowSpeed(panSpeed_ * 2.0f);
 				followCamera_->SetOffsetSoon(0.0f);
-				followCamera_->SetOffset(boss_->GetCameraRang(), 30.0f);
+				followCamera_->SetOffset(boss_->GetCameraRange(), 30.0f);
 				CameraManager::GetInstance()->GetCamera()->transform.rotate = boss_->GetSummonCameraRotate();
 				CameraManager::GetInstance()->GetCamera()->transform.translate = summonCameraPos_;
 			} else {
-				followCamera_->Update(boss_->GetDefoultPos());
+				followCamera_->Update(boss_->GetDefaultPos());
 			}
 		} else {
-			followCamera_->SetOffset(boss_->GetCameraRang(), 30.0f);
+			followCamera_->SetOffset(boss_->GetCameraRange(), 30.0f);
 			followCamera_->SetFollowSpeed(boss_->GetCameraFollowSpeed());
 			followCamera_->Update(boss_->GetBossCore()->GetWorldPos());
 		}

@@ -24,12 +24,12 @@ private:
 	bool isAttack_ = true;
 	bool isPreDush_ = false;
 	bool isNear_ = false;
-	float stopReng_ = 70.0f;
-	float dushReng_ = 0.0f;
+	float stopRange_ = 70.0f;
+	float dushRange_ = 0.0f;
 	float coolTime_ = 30.0f;
 
 	float chargeTime_ = 0.0f;
-	float maxCharegeTime_ = 90.0f;
+	float maxChargeTime_ = 90.0f;
 	float startWaitTime_ = 0.0f;
 	float maxStartWaitTime_ = 10.0f;
 

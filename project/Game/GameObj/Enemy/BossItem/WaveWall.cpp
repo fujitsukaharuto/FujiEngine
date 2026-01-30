@@ -153,7 +153,7 @@ void WaveWall::InitWave(const Vector3& pos, const Vector3& velo) {
 
 }
 
-void WaveWall::CalculetionFollowVec(const Vector3& target) {
+void WaveWall::CalculationFollowVec(const Vector3& target) {
 	Vector3 currentPos = model_->transform.translate;
 	currentPos.y = 0.0f;
 	Vector3 targetZeroY = target;

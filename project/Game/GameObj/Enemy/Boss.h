@@ -62,7 +62,7 @@ public:
 		float startSizeMulX = 3.0f;
 		float startSizeMulY = 6.0f;
 
-		float minRecalcSize = 3.0f;
+		float minReCalcSize = 3.0f;
 	};
 
 	struct BossRadialParams {
@@ -93,7 +93,7 @@ public:
 	void Update()override;
 	void Draw(Graphics::Material* mate = nullptr, bool is = false)override;
 	void CSDispatch();
-	void AnimDraw();
+	void AnimeDraw();
 	void DebugGUI()override;
 	void ParameterGUI();
 
@@ -116,14 +116,14 @@ public:
 	/// <summary>移動処理</summary>
 	void Walk();
 	
-	void CaluModelDir();
+	void CalcModelDir();
 
 	/// <summary>
 	/// Dush攻撃について
 	/// </summary>
 	void DushInit();
-	bool DushCharge(float& t, float maxT,bool& isNear,float reng);
-	bool DushAttack(bool isNear, float& dushReng, float stopReng);
+	bool DushCharge(float& t, float maxT,bool& isNear,float range);
+	bool DushAttack(bool isNear, float& dushRange, float stopRange);
 
 	/// <summary>波攻撃の更新</summary>
 	void UpdateWaveWall();
@@ -189,8 +189,8 @@ public:
 	bool GetIsNowDush() { return isNowDush_; }
 	int GetNowHpIndex() { return nowHpIndex_; }
 	float GetChainRate();
-	Math::Vector3 GetDefoultPos() { return defaultCorePos_; }
-	float GetCameraRang() { return cameraRang_; }
+	Math::Vector3 GetDefaultPos() { return defaultCorePos_; }
+	float GetCameraRange() { return cameraRange_; }
 	float GetCameraFollowSpeed() { return cameraFollowSpeed_; }
 	const Math::Vector3& GetSummonCameraRotate() { return summonCameraRotate_; }
 
@@ -198,8 +198,8 @@ public:
 	//* Setter
 	void SetPlayer(Player* player) { pPlayer_ = player; }
 	void SetDXCom(DXCom* dxcommon) { dxcommon_ = dxcommon; }
-	void SetSatrtWait(float waitT) { startWaiting_ = waitT; }
-	void SetCameraRang(float rang) { cameraRang_ = rang; }
+	void SetStartWait(float waitT) { startWaiting_ = waitT; }
+	void SetCameraRange(float range) { cameraRange_ = range; }
 	void SetCameraFollowSpeed(float speed) { cameraFollowSpeed_ = speed; }
 
 	/// <summary>攻撃フェーズの出力</summary>
@@ -265,7 +265,7 @@ private:
 	bool isShakeSprite_ = false;
 	bool isActiveSprite_ = false;
 	float bossHp_ = 0.0f;
-	float hpCooltime_ = 60.0f;
+	float hpCoolTime_ = 60.0f;
 	int nowHpIndex_ = 4;
 	float shakeTime_ = 0.0f;
 	float baseShakeTime_ = 10.0f;
@@ -309,7 +309,7 @@ private:
 	float chainRate_ = 0.65f;
 	int chainCount_ = 0;
 
-	float cameraRang_ = -25.0f;
+	float cameraRange_ = -25.0f;
 	float cameraFollowSpeed_ = 0.2f;
 
 	bool isNowDush_ = false;
@@ -334,9 +334,9 @@ private:
 	ParticleEmitter jumpWave_;
 	int jumpCSEmitIndex_ = 0;
 
-	ParticleEmitter roringWave_;
-	ParticleEmitter roringParticle_;
-	ParticleEmitter roringring_;
+	ParticleEmitter roaringWave_;
+	ParticleEmitter roaringParticle_;
+	ParticleEmitter roaringRing_;
 
 	ParticleEmitter summonLightning_;;
 	ParticleEmitter energySphere_;
@@ -355,7 +355,7 @@ private:
 
 
 	// post effect
-	float radialtime_ = 0.0f;
+	float radialTime_ = 0.0f;
 	DXCom* dxcommon_;
 
 };

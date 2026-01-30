@@ -203,21 +203,21 @@ void Boss::Initialize() {
 	charge14_.SetParent(&chargeParents_[0]->transform);
 	charge15_.SetParent(&chargeParents_[0]->transform);
 
-	ParticleManager::Load(roringWave_, "roringWave");
-	ParticleManager::Load(roringParticle_, "roringParticle");
-	ParticleManager::Load(roringring_, "roringring");
-	roringWave_.pos_ = animeModel_->transform.translate;
-	roringWave_.grain_.isAutoUVMove_ = true;
-	roringWave_.grain_.autoUVSpeed_.x = 0.01f;
-	roringWave_.grain_.isZandX_ = true;
+	ParticleManager::Load(roaringWave_, "roringWave");
+	ParticleManager::Load(roaringParticle_, "roringParticle");
+	ParticleManager::Load(roaringRing_, "roringring");
+	roaringWave_.pos_ = animeModel_->transform.translate;
+	roaringWave_.grain_.isAutoUVMove_ = true;
+	roaringWave_.grain_.autoUVSpeed_.x = 0.01f;
+	roaringWave_.grain_.isZandX_ = true;
 	animeModel_->RegisterJointWorld("mixamorig:Head");
 	animeModel_->RegisterJointWorld("mixamorig:LeftHand");
 	animeModel_->RegisterJointWorld("mixamorig:RightHand");
-	roringring_.SetAnimeParent(animeModel_->GetJointTrans("mixamorig:Head"));
-	roringring_.pos_.y = -7.0f;
-	roringParticle_.SetAnimeParent(animeModel_->GetJointTrans("mixamorig:Head"));
-	roringParticle_.pos_.y = -6.5f;
-	roringParticle_.pos_.z = 5.0f;
+	roaringRing_.SetAnimeParent(animeModel_->GetJointTrans("mixamorig:Head"));
+	roaringRing_.pos_.y = -7.0f;
+	roaringParticle_.SetAnimeParent(animeModel_->GetJointTrans("mixamorig:Head"));
+	roaringParticle_.pos_.y = -6.5f;
+	roaringParticle_.pos_.z = 5.0f;
 
 	ParticleManager::Load(dushStartParticle_, "duahChargeCompleteParticle");
 	ParticleManager::Load(dushStartCircle_, "duahChargeCompleteCircle");
@@ -257,9 +257,9 @@ void Boss::Update() {
 			startTime_ -= FPSKeeper::DeltaTimeFrame();
 			if (startTime_ > 40.0f && startTime_ < 200.0f) {
 				CameraManager::GetInstance()->GetCamera()->IssuanceShake(0.2f, 2.0f);
-				roringWave_.Emit();
-				roringParticle_.Emit();
-				roringring_.Emit();
+				roaringWave_.Emit();
+				roaringParticle_.Emit();
+				roaringRing_.Emit();
 			}
 			if (startTime_ < 0.0f) {
 				isStart_ = false;
@@ -268,14 +268,14 @@ void Boss::Update() {
 			}
 		}
 	} else if (!isHpActive_) { // HPの段階が切り替わった際の処理
-		hpCooltime_ -= FPSKeeper::DeltaTimeFrame();
+		hpCoolTime_ -= FPSKeeper::DeltaTimeFrame();
 		RadialUpdate();
 
 		UpdateWaveWall();
 		UpdateArrows();
 		UpdateRod();
 		UpdateUnderRing();
-		if (hpCooltime_ < 0.0f) {
+		if (hpCoolTime_ < 0.0f) {
 			isHpActive_ = true;
 			ChangeBehavior(std::make_unique<BossRoot>(this));
 			animeModel_->IsLoopAnimation(true);
@@ -354,7 +354,7 @@ void Boss::CSDispatch() {
 	animeModel_->CSDispatch();
 }
 
-void Boss::AnimDraw() {
+void Boss::AnimeDraw() {
 	animeModel_->Draw();
 }
 
@@ -430,7 +430,7 @@ void Boss::ParameterGUI() {
 					const char* column_name = ImGui::TableGetColumnName(column); // Retrieve name passed to TableSetupColumn()
 					ImGui::PushID(column);
 					ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
-					ImGui::RadioButton("##checkall", &phaseIndex_, column);
+					ImGui::RadioButton("##checkAll", &phaseIndex_, column);
 					ImGui::PopStyleVar();
 					ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
 					ImGui::TableHeader(column_name);
@@ -672,11 +672,11 @@ void Boss::Walk() {
 		Vector3 front = GetFrontOffset(Vector3(0.0f, 0.0f, 1.0f) * 0.05f * FPSKeeper::DeltaTimeFrame(), targetAngle);
 		animeModel_->transform.translate += front;
 
-		CaluModelDir();
+		CalcModelDir();
 	}
 }
 
-void Boss::CaluModelDir() {
+void Boss::CalcModelDir() {
 	Vector3 dir = pPlayer_->GetWorldPos() - animeModel_->transform.translate;
 	dir.y = 0.0f; // 水平方向だけに限定
 	dir = dir.Normalize();
@@ -728,12 +728,12 @@ void Boss::DushInit() {
 	}
 }
 
-bool Boss::DushCharge(float& t, float maxT, bool& isNear, float reng) {
+bool Boss::DushCharge(float& t, float maxT, bool& isNear, float range) {
 	if (t <= 0.0f) {
 		DushInit();
 	}
 	if (t <= maxT * 0.75f) {
-		CaluModelDir();
+		CalcModelDir();
 	}
 	t += FPSKeeper::DeltaTimeFrame();
 
@@ -748,7 +748,7 @@ bool Boss::DushCharge(float& t, float maxT, bool& isNear, float reng) {
 		UpdateEmitterPos(i);
 	}
 
-	if (Vector3(pPlayer_->GetWorldPos() - animeModel_->transform.translate).Length() < reng) {
+	if (Vector3(pPlayer_->GetWorldPos() - animeModel_->transform.translate).Length() < range) {
 		isNear = true;
 	} else {
 		isNear = false;
@@ -769,15 +769,15 @@ bool Boss::DushCharge(float& t, float maxT, bool& isNear, float reng) {
 	return false;
 }
 
-bool Boss::DushAttack(bool isNear, float& dushReng, float stopReng) {
-	if (dushReng == 0.0f) {
+bool Boss::DushAttack(bool isNear, float& dushRange, float stopRange) {
+	if (dushRange == 0.0f) {
 		ParticleManager::GetParticleCSEmitter(dushTrailIndex_).SetEmit(true);
 		ParticleManager::GetParticleCSEmitter(dushTrailIndex_).SetPos(animeModel_->transform.translate);
 	}
 	isNowDush_ = true;
 	Vector3 front = GetFrontOffset(Vector3(0.0f, 0.0f, 2.5f), animeModel_->transform.rotate.y);
 	animeModel_->transform.translate += front;
-	dushReng += front.Length();
+	dushRange += front.Length();
 	Vector3 emitPos = GetFrontOffset(Vector3(0.0f, 0.0f, 8.5f), animeModel_->transform.rotate.y);
 	emitPos += animeModel_->transform.translate;
 	emitPos.y = 3.0f;
@@ -787,11 +787,11 @@ bool Boss::DushAttack(bool isNear, float& dushReng, float stopReng) {
 	emitPos.y = 1.0f;
 	dushSmoke_.pos_ = emitPos;
 	dushSmoke_.Emit();
-	if (!isNear && dushReng >= stopReng * 1.5f) {
+	if (!isNear && dushRange >= stopRange * 1.5f) {
 		ParticleManager::GetParticleCSEmitter(dushTrailIndex_).SetEmit(false);
 		isNowDush_ = false;
 		return true;
-	} else if (isNear && dushReng >= stopReng) {
+	} else if (isNear && dushRange >= stopRange) {
 		ParticleManager::GetParticleCSEmitter(dushTrailIndex_).SetEmit(false);
 		isNowDush_ = false;
 		return true;
@@ -802,7 +802,7 @@ bool Boss::DushAttack(bool isNear, float& dushReng, float stopReng) {
 void Boss::UpdateWaveWall() {
 	for (auto& wall : walls_) {
 		if (!wall->GetIsLive())continue;
-		wall->CalculetionFollowVec(pPlayer_->GetWorldPos());
+		wall->CalculationFollowVec(pPlayer_->GetWorldPos());
 		wall->Update();
 	}
 }
@@ -968,8 +968,8 @@ bool Boss::BeamCharge() {
 					}
 				}
 				chargeParents_[i]->transform.scale = Vector3::FillVec(chargeSize_);
-				float emitpos = chargeParents_[i]->transform.scale.x;
-				traceAnchors_[i]->transform.translate = { emitpos,emitpos,emitpos };
+				float emitPos = chargeParents_[i]->transform.scale.x;
+				traceAnchors_[i]->transform.translate = { emitPos,emitPos,emitPos };
 
 				emitter.data_.prevTranslate = traceAnchors_[i]->GetWorldPos();
 				emitter.data_.lifeTime -= bp.lifeTimeDecrease;
@@ -977,7 +977,7 @@ bool Boss::BeamCharge() {
 			UpdateEmitterPos(i);
 		}
 
-		if (chargeSize_ > bp.minRecalcSize) {
+		if (chargeSize_ > bp.minReCalcSize) {
 			charge15_.grain_.startSize_ = { chargeSize_ * bp.startSizeMulX,chargeSize_ * bp.startSizeMulY };
 		}
 
@@ -1174,7 +1174,7 @@ void Boss::SetDefaultBehavior(bool isInvisibleItem) {
 			ring->SetIsLive(false);
 		}
 	}
-	cameraRang_ = -25.0f;
+	cameraRange_ = -25.0f;
 	cameraFollowSpeed_ = 0.2f;
 	ChangeBehavior(std::make_unique<BossRoot>(this));
 	animeModel_->transform.translate.y = 0.0f;
@@ -1195,22 +1195,22 @@ void Boss::SetDefaultBehavior(bool isInvisibleItem) {
 }
 
 void Boss::RadialSetting() {
-	radialtime_ = params_.radial.baseTime;
+	radialTime_ = params_.radial.baseTime;
 	dxcommon_->GetOffscreenManager()->AddPostEffect(PostEffectList::Radial);
 	dxcommon_->GetOffscreenManager()->SetRadialParamsWidth(params_.radial.widthStart);
 }
 
 void Boss::RadialUpdate() {
-	if (radialtime_ > 0.0f) {
-		radialtime_ -= FPSKeeper::DeltaTimeFrame();
-		if (radialtime_ <= 0.0f) {
-			radialtime_ = 0.0f;
+	if (radialTime_ > 0.0f) {
+		radialTime_ -= FPSKeeper::DeltaTimeFrame();
+		if (radialTime_ <= 0.0f) {
+			radialTime_ = 0.0f;
 			dxcommon_->GetOffscreenManager()->PopPostEffect(PostEffectList::Radial);
 		}
 		auto& rp = params_.radial;
-		float t = radialtime_ / rp.baseTime;
-		float radialwidth = std::lerp(rp.widthStart, rp.widthEnd, 1.0f - powf(1.0f - t, 3.0f));
-		dxcommon_->GetOffscreenManager()->SetRadialParamsWidth(radialwidth);
+		float t = radialTime_ / rp.baseTime;
+		float radialWidth = std::lerp(rp.widthStart, rp.widthEnd, 1.0f - powf(1.0f - t, 3.0f));
+		dxcommon_->GetOffscreenManager()->SetRadialParamsWidth(radialWidth);
 	}
 }
 
@@ -1332,7 +1332,7 @@ void Boss::ChangePhase(float threshold, int indexInc) {
 	animeModel_->ChangeAnimation("hit");
 	animeModel_->IsLoopAnimation(false);
 	RadialSetting();
-	hpCooltime_ = 60.0f;
+	hpCoolTime_ = 60.0f;
 	hpSprites_[nowHpIndex_]->SetColor(damageColor1_);
 }
 

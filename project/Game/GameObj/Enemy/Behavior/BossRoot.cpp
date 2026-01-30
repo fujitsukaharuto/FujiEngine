@@ -18,7 +18,7 @@ using namespace Math;
 
 BossRoot::BossRoot(Boss* pBoss) : BaseBossBehavior(pBoss) {
 	step_ = Step::ROOT;
-	pBoss_->SetCameraRang(cameraRang_);
+	pBoss_->SetCameraRange(cameraRange_);
 	pBoss_->SetCameraFollowSpeed(cameraFollowSpeed_);
 	cooldown_ = pBoss_->GetAttackCooldown();
 	pBoss_->GetAnimeModel()->ChangeAnimation("walk");

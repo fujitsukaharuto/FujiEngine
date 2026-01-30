@@ -10,8 +10,8 @@ using namespace Graphics;
 
 BossRodFall::BossRodFall(Boss* pBoss) : BaseBossBehavior(pBoss) {
 	step_ = Step::ATTACK;
-	cameraRang_ = -35.0f;
-	pBoss_->SetCameraRang(cameraRang_);
+	cameraRange_ = -35.0f;
+	pBoss_->SetCameraRange(cameraRange_);
 	pBoss_->SetCameraFollowSpeed(cameraFollowSpeed_);
 	pBoss_->GetAnimeModel()->ChangeAnimation("idle");
 	pBoss_->GetAnimeModel()->IsLoopAnimation(false);

@@ -46,7 +46,7 @@ void PlayerBullet::Draw(Material* mate, bool is) {
 void PlayerBullet::InitParameter(const Vector3& pos) {
 	isLive_ = true;
 	isCharge_ = true;
-	isStrnght_ = false;
+	isStrength_ = false;
 	collider_->SetWidth(0.3f);
 	collider_->SetDepth(0.3f);
 	collider_->SetHeight(0.3f);
@@ -58,7 +58,7 @@ void PlayerBullet::InitParameter(const Vector3& pos) {
 	damage_ = 0.0f;
 }
 
-void PlayerBullet::CalculetionFollowVec(const Vector3& target) {
+void PlayerBullet::CalculationFollowVec(const Vector3& target) {
 
 	Vector3 currentPos = model_->transform.translate;
 	Vector3 toTarget = (target - currentPos).Normalize();
@@ -78,7 +78,7 @@ void PlayerBullet::CalculetionFollowVec(const Vector3& target) {
 	// 速度に反映
 	velocity_ = newForward * velocity_.Length();
 	
-	if (isStrnght_) {
+	if (isStrength_) {
 		zRotate_ += 0.15f * FPSKeeper::DeltaTimeFrame();
 	} else {
 		zRotate_ += 0.075f * FPSKeeper::DeltaTimeFrame();
@@ -90,16 +90,16 @@ void PlayerBullet::CalculetionFollowVec(const Vector3& target) {
 	model_->transform.rotate = Quaternion::QuaternionToEuler(finalRot);
 
 	trajectory.Emit();
-	if (isStrnght_) trajectory2.Emit();
+	if (isStrength_) trajectory2.Emit();
 }
 
 ///= Collision ================================================================*/
 void PlayerBullet::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 	if (other.tag == "testBoss") {
 		isLive_ = false;
-		if (isStrnght_) { // 強化弾だった時の処理
+		if (isStrength_) { // 強化弾だった時の処理
 			hitSmoke_.Emit();
-			hitcircle_.Emit();
+			hitCircle_.Emit();
 			hit3_.Emit();
 			CameraManager::GetInstance()->GetCamera()->IssuanceShake(0.1f, 15.0f);
 		}
@@ -122,8 +122,8 @@ void PlayerBullet::Charge(const Vector3& pos, const Vector3& rot) {
 	model_->transform.rotate = rot;
 }
 
-void PlayerBullet::StrnghtBullet() { // 強化弾に変更する
-	isStrnght_ = true;
+void PlayerBullet::StrengthBullet() { // 強化弾に変更する
+	isStrength_ = true;
 	collider_->SetWidth(0.6f);
 	collider_->SetDepth(0.6f);
 	collider_->SetHeight(0.6f);
@@ -157,17 +157,17 @@ void PlayerBullet::ParticleEmitterSetting() {
 	ParticleManager::Load(hit2_, "bulletHit2");
 	ParticleManager::Load(hit3_, "bulletHit3");
 	ParticleManager::Load(hitSmoke_, "bulletHitSmoke");
-	ParticleManager::Load(hitcircle_, "bulletHitCircle");
+	ParticleManager::Load(hitCircle_, "bulletHitCircle");
 
 	hit_.SetParent(&model_->transform);
 	hit2_.SetParent(&model_->transform);
 	hit3_.SetParent(&model_->transform);
 	hitSmoke_.SetParent(&model_->transform);
-	hitcircle_.SetParent(&model_->transform);
+	hitCircle_.SetParent(&model_->transform);
 
 	hit_.frequencyTime_ = 0.0f;
 	hit2_.frequencyTime_ = 0.0f;
 	hit3_.frequencyTime_ = 0.0f;
 	hitSmoke_.frequencyTime_ = 0.0f;
-	hitcircle_.frequencyTime_ = 0.0f;
+	hitCircle_.frequencyTime_ = 0.0f;
 }

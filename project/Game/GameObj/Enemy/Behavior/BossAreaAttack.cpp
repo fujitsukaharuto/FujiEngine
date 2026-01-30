@@ -14,7 +14,7 @@ using namespace Math;
 
 BossAreaAttack::BossAreaAttack(Boss* pBoss) : BaseBossBehavior(pBoss) {
 	step_ = Step::ATTACK;
-	pBoss_->SetCameraRang(cameraRang_);
+	pBoss_->SetCameraRange(cameraRange_);
 	pBoss_->SetCameraFollowSpeed(cameraFollowSpeed_);
 	pBoss_->GetAnimeModel()->ChangeAnimation("swordLeft");
 	pBoss_->GetAnimeModel()->IsLoopAnimation(false);

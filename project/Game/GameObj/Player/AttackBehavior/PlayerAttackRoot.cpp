@@ -78,7 +78,7 @@ void PlayerAttackRoot::Update() {
 		if (!(input->PushKey(DIK_J) || input->PressButton(PadInput::A)) || pPlayer_->GetIsStrongState()) {
 			step_ = Step::ROOT;
 			if (pPlayer_->GetIsStrongState()) {
-				pPlayer_->StrngthBullet();
+				pPlayer_->StrengthBullet();
 			}
 			pPlayer_->ReleaseBullet();
 			AudioPlayer::GetInstance()->SoundStopWave(*chargeSE_);
@@ -100,7 +100,7 @@ void PlayerAttackRoot::Update() {
 			chargeRay_->Emit();
 			chargeWave_->Emit();
 			AudioPlayer::GetInstance()->SoundPlayWave(*chargeCompleteSE_,0.4f);
-			pPlayer_->StrngthBullet();
+			pPlayer_->StrengthBullet();
 		}
 
 		break;

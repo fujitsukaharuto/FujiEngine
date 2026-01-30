@@ -100,7 +100,7 @@ void Arrow::ParameterGUI() {
 #ifdef _DEBUG
 	ImGui::Indent();
 	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Selected;
-	if (ImGui::TreeNodeEx("Paramater", flags)) {
+	if (ImGui::TreeNodeEx("Parameter", flags)) {
 
 		if (ImGui::Button("Emit Arrow")) {
 			InitArrow({ 0.0f,0.0f,5.0f }, 90.0f);

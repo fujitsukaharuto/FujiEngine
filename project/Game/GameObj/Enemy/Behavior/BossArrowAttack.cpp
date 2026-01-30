@@ -13,7 +13,7 @@ using namespace Math;
 
 BossArrowAttack::BossArrowAttack(Boss* pBoss,bool beforArrow) : BaseBossBehavior(pBoss) {
 	step_ = Step::ATTACK;
-	pBoss_->SetCameraRang(cameraRang_);
+	pBoss_->SetCameraRange(cameraRange_);
 	pBoss_->SetCameraFollowSpeed(cameraFollowSpeed_);
 	pBoss_->GetAnimeModel()->ChangeAnimation("idle");
 	pBoss_->GetAnimeModel()->IsLoopAnimation(false);

@@ -13,9 +13,9 @@ using namespace Math;
 
 BossDushAttack::BossDushAttack(Boss* pBoss,bool is) : BaseBossBehavior(pBoss) {
 	step_ = Step::CHARGE;
-	cameraRang_ = -40.0f;
+	cameraRange_ = -40.0f;
 	cameraFollowSpeed_ = 0.03f;
-	pBoss_->SetCameraRang(cameraRang_);
+	pBoss_->SetCameraRange(cameraRange_);
 	pBoss_->SetCameraFollowSpeed(cameraFollowSpeed_);
 	pBoss_->GetAnimeModel()->ChangeAnimation("DushPose");
 	pBoss_->GetAnimeModel()->IsLoopAnimation(false);
@@ -34,7 +34,7 @@ void BossDushAttack::Update() {
 	switch (step_) {
 	case BossDushAttack::Step::CHARGE:
 
-		if (pBoss_->DushCharge(chargeTime_, maxCharegeTime_, isNear_, stopReng_)) {
+		if (pBoss_->DushCharge(chargeTime_, maxChargeTime_, isNear_, stopRange_)) {
 			step_ = Step::ATTACK;
 		}
 
@@ -49,7 +49,7 @@ void BossDushAttack::Update() {
 		}
 
 		if (isAttack_) {
-			if (pBoss_->DushAttack(isNear_, dushReng_, stopReng_)) {
+			if (pBoss_->DushAttack(isNear_, dushRange_, stopRange_)) {
 				isAttack_ = false;
 			}
 		}

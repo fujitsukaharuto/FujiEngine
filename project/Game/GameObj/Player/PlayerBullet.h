@@ -23,7 +23,7 @@ public:
 	/// <summary>
 	/// 弾の進行方向の変更
 	/// </summary>
-	void CalculetionFollowVec(const Math::Vector3& target);
+	void CalculationFollowVec(const Math::Vector3& target);
 
 	//========================================================================*/
 	//* Collision
@@ -40,7 +40,7 @@ public:
 	/// <summary>
 	///	弾の強化
 	/// </summary>
-	void StrnghtBullet();
+	void StrengthBullet();
 
 	//========================================================================*/
 	//* Release
@@ -53,7 +53,7 @@ public:
 	//* Getter
 	bool GetIsLive() { return isLive_; }
 	bool GetIsCharge() { return isCharge_; }
-	bool GetIsStrnght() { return isStrnght_; }
+	bool GetIsStrength() { return isStrength_; }
 	float GetDamage() { return damage_; }
 	BaseCollider* GetCollider() { return collider_.get(); }
 
@@ -76,12 +76,12 @@ private:
 	ParticleEmitter hit2_;
 	ParticleEmitter hit3_;
 	ParticleEmitter hitSmoke_;
-	ParticleEmitter hitcircle_;;
+	ParticleEmitter hitCircle_;;
 
 
 	bool isLive_ = false;
 	bool isCharge_ = false;
-	bool isStrnght_ = false;
+	bool isStrength_ = false;
 
 	Math::Vector3 velocity_;
 	float speed_;

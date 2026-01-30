@@ -25,7 +25,7 @@ public:
 	/// <summary>波攻撃の初期化</summary>
 	void InitWave(const Math::Vector3& pos, const Math::Vector3& velo);
 	/// <summary>波攻撃の進行方向更新</summary>
-	void CalculetionFollowVec(const Math::Vector3& target);
+	void CalculationFollowVec(const Math::Vector3& target);
 
 	//========================================================================*/
 	//* Collision
