@@ -1,6 +1,9 @@
 #include "PointLight.h"
 #include "Engine/DX/DXCom.h"
+#include "Engine/DX/FPSKeeper.h"
 #include "ImGuiManager/ImGuiManager.h"
+
+using namespace Core;
 
 void PointLight::Initialize(DXCom* pDxcom) {
 	
@@ -12,11 +15,6 @@ void PointLight::Initialize(DXCom* pDxcom) {
 		pointLightResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&pointLightDataGPU_[i]));
 	}
 
-	pointLightData_.color = { 1.0f,1.0f,1.0f,1.0f };
-	pointLightData_.position = { 0.0f,2.0f,0.0f };
-	pointLightData_.intensity = 1.0f;
-	pointLightData_.radius = 6.0f;
-	pointLightData_.decay = 2.0f;
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
 		CopyData(i);
 	}
@@ -28,10 +26,25 @@ void PointLight::Finalize() {
 	}
 }
 
+void PointLight::SetLightColor(const Math::Vector4& color) {
+	pointLightData_.color = color;
+}
+
+void PointLight::SetLightPos(const Math::Vector3& pos) {
+	pointLightData_.position = pos;
+}
+
+void PointLight::SetAttenuationLight(float time, float intensity) {
+	isAttenuation_ = true;
+	attenuationBaseTime_ = time;
+	attenuationTime_ = time;
+	baseIntensity_ = intensity;
+}
 
 void PointLight::SetLightCommand(ID3D12GraphicsCommandList* commandList) {
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 	if (isOnceCopy_) {
+		AttenuationLight();
 		CopyData(frameIndex);
 		isOnceCopy_ = false;
 	}
@@ -59,4 +72,17 @@ void PointLight::CopyData(uint32_t frameIndex) {
 	pointLightDataGPU_[frameIndex]->intensity = pointLightData_.intensity;
 	pointLightDataGPU_[frameIndex]->radius = pointLightData_.radius;
 	pointLightDataGPU_[frameIndex]->decay = pointLightData_.decay;
+}
+
+void PointLight::AttenuationLight() {
+	if (isAttenuation_) {
+		attenuationTime_ -= FPSKeeper::DeltaTime();
+		if (attenuationTime_ < 0.0f) {
+			isAttenuation_ = false;
+			attenuationTime_ = 0.0f;
+		}
+
+		float t = attenuationTime_ / attenuationBaseTime_;
+		pointLightData_.intensity = std::lerp(0.0f, baseIntensity_, t);
+	}
 }

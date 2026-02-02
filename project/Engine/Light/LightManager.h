@@ -45,8 +45,8 @@ namespace Graphics {
 		//========================================================================*/
 		//* Getter
 		DirectionLight* GetDirectionLight() { return directionLight_.get(); }
-		PointLight* GetPointLight(int num) { return pointLights_[num].get(); }
-		SpotLight* GetSpotLight(int num) { return spotLights_[num].get(); }
+		PointLight* GetPointLight(int num = 0) { return pointLights_[num].get(); }
+		SpotLight* GetSpotLight(int num = 0) { return spotLights_[num].get(); }
 
 		void DebugGUI();
 

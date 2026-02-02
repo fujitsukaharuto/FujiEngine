@@ -6,6 +6,8 @@
 #include "Game/GameObj/Player/PlayerBullet.h"
 #include "Engine/Model/ModelManager.h"
 #include "Engine/Model/Line3dDrawer.h"
+#include "Engine/Light/LightManager.h"
+#include "Engine/Light/PointLight.h"
 
 #include "Particle/ParticleManager.h"
 #include "Scene/SceneManager.h"
@@ -151,6 +153,10 @@ void GameScene::Update() {
 			followCamera_->ResetTargetSpeed();
 			followCamera_->ResetFollowSpeed();
 			AudioPlayer::GetInstance()->SoundLoop(*bgm_, 0.025f);
+		}
+		if (boss_->GetIsDamageLight()) {
+			lightManager_->GetPointLight()->SetLightPos(boss_->GetDamageLightPos());
+			lightManager_->GetPointLight()->SetAttenuationLight(boss_->GetLightTime(), boss_->GetLightIntensity());
 		}
 	} else {
 		AudioPlayer::GetInstance()->SoundStopWave(*bgm_);

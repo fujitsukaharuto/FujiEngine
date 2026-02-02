@@ -177,10 +177,15 @@ public:
 	bool GetIsSummon() { return isSummon_; }
 	bool GetIsClear() { return isClear_; }
 	bool GetIsNowDush() { return isNowDush_; }
+	bool GetIsDamageLight();
 	int GetNowHpIndex() { return nowHpIndex_; }
 	float GetChainRate();
 	Math::Vector3 GetDefaultPos() { return defaultCorePos_; }
+	Math::Vector3 GetFrontPos();
+	Math::Vector3 GetDamageLightPos();
 	float GetCameraRange() { return cameraRange_; }
+	float GetLightTime() { return damageLightTime_; }
+	float GetLightIntensity() { return damageLightIntensity_; }
 	float GetCameraFollowSpeed() { return cameraFollowSpeed_; }
 	const Math::Vector3& GetSummonCameraRotate() { return summonCameraRotate_; }
 
@@ -251,6 +256,7 @@ private:
 	bool isHpActive_ = true;
 	bool isShakeSprite_ = false;
 	bool isActiveSprite_ = false;
+	bool isDamageLight_ = false;
 	float bossHp_ = 0.0f;
 	float hpCoolTime_ = 60.0f;
 	int nowHpIndex_ = 4;
@@ -258,6 +264,8 @@ private:
 	float baseShakeTime_ = 10.0f;
 	float shakeSize_ = 4.0f;
 	float hpIndent = 1.0f;
+	float damageLightTime_ = 0.3f;
+	float damageLightIntensity_ = 3.0f;
 	std::vector<std::unique_ptr<Graphics::Sprite>> hpSprites_;
 	std::vector<std::unique_ptr<Graphics::Sprite>> hpFrame_;
 	Math::Vector2 hpSize_ = { 130.0f,35.0f };
@@ -282,6 +290,8 @@ private:
 	float energyCoolTime_ = 30.0f;
 	int summonIndex_ = 0;
 	float bossYPos_ = 0.0f;
+	float frontZ_ = 4.5f;
+	float coreY_ = 6.5f;
 	Math::Vector3 summonCameraRotate_ = { 0.15f, 0.6f, 0.0f };
 	float summonCameraRotateStart_ = 0.15f;
 	float summonCameraRotateEnd_ = -0.20f;

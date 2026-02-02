@@ -161,6 +161,13 @@ PixelShaderOutput main(VertxShaderOutput input)
             
             
             output.color.rgb = diffuse + specular + diffusePoint + specularPoint;
+            
+            float3 cameraToPosition = normalize(input.WorldPosition - gCamera.worldPosition);
+            float3 reflectedVector = reflect(cameraToPosition, normalize(input.normal));
+            float4 environmentColor = gEnvironment.Sample(gSampler, reflectedVector);
+            
+            output.color.rgb += environmentColor.rgb * gMaterial.environmentCoefficient;
+            
             output.color.a = gMaterial.color.a * textureColor.a;
             if (output.color.a == 0.0)
             {

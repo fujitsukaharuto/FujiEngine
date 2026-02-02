@@ -135,7 +135,7 @@ void Boss::ReStart() {
 	isDying_ = false;
 	isStart_ = true;
 	isActiveSprite_ = false;
-	//phaseIndex_ = 0;
+	isDamageLight_ = false;
 	startTime_ = 300.0f;
 	animeModel_->ChangeAnimation("roaring");
 	animeModel_->LoadTransformFromJson("boss_transform.json");
@@ -151,6 +151,7 @@ void Boss::ReduceBossHP(bool isStrong) {
 		} else {
 			bossHp_ -= 2.0f;
 		}
+		isDamageLight_ = true;
 		// フェーズやHPの段階を切り替える為の処理
 		switch (BossHPState(nowHpIndex_)) {
 		case BossHPState::Max:
@@ -347,8 +348,7 @@ bool Boss::DushAttack(bool isNear, float& dushRange, float stopRange) {
 }
 
 void Boss::WaveWallAttack() {
-	Vector3 wavePos = GetFrontOffset(Vector3(0.0f, 0.0f, 4.5f), animeModel_->transform.rotate.y);
-	wavePos += animeModel_->transform.translate;
+	Vector3 wavePos = GetFrontPos();
 	itemManager_->WaveWallAttack(wavePos, animeModel_->transform.rotate.y);
 
 	waveAttack1.Emit();
@@ -527,8 +527,29 @@ void Boss::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
 void Boss::OnCollisionExit([[maybe_unused]] const ColliderInfo& other) {
 }
 
+bool Boss::GetIsDamageLight() {
+	bool result = isDamageLight_;
+	if (isDamageLight_) {
+		isDamageLight_ = !isDamageLight_;
+	}
+	return result;
+}
+
 float Boss::GetChainRate() {
 	return chainRate_ + (chainCount_ - 1) * 0.05f;
+}
+
+Math::Vector3 Boss::GetFrontPos() {
+	Vector3 frontP = GetFrontOffset(Vector3(0.0f, 0.0f, frontZ_), animeModel_->transform.rotate.y);
+	frontP += animeModel_->transform.translate;
+	return frontP;
+}
+
+Math::Vector3 Boss::GetDamageLightPos() {
+	Vector3 damageP = GetFrontOffset(Vector3(0.0f, 0.0f, frontZ_), animeModel_->transform.rotate.y);
+	damageP += animeModel_->transform.translate;
+	damageP.y += bossYPos_ + coreY_;
+	return damageP;
 }
 
 void Boss::SavePhase() {
