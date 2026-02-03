@@ -20,6 +20,8 @@ ParticleDebugScene::ParticleDebugScene() {}
 ParticleDebugScene::~ParticleDebugScene() {
 	FPSKeeper::SetUnStopped();
 	ParticleManager::SetIsStopped(false);
+	ParticleManager::GetInstance()->ResetCSEmitters();
+	ParticleManager::GetInstance()->InitDefaultCSEmitter();
 }
 
 void ParticleDebugScene::Initialize() {
@@ -32,8 +34,8 @@ void ParticleDebugScene::Initialize() {
 #pragma region シーン遷移用
 	black_ = std::make_unique<Sprite>();
 	black_->Load("white2x2.png");
-	black_->SetColor({ 0.0f,0.0f,0.0f,1.0f });
-	black_->SetSize({ 1280.0f,720.0f });
+	black_->SetColor(Colors::Black);
+	black_->SetSize({ MyWin::kWindowWidth,MyWin::kWindowHeight });
 	black_->SetAnchor({ 0.0f,0.0f });
 #pragma endregion
 

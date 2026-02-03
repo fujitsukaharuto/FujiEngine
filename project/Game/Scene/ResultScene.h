@@ -81,8 +81,6 @@ private:
 	Math::Vector4 terrainColor_ = { 0.85f,0.15f,0.1f,1.0f };
 	Math::Vector4 skyBoxColor_ = { 0.45f,0.25f,0.4f,1.0f };
 
-	Math::Vector3 rightDir_ = { 1.0f,0.0f,0.0f };
-
 	std::unique_ptr<Graphics::Sprite> clear_;
 
 	std::vector<std::unique_ptr<Graphics::Object3d>> players_;
@@ -99,10 +97,11 @@ private:
 	float lastRotateX_ = 0.1f;
 	float lastRotateY_ = 0.2f;
 
-	float defoTransY_ = 0.0f;
-	float defoRotateY_ = 0.0f;
+	float defaTransY_ = 0.0f;
+	float defaRotateY_ = 0.0f;
 
 	float cameraStartRotateX_ = -0.1f;
+	Math::Vector3 cameraPos_ = { 0.0f, 2.0f, -20.0f };
 	Math::Vector3 lightDir_ = { 0.0f,-0.907f,0.42f };
 	float lightIntensity_ = 0.6f;
 

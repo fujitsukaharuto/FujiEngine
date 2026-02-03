@@ -50,10 +50,14 @@ namespace Math {
 		static Vector3 GetZeroVec() { return { 0.0f,0.0f,0.0f }; }
 		/// <summary>上方向を向くVector</summary>
 		static Vector3 GetUpVec() { return { 0.0f,1.0f,0.0f }; }
+		/// <summary>下方向を向くVector</summary>
+		static Vector3 GetDownVec() { return { 0.0f,-1.0f,0.0f }; }
 		/// <summary>右方向を向くVector</summary>
 		static Vector3 Right() { return { 1.0f,0.0f,0.0f }; }
 		/// <summary>上方向を向くVector</summary>
 		static Vector3 Up() { return { 0.0f,1.0f,0.0f }; }
+		/// <summary>下方向を向くVector</summary>
+		static Vector3 Down() { return { 0.0f,-1.0f,0.0f }; }
 		/// <summary>前方向を向くVector</summary>
 		static Vector3 Forward() { return { 0.0f,0.0f,1.0f }; }
 		/// <summary>kで全て埋めるVector</summary>

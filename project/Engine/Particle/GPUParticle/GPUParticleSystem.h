@@ -119,6 +119,10 @@ private:
 	void UpdateGPUEmitter();
 
 	//========================================================================*/
+	//* Debug
+	void LoadPopUpGUI(int id, PipelinePhase type);
+
+	//========================================================================*/
 	//* Dispatch
 	void UpdateParticleCSDispatch();
 	void EmitterDispatch();

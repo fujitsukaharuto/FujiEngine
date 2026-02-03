@@ -183,62 +183,7 @@ void GPUParticleSystem::ParticleCSDebugGUI() {
 		editCSEmitInd_ = idx;
 		if (ImGui::TreeNode("ParticleCS Emit Control")) {
 			csEmitters_[sphereEmitters_[idx]].emitter->DebugGUI();
-			if (ImGui::Button("LoadFile")) {
-				ImGui::OpenPopup("CSEmitterFile Window");
-			}
-
-			ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-			ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-			// 少し大きめのウィンドウサイズを指定（必要に応じて調整してください）
-			ImGui::SetNextWindowSize(ImVec2(500, 400), ImGuiCond_FirstUseEver);
-
-			if (ImGui::BeginPopupModal("CSEmitterFile Window", NULL)) {
-				// --- 上部：ファイル一覧エリア（スクロール可能にする） ---
-				// 下部のボタンエリア(約40px)を残して残りを一覧表示に使う
-				if (ImGui::BeginChild("FileScrollingRegion", ImVec2(0, -40), true, ImGuiWindowFlags_HorizontalScrollbar)) {
-					float windowVisibleX = ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMax().x;
-					ImVec2 buttonSize(100, 100); // ボタンのサイズ
-					ImGuiStyle& style = ImGui::GetStyle();
-
-					auto& fileNames = ParticleManager::GetInstance()->GetCSEmitterFileNames();
-					for (size_t i = 0; i < fileNames.size(); i++) {
-						const auto& filename = fileNames[i];
-
-						// ボタンを描画（ID衝突回避のため ##i を付与するか、PushIDを使う）
-						ImGui::PushID((int)i);
-						if (ImGui::Button(filename.c_str(), buttonSize)) {
-							csEmitters_[sphereEmitters_[idx]].emitter->Load(filename);
-							// 選択したらウィンドウを閉じる
-							ImGui::CloseCurrentPopup();
-						}
-						ImGui::PopID();
-
-						float lastButtonX = ImGui::GetItemRectMax().x;
-						float nextButtonX = lastButtonX + style.ItemSpacing.x + buttonSize.x;
-						// 次のボタンがウィンドウ端を越えない、かつ リストの最後でなければ SameLine
-						if (i + 1 < fileNames.size() && nextButtonX < windowVisibleX) {
-							ImGui::SameLine();
-						}
-					}
-					ImGui::EndChild();
-				}
-
-				// --- 下部：操作ボタンエリア ---
-				ImGui::Separator();
-
-				float buttonWidth = 120.0f;
-				float spaceWidth = ImGui::GetStyle().ItemSpacing.x;
-				float totalButtonWidth = (buttonWidth * 2) + spaceWidth;
-				ImGui::SetCursorPosX(ImGui::GetWindowContentRegionMax().x - totalButtonWidth);
-				if (ImGui::Button("OK", ImVec2(buttonWidth, 0))) {
-					ImGui::CloseCurrentPopup();
-				}
-				ImGui::SameLine();
-				if (ImGui::Button("Cancel", ImVec2(buttonWidth, 0))) {
-					ImGui::CloseCurrentPopup();
-				}
-				ImGui::EndPopup();
-			}
+			LoadPopUpGUI(idx, PipelinePhase::Sphere);
 			ImGui::TreePop();
 		}
 	}
@@ -264,7 +209,11 @@ void GPUParticleSystem::ParticleSurfaceCSDebugGUI() {
 		ImGui::DragInt("emitIndex", &editCSEmitSurfaceInd_, 1.0f, 0, int(MeshSurfaceEmitters_.size() - 1));
 		int idx = std::min(editCSEmitSurfaceInd_, static_cast<int>(MeshSurfaceEmitters_.size()) - 1);
 		editCSEmitSurfaceInd_ = idx;
-		csEmitters_[MeshSurfaceEmitters_[idx]].emitter->DebugGUI();
+		if (ImGui::TreeNode("ParticleCS Emit Control")) {
+			csEmitters_[MeshSurfaceEmitters_[idx]].emitter->DebugGUI();
+			LoadPopUpGUI(idx, PipelinePhase::Surface);
+			ImGui::TreePop();
+		}
 	}
 #endif // _DEBUG
 }
@@ -482,6 +431,77 @@ void GPUParticleSystem::UpdateGPUEmitter() {
 	const float deltaTime = FPSKeeper::DeltaTime();
 	for (int i = 0; i < csEmitters_.size(); i++) {
 		csEmitters_[i].emitter->Update(deltaTime);
+	}
+}
+
+void GPUParticleSystem::LoadPopUpGUI(int id, PipelinePhase type) {
+	if (ImGui::Button("LoadFile")) {
+		ImGui::OpenPopup("CSEmitterFile Window");
+	}
+
+	ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+	// 少し大きめのウィンドウサイズを指定（必要に応じて調整してください）
+	ImGui::SetNextWindowSize(ImVec2(500, 400), ImGuiCond_FirstUseEver);
+
+	if (ImGui::BeginPopupModal("CSEmitterFile Window", NULL)) {
+		// --- 上部：ファイル一覧エリア（スクロール可能にする） ---
+		// 下部のボタンエリア(約40px)を残して残りを一覧表示に使う
+		if (ImGui::BeginChild("FileScrollingRegion", ImVec2(0, -40), true, ImGuiWindowFlags_HorizontalScrollbar)) {
+			float windowVisibleX = ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMax().x;
+			ImVec2 buttonSize(100, 100); // ボタンのサイズ
+			ImGuiStyle& style = ImGui::GetStyle();
+
+			auto& fileNames = ParticleManager::GetInstance()->GetCSEmitterFileNames();
+			for (size_t i = 0; i < fileNames.size(); i++) {
+				const auto& filename = fileNames[i];
+
+				// ボタンを描画（ID衝突回避のため ##i を付与するか、PushIDを使う）
+				ImGui::PushID((int)i);
+				if (ImGui::Button(filename.c_str(), buttonSize)) {
+					switch (type) {
+					case PipelinePhase::Texture:
+						csEmitters_[textureBasedEmitters_[id]].emitter->Load(filename);
+						break;
+					case PipelinePhase::Surface:
+						csEmitters_[MeshSurfaceEmitters_[id]].emitter->Load(filename);
+						break;
+					case PipelinePhase::Sphere:
+						csEmitters_[sphereEmitters_[id]].emitter->Load(filename);
+						break;
+					default:
+						break;
+					}
+					// 選択したらウィンドウを閉じる
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::PopID();
+
+				float lastButtonX = ImGui::GetItemRectMax().x;
+				float nextButtonX = lastButtonX + style.ItemSpacing.x + buttonSize.x;
+				// 次のボタンがウィンドウ端を越えない、かつ リストの最後でなければ SameLine
+				if (i + 1 < fileNames.size() && nextButtonX < windowVisibleX) {
+					ImGui::SameLine();
+				}
+			}
+			ImGui::EndChild();
+		}
+
+		// --- 下部：操作ボタンエリア ---
+		ImGui::Separator();
+
+		float buttonWidth = 120.0f;
+		float spaceWidth = ImGui::GetStyle().ItemSpacing.x;
+		float totalButtonWidth = (buttonWidth * 2) + spaceWidth;
+		ImGui::SetCursorPosX(ImGui::GetWindowContentRegionMax().x - totalButtonWidth);
+		if (ImGui::Button("OK", ImVec2(buttonWidth, 0))) {
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Cancel", ImVec2(buttonWidth, 0))) {
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::EndPopup();
 	}
 }
 

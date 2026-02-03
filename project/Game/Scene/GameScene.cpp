@@ -34,77 +34,14 @@ void GameScene::Initialize() {
 #pragma region シーン遷移用
 	black_ = std::make_unique<Sprite>();
 	black_->Load("white2x2.png");
-	black_->SetColor({ 0.0f,0.0f,0.0f,1.0f });
-	black_->SetSize({ 1280.0f,720.0f });
+	black_->SetColor(Colors::Black);
+	black_->SetSize({ MyWin::kWindowWidth,MyWin::kWindowHeight });
 	black_->SetAnchor({ 0.0f,0.0f });
 #pragma endregion
 
-	skybox_ = std::make_unique<SkyBox>();
-	skybox_->SetCommonResources(dxcommon_, SRVManager::GetInstance(), CameraManager::GetInstance()->GetCamera());
-	skybox_->Initialize();
-	skybox_->SetColor(skyBoxColor_);
-
-	terrain_ = std::make_unique<AnimationModel>();
-	terrain_->Create("ground.obj");
-	terrain_->IsMirrorOBJ(true);
-	terrain_->SetEnvironmentCoeff(0.3f);
-	terrain_->SetTexture("grass.jpg");
-	terrain_->SetColor(terrainColor_);
-
-	player_ = std::make_unique<Player>();
-	boss_ = std::make_unique<Boss>();
-
-	LoadSceneLevelData("resource/Json/GameScene_position.json"); // ここで座標読み込むけど現在プレイヤー別で設定しているので直す
-
-	player_->Initialize();
-	player_->SetDXCom(dxcommon_);
-	player_->SetLandingTime(startPlayerLandingTime_);
-
-	boss_->Initialize();
-	boss_->SetDXCom(dxcommon_);
-	boss_->SetPlayer(player_.get());
-	boss_->SetStartWait(startPlayerLandingTime_ + 60.0f);
-
-	followCamera_ = std::make_unique<FollowCamera>();
-	followCamera_->Initialize();
-	followCamera_->SetTarget(&player_->GetTrans());
-	followCamera_->SetTranslate(player_->GetLandingStartPos());
-	followCamera_->PreRotateUpdate(boss_->GetDefaultPos());
-
-	key_ = std::make_unique<Sprite>();
-	key_->Load("key_beta.png");
-	key_->SetAnchor({ 1.0f,1.0f });
-	key_->SetPos({ MyWin::kWindowWidth, MyWin::kWindowHeight, 0.0f });
-	key_->SetSize({ 400.0f, 300.0f });
-
-	pad_ = std::make_unique<Sprite>();
-	pad_->Load("keyPad_beta.png");
-	pad_->SetAnchor({ 1.0f,1.0f });
-	pad_->SetPos({ MyWin::kWindowWidth, MyWin::kWindowHeight, 0.0f });
-	pad_->SetSize({ 400.0f, 300.0f });
-
-	gameOver_ = std::make_unique<Sprite>();
-	gameOver_->Load("gameover_beta.png");
-	gameOver_->SetAnchor({ 0.0f,0.0f });
-	gameOver_->SetSize({ MyWin::kWindowWidth, MyWin::kWindowHeight });
-
-	gameOverSelector_ = std::make_unique<Sprite>();
-	gameOverSelector_->Load("ball16x16.png");
-	gameOverSelector_->SetPos(selectPointL_);
-	gameOverSelector_->SetColor({ 0.7f, 0.7f, 0.1f, 1.0f });
-	gameOverSelector_->SetSize({ 40.0f, 40.0f });
-
-	ApplyGlobalVariables();
+	InitGameObj();
 
 	cMane_ = std::make_unique<CollisionManager>();
-
-	emit_.count_ = 3;
-	emit_.frequencyTime_ = 20.0f;
-	emit_.name_ = "animetest";
-	emit_.pos_ = { 0.0f,2.0f,0.0f };
-	emit_.animeData_.lifeTime = 40.0f;
-	emit_.RandomSpeed({ -0.1f,0.1f }, { -0.1f,0.1f }, { -0.1f,0.1f });
-	emit_.RandomTranslate({ -0.1f,0.1f }, { -0.1f,0.1f }, { -0.1f,0.1f });
 
 	ParticleManager::Load(field_, "fieldParticle");
 	bgm_ = &AudioPlayer::GetInstance()->SoundLoadWave("UrbanBGM_01.wav");
@@ -115,12 +52,6 @@ void GameScene::Update() {
 
 	cMane_->Reset();
 	PadSwitch();
-
-#ifdef _DEBUG
-
-	ApplyGlobalVariables();
-
-#endif // _DEBUG
 
 	if (!player_->GetIsGameOver()) {// GameOverかどうか
 		if (boss_->GetIsStart()) {//ボスが召喚時
@@ -297,7 +228,7 @@ void GameScene::ParticleDebugGUI() {
 #ifdef _DEBUG
 	ImGui::Indent();
 	
-	emit_.DebugGUI();
+
 
 	ImGui::Unindent();
 #endif // _DEBUG
@@ -358,7 +289,61 @@ void GameScene::LoadSceneLevelData(const std::string& name) {
 	}
 }
 
-void GameScene::ApplyGlobalVariables() {
+void GameScene::InitGameObj() {
+	skybox_ = std::make_unique<SkyBox>();
+	skybox_->SetCommonResources(dxcommon_, SRVManager::GetInstance(), CameraManager::GetInstance()->GetCamera());
+	skybox_->Initialize();
+	skybox_->SetColor(skyBoxColor_);
+
+	terrain_ = std::make_unique<AnimationModel>();
+	terrain_->Create("ground.obj");
+	terrain_->IsMirrorOBJ(true);
+	terrain_->SetEnvironmentCoeff(0.3f);
+	terrain_->SetTexture("grass.jpg");
+	terrain_->SetColor(terrainColor_);
+
+	player_ = std::make_unique<Player>();
+	boss_ = std::make_unique<Boss>();
+
+	LoadSceneLevelData("resource/Json/GameScene_position.json"); // ここで座標読み込むけど現在プレイヤー別で設定しているので直す
+
+	player_->Initialize();
+	player_->SetDXCom(dxcommon_);
+	player_->SetLandingTime(startPlayerLandingTime_);
+
+	boss_->Initialize();
+	boss_->SetDXCom(dxcommon_);
+	boss_->SetPlayer(player_.get());
+	boss_->SetStartWait(startPlayerLandingTime_ + 60.0f);
+
+	followCamera_ = std::make_unique<FollowCamera>();
+	followCamera_->Initialize();
+	followCamera_->SetTarget(&player_->GetTrans());
+	followCamera_->SetTranslate(player_->GetLandingStartPos());
+	followCamera_->PreRotateUpdate(boss_->GetDefaultPos());
+
+	key_ = std::make_unique<Sprite>();
+	key_->Load("key_beta.png");
+	key_->SetAnchor({ 1.0f,1.0f });
+	key_->SetPos({ MyWin::kWindowWidth, MyWin::kWindowHeight, 0.0f });
+	key_->SetSize({ 400.0f, 300.0f });
+
+	pad_ = std::make_unique<Sprite>();
+	pad_->Load("keyPad_beta.png");
+	pad_->SetAnchor({ 1.0f,1.0f });
+	pad_->SetPos({ MyWin::kWindowWidth, MyWin::kWindowHeight, 0.0f });
+	pad_->SetSize({ 400.0f, 300.0f });
+
+	gameOver_ = std::make_unique<Sprite>();
+	gameOver_->Load("gameover_beta.png");
+	gameOver_->SetAnchor({ 0.0f,0.0f });
+	gameOver_->SetSize({ MyWin::kWindowWidth, MyWin::kWindowHeight });
+
+	gameOverSelector_ = std::make_unique<Sprite>();
+	gameOverSelector_->Load("ball16x16.png");
+	gameOverSelector_->SetPos(selectPointL_);
+	gameOverSelector_->SetColor({ 0.7f, 0.7f, 0.1f, 1.0f });
+	gameOverSelector_->SetSize({ 40.0f, 40.0f });
 }
 
 void GameScene::GameOverUpdate() {

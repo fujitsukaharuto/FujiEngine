@@ -20,7 +20,7 @@ using namespace Math;
 ResultScene::ResultScene() {}
 
 ResultScene::~ResultScene() {
-	lightManager_->GetDirectionLight()->SetLightDirection({ 0.0f,-1.0f,0.0f });
+	lightManager_->GetDirectionLight()->SetLightDirection(Vector3::Down());
 	lightManager_->GetDirectionLight()->SetLightIntensity(0.3f);
 	ParticleManager::GetInstance()->GetParticleCSEmitter(hanabiIndex_).SetEmit(false);
 	ParticleManager::GetInstance()->ResetCSEmitters();
@@ -33,7 +33,7 @@ void ResultScene::Initialize() {
 	obj3dCommon_->Initialize();
 
 	CameraManager::GetInstance()->GetCamera()->GetTransform().rotate = { cameraStartRotateX_,0.0f,0.0f };
-	CameraManager::GetInstance()->GetCamera()->GetTransform().translate = { 0.0f, 2.0f, -20.0f };
+	CameraManager::GetInstance()->GetCamera()->GetTransform().translate = cameraPos_;
 	lightManager_->GetDirectionLight()->SetLightDirection(lightDir_);
 	lightManager_->GetDirectionLight()->SetLightIntensity(lightIntensity_);
 
@@ -67,8 +67,8 @@ void ResultScene::Initialize() {
 		player = std::make_unique<Object3d>();
 		player->CreateFromJson("resource/Json/Clear_Player.json");
 		player->SetTexture("Atlas.png");
-		defoRotateY_ = player->transform.rotate.y;
-		defoTransY_ = player->transform.translate.y;
+		defaRotateY_ = player->transform.rotate.y;
+		defaTransY_ = player->transform.translate.y;
 		if (i == 1) {
 			player->transform.translate.x += xDiff_;
 			player->transform.translate.z += zDiff_;
@@ -207,13 +207,13 @@ void ResultScene::ApplyGlobalVariables() {
 void ResultScene::KirbyDance() {
 
 	Vector3 transform = {};
-	transform.y = defoTransY_;
+	transform.y = defaTransY_;
 	Vector3 rotate = {};
-	rotate.y = defoRotateY_;
+	rotate.y = defaRotateY_;
 	danceTime_ += FPSKeeper::DeltaTimeFrame();
 	float t = 0.0f;
 	switch (state_) {
-	case DanceState::TurnLeftMoveToLeft:
+	case DanceState::TurnLeftMoveToLeft:// 左に動く
 		t = danceTime_ / stepTime_.turnLeftBaseTime;
 		transform.x = Lerp(0.0f, -danceDistanceX_, t);
 		rotate.y += std::numbers::pi_v<float> * 2.0f * t;
@@ -221,7 +221,7 @@ void ResultScene::KirbyDance() {
 		if (t >= 1.0f) { danceTime_ = 0.0f; state_ = DanceState::TurnRightMoveToCenter; }
 		break;
 
-	case DanceState::TurnRightMoveToCenter:
+	case DanceState::TurnRightMoveToCenter:// 真ん中に戻る
 		t = danceTime_ / stepTime_.turnRightBaseTime;
 		transform.x = Lerp(-danceDistanceX_, 0.0f, t);
 		transform.y += height_.jumpHeight * 4.0f * t * (1.0f - t);
@@ -230,7 +230,7 @@ void ResultScene::KirbyDance() {
 		if (t >= 1.0f) { danceTime_ = 0.0f; state_ = DanceState::JumpLeft; }
 		break;
 
-	case DanceState::JumpLeft:
+	case DanceState::JumpLeft:// 左にジャンプ
 		t = danceTime_ / stepTime_.jumpLeftBaseTime;
 		transform.x = -1.0f * std::sin(t * std::numbers::pi_v<float>);
 		transform.y += height_.jumpHeight * 4.0f * t * (1.0f - t);
@@ -239,7 +239,7 @@ void ResultScene::KirbyDance() {
 		if (t >= 1.0f) { danceTime_ = 0.0f; state_ = DanceState::JumpRight; }
 		break;
 
-	case DanceState::JumpRight:
+	case DanceState::JumpRight:// 右にジャンプ
 		t = danceTime_ / stepTime_.jumpRightBaseTime;
 		transform.x = 1.0f * sin(t * std::numbers::pi_v<float>);
 		transform.y += height_.jumpHeight * 4.0f * t * (1.0f - t);
@@ -248,7 +248,7 @@ void ResultScene::KirbyDance() {
 		if (t >= 1.0f) { danceTime_ = 0.0f; state_ = DanceState::JumpUPSpin; }
 		break;
 
-	case DanceState::JumpUPSpin:
+	case DanceState::JumpUPSpin:// ジャンプして回転
 		t = danceTime_ / stepTime_.jumpUpBaseTime;
 		rotate.y += std::numbers::pi_v<float> *2.0f * t;
 		transform.y += height_.finishHeight * std::sin(t * std::numbers::pi_v<float>);
@@ -256,14 +256,14 @@ void ResultScene::KirbyDance() {
 		if (t >= 1.0f) { danceTime_ = 0.0f; state_ = DanceState::FastSpin; }
 		break;
 
-	case DanceState::FastSpin:
+	case DanceState::FastSpin:// 素早く回転
 		t = danceTime_ / stepTime_.fastSpinBaseTime;
 		rotate.x = std::numbers::pi_v<float> * 2.0f * t;
 		transform.y += height_.spinHeight * std::sin(t * std::numbers::pi_v<float>);
 
 		if (t >= 1.0f) { danceTime_ = 0.0f; state_ = DanceState::FinishSpin; }
 		break;
-	case DanceState::FinishSpin:
+	case DanceState::FinishSpin:// 最後の回転
 		t = danceTime_ / stepTime_.finishSpinBaseTime;
 		rotate.x = std::numbers::pi_v<float> * 2.0f *t;
 		transform.y += height_.finishHeight * std::sin(t * std::numbers::pi_v<float>);
@@ -271,7 +271,7 @@ void ResultScene::KirbyDance() {
 		if (t >= 1.0f) { danceTime_ = 0.0f; state_ = DanceState::LastPose; }
 		break;
 
-	case DanceState::LastPose:
+	case DanceState::LastPose:// 決めポーズ
 		t = danceTime_ / stepTime_.lastBaseTime;
 		transform.y += height_.lastHeight * std::sin(t * std::numbers::pi_v<float>);
 		rotate.y -= lastRotateY_ * t;  // Y軸：右に20°

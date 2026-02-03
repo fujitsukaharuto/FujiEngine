@@ -52,16 +52,21 @@ private:
 
 	float cameraStartRotateX_ = -0.5f;
 	float cameraEndRotateX_ = 0.15f;
+	Math::Vector3 cameraPos_ = { 0.0f, 5.0f, -30.0f };
 
 	float titleCanMoveTime_ = 30.0f;
 	float titleStartX_ = -640.0f;
+	float titleY_ = 250.0f;
 	float titleEmdX_ = 640.0f;
+	Math::Vector2 titleSize_ = { 968.0f,159.0f };
 
+	Math::Vector3 spacePos_ = { 640.0f,500.0f,0.0f };
+	Math::Vector2 spaceSize_ = { 256.0f,128.0f };
+
+	float towerRad_ = 200.0f;
+	int towerDivision_ = 12;
 
 	std::unique_ptr<Graphics::Object3d> particleTest_ = nullptr;
-
-	ParticleEmitter emit_;
-
 	float csEmitterMoveTime_;
 
 	std::unique_ptr<CollisionManager> cMane_;

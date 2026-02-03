@@ -133,30 +133,33 @@ void MeshSurfaceEmitter::Dispatch(ID3D12GraphicsCommandList* cmd,
 
 void MeshSurfaceEmitter::DebugGUI() {
 #ifdef _DEBUG
-	if (ImGui::TreeNode("ParticleCS Emit Control")) {
-		ImGui::Checkbox("IsEmit", &isEmit_);
+	ImGui::Checkbox("IsEmit", &isEmit_);
 
-		int dragCount = int(data_.count);
-		ImGui::DragInt("emitCount", &dragCount, 1, 0, 100000);
-		data_.count = uint32_t(dragCount);
+	int dragCount = int(data_.count);
+	ImGui::DragInt("emitCount", &dragCount, 1, 0, 100000);
+	data_.count = uint32_t(dragCount);
 
-		ImGui::DragFloat("lifeTime", &data_.lifeTime, 0.01f, 0.01f, 300.0f);
-		ImGui::DragFloat("frequency", &data_.frequency, 0.001f, 0.0f, 300.0f);
+	ImGui::DragFloat("lifeTime", &data_.lifeTime, 0.01f, 0.01f, 300.0f);
+	ImGui::DragFloat("frequency", &data_.frequency, 0.001f, 0.0f, 300.0f);
 
-		ImGui::DragFloat3("translate", &data_.translate.x, 0.1f);
+	ImGui::DragFloat3("translate", &data_.translate.x, 0.1f);
 
-		ImGui::DragFloat("radius", &data_.radius, 0.1f, 0.0f, 300.0f);
+	ImGui::DragFloat("radius", &data_.radius, 0.1f, 0.0f, 300.0f);
 
-		ImGui::SeparatorText("Color");
-		ImGui::DragFloat3("colorMax", &data_.colorMax.x, 0.01f, 0.0f, 1.0f);
-		ImGui::DragFloat3("colorMin", &data_.colorMin.x, 0.01f, 0.0f, 1.0f);
+	ImGui::SeparatorText("Color");
+	ImGui::DragFloat3("colorMax", &data_.colorMax.x, 0.01f, 0.0f, 1.0f);
+	ImGui::DragFloat3("colorMin", &data_.colorMin.x, 0.01f, 0.0f, 1.0f);
 
-		ImGui::SeparatorText("Velocity");
-		ImGui::DragFloat3("baseVelocity", &data_.baseVelocity.x, 0.1f, -10.0f, 10.0f);
-		ImGui::DragFloat("velocityRandMax", &data_.velocityRandMax, 0.1f, -10.0f, 10.0f);
-		ImGui::DragFloat("velocityRandMin", &data_.velocityRandMin, 0.1f, -10.0f, 10.0f);
+	ImGui::SeparatorText("Velocity");
+	ImGui::DragFloat3("baseVelocity", &data_.baseVelocity.x, 0.1f, -10.0f, 10.0f);
+	ImGui::DragFloat("velocityRandMax", &data_.velocityRandMax, 0.1f, -10.0f, 10.0f);
+	ImGui::DragFloat("velocityRandMin", &data_.velocityRandMin, 0.1f, -10.0f, 10.0f);
 
-		ImGui::TreePop();
+	ImGui::SetNextItemWidth(100);
+	ImGui::InputText(".json", saveName_, sizeof(saveName_));
+	ImGui::SameLine();
+	if (ImGui::Button("Save")) {
+		Save(saveName_);
 	}
 #endif // _DEBUG
 }

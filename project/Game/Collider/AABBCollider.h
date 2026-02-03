@@ -57,8 +57,8 @@ public:
 	//* Getter
 	/// <summary>衝突判定のデータ</summary>
 	ColliderInfo GetInfo() const { return info; }
-	Math::Vector3 GetParentRotate() const { return parent_ ? parent_->GetRotation() : Math::Vector3(0.0f, 0.0f, 0.0f); } // obb用に試し
-	CollisionState GetState()const { return state; }
+	Math::Vector3 GetParentRotate() const { return parent_ ? parent_->GetRotation() : Math::Vector3(0.0f, 0.0f, 0.0f); }
+	const CollisionState& GetState()const { return state; }
 	std::array<Math::Vector3, 8> GetWorldVertices() const;
 	bool IsHaveParent() const { return parent_ ? true : false; }
 

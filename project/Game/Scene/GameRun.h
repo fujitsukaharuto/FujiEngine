@@ -20,6 +20,8 @@ public:
 
 private:
 
+	void LoadParticleGroup();
+	void LoadSoundData();
 
 private:
 

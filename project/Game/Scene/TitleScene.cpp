@@ -9,6 +9,7 @@
 #include "Particle/ParticleManager.h"
 #include "Scene/SceneManager.h"
 #include "Engine/Editor/CommandManager.h"
+#include <cmath>
 
 using namespace Core;
 using namespace Graphics;
@@ -27,7 +28,7 @@ void TitleScene::Initialize() {
 	obj3dCommon_->Initialize();
 
 	CameraManager::GetInstance()->GetCamera()->GetTransform().rotate = { cameraStartRotateX_,0.0f,0.0f };
-	CameraManager::GetInstance()->GetCamera()->GetTransform().translate = { 0.0f, 5.0f, -30.0f };
+	CameraManager::GetInstance()->GetCamera()->GetTransform().translate = cameraPos_;
 	
 
 	dxcommon_->GetOffscreenManager()->ResetPostEffect();
@@ -55,13 +56,13 @@ void TitleScene::Initialize() {
 
 	space_ = std::make_unique<Sprite>();
 	space_->Load("spaceKey.png");
-	space_->SetPos({ 640.0f,500.0f,0.0f });
-	space_->SetSize({ 256.0f,128.0f });
+	space_->SetPos(spacePos_);
+	space_->SetSize(spaceSize_);
 
 	title_ = std::make_unique<Sprite>();
 	title_->Load("Title.png");
-	title_->SetPos({ titleStartX_,250.0f,0.0f });
-	title_->SetSize({ 968.0f,159.0f });
+	title_->SetPos({ titleStartX_,titleY_,0.0f });
+	title_->SetSize(titleSize_);
 
 	player_ = std::make_unique<Player>();
 	json playerData = JsonSerializer::DeserializeJsonData("resource/Json/Game_Player.json");
@@ -76,27 +77,19 @@ void TitleScene::Initialize() {
 	particleTest_->SetColor(Colors::Transparent);
 
 	cMane_ = std::make_unique<CollisionManager>();
-
-	ParticleManager::Load(emit_, "lightning");
 	
-	const float radius = 200.0f;
-	const int division = 12;
-	const float PI = 3.14159265359f;
+	const float PI = std::numbers::pi_v<float>;
+	for (int i = 0; i < towerDivision_; i++) {
+		float angle = (2.0f * PI / towerDivision_) * i;
 
-	for (int i = 0; i < division; i++) {
-		float angle = (2.0f * PI / division) * i;
-
-		float x = radius * std::cos(angle);
-		float z = radius * std::sin(angle);
+		float x = towerRad_ * std::cos(angle);
+		float z = towerRad_ * std::sin(angle);
 
 		int emitNum = ParticleManager::GetInstance()->InitGPUEmitterSurface("PointyTower.obj");
 		auto& emitterCS = ParticleManager::GetParticleCSEmitterSurface(emitNum);
+		emitterCS.Load("Tower");
 		emitterCS.SetEmit(true);
 		emitterCS.SetPos({ x,0.0f,z });
-		emitterCS.data_.count = 4000;
-		emitterCS.data_.radius = 9.0f;
-		emitterCS.data_.colorMax = { 0.0f,0.8f,0.4f };
-		emitterCS.data_.colorMin = { 0.0f,0.8f,0.4f };
 		csEmitterNums_.push_back(emitNum);
 	}
 
@@ -125,9 +118,9 @@ void TitleScene::Update() {
 		startTime_ -= FPSKeeper::DeltaTimeFrame();
 	}
 	if (startTime_ <= titleCanMoveTime_) {
-		float titlemoveT = (std::max)(startTime_ / titleCanMoveTime_, 0.0f);
-		float titlePosX = std::lerp(titleEmdX_, titleStartX_, powf(titlemoveT, 4.0f));
-		title_->SetPos({ titlePosX,250.0f,0.0f });
+		float titleMoveT = (std::max)(startTime_ / titleCanMoveTime_, 0.0f);
+		float titlePosX = std::lerp(titleEmdX_, titleStartX_, powf(titleMoveT, 4.0f));
+		title_->SetPos({ titlePosX,titleY_,0.0f });
 	}
 	float cameraT = (std::max)(startTime_ / startMaxTime_, 0.0f);
 	float rotateX = std::lerp(cameraEndRotateX_, cameraStartRotateX_, cameraT);
@@ -182,9 +175,6 @@ void TitleScene::Draw() {
 
 	ParticleManager::GetInstance()->Draw();
 
-#ifdef _DEBUG
-	emit_.DrawSize();
-#endif // _DEBUG
 
 	Line3dDrawer::GetInstance()->Render();
 
@@ -233,7 +223,7 @@ void TitleScene::DebugGUI() {
 void TitleScene::ParticleDebugGUI() {
 #ifdef _DEBUG
 	ImGui::Indent();
-	emit_.DebugGUI();
+
 	ImGui::Unindent();
 #endif // _DEBUG
 }

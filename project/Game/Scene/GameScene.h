@@ -32,7 +32,7 @@ public:
 
 private:
 
-	void ApplyGlobalVariables();//値読み込みテスト用今度Objectクラス作って継承で使えるようにする
+	void InitGameObj();
 
 	void GameOverUpdate();
 	void ContinueUpdate();
@@ -68,7 +68,6 @@ private:
 
 	float startPlayerLandingTime_ = 300.0f;
 
-	ParticleEmitter emit_;
 	ParticleEmitter field_;
 
 	SoundData* bgm_;
