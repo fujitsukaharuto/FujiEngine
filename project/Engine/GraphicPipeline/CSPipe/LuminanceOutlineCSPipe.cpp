@@ -12,6 +12,7 @@ LuminanceOutlineCSPipe::~LuminanceOutlineCSPipe() {
 void LuminanceOutlineCSPipe::CreateRootSignature(ID3D12Device* device) {
     HRESULT hr;
 
+    // LuminanceOutlineCSに必要なルートパラメータを設定していく
     // コンピュートシェーダー用のルートシグネチャ
     D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc = {};
     rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;

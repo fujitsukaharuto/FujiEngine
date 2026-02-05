@@ -27,7 +27,7 @@ void BossItemManager::Initialize(Boss* boss) {
 		wall->Initialize();
 		walls_.push_back(std::move(wall));
 	}
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < 10; i++) {// Itemの初期化
 		std::unique_ptr<Arrow> arrow;
 		arrow = std::make_unique<Arrow>();
 		arrow->Initialize();
@@ -57,7 +57,7 @@ void BossItemManager::Update() {
 }
 
 void BossItemManager::Draw() {
-	for (auto& wall : walls_) {
+	for (auto& wall : walls_) {// Itemの描画
 		if (!wall->GetIsLive())continue;
 		wall->Draw();
 #ifdef _DEBUG

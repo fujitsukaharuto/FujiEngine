@@ -12,7 +12,7 @@ VignetteCSPipe::~VignetteCSPipe() {
 void VignetteCSPipe::CreateRootSignature(ID3D12Device* device) {
     HRESULT hr;
 
-    // コンピュートシェーダー用のルートシグネチャ
+    // VignetteCSに必要なルートパラメータを設定していく
     D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc = {};
     rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 

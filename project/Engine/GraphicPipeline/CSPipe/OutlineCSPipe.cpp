@@ -12,6 +12,7 @@ OutlineCSPipe::~OutlineCSPipe() {
 void OutlineCSPipe::CreateRootSignature(ID3D12Device* device) {
 	HRESULT hr;
 
+	// outlineCSに必要なルートパラメータを設定していく
 	// コンピュートシェーダー用のルートシグネチャ
 	D3D12_ROOT_SIGNATURE_DESC rootDesc{};
 	rootDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;

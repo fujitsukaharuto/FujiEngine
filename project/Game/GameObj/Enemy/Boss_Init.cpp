@@ -61,72 +61,9 @@ void Boss::Initialize() {
 	beam_->Initialize();
 	beam_->SetBossParent(this);
 
-	float parentRotate = std::numbers::pi_v<float> *0.25f;
-	for (int i = 0; i < 8; i++) {
-		std::unique_ptr<Object3d> chargeParent;
-		chargeParent = std::make_unique<Object3d>();
-		chargeParent->Create("cube.obj");
-		chargeParent->GetTransform().translate.y += 20.0f;
-		chargeParent->GetTransform().scale.x = params_.beam.baseChargeSize;
-		chargeParent->GetTransform().scale.y = params_.beam.baseChargeSize;
-		chargeParent->GetTransform().scale.z = params_.beam.baseChargeSize;
-		chargeParent->SetParent(&animeModel_->GetTransform());
-		chargeParent->SetNoneScaleParent(true);
-		if (i != 0 && i != 4) {
-			if (i < 4) {
-				chargeParent->GetTransform().rotate.x = Random::GetFloat(-std::numbers::pi_v<float>, std::numbers::pi_v<float>);
-				chargeParent->GetTransform().rotate.y = Random::GetFloat(-1.56f, 1.56f);
-			} else {
-				chargeParent->GetTransform().rotate.x = Random::GetFloat(-std::numbers::pi_v<float>, std::numbers::pi_v<float>);
-				chargeParent->GetTransform().rotate.y = Random::GetFloat(-1.56f, 1.56f);
-			}
-		}
-		chargeParent->GetTransform().rotate.z = parentRotate * i;
-		chargeParents_.push_back(std::move(chargeParent));
-	}
-	for (int i = 0; i < 8; i++) {
-		std::unique_ptr<Object3d> anchor;
-		anchor = std::make_unique<Object3d>();
-		anchor->Create("cube.obj");
-		anchor->SetParent(&chargeParents_[i]->GetTransform());
-		anchor->SetNoneScaleParent(true);
-		traceAnchors_.push_back(std::move(anchor));
+	InitChargeParent();
 
-		int numEmitter = ParticleManager::GetInstance()->InitGPUEmitter();
-		auto& emitter = ParticleManager::GetSphereEmitter(numEmitter);
-		emitter.isEmit_ = false;
-		emitter.data_.colorMax = { 1.0f,0.0f,0.0f };
-		emitter.data_.colorMin = { 1.0f,0.0f,0.0f };
-		emitter.data_.frequency = 0.0f;
-		emitter.data_.radius = 0.0f;
-		emitter.data_.scale = { 1.5f,1.5f,1.5f };
-		emitter.data_.lifeTime = 0.6f;
-		traceEmitterIndexes_.push_back(numEmitter);
-	}
-
-	waveParent_ = std::make_unique<Object3d>();
-	waveParent_->Create("cube.obj");
-	waveParent_->GetTransform().translate.z += 8.0f;
-	waveParent_->SetParent(&animeModel_->GetTransform());
-	waveParent_->SetNoneScaleParent(true);
-
-	for (int i = 0; i < 4; i++) {
-		std::unique_ptr<Object3d> arrowParent;
-
-		arrowParent = std::make_unique<Object3d>();
-		arrowParent->Create("cube.obj");
-
-		arrowParent->GetTransform().translate.x = 12.0f - float(i) * 5.0f;
-		if (i > 1) {
-			arrowParent->GetTransform().translate.x = -12.0f + float(i - 2) * 5.0f;
-		}
-		arrowParent->GetTransform().translate.y += 6.0f;
-		arrowParent->GetTransform().translate.z -= 2.0f;
-		arrowParent->SetParent(&animeModel_->GetTransform());
-		arrowParent->SetNoneScaleParent(true);
-
-		arrowParents_.push_back(std::move(arrowParent));
-	}
+	InitItemParent();
 
 	InitEmitter();
 
@@ -354,4 +291,75 @@ void Boss::InitSummon() {
 	energyParticle_.pos_ = animeModel_->GetTransform().translate;
 	energyParticle_.pos_.y = 0.0f;
 
+}
+
+void Boss::InitChargeParent() {
+	float parentRotate = std::numbers::pi_v<float> *0.25f;
+	for (int i = 0; i < 8; i++) {// チャージエミッターの親となるもの
+		std::unique_ptr<Object3d> chargeParent;
+		chargeParent = std::make_unique<Object3d>();
+		chargeParent->Create("cube.obj");
+		chargeParent->GetTransform().translate.y += 20.0f;
+		chargeParent->GetTransform().scale.x = params_.beam.baseChargeSize;
+		chargeParent->GetTransform().scale.y = params_.beam.baseChargeSize;
+		chargeParent->GetTransform().scale.z = params_.beam.baseChargeSize;
+		chargeParent->SetParent(&animeModel_->GetTransform());
+		chargeParent->SetNoneScaleParent(true);
+		if (i != 0 && i != 4) {
+			if (i < 4) {
+				chargeParent->GetTransform().rotate.x = Random::GetFloat(-std::numbers::pi_v<float>, std::numbers::pi_v<float>);
+				chargeParent->GetTransform().rotate.y = Random::GetFloat(-1.56f, 1.56f);
+			} else {
+				chargeParent->GetTransform().rotate.x = Random::GetFloat(-std::numbers::pi_v<float>, std::numbers::pi_v<float>);
+				chargeParent->GetTransform().rotate.y = Random::GetFloat(-1.56f, 1.56f);
+			}
+		}
+		chargeParent->GetTransform().rotate.z = parentRotate * i;
+		chargeParents_.push_back(std::move(chargeParent));
+	}
+	for (int i = 0; i < 8; i++) {// ダッシュチャージエミッターの親となるもの
+		std::unique_ptr<Object3d> anchor;
+		anchor = std::make_unique<Object3d>();
+		anchor->Create("cube.obj");
+		anchor->SetParent(&chargeParents_[i]->GetTransform());
+		anchor->SetNoneScaleParent(true);
+		traceAnchors_.push_back(std::move(anchor));
+
+		int numEmitter = ParticleManager::GetInstance()->InitGPUEmitter();
+		auto& emitter = ParticleManager::GetSphereEmitter(numEmitter);
+		emitter.isEmit_ = false;
+		emitter.data_.colorMax = { 1.0f,0.0f,0.0f };
+		emitter.data_.colorMin = { 1.0f,0.0f,0.0f };
+		emitter.data_.frequency = 0.0f;
+		emitter.data_.radius = 0.0f;
+		emitter.data_.scale = { 1.5f,1.5f,1.5f };
+		emitter.data_.lifeTime = 0.6f;
+		traceEmitterIndexes_.push_back(numEmitter);
+	}
+}
+
+void Boss::InitItemParent() {
+	waveParent_ = std::make_unique<Object3d>();
+	waveParent_->Create("cube.obj");
+	waveParent_->GetTransform().translate.z += 8.0f;
+	waveParent_->SetParent(&animeModel_->GetTransform());
+	waveParent_->SetNoneScaleParent(true);
+
+	for (int i = 0; i < 4; i++) {
+		std::unique_ptr<Object3d> arrowParent;
+
+		arrowParent = std::make_unique<Object3d>();
+		arrowParent->Create("cube.obj");
+
+		arrowParent->GetTransform().translate.x = 12.0f - float(i) * 5.0f;
+		if (i > 1) {
+			arrowParent->GetTransform().translate.x = -12.0f + float(i - 2) * 5.0f;
+		}
+		arrowParent->GetTransform().translate.y += 6.0f;
+		arrowParent->GetTransform().translate.z -= 2.0f;
+		arrowParent->SetParent(&animeModel_->GetTransform());
+		arrowParent->SetNoneScaleParent(true);
+
+		arrowParents_.push_back(std::move(arrowParent));
+	}
 }

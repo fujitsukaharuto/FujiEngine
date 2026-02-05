@@ -301,7 +301,7 @@ bool Boss::DushCharge(float& t, float maxT, bool& isNear, float range) {
 	} else {
 		isNear = false;
 	}
-	if (t > maxT) {
+	if (t > maxT) { // ダッシュのチャージ時間が超えているか
 		Vector3 emitPos = GetFrontOffset(Vector3(0.0f, 0.0f, 8.5f), animeModel_->GetTransform().rotate.y);
 		emitPos += animeModel_->GetTransform().translate;
 		emitPos.y = 4.0f;
@@ -335,7 +335,7 @@ bool Boss::DushAttack(bool isNear, float& dushRange, float stopRange) {
 	emitPos.y = 1.0f;
 	dushSmoke_.pos_ = emitPos;
 	dushSmoke_.Emit();
-	if (!isNear && dushRange >= stopRange * 1.5f) {
+	if (!isNear && dushRange >= stopRange * 1.5f) {// 距離に応じて変える
 		ParticleManager::GetParticleCSEmitter(dushTrailIndex_).SetEmit(false);
 		isNowDush_ = false;
 		return true;
@@ -415,7 +415,7 @@ bool Boss::BeamCharge() {
 			UpdateEmitterPos(i);
 		}
 
-		if (chargeSize_ > bp.minReCalcSize) {
+		if (chargeSize_ > bp.minReCalcSize) {// チャージサイズを少し小さく
 			charge15_.grain_.startSize_ = { chargeSize_ * bp.startSizeMulX,chargeSize_ * bp.startSizeMulY };
 		}
 

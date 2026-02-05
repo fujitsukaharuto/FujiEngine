@@ -25,7 +25,7 @@ void FollowCamera::Update(const Vector3& lockOn) {
 	auto& transform = camera->GetTransform();
 
 	Vector3 lockOnPosition;
-	if (isLockOnFollow_) {
+	if (isLockOnFollow_) {// ロックオンしているかどうか
 		lockOnPosition = lockOn;
 		preLockOnPos_ = lockOn;
 	} else {

@@ -19,9 +19,6 @@ public:
 	void DebugGUI()override;
 	void ParameterGUI();
 
-	/// <summary>値の初期化</summary>
-	void InitParameter();
-
 	/// <summary>波攻撃の初期化</summary>
 	void InitWave(const Math::Vector3& pos, const Math::Vector3& velo);
 	/// <summary>波攻撃の進行方向更新</summary>
@@ -45,6 +42,10 @@ public:
 
 
 private:
+
+	/// <summary>値の初期化</summary>
+	void InitParameter();
+	void InitEmitter();
 
 private:
 

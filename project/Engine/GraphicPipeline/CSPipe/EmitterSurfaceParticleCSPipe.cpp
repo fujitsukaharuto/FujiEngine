@@ -12,6 +12,7 @@ EmitterSurfaceParticleCSPipe::~EmitterSurfaceParticleCSPipe() {
 void EmitterSurfaceParticleCSPipe::CreateRootSignature(ID3D12Device* device) {
 	HRESULT hr;
 
+	// EmitSurfaceCSに必要なルートパラメータを設定していく
 	CD3DX12_DESCRIPTOR_RANGE descriptorRanges[12] = {};
 	descriptorRanges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 0);
 	descriptorRanges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 1);

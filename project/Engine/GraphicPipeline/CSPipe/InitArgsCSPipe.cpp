@@ -12,6 +12,7 @@ InitArgsCSPipe::~InitArgsCSPipe() {
 void InitArgsCSPipe::CreateRootSignature(ID3D12Device* device) {
 	HRESULT hr;
 
+	// InitArgsCSに必要なルートパラメータを設定していく
 	CD3DX12_DESCRIPTOR_RANGE descriptorRanges[1] = {};
 	descriptorRanges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 0);
 

@@ -32,63 +32,9 @@ void WaveWall::Initialize() {
 	collider_->SetHeight(2.0f);
 	collider_->SetDepth(1.5f);
 
-	speed_ = 0.5f;
-	velocity_ = { 0.0f,0.0f,0.0f };
+	InitParameter();
 
-	model_->SetLightEnable(LightMode::kLightNone);
-	model_->LoadTransformFromJson("bossItem_wave0.json");
-	model_->SetColor({ 0.0f,0.7f,1.0f,1.0f });
-	model_->SetAlphaRef(0.25f);
-
-	underRing_->SetLightEnable(LightMode::kLightNone);
-	underRing_->SetTexture("underRing.png");
-	underRing_->SetColor({ 0.8f,0.8f,0.8f,1.0f });
-	underRing_->SetAlphaRef(0.25f);
-	underRing_->SetParent(&model_->GetTransform());
-	underRing_->GetTransform().translate.y = 0.001f;
-	underRing_->GetTransform().rotate.y = 1.56f;
-	underRing_->GetTransform().scale.x = 1.65f;
-	underRing_->GetTransform().scale.z = 1.65f;
-
-	float scaleX = 0.9f;
-	float scaleY = 0.9f;
-	wave1_->SetLightEnable(LightMode::kLightNone);
-	wave1_->LoadTransformFromJson("bossItem_wave1.json");
-	wave1_->SetColor({ 0.5f,0.2f,1.0f,1.0f });
-	wave1_->SetAlphaRef(0.25f);
-	wave1_->SetParent(&model_->GetTransform());
-
-	scaleX -= 0.05f;
-	scaleY -= 0.05f;
-	wave2_->SetLightEnable(LightMode::kLightNone);
-	wave2_->LoadTransformFromJson("bossItem_wave2.json");
-	wave2_->SetColor({ 0.0f,0.2f,0.6f,1.0f });
-	wave2_->SetAlphaRef(0.25f);
-	wave2_->SetParent(&model_->GetTransform());
-
-	scaleX -= 0.05f;
-	scaleY -= 0.05f;
-	wave3_->SetLightEnable(LightMode::kLightNone);
-	wave3_->LoadTransformFromJson("bossItem_wave3.json");
-	wave3_->SetColor({ 0.0f,0.2f,1.0f,1.0f });
-	wave3_->SetAlphaRef(0.25f);
-	wave3_->SetParent(&model_->GetTransform());
-
-	ParticleManager::Load(spark1_, "WaveWallSpark");
-	ParticleManager::Load(spark2_, "WaveWallSpark");
-
-	spark1_.SetParent(&model_->GetTransform());
-	spark2_.SetParent(&model_->GetTransform());
-
-	spark1_.pos_.x = 0.4f;
-	spark1_.pos_.z = 1.40f;
-	spark2_.pos_.x = -0.4f;
-	spark2_.pos_.z = 1.40f;
-
-	spark2_.emitSizeMax_.x = 0.0f;
-	spark2_.emitSizeMin_.x = -0.75f;
-	spark2_.para_.speedx = { -0.075f,0.0f };
-
+	InitEmitter();
 }
 
 void WaveWall::Update() {
@@ -140,9 +86,6 @@ void WaveWall::DebugGUI() {
 void WaveWall::ParameterGUI() {
 }
 
-void WaveWall::InitParameter() {
-}
-
 void WaveWall::InitWave(const Vector3& pos, const Vector3& velo) {
 	model_->GetTransform().translate = pos;
 	model_->GetTransform().translate.y = 0.0f;
@@ -188,4 +131,66 @@ void WaveWall::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
 }
 
 void WaveWall::OnCollisionExit([[maybe_unused]] const ColliderInfo& other) {
+}
+
+void WaveWall::InitParameter() {
+	speed_ = 0.5f;
+	velocity_ = { 0.0f,0.0f,0.0f };
+
+	model_->SetLightEnable(LightMode::kLightNone);
+	model_->LoadTransformFromJson("bossItem_wave0.json");
+	model_->SetColor({ 0.0f,0.7f,1.0f,1.0f });
+	model_->SetAlphaRef(0.25f);
+
+	underRing_->SetLightEnable(LightMode::kLightNone);
+	underRing_->SetTexture("underRing.png");
+	underRing_->SetColor({ 0.8f,0.8f,0.8f,1.0f });
+	underRing_->SetAlphaRef(0.25f);
+	underRing_->SetParent(&model_->GetTransform());
+	underRing_->GetTransform().translate.y = 0.001f;
+	underRing_->GetTransform().rotate.y = 1.56f;
+	underRing_->GetTransform().scale.x = 1.65f;
+	underRing_->GetTransform().scale.z = 1.65f;
+
+	// 波のそれぞれの値を読み込む
+	float scaleX = 0.9f;
+	float scaleY = 0.9f;
+	wave1_->SetLightEnable(LightMode::kLightNone);
+	wave1_->LoadTransformFromJson("bossItem_wave1.json");
+	wave1_->SetColor({ 0.5f,0.2f,1.0f,1.0f });
+	wave1_->SetAlphaRef(0.25f);
+	wave1_->SetParent(&model_->GetTransform());
+
+	scaleX -= 0.05f;
+	scaleY -= 0.05f;
+	wave2_->SetLightEnable(LightMode::kLightNone);
+	wave2_->LoadTransformFromJson("bossItem_wave2.json");
+	wave2_->SetColor({ 0.0f,0.2f,0.6f,1.0f });
+	wave2_->SetAlphaRef(0.25f);
+	wave2_->SetParent(&model_->GetTransform());
+
+	scaleX -= 0.05f;
+	scaleY -= 0.05f;
+	wave3_->SetLightEnable(LightMode::kLightNone);
+	wave3_->LoadTransformFromJson("bossItem_wave3.json");
+	wave3_->SetColor({ 0.0f,0.2f,1.0f,1.0f });
+	wave3_->SetAlphaRef(0.25f);
+	wave3_->SetParent(&model_->GetTransform());
+}
+
+void WaveWall::InitEmitter() {
+	ParticleManager::Load(spark1_, "WaveWallSpark");
+	ParticleManager::Load(spark2_, "WaveWallSpark");
+
+	spark1_.SetParent(&model_->GetTransform());
+	spark2_.SetParent(&model_->GetTransform());
+
+	spark1_.pos_.x = 0.4f;
+	spark1_.pos_.z = 1.40f;
+	spark2_.pos_.x = -0.4f;
+	spark2_.pos_.z = 1.40f;
+
+	spark2_.emitSizeMax_.x = 0.0f;
+	spark2_.emitSizeMin_.x = -0.75f;
+	spark2_.para_.speedx = { -0.075f,0.0f };
 }

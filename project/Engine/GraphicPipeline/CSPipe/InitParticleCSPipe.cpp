@@ -12,6 +12,7 @@ InitParticleCSPipe::~InitParticleCSPipe() {
 void InitParticleCSPipe::CreateRootSignature(ID3D12Device* device) {
 	HRESULT hr;
 
+	// InitParticleCSに必要なルートパラメータを設定していく
 	CD3DX12_DESCRIPTOR_RANGE descriptorRanges[10] = {};
 	descriptorRanges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 0);
 	descriptorRanges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 1);

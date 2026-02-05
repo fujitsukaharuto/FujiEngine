@@ -12,7 +12,7 @@ RetroTVCSPipe::~RetroTVCSPipe() {
 void RetroTVCSPipe::CreateRootSignature(ID3D12Device* device) {
     HRESULT hr;
 
-    // コンピュートシェーダー用のルートシグネチャ
+    // RetroTVCSに必要なルートパラメータを設定していく
     D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc = {};
     rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 

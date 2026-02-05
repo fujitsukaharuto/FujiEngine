@@ -12,7 +12,7 @@ BoxFilterCSPipe::~BoxFilterCSPipe() {
 void BoxFilterCSPipe::CreateRootSignature(ID3D12Device* device) {
     HRESULT hr;
 
-    // コンピュートシェーダー用のルートシグネチャ
+    // BoxFilterCSに必要なルートパラメータを設定していく
     D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc = {};
     rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
@@ -20,7 +20,7 @@ void BoxFilterCSPipe::CreateRootSignature(ID3D12Device* device) {
     descriptorRangeSRV[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
     descriptorRangeSRV[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 0);
 
-    // パラメータは3つ。SRV(入力テクスチャ)、UAV(出力テクスチャ)、定数バッファ
+    // パラメータは2つ。SRV(入力テクスチャ)、UAV(出力テクスチャ)、定数バッファ
     D3D12_ROOT_PARAMETER rootParameters[2] = {};
     rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
     rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;

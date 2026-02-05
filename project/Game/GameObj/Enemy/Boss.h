@@ -221,6 +221,8 @@ private:
 	/// <summary>出現時間の更新</summary>
 	void EnergyTimeUpdate();
 
+	void InitChargeParent();
+	void InitItemParent();
 	void UpdateEmitterPos(int i);
 	void ShrinkScale(int i, float delta);
 	void ChangePhase(float threshold, int indexInc);

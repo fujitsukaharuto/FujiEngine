@@ -34,6 +34,7 @@ private:
 
 	void InitGameObj();
 
+	void CollisionUpdate();
 	void GameOverUpdate();
 	void ContinueUpdate();
 	void PadSwitch();

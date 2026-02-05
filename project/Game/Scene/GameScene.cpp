@@ -79,7 +79,7 @@ void GameScene::Update() {
 		}
 
 		boss_->Update();
-		if (!boss_->GetIsStart() && player_->GetIsStart()) {
+		if (!boss_->GetIsStart() && player_->GetIsStart()) {// プレイヤーの開始処理
 			player_->SetIsStart(false);
 			followCamera_->ResetTargetSpeed();
 			followCamera_->ResetFollowSpeed();
@@ -108,44 +108,7 @@ void GameScene::Update() {
 	BlackFade();
 
 	if (!player_->GetIsGameOver()) {
-		cMane_->AddCollider(player_->GetCollider());
-		for (auto& bullet : player_->GetPlayerBullet()) {
-			if (bullet->GetIsLive() && !bullet->GetIsCharge()) {
-				cMane_->AddCollider(bullet->GetCollider());
-			}
-		}
-		if (boss_->GetIsNowDush()) {
-			cMane_->AddCollider(boss_->GetCollider());
-		}
-		cMane_->AddCollider(boss_->GetCoreCollider());
-		for (auto& wall : boss_->GetWalls()) {
-			if (wall->GetIsLive()) {
-				cMane_->AddCollider(wall->GetCollider());
-			}
-		}
-		for (auto& arrow : boss_->GetArrows()) {
-			if (arrow->GetIsLive()) {
-				cMane_->AddCollider(arrow->GetCollider());
-			}
-		}
-		for (auto& ring : boss_->GetUnderRings()) {
-			if (ring->GetIsLive()) {
-				cMane_->AddCollider(ring->GetCollider());
-			}
-		}
-		int beamCount = 0;
-		for (auto& beam : boss_->GetBeam()->GetBeams()) {
-			if (boss_->GetBeam()->GetIsLive() && boss_->GetBeam()->GetChangeTime() <= 0.0f) {
-				cMane_->AddCollider(beam.collider.get());
-				if (boss_->GetBeam()->GetStep() == BeamStep::RotateBeam) {
-					beamCount++;
-				}
-				if (beamCount > 0) {
-					break;
-				}
-			}
-		}
-		cMane_->CheckAllCollision();
+		CollisionUpdate();
 	}
 
 	ParticleManager::GetInstance()->Update();
@@ -307,11 +270,11 @@ void GameScene::InitGameObj() {
 
 	LoadSceneLevelData("resource/Json/GameScene_position.json"); // ここで座標読み込むけど現在プレイヤー別で設定しているので直す
 
-	player_->Initialize();
+	player_->Initialize();// プレイヤー
 	player_->SetDXCom(dxcommon_);
 	player_->SetLandingTime(startPlayerLandingTime_);
 
-	boss_->Initialize();
+	boss_->Initialize();// ボス
 	boss_->SetDXCom(dxcommon_);
 	boss_->SetPlayer(player_.get());
 	boss_->SetStartWait(startPlayerLandingTime_ + 60.0f);
@@ -322,13 +285,13 @@ void GameScene::InitGameObj() {
 	followCamera_->SetTranslate(player_->GetLandingStartPos());
 	followCamera_->PreRotateUpdate(boss_->GetDefaultPos());
 
-	key_ = std::make_unique<Sprite>();
+	key_ = std::make_unique<Sprite>();// キーボード入力
 	key_->Load("key_beta.png");
 	key_->SetAnchor({ 1.0f,1.0f });
 	key_->SetPos({ MyWin::kWindowWidth, MyWin::kWindowHeight, 0.0f });
 	key_->SetSize({ 400.0f, 300.0f });
 
-	pad_ = std::make_unique<Sprite>();
+	pad_ = std::make_unique<Sprite>();// パッド入力
 	pad_->Load("keyPad_beta.png");
 	pad_->SetAnchor({ 1.0f,1.0f });
 	pad_->SetPos({ MyWin::kWindowWidth, MyWin::kWindowHeight, 0.0f });
@@ -344,6 +307,47 @@ void GameScene::InitGameObj() {
 	gameOverSelector_->SetPos(selectPointL_);
 	gameOverSelector_->SetColor({ 0.7f, 0.7f, 0.1f, 1.0f });
 	gameOverSelector_->SetSize({ 40.0f, 40.0f });
+}
+
+void GameScene::CollisionUpdate() {
+	cMane_->AddCollider(player_->GetCollider());
+	for (auto& bullet : player_->GetPlayerBullet()) {// プレイヤーの弾
+		if (bullet->GetIsLive() && !bullet->GetIsCharge()) {
+			cMane_->AddCollider(bullet->GetCollider());
+		}
+	}
+	if (boss_->GetIsNowDush()) {// ダッシュ時の判定
+		cMane_->AddCollider(boss_->GetCollider());
+	}
+	cMane_->AddCollider(boss_->GetCoreCollider());
+	for (auto& wall : boss_->GetWalls()) {// ボスの攻撃Wave
+		if (wall->GetIsLive()) {
+			cMane_->AddCollider(wall->GetCollider());
+		}
+	}
+	for (auto& arrow : boss_->GetArrows()) {// ボスの攻撃Arrow
+		if (arrow->GetIsLive()) {
+			cMane_->AddCollider(arrow->GetCollider());
+		}
+	}
+	for (auto& ring : boss_->GetUnderRings()) {// ボスの攻撃Ring
+		if (ring->GetIsLive()) {
+			cMane_->AddCollider(ring->GetCollider());
+		}
+	}
+	int beamCount = 0;
+	for (auto& beam : boss_->GetBeam()->GetBeams()) {// ボスの攻撃Beam
+		if (boss_->GetBeam()->GetIsLive() && boss_->GetBeam()->GetChangeTime() <= 0.0f) {
+			cMane_->AddCollider(beam.collider.get());
+			if (boss_->GetBeam()->GetStep() == BeamStep::RotateBeam) {
+				beamCount++;
+			}
+			if (beamCount > 0) {
+				break;
+			}
+		}
+	}
+	cMane_->CheckAllCollision();
 }
 
 void GameScene::GameOverUpdate() {
