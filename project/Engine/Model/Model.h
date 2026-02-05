@@ -122,18 +122,17 @@ namespace Graphics {
 		Math::Vector2 GetUVScale() { return uvScale_; }
 		Math::Vector2 GetUVTrans() { return uvTrans_; }
 		size_t GetVertexSize(int i) { return mesh_[i].GetVertexDataSize(); }
-
+		ModelData& GetModelData() { return data_; }
 
 		void CSDispatch(const SkinCluster& skinCluster, ID3D12GraphicsCommandList* commandList, uint32_t frameIndex);
 		void MeshDraw(ID3D12GraphicsCommandList* commandList, Material* mate, int drawCount = 1);
 
+	private:
+
+
+	private:
+
 		ModelData data_;
-
-	private:
-
-
-	private:
-
 
 		std::vector<Material> material_;
 		std::vector<Mesh> mesh_;

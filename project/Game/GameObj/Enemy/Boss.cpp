@@ -84,13 +84,13 @@ void Boss::Update() {
 		}
 	}
 
-	ParticleManager::GetSphereEmitter(halfAuraCS_).SetPos({ animeModel_->transform.translate.x,animeModel_->transform.translate.y + params_.jump.height,animeModel_->transform.translate.z });
-	ParticleManager::GetSphereEmitter(halfSmallAuraCS_).SetPos({ animeModel_->transform.translate.x,animeModel_->transform.translate.y + params_.jump.height,animeModel_->transform.translate.z });
+	ParticleManager::GetSphereEmitter(halfAuraCS_).SetPos({ animeModel_->GetTransform().translate.x,animeModel_->GetTransform().translate.y + params_.jump.height,animeModel_->GetTransform().translate.z });
+	ParticleManager::GetSphereEmitter(halfSmallAuraCS_).SetPos({ animeModel_->GetTransform().translate.x,animeModel_->GetTransform().translate.y + params_.jump.height,animeModel_->GetTransform().translate.z });
 	ParticleManager::GetSphereEmitter(leftHandAuraCS_).SetPos(animeModel_->GetJointWorldPos("mixamorig:LeftHand"));
 	ParticleManager::GetSphereEmitter(rightHandAuraCS_).SetPos(animeModel_->GetJointWorldPos("mixamorig:RightHand"));
 	animeModel_->AnimationUpdate();
-	shadow_->transform.translate = animeModel_->transform.translate;
-	shadow_->transform.translate.y = 0.15f;
+	shadow_->GetTransform().translate = animeModel_->GetTransform().translate;
+	shadow_->GetTransform().translate.y = 0.15f;
 	collider_->InfoUpdate();
 }
 
@@ -139,7 +139,7 @@ void Boss::ReStart() {
 	startTime_ = 300.0f;
 	animeModel_->ChangeAnimation("roaring");
 	animeModel_->LoadTransformFromJson("boss_transform.json");
-	animeModel_->transform.rotate.y = 3.14f;
+	animeModel_->GetTransform().rotate.y = 3.14f;
 	animeModel_->IsLoopAnimation(true);
 	animeModel_->ChangeAnimation("roaring");
 }
@@ -240,7 +240,7 @@ void Boss::ShakeHP() {
 
 void Boss::Walk() {
 	if (BossRoot* behavior = dynamic_cast<BossRoot*>(behavior_.get())) {
-		Vector3 dir = pPlayer_->GetWorldPos() - animeModel_->transform.translate;
+		Vector3 dir = pPlayer_->GetWorldPos() - animeModel_->GetTransform().translate;
 		dir.y = 0.0f; // 水平方向だけに限定
 		dir = dir.Normalize();
 
@@ -248,21 +248,21 @@ void Boss::Walk() {
 		float targetAngle = std::atan2(dir.x, dir.z); // Z前方軸に対する角度
 
 		Vector3 front = GetFrontOffset(Vector3(0.0f, 0.0f, 1.0f) * 0.05f * FPSKeeper::DeltaTimeFrame(), targetAngle);
-		animeModel_->transform.translate += front;
+		animeModel_->GetTransform().translate += front;
 
 		CalcModelDir();
 	}
 }
 
 void Boss::CalcModelDir() {
-	Vector3 dir = pPlayer_->GetWorldPos() - animeModel_->transform.translate;
+	Vector3 dir = pPlayer_->GetWorldPos() - animeModel_->GetTransform().translate;
 	dir.y = 0.0f; // 水平方向だけに限定
 	dir = dir.Normalize();
 
 	// 目標のY軸角度（ラジアン）
 	float targetAngle = std::atan2(dir.x, dir.z); // Z前方軸に対する角度
 	// 現在のY軸角度（モデルの回転）
-	float currentAngle = animeModel_->transform.rotate.y;
+	float currentAngle = animeModel_->GetTransform().rotate.y;
 
 	// 角度差を -π〜+π にラップ
 	float delta = targetAngle - currentAngle;
@@ -273,7 +273,7 @@ void Boss::CalcModelDir() {
 	float lerpFactor = 0.1f; // 追従の速さ
 	float newAngle = currentAngle + delta * lerpFactor;
 
-	animeModel_->transform.rotate.y = newAngle;
+	animeModel_->GetTransform().rotate.y = newAngle;
 }
 
 bool Boss::DushCharge(float& t, float maxT, bool& isNear, float range) {
@@ -289,21 +289,21 @@ bool Boss::DushCharge(float& t, float maxT, bool& isNear, float range) {
 		auto& emitter = ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]);
 		emitter.data_.prevTranslate = traceAnchors_[i]->GetWorldPos();
 
-		if (chargeParents_[i]->transform.scale.x > 0.0f) { // チャージのサイズを縮小していく
+		if (chargeParents_[i]->GetTransform().scale.x > 0.0f) { // チャージのサイズを縮小していく
 			ShrinkScale(i, chargeSize_ / chargeTime_);
-			chargeParents_[i]->transform.rotate.z += 0.05f * FPSKeeper::DeltaTimeFrame();
+			chargeParents_[i]->GetTransform().rotate.z += 0.05f * FPSKeeper::DeltaTimeFrame();
 		}
 		UpdateEmitterPos(i);
 	}
 
-	if (Vector3(pPlayer_->GetWorldPos() - animeModel_->transform.translate).Length() < range) {
+	if (Vector3(pPlayer_->GetWorldPos() - animeModel_->GetTransform().translate).Length() < range) {
 		isNear = true;
 	} else {
 		isNear = false;
 	}
 	if (t > maxT) {
-		Vector3 emitPos = GetFrontOffset(Vector3(0.0f, 0.0f, 8.5f), animeModel_->transform.rotate.y);
-		emitPos += animeModel_->transform.translate;
+		Vector3 emitPos = GetFrontOffset(Vector3(0.0f, 0.0f, 8.5f), animeModel_->GetTransform().rotate.y);
+		emitPos += animeModel_->GetTransform().translate;
 		emitPos.y = 4.0f;
 		dushStartParticle_.pos_ = emitPos;
 		dushStartCircle_.pos_ = emitPos;
@@ -320,18 +320,18 @@ bool Boss::DushCharge(float& t, float maxT, bool& isNear, float range) {
 bool Boss::DushAttack(bool isNear, float& dushRange, float stopRange) {
 	if (dushRange == 0.0f) {
 		ParticleManager::GetParticleCSEmitter(dushTrailIndex_).SetEmit(true);
-		ParticleManager::GetParticleCSEmitter(dushTrailIndex_).SetPos(animeModel_->transform.translate);
+		ParticleManager::GetParticleCSEmitter(dushTrailIndex_).SetPos(animeModel_->GetTransform().translate);
 	}
 	isNowDush_ = true;
-	Vector3 front = GetFrontOffset(Vector3(0.0f, 0.0f, 2.5f), animeModel_->transform.rotate.y);
-	animeModel_->transform.translate += front;
+	Vector3 front = GetFrontOffset(Vector3(0.0f, 0.0f, 2.5f), animeModel_->GetTransform().rotate.y);
+	animeModel_->GetTransform().translate += front;
 	dushRange += front.Length();
-	Vector3 emitPos = GetFrontOffset(Vector3(0.0f, 0.0f, 8.5f), animeModel_->transform.rotate.y);
-	emitPos += animeModel_->transform.translate;
+	Vector3 emitPos = GetFrontOffset(Vector3(0.0f, 0.0f, 8.5f), animeModel_->GetTransform().rotate.y);
+	emitPos += animeModel_->GetTransform().translate;
 	emitPos.y = 3.0f;
 	ParticleManager::GetParticleCSEmitter(dushTrailIndex_).SetPos(emitPos);
-	emitPos = GetFrontOffset(Vector3(0.0f, 0.0f, 5.5f), animeModel_->transform.rotate.y);
-	emitPos += animeModel_->transform.translate;
+	emitPos = GetFrontOffset(Vector3(0.0f, 0.0f, 5.5f), animeModel_->GetTransform().rotate.y);
+	emitPos += animeModel_->GetTransform().translate;
 	emitPos.y = 1.0f;
 	dushSmoke_.pos_ = emitPos;
 	dushSmoke_.Emit();
@@ -349,7 +349,7 @@ bool Boss::DushAttack(bool isNear, float& dushRange, float stopRange) {
 
 void Boss::WaveWallAttack() {
 	Vector3 wavePos = GetFrontPos();
-	itemManager_->WaveWallAttack(wavePos, animeModel_->transform.rotate.y);
+	itemManager_->WaveWallAttack(wavePos, animeModel_->GetTransform().rotate.y);
 
 	waveAttack1.Emit();
 	waveAttack2.Emit();
@@ -368,7 +368,7 @@ void Boss::ArrowAttack() {
 }
 
 void Boss::RodFall() {
-	itemManager_->RodFall(animeModel_->transform.translate);
+	itemManager_->RodFall(animeModel_->GetTransform().translate);
 }
 
 bool Boss::BeamCharge() {
@@ -378,7 +378,7 @@ bool Boss::BeamCharge() {
 		auto& emitter = ParticleManager::GetParticleCSEmitterSurface(1);
 		emitter.isEmit_ = true;
 		emitter.data_.radius = 0.0f;
-		emitter.data_.translate = animeModel_->transform.translate;
+		emitter.data_.translate = animeModel_->GetTransform().translate;
 		emitter.data_.translate.y = bp.parentY;
 	}
 
@@ -394,20 +394,20 @@ bool Boss::BeamCharge() {
 			auto& emitter = ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]);
 			emitter.data_.prevTranslate = traceAnchors_[i]->GetWorldPos();
 
-			if (chargeParents_[i]->transform.scale.x > 0.0f) { // チャージのサイズを縮小していく
+			if (chargeParents_[i]->GetTransform().scale.x > 0.0f) { // チャージのサイズを縮小していく
 				ShrinkScale(i, bp.shrinkSpeed * FPSKeeper::DeltaTimeFrame());
-				chargeParents_[i]->transform.rotate.z += bp.rotateSpeedZ * FPSKeeper::DeltaTimeFrame();
+				chargeParents_[i]->GetTransform().rotate.z += bp.rotateSpeedZ * FPSKeeper::DeltaTimeFrame();
 			}
-			if (chargeParents_[i]->transform.scale.x <= 0.0f) {
+			if (chargeParents_[i]->GetTransform().scale.x <= 0.0f) {
 				if (i == 0) {
 					chargeSize_ -= bp.sizeDecrease;
 					if (chargeSize_ <= 0.0f) {
 						chargeSize_ = 0.0f;
 					}
 				}
-				chargeParents_[i]->transform.scale = Vector3::FillVec(chargeSize_);
-				float emitPos = chargeParents_[i]->transform.scale.x;
-				traceAnchors_[i]->transform.translate = { emitPos,emitPos,emitPos };
+				chargeParents_[i]->GetTransform().scale = Vector3::FillVec(chargeSize_);
+				float emitPos = chargeParents_[i]->GetTransform().scale.x;
+				traceAnchors_[i]->GetTransform().translate = { emitPos,emitPos,emitPos };
 
 				emitter.data_.prevTranslate = traceAnchors_[i]->GetWorldPos();
 				emitter.data_.lifeTime -= bp.lifeTimeDecrease;
@@ -427,12 +427,12 @@ bool Boss::BeamCharge() {
 	} else if (chargeSize_ <= 0.0f) {
 		result = true;
 		for (int i = 0; i < 8; i++) {
-			if (chargeParents_[i]->transform.scale.x > 0.0f) { // 完全に真ん中に集結するようにする
+			if (chargeParents_[i]->GetTransform().scale.x > 0.0f) { // 完全に真ん中に集結するようにする
 				auto& emitter = ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]);
 				emitter.data_.prevTranslate = traceAnchors_[i]->GetWorldPos();
 
 				ShrinkScale(i, bp.shrinkSpeed * FPSKeeper::DeltaTimeFrame());
-				chargeParents_[i]->transform.rotate.z += bp.rotateSpeedZ * FPSKeeper::DeltaTimeFrame();
+				chargeParents_[i]->GetTransform().rotate.z += bp.rotateSpeedZ * FPSKeeper::DeltaTimeFrame();
 				result = false;
 			}
 			if (!result) {
@@ -442,7 +442,7 @@ bool Boss::BeamCharge() {
 	}
 
 	if (result) {
-		chargeParents_[0]->transform.scale = { 1.0f,1.0f,1.0f };
+		chargeParents_[0]->GetTransform().scale = { 1.0f,1.0f,1.0f };
 	}
 
 	return result;
@@ -483,15 +483,15 @@ bool Boss::JumpAttack() {
 
 		float upTime = jp.upStart - jp.upEnd;
 		float flyT = 1.0f - ((jumpTime_ - jp.upEnd) / upTime);
-		animeModel_->transform.translate.y = std::lerp(0.0f, jp.height, (1.0f - (1.0f - flyT) * (1.0f - flyT)));
+		animeModel_->GetTransform().translate.y = std::lerp(0.0f, jp.height, (1.0f - (1.0f - flyT) * (1.0f - flyT)));
 	} else if (jumpTime_ < jp.downStart && jumpTime_ >= jp.downEnd) {//70~50 //20
 
 		float downTime = jp.downStart - jp.downEnd;
 		float flyT = 1.0f - (jumpTime_ - jp.downEnd) / downTime;
-		animeModel_->transform.translate.y = std::lerp(jp.height, 0.0f, (1.0f - powf(1.0f - flyT, 4.0f)));
-		if (std::abs(animeModel_->transform.translate.y) < jp.groundJudgeHeight) {
+		animeModel_->GetTransform().translate.y = std::lerp(jp.height, 0.0f, (1.0f - powf(1.0f - flyT, 4.0f)));
+		if (std::abs(animeModel_->GetTransform().translate.y) < jp.groundJudgeHeight) {
 			if (isJumpAttack_) {
-				jumpWave_.pos_ = animeModel_->transform.translate;
+				jumpWave_.pos_ = animeModel_->GetTransform().translate;
 				jumpWave_.Emit();
 				ParticleManager::GetSphereEmitter(jumpCSEmitIndex_).SetPos(jumpWave_.pos_);
 				ParticleManager::GetSphereEmitter(jumpCSEmitIndex_).Emit();
@@ -500,7 +500,7 @@ bool Boss::JumpAttack() {
 			}
 		}
 	} else if (jumpTime_ <= 0.0f) {
-		animeModel_->transform.translate.y = 0.0f;
+		animeModel_->GetTransform().translate.y = 0.0f;
 		return true;
 	}
 
@@ -509,7 +509,7 @@ bool Boss::JumpAttack() {
 
 void Boss::UnderRingEmit() {
 	isJumpAttack_ = false;
-	itemManager_->UnderRingEmit(animeModel_->transform.translate);
+	itemManager_->UnderRingEmit(animeModel_->GetTransform().translate);
 }
 
 ///= Behavior =================================================================*/
@@ -540,14 +540,14 @@ float Boss::GetChainRate() {
 }
 
 Math::Vector3 Boss::GetFrontPos() {
-	Vector3 frontP = GetFrontOffset(Vector3(0.0f, 0.0f, frontZ_), animeModel_->transform.rotate.y);
-	frontP += animeModel_->transform.translate;
+	Vector3 frontP = GetFrontOffset(Vector3(0.0f, 0.0f, frontZ_), animeModel_->GetTransform().rotate.y);
+	frontP += animeModel_->GetTransform().translate;
 	return frontP;
 }
 
 Math::Vector3 Boss::GetDamageLightPos() {
-	Vector3 damageP = GetFrontOffset(Vector3(0.0f, 0.0f, frontZ_), animeModel_->transform.rotate.y);
-	damageP += animeModel_->transform.translate;
+	Vector3 damageP = GetFrontOffset(Vector3(0.0f, 0.0f, frontZ_), animeModel_->GetTransform().rotate.y);
+	damageP += animeModel_->GetTransform().translate;
 	damageP.y += bossYPos_ + coreY_;
 	return damageP;
 }
@@ -606,21 +606,21 @@ void Boss::SetDefaultBehavior(bool isInvisibleItem) {
 	cameraRange_ = -25.0f;
 	cameraFollowSpeed_ = 0.2f;
 	ChangeBehavior(std::make_unique<BossRoot>(this));
-	animeModel_->transform.translate.y = 0.0f;
-	Vector3 dir = pPlayer_->GetWorldPos() - animeModel_->transform.translate;
+	animeModel_->GetTransform().translate.y = 0.0f;
+	Vector3 dir = pPlayer_->GetWorldPos() - animeModel_->GetTransform().translate;
 	dir.y = 0.0f; // 水平方向だけに限定
 	dir = dir.Normalize();
 	// 目標のY軸角度（ラジアン）
 	float targetAngle = std::atan2(dir.x, dir.z); // Z前方軸に対する角度
-	animeModel_->transform.translate += GetFrontOffset(Vector3(0.0f, 0.0f, 1.0f) * 0.05f * FPSKeeper::DeltaTimeFrame(), targetAngle);
+	animeModel_->GetTransform().translate += GetFrontOffset(Vector3(0.0f, 0.0f, 1.0f) * 0.05f * FPSKeeper::DeltaTimeFrame(), targetAngle);
 	// 現在のY軸角度（モデルの回転）
-	float currentAngle = animeModel_->transform.rotate.y;
+	float currentAngle = animeModel_->GetTransform().rotate.y;
 	// 角度差を -π〜+π にラップ
 	float delta = targetAngle - currentAngle;
 	if (delta > std::numbers::pi_v<float>) delta -= 2.0f * std::numbers::pi_v<float>;
 	if (delta < -std::numbers::pi_v<float>) delta += 2.0f * std::numbers::pi_v<float>;
 	float newAngle = currentAngle + delta;
-	animeModel_->transform.rotate.y = newAngle;
+	animeModel_->GetTransform().rotate.y = newAngle;
 }
 
 void Boss::RadialSetting() {
@@ -681,7 +681,7 @@ void Boss::EnergyTimeUpdate() {
 		energyTime_ -= FPSKeeper::DeltaTimeFrame();
 		if (energyTime_ >= sp.bossRiseStartTime) { // ボスの位置更新
 			float t = (std::max)((energyTime_ - sp.bossRiseStartTime) / sp.bossRiseStartTime, 0.0f);
-			animeModel_->transform.translate.y = std::lerp(bossYPos_, sp.bossDownPos, t);
+			animeModel_->GetTransform().translate.y = std::lerp(bossYPos_, sp.bossDownPos, t);
 			summonCameraRotate_.x = std::lerp(summonCameraRotateStart_, summonCameraRotateEnd_, 1.0f - t);
 		}
 		energyParticle_.Emit();
@@ -696,7 +696,7 @@ void Boss::EnergyTimeUpdate() {
 		energyCoolTime_ -= FPSKeeper::DeltaTimeFrame();
 		if (energyCoolTime_ <= 0.0f) {
 			isSummon_ = false;
-			animeModel_->transform.translate.y = bossYPos_;
+			animeModel_->GetTransform().translate.y = bossYPos_;
 			animeModel_->ChangeAnimation("roaring");
 			ParticleManager::GetParticleCSEmitterTexture(summonIndex_).SetEmit(false);
 			shadow_->SetColor({ 0.02f,0.02f,0.02f,0.5f });
@@ -709,14 +709,14 @@ void Boss::EnergyTimeUpdate() {
 }
 
 void Boss::UpdateEmitterPos(int i) {
-	float emitPos = chargeParents_[i]->transform.scale.x;
-	traceAnchors_[i]->transform.translate = { emitPos, emitPos, emitPos };
+	float emitPos = chargeParents_[i]->GetTransform().scale.x;
+	traceAnchors_[i]->GetTransform().translate = { emitPos, emitPos, emitPos };
 	auto& emitter = ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]);
 	emitter.data_.translate = traceAnchors_[i]->GetWorldPos();
 }
 
 void Boss::ShrinkScale(int i, float delta) {
-	auto& s = chargeParents_[i]->transform.scale;
+	auto& s = chargeParents_[i]->GetTransform().scale;
 	s.x = (std::max)(0.0f, s.x - delta);
 	s.y = (std::max)(0.0f, s.y - delta);
 	s.z = (std::max)(0.0f, s.z - delta);

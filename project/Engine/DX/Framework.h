@@ -43,6 +43,9 @@ namespace Core {
 		/// </summary>
 		void Init();
 
+		/// <summary>
+		/// Updateの開始処理
+		/// </summary>
 		void BeginUpdate();
 
 		/// <summary>
@@ -53,6 +56,8 @@ namespace Core {
 
 	private:
 
+		// 汎用機能の初期化
+		void InitGeneralSystems();
 
 	protected:
 

@@ -72,6 +72,7 @@ namespace Graphics {
 
 		//========================================================================*/
 		//* Getter
+		Math::Trans& GetTransform() { return transform; }
 		Math::Matrix4x4 GetWorldMat() const;
 		Math::Vector3 GetWorldPos()const;
 		std::string GetModelName() { return modelName_; }
@@ -128,7 +129,6 @@ namespace Graphics {
 		// MeshDraw
 		void MeshDraw(Material* mate = nullptr, int drawCount = 1);
 
-		Math::Trans transform{};
 
 	private:
 
@@ -151,6 +151,9 @@ namespace Graphics {
 		void SetTextureNode();
 
 	private:
+
+		Math::Trans transform{};
+
 		std::unique_ptr<Model> model_ = nullptr;
 		std::string modelName_;
 

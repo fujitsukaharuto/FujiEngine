@@ -143,7 +143,7 @@ void CommandManager::DebugGUI() {
 		int newId = CommandManager::GetInstance()->nextObjId++;
 		auto command = std::make_unique<CreateObjCommand>(newId, loadObj->name, loadObj->modelName);
 		Execute(std::move(command));
-		objectList[newId]->obj->transform = loadObj->obj->transform;
+		objectList[newId]->obj->GetTransform() = loadObj->obj->GetTransform();
 	}
 	ImGui::Separator();
 	ImGui::Text("All EditorObjects");
@@ -213,7 +213,7 @@ void CommandManager::EditorObjGUI(EditorObj& obj) {
 					if (ParentCheck(obj.parent, receivedValue)) {
 						obj.children.push_back(receivedValue);
 						objectList[receivedValue]->parent = obj.id;
-						objectList[receivedValue]->obj->SetParent(&obj.obj->transform);
+						objectList[receivedValue]->obj->SetParent(&obj.obj->GetTransform());
 					}
 				},
 				[this, &obj](const ImGuiPayload* payload) {
@@ -263,7 +263,7 @@ void CommandManager::EditorObjGUI(EditorObj& obj) {
 				if (objectList[child]) {
 					if (objectList[child]->parent == obj.id) {
 						if (!objectList[child]->obj->IsHaveParent()) {
-							objectList[child]->obj->SetParent(&obj.obj->transform);
+							objectList[child]->obj->SetParent(&obj.obj->GetTransform());
 						}
 						EditorObjGUI(*objectList[child]);
 					}
@@ -355,19 +355,19 @@ nlohmann::json CommandManager::ConvertObjToJson(EditorObj* obj) {
 	}
 
 	json["transform"]["translate"] = {
-		obj->obj->transform.translate.x,
-		obj->obj->transform.translate.y,
-		obj->obj->transform.translate.z
+		obj->obj->GetTransform().translate.x,
+		obj->obj->GetTransform().translate.y,
+		obj->obj->GetTransform().translate.z
 	};
 	json["transform"]["rotate"] = {
-		obj->obj->transform.rotate.x,
-		obj->obj->transform.rotate.y,
-		obj->obj->transform.rotate.z
+		obj->obj->GetTransform().rotate.x,
+		obj->obj->GetTransform().rotate.y,
+		obj->obj->GetTransform().rotate.z
 	};
 	json["transform"]["scale"] = {
-		obj->obj->transform.scale.x,
-		obj->obj->transform.scale.y,
-		obj->obj->transform.scale.z
+		obj->obj->GetTransform().scale.x,
+		obj->obj->GetTransform().scale.y,
+		obj->obj->GetTransform().scale.z
 	};
 
 	// 子供がいる場合は再帰的に追加
@@ -505,19 +505,19 @@ void CommandManager::LoadObjRecursive(const nlohmann::json& objJson, int parentI
 	if (objJson.contains("transform")) {
 		const auto& t = objJson["transform"];
 		if (t.contains("translate")) {
-			obj->transform.translate.x = t["translate"][0];
-			obj->transform.translate.y = t["translate"][1];
-			obj->transform.translate.z = t["translate"][2];
+			obj->GetTransform().translate.x = t["translate"][0];
+			obj->GetTransform().translate.y = t["translate"][1];
+			obj->GetTransform().translate.z = t["translate"][2];
 		}
 		if (t.contains("rotate")) {
-			obj->transform.rotate.x = t["rotate"][0];
-			obj->transform.rotate.y = t["rotate"][1];
-			obj->transform.rotate.z = t["rotate"][2];
+			obj->GetTransform().rotate.x = t["rotate"][0];
+			obj->GetTransform().rotate.y = t["rotate"][1];
+			obj->GetTransform().rotate.z = t["rotate"][2];
 		}
 		if (t.contains("scale")) {
-			obj->transform.scale.x = t["scale"][0];
-			obj->transform.scale.y = t["scale"][1];
-			obj->transform.scale.z = t["scale"][2];
+			obj->GetTransform().scale.x = t["scale"][0];
+			obj->GetTransform().scale.y = t["scale"][1];
+			obj->GetTransform().scale.z = t["scale"][2];
 		}
 	}
 

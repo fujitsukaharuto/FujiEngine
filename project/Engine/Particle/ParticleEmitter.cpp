@@ -402,9 +402,9 @@ void ParticleEmitter::Emit() {
 			}
 		}
 
-		if (isDistanceComplement_) {
+		if (isDistanceComplement_) {// 距離補間でエミット
 			float distanceMoved = (currentWorldPos_ - previousWorldPos_).Length();
-			int emitCount = (int)(distanceMoved / 0.05f); // spacing = 理想の間隔
+			int emitCount = (int)(distanceMoved / perDistance_); // spacing = 理想の間隔
 
 			for (int i = 0; i < emitCount; ++i) {
 				float t = (float)i / emitCount;

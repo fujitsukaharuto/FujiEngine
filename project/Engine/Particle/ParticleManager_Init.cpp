@@ -57,6 +57,7 @@ void ParticleManager::InitPlaneVertex() {
 	plane_.vertices.push_back({ {1.0f,-1.0f,0.0f,1.0f},{1.0f,1.0f},{0.0f,0.0f,-1.0f} });
 	plane_.vertices.push_back({ {1.0f,1.0f,0.0f,1.0f},{1.0f,0.0f},{0.0f,0.0f,-1.0f} });
 
+	// index番号を
 	plane_.indices.push_back(0);
 	plane_.indices.push_back(3);
 	plane_.indices.push_back(1);
@@ -86,7 +87,7 @@ void ParticleManager::InitPlaneVertex() {
 }
 
 void ParticleManager::InitRingVertex() {
-	const uint32_t kRingDivide = 32;
+	const uint32_t kRingDivide = 32;//分割数
 	const float kOuterRadius = 1.0f;
 	const float kInnerRadius = 0.2f;
 	const float radianPerDivide = 2.0f * std::numbers::pi_v<float> / float(kRingDivide);

@@ -91,6 +91,7 @@ public:
 
 	static void SetIsStopped(bool flag);
 
+	// Emitterの初期化
 	int InitGPUEmitter(int returnMod = 0);
 	int InitGPUEmitterTexture(const std::string& fileName);
 	int InitGPUEmitterSurface(const std::string& fileName);
@@ -98,6 +99,7 @@ public:
 	void ResetCSEmitters();
 	void InitDefaultCSEmitter();
 
+	// ファイルのデータを読み込む
 	void LoadCSEmitterFileDir();
 	const std::vector<std::string>& GetCSEmitterFileNames() { return csEmitterFileNames_; }
 

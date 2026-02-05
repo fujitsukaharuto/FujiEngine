@@ -67,15 +67,15 @@ void ResultScene::Initialize() {
 		player = std::make_unique<Object3d>();
 		player->CreateFromJson("resource/Json/Clear_Player.json");
 		player->SetTexture("Atlas.png");
-		defaRotateY_ = player->transform.rotate.y;
-		defaTransY_ = player->transform.translate.y;
+		defaRotateY_ = player->GetTransform().rotate.y;
+		defaTransY_ = player->GetTransform().translate.y;
 		if (i == 1) {
-			player->transform.translate.x += xDiff_;
-			player->transform.translate.z += zDiff_;
+			player->GetTransform().translate.x += xDiff_;
+			player->GetTransform().translate.z += zDiff_;
 		}
 		else if (i == 2) {
-			player->transform.translate.x -= xDiff_;
-			player->transform.translate.z += zDiff_;
+			player->GetTransform().translate.x -= xDiff_;
+			player->GetTransform().translate.z += zDiff_;
 		}
 		players_.push_back(std::move(player));
 	}
@@ -293,14 +293,14 @@ void ResultScene::KirbyDance() {
 	}
 
 	for (int i = 0; i < 3; i++) {
-		players_[i]->transform.translate = transform;
-		players_[i]->transform.rotate = rotate;
+		players_[i]->GetTransform().translate = transform;
+		players_[i]->GetTransform().rotate = rotate;
 		if (i == 1) {
-			players_[i]->transform.translate.x += xDiff_;
-			players_[i]->transform.translate.z += zDiff_;
+			players_[i]->GetTransform().translate.x += xDiff_;
+			players_[i]->GetTransform().translate.z += zDiff_;
 		} else if (i == 2) {
-			players_[i]->transform.translate.x -= xDiff_;
-			players_[i]->transform.translate.z += zDiff_;
+			players_[i]->GetTransform().translate.x -= xDiff_;
+			players_[i]->GetTransform().translate.z += zDiff_;
 		}
 	}
 }

@@ -15,10 +15,6 @@ void DirectionLight::Initialize(DXCom* pDxcom) {
 		directionLightResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&directionLightDataGPU_[i]));
 	}
 
-	directionLightData_.color = { 1.0f,1.0f,1.0f,1.0f };
-	directionLightData_.direction = { 0.0f,-1.0f,0.0f };
-	directionLightData_.intensity = 0.3f;
-
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
 		CopyData(i);
 	}

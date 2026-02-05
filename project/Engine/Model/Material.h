@@ -54,7 +54,7 @@ namespace Graphics {
 			int32_t enableLighting;
 			float padding[3];
 			Math::Matrix4x4 uvTransform;
-			float shininess;
+			float shininess = 50.0f;
 			float AlphaRef = 0.5f;
 		};
 
@@ -66,7 +66,7 @@ namespace Graphics {
 			int32_t enableLighting;
 			float padding[3];
 			Math::Matrix4x4 uvTransform;
-			float shininess;
+			float shininess = 50.0f;
 			float environmentCoefficient = 1.0f;
 		};
 

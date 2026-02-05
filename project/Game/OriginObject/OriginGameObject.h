@@ -48,8 +48,8 @@ public:
 	//* Getter
 	Graphics::Object3d* GetModel() { return model_.get(); }
 	Graphics::AnimationModel* GetAnimeModel() { return animeModel_.get(); }
-	Math::Trans& GetTrans() { return model_->transform; }
-	Math::Trans& GetAnimeTrans() { return animeModel_->transform; }
+	Math::Trans& GetTrans() { return model_->GetTransform(); }
+	Math::Trans& GetAnimeTrans() { return animeModel_->GetTransform(); }
 	Math::Vector3 GetWorldPos()const { return model_->GetWorldPos(); }
 	Math::Vector3 GetAnimeWorldPos()const { return animeModel_->GetWorldPos(); }
 

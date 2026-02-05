@@ -60,12 +60,16 @@ namespace Core {
 
 		void Debug();
 
-		static float GetClampFrame();
-
+		//========================================================================*/
+		//* Setter
 		static void SetStopped();
 		static void SetUnStopped();
 		static void SetFrameByFrame(bool flag);
+
+		//========================================================================*/
+		//* Getter
 		static bool GetFrameByFrame();
+		static float GetClampFrame();
 
 	private:
 

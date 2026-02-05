@@ -81,23 +81,23 @@ void Object3d::CreateRing(float out, float in, float radius, bool horizon) {
 	this->camera_ = CameraManager::GetInstance()->GetCamera();
 	
 	model_ = std::make_unique<Model>();
-	model_->data_ = ModelManager::GetInstance()->CreateRing(out, in, radius,horizon);
+	model_->GetModelData() = ModelManager::GetInstance()->CreateRing(out, in, radius,horizon);
 	modelName_ = "Ring";
 
-	for (size_t i = 0; i < model_->data_.meshes.size(); i++) {
+	for (size_t i = 0; i < model_->GetModelData().meshes.size(); i++) {
 		Mesh newMesh{};
 		Material newMaterial{};
-		newMaterial.SetTextureNamePath((model_->data_.meshes[i].material.textureFilePath));
+		newMaterial.SetTextureNamePath((model_->GetModelData().meshes[i].material.textureFilePath));
 		newMaterial.CreateMaterial();
 		model_->AddMaterial(newMaterial);
-		model_->SetTextureName((model_->data_.meshes[i].material.textureFilePath));
+		model_->SetTextureName((model_->GetModelData().meshes[i].material.textureFilePath));
 
-		for (size_t index = 0; index < model_->data_.meshes[i].vertices.size(); index++) {
-			VertexDate newVertex = model_->data_.meshes[i].vertices[index];
+		for (size_t index = 0; index < model_->GetModelData().meshes[i].vertices.size(); index++) {
+			VertexDate newVertex = model_->GetModelData().meshes[i].vertices[index];
 			newMesh.AddVertex({ { newVertex.position },{newVertex.texcoord},{newVertex.normal} });
 		}
-		for (size_t index = 0; index < model_->data_.meshes[i].indicies.size(); index++) {
-			uint32_t newIndex = model_->data_.meshes[i].indicies[index];
+		for (size_t index = 0; index < model_->GetModelData().meshes[i].indicies.size(); index++) {
+			uint32_t newIndex = model_->GetModelData().meshes[i].indicies[index];
 			newMesh.AddIndex(newIndex);
 		}
 		newMesh.CreateMesh();
@@ -111,23 +111,23 @@ void Object3d::CreateRing(float out, float in, float radius, bool horizon) {
 void Object3d::CreateCylinder(float topRadius, float bottomRadius, float height) {
 	this->camera_ = CameraManager::GetInstance()->GetCamera();
 	model_ = std::make_unique<Model>();
-	model_->data_ = ModelManager::GetInstance()->CreateCylinder(topRadius, bottomRadius, height);
+	model_->GetModelData() = ModelManager::GetInstance()->CreateCylinder(topRadius, bottomRadius, height);
 	modelName_ = "Cylinder";
 
-	for (size_t i = 0; i < model_->data_.meshes.size(); i++) {
+	for (size_t i = 0; i < model_->GetModelData().meshes.size(); i++) {
 		Mesh newMesh{};
 		Material newMaterial{};
-		newMaterial.SetTextureNamePath((model_->data_.meshes[i].material.textureFilePath));
+		newMaterial.SetTextureNamePath((model_->GetModelData().meshes[i].material.textureFilePath));
 		newMaterial.CreateMaterial();
 		model_->AddMaterial(newMaterial);
-		model_->SetTextureName((model_->data_.meshes[i].material.textureFilePath));
+		model_->SetTextureName((model_->GetModelData().meshes[i].material.textureFilePath));
 
-		for (size_t index = 0; index < model_->data_.meshes[i].vertices.size(); index++) {
-			VertexDate newVertex = model_->data_.meshes[i].vertices[index];
+		for (size_t index = 0; index < model_->GetModelData().meshes[i].vertices.size(); index++) {
+			VertexDate newVertex = model_->GetModelData().meshes[i].vertices[index];
 			newMesh.AddVertex({ { newVertex.position },{newVertex.texcoord},{newVertex.normal} });
 		}
-		for (size_t index = 0; index < model_->data_.meshes[i].indicies.size(); index++) {
-			uint32_t newIndex = model_->data_.meshes[i].indicies[index];
+		for (size_t index = 0; index < model_->GetModelData().meshes[i].indicies.size(); index++) {
+			uint32_t newIndex = model_->GetModelData().meshes[i].indicies[index];
 			newMesh.AddIndex(newIndex);
 		}
 		newMesh.CreateMesh();
@@ -553,23 +553,23 @@ void Object3d::SetLightEnable(LightMode mode) {
 
 void Object3d::SetModel(const std::string& fileName, bool overWrite) {
 	model_ = std::make_unique<Model>();
-	model_->data_ = ModelManager::FindModel(fileName, overWrite);
+	model_->GetModelData() = ModelManager::FindModel(fileName, overWrite);
 	modelName_ = fileName;
 
-	for (size_t i = 0; i < model_->data_.meshes.size(); i++) {
+	for (size_t i = 0; i < model_->GetModelData().meshes.size(); i++) {
 		Mesh newMesh{};
 		Material newMaterial{};
-		newMaterial.SetTextureNamePath((model_->data_.meshes[i].material.textureFilePath));
+		newMaterial.SetTextureNamePath((model_->GetModelData().meshes[i].material.textureFilePath));
 		newMaterial.CreateMaterial();
 		model_->AddMaterial(newMaterial);
-		model_->SetTextureName((model_->data_.meshes[i].material.textureFilePath));
+		model_->SetTextureName((model_->GetModelData().meshes[i].material.textureFilePath));
 
-		for (size_t index = 0; index < model_->data_.meshes[i].vertices.size(); index++) {
-			VertexDate newVertex = model_->data_.meshes[i].vertices[index];
+		for (size_t index = 0; index < model_->GetModelData().meshes[i].vertices.size(); index++) {
+			VertexDate newVertex = model_->GetModelData().meshes[i].vertices[index];
 			newMesh.AddVertex({ { newVertex.position },{newVertex.texcoord},{newVertex.normal} });
 		}
-		for (size_t index = 0; index < model_->data_.meshes[i].indicies.size(); index++) {
-			uint32_t newIndex = model_->data_.meshes[i].indicies[index];
+		for (size_t index = 0; index < model_->GetModelData().meshes[i].indicies.size(); index++) {
+			uint32_t newIndex = model_->GetModelData().meshes[i].indicies[index];
 			newMesh.AddIndex(newIndex);
 		}
 		newMesh.CreateMesh();
@@ -683,8 +683,8 @@ void Object3d::SetWVP() {
 	}
 
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
-	wvpDateGPU_[frameIndex]->World = Multiply(model_->data_.rootNode.local, worldMatrix);
-	wvpDateGPU_[frameIndex]->WVP = Multiply(model_->data_.rootNode.local, worldViewProjectionMatrix);
+	wvpDateGPU_[frameIndex]->World = Multiply(model_->GetModelData().rootNode.local, worldMatrix);
+	wvpDateGPU_[frameIndex]->WVP = Multiply(model_->GetModelData().rootNode.local, worldViewProjectionMatrix);
 	wvpDateGPU_[frameIndex]->WorldInverseTransPose = Transpose(Inverse(wvpDateGPU_[frameIndex]->World));
 
 	cameraPosDataGPU_[frameIndex]->worldPosition = camera_->GetTranslate();

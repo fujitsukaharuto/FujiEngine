@@ -45,36 +45,8 @@ void Framework::Init() {
 	line3dDrawer_->SetCamera(cameraManager_->GetCamera());
 
 #pragma region 汎用機能初期化
-	// ImGuiの初期化
-	imguiManager_ = ImGuiManager::GetInstance();
-	imguiManager_->Initialize(win_, dxcommon_.get());
-
-	// 入力の初期化
-	input_ = Input::GetInstance();
-	input_->Initialize();
-
-	// オーディオの初期化
-	audioPlayer_ = AudioPlayer::GetInstance();
-	audioPlayer_->Initialize();
-
-	// ライト管理
-	lightManager_ = std::make_unique<Graphics::LightManager>();
-	lightManager_->Initialize(dxcommon_.get());
-	lightManager_->CreateLight();
-	lightManager_->AddPointLight();
-	lightManager_->AddSpotLight();
-
-	// object関係
-	textureManager_ = TextureManager::GetInstance();
-	textureManager_->Initialize(dxcommon_.get());
-	modelManager_ = ModelManager::GetInstance();
-	modelManager_->Initialize(dxcommon_.get(),lightManager_.get());
-
-
 	
-	// パーティクル管理
-	pManager_ = ParticleManager::GetInstance();
-	pManager_->Initialize(dxcommon_.get(), srvManager_);
+	InitGeneralSystems();
 
 #pragma endregion
 
@@ -109,4 +81,35 @@ void Framework::Run() {
 		Draw();
 	}
 	Finalize();
+}
+
+void Core::Framework::InitGeneralSystems() {
+	// ImGuiの初期化
+	imguiManager_ = ImGuiManager::GetInstance();
+	imguiManager_->Initialize(win_, dxcommon_.get());
+
+	// 入力の初期化
+	input_ = Input::GetInstance();
+	input_->Initialize();
+
+	// オーディオの初期化
+	audioPlayer_ = AudioPlayer::GetInstance();
+	audioPlayer_->Initialize();
+
+	// ライト管理
+	lightManager_ = std::make_unique<Graphics::LightManager>();
+	lightManager_->Initialize(dxcommon_.get());
+	lightManager_->CreateLight();
+	lightManager_->AddPointLight();
+	lightManager_->AddSpotLight();
+
+	// object関係
+	textureManager_ = TextureManager::GetInstance();
+	textureManager_->Initialize(dxcommon_.get());
+	modelManager_ = ModelManager::GetInstance();
+	modelManager_->Initialize(dxcommon_.get(), lightManager_.get());
+
+	// パーティクル管理
+	pManager_ = ParticleManager::GetInstance();
+	pManager_->Initialize(dxcommon_.get(), srvManager_);
 }

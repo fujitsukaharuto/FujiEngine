@@ -12,9 +12,9 @@ class DXCom;
 /// </summary>
 struct DirectionalLight {
 
-	Math::Vector4 color;
-	Math::Vector3 direction;
-	float intensity;
+	Math::Vector4 color = { 1.0f,1.0f,1.0f,1.0f };
+	Math::Vector3 direction = { 0.0f,-1.0f,0.0f };
+	float intensity = 0.3f;
 
 };
 

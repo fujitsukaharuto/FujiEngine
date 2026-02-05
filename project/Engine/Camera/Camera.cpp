@@ -10,13 +10,13 @@
 using namespace Core;
 using namespace Math;
 
-Camera::Camera() :transform_({ { 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, { 0.0f,5.0f,-30.0f } })
-, fovY_(0.6f), aspect_(float(MyWin::kWindowWidth) / float(MyWin::kWindowHeight))
-, nearClip_(0.1f), farClip_(1000.0f), worldMatrix_(MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate))
-, viewMatrix_(Inverse(worldMatrix_))
-, projectionMatrix_(MakePerspectiveFovMatrix(fovY_, aspect_, nearClip_, farClip_))
-, viewProjectionMatrix_(Multiply(viewMatrix_, projectionMatrix_)), shakeMode_(ShakeMode::RandomShake)
-, shakeTime_(0.0f), shakeStrength_(0.1f) {
+Camera::Camera() {
+	aspect_ = float(MyWin::kWindowWidth) / float(MyWin::kWindowHeight);
+	worldMatrix_ = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+	viewMatrix_ = Inverse(worldMatrix_);
+	projectionMatrix_ = MakePerspectiveFovMatrix(fovY_, aspect_, nearClip_, farClip_);
+	viewProjectionMatrix_ = Multiply(viewMatrix_, projectionMatrix_);
+	shakeMode_ = ShakeMode::RandomShake;
 }
 
 void Camera::Update() {
@@ -27,7 +27,7 @@ void Camera::Update() {
 		float gap;
 		switch (shakeMode_) {
 		case Camera::ShakeMode::RandomShake:
-			shakeGap_ = Random::GetVector3({ -0.5f,0.5f }, { -0.5f,0.5f }, { -0.5f,0.5f });
+			shakeGap_ = Random::GetVector3(shakeGapRand_, shakeGapRand_, shakeGapRand_);
 			shakeGap_.z = 0.0f;
 			shakeGap_ = shakeGap_ * shakeStrength_;
 			break;

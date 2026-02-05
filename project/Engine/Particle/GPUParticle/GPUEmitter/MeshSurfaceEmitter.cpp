@@ -17,14 +17,7 @@ MeshSurfaceEmitter::MeshSurfaceEmitter(DXCom* dx) {
 		resource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&dataGPU_[i]));
 	}
 	data_ = {};
-	data_.count = 500;
-	data_.lifeTime = 1.0f;
-	data_.frequency = 0.008f;
-	data_.radius = 2.5f;
-	data_.scale = Vector3(0.1f, 0.1f, 0.1f);
 	data_.emit = 0;
-	data_.colorMax = { 1.0f,1.0f,1.0f };
-	data_.colorMin = { 0.0f,0.0f,0.0f };
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
 		CopyData(i);
 	}
@@ -50,7 +43,7 @@ void MeshSurfaceEmitter::InitMeshData(const std::string& fileName, DXCom* dx, SR
 
 	// 面積リストとCDFを作る
 	std::vector<float> triangleAreas;
-	triangleAreas.reserve(data.indicies.size() / 3);
+	triangleAreas.reserve(data.indicies.size() / 3);// ポリゴンの頂点数
 	float totalArea = 0.0f;
 	for (size_t i = 0; i < data.indicies.size(); i += 3) {
 		uint32_t i0 = data.indicies[i + 0];
@@ -112,8 +105,8 @@ void MeshSurfaceEmitter::Dispatch(ID3D12GraphicsCommandList* cmd,
 	DXCom* dx, SRVManager* srv, const ParticleCSHandles& shared) {
 	if (!isEmit_ || data_.count == 0) return;
 	uint32_t frameIndex = dx->GetNowFrameCount();
-	CopyData(frameIndex);
-	dx->GetPipelineManager()->SetCSPipeline(Pipe::EmitSurfaceParticleCS, 2);
+	CopyData(frameIndex);// データのコピー
+	dx->GetPipelineManager()->SetCSPipeline(Pipe::EmitSurfaceParticleCS, 2);// 表面エミット
 	cmd->SetComputeRootDescriptorTable(0, shared.transCSUAVHandle);
 	cmd->SetComputeRootDescriptorTable(1, shared.scaleCSUAVHandle);
 	cmd->SetComputeRootDescriptorTable(2, shared.timeCSUAVHandle);

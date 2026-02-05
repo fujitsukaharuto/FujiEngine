@@ -114,11 +114,6 @@ void FPSKeeper::Debug() {
 #endif // _DEBUG
 }
 
-float FPSKeeper::GetClampFrame() {
-	auto* inst = GetInstance();
-	return inst->clampFrame_;
-}
-
 void Core::FPSKeeper::SetStopped() {
 	auto* inst = GetInstance();
 	inst->isStopped_ = true;
@@ -136,4 +131,9 @@ void Core::FPSKeeper::SetFrameByFrame(bool flag) {
 
 bool Core::FPSKeeper::GetFrameByFrame() {
 	return GetInstance()->isFrameByFrame_;
+}
+
+float FPSKeeper::GetClampFrame() {
+	auto* inst = GetInstance();
+	return inst->clampFrame_;
 }

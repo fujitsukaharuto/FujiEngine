@@ -97,8 +97,8 @@ void AnimationModel::LoadAnimationFile(const std::string& filename) {
 	const aiScene* scene = importer.ReadFile(kDirectoryPath_ + filename.c_str(), 0);
 	assert(scene->mNumAnimations != 0);
 
-	CreateSkeleton(model_->data_.rootNode);
-	skinCluster_ = CreateSkinCluster(skeleton_, model_->data_);
+	CreateSkeleton(model_->GetModelData().rootNode);
+	skinCluster_ = CreateSkinCluster(skeleton_, model_->GetModelData());
 
 	animations_.clear();
 
@@ -551,23 +551,23 @@ void AnimationModel::SetEnvironmentCoeff(float environment) {
 
 void AnimationModel::SetModel(const std::string& fileName) {
 	model_ = std::make_unique<Model>();
-	model_->data_ = ModelManager::FindModel(fileName);
+	model_->GetModelData() = ModelManager::FindModel(fileName);
 
-	for (size_t i = 0; i < model_->data_.meshes.size(); i++) {
+	for (size_t i = 0; i < model_->GetModelData().meshes.size(); i++) { // 取得したデータからメッシュを作る
 		Mesh newMesh{};
 		Material newMaterial{};
-		newMaterial.SetTextureNamePath((model_->data_.meshes[i].material.textureFilePath));
+		newMaterial.SetTextureNamePath((model_->GetModelData().meshes[i].material.textureFilePath));
 		newMaterial.CreateMaterial();
-		newMaterial.SetColor(model_->data_.meshes[i].baseColor);
+		newMaterial.SetColor(model_->GetModelData().meshes[i].baseColor);
 		model_->AddMaterial(newMaterial);
-		model_->SetTextureName((model_->data_.meshes[i].material.textureFilePath));
+		model_->SetTextureName((model_->GetModelData().meshes[i].material.textureFilePath));
 
-		for (size_t index = 0; index < model_->data_.meshes[i].vertices.size(); index++) {
-			VertexDate newVertex = model_->data_.meshes[i].vertices[index];
+		for (size_t index = 0; index < model_->GetModelData().meshes[i].vertices.size(); index++) {
+			VertexDate newVertex = model_->GetModelData().meshes[i].vertices[index];
 			newMesh.AddVertex({ { newVertex.position },{newVertex.texcoord},{newVertex.normal} });
 		}
-		for (size_t index = 0; index < model_->data_.meshes[i].indicies.size(); index++) {
-			uint32_t newIndex = model_->data_.meshes[i].indicies[index];
+		for (size_t index = 0; index < model_->GetModelData().meshes[i].indicies.size(); index++) {
+			uint32_t newIndex = model_->GetModelData().meshes[i].indicies[index];
 			newMesh.AddIndex(newIndex);
 		}
 		newMesh.CreateMesh();
@@ -619,7 +619,7 @@ void AnimationModel::SetWVP() {
 	Matrix4x4 worldViewProjectionMatrix;
 
 
-	if (transform.parent) {
+	if (transform.parent) { // 親子付けしているかどうか
 		const Matrix4x4& parentWorldMatrix = transform.parent->GetWorldMat();
 		worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
 	} else if (transform.isCameraParent) {
@@ -628,7 +628,7 @@ void AnimationModel::SetWVP() {
 	}
 
 
-	if (camera_) {
+	if (camera_) { // カメラが存在するかどうか
 		const Matrix4x4& viewProjectionMatrix = camera_->GetViewProjectionMatrix();
 		worldViewProjectionMatrix = Multiply(worldMatrix, viewProjectionMatrix);
 	} else {
@@ -636,7 +636,7 @@ void AnimationModel::SetWVP() {
 	}
 
 	Matrix4x4 localMatrix;
-	localMatrix = model_->data_.rootNode.local;
+	localMatrix = model_->GetModelData().rootNode.local;
 
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 
@@ -656,7 +656,7 @@ void AnimationModel::SetBillboardWVP() {
 	worldMatrix = Multiply(worldMatrix, billboardMatrix_);
 	worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(transform.translate));
 
-	if (camera_) {
+	if (camera_) { // カメラが存在するかどうか
 		const Matrix4x4& viewProjectionMatrix = camera_->GetViewProjectionMatrix();
 		worldViewProjectionMatrix = Multiply(worldMatrix, viewProjectionMatrix);
 	} else {

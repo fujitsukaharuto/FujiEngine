@@ -134,5 +134,7 @@ private:
 
 	bool isUpDatedMatrix_ = false;
 
+	float perDistance_ = 0.05f;
+
 	IParticleGroup* group_;
 };

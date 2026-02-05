@@ -70,6 +70,7 @@ namespace Graphics {
 
 		//========================================================================*/
 		//* Getter
+		Math::Trans& GetTransform() { return transform; }
 		Math::Matrix4x4 GetWorldMat() const;
 		Math::Vector3 GetWorldPos()const;
 		Math::Matrix4x4* GetJointTrans(const std::string& jointName);
@@ -129,23 +130,49 @@ namespace Graphics {
 		/// <summary>アニメーションをループさせるか</summary>
 		void IsLoopAnimation(bool is) { isLoopAnimation_ = is; }
 
-		Math::Trans transform{};
 
 	private:
 
+		Math::Trans transform{};
+
+		/// <summary>
+		/// ジョイントの作成
+		/// </summary>
+		/// <param name="node">ノード</param>
+		/// <param name="parent">親</param>
+		/// <param name="joints">ジョイント</param>
+		/// <returns>int32_t</returns>
 		int32_t CreateJoint(const Node& node, const std::optional<int32_t>& parent, std::vector<Joint>& joints);
 
+		/// <summary>
+		/// WVPの作成
+		/// </summary>
 		void CreateWVP();
 
+		/// <summary>
+		/// WVPの計算
+		/// </summary>
 		void SetWVP();
 
+		/// <summary>
+		/// ビルボード状態のWVP
+		/// </summary>
 		void SetBillboardWVP();
 
+		//========================================================================*/
+		//* キーフレームから値を取り出す
 		Math::Vector3 CalculationValue(const std::vector<KeyframeVector3>& keyframe, float time);
 		Math::Quaternion CalculationValue(const std::vector<KeyframeQuaternion>& keyframe, float time);
 
+		/// <summary>
+		/// ジョイントのDraw
+		/// </summary>
+		/// <param name="m">マトリックス</param>
+		/// <param name="color">色</param>
 		void JointDraw(const Math::Matrix4x4& m, Math::Vector4 color);
 
+		//========================================================================*/
+		//* アニメーション補間のためのGetter
 		Animation* GetCurrentAnimation();
 		Animation* GetPreviousAnimation();
 

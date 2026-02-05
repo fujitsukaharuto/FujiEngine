@@ -165,8 +165,19 @@ namespace Graphics {
 		void DebugGUI();
 		void EffectListGUI();
 
+		/// <summary>
+		/// リソースの作成
+		/// </summary>
 		void CreateResource();
+
+		/// <summary>
+		/// テクスチャ等の必要リソースの作成
+		/// </summary>
 		void SettingTexture();
+
+		/// <summary>
+		/// コマンド、命令の発行
+		/// </summary>
 		void Command();
 
 		/// <summary>
@@ -198,10 +209,40 @@ namespace Graphics {
 
 	private:
 
+		/// <summary>
+		/// 頂点情報の初期化
+		/// </summary>
 		void SettingVertex();
+
+		/// <summary>
+		/// フレームごとのデータリソースの作成
+		/// </summary>
+		void InitDataResource();
+
+		/// <summary>
+		/// 必要データの作成
+		/// </summary>
 		void InitData();
+
+		/// <summary>
+		/// ポストエフェクトの1パス分の情報の作成
+		/// </summary>
 		void InitializePostEffects();
+
+		/// <summary>
+		/// ポストエフェクトの命令発行をPingPong形式で
+		/// </summary>
+		void PingPongCommand();
+
+		/// <summary>
+		/// 別パスでの描画
+		/// </summary>
 		void OtherPipeLineCommand();
+
+		/// <summary>
+		/// データを現在のフレームのリソースにコピー
+		/// </summary>
+		/// <param name="frameIndex">フレーム番号</param>
 		void CopyData(uint32_t frameIndex = 0);
 
 	private:

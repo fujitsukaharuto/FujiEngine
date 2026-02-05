@@ -30,7 +30,7 @@ void PlayerBullet::Initialize() {
 void PlayerBullet::Update() {
 	if (isLive_) {
 		// 位置の更新
-		model_->transform.translate += (velocity_ * speed_) * FPSKeeper::DeltaTimeFrame();
+		model_->GetTransform().translate += (velocity_ * speed_) * FPSKeeper::DeltaTimeFrame();
 
 		collider_->SetPos(model_->GetWorldPos());
 		collider_->InfoUpdate();
@@ -52,15 +52,15 @@ void PlayerBullet::InitParameter(const Vector3& pos) {
 	collider_->SetHeight(0.3f);
 	collider_->SetTag("playerBullet");
 	trajectory.pos_ = { 0.0f,0.0f,0.0f };
-	model_->transform.scale = Vector3::FillVec(0.3f);
-	model_->transform.translate = pos;
+	model_->GetTransform().scale = Vector3::FillVec(0.3f);
+	model_->GetTransform().translate = pos;
 	speed_ = 0.0f;
 	damage_ = 0.0f;
 }
 
 void PlayerBullet::CalculationFollowVec(const Vector3& target) {
 
-	Vector3 currentPos = model_->transform.translate;
+	Vector3 currentPos = model_->GetTransform().translate;
 	Vector3 toTarget = (target - currentPos).Normalize();
 	Vector3 forward = velocity_.Normalize();
 
@@ -87,7 +87,7 @@ void PlayerBullet::CalculationFollowVec(const Vector3& target) {
 	Quaternion spinRot = Quaternion::AngleAxis(zRotate_, Vector3(0, 0, 1));
 	// スピン回転を補間後のクォータニオンに加える（Z軸にひねる）
 	Quaternion finalRot = newRot * spinRot;
-	model_->transform.rotate = Quaternion::QuaternionToEuler(finalRot);
+	model_->GetTransform().rotate = Quaternion::QuaternionToEuler(finalRot);
 
 	trajectory.Emit();
 	if (isStrength_) trajectory2.Emit();
@@ -118,8 +118,8 @@ void PlayerBullet::OnCollisionExit([[maybe_unused]] const ColliderInfo& other) {
 void PlayerBullet::Charge(const Vector3& pos, const Vector3& rot) {
 	if (!isCharge_) return;
 
-	model_->transform.translate = pos;
-	model_->transform.rotate = rot;
+	model_->GetTransform().translate = pos;
+	model_->GetTransform().rotate = rot;
 }
 
 void PlayerBullet::StrengthBullet() { // 強化弾に変更する
@@ -129,7 +129,7 @@ void PlayerBullet::StrengthBullet() { // 強化弾に変更する
 	collider_->SetHeight(0.6f);
 	collider_->SetTag("playerBullet_strng");
 	trajectory.pos_ = { -0.6f,0.0f,-0.6f };
-	model_->transform.scale = Vector3::FillVec(0.6f);
+	model_->GetTransform().scale = Vector3::FillVec(0.6f);
 }
 
 ///= Release ==================================================================*/
@@ -147,8 +147,8 @@ void PlayerBullet::ParticleEmitterSetting() {
 	ParticleManager::Load(trajectory, "BulletTrajectory");
 	ParticleManager::Load(trajectory2, "BulletTrajectory2");
 
-	trajectory.SetParent(&model_->transform);
-	trajectory2.SetParent(&model_->transform);
+	trajectory.SetParent(&model_->GetTransform());
+	trajectory2.SetParent(&model_->GetTransform());
 
 	trajectory.pos_ = { 0.0f,0.0f,0.0f };
 	trajectory2.pos_ = { 0.6f,0.0f,0.6f };
@@ -159,11 +159,11 @@ void PlayerBullet::ParticleEmitterSetting() {
 	ParticleManager::Load(hitSmoke_, "bulletHitSmoke");
 	ParticleManager::Load(hitCircle_, "bulletHitCircle");
 
-	hit_.SetParent(&model_->transform);
-	hit2_.SetParent(&model_->transform);
-	hit3_.SetParent(&model_->transform);
-	hitSmoke_.SetParent(&model_->transform);
-	hitCircle_.SetParent(&model_->transform);
+	hit_.SetParent(&model_->GetTransform());
+	hit2_.SetParent(&model_->GetTransform());
+	hit3_.SetParent(&model_->GetTransform());
+	hitSmoke_.SetParent(&model_->GetTransform());
+	hitCircle_.SetParent(&model_->GetTransform());
 
 	hit_.frequencyTime_ = 0.0f;
 	hit2_.frequencyTime_ = 0.0f;

@@ -25,6 +25,10 @@ namespace Core {
 
 		void Finalize();
 
+		/// <summary>
+		/// メッセージを処理する
+		/// </summary>
+		/// <returns>bool</returns>
 		bool ProcessMessage();
 
 

@@ -66,7 +66,7 @@ ComPtr<IDxcBlob> DXCompil::CompileShader(const std::wstring& filePath, const wch
 	IDxcBlobUtf8* shaderError = nullptr;
 	shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), nullptr);
 	if (shaderError != nullptr && shaderError->GetStringLength() != 0) {
-		Logger::Log(shaderError->GetStringPointer());
+		Logger::Log(shaderError->GetStringPointer()); // Logを出せるようにする
 		assert(false);
 	}
 
@@ -74,7 +74,7 @@ ComPtr<IDxcBlob> DXCompil::CompileShader(const std::wstring& filePath, const wch
 	ComPtr<IDxcBlob> shaderBlob = nullptr;
 	hr = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
 	assert(SUCCEEDED(hr));
-	Logger::Log((std::format(L"Compile Succeeded, path:{}, profile:{}\n", filePath, profile)));
+	Logger::Log((std::format(L"Compile Succeeded, path:{}, profile:{}\n", filePath, profile)));// 成功Logを出せるようにする
 	shaderSource->Release();
 	shaderResult->Release();
 	return shaderBlob;

@@ -9,6 +9,11 @@ using namespace Graphics;
 using namespace Math;
 
 
+namespace {
+	constexpr int JSON_INDENT_WIDTH = 4;
+}
+
+
 void JsonSerializer::ShowSaveTransformPopup(const Trans& transform) {
 #ifdef _DEBUG
 	// Save ボタンを押すとポップアップを開く
@@ -129,7 +134,7 @@ void JsonSerializer::SerializeTransform(const Trans& transform, const std::strin
 	// 書き込み
 	std::ofstream ofs(fullPath);
 	if (ofs.is_open()) {
-		ofs << json.dump(4); // インデント付きで出力
+		ofs << json.dump(JSON_INDENT_WIDTH); // インデント付きで出力
 		ofs.close();
 	}
 }
@@ -293,9 +298,9 @@ void JsonSerializer::SerializeEditorObj(const EditorObj& obj, const std::string&
 	json["objectName"] = obj.name;
 	json["modelName"] = obj.obj->GetModelName();
 	// Vector3をそれぞれ配列として保存
-	json["transform"]["translate"] = { obj.obj->transform.translate.x, obj.obj->transform.translate.y, obj.obj->transform.translate.z };
-	json["transform"]["rotate"] = { obj.obj->transform.rotate.x, obj.obj->transform.rotate.y, obj.obj->transform.rotate.z };
-	json["transform"]["scale"] = { obj.obj->transform.scale.x, obj.obj->transform.scale.y, obj.obj->transform.scale.z };
+	json["transform"]["translate"] = { obj.obj->GetTransform().translate.x, obj.obj->GetTransform().translate.y, obj.obj->GetTransform().translate.z };
+	json["transform"]["rotate"] = { obj.obj->GetTransform().rotate.x, obj.obj->GetTransform().rotate.y, obj.obj->GetTransform().rotate.z };
+	json["transform"]["scale"] = { obj.obj->GetTransform().scale.x, obj.obj->GetTransform().scale.y, obj.obj->GetTransform().scale.z };
 
 	std::filesystem::path dir = "resource/Json";
 	std::filesystem::create_directories(dir); // ディレクトリが無ければ作成
@@ -304,7 +309,7 @@ void JsonSerializer::SerializeEditorObj(const EditorObj& obj, const std::string&
 	// 書き込み
 	std::ofstream ofs(fullPath);
 	if (ofs.is_open()) {
-		ofs << json.dump(4); // インデント付きで出力
+		ofs << json.dump(JSON_INDENT_WIDTH); // インデント付きで出力
 		ofs.close();
 	}
 }
@@ -330,32 +335,32 @@ bool JsonSerializer::DeserializeEditorObj(const std::string& filePath, EditorObj
 		obj.modelName = json["modelName"].get<std::string>();
 	}
 
-	Trans prevTransform = obj.obj->transform;
+	Trans prevTransform = obj.obj->GetTransform();
 	// JSON配列からVector3を復元
 	if (json.contains("transform")) {
 		const auto& t = json["transform"];
 
 		if (t.contains("translate")) {
-			obj.obj->transform.translate.x = t["translate"][0];
-			obj.obj->transform.translate.y = t["translate"][1];
-			obj.obj->transform.translate.z = t["translate"][2];
+			obj.obj->GetTransform().translate.x = t["translate"][0];
+			obj.obj->GetTransform().translate.y = t["translate"][1];
+			obj.obj->GetTransform().translate.z = t["translate"][2];
 		}
 		if (t.contains("rotate")) {
-			obj.obj->transform.rotate.x = t["rotate"][0];
-			obj.obj->transform.rotate.y = t["rotate"][1];
-			obj.obj->transform.rotate.z = t["rotate"][2];
+			obj.obj->GetTransform().rotate.x = t["rotate"][0];
+			obj.obj->GetTransform().rotate.y = t["rotate"][1];
+			obj.obj->GetTransform().rotate.z = t["rotate"][2];
 		}
 		if (t.contains("scale")) {
-			obj.obj->transform.scale.x = t["scale"][0];
-			obj.obj->transform.scale.y = t["scale"][1];
-			obj.obj->transform.scale.z = t["scale"][2];
+			obj.obj->GetTransform().scale.x = t["scale"][0];
+			obj.obj->GetTransform().scale.y = t["scale"][1];
+			obj.obj->GetTransform().scale.z = t["scale"][2];
 		}
 	}
 
 	if (isCreateCommand) {
-		CommandManager::TryCreatePropertyCommand(obj.obj->transform, prevTransform.translate, obj.obj->transform.translate, &Trans::translate);
-		CommandManager::TryCreatePropertyCommand(obj.obj->transform, prevTransform.rotate, obj.obj->transform.rotate, &Trans::rotate);
-		CommandManager::TryCreatePropertyCommand(obj.obj->transform, prevTransform.scale, obj.obj->transform.scale, &Trans::scale);
+		CommandManager::TryCreatePropertyCommand(obj.obj->GetTransform(), prevTransform.translate, obj.obj->GetTransform().translate, &Trans::translate);
+		CommandManager::TryCreatePropertyCommand(obj.obj->GetTransform(), prevTransform.rotate, obj.obj->GetTransform().rotate, &Trans::rotate);
+		CommandManager::TryCreatePropertyCommand(obj.obj->GetTransform(), prevTransform.scale, obj.obj->GetTransform().scale, &Trans::scale);
 	}
 	return true;
 }
@@ -370,7 +375,7 @@ void JsonSerializer::SerializeJsonData([[maybe_unused]] const json& data, [[mayb
 	}
 	std::ofstream file(fullPath);
 	if (file.is_open()) {
-		file << data.dump(4);
+		file << data.dump(JSON_INDENT_WIDTH);
 		file.close();
 	}
 }

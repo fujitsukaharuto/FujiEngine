@@ -112,22 +112,23 @@ private:
 
 
 private:
-	Math::Trans transform_;
+	Math::Trans transform_ = { { 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, { 0.0f,5.0f,-30.0f } };
 
 	Math::Matrix4x4 worldMatrix_;
 	Math::Matrix4x4 viewMatrix_;
 
 	Math::Matrix4x4 projectionMatrix_;
-	float fovY_;
+	float fovY_ = 0.6f;
 	float aspect_;
-	float nearClip_;
-	float farClip_;
+	float nearClip_ = 0.1f;
+	float farClip_ = 1000.0f;
 
 	Math::Matrix4x4 viewProjectionMatrix_;
 
 	ShakeMode shakeMode_;
-	float shakeTime_;
-	float shakeStrength_;
+	float shakeTime_ = 0.0f;
+	float shakeStrength_ = 0.1f;
 	Math::Vector3 shakeGap_;
+	Math::Vector2 shakeGapRand_ = { -0.5f,0.5f };
 	float rollingTime_;
 };

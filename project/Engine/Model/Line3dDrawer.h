@@ -56,6 +56,12 @@ namespace Graphics {
 
 		void Finalize();
 
+		/// <summary>
+		/// 線の描画
+		/// </summary>
+		/// <param name="p1">点1</param>
+		/// <param name="p2">点2</param>
+		/// <param name="color">色</param>
 		void DrawLine3d(const Math::Vector3& p1, const Math::Vector3& p2, const Math::Vector4& color);
 
 		/// <summary>球を線で描画する</summary>

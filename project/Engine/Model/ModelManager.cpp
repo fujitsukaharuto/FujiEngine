@@ -145,7 +145,7 @@ void ModelManager::LoadOBJ(const std::string& filename, bool overWrite) {
 			vertex.position.x *= -1.0f;
 			vertex.normal.x *= -1.0f;
 
-			model->data_.vertices.push_back({ {vertex.position},{vertex.texcoord},{vertex.normal} });
+			model->GetModelData().vertices.push_back({ {vertex.position},{vertex.texcoord},{vertex.normal} });
 			newModelMesh.vertices.push_back({ {vertex.position},{vertex.texcoord},{vertex.normal} });
 		}
 
@@ -155,7 +155,7 @@ void ModelManager::LoadOBJ(const std::string& filename, bool overWrite) {
 
 			for (uint32_t element = 0; element < face.mNumIndices; element++) {
 				uint32_t vertexIndex = face.mIndices[element];
-				model->data_.indicies.push_back(vertexIndex);
+				model->GetModelData().indicies.push_back(vertexIndex);
 				newModelMesh.indicies.push_back(vertexIndex);
 			}
 		}
@@ -183,7 +183,7 @@ void ModelManager::LoadOBJ(const std::string& filename, bool overWrite) {
 		}
 		newModelMesh.material.textureFilePath = texturePath;
 
-		model->data_.meshes.push_back(newModelMesh);
+		model->GetModelData().meshes.push_back(newModelMesh);
 	}
 
 	if (overWrite) {
@@ -237,7 +237,7 @@ void ModelManager::LoadGLTF(const std::string& filename, bool overWrite) {
 			vertex.position.x *= -1.0f;
 			vertex.normal.x *= -1.0f;
 
-			model->data_.vertices.push_back({ {vertex.position},{vertex.texcoord},{vertex.normal} });
+			model->GetModelData().vertices.push_back({ {vertex.position},{vertex.texcoord},{vertex.normal} });
 			newModelMesh.vertices.push_back({ {vertex.position},{vertex.texcoord},{vertex.normal} });
 		}
 
@@ -247,7 +247,7 @@ void ModelManager::LoadGLTF(const std::string& filename, bool overWrite) {
 
 			for (uint32_t element = 0; element < face.mNumIndices; element++) {
 				uint32_t vertexIndex = face.mIndices[element];
-				model->data_.indicies.push_back(vertexIndex);
+				model->GetModelData().indicies.push_back(vertexIndex);
 				newModelMesh.indicies.push_back(vertexIndex);
 			}
 		}
@@ -273,13 +273,13 @@ void ModelManager::LoadGLTF(const std::string& filename, bool overWrite) {
 			texturePath = "white2x2.png";  // デフォルト
 		}
 		newModelMesh.material.textureFilePath = texturePath;
-		model->data_.meshes.push_back(newModelMesh);
+		model->GetModelData().meshes.push_back(newModelMesh);
 
 		// SkinCluster構築用のデータ取得
 		for (uint32_t boneIndex = 0; boneIndex < mesh->mNumBones; boneIndex++) {
 			aiBone* bone = mesh->mBones[boneIndex];
 			std::string jointName = bone->mName.C_Str();
-			JointWeightData& jointWeightData = model->data_.skinClusterData[jointName];
+			JointWeightData& jointWeightData = model->GetModelData().skinClusterData[jointName];
 
 			aiMatrix4x4 bindPosMatrixAssimp = bone->mOffsetMatrix.Inverse();
 			aiVector3D scale, translate;
@@ -302,7 +302,7 @@ void ModelManager::LoadGLTF(const std::string& filename, bool overWrite) {
 		}
 		meshVertexCount += mesh->mNumVertices;
 	}
-	model->data_.rootNode = ReadNode(scene->mRootNode);
+	model->GetModelData().rootNode = ReadNode(scene->mRootNode);
 
 	if (overWrite) {
 		instance->models_[filename] = std::move(model);
@@ -317,7 +317,7 @@ ModelData ModelManager::FindModel(const std::string& filename, bool overWrite) {
 	instance->LoadModelByExtension(filename, overWrite);
 	auto iterator = instance->models_.find(filename);
 	if (iterator != instance->models_.end()) {
-		return iterator->second->data_;
+		return iterator->second->GetModelData();
 	}
 	return ModelData{};
 }
@@ -355,7 +355,7 @@ void ModelManager::CreateSphere() {
 			float y = sinf(lat);
 			float z = cosf(lat) * sinf(lon);
 
-			model->data_.vertices.push_back({ {x, y, z, 1.0f},{u, v},{x, y, z} });
+			model->GetModelData().vertices.push_back({ {x, y, z, 1.0f},{u, v},{x, y, z} });
 			newModelMesh.vertices.push_back({ {x, y, z, 1.0f},{u, v},{x, y, z} });
 		}
 	}
@@ -371,22 +371,22 @@ void ModelManager::CreateSphere() {
 			uint32_t v2 = row2 + lonIndex;
 			uint32_t v3 = row2 + lonIndex + 1;
 
-			model->data_.indicies.push_back(v0);
+			model->GetModelData().indicies.push_back(v0);
 			newModelMesh.indicies.push_back(v0);
-			model->data_.indicies.push_back(v2);
+			model->GetModelData().indicies.push_back(v2);
 			newModelMesh.indicies.push_back(v2);
-			model->data_.indicies.push_back(v1);
+			model->GetModelData().indicies.push_back(v1);
 			newModelMesh.indicies.push_back(v1);
 
-			model->data_.indicies.push_back(v1);
+			model->GetModelData().indicies.push_back(v1);
 			newModelMesh.indicies.push_back(v1);
-			model->data_.indicies.push_back(v2);
+			model->GetModelData().indicies.push_back(v2);
 			newModelMesh.indicies.push_back(v2);
-			model->data_.indicies.push_back(v3);
+			model->GetModelData().indicies.push_back(v3);
 			newModelMesh.indicies.push_back(v3);
 		}
 	}
-	model->data_.meshes.push_back(newModelMesh);
+	model->GetModelData().meshes.push_back(newModelMesh);
 
 	instance->models_.insert(std::make_pair("Sphere", std::move(model)));
 }
@@ -409,17 +409,17 @@ ModelData ModelManager::CreateRing(float out, float in, float radius, bool horiz
 
 		if (horizon) {
 			// 外周
-			model->data_.vertices.push_back({ {-sinA * kOuterRadius, 0.0f, cosA * kOuterRadius, 1.0f}, {u, 0.0f}, {0,0,1} });
+			model->GetModelData().vertices.push_back({ {-sinA * kOuterRadius, 0.0f, cosA * kOuterRadius, 1.0f}, {u, 0.0f}, {0,0,1} });
 			newModelMesh.vertices.push_back({ {-sinA * kOuterRadius, 0.0f, cosA * kOuterRadius, 1.0f}, {u, 0.0f}, {0,0,1} });
 			// 内周
-			model->data_.vertices.push_back({ {-sinA * kInnerRadius, 0.0f, cosA * kInnerRadius, 1.0f}, {u, 1.0f}, {0,0,1} });
+			model->GetModelData().vertices.push_back({ {-sinA * kInnerRadius, 0.0f, cosA * kInnerRadius, 1.0f}, {u, 1.0f}, {0,0,1} });
 			newModelMesh.vertices.push_back({ {-sinA * kInnerRadius, 0.0f, cosA * kInnerRadius, 1.0f}, {u, 1.0f}, {0,0,1} });
 		} else {
 			// 外周
-			model->data_.vertices.push_back({ {-sinA * kOuterRadius, cosA * kOuterRadius, 0.0f, 1.0f}, {u, 0.0f}, {0,0,1} });
+			model->GetModelData().vertices.push_back({ {-sinA * kOuterRadius, cosA * kOuterRadius, 0.0f, 1.0f}, {u, 0.0f}, {0,0,1} });
 			newModelMesh.vertices.push_back({ {-sinA * kOuterRadius, cosA * kOuterRadius, 0.0f, 1.0f}, {u, 0.0f}, {0,0,1} });
 			// 内周
-			model->data_.vertices.push_back({ {-sinA * kInnerRadius, cosA * kInnerRadius, 0.0f, 1.0f}, {u, 1.0f}, {0,0,1} });
+			model->GetModelData().vertices.push_back({ {-sinA * kInnerRadius, cosA * kInnerRadius, 0.0f, 1.0f}, {u, 1.0f}, {0,0,1} });
 			newModelMesh.vertices.push_back({ {-sinA * kInnerRadius, cosA * kInnerRadius, 0.0f, 1.0f}, {u, 1.0f}, {0,0,1} });
 		}
 	}
@@ -432,24 +432,24 @@ ModelData ModelManager::CreateRing(float out, float in, float radius, bool horiz
 		uint32_t inner1 = outer0 + 3;
 
 		// 三角形1
-		model->data_.indicies.push_back(outer0);
+		model->GetModelData().indicies.push_back(outer0);
 		newModelMesh.indicies.push_back(outer0);
-		model->data_.indicies.push_back(inner0);
+		model->GetModelData().indicies.push_back(inner0);
 		newModelMesh.indicies.push_back(inner0);
-		model->data_.indicies.push_back(outer1);
+		model->GetModelData().indicies.push_back(outer1);
 		newModelMesh.indicies.push_back(outer1);
 
 		// 三角形2
-		model->data_.indicies.push_back(outer1);
+		model->GetModelData().indicies.push_back(outer1);
 		newModelMesh.indicies.push_back(outer1);
-		model->data_.indicies.push_back(inner0);
+		model->GetModelData().indicies.push_back(inner0);
 		newModelMesh.indicies.push_back(inner0);
-		model->data_.indicies.push_back(inner1);
+		model->GetModelData().indicies.push_back(inner1);
 		newModelMesh.indicies.push_back(inner1);
 	}
-	model->data_.meshes.push_back(newModelMesh);
+	model->GetModelData().meshes.push_back(newModelMesh);
 
-	return model->data_;
+	return model->GetModelData();
 }
 
 ModelData ModelManager::CreateCylinder(float topRadius, float bottomRadius, float height) {
@@ -472,12 +472,12 @@ ModelData ModelManager::CreateCylinder(float topRadius, float bottomRadius, floa
 		// 下
 		Vector3 posBottom = { cosA * kBottomRadius, 0.0f, sinA * kBottomRadius };
 		Vector3 normal = { cosA, 0.0f, sinA };
-		model->data_.vertices.push_back({ {posBottom.x, posBottom.y, posBottom.z, 1.0f}, {u, 1.0f}, normal });
+		model->GetModelData().vertices.push_back({ {posBottom.x, posBottom.y, posBottom.z, 1.0f}, {u, 1.0f}, normal });
 		newModelMesh.vertices.push_back({ {posBottom.x, posBottom.y, posBottom.z, 1.0f}, {u, 1.0f}, normal });
 
 		// 上
 		Vector3 posTop = { cosA * kTopRadius, kHeight, sinA * kTopRadius };
-		model->data_.vertices.push_back({ {posTop.x, posTop.y, posTop.z, 1.0f}, {u, 0.0f}, normal });
+		model->GetModelData().vertices.push_back({ {posTop.x, posTop.y, posTop.z, 1.0f}, {u, 0.0f}, normal });
 		newModelMesh.vertices.push_back({ {posTop.x, posTop.y, posTop.z, 1.0f}, {u, 0.0f}, normal });
 
 	}
@@ -490,26 +490,26 @@ ModelData ModelManager::CreateCylinder(float topRadius, float bottomRadius, floa
 		uint32_t top1 = bottom0 + 3;
 
 		// 三角形1
-		model->data_.indicies.push_back(bottom0);
-		model->data_.indicies.push_back(top0);
-		model->data_.indicies.push_back(bottom1);
+		model->GetModelData().indicies.push_back(bottom0);
+		model->GetModelData().indicies.push_back(top0);
+		model->GetModelData().indicies.push_back(bottom1);
 
 		newModelMesh.indicies.push_back(bottom0);
 		newModelMesh.indicies.push_back(top0);
 		newModelMesh.indicies.push_back(bottom1);
 
 		// 三角形2
-		model->data_.indicies.push_back(bottom1);
-		model->data_.indicies.push_back(top0);
-		model->data_.indicies.push_back(top1);
+		model->GetModelData().indicies.push_back(bottom1);
+		model->GetModelData().indicies.push_back(top0);
+		model->GetModelData().indicies.push_back(top1);
 
 		newModelMesh.indicies.push_back(bottom1);
 		newModelMesh.indicies.push_back(top0);
 		newModelMesh.indicies.push_back(top1);
 	}
-	model->data_.meshes.push_back(newModelMesh);
+	model->GetModelData().meshes.push_back(newModelMesh);
 
-	return model->data_;
+	return model->GetModelData();
 }
 
 void ModelManager::LoadModelFile(bool overWrite) {

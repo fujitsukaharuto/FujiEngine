@@ -36,11 +36,9 @@ void Material::CreateMaterial() {
 	}
 
 	//色変えるやつ（Resource）
-	materialDate_.color = { 1.0f,1.0f,1.0f,1.0f };
+	materialDate_.color = Colors::White;
 	materialDate_.enableLighting = static_cast<int32_t>(LightMode::kPointLightON);
 	materialDate_.uvTransform = MakeIdentity4x4();
-	materialDate_.shininess = 50.0f;
-	materialDate_.AlphaRef = 0.5f;
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
 		CopyData(i);
 	}
@@ -67,7 +65,6 @@ void Material::CreateEnvironmentMaterial() {
 	materialEnvironment_.color = materialDate_.color;
 	materialEnvironment_.enableLighting = static_cast<int32_t>(LightMode::kPointLightON);
 	materialEnvironment_.uvTransform = MakeIdentity4x4();
-	materialEnvironment_.shininess = 50.0f;
 	materialEnvironment_.environmentCoefficient = 0.0f;
 
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {

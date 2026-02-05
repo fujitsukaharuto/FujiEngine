@@ -6,6 +6,11 @@
 using namespace Core;
 using namespace Math;
 
+namespace {
+	constexpr int32_t PAD_DEADZONE_L = 7849;
+	constexpr int32_t PAD_DEADZONE_R = 8689;
+	constexpr float MAX_PADSTICK = 32767.0f;
+}
 
 const uint8_t Input::kTriggerThreshold = 30;
 
@@ -59,9 +64,8 @@ void Input::Initialize() {
 	ZeroMemory(&pad_.state_, sizeof(XINPUT_STATE));
 	ZeroMemory(&pad_.statePre_, sizeof(XINPUT_STATE));
 
-	pad_.deadZoneL_ = 7849;
-	pad_.deadZoneR_ = 8689;
-
+	pad_.deadZoneL_ = PAD_DEADZONE_L;
+	pad_.deadZoneR_ = PAD_DEADZONE_R;
 }
 
 void Input::Finalize() {
@@ -235,8 +239,8 @@ Vector2 Input::ApplyDeadZone(int32_t x, int32_t y, int32_t deadZone) const {
 		return { 0.0f, 0.0f };
 	}
 
-	stick.x = x / 32767.0f;
-	stick.y = y / 32767.0f;
+	stick.x = x / MAX_PADSTICK;
+	stick.y = y / MAX_PADSTICK;
 
 	return stick;
 }

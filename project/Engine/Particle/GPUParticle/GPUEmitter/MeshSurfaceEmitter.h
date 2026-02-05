@@ -14,17 +14,17 @@ using Microsoft::WRL::ComPtr;
 struct EmitterSurface {
 	Math::Vector3 translate;
 	float padding;
-	Math::Vector3 scale;
-	float radius;
-	uint32_t count;
-	float lifeTime;
-	float frequency;
+	Math::Vector3 scale = { 0.1f, 0.1f, 0.1f };
+	float radius = 2.5f;
+	uint32_t count = 500;
+	float lifeTime = 1.0f;
+	float frequency = 0.008f;
 	float frequencyTime;
 	uint32_t emit;
 
 	// color
-	Math::Vector3 colorMax;
-	Math::Vector3 colorMin;
+	Math::Vector3 colorMax = { 1.0f,1.0f,1.0f };
+	Math::Vector3 colorMin = { 0.0f,0.0f,0.0f };
 	float padding2;
 
 	// velocity

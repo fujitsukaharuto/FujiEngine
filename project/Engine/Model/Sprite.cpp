@@ -127,6 +127,7 @@ void Sprite::InitializeBuffer() {
 	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vData));
 	std::memcpy(vData, vertex_.data(), sizeof(VertexDate) * vertex_.size());
 
+	// vertexのバッファ
 	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
 	vertexBufferView_.SizeInBytes = static_cast<UINT>(sizeof(VertexDate) * vertex_.size());
 	vertexBufferView_.StrideInBytes = static_cast<UINT>(sizeof(VertexDate));
@@ -135,6 +136,7 @@ void Sprite::InitializeBuffer() {
 	indexResource_->Map(0, nullptr, reinterpret_cast<void**>(&iData));
 	std::memcpy(iData, index_.data(), sizeof(uint32_t) * index_.size());
 
+	// indexのバッファ
 	indexBufferView_.BufferLocation = indexResource_->GetGPUVirtualAddress();
 	indexBufferView_.Format = DXGI_FORMAT_R32_UINT;
 	indexBufferView_.SizeInBytes = static_cast<UINT>(sizeof(uint32_t) * index_.size());

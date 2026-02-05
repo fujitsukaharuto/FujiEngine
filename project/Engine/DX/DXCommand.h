@@ -85,6 +85,10 @@ namespace DXC {
 
 	private:
 
+		// Queueの初期化
+		void InitDefaultQueue(ID3D12Device* device);
+		void InitComputeQueue(ID3D12Device* device);
+		void InitImmediateQueue(ID3D12Device* device);
 
 	private:
 

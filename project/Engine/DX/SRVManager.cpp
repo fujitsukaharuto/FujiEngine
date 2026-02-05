@@ -104,7 +104,7 @@ uint32_t SRVManager::Allocate() {
 	assert(kMaxSRVCount_ != useIndex_);
 
 	int index = useIndex_;
-	useIndex_++;
+	useIndex_++;// カウンタの増加
 	return index;
 }
 

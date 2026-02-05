@@ -22,13 +22,13 @@ PlayerAttackRoot::PlayerAttackRoot(Player* pPlayer) : BasePlayerAttackBehavior(p
 	ParticleManager::LoadParentGroup(chargeWave_, "ChargeWave");
 	ParticleManager::LoadParentGroup(chargeCircle_, "ChargeCircle");
 
-	charge1_->SetParent(&pPlayer_->GetModel()->transform);
-	charge2_->SetParent(&pPlayer_->GetModel()->transform);
-	charge3_->SetParent(&pPlayer_->GetModel()->transform);
-	chargeLight_->SetParent(&pPlayer_->GetModel()->transform);
-	chargeRay_->SetParent(&pPlayer_->GetModel()->transform);
-	chargeWave_->SetParent(&pPlayer_->GetModel()->transform);
-	chargeCircle_->SetParent(&pPlayer_->GetModel()->transform);
+	charge1_->SetParent(&pPlayer_->GetModel()->GetTransform());
+	charge2_->SetParent(&pPlayer_->GetModel()->GetTransform());
+	charge3_->SetParent(&pPlayer_->GetModel()->GetTransform());
+	chargeLight_->SetParent(&pPlayer_->GetModel()->GetTransform());
+	chargeRay_->SetParent(&pPlayer_->GetModel()->GetTransform());
+	chargeWave_->SetParent(&pPlayer_->GetModel()->GetTransform());
+	chargeCircle_->SetParent(&pPlayer_->GetModel()->GetTransform());
 
 	chargeCircle_->grain_.isColorFadeIn_ = true;
 

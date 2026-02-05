@@ -47,7 +47,7 @@ void ParticleDebugScene::Initialize() {
 	terrain_ = std::make_unique<AnimationModel>();
 	terrain_->Create("ground.obj");
 	terrain_->IsMirrorOBJ(true);
-	terrain_->transform.translate.y = -5.0f;
+	terrain_->GetTransform().translate.y = -5.0f;
 	terrain_->SetEnvironmentCoeff(0.3f);
 	terrain_->SetTexture("grass.jpg");
 	terrain_->SetColor(terrainColor_);

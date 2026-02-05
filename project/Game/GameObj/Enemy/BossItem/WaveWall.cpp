@@ -24,7 +24,7 @@ void WaveWall::Initialize() {
 
 	collider_ = std::make_unique<AABBCollider>();
 	collider_->SetTag("enemyAttack");
-	collider_->SetParent(&model_->transform);
+	collider_->SetParent(&model_->GetTransform());
 	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
 	collider_->SetCollisionStayCallback([this](const ColliderInfo& other) {OnCollisionStay(other); });
 	collider_->SetCollisionExitCallback([this](const ColliderInfo& other) {OnCollisionExit(other); });
@@ -44,11 +44,11 @@ void WaveWall::Initialize() {
 	underRing_->SetTexture("underRing.png");
 	underRing_->SetColor({ 0.8f,0.8f,0.8f,1.0f });
 	underRing_->SetAlphaRef(0.25f);
-	underRing_->SetParent(&model_->transform);
-	underRing_->transform.translate.y = 0.001f;
-	underRing_->transform.rotate.y = 1.56f;
-	underRing_->transform.scale.x = 1.65f;
-	underRing_->transform.scale.z = 1.65f;
+	underRing_->SetParent(&model_->GetTransform());
+	underRing_->GetTransform().translate.y = 0.001f;
+	underRing_->GetTransform().rotate.y = 1.56f;
+	underRing_->GetTransform().scale.x = 1.65f;
+	underRing_->GetTransform().scale.z = 1.65f;
 
 	float scaleX = 0.9f;
 	float scaleY = 0.9f;
@@ -56,7 +56,7 @@ void WaveWall::Initialize() {
 	wave1_->LoadTransformFromJson("bossItem_wave1.json");
 	wave1_->SetColor({ 0.5f,0.2f,1.0f,1.0f });
 	wave1_->SetAlphaRef(0.25f);
-	wave1_->SetParent(&model_->transform);
+	wave1_->SetParent(&model_->GetTransform());
 
 	scaleX -= 0.05f;
 	scaleY -= 0.05f;
@@ -64,7 +64,7 @@ void WaveWall::Initialize() {
 	wave2_->LoadTransformFromJson("bossItem_wave2.json");
 	wave2_->SetColor({ 0.0f,0.2f,0.6f,1.0f });
 	wave2_->SetAlphaRef(0.25f);
-	wave2_->SetParent(&model_->transform);
+	wave2_->SetParent(&model_->GetTransform());
 
 	scaleX -= 0.05f;
 	scaleY -= 0.05f;
@@ -72,13 +72,13 @@ void WaveWall::Initialize() {
 	wave3_->LoadTransformFromJson("bossItem_wave3.json");
 	wave3_->SetColor({ 0.0f,0.2f,1.0f,1.0f });
 	wave3_->SetAlphaRef(0.25f);
-	wave3_->SetParent(&model_->transform);
+	wave3_->SetParent(&model_->GetTransform());
 
 	ParticleManager::Load(spark1_, "WaveWallSpark");
 	ParticleManager::Load(spark2_, "WaveWallSpark");
 
-	spark1_.SetParent(&model_->transform);
-	spark2_.SetParent(&model_->transform);
+	spark1_.SetParent(&model_->GetTransform());
+	spark2_.SetParent(&model_->GetTransform());
 
 	spark1_.pos_.x = 0.4f;
 	spark1_.pos_.z = 1.40f;
@@ -109,7 +109,7 @@ void WaveWall::Update() {
 		wave2_->SetUVScale({ 0.75f,1.0f }, { uvTransX_ * 0.9f,0.0f });
 		wave3_->SetUVScale({ 0.75f,1.0f }, { -uvTransX_,0.0f });
 		
-		model_->transform.translate += (velocity_ * speed_) * FPSKeeper::DeltaTimeFrame();
+		model_->GetTransform().translate += (velocity_ * speed_) * FPSKeeper::DeltaTimeFrame();
 
 		spark1_.Emit();
 		spark2_.Emit();
@@ -144,8 +144,8 @@ void WaveWall::InitParameter() {
 }
 
 void WaveWall::InitWave(const Vector3& pos, const Vector3& velo) {
-	model_->transform.translate = pos;
-	model_->transform.translate.y = 0.0f;
+	model_->GetTransform().translate = pos;
+	model_->GetTransform().translate.y = 0.0f;
 
 	isLive_ = true;
 	lifeTime_ = 300.0f;
@@ -154,7 +154,7 @@ void WaveWall::InitWave(const Vector3& pos, const Vector3& velo) {
 }
 
 void WaveWall::CalculationFollowVec(const Vector3& target) {
-	Vector3 currentPos = model_->transform.translate;
+	Vector3 currentPos = model_->GetTransform().translate;
 	currentPos.y = 0.0f;
 	Vector3 targetZeroY = target;
 	targetZeroY.y = 0.0f;
@@ -177,7 +177,7 @@ void WaveWall::CalculationFollowVec(const Vector3& target) {
 		velocity_ = newForward * velocity_.Length();
 
 		Quaternion finalRot = newRot;
-		model_->transform.rotate = Quaternion::QuaternionToEuler(finalRot);
+		model_->GetTransform().rotate = Quaternion::QuaternionToEuler(finalRot);
 	}
 }
 

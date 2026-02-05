@@ -83,6 +83,6 @@ void PointLight::AttenuationLight() {
 		}
 
 		float t = attenuationTime_ / attenuationBaseTime_;
-		pointLightData_.intensity = std::lerp(0.0f, baseIntensity_, t);
+		pointLightData_.intensity = std::lerp(0.0f, baseIntensity_, t); // 0~baseIntensityでintensityを調整する
 	}
 }

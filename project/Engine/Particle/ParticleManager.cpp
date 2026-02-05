@@ -300,8 +300,8 @@ void ParticleManager::EmitAnime(const std::string& name, const Vector3& pos, con
 		for (int i = 0; i < group->objects_.size(); i++) {
 
 			if (!group->isLive_[i]) {
-				group->objects_[i]->transform.translate = Random::GetVector3(para.transx, para.transy, para.transz);
-				group->objects_[i]->transform.translate += pos;
+				group->objects_[i]->GetTransform().translate = Random::GetVector3(para.transx, para.transy, para.transz);
+				group->objects_[i]->GetTransform().translate += pos;
 				group->speed[i] = Random::GetVector3(para.speedx, para.speedy, para.speedz);
 				group->lifeTime[i] = data.lifeTime;
 				group->startLifeTime_[i] = group->lifeTime[i];
@@ -408,7 +408,7 @@ void ParticleManager::LoadCSEmitterFileDir() {
 }
 
 void ParticleManager::InternalCreateParticleGroup(const std::string& name, const std::string& fileName, uint32_t count, ShapeType shape, BlendType blendType, bool isParent) {
-	if (isParent) {
+	if (isParent) { // ペアレントするかどうか
 		auto iterator = parentParticleGroups_.find(name);
 		if (iterator != parentParticleGroups_.end()) {
 			return;
@@ -420,7 +420,7 @@ void ParticleManager::InternalCreateParticleGroup(const std::string& name, const
 		newGroup->emitter_->name_ = name;
 		newGroup->emitter_->Load(name);
 
-		newGroup->instanceCount_ = count;
+		newGroup->instanceCount_ = count; // 出す数
 		uint32_t max = newGroup->instanceCount_;
 		for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
 			newGroup->instancing_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), (sizeof(TransformationParticleMatrix) * newGroup->instanceCount_));
@@ -461,7 +461,7 @@ void ParticleManager::InternalCreateParticleGroup(const std::string& name, const
 		newGroup->emitter_.name_ = name;
 		newGroup->emitter_.Load(name);
 
-		newGroup->instanceCount_ = count;
+		newGroup->instanceCount_ = count; // 出す数
 		for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
 			newGroup->instancing_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(),
 				sizeof(TransformationParticleMatrix) * newGroup->instanceCount_);
@@ -519,7 +519,7 @@ void ParticleManager::UpdateParentParticleGroup(const Matrix4x4& billboardMatrix
 }
 
 void ParticleManager::UpdateAnimeGroup(const Matrix4x4& billboardMatrix) {
-	for (auto& groupPair : animeGroups_) {
+	for (auto& groupPair : animeGroups_) { // アニメーショングループ
 		AnimeGroup* group = groupPair.second.get();
 		for (int i = 0; i < group->objects_.size(); i++) {
 			if (group->lifeTime[i] <= 0) {
@@ -530,7 +530,7 @@ void ParticleManager::UpdateAnimeGroup(const Matrix4x4& billboardMatrix) {
 			group->lifeTime[i] -= FPSKeeper::DeltaTimeFrame();
 			group->animeTime[i] += FPSKeeper::DeltaTimeFrame();
 
-			for (auto& animeChange : group->anime_) {
+			for (auto& animeChange : group->anime_) { // 切り替え
 				if (group->animeTime[i] >= animeChange.second * FPSKeeper::DeltaTimeFrame()) {
 					group->objects_[i]->SetTexture(animeChange.first);
 				}
@@ -538,20 +538,20 @@ void ParticleManager::UpdateAnimeGroup(const Matrix4x4& billboardMatrix) {
 
 			SizeType sizeType = SizeType(group->type);
 			float t = (1.0f - float(float(group->lifeTime[i]) / float(group->startLifeTime_[i])));
-			switch (sizeType) {
+			switch (sizeType) {//サイズのタイプ
 			case SizeType::kNormal:
 				break;
 			case SizeType::kShift:
 
-				group->objects_[i]->transform.scale.x = Lerp(group->startSize.x, group->endSize.x, t);
-				group->objects_[i]->transform.scale.y = Lerp(group->startSize.y, group->endSize.y, t);
+				group->objects_[i]->GetTransform().scale.x = Lerp(group->startSize.x, group->endSize.x, t);
+				group->objects_[i]->GetTransform().scale.y = Lerp(group->startSize.y, group->endSize.y, t);
 
 				break;
 			}
 
 			group->speed[i] += group->accele[i] * FPSKeeper::DeltaTimeFrame();
 
-			group->objects_[i]->transform.translate += group->speed[i] * FPSKeeper::DeltaTimeFrame();
+			group->objects_[i]->GetTransform().translate += group->speed[i] * FPSKeeper::DeltaTimeFrame();
 			group->objects_[i]->SetBillboardMat(billboardMatrix);
 		}
 	}
@@ -559,12 +559,12 @@ void ParticleManager::UpdateAnimeGroup(const Matrix4x4& billboardMatrix) {
 
 void ParticleManager::DrawParticleGroup() {
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
-	for (auto& groupPair : particleGroups_) {
+	for (auto& groupPair : particleGroups_) {// 通常パーティクルグループ
 		ParticleGroup* group = groupPair.second.get();
 		if (group->drawCount_ == 0) continue;
 		if (group->shapeType_ == ShapeType::LIGHTNING) continue;
 		if (preType_ != group->type_) {
-			switch (group->type_) {
+			switch (group->type_) {// ブレンドモードによって切り替え
 			case BlendType::ALPHA:
 				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::ParticleAlpha);
 				break;
@@ -596,17 +596,17 @@ void ParticleManager::DrawParticleGroup() {
 		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group->srvIndex_[frameIndex]));
 		dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, group->material_.GetMaterialResource()->GetGPUVirtualAddress());
 		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, group->material_.GetTexture()->gpuHandle);
-		ShapeTypeDrawCommand(group->shapeType_, group->drawCount_);
+		ShapeTypeDrawCommand(group->shapeType_, group->drawCount_);// ShapeTypeでDrawするように
 
 		preType_ = group->type_;
 	}
 
 
-	for (auto& groupPair : particleGroups_) {
+	for (auto& groupPair : particleGroups_) {// ペアレントパーティクルグループ
 		ParticleGroup* group = groupPair.second.get();
 		if (group->drawCount_ == 0) continue;
 		if (group->shapeType_ != ShapeType::LIGHTNING) continue;
-		if (preType_ != group->type_) {
+		if (preType_ != group->type_) {// ブレンドモードによって切り替え
 			switch (group->type_) {
 			case BlendType::ALPHA:
 				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::ParticleAlpha);
@@ -635,7 +635,7 @@ void ParticleManager::DrawParticleGroup() {
 		}
 
 		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group->srvIndex_[frameIndex]));
-		lightning_->MeshDraw(&group->material_, group->drawCount_);
+		lightning_->MeshDraw(&group->material_, group->drawCount_);// ライトニングの描画
 
 		if (group->shapeType_ != ShapeType::PLANE) {
 			dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &plane_.vbView);
@@ -706,7 +706,7 @@ void ParticleManager::ShapeTypeCommand(const ShapeType& type) {
 }
 
 void ParticleManager::ShapeTypeDrawCommand(const ShapeType& type, uint32_t count) {
-	switch (type) {
+	switch (type) {// 形状
 	case ShapeType::PLANE:
 		dxcommon_->GetCommandList()->DrawIndexedInstanced(static_cast<UINT>((plane_.indices.size())), count, 0, 0, 0);
 		break;

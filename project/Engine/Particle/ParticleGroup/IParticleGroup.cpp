@@ -221,7 +221,7 @@ bool IParticleGroup::InitEmitParticle(Particle& particle, const Vector3& pos, co
 		particle.startAlpha_ = particle.color_.w;
 
 		SpeedType type = SpeedType(grain.speedType_);
-		switch (type) {
+		switch (type) {// スピードのタイプで分ける
 		case SpeedType::kConstancy:
 			particle.accele_ = Vector3{ 0.0f,0.0f,0.0f };
 			break;

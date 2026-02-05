@@ -20,99 +20,20 @@ DXCommand::~DXCommand() {
 
 
 void DXCommand::Initialize(ID3D12Device* device) {
-
-	HRESULT hr;
-
 	/// ------------------------------------------
 	/// queue-------------------------------------
-	D3D12_COMMAND_QUEUE_DESC queueDesc{};
-	hr = device->CreateCommandQueue(
-		&queueDesc, IID_PPV_ARGS(&queue_));
-	assert(SUCCEEDED(hr));
-
-
-	/// allocator---------------------------------
-	for (uint32_t i = 0; i < kFrameCount_; ++i) {
-		hr = device->CreateCommandAllocator(
-			D3D12_COMMAND_LIST_TYPE_DIRECT,
-			IID_PPV_ARGS(&allocator_[i]));
-		assert(SUCCEEDED(hr));
-	}
-
-
-	/// list--------------------------------------
-	hr = device->CreateCommandList(
-		0, D3D12_COMMAND_LIST_TYPE_DIRECT,
-		allocator_[0].Get(), nullptr, IID_PPV_ARGS(&list_));
-	assert(SUCCEEDED(hr));
-	list_->Close();
-
-	/// fence-------------------------------------
-	for (uint32_t i = 0; i < kFrameCount_; ++i) {
-		fenceValue_[i] = 0;
-	}
-	hr = device->CreateFence(fenceValue_[0], D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence_));
-	assert(SUCCEEDED(hr));
-
+	InitDefaultQueue(device);
 
 	/// ------------------------------------------
 	/// Compute Queue の追加
 	/// ------------------------------------------
-	D3D12_COMMAND_QUEUE_DESC computeQueueDesc{};
-	computeQueueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
-	computeQueueDesc.Type = D3D12_COMMAND_LIST_TYPE_COMPUTE;
-	hr = device->CreateCommandQueue(&computeQueueDesc, IID_PPV_ARGS(&computeQueue_));
-	assert(SUCCEEDED(hr));
+	InitComputeQueue(device);
 
-	for (uint32_t i = 0; i < kFrameCount_; ++i) {
-		hr = device->CreateCommandAllocator(
-			D3D12_COMMAND_LIST_TYPE_COMPUTE,
-			IID_PPV_ARGS(&computeAllocator_[i]));
-		assert(SUCCEEDED(hr));
-	}
-
-	hr = device->CreateCommandList(
-		0, D3D12_COMMAND_LIST_TYPE_COMPUTE,
-		computeAllocator_[0].Get(), nullptr, IID_PPV_ARGS(&computeList_));
-	assert(SUCCEEDED(hr));
-	computeList_->Close();
-
-	for (uint32_t i = 0; i < kFrameCount_; ++i) {
-		computeFenceValue_[i] = 0;
-	}
-	hr = device->CreateFence(computeFenceValue_[0], D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&computeFence_));
-	assert(SUCCEEDED(hr));
-
-
-	/// immediate allocator ------
-	------------------
-	hr = device->CreateCommandAllocator(
-		D3D12_COMMAND_LIST_TYPE_DIRECT,
-		IID_PPV_ARGS(&immediateAllocator_));
-	assert(SUCCEEDED(hr));
-
-
-	/// immediate list -----------------------------
-	hr = device->CreateCommandList(
-		0,
-		D3D12_COMMAND_LIST_TYPE_DIRECT,
-		immediateAllocator_.Get(),
-		nullptr,
-		IID_PPV_ARGS(&immediateList_));
-	assert(SUCCEEDED(hr));
-
-
-	/// immediate fence ----------------------------
-	hr = device->CreateFence(
-		0,
-		D3D12_FENCE_FLAG_NONE,
-		IID_PPV_ARGS(&immediateFence_));
-	assert(SUCCEEDED(hr));
-	immediateFenceValue_ = 0;
-
+	/// ------------------------------------------
+	/// immediateQueue----------------------------
+	InitImmediateQueue(device);
 
 	/// viewScissor-------------------------------
-
 	viewport_.Width = MyWin::kWindowWidth;
 	viewport_.Height = MyWin::kWindowHeight;
 	viewport_.TopLeftX = 0;
@@ -124,8 +45,6 @@ void DXCommand::Initialize(ID3D12Device* device) {
 	scissor_.right = MyWin::kWindowWidth;
 	scissor_.top = 0;
 	scissor_.bottom = MyWin::kWindowHeight;
-
-
 }
 
 void DXCommand::Flush() {
@@ -205,9 +124,8 @@ void DXC::DXCommand::GPUComputeSignal() {
 }
 
 void DXC::DXCommand::WaitForGPU(uint32_t index) {
-
 	if (index == 0) {
-		if (computeFenceValue_[frameIndex_] != 0) {
+		if (computeFenceValue_[frameIndex_] != 0) { // ComputeQueueを待つ
 			if (computeFence_->GetCompletedValue() < computeFenceValue_[frameIndex_]) {
 				HANDLE fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 				assert(fenceEvent != nullptr);
@@ -218,7 +136,7 @@ void DXC::DXCommand::WaitForGPU(uint32_t index) {
 			}
 		}
 
-		if (fenceValue_[frameIndex_] != 0) {
+		if (fenceValue_[frameIndex_] != 0) { // DefaultQueueを待つ
 			if (fence_->GetCompletedValue() < fenceValue_[frameIndex_]) {
 
 				HANDLE fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
@@ -235,7 +153,7 @@ void DXC::DXCommand::WaitForGPU(uint32_t index) {
 			}
 		}
 	} else {
-		if (immediateFence_->GetCompletedValue() < immediateFenceValue_) {
+		if (immediateFence_->GetCompletedValue() < immediateFenceValue_) { // ImmediateQueueを待つ
 
 			HANDLE fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 			assert(fenceEvent != nullptr);
@@ -245,7 +163,6 @@ void DXC::DXCommand::WaitForGPU(uint32_t index) {
 			CloseHandle(fenceEvent);
 		}
 	}
-
 }
 
 void DXC::DXCommand::WaitComputeInGraphicsQueue() {
@@ -308,4 +225,92 @@ void DXCommand::SetViewAndScissor() {
 	list_->RSSetViewports(1, &viewport_);
 	list_->RSSetScissorRects(1, &scissor_);
 
+}
+
+void DXCommand::InitDefaultQueue(ID3D12Device* device) {
+	HRESULT hr;
+
+	D3D12_COMMAND_QUEUE_DESC queueDesc{};
+	hr = device->CreateCommandQueue(
+		&queueDesc, IID_PPV_ARGS(&queue_));
+	assert(SUCCEEDED(hr));
+
+	/// allocator---------------------------------
+	for (uint32_t i = 0; i < kFrameCount_; ++i) {
+		hr = device->CreateCommandAllocator(
+			D3D12_COMMAND_LIST_TYPE_DIRECT,
+			IID_PPV_ARGS(&allocator_[i]));
+		assert(SUCCEEDED(hr));
+	}
+
+	/// list--------------------------------------
+	hr = device->CreateCommandList(
+		0, D3D12_COMMAND_LIST_TYPE_DIRECT,
+		allocator_[0].Get(), nullptr, IID_PPV_ARGS(&list_));
+	assert(SUCCEEDED(hr));
+	list_->Close();
+
+	/// fence-------------------------------------
+	for (uint32_t i = 0; i < kFrameCount_; ++i) {
+		fenceValue_[i] = 0;
+	}
+	hr = device->CreateFence(fenceValue_[0], D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence_));
+	assert(SUCCEEDED(hr));
+}
+
+void DXCommand::InitComputeQueue(ID3D12Device* device) {
+	HRESULT hr;
+
+	D3D12_COMMAND_QUEUE_DESC computeQueueDesc{};
+	computeQueueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
+	computeQueueDesc.Type = D3D12_COMMAND_LIST_TYPE_COMPUTE;
+	hr = device->CreateCommandQueue(&computeQueueDesc, IID_PPV_ARGS(&computeQueue_));
+	assert(SUCCEEDED(hr));
+
+	for (uint32_t i = 0; i < kFrameCount_; ++i) {
+		hr = device->CreateCommandAllocator(
+			D3D12_COMMAND_LIST_TYPE_COMPUTE,
+			IID_PPV_ARGS(&computeAllocator_[i]));
+		assert(SUCCEEDED(hr));
+	}
+
+	hr = device->CreateCommandList(
+		0, D3D12_COMMAND_LIST_TYPE_COMPUTE,
+		computeAllocator_[0].Get(), nullptr, IID_PPV_ARGS(&computeList_));
+	assert(SUCCEEDED(hr));
+	computeList_->Close();
+
+	for (uint32_t i = 0; i < kFrameCount_; ++i) {
+		computeFenceValue_[i] = 0;
+	}
+	hr = device->CreateFence(computeFenceValue_[0], D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&computeFence_));
+	assert(SUCCEEDED(hr));
+}
+
+void DXCommand::InitImmediateQueue(ID3D12Device* device) {
+	HRESULT hr;
+
+	hr = device->CreateCommandAllocator(
+		D3D12_COMMAND_LIST_TYPE_DIRECT,
+		IID_PPV_ARGS(&immediateAllocator_));
+	assert(SUCCEEDED(hr));
+
+
+	/// immediate list -----------------------------
+	hr = device->CreateCommandList(
+		0,
+		D3D12_COMMAND_LIST_TYPE_DIRECT,
+		immediateAllocator_.Get(),
+		nullptr,
+		IID_PPV_ARGS(&immediateList_));
+	assert(SUCCEEDED(hr));
+
+
+	/// immediate fence ----------------------------
+	hr = device->CreateFence(
+		0,
+		D3D12_FENCE_FLAG_NONE,
+		IID_PPV_ARGS(&immediateFence_));
+	assert(SUCCEEDED(hr));
+	immediateFenceValue_ = 0;
 }

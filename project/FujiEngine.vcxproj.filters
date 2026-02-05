@@ -74,9 +74,6 @@
     <ClCompile Include="Engine\GlobalVariables\GlobalVariables.cpp">
       <Filter>Engine\GlobalVariables</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Model\ModelCommon.cpp">
-      <Filter>Engine\Model</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Model\ModelManager.cpp">
       <Filter>Engine\Model</Filter>
     </ClCompile>
@@ -468,9 +465,6 @@
     </ClInclude>
     <ClInclude Include="Engine\GlobalVariables\GlobalVariables.h">
       <Filter>Engine\GlobalVariables</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Model\ModelCommon.h">
-      <Filter>Engine\Model</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Model\ModelManager.h">
       <Filter>Engine\Model</Filter>

@@ -65,9 +65,11 @@ void AudioPlayer::LoadWave(const char* filename) {
 	RiffHeader riff;
 	file.read(reinterpret_cast<char*>(&riff), sizeof(riff));
 
+	// RIFFかチェック
 	if (strncmp(riff.chunk.id, "RIFF", WaveConst::kChunkIdSize) != 0) {
 		assert(0);
 	}
+	// WAVEかチェック
 	if (strncmp(riff.type, "WAVE", WaveConst::kChunkIdSize) != 0) {
 		assert(0);
 	}
@@ -80,6 +82,7 @@ void AudioPlayer::LoadWave(const char* filename) {
 
 	SoundData soundData{};
 
+	// 各チャンクを順番に読み取る
 	while (file.read(reinterpret_cast<char*>(&chunk), sizeof(chunk))) {
 
 		if (strncmp(chunk.id, "fmt ", WaveConst::kChunkIdSize) == 0) {
