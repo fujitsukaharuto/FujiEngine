@@ -267,7 +267,8 @@ void DXCommand::InitComputeQueue(ID3D12Device* device) {
 	hr = device->CreateCommandQueue(&computeQueueDesc, IID_PPV_ARGS(&computeQueue_));
 	assert(SUCCEEDED(hr));
 
-	for (uint32_t i = 0; i < kFrameCount_; ++i) {
+	// Resourceバリアをはる
+	for (uint32_t i = 0; i < kFrameCount_; ++i) {// Frame数分
 		hr = device->CreateCommandAllocator(
 			D3D12_COMMAND_LIST_TYPE_COMPUTE,
 			IID_PPV_ARGS(&computeAllocator_[i]));

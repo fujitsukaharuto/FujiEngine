@@ -39,10 +39,6 @@ void ParticlePipeline::CreateRootSignature(ID3D12Device* device) {
 	rootParameters[2].DescriptorTable.pDescriptorRanges = descriptorRange;
 	rootParameters[2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);
 
-	//rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-	//rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	//rootParameters[3].Descriptor.ShaderRegister = 1;
-
 	rootDesc.pParameters = rootParameters;
 	rootDesc.NumParameters = _countof(rootParameters);
 

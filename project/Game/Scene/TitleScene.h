@@ -25,7 +25,7 @@ public:
 
 private:
 
-	void ApplyGlobalVariables();//値読み込みテスト用今度Objectクラス作って継承で使えるようにする
+	void ApplyGlobalVariables();
 	
 	void TitleLoadPlayerPoint();
 	void TitleSavePlayerPoint();

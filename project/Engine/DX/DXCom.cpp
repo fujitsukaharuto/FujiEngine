@@ -403,6 +403,7 @@ void DXCom::InsertUAVBarrier(ID3D12Resource* resource) {
 	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 	barrier.UAV.pResource = resource;
 
+	// Resourceバリアをはる
 	command_->GetList()->ResourceBarrier(1, &barrier);
 }
 
@@ -412,6 +413,7 @@ void DXCom::InsertUAVBarrierForCompute(ID3D12Resource* resource) {
 	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 	barrier.UAV.pResource = resource;
 
+	// Resourceバリアをはる
 	command_->GetComputeList()->ResourceBarrier(1, &barrier);
 }
 
@@ -441,6 +443,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DXCom::CreateBufferResource(Microsoft::WR
 	bufferResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 	Microsoft::WRL::ComPtr<ID3D12Resource> resource = nullptr;
 	HRESULT hr;
+	// Resourceの作成
 	hr = device->CreateCommittedResource(&uploadHeapProperties, D3D12_HEAP_FLAG_NONE,
 		&bufferResourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr,
 		IID_PPV_ARGS(&resource));
