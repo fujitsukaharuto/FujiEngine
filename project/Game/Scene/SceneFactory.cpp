@@ -3,6 +3,7 @@
 #include "Game/Scene/GameScene.h"
 #include "Game/Scene/ResultScene.h"
 #include "Game/Scene/ParticleDebugScene.h"
+#include "Game/Scene/GPUParticleScene.h"
 
 SceneFactory::SceneFactory() {
 }
@@ -24,6 +25,10 @@ std::unique_ptr<BaseScene> SceneFactory::CreateScene(const std::string& sceneNam
 
 	} else if (sceneName == "PARTICLEDEBUG") {
 		newScene = std::make_unique<ParticleDebugScene>();
+
+	} else if (sceneName == "GPUPARTICLE") {
+		newScene = std::make_unique<GPUParticleScene>();
+
 	}
 
 	return newScene;

@@ -392,6 +392,9 @@
     <ClCompile Include="Engine\Particle\ParticleManager_Init.cpp">
       <Filter>Engine\Particle</Filter>
     </ClCompile>
+    <ClCompile Include="Game\Scene\GPUParticleScene.cpp">
+      <Filter>Game\Scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -834,6 +837,9 @@
     </ClInclude>
     <ClInclude Include="Game\GameObj\Enemy\BossItem\BossItemManager.h">
       <Filter>Game\GameObj\Enemy\BossItem</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Scene\GPUParticleScene.h">
+      <Filter>Game\Scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

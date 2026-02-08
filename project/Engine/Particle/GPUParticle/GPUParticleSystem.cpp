@@ -174,11 +174,22 @@ void GPUParticleSystem::DebugGUI() {
 void GPUParticleSystem::ParticleCSDebugGUI() {
 #ifdef _DEBUG
 	if (ImGui::CollapsingHeader("GPU Particle Emitter")) {
-		if (ImGui::Button("Add CSEmitter")) {
+		if (ImGui::Button("Emitterの追加")) {
 			InitGPUEmitter();
 		}
 		if (csEmitters_.size() == 0 || sphereEmitters_.size() == 0) return;
-		ImGui::DragInt("emitIndex", &editCSEmitInd_, 1.0f, 0, int(sphereEmitters_.size() - 1));
+		if (ImGui::ArrowButton("Index-",ImGuiDir_Left)) {
+			if (editCSEmitInd_ > 0) {
+				editCSEmitInd_--;
+			}
+		}ImGui::SameLine();
+		ImGui::DragInt("##emitIndex", &editCSEmitInd_, 1.0f, 0, int(sphereEmitters_.size() - 1),"EmitIndex : %d");
+		ImGui::SameLine();
+		if (ImGui::ArrowButton("Index+", ImGuiDir_Right)) {
+			if (editCSEmitInd_ < int(sphereEmitters_.size() - 1)) {
+				editCSEmitInd_++;
+			}
+		}
 		int idx = std::min(editCSEmitInd_, static_cast<int>(sphereEmitters_.size()) - 1);
 		editCSEmitInd_ = idx;
 		if (ImGui::TreeNode("ParticleCS Emit Control")) {
@@ -194,7 +205,18 @@ void GPUParticleSystem::ParticleTexCSDebugGUI() {
 #ifdef _DEBUG
 	if (csEmitters_.size() == 0 || textureBasedEmitters_.size() == 0) return;
 	if (ImGui::CollapsingHeader("GPU ParticleTex Emitter")) {
-		ImGui::DragInt("emitIndex", &editCSEmitTexInd_, 1.0f, 0, int(textureBasedEmitters_.size() - 1));
+		if (ImGui::ArrowButton("Index-", ImGuiDir_Left)) {
+			if (editCSEmitTexInd_ > 0) {
+				editCSEmitTexInd_--;
+			}
+		}ImGui::SameLine();
+		ImGui::DragInt("##emitIndex", &editCSEmitTexInd_, 1.0f, 0, int(textureBasedEmitters_.size() - 1), "EmitIndex : %d");
+		ImGui::SameLine();
+		if (ImGui::ArrowButton("Index+", ImGuiDir_Right)) {
+			if (editCSEmitTexInd_ < int(textureBasedEmitters_.size() - 1)) {
+				editCSEmitTexInd_++;
+			}
+		}
 		int idx = std::min(editCSEmitTexInd_, static_cast<int>(textureBasedEmitters_.size()) - 1);
 		editCSEmitTexInd_ = idx;
 		csEmitters_[textureBasedEmitters_[idx]].emitter->DebugGUI();
@@ -206,7 +228,18 @@ void GPUParticleSystem::ParticleSurfaceCSDebugGUI() {
 #ifdef _DEBUG
 	if (csEmitters_.size() == 0 || MeshSurfaceEmitters_.size() == 0) return;
 	if (ImGui::CollapsingHeader("GPU Particle Surface Emitter")) {
-		ImGui::DragInt("emitIndex", &editCSEmitSurfaceInd_, 1.0f, 0, int(MeshSurfaceEmitters_.size() - 1));
+		if (ImGui::ArrowButton("Index-", ImGuiDir_Left)) {
+			if (editCSEmitSurfaceInd_ > 0) {
+				editCSEmitSurfaceInd_--;
+			}
+		}ImGui::SameLine();
+		ImGui::DragInt("##emitIndex", &editCSEmitSurfaceInd_, 1.0f, 0, int(MeshSurfaceEmitters_.size() - 1), "EmitIndex : %d"); ImGui::SameLine();
+		if (ImGui::ArrowButton("Index+", ImGuiDir_Right)) {
+			if (editCSEmitSurfaceInd_ < int(MeshSurfaceEmitters_.size() - 1)) {
+				editCSEmitSurfaceInd_++;
+			}
+		}
+
 		int idx = std::min(editCSEmitSurfaceInd_, static_cast<int>(MeshSurfaceEmitters_.size()) - 1);
 		editCSEmitSurfaceInd_ = idx;
 		if (ImGui::TreeNode("ParticleCS Emit Control")) {

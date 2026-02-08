@@ -216,8 +216,6 @@ public:
 	D3D12_CPU_DESCRIPTOR_HANDLE GetRTVHandle(uint32_t index) { return rtvHandles_[2 + index]; }
 	D3D12_GPU_DESCRIPTOR_HANDLE GetDepthTexGPUHandle() { return depthTexSrvHandle_[GetNowFrameCount()].second; }
 
-	/*void Tick();*/
-
 private:
 	/// <summary>
 	/// デバイス作成

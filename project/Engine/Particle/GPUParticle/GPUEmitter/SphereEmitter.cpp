@@ -78,21 +78,21 @@ void SphereEmitter::DebugGUI() {
 	ImGui::Checkbox("IsEmit", &isEmit_);
 
 	int dragCount = int(data_.count);
-	ImGui::DragInt("EmitCount", &dragCount, 1, 0, 100000);
+	ImGui::DragInt("発生数", &dragCount, 1, 0, 1000000);
 	data_.count = uint32_t(dragCount);
 
-	ImGui::DragFloat("LifeTime", &data_.lifeTime, 0.01f, 0.01f, 300.0f);
-	ImGui::DragFloat("Frequency", &data_.frequency, 0.001f, 0.0f, 300.0f);
+	ImGui::DragFloat("生存時間", &data_.lifeTime, 0.01f, 0.01f, 300.0f);
+	ImGui::DragFloat("発生間隔", &data_.frequency, 0.001f, 0.0f, 300.0f);
 
 	Vector3 prePos = data_.translate;
 	ImGui::DragFloat3("Translate", &data_.translate.x, 0.1f);
 	data_.prevTranslate = prePos;
 	ImGui::DragFloat3("PreTranslate", &data_.prevTranslate.x, 0.1f);
 	bool isDistance = bool(data_.isDistance);
-	ImGui::Checkbox("IsDistance", &isDistance);
+	ImGui::Checkbox("距離補間", &isDistance);
 	data_.isDistance = uint32_t(isDistance);
 
-	ImGui::DragFloat("Scale", &data_.radius, 0.1f, 0.01f, 300.0f);
+	ImGui::DragFloat("Radius", &data_.radius, 0.1f, 0.01f, 300.0f);
 
 	int shapeType = int(data_.emitShapeType);
 	ImGui::DragInt("EmitShapeType", &shapeType, 0.1f, 0, 6);

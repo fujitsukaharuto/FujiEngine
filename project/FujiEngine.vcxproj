@@ -238,6 +238,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\OriginObject\OriginGameObject.cpp" />
     <ClCompile Include="Game\Scene\GameRun.cpp" />
     <ClCompile Include="Game\Scene\GameScene.cpp" />
+    <ClCompile Include="Game\Scene\GPUParticleScene.cpp" />
     <ClCompile Include="Game\Scene\ParticleDebugScene.cpp" />
     <ClCompile Include="Game\Scene\ResultScene.cpp" />
     <ClCompile Include="Game\Scene\SceneFactory.cpp" />
@@ -388,6 +389,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Game\OriginObject\OriginState.h" />
     <ClInclude Include="Game\Scene\GameRun.h" />
     <ClInclude Include="Game\Scene\GameScene.h" />
+    <ClInclude Include="Game\Scene\GPUParticleScene.h" />
     <ClInclude Include="Game\Scene\ParticleDebugScene.h" />
     <ClInclude Include="Game\Scene\ResultScene.h" />
     <ClInclude Include="Game\Scene\SceneFactory.h" />
