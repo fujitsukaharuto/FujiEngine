@@ -53,7 +53,7 @@ void Boss::ParameterGUI() {
 				{ "Area",   [](Boss* b) { return std::make_unique<BossAreaAttack>(b); } },
 				{ "Arrow",   [](Boss* b) { return std::make_unique<BossArrowAttack>(b); } },
 				{ "FallRod",   [](Boss* b) { return std::make_unique<BossRodFall>(b); } },
-				{ "Dush",   [](Boss* b) { return std::make_unique<BossDushAttack>(b); } },
+				{ "Dash",   [](Boss* b) { return std::make_unique<BossDushAttack>(b); } },
 				// 他も追加
 			};
 			auto it = behaviorFactory.find(nowAction);

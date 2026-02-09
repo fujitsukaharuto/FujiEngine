@@ -222,7 +222,7 @@ void DXCom::CreateDepthBuffer() {
 
 void DXCom::CreateCompiler() {
 
-	compiler_ = std::make_unique<DXCompil>();
+	compiler_ = std::make_unique<DXCompile>();
 	compiler_->Initialize();
 
 }

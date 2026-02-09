@@ -26,20 +26,20 @@ MeshSurfaceEmitter::MeshSurfaceEmitter(DXCom* dx) {
 void MeshSurfaceEmitter::InitMeshData(const std::string& fileName, DXCom* dx, SRVManager* srv) {
 	ModelData data = ModelManager::GetInstance()->FindModel(fileName);
 	verticesResource = dx->CreateBufferResource(dx->GetDevice(), (sizeof(VertexDate) * data.vertices.size()));
-	indiciesResource = dx->CreateBufferResource(dx->GetDevice(), (sizeof(uint32_t) * data.indicies.size()));
+	indicesResource = dx->CreateBufferResource(dx->GetDevice(), (sizeof(uint32_t) * data.indicies.size()));
 	VertexDate* vtx = nullptr;
 	verticesResource->Map(0, nullptr, reinterpret_cast<void**>(&vtx));
 	memcpy(vtx, data.vertices.data(), sizeof(VertexDate) * data.vertices.size());
 	verticesResource->Unmap(0, nullptr);
 	uint32_t* idx = nullptr;
-	indiciesResource->Map(0, nullptr, reinterpret_cast<void**>(&idx));
+	indicesResource->Map(0, nullptr, reinterpret_cast<void**>(&idx));
 	memcpy(idx, data.indicies.data(), sizeof(uint32_t) * data.indicies.size());
-	indiciesResource->Unmap(0, nullptr);
+	indicesResource->Unmap(0, nullptr);
 
 	verticesIndex = srv->Allocate();
-	indiciesIndex = srv->Allocate();
+	indicesIndex = srv->Allocate();
 	srv->CreateStructuredSRV(verticesIndex, verticesResource.Get(), static_cast<UINT>(data.vertices.size()), sizeof(VertexDate));
-	srv->CreateStructuredSRV(indiciesIndex, indiciesResource.Get(), static_cast<UINT>(data.indicies.size()), sizeof(uint32_t));
+	srv->CreateStructuredSRV(indicesIndex, indicesResource.Get(), static_cast<UINT>(data.indicies.size()), sizeof(uint32_t));
 
 	// 面積リストとCDFを作る
 	std::vector<float> triangleAreas;
@@ -116,7 +116,7 @@ void MeshSurfaceEmitter::Dispatch(ID3D12GraphicsCommandList* cmd,
 	cmd->SetComputeRootDescriptorTable(8, shared.freeListIndexUAVHandle);
 	cmd->SetComputeRootDescriptorTable(9, shared.freeListUAVHandle);
 	cmd->SetComputeRootDescriptorTable(10, srv->GetGPUDescriptorHandle(verticesIndex));
-	cmd->SetComputeRootDescriptorTable(11, srv->GetGPUDescriptorHandle(indiciesIndex));
+	cmd->SetComputeRootDescriptorTable(11, srv->GetGPUDescriptorHandle(indicesIndex));
 	cmd->SetComputeRootDescriptorTable(12, srv->GetGPUDescriptorHandle(areasIndex));
 	cmd->SetComputeRootDescriptorTable(13, shared.freeListTailIndexUAVHandle);
 	cmd->SetComputeRootConstantBufferView(6, resource_[frameIndex]->GetGPUVirtualAddress());

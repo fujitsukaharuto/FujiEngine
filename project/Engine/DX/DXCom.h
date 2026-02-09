@@ -13,7 +13,7 @@
 #include "Math/Matrix/MatrixCalculation.h"
 #include "MyWindow.h"
 #include "DXCommand.h"
-#include "DXCompil.h"
+#include "DXCompile.h"
 #include "OffscreenManager.h"
 
 #include "FPSKeeper.h"
@@ -210,7 +210,7 @@ public:
 	ID3D12GraphicsCommandList* GetComputeCommandList() const { return command_->GetComputeList(); }
 	ID3D12GraphicsCommandList* GetImmediateList() const { return command_->GetImmediateList(); }
 	DXC::DXCommand* GetDXCommand() const { return command_.get(); }
-	DXC::DXCompil* GetDXCompil() const { return compiler_.get(); }
+	DXC::DXCompile* GetDXCompile() const { return compiler_.get(); }
 	Graphics::PipelineManager* GetPipelineManager()const { return pipeManager_; }
 	Graphics::OffscreenManager* GetOffscreenManager()const { return offscreen_.get(); }
 	D3D12_CPU_DESCRIPTOR_HANDLE GetRTVHandle(uint32_t index) { return rtvHandles_[2 + index]; }
@@ -301,7 +301,7 @@ private:
 	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> depthTexSrvHandle_[DXC::kFrameCount_];
 
 
-	std::unique_ptr<DXC::DXCompil> compiler_ = nullptr;
+	std::unique_ptr<DXC::DXCompile> compiler_ = nullptr;
 
 	Core::FPSKeeper* fpsKeeper_ = nullptr;
 

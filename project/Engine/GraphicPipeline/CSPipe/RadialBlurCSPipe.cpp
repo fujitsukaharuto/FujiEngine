@@ -1,7 +1,7 @@
 #include "RadialBlurCSPipe.h"
 #include "Engine/DX/DXCom.h"
 #include "DXCommand.h"
-#include "DXCompil.h"
+#include "DXCompile.h"
 #include "Logger.h"
 #include <cassert>
 
@@ -83,7 +83,7 @@ void RadialBlurCSPipe::CreatePSO(ID3D12Device* device) {
     HRESULT hr;
 
 
-    vs = dxcommon_->GetDXCompil()->CompileShader(kDirectoryPath_ + L"CS/RadialBlur.CS.hlsl", L"cs_6_0");
+    vs = dxcommon_->GetDXCompile()->CompileShader(kDirectoryPath_ + L"CS/RadialBlur.CS.hlsl", L"cs_6_0");
     assert(vs != nullptr);
 
     D3D12_COMPUTE_PIPELINE_STATE_DESC computePipelineStateDesc = {};

@@ -206,11 +206,11 @@ SkinCluster AnimationModel::CreateSkinCluster(const Skeleton& skeleton, const Mo
 	VertexInfluence* mappedInfluence = nullptr;
 	skinCluster.influenceResource->Map(0, nullptr, reinterpret_cast<void**>(&mappedInfluence));
 	std::memset(mappedInfluence, 0, sizeof(VertexInfluence) * modelData.vertices.size());
-	skinCluster.mappedInfluece = { mappedInfluence,modelData.vertices.size() };
+	skinCluster.mappedInfluence = { mappedInfluence,modelData.vertices.size() };
 
-	skinCluster.influenceBuffreView.BufferLocation = skinCluster.influenceResource->GetGPUVirtualAddress();
-	skinCluster.influenceBuffreView.SizeInBytes = UINT(sizeof(VertexInfluence) * modelData.vertices.size());
-	skinCluster.influenceBuffreView.StrideInBytes = sizeof(VertexInfluence);
+	skinCluster.influenceBufferView.BufferLocation = skinCluster.influenceResource->GetGPUVirtualAddress();
+	skinCluster.influenceBufferView.SizeInBytes = UINT(sizeof(VertexInfluence) * modelData.vertices.size());
+	skinCluster.influenceBufferView.StrideInBytes = sizeof(VertexInfluence);
 
 	uint32_t influenceIndex = srv->Allocate();
 	skinCluster.influenceSrvHandle.first = srv->GetCPUDescriptorHandle(influenceIndex);
@@ -232,7 +232,7 @@ SkinCluster AnimationModel::CreateSkinCluster(const Skeleton& skeleton, const Mo
 
 		skinCluster.inverseBindPoseMatrices[(*it).second] = jointWeight.second.inverseBindPoseMatrix;
 		for (const auto& vertexWeight : jointWeight.second.vertexWeights) {
-			auto& currentInfluence = skinCluster.mappedInfluece[vertexWeight.vertexIndex];
+			auto& currentInfluence = skinCluster.mappedInfluence[vertexWeight.vertexIndex];
 			for (uint32_t index = 0; index < kNumMaxInfluence; index++) {
 				if (currentInfluence.weights[index] == 0.0f) {
 					currentInfluence.weights[index] = vertexWeight.weight;

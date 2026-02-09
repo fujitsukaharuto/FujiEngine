@@ -50,8 +50,12 @@ public:
 	void Save(const std::string& fileName) override;
 	void Load(const std::string& fileName) override;
 
+	// 一度だけエミット
 	void Emit() override;
 	bool IsEmit() const override { return isEmit_; }
+
+	//========================================================================*/
+	//* Setter
 	void SetPos(const Math::Vector3& pos) override;
 	void SetEmit(bool state) override { isEmit_ = state; }
 	void SetCount(int count) override;

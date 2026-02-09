@@ -135,6 +135,6 @@ AttackPattern BossRoot::ToAttackPattern(const std::string& name) {
 	if (name == "Area") return AttackPattern::AreaAttack;
 	if (name == "Arrow") return AttackPattern::ArrowAttack;
 	if (name == "FallRod") return AttackPattern::FallRod;
-	if (name == "Dush") return AttackPattern::Dush;
+	if (name == "Dash") return AttackPattern::Dush;
 	throw std::invalid_argument("未知のAttackPattern名: " + name);
 }

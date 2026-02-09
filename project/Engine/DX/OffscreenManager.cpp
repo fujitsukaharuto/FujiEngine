@@ -360,7 +360,7 @@ void Graphics::OffscreenManager::InitDataResource() {
 		thunderDataGPU_[i] = nullptr;
 		thunderResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&thunderDataGPU_[i]));
 
-		cRTResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(CRTElemnt));
+		cRTResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(CRTElement));
 		crtDataGPU_[i] = nullptr;
 		cRTResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&crtDataGPU_[i]));
 

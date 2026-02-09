@@ -152,8 +152,6 @@ void TitleScene::Draw() {
 
 	player_->TitleDraw();
 
-	//particleTest_->Draw();
-
 #ifdef _DEBUG
 	if (!uiInvisible_) {
 		if (startTime_ < 0.0f) {

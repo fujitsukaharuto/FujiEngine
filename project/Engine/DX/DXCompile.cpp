@@ -1,4 +1,4 @@
-#include "DXCompil.h"
+#include "DXCompile.h"
 #include <iostream>
 #include "Logger.h"
 #include <cassert>
@@ -8,14 +8,14 @@
 using namespace DXC;
 
 
-DXCompil::~DXCompil() {
+DXCompile::~DXCompile() {
 	dxcUtils_.Reset();
 	dxcCompiler_.Reset();
 	includeHandler_.Reset();
 }
 
 
-void DXCompil::Initialize() {
+void DXCompile::Initialize() {
 
 	HRESULT hr;
 
@@ -29,7 +29,7 @@ void DXCompil::Initialize() {
 
 }
 
-ComPtr<IDxcBlob> DXCompil::CompileShader(const std::wstring& filePath, const wchar_t* profile) {
+ComPtr<IDxcBlob> DXCompile::CompileShader(const std::wstring& filePath, const wchar_t* profile) {
 
 	Logger::Log((std::format(L"Begin CompileShader, path:{},profile:{}", filePath, profile)));
 	IDxcBlobEncoding* shaderSource = nullptr;

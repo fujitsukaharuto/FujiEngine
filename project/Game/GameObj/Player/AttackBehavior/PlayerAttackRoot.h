@@ -25,7 +25,7 @@ public:
 
 private:
 
-	bool isCharegSEStart_ = false;
+	bool isChargeSEStart_ = false;
 
 	Step step_;
 	float chargeTime_;

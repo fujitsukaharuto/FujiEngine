@@ -20,9 +20,6 @@ public:
 
 	void InitParameter();
 
-	//========================================================================*/
-	//* Behavior
-	//void ChangeBehavior(std::unique_ptr<BaseBossBehavior>behavior);
 
 	//========================================================================*/
 	//* Collision
@@ -40,8 +37,6 @@ private:
 private:
 
 	Boss* pBoss_;
-
-	//std::unique_ptr<BaseBossBehavior> behavior_ = nullptr;
 
 	std::unique_ptr<AABBCollider> collider_;
 

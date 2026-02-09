@@ -1,7 +1,7 @@
 #include "SkyboxPipe.h"
 #include "Engine/DX/DXCom.h"
 #include "DXCommand.h"
-#include "DXCompil.h"
+#include "DXCompile.h"
 #include "Logger.h"
 #include <cassert>
 
@@ -109,9 +109,9 @@ void SkyboxPipe::CreatePSO(ID3D12Device* device) {
 	rasterizer.CullMode = D3D12_CULL_MODE_NONE;
 	rasterizer.FillMode = D3D12_FILL_MODE_SOLID;
 
-	vs = dxcommon_->GetDXCompil()->CompileShader(kDirectoryPath_ + L"Skybox.VS.hlsl", L"vs_6_0");
+	vs = dxcommon_->GetDXCompile()->CompileShader(kDirectoryPath_ + L"Skybox.VS.hlsl", L"vs_6_0");
 	assert(vs != nullptr);
-	ps = dxcommon_->GetDXCompil()->CompileShader(kDirectoryPath_ + L"Skybox.PS.hlsl", L"ps_6_0");
+	ps = dxcommon_->GetDXCompile()->CompileShader(kDirectoryPath_ + L"Skybox.PS.hlsl", L"ps_6_0");
 	assert(ps != nullptr);
 
 

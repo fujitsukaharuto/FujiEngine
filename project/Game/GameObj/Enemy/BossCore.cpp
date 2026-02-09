@@ -41,7 +41,6 @@ void BossCore::Draw([[maybe_unused]] Material* mate, [[maybe_unused]] bool is) {
 #ifdef _DEBUG
 	collider_->DrawCollider();
 #endif // _DEBUG
-	//OriginGameObject::Draw(mate, is);
 }
 
 void BossCore::DebugGUI() {
@@ -63,7 +62,7 @@ void BossCore::InitParameter() {
 }
 
 void BossCore::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
-	if (other.tag == "playerBullet_strng") {
+	if (other.tag == "playerBullet_strong") {
 		pBoss_->ReduceBossHP(true);
 	}
 	if (other.tag == "playerBullet") {

@@ -11,10 +11,10 @@ namespace DXC {
 	/// <summary>
 	/// コンパイラー関係
 	/// </summary>
-	class DXCompil {
+	class DXCompile {
 	public:
-		DXCompil() = default;
-		~DXCompil();
+		DXCompile() = default;
+		~DXCompile();
 
 	public:
 

@@ -14,7 +14,7 @@
     <ClCompile Include="Engine\DX\DXCommand.cpp">
       <Filter>Engine\DX</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\DX\DXCompil.cpp">
+    <ClCompile Include="Engine\DX\DXCompile.cpp">
       <Filter>Engine\DX</Filter>
     </ClCompile>
     <ClCompile Include="Engine\GraphicPipeline\BasePipeline.cpp">
@@ -409,7 +409,7 @@
     <ClInclude Include="Engine\DX\DXCommand.h">
       <Filter>Engine\DX</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\DX\DXCompil.h">
+    <ClInclude Include="Engine\DX\DXCompile.h">
       <Filter>Engine\DX</Filter>
     </ClInclude>
     <ClInclude Include="Engine\GraphicPipeline\BasePipeline.h">

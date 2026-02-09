@@ -27,7 +27,7 @@ void PlayerJump::Update() {
 		///---------------------------------------------------------------------------------------
 	case PlayerJump::Step::JUMP:
 
-		if ((input->TriggerKey(DIK_SPACE) || input->TriggerButton(PadInput::X)) && isSecoundJump_) {
+		if ((input->TriggerKey(DIK_SPACE) || input->TriggerButton(PadInput::X)) && isSecondJump_) {
 			if (speed_ > 0.0f) {
 				speed_ += pPlayer_->GetSecondJumpSpeed();
 			} else {
@@ -36,7 +36,7 @@ void PlayerJump::Update() {
 			speed_ = pPlayer_->GetJumpSpeed();
 			pPlayer_->SetFallSpeed(speed_);
 			pPlayer_->SetIsFall(true);
-			isSecoundJump_ = false;
+			isSecondJump_ = false;
 		}
 
 		//移動、ジャンプ

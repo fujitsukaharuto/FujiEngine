@@ -9,7 +9,7 @@
 #include <wrl.h>
 
 #include "DXCommand.h"
-#include "DXCompil.h"
+#include "DXCompile.h"
 #include "Math/Matrix/MatrixCalculation.h"
 #include "PipeKind.h"
 #include "TextureManager.h"
@@ -74,7 +74,7 @@ struct FireElement {
 /// <summary>
 /// CRTエフェクトのデータ
 /// </summary>
-struct CRTElemnt {
+struct CRTElement {
 	float crtTime;
 	Math::Vector2 resolution;
 };
@@ -278,8 +278,8 @@ namespace Graphics {
 		int nowTex_;
 
 		ComPtr<ID3D12Resource> cRTResource_[DXC::kFrameCount_];
-		CRTElemnt* crtDataGPU_[DXC::kFrameCount_];
-		CRTElemnt crtData_;
+		CRTElement* crtDataGPU_[DXC::kFrameCount_];
+		CRTElement crtData_;
 
 		ComPtr<ID3D12Resource> outlineResource_[DXC::kFrameCount_];
 		OutlineElement* outlineDataGPU_[DXC::kFrameCount_];

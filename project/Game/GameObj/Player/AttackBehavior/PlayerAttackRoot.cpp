@@ -82,13 +82,13 @@ void PlayerAttackRoot::Update() {
 			}
 			pPlayer_->ReleaseBullet();
 			AudioPlayer::GetInstance()->SoundStopWave(*chargeSE_);
-			isCharegSEStart_ = false;
+			isChargeSEStart_ = false;
 			chargeTime_ = 0.0f;
 		}
 		if (chargeTime_ > 10.0f) {
-			if (!isCharegSEStart_) {
+			if (!isChargeSEStart_) {
 				AudioPlayer::GetInstance()->SoundLoop(*chargeSE_, 0.04f);
-				isCharegSEStart_ = true;
+				isChargeSEStart_ = true;
 			}
 			charge1_->Emit();
 			charge2_->Emit();
@@ -119,7 +119,7 @@ void PlayerAttackRoot::Update() {
 			step_ = Step::ROOT;
 			AudioPlayer::GetInstance()->SoundStopWave(*chargeSE_);
 			pPlayer_->ReleaseBullet();
-			isCharegSEStart_ = false;
+			isChargeSEStart_ = false;
 		}
 
 		break;

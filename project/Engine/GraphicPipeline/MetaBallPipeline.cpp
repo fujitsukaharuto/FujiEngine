@@ -1,7 +1,7 @@
 #include "MetaBallPipeline.h"
 #include "Engine/DX/DXCom.h"
 #include "DXCommand.h"
-#include "DXCompil.h"
+#include "DXCompile.h"
 #include "Logger.h"
 #include <cassert>
 
@@ -84,9 +84,9 @@ void MetaBallPipeline::CreatePSO(ID3D12Device* device) {
 	layout.NumElements = _countof(element);
 
 
-	vs = dxcommon_->GetDXCompil()->CompileShader(kDirectoryPath_ + L"MetaBall.VS.hlsl", L"vs_6_0");
+	vs = dxcommon_->GetDXCompile()->CompileShader(kDirectoryPath_ + L"MetaBall.VS.hlsl", L"vs_6_0");
 	assert(vs != nullptr);
-	ps = dxcommon_->GetDXCompil()->CompileShader(kDirectoryPath_ + L"MetaBall.PS.hlsl", L"ps_6_0");
+	ps = dxcommon_->GetDXCompile()->CompileShader(kDirectoryPath_ + L"MetaBall.PS.hlsl", L"ps_6_0");
 	assert(ps != nullptr);
 
 

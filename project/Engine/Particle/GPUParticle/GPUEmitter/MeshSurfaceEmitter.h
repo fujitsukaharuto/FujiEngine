@@ -50,8 +50,12 @@ public:
 	void Save(const std::string& fileName) override;
 	void Load(const std::string& fileName) override;
 
+	// 一度だけエミット
 	void Emit() override;
 	bool IsEmit() const override { return isEmit_; }
+
+	//========================================================================*/
+	//* Setter
 	void SetPos(const Math::Vector3& pos) override;
 	void SetEmit(bool state) override { isEmit_ = state; }
 	void SetCount(int count) override;
@@ -66,10 +70,10 @@ private:
 	EmitterSurface* dataGPU_[DXC::kFrameCount_];
 	ComPtr<ID3D12Resource> resource_[DXC::kFrameCount_];
 	ComPtr<ID3D12Resource> verticesResource;
-	ComPtr<ID3D12Resource> indiciesResource;
+	ComPtr<ID3D12Resource> indicesResource;
 	ComPtr<ID3D12Resource> areasResource;
 	uint32_t verticesIndex;
-	uint32_t indiciesIndex;
+	uint32_t indicesIndex;
 	uint32_t areasIndex;
 	bool isOnceEmit_ = false;
 };

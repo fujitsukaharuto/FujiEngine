@@ -21,6 +21,6 @@ private:
 
 	Step step_;
 	float speed_;
-	bool isSecoundJump_ = true;
+	bool isSecondJump_ = true;
 
 };

@@ -127,7 +127,7 @@ void PlayerBullet::StrengthBullet() { // 強化弾に変更する
 	collider_->SetWidth(0.6f);
 	collider_->SetDepth(0.6f);
 	collider_->SetHeight(0.6f);
-	collider_->SetTag("playerBullet_strng");
+	collider_->SetTag("playerBullet_strong");
 	trajectory.pos_ = { -0.6f,0.0f,-0.6f };
 	model_->GetTransform().scale = Vector3::FillVec(0.6f);
 }
