@@ -96,6 +96,8 @@ public:
 	int InitGPUEmitterSurface(const std::string& fileName);
 
 	void DebugGUI();
+	void RenderPerformanceStats();
+	void RenderEmitterList(std::vector<int>& emitterIndices, int& currentIdx, PipelinePhase phase);
 	void ParticleCSDebugGUI();
 	void ParticleTexCSDebugGUI();
 	void ParticleSurfaceCSDebugGUI();

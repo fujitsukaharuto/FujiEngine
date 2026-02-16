@@ -80,31 +80,84 @@ void TextureBasedEmitter::Dispatch(ID3D12GraphicsCommandList* cmd,
 
 void TextureBasedEmitter::DebugGUI() {
 #ifdef _DEBUG
-	if (ImGui::TreeNode("ParticleCS Emit Control")) {
+	ImGui::Checkbox("##IsEmit", &isEmit_);
+	ImGui::SameLine();
+	ImGui::Text(isEmit_ ? "エミッター有効 (Active)" : "エミッター停止 (Inactive)");
+	ImGui::Separator();
 
-		ImGui::Checkbox("IsEmit", &isEmit_);
+	// --- 1. 基本設定 (数、寿命、頻度) ---
+	if (ImGui::CollapsingHeader("基本設定 (Basic)", ImGuiTreeNodeFlags_DefaultOpen)) {
+		ImGui::Indent();
 
 		int dragCount = int(data_.count);
-		ImGui::DragInt("emitCount", &dragCount, 1, 0, 100000);
-		data_.count = uint32_t(dragCount);
+		// Stepを1にして整数単位で増やす。リミットを見やすく
+		if (ImGui::DragInt("発生数 (Count)", &dragCount, 1, 0, 1000000)) {
+			data_.count = uint32_t(dragCount);
+		}
 
-		ImGui::DragFloat("lifeTime", &data_.lifeTime, 0.01f, 0.01f, 300.0f);
-		ImGui::DragFloat("frequency", &data_.frequency, 0.001f, 0.0f, 300.0f);
+		ImGui::DragFloat("生存時間 (LifeTime)", &data_.lifeTime, 0.01f, 0.01f, 300.0f, "%.2f s");
+		ImGui::DragFloat("発生間隔 (Frequency)", &data_.frequency, 0.001f, 0.0f, 300.0f, "%.3f s");
 
-		ImGui::DragFloat3("translate", &data_.translate.x, 0.1f);
+		ImGui::Unindent();
+	}
 
-		ImGui::DragFloat("radius", &data_.radius, 0.1f, 0.0f, 300.0f);
+	// --- 2. 形状と座標 (Shape & Transform) ---
+	if (ImGui::CollapsingHeader("形状と配置 (Shape & Transform)")) {
+		ImGui::Indent();
 
-		ImGui::SeparatorText("Color");
-		ImGui::DragFloat3("colorMax", &data_.colorMax.x, 0.01f, 0.0f, 1.0f);
-		ImGui::DragFloat3("colorMin", &data_.colorMin.x, 0.01f, 0.0f, 1.0f);
+		ImGui::DragFloat("半径 (Radius)", &data_.radius, 0.1f, 0.01f, 300.0f);
 
-		ImGui::SeparatorText("Velocity");
-		ImGui::DragFloat3("baseVelocity", &data_.baseVelocity.x, 0.1f, -10.0f, 10.0f);
-		ImGui::DragFloat("velocityRandMax", &data_.velocityRandMax, 0.1f, -10.0f, 10.0f);
-		ImGui::DragFloat("velocityRandMin", &data_.velocityRandMin, 0.1f, -10.0f, 10.0f);
+		ImGui::Separator();
+		ImGui::Text("位置座標");
 
-		ImGui::TreePop();
+		Vector3 prePos = data_.translate;
+		ImGui::DragFloat3("現在位置 (Pos)", &data_.translate.x, 0.1f);
+
+		ImGui::Unindent();
+	}
+
+	// --- 3. 物理挙動と速度 (Physics & Velocity) ---
+	if (ImGui::CollapsingHeader("動きと速度 (Physics & Velocity)")) {
+		ImGui::Indent();
+
+		ImGui::DragFloat3("基本速度 (Base Vel)", &data_.baseVelocity.x, 0.1f);
+
+		// 範囲設定は見やすく並べる
+		ImGui::Text("速度ランダム範囲");
+		float vMin = data_.velocityRandMin;
+		float vMax = data_.velocityRandMax;
+		ImGui::SetNextItemWidth(100);
+		ImGui::DragFloat("##Min", &vMin, 0.1f, -10.f, 10.f, "Min: %.1f");
+		ImGui::SameLine();
+		ImGui::Text("~");
+		ImGui::SameLine();
+		ImGui::SetNextItemWidth(100);
+		ImGui::DragFloat("##Max", &vMax, 0.1f, -10.f, 10.f, "Max: %.1f");
+		data_.velocityRandMin = vMin;
+		data_.velocityRandMax = vMax;
+
+		ImGui::Unindent();
+	}
+
+	// --- 4. カラー設定 (Color) ---
+	if (ImGui::CollapsingHeader("色 (Color)")) {
+		ImGui::Indent();
+
+		// ColorEdit3を使うとカラーパレットが出て直感的になります
+		ImGui::ColorEdit3("色 (Max)", &data_.colorMax.x);
+		ImGui::ColorEdit3("色 (Min)", &data_.colorMin.x);
+
+		ImGui::Unindent();
+	}
+
+	// --- 5. 保存 (Save) ---
+	ImGui::Separator();
+	ImGui::Text("File I/O");
+	ImGui::SetNextItemWidth(150);
+	ImGui::InputText(".json", saveName_, sizeof(saveName_));
+	ImGui::SameLine();
+	if (ImGui::Button("Save")) {
+		Save(saveName_);
 	}
 #endif // _DEBUG
 }

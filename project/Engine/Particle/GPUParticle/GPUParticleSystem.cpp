@@ -152,22 +152,111 @@ int GPUParticleSystem::InitGPUEmitterSurface(const std::string& fileName) {
 
 void GPUParticleSystem::DebugGUI() {
 #ifdef _DEBUG
-	if (ImGui::CollapsingHeader("GPUTimer##GPUParticleSystem")) {
+	ImGui::Begin("GPUParticle Editor", nullptr, ImGuiWindowFlags_NoCollapse);
+
+	RenderPerformanceStats();
+
+	ImGui::Separator();
+
+	if (ImGui::BeginTabBar("EmitterTabs")) {
+
+		if (ImGui::BeginTabItem("Sphere Emitters")) {
+			if (ImGui::Button("＋ エミッターを追加")) { InitGPUEmitter(); }
+
+			RenderEmitterList(sphereEmitters_, editCSEmitInd_, PipelinePhase::Sphere);
+			ImGui::EndTabItem();
+		}
+
+		if (ImGui::BeginTabItem("TextureBased Emitters")) {
+			RenderEmitterList(textureBasedEmitters_, editCSEmitTexInd_, PipelinePhase::Texture);
+			ImGui::EndTabItem();
+		}
+
+		if (ImGui::BeginTabItem("Surface Emitters")) {
+			RenderEmitterList(MeshSurfaceEmitters_, editCSEmitSurfaceInd_, PipelinePhase::Surface);
+			ImGui::EndTabItem();
+		}
+
+		ImGui::EndTabBar();
+	}
+
+	ImGui::End();
+#endif // _DEBUG
+}
+
+void GPUParticleSystem::RenderPerformanceStats() {
+#ifdef _DEBUG
+	if (ImGui::CollapsingHeader("統計情報 / パフォーマンス")) {
 		uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 		uint32_t finishedFrame = (frameIndex + DXC::kFrameCount_ - 1) % DXC::kFrameCount_;
 
-		double drawTime = gpuTimerGraphics.GetElapsedMS(finishedFrame, kTimer_DrawExecuteIndirect);
-		double particleTime = gpuTimerCompute.GetElapsedMS(finishedFrame, kTimer_ParticleUpdate);
-		double emitterDispatchTime = gpuTimerCompute.GetElapsedMS(finishedFrame, kTimer_EmitterDispatch);
-		double aliveCountTime = gpuTimerCompute.GetElapsedMS(finishedFrame, kTimer_AliveCountDispatch);
-		AliveCountDataReadBack();
+		// テーブルを使うと数値が揃って見やすくなります
+		if (ImGui::BeginTable("StatsTable", 2, ImGuiTableFlags_BordersInnerV)) {
 
-		ImGui::Text("ParticleDraw: %.3f ms", drawTime);
-		ImGui::Text("ParticleUpdate: %.3f ms", particleTime);
-		ImGui::Text("Emit: %.3f ms", emitterDispatchTime);
-		ImGui::Text("AliveCountDispatch: %.3f ms", aliveCountTime);
-		ImGui::Text("AliveCount: %d", aliveCount_);
+			AliveCountDataReadBack();
+
+			ImGui::TableNextRow();
+			ImGui::TableSetColumnIndex(0); ImGui::Text("生存パーティクル数:");
+			ImGui::TableSetColumnIndex(1); ImGui::Text("%d", aliveCount_);
+
+			ImGui::TableNextRow();
+			ImGui::TableSetColumnIndex(0); ImGui::Text("描画負荷 (Draw):");
+			ImGui::TableSetColumnIndex(1); ImGui::Text("%.3f ms", gpuTimerGraphics.GetElapsedMS(finishedFrame, kTimer_DrawExecuteIndirect));
+
+			ImGui::TableNextRow();
+			ImGui::TableSetColumnIndex(0); ImGui::Text("更新負荷 (Update):");
+			ImGui::TableSetColumnIndex(1); ImGui::Text("%.3f ms", gpuTimerCompute.GetElapsedMS(finishedFrame, kTimer_ParticleUpdate));
+
+			ImGui::TableNextRow();
+			ImGui::TableSetColumnIndex(0); ImGui::Text("発生負荷 (Emit):");
+			ImGui::TableSetColumnIndex(1); ImGui::Text("%.3f ms", gpuTimerCompute.GetElapsedMS(finishedFrame, kTimer_EmitterDispatch));
+
+			ImGui::TableNextRow();
+			ImGui::TableSetColumnIndex(0); ImGui::Text("カウント負荷 (Count):");
+			ImGui::TableSetColumnIndex(1); ImGui::Text("%.3f ms", gpuTimerCompute.GetElapsedMS(finishedFrame, kTimer_AliveCountDispatch));
+
+			ImGui::EndTable();
+		}
 	}
+#endif // _DEBUG
+}
+
+void GPUParticleSystem::RenderEmitterList(std::vector<int>& emitterIndices, int& currentIdx, PipelinePhase phase) {
+#ifdef _DEBUG
+	if (emitterIndices.empty()) {
+		ImGui::TextDisabled("エミッターが存在しません。");
+		return;
+	}
+
+	// 左側にリスト、右側に詳細を表示する
+	ImGui::BeginChild("ListRegion", ImVec2(150, 0), ImGuiChildFlags_Border);
+	for (int n = 0; n < (int)emitterIndices.size(); n++) {
+		ImGui::PushID(n);
+		if (ImGui::Selectable("##selectable", currentIdx == n, ImGuiSelectableFlags_SpanAllColumns)) {
+			currentIdx = n;
+		}
+		ImGui::SameLine();
+		ImGui::Text("エミッター %d", n);
+		ImGui::PopID();
+	}
+	ImGui::EndChild();
+
+	ImGui::SameLine();
+
+	// 右側の詳細設定
+	ImGui::BeginGroup();
+	ImGui::BeginChild("DetailRegion", ImVec2(0, -ImGui::GetFrameHeightWithSpacing()), ImGuiChildFlags_Border);
+
+	int actualIdx = emitterIndices[currentIdx];
+	ImGui::Text("詳細設定 - ID: %d", actualIdx);
+	ImGui::Separator();
+
+	// エミッター固有のGUIを呼び出し
+	csEmitters_[actualIdx].emitter->DebugGUI();
+	LoadPopUpGUI(currentIdx, phase);
+
+	ImGui::EndChild();
+	ImGui::EndGroup();
 #endif // _DEBUG
 }
 

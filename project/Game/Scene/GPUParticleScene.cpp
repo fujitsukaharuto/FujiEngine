@@ -117,6 +117,12 @@ void GPUParticleScene::ParticleDebugGUI() {
 #endif // _DEBUG
 }
 
+void GPUParticleScene::ParticleGroupDebugGUI() {
+#ifdef _DEBUG
+	ParticleManager::GetInstance()->GPUParticleSceneGUI();
+#endif // _DEBUG
+}
+
 void GPUParticleScene::BlackFade() {
 	if (isChangePhase_) {
 		if (blackTime_ < blackLimit_) {

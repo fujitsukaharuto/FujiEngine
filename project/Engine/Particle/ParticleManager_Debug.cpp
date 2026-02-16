@@ -226,12 +226,18 @@ void ParticleManager::ParticleCSDebugGUI() {
 #ifdef _DEBUG
 	if (ImGui::CollapsingHeader("GPU Particle System")) {
 		ImGui::Indent();
-		gpuParticleSystem_->DebugGUI();
+		gpuParticleSystem_->RenderPerformanceStats();
 		gpuParticleSystem_->ParticleCSDebugGUI();
 		gpuParticleSystem_->ParticleTexCSDebugGUI();
 		gpuParticleSystem_->ParticleSurfaceCSDebugGUI();
 		ImGui::Unindent();
 	}
+#endif // _DEBUG
+}
+
+void ParticleManager::GPUParticleSceneGUI() {
+#ifdef _DEBUG
+	gpuParticleSystem_->DebugGUI();
 #endif // _DEBUG
 }
 

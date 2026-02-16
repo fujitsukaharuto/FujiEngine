@@ -110,6 +110,9 @@ namespace Core {
 
 #endif // _DEBUG
 	private:
+
+		void SetupModernStyle();
+
 #ifdef _DEBUG
 
 		/// <summary>Textureのセレクトメニューの表示</summary>

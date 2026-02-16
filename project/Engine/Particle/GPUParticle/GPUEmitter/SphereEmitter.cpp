@@ -75,61 +75,121 @@ void SphereEmitter::Dispatch(ID3D12GraphicsCommandList* cmd,
 void SphereEmitter::DebugGUI() {
 #ifdef _DEBUG
 
-	ImGui::Checkbox("IsEmit", &isEmit_);
+	ImGui::Checkbox("##IsEmit", &isEmit_);
+	ImGui::SameLine();
+	ImGui::Text(isEmit_ ? "エミッター有効 (Active)" : "エミッター停止 (Inactive)");
+	ImGui::Separator();
 
-	int dragCount = int(data_.count);
-	ImGui::DragInt("発生数", &dragCount, 1, 0, 1000000);
-	data_.count = uint32_t(dragCount);
+	// --- 1. 基本設定 (数、寿命、頻度) ---
+	if (ImGui::CollapsingHeader("基本設定 (Basic)", ImGuiTreeNodeFlags_DefaultOpen)) {
+		ImGui::Indent();
 
-	ImGui::DragFloat("生存時間", &data_.lifeTime, 0.01f, 0.01f, 300.0f);
-	ImGui::DragFloat("発生間隔", &data_.frequency, 0.001f, 0.0f, 300.0f);
+		int dragCount = int(data_.count);
+		// Stepを1にして整数単位で増やす。リミットを見やすく
+		if (ImGui::DragInt("発生数 (Count)", &dragCount, 1, 0, 1000000)) {
+			data_.count = uint32_t(dragCount);
+		}
 
-	Vector3 prePos = data_.translate;
-	ImGui::DragFloat3("Translate", &data_.translate.x, 0.1f);
-	data_.prevTranslate = prePos;
-	ImGui::DragFloat3("PreTranslate", &data_.prevTranslate.x, 0.1f);
-	bool isDistance = bool(data_.isDistance);
-	ImGui::Checkbox("距離補間", &isDistance);
-	data_.isDistance = uint32_t(isDistance);
+		ImGui::DragFloat("生存時間 (LifeTime)", &data_.lifeTime, 0.01f, 0.01f, 300.0f, "%.2f s");
+		ImGui::DragFloat("発生間隔 (Frequency)", &data_.frequency, 0.001f, 0.0f, 300.0f, "%.3f s");
 
-	ImGui::DragFloat("Radius", &data_.radius, 0.1f, 0.01f, 300.0f);
+		bool isTrailEmit = bool(data_.isTrailEmit);
+		if (ImGui::Checkbox("軌跡エミット (Trail Emit)", &isTrailEmit)) {
+			data_.isTrailEmit = uint32_t(isTrailEmit);
+		}
 
-	int shapeType = int(data_.emitShapeType);
-	ImGui::DragInt("EmitShapeType", &shapeType, 0.1f, 0, 6);
-	data_.emitShapeType = uint32_t(shapeType);
-
-	ImGui::DragFloat3("ParticleScale", &data_.scale.x, 0.01f, 0.01f, 300.0f);
-
-	ImGui::SeparatorText("Color");
-	ImGui::DragFloat3("ColorMax", &data_.colorMax.x, 0.01f, 0.0f, 1.0f);
-	ImGui::DragFloat3("ColorMin", &data_.colorMin.x, 0.01f, 0.0f, 1.0f);
-
-	ImGui::SeparatorText("Velocity");
-	ImGui::DragFloat3("BaseVelocity", &data_.baseVelocity.x, 0.1f, -10.0f, 10.0f);
-	ImGui::DragFloat("VelocityRandMax", &data_.velocityRandMax, 0.1f, -10.0f, 10.0f);
-	ImGui::DragFloat("VelocityRandMin", &data_.velocityRandMin, 0.1f, -10.0f, 10.0f);
-	int veloType = int(data_.emitVeloType);
-	ImGui::DragInt("EmitVelocityType", &veloType, 0.1f, 0, 5);
-	data_.emitVeloType = uint32_t(veloType);
-	int moveType = static_cast<int>(data_.isRandomMove);
-	const char* items[] = {
-		"None",     // 0
-		"Gradate", // 1
-		"Curl"      // 2
-	};
-	if (ImGui::Combo("MoveType", &moveType, items, IM_ARRAYSIZE(items))) {
-		data_.isRandomMove = static_cast<uint32_t>(moveType);
+		ImGui::Unindent();
 	}
 
-	bool isTrailEmit = bool(data_.isTrailEmit);
-	ImGui::Checkbox("IsTrailEmit", &isTrailEmit);
-	data_.isTrailEmit = uint32_t(isTrailEmit);
+	// --- 2. 形状と座標 (Shape & Transform) ---
+	Vector3 prePos = data_.translate;
+	if (ImGui::CollapsingHeader("形状と配置 (Shape & Transform)")) {
+		ImGui::Indent();
 
-	bool isGravity = bool(data_.isGravity);
-	ImGui::Checkbox("IsGravity", &isGravity);
-	data_.isGravity = uint32_t(isGravity);
+		// 形状タイプを数値ではなくコンボボックスで選択
+		int shapeType = int(data_.emitShapeType);
+		const char* shapeItems[] = { "Sphere", "Ring", "Plane", "Cube", "Cone", "Cylinder", "Torus" };
+		if (ImGui::Combo("形状タイプ", &shapeType, shapeItems, IM_ARRAYSIZE(shapeItems))) {
+			data_.emitShapeType = uint32_t(shapeType);
+		}
 
-	ImGui::SetNextItemWidth(100);
+		ImGui::DragFloat("半径 (Radius)", &data_.radius, 0.1f, 0.01f, 300.0f);
+		ImGui::DragFloat3("スケール (Scale)", &data_.scale.x, 0.01f, 0.01f, 300.0f);
+
+		ImGui::Separator();
+		ImGui::Text("位置座標");
+
+		ImGui::DragFloat3("現在位置 (Pos)", &data_.translate.x, 0.1f);
+
+		// 補間設定
+		bool isDistance = bool(data_.isDistance);
+		if (ImGui::Checkbox("距離補間を使用", &isDistance)) {
+			data_.isDistance = uint32_t(isDistance);
+		}
+		if (isDistance) {
+			ImGui::DragFloat3("前回位置 (PrevPos)", &data_.prevTranslate.x, 0.1f);
+		}
+
+		ImGui::Unindent();
+	}
+	data_.prevTranslate = prePos;
+
+	// --- 3. 物理挙動と速度 (Physics & Velocity) ---
+	if (ImGui::CollapsingHeader("動きと速度 (Physics & Velocity)")) {
+		ImGui::Indent();
+
+		// 速度タイプをコンボボックス化
+		int veloType = int(data_.emitVeloType);
+		const char* veloItems[] = { "Type 0", "Type 1", "Type 2", "Type 3", "Type 4", "Type 5" };
+		if (ImGui::Combo("速度タイプ", &veloType, veloItems, IM_ARRAYSIZE(veloItems))) {
+			data_.emitVeloType = uint32_t(veloType);
+		}
+
+		ImGui::DragFloat3("基本速度 (Base Vel)", &data_.baseVelocity.x, 0.1f);
+
+		// 範囲設定は見やすく並べる
+		ImGui::Text("速度ランダム範囲");
+		float vMin = data_.velocityRandMin;
+		float vMax = data_.velocityRandMax;
+		ImGui::SetNextItemWidth(100);
+		ImGui::DragFloat("##Min", &vMin, 0.1f, -10.f, 10.f, "Min: %.1f");
+		ImGui::SameLine();
+		ImGui::Text("~");
+		ImGui::SameLine();
+		ImGui::SetNextItemWidth(100);
+		ImGui::DragFloat("##Max", &vMax, 0.1f, -10.f, 10.f, "Max: %.1f");
+		data_.velocityRandMin = vMin;
+		data_.velocityRandMax = vMax;
+
+		// 特殊な動き
+		int moveType = static_cast<int>(data_.isRandomMove);
+		const char* moveItems[] = { "None", "Gradate", "Curl" };
+		if (ImGui::Combo("特殊動作 (MoveType)", &moveType, moveItems, IM_ARRAYSIZE(moveItems))) {
+			data_.isRandomMove = static_cast<uint32_t>(moveType);
+		}
+
+		bool isGravity = bool(data_.isGravity);
+		if (ImGui::Checkbox("重力を適用 (Gravity)", &isGravity)) {
+			data_.isGravity = uint32_t(isGravity);
+		}
+
+		ImGui::Unindent();
+	}
+
+	// --- 4. カラー設定 (Color) ---
+	if (ImGui::CollapsingHeader("色 (Color)")) {
+		ImGui::Indent();
+
+		ImGui::ColorEdit3("色 (Max)", &data_.colorMax.x);
+		ImGui::ColorEdit3("色 (Min)", &data_.colorMin.x);
+
+		ImGui::Unindent();
+	}
+
+	// --- 5. 保存 (Save) ---
+	ImGui::Separator();
+	ImGui::Text("File I/O");
+	ImGui::SetNextItemWidth(150);
 	ImGui::InputText(".json", saveName_, sizeof(saveName_));
 	ImGui::SameLine();
 	if (ImGui::Button("Save")) {

@@ -36,14 +36,7 @@ void ImGuiManager::Initialize([[maybe_unused]] MyWin* myWin, [[maybe_unused]] DX
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
-	ImGui::StyleColorsDark();
-	/// style
-	ImGui::GetStyle().FrameRounding = 4;
-	ImGui::GetStyle().TabRounding = 8;
-	ImGui::GetStyle().Colors[33] = { 0.55f,0.588f,0.632f,0.8f };
-	ImGui::GetStyle().Colors[34] = { 0.091f,0.179f,0.299f,0.862f };
-	ImGui::GetStyle().Colors[35] = { 0.109f,0.522f,0.0f,1.0f };
-	ImGui::GetStyle().Colors[ImGuiCol_ModalWindowDimBg] = { 0.8f,0.8f,0.8f,0.075f };
+	ImGui::StyleColorsLight();
 
 	ImGui::SetColorEditOptions(ImGuiColorEditFlags_Float | ImGuiColorEditFlags_PickerHueBar);
 
@@ -67,6 +60,8 @@ void ImGuiManager::Initialize([[maybe_unused]] MyWin* myWin, [[maybe_unused]] DX
 	platform_io;
 	ImGuiIO& io2 = ImGui::GetIO();
 	io2.ConfigFlags |= ImGuiConfigFlags_DockingEnable;  // Dockingを有効化
+
+	SetupModernStyle();
 
 	winSizeX_ = myWin->kWindowWidth;
 	winSizeY_ = myWin->kWindowHeight;
@@ -482,6 +477,98 @@ void ImGuiManager::DrawPinIcon(bool connected, ax::Widgets::IconType icon) {
 	ax::Widgets::Icon(ImVec2(static_cast<float>(24), static_cast<float>(24)), icon, connected, color, ImColor(32, 32, 32, 200));
 }
 #endif // _DEBUG
+
+void Core::ImGuiManager::SetupModernStyle() {
+	ImGuiStyle& style = ImGui::GetStyle();
+	ImVec4* colors = style.Colors;
+
+	// --- 1. 形状設定 ---
+	style.WindowRounding = 8.0f;  // ウィンドウの角を丸く
+	style.ChildRounding = 6.0f;
+	style.FrameRounding = 6.0f;  // 入力欄も丸く
+	style.PopupRounding = 6.0f;
+	style.ScrollbarRounding = 9.0f;
+	style.GrabRounding = 6.0f;
+	style.TabRounding = 6.0f;
+	style.TabBarOverlineSize = 0.0f;
+
+	style.WindowBorderSize = 0.0f;  // 枠線はなくしてフラットに
+	style.FrameBorderSize = 1.0f;  // 入力欄には薄い枠線をつける
+	style.PopupBorderSize = 1.0f;
+
+	// --- 2. カラーパレット定義 ---
+	const ImVec4 kTextDark = ImVec4(0.05f, 0.05f, 0.05f, 1.00f); // 真っ黒ではない濃いグレー
+	const ImVec4 kTextLight = ImVec4(0.20f, 0.20f, 0.20f, 1.00f); // 無効テキストなど
+
+	const ImVec4 kBgWindow = ImVec4(0.80f, 0.80f, 0.87f, 1.00f); // ほんの少し青みがかった白
+	const ImVec4 kBgChild = ImVec4(0.80f, 0.80f, 0.80f, 1.00f); // リスト背景などは少し暗く
+	const ImVec4 kBgInput = ImVec4(1.00f, 1.00f, 1.00f, 1.00f); // 入力欄は真っ白
+
+	// アクセントカラー
+	const ImVec4 kAccent = ImVec4(0.40f, 0.38f, 0.95f, 1.00f);
+	const ImVec4 kAccentHover = ImVec4(0.50f, 0.48f, 0.98f, 1.00f);
+	const ImVec4 kAccentActive = ImVec4(0.35f, 0.33f, 0.85f, 1.00f);
+
+	// テキスト
+	colors[ImGuiCol_Text] = kTextDark;
+	colors[ImGuiCol_TextDisabled] = kTextLight;
+
+	// ウィンドウ・背景
+	colors[ImGuiCol_WindowBg] = kBgWindow;
+	colors[ImGuiCol_ChildBg] = kBgChild;
+	colors[ImGuiCol_PopupBg] = ImVec4(1.00f, 1.00f, 1.00f, 0.98f); // ポップアップは白
+	colors[ImGuiCol_Border] = ImVec4(0.00f, 0.00f, 0.00f, 0.06f); // 非常に薄いグレーの枠
+	colors[ImGuiCol_BorderShadow] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+
+	// ヘッダー（リストの選択項目など）
+	colors[ImGuiCol_Header] = ImVec4(kAccent.x, kAccent.y, kAccent.z, 0.35f);
+	colors[ImGuiCol_HeaderHovered] = ImVec4(kAccent.x, kAccent.y, kAccent.z, 0.45f);
+	colors[ImGuiCol_HeaderActive] = ImVec4(kAccent.x, kAccent.y, kAccent.z, 0.55f);
+
+	// 入力エリア（Frame）
+	colors[ImGuiCol_FrameBg] = kBgInput;
+	colors[ImGuiCol_FrameBgHovered] = ImVec4(0.75f, 0.75f, 0.75f, 1.00f);
+	colors[ImGuiCol_FrameBgActive] = ImVec4(0.70f, 0.70f, 0.70f, 1.00f);
+
+	// タイトルバー
+	colors[ImGuiCol_TitleBg] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
+	colors[ImGuiCol_TitleBgActive] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
+	colors[ImGuiCol_TitleBgCollapsed] = ImVec4(1.00f, 1.00f, 1.00f, 0.51f);
+
+	// ボタン
+	colors[ImGuiCol_Button] = ImVec4(kAccent.x, kAccent.y, kAccent.z, 0.35f);
+	colors[ImGuiCol_ButtonHovered] = ImVec4(kAccent.x, kAccent.y, kAccent.z, 0.45f);
+	colors[ImGuiCol_ButtonActive] = ImVec4(kAccent.x, kAccent.y, kAccent.z, 0.55f);
+
+	// タブ
+	colors[ImGuiCol_Tab] = ImVec4(0.92f, 0.93f, 0.94f, 1.00f); // 非アクティブ
+	colors[ImGuiCol_TabHovered] = kAccentHover;
+	colors[ImGuiCol_TabActive] = kAccent; // アクティブなタブは濃く
+	colors[ImGuiCol_TabUnfocused] = ImVec4(0.92f, 0.93f, 0.94f, 1.00f);
+	colors[ImGuiCol_TabUnfocusedActive] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
+	colors[ImGuiCol_TabDimmed] = ImVec4(0.92f, 0.93f, 0.94f, 1.00f); // 非アクティブ
+	colors[ImGuiCol_TabDimmedSelected] = kAccentHover;
+
+	// スライダー・スクロールバー・チェックマーク
+	colors[ImGuiCol_CheckMark] = kAccent;
+	colors[ImGuiCol_SliderGrab] = ImVec4(0.60f, 0.60f, 0.60f, 1.00f); // つまみはグレー
+	colors[ImGuiCol_SliderGrabActive] = kAccent;
+
+	colors[ImGuiCol_ScrollbarBg] = ImVec4(0.98f, 0.98f, 0.98f, 0.53f);
+	colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.80f, 0.80f, 0.80f, 1.00f); // 薄いグレー
+	colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.70f, 0.70f, 0.70f, 1.00f);
+	colors[ImGuiCol_ScrollbarGrabActive] = kAccent;
+
+	// Docking (ドッキング時のプレビュー)
+	colors[ImGuiCol_DockingPreview] = ImVec4(kAccent.x, kAccent.y, kAccent.z, 0.70f);
+	colors[ImGuiCol_DockingEmptyBg] = ImVec4(0.90f, 0.90f, 0.90f, 1.00f);
+
+	// プロットやグラフの線
+	colors[ImGuiCol_PlotLines] = kAccent;
+	colors[ImGuiCol_PlotLinesHovered] = kAccentHover;
+	colors[ImGuiCol_PlotHistogram] = kAccent;
+	colors[ImGuiCol_PlotHistogramHovered] = kAccentHover;
+}
 
 #ifdef _DEBUG
 void ImGuiManager::TextureSelectMenu(NodeGraph* nodeGraph) {

@@ -55,6 +55,7 @@ public:
 
 	void ParticleDebugGUI();
 	void ParticleCSDebugGUI();
+	void GPUParticleSceneGUI();
 	void SelectParticleUpdate();
 	void SelectEmitterSizeDraw();
 
