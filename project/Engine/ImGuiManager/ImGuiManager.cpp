@@ -479,6 +479,7 @@ void ImGuiManager::DrawPinIcon(bool connected, ax::Widgets::IconType icon) {
 #endif // _DEBUG
 
 void Core::ImGuiManager::SetupModernStyle() {
+#ifdef _DEBUG
 	ImGuiStyle& style = ImGui::GetStyle();
 	ImVec4* colors = style.Colors;
 
@@ -568,6 +569,7 @@ void Core::ImGuiManager::SetupModernStyle() {
 	colors[ImGuiCol_PlotLinesHovered] = kAccentHover;
 	colors[ImGuiCol_PlotHistogram] = kAccent;
 	colors[ImGuiCol_PlotHistogramHovered] = kAccentHover;
+#endif // _DEBUG
 }
 
 #ifdef _DEBUG
