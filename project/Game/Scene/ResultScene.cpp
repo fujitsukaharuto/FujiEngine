@@ -85,7 +85,7 @@ void ResultScene::Initialize() {
 
 void ResultScene::Update() {
 
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 
 
 #endif // _DEBUG
@@ -125,7 +125,7 @@ void ResultScene::Draw() {
 
 	clear_->Draw();
 
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	CommandManager::GetInstance()->Draw();
 #endif // _DEBUG
 
@@ -146,7 +146,7 @@ void ResultScene::Draw() {
 }
 
 void ResultScene::DebugGUI() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	ImGui::Indent();
 
 
@@ -156,7 +156,7 @@ void ResultScene::DebugGUI() {
 }
 
 void ResultScene::ParticleDebugGUI() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	ImGui::Indent();
 	if (ImGui::Button("ResetDance")) {
 		state_ = DanceState::TurnLeftMoveToLeft;

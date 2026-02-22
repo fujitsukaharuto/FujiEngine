@@ -15,7 +15,7 @@ namespace {
 
 
 void JsonSerializer::ShowSaveTransformPopup(const Trans& transform) {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	// Save ボタンを押すとポップアップを開く
 	if (ImGui::Button("Save Transform")) {
 		ImGui::OpenPopup("Save Transform");
@@ -66,7 +66,7 @@ void JsonSerializer::ShowSaveTransformPopup(const Trans& transform) {
 }
 
 void JsonSerializer::ShowLoadTransformPopup(Trans& transform) {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	// Load ボタン
 	if (ImGui::Button("Load Transform")) {
 		ImGui::OpenPopup("Load Transform");
@@ -178,7 +178,7 @@ bool JsonSerializer::DeserializeTransform(const std::string& filePath, Trans& ou
 }
 
 void JsonSerializer::ShowSaveEditorObjPopup(const EditorObj& obj) {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	// Save ボタンを押すとポップアップを開く
 	if (ImGui::Button("Save EditorObj")) {
 		ImGui::OpenPopup("Save EditorObj");
@@ -236,7 +236,7 @@ void JsonSerializer::ShowSaveEditorObjPopup(const EditorObj& obj) {
 }
 
 bool JsonSerializer::ShowLoadEditorObjPopup(EditorObj& obj) {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	bool result = false;
 	// Load ボタン
 	if (ImGui::Button("Load EditorObj")) {
@@ -392,7 +392,7 @@ json JsonSerializer::DeserializeJsonData(const std::string& filePath) {
 }
 
 void JsonSerializer::SavedPopup(bool& success) {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	if (success) {
 		ImGui::OpenPopup("Saved!");
 	}
@@ -409,7 +409,7 @@ void JsonSerializer::SavedPopup(bool& success) {
 }
 
 void JsonSerializer::LoadedPopup(bool& success) {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	if (success) {
 		ImGui::OpenPopup("Loaded!");
 	}
@@ -425,7 +425,7 @@ void JsonSerializer::LoadedPopup(bool& success) {
 }
 
 void JsonSerializer::LoadErrorPopup(bool& error, const std::string& filePath) {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	if (error) {
 		ImGui::OpenPopup("Load Error");
 	}

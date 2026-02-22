@@ -109,7 +109,7 @@ void Graphics::TextureManager::LoadAll() {
 }
 
 void TextureManager::LoadTextureFile(bool overWrite) {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	textureFileList_.clear();
 	if (!std::filesystem::exists(directoryPath_)) return;
 

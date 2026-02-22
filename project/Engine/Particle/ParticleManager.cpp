@@ -29,7 +29,7 @@ ParticleManager* ParticleManager::GetInstance() {
 }
 
 void ParticleManager::Finalize() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	selectParticleGroup_ = nullptr;
 #endif // _DEBUG
 
@@ -112,7 +112,7 @@ void ParticleManager::Draw() {
 }
 
 void ParticleManager::SelectParticleUpdate() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	if (selectParticleGroup_) {
 		selectParticleGroup_->emitter_.Emit();
 	}
@@ -120,7 +120,7 @@ void ParticleManager::SelectParticleUpdate() {
 }
 
 void ParticleManager::SelectEmitterSizeDraw() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	if (selectParticleGroup_) {
 		selectParticleGroup_->emitter_.DrawSize();
 	}
@@ -499,7 +499,7 @@ void ParticleManager::InternalCreateParticleGroup(const std::string& name, const
 void ParticleManager::UpdateParticleGroup(const Matrix4x4& billboardMatrix) {
 	for (auto& groupPair : particleGroups_) {
 		ParticleGroup* group = groupPair.second.get();
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 		if (group->emitter_.isEmit_) {
 			if (selectParticleGroup_ != group) {
 				group->emitter_.Emit();
@@ -738,7 +738,7 @@ void ParticleManager::ShapeTypeDrawCommand(const ShapeType& type, uint32_t count
 }
 
 void ParticleManager::SaveGroupData() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	json data{};
 	data["name"] = currentKey_;
 	data["texName"] = selectParticleGroup_->material_.GetPathName();

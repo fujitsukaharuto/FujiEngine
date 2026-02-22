@@ -32,7 +32,7 @@ AnimationModel::~AnimationModel() {
 }
 
 void AnimationModel::DebugGUI() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	ImGui::Indent();
 	if (ImGui::DragFloat("EnvironmentCoeff", &environmentCoeff_, 0.01f, 0.0f, 1.0f)) {
 		model_->SetEnvironment(environmentCoeff_);

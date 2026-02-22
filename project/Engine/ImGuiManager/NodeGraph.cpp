@@ -1,7 +1,7 @@
 #include "NodeGraph.h"
 #include "Engine/ImGuiManager/ImGuiManager.h"
 #include "Engine/DX/FPSKeeper.h"
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 #include "imgui_impl_dx12.h"
 #include "imgui_impl_win32.h"
 #include "ImGuizmo.h"
@@ -14,7 +14,7 @@ using namespace Core;
 using namespace Math;
 
 
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 void NodeGraph::Update(ax::NodeEditor::EditorContext* ctx) {
 	ClearResults();
 
@@ -439,7 +439,7 @@ NodeValue NodeGraph::DeserializeValue(const json& j) {
 
 #endif // _DEBUG
 
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 void MyNode::CreateNode(NodeType nodeType) {
 
 	id = ImGuiManager::GetInstance()->GenerateNodeId();

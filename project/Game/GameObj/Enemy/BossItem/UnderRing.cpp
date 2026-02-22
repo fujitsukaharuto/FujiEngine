@@ -73,7 +73,7 @@ void UnderRing::Draw([[maybe_unused]] Material* mate, [[maybe_unused]] bool is) 
 }
 
 void UnderRing::DrawCollider() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	collider_->DrawCollider();
 #endif // _DEBUG
 }

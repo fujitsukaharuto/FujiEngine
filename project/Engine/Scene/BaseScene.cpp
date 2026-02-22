@@ -32,19 +32,19 @@ void BaseScene::LoadSceneLevelData(const std::string& name) {
 }
 
 void BaseScene::DebugGUI() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 
 #endif // _DEBUG
 }
 
 void BaseScene::ParticleDebugGUI() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 
 #endif // _DEBUG
 }
 
 void BaseScene::ParticleGroupDebugGUI() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 
 #endif // _DEBUG
 }

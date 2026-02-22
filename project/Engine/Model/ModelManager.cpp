@@ -10,7 +10,7 @@
 #include "Engine/ImGuiManager/ImGuiManager.h"
 #include "Engine/Input/Input.h"
 #include "Engine/Light/LightManager.h"
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 #include "ImGuizmo.h"
 #endif // _DEBUG
 
@@ -513,7 +513,7 @@ ModelData ModelManager::CreateCylinder(float topRadius, float bottomRadius, floa
 }
 
 void ModelManager::LoadModelFile(bool overWrite) {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	modelFileList.clear();
 
 	if (!std::filesystem::exists(kDirectoryPath_)) return;
@@ -558,7 +558,7 @@ void ModelManager::NormalCommand() {
 }
 
 void ModelManager::PickingUpdate() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	if (!pickingDataGPU_ || !dxcommon_) return;
 
 	ImGuiIO& io = ImGui::GetIO();
@@ -606,7 +606,7 @@ void ModelManager::PickingCommand() {
 }
 
 void ModelManager::PickingDataReset() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 
 	PickingBuffer init{};
 	init.objID = lastPicked_.objID; // 前回の objID

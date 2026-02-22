@@ -2,7 +2,7 @@
 #include "Engine/Editor/CommandManager.h"
 #include "Engine/Editor/PropertyCommand.h"
 #include "Engine/Editor/JsonSerializer.h"
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 #include "externals/imgui/ImGuizmo.h"
 #endif // _DEBUG
 
@@ -29,7 +29,7 @@ void OriginGameObject::Draw(Material* mate, bool is) {
 }
 
 void OriginGameObject::DebugGUI() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	ImGui::Indent();
 	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Selected;
 	if (ImGui::TreeNodeEx("Trans", flags)) {
@@ -109,7 +109,7 @@ void OriginGameObject::DebugGUI() {
 #endif // _DEBUG
 }
 
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 void OriginGameObject::Debug() {
 }
 #endif // _DEBUG
@@ -186,7 +186,7 @@ void OriginGameObject::SetModelDataJson(const nlohmann::json& jsonData) {
 }
 
 void OriginGameObject::CreatePropertyCommand(int type) {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	if (ImGui::IsItemActivated()) {
 		switch (type) {
 		case 0: prevPos_ = model_->GetTransform().translate; break;

@@ -11,11 +11,11 @@
 
 
 //------------------------------------------------------------------------------
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 # include <imgui_node_editor.h>
 #endif // _DEBUG
 
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 //------------------------------------------------------------------------------
 namespace ax {
     namespace NodeEditor {

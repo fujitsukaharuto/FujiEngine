@@ -76,7 +76,7 @@ void CommandManager::Finalize() {
 }
 
 void CommandManager::Draw() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	for (auto& group : objectList) {
 		EditorObj* obj = group.second.get();
 		if (obj) {
@@ -89,7 +89,7 @@ void CommandManager::Draw() {
 }
 
 void CommandManager::DebugGUI() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	ImGui::Indent();
 
 	for (auto& group: objectList) {
@@ -156,7 +156,7 @@ void CommandManager::DebugGUI() {
 }
 
 void CommandManager::EditorObjGUI(EditorObj& obj) {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	// 表示名（キャッシュが無ければ初期化）
 	if (headerNames.find(obj.id) == headerNames.end()) {
 		std::string defaultName = obj.name.empty()
@@ -386,7 +386,7 @@ nlohmann::json CommandManager::ConvertObjToJson(EditorObj* obj) {
 }
 
 void CommandManager::SaveAllEditorOBJ() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	// Save ボタンを押すとポップアップを開く
 	if (ImGui::Button("Save AllEditorObj")) {
 		ImGui::OpenPopup("Save AllEditorObj");
@@ -530,7 +530,7 @@ void CommandManager::LoadObjRecursive(const nlohmann::json& objJson, int parentI
 }
 
 void CommandManager::LoadAllEditorOBJ() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	// Load ボタン
 	if (ImGui::Button("Load AllEditorObj")) {
 		ImGui::OpenPopup("Load AllEditorObj");

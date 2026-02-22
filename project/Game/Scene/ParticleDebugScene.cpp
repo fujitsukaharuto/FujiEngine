@@ -58,7 +58,7 @@ void ParticleDebugScene::Update() {
 
 	skybox_->Update();
 
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 
 	ParticleManager::GetInstance()->SelectParticleUpdate();
 
@@ -85,7 +85,7 @@ void ParticleDebugScene::Draw() {
 
 	ParticleManager::GetInstance()->Draw();
 
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 
 	ParticleManager::GetInstance()->SelectEmitterSizeDraw();
 
@@ -108,7 +108,7 @@ void ParticleDebugScene::Draw() {
 }
 
 void ParticleDebugScene::DebugGUI() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	ImGui::Indent();
 
 	ImGui::Unindent();
@@ -116,7 +116,7 @@ void ParticleDebugScene::DebugGUI() {
 }
 
 void ParticleDebugScene::ParticleDebugGUI() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	ImGui::Indent();
 
 	ImGui::Unindent();
@@ -124,7 +124,7 @@ void ParticleDebugScene::ParticleDebugGUI() {
 }
 
 void ParticleDebugScene::ParticleGroupDebugGUI() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	ParticleManager::GetInstance()->ParticleDebugGUI();
 #endif // _DEBUG
 }

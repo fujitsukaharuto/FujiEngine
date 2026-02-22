@@ -47,7 +47,7 @@ void Camera::Update() {
 	worldMatrix_ = MakeAffineMatrix(transform_.scale, transform_.rotate, (transform_.translate + shakeGap_));
 	viewMatrix_ = Inverse(worldMatrix_);
 
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	if (CameraManager::GetInstance()->GetDebugMode()) {
 		viewMatrix_ = DebugCamera::GetInstance()->GetViewMatrix();
 	}
@@ -61,7 +61,7 @@ void Camera::UpdateMatrix() {
 	worldMatrix_ = MakeAffineMatrix(transform_.scale, transform_.rotate, (transform_.translate + shakeGap_));
 	viewMatrix_ = Inverse(worldMatrix_);
 
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	if (CameraManager::GetInstance()->GetDebugMode()) {
 		viewMatrix_ = DebugCamera::GetInstance()->GetViewMatrix();
 	}
@@ -77,7 +77,7 @@ void Camera::IssuanceShake(float strength, float time) {
 }
 
 void Camera::DebugGUI() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	if (ImGui::CollapsingHeader("Camera")) {
 		ImGui::DragFloat3("pos", &transform_.translate.x, 0.01f);
 		ImGui::DragFloat3("rotate", &transform_.rotate.x, 0.01f);

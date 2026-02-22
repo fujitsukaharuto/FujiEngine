@@ -60,7 +60,7 @@ void BossItemManager::Draw() {
 	for (auto& wall : walls_) {// Itemの描画
 		if (!wall->GetIsLive())continue;
 		wall->Draw();
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 		wall->DrawCollider();
 #endif // _DEBUG
 	}
@@ -68,7 +68,7 @@ void BossItemManager::Draw() {
 	for (auto& arrow : arrows_) {
 		if (!arrow->GetIsLive())continue;
 		arrow->Draw();
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 		arrow->DrawCollider();
 #endif // _DEBUG
 	}
@@ -80,7 +80,7 @@ void BossItemManager::Draw() {
 	for (auto& ring : underRings_) {
 		if (!ring->GetIsLive())continue;
 		ring->Draw();
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 		ring->DrawCollider();
 #endif // _DEBUG
 	}

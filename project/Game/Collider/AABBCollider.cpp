@@ -12,7 +12,7 @@ AABBCollider::AABBCollider() {
 }
 
 void AABBCollider::DebugGUI() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	ImGui::Indent();
 	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Selected;
 	if (ImGui::TreeNodeEx("Collider", flags)) {
@@ -70,7 +70,7 @@ void AABBCollider::OnCollisionExit(const ColliderInfo& other) {
 }
 
 void AABBCollider::SaveCollider(const std::string& filePath) {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	nlohmann::json json;
 
 	json["position"] = {
@@ -153,7 +153,7 @@ std::array<Vector3, 8> AABBCollider::GetWorldVertices() const {
 	return worldVertices;
 }
 
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 void AABBCollider::Debug() {
 	std::string uniqueName = "AABBCollider##" + std::to_string(reinterpret_cast<uintptr_t>(this));
 	ImGui::Begin(uniqueName.c_str());

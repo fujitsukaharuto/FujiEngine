@@ -41,6 +41,7 @@ ComPtr<IDxcBlob> DXCompile::CompileShader(const std::wstring& filePath, const wc
 	shaderSourceBuffer.Size = shaderSource->GetBufferSize();
 	shaderSourceBuffer.Encoding = DXC_CP_UTF8;
 
+#ifdef _DEBUG
 	// argumentの設定
 	LPCWSTR arguments[] = {
 		filePath.c_str(),
@@ -50,7 +51,15 @@ ComPtr<IDxcBlob> DXCompile::CompileShader(const std::wstring& filePath, const wc
 		L"-Od",
 		L"-Zpr",
 	};
-
+#else
+	LPCWSTR arguments[] = {
+		filePath.c_str(),
+		L"-E",L"main",
+		L"-T",profile,
+		L"-O3",
+		L"-Zpr",
+	};
+#endif
 
 	IDxcResult* shaderResult = nullptr;
 	hr = dxcCompiler_->Compile(

@@ -33,7 +33,7 @@ void OffscreenManager::Update() {
 }
 
 void OffscreenManager::DebugGUI() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	ImGui::Begin("OffScreen Debug");
 
 
@@ -104,7 +104,7 @@ void OffscreenManager::DebugGUI() {
 }
 
 void OffscreenManager::EffectListGUI() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	ImGui::SetNextItemOpen(true, ImGuiCond_Once);
 
 	if (ImGui::TreeNode("PostEffectList")) {

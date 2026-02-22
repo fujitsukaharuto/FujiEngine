@@ -7,7 +7,7 @@
 // CREDITS
 //   Written by Michal Cichon
 //------------------------------------------------------------------------------
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 # define IMGUI_DEFINE_MATH_OPERATORS
 # include "builders.h"
 # include <imgui_internal.h>
@@ -15,7 +15,7 @@
 
 
 
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 //------------------------------------------------------------------------------
 namespace ed   = ax::NodeEditor;
 namespace util = ax::NodeEditor::Utilities;

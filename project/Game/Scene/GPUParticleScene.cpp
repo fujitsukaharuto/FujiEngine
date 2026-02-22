@@ -102,7 +102,7 @@ void GPUParticleScene::Draw() {
 }
 
 void GPUParticleScene::DebugGUI() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	ImGui::Indent();
 
 	ImGui::Unindent();
@@ -110,7 +110,7 @@ void GPUParticleScene::DebugGUI() {
 }
 
 void GPUParticleScene::ParticleDebugGUI() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	ImGui::Indent();
 
 	ImGui::Unindent();
@@ -118,7 +118,7 @@ void GPUParticleScene::ParticleDebugGUI() {
 }
 
 void GPUParticleScene::ParticleGroupDebugGUI() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	ParticleManager::GetInstance()->GPUParticleSceneGUI();
 #endif // _DEBUG
 }

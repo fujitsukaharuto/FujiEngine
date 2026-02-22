@@ -36,7 +36,7 @@ void SkyBox::Draw() {
 }
 
 void SkyBox::DebugGUI() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	if (ImGui::CollapsingHeader("SkyBox")) {
 		ImGui::Indent();
 		Vector4 color = material_.GetColor();

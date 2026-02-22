@@ -104,7 +104,7 @@ void TitleScene::Update() {
 
 	cMane_->Reset();
 
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 
 
 
@@ -152,7 +152,7 @@ void TitleScene::Draw() {
 
 	player_->TitleDraw();
 
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	if (!uiInvisible_) {
 		if (startTime_ < 0.0f) {
 			space_->Draw();
@@ -167,7 +167,7 @@ void TitleScene::Draw() {
 #endif // _DEBUG
 
 
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	CommandManager::GetInstance()->Draw();
 #endif // _DEBUG
 
@@ -191,7 +191,7 @@ void TitleScene::Draw() {
 }
 
 void TitleScene::DebugGUI() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	ImGui::Checkbox("UI Invisible", &uiInvisible_);
 	if (ImGui::TreeNode("PlayerMovePoint")) {
 		ImGui::DragFloat3("StartPoint", &playerStart_.x, 0.01f);
@@ -219,7 +219,7 @@ void TitleScene::DebugGUI() {
 }
 
 void TitleScene::ParticleDebugGUI() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	ImGui::Indent();
 
 	ImGui::Unindent();
@@ -261,7 +261,7 @@ void TitleScene::BlackFade() {
 			}
 		}
 	}
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	if (Input::GetInstance()->PushKey(DIK_RETURN) && Input::GetInstance()->PushKey(DIK_P) && Input::GetInstance()->PushKey(DIK_D) && Input::GetInstance()->TriggerKey(DIK_S)) {
 		if (blackTime_ == 0.0f) {
 			isChangePhase_ = true;
@@ -283,7 +283,7 @@ void TitleScene::TitleLoadPlayerPoint() {
 }
 
 void TitleScene::TitleSavePlayerPoint() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	json data;
 
 	data["start"] = { playerStart_.x,playerStart_.y,playerStart_.z };

@@ -8,14 +8,14 @@
 #include "Engine/Math/Vector/Vector3.h"
 #include "Engine/Math/Vector/Vector4.h"
 #include "Engine/Editor/JsonSerializer.h"
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 #include "imgui.h"
 #include "imgui_node_editor.h"
 
 namespace ed = ax::NodeEditor;
 #endif // _DEBUG
 
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 /// <summary>
 /// ノードが持つ値
 /// </summary>
@@ -154,7 +154,7 @@ struct Link {
 
 namespace Core {
 	// NodeEditor
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 /// <summary>
 /// NodeGraphのクラス
 /// </summary>

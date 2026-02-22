@@ -160,7 +160,7 @@ private:
 	std::unique_ptr<GPUParticleSystem> gpuParticleSystem_;
 	std::vector<std::string> csEmitterFileNames_;
 
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	ParticleGroup* selectParticleGroup_ = nullptr;
 	int currentIndex_ = 0;
 	std::string currentKey_;

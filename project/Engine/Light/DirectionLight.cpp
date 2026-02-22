@@ -48,7 +48,7 @@ void DirectionLight::SetLightIntensity(float intensity) {
 }
 
 void DirectionLight::Debug() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	if (ImGui::CollapsingHeader("directionLight")) {
 
 		ImGui::ColorEdit4("color##direction", &directionLightData_.color.x);

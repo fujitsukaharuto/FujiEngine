@@ -74,7 +74,7 @@ void WaveWall::Draw([[maybe_unused]] Material* mate, [[maybe_unused]] bool is) {
 }
 
 void WaveWall::DrawCollider() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	collider_->DrawCollider();
 #endif // _DEBUG
 }

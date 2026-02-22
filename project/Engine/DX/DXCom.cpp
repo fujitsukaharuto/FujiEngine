@@ -60,7 +60,7 @@ void DXCom::Finalize() {
 	device_.Reset();
 	useAdapter_.Reset();
 	dxgiFactory_.Reset();
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	debugController_.Reset();
 #endif
 }
@@ -120,7 +120,7 @@ void DXCom::CreateDevice() {
 	assert(device_ != nullptr);
 	Logger::Log("Complete create D3D12Device!!\n");
 
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	ID3D12InfoQueue* infoQueue = nullptr;
 	if (SUCCEEDED(device_->QueryInterface(IID_PPV_ARGS(&infoQueue)))) {
 		infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, true);

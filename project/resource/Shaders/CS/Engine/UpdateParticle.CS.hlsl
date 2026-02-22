@@ -32,8 +32,7 @@ void MoveMode(uint pIndex)
         if (len0 < 0.0001f)
         {
             float3 seed = pos * 0.3 + float3(1.234, 5.678, 9.1011);
-            float3 rnd = CurlNoise(seed);
-            float3 v = rnd + float3(0.1, 0.2, 0.1);
+            float3 v = curl + float3(0.1, 0.2, 0.1);
             float l = length(v);
             if (l < 0.0001f)
             {

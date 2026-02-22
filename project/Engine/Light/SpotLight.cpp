@@ -41,7 +41,7 @@ void SpotLight::SetLightCommand(ID3D12GraphicsCommandList* commandList) {
 }
 
 void SpotLight::Debug() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	if (ImGui::CollapsingHeader("spotlight")) {
 
 		ImGui::ColorEdit4("color##spot", &spotLightData_.color.x);

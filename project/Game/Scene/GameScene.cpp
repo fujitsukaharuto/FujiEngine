@@ -97,7 +97,7 @@ void GameScene::Update() {
 
 	field_.Emit();
 
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	if (input_->TriggerKey(DIK_8)) {
 		SoundData& soundData1 = audioPlayer_->SoundLoadWave("shot.wav");
 		audioPlayer_->SoundPlayWave(soundData1);
@@ -137,7 +137,7 @@ void GameScene::Draw() {
 
 	ParticleManager::GetInstance()->Draw();
 
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 
 	Line3dDrawer::GetInstance()->Render();
 #endif // _DEBUG
@@ -170,7 +170,7 @@ void GameScene::Draw() {
 }
 
 void GameScene::DebugGUI() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	ImGui::Indent();
 
 	followCamera_->DebugGUI();
@@ -188,7 +188,7 @@ void GameScene::DebugGUI() {
 }
 
 void GameScene::ParticleDebugGUI() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	ImGui::Indent();
 	
 
@@ -223,7 +223,7 @@ void GameScene::BlackFade() {
 			black_->SetColor({ 0.0f,0.0f,0.0f,Lerp(0.0f,1.0f,(1.0f / blackLimit_ * blackTime_)) });
 		}
 	}
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	if (Input::GetInstance()->TriggerKey(DIK_0)) {
 		if (blackTime_ == 0.0f) {
 			isChangePhase_ = true;

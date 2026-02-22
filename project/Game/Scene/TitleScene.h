@@ -30,7 +30,7 @@ private:
 	void TitleLoadPlayerPoint();
 	void TitleSavePlayerPoint();
 
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	bool uiInvisible_ = false;
 #endif // _DEBUG
 

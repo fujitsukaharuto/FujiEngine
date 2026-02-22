@@ -73,7 +73,7 @@ void SphereEmitter::Dispatch(ID3D12GraphicsCommandList* cmd,
 }
 
 void SphereEmitter::DebugGUI() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 
 	ImGui::Checkbox("##IsEmit", &isEmit_);
 	ImGui::SameLine();

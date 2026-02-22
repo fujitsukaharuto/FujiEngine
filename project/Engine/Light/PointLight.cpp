@@ -54,7 +54,7 @@ void PointLight::SetLightCommand(ID3D12GraphicsCommandList* commandList) {
 
 
 void PointLight::Debug() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	if (ImGui::CollapsingHeader("pointLight")) {
 
 		ImGui::ColorEdit4("color##point", &pointLightData_.color.x);

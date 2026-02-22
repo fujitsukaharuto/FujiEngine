@@ -82,13 +82,13 @@ void Arrow::Draw([[maybe_unused]] Material* mate, [[maybe_unused]] bool is) {
 }
 
 void Arrow::DrawCollider() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	collider_->DrawCollider();
 #endif // _DEBUG
 }
 
 void Arrow::DebugGUI() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	if (ImGui::CollapsingHeader("Arrow")) {
 		collider_->DebugGUI();
 		ParameterGUI();
@@ -97,7 +97,7 @@ void Arrow::DebugGUI() {
 }
 
 void Arrow::ParameterGUI() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	ImGui::Indent();
 	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Selected;
 	if (ImGui::TreeNodeEx("Parameter", flags)) {

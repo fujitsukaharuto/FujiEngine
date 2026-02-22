@@ -186,7 +186,7 @@ private:
 	DXC::GPUTimer gpuTimerGraphics;
 	DXC::GPUTimer gpuTimerCompute;
 
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	int editCSEmitInd_;
 	int editCSEmitTexInd_;
 	int editCSEmitSurfaceInd_;

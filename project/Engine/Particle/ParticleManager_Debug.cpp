@@ -15,7 +15,7 @@ using namespace Math;
 
 
 void ParticleManager::ParticleDebugGUI() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	ImGui::Begin("Particle Editor", nullptr, ImGuiWindowFlags_NoCollapse);
 
 	// テーブルフラグ設定：
@@ -223,7 +223,7 @@ void ParticleManager::ParticleDebugGUI() {
 
 
 void ParticleManager::ParticleCSDebugGUI() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	if (ImGui::CollapsingHeader("GPU Particle System")) {
 		ImGui::Indent();
 		gpuParticleSystem_->RenderPerformanceStats();
@@ -236,13 +236,13 @@ void ParticleManager::ParticleCSDebugGUI() {
 }
 
 void ParticleManager::GPUParticleSceneGUI() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	gpuParticleSystem_->DebugGUI();
 #endif // _DEBUG
 }
 
 void ParticleManager::ParticleTexturePopUp() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	if (ImGui::Button("TextureFile")) {
 		ImGui::OpenPopup("TextureFile Window");
 	}

@@ -178,7 +178,7 @@ void FollowCamera::OffsetChangeCal() {
 }
 
 void FollowCamera::DebugGUI() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	if (ImGui::CollapsingHeader("FollowCamera")) {
 		ImGui::Indent();
 		if (target_) {

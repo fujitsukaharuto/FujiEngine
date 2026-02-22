@@ -16,7 +16,7 @@ void CameraManager::Finalize() {
 }
 
 void CameraManager::Update() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	if (debugMode_) {
 		DebugCamera::GetInstance()->Update();
 	}

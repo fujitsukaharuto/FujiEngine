@@ -57,7 +57,7 @@ void LightManager::SetLightCommand(ID3D12GraphicsCommandList* commandList) {
 }
 
 void LightManager::DebugGUI() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	if (ImGui::CollapsingHeader("light")) {
 		ImGui::Indent();
 		directionLight_->Debug();

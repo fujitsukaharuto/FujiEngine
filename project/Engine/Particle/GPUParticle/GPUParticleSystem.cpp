@@ -151,7 +151,7 @@ int GPUParticleSystem::InitGPUEmitterSurface(const std::string& fileName) {
 }
 
 void GPUParticleSystem::DebugGUI() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	ImGui::Begin("GPUParticle Editor", nullptr, ImGuiWindowFlags_NoCollapse);
 
 	RenderPerformanceStats();
@@ -185,7 +185,7 @@ void GPUParticleSystem::DebugGUI() {
 }
 
 void GPUParticleSystem::RenderPerformanceStats() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	if (ImGui::CollapsingHeader("統計情報 / パフォーマンス")) {
 		uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 		uint32_t finishedFrame = (frameIndex + DXC::kFrameCount_ - 1) % DXC::kFrameCount_;
@@ -222,7 +222,7 @@ void GPUParticleSystem::RenderPerformanceStats() {
 }
 
 void GPUParticleSystem::RenderEmitterList(std::vector<int>& emitterIndices, int& currentIdx, PipelinePhase phase) {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	if (emitterIndices.empty()) {
 		ImGui::TextDisabled("エミッターが存在しません。");
 		return;
@@ -261,7 +261,7 @@ void GPUParticleSystem::RenderEmitterList(std::vector<int>& emitterIndices, int&
 }
 
 void GPUParticleSystem::ParticleCSDebugGUI() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	if (ImGui::CollapsingHeader("GPU Particle Emitter")) {
 		if (ImGui::Button("Emitterの追加")) {
 			InitGPUEmitter();
@@ -291,7 +291,7 @@ void GPUParticleSystem::ParticleCSDebugGUI() {
 }
 
 void GPUParticleSystem::ParticleTexCSDebugGUI() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	if (csEmitters_.size() == 0 || textureBasedEmitters_.size() == 0) return;
 	if (ImGui::CollapsingHeader("GPU ParticleTex Emitter")) {
 		if (ImGui::ArrowButton("Index-", ImGuiDir_Left)) {
@@ -314,7 +314,7 @@ void GPUParticleSystem::ParticleTexCSDebugGUI() {
 }
 
 void GPUParticleSystem::ParticleSurfaceCSDebugGUI() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	if (csEmitters_.size() == 0 || MeshSurfaceEmitters_.size() == 0) return;
 	if (ImGui::CollapsingHeader("GPU Particle Surface Emitter")) {
 		if (ImGui::ArrowButton("Index-", ImGuiDir_Left)) {
@@ -558,7 +558,7 @@ void GPUParticleSystem::UpdateGPUEmitter() {
 }
 
 void GPUParticleSystem::LoadPopUpGUI(int id, PipelinePhase type) {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	if (ImGui::Button("LoadFile")) {
 		ImGui::OpenPopup("CSEmitterFile Window");
 	}

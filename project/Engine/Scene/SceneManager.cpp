@@ -81,7 +81,7 @@ void SceneManager::ChangeScene(const std::string& sceneName, float extraTime) {
 }
 
 void SceneManager::DebugGUI() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	if (ImGui::CollapsingHeader("Scene")) {
 		if (scene_) {
 			scene_->DebugGUI();
@@ -93,7 +93,7 @@ void SceneManager::DebugGUI() {
 }
 
 void SceneManager::ParticleGroupDebugGUI() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	if (scene_) {
 		scene_->ParticleGroupDebugGUI();
 	}

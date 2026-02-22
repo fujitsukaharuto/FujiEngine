@@ -6,7 +6,7 @@
 #include "Engine/Input/Input.h"
 #include "Engine/Editor/JsonSerializer.h"
 #include "Engine/Model/TextureManager.h"
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 #include "imgui_impl_dx12.h"
 #include "imgui_impl_win32.h"
 #include "ImGuizmo.h"
@@ -28,7 +28,7 @@ ImGuiManager* ImGuiManager::GetInstance() {
 
 void ImGuiManager::Initialize([[maybe_unused]] MyWin* myWin, [[maybe_unused]] DXCom* dxComon) {
 	dxCommon_ = dxComon;
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 
 	SRVManager* srvManager = SRVManager::GetInstance();
 	ID3D12DescriptorHeap* srv = srvManager->GetSRVHeap();
@@ -70,7 +70,7 @@ void ImGuiManager::Initialize([[maybe_unused]] MyWin* myWin, [[maybe_unused]] DX
 
 void ImGuiManager::Fin() {
 	dxCommon_ = nullptr;
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	if (nodeEditorContext_) {
 		ax::NodeEditor::DestroyEditor(nodeEditorContext_);
 		nodeEditorContext_ = nullptr;
@@ -83,7 +83,7 @@ void ImGuiManager::Fin() {
 }
 
 void ImGuiManager::Begin() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	ImGui_ImplDX12_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
@@ -96,7 +96,7 @@ void ImGuiManager::Begin() {
 }
 
 void ImGuiManager::End() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	ImGui::Render();
 #endif // _DEBUG
 }
@@ -104,26 +104,26 @@ void ImGuiManager::End() {
 void ImGuiManager::Draw() {
 	ID3D12GraphicsCommandList* commandList = dxCommon_->GetCommandList();
 
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList);
 #endif // _DEBUG
 }
 
 void ImGuiManager::SetFontJapanese() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	ImGui::PushFont(font_japanese_);
 #endif // _DEBUG
 }
 
 void ImGuiManager::UnSetFont() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	ImGui::PopFont();
 #endif // _DEBUG
 }
 
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 void ImGuiManager::ImGuiDragDropButton(const char* buttonLabel, const char* payloadType, const std::function<void(const ImGuiPayload* payload)>& onDrop, const std::function<void(const ImGuiPayload* payload)>& onPreview) {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	if (ImGui::Button(buttonLabel)) {
 		// ボタンが押されたときの処理が必要なら追加
 	}
@@ -151,7 +151,7 @@ void ImGuiManager::ImGuiDragDropButton(const char* buttonLabel, const char* payl
 }
 
 void ImGuiManager::ImGuiDragButton(const char* label, const void* payloadData, size_t payloadSize, const char* payloadType) {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	if (ImGui::Button(label)) {
 		// ボタンが押された場合の処理（必要であれば追加）
 	}
@@ -164,7 +164,7 @@ void ImGuiManager::ImGuiDragButton(const char* label, const void* payloadData, s
 #endif // _DEBUG
 }
 void ImGuiManager::ImGuiPopUpButton(const char* buttonLabel, const char* popupName, std::function<void()> contentFunc) {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	if (ImGui::Button(buttonLabel)) {
 		ImGui::OpenPopup(popupName);
 	}
@@ -187,13 +187,13 @@ void ImGuiManager::ImGuiPopUpButton(const char* buttonLabel, const char* popupNa
 }
 #endif // _DEBUG
 
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 void ImGuiManager::InitNodeTexture() {
 	backGroundHandle_ = TextureManager::GetInstance()->GetTexture("BlueprintBackground.png")->gpuHandle;
 }
 #endif // _DEBUG
 
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 bool ImGuiManager::CanCreateLink(const Pin& a, const Pin& b) {
 	// 出力 → 入力 のみに限定する例
 	if (a.type == b.type || a.pinType != b.pinType)
@@ -479,7 +479,7 @@ void ImGuiManager::DrawPinIcon(bool connected, ax::Widgets::IconType icon) {
 #endif // _DEBUG
 
 void Core::ImGuiManager::SetupModernStyle() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	ImGuiStyle& style = ImGui::GetStyle();
 	ImVec4* colors = style.Colors;
 
@@ -572,7 +572,7 @@ void Core::ImGuiManager::SetupModernStyle() {
 #endif // _DEBUG
 }
 
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 void ImGuiManager::TextureSelectMenu(NodeGraph* nodeGraph) {
 	if (ImGui::BeginMenu("Texture Node")) {
 		for (auto& pair : TextureManager::GetInstance()->GetTextureFiles()) {
@@ -592,7 +592,7 @@ void ImGuiManager::TextureSelectMenu(NodeGraph* nodeGraph) {
 #endif // _DEBUG
 
 
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 // ParticleGroup
 void ParticleGroupSelector::Show(std::function<void(const std::string&, bool)> on_move) {
 

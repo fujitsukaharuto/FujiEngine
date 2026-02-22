@@ -6,7 +6,7 @@
 #include <string>
 #include <functional>
 #include <cstdint>
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 #include "imgui.h"
 #include "imgui_node_editor.h"
 #include "NodeGraph.h"
@@ -65,7 +65,7 @@ namespace Core {
 		///---------------------------------------------------------------------------------------
 		/// ImGuiUtility
 		///---------------------------------------------------------------------------------------
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	/// <summary>Drag＆Dropができるボタン</summary>
 		static void ImGuiDragDropButton(const char* buttonLabel, const char* payloadType, const std::function<void(const ImGuiPayload* payload)>& onDrop, const std::function<void(const ImGuiPayload* payload)>& onPreview);
 		/// <summary>Dragができるボタン</summary>
@@ -76,7 +76,7 @@ namespace Core {
 #endif // _DEBUG
 
 
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 
 		/// <summary>Nodeに使用するTextureの初期化</summary>
 		void InitNodeTexture();
@@ -113,7 +113,7 @@ namespace Core {
 
 		void SetupModernStyle();
 
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 
 		/// <summary>Textureのセレクトメニューの表示</summary>
 		void TextureSelectMenu(NodeGraph* nodeGraph);
@@ -128,7 +128,7 @@ namespace Core {
 		float winSizeX_ = 0.0f;
 		float winSizeY_ = 0.0f;
 
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 		ImFont* font_japanese_ = nullptr;
 
 		D3D12_GPU_DESCRIPTOR_HANDLE backGroundHandle_;
@@ -145,7 +145,7 @@ namespace Core {
 
 
 	struct ParticleGroupSelector {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 		std::vector<std::string> items[2];  // 0: false, 1: true
 		std::string selected[2];
 

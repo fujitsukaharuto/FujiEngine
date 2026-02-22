@@ -209,7 +209,7 @@ void Beam::Draw([[maybe_unused]] Material* mate, [[maybe_unused]]bool is) {
 			beam.beam3->Draw(nullptr, true);
 			beam.beam2->Draw(nullptr, true);
 			beam.beam1->Draw(nullptr, true);
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 			beam.collider->DrawCollider();
 #endif // _DEBUG	
 			beamCount++;

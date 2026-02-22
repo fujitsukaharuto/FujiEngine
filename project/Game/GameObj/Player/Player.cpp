@@ -173,7 +173,7 @@ void Player::Draw(Material* mate, bool is) {
 
 	OriginGameObject::Draw(mate, is);
 
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	collider_->DrawCollider();
 #endif // _DEBUG
 
@@ -186,7 +186,7 @@ void Player::Draw(Material* mate, bool is) {
 }
 
 void Player::DebugGUI() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	if (ImGui::CollapsingHeader("Player")) {
 		model_->DebugGUI();
 		collider_->SetPos(model_->GetWorldPos());
@@ -199,7 +199,7 @@ void Player::DebugGUI() {
 }
 
 void Player::ParameterGUI() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	ImGui::Indent();
 	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Selected;
 	if (ImGui::TreeNodeEx("Parameter", flags)) {

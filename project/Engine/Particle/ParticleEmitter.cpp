@@ -19,7 +19,7 @@ ParticleEmitter::~ParticleEmitter() {
 }
 
 void ParticleEmitter::DebugGUI() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	if (ImGui::CollapsingHeader("エミッター設定")) {
 		ImGui::Indent();
 
@@ -209,7 +209,7 @@ void ParticleEmitter::DebugGUI() {
 }
 
 void ParticleEmitter::EmitProgressGUI() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	float t = 1.0f;
 	if (frequencyTime_ != 0.0f) {
 		t = 1.0f - (time_ / frequencyTime_);
@@ -221,7 +221,7 @@ void ParticleEmitter::EmitProgressGUI() {
 }
 
 void ParticleEmitter::DrawSize() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	if (isDrawSize_) {
 
 

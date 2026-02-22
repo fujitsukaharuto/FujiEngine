@@ -125,7 +125,7 @@ void MeshSurfaceEmitter::Dispatch(ID3D12GraphicsCommandList* cmd,
 }
 
 void MeshSurfaceEmitter::DebugGUI() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	ImGui::Checkbox("##IsEmit", &isEmit_);
 	ImGui::SameLine();
 	ImGui::Text(isEmit_ ? "エミッター有効 (Active)" : "エミッター停止 (Inactive)");

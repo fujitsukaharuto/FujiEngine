@@ -272,7 +272,7 @@ private:
 	Core::MyWin* myWin_;
 
 
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	Microsoft::WRL::ComPtr<ID3D12Debug1> debugController_ = nullptr;
 #endif // _DEBUG
 

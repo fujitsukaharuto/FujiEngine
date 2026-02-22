@@ -11,7 +11,7 @@
 
 
 void Boss::DebugGUI() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	if (ImGui::CollapsingHeader("Boss##0")) {
 		ImGui::Indent();
 		if (ImGui::CollapsingHeader("Boss##1")) {
@@ -27,7 +27,7 @@ void Boss::DebugGUI() {
 
 
 void Boss::ParameterGUI() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	ImGui::Indent();
 	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Selected;
 	if (ImGui::TreeNodeEx("BossBehavior", flags)) {

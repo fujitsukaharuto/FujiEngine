@@ -8,7 +8,7 @@
 #include "Engine/Editor/PropertyCommand.h"
 #include "Engine/Editor/JsonSerializer.h"
 #include "Engine/ImGuiManager/NodeGraph.h"
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 #include "ImGuizmo.h"
 namespace ed = ax::NodeEditor;
 #endif // _DEBUG
@@ -27,7 +27,7 @@ Object3d::Object3d() {
 
 Object3d::~Object3d() {
 	dxcommon_ = nullptr;
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	if (nodeEditorContext_) {
 		ax::NodeEditor::DestroyEditor(nodeEditorContext_);
 		nodeEditorContext_ = nullptr;
@@ -140,7 +140,7 @@ void Object3d::CreateCylinder(float topRadius, float bottomRadius, float height)
 
 void Object3d::Draw(Material* mate, bool isAdd) {
 	SetWVP();
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	if (!isUseNodeGraph_) {
 		NodeContentsUpdate();
 	}
@@ -249,7 +249,7 @@ Vector3 Object3d::GetWorldPos() const {
 
 
 void Object3d::DebugGUI() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	ImGui::Indent();
 	if (ModelManager::GetInstance()->GetPickedID() == objIDData_->objID && objIDData_->objID != -1) {
 		ImGui::SetNextItemOpen(true, ImGuiCond_Always);
@@ -493,7 +493,7 @@ void Object3d::LoadNodeEditorData(const std::string& filename) {
 }
 
 void Object3d::CreateNodeEditor(const std::string& filename) {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	ax::NodeEditor::Config config;
 	config.SettingsFile = filename.c_str();
 	nodeEditorContext_ = CreateEditor(&config);
@@ -505,7 +505,7 @@ void Object3d::CreateNodeEditor(const std::string& filename) {
 	maskMaterial_.CreateMaterial();
 	LoadNodeEditorData(filename);
 	nodeFileName_ = filename;
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	if (selectorNodeId_.Get() != 0) {
 		MyNode* selNode = nodeGraph_.FindNodeById(selectorNodeId_);
 		if (selNode) {
@@ -537,7 +537,7 @@ void Object3d::SetTexture(const std::string& name) {
 	}
 	model_->SetTexture(name);
 	nowTextureName = name;
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	if (selectorNodeId_.Get() != 0) {
 		MyNode* selNode = nodeGraph_.FindNodeById(selectorNodeId_);
 		if (selNode) {
@@ -714,7 +714,7 @@ void Object3d::SetBillboardWVP() {
 }
 
 void Object3d::CreatePropertyCommand(int type) {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	if (ImGui::IsItemActivated()) {
 		switch (type) {
 		case 0: prevPos_ = transform.translate; break;
@@ -852,7 +852,7 @@ void Object3d::AnalysisValue(const json& j, int index, const std::string& typeNa
 }
 
 void Object3d::SetTextureNode() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 
 	nodeGraph_.Update(nodeEditorContext_);
 

@@ -40,7 +40,7 @@ void GameRun::Initialize() {
 
 #pragma endregion
 
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	imguiManager_->InitNodeTexture();
 #endif // _DEBUG
 
@@ -78,7 +78,7 @@ void GameRun::Finalize() {
 void GameRun::Update() {
 	BeginUpdate();
 
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	if (input_->TriggerKey(DIK_F12)) {
 		if (cameraManager_->GetDebugMode()) {
 			cameraManager_->SetDebugMode(false);
@@ -91,7 +91,7 @@ void GameRun::Update() {
 	// ゲームシーンの毎フレーム処理
 	sceneManager_->Update();
 
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	// ImGui受付
 	imguiManager_->Begin();
 	DebugGUI();
@@ -119,7 +119,7 @@ void GameRun::Draw() {
 }
 
 void GameRun::DebugGUI() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	imguiManager_->SetFontJapanese();
 
 	dxcommon_->OffscreenDebugGUI();

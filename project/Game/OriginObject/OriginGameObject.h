@@ -22,7 +22,7 @@ public:
 	virtual void Draw(Graphics::Material* mate = nullptr, bool is = false);
 	virtual void DebugGUI();
 
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	virtual void Debug();
 #endif // _DEBUG
 

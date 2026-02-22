@@ -7,7 +7,7 @@
 #include "Engine/Editor/JsonSerializer.h"
 #include "Engine/ImGuiManager/NodeGraph.h"
 #include "Engine/DX/FrameCount.h"
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 #include "imgui_node_editor.h"
 #endif
 
@@ -185,7 +185,7 @@ namespace Graphics {
 		int gizmoType_ = 0;
 		float IsUsingGizmo_ = false;
 		std::string nodeFileName_;
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 		ax::NodeEditor::EditorContext* nodeEditorContext_ = nullptr;
 		Core::NodeGraph nodeGraph_;
 		ed::NodeId selectorNodeId_;

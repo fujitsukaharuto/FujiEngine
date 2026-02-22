@@ -1,9 +1,9 @@
 # pragma once
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 # include <imgui.h>
 #endif // _DEBUG
 
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 namespace ax {
 	namespace Drawing {
 

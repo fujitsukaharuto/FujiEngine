@@ -38,13 +38,13 @@ void BossCore::Update() {
 }
 
 void BossCore::Draw([[maybe_unused]] Material* mate, [[maybe_unused]] bool is) {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	collider_->DrawCollider();
 #endif // _DEBUG
 }
 
 void BossCore::DebugGUI() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 	if (ImGui::CollapsingHeader("BossCore")) {
 		model_->DebugGUI();
 		collider_->DebugGUI();
@@ -53,7 +53,7 @@ void BossCore::DebugGUI() {
 }
 
 void BossCore::ParameterGUI() {
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
 
 #endif // _DEBUG
 }
