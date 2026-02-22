@@ -37,8 +37,8 @@ namespace Core {
 		const HWND& GetHwnd() const { return hwnd_; }
 		const WNDCLASS& GetWNDCLASS() const { return wc_; }
 		const RECT& GetRECT() const { return wrc_; }
-
-
+		int GetClientWidth()const { return clientWidth_; };
+		int GetClientHeight()const { return clientHeight_; };
 
 	private:
 
@@ -61,5 +61,7 @@ namespace Core {
 		WNDCLASS wc_{};
 		RECT wrc_;
 
+		int clientWidth_ = kWindowWidth;
+		int clientHeight_ = kWindowHeight;
 	};
 }

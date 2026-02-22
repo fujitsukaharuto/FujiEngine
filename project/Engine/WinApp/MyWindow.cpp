@@ -46,6 +46,13 @@ LRESULT MyWin::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 	}
 	//メッセージに応じてゲーム固有の処理を行う
 	switch (msg) {
+	case WM_SIZE:
+		if (wparam != SIZE_MINIMIZED) {
+			GetInstance()->clientWidth_ = LOWORD(lparam);
+			GetInstance()->clientHeight_ = LOWORD(lparam);
+		}
+		return 0;
+
 		//ウィンドウが破棄された
 	case WM_DESTROY:
 		//OSに対応して、アプリの終了を伝える

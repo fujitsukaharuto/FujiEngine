@@ -6,7 +6,11 @@
 #include "Engine/DX/FPSKeeper.h"
 #include "Engine/Particle/ParticleManager.h"
 #include "Engine/Model/ModelManager.h"
+#include "Engine/Input/Input.h"
 #include "ImGuiManager/ImGuiManager.h"
+#ifdef _DEBUGMODE
+#include "ImGuizmo.h"
+#endif // _DEBUGMODE
 
 using namespace Core;
 using namespace Graphics;
@@ -227,6 +231,7 @@ void GPUParticleSystem::RenderEmitterList(std::vector<int>& emitterIndices, int&
 		ImGui::TextDisabled("エミッターが存在しません。");
 		return;
 	}
+	ImGui::Checkbox("Tracking", &isMouseTracking_);
 
 	// 左側にリスト、右側に詳細を表示する
 	ImGui::BeginChild("ListRegion", ImVec2(150, 0), ImGuiChildFlags_Border);
@@ -254,6 +259,11 @@ void GPUParticleSystem::RenderEmitterList(std::vector<int>& emitterIndices, int&
 	// エミッター固有のGUIを呼び出し
 	csEmitters_[actualIdx].emitter->DebugGUI();
 	LoadPopUpGUI(currentIdx, phase);
+
+	if (isMouseTracking_) {
+		MouseTransGuizmo();
+		csEmitters_[actualIdx].emitter->SetPos(mouseTrans_.translate);
+	}
 
 	ImGui::EndChild();
 	ImGui::EndGroup();
@@ -628,6 +638,34 @@ void GPUParticleSystem::LoadPopUpGUI(int id, PipelinePhase type) {
 		ImGui::EndPopup();
 	}
 #endif // _DEBUG
+}
+
+void GPUParticleSystem::MouseTransGuizmo() {
+	Matrix4x4 model = MakeAffineMatrix(mouseTrans_.scale, mouseTrans_.rotate, mouseTrans_.translate);
+
+	Matrix4x4 view;
+	Matrix4x4 proj;
+	view = CameraManager::GetInstance()->GetCamera()->GetViewMatrix();
+	proj = CameraManager::GetInstance()->GetCamera()->GetProjectionMatrix();
+
+	ImGuizmo::Manipulate(
+		&view.m[0][0], &proj.m[0][0],         // カメラ
+		ImGuizmo::TRANSLATE,                  // 操作モード
+		ImGuizmo::WORLD,                      // ローカル座標系
+		&model.m[0][0]                        // 行列
+	);
+
+	// 編集中なら Transform に反映
+	if (ImGuizmo::IsUsing()) {
+		Vector3 t, r, s;
+		ImGuizmo::DecomposeMatrixToComponents(&model.m[0][0], &t.x, &r.x, &s.x);
+		constexpr float DegToRad = 3.14159265f / 180.0f;
+		r = r * DegToRad;
+
+		mouseTrans_.translate = t;
+		mouseTrans_.rotate = r;
+		mouseTrans_.scale = s;
+	}
 }
 
 void GPUParticleSystem::UpdateParticleCSDispatch() {

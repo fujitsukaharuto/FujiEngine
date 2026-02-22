@@ -90,7 +90,7 @@ void ModelManager::Finalize() {
 
 
 void ModelManager::LoadModelByExtension(const std::string& filename, bool overWrite) {
-	std::filesystem::path path(filename);  // 拡張子の解析に便利
+	std::filesystem::path path(filename);
 	std::string ext = path.extension().string();
 
 	if (ext == ".obj") {
@@ -521,7 +521,7 @@ void ModelManager::LoadModelFile(bool overWrite) {
 	for (const auto& entry : std::filesystem::directory_iterator(kDirectoryPath_)) {
 		if (entry.is_regular_file()) {
 			auto path = entry.path();
-			if (path.extension() == ".obj") {
+			if (path.extension() == ".obj" || path.extension() == ".gltf") {
 				if (overWrite) {
 					modelFileList.push_back(std::make_pair(path.filename().string(), true));
 				} else {
@@ -536,7 +536,7 @@ void ModelManager::LoadModelFile(bool overWrite) {
 
 void Graphics::ModelManager::LoadAllFileData() {
 	for (auto& pair : modelFileList) {
-		LoadOBJ(pair.first);
+		LoadModelByExtension(pair.first);
 	}
 }
 

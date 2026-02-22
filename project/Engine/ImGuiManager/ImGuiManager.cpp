@@ -84,6 +84,24 @@ void ImGuiManager::Fin() {
 
 void ImGuiManager::Begin() {
 #ifdef _DEBUGMODE
+	HWND hwnd = MyWin::GetInstance()->GetHwnd();
+	RECT clientRect;
+	GetClientRect(hwnd, &clientRect);
+	float width = static_cast<float>(clientRect.right - clientRect.left);
+	float height = static_cast<float>(clientRect.bottom - clientRect.top);
+
+	POINT point;
+	GetCursorPos(&point);
+	ScreenToClient(hwnd, &point);
+	float scaleX = (width > 0) ? (static_cast<float>(MyWin::kWindowWidth) / width) : 1.0f;
+	float scaleY = (height > 0) ? (static_cast<float>(MyWin::kWindowHeight) / height) : 1.0f;
+	Vector2 corrected = {
+		point.x * scaleX,
+		point.y * scaleY
+	};
+
+	ImGui::GetIO().AddMousePosEvent(corrected.x, corrected.y);
+
 	ImGui_ImplDX12_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
@@ -91,6 +109,10 @@ void ImGuiManager::Begin() {
 	ImGuizmo::BeginFrame();
 	ImGuizmo::SetOrthographic(false);
 	ImGuizmo::SetRect(0, 0, winSizeX_, winSizeY_);
+
+	ImGuiIO& io = ImGui::GetIO();
+	io.DisplayFramebufferScale = ImVec2(1.0f, 1.0f);
+	io.DisplaySize = ImVec2(static_cast<float>(MyWin::kWindowWidth), static_cast<float>(MyWin::kWindowHeight));
 
 #endif // _DEBUG
 }

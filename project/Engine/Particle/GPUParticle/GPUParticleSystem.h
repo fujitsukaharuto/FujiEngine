@@ -123,6 +123,7 @@ private:
 	//========================================================================*/
 	//* Debug
 	void LoadPopUpGUI(int id, PipelinePhase type);
+	void MouseTransGuizmo();
 
 	//========================================================================*/
 	//* Dispatch
@@ -185,6 +186,9 @@ private:
 
 	DXC::GPUTimer gpuTimerGraphics;
 	DXC::GPUTimer gpuTimerCompute;
+
+	bool isMouseTracking_ = true;
+	Math::Trans mouseTrans_;
 
 #ifdef _DEBUGMODE
 	int editCSEmitInd_;
