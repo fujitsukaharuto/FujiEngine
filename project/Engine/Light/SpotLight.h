@@ -8,12 +8,12 @@ class DXCom;
 
 struct SpotLightData {
 	Math::Vector4 color = { 1.0f,1.0f,1.0f,1.0f };
-	Math::Vector3 position = { 0.0f,2.0f,0.0f };
-	float intensity = 1.0f;
+	Math::Vector3 position = { 0.0f,-10.0f,0.0f };
+	float intensity = 200.0f;
 	Math::Vector3 direction = { -1.0f,-1.0f,0.0f };
-	float distance = 6.0f;
-	float decay = 2.0f;
-	float cosAngle;
+	float distance = 250.0f;
+	float decay = 2.15f;
+	float cosAngle = -1.5f;
 	float cosFalloffStart = 3.0f;
 	float padding[1];
 };

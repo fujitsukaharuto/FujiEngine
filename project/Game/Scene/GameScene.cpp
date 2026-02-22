@@ -129,7 +129,7 @@ void GameScene::Draw() {
 
 	obj3dCommon_->PreDraw();
 
-
+	surroundings_->Draw();
 	terrain_->Draw();
 	player_->Draw();
 
@@ -264,6 +264,12 @@ void GameScene::InitGameObj() {
 	terrain_->SetEnvironmentCoeff(0.3f);
 	terrain_->SetTexture("grass.jpg");
 	terrain_->SetColor(terrainColor_);
+
+	surroundings_ = std::make_unique<Object3d>();
+	surroundings_->Create("surroundings.gltf");
+	surroundings_->LoadTransformFromJson("surroundings_transform.json");
+	surroundings_->SetColor(surroundingColor_);
+	surroundings_->SetLightEnable(LightMode::kSpotLightON);
 
 	player_ = std::make_unique<Player>();
 	boss_ = std::make_unique<Boss>();

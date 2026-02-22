@@ -17,7 +17,6 @@ void SpotLight::Initialize(DXCom* pDxcom) {
 	}
 
 	spotLightData_.direction = spotLightData_.direction.Normalize();
-	spotLightData_.cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
 
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
 		CopyData(i);
