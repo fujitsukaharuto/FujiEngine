@@ -641,6 +641,7 @@ void GPUParticleSystem::LoadPopUpGUI(int id, PipelinePhase type) {
 }
 
 void GPUParticleSystem::MouseTransGuizmo() {
+#ifdef _DEBUGMODE
 	Matrix4x4 model = MakeAffineMatrix(mouseTrans_.scale, mouseTrans_.rotate, mouseTrans_.translate);
 
 	Matrix4x4 view;
@@ -666,6 +667,7 @@ void GPUParticleSystem::MouseTransGuizmo() {
 		mouseTrans_.rotate = r;
 		mouseTrans_.scale = s;
 	}
+#endif // _DEBUGMODE
 }
 
 void GPUParticleSystem::UpdateParticleCSDispatch() {
