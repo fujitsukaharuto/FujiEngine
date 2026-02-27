@@ -90,7 +90,7 @@ public:
 	
 	//========================================================================*/
 	//* Getter
-	Math::Vector3 GetWorldPos();
+	Math::Vector3 GetWorldPos(const Math::Vector3& offset = { 0.0f,0.0f,0.0f });
 	Math::Matrix4x4 GetParentMatrix();
 	bool HaveParent() { return parent_ ? true : false; }
 	bool GetIsUpdatedMatrix() { return isUpDatedMatrix_; }

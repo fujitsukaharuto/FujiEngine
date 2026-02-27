@@ -41,6 +41,7 @@ public:
 	virtual void SetLifeTime(float lifeTime) = 0;
 	virtual void SetScale(const Math::Vector3& scale) = 0;
 	virtual void SetRadius(float radius) = 0;
+	virtual void SetVelocity(const Math::Vector3& vel) = 0;
 	virtual void SetColorRandom(const Math::Vector3& max, const Math::Vector3& min = Math::Vector3(0.0f, 0.0f, 0.0f)) = 0;
 	virtual ~IGPUEmitter() = default;
 protected:

@@ -306,6 +306,10 @@ void SphereEmitter::SetRadius(float radius) {
 	data_.radius = radius;
 }
 
+void SphereEmitter::SetVelocity(const Math::Vector3& vel) {
+	data_.baseVelocity = vel;
+}
+
 void SphereEmitter::SetColorRandom(const Math::Vector3& max, const Math::Vector3& min) {
 	data_.colorMax = max;
 	data_.colorMin = min;

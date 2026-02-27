@@ -205,6 +205,9 @@ private:
 	float startLandingTime_ = 0.0f;
 	float startLandingMax_ = 0.0f;
 
+	int moveParticleCSL_;
+	int moveParticleCSR_;
+
 	DXCom* dxcommon_ = nullptr;
 
 	ParticleEmitter hit_{};

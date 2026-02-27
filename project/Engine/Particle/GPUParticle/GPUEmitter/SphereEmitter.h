@@ -69,6 +69,7 @@ public:
 	void SetLifeTime(float lifeTime) override;
 	void SetScale(const Math::Vector3& scale) override;
 	void SetRadius(float radius) override;
+	void SetVelocity(const Math::Vector3& vel) override;
 	void SetColorRandom(const Math::Vector3& max, const Math::Vector3& min = Math::Vector3(0.0f, 0.0f, 0.0f)) override;
 private:
 	void CopyData(uint32_t frameIndex = 0);

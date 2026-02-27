@@ -622,8 +622,8 @@ void ParticleEmitter::Load(const std::string& filename) {
 	}
 }
 
-Vector3 ParticleEmitter::GetWorldPos() {
-	worldMatrix_ = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, pos_);
+Vector3 ParticleEmitter::GetWorldPos(const Math::Vector3& offset) {
+	worldMatrix_ = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, pos_ + offset);
 	if (parent_ || animeParent_) {
 		const Matrix4x4& parentWorldMatrix = animeParent_ ? *animeParent_ : parent_->GetWorldMat();
 		worldMatrix_ = Multiply(worldMatrix_, parentWorldMatrix);

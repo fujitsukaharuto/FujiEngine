@@ -267,7 +267,7 @@ private:
 	float shakeSize_ = 4.0f;
 	float hpIndent = 1.0f;
 	float damageLightTime_ = 0.3f;
-	float damageLightIntensity_ = 3.0f;
+	float damageLightIntensity_ = 5.0f;
 	std::vector<std::unique_ptr<Graphics::Sprite>> hpSprites_;
 	std::vector<std::unique_ptr<Graphics::Sprite>> hpFrame_;
 	Math::Vector2 hpSize_ = { 130.0f,35.0f };

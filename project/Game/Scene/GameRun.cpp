@@ -51,7 +51,7 @@ void GameRun::Initialize() {
 	sceneFactory_ = std::make_unique<SceneFactory>();
 	sceneManager_->SetFactory(sceneFactory_.get());
 
-	int sceneNum = 0;
+	int sceneNum = 10;
 	if (sceneNum == 0) {
 		sceneManager_->StartScene("GPUPARTICLE");
 	} else {

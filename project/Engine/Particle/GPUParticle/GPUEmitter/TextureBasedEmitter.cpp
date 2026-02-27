@@ -244,6 +244,10 @@ void TextureBasedEmitter::SetRadius(float radius) {
 	data_.radius = radius;
 }
 
+void TextureBasedEmitter::SetVelocity(const Math::Vector3& vel) {
+	data_.baseVelocity = vel;
+}
+
 void TextureBasedEmitter::SetColorRandom(const Math::Vector3& max, const Math::Vector3& min) {
 	data_.colorMax = max;
 	data_.colorMin = min;

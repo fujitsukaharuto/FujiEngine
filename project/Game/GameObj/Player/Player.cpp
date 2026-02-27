@@ -664,6 +664,18 @@ void Player::ParticleEmitterSetting() {
 	ParticleManager::Load(hit2_, "playerhit");
 	ParticleManager::Load(moveParticleL_, "playerTranjectory");
 	ParticleManager::Load(moveParticleR_, "playerTranjectory");
+
+	{
+		moveParticleCSL_ = ParticleManager::GetInstance()->InitGPUEmitter();
+		auto& emitterCS = ParticleManager::GetSphereEmitter(moveParticleCSL_);
+		emitterCS.Load("PlayerTranjectory");
+	}
+	{
+		moveParticleCSR_ = ParticleManager::GetInstance()->InitGPUEmitter();
+		auto& emitterCS = ParticleManager::GetSphereEmitter(moveParticleCSR_);
+		emitterCS.Load("PlayerTranjectory");
+	}
+
 	ParticleManager::Load(deathSmoke_, "bulletHitSmoke");
 	ParticleManager::Load(shotSpark_, "shotSpark");
 	ParticleManager::Load(shotWave_, "shotWave");
@@ -733,17 +745,25 @@ void Player::ParticleEmitterSetting() {
 
 void Player::MoveEngineParticle() {
 	Vector3 particleSpeed = Random::GetVector3({ -0.6f,0.6f }, { -0.6f,0.6f }, { -18.0f,-12.0f });
+	float csOffsetX = 0.6f;
+	float csOffsetY = 0.5f;
 	particleSpeed = TransformNormal(particleSpeed, MakeRotateXYZMatrix(model_->GetTransform().rotate));
 	moveParticleL_.para_.speedx = { particleSpeed.x,particleSpeed.x };
 	moveParticleL_.para_.speedy = { particleSpeed.y,particleSpeed.y };
 	moveParticleL_.para_.speedz = { particleSpeed.z,particleSpeed.z };
 	moveParticleL_.Emit();
+	ParticleManager::GetSphereEmitter(moveParticleCSL_).SetVelocity(particleSpeed);
+	ParticleManager::GetSphereEmitter(moveParticleCSL_).SetPos(moveParticleL_.GetWorldPos({ -csOffsetX,-csOffsetY,0.0f }));
+	ParticleManager::GetSphereEmitter(moveParticleCSL_).Emit();
 	particleSpeed = Random::GetVector3({ -0.6f,0.6f }, { -0.6f,0.6f }, { -18.0f,-12.0f });
 	particleSpeed = TransformNormal(particleSpeed, MakeRotateXYZMatrix(model_->GetTransform().rotate));
 	moveParticleR_.para_.speedx = { particleSpeed.x,particleSpeed.x };
 	moveParticleR_.para_.speedy = { particleSpeed.y,particleSpeed.y };
 	moveParticleR_.para_.speedz = { particleSpeed.z,particleSpeed.z };
 	moveParticleR_.Emit();
+	ParticleManager::GetSphereEmitter(moveParticleCSR_).SetVelocity(particleSpeed);
+	ParticleManager::GetSphereEmitter(moveParticleCSR_).SetPos(moveParticleR_.GetWorldPos({ csOffsetX,-csOffsetY,0.0f }));
+	ParticleManager::GetSphereEmitter(moveParticleCSR_).Emit();
 	particleSpeed = { 0.0f,0.0f,-6.0f };
 	particleSpeed = TransformNormal(particleSpeed, MakeRotateXYZMatrix(model_->GetTransform().rotate));
 	moveBurnerL_->para_.speedx = { particleSpeed.x,particleSpeed.x };
