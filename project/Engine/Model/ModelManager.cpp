@@ -155,7 +155,7 @@ void ModelManager::LoadOBJ(const std::string& filename, bool overWrite) {
 
 			for (uint32_t element = 0; element < face.mNumIndices; element++) {
 				uint32_t vertexIndex = face.mIndices[element];
-				model->GetModelData().indicies.push_back(vertexIndex);
+				model->GetModelData().indicies.push_back(vertexIndex + meshVertexCount);
 				newModelMesh.indicies.push_back(vertexIndex);
 			}
 		}
@@ -247,7 +247,7 @@ void ModelManager::LoadGLTF(const std::string& filename, bool overWrite) {
 
 			for (uint32_t element = 0; element < face.mNumIndices; element++) {
 				uint32_t vertexIndex = face.mIndices[element];
-				model->GetModelData().indicies.push_back(vertexIndex);
+				model->GetModelData().indicies.push_back(vertexIndex + meshVertexCount);
 				newModelMesh.indicies.push_back(vertexIndex);
 			}
 		}

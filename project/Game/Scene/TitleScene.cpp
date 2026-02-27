@@ -54,6 +54,12 @@ void TitleScene::Initialize() {
 	terrain_->SetTexture("grass.jpg");
 	terrain_->SetColor(terrainColor_);
 
+	surroundings_ = std::make_unique<Object3d>();
+	surroundings_->Create("surroundings.gltf");
+	surroundings_->LoadTransformFromJson("surroundings_transform.json");
+	surroundings_->SetColor(surroundingColor_);
+	surroundings_->SetLightEnable(LightMode::kSpotLightON);
+
 	space_ = std::make_unique<Sprite>();
 	space_->Load("spaceKey.png");
 	space_->SetPos(spacePos_);
@@ -91,6 +97,13 @@ void TitleScene::Initialize() {
 		emitterCS.SetEmit(true);
 		emitterCS.SetPos({ x,0.0f,z });
 		csEmitterNums_.push_back(emitNum);
+	}
+
+	{
+		int emitNum = ParticleManager::GetInstance()->InitGPUEmitterSurface("Temple.gltf");
+		auto& emitterCS = ParticleManager::GetParticleCSEmitterSurface(emitNum);
+		emitterCS.Load("TempleEmit");
+		emitterCS.SetEmit(true);
 	}
 
 	int emitNum = ParticleManager::GetInstance()->InitGPUEmitter();
@@ -149,6 +162,7 @@ void TitleScene::Draw() {
 
 	obj3dCommon_->PreDraw();
 	terrain_->Draw();
+	surroundings_->Draw();
 
 	player_->TitleDraw();
 

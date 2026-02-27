@@ -62,9 +62,14 @@ void MeshSurfaceEmitter::InitMeshData(const std::string& fileName, DXCom* dx, SR
 	std::vector<float> cdf(triangleAreas.size());
 	float accum = 0.0f;
 	for (size_t i = 0; i < triangleAreas.size(); i++) {
-		accum += triangleAreas[i] / totalArea;
+		accum += triangleAreas[i];
 		cdf[i] = accum;
 	}
+	// 最後に合計値で割って、末尾を確実に1.0にする
+	for (size_t i = 0; i < cdf.size(); i++) {
+		cdf[i] /= accum;
+	}
+	cdf.back() = 1.0f;
 	// 面積CDFをGPUに送る
 	areasResource = dx->CreateBufferResource(dx->GetDevice(), sizeof(float) * cdf.size());
 	float* areaMap = nullptr;

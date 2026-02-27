@@ -109,11 +109,11 @@ void main(uint3 DTid : SV_DispatchThreadID)
         uint triIndex = 0;
             
         uint left = 0;
-        uint right = gEmitter.triangleCount - 1;
+        uint right = gEmitter.triangleCount;
         while (left < right)
         {
             uint mid = (left + right) / 2;
-            if (r <= gTriangleCDF[mid])
+            if (r < gTriangleCDF[mid])
             {
                 right = mid;
             }
@@ -122,7 +122,7 @@ void main(uint3 DTid : SV_DispatchThreadID)
                 left = mid + 1;
             }
         }
-        triIndex = left;
+        triIndex = min(left, gEmitter.triangleCount - 1);
 
         uint i0 = gIndices[triIndex * 3 + 0];
         uint i1 = gIndices[triIndex * 3 + 1];

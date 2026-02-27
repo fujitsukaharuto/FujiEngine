@@ -62,6 +62,12 @@ void ResultScene::Initialize() {
 	terrain_->SetTexture("grass.jpg");
 	terrain_->SetColor(terrainColor_);
 
+	surroundings_ = std::make_unique<Object3d>();
+	surroundings_->Create("surroundings.gltf");
+	surroundings_->LoadTransformFromJson("surroundings_transform.json");
+	surroundings_->SetColor(surroundingColor_);
+	surroundings_->SetLightEnable(LightMode::kSpotLightON);
+
 	for (int i = 0; i < 3; i++) {
 		std::unique_ptr<Object3d> player;
 		player = std::make_unique<Object3d>();
@@ -118,6 +124,7 @@ void ResultScene::Draw() {
 
 	obj3dCommon_->PreDraw();
 	terrain_->Draw();
+	surroundings_->Draw();
 
 	for (auto& player : players_) {
 		player->Draw();

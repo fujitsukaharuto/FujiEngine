@@ -167,7 +167,7 @@ void AnimationModel::CreateSkeleton(const Node& rootNode) {
 
 void AnimationModel::Create(const std::string& fileName) {
 	this->camera_ = CameraManager::GetInstance()->GetCamera();
-	ModelManager::GetInstance()->LoadGLTF(fileName);
+	ModelManager::GetInstance()->LoadModelByExtension(fileName);
 	SetModel(fileName);
 	transform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 	nowTextureName = model_->GetTextuerName();

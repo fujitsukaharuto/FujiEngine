@@ -38,7 +38,7 @@ Object3d::~Object3d() {
 
 void Object3d::Create(const std::string& fileName) {
 	this->camera_ = CameraManager::GetInstance()->GetCamera();
-	ModelManager::GetInstance()->LoadOBJ(fileName);
+	ModelManager::GetInstance()->LoadModelByExtension(fileName);
 	SetModel(fileName);
 	transform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 	nowTextureName = model_->GetTextuerName();
