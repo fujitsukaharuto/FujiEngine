@@ -673,21 +673,39 @@ void GPUParticleSystem::MouseTransGuizmo() {
 void GPUParticleSystem::UpdateParticleCSDispatch() {
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 	gpuTimerCompute.Begin(dxcommon_->GetComputeCommandList(), frameIndex, kTimer_ParticleUpdate);
-	dxcommon_->GetPipelineManager()->SetCSPipeline(Pipe::UpdateParticleCS, 2);// ParticleのUpdate
 	ID3D12GraphicsCommandList* cList = dxcommon_->GetComputeCommandList();
-	cList->SetComputeRootDescriptorTable(0, transCSInstance_.particleCSUAVHandle_.second);
-	cList->SetComputeRootDescriptorTable(1, scaleCSInstance_.particleCSUAVHandle_.second);
-	cList->SetComputeRootDescriptorTable(2, timeCSInstance_.particleCSUAVHandle_.second);
-	cList->SetComputeRootDescriptorTable(3, velocityCSInstance_.particleCSUAVHandle_.second);
-	cList->SetComputeRootDescriptorTable(4, colorCSInstance_.particleCSUAVHandle_.second);
-	cList->SetComputeRootDescriptorTable(5, flagsCSInstance_.particleCSUAVHandle_.second);
-	cList->SetComputeRootConstantBufferView(6, perFrameResource_[frameIndex]->GetGPUVirtualAddress());
-	cList->SetComputeRootDescriptorTable(7, freeListIndexUAVHandle_.second);
-	cList->SetComputeRootDescriptorTable(8, freeListUAVHandle_.second);
-	cList->SetComputeRootDescriptorTable(9, freeListTailIndexUAVHandle_.second);
-	int dispatchCount = (numParticles + threadsPerGroup - 1) / threadsPerGroup;
-	cList->Dispatch(dispatchCount, 1, 1);
+	{
+		dxcommon_->GetPipelineManager()->SetCSPipeline(Pipe::UpdateParticleCS, 2);// ParticleのUpdate
+		cList->SetComputeRootDescriptorTable(0, transCSInstance_.particleCSUAVHandle_.second);
+		cList->SetComputeRootDescriptorTable(1, scaleCSInstance_.particleCSUAVHandle_.second);
+		cList->SetComputeRootDescriptorTable(2, timeCSInstance_.particleCSUAVHandle_.second);
+		cList->SetComputeRootDescriptorTable(3, velocityCSInstance_.particleCSUAVHandle_.second);
+		cList->SetComputeRootDescriptorTable(4, colorCSInstance_.particleCSUAVHandle_.second);
+		cList->SetComputeRootDescriptorTable(5, flagsCSInstance_.particleCSUAVHandle_.second);
+		cList->SetComputeRootConstantBufferView(6, perFrameResource_[frameIndex]->GetGPUVirtualAddress());
+		cList->SetComputeRootDescriptorTable(7, freeListIndexUAVHandle_.second);
+		cList->SetComputeRootDescriptorTable(8, freeListUAVHandle_.second);
+		cList->SetComputeRootDescriptorTable(9, freeListTailIndexUAVHandle_.second);
+		int dispatchCount = (numParticles + 256 - 1) / 256;
+		cList->Dispatch(dispatchCount, 1, 1);
+	}
 	dxcommon_->InsertUAVBarrierForCompute(transCSInstance_.particleCSInstancing_.Get());
+
+	// TrailEmit
+	/*{
+		dxcommon_->GetPipelineManager()->SetCSPipeline(Pipe::TrailEmitCS, 2);// ParticleのTrailEmit
+		cList->SetComputeRootDescriptorTable(0, transCSInstance_.particleCSUAVHandle_.second);
+		cList->SetComputeRootDescriptorTable(1, scaleCSInstance_.particleCSUAVHandle_.second);
+		cList->SetComputeRootDescriptorTable(2, timeCSInstance_.particleCSUAVHandle_.second);
+		cList->SetComputeRootDescriptorTable(3, velocityCSInstance_.particleCSUAVHandle_.second);
+		cList->SetComputeRootDescriptorTable(4, colorCSInstance_.particleCSUAVHandle_.second);
+		cList->SetComputeRootDescriptorTable(5, flagsCSInstance_.particleCSUAVHandle_.second);
+		cList->SetComputeRootDescriptorTable(6, freeListIndexUAVHandle_.second);
+		cList->SetComputeRootDescriptorTable(7, freeListUAVHandle_.second);
+		cList->SetComputeRootDescriptorTable(8, freeListTailIndexUAVHandle_.second);
+		int dispatchCount = (numParticles + 256 - 1) / 256;
+		cList->Dispatch(dispatchCount, 1, 1);
+	}*/
 	gpuTimerCompute.End(dxcommon_->GetComputeCommandList(), frameIndex, kTimer_ParticleUpdate);
 	gpuTimerCompute.Resolve(cList, frameIndex, kTimer_ParticleUpdate);
 }

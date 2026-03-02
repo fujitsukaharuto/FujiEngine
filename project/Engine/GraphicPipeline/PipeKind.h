@@ -44,6 +44,7 @@ enum class Pipe : int {
 	EmitTexParticleCS,
 	EmitSurfaceParticleCS,
 	UpdateParticleCS,
+	TrailEmitCS,
 	InitArgsCS,
 	AliveCountCS,
 

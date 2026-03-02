@@ -196,6 +196,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\GraphicPipeline\CSPipe\RadialBlurCSPipe.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\CSPipe\RandomCSPipe.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\CSPipe\RetroTVCSPipe.cpp" />
+    <ClCompile Include="Engine\GraphicPipeline\CSPipe\TrailEmitCSPipe.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\CSPipe\UpdateParticleCSPipe.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\CSPipe\VignetteCSPipe.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\FirePipe.cpp" />
@@ -333,6 +334,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\GraphicPipeline\CSPipe\RadialBlurCSPipe.h" />
     <ClInclude Include="Engine\GraphicPipeline\CSPipe\RandomCSPipe.h" />
     <ClInclude Include="Engine\GraphicPipeline\CSPipe\RetroTVCSPipe.h" />
+    <ClInclude Include="Engine\GraphicPipeline\CSPipe\TrailEmitCSPipe.h" />
     <ClInclude Include="Engine\GraphicPipeline\CSPipe\UpdateParticleCSPipe.h" />
     <ClInclude Include="Engine\GraphicPipeline\CSPipe\VignetteCSPipe.h" />
     <ClInclude Include="Engine\GraphicPipeline\FirePipe.h" />
@@ -585,6 +587,17 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\CS\Engine\TrailEmit.CS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.0</ShaderModel>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="resource\Shaders\CS\Engine\UpdateParticle.CS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>

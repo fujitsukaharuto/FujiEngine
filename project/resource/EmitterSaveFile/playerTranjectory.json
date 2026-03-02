@@ -16,7 +16,7 @@
     "Para_colorMin": [
         0.0,
         0.0,
-        0.0,
+        1.0,
         1.0
     ],
     "Para_speedx": [

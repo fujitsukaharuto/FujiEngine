@@ -395,6 +395,9 @@
     <ClCompile Include="Game\Scene\GPUParticleScene.cpp">
       <Filter>Game\Scene</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\GraphicPipeline\CSPipe\TrailEmitCSPipe.cpp">
+      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -841,6 +844,9 @@
     <ClInclude Include="Game\Scene\GPUParticleScene.h">
       <Filter>Game\Scene</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\GraphicPipeline\CSPipe\TrailEmitCSPipe.h">
+      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -1113,6 +1119,9 @@
       <Filter>resource\Shaders\CS\Engine</Filter>
     </FxCompile>
     <FxCompile Include="resource\Shaders\CS\Engine\InitArgs.CS.hlsl">
+      <Filter>resource\Shaders\CS\Engine</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\CS\Engine\TrailEmit.CS.hlsl">
       <Filter>resource\Shaders\CS\Engine</Filter>
     </FxCompile>
   </ItemGroup>

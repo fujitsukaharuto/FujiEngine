@@ -32,6 +32,7 @@
 #include "CSPipe/EmitterTexParticleCSPipe.h"
 #include "CSPipe/EmitterSurfaceParticleCSPipe.h"
 #include "CSPipe/UpdateParticleCSPipe.h"
+#include "CSPipe/TrailEmitCSPipe.h"
 #include "CSPipe/InitArgsCSPipe.h"
 #include "CSPipe/AliveCountCSPipe.h"
 
@@ -125,6 +126,7 @@ void PipelineManager::CreatePipeline() {
 	CreatePipe<EmitterTexParticleCSPipe>(Pipe::EmitTexParticleCS);
 	CreatePipe<EmitterSurfaceParticleCSPipe>(Pipe::EmitSurfaceParticleCS);
 	CreatePipe<UpdateParticleCSPipe>(Pipe::UpdateParticleCS);
+	CreatePipe<TrailEmitCSPipe>(Pipe::TrailEmitCS);
 	CreatePipe<InitArgsCSPipe>(Pipe::InitArgsCS);
 	CreatePipe<AliveCountCSPipe>(Pipe::AliveCountCS);
 }
