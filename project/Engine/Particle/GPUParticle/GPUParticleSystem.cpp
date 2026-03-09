@@ -541,7 +541,8 @@ void GPUParticleSystem::DrawParticleCS(const D3D12_VERTEX_BUFFER_VIEW& vbView, c
 
 	ID3D12GraphicsCommandList* graphicsList = dxcommon_->GetCommandList();
 	gpuTimerGraphics.Begin(graphicsList, frameIndex, kTimer_DrawExecuteIndirect);
-	dxcommon_->GetDXCommand()->SetViewAndScissor();
+	//dxcommon_->PreGPUParticleDraw();
+	dxcommon_->GetDXCommand()->SetViewAndScissor(MyWin::kWindowWidth, MyWin::kWindowHeight);
 	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::ParticleCS);
 	graphicsList->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	graphicsList->IASetVertexBuffers(0, 1, &vbView);
@@ -556,6 +557,7 @@ void GPUParticleSystem::DrawParticleCS(const D3D12_VERTEX_BUFFER_VIEW& vbView, c
 	graphicsList->SetGraphicsRootDescriptorTable(6, particleCSMaterial_.GetTexture()->gpuHandle);
 
 	graphicsList->ExecuteIndirect(drawIndexedSignature_.Get(), 1, aliveDrawArgs_.Get(), 0, nullptr, 0);// DrawIndirectを使うように
+	//dxcommon_->PostGPUParticleDraw();
 	gpuTimerGraphics.End(graphicsList, frameIndex, kTimer_DrawExecuteIndirect);
 	gpuTimerGraphics.Resolve(graphicsList, frameIndex, kTimer_DrawExecuteIndirect);
 }
@@ -686,7 +688,7 @@ void GPUParticleSystem::UpdateParticleCSDispatch() {
 		cList->SetComputeRootDescriptorTable(7, freeListIndexUAVHandle_.second);
 		cList->SetComputeRootDescriptorTable(8, freeListUAVHandle_.second);
 		cList->SetComputeRootDescriptorTable(9, freeListTailIndexUAVHandle_.second);
-		int dispatchCount = (numParticles + 256 - 1) / 256;
+		int dispatchCount = (numParticles + threadsPerGroup - 1) / threadsPerGroup;
 		cList->Dispatch(dispatchCount, 1, 1);
 	}
 	dxcommon_->InsertUAVBarrierForCompute(transCSInstance_.particleCSInstancing_.Get());

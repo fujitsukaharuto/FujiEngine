@@ -126,7 +126,8 @@ void MeshSurfaceEmitter::Dispatch(ID3D12GraphicsCommandList* cmd,
 	cmd->SetComputeRootDescriptorTable(13, shared.freeListTailIndexUAVHandle);
 	cmd->SetComputeRootConstantBufferView(6, resource_[frameIndex]->GetGPUVirtualAddress());
 	cmd->SetComputeRootConstantBufferView(7, shared.perFrameCBV);
-	cmd->Dispatch((data_.count + 1024 - 1) / 1024, 1, 1);
+	uint32_t dispatchCount = (data_.count + 1024 - 1) / 1024;
+	cmd->Dispatch(dispatchCount, 1, 1);
 }
 
 void MeshSurfaceEmitter::DebugGUI() {

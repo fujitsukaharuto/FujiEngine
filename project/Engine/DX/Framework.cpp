@@ -74,10 +74,10 @@ void Core::Framework::BeginUpdate() {
 void Framework::Run() {
 	Initialize();
 	while (true) {
-		Update();
 		if (win_->ProcessMessage()) {
 			break;
 		}
+		Update();
 		Draw();
 	}
 	Finalize();

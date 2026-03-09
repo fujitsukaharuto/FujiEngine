@@ -135,7 +135,7 @@ void EmitTrail(uint pIndex)
     }
 }
 
-[numthreads(256, 1, 1)]
+[numthreads(1024, 1, 1)]
 void main( uint3 DTid : SV_DispatchThreadID )
 {
     uint particleIndex = DTid.x;

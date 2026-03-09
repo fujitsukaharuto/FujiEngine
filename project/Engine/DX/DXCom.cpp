@@ -191,6 +191,9 @@ void DXCom::CreateRenderTargets() {
 	rtvHandles_[2].ptr = rtvHandles_[1].ptr + device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	rtvHandles_[3].ptr = rtvHandles_[2].ptr + device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 
+	rtvHandles_[4].ptr = rtvHandles_[3].ptr + device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	rtvHandles_[5].ptr = rtvHandles_[4].ptr + device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+
 	offscreen_->CreateResource();
 
 }
@@ -276,6 +279,7 @@ void DXCom::PreDraw() {
 		D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
 	SRVManager::GetInstance()->SetDescriptorHeap();
+	SRVManager::GetInstance()->SetDescriptorHeapForCompute();
 
 	SetRenderTargets();
 	ClearRenderTarget();
@@ -285,7 +289,7 @@ void DXCom::PreDraw() {
 void DXCom::Command() {
 
 
-	command_->SetViewAndScissor();
+	command_->SetViewAndScissor(MyWin::kWindowWidth, MyWin::kWindowHeight);
 	pipeManager_->SetPipeline(Pipe::Normal);
 
 
@@ -334,7 +338,7 @@ void DXCom::PerFrameWait() {
 }
 
 void DXCom::PreSpriteDraw() {
-	command_->SetViewAndScissor();
+	command_->SetViewAndScissor(MyWin::kWindowWidth, MyWin::kWindowHeight);
 	pipeManager_->SetPipeline(Pipe::Normal);
 	command_->GetList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
@@ -352,7 +356,6 @@ void DXCom::CommandExecution() {
 }
 
 void DXCom::SetRenderTargets() {
-
 	UINT frameIndex = GetNowFrameCount();
 	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
 	UINT dsvIncrement = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
@@ -360,9 +363,20 @@ void DXCom::SetRenderTargets() {
 	command_->GetList()->OMSetRenderTargets(1, &rtvHandles_[2 + GetNowFrameCount()], false, &dsvHandle);
 }
 
-void DXCom::ClearRenderTarget() {
+void DXCom::SetRenderTargetsForGPUParticle() {
+	UINT frameIndex = GetNowFrameCount();
+	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
+	UINT dsvIncrement = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+	dsvHandle.ptr += frameIndex * dsvIncrement;
+	command_->GetList()->OMSetRenderTargets(1, &rtvHandles_[4 + GetNowFrameCount()], false, &dsvHandle);
+}
 
+void DXCom::ClearRenderTarget() {
 	command_->GetList()->ClearRenderTargetView(rtvHandles_[2 + GetNowFrameCount()], offscreen_->GetClearColorValue().Color, 0, nullptr);
+}
+
+void DXCom::ClearRenderTargetForGPUParticle() {
+	command_->GetList()->ClearRenderTargetView(rtvHandles_[4 + GetNowFrameCount()], offscreen_->GetClearColorValueForGPURTV().Color, 0, nullptr);
 }
 
 void DXCom::ClearDepthBuffer() {
@@ -380,6 +394,21 @@ void DXCom::OffscreenUpDate() {
 
 void DXCom::OffscreenDebugGUI() {
 	offscreen_->DebugGUI();
+}
+
+void DXCom::PreGPUParticleDraw() {
+	offscreen_->BarrierSetForGPURTV();
+	SRVManager::GetInstance()->SetDescriptorHeap();
+
+	SetRenderTargetsForGPUParticle();
+	ClearRenderTargetForGPUParticle();
+
+	command_->SetViewAndScissor(MyWin::kWindowWidth / 2, MyWin::kWindowHeight / 2);
+}
+
+void DXCom::PostGPUParticleDraw() {
+	SetRenderTargets();
+	offscreen_->SynthesisGPURTV();
 }
 
 

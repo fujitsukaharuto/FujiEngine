@@ -220,11 +220,21 @@ void DXCommand::PerFrameWait() {
 	}
 }
 
-void DXCommand::SetViewAndScissor() {
+void DXCommand::SetViewAndScissor(UINT width, UINT height) {
+	viewport_.Width = static_cast<FLOAT>(width);
+	viewport_.Height = static_cast<FLOAT>(height);
+	viewport_.TopLeftX = 0;
+	viewport_.TopLeftY = 0;
+	viewport_.MinDepth = 0.0f;
+	viewport_.MaxDepth = 1.0f;
+
+	scissor_.left = 0;
+	scissor_.right = static_cast<LONG>(width);
+	scissor_.top = 0;
+	scissor_.bottom = static_cast<LONG>(height);
 
 	list_->RSSetViewports(1, &viewport_);
 	list_->RSSetScissorRects(1, &scissor_);
-
 }
 
 void DXCommand::InitDefaultQueue(ID3D12Device* device) {

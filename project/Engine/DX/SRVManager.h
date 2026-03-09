@@ -58,6 +58,12 @@ public:
 	void SetDescriptorHeap(uint32_t index = 0);
 
 	/// <summary>
+	/// 現在のディスクリプタヒープをコマンドリストへセットする
+	/// </summary>
+	/// <param name="index">インデックス</param>
+	void SetDescriptorHeapForCompute();
+
+	/// <summary>
 	/// グラフィックスパイプラインにSRVテーブルをバインドする
 	/// </summary>
 	/// <param name="rootIndex">インデックス</param>

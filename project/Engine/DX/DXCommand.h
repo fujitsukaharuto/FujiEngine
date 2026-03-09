@@ -70,7 +70,7 @@ namespace DXC {
 		/// <summary>
 		/// ViewとScissorをセットする
 		/// </summary>
-		void SetViewAndScissor();
+		void SetViewAndScissor(UINT width, UINT height);
 
 		//========================================================================*/
 		//* Getter

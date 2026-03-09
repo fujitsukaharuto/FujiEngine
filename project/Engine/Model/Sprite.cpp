@@ -31,7 +31,7 @@ void Sprite::Draw() {
 	
 	SetWvp();
 
-	dxcommon_->GetDXCommand()->SetViewAndScissor();
+	dxcommon_->GetDXCommand()->SetViewAndScissor(MyWin::kWindowWidth, MyWin::kWindowHeight);
 	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Sprite);
 	dxcommon_->GetDXCommand()->GetList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 

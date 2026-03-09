@@ -198,9 +198,15 @@ namespace Graphics {
 		void PopPostEffect(PostEffectList effect);
 
 		//========================================================================*/
+		//* RTVForGPUParticle
+		void BarrierSetForGPURTV();
+		void SynthesisGPURTV();
+
+		//========================================================================*/
 		//* Getter
 		ID3D12Resource* GetOffscreenResource(uint32_t index) { return offscreenRt_[index].Get(); }
 		const D3D12_CLEAR_VALUE& GetClearColorValue() const { return clearColorValue_; }
+		const D3D12_CLEAR_VALUE& GetClearColorValueForGPURTV() const { return clearColorValueForGPU_; }
 
 		//========================================================================*/
 		//* Setter
@@ -258,6 +264,12 @@ namespace Graphics {
 		D3D12_CPU_DESCRIPTOR_HANDLE offTextureHandleCPU_[DXC::kFrameCount_];
 		D3D12_CPU_DESCRIPTOR_HANDLE offTextureUAVHandleCPU_[DXC::kFrameCount_];
 		D3D12_GPU_DESCRIPTOR_HANDLE offTextureUAVHandle_[DXC::kFrameCount_];
+
+		ComPtr<ID3D12Resource> gpuParticleRt_[DXC::kFrameCount_];
+		D3D12_CLEAR_VALUE clearColorValueForGPU_{};
+		uint32_t gpuParticleSRVIndex_[DXC::kFrameCount_];
+		D3D12_GPU_DESCRIPTOR_HANDLE gpuParticleHandle_[DXC::kFrameCount_];
+		D3D12_CPU_DESCRIPTOR_HANDLE gpuParticleHandleCPU_[DXC::kFrameCount_];
 
 
 		ComPtr<ID3D12Resource> grayCSResource_[DXC::kFrameCount_];

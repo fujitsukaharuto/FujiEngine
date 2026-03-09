@@ -190,10 +190,20 @@ void OffscreenManager::CreateResource() {
 	clearColorValue_.Color[2] = 0.5f;
 	clearColorValue_.Color[3] = 1.0f;
 
+	clearColorValueForGPU_.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	clearColorValueForGPU_.Color[0] = 0.0f;
+	clearColorValueForGPU_.Color[1] = 0.0f;
+	clearColorValueForGPU_.Color[2] = 0.0f;
+	clearColorValueForGPU_.Color[3] = 0.0f;
+
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
 		offscreenRt_[i] = dxcommon_->CreateOffscreenTextureResource(dxcommon_->GetDevice(), MyWin::kWindowWidth, MyWin::kWindowHeight, clearColorValue_);
-
 		dxcommon_->GetDevice()->CreateRenderTargetView(offscreenRt_[i].Get(), &offscreenRTVDesc_, dxcommon_->GetRTVHandle(i));
+	}
+
+	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
+		gpuParticleRt_[i] = dxcommon_->CreateOffscreenTextureResource(dxcommon_->GetDevice(), MyWin::kWindowWidth / 2, MyWin::kWindowHeight / 2, clearColorValueForGPU_);
+		dxcommon_->GetDevice()->CreateRenderTargetView(gpuParticleRt_[i].Get(), &offscreenRTVDesc_, dxcommon_->GetRTVHandle(i + 2));
 	}
 
 	InitDataResource();
@@ -230,6 +240,15 @@ void OffscreenManager::SettingTexture() {
 		uavDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 		uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
 		dxcommon_->GetDevice()->CreateUnorderedAccessView(offscreenRt_[i].Get(), nullptr, &uavDesc, offTextureUAVHandleCPU_[i]);
+	}
+
+	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {// フレーム数分作る
+		gpuParticleSRVIndex_[i] = srvManager->Allocate();
+
+		srvManager->CreateTextureSRV(gpuParticleSRVIndex_[i], gpuParticleRt_[i].Get(), DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, 1, false);
+
+		gpuParticleHandleCPU_[i] = srvManager->GetCPUDescriptorHandle(gpuParticleSRVIndex_[i]);
+		gpuParticleHandle_[i] = srvManager->GetGPUDescriptorHandle(gpuParticleSRVIndex_[i]);
 	}
 
 
@@ -273,6 +292,26 @@ void OffscreenManager::PopPostEffect(PostEffectList effect) {
 	}
 	if (popNumber == -1)return;
 	validPostEffects_.erase(validPostEffects_.begin() + size_t(popNumber));
+}
+
+void Graphics::OffscreenManager::BarrierSetForGPURTV() {
+	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
+	dxcommon_->TransitionResource(gpuParticleRt_[frameIndex].Get(),
+		D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_RENDER_TARGET);
+}
+
+void Graphics::OffscreenManager::SynthesisGPURTV() {
+	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
+	dxcommon_->TransitionResource(gpuParticleRt_[frameIndex].Get(),
+		D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_GENERIC_READ);
+
+	dxcommon_->GetDXCommand()->SetViewAndScissor(MyWin::kWindowWidth, MyWin::kWindowHeight);
+	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::None);
+
+	dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
+	dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, gpuParticleHandle_[frameIndex]);
+	dxcommon_->GetCommandList()->DrawInstanced(3, 1, 0, 0); // 大きな三角形に描画して負荷を減らす
 }
 
 void OffscreenManager::SettingVertex() {
@@ -562,7 +601,7 @@ void Graphics::OffscreenManager::PingPongCommand() {
 			D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_GENERIC_READ);
 	}
 
-	dxcommon_->GetDXCommand()->SetViewAndScissor();
+	dxcommon_->GetDXCommand()->SetViewAndScissor(MyWin::kWindowWidth, MyWin::kWindowHeight);
 	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::None);
 
 	dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -591,7 +630,7 @@ void Graphics::OffscreenManager::OtherPipeLineCommand() {
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 
 	if (isNonePost_) {// 何も描画せず(クリアカラーのみ)
-		dxcommon_->GetDXCommand()->SetViewAndScissor();
+		dxcommon_->GetDXCommand()->SetViewAndScissor(MyWin::kWindowWidth, MyWin::kWindowHeight);
 		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::None);
 
 		dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -601,7 +640,7 @@ void Graphics::OffscreenManager::OtherPipeLineCommand() {
 	}
 
 	if (isShockWave_) {// 衝撃波エフェクト
-		dxcommon_->GetDXCommand()->SetViewAndScissor();
+		dxcommon_->GetDXCommand()->SetViewAndScissor(MyWin::kWindowWidth, MyWin::kWindowHeight);
 		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::ShockWave);
 
 		dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -612,7 +651,7 @@ void Graphics::OffscreenManager::OtherPipeLineCommand() {
 	}
 
 	if (isFire_) {// 炎エフェクト
-		dxcommon_->GetDXCommand()->SetViewAndScissor();
+		dxcommon_->GetDXCommand()->SetViewAndScissor(MyWin::kWindowWidth, MyWin::kWindowHeight);
 		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Fire);
 
 		dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -627,7 +666,7 @@ void Graphics::OffscreenManager::OtherPipeLineCommand() {
 
 
 	if (isThunder_) {// 雷エフェクト
-		dxcommon_->GetDXCommand()->SetViewAndScissor();
+		dxcommon_->GetDXCommand()->SetViewAndScissor(MyWin::kWindowWidth, MyWin::kWindowHeight);
 		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Thunder);
 
 		dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);

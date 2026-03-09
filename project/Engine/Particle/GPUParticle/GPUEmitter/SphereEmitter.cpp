@@ -1,6 +1,7 @@
 #include "SphereEmitter.h"
 #include "Engine/DX/DXCom.h"
 #include "Engine/DX/SRVManager.h"
+#include "Engine/Model/ModelManager.h"
 #include "ImGuiManager/ImGuiManager.h"
 #include "Engine/Editor/JsonSerializer.h"
 
@@ -68,7 +69,8 @@ void SphereEmitter::Dispatch(ID3D12GraphicsCommandList* cmd,
 	cmd->SetComputeRootDescriptorTable(10, shared.freeListTailIndexUAVHandle);
 	cmd->SetComputeRootConstantBufferView(7, shared.perFrameCBV);
 	cmd->SetComputeRootConstantBufferView(6, resource_[frameIndex]->GetGPUVirtualAddress());
-	cmd->Dispatch((data_.count + 1024 - 1) / 1024, 1, 1);
+	uint32_t dispatchCount = (data_.count + 1024 - 1) / 1024;
+	cmd->Dispatch(dispatchCount, 1, 1);
 	isOnceEmit_ = false;
 }
 

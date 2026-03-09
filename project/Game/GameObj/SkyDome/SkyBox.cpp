@@ -1,5 +1,6 @@
 #include "SkyBox.h"
 
+using namespace Core;
 using namespace Graphics;
 using namespace Math;
 
@@ -21,7 +22,7 @@ void SkyBox::Update() {
 }
 
 void SkyBox::Draw() {
-	dxcommon_->GetDXCommand()->SetViewAndScissor();
+	dxcommon_->GetDXCommand()->SetViewAndScissor(MyWin::kWindowWidth, MyWin::kWindowHeight);
 	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Skybox);
 	dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vbView);

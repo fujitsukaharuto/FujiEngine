@@ -102,13 +102,21 @@ public:
 	//========================================================================*/
 	//* Frameの描画前に呼び出す関数群
 	void SetRenderTargets(); // レンダーターゲットのセット
+	void SetRenderTargetsForGPUParticle(); // レンダーターゲットのセット
 	void ClearRenderTarget(); // レンダーターゲットのクリア
+	void ClearRenderTargetForGPUParticle(); // レンダーターゲットのクリア
 	void ClearDepthBuffer(); // 深度バッファのクリア
 
 	//========================================================================*/
 	//* オフスクリーンの処理を行う関数群
 	void OffscreenUpDate(); // オフスクリーンの処理Update
 	void OffscreenDebugGUI(); // オフスクリーン用DebugGUI
+
+	//========================================================================*/
+	//* GPUParticleの描画処理を行う際の関数群
+	void PreGPUParticleDraw();
+	void PostGPUParticleDraw();
+
 
 	/// <summary>
 	/// バリアの変更
@@ -289,8 +297,8 @@ private:
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc_{};
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap_ = nullptr;
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc_{};
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles_[4];
-	UINT numRTVHandle_ = 4;
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles_[6];
+	UINT numRTVHandle_ = 6;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> swapChainResources_[2] = { nullptr };
 

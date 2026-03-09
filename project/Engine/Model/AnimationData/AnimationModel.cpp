@@ -307,7 +307,7 @@ void AnimationModel::Draw(Material* mate) {
 	}
 
 	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
-	dxcommon_->GetDXCommand()->SetViewAndScissor();
+	dxcommon_->GetDXCommand()->SetViewAndScissor(MyWin::kWindowWidth, MyWin::kWindowHeight);
 	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Animation);
 	dxcommon_->GetDXCommand()->GetList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	lightManager_->SetLightCommand(dxcommon_->GetCommandList());

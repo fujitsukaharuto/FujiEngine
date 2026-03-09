@@ -5,6 +5,7 @@
 #include "Engine/DX/SRVManager.h"
 
 using namespace Graphics;
+using namespace Core;
 
 
 void Object3dCommon::Initialize() {
@@ -13,7 +14,7 @@ void Object3dCommon::Initialize() {
 }
 
 void Object3dCommon::PreDraw() {
-	dxcommon_->GetDXCommand()->SetViewAndScissor();
+	dxcommon_->GetDXCommand()->SetViewAndScissor(MyWin::kWindowWidth, MyWin::kWindowHeight);
 	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Normal);
 	dxcommon_->GetDXCommand()->GetList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	lightManager_->SetLightCommand(dxcommon_->GetCommandList());
@@ -21,7 +22,7 @@ void Object3dCommon::PreDraw() {
 }
 
 void Object3dCommon::PreAnimationDraw() {
-	dxcommon_->GetDXCommand()->SetViewAndScissor();
+	dxcommon_->GetDXCommand()->SetViewAndScissor(MyWin::kWindowWidth, MyWin::kWindowHeight);
 	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Animation);
 	dxcommon_->GetDXCommand()->GetList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	lightManager_->SetLightCommand(dxcommon_->GetCommandList());

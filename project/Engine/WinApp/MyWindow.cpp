@@ -49,7 +49,7 @@ LRESULT MyWin::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 	case WM_SIZE:
 		if (wparam != SIZE_MINIMIZED) {
 			GetInstance()->clientWidth_ = LOWORD(lparam);
-			GetInstance()->clientHeight_ = LOWORD(lparam);
+			GetInstance()->clientHeight_ = HIWORD(lparam);
 		}
 		return 0;
 
@@ -110,7 +110,10 @@ void MyWin::CreateGWindow(const wchar_t* name, uint32_t windowSizeX, uint32_t wi
 
 
 void MyWin::ThrowAwayWindow() {
+	if (hwnd_) {
+		DestroyWindow(hwnd_);
+		hwnd_ = nullptr;
+	}
 	UnregisterClass(wc_.lpszClassName, wc_.hInstance);
 	CoUninitialize();
-	CloseWindow(hwnd_);
 }
