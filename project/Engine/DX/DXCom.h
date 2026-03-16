@@ -1,4 +1,3 @@
-
 #pragma once
 #include <Windows.h>
 #include <string>
@@ -9,32 +8,18 @@
 #include <cassert>
 #include <wrl.h>
 
-
 #include "Math/Matrix/MatrixCalculation.h"
 #include "MyWindow.h"
+#include "GraphicsDevice.h"
 #include "DXCommand.h"
 #include "DXCompile.h"
 #include "OffscreenManager.h"
+#include "SwapChainManager.h"
 
 #include "FPSKeeper.h"
 #include "PipelineManager.h"
 #include "TextureManager.h"
 #include "Camera.h"
-
-
-/// <summary>
-/// リークチェック
-/// </summary>
-struct D3DResourceLeakChecker {
-	~D3DResourceLeakChecker() {
-		Microsoft::WRL::ComPtr<IDXGIDebug1> debug;
-		if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&debug)))) {
-			debug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
-			debug->ReportLiveObjects(DXGI_DEBUG_APP, DXGI_DEBUG_RLO_ALL);
-			debug->ReportLiveObjects(DXGI_DEBUG_D3D12, DXGI_DEBUG_RLO_ALL);
-		}
-	}
-};
 
 
 /// <summary>
@@ -117,7 +102,6 @@ public:
 	void PreGPUParticleDraw();
 	void PostGPUParticleDraw();
 
-
 	/// <summary>
 	/// バリアの変更
 	/// </summary>
@@ -148,71 +132,10 @@ public:
 	/// </summary>
 	void PostOutline();
 
-
-	/// <summary>
-	/// 指定されたサイズのバッファリソースを生成する。
-	/// </summary>
-	/// <param name="device">デバイス</param>
-	/// <param name="sizeInBytes">サイズ</param>
-	/// <returns>ID3D12Resource*</returns>
-	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(Microsoft::WRL::ComPtr<ID3D12Device> device, size_t sizeInBytes);
-
-	/// <summary>
-	/// 指定されたタイプ・数でディスクリプタヒープを生成する。
-	/// </summary>
-	/// <param name="heapType">ヒープタイプ</param>
-	/// <param name="numDescriptors">数</param>
-	/// <param name="shaderVisible">shaderVisible</param>
-	/// <returns>ID3D12Resource*</returns>
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
-
-	/// <summary>
-	/// 深度ステンシル用のテクスチャリソースを生成する。
-	/// </summary>
-	/// <param name="device">デバイス</param>
-	/// <param name="width">横</param>
-	/// <param name="height">縦</param>
-	/// <returns>ID3D12Resource*</returns>
-	Microsoft::WRL::ComPtr<ID3D12Resource> CreateDepthStencilTextureResource(Microsoft::WRL::ComPtr<ID3D12Device> device, int32_t width, int32_t height);
-
-	/// <summary>
-	/// オフスクリーン描画用のテクスチャリソースを生成する。
-	/// </summary>
-	/// <param name="device">デバイス</param>
-	/// <param name="width">横</param>
-	/// <param name="height">縦</param>
-	/// <param name="color">色</param>
-	/// <returns>ID3D12Resource*</returns>
-	Microsoft::WRL::ComPtr<ID3D12Resource> CreateOffscreenTextureResource(Microsoft::WRL::ComPtr<ID3D12Device> device, int32_t width, int32_t height, D3D12_CLEAR_VALUE color);
-
-	/// <summary>
-	/// UAV（Unordered Access View）として使用可能なバッファリソースを生成する。
-	/// </summary>
-	/// <param name="device">デバイス</param>
-	/// <param name="sizeInBytes">サイズ</param>
-	/// <returns>ID3D12Resource*</returns>
-	Microsoft::WRL::ComPtr<ID3D12Resource> CreateUAVResource(ID3D12Device* device, size_t sizeInBytes);
-
-	/// <summary>
-	/// GPUからCPUへのデータ読み戻しに使用するリードバックリソースを生成する。
-	/// </summary>
-	/// <param name="device">デバイス</param>
-	/// <param name="sizeInBytes">サイズ</param>
-	/// <returns>ID3D12Resource*</returns>
-	Microsoft::WRL::ComPtr<ID3D12Resource> CreateReadbackResource(ID3D12Device* device, size_t sizeInBytes);
-
-	/// <summary>
-	/// CPUからGPUへデータ転送するためのアップロードバッファを生成する。
-	/// </summary>
-	/// <param name="sizeInBytes">サイズ</param>
-	/// <param name="initData">データ</param>
-	/// <returns>ID3D12Resource*</returns>
-	Microsoft::WRL::ComPtr<ID3D12Resource> CreateUploadBuffer(size_t sizeInBytes, const void* initData);
-
 	//========================================================================*/
 	//* Getter
-	ID3D12Device* GetDevice() const { return device_.Get(); }
-	size_t GetBackBufferCount() const { return swapChainDesc_.BufferCount; }
+	ID3D12Device* GetDevice() const { return graphicsDevice_->GetDevice(); }
+	size_t GetBackBufferCount() const { return swapChainManager_->GetBackBufferCount(); }
 	uint32_t GetNowFrameCount() const { return command_->GetNowFrameIndex(); }
 	ID3D12GraphicsCommandList* GetCommandList() const { return command_->GetList(); }
 	ID3D12GraphicsCommandList* GetComputeCommandList() const { return command_->GetComputeList(); }
@@ -221,100 +144,22 @@ public:
 	DXC::DXCompile* GetDXCompile() const { return compiler_.get(); }
 	Graphics::PipelineManager* GetPipelineManager()const { return pipeManager_; }
 	Graphics::OffscreenManager* GetOffscreenManager()const { return offscreen_.get(); }
-	D3D12_CPU_DESCRIPTOR_HANDLE GetRTVHandle(uint32_t index) { return rtvHandles_[2 + index]; }
-	D3D12_GPU_DESCRIPTOR_HANDLE GetDepthTexGPUHandle() { return depthTexSrvHandle_[GetNowFrameCount()].second; }
-
-private:
-	/// <summary>
-	/// デバイス作成
-	/// </summary>
-	void CreateDevice();
-
-	/// <summary>
-	/// コマンド作成
-	/// </summary>
-	void CreateCommand();
-
-	/// <summary>
-	/// スワップチェイン作成
-	/// </summary>
-	void CreateSwapChain();
-
-	/// <summary>
-	/// レンダーターゲット作成
-	/// </summary>
-	void CreateRenderTargets();
-
-	/// <summary>
-	/// 深度バッファ作成
-	/// </summary>
-	void CreateDepthBuffer();
-
-	/// <summary>
-	/// コンパイラー作成
-	/// </summary>
-	void CreateCompiler();
-
-	/// <summary>
-	/// FPSKeeperの作成
-	/// </summary>
-	void InitializeFPSKeeper();
-
-	/// <summary>
-	/// ルートシグネーチャーの設定
-	/// </summary>
-	void SettingRootSignature();
-
-	/// <summary>
-	/// swapChainのバリア
-	/// </summary>
-	/// <param name="before">前</param>
-	/// <param name="after">後</param>
-	void CreateBarrier(D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after);
-
+	D3D12_CPU_DESCRIPTOR_HANDLE GetRTVHandle(uint32_t index) { return swapChainManager_->GetRTVHandle(index); }
+	D3D12_GPU_DESCRIPTOR_HANDLE GetDepthTexGPUHandle() { return swapChainManager_->GetDepthTexGPUHandle(GetNowFrameCount()); }
 
 private:
 
-	D3DResourceLeakChecker leakCheck_;
+
+private:
 
 	Core::MyWin* myWin_;
 
-
-#ifdef _DEBUGMODE
-	Microsoft::WRL::ComPtr<ID3D12Debug1> debugController_ = nullptr;
-#endif // _DEBUG
-
-
-	Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory_ = nullptr;
-	Microsoft::WRL::ComPtr<IDXGIAdapter4> useAdapter_;
-	Microsoft::WRL::ComPtr<ID3D12Device> device_;
-
-
+	std::unique_ptr<DXC::GraphicsDevice> graphicsDevice_;
 	std::unique_ptr<DXC::DXCommand> command_ = nullptr;
-
-
-	Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain_ = nullptr;
-	DXGI_SWAP_CHAIN_DESC1 swapChainDesc_{};
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap_ = nullptr;
-	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc_{};
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles_[6];
-	UINT numRTVHandle_ = 6;
-
-	Microsoft::WRL::ComPtr<ID3D12Resource> swapChainResources_[2] = { nullptr };
-
-	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource_[DXC::kFrameCount_];
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap_ = nullptr;
-	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc_{};
-	D3D12_SHADER_RESOURCE_VIEW_DESC depthTextureSrvDesc_{};
-	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> depthTexSrvHandle_[DXC::kFrameCount_];
-
-
+	std::unique_ptr<DXC::SwapChainManager> swapChainManager_ = nullptr;
 	std::unique_ptr<DXC::DXCompile> compiler_ = nullptr;
 
 	Core::FPSKeeper* fpsKeeper_ = nullptr;
-
 	Graphics::PipelineManager* pipeManager_;
-
 	std::unique_ptr<Graphics::OffscreenManager> offscreen_;
-
 };

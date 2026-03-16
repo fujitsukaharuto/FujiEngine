@@ -1,5 +1,6 @@
 #include "ParticleManager.h"
 #include "Engine/DX/DXCom.h"
+#include "Engine/DX/DX12Helper.h"
 #include "Engine/DX/SRVManager.h"
 #include "Engine/Camera/CameraManager.h"
 #include "Particle.h"
@@ -66,8 +67,8 @@ void ParticleManager::InitPlaneVertex() {
 	plane_.indices.push_back(3);
 	plane_.indices.push_back(2);
 
-	plane_.vBuffer = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(VertexDate) * plane_.vertices.size());
-	plane_.iBuffer = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(uint32_t) * plane_.indices.size());
+	plane_.vBuffer = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(VertexDate) * plane_.vertices.size());
+	plane_.iBuffer = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(uint32_t) * plane_.indices.size());
 
 	VertexDate* vData = nullptr;
 	plane_.vBuffer->Map(0, nullptr, reinterpret_cast<void**>(&vData));
@@ -122,8 +123,8 @@ void ParticleManager::InitRingVertex() {
 		ring_.indices.push_back(inner1);
 	}
 
-	ring_.vBuffer = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(VertexDate) * ring_.vertices.size());
-	ring_.iBuffer = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(uint32_t) * ring_.indices.size());
+	ring_.vBuffer = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(VertexDate) * ring_.vertices.size());
+	ring_.iBuffer = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(uint32_t) * ring_.indices.size());
 
 	VertexDate* vData = nullptr;
 	ring_.vBuffer->Map(0, nullptr, reinterpret_cast<void**>(&vData));
@@ -188,8 +189,8 @@ void ParticleManager::InitSphereVertex() {
 		}
 	}
 
-	sphere_.vBuffer = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(VertexDate) * sphere_.vertices.size());
-	sphere_.iBuffer = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(uint32_t) * sphere_.indices.size());
+	sphere_.vBuffer = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(VertexDate) * sphere_.vertices.size());
+	sphere_.iBuffer = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(uint32_t) * sphere_.indices.size());
 
 	VertexDate* vData = nullptr;
 	sphere_.vBuffer->Map(0, nullptr, reinterpret_cast<void**>(&vData));
@@ -249,8 +250,8 @@ void ParticleManager::InitCylinderVertex() {
 		cylinder_.indices.push_back(top1);
 	}
 
-	cylinder_.vBuffer = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(VertexDate) * cylinder_.vertices.size());
-	cylinder_.iBuffer = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(uint32_t) * cylinder_.indices.size());
+	cylinder_.vBuffer = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(VertexDate) * cylinder_.vertices.size());
+	cylinder_.iBuffer = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(uint32_t) * cylinder_.indices.size());
 
 	VertexDate* vData = nullptr;
 	cylinder_.vBuffer->Map(0, nullptr, reinterpret_cast<void**>(&vData));

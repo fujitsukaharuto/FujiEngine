@@ -1,5 +1,6 @@
 #include "GPUParticleSystem.h"
 #include "Engine/DX/DXCom.h"
+#include "Engine/DX/DX12Helper.h"
 #include "Engine/DX/SRVManager.h"
 #include "Engine/Camera/CameraManager.h"
 #include "Math/Random/Random.h"
@@ -388,26 +389,26 @@ void GPUParticleSystem::InitParticleCS() {
 	InitInstance(colorCSInstance_, sizeof(ParticleCS_Color));
 	InitInstance(flagsCSInstance_, sizeof(ParticleCS_Flags));
 
-	freeListIndexResource_ = dxcommon_->CreateUAVResource(dxcommon_->GetDevice(), (sizeof(int32_t)));// FreeListの作成
+	freeListIndexResource_ = DXC::Helper::CreateUAVResource(dxcommon_->GetDevice(), (sizeof(int32_t)));// FreeListの作成
 	uint32_t freeCountUAVIndex = srvManager_->Allocate();
 	srvManager_->CreateStructuredUAV(freeCountUAVIndex, freeListIndexResource_.Get(), 1, sizeof(int32_t));
 	freeListIndexUAVHandle_.first = srvManager_->GetCPUDescriptorHandle(freeCountUAVIndex);
 	freeListIndexUAVHandle_.second = srvManager_->GetGPUDescriptorHandle(freeCountUAVIndex);
 
-	freeListTailIndexResource_ = dxcommon_->CreateUAVResource(dxcommon_->GetDevice(), (sizeof(int32_t)));// FreeListTailの作成
+	freeListTailIndexResource_ = DXC::Helper::CreateUAVResource(dxcommon_->GetDevice(), (sizeof(int32_t)));// FreeListTailの作成
 	uint32_t freeTailCountUAVIndex = srvManager_->Allocate();
 	srvManager_->CreateStructuredUAV(freeTailCountUAVIndex, freeListTailIndexResource_.Get(), 1, sizeof(int32_t));
 	freeListTailIndexUAVHandle_.first = srvManager_->GetCPUDescriptorHandle(freeTailCountUAVIndex);
 	freeListTailIndexUAVHandle_.second = srvManager_->GetGPUDescriptorHandle(freeTailCountUAVIndex);
 
-	freeListResource_ = dxcommon_->CreateUAVResource(dxcommon_->GetDevice(), (sizeof(uint32_t) * particleCSInstanceCount_));
+	freeListResource_ = DXC::Helper::CreateUAVResource(dxcommon_->GetDevice(), (sizeof(uint32_t) * particleCSInstanceCount_));
 	uint32_t freeListUAVIndex = srvManager_->Allocate();
 	srvManager_->CreateStructuredUAV(freeListUAVIndex, freeListResource_.Get(), particleCSInstanceCount_, sizeof(uint32_t));
 	freeListUAVHandle_.first = srvManager_->GetCPUDescriptorHandle(freeListUAVIndex);
 	freeListUAVHandle_.second = srvManager_->GetGPUDescriptorHandle(freeListUAVIndex);
 
 	// Draw引数
-	drawAliveIndex_ = dxcommon_->CreateUAVResource(dxcommon_->GetDevice(), (sizeof(int32_t) * particleCSInstanceCount_));
+	drawAliveIndex_ = DXC::Helper::CreateUAVResource(dxcommon_->GetDevice(), (sizeof(int32_t) * particleCSInstanceCount_));
 	uint32_t drawIndexUAVIndex = srvManager_->Allocate();
 	uint32_t drawIndexSRVIndex = srvManager_->Allocate();
 	srvManager_->CreateStructuredUAV(drawIndexUAVIndex, drawAliveIndex_.Get(), particleCSInstanceCount_, sizeof(int32_t));
@@ -434,12 +435,12 @@ void GPUParticleSystem::InitParticleCS() {
 	dxcommon_->CommandExecution();
 
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {// Frame数分作成
-		perViewResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), (sizeof(PerView)));
+		perViewResource_[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), (sizeof(PerView)));
 		perViewResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&perViewData_[i]));
 		perViewData_[i]->viewProjection = MakeIdentity4x4();
 		perViewData_[i]->billboardMatrix = MakeIdentity4x4();
 
-		perFrameResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), (sizeof(PerFrame)));
+		perFrameResource_[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), (sizeof(PerFrame)));
 		perFrameResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&perFrameDataGPU_[i]));
 		perFrameDataGPU_[i]->time = 0.0f;
 		perFrameDataGPU_[i]->deltaTime = 0.0f;
@@ -460,7 +461,7 @@ void GPUParticleSystem::InitParticleCS() {
 	);
 	assert(SUCCEEDED(hr));
 
-	aliveDrawArgs_ = dxcommon_->CreateUAVResource(dxcommon_->GetDevice(), (sizeof(DrawIndexedArgs)));
+	aliveDrawArgs_ = DXC::Helper::CreateUAVResource(dxcommon_->GetDevice(), (sizeof(DrawIndexedArgs)));
 	uint32_t ArgsUAVIndex = srvManager_->Allocate();
 	srvManager_->CreateStructuredUAV(ArgsUAVIndex, aliveDrawArgs_.Get(), 1, sizeof(DrawIndexedArgs));
 	ArgsUAVHandle_.first = srvManager_->GetCPUDescriptorHandle(ArgsUAVIndex);
@@ -469,12 +470,12 @@ void GPUParticleSystem::InitParticleCS() {
 	const size_t readbackSize = sizeof(DrawIndexedArgs);
 
 	for (int i = 0; i < DXC::kFrameCount_; i++) {
-		aliveReadback_[i] = dxcommon_->CreateReadbackResource(dxcommon_->GetDevice(), readbackSize);
+		aliveReadback_[i] = DXC::Helper::CreateReadbackResource(dxcommon_->GetDevice(), readbackSize);
 	}
 }
 
 void GPUParticleSystem::InitInstance(ParticleCSInstance& CSInstance, size_t instanceSize) {
-	CSInstance.particleCSInstancing_ = dxcommon_->CreateUAVResource(dxcommon_->GetDevice(), (instanceSize * particleCSInstanceCount_));
+	CSInstance.particleCSInstancing_ = DXC::Helper::CreateUAVResource(dxcommon_->GetDevice(), (instanceSize * particleCSInstanceCount_));
 	uint32_t particleCSSRVIndex = srvManager_->Allocate();
 	uint32_t particleCSUAVIndex = srvManager_->Allocate();
 	srvManager_->CreateStructuredSRV(particleCSSRVIndex, CSInstance.particleCSInstancing_.Get(), particleCSInstanceCount_, UINT(instanceSize));

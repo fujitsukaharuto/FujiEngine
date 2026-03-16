@@ -1,6 +1,14 @@
 #pragma once
 #include "Scene/AbstractSceneFactory.h"
 
+enum class SceneNames {
+	TITLE,
+	GAME,
+	RESULT,
+	PARTICLEDEBUG,
+	GPUPARTICLE
+};
+
 /// <summary>
 /// シーンファクトリー
 /// </summary>

@@ -1,5 +1,6 @@
 #include "Mesh.h"
 #include "Engine/DX/DXCom.h"
+#include "Engine/DX/DX12Helper.h"
 #include "Engine/Model/ModelManager.h"
 #include "Engine/DX/SRVManager.h"
 
@@ -21,7 +22,7 @@ Mesh::~Mesh() {
 }
 
 void Mesh::CreateMesh() {
-	vertexResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(VertexData) * vertexData_.size());
+	vertexResource_ = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(VertexData) * vertexData_.size());
 	VertexData* vData = nullptr;
 	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vData));
 	std::memcpy(vData, vertexData_.data(), sizeof(VertexData) * vertexData_.size());
@@ -37,7 +38,7 @@ void Mesh::CreateMesh() {
 	SRVManager::GetInstance()->CreateStructuredSRV(srvIndex, vertexResource_.Get(),
 		static_cast<UINT>(vertexData_.size()), static_cast<UINT>(sizeof(VertexData)));
 
-	indexResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(uint32_t) * indexData_.size());
+	indexResource_ = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(uint32_t) * indexData_.size());
 	uint32_t* indexData = nullptr;
 	indexResource_->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
 	std::memcpy(indexData, indexData_.data(), sizeof(uint32_t) * indexData_.size());
@@ -50,7 +51,7 @@ void Mesh::CreateMesh() {
 void Mesh::CreateUAV() {
 	size_t sizeInBytes = sizeof(VertexData) * vertexData_.size();
 
-	skinnedVertexBuffer_ = dxcommon_->CreateUAVResource(dxcommon_->GetDevice(), sizeof(VertexData) * vertexData_.size());
+	skinnedVertexBuffer_ = DXC::Helper::CreateUAVResource(dxcommon_->GetDevice(), sizeof(VertexData) * vertexData_.size());
 
 	// VBV設定
 	skinnedVBV_.BufferLocation = skinnedVertexBuffer_->GetGPUVirtualAddress();

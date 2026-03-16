@@ -44,34 +44,6 @@ struct GrayscaleVertex {
 };
 
 /// <summary>
-/// 衝撃波のデータ
-/// </summary>
-struct ShockWaveData {
-	Math::Vector4 center = { 0.5f,0.5f,0.0f,0.0f };
-	float shockTime;
-	float radius = 1.0f;
-	float intensity = 0.15f;// 歪みの強さ
-	float padding;
-};
-
-/// <summary>
-/// 炎エフェクトのデータ
-/// </summary>
-struct FireElement {
-	float animeTime; // アニメーション時間
-	Math::Vector2 resolution; // 画面解像度
-	float distortionStrength = 0.18f; // UVディストーションの強度
-	float highlightStrength = 0.6f; // ハイライトの強度
-	float detailScale = 7.99f; // 細かいノイズのスケール
-	Math::Vector2 rangeMin = { 0.05f,0.3f };  // 炎の描画範囲（最小UV）
-	Math::Vector2 rangeMax = { 0.93f,2.82f }; // 炎の描画範囲（最大UV）
-	float scale = 1.20f; // Voronoiノイズのスケール
-	float speed = 4.01f; // 炎の揺らぎ速度
-	float noiseSpeed = -0.12f; // 細かいノイズの移動速度
-	float blendStrength = 2.0f;// どれくらい混ぜるか
-};
-
-/// <summary>
 /// CRTエフェクトのデータ
 /// </summary>
 struct CRTElement {
@@ -100,27 +72,6 @@ struct BloomParams {
 struct RadialParams {
 	Math::Vector2 center = { 0.5f, 0.5f };
 	float blurWidth = 0.01f;
-};
-
-/// <summary>
-/// 雷エフェクトのデータ
-/// </summary>
-struct LightningElement {
-	Math::Vector2 startPos = { 0.5f,0.3f };
-	Math::Vector2 endPos = { 0.5f,0.8f };
-	Math::Vector2 rangeMin = { 0.0f,0.0f }; // 描画範囲（最小UV）
-	Math::Vector2 rangeMax = { 1.0f,1.0f }; // 描画範囲（最大UV）
-	Math::Vector2 resolution; // 画面解像度
-	float time; // アニメーション時間
-	float mainBranchStrength = 25.0f; // 主幹の強度
-	float branchCount = 4.0f; // 分岐の数
-	float branchFade = 20.0f; // 分岐のフェード率
-	float highlightStrength = 15.0f; // ハイライトの強度
-	float noiseScale = 0.2f; // ノイズのスケール
-	float noiseSpeed = 5.0f; // ノイズの移動速度
-	float branchStrength = 4.0f;
-	float boltCount = 3.0f;
-	float progress;
 };
 
 enum class PostEffectList : int {
@@ -265,29 +216,23 @@ namespace Graphics {
 		D3D12_CPU_DESCRIPTOR_HANDLE offTextureUAVHandleCPU_[DXC::kFrameCount_];
 		D3D12_GPU_DESCRIPTOR_HANDLE offTextureUAVHandle_[DXC::kFrameCount_];
 
+		ComPtr<ID3D12Resource> outputTexture_[DXC::kFrameCount_];
+		uint32_t outputIndex_[DXC::kFrameCount_];
+		uint32_t outputSRVIndex_[DXC::kFrameCount_];
+		D3D12_CPU_DESCRIPTOR_HANDLE outputSRVHandleCPU_[DXC::kFrameCount_];
+		D3D12_GPU_DESCRIPTOR_HANDLE outputSRVHandle_[DXC::kFrameCount_];
+		D3D12_CPU_DESCRIPTOR_HANDLE outputUAVHandleCPU_[DXC::kFrameCount_];
+		D3D12_GPU_DESCRIPTOR_HANDLE outputUAVHandle_[DXC::kFrameCount_];
+
 		ComPtr<ID3D12Resource> gpuParticleRt_[DXC::kFrameCount_];
 		D3D12_CLEAR_VALUE clearColorValueForGPU_{};
 		uint32_t gpuParticleSRVIndex_[DXC::kFrameCount_];
 		D3D12_GPU_DESCRIPTOR_HANDLE gpuParticleHandle_[DXC::kFrameCount_];
 		D3D12_CPU_DESCRIPTOR_HANDLE gpuParticleHandleCPU_[DXC::kFrameCount_];
 
-
 		ComPtr<ID3D12Resource> grayCSResource_[DXC::kFrameCount_];
 		GrayCS* grayCSDataGPU_[DXC::kFrameCount_];
 		GrayCS grayCSData_;
-
-		ComPtr<ID3D12Resource> shockResource_[DXC::kFrameCount_];
-		ShockWaveData* shockDataGPU_[DXC::kFrameCount_];
-		ShockWaveData shockData_;
-
-		ComPtr<ID3D12Resource> fireResource_[DXC::kFrameCount_];
-		FireElement* fireDataGPU_[DXC::kFrameCount_];
-		FireElement fireData_;
-
-		ComPtr<ID3D12Resource> thunderResource_[DXC::kFrameCount_];
-		LightningElement* thunderDataGPU_[DXC::kFrameCount_];
-		LightningElement thunderData_;
-		int nowTex_;
 
 		ComPtr<ID3D12Resource> cRTResource_[DXC::kFrameCount_];
 		CRTElement* crtDataGPU_[DXC::kFrameCount_];
@@ -314,29 +259,14 @@ namespace Graphics {
 		Texture* noiseTex_;
 		Texture* noiseDirTex_;
 
-
-		ComPtr<ID3D12Resource> vertexGrayResource_ = nullptr;
-		D3D12_VERTEX_BUFFER_VIEW vertexGrayBufferView_{};
-		GrayscaleVertex* grayVertexDate_ = nullptr;
-
-
-		ComPtr<ID3D12Resource> outputTexture_[DXC::kFrameCount_];
-		uint32_t outputIndex_[DXC::kFrameCount_];
-		uint32_t outputSRVIndex_[DXC::kFrameCount_];
-		D3D12_CPU_DESCRIPTOR_HANDLE outputSRVHandleCPU_[DXC::kFrameCount_];
-		D3D12_GPU_DESCRIPTOR_HANDLE outputSRVHandle_[DXC::kFrameCount_];
-		D3D12_CPU_DESCRIPTOR_HANDLE outputUAVHandleCPU_[DXC::kFrameCount_];
-		D3D12_GPU_DESCRIPTOR_HANDLE outputUAVHandle_[DXC::kFrameCount_];
+		ComPtr<ID3D12Resource> vertexResource_ = nullptr;
+		D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
+		GrayscaleVertex* vertexDate_ = nullptr;
 
 		std::vector<PostEffectPass> postEffects_;
 		std::vector<PostEffectPass> validPostEffects_;
 
-		bool isGrayscale_ = true;
+		bool isPostEffect_ = true;
 		bool isNonePost_ = true;
-		bool isShockWave_ = true;
-		bool isFire_ = true;
-		bool isThunder_ = true;
-
-		float maxThunderTime_ = 1.5f;
 	};
 }

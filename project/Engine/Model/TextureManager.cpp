@@ -1,5 +1,6 @@
 #include "TextureManager.h"
 #include "Engine/DX/DXCom.h"
+#include "Engine/DX/DX12Helper.h"
 #include "Logger.h"
 #include "SRVManager.h"
 #include <fstream>
@@ -211,7 +212,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> TextureManager::UploadTextureData(Microso
 	DirectX::PrepareUpload(device.Get(), mipImages.GetImages(), mipImages.GetImageCount(), mipImages.GetMetadata(),
 		subresources);
 	uint64_t intermediateSize = GetRequiredIntermediateSize(texture.Get(), 0, UINT(subresources.size()));
-	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource = dxcommon_->CreateBufferResource(device, intermediateSize);
+	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource = DXC::Helper::CreateBufferResource(device, intermediateSize);
 	UpdateSubresources(commandList.Get(), texture.Get(), intermediateResource.Get(), 0, 0, UINT(subresources.size()), subresources.data());
 
 	D3D12_RESOURCE_BARRIER barrier{};

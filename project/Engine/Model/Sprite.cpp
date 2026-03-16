@@ -1,5 +1,6 @@
 #include "Sprite.h"
 #include "Engine/DX/DXCom.h"
+#include "Engine/DX/DX12Helper.h"
 #include "LightManager.h"
 #include "TextureManager.h"
 #include "Engine/Model/ModelManager.h"
@@ -120,8 +121,8 @@ void Sprite::InitializeBuffer() {
 	index_.push_back(2);
 
 
-	vertexResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(VertexDate) * vertex_.size());
-	indexResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(uint32_t) * index_.size());
+	vertexResource_ = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(VertexDate) * vertex_.size());
+	indexResource_ = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(uint32_t) * index_.size());
 
 	vData = nullptr;
 	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vData));
@@ -147,18 +148,18 @@ void Sprite::InitializeBuffer() {
 
 
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
-		wvpResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(TransformationMatrix));
+		wvpResource_[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(TransformationMatrix));
 		wvpDataGPU_[i] = nullptr;
 		wvpResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&wvpDataGPU_[i]));
 
-		cameraPosResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(DirectionalLight));
+		cameraPosResource_[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(DirectionalLight));
 		cameraPosData_[i] = nullptr;
 		cameraPosResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&cameraPosData_[i]));
 		cameraPosData_[i]->worldPosition = {0.0f,0.0f,0.0f};
 	}
 	SetWvp();
 
-	objIDDataResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(ObjIDData));
+	objIDDataResource_ = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(ObjIDData));
 	objIDData_ = nullptr;
 	objIDDataResource_->Map(0, nullptr, reinterpret_cast<void**>(&objIDData_));
 	objIDData_->objID = -1;

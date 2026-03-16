@@ -1,5 +1,6 @@
 #include "ParticleManager.h"
 #include "Engine/DX/DXCom.h"
+#include "Engine/DX/DX12Helper.h"
 #include "Engine/DX/SRVManager.h"
 #include "Engine/Camera/CameraManager.h"
 #include "Particle.h"
@@ -423,7 +424,7 @@ void ParticleManager::InternalCreateParticleGroup(const std::string& name, const
 		newGroup->instanceCount_ = count; // 出す数
 		uint32_t max = newGroup->instanceCount_;
 		for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
-			newGroup->instancing_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), (sizeof(TransformationParticleMatrix) * newGroup->instanceCount_));
+			newGroup->instancing_[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), (sizeof(TransformationParticleMatrix) * newGroup->instanceCount_));
 			newGroup->instancing_[i]->Map(0, nullptr, reinterpret_cast<void**>(&newGroup->instancingDataGPU_[i]));
 			for (uint32_t index = 0; index < max; ++index) {
 				newGroup->instancingDataGPU_[i][index].WVP = MakeIdentity4x4();
@@ -463,7 +464,7 @@ void ParticleManager::InternalCreateParticleGroup(const std::string& name, const
 
 		newGroup->instanceCount_ = count; // 出す数
 		for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
-			newGroup->instancing_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(),
+			newGroup->instancing_[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(),
 				sizeof(TransformationParticleMatrix) * newGroup->instanceCount_);
 			newGroup->instancing_[i]->Map(0, nullptr, reinterpret_cast<void**>(&newGroup->instancingDataGPU_[i]));
 			for (uint32_t index = 0; index < count; ++index) {

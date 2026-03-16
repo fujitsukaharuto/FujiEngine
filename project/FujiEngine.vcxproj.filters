@@ -398,6 +398,15 @@
     <ClCompile Include="Engine\GraphicPipeline\CSPipe\TrailEmitCSPipe.cpp">
       <Filter>Engine\GraphicPipeline\CSPipe</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\DX\GraphicsDevice.cpp">
+      <Filter>Engine\DX</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\DX\SwapChainManager.cpp">
+      <Filter>Engine\DX</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\DX\DX12Helper.cpp">
+      <Filter>Engine\DX</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -846,6 +855,15 @@
     </ClInclude>
     <ClInclude Include="Engine\GraphicPipeline\CSPipe\TrailEmitCSPipe.h">
       <Filter>Engine\GraphicPipeline\CSPipe</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\DX\GraphicsDevice.h">
+      <Filter>Engine\DX</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\DX\SwapChainManager.h">
+      <Filter>Engine\DX</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\DX\DX12Helper.h">
+      <Filter>Engine\DX</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

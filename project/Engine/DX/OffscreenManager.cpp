@@ -1,5 +1,6 @@
 #include "OffscreenManager.h"
 #include "DXCom.h"
+#include "Engine/DX/DX12Helper.h"
 #include "SRVManager.h"
 #include "ImGuiManager/ImGuiManager.h"
 #include "MyWindow.h"
@@ -20,13 +21,6 @@ void OffscreenManager::Initialize(DXCom* pDxcom) {
 }
 
 void OffscreenManager::Update() {
-	shockData_.shockTime += FPSKeeper::DeltaTime();
-	fireData_.animeTime += FPSKeeper::DeltaTime();
-	thunderData_.time += FPSKeeper::DeltaTime();
-
-	thunderData_.time = std::fmodf(thunderData_.time, maxThunderTime_);
-	thunderData_.progress = thunderData_.time / maxThunderTime_;
-
 	crtData_.crtTime += FPSKeeper::DeltaTime();
 
 	outlineData_.projectionInverse = Inverse(CameraManager::GetInstance()->GetCamera()->GetProjectionMatrix());
@@ -36,47 +30,19 @@ void OffscreenManager::DebugGUI() {
 #ifdef _DEBUGMODE
 	ImGui::Begin("OffScreen Debug");
 
-
-	bool preIsGrayscale = isGrayscale_;
+	bool preIsPostEffect = isPostEffect_;
 	bool preIsNonePost = isNonePost_;
-	bool preIsShock = isShockWave_;
-	bool preIsFire = isFire_;
-	bool preIsThunder = isThunder_;
 
 	if (ImGui::TreeNode("OffScreen ShaderPath")) {
-		ImGui::Checkbox("PostEffect##checkPost", &isGrayscale_);
+		ImGui::Checkbox("PostEffect##checkPost", &isPostEffect_);
 		ImGui::Checkbox("None", &isNonePost_);
 		ImGui::TreePop();
 	}
-	if (isGrayscale_ && !(preIsGrayscale)) {
+	if (isPostEffect_ && !(preIsPostEffect)) {
 		isNonePost_ = false;
-		isShockWave_ = false;
-		isFire_ = false;
-		isThunder_ = false;
 	}
 	if (isNonePost_ && !(preIsNonePost)) {
-		isGrayscale_ = false;
-		isShockWave_ = false;
-		isFire_ = false;
-		isThunder_ = false;
-	}
-	if (isShockWave_ && !(preIsShock)) {
-		isGrayscale_ = false;
-		isNonePost_ = false;
-		isFire_ = false;
-		isThunder_ = false;
-	}
-	if (isFire_ && !(preIsFire)) {
-		isGrayscale_ = false;
-		isNonePost_ = false;
-		isShockWave_ = false;
-		isThunder_ = false;
-	}
-	if (isThunder_ && !(preIsThunder)) {
-		isGrayscale_ = false;
-		isNonePost_ = false;
-		isShockWave_ = false;
-		isFire_ = false;
+		isPostEffect_ = false;
 	}
 
 	EffectListGUI();
@@ -197,13 +163,13 @@ void OffscreenManager::CreateResource() {
 	clearColorValueForGPU_.Color[3] = 0.0f;
 
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
-		offscreenRt_[i] = dxcommon_->CreateOffscreenTextureResource(dxcommon_->GetDevice(), MyWin::kWindowWidth, MyWin::kWindowHeight, clearColorValue_);
-		dxcommon_->GetDevice()->CreateRenderTargetView(offscreenRt_[i].Get(), &offscreenRTVDesc_, dxcommon_->GetRTVHandle(i));
+		offscreenRt_[i] = DXC::Helper::CreateOffscreenTextureResource(dxcommon_->GetDevice(), MyWin::kWindowWidth, MyWin::kWindowHeight, clearColorValue_);
+		dxcommon_->GetDevice()->CreateRenderTargetView(offscreenRt_[i].Get(), &offscreenRTVDesc_, dxcommon_->GetRTVHandle(i + 2));
 	}
 
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
-		gpuParticleRt_[i] = dxcommon_->CreateOffscreenTextureResource(dxcommon_->GetDevice(), MyWin::kWindowWidth / 2, MyWin::kWindowHeight / 2, clearColorValueForGPU_);
-		dxcommon_->GetDevice()->CreateRenderTargetView(gpuParticleRt_[i].Get(), &offscreenRTVDesc_, dxcommon_->GetRTVHandle(i + 2));
+		gpuParticleRt_[i] = DXC::Helper::CreateOffscreenTextureResource(dxcommon_->GetDevice(), MyWin::kWindowWidth / 2, MyWin::kWindowHeight / 2, clearColorValueForGPU_);
+		dxcommon_->GetDevice()->CreateRenderTargetView(gpuParticleRt_[i].Get(), &offscreenRTVDesc_, dxcommon_->GetRTVHandle(i + 4));
 	}
 
 	InitDataResource();
@@ -213,11 +179,8 @@ void OffscreenManager::CreateResource() {
 		CopyData(i);
 	}
 
-	isGrayscale_ = true;
+	isPostEffect_ = true;
 	isNonePost_ = false;
-	isShockWave_ = false;
-	isFire_ = false;
-	isThunder_ = false;
 
 }
 
@@ -258,7 +221,6 @@ void OffscreenManager::SettingTexture() {
 	noiseDirTex_ = TextureManager::GetInstance()->LoadTexture("Noise_Dir.jpg");
 	noiseDirTex_ = TextureManager::GetInstance()->LoadTexture("worley_Noise.jpg");
 	noiseDirTex_ = TextureManager::GetInstance()->LoadTexture("perlin_Noise.png");
-	nowTex_ = 2;
 
 	InitializePostEffects();
 }
@@ -267,7 +229,7 @@ void OffscreenManager::Command() {
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 	CopyData(frameIndex);
 
-	if (isGrayscale_) {
+	if (isPostEffect_) {
 
 		dxcommon_->TransitionResource(offscreenRt_[frameIndex].Get(),
 			D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
@@ -309,25 +271,25 @@ void Graphics::OffscreenManager::SynthesisGPURTV() {
 	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::None);
 
 	dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
+	dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, gpuParticleHandle_[frameIndex]);
 	dxcommon_->GetCommandList()->DrawInstanced(3, 1, 0, 0); // 大きな三角形に描画して負荷を減らす
 }
 
 void OffscreenManager::SettingVertex() {
-	vertexGrayResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(GrayscaleVertex) * 3);
+	vertexResource_ = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(GrayscaleVertex) * 3);
 
-	vertexGrayBufferView_.BufferLocation = vertexGrayResource_->GetGPUVirtualAddress();
-	vertexGrayBufferView_.SizeInBytes = sizeof(GrayscaleVertex) * 3;
-	vertexGrayBufferView_.StrideInBytes = sizeof(GrayscaleVertex);
+	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
+	vertexBufferView_.SizeInBytes = sizeof(GrayscaleVertex) * 3;
+	vertexBufferView_.StrideInBytes = sizeof(GrayscaleVertex);
 
-	grayVertexDate_ = nullptr;
-	vertexGrayResource_->Map(0, nullptr, reinterpret_cast<void**>(&grayVertexDate_));
+	vertexDate_ = nullptr;
+	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDate_));
 
 	// でっかい三角形をセット
-	grayVertexDate_[0] = { Vector4(-1.0f, -1.0f, 0.0f, 1.0f), Vector2(0.0f, 1.0f) }; // 左下
-	grayVertexDate_[1] = { Vector4(-1.0f, 3.0f, 0.0f, 1.0f), Vector2(0.0f, -1.0f) };  // 左上（画面外へ）
-	grayVertexDate_[2] = { Vector4(3.0f, -1.0f, 0.0f, 1.0f), Vector2(2.0f, 1.0f) };
+	vertexDate_[0] = { Vector4(-1.0f, -1.0f, 0.0f, 1.0f), Vector2(0.0f, 1.0f) }; // 左下
+	vertexDate_[1] = { Vector4(-1.0f, 3.0f, 0.0f, 1.0f), Vector2(0.0f, -1.0f) };  // 左上（画面外へ）
+	vertexDate_[2] = { Vector4(3.0f, -1.0f, 0.0f, 1.0f), Vector2(2.0f, 1.0f) };
 
 
 	auto device = dxcommon_->GetDevice();
@@ -383,53 +345,33 @@ void OffscreenManager::SettingVertex() {
 
 void Graphics::OffscreenManager::InitDataResource() {
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
-		grayCSResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(GrayCS));
+		grayCSResource_[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(GrayCS));
 		grayCSDataGPU_[i] = nullptr;
 		grayCSResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&grayCSDataGPU_[i]));
 
-		shockResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(ShockWaveData));
-		shockDataGPU_[i] = nullptr;
-		shockResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&shockDataGPU_[i]));
-
-		fireResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(FireElement));
-		fireDataGPU_[i] = nullptr;
-		fireResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&fireDataGPU_[i]));
-
-		thunderResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(LightningElement));
-		thunderDataGPU_[i] = nullptr;
-		thunderResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&thunderDataGPU_[i]));
-
-		cRTResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(CRTElement));
+		cRTResource_[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(CRTElement));
 		crtDataGPU_[i] = nullptr;
 		cRTResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&crtDataGPU_[i]));
 
-		outlineResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(OutlineElement));
+		outlineResource_[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(OutlineElement));
 		outlineDataGPU_[i] = nullptr;
 		outlineResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&outlineDataGPU_[i]));
 
-		bloomResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(BloomParams));
+		bloomResource_[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(BloomParams));
 		bloomDataGPU_[i] = nullptr;
 		bloomResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&bloomDataGPU_[i]));
 
-		radialResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(RadialParams));
+		radialResource_[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(RadialParams));
 		radialDataGPU_[i] = nullptr;
 		radialResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&radialDataGPU_[i]));
 
-		vignetteResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(VignetteData));
+		vignetteResource_[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(VignetteData));
 		vignetteDataGPU_[i] = nullptr;
 		vignetteResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&vignetteDataGPU_[i]));
 	}
 }
 
 void Graphics::OffscreenManager::InitData() {
-	shockData_.shockTime = 0.0f;
-
-	fireData_.animeTime = 0.0f;
-	fireData_.resolution = { MyWin::kWindowWidth, MyWin::kWindowHeight };
-
-	thunderData_.time = 0.0f;
-	thunderData_.resolution = { MyWin::kWindowWidth, MyWin::kWindowHeight };
-
 	crtData_.crtTime = 0.0f;
 	crtData_.resolution = { MyWin::kWindowWidth, MyWin::kWindowHeight };
 
@@ -564,7 +506,6 @@ void Graphics::OffscreenManager::PingPongCommand() {
 		auto inputSRVHandle = isUsePing ? offTextureHandle_[frameIndex] : outputSRVHandle_[frameIndex];
 		auto outputUAVHandle = isUsePing ? outputUAVHandle_[frameIndex] : offTextureUAVHandle_[frameIndex];
 
-
 		if (i != 0) {
 			dxcommon_->TransitionResource(inputResource.Get(),
 				D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
@@ -589,7 +530,6 @@ void Graphics::OffscreenManager::PingPongCommand() {
 	}
 	isUsePing = !isUsePing;
 
-
 	auto finalOutput = isUsePing ? pong : ping; // 最後に使ったものはどちらなのか
 	auto finalSRVHandle = isUsePing ? outputSRVHandle_[frameIndex] : offTextureHandle_[frameIndex];
 
@@ -605,7 +545,7 @@ void Graphics::OffscreenManager::PingPongCommand() {
 	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::None);
 
 	dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
+	dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, finalSRVHandle);
 	dxcommon_->GetCommandList()->DrawInstanced(3, 1, 0, 0); // 大きな三角形に描画して負荷を減らす
 
@@ -613,15 +553,12 @@ void Graphics::OffscreenManager::PingPongCommand() {
 	if (isUsePing) {// 最後に使ったのがどちらかによってバリアの切り替えを変える
 		dxcommon_->TransitionResource(ping.Get(),
 			D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_GENERIC_READ);
-
 		dxcommon_->TransitionResource(pong.Get(),
 			D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 	} else {
 		if (validPostEffects_.size() != 0) {
 			dxcommon_->TransitionResource(pong.Get(),
 				D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
-		} else {
-
 		}
 	}
 }
@@ -629,110 +566,30 @@ void Graphics::OffscreenManager::PingPongCommand() {
 void Graphics::OffscreenManager::OtherPipeLineCommand() {
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 
-	if (isNonePost_) {// 何も描画せず(クリアカラーのみ)
+	if (isNonePost_) {// 何も描画せず
 		dxcommon_->GetDXCommand()->SetViewAndScissor(MyWin::kWindowWidth, MyWin::kWindowHeight);
 		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::None);
 
 		dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
+		dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
 		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, offTextureHandle_[frameIndex]);
-		dxcommon_->GetCommandList()->DrawInstanced(3, 1, 0, 0);
-	}
-
-	if (isShockWave_) {// 衝撃波エフェクト
-		dxcommon_->GetDXCommand()->SetViewAndScissor(MyWin::kWindowWidth, MyWin::kWindowHeight);
-		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::ShockWave);
-
-		dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
-		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, offTextureHandle_[frameIndex]);
-		dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(1, shockResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
-		dxcommon_->GetCommandList()->DrawInstanced(3, 1, 0, 0);
-	}
-
-	if (isFire_) {// 炎エフェクト
-		dxcommon_->GetDXCommand()->SetViewAndScissor(MyWin::kWindowWidth, MyWin::kWindowHeight);
-		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Fire);
-
-		dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
-		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, offTextureHandle_[frameIndex]);
-		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, baseTex_->gpuHandle);
-		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, vNoiseTex_->gpuHandle);
-		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(3, noiseTex_->gpuHandle);
-		dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(4, fireResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
-		dxcommon_->GetCommandList()->DrawInstanced(3, 1, 0, 0);
-	}
-
-
-	if (isThunder_) {// 雷エフェクト
-		dxcommon_->GetDXCommand()->SetViewAndScissor(MyWin::kWindowWidth, MyWin::kWindowHeight);
-		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Thunder);
-
-		dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexGrayBufferView_);
-		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, offTextureHandle_[frameIndex]);
-		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, noiseDirTex_->gpuHandle);
-		dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(2, thunderResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
 		dxcommon_->GetCommandList()->DrawInstanced(3, 1, 0, 0);
 	}
 }
 
 void OffscreenManager::CopyData(uint32_t frameIndex) {
-
 	grayCSDataGPU_[frameIndex]->gray_ = grayCSData_.gray_;
 
-
 	vignetteDataGPU_[frameIndex]->color_ = vignetteData_.color_;
-
-
-	shockDataGPU_[frameIndex]->center = shockData_.center;
-	shockDataGPU_[frameIndex]->shockTime = shockData_.shockTime;
-	shockDataGPU_[frameIndex]->radius = shockData_.radius;
-	shockDataGPU_[frameIndex]->intensity = shockData_.intensity;
-
-
-	fireDataGPU_[frameIndex]->animeTime = fireData_.animeTime;
-	fireDataGPU_[frameIndex]->resolution = fireData_.resolution;
-	fireDataGPU_[frameIndex]->distortionStrength = fireData_.distortionStrength;
-	fireDataGPU_[frameIndex]->highlightStrength = fireData_.highlightStrength;
-	fireDataGPU_[frameIndex]->detailScale = fireData_.detailScale;
-	fireDataGPU_[frameIndex]->rangeMin = fireData_.rangeMin;
-	fireDataGPU_[frameIndex]->rangeMax = fireData_.rangeMax;
-	fireDataGPU_[frameIndex]->scale = fireData_.scale;
-	fireDataGPU_[frameIndex]->speed = fireData_.speed;
-	fireDataGPU_[frameIndex]->noiseSpeed = fireData_.noiseSpeed;
-	fireDataGPU_[frameIndex]->blendStrength = fireData_.blendStrength;
-
 
 	crtDataGPU_[frameIndex]->crtTime = crtData_.crtTime;
 	crtDataGPU_[frameIndex]->resolution = crtData_.resolution;
 
-
 	outlineDataGPU_[frameIndex]->projectionInverse = outlineData_.projectionInverse;
-
 
 	bloomDataGPU_[frameIndex]->bloomThreshold = bloomData_.bloomThreshold;
 	bloomDataGPU_[frameIndex]->bloomIntensity = bloomData_.bloomIntensity;
 
-
 	radialDataGPU_[frameIndex]->center = radialData_.center;
 	radialDataGPU_[frameIndex]->blurWidth = radialData_.blurWidth;
-
-
-	thunderDataGPU_[frameIndex]->startPos = thunderData_.startPos;
-	thunderDataGPU_[frameIndex]->endPos = thunderData_.endPos;
-	thunderDataGPU_[frameIndex]->rangeMin = thunderData_.rangeMin;
-	thunderDataGPU_[frameIndex]->rangeMax = thunderData_.rangeMax;
-	thunderDataGPU_[frameIndex]->resolution = thunderData_.resolution;
-	thunderDataGPU_[frameIndex]->time = thunderData_.time;
-	thunderDataGPU_[frameIndex]->mainBranchStrength = thunderData_.mainBranchStrength;
-	thunderDataGPU_[frameIndex]->branchCount = thunderData_.branchCount;
-	thunderDataGPU_[frameIndex]->branchFade = thunderData_.branchFade;
-	thunderDataGPU_[frameIndex]->highlightStrength = thunderData_.highlightStrength;
-	thunderDataGPU_[frameIndex]->noiseScale = thunderData_.noiseScale;
-	thunderDataGPU_[frameIndex]->noiseSpeed = thunderData_.noiseSpeed;
-	thunderDataGPU_[frameIndex]->branchStrength = thunderData_.branchStrength;
-	thunderDataGPU_[frameIndex]->boltCount = thunderData_.boltCount;
-	thunderDataGPU_[frameIndex]->progress = thunderData_.progress;
 }

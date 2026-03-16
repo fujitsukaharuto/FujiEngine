@@ -1,5 +1,6 @@
 #include "DirectionLight.h"
 #include "Engine/DX/DXCom.h"
+#include "Engine/DX/DX12Helper.h"
 #include "ImGuiManager/ImGuiManager.h"
 
 using namespace Math;
@@ -10,7 +11,7 @@ void DirectionLight::Initialize(DXCom* pDxcom) {
 	dxcommon_ = pDxcom;
 
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
-		directionLightResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(DirectionalLight));
+		directionLightResource_[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(DirectionalLight));
 		directionLightDataGPU_[i] = nullptr;
 		directionLightResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&directionLightDataGPU_[i]));
 	}

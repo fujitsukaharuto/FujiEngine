@@ -1,5 +1,6 @@
 #include "SpotLight.h"
 #include "Engine/DX/DXCom.h"
+#include "Engine/DX/DX12Helper.h"
 #include <numbers>
 #include "ImGuiManager/ImGuiManager.h"
 
@@ -11,7 +12,7 @@ void SpotLight::Initialize(DXCom* pDxcom) {
 	dxcommon_ = pDxcom;
 
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
-		spotLightResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(SpotLightData));
+		spotLightResource_[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(SpotLightData));
 		spotLightDataGPU_[i] = nullptr;
 		spotLightResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&spotLightDataGPU_[i]));
 	}

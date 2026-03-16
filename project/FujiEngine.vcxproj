@@ -164,14 +164,17 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Camera\Camera.cpp" />
     <ClCompile Include="Engine\Camera\CameraManager.cpp" />
     <ClCompile Include="Engine\Camera\DebugCamera.cpp" />
+    <ClCompile Include="Engine\DX\DX12Helper.cpp" />
     <ClCompile Include="Engine\DX\DXCom.cpp" />
     <ClCompile Include="Engine\DX\DXCommand.cpp" />
     <ClCompile Include="Engine\DX\DXCompile.cpp" />
     <ClCompile Include="Engine\DX\FPSKeeper.cpp" />
     <ClCompile Include="Engine\DX\Framework.cpp" />
     <ClCompile Include="Engine\DX\GPUTimer.cpp" />
+    <ClCompile Include="Engine\DX\GraphicsDevice.cpp" />
     <ClCompile Include="Engine\DX\OffscreenManager.cpp" />
     <ClCompile Include="Engine\DX\SRVManager.cpp" />
+    <ClCompile Include="Engine\DX\SwapChainManager.cpp" />
     <ClCompile Include="Engine\Editor\CommandManager.cpp" />
     <ClCompile Include="Engine\Editor\CreateObjCommand.cpp" />
     <ClCompile Include="Engine\Editor\DeleteObjCommand.cpp" />
@@ -299,6 +302,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Camera\Camera.h" />
     <ClInclude Include="Engine\Camera\CameraManager.h" />
     <ClInclude Include="Engine\Camera\DebugCamera.h" />
+    <ClInclude Include="Engine\DX\DX12Helper.h" />
     <ClInclude Include="Engine\DX\DXCom.h" />
     <ClInclude Include="Engine\DX\DXCommand.h" />
     <ClInclude Include="Engine\DX\DXCompile.h" />
@@ -306,8 +310,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\DX\FrameCount.h" />
     <ClInclude Include="Engine\DX\Framework.h" />
     <ClInclude Include="Engine\DX\GPUTimer.h" />
+    <ClInclude Include="Engine\DX\GraphicsDevice.h" />
     <ClInclude Include="Engine\DX\OffscreenManager.h" />
     <ClInclude Include="Engine\DX\SRVManager.h" />
+    <ClInclude Include="Engine\DX\SwapChainManager.h" />
     <ClInclude Include="Engine\Editor\CommandManager.h" />
     <ClInclude Include="Engine\Editor\CreateObjCommand.h" />
     <ClInclude Include="Engine\Editor\DeleteObjCommand.h" />

@@ -5,6 +5,7 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include "Engine/DX/DX12Helper.h"
 #include "Engine/DX/SRVManager.h"
 #include "Engine/WinApp/MyWindow.h"
 #include "Engine/ImGuiManager/ImGuiManager.h"
@@ -35,7 +36,7 @@ void ModelManager::Initialize(DXCom* pDxcom, Graphics::LightManager* pLight) {
 	LoadModelFile();
 
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
-		pickingBufferResource_[i] = dxcommon_->CreateUAVResource(dxcommon_->GetDevice(), sizeof(PickingBuffer));
+		pickingBufferResource_[i] = DXC::Helper::CreateUAVResource(dxcommon_->GetDevice(), sizeof(PickingBuffer));
 
 		uint32_t srvIndex = SRVManager::GetInstance()->Allocate();
 		pickBufferHandle_[i].first = SRVManager::GetInstance()->GetCPUDescriptorHandle(srvIndex);
@@ -43,10 +44,10 @@ void ModelManager::Initialize(DXCom* pDxcom, Graphics::LightManager* pLight) {
 		SRVManager::GetInstance()->CreateStructuredUAV(srvIndex, pickingBufferResource_[i].Get(),
 			static_cast<UINT>(1), static_cast<UINT>(sizeof(PickingBuffer)));
 
-		pickingBufferReadBack_[i] = dxcommon_->CreateReadbackResource(dxcommon_->GetDevice(), sizeof(PickingBuffer));
+		pickingBufferReadBack_[i] = DXC::Helper::CreateReadbackResource(dxcommon_->GetDevice(), sizeof(PickingBuffer));
 
 
-		pickingDataResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(PickingData));
+		pickingDataResource_[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(PickingData));
 		pickingDataGPU_[i] = nullptr;
 		pickingDataResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&pickingDataGPU_[i]));
 	}
@@ -66,7 +67,7 @@ void ModelManager::Initialize(DXCom* pDxcom, Graphics::LightManager* pLight) {
 	init.depth = 1.0f;
 
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
-		initUploadBuffer_[i] = dxcommon_->CreateUploadBuffer(sizeof(PickingBuffer), &init);
+		initUploadBuffer_[i] = DXC::Helper::CreateUploadBuffer(dxcommon_->GetDevice(), sizeof(PickingBuffer), &init);
 
 		dxcommon_->GetImmediateList()->CopyResource(pickingBufferResource_[i].Get(), initUploadBuffer_[i].Get());
 	}

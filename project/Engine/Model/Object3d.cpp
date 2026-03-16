@@ -1,6 +1,7 @@
 #include "Object3d.h"
 #include "ModelManager.h"
 #include "DXCom.h"
+#include "Engine/DX/DX12Helper.h"
 #include "LightManager.h"
 #include "CameraManager.h"
 #include "Engine/ImGuiManager/ImGuiManager.h"
@@ -589,20 +590,20 @@ void Object3d::MeshDraw(Material* mate, int drawCount) {
 
 void Object3d::CreateWVP() {
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
-		wvpResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(TransformationMatrix));
+		wvpResource_[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(TransformationMatrix));
 		wvpDateGPU_[i] = nullptr;
 		wvpResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&wvpDateGPU_[i]));
 		wvpDateGPU_[i]->WVP = MakeIdentity4x4();
 		wvpDateGPU_[i]->World = MakeIdentity4x4();
 		wvpDateGPU_[i]->WorldInverseTransPose = Transpose(Inverse(wvpDateGPU_[i]->World));
 
-		cameraPosResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(DirectionalLight));
+		cameraPosResource_[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(DirectionalLight));
 		cameraPosDataGPU_[i] = nullptr;
 		cameraPosResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&cameraPosDataGPU_[i]));
 		cameraPosDataGPU_[i]->worldPosition = camera_->GetTranslate();
 	}
 
-	objIDDataResource_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(ObjIDData));
+	objIDDataResource_ = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(ObjIDData));
 	objIDData_ = nullptr;
 	objIDDataResource_->Map(0, nullptr, reinterpret_cast<void**>(&objIDData_));
 	objIDData_->objID = ++useObjID_;

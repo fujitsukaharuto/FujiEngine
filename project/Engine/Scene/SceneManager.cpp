@@ -3,12 +3,11 @@
 #include "Engine/DX/DXCom.h"
 #include "FPSKeeper.h"
 #include "Engine/Scene/BaseScene.h"
-#include "Game/Scene/TitleScene.h"
-#include "Game/Scene/GameScene.h"
-#include "Game/Scene/ResultScene.h"
 #include "ImGuiManager.h"
+#include "Game/Scene/SceneFactory.h"
 #include "Engine/Model/ModelManager.h"
 #include "Engine/Particle/ParticleManager.h"
+#include "Engine/Editor/CommandManager.h"
 
 using namespace Core;
 
@@ -84,6 +83,7 @@ void SceneManager::DebugGUI() {
 #ifdef _DEBUGMODE
 	if (ImGui::CollapsingHeader("Scene")) {
 		if (scene_) {
+			SceneChangeGUI();
 			scene_->DebugGUI();
 			ImGui::SeparatorText("Particle");
 			scene_->ParticleDebugGUI();
@@ -115,4 +115,40 @@ void SceneManager::SceneSet() {
 		scene_->Initialize();
 		isChange_ = false;
 	}
+}
+
+void SceneManager::SceneChangeGUI() {
+#ifdef _DEBUGMODE
+	ImGui::Indent();
+	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Selected;
+	if (ImGui::TreeNodeEx("SceneChange", flags)) {
+		ImGui::Combo("##SceneSelection", &sceneSelection_, "Title\0Game\0Result\0Particle\0GPUParticle\0");
+		ImGui::SameLine();
+		if (ImGui::Button("Change")) {
+			switch (sceneSelection_) {
+			case int(SceneNames::TITLE):
+				ChangeScene("TITLE", 20.0f);
+				break;
+			case int(SceneNames::GAME):
+				ChangeScene("GAME", 20.0f);
+				break;
+			case int(SceneNames::RESULT):
+				ChangeScene("RESULT", 20.0f);
+				break;
+			case int(SceneNames::PARTICLEDEBUG):
+				ChangeScene("PARTICLEDEBUG", 20.0f);
+				break;
+			case int(SceneNames::GPUPARTICLE):
+				ChangeScene("GPUPARTICLE", 20.0f);
+				break;
+			default:
+				break;
+			}
+			CommandManager::GetInstance()->Reset();
+		}
+		ImGui::TreePop();
+	}
+
+	ImGui::Unindent();
+#endif // _DEBUGMODE
 }

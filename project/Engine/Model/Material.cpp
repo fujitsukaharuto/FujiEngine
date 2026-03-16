@@ -1,5 +1,6 @@
 #include "Material.h"
 #include "Engine/DX/DXCom.h"
+#include "Engine/DX/DX12Helper.h"
 
 using namespace Graphics;
 using namespace Math;
@@ -30,7 +31,7 @@ void Material::Finalize() {
 
 void Material::CreateMaterial() {
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
-		materialResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(MaterialDate));
+		materialResource_[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(MaterialDate));
 		materialDateGPU_[i] = nullptr;
 		materialResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&materialDateGPU_[i]));
 	}
@@ -56,7 +57,7 @@ void Material::CreateMaterial() {
 void Material::CreateEnvironmentMaterial() {
 	isEnvironment_ = true;
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
-		materialEnvironmentResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(MaterialEnvironment));
+		materialEnvironmentResource_[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(MaterialEnvironment));
 		materialEnvironmentGPU_[i] = nullptr;
 		materialEnvironmentResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&materialEnvironmentGPU_[i]));
 	}

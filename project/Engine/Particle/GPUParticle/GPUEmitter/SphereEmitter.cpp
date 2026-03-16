@@ -1,5 +1,6 @@
 #include "SphereEmitter.h"
 #include "Engine/DX/DXCom.h"
+#include "Engine/DX/DX12Helper.h"
 #include "Engine/DX/SRVManager.h"
 #include "Engine/Model/ModelManager.h"
 #include "ImGuiManager/ImGuiManager.h"
@@ -11,7 +12,7 @@ using namespace Math;
 
 SphereEmitter::SphereEmitter(DXCom* dx) {
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
-		resource_[i] = dx->CreateBufferResource(dx->GetDevice(), sizeof(EmitterSphere));
+		resource_[i] = DXC::Helper::CreateBufferResource(dx->GetDevice(), sizeof(EmitterSphere));
 		resource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&dataGPU_[i]));
 		*dataGPU_[i] = {};
 	}

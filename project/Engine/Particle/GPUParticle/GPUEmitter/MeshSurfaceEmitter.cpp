@@ -1,5 +1,6 @@
 #include "MeshSurfaceEmitter.h"
 #include "Engine/DX/DXCom.h"
+#include "Engine/DX/DX12Helper.h"
 #include "Engine/DX/SRVManager.h"
 #include "Engine/Model/ModelManager.h"
 #include "ImGuiManager/ImGuiManager.h"
@@ -12,7 +13,7 @@ using namespace Math;
 
 MeshSurfaceEmitter::MeshSurfaceEmitter(DXCom* dx) {
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
-		resource_[i] = dx->CreateBufferResource(dx->GetDevice(), sizeof(EmitterSurface));
+		resource_[i] = DXC::Helper::CreateBufferResource(dx->GetDevice(), sizeof(EmitterSurface));
 		dataGPU_[i] = nullptr;
 		resource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&dataGPU_[i]));
 	}
@@ -25,8 +26,8 @@ MeshSurfaceEmitter::MeshSurfaceEmitter(DXCom* dx) {
 
 void MeshSurfaceEmitter::InitMeshData(const std::string& fileName, DXCom* dx, SRVManager* srv) {
 	ModelData data = ModelManager::GetInstance()->FindModel(fileName);
-	verticesResource = dx->CreateBufferResource(dx->GetDevice(), (sizeof(VertexDate) * data.vertices.size()));
-	indicesResource = dx->CreateBufferResource(dx->GetDevice(), (sizeof(uint32_t) * data.indicies.size()));
+	verticesResource = DXC::Helper::CreateBufferResource(dx->GetDevice(), (sizeof(VertexDate) * data.vertices.size()));
+	indicesResource = DXC::Helper::CreateBufferResource(dx->GetDevice(), (sizeof(uint32_t) * data.indicies.size()));
 	VertexDate* vtx = nullptr;
 	verticesResource->Map(0, nullptr, reinterpret_cast<void**>(&vtx));
 	memcpy(vtx, data.vertices.data(), sizeof(VertexDate) * data.vertices.size());
@@ -71,7 +72,7 @@ void MeshSurfaceEmitter::InitMeshData(const std::string& fileName, DXCom* dx, SR
 	}
 	cdf.back() = 1.0f;
 	// 面積CDFをGPUに送る
-	areasResource = dx->CreateBufferResource(dx->GetDevice(), sizeof(float) * cdf.size());
+	areasResource = DXC::Helper::CreateBufferResource(dx->GetDevice(), sizeof(float) * cdf.size());
 	float* areaMap = nullptr;
 	areasResource->Map(0, nullptr, reinterpret_cast<void**>(&areaMap));
 	memcpy(areaMap, cdf.data(), sizeof(float) * cdf.size());

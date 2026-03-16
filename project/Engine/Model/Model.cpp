@@ -1,4 +1,5 @@
 #include "Model.h"
+#include "Engine/DX/DX12Helper.h"
 
 using namespace Graphics;
 using namespace Math;
@@ -68,7 +69,7 @@ void Model::CreateEnvironment() {
 }
 
 void Model::CreateSkinningInformation(DXCom* pDxcom) {
-	skinningInformation_ = pDxcom->CreateBufferResource(pDxcom->GetDevice(), sizeof(SkinningInformation));
+	skinningInformation_ = DXC::Helper::CreateBufferResource(pDxcom->GetDevice(), sizeof(SkinningInformation));
 	infoData_ = nullptr;
 	skinningInformation_->Map(0, nullptr, reinterpret_cast<void**>(&infoData_));
 	for (int i = 0; i < mesh_.size(); i++) {

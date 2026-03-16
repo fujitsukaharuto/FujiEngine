@@ -1,4 +1,5 @@
 #include "SkyBox.h"
+#include "Engine/DX/DX12Helper.h"
 
 using namespace Core;
 using namespace Graphics;
@@ -80,7 +81,7 @@ void SkyBox::SetColor(const Math::Vector4& color) {
 void SkyBox::ResourceCreate() {
 
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
-		wvpResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(TransformationMatrix));
+		wvpResource_[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(TransformationMatrix));
 		wvpDateGPU_[i] = nullptr;
 		wvpResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&wvpDateGPU_[i]));
 	
@@ -181,8 +182,8 @@ void SkyBox::CreateVertex() {
 	index_.push_back(23);
 
 
-	vBuffer_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(VertexDate) * vertex_.size());
-	iBuffer_ = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(uint32_t) * index_.size());
+	vBuffer_ = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(VertexDate) * vertex_.size());
+	iBuffer_ = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(uint32_t) * index_.size());
 
 	VertexDate* vData = nullptr;
 	vBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&vData));

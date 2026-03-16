@@ -1,5 +1,6 @@
 #include "PointLight.h"
 #include "Engine/DX/DXCom.h"
+#include "Engine/DX/DX12Helper.h"
 #include "Engine/DX/FPSKeeper.h"
 #include "ImGuiManager/ImGuiManager.h"
 
@@ -10,7 +11,7 @@ void PointLight::Initialize(DXCom* pDxcom) {
 	dxcommon_ = pDxcom;
 
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
-		pointLightResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(PointLightData));
+		pointLightResource_[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(PointLightData));
 		pointLightDataGPU_[i] = nullptr;
 		pointLightResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&pointLightDataGPU_[i]));
 	}

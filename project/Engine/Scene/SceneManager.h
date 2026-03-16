@@ -37,6 +37,7 @@ private:
 
 	/// <summary>シーンの設定</summary>
 	void SceneSet();
+	void SceneChangeGUI();
 
 private:
 
@@ -52,6 +53,7 @@ private:
 	bool isChange_ = false;
 	float changeExtraTime = 0.0f;
 	float finishTime = 0.0f;
+	int sceneSelection_ = 0;
 
 	bool isFinish_ = false;
 };

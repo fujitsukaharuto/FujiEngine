@@ -1,5 +1,6 @@
 #include "Line3dDrawer.h"
 #include "Engine/DX/DXCom.h"
+#include "Engine/DX/DX12Helper.h"
 #include "Camera.h"
 
 using namespace Graphics;
@@ -24,7 +25,7 @@ std::unique_ptr<Line3dDrawer::LineData> Line3dDrawer::CreateMesh(UINT vertexCoun
 
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
 		UINT vertBufferSize = sizeof(VertexPosColor) * vertexCount;
-		mesh->vertBuffer[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), vertBufferSize);
+		mesh->vertBuffer[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), vertBufferSize);
 
 		mesh->vbView.StrideInBytes = sizeof(VertexPosColor);
 		mesh->vbView.SizeInBytes = vertBufferSize;
@@ -35,7 +36,7 @@ std::unique_ptr<Line3dDrawer::LineData> Line3dDrawer::CreateMesh(UINT vertexCoun
 
 	UINT indexBufferSize = sizeof(uint16_t) * indexCount;
 	if (indexCount > 0) {
-		mesh->indexBuffer = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), indexBufferSize);
+		mesh->indexBuffer = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), indexBufferSize);
 
 		mesh->ibView.BufferLocation = mesh->indexBuffer->GetGPUVirtualAddress();
 		mesh->ibView.Format = DXGI_FORMAT_R16_UINT;
@@ -190,7 +191,7 @@ void Line3dDrawer::CreateMeshes() {
 
 void Line3dDrawer::CreateResource() {
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
-		cBufferResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(CBuffer));
+		cBufferResource_[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(CBuffer));
 		cBufferData_[i] = nullptr;
 		cBufferResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&cBufferData_[i]));
 		cBufferData_[i]->viewProject = MakeIdentity4x4();

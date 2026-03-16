@@ -1,6 +1,7 @@
 #include "AnimationModel.h"
 #include "Model/ModelManager.h"
 #include "Engine/DX/DXCom.h"
+#include "Engine/DX/DX12Helper.h"
 #include "DX/SRVManager.h"
 #include "LightManager.h"
 #include "Engine/Model/Line3dDrawer.h"
@@ -188,7 +189,7 @@ SkinCluster AnimationModel::CreateSkinCluster(const Skeleton& skeleton, const Mo
 
 	// MatrixPalette
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
-		skinCluster.paletteResource[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(WellForGPU) * skeleton.joints.size());
+		skinCluster.paletteResource[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(WellForGPU) * skeleton.joints.size());
 		WellForGPU* mappedPalette = nullptr;
 		skinCluster.paletteResource[i]->Map(0, nullptr, reinterpret_cast<void**>(&mappedPalette));
 		skinCluster.mappedPalette[i] = { mappedPalette,skeleton.joints.size() };
@@ -202,7 +203,7 @@ SkinCluster AnimationModel::CreateSkinCluster(const Skeleton& skeleton, const Mo
 
 
 	// InfluenceResource
-	skinCluster.influenceResource = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(VertexInfluence) * modelData.vertices.size());
+	skinCluster.influenceResource = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(VertexInfluence) * modelData.vertices.size());
 	VertexInfluence* mappedInfluence = nullptr;
 	skinCluster.influenceResource->Map(0, nullptr, reinterpret_cast<void**>(&mappedInfluence));
 	std::memset(mappedInfluence, 0, sizeof(VertexInfluence) * modelData.vertices.size());
@@ -262,7 +263,7 @@ SkinCluster AnimationModel::CreateSkinCluster(const Skeleton& skeleton, const Mo
 	uint32_t elementCount = static_cast<uint32_t>(skinCluster.meshSections.size());
 	uint32_t bufferSize = elementSize * elementCount;
 
-	skinCluster.meshSectionResource = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), bufferSize);
+	skinCluster.meshSectionResource = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), bufferSize);
 
 	// マップして meshSections のデータをコピー
 	MeshSection* mapped = nullptr;
@@ -600,14 +601,14 @@ int32_t AnimationModel::CreateJoint(const Node& node, const std::optional<int32_
 
 void AnimationModel::CreateWVP() {
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
-		wvpResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(TransformationMatrix));
+		wvpResource_[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(TransformationMatrix));
 		wvpDate_[i] = nullptr;
 		wvpResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&wvpDate_[i]));
 		wvpDate_[i]->WVP = MakeIdentity4x4();
 		wvpDate_[i]->World = MakeIdentity4x4();
 		wvpDate_[i]->WorldInverseTransPose = Transpose(Inverse(wvpDate_[i]->World));
 
-		cameraPosResource_[i] = dxcommon_->CreateBufferResource(dxcommon_->GetDevice(), sizeof(DirectionalLight));
+		cameraPosResource_[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(DirectionalLight));
 		cameraPosData_[i] = nullptr;
 		cameraPosResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&cameraPosData_[i]));
 		cameraPosData_[i]->worldPosition = camera_->GetTranslate();
