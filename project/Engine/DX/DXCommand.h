@@ -2,6 +2,8 @@
 #include <wrl/client.h>
 #include <d3d12.h>
 #include <cmath>
+#include <memory>
+#include "CommandContext.h"
 #include "Engine/DX/FrameCount.h"
 
 using namespace Microsoft::WRL;
@@ -74,51 +76,29 @@ namespace DXC {
 
 		//========================================================================*/
 		//* Getter
-		ID3D12CommandQueue* GetQueue() const { return queue_.Get(); }
-		ID3D12CommandQueue* GetComputeQueue() const { return computeQueue_.Get(); }
-		ID3D12GraphicsCommandList* GetList() const { return list_.Get(); }
-		ID3D12GraphicsCommandList* GetComputeList() const { return computeList_.Get(); }
-		ID3D12GraphicsCommandList* GetImmediateList() const { return immediateList_.Get(); }
+		ID3D12CommandQueue* GetQueue() const { return graphicsContext_->GetQueue(); }
+		ID3D12CommandQueue* GetComputeQueue() const { return computeContext_->GetQueue(); }
+		ID3D12GraphicsCommandList* GetList() const { return graphicsContext_->GetList(); }
+		ID3D12GraphicsCommandList* GetComputeList() const { return computeContext_->GetList(); }
+		ID3D12GraphicsCommandList* GetImmediateList() const { return immediateContext_->GetList(); }
 		uint32_t GetNowFrameIndex() { return frameIndex_; }
 
+		//========================================================================*/
+		//* Setter
 		void SetFrameIndex(uint32_t frameIndex) { frameIndex_ = frameIndex; }
 
 	private:
 
-		// Queueの初期化
-		void InitDefaultQueue(ID3D12Device* device);
-		void InitComputeQueue(ID3D12Device* device);
-		void InitImmediateQueue(ID3D12Device* device);
 
 	private:
 
-		ComPtr<ID3D12CommandQueue> queue_ = nullptr;
-		ComPtr<ID3D12CommandAllocator> allocator_[kFrameCount_];
-		ComPtr<ID3D12GraphicsCommandList> list_ = nullptr;
-
-		ComPtr<ID3D12Fence> fence_ = nullptr;
-		uint64_t fenceValue_[kFrameCount_];
-
-		ComPtr<ID3D12CommandQueue> computeQueue_ = nullptr;
-		ComPtr<ID3D12CommandAllocator> computeAllocator_[kFrameCount_];
-		ComPtr<ID3D12GraphicsCommandList> computeList_ = nullptr;
-
-		ComPtr<ID3D12Fence> computeFence_ = nullptr;
-		uint64_t computeFenceValue_[kFrameCount_];
-
-
-		uint64_t globalFenceValue_ = 0;
-		uint64_t globalComputeFenceValue_ = 0;
 		uint32_t frameIndex_ = 0;
 
 		D3D12_VIEWPORT viewport_{};
 		D3D12_RECT scissor_{};
 
-
-		ComPtr<ID3D12CommandAllocator> immediateAllocator_;
-		ComPtr<ID3D12GraphicsCommandList> immediateList_;
-
-		ComPtr<ID3D12Fence> immediateFence_;
-		uint64_t immediateFenceValue_ = 0;
+		std::unique_ptr<CommandContext> graphicsContext_;
+		std::unique_ptr<CommandContext> computeContext_;
+		std::unique_ptr<CommandContext> immediateContext_;
 	};
 }

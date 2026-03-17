@@ -407,6 +407,9 @@
     <ClCompile Include="Engine\DX\DX12Helper.cpp">
       <Filter>Engine\DX</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\DX\CommandContext.cpp">
+      <Filter>Engine\DX</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -863,6 +866,9 @@
       <Filter>Engine\DX</Filter>
     </ClInclude>
     <ClInclude Include="Engine\DX\DX12Helper.h">
+      <Filter>Engine\DX</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\DX\CommandContext.h">
       <Filter>Engine\DX</Filter>
     </ClInclude>
   </ItemGroup>

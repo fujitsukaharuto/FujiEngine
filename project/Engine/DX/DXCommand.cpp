@@ -8,30 +8,21 @@ using namespace Core;
 
 
 DXCommand::~DXCommand() {
-
-	list_.Reset();
-	for (uint32_t i = 0; i < kFrameCount_; ++i) {
-		allocator_[i].Reset();
-	}
-	fence_.Reset();
-	queue_.Reset();
-
 }
 
 
 void DXCommand::Initialize(ID3D12Device* device) {
-	/// ------------------------------------------
-	/// queue-------------------------------------
-	InitDefaultQueue(device);
+	graphicsContext_ = std::make_unique<CommandContext>();
+	graphicsContext_->Initialize(device, D3D12_COMMAND_LIST_TYPE_DIRECT);
 
-	/// ------------------------------------------
-	/// Compute Queue の追加
-	/// ------------------------------------------
-	InitComputeQueue(device);
+	// コンピュート用コンテキストの初期化
+	computeContext_ = std::make_unique<CommandContext>();
+	computeContext_->Initialize(device, D3D12_COMMAND_LIST_TYPE_COMPUTE);
 
-	/// ------------------------------------------
-	/// immediateQueue----------------------------
-	InitImmediateQueue(device);
+	// 初期化用キュー
+	immediateContext_ = std::make_unique<CommandContext>();
+	immediateContext_->Initialize(device, D3D12_COMMAND_LIST_TYPE_DIRECT);
+	immediateContext_->Reset(frameIndex_);
 
 	/// viewScissor-------------------------------
 	viewport_.Width = MyWin::kWindowWidth;
@@ -49,279 +40,94 @@ void DXCommand::Initialize(ID3D12Device* device) {
 
 void DXCommand::Flush() {
 	// Compute側のQueueのGPU実行を待つ
-	{
-		globalComputeFenceValue_++;
-		computeFenceValue_[frameIndex_] = globalComputeFenceValue_;
-		const uint64_t fenceToWait = computeFenceValue_[frameIndex_];
-		computeQueue_->Signal(computeFence_.Get(), fenceToWait);
+	computeContext_->Signal(frameIndex_);
+	computeContext_->WaitForGPU(frameIndex_);
 
-		HANDLE fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-		computeFence_->SetEventOnCompletion(fenceToWait, fenceEvent);
-		WaitForSingleObject(fenceEvent, INFINITE);
-		CloseHandle(fenceEvent);
-	}
 	// Graphics側のQueueのGPU実行を待つ
-	{
-		globalFenceValue_++;
-		fenceValue_[frameIndex_] = globalFenceValue_;
-		const uint64_t fenceToWait = fenceValue_[frameIndex_];
-		queue_->Signal(fence_.Get(), fenceToWait);
-
-		HANDLE fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-		fence_->SetEventOnCompletion(fenceToWait, fenceEvent);
-		WaitForSingleObject(fenceEvent, INFINITE);
-		CloseHandle(fenceEvent);
-	}
+	graphicsContext_->Signal(frameIndex_);
+	graphicsContext_->WaitForGPU(frameIndex_);
 }
 
 void DXCommand::Close(uint32_t index) {
 
-	HRESULT hr;
 	if (index == 0) {
-		hr = list_->Close();
-		assert(SUCCEEDED(hr));
+		graphicsContext_->Close();
 	} else {
-		hr = immediateList_->Close();
-		assert(SUCCEEDED(hr));
+		immediateContext_->Close();
 	}
 }
 
 void DXCommand::Execution(uint32_t index) {
 
 	if (index == 0) {
-		ComPtr<ID3D12CommandList> commandLists[] = { list_.Get() };
-		queue_->ExecuteCommandLists(1, commandLists->GetAddressOf());
+		graphicsContext_->Execute();
 	} else {
-		ComPtr<ID3D12CommandList> commandLists[] = { immediateList_.Get() };
-		queue_->ExecuteCommandLists(1, commandLists->GetAddressOf());
+		immediateContext_->Execute();
 	}
 }
 
 void DXC::DXCommand::ComputeExecution() {
-	HRESULT hr;
-	hr = computeList_->Close();
-	assert(SUCCEEDED(hr));
-	ComPtr<ID3D12CommandList> computeCommandLists[] = { computeList_.Get() };
-	computeQueue_->ExecuteCommandLists(1, computeCommandLists->GetAddressOf());
+	computeContext_->Close();
+	computeContext_->Execute();
 }
 
 void DXC::DXCommand::GPUSignal(uint32_t index) {
 	// コマンドリストの実行完了を待つ
 	if (index == 0) {
-		globalFenceValue_++;
-		queue_->Signal(fence_.Get(), globalFenceValue_);
-		fenceValue_[frameIndex_] = globalFenceValue_;
+		graphicsContext_->Signal(frameIndex_);
 	} else {
-		const uint64_t fenceToWait = ++immediateFenceValue_;
-		queue_->Signal(immediateFence_.Get(), fenceToWait);
+		immediateContext_->Signal(frameIndex_);
 	}
 }
 
 void DXC::DXCommand::GPUComputeSignal() {
-	globalComputeFenceValue_++;
-	computeQueue_->Signal(computeFence_.Get(), globalComputeFenceValue_);
-	computeFenceValue_[frameIndex_] = globalComputeFenceValue_;
+	computeContext_->Signal(frameIndex_);
 }
 
 void DXC::DXCommand::WaitForGPU(uint32_t index) {
 	if (index == 0) {
-		if (computeFenceValue_[frameIndex_] != 0) { // ComputeQueueを待つ
-			if (computeFence_->GetCompletedValue() < computeFenceValue_[frameIndex_]) {
-				HANDLE fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-				assert(fenceEvent != nullptr);
-
-				computeFence_->SetEventOnCompletion(computeFenceValue_[frameIndex_], fenceEvent);
-				WaitForSingleObject(fenceEvent, INFINITE);
-				CloseHandle(fenceEvent);
-			}
+		if (computeContext_->GetFenceValue(frameIndex_) != 0) { // ComputeQueueを待つ
+			computeContext_->WaitForGPU(frameIndex_);
 		}
 
-		if (fenceValue_[frameIndex_] != 0) { // DefaultQueueを待つ
-			if (fence_->GetCompletedValue() < fenceValue_[frameIndex_]) {
-
-				HANDLE fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-				assert(fenceEvent != nullptr);
-
-				fence_->SetEventOnCompletion(fenceValue_[frameIndex_], fenceEvent);
-				WaitForSingleObject(fenceEvent, INFINITE);
-				CloseHandle(fenceEvent);
-				Logger::LogF("frame=%llu idx=%u fence=%llu completed=%llu",
-					globalFenceValue_,
-					frameIndex_,
-					fenceValue_[frameIndex_],
-					fence_->GetCompletedValue());
-			}
+		if (graphicsContext_->GetFenceValue(frameIndex_) != 0) { // DefaultQueueを待つ
+			graphicsContext_->WaitForGPU(frameIndex_, true);
 		}
 	} else {
-		if (immediateFence_->GetCompletedValue() < immediateFenceValue_) { // ImmediateQueueを待つ
-
-			HANDLE fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-			assert(fenceEvent != nullptr);
-
-			immediateFence_->SetEventOnCompletion(immediateFenceValue_, fenceEvent);
-			WaitForSingleObject(fenceEvent, INFINITE);
-			CloseHandle(fenceEvent);
-		}
+		immediateContext_->WaitForGPU(frameIndex_);
 	}
 }
 
 void DXC::DXCommand::WaitComputeInGraphicsQueue() {
-	queue_->Wait(computeFence_.Get(), computeFenceValue_[frameIndex_]);
+	graphicsContext_->WaitQueueFor(computeContext_.get(), frameIndex_);
 }
 
 void DXCommand::Reset(uint32_t index) {
-
-	HRESULT hr;
-
 	WaitForGPU();
 	if (index == 0) {
-		hr = allocator_[frameIndex_]->Reset();
-		assert(SUCCEEDED(hr));
-		hr = list_->Reset(allocator_[frameIndex_].Get(), nullptr);
-		assert(SUCCEEDED(hr));
+		graphicsContext_->Reset(frameIndex_);
 
-		hr = computeAllocator_[frameIndex_]->Reset();
-		assert(SUCCEEDED(hr));
-		hr = computeList_->Reset(computeAllocator_[frameIndex_].Get(), nullptr);
-		assert(SUCCEEDED(hr));
+		computeContext_->Reset(frameIndex_);
 	} else {
-		hr = immediateAllocator_->Reset();
-		assert(SUCCEEDED(hr));
-
-		hr = immediateList_->Reset(immediateAllocator_.Get(), nullptr);
-		assert(SUCCEEDED(hr));
+		immediateContext_->Reset(frameIndex_);
 	}
 }
 
 void DXCommand::PerFrameWait() {
 	uint32_t waitFrame = (frameIndex_ + kFrameCount_ - 1) % kFrameCount_;
 
-	if (computeFenceValue_[waitFrame] != 0) {
-		if (computeFence_->GetCompletedValue() < computeFenceValue_[waitFrame]) {
-			HANDLE fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-			assert(fenceEvent != nullptr);
-
-			computeFence_->SetEventOnCompletion(computeFenceValue_[waitFrame], fenceEvent);
-			WaitForSingleObject(fenceEvent, INFINITE);
-			CloseHandle(fenceEvent);
-		}
+	if (computeContext_->GetFenceValue(waitFrame) != 0) {
+		computeContext_->WaitForGPU(waitFrame);
 	}
 
-	if (fenceValue_[waitFrame] != 0) {
-		if (fence_->GetCompletedValue() < fenceValue_[waitFrame]) {
-
-			HANDLE fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-			assert(fenceEvent != nullptr);
-
-			fence_->SetEventOnCompletion(fenceValue_[waitFrame], fenceEvent);
-			WaitForSingleObject(fenceEvent, INFINITE);
-			CloseHandle(fenceEvent);
-		}
+	if (graphicsContext_->GetFenceValue(waitFrame) != 0) {
+		graphicsContext_->WaitForGPU(waitFrame);
 	}
 }
 
 void DXCommand::SetViewAndScissor(UINT width, UINT height) {
-	viewport_.Width = static_cast<FLOAT>(width);
-	viewport_.Height = static_cast<FLOAT>(height);
-	viewport_.TopLeftX = 0;
-	viewport_.TopLeftY = 0;
-	viewport_.MinDepth = 0.0f;
-	viewport_.MaxDepth = 1.0f;
-
-	scissor_.left = 0;
-	scissor_.right = static_cast<LONG>(width);
-	scissor_.top = 0;
-	scissor_.bottom = static_cast<LONG>(height);
-
-	list_->RSSetViewports(1, &viewport_);
-	list_->RSSetScissorRects(1, &scissor_);
-}
-
-void DXCommand::InitDefaultQueue(ID3D12Device* device) {
-	HRESULT hr;
-
-	D3D12_COMMAND_QUEUE_DESC queueDesc{};
-	hr = device->CreateCommandQueue(
-		&queueDesc, IID_PPV_ARGS(&queue_));
-	assert(SUCCEEDED(hr));
-
-	/// allocator---------------------------------
-	for (uint32_t i = 0; i < kFrameCount_; ++i) {
-		hr = device->CreateCommandAllocator(
-			D3D12_COMMAND_LIST_TYPE_DIRECT,
-			IID_PPV_ARGS(&allocator_[i]));
-		assert(SUCCEEDED(hr));
-	}
-
-	/// list--------------------------------------
-	hr = device->CreateCommandList(
-		0, D3D12_COMMAND_LIST_TYPE_DIRECT,
-		allocator_[0].Get(), nullptr, IID_PPV_ARGS(&list_));
-	assert(SUCCEEDED(hr));
-	list_->Close();
-
-	/// fence-------------------------------------
-	for (uint32_t i = 0; i < kFrameCount_; ++i) {
-		fenceValue_[i] = 0;
-	}
-	hr = device->CreateFence(fenceValue_[0], D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence_));
-	assert(SUCCEEDED(hr));
-}
-
-void DXCommand::InitComputeQueue(ID3D12Device* device) {
-	HRESULT hr;
-
-	D3D12_COMMAND_QUEUE_DESC computeQueueDesc{};
-	computeQueueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
-	computeQueueDesc.Type = D3D12_COMMAND_LIST_TYPE_COMPUTE;
-	hr = device->CreateCommandQueue(&computeQueueDesc, IID_PPV_ARGS(&computeQueue_));
-	assert(SUCCEEDED(hr));
-
-	// Resourceバリアをはる
-	for (uint32_t i = 0; i < kFrameCount_; ++i) {// Frame数分
-		hr = device->CreateCommandAllocator(
-			D3D12_COMMAND_LIST_TYPE_COMPUTE,
-			IID_PPV_ARGS(&computeAllocator_[i]));
-		assert(SUCCEEDED(hr));
-	}
-
-	hr = device->CreateCommandList(
-		0, D3D12_COMMAND_LIST_TYPE_COMPUTE,
-		computeAllocator_[0].Get(), nullptr, IID_PPV_ARGS(&computeList_));
-	assert(SUCCEEDED(hr));
-	computeList_->Close();
-
-	for (uint32_t i = 0; i < kFrameCount_; ++i) {
-		computeFenceValue_[i] = 0;
-	}
-	hr = device->CreateFence(computeFenceValue_[0], D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&computeFence_));
-	assert(SUCCEEDED(hr));
-}
-
-void DXCommand::InitImmediateQueue(ID3D12Device* device) {
-	HRESULT hr;
-
-	hr = device->CreateCommandAllocator(
-		D3D12_COMMAND_LIST_TYPE_DIRECT,
-		IID_PPV_ARGS(&immediateAllocator_));
-	assert(SUCCEEDED(hr));
-
-
-	/// immediate list -----------------------------
-	hr = device->CreateCommandList(
-		0,
-		D3D12_COMMAND_LIST_TYPE_DIRECT,
-		immediateAllocator_.Get(),
-		nullptr,
-		IID_PPV_ARGS(&immediateList_));
-	assert(SUCCEEDED(hr));
-
-
-	/// immediate fence ----------------------------
-	hr = device->CreateFence(
-		0,
-		D3D12_FENCE_FLAG_NONE,
-		IID_PPV_ARGS(&immediateFence_));
-	assert(SUCCEEDED(hr));
-	immediateFenceValue_ = 0;
+	D3D12_VIEWPORT viewport{ 0.0f, 0.0f, (float)width, (float)height, 0.0f, 1.0f };
+	D3D12_RECT scissor{ 0, 0, static_cast<LONG>(width), static_cast<LONG>(height) };
+	graphicsContext_->GetList()->RSSetViewports(1, &viewport);
+	graphicsContext_->GetList()->RSSetScissorRects(1, &scissor);
 }
