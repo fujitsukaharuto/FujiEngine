@@ -102,6 +102,11 @@ public:
 	void PreGPUParticleDraw();
 	void PostGPUParticleDraw();
 
+	//========================================================================*/
+	//* Outlineの描画処理を行う際の関数群
+	void PreOutline();
+	void PostOutline();
+
 	/// <summary>
 	/// バリアの変更
 	/// </summary>
@@ -121,16 +126,6 @@ public:
 	/// </summary>
 	/// <param name="resource">リソース</param>
 	void InsertUAVBarrierForCompute(ID3D12Resource* resource);
-
-	/// <summary>
-	/// OutLine実行前に呼び出す関数
-	/// </summary>
-	void PreOutline();
-
-	/// <summary>
-	/// OutLine実行後に呼び出す関数
-	/// </summary>
-	void PostOutline();
 
 	//========================================================================*/
 	//* Getter

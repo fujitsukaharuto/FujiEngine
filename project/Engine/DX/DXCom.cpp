@@ -202,6 +202,15 @@ void DXCom::PostGPUParticleDraw() {
 	offscreen_->SynthesisGPURTV();
 }
 
+void DXCom::PreOutline() {
+	TransitionResource(swapChainManager_->GetDSVResource(GetNowFrameCount()),
+		D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+}
+
+void DXCom::PostOutline() {
+	TransitionResource(swapChainManager_->GetDSVResource(GetNowFrameCount()),
+		D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_DEPTH_WRITE);
+}
 
 void DXCom::TransitionResource(ID3D12Resource* resource, D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after) {
 	if (before == after) return;
@@ -235,14 +244,4 @@ void DXCom::InsertUAVBarrierForCompute(ID3D12Resource* resource) {
 
 	// Resourceバリアをはる
 	command_->GetComputeList()->ResourceBarrier(1, &barrier);
-}
-
-void DXCom::PreOutline() {
-	TransitionResource(swapChainManager_->GetDSVResource(GetNowFrameCount()),
-		D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
-}
-
-void DXCom::PostOutline() {
-	TransitionResource(swapChainManager_->GetDSVResource(GetNowFrameCount()),
-		D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_DEPTH_WRITE);
 }
