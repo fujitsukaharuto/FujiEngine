@@ -1,8 +1,7 @@
 #pragma once
 #include "Math/Vector/Vector3.h"
 #include "Math/Vector/Vector2.h"
-#include "Math/Matrix/MatrixCalculation.h"
-#include "Engine/Model/AnimationData/AnimationStructs.h"
+#include "Math/Vector/Vector4.h"
 
 #include <d3d12.h>
 #include <vector>
@@ -16,7 +15,6 @@ namespace Graphics {
 	/// </summary>
 	class Mesh {
 	public:
-
 		/// <summary>
 		/// メッシュのVertexData
 		/// </summary>
@@ -41,10 +39,10 @@ namespace Graphics {
 		Mesh();
 		~Mesh();
 
-		/// <summary>メッシュの生成</summary>
+		/// <summary>メッシュ（頂点・インデックスバッファ）の生成</summary>
 		void CreateMesh();
 
-		/// <summary>UAVの生成</summary>
+		/// <summary>コンピュートシェーダー(スキニング)用のUAV/SRV生成</summary>
 		void CreateUAV();
 
 		/// <summary>Vertexの追加</summary>
@@ -53,37 +51,37 @@ namespace Graphics {
 		/// <summary>Indexの追加</summary>
 		void AddIndex(uint32_t index);
 
-		void Draw(ID3D12GraphicsCommandList* commandList);
+		//========================================================================*/
+		//* Getter
+		const D3D12_VERTEX_BUFFER_VIEW& GetVBV() const { return vertexBufferView_; }
+		const D3D12_INDEX_BUFFER_VIEW& GetIBV() const { return indexBufferView_; }
+		const D3D12_VERTEX_BUFFER_VIEW& GetSkinnedVBV() const { return skinnedVBV_; }
 
-		void AnimationDraw(const SkinCluster& skinCluster, ID3D12GraphicsCommandList* commandList, int index);
+		size_t GetVertexCount() const { return vertexData_.size(); }
+		size_t GetIndexCount() const { return indexData_.size(); }
 
-		/// <summary>バリアの変更</summary>
-		void TransBarrier();
-
-		/// <summary>ディスパッチ処理</summary>
-		void CSDispatch(ID3D12GraphicsCommandList* commandList);
-
-		size_t GetVertexDataSize() { return vertexData_.size(); }
-
-		// MeshDraw
-		void MeshDraw(ID3D12GraphicsCommandList* commandList, int drawCount = 1);
+		// バリア遷移やComputeShader用
+		ID3D12Resource* GetSkinnedResource() const { return skinnedVertexBuffer_.Get(); }
+		std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> GetSrvHandle() const { return srvHandle_; }
+		std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> GetUavHandle() const { return uavHandle_; }
 
 	private:
-
 		DXCom* dxcommon_;
+
+		std::vector<VertexData> vertexData_;
+		std::vector<uint32_t>   indexData_;
 
 		Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_ = nullptr;
 		D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
-		std::vector<VertexData> vertexData_;
-		std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> srvHandle;
-
-		ComPtr<ID3D12Resource> skinnedVertexBuffer_;
-		D3D12_VERTEX_BUFFER_VIEW skinnedVBV_;
-		std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> skinnedSrvHandle;
 
 		Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_ = nullptr;
 		D3D12_INDEX_BUFFER_VIEW indexBufferView_{};
-		std::vector<uint32_t> indexData_;
 
+		// --- アニメーション(CS)用リソース ---
+		Microsoft::WRL::ComPtr<ID3D12Resource> skinnedVertexBuffer_ = nullptr;
+		D3D12_VERTEX_BUFFER_VIEW skinnedVBV_{};
+
+		std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> srvHandle_;
+		std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> uavHandle_;
 	};
 }

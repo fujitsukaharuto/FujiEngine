@@ -297,15 +297,12 @@ void AnimationModel::AnimationUpdate() {
 }
 
 void AnimationModel::CSDispatch() {
-	model_->CSDispatch(skinCluster_, dxcommon_->GetCommandList(), dxcommon_->GetNowFrameCount());
+	model_->CSDispatch(dxcommon_,skinCluster_, dxcommon_->GetCommandList(), dxcommon_->GetNowFrameCount());
 }
 
 void AnimationModel::Draw(Material* mate) {
 	SetWVP();
 
-	if (model_ && !isMirrorObj_) {
-		model_->TransBarrier();
-	}
 
 	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
 	dxcommon_->GetDXCommand()->SetViewAndScissor(MyWin::kWindowWidth, MyWin::kWindowHeight);
@@ -320,7 +317,7 @@ void AnimationModel::Draw(Material* mate) {
 	cList->SetGraphicsRootDescriptorTable(7, environment_->gpuHandle);
 
 	if (model_ && !isMirrorObj_) {
-		model_->AnimationDraw(skinCluster_, cList, mate);
+		model_->AnimationDraw(dxcommon_, cList, mate);
 	} else if (isMirrorObj_) {
 		model_->Draw(cList, mate);
 	}

@@ -79,10 +79,7 @@ namespace Graphics {
 		void Draw(ID3D12GraphicsCommandList* commandList, Material* mate);
 
 		/// <summary>アニメーションモデル用描画</summary>
-		void AnimationDraw(const SkinCluster& skinCluster, ID3D12GraphicsCommandList* commandList, Material* mate);
-
-		/// <summary>バリアの変更</summary>
-		void TransBarrier();
+		void AnimationDraw(DXCom* pDxcom, ID3D12GraphicsCommandList* commandList, Material* mate);
 
 		/// <summary>マテリアルの追加</summary>
 		void AddMaterial(const Material& material);
@@ -121,10 +118,10 @@ namespace Graphics {
 		Math::Vector4 GetColor(int index) { return material_[index].GetColor(); }
 		Math::Vector2 GetUVScale() { return uvScale_; }
 		Math::Vector2 GetUVTrans() { return uvTrans_; }
-		size_t GetVertexSize(int i) { return mesh_[i].GetVertexDataSize(); }
+		size_t GetVertexSize(int i) { return mesh_[i].GetVertexCount(); }
 		ModelData& GetModelData() { return data_; }
 
-		void CSDispatch(const SkinCluster& skinCluster, ID3D12GraphicsCommandList* commandList, uint32_t frameIndex);
+		void CSDispatch(DXCom* pDxcom, const SkinCluster& skinCluster, ID3D12GraphicsCommandList* commandList, uint32_t frameIndex);
 		void MeshDraw(ID3D12GraphicsCommandList* commandList, Material* mate, int drawCount = 1);
 
 	private:

@@ -25,11 +25,14 @@ void Model::Draw(ID3D12GraphicsCommandList* commandList, Material* mate = nullpt
 			commandList->SetGraphicsRootConstantBufferView(0, material_[index].GetMaterialResource()->GetGPUVirtualAddress());
 			commandList->SetGraphicsRootDescriptorTable(2, material_[index].GetTexture()->gpuHandle);
 		}
-		mesh_[index].Draw(commandList);
+
+		commandList->IASetVertexBuffers(0, 1, &mesh_[index].GetVBV());
+		commandList->IASetIndexBuffer(&mesh_[index].GetIBV());
+		commandList->DrawIndexedInstanced(static_cast<UINT>(mesh_[index].GetIndexCount()), 1, 0, 0, 0);
 	}
 }
 
-void Model::AnimationDraw(const SkinCluster& skinCluster, ID3D12GraphicsCommandList* commandList, Material* mate) {
+void Model::AnimationDraw(DXCom* pDxcom, ID3D12GraphicsCommandList* commandList, Material* mate) {
 	int vertexOffset = 0;
 	for (uint32_t index = 0; index < mesh_.size(); ++index) {
 		if (mate) {
@@ -39,15 +42,16 @@ void Model::AnimationDraw(const SkinCluster& skinCluster, ID3D12GraphicsCommandL
 			commandList->SetGraphicsRootConstantBufferView(0, material_[index].GetMaterialResource()->GetGPUVirtualAddress());
 			commandList->SetGraphicsRootDescriptorTable(2, material_[index].GetTexture()->gpuHandle);
 		}
-		mesh_[index].AnimationDraw(skinCluster, commandList, vertexOffset);
-		vertexOffset = 0;
-		vertexOffset += int(mesh_[index].GetVertexDataSize());
-	}
-}
 
-void Model::TransBarrier() {
-	for (uint32_t index = 0; index < mesh_.size(); ++index) {
-		mesh_[index].TransBarrier();
+		commandList->IASetVertexBuffers(0, 1, &mesh_[index].GetSkinnedVBV());
+		commandList->IASetIndexBuffer(&mesh_[index].GetIBV());
+		commandList->DrawIndexedInstanced(static_cast<UINT>(mesh_[index].GetIndexCount()), 1, 0, 0, 0);
+
+		pDxcom->TransitionResource(mesh_[index].GetSkinnedResource(),
+			D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+
+		vertexOffset = 0;
+		vertexOffset += int(mesh_[index].GetVertexCount());
 	}
 }
 
@@ -73,7 +77,7 @@ void Model::CreateSkinningInformation(DXCom* pDxcom) {
 	infoData_ = nullptr;
 	skinningInformation_->Map(0, nullptr, reinterpret_cast<void**>(&infoData_));
 	for (int i = 0; i < mesh_.size(); i++) {
-		infoData_->numVertices += static_cast<int32_t>(mesh_[i].GetVertexDataSize());
+		infoData_->numVertices += static_cast<int32_t>(mesh_[i].GetVertexCount());
 	}
 }
 
@@ -128,7 +132,7 @@ void Model::SetLightEnable(LightMode mode) {
 	}
 }
 
-void Model::CSDispatch(const SkinCluster& skinCluster, ID3D12GraphicsCommandList* commandList, uint32_t frameIndex) {
+void Model::CSDispatch(DXCom* pDxcom, const SkinCluster& skinCluster, ID3D12GraphicsCommandList* commandList, uint32_t frameIndex) {
 	PipelineManager::GetInstance()->SetCSPipeline(Pipe::SkinningCS);
 	commandList->SetComputeRootDescriptorTable(0, skinCluster.paletteSrvHandle[frameIndex].second);        // t0
 	commandList->SetComputeRootDescriptorTable(2, skinCluster.influenceSrvHandle.second);      // t1, t2
@@ -138,7 +142,12 @@ void Model::CSDispatch(const SkinCluster& skinCluster, ID3D12GraphicsCommandList
 	// 各メッシュセクションごとにDispatch
 	for (uint32_t i = 0; i < static_cast<uint32_t>(skinCluster.meshSections.size()); ++i) {
 		// メッシュ側でSRVなどセット（頂点バッファやスキン出力先）
-		mesh_[i].CSDispatch(commandList);
+		commandList->SetComputeRootDescriptorTable(1, mesh_[i].GetSrvHandle().second);
+		commandList->SetComputeRootDescriptorTable(3, mesh_[i].GetUavHandle().second);
+
+		// バリアを張る
+		pDxcom->TransitionResource(mesh_[i].GetSkinnedResource(),
+			D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 
 		// RootConstantで meshIndex を送信（b1）
 		commandList->SetComputeRoot32BitConstants(6, 1, &i, 0);
@@ -159,6 +168,8 @@ void Model::MeshDraw(ID3D12GraphicsCommandList* commandList, Material* mate, int
 			commandList->SetGraphicsRootConstantBufferView(0, material_[index].GetMaterialResource()->GetGPUVirtualAddress());
 			commandList->SetGraphicsRootDescriptorTable(2, material_[index].GetTexture()->gpuHandle);
 		}
-		mesh_[index].MeshDraw(commandList, drawCount);
+		commandList->IASetVertexBuffers(0, 1, &mesh_[index].GetVBV());
+		commandList->IASetIndexBuffer(&mesh_[index].GetIBV());
+		commandList->DrawIndexedInstanced(static_cast<UINT>(mesh_[index].GetIndexCount()), drawCount, 0, 0, 0);
 	}
 }

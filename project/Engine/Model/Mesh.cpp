@@ -6,7 +6,6 @@
 
 using namespace Graphics;
 
-
 Mesh::Mesh() {
 	dxcommon_ = ModelManager::GetInstance()->ShareDXCom();
 }
@@ -16,55 +15,86 @@ Mesh::~Mesh() {
 
 	vertexResource_.Reset();
 	vertexData_.clear();
+
 	indexResource_.Reset();
 	indexData_.clear();
 
+	skinnedVertexBuffer_.Reset();
 }
 
 void Mesh::CreateMesh() {
-	vertexResource_ = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(VertexData) * vertexData_.size());
+	if (vertexData_.empty() || indexData_.empty()) return;
+
+	auto device = dxcommon_->GetDevice();
+
+	// 頂点バッファの生成
+	size_t vertexBufferSize = sizeof(VertexData) * vertexData_.size();
+	vertexResource_ = DXC::Helper::CreateBufferResource(device, vertexBufferSize);
+
 	VertexData* vData = nullptr;
 	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vData));
-	std::memcpy(vData, vertexData_.data(), sizeof(VertexData) * vertexData_.size());
+	std::memcpy(vData, vertexData_.data(), vertexBufferSize);
+	vertexResource_->Unmap(0, nullptr);
 
 	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
-	vertexBufferView_.SizeInBytes = static_cast<UINT>(sizeof(VertexData) * vertexData_.size());
+	vertexBufferView_.SizeInBytes = static_cast<UINT>(vertexBufferSize);
 	vertexBufferView_.StrideInBytes = static_cast<UINT>(sizeof(VertexData));
 
-	uint32_t srvIndex = SRVManager::GetInstance()->Allocate();
-	srvHandle.first = SRVManager::GetInstance()->GetCPUDescriptorHandle(srvIndex);
-	srvHandle.second = SRVManager::GetInstance()->GetGPUDescriptorHandle(srvIndex);
+	// インデックスバッファの生成
+	size_t indexBufferSize = sizeof(uint32_t) * indexData_.size();
+	indexResource_ = DXC::Helper::CreateBufferResource(device, indexBufferSize);
 
-	SRVManager::GetInstance()->CreateStructuredSRV(srvIndex, vertexResource_.Get(),
-		static_cast<UINT>(vertexData_.size()), static_cast<UINT>(sizeof(VertexData)));
-
-	indexResource_ = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(uint32_t) * indexData_.size());
-	uint32_t* indexData = nullptr;
-	indexResource_->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
-	std::memcpy(indexData, indexData_.data(), sizeof(uint32_t) * indexData_.size());
+	uint32_t* iData = nullptr;
+	indexResource_->Map(0, nullptr, reinterpret_cast<void**>(&iData));
+	std::memcpy(iData, indexData_.data(), indexBufferSize);
+	indexResource_->Unmap(0, nullptr);
 
 	indexBufferView_.BufferLocation = indexResource_->GetGPUVirtualAddress();
+	indexBufferView_.SizeInBytes = static_cast<UINT>(indexBufferSize);
 	indexBufferView_.Format = DXGI_FORMAT_R32_UINT;
-	indexBufferView_.SizeInBytes = static_cast<UINT>(sizeof(uint32_t) * indexData_.size());
+
+	// ==========================================
+	// 3. 静的メッシュ用 SRV の生成 (必要に応じて)
+	// ==========================================
+	uint32_t srvIndex = SRVManager::GetInstance()->Allocate();
+	srvHandle_.first = SRVManager::GetInstance()->GetCPUDescriptorHandle(srvIndex);
+	srvHandle_.second = SRVManager::GetInstance()->GetGPUDescriptorHandle(srvIndex);
+
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+	srvDesc.Format = DXGI_FORMAT_UNKNOWN;
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+	srvDesc.Buffer.FirstElement = 0;
+	srvDesc.Buffer.NumElements = static_cast<UINT>(vertexData_.size());
+	srvDesc.Buffer.StructureByteStride = sizeof(VertexData);
+	srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
+
+	device->CreateShaderResourceView(vertexResource_.Get(), &srvDesc, srvHandle_.first);
 }
 
 void Mesh::CreateUAV() {
-	size_t sizeInBytes = sizeof(VertexData) * vertexData_.size();
+	if (vertexData_.empty()) return;
 
-	skinnedVertexBuffer_ = DXC::Helper::CreateUAVResource(dxcommon_->GetDevice(), sizeof(VertexData) * vertexData_.size());
+	auto device = dxcommon_->GetDevice();
+	size_t vertexBufferSize = sizeof(VertexData) * vertexData_.size();
 
-	// VBV設定
+	// ==========================================
+	// スキニング結果書き込み用 UAVバッファの生成
+	// ==========================================
+	skinnedVertexBuffer_ = DXC::Helper::CreateUAVResource(device, vertexBufferSize);
+
+	// VBVのセットアップ (描画時はこちらを使う)
 	skinnedVBV_.BufferLocation = skinnedVertexBuffer_->GetGPUVirtualAddress();
-	skinnedVBV_.SizeInBytes = static_cast<UINT>(sizeInBytes);
-	skinnedVBV_.StrideInBytes = sizeof(VertexData);
+	skinnedVBV_.SizeInBytes = static_cast<UINT>(vertexBufferSize);
+	skinnedVBV_.StrideInBytes = static_cast<UINT>(sizeof(VertexData));
 
-	uint32_t srvIndex = SRVManager::GetInstance()->Allocate();
-	skinnedSrvHandle.first = SRVManager::GetInstance()->GetCPUDescriptorHandle(srvIndex);
-	skinnedSrvHandle.second = SRVManager::GetInstance()->GetGPUDescriptorHandle(srvIndex);
+	// UAVの生成とディスクリプタヒープへの登録
+	uint32_t uavIndex = SRVManager::GetInstance()->Allocate();
+	uavHandle_.first = SRVManager::GetInstance()->GetCPUDescriptorHandle(uavIndex);
+	uavHandle_.second = SRVManager::GetInstance()->GetGPUDescriptorHandle(uavIndex);
 
-	SRVManager::GetInstance()->CreateStructuredUAV(srvIndex, skinnedVertexBuffer_.Get(),
+	SRVManager::GetInstance()->CreateStructuredUAV(uavIndex, skinnedVertexBuffer_.Get(),
 		static_cast<UINT>(vertexData_.size()), static_cast<UINT>(sizeof(VertexData)));
-
 }
 
 void Mesh::AddVertex(const VertexData& vertex) {
@@ -73,36 +103,4 @@ void Mesh::AddVertex(const VertexData& vertex) {
 
 void Mesh::AddIndex(uint32_t index) {
 	indexData_.push_back(index);
-}
-
-void Mesh::Draw(ID3D12GraphicsCommandList* commandList) {
-	commandList->IASetVertexBuffers(0, 1, &vertexBufferView_);
-	commandList->IASetIndexBuffer(&indexBufferView_);
-	commandList->DrawIndexedInstanced(static_cast<UINT>((indexData_.size())), 1, 0, 0, 0);
-}
-
-void Mesh::AnimationDraw([[maybe_unused]]const SkinCluster& skinCluster, ID3D12GraphicsCommandList* commandList, [[maybe_unused]] int index) {
-
-	commandList->IASetVertexBuffers(0, 1, &skinnedVBV_);
-	commandList->IASetIndexBuffer(&indexBufferView_);
-	commandList->DrawIndexedInstanced(static_cast<UINT>((indexData_.size())), 1, 0, 0, 0);
-
-	dxcommon_->TransitionResource(skinnedVertexBuffer_.Get(),
-		D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
-}
-
-void Mesh::TransBarrier() {
-	dxcommon_->TransitionResource(skinnedVertexBuffer_.Get(),
-		D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
-}
-
-void Mesh::CSDispatch(ID3D12GraphicsCommandList* commandList) {
-	commandList->SetComputeRootDescriptorTable(1, srvHandle.second);
-	commandList->SetComputeRootDescriptorTable(3, skinnedSrvHandle.second);
-}
-
-void Mesh::MeshDraw(ID3D12GraphicsCommandList* commandList, int drawCount) {
-	commandList->IASetVertexBuffers(0, 1, &vertexBufferView_);
-	commandList->IASetIndexBuffer(&indexBufferView_);
-	commandList->DrawIndexedInstanced(static_cast<UINT>((indexData_.size())), drawCount, 0, 0, 0);
 }
