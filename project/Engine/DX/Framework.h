@@ -10,6 +10,7 @@
 #include "ModelManager.h"
 #include "LightManager.h"
 #include "CameraManager.h"
+#include "Engine/Model/SpriteRenderer.h"
 #include "Particle/ParticleManager.h"
 #include "Scene//AbstractSceneFactory.h"
 #include "Scene/SceneManager.h"
@@ -74,6 +75,7 @@ namespace Core {
 		std::unique_ptr<SceneManager> sceneManager_ = nullptr;
 		Graphics::TextureManager* textureManager_ = nullptr;
 		Graphics::ModelManager* modelManager_ = nullptr;
+		Graphics::SpriteRenderer* spriteRenderer_ = nullptr;
 		CameraManager* cameraManager_ = nullptr;
 		ImGuiManager* imguiManager_ = nullptr;
 		std::unique_ptr<Graphics::LightManager> lightManager_ = nullptr;

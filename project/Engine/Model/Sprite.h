@@ -5,14 +5,13 @@
 #include "Object3d.h"
 #include "Engine/DX/FrameCount.h"
 
-
 class DXCom;
 class PointLight;
 class SpotLight;
 
 namespace Graphics {
 	/// <summary>
-	/// スプライト描画クラス
+	/// スプライト描画クラス（データ保持用）
 	/// </summary>
 	class Sprite {
 	public:
@@ -20,63 +19,40 @@ namespace Graphics {
 		~Sprite();
 
 	public:
-
-		/// <summary>
-		/// Textureのセット
-		/// </summary>
 		void Load(const std::string& fileName);
-
 		void Draw();
 
 		//========================================================================*/
 		//* Setter
-		/// <summary>スプライトの色の設定</summary>
 		void SetColor(const Math::Vector4& color);
-		/// <summary>スプライトの位置の設定</summary>
 		void SetPos(const Math::Vector3& pos);
-		/// <summary>スプライトのスケールの設定</summary>
 		void SetScale(const Math::Vector2& scale);
-		/// <summary>スプライトのサイズの設定</summary>
 		void SetSize(const Math::Vector2& size);
-		/// <summary>スプライトの回転の設定</summary>
 		void SetAngle(float rotate);
-		/// <summary>スプライトの基準点</summary>
 		void SetAnchor(const Math::Vector2& anchor);
-		/// <summary>左右反転</summary>
-		void SetFlipX(bool is) { isFlipX_ = is; }
-		/// <summary>上下反転</summary>
-		void SetFlipY(bool is) { isFlipY_ = is; }
-		/// <summary>スプライトの描画範囲指定</summary>
+
+		void SetFlipX(bool is) { isFlipX_ = is; SetWvp(); }
+		void SetFlipY(bool is) { isFlipY_ = is; SetWvp(); }
+
 		void SetRange(const Math::Vector2& leftTop, const Math::Vector2& size);
 
 		//========================================================================*/
 		//* Getter
 		Math::Vector2 GetDefaultSize() const { return defaultSize_; }
 
+		// ↓ レンダラーが描画に使うためのデータを渡すGetterを追加
+		D3D12_GPU_VIRTUAL_ADDRESS GetWvpGPUAddress(uint32_t frameIndex) const;
+		D3D12_GPU_VIRTUAL_ADDRESS GetMaterialGPUAddress() ;
+		D3D12_GPU_DESCRIPTOR_HANDLE GetTextureSRV() ;
+
 	private:
-
-		void InitializeBuffer();
-
 		void AdjustTextureSize();
-
 		void SetWvp();
 
 	private:
-
 		DXCom* dxcommon_;
 
-		Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_ = nullptr;
-		Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_ = nullptr;
-
-		VertexDate* vData;
-
-		D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
-		D3D12_INDEX_BUFFER_VIEW indexBufferView_{};
-
-		std::vector<VertexDate> vertex_;
-		std::vector<uint32_t> index_;
-
-
+		// WVPやカメラ、IDのバッファだけ残す（頂点バッファはRendererが持つため削除）
 		Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource_[DXC::kFrameCount_];
 		Math::TransformationMatrix* wvpDataGPU_[DXC::kFrameCount_];
 
@@ -86,7 +62,7 @@ namespace Graphics {
 		Microsoft::WRL::ComPtr<ID3D12Resource> objIDDataResource_ = nullptr;
 		ObjIDData* objIDData_ = nullptr;
 
-		Material material_;
+		Graphics::Material material_;
 		std::string nowTexture;
 
 		Math::Vector2 anchorPoint_{ 0.5f,0.5f };
@@ -98,6 +74,5 @@ namespace Graphics {
 
 		bool isFlipX_ = false;
 		bool isFlipY_ = false;
-
 	};
 }

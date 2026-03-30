@@ -3,13 +3,13 @@
 #include "Engine/DX/DX12Helper.h"
 #include "LightManager.h"
 #include "TextureManager.h"
+#include "SpriteRenderer.h"
 #include "Engine/Model/ModelManager.h"
 #include "Engine/Light/LightManager.h"
 
 using namespace Core;
 using namespace Graphics;
 using namespace Math;
-
 
 Sprite::Sprite() {
 	dxcommon_ = TextureManager::GetInstance()->ShareDXCom();
@@ -22,130 +22,9 @@ Sprite::~Sprite() {
 void Sprite::Load(const std::string& fileName) {
 	material_.SetTextureNamePath(fileName);
 	nowTexture = fileName;
-	InitializeBuffer();
-	SetAnchor({ 0.5f, 0.5f });
-	AdjustTextureSize();
-}
-
-void Sprite::Draw() {
-	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
-	
-	SetWvp();
-
-	dxcommon_->GetDXCommand()->SetViewAndScissor(MyWin::kWindowWidth, MyWin::kWindowHeight);
-	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Sprite);
-	dxcommon_->GetDXCommand()->GetList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
-	cList->IASetVertexBuffers(0, 1, &vertexBufferView_);
-	cList->IASetIndexBuffer(&indexBufferView_);
-	cList->SetGraphicsRootConstantBufferView(0, material_.GetMaterialResource()->GetGPUVirtualAddress());
-	cList->SetGraphicsRootConstantBufferView(1, wvpResource_[frameIndex]->GetGPUVirtualAddress());
-	cList->SetGraphicsRootDescriptorTable(2, material_.GetTexture()->gpuHandle);
-	cList->DrawIndexedInstanced(6, 1, 0, 0, 0);
-
-	ModelManager::GetInstance()->NormalCommand();
-}
-
-void Sprite::SetColor(const Vector4& color) {
-	material_.SetColor(color);
-}
-
-void Sprite::SetPos(const Vector3& pos) {
-	position_ = pos;
-}
-
-void Sprite::SetScale(const Vector2& scale) {
-	scale_ = scale;
-}
-
-void Sprite::SetSize(const Vector2& size) {
-	size_ = size;
-}
-
-void Sprite::SetAngle(float rotate) {
-	rotate_ = rotate;
-}
-
-void Sprite::SetAnchor(const Vector2& anchor) {
-	anchorPoint_ = anchor;
-
-	float left = 0.0f - anchorPoint_.x;
-	float right = 1.0f - anchorPoint_.x;
-	float top = 0.0f - anchorPoint_.y;
-	float bottom = 1.0f - anchorPoint_.y;
-
-	if (isFlipX_) {
-		left = -left;
-		right = -right;
-	}
-	if (isFlipY_) {
-		top = -top;
-		bottom = -bottom;
-	}
-
-	vertex_[0].position = { left,top,0.0f,1.0f };
-	vertex_[1].position = { left,bottom,0.0f,1.0f };
-	vertex_[2].position = { right,bottom,0.0f,1.0f };
-	vertex_[3].position = { right,top,0.0f,1.0f };
-	std::memcpy(vData, vertex_.data(), sizeof(VertexDate) * vertex_.size());
-}
-
-void Sprite::SetRange(const Vector2& leftTop, const Vector2& size) {
-	const DirectX::TexMetadata& meta = TextureManager::GetInstance()->GetMetaData(nowTexture);
-
-	float left = leftTop.x / meta.width;
-	float right = (leftTop.x + size.x) / meta.width;
-	float top = leftTop.y / meta.height;
-	float bottom = (leftTop.y + size.y) / meta.height;
-
-	vertex_[0].texcoord = { left,top };
-	vertex_[1].texcoord = { left,bottom };
-	vertex_[2].texcoord = { right,bottom };
-	vertex_[3].texcoord = { right,top };
-	std::memcpy(vData, vertex_.data(), sizeof(VertexDate) * vertex_.size());
-}
-
-void Sprite::InitializeBuffer() {
-	vertex_.push_back({ {0.0f,0.0f,0.0f,1.0f},{0.0f,0.0f},{0.0f,0.0f,-1.0f} });
-	vertex_.push_back({ {0.0f,1.0f,0.0f,1.0f},{0.0f,1.0f},{0.0f,0.0f,-1.0f} });
-	vertex_.push_back({ {1.0f,1.0f,0.0f,1.0f},{1.0f,1.0f},{0.0f,0.0f,-1.0f} });
-	vertex_.push_back({ {1.0f,0.0f,0.0f,1.0f},{1.0f,0.0f},{0.0f,0.0f,-1.0f} });
-
-	index_.push_back(0);
-	index_.push_back(3);
-	index_.push_back(1);
-
-	index_.push_back(1);
-	index_.push_back(3);
-	index_.push_back(2);
-
-
-	vertexResource_ = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(VertexDate) * vertex_.size());
-	indexResource_ = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(uint32_t) * index_.size());
-
-	vData = nullptr;
-	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vData));
-	std::memcpy(vData, vertex_.data(), sizeof(VertexDate) * vertex_.size());
-
-	// vertexのバッファ
-	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
-	vertexBufferView_.SizeInBytes = static_cast<UINT>(sizeof(VertexDate) * vertex_.size());
-	vertexBufferView_.StrideInBytes = static_cast<UINT>(sizeof(VertexDate));
-
-	uint32_t* iData = nullptr;
-	indexResource_->Map(0, nullptr, reinterpret_cast<void**>(&iData));
-	std::memcpy(iData, index_.data(), sizeof(uint32_t) * index_.size());
-
-	// indexのバッファ
-	indexBufferView_.BufferLocation = indexResource_->GetGPUVirtualAddress();
-	indexBufferView_.Format = DXGI_FORMAT_R32_UINT;
-	indexBufferView_.SizeInBytes = static_cast<UINT>(sizeof(uint32_t) * index_.size());
-
 
 	material_.CreateMaterial();
 	material_.SetLightEnable(LightMode::kLightNone);
-
 
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
 		wvpResource_[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(TransformationMatrix));
@@ -155,14 +34,63 @@ void Sprite::InitializeBuffer() {
 		cameraPosResource_[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(DirectionalLight));
 		cameraPosData_[i] = nullptr;
 		cameraPosResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&cameraPosData_[i]));
-		cameraPosData_[i]->worldPosition = {0.0f,0.0f,0.0f};
+		cameraPosData_[i]->worldPosition = { 0.0f,0.0f,0.0f };
 	}
-	SetWvp();
 
 	objIDDataResource_ = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(ObjIDData));
 	objIDData_ = nullptr;
 	objIDDataResource_->Map(0, nullptr, reinterpret_cast<void**>(&objIDData_));
 	objIDData_->objID = -1;
+
+	SetAnchor({ 0.5f, 0.5f });
+	AdjustTextureSize();
+}
+
+void Sprite::Draw() {
+	SetWvp();
+	SpriteRenderer::GetInstance()->Add(this);
+}
+
+void Sprite::SetColor(const Vector4& color) {
+	material_.SetColor(color);
+}
+void Sprite::SetPos(const Vector3& pos) {
+	position_ = pos;
+	SetWvp();
+}
+void Sprite::SetScale(const Vector2& scale) {
+	scale_ = scale;
+	SetWvp();
+}
+void Sprite::SetSize(const Vector2& size) {
+	size_ = size;
+	SetWvp();
+}
+void Sprite::SetAngle(float rotate) {
+	rotate_ = rotate;
+	SetWvp();
+}
+
+void Sprite::SetAnchor(const Vector2& anchor) {
+	anchorPoint_ = anchor;
+	SetWvp();
+}
+
+void Sprite::SetRange(const Math::Vector2& leftTop, const Math::Vector2& size) {
+	// 元のテクスチャサイズを基準に、UVのスケールとオフセットを計算する
+	Math::Vector2 uvScale;
+	uvScale.x = size.x / defaultSize_.x;
+	uvScale.y = size.y / defaultSize_.y;
+
+	Math::Vector2 uvTrans;
+	uvTrans.x = leftTop.x / defaultSize_.x;
+	uvTrans.y = leftTop.y / defaultSize_.y;
+
+	// マテリアルに計算したUV変換を適用
+	material_.SetUVScale(uvScale, uvTrans);
+	// スプライト自体の描画サイズも、切り抜いたサイズに合わせる
+	size_ = size;
+	SetWvp();
 }
 
 void Sprite::AdjustTextureSize() {
@@ -174,14 +102,40 @@ void Sprite::AdjustTextureSize() {
 }
 
 void Sprite::SetWvp() {
-	Matrix4x4 worldMatrix = Multiply(Multiply(MakeScaleMatrix({ size_.x * scale_.x,size_.y * scale_.y,1.0f }), MakeRotateZMatrix(rotate_)), MakeTranslateMatrix(position_));
-	Matrix4x4 viewMatrix = MakeIdentity4x4();
+	if (!wvpDataGPU_[0]) return; // 初期化前に呼ばれた場合の対策
 
+	// 反転（フリップ）対応
+	float fx = isFlipX_ ? -1.0f : 1.0f;
+	float fy = isFlipY_ ? -1.0f : 1.0f;
+
+	// アンカーポイントによるオフセット行列
+	Matrix4x4 anchorMatrix = MakeTranslateMatrix({ -anchorPoint_.x, -anchorPoint_.y, 0.0f });
+	// スケール（反転含む）行列
+	Matrix4x4 scaleMatrix = MakeScaleMatrix({ size_.x * scale_.x * fx, size_.y * scale_.y * fy, 1.0f });
+	// 回転行列
+	Matrix4x4 rotateMatrix = MakeRotateZMatrix(rotate_);
+	// 平行移動（配置座標）行列
+	Matrix4x4 translateMatrix = MakeTranslateMatrix(position_);
+
+	Matrix4x4 worldMatrix = Multiply(Multiply(Multiply(anchorMatrix, scaleMatrix), rotateMatrix), translateMatrix);
+	Matrix4x4 viewMatrix = MakeIdentity4x4();
 	Matrix4x4 projectionMatrix = MakeOrthographicMatrix(0.0f, 0.0f, float(MyWin::kWindowWidth), float(MyWin::kWindowHeight), 0.0f, 100.0f);
+
 	Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
 
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 	wvpDataGPU_[frameIndex]->World = worldMatrix;
 	wvpDataGPU_[frameIndex]->WVP = worldViewProjectionMatrix;
 	wvpDataGPU_[frameIndex]->WorldInverseTransPose = Transpose(Inverse(wvpDataGPU_[frameIndex]->World));
+}
+
+// --- Rendererへ渡すためのGetter ---
+D3D12_GPU_VIRTUAL_ADDRESS Sprite::GetWvpGPUAddress(uint32_t frameIndex) const {
+	return wvpResource_[frameIndex]->GetGPUVirtualAddress();
+}
+D3D12_GPU_VIRTUAL_ADDRESS Sprite::GetMaterialGPUAddress() {
+	return material_.GetMaterialResource()->GetGPUVirtualAddress();
+}
+D3D12_GPU_DESCRIPTOR_HANDLE Sprite::GetTextureSRV() {
+	return material_.GetTexture()->gpuHandle;
 }

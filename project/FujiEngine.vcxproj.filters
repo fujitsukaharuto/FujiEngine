@@ -410,6 +410,9 @@
     <ClCompile Include="Engine\DX\CommandContext.cpp">
       <Filter>Engine\DX</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Model\SpriteRenderer.cpp">
+      <Filter>Engine\Model</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -870,6 +873,9 @@
     </ClInclude>
     <ClInclude Include="Engine\DX\CommandContext.h">
       <Filter>Engine\DX</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Model\SpriteRenderer.h">
+      <Filter>Engine\Model</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

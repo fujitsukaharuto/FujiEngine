@@ -8,6 +8,7 @@
 #include "Model/Line3dDrawer.h"
 #include "Particle/ParticleManager.h"
 #include "Scene/SceneManager.h"
+#include "Engine/Model/SpriteRenderer.h"
 #include "Engine/Editor/CommandManager.h"
 #include <cmath>
 
@@ -201,7 +202,6 @@ void TitleScene::Draw() {
 	}
 
 #pragma endregion
-	ModelManager::GetInstance()->PickingDataCopy();
 }
 
 void TitleScene::DebugGUI() {

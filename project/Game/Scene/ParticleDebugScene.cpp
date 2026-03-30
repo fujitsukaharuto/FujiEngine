@@ -7,6 +7,7 @@
 #include "Math/Random/Random.h"
 
 #include "Engine/Model/Line3dDrawer.h"
+#include "Engine/Model/SpriteRenderer.h"
 #include "Particle/ParticleManager.h"
 #include "Scene/SceneManager.h"
 
@@ -104,7 +105,6 @@ void ParticleDebugScene::Draw() {
 	}
 
 #pragma endregion
-	ModelManager::GetInstance()->PickingDataCopy();
 }
 
 void ParticleDebugScene::DebugGUI() {

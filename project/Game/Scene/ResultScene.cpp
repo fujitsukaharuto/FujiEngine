@@ -10,6 +10,7 @@
 #include "Particle/ParticleManager.h"
 #include "Scene/SceneManager.h"
 #include "Engine/Light/LightManager.h"
+#include "Engine/Model/SpriteRenderer.h"
 #include "Engine/Editor/CommandManager.h"
 
 using namespace Core;
@@ -149,7 +150,6 @@ void ResultScene::Draw() {
 	}
 
 #pragma endregion
-	ModelManager::GetInstance()->PickingDataCopy();
 }
 
 void ResultScene::DebugGUI() {

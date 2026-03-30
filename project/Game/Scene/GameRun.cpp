@@ -72,6 +72,7 @@ void GameRun::Finalize() {
 	line3dDrawer_->Finalize();
 	cameraManager_->Finalize();
 	pManager_->Finalize();
+	spriteRenderer_->Finalize();
 	textureManager_->Finalize();
 	modelManager_->Finalize();
 	lightManager_->Finalize();
@@ -117,6 +118,10 @@ void GameRun::Draw() {
 	dxcommon_->PreDraw();
 	// ゲームシーンの描画
 	sceneManager_->Draw();
+
+	spriteRenderer_->Render();
+	modelManager_->PickingDataCopy();
+
 	dxcommon_->Command();
 	dxcommon_->PostEffect();
 	// ImGuiの描画

@@ -393,6 +393,13 @@ void ModelManager::CreateSphere() {
 }
 
 ModelData ModelManager::CreateRing(float out, float in, float radius, bool horizon) {
+	std::string key = "Ring_" + std::to_string(out) + "_" + std::to_string(in) + "_" + std::to_string(radius) + "_" + std::to_string(horizon);
+	ModelManager* instance = GetInstance();
+	auto iterator = instance->models_.find(key);
+	if (iterator != instance->models_.end()) {
+		return instance->models_[key]->GetModelData();
+	}
+
 	std::unique_ptr<Model> model;
 	model = std::make_unique<Model>();
 	ModelMesh newModelMesh{};
@@ -450,10 +457,19 @@ ModelData ModelManager::CreateRing(float out, float in, float radius, bool horiz
 	}
 	model->GetModelData().meshes.push_back(newModelMesh);
 
-	return model->GetModelData();
+	instance->models_.insert(std::make_pair(key, std::move(model)));
+
+	return instance->models_[key]->GetModelData();
 }
 
 ModelData ModelManager::CreateCylinder(float topRadius, float bottomRadius, float height) {
+	std::string key = "Cylinder_" + std::to_string(topRadius) + "_" + std::to_string(bottomRadius) + "_" + std::to_string(height);
+	ModelManager* instance = GetInstance();
+	auto iterator = instance->models_.find(key);
+	if (iterator != instance->models_.end()) {
+		return instance->models_[key]->GetModelData();
+	}
+
 	std::unique_ptr<Model> model;
 	model = std::make_unique<Model>();
 	ModelMesh newModelMesh{};
@@ -510,7 +526,9 @@ ModelData ModelManager::CreateCylinder(float topRadius, float bottomRadius, floa
 	}
 	model->GetModelData().meshes.push_back(newModelMesh);
 
-	return model->GetModelData();
+	instance->models_.insert(std::make_pair(key, std::move(model)));
+
+	return instance->models_[key]->GetModelData();
 }
 
 void ModelManager::LoadModelFile(bool overWrite) {
@@ -556,6 +574,48 @@ void ModelManager::NormalCommand() {
 	dxcommon_->GetDXCommand()->GetList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	lightManager_->SetLightCommand(dxcommon_->GetCommandList());
 	PickingCommand();
+}
+
+Model* ModelManager::GetModel(const std::string& filePath) {
+	// すでにロード済みならそれを返す
+	if (models_.contains(filePath)) {
+		return models_[filePath].get();
+	}
+	// 無ければ新規作成
+	LoadModelByExtension(filePath);
+	return models_[filePath].get();
+}
+
+Model* ModelManager::GetSphereModel() {
+	// すでにロード済みならそれを返す
+	if (models_.contains("Sphere")) {
+		return models_["Sphere"].get();
+	}
+	// 無ければ新規作成
+	CreateSphere();
+	return models_["Sphere"].get();
+}
+
+Model* ModelManager::GetRingModel(float out, float in, float radius, bool horizon) {
+	// 引数からユニークな名前（キー）を作る
+	std::string key = "Ring_" + std::to_string(out) + "_" + std::to_string(in) + "_" + std::to_string(radius) + "_" + std::to_string(horizon);
+	if (models_.contains(key)) {
+		return models_[key].get();
+	}
+	// 無ければ新規作成
+	CreateRing(out, in, radius, horizon);
+	return models_[key].get();
+}
+
+Model* ModelManager::GetCylinderModel(float topRadius, float bottomRadius, float height) {
+	// 引数からユニークな名前（キー）を作る
+	std::string key = "Cylinder_" + std::to_string(topRadius) + "_" + std::to_string(bottomRadius) + "_" + std::to_string(height);
+	if (models_.contains(key)) {
+		return models_[key].get();
+	}
+	// 無ければ新規作成
+	CreateCylinder(topRadius, bottomRadius, height);
+	return models_[key].get();
 }
 
 void ModelManager::PickingUpdate() {
