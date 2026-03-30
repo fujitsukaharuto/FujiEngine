@@ -53,9 +53,7 @@ void Mesh::CreateMesh() {
 	indexBufferView_.SizeInBytes = static_cast<UINT>(indexBufferSize);
 	indexBufferView_.Format = DXGI_FORMAT_R32_UINT;
 
-	// ==========================================
-	// 3. 静的メッシュ用 SRV の生成 (必要に応じて)
-	// ==========================================
+	// 静的メッシュ用 SRV の生成
 	uint32_t srvIndex = SRVManager::GetInstance()->Allocate();
 	srvHandle_.first = SRVManager::GetInstance()->GetCPUDescriptorHandle(srvIndex);
 	srvHandle_.second = SRVManager::GetInstance()->GetGPUDescriptorHandle(srvIndex);
@@ -78,12 +76,10 @@ void Mesh::CreateUAV() {
 	auto device = dxcommon_->GetDevice();
 	size_t vertexBufferSize = sizeof(VertexData) * vertexData_.size();
 
-	// ==========================================
 	// スキニング結果書き込み用 UAVバッファの生成
-	// ==========================================
 	skinnedVertexBuffer_ = DXC::Helper::CreateUAVResource(device, vertexBufferSize);
 
-	// VBVのセットアップ (描画時はこちらを使う)
+	// VBVのセットアップ
 	skinnedVBV_.BufferLocation = skinnedVertexBuffer_->GetGPUVirtualAddress();
 	skinnedVBV_.SizeInBytes = static_cast<UINT>(vertexBufferSize);
 	skinnedVBV_.StrideInBytes = static_cast<UINT>(sizeof(VertexData));
