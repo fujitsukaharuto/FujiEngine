@@ -7,15 +7,6 @@
 class DXCom;
 
 /// <summary>
-/// TextureのVertexData
-/// </summary>
-struct VertexDate {
-	Math::Vector4 position;
-	Math::Vector2 texcoord;
-	Math::Vector3 normal;
-};
-
-/// <summary>
 /// Textureのファイルパス
 /// </summary>
 struct MaterialDataPath {

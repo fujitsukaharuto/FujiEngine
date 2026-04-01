@@ -132,22 +132,22 @@ void ModelManager::LoadOBJ(const std::string& filename, bool overWrite) {
 			aiVector3D& position = mesh->mVertices[element];
 			aiVector3D& normal = mesh->mNormals[element];
 
-			VertexDate vertex;
-			vertex.position = { position.x,position.y,position.z,1.0f };
+			VertexData vertex;
+			vertex.pos = { position.x,position.y,position.z,1.0f };
 			vertex.normal = { normal.x,normal.y,normal.z };
 
 			if (hasTexcoord) {
 				aiVector3D& texcoord = mesh->mTextureCoords[0][element];
-				vertex.texcoord = { texcoord.x,texcoord.y };
+				vertex.uv = { texcoord.x,texcoord.y };
 			} else {
-				vertex.texcoord = { 0.0f,0.0f };
+				vertex.uv = { 0.0f,0.0f };
 			}
 
-			vertex.position.x *= -1.0f;
+			vertex.pos.x *= -1.0f;
 			vertex.normal.x *= -1.0f;
 
-			model->GetModelData().vertices.push_back({ {vertex.position},{vertex.texcoord},{vertex.normal} });
-			newModelMesh.vertices.push_back({ {vertex.position},{vertex.texcoord},{vertex.normal} });
+			model->GetModelData().vertices.push_back({ {vertex.pos},{vertex.uv},{vertex.normal} });
+			newModelMesh.vertices.push_back({ {vertex.pos},{vertex.uv},{vertex.normal} });
 		}
 
 		for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; faceIndex++) {
@@ -224,22 +224,22 @@ void ModelManager::LoadGLTF(const std::string& filename, bool overWrite) {
 			aiVector3D& position = mesh->mVertices[element];
 			aiVector3D& normal = mesh->mNormals[element];
 
-			VertexDate vertex;
-			vertex.position = { position.x,position.y,position.z,1.0f };
+			VertexData vertex;
+			vertex.pos = { position.x,position.y,position.z,1.0f };
 			vertex.normal = { normal.x,normal.y,normal.z };
 
 			if (hasTexcoord) {
 				aiVector3D& texcoord = mesh->mTextureCoords[0][element];
-				vertex.texcoord = { texcoord.x,texcoord.y };
+				vertex.uv = { texcoord.x,texcoord.y };
 			} else {
-				vertex.texcoord = { 0.0f,0.0f };
+				vertex.uv = { 0.0f,0.0f };
 			}
 
-			vertex.position.x *= -1.0f;
+			vertex.pos.x *= -1.0f;
 			vertex.normal.x *= -1.0f;
 
-			model->GetModelData().vertices.push_back({ {vertex.position},{vertex.texcoord},{vertex.normal} });
-			newModelMesh.vertices.push_back({ {vertex.position},{vertex.texcoord},{vertex.normal} });
+			model->GetModelData().vertices.push_back({ {vertex.pos},{vertex.uv},{vertex.normal} });
+			newModelMesh.vertices.push_back({ {vertex.pos},{vertex.uv},{vertex.normal} });
 		}
 
 		for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; faceIndex++) {

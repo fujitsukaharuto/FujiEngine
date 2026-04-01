@@ -1,7 +1,7 @@
 #pragma once
 #include "Game/OriginObject/OriginGameObject.h"
 #include "Game/Collider/AABBCollider.h"
-#include "Engine/Model/Sprite.h"
+#include "Engine/Model/Sprite/Sprite.h"
 #include "Engine/Audio/AudioPlayer.h"
 
 #include "Game/GameObj/Player/Behavior/BasePlayerBehavior.h"

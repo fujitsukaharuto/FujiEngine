@@ -231,7 +231,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Math\Vector\Vector2.cpp" />
     <ClCompile Include="Engine\Math\Vector\Vector3.cpp" />
     <ClCompile Include="Engine\Model\AnimationData\AnimationModel.cpp" />
-    <ClCompile Include="Engine\Model\Line3dDrawer.cpp" />
+    <ClCompile Include="Engine\Model\Line\Line3dDrawer.cpp" />
     <ClCompile Include="Engine\Model\Material.cpp" />
     <ClCompile Include="Engine\Model\Mesh.cpp" />
     <ClCompile Include="Engine\Model\Model.cpp" />
@@ -239,8 +239,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Model\Object3d.cpp" />
     <ClCompile Include="Engine\Model\Object3dCommon.cpp" />
     <ClCompile Include="Engine\Model\ObjectRenderer.cpp" />
-    <ClCompile Include="Engine\Model\Sprite.cpp" />
-    <ClCompile Include="Engine\Model\SpriteRenderer.cpp" />
+    <ClCompile Include="Engine\Model\Sprite\Sprite.cpp" />
+    <ClCompile Include="Engine\Model\Sprite\SpriteRenderer.cpp" />
     <ClCompile Include="Engine\Model\TextureManager.cpp" />
     <ClCompile Include="Engine\Particle\GPUParticle\GPUEmitter\MeshSurfaceEmitter.cpp" />
     <ClCompile Include="Engine\Particle\GPUParticle\GPUEmitter\SphereEmitter.cpp" />
@@ -386,7 +386,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Math\Vector\Vector4.h" />
     <ClInclude Include="Engine\Model\AnimationData\AnimationModel.h" />
     <ClInclude Include="Engine\Model\AnimationData\AnimationStructs.h" />
-    <ClInclude Include="Engine\Model\Line3dDrawer.h" />
+    <ClInclude Include="Engine\Model\Line\Line3dDrawer.h" />
     <ClInclude Include="Engine\Model\Material.h" />
     <ClInclude Include="Engine\Model\Mesh.h" />
     <ClInclude Include="Engine\Model\Model.h" />
@@ -394,8 +394,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Model\Object3d.h" />
     <ClInclude Include="Engine\Model\Object3dCommon.h" />
     <ClInclude Include="Engine\Model\ObjectRenderer.h" />
-    <ClInclude Include="Engine\Model\Sprite.h" />
-    <ClInclude Include="Engine\Model\SpriteRenderer.h" />
+    <ClInclude Include="Engine\Model\Sprite\Sprite.h" />
+    <ClInclude Include="Engine\Model\Sprite\SpriteRenderer.h" />
     <ClInclude Include="Engine\Model\TextureManager.h" />
     <ClInclude Include="Engine\Particle\GPUParticle\GPUEmitter\MeshSurfaceEmitter.h" />
     <ClInclude Include="Engine\Particle\GPUParticle\GPUEmitter\SphereEmitter.h" />

@@ -51,7 +51,7 @@ private:
 	D3D12_VERTEX_BUFFER_VIEW vbView{};
 	D3D12_INDEX_BUFFER_VIEW ibView{};
 
-	std::vector<VertexDate> vertex_;
+	std::vector<Graphics::VertexData> vertex_;
 	std::vector<uint32_t> index_;
 
 	Graphics::Material material_;

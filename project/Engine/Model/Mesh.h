@@ -10,19 +10,21 @@
 class DXCom;
 
 namespace Graphics {
+
+	/// <summary>
+	/// メッシュのVertexData
+	/// </summary>
+	struct VertexData {
+		Math::Vector4 pos;    // xyz座標
+		Math::Vector2 uv;     // uv座標
+		Math::Vector3 normal; // 法線ベクトル
+	};
+
 	/// <summary>
 	/// メッシュクラス
 	/// </summary>
 	class Mesh {
 	public:
-		/// <summary>
-		/// メッシュのVertexData
-		/// </summary>
-		struct VertexData {
-			Math::Vector4 pos;    // xyz座標
-			Math::Vector2 uv;     // uv座標
-			Math::Vector3 normal; // 法線ベクトル
-		};
 
 		struct MeshBuffer {
 			Microsoft::WRL::ComPtr<ID3D12Resource> vBuffer;

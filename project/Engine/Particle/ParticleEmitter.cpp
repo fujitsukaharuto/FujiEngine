@@ -3,7 +3,7 @@
 #include "Math/Random/Random.h"
 #include "ImGuiManager.h"
 #include "ParticleGroup/IParticleGroup.h"
-#include "Model/Line3dDrawer.h"
+#include "Model/Line/Line3dDrawer.h"
 #include <iostream>
 #include <fstream>
 

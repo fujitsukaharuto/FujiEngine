@@ -4,7 +4,7 @@
 #include "Engine/DX/DX12Helper.h"
 #include "DX/SRVManager.h"
 #include "LightManager.h"
-#include "Engine/Model/Line3dDrawer.h"
+#include "Engine/Model/Line/Line3dDrawer.h"
 #include "CameraManager.h"
 #include "FPSKeeper.h"
 #include "Engine/ImGuiManager/ImGuiManager.h"
@@ -561,8 +561,8 @@ void AnimationModel::SetModel(const std::string& fileName) {
 		model_->SetTextureName((model_->GetModelData().meshes[i].material.textureFilePath));
 
 		for (size_t index = 0; index < model_->GetModelData().meshes[i].vertices.size(); index++) {
-			VertexDate newVertex = model_->GetModelData().meshes[i].vertices[index];
-			newMesh.AddVertex({ { newVertex.position },{newVertex.texcoord},{newVertex.normal} });
+			VertexData newVertex = model_->GetModelData().meshes[i].vertices[index];
+			newMesh.AddVertex({ { newVertex.pos },{newVertex.uv},{newVertex.normal} });
 		}
 		for (size_t index = 0; index < model_->GetModelData().meshes[i].indicies.size(); index++) {
 			uint32_t newIndex = model_->GetModelData().meshes[i].indicies[index];

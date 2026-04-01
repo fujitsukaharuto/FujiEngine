@@ -5,8 +5,8 @@
 #include "Game/GameObj/FollowCamera.h"
 #include "Game/GameObj/Player/PlayerBullet.h"
 #include "Engine/Model/ModelManager.h"
-#include "Engine/Model/Line3dDrawer.h"
-#include "Engine/Model/SpriteRenderer.h"
+#include "Engine/Model/Line/Line3dDrawer.h"
+#include "Engine/Model/Sprite/SpriteRenderer.h"
 #include "Engine/Light/LightManager.h"
 #include "Engine/Light/PointLight.h"
 

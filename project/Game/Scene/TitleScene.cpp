@@ -5,10 +5,10 @@
 #include "CameraManager.h"
 #include "FPSKeeper.h"
 #include "Math/Random/Random.h"
-#include "Model/Line3dDrawer.h"
+#include "Model/Line/Line3dDrawer.h"
 #include "Particle/ParticleManager.h"
 #include "Scene/SceneManager.h"
-#include "Engine/Model/SpriteRenderer.h"
+#include "Engine/Model/Sprite/SpriteRenderer.h"
 #include "Engine/Editor/CommandManager.h"
 #include <cmath>
 

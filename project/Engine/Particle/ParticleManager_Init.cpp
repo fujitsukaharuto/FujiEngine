@@ -67,16 +67,16 @@ void ParticleManager::InitPlaneVertex() {
 	plane_.indices.push_back(3);
 	plane_.indices.push_back(2);
 
-	plane_.vBuffer = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(VertexDate) * plane_.vertices.size());
+	plane_.vBuffer = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(VertexData) * plane_.vertices.size());
 	plane_.iBuffer = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(uint32_t) * plane_.indices.size());
 
-	VertexDate* vData = nullptr;
+	VertexData* vData = nullptr;
 	plane_.vBuffer->Map(0, nullptr, reinterpret_cast<void**>(&vData));
-	std::memcpy(vData, plane_.vertices.data(), sizeof(VertexDate) * plane_.vertices.size());
+	std::memcpy(vData, plane_.vertices.data(), sizeof(VertexData) * plane_.vertices.size());
 
 	plane_.vbView.BufferLocation = plane_.vBuffer->GetGPUVirtualAddress();
-	plane_.vbView.SizeInBytes = static_cast<UINT>(sizeof(VertexDate) * plane_.vertices.size());
-	plane_.vbView.StrideInBytes = static_cast<UINT>(sizeof(VertexDate));
+	plane_.vbView.SizeInBytes = static_cast<UINT>(sizeof(VertexData) * plane_.vertices.size());
+	plane_.vbView.StrideInBytes = static_cast<UINT>(sizeof(VertexData));
 
 	uint32_t* iData = nullptr;
 	plane_.iBuffer->Map(0, nullptr, reinterpret_cast<void**>(&iData));
@@ -123,16 +123,16 @@ void ParticleManager::InitRingVertex() {
 		ring_.indices.push_back(inner1);
 	}
 
-	ring_.vBuffer = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(VertexDate) * ring_.vertices.size());
+	ring_.vBuffer = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(VertexData) * ring_.vertices.size());
 	ring_.iBuffer = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(uint32_t) * ring_.indices.size());
 
-	VertexDate* vData = nullptr;
+	VertexData* vData = nullptr;
 	ring_.vBuffer->Map(0, nullptr, reinterpret_cast<void**>(&vData));
-	std::memcpy(vData, ring_.vertices.data(), sizeof(VertexDate) * ring_.vertices.size());
+	std::memcpy(vData, ring_.vertices.data(), sizeof(VertexData) * ring_.vertices.size());
 
 	ring_.vbView.BufferLocation = ring_.vBuffer->GetGPUVirtualAddress();
-	ring_.vbView.SizeInBytes = static_cast<UINT>(sizeof(VertexDate) * ring_.vertices.size());
-	ring_.vbView.StrideInBytes = static_cast<UINT>(sizeof(VertexDate));
+	ring_.vbView.SizeInBytes = static_cast<UINT>(sizeof(VertexData) * ring_.vertices.size());
+	ring_.vbView.StrideInBytes = static_cast<UINT>(sizeof(VertexData));
 
 	uint32_t* iData = nullptr;
 	ring_.iBuffer->Map(0, nullptr, reinterpret_cast<void**>(&iData));
@@ -189,16 +189,16 @@ void ParticleManager::InitSphereVertex() {
 		}
 	}
 
-	sphere_.vBuffer = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(VertexDate) * sphere_.vertices.size());
+	sphere_.vBuffer = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(VertexData) * sphere_.vertices.size());
 	sphere_.iBuffer = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(uint32_t) * sphere_.indices.size());
 
-	VertexDate* vData = nullptr;
+	VertexData* vData = nullptr;
 	sphere_.vBuffer->Map(0, nullptr, reinterpret_cast<void**>(&vData));
-	std::memcpy(vData, sphere_.vertices.data(), sizeof(VertexDate) * sphere_.vertices.size());
+	std::memcpy(vData, sphere_.vertices.data(), sizeof(VertexData) * sphere_.vertices.size());
 
 	sphere_.vbView.BufferLocation = sphere_.vBuffer->GetGPUVirtualAddress();
-	sphere_.vbView.SizeInBytes = static_cast<UINT>(sizeof(VertexDate) * sphere_.vertices.size());
-	sphere_.vbView.StrideInBytes = static_cast<UINT>(sizeof(VertexDate));
+	sphere_.vbView.SizeInBytes = static_cast<UINT>(sizeof(VertexData) * sphere_.vertices.size());
+	sphere_.vbView.StrideInBytes = static_cast<UINT>(sizeof(VertexData));
 
 	uint32_t* iData = nullptr;
 	sphere_.iBuffer->Map(0, nullptr, reinterpret_cast<void**>(&iData));
@@ -250,16 +250,16 @@ void ParticleManager::InitCylinderVertex() {
 		cylinder_.indices.push_back(top1);
 	}
 
-	cylinder_.vBuffer = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(VertexDate) * cylinder_.vertices.size());
+	cylinder_.vBuffer = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(VertexData) * cylinder_.vertices.size());
 	cylinder_.iBuffer = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(uint32_t) * cylinder_.indices.size());
 
-	VertexDate* vData = nullptr;
+	VertexData* vData = nullptr;
 	cylinder_.vBuffer->Map(0, nullptr, reinterpret_cast<void**>(&vData));
-	std::memcpy(vData, cylinder_.vertices.data(), sizeof(VertexDate) * cylinder_.vertices.size());
+	std::memcpy(vData, cylinder_.vertices.data(), sizeof(VertexData) * cylinder_.vertices.size());
 
 	cylinder_.vbView.BufferLocation = cylinder_.vBuffer->GetGPUVirtualAddress();
-	cylinder_.vbView.SizeInBytes = static_cast<UINT>(sizeof(VertexDate) * cylinder_.vertices.size());
-	cylinder_.vbView.StrideInBytes = static_cast<UINT>(sizeof(VertexDate));
+	cylinder_.vbView.SizeInBytes = static_cast<UINT>(sizeof(VertexData) * cylinder_.vertices.size());
+	cylinder_.vbView.StrideInBytes = static_cast<UINT>(sizeof(VertexData));
 
 	uint32_t* iData = nullptr;
 	cylinder_.iBuffer->Map(0, nullptr, reinterpret_cast<void**>(&iData));

@@ -26,11 +26,11 @@ MeshSurfaceEmitter::MeshSurfaceEmitter(DXCom* dx) {
 
 void MeshSurfaceEmitter::InitMeshData(const std::string& fileName, DXCom* dx, SRVManager* srv) {
 	ModelData data = ModelManager::GetInstance()->FindModel(fileName);
-	verticesResource = DXC::Helper::CreateBufferResource(dx->GetDevice(), (sizeof(VertexDate) * data.vertices.size()));
+	verticesResource = DXC::Helper::CreateBufferResource(dx->GetDevice(), (sizeof(VertexData) * data.vertices.size()));
 	indicesResource = DXC::Helper::CreateBufferResource(dx->GetDevice(), (sizeof(uint32_t) * data.indicies.size()));
-	VertexDate* vtx = nullptr;
+	VertexData* vtx = nullptr;
 	verticesResource->Map(0, nullptr, reinterpret_cast<void**>(&vtx));
-	memcpy(vtx, data.vertices.data(), sizeof(VertexDate) * data.vertices.size());
+	memcpy(vtx, data.vertices.data(), sizeof(VertexData) * data.vertices.size());
 	verticesResource->Unmap(0, nullptr);
 	uint32_t* idx = nullptr;
 	indicesResource->Map(0, nullptr, reinterpret_cast<void**>(&idx));
@@ -39,7 +39,7 @@ void MeshSurfaceEmitter::InitMeshData(const std::string& fileName, DXCom* dx, SR
 
 	verticesIndex = srv->Allocate();
 	indicesIndex = srv->Allocate();
-	srv->CreateStructuredSRV(verticesIndex, verticesResource.Get(), static_cast<UINT>(data.vertices.size()), sizeof(VertexDate));
+	srv->CreateStructuredSRV(verticesIndex, verticesResource.Get(), static_cast<UINT>(data.vertices.size()), sizeof(VertexData));
 	srv->CreateStructuredSRV(indicesIndex, indicesResource.Get(), static_cast<UINT>(data.indicies.size()), sizeof(uint32_t));
 
 	// 面積リストとCDFを作る
@@ -51,9 +51,9 @@ void MeshSurfaceEmitter::InitMeshData(const std::string& fileName, DXCom* dx, SR
 		uint32_t i1 = data.indicies[i + 1];
 		uint32_t i2 = data.indicies[i + 2];
 
-		Vector3 v0 = data.vertices[i0].position.xyz();
-		Vector3 v1 = data.vertices[i1].position.xyz();
-		Vector3 v2 = data.vertices[i2].position.xyz();
+		Vector3 v0 = data.vertices[i0].pos.xyz();
+		Vector3 v1 = data.vertices[i1].pos.xyz();
+		Vector3 v2 = data.vertices[i2].pos.xyz();
 
 		float area = Vector3::Length(Cross(v1 - v0, v2 - v0)) * 0.5f;
 		totalArea += area;

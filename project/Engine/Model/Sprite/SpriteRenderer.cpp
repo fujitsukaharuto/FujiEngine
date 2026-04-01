@@ -60,9 +60,9 @@ void SpriteRenderer::Render() {
 
 void Graphics::SpriteRenderer::CreateCommonBuffer() {
 	// (ここは前回いただいたコードのままでOKです)
-	vertexResource_ = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(VertexDate) * 4);
+	vertexResource_ = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(VertexData) * 4);
 
-	VertexDate* vertexData = nullptr;
+	VertexData* vertexData = nullptr;
 	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
 	vertexData[0] = { {0.0f, 0.0f, 0.0f, 1.0f}, {0.0f, 0.0f}, {0.0f, 0.0f, -1.0f} };
 	vertexData[1] = { {0.0f, 1.0f, 0.0f, 1.0f}, {0.0f, 1.0f}, {0.0f, 0.0f, -1.0f} };
@@ -71,8 +71,8 @@ void Graphics::SpriteRenderer::CreateCommonBuffer() {
 	vertexResource_->Unmap(0, nullptr);
 
 	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
-	vertexBufferView_.SizeInBytes = sizeof(VertexDate) * 4;
-	vertexBufferView_.StrideInBytes = sizeof(VertexDate);
+	vertexBufferView_.SizeInBytes = sizeof(VertexData) * 4;
+	vertexBufferView_.StrideInBytes = sizeof(VertexData);
 
 
 	indexResource_ = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(uint32_t) * 6);

@@ -1,5 +1,5 @@
 #pragma once
-#include "Model/Sprite.h"
+#include "Model/Sprite/Sprite.h"
 
 #include "Game/OriginObject/OriginGameObject.h"
 

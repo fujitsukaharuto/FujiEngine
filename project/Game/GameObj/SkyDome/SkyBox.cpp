@@ -182,16 +182,16 @@ void SkyBox::CreateVertex() {
 	index_.push_back(23);
 
 
-	vBuffer_ = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(VertexDate) * vertex_.size());
+	vBuffer_ = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(VertexData) * vertex_.size());
 	iBuffer_ = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(uint32_t) * index_.size());
 
-	VertexDate* vData = nullptr;
+	VertexData* vData = nullptr;
 	vBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&vData));
-	std::memcpy(vData, vertex_.data(), sizeof(VertexDate) * vertex_.size());
+	std::memcpy(vData, vertex_.data(), sizeof(VertexData) * vertex_.size());
 
 	vbView.BufferLocation = vBuffer_->GetGPUVirtualAddress();
-	vbView.SizeInBytes = static_cast<UINT>(sizeof(VertexDate) * vertex_.size());
-	vbView.StrideInBytes = static_cast<UINT>(sizeof(VertexDate));
+	vbView.SizeInBytes = static_cast<UINT>(sizeof(VertexData) * vertex_.size());
+	vbView.StrideInBytes = static_cast<UINT>(sizeof(VertexData));
 
 	uint32_t* iData = nullptr;
 	iBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&iData));

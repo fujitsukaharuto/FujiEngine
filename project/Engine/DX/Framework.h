@@ -10,11 +10,11 @@
 #include "ModelManager.h"
 #include "LightManager.h"
 #include "CameraManager.h"
-#include "Engine/Model/SpriteRenderer.h"
+#include "Engine/Model/Sprite/SpriteRenderer.h"
 #include "Particle/ParticleManager.h"
 #include "Scene//AbstractSceneFactory.h"
 #include "Scene/SceneManager.h"
-#include "Model/Line3dDrawer.h"
+#include "Model/Line/Line3dDrawer.h"
 #include "Engine/Editor/CommandManager.h"
 
 namespace Core {

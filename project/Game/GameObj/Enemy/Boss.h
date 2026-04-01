@@ -2,7 +2,7 @@
 #include "Game/OriginObject/OriginGameObject.h"
 #include "Game/Collider/AABBCollider.h"
 #include "Engine/Particle/ParticleEmitter.h"
-#include "Engine/Model/Sprite.h"
+#include "Engine/Model/Sprite/Sprite.h"
 #include "Engine/Audio/AudioPlayer.h"
 
 #include "Game/GameObj/Enemy/Behavior/BaseBossBehavior.h"

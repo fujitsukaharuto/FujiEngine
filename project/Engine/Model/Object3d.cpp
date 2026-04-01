@@ -94,8 +94,8 @@ void Object3d::CreateRing(float out, float in, float radius, bool horizon) {
 		model_->SetTextureName((model_->GetModelData().meshes[i].material.textureFilePath));
 
 		for (size_t index = 0; index < model_->GetModelData().meshes[i].vertices.size(); index++) {
-			VertexDate newVertex = model_->GetModelData().meshes[i].vertices[index];
-			newMesh.AddVertex({ { newVertex.position },{newVertex.texcoord},{newVertex.normal} });
+			VertexData newVertex = model_->GetModelData().meshes[i].vertices[index];
+			newMesh.AddVertex({ { newVertex.pos },{newVertex.uv},{newVertex.normal} });
 		}
 		for (size_t index = 0; index < model_->GetModelData().meshes[i].indicies.size(); index++) {
 			uint32_t newIndex = model_->GetModelData().meshes[i].indicies[index];
@@ -124,8 +124,8 @@ void Object3d::CreateCylinder(float topRadius, float bottomRadius, float height)
 		model_->SetTextureName((model_->GetModelData().meshes[i].material.textureFilePath));
 
 		for (size_t index = 0; index < model_->GetModelData().meshes[i].vertices.size(); index++) {
-			VertexDate newVertex = model_->GetModelData().meshes[i].vertices[index];
-			newMesh.AddVertex({ { newVertex.position },{newVertex.texcoord},{newVertex.normal} });
+			VertexData newVertex = model_->GetModelData().meshes[i].vertices[index];
+			newMesh.AddVertex({ { newVertex.pos },{newVertex.uv},{newVertex.normal} });
 		}
 		for (size_t index = 0; index < model_->GetModelData().meshes[i].indicies.size(); index++) {
 			uint32_t newIndex = model_->GetModelData().meshes[i].indicies[index];
@@ -566,8 +566,8 @@ void Object3d::SetModel(const std::string& fileName, bool overWrite) {
 		model_->SetTextureName((model_->GetModelData().meshes[i].material.textureFilePath));
 
 		for (size_t index = 0; index < model_->GetModelData().meshes[i].vertices.size(); index++) {
-			VertexDate newVertex = model_->GetModelData().meshes[i].vertices[index];
-			newMesh.AddVertex({ { newVertex.position },{newVertex.texcoord},{newVertex.normal} });
+			VertexData newVertex = model_->GetModelData().meshes[i].vertices[index];
+			newMesh.AddVertex({ { newVertex.pos },{newVertex.uv},{newVertex.normal} });
 		}
 		for (size_t index = 0; index < model_->GetModelData().meshes[i].indicies.size(); index++) {
 			uint32_t newIndex = model_->GetModelData().meshes[i].indicies[index];

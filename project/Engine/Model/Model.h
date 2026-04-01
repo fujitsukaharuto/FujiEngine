@@ -48,7 +48,7 @@ struct JointWeightData {
 /// モデルのメッシュのデータ
 /// </summary>
 struct ModelMesh {
-	std::vector<VertexDate> vertices;
+	std::vector<Graphics::VertexData> vertices;
 	std::vector<uint32_t> indicies;
 	MaterialDataPath material;
 	Math::Vector4 baseColor;
@@ -59,7 +59,7 @@ struct ModelMesh {
 /// </summary>
 struct ModelData {
 	std::map<std::string, JointWeightData> skinClusterData;
-	std::vector<VertexDate> vertices;
+	std::vector<Graphics::VertexData> vertices;
 	std::vector<uint32_t> indicies;
 	MaterialDataPath material;
 	Node rootNode;
