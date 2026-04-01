@@ -238,6 +238,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Model\ModelManager.cpp" />
     <ClCompile Include="Engine\Model\Object3d.cpp" />
     <ClCompile Include="Engine\Model\Object3dCommon.cpp" />
+    <ClCompile Include="Engine\Model\ObjectRenderer.cpp" />
     <ClCompile Include="Engine\Model\Sprite.cpp" />
     <ClCompile Include="Engine\Model\SpriteRenderer.cpp" />
     <ClCompile Include="Engine\Model\TextureManager.cpp" />
@@ -392,6 +393,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Model\ModelManager.h" />
     <ClInclude Include="Engine\Model\Object3d.h" />
     <ClInclude Include="Engine\Model\Object3dCommon.h" />
+    <ClInclude Include="Engine\Model\ObjectRenderer.h" />
     <ClInclude Include="Engine\Model\Sprite.h" />
     <ClInclude Include="Engine\Model\SpriteRenderer.h" />
     <ClInclude Include="Engine\Model\TextureManager.h" />

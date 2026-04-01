@@ -51,11 +51,11 @@ namespace Graphics {
 		/// </summary>
 		struct MaterialDate {
 			Math::Vector4 color;
-			int32_t enableLighting;
-			float padding[3];
 			Math::Matrix4x4 uvTransform;
+			int32_t enableLighting;
 			float shininess = 50.0f;
 			float AlphaRef = 0.5f;
+			float padding;
 		};
 
 		/// <summary>
@@ -63,11 +63,11 @@ namespace Graphics {
 		/// </summary>
 		struct MaterialEnvironment {
 			Math::Vector4 color;
-			int32_t enableLighting;
-			float padding[3];
 			Math::Matrix4x4 uvTransform;
+			int32_t enableLighting;
 			float shininess = 50.0f;
 			float environmentCoefficient = 1.0f;
+			float padding;
 		};
 
 	public:

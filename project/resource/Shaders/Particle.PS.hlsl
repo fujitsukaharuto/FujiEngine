@@ -3,9 +3,10 @@
 struct Material
 {
     float4 color;
-    int enableLighting;
     float4x4 uvTransform;
+    int enableLighting;
     float shininess;
+    float alphaRef;
 };
 
 //struct DirectionalLight

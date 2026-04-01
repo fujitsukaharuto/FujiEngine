@@ -413,6 +413,9 @@
     <ClCompile Include="Engine\Model\SpriteRenderer.cpp">
       <Filter>Engine\Model</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Model\ObjectRenderer.cpp">
+      <Filter>Engine\Model</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -875,6 +878,9 @@
       <Filter>Engine\DX</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Model\SpriteRenderer.h">
+      <Filter>Engine\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Model\ObjectRenderer.h">
       <Filter>Engine\Model</Filter>
     </ClInclude>
   </ItemGroup>
