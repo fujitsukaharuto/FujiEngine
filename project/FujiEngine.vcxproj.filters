@@ -44,9 +44,6 @@
     <ClCompile Include="Engine\Model\Material.cpp">
       <Filter>Engine\Model</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Model\Mesh.cpp">
-      <Filter>Engine\Model</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Model\Model.cpp">
       <Filter>Engine\Model</Filter>
     </ClCompile>
@@ -416,6 +413,12 @@
     <ClCompile Include="Engine\Model\Sprite\SpriteRenderer.cpp">
       <Filter>Engine\Model\Sprite</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Model\Mesh\Mesh.cpp">
+      <Filter>Engine\Model\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Model\Mesh\SkinnedMesh.cpp">
+      <Filter>Engine\Model\Mesh</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -458,9 +461,6 @@
       <Filter>Engine\Logger</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Model\Material.h">
-      <Filter>Engine\Model</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Model\Mesh.h">
       <Filter>Engine\Model</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Model\Model.h">
@@ -883,6 +883,12 @@
     <ClInclude Include="Engine\Model\Sprite\SpriteRenderer.h">
       <Filter>Engine\Model\Sprite</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Model\Mesh\Mesh.h">
+      <Filter>Engine\Model\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Model\Mesh\SkinnedMesh.h">
+      <Filter>Engine\Model\Mesh</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -1031,6 +1037,12 @@
     </Filter>
     <Filter Include="Engine\Model\Sprite">
       <UniqueIdentifier>{47449334-1707-44aa-9320-606cc2ab94ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Model\Mesh">
+      <UniqueIdentifier>{1125334f-d555-4460-a6e8-d56ebc98f61f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Model\Material">
+      <UniqueIdentifier>{c4e45bc0-1b98-41a6-b007-01b813ed66da}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

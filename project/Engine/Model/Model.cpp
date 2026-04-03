@@ -32,7 +32,7 @@ void Model::Draw(ID3D12GraphicsCommandList* commandList, Material* mate = nullpt
 	}
 }
 
-void Model::AnimationDraw(DXCom* pDxcom, ID3D12GraphicsCommandList* commandList, Material* mate) {
+void Model::AnimationDraw(DXCom* pDxcom, ID3D12GraphicsCommandList* commandList, std::vector<SkinnedMesh>& skinnedMeshes, Material* mate) {
 	int vertexOffset = 0;
 	for (uint32_t index = 0; index < mesh_.size(); ++index) {
 		if (mate) {
@@ -43,11 +43,11 @@ void Model::AnimationDraw(DXCom* pDxcom, ID3D12GraphicsCommandList* commandList,
 			commandList->SetGraphicsRootDescriptorTable(2, material_[index].GetTexture()->gpuHandle);
 		}
 
-		commandList->IASetVertexBuffers(0, 1, &mesh_[index].GetSkinnedVBV());
+		commandList->IASetVertexBuffers(0, 1, &skinnedMeshes[index].GetSkinnedVBV());
 		commandList->IASetIndexBuffer(&mesh_[index].GetIBV());
 		commandList->DrawIndexedInstanced(static_cast<UINT>(mesh_[index].GetIndexCount()), 1, 0, 0, 0);
 
-		pDxcom->TransitionResource(mesh_[index].GetSkinnedResource(),
+		pDxcom->TransitionResource(skinnedMeshes[index].GetSkinnedResource(),
 			D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 
 		vertexOffset = 0;
@@ -59,16 +59,13 @@ void Model::AddMaterial(const Material& material) {
 	material_.push_back(material);
 }
 
-void Model::AddMesh(const Mesh& mesh) {
-	mesh_.push_back(mesh);
+void Model::AddMesh(Mesh&& mesh) {
+	mesh_.push_back(std::move(mesh));
 }
 
 void Model::CreateEnvironment() {
 	for (Material& material : material_) {
 		material.CreateEnvironmentMaterial();
-	}
-	for (uint32_t index = 0; index < mesh_.size(); ++index) {
-		mesh_[index].CreateUAV();
 	}
 }
 
@@ -132,7 +129,7 @@ void Model::SetLightEnable(LightMode mode) {
 	}
 }
 
-void Model::CSDispatch(DXCom* pDxcom, const SkinCluster& skinCluster, ID3D12GraphicsCommandList* commandList, uint32_t frameIndex) {
+void Model::CSDispatch(DXCom* pDxcom, const SkinCluster& skinCluster, ID3D12GraphicsCommandList* commandList, std::vector<SkinnedMesh>& skinnedMeshes, uint32_t frameIndex) {
 	PipelineManager::GetInstance()->SetCSPipeline(Pipe::SkinningCS);
 	commandList->SetComputeRootDescriptorTable(0, skinCluster.paletteSrvHandle[frameIndex].second);        // t0
 	commandList->SetComputeRootDescriptorTable(2, skinCluster.influenceSrvHandle.second);      // t1, t2
@@ -143,10 +140,10 @@ void Model::CSDispatch(DXCom* pDxcom, const SkinCluster& skinCluster, ID3D12Grap
 	for (uint32_t i = 0; i < static_cast<uint32_t>(skinCluster.meshSections.size()); ++i) {
 		// メッシュ側でSRVなどセット（頂点バッファやスキン出力先）
 		commandList->SetComputeRootDescriptorTable(1, mesh_[i].GetSrvHandle().second);
-		commandList->SetComputeRootDescriptorTable(3, mesh_[i].GetUavHandle().second);
+		commandList->SetComputeRootDescriptorTable(3, skinnedMeshes[i].GetUavHandle().second);
 
 		// バリアを張る
-		pDxcom->TransitionResource(mesh_[i].GetSkinnedResource(),
+		pDxcom->TransitionResource(skinnedMeshes[i].GetSkinnedResource(),
 			D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 
 		// RootConstantで meshIndex を送信（b1）

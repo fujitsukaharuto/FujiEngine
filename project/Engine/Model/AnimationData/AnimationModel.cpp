@@ -28,6 +28,7 @@ AnimationModel::AnimationModel() {
 
 AnimationModel::~AnimationModel() {
 	jointWorldCache_.clear();
+	skinnedMeshes_.clear();
 	dxcommon_ = nullptr;
 	lightManager_ = nullptr;
 }
@@ -155,6 +156,14 @@ void AnimationModel::LoadAnimationFile(const std::string& filename) {
 	preAnimationName_ = nowAnimationName_;
 
 	model_->CreateEnvironment();
+
+	// UAVの作成
+	for (uint32_t index = 0; index < model_->GetMeshCount(); ++index) {
+		SkinnedMesh newSkinnedMesh{};
+		newSkinnedMesh.CreateUAV(model_->GetVertexSize(index));
+		skinnedMeshes_.push_back(std::move(newSkinnedMesh));
+	}
+
 	model_->CreateSkinningInformation(dxcommon_);
 	environment_ = TextureManager::GetInstance()->LoadTexture("skyboxTexture.dds");
 }
@@ -297,7 +306,7 @@ void AnimationModel::AnimationUpdate() {
 }
 
 void AnimationModel::CSDispatch() {
-	model_->CSDispatch(dxcommon_,skinCluster_, dxcommon_->GetCommandList(), dxcommon_->GetNowFrameCount());
+	model_->CSDispatch(dxcommon_, skinCluster_, dxcommon_->GetCommandList(), skinnedMeshes_, dxcommon_->GetNowFrameCount());
 }
 
 void AnimationModel::Draw(Material* mate) {
@@ -317,7 +326,7 @@ void AnimationModel::Draw(Material* mate) {
 	cList->SetGraphicsRootDescriptorTable(7, environment_->gpuHandle);
 
 	if (model_ && !isMirrorObj_) {
-		model_->AnimationDraw(dxcommon_, cList, mate);
+		model_->AnimationDraw(dxcommon_, cList, skinnedMeshes_, mate);
 	} else if (isMirrorObj_) {
 		model_->Draw(cList, mate);
 	}
@@ -569,7 +578,7 @@ void AnimationModel::SetModel(const std::string& fileName) {
 			newMesh.AddIndex(newIndex);
 		}
 		newMesh.CreateMesh();
-		model_->AddMesh(newMesh);
+		model_->AddMesh(std::move(newMesh));
 	}
 }
 

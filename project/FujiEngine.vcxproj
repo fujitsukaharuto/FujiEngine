@@ -233,7 +233,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Model\AnimationData\AnimationModel.cpp" />
     <ClCompile Include="Engine\Model\Line\Line3dDrawer.cpp" />
     <ClCompile Include="Engine\Model\Material.cpp" />
-    <ClCompile Include="Engine\Model\Mesh.cpp" />
+    <ClCompile Include="Engine\Model\Mesh\Mesh.cpp" />
+    <ClCompile Include="Engine\Model\Mesh\SkinnedMesh.cpp" />
     <ClCompile Include="Engine\Model\Model.cpp" />
     <ClCompile Include="Engine\Model\ModelManager.cpp" />
     <ClCompile Include="Engine\Model\Object3d.cpp" />
@@ -388,7 +389,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Model\AnimationData\AnimationStructs.h" />
     <ClInclude Include="Engine\Model\Line\Line3dDrawer.h" />
     <ClInclude Include="Engine\Model\Material.h" />
-    <ClInclude Include="Engine\Model\Mesh.h" />
+    <ClInclude Include="Engine\Model\Mesh\Mesh.h" />
+    <ClInclude Include="Engine\Model\Mesh\SkinnedMesh.h" />
     <ClInclude Include="Engine\Model\Model.h" />
     <ClInclude Include="Engine\Model\ModelManager.h" />
     <ClInclude Include="Engine\Model\Object3d.h" />

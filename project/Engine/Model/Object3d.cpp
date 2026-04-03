@@ -102,7 +102,7 @@ void Object3d::CreateRing(float out, float in, float radius, bool horizon) {
 			newMesh.AddIndex(newIndex);
 		}
 		newMesh.CreateMesh();
-		model_->AddMesh(newMesh);
+		model_->AddMesh(std::move(newMesh));
 	}
 
 	transform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
@@ -132,7 +132,7 @@ void Object3d::CreateCylinder(float topRadius, float bottomRadius, float height)
 			newMesh.AddIndex(newIndex);
 		}
 		newMesh.CreateMesh();
-		model_->AddMesh(newMesh);
+		model_->AddMesh(std::move(newMesh));
 	}
 
 	transform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
@@ -574,7 +574,7 @@ void Object3d::SetModel(const std::string& fileName, bool overWrite) {
 			newMesh.AddIndex(newIndex);
 		}
 		newMesh.CreateMesh();
-		model_->AddMesh(newMesh);
+		model_->AddMesh(std::move(newMesh));
 	}
 
 }

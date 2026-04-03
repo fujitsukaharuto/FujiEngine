@@ -199,6 +199,7 @@ namespace Graphics {
 		std::string nowAnimationName_;
 		std::string preAnimationName_;
 		std::map<std::string, Animation> animations_;
+		std::vector<SkinnedMesh> skinnedMeshes_;
 		Skeleton skeleton_;
 		SkinCluster skinCluster_;
 

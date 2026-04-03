@@ -44,9 +44,6 @@ namespace Graphics {
 		/// <summary>メッシュ（頂点・インデックスバッファ）の生成</summary>
 		void CreateMesh();
 
-		/// <summary>コンピュートシェーダー(スキニング)用のUAV/SRV生成</summary>
-		void CreateUAV();
-
 		/// <summary>Vertexの追加</summary>
 		void AddVertex(const VertexData& vertex);
 
@@ -57,15 +54,11 @@ namespace Graphics {
 		//* Getter
 		const D3D12_VERTEX_BUFFER_VIEW& GetVBV() const { return vertexBufferView_; }
 		const D3D12_INDEX_BUFFER_VIEW& GetIBV() const { return indexBufferView_; }
-		const D3D12_VERTEX_BUFFER_VIEW& GetSkinnedVBV() const { return skinnedVBV_; }
 
 		size_t GetVertexCount() const { return vertexData_.size(); }
 		size_t GetIndexCount() const { return indexData_.size(); }
 
-		// バリア遷移やComputeShader用
-		ID3D12Resource* GetSkinnedResource() const { return skinnedVertexBuffer_.Get(); }
 		std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> GetSrvHandle() const { return srvHandle_; }
-		std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> GetUavHandle() const { return uavHandle_; }
 
 	private:
 		DXCom* dxcommon_;
@@ -79,11 +72,6 @@ namespace Graphics {
 		Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_ = nullptr;
 		D3D12_INDEX_BUFFER_VIEW indexBufferView_{};
 
-		// --- アニメーション(CS)用リソース ---
-		Microsoft::WRL::ComPtr<ID3D12Resource> skinnedVertexBuffer_ = nullptr;
-		D3D12_VERTEX_BUFFER_VIEW skinnedVBV_{};
-
 		std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> srvHandle_;
-		std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> uavHandle_;
 	};
 }

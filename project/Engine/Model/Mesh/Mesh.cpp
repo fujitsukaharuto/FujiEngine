@@ -18,8 +18,6 @@ Mesh::~Mesh() {
 
 	indexResource_.Reset();
 	indexData_.clear();
-
-	skinnedVertexBuffer_.Reset();
 }
 
 void Mesh::CreateMesh() {
@@ -68,29 +66,6 @@ void Mesh::CreateMesh() {
 	srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
 
 	device->CreateShaderResourceView(vertexResource_.Get(), &srvDesc, srvHandle_.first);
-}
-
-void Mesh::CreateUAV() {
-	if (vertexData_.empty()) return;
-
-	auto device = dxcommon_->GetDevice();
-	size_t vertexBufferSize = sizeof(VertexData) * vertexData_.size();
-
-	// スキニング結果書き込み用 UAVバッファの生成
-	skinnedVertexBuffer_ = DXC::Helper::CreateUAVResource(device, vertexBufferSize);
-
-	// VBVのセットアップ
-	skinnedVBV_.BufferLocation = skinnedVertexBuffer_->GetGPUVirtualAddress();
-	skinnedVBV_.SizeInBytes = static_cast<UINT>(vertexBufferSize);
-	skinnedVBV_.StrideInBytes = static_cast<UINT>(sizeof(VertexData));
-
-	// UAVの生成とディスクリプタヒープへの登録
-	uint32_t uavIndex = SRVManager::GetInstance()->Allocate();
-	uavHandle_.first = SRVManager::GetInstance()->GetCPUDescriptorHandle(uavIndex);
-	uavHandle_.second = SRVManager::GetInstance()->GetGPUDescriptorHandle(uavIndex);
-
-	SRVManager::GetInstance()->CreateStructuredUAV(uavIndex, skinnedVertexBuffer_.Get(),
-		static_cast<UINT>(vertexData_.size()), static_cast<UINT>(sizeof(VertexData)));
 }
 
 void Mesh::AddVertex(const VertexData& vertex) {
