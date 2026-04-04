@@ -63,12 +63,6 @@ void Model::AddMesh(Mesh&& mesh) {
 	mesh_.push_back(std::move(mesh));
 }
 
-void Model::CreateEnvironment() {
-	for (Material& material : material_) {
-		material.CreateEnvironmentMaterial();
-	}
-}
-
 void Model::CreateSkinningInformation(DXCom* pDxcom) {
 	skinningInformation_ = DXC::Helper::CreateBufferResource(pDxcom->GetDevice(), sizeof(SkinningInformation));
 	infoData_ = nullptr;
@@ -100,6 +94,12 @@ void Model::SetUVTrans(const Vector2& uvTrans) {
 void Model::SetAlphaRef(float ref) {
 	for (Material& material : material_) {
 		material.SetAlphaRef(ref);
+	}
+}
+
+void Model::SetShininess(float shininess) {
+	for (Material& material : material_) {
+		material.SetShininess(shininess);
 	}
 }
 

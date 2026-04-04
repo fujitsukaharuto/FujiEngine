@@ -1,7 +1,7 @@
 #pragma once
 #include <wrl/client.h>
 #include "Math/Matrix/MatrixCalculation.h"
-#include "Material.h"
+#include "Material/Material.h"
 #include "Object3d.h"
 #include "Engine/DX/FrameCount.h"
 

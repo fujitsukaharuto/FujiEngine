@@ -41,9 +41,6 @@
     <ClCompile Include="Engine\Logger\Logger.cpp">
       <Filter>Engine\Logger</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Model\Material.cpp">
-      <Filter>Engine\Model</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Model\Model.cpp">
       <Filter>Engine\Model</Filter>
     </ClCompile>
@@ -419,6 +416,9 @@
     <ClCompile Include="Engine\Model\Mesh\SkinnedMesh.cpp">
       <Filter>Engine\Model\Mesh</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Model\Material\Material.cpp">
+      <Filter>Engine\Model\Material</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -459,9 +459,6 @@
     </ClInclude>
     <ClInclude Include="Engine\Logger\Logger.h">
       <Filter>Engine\Logger</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Model\Material.h">
-      <Filter>Engine\Model</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Model\Model.h">
       <Filter>Engine\Model</Filter>
@@ -888,6 +885,9 @@
     </ClInclude>
     <ClInclude Include="Engine\Model\Mesh\SkinnedMesh.h">
       <Filter>Engine\Model\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Model\Material\Material.h">
+      <Filter>Engine\Model\Material</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -40,25 +40,13 @@ namespace Graphics {
 		/// <summary>
 		/// マテリアルのデータ
 		/// </summary>
-		struct MaterialDate {
+		struct MaterialData {
 			Math::Vector4 color;
 			Math::Matrix4x4 uvTransform;
 			int32_t enableLighting;
 			float shininess = 50.0f;
 			float AlphaRef = 0.5f;
-			float padding;
-		};
-
-		/// <summary>
-		/// 環境マップのデータ
-		/// </summary>
-		struct MaterialEnvironment {
-			Math::Vector4 color;
-			Math::Matrix4x4 uvTransform;
-			int32_t enableLighting;
-			float shininess = 50.0f;
 			float environmentCoefficient = 1.0f;
-			float padding;
 		};
 
 	public:
@@ -68,9 +56,6 @@ namespace Graphics {
 
 		/// <summary>マテリアルの生成</summary>
 		void CreateMaterial();
-
-		/// <summary>環境マップの生成</summary>
-		void CreateEnvironmentMaterial();
 
 		//========================================================================*/
 		//* Getter
@@ -96,26 +81,22 @@ namespace Graphics {
 		void SetTexture(const std::string& name, bool overWrite = false);
 		/// <summary>ライトモードの設定</summary>
 		void SetLightEnable(LightMode mode);
+		/// <summary>反射の設定</summary>
+		void SetShininess(float shininess);
 		/// <summary>環境マップの設定</summary>
 		void SetEnvironment(float env);
 
 	private:
 
 		void CopyData(uint32_t frameIndex = 0);
-		void CopyDataEnvironment(uint32_t frameIndex = 0);
 
 		DXCom* dxcommon_;
 
 		Math::Matrix4x4 MakeScale4x4(const Math::Vector3& scale);
 
 		Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_[DXC::kFrameCount_];
-		MaterialDate* materialDateGPU_[DXC::kFrameCount_];
-		MaterialDate materialDate_;
-
-		Microsoft::WRL::ComPtr<ID3D12Resource> materialEnvironmentResource_[DXC::kFrameCount_];
-		MaterialEnvironment* materialEnvironmentGPU_[DXC::kFrameCount_];
-		MaterialEnvironment materialEnvironment_;
-		bool isEnvironment_ = false;
+		MaterialData* materialDateGPU_[DXC::kFrameCount_];
+		MaterialData materialDate_;
 
 		Math::Vector2 scale_;
 		Math::Vector2 uvTrans_;

@@ -155,8 +155,6 @@ void AnimationModel::LoadAnimationFile(const std::string& filename) {
 	nowAnimationName_ = animations_.begin()->first;
 	preAnimationName_ = nowAnimationName_;
 
-	model_->CreateEnvironment();
-
 	// UAVの作成
 	for (uint32_t index = 0; index < model_->GetMeshCount(); ++index) {
 		SkinnedMesh newSkinnedMesh{};
@@ -584,7 +582,6 @@ void AnimationModel::SetModel(const std::string& fileName) {
 
 void AnimationModel::IsMirrorOBJ(bool is) {
 	isMirrorObj_ = is;
-	model_->CreateEnvironment();
 	environment_ = TextureManager::GetInstance()->LoadTexture("skyboxTexture.dds");
 }
 

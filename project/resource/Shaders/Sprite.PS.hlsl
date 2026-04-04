@@ -7,6 +7,7 @@ struct Material
     int enableLighting;
     float shininess;
     float alphaRef;
+    float environmentCoefficient;
 };
 
 ConstantBuffer<Material> gMaterial : register(b0);

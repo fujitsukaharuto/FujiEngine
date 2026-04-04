@@ -14,7 +14,6 @@ Material::~Material() {
 
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
 		materialResource_[i].Reset();
-		materialEnvironmentResource_[i].Reset();
 	}
 }
 
@@ -23,15 +22,13 @@ void Material::Finalize() {
 
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
 		materialResource_[i].Reset();
-		materialEnvironmentResource_[i].Reset();
 	}
-
 }
 
 
 void Material::CreateMaterial() {
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
-		materialResource_[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(MaterialDate));
+		materialResource_[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(MaterialData));
 		materialDateGPU_[i] = nullptr;
 		materialResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&materialDateGPU_[i]));
 	}
@@ -40,6 +37,7 @@ void Material::CreateMaterial() {
 	materialDate_.color = Colors::White;
 	materialDate_.enableLighting = static_cast<int32_t>(LightMode::kPointLightON);
 	materialDate_.uvTransform = MakeIdentity4x4();
+	materialDate_.environmentCoefficient = 0.0f;
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
 		CopyData(i);
 	}
@@ -54,54 +52,21 @@ void Material::CreateMaterial() {
 	}
 }
 
-void Material::CreateEnvironmentMaterial() {
-	isEnvironment_ = true;
-	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
-		materialEnvironmentResource_[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(MaterialEnvironment));
-		materialEnvironmentGPU_[i] = nullptr;
-		materialEnvironmentResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&materialEnvironmentGPU_[i]));
-	}
-	
-	//色変えるやつ（Resource）
-	materialEnvironment_.color = materialDate_.color;
-	materialEnvironment_.enableLighting = static_cast<int32_t>(LightMode::kPointLightON);
-	materialEnvironment_.uvTransform = MakeIdentity4x4();
-	materialEnvironment_.environmentCoefficient = 0.0f;
-
-	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
-		CopyDataEnvironment(i);
-	}
-}
-
-
 Texture* Material::GetTexture() {
 	return texture_;
 }
 
-
 ID3D12Resource* Material::GetMaterialResource() {
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
-	if (isEnvironment_) {
-		if (!materialEnvironmentResource_[frameIndex]) {
-			return nullptr;
-		}
-		CopyDataEnvironment(frameIndex);
-		return materialEnvironmentResource_[frameIndex].Get();
-	} else {
-		if (!materialResource_[frameIndex]) {
-			return nullptr;
-		}
-		CopyData(frameIndex);
-		return materialResource_[frameIndex].Get();
+	if (!materialResource_[frameIndex]) {
+		return nullptr;
 	}
+	CopyData(frameIndex);
+	return materialResource_[frameIndex].Get();
 }
 
 Vector4 Material::GetColor() {
-	if (isEnvironment_) {
-		return materialEnvironment_.color;
-	} else {
-		return materialDate_.color;
-	}
+	return materialDate_.color;
 }
 
 void Material::SetTextureNamePath(const std::string& pathName) {
@@ -109,11 +74,7 @@ void Material::SetTextureNamePath(const std::string& pathName) {
 }
 
 void Material::SetColor(const Math::Vector4& color) {
-	if (isEnvironment_) {
-		materialEnvironment_.color = color;
-	} else {
-		materialDate_.color = color;
-	}
+	materialDate_.color = color;
 }
 
 void Material::SetUVScale(const Vector2& scale, const Vector2& uvTrans) {
@@ -121,13 +82,9 @@ void Material::SetUVScale(const Vector2& scale, const Vector2& uvTrans) {
 	Matrix4x4 uvTransMatrix = MakeTranslateMatrix(Vector3(uvTrans.x, uvTrans.y, 0.0f));
 	scale_ = scale;
 	uvTrans_ = uvTrans;
-	if (isEnvironment_) {
-		materialEnvironment_.uvTransform = MakeIdentity4x4();
-		materialEnvironment_.uvTransform = Multiply(uvTransMatrix, uvScaleMatrix);
-	} else {
-		materialDate_.uvTransform = MakeIdentity4x4();
-		materialDate_.uvTransform = Multiply(uvTransMatrix, uvScaleMatrix);
-	}
+
+	materialDate_.uvTransform = MakeIdentity4x4();
+	materialDate_.uvTransform = Multiply(uvTransMatrix, uvScaleMatrix);
 }
 
 void Material::SetUVTrans(const Vector2& uvTrans) {
@@ -146,19 +103,15 @@ void Material::SetTexture(const std::string& name, bool overWrite) {
 }
 
 void Material::SetLightEnable(LightMode mode) {
-	if (isEnvironment_) {
-		materialEnvironment_.enableLighting = static_cast<int32_t>(mode);;
-	} else {
-		materialDate_.enableLighting = static_cast<int32_t>(mode);
-	}
+	materialDate_.enableLighting = static_cast<int32_t>(mode);
+}
+
+void Graphics::Material::SetShininess(float shininess) {
+	materialDate_.shininess = shininess;
 }
 
 void Material::SetEnvironment(float env) {
-	if (isEnvironment_) {
-		materialEnvironment_.environmentCoefficient = env;
-	} else {
-		materialDate_.shininess = env;
-	}
+	materialDate_.environmentCoefficient = env;
 }
 
 void Material::CopyData(uint32_t frameIndex) {
@@ -167,14 +120,7 @@ void Material::CopyData(uint32_t frameIndex) {
 	materialDateGPU_[frameIndex]->uvTransform = materialDate_.uvTransform;
 	materialDateGPU_[frameIndex]->shininess = materialDate_.shininess;
 	materialDateGPU_[frameIndex]->AlphaRef = materialDate_.AlphaRef;
-}
-
-void Graphics::Material::CopyDataEnvironment(uint32_t frameIndex) {
-	materialEnvironmentGPU_[frameIndex]->color = materialEnvironment_.color;
-	materialEnvironmentGPU_[frameIndex]->enableLighting = materialEnvironment_.enableLighting;
-	materialEnvironmentGPU_[frameIndex]->uvTransform = materialEnvironment_.uvTransform;
-	materialEnvironmentGPU_[frameIndex]->shininess = materialEnvironment_.shininess;
-	materialEnvironmentGPU_[frameIndex]->environmentCoefficient = materialEnvironment_.environmentCoefficient;
+	materialDateGPU_[frameIndex]->environmentCoefficient = materialDate_.environmentCoefficient;
 }
 
 Matrix4x4 Material::MakeScale4x4(const Vector3& scale) {

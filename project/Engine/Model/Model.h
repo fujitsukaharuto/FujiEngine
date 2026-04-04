@@ -4,7 +4,7 @@
 #include <string>
 #include "Mesh/Mesh.h"
 #include "Mesh/SkinnedMesh.h"
-#include "Material.h"
+#include "Material/Material.h"
 
 #include "AnimationData/AnimationStructs.h"
 #include "externals/DirectXTex/DirectXTex.h"
@@ -87,9 +87,6 @@ namespace Graphics {
 		/// <summary>メッシュの追加</summary>
 		void AddMesh(Mesh&& mesh);
 
-		/// <summary>環境マップの生成</summary>
-		void CreateEnvironment();
-
 		/// <summary>SkinningInformationの生成</summary>
 		void CreateSkinningInformation(DXCom* pDxcom);
 
@@ -103,6 +100,8 @@ namespace Graphics {
 		void SetUVTrans(const Math::Vector2& uvTrans);
 		/// <summary>α値の閾値</summary>
 		void SetAlphaRef(float ref);
+		/// <summary>反射の設定</summary>
+		void SetShininess(float shininess);
 		/// <summary>環境マップの設定</summary>
 		void SetEnvironment(float env);
 		/// <summary>Textureの設定</summary>
