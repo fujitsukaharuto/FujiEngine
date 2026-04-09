@@ -225,6 +225,7 @@ void TitleScene::DebugGUI() {
 		particleTest_->DebugGUI();
 	}
 	skybox_->DebugGUI();
+	surroundings_->DebugGUI();
 	if (ImGui::CollapsingHeader("terrain")) {
 		terrain_->DebugGUI();
 	}

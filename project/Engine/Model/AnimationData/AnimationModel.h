@@ -7,6 +7,7 @@
 #include <array>
 
 #include "AnimationData/AnimationStructs.h"
+#include "Engine/Model/Base/RenderObject.h"
 #include "Model/Model.h"
 #include "Camera.h"
 #include "Model/Object3dCommon.h"
@@ -15,21 +16,14 @@
 #include "Engine/DX/FrameCount.h"
 
 
-class DXCom;
-namespace Graphics {
-	class LightManager;
-}
-class PointLight;
-class SpotLight;
-
 namespace Graphics {
 	/// <summary>
 	/// アニメーションモデルクラス
 	/// </summary>
-	class AnimationModel {
+	class AnimationModel : public RenderObject {
 	public:
 		AnimationModel();
-		~AnimationModel();
+		~AnimationModel() override;
 
 	public:
 
@@ -48,7 +42,7 @@ namespace Graphics {
 		/// <summary>
 		/// モデルの生成
 		/// </summary>
-		void Create(const std::string& fileName);
+		void Create(const std::string& fileName) override;
 
 		void CreateSphere();
 
@@ -64,15 +58,13 @@ namespace Graphics {
 		/// </summary>
 		void CSDispatch();
 
-		void Draw(Material* mate = nullptr);
+		void Update() override;
+		void Draw(bool isAdd = false) override;
 		void AnimeDraw();
 		void SkeletonDraw();
 
 		//========================================================================*/
 		//* Getter
-		Math::Trans& GetTransform() { return transform; }
-		Math::Matrix4x4 GetWorldMat() const;
-		Math::Vector3 GetWorldPos()const;
 		Math::Matrix4x4* GetJointTrans(const std::string& jointName);
 		Math::Vector3 GetJointWorldPos(const std::string& jointName);
 
@@ -91,8 +83,6 @@ namespace Graphics {
 		/// </summary>
 		void ChangeAnimation(const std::string& newName);
 
-		void UpdateWVP() { SetWVP(); }
-
 		/// <summary>
 		/// JsonからTransformを設定
 		/// </summary>
@@ -100,29 +90,10 @@ namespace Graphics {
 
 		//========================================================================*/
 		//* Setter
-		/// <summary>色の変更</summary>
-		void SetColor(const Math::Vector4& color);
-		/// <summary>UVスケールの変更</summary>
-		void SetUVScale(const Math::Vector2& scale, const Math::Vector2& uvTrans);
-		/// <summary>カメラの設定</summary>
-		void SetCamera(Camera* camera) { this->camera_ = camera; }
-		/// <summary>ペアレントの設定</summary>
-		void SetParent(Math::Trans* parent) { transform.parent = parent; }
-		/// <summary>ペアレントの仕方の設定</summary>
-		void SetNoneScaleParent(bool is) { transform.isNoneScaleParent = is; }
-		/// <summary>カメラにペアレントするか</summary>
-		void SetCameraParent(bool is) { transform.isCameraParent = is; }
 		/// <summary>テクスチャの変更</summary>
-		void SetTexture(const std::string& name);
-		/// <summary>ビルボードMatrixの設定</summary>
-		void SetBillboardMat(const Math::Matrix4x4& mat) { billboardMatrix_ = mat; }
-		/// <summary>ライトモードの設定</summary>
-		void SetLightEnable(LightMode mode);
+		void SetTexture(const std::string& name) override;
 		/// <summary>環境マップの設定</summary>
 		void SetEnvironmentCoeff(float environment);
-		/// <summary>モデルの変更</summary>
-		void SetModel(const std::string& fileName);
-
 		/// <summary>反射するObjectにするか</summary>
 		void IsMirrorOBJ(bool is);
 		/// <summary>アニメーションで動かすか</summary>
@@ -133,8 +104,6 @@ namespace Graphics {
 
 	private:
 
-		Math::Trans transform{};
-
 		/// <summary>
 		/// ジョイントの作成
 		/// </summary>
@@ -143,21 +112,6 @@ namespace Graphics {
 		/// <param name="joints">ジョイント</param>
 		/// <returns>int32_t</returns>
 		int32_t CreateJoint(const Node& node, const std::optional<int32_t>& parent, std::vector<Joint>& joints);
-
-		/// <summary>
-		/// WVPの作成
-		/// </summary>
-		void CreateWVP();
-
-		/// <summary>
-		/// WVPの計算
-		/// </summary>
-		void SetWVP();
-
-		/// <summary>
-		/// ビルボード状態のWVP
-		/// </summary>
-		void SetBillboardWVP();
 
 		//========================================================================*/
 		//* キーフレームから値を取り出す
@@ -178,12 +132,6 @@ namespace Graphics {
 
 	private:
 		const std::string kDirectoryPath_ = "resource/ModelandTexture/";
-		Object3dCommon* common_;
-		std::unique_ptr<Model> model_ = nullptr;
-
-		DXCom* dxcommon_;
-		Graphics::LightManager* lightManager_;
-		Camera* camera_;
 
 		bool isMirrorObj_ = false;
 		float environmentCoeff_ = 0.0f;
@@ -203,16 +151,7 @@ namespace Graphics {
 		Skeleton skeleton_;
 		SkinCluster skinCluster_;
 
-		Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource_[DXC::kFrameCount_];
-		Math::TransformationMatrix* wvpDate_[DXC::kFrameCount_];
-		Microsoft::WRL::ComPtr<ID3D12Resource> cameraPosResource_[DXC::kFrameCount_];
-		Math::CameraForGPU* cameraPosData_[DXC::kFrameCount_];
-
-		Math::Matrix4x4 billboardMatrix_;
-		std::string nowTextureName;
-
 		Texture* environment_;
-
 		int selectedJointIndex_ = -1;
 	};
 }

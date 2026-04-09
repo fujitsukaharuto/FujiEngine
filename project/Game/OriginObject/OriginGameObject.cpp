@@ -22,9 +22,9 @@ void OriginGameObject::Initialize() {
 void OriginGameObject::Update() {
 }
 
-void OriginGameObject::Draw(Material* mate, bool is) {
+void OriginGameObject::Draw(bool is) {
 	if (model_) {
-		model_->Draw(mate, is);
+		model_->Draw(is);
 	}
 }
 

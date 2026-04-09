@@ -29,6 +29,7 @@ AnimationModel::AnimationModel() {
 AnimationModel::~AnimationModel() {
 	jointWorldCache_.clear();
 	skinnedMeshes_.clear();
+	material_.clear();
 	dxcommon_ = nullptr;
 	lightManager_ = nullptr;
 }
@@ -37,9 +38,11 @@ void AnimationModel::DebugGUI() {
 #ifdef _DEBUGMODE
 	ImGui::Indent();
 	if (ImGui::DragFloat("EnvironmentCoeff", &environmentCoeff_, 0.01f, 0.0f, 1.0f)) {
-		model_->SetEnvironment(environmentCoeff_);
+		for (Material& material : material_) {
+			material.SetEnvironment(environmentCoeff_);
+		}
 	}
-	Vector4 color = model_->GetColor(0);
+	Vector4 color = material_[0].GetColor();
 	ImGui::ColorEdit3("color", &color.x);
 	SetColor(color);
 	if (animations_.size() == 0) {
@@ -177,8 +180,7 @@ void AnimationModel::Create(const std::string& fileName) {
 	this->camera_ = CameraManager::GetInstance()->GetCamera();
 	ModelManager::GetInstance()->LoadModelByExtension(fileName);
 	SetModel(fileName);
-	transform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
-	nowTextureName = model_->GetTextuerName();
+	transform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 	CreateWVP();
 }
 
@@ -186,7 +188,7 @@ void AnimationModel::CreateSphere() {
 	this->camera_ = CameraManager::GetInstance()->GetCamera();
 	ModelManager::GetInstance()->CreateSphere();
 	SetModel("Sphere");
-	transform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	transform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 	CreateWVP();
 }
 
@@ -307,9 +309,12 @@ void AnimationModel::CSDispatch() {
 	model_->CSDispatch(dxcommon_, skinCluster_, dxcommon_->GetCommandList(), skinnedMeshes_, dxcommon_->GetNowFrameCount());
 }
 
-void AnimationModel::Draw(Material* mate) {
+void Graphics::AnimationModel::Update() {
 	SetWVP();
+}
 
+void AnimationModel::Draw([[maybe_unused]] bool isAdd) {
+	SetWVP();
 
 	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
 	dxcommon_->GetDXCommand()->SetViewAndScissor(MyWin::kWindowWidth, MyWin::kWindowHeight);
@@ -324,9 +329,9 @@ void AnimationModel::Draw(Material* mate) {
 	cList->SetGraphicsRootDescriptorTable(7, environment_->gpuHandle);
 
 	if (model_ && !isMirrorObj_) {
-		model_->AnimationDraw(dxcommon_, cList, skinnedMeshes_, mate);
+		model_->AnimationDraw(dxcommon_, cList, skinnedMeshes_, material_);
 	} else if (isMirrorObj_) {
-		model_->Draw(cList, mate);
+		model_->Draw(cList, material_);
 	}
 
 	ModelManager::GetInstance()->NormalCommand();
@@ -343,7 +348,7 @@ void AnimationModel::AnimeDraw() {
 	lightManager_->SetLightCommand(cList);
 
 	if (model_) {
-		model_->Draw(cList, nullptr);
+		model_->Draw(cList, material_);
 	}
 }
 
@@ -379,28 +384,6 @@ void AnimationModel::SkeletonDraw() {
 			Line3dDrawer::GetInstance()->DrawLine3d(jointPos, parentPos, { 1.0f,1.0f,1.0f,1.0f });
 		}
 	}
-}
-
-Matrix4x4 AnimationModel::GetWorldMat() const {
-	Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
-
-	if (transform.parent) {
-		const Matrix4x4& parentWorldMatrix = transform.parent->GetWorldMat();
-		worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
-	} else if (transform.isCameraParent) {
-		const Matrix4x4& parentWorldMatrix = camera_->GetWorldMatrix();
-		worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
-	}
-
-	return worldMatrix;
-}
-
-Vector3 AnimationModel::GetWorldPos() const {
-
-	Matrix4x4 worldM = GetWorldMat();
-	Vector3 worldPos = { worldM.m[3][0],worldM.m[3][1] ,worldM.m[3][2] };
-
-	return worldPos;
 }
 
 Matrix4x4* AnimationModel::GetJointTrans(const std::string& jointName) {
@@ -526,57 +509,23 @@ void AnimationModel::ChangeAnimation(const std::string& newName) {
 }
 
 void AnimationModel::LoadTransformFromJson(const std::string& filename) {
-	JsonSerializer::DeserializeTransform(filename, transform);
-}
-
-void AnimationModel::SetColor(const Vector4& color) {
-	model_->SetColor(color);
-}
-
-void AnimationModel::SetUVScale(const Vector2& scale, const Vector2& uvTrans) {
-	model_->SetUVScale(scale, uvTrans);
+	JsonSerializer::DeserializeTransform(filename, transform_);
 }
 
 void AnimationModel::SetTexture(const std::string& name) {
-	if (name == nowTextureName) {
+	if (name == nowTextureName_) {
 		return;
 	}
-	model_->SetTexture(name);
-	nowTextureName = name;
-}
-
-void AnimationModel::SetLightEnable(LightMode mode) {
-	model_->SetLightEnable(mode);
+	for (Material& material : material_) {
+		material.SetTexture(name);
+	}
+	nowTextureName_ = name;
 }
 
 void AnimationModel::SetEnvironmentCoeff(float environment) {
 	environmentCoeff_ = environment;
-	model_->SetEnvironment(environment);
-}
-
-void AnimationModel::SetModel(const std::string& fileName) {
-	model_ = std::make_unique<Model>();
-	model_->GetModelData() = ModelManager::FindModel(fileName);
-
-	for (size_t i = 0; i < model_->GetModelData().meshes.size(); i++) { // 取得したデータからメッシュを作る
-		Mesh newMesh{};
-		Material newMaterial{};
-		newMaterial.SetTextureNamePath((model_->GetModelData().meshes[i].material.textureFilePath));
-		newMaterial.CreateMaterial();
-		newMaterial.SetColor(model_->GetModelData().meshes[i].baseColor);
-		model_->AddMaterial(newMaterial);
-		model_->SetTextureName((model_->GetModelData().meshes[i].material.textureFilePath));
-
-		for (size_t index = 0; index < model_->GetModelData().meshes[i].vertices.size(); index++) {
-			VertexData newVertex = model_->GetModelData().meshes[i].vertices[index];
-			newMesh.AddVertex({ { newVertex.pos },{newVertex.uv},{newVertex.normal} });
-		}
-		for (size_t index = 0; index < model_->GetModelData().meshes[i].indicies.size(); index++) {
-			uint32_t newIndex = model_->GetModelData().meshes[i].indicies[index];
-			newMesh.AddIndex(newIndex);
-		}
-		newMesh.CreateMesh();
-		model_->AddMesh(std::move(newMesh));
+	for (Material& material : material_) {
+		material.SetEnvironment(environment);
 	}
 }
 
@@ -600,78 +549,6 @@ int32_t AnimationModel::CreateJoint(const Node& node, const std::optional<int32_
 		joints[joint.index].children.push_back(childIndex);
 	}
 	return joint.index;
-}
-
-void AnimationModel::CreateWVP() {
-	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
-		wvpResource_[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(TransformationMatrix));
-		wvpDate_[i] = nullptr;
-		wvpResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&wvpDate_[i]));
-		wvpDate_[i]->WVP = MakeIdentity4x4();
-		wvpDate_[i]->World = MakeIdentity4x4();
-		wvpDate_[i]->WorldInverseTransPose = Transpose(Inverse(wvpDate_[i]->World));
-
-		cameraPosResource_[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(DirectionalLight));
-		cameraPosData_[i] = nullptr;
-		cameraPosResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&cameraPosData_[i]));
-		cameraPosData_[i]->worldPosition = camera_->GetTranslate();
-	}
-}
-
-void AnimationModel::SetWVP() {
-	Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
-	Matrix4x4 worldViewProjectionMatrix;
-
-
-	if (transform.parent) { // 親子付けしているかどうか
-		const Matrix4x4& parentWorldMatrix = transform.parent->GetWorldMat();
-		worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
-	} else if (transform.isCameraParent) {
-		const Matrix4x4& parentWorldMatrix = camera_->GetWorldMatrix();
-		worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
-	}
-
-
-	if (camera_) { // カメラが存在するかどうか
-		const Matrix4x4& viewProjectionMatrix = camera_->GetViewProjectionMatrix();
-		worldViewProjectionMatrix = Multiply(worldMatrix, viewProjectionMatrix);
-	} else {
-		worldViewProjectionMatrix = worldMatrix;
-	}
-
-	Matrix4x4 localMatrix;
-	localMatrix = model_->GetModelData().rootNode.local;
-
-	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
-
-	wvpDate_[frameIndex]->World = worldMatrix;
-	wvpDate_[frameIndex]->WVP = worldViewProjectionMatrix;
-	wvpDate_[frameIndex]->WorldInverseTransPose = Transpose(Inverse(wvpDate_[frameIndex]->World));
-
-	cameraPosData_[frameIndex]->worldPosition = camera_->GetTranslate();
-}
-
-void AnimationModel::SetBillboardWVP() {
-	Matrix4x4 worldViewProjectionMatrix;
-	Matrix4x4 worldMatrix = MakeIdentity4x4();
-
-
-	worldMatrix = Multiply(MakeScaleMatrix(transform.scale), MakeRotateXYZMatrix(transform.rotate));
-	worldMatrix = Multiply(worldMatrix, billboardMatrix_);
-	worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(transform.translate));
-
-	if (camera_) { // カメラが存在するかどうか
-		const Matrix4x4& viewProjectionMatrix = camera_->GetViewProjectionMatrix();
-		worldViewProjectionMatrix = Multiply(worldMatrix, viewProjectionMatrix);
-	} else {
-		worldViewProjectionMatrix = worldMatrix;
-	}
-
-	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
-
-	wvpDate_[frameIndex]->World = worldMatrix;
-	wvpDate_[frameIndex]->WVP = worldViewProjectionMatrix;
-	wvpDate_[frameIndex]->WorldInverseTransPose = Transpose(Inverse(wvpDate_[frameIndex]->World));
 }
 
 Vector3 AnimationModel::CalculationValue(const std::vector<KeyframeVector3>& keyframe, float time) {

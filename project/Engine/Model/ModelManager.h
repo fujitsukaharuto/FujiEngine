@@ -77,13 +77,13 @@ namespace Graphics {
 		void NormalCommand();
 
 		// ファイルから読み込むモデルの取得
-		Model* GetModel(const std::string& filePath);
+		static Model* GetModel(const std::string& filePath, bool overWrite = false);
 		// 動的生成モデル（球体）の取得
-		Model* GetSphereModel();
+		static Model* GetSphereModel();
 		// 動的生成モデル（リング）の取得
-		Model* GetRingModel(float out, float in, float radius, bool horizon);
+		static Model* GetRingModel(float out, float in, float radius, bool horizon);
 		// 動的生成モデル（シリンダー）の取得
-		Model* GetCylinderModel(float topRadius, float bottomRadius, float height);
+		static Model* GetCylinderModel(float topRadius, float bottomRadius, float height);
 
 		//========================================================================*/
 		//* Picking

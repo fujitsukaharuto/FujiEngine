@@ -94,7 +94,7 @@ void Boss::Update() {
 	collider_->InfoUpdate();
 }
 
-void Boss::Draw([[maybe_unused]] Material* mate, [[maybe_unused]] bool is) {
+void Boss::Draw([[maybe_unused]] bool is) {
 	shadow_->Draw();
 #ifdef _DEBUGMODE
 	collider_->DrawCollider();

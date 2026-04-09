@@ -19,7 +19,7 @@ public:
 
 	virtual void Initialize();
 	virtual void Update();
-	virtual void Draw(Graphics::Material* mate = nullptr, bool is = false);
+	virtual void Draw(bool is = false);
 	virtual void DebugGUI();
 
 #ifdef _DEBUGMODE

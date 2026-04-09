@@ -419,6 +419,9 @@
     <ClCompile Include="Engine\Model\Material\Material.cpp">
       <Filter>Engine\Model\Material</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Model\Base\RenderObject.cpp">
+      <Filter>Engine\Model\Base</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -888,6 +891,9 @@
     </ClInclude>
     <ClInclude Include="Engine\Model\Material\Material.h">
       <Filter>Engine\Model\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Model\Base\RenderObject.h">
+      <Filter>Engine\Model\Base</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

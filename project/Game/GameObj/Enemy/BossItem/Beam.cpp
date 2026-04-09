@@ -199,16 +199,16 @@ void Beam::Update() {
 	}
 }
 
-void Beam::Draw([[maybe_unused]] Material* mate, [[maybe_unused]]bool is) {
+void Beam::Draw([[maybe_unused]]bool is) {
 	if (isLive_) {
 		int beamCount = 0;
 		for (auto& beam : beams_) {
-			beam.beamCore1->Draw(nullptr, true);
-			beam.beamCore2->Draw(nullptr, true);
-			beam.beamCore3->Draw(nullptr, true);
-			beam.beam3->Draw(nullptr, true);
-			beam.beam2->Draw(nullptr, true);
-			beam.beam1->Draw(nullptr, true);
+			beam.beamCore1->Draw(true);
+			beam.beamCore2->Draw(true);
+			beam.beamCore3->Draw(true);
+			beam.beam3->Draw(true);
+			beam.beam2->Draw(true);
+			beam.beam1->Draw(true);
 #ifdef _DEBUGMODE
 			beam.collider->DrawCollider();
 #endif // _DEBUG	

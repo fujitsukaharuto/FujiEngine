@@ -51,7 +51,7 @@ public:
 
 	void Initialize()override;
 	void Update()override;
-	void Draw(Graphics::Material* mate = nullptr, bool is = false)override;
+	void Draw(bool is = false)override;
 	void DebugGUI()override;
 	void ParameterGUI();
 

@@ -52,7 +52,6 @@ namespace Graphics {
 	private:
 		DXCom* dxcommon_;
 
-		// WVPやカメラ、IDのバッファだけ残す（頂点バッファはRendererが持つため削除）
 		Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource_[DXC::kFrameCount_];
 		Math::TransformationMatrix* wvpDataGPU_[DXC::kFrameCount_];
 

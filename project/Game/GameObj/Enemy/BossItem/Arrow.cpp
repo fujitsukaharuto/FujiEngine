@@ -74,7 +74,7 @@ void Arrow::Update() {
 	collider_->InfoUpdate();
 }
 
-void Arrow::Draw([[maybe_unused]] Material* mate, [[maybe_unused]] bool is) {
+void Arrow::Draw([[maybe_unused]] bool is) {
 	OriginGameObject::Draw();
 	if (isArrow_ && arrivalTime_ > 0.0f && animationTime_ < totalAnimationTime_) {
 		arrivalWarningPotion_->Draw();

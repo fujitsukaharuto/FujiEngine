@@ -187,6 +187,20 @@ void ModelManager::LoadOBJ(const std::string& filename, bool overWrite) {
 		model->GetModelData().meshes.push_back(newModelMesh);
 	}
 
+	for (size_t i = 0; i < model->GetModelData().meshes.size(); i++) {
+		Mesh newMesh{};
+		for (size_t index = 0; index < model->GetModelData().meshes[i].vertices.size(); index++) {
+			VertexData newVertex = model->GetModelData().meshes[i].vertices[index];
+			newMesh.AddVertex({ { newVertex.pos },{newVertex.uv},{newVertex.normal} });
+		}
+		for (size_t index = 0; index < model->GetModelData().meshes[i].indicies.size(); index++) {
+			uint32_t newIndex = model->GetModelData().meshes[i].indicies[index];
+			newMesh.AddIndex(newIndex);
+		}
+		newMesh.CreateMesh();
+		model->AddMesh(std::move(newMesh));
+	}
+
 	if (overWrite) {
 		instance->models_[filename] = std::move(model);
 	} else {
@@ -305,6 +319,20 @@ void ModelManager::LoadGLTF(const std::string& filename, bool overWrite) {
 	}
 	model->GetModelData().rootNode = ReadNode(scene->mRootNode);
 
+	for (size_t i = 0; i < model->GetModelData().meshes.size(); i++) {
+		Mesh newMesh{};
+		for (size_t index = 0; index < model->GetModelData().meshes[i].vertices.size(); index++) {
+			VertexData newVertex = model->GetModelData().meshes[i].vertices[index];
+			newMesh.AddVertex({ { newVertex.pos },{newVertex.uv},{newVertex.normal} });
+		}
+		for (size_t index = 0; index < model->GetModelData().meshes[i].indicies.size(); index++) {
+			uint32_t newIndex = model->GetModelData().meshes[i].indicies[index];
+			newMesh.AddIndex(newIndex);
+		}
+		newMesh.CreateMesh();
+		model->AddMesh(std::move(newMesh));
+	}
+
 	if (overWrite) {
 		instance->models_[filename] = std::move(model);
 	} else {
@@ -389,6 +417,20 @@ void ModelManager::CreateSphere() {
 	}
 	model->GetModelData().meshes.push_back(newModelMesh);
 
+	for (size_t i = 0; i < model->GetModelData().meshes.size(); i++) {
+		Mesh newMesh{};
+		for (size_t index = 0; index < model->GetModelData().meshes[i].vertices.size(); index++) {
+			VertexData newVertex = model->GetModelData().meshes[i].vertices[index];
+			newMesh.AddVertex({ { newVertex.pos },{newVertex.uv},{newVertex.normal} });
+		}
+		for (size_t index = 0; index < model->GetModelData().meshes[i].indicies.size(); index++) {
+			uint32_t newIndex = model->GetModelData().meshes[i].indicies[index];
+			newMesh.AddIndex(newIndex);
+		}
+		newMesh.CreateMesh();
+		model->AddMesh(std::move(newMesh));
+	}
+
 	instance->models_.insert(std::make_pair("Sphere", std::move(model)));
 }
 
@@ -456,6 +498,20 @@ ModelData ModelManager::CreateRing(float out, float in, float radius, bool horiz
 		newModelMesh.indicies.push_back(inner1);
 	}
 	model->GetModelData().meshes.push_back(newModelMesh);
+
+	for (size_t i = 0; i < model->GetModelData().meshes.size(); i++) {
+		Mesh newMesh{};
+		for (size_t index = 0; index < model->GetModelData().meshes[i].vertices.size(); index++) {
+			VertexData newVertex = model->GetModelData().meshes[i].vertices[index];
+			newMesh.AddVertex({ { newVertex.pos },{newVertex.uv},{newVertex.normal} });
+		}
+		for (size_t index = 0; index < model->GetModelData().meshes[i].indicies.size(); index++) {
+			uint32_t newIndex = model->GetModelData().meshes[i].indicies[index];
+			newMesh.AddIndex(newIndex);
+		}
+		newMesh.CreateMesh();
+		model->AddMesh(std::move(newMesh));
+	}
 
 	instance->models_.insert(std::make_pair(key, std::move(model)));
 
@@ -526,6 +582,20 @@ ModelData ModelManager::CreateCylinder(float topRadius, float bottomRadius, floa
 	}
 	model->GetModelData().meshes.push_back(newModelMesh);
 
+	for (size_t i = 0; i < model->GetModelData().meshes.size(); i++) {
+		Mesh newMesh{};
+		for (size_t index = 0; index < model->GetModelData().meshes[i].vertices.size(); index++) {
+			VertexData newVertex = model->GetModelData().meshes[i].vertices[index];
+			newMesh.AddVertex({ { newVertex.pos },{newVertex.uv},{newVertex.normal} });
+		}
+		for (size_t index = 0; index < model->GetModelData().meshes[i].indicies.size(); index++) {
+			uint32_t newIndex = model->GetModelData().meshes[i].indicies[index];
+			newMesh.AddIndex(newIndex);
+		}
+		newMesh.CreateMesh();
+		model->AddMesh(std::move(newMesh));
+	}
+
 	instance->models_.insert(std::make_pair(key, std::move(model)));
 
 	return instance->models_[key]->GetModelData();
@@ -576,46 +646,50 @@ void ModelManager::NormalCommand() {
 	PickingCommand();
 }
 
-Model* ModelManager::GetModel(const std::string& filePath) {
+Model* ModelManager::GetModel(const std::string& filePath, bool overWrite) {
+	ModelManager* instance = GetInstance();
 	// すでにロード済みならそれを返す
-	if (models_.contains(filePath)) {
-		return models_[filePath].get();
+	if (instance->models_.contains(filePath) && !overWrite) {
+		return instance->models_[filePath].get();
 	}
 	// 無ければ新規作成
-	LoadModelByExtension(filePath);
-	return models_[filePath].get();
+	LoadModelByExtension(filePath, overWrite);
+	return instance->models_[filePath].get();
 }
 
 Model* ModelManager::GetSphereModel() {
+	ModelManager* instance = GetInstance();
 	// すでにロード済みならそれを返す
-	if (models_.contains("Sphere")) {
-		return models_["Sphere"].get();
+	if (instance->models_.contains("Sphere")) {
+		return instance->models_["Sphere"].get();
 	}
 	// 無ければ新規作成
 	CreateSphere();
-	return models_["Sphere"].get();
+	return instance->models_["Sphere"].get();
 }
 
 Model* ModelManager::GetRingModel(float out, float in, float radius, bool horizon) {
+	ModelManager* instance = GetInstance();
 	// 引数からユニークな名前（キー）を作る
 	std::string key = "Ring_" + std::to_string(out) + "_" + std::to_string(in) + "_" + std::to_string(radius) + "_" + std::to_string(horizon);
-	if (models_.contains(key)) {
-		return models_[key].get();
+	if (instance->models_.contains(key)) {
+		return instance->models_[key].get();
 	}
 	// 無ければ新規作成
 	CreateRing(out, in, radius, horizon);
-	return models_[key].get();
+	return instance->models_[key].get();
 }
 
 Model* ModelManager::GetCylinderModel(float topRadius, float bottomRadius, float height) {
+	ModelManager* instance = GetInstance();
 	// 引数からユニークな名前（キー）を作る
 	std::string key = "Cylinder_" + std::to_string(topRadius) + "_" + std::to_string(bottomRadius) + "_" + std::to_string(height);
-	if (models_.contains(key)) {
-		return models_[key].get();
+	if (instance->models_.contains(key)) {
+		return instance->models_[key].get();
 	}
 	// 無ければ新規作成
 	CreateCylinder(topRadius, bottomRadius, height);
-	return models_[key].get();
+	return instance->models_[key].get();
 }
 
 void ModelManager::PickingUpdate() {

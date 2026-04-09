@@ -231,6 +231,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Math\Vector\Vector2.cpp" />
     <ClCompile Include="Engine\Math\Vector\Vector3.cpp" />
     <ClCompile Include="Engine\Model\AnimationData\AnimationModel.cpp" />
+    <ClCompile Include="Engine\Model\Base\RenderObject.cpp" />
     <ClCompile Include="Engine\Model\Line\Line3dDrawer.cpp" />
     <ClCompile Include="Engine\Model\Material\Material.cpp" />
     <ClCompile Include="Engine\Model\Mesh\Mesh.cpp" />
@@ -387,6 +388,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Math\Vector\Vector4.h" />
     <ClInclude Include="Engine\Model\AnimationData\AnimationModel.h" />
     <ClInclude Include="Engine\Model\AnimationData\AnimationStructs.h" />
+    <ClInclude Include="Engine\Model\Base\RenderObject.h" />
     <ClInclude Include="Engine\Model\Line\Line3dDrawer.h" />
     <ClInclude Include="Engine\Model\Material\Material.h" />
     <ClInclude Include="Engine\Model\Mesh\Mesh.h" />

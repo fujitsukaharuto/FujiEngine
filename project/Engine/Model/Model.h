@@ -52,7 +52,7 @@ struct ModelMesh {
 	std::vector<Graphics::VertexData> vertices;
 	std::vector<uint32_t> indicies;
 	MaterialDataPath material;
-	Math::Vector4 baseColor;
+	Math::Vector4 baseColor = { 1.0f,1.0f,1.0f,1.0f };
 };
 
 /// <summary>
@@ -77,13 +77,11 @@ namespace Graphics {
 		~Model();
 
 		/// <summary>普通モデル用描画</summary>
-		void Draw(ID3D12GraphicsCommandList* commandList, Material* mate);
+		void Draw(ID3D12GraphicsCommandList* commandList, std::vector<Material>& materials);
 
 		/// <summary>アニメーションモデル用描画</summary>
-		void AnimationDraw(DXCom* pDxcom, ID3D12GraphicsCommandList* commandList, std::vector<SkinnedMesh>& skinnedMeshes, Material* mate);
+		void AnimationDraw(DXCom* pDxcom, ID3D12GraphicsCommandList* commandList, std::vector<SkinnedMesh>& skinnedMeshes, std::vector<Material>& materials);
 
-		/// <summary>マテリアルの追加</summary>
-		void AddMaterial(const Material& material);
 		/// <summary>メッシュの追加</summary>
 		void AddMesh(Mesh&& mesh);
 
@@ -91,33 +89,7 @@ namespace Graphics {
 		void CreateSkinningInformation(DXCom* pDxcom);
 
 		//========================================================================*/
-		//* Setter
-		/// <summary>色の設定</summary>
-		void SetColor(const Math::Vector4& color, int index = 0);
-		/// <summary>UVスケールの設定</summary>
-		void SetUVScale(const Math::Vector2& scale, const Math::Vector2& uvTrans);
-		/// <summary>UVトランスフォームの設定</summary>
-		void SetUVTrans(const Math::Vector2& uvTrans);
-		/// <summary>α値の閾値</summary>
-		void SetAlphaRef(float ref);
-		/// <summary>反射の設定</summary>
-		void SetShininess(float shininess);
-		/// <summary>環境マップの設定</summary>
-		void SetEnvironment(float env);
-		/// <summary>Textureの設定</summary>
-		void SetTexture(const std::string& name);
-		/// <summary>Textureのファイルパスの設定</summary>
-		void SetTextureName(const std::string& name);
-		/// <summary>ライトモードの設定</summary>
-		void SetLightEnable(LightMode mode);
-
-		//========================================================================*/
 		//* Getter
-		std::string GetTextuerName() { return nowTextuer; }
-		int GetMaterialSize() { return int(material_.size()); }
-		Math::Vector4 GetColor(int index) { return material_[index].GetColor(); }
-		Math::Vector2 GetUVScale() { return uvScale_; }
-		Math::Vector2 GetUVTrans() { return uvTrans_; }
 		size_t GetMeshCount() { return mesh_.size(); }
 		size_t GetVertexSize(int i) { return mesh_[i].GetVertexCount(); }
 		ModelData& GetModelData() { return data_; }
@@ -132,17 +104,10 @@ namespace Graphics {
 
 		ModelData data_;
 
-		std::vector<Material> material_;
 		std::vector<Mesh> mesh_;
-		std::string nowTextuer;
-
-		Math::Vector2 uvScale_;
-		Math::Vector2 uvTrans_;
 
 		Microsoft::WRL::ComPtr<ID3D12Resource> skinningInformation_;
 		SkinningInformation* infoData_;
-
-
 
 	};
 }

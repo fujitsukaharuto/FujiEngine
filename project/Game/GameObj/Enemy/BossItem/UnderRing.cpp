@@ -67,9 +67,9 @@ void UnderRing::Update() {
 	}
 }
 
-void UnderRing::Draw([[maybe_unused]] Material* mate, [[maybe_unused]] bool is) {
-	OriginGameObject::Draw(nullptr, true);
-	cylinder_->Draw(nullptr, true);
+void UnderRing::Draw([[maybe_unused]] bool is) {
+	OriginGameObject::Draw(true);
+	cylinder_->Draw(true);
 }
 
 void UnderRing::DrawCollider() {

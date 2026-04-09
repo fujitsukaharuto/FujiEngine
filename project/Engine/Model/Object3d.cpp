@@ -7,8 +7,6 @@
 #include "Engine/ImGuiManager/ImGuiManager.h"
 #include "Engine/Editor/CommandManager.h"
 #include "Engine/Editor/PropertyCommand.h"
-#include "Engine/Editor/JsonSerializer.h"
-#include "Engine/ImGuiManager/NodeGraph.h"
 #ifdef _DEBUGMODE
 #include "ImGuizmo.h"
 namespace ed = ax::NodeEditor;
@@ -28,22 +26,22 @@ Object3d::Object3d() {
 
 Object3d::~Object3d() {
 	dxcommon_ = nullptr;
+	material_.clear();
 #ifdef _DEBUGMODE
 	if (nodeEditorContext_) {
 		ax::NodeEditor::DestroyEditor(nodeEditorContext_);
 		nodeEditorContext_ = nullptr;
 	}
 #endif // _DEBUG
-
 }
 
 void Object3d::Create(const std::string& fileName) {
 	this->camera_ = CameraManager::GetInstance()->GetCamera();
 	ModelManager::GetInstance()->LoadModelByExtension(fileName);
 	SetModel(fileName);
-	transform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
-	nowTextureName = model_->GetTextuerName();
+	transform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 	CreateWVP();
+	CreateIDResource();
 }
 
 void Object3d::CreateFromJson(const std::string& name) {
@@ -53,19 +51,19 @@ void Object3d::CreateFromJson(const std::string& name) {
 	if (objJson.contains("transform")) {
 		const auto& t = objJson["transform"];
 		if (t.contains("translate")) {
-			transform.translate.x = t["translate"][0];
-			transform.translate.y = t["translate"][1];
-			transform.translate.z = t["translate"][2];
+			transform_.translate.x = t["translate"][0];
+			transform_.translate.y = t["translate"][1];
+			transform_.translate.z = t["translate"][2];
 		}
 		if (t.contains("rotate")) {
-			transform.rotate.x = t["rotate"][0];
-			transform.rotate.y = t["rotate"][1];
-			transform.rotate.z = t["rotate"][2];
+			transform_.rotate.x = t["rotate"][0];
+			transform_.rotate.y = t["rotate"][1];
+			transform_.rotate.z = t["rotate"][2];
 		}
 		if (t.contains("scale")) {
-			transform.scale.x = t["scale"][0];
-			transform.scale.y = t["scale"][1];
-			transform.scale.z = t["scale"][2];
+			transform_.scale.x = t["scale"][0];
+			transform_.scale.y = t["scale"][1];
+			transform_.scale.z = t["scale"][2];
 		}
 	}
 }
@@ -74,72 +72,56 @@ void Object3d::CreateSphere() {
 	this->camera_ = CameraManager::GetInstance()->GetCamera();
 	ModelManager::GetInstance()->CreateSphere();
 	SetModel("Sphere");
-	transform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	transform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 	CreateWVP();
+	CreateIDResource();
 }
 
 void Object3d::CreateRing(float out, float in, float radius, bool horizon) {
 	this->camera_ = CameraManager::GetInstance()->GetCamera();
 	
-	model_ = std::make_unique<Model>();
-	model_->GetModelData() = ModelManager::GetInstance()->CreateRing(out, in, radius,horizon);
-	modelName_ = "Ring";
+	model_ = ModelManager::GetRingModel(out, in, radius,horizon);
+	modelName_ = "Ring_" + std::to_string(out) + "_" + std::to_string(in) + "_" + std::to_string(radius) + "_" + std::to_string(horizon);
 
+	material_.clear();
 	for (size_t i = 0; i < model_->GetModelData().meshes.size(); i++) {
-		Mesh newMesh{};
 		Material newMaterial{};
 		newMaterial.SetTextureNamePath((model_->GetModelData().meshes[i].material.textureFilePath));
 		newMaterial.CreateMaterial();
-		model_->AddMaterial(newMaterial);
-		model_->SetTextureName((model_->GetModelData().meshes[i].material.textureFilePath));
-
-		for (size_t index = 0; index < model_->GetModelData().meshes[i].vertices.size(); index++) {
-			VertexData newVertex = model_->GetModelData().meshes[i].vertices[index];
-			newMesh.AddVertex({ { newVertex.pos },{newVertex.uv},{newVertex.normal} });
-		}
-		for (size_t index = 0; index < model_->GetModelData().meshes[i].indicies.size(); index++) {
-			uint32_t newIndex = model_->GetModelData().meshes[i].indicies[index];
-			newMesh.AddIndex(newIndex);
-		}
-		newMesh.CreateMesh();
-		model_->AddMesh(std::move(newMesh));
+		material_.push_back(std::move(newMaterial));
+		nowTextureName_ = model_->GetModelData().meshes[i].material.textureFilePath;
 	}
 
-	transform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	transform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 	CreateWVP();
+	CreateIDResource();
 }
 
 void Object3d::CreateCylinder(float topRadius, float bottomRadius, float height) {
 	this->camera_ = CameraManager::GetInstance()->GetCamera();
-	model_ = std::make_unique<Model>();
-	model_->GetModelData() = ModelManager::GetInstance()->CreateCylinder(topRadius, bottomRadius, height);
-	modelName_ = "Cylinder";
 
+	model_ = ModelManager::GetCylinderModel(topRadius, bottomRadius, height);
+	modelName_ = "Cylinder_" + std::to_string(topRadius) + "_" + std::to_string(bottomRadius) + "_" + std::to_string(height);
+
+	material_.clear();
 	for (size_t i = 0; i < model_->GetModelData().meshes.size(); i++) {
-		Mesh newMesh{};
 		Material newMaterial{};
 		newMaterial.SetTextureNamePath((model_->GetModelData().meshes[i].material.textureFilePath));
 		newMaterial.CreateMaterial();
-		model_->AddMaterial(newMaterial);
-		model_->SetTextureName((model_->GetModelData().meshes[i].material.textureFilePath));
-
-		for (size_t index = 0; index < model_->GetModelData().meshes[i].vertices.size(); index++) {
-			VertexData newVertex = model_->GetModelData().meshes[i].vertices[index];
-			newMesh.AddVertex({ { newVertex.pos },{newVertex.uv},{newVertex.normal} });
-		}
-		for (size_t index = 0; index < model_->GetModelData().meshes[i].indicies.size(); index++) {
-			uint32_t newIndex = model_->GetModelData().meshes[i].indicies[index];
-			newMesh.AddIndex(newIndex);
-		}
-		newMesh.CreateMesh();
-		model_->AddMesh(std::move(newMesh));
+		material_.push_back(std::move(newMaterial));
+		nowTextureName_ = model_->GetModelData().meshes[i].material.textureFilePath;
 	}
 
-	transform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	transform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 	CreateWVP();
+	CreateIDResource();
 }
 
-void Object3d::Draw(Material* mate, bool isAdd) {
+void Graphics::Object3d::Update() {
+	SetWVP();
+}
+
+void Object3d::Draw(bool isAdd) {
 	SetWVP();
 #ifdef _DEBUGMODE
 	if (!isUseNodeGraph_) {
@@ -175,7 +157,7 @@ void Object3d::Draw(Material* mate, bool isAdd) {
 	}
 
 	if (model_) {
-		model_->Draw(cList, mate);
+		model_->Draw(cList, material_);
 	}
 
 	if (isAdd||isMaskMode_) {
@@ -196,58 +178,14 @@ void Object3d::AnimeDraw() {
 	lightManager_->SetLightCommand(cList);
 
 	if (model_) {
-		model_->Draw(cList, nullptr);
+		model_->Draw(cList, material_);
 	}
 }
 
-Matrix4x4 Object3d::GetWorldMat() const {
-	Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
-
-	if (transform.parent) {
-		if (transform.isNoneScaleParent) {
-			const Matrix4x4& parentWorldMatrix = transform.parent->GetWorldMat();
-			// スケール成分を除去した親ワールド行列を作成
-			Matrix4x4 noScaleParentMatrix = parentWorldMatrix;
-
-			// 各軸ベクトルの長さ（スケール）を計算
-			Vector3 xAxis = { parentWorldMatrix.m[0][0], parentWorldMatrix.m[1][0], parentWorldMatrix.m[2][0] };
-			Vector3 yAxis = { parentWorldMatrix.m[0][1], parentWorldMatrix.m[1][1], parentWorldMatrix.m[2][1] };
-			Vector3 zAxis = { parentWorldMatrix.m[0][2], parentWorldMatrix.m[1][2], parentWorldMatrix.m[2][2] };
-
-			float xLen = Vector3::Length(xAxis);
-			float yLen = Vector3::Length(yAxis);
-			float zLen = Vector3::Length(zAxis);
-
-			// 正規化（スケールを除去）
-			for (int i = 0; i < 3; ++i) {
-				noScaleParentMatrix.m[i][0] /= xLen;
-				noScaleParentMatrix.m[i][1] /= yLen;
-				noScaleParentMatrix.m[i][2] /= zLen;
-			}
-
-			// 変換はそのまま（位置は影響受けてOKなら）
-			worldMatrix = Multiply(worldMatrix, noScaleParentMatrix);
-		} else {
-			const Matrix4x4& parentWorldMatrix = transform.parent->GetWorldMat();
-			worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
-		}
-	} else if (transform.isCameraParent) {
-		const Matrix4x4& parentWorldMatrix = camera_->GetWorldMatrix();
-		worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
-	}
-
-	return worldMatrix;
+void Object3d::MeshDraw(Material* mate, int drawCount) {
+	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
+	model_->MeshDraw(cList, mate, drawCount);
 }
-
-Vector3 Object3d::GetWorldPos() const {
-
-	Matrix4x4 worldM = GetWorldMat();
-	Vector3 worldPos = { worldM.m[3][0],worldM.m[3][1] ,worldM.m[3][2] };
-
-	return worldPos;
-}
-
-
 
 void Object3d::DebugGUI() {
 #ifdef _DEBUGMODE
@@ -257,19 +195,19 @@ void Object3d::DebugGUI() {
 	}
 	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Selected;
 	if (ImGui::TreeNodeEx("Trans", flags)) {
-		ImGui::DragFloat3("position", &transform.translate.x, 0.01f);
+		ImGui::DragFloat3("position", &transform_.translate.x, 0.01f);
 		CreatePropertyCommand(0);
-		ImGui::DragFloat3("rotate", &transform.rotate.x, 0.01f);
+		ImGui::DragFloat3("rotate", &transform_.rotate.x, 0.01f);
 		CreatePropertyCommand(1);
-		ImGui::DragFloat3("scale", &transform.scale.x, 0.01f);
+		ImGui::DragFloat3("scale", &transform_.scale.x, 0.01f);
 		CreatePropertyCommand(2);
 
 		ImGui::Separator();
 		ImGui::RadioButton("TRANSLATE", &gizmoType_, 0); ImGui::SameLine();
 		ImGui::RadioButton("ROTATE", &gizmoType_, 1); ImGui::SameLine();
 		ImGui::RadioButton("SCALE", &gizmoType_, 2);
-		JsonSerializer::ShowSaveTransformPopup(transform); ImGui::SameLine();
-		JsonSerializer::ShowLoadTransformPopup(transform);
+		JsonSerializer::ShowSaveTransformPopup(transform_); ImGui::SameLine();
+		JsonSerializer::ShowLoadTransformPopup(transform_);
 		ImGuizmo::OPERATION operation;
 		switch (gizmoType_) {
 		case 0: operation = ImGuizmo::TRANSLATE; break;
@@ -279,10 +217,10 @@ void Object3d::DebugGUI() {
 		}
 
 		// ギズモの表示
-		Matrix4x4 model = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
-		if (transform.parent) {
-			if (transform.isNoneScaleParent) {
-				const Matrix4x4& parentWorldMatrix = transform.parent->GetWorldMat();
+		Matrix4x4 model = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+		if (transform_.parent) {
+			if (transform_.isNoneScaleParent) {
+				const Matrix4x4& parentWorldMatrix = transform_.parent->GetWorldMat();
 				// スケール成分を除去した親ワールド行列を作成
 				Matrix4x4 noScaleParentMatrix = parentWorldMatrix;
 
@@ -305,7 +243,7 @@ void Object3d::DebugGUI() {
 				// 変換はそのまま（位置は影響受けてOKなら）
 				model = Multiply(model, noScaleParentMatrix);
 			} else {
-				const Matrix4x4& parentWorldMatrix = transform.parent->GetWorldMat();
+				const Matrix4x4& parentWorldMatrix = transform_.parent->GetWorldMat();
 				model = Multiply(model, parentWorldMatrix);
 			}
 		}
@@ -325,9 +263,9 @@ void Object3d::DebugGUI() {
 		// 編集中なら Transform に反映
 		if (ImGuizmo::IsUsing()) {
 			if (!IsUsingGizmo_) {
-				prevPos_ = transform.translate;
-				prevRotate_ = transform.rotate;
-				prevScale_ = transform.scale;
+				prevPos_ = transform_.translate;
+				prevRotate_ = transform_.rotate;
+				prevScale_ = transform_.scale;
 			}
 			IsUsingGizmo_ = true;
 
@@ -336,10 +274,10 @@ void Object3d::DebugGUI() {
 			constexpr float DegToRad = 3.14159265f / 180.0f;
 			r = r * DegToRad;
 
-			if (transform.parent) {
+			if (transform_.parent) {
 				// 親ワールド行列（スケールあり or スケールなし）
-				Matrix4x4 parentMatrix = transform.parent->GetWorldMat();
-				if (transform.isNoneScaleParent) {
+				Matrix4x4 parentMatrix = transform_.parent->GetWorldMat();
+				if (transform_.isNoneScaleParent) {
 					// スケール除去（コードはそのまま流用）
 					for (int i = 0; i < 3; ++i) {
 						Vector3 axis = { parentMatrix.m[0][i], parentMatrix.m[1][i], parentMatrix.m[2][i] };
@@ -355,26 +293,26 @@ void Object3d::DebugGUI() {
 				Matrix4x4 worldMatrix = MakeAffineMatrix(s, r, t);
 				Matrix4x4 localMatrix = Multiply(worldMatrix, invParentMatrix);
 
-				ImGuizmo::DecomposeMatrixToComponents(&localMatrix.m[0][0], &transform.translate.x, &transform.rotate.x, &transform.scale.x);
-				transform.rotate = transform.rotate * DegToRad;
+				ImGuizmo::DecomposeMatrixToComponents(&localMatrix.m[0][0], &transform_.translate.x, &transform_.rotate.x, &transform_.scale.x);
+				transform_.rotate = transform_.rotate * DegToRad;
 			} else {
-				transform.translate = t;
-				transform.rotate = r;
-				transform.scale = s;
+				transform_.translate = t;
+				transform_.rotate = r;
+				transform_.scale = s;
 			}
 		} else if (IsUsingGizmo_) {
 			// 編集終了検出 → Command 発行
-			if (transform.translate != prevPos_) {
+			if (transform_.translate != prevPos_) {
 				auto command = std::make_unique<PropertyCommand<Vector3>>(
-					transform, &Trans::translate, prevPos_, transform.translate);
+					transform_, &Trans::translate, prevPos_, transform_.translate);
 				CommandManager::GetInstance()->Execute(std::move(command));
-			} else if (transform.rotate != prevRotate_) {
+			} else if (transform_.rotate != prevRotate_) {
 				auto command = std::make_unique<PropertyCommand<Vector3>>(
-					transform, &Trans::rotate, prevRotate_, transform.rotate);
+					transform_, &Trans::rotate, prevRotate_, transform_.rotate);
 				CommandManager::GetInstance()->Execute(std::move(command));
-			} else if (transform.scale != prevScale_) {
+			} else if (transform_.scale != prevScale_) {
 				auto command = std::make_unique<PropertyCommand<Vector3>>(
-					transform, &Trans::scale, prevScale_, transform.scale);
+					transform_, &Trans::scale, prevScale_, transform_.scale);
 				CommandManager::GetInstance()->Execute(std::move(command));
 			}
 
@@ -385,11 +323,11 @@ void Object3d::DebugGUI() {
 	}
 
 	if (ImGui::TreeNodeEx("color", flags)) {
-		Vector4 color = model_->GetColor(0);
+		Vector4 color = material_[0].GetColor();
 		ImGui::ColorEdit4("color", &color.x);
 		SetColor(color);
-		Vector2 uvScale = model_->GetUVScale();
-		Vector2 uvTrans = model_->GetUVTrans();
+		Vector2 uvScale = material_[0].GetUVScale();
+		Vector2 uvTrans = material_[0].GetUVTrans();
 		ImGui::DragFloat2("uvScale", &uvScale.x, 0.1f);
 		ImGui::DragFloat2("uvTrans", &uvTrans.x, 0.1f);
 		SetUVScale(uvScale, uvTrans);
@@ -478,7 +416,7 @@ void Object3d::DebugGUI() {
 }
 
 void Object3d::LoadTransformFromJson(const std::string& filename) {
-	JsonSerializer::DeserializeTransform(filename, transform);
+	JsonSerializer::DeserializeTransform(filename, transform_);
 }
 
 void Object3d::LoadNodeEditorData(const std::string& filename) {
@@ -510,233 +448,70 @@ void Object3d::CreateNodeEditor(const std::string& filename) {
 	if (selectorNodeId_.Get() != 0) {
 		MyNode* selNode = nodeGraph_.FindNodeById(selectorNodeId_);
 		if (selNode) {
-			selNode->values[0] = NodeValue(nowTextureName);
+			selNode->values[0] = NodeValue(nowTextureName_);
 		}
 	}
 #endif // _DEBUG
 }
 
-void Object3d::SetColor(const Vector4& color) {
-	model_->SetColor(color);
-}
-
-void Object3d::SetUVScale(const Vector2& scale, const Vector2& uvTrans) {
-	model_->SetUVScale(scale, uvTrans);
-}
-
-void Object3d::SetUVTrans(const Vector2& uvTrans) {
-	model_->SetUVTrans(uvTrans);
-}
-
 void Object3d::SetAlphaRef(float ref) {
-	model_->SetAlphaRef(ref);
+	for (Material& material : material_) {
+		material.SetAlphaRef(ref);
+	}
 }
 
 void Object3d::SetTexture(const std::string& name) {
-	if (name == nowTextureName) {
+	if (name == nowTextureName_) {
 		return;
 	}
-	model_->SetTexture(name);
-	nowTextureName = name;
+	for (Material& material : material_) {
+		material.SetTexture(name);
+	}
+	nowTextureName_ = name;
 #ifdef _DEBUGMODE
 	if (selectorNodeId_.Get() != 0) {
 		MyNode* selNode = nodeGraph_.FindNodeById(selectorNodeId_);
 		if (selNode) {
-			selNode->values[0] = NodeValue(nowTextureName);
+			selNode->values[0] = NodeValue(nowTextureName_);
 		}
 	}
 #endif // _DEBUG
-}
-
-void Object3d::SetLightEnable(LightMode mode) {
-	model_->SetLightEnable(mode);
-}
-
-void Object3d::SetModel(const std::string& fileName, bool overWrite) {
-	model_ = std::make_unique<Model>();
-	model_->GetModelData() = ModelManager::FindModel(fileName, overWrite);
-	modelName_ = fileName;
-
-	for (size_t i = 0; i < model_->GetModelData().meshes.size(); i++) {
-		Mesh newMesh{};
-		Material newMaterial{};
-		newMaterial.SetTextureNamePath((model_->GetModelData().meshes[i].material.textureFilePath));
-		newMaterial.CreateMaterial();
-		model_->AddMaterial(newMaterial);
-		model_->SetTextureName((model_->GetModelData().meshes[i].material.textureFilePath));
-
-		for (size_t index = 0; index < model_->GetModelData().meshes[i].vertices.size(); index++) {
-			VertexData newVertex = model_->GetModelData().meshes[i].vertices[index];
-			newMesh.AddVertex({ { newVertex.pos },{newVertex.uv},{newVertex.normal} });
-		}
-		for (size_t index = 0; index < model_->GetModelData().meshes[i].indicies.size(); index++) {
-			uint32_t newIndex = model_->GetModelData().meshes[i].indicies[index];
-			newMesh.AddIndex(newIndex);
-		}
-		newMesh.CreateMesh();
-		model_->AddMesh(std::move(newMesh));
-	}
-
 }
 
 void Object3d::SetEditorObjParameter() {
 	objIDData_->objID += 1000;
 }
 
-void Object3d::MeshDraw(Material* mate, int drawCount) {
-	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
-	model_->MeshDraw(cList, mate, drawCount);
-}
-
-void Object3d::CreateWVP() {
-	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
-		wvpResource_[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(TransformationMatrix));
-		wvpDateGPU_[i] = nullptr;
-		wvpResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&wvpDateGPU_[i]));
-		wvpDateGPU_[i]->WVP = MakeIdentity4x4();
-		wvpDateGPU_[i]->World = MakeIdentity4x4();
-		wvpDateGPU_[i]->WorldInverseTransPose = Transpose(Inverse(wvpDateGPU_[i]->World));
-
-		cameraPosResource_[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(DirectionalLight));
-		cameraPosDataGPU_[i] = nullptr;
-		cameraPosResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&cameraPosDataGPU_[i]));
-		cameraPosDataGPU_[i]->worldPosition = camera_->GetTranslate();
-	}
-
+void Graphics::Object3d::CreateIDResource() {
 	objIDDataResource_ = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(ObjIDData));
 	objIDData_ = nullptr;
 	objIDDataResource_->Map(0, nullptr, reinterpret_cast<void**>(&objIDData_));
 	objIDData_->objID = ++useObjID_;
 }
 
-void Object3d::SetWVP() {
-	Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
-	Matrix4x4 worldViewProjectionMatrix;
-
-
-	if (transform.parent) {
-		if (transform.isNoneScaleParent) {
-			const Matrix4x4& parentWorldMatrix = transform.parent->GetWorldMat();
-			// スケール成分を除去した親ワールド行列を作成
-			Matrix4x4 noScaleParentMatrix = parentWorldMatrix;
-
-			// 各軸ベクトルの長さ（スケール）を計算
-			Vector3 xAxis = { parentWorldMatrix.m[0][0], parentWorldMatrix.m[1][0], parentWorldMatrix.m[2][0] };
-			Vector3 yAxis = { parentWorldMatrix.m[0][1], parentWorldMatrix.m[1][1], parentWorldMatrix.m[2][1] };
-			Vector3 zAxis = { parentWorldMatrix.m[0][2], parentWorldMatrix.m[1][2], parentWorldMatrix.m[2][2] };
-
-			float xLen = Vector3::Length(xAxis);
-			float yLen = Vector3::Length(yAxis);
-			float zLen = Vector3::Length(zAxis);
-
-			// 正規化（スケールを除去）
-			for (int i = 0; i < 3; ++i) {
-				noScaleParentMatrix.m[i][0] /= xLen;
-				noScaleParentMatrix.m[i][1] /= yLen;
-				noScaleParentMatrix.m[i][2] /= zLen;
-			}
-
-			// 変換はそのまま（位置は影響受けてOKなら）
-			worldMatrix = Multiply(worldMatrix, noScaleParentMatrix);
-		} else {
-			const Matrix4x4& parentWorldMatrix = transform.parent->GetWorldMat();
-			worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
-		}
-	} else if (transform.animeParent) {
-		if (transform.isNoneScaleParent) {
-			const Matrix4x4& parentWorldMatrix = *transform.animeParent;
-			// スケール成分を除去した親ワールド行列を作成
-			Matrix4x4 noScaleParentMatrix = parentWorldMatrix;
-
-			// 各軸ベクトルの長さ（スケール）を計算
-			Vector3 xAxis = { parentWorldMatrix.m[0][0], parentWorldMatrix.m[1][0], parentWorldMatrix.m[2][0] };
-			Vector3 yAxis = { parentWorldMatrix.m[0][1], parentWorldMatrix.m[1][1], parentWorldMatrix.m[2][1] };
-			Vector3 zAxis = { parentWorldMatrix.m[0][2], parentWorldMatrix.m[1][2], parentWorldMatrix.m[2][2] };
-
-			float xLen = Vector3::Length(xAxis);
-			float yLen = Vector3::Length(yAxis);
-			float zLen = Vector3::Length(zAxis);
-
-			// 正規化（スケールを除去）
-			for (int i = 0; i < 3; ++i) {
-				noScaleParentMatrix.m[i][0] /= xLen;
-				noScaleParentMatrix.m[i][1] /= yLen;
-				noScaleParentMatrix.m[i][2] /= zLen;
-			}
-
-			// 変換はそのまま（位置は影響受けてOKなら）
-			worldMatrix = Multiply(worldMatrix, noScaleParentMatrix);
-		} else {
-			const Matrix4x4& parentWorldMatrix = *transform.animeParent;
-			worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
-		}
-	} else if (transform.isCameraParent) {
-		const Matrix4x4& parentWorldMatrix = camera_->GetWorldMatrix();
-		worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
-	}
-
-
-	if (camera_) {
-		const Matrix4x4& viewProjectionMatrix = camera_->GetViewProjectionMatrix();
-		worldViewProjectionMatrix = Multiply(worldMatrix, viewProjectionMatrix);
-	} else {
-		worldViewProjectionMatrix = worldMatrix;
-	}
-
-	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
-	wvpDateGPU_[frameIndex]->World = Multiply(model_->GetModelData().rootNode.local, worldMatrix);
-	wvpDateGPU_[frameIndex]->WVP = Multiply(model_->GetModelData().rootNode.local, worldViewProjectionMatrix);
-	wvpDateGPU_[frameIndex]->WorldInverseTransPose = Transpose(Inverse(wvpDateGPU_[frameIndex]->World));
-
-	cameraPosDataGPU_[frameIndex]->worldPosition = camera_->GetTranslate();
-
-}
-
-void Object3d::SetBillboardWVP() {
-	Matrix4x4 worldViewProjectionMatrix;
-	Matrix4x4 worldMatrix = MakeIdentity4x4();
-
-
-	worldMatrix = Multiply(MakeScaleMatrix(transform.scale), MakeRotateXYZMatrix(transform.rotate));
-	worldMatrix = Multiply(worldMatrix, billboardMatrix_);
-	worldMatrix = Multiply(worldMatrix, MakeTranslateMatrix(transform.translate));
-
-	if (camera_) {
-		const Matrix4x4& viewProjectionMatrix = camera_->GetViewProjectionMatrix();
-		worldViewProjectionMatrix = Multiply(worldMatrix, viewProjectionMatrix);
-	} else {
-		worldViewProjectionMatrix = worldMatrix;
-	}
-
-	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
-	wvpDateGPU_[frameIndex]->World = worldMatrix;
-	wvpDateGPU_[frameIndex]->WVP = worldViewProjectionMatrix;
-	wvpDateGPU_[frameIndex]->WorldInverseTransPose = Transpose(Inverse(wvpDateGPU_[frameIndex]->World));
-}
-
 void Object3d::CreatePropertyCommand(int type) {
 #ifdef _DEBUGMODE
 	if (ImGui::IsItemActivated()) {
 		switch (type) {
-		case 0: prevPos_ = transform.translate; break;
-		case 1: prevRotate_ = transform.rotate;    break;
-		case 2: prevScale_ = transform.scale;     break;
+		case 0: prevPos_ = transform_.translate; break;
+		case 1: prevRotate_ = transform_.rotate;    break;
+		case 2: prevScale_ = transform_.scale;     break;
 		default: break;
 		}
 	}
 	if (ImGui::IsItemDeactivatedAfterEdit()) { // 編集完了検出
 		switch (type) {
 		case 0:
-			CommandManager::TryCreatePropertyCommand(transform, prevPos_, transform.translate, &Trans::translate);
-			prevPos_ = transform.translate;
+			CommandManager::TryCreatePropertyCommand(transform_, prevPos_, transform_.translate, &Trans::translate);
+			prevPos_ = transform_.translate;
 			break;
 		case 1:
-			CommandManager::TryCreatePropertyCommand(transform, prevRotate_, transform.rotate, &Trans::rotate);
-			prevRotate_ = transform.rotate;
+			CommandManager::TryCreatePropertyCommand(transform_, prevRotate_, transform_.rotate, &Trans::rotate);
+			prevRotate_ = transform_.rotate;
 			break;
 		case 2:
-			CommandManager::TryCreatePropertyCommand(transform, prevScale_, transform.scale, &Trans::scale);
-			prevScale_ = transform.scale;
+			CommandManager::TryCreatePropertyCommand(transform_, prevScale_, transform_.scale, &Trans::scale);
+			prevScale_ = transform_.scale;
 			break;
 		default: break;
 		}
@@ -750,7 +525,7 @@ void Object3d::NodeContentsUpdate() {
 	}
 
 	if (nodeContentData_[0].isMoveUV_) {
-		Vector2 newUV = model_->GetUVTrans();
+		Vector2 newUV = material_[0].GetUVTrans();
 		if (nodeContentData_[0].isAddDeltaUV_) {
 			newUV.x += FPSKeeper::DeltaTime();
 			newUV.y += FPSKeeper::DeltaTime();

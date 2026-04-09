@@ -65,12 +65,12 @@ void WaveWall::Update() {
 
 }
 
-void WaveWall::Draw([[maybe_unused]] Material* mate, [[maybe_unused]] bool is) {
-	underRing_->Draw(nullptr,true);
-	wave1_->Draw(nullptr, true);
-	wave2_->Draw(nullptr, true);
-	wave3_->Draw(nullptr, true);
-	OriginGameObject::Draw(nullptr, true);
+void WaveWall::Draw([[maybe_unused]] bool is) {
+	underRing_->Draw(true);
+	wave1_->Draw(true);
+	wave2_->Draw(true);
+	wave3_->Draw(true);
+	OriginGameObject::Draw(true);
 }
 
 void WaveWall::DrawCollider() {

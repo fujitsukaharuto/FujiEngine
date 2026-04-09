@@ -63,6 +63,7 @@ namespace Graphics {
 		ID3D12Resource* GetMaterialResource();
 		std::string GetPathName() const { return textureNamePath_.textureFilePath; }
 		Math::Vector4 GetColor();
+		Math::Vector2 GetUVScale() { return scale_; }
 		Math::Vector2 GetUVTrans() { return uvTrans_; }
 
 		//========================================================================*/

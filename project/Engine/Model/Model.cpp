@@ -7,24 +7,16 @@ using namespace Math;
 
 Model::Model() {
 	data_.rootNode.local = MakeIdentity4x4();
-	uvScale_ = { 1.0f,1.0f };
-	uvTrans_ = { 0.0f,0.0f };
 }
 
 Model::~Model() {
-	material_.clear();
 	mesh_.clear();
 }
 
-void Model::Draw(ID3D12GraphicsCommandList* commandList, Material* mate = nullptr) {
+void Model::Draw(ID3D12GraphicsCommandList* commandList, std::vector<Material>& materials) {
 	for (uint32_t index = 0; index < mesh_.size(); ++index) {
-		if (mate) {
-			commandList->SetGraphicsRootConstantBufferView(0, mate->GetMaterialResource()->GetGPUVirtualAddress());
-			commandList->SetGraphicsRootDescriptorTable(2, mate->GetTexture()->gpuHandle);
-		} else {
-			commandList->SetGraphicsRootConstantBufferView(0, material_[index].GetMaterialResource()->GetGPUVirtualAddress());
-			commandList->SetGraphicsRootDescriptorTable(2, material_[index].GetTexture()->gpuHandle);
-		}
+		commandList->SetGraphicsRootConstantBufferView(0, materials[index].GetMaterialResource()->GetGPUVirtualAddress());
+		commandList->SetGraphicsRootDescriptorTable(2, materials[index].GetTexture()->gpuHandle);
 
 		commandList->IASetVertexBuffers(0, 1, &mesh_[index].GetVBV());
 		commandList->IASetIndexBuffer(&mesh_[index].GetIBV());
@@ -32,16 +24,11 @@ void Model::Draw(ID3D12GraphicsCommandList* commandList, Material* mate = nullpt
 	}
 }
 
-void Model::AnimationDraw(DXCom* pDxcom, ID3D12GraphicsCommandList* commandList, std::vector<SkinnedMesh>& skinnedMeshes, Material* mate) {
+void Model::AnimationDraw(DXCom* pDxcom, ID3D12GraphicsCommandList* commandList, std::vector<SkinnedMesh>& skinnedMeshes, std::vector<Material>& materials) {
 	int vertexOffset = 0;
 	for (uint32_t index = 0; index < mesh_.size(); ++index) {
-		if (mate) {
-			commandList->SetGraphicsRootConstantBufferView(0, mate->GetMaterialResource()->GetGPUVirtualAddress());
-			commandList->SetGraphicsRootDescriptorTable(2, mate->GetTexture()->gpuHandle);
-		} else {
-			commandList->SetGraphicsRootConstantBufferView(0, material_[index].GetMaterialResource()->GetGPUVirtualAddress());
-			commandList->SetGraphicsRootDescriptorTable(2, material_[index].GetTexture()->gpuHandle);
-		}
+		commandList->SetGraphicsRootConstantBufferView(0, materials[index].GetMaterialResource()->GetGPUVirtualAddress());
+		commandList->SetGraphicsRootDescriptorTable(2, materials[index].GetTexture()->gpuHandle);
 
 		commandList->IASetVertexBuffers(0, 1, &skinnedMeshes[index].GetSkinnedVBV());
 		commandList->IASetIndexBuffer(&mesh_[index].GetIBV());
@@ -55,10 +42,6 @@ void Model::AnimationDraw(DXCom* pDxcom, ID3D12GraphicsCommandList* commandList,
 	}
 }
 
-void Model::AddMaterial(const Material& material) {
-	material_.push_back(material);
-}
-
 void Model::AddMesh(Mesh&& mesh) {
 	mesh_.push_back(std::move(mesh));
 }
@@ -69,63 +52,6 @@ void Model::CreateSkinningInformation(DXCom* pDxcom) {
 	skinningInformation_->Map(0, nullptr, reinterpret_cast<void**>(&infoData_));
 	for (int i = 0; i < mesh_.size(); i++) {
 		infoData_->numVertices += static_cast<int32_t>(mesh_[i].GetVertexCount());
-	}
-}
-
-void Model::SetColor(const Vector4& color, int index) {
-	material_[index].SetColor(color);
-}
-
-void Model::SetUVScale(const Vector2& scale, const Vector2& uvTrans) {
-	uvScale_ = scale;
-	uvTrans_ = uvTrans;
-	for (Material& material : material_) {
-		material.SetUVScale(scale, uvTrans);
-	}
-}
-
-void Model::SetUVTrans(const Vector2& uvTrans) {
-	uvTrans_ = uvTrans;
-	for (Material& material : material_) {
-		material.SetUVScale(uvScale_, uvTrans_);
-	}
-}
-
-void Model::SetAlphaRef(float ref) {
-	for (Material& material : material_) {
-		material.SetAlphaRef(ref);
-	}
-}
-
-void Model::SetShininess(float shininess) {
-	for (Material& material : material_) {
-		material.SetShininess(shininess);
-	}
-}
-
-void Model::SetEnvironment(float env) {
-	for (Material& material : material_) {
-		material.SetEnvironment(env);
-	}
-}
-
-void Model::SetTexture(const std::string& name) {
-	if (nowTextuer == name) {
-		return;
-	}
-	for (uint32_t index = 0; index < mesh_.size(); ++index) {
-		material_[index].SetTexture(name);
-	}
-	nowTextuer = name;
-}
-
-void Model::SetTextureName(const std::string& name) {
-	nowTextuer = name;
-}
-
-void Model::SetLightEnable(LightMode mode) {
-	for (uint32_t index = 0; index < mesh_.size(); ++index) {
-		material_[index].SetLightEnable(mode);
 	}
 }
 
@@ -158,13 +84,9 @@ void Model::CSDispatch(DXCom* pDxcom, const SkinCluster& skinCluster, ID3D12Grap
 
 void Model::MeshDraw(ID3D12GraphicsCommandList* commandList, Material* mate, int drawCount) {
 	for (uint32_t index = 0; index < mesh_.size(); ++index) {
-		if (mate) {
-			commandList->SetGraphicsRootConstantBufferView(0, mate->GetMaterialResource()->GetGPUVirtualAddress());
-			commandList->SetGraphicsRootDescriptorTable(2, mate->GetTexture()->gpuHandle);
-		} else {
-			commandList->SetGraphicsRootConstantBufferView(0, material_[index].GetMaterialResource()->GetGPUVirtualAddress());
-			commandList->SetGraphicsRootDescriptorTable(2, material_[index].GetTexture()->gpuHandle);
-		}
+		commandList->SetGraphicsRootConstantBufferView(0, mate->GetMaterialResource()->GetGPUVirtualAddress());
+		commandList->SetGraphicsRootDescriptorTable(2, mate->GetTexture()->gpuHandle);
+
 		commandList->IASetVertexBuffers(0, 1, &mesh_[index].GetVBV());
 		commandList->IASetIndexBuffer(&mesh_[index].GetIBV());
 		commandList->DrawIndexedInstanced(static_cast<UINT>(mesh_[index].GetIndexCount()), drawCount, 0, 0, 0);

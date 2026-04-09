@@ -161,7 +161,7 @@ void Player::Update() {
 	collider_->InfoUpdate();
 }
 
-void Player::Draw(Material* mate, bool is) {
+void Player::Draw(bool is) {
 
 	for (auto& bullet : bullets_) {
 		if (bullet->GetIsLive()) {
@@ -171,7 +171,7 @@ void Player::Draw(Material* mate, bool is) {
 
 	shadow_->Draw();
 
-	OriginGameObject::Draw(mate, is);
+	OriginGameObject::Draw(is);
 
 #ifdef _DEBUGMODE
 	collider_->DrawCollider();
