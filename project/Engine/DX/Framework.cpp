@@ -108,6 +108,8 @@ void Core::Framework::InitGeneralSystems() {
 	textureManager_->Initialize(dxcommon_.get());
 	modelManager_ = ModelManager::GetInstance();
 	modelManager_->Initialize(dxcommon_.get(), lightManager_.get());
+	objectRenderer_ = ObjectRenderer::GetInstance();
+	objectRenderer_->Initialize(dxcommon_.get(), lightManager_.get());
 	spriteRenderer_ = SpriteRenderer::GetInstance();
 	spriteRenderer_->Initialize(dxcommon_.get());
 

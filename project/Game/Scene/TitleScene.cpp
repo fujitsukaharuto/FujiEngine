@@ -25,12 +25,8 @@ TitleScene::~TitleScene() {
 
 void TitleScene::Initialize() {
 
-	obj3dCommon_ = std::make_unique<Object3dCommon>();
-	obj3dCommon_->Initialize();
-
 	CameraManager::GetInstance()->GetCamera()->GetTransform().rotate = { cameraStartRotateX_,0.0f,0.0f };
 	CameraManager::GetInstance()->GetCamera()->GetTransform().translate = cameraPos_;
-	
 
 	dxcommon_->GetOffscreenManager()->ResetPostEffect();
 	dxcommon_->GetOffscreenManager()->AddPostEffect(PostEffectList::Bloom);
@@ -125,8 +121,6 @@ void TitleScene::Update() {
 #endif // _DEBUG
 
 	BlackFade();
-	skybox_->Update();
-
 
 	if (FPSKeeper::DeltaTimeFrame() < FPSKeeper::GetClampFrame()) {
 		startTime_ -= FPSKeeper::DeltaTimeFrame();
@@ -154,14 +148,11 @@ void TitleScene::Draw() {
 #pragma region 背景描画
 
 
-	dxcommon_->ClearDepthBuffer();
 #pragma endregion
-
 
 #pragma region 3Dオブジェクト
 	skybox_->Draw();
 
-	obj3dCommon_->PreDraw();
 	terrain_->Draw();
 	surroundings_->Draw();
 
@@ -186,17 +177,9 @@ void TitleScene::Draw() {
 	CommandManager::GetInstance()->Draw();
 #endif // _DEBUG
 
-	ParticleManager::GetInstance()->Draw();
-
-
-	Line3dDrawer::GetInstance()->Render();
-
 #pragma endregion
 
-	//test
 #pragma region 前景スプライト
-
-	dxcommon_->PreSpriteDraw();
 	if (blackTime_ != 0.0f) {
 		black_->Draw();
 	}
@@ -225,7 +208,6 @@ void TitleScene::DebugGUI() {
 		particleTest_->DebugGUI();
 	}
 	skybox_->DebugGUI();
-	surroundings_->DebugGUI();
 	if (ImGui::CollapsingHeader("terrain")) {
 		terrain_->DebugGUI();
 	}

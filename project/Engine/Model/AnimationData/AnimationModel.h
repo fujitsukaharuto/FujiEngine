@@ -10,7 +10,6 @@
 #include "Engine/Model/Base/RenderObject.h"
 #include "Model/Model.h"
 #include "Camera.h"
-#include "Model/Object3dCommon.h"
 #include "Math/Animation/Animation.h"
 #include "Math/Animation/Skelton.h"
 #include "Engine/DX/FrameCount.h"
@@ -27,65 +26,45 @@ namespace Graphics {
 
 	public:
 
-		void DebugGUI();
-
-		/// <summary>
-		/// アニメーションデータの読み込み
-		/// </summary>
-		void LoadAnimationFile(const std::string& filename);
-
-		/// <summary>
-		/// スケルトンの生成
-		/// </summary>
-		void CreateSkeleton(const Node& rootNode);
-
-		/// <summary>
-		/// モデルの生成
-		/// </summary>
+		/// <summary>モデルの生成</summary>
 		void Create(const std::string& fileName) override;
-
 		void CreateSphere();
-
-		/// <summary>
-		/// スキンクラスターの生成
-		/// </summary>
+		/// <summary>スケルトンの生成</summary>
+		void CreateSkeleton(const Node& rootNode);
+		/// <summary>スキンクラスターの生成</summary>
 		SkinCluster CreateSkinCluster(const Skeleton& skeleton, const ModelData& modelData);
 
-		void AnimationUpdate();
-
-		/// <summary>
-		/// ディスパッチ処理
-		/// </summary>
-		void CSDispatch();
-
 		void Update() override;
+		void AnimationUpdate();
+		void SkeletonUpdate();
+		void SkinClusterUpdate();
+		/// <summary>アニメーションの適用</summary>
+		void ApplyAnimation();
 		void Draw(bool isAdd = false) override;
+		void Render() override;
 		void AnimeDraw();
 		void SkeletonDraw();
+
+		/// <summary>ディスパッチ処理</summary>
+		void CSDispatch();
+
+		void DebugGUI();
 
 		//========================================================================*/
 		//* Getter
 		Math::Matrix4x4* GetJointTrans(const std::string& jointName);
 		Math::Vector3 GetJointWorldPos(const std::string& jointName);
 
+		/// <summary>親子付け用にJointを登録しとく</summary>
 		void RegisterJointWorld(const std::string& jointName);
 
-		void SkeletonUpdate();
-		void SkinClusterUpdate();
-
-		/// <summary>
-		/// アニメーションの適用
-		/// </summary>
-		void ApplyAnimation();
-
-		/// <summary>
-		/// アニメーションの変更
-		/// </summary>
+		/// <summary>アニメーションの変更</summary>
 		void ChangeAnimation(const std::string& newName);
 
-		/// <summary>
-		/// JsonからTransformを設定
-		/// </summary>
+		/// <summary>アニメーションデータの読み込み</summary>
+		void LoadAnimationFile(const std::string& filename);
+
+		/// <summary>JsonからTransformを設定</summary>
 		void LoadTransformFromJson(const std::string& filename);
 
 		//========================================================================*/

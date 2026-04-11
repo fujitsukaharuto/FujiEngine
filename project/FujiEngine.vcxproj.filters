@@ -74,9 +74,6 @@
     <ClCompile Include="Engine\Model\Object3d.cpp">
       <Filter>Engine\Model</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Model\Object3dCommon.cpp">
-      <Filter>Engine\Model</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\GraphicPipeline\PipelineManager.cpp">
       <Filter>Engine\GraphicPipeline</Filter>
     </ClCompile>
@@ -196,9 +193,6 @@
     </ClCompile>
     <ClCompile Include="Engine\Editor\CommandManager.cpp">
       <Filter>Engine\Editor</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\GameObj\SkyDome\SkyBox.cpp">
-      <Filter>Game\GameObj\SkyDome</Filter>
     </ClCompile>
     <ClCompile Include="Engine\GraphicPipeline\SkyboxPipe.cpp">
       <Filter>Engine\GraphicPipeline</Filter>
@@ -422,6 +416,9 @@
     <ClCompile Include="Engine\Model\Base\RenderObject.cpp">
       <Filter>Engine\Model\Base</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Model\SkyBox\SkyBox.cpp">
+      <Filter>Engine\Model\SkyBox</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -494,9 +491,6 @@
       <Filter>Engine\Model</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Model\Object3d.h">
-      <Filter>Engine\Model</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Model\Object3dCommon.h">
       <Filter>Engine\Model</Filter>
     </ClInclude>
     <ClInclude Include="Engine\GraphicPipeline\PipelineManager.h">
@@ -672,9 +666,6 @@
     </ClInclude>
     <ClInclude Include="Engine\Editor\PropertyCommand.h">
       <Filter>Engine\Editor</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\GameObj\SkyDome\SkyBox.h">
-      <Filter>Game\GameObj\SkyDome</Filter>
     </ClInclude>
     <ClInclude Include="Engine\GraphicPipeline\SkyboxPipe.h">
       <Filter>Engine\GraphicPipeline</Filter>
@@ -895,6 +886,9 @@
     <ClInclude Include="Engine\Model\Base\RenderObject.h">
       <Filter>Engine\Model\Base</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Model\SkyBox\SkyBox.h">
+      <Filter>Engine\Model\SkyBox</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -1005,9 +999,6 @@
     <Filter Include="Engine\Editor">
       <UniqueIdentifier>{b324ee81-9c59-4fe2-9acd-053eaf7bcddc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\GameObj\SkyDome">
-      <UniqueIdentifier>{972c8ba7-1fdf-4420-8976-641d635fa5ae}</UniqueIdentifier>
-    </Filter>
     <Filter Include="resource\Shaders\CS\Engine">
       <UniqueIdentifier>{a53b59b2-f85d-43ce-897a-0b92b392dcaf}</UniqueIdentifier>
     </Filter>
@@ -1049,6 +1040,9 @@
     </Filter>
     <Filter Include="Engine\Model\Material">
       <UniqueIdentifier>{c4e45bc0-1b98-41a6-b007-01b813ed66da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Model\SkyBox">
+      <UniqueIdentifier>{498ad03e-86bb-40f0-a3a9-aa3e831a667b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

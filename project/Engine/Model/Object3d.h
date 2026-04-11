@@ -2,7 +2,6 @@
 #include <wrl/client.h>
 #include <string>
 #include "Engine/Model/Base/RenderObject.h"
-#include "Object3dCommon.h"
 #include "Engine/Editor/JsonSerializer.h"
 #include "Engine/ImGuiManager/NodeGraph.h"
 #include "Engine/DX/FrameCount.h"
@@ -48,9 +47,10 @@ namespace Graphics {
 
 		void Update() override;
 		void Draw(bool isAdd = false) override;
+		void Render() override;
 		/// <summary> 連番用描画 </summary>
 		void AnimeDraw();
-		// MeshDraw
+		// MeshDraw(Particle用)
 		void MeshDraw(Material* mate, int drawCount = 1);
 
 		void DebugGUI();

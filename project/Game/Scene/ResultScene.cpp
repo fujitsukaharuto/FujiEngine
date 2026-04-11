@@ -30,9 +30,6 @@ ResultScene::~ResultScene() {
 
 void ResultScene::Initialize() {
 
-	obj3dCommon_=std::make_unique<Object3dCommon>();
-	obj3dCommon_->Initialize();
-
 	CameraManager::GetInstance()->GetCamera()->GetTransform().rotate = { cameraStartRotateX_,0.0f,0.0f };
 	CameraManager::GetInstance()->GetCamera()->GetTransform().translate = cameraPos_;
 	lightManager_->GetDirectionLight()->SetLightDirection(lightDir_);
@@ -98,7 +95,6 @@ void ResultScene::Update() {
 #endif // _DEBUG
 
 	BlackFade();
-	skybox_->Update();
 
 	if (FPSKeeper::DeltaTimeFrame() < FPSKeeper::GetClampFrame()) {
 		if (waitTime_ > 0.0f) {
@@ -116,14 +112,11 @@ void ResultScene::Draw() {
 #pragma region 背景描画
 
 
-	dxcommon_->ClearDepthBuffer();
 #pragma endregion
-
 
 #pragma region 3Dオブジェクト
 	skybox_->Draw();
 
-	obj3dCommon_->PreDraw();
 	terrain_->Draw();
 	surroundings_->Draw();
 
@@ -137,14 +130,9 @@ void ResultScene::Draw() {
 	CommandManager::GetInstance()->Draw();
 #endif // _DEBUG
 
-	ParticleManager::GetInstance()->Draw();
-
 #pragma endregion
 
-
 #pragma region 前景スプライト
-
-	dxcommon_->PreSpriteDraw();
 	if (blackTime_ != 0.0f) {
 		black_->Draw();
 	}

@@ -1,6 +1,6 @@
 #pragma once
 #include "Scene/BaseScene.h"
-#include "Game/GameObj/SkyDome/SkyBox.h"
+#include "Engine/Model/SkyBox/SkyBox.h"
 
 /// <summary>
 /// カービィダンスっぽい動き
@@ -75,8 +75,7 @@ private:
 
 	void HanabiUpdate();
 
-	std::unique_ptr<Graphics::Object3dCommon> obj3dCommon_ = nullptr;
-	std::unique_ptr<SkyBox> skybox_;
+	std::unique_ptr<Graphics::SkyBox> skybox_;
 	std::unique_ptr<Graphics::AnimationModel> terrain_ = nullptr;
 	std::unique_ptr<Graphics::Object3d> surroundings_ = nullptr;
 	Math::Vector4 terrainColor_ = { 0.85f,0.15f,0.1f,1.0f };

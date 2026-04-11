@@ -28,10 +28,6 @@ GameScene::~GameScene() {
 
 void GameScene::Initialize() {
 
-	obj3dCommon_ = std::make_unique<Object3dCommon>();
-	obj3dCommon_->Initialize();
-
-
 #pragma region シーン遷移用
 	black_ = std::make_unique<Sprite>();
 	black_->Load("white2x2.png");
@@ -105,7 +101,6 @@ void GameScene::Update() {
 	}
 #endif // _DEBUG
 
-	skybox_->Update();
 	BlackFade();
 
 	if (!player_->GetIsGameOver()) {
@@ -118,17 +113,11 @@ void GameScene::Update() {
 void GameScene::Draw() {
 #pragma region 背景描画
 
-	boss_->CSDispatch();
 
-	dxcommon_->ClearDepthBuffer();
 #pragma endregion
-
 
 #pragma region 3Dオブジェクト
 	skybox_->Draw();
-
-
-	obj3dCommon_->PreDraw();
 
 	surroundings_->Draw();
 	terrain_->Draw();
@@ -136,18 +125,9 @@ void GameScene::Draw() {
 
 	boss_->Draw();
 
-	ParticleManager::GetInstance()->Draw();
-
-#ifdef _DEBUGMODE
-
-	Line3dDrawer::GetInstance()->Render();
-#endif // _DEBUG
 #pragma endregion
 
-
 #pragma region 前景スプライト
-
-	dxcommon_->PreSpriteDraw();
 	if (!player_->GetIsStart()) {
 		if (isPadDraw_) {
 			pad_->Draw();
@@ -159,7 +139,6 @@ void GameScene::Draw() {
 		gameOver_->Draw();
 		gameOverSelector_->Draw();
 	}
-	//test->Draw();
 	if (blackTime_ != 0.0f) {
 		black_->Draw();
 	} else if (isContinueFade_ || isGameOverFade_) {

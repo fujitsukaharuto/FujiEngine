@@ -1,5 +1,6 @@
 #include "AnimationModel.h"
 #include "Model/ModelManager.h"
+#include "Engine/Model/ObjectRenderer.h"
 #include "Engine/DX/DXCom.h"
 #include "Engine/DX/DX12Helper.h"
 #include "DX/SRVManager.h"
@@ -34,148 +35,6 @@ AnimationModel::~AnimationModel() {
 	lightManager_ = nullptr;
 }
 
-void AnimationModel::DebugGUI() {
-#ifdef _DEBUGMODE
-	ImGui::Indent();
-	if (ImGui::DragFloat("EnvironmentCoeff", &environmentCoeff_, 0.01f, 0.0f, 1.0f)) {
-		for (Material& material : material_) {
-			material.SetEnvironment(environmentCoeff_);
-		}
-	}
-	Vector4 color = material_[0].GetColor();
-	ImGui::ColorEdit3("color", &color.x);
-	SetColor(color);
-	if (animations_.size() == 0) {
-		ImGui::Unindent();
-		return;
-	}
-	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Selected;
-	if (ImGui::TreeNodeEx("animation", flags)) {
-
-		int currentIndex = -1;
-		std::vector<const char*> animationNames;
-		animationNames.reserve(animations_.size());
-
-		int index = 0;
-		for (const auto& [name, anime] : animations_) {
-			animationNames.push_back(name.c_str());
-			if (name == nowAnimationName_) {
-				currentIndex = index;
-			}
-			++index;
-		}
-
-		if (currentIndex == -1 && !animationNames.empty()) {
-			currentIndex = 0;
-			nowAnimationName_ = animationNames[0]; // デフォルトで先頭
-		}
-
-		if (!animationNames.empty()) {
-			if (ImGui::Combo("Animation Name", &currentIndex, animationNames.data(), static_cast<int>(animationNames.size()))) {
-				ChangeAnimation(animationNames[currentIndex]);
-			}
-		} else {
-			ImGui::Text("No animations available");
-		}
-
-		ImGui::DragFloat("Animation Time", &animationTime_, 0.01f, 0.0f, 100.0f);
-
-		ImGui::TreePop();
-	}
-	if (ImGui::TreeNodeEx("joint", flags)) {
-		for (int i = 0; i < skeleton_.joints.size(); ++i) {
-			const std::string& jointName = skeleton_.joints[i].name;
-			bool isSelected = (i == selectedJointIndex_);
-			if (ImGui::Selectable(jointName.c_str(), isSelected)) {
-				selectedJointIndex_ = i;
-			}
-		}
-		ImGui::TreePop();
-	}
-	ImGui::Unindent();
-#endif // _DEBUG
-}
-
-void AnimationModel::LoadAnimationFile(const std::string& filename) {
-	Assimp::Importer importer;
-
-	const aiScene* scene = importer.ReadFile(kDirectoryPath_ + filename.c_str(), 0);
-	assert(scene->mNumAnimations != 0);
-
-	CreateSkeleton(model_->GetModelData().rootNode);
-	skinCluster_ = CreateSkinCluster(skeleton_, model_->GetModelData());
-
-	animations_.clear();
-
-	for (uint32_t animIndex = 0; animIndex < scene->mNumAnimations; ++animIndex) {
-		aiAnimation* animationAssimp = scene->mAnimations[animIndex];
-		Animation animation;
-
-		// アニメーション名を取得（空なら仮の名前）
-		std::string animName;
-		if (animationAssimp->mName.length > 0) {
-			animName = animationAssimp->mName.C_Str();
-		} else {
-			animName = "Animation_" + std::to_string(animIndex);
-		}
-		animation.name = animName;
-		animation.duration = float(animationAssimp->mDuration / animationAssimp->mTicksPerSecond);
-
-		for (uint32_t channelIndex = 0; channelIndex < animationAssimp->mNumChannels; ++channelIndex) {
-			aiNodeAnim* nodeAnimationAssimp = animationAssimp->mChannels[channelIndex];
-			NodeAnimation& nodeAnimation = animation.nodeAnimations[nodeAnimationAssimp->mNodeName.C_Str()];
-
-			for (uint32_t keyIndex = 0; keyIndex < nodeAnimationAssimp->mNumPositionKeys; ++keyIndex) {
-				aiVectorKey& keyAssimp = nodeAnimationAssimp->mPositionKeys[keyIndex];
-				KeyframeVector3 keyframe;
-				keyframe.time = float(keyAssimp.mTime / animationAssimp->mTicksPerSecond);
-				keyframe.value = { -keyAssimp.mValue.x, keyAssimp.mValue.y, keyAssimp.mValue.z };
-				nodeAnimation.translate.keyframes.push_back(keyframe);
-			}
-
-			for (uint32_t keyIndex = 0; keyIndex < nodeAnimationAssimp->mNumRotationKeys; ++keyIndex) {
-				aiQuatKey& keyAssimp = nodeAnimationAssimp->mRotationKeys[keyIndex];
-				KeyframeQuaternion keyframe;
-				keyframe.time = float(keyAssimp.mTime / animationAssimp->mTicksPerSecond);
-				keyframe.value = { keyAssimp.mValue.x, -keyAssimp.mValue.y, -keyAssimp.mValue.z, keyAssimp.mValue.w };
-				nodeAnimation.rotate.keyframes.push_back(keyframe);
-			}
-
-			for (uint32_t keyIndex = 0; keyIndex < nodeAnimationAssimp->mNumScalingKeys; ++keyIndex) {
-				aiVectorKey& keyAssimp = nodeAnimationAssimp->mScalingKeys[keyIndex];
-				KeyframeVector3 keyframe;
-				keyframe.time = float(keyAssimp.mTime / animationAssimp->mTicksPerSecond);
-				keyframe.value = { keyAssimp.mValue.x, keyAssimp.mValue.y, keyAssimp.mValue.z };
-				nodeAnimation.scale.keyframes.push_back(keyframe);
-			}
-		}
-
-		// マップに追加
-		animations_[animName] = std::move(animation);
-	}
-
-	// 最初のアニメーションを再生対象にする（任意）
-	nowAnimationName_ = animations_.begin()->first;
-	preAnimationName_ = nowAnimationName_;
-
-	// UAVの作成
-	for (uint32_t index = 0; index < model_->GetMeshCount(); ++index) {
-		SkinnedMesh newSkinnedMesh{};
-		newSkinnedMesh.CreateUAV(model_->GetVertexSize(index));
-		skinnedMeshes_.push_back(std::move(newSkinnedMesh));
-	}
-
-	model_->CreateSkinningInformation(dxcommon_);
-	environment_ = TextureManager::GetInstance()->LoadTexture("skyboxTexture.dds");
-}
-
-void AnimationModel::CreateSkeleton(const Node& rootNode) {
-	skeleton_.root = CreateJoint(rootNode, {}, skeleton_.joints);
-	for (const Joint& joint : skeleton_.joints) {
-		skeleton_.jointMap.emplace(joint.name, joint.index);
-	}
-}
-
 void AnimationModel::Create(const std::string& fileName) {
 	this->camera_ = CameraManager::GetInstance()->GetCamera();
 	ModelManager::GetInstance()->LoadModelByExtension(fileName);
@@ -190,6 +49,13 @@ void AnimationModel::CreateSphere() {
 	SetModel("Sphere");
 	transform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 	CreateWVP();
+}
+
+void AnimationModel::CreateSkeleton(const Node& rootNode) {
+	skeleton_.root = CreateJoint(rootNode, {}, skeleton_.joints);
+	for (const Joint& joint : skeleton_.joints) {
+		skeleton_.jointMap.emplace(joint.name, joint.index);
+	}
 }
 
 SkinCluster AnimationModel::CreateSkinCluster(const Skeleton& skeleton, const ModelData& modelData) {
@@ -288,6 +154,10 @@ SkinCluster AnimationModel::CreateSkinCluster(const Skeleton& skeleton, const Mo
 	return skinCluster;
 }
 
+void Graphics::AnimationModel::Update() {
+	SetWVP();
+}
+
 void AnimationModel::AnimationUpdate() {
 	animationTime_ += FPSKeeper::DeltaTime();
 	blendTime_ += FPSKeeper::DeltaTime();
@@ -303,113 +173,6 @@ void AnimationModel::AnimationUpdate() {
 	ApplyAnimation();
 	SkeletonUpdate();
 	SkinClusterUpdate();
-}
-
-void AnimationModel::CSDispatch() {
-	model_->CSDispatch(dxcommon_, skinCluster_, dxcommon_->GetCommandList(), skinnedMeshes_, dxcommon_->GetNowFrameCount());
-}
-
-void Graphics::AnimationModel::Update() {
-	SetWVP();
-}
-
-void AnimationModel::Draw([[maybe_unused]] bool isAdd) {
-	SetWVP();
-
-	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
-	dxcommon_->GetDXCommand()->SetViewAndScissor(MyWin::kWindowWidth, MyWin::kWindowHeight);
-	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Animation);
-	dxcommon_->GetDXCommand()->GetList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	lightManager_->SetLightCommand(dxcommon_->GetCommandList());
-
-	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
-
-	cList->SetGraphicsRootConstantBufferView(1, wvpResource_[frameIndex]->GetGPUVirtualAddress());
-	cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_[frameIndex]->GetGPUVirtualAddress());
-	cList->SetGraphicsRootDescriptorTable(7, environment_->gpuHandle);
-
-	if (model_ && !isMirrorObj_) {
-		model_->AnimationDraw(dxcommon_, cList, skinnedMeshes_, material_);
-	} else if (isMirrorObj_) {
-		model_->Draw(cList, material_);
-	}
-
-	ModelManager::GetInstance()->NormalCommand();
-}
-
-void AnimationModel::AnimeDraw() {
-	SetBillboardWVP();
-
-	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
-
-	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
-	cList->SetGraphicsRootConstantBufferView(1, wvpResource_[frameIndex]->GetGPUVirtualAddress());
-	cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_[frameIndex]->GetGPUVirtualAddress());
-	lightManager_->SetLightCommand(cList);
-
-	if (model_) {
-		model_->Draw(cList, material_);
-	}
-}
-
-void AnimationModel::SkeletonDraw() {
-	for (size_t i = 0; i < skeleton_.joints.size(); ++i) {
-		Joint& joint = skeleton_.joints[i];
-		Matrix4x4 worldJointPos = Multiply(joint.skeletonSpaceMatrix, GetWorldMat());
-		Vector3 jointPos = {
-			worldJointPos.m[3][0],
-			worldJointPos.m[3][1],
-			worldJointPos.m[3][2]
-		};
-
-		// ハイライトの色判定
-		if (i == selectedJointIndex_) {
-			JointDraw(worldJointPos, { 1.0f, 0.0f, 0.0f, 1.0f }); // 赤で強調
-		} else {
-			JointDraw(worldJointPos, { 0.3f, 1.0f, 0.3f, 1.0f }); // 通常白
-		}
-
-		if (!joint.children.empty()) {
-
-		}
-
-		// 親子関係のライン
-		if (joint.parent) {
-			Matrix4x4 worldParentJointPos = Multiply(skeleton_.joints[*joint.parent].skeletonSpaceMatrix, GetWorldMat());
-			Vector3 parentPos = {
-				worldParentJointPos.m[3][0],
-				worldParentJointPos.m[3][1],
-				worldParentJointPos.m[3][2]
-			};
-			Line3dDrawer::GetInstance()->DrawLine3d(jointPos, parentPos, { 1.0f,1.0f,1.0f,1.0f });
-		}
-	}
-}
-
-Matrix4x4* AnimationModel::GetJointTrans(const std::string& jointName) {
-	auto it = jointWorldCache_.find(jointName);
-	if (it == jointWorldCache_.end()) {
-		return nullptr;
-	}
-	return it->second.get();
-}
-
-Math::Vector3 Graphics::AnimationModel::GetJointWorldPos(const std::string& jointName) {
-	auto it = jointWorldCache_.find(jointName);
-	if (it == jointWorldCache_.end() || !it->second) {
-		return {};
-	}
-
-	const auto& m = *it->second;
-	return { m.m[3][0], m.m[3][1], m.m[3][2] };
-}
-
-void Graphics::AnimationModel::RegisterJointWorld(const std::string& jointName) {
-	// すでに登録済みなら何もしない
-	if (jointWorldCache_.contains(jointName)) {
-		return;
-	}
-	jointWorldCache_[jointName] = std::make_unique<Math::Matrix4x4>(Math::Matrix4x4::MakeIdentity4x4());
 }
 
 void AnimationModel::SkeletonUpdate() {
@@ -491,6 +254,179 @@ void AnimationModel::ApplyAnimation() {
 	}
 }
 
+void AnimationModel::Draw(bool isAdd) {
+	isAdd_ = isAdd;
+	SetWVP();
+
+	ObjectRenderer::GetInstance()->AddSkinned(this);
+	ObjectRenderer::GetInstance()->Add(this);
+}
+
+void AnimationModel::Render() {
+	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
+	dxcommon_->GetDXCommand()->SetViewAndScissor(MyWin::kWindowWidth, MyWin::kWindowHeight);
+	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Animation);
+	dxcommon_->GetDXCommand()->GetList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	lightManager_->SetLightCommand(dxcommon_->GetCommandList());
+
+	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
+
+	cList->SetGraphicsRootConstantBufferView(1, wvpResource_[frameIndex]->GetGPUVirtualAddress());
+	cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_[frameIndex]->GetGPUVirtualAddress());
+	cList->SetGraphicsRootDescriptorTable(7, environment_->gpuHandle);
+
+	if (model_ && !isMirrorObj_) {
+		model_->AnimationDraw(dxcommon_, cList, skinnedMeshes_, material_);
+	} else if (isMirrorObj_) {
+		model_->Draw(cList, material_);
+	}
+
+	ModelManager::GetInstance()->NormalCommand();
+}
+
+void AnimationModel::AnimeDraw() {
+	SetBillboardWVP();
+
+	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
+
+	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
+	cList->SetGraphicsRootConstantBufferView(1, wvpResource_[frameIndex]->GetGPUVirtualAddress());
+	cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_[frameIndex]->GetGPUVirtualAddress());
+	lightManager_->SetLightCommand(cList);
+
+	if (model_) {
+		model_->Draw(cList, material_);
+	}
+}
+
+void AnimationModel::SkeletonDraw() {
+	for (size_t i = 0; i < skeleton_.joints.size(); ++i) {
+		Joint& joint = skeleton_.joints[i];
+		Matrix4x4 worldJointPos = Multiply(joint.skeletonSpaceMatrix, GetWorldMat());
+		Vector3 jointPos = {
+			worldJointPos.m[3][0],
+			worldJointPos.m[3][1],
+			worldJointPos.m[3][2]
+		};
+
+		// ハイライトの色判定
+		if (i == selectedJointIndex_) {
+			JointDraw(worldJointPos, { 1.0f, 0.0f, 0.0f, 1.0f }); // 赤で強調
+		} else {
+			JointDraw(worldJointPos, { 0.3f, 1.0f, 0.3f, 1.0f }); // 通常白
+		}
+
+		if (!joint.children.empty()) {
+
+		}
+
+		// 親子関係のライン
+		if (joint.parent) {
+			Matrix4x4 worldParentJointPos = Multiply(skeleton_.joints[*joint.parent].skeletonSpaceMatrix, GetWorldMat());
+			Vector3 parentPos = {
+				worldParentJointPos.m[3][0],
+				worldParentJointPos.m[3][1],
+				worldParentJointPos.m[3][2]
+			};
+			Line3dDrawer::GetInstance()->DrawLine3d(jointPos, parentPos, { 1.0f,1.0f,1.0f,1.0f });
+		}
+	}
+}
+
+void AnimationModel::CSDispatch() {
+	if (!isMirrorObj_) {
+		model_->CSDispatch(dxcommon_, skinCluster_, dxcommon_->GetCommandList(), skinnedMeshes_, dxcommon_->GetNowFrameCount());
+	}
+}
+
+void AnimationModel::DebugGUI() {
+#ifdef _DEBUGMODE
+	ImGui::Indent();
+	if (ImGui::DragFloat("EnvironmentCoeff", &environmentCoeff_, 0.01f, 0.0f, 1.0f)) {
+		for (Material& material : material_) {
+			material.SetEnvironment(environmentCoeff_);
+		}
+	}
+	Vector4 color = material_[0].GetColor();
+	ImGui::ColorEdit3("color", &color.x);
+	SetColor(color);
+	if (animations_.size() == 0) {
+		ImGui::Unindent();
+		return;
+	}
+	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Selected;
+	if (ImGui::TreeNodeEx("animation", flags)) {
+
+		int currentIndex = -1;
+		std::vector<const char*> animationNames;
+		animationNames.reserve(animations_.size());
+
+		int index = 0;
+		for (const auto& [name, anime] : animations_) {
+			animationNames.push_back(name.c_str());
+			if (name == nowAnimationName_) {
+				currentIndex = index;
+			}
+			++index;
+		}
+
+		if (currentIndex == -1 && !animationNames.empty()) {
+			currentIndex = 0;
+			nowAnimationName_ = animationNames[0]; // デフォルトで先頭
+		}
+
+		if (!animationNames.empty()) {
+			if (ImGui::Combo("Animation Name", &currentIndex, animationNames.data(), static_cast<int>(animationNames.size()))) {
+				ChangeAnimation(animationNames[currentIndex]);
+			}
+		} else {
+			ImGui::Text("No animations available");
+		}
+
+		ImGui::DragFloat("Animation Time", &animationTime_, 0.01f, 0.0f, 100.0f);
+
+		ImGui::TreePop();
+	}
+	if (ImGui::TreeNodeEx("joint", flags)) {
+		for (int i = 0; i < skeleton_.joints.size(); ++i) {
+			const std::string& jointName = skeleton_.joints[i].name;
+			bool isSelected = (i == selectedJointIndex_);
+			if (ImGui::Selectable(jointName.c_str(), isSelected)) {
+				selectedJointIndex_ = i;
+			}
+		}
+		ImGui::TreePop();
+	}
+	ImGui::Unindent();
+#endif // _DEBUG
+}
+
+Matrix4x4* AnimationModel::GetJointTrans(const std::string& jointName) {
+	auto it = jointWorldCache_.find(jointName);
+	if (it == jointWorldCache_.end()) {
+		return nullptr;
+	}
+	return it->second.get();
+}
+
+Math::Vector3 Graphics::AnimationModel::GetJointWorldPos(const std::string& jointName) {
+	auto it = jointWorldCache_.find(jointName);
+	if (it == jointWorldCache_.end() || !it->second) {
+		return {};
+	}
+
+	const auto& m = *it->second;
+	return { m.m[3][0], m.m[3][1], m.m[3][2] };
+}
+
+void Graphics::AnimationModel::RegisterJointWorld(const std::string& jointName) {
+	// すでに登録済みなら何もしない
+	if (jointWorldCache_.contains(jointName)) {
+		return;
+	}
+	jointWorldCache_[jointName] = std::make_unique<Math::Matrix4x4>(Math::Matrix4x4::MakeIdentity4x4());
+}
+
 void AnimationModel::ChangeAnimation(const std::string& newName) {
 	if (newName == nowAnimationName_) return;
 
@@ -506,6 +442,79 @@ void AnimationModel::ChangeAnimation(const std::string& newName) {
 	nowAnimationName_ = newName;
 	animationTime_ = 0.0f; // Bは頭から再生
 	blendTime_ = 0.0f;
+}
+
+void AnimationModel::LoadAnimationFile(const std::string& filename) {
+	Assimp::Importer importer;
+
+	const aiScene* scene = importer.ReadFile(kDirectoryPath_ + filename.c_str(), 0);
+	assert(scene->mNumAnimations != 0);
+
+	CreateSkeleton(model_->GetModelData().rootNode);
+	skinCluster_ = CreateSkinCluster(skeleton_, model_->GetModelData());
+
+	animations_.clear();
+
+	for (uint32_t animIndex = 0; animIndex < scene->mNumAnimations; ++animIndex) {
+		aiAnimation* animationAssimp = scene->mAnimations[animIndex];
+		Animation animation;
+
+		// アニメーション名を取得（空なら仮の名前）
+		std::string animName;
+		if (animationAssimp->mName.length > 0) {
+			animName = animationAssimp->mName.C_Str();
+		} else {
+			animName = "Animation_" + std::to_string(animIndex);
+		}
+		animation.name = animName;
+		animation.duration = float(animationAssimp->mDuration / animationAssimp->mTicksPerSecond);
+
+		for (uint32_t channelIndex = 0; channelIndex < animationAssimp->mNumChannels; ++channelIndex) {
+			aiNodeAnim* nodeAnimationAssimp = animationAssimp->mChannels[channelIndex];
+			NodeAnimation& nodeAnimation = animation.nodeAnimations[nodeAnimationAssimp->mNodeName.C_Str()];
+
+			for (uint32_t keyIndex = 0; keyIndex < nodeAnimationAssimp->mNumPositionKeys; ++keyIndex) {
+				aiVectorKey& keyAssimp = nodeAnimationAssimp->mPositionKeys[keyIndex];
+				KeyframeVector3 keyframe;
+				keyframe.time = float(keyAssimp.mTime / animationAssimp->mTicksPerSecond);
+				keyframe.value = { -keyAssimp.mValue.x, keyAssimp.mValue.y, keyAssimp.mValue.z };
+				nodeAnimation.translate.keyframes.push_back(keyframe);
+			}
+
+			for (uint32_t keyIndex = 0; keyIndex < nodeAnimationAssimp->mNumRotationKeys; ++keyIndex) {
+				aiQuatKey& keyAssimp = nodeAnimationAssimp->mRotationKeys[keyIndex];
+				KeyframeQuaternion keyframe;
+				keyframe.time = float(keyAssimp.mTime / animationAssimp->mTicksPerSecond);
+				keyframe.value = { keyAssimp.mValue.x, -keyAssimp.mValue.y, -keyAssimp.mValue.z, keyAssimp.mValue.w };
+				nodeAnimation.rotate.keyframes.push_back(keyframe);
+			}
+
+			for (uint32_t keyIndex = 0; keyIndex < nodeAnimationAssimp->mNumScalingKeys; ++keyIndex) {
+				aiVectorKey& keyAssimp = nodeAnimationAssimp->mScalingKeys[keyIndex];
+				KeyframeVector3 keyframe;
+				keyframe.time = float(keyAssimp.mTime / animationAssimp->mTicksPerSecond);
+				keyframe.value = { keyAssimp.mValue.x, keyAssimp.mValue.y, keyAssimp.mValue.z };
+				nodeAnimation.scale.keyframes.push_back(keyframe);
+			}
+		}
+
+		// マップに追加
+		animations_[animName] = std::move(animation);
+	}
+
+	// 最初のアニメーションを再生対象にする（任意）
+	nowAnimationName_ = animations_.begin()->first;
+	preAnimationName_ = nowAnimationName_;
+
+	// UAVの作成
+	for (uint32_t index = 0; index < model_->GetMeshCount(); ++index) {
+		SkinnedMesh newSkinnedMesh{};
+		newSkinnedMesh.CreateUAV(model_->GetVertexSize(index));
+		skinnedMeshes_.push_back(std::move(newSkinnedMesh));
+	}
+
+	model_->CreateSkinningInformation(dxcommon_);
+	environment_ = TextureManager::GetInstance()->LoadTexture("skyboxTexture.dds");
 }
 
 void AnimationModel::LoadTransformFromJson(const std::string& filename) {

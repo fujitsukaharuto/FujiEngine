@@ -22,9 +22,13 @@ void SpriteRenderer::Finalize() {
 	indexResource_.Reset();
 }
 
-void SpriteRenderer::Add(Sprite* sprite) {
+void SpriteRenderer::Add(Sprite* sprite, Layer layer) {
 	if (sprite) {
-		renderQueue_.push_back(sprite);
+		if (layer == Layer::Foreground) {
+			renderForegroundQueue_.push_back(sprite);
+		} else if (layer == Layer::Background) {
+			renderQueue_.push_back(sprite);
+		}
 	}
 }
 
@@ -56,6 +60,37 @@ void SpriteRenderer::Render() {
 
 	// 描画が終わったらリストを空にする
 	renderQueue_.clear();
+}
+
+void Graphics::SpriteRenderer::RenderForeground() {
+	// 描画するものがなければ何もしない
+	if (renderForegroundQueue_.empty()) {
+		return;
+	}
+
+	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
+	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
+
+	dxcommon_->GetDXCommand()->SetViewAndScissor(MyWin::kWindowWidth, MyWin::kWindowHeight);
+	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Sprite);
+	cList->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	cList->IASetVertexBuffers(0, 1, &vertexBufferView_);
+	cList->IASetIndexBuffer(&indexBufferView_);
+
+	// 登録されたスプライトをループで描画
+	for (Sprite* sprite : renderForegroundQueue_) {
+		cList->SetGraphicsRootConstantBufferView(0, sprite->GetMaterialGPUAddress());
+		cList->SetGraphicsRootConstantBufferView(1, sprite->GetWvpGPUAddress(frameIndex));
+		cList->SetGraphicsRootDescriptorTable(2, sprite->GetTextureSRV());
+		cList->DrawIndexedInstanced(6, 1, 0, 0, 0);
+	}
+
+	ModelManager::GetInstance()->NormalCommand();
+
+	// 描画が終わったらリストを空にする
+	renderForegroundQueue_.clear();
+	dxcommon_->ClearDepthBuffer();
 }
 
 void Graphics::SpriteRenderer::CreateCommonBuffer() {

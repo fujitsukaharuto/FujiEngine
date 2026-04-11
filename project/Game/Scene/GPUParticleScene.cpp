@@ -27,9 +27,6 @@ GPUParticleScene::~GPUParticleScene() {
 
 void GPUParticleScene::Initialize() {
 
-	obj3dCommon_ = std::make_unique<Object3dCommon>();
-	obj3dCommon_->Initialize();
-
 	CameraManager::GetInstance()->GetCamera()->GetTransform().rotate = { 0.0f,0.0f,0.0f };
 
 #pragma region シーン遷移用
@@ -62,38 +59,25 @@ void GPUParticleScene::Initialize() {
 
 void GPUParticleScene::Update() {
 
-	skybox_->Update();
-
 	BlackFade();
 
 	ParticleManager::GetInstance()->Update();
 }
 
 void GPUParticleScene::Draw() {
-
 #pragma region 背景描画
 
 
-	dxcommon_->ClearDepthBuffer();
 #pragma endregion
-
-	skybox_->Draw();
 
 #pragma region 3Dオブジェクト
-	obj3dCommon_->PreDraw();
+	skybox_->Draw();
+
 	terrain_->Draw();
-
-	ParticleManager::GetInstance()->Draw();
-
-
-	Line3dDrawer::GetInstance()->Render();
 
 #pragma endregion
 
-
 #pragma region 前景スプライト
-
-	dxcommon_->PreSpriteDraw();
 	if (blackTime_ != 0.0f) {
 		black_->Draw();
 	}

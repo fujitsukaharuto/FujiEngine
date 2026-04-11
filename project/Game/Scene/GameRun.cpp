@@ -73,6 +73,7 @@ void GameRun::Finalize() {
 	cameraManager_->Finalize();
 	pManager_->Finalize();
 	spriteRenderer_->Finalize();
+	objectRenderer_->Finalize();
 	textureManager_->Finalize();
 	modelManager_->Finalize();
 	lightManager_->Finalize();
@@ -119,7 +120,16 @@ void GameRun::Draw() {
 	// ゲームシーンの描画
 	sceneManager_->Draw();
 
+	objectRenderer_->Skinning();
+	spriteRenderer_->RenderForeground();
+	objectRenderer_->RenderSkyBox();
+	objectRenderer_->Render();
+	ParticleManager::GetInstance()->Draw();
+#ifdef _DEBUGMODE
+	Line3dDrawer::GetInstance()->Render();
+#endif // _DEBUG
 	spriteRenderer_->Render();
+
 	modelManager_->PickingDataCopy();
 
 	dxcommon_->Command();

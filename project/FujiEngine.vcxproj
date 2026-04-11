@@ -239,8 +239,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Model\Model.cpp" />
     <ClCompile Include="Engine\Model\ModelManager.cpp" />
     <ClCompile Include="Engine\Model\Object3d.cpp" />
-    <ClCompile Include="Engine\Model\Object3dCommon.cpp" />
     <ClCompile Include="Engine\Model\ObjectRenderer.cpp" />
+    <ClCompile Include="Engine\Model\SkyBox\SkyBox.cpp" />
     <ClCompile Include="Engine\Model\Sprite\Sprite.cpp" />
     <ClCompile Include="Engine\Model\Sprite\SpriteRenderer.cpp" />
     <ClCompile Include="Engine\Model\TextureManager.cpp" />
@@ -287,7 +287,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\GameObj\Player\Behavior\PlayerRoot.cpp" />
     <ClCompile Include="Game\GameObj\Player\Player.cpp" />
     <ClCompile Include="Game\GameObj\Player\PlayerBullet.cpp" />
-    <ClCompile Include="Game\GameObj\SkyDome\SkyBox.cpp" />
     <ClCompile Include="Game\Collider\BaseCollider.cpp" />
     <ClCompile Include="Game\Collider\AABBCollider.cpp" />
     <ClCompile Include="Game\Collider\CollisionManager.cpp" />
@@ -396,8 +395,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Model\Model.h" />
     <ClInclude Include="Engine\Model\ModelManager.h" />
     <ClInclude Include="Engine\Model\Object3d.h" />
-    <ClInclude Include="Engine\Model\Object3dCommon.h" />
     <ClInclude Include="Engine\Model\ObjectRenderer.h" />
+    <ClInclude Include="Engine\Model\SkyBox\SkyBox.h" />
     <ClInclude Include="Engine\Model\Sprite\Sprite.h" />
     <ClInclude Include="Engine\Model\Sprite\SpriteRenderer.h" />
     <ClInclude Include="Engine\Model\TextureManager.h" />
@@ -446,7 +445,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Game\GameObj\Player\Behavior\PlayerRoot.h" />
     <ClInclude Include="Game\GameObj\Player\Player.h" />
     <ClInclude Include="Game\GameObj\Player\PlayerBullet.h" />
-    <ClInclude Include="Game\GameObj\SkyDome\SkyBox.h" />
     <ClInclude Include="Game\Collider\BaseCollider.h" />
     <ClInclude Include="Game\Collider\AABBCollider.h" />
     <ClInclude Include="Game\Collider\CollisionManager.h" />

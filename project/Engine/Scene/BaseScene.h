@@ -4,7 +4,6 @@
 #include "Input.h"
 #include "AudioPlayer.h"
 #include "DebugCamera.h"
-#include "Object3dCommon.h"
 #include "Object3d.h"
 #include "Model/AnimationData/AnimationModel.h"
 #include "Sprite/Sprite.h"

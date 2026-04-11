@@ -19,6 +19,7 @@ namespace Graphics {
 
 		virtual void Update() = 0; 
 		virtual void Draw(bool isAdd = false) = 0;
+		virtual void Render() = 0;
 
 		//========================================================================*/
 		//* Getter
@@ -73,6 +74,8 @@ namespace Graphics {
 		Math::Matrix4x4 billboardMatrix_;
 		std::string nowTextureName_;
 		std::string modelName_;
+
+		bool isAdd_ = false;
 
 		DXCom* dxcommon_ = nullptr;
 		LightManager* lightManager_ = nullptr;

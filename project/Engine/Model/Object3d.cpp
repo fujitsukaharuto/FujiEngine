@@ -1,5 +1,6 @@
 #include "Object3d.h"
 #include "ModelManager.h"
+#include "Engine/Model/ObjectRenderer.h"
 #include "DXCom.h"
 #include "Engine/DX/DX12Helper.h"
 #include "LightManager.h"
@@ -122,7 +123,12 @@ void Graphics::Object3d::Update() {
 }
 
 void Object3d::Draw(bool isAdd) {
+	isAdd_ = isAdd;
 	SetWVP();
+	ObjectRenderer::GetInstance()->Add(this);
+}
+
+void Object3d::Render() {
 #ifdef _DEBUGMODE
 	if (!isUseNodeGraph_) {
 		NodeContentsUpdate();
@@ -134,14 +140,14 @@ void Object3d::Draw(bool isAdd) {
 
 	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
 	if (isMaskMode_) {
-		if (isAdd) {
+		if (isAdd_) {
 			dxcommon_->GetPipelineManager()->SetPipeline(Pipe::NormalNodeAdd);
 		} else {
 			dxcommon_->GetPipelineManager()->SetPipeline(Pipe::NormalNode);
 		}
 		lightManager_->SetLightCommand(cList);
 	} else {
-		if (isAdd) {
+		if (isAdd_) {
 			dxcommon_->GetPipelineManager()->SetPipeline(Pipe::NormalAdd);
 		}
 	}
@@ -160,7 +166,7 @@ void Object3d::Draw(bool isAdd) {
 		model_->Draw(cList, material_);
 	}
 
-	if (isAdd||isMaskMode_) {
+	if (isAdd_ || isMaskMode_) {
 		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Normal);
 		if (isMaskMode_) {
 			lightManager_->SetLightCommand(cList);

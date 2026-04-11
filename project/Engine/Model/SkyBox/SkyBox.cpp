@@ -1,5 +1,6 @@
 #include "SkyBox.h"
 #include "Engine/DX/DX12Helper.h"
+#include "Engine/Model/ObjectRenderer.h"
 
 using namespace Core;
 using namespace Graphics;
@@ -18,11 +19,12 @@ void SkyBox::Initialize() {
 	transform_.scale = { 300.0f,300.0f,300.0f };
 }
 
-void SkyBox::Update() {
+void SkyBox::Draw() {
 	UpdateWVP();
+	ObjectRenderer::GetInstance()->SetSkyBox(this);
 }
 
-void SkyBox::Draw() {
+void SkyBox::Render() {
 	dxcommon_->GetDXCommand()->SetViewAndScissor(MyWin::kWindowWidth, MyWin::kWindowHeight);
 	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Skybox);
 	dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -33,7 +35,7 @@ void SkyBox::Draw() {
 	dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, material_.GetMaterialResource()->GetGPUVirtualAddress());
 	dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(1, wvpResource_[frameIndex]->GetGPUVirtualAddress());
 	dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, material_.GetTexture()->gpuHandle);
-	
+
 	dxcommon_->GetCommandList()->DrawIndexedInstanced(static_cast<UINT>((index_.size())), 1, 0, 0, 0);
 }
 

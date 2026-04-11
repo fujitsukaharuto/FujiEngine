@@ -27,9 +27,6 @@ ParticleDebugScene::~ParticleDebugScene() {
 
 void ParticleDebugScene::Initialize() {
 
-	obj3dCommon_ = std::make_unique<Object3dCommon>();
-	obj3dCommon_->Initialize();
-
 	CameraManager::GetInstance()->GetCamera()->GetTransform().rotate = { 0.0f,0.0f,0.0f };
 
 #pragma region シーン遷移用
@@ -57,8 +54,6 @@ void ParticleDebugScene::Initialize() {
 
 void ParticleDebugScene::Update() {
 
-	skybox_->Update();
-
 #ifdef _DEBUGMODE
 
 	ParticleManager::GetInstance()->SelectParticleUpdate();
@@ -71,35 +66,22 @@ void ParticleDebugScene::Update() {
 }
 
 void ParticleDebugScene::Draw() {
-
 #pragma region 背景描画
 
 
-	dxcommon_->ClearDepthBuffer();
 #pragma endregion
-
-	skybox_->Draw();
 
 #pragma region 3Dオブジェクト
-	obj3dCommon_->PreDraw();
+	skybox_->Draw();
 	terrain_->Draw();
 
-	ParticleManager::GetInstance()->Draw();
-
 #ifdef _DEBUGMODE
-
 	ParticleManager::GetInstance()->SelectEmitterSizeDraw();
-
 #endif // _DEBUG
-
-	Line3dDrawer::GetInstance()->Render();
 
 #pragma endregion
 
-
 #pragma region 前景スプライト
-
-	dxcommon_->PreSpriteDraw();
 	if (blackTime_ != 0.0f) {
 		black_->Draw();
 	}
