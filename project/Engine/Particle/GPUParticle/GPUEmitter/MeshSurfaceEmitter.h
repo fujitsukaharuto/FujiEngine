@@ -37,8 +37,6 @@ struct EmitterSurface {
 
 class MeshSurfaceEmitter : public IGPUEmitter {
 public:
-	EmitterSurface data_;
-	bool isEmit_ = false;
 
 	MeshSurfaceEmitter(DXCom* dx);
 	void InitMeshData(const std::string& fileName, DXCom* dx, SRVManager* srv);
@@ -54,6 +52,8 @@ public:
 	void Emit() override;
 	bool IsEmit() const override { return isEmit_; }
 
+	EmitterSurface& GetData() { return data_; }
+
 	//========================================================================*/
 	//* Setter
 	void SetPos(const Math::Vector3& pos) override;
@@ -66,6 +66,9 @@ public:
 	void SetColorRandom(const Math::Vector3& max, const Math::Vector3& min = Math::Vector3(0.0f, 0.0f, 0.0f)) override;
 private:
 	void CopyData(uint32_t frameIndex = 0);
+
+	EmitterSurface data_;
+	bool isEmit_ = false;
 
 	char saveName_[64] = "default";
 	EmitterSurface* dataGPU_[DXC::kFrameCount_];

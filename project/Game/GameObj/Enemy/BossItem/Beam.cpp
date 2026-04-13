@@ -24,12 +24,12 @@ void Beam::Initialize() {
 	halfPi_ = std::numbers::pi_v<float> / 2.0f;
 
 	auto& emitter = ParticleManager::GetParticleCSEmitterSurface(1);
-	emitter.isEmit_ = false;
-	emitter.data_.count = 5000;
-	emitter.data_.colorMax = { 1.0f,0.0f,0.25f };
-	emitter.data_.colorMin = { 0.5f,0.0f,0.0f };
-	emitter.data_.velocityRandMax = 2.4f;
-	emitter.data_.velocityRandMin = -2.4f;
+	emitter.SetEmit(false);
+	emitter.GetData().count = 5000;
+	emitter.GetData().colorMax = { 1.0f,0.0f,0.25f };
+	emitter.GetData().colorMin = { 0.5f,0.0f,0.0f };
+	emitter.GetData().velocityRandMax = 2.4f;
+	emitter.GetData().velocityRandMin = -2.4f;
 
 	model_->SetLightEnable(LightMode::kLightNone);
 	model_->GetTransform().translate.y = 25.0f;
@@ -413,7 +413,7 @@ void Beam::ChangeBeamStep() {
 		changeTime_ -= FPSKeeper::DeltaTimeFrame();
 		float t = 1.0f - (changeTime_ / params_.changeBaseTime_);
 		Vector3 emitPos = Lerp(prePos_, targetPos_, t);
-		ParticleManager::GetParticleCSEmitterSurface(1).data_.translate = emitPos;
+		ParticleManager::GetParticleCSEmitterSurface(1).GetData().translate = emitPos;
 	}
 	if (changeTime_ <= 0.0f) {
 		expandTime_ = params_.expandBaseTime;

@@ -213,14 +213,14 @@ void Boss::DushInit() {
 
 	for (int i = 0; i < 8; i++) {
 		auto& emitter = ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]);
-		emitter.isEmit_ = true;
-		emitter.data_.lifeTime = 0.6f;
+		emitter.SetEmit(true);
+		emitter.GetData().lifeTime = 0.6f;
 		UpdateEmitterPos(i);
-		emitter.data_.prevTranslate = traceAnchors_[i]->GetWorldPos();
+		emitter.GetData().prevTranslate = traceAnchors_[i]->GetWorldPos();
 
 		Vector3 randColor = Random::GetVector3({ 0.0f,0.0f }, { 0.2f,0.8f }, { 0.2f,1.0f });
-		emitter.data_.colorMax = randColor;
-		emitter.data_.colorMin = randColor;
+		emitter.GetData().colorMax = randColor;
+		emitter.GetData().colorMin = randColor;
 	}
 }
 
@@ -246,14 +246,14 @@ void Boss::InitBeam() {
 
 	for (int i = 0; i < 8; i++) {
 		auto& emitter = ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]);
-		emitter.isEmit_ = true;
-		emitter.data_.lifeTime = bp.emitterLifeTime;
+		emitter.SetEmit(true);
+		emitter.GetData().lifeTime = bp.emitterLifeTime;
 		UpdateEmitterPos(i);
-		emitter.data_.prevTranslate = traceAnchors_[i]->GetWorldPos();
+		emitter.GetData().prevTranslate = traceAnchors_[i]->GetWorldPos();
 
 		Vector3 randColor = Random::GetVector3({ 0.3f,1.0f }, { 0.0f,0.2f }, { 0.0f,0.5f });
-		emitter.data_.colorMax = randColor;
-		emitter.data_.colorMin = randColor;
+		emitter.GetData().colorMax = randColor;
+		emitter.GetData().colorMin = randColor;
 	}
 }
 
@@ -267,11 +267,11 @@ void Boss::InitSummon() {
 
 	auto& emitter = ParticleManager::GetParticleCSEmitterTexture(summonIndex_);
 	emitter.SetEmit(true);
-	emitter.data_.lifeTime = 0.8f;
-	emitter.data_.radius = 10.0f;
-	emitter.data_.frequency = 0.01f;
-	emitter.data_.translate = animeModel_->GetTransform().translate;
-	emitter.data_.baseVelocity = { 0.0f,0.6f,0.0f };
+	emitter.GetData().lifeTime = 0.8f;
+	emitter.GetData().radius = 10.0f;
+	emitter.GetData().frequency = 0.01f;
+	emitter.GetData().translate = animeModel_->GetTransform().translate;
+	emitter.GetData().baseVelocity = { 0.0f,0.6f,0.0f };
 
 	bossYPos_ = animeModel_->GetTransform().translate.y;
 	defaultCorePos_ = core_->GetWorldPos();
@@ -327,13 +327,13 @@ void Boss::InitChargeParent() {
 
 		int numEmitter = ParticleManager::GetInstance()->InitGPUEmitter();
 		auto& emitter = ParticleManager::GetSphereEmitter(numEmitter);
-		emitter.isEmit_ = false;
-		emitter.data_.colorMax = { 1.0f,0.0f,0.0f };
-		emitter.data_.colorMin = { 1.0f,0.0f,0.0f };
-		emitter.data_.frequency = 0.0f;
-		emitter.data_.radius = 0.0f;
-		emitter.data_.scale = { 1.5f,1.5f,1.5f };
-		emitter.data_.lifeTime = 0.6f;
+		emitter.SetEmit(false);
+		emitter.GetData().colorMax = { 1.0f,0.0f,0.0f };
+		emitter.GetData().colorMin = { 1.0f,0.0f,0.0f };
+		emitter.GetData().frequency = 0.0f;
+		emitter.GetData().radius = 0.0f;
+		emitter.GetData().scale = { 1.5f,1.5f,1.5f };
+		emitter.GetData().lifeTime = 0.6f;
 		traceEmitterIndexes_.push_back(numEmitter);
 	}
 }

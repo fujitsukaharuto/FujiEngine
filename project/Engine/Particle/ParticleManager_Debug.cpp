@@ -132,7 +132,7 @@ void ParticleManager::ParticleDebugGUI() {
 					// 画像表示
 					ImGui::Image(
 						(ImTextureID)TextureManager::GetInstance()->GetTexture(
-							selectParticleGroup_->material_.GetPathName().c_str())->gpuHandle.ptr,
+							selectParticleGroup_->GetMaterial().GetPathName().c_str())->gpuHandle.ptr,
 						ImVec2(80, 80),
 						ImVec2(0, 0), ImVec2(1, 1),
 						ImVec4(1, 1, 1, 1), ImVec4(1, 1, 1, 0.5f) // 枠線をつける
@@ -145,7 +145,7 @@ void ParticleManager::ParticleDebugGUI() {
 					ImGui::Text("Material:");
 					ParticleTexturePopUp();
 					ImGui::Spacing();
-					ImGui::TextDisabled("Path: %s", selectParticleGroup_->material_.GetPathName().c_str());
+					ImGui::TextDisabled("Path: %s", selectParticleGroup_->GetMaterial().GetPathName().c_str());
 				}
 				ImGui::EndGroup();
 
@@ -156,12 +156,12 @@ void ParticleManager::ParticleDebugGUI() {
 					ImGui::Indent();
 
 					// Shape Type
-					int shapeType = static_cast<int>(selectParticleGroup_->shapeType_);
+					int shapeType = static_cast<int>(selectParticleGroup_->GetShapeType());
 					ImGui::Text("形状");
 					ImGui::SetNextItemWidth(-FLT_MIN);
 					if (ImGui::Combo("##ShapeType", &shapeType,
 						"平面\0リング\0球\0トーラス\0円柱\0コーン\0三角形\0キューブ\0雷\0")) {
-						selectParticleGroup_->shapeType_ = static_cast<ShapeType>(shapeType);
+						selectParticleGroup_->GetShapeType() = static_cast<ShapeType>(shapeType);
 					}
 
 					ImGui::Spacing();
@@ -178,14 +178,14 @@ void ParticleManager::ParticleDebugGUI() {
 					ImGui::Spacing();
 
 					// Counts
-					int maxCount = static_cast<uint32_t>(selectParticleGroup_->instanceCount_);
+					int maxCount = static_cast<uint32_t>(selectParticleGroup_->GetInstanceCount());
 					ImGui::Text("最大パーティクル数");
 					ImGui::SetNextItemWidth(-FLT_MIN);
 					if (ImGui::DragInt("##MaxCount", &maxCount, 10, 1, 10000)) {
-						selectParticleGroup_->instanceCount_ = static_cast<uint32_t>(maxCount);
+						selectParticleGroup_->GetInstanceCount() = static_cast<uint32_t>(maxCount);
 					}
 
-					ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "生存数: %d", int(selectParticleGroup_->drawCount_));
+					ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "生存数: %d", int(selectParticleGroup_->GetDrawCount()));
 
 					selectParticleGroup_->emitter_.EmitProgressGUI();
 
@@ -261,8 +261,8 @@ void ParticleManager::ParticleTexturePopUp() {
 				buttonCount = 0;
 			}
 			if (ImGui::ImageButton(("##" + TexName.first).c_str(), (ImTextureID)TextureManager::GetInstance()->GetTexture(TexName.first.c_str())->gpuHandle.ptr, ImVec2(100, 100))) {
-				selectParticleGroup_->material_.SetTextureNamePath(TexName.first.c_str());
-				selectParticleGroup_->material_.SetTexture(TexName.first.c_str(), TexName.second);
+				selectParticleGroup_->GetMaterial().SetTextureNamePath(TexName.first.c_str());
+				selectParticleGroup_->GetMaterial().SetTexture(TexName.first.c_str(), TexName.second);
 				if (TexName.second) {
 					TextureManager::GetInstance()->SetTextureFileOnceLoad(TexName.first.c_str());
 				}

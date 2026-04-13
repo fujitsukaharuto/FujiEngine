@@ -17,15 +17,6 @@ public:
 
 	virtual void Update(const Math::Matrix4x4& billboardMatrix,Camera* camera, uint32_t frameIndex) = 0;
 
-	Graphics::Material material_;
-	std::list<Particle> particles_;
-	uint32_t srvIndex_[DXC::kFrameCount_];
-	ComPtr<ID3D12Resource> instancing_[DXC::kFrameCount_];
-	uint32_t instanceCount_;
-	TransformationParticleMatrix* instancingDataGPU_[DXC::kFrameCount_];
-	uint32_t drawCount_;
-	ShapeType shapeType_ = ShapeType::PLANE;
-
 	/// <summary>パーティクルの寿命の処理</summary>
 	bool LifeUpdate(Particle& particle);
 	/// <summary>パーティクルのサイズのアップデート</summary>
@@ -35,5 +26,27 @@ public:
 	/// <summary>パーティクルのビルボード処理</summary>
 	void Billboard(Particle& particle, Math::Matrix4x4& worldMatrix, const Math::Matrix4x4& billboardMatrix, const Math::Matrix4x4& rotate, Camera* camera);
 	bool InitEmitParticle(Particle& particle, const Math::Vector3& pos, const Math::Vector3& rotate, const Particle& grain, const RandomParameter& para);
+
+	//========================================================================*/
+	//* Getter
+
+	Graphics::Material& GetMaterial() { return material_; }
+	std::list<Particle>& GetParticles() { return particles_; }
+	uint32_t& GetSRVIndex(UINT index) { return srvIndex_[index]; }
+	uint32_t& GetInstanceCount() { return instanceCount_; }
+	uint32_t& GetDrawCount() { return drawCount_; }
+	ComPtr<ID3D12Resource>& GetInstancingResource(UINT index) { return instancing_[index]; }
+	TransformationParticleMatrix*& GetInstancingDataGPU(UINT index) { return instancingDataGPU_[index]; }
+	ShapeType& GetShapeType() { return shapeType_; }
+
+protected:
+	Graphics::Material material_;
+	std::list<Particle> particles_;
+	uint32_t srvIndex_[DXC::kFrameCount_];
+	ComPtr<ID3D12Resource> instancing_[DXC::kFrameCount_];
+	uint32_t instanceCount_;
+	TransformationParticleMatrix* instancingDataGPU_[DXC::kFrameCount_];
+	uint32_t drawCount_;
+	ShapeType shapeType_ = ShapeType::PLANE;
 
 };

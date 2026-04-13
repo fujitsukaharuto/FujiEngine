@@ -37,8 +37,6 @@ struct EmitterTexture {
 
 class TextureBasedEmitter : public IGPUEmitter {
 public:
-	EmitterTexture data_;
-	bool isEmit_ = false;
 
 	TextureBasedEmitter(DXCom* dx);
 	void InitTextureData(const std::string& fileName);
@@ -54,6 +52,8 @@ public:
 	void Emit() override;
 	bool IsEmit() const override { return isEmit_; }
 
+	EmitterTexture& GetData() { return data_; }
+
 	//========================================================================*/
 	//* Setter
 	void SetPos(const Math::Vector3& pos) override;
@@ -66,6 +66,9 @@ public:
 	void SetColorRandom(const Math::Vector3& max, const Math::Vector3& min = Math::Vector3(0.0f, 0.0f, 0.0f)) override;
 private:
 	void CopyData(uint32_t frameIndex = 0);
+
+	EmitterTexture data_;
+	bool isEmit_ = false;
 
 	char saveName_[64] = "default";
 	EmitterTexture* dataGPU_[DXC::kFrameCount_];

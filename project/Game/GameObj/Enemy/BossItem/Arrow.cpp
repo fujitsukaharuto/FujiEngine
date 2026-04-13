@@ -137,8 +137,8 @@ void Arrow::InitArrow(const Vector3& pos, float emitTime) {
 	isLive_ = true;
 
 	auto& emitter = ParticleManager::GetSphereEmitter(emitterNumber_);
-	emitter.data_.prevTranslate = model_->GetTransform().translate;
-	emitter.data_.translate = model_->GetTransform().translate;
+	emitter.GetData().prevTranslate = model_->GetTransform().translate;
+	emitter.GetData().translate = model_->GetTransform().translate;
 }
 
 void Arrow::TargetSetting(const Vector3& target) {
@@ -183,7 +183,7 @@ void Arrow::ArrivalTimeUpdate() {
 	if (emitTime_ > 0.0f || animationTime_ > 0.0f) return;
 	if (arrivalTime_ > 0.0f) {
 		auto& emitter = ParticleManager::GetSphereEmitter(emitterNumber_);
-		emitter.data_.prevTranslate = model_->GetTransform().translate;
+		emitter.GetData().prevTranslate = model_->GetTransform().translate;
 		
 		float pret = (std::min)((1.0f - arrivalTime_ / totalArrivalTime_), 1.0f);
 		arrivalTime_ -= FPSKeeper::DeltaTimeFrame();
@@ -191,7 +191,7 @@ void Arrow::ArrivalTimeUpdate() {
 		float t = (std::min)((1.0f - arrivalTime_ / totalArrivalTime_), 1.0f);
 		Vector3 pos = (1.0f - t) * (1.0f - t) * startP_ + 2.0f * (1.0f - t) * t * midtermP_ + t * t * endP_;
 		model_->GetTransform().translate = pos;
-		emitter.data_.translate = model_->GetTransform().translate;
+		emitter.GetData().translate = model_->GetTransform().translate;
 
 		// 回転を決める
 		Vector3 dir = (2.0f * (1.0f - t)) * (midtermP_ - startP_) + (2.0f * t) * (endP_ - midtermP_);

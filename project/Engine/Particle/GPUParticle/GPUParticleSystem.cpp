@@ -107,7 +107,7 @@ void GPUParticleSystem::InitDefaultEmitter() {
 int GPUParticleSystem::InitGPUEmitter(int returnMod) {
 	std::unique_ptr<SphereEmitter> emitter;
 	emitter = std::make_unique<SphereEmitter>(dxcommon_);
-	emitter->isEmit_ = false;
+	emitter->SetEmit(false);
 
 	EmitterInfo info;
 	info.phase = PipelinePhase::Sphere;
@@ -125,7 +125,7 @@ int GPUParticleSystem::InitGPUEmitterTexture(const std::string& fileName) {
 	std::unique_ptr<TextureBasedEmitter> emitter;
 	emitter = std::make_unique<TextureBasedEmitter>(dxcommon_);
 	emitter->InitTextureData(fileName);
-	emitter->isEmit_ = false;
+	emitter->SetEmit(false);
 
 	EmitterInfo info;
 	info.phase = PipelinePhase::Texture;
@@ -142,7 +142,7 @@ int GPUParticleSystem::InitGPUEmitterSurface(const std::string& fileName) {
 	std::unique_ptr<MeshSurfaceEmitter> emitter;
 	emitter = std::make_unique<MeshSurfaceEmitter>(dxcommon_);
 	emitter->InitMeshData(fileName,dxcommon_,srvManager_);
-	emitter->isEmit_ = false;
+	emitter->SetEmit(false);
 
 	EmitterInfo info;
 	info.phase = PipelinePhase::Surface;

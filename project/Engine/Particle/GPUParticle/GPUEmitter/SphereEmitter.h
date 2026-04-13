@@ -45,8 +45,6 @@ struct EmitterSphere {
 
 class SphereEmitter : public IGPUEmitter {
 public:
-	EmitterSphere data_;
-	bool isEmit_ = false;
 
 	SphereEmitter(DXCom* dx);
 
@@ -61,6 +59,8 @@ public:
 	void Emit() override;
 	bool IsEmit() const override { return isEmit_; }
 
+	EmitterSphere& GetData() { return data_; }
+
 	//========================================================================*/
 	//* Setter
 	void SetPos(const Math::Vector3& pos) override;
@@ -73,6 +73,9 @@ public:
 	void SetColorRandom(const Math::Vector3& max, const Math::Vector3& min = Math::Vector3(0.0f, 0.0f, 0.0f)) override;
 private:
 	void CopyData(uint32_t frameIndex = 0);
+
+	EmitterSphere data_;
+	bool isEmit_ = false;
 
 	char saveName_[64] = "default";
 	EmitterSphere* dataGPU_[DXC::kFrameCount_];

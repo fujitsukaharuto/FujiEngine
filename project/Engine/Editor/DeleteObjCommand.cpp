@@ -16,7 +16,7 @@ void DeleteObjCommand::UnDo() {
 	// 描画するように
 	if (obj) {
 		obj->isActive = true;
-		CommandManager::GetInstance()->objectList[objId] = obj;
+		CommandManager::GetInstance()->GetObjectList()[objId] = obj;
 	}
 }
 

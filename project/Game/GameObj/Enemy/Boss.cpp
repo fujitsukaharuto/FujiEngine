@@ -287,7 +287,7 @@ bool Boss::DushCharge(float& t, float maxT, bool& isNear, float range) {
 
 	for (int i = 0; i < 8; i++) {
 		auto& emitter = ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]);
-		emitter.data_.prevTranslate = traceAnchors_[i]->GetWorldPos();
+		emitter.GetData().prevTranslate = traceAnchors_[i]->GetWorldPos();
 
 		if (chargeParents_[i]->GetTransform().scale.x > 0.0f) { // チャージのサイズを縮小していく
 			ShrinkScale(i, chargeSize_ / chargeTime_);
@@ -376,14 +376,14 @@ bool Boss::BeamCharge() {
 	bool result = false;
 	if (ParticleManager::GetParticleCSEmitterSurface(1).IsEmit() == false) {
 		auto& emitter = ParticleManager::GetParticleCSEmitterSurface(1);
-		emitter.isEmit_ = true;
-		emitter.data_.radius = 0.0f;
-		emitter.data_.translate = animeModel_->GetTransform().translate;
-		emitter.data_.translate.y = bp.parentY;
+		emitter.SetEmit(true);
+		emitter.GetData().radius = 0.0f;
+		emitter.GetData().translate = animeModel_->GetTransform().translate;
+		emitter.GetData().translate.y = bp.parentY;
 	}
 
 	if (chargeSize_ > 0.0f) {
-		ParticleManager::GetParticleCSEmitterSurface(1).data_.radius += bp.radiusGrowSpeed * FPSKeeper::DeltaTimeFrame();
+		ParticleManager::GetParticleCSEmitterSurface(1).GetData().radius += bp.radiusGrowSpeed * FPSKeeper::DeltaTimeFrame();
 		for (int i = 0; i < 8; i++) {
 			if (i > 2) {
 				if (!(chargeTime_ < bp.chargeTime - i * 2.0f)) {
@@ -392,7 +392,7 @@ bool Boss::BeamCharge() {
 			}
 
 			auto& emitter = ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]);
-			emitter.data_.prevTranslate = traceAnchors_[i]->GetWorldPos();
+			emitter.GetData().prevTranslate = traceAnchors_[i]->GetWorldPos();
 
 			if (chargeParents_[i]->GetTransform().scale.x > 0.0f) { // チャージのサイズを縮小していく
 				ShrinkScale(i, bp.shrinkSpeed * FPSKeeper::DeltaTimeFrame());
@@ -409,8 +409,8 @@ bool Boss::BeamCharge() {
 				float emitPos = chargeParents_[i]->GetTransform().scale.x;
 				traceAnchors_[i]->GetTransform().translate = { emitPos,emitPos,emitPos };
 
-				emitter.data_.prevTranslate = traceAnchors_[i]->GetWorldPos();
-				emitter.data_.lifeTime -= bp.lifeTimeDecrease;
+				emitter.GetData().prevTranslate = traceAnchors_[i]->GetWorldPos();
+				emitter.GetData().lifeTime -= bp.lifeTimeDecrease;
 			}
 			UpdateEmitterPos(i);
 		}
@@ -429,7 +429,7 @@ bool Boss::BeamCharge() {
 		for (int i = 0; i < 8; i++) {
 			if (chargeParents_[i]->GetTransform().scale.x > 0.0f) { // 完全に真ん中に集結するようにする
 				auto& emitter = ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]);
-				emitter.data_.prevTranslate = traceAnchors_[i]->GetWorldPos();
+				emitter.GetData().prevTranslate = traceAnchors_[i]->GetWorldPos();
 
 				ShrinkScale(i, bp.shrinkSpeed * FPSKeeper::DeltaTimeFrame());
 				chargeParents_[i]->GetTransform().rotate.z += bp.rotateSpeedZ * FPSKeeper::DeltaTimeFrame();
@@ -666,7 +666,7 @@ void Boss::ExpandSummon() {
 		summonCircleExpandTime_ -= FPSKeeper::DeltaTimeFrame();
 		float t = (std::max)(summonCircleExpandTime_ / sp.summonExpandTime, 0.0f);
 		float summonRadius = std::lerp(sp.summonRadiusStart, sp.summonRadiusEnd, t);
-		ParticleManager::GetParticleCSEmitterTexture(summonIndex_).data_.radius = summonRadius;
+		ParticleManager::GetParticleCSEmitterTexture(summonIndex_).GetData().radius = summonRadius;
 		energyParticle_.Emit();
 	}
 }
@@ -712,7 +712,7 @@ void Boss::UpdateEmitterPos(int i) {
 	float emitPos = chargeParents_[i]->GetTransform().scale.x;
 	traceAnchors_[i]->GetTransform().translate = { emitPos, emitPos, emitPos };
 	auto& emitter = ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]);
-	emitter.data_.translate = traceAnchors_[i]->GetWorldPos();
+	emitter.GetData().translate = traceAnchors_[i]->GetWorldPos();
 }
 
 void Boss::ShrinkScale(int i, float delta) {

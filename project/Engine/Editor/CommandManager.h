@@ -113,9 +113,9 @@ public:
 	std::shared_ptr<EditorObj> GetEditorObject(int id) const;
 	void GarbageCollect();
 
-	std::unordered_map<int, std::shared_ptr<EditorObj>> objectList;
-	std::unordered_map<int, std::string> headerNames;
-	std::unordered_map<int, size_t> nameHashes;
+	std::unordered_map<int, std::shared_ptr<EditorObj>>& GetObjectList() { return objectList; }
+	std::unordered_map<int, std::string>& GetHeaderNames() { return headerNames; }
+	std::unordered_map<int, size_t>& GetNameHashes() { return nameHashes; }
 
 private:
 
@@ -160,6 +160,10 @@ private:
 	bool ParentCheck(int parentID, int receiveID);
 
 private:
+	std::unordered_map<int, std::shared_ptr<EditorObj>> objectList;
+	std::unordered_map<int, std::string> headerNames;
+	std::unordered_map<int, size_t> nameHashes;
+
 	std::stack<std::unique_ptr<ICommand>> undoStack;
 	std::stack<std::unique_ptr<ICommand>> redoStack;
 
