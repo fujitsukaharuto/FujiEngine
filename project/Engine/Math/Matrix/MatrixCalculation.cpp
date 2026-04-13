@@ -458,7 +458,7 @@ Vector3 Math::CatmullRom(const std::vector<Vector3>& control, float t) {
 	t_2 = Clamp(t_2, 0.0f, 1.0f);
 
 	size_t index = static_cast<size_t>(t / areaWidth);
-	index = std::min(index, control.size() - 2);
+	index = (std::min)(index, control.size() - 2);
 
 	size_t index0 = index - 1;
 	size_t index1 = index;

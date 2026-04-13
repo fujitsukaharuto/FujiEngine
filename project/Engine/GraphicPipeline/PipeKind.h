@@ -27,6 +27,7 @@ enum class Pipe : int {
 	Fire,
 	Thunder,
 	CRT,
+	BaseGrid,
 	GrayCS,
 	GaussCS,
 	BoxFilterCS,

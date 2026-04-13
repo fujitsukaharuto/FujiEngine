@@ -66,6 +66,8 @@ public:
 
 	Math::Vector3 GetTranslate() { return translation_; }
 
+	void DebugGUI();
+
 private:
 
 	Math::Matrix4x4 matRot_;

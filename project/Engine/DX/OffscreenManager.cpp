@@ -151,9 +151,9 @@ void OffscreenManager::CreateResource() {
 	offscreenRTVDesc_.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 
 	clearColorValue_.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-	clearColorValue_.Color[0] = 0.1f;
-	clearColorValue_.Color[1] = 0.25f;
-	clearColorValue_.Color[2] = 0.5f;
+	clearColorValue_.Color[0] = 0.0f;
+	clearColorValue_.Color[1] = 0.0f;
+	clearColorValue_.Color[2] = 0.0f;
 	clearColorValue_.Color[3] = 1.0f;
 
 	clearColorValueForGPU_.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;

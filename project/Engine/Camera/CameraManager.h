@@ -2,7 +2,7 @@
 #include <memory>
 #include "Camera.h"
 
-
+class DXCom;
 
 /// <summary>
 /// カメラ管理クラス
@@ -15,7 +15,7 @@ public:
 public:
 
 	static CameraManager* GetInstance();
-	void Initialize();
+	void Initialize(DXCom* pDXCom);
 	void Finalize();
 	void Update();
 
@@ -43,6 +43,8 @@ public:
 	/// </summary>
 	/// <param name="is">Debugモードにするかどうか</param>
 	void SetDebugMode(bool is);
+
+	void DebugGUI();
 
 private:
 

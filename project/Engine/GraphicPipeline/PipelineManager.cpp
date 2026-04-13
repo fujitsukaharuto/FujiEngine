@@ -15,6 +15,7 @@
 #include "FirePipe.h"
 #include "ThunderPipe.h"
 #include "CRTPipe.h"
+#include "BaseGridPipe.h"
 #include "CSPipe/GrayCSPipe.h"
 #include "CSPipe/GaussCSPipe.h"
 #include "CSPipe/BoxFilterCSPipe.h"
@@ -107,6 +108,7 @@ void PipelineManager::CreatePipeline() {
 	CreatePipe<FirePipe>(Pipe::Fire);
 	CreatePipe<ThunderPipe>(Pipe::Thunder);
 	CreatePipe<CRTPipe>(Pipe::CRT);
+	CreatePipe<BaseGridPipe>(Pipe::BaseGrid);
 
 	CreatePipe<GrayCSPipe>(Pipe::GrayCS);
 	CreatePipe<GaussCSPipe>(Pipe::GaussCS);

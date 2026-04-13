@@ -29,6 +29,8 @@ namespace Graphics {
 		void Skinning();
 		// セットされたSkyBoxを描画
 		void RenderSkyBox();
+		// Grid描画
+		void RenderGrid();
 
 	private:
 

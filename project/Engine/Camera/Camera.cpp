@@ -1,6 +1,8 @@
 #include "Camera.h"
 
 #include "WinApp/MyWindow.h"
+#include "Engine/DX/DXCom.h"
+#include "Engine/DX/DX12Helper.h"
 #include "DX/FPSKeeper.h"
 #include "CameraManager.h"
 #include "DebugCamera.h"
@@ -17,6 +19,21 @@ Camera::Camera() {
 	projectionMatrix_ = MakePerspectiveFovMatrix(fovY_, aspect_, nearClip_, farClip_);
 	viewProjectionMatrix_ = Multiply(viewMatrix_, projectionMatrix_);
 	shakeMode_ = ShakeMode::RandomShake;
+}
+
+Camera::~Camera() {
+	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
+		cameraInfoResource_[i].Reset();
+	}
+}
+
+void Camera::Initialize(DXCom* pDXCom) {
+	dxcommon_ = pDXCom;
+	uint32_t size = (sizeof(CameraInfo) + 0xff) & ~0xff;
+	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
+		cameraInfoResource_[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), size);
+		cameraInfoResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&cameraInfoData_[i]));
+	}
 }
 
 void Camera::Update() {
@@ -55,6 +72,14 @@ void Camera::Update() {
 
 	projectionMatrix_ = MakePerspectiveFovMatrix(fovY_, aspect_, nearClip_, farClip_);
 	viewProjectionMatrix_ = Multiply(viewMatrix_, projectionMatrix_);
+	Matrix4x4 invVP = Inverse(viewProjectionMatrix_);
+
+	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
+	if (cameraInfoData_[frameIndex]) {
+		cameraInfoData_[frameIndex]->invViewProj = invVP;
+		cameraInfoData_[frameIndex]->cameraPos = transform_.translate;
+		cameraInfoData_[frameIndex]->viewProj = viewProjectionMatrix_;
+	}
 }
 
 void Camera::UpdateMatrix() {
@@ -76,17 +101,20 @@ void Camera::IssuanceShake(float strength, float time) {
 	shakeStrength_ = strength;
 }
 
+D3D12_GPU_VIRTUAL_ADDRESS Camera::GetCameraInfoGPUVirtualAddress() const {
+	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
+	return cameraInfoResource_[frameIndex]->GetGPUVirtualAddress();
+}
+
 void Camera::DebugGUI() {
 #ifdef _DEBUGMODE
-	if (ImGui::CollapsingHeader("Camera")) {
-		ImGui::DragFloat3("pos", &transform_.translate.x, 0.01f);
-		ImGui::DragFloat3("rotate", &transform_.rotate.x, 0.01f);
-		ImGui::SeparatorText("Shake");
-		ImGui::DragFloat("shakeTime", &shakeTime_, 0.01f, 0.0f);
-		ImGui::DragFloat("shakeStrength", &shakeStrength_, 0.01f, 0.0f);
-		ImGui::SeparatorText("Parameter##camera");
-		ImGui::DragFloat("Fov", &fovY_, 0.01f, 0.0f, 5.0f);
-	}
+	ImGui::DragFloat3("pos", &transform_.translate.x, 0.01f);
+	ImGui::DragFloat3("rotate", &transform_.rotate.x, 0.01f);
+	ImGui::SeparatorText("Shake");
+	ImGui::DragFloat("shakeTime", &shakeTime_, 0.01f, 0.0f);
+	ImGui::DragFloat("shakeStrength", &shakeStrength_, 0.01f, 0.0f);
+	ImGui::SeparatorText("Parameter##camera");
+	ImGui::DragFloat("Fov", &fovY_, 0.01f, 0.0f, 5.0f);
 #endif // _DEBUG
 }
 

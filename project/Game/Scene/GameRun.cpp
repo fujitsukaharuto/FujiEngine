@@ -53,7 +53,7 @@ void GameRun::Initialize() {
 
 	int sceneNum = 0;
 	if (sceneNum == 0) {
-		sceneManager_->StartScene("GPUPARTICLE");
+		sceneManager_->StartScene("TEST");
 	} else {
 		sceneManager_->StartScene("TITLE");
 	}
@@ -171,7 +171,7 @@ void GameRun::DebugGUI() {
 			ImGui::EndTabItem();
 		}
 		if (ImGui::BeginTabItem("Camera")) {
-			cameraManager_->GetCamera()->DebugGUI();
+			cameraManager_->DebugGUI();
 			ImGui::EndTabItem();
 		}
 		if (ImGui::BeginTabItem("Light")) {

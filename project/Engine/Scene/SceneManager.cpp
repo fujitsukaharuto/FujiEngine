@@ -122,7 +122,7 @@ void SceneManager::SceneChangeGUI() {
 	ImGui::Indent();
 	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Selected;
 	if (ImGui::TreeNodeEx("SceneChange", flags)) {
-		ImGui::Combo("##SceneSelection", &sceneSelection_, "Title\0Game\0Result\0Particle\0GPUParticle\0");
+		ImGui::Combo("##SceneSelection", &sceneSelection_, "Title\0Game\0Result\0Particle\0GPUParticle\0TEST\0");
 		ImGui::SameLine();
 		if (ImGui::Button("Change")) {
 			switch (sceneSelection_) {
@@ -141,6 +141,9 @@ void SceneManager::SceneChangeGUI() {
 			case int(SceneNames::GPUPARTICLE):
 				ChangeScene("GPUPARTICLE", 20.0f);
 				break;
+			case int(SceneNames::TEST):
+					ChangeScene("TEST", 20.0f);
+					break;
 			default:
 				break;
 			}

@@ -1,5 +1,19 @@
 #pragma once
 #include "Math/Matrix/MatrixCalculation.h"
+#include "Engine/DX/FrameCount.h"
+#include <d3d12.h>
+#include <wrl/client.h>
+
+class DXCom;
+
+
+// カメラ情報を送るための構造体
+struct CameraInfo {
+	Math::Matrix4x4 invViewProj; // ViewProjectionの逆行列
+	Math::Vector3 cameraPos;     // カメラのワールド座標
+	float pad;
+	Math::Matrix4x4 viewProj;
+};
 
 /// <summary>
 /// カメラクラス
@@ -7,7 +21,7 @@
 class Camera {
 public:
 	Camera();
-	~Camera() = default;
+	~Camera();
 
 public:
 
@@ -19,6 +33,7 @@ public:
 		RollingShake,// 横揺れ
 	};
 
+	void Initialize(DXCom* pDXCom);
 	void Update();
 
 	/// <summary>
@@ -100,6 +115,9 @@ public:
 	/// <returns>Matrix4x4</returns>
 	const Math::Matrix4x4& GetViewProjectionMatrix() const { return viewProjectionMatrix_; }
 
+	// GPUアドレス取得
+	D3D12_GPU_VIRTUAL_ADDRESS GetCameraInfoGPUVirtualAddress() const;
+
 	void DebugGUI();
 
 	//========================================================================*/
@@ -131,4 +149,8 @@ private:
 	Math::Vector3 shakeGap_;
 	Math::Vector2 shakeGapRand_ = { -0.5f,0.5f };
 	float rollingTime_;
+
+	DXCom* dxcommon_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> cameraInfoResource_[DXC::kFrameCount_];
+	CameraInfo* cameraInfoData_[DXC::kFrameCount_];
 };

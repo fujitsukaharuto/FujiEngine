@@ -37,7 +37,7 @@ void Framework::Init() {
 
 	// カメラ管理
 	cameraManager_ = CameraManager::GetInstance();
-	cameraManager_->Initialize();
+	cameraManager_->Initialize(dxcommon_.get());
 
 	// ライン描画
 	line3dDrawer_ = Line3dDrawer::GetInstance();

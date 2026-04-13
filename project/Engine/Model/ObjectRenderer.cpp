@@ -6,6 +6,7 @@
 #include "Engine/Model/ModelManager.h"
 #include "Engine/DX/DXCom.h"
 #include "Engine/Light/LightManager.h"
+#include "Engine/Camera/CameraManager.h"
 
 using namespace Core;
 using namespace Graphics;
@@ -81,6 +82,18 @@ void ObjectRenderer::RenderSkyBox() {
 		skyBox_->Render();
 	}
 	skyBox_ = nullptr;
+}
+
+void Graphics::ObjectRenderer::RenderGrid() {
+	dxcommon_->GetDXCommand()->SetViewAndScissor(MyWin::kWindowWidth, MyWin::kWindowHeight);
+	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::BaseGrid);
+
+	dxcommon_->GetDXCommand()->GetList()->SetGraphicsRootConstantBufferView(0, CameraManager::GetInstance()->GetCamera()->GetCameraInfoGPUVirtualAddress());
+	// 頂点バッファ・インデックスバッファは「無し」
+	dxcommon_->GetDXCommand()->GetList()->IASetVertexBuffers(0, 0, nullptr);
+	dxcommon_->GetDXCommand()->GetList()->IASetIndexBuffer(nullptr);
+	dxcommon_->GetDXCommand()->GetList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	dxcommon_->GetDXCommand()->GetList()->DrawInstanced(3, 1, 0, 0);
 }
 
 void ObjectRenderer::PreDraw() {

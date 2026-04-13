@@ -419,6 +419,12 @@
     <ClCompile Include="Engine\Model\SkyBox\SkyBox.cpp">
       <Filter>Engine\Model\SkyBox</Filter>
     </ClCompile>
+    <ClCompile Include="Game\Scene\TestScene.cpp">
+      <Filter>Game\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\GraphicPipeline\BaseGridPipe.cpp">
+      <Filter>Engine\GraphicPipeline</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -889,6 +895,12 @@
     <ClInclude Include="Engine\Model\SkyBox\SkyBox.h">
       <Filter>Engine\Model\SkyBox</Filter>
     </ClInclude>
+    <ClInclude Include="Game\Scene\TestScene.h">
+      <Filter>Game\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\GraphicPipeline\BaseGridPipe.h">
+      <Filter>Engine\GraphicPipeline</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -1180,6 +1192,12 @@
     </FxCompile>
     <FxCompile Include="resource\Shaders\CS\Engine\TrailEmit.CS.hlsl">
       <Filter>resource\Shaders\CS\Engine</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\BaseGrid.VS.hlsl">
+      <Filter>resource\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\BaseGrid.PS.hlsl">
+      <Filter>resource\Shaders</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>

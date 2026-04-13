@@ -4,6 +4,7 @@
 
 #include "Input/Input.h"
 #include "WinApp/MyWindow.h"
+#include "ImGuiManager.h"
 
 using namespace Core;
 using namespace Math;
@@ -131,4 +132,10 @@ void DebugCamera::PreChange() {
 
 Matrix4x4 DebugCamera::GetViewMatrix() const {
 	return viewMatrix_;
+}
+
+void DebugCamera::DebugGUI() {
+#ifdef _DEBUGMODE
+	ImGui::DragFloat3("pos", &translation_.x, 0.01f);
+#endif // _DEBUG
 }

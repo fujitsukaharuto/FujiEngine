@@ -6,7 +6,8 @@ enum class SceneNames {
 	GAME,
 	RESULT,
 	PARTICLEDEBUG,
-	GPUPARTICLE
+	GPUPARTICLE,
+	TEST
 };
 
 /// <summary>
