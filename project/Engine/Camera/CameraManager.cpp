@@ -42,8 +42,8 @@ void CameraManager::DebugGUI() {
 		camera_->DebugGUI();
 		ImGui::Unindent();
 	}
-	if (ImGui::Checkbox("DebugCamera", &debugMode_)) {
-		if (debugMode_) {
+	if (ImGui::Checkbox("IsDebugCamera", &debugMode_)) {
+		if (!debugMode_) {
 			SetDebugMode(false);
 		} else {
 			SetDebugMode(true);
