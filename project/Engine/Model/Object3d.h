@@ -10,14 +10,6 @@
 #endif
 
 
-/// <summary>
-/// ピッキングで使うObjectの番号データ
-/// </summary>
-struct ObjIDData {
-	int objID;
-	uint32_t padding[3];
-};
-
 namespace Graphics {
 	/// <summary>
 	/// ３Dオブジェクトのクラス
@@ -80,8 +72,6 @@ namespace Graphics {
 
 	private:
 
-		void CreateIDResource();
-
 		/// <summary>コマンドの生成</summary>
 		void CreatePropertyCommand(int type);
 
@@ -95,10 +85,6 @@ namespace Graphics {
 		void SetTextureNode();
 
 	private:
-
-		Microsoft::WRL::ComPtr<ID3D12Resource> objIDDataResource_ = nullptr;
-		ObjIDData* objIDData_ = nullptr;
-		static int useObjID_;
 
 		bool isMaskMode_ = false;
 		bool isUseNodeGraph_ = false;

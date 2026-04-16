@@ -7,6 +7,15 @@
 
 class DXCom;
 
+
+/// <summary>
+/// ピッキングで使うObjectの番号データ
+/// </summary>
+struct ObjIDData {
+	int objID;
+	uint32_t padding[3];
+};
+
 namespace Graphics {
 	class LightManager;
 
@@ -55,6 +64,8 @@ namespace Graphics {
 
 		/// <summary> WVPの作成 </summary>
 		void CreateWVP();
+		/// <summary> ピッキング用バッファ作成 </summary>
+		void CreateIDResource();
 		/// <summary> WVPの計算 </summary>
 		void SetWVP();
 		/// <summary> ビルボード状態のWVP </summary>
@@ -70,6 +81,9 @@ namespace Graphics {
 		Microsoft::WRL::ComPtr<ID3D12Resource> cameraPosResource_[DXC::kFrameCount_];
 		Math::TransformationMatrix* wvpDate_[DXC::kFrameCount_];
 		Math::CameraForGPU* cameraPosData_[DXC::kFrameCount_];
+		Microsoft::WRL::ComPtr<ID3D12Resource> objIDDataResource_ = nullptr;
+		ObjIDData* objIDData_ = nullptr;
+		static int useObjID_;
 
 		Math::Matrix4x4 billboardMatrix_;
 		std::string nowTextureName_;

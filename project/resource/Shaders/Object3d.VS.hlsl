@@ -9,7 +9,6 @@ struct TransformationMatrix
 ConstantBuffer<TransformationMatrix> gTransformationMatrix : register(b0);
 
 
-
 VertxShaderOutput main(VertexShaderInput input)
 {
     VertxShaderOutput output;

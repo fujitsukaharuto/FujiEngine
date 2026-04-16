@@ -7,6 +7,8 @@
 using namespace Math;
 using namespace Graphics;
 
+int RenderObject::useObjID_ = 0;
+
 RenderObject::RenderObject() {
 	dxcommon_ = ModelManager::GetInstance()->ShareDXCom();
 	lightManager_ = ModelManager::GetInstance()->ShareLight();
@@ -116,6 +118,13 @@ void RenderObject::CreateWVP() {
 		cameraPosResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&cameraPosData_[i]));
 		cameraPosData_[i]->worldPosition = camera_->GetTranslate();
 	}
+}
+
+void RenderObject::CreateIDResource() {
+	objIDDataResource_ = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(ObjIDData));
+	objIDData_ = nullptr;
+	objIDDataResource_->Map(0, nullptr, reinterpret_cast<void**>(&objIDData_));
+	objIDData_->objID = ++useObjID_;
 }
 
 void RenderObject::SetWVP() {

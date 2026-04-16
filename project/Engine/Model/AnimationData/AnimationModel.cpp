@@ -41,6 +41,7 @@ void AnimationModel::Create(const std::string& fileName) {
 	SetModel(fileName);
 	transform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 	CreateWVP();
+	CreateIDResource();
 }
 
 void AnimationModel::CreateSphere() {
@@ -263,25 +264,31 @@ void AnimationModel::Draw(bool isAdd) {
 }
 
 void AnimationModel::Render() {
-	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
-	dxcommon_->GetDXCommand()->SetViewAndScissor(MyWin::kWindowWidth, MyWin::kWindowHeight);
-	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Animation);
-	dxcommon_->GetDXCommand()->GetList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	lightManager_->SetLightCommand(dxcommon_->GetCommandList());
-
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
-
-	cList->SetGraphicsRootConstantBufferView(1, wvpResource_[frameIndex]->GetGPUVirtualAddress());
-	cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_[frameIndex]->GetGPUVirtualAddress());
-	cList->SetGraphicsRootDescriptorTable(7, environment_->gpuHandle);
-
+	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
 	if (model_ && !isMirrorObj_) {
-		model_->AnimationDraw(dxcommon_, cList, skinnedMeshes_, material_);
-	} else if (isMirrorObj_) {
-		model_->Draw(cList, material_);
-	}
 
-	ModelManager::GetInstance()->NormalCommand();
+		cList->SetGraphicsRootConstantBufferView(1, wvpResource_[frameIndex]->GetGPUVirtualAddress());
+		cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_[frameIndex]->GetGPUVirtualAddress());
+		cList->SetGraphicsRootConstantBufferView(9, objIDDataResource_->GetGPUVirtualAddress());
+		ModelManager::GetInstance()->PickingCommand();
+
+		model_->AnimationDraw(dxcommon_, cList, skinnedMeshes_, material_);
+
+	} else if (model_ && isMirrorObj_) {
+		dxcommon_->GetDXCommand()->SetViewAndScissor(MyWin::kWindowWidth, MyWin::kWindowHeight);
+		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Animation);
+		dxcommon_->GetDXCommand()->GetList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		lightManager_->SetLightCommand(dxcommon_->GetCommandList());
+
+		cList->SetGraphicsRootConstantBufferView(1, wvpResource_[frameIndex]->GetGPUVirtualAddress());
+		cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_[frameIndex]->GetGPUVirtualAddress());
+		cList->SetGraphicsRootDescriptorTable(7, environment_->gpuHandle);
+
+		model_->Draw(cList, material_);
+
+		ModelManager::GetInstance()->NormalCommand();
+	}
 }
 
 void AnimationModel::AnimeDraw() {

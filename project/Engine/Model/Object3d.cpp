@@ -18,8 +18,6 @@ using namespace Graphics;
 using namespace Math;
 
 
-int Object3d::useObjID_ = 0;
-
 Object3d::Object3d() {
 	dxcommon_ = ModelManager::GetInstance()->ShareDXCom();
 	lightManager_ = ModelManager::GetInstance()->ShareLight();
@@ -138,6 +136,7 @@ void Object3d::Render() {
 	NodeContentsUpdate();
 #endif // _RELEASE
 
+	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
 	if (isMaskMode_) {
 		if (isAdd_) {
@@ -151,7 +150,7 @@ void Object3d::Render() {
 			dxcommon_->GetPipelineManager()->SetPipeline(Pipe::NormalAdd);
 		}
 	}
-	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
+
 	cList->SetGraphicsRootConstantBufferView(1, wvpResource_[frameIndex]->GetGPUVirtualAddress());
 	cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_[frameIndex]->GetGPUVirtualAddress());
 	cList->SetGraphicsRootConstantBufferView(9, objIDDataResource_->GetGPUVirtualAddress());
@@ -486,13 +485,6 @@ void Object3d::SetTexture(const std::string& name) {
 
 void Object3d::SetEditorObjParameter() {
 	objIDData_->objID += 1000;
-}
-
-void Graphics::Object3d::CreateIDResource() {
-	objIDDataResource_ = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(ObjIDData));
-	objIDData_ = nullptr;
-	objIDDataResource_->Map(0, nullptr, reinterpret_cast<void**>(&objIDData_));
-	objIDData_->objID = ++useObjID_;
 }
 
 void Object3d::CreatePropertyCommand(int type) {
