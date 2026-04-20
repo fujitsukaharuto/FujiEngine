@@ -101,7 +101,6 @@ void Core::Framework::InitGeneralSystems() {
 	lightManager_->Initialize(dxcommon_.get());
 	lightManager_->CreateLight();
 	lightManager_->AddPointLight();
-	lightManager_->AddSpotLight();
 
 	// object関係
 	textureManager_ = TextureManager::GetInstance();

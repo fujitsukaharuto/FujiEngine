@@ -375,6 +375,46 @@ void Object3d::DebugGUI() {
 		ImGui::TreePop();
 	}
 
+	if (ImGui::TreeNodeEx("normalMap", flags)) {
+		bool useNormal = bool(material_[0].GetUseNormalMap());
+		ImGui::Checkbox("UseNormalMap", &useNormal);
+		material_[0].SetUseNormalMap(int32_t(useNormal));
+		if (ImGui::Button("TextureFile")) {
+			ImGui::OpenPopup("TextureFile Window");
+		}
+		ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+		ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+		ImGui::PushStyleColor(ImGuiCol_ModalWindowDimBg, ImVec4(0, 0, 0, 0.25f));
+		if (ImGui::BeginPopupModal("TextureFile Window", NULL)) {
+			if (ImGui::Button("Refresh")) {
+				TextureManager::GetInstance()->LoadTextureFile(true);
+			}
+			int buttonCount = 0;
+			for (const auto& TexName : TextureManager::GetInstance()->GetTextureFiles()) {
+				if (buttonCount > 0 && buttonCount < 5) {
+					ImGui::SameLine();
+				} else {
+					buttonCount = 0;
+				}
+				if (ImGui::ImageButton(("##" + TexName.first).c_str(), (ImTextureID)TextureManager::GetInstance()->GetTexture(TexName.first.c_str())->gpuHandle.ptr, ImVec2(100, 100))) {
+					material_[0].SetNormalMap(TexName.first.c_str(), TexName.second);
+					if (TexName.second) {
+						TextureManager::GetInstance()->SetTextureFileOnceLoad(TexName.first.c_str());
+					}
+				}
+				buttonCount++;
+			}
+			ImGui::Separator();
+			if (ImGui::Button("OK", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+			ImGui::SetItemDefaultFocus();
+			ImGui::SameLine();
+			if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+			ImGui::EndPopup();
+		}
+		ImGui::PopStyleColor();
+		ImGui::TreePop();
+	}
+
 	if (ImGui::TreeNodeEx("SetModel", flags)) {
 
 		if (ImGui::Button("ModelFile")) {

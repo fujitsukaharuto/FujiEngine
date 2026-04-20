@@ -8,6 +8,7 @@ struct Material
     float shininess;
     float alphaRef;
     float environmentCoefficient;
+    int useNormalMap;
 };
 
 struct DirectionalLight
@@ -17,12 +18,6 @@ struct DirectionalLight
     float intensity;
 };
 
-//reflectionModel
-struct Camera
-{
-    float3 worldPosition;
-};
-
 struct PointLight
 {
     float4 color;
@@ -30,6 +25,7 @@ struct PointLight
     float intensity;
     float radius;
     float decay;
+    float2 padding;
 };
 
 struct SpotLight
@@ -42,6 +38,22 @@ struct SpotLight
     float decay;
     float cosAngle;
     float cosStart;
+    float padding;
+};
+
+struct AllLights
+{
+    DirectionalLight directionalLights[3];
+    PointLight pointLights[10];
+    SpotLight spotLights[10];
+    int numDirectionalLights;
+    int numPointLights;
+    int numSpotLights;
+};
+
+struct Camera
+{
+    float3 worldPosition;
 };
 
 struct PickingBuffer
@@ -52,20 +64,17 @@ struct PickingBuffer
 
 ConstantBuffer<Material> gMaterial : register(b0);
 Texture2D<float4> gTexture : register(t0);
+Texture2D<float4> gNormalMap : register(t1);
 SamplerState gSampler : register(s0);
-ConstantBuffer<DirectionalLight> gDirectionnalLight : register(b1);
-
-//reflectionModel
+ConstantBuffer<AllLights> gLights : register(b1);
 ConstantBuffer<Camera> gCamera : register(b2);
-ConstantBuffer<PointLight> gPointLight : register(b3);
-ConstantBuffer<SpotLight> gSpotLight : register(b4);
 RWStructuredBuffer<PickingBuffer> gPickingBuffer : register(u0);
 
 // マウスの位置とクリックしたか
 cbuffer PickingData : register(b5)
 {
-    int2 pickingPixelCoord;// マウスの位置
-    uint pickingEnable;    // クリックしたか
+    int2 pickingPixelCoord; // マウスの位置
+    uint pickingEnable; // クリックしたか
 };
 
 cbuffer ObjIDData : register(b6)
@@ -73,26 +82,83 @@ cbuffer ObjIDData : register(b6)
     uint objID;
 };
 
-
 struct PixelShaderOutput
 {
     float4 color : SV_TARGET0;
 };
 
+float3 CalculateDirectionalLight(DirectionalLight light, float3 normal, float3 toEye, float shininess)
+{
+    float3 lightDir = normalize(-light.direction);
+    
+    // Lambert/Half-Lambert
+    float NdotL = dot(normal, lightDir);
+    float cos = pow(saturate(NdotL * 0.5f + 0.5f), 2.0f);
+    float3 diffuse = light.color.rgb * cos * light.intensity;
+    
+    // Blinn-Phong Specular
+    float3 halfVector = normalize(lightDir + toEye);
+    float NdotH = dot(normal, halfVector);
+    float specularPow = pow(saturate(NdotH), shininess);
+    // 完全に裏側の場合はSpecularを抑制 (NdotL > 0 の範囲で徐々に有効にする)
+    float3 specular = light.color.rgb * light.intensity * specularPow * saturate(NdotL * 10.0f);
+    
+    return diffuse + specular;
+}
+
+float3 CalculatePointLight(PointLight light, float3 normal, float3 worldPos, float3 toEye, float shininess)
+{
+    float3 lightDir = normalize(worldPos - light.position);
+    float distance = length(light.position - worldPos);
+    float factor = pow(saturate(-distance / light.radius + 1.0), light.decay);
+    
+    float NdotL = dot(normal, -lightDir);
+    float cos = pow(saturate(NdotL * 0.5f + 0.5f), 2.0f);
+    
+    float3 halfVector = normalize(-lightDir + toEye);
+    float NdotH = dot(normal, halfVector);
+    float specularPow = pow(saturate(NdotH), shininess);
+    
+    float3 diffuse = light.color.rgb * cos * light.intensity * factor;
+    float3 specular = light.color.rgb * light.intensity * factor * specularPow * saturate(NdotL * 10.0f);
+    
+    return diffuse + specular;
+}
+
+float3 CalculateSpotLight(SpotLight light, float3 normal, float3 worldPos, float3 toEye, float shininess)
+{
+    float3 lightDirOnSurface = normalize(worldPos - light.position);
+    float distance = length(light.position - worldPos);
+    float attenuationFactor = pow(saturate(-distance / light.distance + 1.0), light.decay);
+    
+    float cosAngle = dot(lightDirOnSurface, normalize(light.direction));
+    float falloffFactor = saturate((cosAngle - light.cosAngle) / (light.cosStart - light.cosAngle));
+    
+    float NdotL = dot(normal, -lightDirOnSurface);
+    float cos = pow(saturate(NdotL * 0.5f + 0.5f), 2.0f);
+    
+    float3 halfVector = normalize(-lightDirOnSurface + toEye);
+    float NdotH = dot(normal, halfVector);
+    float specularPow = pow(saturate(NdotH), shininess);
+    
+    float3 diffuse = light.color.rgb * cos * light.intensity * attenuationFactor * falloffFactor;
+    float3 specular = light.color.rgb * light.intensity * attenuationFactor * falloffFactor * specularPow * saturate(NdotL * 10.0f);
+    
+    return diffuse + specular;
+}
+
 PixelShaderOutput main(VertxShaderOutput input)
 {
     PixelShaderOutput output;
-    float4 transformedUV = mul(float4(input.texcoord, 0.0f,1.0f), gMaterial.uvTransform);
+    float4 transformedUV = mul(float4(input.texcoord, 0.0f, 1.0f), gMaterial.uvTransform);
     float4 textureColor = gTexture.Sample(gSampler, transformedUV.xy);
-    if (textureColor.a == 0.0)
-    {
-        discard;
-    }
+    
     if (textureColor.a <= gMaterial.alphaRef)
     {
         discard;
     }
     
+    // Picking logic
     if (pickingEnable != 0 && all(int2(input.position.xy) == pickingPixelCoord))
     {
         if (objID != -1 && input.position.z < gPickingBuffer[0].depth)
@@ -102,146 +168,52 @@ PixelShaderOutput main(VertxShaderOutput input)
         }
     }
     
+    float3 totalLight = float3(0, 0, 0);
+    float3 normal = normalize(input.normal);
+    
+    if (gMaterial.useNormalMap != 0)
+    {
+        float3 tangent = normalize(input.tangent);
+        // Gram-Schmidtで直交化
+        tangent = normalize(tangent - dot(tangent, normal) * normal);
+        // Bitangentの計算順序を入れ替えてUVのV方向(下向き)に合わせる
+        float3 bitangent = normalize(cross(tangent, normal));
+        float3x3 TBN = float3x3(tangent, bitangent, normal);
+        float3 sampledNormal = gNormalMap.Sample(gSampler, transformedUV.xy).rgb;
+        sampledNormal = sampledNormal * 2.0f - 1.0f;
+        // 接空間からワールド空間へ変換
+        normal = normalize(mul(sampledNormal, TBN));
+    }
+    
+    float3 toEye = normalize(gCamera.worldPosition - input.WorldPosition);
+    
     if (gMaterial.enableLighting != 0)
     {
-        if (gMaterial.enableLighting == 1)
+        // Directional Lights
+        for (int i = 0; i < gLights.numDirectionalLights; i++)
         {
-            float NdotL = dot(normalize(input.normal), -gDirectionnalLight.direction);
-            float cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
-            output.color.rgb = gMaterial.color.rgb * textureColor.rgb * gDirectionnalLight.color.rgb * cos * gDirectionnalLight.intensity;
-            output.color.a = gMaterial.color.a * textureColor.a;
-            if (output.color.a == 0.0)
-            {
-                discard;
-            }
+            totalLight += CalculateDirectionalLight(gLights.directionalLights[i], normal, toEye, gMaterial.shininess);
         }
-        if (gMaterial.enableLighting == 2)
+        
+        // Point Lights
+        for (int j = 0; j < gLights.numPointLights; j++)
         {
-            float cos = saturate(dot(normalize(input.normal), -gDirectionnalLight.direction));
-            output.color.rgb = gMaterial.color.rgb * textureColor.rgb * gDirectionnalLight.color.rgb * cos * gDirectionnalLight.intensity;
-            output.color.a = gMaterial.color.a * textureColor.a;
-            if (output.color.a == 0.0)
-            {
-                discard;
-            }
+            totalLight += CalculatePointLight(gLights.pointLights[j], normal, input.WorldPosition, toEye, gMaterial.shininess);
         }
-        if (gMaterial.enableLighting == 3)
+        
+        // Spot Lights
+        for (int k = 0; k < gLights.numSpotLights; k++)
         {
-            float NdotL = dot(normalize(input.normal), -gDirectionnalLight.direction);
-            float cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
-            
-            float3 toEye = normalize(gCamera.worldPosition - input.WorldPosition);
-            float3 reflectLight = reflect(gDirectionnalLight.direction, normalize(input.normal));
-            float RdotE = dot(reflectLight, toEye);
-            float specularPow = pow(saturate(RdotE), gMaterial.shininess);
-            float3 diffuse = gMaterial.color.rgb * textureColor.rgb * gDirectionnalLight.color.rgb * cos * gDirectionnalLight.intensity;
-            float3 specular = gDirectionnalLight.color.rgb * gDirectionnalLight.intensity * specularPow * float3(1.0f, 1.0f, 1.0f);
-            
-            output.color.rgb = diffuse + specular;
-            output.color.a = gMaterial.color.a * textureColor.a;
-            if (output.color.a == 0.0)
-            {
-                discard;
-            }
+            totalLight += CalculateSpotLight(gLights.spotLights[k], normal, input.WorldPosition, toEye, gMaterial.shininess);
         }
-        if (gMaterial.enableLighting == 4)
-        {
-            float NdotL = dot(normalize(input.normal), -gDirectionnalLight.direction);
-            float cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
-            
-            float3 toEye = normalize(gCamera.worldPosition - input.WorldPosition);
-            float3 halfVector = normalize(-gDirectionnalLight.direction + toEye);
-            float NDotH = dot(normalize(input.normal), halfVector);
-            float specularPow = pow(saturate(NDotH), gMaterial.shininess);
-            float3 diffuse = gMaterial.color.rgb * textureColor.rgb * gDirectionnalLight.color.rgb * cos * gDirectionnalLight.intensity;
-            float3 specular = gDirectionnalLight.color.rgb * gDirectionnalLight.intensity * specularPow * float3(1.0f, 1.0f, 1.0f);
-            
-            output.color.rgb = diffuse + specular;
-            output.color.a = gMaterial.color.a * textureColor.a;
-            if (output.color.a == 0.0)
-            {
-                discard;
-            }
-        }
-        if (gMaterial.enableLighting == 5)
-        {
-            float NdotL = dot(normalize(input.normal), -gDirectionnalLight.direction);
-            float cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
-            
-            float3 toEye = normalize(gCamera.worldPosition - input.WorldPosition);
-            float3 halfVector = normalize(-gDirectionnalLight.direction + toEye);
-            float NDotH = dot(normalize(input.normal), halfVector);
-            float specularPow = pow(saturate(NDotH), gMaterial.shininess);
-            float3 diffuse = gMaterial.color.rgb * textureColor.rgb * gDirectionnalLight.color.rgb * cos * gDirectionnalLight.intensity;
-            float3 specular = gDirectionnalLight.color.rgb * gDirectionnalLight.intensity * specularPow * float3(1.0f, 1.0f, 1.0f);
-            
-            
-            float3 pointLightDir = normalize(input.WorldPosition - gPointLight.position);
-            float NdotLPoint = dot(normalize(input.normal), -pointLightDir);
-            float cosPoint = pow(NdotLPoint * 0.5f + 0.5f, 2.0f);
-            float3 halfVectorPoint = normalize(-pointLightDir + toEye);
-            float NDotHPoint = dot(normalize(input.normal), halfVectorPoint);
-            float specularPowPoint = pow(saturate(NDotHPoint), gMaterial.shininess);
-            
-            float distance = length(gPointLight.position - input.WorldPosition);
-            float factor = pow(saturate(-distance / gPointLight.radius + 1.0), gPointLight.decay);
-            float3 diffusePoint = gMaterial.color.rgb * textureColor.rgb * gPointLight.color.rgb * cosPoint * gPointLight.intensity * factor;
-            float3 specularPoint = gPointLight.color.rgb * gPointLight.intensity * factor * specularPowPoint * float3(1.0f, 1.0f, 1.0f);
-            
-            
-            output.color.rgb = diffuse + specular + diffusePoint + specularPoint;
-            output.color.a = gMaterial.color.a * textureColor.a;
-            if (output.color.a == 0.0)
-            {
-                discard;
-            }
-        }
-        if (gMaterial.enableLighting == 6)
-        {
-            float NdotL = dot(normalize(input.normal), -gDirectionnalLight.direction);
-            float cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
-            
-            float3 toEye = normalize(gCamera.worldPosition - input.WorldPosition);
-            float3 halfVector = normalize(-gDirectionnalLight.direction + toEye);
-            float NDotH = dot(normalize(input.normal), halfVector);
-            float specularPow = pow(saturate(NDotH), gMaterial.shininess);
-            float3 diffuse = gMaterial.color.rgb * textureColor.rgb * gDirectionnalLight.color.rgb * cos * gDirectionnalLight.intensity;
-            float3 specular = gDirectionnalLight.color.rgb * gDirectionnalLight.intensity * specularPow * float3(1.0f, 1.0f, 1.0f);
-            
-            
-            float3 spotDirOnSurface = normalize(input.WorldPosition - gSpotLight.position);
-            float NdotLSpot = dot(normalize(input.normal), -spotDirOnSurface);
-            float cosSpot = pow(NdotLSpot * 0.5f + 0.5f, 2.0f);
-            float3 halfVectorSpot = normalize(-spotDirOnSurface + toEye);
-            float NDotHSpot = dot(normalize(input.normal), halfVectorSpot);
-            float specularPowSpot = pow(saturate(NDotHSpot), gMaterial.shininess);
-            
-            float cosAngle = dot(spotDirOnSurface, gSpotLight.direction);
-            float falloffFactor = saturate((cosAngle - gSpotLight.cosAngle) / (gSpotLight.cosStart - gSpotLight.cosAngle));
-
-            float distance = length(gSpotLight.position - input.WorldPosition);
-            float attenuationFactor = pow(saturate(-distance / gSpotLight.distance + 1.0), gSpotLight.decay);
-
-            float3 diffuseSpot = gMaterial.color.rgb * textureColor.rgb * gSpotLight.color.rgb * cosSpot * gSpotLight.intensity * attenuationFactor * falloffFactor;
-            float3 specularSpot = gSpotLight.color.rgb * gSpotLight.intensity * attenuationFactor * falloffFactor * specularPowSpot * float3(1.0f, 1.0f, 1.0f);
-            
-            
-            output.color.rgb = diffuse + specular + diffuseSpot + specularSpot;
-            output.color.a = gMaterial.color.a * textureColor.a;
-            if (output.color.a == 0.0)
-            {
-                discard;
-            }
-        }
+        
+        output.color.rgb = gMaterial.color.rgb * textureColor.rgb * totalLight;
+        output.color.a = gMaterial.color.a * textureColor.a;
     }
     else
     {
-        textureColor.rgb = pow(textureColor.rgb, 2.2);
         output.color = gMaterial.color * textureColor;
-        if (output.color.a == 0.0)
-        {
-            discard;
-        }
     }
+    
     return output;
 }

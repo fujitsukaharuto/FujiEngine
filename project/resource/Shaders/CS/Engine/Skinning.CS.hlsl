@@ -9,6 +9,7 @@ struct Vertex
     float4 position;
     float2 texcoord;
     float3 normal;
+    float3 tangent;
 };
 
 struct VertexInfluence
@@ -59,22 +60,33 @@ void main(uint3 DTid : SV_DispatchThreadID)
 
     float4 skinnedPos = float4(0, 0, 0, 0);
     float3 skinnedNorm = float3(0, 0, 0);
+    float3 skinnedTangent = float3(0, 0, 0);
 
+    // Position skinning
     skinnedPos = mul(input.position, gMatrixPallette[infl.index.x].skeletonSpaceMatrix) * infl.weight.x;
     skinnedPos += mul(input.position, gMatrixPallette[infl.index.y].skeletonSpaceMatrix) * infl.weight.y;
     skinnedPos += mul(input.position, gMatrixPallette[infl.index.z].skeletonSpaceMatrix) * infl.weight.z;
     skinnedPos += mul(input.position, gMatrixPallette[infl.index.w].skeletonSpaceMatrix) * infl.weight.w;
     skinnedPos.w = 1.0f;
 
+    // Normal skinning
     skinnedNorm = mul(input.normal, (float3x3) gMatrixPallette[infl.index.x].skeletonSpaceInverseTransposeMatrix) * infl.weight.x;
     skinnedNorm += mul(input.normal, (float3x3) gMatrixPallette[infl.index.y].skeletonSpaceInverseTransposeMatrix) * infl.weight.y;
     skinnedNorm += mul(input.normal, (float3x3) gMatrixPallette[infl.index.z].skeletonSpaceInverseTransposeMatrix) * infl.weight.z;
     skinnedNorm += mul(input.normal, (float3x3) gMatrixPallette[infl.index.w].skeletonSpaceInverseTransposeMatrix) * infl.weight.w;
     skinnedNorm = normalize(skinnedNorm);
 
+    // Tangent skinning (Normalと同様に回転の影響のみ受ける)
+    skinnedTangent = mul(input.tangent, (float3x3) gMatrixPallette[infl.index.x].skeletonSpaceInverseTransposeMatrix) * infl.weight.x;
+    skinnedTangent += mul(input.tangent, (float3x3) gMatrixPallette[infl.index.y].skeletonSpaceInverseTransposeMatrix) * infl.weight.y;
+    skinnedTangent += mul(input.tangent, (float3x3) gMatrixPallette[infl.index.z].skeletonSpaceInverseTransposeMatrix) * infl.weight.z;
+    skinnedTangent += mul(input.tangent, (float3x3) gMatrixPallette[infl.index.w].skeletonSpaceInverseTransposeMatrix) * infl.weight.w;
+    skinnedTangent = normalize(skinnedTangent);
+
     Vertex output;
     output.position = skinnedPos;
     output.normal = skinnedNorm;
+    output.tangent = skinnedTangent;
     output.texcoord = input.texcoord;
 
     gOutputVertices[globalIndex] = output;

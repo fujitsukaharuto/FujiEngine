@@ -38,6 +38,7 @@ void Material::CreateMaterial() {
 	materialDate_.enableLighting = static_cast<int32_t>(LightMode::kPointLightON);
 	materialDate_.uvTransform = MakeIdentity4x4();
 	materialDate_.environmentCoefficient = 0.0f;
+	materialDate_.useNormalMap = 0;
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
 		CopyData(i);
 	}
@@ -50,6 +51,9 @@ void Material::CreateMaterial() {
 	} else {
 		texture_ = TextureManager::GetInstance()->LoadTexture(textureNamePath_.textureFilePath);
 	}
+	
+	// Default normal map
+	normalMap_ = TextureManager::GetInstance()->GetTexture("defaultNormal.png");
 }
 
 Texture* Material::GetTexture() {
@@ -102,6 +106,14 @@ void Material::SetTexture(const std::string& name, bool overWrite) {
 	texture_ = TextureManager::GetInstance()->GetTexture(name);
 }
 
+void Material::SetNormalMap(const std::string& name, bool overWrite) {
+	if (overWrite) {
+		TextureManager::GetInstance()->Load(name, overWrite);
+	}
+	normalMap_ = TextureManager::GetInstance()->GetTexture(name);
+	materialDate_.useNormalMap = 1;
+}
+
 void Material::SetLightEnable(LightMode mode) {
 	materialDate_.enableLighting = static_cast<int32_t>(mode);
 }
@@ -121,6 +133,7 @@ void Material::CopyData(uint32_t frameIndex) {
 	materialDateGPU_[frameIndex]->shininess = materialDate_.shininess;
 	materialDateGPU_[frameIndex]->AlphaRef = materialDate_.AlphaRef;
 	materialDateGPU_[frameIndex]->environmentCoefficient = materialDate_.environmentCoefficient;
+	materialDateGPU_[frameIndex]->useNormalMap = materialDate_.useNormalMap;
 }
 
 Matrix4x4 Material::MakeScale4x4(const Vector3& scale) {

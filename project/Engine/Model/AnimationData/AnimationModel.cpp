@@ -283,7 +283,7 @@ void AnimationModel::Render() {
 
 		cList->SetGraphicsRootConstantBufferView(1, wvpResource_[frameIndex]->GetGPUVirtualAddress());
 		cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_[frameIndex]->GetGPUVirtualAddress());
-		cList->SetGraphicsRootDescriptorTable(7, environment_->gpuHandle);
+		cList->SetGraphicsRootDescriptorTable(6, environment_->gpuHandle);
 
 		model_->Draw(cList, material_);
 

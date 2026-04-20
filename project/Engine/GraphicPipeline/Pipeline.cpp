@@ -18,8 +18,8 @@ void Pipeline::CreateRootSignature(ID3D12Device* device) {
 	rootDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
 
-	D3D12_DESCRIPTOR_RANGE descriptorRange[2] = {};
-	descriptorRange[0].BaseShaderRegister = 0;
+	D3D12_DESCRIPTOR_RANGE descriptorRange[3] = {};
+	descriptorRange[0].BaseShaderRegister = 0; // t0: Diffuse
 	descriptorRange[0].NumDescriptors = 1;
 	descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 	descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
@@ -28,6 +28,11 @@ void Pipeline::CreateRootSignature(ID3D12Device* device) {
 	descriptorRange[1].NumDescriptors = 1;
 	descriptorRange[1].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
 	descriptorRange[1].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+	descriptorRange[2].BaseShaderRegister = 1; // t1: Normal
+	descriptorRange[2].NumDescriptors = 1;
+	descriptorRange[2].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	descriptorRange[2].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
 	D3D12_ROOT_PARAMETER rootParameters[10] = {};
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
@@ -51,9 +56,10 @@ void Pipeline::CreateRootSignature(ID3D12Device* device) {
 	rootParameters[4].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	rootParameters[4].Descriptor.ShaderRegister = 2;
 
-	rootParameters[5].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[5].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
 	rootParameters[5].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	rootParameters[5].Descriptor.ShaderRegister = 3;
+	rootParameters[5].DescriptorTable.pDescriptorRanges = &descriptorRange[2];
+	rootParameters[5].DescriptorTable.NumDescriptorRanges = 1;
 
 	rootParameters[6].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParameters[6].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
@@ -109,7 +115,7 @@ void Pipeline::CreatePSO(ID3D12Device* device) {
 
 	HRESULT hr;
 
-	D3D12_INPUT_ELEMENT_DESC element[3] = {};
+	D3D12_INPUT_ELEMENT_DESC element[4] = {};
 	element[0].SemanticName = "POSITION";
 	element[0].SemanticIndex = 0;
 	element[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
@@ -124,6 +130,11 @@ void Pipeline::CreatePSO(ID3D12Device* device) {
 	element[2].SemanticIndex = 0;
 	element[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
 	element[2].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+
+	element[3].SemanticName = "TANGENT";
+	element[3].SemanticIndex = 0;
+	element[3].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+	element[3].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
 
 	D3D12_INPUT_LAYOUT_DESC layout{};
 	layout.pInputElementDescs = element;

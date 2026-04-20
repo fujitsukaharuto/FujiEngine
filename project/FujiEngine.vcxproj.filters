@@ -1109,10 +1109,7 @@
     <FxCompile Include="resource\Shaders\CS\Grayscale.CS.hlsl">
       <Filter>resource\Shaders\CS</Filter>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\SkinningObject3d.VS.hlsl">
-      <Filter>resource\Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="resource\Shaders\SkinningObject3d.PS.hlsl">
+    <FxCompile Include="resource\Shaders\EnvMapObject3d.PS.hlsl">
       <Filter>resource\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="resource\Shaders\CS\CRTEffect.CS.hlsl">
@@ -1208,9 +1205,6 @@
       <Filter>resource\Shaders</Filter>
     </None>
     <None Include="resource\Shaders\Line3d.hlsli">
-      <Filter>resource\Shaders</Filter>
-    </None>
-    <None Include="resource\Shaders\SkinningObject3d.hlsli">
       <Filter>resource\Shaders</Filter>
     </None>
     <None Include="resource\Shaders\Skybox.hlsli">

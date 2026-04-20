@@ -11,6 +11,7 @@ class DXCom;
 /// </summary>
 struct MaterialDataPath {
 	std::string textureFilePath;
+	std::string normalFilePath;
 };
 
 enum class LightMode {
@@ -47,6 +48,7 @@ namespace Graphics {
 			float shininess = 50.0f;
 			float AlphaRef = 0.5f;
 			float environmentCoefficient = 1.0f;
+			int32_t useNormalMap = 0;
 		};
 
 	public:
@@ -60,11 +62,13 @@ namespace Graphics {
 		//========================================================================*/
 		//* Getter
 		Texture* GetTexture();
+		Texture* GetNormalMap() { return normalMap_; }
 		ID3D12Resource* GetMaterialResource();
 		std::string GetPathName() const { return textureNamePath_.textureFilePath; }
 		Math::Vector4 GetColor();
 		Math::Vector2 GetUVScale() { return scale_; }
 		Math::Vector2 GetUVTrans() { return uvTrans_; }
+		int32_t GetUseNormalMap() { return materialDate_.useNormalMap; }
 
 		//========================================================================*/
 		//* Setter
@@ -76,10 +80,14 @@ namespace Graphics {
 		void SetUVScale(const Math::Vector2& scale, const Math::Vector2& uvTrans);
 		/// <summary>UVトランスの設定</summary>
 		void SetUVTrans(const Math::Vector2& uvTrans);
+		/// <summary> 法線マップを使用するか</summary>
+		void SetUseNormalMap(int32_t is) { materialDate_.useNormalMap = is; }
 		/// <summary>アルファ閾値の設定</summary>
 		void SetAlphaRef(float ref) { materialDate_.AlphaRef = ref; }
 		/// <summary>テクスチャの設定</summary>
 		void SetTexture(const std::string& name, bool overWrite = false);
+		/// <summary>法線マップの設定</summary>
+		void SetNormalMap(const std::string& name, bool overWrite = false);
 		/// <summary>ライトモードの設定</summary>
 		void SetLightEnable(LightMode mode);
 		/// <summary>反射の設定</summary>
@@ -103,6 +111,7 @@ namespace Graphics {
 		Math::Vector2 uvTrans_;
 
 		Texture* texture_ = nullptr;
+		Texture* normalMap_ = nullptr;
 		MaterialDataPath textureNamePath_;
 	};
 }

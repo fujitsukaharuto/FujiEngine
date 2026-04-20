@@ -8,6 +8,7 @@ struct Material
     float shininess;
     float alphaRef;
     float environmentCoefficient;
+    int useNormalMap;
 };
 
 ConstantBuffer<Material> gMaterial : register(b0);

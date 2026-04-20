@@ -8,11 +8,17 @@ class DXCom;
 
 struct PointLightData {
 	Math::Vector4 color = { 1.0f,0.5f,0.0f,1.0f };
-	Math::Vector3 position = { 0.0f,2.0f,0.0f };
-	float intensity = 0.0f;
+	Math::Vector3 position = { 0.0f,1.0f,0.0f };
+	float intensity = 1.0f;
 	float radius = 10.0f;
-	float decay = 2.0f;
+	float decay = 1.0f;
 	float padding[2];
+
+	// 互換性のためのセッター
+	void SetLightPos(const Math::Vector3& pos) { position = pos; }
+	void SetAttenuationLight(float rad, float dec) { radius = rad; decay = dec; }
+	void SetColor(const Math::Vector4& col) { color = col; }
+	void SetIntensity(float inst) { intensity = inst; }
 };
 
 /// <summary>

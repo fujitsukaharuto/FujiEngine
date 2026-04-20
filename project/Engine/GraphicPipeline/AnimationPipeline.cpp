@@ -18,18 +18,23 @@ void AnimationPipeline::CreateRootSignature(ID3D12Device* device) {
 	rootDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
 
-	D3D12_DESCRIPTOR_RANGE descriptorRange[2] = {};
-	descriptorRange[0].BaseShaderRegister = 0;
+	D3D12_DESCRIPTOR_RANGE descriptorRange[3] = {};
+	descriptorRange[0].BaseShaderRegister = 0; // t0: Diffuse
 	descriptorRange[0].NumDescriptors = 1;
 	descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 	descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 	
-	descriptorRange[1].BaseShaderRegister = 1;
+	descriptorRange[1].BaseShaderRegister = 1; // t1: Normal
 	descriptorRange[1].NumDescriptors = 1;
 	descriptorRange[1].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 	descriptorRange[1].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 	
-	D3D12_ROOT_PARAMETER rootParameters[8] = {};
+	descriptorRange[2].BaseShaderRegister = 2; // t2
+	descriptorRange[2].NumDescriptors = 1;
+	descriptorRange[2].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	descriptorRange[2].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+	
+	D3D12_ROOT_PARAMETER rootParameters[7] = {};
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	rootParameters[0].Descriptor.ShaderRegister = 0;
@@ -51,18 +56,15 @@ void AnimationPipeline::CreateRootSignature(ID3D12Device* device) {
 	rootParameters[4].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	rootParameters[4].Descriptor.ShaderRegister = 2;
 
-	rootParameters[5].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[5].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
 	rootParameters[5].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	rootParameters[5].Descriptor.ShaderRegister = 3;
+	rootParameters[5].DescriptorTable.pDescriptorRanges = &descriptorRange[1];
+	rootParameters[5].DescriptorTable.NumDescriptorRanges = 1;
 
-	rootParameters[6].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[6].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
 	rootParameters[6].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	rootParameters[6].Descriptor.ShaderRegister = 4;
-
-	rootParameters[7].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-	rootParameters[7].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	rootParameters[7].DescriptorTable.pDescriptorRanges = &descriptorRange[1];
-	rootParameters[7].DescriptorTable.NumDescriptorRanges = 1;
+	rootParameters[6].DescriptorTable.pDescriptorRanges = &descriptorRange[2];
+	rootParameters[6].DescriptorTable.NumDescriptorRanges = 1;
 
 	rootDesc.pParameters = rootParameters;
 	rootDesc.NumParameters = _countof(rootParameters);
@@ -101,7 +103,7 @@ void AnimationPipeline::CreatePSO(ID3D12Device* device) {
 
 	HRESULT hr;
 
-	D3D12_INPUT_ELEMENT_DESC element[5] = {};
+	D3D12_INPUT_ELEMENT_DESC element[6] = {};
 	element[0].SemanticName = "POSITION";
 	element[0].SemanticIndex = 0;
 	element[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
@@ -117,17 +119,22 @@ void AnimationPipeline::CreatePSO(ID3D12Device* device) {
 	element[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
 	element[2].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
 
-	element[3].SemanticName = "WEIGHT";
+	element[3].SemanticName = "TANGENT";
 	element[3].SemanticIndex = 0;
-	element[3].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-	element[3].InputSlot = 1;
+	element[3].Format = DXGI_FORMAT_R32G32B32_FLOAT;
 	element[3].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
 
-	element[4].SemanticName = "INDEX";
+	element[4].SemanticName = "WEIGHT";
 	element[4].SemanticIndex = 0;
-	element[4].Format = DXGI_FORMAT_R32G32B32A32_SINT;
+	element[4].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
 	element[4].InputSlot = 1;
 	element[4].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+
+	element[5].SemanticName = "INDEX";
+	element[5].SemanticIndex = 0;
+	element[5].Format = DXGI_FORMAT_R32G32B32A32_SINT;
+	element[5].InputSlot = 1;
+	element[5].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
 
 	D3D12_INPUT_LAYOUT_DESC layout{};
 	layout.pInputElementDescs = element;
@@ -147,9 +154,9 @@ void AnimationPipeline::CreatePSO(ID3D12Device* device) {
 	rasterizer.CullMode = D3D12_CULL_MODE_NONE;
 	rasterizer.FillMode = D3D12_FILL_MODE_SOLID;
 
-	vs = dxcommon_->GetDXCompile()->CompileShader(kDirectoryPath_ + L"SkinningObject3d.VS.hlsl", L"vs_6_0");
+	vs = dxcommon_->GetDXCompile()->CompileShader(kDirectoryPath_ + L"Object3d.VS.hlsl", L"vs_6_0");
 	assert(vs != nullptr);
-	ps = dxcommon_->GetDXCompile()->CompileShader(kDirectoryPath_ + L"SkinningObject3d.PS.hlsl", L"ps_6_0");
+	ps = dxcommon_->GetDXCompile()->CompileShader(kDirectoryPath_ + L"EnvMapObject3d.PS.hlsl", L"ps_6_0");
 	assert(ps != nullptr);
 
 

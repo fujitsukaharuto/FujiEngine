@@ -15,9 +15,10 @@ namespace Graphics {
 	/// メッシュのVertexData
 	/// </summary>
 	struct VertexData {
-		Math::Vector4 pos;    // xyz座標
-		Math::Vector2 uv;     // uv座標
-		Math::Vector3 normal; // 法線ベクトル
+		Math::Vector4 pos;     // xyz座標
+		Math::Vector2 uv;      // uv座標
+		Math::Vector3 normal;  // 法線ベクトル
+		Math::Vector3 tangent; // 接線ベクトル
 	};
 
 	/// <summary>

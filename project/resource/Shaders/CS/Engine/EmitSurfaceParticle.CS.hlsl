@@ -32,6 +32,7 @@ struct VertexData
     float4 position;
     float2 texcoord;
     float3 normal;
+    float3 tangent;
 };
 StructuredBuffer<VertexData> gVertices : register(t0);
 StructuredBuffer<uint> gIndices : register(t1);

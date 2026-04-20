@@ -15,6 +15,7 @@ VertxShaderOutput main(VertexShaderInput input)
     output.position = mul(input.position, gTransformationMatrix.WVP);
     output.texcoord = input.texcoord;
     output.normal = normalize(mul(input.normal, (float3x3) gTransformationMatrix.WorldInversTransPose));
+    output.tangent = normalize(mul(input.tangent, (float3x3) gTransformationMatrix.World));
     
     //reflectionModel
     output.WorldPosition = mul(input.position, gTransformationMatrix.World).xyz;

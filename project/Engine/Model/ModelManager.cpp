@@ -115,7 +115,7 @@ void ModelManager::LoadOBJ(const std::string& filename, bool overWrite) {
 
 	Assimp::Importer importer;
 	std::string path = instance->kDirectoryPath_ + filename;
-	const aiScene* scene = importer.ReadFile(path.c_str(), aiProcess_FlipWindingOrder | aiProcess_FlipUVs);
+	const aiScene* scene = importer.ReadFile(path.c_str(), aiProcess_FlipWindingOrder | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
 	assert(scene->HasMeshes());
 
 	// Mesh解析
@@ -123,6 +123,7 @@ void ModelManager::LoadOBJ(const std::string& filename, bool overWrite) {
 	for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; meshIndex++) {
 		aiMesh* mesh = scene->mMeshes[meshIndex];
 		assert(mesh->HasNormals());
+		bool hasTangent = mesh->HasTangentsAndBitangents();
 		bool hasTexcoord = mesh->HasTextureCoords(0);
 
 		ModelMesh newModelMesh{};
@@ -136,6 +137,13 @@ void ModelManager::LoadOBJ(const std::string& filename, bool overWrite) {
 			vertex.pos = { position.x,position.y,position.z,1.0f };
 			vertex.normal = { normal.x,normal.y,normal.z };
 
+			if (hasTangent) {
+				aiVector3D& tangent = mesh->mTangents[element];
+				vertex.tangent = { tangent.x,tangent.y,tangent.z };
+			} else {
+				vertex.tangent = { 1.0f,0.0f,0.0f };
+			}
+
 			if (hasTexcoord) {
 				aiVector3D& texcoord = mesh->mTextureCoords[0][element];
 				vertex.uv = { texcoord.x,texcoord.y };
@@ -145,9 +153,10 @@ void ModelManager::LoadOBJ(const std::string& filename, bool overWrite) {
 
 			vertex.pos.x *= -1.0f;
 			vertex.normal.x *= -1.0f;
+			vertex.tangent.x *= -1.0f;
 
-			model->GetModelData().vertices.push_back({ {vertex.pos},{vertex.uv},{vertex.normal} });
-			newModelMesh.vertices.push_back({ {vertex.pos},{vertex.uv},{vertex.normal} });
+			model->GetModelData().vertices.push_back({ {vertex.pos},{vertex.uv},{vertex.normal},{vertex.tangent} });
+			newModelMesh.vertices.push_back({ {vertex.pos},{vertex.uv},{vertex.normal},{vertex.tangent} });
 		}
 
 		for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; faceIndex++) {
@@ -184,6 +193,20 @@ void ModelManager::LoadOBJ(const std::string& filename, bool overWrite) {
 		}
 		newModelMesh.material.textureFilePath = texturePath;
 
+		aiString normalMapFileName;
+		std::string normalMapPath;
+
+		if (material->GetTextureCount(aiTextureType_NORMALS) > 0 &&
+			material->GetTexture(aiTextureType_NORMALS, 0, &normalMapFileName) == AI_SUCCESS) {
+			normalMapPath = normalMapFileName.C_Str();
+		} else if (material->GetTextureCount(aiTextureType_HEIGHT) > 0 &&
+			material->GetTexture(aiTextureType_HEIGHT, 0, &normalMapFileName) == AI_SUCCESS) {
+			normalMapPath = normalMapFileName.C_Str();
+		} else {
+			normalMapPath = "defaultNormal.png";
+		}
+		newModelMesh.material.normalFilePath = normalMapPath;
+
 		model->GetModelData().meshes.push_back(newModelMesh);
 	}
 
@@ -191,7 +214,7 @@ void ModelManager::LoadOBJ(const std::string& filename, bool overWrite) {
 		Mesh newMesh{};
 		for (size_t index = 0; index < model->GetModelData().meshes[i].vertices.size(); index++) {
 			VertexData newVertex = model->GetModelData().meshes[i].vertices[index];
-			newMesh.AddVertex({ { newVertex.pos },{newVertex.uv},{newVertex.normal} });
+			newMesh.AddVertex({ { newVertex.pos },{newVertex.uv},{newVertex.normal},{newVertex.tangent} });
 		}
 		for (size_t index = 0; index < model->GetModelData().meshes[i].indicies.size(); index++) {
 			uint32_t newIndex = model->GetModelData().meshes[i].indicies[index];
@@ -222,7 +245,7 @@ void ModelManager::LoadGLTF(const std::string& filename, bool overWrite) {
 
 	Assimp::Importer importer;
 	std::string path = instance->kDirectoryPath_ + "/" + filename;
-	const aiScene* scene = importer.ReadFile(path.c_str(), aiProcess_FlipWindingOrder | aiProcess_FlipUVs);
+	const aiScene* scene = importer.ReadFile(path.c_str(), aiProcess_FlipWindingOrder | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
 	assert(scene->HasMeshes());
 
 	// Mesh解析
@@ -231,6 +254,7 @@ void ModelManager::LoadGLTF(const std::string& filename, bool overWrite) {
 		ModelMesh newModelMesh{};
 		aiMesh* mesh = scene->mMeshes[meshIndex];
 		assert(mesh->HasNormals());
+		bool hasTangent = mesh->HasTangentsAndBitangents();
 		bool hasTexcoord = mesh->HasTextureCoords(0);
 
 		// Vertex解析
@@ -242,6 +266,13 @@ void ModelManager::LoadGLTF(const std::string& filename, bool overWrite) {
 			vertex.pos = { position.x,position.y,position.z,1.0f };
 			vertex.normal = { normal.x,normal.y,normal.z };
 
+			if (hasTangent) {
+				aiVector3D& tangent = mesh->mTangents[element];
+				vertex.tangent = { tangent.x,tangent.y,tangent.z };
+			} else {
+				vertex.tangent = { 1.0f,0.0f,0.0f };
+			}
+
 			if (hasTexcoord) {
 				aiVector3D& texcoord = mesh->mTextureCoords[0][element];
 				vertex.uv = { texcoord.x,texcoord.y };
@@ -251,9 +282,10 @@ void ModelManager::LoadGLTF(const std::string& filename, bool overWrite) {
 
 			vertex.pos.x *= -1.0f;
 			vertex.normal.x *= -1.0f;
+			vertex.tangent.x *= -1.0f;
 
-			model->GetModelData().vertices.push_back({ {vertex.pos},{vertex.uv},{vertex.normal} });
-			newModelMesh.vertices.push_back({ {vertex.pos},{vertex.uv},{vertex.normal} });
+			model->GetModelData().vertices.push_back({ {vertex.pos},{vertex.uv},{vertex.normal},{vertex.tangent} });
+			newModelMesh.vertices.push_back({ {vertex.pos},{vertex.uv},{vertex.normal},{vertex.tangent} });
 		}
 
 		for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; faceIndex++) {
@@ -288,6 +320,21 @@ void ModelManager::LoadGLTF(const std::string& filename, bool overWrite) {
 			texturePath = "white2x2.png";  // デフォルト
 		}
 		newModelMesh.material.textureFilePath = texturePath;
+		
+		aiString normalMapFileName;
+		std::string normalMapPath;
+
+		if (material->GetTextureCount(aiTextureType_NORMALS) > 0 &&
+			material->GetTexture(aiTextureType_NORMALS, 0, &normalMapFileName) == AI_SUCCESS) {
+			normalMapPath = normalMapFileName.C_Str();
+		} else if (material->GetTextureCount(aiTextureType_HEIGHT) > 0 &&
+			material->GetTexture(aiTextureType_HEIGHT, 0, &normalMapFileName) == AI_SUCCESS) {
+			normalMapPath = normalMapFileName.C_Str();
+		} else {
+			normalMapPath = "defaultNormal.png";
+		}
+		newModelMesh.material.normalFilePath = normalMapPath;
+		
 		model->GetModelData().meshes.push_back(newModelMesh);
 
 		// SkinCluster構築用のデータ取得
@@ -323,7 +370,7 @@ void ModelManager::LoadGLTF(const std::string& filename, bool overWrite) {
 		Mesh newMesh{};
 		for (size_t index = 0; index < model->GetModelData().meshes[i].vertices.size(); index++) {
 			VertexData newVertex = model->GetModelData().meshes[i].vertices[index];
-			newMesh.AddVertex({ { newVertex.pos },{newVertex.uv},{newVertex.normal} });
+			newMesh.AddVertex({ { newVertex.pos },{newVertex.uv},{newVertex.normal},{newVertex.tangent} });
 		}
 		for (size_t index = 0; index < model->GetModelData().meshes[i].indicies.size(); index++) {
 			uint32_t newIndex = model->GetModelData().meshes[i].indicies[index];
@@ -384,8 +431,22 @@ void ModelManager::CreateSphere() {
 			float y = sinf(lat);
 			float z = cosf(lat) * sinf(lon);
 
-			model->GetModelData().vertices.push_back({ {x, y, z, 1.0f},{u, v},{x, y, z} });
-			newModelMesh.vertices.push_back({ {x, y, z, 1.0f},{u, v},{x, y, z} });
+			Vector3 normal = { x, y, z };
+			Vector3 tangent = { -cosf(lat) * sinf(lon),0.0f,cosf(lat) * cosf(lon) };
+
+			if (Vector3::Length(tangent) < 0.0001f) {
+				tangent = { 1.0f, 0.0f, 0.0f };
+			} else {
+				tangent = Vector3::Normalize(tangent);
+			}
+
+			// X軸を反転させて、LoadOBJ等との整合性を保つ
+			x *= -1.0f;
+			normal.x *= -1.0f;
+			tangent.x *= -1.0f;
+
+			model->GetModelData().vertices.push_back({ {x, y, z, 1.0f},{u, v},normal,tangent });
+			newModelMesh.vertices.push_back({ {x, y, z, 1.0f},{u, v},normal,tangent });
 		}
 	}
 
@@ -400,19 +461,20 @@ void ModelManager::CreateSphere() {
 			uint32_t v2 = row2 + lonIndex;
 			uint32_t v3 = row2 + lonIndex + 1;
 
+			// 表側を向くように順序を修正 (v0, v1, v2) (v1, v3, v2)
 			model->GetModelData().indicies.push_back(v0);
 			newModelMesh.indicies.push_back(v0);
-			model->GetModelData().indicies.push_back(v2);
-			newModelMesh.indicies.push_back(v2);
 			model->GetModelData().indicies.push_back(v1);
 			newModelMesh.indicies.push_back(v1);
+			model->GetModelData().indicies.push_back(v2);
+			newModelMesh.indicies.push_back(v2);
 
 			model->GetModelData().indicies.push_back(v1);
 			newModelMesh.indicies.push_back(v1);
-			model->GetModelData().indicies.push_back(v2);
-			newModelMesh.indicies.push_back(v2);
 			model->GetModelData().indicies.push_back(v3);
 			newModelMesh.indicies.push_back(v3);
+			model->GetModelData().indicies.push_back(v2);
+			newModelMesh.indicies.push_back(v2);
 		}
 	}
 	model->GetModelData().meshes.push_back(newModelMesh);
@@ -421,7 +483,7 @@ void ModelManager::CreateSphere() {
 		Mesh newMesh{};
 		for (size_t index = 0; index < model->GetModelData().meshes[i].vertices.size(); index++) {
 			VertexData newVertex = model->GetModelData().meshes[i].vertices[index];
-			newMesh.AddVertex({ { newVertex.pos },{newVertex.uv},{newVertex.normal} });
+			newMesh.AddVertex({ { newVertex.pos },{newVertex.uv},{newVertex.normal},{newVertex.tangent} });
 		}
 		for (size_t index = 0; index < model->GetModelData().meshes[i].indicies.size(); index++) {
 			uint32_t newIndex = model->GetModelData().meshes[i].indicies[index];
@@ -457,20 +519,23 @@ ModelData ModelManager::CreateRing(float out, float in, float radius, bool horiz
 		float cosA = std::cos(angle);
 		float u = float(i) / float(kRingDivide);
 
+		Vector3 normal = { 0,0,1 };
+		Vector3 tangent = { cosA, 0.0f, sinA };
+
 		if (horizon) {
 			// 外周
-			model->GetModelData().vertices.push_back({ {-sinA * kOuterRadius, 0.0f, cosA * kOuterRadius, 1.0f}, {u, 0.0f}, {0,0,1} });
-			newModelMesh.vertices.push_back({ {-sinA * kOuterRadius, 0.0f, cosA * kOuterRadius, 1.0f}, {u, 0.0f}, {0,0,1} });
+			model->GetModelData().vertices.push_back({ {-sinA * kOuterRadius, 0.0f, cosA * kOuterRadius, 1.0f}, {u, 0.0f}, normal, tangent });
+			newModelMesh.vertices.push_back({ {-sinA * kOuterRadius, 0.0f, cosA * kOuterRadius, 1.0f}, {u, 0.0f}, normal, tangent });
 			// 内周
-			model->GetModelData().vertices.push_back({ {-sinA * kInnerRadius, 0.0f, cosA * kInnerRadius, 1.0f}, {u, 1.0f}, {0,0,1} });
-			newModelMesh.vertices.push_back({ {-sinA * kInnerRadius, 0.0f, cosA * kInnerRadius, 1.0f}, {u, 1.0f}, {0,0,1} });
+			model->GetModelData().vertices.push_back({ {-sinA * kInnerRadius, 0.0f, cosA * kInnerRadius, 1.0f}, {u, 1.0f}, normal, tangent });
+			newModelMesh.vertices.push_back({ {-sinA * kInnerRadius, 0.0f, cosA * kInnerRadius, 1.0f}, {u, 1.0f}, normal, tangent });
 		} else {
 			// 外周
-			model->GetModelData().vertices.push_back({ {-sinA * kOuterRadius, cosA * kOuterRadius, 0.0f, 1.0f}, {u, 0.0f}, {0,0,1} });
-			newModelMesh.vertices.push_back({ {-sinA * kOuterRadius, cosA * kOuterRadius, 0.0f, 1.0f}, {u, 0.0f}, {0,0,1} });
+			model->GetModelData().vertices.push_back({ {-sinA * kOuterRadius, cosA * kOuterRadius, 0.0f, 1.0f}, {u, 0.0f}, normal, tangent });
+			newModelMesh.vertices.push_back({ {-sinA * kOuterRadius, cosA * kOuterRadius, 0.0f, 1.0f}, {u, 0.0f}, normal, tangent });
 			// 内周
-			model->GetModelData().vertices.push_back({ {-sinA * kInnerRadius, cosA * kInnerRadius, 0.0f, 1.0f}, {u, 1.0f}, {0,0,1} });
-			newModelMesh.vertices.push_back({ {-sinA * kInnerRadius, cosA * kInnerRadius, 0.0f, 1.0f}, {u, 1.0f}, {0,0,1} });
+			model->GetModelData().vertices.push_back({ {-sinA * kInnerRadius, cosA * kInnerRadius, 0.0f, 1.0f}, {u, 1.0f}, normal, tangent });
+			newModelMesh.vertices.push_back({ {-sinA * kInnerRadius, cosA * kInnerRadius, 0.0f, 1.0f}, {u, 1.0f}, normal, tangent });
 		}
 	}
 
@@ -503,7 +568,7 @@ ModelData ModelManager::CreateRing(float out, float in, float radius, bool horiz
 		Mesh newMesh{};
 		for (size_t index = 0; index < model->GetModelData().meshes[i].vertices.size(); index++) {
 			VertexData newVertex = model->GetModelData().meshes[i].vertices[index];
-			newMesh.AddVertex({ { newVertex.pos },{newVertex.uv},{newVertex.normal} });
+			newMesh.AddVertex({ { newVertex.pos },{newVertex.uv},{newVertex.normal},{newVertex.tangent} });
 		}
 		for (size_t index = 0; index < model->GetModelData().meshes[i].indicies.size(); index++) {
 			uint32_t newIndex = model->GetModelData().meshes[i].indicies[index];
@@ -586,7 +651,7 @@ ModelData ModelManager::CreateCylinder(float topRadius, float bottomRadius, floa
 		Mesh newMesh{};
 		for (size_t index = 0; index < model->GetModelData().meshes[i].vertices.size(); index++) {
 			VertexData newVertex = model->GetModelData().meshes[i].vertices[index];
-			newMesh.AddVertex({ { newVertex.pos },{newVertex.uv},{newVertex.normal} });
+			newMesh.AddVertex({ { newVertex.pos },{newVertex.uv},{newVertex.normal},{newVertex.tangent} });
 		}
 		for (size_t index = 0; index < model->GetModelData().meshes[i].indicies.size(); index++) {
 			uint32_t newIndex = model->GetModelData().meshes[i].indicies[index];
@@ -709,7 +774,7 @@ void ModelManager::PickingUpdate() {
 		pickingData_.pickingEnable = 0;
 		pickingData_.pickingPixelCoord[0] = -1;
 		pickingData_.pickingPixelCoord[1] = -1;
-	} else if (Input::GetInstance()->IsTriggerMouse(0)){
+	} else if (Input::GetInstance()->IsTriggerMouse(0)) {
 		isPicked_ = true;
 		pickingData_.pickingEnable = 1;
 		pickingData_.pickingPixelCoord[0] = int(mousePos.x);

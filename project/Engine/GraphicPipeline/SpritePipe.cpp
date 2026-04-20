@@ -76,7 +76,7 @@ void SpritePipe::CreatePSO(ID3D12Device* device) {
 
 	HRESULT hr;
 
-	D3D12_INPUT_ELEMENT_DESC element[3] = {};
+	D3D12_INPUT_ELEMENT_DESC element[4] = {};
 	element[0].SemanticName = "POSITION";
 	element[0].SemanticIndex = 0;
 	element[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
@@ -91,6 +91,11 @@ void SpritePipe::CreatePSO(ID3D12Device* device) {
 	element[2].SemanticIndex = 0;
 	element[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
 	element[2].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+
+	element[3].SemanticName = "TANGENT";
+	element[3].SemanticIndex = 0;
+	element[3].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+	element[3].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
 
 	D3D12_INPUT_LAYOUT_DESC layout{};
 	layout.pInputElementDescs = element;

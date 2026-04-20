@@ -11,11 +11,14 @@ class DXCom;
 /// ディレクションライトのデータ
 /// </summary>
 struct DirectionalLight {
+	Math::Vector4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
+	Math::Vector3 direction = { 0.0f, -1.0f, 0.0f };
+	float intensity = 1.0f;
 
-	Math::Vector4 color = { 1.0f,1.0f,1.0f,1.0f };
-	Math::Vector3 direction = { 0.0f,-1.0f,0.0f };
-	float intensity = 0.3f;
-
+	// 互換性のためのセッター
+	void SetLightDirection(const Math::Vector3& dir) { direction = Math::Vector3::Normalize(dir); }
+	void SetLightIntensity(float inst) { intensity = inst; }
+	void SetColor(const Math::Vector4& col) { color = col; }
 };
 
 /// <summary>
