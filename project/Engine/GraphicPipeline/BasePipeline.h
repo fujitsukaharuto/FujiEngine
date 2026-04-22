@@ -5,8 +5,10 @@
 #include <vector>
 #include <string>
 
+#include "Engine/DX/DXCompile.h"
 #include "externals/DirectXTex/DirectXTex.h"
 #include "externals/DirectXTex/d3dx12.h"
+#include <unordered_map>
 
 using namespace Microsoft::WRL;
 
@@ -50,6 +52,16 @@ public:
 	/// </summary>
 	ID3D12RootSignature* GetRootSignature();
 
+	/// <summary>
+	/// ルートパラメータのインデックスを取得
+	/// </summary>
+	uint32_t GetRootIndex(const std::string& name) const;
+
+	/// <summary>
+	/// 指定した名前のルートパラメータが存在するか確認
+	/// </summary>
+	bool HasRootIndex(const std::string& name) const { return rootParameterMap_.contains(name); }
+
 private:
 
 	/// <summary>
@@ -71,6 +83,10 @@ protected:
 
 	ComPtr<IDxcBlob> vs = nullptr;
 	ComPtr<IDxcBlob> ps = nullptr;
+	ComPtr<ID3D12ShaderReflection> vsReflection_ = nullptr;
+	ComPtr<ID3D12ShaderReflection> psReflection_ = nullptr;
+
+	std::unordered_map<std::string, uint32_t> rootParameterMap_;
 
 	const std::wstring kDirectoryPath_ = L"./resource/Shaders/";
 

@@ -42,6 +42,16 @@ namespace Graphics {
 
 		ID3D12RootSignature* GetRootSignature(Pipe type);
 
+		BasePipeline* GetCurrentPipeline() const { return currentPipeline_; }
+
+		// --- 名前でルートパラメータをセットするヘルパー ---
+		void SetGraphicsRootCBV(ID3D12GraphicsCommandList* list, const std::string& name, D3D12_GPU_VIRTUAL_ADDRESS address);
+		void SetGraphicsRootDescriptorTable(ID3D12GraphicsCommandList* list, const std::string& name, D3D12_GPU_DESCRIPTOR_HANDLE handle);
+		
+		void SetComputeRootCBV(ID3D12GraphicsCommandList* list, const std::string& name, D3D12_GPU_VIRTUAL_ADDRESS address);
+		void SetComputeRootDescriptorTable(ID3D12GraphicsCommandList* list, const std::string& name, D3D12_GPU_DESCRIPTOR_HANDLE handle);
+		void SetComputeRoot32BitConstants(ID3D12GraphicsCommandList* list, const std::string& name, UINT numValues, const void* data, UINT offset);
+
 	private:
 
 		template<class T>
@@ -54,6 +64,8 @@ namespace Graphics {
 
 		DXCom* dxcommon_;
 		std::array<std::unique_ptr<BasePipeline>, static_cast<size_t>(Pipe::Count)> pipelines_;
+
+		BasePipeline* currentPipeline_ = nullptr;
 
 	};
 

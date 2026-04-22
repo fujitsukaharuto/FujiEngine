@@ -98,37 +98,26 @@ void Pipeline::CreateRootSignature(ID3D12Device* device) {
 		signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature_));
 	assert(SUCCEEDED(hr));
 
+	//// シェーダーをコンパイルしてリフレクション情報を取得する
+	//auto vsData = dxcommon_->GetDXCompile()->CompileShaderWithReflection(kDirectoryPath_ + L"Object3d.VS.hlsl", L"vs_6_0");
+	//vs = vsData.blob;
+	//vsReflection_ = vsData.reflection;
+	//assert(vs != nullptr);
+
+	//auto psData = dxcommon_->GetDXCompile()->CompileShaderWithReflection(kDirectoryPath_ + L"Object3d.PS.hlsl", L"ps_6_0");
+	//ps = psData.blob;
+	//psReflection_ = psData.reflection;
+	//assert(ps != nullptr);
+
+	//// リフレクションからルートシグネチャを自動生成（内部でマッピング情報をログ出力）
+	//rootSignature_ = dxcommon_->GetDXCompile()->CreateRootSignature(device, vsReflection_.Get(), psReflection_.Get());
+	//assert(rootSignature_ != nullptr);
 }
 
 
 void Pipeline::CreatePSO(ID3D12Device* device) {
 
 	HRESULT hr;
-
-	D3D12_INPUT_ELEMENT_DESC element[4] = {};
-	element[0].SemanticName = "POSITION";
-	element[0].SemanticIndex = 0;
-	element[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-	element[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-
-	element[1].SemanticName = "TEXCOORD";
-	element[1].SemanticIndex = 0;
-	element[1].Format = DXGI_FORMAT_R32G32_FLOAT;
-	element[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-
-	element[2].SemanticName = "NORMAL";
-	element[2].SemanticIndex = 0;
-	element[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-	element[2].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-
-	element[3].SemanticName = "TANGENT";
-	element[3].SemanticIndex = 0;
-	element[3].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-	element[3].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-
-	D3D12_INPUT_LAYOUT_DESC layout{};
-	layout.pInputElementDescs = element;
-	layout.NumElements = _countof(element);
 
 	D3D12_BLEND_DESC blend{};
 	if (!isAddMode_) {
@@ -155,10 +144,35 @@ void Pipeline::CreatePSO(ID3D12Device* device) {
 	rasterizer.CullMode = D3D12_CULL_MODE_NONE;
 	rasterizer.FillMode = D3D12_FILL_MODE_SOLID;
 
-	vs = dxcommon_->GetDXCompile()->CompileShader(kDirectoryPath_ + L"Object3d.VS.hlsl", L"vs_6_0");
+	auto vsData = dxcommon_->GetDXCompile()->CompileShaderWithReflection(kDirectoryPath_ + L"Object3d.VS.hlsl", L"vs_6_0");
+	vs = vsData.blob;
 	assert(vs != nullptr);
-	ps = dxcommon_->GetDXCompile()->CompileShader(kDirectoryPath_ + L"Object3d.PS.hlsl", L"ps_6_0");
+	auto psData = dxcommon_->GetDXCompile()->CompileShaderWithReflection(kDirectoryPath_ + L"Object3d.PS.hlsl", L"ps_6_0");
+	ps = psData.blob;
 	assert(ps != nullptr);
+
+	// --- リフレクション情報のログ出力 ---
+	auto vsBindings = dxcommon_->GetDXCompile()->ReflectResources(vsData.reflection.Get());
+	Logger::Log("--- Vertex Shader Resources ---");
+	for (const auto& binding : vsBindings) {
+		Logger::Log(std::format("Name: {}, BindPoint: {}, BindCount: {}, Space: {}, Type: {}", 
+			binding.name, binding.bindPoint, binding.bindCount, binding.space, (int)binding.type));
+	}
+
+	auto psBindings = dxcommon_->GetDXCompile()->ReflectResources(psData.reflection.Get());
+	Logger::Log("--- Pixel Shader Resources ---");
+	for (const auto& binding : psBindings) {
+		Logger::Log(std::format("Name: {}, BindPoint: {}, BindCount: {}, Space: {}, Type: {}", 
+			binding.name, binding.bindPoint, binding.bindCount, binding.space, (int)binding.type));
+	}
+	// ----------------------------------
+
+	// リフレクションから入力レイアウトを自動生成
+	auto inputLayout = dxcommon_->GetDXCompile()->CreateInputLayout(vsData.reflection.Get());
+
+	D3D12_INPUT_LAYOUT_DESC layout{};
+	layout.pInputElementDescs = inputLayout.data();
+	layout.NumElements = static_cast<UINT>(inputLayout.size());
 
 
 	D3D12_DEPTH_STENCIL_DESC depth{};

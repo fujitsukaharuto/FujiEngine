@@ -137,14 +137,41 @@ void PipelineManager::SetPipeline(Pipe type) {
 	auto& pipe = pipelines_[static_cast<size_t>(type)];
 	assert(pipe);
 	pipe->SetPipelineState();
+	currentPipeline_ = pipe.get();
 }
 
 void PipelineManager::SetCSPipeline(Pipe type, uint32_t index) {
 	auto& pipe = pipelines_[static_cast<size_t>(type)];
 	assert(pipe);
 	pipe->SetPipelineCSState(index);
+	currentPipeline_ = pipe.get();
 }
 
 ID3D12RootSignature* Graphics::PipelineManager::GetRootSignature(Pipe type) {
 	return pipelines_[static_cast<int>(type)]->GetRootSignature();
+}
+
+void PipelineManager::SetGraphicsRootCBV(ID3D12GraphicsCommandList* list, const std::string& name, D3D12_GPU_VIRTUAL_ADDRESS address) {
+	assert(currentPipeline_);
+	list->SetGraphicsRootConstantBufferView(currentPipeline_->GetRootIndex(name), address);
+}
+
+void PipelineManager::SetGraphicsRootDescriptorTable(ID3D12GraphicsCommandList* list, const std::string& name, D3D12_GPU_DESCRIPTOR_HANDLE handle) {
+	assert(currentPipeline_);
+	list->SetGraphicsRootDescriptorTable(currentPipeline_->GetRootIndex(name), handle);
+}
+
+void PipelineManager::SetComputeRootCBV(ID3D12GraphicsCommandList* list, const std::string& name, D3D12_GPU_VIRTUAL_ADDRESS address) {
+	assert(currentPipeline_);
+	list->SetComputeRootConstantBufferView(currentPipeline_->GetRootIndex(name), address);
+}
+
+void PipelineManager::SetComputeRootDescriptorTable(ID3D12GraphicsCommandList* list, const std::string& name, D3D12_GPU_DESCRIPTOR_HANDLE handle) {
+	assert(currentPipeline_);
+	list->SetComputeRootDescriptorTable(currentPipeline_->GetRootIndex(name), handle);
+}
+
+void PipelineManager::SetComputeRoot32BitConstants(ID3D12GraphicsCommandList* list, const std::string& name, UINT numValues, const void* data, UINT offset) {
+	assert(currentPipeline_);
+	list->SetComputeRoot32BitConstants(currentPipeline_->GetRootIndex(name), numValues, data, offset);
 }

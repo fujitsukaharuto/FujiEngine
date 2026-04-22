@@ -89,7 +89,6 @@ void LightManager::AddSpotLight(const SpotLightData& data) {
 
 void LightManager::SetLightCommand(ID3D12GraphicsCommandList* commandList) {
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
-	// register(b1) にバインド (Pipeline.cppの設定に合わせる)
 	commandList->SetGraphicsRootConstantBufferView(3, allLightsResource_[frameIndex]->GetGPUVirtualAddress());
 }
 

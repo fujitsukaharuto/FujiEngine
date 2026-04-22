@@ -1,6 +1,7 @@
 #include "BasePipeline.h"
 #include "Engine/DX/DXCom.h"
 #include "DXCommand.h"
+#include "Logger.h"
 
 
 BasePipeline::~BasePipeline() {
@@ -46,6 +47,16 @@ void BasePipeline::SetPipelineCSState(uint32_t index) {
 
 ID3D12RootSignature* BasePipeline::GetRootSignature() {
 	return rootSignature_.Get();
+}
+
+uint32_t BasePipeline::GetRootIndex(const std::string& name) const {
+	auto it = rootParameterMap_.find(name);
+	if (it != rootParameterMap_.end()) {
+		return it->second;
+	}
+	// リフレクションで見つからなかった場合は警告を出して、とりあえず 0 を返すなりアサートするなり
+	Logger::Log(std::format("Warning: RootParameter '{}' not found in current pipeline reflection map.", name));
+	return 0; 
 }
 
 void BasePipeline::CreateRootSignature([[maybe_unused]] ID3D12Device* device) {

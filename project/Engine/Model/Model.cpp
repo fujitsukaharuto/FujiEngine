@@ -1,6 +1,7 @@
 #include "Model.h"
 #include "Engine/DX/DX12Helper.h"
 #include "Engine/DX/SRVManager.h"
+#include "Engine/GraphicPipeline/PipelineManager.h"
 
 using namespace Graphics;
 using namespace Math;
