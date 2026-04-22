@@ -45,6 +45,7 @@ namespace Graphics {
 		void Load(const std::string& filename, bool overWrite = false);
 		void LoadAll();
 		void LoadTextureFile(bool overWrite = false);
+		void LoadSkyCube();
 
 		// テクスチャの取得
 		Texture* GetTexture(const std::string& filename);

@@ -9,6 +9,8 @@ struct Material
     float alphaRef;
     float environmentCoefficient;
     int useNormalMap;
+    int textureIndex;
+    int normalMapIndex;
 };
 
 struct DirectionalLight
@@ -63,8 +65,7 @@ struct PickingBuffer
 };
 
 ConstantBuffer<Material> gMaterial : register(b0);
-Texture2D<float4> gTexture : register(t0);
-Texture2D<float4> gNormalMap : register(t1); // register(t1) is reused for Normal Map
+Texture2D<float4> gTextures[] : register(t0);
 SamplerState gSampler : register(s0);
 ConstantBuffer<AllLights> gLights : register(b1);
 ConstantBuffer<Camera> gCamera : register(b2);
@@ -82,15 +83,14 @@ cbuffer ObjIDData : register(b6)
     uint objID;
 };
 
-// MaskTexture - shifted to register(t2) because t1 is now Normal Map
-Texture2D<float4> gMaskTexture : register(t2);
+// MaskMaterial - index from this material will be used to sample from gTextures
 ConstantBuffer<Material> gMaskMaterial : register(b7);
 
 
 float4 ApplyMaskTexture(float4 baseColor, float2 texcoord)
 {
     float4 maskUV = mul(float4(texcoord, 0.0f, 1.0f), gMaskMaterial.uvTransform);
-    float4 maskTexColor = gMaskTexture.Sample(gSampler, maskUV.xy);
+    float4 maskTexColor = gTextures[gMaskMaterial.textureIndex].Sample(gSampler, maskUV.xy);
 
     // RGBの輝度（明るさ）をマスク強度として使用
     float mask = dot(maskTexColor.rgb, float3(0.299, 0.587, 0.114));
@@ -167,7 +167,7 @@ PixelShaderOutput main(VertxShaderOutput input)
 {
     PixelShaderOutput output;
     float4 transformedUV = mul(float4(input.texcoord, 0.0f, 1.0f), gMaterial.uvTransform);
-    float4 textureColor = gTexture.Sample(gSampler, transformedUV.xy);
+    float4 textureColor = gTextures[gMaterial.textureIndex].Sample(gSampler, transformedUV.xy);
     
     if (textureColor.a <= gMaterial.alphaRef)
     {
@@ -192,7 +192,7 @@ PixelShaderOutput main(VertxShaderOutput input)
         float3 tangent = normalize(input.tangent);
         float3 bitangent = normalize(cross(normal, tangent));
         float3x3 TBN = float3x3(tangent, bitangent, normal);
-        float3 sampledNormal = gNormalMap.Sample(gSampler, transformedUV.xy).rgb;
+        float3 sampledNormal = gTextures[gMaterial.normalMapIndex].Sample(gSampler, transformedUV.xy).rgb;
         sampledNormal = sampledNormal * 2.0f - 1.0f;
         normal = normalize(mul(sampledNormal, TBN));
     }

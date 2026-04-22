@@ -27,6 +27,7 @@ TextureManager* TextureManager::GetInstance() {
 
 void TextureManager::Initialize(DXCom* pDxcom) {
 	dxcommon_ = pDxcom;
+	LoadSkyCube();
 	LoadTextureFile();
 	for (auto& pair : textureFileList_) {
 		Load(pair.first.c_str());
@@ -127,6 +128,11 @@ void TextureManager::LoadTextureFile(bool overWrite) {
 		}
 	}
 #endif // _DEBUG
+}
+
+void Graphics::TextureManager::LoadSkyCube() {
+	std::string filename = "skyboxTexture.dds";
+	Load(filename);
 }
 
 Texture* TextureManager::GetTexture(const std::string& filename) {

@@ -1,6 +1,7 @@
 #include "Object3d.h"
 #include "ModelManager.h"
 #include "Engine/Model/ObjectRenderer.h"
+#include "Engine/DX/SRVManager.h"
 #include "DXCom.h"
 #include "Engine/DX/DX12Helper.h"
 #include "LightManager.h"
@@ -153,13 +154,15 @@ void Object3d::Render() {
 
 	cList->SetGraphicsRootConstantBufferView(1, wvpResource_[frameIndex]->GetGPUVirtualAddress());
 	cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_[frameIndex]->GetGPUVirtualAddress());
-	cList->SetGraphicsRootConstantBufferView(9, objIDDataResource_->GetGPUVirtualAddress());
+	cList->SetGraphicsRootConstantBufferView(8, objIDDataResource_->GetGPUVirtualAddress());
 	ModelManager::GetInstance()->PickingCommand();
 
 	if (isMaskMode_) {
-		cList->SetGraphicsRootConstantBufferView(11, maskMaterial_.GetMaterialResource()->GetGPUVirtualAddress());
-		cList->SetGraphicsRootDescriptorTable(10, maskMaterial_.GetTexture()->gpuHandle);
+		cList->SetGraphicsRootConstantBufferView(9, maskMaterial_.GetMaterialResource()->GetGPUVirtualAddress());
+		cList->SetGraphicsRootDescriptorTable(2, SRVManager::GetInstance()->GetGPUDescriptorHandle(0));
 	}
+
+	cList->SetGraphicsRootDescriptorTable(2, SRVManager::GetInstance()->GetGPUDescriptorHandle(0));
 
 	if (model_) {
 		model_->Draw(cList, material_);

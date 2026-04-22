@@ -1,5 +1,6 @@
 #include "Model.h"
 #include "Engine/DX/DX12Helper.h"
+#include "Engine/DX/SRVManager.h"
 
 using namespace Graphics;
 using namespace Math;
@@ -16,8 +17,7 @@ Model::~Model() {
 void Model::Draw(ID3D12GraphicsCommandList* commandList, std::vector<Material>& materials) {
 	for (uint32_t index = 0; index < mesh_.size(); ++index) {
 		commandList->SetGraphicsRootConstantBufferView(0, materials[index].GetMaterialResource()->GetGPUVirtualAddress());
-		commandList->SetGraphicsRootDescriptorTable(2, materials[index].GetTexture()->gpuHandle);
-		commandList->SetGraphicsRootDescriptorTable(5, materials[index].GetNormalMap()->gpuHandle);
+		commandList->SetGraphicsRootDescriptorTable(2, SRVManager::GetInstance()->GetGPUDescriptorHandle(0));
 
 		commandList->IASetVertexBuffers(0, 1, &mesh_[index].GetVBV());
 		commandList->IASetIndexBuffer(&mesh_[index].GetIBV());
@@ -29,8 +29,7 @@ void Model::AnimationDraw(DXCom* pDxcom, ID3D12GraphicsCommandList* commandList,
 	int vertexOffset = 0;
 	for (uint32_t index = 0; index < mesh_.size(); ++index) {
 		commandList->SetGraphicsRootConstantBufferView(0, materials[index].GetMaterialResource()->GetGPUVirtualAddress());
-		commandList->SetGraphicsRootDescriptorTable(2, materials[index].GetTexture()->gpuHandle);
-		commandList->SetGraphicsRootDescriptorTable(5, materials[index].GetNormalMap()->gpuHandle);
+		commandList->SetGraphicsRootDescriptorTable(2, SRVManager::GetInstance()->GetGPUDescriptorHandle(0));
 
 		commandList->IASetVertexBuffers(0, 1, &skinnedMeshes[index].GetSkinnedVBV());
 		commandList->IASetIndexBuffer(&mesh_[index].GetIBV());

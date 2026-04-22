@@ -801,8 +801,8 @@ void ModelManager::PickingUpdate() {
 
 void ModelManager::PickingCommand() {
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
-	dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(7, pickBufferHandle_[frameIndex].second);
-	dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(8, pickingDataResource_[frameIndex]->GetGPUVirtualAddress());
+	dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(6, pickBufferHandle_[frameIndex].second);
+	dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(7, pickingDataResource_[frameIndex]->GetGPUVirtualAddress());
 }
 
 void ModelManager::PickingDataReset() {

@@ -18,9 +18,9 @@ void PipelineNode::CreateRootSignature(ID3D12Device* device) {
 	rootDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
 
-	D3D12_DESCRIPTOR_RANGE descriptorRange[4] = {};
-	descriptorRange[0].BaseShaderRegister = 0; // t0: Diffuse
-	descriptorRange[0].NumDescriptors = 1;
+	D3D12_DESCRIPTOR_RANGE descriptorRange[2] = {};
+	descriptorRange[0].BaseShaderRegister = 0; // t0: Bindless Textures
+	descriptorRange[0].NumDescriptors = 4096;
 	descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 	descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
@@ -29,17 +29,7 @@ void PipelineNode::CreateRootSignature(ID3D12Device* device) {
 	descriptorRange[1].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
 	descriptorRange[1].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
-	descriptorRange[2].BaseShaderRegister = 1; // t1: Normal
-	descriptorRange[2].NumDescriptors = 1;
-	descriptorRange[2].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
-	descriptorRange[2].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
-
-	descriptorRange[3].BaseShaderRegister = 2; // t2: Mask
-	descriptorRange[3].NumDescriptors = 1;
-	descriptorRange[3].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
-	descriptorRange[3].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
-
-	D3D12_ROOT_PARAMETER rootParameters[12] = {};
+	D3D12_ROOT_PARAMETER rootParameters[10] = {};
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	rootParameters[0].Descriptor.ShaderRegister = 0;
@@ -61,36 +51,26 @@ void PipelineNode::CreateRootSignature(ID3D12Device* device) {
 	rootParameters[4].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	rootParameters[4].Descriptor.ShaderRegister = 2;
 
-	rootParameters[5].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[5].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParameters[5].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	rootParameters[5].DescriptorTable.pDescriptorRanges = &descriptorRange[2];
-	rootParameters[5].DescriptorTable.NumDescriptorRanges = 1;
+	rootParameters[5].Descriptor.ShaderRegister = 4;
 
-	rootParameters[6].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[6].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
 	rootParameters[6].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	rootParameters[6].Descriptor.ShaderRegister = 4;
+	rootParameters[6].DescriptorTable.pDescriptorRanges = &descriptorRange[1];
+	rootParameters[6].DescriptorTable.NumDescriptorRanges = 1;
 
-	rootParameters[7].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[7].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParameters[7].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	rootParameters[7].DescriptorTable.pDescriptorRanges = &descriptorRange[1];
-	rootParameters[7].DescriptorTable.NumDescriptorRanges = 1;
+	rootParameters[7].Descriptor.ShaderRegister = 5;
 
 	rootParameters[8].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParameters[8].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	rootParameters[8].Descriptor.ShaderRegister = 5;
+	rootParameters[8].Descriptor.ShaderRegister = 6;
 
 	rootParameters[9].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParameters[9].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	rootParameters[9].Descriptor.ShaderRegister = 6;
-
-	rootParameters[10].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-	rootParameters[10].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	rootParameters[10].DescriptorTable.pDescriptorRanges = &descriptorRange[3];
-	rootParameters[10].DescriptorTable.NumDescriptorRanges = 1;
-
-	rootParameters[11].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-	rootParameters[11].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	rootParameters[11].Descriptor.ShaderRegister = 7;
+	rootParameters[9].Descriptor.ShaderRegister = 7;
 
 	rootDesc.pParameters = rootParameters;
 	rootDesc.NumParameters = _countof(rootParameters);

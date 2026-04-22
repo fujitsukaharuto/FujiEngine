@@ -49,6 +49,8 @@ namespace Graphics {
 			float AlphaRef = 0.5f;
 			float environmentCoefficient = 1.0f;
 			int32_t useNormalMap = 0;
+			int32_t textureIndex = 0;
+			int32_t normalMapIndex = 0;
 		};
 
 	public:

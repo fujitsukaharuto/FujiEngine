@@ -18,23 +18,20 @@ void AnimationPipeline::CreateRootSignature(ID3D12Device* device) {
 	rootDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
 
-	D3D12_DESCRIPTOR_RANGE descriptorRange[3] = {};
-	descriptorRange[0].BaseShaderRegister = 0; // t0: Diffuse
-	descriptorRange[0].NumDescriptors = 1;
+	D3D12_DESCRIPTOR_RANGE descriptorRange[2] = {};
+	descriptorRange[0].BaseShaderRegister = 0; // t0: Bindless Textures
+	descriptorRange[0].NumDescriptors = 4096;
 	descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 	descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
-	
-	descriptorRange[1].BaseShaderRegister = 1; // t1: Normal
+	descriptorRange[0].RegisterSpace = 0;
+
+	descriptorRange[1].BaseShaderRegister = 0; // t1: Environment map
 	descriptorRange[1].NumDescriptors = 1;
 	descriptorRange[1].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 	descriptorRange[1].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
-	
-	descriptorRange[2].BaseShaderRegister = 2; // t2
-	descriptorRange[2].NumDescriptors = 1;
-	descriptorRange[2].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
-	descriptorRange[2].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
-	
-	D3D12_ROOT_PARAMETER rootParameters[7] = {};
+	descriptorRange[1].RegisterSpace = 1;
+
+	D3D12_ROOT_PARAMETER rootParameters[6] = {};
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	rootParameters[0].Descriptor.ShaderRegister = 0;
@@ -60,11 +57,6 @@ void AnimationPipeline::CreateRootSignature(ID3D12Device* device) {
 	rootParameters[5].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	rootParameters[5].DescriptorTable.pDescriptorRanges = &descriptorRange[1];
 	rootParameters[5].DescriptorTable.NumDescriptorRanges = 1;
-
-	rootParameters[6].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-	rootParameters[6].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	rootParameters[6].DescriptorTable.pDescriptorRanges = &descriptorRange[2];
-	rootParameters[6].DescriptorTable.NumDescriptorRanges = 1;
 
 	rootDesc.pParameters = rootParameters;
 	rootDesc.NumParameters = _countof(rootParameters);

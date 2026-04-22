@@ -270,7 +270,8 @@ void AnimationModel::Render() {
 
 		cList->SetGraphicsRootConstantBufferView(1, wvpResource_[frameIndex]->GetGPUVirtualAddress());
 		cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_[frameIndex]->GetGPUVirtualAddress());
-		cList->SetGraphicsRootConstantBufferView(9, objIDDataResource_->GetGPUVirtualAddress());
+		cList->SetGraphicsRootConstantBufferView(8, objIDDataResource_->GetGPUVirtualAddress());
+		cList->SetGraphicsRootDescriptorTable(2, SRVManager::GetInstance()->GetGPUDescriptorHandle(0));
 		ModelManager::GetInstance()->PickingCommand();
 
 		model_->AnimationDraw(dxcommon_, cList, skinnedMeshes_, material_);
@@ -283,7 +284,8 @@ void AnimationModel::Render() {
 
 		cList->SetGraphicsRootConstantBufferView(1, wvpResource_[frameIndex]->GetGPUVirtualAddress());
 		cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_[frameIndex]->GetGPUVirtualAddress());
-		cList->SetGraphicsRootDescriptorTable(6, environment_->gpuHandle);
+		cList->SetGraphicsRootDescriptorTable(2, SRVManager::GetInstance()->GetGPUDescriptorHandle(0));
+		cList->SetGraphicsRootDescriptorTable(5, environment_->gpuHandle);
 
 		model_->Draw(cList, material_);
 

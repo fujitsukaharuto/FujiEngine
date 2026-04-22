@@ -9,6 +9,8 @@ struct Material
     float alphaRef;
     float environmentCoefficient;
     int useNormalMap;
+    int textureIndex;
+    int normalMapIndex;
 };
 
 struct DirectionalLight
@@ -57,12 +59,11 @@ struct Camera
 };
 
 ConstantBuffer<Material> gMaterial : register(b0);
-Texture2D<float4> gTexture : register(t0);
-Texture2D<float4> gNormalMap : register(t1);
+Texture2D<float4> gTextures[] : register(t0, space0);
 SamplerState gSampler : register(s0);
 ConstantBuffer<AllLights> gLights : register(b1);
 ConstantBuffer<Camera> gCamera : register(b2);
-TextureCube<float4> gEnvironment : register(t2);
+TextureCube<float4> gEnvironment : register(t0, space1);
 
 struct PixelShaderOutput
 {
@@ -129,7 +130,7 @@ PixelShaderOutput main(VertxShaderOutput input)
 {
     PixelShaderOutput output;
     float4 transformedUV = mul(float4(input.texcoord, 0.0f, 1.0f), gMaterial.uvTransform);
-    float4 textureColor = gTexture.Sample(gSampler, transformedUV.xy);
+    float4 textureColor = gTextures[gMaterial.textureIndex].Sample(gSampler, transformedUV.xy);
     
     if (textureColor.a <= gMaterial.alphaRef)
     {
@@ -144,7 +145,7 @@ PixelShaderOutput main(VertxShaderOutput input)
         float3 tangent = normalize(input.tangent);
         float3 bitangent = normalize(cross(normal, tangent));
         float3x3 TBN = float3x3(tangent, bitangent, normal);
-        float3 sampledNormal = gNormalMap.Sample(gSampler, transformedUV.xy).rgb;
+        float3 sampledNormal = gTextures[gMaterial.normalMapIndex].Sample(gSampler, transformedUV.xy).rgb;
         sampledNormal = sampledNormal * 2.0f - 1.0f;
         normal = normalize(mul(sampledNormal, TBN));
     }

@@ -134,6 +134,8 @@ void Material::CopyData(uint32_t frameIndex) {
 	materialDateGPU_[frameIndex]->AlphaRef = materialDate_.AlphaRef;
 	materialDateGPU_[frameIndex]->environmentCoefficient = materialDate_.environmentCoefficient;
 	materialDateGPU_[frameIndex]->useNormalMap = materialDate_.useNormalMap;
+	materialDateGPU_[frameIndex]->textureIndex = texture_ ? texture_->srvIndex : 0;
+	materialDateGPU_[frameIndex]->normalMapIndex = normalMap_ ? normalMap_->srvIndex : 0;
 }
 
 Matrix4x4 Material::MakeScale4x4(const Vector3& scale) {

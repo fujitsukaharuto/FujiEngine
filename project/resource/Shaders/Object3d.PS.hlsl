@@ -9,6 +9,8 @@ struct Material
     float alphaRef;
     float environmentCoefficient;
     int useNormalMap;
+    int textureIndex;
+    int normalMapIndex;
 };
 
 struct DirectionalLight
@@ -63,8 +65,7 @@ struct PickingBuffer
 };
 
 ConstantBuffer<Material> gMaterial : register(b0);
-Texture2D<float4> gTexture : register(t0);
-Texture2D<float4> gNormalMap : register(t1);
+Texture2D<float4> gTextures[] : register(t0);
 SamplerState gSampler : register(s0);
 ConstantBuffer<AllLights> gLights : register(b1);
 ConstantBuffer<Camera> gCamera : register(b2);
@@ -151,7 +152,7 @@ PixelShaderOutput main(VertxShaderOutput input)
 {
     PixelShaderOutput output;
     float4 transformedUV = mul(float4(input.texcoord, 0.0f, 1.0f), gMaterial.uvTransform);
-    float4 textureColor = gTexture.Sample(gSampler, transformedUV.xy);
+    float4 textureColor = gTextures[gMaterial.textureIndex].Sample(gSampler, transformedUV.xy);
     
     if (textureColor.a <= gMaterial.alphaRef)
     {
@@ -179,7 +180,7 @@ PixelShaderOutput main(VertxShaderOutput input)
         // Bitangentの計算順序を入れ替えてUVのV方向(下向き)に合わせる
         float3 bitangent = normalize(cross(tangent, normal));
         float3x3 TBN = float3x3(tangent, bitangent, normal);
-        float3 sampledNormal = gNormalMap.Sample(gSampler, transformedUV.xy).rgb;
+        float3 sampledNormal = gTextures[gMaterial.normalMapIndex].Sample(gSampler, transformedUV.xy).rgb;
         sampledNormal = sampledNormal * 2.0f - 1.0f;
         // 接空間からワールド空間へ変換
         normal = normalize(mul(sampledNormal, TBN));
