@@ -199,19 +199,7 @@ ComPtr<ID3D12RootSignature> DXCompile::CreateRootSignature(ID3D12Device* device,
 		for (UINT i = 0; i < shaderDesc.BoundResources; i++) {
 			D3D12_SHADER_INPUT_BIND_DESC bindDesc;
 			reflection->GetResourceBindingDesc(i, &bindDesc);
-
-			// 重複チェック
-			bool found = false;
-			for (auto& res : allResources) {
-				if (res.desc.BindPoint == bindDesc.BindPoint && res.desc.Type == bindDesc.Type && res.desc.Space == bindDesc.Space) {
-					res.visibility = D3D12_SHADER_VISIBILITY_ALL;
-					found = true;
-					break;
-				}
-			}
-			if (!found) {
-				allResources.push_back({ bindDesc, visibility });
-			}
+			allResources.push_back({ bindDesc, visibility });
 		}
 	};
 
@@ -223,10 +211,11 @@ ComPtr<ID3D12RootSignature> DXCompile::CreateRootSignature(ID3D12Device* device,
 
 	Logger::Log("--- Generated Root Signature Layout ---");
 
-	for (size_t i = 0; i < allResources.size(); ++i) {
-		const auto& res = allResources[i];
+	uint32_t currentRootIndex = 0;
+	for (const auto& res : allResources) {
 		std::string typeStr;
 		char regPrefix = ' ';
+		bool isAdded = false;
 
 		if (res.desc.Type == D3D_SIT_CBUFFER) {
 			typeStr = "CBV";
@@ -237,6 +226,7 @@ ComPtr<ID3D12RootSignature> DXCompile::CreateRootSignature(ID3D12Device* device,
 			param.Descriptor.ShaderRegister = res.desc.BindPoint;
 			param.Descriptor.RegisterSpace = res.desc.Space;
 			rootParams.push_back(param);
+			isAdded = true;
 		} else if (res.desc.Type == D3D_SIT_TEXTURE || res.desc.Type == D3D_SIT_UAV_RWSTRUCTURED) {
 			typeStr = (res.desc.Type == D3D_SIT_TEXTURE) ? "SRV (Table)" : "UAV (Table)";
 			regPrefix = (res.desc.Type == D3D_SIT_TEXTURE) ? 't' : 'u';
@@ -256,14 +246,18 @@ ComPtr<ID3D12RootSignature> DXCompile::CreateRootSignature(ID3D12Device* device,
 			
 			ranges.push_back(std::move(range));
 			rootParams.push_back(param);
+			isAdded = true;
 		}
 
-		// インデックスと変数名のマッピングをログ出力
-		Logger::Log(std::format("[RootIndex: {}] Name: {}, Type: {}, Register: {}{}, Space: {}",
-			i, res.desc.Name, typeStr, regPrefix, res.desc.BindPoint, res.desc.Space));
+		if (isAdded) {
+			// インデックスと変数名のマッピングをログ出力
+			Logger::Log(std::format("[RootIndex: {}] Name: {}, Type: {}, Register: {}{}, Space: {}",
+				currentRootIndex, res.desc.Name, typeStr, regPrefix, res.desc.BindPoint, res.desc.Space));
 
-		rootParameterMap[res.desc.Name] = static_cast<uint32_t>(i);
-		rootParameterMap[std::format("{}{}", regPrefix, res.desc.BindPoint)] = static_cast<uint32_t>(i);
+			rootParameterMap[res.desc.Name] = currentRootIndex;
+			rootParameterMap[std::format("{}{}", regPrefix, res.desc.BindPoint)] = currentRootIndex;
+			currentRootIndex++;
+		}
 	}
 	Logger::Log("---------------------------------------");
 

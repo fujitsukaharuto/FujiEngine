@@ -152,17 +152,19 @@ void Object3d::Render() {
 		}
 	}
 
-	cList->SetGraphicsRootConstantBufferView(1, wvpResource_[frameIndex]->GetGPUVirtualAddress());
-	cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_[frameIndex]->GetGPUVirtualAddress());
-	cList->SetGraphicsRootConstantBufferView(8, objIDDataResource_->GetGPUVirtualAddress());
+	PipelineManager* pPipeManager = PipelineManager::GetInstance()->GetInstance();
+
+	pPipeManager->SetGraphicsRootCBV(cList, "gTransformationMatrix", wvpResource_[frameIndex]->GetGPUVirtualAddress());
+	pPipeManager->SetGraphicsRootCBV(cList, "gCamera", cameraPosResource_[frameIndex]->GetGPUVirtualAddress());
+	pPipeManager->SetGraphicsRootCBV(cList, "ObjIDData", objIDDataResource_->GetGPUVirtualAddress());
 	ModelManager::GetInstance()->PickingCommand();
 
 	if (isMaskMode_) {
-		cList->SetGraphicsRootConstantBufferView(9, maskMaterial_.GetMaterialResource()->GetGPUVirtualAddress());
-		cList->SetGraphicsRootDescriptorTable(2, SRVManager::GetInstance()->GetGPUDescriptorHandle(0));
+		pPipeManager->SetGraphicsRootCBV(cList, "gMaskMaterial", maskMaterial_.GetMaterialResource()->GetGPUVirtualAddress());
+		pPipeManager->SetGraphicsRootDescriptorTable(cList, "gTextures", SRVManager::GetInstance()->GetGPUDescriptorHandle(0));
 	}
 
-	cList->SetGraphicsRootDescriptorTable(2, SRVManager::GetInstance()->GetGPUDescriptorHandle(0));
+	pPipeManager->SetGraphicsRootDescriptorTable(cList, "gTextures", SRVManager::GetInstance()->GetGPUDescriptorHandle(0));
 
 	if (model_) {
 		model_->Draw(cList, material_);
@@ -181,8 +183,9 @@ void Object3d::AnimeDraw() {
 
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
-	cList->SetGraphicsRootConstantBufferView(1, wvpResource_[frameIndex]->GetGPUVirtualAddress());
-	cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_[frameIndex]->GetGPUVirtualAddress());
+	PipelineManager* pPipeManager = PipelineManager::GetInstance()->GetInstance();
+	pPipeManager->SetGraphicsRootCBV(cList, "gTransformationMatrix", wvpResource_[frameIndex]->GetGPUVirtualAddress());
+	pPipeManager->SetGraphicsRootCBV(cList, "gCamera", cameraPosResource_[frameIndex]->GetGPUVirtualAddress());
 	lightManager_->SetLightCommand(cList);
 
 	if (model_) {

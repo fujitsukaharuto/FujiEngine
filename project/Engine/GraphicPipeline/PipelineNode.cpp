@@ -12,96 +12,19 @@ PipelineNode::~PipelineNode() {}
 
 void PipelineNode::CreateRootSignature(ID3D12Device* device) {
 
-	HRESULT hr;
+	// シェーダーをコンパイルしてリフレクション情報を取得する
+	auto vsData = dxcommon_->GetDXCompile()->CompileShaderWithReflection(kDirectoryPath_ + L"Object3d.VS.hlsl", L"vs_6_0");
+	vs = vsData.blob;
+	vsReflection_ = vsData.reflection;
+	assert(vs != nullptr);
 
-	D3D12_ROOT_SIGNATURE_DESC rootDesc{};
-	rootDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+	auto psData = dxcommon_->GetDXCompile()->CompileShaderWithReflection(kDirectoryPath_ + L"Object3dNode.PS.hlsl", L"ps_6_0");
+	ps = psData.blob;
+	psReflection_ = psData.reflection;
+	assert(ps != nullptr);
 
-
-	D3D12_DESCRIPTOR_RANGE descriptorRange[2] = {};
-	descriptorRange[0].BaseShaderRegister = 0; // t0: Bindless Textures
-	descriptorRange[0].NumDescriptors = 4096;
-	descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
-	descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
-
-	descriptorRange[1].BaseShaderRegister = 0; // register(u0)
-	descriptorRange[1].NumDescriptors = 1;
-	descriptorRange[1].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
-	descriptorRange[1].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
-
-	D3D12_ROOT_PARAMETER rootParameters[10] = {};
-	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	rootParameters[0].Descriptor.ShaderRegister = 0;
-
-	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
-	rootParameters[1].Descriptor.ShaderRegister = 0;
-
-	rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	rootParameters[2].DescriptorTable.pDescriptorRanges = &descriptorRange[0];
-	rootParameters[2].DescriptorTable.NumDescriptorRanges = 1;
-
-	rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-	rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	rootParameters[3].Descriptor.ShaderRegister = 1;
-
-	rootParameters[4].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-	rootParameters[4].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	rootParameters[4].Descriptor.ShaderRegister = 2;
-
-	rootParameters[5].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-	rootParameters[5].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	rootParameters[5].Descriptor.ShaderRegister = 4;
-
-	rootParameters[6].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-	rootParameters[6].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	rootParameters[6].DescriptorTable.pDescriptorRanges = &descriptorRange[1];
-	rootParameters[6].DescriptorTable.NumDescriptorRanges = 1;
-
-	rootParameters[7].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-	rootParameters[7].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	rootParameters[7].Descriptor.ShaderRegister = 5;
-
-	rootParameters[8].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-	rootParameters[8].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	rootParameters[8].Descriptor.ShaderRegister = 6;
-
-	rootParameters[9].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-	rootParameters[9].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	rootParameters[9].Descriptor.ShaderRegister = 7;
-
-	rootDesc.pParameters = rootParameters;
-	rootDesc.NumParameters = _countof(rootParameters);
-
-
-	D3D12_STATIC_SAMPLER_DESC staticSamplers[1] = {};
-	staticSamplers[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
-	staticSamplers[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-	staticSamplers[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-	staticSamplers[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-	staticSamplers[0].ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
-	staticSamplers[0].MaxLOD = D3D12_FLOAT32_MAX;
-	staticSamplers[0].ShaderRegister = 0;
-	staticSamplers[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	rootDesc.pStaticSamplers = staticSamplers;
-	rootDesc.NumStaticSamplers = _countof(staticSamplers);
-
-
-	ComPtr<ID3DBlob> signatureBlob;
-	ComPtr<ID3DBlob> errorBlob;
-	hr = D3D12SerializeRootSignature(&rootDesc, D3D_ROOT_SIGNATURE_VERSION_1,
-		&signatureBlob, &errorBlob);
-	if (FAILED(hr)) {
-		Logger::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
-		assert(false);
-	}
-
-	hr = device->CreateRootSignature(0, signatureBlob->GetBufferPointer(),
-		signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature_));
-	assert(SUCCEEDED(hr));
-
+	rootSignature_ = dxcommon_->GetDXCompile()->CreateRootSignature(device, vsReflection_.Get(), psReflection_.Get(), rootParameterMap_);
+	assert(rootSignature_ != nullptr);
 }
 
 
@@ -130,36 +53,18 @@ void PipelineNode::CreatePSO(ID3D12Device* device) {
 		blend.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
 	}
 
+	// すでにコンパイル済みのシェーダーとリフレクションを使用
+	assert(vs != nullptr);
+	assert(ps != nullptr);
+	assert(vsReflection_ != nullptr);
+	assert(psReflection_ != nullptr);
+
+	// リフレクションから入力レイアウトを自動生成
+	auto inputLayout = dxcommon_->GetDXCompile()->CreateInputLayout(vsReflection_.Get());
+
 	D3D12_RASTERIZER_DESC rasterizer{};
 	rasterizer.CullMode = D3D12_CULL_MODE_NONE;
 	rasterizer.FillMode = D3D12_FILL_MODE_SOLID;
-
-	auto vsData = dxcommon_->GetDXCompile()->CompileShaderWithReflection(kDirectoryPath_ + L"Object3d.VS.hlsl", L"vs_6_0");
-	vs = vsData.blob;
-	assert(vs != nullptr);
-	auto psData = dxcommon_->GetDXCompile()->CompileShaderWithReflection(kDirectoryPath_ + L"Object3dNode.PS.hlsl", L"ps_6_0");
-	ps = psData.blob;
-	assert(ps != nullptr);
-
-
-	// --- リフレクション情報のログ出力 ---
-	auto vsBindings = dxcommon_->GetDXCompile()->ReflectResources(vsData.reflection.Get());
-	Logger::Log("--- Vertex Shader Resources ---");
-	for (const auto& binding : vsBindings) {
-		Logger::Log(std::format("Name: {}, BindPoint: {}, BindCount: {}, Space: {}, Type: {}",
-			binding.name, binding.bindPoint, binding.bindCount, binding.space, (int)binding.type));
-	}
-
-	auto psBindings = dxcommon_->GetDXCompile()->ReflectResources(psData.reflection.Get());
-	Logger::Log("--- Pixel Shader Resources ---");
-	for (const auto& binding : psBindings) {
-		Logger::Log(std::format("Name: {}, BindPoint: {}, BindCount: {}, Space: {}, Type: {}",
-			binding.name, binding.bindPoint, binding.bindCount, binding.space, (int)binding.type));
-	}
-	// ----------------------------------
-
-	// リフレクションから入力レイアウトを自動生成
-	auto inputLayout = dxcommon_->GetDXCompile()->CreateInputLayout(vsData.reflection.Get());
 
 	D3D12_INPUT_LAYOUT_DESC layout{};
 	layout.pInputElementDescs = inputLayout.data();

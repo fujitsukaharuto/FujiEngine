@@ -17,8 +17,10 @@ Model::~Model() {
 
 void Model::Draw(ID3D12GraphicsCommandList* commandList, std::vector<Material>& materials) {
 	for (uint32_t index = 0; index < mesh_.size(); ++index) {
-		commandList->SetGraphicsRootConstantBufferView(0, materials[index].GetMaterialResource()->GetGPUVirtualAddress());
-		commandList->SetGraphicsRootDescriptorTable(2, SRVManager::GetInstance()->GetGPUDescriptorHandle(0));
+		PipelineManager* pPipeManager = PipelineManager::GetInstance()->GetInstance();
+		
+		pPipeManager->SetGraphicsRootCBV(commandList, "gMaterial", materials[index].GetMaterialResource()->GetGPUVirtualAddress());
+		pPipeManager->SetGraphicsRootDescriptorTable(commandList, "gTextures", SRVManager::GetInstance()->GetGPUDescriptorHandle(0));
 
 		commandList->IASetVertexBuffers(0, 1, &mesh_[index].GetVBV());
 		commandList->IASetIndexBuffer(&mesh_[index].GetIBV());
@@ -29,8 +31,10 @@ void Model::Draw(ID3D12GraphicsCommandList* commandList, std::vector<Material>& 
 void Model::AnimationDraw(DXCom* pDxcom, ID3D12GraphicsCommandList* commandList, std::vector<SkinnedMesh>& skinnedMeshes, std::vector<Material>& materials) {
 	int vertexOffset = 0;
 	for (uint32_t index = 0; index < mesh_.size(); ++index) {
-		commandList->SetGraphicsRootConstantBufferView(0, materials[index].GetMaterialResource()->GetGPUVirtualAddress());
-		commandList->SetGraphicsRootDescriptorTable(2, SRVManager::GetInstance()->GetGPUDescriptorHandle(0));
+		PipelineManager* pPipeManager = PipelineManager::GetInstance()->GetInstance();
+
+		pPipeManager->SetGraphicsRootCBV(commandList, "gMaterial", materials[index].GetMaterialResource()->GetGPUVirtualAddress());
+		pPipeManager->SetGraphicsRootDescriptorTable(commandList, "gTextures", SRVManager::GetInstance()->GetGPUDescriptorHandle(0));
 
 		commandList->IASetVertexBuffers(0, 1, &skinnedMeshes[index].GetSkinnedVBV());
 		commandList->IASetIndexBuffer(&mesh_[index].GetIBV());

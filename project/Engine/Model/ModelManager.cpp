@@ -425,14 +425,14 @@ void ModelManager::CreateSphere() {
 		for (uint32_t lonIndex = 0; lonIndex <= kSubdivision; ++lonIndex) {
 			// 経度ループ用に +1 まで回す
 			float lon = lonIndex * kLonEvery;
-			float u = float(lonIndex) / float(kSubdivision); // 経度でuを算出（0〜1）
+			float u = 1.0f - float(lonIndex) / float(kSubdivision); // 経度でuを算出（0〜1）を反転
 
 			float x = cosf(lat) * cosf(lon);
 			float y = sinf(lat);
 			float z = cosf(lat) * sinf(lon);
 
 			Vector3 normal = { x, y, z };
-			Vector3 tangent = { -cosf(lat) * sinf(lon),0.0f,cosf(lat) * cosf(lon) };
+			Vector3 tangent = { cosf(lat) * sinf(lon), 0.0f, -cosf(lat) * cosf(lon) };
 
 			if (Vector3::Length(tangent) < 0.0001f) {
 				tangent = { 1.0f, 0.0f, 0.0f };
@@ -461,20 +461,20 @@ void ModelManager::CreateSphere() {
 			uint32_t v2 = row2 + lonIndex;
 			uint32_t v3 = row2 + lonIndex + 1;
 
-			// 表側を向くように順序を修正 (v0, v1, v2) (v1, v3, v2)
+			// 表側を向くように順序を修正 (v0, v2, v1) (v1, v2, v3)
 			model->GetModelData().indicies.push_back(v0);
 			newModelMesh.indicies.push_back(v0);
-			model->GetModelData().indicies.push_back(v1);
-			newModelMesh.indicies.push_back(v1);
 			model->GetModelData().indicies.push_back(v2);
 			newModelMesh.indicies.push_back(v2);
+			model->GetModelData().indicies.push_back(v1);
+			newModelMesh.indicies.push_back(v1);
 
 			model->GetModelData().indicies.push_back(v1);
 			newModelMesh.indicies.push_back(v1);
-			model->GetModelData().indicies.push_back(v3);
-			newModelMesh.indicies.push_back(v3);
 			model->GetModelData().indicies.push_back(v2);
 			newModelMesh.indicies.push_back(v2);
+			model->GetModelData().indicies.push_back(v3);
+			newModelMesh.indicies.push_back(v3);
 		}
 	}
 	model->GetModelData().meshes.push_back(newModelMesh);
@@ -801,8 +801,10 @@ void ModelManager::PickingUpdate() {
 
 void ModelManager::PickingCommand() {
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
-	dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(6, pickBufferHandle_[frameIndex].second);
-	dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(7, pickingDataResource_[frameIndex]->GetGPUVirtualAddress());
+	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
+
+	PipelineManager::GetInstance()->SetGraphicsRootCBV(cList, "PickingData", pickingDataResource_[frameIndex]->GetGPUVirtualAddress());
+	PipelineManager::GetInstance()->SetGraphicsRootDescriptorTable(cList, "gPickingBuffer", pickBufferHandle_[frameIndex].second);
 }
 
 void ModelManager::PickingDataReset() {

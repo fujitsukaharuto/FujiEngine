@@ -89,7 +89,7 @@ void LightManager::AddSpotLight(const SpotLightData& data) {
 
 void LightManager::SetLightCommand(ID3D12GraphicsCommandList* commandList) {
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
-	commandList->SetGraphicsRootConstantBufferView(3, allLightsResource_[frameIndex]->GetGPUVirtualAddress());
+	PipelineManager::GetInstance()->SetGraphicsRootCBV(commandList, "gLights", allLightsResource_[frameIndex]->GetGPUVirtualAddress());
 }
 
 void LightManager::CopyData(uint32_t frameIndex) {
