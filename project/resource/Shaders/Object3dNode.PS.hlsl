@@ -64,27 +64,27 @@ struct PickingBuffer
     float depth;
 };
 
-ConstantBuffer<Material> gMaterial : register(b0);
+ConstantBuffer<Material> gMaterial : register(b1);
 Texture2D<float4> gTextures[] : register(t0);
 SamplerState gSampler : register(s0);
-ConstantBuffer<AllLights> gLights : register(b1);
-ConstantBuffer<Camera> gCamera : register(b2);
+ConstantBuffer<AllLights> gLights : register(b2);
+ConstantBuffer<Camera> gCamera : register(b3);
 RWStructuredBuffer<PickingBuffer> gPickingBuffer : register(u0);
 
 // マウスの位置とクリックしたか
-cbuffer PickingData : register(b5)
+cbuffer PickingData : register(b4)
 {
     int2 pickingPixelCoord; // マウスの位置
     uint pickingEnable; // クリックしたか
 };
 
-cbuffer ObjIDData : register(b6)
+cbuffer ObjIDData : register(b5)
 {
     uint objID;
 };
 
 // MaskMaterial - index from this material will be used to sample from gTextures
-ConstantBuffer<Material> gMaskMaterial : register(b7);
+ConstantBuffer<Material> gMaskMaterial : register(b6);
 
 
 float4 ApplyMaskTexture(float4 baseColor, float2 texcoord)

@@ -1,17 +1,6 @@
 #include "CSParticle.hlsli"
 
-struct Material
-{
-    float4 color;
-    float4x4 uvTransform;
-    int enableLighting;
-    float shininess;
-    float alphaRef;
-    float environmentCoefficient;
-};
-
-ConstantBuffer<Material> gMaterial : register(b1);
-Texture2D<float4> gTexture : register(t0);
+Texture2D<float4> gTexture : register(t4);
 SamplerState gSampler : register(s0);
 
 struct PixelShaderOutput

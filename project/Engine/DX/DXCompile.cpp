@@ -118,6 +118,10 @@ std::vector<D3D12_INPUT_ELEMENT_DESC> DXCompile::CreateInputLayout(ID3D12ShaderR
 		D3D12_SIGNATURE_PARAMETER_DESC paramDesc;
 		reflection->GetInputParameterDesc(i, &paramDesc);
 
+		if (paramDesc.SystemValueType != D3D_NAME_UNDEFINED) {
+			continue;
+		}
+
 		D3D12_INPUT_ELEMENT_DESC elementDesc{};
 		elementDesc.SemanticName = paramDesc.SemanticName;
 		elementDesc.SemanticIndex = paramDesc.SemanticIndex;
@@ -180,7 +184,14 @@ std::vector<ShaderResourceBinding> DXCompile::ReflectResources(ID3D12ShaderRefle
 	return bindings;
 }
 
-ComPtr<ID3D12RootSignature> DXCompile::CreateRootSignature(ID3D12Device* device, ID3D12ShaderReflection* vsReflection, ID3D12ShaderReflection* psReflection, std::unordered_map<std::string, uint32_t>& rootParameterMap) {
+ComPtr<ID3D12RootSignature> DXCompile::CreateRootSignature(
+	ID3D12Device* device,
+	ID3D12ShaderReflection* vsReflection,
+	ID3D12ShaderReflection* psReflection,
+	std::unordered_map<std::string, uint32_t>& rootParameterMap,
+	D3D12_SHADER_VISIBILITY vsVisibility,
+	D3D12_SHADER_VISIBILITY psVisibility,
+	const std::vector<D3D12_STATIC_SAMPLER_DESC>& staticSamplers) {
 	assert(device != nullptr);
 
 	rootParameterMap.clear();
@@ -203,8 +214,8 @@ ComPtr<ID3D12RootSignature> DXCompile::CreateRootSignature(ID3D12Device* device,
 		}
 	};
 
-	CollectResources(vsReflection, D3D12_SHADER_VISIBILITY_VERTEX);
-	CollectResources(psReflection, D3D12_SHADER_VISIBILITY_PIXEL);
+	CollectResources(vsReflection, vsVisibility);
+	CollectResources(psReflection, psVisibility);
 
 	std::vector<D3D12_ROOT_PARAMETER> rootParams;
 	std::vector<std::unique_ptr<D3D12_DESCRIPTOR_RANGE>> ranges; // Table用のRange保持用
@@ -217,9 +228,66 @@ ComPtr<ID3D12RootSignature> DXCompile::CreateRootSignature(ID3D12Device* device,
 		char regPrefix = ' ';
 		bool isAdded = false;
 
+		// リソースの種別判定用
+		bool isCBV = false;
+		bool isUAV = false;
+		D3D12_DESCRIPTOR_RANGE_TYPE rangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+
 		if (res.desc.Type == D3D_SIT_CBUFFER) {
 			typeStr = "CBV";
 			regPrefix = 'b';
+			isCBV = true;
+		} else if (res.desc.Type == D3D_SIT_TEXTURE || 
+				   res.desc.Type == D3D_SIT_UAV_RWSTRUCTURED || 
+				   res.desc.Type == D3D_SIT_UAV_RWTYPED ||
+				   res.desc.Type == D3D_SIT_UAV_RWBYTEADDRESS ||
+				   res.desc.Type == D3D_SIT_STRUCTURED ||
+				   res.desc.Type == D3D_SIT_BYTEADDRESS) {
+
+			isUAV = (res.desc.Type == D3D_SIT_UAV_RWSTRUCTURED || res.desc.Type == D3D_SIT_UAV_RWTYPED || res.desc.Type == D3D_SIT_UAV_RWBYTEADDRESS);
+			typeStr = isUAV ? "UAV (Table)" : "SRV (Table)";
+			regPrefix = isUAV ? 'u' : 't';
+			rangeType = isUAV ? D3D12_DESCRIPTOR_RANGE_TYPE_UAV : D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+		} else {
+			continue; // 処理対象外
+		}
+
+		// 既に同じレジスタ番号のRootParameterが存在するか検索する
+		int duplicateIndex = -1;
+		for (size_t i = 0; i < rootParams.size(); ++i) {
+			const auto& param = rootParams[i];
+			if (isCBV && param.ParameterType == D3D12_ROOT_PARAMETER_TYPE_CBV) {
+				if (param.Descriptor.ShaderRegister == res.desc.BindPoint &&
+					param.Descriptor.RegisterSpace == res.desc.Space) {
+					duplicateIndex = static_cast<int>(i);
+					break;
+				}
+			} else if (!isCBV && param.ParameterType == D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE) {
+				const auto* range = param.DescriptorTable.pDescriptorRanges;
+				if (range->RangeType == rangeType &&
+					range->BaseShaderRegister == res.desc.BindPoint &&
+					range->RegisterSpace == res.desc.Space) {
+					duplicateIndex = static_cast<int>(i);
+					break;
+				}
+			}
+		}
+
+		// 重複が見つかった場合は新規追加せず、VisibilityをALLに拡張する
+		if (duplicateIndex != -1) {
+			rootParams[duplicateIndex].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+			
+			Logger::Log(std::format("[RootIndex: {}] Merged (Visibility=ALL) Name: {}, Type: {}, Register: {}{}, Space: {}",
+				duplicateIndex, res.desc.Name, typeStr, regPrefix, res.desc.BindPoint, res.desc.Space));
+
+			// PSとVSで変数名が異なるケースも考慮してマッピングを追加
+			rootParameterMap[res.desc.Name] = duplicateIndex;
+			rootParameterMap[std::format("{}{}", regPrefix, res.desc.BindPoint)] = duplicateIndex;
+			continue; // これ以上の処理（新規追加）はスキップ
+		}
+
+		// 見つからなかった場合は新規パラメータとして登録
+		if (isCBV) {
 			D3D12_ROOT_PARAMETER param{};
 			param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 			param.ShaderVisibility = res.visibility;
@@ -227,12 +295,9 @@ ComPtr<ID3D12RootSignature> DXCompile::CreateRootSignature(ID3D12Device* device,
 			param.Descriptor.RegisterSpace = res.desc.Space;
 			rootParams.push_back(param);
 			isAdded = true;
-		} else if (res.desc.Type == D3D_SIT_TEXTURE || res.desc.Type == D3D_SIT_UAV_RWSTRUCTURED) {
-			typeStr = (res.desc.Type == D3D_SIT_TEXTURE) ? "SRV (Table)" : "UAV (Table)";
-			regPrefix = (res.desc.Type == D3D_SIT_TEXTURE) ? 't' : 'u';
-			
+		} else {
 			auto range = std::make_unique<D3D12_DESCRIPTOR_RANGE>();
-			range->RangeType = (res.desc.Type == D3D_SIT_TEXTURE) ? D3D12_DESCRIPTOR_RANGE_TYPE_SRV : D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
+			range->RangeType = rangeType;
 			range->NumDescriptors = (res.desc.BindCount == 0) ? 4096 : res.desc.BindCount;
 			range->BaseShaderRegister = res.desc.BindPoint;
 			range->RegisterSpace = res.desc.Space;
@@ -261,23 +326,39 @@ ComPtr<ID3D12RootSignature> DXCompile::CreateRootSignature(ID3D12Device* device,
 	}
 	Logger::Log("---------------------------------------");
 
-	// Static Sampler (s0)
-	D3D12_STATIC_SAMPLER_DESC staticSampler{};
-	staticSampler.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
-	staticSampler.AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-	staticSampler.AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-	staticSampler.AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-	staticSampler.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
-	staticSampler.MaxLOD = D3D12_FLOAT32_MAX;
-	staticSampler.ShaderRegister = 0;
-	staticSampler.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 
+	const D3D12_STATIC_SAMPLER_DESC* pSamplers = nullptr;
+	UINT numSamplers = 0;
+	D3D12_STATIC_SAMPLER_DESC defaultSampler{};
+	if (staticSamplers.empty()) {
+		defaultSampler.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+		defaultSampler.AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+		defaultSampler.AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+		defaultSampler.AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+		defaultSampler.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
+		defaultSampler.MaxLOD = D3D12_FLOAT32_MAX;
+		defaultSampler.ShaderRegister = 0;
+		// PSがある場合はPS限定、それ以外（CS等）はALL
+		defaultSampler.ShaderVisibility = (psReflection != nullptr && psVisibility == D3D12_SHADER_VISIBILITY_PIXEL) ? D3D12_SHADER_VISIBILITY_PIXEL : D3D12_SHADER_VISIBILITY_ALL;
+
+		pSamplers = &defaultSampler;
+		numSamplers = 1;
+	} else {
+		pSamplers = staticSamplers.data();
+		numSamplers = (UINT)staticSamplers.size();
+	}
+	
 	D3D12_ROOT_SIGNATURE_DESC rootDesc{};
 	rootDesc.pParameters = rootParams.data();
 	rootDesc.NumParameters = (UINT)rootParams.size();
-	rootDesc.pStaticSamplers = &staticSampler;
-	rootDesc.NumStaticSamplers = 1;
+	rootDesc.pStaticSamplers = pSamplers;
+	rootDesc.NumStaticSamplers = numSamplers;
+	
+	// CSの場合は InputAssembler 許可フラグを立てない
 	rootDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+	if (vsVisibility == D3D12_SHADER_VISIBILITY_ALL) {
+		rootDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_NONE;
+	}
 
 	ComPtr<ID3DBlob> signatureBlob;
 	ComPtr<ID3DBlob> errorBlob;
@@ -292,4 +373,9 @@ ComPtr<ID3D12RootSignature> DXCompile::CreateRootSignature(ID3D12Device* device,
 	assert(SUCCEEDED(hr));
 
 	return rootSignature;
+}
+
+ComPtr<ID3D12RootSignature> DXCompile::CreateRootSignature(ID3D12Device* device, ID3D12ShaderReflection* csReflection, std::unordered_map<std::string, uint32_t>& rootParameterMap, const std::vector<D3D12_STATIC_SAMPLER_DESC>& staticSamplers) {
+	// CSの場合は visibility を ALL にして共通関数を呼ぶ
+	return CreateRootSignature(device, csReflection, nullptr, rootParameterMap, D3D12_SHADER_VISIBILITY_ALL, D3D12_SHADER_VISIBILITY_ALL, staticSamplers);
 }

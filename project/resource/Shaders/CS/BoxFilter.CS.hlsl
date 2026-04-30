@@ -1,4 +1,4 @@
-Texture2D gTexture : register(t0);
+Texture2D InputTexture : register(t0);
 SamplerState gSampler : register(s0);
 RWTexture2D<float4> outputTexture : register(u0);
 
@@ -31,7 +31,7 @@ void main(uint3 dispatchThreadID : SV_DispatchThreadID)
     uint2 coord = dispatchThreadID.xy;
 
     int width, height;
-    gTexture.GetDimensions(width, height);
+    InputTexture.GetDimensions(width, height);
     if (coord.x >= width || coord.y >= height)
         return;
 
@@ -59,7 +59,7 @@ void main(uint3 dispatchThreadID : SV_DispatchThreadID)
         {
             float2 offset = kIndex3x3[x][y] * uvStepSize;
             float2 sampleUV = texcoord + offset;
-            float3 fetchColor = gTexture.SampleLevel(gSampler, sampleUV, 0).rgb;
+            float3 fetchColor = InputTexture.SampleLevel(gSampler, sampleUV, 0).rgb;
 
             baseColor.rgb += fetchColor * kKernel3x3[x][y];
         }

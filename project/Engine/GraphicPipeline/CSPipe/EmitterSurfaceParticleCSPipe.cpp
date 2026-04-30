@@ -10,124 +10,19 @@ EmitterSurfaceParticleCSPipe::~EmitterSurfaceParticleCSPipe() {
 }
 
 void EmitterSurfaceParticleCSPipe::CreateRootSignature(ID3D12Device* device) {
-	HRESULT hr;
+	auto csData = dxcommon_->GetDXCompile()->CompileShaderWithReflection(kDirectoryPath_ + L"CS/Engine/EmitSurfaceParticle.CS.hlsl", L"cs_6_0");
 
-	// EmitSurfaceCSに必要なルートパラメータを設定していく
-	CD3DX12_DESCRIPTOR_RANGE descriptorRanges[12] = {};
-	descriptorRanges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 0);
-	descriptorRanges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 1);
-	descriptorRanges[2].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 2);
-	descriptorRanges[3].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 3);
-	descriptorRanges[4].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 4);
-	descriptorRanges[5].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 5);
-	descriptorRanges[6].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 6);
-	descriptorRanges[7].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 7);
-	descriptorRanges[8].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
-	descriptorRanges[9].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1);
-	descriptorRanges[10].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 2);
-	descriptorRanges[11].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 8);
+	vs = csData.blob;
+	vsReflection_ = csData.reflection;
+	assert(vs != nullptr);
 
-
-	CD3DX12_ROOT_PARAMETER rootParameters[14];
-	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-	rootParameters[0].DescriptorTable.pDescriptorRanges = &descriptorRanges[0];
-	rootParameters[0].DescriptorTable.NumDescriptorRanges = 1;
-
-	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-	rootParameters[1].DescriptorTable.pDescriptorRanges = &descriptorRanges[1];
-	rootParameters[1].DescriptorTable.NumDescriptorRanges = 1;
-
-	rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-	rootParameters[2].DescriptorTable.pDescriptorRanges = &descriptorRanges[2];
-	rootParameters[2].DescriptorTable.NumDescriptorRanges = 1;
-
-	rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-	rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-	rootParameters[3].DescriptorTable.pDescriptorRanges = &descriptorRanges[3];
-	rootParameters[3].DescriptorTable.NumDescriptorRanges = 1;
-
-	rootParameters[4].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-	rootParameters[4].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-	rootParameters[4].DescriptorTable.pDescriptorRanges = &descriptorRanges[4];
-	rootParameters[4].DescriptorTable.NumDescriptorRanges = 1;
-
-	rootParameters[5].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-	rootParameters[5].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-	rootParameters[5].DescriptorTable.pDescriptorRanges = &descriptorRanges[5];
-	rootParameters[5].DescriptorTable.NumDescriptorRanges = 1;
-
-	rootParameters[6].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-	rootParameters[6].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-	rootParameters[6].Descriptor.ShaderRegister = 0;
-	rootParameters[6].Descriptor.RegisterSpace = 0;
-
-	rootParameters[7].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-	rootParameters[7].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-	rootParameters[7].Descriptor.ShaderRegister = 1;
-	rootParameters[7].Descriptor.RegisterSpace = 0;
-
-	rootParameters[8].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-	rootParameters[8].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-	rootParameters[8].DescriptorTable.pDescriptorRanges = &descriptorRanges[6];
-	rootParameters[8].DescriptorTable.NumDescriptorRanges = 1;
-
-	rootParameters[9].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-	rootParameters[9].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-	rootParameters[9].DescriptorTable.pDescriptorRanges = &descriptorRanges[7];
-	rootParameters[9].DescriptorTable.NumDescriptorRanges = 1;
-
-	rootParameters[10].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-	rootParameters[10].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-	rootParameters[10].DescriptorTable.pDescriptorRanges = &descriptorRanges[8];
-	rootParameters[10].DescriptorTable.NumDescriptorRanges = 1;
-
-	rootParameters[11].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-	rootParameters[11].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-	rootParameters[11].DescriptorTable.pDescriptorRanges = &descriptorRanges[9];
-	rootParameters[11].DescriptorTable.NumDescriptorRanges = 1;
-
-	rootParameters[12].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-	rootParameters[12].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-	rootParameters[12].DescriptorTable.pDescriptorRanges = &descriptorRanges[10];
-	rootParameters[12].DescriptorTable.NumDescriptorRanges = 1;
-
-	rootParameters[13].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-	rootParameters[13].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-	rootParameters[13].DescriptorTable.pDescriptorRanges = &descriptorRanges[11];
-	rootParameters[13].DescriptorTable.NumDescriptorRanges = 1;
-
-	// Compute専用なのでフラグは0でOK
-	D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc{};
-	rootSignatureDesc.NumParameters = _countof(rootParameters);
-	rootSignatureDesc.pParameters = rootParameters;
-	rootSignatureDesc.NumStaticSamplers = 0;
-	rootSignatureDesc.pStaticSamplers = nullptr;
-	rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_NONE;
-
-	ComPtr<ID3DBlob> signatureBlob;
-	ComPtr<ID3DBlob> errorBlob;
-	hr = D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1,
-		&signatureBlob, &errorBlob);
-	if (FAILED(hr)) {
-		if (errorBlob) {
-			Logger::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
-		}
-		assert(false);
-	}
-
-	hr = device->CreateRootSignature(0, signatureBlob->GetBufferPointer(),
-		signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature_));
-	assert(SUCCEEDED(hr));
+	rootSignature_ = dxcommon_->GetDXCompile()->CreateRootSignature(device, vsReflection_.Get(), rootParameterMap_);
+	assert(rootSignature_ != nullptr);
 }
 
 void EmitterSurfaceParticleCSPipe::CreatePSO(ID3D12Device* device) {
 	HRESULT hr;
 
-
-	vs = dxcommon_->GetDXCompile()->CompileShader(kDirectoryPath_ + L"CS/Engine/EmitSurfaceParticle.CS.hlsl", L"cs_6_0");
 	assert(vs != nullptr);
 
 	D3D12_COMPUTE_PIPELINE_STATE_DESC computePipelineStateDesc = {};

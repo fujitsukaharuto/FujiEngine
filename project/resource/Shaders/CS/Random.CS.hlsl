@@ -1,5 +1,3 @@
-// 入力テクスチャ (SRV)
-Texture2D InputTexture : register(t0);
 
 // サンプラー
 SamplerState InputSampler : register(s0);

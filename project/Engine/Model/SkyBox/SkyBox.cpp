@@ -25,18 +25,21 @@ void SkyBox::Draw() {
 }
 
 void SkyBox::Render() {
+	PipelineManager* pPipeManager = PipelineManager::GetInstance();
+	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
+
 	dxcommon_->GetDXCommand()->SetViewAndScissor(MyWin::kWindowWidth, MyWin::kWindowHeight);
-	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Skybox);
-	dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vbView);
-	dxcommon_->GetCommandList()->IASetIndexBuffer(&ibView);
+	pPipeManager->SetPipeline(Pipe::Skybox);
+	cList->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	cList->IASetVertexBuffers(0, 1, &vbView);
+	cList->IASetIndexBuffer(&ibView);
 
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
-	dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, material_.GetMaterialResource()->GetGPUVirtualAddress());
-	dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(1, wvpResource_[frameIndex]->GetGPUVirtualAddress());
-	dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, material_.GetTexture()->gpuHandle);
+	pPipeManager->SetGraphicsRootCBV(cList, "gMaterial", material_.GetMaterialResource()->GetGPUVirtualAddress());
+	pPipeManager->SetGraphicsRootCBV(cList, "gTransformationMatrix", wvpResource_[frameIndex]->GetGPUVirtualAddress());
+	pPipeManager->SetGraphicsRootDescriptorTable(cList, "gTexture", material_.GetTexture()->gpuHandle);
 
-	dxcommon_->GetCommandList()->DrawIndexedInstanced(static_cast<UINT>((index_.size())), 1, 0, 0, 0);
+	cList->DrawIndexedInstanced(static_cast<UINT>((index_.size())), 1, 0, 0, 0);
 }
 
 void SkyBox::DebugGUI() {

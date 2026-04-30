@@ -11,52 +11,20 @@ NonePipeline::~NonePipeline() {}
 
 
 void NonePipeline::CreateRootSignature(ID3D12Device* device) {
+	// シェーダーをコンパイルしてリフレクション情報を取得する
+	auto vsData = dxcommon_->GetDXCompile()->CompileShaderWithReflection(kDirectoryPath_ + L"NonePost.VS.hlsl", L"vs_6_0");
+	vs = vsData.blob;
+	vsReflection_ = vsData.reflection;
+	assert(vs != nullptr);
 
-	HRESULT hr;
+	auto psData = dxcommon_->GetDXCompile()->CompileShaderWithReflection(kDirectoryPath_ + L"NonePost.PS.hlsl", L"ps_6_0");
+	ps = psData.blob;
+	psReflection_ = psData.reflection;
+	assert(ps != nullptr);
 
-	D3D12_ROOT_SIGNATURE_DESC rootDesc{};
-	rootDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-
-
-	CD3DX12_DESCRIPTOR_RANGE descriptorRange[1] = {};
-	descriptorRange[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
-
-	D3D12_ROOT_PARAMETER rootParameters[1] = {};
-	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	rootParameters[0].DescriptorTable.pDescriptorRanges = descriptorRange;
-	rootParameters[0].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);
-
-	rootDesc.pParameters = rootParameters;
-	rootDesc.NumParameters = _countof(rootParameters);
-
-
-	D3D12_STATIC_SAMPLER_DESC staticSamplers[1] = {};
-	staticSamplers[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
-	staticSamplers[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-	staticSamplers[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-	staticSamplers[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-	staticSamplers[0].ComparisonFunc = D3D12_COMPARISON_FUNC_ALWAYS;
-	staticSamplers[0].MaxLOD = D3D12_FLOAT32_MAX;
-	staticSamplers[0].ShaderRegister = 0;
-	staticSamplers[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	rootDesc.pStaticSamplers = staticSamplers;
-	rootDesc.NumStaticSamplers = _countof(staticSamplers);
-
-
-	ComPtr<ID3DBlob> signatureBlob;
-	ComPtr<ID3DBlob> errorBlob;
-	hr = D3D12SerializeRootSignature(&rootDesc, D3D_ROOT_SIGNATURE_VERSION_1,
-		&signatureBlob, &errorBlob);
-	if (FAILED(hr)) {
-		Logger::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
-		assert(false);
-	}
-
-	hr = device->CreateRootSignature(0, signatureBlob->GetBufferPointer(),
-		signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature_));
-	assert(SUCCEEDED(hr));
-
+	// リフレクションからルートシグネチャを自動生成（内部でマッピング情報をログ出力）
+	rootSignature_ = dxcommon_->GetDXCompile()->CreateRootSignature(device, vsReflection_.Get(), psReflection_.Get(), rootParameterMap_);
+	assert(rootSignature_ != nullptr);
 }
 
 
@@ -64,27 +32,18 @@ void NonePipeline::CreatePSO(ID3D12Device* device) {
 
 	HRESULT hr;
 
-	D3D12_INPUT_ELEMENT_DESC element[2] = {};
-	element[0].SemanticName = "POSITION";
-	element[0].SemanticIndex = 0;
-	element[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-	element[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+	assert(vs != nullptr);
+	assert(ps != nullptr);
+	assert(vsReflection_ != nullptr);
+	assert(psReflection_ != nullptr);
 
-	element[1].SemanticName = "TEXCOORD";
-	element[1].SemanticIndex = 0;
-	element[1].Format = DXGI_FORMAT_R32G32_FLOAT;
-	element[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+	// リフレクションから入力レイアウトを自動生成
+	auto inputLayout = dxcommon_->GetDXCompile()->CreateInputLayout(vsReflection_.Get());
+
 
 	D3D12_INPUT_LAYOUT_DESC layout{};
-	layout.pInputElementDescs = element;
-	layout.NumElements = _countof(element);
-
-
-	vs = dxcommon_->GetDXCompile()->CompileShader(kDirectoryPath_ + L"NonePost.VS.hlsl", L"vs_6_0");
-	assert(vs != nullptr);
-	ps = dxcommon_->GetDXCompile()->CompileShader(kDirectoryPath_ + L"NonePost.PS.hlsl", L"ps_6_0");
-	assert(ps != nullptr);
-
+	layout.pInputElementDescs = inputLayout.data();
+	layout.NumElements = static_cast<UINT>(inputLayout.size());
 
 	D3D12_DEPTH_STENCIL_DESC depth{};
 	depth.DepthEnable = FALSE;

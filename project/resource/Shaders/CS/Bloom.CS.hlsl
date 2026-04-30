@@ -4,7 +4,7 @@ cbuffer BloomParams : register(b0)
     float bloomIntensity; // ブルーム強度（例：1.2）
 };
 
-Texture2D<float4> gTexture : register(t0); // HDR シーン
+Texture2D<float4> InputTexture : register(t0); // HDR シーン
 SamplerState gSampler : register(s0);
 RWTexture2D<float4> outputTexture : register(u0); // 合成結果（Scene + Bloom）
 
@@ -40,7 +40,7 @@ void main(uint3 dispatchThreadID : SV_DispatchThreadID)
     float2 uv = (dispatchThreadID.xy + 0.5f) / float2(1280, 720);
 
     // 元のシーンカラーを取得（合成のベース）
-    float3 sceneColor = gTexture.SampleLevel(gSampler, uv, 0).rgb;
+    float3 sceneColor = InputTexture.SampleLevel(gSampler, uv, 0).rgb;
 
     // =========================
     // Step 1: Bright Pass 抽出
@@ -59,7 +59,7 @@ void main(uint3 dispatchThreadID : SV_DispatchThreadID)
         for (int x = -2; x <= 2; ++x)
         {
             float2 offset = float2(x / (float) 1280, y / (float) 720);
-            float3 sampleColor = gTexture.SampleLevel(gSampler, uv + offset, 0).rgb;
+            float3 sampleColor = InputTexture.SampleLevel(gSampler, uv + offset, 0).rgb;
 
             // BrightPass抽出を各サンプルにも適用
             float lum = dot(sampleColor, float3(0.2126, 0.7152, 0.0722));

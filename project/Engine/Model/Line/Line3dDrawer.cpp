@@ -69,8 +69,8 @@ void Line3dDrawer::Finalize() {
 void Line3dDrawer::DrawLine3d(const Vector3& p1, const Vector3& p2, const Vector4& color) {
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 	if (indexLine_ < kMaxLineCount) {
-		line_->vertMap[frameIndex][indexLine_ * 2] = { p1,color };
-		line_->vertMap[frameIndex][indexLine_ * 2 + 1] = { p2,color };
+		line_->vertMap[frameIndex][indexLine_ * 2] = { {p1.x,p1.y,p1.z,1.0f},color };
+		line_->vertMap[frameIndex][indexLine_ * 2 + 1] = { {p2.x,p2.y,p2.z,1.0f},color };
 
 		indexLine_++;
 	}
@@ -169,7 +169,7 @@ void Line3dDrawer::Render() {
 
 	D3D12_VERTEX_BUFFER_VIEW vbView = line_->vbView;
 	cList->IASetVertexBuffers(0, 1, &vbView);
-	cList->SetGraphicsRootConstantBufferView(0, cBufferResource_[frameIndex]->GetGPUVirtualAddress());
+	dxcommon_->GetPipelineManager()->SetGraphicsRootCBV(cList, "gCamera", cBufferResource_[frameIndex]->GetGPUVirtualAddress());
 	cList->DrawInstanced(indexLine_ * 2, 1, 0, 0);
 
 	Reset();

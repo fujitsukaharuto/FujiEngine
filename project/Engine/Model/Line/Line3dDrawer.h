@@ -31,7 +31,7 @@ namespace Graphics {
 		/// 線を構成するためのデータ
 		/// </summary>
 		struct VertexPosColor {
-			Math::Vector3 pos;
+			Math::Vector4 pos;
 			Math::Vector4 color;
 		};
 

@@ -419,17 +419,19 @@ void GPUParticleSystem::InitParticleCS() {
 	drawAliveSRVHandle_.second = srvManager_->GetGPUDescriptorHandle(drawIndexSRVIndex);
 
 	srvManager_->SetDescriptorHeap(1);
-	dxcommon_->GetPipelineManager()->SetCSPipeline(Pipe::InitParticleCS, 1);
-	dxcommon_->GetImmediateList()->SetComputeRootDescriptorTable(0, transCSInstance_.particleCSUAVHandle_.second);
-	dxcommon_->GetImmediateList()->SetComputeRootDescriptorTable(1, scaleCSInstance_.particleCSUAVHandle_.second);
-	dxcommon_->GetImmediateList()->SetComputeRootDescriptorTable(2, timeCSInstance_.particleCSUAVHandle_.second);
-	dxcommon_->GetImmediateList()->SetComputeRootDescriptorTable(3, velocityCSInstance_.particleCSUAVHandle_.second);
-	dxcommon_->GetImmediateList()->SetComputeRootDescriptorTable(4, colorCSInstance_.particleCSUAVHandle_.second);
-	dxcommon_->GetImmediateList()->SetComputeRootDescriptorTable(5, flagsCSInstance_.particleCSUAVHandle_.second);
-	dxcommon_->GetImmediateList()->SetComputeRootDescriptorTable(6, freeListIndexUAVHandle_.second);
-	dxcommon_->GetImmediateList()->SetComputeRootDescriptorTable(7, freeListUAVHandle_.second);
-	dxcommon_->GetImmediateList()->SetComputeRootDescriptorTable(8, freeListTailIndexUAVHandle_.second);
-	dxcommon_->GetImmediateList()->SetComputeRootDescriptorTable(9, drawAliveUAVHandle_.second);
+	ID3D12GraphicsCommandList* cList = dxcommon_->GetImmediateList();
+	PipelineManager* pPipeManager = PipelineManager::GetInstance();
+	pPipeManager->SetCSPipeline(Pipe::InitParticleCS, 1);
+	pPipeManager->SetComputeRootDescriptorTable(cList, "gParticles_Trans", transCSInstance_.particleCSUAVHandle_.second);
+	pPipeManager->SetComputeRootDescriptorTable(cList, "gParticles_Scale", scaleCSInstance_.particleCSUAVHandle_.second);
+	pPipeManager->SetComputeRootDescriptorTable(cList, "gParticles_Time", timeCSInstance_.particleCSUAVHandle_.second);
+	pPipeManager->SetComputeRootDescriptorTable(cList, "gParticles_Velocity", velocityCSInstance_.particleCSUAVHandle_.second);
+	pPipeManager->SetComputeRootDescriptorTable(cList, "gParticles_Color", colorCSInstance_.particleCSUAVHandle_.second);
+	pPipeManager->SetComputeRootDescriptorTable(cList, "gParticles_Flags", flagsCSInstance_.particleCSUAVHandle_.second);
+	pPipeManager->SetComputeRootDescriptorTable(cList, "gFreeListIndex", freeListIndexUAVHandle_.second);
+	pPipeManager->SetComputeRootDescriptorTable(cList, "gFreeList", freeListUAVHandle_.second);
+	pPipeManager->SetComputeRootDescriptorTable(cList, "gFreeListTailIndex", freeListTailIndexUAVHandle_.second);
+	pPipeManager->SetComputeRootDescriptorTable(cList, "gDrawParticleIndex", drawAliveUAVHandle_.second);
 	int dispatchCount = (numParticles + threadsPerGroup - 1) / threadsPerGroup;
 	dxcommon_->GetImmediateList()->Dispatch(dispatchCount, 1, 1);
 	dxcommon_->CommandExecution();
@@ -519,15 +521,16 @@ void GPUParticleSystem::DrawParticleCS(const D3D12_VERTEX_BUFFER_VIEW& vbView, c
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 	gpuTimerCompute.Begin(dxcommon_->GetComputeCommandList(), frameIndex, kTimer_AliveCountDispatch);
 	ID3D12GraphicsCommandList* computeList = dxcommon_->GetComputeCommandList();
-	dxcommon_->GetPipelineManager()->SetCSPipeline(Pipe::InitArgsCS, 2);
-	computeList->SetComputeRootDescriptorTable(0, ArgsUAVHandle_.second);
+	PipelineManager* pPipeManager = PipelineManager::GetInstance();
+	pPipeManager->SetCSPipeline(Pipe::InitArgsCS, 2);
+	pPipeManager->SetComputeRootDescriptorTable(computeList, "gDrawArgs", ArgsUAVHandle_.second);
 	computeList->Dispatch(1, 1, 1);
 	dxcommon_->InsertUAVBarrierForCompute(aliveDrawArgs_.Get());
 
-	dxcommon_->GetPipelineManager()->SetCSPipeline(Pipe::AliveCountCS, 2);// 生きているパーティクルの数を数える
-	computeList->SetComputeRootDescriptorTable(0, colorCSInstance_.particleCSUAVHandle_.second);
-	computeList->SetComputeRootDescriptorTable(1, ArgsUAVHandle_.second);
-	computeList->SetComputeRootDescriptorTable(2, drawAliveUAVHandle_.second);
+	pPipeManager->SetCSPipeline(Pipe::AliveCountCS, 2);// 生きているパーティクルの数を数える
+	pPipeManager->SetComputeRootDescriptorTable(computeList, "gParticles_Color", colorCSInstance_.particleCSUAVHandle_.second);
+	pPipeManager->SetComputeRootDescriptorTable(computeList, "gDrawArgs", ArgsUAVHandle_.second);
+	pPipeManager->SetComputeRootDescriptorTable(computeList, "gDrawParticleIndex", drawAliveUAVHandle_.second);
 	int dispatchCount = (numParticles + threadsPerGroup - 1) / threadsPerGroup;
 	computeList->Dispatch(dispatchCount, 1, 1);
 	dxcommon_->InsertUAVBarrierForCompute(aliveDrawArgs_.Get());
@@ -544,18 +547,17 @@ void GPUParticleSystem::DrawParticleCS(const D3D12_VERTEX_BUFFER_VIEW& vbView, c
 	gpuTimerGraphics.Begin(graphicsList, frameIndex, kTimer_DrawExecuteIndirect);
 	//dxcommon_->PreGPUParticleDraw();
 	dxcommon_->GetDXCommand()->SetViewAndScissor(MyWin::kWindowWidth, MyWin::kWindowHeight);
-	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::ParticleCS);
+	pPipeManager->SetPipeline(Pipe::ParticleCS);
 	graphicsList->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	graphicsList->IASetVertexBuffers(0, 1, &vbView);
 	graphicsList->IASetIndexBuffer(&ibView);
 
-	graphicsList->SetGraphicsRootConstantBufferView(0, perViewResource_[frameIndex]->GetGPUVirtualAddress());
-	graphicsList->SetGraphicsRootConstantBufferView(1, particleCSMaterial_.GetMaterialResource()->GetGPUVirtualAddress());
-	graphicsList->SetGraphicsRootDescriptorTable(2, transCSInstance_.particleCSSRVHandle_.second);
-	graphicsList->SetGraphicsRootDescriptorTable(3, scaleCSInstance_.particleCSSRVHandle_.second);
-	graphicsList->SetGraphicsRootDescriptorTable(4, colorCSInstance_.particleCSSRVHandle_.second);
-	graphicsList->SetGraphicsRootDescriptorTable(5, drawAliveSRVHandle_.second);
-	graphicsList->SetGraphicsRootDescriptorTable(6, particleCSMaterial_.GetTexture()->gpuHandle);
+	pPipeManager->SetGraphicsRootCBV(graphicsList, "gPerView", perViewResource_[frameIndex]->GetGPUVirtualAddress());
+	pPipeManager->SetGraphicsRootDescriptorTable(graphicsList, "gParticles_Trans", transCSInstance_.particleCSSRVHandle_.second);
+	pPipeManager->SetGraphicsRootDescriptorTable(graphicsList, "gParticles_Scale", scaleCSInstance_.particleCSSRVHandle_.second);
+	pPipeManager->SetGraphicsRootDescriptorTable(graphicsList, "gParticles_Color", colorCSInstance_.particleCSSRVHandle_.second);
+	pPipeManager->SetGraphicsRootDescriptorTable(graphicsList, "gDrawParticleIndex", drawAliveSRVHandle_.second);
+	pPipeManager->SetGraphicsRootDescriptorTable(graphicsList, "gTexture", particleCSMaterial_.GetTexture()->gpuHandle);
 
 	graphicsList->ExecuteIndirect(drawIndexedSignature_.Get(), 1, aliveDrawArgs_.Get(), 0, nullptr, 0);// DrawIndirectを使うように
 	//dxcommon_->PostGPUParticleDraw();
@@ -677,18 +679,20 @@ void GPUParticleSystem::UpdateParticleCSDispatch() {
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 	gpuTimerCompute.Begin(dxcommon_->GetComputeCommandList(), frameIndex, kTimer_ParticleUpdate);
 	ID3D12GraphicsCommandList* cList = dxcommon_->GetComputeCommandList();
+	PipelineManager* pPipeManager = PipelineManager::GetInstance();
 	{
-		dxcommon_->GetPipelineManager()->SetCSPipeline(Pipe::UpdateParticleCS, 2);// ParticleのUpdate
-		cList->SetComputeRootDescriptorTable(0, transCSInstance_.particleCSUAVHandle_.second);
-		cList->SetComputeRootDescriptorTable(1, scaleCSInstance_.particleCSUAVHandle_.second);
-		cList->SetComputeRootDescriptorTable(2, timeCSInstance_.particleCSUAVHandle_.second);
-		cList->SetComputeRootDescriptorTable(3, velocityCSInstance_.particleCSUAVHandle_.second);
-		cList->SetComputeRootDescriptorTable(4, colorCSInstance_.particleCSUAVHandle_.second);
-		cList->SetComputeRootDescriptorTable(5, flagsCSInstance_.particleCSUAVHandle_.second);
-		cList->SetComputeRootConstantBufferView(6, perFrameResource_[frameIndex]->GetGPUVirtualAddress());
-		cList->SetComputeRootDescriptorTable(7, freeListIndexUAVHandle_.second);
-		cList->SetComputeRootDescriptorTable(8, freeListUAVHandle_.second);
-		cList->SetComputeRootDescriptorTable(9, freeListTailIndexUAVHandle_.second);
+		pPipeManager->SetCSPipeline(Pipe::UpdateParticleCS, 2);// ParticleのUpdate
+		
+		pPipeManager->SetComputeRootDescriptorTable(cList, "gParticles_Trans", transCSInstance_.particleCSUAVHandle_.second);
+		pPipeManager->SetComputeRootDescriptorTable(cList, "gParticles_Scale", scaleCSInstance_.particleCSUAVHandle_.second);
+		pPipeManager->SetComputeRootDescriptorTable(cList, "gParticles_Time", timeCSInstance_.particleCSUAVHandle_.second);
+		pPipeManager->SetComputeRootDescriptorTable(cList, "gParticles_Velocity", velocityCSInstance_.particleCSUAVHandle_.second);
+		pPipeManager->SetComputeRootDescriptorTable(cList, "gParticles_Color", colorCSInstance_.particleCSUAVHandle_.second);
+		pPipeManager->SetComputeRootDescriptorTable(cList, "gParticles_Flags", flagsCSInstance_.particleCSUAVHandle_.second);
+		pPipeManager->SetComputeRootDescriptorTable(cList, "gFreeListIndex", freeListIndexUAVHandle_.second);
+		pPipeManager->SetComputeRootDescriptorTable(cList, "gFreeList", freeListUAVHandle_.second);
+		pPipeManager->SetComputeRootDescriptorTable(cList, "gFreeListTailIndex", freeListTailIndexUAVHandle_.second);
+		pPipeManager->SetComputeRootCBV(cList, "gPerFrame", perFrameResource_[frameIndex]->GetGPUVirtualAddress());
 		int dispatchCount = (numParticles + threadsPerGroup - 1) / threadsPerGroup;
 		cList->Dispatch(dispatchCount, 1, 1);
 	}

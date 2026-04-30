@@ -10,47 +10,19 @@ InitArgsCSPipe::~InitArgsCSPipe() {
 }
 
 void InitArgsCSPipe::CreateRootSignature(ID3D12Device* device) {
-	HRESULT hr;
+	auto csData = dxcommon_->GetDXCompile()->CompileShaderWithReflection(kDirectoryPath_ + L"CS/Engine/InitArgs.CS.hlsl", L"cs_6_0");
 
-	// InitArgsCSに必要なルートパラメータを設定していく
-	CD3DX12_DESCRIPTOR_RANGE descriptorRanges[1] = {};
-	descriptorRanges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 0);
+	vs = csData.blob;
+	vsReflection_ = csData.reflection;
+	assert(vs != nullptr);
 
-	CD3DX12_ROOT_PARAMETER rootParameters[1];
-	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-	rootParameters[0].DescriptorTable.pDescriptorRanges = &descriptorRanges[0];
-	rootParameters[0].DescriptorTable.NumDescriptorRanges = 1;
-
-	// Compute専用なのでフラグは0でOK
-	D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc{};
-	rootSignatureDesc.NumParameters = _countof(rootParameters);
-	rootSignatureDesc.pParameters = rootParameters;
-	rootSignatureDesc.NumStaticSamplers = 0;
-	rootSignatureDesc.pStaticSamplers = nullptr;
-	rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_NONE;
-
-	ComPtr<ID3DBlob> signatureBlob;
-	ComPtr<ID3DBlob> errorBlob;
-	hr = D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1,
-		&signatureBlob, &errorBlob);
-	if (FAILED(hr)) {
-		if (errorBlob) {
-			Logger::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
-		}
-		assert(false);
-	}
-
-	hr = device->CreateRootSignature(0, signatureBlob->GetBufferPointer(),
-		signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature_));
-	assert(SUCCEEDED(hr));
+	rootSignature_ = dxcommon_->GetDXCompile()->CreateRootSignature(device, vsReflection_.Get(), rootParameterMap_);
+	assert(rootSignature_ != nullptr);
 }
 
 void InitArgsCSPipe::CreatePSO(ID3D12Device* device) {
 	HRESULT hr;
 
-
-	vs = dxcommon_->GetDXCompile()->CompileShader(kDirectoryPath_ + L"CS/Engine/InitArgs.CS.hlsl", L"cs_6_0");
 	assert(vs != nullptr);
 
 	D3D12_COMPUTE_PIPELINE_STATE_DESC computePipelineStateDesc = {};

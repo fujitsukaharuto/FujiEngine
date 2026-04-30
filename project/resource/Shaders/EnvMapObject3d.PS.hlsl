@@ -58,11 +58,11 @@ struct Camera
     float3 worldPosition;
 };
 
-ConstantBuffer<Material> gMaterial : register(b0);
+ConstantBuffer<Material> gMaterial : register(b1);
 Texture2D<float4> gTextures[] : register(t0, space0);
 SamplerState gSampler : register(s0);
-ConstantBuffer<AllLights> gLights : register(b1);
-ConstantBuffer<Camera> gCamera : register(b2);
+ConstantBuffer<AllLights> gLights : register(b2);
+ConstantBuffer<Camera> gCamera : register(b3);
 TextureCube<float4> gEnvironment : register(t0, space1);
 
 struct PixelShaderOutput

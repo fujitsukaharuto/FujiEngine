@@ -4,9 +4,9 @@ cbuffer Constants : register(b0)
     float2 iResolution;
 }
 
-Texture2D iChannel0 : register(t0);
+Texture2D InputTexture : register(t0);
 SamplerState samplerState : register(s0);
-RWTexture2D<float4> outputTex : register(u0); // 出力先
+RWTexture2D<float4> outputTexture : register(u0); // 出力先
 
 
 float3 LinearToSRGB(float3 linearColor)
@@ -80,11 +80,11 @@ void main( uint3 DTid : SV_DispatchThreadID )
     if (crtCoords.x < 0.0 || crtCoords.x > 1.0 || crtCoords.y < 0.0 || crtCoords.y > 1.0)
         return;
 
-    float3 color = sampleSplit(iChannel0, crtCoords);
+    float3 color = sampleSplit(InputTexture, crtCoords);
 
     float2 screenSpace = crtCoords * iResolution;
     color = scanline(screenSpace, color);
     color.rgb = LinearToSRGB(color.rgb);
     
-    outputTex[DTid.xy] = float4(color, 1.0);
+    outputTexture[DTid.xy] = float4(color, 1.0);
 }

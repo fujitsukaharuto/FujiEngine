@@ -39,10 +39,11 @@ void SpriteRenderer::Render() {
 	}
 
 	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
+	PipelineManager* pPipeManager = PipelineManager::GetInstance();
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 
 	dxcommon_->GetDXCommand()->SetViewAndScissor(MyWin::kWindowWidth, MyWin::kWindowHeight);
-	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Sprite);
+	pPipeManager->SetPipeline(Pipe::Sprite);
 	cList->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	cList->IASetVertexBuffers(0, 1, &vertexBufferView_);
@@ -50,9 +51,9 @@ void SpriteRenderer::Render() {
 
 	// 登録されたスプライトをループで描画
 	for (Sprite* sprite : renderQueue_) {
-		cList->SetGraphicsRootConstantBufferView(0, sprite->GetMaterialGPUAddress());
-		cList->SetGraphicsRootConstantBufferView(1, sprite->GetWvpGPUAddress(frameIndex));
-		cList->SetGraphicsRootDescriptorTable(2, sprite->GetTextureSRV());
+		pPipeManager->SetGraphicsRootCBV(cList, "gMaterial", sprite->GetMaterialGPUAddress());
+		pPipeManager->SetGraphicsRootCBV(cList, "gTransformationMatrix", sprite->GetWvpGPUAddress(frameIndex));
+		pPipeManager->SetGraphicsRootDescriptorTable(cList, "gTexture", sprite->GetTextureSRV());
 		cList->DrawIndexedInstanced(6, 1, 0, 0, 0);
 	}
 
@@ -69,10 +70,11 @@ void Graphics::SpriteRenderer::RenderForeground() {
 	}
 
 	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
+	PipelineManager* pPipeManager = PipelineManager::GetInstance();
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 
 	dxcommon_->GetDXCommand()->SetViewAndScissor(MyWin::kWindowWidth, MyWin::kWindowHeight);
-	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Sprite);
+	pPipeManager->SetPipeline(Pipe::Sprite);
 	cList->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	cList->IASetVertexBuffers(0, 1, &vertexBufferView_);
@@ -80,9 +82,9 @@ void Graphics::SpriteRenderer::RenderForeground() {
 
 	// 登録されたスプライトをループで描画
 	for (Sprite* sprite : renderForegroundQueue_) {
-		cList->SetGraphicsRootConstantBufferView(0, sprite->GetMaterialGPUAddress());
-		cList->SetGraphicsRootConstantBufferView(1, sprite->GetWvpGPUAddress(frameIndex));
-		cList->SetGraphicsRootDescriptorTable(2, sprite->GetTextureSRV());
+		pPipeManager->SetGraphicsRootCBV(cList, "gMaterial", sprite->GetMaterialGPUAddress());
+		pPipeManager->SetGraphicsRootCBV(cList, "gTransformationMatrix", sprite->GetWvpGPUAddress(frameIndex));
+		pPipeManager->SetGraphicsRootDescriptorTable(cList, "gTexture", sprite->GetTextureSRV());
 		cList->DrawIndexedInstanced(6, 1, 0, 0, 0);
 	}
 

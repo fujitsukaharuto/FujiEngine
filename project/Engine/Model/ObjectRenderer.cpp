@@ -87,8 +87,8 @@ void ObjectRenderer::RenderSkyBox() {
 void Graphics::ObjectRenderer::RenderGrid() {
 	dxcommon_->GetDXCommand()->SetViewAndScissor(MyWin::kWindowWidth, MyWin::kWindowHeight);
 	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::BaseGrid);
-
-	dxcommon_->GetDXCommand()->GetList()->SetGraphicsRootConstantBufferView(0, CameraManager::GetInstance()->GetCamera()->GetCameraInfoGPUVirtualAddress());
+	
+	PipelineManager::GetInstance()->GetInstance()->SetGraphicsRootCBV(dxcommon_->GetDXCommand()->GetList(), "CameraInfo", CameraManager::GetInstance()->GetCamera()->GetCameraInfoGPUVirtualAddress());
 	// 頂点バッファ・インデックスバッファは「無し」
 	dxcommon_->GetDXCommand()->GetList()->IASetVertexBuffers(0, 0, nullptr);
 	dxcommon_->GetDXCommand()->GetList()->IASetIndexBuffer(nullptr);

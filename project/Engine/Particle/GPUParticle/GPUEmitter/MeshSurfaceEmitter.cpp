@@ -2,6 +2,7 @@
 #include "Engine/DX/DXCom.h"
 #include "Engine/DX/DX12Helper.h"
 #include "Engine/DX/SRVManager.h"
+#include "Engine/GraphicPipeline/PipelineManager.h"
 #include "Engine/Model/ModelManager.h"
 #include "ImGuiManager/ImGuiManager.h"
 #include "Engine/Editor/JsonSerializer.h"
@@ -111,22 +112,24 @@ void MeshSurfaceEmitter::Dispatch(ID3D12GraphicsCommandList* cmd,
 	DXCom* dx, SRVManager* srv, const ParticleCSHandles& shared) {
 	if (!isEmit_ || data_.count == 0) return;
 	uint32_t frameIndex = dx->GetNowFrameCount();
+	Graphics::PipelineManager* pPipeManager = Graphics::PipelineManager::GetInstance();
+	
 	CopyData(frameIndex);// データのコピー
-	dx->GetPipelineManager()->SetCSPipeline(Pipe::EmitSurfaceParticleCS, 2);// 表面エミット
-	cmd->SetComputeRootDescriptorTable(0, shared.transCSUAVHandle);
-	cmd->SetComputeRootDescriptorTable(1, shared.scaleCSUAVHandle);
-	cmd->SetComputeRootDescriptorTable(2, shared.timeCSUAVHandle);
-	cmd->SetComputeRootDescriptorTable(3, shared.velocityCSUAVHandle);
-	cmd->SetComputeRootDescriptorTable(4, shared.colorCSUAVHandle);
-	cmd->SetComputeRootDescriptorTable(5, shared.flagsCSUAVHandle);
-	cmd->SetComputeRootDescriptorTable(8, shared.freeListIndexUAVHandle);
-	cmd->SetComputeRootDescriptorTable(9, shared.freeListUAVHandle);
-	cmd->SetComputeRootDescriptorTable(10, srv->GetGPUDescriptorHandle(verticesIndex));
-	cmd->SetComputeRootDescriptorTable(11, srv->GetGPUDescriptorHandle(indicesIndex));
-	cmd->SetComputeRootDescriptorTable(12, srv->GetGPUDescriptorHandle(areasIndex));
-	cmd->SetComputeRootDescriptorTable(13, shared.freeListTailIndexUAVHandle);
-	cmd->SetComputeRootConstantBufferView(6, resource_[frameIndex]->GetGPUVirtualAddress());
-	cmd->SetComputeRootConstantBufferView(7, shared.perFrameCBV);
+	pPipeManager->SetCSPipeline(Pipe::EmitSurfaceParticleCS, 2);// 表面エミット
+	pPipeManager->SetComputeRootDescriptorTable(cmd, "gParticles_Trans", shared.transCSUAVHandle);
+	pPipeManager->SetComputeRootDescriptorTable(cmd, "gParticles_Scale", shared.scaleCSUAVHandle);
+	pPipeManager->SetComputeRootDescriptorTable(cmd, "gParticles_Time", shared.timeCSUAVHandle);
+	pPipeManager->SetComputeRootDescriptorTable(cmd, "gParticles_Velocity", shared.velocityCSUAVHandle);
+	pPipeManager->SetComputeRootDescriptorTable(cmd, "gParticles_Color", shared.colorCSUAVHandle);
+	pPipeManager->SetComputeRootDescriptorTable(cmd, "gParticles_Flags", shared.flagsCSUAVHandle);
+	pPipeManager->SetComputeRootDescriptorTable(cmd, "gFreeListIndex", shared.freeListIndexUAVHandle);
+	pPipeManager->SetComputeRootDescriptorTable(cmd, "gFreeList", shared.freeListUAVHandle);
+	pPipeManager->SetComputeRootDescriptorTable(cmd, "gFreeListTailIndex", shared.freeListTailIndexUAVHandle);
+	pPipeManager->SetComputeRootDescriptorTable(cmd, "gVertices", srv->GetGPUDescriptorHandle(verticesIndex));
+	pPipeManager->SetComputeRootDescriptorTable(cmd, "gIndices", srv->GetGPUDescriptorHandle(indicesIndex));
+	pPipeManager->SetComputeRootDescriptorTable(cmd, "gTriangleCDF", srv->GetGPUDescriptorHandle(areasIndex));
+	pPipeManager->SetComputeRootCBV(cmd, "gPerFrame", shared.perFrameCBV);
+	pPipeManager->SetComputeRootCBV(cmd, "gEmitter", resource_[frameIndex]->GetGPUVirtualAddress());
 	uint32_t dispatchCount = (data_.count + 1024 - 1) / 1024;
 	cmd->Dispatch(dispatchCount, 1, 1);
 }

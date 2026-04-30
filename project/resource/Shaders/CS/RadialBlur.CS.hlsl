@@ -5,7 +5,7 @@ SamplerState gSampler : register(s0);
 // 出力テクスチャ (UAV)
 RWTexture2D<float4> outputTexture : register(u0);
 
-cbuffer BlerConstantBuffer : register(b0)
+cbuffer BlurConstantBuffer : register(b0)
 {
     float2 center;
     float blurWidth;

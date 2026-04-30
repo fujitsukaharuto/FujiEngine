@@ -4,7 +4,7 @@ cbuffer Constants : register(b0)
     float2 iResolution;
 }
 
-Texture2D<float4> iChannel0 : register(t0);
+Texture2D<float4> InputTexture : register(t0);
 SamplerState samplerState : register(s0);
 RWTexture2D<float4> outputTexture : register(u0);
 
@@ -77,7 +77,7 @@ void main(uint3 DTid : SV_DispatchThreadID)
         return;
     }
 
-    float3 color = sampleSplit(iChannel0, crtCoords);
+    float3 color = sampleSplit(InputTexture, crtCoords);
     float2 screenSpace = crtCoords * iResolution.xy;
     color = scanline(screenSpace, color);
 

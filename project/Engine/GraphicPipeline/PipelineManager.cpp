@@ -103,11 +103,6 @@ void PipelineManager::CreatePipeline() {
 	CreatePipe<ParticleCSPipe>(Pipe::ParticleCS);
 	CreatePipe<AnimationPipeline>(Pipe::Animation);
 	CreatePipe<SkyboxPipe>(Pipe::Skybox);
-	CreatePipe<MetaBallPipeline>(Pipe::MetaBall);
-	CreatePipe<ShockWavePipe>(Pipe::ShockWave);
-	CreatePipe<FirePipe>(Pipe::Fire);
-	CreatePipe<ThunderPipe>(Pipe::Thunder);
-	CreatePipe<CRTPipe>(Pipe::CRT);
 	CreatePipe<BaseGridPipe>(Pipe::BaseGrid);
 
 	CreatePipe<GrayCSPipe>(Pipe::GrayCS);

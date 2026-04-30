@@ -560,6 +560,8 @@ void ParticleManager::UpdateAnimeGroup(const Matrix4x4& billboardMatrix) {
 
 void ParticleManager::DrawParticleGroup() {
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
+	PipelineManager* pPipeManager = PipelineManager::GetInstance();
+	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
 	for (auto& groupPair : particleGroups_) {// 通常パーティクルグループ
 		ParticleGroup* group = groupPair.second.get();
 		if (group->GetDrawCount() == 0) continue;
@@ -567,80 +569,79 @@ void ParticleManager::DrawParticleGroup() {
 		if (preType_ != group->type_) {
 			switch (group->type_) {// ブレンドモードによって切り替え
 			case BlendType::ALPHA:
-				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::ParticleAlpha);
+				pPipeManager->SetPipeline(Pipe::ParticleAlpha);
 				break;
 			case BlendType::ADD:
-				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Particle);
+				pPipeManager->SetPipeline(Pipe::Particle);
 				break;
 			case BlendType::SUBTRACT:
-				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::ParticleSub);
+				pPipeManager->SetPipeline(Pipe::ParticleSub);
 				break;
 			case BlendType::SCREEN:
-				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::ParticleScreen);
+				pPipeManager->SetPipeline(Pipe::ParticleScreen);
 				break;
 			case BlendType::MULTIPLY:
-				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::ParticleMultiply);
+				pPipeManager->SetPipeline(Pipe::ParticleMultiply);
 				break;
 			case BlendType::SOFT_ADD:
-				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::ParticleSoftAdd);
+				pPipeManager->SetPipeline(Pipe::ParticleSoftAdd);
 				break;
 			case BlendType::PREMULTIPLIED_ALPHA:
-				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::ParticlePreMulAlpha);
+				pPipeManager->SetPipeline(Pipe::ParticlePreMulAlpha);
 				break;
 			default:
-				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Particle);
+				pPipeManager->SetPipeline(Pipe::Particle);
 				break;
 			}
 		}
 
 		ShapeTypeCommand(group->GetShapeType());
-		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group->GetSRVIndex(frameIndex)));
-		dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, group->GetMaterial().GetMaterialResource()->GetGPUVirtualAddress());
-		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, group->GetMaterial().GetTexture()->gpuHandle);
+		pPipeManager->SetGraphicsRootDescriptorTable(cList, "gTransformationMatries", srvManager_->GetGPUDescriptorHandle(group->GetSRVIndex(frameIndex)));
+		pPipeManager->SetGraphicsRootDescriptorTable(cList, "gTexture", group->GetMaterial().GetTexture()->gpuHandle);
 		ShapeTypeDrawCommand(group->GetShapeType(), group->GetDrawCount());// ShapeTypeでDrawするように
 
 		preType_ = group->type_;
 	}
 
 
-	for (auto& groupPair : particleGroups_) {// ペアレントパーティクルグループ
+	for (auto& groupPair : particleGroups_) {
 		ParticleGroup* group = groupPair.second.get();
 		if (group->GetDrawCount() == 0) continue;
 		if (group->GetShapeType() != ShapeType::LIGHTNING) continue;
 		if (preType_ != group->type_) {// ブレンドモードによって切り替え
 			switch (group->type_) {
 			case BlendType::ALPHA:
-				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::ParticleAlpha);
+				pPipeManager->SetPipeline(Pipe::ParticleAlpha);
 				break;
 			case BlendType::ADD:
-				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Particle);
+				pPipeManager->SetPipeline(Pipe::Particle);
 				break;
 			case BlendType::SUBTRACT:
-				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::ParticleSub);
+				pPipeManager->SetPipeline(Pipe::ParticleSub);
 				break;
 			case BlendType::SCREEN:
-				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::ParticleScreen);
+				pPipeManager->SetPipeline(Pipe::ParticleScreen);
 				break;
 			case BlendType::MULTIPLY:
-				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::ParticleMultiply);
+				pPipeManager->SetPipeline(Pipe::ParticleMultiply);
 				break;
 			case BlendType::SOFT_ADD:
-				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::ParticleSoftAdd);
+				pPipeManager->SetPipeline(Pipe::ParticleSoftAdd);
 				break;
 			case BlendType::PREMULTIPLIED_ALPHA:
-				dxcommon_->GetPipelineManager()->SetPipeline(Pipe::ParticlePreMulAlpha);
+				pPipeManager->SetPipeline(Pipe::ParticlePreMulAlpha);
 				break;
 			default:
 				break;
 			}
 		}
 
-		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group->GetSRVIndex(frameIndex)));
+		pPipeManager->SetGraphicsRootDescriptorTable(cList, "gTransformationMatries", srvManager_->GetGPUDescriptorHandle(group->GetSRVIndex(frameIndex)));
 		lightning_->MeshDraw(&group->GetMaterial(), group->GetDrawCount());// ライトニングの描画
 
 		if (group->GetShapeType() != ShapeType::PLANE) {
-			dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &plane_.vbView);
-			dxcommon_->GetCommandList()->IASetIndexBuffer(&plane_.ibView);
+			cList->IASetVertexBuffers(0, 1, &plane_.vbView);
+			cList->IASetIndexBuffer(&plane_.ibView);
 		}
 
 		preType_ = group->type_;
@@ -649,15 +650,16 @@ void ParticleManager::DrawParticleGroup() {
 
 void ParticleManager::DrawParentParticleGroup() {
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
+	PipelineManager* pPipeManager = PipelineManager::GetInstance();
+	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
 	for (auto& groupPair : parentParticleGroups_) {
 		ParentParticleGroup* group = groupPair.second.get();
 		if (group->GetDrawCount() == 0) continue;
 		if (group->GetShapeType() == ShapeType::LIGHTNING) continue;
 
 		ShapeTypeCommand(group->GetShapeType());
-		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group->GetSRVIndex(frameIndex)));
-		dxcommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, group->GetMaterial().GetMaterialResource()->GetGPUVirtualAddress());
-		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, group->GetMaterial().GetTexture()->gpuHandle);
+		pPipeManager->SetGraphicsRootDescriptorTable(cList, "gTransformationMatries", srvManager_->GetGPUDescriptorHandle(group->GetSRVIndex(frameIndex)));
+		pPipeManager->SetGraphicsRootDescriptorTable(cList, "gTexture", group->GetMaterial().GetTexture()->gpuHandle);
 		ShapeTypeDrawCommand(group->GetShapeType(), group->GetDrawCount());
 	}
 	for (auto& groupPair : parentParticleGroups_) {
@@ -665,12 +667,12 @@ void ParticleManager::DrawParentParticleGroup() {
 		if (group->GetDrawCount() == 0) continue;
 		if (group->GetShapeType() != ShapeType::LIGHTNING) continue;
 
-		dxcommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group->GetSRVIndex(frameIndex)));
+		pPipeManager->SetGraphicsRootDescriptorTable(cList, "gTransformationMatries", srvManager_->GetGPUDescriptorHandle(group->GetSRVIndex(frameIndex)));
 		lightning_->MeshDraw(&group->GetMaterial(), group->GetDrawCount());
 
 		if (group->GetShapeType() != ShapeType::PLANE) {
-			dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &plane_.vbView);
-			dxcommon_->GetCommandList()->IASetIndexBuffer(&plane_.ibView);
+			cList->IASetVertexBuffers(0, 1, &plane_.vbView);
+			cList->IASetIndexBuffer(&plane_.ibView);
 		}
 	}
 }

@@ -81,12 +81,30 @@ namespace DXC {
 		/// <param name="vsReflection">VSのリフレクション</param>
 		/// <param name="psReflection">PSのリフレクション</param>
 		/// <param name="rootParameterMap">ルートパラメータのインデックスマップ</param>
+		/// <param name="vsVisibility">VSのVisibility (デフォルト VERTEX)</param>
+		/// <param name="psVisibility">PSのVisibility (デフォルト PIXEL)</param>
 		/// <returns>ルートシグネチャ</returns>
 		ComPtr<ID3D12RootSignature> CreateRootSignature(
 			ID3D12Device* device,
 			ID3D12ShaderReflection* vsReflection,
 			ID3D12ShaderReflection* psReflection,
-			std::unordered_map<std::string, uint32_t>& rootParameterMap);
+			std::unordered_map<std::string, uint32_t>& rootParameterMap,
+			D3D12_SHADER_VISIBILITY vsVisibility = D3D12_SHADER_VISIBILITY_VERTEX,
+			D3D12_SHADER_VISIBILITY psVisibility = D3D12_SHADER_VISIBILITY_PIXEL,
+			const std::vector<D3D12_STATIC_SAMPLER_DESC>& staticSamplers = {});
+
+		/// <summary>
+		/// リフレクションからルートシグネチャを生成 (CS用)
+		/// </summary>
+		/// <param name="device">デバイス</param>
+		/// <param name="csReflection">CSのリフレクション</param>
+		/// <param name="rootParameterMap">ルートパラメータのインデックスマップ</param>
+		/// <returns>ルートシグネチャ</returns>
+		ComPtr<ID3D12RootSignature> CreateRootSignature(
+			ID3D12Device* device,
+			ID3D12ShaderReflection* csReflection,
+			std::unordered_map<std::string, uint32_t>& rootParameterMap,
+			const std::vector<D3D12_STATIC_SAMPLER_DESC>& staticSamplers = {});
 
 	private:
 

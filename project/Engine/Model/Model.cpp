@@ -90,8 +90,7 @@ void Model::CSDispatch(DXCom* pDxcom, const SkinCluster& skinCluster, ID3D12Grap
 
 void Model::MeshDraw(ID3D12GraphicsCommandList* commandList, Material* mate, int drawCount) {
 	for (uint32_t index = 0; index < mesh_.size(); ++index) {
-		commandList->SetGraphicsRootConstantBufferView(0, mate->GetMaterialResource()->GetGPUVirtualAddress());
-		commandList->SetGraphicsRootDescriptorTable(2, mate->GetTexture()->gpuHandle);
+		PipelineManager::GetInstance()->SetGraphicsRootDescriptorTable(commandList, "gTexture", mate->GetTexture()->gpuHandle);
 
 		commandList->IASetVertexBuffers(0, 1, &mesh_[index].GetVBV());
 		commandList->IASetIndexBuffer(&mesh_[index].GetIBV());

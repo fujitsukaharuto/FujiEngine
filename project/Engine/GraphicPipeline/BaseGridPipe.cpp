@@ -10,40 +10,25 @@ BaseGridPipe::~BaseGridPipe() {
 
 void BaseGridPipe::CreateRootSignature(ID3D12Device* device) {
 
-	HRESULT hr;
+	// シェーダーをコンパイルしてリフレクション情報を取得する
+	auto vsData = dxcommon_->GetDXCompile()->CompileShaderWithReflection(kDirectoryPath_ + L"BaseGrid.VS.hlsl", L"vs_6_0");
+	vs = vsData.blob;
+	vsReflection_ = vsData.reflection;
+	assert(vs != nullptr);
 
-	D3D12_ROOT_SIGNATURE_DESC rootDesc{};
-	rootDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_NONE;
+	auto psData = dxcommon_->GetDXCompile()->CompileShaderWithReflection(kDirectoryPath_ + L"BaseGrid.PS.hlsl", L"ps_6_0");
+	ps = psData.blob;
+	psReflection_ = psData.reflection;
+	assert(ps != nullptr);
 
-	D3D12_ROOT_PARAMETER rootParameters[1] = {};
-	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-	rootParameters[0].Descriptor.ShaderRegister = 0; // b0
-
-	rootDesc.pParameters = rootParameters;
-	rootDesc.NumParameters = _countof(rootParameters);
-
-	ComPtr<ID3DBlob> signatureBlob;
-	ComPtr<ID3DBlob> errorBlob;
-	hr = D3D12SerializeRootSignature(&rootDesc, D3D_ROOT_SIGNATURE_VERSION_1,
-		&signatureBlob, &errorBlob);
-	if (FAILED(hr)) {
-		Logger::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
-		assert(false);
-	}
-
-	hr = device->CreateRootSignature(0, signatureBlob->GetBufferPointer(),
-		signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature_));
-	assert(SUCCEEDED(hr));
+	// リフレクションからルートシグネチャを自動生成（内部でマッピング情報をログ出力）
+	rootSignature_ = dxcommon_->GetDXCompile()->CreateRootSignature(device, vsReflection_.Get(), psReflection_.Get(), rootParameterMap_);
+	assert(rootSignature_ != nullptr);
 }
 
 void BaseGridPipe::CreatePSO(ID3D12Device* device) {
 
 	HRESULT hr;
-
-	D3D12_INPUT_LAYOUT_DESC layout{};
-	layout.pInputElementDescs = nullptr;
-	layout.NumElements = 0;
 
 	D3D12_BLEND_DESC blend{};
 	blend.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
@@ -55,15 +40,22 @@ void BaseGridPipe::CreatePSO(ID3D12Device* device) {
 	blend.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
 	blend.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
 
+	// すでにコンパイル済みのシェーダーとリフレクションを使用
+	assert(vs != nullptr);
+	assert(ps != nullptr);
+	assert(vsReflection_ != nullptr);
+	assert(psReflection_ != nullptr);
+
+	// リフレクションから入力レイアウトを自動生成
+	auto inputLayout = dxcommon_->GetDXCompile()->CreateInputLayout(vsReflection_.Get());
+
 	D3D12_RASTERIZER_DESC rasterizer{};
 	rasterizer.CullMode = D3D12_CULL_MODE_NONE;
 	rasterizer.FillMode = D3D12_FILL_MODE_SOLID;
 
-	vs = dxcommon_->GetDXCompile()->CompileShader(kDirectoryPath_ + L"BaseGrid.VS.hlsl", L"vs_6_0");
-	assert(vs != nullptr);
-	ps = dxcommon_->GetDXCompile()->CompileShader(kDirectoryPath_ + L"BaseGrid.PS.hlsl", L"ps_6_0");
-	assert(ps != nullptr);
-
+	D3D12_INPUT_LAYOUT_DESC layout{};
+	layout.pInputElementDescs = nullptr;
+	layout.NumElements = static_cast<UINT>(inputLayout.size());
 
 	D3D12_DEPTH_STENCIL_DESC depth{};
 	depth.DepthEnable = TRUE; 

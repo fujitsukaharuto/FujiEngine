@@ -20,9 +20,6 @@
     <ClCompile Include="Engine\GraphicPipeline\BasePipeline.cpp">
       <Filter>Engine\GraphicPipeline</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\GraphicPipeline\MetaBallPipeline.cpp">
-      <Filter>Engine\GraphicPipeline</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\GraphicPipeline\NonePipeline.cpp">
       <Filter>Engine\GraphicPipeline</Filter>
     </ClCompile>
@@ -92,17 +89,8 @@
     <ClCompile Include="Engine\Scene\SceneManager.cpp">
       <Filter>Engine\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\GraphicPipeline\ShockWavePipe.cpp">
-      <Filter>Engine\GraphicPipeline</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\DX\Framework.cpp">
       <Filter>Engine\DX</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\GraphicPipeline\FirePipe.cpp">
-      <Filter>Engine\GraphicPipeline</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\GraphicPipeline\ThunderPipe.cpp">
-      <Filter>Engine\GraphicPipeline</Filter>
     </ClCompile>
     <ClCompile Include="Engine\GraphicPipeline\Line3dPipe.cpp">
       <Filter>Engine\GraphicPipeline</Filter>
@@ -139,9 +127,6 @@
     </ClCompile>
     <ClCompile Include="Game\Collider\CollisionManager.cpp">
       <Filter>Game\Collider</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\GraphicPipeline\CRTPipe.cpp">
-      <Filter>Engine\GraphicPipeline</Filter>
     </ClCompile>
     <ClCompile Include="Engine\DX\OffscreenManager.cpp">
       <Filter>Engine\DX</Filter>
@@ -445,9 +430,6 @@
     <ClInclude Include="Engine\GraphicPipeline\BasePipeline.h">
       <Filter>Engine\GraphicPipeline</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\MetaBallPipeline.h">
-      <Filter>Engine\GraphicPipeline</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\GraphicPipeline\NonePipeline.h">
       <Filter>Engine\GraphicPipeline</Filter>
     </ClInclude>
@@ -520,17 +502,8 @@
     <ClInclude Include="Engine\Scene\SceneManager.h">
       <Filter>Engine\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\ShockWavePipe.h">
-      <Filter>Engine\GraphicPipeline</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\DX\Framework.h">
       <Filter>Engine\DX</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\FirePipe.h">
-      <Filter>Engine\GraphicPipeline</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\ThunderPipe.h">
-      <Filter>Engine\GraphicPipeline</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Scene\AbstractSceneFactory.h">
       <Filter>Engine\Scene</Filter>
@@ -570,9 +543,6 @@
     </ClInclude>
     <ClInclude Include="Game\Collider\CollisionManager.h">
       <Filter>Game\Collider</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\CRTPipe.h">
-      <Filter>Engine\GraphicPipeline</Filter>
     </ClInclude>
     <ClInclude Include="Engine\DX\OffscreenManager.h">
       <Filter>Engine\DX</Filter>
@@ -1061,12 +1031,6 @@
     <FxCompile Include="resource\Shaders\GaussianBlur.PS.hlsl">
       <Filter>resource\Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\MetaBall.PS.hlsl">
-      <Filter>resource\Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="resource\Shaders\MetaBall.VS.hlsl">
-      <Filter>resource\Shaders</Filter>
-    </FxCompile>
     <FxCompile Include="resource\Shaders\NonePost.PS.hlsl">
       <Filter>resource\Shaders</Filter>
     </FxCompile>
@@ -1085,25 +1049,10 @@
     <FxCompile Include="resource\Shaders\Particle.VS.hlsl">
       <Filter>resource\Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\SimpleGrayscale.PS.hlsl">
-      <Filter>resource\Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="resource\Shaders\ShockWave.PS.hlsl">
-      <Filter>resource\Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="resource\Shaders\Fire.PS.hlsl">
-      <Filter>resource\Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="resource\Shaders\Thunder.PS.hlsl">
-      <Filter>resource\Shaders</Filter>
-    </FxCompile>
     <FxCompile Include="resource\Shaders\Line3d.VS.hlsl">
       <Filter>resource\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="resource\Shaders\Line3d.PS.hlsl">
-      <Filter>resource\Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="resource\Shaders\CRTEffect.PS.hlsl">
       <Filter>resource\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="resource\Shaders\CS\Grayscale.CS.hlsl">

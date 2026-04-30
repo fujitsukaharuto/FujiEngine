@@ -152,7 +152,7 @@ void Object3d::Render() {
 		}
 	}
 
-	PipelineManager* pPipeManager = PipelineManager::GetInstance()->GetInstance();
+	PipelineManager* pPipeManager = PipelineManager::GetInstance();
 
 	pPipeManager->SetGraphicsRootCBV(cList, "gTransformationMatrix", wvpResource_[frameIndex]->GetGPUVirtualAddress());
 	pPipeManager->SetGraphicsRootCBV(cList, "gCamera", cameraPosResource_[frameIndex]->GetGPUVirtualAddress());

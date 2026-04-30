@@ -2,6 +2,7 @@
 #include "Engine/DX/DXCom.h"
 #include "Engine/DX/DX12Helper.h"
 #include "Engine/DX/SRVManager.h"
+#include "Engine/GraphicPipeline/PipelineManager.h"
 #include "ImGuiManager/ImGuiManager.h"
 
 using namespace Core;
@@ -59,21 +60,22 @@ void TextureBasedEmitter::Dispatch(ID3D12GraphicsCommandList* cmd,
 	DXCom* dx, [[maybe_unused]] SRVManager* srv, const ParticleCSHandles& shared) {
 	if (!isEmit_ || data_.count == 0) return;
 	uint32_t frameIndex = dx->GetNowFrameCount();
+	Graphics::PipelineManager* pPipeManager = Graphics::PipelineManager::GetInstance();
+	
 	CopyData(frameIndex);
 	dx->GetPipelineManager()->SetCSPipeline(Pipe::EmitTexParticleCS, 2);
-	cmd->SetComputeRootDescriptorTable(0, shared.transCSUAVHandle);
-	cmd->SetComputeRootDescriptorTable(1, shared.scaleCSUAVHandle);
-	cmd->SetComputeRootDescriptorTable(2, shared.timeCSUAVHandle);
-	cmd->SetComputeRootDescriptorTable(3, shared.velocityCSUAVHandle);
-	cmd->SetComputeRootDescriptorTable(4, shared.colorCSUAVHandle);
-	cmd->SetComputeRootDescriptorTable(5, shared.flagsCSUAVHandle);
-
-	cmd->SetComputeRootDescriptorTable(8, shared.freeListIndexUAVHandle);
-	cmd->SetComputeRootDescriptorTable(9, shared.freeListUAVHandle);
-	cmd->SetComputeRootDescriptorTable(10, textureForEmit_->gpuHandle);
-	cmd->SetComputeRootDescriptorTable(11, shared.freeListTailIndexUAVHandle);
-	cmd->SetComputeRootConstantBufferView(6, resource_[frameIndex]->GetGPUVirtualAddress());
-	cmd->SetComputeRootConstantBufferView(7, shared.perFrameCBV);
+	pPipeManager->SetComputeRootDescriptorTable(cmd, "gParticles_Trans", shared.transCSUAVHandle);
+	pPipeManager->SetComputeRootDescriptorTable(cmd, "gParticles_Scale", shared.scaleCSUAVHandle);
+	pPipeManager->SetComputeRootDescriptorTable(cmd, "gParticles_Time", shared.timeCSUAVHandle);
+	pPipeManager->SetComputeRootDescriptorTable(cmd, "gParticles_Velocity", shared.velocityCSUAVHandle);
+	pPipeManager->SetComputeRootDescriptorTable(cmd, "gParticles_Color", shared.colorCSUAVHandle);
+	pPipeManager->SetComputeRootDescriptorTable(cmd, "gParticles_Flags", shared.flagsCSUAVHandle);
+	pPipeManager->SetComputeRootDescriptorTable(cmd, "gFreeListIndex", shared.freeListIndexUAVHandle);
+	pPipeManager->SetComputeRootDescriptorTable(cmd, "gFreeList", shared.freeListUAVHandle);
+	pPipeManager->SetComputeRootDescriptorTable(cmd, "gFreeListTailIndex", shared.freeListTailIndexUAVHandle);
+	pPipeManager->SetComputeRootDescriptorTable(cmd, "gMaskTex", textureForEmit_->gpuHandle);
+	pPipeManager->SetComputeRootCBV(cmd, "gPerFrame", shared.perFrameCBV);
+	pPipeManager->SetComputeRootCBV(cmd, "gEmitter", resource_[frameIndex]->GetGPUVirtualAddress());
 	int dispatchCountX = (int(textureForEmit_->meta.width) + 32 - 1) / 32;
 	int dispatchCountY = (int(textureForEmit_->meta.height) + 32 - 1) / 32;
 	cmd->Dispatch(dispatchCountX, dispatchCountY, 1);

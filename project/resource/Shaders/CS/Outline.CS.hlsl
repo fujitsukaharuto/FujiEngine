@@ -1,4 +1,4 @@
-Texture2D gTexture : register(t0);
+Texture2D InputTexture : register(t0);
 SamplerState gSampler : register(s0);
 Texture2D<float> gDepthTexture : register(t1);
 SamplerState gSamplerPoint : register(s1);
@@ -39,7 +39,7 @@ void main(uint3 dispatchThreadID : SV_DispatchThreadID)
     uint2 coord = dispatchThreadID.xy;
 
     int width, height;
-    gTexture.GetDimensions(width, height);
+    InputTexture.GetDimensions(width, height);
     if (coord.x >= width || coord.y >= height)
         return;
 
@@ -88,7 +88,7 @@ void main(uint3 dispatchThreadID : SV_DispatchThreadID)
 
     float weight = saturate(length(difference));
 
-    float3 baseColor = gTexture.SampleLevel(gSampler, texcoord, 0).rgb;
+    float3 baseColor = InputTexture.SampleLevel(gSampler, texcoord, 0).rgb;
     float3 finalColor = (1.0f - weight) * baseColor;
     finalColor.rgb = LinearToSRGB(finalColor.rgb);
     
