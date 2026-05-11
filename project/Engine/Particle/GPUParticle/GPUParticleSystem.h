@@ -164,10 +164,8 @@ private:
 	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> freeListUAVHandle_;
 
 	ComPtr<ID3D12CommandSignature> drawIndexedSignature_;
-	ComPtr<ID3D12Resource> aliveDrawArgs_;
-	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> ArgsUAVHandle_;
-	//ComPtr<ID3D12Resource> aliveDrawArgs_[DXC::kFrameCount_];
-	//std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> ArgsUAVHandle_[DXC::kFrameCount_];
+	ComPtr<ID3D12Resource> aliveDrawArgs_[DXC::kFrameCount_];
+	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> ArgsUAVHandle_[DXC::kFrameCount_];
 	ComPtr<ID3D12Resource> drawAliveIndex_;
 	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> drawAliveUAVHandle_;
 	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> drawAliveSRVHandle_;
