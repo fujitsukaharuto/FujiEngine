@@ -730,9 +730,10 @@ void GPUParticleSystem::UpdateParticleCSDispatch() {
 		uint32_t dispatchY = (std::min)(kGroupsYPerDispatch, totalGroupsY - y);
 		cList->Dispatch(groupsX, dispatchY, 1);
 
-		// 各分割実行の間にバリアを張り、GPUの処理の区切りを作る
-		dxcommon_->InsertUAVBarrierForCompute(nullptr);
+
 	}
+	// 各分割実行の間にバリアを張り、GPUの処理の区切りを作る
+	dxcommon_->InsertUAVBarrierForCompute(nullptr);
 
 	dxcommon_->InsertUAVBarrierForCompute(aliveDrawArgs_.Get());
 	dxcommon_->InsertUAVBarrierForCompute(drawAliveIndex_.Get());
