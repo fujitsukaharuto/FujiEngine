@@ -136,24 +136,23 @@ void main(uint3 DTid : SV_DispatchThreadID)
         // エミッタ座標系
         pos = pos * gEmitter.radius + gEmitter.translate;
 
-        gParticles_Scale[particleIndex].scale = gEmitter.scale;
-        gParticles_Scale[particleIndex].startScale = gEmitter.scale;
+        gParticles_Scale[particleIndex].packedScale = PackHalf2(float2(gEmitter.scale.x, gEmitter.scale.x));
         gParticles_Trans[particleIndex].translate = pos;
 
         float3 t = (generator.Generate3d() + 1) * 0.5f;
-        gParticles_Color[particleIndex].color.rgb = lerp(gEmitter.colorMin, gEmitter.colorMax, t);
-        gParticles_Color[particleIndex].color.a = 1.0f;
+        float4 color;
+        color.rgb = lerp(gEmitter.colorMin, gEmitter.colorMax, t);
+        color.a = 1;
+        gParticles_Color[particleIndex].color = PackRGBA8(color);
 
         float veloT = generator.Generate1d();
         float3 dirRand = generator.GenerateUnitSphereDirection();
         float speed = lerp(gEmitter.velocityRandMin, gEmitter.velocityRandMax, veloT);
         float3 velocityOffset = gEmitter.baseVelocity + dirRand * speed;
-        gParticles_Velocity[particleIndex].velocity = velocityOffset;
+        gParticles_Velocity[particleIndex].packedVelocity = PackHalf3(velocityOffset);
         gParticles_Time[particleIndex].lifeTime = gEmitter.lifeTime;
         gParticles_Time[particleIndex].currentTime = 0.0f;
         
-        gParticles_Flags[particleIndex].isRandomMove = 0;
-        gParticles_Flags[particleIndex].isTrailEmit = 0;
-        gParticles_Flags[particleIndex].isGravity = 0;
+        gParticles_Flags[particleIndex].flags = 0;
     }
 }

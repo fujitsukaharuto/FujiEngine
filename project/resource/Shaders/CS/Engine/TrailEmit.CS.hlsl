@@ -34,6 +34,9 @@ void EmitTrail(uint pIndex)
             return;
         }
 
+        float2 scales = UnpackHalf2(gParticles_Scale[pIndex].packedScale);
+        float currentScale = scales.x;
+        
         for (int t = 0; t < numTrail; ++t)
         {
             int slot = (originalHead + t) % capacity;
@@ -44,29 +47,27 @@ void EmitTrail(uint pIndex)
 
             gParticles_Trans[trailIndex].translate = trailPos;
             gParticles_Trans[trailIndex].prevTranslate = trailPos;
-            gParticles_Scale[trailIndex].scale = gParticles_Scale[pIndex].scale * 0.75f;
-            gParticles_Scale[trailIndex].startScale = gParticles_Scale[pIndex].scale * 0.75f;
+            gParticles_Scale[trailIndex].packedScale = PackHalf2(float2(currentScale * 0.75f, currentScale * 0.75f));
             gParticles_Time[trailIndex].lifeTime = gParticles_Time[pIndex].lifeTime * 0.5f;
             gParticles_Time[trailIndex].currentTime = 0;
-            gParticles_Velocity[trailIndex].velocity = float3(0, 0, 0);
+            gParticles_Velocity[trailIndex].packedVelocity = PackHalf3(float3(0, 0, 0));
             gParticles_Color[trailIndex].color = gParticles_Color[pIndex].color;
-            gParticles_Color[trailIndex].color.a = 1.0f;
-            gParticles_Flags[trailIndex].isRandomMove = 0;
-            gParticles_Flags[trailIndex].isTrailEmit = 0;
-            gParticles_Flags[trailIndex].isGravity = 0;
+            gParticles_Flags[trailIndex].flags = 0;
         }
     }
 }
 
-[numthreads(256, 1, 1)]
-void main(uint3 DTid : SV_DispatchThreadID)
+[numthreads(1024, 1, 1)]
+            void main(uint3 DTid : SV_DispatchThreadID)
 {
     uint particleIndex = DTid.x;
     if (particleIndex < kMaxParticles)
     {
-        if (gParticles_Color[particleIndex].color.a != 0)
+        float4 color = UnpackRGBA8(gParticles_Color[particleIndex].color);
+        if (color.a != 0)
         {
-            if (gParticles_Flags[particleIndex].isTrailEmit == 1)
+            uint flags = gParticles_Flags[particleIndex].flags;
+            if (((flags >> 2) & 0x1) == 1) // isTrailEmit
             {
                 EmitTrail(particleIndex);
             }

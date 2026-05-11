@@ -11,103 +11,94 @@ struct PerFrame
 {
     float time;
     float deltaTime;
+    uint yOffset;
+    float padding1;
+    float4 frustumPlanes[6]; // 視錐台の6平面
 };
 ConstantBuffer<PerFrame> gPerFrame : register(b0);
+
+// パーティクルが視錐台内にあるかチェックする関数
+bool IsVisible(float3 pos, float scale)
+{
+    // 各平面に対してチェック
+    for (int i = 0; i < 6; ++i)
+    {
+        // 平面の方程式: ax + by + cz + d = 0
+        // dot(plane.xyz, pos) + plane.w が 0以上なら平面の内側
+        // パーティクルの半径（scale）も考慮してマージンを持たせる
+        if (dot(gPerFrame.frustumPlanes[i].xyz, pos) + gPerFrame.frustumPlanes[i].w < -scale)
+        {
+            return false; // 完全に外側
+        }
+    }
+    return true;
+}
+
 RWStructuredBuffer<int> gFreeListIndex : register(u6);
 RWStructuredBuffer<uint> gFreeList : register(u7);
 RWStructuredBuffer<int> gFreeListTailIndex : register(u8);
 
-void MoveMode(uint pIndex)
+RWStructuredBuffer<DrawIndexedArgs> gDrawArgs : register(u9);
+RWStructuredBuffer<uint> gDrawParticleIndex : register(u10);
+
+void MoveMode(uint pIndex, uint isRandomMove)
 {
-    if (gParticles_Flags[pIndex].isRandomMove == 1)
+    if (isRandomMove == 1)
     {
         float3 pos = gParticles_Trans[pIndex].translate;
         float time = gPerFrame.time;
 
-        float3 samplePos = pos * 0.4 + float3(0, time * 0.5 + frac(pIndex * 0.012) * 10.0, 0);// pIndexが大きくなった時に値がでかくなりすぎないように
+        float3 samplePos = pos * 0.4 + float3(0, time * 0.5 + frac(pIndex * 0.012) * 10.0, 0);
         float3 curl = CurlNoise(samplePos);
 
-        float3 vel0 = gParticles_Velocity[pIndex].velocity;
+        float3 vel0 = UnpackHalf3(gParticles_Velocity[pIndex].packedVelocity);
         float len0 = length(vel0);
         if (len0 < 0.0001f)
         {
-            float3 seed = pos * 0.3 + float3(1.234, 5.678, 9.1011);
             float3 v = curl + float3(0.1, 0.2, 0.1);
             float l = length(v);
-            if (l < 0.0001f)
-            {
-                v = float3(0.3, 0.1, 0.2);
-                l = length(v);
-            }
+            if (l < 0.0001f) { v = float3(0.3, 0.1, 0.2); l = 1.0f; }
             vel0 = v / l * 0.005f;
             len0 = 0.005f;
         }
         float baseSpeed = max(len0, 0.01f);
-        float baseLen = length(vel0);
-        float3 baseDir;
-        if (baseLen < 0.0001f)
-        {
-            baseDir = float3(0.0f, 1.0f, 0.0f);
-        }
-        else
-        {
-            baseDir = vel0 / baseLen;
-        }
-        float3 force = curl * 0.1;// ノイズに強度をつける
-        float3 vel = baseDir + force;
-        float vlen = length(vel);
-        if (vlen < 0.0001f)
-        {
-            vel = baseDir;
-            vlen = length(vel);
-            if (vlen < 0.0001f)
-            {
-                vel = float3(0.0f, 1.0f, 0.0f);
-                vlen = 1.0f;
-            }
-        }
+        float3 baseDir = normalize(vel0);
+        float3 force = curl * 0.1;
+        float3 vel = normalize(baseDir + force);
 
-        vel /= vlen;
-        gParticles_Velocity[pIndex].velocity = vel * baseSpeed;
+        gParticles_Velocity[pIndex].packedVelocity = PackHalf3(vel * baseSpeed);
     }
-    else if (gParticles_Flags[pIndex].isRandomMove == 2)
+    else if (isRandomMove == 2)
     {
         float3 pos = gParticles_Trans[pIndex].translate;
         float time = gPerFrame.time;
-        float3 samplePos =pos * 0.5f +
-        float3(0.0f, time * 0.8f, 0.0f);
-
+        float3 samplePos = pos * 0.5f + float3(0.0f, time * 0.8f, 0.0f);
         float3 curl = CurlNoise(samplePos);
 
-        float noisePower = 4.0f; // ノイズ強度
-        float speed = length(gParticles_Velocity[pIndex].velocity);
-
-        gParticles_Velocity[pIndex].velocity =
-        normalize(gParticles_Velocity[pIndex].velocity + curl * noisePower) * speed;
+        float3 velocity = UnpackHalf3(gParticles_Velocity[pIndex].packedVelocity);
+        float noisePower = 4.0f;
+        float speed = length(velocity);
+        gParticles_Velocity[pIndex].packedVelocity = PackHalf3(normalize(velocity + curl * noisePower) * speed);
     }
-
 }
 
-void EmitTrail(uint pIndex)
+void EmitTrail(uint pIndex, uint colorUint, float scale)
 {
-    float dist = length(gParticles_Trans[pIndex].translate - gParticles_Trans[pIndex].prevTranslate);
+    float3 pos = gParticles_Trans[pIndex].translate;
+    float3 prevPos = gParticles_Trans[pIndex].prevTranslate;
+    float dist = length(pos - prevPos);
     if (dist > 0.01f)
     {
-        // トレイル粒子生成回数 (距離に応じて 1~n 個)
-        int numTrail = (int) (dist * 100.0f * 1.0f);
-        numTrail = clamp(numTrail, 0, 60);
-        if (numTrail == 0)
-            return;
+        int numTrail = clamp((int)(dist * 100.0f), 0, 60);
+        if (numTrail == 0) return;
 
         uint originalHead;
         InterlockedAdd(gFreeListIndex[0], numTrail, originalHead);
-        uint newHead = originalHead + (numTrail - 1);
         uint capacity = kMaxParticles;
         uint tail = gFreeListTailIndex[0];
-        if (newHead >= tail)
+        if (originalHead + numTrail >= tail)
         {
-            uint dummy;
-            InterlockedAdd(gFreeListIndex[0], -numTrail, dummy);
+            InterlockedAdd(gFreeListIndex[0], -numTrail);
             return;
         }
 
@@ -116,71 +107,127 @@ void EmitTrail(uint pIndex)
             int slot = (originalHead + t) % capacity;
             uint trailIndex = gFreeList[slot];
 
-            float k = (float) t / max(1, numTrail);
-            float3 trailPos = lerp(gParticles_Trans[pIndex].prevTranslate,gParticles_Trans[pIndex].translate,k);
+            float k = (float)t / (float)numTrail;
+            float3 trailPos = lerp(prevPos, pos, k);
 
             gParticles_Trans[trailIndex].translate = trailPos;
             gParticles_Trans[trailIndex].prevTranslate = trailPos;
-            gParticles_Scale[trailIndex].scale = gParticles_Scale[pIndex].scale * 0.75f;
-            gParticles_Scale[trailIndex].startScale = gParticles_Scale[pIndex].scale * 0.75f;
+            gParticles_Scale[trailIndex].packedScale = PackHalf2(float2(scale * 0.75f, scale * 0.75f));
             gParticles_Time[trailIndex].lifeTime = gParticles_Time[pIndex].lifeTime * 0.5f;
             gParticles_Time[trailIndex].currentTime = 0;
-            gParticles_Velocity[trailIndex].velocity = float3(0, 0, 0);
-            gParticles_Color[trailIndex].color = gParticles_Color[pIndex].color;
-            gParticles_Color[trailIndex].color.a = 1.0f;
-            gParticles_Flags[trailIndex].isRandomMove = 0;
-            gParticles_Flags[trailIndex].isTrailEmit = 0;
-            gParticles_Flags[trailIndex].isGravity = 0;
+            gParticles_Velocity[trailIndex].packedVelocity = PackHalf3(float3(0, 0, 0));
+            gParticles_Color[trailIndex].color = colorUint;
+            gParticles_Flags[trailIndex].flags = 0;
         }
     }
 }
 
-[numthreads(1024, 1, 1)]
-void main( uint3 DTid : SV_DispatchThreadID )
+uint GetParticleIndexWithOffset(uint3 DTid)
 {
-    uint particleIndex = DTid.x;
+    return DTid.x + (DTid.y + gPerFrame.yOffset) * kThreadsPerRow;
+}
+
+groupshared uint gs_AliveCount;
+groupshared uint gs_WriteOffset;
+groupshared uint gs_DeadCount;
+groupshared uint gs_DeadOffset;
+
+[numthreads(1024, 1, 1)]
+void main( uint3 DTid : SV_DispatchThreadID, uint GI : SV_GroupIndex )
+{
+    // グループ共有カウンタの初期化
+    if (GI == 0) {
+        gs_AliveCount = 0;
+        gs_DeadCount = 0;
+    }
+    GroupMemoryBarrierWithGroupSync();
+
+    uint particleIndex = GetParticleIndexWithOffset(DTid);
+    bool isVisible = false;
+    bool isDead = false;
+    uint localAliveIndex = 0;
+    uint localDeadIndex = 0;
+
     if (particleIndex < kMaxParticles)
     {
-        if (gParticles_Color[particleIndex].color.a != 0)
+        uint colorUint = gParticles_Color[particleIndex].color;
+        float4 color = UnpackRGBA8(colorUint);
+        
+        // 生きているパーティクルのみ処理
+        if (color.a > 0.0f)
         {
-            if (gParticles_Flags[particleIndex].isRandomMove != 0)
-            {
-                MoveMode(particleIndex);
-            }
+            uint flags = gParticles_Flags[particleIndex].flags;
+            uint isRandomMove = flags & 0x3;
+            uint isTrailEmit = (flags >> 2) & 0x1;
+            uint isGravity = (flags >> 3) & 0x1;
 
-            if (gParticles_Flags[particleIndex].isGravity == 1)
-            {
-                gParticles_Velocity[particleIndex].velocity += kGravity * gPerFrame.deltaTime;
-            }
-
-            gParticles_Trans[particleIndex].prevTranslate = gParticles_Trans[particleIndex].translate;
-            gParticles_Trans[particleIndex].translate += gParticles_Velocity[particleIndex].velocity * gPerFrame.deltaTime;
+            if (isRandomMove != 0) MoveMode(particleIndex, isRandomMove);
             
-            if (gParticles_Flags[particleIndex].isTrailEmit == 1)
-            {
-                EmitTrail(particleIndex);
-            }
+            float3 velocity = UnpackHalf3(gParticles_Velocity[particleIndex].packedVelocity);
+            if (isGravity == 1) velocity += kGravity * gPerFrame.deltaTime;
+
+            float3 pos = gParticles_Trans[particleIndex].translate;
+            gParticles_Trans[particleIndex].prevTranslate = pos;
+            pos += velocity * gPerFrame.deltaTime;
+            gParticles_Trans[particleIndex].translate = pos;
+            gParticles_Velocity[particleIndex].packedVelocity = PackHalf3(velocity);
+            
+            float2 scales = UnpackHalf2(gParticles_Scale[particleIndex].packedScale);
+            float currentScale = scales.x;
+            float startScale = scales.y;
+
+            // 注意: EmitTrail内のアトミック操作は非常に重いため、数千万単位では慎重に使用する必要があります
+            if (isTrailEmit == 1) EmitTrail(particleIndex, colorUint, currentScale);
             
             gParticles_Time[particleIndex].currentTime += gPerFrame.deltaTime;
-            float lifeRatio = gParticles_Time[particleIndex].currentTime / gParticles_Time[particleIndex].lifeTime;
+            float lifeRatio = saturate(gParticles_Time[particleIndex].currentTime / gParticles_Time[particleIndex].lifeTime);
 
-            float alpha = 1.0f - lifeRatio;
-            gParticles_Color[particleIndex].color.a = saturate(alpha);
+            color.a = saturate(1.0f - lifeRatio);
+            currentScale = startScale * (1.0f - lifeRatio);
 
-            gParticles_Scale[particleIndex].scale = gParticles_Scale[particleIndex].startScale * (1.0f - lifeRatio);
-
-            if (gParticles_Color[particleIndex].color.a == 0.0f)
+            uint nextColor = PackRGBA8(color);
+            
+            // 死亡判定
+            if ((nextColor >> 24) == 0 || lifeRatio >= 1.0f)
             {
-                gParticles_Scale[particleIndex].scale = float3(0.0f, 0.0f, 0.0f);
-
-                // tailを1増やし、古いtail値を取得（atomic +1）
-                int oldTail;
-                InterlockedAdd(gFreeListTailIndex[0], 1, oldTail);
-                // リングバッファ化
-                int slot = oldTail % kMaxParticles;
-                // 空きスロットにパーティクル番号を保存
-                gFreeList[slot] = particleIndex;
+                gParticles_Scale[particleIndex].packedScale = 0;
+                gParticles_Color[particleIndex].color = 0;
+                isDead = true;
+                InterlockedAdd(gs_DeadCount, 1, localDeadIndex);
+            }
+            else
+            {
+                gParticles_Color[particleIndex].color = nextColor;
+                gParticles_Scale[particleIndex].packedScale = PackHalf2(float2(currentScale, startScale));
+                
+                //更新と同時に描画用インデックスバッファに登録
+                // カリング判定（画面内にいるか）を追加
+                if (color.a >= 0.15f && IsVisible(pos, startScale))
+                {
+                    isVisible = true;
+                    InterlockedAdd(gs_AliveCount, 1, localAliveIndex);
+                }
             }
         }
+    }
+
+    // グループ内の集計結果をグローバルに反映
+    GroupMemoryBarrierWithGroupSync();
+    if (GI == 0)
+    {
+        if (gs_AliveCount > 0) InterlockedAdd(gDrawArgs[0].InstanceCount, gs_AliveCount, gs_WriteOffset);
+        if (gs_DeadCount > 0) InterlockedAdd(gFreeListTailIndex[0], gs_DeadCount, gs_DeadOffset);
+    }
+    GroupMemoryBarrierWithGroupSync();
+
+    // グローバルな書き込み位置を計算して登録
+    if (isVisible)
+    {
+        gDrawParticleIndex[gs_WriteOffset + localAliveIndex] = particleIndex;
+    }
+    
+    if (isDead)
+    {
+        gFreeList[(gs_DeadOffset + localDeadIndex) % kMaxParticles] = particleIndex;
     }
 }

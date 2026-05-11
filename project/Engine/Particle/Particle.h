@@ -122,16 +122,14 @@ struct Particle {
 /// </summary>
 struct ParticleCS {
 	Math::Vector3 translate;
-	Math::Vector3 scale;
-	Math::Vector3 startScale;
+	float scale;
+	float startScale;
 	float lifeTime;
 	Math::Vector3 velocity;
 	float currentTime;
-	Math::Vector4 color;
+	uint32_t color; // RGBA8_UNORM
 	Math::Vector3 prevTranslate;
-	uint32_t isRandomMove;
-	uint32_t isTrailEmit;
-	uint32_t isGravity;
+	uint32_t flags; // bit 0: isRandomMove, bit 1: isTrailEmit, bit 2: isGravity
 };
 
 
@@ -141,8 +139,7 @@ struct ParticleCS_Translate {
 };
 
 struct ParticleCS_Scale {
-	Math::Vector3 scale;
-	Math::Vector3 startScale;
+	uint32_t packedScale; // half2 (scale, startScale)
 };
 
 struct ParticleCS_Time {
@@ -151,15 +148,13 @@ struct ParticleCS_Time {
 };
 
 struct ParticleCS_Velocity {
-	Math::Vector3 velocity;
+	uint32_t packedVelocity[2]; // half3 (x, y, z) + padding
 };
 
 struct ParticleCS_Color {
-	Math::Vector4 color;
+	uint32_t color;
 };
 
 struct ParticleCS_Flags {
-	uint32_t isRandomMove;
-	uint32_t isTrailEmit;
-	uint32_t isGravity;
+	uint32_t flags;
 };

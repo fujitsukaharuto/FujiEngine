@@ -92,7 +92,7 @@ void SphereEmitter::DebugGUI() {
 
 		int dragCount = int(data_.count);
 		// Stepを1にして整数単位で増やす。リミットを見やすく
-		if (ImGui::DragInt("発生数 (Count)", &dragCount, 1, 0, 1000000)) {
+		if (ImGui::DragInt("発生数 (Count)", &dragCount, 1, 0, 60000000)) {
 			data_.count = uint32_t(dragCount);
 		}
 

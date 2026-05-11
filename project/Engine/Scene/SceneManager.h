@@ -30,13 +30,14 @@ public:
 	/// <summary>シーンファクトリーの設定</summary>
 	void SetFactory(AbstractSceneFactory* factory) { sceneFactory_ = factory; }
 
+	/// <summary>シーンの設定</summary>
+	void SceneSet();
+
 	void DebugGUI();
 	void ParticleGroupDebugGUI();
 
 private:
 
-	/// <summary>シーンの設定</summary>
-	void SceneSet();
 	void SceneChangeGUI();
 
 private:

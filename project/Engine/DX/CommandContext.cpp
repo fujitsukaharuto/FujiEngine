@@ -53,6 +53,7 @@ void CommandContext::Initialize(ID3D12Device* device, D3D12_COMMAND_LIST_TYPE ty
 void CommandContext::Close() {
 	HRESULT hr = list_->Close();
 	assert(SUCCEEDED(hr));
+	isOpen_ = false;
 }
 
 void CommandContext::Execute() {
@@ -91,4 +92,5 @@ void CommandContext::Reset(uint32_t frameIndex) {
 	assert(SUCCEEDED(hr));
 	hr = list_->Reset(allocator_[frameIndex].Get(), nullptr);
 	assert(SUCCEEDED(hr));
+	isOpen_ = true;
 }

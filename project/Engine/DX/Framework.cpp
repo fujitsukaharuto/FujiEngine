@@ -69,6 +69,7 @@ void Core::Framework::BeginUpdate() {
 	dxcommon_->OffscreenUpDate();
 	modelManager_->PickingUpdate();
 	lightManager_->Update();
+	sceneManager_->SceneSet();
 }
 
 void Framework::Run() {

@@ -226,24 +226,29 @@ void main(uint3 DTid : SV_DispatchThreadID)
         localPos = RotateVector(localPos, gEmitter.rotation);
         float3 pos = interpPos + localPos;
 
-        gParticles_Scale[particleIndex].scale = gEmitter.scale;
-        gParticles_Scale[particleIndex].startScale = gEmitter.scale;
+        gParticles_Scale[particleIndex].packedScale = PackHalf2(float2(gEmitter.scale.x, gEmitter.scale.x));
         gParticles_Trans[particleIndex].translate = pos;
         gParticles_Trans[particleIndex].prevTranslate = pos;
 
         float3 t = (generator.Generate3d() + 1) * 0.5f;
-        gParticles_Color[particleIndex].color.rgb = lerp(gEmitter.colorMin, gEmitter.colorMax, t);
-        gParticles_Color[particleIndex].color.a = 1.0f;
+        float4 color;
+        color.rgb = lerp(gEmitter.colorMin, gEmitter.colorMax, t);
+        color.a = 1;
+        gParticles_Color[particleIndex].color = PackRGBA8(color);
 
         float veloT = generator.Generate1d();
         float speed = lerp(gEmitter.velocityRandMin, gEmitter.velocityRandMax, veloT);
         float3 velDir = GenerateEmitVelocity(gEmitter.emitVeloType, localPos, generator);
-        gParticles_Velocity[particleIndex].velocity = gEmitter.baseVelocity + velDir * speed;
+        float3 velocity = gEmitter.baseVelocity + velDir * speed;
+        gParticles_Velocity[particleIndex].packedVelocity = PackHalf3(velocity);
 
         gParticles_Time[particleIndex].lifeTime = gEmitter.lifeTime;
         gParticles_Time[particleIndex].currentTime = 0.0f;
-        gParticles_Flags[particleIndex].isRandomMove = gEmitter.isRandomMove;
-        gParticles_Flags[particleIndex].isTrailEmit = gEmitter.isTrailEmit;
-        gParticles_Flags[particleIndex].isGravity = gEmitter.isGravity;
+        
+        uint flags = 0;
+        flags |= (gEmitter.isRandomMove & 0x3);
+        flags |= (gEmitter.isTrailEmit & 0x1) << 2;
+        flags |= (gEmitter.isGravity & 0x1) << 3;
+        gParticles_Flags[particleIndex].flags = flags;
     }
 }

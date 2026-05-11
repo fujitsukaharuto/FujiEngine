@@ -82,7 +82,7 @@ void DXCom::PreDraw() {
 		D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
 	SRVManager::GetInstance()->SetDescriptorHeap();
-	SRVManager::GetInstance()->SetDescriptorHeapForCompute();
+	//SRVManager::GetInstance()->SetDescriptorHeapForCompute();
 
 	SetRenderTargets();
 	ClearRenderTarget();
@@ -129,7 +129,7 @@ void DXCom::PostDraw() {
 
 void DXCom::BeginFrame() {
 	command_->SetFrameIndex((command_->GetNowFrameIndex() + 1) % kFrameCount_);
-	fpsKeeper_->FixFPS();
+	 fpsKeeper_->FixFPS();
 	command_->Reset();
 }
 

@@ -107,7 +107,6 @@ void GameScene::Update() {
 		CollisionUpdate();
 	}
 
-	ParticleManager::GetInstance()->Update();
 }
 
 void GameScene::Draw() {

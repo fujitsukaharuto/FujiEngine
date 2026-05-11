@@ -101,25 +101,25 @@ void main(uint3 DTid : SV_DispatchThreadID)
 
     gParticles_Trans[particleIndex].translate = worldPos;
 
-    gParticles_Scale[particleIndex].scale = float3(0.1f, 0.1f, 0.1f);
-    gParticles_Scale[particleIndex].startScale = gParticles_Scale[particleIndex].scale;
+    gParticles_Scale[particleIndex].packedScale = PackHalf2(float2(0.1f, 0.1f));
 
     // 色はマスク色 or ランダム
     RandomGenerator generator;
     generator.InitSeed(DTid, gPerFrame.time);
     float3 t = (generator.Generate3d() + 1) * 0.5f;
-    gParticles_Color[particleIndex].color.rgb = lerp(gEmitter.colorMin, gEmitter.colorMax, t);
-    gParticles_Color[particleIndex].color.a = 1.0f;
+    float4 color;
+    color.rgb = lerp(gEmitter.colorMin, gEmitter.colorMax, t);
+    color.a = 1;
+    gParticles_Color[particleIndex].color = PackRGBA8(color);
 
     float veloT = generator.Generate1d();
     float3 dirRand = generator.GenerateUnitSphereDirection();
     float speed = lerp(gEmitter.velocityRandMin, gEmitter.velocityRandMax, veloT);
-    gParticles_Velocity[particleIndex].velocity = gEmitter.baseVelocity + dirRand * speed;
+    float3 velocity = gEmitter.baseVelocity + dirRand * speed;
+    gParticles_Velocity[particleIndex].packedVelocity = PackHalf3(velocity);
 
     gParticles_Time[particleIndex].lifeTime = gEmitter.lifeTime;
     gParticles_Time[particleIndex].currentTime = 0.0f;
     
-    gParticles_Flags[particleIndex].isRandomMove = 0;
-    gParticles_Flags[particleIndex].isTrailEmit = 0;
-    gParticles_Flags[particleIndex].isGravity = 0;
+    gParticles_Flags[particleIndex].flags = 0;
 }

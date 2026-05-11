@@ -61,7 +61,6 @@ void GPUParticleScene::Update() {
 
 	BlackFade();
 
-	ParticleManager::GetInstance()->Update();
 }
 
 void GPUParticleScene::Draw() {

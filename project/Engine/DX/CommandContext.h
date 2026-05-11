@@ -32,6 +32,8 @@ namespace DXC {
 		// 次のフレームに向けてアロケータとリストをリセットする
 		void Reset(uint32_t frameIndex);
 
+		bool IsOpen() const { return isOpen_; }
+
 	private:
 		Microsoft::WRL::ComPtr<ID3D12CommandQueue> queue_ = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12CommandAllocator> allocator_[DXC::kFrameCount_];
@@ -41,5 +43,7 @@ namespace DXC {
 		uint64_t globalFenceValue_ = 0;
 		uint64_t fenceValue_[DXC::kFrameCount_] = { 0 };
 		HANDLE fenceEvent_ = nullptr;
+
+		bool isOpen_ = false;
 	};
 }

@@ -40,10 +40,6 @@ void SceneManager::Update() {
 		}
 	} else {
 		changeExtraTime -= FPSKeeper::DeltaTimeFrame();
-		if (changeExtraTime <= 0.0f) {
-			SceneSet();
-
-		}
 	}
 }
 
@@ -102,18 +98,20 @@ void SceneManager::ParticleGroupDebugGUI() {
 }
 
 void SceneManager::SceneSet() {
-	if (nextScene_) {
-		if (scene_) {
-			ParticleManager::ParentReset();
-			dxcommon_->PerFrameWait();
+	if (changeExtraTime <= 0.0f) {
+		if (nextScene_) {
+			if (scene_) {
+				ParticleManager::ParentReset();
+				dxcommon_->PerFrameWait();
+			}
+
+			// 所有権を nextScene_ から scene_ へ移動
+			scene_ = std::move(nextScene_);
+
+			scene_->Init(dxcommon_, this, lightManager_);
+			scene_->Initialize();
+			isChange_ = false;
 		}
-
-		// 所有権を nextScene_ から scene_ へ移動
-		scene_ = std::move(nextScene_);
-
-		scene_->Init(dxcommon_, this, lightManager_);
-		scene_->Initialize();
-		isChange_ = false;
 	}
 }
 

@@ -73,6 +73,7 @@ void ParticleCSPipe::CreatePSO(ID3D12Device* device) {
 	depth.DepthEnable = true;
 	depth.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
 	depth.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+	depth.StencilEnable = false;
 
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC stateDesc{};

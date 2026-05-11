@@ -104,7 +104,6 @@ void ResultScene::Update() {
 		}
 	}
 
-	ParticleManager::GetInstance()->Update();
 }
 
 void ResultScene::Draw() {

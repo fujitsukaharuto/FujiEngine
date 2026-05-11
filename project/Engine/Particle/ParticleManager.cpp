@@ -82,6 +82,7 @@ void ParticleManager::Update() {
 	}
 
 	gpuParticleSystem_->Update(billboardMatrix);
+	gpuParticleSystem_->Dispatch();
 
 	UpdateParticleGroup(billboardMatrix);
 	UpdateParentParticleGroup(billboardMatrix);

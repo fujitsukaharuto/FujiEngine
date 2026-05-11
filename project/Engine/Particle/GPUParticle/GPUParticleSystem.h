@@ -25,11 +25,15 @@ struct PerView {
 };
 
 /// <summary>
-/// GPUパーティクル用フレームデータ
+/// GPUパーティクル用フレームデータ (256バイトアライメント)
 /// </summary>
 struct PerFrame {
 	float time;
 	float deltaTime;
+	uint32_t yOffset;
+	float padding1;
+	Math::Vector4 frustumPlanes[6]; // 視錐台の6平面 (ax + by + cz + d = 0)
+	uint32_t padding2[36]; // 256バイト境界に合わせる
 };
 
 struct DrawIndexedArgs {
@@ -87,6 +91,7 @@ public:
 	void Initialize(DXCom* pDxcom, SRVManager* srvManager);
 	void Finalize();
 	void Update(const Math::Matrix4x4& billboardMatrix);
+	void Dispatch();
 	void Draw(const D3D12_VERTEX_BUFFER_VIEW& vbView, const D3D12_INDEX_BUFFER_VIEW& ibView);
 	void ResetEmitters();
 	void InitDefaultEmitter();
@@ -116,7 +121,6 @@ private:
 	void InitGPUTimer();
 	void AliveCountDataReadBack();
 	void UpdatePerViewData(const Math::Matrix4x4& billboardMatrix);
-	void DrawParticleCS(const D3D12_VERTEX_BUFFER_VIEW& vbView, const D3D12_INDEX_BUFFER_VIEW& ibView);
 
 	void UpdateGPUEmitter();
 
@@ -180,7 +184,7 @@ private:
 	int textureBasedEmitterIndex_ = 0;
 	int MeshSurfaceEmitterIndex_ = 0;
 
-	uint32_t numParticles = 20485760;
+	uint32_t numParticles = 60485760;
 	uint32_t threadsPerGroup = 1024;
 	int threadGroupSize_ = 1024;
 

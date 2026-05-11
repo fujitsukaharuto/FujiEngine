@@ -47,7 +47,6 @@ void TestScene::Update() {
 
 	cMane_->CheckAllCollision();
 
-	ParticleManager::GetInstance()->Update();
 }
 
 void TestScene::Draw() {

@@ -140,7 +140,6 @@ void TitleScene::Update() {
 
 	cMane_->CheckAllCollision();
 
-	ParticleManager::GetInstance()->Update();
 }
 
 void TitleScene::Draw() {

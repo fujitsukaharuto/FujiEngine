@@ -99,6 +99,7 @@ void GameRun::Update() {
 
 	// ゲームシーンの毎フレーム処理
 	sceneManager_->Update();
+	ParticleManager::GetInstance()->Update();
 
 #ifdef _DEBUGMODE
 	// ImGui受付

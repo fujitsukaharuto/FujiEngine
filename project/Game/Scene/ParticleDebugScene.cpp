@@ -62,7 +62,6 @@ void ParticleDebugScene::Update() {
 
 	BlackFade();
 
-	ParticleManager::GetInstance()->Update();
 }
 
 void ParticleDebugScene::Draw() {
