@@ -567,7 +567,8 @@ void GPUParticleSystem::AliveCountDataReadBack() {
 
 void GPUParticleSystem::UpdatePerViewData(const Matrix4x4& billboardMatrix) {
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
-	perViewData_[frameIndex]->viewProjection = camera_->GetViewProjectionMatrix();
+	Matrix4x4 viewProj = camera_->GetViewProjectionMatrix();
+	perViewData_[frameIndex]->viewProjection = viewProj;
 	perViewData_[frameIndex]->billboardMatrix = billboardMatrix;
 
 	perFrameData_.deltaTime = FPSKeeper::DeltaTime();
@@ -575,8 +576,39 @@ void GPUParticleSystem::UpdatePerViewData(const Matrix4x4& billboardMatrix) {
 	if (perFrameData_.time > 420.0f) {
 		perFrameData_.time = 0.0f;
 	}
+
+	// 視錐台平面の計算
+	Vector4 row0 = { viewProj.m[0][0], viewProj.m[1][0], viewProj.m[2][0], viewProj.m[3][0] };
+	Vector4 row1 = { viewProj.m[0][1], viewProj.m[1][1], viewProj.m[2][1], viewProj.m[3][1] };
+	Vector4 row2 = { viewProj.m[0][2], viewProj.m[1][2], viewProj.m[2][2], viewProj.m[3][2] };
+	Vector4 row3 = { viewProj.m[0][3], viewProj.m[1][3], viewProj.m[2][3], viewProj.m[3][3] };
+
+	perFrameData_.frustumPlanes[0] = row3 + row0; // Left
+	perFrameData_.frustumPlanes[1] = row3 - row0; // Right
+	perFrameData_.frustumPlanes[2] = row3 + row1; // Bottom
+	perFrameData_.frustumPlanes[3] = row3 - row1; // Top
+	perFrameData_.frustumPlanes[4] = row2;        // Near
+	perFrameData_.frustumPlanes[5] = row3 - row2; // Far
+
+	for (int i = 0; i < 6; ++i) {
+		float length = std::sqrt(
+			perFrameData_.frustumPlanes[i].x * perFrameData_.frustumPlanes[i].x +
+			perFrameData_.frustumPlanes[i].y * perFrameData_.frustumPlanes[i].y +
+			perFrameData_.frustumPlanes[i].z * perFrameData_.frustumPlanes[i].z
+		);
+		if (length > 0.0001f) {
+			perFrameData_.frustumPlanes[i].x /= length;
+			perFrameData_.frustumPlanes[i].y /= length;
+			perFrameData_.frustumPlanes[i].z /= length;
+			perFrameData_.frustumPlanes[i].w /= length;
+		}
+	}
+
 	perFrameDataGPU_[frameIndex]->time = perFrameData_.time;
 	perFrameDataGPU_[frameIndex]->deltaTime = perFrameData_.deltaTime;
+	for (int i = 0; i < 6; i++) {
+		perFrameDataGPU_[frameIndex]->frustumPlanes[i] = perFrameData_.frustumPlanes[i];
+	}
 }
 
 void GPUParticleSystem::UpdateGPUEmitter() {
@@ -724,6 +756,9 @@ void GPUParticleSystem::UpdateParticleCSDispatch() {
 		perFrameDataGPU_[frameIndex][chunkIdx].time = perFrameData_.time;
 		perFrameDataGPU_[frameIndex][chunkIdx].deltaTime = perFrameData_.deltaTime;
 		perFrameDataGPU_[frameIndex][chunkIdx].yOffset = y;
+		for (int i = 0; i < 6; i++) {
+			perFrameDataGPU_[frameIndex][chunkIdx].frustumPlanes[i] = perFrameData_.frustumPlanes[i];
+		}
 
 		// 256バイトアライメントされたアドレスを計算してセット
 		D3D12_GPU_VIRTUAL_ADDRESS cbvAddress = perFrameResource_[frameIndex]->GetGPUVirtualAddress() + (chunkIdx * sizeof(PerFrame));
