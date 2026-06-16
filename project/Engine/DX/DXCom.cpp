@@ -194,7 +194,7 @@ void DXCom::PreGPUParticleDraw() {
 	SetRenderTargetsForGPUParticle();
 	ClearRenderTargetForGPUParticle();
 
-	command_->SetViewAndScissor(MyWin::kWindowWidth / 2, MyWin::kWindowHeight / 2);
+	command_->SetViewAndScissor(MyWin::kWindowWidth / 4, MyWin::kWindowHeight / 4);
 }
 
 void DXCom::PostGPUParticleDraw() {

@@ -58,10 +58,10 @@ void GPUParticleSystem::Finalize() {
 		perFrameResource_[i].Reset();
 		aliveReadback_[i].Reset();
 		aliveDrawArgs_[i].Reset();
+		drawAliveIndex_[i].Reset();
 	}
 
 	drawIndexedSignature_.Reset();
-	drawAliveIndex_.Reset();
 
 	particleCSMaterial_.Finalize();
 
@@ -129,7 +129,7 @@ void GPUParticleSystem::Draw(const D3D12_VERTEX_BUFFER_VIEW& vbView, const D3D12
 	pPipeManager->SetGraphicsRootDescriptorTable(graphicsList, "gParticles_Trans", transCSInstance_.particleCSSRVHandle_.second);
 	pPipeManager->SetGraphicsRootDescriptorTable(graphicsList, "gParticles_Scale", scaleCSInstance_.particleCSSRVHandle_.second);
 	pPipeManager->SetGraphicsRootDescriptorTable(graphicsList, "gParticles_Color", colorCSInstance_.particleCSSRVHandle_.second);
-	pPipeManager->SetGraphicsRootDescriptorTable(graphicsList, "gDrawParticleIndex", drawAliveSRVHandle_.second);
+	pPipeManager->SetGraphicsRootDescriptorTable(graphicsList, "gDrawParticleIndex", drawAliveSRVHandle_[frameIndex].second);
 	pPipeManager->SetGraphicsRootDescriptorTable(graphicsList, "gTexture", particleCSMaterial_.GetTexture()->gpuHandle);
 
 	graphicsList->ExecuteIndirect(drawIndexedSignature_.Get(), 1, aliveDrawArgs_[frameIndex].Get(), 0, nullptr, 0);
@@ -462,15 +462,17 @@ void GPUParticleSystem::InitParticleCS() {
 	freeListUAVHandle_.second = srvManager_->GetGPUDescriptorHandle(freeListUAVIndex);
 
 	// Draw引数
-	drawAliveIndex_ = DXC::Helper::CreateUAVResource(dxcommon_->GetDevice(), (sizeof(int32_t) * particleCSInstanceCount_));
-	uint32_t drawIndexUAVIndex = srvManager_->Allocate();
-	uint32_t drawIndexSRVIndex = srvManager_->Allocate();
-	srvManager_->CreateStructuredUAV(drawIndexUAVIndex, drawAliveIndex_.Get(), particleCSInstanceCount_, sizeof(int32_t));
-	srvManager_->CreateStructuredSRV(drawIndexSRVIndex, drawAliveIndex_.Get(), particleCSInstanceCount_, sizeof(int32_t));
-	drawAliveUAVHandle_.first = srvManager_->GetCPUDescriptorHandle(drawIndexUAVIndex);
-	drawAliveUAVHandle_.second = srvManager_->GetGPUDescriptorHandle(drawIndexUAVIndex);
-	drawAliveSRVHandle_.first = srvManager_->GetCPUDescriptorHandle(drawIndexSRVIndex);
-	drawAliveSRVHandle_.second = srvManager_->GetGPUDescriptorHandle(drawIndexSRVIndex);
+	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
+		drawAliveIndex_[i] = DXC::Helper::CreateUAVResource(dxcommon_->GetDevice(), (sizeof(int32_t) * particleCSInstanceCount_));
+		uint32_t drawIndexUAVIndex = srvManager_->Allocate();
+		uint32_t drawIndexSRVIndex = srvManager_->Allocate();
+		srvManager_->CreateStructuredUAV(drawIndexUAVIndex, drawAliveIndex_[i].Get(), particleCSInstanceCount_, sizeof(int32_t));
+		srvManager_->CreateStructuredSRV(drawIndexSRVIndex, drawAliveIndex_[i].Get(), particleCSInstanceCount_, sizeof(int32_t));
+		drawAliveUAVHandle_[i].first = srvManager_->GetCPUDescriptorHandle(drawIndexUAVIndex);
+		drawAliveUAVHandle_[i].second = srvManager_->GetGPUDescriptorHandle(drawIndexUAVIndex);
+		drawAliveSRVHandle_[i].first = srvManager_->GetCPUDescriptorHandle(drawIndexSRVIndex);
+		drawAliveSRVHandle_[i].second = srvManager_->GetGPUDescriptorHandle(drawIndexSRVIndex);
+	}
 
 	srvManager_->SetDescriptorHeap(1);
 	ID3D12GraphicsCommandList* cList = dxcommon_->GetImmediateList();
@@ -485,9 +487,13 @@ void GPUParticleSystem::InitParticleCS() {
 	pPipeManager->SetComputeRootDescriptorTable(cList, "gFreeListIndex", freeListIndexUAVHandle_.second);
 	pPipeManager->SetComputeRootDescriptorTable(cList, "gFreeList", freeListUAVHandle_.second);
 	pPipeManager->SetComputeRootDescriptorTable(cList, "gFreeListTailIndex", freeListTailIndexUAVHandle_.second);
-	pPipeManager->SetComputeRootDescriptorTable(cList, "gDrawParticleIndex", drawAliveUAVHandle_.second);
-	int dispatchCount = (numParticles + threadsPerGroup - 1) / threadsPerGroup;
-	dxcommon_->GetImmediateList()->Dispatch(dispatchCount, 1, 1);
+
+	// 全てのフレームバッファを初期化
+	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
+		pPipeManager->SetComputeRootDescriptorTable(cList, "gDrawParticleIndex", drawAliveUAVHandle_[i].second);
+		int dispatchCount = (numParticles + threadsPerGroup - 1) / threadsPerGroup;
+		dxcommon_->GetImmediateList()->Dispatch(dispatchCount, 1, 1);
+	}
 	dxcommon_->CommandExecution();
 
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {// Frame数分作成
@@ -738,7 +744,7 @@ void GPUParticleSystem::UpdateParticleCSDispatch() {
 	pPipeManager->SetComputeRootDescriptorTable(cList, "gFreeList", freeListUAVHandle_.second);
 	pPipeManager->SetComputeRootDescriptorTable(cList, "gFreeListTailIndex", freeListTailIndexUAVHandle_.second);
 	pPipeManager->SetComputeRootDescriptorTable(cList, "gDrawArgs", ArgsUAVHandle_[frameIndex].second);
-	pPipeManager->SetComputeRootDescriptorTable(cList, "gDrawParticleIndex", drawAliveUAVHandle_.second);
+	pPipeManager->SetComputeRootDescriptorTable(cList, "gDrawParticleIndex", drawAliveUAVHandle_[frameIndex].second);
 
 	// 2D Dispatchの設定
 	uint32_t groupsX = 1024;
@@ -772,7 +778,7 @@ void GPUParticleSystem::UpdateParticleCSDispatch() {
 	dxcommon_->InsertUAVBarrierForCompute(nullptr);
 
 	dxcommon_->InsertUAVBarrierForCompute(aliveDrawArgs_[frameIndex].Get());
-	dxcommon_->InsertUAVBarrierForCompute(drawAliveIndex_.Get());
+	dxcommon_->InsertUAVBarrierForCompute(drawAliveIndex_[frameIndex].Get());
 
 	gpuTimerCompute.End(dxcommon_->GetComputeCommandList(), frameIndex, kTimer_ParticleUpdate);
 	gpuTimerCompute.Resolve(cList, frameIndex, kTimer_ParticleUpdate);
