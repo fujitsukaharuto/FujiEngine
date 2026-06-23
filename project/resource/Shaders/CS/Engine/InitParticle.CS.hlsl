@@ -15,7 +15,7 @@ RWStructuredBuffer<int> gDrawParticleIndex : register(u9);
 [numthreads(1024, 1, 1)]
 void main( uint3 DTid : SV_DispatchThreadID )
 {
-    uint particleIndex = DTid.x;
+    uint particleIndex = GetParticleIndex(DTid); // 2D Dispatch対応 (DTid.x + DTid.y * kThreadsPerRow)
     if (particleIndex < kMaxParticles)
     {
         gParticles_Trans[particleIndex] = (Particle_Translate) 0;

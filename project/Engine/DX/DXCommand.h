@@ -62,6 +62,12 @@ namespace DXC {
 		void WaitComputeInGraphicsQueue();
 
 		/// <summary>
+		/// Compute Queueが前フレームのGraphics完了を待つ。
+		/// パーティクルを、graphics(N)の描画読み取り中にcompute(N+1)の更新が上書きを防ぐ。
+		/// </summary>
+		void WaitGraphicsInComputeQueue();
+
+		/// <summary>
 		/// コマンドアロケータおよびコマンドリストをリセットする
 		/// </summary>
 		/// <param name="index">どのコマンドリストか</param>

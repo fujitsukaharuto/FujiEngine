@@ -107,6 +107,11 @@ public:
 	void PreOutline();
 	void PostOutline();
 
+	//========================================================================*/
+	//* 深度バッファをCSから読む/DSVへ戻す状態遷移 (splatのシーン遮蔽深度テスト等で使用)
+	void TransitionDepthToRead();   // DEPTH_WRITE -> NON_PIXEL_SHADER_RESOURCE
+	void TransitionDepthToWrite();  // NON_PIXEL_SHADER_RESOURCE -> DEPTH_WRITE
+
 	/// <summary>
 	/// バリアの変更
 	/// </summary>

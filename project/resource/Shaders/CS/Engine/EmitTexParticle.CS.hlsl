@@ -84,7 +84,7 @@ void main(uint3 DTid : SV_DispatchThreadID)
         uint particleIndex = gFreeList[freePos];
 
         float3 worldPos = gEmitter.translate + float3((uv.x - 0.5f) * gEmitter.radius * 2.0f, 0, (uv.y - 0.5f) * gEmitter.radius * 2.0f);
-        gParticles_Trans[particleIndex].translate = worldPos;
+        gParticles_Trans[particleIndex].packedPos = PackPos21(worldPos);
         gParticles_Scale[particleIndex].packedScale = PackHalf2(float2(0.1f, 0.1f));
 
         RandomGenerator generator;

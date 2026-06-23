@@ -162,7 +162,8 @@ void DXCom::SetRenderTargets() {
 
 void DXCom::SetRenderTargetsForGPUParticle() {
 	UINT frameIndex = GetNowFrameCount();
-	command_->GetList()->OMSetRenderTargets(1, &swapChainManager_->GetRTVHandle(4 + frameIndex), false, &swapChainManager_->GetDSVHandle(frameIndex));
+	// 1/4解像度RT。深度は使わない(フル解像度DSVとは寸法が合わないため nullptr)。
+	command_->GetList()->OMSetRenderTargets(1, &swapChainManager_->GetRTVHandle(4 + frameIndex), false, nullptr);
 }
 
 void DXCom::ClearRenderTarget() {
@@ -208,6 +209,16 @@ void DXCom::PreOutline() {
 }
 
 void DXCom::PostOutline() {
+	TransitionResource(swapChainManager_->GetDSVResource(GetNowFrameCount()),
+		D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_DEPTH_WRITE);
+}
+
+void DXCom::TransitionDepthToRead() {
+	TransitionResource(swapChainManager_->GetDSVResource(GetNowFrameCount()),
+		D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+}
+
+void DXCom::TransitionDepthToWrite() {
 	TransitionResource(swapChainManager_->GetDSVResource(GetNowFrameCount()),
 		D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_DEPTH_WRITE);
 }

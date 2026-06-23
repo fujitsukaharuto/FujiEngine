@@ -11,9 +11,13 @@ RWStructuredBuffer<int> gFreeListIndex : register(u6);
 RWStructuredBuffer<uint> gFreeList : register(u7);
 RWStructuredBuffer<int> gFreeListTailIndex : register(u8);
 
+// 注: このスタンドアロンTrailは現在 Update内の EmitTrailWave に置き換え済みで未ディスパッチ。
+// prevTranslate 撤去(T2)に伴い、前フレーム位置は速度から近似復元する(dtはCB未保持のため60fps仮定)。
 void EmitTrail(uint pIndex)
 {
-    float dist = length(gParticles_Trans[pIndex].translate - gParticles_Trans[pIndex].prevTranslate);
+    float3 pos = UnpackPos21(gParticles_Trans[pIndex].packedPos);
+    float3 prevPos = pos - UnpackHalf3(gParticles_Velocity[pIndex].packedVelocity) * (1.0f / 60.0f);
+    float dist = length(pos - prevPos);
     if (dist > 0.01f)
     {
         // トレイル粒子生成回数 (距離に応じて 1~n 個)
@@ -43,10 +47,10 @@ void EmitTrail(uint pIndex)
             uint trailIndex = gFreeList[slot];
 
             float k = (float) t / max(1, numTrail);
-            float3 trailPos = lerp(gParticles_Trans[pIndex].prevTranslate, gParticles_Trans[pIndex].translate, k);
+            float3 trailPos = lerp(prevPos, pos, k);
 
-            gParticles_Trans[trailIndex].translate = trailPos;
-            gParticles_Trans[trailIndex].prevTranslate = trailPos;
+            gParticles_Trans[trailIndex].packedPos = PackPos21(trailPos);
+            // prevTranslate 撤去(T2)
             gParticles_Scale[trailIndex].packedScale = PackHalf2(float2(currentScale * 0.75f, currentScale * 0.75f));
             gParticles_Time[trailIndex].lifeTime = gParticles_Time[pIndex].lifeTime * 0.5f;
             gParticles_Time[trailIndex].currentTime = 0;

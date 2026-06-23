@@ -161,8 +161,8 @@ void main(uint3 DTid : SV_DispatchThreadID)
         float3 pos = interpPos + localPos;
 
         gParticles_Scale[particleIndex].packedScale = PackHalf2(float2(gEmitter.scale.x, gEmitter.scale.x));
-        gParticles_Trans[particleIndex].translate = pos;
-        gParticles_Trans[particleIndex].prevTranslate = pos;
+        gParticles_Trans[particleIndex].packedPos = PackPos21(pos);
+        // 粒子 prevTranslate は撤去(T2)。gEmitter.prevTranslate(距離補間用)とは別物なので温存
 
         float3 t = (generator.Generate3d() + 1) * 0.5f;
         float4 color = float4(lerp(gEmitter.colorMin, gEmitter.colorMax, t), 1.0f);

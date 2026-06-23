@@ -268,7 +268,7 @@ void Graphics::OffscreenManager::SynthesisGPURTV() {
 		D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_GENERIC_READ);
 
 	dxcommon_->GetDXCommand()->SetViewAndScissor(MyWin::kWindowWidth, MyWin::kWindowHeight);
-	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::None);
+	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::GPUParticleSynthesis); // 加算合成でシーンへ重ねる
 
 	dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);

@@ -19,7 +19,8 @@ public:
 
 public:
 
-
+	// trueにすると加算合成(Src ONE / Dest ONE)になる。GPUパーティクルRTの合成用。
+	void SetIsAddMode(bool isAdd) { isAddMode_ = isAdd; }
 
 private:
 
@@ -29,5 +30,6 @@ private:
 
 private:
 
+	bool isAddMode_ = false;
 
 };

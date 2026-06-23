@@ -1,6 +1,15 @@
 #include "../../CSParticle.hlsli"
 #include "../Noise.hlsli"
 
+// ============================================================================
+// splatモード専用 Update。
+// 通常版(UpdateParticle.CS.hlsl)との違い:
+//   - 視錐台カリング(IsVisible)を行わない … splat描画側が各粒子をNDCで自前カリングするため。
+//   - 描画リスト gDrawParticleIndex への散らばり書き込みを廃止 … splatは全プールを走査するため不要。
+//   - 可視数の per-visible atomic を廃止。生存数UIのため per-group atomic 1個だけ gDrawArgs に積む。
+// → コンパイル時にラスタ用の死に処理を丸ごと除去する目的で、通常版とは別シェーダ/別PSOにしている。
+// ============================================================================
+
 RWStructuredBuffer<Particle_Translate> gParticles_Trans : register(u0);
 RWStructuredBuffer<Particle_Scale> gParticles_Scale : register(u1);
 RWStructuredBuffer<Particle_Time> gParticles_Time : register(u2);
@@ -14,34 +23,20 @@ struct PerFrame
     float deltaTime;
     uint yOffset;
     float padding1;
-    float4 frustumPlanes[6]; // 視錐台の6平面
+    float4 frustumPlanes[6]; // splatでは未使用だがCBレイアウト互換のため保持
 };
 ConstantBuffer<PerFrame> gPerFrame : register(b0);
-
-// パーティクルが視錐台内にあるかチェックする関数
-bool IsVisible(float3 pos, float scale)
-{
-    for (int i = 0; i < 6; ++i)
-    {
-        if (dot(gPerFrame.frustumPlanes[i].xyz, pos) + gPerFrame.frustumPlanes[i].w < -scale)
-        {
-            return false;
-        }
-    }
-    return true;
-}
 
 RWStructuredBuffer<int> gFreeListIndex : register(u6);
 RWStructuredBuffer<uint> gFreeList : register(u7);
 RWStructuredBuffer<int> gFreeListTailIndex : register(u8);
 
-RWStructuredBuffer<DrawIndexedArgs> gDrawArgs : register(u9);
-RWStructuredBuffer<uint> gDrawParticleIndex : register(u10);
+RWStructuredBuffer<DrawIndexedArgs> gDrawArgs : register(u9); // splatでは InstanceCount を生存数UI用にのみ使用
 
 // プール2枚化(ピンポン): 読み取り元(readBuf=前フレームwriteBuf)。
 // 生存判定/前フレーム位置は Prev から読み、書き込みは gParticles_Trans/Color(=writeBuf)へ。
-RWStructuredBuffer<Particle_Translate> gParticles_TransPrev : register(u11);
-RWStructuredBuffer<Particle_Color> gParticles_ColorPrev : register(u12);
+RWStructuredBuffer<Particle_Translate> gParticles_TransPrev : register(u10);
+RWStructuredBuffer<Particle_Color> gParticles_ColorPrev : register(u11);
 
 void MoveMode(uint pIndex, uint isRandomMove)
 {
@@ -50,7 +45,7 @@ void MoveMode(uint pIndex, uint isRandomMove)
         float3 pos = UnpackPos21(gParticles_TransPrev[pIndex].packedPos);
         float time = gPerFrame.time;
         float3 samplePos = pos * 0.4 + float3(0, time * 0.5 + frac(pIndex * 0.012) * 10.0, 0);
-        float3 curl = CurlNoise(samplePos); // full simplex版(高品質)。100M到達時はT1-a(3Dカールテクスチャ)でこの品質を1サンプル化する予定
+        float3 curl = CurlNoise(samplePos);
         float3 vel0 = UnpackHalf3(gParticles_Velocity[pIndex].packedVelocity);
         float len0 = length(vel0);
         if (len0 < 0.0001f)
@@ -72,7 +67,7 @@ void MoveMode(uint pIndex, uint isRandomMove)
         float3 pos = UnpackPos21(gParticles_TransPrev[pIndex].packedPos);
         float time = gPerFrame.time;
         float3 samplePos = pos * 0.5f + float3(0.0f, time * 0.8f, 0.0f);
-        float3 curl = CurlNoise(samplePos); // full simplex版(高品質)。100M到達時はT1-a(3Dカールテクスチャ)でこの品質を1サンプル化する予定
+        float3 curl = CurlNoise(samplePos);
         float3 velocity = UnpackHalf3(gParticles_Velocity[pIndex].packedVelocity);
         float noisePower = 4.0f;
         float speed = length(velocity);
@@ -81,11 +76,11 @@ void MoveMode(uint pIndex, uint isRandomMove)
 }
 
 // Wave Intrinsics を使用した EmitTrail
-// 前フレーム位置(prevPos)は呼び出し側(=更新前のtranslate)から受け取る
+// prevTranslate 撤去(T2): 前フレーム位置(prevPos)は呼び出し側(=更新前のtranslate)から受け取る
 void EmitTrailWave(uint pIndex, uint colorUint, float scale, float3 pos, float3 prevPos)
 {
     float dist = length(pos - prevPos);
-    
+
     uint numTrail = (dist > 0.01f) ? clamp((uint)(dist * 100.0f), 0, 60) : 0;
 
     uint waveTotalTrails = WaveActiveSum(numTrail);
@@ -94,18 +89,16 @@ void EmitTrailWave(uint pIndex, uint colorUint, float scale, float3 pos, float3 
 
     if (WaveIsFirstLane() && waveTotalTrails > 0)
     {
-        // gFreeListIndex は int なので waveBaseHead も int
         InterlockedAdd(gFreeListIndex[0], (int)waveTotalTrails, waveBaseHead);
-        
-        // リングバッファ空き容量チェック (32bitラップアラウンド対応)
+
         uint tailVal = (uint)gFreeListTailIndex[0];
         uint headVal = (uint)waveBaseHead;
-        uint available = tailVal - headVal; 
+        uint available = tailVal - headVal;
 
         if (waveTotalTrails > available)
         {
             InterlockedAdd(gFreeListIndex[0], -(int)waveTotalTrails);
-            waveBaseHead = -1; // 失敗フラグ
+            waveBaseHead = -1;
         }
     }
 
@@ -146,7 +139,7 @@ groupshared uint gs_DeadCount;
 groupshared uint gs_DeadOffset;
 
 [numthreads(1024, 1, 1)]
-void main( uint3 DTid : SV_DispatchThreadID, uint GI : SV_GroupIndex )
+void main(uint3 DTid : SV_DispatchThreadID, uint GI : SV_GroupIndex)
 {
     if (GI == 0) {
         gs_AliveCount = 0;
@@ -155,7 +148,7 @@ void main( uint3 DTid : SV_DispatchThreadID, uint GI : SV_GroupIndex )
     GroupMemoryBarrierWithGroupSync();
 
     uint particleIndex = GetParticleIndexWithOffset(DTid);
-    bool isVisible = false;
+    bool isAlive = false;
     bool isDead = false;
 
     if (particleIndex < kMaxParticles)
@@ -171,7 +164,7 @@ void main( uint3 DTid : SV_DispatchThreadID, uint GI : SV_GroupIndex )
             uint isGravity = (flags >> 3) & 0x1;
 
             if (isRandomMove != 0) MoveMode(particleIndex, isRandomMove);
-            
+
             float3 velocity = UnpackHalf3(gParticles_Velocity[particleIndex].packedVelocity);
             if (isGravity == 1) velocity += kGravity * gPerFrame.deltaTime;
 
@@ -185,7 +178,7 @@ void main( uint3 DTid : SV_DispatchThreadID, uint GI : SV_GroupIndex )
             float startScale = scales.y;
 
             if (isTrailEmit == 1) EmitTrailWave(particleIndex, colorUint, currentScale, pos, prevPos);
-            
+
             gParticles_Time[particleIndex].currentTime += gPerFrame.deltaTime;
             float lifeRatio = saturate(gParticles_Time[particleIndex].currentTime / gParticles_Time[particleIndex].lifeTime);
 
@@ -193,7 +186,7 @@ void main( uint3 DTid : SV_DispatchThreadID, uint GI : SV_GroupIndex )
             currentScale = startScale * (1.0f - lifeRatio);
 
             uint nextColor = PackRGBA8(color);
-            
+
             if ((nextColor >> 24) == 0 || lifeRatio >= 1.0f)
             {
                 gParticles_Scale[particleIndex].packedScale = 0;
@@ -204,24 +197,19 @@ void main( uint3 DTid : SV_DispatchThreadID, uint GI : SV_GroupIndex )
             {
                 gParticles_Color[particleIndex].color = nextColor;
                 gParticles_Scale[particleIndex].packedScale = PackHalf2(float2(currentScale, startScale));
-                
-                if (color.a >= 0.15f && IsVisible(pos, startScale))
-                {
-                    isVisible = true;
-                }
+                isAlive = true; // 視錐台カリングはしない(splat側でNDCカリング)
             }
         }
     }
 
-    // --- Wave集計 ---
-    uint waveAliveCount = WaveActiveCountBits(isVisible);
-    uint waveAlivePrefix = WavePrefixCountBits(isVisible);
-    uint waveAliveBase = 0;
+    // --- 生存数の集計(UI用。per-group atomic 1個) ---
+    uint waveAliveCount = WaveActiveCountBits(isAlive);
     if (WaveIsFirstLane() && waveAliveCount > 0) {
-        InterlockedAdd(gs_AliveCount, waveAliveCount, waveAliveBase);
+        uint dummy;
+        InterlockedAdd(gs_AliveCount, waveAliveCount, dummy);
     }
-    uint localAliveIndex = WaveReadLaneFirst(waveAliveBase) + waveAlivePrefix;
 
+    // --- 死亡 → FreeList返却(通常版と同じ) ---
     uint waveDeadCount = WaveActiveCountBits(isDead);
     uint waveDeadPrefix = WavePrefixCountBits(isDead);
     uint waveDeadBase = 0;
@@ -230,14 +218,12 @@ void main( uint3 DTid : SV_DispatchThreadID, uint GI : SV_GroupIndex )
     }
     uint localDeadIndex = WaveReadLaneFirst(waveDeadBase) + waveDeadPrefix;
 
-    // --- グローバル反映 ---
     GroupMemoryBarrierWithGroupSync();
     if (GI == 0)
     {
         if (gs_AliveCount > 0) {
             uint tempWriteOffset;
             InterlockedAdd(gDrawArgs[0].InstanceCount, gs_AliveCount, tempWriteOffset);
-            gs_WriteOffset = tempWriteOffset;
         }
         if (gs_DeadCount > 0) {
             int tempDeadOffset;
@@ -247,11 +233,6 @@ void main( uint3 DTid : SV_DispatchThreadID, uint GI : SV_GroupIndex )
     }
     GroupMemoryBarrierWithGroupSync();
 
-    if (isVisible)
-    {
-        gDrawParticleIndex[gs_WriteOffset + localAliveIndex] = particleIndex;
-    }
-    
     if (isDead)
     {
         gFreeList[(gs_DeadOffset + localDeadIndex) % kMaxParticles] = particleIndex;

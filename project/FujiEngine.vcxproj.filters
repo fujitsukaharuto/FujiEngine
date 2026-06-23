@@ -284,6 +284,12 @@
     <ClCompile Include="Engine\GraphicPipeline\CSPipe\UpdateParticleCSPipe.cpp">
       <Filter>Engine\GraphicPipeline\CSPipe</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\GraphicPipeline\CSPipe\UpdateParticleSplatCSPipe.cpp">
+      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\GraphicPipeline\CSPipe\ClearParticleColorCSPipe.cpp">
+      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
+    </ClCompile>
     <ClCompile Include="Engine\GraphicPipeline\CSPipe\VignetteCSPipe.cpp">
       <Filter>Engine\GraphicPipeline\CSPipe</Filter>
     </ClCompile>
@@ -337,6 +343,15 @@
     </ClCompile>
     <ClCompile Include="Engine\GraphicPipeline\CSPipe\InitArgsCSPipe.cpp">
       <Filter>Engine\GraphicPipeline\CSPipe</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\GraphicPipeline\CSPipe\SplatClearCSPipe.cpp">
+      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\GraphicPipeline\CSPipe\SplatParticleCSPipe.cpp">
+      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\GraphicPipeline\SplatCompositePipe.cpp">
+      <Filter>Engine\GraphicPipeline</Filter>
     </ClCompile>
     <ClCompile Include="Engine\DX\GPUTimer.cpp">
       <Filter>Engine\DX</Filter>
@@ -751,6 +766,12 @@
     <ClInclude Include="Engine\GraphicPipeline\CSPipe\UpdateParticleCSPipe.h">
       <Filter>Engine\GraphicPipeline\CSPipe</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\GraphicPipeline\CSPipe\UpdateParticleSplatCSPipe.h">
+      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\GraphicPipeline\CSPipe\ClearParticleColorCSPipe.h">
+      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
+    </ClInclude>
     <ClInclude Include="Engine\GraphicPipeline\CSPipe\VignetteCSPipe.h">
       <Filter>Engine\GraphicPipeline\CSPipe</Filter>
     </ClInclude>
@@ -813,6 +834,15 @@
     </ClInclude>
     <ClInclude Include="Engine\GraphicPipeline\CSPipe\InitArgsCSPipe.h">
       <Filter>Engine\GraphicPipeline\CSPipe</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\GraphicPipeline\CSPipe\SplatClearCSPipe.h">
+      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\GraphicPipeline\CSPipe\SplatParticleCSPipe.h">
+      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\GraphicPipeline\SplatCompositePipe.h">
+      <Filter>Engine\GraphicPipeline</Filter>
     </ClInclude>
     <ClInclude Include="Engine\DX\GPUTimer.h">
       <Filter>Engine\DX</Filter>
@@ -1073,6 +1103,18 @@
     <FxCompile Include="resource\Shaders\CS\Engine\Skinning.CS.hlsl">
       <Filter>resource\Shaders\CS\Engine</Filter>
     </FxCompile>
+    <FxCompile Include="resource\Shaders\CS\Engine\SplatClear.CS.hlsl">
+      <Filter>resource\Shaders\CS\Engine</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\CS\Engine\SplatParticle.CS.hlsl">
+      <Filter>resource\Shaders\CS\Engine</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\SplatComposite.PS.hlsl">
+      <Filter>resource\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\SplatComposite.VS.hlsl">
+      <Filter>resource\Shaders</Filter>
+    </FxCompile>
     <FxCompile Include="resource\Shaders\DepthBasedOutline.PS.hlsl">
       <Filter>resource\Shaders</Filter>
     </FxCompile>
@@ -1116,6 +1158,12 @@
       <Filter>resource\Shaders\CS\Engine</Filter>
     </FxCompile>
     <FxCompile Include="resource\Shaders\CS\Engine\UpdateParticle.CS.hlsl">
+      <Filter>resource\Shaders\CS\Engine</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\CS\Engine\UpdateParticleSplat.CS.hlsl">
+      <Filter>resource\Shaders\CS\Engine</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\CS\Engine\ClearParticleColor.CS.hlsl">
       <Filter>resource\Shaders\CS\Engine</Filter>
     </FxCompile>
     <FxCompile Include="resource\Shaders\CS\Vignette.CS.hlsl">
@@ -1167,6 +1215,9 @@
     </None>
     <None Include="resource\Shaders\CS\Noise.hlsli">
       <Filter>resource\Shaders\CS</Filter>
+    </None>
+    <None Include="resource\Shaders\CS\Engine\Splat.hlsli">
+      <Filter>resource\Shaders\CS\Engine</Filter>
     </None>
   </ItemGroup>
 </Project>

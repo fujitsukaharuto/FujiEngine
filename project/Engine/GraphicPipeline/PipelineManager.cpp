@@ -33,9 +33,14 @@
 #include "CSPipe/EmitterTexParticleCSPipe.h"
 #include "CSPipe/EmitterSurfaceParticleCSPipe.h"
 #include "CSPipe/UpdateParticleCSPipe.h"
+#include "CSPipe/UpdateParticleSplatCSPipe.h"
+#include "CSPipe/ClearParticleColorCSPipe.h"
 #include "CSPipe/TrailEmitCSPipe.h"
 #include "CSPipe/InitArgsCSPipe.h"
 #include "CSPipe/AliveCountCSPipe.h"
+#include "CSPipe/SplatClearCSPipe.h"
+#include "CSPipe/SplatParticleCSPipe.h"
+#include "SplatCompositePipe.h"
 
 using namespace Graphics;
 
@@ -62,6 +67,9 @@ void PipelineManager::Finalize() {
 void PipelineManager::CreatePipeline() {
 
 	CreatePipe<NonePipeline>(Pipe::None);
+	CreatePipe<NonePipeline>(Pipe::GPUParticleSynthesis, [](NonePipeline& p) {
+		p.SetIsAddMode(true);
+		});
 	CreatePipe<Pipeline>(Pipe::Normal);
 
 	CreatePipe<Pipeline>(Pipe::NormalAdd, [](Pipeline& p) {
@@ -123,9 +131,15 @@ void PipelineManager::CreatePipeline() {
 	CreatePipe<EmitterTexParticleCSPipe>(Pipe::EmitTexParticleCS);
 	CreatePipe<EmitterSurfaceParticleCSPipe>(Pipe::EmitSurfaceParticleCS);
 	CreatePipe<UpdateParticleCSPipe>(Pipe::UpdateParticleCS);
+	CreatePipe<UpdateParticleSplatCSPipe>(Pipe::UpdateParticleSplatCS);
+	CreatePipe<ClearParticleColorCSPipe>(Pipe::ClearParticleColorCS);
 	CreatePipe<TrailEmitCSPipe>(Pipe::TrailEmitCS);
 	CreatePipe<InitArgsCSPipe>(Pipe::InitArgsCS);
 	CreatePipe<AliveCountCSPipe>(Pipe::AliveCountCS);
+
+	CreatePipe<SplatClearCSPipe>(Pipe::SplatClearCS);
+	CreatePipe<SplatParticleCSPipe>(Pipe::SplatParticleCS);
+	CreatePipe<SplatCompositePipe>(Pipe::SplatComposite);
 }
 
 void PipelineManager::SetPipeline(Pipe type) {

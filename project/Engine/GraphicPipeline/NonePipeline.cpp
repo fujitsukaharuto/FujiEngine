@@ -59,7 +59,19 @@ void NonePipeline::CreatePSO(ID3D12Device* device) {
 	stateDesc.PS = { ps->GetBufferPointer(),ps->GetBufferSize() };
 	stateDesc.DepthStencilState = depth;
 	stateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	stateDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+
+	D3D12_BLEND_DESC blendDesc = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+	if (isAddMode_) {
+		// 加算合成: out = sampledColor + dst (GPUパーティクルRTをシーンへ重ねる)
+		blendDesc.RenderTarget[0].BlendEnable = TRUE;
+		blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_ONE;
+		blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
+		blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+		blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
+		blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ONE;
+		blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
+	}
+	stateDesc.BlendState = blendDesc;
 	stateDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
 
 	stateDesc.NumRenderTargets = 1;

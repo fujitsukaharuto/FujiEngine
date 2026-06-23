@@ -45,6 +45,16 @@ struct DrawIndexedArgs {
 };
 
 /// <summary>
+/// コンピュート・スプラット用パラメータ (CB)
+/// </summary>
+struct SplatParamCB {
+	uint32_t dimsX;
+	uint32_t dimsY;
+	uint32_t enableDepthTest; // 1=シーン遮蔽の深度テスト有効(フル解像度時のみ)
+	uint32_t pad1;
+};
+
+/// <summary>
 /// 加速場
 /// </summary>
 struct AcceleFiled {
@@ -119,6 +129,8 @@ private:
 	void InitParticleCS();
 	void InitInstance(ParticleCSInstance& CSInstance, size_t instanceSize);
 	void InitGPUTimer();
+	void InitSplat();
+	void SplatDraw(); // コンピュート・スプラット描画(クリア→点描→加算合成)
 	void AliveCountDataReadBack();
 	void UpdatePerViewData(const Math::Matrix4x4& billboardMatrix);
 
@@ -133,6 +145,7 @@ private:
 	//* Dispatch
 	void UpdateParticleCSDispatch();
 	void EmitterDispatch();
+	void ClearWriteColorDispatch(); // ピンポン: 書き込み先プールのcolorを0クリア
 
 private:
 
@@ -142,12 +155,15 @@ private:
 
 	uint32_t particleCSInstanceCount_;
 
-	ParticleCSInstance transCSInstance_;
+	// プール2枚化(完全ピンポン): Drawが読む trans/color のみ2枚持つ。
+	// writeIdx_ を毎フレーム反転し、readIdx = writeIdx_^1。書き込みは[writeIdx_]、読み取りは[readIdx]。
+	ParticleCSInstance transCSInstance_[2];
 	ParticleCSInstance scaleCSInstance_;
 	ParticleCSInstance timeCSInstance_;
 	ParticleCSInstance velocityCSInstance_;
-	ParticleCSInstance colorCSInstance_;
+	ParticleCSInstance colorCSInstance_[2];
 	ParticleCSInstance flagsCSInstance_;
+	int writeIdx_ = 0; // 今フレームの書き込み先プールのインデックス(Dispatch冒頭で反転)
 
 	Graphics::Material particleCSMaterial_;
 	ComPtr<ID3D12Resource> perViewResource_[DXC::kFrameCount_];
@@ -171,6 +187,20 @@ private:
 	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> drawAliveSRVHandle_[DXC::kFrameCount_];
 	ComPtr<ID3D12Resource> aliveReadback_[DXC::kFrameCount_];
 
+	// --- コンピュート・スプラット描画 ---
+	ComPtr<ID3D12Resource> splatAccumResource_; // 蓄積バッファ(1px=4uint固定小数)
+	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> splatAccumUAVHandle_;
+	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> splatAccumSRVHandle_;
+	ComPtr<ID3D12Resource> splatParamResource_;
+	SplatParamCB* splatParamData_ = nullptr; // 永続マップ(enableDepthTestを毎フレーム更新)
+	uint32_t splatAccumElementCount_ = 0;
+	bool useComputeSplat_ = true;    // true:コンピュート・スプラット / false:従来ラスタ(1/4解像度)
+	bool useFullResolution_ = true;  // 描画解像度: true=フルサイズ(深度テスト有効) / false=1/4扱い(深度テスト無効)。useComputeSplat_とは独立
+
+	// Stage2(フェンス並走化): splat時に compute_N の graphics_{N-1} 待ちを省き Update_{N+1} ∥ Draw_N にする。
+	bool useOverlap_ = true;             // true:オーバーラップ有効(A/B計測用にトグル可)
+	bool prevUseComputeSplat_ = false;   // 前フレームのsplat有無。2フレーム連続splat時のみ並走(切替フレームのscaleハザード回避)
+
 	std::vector<EmitterInfo> csEmitters_;
 
 	std::vector<int> sphereEmitters_;
@@ -184,7 +214,9 @@ private:
 	int textureBasedEmitterIndex_ = 0;
 	int MeshSurfaceEmitterIndex_ = 0;
 
-	uint32_t numParticles = 60485760;
+	// 1億パーティクル (96 * 1024 * 1024 = 100,663,296)。kThreadsPerRow(1024*1024)の倍数にして2D Dispatchを綺麗に割り切らせる。
+	// ※この値はシェーダ側の kMaxParticles (CSParticle.hlsli) と必ず一致させること
+	uint32_t numParticles = 100663296;
 	uint32_t threadsPerGroup = 1024;
 	int threadGroupSize_ = 1024;
 

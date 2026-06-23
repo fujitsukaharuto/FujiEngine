@@ -23,7 +23,7 @@ VertxShaderOutput main(VertexShaderInput input, uint instanceId : SV_InstanceID)
     worldMatrix[0] *= scale;
     worldMatrix[1] *= scale;
     worldMatrix[2] *= scale;
-    worldMatrix[3].xyz = gParticles_Trans[idx].translate;
+    worldMatrix[3].xyz = UnpackPos21(gParticles_Trans[idx].packedPos);
     output.position = mul(input.position, mul(worldMatrix, gPerView.viewProjection));
     output.texcoord = input.texcoord;
     output.color = UnpackRGBA8(gParticles_Color[idx].color);

@@ -102,6 +102,14 @@ void DXC::DXCommand::WaitComputeInGraphicsQueue() {
 	graphicsContext_->WaitQueueFor(computeContext_.get(), frameIndex_);
 }
 
+void DXC::DXCommand::WaitGraphicsInComputeQueue() {
+	// 前フレーム(=同じプールを読み終えたフレーム)のGraphics完了を待つ。
+	uint32_t prevFrame = (frameIndex_ + kFrameCount_ - 1) % kFrameCount_;
+	if (graphicsContext_->GetFenceValue(prevFrame) != 0) {
+		computeContext_->WaitQueueFor(graphicsContext_.get(), prevFrame);
+	}
+}
+
 void DXCommand::Reset(uint32_t index) {
 	WaitForGPU();
 	if (index == 0) {

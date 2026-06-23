@@ -106,7 +106,7 @@ void main(uint3 DTid : SV_DispatchThreadID)
         float3 pos = RandomPointOnTriangle(generator, p0, p1, p2) * gEmitter.radius + gEmitter.translate;
 
         gParticles_Scale[particleIndex].packedScale = PackHalf2(float2(gEmitter.scale.x, gEmitter.scale.x));
-        gParticles_Trans[particleIndex].translate = pos;
+        gParticles_Trans[particleIndex].packedPos = PackPos21(pos);
 
         float3 t = (generator.Generate3d() + 1) * 0.5f;
         gParticles_Color[particleIndex].color = PackRGBA8(float4(lerp(gEmitter.colorMin, gEmitter.colorMax, t), 1.0f));

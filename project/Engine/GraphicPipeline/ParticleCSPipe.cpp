@@ -69,8 +69,10 @@ void ParticleCSPipe::CreatePSO(ID3D12Device* device) {
 	layout.NumElements = static_cast<UINT>(inputLayout.size());
 
 
+	// 1/4解像度の専用RTへ描画するため、フル解像度DSVは使わない(寸法不一致になる)。
+	// よって深度テストは無効化し、加算合成でシーンへ重ねる。
 	D3D12_DEPTH_STENCIL_DESC depth{};
-	depth.DepthEnable = true;
+	depth.DepthEnable = false;
 	depth.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
 	depth.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 	depth.StencilEnable = false;
@@ -82,7 +84,7 @@ void ParticleCSPipe::CreatePSO(ID3D12Device* device) {
 	stateDesc.VS = { vs->GetBufferPointer(),vs->GetBufferSize() };
 	stateDesc.PS = { ps->GetBufferPointer(),ps->GetBufferSize() };
 	stateDesc.DepthStencilState = depth;
-	stateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	stateDesc.DSVFormat = DXGI_FORMAT_UNKNOWN; // DSVを使わない
 	stateDesc.BlendState = blend;
 	stateDesc.RasterizerState = rasterizer;
 
