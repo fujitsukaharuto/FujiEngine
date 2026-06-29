@@ -22,7 +22,7 @@ struct DrawIndexedArgs
 
 static const float3 kGravity = float3(0.0f, -8.0f, 0.0f);
 // ※この値は numParticles (GPUParticleSystem.h) と必ず一致させること
-static const uint kMaxParticles = 100663296;
+static const uint kMaxParticles = 50331648;
 // 位置パッキング用ワールド半径 (±R)。この範囲外は saturate でクランプされる。
 // R=512 で刻み 2R/(2^21-1)≒0.0005u、静的誤差±0.00024u。クリップ/フリーズが出たら調整。
 static const float kPosPackRadius = 512.0f;

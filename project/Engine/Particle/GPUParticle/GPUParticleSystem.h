@@ -214,9 +214,9 @@ private:
 	int textureBasedEmitterIndex_ = 0;
 	int MeshSurfaceEmitterIndex_ = 0;
 
-	// 1億パーティクル (96 * 1024 * 1024 = 100,663,296)。kThreadsPerRow(1024*1024)の倍数にして2D Dispatchを綺麗に割り切らせる。
+	// 5000万パーティクル (48 * 1024 * 1024 = 50,331,648)。kThreadsPerRow(1024*1024)の倍数にして2D Dispatchを綺麗に割り切らせる。
 	// ※この値はシェーダ側の kMaxParticles (CSParticle.hlsli) と必ず一致させること
-	uint32_t numParticles = 100663296;
+	uint32_t numParticles = 50331648;
 	uint32_t threadsPerGroup = 1024;
 	int threadGroupSize_ = 1024;
 
