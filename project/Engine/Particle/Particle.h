@@ -134,8 +134,6 @@ struct ParticleCS {
 
 
 struct ParticleCS_Translate {
-	// 位置パッキング: ワールド半径R内を各軸21bit固定小数で uint2 にパック(12B→8B)。
-	// 100Mで VRAM -0.4GB / Update+Draw 帯域 -12B/粒子。エンコードは CSParticle.hlsli の PackPos21/UnpackPos21。
 	uint32_t packedPos[2];
 };
 
