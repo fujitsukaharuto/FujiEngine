@@ -179,7 +179,7 @@ bool LockOn::SearchAreaAngle() {
 
 }
 
-Vector3 LockOn::WorldToScreen(Vector3 worldPosition) {
+Vector3 LockOn::WorldToScreen(const Vector3& worldPosition) {
 
 	Vector3 positionEnemy = worldPosition;
 	Matrix4x4 matViewport = MakeViewportMat(0, 0, MyWin::kWindowWidth, MyWin::kWindowHeight, 0, 1);

@@ -231,6 +231,37 @@ private:
 
 private:
 
+	//========================================================================*/
+	//* 定数
+	static constexpr int kChargeCount_ = 8;               // チャージ/トレース用エミッター・親オブジェクトの数（円周を8分割）
+	static constexpr int kHpSegmentCount_ = 5;            // HPバーの分割数
+	static constexpr int kHpFrameCount_ = 2;              // HPバー枠の数（外枠・内枠）
+	static constexpr float kMaxBossHp_ = 100.0f;          // ボスHPの最大値（初期値）
+	static constexpr float kInitAttackCooldown_ = 120.0f; // 攻撃クールタイムの初期値
+	static constexpr float kWaveAttackPosZ_ = 4.0f;       // 波攻撃エミッターのZオフセット
+
+	//* HP・戦闘
+	static constexpr float kStrongDamage_ = 4.0f;          // 強攻撃のダメージ量
+	static constexpr float kNormalDamage_ = 2.0f;          // 通常攻撃のダメージ量
+	static constexpr float kHpThresholdMax_ = 80.0f;       // Maxフェーズからの移行HP
+	static constexpr float kHpThresholdHigh_ = 60.0f;      // Highフェーズからの移行HP
+	static constexpr float kHpThresholdHalf_ = 40.0f;      // Halfフェーズからの移行HP
+	static constexpr float kHpThresholdLow_ = 30.0f;       // Lowフェーズからの移行HP
+	static constexpr float kHpColorRangeWide_ = 20.0f;     // HP色補間の範囲（Max/High/Half）
+	static constexpr float kHpColorRangeNarrow_ = 10.0f;   // HP色補間の範囲（Low）
+	static constexpr float kHpColorRangeEmpty_ = 30.0f;    // HP色補間の範囲（Empty）
+	static constexpr float kHpCoolTime_ = 60.0f;           // フェーズ移行時のクールタイム
+	static constexpr float kChainRateStep_ = 0.05f;        // 連続行動ごとのチェインレート増加量
+
+	//* タイミング・移動・カメラ（閾値/重複値）
+	static constexpr float kStartTime_ = 300.0f;           // 開始演出の時間
+	static constexpr float kRoarShakeTimeMin_ = 40.0f;     // 咆哮シェイクを行う時間の下限
+	static constexpr float kRoarShakeTimeMax_ = 200.0f;    // 咆哮シェイクを行う時間の上限
+	static constexpr float kWalkSpeed_ = 0.05f;            // 歩行速度
+	static constexpr float kShadowPosY_ = 0.15f;           // 影のY位置
+	static constexpr float kCameraRange_ = -25.0f;         // カメラ距離の既定値
+	static constexpr float kCameraFollowSpeed_ = 0.2f;     // カメラ追従速度の既定値
+
 	std::unique_ptr<BaseBossBehavior> behavior_ = nullptr;
 	std::unique_ptr<BossItemManager> itemManager_ = nullptr;
 
@@ -260,8 +291,8 @@ private:
 	bool isActiveSprite_ = false;
 	bool isDamageLight_ = false;
 	float bossHp_ = 0.0f;
-	float hpCoolTime_ = 60.0f;
-	int nowHpIndex_ = 4;
+	float hpCoolTime_ = kHpCoolTime_;
+	int nowHpIndex_ = kHpSegmentCount_ - 1;
 	float shakeTime_ = 0.0f;
 	float baseShakeTime_ = 10.0f;
 	float shakeSize_ = 4.0f;
@@ -284,7 +315,7 @@ private:
 
 	bool isStart_ = true;
 	bool isSummon_ = false;
-	float startTime_ = 300.0f;
+	float startTime_ = kStartTime_;
 
 	float startWaiting_ = 0.0f;
 	float summonCircleExpandTime_ = 50.0f;
@@ -310,8 +341,8 @@ private:
 	float chainRate_ = 0.65f;
 	int chainCount_ = 0;
 
-	float cameraRange_ = -25.0f;
-	float cameraFollowSpeed_ = 0.2f;
+	float cameraRange_ = kCameraRange_;
+	float cameraFollowSpeed_ = kCameraFollowSpeed_;
 
 	bool isNowDush_ = false;
 	int dushChargeIndex_ = 0;

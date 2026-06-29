@@ -11,7 +11,7 @@ namespace DXC::Helper {
 	/// <param name="device">デバイス</param>
 	/// <param name="sizeInBytes">サイズ</param>
 	/// <returns>ID3D12Resource*</returns>
-	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(Microsoft::WRL::ComPtr<ID3D12Device> device, size_t sizeInBytes);
+	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(const Microsoft::WRL::ComPtr<ID3D12Device>& device, size_t sizeInBytes);
 
 	/// <summary>
 	/// 指定されたタイプ・数でディスクリプタヒープを生成する。
@@ -30,7 +30,7 @@ namespace DXC::Helper {
 	/// <param name="width">横</param>
 	/// <param name="height">縦</param>
 	/// <returns>ID3D12Resource*</returns>
-	Microsoft::WRL::ComPtr<ID3D12Resource> CreateDepthStencilTextureResource(Microsoft::WRL::ComPtr<ID3D12Device> device, int32_t width, int32_t height);
+	Microsoft::WRL::ComPtr<ID3D12Resource> CreateDepthStencilTextureResource(const Microsoft::WRL::ComPtr<ID3D12Device>& device, int32_t width, int32_t height);
 
 	/// <summary>
 	/// オフスクリーン描画用のテクスチャリソースを生成する。
@@ -40,7 +40,7 @@ namespace DXC::Helper {
 	/// <param name="height">縦</param>
 	/// <param name="color">色</param>
 	/// <returns>ID3D12Resource*</returns>
-	Microsoft::WRL::ComPtr<ID3D12Resource> CreateOffscreenTextureResource(Microsoft::WRL::ComPtr<ID3D12Device> device, int32_t width, int32_t height, D3D12_CLEAR_VALUE color);
+	Microsoft::WRL::ComPtr<ID3D12Resource> CreateOffscreenTextureResource(const Microsoft::WRL::ComPtr<ID3D12Device>& device, int32_t width, int32_t height, D3D12_CLEAR_VALUE color);
 
 	/// <summary>
 	/// UAV（Unordered Access View）として使用可能なバッファリソースを生成する。

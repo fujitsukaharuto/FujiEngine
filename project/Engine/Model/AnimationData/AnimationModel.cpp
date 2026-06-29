@@ -602,7 +602,7 @@ Quaternion AnimationModel::CalculationValue(const std::vector<KeyframeQuaternion
 	return (*keyframe.rbegin()).value;
 }
 
-void AnimationModel::JointDraw(const Matrix4x4& m, Vector4 color) {
+void AnimationModel::JointDraw(const Matrix4x4& m, const Vector4& color) {
 	Vector3 jointPos = { m.m[3][0], m.m[3][1], m.m[3][2] };
 	Line3dDrawer::GetInstance()->DrawSphereLine(jointPos, 0.05f, color);
 }

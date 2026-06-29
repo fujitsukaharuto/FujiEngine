@@ -30,7 +30,7 @@ public:
 	// 値のセット(float)
 	void SetValue(const std::string& groupName, const std::string& key, float value);
 	// 値のセット(Vector3)
-	void SetValue(const std::string& groupName, const std::string& key, Math::Vector3 value);
+	void SetValue(const std::string& groupName, const std::string& key, const Math::Vector3& value);
 
 	/// <summary>
 	/// ファイルに書き出し

@@ -49,7 +49,7 @@ public:
 	/// <summary>
 	///	スクリーン座標に変換
 	/// </summary>
-	Math::Vector3 WorldToScreen(Math::Vector3 worldPosition);
+	Math::Vector3 WorldToScreen(const Math::Vector3& worldPosition);
 
 	/// <summary>
 	///	ターゲットの変更

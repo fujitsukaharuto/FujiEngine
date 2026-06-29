@@ -36,7 +36,7 @@ Boss::~Boss() {
 	ParticleManager::GetSphereEmitter(leftHandAuraCS_).SetEmit(false);
 	ParticleManager::GetSphereEmitter(rightHandAuraCS_).SetEmit(false);
 
-	for (int i = 0; i < 8; i++) {
+	for (int i = 0; i < kChargeCount_; i++) {
 		ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]).SetEmit(false);
 	}
 }
@@ -55,7 +55,7 @@ void Boss::Update() {
 	} else if (isStart_) { // 開始時の召喚処理
 		if (EnergyUpdate()) {
 			startTime_ -= FPSKeeper::DeltaTimeFrame();
-			if (startTime_ > 40.0f && startTime_ < 200.0f) {
+			if (startTime_ > kRoarShakeTimeMin_ && startTime_ < kRoarShakeTimeMax_) {
 				CameraManager::GetInstance()->GetCamera()->IssuanceShake(0.2f, 2.0f);
 				roaringWave_.Emit();
 				roaringParticle_.Emit();
@@ -90,7 +90,7 @@ void Boss::Update() {
 	ParticleManager::GetSphereEmitter(rightHandAuraCS_).SetPos(animeModel_->GetJointWorldPos("mixamorig:RightHand"));
 	animeModel_->AnimationUpdate();
 	shadow_->GetTransform().translate = animeModel_->GetTransform().translate;
-	shadow_->GetTransform().translate.y = 0.15f;
+	shadow_->GetTransform().translate.y = kShadowPosY_;
 	collider_->InfoUpdate();
 }
 
@@ -136,7 +136,7 @@ void Boss::ReStart() {
 	isStart_ = true;
 	isActiveSprite_ = false;
 	isDamageLight_ = false;
-	startTime_ = 300.0f;
+	startTime_ = kStartTime_;
 	animeModel_->ChangeAnimation("roaring");
 	animeModel_->LoadTransformFromJson("boss_transform.json");
 	animeModel_->GetTransform().rotate.y = 3.14f;
@@ -147,24 +147,24 @@ void Boss::ReStart() {
 void Boss::ReduceBossHP(bool isStrong) {
 	if (isHpActive_) {
 		if (isStrong) {
-			bossHp_ -= 4.0f;
+			bossHp_ -= kStrongDamage_;
 		} else {
-			bossHp_ -= 2.0f;
+			bossHp_ -= kNormalDamage_;
 		}
 		isDamageLight_ = true;
 		// フェーズやHPの段階を切り替える為の処理
 		switch (BossHPState(nowHpIndex_)) {
 		case BossHPState::Max:
-			HPColorSet(80.0f, 20.0f);
-			if (bossHp_ < 80.0f) {
-				ChangePhase(80.0f, 1);
+			HPColorSet(kHpThresholdMax_, kHpColorRangeWide_);
+			if (bossHp_ < kHpThresholdMax_) {
+				ChangePhase(kHpThresholdMax_, 1);
 				return;
 			}
 			break;
 		case BossHPState::High:
-			HPColorSet(60.0f, 20.0f);
-			if (bossHp_ < 60.0f) {
-				ChangePhase(60.0f, 1);
+			HPColorSet(kHpThresholdHigh_, kHpColorRangeWide_);
+			if (bossHp_ < kHpThresholdHigh_) {
+				ChangePhase(kHpThresholdHigh_, 1);
 				phaseIndex_++;
 				ParticleManager::GetSphereEmitter(halfAuraCS_).SetEmit(true);
 				ParticleManager::GetSphereEmitter(halfSmallAuraCS_).SetEmit(true);
@@ -174,21 +174,21 @@ void Boss::ReduceBossHP(bool isStrong) {
 			}
 			break;
 		case BossHPState::Half:
-			HPColorSet(40.0f, 20.0f);
-			if (bossHp_ < 40.0f) {
-				ChangePhase(40.0f, 1);
+			HPColorSet(kHpThresholdHalf_, kHpColorRangeWide_);
+			if (bossHp_ < kHpThresholdHalf_) {
+				ChangePhase(kHpThresholdHalf_, 1);
 				return;
 			}
 			break;
 		case BossHPState::Low:
-			HPColorSet(30.0f, 10.0f);
-			if (bossHp_ < 30.0f) {
-				ChangePhase(30.0f, 1);
+			HPColorSet(kHpThresholdLow_, kHpColorRangeNarrow_);
+			if (bossHp_ < kHpThresholdLow_) {
+				ChangePhase(kHpThresholdLow_, 1);
 				return;
 			}
 			break;
 		case BossHPState::Empty:
-			HPColorSet(0.0f, 30.0f);
+			HPColorSet(0.0f, kHpColorRangeEmpty_);
 			break;
 		default:
 			break;
@@ -247,7 +247,7 @@ void Boss::Walk() {
 		// 目標のY軸角度（ラジアン）
 		float targetAngle = std::atan2(dir.x, dir.z); // Z前方軸に対する角度
 
-		Vector3 front = GetFrontOffset(Vector3(0.0f, 0.0f, 1.0f) * 0.05f * FPSKeeper::DeltaTimeFrame(), targetAngle);
+		Vector3 front = GetFrontOffset(Vector3(0.0f, 0.0f, 1.0f) * kWalkSpeed_ * FPSKeeper::DeltaTimeFrame(), targetAngle);
 		animeModel_->GetTransform().translate += front;
 
 		CalcModelDir();
@@ -285,7 +285,7 @@ bool Boss::DushCharge(float& t, float maxT, bool& isNear, float range) {
 	}
 	t += FPSKeeper::DeltaTimeFrame();
 
-	for (int i = 0; i < 8; i++) {
+	for (int i = 0; i < kChargeCount_; i++) {
 		auto& emitter = ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]);
 		emitter.GetData().prevTranslate = traceAnchors_[i]->GetWorldPos();
 
@@ -309,7 +309,7 @@ bool Boss::DushCharge(float& t, float maxT, bool& isNear, float range) {
 		dushStartCircle_.pos_ = emitPos;
 		dushStartParticle_.Emit();
 		dushStartCircle_.Emit();
-		for (int i = 0; i < 8; i++) {
+		for (int i = 0; i < kChargeCount_; i++) {
 			ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]).SetEmit(false);
 		}
 		return true;
@@ -384,7 +384,7 @@ bool Boss::BeamCharge() {
 
 	if (chargeSize_ > 0.0f) {
 		ParticleManager::GetParticleCSEmitterSurface(1).GetData().radius += bp.radiusGrowSpeed * FPSKeeper::DeltaTimeFrame();
-		for (int i = 0; i < 8; i++) {
+		for (int i = 0; i < kChargeCount_; i++) {
 			if (i > 2) {
 				if (!(chargeTime_ < bp.chargeTime - i * 2.0f)) {
 					continue;
@@ -426,7 +426,7 @@ bool Boss::BeamCharge() {
 		chargeTime_ -= FPSKeeper::DeltaTimeFrame();
 	} else if (chargeSize_ <= 0.0f) {
 		result = true;
-		for (int i = 0; i < 8; i++) {
+		for (int i = 0; i < kChargeCount_; i++) {
 			if (chargeParents_[i]->GetTransform().scale.x > 0.0f) { // 完全に真ん中に集結するようにする
 				auto& emitter = ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]);
 				emitter.GetData().prevTranslate = traceAnchors_[i]->GetWorldPos();
@@ -449,7 +449,7 @@ bool Boss::BeamCharge() {
 }
 
 void Boss::BeamChargeComplete() {
-	for (int i = 0; i < 8; i++) {
+	for (int i = 0; i < kChargeCount_; i++) {
 		ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]).SetEmit(false);
 	}
 	charge12_.Emit();
@@ -536,7 +536,7 @@ bool Boss::GetIsDamageLight() {
 }
 
 float Boss::GetChainRate() {
-	return chainRate_ + (chainCount_ - 1) * 0.05f;
+	return chainRate_ + (chainCount_ - 1) * kChainRateStep_;
 }
 
 Math::Vector3 Boss::GetFrontPos() {
@@ -596,15 +596,15 @@ void Boss::LoadPhase() {
 
 void Boss::SetDefaultBehavior(bool isInvisibleItem) {
 	beam_->SetIsLive(false);
-	for (int i = 0; i < 8; i++) {
+	for (int i = 0; i < kChargeCount_; i++) {
 		ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]).SetEmit(false);
 	}
 	ParticleManager::GetParticleCSEmitter(dushTrailIndex_).SetEmit(false);
 	if (isInvisibleItem) {
 		itemManager_->ReStart();
 	}
-	cameraRange_ = -25.0f;
-	cameraFollowSpeed_ = 0.2f;
+	cameraRange_ = kCameraRange_;
+	cameraFollowSpeed_ = kCameraFollowSpeed_;
 	ChangeBehavior(std::make_unique<BossRoot>(this));
 	animeModel_->GetTransform().translate.y = 0.0f;
 	Vector3 dir = pPlayer_->GetWorldPos() - animeModel_->GetTransform().translate;
@@ -612,7 +612,7 @@ void Boss::SetDefaultBehavior(bool isInvisibleItem) {
 	dir = dir.Normalize();
 	// 目標のY軸角度（ラジアン）
 	float targetAngle = std::atan2(dir.x, dir.z); // Z前方軸に対する角度
-	animeModel_->GetTransform().translate += GetFrontOffset(Vector3(0.0f, 0.0f, 1.0f) * 0.05f * FPSKeeper::DeltaTimeFrame(), targetAngle);
+	animeModel_->GetTransform().translate += GetFrontOffset(Vector3(0.0f, 0.0f, 1.0f) * kWalkSpeed_ * FPSKeeper::DeltaTimeFrame(), targetAngle);
 	// 現在のY軸角度（モデルの回転）
 	float currentAngle = animeModel_->GetTransform().rotate.y;
 	// 角度差を -π〜+π にラップ
@@ -730,7 +730,7 @@ void Boss::ChangePhase(float threshold, int indexInc) {
 	animeModel_->ChangeAnimation("hit");
 	animeModel_->IsLoopAnimation(false);
 	RadialSetting();
-	hpCoolTime_ = 60.0f;
+	hpCoolTime_ = kHpCoolTime_;
 	hpSprites_[nowHpIndex_]->SetColor(damageColor1_);
 }
 

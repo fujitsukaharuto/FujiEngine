@@ -37,7 +37,7 @@ void Boss::Initialize() {
 	shadow_->SetColor({ 0.02f,0.02f,0.02f,0.0f });
 	shadow_->SetLightEnable(LightMode::kLightNone);
 	shadow_->GetTransform().translate = animeModel_->GetTransform().translate;
-	shadow_->GetTransform().translate.y = 0.15f;
+	shadow_->GetTransform().translate.y = kShadowPosY_;
 	shadow_->GetTransform().scale = { 3.0f,0.0f,3.0f };
 	shadow_->GetTransform().scale.y = 0.1f;
 
@@ -79,14 +79,14 @@ void Boss::Initialize() {
 }
 
 void Boss::InitParameter() {
-	attackCooldown_ = 120.0f;
-	bossHp_ = 100.0f;
+	attackCooldown_ = kInitAttackCooldown_;
+	bossHp_ = kMaxBossHp_;
 
 	params_.beam.parentRotateStep = std::numbers::pi_v<float>*0.25f;
 	itemManager_ = std::make_unique<BossItemManager>();
 	itemManager_->Initialize(this);
 
-	for (int i = 0; i < 5; i++) {
+	for (int i = 0; i < kHpSegmentCount_; i++) {
 		std::unique_ptr<Sprite> hpTex;
 		hpTex = std::make_unique<Sprite>();
 		hpTex->Load("white2x2.png");
@@ -96,7 +96,7 @@ void Boss::InitParameter() {
 		hpSprites_[i]->SetSize(hpSize_);
 	}
 
-	for (int i = 0; i < 2; i++) {
+	for (int i = 0; i < kHpFrameCount_; i++) {
 		std::unique_ptr<Sprite> hpTex;
 		hpTex = std::make_unique<Sprite>();
 		hpTex->Load("white2x2.png");
@@ -134,10 +134,10 @@ void Boss::InitEmitter() {
 	waveAttack2.frequencyTime_ = 0.0f;
 	waveAttack3.frequencyTime_ = 0.0f;
 	waveAttack4.frequencyTime_ = 0.0f;
-	waveAttack1.pos_.z = 4.0f;
-	waveAttack2.pos_.z = 4.0f;
-	waveAttack3.pos_.z = 4.0f;
-	waveAttack4.pos_.z = 4.0f;
+	waveAttack1.pos_.z = kWaveAttackPosZ_;
+	waveAttack2.pos_.z = kWaveAttackPosZ_;
+	waveAttack3.pos_.z = kWaveAttackPosZ_;
+	waveAttack4.pos_.z = kWaveAttackPosZ_;
 	jumpWave_.frequencyTime_ = 0.0f;
 
 	waveAttack1.isAddRandomSize_ = true;
@@ -196,7 +196,7 @@ void Boss::InitEmitter() {
 
 void Boss::DushInit() {
 	float parentRotate = std::numbers::pi_v<float> *0.25f;
-	for (int i = 0; i < 8; i++) {
+	for (int i = 0; i < kChargeCount_; i++) {
 		if (i != 0 && i != 4) {
 			chargeParents_[i]->GetTransform().rotate.x = Random::GetFloat(-std::numbers::pi_v<float>, std::numbers::pi_v<float>);
 			chargeParents_[i]->GetTransform().rotate.y = Random::GetFloat(-std::numbers::pi_v<float>*0.5f, std::numbers::pi_v<float>*0.5f);
@@ -211,7 +211,7 @@ void Boss::DushInit() {
 		chargeParent->GetTransform().scale = Vector3::FillVec(chargeSize_);
 	}
 
-	for (int i = 0; i < 8; i++) {
+	for (int i = 0; i < kChargeCount_; i++) {
 		auto& emitter = ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]);
 		emitter.SetEmit(true);
 		emitter.GetData().lifeTime = 0.6f;
@@ -227,7 +227,7 @@ void Boss::DushInit() {
 void Boss::InitBeam() {
 	auto& bp = params_.beam;
 	float parentRotate = bp.parentRotateStep;
-	for (int i = 0; i < 8; i++) {
+	for (int i = 0; i < kChargeCount_; i++) {
 		if (i != 0 && i != 4) {
 			chargeParents_[i]->GetTransform().rotate.x = Random::GetFloat(-std::numbers::pi_v<float>, std::numbers::pi_v<float>);
 			chargeParents_[i]->GetTransform().rotate.y = Random::GetFloat(-std::numbers::pi_v<float>*0.5f, std::numbers::pi_v<float>*0.5f);
@@ -244,7 +244,7 @@ void Boss::InitBeam() {
 		chargeParent->GetTransform().scale = Vector3::FillVec(chargeSize_);
 	}
 
-	for (int i = 0; i < 8; i++) {
+	for (int i = 0; i < kChargeCount_; i++) {
 		auto& emitter = ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]);
 		emitter.SetEmit(true);
 		emitter.GetData().lifeTime = bp.emitterLifeTime;
@@ -295,7 +295,7 @@ void Boss::InitSummon() {
 
 void Boss::InitChargeParent() {
 	float parentRotate = std::numbers::pi_v<float> *0.25f;
-	for (int i = 0; i < 8; i++) {// チャージエミッターの親となるもの
+	for (int i = 0; i < kChargeCount_; i++) {// チャージエミッターの親となるもの
 		std::unique_ptr<Object3d> chargeParent;
 		chargeParent = std::make_unique<Object3d>();
 		chargeParent->Create("cube.obj");
@@ -317,7 +317,7 @@ void Boss::InitChargeParent() {
 		chargeParent->GetTransform().rotate.z = parentRotate * i;
 		chargeParents_.push_back(std::move(chargeParent));
 	}
-	for (int i = 0; i < 8; i++) {// ダッシュチャージエミッターの親となるもの
+	for (int i = 0; i < kChargeCount_; i++) {// ダッシュチャージエミッターの親となるもの
 		std::unique_ptr<Object3d> anchor;
 		anchor = std::make_unique<Object3d>();
 		anchor->Create("cube.obj");
@@ -345,7 +345,7 @@ void Boss::InitItemParent() {
 	waveParent_->SetParent(&animeModel_->GetTransform());
 	waveParent_->SetNoneScaleParent(true);
 
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < arrowSpawnNum_; i++) {
 		std::unique_ptr<Object3d> arrowParent;
 
 		arrowParent = std::make_unique<Object3d>();

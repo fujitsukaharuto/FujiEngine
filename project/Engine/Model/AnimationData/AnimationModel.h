@@ -102,7 +102,7 @@ namespace Graphics {
 		/// </summary>
 		/// <param name="m">マトリックス</param>
 		/// <param name="color">色</param>
-		void JointDraw(const Math::Matrix4x4& m, Math::Vector4 color);
+		void JointDraw(const Math::Matrix4x4& m, const Math::Vector4& color);
 
 		//========================================================================*/
 		//* アニメーション補間のためのGetter
