@@ -175,6 +175,15 @@ private:
 	std::vector<std::unique_ptr<Graphics::Sprite>> hpFrame_;
 	Math::Vector3 damageColor_ = { 1.5f,1.5f,5.0f };
 
+	//========================================================================*/
+	//* パラメータ定数（初期値）
+	static constexpr float kMoveSpeed_ = 0.2f;         // 移動速度
+	static constexpr float kJumpSpeed_ = 0.2f;         // ジャンプの初速
+	static constexpr float kSecondJumpSpeed_ = 0.1f;   // 2段ジャンプの初速
+	static constexpr float kGravity_ = 0.005f;         // 重力加速度
+	static constexpr float kMaxFallSpeed_ = 2.0f;      // 最大落下速度
+	static constexpr float kMaxChargeTime_ = 60.0f;    // 最大チャージ時間
+
 	float moveSpeed_ = 0.0f;
 	float jumpSpeed_ = 0.0f;
 	float secondJumpSpeed_ = 0.0f;

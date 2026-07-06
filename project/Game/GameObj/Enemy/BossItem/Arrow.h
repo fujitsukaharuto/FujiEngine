@@ -75,6 +75,19 @@ private:
 
 private:
 
+	//========================================================================*/
+	//* 定数
+	static constexpr float kArrowModelScale_ = 5.0f;         // 矢モデルのスケール
+	static constexpr float kThrowSEVolume_ = 0.2f;           // 発射SEの音量
+	static constexpr float kArrivalRotationLerpRate_ = 0.1f; // 追尾中の回転補間レート
+	static constexpr int   kHitEmitCount_ = 300;             // ヒット時GPUエミッターの生成数
+	static constexpr float kHitEmitLifeTime_ = 0.5f;         // ヒット時GPUエミッターの寿命
+	// Rod（避雷針）
+	static constexpr float kRodFallStartHeight_ = 9.0f;      // 落下開始のY高さ
+	static constexpr float kRodFallEndHeight_ = 1.0f;        // 落下終了(着地)のY高さ
+	static constexpr float kLightningTriggerTime_ = 5.0f;    // 破壊直前に雷を出す残り時間
+	static constexpr float kLightningSpawnHeight_ = 40.0f;   // 雷パーティクルの発生Y高さ
+
 	bool isArrow_ = false;
 	bool isLive_ = false;
 	Math::Vector3 velocity_;

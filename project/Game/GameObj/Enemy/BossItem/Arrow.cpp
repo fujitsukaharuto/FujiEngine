@@ -44,7 +44,7 @@ void Arrow::Initialize() {
 	arrivalWarningPotion_->GetTransform().scale.y = 0.1f;
 
 	velocity_ = { 0.0f,0.0f,0.0f };
-	model_->GetTransform().scale = { 5.0f,5.0f,5.0f };
+	model_->GetTransform().scale = { kArrowModelScale_, kArrowModelScale_, kArrowModelScale_ };
 
 	ParticleManager::Load(spark1_, "lightning");
 	ParticleManager::Load(spark2_, "lightningSphere");
@@ -174,7 +174,7 @@ void Arrow::AnimaTimeUpdate() {
 			model_->GetTransform().rotate.y = 0.0f;
 		if (animationTime_ <= 0.0f) {
 			ParticleManager::GetSphereEmitter(emitterNumber_).SetEmit(true);
-			AudioPlayer::GetInstance()->SoundPlayWave(*throwSE_, 0.2f);
+			AudioPlayer::GetInstance()->SoundPlayWave(*throwSE_, kThrowSEVolume_);
 		}
 	}
 }
@@ -201,7 +201,7 @@ void Arrow::ArrivalTimeUpdate() {
 
 		Quaternion rot = Quaternion::LookRotation(dir);
 		Quaternion prerot = Quaternion::LookRotation(predir);
-		Quaternion newRot = Quaternion::SLerp(prerot, rot, 0.1f);
+		Quaternion newRot = Quaternion::SLerp(prerot, rot, kArrivalRotationLerpRate_);
 
 		model_->GetTransform().rotate = Quaternion::QuaternionToEuler(newRot);
 	} else {
@@ -222,8 +222,8 @@ void Arrow::ArrivalTimeUpdate() {
 
 void Arrow::GPUEmitterSetting() {
 	auto& emitter = ParticleManager::GetSphereEmitter(emitterNumber_);
-	emitter.SetCount(300);
-	emitter.SetLifeTime(0.5f);
+	emitter.SetCount(kHitEmitCount_);
+	emitter.SetLifeTime(kHitEmitLifeTime_);
 	emitter.SetRadius(0.0f);
 	emitter.SetScale({ 1.0f,1.0f,1.0f });
 	emitter.SetColorRandom({1.0f,0.0f,0.0f}, { 1.0f,0.0f,0.0f });
@@ -265,7 +265,7 @@ void Arrow::FallTimeUpdate() {
 			fallTime_ = 0.0f;
 
 		float t = 1.0f - (fallTime_ / maxFallTime_);
-		float fallPos = std::lerp(9.0f, 1.0f, t);
+		float fallPos = std::lerp(kRodFallStartHeight_, kRodFallEndHeight_, t);
 		model_->GetTransform().translate.y = fallPos;
 		if (fallTime_ == 0.0f) {
 			hitParticle_.pos_ = model_->GetTransform().translate;
@@ -294,10 +294,10 @@ void Arrow::BrokeTimeUpdate() {
 			spark2_.Emit();
 			spark3_.Emit();
 		}
-		if (brokeTime_ <= 5.0f) {
+		if (brokeTime_ <= kLightningTriggerTime_) {
 			if (isLightNing_) {
 				spark1_.pos_ = model_->GetTransform().translate;
-				spark1_.pos_.y += 40.0f;
+				spark1_.pos_.y += kLightningSpawnHeight_;
 				spark1_.particleRotate_.y = Random::GetFloat(-std::numbers::pi_v<float>, std::numbers::pi_v<float>);
 
 				spark1_.Emit();

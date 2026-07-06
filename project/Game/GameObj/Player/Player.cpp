@@ -61,12 +61,12 @@ void Player::Initialize() {
 	hpFrame_[1]->SetPos({ hpSprite.hpFrameStartPos.x, hpSprite.hpFrameStartPos.y, 0.0f });
 	hpFrame_[1]->SetSize(hpSprite.hpFrameInSize);
 
-	moveSpeed_ = 0.2f;
-	secondJumpSpeed_ = 0.1f;
-	jumpSpeed_ = 0.2f;
-	gravity_ = 0.005f;
-	maxFallSpeed_ = 2.0f;
-	maxChargeTime_ = 60.0f;
+	moveSpeed_ = kMoveSpeed_;
+	secondJumpSpeed_ = kSecondJumpSpeed_;
+	jumpSpeed_ = kJumpSpeed_;
+	gravity_ = kGravity_;
+	maxFallSpeed_ = kMaxFallSpeed_;
+	maxChargeTime_ = kMaxChargeTime_;
 	avoidEffectTime_ = 0.0f;
 
 	collider_ = std::make_unique<AABBCollider>();
