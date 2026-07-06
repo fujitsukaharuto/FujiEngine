@@ -58,7 +58,7 @@ namespace Graphics {
 		void CreatePipe(Pipe type);
 
 		template<class T>
-		void CreatePipe(Pipe type, std::function<void(T&)> setup);
+		void CreatePipe(Pipe type, const std::function<void(T&)>& setup);
 
 	private:
 
@@ -80,7 +80,7 @@ namespace Graphics {
 	template<class T>
 	void PipelineManager::CreatePipe(
 		Pipe type,
-		std::function<void(T&)> setup
+		const std::function<void(T&)>& setup
 	) {
 		auto pipe = std::make_unique<T>();
 		setup(*pipe);

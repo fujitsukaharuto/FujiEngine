@@ -72,7 +72,7 @@ namespace Core {
 		static void ImGuiDragButton(const char* label, const void* payloadData, size_t payloadSize, const char* payloadType);
 
 		/// <summary>ポップアップを開くボタン</summary>
-		static void ImGuiPopUpButton(const char* buttonLabel, const char* popupName, std::function<void()> contentFunc);
+		static void ImGuiPopUpButton(const char* buttonLabel, const char* popupName, const std::function<void()>& contentFunc);
 #endif // _DEBUG
 
 
@@ -149,7 +149,7 @@ namespace Core {
 		std::vector<std::string> items[2];  // 0: false, 1: true
 		std::string selected[2];
 
-		void Show(std::function<void(const std::string&, bool)> on_move);
+		void Show(const std::function<void(const std::string&, bool)>& on_move);
 #endif // _DEBUG
 	};
 }

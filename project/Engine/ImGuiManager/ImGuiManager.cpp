@@ -185,7 +185,7 @@ void ImGuiManager::ImGuiDragButton(const char* label, const void* payloadData, s
 	}
 #endif // _DEBUG
 }
-void ImGuiManager::ImGuiPopUpButton(const char* buttonLabel, const char* popupName, std::function<void()> contentFunc) {
+void ImGuiManager::ImGuiPopUpButton(const char* buttonLabel, const char* popupName, const std::function<void()>& contentFunc) {
 #ifdef _DEBUGMODE
 	if (ImGui::Button(buttonLabel)) {
 		ImGui::OpenPopup(popupName);
@@ -616,7 +616,7 @@ void ImGuiManager::TextureSelectMenu(NodeGraph* nodeGraph) {
 
 #ifdef _DEBUGMODE
 // ParticleGroup
-void ParticleGroupSelector::Show(std::function<void(const std::string&, bool)> on_move) {
+void ParticleGroupSelector::Show(const std::function<void(const std::string&, bool)>& on_move) {
 
 	const float listBoxHeight = 200.0f;
 

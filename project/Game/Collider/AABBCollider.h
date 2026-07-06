@@ -33,13 +33,13 @@ public:
 	//========================================================================*/
 	//* イベントハンドラの設定
 	void SetCollisionEnterCallback(std::function<void(const ColliderInfo&)> callback) {
-		onCollisionEvents_[static_cast<int>(CollisionState::CollisionEnter)] = callback;
+		onCollisionEvents_[static_cast<int>(CollisionState::CollisionEnter)] = std::move(callback);
 	}
 	void SetCollisionStayCallback(std::function<void(const ColliderInfo&)> callback) {
-		onCollisionEvents_[static_cast<int>(CollisionState::CollisionStay)] = callback;
+		onCollisionEvents_[static_cast<int>(CollisionState::CollisionStay)] = std::move(callback);
 	}
 	void SetCollisionExitCallback(std::function<void(const ColliderInfo&)> callback) {
-		onCollisionEvents_[static_cast<int>(CollisionState::CollisionExit)] = callback;
+		onCollisionEvents_[static_cast<int>(CollisionState::CollisionExit)] = std::move(callback);
 	}
 
 	/// <summary>
