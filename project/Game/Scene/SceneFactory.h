@@ -22,6 +22,7 @@ public:
 	/// シーンの作成を行う
 	/// </summary>
 	std::unique_ptr<BaseScene> CreateScene(const std::string& sceneName) override;
+	std::vector<std::string> GetSceneNames() const override;
 
 private:
 
