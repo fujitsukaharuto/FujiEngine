@@ -35,6 +35,9 @@ void GPUParticleSystem::Initialize(DXCom* pDxcom, SRVManager* srvManager) {
 	InitGPUEmitter();
 	InitGPUEmitterSurface("DeadTree_2.obj");
 	InitGPUEmitterSurface("BeamCrystal.obj");
+	InitGPUEmitterSurface("Terrain_1783481558545.obj");
+	InitGPUEmitterSurface("Terrain_1783481558545.obj");
+	InitGPUEmitterSurface("Terrain_1783481558545.obj");
 	csEmitters_[0].emitter->Load("titleDefault");
 	csEmitters_[0].emitter->Emit();// 初回に一度エミットしておく
 }
