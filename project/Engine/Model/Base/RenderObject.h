@@ -35,6 +35,9 @@ namespace Graphics {
 		Math::Trans& GetTransform() { return transform_; }
 		Math::Matrix4x4 GetWorldMat() const;
 		Math::Vector3 GetWorldPos()const;
+		/// <summary>マテリアルの取得</summary>
+		Material& GetMaterial(size_t index = 0) { return material_[index]; }
+		size_t GetMaterialCount() const { return material_.size(); }
 
 		//========================================================================*/
 		//* Setter

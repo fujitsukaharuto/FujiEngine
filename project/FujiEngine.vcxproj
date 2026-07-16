@@ -180,6 +180,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Editor\CreateObjCommand.cpp" />
     <ClCompile Include="Engine\Editor\DeleteObjCommand.cpp" />
     <ClCompile Include="Engine\Editor\JsonSerializer.cpp" />
+    <ClCompile Include="Engine\Editor\Object3dEditor.cpp" />
     <ClCompile Include="Engine\GlobalVariables\GlobalVariables.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\AnimationPipeline.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\BaseGridPipe.cpp" />
@@ -326,6 +327,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Editor\DeleteObjCommand.h" />
     <ClInclude Include="Engine\Editor\ICommand.h" />
     <ClInclude Include="Engine\Editor\JsonSerializer.h" />
+    <ClInclude Include="Engine\Editor\Object3dEditor.h" />
     <ClInclude Include="Engine\Editor\PropertyCommand.h" />
     <ClInclude Include="Engine\GlobalVariables\GlobalVariables.h" />
     <ClInclude Include="Engine\GraphicPipeline\AnimationPipeline.h" />

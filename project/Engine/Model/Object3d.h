@@ -1,6 +1,7 @@
 #pragma once
 #include <wrl/client.h>
 #include <string>
+#include <memory>
 #include "Engine/Model/Base/RenderObject.h"
 #include "Engine/Editor/JsonSerializer.h"
 #if 0 // TODO: Node機能はPhase2のエディタ分離時に再設計して復活させる
@@ -13,6 +14,10 @@
 #endif
 #endif
 
+
+namespace Editor {
+	class Object3dEditor;
+}
 
 namespace Graphics {
 	/// <summary>
@@ -78,9 +83,6 @@ namespace Graphics {
 
 	private:
 
-		/// <summary>コマンドの生成</summary>
-		void CreatePropertyCommand(int type);
-
 #if 0 // TODO: Node機能はPhase2のエディタ分離時に再設計して復活させる
 		void NodeContentsUpdate();
 
@@ -101,11 +103,9 @@ namespace Graphics {
 		std::vector<NodeContent> nodeContentData_;
 #endif
 
-		Math::Vector3 prevPos_;
-		Math::Vector3 prevRotate_;
-		Math::Vector3 prevScale_;
-		int gizmoType_ = 0;
-		float IsUsingGizmo_ = false;
+#ifdef _DEBUGMODE
+		std::unique_ptr<Editor::Object3dEditor> editor_;
+#endif // _DEBUGMODE
 #if 0 // TODO: Node機能はPhase2のエディタ分離時に再設計して復活させる
 		std::string nodeFileName_;
 #ifdef _DEBUGMODE

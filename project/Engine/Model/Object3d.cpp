@@ -6,15 +6,9 @@
 #include "Engine/DX/DX12Helper.h"
 #include "LightManager.h"
 #include "CameraManager.h"
-#include "Engine/ImGuiManager/ImGuiManager.h"
-#include "Engine/Editor/CommandManager.h"
-#include "Engine/Editor/PropertyCommand.h"
 #ifdef _DEBUGMODE
-#include "ImGuizmo.h"
-#if 0 // TODO: Node機能はPhase2のエディタ分離時に再設計して復活させる
-namespace ed = ax::NodeEditor;
-#endif
-#endif // _DEBUG
+#include "Engine/Editor/Object3dEditor.h"
+#endif // _DEBUGMODE
 
 using namespace Core;
 using namespace Graphics;
@@ -24,6 +18,9 @@ using namespace Math;
 Object3d::Object3d() {
 	dxcommon_ = ModelManager::GetInstance()->ShareDXCom();
 	lightManager_ = ModelManager::GetInstance()->ShareLight();
+#ifdef _DEBUGMODE
+	editor_ = std::make_unique<Editor::Object3dEditor>();
+#endif // _DEBUGMODE
 }
 
 Object3d::~Object3d() {
@@ -185,236 +182,10 @@ void Object3d::MeshDraw(Material* mate, int drawCount) {
 
 void Object3d::DebugGUI() {
 #ifdef _DEBUGMODE
-	ImGui::Indent();
-	if (ModelManager::GetInstance()->GetPickedID() == objIDData_->objID && objIDData_->objID != -1) {
-		ImGui::SetNextItemOpen(true, ImGuiCond_Always);
+	if (editor_) {
+		editor_->DrawGUI(*this);
 	}
-	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Selected;
-	if (ImGui::TreeNodeEx("Trans", flags)) {
-		ImGui::DragFloat3("position", &transform_.translate.x, 0.01f);
-		CreatePropertyCommand(0);
-		ImGui::DragFloat3("rotate", &transform_.rotate.x, 0.01f);
-		CreatePropertyCommand(1);
-		ImGui::DragFloat3("scale", &transform_.scale.x, 0.01f);
-		CreatePropertyCommand(2);
-
-		ImGui::Separator();
-		ImGui::RadioButton("TRANSLATE", &gizmoType_, 0); ImGui::SameLine();
-		ImGui::RadioButton("ROTATE", &gizmoType_, 1); ImGui::SameLine();
-		ImGui::RadioButton("SCALE", &gizmoType_, 2);
-		JsonSerializer::ShowSaveTransformPopup(transform_); ImGui::SameLine();
-		JsonSerializer::ShowLoadTransformPopup(transform_);
-		ImGuizmo::OPERATION operation;
-		switch (gizmoType_) {
-		case 0: operation = ImGuizmo::TRANSLATE; break;
-		case 1: operation = ImGuizmo::ROTATE;    break;
-		case 2: operation = ImGuizmo::SCALE;     break;
-		default: operation = ImGuizmo::TRANSLATE; break; // デフォルト安全策
-		}
-
-		// ギズモの表示
-		Matrix4x4 model = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
-		if (transform_.parent) {
-			const Matrix4x4 parentWorld = transform_.parent->GetWorldMat();
-			model = Multiply(model, transform_.isNoneScaleParent ? Math::RemoveScale(parentWorld) : parentWorld);
-		}
-
-		Matrix4x4 view;
-		Matrix4x4 proj;
-		view = CameraManager::GetInstance()->GetCamera()->GetViewMatrix();
-		proj = CameraManager::GetInstance()->GetCamera()->GetProjectionMatrix();
-
-		ImGuizmo::Manipulate(
-			&view.m[0][0], &proj.m[0][0],         // カメラ
-			operation,                            // 操作モード
-			ImGuizmo::WORLD,                      // ローカル座標系
-			&model.m[0][0]                        // 行列
-		);
-
-		// 編集中なら Transform に反映
-		if (ImGuizmo::IsUsing()) {
-			if (!IsUsingGizmo_) {
-				prevPos_ = transform_.translate;
-				prevRotate_ = transform_.rotate;
-				prevScale_ = transform_.scale;
-			}
-			IsUsingGizmo_ = true;
-
-			Vector3 t, r, s;
-			ImGuizmo::DecomposeMatrixToComponents(&model.m[0][0], &t.x, &r.x, &s.x);
-			constexpr float DegToRad = 3.14159265f / 180.0f;
-			r = r * DegToRad;
-
-			if (transform_.parent) {
-				// 親ワールド行列（スケールあり or スケールなし）
-				Matrix4x4 parentMatrix = transform_.parent->GetWorldMat();
-				if (transform_.isNoneScaleParent) {
-					parentMatrix = Math::RemoveScale(parentMatrix);
-				}
-
-				// ワールド→ローカル変換
-				Matrix4x4 invParentMatrix = Inverse(parentMatrix);
-
-				Matrix4x4 worldMatrix = MakeAffineMatrix(s, r, t);
-				Matrix4x4 localMatrix = Multiply(worldMatrix, invParentMatrix);
-
-				ImGuizmo::DecomposeMatrixToComponents(&localMatrix.m[0][0], &transform_.translate.x, &transform_.rotate.x, &transform_.scale.x);
-				transform_.rotate = transform_.rotate * DegToRad;
-			} else {
-				transform_.translate = t;
-				transform_.rotate = r;
-				transform_.scale = s;
-			}
-		} else if (IsUsingGizmo_) {
-			// 編集終了検出 → Command 発行
-			if (transform_.translate != prevPos_) {
-				auto command = std::make_unique<PropertyCommand<Vector3>>(
-					transform_, &Trans::translate, prevPos_, transform_.translate);
-				CommandManager::GetInstance()->Execute(std::move(command));
-			} else if (transform_.rotate != prevRotate_) {
-				auto command = std::make_unique<PropertyCommand<Vector3>>(
-					transform_, &Trans::rotate, prevRotate_, transform_.rotate);
-				CommandManager::GetInstance()->Execute(std::move(command));
-			} else if (transform_.scale != prevScale_) {
-				auto command = std::make_unique<PropertyCommand<Vector3>>(
-					transform_, &Trans::scale, prevScale_, transform_.scale);
-				CommandManager::GetInstance()->Execute(std::move(command));
-			}
-
-			IsUsingGizmo_ = false; // フラグリセット
-		}
-
-		ImGui::TreePop();
-	}
-
-	if (ImGui::TreeNodeEx("color", flags)) {
-		Vector4 color = material_[0].GetColor();
-		ImGui::ColorEdit4("color", &color.x);
-		SetColor(color);
-		Vector2 uvScale = material_[0].GetUVScale();
-		Vector2 uvTrans = material_[0].GetUVTrans();
-		ImGui::DragFloat2("uvScale", &uvScale.x, 0.1f);
-		ImGui::DragFloat2("uvTrans", &uvTrans.x, 0.1f);
-		SetUVScale(uvScale, uvTrans);
-#if 0 // TODO: Node機能はPhase2のエディタ分離時に再設計して復活させる
-		if (nodeEditorContext_) {
-			if (ImGui::Button("MaterialSetting")) {
-				ImGui::OpenPopup("Material Window");
-			}
-			ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-			ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-			if (ImGui::BeginPopupModal("Material Window", NULL)) {
-				isUseNodeGraph_ = true;
-				SetTextureNode();
-				ImGui::Separator();
-				if (ImGui::Button("OK", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
-				ImGui::SetItemDefaultFocus();
-				ImGui::SameLine();
-				if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
-				ImGui::SameLine();
-				if (ImGui::Button("Save", ImVec2(120, 0))) { JsonSerializer::SerializeJsonData(nodeGraph_.SaveNodeData(), nodeFileName_); }
-				ImGui::EndPopup();
-			} else {
-				isUseNodeGraph_ = false;
-			}
-		} else {
-			ImGui::SeparatorText("Add New NodeEditor");
-			// 静的入力バッファ（入力欄）
-			static char newEditorName[64] = "NewEditor";
-
-			ImGui::InputText("Editor Name", newEditorName, sizeof(newEditorName));
-
-			// 追加ボタンが押されたら
-			if (ImGui::Button("Add")) {
-				std::string newname = "resource/NodeEditorData/";
-				CreateNodeEditor(newname+newEditorName + ".json");
-				// 入力欄クリア
-				std::memset(newEditorName, 0, sizeof(newEditorName));
-				strcpy_s(newEditorName, "NewEditor");
-			}
-		}
-#endif
-		ImGui::TreePop();
-	}
-
-	if (ImGui::TreeNodeEx("normalMap", flags)) {
-		bool useNormal = bool(material_[0].GetUseNormalMap());
-		ImGui::Checkbox("UseNormalMap", &useNormal);
-		material_[0].SetUseNormalMap(int32_t(useNormal));
-		if (ImGui::Button("TextureFile")) {
-			ImGui::OpenPopup("TextureFile Window");
-		}
-		ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-		ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-		ImGui::PushStyleColor(ImGuiCol_ModalWindowDimBg, ImVec4(0, 0, 0, 0.25f));
-		if (ImGui::BeginPopupModal("TextureFile Window", NULL)) {
-			if (ImGui::Button("Refresh")) {
-				TextureManager::GetInstance()->LoadTextureFile(true);
-			}
-			int buttonCount = 0;
-			for (const auto& TexName : TextureManager::GetInstance()->GetTextureFiles()) {
-				if (buttonCount > 0 && buttonCount < 5) {
-					ImGui::SameLine();
-				} else {
-					buttonCount = 0;
-				}
-				if (ImGui::ImageButton(("##" + TexName.first).c_str(), (ImTextureID)TextureManager::GetInstance()->GetTexture(TexName.first.c_str())->gpuHandle.ptr, ImVec2(100, 100))) {
-					material_[0].SetNormalMap(TexName.first.c_str(), TexName.second);
-					if (TexName.second) {
-						TextureManager::GetInstance()->SetTextureFileOnceLoad(TexName.first.c_str());
-					}
-				}
-				buttonCount++;
-			}
-			ImGui::Separator();
-			if (ImGui::Button("OK", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
-			ImGui::SetItemDefaultFocus();
-			ImGui::SameLine();
-			if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
-			ImGui::EndPopup();
-		}
-		ImGui::PopStyleColor();
-		ImGui::TreePop();
-	}
-
-	if (ImGui::TreeNodeEx("SetModel", flags)) {
-
-		if (ImGui::Button("ModelFile")) {
-			ImGui::OpenPopup("ModelFile Window");
-		}
-		ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-		ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-		if (ImGui::BeginPopupModal("ModelFile Window", NULL)) {
-			if (ImGui::Button("Refresh")) {
-				ModelManager::GetInstance()->LoadModelFile(true);
-			}
-			int buttonCount = 0;
-			for (const auto& modelName : ModelManager::GetInstance()->GetModelFiles()) {
-				if (buttonCount > 0 && buttonCount < 5) {
-					ImGui::SameLine();
-				} else {
-					buttonCount = 0;
-				}
-				if (ImGui::Button(modelName.first.c_str(), ImVec2(100, 100))) {
-					SetModel(modelName.first.c_str(), modelName.second);
-					if (modelName.second) {
-						ModelManager::GetInstance()->SetModelFileOnceLoad(modelName.first.c_str());
-					}
-				}
-				buttonCount++;
-			}
-			ImGui::Separator();
-			if (ImGui::Button("OK", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
-			ImGui::SetItemDefaultFocus();
-			ImGui::SameLine();
-			if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
-			ImGui::EndPopup();
-		}
-
-		ImGui::TreePop();
-	}
-	ImGui::Unindent();
-#endif // _DEBUG
+#endif // _DEBUGMODE
 }
 
 void Object3d::LoadTransformFromJson(const std::string& filename) {
@@ -486,36 +257,6 @@ void Object3d::SetTexture(const std::string& name) {
 
 void Object3d::SetEditorObjParameter() {
 	objIDData_->objID += 1000;
-}
-
-void Object3d::CreatePropertyCommand(int type) {
-#ifdef _DEBUGMODE
-	if (ImGui::IsItemActivated()) {
-		switch (type) {
-		case 0: prevPos_ = transform_.translate; break;
-		case 1: prevRotate_ = transform_.rotate;    break;
-		case 2: prevScale_ = transform_.scale;     break;
-		default: break;
-		}
-	}
-	if (ImGui::IsItemDeactivatedAfterEdit()) { // 編集完了検出
-		switch (type) {
-		case 0:
-			CommandManager::TryCreatePropertyCommand(transform_, prevPos_, transform_.translate, &Trans::translate);
-			prevPos_ = transform_.translate;
-			break;
-		case 1:
-			CommandManager::TryCreatePropertyCommand(transform_, prevRotate_, transform_.rotate, &Trans::rotate);
-			prevRotate_ = transform_.rotate;
-			break;
-		case 2:
-			CommandManager::TryCreatePropertyCommand(transform_, prevScale_, transform_.scale, &Trans::scale);
-			prevScale_ = transform_.scale;
-			break;
-		default: break;
-		}
-	}
-#endif // _DEBUG
 }
 
 #if 0 // TODO: Node機能はPhase2のエディタ分離時に再設計して復活させる
