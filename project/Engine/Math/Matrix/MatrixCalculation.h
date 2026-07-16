@@ -151,6 +151,9 @@ namespace Math {
 	/// </summary>
 	Matrix4x4 Inverse(const Matrix4x4& matrix);
 
+	/// <summary>行列からスケール成分を除去した行列を返す</summary>
+	Matrix4x4 RemoveScale(const Matrix4x4& m);
+
 	/// <summary>
 	/// 単位行列を生成する。
 	/// </summary>

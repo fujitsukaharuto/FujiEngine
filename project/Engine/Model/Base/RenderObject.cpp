@@ -21,42 +21,7 @@ RenderObject::~RenderObject() {
 }
 
 Matrix4x4 RenderObject::GetWorldMat() const {
-	Matrix4x4 worldMatrix = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
-
-	if (transform_.parent) {
-		if (transform_.isNoneScaleParent) {
-			const Matrix4x4& parentWorldMatrix = transform_.parent->GetWorldMat();
-			// スケール成分を除去した親ワールド行列を作成
-			Matrix4x4 noScaleParentMatrix = parentWorldMatrix;
-
-			// 各軸ベクトルの長さ（スケール）を計算
-			Vector3 xAxis = { parentWorldMatrix.m[0][0], parentWorldMatrix.m[1][0], parentWorldMatrix.m[2][0] };
-			Vector3 yAxis = { parentWorldMatrix.m[0][1], parentWorldMatrix.m[1][1], parentWorldMatrix.m[2][1] };
-			Vector3 zAxis = { parentWorldMatrix.m[0][2], parentWorldMatrix.m[1][2], parentWorldMatrix.m[2][2] };
-
-			float xLen = Vector3::Length(xAxis);
-			float yLen = Vector3::Length(yAxis);
-			float zLen = Vector3::Length(zAxis);
-
-			// 正規化（スケールを除去）
-			for (int i = 0; i < 3; ++i) {
-				noScaleParentMatrix.m[i][0] /= xLen;
-				noScaleParentMatrix.m[i][1] /= yLen;
-				noScaleParentMatrix.m[i][2] /= zLen;
-			}
-
-			// 変換はそのまま（位置は影響受けてOKなら）
-			worldMatrix = Multiply(worldMatrix, noScaleParentMatrix);
-		} else {
-			const Matrix4x4& parentWorldMatrix = transform_.parent->GetWorldMat();
-			worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
-		}
-	} else if (transform_.isCameraParent) {
-		const Matrix4x4& parentWorldMatrix = camera_->GetWorldMatrix();
-		worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
-	}
-
-	return worldMatrix;
+	return transform_.GetWorldMat();
 }
 
 Vector3 RenderObject::GetWorldPos() const {
@@ -133,64 +98,13 @@ void RenderObject::SetWVP() {
 
 
 	if (transform_.parent) {
-		if (transform_.isNoneScaleParent) {
-			const Matrix4x4& parentWorldMatrix = transform_.parent->GetWorldMat();
-			// スケール成分を除去した親ワールド行列を作成
-			Matrix4x4 noScaleParentMatrix = parentWorldMatrix;
-
-			// 各軸ベクトルの長さ（スケール）を計算
-			Vector3 xAxis = { parentWorldMatrix.m[0][0], parentWorldMatrix.m[1][0], parentWorldMatrix.m[2][0] };
-			Vector3 yAxis = { parentWorldMatrix.m[0][1], parentWorldMatrix.m[1][1], parentWorldMatrix.m[2][1] };
-			Vector3 zAxis = { parentWorldMatrix.m[0][2], parentWorldMatrix.m[1][2], parentWorldMatrix.m[2][2] };
-
-			float xLen = Vector3::Length(xAxis);
-			float yLen = Vector3::Length(yAxis);
-			float zLen = Vector3::Length(zAxis);
-
-			// 正規化（スケールを除去）
-			for (int i = 0; i < 3; ++i) {
-				noScaleParentMatrix.m[i][0] /= xLen;
-				noScaleParentMatrix.m[i][1] /= yLen;
-				noScaleParentMatrix.m[i][2] /= zLen;
-			}
-
-			// 変換はそのまま（位置は影響受けてOKなら）
-			worldMatrix = Multiply(worldMatrix, noScaleParentMatrix);
-		} else {
-			const Matrix4x4& parentWorldMatrix = transform_.parent->GetWorldMat();
-			worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
-		}
+		const Matrix4x4 parentWorld = transform_.parent->GetWorldMat();
+		worldMatrix = Multiply(worldMatrix, transform_.isNoneScaleParent ? Math::RemoveScale(parentWorld) : parentWorld);
 	} else if (transform_.animeParent) {
-		if (transform_.isNoneScaleParent) {
-			const Matrix4x4& parentWorldMatrix = *transform_.animeParent;
-			// スケール成分を除去した親ワールド行列を作成
-			Matrix4x4 noScaleParentMatrix = parentWorldMatrix;
-
-			// 各軸ベクトルの長さ（スケール）を計算
-			Vector3 xAxis = { parentWorldMatrix.m[0][0], parentWorldMatrix.m[1][0], parentWorldMatrix.m[2][0] };
-			Vector3 yAxis = { parentWorldMatrix.m[0][1], parentWorldMatrix.m[1][1], parentWorldMatrix.m[2][1] };
-			Vector3 zAxis = { parentWorldMatrix.m[0][2], parentWorldMatrix.m[1][2], parentWorldMatrix.m[2][2] };
-
-			float xLen = Vector3::Length(xAxis);
-			float yLen = Vector3::Length(yAxis);
-			float zLen = Vector3::Length(zAxis);
-
-			// 正規化（スケールを除去）
-			for (int i = 0; i < 3; ++i) {
-				noScaleParentMatrix.m[i][0] /= xLen;
-				noScaleParentMatrix.m[i][1] /= yLen;
-				noScaleParentMatrix.m[i][2] /= zLen;
-			}
-
-			// 変換はそのまま（位置は影響受けてOKなら）
-			worldMatrix = Multiply(worldMatrix, noScaleParentMatrix);
-		} else {
-			const Matrix4x4& parentWorldMatrix = *transform_.animeParent;
-			worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
-		}
+		const Matrix4x4& parentWorld = *transform_.animeParent;
+		worldMatrix = Multiply(worldMatrix, transform_.isNoneScaleParent ? Math::RemoveScale(parentWorld) : parentWorld);
 	} else if (transform_.isCameraParent) {
-		const Matrix4x4& parentWorldMatrix = camera_->GetWorldMatrix();
-		worldMatrix = Multiply(worldMatrix, parentWorldMatrix);
+		worldMatrix = Multiply(worldMatrix, camera_->GetWorldMatrix());
 	}
 
 
