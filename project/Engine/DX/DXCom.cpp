@@ -180,7 +180,7 @@ void DXCom::ClearDepthBuffer() {
 	command_->GetList()->ClearDepthStencilView(swapChainManager_->GetDSVHandle(frameIndex), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 }
 
-void DXCom::OffscreenUpDate() {
+void DXCom::OffscreenUpdate() {
 	offscreen_->Update();
 }
 

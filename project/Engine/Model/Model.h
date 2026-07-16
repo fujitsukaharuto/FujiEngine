@@ -50,7 +50,7 @@ struct JointWeightData {
 /// </summary>
 struct ModelMesh {
 	std::vector<Graphics::VertexData> vertices;
-	std::vector<uint32_t> indicies;
+	std::vector<uint32_t> indices;
 	MaterialDataPath material;
 	Math::Vector4 baseColor = { 1.0f,1.0f,1.0f,1.0f };
 };
@@ -61,7 +61,7 @@ struct ModelMesh {
 struct ModelData {
 	std::map<std::string, JointWeightData> skinClusterData;
 	std::vector<Graphics::VertexData> vertices;
-	std::vector<uint32_t> indicies;
+	std::vector<uint32_t> indices;
 	MaterialDataPath material;
 	Node rootNode;
 	std::vector<ModelMesh> meshes;

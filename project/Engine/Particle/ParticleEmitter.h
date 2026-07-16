@@ -85,7 +85,7 @@ public:
 	void SetParent(Math::Trans* parent) { parent_ = parent; }
 	/// <summary>アニメーションモデルにペアレントする設定</summary>
 	void SetAnimeParent(Math::Matrix4x4* parent) { animeParent_ = parent; }
-	void SetIsUpdatedMatrix(bool is) { isUpDatedMatrix_ = is; }
+	void SetIsUpdatedMatrix(bool is) { isUpdatedMatrix_ = is; }
 	void SetGroup(IParticleGroup* group) { group_ = group; }
 	
 	//========================================================================*/
@@ -93,7 +93,7 @@ public:
 	Math::Vector3 GetWorldPos(const Math::Vector3& offset = { 0.0f,0.0f,0.0f });
 	Math::Matrix4x4 GetParentMatrix();
 	bool HaveParent() { return parent_ ? true : false; }
-	bool GetIsUpdatedMatrix() { return isUpDatedMatrix_; }
+	bool GetIsUpdatedMatrix() { return isUpdatedMatrix_; }
 
 	std::string name_;
 	Math::Vector3 pos_;
@@ -132,7 +132,7 @@ private:
 	Math::Trans* parent_ = nullptr;
 	Math::Matrix4x4* animeParent_ = nullptr;
 
-	bool isUpDatedMatrix_ = false;
+	bool isUpdatedMatrix_ = false;
 
 	float perDistance_ = 0.05f;
 

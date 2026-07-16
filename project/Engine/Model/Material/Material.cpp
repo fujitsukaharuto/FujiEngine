@@ -29,16 +29,16 @@ void Material::Finalize() {
 void Material::CreateMaterial() {
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
 		materialResource_[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(MaterialData));
-		materialDateGPU_[i] = nullptr;
-		materialResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&materialDateGPU_[i]));
+		materialDataGPU_[i] = nullptr;
+		materialResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&materialDataGPU_[i]));
 	}
 
 	//色変えるやつ（Resource）
-	materialDate_.color = Colors::White;
-	materialDate_.enableLighting = static_cast<int32_t>(LightMode::kPointLightON);
-	materialDate_.uvTransform = MakeIdentity4x4();
-	materialDate_.environmentCoefficient = 0.0f;
-	materialDate_.useNormalMap = 0;
+	materialData_.color = Colors::White;
+	materialData_.enableLighting = static_cast<int32_t>(LightMode::kPointLightON);
+	materialData_.uvTransform = MakeIdentity4x4();
+	materialData_.environmentCoefficient = 0.0f;
+	materialData_.useNormalMap = 0;
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
 		CopyData(i);
 	}
@@ -70,7 +70,7 @@ ID3D12Resource* Material::GetMaterialResource() {
 }
 
 Vector4 Material::GetColor() {
-	return materialDate_.color;
+	return materialData_.color;
 }
 
 void Material::SetTextureNamePath(const std::string& pathName) {
@@ -78,7 +78,7 @@ void Material::SetTextureNamePath(const std::string& pathName) {
 }
 
 void Material::SetColor(const Math::Vector4& color) {
-	materialDate_.color = color;
+	materialData_.color = color;
 }
 
 void Material::SetUVScale(const Vector2& scale, const Vector2& uvTrans) {
@@ -87,16 +87,16 @@ void Material::SetUVScale(const Vector2& scale, const Vector2& uvTrans) {
 	scale_ = scale;
 	uvTrans_ = uvTrans;
 
-	materialDate_.uvTransform = MakeIdentity4x4();
-	materialDate_.uvTransform = Multiply(uvTransMatrix, uvScaleMatrix);
+	materialData_.uvTransform = MakeIdentity4x4();
+	materialData_.uvTransform = Multiply(uvTransMatrix, uvScaleMatrix);
 }
 
 void Material::SetUVTrans(const Vector2& uvTrans) {
 	Matrix4x4 uvScaleMatrix = MakeScale4x4(Vector3(scale_.x, scale_.y, 1.0f));
 	Matrix4x4 uvTransMatrix = MakeTranslateMatrix(Vector3(uvTrans.x, uvTrans.y, 0.0f));
 	uvTrans_ = uvTrans;
-	materialDate_.uvTransform = MakeIdentity4x4();
-	materialDate_.uvTransform = Multiply(uvTransMatrix, uvScaleMatrix);
+	materialData_.uvTransform = MakeIdentity4x4();
+	materialData_.uvTransform = Multiply(uvTransMatrix, uvScaleMatrix);
 }
 
 void Material::SetTexture(const std::string& name, bool overWrite) {
@@ -111,31 +111,31 @@ void Material::SetNormalMap(const std::string& name, bool overWrite) {
 		TextureManager::GetInstance()->Load(name, overWrite);
 	}
 	normalMap_ = TextureManager::GetInstance()->GetTexture(name);
-	materialDate_.useNormalMap = 1;
+	materialData_.useNormalMap = 1;
 }
 
 void Material::SetLightEnable(LightMode mode) {
-	materialDate_.enableLighting = static_cast<int32_t>(mode);
+	materialData_.enableLighting = static_cast<int32_t>(mode);
 }
 
 void Graphics::Material::SetShininess(float shininess) {
-	materialDate_.shininess = shininess;
+	materialData_.shininess = shininess;
 }
 
 void Material::SetEnvironment(float env) {
-	materialDate_.environmentCoefficient = env;
+	materialData_.environmentCoefficient = env;
 }
 
 void Material::CopyData(uint32_t frameIndex) {
-	materialDateGPU_[frameIndex]->color = materialDate_.color;
-	materialDateGPU_[frameIndex]->enableLighting = materialDate_.enableLighting;
-	materialDateGPU_[frameIndex]->uvTransform = materialDate_.uvTransform;
-	materialDateGPU_[frameIndex]->shininess = materialDate_.shininess;
-	materialDateGPU_[frameIndex]->AlphaRef = materialDate_.AlphaRef;
-	materialDateGPU_[frameIndex]->environmentCoefficient = materialDate_.environmentCoefficient;
-	materialDateGPU_[frameIndex]->useNormalMap = materialDate_.useNormalMap;
-	materialDateGPU_[frameIndex]->textureIndex = texture_ ? texture_->srvIndex : 0;
-	materialDateGPU_[frameIndex]->normalMapIndex = normalMap_ ? normalMap_->srvIndex : 0;
+	materialDataGPU_[frameIndex]->color = materialData_.color;
+	materialDataGPU_[frameIndex]->enableLighting = materialData_.enableLighting;
+	materialDataGPU_[frameIndex]->uvTransform = materialData_.uvTransform;
+	materialDataGPU_[frameIndex]->shininess = materialData_.shininess;
+	materialDataGPU_[frameIndex]->AlphaRef = materialData_.AlphaRef;
+	materialDataGPU_[frameIndex]->environmentCoefficient = materialData_.environmentCoefficient;
+	materialDataGPU_[frameIndex]->useNormalMap = materialData_.useNormalMap;
+	materialDataGPU_[frameIndex]->textureIndex = texture_ ? texture_->srvIndex : 0;
+	materialDataGPU_[frameIndex]->normalMapIndex = normalMap_ ? normalMap_->srvIndex : 0;
 }
 
 Matrix4x4 Material::MakeScale4x4(const Vector3& scale) {

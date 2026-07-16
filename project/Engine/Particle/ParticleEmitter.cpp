@@ -287,7 +287,7 @@ void ParticleEmitter::Emit() {
 			}
 		}
 		if (grain_.isParent_) {
-			isUpDatedMatrix_ = true;
+			isUpdatedMatrix_ = true;
 		}
 
 

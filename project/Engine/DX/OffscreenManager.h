@@ -261,7 +261,7 @@ namespace Graphics {
 
 		ComPtr<ID3D12Resource> vertexResource_ = nullptr;
 		D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
-		GrayscaleVertex* vertexDate_ = nullptr;
+		GrayscaleVertex* vertexData_ = nullptr;
 
 		std::vector<PostEffectPass> postEffects_;
 		std::vector<PostEffectPass> validPostEffects_;

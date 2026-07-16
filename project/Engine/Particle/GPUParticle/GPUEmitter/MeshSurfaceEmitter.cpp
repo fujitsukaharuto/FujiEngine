@@ -28,29 +28,29 @@ MeshSurfaceEmitter::MeshSurfaceEmitter(DXCom* dx) {
 void MeshSurfaceEmitter::InitMeshData(const std::string& fileName, DXCom* dx, SRVManager* srv) {
 	ModelData data = ModelManager::GetInstance()->FindModel(fileName);
 	verticesResource = DXC::Helper::CreateBufferResource(dx->GetDevice(), (sizeof(VertexData) * data.vertices.size()));
-	indicesResource = DXC::Helper::CreateBufferResource(dx->GetDevice(), (sizeof(uint32_t) * data.indicies.size()));
+	indicesResource = DXC::Helper::CreateBufferResource(dx->GetDevice(), (sizeof(uint32_t) * data.indices.size()));
 	VertexData* vtx = nullptr;
 	verticesResource->Map(0, nullptr, reinterpret_cast<void**>(&vtx));
 	memcpy(vtx, data.vertices.data(), sizeof(VertexData) * data.vertices.size());
 	verticesResource->Unmap(0, nullptr);
 	uint32_t* idx = nullptr;
 	indicesResource->Map(0, nullptr, reinterpret_cast<void**>(&idx));
-	memcpy(idx, data.indicies.data(), sizeof(uint32_t) * data.indicies.size());
+	memcpy(idx, data.indices.data(), sizeof(uint32_t) * data.indices.size());
 	indicesResource->Unmap(0, nullptr);
 
 	verticesIndex = srv->Allocate();
 	indicesIndex = srv->Allocate();
 	srv->CreateStructuredSRV(verticesIndex, verticesResource.Get(), static_cast<UINT>(data.vertices.size()), sizeof(VertexData));
-	srv->CreateStructuredSRV(indicesIndex, indicesResource.Get(), static_cast<UINT>(data.indicies.size()), sizeof(uint32_t));
+	srv->CreateStructuredSRV(indicesIndex, indicesResource.Get(), static_cast<UINT>(data.indices.size()), sizeof(uint32_t));
 
 	// 面積リストとCDFを作る
 	std::vector<float> triangleAreas;
-	triangleAreas.reserve(data.indicies.size() / 3);// ポリゴンの頂点数
+	triangleAreas.reserve(data.indices.size() / 3);// ポリゴンの頂点数
 	float totalArea = 0.0f;
-	for (size_t i = 0; i < data.indicies.size(); i += 3) {
-		uint32_t i0 = data.indicies[i + 0];
-		uint32_t i1 = data.indicies[i + 1];
-		uint32_t i2 = data.indicies[i + 2];
+	for (size_t i = 0; i < data.indices.size(); i += 3) {
+		uint32_t i0 = data.indices[i + 0];
+		uint32_t i1 = data.indices[i + 1];
+		uint32_t i2 = data.indices[i + 2];
 
 		Vector3 v0 = data.vertices[i0].pos.xyz();
 		Vector3 v1 = data.vertices[i1].pos.xyz();

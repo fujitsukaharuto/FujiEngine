@@ -79,7 +79,7 @@ namespace Graphics {
 
 		Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource_[DXC::kFrameCount_];
 		Microsoft::WRL::ComPtr<ID3D12Resource> cameraPosResource_[DXC::kFrameCount_];
-		Math::TransformationMatrix* wvpDate_[DXC::kFrameCount_];
+		Math::TransformationMatrix* wvpData_[DXC::kFrameCount_];
 		Math::CameraForGPU* cameraPosData_[DXC::kFrameCount_];
 		Microsoft::WRL::ComPtr<ID3D12Resource> objIDDataResource_ = nullptr;
 		ObjIDData* objIDData_ = nullptr;

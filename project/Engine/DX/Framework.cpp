@@ -66,7 +66,7 @@ void Core::Framework::BeginUpdate() {
 	// 入力関連の毎フレーム処理
 	input_->Update();
 	cameraManager_->Update();
-	dxcommon_->OffscreenUpDate();
+	dxcommon_->OffscreenUpdate();
 	modelManager_->PickingUpdate();
 	lightManager_->Update();
 	sceneManager_->SceneSet();

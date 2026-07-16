@@ -52,7 +52,7 @@ namespace Graphics {
 		Graphics::Material material_;
 
 		Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource_[DXC::kFrameCount_];
-		Math::TransformationMatrix* wvpDateGPU_[DXC::kFrameCount_];
+		Math::TransformationMatrix* wvpDataGPU_[DXC::kFrameCount_];
 
 	};
 }

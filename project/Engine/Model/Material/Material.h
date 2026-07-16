@@ -70,7 +70,7 @@ namespace Graphics {
 		Math::Vector4 GetColor();
 		Math::Vector2 GetUVScale() { return scale_; }
 		Math::Vector2 GetUVTrans() { return uvTrans_; }
-		int32_t GetUseNormalMap() { return materialDate_.useNormalMap; }
+		int32_t GetUseNormalMap() { return materialData_.useNormalMap; }
 
 		//========================================================================*/
 		//* Setter
@@ -83,9 +83,9 @@ namespace Graphics {
 		/// <summary>UVトランスの設定</summary>
 		void SetUVTrans(const Math::Vector2& uvTrans);
 		/// <summary> 法線マップを使用するか</summary>
-		void SetUseNormalMap(int32_t is) { materialDate_.useNormalMap = is; }
+		void SetUseNormalMap(int32_t is) { materialData_.useNormalMap = is; }
 		/// <summary>アルファ閾値の設定</summary>
-		void SetAlphaRef(float ref) { materialDate_.AlphaRef = ref; }
+		void SetAlphaRef(float ref) { materialData_.AlphaRef = ref; }
 		/// <summary>テクスチャの設定</summary>
 		void SetTexture(const std::string& name, bool overWrite = false);
 		/// <summary>法線マップの設定</summary>
@@ -106,8 +106,8 @@ namespace Graphics {
 		Math::Matrix4x4 MakeScale4x4(const Math::Vector3& scale);
 
 		Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_[DXC::kFrameCount_];
-		MaterialData* materialDateGPU_[DXC::kFrameCount_];
-		MaterialData materialDate_;
+		MaterialData* materialDataGPU_[DXC::kFrameCount_];
+		MaterialData materialData_;
 
 		Math::Vector2 scale_;
 		Math::Vector2 uvTrans_;

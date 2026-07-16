@@ -165,8 +165,8 @@ void ModelManager::LoadOBJ(const std::string& filename, bool overWrite) {
 
 			for (uint32_t element = 0; element < face.mNumIndices; element++) {
 				uint32_t vertexIndex = face.mIndices[element];
-				model->GetModelData().indicies.push_back(vertexIndex + meshVertexCount);
-				newModelMesh.indicies.push_back(vertexIndex);
+				model->GetModelData().indices.push_back(vertexIndex + meshVertexCount);
+				newModelMesh.indices.push_back(vertexIndex);
 			}
 		}
 		meshVertexCount += mesh->mNumVertices;
@@ -216,8 +216,8 @@ void ModelManager::LoadOBJ(const std::string& filename, bool overWrite) {
 			VertexData newVertex = model->GetModelData().meshes[i].vertices[index];
 			newMesh.AddVertex({ { newVertex.pos },{newVertex.uv},{newVertex.normal},{newVertex.tangent} });
 		}
-		for (size_t index = 0; index < model->GetModelData().meshes[i].indicies.size(); index++) {
-			uint32_t newIndex = model->GetModelData().meshes[i].indicies[index];
+		for (size_t index = 0; index < model->GetModelData().meshes[i].indices.size(); index++) {
+			uint32_t newIndex = model->GetModelData().meshes[i].indices[index];
 			newMesh.AddIndex(newIndex);
 		}
 		newMesh.CreateMesh();
@@ -294,8 +294,8 @@ void ModelManager::LoadGLTF(const std::string& filename, bool overWrite) {
 
 			for (uint32_t element = 0; element < face.mNumIndices; element++) {
 				uint32_t vertexIndex = face.mIndices[element];
-				model->GetModelData().indicies.push_back(vertexIndex + meshVertexCount);
-				newModelMesh.indicies.push_back(vertexIndex);
+				model->GetModelData().indices.push_back(vertexIndex + meshVertexCount);
+				newModelMesh.indices.push_back(vertexIndex);
 			}
 		}
 
@@ -372,8 +372,8 @@ void ModelManager::LoadGLTF(const std::string& filename, bool overWrite) {
 			VertexData newVertex = model->GetModelData().meshes[i].vertices[index];
 			newMesh.AddVertex({ { newVertex.pos },{newVertex.uv},{newVertex.normal},{newVertex.tangent} });
 		}
-		for (size_t index = 0; index < model->GetModelData().meshes[i].indicies.size(); index++) {
-			uint32_t newIndex = model->GetModelData().meshes[i].indicies[index];
+		for (size_t index = 0; index < model->GetModelData().meshes[i].indices.size(); index++) {
+			uint32_t newIndex = model->GetModelData().meshes[i].indices[index];
 			newMesh.AddIndex(newIndex);
 		}
 		newMesh.CreateMesh();
@@ -462,19 +462,19 @@ void ModelManager::CreateSphere() {
 			uint32_t v3 = row2 + lonIndex + 1;
 
 			// 表側を向くように順序を修正 (v0, v2, v1) (v1, v2, v3)
-			model->GetModelData().indicies.push_back(v0);
-			newModelMesh.indicies.push_back(v0);
-			model->GetModelData().indicies.push_back(v2);
-			newModelMesh.indicies.push_back(v2);
-			model->GetModelData().indicies.push_back(v1);
-			newModelMesh.indicies.push_back(v1);
+			model->GetModelData().indices.push_back(v0);
+			newModelMesh.indices.push_back(v0);
+			model->GetModelData().indices.push_back(v2);
+			newModelMesh.indices.push_back(v2);
+			model->GetModelData().indices.push_back(v1);
+			newModelMesh.indices.push_back(v1);
 
-			model->GetModelData().indicies.push_back(v1);
-			newModelMesh.indicies.push_back(v1);
-			model->GetModelData().indicies.push_back(v2);
-			newModelMesh.indicies.push_back(v2);
-			model->GetModelData().indicies.push_back(v3);
-			newModelMesh.indicies.push_back(v3);
+			model->GetModelData().indices.push_back(v1);
+			newModelMesh.indices.push_back(v1);
+			model->GetModelData().indices.push_back(v2);
+			newModelMesh.indices.push_back(v2);
+			model->GetModelData().indices.push_back(v3);
+			newModelMesh.indices.push_back(v3);
 		}
 	}
 	model->GetModelData().meshes.push_back(newModelMesh);
@@ -485,8 +485,8 @@ void ModelManager::CreateSphere() {
 			VertexData newVertex = model->GetModelData().meshes[i].vertices[index];
 			newMesh.AddVertex({ { newVertex.pos },{newVertex.uv},{newVertex.normal},{newVertex.tangent} });
 		}
-		for (size_t index = 0; index < model->GetModelData().meshes[i].indicies.size(); index++) {
-			uint32_t newIndex = model->GetModelData().meshes[i].indicies[index];
+		for (size_t index = 0; index < model->GetModelData().meshes[i].indices.size(); index++) {
+			uint32_t newIndex = model->GetModelData().meshes[i].indices[index];
 			newMesh.AddIndex(newIndex);
 		}
 		newMesh.CreateMesh();
@@ -547,20 +547,20 @@ ModelData ModelManager::CreateRing(float out, float in, float radius, bool horiz
 		uint32_t inner1 = outer0 + 3;
 
 		// 三角形1
-		model->GetModelData().indicies.push_back(outer0);
-		newModelMesh.indicies.push_back(outer0);
-		model->GetModelData().indicies.push_back(inner0);
-		newModelMesh.indicies.push_back(inner0);
-		model->GetModelData().indicies.push_back(outer1);
-		newModelMesh.indicies.push_back(outer1);
+		model->GetModelData().indices.push_back(outer0);
+		newModelMesh.indices.push_back(outer0);
+		model->GetModelData().indices.push_back(inner0);
+		newModelMesh.indices.push_back(inner0);
+		model->GetModelData().indices.push_back(outer1);
+		newModelMesh.indices.push_back(outer1);
 
 		// 三角形2
-		model->GetModelData().indicies.push_back(outer1);
-		newModelMesh.indicies.push_back(outer1);
-		model->GetModelData().indicies.push_back(inner0);
-		newModelMesh.indicies.push_back(inner0);
-		model->GetModelData().indicies.push_back(inner1);
-		newModelMesh.indicies.push_back(inner1);
+		model->GetModelData().indices.push_back(outer1);
+		newModelMesh.indices.push_back(outer1);
+		model->GetModelData().indices.push_back(inner0);
+		newModelMesh.indices.push_back(inner0);
+		model->GetModelData().indices.push_back(inner1);
+		newModelMesh.indices.push_back(inner1);
 	}
 	model->GetModelData().meshes.push_back(newModelMesh);
 
@@ -570,8 +570,8 @@ ModelData ModelManager::CreateRing(float out, float in, float radius, bool horiz
 			VertexData newVertex = model->GetModelData().meshes[i].vertices[index];
 			newMesh.AddVertex({ { newVertex.pos },{newVertex.uv},{newVertex.normal},{newVertex.tangent} });
 		}
-		for (size_t index = 0; index < model->GetModelData().meshes[i].indicies.size(); index++) {
-			uint32_t newIndex = model->GetModelData().meshes[i].indicies[index];
+		for (size_t index = 0; index < model->GetModelData().meshes[i].indices.size(); index++) {
+			uint32_t newIndex = model->GetModelData().meshes[i].indices[index];
 			newMesh.AddIndex(newIndex);
 		}
 		newMesh.CreateMesh();
@@ -628,22 +628,22 @@ ModelData ModelManager::CreateCylinder(float topRadius, float bottomRadius, floa
 		uint32_t top1 = bottom0 + 3;
 
 		// 三角形1
-		model->GetModelData().indicies.push_back(bottom0);
-		model->GetModelData().indicies.push_back(top0);
-		model->GetModelData().indicies.push_back(bottom1);
+		model->GetModelData().indices.push_back(bottom0);
+		model->GetModelData().indices.push_back(top0);
+		model->GetModelData().indices.push_back(bottom1);
 
-		newModelMesh.indicies.push_back(bottom0);
-		newModelMesh.indicies.push_back(top0);
-		newModelMesh.indicies.push_back(bottom1);
+		newModelMesh.indices.push_back(bottom0);
+		newModelMesh.indices.push_back(top0);
+		newModelMesh.indices.push_back(bottom1);
 
 		// 三角形2
-		model->GetModelData().indicies.push_back(bottom1);
-		model->GetModelData().indicies.push_back(top0);
-		model->GetModelData().indicies.push_back(top1);
+		model->GetModelData().indices.push_back(bottom1);
+		model->GetModelData().indices.push_back(top0);
+		model->GetModelData().indices.push_back(top1);
 
-		newModelMesh.indicies.push_back(bottom1);
-		newModelMesh.indicies.push_back(top0);
-		newModelMesh.indicies.push_back(top1);
+		newModelMesh.indices.push_back(bottom1);
+		newModelMesh.indices.push_back(top0);
+		newModelMesh.indices.push_back(top1);
 	}
 	model->GetModelData().meshes.push_back(newModelMesh);
 
@@ -653,8 +653,8 @@ ModelData ModelManager::CreateCylinder(float topRadius, float bottomRadius, floa
 			VertexData newVertex = model->GetModelData().meshes[i].vertices[index];
 			newMesh.AddVertex({ { newVertex.pos },{newVertex.uv},{newVertex.normal},{newVertex.tangent} });
 		}
-		for (size_t index = 0; index < model->GetModelData().meshes[i].indicies.size(); index++) {
-			uint32_t newIndex = model->GetModelData().meshes[i].indicies[index];
+		for (size_t index = 0; index < model->GetModelData().meshes[i].indices.size(); index++) {
+			uint32_t newIndex = model->GetModelData().meshes[i].indices[index];
 			newMesh.AddIndex(newIndex);
 		}
 		newMesh.CreateMesh();

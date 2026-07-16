@@ -72,11 +72,11 @@ void RenderObject::SetLightEnable(LightMode mode) {
 void RenderObject::CreateWVP() {
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
 		wvpResource_[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(TransformationMatrix));
-		wvpDate_[i] = nullptr;
-		wvpResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&wvpDate_[i]));
-		wvpDate_[i]->WVP = MakeIdentity4x4();
-		wvpDate_[i]->World = MakeIdentity4x4();
-		wvpDate_[i]->WorldInverseTransPose = Transpose(Inverse(wvpDate_[i]->World));
+		wvpData_[i] = nullptr;
+		wvpResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&wvpData_[i]));
+		wvpData_[i]->WVP = MakeIdentity4x4();
+		wvpData_[i]->World = MakeIdentity4x4();
+		wvpData_[i]->WorldInverseTransPose = Transpose(Inverse(wvpData_[i]->World));
 
 		cameraPosResource_[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(DirectionalLight));
 		cameraPosData_[i] = nullptr;
@@ -116,9 +116,9 @@ void RenderObject::SetWVP() {
 	}
 
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
-	wvpDate_[frameIndex]->World = worldMatrix;
-	wvpDate_[frameIndex]->WVP = worldViewProjectionMatrix;
-	wvpDate_[frameIndex]->WorldInverseTransPose = Transpose(Inverse(wvpDate_[frameIndex]->World));
+	wvpData_[frameIndex]->World = worldMatrix;
+	wvpData_[frameIndex]->WVP = worldViewProjectionMatrix;
+	wvpData_[frameIndex]->WorldInverseTransPose = Transpose(Inverse(wvpData_[frameIndex]->World));
 
 	cameraPosData_[frameIndex]->worldPosition = camera_->GetTranslate();
 }
@@ -139,7 +139,7 @@ void RenderObject::SetBillboardWVP() {
 	}
 
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
-	wvpDate_[frameIndex]->World = worldMatrix;
-	wvpDate_[frameIndex]->WVP = worldViewProjectionMatrix;
-	wvpDate_[frameIndex]->WorldInverseTransPose = Transpose(Inverse(wvpDate_[frameIndex]->World));
+	wvpData_[frameIndex]->World = worldMatrix;
+	wvpData_[frameIndex]->WVP = worldViewProjectionMatrix;
+	wvpData_[frameIndex]->WorldInverseTransPose = Transpose(Inverse(wvpData_[frameIndex]->World));
 }

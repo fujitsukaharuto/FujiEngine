@@ -283,13 +283,13 @@ void OffscreenManager::SettingVertex() {
 	vertexBufferView_.SizeInBytes = sizeof(GrayscaleVertex) * 3;
 	vertexBufferView_.StrideInBytes = sizeof(GrayscaleVertex);
 
-	vertexDate_ = nullptr;
-	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDate_));
+	vertexData_ = nullptr;
+	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
 
 	// でっかい三角形をセット
-	vertexDate_[0] = { Vector4(-1.0f, -1.0f, 0.0f, 1.0f), Vector2(0.0f, 1.0f) }; // 左下
-	vertexDate_[1] = { Vector4(-1.0f, 3.0f, 0.0f, 1.0f), Vector2(0.0f, -1.0f) };  // 左上（画面外へ）
-	vertexDate_[2] = { Vector4(3.0f, -1.0f, 0.0f, 1.0f), Vector2(2.0f, 1.0f) };
+	vertexData_[0] = { Vector4(-1.0f, -1.0f, 0.0f, 1.0f), Vector2(0.0f, 1.0f) }; // 左下
+	vertexData_[1] = { Vector4(-1.0f, 3.0f, 0.0f, 1.0f), Vector2(0.0f, -1.0f) };  // 左上（画面外へ）
+	vertexData_[2] = { Vector4(3.0f, -1.0f, 0.0f, 1.0f), Vector2(2.0f, 1.0f) };
 
 
 	auto device = dxcommon_->GetDevice();
