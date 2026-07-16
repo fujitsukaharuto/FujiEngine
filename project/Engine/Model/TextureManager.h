@@ -54,8 +54,6 @@ namespace Graphics {
 
 		void SetTextureFileOnceLoad(const std::string& name);
 
-		void ReleaseTexture(const std::string& filename);
-
 		DXCom* ShareDXCom() { return dxcommon_; }
 
 	private:

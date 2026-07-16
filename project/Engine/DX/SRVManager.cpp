@@ -105,9 +105,9 @@ void SRVManager::SetGraphicsRootDescriptorTable(UINT rootIndex, uint32_t srvInde
 
 
 uint32_t SRVManager::Allocate() {
-	assert(kMaxSRVCount_ != useIndex_);
+	assert(useIndex_ < kMaxSRVCount_);
 
-	int index = useIndex_;
+	uint32_t index = useIndex_;
 	useIndex_++;// カウンタの増加
 	return index;
 }

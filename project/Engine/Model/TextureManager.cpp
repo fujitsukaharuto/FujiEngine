@@ -161,10 +161,6 @@ void TextureManager::SetTextureFileOnceLoad(const std::string& name) {
 	}
 }
 
-void TextureManager::ReleaseTexture(const std::string& filename) {
-	textureCache_.erase(filename);
-}
-
 DirectX::ScratchImage TextureManager::LoadTextureFile(const std::string& filePath) {
 	DirectX::ScratchImage image{};
 	HRESULT hr;
