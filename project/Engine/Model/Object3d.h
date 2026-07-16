@@ -3,10 +3,14 @@
 #include <string>
 #include "Engine/Model/Base/RenderObject.h"
 #include "Engine/Editor/JsonSerializer.h"
+#if 0 // TODO: Node機能はPhase2のエディタ分離時に再設計して復活させる
 #include "Engine/ImGuiManager/NodeGraph.h"
+#endif
 #include "Engine/DX/FrameCount.h"
+#if 0 // TODO: Node機能はPhase2のエディタ分離時に再設計して復活させる
 #ifdef _DEBUGMODE
 #include "imgui_node_editor.h"
+#endif
 #endif
 
 
@@ -57,9 +61,11 @@ namespace Graphics {
 
 		/// <summary>jsonからTransform初期化</summary>
 		void LoadTransformFromJson(const std::string& filename);
+#if 0 // TODO: Node機能はPhase2のエディタ分離時に再設計して復活させる
 		/// <summary>ReleaseでNodeの内容道理に動くように</summary>
 		void LoadNodeEditorData(const std::string& filename);
 		void CreateNodeEditor(const std::string& filename);
+#endif
 
 		//========================================================================*/
 		//* Setter
@@ -75,6 +81,7 @@ namespace Graphics {
 		/// <summary>コマンドの生成</summary>
 		void CreatePropertyCommand(int type);
 
+#if 0 // TODO: Node機能はPhase2のエディタ分離時に再設計して復活させる
 		void NodeContentsUpdate();
 
 		void AnalysisNode(const json& j, int index);
@@ -83,24 +90,29 @@ namespace Graphics {
 
 		/// <summary>テクスチャをNodeから設定</summary>
 		void SetTextureNode();
+#endif
 
 	private:
 
+#if 0 // TODO: Node機能はPhase2のエディタ分離時に再設計して復活させる
 		bool isMaskMode_ = false;
 		bool isUseNodeGraph_ = false;
 		Material maskMaterial_;
 		std::vector<NodeContent> nodeContentData_;
+#endif
 
 		Math::Vector3 prevPos_;
 		Math::Vector3 prevRotate_;
 		Math::Vector3 prevScale_;
 		int gizmoType_ = 0;
 		float IsUsingGizmo_ = false;
+#if 0 // TODO: Node機能はPhase2のエディタ分離時に再設計して復活させる
 		std::string nodeFileName_;
 #ifdef _DEBUGMODE
 		ax::NodeEditor::EditorContext* nodeEditorContext_ = nullptr;
 		Core::NodeGraph nodeGraph_;
 		ed::NodeId selectorNodeId_;
 #endif // _DEBUG
+#endif
 	};
 }

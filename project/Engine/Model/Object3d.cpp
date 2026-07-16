@@ -11,7 +11,9 @@
 #include "Engine/Editor/PropertyCommand.h"
 #ifdef _DEBUGMODE
 #include "ImGuizmo.h"
+#if 0 // TODO: Node機能はPhase2のエディタ分離時に再設計して復活させる
 namespace ed = ax::NodeEditor;
+#endif
 #endif // _DEBUG
 
 using namespace Core;
@@ -27,12 +29,14 @@ Object3d::Object3d() {
 Object3d::~Object3d() {
 	dxcommon_ = nullptr;
 	material_.clear();
+#if 0 // TODO: Node機能はPhase2のエディタ分離時に再設計して復活させる
 #ifdef _DEBUGMODE
 	if (nodeEditorContext_) {
 		ax::NodeEditor::DestroyEditor(nodeEditorContext_);
 		nodeEditorContext_ = nullptr;
 	}
 #endif // _DEBUG
+#endif
 }
 
 void Object3d::Create(const std::string& fileName) {
@@ -128,28 +132,17 @@ void Object3d::Draw(bool isAdd) {
 }
 
 void Object3d::Render() {
-#ifdef _DEBUGMODE
+#if 0 // TODO: Node機能はPhase2のエディタ分離時に再設計して復活させる
+	// ノードグラフ編集中はエディタ側が値を直接書き込むため更新しない
 	if (!isUseNodeGraph_) {
 		NodeContentsUpdate();
 	}
-#endif // _DEBUG
-#ifdef _RELEASE
-	NodeContentsUpdate();
-#endif // _RELEASE
+#endif
 
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
-	if (isMaskMode_) {
-		if (isAdd_) {
-			dxcommon_->GetPipelineManager()->SetPipeline(Pipe::NormalNodeAdd);
-		} else {
-			dxcommon_->GetPipelineManager()->SetPipeline(Pipe::NormalNode);
-		}
-		lightManager_->SetLightCommand(cList);
-	} else {
-		if (isAdd_) {
-			dxcommon_->GetPipelineManager()->SetPipeline(Pipe::NormalAdd);
-		}
+	if (isAdd_) {
+		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::NormalAdd);
 	}
 
 	PipelineManager* pPipeManager = PipelineManager::GetInstance();
@@ -159,22 +152,14 @@ void Object3d::Render() {
 	pPipeManager->SetGraphicsRootCBV(cList, "ObjIDData", objIDDataResource_->GetGPUVirtualAddress());
 	ModelManager::GetInstance()->PickingCommand();
 
-	if (isMaskMode_) {
-		pPipeManager->SetGraphicsRootCBV(cList, "gMaskMaterial", maskMaterial_.GetMaterialResource()->GetGPUVirtualAddress());
-		pPipeManager->SetGraphicsRootDescriptorTable(cList, "gTextures", SRVManager::GetInstance()->GetGPUDescriptorHandle(0));
-	}
-
 	pPipeManager->SetGraphicsRootDescriptorTable(cList, "gTextures", SRVManager::GetInstance()->GetGPUDescriptorHandle(0));
 
 	if (model_) {
 		model_->Draw(cList, material_);
 	}
 
-	if (isAdd_ || isMaskMode_) {
+	if (isAdd_) {
 		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Normal);
-		if (isMaskMode_) {
-			lightManager_->SetLightCommand(cList);
-		}
 	}
 }
 
@@ -311,6 +296,7 @@ void Object3d::DebugGUI() {
 		ImGui::DragFloat2("uvScale", &uvScale.x, 0.1f);
 		ImGui::DragFloat2("uvTrans", &uvTrans.x, 0.1f);
 		SetUVScale(uvScale, uvTrans);
+#if 0 // TODO: Node機能はPhase2のエディタ分離時に再設計して復活させる
 		if (nodeEditorContext_) {
 			if (ImGui::Button("MaterialSetting")) {
 				ImGui::OpenPopup("Material Window");
@@ -347,6 +333,7 @@ void Object3d::DebugGUI() {
 				strcpy_s(newEditorName, "NewEditor");
 			}
 		}
+#endif
 		ImGui::TreePop();
 	}
 
@@ -428,17 +415,13 @@ void Object3d::DebugGUI() {
 	}
 	ImGui::Unindent();
 #endif // _DEBUG
-
-#ifdef _RELEASE
-	NodeContentsUpdate();
-#endif // _RELEASE
-
 }
 
 void Object3d::LoadTransformFromJson(const std::string& filename) {
 	JsonSerializer::DeserializeTransform(filename, transform_);
 }
 
+#if 0 // TODO: Node機能はPhase2のエディタ分離時に再設計して復活させる
 void Object3d::LoadNodeEditorData(const std::string& filename) {
 	json data = JsonSerializer::DeserializeJsonData(filename);
 
@@ -473,6 +456,7 @@ void Object3d::CreateNodeEditor(const std::string& filename) {
 	}
 #endif // _DEBUG
 }
+#endif
 
 void Object3d::SetAlphaRef(float ref) {
 	for (Material& material : material_) {
@@ -488,6 +472,7 @@ void Object3d::SetTexture(const std::string& name) {
 		material.SetTexture(name);
 	}
 	nowTextureName_ = name;
+#if 0 // TODO: Node機能はPhase2のエディタ分離時に再設計して復活させる
 #ifdef _DEBUGMODE
 	if (selectorNodeId_.Get() != 0) {
 		MyNode* selNode = nodeGraph_.FindNodeById(selectorNodeId_);
@@ -496,6 +481,7 @@ void Object3d::SetTexture(const std::string& name) {
 		}
 	}
 #endif // _DEBUG
+#endif
 }
 
 void Object3d::SetEditorObjParameter() {
@@ -532,6 +518,7 @@ void Object3d::CreatePropertyCommand(int type) {
 #endif // _DEBUG
 }
 
+#if 0 // TODO: Node機能はPhase2のエディタ分離時に再設計して復活させる
 void Object3d::NodeContentsUpdate() {
 	if (nodeContentData_.size() == 0) {
 		return;
@@ -669,3 +656,4 @@ void Object3d::SetTextureNode() {
 
 #endif // _DEBUG
 }
+#endif
