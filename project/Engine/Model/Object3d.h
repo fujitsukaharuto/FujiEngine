@@ -3,7 +3,6 @@
 #include <string>
 #include <memory>
 #include "Engine/Model/Base/RenderObject.h"
-#include "Engine/Editor/JsonSerializer.h"
 #if 0 // TODO: Node機能はPhase2のエディタ分離時に再設計して復活させる
 #include "Engine/ImGuiManager/NodeGraph.h"
 #endif
@@ -64,8 +63,6 @@ namespace Graphics {
 		bool IsHaveParent() { return transform_.parent ? true : false; }
 
 
-		/// <summary>jsonからTransform初期化</summary>
-		void LoadTransformFromJson(const std::string& filename);
 #if 0 // TODO: Node機能はPhase2のエディタ分離時に再設計して復活させる
 		/// <summary>ReleaseでNodeの内容道理に動くように</summary>
 		void LoadNodeEditorData(const std::string& filename);
@@ -76,8 +73,6 @@ namespace Graphics {
 		//* Setter
 		/// <summary>α値の閾値</summary>
 		void SetAlphaRef(float ref);
-		/// <summary>テクスチャの設定</summary>
-		void SetTexture(const std::string& name) override;
 		/// <summary>ピッキング用にIDの調整</summary>
 		void SetEditorObjParameter();
 

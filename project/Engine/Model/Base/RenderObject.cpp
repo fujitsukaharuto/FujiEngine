@@ -3,7 +3,9 @@
 #include "Engine/Light/LightManager.h"
 #include "Engine/DX/DXCom.h"
 #include "Engine/DX/DX12Helper.h"
+#include "Engine/Editor/JsonSerializer.h"
 
+using namespace Core;
 using namespace Math;
 using namespace Graphics;
 
@@ -43,6 +45,20 @@ void Graphics::RenderObject::SetModel(const std::string& fileName, bool overWrit
 		material_.push_back(std::move(newMaterial));
 		nowTextureName_ = model_->GetModelData().meshes[i].material.textureFilePath;
 	}
+}
+
+void RenderObject::LoadTransformFromJson(const std::string& filename) {
+	JsonSerializer::DeserializeTransform(filename, transform_);
+}
+
+void RenderObject::SetTexture(const std::string& name) {
+	if (name == nowTextureName_) {
+		return;
+	}
+	for (Material& material : material_) {
+		material.SetTexture(name);
+	}
+	nowTextureName_ = name;
 }
 
 void RenderObject::SetColor(const Vector4& color) {

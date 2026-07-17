@@ -6,6 +6,7 @@
 #include "Engine/DX/DX12Helper.h"
 #include "LightManager.h"
 #include "CameraManager.h"
+#include "Engine/Editor/JsonSerializer.h"
 #ifdef _DEBUGMODE
 #include "Engine/Editor/Object3dEditor.h"
 #endif // _DEBUGMODE
@@ -188,10 +189,6 @@ void Object3d::DebugGUI() {
 #endif // _DEBUGMODE
 }
 
-void Object3d::LoadTransformFromJson(const std::string& filename) {
-	JsonSerializer::DeserializeTransform(filename, transform_);
-}
-
 #if 0 // TODO: Node機能はPhase2のエディタ分離時に再設計して復活させる
 void Object3d::LoadNodeEditorData(const std::string& filename) {
 	json data = JsonSerializer::DeserializeJsonData(filename);
@@ -233,26 +230,6 @@ void Object3d::SetAlphaRef(float ref) {
 	for (Material& material : material_) {
 		material.SetAlphaRef(ref);
 	}
-}
-
-void Object3d::SetTexture(const std::string& name) {
-	if (name == nowTextureName_) {
-		return;
-	}
-	for (Material& material : material_) {
-		material.SetTexture(name);
-	}
-	nowTextureName_ = name;
-#if 0 // TODO: Node機能はPhase2のエディタ分離時に再設計して復活させる
-#ifdef _DEBUGMODE
-	if (selectorNodeId_.Get() != 0) {
-		MyNode* selNode = nodeGraph_.FindNodeById(selectorNodeId_);
-		if (selNode) {
-			selNode->values[0] = NodeValue(nowTextureName_);
-		}
-	}
-#endif // _DEBUG
-#endif
 }
 
 void Object3d::SetEditorObjParameter() {

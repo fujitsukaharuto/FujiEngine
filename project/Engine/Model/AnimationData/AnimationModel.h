@@ -13,13 +13,21 @@
 #include "Math/Animation/Animation.h"
 #include "Math/Animation/Skelton.h"
 #include "Engine/DX/FrameCount.h"
+#include <memory>
 
+
+namespace Editor {
+	class AnimationModelEditor;
+}
 
 namespace Graphics {
 	/// <summary>
 	/// アニメーションモデルクラス
 	/// </summary>
 	class AnimationModel : public RenderObject {
+#ifdef _DEBUGMODE
+		friend class Editor::AnimationModelEditor;
+#endif // _DEBUGMODE
 	public:
 		AnimationModel();
 		~AnimationModel() override;
@@ -42,8 +50,6 @@ namespace Graphics {
 		void ApplyAnimation();
 		void Draw(bool isAdd = false) override;
 		void Render() override;
-		void AnimeDraw();
-		void SkeletonDraw();
 
 		/// <summary>ディスパッチ処理</summary>
 		void CSDispatch();
@@ -64,13 +70,8 @@ namespace Graphics {
 		/// <summary>アニメーションデータの読み込み</summary>
 		void LoadAnimationFile(const std::string& filename);
 
-		/// <summary>JsonからTransformを設定</summary>
-		void LoadTransformFromJson(const std::string& filename);
-
 		//========================================================================*/
 		//* Setter
-		/// <summary>テクスチャの変更</summary>
-		void SetTexture(const std::string& name) override;
 		/// <summary>環境マップの設定</summary>
 		void SetEnvironmentCoeff(float environment);
 		/// <summary>反射するObjectにするか</summary>
@@ -96,13 +97,6 @@ namespace Graphics {
 		//* キーフレームから値を取り出す
 		Math::Vector3 CalculationValue(const std::vector<KeyframeVector3>& keyframe, float time);
 		Math::Quaternion CalculationValue(const std::vector<KeyframeQuaternion>& keyframe, float time);
-
-		/// <summary>
-		/// ジョイントのDraw
-		/// </summary>
-		/// <param name="m">マトリックス</param>
-		/// <param name="color">色</param>
-		void JointDraw(const Math::Matrix4x4& m, const Math::Vector4& color);
 
 		//========================================================================*/
 		//* アニメーション補間のためのGetter
@@ -131,6 +125,9 @@ namespace Graphics {
 		SkinCluster skinCluster_;
 
 		Texture* environment_;
-		int selectedJointIndex_ = -1;
+
+#ifdef _DEBUGMODE
+		std::unique_ptr<Editor::AnimationModelEditor> editor_;
+#endif // _DEBUGMODE
 	};
 }

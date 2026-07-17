@@ -39,11 +39,15 @@ namespace Graphics {
 		Material& GetMaterial(size_t index = 0) { return material_[index]; }
 		size_t GetMaterialCount() const { return material_.size(); }
 
+		/// <summary>jsonからTransform初期化</summary>
+		void LoadTransformFromJson(const std::string& filename);
+
 		//========================================================================*/
 		//* Setter
 		void SetCamera(Camera* camera) { camera_ = camera; }
 		void SetModel(const std::string& fileName, bool overWrite = false);
-		virtual void SetTexture(const std::string& name) = 0;
+		/// <summary>テクスチャの設定</summary>
+		void SetTexture(const std::string& name);
 		/// <summary>色の設定</summary>
 		void SetColor(const Math::Vector4& color);
 		/// <summary>UVスケールの設定</summary>

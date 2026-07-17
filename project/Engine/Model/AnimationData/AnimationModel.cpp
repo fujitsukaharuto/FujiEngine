@@ -10,6 +10,9 @@
 #include "FPSKeeper.h"
 #include "Engine/ImGuiManager/ImGuiManager.h"
 #include "Engine/Editor/JsonSerializer.h"
+#ifdef _DEBUGMODE
+#include "Engine/Editor/AnimationModelEditor.h"
+#endif // _DEBUGMODE
 
 #include <fstream>
 #include <assimp/Importer.hpp>
@@ -25,6 +28,9 @@ using namespace Math;
 AnimationModel::AnimationModel() {
 	dxcommon_ = ModelManager::GetInstance()->ShareDXCom();
 	lightManager_ = ModelManager::GetInstance()->ShareLight();
+#ifdef _DEBUGMODE
+	editor_ = std::make_unique<Editor::AnimationModelEditor>();
+#endif // _DEBUGMODE
 }
 
 AnimationModel::~AnimationModel() {
@@ -261,6 +267,12 @@ void AnimationModel::Draw(bool isAdd) {
 
 	ObjectRenderer::GetInstance()->AddSkinned(this);
 	ObjectRenderer::GetInstance()->Add(this);
+
+#ifdef _DEBUGMODE
+	if (editor_) {
+		editor_->DrawSkeleton(*this);
+	}
+#endif // _DEBUGMODE
 }
 
 void AnimationModel::Render() {
@@ -294,55 +306,6 @@ void AnimationModel::Render() {
 	}
 }
 
-void AnimationModel::AnimeDraw() {
-	SetBillboardWVP();
-
-	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
-
-	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
-	cList->SetGraphicsRootConstantBufferView(1, wvpResource_[frameIndex]->GetGPUVirtualAddress());
-	cList->SetGraphicsRootConstantBufferView(4, cameraPosResource_[frameIndex]->GetGPUVirtualAddress());
-	lightManager_->SetLightCommand(cList);
-
-	if (model_) {
-		model_->Draw(cList, material_);
-	}
-}
-
-void AnimationModel::SkeletonDraw() {
-	for (size_t i = 0; i < skeleton_.joints.size(); ++i) {
-		Joint& joint = skeleton_.joints[i];
-		Matrix4x4 worldJointPos = Multiply(joint.skeletonSpaceMatrix, GetWorldMat());
-		Vector3 jointPos = {
-			worldJointPos.m[3][0],
-			worldJointPos.m[3][1],
-			worldJointPos.m[3][2]
-		};
-
-		// ハイライトの色判定
-		if (i == selectedJointIndex_) {
-			JointDraw(worldJointPos, { 1.0f, 0.0f, 0.0f, 1.0f }); // 赤で強調
-		} else {
-			JointDraw(worldJointPos, { 0.3f, 1.0f, 0.3f, 1.0f }); // 通常白
-		}
-
-		if (!joint.children.empty()) {
-
-		}
-
-		// 親子関係のライン
-		if (joint.parent) {
-			Matrix4x4 worldParentJointPos = Multiply(skeleton_.joints[*joint.parent].skeletonSpaceMatrix, GetWorldMat());
-			Vector3 parentPos = {
-				worldParentJointPos.m[3][0],
-				worldParentJointPos.m[3][1],
-				worldParentJointPos.m[3][2]
-			};
-			Line3dDrawer::GetInstance()->DrawLine3d(jointPos, parentPos, { 1.0f,1.0f,1.0f,1.0f });
-		}
-	}
-}
-
 void AnimationModel::CSDispatch() {
 	if (!isMirrorObj_) {
 		model_->CSDispatch(dxcommon_, skinCluster_, dxcommon_->GetCommandList(), skinnedMeshes_, dxcommon_->GetNowFrameCount());
@@ -351,64 +314,10 @@ void AnimationModel::CSDispatch() {
 
 void AnimationModel::DebugGUI() {
 #ifdef _DEBUGMODE
-	ImGui::Indent();
-	if (ImGui::DragFloat("EnvironmentCoeff", &environmentCoeff_, 0.01f, 0.0f, 1.0f)) {
-		for (Material& material : material_) {
-			material.SetEnvironment(environmentCoeff_);
-		}
+	if (editor_) {
+		editor_->DrawGUI(*this);
 	}
-	Vector4 color = material_[0].GetColor();
-	ImGui::ColorEdit3("color", &color.x);
-	SetColor(color);
-	if (animations_.size() == 0) {
-		ImGui::Unindent();
-		return;
-	}
-	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Selected;
-	if (ImGui::TreeNodeEx("animation", flags)) {
-
-		int currentIndex = -1;
-		std::vector<const char*> animationNames;
-		animationNames.reserve(animations_.size());
-
-		int index = 0;
-		for (const auto& [name, anime] : animations_) {
-			animationNames.push_back(name.c_str());
-			if (name == nowAnimationName_) {
-				currentIndex = index;
-			}
-			++index;
-		}
-
-		if (currentIndex == -1 && !animationNames.empty()) {
-			currentIndex = 0;
-			nowAnimationName_ = animationNames[0]; // デフォルトで先頭
-		}
-
-		if (!animationNames.empty()) {
-			if (ImGui::Combo("Animation Name", &currentIndex, animationNames.data(), static_cast<int>(animationNames.size()))) {
-				ChangeAnimation(animationNames[currentIndex]);
-			}
-		} else {
-			ImGui::Text("No animations available");
-		}
-
-		ImGui::DragFloat("Animation Time", &animationTime_, 0.01f, 0.0f, 100.0f);
-
-		ImGui::TreePop();
-	}
-	if (ImGui::TreeNodeEx("joint", flags)) {
-		for (int i = 0; i < skeleton_.joints.size(); ++i) {
-			const std::string& jointName = skeleton_.joints[i].name;
-			bool isSelected = (i == selectedJointIndex_);
-			if (ImGui::Selectable(jointName.c_str(), isSelected)) {
-				selectedJointIndex_ = i;
-			}
-		}
-		ImGui::TreePop();
-	}
-	ImGui::Unindent();
-#endif // _DEBUG
+#endif // _DEBUGMODE
 }
 
 Matrix4x4* AnimationModel::GetJointTrans(const std::string& jointName) {
@@ -527,20 +436,6 @@ void AnimationModel::LoadAnimationFile(const std::string& filename) {
 	environment_ = TextureManager::GetInstance()->LoadTexture("skyboxTexture.dds");
 }
 
-void AnimationModel::LoadTransformFromJson(const std::string& filename) {
-	JsonSerializer::DeserializeTransform(filename, transform_);
-}
-
-void AnimationModel::SetTexture(const std::string& name) {
-	if (name == nowTextureName_) {
-		return;
-	}
-	for (Material& material : material_) {
-		material.SetTexture(name);
-	}
-	nowTextureName_ = name;
-}
-
 void AnimationModel::SetEnvironmentCoeff(float environment) {
 	environmentCoeff_ = environment;
 	for (Material& material : material_) {
@@ -600,11 +495,6 @@ Quaternion AnimationModel::CalculationValue(const std::vector<KeyframeQuaternion
 		}
 	}
 	return (*keyframe.rbegin()).value;
-}
-
-void AnimationModel::JointDraw(const Matrix4x4& m, const Vector4& color) {
-	Vector3 jointPos = { m.m[3][0], m.m[3][1], m.m[3][2] };
-	Line3dDrawer::GetInstance()->DrawSphereLine(jointPos, 0.05f, color);
 }
 
 Animation* AnimationModel::GetCurrentAnimation() {
