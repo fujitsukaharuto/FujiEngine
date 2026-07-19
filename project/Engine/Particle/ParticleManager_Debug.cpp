@@ -226,10 +226,7 @@ void ParticleManager::ParticleCSDebugGUI() {
 #ifdef _DEBUGMODE
 	if (ImGui::CollapsingHeader("GPU Particle System")) {
 		ImGui::Indent();
-		gpuParticleSystem_->RenderPerformanceStats();
-		gpuParticleSystem_->ParticleCSDebugGUI();
-		gpuParticleSystem_->ParticleTexCSDebugGUI();
-		gpuParticleSystem_->ParticleSurfaceCSDebugGUI();
+		gpuParticleSystem_->EmitterInspectorGUI();
 		ImGui::Unindent();
 	}
 #endif // _DEBUG

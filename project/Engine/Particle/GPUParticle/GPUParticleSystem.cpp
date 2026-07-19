@@ -5,12 +5,9 @@
 #include "Engine/Camera/CameraManager.h"
 #include "Math/Random/Random.h"
 #include "Engine/DX/FPSKeeper.h"
-#include "Engine/Particle/ParticleManager.h"
 #include "Engine/Model/ModelManager.h"
-#include "Engine/Input/Input.h"
-#include "ImGuiManager/ImGuiManager.h"
 #ifdef _DEBUGMODE
-#include "ImGuizmo.h"
+#include "Engine/Editor/GPUParticleSystemEditor.h"
 #endif // _DEBUGMODE
 
 using namespace Core;
@@ -19,6 +16,9 @@ using namespace Math;
 
 
 GPUParticleSystem::GPUParticleSystem() {
+#ifdef _DEBUGMODE
+	editor_ = std::make_unique<Editor::GPUParticleSystemEditor>();
+#endif // _DEBUGMODE
 }
 
 GPUParticleSystem::~GPUParticleSystem() {
@@ -326,210 +326,18 @@ int GPUParticleSystem::InitGPUEmitterSurface(const std::string& fileName) {
 
 void GPUParticleSystem::DebugGUI() {
 #ifdef _DEBUGMODE
-	ImGui::Begin("GPUParticle Editor", nullptr, ImGuiWindowFlags_NoCollapse);
-
-	RenderPerformanceStats();
-
-	ImGui::Separator();
-
-	if (ImGui::BeginTabBar("EmitterTabs")) {
-
-		if (ImGui::BeginTabItem("Sphere Emitters")) {
-			if (ImGui::Button("＋ エミッターを追加")) { InitGPUEmitter(); }
-
-			RenderEmitterList(sphereEmitters_, editCSEmitInd_, PipelinePhase::Sphere);
-			ImGui::EndTabItem();
-		}
-
-		if (ImGui::BeginTabItem("TextureBased Emitters")) {
-			RenderEmitterList(textureBasedEmitters_, editCSEmitTexInd_, PipelinePhase::Texture);
-			ImGui::EndTabItem();
-		}
-
-		if (ImGui::BeginTabItem("Surface Emitters")) {
-			RenderEmitterList(MeshSurfaceEmitters_, editCSEmitSurfaceInd_, PipelinePhase::Surface);
-			ImGui::EndTabItem();
-		}
-
-		ImGui::EndTabBar();
+	if (editor_) {
+		editor_->DrawSceneGUI(*this);
 	}
-
-	ImGui::End();
-#endif // _DEBUG
+#endif // _DEBUGMODE
 }
 
-void GPUParticleSystem::RenderPerformanceStats() {
+void GPUParticleSystem::EmitterInspectorGUI() {
 #ifdef _DEBUGMODE
-	if (ImGui::CollapsingHeader("統計情報 / パフォーマンス")) {
-		uint32_t frameIndex = dxcommon_->GetNowFrameCount();
-		uint32_t finishedFrame = (frameIndex + DXC::kFrameCount_ - 1) % DXC::kFrameCount_;
-
-		ImGui::Checkbox("コンピュート・スプラット描画", &useComputeSplat_);
-		ImGui::SameLine();
-		ImGui::TextDisabled("(OFF=従来ラスタ1/4解像度)");
-
-		ImGui::Checkbox("フル解像度 (深度テスト有効)", &useFullResolution_);
-		ImGui::SameLine();
-		ImGui::TextDisabled("(OFF=1/4扱い・深度テスト無効。splat時のシーン遮蔽)");
-
-		ImGui::Checkbox("オーバーラップ (Stage2: Update∥Draw)", &useOverlap_);
-		ImGui::SameLine();
-		ImGui::TextDisabled("(splat時のみ。OFF=従来直列でA/B比較)");
-
-		// テーブルを使うと数値が揃って見やすくなります
-		if (ImGui::BeginTable("StatsTable", 2, ImGuiTableFlags_BordersInnerV)) {
-
-			AliveCountDataReadBack();
-
-			ImGui::TableNextRow();
-			ImGui::TableSetColumnIndex(0); ImGui::Text("生存パーティクル数:");
-			ImGui::TableSetColumnIndex(1); ImGui::Text("%d", aliveCount_);
-
-			ImGui::TableNextRow();
-			ImGui::TableSetColumnIndex(0); ImGui::Text("描画負荷 (Draw):");
-			ImGui::TableSetColumnIndex(1); ImGui::Text("%.3f ms", gpuTimerGraphics.GetElapsedMS(finishedFrame, kTimer_DrawExecuteIndirect));
-
-			ImGui::TableNextRow();
-			ImGui::TableSetColumnIndex(0); ImGui::Text("更新負荷 (Update):");
-			ImGui::TableSetColumnIndex(1); ImGui::Text("%.3f ms", gpuTimerCompute.GetElapsedMS(finishedFrame, kTimer_ParticleUpdate));
-
-			ImGui::TableNextRow();
-			ImGui::TableSetColumnIndex(0); ImGui::Text("発生負荷 (Emit):");
-			ImGui::TableSetColumnIndex(1); ImGui::Text("%.3f ms", gpuTimerCompute.GetElapsedMS(finishedFrame, kTimer_EmitterDispatch));
-
-			ImGui::EndTable();
-		}
+	if (editor_) {
+		editor_->DrawInspectorGUI(*this);
 	}
-#endif // _DEBUG
-}
-
-void GPUParticleSystem::RenderEmitterList(std::vector<int>& emitterIndices, int& currentIdx, PipelinePhase phase) {
-#ifdef _DEBUGMODE
-	if (emitterIndices.empty()) {
-		ImGui::TextDisabled("エミッターが存在しません。");
-		return;
-	}
-	ImGui::Checkbox("Tracking", &isMouseTracking_);
-
-	if (currentIdx >= emitterIndices.size()) {
-		currentIdx = int(emitterIndices.size()) - 1;
-	}
-
-	// 左側にリスト、右側に詳細を表示する
-	ImGui::BeginChild("ListRegion", ImVec2(150, 0), ImGuiChildFlags_Border);
-	for (int n = 0; n < (int)emitterIndices.size(); n++) {
-		ImGui::PushID(n);
-		if (ImGui::Selectable("##selectable", currentIdx == n, ImGuiSelectableFlags_SpanAllColumns)) {
-			currentIdx = n;
-		}
-		ImGui::SameLine();
-		ImGui::Text("エミッター %d", n);
-		ImGui::PopID();
-	}
-	ImGui::EndChild();
-
-	ImGui::SameLine();
-
-	// 右側の詳細設定
-	ImGui::BeginGroup();
-	ImGui::BeginChild("DetailRegion", ImVec2(0, -ImGui::GetFrameHeightWithSpacing()), ImGuiChildFlags_Border);
-
-	int actualIdx = emitterIndices[currentIdx];
-	ImGui::Text("詳細設定 - ID: %d", actualIdx);
-	ImGui::Separator();
-
-	// エミッター固有のGUIを呼び出し
-	csEmitters_[actualIdx].emitter->DebugGUI();
-	LoadPopUpGUI(currentIdx, phase);
-
-	if (isMouseTracking_) {
-		MouseTransGuizmo();
-		csEmitters_[actualIdx].emitter->SetPos(mouseTrans_.translate);
-	}
-
-	ImGui::EndChild();
-	ImGui::EndGroup();
-#endif // _DEBUG
-}
-
-void GPUParticleSystem::ParticleCSDebugGUI() {
-#ifdef _DEBUGMODE
-	if (ImGui::CollapsingHeader("GPU Particle Emitter")) {
-		if (ImGui::Button("Emitterの追加")) {
-			InitGPUEmitter();
-		}
-		if (csEmitters_.size() == 0 || sphereEmitters_.size() == 0) return;
-		if (ImGui::ArrowButton("Index-", ImGuiDir_Left)) {
-			if (editCSEmitInd_ > 0) {
-				editCSEmitInd_--;
-			}
-		}ImGui::SameLine();
-		ImGui::DragInt("##emitIndex", &editCSEmitInd_, 1.0f, 0, int(sphereEmitters_.size() - 1), "EmitIndex : %d");
-		ImGui::SameLine();
-		if (ImGui::ArrowButton("Index+", ImGuiDir_Right)) {
-			if (editCSEmitInd_ < int(sphereEmitters_.size() - 1)) {
-				editCSEmitInd_++;
-			}
-		}
-		int idx = std::min(editCSEmitInd_, static_cast<int>(sphereEmitters_.size()) - 1);
-		editCSEmitInd_ = idx;
-		if (ImGui::TreeNode("ParticleCS Emit Control")) {
-			csEmitters_[sphereEmitters_[idx]].emitter->DebugGUI();
-			LoadPopUpGUI(idx, PipelinePhase::Sphere);
-			ImGui::TreePop();
-		}
-	}
-#endif // _DEBUG
-}
-
-void GPUParticleSystem::ParticleTexCSDebugGUI() {
-#ifdef _DEBUGMODE
-	if (csEmitters_.size() == 0 || textureBasedEmitters_.size() == 0) return;
-	if (ImGui::CollapsingHeader("GPU ParticleTex Emitter")) {
-		if (ImGui::ArrowButton("Index-", ImGuiDir_Left)) {
-			if (editCSEmitTexInd_ > 0) {
-				editCSEmitTexInd_--;
-			}
-		}ImGui::SameLine();
-		ImGui::DragInt("##emitIndex", &editCSEmitTexInd_, 1.0f, 0, int(textureBasedEmitters_.size() - 1), "EmitIndex : %d");
-		ImGui::SameLine();
-		if (ImGui::ArrowButton("Index+", ImGuiDir_Right)) {
-			if (editCSEmitTexInd_ < int(textureBasedEmitters_.size() - 1)) {
-				editCSEmitTexInd_++;
-			}
-		}
-		int idx = std::min(editCSEmitTexInd_, static_cast<int>(textureBasedEmitters_.size()) - 1);
-		editCSEmitTexInd_ = idx;
-		csEmitters_[textureBasedEmitters_[idx]].emitter->DebugGUI();
-	}
-#endif // _DEBUG
-}
-
-void GPUParticleSystem::ParticleSurfaceCSDebugGUI() {
-#ifdef _DEBUGMODE
-	if (csEmitters_.size() == 0 || MeshSurfaceEmitters_.size() == 0) return;
-	if (ImGui::CollapsingHeader("GPU Particle Surface Emitter")) {
-		if (ImGui::ArrowButton("Index-", ImGuiDir_Left)) {
-			if (editCSEmitSurfaceInd_ > 0) {
-				editCSEmitSurfaceInd_--;
-			}
-		}ImGui::SameLine();
-		ImGui::DragInt("##emitIndex", &editCSEmitSurfaceInd_, 1.0f, 0, int(MeshSurfaceEmitters_.size() - 1), "EmitIndex : %d"); ImGui::SameLine();
-		if (ImGui::ArrowButton("Index+", ImGuiDir_Right)) {
-			if (editCSEmitSurfaceInd_ < int(MeshSurfaceEmitters_.size() - 1)) {
-				editCSEmitSurfaceInd_++;
-			}
-		}
-
-		int idx = std::min(editCSEmitSurfaceInd_, static_cast<int>(MeshSurfaceEmitters_.size()) - 1);
-		editCSEmitSurfaceInd_ = idx;
-		if (ImGui::TreeNode("ParticleCS Emit Control")) {
-			csEmitters_[MeshSurfaceEmitters_[idx]].emitter->DebugGUI();
-			LoadPopUpGUI(idx, PipelinePhase::Surface);
-			ImGui::TreePop();
-		}
-	}
-#endif // _DEBUG
+#endif // _DEBUGMODE
 }
 
 IGPUEmitter& GPUParticleSystem::GetParticleCSEmitter(int index) {
@@ -758,109 +566,6 @@ void GPUParticleSystem::UpdateGPUEmitter() {
 	for (int i = 0; i < csEmitters_.size(); i++) {
 		csEmitters_[i].emitter->Update(deltaTime);
 	}
-}
-
-void GPUParticleSystem::LoadPopUpGUI(int id, PipelinePhase type) {
-#ifdef _DEBUGMODE
-	if (ImGui::Button("LoadFile")) {
-		ImGui::OpenPopup("CSEmitterFile Window");
-	}
-
-	ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-	// 少し大きめのウィンドウサイズを指定（必要に応じて調整してください）
-	ImGui::SetNextWindowSize(ImVec2(500, 400), ImGuiCond_FirstUseEver);
-
-	if (ImGui::BeginPopupModal("CSEmitterFile Window", NULL)) {
-		// --- 上部：ファイル一覧エリア（スクロール可能にする） ---
-		// 下部のボタンエリア(約40px)を残して残りを一覧表示に使う
-		if (ImGui::BeginChild("FileScrollingRegion", ImVec2(0, -40), true, ImGuiWindowFlags_HorizontalScrollbar)) {
-			float windowVisibleX = ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMax().x;
-			ImVec2 buttonSize(100, 100); // ボタンのサイズ
-			ImGuiStyle& style = ImGui::GetStyle();
-
-			auto& fileNames = ParticleManager::GetInstance()->GetCSEmitterFileNames();
-			for (size_t i = 0; i < fileNames.size(); i++) {
-				const auto& filename = fileNames[i];
-
-				// ボタンを描画（ID衝突回避のため ##i を付与するか、PushIDを使う）
-				ImGui::PushID((int)i);
-				if (ImGui::Button(filename.c_str(), buttonSize)) {
-					switch (type) {
-					case PipelinePhase::Texture:
-						csEmitters_[textureBasedEmitters_[id]].emitter->Load(filename);
-						break;
-					case PipelinePhase::Surface:
-						csEmitters_[MeshSurfaceEmitters_[id]].emitter->Load(filename);
-						break;
-					case PipelinePhase::Sphere:
-						csEmitters_[sphereEmitters_[id]].emitter->Load(filename);
-						break;
-					default:
-						break;
-					}
-					// 選択したらウィンドウを閉じる
-					ImGui::CloseCurrentPopup();
-				}
-				ImGui::PopID();
-
-				float lastButtonX = ImGui::GetItemRectMax().x;
-				float nextButtonX = lastButtonX + style.ItemSpacing.x + buttonSize.x;
-				// 次のボタンがウィンドウ端を越えない、かつ リストの最後でなければ SameLine
-				if (i + 1 < fileNames.size() && nextButtonX < windowVisibleX) {
-					ImGui::SameLine();
-				}
-			}
-			ImGui::EndChild();
-		}
-
-		// --- 下部：操作ボタンエリア ---
-		ImGui::Separator();
-
-		float buttonWidth = 120.0f;
-		float spaceWidth = ImGui::GetStyle().ItemSpacing.x;
-		float totalButtonWidth = (buttonWidth * 2) + spaceWidth;
-		ImGui::SetCursorPosX(ImGui::GetWindowContentRegionMax().x - totalButtonWidth);
-		if (ImGui::Button("OK", ImVec2(buttonWidth, 0))) {
-			ImGui::CloseCurrentPopup();
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("Cancel", ImVec2(buttonWidth, 0))) {
-			ImGui::CloseCurrentPopup();
-		}
-		ImGui::EndPopup();
-	}
-#endif // _DEBUG
-}
-
-void GPUParticleSystem::MouseTransGuizmo() {
-#ifdef _DEBUGMODE
-	Matrix4x4 model = MakeAffineMatrix(mouseTrans_.scale, mouseTrans_.rotate, mouseTrans_.translate);
-
-	Matrix4x4 view;
-	Matrix4x4 proj;
-	view = CameraManager::GetInstance()->GetCamera()->GetViewMatrix();
-	proj = CameraManager::GetInstance()->GetCamera()->GetProjectionMatrix();
-
-	ImGuizmo::Manipulate(
-		&view.m[0][0], &proj.m[0][0],         // カメラ
-		ImGuizmo::TRANSLATE,                  // 操作モード
-		ImGuizmo::WORLD,                      // ローカル座標系
-		&model.m[0][0]                        // 行列
-	);
-
-	// 編集中なら Transform に反映
-	if (ImGuizmo::IsUsing()) {
-		Vector3 t, r, s;
-		ImGuizmo::DecomposeMatrixToComponents(&model.m[0][0], &t.x, &r.x, &s.x);
-		constexpr float DegToRad = 3.14159265f / 180.0f;
-		r = r * DegToRad;
-
-		mouseTrans_.translate = t;
-		mouseTrans_.rotate = r;
-		mouseTrans_.scale = s;
-	}
-#endif // _DEBUGMODE
 }
 
 void GPUParticleSystem::UpdateParticleCSDispatch() {

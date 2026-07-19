@@ -2,9 +2,6 @@
 #include "Engine/Editor/CommandManager.h"
 #include "Engine/Editor/PropertyCommand.h"
 #include "Engine/Editor/JsonSerializer.h"
-#ifdef _DEBUGMODE
-#include "externals/imgui/ImGuizmo.h"
-#endif // _DEBUG
 
 using namespace Core;
 using namespace Graphics;
@@ -41,68 +38,11 @@ void OriginGameObject::DebugGUI() {
 		CreatePropertyCommand(2);
 
 		ImGui::Separator();
-		ImGui::RadioButton("TRANSLATE", &gizmoType_, 0); ImGui::SameLine();
-		ImGui::RadioButton("ROTATE", &gizmoType_, 1); ImGui::SameLine();
-		ImGui::RadioButton("SCALE", &gizmoType_, 2);
+		gizmo_.DrawOperationRadio();
 		JsonSerializer::ShowSaveTransformPopup(model_->GetTransform()); ImGui::SameLine();
 		JsonSerializer::ShowLoadTransformPopup(model_->GetTransform());
-		ImGuizmo::OPERATION operation;
-		switch (gizmoType_) {
-		case 0: operation = ImGuizmo::TRANSLATE; break;
-		case 1: operation = ImGuizmo::ROTATE;    break;
-		case 2: operation = ImGuizmo::SCALE;     break;
-		default: operation = ImGuizmo::TRANSLATE; break; // デフォルト安全策
-		}
+		gizmo_.Manipulate(model_->GetTransform());
 
-		// ギズモの表示
-		Matrix4x4 model = MakeAffineMatrix(model_->GetTransform().scale, model_->GetTransform().rotate, model_->GetTransform().translate);
-
-		Matrix4x4 view;
-		Matrix4x4 proj;
-		view = CameraManager::GetInstance()->GetCamera()->GetViewMatrix();
-		proj = CameraManager::GetInstance()->GetCamera()->GetProjectionMatrix();
-
-		ImGuizmo::Manipulate(
-			&view.m[0][0], &proj.m[0][0],         // カメラ
-			operation,                  // 操作モード
-			ImGuizmo::WORLD,                      // ローカル座標系
-			&model.m[0][0]                        // 行列
-		);
-
-		// 編集中なら Transform に反映
-		if (ImGuizmo::IsUsing()) {
-			if (!IsUsingGizmo_) {
-				prevPos_ = model_->GetTransform().translate; // 開始時の状態を保存
-				prevRotate_ = model_->GetTransform().rotate;
-				prevScale_ = model_->GetTransform().scale;
-			}
-			IsUsingGizmo_ = true;
-
-			Vector3 t, r, s;
-			ImGuizmo::DecomposeMatrixToComponents(&model.m[0][0], &t.x, &r.x, &s.x);
-			model_->GetTransform().translate = t;
-			constexpr float DegToRad = 3.14159265f / 180.0f;
-			model_->GetTransform().rotate = r * DegToRad;
-			model_->GetTransform().scale = s;
-		} else if (IsUsingGizmo_) {
-			// 編集終了検出 → Command 発行
-			if (model_->GetTransform().translate != prevPos_) {
-				auto command = std::make_unique<PropertyCommand<Vector3>>(
-					model_->GetTransform(), &Trans::translate, prevPos_, model_->GetTransform().translate);
-				CommandManager::GetInstance()->Execute(std::move(command));
-			} else if (model_->GetTransform().rotate != prevRotate_) {
-				auto command = std::make_unique<PropertyCommand<Vector3>>(
-					model_->GetTransform(), &Trans::rotate, prevRotate_, model_->GetTransform().rotate);
-				CommandManager::GetInstance()->Execute(std::move(command));
-			} else if (model_->GetTransform().scale != prevScale_) {
-				auto command = std::make_unique<PropertyCommand<Vector3>>(
-					model_->GetTransform(), &Trans::scale, prevScale_, model_->GetTransform().scale);
-				CommandManager::GetInstance()->Execute(std::move(command));
-			}
-			// ※必要に応じて rotate/scale の比較と Command 追加も可
-
-			IsUsingGizmo_ = false; // フラグリセット
-		}
 		ImGui::TreePop();
 	}
 	ImGui::Unindent();

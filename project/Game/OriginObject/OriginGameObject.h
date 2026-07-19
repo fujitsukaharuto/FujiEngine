@@ -8,6 +8,9 @@
 #include "Camera/CameraManager.h"
 #include "Input/Input.h"
 #include "Engine/ImGuiManager/ImGuiManager.h"
+#ifdef _DEBUGMODE
+#include "Engine/Editor/GizmoHelper.h"
+#endif // _DEBUGMODE
 
 /// <summary>
 /// ゲームオブジェクトの基底クラス
@@ -64,8 +67,9 @@ protected:
 	Math::Vector3 prevPos_;
 	Math::Vector3 prevRotate_;
 	Math::Vector3 prevScale_;
-	int gizmoType_ = 0;
-	float IsUsingGizmo_ = false;
+#ifdef _DEBUGMODE
+	Editor::GizmoHelper gizmo_;
+#endif // _DEBUGMODE
 
 	nlohmann::json modelDataJson_;
 

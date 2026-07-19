@@ -72,6 +72,10 @@ struct EmitterInfo {
 class DXCom;
 class SRVManager;
 
+namespace Editor {
+	class GPUParticleSystemEditor;
+}
+
 struct ParticleCSInstance {
 	ComPtr<ID3D12Resource> particleCSInstancing_;
 	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> particleCSSRVHandle_;
@@ -82,6 +86,9 @@ struct ParticleCSInstance {
 /// GPUパーティクル管理クラス
 /// </summary>
 class GPUParticleSystem {
+#ifdef _DEBUGMODE
+	friend class Editor::GPUParticleSystemEditor;
+#endif // _DEBUGMODE
 public:
 	GPUParticleSystem();
 	~GPUParticleSystem();
@@ -110,12 +117,10 @@ public:
 	int InitGPUEmitterTexture(const std::string& fileName = "white2x2.png");
 	int InitGPUEmitterSurface(const std::string& fileName);
 
+	/// <summary>タブ形式のエミッター編集ウィンドウ(GPUParticleScene用)</summary>
 	void DebugGUI();
-	void RenderPerformanceStats();
-	void RenderEmitterList(std::vector<int>& emitterIndices, int& currentIdx, PipelinePhase phase);
-	void ParticleCSDebugGUI();
-	void ParticleTexCSDebugGUI();
-	void ParticleSurfaceCSDebugGUI();
+	/// <summary>統計情報と3種のエミッター設定(全シーン共通のインスペクタ用)</summary>
+	void EmitterInspectorGUI();
 
 	//========================================================================*/
 	//* Getter
@@ -135,11 +140,6 @@ private:
 	void UpdatePerViewData(const Math::Matrix4x4& billboardMatrix);
 
 	void UpdateGPUEmitter();
-
-	//========================================================================*/
-	//* Debug
-	void LoadPopUpGUI(int id, PipelinePhase type);
-	void MouseTransGuizmo();
 
 	//========================================================================*/
 	//* Dispatch
@@ -223,12 +223,7 @@ private:
 	DXC::GPUTimer gpuTimerGraphics;
 	DXC::GPUTimer gpuTimerCompute;
 
-	bool isMouseTracking_ = true;
-	Math::Trans mouseTrans_;
-
 #ifdef _DEBUGMODE
-	int editCSEmitInd_;
-	int editCSEmitTexInd_;
-	int editCSEmitSurfaceInd_;
-#endif // _DEBUG
+	std::unique_ptr<Editor::GPUParticleSystemEditor> editor_;
+#endif // _DEBUGMODE
 };

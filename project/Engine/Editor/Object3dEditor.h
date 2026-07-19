@@ -1,6 +1,7 @@
 #pragma once
 #ifdef _DEBUGMODE
 #include "Engine/Math/Matrix/MatrixCalculation.h"
+#include "Engine/Editor/GizmoHelper.h"
 
 namespace Graphics {
 	class Object3d;
@@ -30,8 +31,7 @@ namespace Editor {
 		Math::Vector3 prevPos_;
 		Math::Vector3 prevRotate_;
 		Math::Vector3 prevScale_;
-		int gizmoType_ = 0;
-		bool isUsingGizmo_ = false;
+		GizmoHelper gizmo_;
 	};
 }
 #endif // _DEBUGMODE

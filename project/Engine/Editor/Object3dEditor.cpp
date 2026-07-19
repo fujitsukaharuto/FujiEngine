@@ -3,12 +3,10 @@
 #include "Engine/Model/Object3d.h"
 #include "Engine/Model/ModelManager.h"
 #include "Engine/Model/TextureManager.h"
-#include "Engine/Camera/CameraManager.h"
 #include "Engine/ImGuiManager/ImGuiManager.h"
 #include "Engine/Editor/CommandManager.h"
 #include "Engine/Editor/PropertyCommand.h"
 #include "Engine/Editor/JsonSerializer.h"
-#include "ImGuizmo.h"
 
 using namespace Core;
 using namespace Graphics;
@@ -47,90 +45,10 @@ namespace Editor {
 		CreatePropertyCommand(transform, 2);
 
 		ImGui::Separator();
-		ImGui::RadioButton("TRANSLATE", &gizmoType_, 0); ImGui::SameLine();
-		ImGui::RadioButton("ROTATE", &gizmoType_, 1); ImGui::SameLine();
-		ImGui::RadioButton("SCALE", &gizmoType_, 2);
+		gizmo_.DrawOperationRadio();
 		JsonSerializer::ShowSaveTransformPopup(transform); ImGui::SameLine();
 		JsonSerializer::ShowLoadTransformPopup(transform);
-		ImGuizmo::OPERATION operation;
-		switch (gizmoType_) {
-		case 0: operation = ImGuizmo::TRANSLATE; break;
-		case 1: operation = ImGuizmo::ROTATE;    break;
-		case 2: operation = ImGuizmo::SCALE;     break;
-		default: operation = ImGuizmo::TRANSLATE; break; // デフォルト安全策
-		}
-
-		// ギズモの表示
-		Matrix4x4 model = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
-		if (transform.parent) {
-			const Matrix4x4 parentWorld = transform.parent->GetWorldMat();
-			model = Multiply(model, transform.isNoneScaleParent ? Math::RemoveScale(parentWorld) : parentWorld);
-		}
-
-		Matrix4x4 view;
-		Matrix4x4 proj;
-		view = CameraManager::GetInstance()->GetCamera()->GetViewMatrix();
-		proj = CameraManager::GetInstance()->GetCamera()->GetProjectionMatrix();
-
-		ImGuizmo::Manipulate(
-			&view.m[0][0], &proj.m[0][0],         // カメラ
-			operation,                            // 操作モード
-			ImGuizmo::WORLD,                      // ローカル座標系
-			&model.m[0][0]                        // 行列
-		);
-
-		// 編集中なら Transform に反映
-		if (ImGuizmo::IsUsing()) {
-			if (!isUsingGizmo_) {
-				prevPos_ = transform.translate;
-				prevRotate_ = transform.rotate;
-				prevScale_ = transform.scale;
-			}
-			isUsingGizmo_ = true;
-
-			Vector3 t, r, s;
-			ImGuizmo::DecomposeMatrixToComponents(&model.m[0][0], &t.x, &r.x, &s.x);
-			constexpr float DegToRad = 3.14159265f / 180.0f;
-			r = r * DegToRad;
-
-			if (transform.parent) {
-				// 親ワールド行列（スケールあり or スケールなし）
-				Matrix4x4 parentMatrix = transform.parent->GetWorldMat();
-				if (transform.isNoneScaleParent) {
-					parentMatrix = Math::RemoveScale(parentMatrix);
-				}
-
-				// ワールド→ローカル変換
-				Matrix4x4 invParentMatrix = Inverse(parentMatrix);
-
-				Matrix4x4 worldMatrix = MakeAffineMatrix(s, r, t);
-				Matrix4x4 localMatrix = Multiply(worldMatrix, invParentMatrix);
-
-				ImGuizmo::DecomposeMatrixToComponents(&localMatrix.m[0][0], &transform.translate.x, &transform.rotate.x, &transform.scale.x);
-				transform.rotate = transform.rotate * DegToRad;
-			} else {
-				transform.translate = t;
-				transform.rotate = r;
-				transform.scale = s;
-			}
-		} else if (isUsingGizmo_) {
-			// 編集終了検出 → Command 発行
-			if (transform.translate != prevPos_) {
-				auto command = std::make_unique<PropertyCommand<Vector3>>(
-					transform, &Trans::translate, prevPos_, transform.translate);
-				CommandManager::GetInstance()->Execute(std::move(command));
-			} else if (transform.rotate != prevRotate_) {
-				auto command = std::make_unique<PropertyCommand<Vector3>>(
-					transform, &Trans::rotate, prevRotate_, transform.rotate);
-				CommandManager::GetInstance()->Execute(std::move(command));
-			} else if (transform.scale != prevScale_) {
-				auto command = std::make_unique<PropertyCommand<Vector3>>(
-					transform, &Trans::scale, prevScale_, transform.scale);
-				CommandManager::GetInstance()->Execute(std::move(command));
-			}
-
-			isUsingGizmo_ = false; // フラグリセット
-		}
+		gizmo_.Manipulate(transform);
 
 		ImGui::TreePop();
 	}
