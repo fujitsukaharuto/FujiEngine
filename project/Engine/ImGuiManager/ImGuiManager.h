@@ -9,11 +9,18 @@
 #ifdef _DEBUGMODE
 #include "imgui.h"
 #include "imgui_node_editor.h"
-#include "Engine/ImGuiManager/NodeGraph.h"
 #include "utilities/builders.h"
 #include "utilities/widgets.h"
 
 namespace ed = ax::NodeEditor;
+
+// NodeGraph.h は json.hpp を連れてくるので実体includeは .cpp に置く
+namespace Core {
+	struct Pin;
+	struct MyNode;
+	struct Link;
+	class NodeGraph;
+}
 #endif // _DEBUG
 
 

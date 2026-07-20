@@ -1,9 +1,6 @@
 #pragma once
 #include "Particle.h"
 #include "Engine/Model/Object3d.h"
-#include <json.hpp>
-
-using json = nlohmann::json;
 
 namespace Graphics {
 

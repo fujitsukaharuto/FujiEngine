@@ -2,6 +2,7 @@
 #ifdef _DEBUGMODE
 #include <fstream>
 #include <filesystem>
+#include <json.hpp>
 
 #include "Engine/ImGuiManager/ImGuiManager.h"
 #include "Engine/Editor/CommandManager.h"

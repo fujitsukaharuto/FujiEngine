@@ -1,13 +1,13 @@
 #pragma once
 #include <memory>
-#include <json.hpp>
+// json は宣言とポインタにしか使わないので前方宣言で足りる
+#include <json_fwd.hpp>
 
 #include "Engine/Model/Object3d.h"
 #include "Engine/Model/AnimationData/AnimationModel.h"
 #include "Engine/DX/FPSKeeper.h"
 #include "Engine/Camera/CameraManager.h"
 #include "Engine/Input/Input.h"
-#include "Engine/ImGuiManager/ImGuiManager.h"
 
 /// <summary>
 /// ゲームオブジェクトの基底クラス
@@ -15,7 +15,8 @@
 class OriginGameObject {
 public:
 	OriginGameObject();
-	virtual ~OriginGameObject() = default;
+	/// <remarks>modelDataJson_ が不完全型の unique_ptr なので定義は .cpp に置く</remarks>
+	virtual ~OriginGameObject();
 
 	virtual void Initialize();
 	virtual void Update();
@@ -58,7 +59,8 @@ protected:
 	std::unique_ptr<Graphics::Object3d> model_;
 	std::unique_ptr<Graphics::AnimationModel> animeModel_;
 
-	nlohmann::json modelDataJson_;
+	/// <summary>Jsonから生成する際の元データ。json.hpp をヘッダから隔離するため実体は持たない</summary>
+	std::unique_ptr<nlohmann::json> modelDataJson_;
 
 private:
 

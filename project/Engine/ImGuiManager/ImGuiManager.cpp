@@ -7,6 +7,7 @@
 #include "Engine/Serialize/JsonSerializer.h"
 #include "Engine/Model/TextureManager.h"
 #ifdef _DEBUGMODE
+#include "Engine/ImGuiManager/NodeGraph.h"
 #include "imgui_impl_dx12.h"
 #include "imgui_impl_win32.h"
 #include "ImGuizmo.h"

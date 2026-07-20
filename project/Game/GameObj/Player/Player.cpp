@@ -1,5 +1,6 @@
 #include "Player.h"
 
+#include "Engine/ImGuiManager/ImGuiManager.h"
 #include "Engine/Particle/ParticleManager.h"
 #include "Engine/Serialize/JsonSerializer.h"
 #include "Engine/Math/Random/Random.h"

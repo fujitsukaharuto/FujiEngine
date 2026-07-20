@@ -1,4 +1,5 @@
 #include "GameScene.h"
+#include <json.hpp>
 #include "Engine/FujiEngine.h"
 #include "Game/GameObj/FollowCamera.h"
 #include "Game/GameObj/Player/PlayerBullet.h"
@@ -209,7 +210,7 @@ void GameScene::BlackFade() {
 
 void GameScene::LoadSceneLevelData(const std::string& name) {
 	BaseScene::LoadSceneLevelData(name);
-	for (const auto& objJson : sceneData_["objects"]) {
+	for (const auto& objJson : (*sceneData_)["objects"]) {
 		if (objJson.contains("objectType")) {
 			if (objJson["objectType"] == "Normal") {
 				

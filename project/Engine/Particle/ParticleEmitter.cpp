@@ -1,4 +1,5 @@
 #include "ParticleEmitter.h"
+#include <json.hpp>
 #include "ParticleManager.h"
 #include "Engine/Math/Random/Random.h"
 #include "Engine/ImGuiManager/ImGuiManager.h"
@@ -418,7 +419,7 @@ void ParticleEmitter::RandomTranslate(const Vector2& x, const Vector2& y, const 
 }
 
 void ParticleEmitter::Save() {
-	json j;
+	nlohmann::json j;
 
 	j["position"]             = { pos_.x, pos_.y, pos_.z };
 	j["rotate"]               = { particleRotate_.x,particleRotate_.y,particleRotate_.z };
@@ -484,7 +485,7 @@ void ParticleEmitter::Load(const std::string& filename) {
 		return;
 	}
 
-	json j;
+	nlohmann::json j;
 	file >> j;
 	file.close();
 

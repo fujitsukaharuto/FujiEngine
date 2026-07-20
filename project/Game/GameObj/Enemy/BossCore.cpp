@@ -1,4 +1,5 @@
 #include "BossCore.h"
+#include "Engine/ImGuiManager/ImGuiManager.h"
 
 #include "Game/GameObj/Enemy/Boss.h"
 

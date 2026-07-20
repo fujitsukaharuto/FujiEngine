@@ -3,7 +3,7 @@
 #include <memory>
 #include <string>
 #include <cstring>
-#include <json.hpp>
+#include <json_fwd.hpp>	// json は宣言にしか使わないので前方宣言で足りる
 
 #include "Engine/Editor/ICommand.h"
 #include "Engine/Editor/PropertyCommand.h"

@@ -2,7 +2,6 @@
 #include "Engine/Audio/AudioPlayer.h"
 #include "Engine/DX/DXCom.h"
 #include "Engine/Model/TextureManager.h"
-#include "Engine/ImGuiManager/ImGuiManager.h"
 #include "Engine/DX/SRVManager.h"
 #include "Engine/WinApp/MyWindow.h"
 #include "Engine/GlobalVariables/GlobalVariables.h"
@@ -16,6 +15,9 @@
 #include "Engine/Scene/SceneManager.h"
 #include "Engine/Model/Line/Line3dDrawer.h"
 #include "Engine/Editor/CommandManager.h"
+
+// ImGuiManager.h は imgui.h を連れてくるので、ポインタ保持だけの用途では前方宣言に留める
+namespace Core { class ImGuiManager; }
 
 namespace Core {
 	/// <summary>

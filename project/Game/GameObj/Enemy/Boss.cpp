@@ -1,4 +1,5 @@
 #include "Boss.h"
+#include <json.hpp>
 #include "Engine/Particle/ParticleManager.h"
 #include "Engine/Math/Random/Random.h"
 #include "Engine/Camera/CameraManager.h"

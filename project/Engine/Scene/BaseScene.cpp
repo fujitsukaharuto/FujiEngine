@@ -1,4 +1,6 @@
 #include "BaseScene.h"
+#include <json.hpp>
+#include "Engine/Serialize/JsonSerializer.h"
 
 #include "Engine/Scene/SceneManager.h"
 #include "Engine/Editor/CommandManager.h"
@@ -10,8 +12,10 @@ using namespace Scene;
 using namespace DXC;
 
 
-BaseScene::BaseScene() {
+BaseScene::BaseScene() : sceneData_(std::make_unique<nlohmann::json>()) {
 }
+
+BaseScene::~BaseScene() = default;
 
 void BaseScene::Initialize() {
 }
@@ -31,7 +35,7 @@ void BaseScene::Init(DXCom* pDxcom, SceneManager* pSceneManager, Graphics::Light
 }
 
 void BaseScene::LoadSceneLevelData(const std::string& name) {
-	sceneData_ = JsonSerializer::DeserializeJsonData(name);
+	*sceneData_ = JsonSerializer::DeserializeJsonData(name);
 }
 
 void BaseScene::DebugGUI() {

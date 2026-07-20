@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 #include "Engine/DX/DXCom.h"
 #include "Engine/Serialize/JsonSerializer.h"
 #include "Engine/Input/Input.h"
@@ -21,7 +22,8 @@ namespace Scene {
 	class BaseScene {
 	public:
 		BaseScene();
-		virtual ~BaseScene() = default;
+		/// <remarks>sceneData_ が不完全型の unique_ptr なので定義は .cpp に置く</remarks>
+		virtual ~BaseScene();
 
 	public:
 
@@ -58,7 +60,8 @@ namespace Scene {
 		Core::Input* input_ = nullptr;
 		Audio::AudioPlayer* audioPlayer_ = nullptr;
 		Graphics::LightManager* lightManager_ = nullptr;
-		nlohmann::json sceneData_;
+		/// <summary>シーン配置データ。json.hpp をヘッダから隔離するため実体は持たない</summary>
+		std::unique_ptr<nlohmann::json> sceneData_;
 
 	private:
 

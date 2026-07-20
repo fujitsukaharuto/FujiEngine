@@ -1,4 +1,5 @@
 #include "Engine/Model/Object3d.h"
+#include <json.hpp>
 #include "Engine/GraphicPipeline/PipeKind.h"
 #include "Engine/GraphicPipeline/PipelineManager.h"
 #include "Engine/Model/ModelManager.h"

@@ -1,7 +1,7 @@
 #pragma once
 #include <variant>
 #include <map>
-#include <json.hpp>
+#include <json_fwd.hpp>	// json は private な型エイリアスにしか使わないので前方宣言で足りる
 #include "Engine/Math/Matrix/MatrixCalculation.h"
 
 namespace Core {

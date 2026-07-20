@@ -1,4 +1,5 @@
 #include "OriginGameObject.h"
+#include <json.hpp>
 #include "Engine/Serialize/JsonSerializer.h"
 
 using namespace Core;
@@ -7,8 +8,10 @@ using namespace Math;
 using namespace Editor;
 
 
-OriginGameObject::OriginGameObject() {
+OriginGameObject::OriginGameObject() : modelDataJson_(std::make_unique<nlohmann::json>()) {
 }
+
+OriginGameObject::~OriginGameObject() = default;
 
 void OriginGameObject::Initialize() {
 	model_ = std::make_unique<Object3d>();
@@ -75,10 +78,10 @@ void OriginGameObject::CreateFromJson(const std::string& name) {
 }
 
 void OriginGameObject::CreateFromJson() {
-	std::string modelName = modelDataJson_.value("modelName", "DefaultModel");
+	std::string modelName = modelDataJson_->value("modelName", "DefaultModel");
 	model_->Create(modelName);
-	if (modelDataJson_.contains("transform")) {
-		const auto& t = modelDataJson_["transform"];
+	if (modelDataJson_->contains("transform")) {
+		const auto& t = (*modelDataJson_)["transform"];
 		if (t.contains("translate")) {
 			model_->GetTransform().translate.x = t["translate"][0];
 			model_->GetTransform().translate.y = t["translate"][1];
@@ -106,6 +109,6 @@ void OriginGameObject::SetAnimeModel(const std::string& name) {
 }
 
 void OriginGameObject::SetModelDataJson(const nlohmann::json& jsonData) {
-	modelDataJson_ = jsonData;
+	*modelDataJson_ = jsonData;
 }
 

@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
-#include <json.hpp>
+// json は宣言(引数・戻り値)にしか使わないので前方宣言で足りる。実体が要る側は <json.hpp> を直接includeすること
+#include <json_fwd.hpp>
 #include "Engine/Math/Matrix/MatrixCalculation.h"
 
 using json = nlohmann::json;
