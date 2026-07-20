@@ -4,7 +4,6 @@
 #include "Engine/DX/FPSKeeper.h"
 #include "Engine/Particle/ParticleManager.h"
 #include "Engine/Model/ObjectRenderer.h"
-#include "Engine/Editor/CommandManager.h"
 
 using namespace Core;
 using namespace Graphics;
@@ -66,9 +65,7 @@ void TestScene::Draw() {
 	
 
 
-#ifdef _DEBUGMODE
-	CommandManager::GetInstance()->Draw();
-#endif // _DEBUG
+	DrawEditorObjects();
 
 #pragma endregion
 

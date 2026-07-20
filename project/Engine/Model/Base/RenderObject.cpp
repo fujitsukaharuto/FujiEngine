@@ -3,7 +3,7 @@
 #include "Engine/Light/LightManager.h"
 #include "Engine/DX/DXCom.h"
 #include "Engine/DX/DX12Helper.h"
-#include "Engine/Editor/JsonSerializer.h"
+#include "Engine/Serialize/JsonSerializer.h"
 
 using namespace Core;
 using namespace Math;

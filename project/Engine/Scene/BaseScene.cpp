@@ -56,3 +56,9 @@ void BaseScene::ChangeScene(const std::string& sceneName, float extraTime) {
 	sceneManager_->ChangeScene(sceneName, extraTime);
 	CommandManager::GetInstance()->Reset();
 }
+
+void BaseScene::DrawEditorObjects() {
+#ifdef _DEBUGMODE
+	CommandManager::GetInstance()->Draw();
+#endif // _DEBUGMODE
+}

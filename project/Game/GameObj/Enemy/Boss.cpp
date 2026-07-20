@@ -2,7 +2,7 @@
 #include "Engine/Particle/ParticleManager.h"
 #include "Engine/Math/Random/Random.h"
 #include "Engine/Camera/CameraManager.h"
-#include "Engine/Editor/JsonSerializer.h"
+#include "Engine/Serialize/JsonSerializer.h"
 #include <numbers>
 
 #include "Game/GameObj/Enemy/Behavior/BossRoot.h"

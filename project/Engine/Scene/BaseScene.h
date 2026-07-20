@@ -1,6 +1,6 @@
 #pragma once
 #include "Engine/DX/DXCom.h"
-#include "Engine/Editor/JsonSerializer.h"
+#include "Engine/Serialize/JsonSerializer.h"
 #include "Engine/Input/Input.h"
 #include "Engine/Audio/AudioPlayer.h"
 #include "Engine/Camera/DebugCamera.h"
@@ -38,6 +38,12 @@ namespace Scene {
 
 		/// <summary>シーンの変更</summary>
 		void ChangeScene(const std::string& sceneName, float extraTime);
+
+	protected:
+
+		/// <summary>エディタで配置したオブジェクトを描画する</summary>
+		/// <remarks>Debug構成以外では何もしないので、呼び出し側で分岐する必要はない</remarks>
+		void DrawEditorObjects();
 
 	private:
 

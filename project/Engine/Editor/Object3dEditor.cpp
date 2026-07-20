@@ -6,7 +6,7 @@
 #include "Engine/ImGuiManager/ImGuiManager.h"
 #include "Engine/Editor/CommandManager.h"
 #include "Engine/Editor/PropertyCommand.h"
-#include "Engine/Editor/JsonSerializer.h"
+#include "Engine/Editor/JsonEditorUI.h"
 
 using namespace Core;
 using namespace Graphics;
@@ -46,8 +46,8 @@ namespace Editor {
 
 		ImGui::Separator();
 		gizmo_.DrawOperationRadio();
-		JsonSerializer::ShowSaveTransformPopup(transform); ImGui::SameLine();
-		JsonSerializer::ShowLoadTransformPopup(transform);
+		JsonEditorUI::ShowSaveTransformPopup(transform); ImGui::SameLine();
+		JsonEditorUI::ShowLoadTransformPopup(transform);
 		gizmo_.Manipulate(transform);
 
 		ImGui::TreePop();

@@ -1,6 +1,6 @@
 #include "CommandManager.h"
 #include "Engine/Input/Input.h"
-#include "Engine/Editor/JsonSerializer.h"
+#include "Engine/Editor/JsonEditorUI.h"
 #include "Engine/ImGuiManager/ImGuiManager.h"
 #include "Engine/Model/ModelManager.h"
 #include <fstream>
@@ -140,7 +140,7 @@ void CommandManager::DebugGUI() {
 		loadObj->obj = std::make_unique<Object3d>();
 		loadObj->obj->CreateSphere();
 	}
-	if (JsonSerializer::ShowLoadEditorObjPopup(*loadObj)) {
+	if (JsonEditorUI::ShowLoadEditorObjPopup(*loadObj)) {
 		int newId = CommandManager::GetInstance()->nextObjId++;
 		auto command = std::make_unique<CreateObjCommand>(newId, loadObj->name, loadObj->modelName);
 		Execute(std::move(command));
@@ -237,7 +237,7 @@ void CommandManager::EditorObjGUI(EditorObj& obj) {
 			}
 
 			ImGui::Separator();
-			JsonSerializer::ShowSaveEditorObjPopup(obj);
+			JsonEditorUI::ShowSaveEditorObjPopup(obj);
 			ImGui::SameLine();
 			if (ImGui::Button(obj.deleteButtonLabel.c_str())) {
 				auto deleteCommand = std::make_unique<DeleteObjCommand>(obj.id);
@@ -440,7 +440,7 @@ void CommandManager::SaveAllEditorOBJ() {
 
 	// 保存完了後の通知
 	if (showSuccessMessage) {
-		JsonSerializer::SavedPopup(showSuccessMessage);
+		JsonEditorUI::SavedPopup(showSuccessMessage);
 	}
 #endif // _DEBUG
 }
@@ -576,12 +576,12 @@ void CommandManager::LoadAllEditorOBJ() {
 	}
 
 	if (showLoadSuccessMessage) {
-		JsonSerializer::LoadedPopup(showLoadSuccessMessage);
+		JsonEditorUI::LoadedPopup(showLoadSuccessMessage);
 	}
 
 	// エラーメッセージ（ファイルが存在しない）
 	if (showLoadErrorMessage) {
-		JsonSerializer::LoadErrorPopup(showLoadErrorMessage, fileName);
+		JsonEditorUI::LoadErrorPopup(showLoadErrorMessage, fileName);
 	}
 #endif // _DEBUG
 }

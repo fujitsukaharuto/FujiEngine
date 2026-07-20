@@ -9,7 +9,6 @@
 #include "Engine/Particle/ParticleManager.h"
 #include "Engine/Scene/SceneManager.h"
 #include "Engine/Model/Sprite/SpriteRenderer.h"
-#include "Engine/Editor/CommandManager.h"
 #include <cmath>
 
 using namespace Core;
@@ -175,9 +174,7 @@ void TitleScene::Draw() {
 #endif // _DEBUG
 
 
-#ifdef _DEBUGMODE
-	CommandManager::GetInstance()->Draw();
-#endif // _DEBUG
+	DrawEditorObjects();
 
 #pragma endregion
 

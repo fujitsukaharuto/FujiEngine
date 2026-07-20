@@ -182,7 +182,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Editor\AnimationModelEditor.cpp" />
     <ClCompile Include="Engine\Editor\GizmoHelper.cpp" />
     <ClCompile Include="Engine\Editor\GPUParticleSystemEditor.cpp" />
-    <ClCompile Include="Engine\Editor\JsonSerializer.cpp" />
+    <ClCompile Include="Engine\Serialize\JsonSerializer.cpp" />
+    <ClCompile Include="Engine\Editor\JsonEditorUI.cpp" />
     <ClCompile Include="Engine\Editor\Object3dEditor.cpp" />
     <ClCompile Include="Engine\GlobalVariables\GlobalVariables.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\AnimationPipeline.cpp" />
@@ -319,6 +320,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\DX\DXCompile.h" />
     <ClInclude Include="Engine\DX\FPSKeeper.h" />
     <ClInclude Include="Engine\DX\FrameCount.h" />
+    <ClInclude Include="Engine\FujiEngine.h" />
     <ClInclude Include="Engine\DX\Framework.h" />
     <ClInclude Include="Engine\DX\GPUTimer.h" />
     <ClInclude Include="Engine\DX\GraphicsDevice.h" />
@@ -332,7 +334,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Editor\AnimationModelEditor.h" />
     <ClInclude Include="Engine\Editor\GizmoHelper.h" />
     <ClInclude Include="Engine\Editor\GPUParticleSystemEditor.h" />
-    <ClInclude Include="Engine\Editor\JsonSerializer.h" />
+    <ClInclude Include="Engine\Serialize\JsonSerializer.h" />
+    <ClInclude Include="Engine\Editor\JsonEditorUI.h" />
     <ClInclude Include="Engine\Editor\Object3dEditor.h" />
     <ClInclude Include="Engine\Editor\PropertyCommand.h" />
     <ClInclude Include="Engine\GlobalVariables\GlobalVariables.h" />

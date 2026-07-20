@@ -8,9 +8,6 @@
 #include "Engine/Camera/CameraManager.h"
 #include "Engine/Input/Input.h"
 #include "Engine/ImGuiManager/ImGuiManager.h"
-#ifdef _DEBUGMODE
-#include "Engine/Editor/GizmoHelper.h"
-#endif // _DEBUGMODE
 
 /// <summary>
 /// ゲームオブジェクトの基底クラス
@@ -56,20 +53,10 @@ public:
 	Math::Vector3 GetWorldPos()const { return model_->GetWorldPos(); }
 	Math::Vector3 GetAnimeWorldPos()const { return animeModel_->GetWorldPos(); }
 
-	void CreatePropertyCommand(int type);
-
 protected:
 
 	std::unique_ptr<Graphics::Object3d> model_;
 	std::unique_ptr<Graphics::AnimationModel> animeModel_;
-
-
-	Math::Vector3 prevPos_;
-	Math::Vector3 prevRotate_;
-	Math::Vector3 prevScale_;
-#ifdef _DEBUGMODE
-	Editor::GizmoHelper gizmo_;
-#endif // _DEBUGMODE
 
 	nlohmann::json modelDataJson_;
 

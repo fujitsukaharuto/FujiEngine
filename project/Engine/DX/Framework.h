@@ -1,7 +1,6 @@
 #pragma once
 #include "Engine/Audio/AudioPlayer.h"
 #include "Engine/DX/DXCom.h"
-#include "Game/Scene/GameScene.h"
 #include "Engine/Model/TextureManager.h"
 #include "Engine/ImGuiManager/ImGuiManager.h"
 #include "Engine/DX/SRVManager.h"

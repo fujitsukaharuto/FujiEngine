@@ -185,7 +185,10 @@
     <ClCompile Include="Engine\GraphicPipeline\SkinningCSPipe.cpp">
       <Filter>Engine\GraphicPipeline</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Editor\JsonSerializer.cpp">
+    <ClCompile Include="Engine\Serialize\JsonSerializer.cpp">
+      <Filter>Engine\Serialize</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Editor\JsonEditorUI.cpp">
       <Filter>Engine\Editor</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Editor\Object3dEditor.cpp">
@@ -529,6 +532,9 @@
     <ClInclude Include="Engine\Scene\SceneManager.h">
       <Filter>Engine\Scene</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\FujiEngine.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
     <ClInclude Include="Engine\DX\Framework.h">
       <Filter>Engine\DX</Filter>
     </ClInclude>
@@ -676,7 +682,10 @@
     <ClInclude Include="Engine\GraphicPipeline\SkinningCSPipe.h">
       <Filter>Engine\GraphicPipeline</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Editor\JsonSerializer.h">
+    <ClInclude Include="Engine\Serialize\JsonSerializer.h">
+      <Filter>Engine\Serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Editor\JsonEditorUI.h">
       <Filter>Engine\Editor</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Editor\Object3dEditor.h">
@@ -1034,6 +1043,9 @@
     </Filter>
     <Filter Include="Engine\Editor">
       <UniqueIdentifier>{b324ee81-9c59-4fe2-9acd-053eaf7bcddc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Serialize">
+      <UniqueIdentifier>{3f7a1c62-5b04-4e19-8d73-2a6f9c1b45e0}</UniqueIdentifier>
     </Filter>
     <Filter Include="resource\Shaders\CS\Engine">
       <UniqueIdentifier>{a53b59b2-f85d-43ce-897a-0b92b392dcaf}</UniqueIdentifier>

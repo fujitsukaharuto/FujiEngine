@@ -6,7 +6,7 @@
 #include "Engine/DX/DX12Helper.h"
 #include "Engine/Light/LightManager.h"
 #include "Engine/Camera/CameraManager.h"
-#include "Engine/Editor/JsonSerializer.h"
+#include "Engine/Serialize/JsonSerializer.h"
 #ifdef _DEBUGMODE
 #include "Engine/Editor/Object3dEditor.h"
 #endif // _DEBUGMODE

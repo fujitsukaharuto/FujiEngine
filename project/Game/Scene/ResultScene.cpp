@@ -11,7 +11,6 @@
 #include "Engine/Scene/SceneManager.h"
 #include "Engine/Light/LightManager.h"
 #include "Engine/Model/Sprite/SpriteRenderer.h"
-#include "Engine/Editor/CommandManager.h"
 
 using namespace Core;
 using namespace Graphics;
@@ -128,9 +127,7 @@ void ResultScene::Draw() {
 
 	clear_->Draw();
 
-#ifdef _DEBUGMODE
-	CommandManager::GetInstance()->Draw();
-#endif // _DEBUG
+	DrawEditorObjects();
 
 #pragma endregion
 

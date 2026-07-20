@@ -1,17 +1,7 @@
 #include "GameScene.h"
-#include "Engine/ImGuiManager/ImGuiManager.h"
-#include "Engine/GlobalVariables/GlobalVariables.h"
-#include "Engine/DX/FPSKeeper.h"
+#include "Engine/FujiEngine.h"
 #include "Game/GameObj/FollowCamera.h"
 #include "Game/GameObj/Player/PlayerBullet.h"
-#include "Engine/Model/ModelManager.h"
-#include "Engine/Model/Line/Line3dDrawer.h"
-#include "Engine/Model/Sprite/SpriteRenderer.h"
-#include "Engine/Light/LightManager.h"
-#include "Engine/Light/PointLight.h"
-
-#include "Engine/Particle/ParticleManager.h"
-#include "Engine/Scene/SceneManager.h"
 
 using namespace Audio;
 using namespace Core;
