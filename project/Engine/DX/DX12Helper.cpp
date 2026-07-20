@@ -3,13 +3,6 @@
 
 namespace DXC::Helper {
 
-	/// <summary>
-	/// CPUから書き込めるUploadヒープ上にバッファリソースを作成する
-	/// </summary>
-	/// <param name="device">デバイス</param>
-	/// <param name="sizeInBytes">確保するサイズ(バイト)</param>
-	/// <returns>作成したリソース</returns>
-	/// <remarks>定数バッファや頂点バッファなど、毎フレーム書き換えるものに使う</remarks>
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(const Microsoft::WRL::ComPtr<ID3D12Device>& device, size_t sizeInBytes) {
 		D3D12_HEAP_PROPERTIES uploadHeapProperties{};
 		uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
@@ -34,15 +27,6 @@ namespace DXC::Helper {
 		return resource;
 	}
 
-	/// <summary>
-	/// ディスクリプタヒープを作成する
-	/// </summary>
-	/// <param name="device">デバイス</param>
-	/// <param name="heapType">ヒープの種類(RTV / DSV / CBV_SRV_UAV など)</param>
-	/// <param name="numDescriptors">確保するディスクリプタの数</param>
-	/// <param name="shaderVisible">シェーダーから参照するかどうか</param>
-	/// <returns>作成したディスクリプタヒープ</returns>
-	/// <remarks>RTVとDSVのヒープはシェーダーから参照できないのでshaderVisibleはfalseにする</remarks>
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible) {
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap = nullptr;
 		D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc{};
@@ -55,14 +39,6 @@ namespace DXC::Helper {
 		return descriptorHeap;
 	}
 
-	/// <summary>
-	/// 深度ステンシル用のテクスチャリソースを作成する
-	/// </summary>
-	/// <param name="device">デバイス</param>
-	/// <param name="width">幅</param>
-	/// <param name="height">高さ</param>
-	/// <returns>作成したリソース</returns>
-	/// <remarks>フォーマットはD24_UNORM_S8_UINT固定、深度は1.0fでクリアされる</remarks>
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateDepthStencilTextureResource(const Microsoft::WRL::ComPtr<ID3D12Device>& device, int32_t width, int32_t height) {
 		D3D12_RESOURCE_DESC resourceDesc{};
 		resourceDesc.Width = width;
@@ -91,15 +67,6 @@ namespace DXC::Helper {
 		return resource;
 	}
 
-	/// <summary>
-	/// オフスクリーン描画用のテクスチャリソースを作成する
-	/// </summary>
-	/// <param name="device">デバイス</param>
-	/// <param name="width">幅</param>
-	/// <param name="height">高さ</param>
-	/// <param name="color">クリアカラー</param>
-	/// <returns>作成したリソース</returns>
-	/// <remarks>ポストエフェクトのためレンダーターゲットとUAVの両方を許可している</remarks>
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateOffscreenTextureResource(const Microsoft::WRL::ComPtr<ID3D12Device>& device, int32_t width, int32_t height, D3D12_CLEAR_VALUE color) {
 		D3D12_RESOURCE_DESC resourceDesc{};
 		resourceDesc.Width = width;
@@ -129,13 +96,6 @@ namespace DXC::Helper {
 		return resource;
 	}
 
-	/// <summary>
-	/// コンピュートシェーダーから書き込めるバッファリソースを作成する
-	/// </summary>
-	/// <param name="device">デバイス</param>
-	/// <param name="sizeInBytes">確保するサイズ(バイト)</param>
-	/// <returns>作成したリソース</returns>
-	/// <remarks>DefaultヒープなのでCPUからは書き込めない、GPUパーティクルのバッファ等に使う</remarks>
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateUAVResource(ID3D12Device* device, size_t sizeInBytes) {
 		HRESULT hr;
 
@@ -159,13 +119,6 @@ namespace DXC::Helper {
 		return bufferResource;
 	}
 
-	/// <summary>
-	/// GPUの結果をCPUから読み取るためのバッファリソースを作成する
-	/// </summary>
-	/// <param name="device">デバイス</param>
-	/// <param name="sizeInBytes">確保するサイズ(バイト)</param>
-	/// <returns>作成したリソース</returns>
-	/// <remarks>GPU側からここへコピーしてからMapして読む、生存パーティクル数の取得等に使う</remarks>
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateReadbackResource(ID3D12Device* device, size_t sizeInBytes) {
 		HRESULT hr;
 
@@ -197,13 +150,6 @@ namespace DXC::Helper {
 		return readbackResource;
 	}
 
-	/// <summary>
-	/// Uploadヒープ上にバッファを作成し、初期データがあれば書き込む
-	/// </summary>
-	/// <param name="device">デバイス</param>
-	/// <param name="sizeInBytes">確保するサイズ(バイト)</param>
-	/// <param name="initData">初期データ、nullptrなら書き込まない</param>
-	/// <returns>作成したリソース</returns>
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateUploadBuffer(ID3D12Device* device, size_t sizeInBytes, const void* initData) {
 		HRESULT hr;
 

@@ -8,38 +8,22 @@ namespace WaveConst {
 	constexpr uint32_t kRiffFmtSizePCM = 16;
 }
 
-/// <summary>
-/// シングルトンのため外部からは生成できない
-/// </summary>
 AudioPlayer::AudioPlayer() {
 }
 
-/// <summary>
-/// 解放はFinalizeで行うためここでは何もしない
-/// </summary>
 AudioPlayer::~AudioPlayer() {
 }
 
-/// <summary>
-/// インスタンスの取得
-/// </summary>
-/// <returns>AudioPlayer*</returns>
 AudioPlayer* AudioPlayer::GetInstance() {
 	static AudioPlayer instance;
 	return &instance;
 }
 
-/// <summary>
-/// XAudio2エンジンとマスターボイスを作成する
-/// </summary>
 void AudioPlayer::Initialize() {
 	XAudio2Create(&xAudio2_, 0, XAUDIO2_DEFAULT_PROCESSOR);
 	xAudio2_->CreateMasteringVoice(&masterVoice_);
 }
 
-/// <summary>
-/// 終了処理、再生中のボイスと読み込み済みの音声データをすべて破棄する
-/// </summary>
 void AudioPlayer::Finalize() {
 	for (auto& [name, sound] : container_) {
 		for (auto* voice : sound.pSourceVoices) {
@@ -68,11 +52,6 @@ void AudioPlayer::Finalize() {
 	}
 }
 
-/// <summary>
-/// Waveファイルを読み込んでコンテナへ登録する
-/// </summary>
-/// <param name="filename">ファイル名</param>
-/// <remarks>読み込み済みなら何もしない、fmtとdataのチャンクが揃っていない場合はassertで止まる</remarks>
 void AudioPlayer::LoadWave(const char* filename) {
 	auto it = container_.find(filename);
 	if (it != container_.end()) {
@@ -138,12 +117,6 @@ void AudioPlayer::LoadWave(const char* filename) {
 	container_.insert(std::make_pair(filename, std::move(soundData)));
 }
 
-/// <summary>
-/// Waveファイルを読み込んでSoundDataを取得する
-/// </summary>
-/// <param name="filename">ファイル名</param>
-/// <returns>SoundData&</returns>
-/// <remarks>読み込み済みならコンテナ内のものをそのまま返す</remarks>
 SoundData& AudioPlayer::SoundLoadWave(const char* filename) {
 	auto it = container_.find(filename);
 	if (it != container_.end()) {
@@ -157,10 +130,6 @@ SoundData& AudioPlayer::SoundLoadWave(const char* filename) {
 	return it->second;
 }
 
-/// <summary>
-/// SoundDataの中身を空にする
-/// </summary>
-/// <param name="soundData">音声データ</param>
 void AudioPlayer::SoundUnload(SoundData* soundData) {
 	if (!soundData) return;
 
@@ -169,12 +138,6 @@ void AudioPlayer::SoundUnload(SoundData* soundData) {
 	soundData->wfex = {};
 }
 
-/// <summary>
-/// 音を1回だけ再生する
-/// </summary>
-/// <param name="soundData">音声データ</param>
-/// <param name="volume">音量</param>
-/// <remarks>再生ごとにソースボイスを作るので、多重再生できる</remarks>
 void AudioPlayer::SoundPlayWave(SoundData& soundData, float volume) {
 	HRESULT result;
 	// 冒頭などで掃除を行う
@@ -197,12 +160,6 @@ void AudioPlayer::SoundPlayWave(SoundData& soundData, float volume) {
 	soundData.pSourceVoices.push_back(pSourceVoice);
 }
 
-/// <summary>
-/// 音をループ再生する
-/// </summary>
-/// <param name="soundData">音声データ</param>
-/// <param name="volume">音量</param>
-/// <remarks>止めるまで鳴り続けるのでSoundStopWaveで停止する</remarks>
 void AudioPlayer::SoundLoop(SoundData& soundData, float volume) {
 	HRESULT result;
 	SoundResourceCleaning(soundData);
@@ -225,10 +182,6 @@ void AudioPlayer::SoundLoop(SoundData& soundData, float volume) {
 	soundData.pSourceVoices.push_back(pSourceVoice);
 }
 
-/// <summary>
-/// 再生中のソースボイスをすべて止めて破棄する
-/// </summary>
-/// <param name="soundData">音声データ</param>
 void AudioPlayer::SoundStopWave(SoundData& soundData) {
 	for (auto& voice : soundData.pSourceVoices) {
 		if (voice) {
@@ -240,11 +193,6 @@ void AudioPlayer::SoundStopWave(SoundData& soundData) {
 	soundData.pSourceVoices.clear();
 }
 
-/// <summary>
-/// 再生の終わったソースボイスを破棄してリストから取り除く
-/// </summary>
-/// <param name="soundData">音声データ</param>
-/// <remarks>再生のたびに呼ぶことでボイスが溜まり続けるのを防いでいる</remarks>
 void Audio::AudioPlayer::SoundResourceCleaning(SoundData& soundData) {
 	for (auto it = soundData.pSourceVoices.begin(); it != soundData.pSourceVoices.end(); ) {
 		XAUDIO2_VOICE_STATE state;
