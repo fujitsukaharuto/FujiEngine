@@ -2,6 +2,7 @@
 #include "Engine/DX/DXCom.h"
 #include "Engine/DX/DX12Helper.h"
 #include "Engine/Camera/Camera.h"
+#include "Engine/GraphicPipeline/PipelineManager.h"
 
 using namespace Graphics;
 using namespace Math;

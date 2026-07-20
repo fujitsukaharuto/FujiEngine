@@ -1,5 +1,6 @@
 #pragma once
 #include "IParticleGroup.h"
+#include "Engine/GraphicPipeline/BasePipeline.h"
 
 namespace Graphics {
 

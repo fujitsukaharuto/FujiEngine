@@ -1,4 +1,6 @@
 #include "GPUParticleSystem.h"
+#include "Engine/GraphicPipeline/PipelineManager.h"
+#include "Engine/WinApp/MyWindow.h"
 #include "Engine/DX/DXCom.h"
 #include "Engine/DX/DX12Helper.h"
 #include "Engine/DX/SRVManager.h"

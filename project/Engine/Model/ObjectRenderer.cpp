@@ -7,6 +7,9 @@
 #include "Engine/DX/DXCom.h"
 #include "Engine/Light/LightManager.h"
 #include "Engine/Camera/CameraManager.h"
+#include "Engine/GraphicPipeline/PipeKind.h"
+#include "Engine/GraphicPipeline/PipelineManager.h"
+#include "Engine/WinApp/MyWindow.h"
 
 using namespace Core;
 using namespace Graphics;

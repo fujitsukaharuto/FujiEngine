@@ -2,6 +2,7 @@
 #include "Engine/ImGuiManager/ImGuiManager.h"
 #include "Engine/DX/DXCom.h"
 #include "Engine/DX/DX12Helper.h"
+#include "Engine/GraphicPipeline/PipelineManager.h"
 
 using namespace Graphics;
 using namespace DXC;

@@ -16,6 +16,7 @@
 #include "Game/GameObj/Enemy/Behavior/BossDushAttack.h"
 
 #include "Game/GameObj/Player/Player.h"
+#include "Engine/DX/OffscreenManager.h"
 
 using namespace Audio;
 using namespace Core;

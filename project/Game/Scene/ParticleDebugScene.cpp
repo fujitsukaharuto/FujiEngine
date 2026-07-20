@@ -10,6 +10,7 @@
 #include "Engine/Model/Sprite/SpriteRenderer.h"
 #include "Engine/Particle/ParticleManager.h"
 #include "Engine/Scene/SceneManager.h"
+#include "Engine/WinApp/MyWindow.h"
 
 using namespace Core;
 using namespace Graphics;

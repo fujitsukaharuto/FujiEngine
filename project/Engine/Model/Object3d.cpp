@@ -1,4 +1,6 @@
 #include "Engine/Model/Object3d.h"
+#include "Engine/GraphicPipeline/PipeKind.h"
+#include "Engine/GraphicPipeline/PipelineManager.h"
 #include "Engine/Model/ModelManager.h"
 #include "Engine/Model/ObjectRenderer.h"
 #include "Engine/DX/SRVManager.h"

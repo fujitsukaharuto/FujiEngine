@@ -1,4 +1,6 @@
 #include "Engine/Model/ModelManager.h"
+#include "Engine/GraphicPipeline/PipeKind.h"
+#include "Engine/GraphicPipeline/PipelineManager.h"
 #include <fstream>
 #include <filesystem>
 #include <iostream>

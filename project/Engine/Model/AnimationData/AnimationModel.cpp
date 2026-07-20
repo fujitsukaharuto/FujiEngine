@@ -19,6 +19,8 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include "Engine/Math/Animation/NodeAnimation.h"
+#include "Engine/GraphicPipeline/PipelineManager.h"
+#include "Engine/WinApp/MyWindow.h"
 
 using namespace Core;
 using namespace Graphics;

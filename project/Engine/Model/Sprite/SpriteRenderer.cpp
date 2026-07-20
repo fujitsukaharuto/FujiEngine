@@ -3,6 +3,7 @@
 #include "Engine/DX/DX12Helper.h"
 #include "Engine/Model/ModelManager.h" // NormalCommand()用
 #include "Engine/WinApp/MyWindow.h"
+#include "Engine/GraphicPipeline/PipelineManager.h"
 
 using namespace Core;
 using namespace Graphics;

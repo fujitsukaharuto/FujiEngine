@@ -6,6 +6,7 @@
 #include "Engine/WinApp/MyWindow.h"
 #include "Engine/GraphicPipeline/PipelineManager.h"
 #include "Engine/Camera/CameraManager.h"
+#include "Engine/DX/FPSKeeper.h"
 
 using namespace Core;
 using namespace Graphics;

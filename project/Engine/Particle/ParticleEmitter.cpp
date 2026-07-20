@@ -6,6 +6,7 @@
 #include "Engine/Model/Line/Line3dDrawer.h"
 #include <iostream>
 #include <fstream>
+#include "Engine/DX/FPSKeeper.h"
 
 using namespace Core;
 using namespace Graphics;

@@ -1,6 +1,8 @@
 #include "SkyBox.h"
 #include "Engine/DX/DX12Helper.h"
 #include "Engine/Model/ObjectRenderer.h"
+#include "Engine/GraphicPipeline/PipelineManager.h"
+#include "Engine/WinApp/MyWindow.h"
 
 using namespace Core;
 using namespace Graphics;

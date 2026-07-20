@@ -8,29 +8,32 @@
 #include <cassert>
 #include <wrl.h>
 
-#include "Engine/Math/Matrix/MatrixCalculation.h"
-#include "Engine/WinApp/MyWindow.h"
 #include "Engine/DX/GraphicsDevice.h"
 #include "Engine/DX/DXCommand.h"
-#include "Engine/DX/DXCompile.h"
-#include "Engine/DX/OffscreenManager.h"
 #include "Engine/DX/SwapChainManager.h"
 
-#include "Engine/DX/FPSKeeper.h"
-#include "Engine/GraphicPipeline/PipelineManager.h"
-#include "Engine/Model/TextureManager.h"
-#include "Engine/Camera/Camera.h"
 
+namespace Core {
+	class MyWin;
+	class FPSKeeper;
+}
+namespace Graphics {
+	class PipelineManager;
+	class OffscreenManager;
+}
 
 namespace DXC {
+
+	class DXCompile;
 
 	/// <summary>
 	/// DXComクラス
 	/// </summary>
 	class DXCom {
 	public:
-		DXCom() = default;
-		~DXCom() = default;
+		DXCom();
+		// unique_ptrの中身が不完全型なのでデストラクタは.cppに置く
+		~DXCom();
 	public:
 
 		void Initialize(Core::MyWin* myWin);

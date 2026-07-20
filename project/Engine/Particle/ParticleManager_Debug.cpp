@@ -7,6 +7,7 @@
 #include "Engine/DX/FPSKeeper.h"
 #include "Engine/Model/ModelManager.h"
 #include "Engine/ImGuiManager/ImGuiManager.h"
+#include "Engine/GraphicPipeline/BasePipeline.h"
 
 using namespace Core;
 using namespace Graphics;

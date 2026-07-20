@@ -6,6 +6,7 @@
 #include "SpriteRenderer.h"
 #include "Engine/Model/ModelManager.h"
 #include "Engine/Light/LightManager.h"
+#include "Engine/WinApp/MyWindow.h"
 
 using namespace Core;
 using namespace Graphics;

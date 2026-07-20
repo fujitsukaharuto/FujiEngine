@@ -7,6 +7,7 @@
 #include "Game/GameObj/Player/AttackBehavior/PlayerAttackRoot.h"
 #include "Game/GameObj/Player/PlayerBullet.h"
 #include "Game/GameObj/Enemy/BossItem/UnderRing.h"
+#include "Engine/DX/OffscreenManager.h"
 
 using namespace Audio;
 using namespace Core;

@@ -12,6 +12,10 @@
 #include "Engine/DX/FrameCount.h"
 #include <fstream>
 #include <filesystem>
+#include "Engine/GraphicPipeline/BasePipeline.h"
+#include "Engine/GraphicPipeline/PipeKind.h"
+#include "Engine/GraphicPipeline/PipelineManager.h"
+#include "Engine/WinApp/MyWindow.h"
 
 using namespace Core;
 using namespace Graphics;

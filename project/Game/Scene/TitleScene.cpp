@@ -10,6 +10,8 @@
 #include "Engine/Scene/SceneManager.h"
 #include "Engine/Model/Sprite/SpriteRenderer.h"
 #include <cmath>
+#include "Engine/DX/OffscreenManager.h"
+#include "Engine/WinApp/MyWindow.h"
 
 using namespace Core;
 using namespace Graphics;

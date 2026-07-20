@@ -4,6 +4,13 @@
 #include "Engine/DX/SRVManager.h"
 #include "Engine/ImGuiManager/ImGuiManager.h"
 
+// DXCom.h では前方宣言に留めているもの
+#include "Engine/WinApp/MyWindow.h"
+#include "Engine/DX/DXCompile.h"
+#include "Engine/DX/OffscreenManager.h"
+#include "Engine/DX/FPSKeeper.h"
+#include "Engine/GraphicPipeline/PipelineManager.h"
+
 
 #include <d3d12.h>
 #include <dxgi1_6.h>
@@ -16,6 +23,9 @@ using namespace DXC;
 using namespace Core;
 using namespace Graphics;
 
+
+DXCom::DXCom() = default;
+DXCom::~DXCom() = default;
 
 void DXCom::Initialize(MyWin* myWin) {
 	assert(myWin);

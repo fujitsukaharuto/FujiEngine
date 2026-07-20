@@ -10,6 +10,7 @@
 #include "Engine/Model/Model.h"
 #include "Engine/Model/Object3d.h"
 #include "Engine/Math/Matrix/MatrixCalculation.h"
+#include "Engine/GraphicPipeline/BasePipeline.h"
 
 using Microsoft::WRL::ComPtr;
 

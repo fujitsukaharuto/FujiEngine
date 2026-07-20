@@ -1,4 +1,5 @@
 #include "Engine/DX/Framework.h"
+#include "Engine/DX/FPSKeeper.h"
 
 using namespace Audio;
 using namespace Core;
