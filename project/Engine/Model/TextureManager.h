@@ -9,7 +9,6 @@
 
 
 #include "externals/DirectXTex/DirectXTex.h"
-#include "externals/DirectXTex/d3dx12.h"
 
 
 namespace DXC { class DXCom; }

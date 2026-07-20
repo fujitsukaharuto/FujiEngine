@@ -6,8 +6,6 @@
 #include <string>
 
 #include "Engine/DX/DXCompile.h"
-#include "externals/DirectXTex/DirectXTex.h"
-#include "externals/DirectXTex/d3dx12.h"
 #include <unordered_map>
 
 using namespace Microsoft::WRL;

@@ -3,6 +3,7 @@
 #include "Engine/DX/DXCommand.h"
 #include "Engine/DX/DXCompile.h"
 #include "Engine/Logger/Logger.h"
+#include "externals/DirectXTex/d3dx12.h"
 #include <cassert>
 
 using namespace Graphics;

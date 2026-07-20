@@ -7,6 +7,7 @@
 #include "Engine/GraphicPipeline/PipelineManager.h"
 #include "Engine/Camera/CameraManager.h"
 #include "Engine/DX/FPSKeeper.h"
+#include "externals/DirectXTex/d3dx12.h"
 
 using namespace Core;
 using namespace Graphics;

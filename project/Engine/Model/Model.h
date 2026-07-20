@@ -7,8 +7,6 @@
 #include "Engine/Model/Material/Material.h"
 
 #include "Engine/Model/AnimationData/AnimationStructs.h"
-#include "externals/DirectXTex/DirectXTex.h"
-#include "externals/DirectXTex/d3dx12.h"
 
 namespace DXC { class DXCom; }
 

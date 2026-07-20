@@ -5,12 +5,10 @@
 #include <map>
 #include "Engine/Model/Model.h"
 #include "Engine/Math/Vector/Vector2.h"
-#include <assimp/scene.h>
 #include "Engine/DX/FrameCount.h"
 
-#include "externals/DirectXTex/DirectXTex.h"
-#include "externals/DirectXTex/d3dx12.h"
 
+struct aiNode;
 
 namespace DXC { class DXCom; }
 namespace Graphics {
