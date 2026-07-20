@@ -1,7 +1,7 @@
 #pragma once
-#include "DirectionLight.h"
-#include "PointLight.h"
-#include "SpotLight.h"
+#include "Engine/Light/DirectionLight.h"
+#include "Engine/Light/PointLight.h"
+#include "Engine/Light/SpotLight.h"
 #include <d3d12.h>
 #include <memory>
 #include <vector>

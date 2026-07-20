@@ -1,5 +1,5 @@
 #pragma once
-#include "Framework.h"
+#include "Engine/DX/Framework.h"
 
 /// <summary>
 /// ゲームランクラス

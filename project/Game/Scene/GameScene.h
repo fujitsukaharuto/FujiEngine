@@ -1,5 +1,5 @@
 #pragma once
-#include "Scene/BaseScene.h"
+#include "Engine/Scene/BaseScene.h"
 #include "Engine/Model/AnimationData/AnimationModel.h"
 #include "Engine/Model/SkyBox/SkyBox.h"
 #include "Game/GameObj/FollowCamera.h"

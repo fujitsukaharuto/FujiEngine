@@ -1,7 +1,7 @@
-#include "Input.h"
+#include "Engine/Input/Input.h"
 #include <stdexcept>
 
-#include "MyWindow.h"
+#include "Engine/WinApp/MyWindow.h"
 
 using namespace Core;
 using namespace Math;

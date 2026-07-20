@@ -2,9 +2,9 @@
 #include <cassert>
 #include <vector>
 #include "Engine/DX/DXCom.h"
-#include "FPSKeeper.h"
+#include "Engine/DX/FPSKeeper.h"
 #include "Engine/Scene/BaseScene.h"
-#include "ImGuiManager.h"
+#include "Engine/ImGuiManager/ImGuiManager.h"
 #include "Engine/Model/ModelManager.h"
 #include "Engine/Particle/ParticleManager.h"
 #include "Engine/Editor/CommandManager.h"

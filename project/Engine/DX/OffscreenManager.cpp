@@ -1,10 +1,10 @@
-#include "OffscreenManager.h"
-#include "DXCom.h"
+#include "Engine/DX/OffscreenManager.h"
+#include "Engine/DX/DXCom.h"
 #include "Engine/DX/DX12Helper.h"
-#include "SRVManager.h"
-#include "ImGuiManager/ImGuiManager.h"
-#include "MyWindow.h"
-#include "PipelineManager.h"
+#include "Engine/DX/SRVManager.h"
+#include "Engine/ImGuiManager/ImGuiManager.h"
+#include "Engine/WinApp/MyWindow.h"
+#include "Engine/GraphicPipeline/PipelineManager.h"
 #include "Engine/Camera/CameraManager.h"
 
 using namespace Core;

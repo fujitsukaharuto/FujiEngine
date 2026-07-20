@@ -4,7 +4,7 @@
 #include "Engine/DX/SRVManager.h"
 #include "Engine/GraphicPipeline/PipelineManager.h"
 #include "Engine/Model/ModelManager.h"
-#include "ImGuiManager/ImGuiManager.h"
+#include "Engine/ImGuiManager/ImGuiManager.h"
 #include "Engine/Editor/JsonSerializer.h"
 
 using namespace Core;

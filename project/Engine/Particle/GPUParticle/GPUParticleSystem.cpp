@@ -3,7 +3,7 @@
 #include "Engine/DX/DX12Helper.h"
 #include "Engine/DX/SRVManager.h"
 #include "Engine/Camera/CameraManager.h"
-#include "Math/Random/Random.h"
+#include "Engine/Math/Random/Random.h"
 #include "Engine/DX/FPSKeeper.h"
 #include "Engine/Model/ModelManager.h"
 #ifdef _DEBUGMODE

@@ -9,7 +9,7 @@
 #ifdef _DEBUGMODE
 #include "imgui.h"
 #include "imgui_node_editor.h"
-#include "NodeGraph.h"
+#include "Engine/ImGuiManager/NodeGraph.h"
 #include "utilities/builders.h"
 #include "utilities/widgets.h"
 

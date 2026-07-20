@@ -1,6 +1,6 @@
-#include "DXCompile.h"
+#include "Engine/DX/DXCompile.h"
 #include <iostream>
-#include "Logger.h"
+#include "Engine/Logger/Logger.h"
 #include <cassert>
 
 #pragma comment(lib,"dxcompiler.lib")

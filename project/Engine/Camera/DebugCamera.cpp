@@ -1,10 +1,10 @@
-#include "DebugCamera.h"
+#include "Engine/Camera/DebugCamera.h"
 
 #include <numbers>
 
-#include "Input/Input.h"
-#include "WinApp/MyWindow.h"
-#include "ImGuiManager.h"
+#include "Engine/Input/Input.h"
+#include "Engine/WinApp/MyWindow.h"
+#include "Engine/ImGuiManager/ImGuiManager.h"
 
 using namespace Core;
 using namespace Math;

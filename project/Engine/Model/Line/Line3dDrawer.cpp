@@ -1,7 +1,7 @@
 #include "Line3dDrawer.h"
 #include "Engine/DX/DXCom.h"
 #include "Engine/DX/DX12Helper.h"
-#include "Camera.h"
+#include "Engine/Camera/Camera.h"
 
 using namespace Graphics;
 using namespace Math;

@@ -1,8 +1,8 @@
-#include "DXCom.h"
-#include "DX12Helper.h"
-#include "Logger.h"
-#include "SRVManager.h"
-#include "ImGuiManager.h"
+#include "Engine/DX/DXCom.h"
+#include "Engine/DX/DX12Helper.h"
+#include "Engine/Logger/Logger.h"
+#include "Engine/DX/SRVManager.h"
+#include "Engine/ImGuiManager/ImGuiManager.h"
 
 
 #include <d3d12.h>

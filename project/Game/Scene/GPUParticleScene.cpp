@@ -1,15 +1,15 @@
 #include "GPUParticleScene.h"
-#include "ImGuiManager.h"
-#include "ModelManager.h"
-#include "GlobalVariables.h"
-#include "CameraManager.h"
-#include "FPSKeeper.h"
-#include "Math/Random/Random.h"
+#include "Engine/ImGuiManager/ImGuiManager.h"
+#include "Engine/Model/ModelManager.h"
+#include "Engine/GlobalVariables/GlobalVariables.h"
+#include "Engine/Camera/CameraManager.h"
+#include "Engine/DX/FPSKeeper.h"
+#include "Engine/Math/Random/Random.h"
 
 #include "Engine/Model/Line/Line3dDrawer.h"
 #include "Engine/Model/Sprite/SpriteRenderer.h"
-#include "Particle/ParticleManager.h"
-#include "Scene/SceneManager.h"
+#include "Engine/Particle/ParticleManager.h"
+#include "Engine/Scene/SceneManager.h"
 
 using namespace Core;
 using namespace Graphics;

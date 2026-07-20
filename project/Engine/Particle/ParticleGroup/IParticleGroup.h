@@ -1,9 +1,9 @@
 #pragma once
 #include <wrl/client.h>
 #include <map>
-#include "Particle/Particle.h"
-#include "Particle/ParticleEmitter.h"
-#include "Math/Matrix/MatrixCalculation.h"
+#include "Engine/Particle/Particle.h"
+#include "Engine/Particle/ParticleEmitter.h"
+#include "Engine/Math/Matrix/MatrixCalculation.h"
 #include "Engine/DX/FrameCount.h"
 
 using Microsoft::WRL::ComPtr;

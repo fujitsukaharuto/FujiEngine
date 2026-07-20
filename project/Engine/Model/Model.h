@@ -1,12 +1,12 @@
 #pragma once
-#include "Math/Matrix/MatrixCalculation.h"
+#include "Engine/Math/Matrix/MatrixCalculation.h"
 #include <d3d12.h>
 #include <string>
-#include "Mesh/Mesh.h"
-#include "Mesh/SkinnedMesh.h"
-#include "Material/Material.h"
+#include "Engine/Model/Mesh/Mesh.h"
+#include "Engine/Model/Mesh/SkinnedMesh.h"
+#include "Engine/Model/Material/Material.h"
 
-#include "AnimationData/AnimationStructs.h"
+#include "Engine/Model/AnimationData/AnimationStructs.h"
 #include "externals/DirectXTex/DirectXTex.h"
 #include "externals/DirectXTex/d3dx12.h"
 

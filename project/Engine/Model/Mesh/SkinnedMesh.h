@@ -1,7 +1,7 @@
 #pragma once
-#include "Math/Vector/Vector3.h"
-#include "Math/Vector/Vector2.h"
-#include "Math/Vector/Vector4.h"
+#include "Engine/Math/Vector/Vector3.h"
+#include "Engine/Math/Vector/Vector2.h"
+#include "Engine/Math/Vector/Vector4.h"
 
 #include <d3d12.h>
 #include <vector>

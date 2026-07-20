@@ -8,18 +8,18 @@
 #include <cassert>
 #include <wrl.h>
 
-#include "Math/Matrix/MatrixCalculation.h"
-#include "MyWindow.h"
-#include "GraphicsDevice.h"
-#include "DXCommand.h"
-#include "DXCompile.h"
-#include "OffscreenManager.h"
-#include "SwapChainManager.h"
+#include "Engine/Math/Matrix/MatrixCalculation.h"
+#include "Engine/WinApp/MyWindow.h"
+#include "Engine/DX/GraphicsDevice.h"
+#include "Engine/DX/DXCommand.h"
+#include "Engine/DX/DXCompile.h"
+#include "Engine/DX/OffscreenManager.h"
+#include "Engine/DX/SwapChainManager.h"
 
-#include "FPSKeeper.h"
-#include "PipelineManager.h"
-#include "TextureManager.h"
-#include "Camera.h"
+#include "Engine/DX/FPSKeeper.h"
+#include "Engine/GraphicPipeline/PipelineManager.h"
+#include "Engine/Model/TextureManager.h"
+#include "Engine/Camera/Camera.h"
 
 
 namespace DXC {

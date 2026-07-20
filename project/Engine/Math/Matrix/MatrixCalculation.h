@@ -4,14 +4,14 @@
 #include <string>
 #include <map>
 
-#include "Vector/Vector2.h"
-#include "Vector/Vector3.h"
-#include "Vector/Vector4.h"
-#include "Vector/Vector2Matrix.h"
-#include "Matrix/Matrix2x2.h"
-#include "Matrix/Matrix3x3.h"
-#include "Matrix/Matrix4x4.h"
-#include "Quaternion/Quaternion.h"
+#include "Engine/Math/Vector/Vector2.h"
+#include "Engine/Math/Vector/Vector3.h"
+#include "Engine/Math/Vector/Vector4.h"
+#include "Engine/Math/Vector/Vector2Matrix.h"
+#include "Engine/Math/Matrix/Matrix2x2.h"
+#include "Engine/Math/Matrix/Matrix3x3.h"
+#include "Engine/Math/Matrix/Matrix4x4.h"
+#include "Engine/Math/Quaternion/Quaternion.h"
 
 namespace Math {
 	/// <summary>

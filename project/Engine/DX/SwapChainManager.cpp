@@ -1,7 +1,7 @@
-#include "SwapChainManager.h"
-#include "DX12Helper.h"
-#include "DXCommand.h"
-#include "SRVManager.h"
+#include "Engine/DX/SwapChainManager.h"
+#include "Engine/DX/DX12Helper.h"
+#include "Engine/DX/DXCommand.h"
+#include "Engine/DX/SRVManager.h"
 #include <cassert>
 
 using namespace DXC;

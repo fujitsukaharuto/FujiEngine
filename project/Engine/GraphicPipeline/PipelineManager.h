@@ -1,6 +1,6 @@
 #pragma once
-#include "BasePipeline.h"
-#include "PipeKind.h"
+#include "Engine/GraphicPipeline/BasePipeline.h"
+#include "Engine/GraphicPipeline/PipeKind.h"
 #include <memory>
 #include <array>
 #include <functional>

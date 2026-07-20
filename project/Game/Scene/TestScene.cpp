@@ -1,8 +1,8 @@
 #include "TestScene.h"
-#include "ImGuiManager.h"
-#include "CameraManager.h"
-#include "FPSKeeper.h"
-#include "Particle/ParticleManager.h"
+#include "Engine/ImGuiManager/ImGuiManager.h"
+#include "Engine/Camera/CameraManager.h"
+#include "Engine/DX/FPSKeeper.h"
+#include "Engine/Particle/ParticleManager.h"
 #include "Engine/Model/ObjectRenderer.h"
 #include "Engine/Editor/CommandManager.h"
 

@@ -1,6 +1,6 @@
 #pragma once
 #include <memory>
-#include "Camera.h"
+#include "Engine/Camera/Camera.h"
 
 namespace DXC { class DXCom; }
 

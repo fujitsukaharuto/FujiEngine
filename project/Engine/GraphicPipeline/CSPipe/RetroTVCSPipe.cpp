@@ -1,8 +1,8 @@
 #include "RetroTVCSPipe.h"
 #include "Engine/DX/DXCom.h"
-#include "DXCommand.h"
-#include "DXCompile.h"
-#include "Logger.h"
+#include "Engine/DX/DXCommand.h"
+#include "Engine/DX/DXCompile.h"
+#include "Engine/Logger/Logger.h"
 #include <cassert>
 
 using namespace Graphics;

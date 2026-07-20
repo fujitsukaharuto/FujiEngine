@@ -1,8 +1,8 @@
-#include "SpotLight.h"
+#include "Engine/Light/SpotLight.h"
 #include "Engine/DX/DXCom.h"
 #include "Engine/DX/DX12Helper.h"
 #include <numbers>
-#include "ImGuiManager/ImGuiManager.h"
+#include "Engine/ImGuiManager/ImGuiManager.h"
 
 using namespace Graphics;
 using namespace Math;

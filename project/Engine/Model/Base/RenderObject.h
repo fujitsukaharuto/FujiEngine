@@ -1,8 +1,8 @@
 #pragma once
 #include <string>
 #include <vector>
-#include "Model.h"
-#include "Camera.h"
+#include "Engine/Model/Model.h"
+#include "Engine/Camera/Camera.h"
 
 
 namespace DXC { class DXCom; }

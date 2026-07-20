@@ -1,8 +1,8 @@
-#include "PointLight.h"
+#include "Engine/Light/PointLight.h"
 #include "Engine/DX/DXCom.h"
 #include "Engine/DX/DX12Helper.h"
 #include "Engine/DX/FPSKeeper.h"
-#include "ImGuiManager/ImGuiManager.h"
+#include "Engine/ImGuiManager/ImGuiManager.h"
 
 using namespace Core;
 using namespace Graphics;

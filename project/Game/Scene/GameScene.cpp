@@ -1,7 +1,7 @@
 #include "GameScene.h"
-#include "ImGuiManager.h"
-#include "GlobalVariables.h"
-#include "FPSKeeper.h"
+#include "Engine/ImGuiManager/ImGuiManager.h"
+#include "Engine/GlobalVariables/GlobalVariables.h"
+#include "Engine/DX/FPSKeeper.h"
 #include "Game/GameObj/FollowCamera.h"
 #include "Game/GameObj/Player/PlayerBullet.h"
 #include "Engine/Model/ModelManager.h"
@@ -10,8 +10,8 @@
 #include "Engine/Light/LightManager.h"
 #include "Engine/Light/PointLight.h"
 
-#include "Particle/ParticleManager.h"
-#include "Scene/SceneManager.h"
+#include "Engine/Particle/ParticleManager.h"
+#include "Engine/Scene/SceneManager.h"
 
 using namespace Audio;
 using namespace Core;

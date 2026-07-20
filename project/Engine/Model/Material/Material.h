@@ -1,7 +1,7 @@
 #pragma once
-#include "Math/Matrix/MatrixCalculation.h"
+#include "Engine/Math/Matrix/MatrixCalculation.h"
 #include "Engine/Math/Vector/Vector4.h"
-#include "TextureManager.h"
+#include "Engine/Model/TextureManager.h"
 #include "Engine/DX/FrameCount.h"
 
 namespace DXC { class DXCom; }

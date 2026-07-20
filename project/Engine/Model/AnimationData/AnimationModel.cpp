@@ -1,13 +1,13 @@
 #include "AnimationModel.h"
-#include "Model/ModelManager.h"
+#include "Engine/Model/ModelManager.h"
 #include "Engine/Model/ObjectRenderer.h"
 #include "Engine/DX/DXCom.h"
 #include "Engine/DX/DX12Helper.h"
-#include "DX/SRVManager.h"
-#include "LightManager.h"
+#include "Engine/DX/SRVManager.h"
+#include "Engine/Light/LightManager.h"
 #include "Engine/Model/Line/Line3dDrawer.h"
-#include "CameraManager.h"
-#include "FPSKeeper.h"
+#include "Engine/Camera/CameraManager.h"
+#include "Engine/DX/FPSKeeper.h"
 #include "Engine/ImGuiManager/ImGuiManager.h"
 #include "Engine/Editor/JsonSerializer.h"
 #ifdef _DEBUGMODE
@@ -18,7 +18,7 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-#include "Math/Animation/NodeAnimation.h"
+#include "Engine/Math/Animation/NodeAnimation.h"
 
 using namespace Core;
 using namespace Graphics;

@@ -1,7 +1,7 @@
-#include "DirectionLight.h"
+#include "Engine/Light/DirectionLight.h"
 #include "Engine/DX/DXCom.h"
 #include "Engine/DX/DX12Helper.h"
-#include "ImGuiManager/ImGuiManager.h"
+#include "Engine/ImGuiManager/ImGuiManager.h"
 
 using namespace Graphics;
 using namespace Math;

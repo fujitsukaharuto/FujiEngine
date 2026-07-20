@@ -8,11 +8,11 @@
 #include <cassert>
 #include <wrl.h>
 
-#include "DXCommand.h"
-#include "DXCompile.h"
-#include "Math/Matrix/MatrixCalculation.h"
-#include "PipeKind.h"
-#include "TextureManager.h"
+#include "Engine/DX/DXCommand.h"
+#include "Engine/DX/DXCompile.h"
+#include "Engine/Math/Matrix/MatrixCalculation.h"
+#include "Engine/GraphicPipeline/PipeKind.h"
+#include "Engine/Model/TextureManager.h"
 #include "Engine/DX/FrameCount.h"
 
 

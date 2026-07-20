@@ -1,8 +1,8 @@
-#include "TextureManager.h"
+#include "Engine/Model/TextureManager.h"
 #include "Engine/DX/DXCom.h"
 #include "Engine/DX/DX12Helper.h"
-#include "Logger.h"
-#include "SRVManager.h"
+#include "Engine/Logger/Logger.h"
+#include "Engine/DX/SRVManager.h"
 #include <fstream>
 #include <filesystem>
 #include <iostream>

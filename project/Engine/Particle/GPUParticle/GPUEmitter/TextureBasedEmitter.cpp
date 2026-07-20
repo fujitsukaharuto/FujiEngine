@@ -3,7 +3,7 @@
 #include "Engine/DX/DX12Helper.h"
 #include "Engine/DX/SRVManager.h"
 #include "Engine/GraphicPipeline/PipelineManager.h"
-#include "ImGuiManager/ImGuiManager.h"
+#include "Engine/ImGuiManager/ImGuiManager.h"
 
 using namespace Core;
 using namespace Graphics;

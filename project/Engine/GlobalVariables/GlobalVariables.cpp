@@ -1,5 +1,5 @@
-#include "GlobalVariables.h"
-#include "ImGuiManager.h"
+#include "Engine/GlobalVariables/GlobalVariables.h"
+#include "Engine/ImGuiManager/ImGuiManager.h"
 #include <fstream>
 #include <iostream>
 

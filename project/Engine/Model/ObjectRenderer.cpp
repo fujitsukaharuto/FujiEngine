@@ -1,4 +1,4 @@
-#include "ObjectRenderer.h"
+#include "Engine/Model/ObjectRenderer.h"
 // RenderObjectのヘッダーをインクルード（パスはプロジェクト構成に合わせて調整してください）
 #include "Engine/Model/Base/RenderObject.h"
 #include "Engine/Model/AnimationData/AnimationModel.h"

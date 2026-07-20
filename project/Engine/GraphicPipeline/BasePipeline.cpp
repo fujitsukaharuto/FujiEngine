@@ -1,7 +1,7 @@
-#include "BasePipeline.h"
+#include "Engine/GraphicPipeline/BasePipeline.h"
 #include "Engine/DX/DXCom.h"
-#include "DXCommand.h"
-#include "Logger.h"
+#include "Engine/DX/DXCommand.h"
+#include "Engine/Logger/Logger.h"
 
 using namespace Graphics;
 using namespace DXC;

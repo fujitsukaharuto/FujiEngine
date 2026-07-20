@@ -1,13 +1,13 @@
-#include "Camera.h"
+#include "Engine/Camera/Camera.h"
 
-#include "WinApp/MyWindow.h"
+#include "Engine/WinApp/MyWindow.h"
 #include "Engine/DX/DXCom.h"
 #include "Engine/DX/DX12Helper.h"
-#include "DX/FPSKeeper.h"
-#include "CameraManager.h"
-#include "DebugCamera.h"
-#include "Math/Random/Random.h"
-#include "ImGuiManager.h"
+#include "Engine/DX/FPSKeeper.h"
+#include "Engine/Camera/CameraManager.h"
+#include "Engine/Camera/DebugCamera.h"
+#include "Engine/Math/Random/Random.h"
+#include "Engine/ImGuiManager/ImGuiManager.h"
 
 using namespace Core;
 using namespace Math;

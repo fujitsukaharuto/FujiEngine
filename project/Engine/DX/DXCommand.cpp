@@ -1,5 +1,5 @@
-#include "DXCommand.h"
-#include "MyWindow.h"
+#include "Engine/DX/DXCommand.h"
+#include "Engine/WinApp/MyWindow.h"
 #include "Engine/Logger/Logger.h"
 #include <cassert>
 

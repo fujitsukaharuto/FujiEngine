@@ -7,9 +7,9 @@
 #include "GPUEmitter/TextureBasedEmitter.h"
 #include "GPUEmitter/MeshSurfaceEmitter.h"
 
-#include "Model.h"
-#include "Object3d.h"
-#include "Math/Matrix/MatrixCalculation.h"
+#include "Engine/Model/Model.h"
+#include "Engine/Model/Object3d.h"
+#include "Engine/Math/Matrix/MatrixCalculation.h"
 #include "Engine/DX/FrameCount.h"
 #include "Engine/DX/GPUTimer.h"
 

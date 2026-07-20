@@ -7,9 +7,9 @@
 #include "ParticleGroup/ParticleGroup.h"
 #include "ParticleGroup/ParentParticleGroup.h"
 #include "GPUParticle/GPUParticleSystem.h"
-#include "Model.h"
-#include "Object3d.h"
-#include "Math/Matrix/MatrixCalculation.h"
+#include "Engine/Model/Model.h"
+#include "Engine/Model/Object3d.h"
+#include "Engine/Math/Matrix/MatrixCalculation.h"
 
 using Microsoft::WRL::ComPtr;
 

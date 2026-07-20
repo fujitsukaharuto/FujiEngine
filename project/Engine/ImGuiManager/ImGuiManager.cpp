@@ -1,8 +1,8 @@
-#include "ImGuiManager.h"
+#include "Engine/ImGuiManager/ImGuiManager.h"
 
-#include "DXCom.h"
-#include "MyWindow.h"
-#include "SRVManager.h"
+#include "Engine/DX/DXCom.h"
+#include "Engine/WinApp/MyWindow.h"
+#include "Engine/DX/SRVManager.h"
 #include "Engine/Input/Input.h"
 #include "Engine/Editor/JsonSerializer.h"
 #include "Engine/Model/TextureManager.h"

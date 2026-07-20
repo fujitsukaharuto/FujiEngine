@@ -1,8 +1,8 @@
 #pragma once
 #include <string>
 #include <functional>
-#include "Math/Vector/Vector3.h"
-#include "Model/Object3d.h"
+#include "Engine/Math/Vector/Vector3.h"
+#include "Engine/Model/Object3d.h"
 
 
 class OriginGameObject;

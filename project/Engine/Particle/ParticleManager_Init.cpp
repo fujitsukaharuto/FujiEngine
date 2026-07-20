@@ -4,10 +4,10 @@
 #include "Engine/DX/SRVManager.h"
 #include "Engine/Camera/CameraManager.h"
 #include "Particle.h"
-#include "Math/Random/Random.h"
+#include "Engine/Math/Random/Random.h"
 #include "Engine/DX/FPSKeeper.h"
 #include "Engine/Model/ModelManager.h"
-#include "ImGuiManager/ImGuiManager.h"
+#include "Engine/ImGuiManager/ImGuiManager.h"
 #include "Engine/Editor/JsonSerializer.h"
 #include "Engine/DX/FrameCount.h"
 #include <fstream>

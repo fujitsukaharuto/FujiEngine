@@ -1,7 +1,7 @@
 #pragma once
 #include <random>
-#include "Math/Vector/Vector3.h"
-#include "Math/Vector/Vector2.h"
+#include "Engine/Math/Vector/Vector3.h"
+#include "Engine/Math/Vector/Vector2.h"
 
 namespace Math {
 	/// <summary>

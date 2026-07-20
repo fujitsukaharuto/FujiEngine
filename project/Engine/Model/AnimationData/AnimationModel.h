@@ -6,12 +6,12 @@
 #include <span>
 #include <array>
 
-#include "AnimationData/AnimationStructs.h"
+#include "Engine/Model/AnimationData/AnimationStructs.h"
 #include "Engine/Model/Base/RenderObject.h"
-#include "Model/Model.h"
-#include "Camera.h"
-#include "Math/Animation/Animation.h"
-#include "Math/Animation/Skelton.h"
+#include "Engine/Model/Model.h"
+#include "Engine/Camera/Camera.h"
+#include "Engine/Math/Animation/Animation.h"
+#include "Engine/Math/Animation/Skelton.h"
 #include "Engine/DX/FrameCount.h"
 #include <memory>
 

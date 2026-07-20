@@ -1,6 +1,6 @@
-#include "GraphicsDevice.h"
+#include "Engine/DX/GraphicsDevice.h"
 #include <cassert>
-#include "Logger.h"
+#include "Engine/Logger/Logger.h"
 
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")

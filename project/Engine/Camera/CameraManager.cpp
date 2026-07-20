@@ -1,7 +1,7 @@
-#include "CameraManager.h"
-#include "DebugCamera.h"
+#include "Engine/Camera/CameraManager.h"
+#include "Engine/Camera/DebugCamera.h"
 #include "Engine/DX/DXCom.h"
-#include "ImGuiManager.h"
+#include "Engine/ImGuiManager/ImGuiManager.h"
 
 using namespace Graphics;
 using namespace DXC;

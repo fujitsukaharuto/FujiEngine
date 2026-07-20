@@ -2,11 +2,11 @@
 #include <memory>
 #include <json.hpp>
 
-#include "Model/Object3d.h"
-#include "Model/AnimationData/AnimationModel.h"
+#include "Engine/Model/Object3d.h"
+#include "Engine/Model/AnimationData/AnimationModel.h"
 #include "Engine/DX/FPSKeeper.h"
-#include "Camera/CameraManager.h"
-#include "Input/Input.h"
+#include "Engine/Camera/CameraManager.h"
+#include "Engine/Input/Input.h"
 #include "Engine/ImGuiManager/ImGuiManager.h"
 #ifdef _DEBUGMODE
 #include "Engine/Editor/GizmoHelper.h"

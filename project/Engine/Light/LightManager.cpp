@@ -1,5 +1,5 @@
-#include "LightManager.h"
-#include "ImGuiManager/ImGuiManager.h"
+#include "Engine/Light/LightManager.h"
+#include "Engine/ImGuiManager/ImGuiManager.h"
 #include "Engine/DX/DXCom.h"
 #include "Engine/DX/DX12Helper.h"
 

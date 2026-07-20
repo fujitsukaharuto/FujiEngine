@@ -1,8 +1,8 @@
 #pragma once
 #include <wrl/client.h>
-#include "Math/Matrix/MatrixCalculation.h"
-#include "Material/Material.h"
-#include "Object3d.h"
+#include "Engine/Math/Matrix/MatrixCalculation.h"
+#include "Engine/Model/Material/Material.h"
+#include "Engine/Model/Object3d.h"
 #include "Engine/DX/FrameCount.h"
 
 namespace DXC { class DXCom; }

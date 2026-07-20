@@ -1,9 +1,9 @@
 #include "ParticleEmitter.h"
 #include "ParticleManager.h"
-#include "Math/Random/Random.h"
-#include "ImGuiManager.h"
+#include "Engine/Math/Random/Random.h"
+#include "Engine/ImGuiManager/ImGuiManager.h"
 #include "ParticleGroup/IParticleGroup.h"
-#include "Model/Line/Line3dDrawer.h"
+#include "Engine/Model/Line/Line3dDrawer.h"
 #include <iostream>
 #include <fstream>
 
