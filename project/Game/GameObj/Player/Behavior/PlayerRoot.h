@@ -9,6 +9,9 @@ public:
 	PlayerRoot(Player* pPlayer);
 	~PlayerRoot();
 
+	/// <summary>
+	/// 通常状態の進行状態、待機からジャンプや回避へ移る
+	/// </summary>
 	enum class Step {
 		ROOT,
 		TOJUMP,

@@ -16,6 +16,9 @@
 
 class Player;
 
+/// <summary>
+/// 残りHPの段階、値が大きいほど体力が多い
+/// </summary>
 enum class BossHPState {
 	Max = 4,
 	High = 3,
@@ -33,6 +36,9 @@ public:
 	Boss();
 	~Boss();
 
+	/// <summary>
+	/// ジャンプ攻撃の各フェーズの時間と跳ぶ高さのパラメーター
+	/// </summary>
 	struct JumpParams {
 		float jumpTotalTime = 150.0f;
 		float upStart = 120.0f;
@@ -43,6 +49,9 @@ public:
 		float groundJudgeHeight = 0.25f;
 	};
 
+	/// <summary>
+	/// ビーム攻撃のチャージ演出と発射後のエフェクトのパラメーター
+	/// </summary>
 	struct BeamParams {
 		float chargeTime = 120.0f;
 		float parentRotateStep;
@@ -66,12 +75,18 @@ public:
 		float minReCalcSize = 3.0f;
 	};
 
+	/// <summary>
+	/// 攻撃時のラジアルブラーの時間と強さのパラメーター
+	/// </summary>
 	struct BossRadialParams {
 		float baseTime = 40.0f;
 		float widthStart = 0.0f;
 		float widthEnd = 0.005f;
 	};
 
+	/// <summary>
+	/// 登場演出の展開時間とボスがせり上がる高さのパラメーター
+	/// </summary>
 	struct SummonParams {
 		float summonExpandTime = 50.0f;
 		float summonRadiusStart = 30.0f;
@@ -82,6 +97,9 @@ public:
 		float bossDownPos = -30.0f;
 	};
 
+	/// <summary>
+	/// ボスの調整項目をまとめたもの、Jsonのセーブとロードの単位になる
+	/// </summary>
 	struct BossParams {
 		JumpParams jump;
 		BeamParams beam;

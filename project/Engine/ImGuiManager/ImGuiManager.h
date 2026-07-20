@@ -144,6 +144,9 @@ namespace Core {
 	};
 
 
+	/// <summary>
+	/// パーティクルグループを2つのリスト間で移動させるGUI
+	/// </summary>
 	struct ParticleGroupSelector {
 #ifdef _DEBUGMODE
 		std::vector<std::string> items[2];  // 0: false, 1: true

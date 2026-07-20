@@ -10,12 +10,18 @@
 #include <vector>
 
 
+/// <summary>
+/// 残りHPに応じた被弾演出の段階、1段階分の範囲を表す
+/// </summary>
 struct DamageStepTime {
 	float start;      // この時間以上
 	float end;        // この時間未満
 	bool popVignette; // ヴィネットを出すステップかどうか
 };
 
+/// <summary>
+/// PlayerのHPと被弾の無敵時間のパラメーター
+/// </summary>
 struct PlayerHPParams {
 	std::vector<DamageStepTime> damageStep;
 	float hp;
@@ -23,6 +29,9 @@ struct PlayerHPParams {
 	float damageCoolTime = 60.0f;
 };
 
+/// <summary>
+/// HPバーのスプライトの色、サイズ、表示位置のパラメーター
+/// </summary>
 struct PlayerHPSpritParams {
 	Math::Vector4 color = { 0.7f,0.211f,0.505f,1.0f };
 	Math::Vector2 hpSize = { 275.0f,35.0f };
@@ -32,6 +41,9 @@ struct PlayerHPSpritParams {
 	Math::Vector2 hpFrameStartPos = { 192.5f,650.0f };
 };
 
+/// <summary>
+/// Playerの調整項目をまとめたもの、Jsonのセーブとロードの単位になる
+/// </summary>
 struct PlayerParams {
 	PlayerHPParams hp;
 	PlayerHPSpritParams hpSprite;

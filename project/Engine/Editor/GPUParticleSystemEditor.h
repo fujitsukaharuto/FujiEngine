@@ -22,10 +22,15 @@ namespace Editor {
 
 	private:
 
+		/// <summary>パーティクル数やGPU時間の統計と、描画方式の切り替えチェックボックス</summary>
 		void DrawPerformanceStats(Graphics::GPUParticleSystem& system);
+		/// <summary>左にエミッター一覧、右に選択中のエミッターの詳細を表示する</summary>
 		void DrawEmitterList(Graphics::GPUParticleSystem& system, std::vector<int>& emitterIndices, int& currentIdx, Graphics::PipelinePhase phase);
+		/// <summary>球エミッターの追加とIndex送りによる設定</summary>
 		void DrawSphereEmitterGUI(Graphics::GPUParticleSystem& system);
+		/// <summary>テクスチャベースエミッターのIndex送りによる設定</summary>
 		void DrawTextureEmitterGUI(Graphics::GPUParticleSystem& system);
+		/// <summary>メッシュ表面エミッターのIndex送りによる設定</summary>
 		void DrawSurfaceEmitterGUI(Graphics::GPUParticleSystem& system);
 		/// <summary>エミッター設定ファイルの読み込みポップアップ</summary>
 		void DrawLoadPopUp(Graphics::GPUParticleSystem& system, int id, Graphics::PipelinePhase type);

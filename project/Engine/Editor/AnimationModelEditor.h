@@ -12,6 +12,7 @@ namespace Editor {
 	class AnimationModelEditor {
 	public:
 
+		/// <summary>マテリアルとアニメーションの選択、ジョイント一覧を並べた編集GUI</summary>
 		void DrawGUI(Graphics::AnimationModel& model);
 		/// <summary>スケルトンのジョイントをデバッグ描画する(選択中を赤で強調)</summary>
 		void DrawSkeleton(Graphics::AnimationModel& model);

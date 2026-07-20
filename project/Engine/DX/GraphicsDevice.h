@@ -20,6 +20,9 @@ namespace DXC {
 		}
 	};
 
+	/// <summary>
+	/// DXGIファクトリとD3D12デバイスの生成、保持をするクラス
+	/// </summary>
 	class GraphicsDevice {
 	public:
 		GraphicsDevice() = default;

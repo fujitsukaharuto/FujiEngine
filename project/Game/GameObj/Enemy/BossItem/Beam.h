@@ -34,6 +34,9 @@ public:
 	Beam();
 	~Beam();
 
+	/// <summary>
+	/// ビームの伸縮と攻撃の各フェーズの時間のパラメーター
+	/// </summary>
 	struct BeamParams {
 		float initRotateX = 2.443f;
 		float initPParentRotateX = 0.873f;

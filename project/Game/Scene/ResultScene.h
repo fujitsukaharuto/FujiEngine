@@ -42,6 +42,9 @@ struct DanceStepHight {
 	float lastHeight = 0.3f;
 };
 
+/// <summary>
+/// 花火を出現させる範囲、各軸の最小値と最大値
+/// </summary>
 struct HanabiPopReng {
 	Math::Vector2 xMinMax = { -8.0f, 8.0f };
 	Math::Vector2 yMinMax = {  5.5f,10.0f };

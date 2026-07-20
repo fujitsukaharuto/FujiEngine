@@ -27,6 +27,9 @@ namespace Graphics {
 	class Mesh {
 	public:
 
+		/// <summary>
+		/// 頂点とインデックスのバッファ、ビュー、元データを1組にしたもの
+		/// </summary>
 		struct MeshBuffer {
 			Microsoft::WRL::ComPtr<ID3D12Resource> vBuffer;
 			Microsoft::WRL::ComPtr<ID3D12Resource> iBuffer;

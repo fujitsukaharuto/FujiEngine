@@ -10,6 +10,9 @@ namespace Graphics {
 	class AnimationModel;
 	class SkyBox;
 
+	/// <summary>
+	/// 3Dオブジェクトを集めてまとめて描画するクラス
+	/// </summary>
 	class ObjectRenderer {
 	public:
 		// シングルトンインスタンスの取得

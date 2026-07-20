@@ -9,6 +9,9 @@ public:
 	BossDushAttack(Boss* pBoss, bool is = false);
 	~BossDushAttack();
 
+	/// <summary>
+	/// 突進攻撃の進行状態、溜めてから突っ込む
+	/// </summary>
 	enum class Step {
 		CHARGE,
 		ATTACK,

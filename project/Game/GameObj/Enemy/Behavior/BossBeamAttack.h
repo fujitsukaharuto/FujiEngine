@@ -10,6 +10,9 @@ public:
 	BossBeamAttack(Boss* pBoss);
 	~BossBeamAttack();
 
+	/// <summary>
+	/// ビーム攻撃の進行状態、チャージしてから撃つ
+	/// </summary>
 	enum class Step {
 		CHARGE,
 		ATTACK,

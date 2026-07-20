@@ -9,9 +9,9 @@ namespace DXC { class SRVManager; }
 
 namespace Graphics {
 
-	// <summary>
-	// 共通Computeリソース構造体
-	// </summary>
+	/// <summary>
+	/// 全エミッターが共通で使うComputeリソースのハンドル
+	/// </summary>
 	struct ParticleCSHandles {
 		D3D12_GPU_DESCRIPTOR_HANDLE transCSUAVHandle{};
 		D3D12_GPU_DESCRIPTOR_HANDLE scaleCSUAVHandle{};
@@ -25,6 +25,9 @@ namespace Graphics {
 		D3D12_GPU_DESCRIPTOR_HANDLE freeListUAVHandle{};
 	};
 
+	/// <summary>
+	/// GPUパーティクルのエミッターの基底クラス
+	/// </summary>
 	class IGPUEmitter {
 	public:
 		IGPUEmitter() = default;

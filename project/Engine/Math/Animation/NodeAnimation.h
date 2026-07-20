@@ -6,6 +6,9 @@
 
 namespace Math {
 
+	/// <summary>
+	/// キーフレームを並べたアニメーションカーブ
+	/// </summary>
 	template <typename tValue>
 	struct AnimationCurve {
 		std::vector<Keyframe<tValue>> keyframes;

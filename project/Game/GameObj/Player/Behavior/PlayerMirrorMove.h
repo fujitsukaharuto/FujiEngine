@@ -2,6 +2,9 @@
 #include "BasePlayerBehavior.h"
 
 
+/// <summary>
+/// Playerのミラー移動の行動クラス
+/// </summary>
 class PlayerMirrorMove : public BasePlayerBehavior {
 public:
 	PlayerMirrorMove(Player* pPlayer);

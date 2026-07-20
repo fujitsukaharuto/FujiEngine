@@ -103,6 +103,11 @@ namespace Audio {
 
 	private:
 
+		/// <summary>
+		/// 再生の終わったソースボイスを破棄してリストから取り除く
+		/// </summary>
+		/// <param name="soundData">音声データ</param>
+		/// <remarks>再生のたびに呼ぶことでボイスが溜まり続けるのを防いでいる</remarks>
 		void SoundResourceCleaning(SoundData& soundData);
 
 		Microsoft::WRL::ComPtr<IXAudio2> xAudio2_;

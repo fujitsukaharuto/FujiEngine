@@ -45,6 +45,9 @@ namespace Graphics {
 		uint32_t padding2[36]; // 256バイト境界に合わせる
 	};
 
+	/// <summary>
+	/// ExecuteIndirectへ渡す描画の引数、GPU側から書き換える
+	/// </summary>
 	struct DrawIndexedArgs {
 		uint32_t IndexCountPerInstance;
 		uint32_t InstanceCount;
@@ -71,13 +74,22 @@ namespace Graphics {
 		Math::AABB area;
 	};
 
+	/// <summary>
+	/// エミッターの種類、使用するComputeパイプラインの選択に使う
+	/// </summary>
 	enum class PipelinePhase { Texture, Surface, Sphere };
 
+	/// <summary>
+	/// エミッターとその種類を1組にしたもの
+	/// </summary>
 	struct EmitterInfo {
 		std::unique_ptr<IGPUEmitter> emitter;
 		PipelinePhase phase;
 	};
 
+	/// <summary>
+	/// パーティクルのバッファ1本分のリソースとSRV / UAVのハンドル
+	/// </summary>
 	struct ParticleCSInstance {
 		ComPtr<ID3D12Resource> particleCSInstancing_;
 		std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> particleCSSRVHandle_;
@@ -97,10 +109,16 @@ namespace Graphics {
 
 	public:
 
+		/// <summary>
+		/// 描画側のGPU時間の計測区間
+		/// </summary>
 		enum TimerID {
 			kTimer_DrawExecuteIndirect = 0,
 		};
 
+		/// <summary>
+		/// Compute側のGPU時間の計測区間
+		/// </summary>
 		enum ComputeTimerID {
 			kTimer_ParticleUpdate = 0,
 			kTimer_EmitterDispatch = 1,

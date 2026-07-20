@@ -9,7 +9,9 @@ namespace DXC { class DXCom; }
 
 namespace Graphics {
 
-	// カメラ情報を送るための構造体
+	/// <summary>
+	/// カメラ情報をシェーダーへ送るための定数バッファ用の構造体
+	/// </summary>
 	struct CameraInfo {
 		Math::Matrix4x4 invViewProj; // ViewProjectionの逆行列
 		Math::Vector3 cameraPos;     // カメラのワールド座標
@@ -125,6 +127,12 @@ namespace Graphics {
 		//========================================================================*/
 		//* Getter
 		Math::Trans& GetTransform() { return transform_; };
+
+		/// <summary>
+		/// カメラの位置の取得
+		/// </summary>
+		/// <returns>Vector3</returns>
+		/// <remarks>デバッグカメラが有効なときはそちらの位置を返す</remarks>
 		Math::Vector3 GetTranslate();
 
 	private:

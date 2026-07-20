@@ -9,6 +9,9 @@ public:
 	BossRoot(Boss* pBoss);
 	~BossRoot();
 
+	/// <summary>
+	/// 通常状態の進行状態、待機してから攻撃へ移る
+	/// </summary>
 	enum class Step {
 		ROOT,
 		TOATTACK,

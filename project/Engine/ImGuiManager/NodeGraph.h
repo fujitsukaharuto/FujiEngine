@@ -15,8 +15,9 @@
 namespace ed = ax::NodeEditor;
 #endif // _DEBUG
 
-#ifdef _DEBUGMODE
 namespace Core {
+
+#ifdef _DEBUGMODE
 
 	/// <summary>
 	/// ノードが持つ値
@@ -92,6 +93,9 @@ namespace Core {
 		Input
 	};
 
+	/// <summary>
+	/// Addノードで加算する値の種類
+	/// </summary>
 	enum class AddType {
 		Increment,
 		DeltaTime,
@@ -118,6 +122,9 @@ namespace Core {
 		std::vector<NodeValue> values;
 		std::vector<NodeValue> outputValue;
 
+		/// <summary>
+		/// ノードの種類、評価の仕方が変わる
+		/// </summary>
 		enum class NodeType {
 			Texture,
 			Float,
@@ -151,7 +158,7 @@ namespace Core {
 		ed::PinId startPinId; // output
 		ed::PinId endPinId;   // input
 	};
-	#endif // _DEBUG
+#endif // _DEBUGMODE
 
 	// NodeEditor
 #ifdef _DEBUGMODE
@@ -212,14 +219,17 @@ namespace Core {
 	private:
 		ed::NodeId materialNodeId_;
 	};
-#endif // _DEBUG
+#endif // _DEBUGMODE
+
+	/// <summary>
+	/// ノードグラフから取り出したUVの動かし方の設定
+	/// </summary>
+	struct NodeContent {
+
+		bool isMoveUV_ = false;
+		bool isAddDeltaUV_ = false;
+
+		Math::Vector2 incrementUV_;
+
+	};
 }
-
-struct NodeContent {
-
-	bool isMoveUV_ = false;
-	bool isAddDeltaUV_ = false;
-
-	Math::Vector2 incrementUV_;
-
-};

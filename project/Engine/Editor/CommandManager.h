@@ -14,6 +14,9 @@
 
 namespace Editor {
 
+	/// <summary>
+	/// EditorObjectの種類
+	/// </summary>
 	enum class ObjectType{
 		Normal,
 		Player,
@@ -60,14 +63,28 @@ namespace Editor {
 		CommandManager(const CommandManager&) = delete;
 		CommandManager& operator=(const CommandManager&) = delete;
 
+		/// <summary>
+		/// インスタンスの取得
+		/// </summary>
 		static CommandManager* GetInstance() {
 			static CommandManager instance;
 			return &instance;
 		}
 
 	public:
+		/// <summary>
+		/// コマンドを実行してUndoスタックへ積む
+		/// </summary>
 		void Execute(std::unique_ptr<ICommand> command);
+
+		/// <summary>
+		/// 直前のコマンドを取り消してRedoスタックへ移す
+		/// </summary>
 		void Undo();
+
+		/// <summary>
+		/// 取り消したコマンドをやり直してUndoスタックへ戻す
+		/// </summary>
 		void Redo();
 
 		/// <summary>
@@ -88,8 +105,19 @@ namespace Editor {
 
 		//========================================================================*/
 		//* データリセット用関数群
+		/// <summary>
+		/// スタックとオブジェクトリストを空にする
+		/// </summary>
 		void Reset();
+
+		/// <summary>
+		/// Undo / Redoのスタックだけを空にする
+		/// </summary>
 		void StackReset();
+
+		/// <summary>
+		/// 終了処理、保持しているデータをすべて解放する
+		/// </summary>
 		void Finalize();
 
 		/// <summary>
@@ -109,14 +137,44 @@ namespace Editor {
 		}
 
 
+		/// <summary>
+		/// アクティブなEditorObjectをすべて描画
+		/// </summary>
 		void Draw();
+
+		/// <summary>
+		/// ルートのEditorObjectを並べたデバッグGUI
+		/// </summary>
 		void DebugGUI();
+
+		/// <summary>
+		/// EditorObject1つ分のGUI、子オブジェクトも再帰的に表示する
+		/// </summary>
 		void EditorObjGUI(EditorObj& obj);
+
+		/// <summary>
+		/// IDからEditorObjectを取得
+		/// </summary>
 		std::shared_ptr<EditorObj> GetEditorObject(int id) const;
+
+		/// <summary>
+		/// 非アクティブなEditorObjectと、それに紐づく名前やハッシュを破棄する
+		/// </summary>
 		void GarbageCollect();
 
+		/// <summary>
+		/// EditorObjectのリストを取得
+		/// </summary>
 		std::unordered_map<int, std::shared_ptr<EditorObj>>& GetObjectList() { return objectList; }
+
+		/// <summary>
+		/// ヘッダーの表示名のリストを取得
+		/// </summary>
 		std::unordered_map<int, std::string>& GetHeaderNames() { return headerNames; }
+
+		/// <summary>
+		/// 表示名のハッシュのリストを取得
+		/// </summary>
 		std::unordered_map<int, size_t>& GetNameHashes() { return nameHashes; }
 
 	private:

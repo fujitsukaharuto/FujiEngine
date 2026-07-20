@@ -12,6 +12,9 @@ namespace Graphics {
 
 	class Camera;
 
+	/// <summary>
+	/// CPUパーティクルのグループの基底クラス
+	/// </summary>
 	class IParticleGroup {
 	public:
 		IParticleGroup() = default;

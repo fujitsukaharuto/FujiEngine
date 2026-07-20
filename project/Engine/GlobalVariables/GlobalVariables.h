@@ -13,10 +13,16 @@ namespace Core {
 	public:
 		static GlobalVariables* GetInstance();
 
+		/// <summary>
+		/// グローバル変数1項目分の値、int / float / Vector3 のいずれかを持つ
+		/// </summary>
 		struct Item {
 			std::variant<int32_t, float, Math::Vector3> value;
 		};
 
+		/// <summary>
+		/// 項目をまとめるグループ、1グループが1つのJsonファイルに対応する
+		/// </summary>
 		struct Group {
 			std::map<std::string, Item> items;
 		};

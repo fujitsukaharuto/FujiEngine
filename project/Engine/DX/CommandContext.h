@@ -6,6 +6,9 @@
 
 namespace DXC {
 
+	/// <summary>
+	/// コマンドキュー、アロケータ、コマンドリスト、フェンスを1組にまとめたクラス
+	/// </summary>
 	class CommandContext {
 	public:
 		CommandContext() = default;

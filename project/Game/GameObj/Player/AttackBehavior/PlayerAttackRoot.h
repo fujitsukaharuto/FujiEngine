@@ -11,6 +11,9 @@ public:
 	PlayerAttackRoot(Player* pPlayer);
 	~PlayerAttackRoot();
 
+	/// <summary>
+	/// 攻撃の進行状態、溜めると強い弾になる
+	/// </summary>
 	enum class Step {
 		ROOT,
 		CHAREGE,

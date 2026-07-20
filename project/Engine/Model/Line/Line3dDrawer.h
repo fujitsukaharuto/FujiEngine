@@ -94,6 +94,9 @@ namespace Graphics {
 		DXC::DXCom* dxcommon_;
 		Camera* camera_ = nullptr;
 
+		/// <summary>
+		/// 線の描画に使うViewProjection行列の定数バッファ用の構造体
+		/// </summary>
 		struct CBuffer {
 			Math::Matrix4x4 viewProject;
 		};

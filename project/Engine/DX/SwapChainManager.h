@@ -11,6 +11,9 @@ namespace DXC {
 }
 
 namespace DXC {
+	/// <summary>
+	/// スワップチェーンとバックバッファのRTVを管理するクラス
+	/// </summary>
 	class SwapChainManager {
 	public:
 		SwapChainManager() = default;

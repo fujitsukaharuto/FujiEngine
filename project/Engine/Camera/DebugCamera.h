@@ -13,6 +13,9 @@ namespace Graphics {
 
 	public:
 
+		/// <summary>
+		/// デバッグカメラの初期姿勢と操作の速度のパラメーター
+		/// </summary>
 		struct DebugCameraParam {
 			Math::Vector3 initPos = { 0.0f,5.0f,-30.0f };
 			float fovY = 0.45f;

@@ -9,11 +9,17 @@ namespace DXC { class DXCom; }
 
 namespace Graphics {
 
+	/// <summary>
+	/// スプライトを描く重ね順
+	/// </summary>
 	enum class Layer {
 		Foreground,
 		Background
 	};
 
+	/// <summary>
+	/// スプライトを集めてまとめて描画するクラス
+	/// </summary>
 	class SpriteRenderer {
 	public:
 		// シングルトンインスタンスの取得

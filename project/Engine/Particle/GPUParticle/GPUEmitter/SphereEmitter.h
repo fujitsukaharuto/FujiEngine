@@ -45,6 +45,9 @@ namespace Graphics {
 		uint32_t isGravity;
 	};
 
+	/// <summary>
+	/// 指定した形状の内側からパーティクルを発生させるエミッター
+	/// </summary>
 	class SphereEmitter : public IGPUEmitter {
 	public:
 

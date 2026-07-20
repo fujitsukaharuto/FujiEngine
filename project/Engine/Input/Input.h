@@ -15,6 +15,9 @@
 
 namespace Core {
 
+	/// <summary>
+	/// ゲームパッドのボタン、XInputのビットに対応する
+	/// </summary>
 	enum class PadInput : WORD {
 		Up = XINPUT_GAMEPAD_DPAD_UP,
 		Down = XINPUT_GAMEPAD_DPAD_DOWN,

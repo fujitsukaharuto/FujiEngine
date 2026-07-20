@@ -3,6 +3,9 @@
 
 namespace Graphics {
 
+	/// <summary>
+	/// 生存時間に対するサイズの変化のさせ方
+	/// </summary>
 	enum class SizeType {
 		kNormal,
 		kShift,
@@ -27,6 +30,9 @@ namespace Graphics {
 		kRandom,
 	};
 
+	/// <summary>
+	/// ビルボードでカメラへ向ける軸の組み合わせ
+	/// </summary>
 	enum class BillBoardPattern {
 		kXYZBillBoard,
 		kXBillBoard,
@@ -46,6 +52,9 @@ namespace Graphics {
 		Math::Vector2 uvScale = { 1.0f,1.0f };
 	};
 
+	/// <summary>
+	/// パーティクル1粒に使うメッシュの形状
+	/// </summary>
 	enum class ShapeType {
 		PLANE,
 		RING,
@@ -135,29 +144,50 @@ namespace Graphics {
 	};
 
 
+	//========================================================================*/
+	//* ParticleCSを要素ごとのバッファへ分割したもの(CSParticle.hlsli の Particle_* と対応)
+
+	/// <summary>
+	/// パーティクルの座標、各軸21bitの固定小数にパックして持つ
+	/// </summary>
 	struct ParticleCS_Translate {
-		uint32_t packedPos[2];
+		uint32_t packedPos[2]; // x:bit0-20, y:bit21-41, z:bit42-62
 	};
 
+	/// <summary>
+	/// パーティクルの現在と初期のサイズ
+	/// </summary>
 	struct ParticleCS_Scale {
 		uint32_t packedScale; // half2 (scale, startScale)
 	};
 
+	/// <summary>
+	/// パーティクルの寿命と経過時間
+	/// </summary>
 	struct ParticleCS_Time {
 		float lifeTime;
 		float currentTime;
 	};
 
+	/// <summary>
+	/// パーティクルの速度
+	/// </summary>
 	struct ParticleCS_Velocity {
 		uint32_t packedVelocity[2]; // half3 (x, y, z) + padding
 	};
 
+	/// <summary>
+	/// パーティクルの色
+	/// </summary>
 	struct ParticleCS_Color {
-		uint32_t color;
+		uint32_t color; // RGBA8_UNORM
 	};
 
+	/// <summary>
+	/// パーティクルの挙動を切り替えるフラグ
+	/// </summary>
 	struct ParticleCS_Flags {
-		uint32_t flags;
+		uint32_t flags; // bit 0: isRandomMove, bit 1: isTrailEmit, bit 2: isGravity
 	};
 
 }

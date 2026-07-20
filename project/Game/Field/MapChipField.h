@@ -12,6 +12,9 @@ enum class MapChipType{
 	Normal_Block,	//通常のブロック
 };
 
+/// <summary>
+/// マップチップを縦横に並べたフィールドのデータ
+/// </summary>
 struct MapChipData{
 	std::vector<std::vector<MapChipType>> data;
 };

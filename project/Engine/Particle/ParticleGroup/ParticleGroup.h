@@ -3,6 +3,9 @@
 
 namespace Graphics {
 
+	/// <summary>
+	/// エミッターを1つ持つ通常のパーティクルグループ
+	/// </summary>
 	class ParticleGroup : public IParticleGroup {
 	public:
 		ParticleGroup();

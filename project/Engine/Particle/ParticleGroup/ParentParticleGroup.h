@@ -3,6 +3,9 @@
 
 namespace Graphics {
 
+	/// <summary>
+	/// 親オブジェクトに追従させるパーティクルグループ
+	/// </summary>
 	class ParentParticleGroup : public IParticleGroup {
 	public:
 		ParentParticleGroup();

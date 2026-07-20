@@ -37,6 +37,9 @@ namespace Graphics {
 
 	};
 
+	/// <summary>
+	/// テクスチャの絵柄をもとにパーティクルを発生させるエミッター
+	/// </summary>
 	class TextureBasedEmitter : public IGPUEmitter {
 	public:
 

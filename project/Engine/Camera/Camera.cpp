@@ -14,6 +14,9 @@ using namespace Math;
 using namespace Graphics;
 using namespace DXC;
 
+/// <summary>
+/// 既定のTransformから各行列を計算しておく
+/// </summary>
 Camera::Camera() {
 	aspect_ = float(MyWin::kWindowWidth) / float(MyWin::kWindowHeight);
 	worldMatrix_ = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
@@ -23,12 +26,20 @@ Camera::Camera() {
 	shakeMode_ = ShakeMode::RandomShake;
 }
 
+/// <summary>
+/// 定数バッファのリソースを解放する
+/// </summary>
 Camera::~Camera() {
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
 		cameraInfoResource_[i].Reset();
 	}
 }
 
+/// <summary>
+/// CameraInfoの定数バッファをフレーム数分作成してMapする
+/// </summary>
+/// <param name="pDXCom">DXCom</param>
+/// <remarks>Mapしたままにしているのでリソースは解放するまで書き込み続けられる</remarks>
 void Camera::Initialize(DXCom* pDXCom) {
 	dxcommon_ = pDXCom;
 	uint32_t size = (sizeof(CameraInfo) + 0xff) & ~0xff;
@@ -38,6 +49,10 @@ void Camera::Initialize(DXCom* pDXCom) {
 	}
 }
 
+/// <summary>
+/// シェイクを進めて各行列を更新し、今のフレームの定数バッファへ書き込む
+/// </summary>
+/// <remarks>デバッグカメラが有効なときはビュー行列だけそちらで上書きする</remarks>
 void Camera::Update() {
 
 	shakeGap_ = { 0.0f,0.0f,0.0f };
@@ -84,6 +99,10 @@ void Camera::Update() {
 	}
 }
 
+/// <summary>
+/// 各行列だけを更新する
+/// </summary>
+/// <remarks>Update()からシェイクの進行と定数バッファへの書き込みを除いたもの</remarks>
 void Camera::UpdateMatrix() {
 	worldMatrix_ = MakeAffineMatrix(transform_.scale, transform_.rotate, (transform_.translate + shakeGap_));
 	viewMatrix_ = Inverse(worldMatrix_);
@@ -98,16 +117,28 @@ void Camera::UpdateMatrix() {
 	viewProjectionMatrix_ = Multiply(viewMatrix_, projectionMatrix_);
 }
 
+/// <summary>
+/// シェイクを発生させる
+/// </summary>
+/// <param name="strength">シェイク強度</param>
+/// <param name="time">シェイク時間</param>
 void Camera::IssuanceShake(float strength, float time) {
 	shakeTime_ = time;
 	shakeStrength_ = strength;
 }
 
+/// <summary>
+/// 今のフレームのCameraInfoのGPUアドレスを取得
+/// </summary>
+/// <returns>D3D12_GPU_VIRTUAL_ADDRESS</returns>
 D3D12_GPU_VIRTUAL_ADDRESS Camera::GetCameraInfoGPUVirtualAddress() const {
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 	return cameraInfoResource_[frameIndex]->GetGPUVirtualAddress();
 }
 
+/// <summary>
+/// 位置と回転、シェイク、視野角を調整するデバッグGUI
+/// </summary>
 void Camera::DebugGUI() {
 #ifdef _DEBUGMODE
 	ImGui::DragFloat3("pos", &transform_.translate.x, 0.01f);
@@ -120,6 +151,11 @@ void Camera::DebugGUI() {
 #endif // _DEBUG
 }
 
+/// <summary>
+/// カメラの位置の取得
+/// </summary>
+/// <returns>Vector3</returns>
+/// <remarks>デバッグカメラが有効なときはそちらの位置を返す</remarks>
 Vector3 Camera::GetTranslate() {
 	if (CameraManager::GetInstance()->GetDebugMode()) {
 		return DebugCamera::GetInstance()->GetTranslate();

@@ -8,6 +8,9 @@ namespace DXC { class DXCom; }
 
 namespace Graphics {
 
+	/// <summary>
+	/// 点光源の情報をシェーダーへ送るための定数バッファ用の構造体
+	/// </summary>
 	struct PointLightData {
 		Math::Vector4 color = { 1.0f,0.5f,0.0f,1.0f };
 		Math::Vector3 position = { 0.0f,1.0f,0.0f };

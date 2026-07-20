@@ -37,6 +37,9 @@ namespace Graphics {
 		int triangleCount;
 	};
 
+	/// <summary>
+	/// モデルの三角形の上からパーティクルを発生させるエミッター
+	/// </summary>
 	class MeshSurfaceEmitter : public IGPUEmitter {
 	public:
 

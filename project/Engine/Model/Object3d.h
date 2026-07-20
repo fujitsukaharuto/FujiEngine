@@ -95,7 +95,7 @@ namespace Graphics {
 		bool isMaskMode_ = false;
 		bool isUseNodeGraph_ = false;
 		Material maskMaterial_;
-		std::vector<NodeContent> nodeContentData_;
+		std::vector<Core::NodeContent> nodeContentData_;
 #endif
 
 #ifdef _DEBUGMODE

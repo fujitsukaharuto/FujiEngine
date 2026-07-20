@@ -19,6 +19,9 @@ struct ObjIDData {
 namespace Graphics {
 	class LightManager;
 
+	/// <summary>
+	/// 描画するオブジェクトの基底クラス、Transformとマテリアルを持つ
+	/// </summary>
 	class RenderObject {
 	public:
 		RenderObject();
