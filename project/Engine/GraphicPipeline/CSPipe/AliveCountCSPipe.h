@@ -9,25 +9,29 @@
 using namespace Microsoft::WRL;
 
 
-/// <summary>
-/// GPUパーティクル初期化用パイプライン(CS)
-/// </summary>
-class AliveCountCSPipe :public BasePipeline {
-public:
-	AliveCountCSPipe() = default;
-	~AliveCountCSPipe();
+namespace Graphics {
 
-public:
+	/// <summary>
+	/// GPUパーティクル初期化用パイプライン(CS)
+	/// </summary>
+	class AliveCountCSPipe :public BasePipeline {
+	public:
+		AliveCountCSPipe() = default;
+		~AliveCountCSPipe();
 
-
-
-private:
-
-	void CreateRootSignature(ID3D12Device* device)override;
-
-	void CreatePSO(ID3D12Device* device)override;
-
-private:
+	public:
 
 
-};
+
+	private:
+
+		void CreateRootSignature(ID3D12Device* device)override;
+
+		void CreatePSO(ID3D12Device* device)override;
+
+	private:
+
+
+	};
+
+}

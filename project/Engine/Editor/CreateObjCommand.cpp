@@ -3,6 +3,7 @@
 #include "Engine/Model/Object3d.h"
 
 using namespace Graphics;
+using namespace Editor;
 
 
 void CreateObjCommand::Do() {

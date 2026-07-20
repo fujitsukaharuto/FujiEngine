@@ -10,6 +10,7 @@
 using namespace Core;
 using namespace Graphics;
 using namespace Math;
+using namespace DXC;
 
 
 MeshSurfaceEmitter::MeshSurfaceEmitter(DXCom* dx) {

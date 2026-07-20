@@ -12,82 +12,86 @@
 
 using namespace Microsoft::WRL;
 
-/// <summary>
-/// 合成モード
-/// </summary>
-enum class BlendType {
-	ALPHA,
-	ADD,
-	SUBTRACT,
-	SCREEN,
-	MULTIPLY,
-	SOFT_ADD,
-	PREMULTIPLIED_ALPHA
-};
+namespace DXC { class DXCom; }
 
-class DXCom;
-
-/// <summary>
-/// パイプラインの基底クラス
-/// </summary>
-class BasePipeline {
-public:
-	BasePipeline() = default;
-	~BasePipeline();
-
-	void Initialize(DXCom* pDxcom);
+namespace Graphics {
 
 	/// <summary>
-	/// グラフィックスパイプラインステートを設定
+	/// 合成モード
 	/// </summary>
-	void SetPipelineState();
+	enum class BlendType {
+		ALPHA,
+		ADD,
+		SUBTRACT,
+		SCREEN,
+		MULTIPLY,
+		SOFT_ADD,
+		PREMULTIPLIED_ALPHA
+	};
 
 	/// <summary>
-	/// コンピュートシェーダ用のパイプラインステートを設定
+	/// パイプラインの基底クラス
 	/// </summary>
-	void SetPipelineCSState(uint32_t index = 0);
+	class BasePipeline {
+	public:
+		BasePipeline() = default;
+		~BasePipeline();
 
-	/// <summary>
-	/// パイプラインを生成する
-	/// </summary>
-	ID3D12RootSignature* GetRootSignature();
+		void Initialize(DXC::DXCom* pDxcom);
 
-	/// <summary>
-	/// ルートパラメータのインデックスを取得
-	/// </summary>
-	uint32_t GetRootIndex(const std::string& name) const;
+		/// <summary>
+		/// グラフィックスパイプラインステートを設定
+		/// </summary>
+		void SetPipelineState();
 
-	/// <summary>
-	/// 指定した名前のルートパラメータが存在するか確認
-	/// </summary>
-	bool HasRootIndex(const std::string& name) const { return rootParameterMap_.contains(name); }
+		/// <summary>
+		/// コンピュートシェーダ用のパイプラインステートを設定
+		/// </summary>
+		void SetPipelineCSState(uint32_t index = 0);
 
-private:
+		/// <summary>
+		/// パイプラインを生成する
+		/// </summary>
+		ID3D12RootSignature* GetRootSignature();
 
-	/// <summary>
-	/// ルートシグネチャを生成
-	/// </summary>
-	virtual void CreateRootSignature(ID3D12Device* device);
+		/// <summary>
+		/// ルートパラメータのインデックスを取得
+		/// </summary>
+		uint32_t GetRootIndex(const std::string& name) const;
 
-	/// <summary>
-	/// PSOを生成
-	/// </summary>
-	virtual void CreatePSO(ID3D12Device* device);
+		/// <summary>
+		/// 指定した名前のルートパラメータが存在するか確認
+		/// </summary>
+		bool HasRootIndex(const std::string& name) const { return rootParameterMap_.contains(name); }
 
-protected:
+	private:
 
-	DXCom* dxcommon_;
+		/// <summary>
+		/// ルートシグネチャを生成
+		/// </summary>
+		virtual void CreateRootSignature(ID3D12Device* device);
 
-	ComPtr<ID3D12RootSignature> rootSignature_ = nullptr;
-	ComPtr<ID3D12PipelineState> pso_ = nullptr;
+		/// <summary>
+		/// PSOを生成
+		/// </summary>
+		virtual void CreatePSO(ID3D12Device* device);
 
-	ComPtr<IDxcBlob> vs = nullptr;
-	ComPtr<IDxcBlob> ps = nullptr;
-	ComPtr<ID3D12ShaderReflection> vsReflection_ = nullptr;
-	ComPtr<ID3D12ShaderReflection> psReflection_ = nullptr;
+	protected:
 
-	std::unordered_map<std::string, uint32_t> rootParameterMap_;
+		DXC::DXCom* dxcommon_;
 
-	const std::wstring kDirectoryPath_ = L"./resource/Shaders/";
+		ComPtr<ID3D12RootSignature> rootSignature_ = nullptr;
+		ComPtr<ID3D12PipelineState> pso_ = nullptr;
 
-};
+		ComPtr<IDxcBlob> vs = nullptr;
+		ComPtr<IDxcBlob> ps = nullptr;
+		ComPtr<ID3D12ShaderReflection> vsReflection_ = nullptr;
+		ComPtr<ID3D12ShaderReflection> psReflection_ = nullptr;
+
+		std::unordered_map<std::string, uint32_t> rootParameterMap_;
+
+		const std::wstring kDirectoryPath_ = L"./resource/Shaders/";
+
+	};
+
+}

@@ -9,29 +9,33 @@
 using namespace Microsoft::WRL;
 
 
-/// <summary>
-/// パーティクル用パイプライン
-/// </summary>
-class ParticlePipeline :public BasePipeline {
-public:
-	ParticlePipeline() = default;
-	~ParticlePipeline();
-
-public:
+namespace Graphics {
 
 	/// <summary>
-	/// 減算合成にするかどうか
+	/// パーティクル用パイプライン
 	/// </summary>
-	void SetBlendType(BlendType type) { type_ = type; }
+	class ParticlePipeline :public BasePipeline {
+	public:
+		ParticlePipeline() = default;
+		~ParticlePipeline();
 
-private:
+	public:
 
-	void CreateRootSignature(ID3D12Device* device)override;
+		/// <summary>
+		/// 減算合成にするかどうか
+		/// </summary>
+		void SetBlendType(BlendType type) { type_ = type; }
 
-	void CreatePSO(ID3D12Device* device)override;
+	private:
 
-private:
+		void CreateRootSignature(ID3D12Device* device)override;
 
-	BlendType type_ = BlendType::ADD;
+		void CreatePSO(ID3D12Device* device)override;
 
-};
+	private:
+
+		BlendType type_ = BlendType::ADD;
+
+	};
+
+}

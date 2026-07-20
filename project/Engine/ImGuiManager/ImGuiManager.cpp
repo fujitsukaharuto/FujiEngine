@@ -19,6 +19,7 @@ namespace ed = ax::NodeEditor;
 using namespace Core;
 using namespace Graphics;
 using namespace Math;
+using namespace DXC;
 
 
 ImGuiManager* ImGuiManager::GetInstance() {

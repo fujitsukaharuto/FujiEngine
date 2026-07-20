@@ -51,7 +51,7 @@ struct HanabiPopReng {
 /// <summary>
 /// リザルトシーンクラス
 /// </summary>
-class ResultScene :public BaseScene {
+class ResultScene :public Scene::BaseScene {
 public:
 	ResultScene();
 	~ResultScene();

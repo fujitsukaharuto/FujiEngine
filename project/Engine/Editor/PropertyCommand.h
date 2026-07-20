@@ -3,33 +3,37 @@
 #include "Engine/Math/Matrix/MatrixCalculation.h"
 #include "Engine/Math/Vector/Vector3.h"
 
-/// <summary>
-/// 任意のメンバ変数の変更をコマンドとして扱うためのテンプレートクラス
-/// </summary>
-template<typename T>
-class PropertyCommand : public ICommand {
-public:
-	using MemberPtr = T Math::Trans::*;
+namespace Editor {
 
-	PropertyCommand(Math::Trans& target, MemberPtr member, const T& oldValue, const T& newValue)
-		: target_(target), member_(member), oldValue_(oldValue), newValue_(newValue) {
-	}
+	/// <summary>
+	/// 任意のメンバ変数の変更をコマンドとして扱うためのテンプレートクラス
+	/// </summary>
+	template<typename T>
+	class PropertyCommand : public ICommand {
+	public:
+		using MemberPtr = T Math::Trans::*;
 
-	void Do() override {
-		target_.*member_ = newValue_;
-	}
+		PropertyCommand(Math::Trans& target, MemberPtr member, const T& oldValue, const T& newValue)
+			: target_(target), member_(member), oldValue_(oldValue), newValue_(newValue) {
+		}
 
-	void UnDo() override {
-		target_.*member_ = oldValue_;
-	}
+		void Do() override {
+			target_.*member_ = newValue_;
+		}
 
-	void ReDo() override {
-		Do();
-	}
+		void UnDo() override {
+			target_.*member_ = oldValue_;
+		}
 
-private:
-	Math::Trans& target_;
-	MemberPtr member_;
-	T oldValue_;
-	T newValue_;
-};
+		void ReDo() override {
+			Do();
+		}
+
+	private:
+		Math::Trans& target_;
+		MemberPtr member_;
+		T oldValue_;
+		T newValue_;
+	};
+
+}

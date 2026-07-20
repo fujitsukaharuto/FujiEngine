@@ -14,6 +14,7 @@
 using namespace Core;
 using namespace Graphics;
 using namespace Math;
+using namespace DXC;
 
 
 Object3d::Object3d() {

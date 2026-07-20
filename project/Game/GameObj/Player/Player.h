@@ -133,7 +133,7 @@ public:
 	void SetIsStart(bool is) { isStart_ = is; }
 	void SetTargetPos(const Math::Vector3& pos) { targetPos_ = pos; }
 	void SetIsNowAvoid(bool is) { isNowAvoid_ = is; }
-	void SetDXCom(DXCom* dxcom) { dxcommon_ = dxcom; }
+	void SetDXCom(DXC::DXCom* dxcom) { dxcommon_ = dxcom; }
 	void SetLandingTime(float landTime);
 
 	//========================================================================*/
@@ -217,35 +217,35 @@ private:
 	int moveParticleCSL_;
 	int moveParticleCSR_;
 
-	DXCom* dxcommon_ = nullptr;
+	DXC::DXCom* dxcommon_ = nullptr;
 
-	ParticleEmitter hit_{};
-	ParticleEmitter hit2_{};
-	ParticleEmitter moveParticleL_{};
-	ParticleEmitter moveParticleR_{};
-	ParticleEmitter deathSmoke_{};
-	ParticleEmitter shotSpark_{};
-	ParticleEmitter shotWave_{};
-	ParticleEmitter strongShotWave_{};
+	Graphics::ParticleEmitter hit_{};
+	Graphics::ParticleEmitter hit2_{};
+	Graphics::ParticleEmitter moveParticleL_{};
+	Graphics::ParticleEmitter moveParticleR_{};
+	Graphics::ParticleEmitter deathSmoke_{};
+	Graphics::ParticleEmitter shotSpark_{};
+	Graphics::ParticleEmitter shotWave_{};
+	Graphics::ParticleEmitter strongShotWave_{};
 
-	ParticleEmitter* moveBurnerL_{};
-	ParticleEmitter* moveBurnerR_{};
-	ParticleEmitter* moveBurnerLT_{};
-	ParticleEmitter* moveBurnerRT_{};
+	Graphics::ParticleEmitter* moveBurnerL_{};
+	Graphics::ParticleEmitter* moveBurnerR_{};
+	Graphics::ParticleEmitter* moveBurnerLT_{};
+	Graphics::ParticleEmitter* moveBurnerRT_{};
 
-	ParticleEmitter* avoidEmitter01_{};
-	ParticleEmitter* avoidEmitter02_{};
-	ParticleEmitter* avoidEmitter03_{};
+	Graphics::ParticleEmitter* avoidEmitter01_{};
+	Graphics::ParticleEmitter* avoidEmitter02_{};
+	Graphics::ParticleEmitter* avoidEmitter03_{};
 
-	ParticleEmitter* avoidEmitter1_{};
-	ParticleEmitter* avoidEmitter2_{};
-	ParticleEmitter* avoidEmitter3_{};
-	ParticleEmitter* avoidEmitter4_{};
+	Graphics::ParticleEmitter* avoidEmitter1_{};
+	Graphics::ParticleEmitter* avoidEmitter2_{};
+	Graphics::ParticleEmitter* avoidEmitter3_{};
+	Graphics::ParticleEmitter* avoidEmitter4_{};
 
-	ParticleEmitter* strengthStateEmitter1_{};
-	ParticleEmitter strengthStateEmitter2_{};
+	Graphics::ParticleEmitter* strengthStateEmitter1_{};
+	Graphics::ParticleEmitter strengthStateEmitter2_{};
 
-	SoundData* shotSE_{};
+	Audio::SoundData* shotSE_{};
 
 	// Title
 	Math::Vector3 titleStartP_{};

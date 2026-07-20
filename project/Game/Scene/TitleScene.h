@@ -7,7 +7,7 @@
 /// <summary>
 /// タイトルシーンクラス
 /// </summary>
-class TitleScene:public BaseScene {
+class TitleScene:public Scene::BaseScene {
 public:
 	TitleScene();
 	~TitleScene();

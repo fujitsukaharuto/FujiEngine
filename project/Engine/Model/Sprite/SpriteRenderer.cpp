@@ -6,6 +6,7 @@
 
 using namespace Core;
 using namespace Graphics;
+using namespace DXC;
 
 SpriteRenderer* SpriteRenderer::GetInstance() {
 	static SpriteRenderer instance;

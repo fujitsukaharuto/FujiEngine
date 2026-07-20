@@ -9,19 +9,23 @@
 using namespace Microsoft::WRL;
 
 
-/// <summary>
-/// GPUパーティクルUpdate用パイプライン(CS) ※splatモード専用
-/// 視錐台カリング/描画リスト構築を持たない軽量版。ルートシグネチャはシェーダリフレクションから生成。
-/// </summary>
-class UpdateParticleSplatCSPipe :public BasePipeline {
-public:
-	UpdateParticleSplatCSPipe() = default;
-	~UpdateParticleSplatCSPipe();
+namespace Graphics {
 
-private:
+	/// <summary>
+	/// GPUパーティクルUpdate用パイプライン(CS) ※splatモード専用
+	/// 視錐台カリング/描画リスト構築を持たない軽量版。ルートシグネチャはシェーダリフレクションから生成。
+	/// </summary>
+	class UpdateParticleSplatCSPipe :public BasePipeline {
+	public:
+		UpdateParticleSplatCSPipe() = default;
+		~UpdateParticleSplatCSPipe();
 
-	void CreateRootSignature(ID3D12Device* device)override;
+	private:
 
-	void CreatePSO(ID3D12Device* device)override;
+		void CreateRootSignature(ID3D12Device* device)override;
 
-};
+		void CreatePSO(ID3D12Device* device)override;
+
+	};
+
+}

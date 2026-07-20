@@ -8,6 +8,7 @@
 
 using namespace Core;
 using namespace Math;
+using namespace Graphics;
 
 namespace {
 

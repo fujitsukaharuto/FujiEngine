@@ -3,8 +3,10 @@
 #include <vector>
 #include "Engine/Math/Matrix/MatrixCalculation.h"
 
-class GPUParticleSystem;
-enum class PipelinePhase;
+namespace Graphics {
+	class GPUParticleSystem;
+	enum class PipelinePhase;
+}
 
 namespace Editor {
 	/// <summary>
@@ -14,19 +16,19 @@ namespace Editor {
 	public:
 
 		/// <summary>タブ形式のエミッター編集ウィンドウ(GPUParticleScene用)</summary>
-		void DrawSceneGUI(GPUParticleSystem& system);
+		void DrawSceneGUI(Graphics::GPUParticleSystem& system);
 		/// <summary>統計情報と3種のエミッター設定(全シーン共通のインスペクタ用)</summary>
-		void DrawInspectorGUI(GPUParticleSystem& system);
+		void DrawInspectorGUI(Graphics::GPUParticleSystem& system);
 
 	private:
 
-		void DrawPerformanceStats(GPUParticleSystem& system);
-		void DrawEmitterList(GPUParticleSystem& system, std::vector<int>& emitterIndices, int& currentIdx, PipelinePhase phase);
-		void DrawSphereEmitterGUI(GPUParticleSystem& system);
-		void DrawTextureEmitterGUI(GPUParticleSystem& system);
-		void DrawSurfaceEmitterGUI(GPUParticleSystem& system);
+		void DrawPerformanceStats(Graphics::GPUParticleSystem& system);
+		void DrawEmitterList(Graphics::GPUParticleSystem& system, std::vector<int>& emitterIndices, int& currentIdx, Graphics::PipelinePhase phase);
+		void DrawSphereEmitterGUI(Graphics::GPUParticleSystem& system);
+		void DrawTextureEmitterGUI(Graphics::GPUParticleSystem& system);
+		void DrawSurfaceEmitterGUI(Graphics::GPUParticleSystem& system);
 		/// <summary>エミッター設定ファイルの読み込みポップアップ</summary>
-		void DrawLoadPopUp(GPUParticleSystem& system, int id, PipelinePhase type);
+		void DrawLoadPopUp(Graphics::GPUParticleSystem& system, int id, Graphics::PipelinePhase type);
 		/// <summary>マウス追従用のTransギズモ</summary>
 		void DrawMouseTransGizmo();
 

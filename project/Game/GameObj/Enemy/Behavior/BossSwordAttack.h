@@ -22,6 +22,6 @@ private:
 	Step step_;
 	float coolTime_;
 	int attackCount_;
-	SoundData* attackSE_;
+	Audio::SoundData* attackSE_;
 
 };

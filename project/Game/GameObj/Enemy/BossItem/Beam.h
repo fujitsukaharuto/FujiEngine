@@ -129,9 +129,9 @@ private:
 	//std::unique_ptr<AABBCollider> collider_;
 
 	// emitter
-	ParticleEmitter spark1_;
-	ParticleEmitter spark2_;
-	ParticleEmitter* beamParticle_;
-	ParticleEmitter* beamLight_;
+	Graphics::ParticleEmitter spark1_;
+	Graphics::ParticleEmitter spark2_;
+	Graphics::ParticleEmitter* beamParticle_;
+	Graphics::ParticleEmitter* beamLight_;
 
 };

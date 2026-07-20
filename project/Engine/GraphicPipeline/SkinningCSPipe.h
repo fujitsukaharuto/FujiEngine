@@ -9,25 +9,29 @@
 using namespace Microsoft::WRL;
 
 
-/// <summary>
-/// スキニング用パイプライン
-/// </summary>
-class SkinningCSPipe :public BasePipeline {
-public:
-	SkinningCSPipe() = default;
-	~SkinningCSPipe();
+namespace Graphics {
 
-public:
+	/// <summary>
+	/// スキニング用パイプライン
+	/// </summary>
+	class SkinningCSPipe :public BasePipeline {
+	public:
+		SkinningCSPipe() = default;
+		~SkinningCSPipe();
 
-
-
-private:
-
-	void CreateRootSignature(ID3D12Device* device)override;
-
-	void CreatePSO(ID3D12Device* device)override;
-
-private:
+	public:
 
 
-};
+
+	private:
+
+		void CreateRootSignature(ID3D12Device* device)override;
+
+		void CreatePSO(ID3D12Device* device)override;
+
+	private:
+
+
+	};
+
+}

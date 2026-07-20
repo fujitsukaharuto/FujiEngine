@@ -5,6 +5,8 @@
 #include "ImGuiManager/ImGuiManager.h"
 
 using namespace Core;
+using namespace Graphics;
+using namespace DXC;
 
 void PointLight::Initialize(DXCom* pDxcom) {
 	

@@ -3,6 +3,9 @@
 #include "Engine/DX/DXCom.h"
 #include "ImGuiManager.h"
 
+using namespace Graphics;
+using namespace DXC;
+
 CameraManager* CameraManager::GetInstance() {
 	static CameraManager instance;
 	return &instance;

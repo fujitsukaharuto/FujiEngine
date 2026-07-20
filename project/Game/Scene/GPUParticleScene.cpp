@@ -14,6 +14,8 @@
 using namespace Core;
 using namespace Graphics;
 using namespace Math;
+using namespace Scene;
+using namespace DXC;
 
 
 GPUParticleScene::GPUParticleScene() {}

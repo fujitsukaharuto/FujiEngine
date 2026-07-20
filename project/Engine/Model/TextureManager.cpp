@@ -11,6 +11,7 @@
 #include "externals/DirectXTex/d3dx12.h"
 
 using namespace Graphics;
+using namespace DXC;
 
 
 TextureManager::TextureManager() {}

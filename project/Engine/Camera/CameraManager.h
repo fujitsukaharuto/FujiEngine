@@ -2,58 +2,62 @@
 #include <memory>
 #include "Camera.h"
 
-class DXCom;
+namespace DXC { class DXCom; }
 
-/// <summary>
-/// カメラ管理クラス
-/// </summary>
-class CameraManager {
-public:
-	CameraManager() = default;
-	~CameraManager() = default;
-
-public:
-
-	static CameraManager* GetInstance();
-	void Initialize(DXCom* pDXCom);
-	void Finalize();
-	void Update();
-
-
-	//========================================================================*/
-	//* Getter
+namespace Graphics {
 
 	/// <summary>
-	/// カメラの取得
+	/// カメラ管理クラス
 	/// </summary>
-	/// <returns>Camera</returns>
-	Camera* GetCamera()const { return camera_.get(); }
+	class CameraManager {
+	public:
+		CameraManager() = default;
+		~CameraManager() = default;
 
-	/// <summary>
-	/// Debugモードかどうかの取得
-	/// </summary>
-	/// <returns>bool</returns>
-	bool GetDebugMode()const { return debugMode_; }
+	public:
 
-	//========================================================================*/
-	//* Setter
-
-	/// <summary>
-	/// Debugモードを設定
-	/// </summary>
-	/// <param name="is">Debugモードにするかどうか</param>
-	void SetDebugMode(bool is);
-
-	void DebugGUI();
-
-private:
+		static CameraManager* GetInstance();
+		void Initialize(DXC::DXCom* pDXCom);
+		void Finalize();
+		void Update();
 
 
+		//========================================================================*/
+		//* Getter
 
-private:
+		/// <summary>
+		/// カメラの取得
+		/// </summary>
+		/// <returns>Camera</returns>
+		Camera* GetCamera()const { return camera_.get(); }
 
-	std::unique_ptr<Camera> camera_ = nullptr;
+		/// <summary>
+		/// Debugモードかどうかの取得
+		/// </summary>
+		/// <returns>bool</returns>
+		bool GetDebugMode()const { return debugMode_; }
 
-	bool debugMode_ = false;
+		//========================================================================*/
+		//* Setter
 
-};
+		/// <summary>
+		/// Debugモードを設定
+		/// </summary>
+		/// <param name="is">Debugモードにするかどうか</param>
+		void SetDebugMode(bool is);
+
+		void DebugGUI();
+
+	private:
+
+
+
+	private:
+
+		std::unique_ptr<Camera> camera_ = nullptr;
+
+		bool debugMode_ = false;
+
+	};
+
+}

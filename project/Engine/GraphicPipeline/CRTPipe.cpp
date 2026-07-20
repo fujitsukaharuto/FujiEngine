@@ -5,6 +5,9 @@
 #include "Logger.h"
 #include <cassert>
 
+using namespace Graphics;
+using namespace DXC;
+
 
 
 CRTPipe::~CRTPipe() {}

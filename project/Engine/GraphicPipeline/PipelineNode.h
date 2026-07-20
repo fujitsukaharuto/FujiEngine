@@ -9,29 +9,33 @@
 using namespace Microsoft::WRL;
 
 
-/// <summary>
-/// 通常描画用パイプライン
-/// </summary>
-class PipelineNode :public BasePipeline {
-public:
-	PipelineNode() = default;
-	~PipelineNode();
-
-public:
+namespace Graphics {
 
 	/// <summary>
-	/// 減算合成にするかどうか
+	/// 通常描画用パイプライン
 	/// </summary>
-	void SetIsAddMode(bool is) { isAddMode_ = is; }
+	class PipelineNode :public BasePipeline {
+	public:
+		PipelineNode() = default;
+		~PipelineNode();
 
-private:
+	public:
 
-	void CreateRootSignature(ID3D12Device* device)override;
+		/// <summary>
+		/// 減算合成にするかどうか
+		/// </summary>
+		void SetIsAddMode(bool is) { isAddMode_ = is; }
 
-	void CreatePSO(ID3D12Device* device)override;
+	private:
 
-private:
+		void CreateRootSignature(ID3D12Device* device)override;
 
-	bool isAddMode_ = false;
+		void CreatePSO(ID3D12Device* device)override;
 
-};
+	private:
+
+		bool isAddMode_ = false;
+
+	};
+
+}

@@ -1,6 +1,8 @@
 #include "DeleteObjCommand.h"
 #include "Engine/Editor/CommandManager.h"
 
+using namespace Editor;
+
 DeleteObjCommand::DeleteObjCommand(int id) : objId(id) {
 	obj = CommandManager::GetInstance()->GetEditorObject(id);
 }

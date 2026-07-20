@@ -10,50 +10,54 @@
 #include "Engine/Math/Matrix/MatrixCalculation.h"
 #include "Engine/DX/FrameCount.h"
 
-const uint32_t kNumMaxInfluence = 4;
-/// <summary>
-/// ボーン重み構造体
-/// </summary>
-struct VertexInfluence {
-	std::array<float, kNumMaxInfluence> weights;
-	std::array<int32_t, kNumMaxInfluence> jointIndices;
-};
+namespace Graphics {
 
-/// <summary>
-/// GPUに送るスケルトンデータ構造体
-/// </summary>
-struct WellForGPU {
-	Math::Matrix4x4 skeletonSpaceMatrix;
-	Math::Matrix4x4 skeletonSpaceInverseTransposeMatrix;
-};
+	const uint32_t kNumMaxInfluence = 4;
+	/// <summary>
+	/// ボーン重み構造体
+	/// </summary>
+	struct VertexInfluence {
+		std::array<float, kNumMaxInfluence> weights;
+		std::array<int32_t, kNumMaxInfluence> jointIndices;
+	};
 
-/// <summary>
-/// メッシュセクション構造体
-/// </summary>
-struct MeshSection {
-	uint32_t  vertexOffset;
-	uint32_t  vertexCount;
-	uint32_t  matrixPaletteOffset;
-	uint32_t  materialIndex;
-};
+	/// <summary>
+	/// GPUに送るスケルトンデータ構造体
+	/// </summary>
+	struct WellForGPU {
+		Math::Matrix4x4 skeletonSpaceMatrix;
+		Math::Matrix4x4 skeletonSpaceInverseTransposeMatrix;
+	};
 
-/// <summary>
-/// スキンクラスター構造体
-/// </summary>
-struct SkinCluster {
-	std::vector<Math::Matrix4x4> inverseBindPoseMatrices;
+	/// <summary>
+	/// メッシュセクション構造体
+	/// </summary>
+	struct MeshSection {
+		uint32_t  vertexOffset;
+		uint32_t  vertexCount;
+		uint32_t  matrixPaletteOffset;
+		uint32_t  materialIndex;
+	};
 
-	std::vector<MeshSection> meshSections;
+	/// <summary>
+	/// スキンクラスター構造体
+	/// </summary>
+	struct SkinCluster {
+		std::vector<Math::Matrix4x4> inverseBindPoseMatrices;
 
-	// MeshSection用リソースとSRVハンドルを追加
-	Microsoft::WRL::ComPtr<ID3D12Resource> meshSectionResource;
-	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> meshSectionSrvHandle;
+		std::vector<MeshSection> meshSections;
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> influenceResource;
-	D3D12_VERTEX_BUFFER_VIEW influenceBufferView;
-	std::span<VertexInfluence> mappedInfluence;
-	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> influenceSrvHandle;
-	Microsoft::WRL::ComPtr<ID3D12Resource> paletteResource[DXC::kFrameCount_];
-	std::span<WellForGPU> mappedPalette[DXC::kFrameCount_];
-	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> paletteSrvHandle[DXC::kFrameCount_];
-};
+		// MeshSection用リソースとSRVハンドルを追加
+		Microsoft::WRL::ComPtr<ID3D12Resource> meshSectionResource;
+		std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> meshSectionSrvHandle;
+
+		Microsoft::WRL::ComPtr<ID3D12Resource> influenceResource;
+		D3D12_VERTEX_BUFFER_VIEW influenceBufferView;
+		std::span<VertexInfluence> mappedInfluence;
+		std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> influenceSrvHandle;
+		Microsoft::WRL::ComPtr<ID3D12Resource> paletteResource[DXC::kFrameCount_];
+		std::span<WellForGPU> mappedPalette[DXC::kFrameCount_];
+		std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> paletteSrvHandle[DXC::kFrameCount_];
+	};
+
+}

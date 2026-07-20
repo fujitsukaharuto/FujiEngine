@@ -9,25 +9,29 @@
 using namespace Microsoft::WRL;
 
 
-/// <summary>
-/// 輝度ベースアウトライン用パイプライン(CS)
-/// </summary>
-class LuminanceOutlineCSPipe :public BasePipeline {
-public:
-	LuminanceOutlineCSPipe() = default;
-	~LuminanceOutlineCSPipe();
+namespace Graphics {
 
-public:
+	/// <summary>
+	/// 輝度ベースアウトライン用パイプライン(CS)
+	/// </summary>
+	class LuminanceOutlineCSPipe :public BasePipeline {
+	public:
+		LuminanceOutlineCSPipe() = default;
+		~LuminanceOutlineCSPipe();
 
-
-
-private:
-
-	void CreateRootSignature(ID3D12Device* device)override;
-
-	void CreatePSO(ID3D12Device* device)override;
-
-private:
+	public:
 
 
-};
+
+	private:
+
+		void CreateRootSignature(ID3D12Device* device)override;
+
+		void CreatePSO(ID3D12Device* device)override;
+
+	private:
+
+
+	};
+
+}

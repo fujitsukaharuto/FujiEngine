@@ -16,143 +16,143 @@ namespace ed = ax::NodeEditor;
 #endif // _DEBUG
 
 #ifdef _DEBUGMODE
-/// <summary>
-/// ノードが持つ値
-/// </summary>
-struct NodeValue {
+namespace Core {
 
-	enum class Type { None, Int, Float, Vector2, Vector3, Color, Texture };
+	/// <summary>
+	/// ノードが持つ値
+	/// </summary>
+	struct NodeValue {
 
-	// 実データ本体（variant にすべて詰め込む）
-	std::variant<std::monostate, int, float, Math::Vector2, Math::Vector3, Math::Vector4, std::string> data;
+		enum class Type { None, Int, Float, Vector2, Vector3, Color, Texture };
 
-	// タイプを明示的に持っておく（オプション）
-	Type type = Type::None;
+		// 実データ本体（variant にすべて詰め込む）
+		std::variant<std::monostate, int, float, Math::Vector2, Math::Vector3, Math::Vector4, std::string> data;
 
-	// コンストラクタ（型推論対応）
-	NodeValue() : data(std::monostate{}), type(Type::None) {}
-	NodeValue(int v) : data(v), type(Type::Int) {}
-	NodeValue(float v) : data(v), type(Type::Float) {}
-	NodeValue(const Math::Vector2& v) : data(v), type(Type::Vector2) {}
-	NodeValue(const Math::Vector3& v) : data(v), type(Type::Vector3) {}
-	NodeValue(const Math::Vector4& v) : data(v), type(Type::Color) {}
-	NodeValue(const std::string& texName) : data(texName), type(Type::Texture) {}
-	NodeValue(const char* texName) : data(std::string(texName)), type(Type::Texture) {}
+		// タイプを明示的に持っておく（オプション）
+		Type type = Type::None;
 
-	// ヘルパー関数
-	bool IsValid() const {
-		return type != Type::None;
-	}
+		// コンストラクタ（型推論対応）
+		NodeValue() : data(std::monostate{}), type(Type::None) {}
+		NodeValue(int v) : data(v), type(Type::Int) {}
+		NodeValue(float v) : data(v), type(Type::Float) {}
+		NodeValue(const Math::Vector2& v) : data(v), type(Type::Vector2) {}
+		NodeValue(const Math::Vector3& v) : data(v), type(Type::Vector3) {}
+		NodeValue(const Math::Vector4& v) : data(v), type(Type::Color) {}
+		NodeValue(const std::string& texName) : data(texName), type(Type::Texture) {}
+		NodeValue(const char* texName) : data(std::string(texName)), type(Type::Texture) {}
 
-	// 型チェック（テンプレートベース）
-	template<typename T>
-	bool Is() const {
-		return std::holds_alternative<T>(data);
-	}
+		// ヘルパー関数
+		bool IsValid() const {
+			return type != Type::None;
+		}
 
-	// 値取得（安全な参照取得、存在しなければ例外）
-	template<typename T>
-	const T& Get() const {
-		return std::get<T>(data);
-	}
-	template<typename T>
-	T& Get() {
-		return std::get<T>(data);
-	}
+		// 型チェック（テンプレートベース）
+		template<typename T>
+		bool Is() const {
+			return std::holds_alternative<T>(data);
+		}
 
-	// 値取得（デフォルト値付きで安全）
-	template<typename T>
-	T GetOr(const T& defaultValue) const {
-		if (std::holds_alternative<T>(data)) {
+		// 値取得（安全な参照取得、存在しなければ例外）
+		template<typename T>
+		const T& Get() const {
 			return std::get<T>(data);
 		}
-		return defaultValue;
-	}
-};
+		template<typename T>
+		T& Get() {
+			return std::get<T>(data);
+		}
 
-enum class PinType {
-	Flow,
-	Bool,
-	Int,
-	Float,
-	String,
-	Object,
-	Function,
-	Delegate,
-	Vector2,
-	Color,
-	Texture,
-	Material,
-};
+		// 値取得（デフォルト値付きで安全）
+		template<typename T>
+		T GetOr(const T& defaultValue) const {
+			if (std::holds_alternative<T>(data)) {
+				return std::get<T>(data);
+			}
+			return defaultValue;
+		}
+	};
 
-enum class PinKind {
-	Output,
-	Input
-};
-
-enum class AddType {
-	Increment,
-	DeltaTime,
-};
-
-/// <summary>
-/// NodeのPin
-/// </summary>
-struct Pin {
-	ed::PinId id;
-	bool isLinked = false;
-	enum class Type { Input, Output } type;
-	PinType pinType;
-};
-
-/// <summary>
-/// Nodeのデータ
-/// </summary>
-struct MyNode {
-	ed::NodeId id;
-	std::string name;
-	std::vector<Pin> inputs;
-	std::vector<Pin> outputs;
-	std::vector<NodeValue> values;
-	std::vector<NodeValue> outputValue;
-
-	enum class NodeType {
-		Texture,
+	enum class PinType {
+		Flow,
+		Bool,
+		Int,
 		Float,
-		Add,
-		Material,
-		SubMaterial,
-		Color,
+		String,
+		Object,
+		Function,
+		Delegate,
 		Vector2,
-		// 追加予定のノード種類…
-	} type;
+		Color,
+		Texture,
+		Material,
+	};
 
-	bool isUpdated = false;
+	enum class PinKind {
+		Output,
+		Input
+	};
 
-	NodeValue result; // ← ★ これがノードの出力
+	enum class AddType {
+		Increment,
+		DeltaTime,
+	};
 
-	// NodeTypeによって必要になるもの
-	std::string texName;
-	AddType addType = AddType::Increment;
+	/// <summary>
+	/// NodeのPin
+	/// </summary>
+	struct Pin {
+		ed::PinId id;
+		bool isLinked = false;
+		enum class Type { Input, Output } type;
+		PinType pinType;
+	};
 
-	MyNode* child = nullptr;
-	std::function<NodeValue(const std::vector<NodeValue>&)> evaluator; // 入力 → 出力
+	/// <summary>
+	/// Nodeのデータ
+	/// </summary>
+	struct MyNode {
+		ed::NodeId id;
+		std::string name;
+		std::vector<Pin> inputs;
+		std::vector<Pin> outputs;
+		std::vector<NodeValue> values;
+		std::vector<NodeValue> outputValue;
 
-	void CreateNode(NodeType nodeType);
-};
+		enum class NodeType {
+			Texture,
+			Float,
+			Add,
+			Material,
+			SubMaterial,
+			Color,
+			Vector2,
+			// 追加予定のノード種類…
+		} type;
 
-/// <summary>
-/// NodeのLinkデータ
-/// </summary>
-struct Link {
-	ed::LinkId id;
-	ed::PinId startPinId; // output
-	ed::PinId endPinId;   // input
-};
-#endif // _DEBUG
+		bool isUpdated = false;
 
+		NodeValue result; // ← ★ これがノードの出力
 
-namespace Core {
+		// NodeTypeによって必要になるもの
+		std::string texName;
+		AddType addType = AddType::Increment;
+
+		MyNode* child = nullptr;
+		std::function<NodeValue(const std::vector<NodeValue>&)> evaluator; // 入力 → 出力
+
+		void CreateNode(NodeType nodeType);
+	};
+
+	/// <summary>
+	/// NodeのLinkデータ
+	/// </summary>
+	struct Link {
+		ed::LinkId id;
+		ed::PinId startPinId; // output
+		ed::PinId endPinId;   // input
+	};
+	#endif // _DEBUG
+
 	// NodeEditor
 #ifdef _DEBUGMODE
 /// <summary>

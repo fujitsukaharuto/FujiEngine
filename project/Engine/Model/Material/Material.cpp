@@ -4,6 +4,7 @@
 
 using namespace Graphics;
 using namespace Math;
+using namespace DXC;
 
 
 Material::Material() {

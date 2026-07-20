@@ -2,6 +2,7 @@
 #include "Engine/DX/FrameCount.h"
 
 using namespace Math;
+using namespace Graphics;
 
 
 ParticleGroup::ParticleGroup() {

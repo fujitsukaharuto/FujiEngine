@@ -3,7 +3,9 @@
 #include "Engine/DX/DX12Helper.h"
 #include "ImGuiManager/ImGuiManager.h"
 
+using namespace Graphics;
 using namespace Math;
+using namespace DXC;
 
 
 void DirectionLight::Initialize(DXCom* pDxcom) {

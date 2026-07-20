@@ -4,6 +4,8 @@
 #include "Engine/DX/DXCom.h"
 #include "Engine/DX/DX12Helper.h"
 
+using namespace DXC;
+
 
 const uint32_t SRVManager::kMaxSRVCount_ = 4096;
 

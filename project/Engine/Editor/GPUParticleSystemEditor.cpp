@@ -9,6 +9,8 @@
 
 using namespace Core;
 using namespace Math;
+using namespace Graphics;
+using namespace DXC;
 
 
 namespace Editor {

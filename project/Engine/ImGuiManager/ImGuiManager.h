@@ -20,7 +20,7 @@ namespace ed = ax::NodeEditor;
 namespace Core {
 	class MyWin;
 }
-class DXCom;
+namespace DXC { class DXCom; }
 
 namespace Core {
 	/// <summary>
@@ -34,7 +34,7 @@ namespace Core {
 		static ImGuiManager* GetInstance();
 	public:
 
-		void Initialize(MyWin* myWin, DXCom* dxComon);
+		void Initialize(MyWin* myWin, DXC::DXCom* dxComon);
 		void Fin();
 
 		/// <summary>
@@ -122,7 +122,7 @@ namespace Core {
 
 
 	private:
-		DXCom* dxCommon_ = nullptr;
+		DXC::DXCom* dxCommon_ = nullptr;
 		uint32_t srvIndex;
 
 		float winSizeX_ = 0.0f;

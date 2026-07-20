@@ -32,14 +32,14 @@ private:
 	float coolTime_;
 
 	// Emitter
-	ParticleEmitter* charge1_;
-	ParticleEmitter* charge2_;
-	ParticleEmitter* charge3_;
-	ParticleEmitter* chargeLight_;
-	ParticleEmitter* chargeRay_;
-	ParticleEmitter* chargeWave_;
-	ParticleEmitter* chargeCircle_;
+	Graphics::ParticleEmitter* charge1_;
+	Graphics::ParticleEmitter* charge2_;
+	Graphics::ParticleEmitter* charge3_;
+	Graphics::ParticleEmitter* chargeLight_;
+	Graphics::ParticleEmitter* chargeRay_;
+	Graphics::ParticleEmitter* chargeWave_;
+	Graphics::ParticleEmitter* chargeCircle_;
 
-	SoundData* chargeSE_;
-	SoundData* chargeCompleteSE_;
+	Audio::SoundData* chargeSE_;
+	Audio::SoundData* chargeCompleteSE_;
 };

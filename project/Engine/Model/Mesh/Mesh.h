@@ -7,7 +7,7 @@
 #include <vector>
 #include <wrl.h>
 
-class DXCom;
+namespace DXC { class DXCom; }
 
 namespace Graphics {
 
@@ -62,7 +62,7 @@ namespace Graphics {
 		std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> GetSrvHandle() const { return srvHandle_; }
 
 	private:
-		DXCom* dxcommon_;
+		DXC::DXCom* dxcommon_;
 
 		std::vector<VertexData> vertexData_;
 		std::vector<uint32_t>   indexData_;

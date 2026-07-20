@@ -9,25 +9,29 @@
 using namespace Microsoft::WRL;
 
 
-/// <summary>
-/// レトロテレビエフェクト用パイプライン(CS)
-/// </summary>
-class RetroTVCSPipe :public BasePipeline {
-public:
-	RetroTVCSPipe() = default;
-	~RetroTVCSPipe();
+namespace Graphics {
 
-public:
+	/// <summary>
+	/// レトロテレビエフェクト用パイプライン(CS)
+	/// </summary>
+	class RetroTVCSPipe :public BasePipeline {
+	public:
+		RetroTVCSPipe() = default;
+		~RetroTVCSPipe();
 
-
-
-private:
-
-	void CreateRootSignature(ID3D12Device* device)override;
-
-	void CreatePSO(ID3D12Device* device)override;
-
-private:
+	public:
 
 
-};
+
+	private:
+
+		void CreateRootSignature(ID3D12Device* device)override;
+
+		void CreatePSO(ID3D12Device* device)override;
+
+	private:
+
+
+	};
+
+}

@@ -9,25 +9,29 @@
 using namespace Microsoft::WRL;
 
 
-/// <summary>
-/// ランダムエフェクト用パイプライン(CS)
-/// </summary>
-class RandomCSPipe :public BasePipeline {
-public:
-	RandomCSPipe() = default;
-	~RandomCSPipe();
+namespace Graphics {
 
-public:
+	/// <summary>
+	/// ランダムエフェクト用パイプライン(CS)
+	/// </summary>
+	class RandomCSPipe :public BasePipeline {
+	public:
+		RandomCSPipe() = default;
+		~RandomCSPipe();
 
-
-
-private:
-
-	void CreateRootSignature(ID3D12Device* device)override;
-
-	void CreatePSO(ID3D12Device* device)override;
-
-private:
+	public:
 
 
-};
+
+	private:
+
+		void CreateRootSignature(ID3D12Device* device)override;
+
+		void CreatePSO(ID3D12Device* device)override;
+
+	private:
+
+
+	};
+
+}

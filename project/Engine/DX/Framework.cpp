@@ -3,6 +3,9 @@
 using namespace Audio;
 using namespace Core;
 using namespace Graphics;
+using namespace Editor;
+using namespace Scene;
+using namespace DXC;
 
 
 Framework::Framework() {

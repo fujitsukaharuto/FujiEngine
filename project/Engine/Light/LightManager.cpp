@@ -4,6 +4,7 @@
 #include "Engine/DX/DX12Helper.h"
 
 using namespace Graphics;
+using namespace DXC;
 
 void LightManager::Initialize(DXCom* pDxcom) {
 	dxcommon_ = pDxcom;

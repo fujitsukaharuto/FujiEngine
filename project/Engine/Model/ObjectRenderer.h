@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 
-class DXCom;
+namespace DXC { class DXCom; }
 
 namespace Graphics {
 
@@ -15,7 +15,7 @@ namespace Graphics {
 		// シングルトンインスタンスの取得
 		static ObjectRenderer* GetInstance();
 
-		void Initialize(DXCom* pDxcom, LightManager* pLightManager);
+		void Initialize(DXC::DXCom* pDxcom, LightManager* pLightManager);
 		void Finalize();
 
 		// 毎フレーム、描画したいRenderObject（Object3d, AnimationObject等）を登録する
@@ -40,7 +40,7 @@ namespace Graphics {
 		ObjectRenderer() = default;
 		~ObjectRenderer() = default;
 
-		DXCom* dxcommon_ = nullptr;
+		DXC::DXCom* dxcommon_ = nullptr;
 		LightManager* lightManager_ = nullptr;
 
 		std::vector<Graphics::RenderObject*> renderQueue_;

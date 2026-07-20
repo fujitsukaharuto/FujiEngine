@@ -9,25 +9,29 @@
 using namespace Microsoft::WRL;
 
 
-/// <summary>
-/// GPUパーティクルTextureEmit用パイプライン(CS)
-/// </summary>
-class EmitterTexParticleCSPipe :public BasePipeline {
-public:
-	EmitterTexParticleCSPipe() = default;
-	~EmitterTexParticleCSPipe();
+namespace Graphics {
 
-public:
+	/// <summary>
+	/// GPUパーティクルTextureEmit用パイプライン(CS)
+	/// </summary>
+	class EmitterTexParticleCSPipe :public BasePipeline {
+	public:
+		EmitterTexParticleCSPipe() = default;
+		~EmitterTexParticleCSPipe();
 
-
-
-private:
-
-	void CreateRootSignature(ID3D12Device* device)override;
-
-	void CreatePSO(ID3D12Device* device)override;
-
-private:
+	public:
 
 
-};
+
+	private:
+
+		void CreateRootSignature(ID3D12Device* device)override;
+
+		void CreatePSO(ID3D12Device* device)override;
+
+	private:
+
+
+	};
+
+}

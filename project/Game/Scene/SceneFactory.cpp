@@ -6,6 +6,8 @@
 #include "Game/Scene/GPUParticleScene.h"
 #include "Game/Scene/TestScene.h"
 
+using namespace Scene;
+
 SceneFactory::SceneFactory() {
 }
 

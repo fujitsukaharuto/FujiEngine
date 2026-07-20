@@ -9,25 +9,29 @@
 using namespace Microsoft::WRL;
 
 
-/// <summary>
-/// GPUパーティクルUpdate用パイプライン(CS)
-/// </summary>
-class TrailEmitCSPipe :public BasePipeline {
-public:
-	TrailEmitCSPipe() = default;
-	~TrailEmitCSPipe();
+namespace Graphics {
 
-public:
+	/// <summary>
+	/// GPUパーティクルUpdate用パイプライン(CS)
+	/// </summary>
+	class TrailEmitCSPipe :public BasePipeline {
+	public:
+		TrailEmitCSPipe() = default;
+		~TrailEmitCSPipe();
 
-
-
-private:
-
-	void CreateRootSignature(ID3D12Device* device)override;
-
-	void CreatePSO(ID3D12Device* device)override;
-
-private:
+	public:
 
 
-};
+
+	private:
+
+		void CreateRootSignature(ID3D12Device* device)override;
+
+		void CreatePSO(ID3D12Device* device)override;
+
+	private:
+
+
+	};
+
+}

@@ -7,7 +7,7 @@
 #include <vector>
 #include <wrl.h>
 
-class DXCom;
+namespace DXC { class DXCom; }
 
 namespace Graphics {
 
@@ -31,7 +31,7 @@ namespace Graphics {
 		std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> GetUavHandle() const { return uavHandle_; }
 
 	private:
-		DXCom* dxcommon_;
+		DXC::DXCom* dxcommon_;
 
 		Microsoft::WRL::ComPtr<ID3D12Resource> skinnedVertexBuffer_ = nullptr;
 		D3D12_VERTEX_BUFFER_VIEW skinnedVBV_{};

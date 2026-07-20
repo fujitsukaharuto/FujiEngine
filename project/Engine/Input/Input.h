@@ -13,40 +13,41 @@
 #pragma comment(lib, "dxguid.lib")
 #pragma comment(lib, "xinput.lib")
 
-enum class PadInput : WORD {
-	Up = XINPUT_GAMEPAD_DPAD_UP,
-	Down = XINPUT_GAMEPAD_DPAD_DOWN,
-	Left = XINPUT_GAMEPAD_DPAD_LEFT,
-	Right = XINPUT_GAMEPAD_DPAD_RIGHT,
-
-	Start = XINPUT_GAMEPAD_START,
-	Back = XINPUT_GAMEPAD_BACK,
-
-	LeftStick = XINPUT_GAMEPAD_LEFT_THUMB, LStick = XINPUT_GAMEPAD_LEFT_THUMB,
-	RightStick = XINPUT_GAMEPAD_RIGHT_THUMB, RStick = XINPUT_GAMEPAD_RIGHT_THUMB,
-
-	LeftShoulder = XINPUT_GAMEPAD_LEFT_SHOULDER,
-	RightShoulder = XINPUT_GAMEPAD_RIGHT_SHOULDER,
-
-	A = XINPUT_GAMEPAD_A,
-	B = XINPUT_GAMEPAD_B,
-	X = XINPUT_GAMEPAD_X,
-	Y = XINPUT_GAMEPAD_Y
-};
-
-/// <summary>
-/// ゲームパッドのデータ
-/// </summary>
-struct GamePad {
-	Microsoft::WRL::ComPtr<IDirectInputDevice8> device_;
-	int32_t deadZoneL_;
-	int32_t deadZoneR_;
-	XINPUT_STATE state_;
-	XINPUT_STATE statePre_;
-	bool isConnected_ = false;
-};
-
 namespace Core {
+
+	enum class PadInput : WORD {
+		Up = XINPUT_GAMEPAD_DPAD_UP,
+		Down = XINPUT_GAMEPAD_DPAD_DOWN,
+		Left = XINPUT_GAMEPAD_DPAD_LEFT,
+		Right = XINPUT_GAMEPAD_DPAD_RIGHT,
+
+		Start = XINPUT_GAMEPAD_START,
+		Back = XINPUT_GAMEPAD_BACK,
+
+		LeftStick = XINPUT_GAMEPAD_LEFT_THUMB, LStick = XINPUT_GAMEPAD_LEFT_THUMB,
+		RightStick = XINPUT_GAMEPAD_RIGHT_THUMB, RStick = XINPUT_GAMEPAD_RIGHT_THUMB,
+
+		LeftShoulder = XINPUT_GAMEPAD_LEFT_SHOULDER,
+		RightShoulder = XINPUT_GAMEPAD_RIGHT_SHOULDER,
+
+		A = XINPUT_GAMEPAD_A,
+		B = XINPUT_GAMEPAD_B,
+		X = XINPUT_GAMEPAD_X,
+		Y = XINPUT_GAMEPAD_Y
+	};
+
+	/// <summary>
+	/// ゲームパッドのデータ
+	/// </summary>
+	struct GamePad {
+		Microsoft::WRL::ComPtr<IDirectInputDevice8> device_;
+		int32_t deadZoneL_;
+		int32_t deadZoneR_;
+		XINPUT_STATE state_;
+		XINPUT_STATE statePre_;
+		bool isConnected_ = false;
+	};
+
 	/// <summary>
 	/// Inputの管理クラス
 	/// </summary>

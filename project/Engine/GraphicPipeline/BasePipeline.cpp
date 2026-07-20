@@ -3,6 +3,9 @@
 #include "DXCommand.h"
 #include "Logger.h"
 
+using namespace Graphics;
+using namespace DXC;
+
 
 BasePipeline::~BasePipeline() {
 	pso_.Reset();

@@ -22,6 +22,6 @@ private:
 	Step step_;
 	bool isAttack_ = true;
 	float coolTime_ = 30.0f;
-	SoundData* attackSE_;
+	Audio::SoundData* attackSE_;
 
 };

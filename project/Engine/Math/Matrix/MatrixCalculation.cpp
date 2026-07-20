@@ -5,6 +5,7 @@
 #include <assert.h>
 
 using namespace Math;
+using namespace Graphics;
 
 Matrix3x3 Math::MakeAffineMat(const Vector2& scale, float rotate, const Vector2& translate) {
 	Matrix3x3 result{};

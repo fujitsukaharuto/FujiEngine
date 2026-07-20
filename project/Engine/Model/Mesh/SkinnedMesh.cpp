@@ -6,6 +6,7 @@
 #include "Engine/DX/SRVManager.h"
 
 using namespace Graphics;
+using namespace DXC;
 
 SkinnedMesh::SkinnedMesh() {
 	dxcommon_ = ModelManager::GetInstance()->ShareDXCom();

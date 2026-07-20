@@ -9,25 +9,29 @@
 using namespace Microsoft::WRL;
 
 
-/// <summary>
-/// ガウスエフェクト用パイプライン(CS)
-/// </summary>
-class GaussCSPipe :public BasePipeline {
-public:
-	GaussCSPipe() = default;
-	~GaussCSPipe();
+namespace Graphics {
 
-public:
+	/// <summary>
+	/// ガウスエフェクト用パイプライン(CS)
+	/// </summary>
+	class GaussCSPipe :public BasePipeline {
+	public:
+		GaussCSPipe() = default;
+		~GaussCSPipe();
 
-
-
-private:
-
-	void CreateRootSignature(ID3D12Device* device)override;
-
-	void CreatePSO(ID3D12Device* device)override;
-
-private:
+	public:
 
 
-};
+
+	private:
+
+		void CreateRootSignature(ID3D12Device* device)override;
+
+		void CreatePSO(ID3D12Device* device)override;
+
+	private:
+
+
+	};
+
+}

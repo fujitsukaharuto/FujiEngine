@@ -11,6 +11,8 @@
 
 using namespace Core;
 using namespace Math;
+using namespace Graphics;
+using namespace DXC;
 
 Camera::Camera() {
 	aspect_ = float(MyWin::kWindowWidth) / float(MyWin::kWindowHeight);

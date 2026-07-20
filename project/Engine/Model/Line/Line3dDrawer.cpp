@@ -5,6 +5,7 @@
 
 using namespace Graphics;
 using namespace Math;
+using namespace DXC;
 
 
 Line3dDrawer::Line3dDrawer() {

@@ -107,17 +107,17 @@ private:
 	std::unique_ptr<Graphics::Object3d> arrivalWarningPotion_;
 
 	// emitter
-	ParticleEmitter spark1_;
-	ParticleEmitter spark2_;
-	ParticleEmitter spark3_;
+	Graphics::ParticleEmitter spark1_;
+	Graphics::ParticleEmitter spark2_;
+	Graphics::ParticleEmitter spark3_;
 
-	ParticleEmitter hit_;
-	ParticleEmitter hitParticle_;
-	ParticleEmitter hitExpand_;
+	Graphics::ParticleEmitter hit_;
+	Graphics::ParticleEmitter hitParticle_;
+	Graphics::ParticleEmitter hitExpand_;
 	int hitEmitIndex_ = 0;
 	int hitEmitTrailIndex_ = 0;
 
-	SoundData* throwSE_ = nullptr;
+	Audio::SoundData* throwSE_ = nullptr;
 
 	// Gpu Particle
 	int emitterNumber_ = -1;

@@ -6,25 +6,29 @@
 #include <string>
 #include "BasePipeline.h"
 
-/// <summary>
-/// スカイボックス描画用パイプライン
-/// </summary>
-class SkyboxPipe :public BasePipeline {
-public:
-	SkyboxPipe() = default;
-	~SkyboxPipe();
+namespace Graphics {
 
-public:
+	/// <summary>
+	/// スカイボックス描画用パイプライン
+	/// </summary>
+	class SkyboxPipe :public BasePipeline {
+	public:
+		SkyboxPipe() = default;
+		~SkyboxPipe();
 
-
-
-private:
-
-	void CreateRootSignature(ID3D12Device* device)override;
-
-	void CreatePSO(ID3D12Device* device)override;
-
-private:
+	public:
 
 
-};
+
+	private:
+
+		void CreateRootSignature(ID3D12Device* device)override;
+
+		void CreatePSO(ID3D12Device* device)override;
+
+	private:
+
+
+	};
+
+}

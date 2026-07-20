@@ -4,7 +4,9 @@
 #include <numbers>
 #include "ImGuiManager/ImGuiManager.h"
 
+using namespace Graphics;
 using namespace Math;
+using namespace DXC;
 
 
 void SpotLight::Initialize(DXCom* pDxcom) {

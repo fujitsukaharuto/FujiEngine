@@ -8,6 +8,7 @@
 using namespace Core;
 using namespace Math;
 using namespace Graphics;
+using namespace DXC;
 
 int RenderObject::useObjID_ = 0;
 

@@ -9,29 +9,33 @@
 using namespace Microsoft::WRL;
 
 
-/// <summary>
-/// GPUパーティクル用パイプライン
-/// </summary>
-class ParticleCSPipe :public BasePipeline {
-public:
-	ParticleCSPipe() = default;
-	~ParticleCSPipe();
-
-public:
+namespace Graphics {
 
 	/// <summary>
-	/// 減算合成にするかどうか
+	/// GPUパーティクル用パイプライン
 	/// </summary>
-	void SetIsSubMode(bool is) { isSubMode_ = is; }
+	class ParticleCSPipe :public BasePipeline {
+	public:
+		ParticleCSPipe() = default;
+		~ParticleCSPipe();
 
-private:
+	public:
 
-	void CreateRootSignature(ID3D12Device* device)override;
+		/// <summary>
+		/// 減算合成にするかどうか
+		/// </summary>
+		void SetIsSubMode(bool is) { isSubMode_ = is; }
 
-	void CreatePSO(ID3D12Device* device)override;
+	private:
 
-private:
+		void CreateRootSignature(ID3D12Device* device)override;
 
-	bool isSubMode_ = false;
+		void CreatePSO(ID3D12Device* device)override;
 
-};
+	private:
+
+		bool isSubMode_ = false;
+
+	};
+
+}

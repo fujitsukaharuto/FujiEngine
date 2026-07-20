@@ -9,25 +9,29 @@
 using namespace Microsoft::WRL;
 
 
-/// <summary>
-/// 衝撃波エフェクト用パイプライン
-/// </summary>
-class ShockWavePipe :public BasePipeline {
-public:
-	ShockWavePipe() = default;
-	~ShockWavePipe();
+namespace Graphics {
 
-public:
+	/// <summary>
+	/// 衝撃波エフェクト用パイプライン
+	/// </summary>
+	class ShockWavePipe :public BasePipeline {
+	public:
+		ShockWavePipe() = default;
+		~ShockWavePipe();
 
-
-
-private:
-
-	void CreateRootSignature(ID3D12Device* device)override;
-
-	void CreatePSO(ID3D12Device* device)override;
-
-private:
+	public:
 
 
-};
+
+	private:
+
+		void CreateRootSignature(ID3D12Device* device)override;
+
+		void CreatePSO(ID3D12Device* device)override;
+
+	private:
+
+
+	};
+
+}

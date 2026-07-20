@@ -9,27 +9,31 @@
 using namespace Microsoft::WRL;
 
 
-/// <summary>
-/// 何もオフスクリーンかけない用パイプライン
-/// </summary>
-class NonePipeline :public BasePipeline {
-public:
-	NonePipeline() = default;
-	~NonePipeline();
+namespace Graphics {
 
-public:
+	/// <summary>
+	/// 何もオフスクリーンかけない用パイプライン
+	/// </summary>
+	class NonePipeline :public BasePipeline {
+	public:
+		NonePipeline() = default;
+		~NonePipeline();
 
-	// trueにすると加算合成(Src ONE / Dest ONE)になる。GPUパーティクルRTの合成用。
-	void SetIsAddMode(bool isAdd) { isAddMode_ = isAdd; }
+	public:
 
-private:
+		// trueにすると加算合成(Src ONE / Dest ONE)になる。GPUパーティクルRTの合成用。
+		void SetIsAddMode(bool isAdd) { isAddMode_ = isAdd; }
 
-	void CreateRootSignature(ID3D12Device* device)override;
+	private:
 
-	void CreatePSO(ID3D12Device* device)override;
+		void CreateRootSignature(ID3D12Device* device)override;
 
-private:
+		void CreatePSO(ID3D12Device* device)override;
 
-	bool isAddMode_ = false;
+	private:
 
-};
+		bool isAddMode_ = false;
+
+	};
+
+}

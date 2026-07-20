@@ -23,6 +23,6 @@ private:
 	bool isAttack_ = true;
 	float coolTime_ = 80.0f;
 
-	SoundData* areaAttackSE_;
+	Audio::SoundData* areaAttackSE_;
 
 };

@@ -5,6 +5,9 @@
 
 using namespace Audio;
 using namespace Core;
+using namespace Editor;
+using namespace Scene;
+using namespace DXC;
 
 
 BaseScene::BaseScene() {

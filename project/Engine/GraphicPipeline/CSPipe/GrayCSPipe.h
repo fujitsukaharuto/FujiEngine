@@ -9,25 +9,29 @@
 using namespace Microsoft::WRL;
 
 
-/// <summary>
-/// グレースケール用パイプライン(CS)
-/// </summary>
-class GrayCSPipe :public BasePipeline {
-public:
-	GrayCSPipe() = default;
-	~GrayCSPipe();
+namespace Graphics {
 
-public:
+	/// <summary>
+	/// グレースケール用パイプライン(CS)
+	/// </summary>
+	class GrayCSPipe :public BasePipeline {
+	public:
+		GrayCSPipe() = default;
+		~GrayCSPipe();
 
-
-
-private:
-
-	void CreateRootSignature(ID3D12Device* device)override;
-
-	void CreatePSO(ID3D12Device* device)override;
-
-private:
+	public:
 
 
-};
+
+	private:
+
+		void CreateRootSignature(ID3D12Device* device)override;
+
+		void CreatePSO(ID3D12Device* device)override;
+
+	private:
+
+
+	};
+
+}

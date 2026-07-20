@@ -5,7 +5,7 @@
 /// <summary>
 /// パーティクルデバッグシーンクラス
 /// </summary>
-class ParticleDebugScene :public BaseScene {
+class ParticleDebugScene :public Scene::BaseScene {
 public:
 	ParticleDebugScene();
 	~ParticleDebugScene();

@@ -12,7 +12,7 @@
 #include "externals/DirectXTex/d3dx12.h"
 
 
-class DXCom;
+namespace DXC { class DXCom; }
 namespace Graphics {
 	class LightManager;
 }
@@ -47,7 +47,7 @@ namespace Graphics {
 
 		static ModelManager* GetInstance();
 
-		void Initialize(DXCom* pDxcom, Graphics::LightManager* pLight);
+		void Initialize(DXC::DXCom* pDxcom, Graphics::LightManager* pLight);
 		void Finalize();
 
 		static void LoadModelByExtension(const std::string& filename, bool overWrite = false);
@@ -64,7 +64,7 @@ namespace Graphics {
 		/// <summary>シリンダーのモデルを生成</summary>
 		static ModelData CreateCylinder(float topRadius = 1.0f, float bottomRadius = 1.0f, float height = 3.0f);
 
-		DXCom* ShareDXCom() { return dxcommon_; }
+		DXC::DXCom* ShareDXCom() { return dxcommon_; }
 		Graphics::LightManager* ShareLight() { return lightManager_; }
 
 		/// <summary>モデルのファイルディレクトリを読み込み</summary>
@@ -104,7 +104,7 @@ namespace Graphics {
 
 	private:
 
-		DXCom* dxcommon_;
+		DXC::DXCom* dxcommon_;
 		Graphics::LightManager* lightManager_;
 
 		const std::string kDirectoryPath_ = "resource/ModelandTexture/";

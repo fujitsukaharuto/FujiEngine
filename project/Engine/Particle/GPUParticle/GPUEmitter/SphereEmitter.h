@@ -8,77 +8,81 @@
 using Microsoft::WRL::ComPtr;
 
 
-/// <summary>
-/// GPUパーティクルエミッター
-/// </summary>
-struct EmitterSphere {
-	Math::Vector3 translate;
-	float radius;
+namespace Graphics {
 
-	Math::Vector3 scale;
-	uint32_t count;
+	/// <summary>
+	/// GPUパーティクルエミッター
+	/// </summary>
+	struct EmitterSphere {
+		Math::Vector3 translate;
+		float radius;
 
-	Math::Vector3 colorMax;
-	float  lifeTime;
+		Math::Vector3 scale;
+		uint32_t count;
 
-	Math::Vector3 colorMin;
-	float frequency;
+		Math::Vector3 colorMax;
+		float  lifeTime;
 
-	Math::Vector3 baseVelocity;
-	float velocityRandMax;
+		Math::Vector3 colorMin;
+		float frequency;
 
-	float velocityRandMin;
-	uint32_t emit;
-	uint32_t isDistance;
-	float frequencyTime;
+		Math::Vector3 baseVelocity;
+		float velocityRandMax;
 
-	Math::Vector3 prevTranslate;
-	uint32_t emitShapeType;
+		float velocityRandMin;
+		uint32_t emit;
+		uint32_t isDistance;
+		float frequencyTime;
 
-	Math::Quaternion rotation;
+		Math::Vector3 prevTranslate;
+		uint32_t emitShapeType;
 
-	uint32_t emitVeloType;
-	uint32_t isRandomMove;
-	uint32_t isTrailEmit;
-	uint32_t isGravity;
-};
+		Math::Quaternion rotation;
 
-class SphereEmitter : public IGPUEmitter {
-public:
+		uint32_t emitVeloType;
+		uint32_t isRandomMove;
+		uint32_t isTrailEmit;
+		uint32_t isGravity;
+	};
 
-	SphereEmitter(DXCom* dx);
+	class SphereEmitter : public IGPUEmitter {
+	public:
 
-	void Update(float deltaTime) override;
-	void Dispatch(ID3D12GraphicsCommandList* cmd,
-		DXCom* dx, SRVManager* srv, const ParticleCSHandles& shared) override;
-	void DebugGUI() override;
-	void Save(const std::string& fileName) override;
-	void Load(const std::string& fileName) override;
+		SphereEmitter(DXC::DXCom* dx);
 
-	// 一度だけエミット
-	void Emit() override;
-	bool IsEmit() const override { return isEmit_; }
+		void Update(float deltaTime) override;
+		void Dispatch(ID3D12GraphicsCommandList* cmd,
+			DXC::DXCom* dx, DXC::SRVManager* srv, const ParticleCSHandles& shared) override;
+		void DebugGUI() override;
+		void Save(const std::string& fileName) override;
+		void Load(const std::string& fileName) override;
 
-	EmitterSphere& GetData() { return data_; }
+		// 一度だけエミット
+		void Emit() override;
+		bool IsEmit() const override { return isEmit_; }
 
-	//========================================================================*/
-	//* Setter
-	void SetPos(const Math::Vector3& pos) override;
-	void SetEmit(bool state) override;
-	void SetCount(int count) override;
-	void SetLifeTime(float lifeTime) override;
-	void SetScale(const Math::Vector3& scale) override;
-	void SetRadius(float radius) override;
-	void SetVelocity(const Math::Vector3& vel) override;
-	void SetColorRandom(const Math::Vector3& max, const Math::Vector3& min = Math::Vector3(0.0f, 0.0f, 0.0f)) override;
-private:
-	void CopyData(uint32_t frameIndex = 0);
+		EmitterSphere& GetData() { return data_; }
 
-	EmitterSphere data_;
-	bool isEmit_ = false;
+		//========================================================================*/
+		//* Setter
+		void SetPos(const Math::Vector3& pos) override;
+		void SetEmit(bool state) override;
+		void SetCount(int count) override;
+		void SetLifeTime(float lifeTime) override;
+		void SetScale(const Math::Vector3& scale) override;
+		void SetRadius(float radius) override;
+		void SetVelocity(const Math::Vector3& vel) override;
+		void SetColorRandom(const Math::Vector3& max, const Math::Vector3& min = Math::Vector3(0.0f, 0.0f, 0.0f)) override;
+	private:
+		void CopyData(uint32_t frameIndex = 0);
 
-	char saveName_[64] = "default";
-	EmitterSphere* dataGPU_[DXC::kFrameCount_];
-	ComPtr<ID3D12Resource> resource_[DXC::kFrameCount_];
-	bool isOnceEmit_ = false;
-};
+		EmitterSphere data_;
+		bool isEmit_ = false;
+
+		char saveName_[64] = "default";
+		EmitterSphere* dataGPU_[DXC::kFrameCount_];
+		ComPtr<ID3D12Resource> resource_[DXC::kFrameCount_];
+		bool isOnceEmit_ = false;
+	};
+
+}

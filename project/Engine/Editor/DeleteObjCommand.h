@@ -4,26 +4,30 @@
 #include <memory>
 
 
-struct EditorObj;
+namespace Editor {
 
-/// <summary>
-/// EditorObjectを削除するコマンドクラス
-/// </summary>
-class DeleteObjCommand : public ICommand {
-public:
+	struct EditorObj;
+
+	/// <summary>
+	/// EditorObjectを削除するコマンドクラス
+	/// </summary>
+	class DeleteObjCommand : public ICommand {
+	public:
 
 
-	DeleteObjCommand(int id);
+		DeleteObjCommand(int id);
 
-	void Do() override;
+		void Do() override;
 
-	void UnDo() override;
+		void UnDo() override;
 
-	void ReDo() override;
+		void ReDo() override;
 
-private:
+	private:
 
-	int objId;
-	std::shared_ptr<EditorObj> obj;
+		int objId;
+		std::shared_ptr<EditorObj> obj;
 
-};
+	};
+
+}

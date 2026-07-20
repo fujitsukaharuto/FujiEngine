@@ -9,25 +9,29 @@
 using namespace Microsoft::WRL;
 
 
-/// <summary>
-/// GPUパーティクル初期化用パイプライン(CS)
-/// </summary>
-class InitArgsCSPipe :public BasePipeline {
-public:
-	InitArgsCSPipe() = default;
-	~InitArgsCSPipe();
+namespace Graphics {
 
-public:
+	/// <summary>
+	/// GPUパーティクル初期化用パイプライン(CS)
+	/// </summary>
+	class InitArgsCSPipe :public BasePipeline {
+	public:
+		InitArgsCSPipe() = default;
+		~InitArgsCSPipe();
 
-
-
-private:
-
-	void CreateRootSignature(ID3D12Device* device)override;
-
-	void CreatePSO(ID3D12Device* device)override;
-
-private:
+	public:
 
 
-};
+
+	private:
+
+		void CreateRootSignature(ID3D12Device* device)override;
+
+		void CreatePSO(ID3D12Device* device)override;
+
+	private:
+
+
+	};
+
+}

@@ -5,7 +5,7 @@
 #include "Object3d.h"
 #include "Engine/DX/FrameCount.h"
 
-class DXCom;
+namespace DXC { class DXCom; }
 class PointLight;
 class SpotLight;
 
@@ -50,7 +50,7 @@ namespace Graphics {
 		void SetWvp();
 
 	private:
-		DXCom* dxcommon_;
+		DXC::DXCom* dxcommon_;
 
 		Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource_[DXC::kFrameCount_];
 		Math::TransformationMatrix* wvpDataGPU_[DXC::kFrameCount_];

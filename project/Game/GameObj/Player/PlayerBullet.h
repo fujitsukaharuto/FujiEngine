@@ -69,14 +69,14 @@ private:
 
 	std::unique_ptr<AABBCollider> collider_;
 
-	ParticleEmitter trajectory;
-	ParticleEmitter trajectory2;
+	Graphics::ParticleEmitter trajectory;
+	Graphics::ParticleEmitter trajectory2;
 
-	ParticleEmitter hit_;
-	ParticleEmitter hit2_;
-	ParticleEmitter hit3_;
-	ParticleEmitter hitSmoke_;
-	ParticleEmitter hitCircle_;;
+	Graphics::ParticleEmitter hit_;
+	Graphics::ParticleEmitter hit2_;
+	Graphics::ParticleEmitter hit3_;
+	Graphics::ParticleEmitter hitSmoke_;
+	Graphics::ParticleEmitter hitCircle_;;
 
 
 	bool isLive_ = false;

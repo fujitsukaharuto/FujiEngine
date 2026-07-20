@@ -4,7 +4,9 @@
 #include <json.hpp>
 #include "Math/Matrix/MatrixCalculation.h"
 
-struct EditorObj;
+namespace Editor {
+	struct EditorObj;
+}
 using json = nlohmann::json;
 
 namespace Core {
@@ -34,18 +36,18 @@ namespace Core {
 		//* EditorObj
 		/// <summary>EditorObjのセーブ時ポップアップ</summary>
 		/// <param name="obj">オブジェクト</param>
-		static void ShowSaveEditorObjPopup(const EditorObj& obj);
+		static void ShowSaveEditorObjPopup(const Editor::EditorObj& obj);
 		/// <summary>EditorObjのロード時ポップアップ</summary>
 		/// <param name="obj">オブジェクト</param>
 		/// <returns>bool</returns>
-		static bool ShowLoadEditorObjPopup(EditorObj& obj);
+		static bool ShowLoadEditorObjPopup(Editor::EditorObj& obj);
 		/// <summary>EditorObjのデータ出力</summary>
 		/// <param name="obj">オブジェクト</param> <param name="filePath">ファイルパス</param>
-		static void SerializeEditorObj(const EditorObj& obj, const std::string& filePath);
+		static void SerializeEditorObj(const Editor::EditorObj& obj, const std::string& filePath);
 		/// <summary>EditorObjのデータ読み込み</summary>
 		/// <param name="filePath">ファイルパス</param> <param name="obj">オブジェクト</param> <param name="isCreateCommand">作るかどうか</param>
 		/// <returns>bool</returns>
-		static bool DeserializeEditorObj(const std::string& filePath, EditorObj& obj, bool isCreateCommand = false);
+		static bool DeserializeEditorObj(const std::string& filePath, Editor::EditorObj& obj, bool isCreateCommand = false);
 
 		//========================================================================*/
 		//* JsonData

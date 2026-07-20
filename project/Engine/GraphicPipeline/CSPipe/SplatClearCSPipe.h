@@ -9,18 +9,22 @@
 using namespace Microsoft::WRL;
 
 
-/// <summary>
-/// スプラット蓄積バッファのクリア用パイプライン(CS)
-/// </summary>
-class SplatClearCSPipe :public BasePipeline {
-public:
-	SplatClearCSPipe() = default;
-	~SplatClearCSPipe();
+namespace Graphics {
 
-private:
+	/// <summary>
+	/// スプラット蓄積バッファのクリア用パイプライン(CS)
+	/// </summary>
+	class SplatClearCSPipe :public BasePipeline {
+	public:
+		SplatClearCSPipe() = default;
+		~SplatClearCSPipe();
 
-	void CreateRootSignature(ID3D12Device* device)override;
+	private:
 
-	void CreatePSO(ID3D12Device* device)override;
+		void CreateRootSignature(ID3D12Device* device)override;
 
-};
+		void CreatePSO(ID3D12Device* device)override;
+
+	};
+
+}

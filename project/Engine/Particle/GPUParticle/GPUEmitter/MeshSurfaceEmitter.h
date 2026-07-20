@@ -8,76 +8,80 @@
 using Microsoft::WRL::ComPtr;
 
 
-/// <summary>
-/// GPUパーティクル表面エミッター
-/// </summary>
-struct EmitterSurface {
-	Math::Vector3 translate;
-	float padding;
-	Math::Vector3 scale = { 0.1f, 0.1f, 0.1f };
-	float radius = 2.5f;
-	uint32_t count = 500;
-	float lifeTime = 1.0f;
-	float frequency = 0.008f;
-	float frequencyTime;
-	uint32_t emit;
+namespace Graphics {
 
-	// color
-	Math::Vector3 colorMax = { 1.0f,1.0f,1.0f };
-	Math::Vector3 colorMin = { 0.0f,0.0f,0.0f };
-	float padding2;
+	/// <summary>
+	/// GPUパーティクル表面エミッター
+	/// </summary>
+	struct EmitterSurface {
+		Math::Vector3 translate;
+		float padding;
+		Math::Vector3 scale = { 0.1f, 0.1f, 0.1f };
+		float radius = 2.5f;
+		uint32_t count = 500;
+		float lifeTime = 1.0f;
+		float frequency = 0.008f;
+		float frequencyTime;
+		uint32_t emit;
 
-	// velocity
-	Math::Vector3 baseVelocity;
-	float velocityRandMax;
-	float velocityRandMin;
+		// color
+		Math::Vector3 colorMax = { 1.0f,1.0f,1.0f };
+		Math::Vector3 colorMin = { 0.0f,0.0f,0.0f };
+		float padding2;
 
-	int triangleCount;
-};
+		// velocity
+		Math::Vector3 baseVelocity;
+		float velocityRandMax;
+		float velocityRandMin;
 
-class MeshSurfaceEmitter : public IGPUEmitter {
-public:
+		int triangleCount;
+	};
 
-	MeshSurfaceEmitter(DXCom* dx);
-	void InitMeshData(const std::string& fileName, DXCom* dx, SRVManager* srv);
+	class MeshSurfaceEmitter : public IGPUEmitter {
+	public:
 
-	void Update(float deltaTime) override;
-	void Dispatch(ID3D12GraphicsCommandList* cmd,
-		DXCom* dx, SRVManager* srv, const ParticleCSHandles& shared) override;
-	void DebugGUI() override;
-	void Save(const std::string& fileName) override;
-	void Load(const std::string& fileName) override;
+		MeshSurfaceEmitter(DXC::DXCom* dx);
+		void InitMeshData(const std::string& fileName, DXC::DXCom* dx, DXC::SRVManager* srv);
 
-	// 一度だけエミット
-	void Emit() override;
-	bool IsEmit() const override { return isEmit_; }
+		void Update(float deltaTime) override;
+		void Dispatch(ID3D12GraphicsCommandList* cmd,
+			DXC::DXCom* dx, DXC::SRVManager* srv, const ParticleCSHandles& shared) override;
+		void DebugGUI() override;
+		void Save(const std::string& fileName) override;
+		void Load(const std::string& fileName) override;
 
-	EmitterSurface& GetData() { return data_; }
+		// 一度だけエミット
+		void Emit() override;
+		bool IsEmit() const override { return isEmit_; }
 
-	//========================================================================*/
-	//* Setter
-	void SetPos(const Math::Vector3& pos) override;
-	void SetEmit(bool state) override { isEmit_ = state; }
-	void SetCount(int count) override;
-	void SetLifeTime(float lifeTime) override;
-	void SetScale(const Math::Vector3& scale) override;
-	void SetRadius(float radius) override;
-	void SetVelocity(const Math::Vector3& vel) override;
-	void SetColorRandom(const Math::Vector3& max, const Math::Vector3& min = Math::Vector3(0.0f, 0.0f, 0.0f)) override;
-private:
-	void CopyData(uint32_t frameIndex = 0);
+		EmitterSurface& GetData() { return data_; }
 
-	EmitterSurface data_;
-	bool isEmit_ = false;
+		//========================================================================*/
+		//* Setter
+		void SetPos(const Math::Vector3& pos) override;
+		void SetEmit(bool state) override { isEmit_ = state; }
+		void SetCount(int count) override;
+		void SetLifeTime(float lifeTime) override;
+		void SetScale(const Math::Vector3& scale) override;
+		void SetRadius(float radius) override;
+		void SetVelocity(const Math::Vector3& vel) override;
+		void SetColorRandom(const Math::Vector3& max, const Math::Vector3& min = Math::Vector3(0.0f, 0.0f, 0.0f)) override;
+	private:
+		void CopyData(uint32_t frameIndex = 0);
 
-	char saveName_[64] = "default";
-	EmitterSurface* dataGPU_[DXC::kFrameCount_];
-	ComPtr<ID3D12Resource> resource_[DXC::kFrameCount_];
-	ComPtr<ID3D12Resource> verticesResource;
-	ComPtr<ID3D12Resource> indicesResource;
-	ComPtr<ID3D12Resource> areasResource;
-	uint32_t verticesIndex;
-	uint32_t indicesIndex;
-	uint32_t areasIndex;
-	bool isOnceEmit_ = false;
-};
+		EmitterSurface data_;
+		bool isEmit_ = false;
+
+		char saveName_[64] = "default";
+		EmitterSurface* dataGPU_[DXC::kFrameCount_];
+		ComPtr<ID3D12Resource> resource_[DXC::kFrameCount_];
+		ComPtr<ID3D12Resource> verticesResource;
+		ComPtr<ID3D12Resource> indicesResource;
+		ComPtr<ID3D12Resource> areasResource;
+		uint32_t verticesIndex;
+		uint32_t indicesIndex;
+		uint32_t areasIndex;
+		bool isOnceEmit_ = false;
+	};
+
+}

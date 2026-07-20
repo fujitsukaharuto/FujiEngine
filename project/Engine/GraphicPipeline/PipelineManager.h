@@ -5,7 +5,7 @@
 #include <array>
 #include <functional>
 
-class DXCom;
+namespace DXC { class DXCom; }
 
 namespace Graphics {
 	/// <summary>
@@ -20,7 +20,7 @@ namespace Graphics {
 
 		static PipelineManager* GetInstance();
 
-		void Initialize(DXCom* pDxcom);
+		void Initialize(DXC::DXCom* pDxcom);
 		void Finalize();
 
 		/// <summary>
@@ -62,7 +62,7 @@ namespace Graphics {
 
 	private:
 
-		DXCom* dxcommon_;
+		DXC::DXCom* dxcommon_;
 		std::array<std::unique_ptr<BasePipeline>, static_cast<size_t>(Pipe::Count)> pipelines_;
 
 		BasePipeline* currentPipeline_ = nullptr;

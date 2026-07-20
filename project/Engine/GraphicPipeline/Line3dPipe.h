@@ -9,25 +9,29 @@
 using namespace Microsoft::WRL;
 
 
-/// <summary>
-/// 線描画用パイプライン
-/// </summary>
-class Line3dPipe :public BasePipeline {
-public:
-	Line3dPipe() = default;
-	~Line3dPipe();
+namespace Graphics {
 
-public:
+	/// <summary>
+	/// 線描画用パイプライン
+	/// </summary>
+	class Line3dPipe :public BasePipeline {
+	public:
+		Line3dPipe() = default;
+		~Line3dPipe();
 
-
-
-private:
-
-	void CreateRootSignature(ID3D12Device* device)override;
-
-	void CreatePSO(ID3D12Device* device)override;
-
-private:
+	public:
 
 
-};
+
+	private:
+
+		void CreateRootSignature(ID3D12Device* device)override;
+
+		void CreatePSO(ID3D12Device* device)override;
+
+	private:
+
+
+	};
+
+}

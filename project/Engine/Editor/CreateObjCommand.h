@@ -5,29 +5,33 @@
 #include <memory>
 
 
-struct EditorObj;
+namespace Editor {
 
-/// <summary>
-/// EditorObjectを生み出すコマンドクラス
-/// </summary>
-class CreateObjCommand : public ICommand {
-public:
-	CreateObjCommand(int id, const std::string& name, const std::string& mName = "Sphere")
-		: objId(id), objName(name), modelName(mName) {
-	}
+	struct EditorObj;
 
-	void Do() override;
+	/// <summary>
+	/// EditorObjectを生み出すコマンドクラス
+	/// </summary>
+	class CreateObjCommand : public ICommand {
+	public:
+		CreateObjCommand(int id, const std::string& name, const std::string& mName = "Sphere")
+			: objId(id), objName(name), modelName(mName) {
+		}
 
-	void UnDo() override;
+		void Do() override;
 
-	void ReDo() override;
+		void UnDo() override;
+
+		void ReDo() override;
 
 
-private:
+	private:
 
-	int objId;
-	std::string objName;
-	std::string modelName;
-	std::shared_ptr<EditorObj> obj;
+		int objId;
+		std::string objName;
+		std::string modelName;
+		std::shared_ptr<EditorObj> obj;
 
-};
+	};
+
+}

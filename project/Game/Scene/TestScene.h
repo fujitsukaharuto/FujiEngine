@@ -5,7 +5,7 @@
 /// <summary>
 /// Testシーンクラス
 /// </summary>
-class TestScene :public BaseScene {
+class TestScene :public Scene::BaseScene {
 public:
 	TestScene();
 	~TestScene();

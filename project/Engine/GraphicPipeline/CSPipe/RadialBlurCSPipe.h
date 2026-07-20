@@ -9,25 +9,29 @@
 using namespace Microsoft::WRL;
 
 
-/// <summary>
-/// ラジアルブラー用パイプライン(CS)
-/// </summary>
-class RadialBlurCSPipe :public BasePipeline {
-public:
-	RadialBlurCSPipe() = default;
-	~RadialBlurCSPipe();
+namespace Graphics {
 
-public:
+	/// <summary>
+	/// ラジアルブラー用パイプライン(CS)
+	/// </summary>
+	class RadialBlurCSPipe :public BasePipeline {
+	public:
+		RadialBlurCSPipe() = default;
+		~RadialBlurCSPipe();
 
-
-
-private:
-
-	void CreateRootSignature(ID3D12Device* device)override;
-
-	void CreatePSO(ID3D12Device* device)override;
-
-private:
+	public:
 
 
-};
+
+	private:
+
+		void CreateRootSignature(ID3D12Device* device)override;
+
+		void CreatePSO(ID3D12Device* device)override;
+
+	private:
+
+
+	};
+
+}

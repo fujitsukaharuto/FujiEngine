@@ -4,7 +4,7 @@
 #include "TextureManager.h"
 #include "Engine/DX/FrameCount.h"
 
-class DXCom;
+namespace DXC { class DXCom; }
 
 /// <summary>
 /// Textureのファイルパス
@@ -101,7 +101,7 @@ namespace Graphics {
 
 		void CopyData(uint32_t frameIndex = 0);
 
-		DXCom* dxcommon_;
+		DXC::DXCom* dxcommon_;
 
 		Math::Matrix4x4 MakeScale4x4(const Math::Vector3& scale);
 

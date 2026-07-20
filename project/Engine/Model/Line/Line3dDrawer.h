@@ -9,10 +9,12 @@
 using namespace Microsoft::WRL;
 
 
-class DXCom;
-class Camera;
+namespace DXC { class DXCom; }
 
 namespace Graphics {
+
+	class Camera;
+
 	/// <summary>
 	/// 線描画管理クラス
 	/// </summary>
@@ -52,7 +54,7 @@ namespace Graphics {
 
 		std::unique_ptr<LineData> CreateMesh(UINT vertexCount, UINT indexCount);
 
-		void Initialize(DXCom* pDxcom);
+		void Initialize(DXC::DXCom* pDxcom);
 
 		void Finalize();
 
@@ -89,7 +91,7 @@ namespace Graphics {
 
 		uint32_t indexLine_ = 0;
 
-		DXCom* dxcommon_;
+		DXC::DXCom* dxcommon_;
 		Camera* camera_ = nullptr;
 
 		struct CBuffer {

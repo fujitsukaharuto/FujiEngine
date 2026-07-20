@@ -192,7 +192,7 @@ public:
 	//========================================================================*/
 	//* Setter
 	void SetPlayer(Player* player) { pPlayer_ = player; itemManager_->SetPlayer(player); }
-	void SetDXCom(DXCom* dxcommon) { dxcommon_ = dxcommon; }
+	void SetDXCom(DXC::DXCom* dxcommon) { dxcommon_ = dxcommon; }
 	void SetStartWait(float waitT) { startWaiting_ = waitT; }
 	void SetCameraRange(float range) { cameraRange_ = range; }
 	void SetCameraFollowSpeed(float speed) { cameraFollowSpeed_ = speed; }
@@ -349,45 +349,45 @@ private:
 	int dushTrailIndex_ = 0;
 
 	// emitter
-	ParticleEmitter waveAttack1;
-	ParticleEmitter waveAttack2;
-	ParticleEmitter waveAttack3;
-	ParticleEmitter waveAttack4;
+	Graphics::ParticleEmitter waveAttack1;
+	Graphics::ParticleEmitter waveAttack2;
+	Graphics::ParticleEmitter waveAttack3;
+	Graphics::ParticleEmitter waveAttack4;
 	int waveCSEmitIndex_ = 0;
 
-	ParticleEmitter charge9_;
-	ParticleEmitter charge10_;
-	ParticleEmitter charge11_;
-	ParticleEmitter charge12_;
-	ParticleEmitter charge13_;
-	ParticleEmitter charge14_;
-	ParticleEmitter charge15_;
+	Graphics::ParticleEmitter charge9_;
+	Graphics::ParticleEmitter charge10_;
+	Graphics::ParticleEmitter charge11_;
+	Graphics::ParticleEmitter charge12_;
+	Graphics::ParticleEmitter charge13_;
+	Graphics::ParticleEmitter charge14_;
+	Graphics::ParticleEmitter charge15_;
 
-	ParticleEmitter jumpWave_;
+	Graphics::ParticleEmitter jumpWave_;
 	int jumpCSEmitIndex_ = 0;
 
-	ParticleEmitter roaringWave_;
-	ParticleEmitter roaringParticle_;
-	ParticleEmitter roaringRing_;
+	Graphics::ParticleEmitter roaringWave_;
+	Graphics::ParticleEmitter roaringParticle_;
+	Graphics::ParticleEmitter roaringRing_;
 
-	ParticleEmitter summonLightning_;;
-	ParticleEmitter energySphere_;
-	ParticleEmitter energyParticle_;
+	Graphics::ParticleEmitter summonLightning_;;
+	Graphics::ParticleEmitter energySphere_;
+	Graphics::ParticleEmitter energyParticle_;
 
-	ParticleEmitter dushStartParticle_;
-	ParticleEmitter dushStartCircle_;
-	ParticleEmitter dushSmoke_;
+	Graphics::ParticleEmitter dushStartParticle_;
+	Graphics::ParticleEmitter dushStartCircle_;
+	Graphics::ParticleEmitter dushSmoke_;
 
 	int halfAuraCS_ = 0;
 	int halfSmallAuraCS_ = 0;
 	int leftHandAuraCS_ = 0;
 	int rightHandAuraCS_ = 0;
 
-	SoundData* jumpAttackSE_;
+	Audio::SoundData* jumpAttackSE_;
 
 
 	// post effect
 	float radialTime_ = 0.0f;
-	DXCom* dxcommon_;
+	DXC::DXCom* dxcommon_;
 
 };

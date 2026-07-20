@@ -66,23 +66,23 @@ namespace Core {
 		bool endRequest_ = false;
 
 		Core::MyWin* win_ = nullptr;
-		std::unique_ptr<DXCom> dxcommon_ = nullptr;
-		SRVManager* srvManager_ = nullptr;
+		std::unique_ptr<DXC::DXCom> dxcommon_ = nullptr;
+		DXC::SRVManager* srvManager_ = nullptr;
 		// 汎用
 		Input* input_ = nullptr;
 		Audio::AudioPlayer* audioPlayer_ = nullptr;
 		FPSKeeper* fpsKeeper_ = nullptr;
-		std::unique_ptr<AbstractSceneFactory> sceneFactory_ = nullptr;
-		std::unique_ptr<SceneManager> sceneManager_ = nullptr;
+		std::unique_ptr<Scene::AbstractSceneFactory> sceneFactory_ = nullptr;
+		std::unique_ptr<Scene::SceneManager> sceneManager_ = nullptr;
 		Graphics::TextureManager* textureManager_ = nullptr;
 		Graphics::ModelManager* modelManager_ = nullptr;
 		Graphics::ObjectRenderer* objectRenderer_ = nullptr;
 		Graphics::SpriteRenderer* spriteRenderer_ = nullptr;
-		CameraManager* cameraManager_ = nullptr;
+		Graphics::CameraManager* cameraManager_ = nullptr;
 		ImGuiManager* imguiManager_ = nullptr;
 		std::unique_ptr<Graphics::LightManager> lightManager_ = nullptr;
-		ParticleManager* pManager_ = nullptr;
+		Graphics::ParticleManager* pManager_ = nullptr;
 		Graphics::Line3dDrawer* line3dDrawer_ = nullptr;
-		CommandManager* commandManager_;
+		Editor::CommandManager* commandManager_;
 	};
 }

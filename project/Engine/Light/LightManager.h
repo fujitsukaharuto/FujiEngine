@@ -7,7 +7,7 @@
 #include <vector>
 #include <wrl.h>
 
-class DXCom;
+namespace DXC { class DXCom; }
 
 namespace Graphics {
 
@@ -37,7 +37,7 @@ namespace Graphics {
 
 	public:
 
-		void Initialize(DXCom* pDxcom);
+		void Initialize(DXC::DXCom* pDxcom);
 		void Finalize();
 		void Update();
 
@@ -86,7 +86,7 @@ namespace Graphics {
 
 	private:
 
-		DXCom* dxcommon_;
+		DXC::DXCom* dxcommon_;
 		
 		Microsoft::WRL::ComPtr<ID3D12Resource> allLightsResource_[DXC::kFrameCount_];
 		AllLightsData* allLightsDataGPU_[DXC::kFrameCount_];

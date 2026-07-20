@@ -9,18 +9,22 @@
 using namespace Microsoft::WRL;
 
 
-/// <summary>
-/// パーティクルを画面へ点描(atomic加算)するスプラット用パイプライン(CS)
-/// </summary>
-class SplatParticleCSPipe :public BasePipeline {
-public:
-	SplatParticleCSPipe() = default;
-	~SplatParticleCSPipe();
+namespace Graphics {
 
-private:
+	/// <summary>
+	/// パーティクルを画面へ点描(atomic加算)するスプラット用パイプライン(CS)
+	/// </summary>
+	class SplatParticleCSPipe :public BasePipeline {
+	public:
+		SplatParticleCSPipe() = default;
+		~SplatParticleCSPipe();
 
-	void CreateRootSignature(ID3D12Device* device)override;
+	private:
 
-	void CreatePSO(ID3D12Device* device)override;
+		void CreateRootSignature(ID3D12Device* device)override;
 
-};
+		void CreatePSO(ID3D12Device* device)override;
+
+	};
+
+}

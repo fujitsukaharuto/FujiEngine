@@ -5,7 +5,7 @@
 #include "Camera.h"
 
 
-class DXCom;
+namespace DXC { class DXCom; }
 
 
 /// <summary>
@@ -98,7 +98,7 @@ namespace Graphics {
 
 		bool isAdd_ = false;
 
-		DXCom* dxcommon_ = nullptr;
+		DXC::DXCom* dxcommon_ = nullptr;
 		LightManager* lightManager_ = nullptr;
 		Camera* camera_ = nullptr;
 	};

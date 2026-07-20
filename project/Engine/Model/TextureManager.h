@@ -12,7 +12,7 @@
 #include "externals/DirectXTex/d3dx12.h"
 
 
-class DXCom;
+namespace DXC { class DXCom; }
 
 /// <summary>
 /// テクスチャのデータ
@@ -37,7 +37,7 @@ namespace Graphics {
 
 		static TextureManager* GetInstance();
 
-		void Initialize(DXCom* pDxcom);
+		void Initialize(DXC::DXCom* pDxcom);
 		void Finalize();
 
 		// テクスチャのロード
@@ -54,7 +54,7 @@ namespace Graphics {
 
 		void SetTextureFileOnceLoad(const std::string& name);
 
-		DXCom* ShareDXCom() { return dxcommon_; }
+		DXC::DXCom* ShareDXCom() { return dxcommon_; }
 
 	private:
 
@@ -66,7 +66,7 @@ namespace Graphics {
 
 	private:
 
-		DXCom* dxcommon_;
+		DXC::DXCom* dxcommon_;
 
 		std::unordered_map<std::string, std::unique_ptr<Texture>> textureCache_;
 

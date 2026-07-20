@@ -9,25 +9,29 @@
 using namespace Microsoft::WRL;
 
 
-/// <summary>
-/// アニメーション用パイプライン
-/// </summary>
-class AnimationPipeline :public BasePipeline {
-public:
-	AnimationPipeline() = default;
-	~AnimationPipeline();
+namespace Graphics {
 
-public:
+	/// <summary>
+	/// アニメーション用パイプライン
+	/// </summary>
+	class AnimationPipeline :public BasePipeline {
+	public:
+		AnimationPipeline() = default;
+		~AnimationPipeline();
 
-
-
-private:
-
-	void CreateRootSignature(ID3D12Device* device)override;
-
-	void CreatePSO(ID3D12Device* device)override;
-
-private:
+	public:
 
 
-};
+
+	private:
+
+		void CreateRootSignature(ID3D12Device* device)override;
+
+		void CreatePSO(ID3D12Device* device)override;
+
+	private:
+
+
+	};
+
+}

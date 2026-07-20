@@ -9,18 +9,22 @@
 using namespace Microsoft::WRL;
 
 
-/// <summary>
-/// プール2枚化(ピンポン)用: 書き込み先プールのcolorを0クリアするパイプライン(CS)
-/// </summary>
-class ClearParticleColorCSPipe :public BasePipeline {
-public:
-	ClearParticleColorCSPipe() = default;
-	~ClearParticleColorCSPipe();
+namespace Graphics {
 
-private:
+	/// <summary>
+	/// プール2枚化(ピンポン)用: 書き込み先プールのcolorを0クリアするパイプライン(CS)
+	/// </summary>
+	class ClearParticleColorCSPipe :public BasePipeline {
+	public:
+		ClearParticleColorCSPipe() = default;
+		~ClearParticleColorCSPipe();
 
-	void CreateRootSignature(ID3D12Device* device)override;
+	private:
 
-	void CreatePSO(ID3D12Device* device)override;
+		void CreateRootSignature(ID3D12Device* device)override;
 
-};
+		void CreatePSO(ID3D12Device* device)override;
+
+	};
+
+}

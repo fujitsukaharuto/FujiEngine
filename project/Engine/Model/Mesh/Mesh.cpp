@@ -5,6 +5,7 @@
 #include "Engine/DX/SRVManager.h"
 
 using namespace Graphics;
+using namespace DXC;
 
 Mesh::Mesh() {
 	dxcommon_ = ModelManager::GetInstance()->ShareDXCom();

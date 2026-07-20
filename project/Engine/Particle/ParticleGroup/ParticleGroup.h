@@ -1,14 +1,18 @@
 #pragma once
 #include "IParticleGroup.h"
 
-class ParticleGroup : public IParticleGroup {
-public:
-	ParticleGroup();
-	~ParticleGroup();
+namespace Graphics {
 
-	void Update(const Math::Matrix4x4& billboardMatrix, Camera* camera, uint32_t frameIndex) override;
+	class ParticleGroup : public IParticleGroup {
+	public:
+		ParticleGroup();
+		~ParticleGroup();
 
-	ParticleEmitter emitter_;
-	BlendType type_ = BlendType::ADD;
-	bool isSubMode_ = false;
-};
+		void Update(const Math::Matrix4x4& billboardMatrix, Graphics::Camera* camera, uint32_t frameIndex) override;
+
+		ParticleEmitter emitter_;
+		Graphics::BlendType type_ = Graphics::BlendType::ADD;
+		bool isSubMode_ = false;
+	};
+
+}

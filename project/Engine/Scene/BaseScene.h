@@ -10,50 +10,55 @@
 #include "Particle/ParticleEmitter.h"
 
 
-class SceneManager;
+namespace Scene {
 
-/// <summary>
-/// シーンの基底クラス
-/// </summary>
-class BaseScene {
-public:
-	BaseScene();
-	virtual ~BaseScene() = default;
-
-public:
-
-	virtual void Initialize();
-	virtual void Update();
-	virtual void Draw();
-
-	void Init(DXCom* pDxcom, SceneManager* pSceneManager, Graphics::LightManager* pLightManager);
-	virtual void LoadSceneLevelData(const std::string& name);
-
-	virtual void DebugGUI();
-	virtual void ParticleDebugGUI();
-	virtual void ParticleGroupDebugGUI();
-
-	/// <summary>シーンの変更</summary>
-	void ChangeScene(const std::string& sceneName, float extraTime);
-
-private:
+	class SceneManager;
 
 
+	/// <summary>
+	/// シーンの基底クラス
+	/// </summary>
+	class BaseScene {
+	public:
+		BaseScene();
+		virtual ~BaseScene() = default;
 
+	public:
 
+		virtual void Initialize();
+		virtual void Update();
+		virtual void Draw();
 
-protected:
+		void Init(DXC::DXCom* pDxcom, SceneManager* pSceneManager, Graphics::LightManager* pLightManager);
+		virtual void LoadSceneLevelData(const std::string& name);
 
-	DXCom* dxcommon_;
-	SceneManager* sceneManager_;
-	Core::Input* input_ = nullptr;
-	Audio::AudioPlayer* audioPlayer_ = nullptr;
-	Graphics::LightManager* lightManager_ = nullptr;
-	nlohmann::json sceneData_;
+		virtual void DebugGUI();
+		virtual void ParticleDebugGUI();
+		virtual void ParticleGroupDebugGUI();
 
-private:
+		/// <summary>シーンの変更</summary>
+		void ChangeScene(const std::string& sceneName, float extraTime);
+
+	private:
 
 
 
 
-};
+
+	protected:
+
+		DXC::DXCom* dxcommon_;
+		SceneManager* sceneManager_;
+		Core::Input* input_ = nullptr;
+		Audio::AudioPlayer* audioPlayer_ = nullptr;
+		Graphics::LightManager* lightManager_ = nullptr;
+		nlohmann::json sceneData_;
+
+	private:
+
+
+
+
+	};
+
+}

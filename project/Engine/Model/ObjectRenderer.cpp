@@ -10,6 +10,7 @@
 
 using namespace Core;
 using namespace Graphics;
+using namespace DXC;
 
 ObjectRenderer* ObjectRenderer::GetInstance() {
 	static ObjectRenderer instance;

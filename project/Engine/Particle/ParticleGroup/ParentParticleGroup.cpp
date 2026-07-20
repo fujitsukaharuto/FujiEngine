@@ -1,6 +1,7 @@
 #include "ParentParticleGroup.h"
 
 using namespace Math;
+using namespace Graphics;
 
 
 ParentParticleGroup::ParentParticleGroup() {

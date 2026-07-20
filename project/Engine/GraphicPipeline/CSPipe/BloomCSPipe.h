@@ -9,25 +9,29 @@
 using namespace Microsoft::WRL;
 
 
-/// <summary>
-/// ブルームエフェクト用パイプライン(CS)
-/// </summary>
-class BloomCSPipe :public BasePipeline {
-public:
-	BloomCSPipe() = default;
-	~BloomCSPipe();
+namespace Graphics {
 
-public:
+	/// <summary>
+	/// ブルームエフェクト用パイプライン(CS)
+	/// </summary>
+	class BloomCSPipe :public BasePipeline {
+	public:
+		BloomCSPipe() = default;
+		~BloomCSPipe();
 
-
-
-private:
-
-	void CreateRootSignature(ID3D12Device* device)override;
-
-	void CreatePSO(ID3D12Device* device)override;
-
-private:
+	public:
 
 
-};
+
+	private:
+
+		void CreateRootSignature(ID3D12Device* device)override;
+
+		void CreatePSO(ID3D12Device* device)override;
+
+	private:
+
+
+	};
+
+}

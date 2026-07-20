@@ -18,86 +18,88 @@
 
 using namespace Microsoft::WRL;
 
-class DXCom;
+namespace DXC { class DXCom; }
 
 #pragma region 構造体群
-/// <summary>
-/// グレースケールの色
-/// </summary>
-struct GrayCS {
-	Math::Vector3 gray_= { 0.2f,0.4f,0.2f };
-};
+namespace Graphics {
+	/// <summary>
+	/// グレースケールの色
+	/// </summary>
+	struct GrayCS {
+		Math::Vector3 gray_= { 0.2f,0.4f,0.2f };
+	};
 
-/// <summary>
-/// ヴィネットの色
-/// </summary>
-struct VignetteData {
-	Math::Vector3 color_;
-};
+	/// <summary>
+	/// ヴィネットの色
+	/// </summary>
+	struct VignetteData {
+		Math::Vector3 color_;
+	};
 
-/// <summary>
-/// グレースケールのポストエフェクトTextureのvertexData
-/// </summary>
-struct GrayscaleVertex {
-	Math::Vector4 position;
-	Math::Vector2 texcoord;
-};
+	/// <summary>
+	/// グレースケールのポストエフェクトTextureのvertexData
+	/// </summary>
+	struct GrayscaleVertex {
+		Math::Vector4 position;
+		Math::Vector2 texcoord;
+	};
 
-/// <summary>
-/// CRTエフェクトのデータ
-/// </summary>
-struct CRTElement {
-	float crtTime;
-	Math::Vector2 resolution;
-};
+	/// <summary>
+	/// CRTエフェクトのデータ
+	/// </summary>
+	struct CRTElement {
+		float crtTime;
+		Math::Vector2 resolution;
+	};
 
-/// <summary>
-/// OutLineのポストエフェクト時に送るデータ
-/// </summary>
-struct OutlineElement {
-	Math::Matrix4x4 projectionInverse;
-};
+	/// <summary>
+	/// OutLineのポストエフェクト時に送るデータ
+	/// </summary>
+	struct OutlineElement {
+		Math::Matrix4x4 projectionInverse;
+	};
 
-/// <summary>
-/// ブルームのデータ
-/// </summary>
-struct BloomParams {
-	float bloomThreshold = 0.75f; // しきい値（例：1.0）
-	float bloomIntensity = 1.0f; // ブルーム強度（例：1.2）
-};
+	/// <summary>
+	/// ブルームのデータ
+	/// </summary>
+	struct BloomParams {
+		float bloomThreshold = 0.75f; // しきい値（例：1.0）
+		float bloomIntensity = 1.0f; // ブルーム強度（例：1.2）
+	};
 
-/// <summary>
-/// ラジアルブラーのデータ
-/// </summary>
-struct RadialParams {
-	Math::Vector2 center = { 0.5f, 0.5f };
-	float blurWidth = 0.01f;
-};
+	/// <summary>
+	/// ラジアルブラーのデータ
+	/// </summary>
+	struct RadialParams {
+		Math::Vector2 center = { 0.5f, 0.5f };
+		float blurWidth = 0.01f;
+	};
 
-enum class PostEffectList : int {
-	Gray,
-	CRT,
-	RetroTV,
-	Gauss,
-	BoxFilter,
-	Radial,
-	Vignette,
-	Outline,
-	LuminanceOutline,
-	Bloom,
-	Random,
-};
+	enum class PostEffectList : int {
+		Gray,
+		CRT,
+		RetroTV,
+		Gauss,
+		BoxFilter,
+		Radial,
+		Vignette,
+		Outline,
+		LuminanceOutline,
+		Bloom,
+		Random,
+	};
 
-/// <summary>
-/// ポストエフェクトの1パス分の情報を管理する構造体
-/// </summary>
-struct PostEffectPass {
-	Pipe pipeline; // 使用するパイプライン名
-	PostEffectList effectName;
+	/// <summary>
+	/// ポストエフェクトの1パス分の情報を管理する構造体
+	/// </summary>
+	struct PostEffectPass {
+		Pipe pipeline; // 使用するパイプライン名
+		PostEffectList effectName;
 
-	// SRV/UAV/CBVのセット処理
-	std::function<void(ID3D12GraphicsCommandList* cmdList, D3D12_GPU_DESCRIPTOR_HANDLE input, D3D12_GPU_DESCRIPTOR_HANDLE output)> setup;
-};
+		// SRV/UAV/CBVのセット処理
+		std::function<void(ID3D12GraphicsCommandList* cmdList, D3D12_GPU_DESCRIPTOR_HANDLE input, D3D12_GPU_DESCRIPTOR_HANDLE output)> setup;
+	};
+}
 #pragma endregion
 
 namespace Graphics {
@@ -111,7 +113,7 @@ namespace Graphics {
 
 	public:
 
-		void Initialize(DXCom* dxcom);
+		void Initialize(DXC::DXCom* dxcom);
 		void Update();
 		void DebugGUI();
 		void EffectListGUI();
@@ -204,7 +206,7 @@ namespace Graphics {
 
 	private:
 
-		DXCom* dxcommon_ = nullptr;
+		DXC::DXCom* dxcommon_ = nullptr;
 
 		ComPtr<ID3D12Resource> offscreenRt_[DXC::kFrameCount_];
 		D3D12_RENDER_TARGET_VIEW_DESC offscreenRTVDesc_{};

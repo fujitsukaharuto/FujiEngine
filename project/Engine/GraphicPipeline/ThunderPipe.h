@@ -8,25 +8,29 @@
 
 using namespace Microsoft::WRL;
 
-/// <summary>
-/// 雷エフェクト用パイプライン
-/// </summary>
-class ThunderPipe :public BasePipeline {
-public:
-	ThunderPipe() = default;
-	~ThunderPipe();
+namespace Graphics {
 
-public:
+	/// <summary>
+	/// 雷エフェクト用パイプライン
+	/// </summary>
+	class ThunderPipe :public BasePipeline {
+	public:
+		ThunderPipe() = default;
+		~ThunderPipe();
 
-
-
-private:
-
-	void CreateRootSignature(ID3D12Device* device)override;
-
-	void CreatePSO(ID3D12Device* device)override;
-
-private:
+	public:
 
 
-};
+
+	private:
+
+		void CreateRootSignature(ID3D12Device* device)override;
+
+		void CreatePSO(ID3D12Device* device)override;
+
+	private:
+
+
+	};
+
+}

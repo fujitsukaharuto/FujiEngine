@@ -5,58 +5,62 @@
 #include "Engine/DX/FrameCount.h"
 
 
-class DXCom;
+namespace DXC { class DXCom; }
 
-/// <summary>
-/// ディレクションライトのデータ
-/// </summary>
-struct DirectionalLight {
-	Math::Vector4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
-	Math::Vector3 direction = { 0.0f, -1.0f, 0.0f };
-	float intensity = 1.0f;
-
-	// 互換性のためのセッター
-	void SetLightDirection(const Math::Vector3& dir) { direction = Math::Vector3::Normalize(dir); }
-	void SetLightIntensity(float inst) { intensity = inst; }
-	void SetColor(const Math::Vector4& col) { color = col; }
-};
-
-/// <summary>
-/// ディレクションライトのクラス
-/// </summary>
-class DirectionLight {
-public:
-	DirectionLight() = default;
-	~DirectionLight() = default;
-
-public:
-
-	void Initialize(DXCom* pDxcom);
-	void Finalize();
+namespace Graphics {
 
 	/// <summary>
-	/// データをコマンドリストに送る
+	/// ディレクションライトのデータ
 	/// </summary>
-	void SetLightCommand(ID3D12GraphicsCommandList* commandList);
+	struct DirectionalLight {
+		Math::Vector4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
+		Math::Vector3 direction = { 0.0f, -1.0f, 0.0f };
+		float intensity = 1.0f;
 
-	void SetLightColor(const Math::Vector4& color);
-	void SetLightDirection(const Math::Vector3& direction);
-	void SetLightIntensity(float intensity);
+		// 互換性のためのセッター
+		void SetLightDirection(const Math::Vector3& dir) { direction = Math::Vector3::Normalize(dir); }
+		void SetLightIntensity(float inst) { intensity = inst; }
+		void SetColor(const Math::Vector4& col) { color = col; }
+	};
 
-	void SetIsOnceCopy(bool is) { isOnceCopy_ = is; }
+	/// <summary>
+	/// ディレクションライトのクラス
+	/// </summary>
+	class DirectionLight {
+	public:
+		DirectionLight() = default;
+		~DirectionLight() = default;
 
-	void Debug();
+	public:
 
-private:
+		void Initialize(DXC::DXCom* pDxcom);
+		void Finalize();
 
-	void CopyData(uint32_t frameIndex = 0);
+		/// <summary>
+		/// データをコマンドリストに送る
+		/// </summary>
+		void SetLightCommand(ID3D12GraphicsCommandList* commandList);
 
-private:
+		void SetLightColor(const Math::Vector4& color);
+		void SetLightDirection(const Math::Vector3& direction);
+		void SetLightIntensity(float intensity);
 
-	DXCom* dxcommon_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> directionLightResource_[DXC::kFrameCount_];
-	DirectionalLight* directionLightDataGPU_[DXC::kFrameCount_];
-	DirectionalLight directionLightData_;
+		void SetIsOnceCopy(bool is) { isOnceCopy_ = is; }
 
-	bool isOnceCopy_ = true;
-};
+		void Debug();
+
+	private:
+
+		void CopyData(uint32_t frameIndex = 0);
+
+	private:
+
+		DXC::DXCom* dxcommon_;
+		Microsoft::WRL::ComPtr<ID3D12Resource> directionLightResource_[DXC::kFrameCount_];
+		DirectionalLight* directionLightDataGPU_[DXC::kFrameCount_];
+		DirectionalLight directionLightData_;
+
+		bool isOnceCopy_ = true;
+	};
+
+}

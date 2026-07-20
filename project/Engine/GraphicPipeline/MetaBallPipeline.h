@@ -9,25 +9,29 @@
 using namespace Microsoft::WRL;
 
 
-/// <summary>
-/// メタボールエフェクト用パイプライン
-/// </summary>
-class MetaBallPipeline :public BasePipeline {
-public:
-	MetaBallPipeline() = default;
-	~MetaBallPipeline();
+namespace Graphics {
 
-public:
+	/// <summary>
+	/// メタボールエフェクト用パイプライン
+	/// </summary>
+	class MetaBallPipeline :public BasePipeline {
+	public:
+		MetaBallPipeline() = default;
+		~MetaBallPipeline();
 
-
-
-private:
-
-	void CreateRootSignature(ID3D12Device* device)override;
-
-	void CreatePSO(ID3D12Device* device)override;
-
-private:
+	public:
 
 
-};
+
+	private:
+
+		void CreateRootSignature(ID3D12Device* device)override;
+
+		void CreatePSO(ID3D12Device* device)override;
+
+	private:
+
+
+	};
+
+}

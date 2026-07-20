@@ -15,6 +15,9 @@
 using namespace Core;
 using namespace Graphics;
 using namespace Math;
+using namespace Editor;
+using namespace Scene;
+using namespace DXC;
 
 
 TitleScene::TitleScene() {}

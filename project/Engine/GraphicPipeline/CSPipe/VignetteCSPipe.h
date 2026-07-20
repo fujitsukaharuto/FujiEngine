@@ -9,25 +9,29 @@
 using namespace Microsoft::WRL;
 
 
-/// <summary>
-/// ビネット用パイプライン(CS)
-/// </summary>
-class VignetteCSPipe :public BasePipeline {
-public:
-	VignetteCSPipe() = default;
-	~VignetteCSPipe();
+namespace Graphics {
 
-public:
+	/// <summary>
+	/// ビネット用パイプライン(CS)
+	/// </summary>
+	class VignetteCSPipe :public BasePipeline {
+	public:
+		VignetteCSPipe() = default;
+		~VignetteCSPipe();
 
-
-
-private:
-
-	void CreateRootSignature(ID3D12Device* device)override;
-
-	void CreatePSO(ID3D12Device* device)override;
-
-private:
+	public:
 
 
-};
+
+	private:
+
+		void CreateRootSignature(ID3D12Device* device)override;
+
+		void CreatePSO(ID3D12Device* device)override;
+
+	private:
+
+
+	};
+
+}

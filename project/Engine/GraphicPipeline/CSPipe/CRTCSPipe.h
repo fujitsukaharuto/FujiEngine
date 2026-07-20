@@ -9,25 +9,29 @@
 using namespace Microsoft::WRL;
 
 
-/// <summary>
-/// CRTエフェクト用パイプライン(CS)
-/// </summary>
-class CRTCSPipe :public BasePipeline {
-public:
-	CRTCSPipe() = default;
-	~CRTCSPipe();
+namespace Graphics {
 
-public:
+	/// <summary>
+	/// CRTエフェクト用パイプライン(CS)
+	/// </summary>
+	class CRTCSPipe :public BasePipeline {
+	public:
+		CRTCSPipe() = default;
+		~CRTCSPipe();
 
-
-
-private:
-
-	void CreateRootSignature(ID3D12Device* device)override;
-
-	void CreatePSO(ID3D12Device* device)override;
-
-private:
+	public:
 
 
-};
+
+	private:
+
+		void CreateRootSignature(ID3D12Device* device)override;
+
+		void CreatePSO(ID3D12Device* device)override;
+
+	private:
+
+
+	};
+
+}

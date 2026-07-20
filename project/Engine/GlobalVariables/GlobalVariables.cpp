@@ -4,6 +4,7 @@
 #include <iostream>
 
 using namespace Math;
+using namespace Core;
 
 
 GlobalVariables* GlobalVariables::GetInstance() {

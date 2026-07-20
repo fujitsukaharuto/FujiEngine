@@ -1,14 +1,18 @@
 #pragma once
 #include "IParticleGroup.h"
 
-class ParentParticleGroup : public IParticleGroup {
-public:
-	ParentParticleGroup();
-	~ParentParticleGroup();
+namespace Graphics {
 
-	void Update(const Math::Matrix4x4& billboardMatrix, Camera* camera, uint32_t frameIndex) override;
+	class ParentParticleGroup : public IParticleGroup {
+	public:
+		ParentParticleGroup();
+		~ParentParticleGroup();
 
-	std::unique_ptr<ParticleEmitter> emitter_;
+		void Update(const Math::Matrix4x4& billboardMatrix, Graphics::Camera* camera, uint32_t frameIndex) override;
 
-	BlendType type_ = BlendType::ADD;
-};
+		std::unique_ptr<ParticleEmitter> emitter_;
+
+		Graphics::BlendType type_ = Graphics::BlendType::ADD;
+	};
+
+}

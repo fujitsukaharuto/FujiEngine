@@ -43,6 +43,7 @@
 #include "SplatCompositePipe.h"
 
 using namespace Graphics;
+using namespace DXC;
 
 
 PipelineManager::~PipelineManager() {

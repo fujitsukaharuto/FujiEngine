@@ -9,18 +9,22 @@
 using namespace Microsoft::WRL;
 
 
-/// <summary>
-/// スプラット蓄積バッファを加算合成でシーンへ重ねるパイプライン(フルスクリーン)
-/// </summary>
-class SplatCompositePipe :public BasePipeline {
-public:
-	SplatCompositePipe() = default;
-	~SplatCompositePipe();
+namespace Graphics {
 
-private:
+	/// <summary>
+	/// スプラット蓄積バッファを加算合成でシーンへ重ねるパイプライン(フルスクリーン)
+	/// </summary>
+	class SplatCompositePipe :public BasePipeline {
+	public:
+		SplatCompositePipe() = default;
+		~SplatCompositePipe();
 
-	void CreateRootSignature(ID3D12Device* device)override;
+	private:
 
-	void CreatePSO(ID3D12Device* device)override;
+		void CreateRootSignature(ID3D12Device* device)override;
 
-};
+		void CreatePSO(ID3D12Device* device)override;
+
+	};
+
+}

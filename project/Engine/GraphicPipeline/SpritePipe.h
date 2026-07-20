@@ -9,26 +9,30 @@
 using namespace Microsoft::WRL;
 
 
-/// <summary>
-/// スプライト描画用パイプライン
-/// </summary>
-class SpritePipe :public BasePipeline {
-public:
-	SpritePipe() = default;
-	~SpritePipe();
+namespace Graphics {
 
-public:
+	/// <summary>
+	/// スプライト描画用パイプライン
+	/// </summary>
+	class SpritePipe :public BasePipeline {
+	public:
+		SpritePipe() = default;
+		~SpritePipe();
 
-
-
-private:
-
-	void CreateRootSignature(ID3D12Device* device)override;
-
-	void CreatePSO(ID3D12Device* device)override;
-
-private:
+	public:
 
 
 
-};
+	private:
+
+		void CreateRootSignature(ID3D12Device* device)override;
+
+		void CreatePSO(ID3D12Device* device)override;
+
+	private:
+
+
+
+	};
+
+}

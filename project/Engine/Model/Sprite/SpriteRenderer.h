@@ -4,7 +4,7 @@
 #include <d3d12.h>
 #include "Sprite.h"
 
-class DXCom;
+namespace DXC { class DXCom; }
 
 
 namespace Graphics {
@@ -20,7 +20,7 @@ namespace Graphics {
 		static SpriteRenderer* GetInstance();
 
 		// 初期化（DXComのポインタなどを渡しておく）
-		void Initialize(DXCom* pDxcom);
+		void Initialize(DXC::DXCom* pDxcom);
 		void Finalize();
 
 		// 毎フレーム、描画したいスプライトを登録する
@@ -36,7 +36,7 @@ namespace Graphics {
 
 		void CreateCommonBuffer();
 
-		DXCom* dxcommon_ = nullptr;
+		DXC::DXCom* dxcommon_ = nullptr;
 
 		// 描画待ちのスプライトを貯めるキュー
 		std::vector<Graphics::Sprite*> renderQueue_;

@@ -40,7 +40,7 @@ namespace Graphics {
 		/// <summary>スケルトンの生成</summary>
 		void CreateSkeleton(const Node& rootNode);
 		/// <summary>スキンクラスターの生成</summary>
-		SkinCluster CreateSkinCluster(const Skeleton& skeleton, const ModelData& modelData);
+		SkinCluster CreateSkinCluster(const Math::Skeleton& skeleton, const ModelData& modelData);
 
 		void Update() override;
 		void AnimationUpdate();
@@ -91,17 +91,17 @@ namespace Graphics {
 		/// <param name="parent">親</param>
 		/// <param name="joints">ジョイント</param>
 		/// <returns>int32_t</returns>
-		int32_t CreateJoint(const Node& node, const std::optional<int32_t>& parent, std::vector<Joint>& joints);
+		int32_t CreateJoint(const Node& node, const std::optional<int32_t>& parent, std::vector<Math::Joint>& joints);
 
 		//========================================================================*/
 		//* キーフレームから値を取り出す
-		Math::Vector3 CalculationValue(const std::vector<KeyframeVector3>& keyframe, float time);
-		Math::Quaternion CalculationValue(const std::vector<KeyframeQuaternion>& keyframe, float time);
+		Math::Vector3 CalculationValue(const std::vector<Math::KeyframeVector3>& keyframe, float time);
+		Math::Quaternion CalculationValue(const std::vector<Math::KeyframeQuaternion>& keyframe, float time);
 
 		//========================================================================*/
 		//* アニメーション補間のためのGetter
-		Animation* GetCurrentAnimation();
-		Animation* GetPreviousAnimation();
+		Math::Animation* GetCurrentAnimation();
+		Math::Animation* GetPreviousAnimation();
 
 	private:
 		const std::string kDirectoryPath_ = "resource/ModelandTexture/";
@@ -119,9 +119,9 @@ namespace Graphics {
 		float blendDuration_ = 0.3f;
 		std::string nowAnimationName_;
 		std::string preAnimationName_;
-		std::map<std::string, Animation> animations_;
+		std::map<std::string, Math::Animation> animations_;
 		std::vector<SkinnedMesh> skinnedMeshes_;
-		Skeleton skeleton_;
+		Math::Skeleton skeleton_;
 		SkinCluster skinCluster_;
 
 		Texture* environment_;

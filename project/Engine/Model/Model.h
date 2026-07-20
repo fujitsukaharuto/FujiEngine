@@ -10,7 +10,7 @@
 #include "externals/DirectXTex/DirectXTex.h"
 #include "externals/DirectXTex/d3dx12.h"
 
-class DXCom;
+namespace DXC { class DXCom; }
 
 /// <summary>
 /// スケルトンのNodeのデータ
@@ -80,13 +80,13 @@ namespace Graphics {
 		void Draw(ID3D12GraphicsCommandList* commandList, std::vector<Material>& materials);
 
 		/// <summary>アニメーションモデル用描画</summary>
-		void AnimationDraw(DXCom* pDxcom, ID3D12GraphicsCommandList* commandList, std::vector<SkinnedMesh>& skinnedMeshes, std::vector<Material>& materials);
+		void AnimationDraw(DXC::DXCom* pDxcom, ID3D12GraphicsCommandList* commandList, std::vector<SkinnedMesh>& skinnedMeshes, std::vector<Material>& materials);
 
 		/// <summary>メッシュの追加</summary>
 		void AddMesh(Mesh&& mesh);
 
 		/// <summary>SkinningInformationの生成</summary>
-		void CreateSkinningInformation(DXCom* pDxcom);
+		void CreateSkinningInformation(DXC::DXCom* pDxcom);
 
 		//========================================================================*/
 		//* Getter
@@ -94,7 +94,7 @@ namespace Graphics {
 		size_t GetVertexSize(int i) { return mesh_[i].GetVertexCount(); }
 		ModelData& GetModelData() { return data_; }
 
-		void CSDispatch(DXCom* pDxcom, const SkinCluster& skinCluster, ID3D12GraphicsCommandList* commandList, std::vector<SkinnedMesh>& skinnedMeshes, uint32_t frameIndex);
+		void CSDispatch(DXC::DXCom* pDxcom, const SkinCluster& skinCluster, ID3D12GraphicsCommandList* commandList, std::vector<SkinnedMesh>& skinnedMeshes, uint32_t frameIndex);
 		void MeshDraw(ID3D12GraphicsCommandList* commandList, Material* mate, int drawCount = 1);
 
 	private:

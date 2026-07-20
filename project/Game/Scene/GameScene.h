@@ -10,7 +10,7 @@
 /// <summary>
 /// ゲームシーンクラス
 /// </summary>
-class GameScene :public BaseScene {
+class GameScene :public Scene::BaseScene {
 public:
 	GameScene();
 	~GameScene();
@@ -70,9 +70,9 @@ private:
 
 	float startPlayerLandingTime_ = 300.0f;
 
-	ParticleEmitter field_;
+	Graphics::ParticleEmitter field_;
 
-	SoundData* bgm_;
+	Audio::SoundData* bgm_;
 
 	float gameOverFadeTime_ = 0.0f;
 	float continueFadeTime_ = 0.0f;

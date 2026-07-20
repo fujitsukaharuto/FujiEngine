@@ -5,7 +5,7 @@
 /// <summary>
 /// GPUParticleシーンクラス
 /// </summary>
-class GPUParticleScene :public BaseScene {
+class GPUParticleScene :public Scene::BaseScene {
 public:
 	GPUParticleScene();
 	~GPUParticleScene();

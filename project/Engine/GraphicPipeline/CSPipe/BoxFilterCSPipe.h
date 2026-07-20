@@ -9,25 +9,29 @@
 using namespace Microsoft::WRL;
 
 
-/// <summary>
-/// ボックスフィルタ用パイプライン(CS)
-/// </summary>
-class BoxFilterCSPipe :public BasePipeline {
-public:
-	BoxFilterCSPipe() = default;
-	~BoxFilterCSPipe();
+namespace Graphics {
 
-public:
+	/// <summary>
+	/// ボックスフィルタ用パイプライン(CS)
+	/// </summary>
+	class BoxFilterCSPipe :public BasePipeline {
+	public:
+		BoxFilterCSPipe() = default;
+		~BoxFilterCSPipe();
 
-
-
-private:
-
-	void CreateRootSignature(ID3D12Device* device)override;
-
-	void CreatePSO(ID3D12Device* device)override;
-
-private:
+	public:
 
 
-};
+
+	private:
+
+		void CreateRootSignature(ID3D12Device* device)override;
+
+		void CreatePSO(ID3D12Device* device)override;
+
+	private:
+
+
+	};
+
+}

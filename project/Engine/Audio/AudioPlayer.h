@@ -7,41 +7,42 @@
 
 #pragma comment(lib,"xaudio2.lib")
 
-/// <summary>
-/// チャンクヘッダー構造体
-/// </summary>
-struct ChunkHeader {
-	char id[4];
-	int32_t size;
-};
-
-/// <summary>
-/// RIFFヘッダー構造体
-/// </summary>
-struct RiffHeader {
-	ChunkHeader chunk;
-	char type[4];
-};
-
-/// <summary>
-/// フォーマットチャンク構造体
-/// </summary>
-struct FormatChunk {
-	ChunkHeader chunk;
-	WAVEFORMATEX fmt;
-};
-
-/// <summary>
-/// サウンドデータ構造体
-/// </summary>
-struct SoundData {
-	WAVEFORMATEX wfex;
-	// バッファの先頭アドレス
-	std::vector<BYTE> buffer;
-	std::vector<IXAudio2SourceVoice*> pSourceVoices;
-};
-
 namespace Audio {
+
+	/// <summary>
+	/// チャンクヘッダー構造体
+	/// </summary>
+	struct ChunkHeader {
+		char id[4];
+		int32_t size;
+	};
+
+	/// <summary>
+	/// RIFFヘッダー構造体
+	/// </summary>
+	struct RiffHeader {
+		ChunkHeader chunk;
+		char type[4];
+	};
+
+	/// <summary>
+	/// フォーマットチャンク構造体
+	/// </summary>
+	struct FormatChunk {
+		ChunkHeader chunk;
+		WAVEFORMATEX fmt;
+	};
+
+	/// <summary>
+	/// サウンドデータ構造体
+	/// </summary>
+	struct SoundData {
+		WAVEFORMATEX wfex;
+		// バッファの先頭アドレス
+		std::vector<BYTE> buffer;
+		std::vector<IXAudio2SourceVoice*> pSourceVoices;
+	};
+
 	/// <summary>
 	/// 音声再生を管理するクラス
 	/// </summary>

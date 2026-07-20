@@ -10,6 +10,10 @@
 #include "Engine/Editor/CommandManager.h"
 
 using namespace Core;
+using namespace Editor;
+using namespace Graphics;
+using namespace Scene;
+using namespace DXC;
 
 
 SceneManager::SceneManager() {
