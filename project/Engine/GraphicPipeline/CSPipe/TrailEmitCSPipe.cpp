@@ -1,4 +1,5 @@
 #include "TrailEmitCSPipe.h"
+#include <wrl/client.h>
 #include "Engine/DX/DXCom.h"
 #include "Engine/DX/DXCommand.h"
 #include "Engine/DX/DXCompile.h"
@@ -81,8 +82,8 @@ void TrailEmitCSPipe::CreateRootSignature(ID3D12Device* device) {
 	rootSignatureDesc.pStaticSamplers = nullptr;
 	rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_NONE;
 
-	ComPtr<ID3DBlob> signatureBlob;
-	ComPtr<ID3DBlob> errorBlob;
+	Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob;
+	Microsoft::WRL::ComPtr<ID3DBlob> errorBlob;
 	hr = D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1,
 		&signatureBlob, &errorBlob);
 	if (FAILED(hr)) {

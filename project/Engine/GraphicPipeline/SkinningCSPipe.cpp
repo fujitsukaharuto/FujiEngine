@@ -1,4 +1,5 @@
 #include "Engine/GraphicPipeline/SkinningCSPipe.h"
+#include <wrl/client.h>
 #include "Engine/DX/DXCom.h"
 #include "Engine/DX/DXCommand.h"
 #include "Engine/DX/DXCompile.h"
@@ -73,8 +74,8 @@ void SkinningCSPipe::CreateRootSignature(ID3D12Device* device) {
 		D3D12_ROOT_SIGNATURE_FLAG_DENY_VERTEX_SHADER_ROOT_ACCESS |
 		D3D12_ROOT_SIGNATURE_FLAG_DENY_PIXEL_SHADER_ROOT_ACCESS;
 
-	ComPtr<ID3DBlob> sigBlob;
-	ComPtr<ID3DBlob> errBlob;
+	Microsoft::WRL::ComPtr<ID3DBlob> sigBlob;
+	Microsoft::WRL::ComPtr<ID3DBlob> errBlob;
 	hr = D3D12SerializeRootSignature(&rootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1, &sigBlob, &errBlob);
 	if (FAILED(hr)) {
 		Logger::Log(reinterpret_cast<const char*>(errBlob->GetBufferPointer()));

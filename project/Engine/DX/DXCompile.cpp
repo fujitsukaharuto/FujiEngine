@@ -30,7 +30,7 @@ void DXCompile::Initialize() {
 
 }
 
-ComPtr<IDxcBlob> DXCompile::CompileShader(const std::wstring& filePath, const wchar_t* profile) {
+Microsoft::WRL::ComPtr<IDxcBlob> DXCompile::CompileShader(const std::wstring& filePath, const wchar_t* profile) {
 	return CompileShaderWithReflection(filePath, profile).blob;
 }
 
@@ -184,7 +184,7 @@ std::vector<ShaderResourceBinding> DXCompile::ReflectResources(ID3D12ShaderRefle
 	return bindings;
 }
 
-ComPtr<ID3D12RootSignature> DXCompile::CreateRootSignature(
+Microsoft::WRL::ComPtr<ID3D12RootSignature> DXCompile::CreateRootSignature(
 	ID3D12Device* device,
 	ID3D12ShaderReflection* vsReflection,
 	ID3D12ShaderReflection* psReflection,
@@ -360,22 +360,22 @@ ComPtr<ID3D12RootSignature> DXCompile::CreateRootSignature(
 		rootDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_NONE;
 	}
 
-	ComPtr<ID3DBlob> signatureBlob;
-	ComPtr<ID3DBlob> errorBlob;
+	Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob;
+	Microsoft::WRL::ComPtr<ID3DBlob> errorBlob;
 	HRESULT hr = D3D12SerializeRootSignature(&rootDesc, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
 	if (FAILED(hr)) {
 		if (errorBlob) Logger::Log((char*)errorBlob->GetBufferPointer());
 		assert(false);
 	}
 
-	ComPtr<ID3D12RootSignature> rootSignature;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature;
 	hr = device->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature));
 	assert(SUCCEEDED(hr));
 
 	return rootSignature;
 }
 
-ComPtr<ID3D12RootSignature> DXCompile::CreateRootSignature(ID3D12Device* device, ID3D12ShaderReflection* csReflection, std::unordered_map<std::string, uint32_t>& rootParameterMap, const std::vector<D3D12_STATIC_SAMPLER_DESC>& staticSamplers) {
+Microsoft::WRL::ComPtr<ID3D12RootSignature> DXCompile::CreateRootSignature(ID3D12Device* device, ID3D12ShaderReflection* csReflection, std::unordered_map<std::string, uint32_t>& rootParameterMap, const std::vector<D3D12_STATIC_SAMPLER_DESC>& staticSamplers) {
 	// CSの場合は visibility を ALL にして共通関数を呼ぶ
 	return CreateRootSignature(device, csReflection, nullptr, rootParameterMap, D3D12_SHADER_VISIBILITY_ALL, D3D12_SHADER_VISIBILITY_ALL, staticSamplers);
 }

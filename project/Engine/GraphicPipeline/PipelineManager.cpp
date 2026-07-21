@@ -1,8 +1,8 @@
 #include "Engine/GraphicPipeline/PipelineManager.h"
+#include <string>
 
 #include "Engine/DX/DXCom.h"
 #include "Engine/GraphicPipeline/Pipeline.h"
-#include "Engine/GraphicPipeline/PipelineNode.h"
 #include "Engine/GraphicPipeline/Line3dPipe.h"
 #include "Engine/GraphicPipeline/SpritePipe.h"
 #include "Engine/GraphicPipeline/ParticlePipeline.h"
@@ -74,12 +74,6 @@ void PipelineManager::CreatePipeline() {
 	CreatePipe<Pipeline>(Pipe::Normal);
 
 	CreatePipe<Pipeline>(Pipe::NormalAdd, [](Pipeline& p) {
-		p.SetIsAddMode(true);
-		});
-
-
-	CreatePipe<PipelineNode>(Pipe::NormalNode);
-	CreatePipe<PipelineNode>(Pipe::NormalNodeAdd, [](PipelineNode& p) {
 		p.SetIsAddMode(true);
 		});
 

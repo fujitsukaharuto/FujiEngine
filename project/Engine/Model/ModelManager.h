@@ -15,24 +15,25 @@ namespace Graphics {
 	class LightManager;
 }
 
-/// <summary>
-/// ピッキング用のバッファ
-/// </summary>
-struct PickingBuffer {
-	int objID;
-	float depth;
-};
-
-/// <summary>
-/// ピッキングのデータ
-/// </summary>
-struct PickingData {
-	int pickingPixelCoord[2];
-	uint32_t pickingEnable;
-	uint32_t padding = 0;
-};
-
 namespace Graphics {
+
+	/// <summary>
+	/// ピッキング用のバッファ
+	/// </summary>
+	struct PickingBuffer {
+		int objID;
+		float depth;
+	};
+
+	/// <summary>
+	/// ピッキングのデータ
+	/// </summary>
+	struct PickingData {
+		int pickingPixelCoord[2];
+		uint32_t pickingEnable;
+		uint32_t padding = 0;
+	};
+
 	/// <summary>
 	/// モデル管理クラス(読み込み、読み込みデータ等)
 	/// </summary>
@@ -95,6 +96,10 @@ namespace Graphics {
 		bool GetIsPicked() { return isPicked_; }
 
 	private:
+
+		/// <summary>OBJ/GLTF共通のモデル読み込み本体</summary>
+		/// <param name="extractSkinning">SkinClusterとルートノードも取り出すか(GLTFのみtrue)</param>
+		static void LoadModelInternal(const std::string& filename, bool overWrite, bool extractSkinning);
 
 		static MaterialDataPath LoadMaterialFile(const std::string& filename);
 		static Node ReadNode(aiNode* node);

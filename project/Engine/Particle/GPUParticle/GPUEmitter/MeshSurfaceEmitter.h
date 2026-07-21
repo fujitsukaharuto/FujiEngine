@@ -77,10 +77,10 @@ namespace Graphics {
 
 		char saveName_[64] = "default";
 		EmitterSurface* dataGPU_[DXC::kFrameCount_];
-		ComPtr<ID3D12Resource> resource_[DXC::kFrameCount_];
-		ComPtr<ID3D12Resource> verticesResource;
-		ComPtr<ID3D12Resource> indicesResource;
-		ComPtr<ID3D12Resource> areasResource;
+		Microsoft::WRL::ComPtr<ID3D12Resource> resource_[DXC::kFrameCount_];
+		Microsoft::WRL::ComPtr<ID3D12Resource> verticesResource;
+		Microsoft::WRL::ComPtr<ID3D12Resource> indicesResource;
+		Microsoft::WRL::ComPtr<ID3D12Resource> areasResource;
 		uint32_t verticesIndex;
 		uint32_t indicesIndex;
 		uint32_t areasIndex;

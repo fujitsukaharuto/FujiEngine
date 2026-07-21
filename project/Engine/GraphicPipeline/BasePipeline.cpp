@@ -1,4 +1,5 @@
 #include "Engine/GraphicPipeline/BasePipeline.h"
+#include <string>
 #include "Engine/DX/DXCom.h"
 #include "Engine/DX/DXCommand.h"
 #include "Engine/Logger/Logger.h"

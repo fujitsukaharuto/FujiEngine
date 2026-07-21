@@ -3,15 +3,7 @@
 #include <string>
 #include <memory>
 #include "Engine/Model/Base/RenderObject.h"
-#if 0 // TODO: Node機能はPhase2のエディタ分離時に再設計して復活させる
-#include "Engine/ImGuiManager/NodeGraph.h"
-#endif
 #include "Engine/DX/FrameCount.h"
-#if 0 // TODO: Node機能はPhase2のエディタ分離時に再設計して復活させる
-#ifdef _DEBUGMODE
-#include "imgui_node_editor.h"
-#endif
-#endif
 
 
 namespace Editor {
@@ -63,11 +55,6 @@ namespace Graphics {
 		bool IsHaveParent() { return transform_.parent ? true : false; }
 
 
-#if 0 // TODO: Node機能はPhase2のエディタ分離時に再設計して復活させる
-		/// <summary>ReleaseでNodeの内容道理に動くように</summary>
-		void LoadNodeEditorData(const std::string& filename);
-		void CreateNodeEditor(const std::string& filename);
-#endif
 
 		//========================================================================*/
 		//* Setter
@@ -78,36 +65,12 @@ namespace Graphics {
 
 	private:
 
-#if 0 // TODO: Node機能はPhase2のエディタ分離時に再設計して復活させる
-		void NodeContentsUpdate();
-
-		void AnalysisNode(const json& j, int index);
-
-		void AnalysisValue(const json& j, int index, const std::string& typeName);
-
-		/// <summary>テクスチャをNodeから設定</summary>
-		void SetTextureNode();
-#endif
 
 	private:
 
-#if 0 // TODO: Node機能はPhase2のエディタ分離時に再設計して復活させる
-		bool isMaskMode_ = false;
-		bool isUseNodeGraph_ = false;
-		Material maskMaterial_;
-		std::vector<Core::NodeContent> nodeContentData_;
-#endif
 
 #ifdef _DEBUGMODE
 		std::unique_ptr<Editor::Object3dEditor> editor_;
 #endif // _DEBUGMODE
-#if 0 // TODO: Node機能はPhase2のエディタ分離時に再設計して復活させる
-		std::string nodeFileName_;
-#ifdef _DEBUGMODE
-		ax::NodeEditor::EditorContext* nodeEditorContext_ = nullptr;
-		Core::NodeGraph nodeGraph_;
-		ed::NodeId selectorNodeId_;
-#endif // _DEBUG
-#endif
 	};
 }

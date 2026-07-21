@@ -1,4 +1,5 @@
 #pragma once
+#include <wrl/client.h>
 #include "Engine/DX/DXCom.h"
 #include "Engine/DX/SRVManager.h"
 #include "Engine/Model/Model.h"
@@ -40,8 +41,8 @@ namespace Graphics {
 
 		Math::Trans transform_;
 
-		ComPtr<ID3D12Resource> vBuffer_;
-		ComPtr<ID3D12Resource> iBuffer_;
+		Microsoft::WRL::ComPtr<ID3D12Resource> vBuffer_;
+		Microsoft::WRL::ComPtr<ID3D12Resource> iBuffer_;
 		D3D12_VERTEX_BUFFER_VIEW vbView{};
 		D3D12_INDEX_BUFFER_VIEW ibView{};
 

@@ -8,16 +8,16 @@
 namespace DXC { class DXCom; }
 
 
-/// <summary>
-/// ピッキングで使うObjectの番号データ
-/// </summary>
-struct ObjIDData {
-	int objID;
-	uint32_t padding[3];
-};
-
 namespace Graphics {
 	class LightManager;
+
+	/// <summary>
+	/// ピッキングで使うObjectの番号データ
+	/// </summary>
+	struct ObjIDData {
+		int objID;
+		uint32_t padding[3];
+	};
 
 	/// <summary>
 	/// 描画するオブジェクトの基底クラス、Transformとマテリアルを持つ

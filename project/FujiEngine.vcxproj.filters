@@ -203,9 +203,6 @@
     <ClCompile Include="Engine\Editor\GPUParticleSystemEditor.cpp">
       <Filter>Engine\Editor</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\ImGuiManager\NodeGraph.cpp">
-      <Filter>Engine\ImGuiManager</Filter>
-    </ClCompile>
     <ClCompile Include="Game\GameObj\Enemy\Behavior\BossRoot.cpp">
       <Filter>Game\GameObj\Enemy\Behavior</Filter>
     </ClCompile>
@@ -325,9 +322,6 @@
     </ClCompile>
     <ClCompile Include="Game\OriginObject\OriginGameObject.cpp">
       <Filter>Game\OriginObject</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\GraphicPipeline\PipelineNode.cpp">
-      <Filter>Engine\GraphicPipeline</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Particle\GPUParticle\GPUParticleSystem.cpp">
       <Filter>Engine\Particle\GPUParticle</Filter>
@@ -700,9 +694,6 @@
     <ClInclude Include="Engine\Editor\GPUParticleSystemEditor.h">
       <Filter>Engine\Editor</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\ImGuiManager\NodeGraph.h">
-      <Filter>Engine\ImGuiManager</Filter>
-    </ClInclude>
     <ClInclude Include="Game\GameObj\Enemy\Behavior\BossRoot.h">
       <Filter>Game\GameObj\Enemy\Behavior</Filter>
     </ClInclude>
@@ -828,9 +819,6 @@
     </ClInclude>
     <ClInclude Include="Game\OriginObject\OriginState.h">
       <Filter>Game\OriginObject</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\PipelineNode.h">
-      <Filter>Engine\GraphicPipeline</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Particle\GPUParticle\GPUParticleSystem.h">
       <Filter>Engine\Particle\GPUParticle</Filter>
@@ -1210,9 +1198,6 @@
     </FxCompile>
     <FxCompile Include="resource\Shaders\CS\Engine\EmitSurfaceParticle.CS.hlsl">
       <Filter>resource\Shaders\CS\Engine</Filter>
-    </FxCompile>
-    <FxCompile Include="resource\Shaders\Object3dNode.PS.hlsl">
-      <Filter>resource\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="resource\Shaders\CS\Engine\AliveParticleCount.CS.hlsl">
       <Filter>resource\Shaders\CS\Engine</Filter>

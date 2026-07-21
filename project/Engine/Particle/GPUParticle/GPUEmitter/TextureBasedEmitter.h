@@ -76,7 +76,7 @@ namespace Graphics {
 
 		char saveName_[64] = "default";
 		EmitterTexture* dataGPU_[DXC::kFrameCount_];
-		ComPtr<ID3D12Resource> resource_[DXC::kFrameCount_];
+		Microsoft::WRL::ComPtr<ID3D12Resource> resource_[DXC::kFrameCount_];
 		Texture* textureForEmit_;
 		bool isOnceEmit_ = false;
 	};

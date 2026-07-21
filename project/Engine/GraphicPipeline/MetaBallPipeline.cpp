@@ -1,4 +1,5 @@
 #include "Engine/GraphicPipeline/MetaBallPipeline.h"
+#include <wrl/client.h>
 #include "Engine/DX/DXCom.h"
 #include "Engine/DX/DXCommand.h"
 #include "Engine/DX/DXCompile.h"
@@ -52,8 +53,8 @@ void MetaBallPipeline::CreateRootSignature(ID3D12Device* device) {
 	rootDesc.NumStaticSamplers = _countof(staticSamplers);
 
 
-	ComPtr<ID3DBlob> signatureBlob;
-	ComPtr<ID3DBlob> errorBlob;
+	Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob;
+	Microsoft::WRL::ComPtr<ID3DBlob> errorBlob;
 	hr = D3D12SerializeRootSignature(&rootDesc, D3D_ROOT_SIGNATURE_VERSION_1,
 		&signatureBlob, &errorBlob);
 	if (FAILED(hr)) {

@@ -8,19 +8,6 @@
 #include <cstdint>
 #ifdef _DEBUGMODE
 #include "imgui.h"
-#include "imgui_node_editor.h"
-#include "utilities/builders.h"
-#include "utilities/widgets.h"
-
-namespace ed = ax::NodeEditor;
-
-// NodeGraph.h は json.hpp を連れてくるので実体includeは .cpp に置く
-namespace Core {
-	struct Pin;
-	struct MyNode;
-	struct Link;
-	class NodeGraph;
-}
 #endif // _DEBUG
 
 
@@ -83,50 +70,9 @@ namespace Core {
 #endif // _DEBUG
 
 
-#ifdef _DEBUGMODE
-
-		/// <summary>Nodeに使用するTextureの初期化</summary>
-		void InitNodeTexture();
-
-		/// <summary>NodeIDの生成</summary>
-		ed::NodeId GenerateNodeId() { return ed::NodeId(nextId++); }
-		/// <summary>PinIDの生成</summary>
-		ed::PinId GeneratePinId() { return ed::PinId(nextId++); }
-		/// <summary>LinkIDの生成</summary>
-		ed::LinkId GenerateLinkId() { return ed::LinkId(nextId++); }
-
-		/// <summary>Linkできるのかどうかのチェック</summary>
-		bool CanCreateLink(const Pin& a, const Pin& b);
-		/// <summary>PinIDからノードを探す</summary>
-		const MyNode* FindNodeByPinId(const ed::PinId& pinId, const std::vector<MyNode>& nodes);
-		/// <summary>Pinを探す</summary>
-		const Pin* FindPin(const ed::PinId& id, const std::vector<MyNode>& nodes);
-
-		/// <summary>Linkを結ぶのか確認</summary>
-		void HandleCreateLink(std::vector<Link>& links, const std::vector<MyNode>& nodes);
-		/// <summary>Linkを削除するのか確認</summary>
-		void HandleDeleteLink(std::vector<Link>& links);
-		/// <summary>Linkを結ぶ処理</summary>
-		void CreateLink(std::vector<Link>& links, const Pin& input, const Pin& output);
-		/// <summary>Nodeの描画</summary>
-		void DrawNode(MyNode& node, ed::Utilities::BlueprintNodeBuilder& builder);
-		/// <summary>NodeEditorの描画</summary>
-		void DrawNodeEditor(NodeGraph* nodeGraph);
-		/// <summary>Pinの描画</summary>
-		void DrawPinIcon(bool connected, ax::Widgets::IconType icon = ax::Widgets::IconType::Circle);
-
-#endif // _DEBUG
 	private:
 
 		void SetupModernStyle();
-
-#ifdef _DEBUGMODE
-
-		/// <summary>Textureのセレクトメニューの表示</summary>
-		void TextureSelectMenu(NodeGraph* nodeGraph);
-
-#endif // _DEBUG
-
 
 	private:
 		DXC::DXCom* dxCommon_ = nullptr;
@@ -137,13 +83,6 @@ namespace Core {
 
 #ifdef _DEBUGMODE
 		ImFont* font_japanese_ = nullptr;
-
-		D3D12_GPU_DESCRIPTOR_HANDLE backGroundHandle_;
-
-		int nextId = 1;
-		// ノードエディタのコンテキスト
-		ax::NodeEditor::EditorContext* nodeEditorContext_ = nullptr;
-		ed::NodeId selectNodeID_;
 #endif // _DEBUG
 	private:
 		ImGuiManager(const ImGuiManager&) = delete;

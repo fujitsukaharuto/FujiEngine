@@ -1,4 +1,5 @@
 #include "OutlineCSPipe.h"
+#include <vector>
 #include "Engine/DX/DXCom.h"
 #include "Engine/DX/DXCommand.h"
 #include "Engine/DX/DXCompile.h"

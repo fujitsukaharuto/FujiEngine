@@ -6,24 +6,6 @@
 
 namespace DXC { class DXCom; }
 
-/// <summary>
-/// Textureのファイルパス
-/// </summary>
-struct MaterialDataPath {
-	std::string textureFilePath;
-	std::string normalFilePath;
-};
-
-enum class LightMode {
-	kLightNone,
-	kLightHalfLambert,
-	kLightLambert,
-	kPhongReflect,
-	kBlinnPhongReflection,
-	kPointLightON,
-	kSpotLightON,
-};
-
 namespace Colors {
 	constexpr Math::Vector4 Black = { 0.0f, 0.0f, 0.0f, 1.0f };
 	constexpr Math::Vector4 White = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -33,6 +15,25 @@ namespace Colors {
 }
 
 namespace Graphics {
+
+	/// <summary>
+	/// Textureのファイルパス
+	/// </summary>
+	struct MaterialDataPath {
+		std::string textureFilePath;
+		std::string normalFilePath;
+	};
+
+	enum class LightMode {
+		kLightNone,
+		kLightHalfLambert,
+		kLightLambert,
+		kPhongReflect,
+		kBlinnPhongReflection,
+		kPointLightON,
+		kSpotLightON,
+	};
+
 	/// <summary>
 	/// マテリアルクラス
 	/// </summary>

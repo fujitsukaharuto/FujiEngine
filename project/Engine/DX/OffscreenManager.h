@@ -1,6 +1,5 @@
 #pragma once
 #include <Windows.h>
-#include <string>
 #include <format>
 #include <d3d12.h>
 #include <dxgi1_6.h>
@@ -15,8 +14,6 @@
 #include "Engine/Model/TextureManager.h"
 #include "Engine/DX/FrameCount.h"
 
-
-using namespace Microsoft::WRL;
 
 namespace DXC { class DXCom; }
 
@@ -208,7 +205,7 @@ namespace Graphics {
 
 		DXC::DXCom* dxcommon_ = nullptr;
 
-		ComPtr<ID3D12Resource> offscreenRt_[DXC::kFrameCount_];
+		Microsoft::WRL::ComPtr<ID3D12Resource> offscreenRt_[DXC::kFrameCount_];
 		D3D12_RENDER_TARGET_VIEW_DESC offscreenRTVDesc_{};
 		D3D12_CLEAR_VALUE clearColorValue_{};
 		uint32_t offscreenSRVIndex_[DXC::kFrameCount_];
@@ -218,7 +215,7 @@ namespace Graphics {
 		D3D12_CPU_DESCRIPTOR_HANDLE offTextureUAVHandleCPU_[DXC::kFrameCount_];
 		D3D12_GPU_DESCRIPTOR_HANDLE offTextureUAVHandle_[DXC::kFrameCount_];
 
-		ComPtr<ID3D12Resource> outputTexture_[DXC::kFrameCount_];
+		Microsoft::WRL::ComPtr<ID3D12Resource> outputTexture_[DXC::kFrameCount_];
 		uint32_t outputIndex_[DXC::kFrameCount_];
 		uint32_t outputSRVIndex_[DXC::kFrameCount_];
 		D3D12_CPU_DESCRIPTOR_HANDLE outputSRVHandleCPU_[DXC::kFrameCount_];
@@ -226,33 +223,33 @@ namespace Graphics {
 		D3D12_CPU_DESCRIPTOR_HANDLE outputUAVHandleCPU_[DXC::kFrameCount_];
 		D3D12_GPU_DESCRIPTOR_HANDLE outputUAVHandle_[DXC::kFrameCount_];
 
-		ComPtr<ID3D12Resource> gpuParticleRt_[DXC::kFrameCount_];
+		Microsoft::WRL::ComPtr<ID3D12Resource> gpuParticleRt_[DXC::kFrameCount_];
 		D3D12_CLEAR_VALUE clearColorValueForGPU_{};
 		uint32_t gpuParticleSRVIndex_[DXC::kFrameCount_];
 		D3D12_GPU_DESCRIPTOR_HANDLE gpuParticleHandle_[DXC::kFrameCount_];
 		D3D12_CPU_DESCRIPTOR_HANDLE gpuParticleHandleCPU_[DXC::kFrameCount_];
 
-		ComPtr<ID3D12Resource> grayCSResource_[DXC::kFrameCount_];
+		Microsoft::WRL::ComPtr<ID3D12Resource> grayCSResource_[DXC::kFrameCount_];
 		GrayCS* grayCSDataGPU_[DXC::kFrameCount_];
 		GrayCS grayCSData_;
 
-		ComPtr<ID3D12Resource> cRTResource_[DXC::kFrameCount_];
+		Microsoft::WRL::ComPtr<ID3D12Resource> cRTResource_[DXC::kFrameCount_];
 		CRTElement* crtDataGPU_[DXC::kFrameCount_];
 		CRTElement crtData_;
 
-		ComPtr<ID3D12Resource> outlineResource_[DXC::kFrameCount_];
+		Microsoft::WRL::ComPtr<ID3D12Resource> outlineResource_[DXC::kFrameCount_];
 		OutlineElement* outlineDataGPU_[DXC::kFrameCount_];
 		OutlineElement outlineData_;
 
-		ComPtr<ID3D12Resource> bloomResource_[DXC::kFrameCount_];
+		Microsoft::WRL::ComPtr<ID3D12Resource> bloomResource_[DXC::kFrameCount_];
 		BloomParams* bloomDataGPU_[DXC::kFrameCount_];
 		BloomParams bloomData_;
 
-		ComPtr<ID3D12Resource> radialResource_[DXC::kFrameCount_];
+		Microsoft::WRL::ComPtr<ID3D12Resource> radialResource_[DXC::kFrameCount_];
 		RadialParams* radialDataGPU_[DXC::kFrameCount_];
 		RadialParams radialData_;
 
-		ComPtr<ID3D12Resource> vignetteResource_[DXC::kFrameCount_];
+		Microsoft::WRL::ComPtr<ID3D12Resource> vignetteResource_[DXC::kFrameCount_];
 		VignetteData* vignetteDataGPU_[DXC::kFrameCount_];
 		VignetteData vignetteData_;
 
@@ -261,7 +258,7 @@ namespace Graphics {
 		Texture* noiseTex_;
 		Texture* noiseDirTex_;
 
-		ComPtr<ID3D12Resource> vertexResource_ = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_ = nullptr;
 		D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
 		GrayscaleVertex* vertexData_ = nullptr;
 

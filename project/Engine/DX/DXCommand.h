@@ -1,12 +1,9 @@
 #pragma once
-#include <wrl/client.h>
 #include <d3d12.h>
 #include <cmath>
 #include <memory>
 #include "Engine/DX/CommandContext.h"
 #include "Engine/DX/FrameCount.h"
-
-using namespace Microsoft::WRL;
 
 namespace DXC {
 	/// <summary>

@@ -9,16 +9,14 @@
 #include <unordered_map>
 
 
-using namespace Microsoft::WRL;
-
 namespace DXC {
 
 	/// <summary>
 	/// シェーダーデータ（Blobとリフレクション）
 	/// </summary>
 	struct ShaderData {
-		ComPtr<IDxcBlob> blob;
-		ComPtr<ID3D12ShaderReflection> reflection;
+		Microsoft::WRL::ComPtr<IDxcBlob> blob;
+		Microsoft::WRL::ComPtr<ID3D12ShaderReflection> reflection;
 	};
 
 	/// <summary>
@@ -50,7 +48,7 @@ namespace DXC {
 		/// <param name="filePath">ファイルパス</param>
 		/// <param name="profile">シェーダーレベル</param>
 		/// <returns>IDxcBlob*</returns>
-		ComPtr<IDxcBlob> CompileShader(const std::wstring& filePath, const wchar_t* profile);
+		Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(const std::wstring& filePath, const wchar_t* profile);
 
 		/// <summary>
 		/// シェーダーのコンパイルとリフレクション取得
@@ -84,7 +82,7 @@ namespace DXC {
 		/// <param name="vsVisibility">VSのVisibility (デフォルト VERTEX)</param>
 		/// <param name="psVisibility">PSのVisibility (デフォルト PIXEL)</param>
 		/// <returns>ルートシグネチャ</returns>
-		ComPtr<ID3D12RootSignature> CreateRootSignature(
+		Microsoft::WRL::ComPtr<ID3D12RootSignature> CreateRootSignature(
 			ID3D12Device* device,
 			ID3D12ShaderReflection* vsReflection,
 			ID3D12ShaderReflection* psReflection,
@@ -100,7 +98,7 @@ namespace DXC {
 		/// <param name="csReflection">CSのリフレクション</param>
 		/// <param name="rootParameterMap">ルートパラメータのインデックスマップ</param>
 		/// <returns>ルートシグネチャ</returns>
-		ComPtr<ID3D12RootSignature> CreateRootSignature(
+		Microsoft::WRL::ComPtr<ID3D12RootSignature> CreateRootSignature(
 			ID3D12Device* device,
 			ID3D12ShaderReflection* csReflection,
 			std::unordered_map<std::string, uint32_t>& rootParameterMap,
@@ -111,9 +109,9 @@ namespace DXC {
 
 	private:
 
-		ComPtr<IDxcUtils> dxcUtils_;
-		ComPtr<IDxcCompiler3> dxcCompiler_;
-		ComPtr<IDxcIncludeHandler> includeHandler_;
+		Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils_;
+		Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler_;
+		Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler_;
 
 
 	};

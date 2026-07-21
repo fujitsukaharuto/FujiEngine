@@ -31,14 +31,6 @@ Object3d::Object3d() {
 Object3d::~Object3d() {
 	dxcommon_ = nullptr;
 	material_.clear();
-#if 0 // TODO: Node機能はPhase2のエディタ分離時に再設計して復活させる
-#ifdef _DEBUGMODE
-	if (nodeEditorContext_) {
-		ax::NodeEditor::DestroyEditor(nodeEditorContext_);
-		nodeEditorContext_ = nullptr;
-	}
-#endif // _DEBUG
-#endif
 }
 
 void Object3d::Create(const std::string& fileName) {
@@ -134,12 +126,6 @@ void Object3d::Draw(bool isAdd) {
 }
 
 void Object3d::Render() {
-#if 0 // TODO: Node機能はPhase2のエディタ分離時に再設計して復活させる
-	// ノードグラフ編集中はエディタ側が値を直接書き込むため更新しない
-	if (!isUseNodeGraph_) {
-		NodeContentsUpdate();
-	}
-#endif
 
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
@@ -193,42 +179,6 @@ void Object3d::DebugGUI() {
 #endif // _DEBUGMODE
 }
 
-#if 0 // TODO: Node機能はPhase2のエディタ分離時に再設計して復活させる
-void Object3d::LoadNodeEditorData(const std::string& filename) {
-	json data = JsonSerializer::DeserializeJsonData(filename);
-
-	if (!data.contains("Nodes") || !data["Nodes"].is_array()) {
-		return;
-	}
-
-	for (const auto& nodeData : data["Nodes"]) {
-		AnalysisNode(nodeData, -1);
-	}
-}
-
-void Object3d::CreateNodeEditor(const std::string& filename) {
-#ifdef _DEBUGMODE
-	ax::NodeEditor::Config config;
-	config.SettingsFile = filename.c_str();
-	nodeEditorContext_ = CreateEditor(&config);
-
-	selectorNodeId_ = nodeGraph_.DeserializeNodeData(filename);
-
-#endif // _DEBUG
-	maskMaterial_.SetTextureNamePath("white2x2.png");
-	maskMaterial_.CreateMaterial();
-	LoadNodeEditorData(filename);
-	nodeFileName_ = filename;
-#ifdef _DEBUGMODE
-	if (selectorNodeId_.Get() != 0) {
-		MyNode* selNode = nodeGraph_.FindNodeById(selectorNodeId_);
-		if (selNode) {
-			selNode->values[0] = NodeValue(nowTextureName_);
-		}
-	}
-#endif // _DEBUG
-}
-#endif
 
 void Object3d::SetAlphaRef(float ref) {
 	for (Material& material : material_) {
@@ -240,142 +190,3 @@ void Object3d::SetEditorObjParameter() {
 	objIDData_->objID += 1000;
 }
 
-#if 0 // TODO: Node機能はPhase2のエディタ分離時に再設計して復活させる
-void Object3d::NodeContentsUpdate() {
-	if (nodeContentData_.size() == 0) {
-		return;
-	}
-
-	if (nodeContentData_[0].isMoveUV_) {
-		Vector2 newUV = material_[0].GetUVTrans();
-		if (nodeContentData_[0].isAddDeltaUV_) {
-			newUV.x += FPSKeeper::DeltaTime();
-			newUV.y += FPSKeeper::DeltaTime();
-		} else {
-			newUV += nodeContentData_[0].incrementUV_;
-		}
-		SetUVTrans(newUV);
-	}
-
-	if (isMaskMode_) {
-		if (nodeContentData_[1].isMoveUV_) {
-			Vector2 newUV = maskMaterial_.GetUVTrans();
-			if (nodeContentData_[1].isAddDeltaUV_) {
-				newUV.x += FPSKeeper::DeltaTime();
-				newUV.y += FPSKeeper::DeltaTime();
-			} else {
-				newUV += nodeContentData_[1].incrementUV_;
-			}
-			maskMaterial_.SetUVTrans(newUV);
-		}
-	}
-}
-
-void Object3d::AnalysisNode(const json& j, int index) {
-	std::string nodeType = j.value("nodeType", "Unknown");
-	if (nodeType == "Material") {
-		index++;
-		NodeContent content;
-		nodeContentData_.push_back(content);
-	}
-	if (index == -1) {
-		return;
-	}
-	if (nodeType == "SubMaterial") {
-		index++;
-		if (!maskMaterial_.GetMaterialResource()) {
-			maskMaterial_.SetTextureNamePath("white2x2.png");
-			maskMaterial_.CreateMaterial();
-		}
-		isMaskMode_ = true;
-		NodeContent content;
-		nodeContentData_.push_back(content);
-	}
-	// indexが0なら親(このオブジェクトのメインのマテリアル)、1以上ならサブのマテリアル
-
-	if (nodeType != "Material" && nodeType != "SubMaterial") {
-		// values の復元
-		if (j.contains("values") && j["values"].is_array()) {
-			for (size_t i = 0; i < j["values"].size(); ++i) {
-				AnalysisValue(j["values"][i], index, j.value("name", "Unknown"));
-			}
-		}
-	}
-
-	// Textureノード専用
-	if (j.contains("texName")) {
-		if (index == 0) {
-			SetTexture(j["texName"].get<std::string>());
-		} else {
-			maskMaterial_.SetTexture(j["texName"].get<std::string>());
-		}
-	}
-	if (j.contains("addType")) {
-		nodeContentData_[index].isAddDeltaUV_ = j["addType"] == 0 ? false : true;
-	}
-
-	// child ノード（入力側に繋がっているノード）を再帰的に復元
-	if (j.contains("child") && j["child"].is_array()) {
-		for (int i = 0; i < j["child"].size(); i++) {
-			const auto& value = j["child"][i];
-			if (value.is_null()) {
-				continue; // null の場合はスキップ
-			}
-			AnalysisNode(value, index);
-		}
-	}
-}
-
-void Object3d::AnalysisValue(const json& j, int index, const std::string& typeName) {
-	if (typeName == "UVVector2") {
-		nodeContentData_[index].isMoveUV_ = true;
-		auto arr = j["value"];
-		if (index == 0) {
-			SetUVTrans(Vector2{ arr[0], arr[1] });
-		} else {
-			maskMaterial_.SetUVTrans(Vector2{ arr[0], arr[1] });
-		}
-	} else if (typeName == "Color") {
-		auto arr = j["value"];
-		if (index == 0) {
-			SetColor(Vector4{ arr[0], arr[1], arr[2], arr[3] });
-		} else {
-			maskMaterial_.SetColor(Vector4{ arr[0], arr[1], arr[2], arr[3] });
-		}
-	} else if (typeName == "UVAddx") {
-		nodeContentData_[index].incrementUV_.x = j["value"].get<float>();
-	} else if (typeName == "UVAddy") {
-		nodeContentData_[index].incrementUV_.y = j["value"].get<float>();
-	}// UVScaleなどをこの後追加した時に
-}
-
-void Object3d::SetTextureNode() {
-#ifdef _DEBUGMODE
-
-	nodeGraph_.Update(nodeEditorContext_);
-
-	// Selector ノードを探して評価
-	if (selectorNodeId_.Get() != 0) {
-		MyNode* selNode = nodeGraph_.FindNodeById(selectorNodeId_);
-		if (selNode) {
-			SetTexture(selNode->outputValue[0].Get<std::string>());
-			SetColor(selNode->outputValue[1].Get<Vector4>());
-			SetUVTrans(selNode->outputValue[2].Get<Vector2>());
-			if (selNode->child) {
-				isMaskMode_ = true;
-				if (selNode->child->inputs.size() > 0 || selNode->child->outputs.size() > 0) {
-					if (selNode->child->outputValue.size() > 0) {
-						maskMaterial_.SetTexture(selNode->child->outputValue[0].Get<std::string>());
-						maskMaterial_.SetColor(selNode->child->outputValue[1].Get<Vector4>());
-						maskMaterial_.SetUVTrans(selNode->child->outputValue[2].Get<Vector2>());
-					}
-				}
-			} else {
-				isMaskMode_ = false;
-			}
-		}
-	}
-
-#endif // _DEBUG
-}
-#endif

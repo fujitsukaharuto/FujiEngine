@@ -44,10 +44,6 @@ void GameRun::Initialize() {
 
 #pragma endregion
 
-#ifdef _DEBUGMODE
-	imguiManager_->InitNodeTexture();
-#endif // _DEBUG
-
 	GlobalVariables::GetInstance()->LoadFiles();
 
 #pragma endregion

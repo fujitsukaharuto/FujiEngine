@@ -497,8 +497,8 @@ void OffscreenManager::InitializePostEffects() {
 void Graphics::OffscreenManager::PingPongCommand() {
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 
-	ComPtr<ID3D12Resource> ping = offscreenRt_[frameIndex];
-	ComPtr<ID3D12Resource> pong = outputTexture_[frameIndex];
+	Microsoft::WRL::ComPtr<ID3D12Resource> ping = offscreenRt_[frameIndex];
+	Microsoft::WRL::ComPtr<ID3D12Resource> pong = outputTexture_[frameIndex];
 	bool isUsePing = true;
 
 	// validPostEffectsの中身を回してPingPong形式でRTVになるものを切り替える

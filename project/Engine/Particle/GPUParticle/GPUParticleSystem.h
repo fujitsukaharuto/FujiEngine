@@ -91,7 +91,7 @@ namespace Graphics {
 	/// パーティクルのバッファ1本分のリソースとSRV / UAVのハンドル
 	/// </summary>
 	struct ParticleCSInstance {
-		ComPtr<ID3D12Resource> particleCSInstancing_;
+		Microsoft::WRL::ComPtr<ID3D12Resource> particleCSInstancing_;
 		std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> particleCSSRVHandle_;
 		std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> particleCSUAVHandle_;
 	};
@@ -186,32 +186,32 @@ namespace Graphics {
 		int writeIdx_ = 0; // 今フレームの書き込み先プールのインデックス(Dispatch冒頭で反転)
 
 		Graphics::Material particleCSMaterial_;
-		ComPtr<ID3D12Resource> perViewResource_[DXC::kFrameCount_];
+		Microsoft::WRL::ComPtr<ID3D12Resource> perViewResource_[DXC::kFrameCount_];
 		PerView* perViewData_[DXC::kFrameCount_];
-		ComPtr<ID3D12Resource> perFrameResource_[DXC::kFrameCount_];
+		Microsoft::WRL::ComPtr<ID3D12Resource> perFrameResource_[DXC::kFrameCount_];
 		PerFrame* perFrameDataGPU_[DXC::kFrameCount_];
 		PerFrame perFrameData_;
 
-		ComPtr<ID3D12Resource> freeListIndexResource_;
+		Microsoft::WRL::ComPtr<ID3D12Resource> freeListIndexResource_;
 		std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> freeListIndexUAVHandle_;
-		ComPtr<ID3D12Resource> freeListTailIndexResource_;
+		Microsoft::WRL::ComPtr<ID3D12Resource> freeListTailIndexResource_;
 		std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> freeListTailIndexUAVHandle_;
-		ComPtr<ID3D12Resource> freeListResource_;
+		Microsoft::WRL::ComPtr<ID3D12Resource> freeListResource_;
 		std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> freeListUAVHandle_;
 
-		ComPtr<ID3D12CommandSignature> drawIndexedSignature_;
-		ComPtr<ID3D12Resource> aliveDrawArgs_[DXC::kFrameCount_];
+		Microsoft::WRL::ComPtr<ID3D12CommandSignature> drawIndexedSignature_;
+		Microsoft::WRL::ComPtr<ID3D12Resource> aliveDrawArgs_[DXC::kFrameCount_];
 		std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> ArgsUAVHandle_[DXC::kFrameCount_];
-		ComPtr<ID3D12Resource> drawAliveIndex_[DXC::kFrameCount_];
+		Microsoft::WRL::ComPtr<ID3D12Resource> drawAliveIndex_[DXC::kFrameCount_];
 		std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> drawAliveUAVHandle_[DXC::kFrameCount_];
 		std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> drawAliveSRVHandle_[DXC::kFrameCount_];
-		ComPtr<ID3D12Resource> aliveReadback_[DXC::kFrameCount_];
+		Microsoft::WRL::ComPtr<ID3D12Resource> aliveReadback_[DXC::kFrameCount_];
 
 		// --- コンピュート・スプラット描画 ---
-		ComPtr<ID3D12Resource> splatAccumResource_; // 蓄積バッファ(1px=4uint固定小数)
+		Microsoft::WRL::ComPtr<ID3D12Resource> splatAccumResource_; // 蓄積バッファ(1px=4uint固定小数)
 		std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> splatAccumUAVHandle_;
 		std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> splatAccumSRVHandle_;
-		ComPtr<ID3D12Resource> splatParamResource_;
+		Microsoft::WRL::ComPtr<ID3D12Resource> splatParamResource_;
 		SplatParamCB* splatParamData_ = nullptr; // 永続マップ(enableDepthTestを毎フレーム更新)
 		uint32_t splatAccumElementCount_ = 0;
 		bool useComputeSplat_ = true;    // true:コンピュート・スプラット / false:従来ラスタ(1/4解像度)

@@ -40,7 +40,7 @@ namespace Graphics {
 		uint32_t& GetSRVIndex(UINT index) { return srvIndex_[index]; }
 		uint32_t& GetInstanceCount() { return instanceCount_; }
 		uint32_t& GetDrawCount() { return drawCount_; }
-		ComPtr<ID3D12Resource>& GetInstancingResource(UINT index) { return instancing_[index]; }
+		Microsoft::WRL::ComPtr<ID3D12Resource>& GetInstancingResource(UINT index) { return instancing_[index]; }
 		TransformationParticleMatrix*& GetInstancingDataGPU(UINT index) { return instancingDataGPU_[index]; }
 		ShapeType& GetShapeType() { return shapeType_; }
 
@@ -48,7 +48,7 @@ namespace Graphics {
 		Graphics::Material material_;
 		std::list<Particle> particles_;
 		uint32_t srvIndex_[DXC::kFrameCount_];
-		ComPtr<ID3D12Resource> instancing_[DXC::kFrameCount_];
+		Microsoft::WRL::ComPtr<ID3D12Resource> instancing_[DXC::kFrameCount_];
 		uint32_t instanceCount_;
 		TransformationParticleMatrix* instancingDataGPU_[DXC::kFrameCount_];
 		uint32_t drawCount_;

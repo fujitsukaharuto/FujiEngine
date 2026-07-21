@@ -105,6 +105,14 @@ void ModelManager::LoadModelByExtension(const std::string& filename, bool overWr
 }
 
 void ModelManager::LoadOBJ(const std::string& filename, bool overWrite) {
+	LoadModelInternal(filename, overWrite, false);
+}
+
+void ModelManager::LoadGLTF(const std::string& filename, bool overWrite) {
+	LoadModelInternal(filename, overWrite, true);
+}
+
+void ModelManager::LoadModelInternal(const std::string& filename, bool overWrite, bool extractSkinning) {
 	ModelManager* instance = GetInstance();
 	if (!overWrite) {
 		auto iterator = instance->models_.find(filename);
@@ -172,7 +180,6 @@ void ModelManager::LoadOBJ(const std::string& filename, bool overWrite) {
 				newModelMesh.indices.push_back(vertexIndex);
 			}
 		}
-		meshVertexCount += mesh->mNumVertices;
 
 		// === メッシュに対応するマテリアルを取得 ===
 		uint32_t materialIndex = mesh->mMaterialIndex;
@@ -211,163 +218,40 @@ void ModelManager::LoadOBJ(const std::string& filename, bool overWrite) {
 		newModelMesh.material.normalFilePath = normalMapPath;
 
 		model->GetModelData().meshes.push_back(newModelMesh);
-	}
 
-	for (size_t i = 0; i < model->GetModelData().meshes.size(); i++) {
-		Mesh newMesh{};
-		for (size_t index = 0; index < model->GetModelData().meshes[i].vertices.size(); index++) {
-			VertexData newVertex = model->GetModelData().meshes[i].vertices[index];
-			newMesh.AddVertex({ { newVertex.pos },{newVertex.uv},{newVertex.normal},{newVertex.tangent} });
-		}
-		for (size_t index = 0; index < model->GetModelData().meshes[i].indices.size(); index++) {
-			uint32_t newIndex = model->GetModelData().meshes[i].indices[index];
-			newMesh.AddIndex(newIndex);
-		}
-		newMesh.CreateMesh();
-		model->AddMesh(std::move(newMesh));
-	}
+		if (extractSkinning) {
+			// SkinCluster構築用のデータ取得
+			for (uint32_t boneIndex = 0; boneIndex < mesh->mNumBones; boneIndex++) {
+				aiBone* bone = mesh->mBones[boneIndex];
+				std::string jointName = bone->mName.C_Str();
+				JointWeightData& jointWeightData = model->GetModelData().skinClusterData[jointName];
 
-	if (overWrite) {
-		instance->models_[filename] = std::move(model);
-	} else {
-		instance->models_.insert(std::make_pair(filename, std::move(model)));
-	}
-}
+				aiMatrix4x4 bindPosMatrixAssimp = bone->mOffsetMatrix.Inverse();
+				aiVector3D scale, translate;
+				aiQuaternion rotate;
+				bindPosMatrixAssimp.Decompose(scale, rotate, translate);
+				Matrix4x4 bindPoseMatrix = MakeAffineMatrix(
+					{ scale.x,scale.y,scale.z }, { rotate.x,-rotate.y,-rotate.z,rotate.w }, { -translate.x,translate.y,translate.z }
+				);
+				jointWeightData.inverseBindPoseMatrix = Inverse(bindPoseMatrix);
 
-void ModelManager::LoadGLTF(const std::string& filename, bool overWrite) {
-	ModelManager* instance = GetInstance();
-	if (!overWrite) {
-		auto iterator = instance->models_.find(filename);
-		if (iterator != instance->models_.end()) {
-			return;
-		}
-	}
+				for (uint32_t weightIndex = 0; weightIndex < bone->mNumWeights; weightIndex++) {
+					uint32_t localIndex = bone->mWeights[weightIndex].mVertexId;
+					uint32_t globalIndex = meshVertexCount + localIndex;
 
-	std::unique_ptr<Model> model;
-	model = std::make_unique<Model>();
-
-	Assimp::Importer importer;
-	std::string path = instance->kDirectoryPath_ + "/" + filename;
-	const aiScene* scene = importer.ReadFile(path.c_str(), aiProcess_FlipWindingOrder | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
-	assert(scene->HasMeshes());
-
-	// Mesh解析
-	uint32_t meshVertexCount = 0;
-	for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; meshIndex++) {
-		ModelMesh newModelMesh{};
-		aiMesh* mesh = scene->mMeshes[meshIndex];
-		assert(mesh->HasNormals());
-		bool hasTangent = mesh->HasTangentsAndBitangents();
-		bool hasTexcoord = mesh->HasTextureCoords(0);
-
-		// Vertex解析
-		for (uint32_t element = 0; element < mesh->mNumVertices; element++) {
-			aiVector3D& position = mesh->mVertices[element];
-			aiVector3D& normal = mesh->mNormals[element];
-
-			VertexData vertex;
-			vertex.pos = { position.x,position.y,position.z,1.0f };
-			vertex.normal = { normal.x,normal.y,normal.z };
-
-			if (hasTangent) {
-				aiVector3D& tangent = mesh->mTangents[element];
-				vertex.tangent = { tangent.x,tangent.y,tangent.z };
-			} else {
-				vertex.tangent = { 1.0f,0.0f,0.0f };
-			}
-
-			if (hasTexcoord) {
-				aiVector3D& texcoord = mesh->mTextureCoords[0][element];
-				vertex.uv = { texcoord.x,texcoord.y };
-			} else {
-				vertex.uv = { 0.0f,0.0f };
-			}
-
-			vertex.pos.x *= -1.0f;
-			vertex.normal.x *= -1.0f;
-			vertex.tangent.x *= -1.0f;
-
-			model->GetModelData().vertices.push_back({ {vertex.pos},{vertex.uv},{vertex.normal},{vertex.tangent} });
-			newModelMesh.vertices.push_back({ {vertex.pos},{vertex.uv},{vertex.normal},{vertex.tangent} });
-		}
-
-		for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; faceIndex++) {
-			aiFace& face = mesh->mFaces[faceIndex];
-			assert(face.mNumIndices == 3);
-
-			for (uint32_t element = 0; element < face.mNumIndices; element++) {
-				uint32_t vertexIndex = face.mIndices[element];
-				model->GetModelData().indices.push_back(vertexIndex + meshVertexCount);
-				newModelMesh.indices.push_back(vertexIndex);
-			}
-		}
-
-		// === メッシュに対応するマテリアルを取得 ===
-		uint32_t materialIndex = mesh->mMaterialIndex;
-		aiMaterial* material = scene->mMaterials[materialIndex];
-
-		aiString textureFileName;
-		std::string texturePath;
-
-		aiColor3D diffuseColor(1.0f, 1.0f, 1.0f);
-		if (material->GetTextureCount(aiTextureType_DIFFUSE) > 0 &&
-			material->GetTexture(aiTextureType_DIFFUSE, 0, &textureFileName) == AI_SUCCESS) {
-			texturePath = textureFileName.C_Str();
-			newModelMesh.baseColor = { 1.0f, 1.0f, 1.0f, 1.0f };
-		} else {
-			if (material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor) == AI_SUCCESS) {
-				newModelMesh.baseColor = { diffuseColor.r, diffuseColor.g, diffuseColor.b, 1.0f };
-			} else {
-				newModelMesh.baseColor = { 1.0f, 1.0f, 1.0f, 1.0f };
-			}
-			texturePath = "white2x2.png";  // デフォルト
-		}
-		newModelMesh.material.textureFilePath = texturePath;
-		
-		aiString normalMapFileName;
-		std::string normalMapPath;
-
-		if (material->GetTextureCount(aiTextureType_NORMALS) > 0 &&
-			material->GetTexture(aiTextureType_NORMALS, 0, &normalMapFileName) == AI_SUCCESS) {
-			normalMapPath = normalMapFileName.C_Str();
-		} else if (material->GetTextureCount(aiTextureType_HEIGHT) > 0 &&
-			material->GetTexture(aiTextureType_HEIGHT, 0, &normalMapFileName) == AI_SUCCESS) {
-			normalMapPath = normalMapFileName.C_Str();
-		} else {
-			normalMapPath = "defaultNormal.png";
-		}
-		newModelMesh.material.normalFilePath = normalMapPath;
-		
-		model->GetModelData().meshes.push_back(newModelMesh);
-
-		// SkinCluster構築用のデータ取得
-		for (uint32_t boneIndex = 0; boneIndex < mesh->mNumBones; boneIndex++) {
-			aiBone* bone = mesh->mBones[boneIndex];
-			std::string jointName = bone->mName.C_Str();
-			JointWeightData& jointWeightData = model->GetModelData().skinClusterData[jointName];
-
-			aiMatrix4x4 bindPosMatrixAssimp = bone->mOffsetMatrix.Inverse();
-			aiVector3D scale, translate;
-			aiQuaternion rotate;
-			bindPosMatrixAssimp.Decompose(scale, rotate, translate);
-			Matrix4x4 bindPoseMatrix = MakeAffineMatrix(
-				{ scale.x,scale.y,scale.z }, { rotate.x,-rotate.y,-rotate.z,rotate.w }, { -translate.x,translate.y,translate.z }
-			);
-			jointWeightData.inverseBindPoseMatrix = Inverse(bindPoseMatrix);
-
-			for (uint32_t weightIndex = 0; weightIndex < bone->mNumWeights; weightIndex++) {
-				uint32_t localIndex = bone->mWeights[weightIndex].mVertexId;
-				uint32_t globalIndex = meshVertexCount + localIndex;
-
-				jointWeightData.vertexWeights.push_back({
-					bone->mWeights[weightIndex].mWeight,
-					globalIndex
-					});
+					jointWeightData.vertexWeights.push_back({
+						bone->mWeights[weightIndex].mWeight,
+						globalIndex
+						});
+				}
 			}
 		}
 		meshVertexCount += mesh->mNumVertices;
 	}
-	model->GetModelData().rootNode = ReadNode(scene->mRootNode);
+
+	if (extractSkinning) {
+		model->GetModelData().rootNode = ReadNode(scene->mRootNode);
+	}
 
 	for (size_t i = 0; i < model->GetModelData().meshes.size(); i++) {
 		Mesh newMesh{};

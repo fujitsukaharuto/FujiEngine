@@ -11,8 +11,6 @@ namespace Graphics {
 		GPUParticleSynthesis, // 1/4解像度GPUパーティクルRTをシーンへ加算合成するフルスクリーンパイプ
 		Normal,
 		NormalAdd,
-		NormalNode,
-		NormalNodeAdd,
 		Sprite,
 		Line3d,
 		Particle,

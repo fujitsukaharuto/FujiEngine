@@ -2,13 +2,10 @@
 #include <wrl/client.h>
 #include <d3d12.h>
 #include <dxcapi.h>
-#include <vector>
 #include <string>
 
 #include "Engine/DX/DXCompile.h"
 #include <unordered_map>
-
-using namespace Microsoft::WRL;
 
 namespace DXC { class DXCom; }
 
@@ -78,13 +75,13 @@ namespace Graphics {
 
 		DXC::DXCom* dxcommon_;
 
-		ComPtr<ID3D12RootSignature> rootSignature_ = nullptr;
-		ComPtr<ID3D12PipelineState> pso_ = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_ = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12PipelineState> pso_ = nullptr;
 
-		ComPtr<IDxcBlob> vs = nullptr;
-		ComPtr<IDxcBlob> ps = nullptr;
-		ComPtr<ID3D12ShaderReflection> vsReflection_ = nullptr;
-		ComPtr<ID3D12ShaderReflection> psReflection_ = nullptr;
+		Microsoft::WRL::ComPtr<IDxcBlob> vs = nullptr;
+		Microsoft::WRL::ComPtr<IDxcBlob> ps = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12ShaderReflection> vsReflection_ = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12ShaderReflection> psReflection_ = nullptr;
 
 		std::unordered_map<std::string, uint32_t> rootParameterMap_;
 

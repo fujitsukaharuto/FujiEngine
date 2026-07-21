@@ -10,62 +10,63 @@
 
 namespace DXC { class DXCom; }
 
-/// <summary>
-/// スケルトンのNodeのデータ
-/// </summary>
-struct Node {
-	Math::QuaternionTrans transform;
-	Math::Matrix4x4 local;
-	std::string name;
-	std::vector<Node> children;
-};
-
-/// <summary>
-/// スケルトンのVertexごとの重みのデータ
-/// </summary>
-struct VertexWeightData {
-	float weight;
-	uint32_t vertexIndex;
-};
-
-/// <summary>
-/// SkinningInformationのデータ
-/// </summary>
-struct SkinningInformation {
-	uint32_t numVertices;
-};
-
-/// <summary>
-/// ジョイントごとの重みのデータ
-/// </summary>
-struct JointWeightData {
-	Math::Matrix4x4 inverseBindPoseMatrix;
-	std::vector<VertexWeightData> vertexWeights;
-};
-
-/// <summary>
-/// モデルのメッシュのデータ
-/// </summary>
-struct ModelMesh {
-	std::vector<Graphics::VertexData> vertices;
-	std::vector<uint32_t> indices;
-	MaterialDataPath material;
-	Math::Vector4 baseColor = { 1.0f,1.0f,1.0f,1.0f };
-};
-
-/// <summary>
-/// モデルを構成するデータ
-/// </summary>
-struct ModelData {
-	std::map<std::string, JointWeightData> skinClusterData;
-	std::vector<Graphics::VertexData> vertices;
-	std::vector<uint32_t> indices;
-	MaterialDataPath material;
-	Node rootNode;
-	std::vector<ModelMesh> meshes;
-};
-
 namespace Graphics {
+
+	/// <summary>
+	/// スケルトンのNodeのデータ
+	/// </summary>
+	struct Node {
+		Math::QuaternionTrans transform;
+		Math::Matrix4x4 local;
+		std::string name;
+		std::vector<Node> children;
+	};
+
+	/// <summary>
+	/// スケルトンのVertexごとの重みのデータ
+	/// </summary>
+	struct VertexWeightData {
+		float weight;
+		uint32_t vertexIndex;
+	};
+
+	/// <summary>
+	/// SkinningInformationのデータ
+	/// </summary>
+	struct SkinningInformation {
+		uint32_t numVertices;
+	};
+
+	/// <summary>
+	/// ジョイントごとの重みのデータ
+	/// </summary>
+	struct JointWeightData {
+		Math::Matrix4x4 inverseBindPoseMatrix;
+		std::vector<VertexWeightData> vertexWeights;
+	};
+
+	/// <summary>
+	/// モデルのメッシュのデータ
+	/// </summary>
+	struct ModelMesh {
+		std::vector<VertexData> vertices;
+		std::vector<uint32_t> indices;
+		MaterialDataPath material;
+		Math::Vector4 baseColor = { 1.0f,1.0f,1.0f,1.0f };
+	};
+
+	/// <summary>
+	/// モデルを構成するデータ
+	/// </summary>
+	struct ModelData {
+		std::map<std::string, JointWeightData> skinClusterData;
+		std::vector<VertexData> vertices;
+		std::vector<uint32_t> indices;
+		MaterialDataPath material;
+		Node rootNode;
+		std::vector<ModelMesh> meshes;
+	};
+
 	/// <summary>
 	/// モデルクラス
 	/// </summary>
