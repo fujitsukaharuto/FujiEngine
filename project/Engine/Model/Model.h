@@ -84,6 +84,12 @@ namespace Graphics {
 		/// <summary>メッシュの追加</summary>
 		void AddMesh(Mesh&& mesh);
 
+		/// <summary>
+		/// 再読み込み用に中身を空にする
+		/// </summary>
+		/// <remarks>Model自体は破棄しないので、外部が持つ Model* は有効なまま保たれる</remarks>
+		void Clear();
+
 		/// <summary>SkinningInformationの生成</summary>
 		void CreateSkinningInformation(DXC::DXCom* pDxcom);
 

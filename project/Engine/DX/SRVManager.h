@@ -2,6 +2,7 @@
 #include <wrl/client.h>
 #include <Windows.h>
 #include <string>
+#include <vector>
 #include <d3d12.h>
 
 
@@ -78,6 +79,16 @@ namespace DXC {
 		/// <returns>uint32_t</returns>
 		uint32_t Allocate();
 
+		/// <summary>
+		/// 使い終わったスロットを返却する(次のAllocateで再利用される)
+		/// </summary>
+		/// <remarks>
+		/// GPUが参照中のディスクリプタを返却してはいけない。
+		/// 呼び出す前にDXCom::Flush()でコマンドの完了を待つこと
+		/// </remarks>
+		/// <param name="index">Allocateで得たインデックス</param>
+		void Free(uint32_t index);
+
 		//========================================================================*/
 		//* Getter
 		D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(uint32_t index);
@@ -95,7 +106,9 @@ namespace DXC {
 		uint32_t descriptorSize_;
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap_;
 
+		// useIndex_ は「一度も使っていない領域の先頭」。返却されたスロットは freeList_ に入り再利用される
 		uint32_t useIndex_ = 0;
+		std::vector<uint32_t> freeList_;
 
 	};
 

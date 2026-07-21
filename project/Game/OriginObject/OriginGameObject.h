@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <cassert>
 // json は宣言とポインタにしか使わないので前方宣言で足りる
 #include <json_fwd.hpp>
 
@@ -47,12 +48,23 @@ public:
 
 	//========================================================================*/
 	//* Getter
+	/// <remarks>生成していない側は nullptr を返す</remarks>
 	Graphics::Object3d* GetModel() { return model_.get(); }
 	Graphics::AnimationModel* GetAnimeModel() { return animeModel_.get(); }
-	Math::Trans& GetTrans() { return model_->GetTransform(); }
-	Math::Trans& GetAnimeTrans() { return animeModel_->GetTransform(); }
-	Math::Vector3 GetWorldPos()const { return model_->GetWorldPos(); }
-	Math::Vector3 GetAnimeWorldPos()const { return animeModel_->GetWorldPos(); }
+
+	// 生成していない側のTransformを求めるのは呼び出し側の誤り。assertで気づけるようにする
+	Math::Trans& GetTrans() { assert(model_ && "このオブジェクトはObject3dを生成していない"); return model_->GetTransform(); }
+	Math::Trans& GetAnimeTrans() { assert(animeModel_ && "このオブジェクトはAnimationModelを生成していない"); return animeModel_->GetTransform(); }
+	Math::Vector3 GetWorldPos()const { assert(model_ && "このオブジェクトはObject3dを生成していない"); return model_->GetWorldPos(); }
+	Math::Vector3 GetAnimeWorldPos()const { assert(animeModel_ && "このオブジェクトはAnimationModelを生成していない"); return animeModel_->GetWorldPos(); }
+
+protected:
+
+	/// <summary>model_ を必要になった時点で生成する</summary>
+	/// <remarks>model_ を直接操作したい派生クラスは、先にこれを通すこと</remarks>
+	Graphics::Object3d* EnsureModel();
+	/// <summary>animeModel_ を必要になった時点で生成する</summary>
+	Graphics::AnimationModel* EnsureAnimeModel();
 
 protected:
 

@@ -1,4 +1,5 @@
 #include "Engine/Model/Model.h"
+#include <cassert>
 #include "Engine/DX/DX12Helper.h"
 #include "Engine/DX/SRVManager.h"
 #include "Engine/GraphicPipeline/PipelineManager.h"
@@ -17,7 +18,12 @@ Model::~Model() {
 }
 
 void Model::Draw(ID3D12GraphicsCommandList* commandList, std::vector<Material>& materials) {
-	for (uint32_t index = 0; index < mesh_.size(); ++index) {
+	// モデルを再読み込みするとメッシュ数が変わることがあり、
+	// SetModelを呼んでいない他のオブジェクトのmaterialsは古い個数のまま残る
+	assert(materials.size() >= mesh_.size() && "マテリアル数がメッシュ数に足りていない");
+	const size_t drawCount = (materials.size() < mesh_.size()) ? materials.size() : mesh_.size();
+
+	for (uint32_t index = 0; index < drawCount; ++index) {
 		PipelineManager* pPipeManager = PipelineManager::GetInstance()->GetInstance();
 		
 		pPipeManager->SetGraphicsRootCBV(commandList, "gMaterial", materials[index].GetMaterialResource()->GetGPUVirtualAddress());
@@ -30,8 +36,14 @@ void Model::Draw(ID3D12GraphicsCommandList* commandList, std::vector<Material>& 
 }
 
 void Model::AnimationDraw(DXCom* pDxcom, ID3D12GraphicsCommandList* commandList, std::vector<SkinnedMesh>& skinnedMeshes, std::vector<Material>& materials) {
+	// Draw と同じ理由でメッシュ数・マテリアル数・スキン済みメッシュ数がずれ得る
+	assert(materials.size() >= mesh_.size() && skinnedMeshes.size() >= mesh_.size() && "マテリアル/スキン済みメッシュの個数が足りていない");
+	size_t drawCount = mesh_.size();
+	if (materials.size() < drawCount) { drawCount = materials.size(); }
+	if (skinnedMeshes.size() < drawCount) { drawCount = skinnedMeshes.size(); }
+
 	int vertexOffset = 0;
-	for (uint32_t index = 0; index < mesh_.size(); ++index) {
+	for (uint32_t index = 0; index < drawCount; ++index) {
 		PipelineManager* pPipeManager = PipelineManager::GetInstance()->GetInstance();
 
 		pPipeManager->SetGraphicsRootCBV(commandList, "gMaterial", materials[index].GetMaterialResource()->GetGPUVirtualAddress());
@@ -51,6 +63,12 @@ void Model::AnimationDraw(DXCom* pDxcom, ID3D12GraphicsCommandList* commandList,
 
 void Model::AddMesh(Mesh&& mesh) {
 	mesh_.push_back(std::move(mesh));
+}
+
+void Model::Clear() {
+	// mesh_ の破棄で各MeshがSRVスロットを返却する
+	mesh_.clear();
+	data_ = ModelData{};
 }
 
 void Model::CreateSkinningInformation(DXCom* pDxcom) {

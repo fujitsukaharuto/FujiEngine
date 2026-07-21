@@ -1,5 +1,6 @@
 #include "Engine/DX/SRVManager.h"
 #include <cassert>
+#include <algorithm>
 
 #include "Engine/DX/DXCom.h"
 #include "Engine/DX/DX12Helper.h"
@@ -30,6 +31,8 @@ void SRVManager::Initialize(DXCom* pDxcom) {
 
 void SRVManager::Finalize() {
 	descriptorHeap_.Reset();
+	freeList_.clear();
+	useIndex_ = 0;
 	dxcommon_ = nullptr;
 }
 
@@ -107,11 +110,32 @@ void SRVManager::SetGraphicsRootDescriptorTable(UINT rootIndex, uint32_t srvInde
 
 
 uint32_t SRVManager::Allocate() {
+	// 返却済みのスロットがあればそちらを先に使う
+	if (!freeList_.empty()) {
+		uint32_t index = freeList_.back();
+		freeList_.pop_back();
+		return index;
+	}
+
 	assert(useIndex_ < kMaxSRVCount_);
 
 	uint32_t index = useIndex_;
 	useIndex_++;// カウンタの増加
 	return index;
+}
+
+void SRVManager::Free(uint32_t index) {
+	// 一度も割り当てていない範囲は無視する
+	if (index >= useIndex_) {
+		assert(false && "SRVManager::Free に未割り当てのインデックスが渡された");
+		return;
+	}
+
+	// 二重解放するとfreeList_に同じ番号が2つ入り、別々のオブジェクトが同じスロットを掴む
+	assert(std::find(freeList_.begin(), freeList_.end(), index) == freeList_.end()
+		&& "SRVインデックスの二重解放");
+
+	freeList_.push_back(index);
 }
 
 

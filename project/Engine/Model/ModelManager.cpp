@@ -114,15 +114,28 @@ void ModelManager::LoadGLTF(const std::string& filename, bool overWrite) {
 
 void ModelManager::LoadModelInternal(const std::string& filename, bool overWrite, bool extractSkinning) {
 	ModelManager* instance = GetInstance();
-	if (!overWrite) {
-		auto iterator = instance->models_.find(filename);
-		if (iterator != instance->models_.end()) {
+
+	// 新規は従来どおりローカルに組み立ててから登録する。
+	// 上書き時だけは既存のModelを破棄せず中身を詰め替える。
+	// unique_ptrを差し替えると、同じモデルを指している他のRenderObjectのModel*が全てダングリングするため
+	std::unique_ptr<Model> newModel;
+	Model* model = nullptr;
+
+	auto iterator = instance->models_.find(filename);
+	if (iterator != instance->models_.end()) {
+		if (!overWrite) {
 			return;
 		}
+		// GPUが参照中の頂点バッファとSRVを作り直すので、積んだコマンドの完了を待つ
+		if (instance->dxcommon_) {
+			instance->dxcommon_->Flush();
+		}
+		model = iterator->second.get();
+		model->Clear();
+	} else {
+		newModel = std::make_unique<Model>();
+		model = newModel.get();
 	}
-
-	std::unique_ptr<Model> model;
-	model = std::make_unique<Model>();
 
 	Assimp::Importer importer;
 	std::string path = instance->kDirectoryPath_ + filename;
@@ -267,10 +280,9 @@ void ModelManager::LoadModelInternal(const std::string& filename, bool overWrite
 		model->AddMesh(std::move(newMesh));
 	}
 
-	if (overWrite) {
-		instance->models_[filename] = std::move(model);
-	} else {
-		instance->models_.insert(std::make_pair(filename, std::move(model)));
+	// 上書き時は既存のModelに詰め替え済みなので、新規のときだけ登録する
+	if (newModel) {
+		instance->models_.insert(std::make_pair(filename, std::move(newModel)));
 	}
 }
 

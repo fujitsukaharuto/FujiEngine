@@ -42,8 +42,18 @@ namespace Graphics {
 		};
 
 	public:
+		/// <summary>未割り当てを表すSRVインデックス</summary>
+		static constexpr uint32_t kInvalidSrvIndex = UINT32_MAX;
+
+	public:
 		Mesh();
 		~Mesh();
+
+		// SRVスロットを所有するのでコピーすると二重解放になる。ムーブのみ許可する
+		Mesh(const Mesh&) = delete;
+		Mesh& operator=(const Mesh&) = delete;
+		Mesh(Mesh&& other) noexcept;
+		Mesh& operator=(Mesh&& other) noexcept;
 
 		/// <summary>メッシュ（頂点・インデックスバッファ）の生成</summary>
 		void CreateMesh();
@@ -65,6 +75,11 @@ namespace Graphics {
 		std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> GetSrvHandle() const { return srvHandle_; }
 
 	private:
+
+		/// <summary>確保済みのSRVスロットを返却する</summary>
+		void FreeSrv();
+
+	private:
 		DXC::DXCom* dxcommon_;
 
 		std::vector<VertexData> vertexData_;
@@ -77,5 +92,6 @@ namespace Graphics {
 		D3D12_INDEX_BUFFER_VIEW indexBufferView_{};
 
 		std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> srvHandle_;
+		uint32_t srvIndex_ = kInvalidSrvIndex;
 	};
 }

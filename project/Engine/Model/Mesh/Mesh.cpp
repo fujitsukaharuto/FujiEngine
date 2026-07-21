@@ -12,6 +12,8 @@ Mesh::Mesh() {
 }
 
 Mesh::~Mesh() {
+	FreeSrv();
+
 	dxcommon_ = nullptr;
 
 	vertexResource_.Reset();
@@ -19,6 +21,46 @@ Mesh::~Mesh() {
 
 	indexResource_.Reset();
 	indexData_.clear();
+}
+
+Mesh::Mesh(Mesh&& other) noexcept
+	: dxcommon_(other.dxcommon_)
+	, vertexData_(std::move(other.vertexData_))
+	, indexData_(std::move(other.indexData_))
+	, vertexResource_(std::move(other.vertexResource_))
+	, vertexBufferView_(other.vertexBufferView_)
+	, indexResource_(std::move(other.indexResource_))
+	, indexBufferView_(other.indexBufferView_)
+	, srvHandle_(other.srvHandle_)
+	, srvIndex_(other.srvIndex_) {
+	// ムーブ元が解放しないよう所有権を手放させる
+	other.srvIndex_ = kInvalidSrvIndex;
+}
+
+Mesh& Mesh::operator=(Mesh&& other) noexcept {
+	if (this != &other) {
+		FreeSrv();
+
+		dxcommon_ = other.dxcommon_;
+		vertexData_ = std::move(other.vertexData_);
+		indexData_ = std::move(other.indexData_);
+		vertexResource_ = std::move(other.vertexResource_);
+		vertexBufferView_ = other.vertexBufferView_;
+		indexResource_ = std::move(other.indexResource_);
+		indexBufferView_ = other.indexBufferView_;
+		srvHandle_ = other.srvHandle_;
+		srvIndex_ = other.srvIndex_;
+
+		other.srvIndex_ = kInvalidSrvIndex;
+	}
+	return *this;
+}
+
+void Mesh::FreeSrv() {
+	if (srvIndex_ != kInvalidSrvIndex) {
+		SRVManager::GetInstance()->Free(srvIndex_);
+		srvIndex_ = kInvalidSrvIndex;
+	}
 }
 
 void Mesh::CreateMesh() {
@@ -52,10 +94,12 @@ void Mesh::CreateMesh() {
 	indexBufferView_.SizeInBytes = static_cast<UINT>(indexBufferSize);
 	indexBufferView_.Format = DXGI_FORMAT_R32_UINT;
 
-	// 静的メッシュ用 SRV の生成
-	uint32_t srvIndex = SRVManager::GetInstance()->Allocate();
-	srvHandle_.first = SRVManager::GetInstance()->GetCPUDescriptorHandle(srvIndex);
-	srvHandle_.second = SRVManager::GetInstance()->GetGPUDescriptorHandle(srvIndex);
+	// 静的メッシュ用 SRV の生成(再生成時は同じスロットを使い回す)
+	if (srvIndex_ == kInvalidSrvIndex) {
+		srvIndex_ = SRVManager::GetInstance()->Allocate();
+	}
+	srvHandle_.first = SRVManager::GetInstance()->GetCPUDescriptorHandle(srvIndex_);
+	srvHandle_.second = SRVManager::GetInstance()->GetGPUDescriptorHandle(srvIndex_);
 
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
 	srvDesc.Format = DXGI_FORMAT_UNKNOWN;

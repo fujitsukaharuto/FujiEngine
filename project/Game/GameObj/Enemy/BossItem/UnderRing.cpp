@@ -11,7 +11,8 @@ UnderRing::UnderRing() {
 
 void UnderRing::Initialize() {
 	OriginGameObject::Initialize();
-	model_->CreateRing(0.5f,0.25f,2.0f,true);
+	// ファイルからではなく手続き的に生成するので、Createモデル系を通らない。先に実体を用意する
+	EnsureModel()->CreateRing(0.5f,0.25f,2.0f,true);
 	model_->GetTransform().translate.y = 0.5f;
 
 	collider_ = std::make_unique<AABBCollider>();

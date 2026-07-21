@@ -14,8 +14,24 @@ OriginGameObject::OriginGameObject() : modelDataJson_(std::make_unique<nlohmann:
 OriginGameObject::~OriginGameObject() = default;
 
 void OriginGameObject::Initialize() {
-	model_ = std::make_unique<Object3d>();
-	animeModel_ = std::make_unique<AnimationModel>();
+	// 描画オブジェクトはここで両方作らない。
+	// CreateModel系が呼ばれたときに必要な方だけ生成する
+	// (両方作ると、片方しか使わないオブジェクトが空のObject3d/AnimationModelを抱え続け、
+	//  GetTransが「一度もCreateされていない方」のTransformを静かに返す事故も起きる)
+}
+
+Graphics::Object3d* OriginGameObject::EnsureModel() {
+	if (!model_) {
+		model_ = std::make_unique<Object3d>();
+	}
+	return model_.get();
+}
+
+Graphics::AnimationModel* OriginGameObject::EnsureAnimeModel() {
+	if (!animeModel_) {
+		animeModel_ = std::make_unique<AnimationModel>();
+	}
+	return animeModel_.get();
 }
 
 void OriginGameObject::Update() {
@@ -46,17 +62,17 @@ float OriginGameObject::ComparNum(float a, float b) {
 }
 
 void OriginGameObject::CreateModel(const std::string& name) {
-	model_->Create(name);
+	EnsureModel()->Create(name);
 }
 
 void OriginGameObject::CreateAnimeModel(const std::string& name) {
-	animeModel_->Create(name);
+	EnsureAnimeModel()->Create(name);
 }
 
 void OriginGameObject::CreateFromJson(const std::string& name) {
 	nlohmann::json objJson = JsonSerializer::DeserializeJsonData(name);
 	std::string modelName = objJson.value("modelName", "DefaultModel");
-	model_->Create(modelName);
+	EnsureModel()->Create(modelName);
 	if (objJson.contains("transform")) {
 		const auto& t = objJson["transform"];
 		if (t.contains("translate")) {
@@ -79,7 +95,7 @@ void OriginGameObject::CreateFromJson(const std::string& name) {
 
 void OriginGameObject::CreateFromJson() {
 	std::string modelName = modelDataJson_->value("modelName", "DefaultModel");
-	model_->Create(modelName);
+	EnsureModel()->Create(modelName);
 	if (modelDataJson_->contains("transform")) {
 		const auto& t = (*modelDataJson_)["transform"];
 		if (t.contains("translate")) {
@@ -101,11 +117,11 @@ void OriginGameObject::CreateFromJson() {
 }
 
 void OriginGameObject::SetModel(const std::string& name) {
-	model_->SetModel(name);
+	EnsureModel()->SetModel(name);
 }
 
 void OriginGameObject::SetAnimeModel(const std::string& name) {
-	animeModel_->SetModel(name);
+	EnsureAnimeModel()->SetModel(name);
 }
 
 void OriginGameObject::SetModelDataJson(const nlohmann::json& jsonData) {
