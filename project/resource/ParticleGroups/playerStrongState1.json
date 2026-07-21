@@ -2,6 +2,7 @@
     "Shape": 4,
     "count": 100,
     "name": "playerStrongState1",
+    "parent": true,
     "subMode": false,
     "texName": "beamCore.png"
 }

@@ -2,6 +2,7 @@
     "Shape": 0,
     "count": 2,
     "name": "ChargeCircle",
+    "parent": true,
     "subMode": false,
     "texName": "chargeCircle.png"
 }

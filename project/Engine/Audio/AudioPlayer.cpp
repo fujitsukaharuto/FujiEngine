@@ -1,5 +1,6 @@
 #include "Engine/Audio/AudioPlayer.h"
 #include <cassert>
+#include <filesystem>
 
 using namespace Audio;
 
@@ -49,6 +50,20 @@ void AudioPlayer::Finalize() {
 	if (xAudio2_) {
 		xAudio2_.Reset();
 		xAudio2_ = nullptr;
+	}
+}
+
+// TextureManager::LoadAll と同じ方針。.wavを追加してもコードを触らずに済むようにする
+void AudioPlayer::LoadAll() {
+	if (!std::filesystem::exists(kDirectoryPath_)) return;
+
+	for (const auto& entry : std::filesystem::directory_iterator(kDirectoryPath_)) {
+		if (entry.is_regular_file()) {
+			const auto& path = entry.path();
+			if (path.extension() == ".wav") {
+				LoadWave(path.filename().string().c_str());
+			}
+		}
 	}
 }
 

@@ -553,8 +553,10 @@ ModelData ModelManager::CreateCylinder(float topRadius, float bottomRadius, floa
 	return instance->models_[key]->GetModelData();
 }
 
+// ファイル一覧の構築は全構成で必要(LoadAllFileDataの入力になる)。
+// pair.second の上書きフラグはエディタのモデル一覧でしか使わないが、
+// リスト自体をデバッグ限定にすると Release で事前ロードが丸ごと効かなくなる。
 void ModelManager::LoadModelFile(bool overWrite) {
-#ifdef _DEBUGMODE
 	modelFileList.clear();
 
 	if (!std::filesystem::exists(kDirectoryPath_)) return;
@@ -563,16 +565,10 @@ void ModelManager::LoadModelFile(bool overWrite) {
 		if (entry.is_regular_file()) {
 			auto path = entry.path();
 			if (path.extension() == ".obj" || path.extension() == ".gltf") {
-				if (overWrite) {
-					modelFileList.push_back(std::make_pair(path.filename().string(), true));
-				} else {
-					modelFileList.push_back(std::make_pair(path.filename().string(), false));
-				}
+				modelFileList.push_back(std::make_pair(path.filename().string(), overWrite));
 			}
 		}
 	}
-
-#endif // _DEBUG
 }
 
 void Graphics::ModelManager::LoadAllFileData() {

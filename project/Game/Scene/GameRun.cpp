@@ -28,8 +28,8 @@ void GameRun::Initialize() {
 
 #pragma region オブジェクト読み込み
 	ModelManager::GetInstance()->CreateSphere();
+	// ModelandTexture内の.obj/.gltfを全て読み込む(T_boss.gltfもここに含まれる)
 	modelManager_->LoadAllFileData();
-	modelManager_->LoadGLTF("T_boss.gltf");
 #pragma endregion
 
 #pragma region パーティクル生成
@@ -192,57 +192,15 @@ void GameRun::DebugGUI() {
 }
 
 void GameRun::LoadParticleGroup() {
+	// パーティクルグループの生成情報は resource/ParticleGroups/*.json が持っている。
+	// テクスチャ・数・形状・ペアレント版の要否まで全てJSON側で完結する
 	pManager_->LoadAllFileData();
 
-	// playerBullet用
-	pManager_->CreateParentParticleGroup("ChargeEffect1", "redCircle.png", 40);
-	pManager_->CreateParentParticleGroup("ChargeEffect2", "redCircle.png", 40);
-	pManager_->CreateParentParticleGroup("ChargeEffect3", "redCircle.png", 40);
-	pManager_->CreateParentParticleGroup("ChargeLight", "redCircle.png", 40);
-	pManager_->CreateParentParticleGroup("ChargeRay", "chargeRay.png", 20);
-	pManager_->CreateParentParticleGroup("ChargeWave", "chargeCircle.png", 10);
-	pManager_->CreateParentParticleGroup("ChargeCircle", "chargeCircle.png", 10);
-
-
-	pManager_->CreateParentParticleGroup("playerAfterBurner", "shockWaveGround.png", 200, ShapeType::RING);
-	pManager_->CreateParentParticleGroup("playerAfterBurner2", "shockWaveGround.png", 200, ShapeType::RING);
-	pManager_->CreateParentParticleGroup("playerAfterBurner3", "shockWaveGround.png", 200, ShapeType::RING);
-	pManager_->CreateParentParticleGroup("playerAfterBurner4", "shockWaveGround.png", 200, ShapeType::RING);
-
-	pManager_->CreateParentParticleGroup("playerAvoid01", "ringOutline.png", 10, ShapeType::RING);
-	pManager_->CreateParentParticleGroup("playerAvoid02", "redCircle.png", 150);
-	pManager_->CreateParentParticleGroup("playerAvoid03", "redCircle.png", 150);
-
-	pManager_->CreateParentParticleGroup("playerAvoid1", "redCircle.png", 100);
-	pManager_->CreateParentParticleGroup("playerAvoid2", "redCircle.png", 100);
-	pManager_->CreateParentParticleGroup("playerAvoid3", "redCircle.png", 100);
-	pManager_->CreateParentParticleGroup("playerAvoid4");
-
-	pManager_->CreateParentParticleGroup("playerStrongState1", "beamCore.png", 100, ShapeType::CYLINDER);
-	pManager_->CreateParentParticleGroup("playerStrongState2", "redCircle.png", 100);
-
-
-	pManager_->CreateParentParticleGroup("BeamParticle", "redCircle.png", 400);
-	pManager_->CreateParentParticleGroup("BeamLight", "redCircle.png", 40);
-
-
-	// 半透明になる
-	pManager_->CreateParticleGroup("ShockWave", "white.png", 10, ShapeType::SPHERE);
-	pManager_->CreateParticleGroup("JumpShockWave", "white.png", 10, ShapeType::SPHERE);
-
-
+	// 連番アニメだけはJSON走査の対象外なのでここで生成する
 	pManager_->CreateAnimeGroup("animetest", "uvChecker.png");
 	pManager_->AddAnime("animetest", "white2x2.png", 10.0f);
 }
 
 void GameRun::LoadSoundData() {
-	audioPlayer_->LoadWave("UrbanBGM_01.wav");
-	audioPlayer_->LoadWave("mokugyo.wav");
-	audioPlayer_->LoadWave("shot.wav");
-	audioPlayer_->LoadWave("chargeSE.wav");
-	audioPlayer_->LoadWave("chargeCompleteSE.wav");
-	audioPlayer_->LoadWave("jumpAttackSE.wav");
-	audioPlayer_->LoadWave("areaAttackSE.wav");
-	audioPlayer_->LoadWave("attackSE.wav");
-	audioPlayer_->LoadWave("arrowThrowSE.wav");
+	audioPlayer_->LoadAll();
 }

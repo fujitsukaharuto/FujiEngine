@@ -69,6 +69,11 @@ namespace Audio {
 		void LoadWave(const char* filename);
 
 		/// <summary>
+		/// audioディレクトリ内の.wavを全て読み込む
+		/// </summary>
+		void LoadAll();
+
+		/// <summary>
 		/// Waveファイルの読み込みとSoundDataの生成
 		/// </summary>
 		/// <param name="filename">ファイル名</param>

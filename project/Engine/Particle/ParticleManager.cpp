@@ -252,7 +252,15 @@ void ParticleManager::LoadAllFileData() {
 			const auto& filePath = entry.path();
 			if (filePath.extension() == ".json") {
 				// .json を除いたファイル名
-				CreateParticleGroup(filePath.stem().string());
+				const std::string name = filePath.stem().string();
+				CreateParticleGroup(name);
+
+				// "parent": true のグループはペアレント版も生成する。
+				// 生成パラメータはどちらも JsonCheckForGroup が同じJSONから読むので引数は既定のままでよい
+				const json data = JsonSerializer::DeserializeJsonData(filePath.string().c_str());
+				if (data.value("parent", false)) {
+					CreateParentParticleGroup(name);
+				}
 			}
 		}
 	}
@@ -749,13 +757,21 @@ void ParticleManager::ShapeTypeDrawCommand(const ShapeType& type, uint32_t count
 
 void ParticleManager::SaveGroupData() {
 #ifdef _DEBUGMODE
+	const std::string path = "resource/ParticleGroups/" + currentKey_ + ".json";
+
+	// 空のjsonから作ると、このUIが編集しない項目(blendType/parent)が保存のたびに消えてしまう。
+	// 既存のファイルを読んでから上書きすること
 	json data{};
+	if (std::filesystem::exists(path)) {
+		data = JsonSerializer::DeserializeJsonData(path.c_str());
+	}
+
 	data["name"] = currentKey_;
 	data["texName"] = selectParticleGroup_->GetMaterial().GetPathName();
 	data["count"] = selectParticleGroup_->GetInstanceCount();
 	data["Shape"] = static_cast<int>(selectParticleGroup_->GetShapeType());
 	data["subMode"] = selectParticleGroup_->isSubMode_;
-	JsonSerializer::SerializeJsonData(data, ("resource/ParticleGroups/" + currentKey_ + ".json").c_str());
+	JsonSerializer::SerializeJsonData(data, path.c_str());
 #endif // _DEBUG
 }
 
@@ -783,6 +799,7 @@ void ParticleManager::JsonCheckForGroup(const std::string& name, const std::stri
 		data["count"] = count;
 		data["Shape"] = static_cast<int>(shape);
 		data["blendType"] = blendType;
+		data["parent"] = isParnt;
 		JsonSerializer::SerializeJsonData(data, path.c_str());
 	}
 }

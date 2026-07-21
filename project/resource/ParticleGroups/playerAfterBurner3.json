@@ -3,5 +3,6 @@
     "blendType": 1,
     "count": 200,
     "name": "playerAfterBurner3",
+    "parent": true,
     "texName": "shockWaveGround.png"
 }

@@ -2,6 +2,7 @@
     "Shape": 0,
     "count": 200,
     "name": "BeamParticle",
+    "parent": true,
     "subMode": false,
     "texName": "redCircle.png"
 }

@@ -2,6 +2,7 @@
     "Shape": 1,
     "count": 100,
     "name": "playerAvoid01",
+    "parent": true,
     "subMode": false,
     "texName": "ringOutline.png"
 }

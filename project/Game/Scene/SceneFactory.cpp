@@ -6,40 +6,15 @@
 #include "Game/Scene/GPUParticleScene.h"
 #include "Game/Scene/TestScene.h"
 
-using namespace Scene;
-
 SceneFactory::SceneFactory() {
+	// ここに並べた順がシーン切り替えGUIの表示順になる
+	Register<TitleScene>("TITLE");
+	Register<GameScene>("GAME");
+	Register<ResultScene>("RESULT");
+	Register<ParticleDebugScene>("PARTICLEDEBUG");
+	Register<GPUParticleScene>("GPUPARTICLE");
+	Register<TestScene>("TEST");
 }
 
 SceneFactory::~SceneFactory() {
-}
-
-std::unique_ptr<BaseScene> SceneFactory::CreateScene(const std::string& sceneName) {
-	std::unique_ptr<BaseScene> newScene = nullptr;
-
-	if (sceneName == "TITLE") {
-		newScene = std::make_unique<TitleScene>();
-
-	} else if (sceneName == "GAME") {
-		newScene = std::make_unique<GameScene>();
-
-	} else if (sceneName == "RESULT") {
-		newScene = std::make_unique<ResultScene>();
-
-	} else if (sceneName == "PARTICLEDEBUG") {
-		newScene = std::make_unique<ParticleDebugScene>();
-
-	} else if (sceneName == "GPUPARTICLE") {
-		newScene = std::make_unique<GPUParticleScene>();
-
-	} else if (sceneName == "TEST") {
-		newScene = std::make_unique<TestScene>();
-
-	}
-
-	return newScene;
-}
-
-std::vector<std::string> SceneFactory::GetSceneNames() const {
-	return { "TITLE","GAME","RESULT","PARTICLEDEBUG" ,"GPUPARTICLE" ,"TEST" };
 }
