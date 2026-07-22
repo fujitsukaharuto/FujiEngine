@@ -36,8 +36,7 @@ void Arrow::Initialize() {
 	collider_->SetHeight(3.0f);
 	collider_->SetDepth(2.0f);
 
-	arrivalWarningPotion_ = std::make_unique<Object3d>();
-	arrivalWarningPotion_->Create("Sphere");
+	arrivalWarningPotion_ = AddRenderer("Sphere");
 	arrivalWarningPotion_->SetTexture("white2x2.png");
 	arrivalWarningPotion_->SetColor({ 0.8f,0.0f,0.0f,0.4f });
 	arrivalWarningPotion_->SetLightEnable(LightMode::kLightNone);
@@ -76,10 +75,9 @@ void Arrow::Update() {
 }
 
 void Arrow::Draw([[maybe_unused]] bool is) {
+	// 着弾予告の円は条件付き表示。基底の描画リストに載せたまま可視フラグで切り替える
+	SetRendererVisible(arrivalWarningPotion_, isArrow_ && arrivalTime_ > 0.0f && animationTime_ < totalAnimationTime_);
 	OriginGameObject::Draw();
-	if (isArrow_ && arrivalTime_ > 0.0f && animationTime_ < totalAnimationTime_) {
-		arrivalWarningPotion_->Draw();
-	}
 }
 
 void Arrow::DrawCollider() {

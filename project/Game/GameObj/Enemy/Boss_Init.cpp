@@ -31,8 +31,7 @@ void Boss::Initialize() {
 
 	animeModel_->LoadTransformFromJson("boss_transform.json");
 
-	shadow_ = std::make_unique<Object3d>();
-	shadow_->Create("Sphere");
+	shadow_ = AddRenderer("Sphere");
 	shadow_->SetTexture("white2x2.png");
 	shadow_->SetColor({ 0.02f,0.02f,0.02f,0.0f });
 	shadow_->SetLightEnable(LightMode::kLightNone);

@@ -104,7 +104,8 @@ private:
 	float controlHeight_ = 20.0f;
 
 	std::unique_ptr<AABBCollider> collider_;
-	std::unique_ptr<Graphics::Object3d> arrivalWarningPotion_;
+	/// <summary>着弾予告の円。所有権は基底の renderers_ が持つ</summary>
+	Graphics::Object3d* arrivalWarningPotion_ = nullptr;
 
 	// emitter
 	Graphics::ParticleEmitter spark1_;

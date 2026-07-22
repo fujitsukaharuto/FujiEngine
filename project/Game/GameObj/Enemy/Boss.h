@@ -290,7 +290,8 @@ private:
 	std::unique_ptr<BossCore> core_;
 	std::unique_ptr<Beam> beam_;
 
-	std::unique_ptr<Graphics::Object3d> shadow_;
+	/// <summary>追加ビジュアル。所有権は基底の renderers_ が持つ</summary>
+	Graphics::Object3d* shadow_ = nullptr;
 	std::unique_ptr<AABBCollider> collider_;
 
 	Player* pPlayer_;

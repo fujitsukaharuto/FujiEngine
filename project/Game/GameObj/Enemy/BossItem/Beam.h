@@ -63,9 +63,6 @@ public:
 
 	/// <summary>ビームの初期化</summary>
 	void InitBeam(const Math::Vector3& pos, const Math::Vector3& velo);
-	/// <summary>ビームの回転</summary>
-	bool BeamRotate();
-
 	/// <summary>ビームの更新</summary>
 	bool BeamAttackUpdate();
 
@@ -101,12 +98,7 @@ private:
 	BeamStep step_ = BeamStep::AroundAttack;
 	std::vector<OneBeam> beams_;
 
-	std::unique_ptr<Graphics::Object3d> beamCore1_;
-	std::unique_ptr<Graphics::Object3d> beamCore2_;
-	std::unique_ptr<Graphics::Object3d> beamCore3_;
-	std::unique_ptr<Graphics::Object3d> beam1_;
-	std::unique_ptr<Graphics::Object3d> beam2_;
-	std::unique_ptr<Graphics::Object3d> beam3_;
+	/// <remarks>描画されない Transform アンカー(エミッタの親)なので renderers_ には入れない</remarks>
 	std::unique_ptr<Graphics::Object3d> particleParent_;
 
 	bool isLive_ = false;

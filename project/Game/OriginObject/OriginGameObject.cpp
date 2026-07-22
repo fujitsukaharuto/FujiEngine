@@ -38,11 +38,15 @@ void OriginGameObject::Update() {
 }
 
 void OriginGameObject::Draw(bool is) {
-	if (model_) {
-		model_->Draw(is);
-	}
+	// 子ビジュアルを先に描く。影のような非additiveの子は本体より前に描く必要があるため
+	// (additiveの子は順不同なので、この順で全ケースを満たせる)
 	for (auto& r : renderers_) {
-		r->Draw(is);
+		if (r.visible) {
+			r.object->Draw(is);
+		}
+	}
+	if (RenderObject* o = GetRenderObject()) {
+		o->Draw(is);
 	}
 }
 
@@ -134,7 +138,7 @@ void OriginGameObject::SetModelDataJson(const nlohmann::json& jsonData) {
 Graphics::Object3d* OriginGameObject::AddRenderer() {
 	auto obj = std::make_unique<Object3d>();
 	Object3d* handle = obj.get();
-	renderers_.push_back(std::move(obj));
+	renderers_.push_back({ std::move(obj), true });
 	return handle;
 }
 
@@ -142,5 +146,14 @@ Graphics::Object3d* OriginGameObject::AddRenderer(const std::string& name) {
 	Object3d* handle = AddRenderer();
 	handle->Create(name);
 	return handle;
+}
+
+void OriginGameObject::SetRendererVisible(const Graphics::RenderObject* handle, bool visible) {
+	for (auto& r : renderers_) {
+		if (r.object.get() == handle) {
+			r.visible = visible;
+			return;
+		}
+	}
 }
 

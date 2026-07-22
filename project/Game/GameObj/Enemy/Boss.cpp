@@ -97,12 +97,12 @@ void Boss::Update() {
 }
 
 void Boss::Draw([[maybe_unused]] bool is) {
-	shadow_->Draw();
+	// 子ビジュアル(shadow_) → animeModel_ の順で描かれる
+	OriginGameObject::Draw();
 #ifdef _DEBUGMODE
 	collider_->DrawCollider();
 #endif // _DEBUG
 
-	animeModel_->Draw();
 	core_->Draw();
 	itemManager_->Draw();
 

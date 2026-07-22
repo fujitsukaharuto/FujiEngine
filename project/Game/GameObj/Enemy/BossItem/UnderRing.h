@@ -47,7 +47,8 @@ private:
 
 private:
 
-	std::unique_ptr<Graphics::Object3d> cylinder_;
+	/// <summary>追加ビジュアル。所有権は基底の renderers_ が持つ</summary>
+	Graphics::Object3d* cylinder_ = nullptr;
 
 	bool isLive_ = false;
 	float lifeTime_ = 300.0f;

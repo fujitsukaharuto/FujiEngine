@@ -23,7 +23,7 @@ void UnderRing::Initialize() {
 	collider_->SetCollisionStayCallback([this](const ColliderInfo& other) {OnCollisionStay(other); });
 	collider_->SetCollisionExitCallback([this](const ColliderInfo& other) {OnCollisionExit(other); });
 
-	cylinder_ = std::make_unique<Object3d>();
+	cylinder_ = AddRenderer();
 	cylinder_->CreateCylinder(0.5f, 0.5f, 3.0f);
 	cylinder_->GetTransform().translate.y = -1.2f;
 	cylinder_->SetParent(&model_->GetTransform());
@@ -69,8 +69,8 @@ void UnderRing::Update() {
 }
 
 void UnderRing::Draw([[maybe_unused]] bool is) {
+	// model_ と登録済み子ビジュアル(cylinder_)をまとめて additive 描画
 	OriginGameObject::Draw(true);
-	cylinder_->Draw(true);
 }
 
 void UnderRing::DrawCollider() {

@@ -82,14 +82,23 @@ protected:
 	Graphics::Object3d* AddRenderer();
 	/// <summary>子ビジュアル(Object3d)を name で生成(Create済)・登録し、ハンドルを返す</summary>
 	Graphics::Object3d* AddRenderer(const std::string& name);
+	/// <summary>子ビジュアルの表示/非表示を切り替える</summary>
+	/// <remarks>条件付きで描いていたビジュアルを renderers_ に載せるためのもの。未登録のハンドルは無視される</remarks>
+	void SetRendererVisible(const Graphics::RenderObject* handle, bool visible);
 
 protected:
+
+	/// <summary>基底が所有・描画する子ビジュアル1件</summary>
+	struct RendererEntry {
+		std::unique_ptr<Graphics::RenderObject> object;
+		bool visible = true;
+	};
 
 	std::unique_ptr<Graphics::Object3d> model_;
 	std::unique_ptr<Graphics::AnimationModel> animeModel_;
 
 	/// <summary>このオブジェクトにぶら下がる追加ビジュアル。生成/描画を一元管理する(=MeshRenderer相当)</summary>
-	std::vector<std::unique_ptr<Graphics::RenderObject>> renderers_;
+	std::vector<RendererEntry> renderers_;
 
 	/// <summary>Jsonから生成する際の元データ。json.hpp をヘッダから隔離するため実体は持たない</summary>
 	std::unique_ptr<nlohmann::json> modelDataJson_;

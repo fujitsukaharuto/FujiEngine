@@ -28,8 +28,7 @@ void Player::Initialize() {
 
 	model_->SetTexture("Atlas.png");
 
-	shadow_ = std::make_unique<Object3d>();
-	shadow_->Create("Sphere");
+	shadow_ = AddRenderer("Sphere");
 	shadow_->SetColor({ 0.02f,0.02f,0.02f,0.5f });
 	shadow_->SetLightEnable(LightMode::kLightNone);
 	shadow_->GetTransform().translate = model_->GetTransform().translate;
@@ -171,8 +170,7 @@ void Player::Draw(bool is) {
 		}
 	}
 
-	shadow_->Draw();
-
+	// 子ビジュアル(shadow_) → model_ の順で描かれる
 	OriginGameObject::Draw(is);
 
 #ifdef _DEBUGMODE
@@ -631,7 +629,8 @@ void Player::TitleUpdate([[maybe_unused]]float titleTime) {
 }
 
 void Player::TitleDraw() {
-	OriginGameObject::Draw();
+	// タイトルでは影を出さない(従来どおり)ので、基底Drawではなく本体だけを描く
+	model_->Draw();
 }
 
 void Player::SettingTitleStartPosition(const Vector3& start, const Vector3& center, const Vector3& end) {
