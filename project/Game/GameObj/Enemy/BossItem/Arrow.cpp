@@ -26,12 +26,8 @@ void Arrow::Initialize() {
 	OriginGameObject::Initialize();
 	OriginGameObject::CreateModel("Boss_Arrow.obj");
 
-	collider_ = std::make_unique<AABBCollider>();
-	collider_->SetTag("enemyAttack");
+	collider_ = AddCollider("enemyAttack");
 	collider_->SetParent(&model_->GetTransform());
-	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
-	collider_->SetCollisionStayCallback([this](const ColliderInfo& other) {OnCollisionStay(other); });
-	collider_->SetCollisionExitCallback([this](const ColliderInfo& other) {OnCollisionExit(other); });
 	collider_->SetWidth(2.0f);
 	collider_->SetHeight(3.0f);
 	collider_->SetDepth(2.0f);
@@ -81,9 +77,7 @@ void Arrow::Draw([[maybe_unused]] bool is) {
 }
 
 void Arrow::DrawCollider() {
-#ifdef _DEBUGMODE
-	collider_->DrawCollider();
-#endif // _DEBUG
+	DrawColliders();
 }
 
 void Arrow::DebugGUI() {

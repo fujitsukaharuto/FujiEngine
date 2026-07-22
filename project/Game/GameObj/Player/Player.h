@@ -78,9 +78,9 @@ public:
 
 	//========================================================================*/
 	//* Collision
-	void OnCollisionEnter([[maybe_unused]] const ColliderInfo& other);
-	void OnCollisionStay([[maybe_unused]] const ColliderInfo& other);
-	void OnCollisionExit([[maybe_unused]] const ColliderInfo& other);
+	void OnCollisionEnter([[maybe_unused]] const ColliderInfo& other)override;
+	void OnCollisionStay([[maybe_unused]] const ColliderInfo& other)override;
+	void OnCollisionExit([[maybe_unused]] const ColliderInfo& other)override;
 
 	//========================================================================*/
 	//* Move
@@ -134,7 +134,6 @@ public:
 	bool GetIsGameOver() { return isGameOver_; }
 	bool GetIsStart() { return isStart_; }
 	bool GetIsStrongState() { return isStrongState_; }
-	BaseCollider* GetCollider() { return collider_.get(); }
 
 	std::vector<std::unique_ptr<PlayerBullet>>& GetPlayerBullet() { return bullets_; }
 
@@ -177,7 +176,8 @@ private:
 	Graphics::Object3d* shadow_ = nullptr;
 	/// <remarks>描画されない Transform アンカー(エミッタの親)なので renderers_ には入れない</remarks>
 	std::unique_ptr<Graphics::Object3d> strongStatePos_;
-	std::unique_ptr<AABBCollider> collider_;
+	/// <summary>所有権は基底の colliders_ が持つ</summary>
+	AABBCollider* collider_ = nullptr;
 
 	Math::Vector3 targetPos_;
 

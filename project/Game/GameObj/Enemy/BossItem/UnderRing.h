@@ -27,9 +27,9 @@ public:
 
 	//========================================================================*/
 	//* Collision
-	void OnCollisionEnter([[maybe_unused]] const ColliderInfo& other);
-	void OnCollisionStay([[maybe_unused]] const ColliderInfo& other);
-	void OnCollisionExit([[maybe_unused]] const ColliderInfo& other);
+	void OnCollisionEnter([[maybe_unused]] const ColliderInfo& other)override;
+	void OnCollisionStay([[maybe_unused]] const ColliderInfo& other)override;
+	void OnCollisionExit([[maybe_unused]] const ColliderInfo& other)override;
 
 	//========================================================================*/
 	//* Setter
@@ -37,7 +37,6 @@ public:
 
 	//========================================================================*/
 	//* Getter
-	BaseCollider* GetCollider() { return collider_.get(); }
 	float GetLifeTime() { return lifeTime_; }
 	bool GetIsLive() { return isLive_; }
 	float GetRingRadMax() { return ringRadMax_; }
@@ -62,6 +61,7 @@ private:
 
 	float uvTransX_;
 
-	std::unique_ptr<AABBCollider> collider_;
+	/// <summary>所有権は基底の colliders_ が持つ</summary>
+	AABBCollider* collider_ = nullptr;
 
 };

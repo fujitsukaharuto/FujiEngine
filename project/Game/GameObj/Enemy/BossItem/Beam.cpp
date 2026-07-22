@@ -68,11 +68,7 @@ void Beam::Initialize() {
 		beam.beam3->CreateCylinder();
 		beam.beam3->SetTexture("beamCore.png");
 
-		beam.collider = std::make_unique<AABBCollider>();
-		beam.collider->SetTag("enemyAttack");
-		beam.collider->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
-		beam.collider->SetCollisionStayCallback([this](const ColliderInfo& other) {OnCollisionStay(other); });
-		beam.collider->SetCollisionExitCallback([this](const ColliderInfo& other) {OnCollisionExit(other); });
+		beam.collider = AddCollider("enemyAttack");
 		beam.collider->SetOffset({ 0.0f,0.0f,50.0f });
 		beam.collider->SetDepth(100.0f);
 		beam.collider->SetWidth(7.5f);
@@ -192,10 +188,8 @@ void Beam::Update() {
 			beam.particleParent->GetTransform().translate = beam.model->GetTransform().translate;
 		}
 
-		//collider_->SetPos(model_->GetWorldPos());
-		for (auto& beam : beams_) {
-			beam.collider->InfoUpdate();
-		}
+		// 6本分のコライダーは全て基底が持っているのでまとめて更新できる
+		UpdateColliders();
 	}
 }
 

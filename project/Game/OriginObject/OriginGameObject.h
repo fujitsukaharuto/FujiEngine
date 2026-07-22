@@ -8,6 +8,7 @@
 #include "Engine/Model/Object3d.h"
 #include "Engine/Model/AnimationData/AnimationModel.h"
 #include "Engine/Model/Base/RenderObject.h"
+#include "Game/Collider/AABBCollider.h"
 #include "Engine/DX/FPSKeeper.h"
 #include "Engine/Camera/CameraManager.h"
 #include "Engine/Input/Input.h"
@@ -31,6 +32,18 @@ public:
 #endif // _DEBUG
 
 public:
+
+	//========================================================================*/
+	//* Collision
+	// AddCollider で自動的に結線される。反応が要る派生クラスだけが override すればよい
+	virtual void OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {}
+	virtual void OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {}
+	virtual void OnCollisionExit([[maybe_unused]] const ColliderInfo& other) {}
+
+	/// <summary>登録済みコライダーのワールド情報を更新する</summary>
+	void UpdateColliders();
+	/// <summary>登録済みコライダーの判定ボリュームを描く</summary>
+	void DrawColliders();
 
 	/// <summary>値比較</summary>
 	float ComparNum(float a, float b);
@@ -69,6 +82,11 @@ public:
 	Math::Trans& GetTrans() { Graphics::RenderObject* o = GetRenderObject(); assert(o && "このオブジェクトは描画モデルを生成していない"); return o->GetTransform(); }
 	Math::Vector3 GetWorldPos()const { const Graphics::RenderObject* o = GetRenderObject(); assert(o && "このオブジェクトは描画モデルを生成していない"); return o->GetWorldPos(); }
 
+	/// <summary>コライダーの取得</summary>
+	/// <remarks>1つしか持たないオブジェクト向け。複数持つ場合は GetColliders() を使う</remarks>
+	BaseCollider* GetCollider() { return colliders_.empty() ? nullptr : colliders_.front().get(); }
+	const std::vector<std::unique_ptr<AABBCollider>>& GetColliders() const { return colliders_; }
+
 protected:
 
 	/// <summary>model_ を必要になった時点で生成する</summary>
@@ -82,6 +100,13 @@ protected:
 	Graphics::Object3d* AddRenderer();
 	/// <summary>子ビジュアル(Object3d)を name で生成(Create済)・登録し、ハンドルを返す</summary>
 	Graphics::Object3d* AddRenderer(const std::string& name);
+	/// <summary>コライダーを生成・登録し、設定用ハンドルを返す</summary>
+	/// <remarks>
+	/// タグ・オーナー・3つのコールバックはここで結線するので、派生側はサイズと親だけ設定すればよい。
+	/// 所有権は colliders_ が持つ
+	/// </remarks>
+	AABBCollider* AddCollider(const std::string& tag = "");
+
 	/// <summary>子ビジュアルの表示/非表示を切り替える</summary>
 	/// <remarks>条件付きで描いていたビジュアルを renderers_ に載せるためのもの。未登録のハンドルは無視される</remarks>
 	void SetRendererVisible(const Graphics::RenderObject* handle, bool visible);
@@ -99,6 +124,9 @@ protected:
 
 	/// <summary>このオブジェクトにぶら下がる追加ビジュアル。生成/描画を一元管理する(=MeshRenderer相当)</summary>
 	std::vector<RendererEntry> renderers_;
+
+	/// <summary>このオブジェクトが持つあたり判定(=Colliderコンポーネント相当)</summary>
+	std::vector<std::unique_ptr<AABBCollider>> colliders_;
 
 	/// <summary>Jsonから生成する際の元データ。json.hpp をヘッダから隔離するため実体は持たない</summary>
 	std::unique_ptr<nlohmann::json> modelDataJson_;

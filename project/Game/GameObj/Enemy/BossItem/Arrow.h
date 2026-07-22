@@ -55,9 +55,9 @@ public:
 
 	//========================================================================*/
 	//* Collision
-	void OnCollisionEnter([[maybe_unused]] const ColliderInfo& other);
-	void OnCollisionStay([[maybe_unused]] const ColliderInfo& other);
-	void OnCollisionExit([[maybe_unused]] const ColliderInfo& other);
+	void OnCollisionEnter([[maybe_unused]] const ColliderInfo& other)override;
+	void OnCollisionStay([[maybe_unused]] const ColliderInfo& other)override;
+	void OnCollisionExit([[maybe_unused]] const ColliderInfo& other)override;
 
 	//========================================================================*/
 	//* Setter
@@ -67,7 +67,6 @@ public:
 
 	//========================================================================*/
 	//* Getter
-	BaseCollider* GetCollider() { return collider_.get(); }
 	bool GetIsLive() { return isLive_; }
 
 
@@ -103,7 +102,8 @@ private:
 	Math::Vector3 endP_;
 	float controlHeight_ = 20.0f;
 
-	std::unique_ptr<AABBCollider> collider_;
+	/// <summary>所有権は基底の colliders_ が持つ</summary>
+	AABBCollider* collider_ = nullptr;
 	/// <summary>着弾予告の円。所有権は基底の renderers_ が持つ</summary>
 	Graphics::Object3d* arrivalWarningPotion_ = nullptr;
 

@@ -19,12 +19,8 @@ void WaveWall::Initialize() {
 	wave2_ = AddRenderer("bossWaveWall.obj");
 	wave3_ = AddRenderer("bossWaveWall.obj");
 
-	collider_ = std::make_unique<AABBCollider>();
-	collider_->SetTag("enemyAttack");
+	collider_ = AddCollider("enemyAttack");
 	collider_->SetParent(&model_->GetTransform());
-	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
-	collider_->SetCollisionStayCallback([this](const ColliderInfo& other) {OnCollisionStay(other); });
-	collider_->SetCollisionExitCallback([this](const ColliderInfo& other) {OnCollisionExit(other); });
 	collider_->SetWidth(2.0f);
 	collider_->SetHeight(2.0f);
 	collider_->SetDepth(1.5f);
@@ -68,9 +64,7 @@ void WaveWall::Draw([[maybe_unused]] bool is) {
 }
 
 void WaveWall::DrawCollider() {
-#ifdef _DEBUGMODE
-	collider_->DrawCollider();
-#endif // _DEBUG
+	DrawColliders();
 }
 
 void WaveWall::DebugGUI() {

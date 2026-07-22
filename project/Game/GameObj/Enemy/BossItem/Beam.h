@@ -19,7 +19,7 @@ struct OneBeam {
 	std::unique_ptr<Graphics::Object3d> beam1;
 	std::unique_ptr<Graphics::Object3d> beam2;
 	std::unique_ptr<Graphics::Object3d> beam3;
-	std::unique_ptr<AABBCollider> collider;
+	AABBCollider* collider = nullptr;	// 所有権は Beam の基底 colliders_ が持つ
 	std::unique_ptr<Graphics::Object3d> model;
 	std::unique_ptr<Graphics::Object3d> particleParent;
 };
@@ -68,13 +68,12 @@ public:
 
 	//========================================================================*/
 	//* Collision
-	void OnCollisionEnter([[maybe_unused]] const ColliderInfo& other);
-	void OnCollisionStay([[maybe_unused]] const ColliderInfo& other);
-	void OnCollisionExit([[maybe_unused]] const ColliderInfo& other);
+	void OnCollisionEnter([[maybe_unused]] const ColliderInfo& other)override;
+	void OnCollisionStay([[maybe_unused]] const ColliderInfo& other)override;
+	void OnCollisionExit([[maybe_unused]] const ColliderInfo& other)override;
 
 	//========================================================================*/
 	//* Getter
-	BaseCollider* GetCollider() { return beams_[0].collider.get(); }
 	std::vector<OneBeam>& GetBeams() { return beams_; }
 	float GetLifeTime() { return lifeTime_; }
 	bool GetIsLive() { return isLive_; }

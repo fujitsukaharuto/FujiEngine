@@ -15,13 +15,8 @@ void UnderRing::Initialize() {
 	EnsureModel()->CreateRing(0.5f,0.25f,2.0f,true);
 	model_->GetTransform().translate.y = 0.5f;
 
-	collider_ = std::make_unique<AABBCollider>();
-	collider_->SetTag("enemyAttack_ring");
-	collider_->SetOwner(this);
+	collider_ = AddCollider("enemyAttack_ring");
 	collider_->SetParent(&model_->GetTransform());
-	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
-	collider_->SetCollisionStayCallback([this](const ColliderInfo& other) {OnCollisionStay(other); });
-	collider_->SetCollisionExitCallback([this](const ColliderInfo& other) {OnCollisionExit(other); });
 
 	cylinder_ = AddRenderer();
 	cylinder_->CreateCylinder(0.5f, 0.5f, 3.0f);
@@ -74,9 +69,7 @@ void UnderRing::Draw([[maybe_unused]] bool is) {
 }
 
 void UnderRing::DrawCollider() {
-#ifdef _DEBUGMODE
-	collider_->DrawCollider();
-#endif // _DEBUG
+	DrawColliders();
 }
 
 void UnderRing::DebugGUI() {

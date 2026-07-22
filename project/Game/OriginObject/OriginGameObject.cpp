@@ -148,6 +148,34 @@ Graphics::Object3d* OriginGameObject::AddRenderer(const std::string& name) {
 	return handle;
 }
 
+AABBCollider* OriginGameObject::AddCollider(const std::string& tag) {
+	auto collider = std::make_unique<AABBCollider>();
+	AABBCollider* handle = collider.get();
+
+	handle->SetTag(tag);
+	handle->SetOwner(this);
+	handle->SetCollisionEnterCallback([this](const ColliderInfo& other) { OnCollisionEnter(other); });
+	handle->SetCollisionStayCallback([this](const ColliderInfo& other) { OnCollisionStay(other); });
+	handle->SetCollisionExitCallback([this](const ColliderInfo& other) { OnCollisionExit(other); });
+
+	colliders_.push_back(std::move(collider));
+	return handle;
+}
+
+void OriginGameObject::UpdateColliders() {
+	for (auto& collider : colliders_) {
+		collider->InfoUpdate();
+	}
+}
+
+void OriginGameObject::DrawColliders() {
+#ifdef _DEBUGMODE
+	for (auto& collider : colliders_) {
+		collider->DrawCollider();
+	}
+#endif // _DEBUG
+}
+
 void OriginGameObject::SetRendererVisible(const Graphics::RenderObject* handle, bool visible) {
 	for (auto& r : renderers_) {
 		if (r.object.get() == handle) {

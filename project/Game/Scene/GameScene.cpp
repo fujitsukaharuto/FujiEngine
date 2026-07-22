@@ -315,7 +315,7 @@ void GameScene::CollisionUpdate() {
 	int beamCount = 0;
 	for (auto& beam : boss_->GetBeam()->GetBeams()) {// ボスの攻撃Beam
 		if (boss_->GetBeam()->GetIsLive() && boss_->GetBeam()->GetChangeTime() <= 0.0f) {
-			cMane_->AddCollider(beam.collider.get());
+			cMane_->AddCollider(beam.collider);
 			if (boss_->GetBeam()->GetStep() == BeamStep::RotateBeam) {
 				beamCount++;
 			}

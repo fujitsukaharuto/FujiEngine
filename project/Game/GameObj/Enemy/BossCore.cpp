@@ -16,12 +16,8 @@ void BossCore::Initialize() {
 
 	model_->LoadTransformFromJson("bossCore_transform.json");
 
-	collider_ = std::make_unique<AABBCollider>();
-	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
-	collider_->SetCollisionStayCallback([this](const ColliderInfo& other) {OnCollisionStay(other); });
-	collider_->SetCollisionExitCallback([this](const ColliderInfo& other) {OnCollisionExit(other); });
+	collider_ = AddCollider("testBoss");
 	collider_->SetParent(&model_->GetTransform());
-	collider_->SetTag("testBoss");
 	collider_->SetOffset({ 0.0f,2.0f, -1.5f });
 	collider_->SetWidth(5.0f);
 	collider_->SetHeight(5.0f);
@@ -39,9 +35,8 @@ void BossCore::Update() {
 }
 
 void BossCore::Draw([[maybe_unused]] bool is) {
-#ifdef _DEBUGMODE
-	collider_->DrawCollider();
-#endif // _DEBUG
+	// model_ は当たり判定用のアンカーなので描画しない
+	DrawColliders();
 }
 
 void BossCore::DebugGUI() {

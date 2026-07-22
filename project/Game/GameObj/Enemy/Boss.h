@@ -174,13 +174,12 @@ public:
 
 	//========================================================================*/
 	//* Collision
-	void OnCollisionEnter([[maybe_unused]] const ColliderInfo& other);
-	void OnCollisionStay([[maybe_unused]] const ColliderInfo& other);
-	void OnCollisionExit([[maybe_unused]] const ColliderInfo& other);
+	void OnCollisionEnter([[maybe_unused]] const ColliderInfo& other)override;
+	void OnCollisionStay([[maybe_unused]] const ColliderInfo& other)override;
+	void OnCollisionExit([[maybe_unused]] const ColliderInfo& other)override;
 
 	//========================================================================*/
 	//* Getter
-	BaseCollider* GetCollider() { return collider_.get(); }
 	BaseCollider* GetCoreCollider() { return core_->GetCollider(); }
 	BossCore* GetBossCore() { return core_.get(); }
 	Beam* GetBeam() { return beam_.get(); }
@@ -292,7 +291,8 @@ private:
 
 	/// <summary>追加ビジュアル。所有権は基底の renderers_ が持つ</summary>
 	Graphics::Object3d* shadow_ = nullptr;
-	std::unique_ptr<AABBCollider> collider_;
+	/// <summary>所有権は基底の colliders_ が持つ</summary>
+	AABBCollider* collider_ = nullptr;
 
 	Player* pPlayer_;
 	std::vector<std::unique_ptr<Graphics::Object3d>> chargeParents_;

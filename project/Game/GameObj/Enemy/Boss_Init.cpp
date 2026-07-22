@@ -40,12 +40,8 @@ void Boss::Initialize() {
 	shadow_->GetTransform().scale = { 3.0f,0.0f,3.0f };
 	shadow_->GetTransform().scale.y = 0.1f;
 
-	collider_ = std::make_unique<AABBCollider>();
-	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
-	collider_->SetCollisionStayCallback([this](const ColliderInfo& other) {OnCollisionStay(other); });
-	collider_->SetCollisionExitCallback([this](const ColliderInfo& other) {OnCollisionExit(other); });
+	collider_ = AddCollider("Boss");
 	collider_->SetParent(&animeModel_->GetTransform());
-	collider_->SetTag("Boss");
 	collider_->SetOffset({ 0.0f,7.0f,0.0f });
 	collider_->SetWidth(7.5f);
 	collider_->SetHeight(15.0f);

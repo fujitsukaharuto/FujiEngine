@@ -70,14 +70,10 @@ void Player::Initialize() {
 	maxChargeTime_ = kMaxChargeTime_;
 	avoidEffectTime_ = 0.0f;
 
-	collider_ = std::make_unique<AABBCollider>();
-	collider_->SetTag("player");
+	collider_ = AddCollider("player");
 	collider_->SetWidth(2.0f);
 	collider_->SetDepth(2.0f);
 	collider_->SetHeight(2.0f);
-	collider_->SetCollisionEnterCallback([this](const ColliderInfo& other) {OnCollisionEnter(other); });
-	collider_->SetCollisionStayCallback([this](const ColliderInfo& other) {OnCollisionStay(other); });
-	collider_->SetCollisionExitCallback([this](const ColliderInfo& other) {OnCollisionExit(other); });
 
 	for (int i = 0; i < 10; i++) {
 		std::unique_ptr<PlayerBullet> bullet;
@@ -173,9 +169,7 @@ void Player::Draw(bool is) {
 	// 子ビジュアル(shadow_) → model_ の順で描かれる
 	OriginGameObject::Draw(is);
 
-#ifdef _DEBUGMODE
-	collider_->DrawCollider();
-#endif // _DEBUG
+	DrawColliders();
 
 	if (!isStart_) {
 		for (auto& hpTex : hpFrame_) {
