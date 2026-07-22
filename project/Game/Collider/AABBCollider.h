@@ -17,13 +17,8 @@ public:
 	/// <summary>
 	///	衝突判定時に呼び出される関数
 	/// </summary>
+	/// <remarks>直前に SetState された状態に対応するコールバックだけを呼ぶ</remarks>
 	void OnCollision(const ColliderInfo& other);
-
-	//========================================================================*/
-	//* 衝突判定
-	void OnCollisionEnter(const ColliderInfo& other)override;
-	void OnCollisionStay(const ColliderInfo& other)override;
-	void OnCollisionExit(const ColliderInfo& other)override;
 
 	/// <summary>
 	///	衝突判定のデータ出力
@@ -56,11 +51,10 @@ public:
 	//========================================================================*/
 	//* Getter
 	/// <summary>衝突判定のデータ</summary>
-	ColliderInfo GetInfo() const { return info; }
-	Math::Vector3 GetParentRotate() const { return parent_ ? parent_->GetRotation() : Math::Vector3(0.0f, 0.0f, 0.0f); }
+	const ColliderInfo& GetInfo() const { return info; }
 	const CollisionState& GetState()const { return state; }
+	/// <summary>判定に使うワールド空間の8頂点</summary>
 	std::array<Math::Vector3, 8> GetWorldVertices() const;
-	bool IsHaveParent() const { return parent_ ? true : false; }
 
 	float GetWidth() const { return width; }
 	float GetHeight() const { return height; }
@@ -68,18 +62,15 @@ public:
 
 
 #ifdef _DEBUGMODE
-	void Debug();
+	/// <summary>判定ボリュームの枠を描く</summary>
+	/// <remarks>GetWorldVertices 経由なので、描かれる枠と実際の判定は必ず一致する</remarks>
 	void DrawCollider();
 #endif // _DEBUG
 
 
 private:
 
-
-
-private:
-
-	CollisionState state;
+	CollisionState state = CollisionState::None;
 
 	std::array<std::function<void(const ColliderInfo&)>, 3> onCollisionEvents_;
 

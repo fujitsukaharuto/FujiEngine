@@ -42,32 +42,17 @@ void AABBCollider::DebugGUI() {
 }
 
 void AABBCollider::OnCollision(const ColliderInfo& other) {
+	// onCollisionEvents_ は Enter/Stay/Exit の3つ分しかないので None は必ず弾く
+	if (state == CollisionState::None) {
+		return;
+	}
+
 	if (onCollisionEvents_[static_cast<int>(state)]) {
 		onCollisionEvents_[static_cast<int>(state)](other);
-		if (state == CollisionState::CollisionExit) {
-			state = CollisionState::None;
-		}
 	}
-}
-
-
-void AABBCollider::OnCollisionEnter(const ColliderInfo& other) {
-	if (onCollisionEvents_[static_cast<int>(CollisionState::CollisionEnter)]) {
-		onCollisionEvents_[static_cast<int>(CollisionState::CollisionEnter)](other);
+	if (state == CollisionState::CollisionExit) {
+		state = CollisionState::None;
 	}
-}
-
-void AABBCollider::OnCollisionStay(const ColliderInfo& other) {
-	if (onCollisionEvents_[static_cast<int>(CollisionState::CollisionStay)]) {
-		onCollisionEvents_[static_cast<int>(CollisionState::CollisionStay)](other);
-	}
-}
-
-void AABBCollider::OnCollisionExit(const ColliderInfo& other) {
-	if (onCollisionEvents_[static_cast<int>(CollisionState::CollisionExit)]) {
-		onCollisionEvents_[static_cast<int>(CollisionState::CollisionExit)](other);
-	}
-	state = CollisionState::None;
 }
 
 void AABBCollider::SaveCollider(const std::string& filePath) {
@@ -120,10 +105,8 @@ std::array<Vector3, 8> AABBCollider::GetWorldVertices() const {
 
 	std::array<Vector3, 8> worldVertices;
 
-	Matrix4x4 worldMatrix = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, info.pos + offset_);
-	if (parent_) {
-		worldMatrix = Multiply(worldMatrix, Math::RemoveScale(parent_->GetNoneScaleWorldMat()));
-	}
+	// 判定と同じワールド行列を使う(別経路で組み立てると枠と判定がズレる)
+	const Matrix4x4 worldMatrix = GetWorldMatrix();
 
 	// 各頂点をワールド空間に変換
 	for (int i = 0; i < 8; ++i) {
@@ -134,17 +117,6 @@ std::array<Vector3, 8> AABBCollider::GetWorldVertices() const {
 }
 
 #ifdef _DEBUGMODE
-void AABBCollider::Debug() {
-	std::string uniqueName = "AABBCollider##" + std::to_string(reinterpret_cast<uintptr_t>(this));
-	ImGui::Begin(uniqueName.c_str());
-	ImGui::DragFloat3("pos", &info.pos.x, 0.01f);
-	ImGui::DragFloat("width", &width, 0.01f);
-	ImGui::DragFloat("height", &height, 0.01f);
-	ImGui::DragFloat("depth", &depth, 0.01f);
-	ImGui::Checkbox("isCollision", &isCollisionCheck_);
-	ImGui::End();
-}
-
 void AABBCollider::DrawCollider() {
 
 	std::array<Vector3, 8> v = GetWorldVertices();

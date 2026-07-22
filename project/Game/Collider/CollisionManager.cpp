@@ -15,65 +15,61 @@ void CollisionManager::CheckCollisionPair(BaseCollider* A, BaseCollider* B) {
 	AABBCollider* aabbA = dynamic_cast<AABBCollider*>(A);
 	AABBCollider* aabbB = dynamic_cast<AABBCollider*>(B);
 
-	if (aabbA && aabbB) {
-		bool isColliding = checkAABBCollision(aabbA, aabbB);
-
-		auto& hitListA = aabbA->hitList_;
-		auto& hitListB = aabbB->hitList_;
-
-		if (isColliding) {
-
-			if (!aabbA->GetIsCollisonCheck() || !aabbB->GetIsCollisonCheck()) {
-				if (std::find(hitListA.begin(), hitListA.end(), B) == hitListA.end()) {
-				} else {
-					hitListA.remove(B);
-					aabbA->SetState(CollisionState::CollisionExit);
-					aabbA->OnCollision({ B->GetTag(), B->GetPos(),B->GetWorldPos(),B->GetOwner() });
-				}
-
-				if (std::find(hitListB.begin(), hitListB.end(), A) == hitListB.end()) {
-				} else {
-					hitListB.remove(A);
-					aabbB->SetState(CollisionState::CollisionExit);
-					aabbB->OnCollision({ A->GetTag(), A->GetPos(),A->GetWorldPos(),A->GetOwner() });
-				}
-				return;
-			}
-
-			// AとBが初めて衝突した場合
-			if (std::find(hitListA.begin(), hitListA.end(), B) == hitListA.end()) {
-				hitListA.push_back(B);
-				aabbA->SetState(CollisionState::CollisionEnter);
-				aabbA->OnCollision({ B->GetTag(), B->GetPos(),B->GetWorldPos(),B->GetOwner() });
-			} else {
-				aabbA->SetState(CollisionState::CollisionStay);
-				aabbA->OnCollision({ B->GetTag(), B->GetPos(),B->GetWorldPos(),B->GetOwner() });
-			}
-
-			if (std::find(hitListB.begin(), hitListB.end(), A) == hitListB.end()) {
-				hitListB.push_back(A);
-				aabbB->SetState(CollisionState::CollisionEnter);
-				aabbB->OnCollision({ A->GetTag(), A->GetPos(),A->GetWorldPos(),A->GetOwner() });
-			} else {
-				aabbB->SetState(CollisionState::CollisionStay);
-				aabbB->OnCollision({ A->GetTag(), A->GetPos(),A->GetWorldPos(),A->GetOwner() });
-			}
-		} else {
-			// 衝突が終了した場合
-			if (std::find(hitListA.begin(), hitListA.end(), B) != hitListA.end()) {
-				hitListA.remove(B);
-				aabbA->SetState(CollisionState::CollisionExit);
-				aabbA->OnCollision({ B->GetTag(), B->GetPos(),B->GetWorldPos(),B->GetOwner() });
-			}
-			if (std::find(hitListB.begin(), hitListB.end(), A) != hitListB.end()) {
-				hitListB.remove(A);
-				aabbB->SetState(CollisionState::CollisionExit);
-				aabbB->OnCollision({ A->GetTag(), A->GetPos(),A->GetWorldPos(),A->GetOwner() });
-			}
-		}
-
+	if (!aabbA || !aabbB) {
+		return;
 	}
 
+	// 判定が無効なペアは、重なっていても「離れている」として扱う(既に衝突中ならExitになる)
+	const bool isColliding =
+		aabbA->GetIsCollisonCheck() &&
+		aabbB->GetIsCollisonCheck() &&
+		checkAABBCollision(aabbA, aabbB);
+
+	NotifyCollision(aabbA, aabbB, isColliding);
+	NotifyCollision(aabbB, aabbA, isColliding);
+}
+
+void CollisionManager::NotifyCollision(AABBCollider* self, AABBCollider* other, bool isColliding) {
+
+	const bool wasHitting = self->IsHitting(other);
+
+	// 大半のペアは「触れていないし触れていなかった」なので、情報を作る前に抜ける
+	if (!isColliding && !wasHitting) {
+		return;
+	}
+
+	const Vector3 otherPos = other->GetPos();
+	const ColliderInfo otherInfo{ other->GetTag(), otherPos, otherPos, other->GetOwner() };
+
+	if (isColliding) {
+		if (wasHitting) {
+			self->SetState(CollisionState::CollisionStay);
+		} else {
+			self->AddHit(other, otherInfo);
+			self->SetState(CollisionState::CollisionEnter);
+		}
+	} else {
+		self->RemoveHit(other);
+		self->SetState(CollisionState::CollisionExit);
+	}
+
+	self->OnCollision(otherInfo);
+}
+
+void CollisionManager::NotifyLostColliders() {
+
+	aliveColliders_.clear();
+	aliveColliders_.insert(colliders_.begin(), colliders_.end());
+
+	for (AABBCollider* aabb : aabbColliders_) {
+		// 相手は既に破棄されている可能性があるので、衝突開始時に控えた情報で通知する
+		for (const ColliderInfo& lost : aabb->RemoveHitsIfNot(
+			[this](const BaseCollider* other) { return aliveColliders_.contains(other); })) {
+
+			aabb->SetState(CollisionState::CollisionExit);
+			aabb->OnCollision(lost);
+		}
+	}
 }
 
 void CollisionManager::CheckAllCollision() {
@@ -82,33 +78,19 @@ void CollisionManager::CheckAllCollision() {
 		return; // colliders_が空なら処理を終了
 	}
 
-	for (auto& collider : colliders_) {
-		AABBCollider* aabb = dynamic_cast<AABBCollider*>(collider);
-		if (aabb) {
-			auto& hitList = aabb->hitList_;
-			hitList.remove_if([this, aabb](BaseCollider* other) {
-				// コライダーリストに存在しない場合
-				if (std::find(colliders_.begin(), colliders_.end(), other) == colliders_.end()) {
-					// 衝突終了状態を設定
-					aabb->SetState(CollisionState::CollisionExit);
-					return true; // リストから削除
-				}
-				return false; // 残す
-				});
+	// 型の絞り込みはペアループの外で1回だけ行う(内側でやると dynamic_cast が O(n^2) 回走る)
+	aabbColliders_.clear();
+	for (BaseCollider* collider : colliders_) {
+		if (AABBCollider* aabb = dynamic_cast<AABBCollider*>(collider)) {
+			aabbColliders_.push_back(aabb);
 		}
 	}
 
-	std::list<BaseCollider*>::iterator itrA = colliders_.begin();
-	for (; itrA != colliders_.end(); ++itrA) {
-		BaseCollider* colliderA = *itrA;
+	NotifyLostColliders();
 
-		std::list<BaseCollider*>::iterator itrB = itrA;
-		itrB++;
-
-		for (; itrB != colliders_.end(); ++itrB) {
-			BaseCollider* colliderB = *itrB;
-
-			CheckCollisionPair(colliderA, colliderB);
+	for (size_t i = 0; i < aabbColliders_.size(); ++i) {
+		for (size_t j = i + 1; j < aabbColliders_.size(); ++j) {
+			CheckCollisionPair(aabbColliders_[i], aabbColliders_[j]);
 		}
 	}
 }
@@ -116,8 +98,11 @@ void CollisionManager::CheckAllCollision() {
 OBB CollisionManager::ConvertAABBToOBB(const AABBCollider* aabb) {
 	OBB obb;
 
+	// キャッシュ済みの worldPos は InfoUpdate() を呼び忘れると古いままなので、その場で作り直す
+	const Matrix4x4 world = aabb->GetWorldMatrix();
+
 	// ワールド中心座標
-	obb.center = aabb->GetInfo().worldPos;
+	obb.center = { world.m[3][0],world.m[3][1],world.m[3][2] };
 
 	// ハーフサイズ（AABBのサイズをOBB構造に）
 	obb.size = {
@@ -126,55 +111,54 @@ OBB CollisionManager::ConvertAABBToOBB(const AABBCollider* aabb) {
 		aabb->GetDepth() / 2.0f
 	};
 
-	// 回転（親が持つ回転をそのまま渡す）
-	obb.rotate = aabb->IsHaveParent() ? aabb->GetParentRotate() : Vector3(0.0f, 0.0f, 0.0f);
+	// 回転（ワールド行列の基底をそのまま軸にする）
+	obb.axes = {
+		Vector3(world.m[0][0],world.m[0][1],world.m[0][2]).Normalize(),
+		Vector3(world.m[1][0],world.m[1][1],world.m[1][2]).Normalize(),
+		Vector3(world.m[2][0],world.m[2][1],world.m[2][2]).Normalize(),
+	};
 
 	return obb;
 }
 
 bool CollisionManager::checkAABBCollision(AABBCollider* A, AABBCollider* B) {
 
-	OBB obbA = ConvertAABBToOBB(A);
-	OBB obbB = ConvertAABBToOBB(B);
+	const OBB obbA = ConvertAABBToOBB(A);
+	const OBB obbB = ConvertAABBToOBB(B);
 
 	auto CalculateProjection =
-		[](const OBB& obb, const Vector3& axis, const Vector3* axes) -> float {
-		return std::abs(obb.size.x * Vector3::Dot(axes[0], axis)) +
-			std::abs(obb.size.y * Vector3::Dot(axes[1], axis)) +
-			std::abs(obb.size.z * Vector3::Dot(axes[2], axis));
+		[](const OBB& obb, const Vector3& axis) -> float {
+		return std::abs(obb.size.x * Vector3::Dot(obb.axes[0], axis)) +
+			std::abs(obb.size.y * Vector3::Dot(obb.axes[1], axis)) +
+			std::abs(obb.size.z * Vector3::Dot(obb.axes[2], axis));
 		};
 
-	auto GetOBBAxes = [](const OBB& obb) -> std::array<Vector3, 3> {
-		Matrix4x4 rotationMatrix = MakeRotateXYZMatrix(obb.rotate);
-		return {
-			TransformDirection(Vector3(1.0f, 0.0f, 0.0f), rotationMatrix),
-			TransformDirection(Vector3(0.0f, 1.0f, 0.0f), rotationMatrix),
-			TransformDirection(Vector3(0.0f, 0.0f, 1.0f), rotationMatrix)
-		};
-		};
-
-	auto obbAxesA = GetOBBAxes(obbA);
-	auto obbAxesB = GetOBBAxes(obbB);
-
-	std::vector<Vector3> axes;
-	axes.insert(axes.end(), obbAxesA.begin(), obbAxesA.end());
-	axes.insert(axes.end(), obbAxesB.begin(), obbAxesB.end());
-	for (const auto& axisA : obbAxesA) {
-		for (const auto& axisB : obbAxesB) {
-			axes.push_back(Vector3::Cross(axisA, axisB));
+	// 分離軸は 3 + 3 + 3x3 の15本で固定なので、毎フレームのヒープ確保は不要
+	std::array<Vector3, 15> axes;
+	size_t axisCount = 0;
+	for (const auto& axisA : obbA.axes) {
+		axes[axisCount++] = axisA;
+	}
+	for (const auto& axisB : obbB.axes) {
+		axes[axisCount++] = axisB;
+	}
+	for (const auto& axisA : obbA.axes) {
+		for (const auto& axisB : obbB.axes) {
+			axes[axisCount++] = Vector3::Cross(axisA, axisB);
 		}
 	}
 
-	for (const auto& axis : axes) {
+	for (size_t i = 0; i < axisCount; ++i) {
+		const Vector3& axis = axes[i];
 		if (axis.Length() < std::numeric_limits<float>::epsilon()) {
 			continue;
 		}
 
-		Vector3 normalizedAxis = axis.Normalize();
+		const Vector3 normalizedAxis = axis.Normalize();
 
-		float obbAProjection = CalculateProjection(obbA, normalizedAxis, obbAxesA.data());
-		float obbBProjection = CalculateProjection(obbB, normalizedAxis, obbAxesB.data());
-		float distance = std::abs(Vector3::Dot(obbA.center - obbB.center, normalizedAxis));
+		const float obbAProjection = CalculateProjection(obbA, normalizedAxis);
+		const float obbBProjection = CalculateProjection(obbB, normalizedAxis);
+		const float distance = std::abs(Vector3::Dot(obbA.center - obbB.center, normalizedAxis));
 
 		if (distance > obbAProjection + obbBProjection) {
 			return false;
