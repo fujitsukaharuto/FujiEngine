@@ -41,6 +41,9 @@ void OriginGameObject::Draw(bool is) {
 	if (model_) {
 		model_->Draw(is);
 	}
+	for (auto& r : renderers_) {
+		r->Draw(is);
+	}
 }
 
 void OriginGameObject::DebugGUI() {
@@ -126,5 +129,18 @@ void OriginGameObject::SetAnimeModel(const std::string& name) {
 
 void OriginGameObject::SetModelDataJson(const nlohmann::json& jsonData) {
 	*modelDataJson_ = jsonData;
+}
+
+Graphics::Object3d* OriginGameObject::AddRenderer() {
+	auto obj = std::make_unique<Object3d>();
+	Object3d* handle = obj.get();
+	renderers_.push_back(std::move(obj));
+	return handle;
+}
+
+Graphics::Object3d* OriginGameObject::AddRenderer(const std::string& name) {
+	Object3d* handle = AddRenderer();
+	handle->Create(name);
+	return handle;
 }
 

@@ -49,10 +49,10 @@ private:
 
 private:
 
-	std::unique_ptr<Graphics::Object3d> underRing_;
-	std::unique_ptr<Graphics::Object3d> wave1_;
-	std::unique_ptr<Graphics::Object3d> wave2_;
-	std::unique_ptr<Graphics::Object3d> wave3_;
+	Graphics::Object3d* underRing_ = nullptr;
+	Graphics::Object3d* wave1_ = nullptr;
+	Graphics::Object3d* wave2_ = nullptr;
+	Graphics::Object3d* wave3_ = nullptr;
 
 	bool isLive_ = false;
 	float lifeTime_ = 300.0f;

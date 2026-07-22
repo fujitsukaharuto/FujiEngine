@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <vector>
 #include <cassert>
 // json は宣言とポインタにしか使わないので前方宣言で足りる
 #include <json_fwd.hpp>
@@ -76,10 +77,19 @@ protected:
 	/// <summary>animeModel_ を必要になった時点で生成する</summary>
 	Graphics::AnimationModel* EnsureAnimeModel();
 
+	/// <summary>子ビジュアル(Object3d)を空で生成・登録し、設定用ハンドルを返す</summary>
+	/// <remarks>Create/CreateRing 等の生成は呼び出し側で行う。所有権は renderers_ が持つ</remarks>
+	Graphics::Object3d* AddRenderer();
+	/// <summary>子ビジュアル(Object3d)を name で生成(Create済)・登録し、ハンドルを返す</summary>
+	Graphics::Object3d* AddRenderer(const std::string& name);
+
 protected:
 
 	std::unique_ptr<Graphics::Object3d> model_;
 	std::unique_ptr<Graphics::AnimationModel> animeModel_;
+
+	/// <summary>このオブジェクトにぶら下がる追加ビジュアル。生成/描画を一元管理する(=MeshRenderer相当)</summary>
+	std::vector<std::unique_ptr<Graphics::RenderObject>> renderers_;
 
 	/// <summary>Jsonから生成する際の元データ。json.hpp をヘッダから隔離するため実体は持たない</summary>
 	std::unique_ptr<nlohmann::json> modelDataJson_;
