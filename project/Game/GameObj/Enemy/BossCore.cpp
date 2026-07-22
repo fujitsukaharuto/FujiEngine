@@ -29,7 +29,7 @@ void BossCore::Initialize() {
 
 	InitParameter();
 
-	model_->SetParent(&pBoss_->GetAnimeModel()->GetTransform());
+	model_->SetParent(&pBoss_->GetTrans());
 	model_->SetNoneScaleParent(true);
 
 }

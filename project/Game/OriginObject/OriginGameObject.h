@@ -6,6 +6,7 @@
 
 #include "Engine/Model/Object3d.h"
 #include "Engine/Model/AnimationData/AnimationModel.h"
+#include "Engine/Model/Base/RenderObject.h"
 #include "Engine/DX/FPSKeeper.h"
 #include "Engine/Camera/CameraManager.h"
 #include "Engine/Input/Input.h"
@@ -52,11 +53,20 @@ public:
 	Graphics::Object3d* GetModel() { return model_.get(); }
 	Graphics::AnimationModel* GetAnimeModel() { return animeModel_.get(); }
 
-	// 生成していない側のTransformを求めるのは呼び出し側の誤り。assertで気づけるようにする
-	Math::Trans& GetTrans() { assert(model_ && "このオブジェクトはObject3dを生成していない"); return model_->GetTransform(); }
-	Math::Trans& GetAnimeTrans() { assert(animeModel_ && "このオブジェクトはAnimationModelを生成していない"); return animeModel_->GetTransform(); }
-	Math::Vector3 GetWorldPos()const { assert(model_ && "このオブジェクトはObject3dを生成していない"); return model_->GetWorldPos(); }
-	Math::Vector3 GetAnimeWorldPos()const { assert(animeModel_ && "このオブジェクトはAnimationModelを生成していない"); return animeModel_->GetWorldPos(); }
+	/// <summary>生成済みの描画オブジェクトを基底(RenderObject)として返す</summary>
+	/// <remarks>model_ と animeModel_ は同時に生成しない設計。生成済みの方を返し、未生成なら nullptr</remarks>
+	Graphics::RenderObject* GetRenderObject() {
+		if (model_) { return model_.get(); }
+		return animeModel_.get();
+	}
+	const Graphics::RenderObject* GetRenderObject() const {
+		if (model_) { return model_.get(); }
+		return animeModel_.get();
+	}
+
+	// Object3d / AnimationModel のどちらで生成していても Transform・ワールド座標を取れる
+	Math::Trans& GetTrans() { Graphics::RenderObject* o = GetRenderObject(); assert(o && "このオブジェクトは描画モデルを生成していない"); return o->GetTransform(); }
+	Math::Vector3 GetWorldPos()const { const Graphics::RenderObject* o = GetRenderObject(); assert(o && "このオブジェクトは描画モデルを生成していない"); return o->GetWorldPos(); }
 
 protected:
 

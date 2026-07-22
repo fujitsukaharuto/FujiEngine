@@ -379,14 +379,14 @@ void Beam::SetIsLive(bool is) {
 }
 
 void Beam::SetBossParent(Boss* boss) {
-	model_->SetParent(&boss->GetAnimeModel()->GetTransform());
+	model_->SetParent(&boss->GetTrans());
 	model_->SetNoneScaleParent(true);
-	particleParent_->SetParent(&boss->GetAnimeModel()->GetTransform());
+	particleParent_->SetParent(&boss->GetTrans());
 	particleParent_->SetNoneScaleParent(true);
 	for (auto& beam : beams_) {
-		beam.model->SetParent(&boss->GetAnimeModel()->GetTransform());
+		beam.model->SetParent(&boss->GetTrans());
 		beam.model->SetNoneScaleParent(true);
-		beam.particleParent->SetParent(&boss->GetAnimeModel()->GetTransform());
+		beam.particleParent->SetParent(&boss->GetTrans());
 		beam.particleParent->SetNoneScaleParent(true);
 	}
 }
