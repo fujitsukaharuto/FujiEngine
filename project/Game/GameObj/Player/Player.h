@@ -174,8 +174,8 @@ private:
 
 	/// <summary>追加ビジュアル。所有権は基底の renderers_ が持つ</summary>
 	Graphics::Object3d* shadow_ = nullptr;
-	/// <remarks>描画されない Transform アンカー(エミッタの親)なので renderers_ には入れない</remarks>
-	std::unique_ptr<Graphics::Object3d> strongStatePos_;
+	/// <remarks>描画されない Transform アンカー(エミッタの親)。所有権は基底 anchors_ が持つ</remarks>
+	Math::Trans* strongStatePos_ = nullptr;
 	/// <summary>所有権は基底の colliders_ が持つ</summary>
 	AABBCollider* collider_ = nullptr;
 

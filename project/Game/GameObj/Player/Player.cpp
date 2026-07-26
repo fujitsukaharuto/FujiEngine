@@ -35,9 +35,7 @@ void Player::Initialize() {
 	shadow_->GetTransform().translate.y = 0.15f;
 	shadow_->GetTransform().scale.y = 0.1f;
 
-	strongStatePos_ = std::make_unique<Object3d>();
-	strongStatePos_->Create("Sphere");
-	strongStatePos_->SetColor(Colors::Transparent);
+	strongStatePos_ = AddAnchor();
 
 	InitParameter();
 
@@ -152,8 +150,8 @@ void Player::Update() {
 	AvoidPostEffect();
 	shadow_->GetTransform().translate = model_->GetTransform().translate;
 	shadow_->GetTransform().translate.y = 0.15f;
-	strongStatePos_->GetTransform().translate = model_->GetTransform().translate;
-	strongStatePos_->GetTransform().translate.y -= 0.65f;
+	strongStatePos_->translate = model_->GetTransform().translate;
+	strongStatePos_->translate.y -= 0.65f;
 	collider_->SetPos(model_->GetWorldPos());
 	collider_->InfoUpdate();
 }
@@ -733,7 +731,7 @@ void Player::ParticleEmitterSetting() {
 
 	ParticleManager::LoadParentGroup(strengthStateEmitter1_, "playerStrongState1");
 	ParticleManager::Load(strengthStateEmitter2_, "playerStrongState2");
-	strengthStateEmitter1_->SetParent(&strongStatePos_->GetTransform());
+	strengthStateEmitter1_->SetParent(strongStatePos_);
 	strengthStateEmitter2_.SetParent(&model_->GetTransform());
 
 }
