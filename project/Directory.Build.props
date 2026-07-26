@@ -1,0 +1,13 @@
+<Project>
+  <!--
+    FujiEngine 本体にだけ NOMINMAX を定義する。
+    Windows.h の min/max マクロが std::min/std::max を壊すのを、include 順に依存せず
+    コンパイル時定義で防ぐ(#define をヘッダに書く方式は windows.h の入口が多数=不確実なため不採用)。
+    externals(DirectXTex/imgui)には波及させないよう MSBuildProjectName で限定する。
+  -->
+  <ItemDefinitionGroup Condition="'$(MSBuildProjectName)' == 'FujiEngine'">
+    <ClCompile>
+      <PreprocessorDefinitions>NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+</Project>
