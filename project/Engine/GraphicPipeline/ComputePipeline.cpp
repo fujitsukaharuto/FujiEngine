@@ -1,4 +1,4 @@
-#include "EmitterSurfaceParticleCSPipe.h"
+#include "ComputePipeline.h"
 #include "Engine/DX/DXCom.h"
 #include "Engine/DX/DXCommand.h"
 #include "Engine/DX/DXCompile.h"
@@ -9,11 +9,11 @@ using namespace Graphics;
 using namespace DXC;
 
 
-EmitterSurfaceParticleCSPipe::~EmitterSurfaceParticleCSPipe() {
+ComputePipeline::~ComputePipeline() {
 }
 
-void EmitterSurfaceParticleCSPipe::CreateRootSignature(ID3D12Device* device) {
-	auto csData = dxcommon_->GetDXCompile()->CompileShaderWithReflection(kDirectoryPath_ + L"CS/Engine/EmitSurfaceParticle.CS.hlsl", L"cs_6_0");
+void ComputePipeline::CreateRootSignature(ID3D12Device* device) {
+	auto csData = dxcommon_->GetDXCompile()->CompileShaderWithReflection(kDirectoryPath_ + csPath_, L"cs_6_0");
 
 	vs = csData.blob;
 	vsReflection_ = csData.reflection;
@@ -23,7 +23,7 @@ void EmitterSurfaceParticleCSPipe::CreateRootSignature(ID3D12Device* device) {
 	assert(rootSignature_ != nullptr);
 }
 
-void EmitterSurfaceParticleCSPipe::CreatePSO(ID3D12Device* device) {
+void ComputePipeline::CreatePSO(ID3D12Device* device) {
 	HRESULT hr;
 
 	assert(vs != nullptr);

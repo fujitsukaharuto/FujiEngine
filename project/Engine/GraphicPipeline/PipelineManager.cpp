@@ -16,30 +16,10 @@
 #include "Engine/GraphicPipeline/ThunderPipe.h"
 #include "Engine/GraphicPipeline/CRTPipe.h"
 #include "Engine/GraphicPipeline/BaseGridPipe.h"
-#include "Engine/GraphicPipeline/CSPipe/GrayCSPipe.h"
-#include "Engine/GraphicPipeline/CSPipe/GaussCSPipe.h"
-#include "Engine/GraphicPipeline/CSPipe/BoxFilterCSPipe.h"
-#include "Engine/GraphicPipeline/CSPipe/RadialBlurCSPipe.h"
-#include "Engine/GraphicPipeline/CSPipe/VignetteCSPipe.h"
-#include "Engine/GraphicPipeline/CSPipe/CRTCSPipe.h"
-#include "Engine/GraphicPipeline/CSPipe/RetroTVCSPipe.h"
+#include "Engine/GraphicPipeline/ComputePipeline.h"
 #include "Engine/GraphicPipeline/CSPipe/OutlineCSPipe.h"
-#include "Engine/GraphicPipeline/CSPipe/LuminanceOutlineCSPipe.h"
-#include "Engine/GraphicPipeline/CSPipe/BloomCSPipe.h"
-#include "Engine/GraphicPipeline/CSPipe/RandomCSPipe.h"
-#include "Engine/GraphicPipeline/SkinningCSPipe.h"
-#include "Engine/GraphicPipeline/CSPipe/InitParticleCSPipe.h"
-#include "Engine/GraphicPipeline/CSPipe/EmitterParticleCSPipe.h"
-#include "Engine/GraphicPipeline/CSPipe/EmitterTexParticleCSPipe.h"
-#include "Engine/GraphicPipeline/CSPipe/EmitterSurfaceParticleCSPipe.h"
-#include "Engine/GraphicPipeline/CSPipe/UpdateParticleCSPipe.h"
-#include "Engine/GraphicPipeline/CSPipe/UpdateParticleSplatCSPipe.h"
-#include "Engine/GraphicPipeline/CSPipe/ClearParticleColorCSPipe.h"
 #include "Engine/GraphicPipeline/CSPipe/TrailEmitCSPipe.h"
-#include "Engine/GraphicPipeline/CSPipe/InitArgsCSPipe.h"
-#include "Engine/GraphicPipeline/CSPipe/AliveCountCSPipe.h"
-#include "Engine/GraphicPipeline/CSPipe/SplatClearCSPipe.h"
-#include "Engine/GraphicPipeline/CSPipe/SplatParticleCSPipe.h"
+#include "Engine/GraphicPipeline/SkinningCSPipe.h"
 #include "Engine/GraphicPipeline/SplatCompositePipe.h"
 
 using namespace Graphics;
@@ -108,33 +88,40 @@ void PipelineManager::CreatePipeline() {
 	CreatePipe<SkyboxPipe>(Pipe::Skybox);
 	CreatePipe<BaseGridPipe>(Pipe::BaseGrid);
 
-	CreatePipe<GrayCSPipe>(Pipe::GrayCS);
-	CreatePipe<GaussCSPipe>(Pipe::GaussCS);
-	CreatePipe<BoxFilterCSPipe>(Pipe::BoxFilterCS);
-	CreatePipe<RadialBlurCSPipe>(Pipe::RadialCS);
-	CreatePipe<VignetteCSPipe>(Pipe::VignetteCS);
-	CreatePipe<CRTCSPipe>(Pipe::CRTCS);
-	CreatePipe<RetroTVCSPipe>(Pipe::RetroTVCS);
+	CreateComputePipe(Pipe::GrayCS, L"CS/Grayscale.CS.hlsl");
+	CreateComputePipe(Pipe::GaussCS, L"CS/Gaussian.CS.hlsl");
+	CreateComputePipe(Pipe::BoxFilterCS, L"CS/BoxFilter.CS.hlsl");
+	CreateComputePipe(Pipe::RadialCS, L"CS/RadialBlur.CS.hlsl");
+	CreateComputePipe(Pipe::VignetteCS, L"CS/Vignette.CS.hlsl");
+	CreateComputePipe(Pipe::CRTCS, L"CS/CRTEffect.CS.hlsl");
+	CreateComputePipe(Pipe::RetroTVCS, L"CS/RetroTV.CS.hlsl");
 	CreatePipe<OutlineCSPipe>(Pipe::OutlineCS);
-	CreatePipe<LuminanceOutlineCSPipe>(Pipe::LuminanceOutlineCS);
-	CreatePipe<BloomCSPipe>(Pipe::BloomCS);
-	CreatePipe<RandomCSPipe>(Pipe::RandomCS);
+	CreateComputePipe(Pipe::LuminanceOutlineCS, L"CS/LuminanceBasedOutline.CS.hlsl");
+	CreateComputePipe(Pipe::BloomCS, L"CS/Bloom.CS.hlsl");
+	CreateComputePipe(Pipe::RandomCS, L"CS/Random.CS.hlsl");
 	CreatePipe<SkinningCSPipe>(Pipe::SkinningCS);
 
-	CreatePipe<InitParticleCSPipe>(Pipe::InitParticleCS);
-	CreatePipe<EmitterParticleCSPipe>(Pipe::EmitParticleCS);
-	CreatePipe<EmitterTexParticleCSPipe>(Pipe::EmitTexParticleCS);
-	CreatePipe<EmitterSurfaceParticleCSPipe>(Pipe::EmitSurfaceParticleCS);
-	CreatePipe<UpdateParticleCSPipe>(Pipe::UpdateParticleCS);
-	CreatePipe<UpdateParticleSplatCSPipe>(Pipe::UpdateParticleSplatCS);
-	CreatePipe<ClearParticleColorCSPipe>(Pipe::ClearParticleColorCS);
+	CreateComputePipe(Pipe::InitParticleCS, L"CS/Engine/InitParticle.CS.hlsl");
+	CreateComputePipe(Pipe::EmitParticleCS, L"CS/Engine/EmitParticle.CS.hlsl");
+	CreateComputePipe(Pipe::EmitTexParticleCS, L"CS/Engine/EmitTexParticle.CS.hlsl");
+	CreateComputePipe(Pipe::EmitSurfaceParticleCS, L"CS/Engine/EmitSurfaceParticle.CS.hlsl");
+	CreateComputePipe(Pipe::UpdateParticleCS, L"CS/Engine/UpdateParticle.CS.hlsl");
+	CreateComputePipe(Pipe::UpdateParticleSplatCS, L"CS/Engine/UpdateParticleSplat.CS.hlsl");
+	CreateComputePipe(Pipe::ClearParticleColorCS, L"CS/Engine/ClearParticleColor.CS.hlsl");
 	CreatePipe<TrailEmitCSPipe>(Pipe::TrailEmitCS);
-	CreatePipe<InitArgsCSPipe>(Pipe::InitArgsCS);
-	CreatePipe<AliveCountCSPipe>(Pipe::AliveCountCS);
+	CreateComputePipe(Pipe::InitArgsCS, L"CS/Engine/InitArgs.CS.hlsl");
+	CreateComputePipe(Pipe::AliveCountCS, L"CS/Engine/AliveParticleCount.CS.hlsl");
 
-	CreatePipe<SplatClearCSPipe>(Pipe::SplatClearCS);
-	CreatePipe<SplatParticleCSPipe>(Pipe::SplatParticleCS);
+	CreateComputePipe(Pipe::SplatClearCS, L"CS/Engine/SplatClear.CS.hlsl");
+	CreateComputePipe(Pipe::SplatParticleCS, L"CS/Engine/SplatParticle.CS.hlsl");
 	CreatePipe<SplatCompositePipe>(Pipe::SplatComposite);
+}
+
+void PipelineManager::CreateComputePipe(Pipe type, const std::wstring& csPath) {
+	auto pipe = std::make_unique<ComputePipeline>();
+	pipe->SetShaderPath(csPath);
+	pipe->Initialize(dxcommon_);
+	pipelines_[static_cast<size_t>(type)] = std::move(pipe);
 }
 
 void PipelineManager::SetPipeline(Pipe type) {

@@ -20,6 +20,9 @@
     <ClCompile Include="Engine\GraphicPipeline\BasePipeline.cpp">
       <Filter>Engine\GraphicPipeline</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\GraphicPipeline\ComputePipeline.cpp">
+      <Filter>Engine\GraphicPipeline</Filter>
+    </ClCompile>
     <ClCompile Include="Engine\GraphicPipeline\NonePipeline.cpp">
       <Filter>Engine\GraphicPipeline</Filter>
     </ClCompile>
@@ -251,62 +254,14 @@
     <ClCompile Include="Engine\GraphicPipeline\CSPipe\OutlineCSPipe.cpp">
       <Filter>Engine\GraphicPipeline\CSPipe</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\GraphicPipeline\CSPipe\GaussCSPipe.cpp">
-      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\GraphicPipeline\CSPipe\CRTCSPipe.cpp">
-      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\GraphicPipeline\CSPipe\GrayCSPipe.cpp">
-      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
-    </ClCompile>
     <ClCompile Include="Game\GameObj\Player\Behavior\PlayerAvoid.cpp">
       <Filter>Game\GameObj\Player\Behavior</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\GraphicPipeline\CSPipe\BloomCSPipe.cpp">
-      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\GraphicPipeline\CSPipe\BoxFilterCSPipe.cpp">
-      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\GraphicPipeline\CSPipe\RandomCSPipe.cpp">
-      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\GraphicPipeline\CSPipe\RadialBlurCSPipe.cpp">
-      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\GraphicPipeline\CSPipe\LuminanceOutlineCSPipe.cpp">
-      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\GraphicPipeline\CSPipe\RetroTVCSPipe.cpp">
-      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
     </ClCompile>
     <ClCompile Include="Game\GameObj\Enemy\Behavior\BossAreaAttack.cpp">
       <Filter>Game\GameObj\Enemy\Behavior</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\GraphicPipeline\CSPipe\InitParticleCSPipe.cpp">
-      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\GraphicPipeline\ParticleCSPipe.cpp">
       <Filter>Engine\GraphicPipeline</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\GraphicPipeline\CSPipe\EmitterParticleCSPipe.cpp">
-      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\GraphicPipeline\CSPipe\UpdateParticleCSPipe.cpp">
-      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\GraphicPipeline\CSPipe\UpdateParticleSplatCSPipe.cpp">
-      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\GraphicPipeline\CSPipe\ClearParticleColorCSPipe.cpp">
-      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\GraphicPipeline\CSPipe\VignetteCSPipe.cpp">
-      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\GraphicPipeline\CSPipe\EmitterTexParticleCSPipe.cpp">
-      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
     </ClCompile>
     <ClCompile Include="Game\GameObj\Enemy\BossItem\Arrow.cpp">
       <Filter>Game\GameObj\Enemy\BossItem</Filter>
@@ -316,9 +271,6 @@
     </ClCompile>
     <ClCompile Include="Game\GameObj\Enemy\Behavior\BossRodFall.cpp">
       <Filter>Game\GameObj\Enemy\Behavior</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\GraphicPipeline\CSPipe\EmitterSurfaceParticleCSPipe.cpp">
-      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
     </ClCompile>
     <ClCompile Include="Game\OriginObject\OriginGameObject.cpp">
       <Filter>Game\OriginObject</Filter>
@@ -346,18 +298,6 @@
     </ClCompile>
     <ClCompile Include="Game\GameObj\Enemy\Behavior\BossDushAttack.cpp">
       <Filter>Game\GameObj\Enemy\Behavior</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\GraphicPipeline\CSPipe\AliveCountCSPipe.cpp">
-      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\GraphicPipeline\CSPipe\InitArgsCSPipe.cpp">
-      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\GraphicPipeline\CSPipe\SplatClearCSPipe.cpp">
-      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\GraphicPipeline\CSPipe\SplatParticleCSPipe.cpp">
-      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
     </ClCompile>
     <ClCompile Include="Engine\GraphicPipeline\SplatCompositePipe.cpp">
       <Filter>Engine\GraphicPipeline</Filter>
@@ -452,6 +392,9 @@
       <Filter>Engine\DX</Filter>
     </ClInclude>
     <ClInclude Include="Engine\GraphicPipeline\BasePipeline.h">
+      <Filter>Engine\GraphicPipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\GraphicPipeline\ComputePipeline.h">
       <Filter>Engine\GraphicPipeline</Filter>
     </ClInclude>
     <ClInclude Include="Engine\GraphicPipeline\NonePipeline.h">
@@ -745,62 +688,14 @@
     <ClInclude Include="Engine\GraphicPipeline\CSPipe\OutlineCSPipe.h">
       <Filter>Engine\GraphicPipeline\CSPipe</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\CSPipe\GaussCSPipe.h">
-      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\CSPipe\CRTCSPipe.h">
-      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\CSPipe\GrayCSPipe.h">
-      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
-    </ClInclude>
     <ClInclude Include="Game\GameObj\Player\Behavior\PlayerAvoid.h">
       <Filter>Game\GameObj\Player\Behavior</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\CSPipe\BloomCSPipe.h">
-      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\CSPipe\BoxFilterCSPipe.h">
-      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\CSPipe\RandomCSPipe.h">
-      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\CSPipe\RadialBlurCSPipe.h">
-      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\CSPipe\LuminanceOutlineCSPipe.h">
-      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\CSPipe\RetroTVCSPipe.h">
-      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
     </ClInclude>
     <ClInclude Include="Game\GameObj\Enemy\Behavior\BossAreaAttack.h">
       <Filter>Game\GameObj\Enemy\Behavior</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\CSPipe\InitParticleCSPipe.h">
-      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\GraphicPipeline\ParticleCSPipe.h">
       <Filter>Engine\GraphicPipeline</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\CSPipe\EmitterParticleCSPipe.h">
-      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\CSPipe\UpdateParticleCSPipe.h">
-      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\CSPipe\UpdateParticleSplatCSPipe.h">
-      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\CSPipe\ClearParticleColorCSPipe.h">
-      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\CSPipe\VignetteCSPipe.h">
-      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\CSPipe\EmitterTexParticleCSPipe.h">
-      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
     </ClInclude>
     <ClInclude Include="Game\GameObj\Enemy\BossItem\Arrow.h">
       <Filter>Game\GameObj\Enemy\BossItem</Filter>
@@ -810,9 +705,6 @@
     </ClInclude>
     <ClInclude Include="Game\GameObj\Enemy\Behavior\BossRodFall.h">
       <Filter>Game\GameObj\Enemy\Behavior</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\CSPipe\EmitterSurfaceParticleCSPipe.h">
-      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
     </ClInclude>
     <ClInclude Include="Game\OriginObject\OriginGameObject.h">
       <Filter>Game\OriginObject</Filter>
@@ -849,18 +741,6 @@
     </ClInclude>
     <ClInclude Include="Engine\DX\FrameCount.h">
       <Filter>Engine\DX</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\CSPipe\AliveCountCSPipe.h">
-      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\CSPipe\InitArgsCSPipe.h">
-      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\CSPipe\SplatClearCSPipe.h">
-      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\CSPipe\SplatParticleCSPipe.h">
-      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
     </ClInclude>
     <ClInclude Include="Engine\GraphicPipeline\SplatCompositePipe.h">
       <Filter>Engine\GraphicPipeline</Filter>

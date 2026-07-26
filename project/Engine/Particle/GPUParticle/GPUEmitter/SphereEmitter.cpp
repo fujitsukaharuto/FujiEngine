@@ -230,7 +230,7 @@ void SphereEmitter::Save(const std::string& fileName) {
 	j["velType"] = data_.emitVeloType;
 	j["moveType"] = data_.isRandomMove;
 	j["isTrailEmit"] = data_.isTrailEmit;
-	j["isGravity"] = data_.isTrailEmit;
+	j["isGravity"] = data_.isGravity;
 
 	JsonSerializer::SerializeJsonData(j, (kDirectoryPath_ + fileName + ".json").c_str());
 }

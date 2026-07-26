@@ -253,11 +253,6 @@ namespace Graphics {
 		VignetteData* vignetteDataGPU_[DXC::kFrameCount_];
 		VignetteData vignetteData_;
 
-		Texture* baseTex_;
-		Texture* vNoiseTex_;
-		Texture* noiseTex_;
-		Texture* noiseDirTex_;
-
 		Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_ = nullptr;
 		D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
 		GrayscaleVertex* vertexData_ = nullptr;

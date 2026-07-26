@@ -218,13 +218,6 @@ void OffscreenManager::SettingTexture() {
 	}
 
 
-	baseTex_ = TextureManager::GetInstance()->LoadTexture("Gradient02.jpg");
-	vNoiseTex_ = TextureManager::GetInstance()->LoadTexture("T_Noise04.jpg");
-	noiseTex_ = TextureManager::GetInstance()->LoadTexture("T_Noise02-300x300.jpg");
-	noiseDirTex_ = TextureManager::GetInstance()->LoadTexture("Noise_Dir.jpg");
-	noiseDirTex_ = TextureManager::GetInstance()->LoadTexture("worley_Noise.jpg");
-	noiseDirTex_ = TextureManager::GetInstance()->LoadTexture("perlin_Noise.png");
-
 	InitializePostEffects();
 }
 

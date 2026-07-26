@@ -60,6 +60,9 @@ namespace Graphics {
 		template<class T>
 		void CreatePipe(Pipe type, const std::function<void(T&)>& setup);
 
+		/// <summary>シェーダパスだけが違う標準CS用: ComputePipeline を生成して登録する</summary>
+		void CreateComputePipe(Pipe type, const std::wstring& csPath);
+
 	private:
 
 		DXC::DXCom* dxcommon_;
