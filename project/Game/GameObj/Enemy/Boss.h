@@ -295,11 +295,12 @@ private:
 	AABBCollider* collider_ = nullptr;
 
 	Player* pPlayer_;
-	std::vector<std::unique_ptr<Graphics::Object3d>> chargeParents_;
-	std::vector<std::unique_ptr<Graphics::Object3d>> traceAnchors_;
+	/// <remarks>以下は描画しないTransformアンカー。所有権は基底の anchors_ が持つ</remarks>
+	std::vector<Math::Trans*> chargeParents_;
+	std::vector<Math::Trans*> traceAnchors_;
 	std::vector<int> traceEmitterIndexes_;
-	std::unique_ptr<Graphics::Object3d> waveParent_;
-	std::vector<std::unique_ptr<Graphics::Object3d>> arrowParents_;
+	Math::Trans* waveParent_ = nullptr;
+	std::vector<Math::Trans*> arrowParents_;
 
 	bool isClear_ = false;
 	bool isDying_ = false;

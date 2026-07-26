@@ -289,9 +289,9 @@ bool Boss::DushCharge(float& t, float maxT, bool& isNear, float range) {
 		auto& emitter = ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]);
 		emitter.GetData().prevTranslate = traceAnchors_[i]->GetWorldPos();
 
-		if (chargeParents_[i]->GetTransform().scale.x > 0.0f) { // チャージのサイズを縮小していく
+		if (chargeParents_[i]->scale.x > 0.0f) { // チャージのサイズを縮小していく
 			ShrinkScale(i, chargeSize_ / chargeTime_);
-			chargeParents_[i]->GetTransform().rotate.z += 0.05f * FPSKeeper::DeltaTimeFrame();
+			chargeParents_[i]->rotate.z += 0.05f * FPSKeeper::DeltaTimeFrame();
 		}
 		UpdateEmitterPos(i);
 	}
@@ -394,20 +394,20 @@ bool Boss::BeamCharge() {
 			auto& emitter = ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]);
 			emitter.GetData().prevTranslate = traceAnchors_[i]->GetWorldPos();
 
-			if (chargeParents_[i]->GetTransform().scale.x > 0.0f) { // チャージのサイズを縮小していく
+			if (chargeParents_[i]->scale.x > 0.0f) { // チャージのサイズを縮小していく
 				ShrinkScale(i, bp.shrinkSpeed * FPSKeeper::DeltaTimeFrame());
-				chargeParents_[i]->GetTransform().rotate.z += bp.rotateSpeedZ * FPSKeeper::DeltaTimeFrame();
+				chargeParents_[i]->rotate.z += bp.rotateSpeedZ * FPSKeeper::DeltaTimeFrame();
 			}
-			if (chargeParents_[i]->GetTransform().scale.x <= 0.0f) {
+			if (chargeParents_[i]->scale.x <= 0.0f) {
 				if (i == 0) {
 					chargeSize_ -= bp.sizeDecrease;
 					if (chargeSize_ <= 0.0f) {
 						chargeSize_ = 0.0f;
 					}
 				}
-				chargeParents_[i]->GetTransform().scale = Vector3::FillVec(chargeSize_);
-				float emitPos = chargeParents_[i]->GetTransform().scale.x;
-				traceAnchors_[i]->GetTransform().translate = { emitPos,emitPos,emitPos };
+				chargeParents_[i]->scale = Vector3::FillVec(chargeSize_);
+				float emitPos = chargeParents_[i]->scale.x;
+				traceAnchors_[i]->translate = { emitPos,emitPos,emitPos };
 
 				emitter.GetData().prevTranslate = traceAnchors_[i]->GetWorldPos();
 				emitter.GetData().lifeTime -= bp.lifeTimeDecrease;
@@ -427,12 +427,12 @@ bool Boss::BeamCharge() {
 	} else if (chargeSize_ <= 0.0f) {
 		result = true;
 		for (int i = 0; i < kChargeCount_; i++) {
-			if (chargeParents_[i]->GetTransform().scale.x > 0.0f) { // 完全に真ん中に集結するようにする
+			if (chargeParents_[i]->scale.x > 0.0f) { // 完全に真ん中に集結するようにする
 				auto& emitter = ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]);
 				emitter.GetData().prevTranslate = traceAnchors_[i]->GetWorldPos();
 
 				ShrinkScale(i, bp.shrinkSpeed * FPSKeeper::DeltaTimeFrame());
-				chargeParents_[i]->GetTransform().rotate.z += bp.rotateSpeedZ * FPSKeeper::DeltaTimeFrame();
+				chargeParents_[i]->rotate.z += bp.rotateSpeedZ * FPSKeeper::DeltaTimeFrame();
 				result = false;
 			}
 			if (!result) {
@@ -442,7 +442,7 @@ bool Boss::BeamCharge() {
 	}
 
 	if (result) {
-		chargeParents_[0]->GetTransform().scale = { 1.0f,1.0f,1.0f };
+		chargeParents_[0]->scale = { 1.0f,1.0f,1.0f };
 	}
 
 	return result;
@@ -709,14 +709,14 @@ void Boss::EnergyTimeUpdate() {
 }
 
 void Boss::UpdateEmitterPos(int i) {
-	float emitPos = chargeParents_[i]->GetTransform().scale.x;
-	traceAnchors_[i]->GetTransform().translate = { emitPos, emitPos, emitPos };
+	float emitPos = chargeParents_[i]->scale.x;
+	traceAnchors_[i]->translate = { emitPos, emitPos, emitPos };
 	auto& emitter = ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]);
 	emitter.GetData().translate = traceAnchors_[i]->GetWorldPos();
 }
 
 void Boss::ShrinkScale(int i, float delta) {
-	auto& s = chargeParents_[i]->GetTransform().scale;
+	auto& s = chargeParents_[i]->scale;
 	s.x = (std::max)(0.0f, s.x - delta);
 	s.y = (std::max)(0.0f, s.y - delta);
 	s.z = (std::max)(0.0f, s.z - delta);

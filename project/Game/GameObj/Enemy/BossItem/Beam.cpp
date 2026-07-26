@@ -140,21 +140,19 @@ void Beam::Initialize() {
 		beam.beamCore3->SetAlphaRef(0.25f);
 		beam.beamCore3->SetParent(&beam.model->GetTransform());
 
-		beam.particleParent = std::make_unique<Object3d>();
-		beam.particleParent->Create("cube.obj");
-		beam.particleParent->GetTransform().translate = beam.model->GetTransform().translate;
-		beam.particleParent->GetTransform().rotate.y = rad;
+		beam.particleParent = AddAnchor();
+		beam.particleParent->translate = beam.model->GetTransform().translate;
+		beam.particleParent->rotate.y = rad;
 		rad += radDis;
 
-		beam.collider->SetParent(&beam.particleParent->GetTransform());
+		beam.collider->SetParent(beam.particleParent);
 
 		beams_.push_back(std::move(beam));
 	}
 
 
-	particleParent_ = std::make_unique<Object3d>();
-	particleParent_->CreateSphere();
-	particleParent_->GetTransform().translate = model_->GetTransform().translate;
+	particleParent_ = AddAnchor();
+	particleParent_->translate = model_->GetTransform().translate;
 
 	/*for (auto& beam : beams_) {
 		beam.collider->SetParent(&particleParent_->transform);
@@ -162,9 +160,9 @@ void Beam::Initialize() {
 
 	ParticleManager::LoadParentGroup(beamParticle_, "BeamParticle");
 	ParticleManager::LoadParentGroup(beamLight_, "BeamLight");
-	beamParticle_->SetParent(&particleParent_->GetTransform());
+	beamParticle_->SetParent(particleParent_);
 	beamParticle_->grain_.isParentRotate_ = true;
-	beamLight_->SetParent(&particleParent_->GetTransform());
+	beamLight_->SetParent(particleParent_);
 }
 
 void Beam::Update() {
@@ -185,7 +183,7 @@ void Beam::Update() {
 			beam.beamCore1->SetUVScale({ 1.0f,3.0f }, { 0.0f,uvTransX_ * 0.5f });
 			beam.beamCore2->SetUVScale({ 1.0f,1.5f }, { 0.0f,uvTransX_ * 0.5f });
 			beam.beamCore3->SetUVScale({ 1.0f,3.0f }, { 0.0f,uvTransX_ * 1.5f });
-			beam.particleParent->GetTransform().translate = beam.model->GetTransform().translate;
+			beam.particleParent->translate = beam.model->GetTransform().translate;
 		}
 
 		// 6本分のコライダーは全て基底が持っているのでまとめて更新できる
@@ -226,8 +224,8 @@ void Beam::InitParameter() {
 void Beam::InitBeam([[maybe_unused]] const Vector3& pos, [[maybe_unused]] const Vector3& velo) {
 	model_->GetTransform().rotate.y = 0.0f;
 	model_->GetTransform().translate.y = 17.0f;
-	particleParent_->GetTransform().translate = model_->GetTransform().translate;
-	particleParent_->GetTransform().rotate.x = params_.initRotateX;
+	particleParent_->translate = model_->GetTransform().translate;
+	particleParent_->rotate.x = params_.initRotateX;
 
 	isLive_ = true;
 	lifeTime_ = params_.lifeBaseTime;
@@ -258,9 +256,9 @@ void Beam::InitBeam([[maybe_unused]] const Vector3& pos, [[maybe_unused]] const 
 		beam.beam2->GetTransform().scale.z = 0.0f;
 		beam.beam3->GetTransform().scale.x = 0.0f;
 		beam.beam3->GetTransform().scale.z = 0.0f;
-		beam.particleParent->GetTransform().translate = beam.model->GetTransform().translate;
-		beam.particleParent->GetTransform().rotate.y = beam.model->GetTransform().rotate.y;
-		beam.particleParent->GetTransform().rotate.x = params_.initPParentRotateX;
+		beam.particleParent->translate = beam.model->GetTransform().translate;
+		beam.particleParent->rotate.y = beam.model->GetTransform().rotate.y;
+		beam.particleParent->rotate.x = params_.initPParentRotateX;
 		rad += radDis;
 	}
 }
@@ -322,14 +320,14 @@ void Beam::ChangeBeamStep() {
 		model_->GetTransform().translate.y = 5.0f;
 		model_->GetTransform().rotate.x = halfPi_;
 
-		particleParent_->GetTransform().translate = model_->GetTransform().translate;
-		particleParent_->GetTransform().rotate.x = 0.0f;
+		particleParent_->translate = model_->GetTransform().translate;
+		particleParent_->rotate.x = 0.0f;
 
 		for (auto& beam : beams_) {
 			beam.model->GetTransform().translate.y = 5.0f;
 			beam.model->GetTransform().rotate.x = halfPi_;
-			beam.particleParent->GetTransform().translate = model_->GetTransform().translate;
-			beam.particleParent->GetTransform().rotate.x = 0.0f;
+			beam.particleParent->translate = model_->GetTransform().translate;
+			beam.particleParent->rotate.x = 0.0f;
 		}
 		targetPos_ = model_->GetWorldPos();
 		step_ = BeamStep::RotateBeam;
@@ -399,10 +397,10 @@ void Beam::BeamMove(BeamStep step) {
 
 			// Y軸回転の行列（右手系前提）
 			model_->GetTransform().rotate.x = angleRadians;
-			particleParent_->GetTransform().rotate.x = angleRadiansParent;
+			particleParent_->rotate.x = angleRadiansParent;
 			for (auto& beam : beams_) {
 				beam.model->GetTransform().rotate.x = angleRadians;
-				beam.particleParent->GetTransform().rotate.x = angleRadiansParent;
+				beam.particleParent->rotate.x = angleRadiansParent;
 			}
 
 			//beamParticle_->Emit();
@@ -417,10 +415,10 @@ void Beam::BeamMove(BeamStep step) {
 
 			// Y軸回転の行列（右手系前提）
 			model_->GetTransform().rotate.y = angleRadians;
-			particleParent_->GetTransform().rotate.y = model_->GetTransform().rotate.y;
+			particleParent_->rotate.y = model_->GetTransform().rotate.y;
 
 			beams_[0].model->GetTransform().rotate.y = angleRadians;
-			beams_[0].particleParent->GetTransform().rotate.y = beams_[0].model->GetTransform().rotate.y;
+			beams_[0].particleParent->rotate.y = beams_[0].model->GetTransform().rotate.y;
 
 
 			beamParticle_->Emit();
@@ -437,10 +435,10 @@ void Beam::BeamShrink(BeamStep step) {
 	if (expandTime_ > 0.0f || beamAttackTime_ > 0.0f) return;
 	if (shrinkTime_ > 0.0f) {
 		model_->GetTransform().rotate.y = 0.0f;
-		particleParent_->GetTransform().rotate.y = model_->GetTransform().rotate.y;
+		particleParent_->rotate.y = model_->GetTransform().rotate.y;
 
 		beams_[0].model->GetTransform().rotate.y = 0.0f;
-		beams_[0].particleParent->GetTransform().rotate.y = beams_[0].model->GetTransform().rotate.y;
+		beams_[0].particleParent->rotate.y = beams_[0].model->GetTransform().rotate.y;
 
 
 		shrinkTime_ -= FPSKeeper::DeltaTimeFrame();

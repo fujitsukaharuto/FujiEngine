@@ -148,6 +148,14 @@ Graphics::Object3d* OriginGameObject::AddRenderer(const std::string& name) {
 	return handle;
 }
 
+Math::Trans* OriginGameObject::AddAnchor() {
+	auto anchor = std::make_unique<Trans>();
+	anchor->scale = { 1.0f,1.0f,1.0f };
+	Trans* handle = anchor.get();
+	anchors_.push_back(std::move(anchor));
+	return handle;
+}
+
 AABBCollider* OriginGameObject::AddCollider(const std::string& tag) {
 	auto collider = std::make_unique<AABBCollider>();
 	AABBCollider* handle = collider.get();

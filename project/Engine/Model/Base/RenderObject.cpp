@@ -28,9 +28,7 @@ Matrix4x4 RenderObject::GetWorldMat() const {
 }
 
 Vector3 RenderObject::GetWorldPos() const {
-	Matrix4x4 worldM = GetWorldMat();
-	Vector3 worldPos = { worldM.m[3][0],worldM.m[3][1] ,worldM.m[3][2] };
-	return worldPos;
+	return transform_.GetWorldPos();
 }
 
 void Graphics::RenderObject::SetModel(const std::string& fileName, bool overWrite) {

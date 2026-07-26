@@ -31,6 +31,8 @@ namespace Math {
 		Vector3 rotate; // Quaternion
 		Vector3 translate;
 
+		/// <summary>ペアレントの設定</summary>
+		void SetParent(Trans* trans) { parent = trans; }
 		/// <summary>スケールを適用しないペアレント</summary>
 		void SetNoneScaleParent(bool is) { isNoneScaleParent = is; }
 		/// <summary>カメラにペアレント</summary>
@@ -40,6 +42,8 @@ namespace Math {
 		//* Getter
 		Matrix4x4 GetWorldMat() const;
 		Matrix4x4 GetNoneScaleWorldMat() const;
+		/// <summary>ペアレントを含めたワールド座標</summary>
+		Vector3 GetWorldPos() const;
 		Vector3 GetRotation();
 
 		Trans* parent = nullptr;

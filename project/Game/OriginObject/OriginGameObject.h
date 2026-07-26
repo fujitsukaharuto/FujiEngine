@@ -100,6 +100,13 @@ protected:
 	Graphics::Object3d* AddRenderer();
 	/// <summary>子ビジュアル(Object3d)を name で生成(Create済)・登録し、ハンドルを返す</summary>
 	Graphics::Object3d* AddRenderer(const std::string& name);
+	/// <summary>Transformアンカー(エミッタやコライダーの親にするだけの点)を生成・登録し、ハンドルを返す</summary>
+	/// <remarks>
+	/// 描画しないので Object3d ではなく Math::Trans を使う(定数バッファもマテリアルも確保しない)。
+	/// scale は 1 で初期化する。0 のままだと子の GetWorldMat が潰れ、RemoveScale では 0 除算になる。
+	/// 所有権は anchors_ が持ち、ハンドルのアドレスは追加しても動かない
+	/// </remarks>
+	Math::Trans* AddAnchor();
 	/// <summary>コライダーを生成・登録し、設定用ハンドルを返す</summary>
 	/// <remarks>
 	/// タグ・オーナー・3つのコールバックはここで結線するので、派生側はサイズと親だけ設定すればよい。
@@ -127,6 +134,9 @@ protected:
 
 	/// <summary>このオブジェクトが持つあたり判定(=Colliderコンポーネント相当)</summary>
 	std::vector<std::unique_ptr<AABBCollider>> colliders_;
+
+	/// <summary>描画しないTransformアンカー。エミッタ・コライダーのペアレント先にだけ使う</summary>
+	std::vector<std::unique_ptr<Math::Trans>> anchors_;
 
 	/// <summary>Jsonから生成する際の元データ。json.hpp をヘッダから隔離するため実体は持たない</summary>
 	std::unique_ptr<nlohmann::json> modelDataJson_;

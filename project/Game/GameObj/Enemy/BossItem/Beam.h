@@ -21,7 +21,7 @@ struct OneBeam {
 	std::unique_ptr<Graphics::Object3d> beam3;
 	AABBCollider* collider = nullptr;	// 所有権は Beam の基底 colliders_ が持つ
 	std::unique_ptr<Graphics::Object3d> model;
-	std::unique_ptr<Graphics::Object3d> particleParent;
+	Math::Trans* particleParent = nullptr;	// 所有権は Beam の基底 anchors_ が持つ
 };
 
 class Boss;
@@ -97,8 +97,8 @@ private:
 	BeamStep step_ = BeamStep::AroundAttack;
 	std::vector<OneBeam> beams_;
 
-	/// <remarks>描画されない Transform アンカー(エミッタの親)なので renderers_ には入れない</remarks>
-	std::unique_ptr<Graphics::Object3d> particleParent_;
+	/// <remarks>描画されない Transform アンカー(エミッタの親)。所有権は基底 anchors_ が持つ</remarks>
+	Math::Trans* particleParent_ = nullptr;
 
 	bool isLive_ = false;
 	float lifeTime_ = 780.0f;

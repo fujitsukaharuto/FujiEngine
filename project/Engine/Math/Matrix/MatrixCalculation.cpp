@@ -699,6 +699,11 @@ Matrix4x4 Trans::GetNoneScaleWorldMat() const {
 	return worldMatrix;
 }
 
+Vector3 Trans::GetWorldPos() const {
+	const Matrix4x4 worldM = GetWorldMat();
+	return { worldM.m[3][0],worldM.m[3][1],worldM.m[3][2] };
+}
+
 Vector3 Trans::GetRotation() {
 	Vector3 nowRotate = rotate;
 	if (parent) {
