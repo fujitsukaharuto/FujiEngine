@@ -264,7 +264,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\GameObj\Enemy\Boss_Debug.cpp" />
     <ClCompile Include="Game\GameObj\Enemy\Boss_Init.cpp" />
     <ClCompile Include="Game\GameObj\FollowCamera.cpp" />
-    <ClCompile Include="Game\GameObj\LockOn.cpp" />
     <ClCompile Include="Game\GameObj\Player\AttackBehavior\PlayerAttackRoot.cpp" />
     <ClCompile Include="Game\GameObj\Player\Behavior\PlayerAvoid.cpp" />
     <ClCompile Include="Game\GameObj\Player\Behavior\PlayerJump.cpp" />
@@ -371,6 +370,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Model\Sprite\SpriteRenderer.h" />
     <ClInclude Include="Engine\Model\TextureManager.h" />
     <ClInclude Include="Engine\Particle\GPUParticle\GPUEmitter\MeshSurfaceEmitter.h" />
+    <ClInclude Include="Engine\Particle\GPUParticle\GPUEmitter\EmitterJsonArchive.h" />
     <ClInclude Include="Engine\Particle\GPUParticle\GPUEmitter\SphereEmitter.h" />
     <ClInclude Include="Engine\Particle\GPUParticle\GPUEmitter\TextureBasedEmitter.h" />
     <ClInclude Include="Engine\Particle\GPUParticle\GPUParticleSystem.h" />
@@ -406,7 +406,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Game\GameObj\Enemy\BossItem\UnderRing.h" />
     <ClInclude Include="Game\GameObj\Enemy\BossItem\WaveWall.h" />
     <ClInclude Include="Game\GameObj\FollowCamera.h" />
-    <ClInclude Include="Game\GameObj\LockOn.h" />
     <ClInclude Include="Game\GameObj\Player\AttackBehavior\BasePlayerAttackBehavior.h" />
     <ClInclude Include="Game\GameObj\Player\AttackBehavior\PlayerAttackRoot.h" />
     <ClInclude Include="Game\GameObj\Player\Behavior\BasePlayerBehavior.h" />

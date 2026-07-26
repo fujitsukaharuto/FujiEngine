@@ -1,4 +1,5 @@
 #include "TextureBasedEmitter.h"
+#include "EmitterJsonArchive.h"
 #include <json.hpp>
 #include "Engine/Serialize/JsonSerializer.h"
 #include "Engine/DX/DXCom.h"
@@ -168,22 +169,23 @@ void TextureBasedEmitter::DebugGUI() {
 #endif // _DEBUG
 }
 
+template<class Ar> void TextureBasedEmitter::SerializeFields(Ar& ar) {
+	ar.field("emitCount", data_.count);
+	ar.field("lifeTime", data_.lifeTime);
+	ar.field("frequency", data_.frequency);
+	ar.field("translate", data_.translate);
+	ar.field("emitterScale", data_.radius);
+	ar.field("colorMax", data_.colorMax);
+	ar.field("colorMin", data_.colorMin);
+	ar.field("baseVelocity", data_.baseVelocity);
+	ar.field("velRandMax", data_.velocityRandMax);
+	ar.field("velRandMin", data_.velocityRandMin);
+}
+
 void TextureBasedEmitter::Save(const std::string& fileName) {
 	json j;
-
-	j["emitCount"] = data_.count;
-	j["lifeTime"] = data_.lifeTime;
-	j["frequency"] = data_.frequency;
-	j["translate"] = { data_.translate.x,data_.translate.y,data_.translate.z };
-	j["emitterScale"] = data_.radius;
-
-	j["colorMax"] = { data_.colorMax.x,data_.colorMax.y,data_.colorMax.z };
-	j["colorMin"] = { data_.colorMin.x,data_.colorMin.y,data_.colorMin.z };
-
-	j["baseVelocity"] = { data_.baseVelocity.x,data_.baseVelocity.y,data_.baseVelocity.z };
-	j["velRandMax"] = data_.velocityRandMax;
-	j["velRandMin"] = data_.velocityRandMin;
-
+	EmitterJsonWriter w{ j };
+	SerializeFields(w);
 	JsonSerializer::SerializeJsonData(j, (kDirectoryPath_ + fileName + ".json").c_str());
 }
 
@@ -192,38 +194,8 @@ void TextureBasedEmitter::Load(const std::string& fileName) {
 	json j = JsonSerializer::DeserializeJsonData(path);
 	strcpy_s(saveName_, sizeof(saveName_), fileName.c_str());
 
-	data_.count = j.value("emitCount", data_.count);
-	data_.lifeTime = j.value("lifeTime", data_.lifeTime);
-	data_.frequency = j.value("frequency", data_.frequency);
-
-	if (j.contains("translate") && j["translate"].is_array() && j["translate"].size() == 3) {
-		data_.translate.x = j["translate"][0];
-		data_.translate.y = j["translate"][1];
-		data_.translate.z = j["translate"][2];
-	}
-
-	data_.radius = j.value("emitterScale", data_.radius);
-
-	if (j.contains("colorMax") && j["colorMax"].is_array() && j["colorMax"].size() == 3) {
-		data_.colorMax.x = j["colorMax"][0];
-		data_.colorMax.y = j["colorMax"][1];
-		data_.colorMax.z = j["colorMax"][2];
-	}
-
-	if (j.contains("colorMin") && j["colorMin"].is_array() && j["colorMin"].size() == 3) {
-		data_.colorMin.x = j["colorMin"][0];
-		data_.colorMin.y = j["colorMin"][1];
-		data_.colorMin.z = j["colorMin"][2];
-	}
-
-	if (j.contains("baseVelocity") && j["baseVelocity"].is_array() && j["baseVelocity"].size() == 3) {
-		data_.baseVelocity.x = j["baseVelocity"][0];
-		data_.baseVelocity.y = j["baseVelocity"][1];
-		data_.baseVelocity.z = j["baseVelocity"][2];
-	}
-
-	data_.velocityRandMax = j.value("velRandMax", data_.velocityRandMax);
-	data_.velocityRandMin = j.value("velRandMin", data_.velocityRandMin);
+	EmitterJsonReader r{ j };
+	SerializeFields(r);
 }
 
 void TextureBasedEmitter::Emit() {

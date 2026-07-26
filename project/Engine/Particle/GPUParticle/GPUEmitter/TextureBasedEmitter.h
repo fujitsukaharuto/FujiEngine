@@ -71,6 +71,9 @@ namespace Graphics {
 	private:
 		void CopyData(uint32_t frameIndex = 0);
 
+		/// <summary>Save/Load 共通のフィールド列挙(Writer/Reader を渡すだけ)。実体は .cpp</summary>
+		template<class Ar> void SerializeFields(Ar& ar);
+
 		EmitterTexture data_;
 		bool isEmit_ = false;
 
