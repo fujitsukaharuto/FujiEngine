@@ -1,4 +1,5 @@
 #include "Engine/Model/ObjectRenderer.h"
+#include "Engine/GraphicPipeline/RootNames.h"
 // RenderObjectのヘッダーをインクルード（パスはプロジェクト構成に合わせて調整してください）
 #include "Engine/Model/Base/RenderObject.h"
 #include "Engine/Model/AnimationData/AnimationModel.h"
@@ -92,7 +93,7 @@ void Graphics::ObjectRenderer::RenderGrid() {
 	dxcommon_->GetDXCommand()->SetViewAndScissor(MyWin::kWindowWidth, MyWin::kWindowHeight);
 	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::BaseGrid);
 	
-	PipelineManager::GetInstance()->GetInstance()->SetGraphicsRootCBV(dxcommon_->GetDXCommand()->GetList(), "CameraInfo", CameraManager::GetInstance()->GetCamera()->GetCameraInfoGPUVirtualAddress());
+	PipelineManager::GetInstance()->GetInstance()->SetGraphicsRootCBV(dxcommon_->GetDXCommand()->GetList(), RootName::kCameraInfo, CameraManager::GetInstance()->GetCamera()->GetCameraInfoGPUVirtualAddress());
 	// 頂点バッファ・インデックスバッファは「無し」
 	dxcommon_->GetDXCommand()->GetList()->IASetVertexBuffers(0, 0, nullptr);
 	dxcommon_->GetDXCommand()->GetList()->IASetIndexBuffer(nullptr);

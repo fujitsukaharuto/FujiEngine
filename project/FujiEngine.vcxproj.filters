@@ -23,6 +23,9 @@
     <ClCompile Include="Engine\GraphicPipeline\ComputePipeline.cpp">
       <Filter>Engine\GraphicPipeline</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\GraphicPipeline\RootParam.cpp">
+      <Filter>Engine\GraphicPipeline</Filter>
+    </ClCompile>
     <ClCompile Include="Engine\GraphicPipeline\NonePipeline.cpp">
       <Filter>Engine\GraphicPipeline</Filter>
     </ClCompile>
@@ -392,6 +395,12 @@
       <Filter>Engine\GraphicPipeline</Filter>
     </ClInclude>
     <ClInclude Include="Engine\GraphicPipeline\ComputePipeline.h">
+      <Filter>Engine\GraphicPipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\GraphicPipeline\RootParam.h">
+      <Filter>Engine\GraphicPipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\GraphicPipeline\RootNames.h">
       <Filter>Engine\GraphicPipeline</Filter>
     </ClInclude>
     <ClInclude Include="Engine\GraphicPipeline\NonePipeline.h">

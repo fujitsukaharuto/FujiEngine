@@ -1,4 +1,5 @@
 #include "AnimationModel.h"
+#include "Engine/GraphicPipeline/RootNames.h"
 #include "Engine/Model/ModelManager.h"
 #include "Engine/Model/ObjectRenderer.h"
 #include "Engine/DX/DXCom.h"
@@ -284,10 +285,10 @@ void AnimationModel::Render() {
 	PipelineManager* pPipeManager = PipelineManager::GetInstance()->GetInstance();
 	if (model_ && !isMirrorObj_) {
 
-		pPipeManager->SetGraphicsRootCBV(cList, "gTransformationMatrix", wvpResource_[frameIndex]->GetGPUVirtualAddress());
-		pPipeManager->SetGraphicsRootCBV(cList, "gCamera", cameraPosResource_[frameIndex]->GetGPUVirtualAddress());
-		pPipeManager->SetGraphicsRootCBV(cList, "ObjIDData", objIDDataResource_->GetGPUVirtualAddress());
-		pPipeManager->SetGraphicsRootDescriptorTable(cList, "gTextures", SRVManager::GetInstance()->GetGPUDescriptorHandle(0));
+		pPipeManager->SetGraphicsRootCBV(cList, RootName::kTransformationMatrix, wvpResource_[frameIndex]->GetGPUVirtualAddress());
+		pPipeManager->SetGraphicsRootCBV(cList, RootName::kCamera, cameraPosResource_[frameIndex]->GetGPUVirtualAddress());
+		pPipeManager->SetGraphicsRootCBV(cList, RootName::kObjIDData, objIDDataResource_->GetGPUVirtualAddress());
+		pPipeManager->SetGraphicsRootDescriptorTable(cList, RootName::kTextures, SRVManager::GetInstance()->GetGPUDescriptorHandle(0));
 		ModelManager::GetInstance()->PickingCommand();
 
 		model_->AnimationDraw(dxcommon_, cList, skinnedMeshes_, material_);
@@ -298,10 +299,10 @@ void AnimationModel::Render() {
 		dxcommon_->GetDXCommand()->GetList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		lightManager_->SetLightCommand(dxcommon_->GetCommandList());
 
-		pPipeManager->SetGraphicsRootCBV(cList, "gTransformationMatrix", wvpResource_[frameIndex]->GetGPUVirtualAddress());
-		pPipeManager->SetGraphicsRootCBV(cList, "gCamera", cameraPosResource_[frameIndex]->GetGPUVirtualAddress());
-		pPipeManager->SetGraphicsRootDescriptorTable(cList, "gTextures", SRVManager::GetInstance()->GetGPUDescriptorHandle(0));
-		pPipeManager->SetGraphicsRootDescriptorTable(cList, "gEnvironment", environment_->gpuHandle);
+		pPipeManager->SetGraphicsRootCBV(cList, RootName::kTransformationMatrix, wvpResource_[frameIndex]->GetGPUVirtualAddress());
+		pPipeManager->SetGraphicsRootCBV(cList, RootName::kCamera, cameraPosResource_[frameIndex]->GetGPUVirtualAddress());
+		pPipeManager->SetGraphicsRootDescriptorTable(cList, RootName::kTextures, SRVManager::GetInstance()->GetGPUDescriptorHandle(0));
+		pPipeManager->SetGraphicsRootDescriptorTable(cList, RootName::kEnvironment, environment_->gpuHandle);
 
 		model_->Draw(cList, material_);
 

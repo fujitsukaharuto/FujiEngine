@@ -1,4 +1,5 @@
 #include "MeshSurfaceEmitter.h"
+#include "Engine/GraphicPipeline/RootNames.h"
 #include "EmitterJsonArchive.h"
 #include <json.hpp>
 #include "Engine/DX/DXCom.h"
@@ -119,20 +120,20 @@ void MeshSurfaceEmitter::Dispatch(ID3D12GraphicsCommandList* cmd,
 	
 	CopyData(frameIndex);// データのコピー
 	pPipeManager->SetCSPipeline(Pipe::EmitSurfaceParticleCS, 2);// 表面エミット
-	pPipeManager->SetComputeRootDescriptorTable(cmd, "gParticles_Trans", shared.transCSUAVHandle);
-	pPipeManager->SetComputeRootDescriptorTable(cmd, "gParticles_Scale", shared.scaleCSUAVHandle);
-	pPipeManager->SetComputeRootDescriptorTable(cmd, "gParticles_Time", shared.timeCSUAVHandle);
-	pPipeManager->SetComputeRootDescriptorTable(cmd, "gParticles_Velocity", shared.velocityCSUAVHandle);
-	pPipeManager->SetComputeRootDescriptorTable(cmd, "gParticles_Color", shared.colorCSUAVHandle);
-	pPipeManager->SetComputeRootDescriptorTable(cmd, "gParticles_Flags", shared.flagsCSUAVHandle);
-	pPipeManager->SetComputeRootDescriptorTable(cmd, "gFreeListIndex", shared.freeListIndexUAVHandle);
-	pPipeManager->SetComputeRootDescriptorTable(cmd, "gFreeList", shared.freeListUAVHandle);
-	pPipeManager->SetComputeRootDescriptorTable(cmd, "gFreeListTailIndex", shared.freeListTailIndexUAVHandle);
-	pPipeManager->SetComputeRootDescriptorTable(cmd, "gVertices", srv->GetGPUDescriptorHandle(verticesIndex));
-	pPipeManager->SetComputeRootDescriptorTable(cmd, "gIndices", srv->GetGPUDescriptorHandle(indicesIndex));
-	pPipeManager->SetComputeRootDescriptorTable(cmd, "gTriangleCDF", srv->GetGPUDescriptorHandle(areasIndex));
-	pPipeManager->SetComputeRootCBV(cmd, "gPerFrame", shared.perFrameCBV);
-	pPipeManager->SetComputeRootCBV(cmd, "gEmitter", resource_[frameIndex]->GetGPUVirtualAddress());
+	pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kParticles_Trans, shared.transCSUAVHandle);
+	pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kParticles_Scale, shared.scaleCSUAVHandle);
+	pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kParticles_Time, shared.timeCSUAVHandle);
+	pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kParticles_Velocity, shared.velocityCSUAVHandle);
+	pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kParticles_Color, shared.colorCSUAVHandle);
+	pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kParticles_Flags, shared.flagsCSUAVHandle);
+	pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kFreeListIndex, shared.freeListIndexUAVHandle);
+	pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kFreeList, shared.freeListUAVHandle);
+	pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kFreeListTailIndex, shared.freeListTailIndexUAVHandle);
+	pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kVertices, srv->GetGPUDescriptorHandle(verticesIndex));
+	pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kIndices, srv->GetGPUDescriptorHandle(indicesIndex));
+	pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kTriangleCDF, srv->GetGPUDescriptorHandle(areasIndex));
+	pPipeManager->SetComputeRootCBV(cmd, RootName::kPerFrame, shared.perFrameCBV);
+	pPipeManager->SetComputeRootCBV(cmd, RootName::kEmitter, resource_[frameIndex]->GetGPUVirtualAddress());
 	uint32_t dispatchCount = (data_.count + 1024 - 1) / 1024;
 	cmd->Dispatch(dispatchCount, 1, 1);
 }

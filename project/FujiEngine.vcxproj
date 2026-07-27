@@ -190,6 +190,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\GraphicPipeline\BaseGridPipe.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\BasePipeline.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\ComputePipeline.cpp" />
+    <ClCompile Include="Engine\GraphicPipeline\RootParam.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\SplatCompositePipe.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\CSPipe\OutlineCSPipe.cpp" />
     <ClCompile Include="Engine\GraphicPipeline\CSPipe\TrailEmitCSPipe.cpp" />
@@ -330,6 +331,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\GraphicPipeline\PipeKind.h" />
     <ClInclude Include="Engine\GraphicPipeline\Pipeline.h" />
     <ClInclude Include="Engine\GraphicPipeline\PipelineManager.h" />
+    <ClInclude Include="Engine\GraphicPipeline\RootNames.h" />
+    <ClInclude Include="Engine\GraphicPipeline\RootParam.h" />
     <ClInclude Include="Engine\GraphicPipeline\SkinningCSPipe.h" />
     <ClInclude Include="Engine\GraphicPipeline\SkyboxPipe.h" />
     <ClInclude Include="Engine\GraphicPipeline\SpritePipe.h" />

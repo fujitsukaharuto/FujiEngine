@@ -1,4 +1,5 @@
 #include "Engine/Model/Object3d.h"
+#include "Engine/GraphicPipeline/RootNames.h"
 #include <json.hpp>
 #include "Engine/GraphicPipeline/PipeKind.h"
 #include "Engine/GraphicPipeline/PipelineManager.h"
@@ -135,12 +136,12 @@ void Object3d::Render() {
 
 	PipelineManager* pPipeManager = PipelineManager::GetInstance();
 
-	pPipeManager->SetGraphicsRootCBV(cList, "gTransformationMatrix", wvpResource_[frameIndex]->GetGPUVirtualAddress());
-	pPipeManager->SetGraphicsRootCBV(cList, "gCamera", cameraPosResource_[frameIndex]->GetGPUVirtualAddress());
-	pPipeManager->SetGraphicsRootCBV(cList, "ObjIDData", objIDDataResource_->GetGPUVirtualAddress());
+	pPipeManager->SetGraphicsRootCBV(cList, RootName::kTransformationMatrix, wvpResource_[frameIndex]->GetGPUVirtualAddress());
+	pPipeManager->SetGraphicsRootCBV(cList, RootName::kCamera, cameraPosResource_[frameIndex]->GetGPUVirtualAddress());
+	pPipeManager->SetGraphicsRootCBV(cList, RootName::kObjIDData, objIDDataResource_->GetGPUVirtualAddress());
 	ModelManager::GetInstance()->PickingCommand();
 
-	pPipeManager->SetGraphicsRootDescriptorTable(cList, "gTextures", SRVManager::GetInstance()->GetGPUDescriptorHandle(0));
+	pPipeManager->SetGraphicsRootDescriptorTable(cList, RootName::kTextures, SRVManager::GetInstance()->GetGPUDescriptorHandle(0));
 
 	if (model_) {
 		model_->Draw(cList, material_);
@@ -157,8 +158,8 @@ void Object3d::AnimeDraw() {
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
 	PipelineManager* pPipeManager = PipelineManager::GetInstance()->GetInstance();
-	pPipeManager->SetGraphicsRootCBV(cList, "gTransformationMatrix", wvpResource_[frameIndex]->GetGPUVirtualAddress());
-	pPipeManager->SetGraphicsRootCBV(cList, "gCamera", cameraPosResource_[frameIndex]->GetGPUVirtualAddress());
+	pPipeManager->SetGraphicsRootCBV(cList, RootName::kTransformationMatrix, wvpResource_[frameIndex]->GetGPUVirtualAddress());
+	pPipeManager->SetGraphicsRootCBV(cList, RootName::kCamera, cameraPosResource_[frameIndex]->GetGPUVirtualAddress());
 	lightManager_->SetLightCommand(cList);
 
 	if (model_) {

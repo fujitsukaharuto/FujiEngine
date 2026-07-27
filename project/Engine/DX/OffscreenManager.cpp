@@ -1,4 +1,5 @@
 #include "Engine/DX/OffscreenManager.h"
+#include "Engine/GraphicPipeline/RootNames.h"
 #include "Engine/DX/DXCom.h"
 #include "Engine/DX/DX12Helper.h"
 #include "Engine/DX/SRVManager.h"
@@ -268,7 +269,7 @@ void Graphics::OffscreenManager::SynthesisGPURTV() {
 
 	dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
-	dxcommon_->GetPipelineManager()->SetGraphicsRootDescriptorTable(dxcommon_->GetCommandList(), "g_InputTexture", gpuParticleHandle_[frameIndex]);
+	dxcommon_->GetPipelineManager()->SetGraphicsRootDescriptorTable(dxcommon_->GetCommandList(), RootName::kG_InputTexture, gpuParticleHandle_[frameIndex]);
 	dxcommon_->GetCommandList()->DrawInstanced(3, 1, 0, 0); // 大きな三角形に描画して負荷を減らす
 }
 
@@ -382,9 +383,9 @@ void OffscreenManager::InitializePostEffects() {
 		Pipe::GrayCS,
 		PostEffectList::Gray,
 		[=](auto* cmd, auto input, auto output) {
-			pPipeManager->SetComputeRootDescriptorTable(cmd, "InputTexture", input);
-			pPipeManager->SetComputeRootDescriptorTable(cmd, "outputTexture", output);
-			pPipeManager->SetComputeRootCBV(cmd, "GrayscaleConstantBuffer", grayCSResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
+			pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kInputTexture, input);
+			pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kOutputTexture, output);
+			pPipeManager->SetComputeRootCBV(cmd, RootName::kGrayscaleConstantBuffer, grayCSResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
 		}
 		});
 
@@ -392,9 +393,9 @@ void OffscreenManager::InitializePostEffects() {
 		Pipe::CRTCS,
 		PostEffectList::CRT,
 		[=](auto* cmd, auto input, auto output) {
-			pPipeManager->SetComputeRootDescriptorTable(cmd, "InputTexture", input);
-			pPipeManager->SetComputeRootDescriptorTable(cmd, "outputTexture", output);
-			pPipeManager->SetComputeRootCBV(cmd, "Constants", cRTResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
+			pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kInputTexture, input);
+			pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kOutputTexture, output);
+			pPipeManager->SetComputeRootCBV(cmd, RootName::kConstants, cRTResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
 		}
 		});
 
@@ -402,9 +403,9 @@ void OffscreenManager::InitializePostEffects() {
 		Pipe::RetroTVCS,
 		PostEffectList::RetroTV,
 		[=](auto* cmd, auto input, auto output) {
-			pPipeManager->SetComputeRootDescriptorTable(cmd, "InputTexture", input);
-			pPipeManager->SetComputeRootDescriptorTable(cmd, "outputTexture", output);
-			pPipeManager->SetComputeRootCBV(cmd, "Constants", cRTResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
+			pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kInputTexture, input);
+			pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kOutputTexture, output);
+			pPipeManager->SetComputeRootCBV(cmd, RootName::kConstants, cRTResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
 		}
 		});
 
@@ -412,8 +413,8 @@ void OffscreenManager::InitializePostEffects() {
 		Pipe::GaussCS,
 		PostEffectList::Gauss,
 		[=](auto* cmd, auto input, [[maybe_unused]] auto output) {
-			pPipeManager->SetComputeRootDescriptorTable(cmd, "InputTexture", input);
-			pPipeManager->SetComputeRootDescriptorTable(cmd, "outputTexture", output);
+			pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kInputTexture, input);
+			pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kOutputTexture, output);
 		}
 		});
 
@@ -421,8 +422,8 @@ void OffscreenManager::InitializePostEffects() {
 		Pipe::BoxFilterCS,
 		PostEffectList::BoxFilter,
 		[=](auto* cmd, auto input, [[maybe_unused]] auto output) {
-			pPipeManager->SetComputeRootDescriptorTable(cmd, "InputTexture", input);
-			pPipeManager->SetComputeRootDescriptorTable(cmd, "outputTexture", output);
+			pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kInputTexture, input);
+			pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kOutputTexture, output);
 		}
 		});
 
@@ -430,9 +431,9 @@ void OffscreenManager::InitializePostEffects() {
 		Pipe::RadialCS,
 		PostEffectList::Radial,
 		[=](auto* cmd, auto input, [[maybe_unused]] auto output) {
-			pPipeManager->SetComputeRootDescriptorTable(cmd, "InputTexture", input);
-			pPipeManager->SetComputeRootDescriptorTable(cmd, "outputTexture", output);
-			pPipeManager->SetComputeRootCBV(cmd, "BlurConstantBuffer", radialResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
+			pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kInputTexture, input);
+			pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kOutputTexture, output);
+			pPipeManager->SetComputeRootCBV(cmd, RootName::kBlurConstantBuffer, radialResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
 		}
 		});
 
@@ -440,9 +441,9 @@ void OffscreenManager::InitializePostEffects() {
 		Pipe::VignetteCS,
 		PostEffectList::Vignette,
 		[=](auto* cmd, auto input, [[maybe_unused]] auto output) {
-			pPipeManager->SetComputeRootDescriptorTable(cmd, "InputTexture", input);
-			pPipeManager->SetComputeRootDescriptorTable(cmd, "outputTexture", output);
-			pPipeManager->SetComputeRootCBV(cmd, "VignetteConstantBuffer", vignetteResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
+			pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kInputTexture, input);
+			pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kOutputTexture, output);
+			pPipeManager->SetComputeRootCBV(cmd, RootName::kVignetteConstantBuffer, vignetteResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
 		}
 		});
 
@@ -450,10 +451,10 @@ void OffscreenManager::InitializePostEffects() {
 		Pipe::OutlineCS,
 		PostEffectList::Outline,
 		[=](auto* cmd, auto input, [[maybe_unused]] auto output) {
-			pPipeManager->SetComputeRootDescriptorTable(cmd, "InputTexture", input);
-			pPipeManager->SetComputeRootDescriptorTable(cmd, "outputTexture", output);
-			pPipeManager->SetComputeRootDescriptorTable(cmd, "gDepthTexture", dxcommon_->GetDepthTexGPUHandle());
-			pPipeManager->SetComputeRootCBV(cmd, "gMaterial", outlineResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
+			pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kInputTexture, input);
+			pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kOutputTexture, output);
+			pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kDepthTexture, dxcommon_->GetDepthTexGPUHandle());
+			pPipeManager->SetComputeRootCBV(cmd, RootName::kMaterial, outlineResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
 		}
 		});
 
@@ -461,8 +462,8 @@ void OffscreenManager::InitializePostEffects() {
 		Pipe::LuminanceOutlineCS,
 		PostEffectList::LuminanceOutline,
 		[=](auto* cmd, auto input, [[maybe_unused]] auto output) {
-			pPipeManager->SetComputeRootDescriptorTable(cmd, "InputTexture", input);
-			pPipeManager->SetComputeRootDescriptorTable(cmd, "outputTexture", output);
+			pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kInputTexture, input);
+			pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kOutputTexture, output);
 		}
 		});
 
@@ -470,9 +471,9 @@ void OffscreenManager::InitializePostEffects() {
 		Pipe::BloomCS,
 		PostEffectList::Bloom,
 		[=](auto* cmd, auto input, [[maybe_unused]] auto output) {
-			pPipeManager->SetComputeRootDescriptorTable(cmd, "InputTexture", input);
-			pPipeManager->SetComputeRootDescriptorTable(cmd, "outputTexture", output);
-			pPipeManager->SetComputeRootCBV(cmd, "BloomParams", bloomResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
+			pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kInputTexture, input);
+			pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kOutputTexture, output);
+			pPipeManager->SetComputeRootCBV(cmd, RootName::kBloomParams, bloomResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
 		}
 		});
 
@@ -480,8 +481,8 @@ void OffscreenManager::InitializePostEffects() {
 		Pipe::RandomCS,
 		PostEffectList::Random,
 		[=](auto* cmd, [[maybe_unused]] auto input, [[maybe_unused]] auto output) {
-			pPipeManager->SetComputeRootDescriptorTable(cmd, "outputTexture", output);
-			pPipeManager->SetComputeRootCBV(cmd, "Constants", cRTResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
+			pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kOutputTexture, output);
+			pPipeManager->SetComputeRootCBV(cmd, RootName::kConstants, cRTResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
 		}
 		});
 
@@ -542,7 +543,7 @@ void Graphics::OffscreenManager::PingPongCommand() {
 
 	dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
-	dxcommon_->GetPipelineManager()->SetGraphicsRootDescriptorTable(dxcommon_->GetCommandList(), "g_InputTexture", finalSRVHandle);
+	dxcommon_->GetPipelineManager()->SetGraphicsRootDescriptorTable(dxcommon_->GetCommandList(), RootName::kG_InputTexture, finalSRVHandle);
 	dxcommon_->GetCommandList()->DrawInstanced(3, 1, 0, 0); // 大きな三角形に描画して負荷を減らす
 
 
@@ -568,7 +569,7 @@ void Graphics::OffscreenManager::OtherPipeLineCommand() {
 
 		dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
-		dxcommon_->GetPipelineManager()->SetGraphicsRootDescriptorTable(dxcommon_->GetCommandList(), "g_InputTexture", offTextureHandle_[frameIndex]);
+		dxcommon_->GetPipelineManager()->SetGraphicsRootDescriptorTable(dxcommon_->GetCommandList(), RootName::kG_InputTexture, offTextureHandle_[frameIndex]);
 		dxcommon_->GetCommandList()->DrawInstanced(3, 1, 0, 0);
 	}
 }

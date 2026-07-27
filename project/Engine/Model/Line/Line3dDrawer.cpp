@@ -1,4 +1,5 @@
 #include "Line3dDrawer.h"
+#include "Engine/GraphicPipeline/RootNames.h"
 #include "Engine/DX/DXCom.h"
 #include "Engine/DX/DX12Helper.h"
 #include "Engine/Camera/Camera.h"
@@ -171,7 +172,7 @@ void Line3dDrawer::Render() {
 
 	D3D12_VERTEX_BUFFER_VIEW vbView = line_->vbView;
 	cList->IASetVertexBuffers(0, 1, &vbView);
-	dxcommon_->GetPipelineManager()->SetGraphicsRootCBV(cList, "gCamera", cBufferResource_[frameIndex]->GetGPUVirtualAddress());
+	dxcommon_->GetPipelineManager()->SetGraphicsRootCBV(cList, RootName::kCamera, cBufferResource_[frameIndex]->GetGPUVirtualAddress());
 	cList->DrawInstanced(indexLine_ * 2, 1, 0, 0);
 
 	Reset();

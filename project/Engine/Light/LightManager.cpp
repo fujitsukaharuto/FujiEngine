@@ -1,4 +1,5 @@
 #include "Engine/Light/LightManager.h"
+#include "Engine/GraphicPipeline/RootNames.h"
 #include "Engine/ImGuiManager/ImGuiManager.h"
 #include "Engine/DX/DXCom.h"
 #include "Engine/DX/DX12Helper.h"
@@ -91,7 +92,7 @@ void LightManager::AddSpotLight(const SpotLightData& data) {
 
 void LightManager::SetLightCommand(ID3D12GraphicsCommandList* commandList) {
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
-	PipelineManager::GetInstance()->SetGraphicsRootCBV(commandList, "gLights", allLightsResource_[frameIndex]->GetGPUVirtualAddress());
+	PipelineManager::GetInstance()->SetGraphicsRootCBV(commandList, RootName::kLights, allLightsResource_[frameIndex]->GetGPUVirtualAddress());
 }
 
 void LightManager::CopyData(uint32_t frameIndex) {

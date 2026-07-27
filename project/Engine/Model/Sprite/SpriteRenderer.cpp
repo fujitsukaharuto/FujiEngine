@@ -1,4 +1,5 @@
 #include "SpriteRenderer.h"
+#include "Engine/GraphicPipeline/RootNames.h"
 #include "Engine/DX/DXCom.h"
 #include "Engine/DX/DX12Helper.h"
 #include "Engine/Model/ModelManager.h" // NormalCommand()用
@@ -53,9 +54,9 @@ void SpriteRenderer::Render() {
 
 	// 登録されたスプライトをループで描画
 	for (Sprite* sprite : renderQueue_) {
-		pPipeManager->SetGraphicsRootCBV(cList, "gMaterial", sprite->GetMaterialGPUAddress());
-		pPipeManager->SetGraphicsRootCBV(cList, "gTransformationMatrix", sprite->GetWvpGPUAddress(frameIndex));
-		pPipeManager->SetGraphicsRootDescriptorTable(cList, "gTexture", sprite->GetTextureSRV());
+		pPipeManager->SetGraphicsRootCBV(cList, RootName::kMaterial, sprite->GetMaterialGPUAddress());
+		pPipeManager->SetGraphicsRootCBV(cList, RootName::kTransformationMatrix, sprite->GetWvpGPUAddress(frameIndex));
+		pPipeManager->SetGraphicsRootDescriptorTable(cList, RootName::kTexture, sprite->GetTextureSRV());
 		cList->DrawIndexedInstanced(6, 1, 0, 0, 0);
 	}
 
@@ -84,9 +85,9 @@ void Graphics::SpriteRenderer::RenderForeground() {
 
 	// 登録されたスプライトをループで描画
 	for (Sprite* sprite : renderForegroundQueue_) {
-		pPipeManager->SetGraphicsRootCBV(cList, "gMaterial", sprite->GetMaterialGPUAddress());
-		pPipeManager->SetGraphicsRootCBV(cList, "gTransformationMatrix", sprite->GetWvpGPUAddress(frameIndex));
-		pPipeManager->SetGraphicsRootDescriptorTable(cList, "gTexture", sprite->GetTextureSRV());
+		pPipeManager->SetGraphicsRootCBV(cList, RootName::kMaterial, sprite->GetMaterialGPUAddress());
+		pPipeManager->SetGraphicsRootCBV(cList, RootName::kTransformationMatrix, sprite->GetWvpGPUAddress(frameIndex));
+		pPipeManager->SetGraphicsRootDescriptorTable(cList, RootName::kTexture, sprite->GetTextureSRV());
 		cList->DrawIndexedInstanced(6, 1, 0, 0, 0);
 	}
 

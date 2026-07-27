@@ -1,4 +1,5 @@
 #include "Engine/Model/Model.h"
+#include "Engine/GraphicPipeline/RootNames.h"
 #include <cassert>
 #include "Engine/DX/DX12Helper.h"
 #include "Engine/DX/SRVManager.h"
@@ -26,8 +27,8 @@ void Model::Draw(ID3D12GraphicsCommandList* commandList, std::vector<Material>& 
 	for (uint32_t index = 0; index < drawCount; ++index) {
 		PipelineManager* pPipeManager = PipelineManager::GetInstance()->GetInstance();
 		
-		pPipeManager->SetGraphicsRootCBV(commandList, "gMaterial", materials[index].GetMaterialResource()->GetGPUVirtualAddress());
-		pPipeManager->SetGraphicsRootDescriptorTable(commandList, "gTextures", SRVManager::GetInstance()->GetGPUDescriptorHandle(0));
+		pPipeManager->SetGraphicsRootCBV(commandList, RootName::kMaterial, materials[index].GetMaterialResource()->GetGPUVirtualAddress());
+		pPipeManager->SetGraphicsRootDescriptorTable(commandList, RootName::kTextures, SRVManager::GetInstance()->GetGPUDescriptorHandle(0));
 
 		commandList->IASetVertexBuffers(0, 1, &mesh_[index].GetVBV());
 		commandList->IASetIndexBuffer(&mesh_[index].GetIBV());
@@ -46,8 +47,8 @@ void Model::AnimationDraw(DXCom* pDxcom, ID3D12GraphicsCommandList* commandList,
 	for (uint32_t index = 0; index < drawCount; ++index) {
 		PipelineManager* pPipeManager = PipelineManager::GetInstance()->GetInstance();
 
-		pPipeManager->SetGraphicsRootCBV(commandList, "gMaterial", materials[index].GetMaterialResource()->GetGPUVirtualAddress());
-		pPipeManager->SetGraphicsRootDescriptorTable(commandList, "gTextures", SRVManager::GetInstance()->GetGPUDescriptorHandle(0));
+		pPipeManager->SetGraphicsRootCBV(commandList, RootName::kMaterial, materials[index].GetMaterialResource()->GetGPUVirtualAddress());
+		pPipeManager->SetGraphicsRootDescriptorTable(commandList, RootName::kTextures, SRVManager::GetInstance()->GetGPUDescriptorHandle(0));
 
 		commandList->IASetVertexBuffers(0, 1, &skinnedMeshes[index].GetSkinnedVBV());
 		commandList->IASetIndexBuffer(&mesh_[index].GetIBV());
@@ -109,7 +110,7 @@ void Model::CSDispatch(DXCom* pDxcom, const SkinCluster& skinCluster, ID3D12Grap
 
 void Model::MeshDraw(ID3D12GraphicsCommandList* commandList, Material* mate, int drawCount) {
 	for (uint32_t index = 0; index < mesh_.size(); ++index) {
-		PipelineManager::GetInstance()->SetGraphicsRootDescriptorTable(commandList, "gTexture", mate->GetTexture()->gpuHandle);
+		PipelineManager::GetInstance()->SetGraphicsRootDescriptorTable(commandList, RootName::kTexture, mate->GetTexture()->gpuHandle);
 
 		commandList->IASetVertexBuffers(0, 1, &mesh_[index].GetVBV());
 		commandList->IASetIndexBuffer(&mesh_[index].GetIBV());

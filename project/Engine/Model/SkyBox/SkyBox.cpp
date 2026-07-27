@@ -1,4 +1,5 @@
 #include "SkyBox.h"
+#include "Engine/GraphicPipeline/RootNames.h"
 #include "Engine/ImGuiManager/ImGuiManager.h"
 #include "Engine/DX/DX12Helper.h"
 #include "Engine/Model/ObjectRenderer.h"
@@ -39,9 +40,9 @@ void SkyBox::Render() {
 	cList->IASetIndexBuffer(&ibView);
 
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
-	pPipeManager->SetGraphicsRootCBV(cList, "gMaterial", material_.GetMaterialResource()->GetGPUVirtualAddress());
-	pPipeManager->SetGraphicsRootCBV(cList, "gTransformationMatrix", wvpResource_[frameIndex]->GetGPUVirtualAddress());
-	pPipeManager->SetGraphicsRootDescriptorTable(cList, "gTexture", material_.GetTexture()->gpuHandle);
+	pPipeManager->SetGraphicsRootCBV(cList, RootName::kMaterial, material_.GetMaterialResource()->GetGPUVirtualAddress());
+	pPipeManager->SetGraphicsRootCBV(cList, RootName::kTransformationMatrix, wvpResource_[frameIndex]->GetGPUVirtualAddress());
+	pPipeManager->SetGraphicsRootDescriptorTable(cList, RootName::kTexture, material_.GetTexture()->gpuHandle);
 
 	cList->DrawIndexedInstanced(static_cast<UINT>((index_.size())), 1, 0, 0, 0);
 }

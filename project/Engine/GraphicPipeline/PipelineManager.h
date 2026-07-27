@@ -8,6 +8,9 @@
 namespace DXC { class DXCom; }
 
 namespace Graphics {
+
+	class RootParam;
+
 	/// <summary>
 	/// パイプライン管理クラス
 	/// </summary>
@@ -45,12 +48,14 @@ namespace Graphics {
 		BasePipeline* GetCurrentPipeline() const { return currentPipeline_; }
 
 		// --- 名前でルートパラメータをセットするヘルパー ---
-		void SetGraphicsRootCBV(ID3D12GraphicsCommandList* list, const std::string& name, D3D12_GPU_VIRTUAL_ADDRESS address);
-		void SetGraphicsRootDescriptorTable(ID3D12GraphicsCommandList* list, const std::string& name, D3D12_GPU_DESCRIPTOR_HANDLE handle);
-		
-		void SetComputeRootCBV(ID3D12GraphicsCommandList* list, const std::string& name, D3D12_GPU_VIRTUAL_ADDRESS address);
-		void SetComputeRootDescriptorTable(ID3D12GraphicsCommandList* list, const std::string& name, D3D12_GPU_DESCRIPTOR_HANDLE handle);
-		void SetComputeRoot32BitConstants(ID3D12GraphicsCommandList* list, const std::string& name, UINT numValues, const void* data, UINT offset);
+		// 名前は RootNames.h の定数(RootParam)で渡す。RootParam がパイプライン毎の
+		// 解決結果を持つので、毎フレームの文字列ハッシュ検索は発生しない
+		void SetGraphicsRootCBV(ID3D12GraphicsCommandList* list, const RootParam& param, D3D12_GPU_VIRTUAL_ADDRESS address);
+		void SetGraphicsRootDescriptorTable(ID3D12GraphicsCommandList* list, const RootParam& param, D3D12_GPU_DESCRIPTOR_HANDLE handle);
+
+		void SetComputeRootCBV(ID3D12GraphicsCommandList* list, const RootParam& param, D3D12_GPU_VIRTUAL_ADDRESS address);
+		void SetComputeRootDescriptorTable(ID3D12GraphicsCommandList* list, const RootParam& param, D3D12_GPU_DESCRIPTOR_HANDLE handle);
+		void SetComputeRoot32BitConstants(ID3D12GraphicsCommandList* list, const RootParam& param, UINT numValues, const void* data, UINT offset);
 
 	private:
 
@@ -69,6 +74,7 @@ namespace Graphics {
 		std::array<std::unique_ptr<BasePipeline>, static_cast<size_t>(Pipe::Count)> pipelines_;
 
 		BasePipeline* currentPipeline_ = nullptr;
+		Pipe currentPipeType_ = Pipe::Count;	// RootParam のキャッシュを引くためのキー
 
 	};
 

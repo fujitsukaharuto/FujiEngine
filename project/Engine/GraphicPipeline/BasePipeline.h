@@ -54,11 +54,6 @@ namespace Graphics {
 		/// </summary>
 		uint32_t GetRootIndex(const std::string& name) const;
 
-		/// <summary>
-		/// 指定した名前のルートパラメータが存在するか確認
-		/// </summary>
-		bool HasRootIndex(const std::string& name) const { return rootParameterMap_.contains(name); }
-
 	private:
 
 		/// <summary>

@@ -3,6 +3,7 @@
 #include "Engine/DX/DXCom.h"
 #include "Engine/DX/DXCommand.h"
 #include "Engine/Logger/Logger.h"
+#include <cassert>
 
 using namespace Graphics;
 using namespace DXC;
@@ -58,9 +59,11 @@ uint32_t BasePipeline::GetRootIndex(const std::string& name) const {
 	if (it != rootParameterMap_.end()) {
 		return it->second;
 	}
-	// リフレクションで見つからなかった場合は警告を出して、とりあえず 0 を返すなりアサートするなり
+	// 見つからない = シェーダ側の宣言と名前が食い違っている。0 を返すと別のリソースを
+	// 黙ってバインドし続けるので、開発中は必ず止める
 	Logger::Log(std::format("Warning: RootParameter '{}' not found in current pipeline reflection map.", name));
-	return 0; 
+	assert(false && "RootParameter not found. RootNames.h の綴りが HLSL 側と一致しているか確認すること");
+	return 0;
 }
 
 void BasePipeline::CreateRootSignature([[maybe_unused]] ID3D12Device* device) {

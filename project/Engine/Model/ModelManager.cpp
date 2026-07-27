@@ -1,4 +1,5 @@
 #include "Engine/Model/ModelManager.h"
+#include "Engine/GraphicPipeline/RootNames.h"
 #include "Engine/GraphicPipeline/PipeKind.h"
 #include "Engine/GraphicPipeline/PipelineManager.h"
 #include <fstream>
@@ -698,8 +699,8 @@ void ModelManager::PickingCommand() {
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
 
-	PipelineManager::GetInstance()->SetGraphicsRootCBV(cList, "PickingData", pickingDataResource_[frameIndex]->GetGPUVirtualAddress());
-	PipelineManager::GetInstance()->SetGraphicsRootDescriptorTable(cList, "gPickingBuffer", pickBufferHandle_[frameIndex].second);
+	PipelineManager::GetInstance()->SetGraphicsRootCBV(cList, RootName::kPickingData, pickingDataResource_[frameIndex]->GetGPUVirtualAddress());
+	PipelineManager::GetInstance()->SetGraphicsRootDescriptorTable(cList, RootName::kPickingBuffer, pickBufferHandle_[frameIndex].second);
 }
 
 void ModelManager::PickingDataReset() {

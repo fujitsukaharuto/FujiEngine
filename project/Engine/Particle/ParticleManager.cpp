@@ -1,4 +1,5 @@
 #include "ParticleManager.h"
+#include "Engine/GraphicPipeline/RootNames.h"
 #include <json.hpp>
 #include "Engine/DX/DXCom.h"
 #include "Engine/DX/DX12Helper.h"
@@ -611,8 +612,8 @@ void ParticleManager::DrawParticleGroup() {
 		}
 
 		ShapeTypeCommand(group->GetShapeType());
-		pPipeManager->SetGraphicsRootDescriptorTable(cList, "gTransformationMatries", srvManager_->GetGPUDescriptorHandle(group->GetSRVIndex(frameIndex)));
-		pPipeManager->SetGraphicsRootDescriptorTable(cList, "gTexture", group->GetMaterial().GetTexture()->gpuHandle);
+		pPipeManager->SetGraphicsRootDescriptorTable(cList, RootName::kTransformationMatries, srvManager_->GetGPUDescriptorHandle(group->GetSRVIndex(frameIndex)));
+		pPipeManager->SetGraphicsRootDescriptorTable(cList, RootName::kTexture, group->GetMaterial().GetTexture()->gpuHandle);
 		ShapeTypeDrawCommand(group->GetShapeType(), group->GetDrawCount());// ShapeTypeでDrawするように
 
 		preType_ = group->type_;
@@ -651,7 +652,7 @@ void ParticleManager::DrawParticleGroup() {
 			}
 		}
 
-		pPipeManager->SetGraphicsRootDescriptorTable(cList, "gTransformationMatries", srvManager_->GetGPUDescriptorHandle(group->GetSRVIndex(frameIndex)));
+		pPipeManager->SetGraphicsRootDescriptorTable(cList, RootName::kTransformationMatries, srvManager_->GetGPUDescriptorHandle(group->GetSRVIndex(frameIndex)));
 		lightning_->MeshDraw(&group->GetMaterial(), group->GetDrawCount());// ライトニングの描画
 
 		if (group->GetShapeType() != ShapeType::PLANE) {
@@ -673,8 +674,8 @@ void ParticleManager::DrawParentParticleGroup() {
 		if (group->GetShapeType() == ShapeType::LIGHTNING) continue;
 
 		ShapeTypeCommand(group->GetShapeType());
-		pPipeManager->SetGraphicsRootDescriptorTable(cList, "gTransformationMatries", srvManager_->GetGPUDescriptorHandle(group->GetSRVIndex(frameIndex)));
-		pPipeManager->SetGraphicsRootDescriptorTable(cList, "gTexture", group->GetMaterial().GetTexture()->gpuHandle);
+		pPipeManager->SetGraphicsRootDescriptorTable(cList, RootName::kTransformationMatries, srvManager_->GetGPUDescriptorHandle(group->GetSRVIndex(frameIndex)));
+		pPipeManager->SetGraphicsRootDescriptorTable(cList, RootName::kTexture, group->GetMaterial().GetTexture()->gpuHandle);
 		ShapeTypeDrawCommand(group->GetShapeType(), group->GetDrawCount());
 	}
 	for (auto& groupPair : parentParticleGroups_) {
@@ -682,7 +683,7 @@ void ParticleManager::DrawParentParticleGroup() {
 		if (group->GetDrawCount() == 0) continue;
 		if (group->GetShapeType() != ShapeType::LIGHTNING) continue;
 
-		pPipeManager->SetGraphicsRootDescriptorTable(cList, "gTransformationMatries", srvManager_->GetGPUDescriptorHandle(group->GetSRVIndex(frameIndex)));
+		pPipeManager->SetGraphicsRootDescriptorTable(cList, RootName::kTransformationMatries, srvManager_->GetGPUDescriptorHandle(group->GetSRVIndex(frameIndex)));
 		lightning_->MeshDraw(&group->GetMaterial(), group->GetDrawCount());
 
 		if (group->GetShapeType() != ShapeType::PLANE) {
