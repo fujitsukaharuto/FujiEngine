@@ -49,10 +49,6 @@ int ParticleManager::InitGPUEmitterSurface(const std::string& fileName) {
 	return gpuParticleSystem_->InitGPUEmitterSurface(fileName);
 }
 
-void ParticleManager::InitDefaultCSEmitter() {
-	gpuParticleSystem_->InitDefaultEmitter();
-}
-
 void ParticleManager::InitPlaneVertex() {
 	plane_.vertices.push_back({ {-1.0f,1.0f,0.0f,1.0f},{0.0f,0.0f},{0.0f,0.0f,-1.0f} });
 	plane_.vertices.push_back({ {-1.0f,-1.0f,0.0f,1.0f},{0.0f,1.0f},{0.0f,0.0f,-1.0f} });

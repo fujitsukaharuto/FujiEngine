@@ -15,6 +15,7 @@
 #include "Game/GameObj/Enemy/BossItem/Arrow.h"
 
 class Player;
+namespace Graphics { class SphereEmitter; }
 
 /// <summary>
 /// 残りHPの段階、値が大きいほど体力が多い
@@ -240,6 +241,14 @@ private:
 
 	void InitChargeParent();
 	void InitItemParent();
+
+	/// <summary>チャージ/トレース用エミッターを引く</summary>
+	Graphics::SphereEmitter& TraceEmitter(int i);
+	/// <summary>チャージ/トレース用エミッターを寿命と色範囲を指定して発生開始させる</summary>
+	void StartTraceEmitters(float lifeTime, const Math::Vector2& colorX, const Math::Vector2& colorY, const Math::Vector2& colorZ);
+	/// <summary>チャージ/トレース用エミッターを全て止める</summary>
+	void StopTraceEmitters();
+
 	void UpdateEmitterPos(int i);
 	void ShrinkScale(int i, float delta);
 	void ChangePhase(float threshold, int indexInc);
@@ -256,6 +265,7 @@ private:
 	static constexpr float kMaxBossHp_ = 100.0f;          // ボスHPの最大値（初期値）
 	static constexpr float kInitAttackCooldown_ = 120.0f; // 攻撃クールタイムの初期値
 	static constexpr float kWaveAttackPosZ_ = 4.0f;       // 波攻撃エミッターのZオフセット
+	static constexpr float kTraceEmitterLifeTime_ = 0.6f; // チャージ/トレース用エミッターの寿命（ビーム時のみ beam.emitterLifeTime で上書き）
 
 	//* HP・戦闘
 	static constexpr float kStrongDamage_ = 4.0f;          // 強攻撃のダメージ量

@@ -4,6 +4,7 @@
 #include <cmath>
 
 #include "Game/GameObj/Enemy/Boss.h"
+#include "Game/Particle/GameEmitters.h"
 
 using namespace Core;
 using namespace Graphics;
@@ -14,7 +15,7 @@ Beam::Beam() {
 }
 
 Beam::~Beam() {
-	ParticleManager::GetParticleCSEmitterSurface(1).SetEmit(false);
+	Game::BeamCrystalEmitter().SetEmit(false);
 }
 
 void Beam::Initialize() {
@@ -23,7 +24,7 @@ void Beam::Initialize() {
 
 	halfPi_ = std::numbers::pi_v<float> / 2.0f;
 
-	auto& emitter = ParticleManager::GetParticleCSEmitterSurface(1);
+	auto& emitter = Game::BeamCrystalEmitter();
 	emitter.SetEmit(false);
 	emitter.GetData().count = 5000;
 	emitter.GetData().colorMax = { 1.0f,0.0f,0.25f };
@@ -173,7 +174,7 @@ void Beam::Update() {
 		} else if (lifeTime_ <= 0.0f) {
 			lifeTime_ = 0.0f;
 			isLive_ = false;
-			ParticleManager::GetParticleCSEmitterSurface(1).SetEmit(false);
+			Game::BeamCrystalEmitter().SetEmit(false);
 		}
 
 		for (auto& beam : beams_) {
@@ -299,7 +300,7 @@ void Beam::OnCollisionExit([[maybe_unused]] const ColliderInfo& other) {
 
 void Beam::SetIsLive(bool is) { 
 	isLive_ = is;
-	ParticleManager::GetParticleCSEmitterSurface(1).SetEmit(false);
+	Game::BeamCrystalEmitter().SetEmit(false);
 }
 
 void Beam::SetBossParent(Boss* boss) {
@@ -337,7 +338,7 @@ void Beam::ChangeBeamStep() {
 		changeTime_ -= FPSKeeper::DeltaTimeFrame();
 		float t = 1.0f - (changeTime_ / params_.changeBaseTime_);
 		Vector3 emitPos = Lerp(prePos_, targetPos_, t);
-		ParticleManager::GetParticleCSEmitterSurface(1).GetData().translate = emitPos;
+		Game::BeamCrystalEmitter().GetData().translate = emitPos;
 	}
 	if (changeTime_ <= 0.0f) {
 		expandTime_ = params_.expandBaseTime;

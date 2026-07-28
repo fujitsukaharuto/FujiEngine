@@ -109,7 +109,6 @@ private:
 	Math::Vector3 lightDir_ = { 0.0f,-0.907f,0.42f };
 	float lightIntensity_ = 0.6f;
 
-	int hanabiIndex_ = 0;
 	HanabiPopReng popPos_;
 
 	// sceneChange

@@ -36,14 +36,6 @@ void GPUParticleSystem::Initialize(DXCom* pDxcom, SRVManager* srvManager) {
 	InitGPUTimer();
 	InitParticleCS();
 	InitSplat();
-	InitGPUEmitter();
-	InitGPUEmitterSurface("DeadTree_2.obj");
-	InitGPUEmitterSurface("BeamCrystal.obj");
-	InitGPUEmitterSurface("Terrain_1783481558545.obj");
-	InitGPUEmitterSurface("Terrain_1783481558545.obj");
-	InitGPUEmitterSurface("Terrain_1783481558545.obj");
-	csEmitters_[0].emitter->Load("titleDefault");
-	csEmitters_[0].emitter->Emit();// 初回に一度エミットしておく
 }
 
 void GPUParticleSystem::Finalize() {
@@ -269,12 +261,6 @@ void GPUParticleSystem::ResetEmitters() {
 	sphereEmitterIndex_ = 0;
 	textureBasedEmitterIndex_ = 0;
 	MeshSurfaceEmitterIndex_ = 0;
-}
-
-void GPUParticleSystem::InitDefaultEmitter() {
-	InitGPUEmitter();
-	InitGPUEmitterSurface("DeadTree_2.obj");
-	InitGPUEmitterSurface("BeamCrystal.obj");
 }
 
 int GPUParticleSystem::InitGPUEmitter(int returnMod) {

@@ -11,6 +11,7 @@
 #include "Engine/Scene/SceneManager.h"
 #include "Engine/Light/LightManager.h"
 #include "Engine/Model/Sprite/SpriteRenderer.h"
+#include "Game/Particle/GameEmitters.h"
 
 using namespace Core;
 using namespace Graphics;
@@ -25,9 +26,9 @@ ResultScene::ResultScene() {}
 ResultScene::~ResultScene() {
 	lightManager_->GetDirectionLight()->SetLightDirection(Vector3::Down());
 	lightManager_->GetDirectionLight()->SetLightIntensity(0.3f);
-	ParticleManager::GetInstance()->GetParticleCSEmitter(hanabiIndex_).SetEmit(false);
+	Game::DefaultSphereEmitter().SetEmit(false);
 	ParticleManager::GetInstance()->ResetCSEmitters();
-	ParticleManager::GetInstance()->InitDefaultCSEmitter();
+	Game::CreateDefaultEmitters();
 }
 
 void ResultScene::Initialize() {
@@ -86,7 +87,7 @@ void ResultScene::Initialize() {
 		players_.push_back(std::move(player));
 	}
 
-	ParticleManager::GetInstance()->GetParticleCSEmitter(hanabiIndex_).Load("hanabi");
+	Game::DefaultSphereEmitter().Load("hanabi");
 }
 
 void ResultScene::Update() {
@@ -274,8 +275,8 @@ void ResultScene::KirbyDance() {
 		if (t >= 1.0f) {
 			danceTime_ = 0.0f;
 			state_ = DanceState::Finish;
-			ParticleManager::GetInstance()->GetParticleCSEmitter(hanabiIndex_).SetEmit(true);
-			ParticleManager::GetInstance()->GetParticleCSEmitter(hanabiIndex_).Emit();
+			Game::DefaultSphereEmitter().SetEmit(true);
+			Game::DefaultSphereEmitter().Emit();
 		}
 		break;
 
@@ -301,5 +302,5 @@ void ResultScene::KirbyDance() {
 
 void ResultScene::HanabiUpdate() {
 	Vector3 popPos = Random::GetVector3(popPos_.xMinMax, popPos_.yMinMax, popPos_.zMinMax);
-	ParticleManager::GetInstance()->GetParticleCSEmitter(hanabiIndex_).SetPos(popPos);
+	Game::DefaultSphereEmitter().SetPos(popPos);
 }

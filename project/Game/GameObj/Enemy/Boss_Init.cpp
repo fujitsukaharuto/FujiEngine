@@ -206,17 +206,7 @@ void Boss::DushInit() {
 		chargeParent->scale = Vector3::FillVec(chargeSize_);
 	}
 
-	for (int i = 0; i < kChargeCount_; i++) {
-		auto& emitter = ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]);
-		emitter.SetEmit(true);
-		emitter.GetData().lifeTime = 0.6f;
-		UpdateEmitterPos(i);
-		emitter.GetData().prevTranslate = traceAnchors_[i]->GetWorldPos();
-
-		Vector3 randColor = Random::GetVector3({ 0.0f,0.0f }, { 0.2f,0.8f }, { 0.2f,1.0f });
-		emitter.GetData().colorMax = randColor;
-		emitter.GetData().colorMin = randColor;
-	}
+	StartTraceEmitters(kTraceEmitterLifeTime_, { 0.0f,0.0f }, { 0.2f,0.8f }, { 0.2f,1.0f });
 }
 
 void Boss::InitBeam() {
@@ -239,17 +229,7 @@ void Boss::InitBeam() {
 		chargeParent->scale = Vector3::FillVec(chargeSize_);
 	}
 
-	for (int i = 0; i < kChargeCount_; i++) {
-		auto& emitter = ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]);
-		emitter.SetEmit(true);
-		emitter.GetData().lifeTime = bp.emitterLifeTime;
-		UpdateEmitterPos(i);
-		emitter.GetData().prevTranslate = traceAnchors_[i]->GetWorldPos();
-
-		Vector3 randColor = Random::GetVector3({ 0.3f,1.0f }, { 0.0f,0.2f }, { 0.0f,0.5f });
-		emitter.GetData().colorMax = randColor;
-		emitter.GetData().colorMin = randColor;
-	}
+	StartTraceEmitters(bp.emitterLifeTime, { 0.3f,1.0f }, { 0.0f,0.2f }, { 0.0f,0.5f });
 }
 
 void Boss::InitJumpAttack() {
@@ -316,16 +296,15 @@ void Boss::InitChargeParent() {
 		anchor->SetNoneScaleParent(true);
 		traceAnchors_.push_back(anchor);
 
-		int numEmitter = ParticleManager::GetInstance()->InitGPUEmitter();
-		auto& emitter = ParticleManager::GetSphereEmitter(numEmitter);
+		traceEmitterIndexes_.push_back(ParticleManager::GetInstance()->InitGPUEmitter());
+		auto& emitter = TraceEmitter(i);
 		emitter.SetEmit(false);
 		emitter.GetData().colorMax = { 1.0f,0.0f,0.0f };
 		emitter.GetData().colorMin = { 1.0f,0.0f,0.0f };
 		emitter.GetData().frequency = 0.0f;
 		emitter.GetData().radius = 0.0f;
 		emitter.GetData().scale = { 1.5f,1.5f,1.5f };
-		emitter.GetData().lifeTime = 0.6f;
-		traceEmitterIndexes_.push_back(numEmitter);
+		emitter.GetData().lifeTime = kTraceEmitterLifeTime_;
 	}
 }
 

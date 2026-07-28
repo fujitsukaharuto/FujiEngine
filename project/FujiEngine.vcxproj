@@ -276,6 +276,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\Collider\CollisionManager.cpp" />
     <ClCompile Include="Game\Field\MapChipField.cpp" />
     <ClCompile Include="Game\OriginObject\OriginGameObject.cpp" />
+    <ClCompile Include="Game\Particle\GameEmitters.cpp" />
     <ClCompile Include="Game\Scene\GameRun.cpp" />
     <ClCompile Include="Game\Scene\GameScene.cpp" />
     <ClCompile Include="Game\Scene\GPUParticleScene.cpp" />
@@ -423,6 +424,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Game\Field\MapChipField.h" />
     <ClInclude Include="Game\OriginObject\OriginGameObject.h" />
     <ClInclude Include="Game\OriginObject\OriginState.h" />
+    <ClInclude Include="Game\Particle\GameEmitters.h" />
     <ClInclude Include="Game\Scene\GameRun.h" />
     <ClInclude Include="Game\Scene\GameScene.h" />
     <ClInclude Include="Game\Scene\GPUParticleScene.h" />

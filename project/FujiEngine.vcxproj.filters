@@ -110,6 +110,9 @@
     <ClCompile Include="Engine\Camera\DebugCamera.cpp">
       <Filter>Engine\Camera</Filter>
     </ClCompile>
+    <ClCompile Include="Game\Particle\GameEmitters.cpp">
+      <Filter>Game\Particle</Filter>
+    </ClCompile>
     <ClCompile Include="Game\Scene\GameRun.cpp">
       <Filter>Game\Scene</Filter>
     </ClCompile>
@@ -496,6 +499,9 @@
     <ClInclude Include="Engine\Camera\DebugCamera.h">
       <Filter>Engine\Camera</Filter>
     </ClInclude>
+    <ClInclude Include="Game\Particle\GameEmitters.h">
+      <Filter>Game\Particle</Filter>
+    </ClInclude>
     <ClInclude Include="Game\Scene\GameRun.h">
       <Filter>Game\Scene</Filter>
     </ClInclude>
@@ -875,6 +881,9 @@
     </Filter>
     <Filter Include="Game\Scene">
       <UniqueIdentifier>{9f02f36c-fca6-4a84-99db-93ec2013ba4b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Particle">
+      <UniqueIdentifier>{3c8a1f2d-6b47-4d9e-9a15-2f7c5e0b48d1}</UniqueIdentifier>
     </Filter>
     <Filter Include="Game\GameObj">
       <UniqueIdentifier>{617e8378-5eb2-45b5-b7d1-72cdc9b6216f}</UniqueIdentifier>

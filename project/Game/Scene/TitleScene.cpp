@@ -14,6 +14,7 @@
 #include <cmath>
 #include "Engine/DX/OffscreenManager.h"
 #include "Engine/WinApp/MyWindow.h"
+#include "Game/Particle/GameEmitters.h"
 
 using namespace Core;
 using namespace Graphics;
@@ -26,7 +27,8 @@ using namespace DXC;
 TitleScene::TitleScene() {}
 
 TitleScene::~TitleScene() {
-	ParticleManager::GetParticleCSEmitterSurface(0).SetEmit(false);
+	ParticleManager::GetInstance()->ResetCSEmitters();
+	Game::CreateDefaultEmitters();
 }
 
 void TitleScene::Initialize() {
@@ -99,7 +101,6 @@ void TitleScene::Initialize() {
 		emitterCS.Load("Tower");
 		emitterCS.SetEmit(true);
 		emitterCS.SetPos({ x,0.0f,z });
-		csEmitterNums_.push_back(emitNum);
 	}
 
 	{
@@ -113,6 +114,9 @@ void TitleScene::Initialize() {
 	auto& emitterCS = ParticleManager::GetSphereEmitter(emitNum);
 	emitterCS.Load("skyStar");
 	emitterCS.SetEmit(true);
+
+	Game::DefaultSphereEmitter().Load("titleDefault");
+	Game::DefaultSphereEmitter().Emit();// 一度だけエミットする
 
 }
 
@@ -141,7 +145,7 @@ void TitleScene::Update() {
 	CameraManager::GetInstance()->GetCamera()->GetTransform().rotate = { rotateX,0.0f,0.0f };
 	player_->TitleUpdate(startTime_);
 
-	auto& emitter = ParticleManager::GetSphereEmitter(0);
+	auto& emitter = Game::DefaultSphereEmitter();
 	emitter.SetPos(particleTest_->GetWorldPos());
 
 	cMane_->CheckAllCollision();

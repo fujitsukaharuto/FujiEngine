@@ -101,7 +101,6 @@ namespace Graphics {
 		int InitGPUEmitterSurface(const std::string& fileName);
 
 		void ResetCSEmitters();
-		void InitDefaultCSEmitter();
 
 		// ファイルのデータを読み込む
 		void LoadCSEmitterFileDir();

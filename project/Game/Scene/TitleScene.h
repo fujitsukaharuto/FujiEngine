@@ -71,7 +71,6 @@ private:
 	float csEmitterMoveTime_;
 
 	std::unique_ptr<CollisionManager> cMane_;
-	std::vector<int> csEmitterNums_;
 
 	// sceneChange
 	std::unique_ptr<Graphics::Sprite> black_;

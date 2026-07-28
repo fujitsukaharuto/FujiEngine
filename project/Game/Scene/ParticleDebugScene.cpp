@@ -11,6 +11,7 @@
 #include "Engine/Particle/ParticleManager.h"
 #include "Engine/Scene/SceneManager.h"
 #include "Engine/WinApp/MyWindow.h"
+#include "Game/Particle/GameEmitters.h"
 
 using namespace Core;
 using namespace Graphics;
@@ -25,7 +26,7 @@ ParticleDebugScene::~ParticleDebugScene() {
 	FPSKeeper::SetUnStopped();
 	ParticleManager::SetIsStopped(false);
 	ParticleManager::GetInstance()->ResetCSEmitters();
-	ParticleManager::GetInstance()->InitDefaultCSEmitter();
+	Game::CreateDefaultEmitters();
 }
 
 void ParticleDebugScene::Initialize() {

@@ -1,6 +1,7 @@
 #include "GameRun.h"
 #include "Engine/ImGuiManager/ImGuiManager.h"
 #include "SceneFactory.h"
+#include "Game/Particle/GameEmitters.h"
 #include "Engine/DX/FPSKeeper.h"
 
 using namespace Audio;
@@ -35,6 +36,7 @@ void GameRun::Initialize() {
 #pragma region パーティクル生成
 	
 	LoadParticleGroup();
+	Game::CreateDefaultEmitters();
 
 #pragma endregion
 

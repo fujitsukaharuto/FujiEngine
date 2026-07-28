@@ -6,6 +6,7 @@
 #include "Engine/Serialize/JsonSerializer.h"
 #include <numbers>
 
+#include "Game/Particle/GameEmitters.h"
 #include "Game/GameObj/Enemy/Behavior/BossRoot.h"
 #include "Game/GameObj/Enemy/Behavior/BossAttack.h"
 #include "Game/GameObj/Enemy/Behavior/BossJumpAttack.h"
@@ -38,9 +39,7 @@ Boss::~Boss() {
 	ParticleManager::GetSphereEmitter(leftHandAuraCS_).SetEmit(false);
 	ParticleManager::GetSphereEmitter(rightHandAuraCS_).SetEmit(false);
 
-	for (int i = 0; i < kChargeCount_; i++) {
-		ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]).SetEmit(false);
-	}
+	StopTraceEmitters();
 }
 
 void Boss::Update() {
@@ -286,7 +285,7 @@ bool Boss::DushCharge(float& t, float maxT, bool& isNear, float range) {
 	t += FPSKeeper::DeltaTimeFrame();
 
 	for (int i = 0; i < kChargeCount_; i++) {
-		auto& emitter = ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]);
+		auto& emitter = TraceEmitter(i);
 		emitter.GetData().prevTranslate = traceAnchors_[i]->GetWorldPos();
 
 		if (chargeParents_[i]->scale.x > 0.0f) { // チャージのサイズを縮小していく
@@ -309,9 +308,7 @@ bool Boss::DushCharge(float& t, float maxT, bool& isNear, float range) {
 		dushStartCircle_.pos_ = emitPos;
 		dushStartParticle_.Emit();
 		dushStartCircle_.Emit();
-		for (int i = 0; i < kChargeCount_; i++) {
-			ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]).SetEmit(false);
-		}
+		StopTraceEmitters();
 		return true;
 	}
 	return false;
@@ -374,8 +371,8 @@ void Boss::RodFall() {
 bool Boss::BeamCharge() {
 	auto& bp = params_.beam;
 	bool result = false;
-	if (ParticleManager::GetParticleCSEmitterSurface(1).IsEmit() == false) {
-		auto& emitter = ParticleManager::GetParticleCSEmitterSurface(1);
+	if (Game::BeamCrystalEmitter().IsEmit() == false) {
+		auto& emitter = Game::BeamCrystalEmitter();
 		emitter.SetEmit(true);
 		emitter.GetData().radius = 0.0f;
 		emitter.GetData().translate = animeModel_->GetTransform().translate;
@@ -383,7 +380,7 @@ bool Boss::BeamCharge() {
 	}
 
 	if (chargeSize_ > 0.0f) {
-		ParticleManager::GetParticleCSEmitterSurface(1).GetData().radius += bp.radiusGrowSpeed * FPSKeeper::DeltaTimeFrame();
+		Game::BeamCrystalEmitter().GetData().radius += bp.radiusGrowSpeed * FPSKeeper::DeltaTimeFrame();
 		for (int i = 0; i < kChargeCount_; i++) {
 			if (i > 2) {
 				if (!(chargeTime_ < bp.chargeTime - i * 2.0f)) {
@@ -391,7 +388,7 @@ bool Boss::BeamCharge() {
 				}
 			}
 
-			auto& emitter = ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]);
+			auto& emitter = TraceEmitter(i);
 			emitter.GetData().prevTranslate = traceAnchors_[i]->GetWorldPos();
 
 			if (chargeParents_[i]->scale.x > 0.0f) { // チャージのサイズを縮小していく
@@ -428,7 +425,7 @@ bool Boss::BeamCharge() {
 		result = true;
 		for (int i = 0; i < kChargeCount_; i++) {
 			if (chargeParents_[i]->scale.x > 0.0f) { // 完全に真ん中に集結するようにする
-				auto& emitter = ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]);
+				auto& emitter = TraceEmitter(i);
 				emitter.GetData().prevTranslate = traceAnchors_[i]->GetWorldPos();
 
 				ShrinkScale(i, bp.shrinkSpeed * FPSKeeper::DeltaTimeFrame());
@@ -449,9 +446,7 @@ bool Boss::BeamCharge() {
 }
 
 void Boss::BeamChargeComplete() {
-	for (int i = 0; i < kChargeCount_; i++) {
-		ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]).SetEmit(false);
-	}
+	StopTraceEmitters();
 	charge12_.Emit();
 	charge13_.Emit();
 	charge14_.Emit();
@@ -596,9 +591,7 @@ void Boss::LoadPhase() {
 
 void Boss::SetDefaultBehavior(bool isInvisibleItem) {
 	beam_->SetIsLive(false);
-	for (int i = 0; i < kChargeCount_; i++) {
-		ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]).SetEmit(false);
-	}
+	StopTraceEmitters();
 	ParticleManager::GetParticleCSEmitter(dushTrailIndex_).SetEmit(false);
 	if (isInvisibleItem) {
 		itemManager_->ReStart();
@@ -708,11 +701,34 @@ void Boss::EnergyTimeUpdate() {
 	}
 }
 
+SphereEmitter& Boss::TraceEmitter(int i) {
+	return ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]);
+}
+
+void Boss::StartTraceEmitters(float lifeTime, const Vector2& colorX, const Vector2& colorY, const Vector2& colorZ) {
+	for (int i = 0; i < kChargeCount_; i++) {
+		auto& emitter = TraceEmitter(i);
+		emitter.SetEmit(true);
+		emitter.GetData().lifeTime = lifeTime;
+		UpdateEmitterPos(i);
+		emitter.GetData().prevTranslate = traceAnchors_[i]->GetWorldPos();
+
+		Vector3 randColor = Random::GetVector3(colorX, colorY, colorZ);
+		emitter.GetData().colorMax = randColor;
+		emitter.GetData().colorMin = randColor;
+	}
+}
+
+void Boss::StopTraceEmitters() {
+	for (int i = 0; i < kChargeCount_; i++) {
+		TraceEmitter(i).SetEmit(false);
+	}
+}
+
 void Boss::UpdateEmitterPos(int i) {
 	float emitPos = chargeParents_[i]->scale.x;
 	traceAnchors_[i]->translate = { emitPos, emitPos, emitPos };
-	auto& emitter = ParticleManager::GetSphereEmitter(traceEmitterIndexes_[i]);
-	emitter.GetData().translate = traceAnchors_[i]->GetWorldPos();
+	TraceEmitter(i).GetData().translate = traceAnchors_[i]->GetWorldPos();
 }
 
 void Boss::ShrinkScale(int i, float delta) {

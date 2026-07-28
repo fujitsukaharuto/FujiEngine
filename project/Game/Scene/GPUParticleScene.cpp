@@ -11,6 +11,7 @@
 #include "Engine/Particle/ParticleManager.h"
 #include "Engine/Scene/SceneManager.h"
 #include "Engine/WinApp/MyWindow.h"
+#include "Game/Particle/GameEmitters.h"
 
 using namespace Core;
 using namespace Graphics;
@@ -25,7 +26,7 @@ GPUParticleScene::~GPUParticleScene() {
 	FPSKeeper::SetUnStopped();
 	ParticleManager::SetIsStopped(false);
 	ParticleManager::GetInstance()->ResetCSEmitters();
-	ParticleManager::GetInstance()->InitDefaultCSEmitter();
+	Game::CreateDefaultEmitters();
 }
 
 void GPUParticleScene::Initialize() {
@@ -57,6 +58,11 @@ void GPUParticleScene::Initialize() {
 	auto& emitterCS = ParticleManager::GetSphereEmitter(emitNum);
 	emitterCS.Load("bossHandAura");
 	emitterCS.SetEmit(true);
+
+	// メッシュ表面エミッターの実験用
+	ParticleManager::GetInstance()->InitGPUEmitterSurface("Terrain_1783481558545.obj");
+	ParticleManager::GetInstance()->InitGPUEmitterSurface("Terrain_1783481558545.obj");
+	ParticleManager::GetInstance()->InitGPUEmitterSurface("Terrain_1783481558545.obj");
 
 }
 
