@@ -42,6 +42,7 @@ void SphereEmitter::Update(float deltaTime) {
 	if (isOnceEmit_) {
 		data_.emit = 1;
 		data_.frequencyTime = 0.0f;
+		isOnceEmit_ = false;
 		return;
 	}
 	if (!isEmit_) {
@@ -80,7 +81,6 @@ void SphereEmitter::Dispatch(ID3D12GraphicsCommandList* cmd,
 	pPipeManager->SetComputeRootCBV(cmd, RootName::kEmitter, resource_[frameIndex]->GetGPUVirtualAddress());
 	uint32_t dispatchCount = (data_.count + 1024 - 1) / 1024;
 	cmd->Dispatch(dispatchCount, 1, 1);
-	isOnceEmit_ = false;
 }
 
 void SphereEmitter::DebugGUI() {
