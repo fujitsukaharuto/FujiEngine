@@ -3,6 +3,7 @@
 #include "Game/Collider/AABBCollider.h"
 #include "Engine/Model/Sprite/Sprite.h"
 #include "Engine/Audio/AudioPlayer.h"
+#include "Game/Particle/GameEmitters.h"
 
 #include "Game/GameObj/Player/Behavior/BasePlayerBehavior.h"
 #include "Game/GameObj/Player/AttackBehavior/BasePlayerAttackBehavior.h"
@@ -228,8 +229,8 @@ private:
 	float startLandingTime_ = 0.0f;
 	float startLandingMax_ = 0.0f;
 
-	int moveParticleCSL_;
-	int moveParticleCSR_;
+	int moveParticleCSL_ = Game::kInvalidEmitterIndex;
+	int moveParticleCSR_ = Game::kInvalidEmitterIndex;
 
 	DXC::DXCom* dxcommon_ = nullptr;
 

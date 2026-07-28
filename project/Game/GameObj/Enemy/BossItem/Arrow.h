@@ -3,6 +3,7 @@
 #include "Game/Collider/AABBCollider.h"
 #include "Engine/Particle/ParticleEmitter.h"
 #include "Engine/Audio/AudioPlayer.h"
+#include "Game/Particle/GameEmitters.h"
 
 
 /// <summary>
@@ -115,13 +116,13 @@ private:
 	Graphics::ParticleEmitter hit_;
 	Graphics::ParticleEmitter hitParticle_;
 	Graphics::ParticleEmitter hitExpand_;
-	int hitEmitIndex_ = 0;
-	int hitEmitTrailIndex_ = 0;
+	int hitEmitIndex_ = Game::kInvalidEmitterIndex;
+	int hitEmitTrailIndex_ = Game::kInvalidEmitterIndex;
 
 	Audio::SoundData* throwSE_ = nullptr;
 
 	// Gpu Particle
-	int emitterNumber_ = -1;
+	int emitterNumber_ = Game::kInvalidEmitterIndex;
 
 
 	// Rod

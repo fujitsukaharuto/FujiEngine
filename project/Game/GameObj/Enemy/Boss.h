@@ -13,6 +13,7 @@
 #include "Game/GameObj/Enemy/BossItem/WaveWall.h"
 #include "Game/GameObj/Enemy/BossItem/Beam.h"
 #include "Game/GameObj/Enemy/BossItem/Arrow.h"
+#include "Game/Particle/GameEmitters.h"
 
 class Player;
 namespace Graphics { class SphereEmitter; }
@@ -351,7 +352,7 @@ private:
 	float summonCircleExpandTime_ = 50.0f;
 	float energyTime_ = 120.0f;
 	float energyCoolTime_ = 30.0f;
-	int summonIndex_ = 0;
+	int summonIndex_ = Game::kInvalidEmitterIndex;
 	float bossYPos_ = 0.0f;
 	float frontZ_ = 4.5f;
 	float coreY_ = 6.5f;
@@ -375,15 +376,14 @@ private:
 	float cameraFollowSpeed_ = kCameraFollowSpeed_;
 
 	bool isNowDush_ = false;
-	int dushChargeIndex_ = 0;
-	int dushTrailIndex_ = 0;
+	int dushTrailIndex_ = Game::kInvalidEmitterIndex;
 
 	// emitter
 	Graphics::ParticleEmitter waveAttack1;
 	Graphics::ParticleEmitter waveAttack2;
 	Graphics::ParticleEmitter waveAttack3;
 	Graphics::ParticleEmitter waveAttack4;
-	int waveCSEmitIndex_ = 0;
+	int waveCSEmitIndex_ = Game::kInvalidEmitterIndex;
 
 	Graphics::ParticleEmitter charge9_;
 	Graphics::ParticleEmitter charge10_;
@@ -394,7 +394,7 @@ private:
 	Graphics::ParticleEmitter charge15_;
 
 	Graphics::ParticleEmitter jumpWave_;
-	int jumpCSEmitIndex_ = 0;
+	int jumpCSEmitIndex_ = Game::kInvalidEmitterIndex;
 
 	Graphics::ParticleEmitter roaringWave_;
 	Graphics::ParticleEmitter roaringParticle_;
@@ -408,10 +408,10 @@ private:
 	Graphics::ParticleEmitter dushStartCircle_;
 	Graphics::ParticleEmitter dushSmoke_;
 
-	int halfAuraCS_ = 0;
-	int halfSmallAuraCS_ = 0;
-	int leftHandAuraCS_ = 0;
-	int rightHandAuraCS_ = 0;
+	int halfAuraCS_ = Game::kInvalidEmitterIndex;
+	int halfSmallAuraCS_ = Game::kInvalidEmitterIndex;
+	int leftHandAuraCS_ = Game::kInvalidEmitterIndex;
+	int rightHandAuraCS_ = Game::kInvalidEmitterIndex;
 
 	Audio::SoundData* jumpAttackSE_;
 
