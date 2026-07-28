@@ -118,7 +118,7 @@ namespace Audio {
 		Microsoft::WRL::ComPtr<IXAudio2> xAudio2_;
 		IXAudio2MasteringVoice* masterVoice_;
 		std::unordered_map<std::string, SoundData> container_;
-		const std::string kDirectoryPath_ = "resource/audio/";
+		const std::string kDirectoryPath_ = "resource/Audio/";
 
 	};
 }

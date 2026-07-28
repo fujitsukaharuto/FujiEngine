@@ -1,4 +1,4 @@
-#include "Game/Scene/GameRun.h"
+#include "Game/App/GameRun.h"
 #include <memory>
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {

@@ -1,5 +1,5 @@
 #include "Boss.h"
-#include "Engine/ImGuiManager/ImGuiManager.h"
+#include "Engine/Core/Debug/ImGuiManager.h"
 #include "Game/GameObj/Enemy/Behavior/BossRoot.h"
 #include "Game/GameObj/Enemy/Behavior/BossAttack.h"
 #include "Game/GameObj/Enemy/Behavior/BossJumpAttack.h"

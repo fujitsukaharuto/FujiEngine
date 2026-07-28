@@ -8,125 +8,125 @@
     <ClCompile Include="Engine\Audio\AudioPlayer.cpp">
       <Filter>Engine\Audio</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\DX\DXCom.cpp">
-      <Filter>Engine\DX</Filter>
+    <ClCompile Include="Engine\DXC\DXCom.cpp">
+      <Filter>Engine\DXC</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\DX\DXCommand.cpp">
-      <Filter>Engine\DX</Filter>
+    <ClCompile Include="Engine\DXC\Command\DXCommand.cpp">
+      <Filter>Engine\DXC\Command</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\DX\DXCompile.cpp">
-      <Filter>Engine\DX</Filter>
+    <ClCompile Include="Engine\DXC\Shader\DXCompile.cpp">
+      <Filter>Engine\DXC\Shader</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\GraphicPipeline\BasePipeline.cpp">
-      <Filter>Engine\GraphicPipeline</Filter>
+    <ClCompile Include="Engine\Graphics\Pipeline\BasePipeline.cpp">
+      <Filter>Engine\Graphics\Pipeline</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\GraphicPipeline\ComputePipeline.cpp">
-      <Filter>Engine\GraphicPipeline</Filter>
+    <ClCompile Include="Engine\Graphics\Pipeline\Compute\ComputePipeline.cpp">
+      <Filter>Engine\Graphics\Pipeline\Compute</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\GraphicPipeline\RootParam.cpp">
-      <Filter>Engine\GraphicPipeline</Filter>
+    <ClCompile Include="Engine\Graphics\Pipeline\RootParam.cpp">
+      <Filter>Engine\Graphics\Pipeline</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\GraphicPipeline\NonePipeline.cpp">
-      <Filter>Engine\GraphicPipeline</Filter>
+    <ClCompile Include="Engine\Graphics\Pipeline\Render\NonePipeline.cpp">
+      <Filter>Engine\Graphics\Pipeline\Render</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\GraphicPipeline\ParticlePipeline.cpp">
-      <Filter>Engine\GraphicPipeline</Filter>
+    <ClCompile Include="Engine\Graphics\Pipeline\Render\ParticlePipeline.cpp">
+      <Filter>Engine\Graphics\Pipeline\Render</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\GraphicPipeline\Pipeline.cpp">
-      <Filter>Engine\GraphicPipeline</Filter>
+    <ClCompile Include="Engine\Graphics\Pipeline\Render\Pipeline.cpp">
+      <Filter>Engine\Graphics\Pipeline\Render</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\ImGuiManager\ImGuiManager.cpp">
-      <Filter>Engine\ImGuiManager</Filter>
+    <ClCompile Include="Engine\Core\Debug\ImGuiManager.cpp">
+      <Filter>Engine\Core\Debug</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Input\Input.cpp">
-      <Filter>Engine\Input</Filter>
+    <ClCompile Include="Engine\Core\Input\Input.cpp">
+      <Filter>Engine\Core\Input</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Logger\Logger.cpp">
       <Filter>Engine\Logger</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Model\Model.cpp">
-      <Filter>Engine\Model</Filter>
+    <ClCompile Include="Engine\Graphics\Model\Model.cpp">
+      <Filter>Engine\Graphics\Model</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Model\TextureManager.cpp">
-      <Filter>Engine\Model</Filter>
+    <ClCompile Include="Engine\Graphics\Texture\TextureManager.cpp">
+      <Filter>Engine\Graphics\Texture</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\WinApp\MyWindow.cpp">
-      <Filter>Engine\WinApp</Filter>
+    <ClCompile Include="Engine\Core\App\MyWindow.cpp">
+      <Filter>Engine\Core\App</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Light\DirectionLight.cpp">
-      <Filter>Engine\Light</Filter>
+    <ClCompile Include="Engine\Graphics\Light\DirectionLight.cpp">
+      <Filter>Engine\Graphics\Light</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Light\PointLight.cpp">
-      <Filter>Engine\Light</Filter>
+    <ClCompile Include="Engine\Graphics\Light\PointLight.cpp">
+      <Filter>Engine\Graphics\Light</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Light\LightManager.cpp">
-      <Filter>Engine\Light</Filter>
+    <ClCompile Include="Engine\Graphics\Light\LightManager.cpp">
+      <Filter>Engine\Graphics\Light</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Light\SpotLight.cpp">
-      <Filter>Engine\Light</Filter>
+    <ClCompile Include="Engine\Graphics\Light\SpotLight.cpp">
+      <Filter>Engine\Graphics\Light</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\DX\FPSKeeper.cpp">
-      <Filter>Engine\DX</Filter>
+    <ClCompile Include="Engine\Core\Time\FPSKeeper.cpp">
+      <Filter>Engine\Core\Time</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\GlobalVariables\GlobalVariables.cpp">
-      <Filter>Engine\GlobalVariables</Filter>
+    <ClCompile Include="Engine\Core\Serialize\GlobalVariables.cpp">
+      <Filter>Engine\Core\Serialize</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Model\ModelManager.cpp">
-      <Filter>Engine\Model</Filter>
+    <ClCompile Include="Engine\Graphics\Model\ModelManager.cpp">
+      <Filter>Engine\Graphics\Model</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Model\Object3d.cpp">
-      <Filter>Engine\Model</Filter>
+    <ClCompile Include="Engine\Graphics\Object\Object3d.cpp">
+      <Filter>Engine\Graphics\Object</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\GraphicPipeline\PipelineManager.cpp">
-      <Filter>Engine\GraphicPipeline</Filter>
+    <ClCompile Include="Engine\Graphics\Pipeline\PipelineManager.cpp">
+      <Filter>Engine\Graphics\Pipeline</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Scene\BaseScene.cpp">
       <Filter>Engine\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Particle\ParticleEmitter.cpp">
-      <Filter>Engine\Particle</Filter>
+    <ClCompile Include="Engine\Graphics\Particle\ParticleEmitter.cpp">
+      <Filter>Engine\Graphics\Particle</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Particle\ParticleManager.cpp">
-      <Filter>Engine\Particle</Filter>
+    <ClCompile Include="Engine\Graphics\Particle\ParticleManager.cpp">
+      <Filter>Engine\Graphics\Particle</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\DX\SRVManager.cpp">
-      <Filter>Engine\DX</Filter>
+    <ClCompile Include="Engine\DXC\Resource\SRVManager.cpp">
+      <Filter>Engine\DXC\Resource</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Scene\SceneManager.cpp">
       <Filter>Engine\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\DX\Framework.cpp">
-      <Filter>Engine\DX</Filter>
+    <ClCompile Include="Engine\Core\App\Framework.cpp">
+      <Filter>Engine\Core\App</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\GraphicPipeline\Line3dPipe.cpp">
-      <Filter>Engine\GraphicPipeline</Filter>
+    <ClCompile Include="Engine\Graphics\Pipeline\Render\Line3dPipe.cpp">
+      <Filter>Engine\Graphics\Pipeline\Render</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Camera\Camera.cpp">
-      <Filter>Engine\Camera</Filter>
+    <ClCompile Include="Engine\Graphics\Camera\Camera.cpp">
+      <Filter>Engine\Graphics\Camera</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Camera\CameraManager.cpp">
-      <Filter>Engine\Camera</Filter>
+    <ClCompile Include="Engine\Graphics\Camera\CameraManager.cpp">
+      <Filter>Engine\Graphics\Camera</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Camera\DebugCamera.cpp">
-      <Filter>Engine\Camera</Filter>
+    <ClCompile Include="Engine\Graphics\Camera\DebugCamera.cpp">
+      <Filter>Engine\Graphics\Camera</Filter>
     </ClCompile>
     <ClCompile Include="Game\Particle\GameEmitters.cpp">
       <Filter>Game\Particle</Filter>
     </ClCompile>
-    <ClCompile Include="Game\Scene\GameRun.cpp">
-      <Filter>Game\Scene</Filter>
+    <ClCompile Include="Game\App\GameRun.cpp">
+      <Filter>Game\App</Filter>
     </ClCompile>
-    <ClCompile Include="Game\Scene\GameScene.cpp">
-      <Filter>Game\Scene</Filter>
+    <ClCompile Include="Game\Scene\Main\GameScene.cpp">
+      <Filter>Game\Scene\Main</Filter>
     </ClCompile>
-    <ClCompile Include="Game\Scene\ResultScene.cpp">
-      <Filter>Game\Scene</Filter>
+    <ClCompile Include="Game\Scene\Main\ResultScene.cpp">
+      <Filter>Game\Scene\Main</Filter>
     </ClCompile>
     <ClCompile Include="Game\Scene\SceneFactory.cpp">
       <Filter>Game\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Game\Scene\TitleScene.cpp">
-      <Filter>Game\Scene</Filter>
+    <ClCompile Include="Game\Scene\Main\TitleScene.cpp">
+      <Filter>Game\Scene\Main</Filter>
     </ClCompile>
     <ClCompile Include="Game\Collider\BaseCollider.cpp">
       <Filter>Game\Collider</Filter>
@@ -137,14 +137,14 @@
     <ClCompile Include="Game\Collider\CollisionManager.cpp">
       <Filter>Game\Collider</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\DX\OffscreenManager.cpp">
-      <Filter>Engine\DX</Filter>
+    <ClCompile Include="Engine\Graphics\PostEffect\OffscreenManager.cpp">
+      <Filter>Engine\Graphics\PostEffect</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Model\AnimationData\AnimationModel.cpp">
-      <Filter>Engine\Model\AnimationData</Filter>
+    <ClCompile Include="Engine\Graphics\Object\AnimationModel.cpp">
+      <Filter>Engine\Graphics\Object</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\GraphicPipeline\AnimationPipeline.cpp">
-      <Filter>Engine\GraphicPipeline</Filter>
+    <ClCompile Include="Engine\Graphics\Pipeline\Render\AnimationPipeline.cpp">
+      <Filter>Engine\Graphics\Pipeline\Render</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Math\Matrix\MatrixCalculation.cpp">
       <Filter>Engine\Math\Matrix</Filter>
@@ -173,8 +173,8 @@
     <ClCompile Include="Game\GameObj\Player\AttackBehavior\PlayerAttackRoot.cpp">
       <Filter>Game\GameObj\Player\AttackBehavior</Filter>
     </ClCompile>
-    <ClCompile Include="Game\Scene\ParticleDebugScene.cpp">
-      <Filter>Game\Scene</Filter>
+    <ClCompile Include="Game\Scene\Debug\ParticleDebugScene.cpp">
+      <Filter>Game\Scene\Debug</Filter>
     </ClCompile>
     <ClCompile Include="Game\GameObj\Player\PlayerBullet.cpp">
       <Filter>Game\GameObj\Player</Filter>
@@ -182,32 +182,32 @@
     <ClCompile Include="Game\GameObj\Enemy\Boss.cpp">
       <Filter>Game\GameObj\Enemy</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Editor\CommandManager.cpp">
-      <Filter>Engine\Editor</Filter>
+    <ClCompile Include="Engine\Editor\Command\CommandManager.cpp">
+      <Filter>Engine\Editor\Command</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\GraphicPipeline\SkyboxPipe.cpp">
-      <Filter>Engine\GraphicPipeline</Filter>
+    <ClCompile Include="Engine\Graphics\Pipeline\Render\SkyboxPipe.cpp">
+      <Filter>Engine\Graphics\Pipeline\Render</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\GraphicPipeline\SkinningCSPipe.cpp">
-      <Filter>Engine\GraphicPipeline</Filter>
+    <ClCompile Include="Engine\Graphics\Pipeline\Compute\SkinningCSPipe.cpp">
+      <Filter>Engine\Graphics\Pipeline\Compute</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Serialize\JsonSerializer.cpp">
-      <Filter>Engine\Serialize</Filter>
+    <ClCompile Include="Engine\Core\Serialize\JsonSerializer.cpp">
+      <Filter>Engine\Core\Serialize</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Editor\JsonEditorUI.cpp">
-      <Filter>Engine\Editor</Filter>
+    <ClCompile Include="Engine\Editor\Widget\JsonEditorUI.cpp">
+      <Filter>Engine\Editor\Widget</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Editor\Object3dEditor.cpp">
-      <Filter>Engine\Editor</Filter>
+    <ClCompile Include="Engine\Editor\ObjectEditor\Object3dEditor.cpp">
+      <Filter>Engine\Editor\ObjectEditor</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Editor\AnimationModelEditor.cpp">
-      <Filter>Engine\Editor</Filter>
+    <ClCompile Include="Engine\Editor\ObjectEditor\AnimationModelEditor.cpp">
+      <Filter>Engine\Editor\ObjectEditor</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Editor\GizmoHelper.cpp">
-      <Filter>Engine\Editor</Filter>
+    <ClCompile Include="Engine\Editor\Widget\GizmoHelper.cpp">
+      <Filter>Engine\Editor\Widget</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Editor\GPUParticleSystemEditor.cpp">
-      <Filter>Engine\Editor</Filter>
+    <ClCompile Include="Engine\Editor\ObjectEditor\GPUParticleSystemEditor.cpp">
+      <Filter>Engine\Editor\ObjectEditor</Filter>
     </ClCompile>
     <ClCompile Include="Game\GameObj\Enemy\Behavior\BossRoot.cpp">
       <Filter>Game\GameObj\Enemy\Behavior</Filter>
@@ -216,13 +216,13 @@
       <Filter>Game\GameObj\Enemy\Behavior</Filter>
     </ClCompile>
     <ClCompile Include="externals\imgui\utilities\drawing.cpp">
-      <Filter>Externals\imgui\utilities</Filter>
+      <Filter>externals\imgui\utilities</Filter>
     </ClCompile>
     <ClCompile Include="externals\imgui\utilities\widgets.cpp">
-      <Filter>Externals\imgui\utilities</Filter>
+      <Filter>externals\imgui\utilities</Filter>
     </ClCompile>
     <ClCompile Include="externals\imgui\utilities\builders.cpp">
-      <Filter>Externals\imgui\utilities</Filter>
+      <Filter>externals\imgui\utilities</Filter>
     </ClCompile>
     <ClCompile Include="Game\GameObj\Enemy\BossCore.cpp">
       <Filter>Game\GameObj\Enemy</Filter>
@@ -236,11 +236,11 @@
     <ClCompile Include="Game\GameObj\Enemy\Behavior\BossBeamAttack.cpp">
       <Filter>Game\GameObj\Enemy\Behavior</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Editor\CreateObjCommand.cpp">
-      <Filter>Engine\Editor</Filter>
+    <ClCompile Include="Engine\Editor\Command\CreateObjCommand.cpp">
+      <Filter>Engine\Editor\Command</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Editor\DeleteObjCommand.cpp">
-      <Filter>Engine\Editor</Filter>
+    <ClCompile Include="Engine\Editor\Command\DeleteObjCommand.cpp">
+      <Filter>Engine\Editor\Command</Filter>
     </ClCompile>
     <ClCompile Include="Game\GameObj\Enemy\Behavior\BossJumpAttack.cpp">
       <Filter>Game\GameObj\Enemy\Behavior</Filter>
@@ -251,11 +251,11 @@
     <ClCompile Include="Game\GameObj\Enemy\BossItem\UnderRing.cpp">
       <Filter>Game\GameObj\Enemy\BossItem</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\GraphicPipeline\SpritePipe.cpp">
-      <Filter>Engine\GraphicPipeline</Filter>
+    <ClCompile Include="Engine\Graphics\Pipeline\Render\SpritePipe.cpp">
+      <Filter>Engine\Graphics\Pipeline\Render</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\GraphicPipeline\CSPipe\OutlineCSPipe.cpp">
-      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
+    <ClCompile Include="Engine\Graphics\Pipeline\Compute\OutlineCSPipe.cpp">
+      <Filter>Engine\Graphics\Pipeline\Compute</Filter>
     </ClCompile>
     <ClCompile Include="Game\GameObj\Player\Behavior\PlayerAvoid.cpp">
       <Filter>Game\GameObj\Player\Behavior</Filter>
@@ -263,8 +263,8 @@
     <ClCompile Include="Game\GameObj\Enemy\Behavior\BossAreaAttack.cpp">
       <Filter>Game\GameObj\Enemy\Behavior</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\GraphicPipeline\ParticleCSPipe.cpp">
-      <Filter>Engine\GraphicPipeline</Filter>
+    <ClCompile Include="Engine\Graphics\Pipeline\Compute\ParticleCSPipe.cpp">
+      <Filter>Engine\Graphics\Pipeline\Compute</Filter>
     </ClCompile>
     <ClCompile Include="Game\GameObj\Enemy\BossItem\Arrow.cpp">
       <Filter>Game\GameObj\Enemy\BossItem</Filter>
@@ -278,35 +278,35 @@
     <ClCompile Include="Game\OriginObject\OriginGameObject.cpp">
       <Filter>Game\OriginObject</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Particle\GPUParticle\GPUParticleSystem.cpp">
-      <Filter>Engine\Particle\GPUParticle</Filter>
+    <ClCompile Include="Engine\Graphics\Particle\GPUParticle\GPUParticleSystem.cpp">
+      <Filter>Engine\Graphics\Particle\GPUParticle</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Particle\GPUParticle\GPUEmitter\SphereEmitter.cpp">
-      <Filter>Engine\Particle\GPUParticle\GPUEmitter</Filter>
+    <ClCompile Include="Engine\Graphics\Particle\GPUParticle\GPUEmitter\SphereEmitter.cpp">
+      <Filter>Engine\Graphics\Particle\GPUParticle\GPUEmitter</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Particle\GPUParticle\GPUEmitter\TextureBasedEmitter.cpp">
-      <Filter>Engine\Particle\GPUParticle\GPUEmitter</Filter>
+    <ClCompile Include="Engine\Graphics\Particle\GPUParticle\GPUEmitter\TextureBasedEmitter.cpp">
+      <Filter>Engine\Graphics\Particle\GPUParticle\GPUEmitter</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Particle\GPUParticle\GPUEmitter\MeshSurfaceEmitter.cpp">
-      <Filter>Engine\Particle\GPUParticle\GPUEmitter</Filter>
+    <ClCompile Include="Engine\Graphics\Particle\GPUParticle\GPUEmitter\MeshSurfaceEmitter.cpp">
+      <Filter>Engine\Graphics\Particle\GPUParticle\GPUEmitter</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Particle\ParticleGroup\IParticleGroup.cpp">
-      <Filter>Engine\Particle\ParticleGroup</Filter>
+    <ClCompile Include="Engine\Graphics\Particle\ParticleGroup\IParticleGroup.cpp">
+      <Filter>Engine\Graphics\Particle\ParticleGroup</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Particle\ParticleGroup\ParticleGroup.cpp">
-      <Filter>Engine\Particle\ParticleGroup</Filter>
+    <ClCompile Include="Engine\Graphics\Particle\ParticleGroup\ParticleGroup.cpp">
+      <Filter>Engine\Graphics\Particle\ParticleGroup</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Particle\ParticleGroup\ParentParticleGroup.cpp">
-      <Filter>Engine\Particle\ParticleGroup</Filter>
+    <ClCompile Include="Engine\Graphics\Particle\ParticleGroup\ParentParticleGroup.cpp">
+      <Filter>Engine\Graphics\Particle\ParticleGroup</Filter>
     </ClCompile>
     <ClCompile Include="Game\GameObj\Enemy\Behavior\BossDushAttack.cpp">
       <Filter>Game\GameObj\Enemy\Behavior</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\GraphicPipeline\SplatCompositePipe.cpp">
-      <Filter>Engine\GraphicPipeline</Filter>
+    <ClCompile Include="Engine\Graphics\Pipeline\Render\SplatCompositePipe.cpp">
+      <Filter>Engine\Graphics\Pipeline\Render</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\DX\GPUTimer.cpp">
-      <Filter>Engine\DX</Filter>
+    <ClCompile Include="Engine\DXC\Debug\GPUTimer.cpp">
+      <Filter>Engine\DXC\Debug</Filter>
     </ClCompile>
     <ClCompile Include="Game\GameObj\Enemy\Boss_Debug.cpp">
       <Filter>Game\GameObj\Enemy</Filter>
@@ -320,62 +320,62 @@
     <ClCompile Include="Engine\Math\Quaternion\Quaternion.cpp">
       <Filter>Engine\Math\Quaternion</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Particle\ParticleManager_Debug.cpp">
-      <Filter>Engine\Particle</Filter>
+    <ClCompile Include="Engine\Graphics\Particle\ParticleManager_Debug.cpp">
+      <Filter>Engine\Graphics\Particle</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Particle\ParticleManager_Init.cpp">
-      <Filter>Engine\Particle</Filter>
+    <ClCompile Include="Engine\Graphics\Particle\ParticleManager_Init.cpp">
+      <Filter>Engine\Graphics\Particle</Filter>
     </ClCompile>
-    <ClCompile Include="Game\Scene\GPUParticleScene.cpp">
-      <Filter>Game\Scene</Filter>
+    <ClCompile Include="Game\Scene\Debug\GPUParticleScene.cpp">
+      <Filter>Game\Scene\Debug</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\GraphicPipeline\CSPipe\TrailEmitCSPipe.cpp">
-      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
+    <ClCompile Include="Engine\Graphics\Pipeline\Compute\TrailEmitCSPipe.cpp">
+      <Filter>Engine\Graphics\Pipeline\Compute</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\DX\GraphicsDevice.cpp">
-      <Filter>Engine\DX</Filter>
+    <ClCompile Include="Engine\DXC\Device\GraphicsDevice.cpp">
+      <Filter>Engine\DXC\Device</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\DX\SwapChainManager.cpp">
-      <Filter>Engine\DX</Filter>
+    <ClCompile Include="Engine\DXC\Device\SwapChainManager.cpp">
+      <Filter>Engine\DXC\Device</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\DX\DX12Helper.cpp">
-      <Filter>Engine\DX</Filter>
+    <ClCompile Include="Engine\DXC\Resource\DX12Helper.cpp">
+      <Filter>Engine\DXC\Resource</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\DX\CommandContext.cpp">
-      <Filter>Engine\DX</Filter>
+    <ClCompile Include="Engine\DXC\Command\CommandContext.cpp">
+      <Filter>Engine\DXC\Command</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Model\ObjectRenderer.cpp">
-      <Filter>Engine\Model</Filter>
+    <ClCompile Include="Engine\Graphics\Object\ObjectRenderer.cpp">
+      <Filter>Engine\Graphics\Object</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Model\Line\Line3dDrawer.cpp">
-      <Filter>Engine\Model\Line</Filter>
+    <ClCompile Include="Engine\Graphics\Line\Line3dDrawer.cpp">
+      <Filter>Engine\Graphics\Line</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Model\Sprite\Sprite.cpp">
-      <Filter>Engine\Model\Sprite</Filter>
+    <ClCompile Include="Engine\Graphics\Sprite\Sprite.cpp">
+      <Filter>Engine\Graphics\Sprite</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Model\Sprite\SpriteRenderer.cpp">
-      <Filter>Engine\Model\Sprite</Filter>
+    <ClCompile Include="Engine\Graphics\Sprite\SpriteRenderer.cpp">
+      <Filter>Engine\Graphics\Sprite</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Model\Mesh\Mesh.cpp">
-      <Filter>Engine\Model\Mesh</Filter>
+    <ClCompile Include="Engine\Graphics\Model\Mesh\Mesh.cpp">
+      <Filter>Engine\Graphics\Model\Mesh</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Model\Mesh\SkinnedMesh.cpp">
-      <Filter>Engine\Model\Mesh</Filter>
+    <ClCompile Include="Engine\Graphics\Model\Mesh\SkinnedMesh.cpp">
+      <Filter>Engine\Graphics\Model\Mesh</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Model\Material\Material.cpp">
-      <Filter>Engine\Model\Material</Filter>
+    <ClCompile Include="Engine\Graphics\Model\Material\Material.cpp">
+      <Filter>Engine\Graphics\Model\Material</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Model\Base\RenderObject.cpp">
-      <Filter>Engine\Model\Base</Filter>
+    <ClCompile Include="Engine\Graphics\Object\RenderObject.cpp">
+      <Filter>Engine\Graphics\Object</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Model\SkyBox\SkyBox.cpp">
-      <Filter>Engine\Model\SkyBox</Filter>
+    <ClCompile Include="Engine\Graphics\SkyBox\SkyBox.cpp">
+      <Filter>Engine\Graphics\SkyBox</Filter>
     </ClCompile>
-    <ClCompile Include="Game\Scene\TestScene.cpp">
-      <Filter>Game\Scene</Filter>
+    <ClCompile Include="Game\Scene\Debug\TestScene.cpp">
+      <Filter>Game\Scene\Debug</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\GraphicPipeline\BaseGridPipe.cpp">
-      <Filter>Engine\GraphicPipeline</Filter>
+    <ClCompile Include="Engine\Graphics\Pipeline\Render\BaseGridPipe.cpp">
+      <Filter>Engine\Graphics\Pipeline\Render</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -385,95 +385,95 @@
     <ClInclude Include="Engine\Audio\AudioPlayer.h">
       <Filter>Engine\Audio</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\DX\DXCom.h">
-      <Filter>Engine\DX</Filter>
+    <ClInclude Include="Engine\DXC\DXCom.h">
+      <Filter>Engine\DXC</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\DX\DXCommand.h">
-      <Filter>Engine\DX</Filter>
+    <ClInclude Include="Engine\DXC\Command\DXCommand.h">
+      <Filter>Engine\DXC\Command</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\DX\DXCompile.h">
-      <Filter>Engine\DX</Filter>
+    <ClInclude Include="Engine\DXC\Shader\DXCompile.h">
+      <Filter>Engine\DXC\Shader</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\BasePipeline.h">
-      <Filter>Engine\GraphicPipeline</Filter>
+    <ClInclude Include="Engine\Graphics\Pipeline\BasePipeline.h">
+      <Filter>Engine\Graphics\Pipeline</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\ComputePipeline.h">
-      <Filter>Engine\GraphicPipeline</Filter>
+    <ClInclude Include="Engine\Graphics\Pipeline\Compute\ComputePipeline.h">
+      <Filter>Engine\Graphics\Pipeline\Compute</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\RootParam.h">
-      <Filter>Engine\GraphicPipeline</Filter>
+    <ClInclude Include="Engine\Graphics\Pipeline\RootParam.h">
+      <Filter>Engine\Graphics\Pipeline</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\RootNames.h">
-      <Filter>Engine\GraphicPipeline</Filter>
+    <ClInclude Include="Engine\Graphics\Pipeline\RootNames.h">
+      <Filter>Engine\Graphics\Pipeline</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\NonePipeline.h">
-      <Filter>Engine\GraphicPipeline</Filter>
+    <ClInclude Include="Engine\Graphics\Pipeline\Render\NonePipeline.h">
+      <Filter>Engine\Graphics\Pipeline\Render</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\ParticlePipeline.h">
-      <Filter>Engine\GraphicPipeline</Filter>
+    <ClInclude Include="Engine\Graphics\Pipeline\Render\ParticlePipeline.h">
+      <Filter>Engine\Graphics\Pipeline\Render</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\Pipeline.h">
-      <Filter>Engine\GraphicPipeline</Filter>
+    <ClInclude Include="Engine\Graphics\Pipeline\Render\Pipeline.h">
+      <Filter>Engine\Graphics\Pipeline\Render</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\ImGuiManager\ImGuiManager.h">
-      <Filter>Engine\ImGuiManager</Filter>
+    <ClInclude Include="Engine\Core\Debug\ImGuiManager.h">
+      <Filter>Engine\Core\Debug</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Input\Input.h">
-      <Filter>Engine\Input</Filter>
+    <ClInclude Include="Engine\Core\Input\Input.h">
+      <Filter>Engine\Core\Input</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Logger\Logger.h">
       <Filter>Engine\Logger</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Model\Model.h">
-      <Filter>Engine\Model</Filter>
+    <ClInclude Include="Engine\Graphics\Model\Model.h">
+      <Filter>Engine\Graphics\Model</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Model\TextureManager.h">
-      <Filter>Engine\Model</Filter>
+    <ClInclude Include="Engine\Graphics\Texture\TextureManager.h">
+      <Filter>Engine\Graphics\Texture</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\WinApp\MyWindow.h">
-      <Filter>Engine\WinApp</Filter>
+    <ClInclude Include="Engine\Core\App\MyWindow.h">
+      <Filter>Engine\Core\App</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Light\DirectionLight.h">
-      <Filter>Engine\Light</Filter>
+    <ClInclude Include="Engine\Graphics\Light\DirectionLight.h">
+      <Filter>Engine\Graphics\Light</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Light\PointLight.h">
-      <Filter>Engine\Light</Filter>
+    <ClInclude Include="Engine\Graphics\Light\PointLight.h">
+      <Filter>Engine\Graphics\Light</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Light\LightManager.h">
-      <Filter>Engine\Light</Filter>
+    <ClInclude Include="Engine\Graphics\Light\LightManager.h">
+      <Filter>Engine\Graphics\Light</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Light\SpotLight.h">
-      <Filter>Engine\Light</Filter>
+    <ClInclude Include="Engine\Graphics\Light\SpotLight.h">
+      <Filter>Engine\Graphics\Light</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\DX\FPSKeeper.h">
-      <Filter>Engine\DX</Filter>
+    <ClInclude Include="Engine\Core\Time\FPSKeeper.h">
+      <Filter>Engine\Core\Time</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\GlobalVariables\GlobalVariables.h">
-      <Filter>Engine\GlobalVariables</Filter>
+    <ClInclude Include="Engine\Core\Serialize\GlobalVariables.h">
+      <Filter>Engine\Core\Serialize</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Model\ModelManager.h">
-      <Filter>Engine\Model</Filter>
+    <ClInclude Include="Engine\Graphics\Model\ModelManager.h">
+      <Filter>Engine\Graphics\Model</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Model\Object3d.h">
-      <Filter>Engine\Model</Filter>
+    <ClInclude Include="Engine\Graphics\Object\Object3d.h">
+      <Filter>Engine\Graphics\Object</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\PipelineManager.h">
-      <Filter>Engine\GraphicPipeline</Filter>
+    <ClInclude Include="Engine\Graphics\Pipeline\PipelineManager.h">
+      <Filter>Engine\Graphics\Pipeline</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Scene\BaseScene.h">
       <Filter>Engine\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Particle\Particle.h">
-      <Filter>Engine\Particle</Filter>
+    <ClInclude Include="Engine\Graphics\Particle\Particle.h">
+      <Filter>Engine\Graphics\Particle</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Particle\ParticleEmitter.h">
-      <Filter>Engine\Particle</Filter>
+    <ClInclude Include="Engine\Graphics\Particle\ParticleEmitter.h">
+      <Filter>Engine\Graphics\Particle</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Particle\ParticleManager.h">
-      <Filter>Engine\Particle</Filter>
+    <ClInclude Include="Engine\Graphics\Particle\ParticleManager.h">
+      <Filter>Engine\Graphics\Particle</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\DX\SRVManager.h">
-      <Filter>Engine\DX</Filter>
+    <ClInclude Include="Engine\DXC\Resource\SRVManager.h">
+      <Filter>Engine\DXC\Resource</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Scene\SceneManager.h">
       <Filter>Engine\Scene</Filter>
@@ -481,41 +481,41 @@
     <ClInclude Include="Engine\FujiEngine.h">
       <Filter>Engine</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\DX\Framework.h">
-      <Filter>Engine\DX</Filter>
+    <ClInclude Include="Engine\Core\App\Framework.h">
+      <Filter>Engine\Core\App</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Scene\AbstractSceneFactory.h">
       <Filter>Engine\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\Line3dPipe.h">
-      <Filter>Engine\GraphicPipeline</Filter>
+    <ClInclude Include="Engine\Graphics\Pipeline\Render\Line3dPipe.h">
+      <Filter>Engine\Graphics\Pipeline\Render</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Camera\Camera.h">
-      <Filter>Engine\Camera</Filter>
+    <ClInclude Include="Engine\Graphics\Camera\Camera.h">
+      <Filter>Engine\Graphics\Camera</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Camera\CameraManager.h">
-      <Filter>Engine\Camera</Filter>
+    <ClInclude Include="Engine\Graphics\Camera\CameraManager.h">
+      <Filter>Engine\Graphics\Camera</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Camera\DebugCamera.h">
-      <Filter>Engine\Camera</Filter>
+    <ClInclude Include="Engine\Graphics\Camera\DebugCamera.h">
+      <Filter>Engine\Graphics\Camera</Filter>
     </ClInclude>
     <ClInclude Include="Game\Particle\GameEmitters.h">
       <Filter>Game\Particle</Filter>
     </ClInclude>
-    <ClInclude Include="Game\Scene\GameRun.h">
-      <Filter>Game\Scene</Filter>
+    <ClInclude Include="Game\App\GameRun.h">
+      <Filter>Game\App</Filter>
     </ClInclude>
-    <ClInclude Include="Game\Scene\GameScene.h">
-      <Filter>Game\Scene</Filter>
+    <ClInclude Include="Game\Scene\Main\GameScene.h">
+      <Filter>Game\Scene\Main</Filter>
     </ClInclude>
-    <ClInclude Include="Game\Scene\ResultScene.h">
-      <Filter>Game\Scene</Filter>
+    <ClInclude Include="Game\Scene\Main\ResultScene.h">
+      <Filter>Game\Scene\Main</Filter>
     </ClInclude>
     <ClInclude Include="Game\Scene\SceneFactory.h">
       <Filter>Game\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Game\Scene\TitleScene.h">
-      <Filter>Game\Scene</Filter>
+    <ClInclude Include="Game\Scene\Main\TitleScene.h">
+      <Filter>Game\Scene\Main</Filter>
     </ClInclude>
     <ClInclude Include="Game\Collider\BaseCollider.h">
       <Filter>Game\Collider</Filter>
@@ -526,8 +526,8 @@
     <ClInclude Include="Game\Collider\CollisionManager.h">
       <Filter>Game\Collider</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\DX\OffscreenManager.h">
-      <Filter>Engine\DX</Filter>
+    <ClInclude Include="Engine\Graphics\PostEffect\OffscreenManager.h">
+      <Filter>Engine\Graphics\PostEffect</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Math\Animation\Keyframe.h">
       <Filter>Engine\Math\Animation</Filter>
@@ -538,17 +538,17 @@
     <ClInclude Include="Engine\Math\Animation\Animation.h">
       <Filter>Engine\Math\Animation</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Model\AnimationData\AnimationModel.h">
-      <Filter>Engine\Model\AnimationData</Filter>
+    <ClInclude Include="Engine\Graphics\Object\AnimationModel.h">
+      <Filter>Engine\Graphics\Object</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Math\Animation\Skelton.h">
       <Filter>Engine\Math\Animation</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\AnimationPipeline.h">
-      <Filter>Engine\GraphicPipeline</Filter>
+    <ClInclude Include="Engine\Graphics\Pipeline\Render\AnimationPipeline.h">
+      <Filter>Engine\Graphics\Pipeline\Render</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Model\AnimationData\AnimationStructs.h">
-      <Filter>Engine\Model\AnimationData</Filter>
+    <ClInclude Include="Engine\Graphics\Model\AnimationStructs.h">
+      <Filter>Engine\Graphics\Model</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Math\Vector\Vector2.h">
       <Filter>Engine\Math\Vector</Filter>
@@ -601,8 +601,8 @@
     <ClInclude Include="Game\GameObj\Player\AttackBehavior\BasePlayerAttackBehavior.h">
       <Filter>Game\GameObj\Player\AttackBehavior</Filter>
     </ClInclude>
-    <ClInclude Include="Game\Scene\ParticleDebugScene.h">
-      <Filter>Game\Scene</Filter>
+    <ClInclude Include="Game\Scene\Debug\ParticleDebugScene.h">
+      <Filter>Game\Scene\Debug</Filter>
     </ClInclude>
     <ClInclude Include="Game\GameObj\Player\PlayerBullet.h">
       <Filter>Game\GameObj\Player</Filter>
@@ -613,38 +613,38 @@
     <ClInclude Include="Game\GameObj\Enemy\Behavior\BaseBossBehavior.h">
       <Filter>Game\GameObj\Enemy\Behavior</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Editor\ICommand.h">
-      <Filter>Engine\Editor</Filter>
+    <ClInclude Include="Engine\Editor\Command\ICommand.h">
+      <Filter>Engine\Editor\Command</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Editor\CommandManager.h">
-      <Filter>Engine\Editor</Filter>
+    <ClInclude Include="Engine\Editor\Command\CommandManager.h">
+      <Filter>Engine\Editor\Command</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Editor\PropertyCommand.h">
-      <Filter>Engine\Editor</Filter>
+    <ClInclude Include="Engine\Editor\Command\PropertyCommand.h">
+      <Filter>Engine\Editor\Command</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\SkyboxPipe.h">
-      <Filter>Engine\GraphicPipeline</Filter>
+    <ClInclude Include="Engine\Graphics\Pipeline\Render\SkyboxPipe.h">
+      <Filter>Engine\Graphics\Pipeline\Render</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\SkinningCSPipe.h">
-      <Filter>Engine\GraphicPipeline</Filter>
+    <ClInclude Include="Engine\Graphics\Pipeline\Compute\SkinningCSPipe.h">
+      <Filter>Engine\Graphics\Pipeline\Compute</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Serialize\JsonSerializer.h">
-      <Filter>Engine\Serialize</Filter>
+    <ClInclude Include="Engine\Core\Serialize\JsonSerializer.h">
+      <Filter>Engine\Core\Serialize</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Editor\JsonEditorUI.h">
-      <Filter>Engine\Editor</Filter>
+    <ClInclude Include="Engine\Editor\Widget\JsonEditorUI.h">
+      <Filter>Engine\Editor\Widget</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Editor\Object3dEditor.h">
-      <Filter>Engine\Editor</Filter>
+    <ClInclude Include="Engine\Editor\ObjectEditor\Object3dEditor.h">
+      <Filter>Engine\Editor\ObjectEditor</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Editor\AnimationModelEditor.h">
-      <Filter>Engine\Editor</Filter>
+    <ClInclude Include="Engine\Editor\ObjectEditor\AnimationModelEditor.h">
+      <Filter>Engine\Editor\ObjectEditor</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Editor\GizmoHelper.h">
-      <Filter>Engine\Editor</Filter>
+    <ClInclude Include="Engine\Editor\Widget\GizmoHelper.h">
+      <Filter>Engine\Editor\Widget</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Editor\GPUParticleSystemEditor.h">
-      <Filter>Engine\Editor</Filter>
+    <ClInclude Include="Engine\Editor\ObjectEditor\GPUParticleSystemEditor.h">
+      <Filter>Engine\Editor\ObjectEditor</Filter>
     </ClInclude>
     <ClInclude Include="Game\GameObj\Enemy\Behavior\BossRoot.h">
       <Filter>Game\GameObj\Enemy\Behavior</Filter>
@@ -653,13 +653,13 @@
       <Filter>Game\GameObj\Enemy\Behavior</Filter>
     </ClInclude>
     <ClInclude Include="externals\imgui\utilities\drawing.h">
-      <Filter>Externals\imgui\utilities</Filter>
+      <Filter>externals\imgui\utilities</Filter>
     </ClInclude>
     <ClInclude Include="externals\imgui\utilities\widgets.h">
-      <Filter>Externals\imgui\utilities</Filter>
+      <Filter>externals\imgui\utilities</Filter>
     </ClInclude>
     <ClInclude Include="externals\imgui\utilities\builders.h">
-      <Filter>Externals\imgui\utilities</Filter>
+      <Filter>externals\imgui\utilities</Filter>
     </ClInclude>
     <ClInclude Include="Game\GameObj\Enemy\BossCore.h">
       <Filter>Game\GameObj\Enemy</Filter>
@@ -673,11 +673,11 @@
     <ClInclude Include="Game\GameObj\Enemy\Behavior\BossBeamAttack.h">
       <Filter>Game\GameObj\Enemy\Behavior</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Editor\CreateObjCommand.h">
-      <Filter>Engine\Editor</Filter>
+    <ClInclude Include="Engine\Editor\Command\CreateObjCommand.h">
+      <Filter>Engine\Editor\Command</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Editor\DeleteObjCommand.h">
-      <Filter>Engine\Editor</Filter>
+    <ClInclude Include="Engine\Editor\Command\DeleteObjCommand.h">
+      <Filter>Engine\Editor\Command</Filter>
     </ClInclude>
     <ClInclude Include="Game\GameObj\Enemy\Behavior\BossJumpAttack.h">
       <Filter>Game\GameObj\Enemy\Behavior</Filter>
@@ -688,14 +688,14 @@
     <ClInclude Include="Game\GameObj\Enemy\BossItem\UnderRing.h">
       <Filter>Game\GameObj\Enemy\BossItem</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\SpritePipe.h">
-      <Filter>Engine\GraphicPipeline</Filter>
+    <ClInclude Include="Engine\Graphics\Pipeline\Render\SpritePipe.h">
+      <Filter>Engine\Graphics\Pipeline\Render</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\PipeKind.h">
-      <Filter>Engine\GraphicPipeline</Filter>
+    <ClInclude Include="Engine\Graphics\Pipeline\PipeKind.h">
+      <Filter>Engine\Graphics\Pipeline</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\CSPipe\OutlineCSPipe.h">
-      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
+    <ClInclude Include="Engine\Graphics\Pipeline\Compute\OutlineCSPipe.h">
+      <Filter>Engine\Graphics\Pipeline\Compute</Filter>
     </ClInclude>
     <ClInclude Include="Game\GameObj\Player\Behavior\PlayerAvoid.h">
       <Filter>Game\GameObj\Player\Behavior</Filter>
@@ -703,8 +703,8 @@
     <ClInclude Include="Game\GameObj\Enemy\Behavior\BossAreaAttack.h">
       <Filter>Game\GameObj\Enemy\Behavior</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\ParticleCSPipe.h">
-      <Filter>Engine\GraphicPipeline</Filter>
+    <ClInclude Include="Engine\Graphics\Pipeline\Compute\ParticleCSPipe.h">
+      <Filter>Engine\Graphics\Pipeline\Compute</Filter>
     </ClInclude>
     <ClInclude Include="Game\GameObj\Enemy\BossItem\Arrow.h">
       <Filter>Game\GameObj\Enemy\BossItem</Filter>
@@ -721,190 +721,220 @@
     <ClInclude Include="Game\OriginObject\OriginState.h">
       <Filter>Game\OriginObject</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Particle\GPUParticle\GPUParticleSystem.h">
-      <Filter>Engine\Particle\GPUParticle</Filter>
+    <ClInclude Include="Engine\Graphics\Particle\GPUParticle\GPUParticleSystem.h">
+      <Filter>Engine\Graphics\Particle\GPUParticle</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Particle\GPUParticle\IGPUParticleEmitter.h">
-      <Filter>Engine\Particle\GPUParticle</Filter>
+    <ClInclude Include="Engine\Graphics\Particle\GPUParticle\IGPUParticleEmitter.h">
+      <Filter>Engine\Graphics\Particle\GPUParticle</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Particle\GPUParticle\GPUEmitter\EmitterJsonArchive.h">
-      <Filter>Engine\Particle\GPUParticle\GPUEmitter</Filter>
+    <ClInclude Include="Engine\Graphics\Particle\GPUParticle\GPUEmitter\EmitterJsonArchive.h">
+      <Filter>Engine\Graphics\Particle\GPUParticle\GPUEmitter</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Particle\GPUParticle\GPUEmitter\SphereEmitter.h">
-      <Filter>Engine\Particle\GPUParticle\GPUEmitter</Filter>
+    <ClInclude Include="Engine\Graphics\Particle\GPUParticle\GPUEmitter\SphereEmitter.h">
+      <Filter>Engine\Graphics\Particle\GPUParticle\GPUEmitter</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Particle\GPUParticle\GPUEmitter\TextureBasedEmitter.h">
-      <Filter>Engine\Particle\GPUParticle\GPUEmitter</Filter>
+    <ClInclude Include="Engine\Graphics\Particle\GPUParticle\GPUEmitter\TextureBasedEmitter.h">
+      <Filter>Engine\Graphics\Particle\GPUParticle\GPUEmitter</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Particle\GPUParticle\GPUEmitter\MeshSurfaceEmitter.h">
-      <Filter>Engine\Particle\GPUParticle\GPUEmitter</Filter>
+    <ClInclude Include="Engine\Graphics\Particle\GPUParticle\GPUEmitter\MeshSurfaceEmitter.h">
+      <Filter>Engine\Graphics\Particle\GPUParticle\GPUEmitter</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Particle\ParticleGroup\IParticleGroup.h">
-      <Filter>Engine\Particle\ParticleGroup</Filter>
+    <ClInclude Include="Engine\Graphics\Particle\ParticleGroup\IParticleGroup.h">
+      <Filter>Engine\Graphics\Particle\ParticleGroup</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Particle\ParticleGroup\ParticleGroup.h">
-      <Filter>Engine\Particle\ParticleGroup</Filter>
+    <ClInclude Include="Engine\Graphics\Particle\ParticleGroup\ParticleGroup.h">
+      <Filter>Engine\Graphics\Particle\ParticleGroup</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Particle\ParticleGroup\ParentParticleGroup.h">
-      <Filter>Engine\Particle\ParticleGroup</Filter>
+    <ClInclude Include="Engine\Graphics\Particle\ParticleGroup\ParentParticleGroup.h">
+      <Filter>Engine\Graphics\Particle\ParticleGroup</Filter>
     </ClInclude>
     <ClInclude Include="Game\GameObj\Enemy\Behavior\BossDushAttack.h">
       <Filter>Game\GameObj\Enemy\Behavior</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\DX\FrameCount.h">
-      <Filter>Engine\DX</Filter>
+    <ClInclude Include="Engine\DXC\FrameCount.h">
+      <Filter>Engine\DXC</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\SplatCompositePipe.h">
-      <Filter>Engine\GraphicPipeline</Filter>
+    <ClInclude Include="Engine\Graphics\Pipeline\Render\SplatCompositePipe.h">
+      <Filter>Engine\Graphics\Pipeline\Render</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\DX\GPUTimer.h">
-      <Filter>Engine\DX</Filter>
+    <ClInclude Include="Engine\DXC\Debug\GPUTimer.h">
+      <Filter>Engine\DXC\Debug</Filter>
     </ClInclude>
     <ClInclude Include="Game\GameObj\Enemy\BossItem\BossItemManager.h">
       <Filter>Game\GameObj\Enemy\BossItem</Filter>
     </ClInclude>
-    <ClInclude Include="Game\Scene\GPUParticleScene.h">
-      <Filter>Game\Scene</Filter>
+    <ClInclude Include="Game\Scene\Debug\GPUParticleScene.h">
+      <Filter>Game\Scene\Debug</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\CSPipe\TrailEmitCSPipe.h">
-      <Filter>Engine\GraphicPipeline\CSPipe</Filter>
+    <ClInclude Include="Engine\Graphics\Pipeline\Compute\TrailEmitCSPipe.h">
+      <Filter>Engine\Graphics\Pipeline\Compute</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\DX\GraphicsDevice.h">
-      <Filter>Engine\DX</Filter>
+    <ClInclude Include="Engine\DXC\Device\GraphicsDevice.h">
+      <Filter>Engine\DXC\Device</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\DX\SwapChainManager.h">
-      <Filter>Engine\DX</Filter>
+    <ClInclude Include="Engine\DXC\Device\SwapChainManager.h">
+      <Filter>Engine\DXC\Device</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\DX\DX12Helper.h">
-      <Filter>Engine\DX</Filter>
+    <ClInclude Include="Engine\DXC\Resource\DX12Helper.h">
+      <Filter>Engine\DXC\Resource</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\DX\CommandContext.h">
-      <Filter>Engine\DX</Filter>
+    <ClInclude Include="Engine\DXC\Command\CommandContext.h">
+      <Filter>Engine\DXC\Command</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Model\ObjectRenderer.h">
-      <Filter>Engine\Model</Filter>
+    <ClInclude Include="Engine\Graphics\Object\ObjectRenderer.h">
+      <Filter>Engine\Graphics\Object</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Model\Line\Line3dDrawer.h">
-      <Filter>Engine\Model\Line</Filter>
+    <ClInclude Include="Engine\Graphics\Line\Line3dDrawer.h">
+      <Filter>Engine\Graphics\Line</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Model\Sprite\Sprite.h">
-      <Filter>Engine\Model\Sprite</Filter>
+    <ClInclude Include="Engine\Graphics\Sprite\Sprite.h">
+      <Filter>Engine\Graphics\Sprite</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Model\Sprite\SpriteRenderer.h">
-      <Filter>Engine\Model\Sprite</Filter>
+    <ClInclude Include="Engine\Graphics\Sprite\SpriteRenderer.h">
+      <Filter>Engine\Graphics\Sprite</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Model\Mesh\Mesh.h">
-      <Filter>Engine\Model\Mesh</Filter>
+    <ClInclude Include="Engine\Graphics\Model\Mesh\Mesh.h">
+      <Filter>Engine\Graphics\Model\Mesh</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Model\Mesh\SkinnedMesh.h">
-      <Filter>Engine\Model\Mesh</Filter>
+    <ClInclude Include="Engine\Graphics\Model\Mesh\SkinnedMesh.h">
+      <Filter>Engine\Graphics\Model\Mesh</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Model\Material\Material.h">
-      <Filter>Engine\Model\Material</Filter>
+    <ClInclude Include="Engine\Graphics\Model\Material\Material.h">
+      <Filter>Engine\Graphics\Model\Material</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Model\Base\RenderObject.h">
-      <Filter>Engine\Model\Base</Filter>
+    <ClInclude Include="Engine\Graphics\Object\RenderObject.h">
+      <Filter>Engine\Graphics\Object</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Model\SkyBox\SkyBox.h">
-      <Filter>Engine\Model\SkyBox</Filter>
+    <ClInclude Include="Engine\Graphics\SkyBox\SkyBox.h">
+      <Filter>Engine\Graphics\SkyBox</Filter>
     </ClInclude>
-    <ClInclude Include="Game\Scene\TestScene.h">
-      <Filter>Game\Scene</Filter>
+    <ClInclude Include="Game\Scene\Debug\TestScene.h">
+      <Filter>Game\Scene\Debug</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\GraphicPipeline\BaseGridPipe.h">
-      <Filter>Engine\GraphicPipeline</Filter>
+    <ClInclude Include="Engine\Graphics\Pipeline\Render\BaseGridPipe.h">
+      <Filter>Engine\Graphics\Pipeline\Render</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
       <UniqueIdentifier>{73eddf69-5416-4ecf-b2ba-3d701407fe67}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Externals">
-      <UniqueIdentifier>{5be5382f-ec04-4a33-8580-04e98ff8956d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game">
-      <UniqueIdentifier>{a757f108-94e3-4654-a9dd-60e1df2d6d9a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="resource">
-      <UniqueIdentifier>{d1480a97-446f-40e9-b028-4aef321c7247}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Engine\Audio">
       <UniqueIdentifier>{c4da6d91-5105-4c92-9aaf-351f4c3f5156}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\Input">
-      <UniqueIdentifier>{4fc9f971-4a5f-4773-aa3d-57b056c87b75}</UniqueIdentifier>
+    <Filter Include="Engine\Core">
+      <UniqueIdentifier>{619e271e-f0bb-41d0-9e63-c3006c8d32d8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\DX">
-      <UniqueIdentifier>{6a497f9a-2b7b-4445-af09-d340cd39e7f8}</UniqueIdentifier>
+    <Filter Include="Engine\Core\App">
+      <UniqueIdentifier>{460da20a-ca47-4690-a0d2-90af2dfa810c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\ImGuiManager">
-      <UniqueIdentifier>{eba0a991-a0b4-4a1a-9d00-911ff514c42b}</UniqueIdentifier>
+    <Filter Include="Engine\Core\Debug">
+      <UniqueIdentifier>{50c45886-05e2-48e6-a137-8c21a7797194}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Core\Input">
+      <UniqueIdentifier>{6100787a-bc10-4169-b3bb-7cf34ecc5722}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Core\Serialize">
+      <UniqueIdentifier>{fd37f843-fbf0-4b59-bdc2-d97ee9c178b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Core\Time">
+      <UniqueIdentifier>{11ca4f5f-467d-43da-a324-43c0d9ddb903}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\DXC">
+      <UniqueIdentifier>{05f81efd-0768-45bf-bb88-ed28152186ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\DXC\Command">
+      <UniqueIdentifier>{8b8d6d78-0350-4b6c-8e13-a0f09a933661}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\DXC\Debug">
+      <UniqueIdentifier>{127da422-28bc-4705-86c7-332f4370a299}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\DXC\Device">
+      <UniqueIdentifier>{b663ea91-9647-46da-a3a2-089f8864e526}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\DXC\Resource">
+      <UniqueIdentifier>{4fe1a4b2-d7dd-4d43-a92c-1d18f03ed964}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\DXC\Shader">
+      <UniqueIdentifier>{51024848-24c7-4cc4-bed6-f7015c00e699}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Editor">
+      <UniqueIdentifier>{b324ee81-9c59-4fe2-9acd-053eaf7bcddc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Editor\Command">
+      <UniqueIdentifier>{8ee7e266-a9a5-4e54-aec2-5010785b81b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Editor\ObjectEditor">
+      <UniqueIdentifier>{831a36ef-cbe3-4400-b3d2-9f5df3c23a5c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Editor\Widget">
+      <UniqueIdentifier>{7d52c69a-aa69-4ee6-9f79-bc9b3423e982}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Graphics">
+      <UniqueIdentifier>{41336af9-34e2-4ba6-beba-a8bc0c3d679f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Graphics\Camera">
+      <UniqueIdentifier>{f5fc9678-7ffc-418c-b44e-32744105ba66}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Graphics\Light">
+      <UniqueIdentifier>{2179f239-8625-4bb6-aabb-7016ebdb4b05}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Graphics\Line">
+      <UniqueIdentifier>{bb1062cd-adbf-4ce8-9e4b-4b6d3d007022}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Graphics\Model">
+      <UniqueIdentifier>{4bc76c76-deff-4ae4-ae47-91330a2a46e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Graphics\Model\Material">
+      <UniqueIdentifier>{b74125c9-3c29-46b2-81d2-37358e6e6a51}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Graphics\Model\Mesh">
+      <UniqueIdentifier>{6248f548-efe6-4fc9-b543-8257562da967}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Graphics\Object">
+      <UniqueIdentifier>{706f39f8-319a-4386-bad1-61336b6d9302}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Graphics\Particle">
+      <UniqueIdentifier>{4d4dc60b-04b2-40e2-9607-9fe0ee88842d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Graphics\Particle\GPUParticle">
+      <UniqueIdentifier>{dbdf5614-d80c-4e41-afda-a9d092e3a777}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Graphics\Particle\GPUParticle\GPUEmitter">
+      <UniqueIdentifier>{64f2e89b-2981-4c15-a805-0911fc8d3d5d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Graphics\Particle\ParticleGroup">
+      <UniqueIdentifier>{f75ee25c-8af4-4967-9897-b152d5adf9da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Graphics\Pipeline">
+      <UniqueIdentifier>{af2a2f11-251f-4051-a36a-218e2a476d33}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Graphics\Pipeline\Compute">
+      <UniqueIdentifier>{d239e3fb-95d8-40f3-953c-7d7f59811df7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Graphics\Pipeline\Render">
+      <UniqueIdentifier>{c8e2881d-d3be-4d75-bfb2-cf742fe43cc6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Graphics\PostEffect">
+      <UniqueIdentifier>{5e1bcb8e-e405-440e-9b7f-3be0a1f637d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Graphics\SkyBox">
+      <UniqueIdentifier>{8bf1d823-4716-42bc-b10e-f178f4e21b6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Graphics\Sprite">
+      <UniqueIdentifier>{f3554820-597a-4393-b67a-5f9dc3415504}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Graphics\Texture">
+      <UniqueIdentifier>{33714a27-f888-409f-a9a4-9c3ca2e73f0f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Engine\Logger">
       <UniqueIdentifier>{e851916b-0abb-46d1-9001-33ec613ee5b6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\Model">
-      <UniqueIdentifier>{22fba7d1-7d6a-47d0-94a3-8cad2d89de8f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Engine\Math">
       <UniqueIdentifier>{11241f09-8f20-47f7-9a9b-6f5b29a62dd0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\WinApp">
-      <UniqueIdentifier>{f16bc601-30c2-494a-b5f2-9dddb2b5e815}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\GraphicPipeline">
-      <UniqueIdentifier>{a7aec92a-a6ed-4e8d-b70e-d00475873d04}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\Field">
-      <UniqueIdentifier>{474c6061-5ccc-4a22-b89f-a7917901b616}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="resource\Shaders">
-      <UniqueIdentifier>{721d04ed-0430-462c-a558-1b345031cb69}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\GlobalVariables">
-      <UniqueIdentifier>{dee81627-0be4-4b1e-bd00-7dfcde087c80}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\Light">
-      <UniqueIdentifier>{bbaf8ed5-8934-40c2-981e-ec659d17c094}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\Particle">
-      <UniqueIdentifier>{3102e485-29ad-45b9-aa83-d99616131e4c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\Scene">
-      <UniqueIdentifier>{9b2b279b-994d-4704-b28e-0a62df13d1b9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\Camera">
-      <UniqueIdentifier>{cf744bcb-b934-4c5e-9da0-1a40d0968e23}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\Collider">
-      <UniqueIdentifier>{20f410ec-47e8-4e10-a499-b1fd2ef09cde}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\Scene">
-      <UniqueIdentifier>{9f02f36c-fca6-4a84-99db-93ec2013ba4b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\Particle">
-      <UniqueIdentifier>{3c8a1f2d-6b47-4d9e-9a15-2f7c5e0b48d1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\GameObj">
-      <UniqueIdentifier>{617e8378-5eb2-45b5-b7d1-72cdc9b6216f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\GameObj\Player">
-      <UniqueIdentifier>{272b979d-4022-461f-9b40-fa2e97c94d98}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\GameObj\Enemy">
-      <UniqueIdentifier>{75f61a48-bc79-46a6-b1ec-ceee4a1b817f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="resource\Shaders\CS">
-      <UniqueIdentifier>{a2b12930-efd8-4b03-84dc-c65ccb0fc2eb}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Engine\Math\Animation">
       <UniqueIdentifier>{bd1e8302-2cd0-47fe-bbf8-ba4e941d5a51}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\Model\AnimationData">
-      <UniqueIdentifier>{caf4aa0b-f65b-4267-bfeb-452ebca8902c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\Math\Vector">
-      <UniqueIdentifier>{7d72c698-8a41-43a4-8ede-abcee7e036a8}</UniqueIdentifier>
     </Filter>
     <Filter Include="Engine\Math\Matrix">
       <UniqueIdentifier>{c3c8cefe-3407-4bcf-89b5-30a88c2d74c4}</UniqueIdentifier>
@@ -915,71 +945,83 @@
     <Filter Include="Engine\Math\Random">
       <UniqueIdentifier>{fbafdfc2-b133-4fa5-8806-f13994df902f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\GameObj\Player\Behavior">
-      <UniqueIdentifier>{8d06dd74-7aa7-4bd8-9f75-d044a3d5acdc}</UniqueIdentifier>
+    <Filter Include="Engine\Math\Vector">
+      <UniqueIdentifier>{7d72c698-8a41-43a4-8ede-abcee7e036a8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\GameObj\Player\AttackBehavior">
-      <UniqueIdentifier>{611fdb19-c0f4-416e-b738-366e3fdfbd34}</UniqueIdentifier>
+    <Filter Include="Engine\Scene">
+      <UniqueIdentifier>{9b2b279b-994d-4704-b28e-0a62df13d1b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="externals">
+      <UniqueIdentifier>{5be5382f-ec04-4a33-8580-04e98ff8956d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="externals\imgui">
+      <UniqueIdentifier>{1d7ac97b-a66d-4b17-ae3e-18af557da005}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="externals\imgui\utilities">
+      <UniqueIdentifier>{94f6f261-20b1-4c47-a774-0143dd37d546}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game">
+      <UniqueIdentifier>{a757f108-94e3-4654-a9dd-60e1df2d6d9a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\App">
+      <UniqueIdentifier>{e84b01f8-a8cf-4267-b86c-0ccc66fcee4d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Collider">
+      <UniqueIdentifier>{20f410ec-47e8-4e10-a499-b1fd2ef09cde}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Field">
+      <UniqueIdentifier>{474c6061-5ccc-4a22-b89f-a7917901b616}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameObj">
+      <UniqueIdentifier>{617e8378-5eb2-45b5-b7d1-72cdc9b6216f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameObj\Enemy">
+      <UniqueIdentifier>{75f61a48-bc79-46a6-b1ec-ceee4a1b817f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Game\GameObj\Enemy\Behavior">
       <UniqueIdentifier>{2263d8f9-5f9a-4c29-8a79-292d1fed0cbb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\Editor">
-      <UniqueIdentifier>{b324ee81-9c59-4fe2-9acd-053eaf7bcddc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\Serialize">
-      <UniqueIdentifier>{3f7a1c62-5b04-4e19-8d73-2a6f9c1b45e0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="resource\Shaders\CS\Engine">
-      <UniqueIdentifier>{a53b59b2-f85d-43ce-897a-0b92b392dcaf}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Externals\imgui">
-      <UniqueIdentifier>{1d7ac97b-a66d-4b17-ae3e-18af557da005}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Externals\imgui\utilities">
-      <UniqueIdentifier>{94f6f261-20b1-4c47-a774-0143dd37d546}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Game\GameObj\Enemy\BossItem">
       <UniqueIdentifier>{6f67285b-3cf8-4b8c-8d42-5873aa75a24d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\GraphicPipeline\CSPipe">
-      <UniqueIdentifier>{d918235d-47db-4aad-82b9-b5ab9d7beab9}</UniqueIdentifier>
+    <Filter Include="Game\GameObj\Player">
+      <UniqueIdentifier>{272b979d-4022-461f-9b40-fa2e97c94d98}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameObj\Player\AttackBehavior">
+      <UniqueIdentifier>{611fdb19-c0f4-416e-b738-366e3fdfbd34}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameObj\Player\Behavior">
+      <UniqueIdentifier>{8d06dd74-7aa7-4bd8-9f75-d044a3d5acdc}</UniqueIdentifier>
     </Filter>
     <Filter Include="Game\OriginObject">
       <UniqueIdentifier>{582d5b3b-3b7d-4005-9981-1c1a7472245f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\Particle\GPUParticle">
-      <UniqueIdentifier>{c7844967-c97f-41c5-81a1-7a03ea96388f}</UniqueIdentifier>
+    <Filter Include="Game\Particle">
+      <UniqueIdentifier>{3c8a1f2d-6b47-4d9e-9a15-2f7c5e0b48d1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\Particle\GPUParticle\GPUEmitter">
-      <UniqueIdentifier>{37635143-d44c-4167-a8a8-41e9c7257570}</UniqueIdentifier>
+    <Filter Include="Game\Scene">
+      <UniqueIdentifier>{9f02f36c-fca6-4a84-99db-93ec2013ba4b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\Particle\ParticleGroup">
-      <UniqueIdentifier>{246db227-4e53-40f4-a155-ac14d20d5b6c}</UniqueIdentifier>
+    <Filter Include="Game\Scene\Debug">
+      <UniqueIdentifier>{e1d3045a-e5a5-46ba-8f78-616066e6603f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\Model\Base">
-      <UniqueIdentifier>{c1ed27b9-c1cb-449b-a473-f7d3631dfabc}</UniqueIdentifier>
+    <Filter Include="Game\Scene\Main">
+      <UniqueIdentifier>{e740af0f-9631-47ae-8b6b-ce7f7dfab025}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\Model\Line">
-      <UniqueIdentifier>{77a998a4-3f68-4dd7-9763-569616e838a6}</UniqueIdentifier>
+    <Filter Include="resource">
+      <UniqueIdentifier>{d1480a97-446f-40e9-b028-4aef321c7247}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\Model\Sprite">
-      <UniqueIdentifier>{47449334-1707-44aa-9320-606cc2ab94ed}</UniqueIdentifier>
+    <Filter Include="resource\Shaders">
+      <UniqueIdentifier>{721d04ed-0430-462c-a558-1b345031cb69}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\Model\Mesh">
-      <UniqueIdentifier>{1125334f-d555-4460-a6e8-d56ebc98f61f}</UniqueIdentifier>
+    <Filter Include="resource\Shaders\CS">
+      <UniqueIdentifier>{a2b12930-efd8-4b03-84dc-c65ccb0fc2eb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\Model\Material">
-      <UniqueIdentifier>{c4e45bc0-1b98-41a6-b007-01b813ed66da}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\Model\SkyBox">
-      <UniqueIdentifier>{498ad03e-86bb-40f0-a3a9-aa3e831a667b}</UniqueIdentifier>
+    <Filter Include="resource\Shaders\CS\Engine">
+      <UniqueIdentifier>{a53b59b2-f85d-43ce-897a-0b92b392dcaf}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="resource\Shaders\GaussianBlur.PS.hlsl">
-      <Filter>resource\Shaders</Filter>
-    </FxCompile>
     <FxCompile Include="resource\Shaders\NonePost.PS.hlsl">
       <Filter>resource\Shaders</Filter>
     </FxCompile>
@@ -1032,9 +1074,6 @@
       <Filter>resource\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="resource\Shaders\SplatComposite.VS.hlsl">
-      <Filter>resource\Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="resource\Shaders\DepthBasedOutline.PS.hlsl">
       <Filter>resource\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="resource\Shaders\Sprite.PS.hlsl">

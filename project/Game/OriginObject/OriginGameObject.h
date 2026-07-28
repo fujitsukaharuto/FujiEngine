@@ -5,13 +5,13 @@
 // json は宣言とポインタにしか使わないので前方宣言で足りる
 #include <json_fwd.hpp>
 
-#include "Engine/Model/Object3d.h"
-#include "Engine/Model/AnimationData/AnimationModel.h"
-#include "Engine/Model/Base/RenderObject.h"
+#include "Engine/Graphics/Object/Object3d.h"
+#include "Engine/Graphics/Object/AnimationModel.h"
+#include "Engine/Graphics/Object/RenderObject.h"
 #include "Game/Collider/AABBCollider.h"
-#include "Engine/DX/FPSKeeper.h"
-#include "Engine/Camera/CameraManager.h"
-#include "Engine/Input/Input.h"
+#include "Engine/Core/Time/FPSKeeper.h"
+#include "Engine/Graphics/Camera/CameraManager.h"
+#include "Engine/Core/Input/Input.h"
 
 /// <summary>
 /// ゲームオブジェクトの基底クラス

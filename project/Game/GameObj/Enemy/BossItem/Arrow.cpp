@@ -1,7 +1,7 @@
 #include "Arrow.h"
-#include "Engine/ImGuiManager/ImGuiManager.h"
-#include "Engine/Particle/ParticleManager.h"
-#include "Engine/Model/Object3d.h"
+#include "Engine/Core/Debug/ImGuiManager.h"
+#include "Engine/Graphics/Particle/ParticleManager.h"
+#include "Engine/Graphics/Object/Object3d.h"
 #include "Engine/Math/Random/Random.h"
 #include <algorithm>
 

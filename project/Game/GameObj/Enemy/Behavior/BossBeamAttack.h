@@ -1,6 +1,6 @@
 #pragma once
 #include "BaseBossBehavior.h"
-#include "Engine/Particle/ParticleEmitter.h"
+#include "Engine/Graphics/Particle/ParticleEmitter.h"
 
 /// <summary>
 /// Bossのビーム攻撃の行動クラス

@@ -1,14 +1,14 @@
 #pragma once
 #include <memory>
-#include "Engine/DX/DXCom.h"
-#include "Engine/Serialize/JsonSerializer.h"
-#include "Engine/Input/Input.h"
+#include "Engine/DXC/DXCom.h"
+#include "Engine/Core/Serialize/JsonSerializer.h"
+#include "Engine/Core/Input/Input.h"
 #include "Engine/Audio/AudioPlayer.h"
-#include "Engine/Camera/DebugCamera.h"
-#include "Engine/Model/Object3d.h"
-#include "Engine/Model/AnimationData/AnimationModel.h"
-#include "Engine/Model/Sprite/Sprite.h"
-#include "Engine/Particle/ParticleEmitter.h"
+#include "Engine/Graphics/Camera/DebugCamera.h"
+#include "Engine/Graphics/Object/Object3d.h"
+#include "Engine/Graphics/Object/AnimationModel.h"
+#include "Engine/Graphics/Sprite/Sprite.h"
+#include "Engine/Graphics/Particle/ParticleEmitter.h"
 
 
 namespace Scene {

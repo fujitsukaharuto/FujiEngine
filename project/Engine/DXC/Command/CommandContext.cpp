@@ -1,0 +1,96 @@
+#include "Engine/DXC/Command/CommandContext.h"
+#include "Engine/Logger/Logger.h"
+
+using namespace DXC;
+
+
+CommandContext::~CommandContext() {
+	if (fenceEvent_) {
+		CloseHandle(fenceEvent_);
+	}
+
+	list_.Reset();
+	for (uint32_t i = 0; i < kFrameCount_; ++i) {
+		allocator_[i].Reset();
+	}
+	fence_.Reset();
+	queue_.Reset();
+}
+
+void CommandContext::Initialize(ID3D12Device* device, D3D12_COMMAND_LIST_TYPE type) {
+	HRESULT hr;
+
+	// 1. キューの生成
+	D3D12_COMMAND_QUEUE_DESC queueDesc{};
+	queueDesc.Type = type;
+	queueDesc.Priority = D3D12_COMMAND_QUEUE_PRIORITY_NORMAL;
+	queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
+	queueDesc.NodeMask = 0;
+	hr = device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&queue_));
+	assert(SUCCEEDED(hr));
+
+	// 2. アロケータの生成（フレーム数分）
+	for (uint32_t i = 0; i < DXC::kFrameCount_; ++i) {
+		hr = device->CreateCommandAllocator(type, IID_PPV_ARGS(&allocator_[i]));
+		assert(SUCCEEDED(hr));
+	}
+
+	// 3. コマンドリストの生成
+	hr = device->CreateCommandList(0, type, allocator_[0].Get(), nullptr, IID_PPV_ARGS(&list_));
+	assert(SUCCEEDED(hr));
+	list_->Close(); // 最初は閉じた状態にしておく
+
+	// 4. フェンスとイベントの生成
+	hr = device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence_));
+	assert(SUCCEEDED(hr));
+	for (uint32_t i = 0; i < DXC::kFrameCount_; ++i) {
+		fenceValue_[i] = 0;
+	}
+	fenceEvent_ = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+	assert(fenceEvent_ != nullptr);
+}
+
+void CommandContext::Close() {
+	HRESULT hr = list_->Close();
+	assert(SUCCEEDED(hr));
+	isOpen_ = false;
+}
+
+void CommandContext::Execute() {
+	ID3D12CommandList* commandLists[] = { list_.Get() };
+	queue_->ExecuteCommandLists(1, commandLists);
+}
+
+void CommandContext::Signal(uint32_t frameIndex) {
+	globalFenceValue_++;
+	queue_->Signal(fence_.Get(), globalFenceValue_);
+	fenceValue_[frameIndex] = globalFenceValue_;
+}
+
+void CommandContext::WaitForGPU(uint32_t frameIndex, bool isLogging) {
+	if (fence_->GetCompletedValue() < fenceValue_[frameIndex]) {
+		fence_->SetEventOnCompletion(fenceValue_[frameIndex], fenceEvent_);
+		WaitForSingleObject(fenceEvent_, INFINITE);
+
+		if (isLogging) {
+			Logger::LogF("frame=%llu idx=%u fence=%llu completed=%llu",
+				globalFenceValue_,
+				frameIndex,
+				fenceValue_[frameIndex],
+				fence_->GetCompletedValue());
+		}
+	}
+}
+
+void CommandContext::WaitQueueFor(CommandContext* otherContext, uint32_t frameIndex) {
+	HRESULT hr = queue_->Wait(otherContext->GetFence(), otherContext->GetFenceValue(frameIndex));
+	assert(SUCCEEDED(hr));
+}
+
+void CommandContext::Reset(uint32_t frameIndex) {
+	HRESULT hr = allocator_[frameIndex]->Reset();
+	assert(SUCCEEDED(hr));
+	hr = list_->Reset(allocator_[frameIndex].Get(), nullptr);
+	assert(SUCCEEDED(hr));
+	isOpen_ = true;
+}

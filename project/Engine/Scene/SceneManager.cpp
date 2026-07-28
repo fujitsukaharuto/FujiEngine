@@ -1,13 +1,13 @@
 #include "SceneManager.h"
 #include <cassert>
 #include <vector>
-#include "Engine/DX/DXCom.h"
-#include "Engine/DX/FPSKeeper.h"
+#include "Engine/DXC/DXCom.h"
+#include "Engine/Core/Time/FPSKeeper.h"
 #include "Engine/Scene/BaseScene.h"
-#include "Engine/ImGuiManager/ImGuiManager.h"
-#include "Engine/Model/ModelManager.h"
-#include "Engine/Particle/ParticleManager.h"
-#include "Engine/Editor/CommandManager.h"
+#include "Engine/Core/Debug/ImGuiManager.h"
+#include "Engine/Graphics/Model/ModelManager.h"
+#include "Engine/Graphics/Particle/ParticleManager.h"
+#include "Engine/Editor/Command/CommandManager.h"
 
 using namespace Core;
 using namespace Editor;

@@ -1,7 +1,7 @@
 #pragma once
 #include "Game/OriginObject/OriginGameObject.h"
 #include "Game/Collider/AABBCollider.h"
-#include "Engine/Particle/ParticleEmitter.h"
+#include "Engine/Graphics/Particle/ParticleEmitter.h"
 #include "Engine/Audio/AudioPlayer.h"
 #include "Game/Particle/GameEmitters.h"
 

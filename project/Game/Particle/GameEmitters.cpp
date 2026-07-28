@@ -1,5 +1,5 @@
 #include "Game/Particle/GameEmitters.h"
-#include "Engine/Particle/ParticleManager.h"
+#include "Engine/Graphics/Particle/ParticleManager.h"
 
 using namespace Graphics;
 

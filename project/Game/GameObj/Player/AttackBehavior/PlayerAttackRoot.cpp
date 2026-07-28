@@ -1,7 +1,7 @@
 #include "PlayerAttackRoot.h"
 #include "Engine/Audio/AudioPlayer.h"
-#include "Engine/Particle/ParticleManager.h"
-#include "Engine/Input/Input.h"
+#include "Engine/Graphics/Particle/ParticleManager.h"
+#include "Engine/Core/Input/Input.h"
 
 #include "Game/GameObj/Player/Player.h"
 

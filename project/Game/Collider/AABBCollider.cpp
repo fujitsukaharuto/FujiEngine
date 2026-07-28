@@ -1,8 +1,8 @@
 #include "AABBCollider.h"
 #include <json.hpp>
-#include "Engine/Model/Line/Line3dDrawer.h"
-#include "Engine/ImGuiManager/ImGuiManager.h"
-#include "Engine/Serialize/JsonSerializer.h"
+#include "Engine/Graphics/Line/Line3dDrawer.h"
+#include "Engine/Core/Debug/ImGuiManager.h"
+#include "Engine/Core/Serialize/JsonSerializer.h"
 
 using namespace Core;
 using namespace Graphics;

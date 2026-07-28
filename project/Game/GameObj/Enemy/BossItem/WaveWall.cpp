@@ -1,5 +1,5 @@
 #include "WaveWall.h"
-#include "Engine/Particle/ParticleManager.h"
+#include "Engine/Graphics/Particle/ParticleManager.h"
 
 using namespace Core;
 using namespace Graphics;

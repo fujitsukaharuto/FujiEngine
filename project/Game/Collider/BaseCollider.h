@@ -3,7 +3,7 @@
 #include <functional>
 #include <vector>
 #include "Engine/Math/Vector/Vector3.h"
-#include "Engine/Model/Object3d.h"
+#include "Engine/Graphics/Object/Object3d.h"
 
 
 class OriginGameObject;

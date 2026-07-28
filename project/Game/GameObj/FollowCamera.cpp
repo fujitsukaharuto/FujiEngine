@@ -1,8 +1,8 @@
 #include "FollowCamera.h"
-#include "Engine/Input/Input.h"
-#include "Engine/Camera/CameraManager.h"
-#include "Engine/DX/FPSKeeper.h"
-#include "Engine/ImGuiManager/ImGuiManager.h"
+#include "Engine/Core/Input/Input.h"
+#include "Engine/Graphics/Camera/CameraManager.h"
+#include "Engine/Core/Time/FPSKeeper.h"
+#include "Engine/Core/Debug/ImGuiManager.h"
 
 using namespace Core;
 using namespace Math;

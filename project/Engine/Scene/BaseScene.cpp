@@ -1,9 +1,9 @@
 #include "BaseScene.h"
 #include <json.hpp>
-#include "Engine/Serialize/JsonSerializer.h"
+#include "Engine/Core/Serialize/JsonSerializer.h"
 
 #include "Engine/Scene/SceneManager.h"
-#include "Engine/Editor/CommandManager.h"
+#include "Engine/Editor/Command/CommandManager.h"
 
 using namespace Audio;
 using namespace Core;

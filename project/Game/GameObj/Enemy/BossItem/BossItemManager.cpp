@@ -1,10 +1,10 @@
 #include "BossItemManager.h"
 #include "Game/GameObj/Enemy/Boss.h"
 #include "Game/GameObj/Player/Player.h"
-#include "Engine/Particle/ParticleManager.h"
+#include "Engine/Graphics/Particle/ParticleManager.h"
 #include "Engine/Math/Random/Random.h"
-#include "Engine/Camera/CameraManager.h"
-#include "Engine/Serialize/JsonSerializer.h"
+#include "Engine/Graphics/Camera/CameraManager.h"
+#include "Engine/Core/Serialize/JsonSerializer.h"
 #include <numbers>
 
 

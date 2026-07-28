@@ -12,12 +12,12 @@
 
 //========================================================================*/
 //* 基盤
-#include "Engine/DX/Framework.h"
-#include "Engine/DX/FPSKeeper.h"
-#include "Engine/WinApp/MyWindow.h"
-#include "Engine/Input/Input.h"
+#include "Engine/Core/App/Framework.h"
+#include "Engine/Core/Time/FPSKeeper.h"
+#include "Engine/Core/App/MyWindow.h"
+#include "Engine/Core/Input/Input.h"
 #include "Engine/Audio/AudioPlayer.h"
-#include "Engine/GlobalVariables/GlobalVariables.h"
+#include "Engine/Core/Serialize/GlobalVariables.h"
 
 //========================================================================*/
 //* 数学
@@ -34,33 +34,33 @@
 
 //========================================================================*/
 //* 描画
-#include "Engine/Camera/CameraManager.h"
-#include "Engine/Model/Object3d.h"
-#include "Engine/Model/ObjectRenderer.h"
-#include "Engine/Model/ModelManager.h"
-#include "Engine/Model/AnimationData/AnimationModel.h"
-#include "Engine/Model/SkyBox/SkyBox.h"
-#include "Engine/Model/Line/Line3dDrawer.h"
-#include "Engine/Model/Sprite/Sprite.h"
-#include "Engine/Model/Sprite/SpriteRenderer.h"
+#include "Engine/Graphics/Camera/CameraManager.h"
+#include "Engine/Graphics/Object/Object3d.h"
+#include "Engine/Graphics/Object/ObjectRenderer.h"
+#include "Engine/Graphics/Model/ModelManager.h"
+#include "Engine/Graphics/Object/AnimationModel.h"
+#include "Engine/Graphics/SkyBox/SkyBox.h"
+#include "Engine/Graphics/Line/Line3dDrawer.h"
+#include "Engine/Graphics/Sprite/Sprite.h"
+#include "Engine/Graphics/Sprite/SpriteRenderer.h"
 
 //========================================================================*/
 //* ライト
-#include "Engine/Light/LightManager.h"
-#include "Engine/Light/PointLight.h"
+#include "Engine/Graphics/Light/LightManager.h"
+#include "Engine/Graphics/Light/PointLight.h"
 
 //========================================================================*/
 //* パーティクル
-#include "Engine/Particle/ParticleManager.h"
-#include "Engine/Particle/ParticleEmitter.h"
+#include "Engine/Graphics/Particle/ParticleManager.h"
+#include "Engine/Graphics/Particle/ParticleEmitter.h"
 
 //========================================================================*/
 //* シリアライズ
-#include "Engine/Serialize/JsonSerializer.h"
+#include "Engine/Core/Serialize/JsonSerializer.h"
 
 //========================================================================*/
 //* デバッグ
-#include "Engine/ImGuiManager/ImGuiManager.h"
+#include "Engine/Core/Debug/ImGuiManager.h"
 
 //========================================================================*/
 //* 公開しないもの

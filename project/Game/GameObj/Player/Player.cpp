@@ -1,14 +1,14 @@
 #include "Player.h"
 
-#include "Engine/ImGuiManager/ImGuiManager.h"
-#include "Engine/Particle/ParticleManager.h"
-#include "Engine/Serialize/JsonSerializer.h"
+#include "Engine/Core/Debug/ImGuiManager.h"
+#include "Engine/Graphics/Particle/ParticleManager.h"
+#include "Engine/Core/Serialize/JsonSerializer.h"
 #include "Engine/Math/Random/Random.h"
 #include "Game/GameObj/Player/Behavior/PlayerRoot.h"
 #include "Game/GameObj/Player/AttackBehavior/PlayerAttackRoot.h"
 #include "Game/GameObj/Player/PlayerBullet.h"
 #include "Game/GameObj/Enemy/BossItem/UnderRing.h"
-#include "Engine/DX/OffscreenManager.h"
+#include "Engine/Graphics/PostEffect/OffscreenManager.h"
 
 using namespace Audio;
 using namespace Core;
