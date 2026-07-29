@@ -84,6 +84,12 @@ namespace DXC {
 		ID3D12GraphicsCommandList* GetList() const { return graphicsContext_->GetList(); }
 		ID3D12GraphicsCommandList* GetComputeList() const { return computeContext_->GetList(); }
 		ID3D12GraphicsCommandList* GetImmediateList() const { return immediateContext_->GetList(); }
+
+		// レイトレ用。加速構造の構築に使う。非対応環境では nullptr
+		ID3D12GraphicsCommandList4* GetList4() const { return graphicsContext_->GetList4(); }
+		ID3D12GraphicsCommandList4* GetComputeList4() const { return computeContext_->GetList4(); }
+		ID3D12GraphicsCommandList4* GetImmediateList4() const { return immediateContext_->GetList4(); }
+
 		uint32_t GetNowFrameIndex() { return frameIndex_; }
 
 		//========================================================================*/

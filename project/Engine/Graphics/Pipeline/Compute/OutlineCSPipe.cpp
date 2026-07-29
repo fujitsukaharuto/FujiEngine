@@ -14,7 +14,7 @@ OutlineCSPipe::~OutlineCSPipe() {
 }
 
 void OutlineCSPipe::CreateRootSignature(ID3D12Device* device) {
-	auto csData = dxcommon_->GetDXCompile()->CompileShaderWithReflection(kDirectoryPath_ + L"PostEffect/Outline.CS.hlsl", L"cs_6_0");
+	auto csData = dxcommon_->GetDXCompile()->CompileShaderWithReflection(kDirectoryPath_ + L"PostEffect/Outline.CS.hlsl", DXC::kCSProfile);
 
 	vs = csData.blob;
 	vsReflection_ = csData.reflection;

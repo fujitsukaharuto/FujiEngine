@@ -89,7 +89,7 @@ void SkinningCSPipe::CreateRootSignature(ID3D12Device* device) {
 void SkinningCSPipe::CreatePSO(ID3D12Device* device) {
 	HRESULT hr;
 
-	vs = dxcommon_->GetDXCompile()->CompileShader(kDirectoryPath_ + L"Object/Skinning.CS.hlsl", L"cs_6_0");
+	vs = dxcommon_->GetDXCompile()->CompileShader(kDirectoryPath_ + L"Object/Skinning.CS.hlsl", DXC::kCSProfile);
 	assert(vs != nullptr);
 
 	D3D12_COMPUTE_PIPELINE_STATE_DESC psoDesc = {};

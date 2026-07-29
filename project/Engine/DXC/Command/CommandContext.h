@@ -28,6 +28,12 @@ namespace DXC {
 		//* Getter
 		ID3D12CommandQueue* GetQueue() const { return queue_.Get(); }
 		ID3D12GraphicsCommandList* GetList() const { return list_.Get(); }
+
+		/// <summary>
+		/// レイトレ用のコマンドリスト。非対応環境では nullptr
+		/// </summary>
+		ID3D12GraphicsCommandList4* GetList4() const { return list4_.Get(); }
+
 		ID3D12CommandAllocator* GetAllocator(uint32_t frameIndex) const { return allocator_[frameIndex].Get(); }
 		ID3D12Fence* GetFence() const { return fence_.Get(); }
 		uint64_t GetFenceValue(uint32_t frameIndex) const { return fenceValue_[frameIndex]; }
@@ -41,6 +47,7 @@ namespace DXC {
 		Microsoft::WRL::ComPtr<ID3D12CommandQueue> queue_ = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12CommandAllocator> allocator_[DXC::kFrameCount_];
 		Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> list_ = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> list4_ = nullptr;
 
 		Microsoft::WRL::ComPtr<ID3D12Fence> fence_ = nullptr;
 		uint64_t globalFenceValue_ = 0;

@@ -237,15 +237,19 @@ Microsoft::WRL::ComPtr<ID3D12RootSignature> DXCompile::CreateRootSignature(
 			typeStr = "CBV";
 			regPrefix = 'b';
 			isCBV = true;
-		} else if (res.desc.Type == D3D_SIT_TEXTURE || 
-				   res.desc.Type == D3D_SIT_UAV_RWSTRUCTURED || 
+		} else if (res.desc.Type == D3D_SIT_TEXTURE ||
+				   res.desc.Type == D3D_SIT_UAV_RWSTRUCTURED ||
 				   res.desc.Type == D3D_SIT_UAV_RWTYPED ||
 				   res.desc.Type == D3D_SIT_UAV_RWBYTEADDRESS ||
 				   res.desc.Type == D3D_SIT_STRUCTURED ||
-				   res.desc.Type == D3D_SIT_BYTEADDRESS) {
+				   res.desc.Type == D3D_SIT_BYTEADDRESS ||
+				   res.desc.Type == D3D_SIT_RTACCELERATIONSTRUCTURE) {
 
 			isUAV = (res.desc.Type == D3D_SIT_UAV_RWSTRUCTURED || res.desc.Type == D3D_SIT_UAV_RWTYPED || res.desc.Type == D3D_SIT_UAV_RWBYTEADDRESS);
-			typeStr = isUAV ? "UAV (Table)" : "SRV (Table)";
+			// TLAS（RaytracingAccelerationStructure）は t レジスタのSRVとして入る。
+			// UAVに見えるが書き込み不可で、SRVとして扱わないとルートシグネチャが合わない
+			const bool isTLAS = (res.desc.Type == D3D_SIT_RTACCELERATIONSTRUCTURE);
+			typeStr = isUAV ? "UAV (Table)" : (isTLAS ? "SRV (Table, TLAS)" : "SRV (Table)");
 			regPrefix = isUAV ? 'u' : 't';
 			rangeType = isUAV ? D3D12_DESCRIPTOR_RANGE_TYPE_UAV : D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 		} else {

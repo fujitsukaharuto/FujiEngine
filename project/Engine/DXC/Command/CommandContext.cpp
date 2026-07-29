@@ -9,6 +9,7 @@ CommandContext::~CommandContext() {
 		CloseHandle(fenceEvent_);
 	}
 
+	list4_.Reset();
 	list_.Reset();
 	for (uint32_t i = 0; i < kFrameCount_; ++i) {
 		allocator_[i].Reset();
@@ -39,6 +40,12 @@ void CommandContext::Initialize(ID3D12Device* device, D3D12_COMMAND_LIST_TYPE ty
 	hr = device->CreateCommandList(0, type, allocator_[0].Get(), nullptr, IID_PPV_ARGS(&list_));
 	assert(SUCCEEDED(hr));
 	list_->Close(); // 最初は閉じた状態にしておく
+
+	// 加速構造の構築（BuildRaytracingAccelerationStructure）に必要。
+	// 非対応環境でも起動は続けたいので、失敗しても nullptr のままにしておく
+	if (FAILED(list_.As(&list4_))) {
+		list4_ = nullptr;
+	}
 
 	// 4. フェンスとイベントの生成
 	hr = device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence_));

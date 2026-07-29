@@ -118,12 +118,12 @@ D3D12_DEPTH_STENCIL_DESC RenderPipeline::MakeDepthStencilDesc(DepthMode mode) {
 void RenderPipeline::CreateRootSignature(ID3D12Device* device) {
 
 	// シェーダーをコンパイルしてリフレクション情報を取得する
-	auto vsData = dxcommon_->GetDXCompile()->CompileShaderWithReflection(kDirectoryPath_ + desc_.vsPath, L"vs_6_0");
+	auto vsData = dxcommon_->GetDXCompile()->CompileShaderWithReflection(kDirectoryPath_ + desc_.vsPath, DXC::kVSProfile);
 	vs = vsData.blob;
 	vsReflection_ = vsData.reflection;
 	assert(vs != nullptr);
 
-	auto psData = dxcommon_->GetDXCompile()->CompileShaderWithReflection(kDirectoryPath_ + desc_.psPath, L"ps_6_0");
+	auto psData = dxcommon_->GetDXCompile()->CompileShaderWithReflection(kDirectoryPath_ + desc_.psPath, DXC::kPSProfile);
 	ps = psData.blob;
 	psReflection_ = psData.reflection;
 	assert(ps != nullptr);

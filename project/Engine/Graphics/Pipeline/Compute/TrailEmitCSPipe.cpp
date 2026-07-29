@@ -101,7 +101,7 @@ void TrailEmitCSPipe::CreateRootSignature(ID3D12Device* device) {
 void TrailEmitCSPipe::CreatePSO(ID3D12Device* device) {
 	HRESULT hr;
 
-	vs = dxcommon_->GetDXCompile()->CompileShader(kDirectoryPath_ + L"Particle/GPU/TrailEmit.CS.hlsl", L"cs_6_0");
+	vs = dxcommon_->GetDXCompile()->CompileShader(kDirectoryPath_ + L"Particle/GPU/TrailEmit.CS.hlsl", DXC::kCSProfile);
 	assert(vs != nullptr);
 
 	D3D12_COMPUTE_PIPELINE_STATE_DESC computePipelineStateDesc = {};

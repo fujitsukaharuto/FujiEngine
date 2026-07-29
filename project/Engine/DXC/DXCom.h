@@ -140,6 +140,8 @@ namespace DXC {
 		//========================================================================*/
 		//* Getter
 		ID3D12Device* GetDevice() const { return graphicsDevice_->GetDevice(); }
+		ID3D12Device5* GetDevice5() const { return graphicsDevice_->GetDevice5(); }
+		bool IsRayQuerySupported() const { return graphicsDevice_->IsRayQuerySupported(); }
 		size_t GetBackBufferCount() const { return swapChainManager_->GetBackBufferCount(); }
 		uint32_t GetNowFrameCount() const { return command_->GetNowFrameIndex(); }
 		ID3D12GraphicsCommandList* GetCommandList() const { return command_->GetList(); }

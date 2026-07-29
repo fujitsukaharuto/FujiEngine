@@ -13,7 +13,7 @@ ComputePipeline::~ComputePipeline() {
 }
 
 void ComputePipeline::CreateRootSignature(ID3D12Device* device) {
-	auto csData = dxcommon_->GetDXCompile()->CompileShaderWithReflection(kDirectoryPath_ + csPath_, L"cs_6_0");
+	auto csData = dxcommon_->GetDXCompile()->CompileShaderWithReflection(kDirectoryPath_ + csPath_, DXC::kCSProfile);
 
 	vs = csData.blob;
 	vsReflection_ = csData.reflection;

@@ -12,6 +12,18 @@
 namespace DXC {
 
 	/// <summary>
+	/// コンパイルに使うシェーダーモデル
+	/// </summary>
+	/// <remarks>
+	/// インラインレイトレ（RayQuery）が 6.5 以上を要求するため、段階ごとに混ざらないよう全体を 6.5 で揃えている。
+	/// 上げ下げはここ3行だけで済むが、実行環境も 6.5 を満たしている必要がある
+	/// （GraphicsDevice::GetHighestShaderModel が起動ログに出る）。
+	/// </remarks>
+	constexpr const wchar_t* kVSProfile = L"vs_6_5";
+	constexpr const wchar_t* kPSProfile = L"ps_6_5";
+	constexpr const wchar_t* kCSProfile = L"cs_6_5";
+
+	/// <summary>
 	/// シェーダーデータ（Blobとリフレクション）
 	/// </summary>
 	struct ShaderData {

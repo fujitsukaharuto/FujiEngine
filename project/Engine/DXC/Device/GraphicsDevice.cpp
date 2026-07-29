@@ -60,6 +60,15 @@ void GraphicsDevice::Initialize() {
 	assert(device_ != nullptr);
 	Logger::Log("Complete create D3D12Device!!\n");
 
+	// インラインレイトレ（RayQuery）で BuildRaytracingAccelerationStructure を積むために Device5 が要る。
+	// 非対応環境でも起動自体は続けたいので、失敗させずに nullptr のままにしておく
+	if (FAILED(device_.As(&device5_))) {
+		device5_ = nullptr;
+		Logger::Log("ID3D12Device5 is not available. Raytracing will be disabled.\n");
+	}
+
+	QueryFeatureSupport();
+
 #ifdef _DEBUGMODE
 	ID3D12InfoQueue* infoQueue = nullptr;
 	if (SUCCEEDED(device_->QueryInterface(IID_PPV_ARGS(&infoQueue)))) {
@@ -83,7 +92,43 @@ void GraphicsDevice::Initialize() {
 #endif // _DEBUG
 }
 
+void GraphicsDevice::QueryFeatureSupport() {
+	// レイトレのTier。1.1 で初めてシェーダー内の RayQuery（インラインレイトレ）が使える。
+	// 1.0 は専用パイプライン（DispatchRays + SBT）だけなので、こちらの用途では非対応と同じ扱い
+	D3D12_FEATURE_DATA_D3D12_OPTIONS5 options5{};
+	if (SUCCEEDED(device_->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS5, &options5, sizeof(options5)))) {
+		raytracingTier_ = options5.RaytracingTier;
+	}
+
+	// Tierの値は 10 = 1.0 / 11 = 1.1 / 12 = 1.2 …と10倍で並んでいる。
+	// switchで列挙すると新しいTierがdefaultに落ちて「非対応」と誤表示するので数値から組み立てる
+	const uint32_t tierValue = static_cast<uint32_t>(raytracingTier_);
+	const std::string tierString = (raytracingTier_ == D3D12_RAYTRACING_TIER_NOT_SUPPORTED)
+		? std::string("NotSupported")
+		: std::format("{}.{}", tierValue / 10, tierValue % 10);
+	Logger::Log(std::format("RaytracingTier : {}\n", tierString));
+
+	// シェーダーモデル。CheckFeatureSupport は「アプリが知っている最大値」を入れて渡す仕様で、
+	// ランタイムがその値を知らないと E_INVALIDARG で落ちるため高い順に降りていく
+	constexpr D3D_SHADER_MODEL kCandidates[] = {
+		D3D_SHADER_MODEL_6_6, D3D_SHADER_MODEL_6_5, D3D_SHADER_MODEL_6_0
+	};
+	for (D3D_SHADER_MODEL candidate : kCandidates) {
+		D3D12_FEATURE_DATA_SHADER_MODEL shaderModel{ candidate };
+		if (SUCCEEDED(device_->CheckFeatureSupport(D3D12_FEATURE_SHADER_MODEL, &shaderModel, sizeof(shaderModel)))) {
+			highestShaderModel_ = shaderModel.HighestShaderModel;
+			break;
+		}
+	}
+	Logger::Log(std::format("HighestShaderModel : {}.{}\n",
+		(static_cast<uint32_t>(highestShaderModel_) >> 4) & 0xf,
+		static_cast<uint32_t>(highestShaderModel_) & 0xf));
+
+	Logger::Log(std::format("RayQuery (inline raytracing) : {}\n", IsRayQuerySupported() ? "Supported" : "NOT supported"));
+}
+
 void GraphicsDevice::Finalize() {
+	device5_.Reset();
 	device_.Reset();
 	useAdapter_.Reset();
 	dxgiFactory_.Reset();
