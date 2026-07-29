@@ -5,7 +5,7 @@ struct Material
     float4 color;
     float4x4 uvTransform;
     int enableLighting;
-    float shininess;
+    float roughness;
     float alphaRef;
     float environmentCoefficient;
 };

@@ -1,6 +1,7 @@
 #include "Material.h"
 #include "Engine/DXC/DXCom.h"
 #include "Engine/DXC/Resource/DX12Helper.h"
+#include <algorithm>
 
 using namespace Graphics;
 using namespace Math;
@@ -119,8 +120,12 @@ void Material::SetLightEnable(LightMode mode) {
 	materialData_.enableLighting = static_cast<int32_t>(mode);
 }
 
-void Graphics::Material::SetShininess(float shininess) {
-	materialData_.shininess = shininess;
+void Graphics::Material::SetRoughness(float roughness) {
+	materialData_.roughness = std::clamp(roughness, 0.0f, 1.0f);
+}
+
+void Graphics::Material::SetMetallic(float metallic) {
+	materialData_.metallic = std::clamp(metallic, 0.0f, 1.0f);
 }
 
 void Material::SetEnvironment(float env) {
@@ -131,12 +136,13 @@ void Material::CopyData(uint32_t frameIndex) {
 	materialDataGPU_[frameIndex]->color = materialData_.color;
 	materialDataGPU_[frameIndex]->enableLighting = materialData_.enableLighting;
 	materialDataGPU_[frameIndex]->uvTransform = materialData_.uvTransform;
-	materialDataGPU_[frameIndex]->shininess = materialData_.shininess;
+	materialDataGPU_[frameIndex]->roughness = materialData_.roughness;
 	materialDataGPU_[frameIndex]->AlphaRef = materialData_.AlphaRef;
 	materialDataGPU_[frameIndex]->environmentCoefficient = materialData_.environmentCoefficient;
 	materialDataGPU_[frameIndex]->useNormalMap = materialData_.useNormalMap;
 	materialDataGPU_[frameIndex]->textureIndex = texture_ ? texture_->srvIndex : 0;
 	materialDataGPU_[frameIndex]->normalMapIndex = normalMap_ ? normalMap_->srvIndex : 0;
+	materialDataGPU_[frameIndex]->metallic = materialData_.metallic;
 }
 
 Matrix4x4 Material::MakeScale4x4(const Vector3& scale) {

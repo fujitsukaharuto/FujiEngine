@@ -1,15 +1,6 @@
 #include "../Object/Object3d.hlsli"
 
-struct Material
-{
-    float4 color;
-    float4x4 uvTransform;
-    int enableLighting;
-    float shininess;
-    float alphaRef;
-    float environmentCoefficient;
-    int useNormalMap;
-};
+// Material 構造体は Object3d.hlsli の共有定義を使う(独自に書き写すとレイアウトが分岐するため)
 
 ConstantBuffer<Material> gMaterial : register(b1);
 Texture2D<float4> gTexture : register(t0);
@@ -35,7 +26,8 @@ PixelShaderOutput main(VertxShaderOutput input)
         discard;
     }
     
-    textureColor.rgb = pow(textureColor.rgb, 2.2);
+    // テクスチャは TextureManager が WIC_FLAGS_FORCE_SRGB で読み SRV も _SRGB なので、
+    // サンプルした時点でハードウェアがリニア化済み。ここでガンマを掛けると二重デコードになる
     output.color = gMaterial.color * textureColor;
     if (output.color.a == 0.0)
     {

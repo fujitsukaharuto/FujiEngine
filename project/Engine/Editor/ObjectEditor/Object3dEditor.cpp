@@ -69,6 +69,16 @@ namespace Editor {
 		ImGui::DragFloat2("uvTrans", &uvTrans.x, 0.1f);
 		obj.SetUVScale(uvScale, uvTrans);
 
+		ImGui::SeparatorText("PBR");
+		float roughness = material.GetRoughness();
+		if (ImGui::SliderFloat("roughness", &roughness, 0.0f, 1.0f)) {
+			material.SetRoughness(roughness);
+		}
+		float metallic = material.GetMetallic();
+		if (ImGui::SliderFloat("metallic", &metallic, 0.0f, 1.0f)) {
+			material.SetMetallic(metallic);
+		}
+
 		ImGui::TreePop();
 	}
 

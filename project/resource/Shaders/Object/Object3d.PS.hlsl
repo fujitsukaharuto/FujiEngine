@@ -1,62 +1,7 @@
 #include "Object3d.hlsli"
+#include "../Common/PBR.hlsli"
 
-struct Material
-{
-    float4 color;
-    float4x4 uvTransform;
-    int enableLighting;
-    float shininess;
-    float alphaRef;
-    float environmentCoefficient;
-    int useNormalMap;
-    int textureIndex;
-    int normalMapIndex;
-};
-
-struct DirectionalLight
-{
-    float4 color;
-    float3 direction;
-    float intensity;
-};
-
-struct PointLight
-{
-    float4 color;
-    float3 position;
-    float intensity;
-    float radius;
-    float decay;
-    float2 padding;
-};
-
-struct SpotLight
-{
-    float4 color;
-    float3 position;
-    float intensity;
-    float3 direction;
-    float distance;
-    float decay;
-    float cosAngle;
-    float cosStart;
-    float padding;
-};
-
-struct AllLights
-{
-    DirectionalLight directionalLights[3];
-    PointLight pointLights[10];
-    SpotLight spotLights[10];
-    int numDirectionalLights;
-    int numPointLights;
-    int numSpotLights;
-};
-
-struct Camera
-{
-    float3 worldPosition;
-};
+// 構造体(Material / 各種ライト / Camera)は Object3d.hlsli にまとめてある
 
 struct PickingBuffer
 {
@@ -88,64 +33,23 @@ struct PixelShaderOutput
     float4 color : SV_TARGET0;
 };
 
-float3 CalculateDirectionalLight(DirectionalLight light, float3 normal, float3 toEye, float shininess)
+// 減衰カーブは旧実装のものをそのまま使う。物理的な逆二乗ではないが、
+// 既存のシーンがこの効き方で調整されているので、今回は BRDF だけを差し替える
+float PointLightAttenuation(PointLight light, float3 worldPos)
 {
-    float3 lightDir = normalize(-light.direction);
-    
-    // Lambert/Half-Lambert
-    float NdotL = dot(normal, lightDir);
-    float cos = pow(saturate(NdotL * 0.5f + 0.5f), 2.0f);
-    float3 diffuse = light.color.rgb * cos * light.intensity;
-    
-    // Blinn-Phong Specular
-    float3 halfVector = normalize(lightDir + toEye);
-    float NdotH = dot(normal, halfVector);
-    float specularPow = pow(saturate(NdotH), shininess);
-    // 完全に裏側の場合はSpecularを抑制 (NdotL > 0 の範囲で徐々に有効にする)
-    float3 specular = light.color.rgb * light.intensity * specularPow * saturate(NdotL * 10.0f);
-    
-    return diffuse + specular;
+    float distance = length(light.position - worldPos);
+    return pow(saturate(-distance / light.radius + 1.0f), light.decay);
 }
 
-float3 CalculatePointLight(PointLight light, float3 normal, float3 worldPos, float3 toEye, float shininess)
+float SpotLightAttenuation(SpotLight light, float3 worldPos, float3 lightDirOnSurface)
 {
-    float3 lightDir = normalize(worldPos - light.position);
     float distance = length(light.position - worldPos);
-    float factor = pow(saturate(-distance / light.radius + 1.0), light.decay);
-    
-    float NdotL = dot(normal, -lightDir);
-    float cos = pow(saturate(NdotL * 0.5f + 0.5f), 2.0f);
-    
-    float3 halfVector = normalize(-lightDir + toEye);
-    float NdotH = dot(normal, halfVector);
-    float specularPow = pow(saturate(NdotH), shininess);
-    
-    float3 diffuse = light.color.rgb * cos * light.intensity * factor;
-    float3 specular = light.color.rgb * light.intensity * factor * specularPow * saturate(NdotL * 10.0f);
-    
-    return diffuse + specular;
-}
+    float attenuation = pow(saturate(-distance / light.distance + 1.0f), light.decay);
 
-float3 CalculateSpotLight(SpotLight light, float3 normal, float3 worldPos, float3 toEye, float shininess)
-{
-    float3 lightDirOnSurface = normalize(worldPos - light.position);
-    float distance = length(light.position - worldPos);
-    float attenuationFactor = pow(saturate(-distance / light.distance + 1.0), light.decay);
-    
     float cosAngle = dot(lightDirOnSurface, normalize(light.direction));
-    float falloffFactor = saturate((cosAngle - light.cosAngle) / (light.cosStart - light.cosAngle));
-    
-    float NdotL = dot(normal, -lightDirOnSurface);
-    float cos = pow(saturate(NdotL * 0.5f + 0.5f), 2.0f);
-    
-    float3 halfVector = normalize(-lightDirOnSurface + toEye);
-    float NdotH = dot(normal, halfVector);
-    float specularPow = pow(saturate(NdotH), shininess);
-    
-    float3 diffuse = light.color.rgb * cos * light.intensity * attenuationFactor * falloffFactor;
-    float3 specular = light.color.rgb * light.intensity * attenuationFactor * falloffFactor * specularPow * saturate(NdotL * 10.0f);
-    
-    return diffuse + specular;
+    float falloff = saturate((cosAngle - light.cosAngle) / (light.cosStart - light.cosAngle));
+
+    return attenuation * falloff;
 }
 
 PixelShaderOutput main(VertxShaderOutput input)
@@ -153,12 +57,12 @@ PixelShaderOutput main(VertxShaderOutput input)
     PixelShaderOutput output;
     float4 transformedUV = mul(float4(input.texcoord, 0.0f, 1.0f), gMaterial.uvTransform);
     float4 textureColor = gTextures[gMaterial.textureIndex].Sample(gSampler, transformedUV.xy);
-    
+
     if (textureColor.a <= gMaterial.alphaRef)
     {
         discard;
     }
-    
+
     // Picking logic
     if (pickingEnable != 0 && all(int2(input.position.xy) == pickingPixelCoord))
     {
@@ -168,10 +72,9 @@ PixelShaderOutput main(VertxShaderOutput input)
             gPickingBuffer[0].depth = input.position.z;
         }
     }
-    
-    float3 totalLight = float3(0, 0, 0);
+
     float3 normal = normalize(input.normal);
-    
+
     if (gMaterial.useNormalMap != 0)
     {
         float3 tangent = normalize(input.tangent);
@@ -185,36 +88,60 @@ PixelShaderOutput main(VertxShaderOutput input)
         // 接空間からワールド空間へ変換
         normal = normalize(mul(sampledNormal, TBN));
     }
-    
+
     float3 toEye = normalize(gCamera.worldPosition - input.WorldPosition);
-    
+
     if (gMaterial.enableLighting != 0)
     {
+        // テクスチャは sRGB として読み込まれているので、サンプルした時点でリニアになっている
+        float3 albedo = gMaterial.color.rgb * textureColor.rgb;
+        float metallic = saturate(gMaterial.metallic);
+        // 0 にすると GGX のハイライトが1点に潰れてちらつくので下限を置く
+        float roughness = clamp(gMaterial.roughness, 0.04f, 1.0f);
+
+        // 金属はアルベドをそのまま鏡面反射率にし、拡散反射を持たない
+        float3 f0 = lerp(kDielectricF0, albedo, metallic);
+        float3 diffuseColor = albedo * (1.0f - metallic);
+
+        // 光の当たらない面の明るさはこれが全て(PBRには Half-Lambert のような回り込みが無い)
+        float3 totalLight = HemisphereAmbient(normal, gLights.ambientSkyColor,
+                                              gLights.ambientGroundColor, gLights.ambientIntensity) * diffuseColor;
+
         // Directional Lights
         for (int i = 0; i < gLights.numDirectionalLights; i++)
         {
-            totalLight += CalculateDirectionalLight(gLights.directionalLights[i], normal, toEye, gMaterial.shininess);
+            DirectionalLight light = gLights.directionalLights[i];
+            float3 L = normalize(-light.direction);
+            float3 radiance = light.color.rgb * light.intensity;
+            totalLight += BRDF(normal, toEye, L, diffuseColor, f0, roughness) * radiance;
         }
-        
+
         // Point Lights
         for (int j = 0; j < gLights.numPointLights; j++)
         {
-            totalLight += CalculatePointLight(gLights.pointLights[j], normal, input.WorldPosition, toEye, gMaterial.shininess);
+            PointLight light = gLights.pointLights[j];
+            float3 L = normalize(light.position - input.WorldPosition);
+            float3 radiance = light.color.rgb * light.intensity * PointLightAttenuation(light, input.WorldPosition);
+            totalLight += BRDF(normal, toEye, L, diffuseColor, f0, roughness) * radiance;
         }
-        
+
         // Spot Lights
         for (int k = 0; k < gLights.numSpotLights; k++)
         {
-            totalLight += CalculateSpotLight(gLights.spotLights[k], normal, input.WorldPosition, toEye, gMaterial.shininess);
+            SpotLight light = gLights.spotLights[k];
+            float3 lightDirOnSurface = normalize(input.WorldPosition - light.position);
+            float3 L = -lightDirOnSurface;
+            float3 radiance = light.color.rgb * light.intensity * SpotLightAttenuation(light, input.WorldPosition, lightDirOnSurface);
+            totalLight += BRDF(normal, toEye, L, diffuseColor, f0, roughness) * radiance;
         }
-        
-        output.color.rgb = gMaterial.color.rgb * textureColor.rgb * totalLight;
+
+        output.color.rgb = totalLight;
         output.color.a = gMaterial.color.a * textureColor.a;
     }
     else
     {
         output.color = gMaterial.color * textureColor;
     }
-    
+
     return output;
 }

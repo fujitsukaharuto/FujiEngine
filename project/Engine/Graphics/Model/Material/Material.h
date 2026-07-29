@@ -42,16 +42,22 @@ namespace Graphics {
 		/// <summary>
 		/// マテリアルのデータ
 		/// </summary>
+		/// <remarks>
+		/// HLSL 側の Material 構造体(Object3d.hlsli)と**並び順が完全に一致していること**。
+		/// 全て4バイトのスカラなので float4 境界を跨がず、素直に前から詰まる。
+		/// 途中に挿入すると以降のオフセットが全部ずれるので、追加は必ず末尾に行うこと
+		/// </remarks>
 		struct MaterialData {
 			Math::Vector4 color;
 			Math::Matrix4x4 uvTransform;
 			int32_t enableLighting;
-			float shininess = 50.0f;
+			float roughness = 0.5f;			// 0=鏡面 1=完全に拡散
 			float AlphaRef = 0.5f;
 			float environmentCoefficient = 1.0f;
 			int32_t useNormalMap = 0;
 			int32_t textureIndex = 0;
 			int32_t normalMapIndex = 0;
+			float metallic = 0.0f;			// 0=誘電体 1=金属
 		};
 
 	public:
@@ -72,6 +78,8 @@ namespace Graphics {
 		Math::Vector2 GetUVScale() { return scale_; }
 		Math::Vector2 GetUVTrans() { return uvTrans_; }
 		int32_t GetUseNormalMap() { return materialData_.useNormalMap; }
+		float GetRoughness() const { return materialData_.roughness; }
+		float GetMetallic() const { return materialData_.metallic; }
 
 		//========================================================================*/
 		//* Setter
@@ -93,8 +101,10 @@ namespace Graphics {
 		void SetNormalMap(const std::string& name, bool overWrite = false);
 		/// <summary>ライトモードの設定</summary>
 		void SetLightEnable(LightMode mode);
-		/// <summary>反射の設定</summary>
-		void SetShininess(float shininess);
+		/// <summary>粗さの設定(0=鏡のように鋭い 1=完全に拡散)</summary>
+		void SetRoughness(float roughness);
+		/// <summary>金属度の設定(0=誘電体 1=金属)</summary>
+		void SetMetallic(float metallic);
 		/// <summary>環境マップの設定</summary>
 		void SetEnvironment(float env);
 

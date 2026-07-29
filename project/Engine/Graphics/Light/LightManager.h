@@ -18,6 +18,10 @@ namespace Graphics {
 	/// <summary>
 	/// 全てのライトをまとめた構造体
 	/// </summary>
+	/// <remarks>
+	/// HLSL 側の AllLights 構造体と並び順・パディングが完全に一致していること。
+	/// float3 は float4 境界を跨げないので、後ろに詰める値は明示的に pad を置いて位置を固定する
+	/// </remarks>
 	struct AllLightsData {
 		DirectionalLight directionalLights[kMaxDirectionalLights];
 		PointLightData pointLights[kMaxPointLights];
@@ -25,6 +29,14 @@ namespace Graphics {
 		int32_t numDirectionalLights;
 		int32_t numPointLights;
 		int32_t numSpotLights;
+		float pad0;
+
+		// 半球アンビエント。法線の上下で空色と地面色を混ぜる。
+		// PBR にすると Half-Lambert の回り込みが無くなるので、これが無いと影側が真っ黒になる
+		Math::Vector3 ambientSkyColor = { 0.35f, 0.42f, 0.55f };
+		float ambientIntensity = 0.30f;
+		Math::Vector3 ambientGroundColor = { 0.20f, 0.17f, 0.14f };
+		float pad1;
 	};
 
 	/// <summary>

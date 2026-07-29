@@ -86,7 +86,7 @@ namespace Graphics {
 	/// 最終出力のトーンマップに送るデータ
 	/// </summary>
 	struct TonemapParams {
-		float exposure = 1.0f;
+		float exposure = 2.0f;
 		TonemapMode mode = TonemapMode::ACES;
 	};
 
