@@ -2,6 +2,7 @@
 #include "Engine/DXC/DXCom.h"
 #include "Engine/DXC/Command/DXCommand.h"
 #include "Engine/DXC/Shader/DXCompile.h"
+#include "Engine/DXC/Resource/DX12Helper.h"
 #include "Engine/Logger/Logger.h"
 #include <cassert>
 
@@ -92,7 +93,7 @@ void ParticleCSPipe::CreatePSO(ID3D12Device* device) {
 	stateDesc.RasterizerState = rasterizer;
 
 	stateDesc.NumRenderTargets = 1;
-	stateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	stateDesc.RTVFormats[0] = kSceneColorFormat;	// 1/4解像度のGPUパーティクルRTもオフスクリーンと同じHDR形式
 
 	stateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 

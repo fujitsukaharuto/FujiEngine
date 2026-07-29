@@ -1,0 +1,64 @@
+// 画面へ出す最終パス。リニアHDRのオフスクリーンを露光・トーンマップして表示レンジへ落とす。
+//
+// NonePost.PS と分けてあるのは、あちらが Pipe::GPUParticleSynthesis と共用で、
+// そちらは「オフスクリーン → オフスクリーン」の加算合成なのでトーンマップしてはいけないため。
+// このシェーダは Pipe::None (= バックバッファへの最終出力) 専用。
+//
+// 出力先のRTVが _SRGB なので、sRGBへのエンコードはハードウェアが行う。
+// ここでは絶対に自前でガンマを掛けないこと(二重に掛かる)。
+
+Texture2D g_InputTexture : register(t0);
+SamplerState g_Sampler : register(s0);
+
+cbuffer TonemapParams : register(b0)
+{
+    float exposure; // トーンマップ前に掛ける露光倍率
+    uint tonemapMode; // 0=なし / 1=Reinhard / 2=ACES
+};
+
+struct PSInput
+{
+    float4 position : SV_POSITION;
+    float2 texcoord : TEXCOORD0;
+};
+
+// Reinhard。最も単純だがハイライトが平坦になりやすい
+float3 Reinhard(float3 x)
+{
+    return x / (1.0f + x);
+}
+
+// ACES のフィルミックカーブ近似 (Krzysztof Narkowicz)
+// 1.0 -> 0.80 / 2.0 -> 0.93 / 4.0 -> 0.98 と、明部を緩やかに詰めていく
+float3 ACESFilm(float3 x)
+{
+    const float a = 2.51f;
+    const float b = 0.03f;
+    const float c = 2.43f;
+    const float d = 0.59f;
+    const float e = 0.14f;
+    return saturate((x * (a * x + b)) / (x * (c * x + d) + e));
+}
+
+float4 main(PSInput input) : SV_TARGET
+{
+    float4 color = g_InputTexture.Sample(g_Sampler, input.texcoord);
+
+    float3 hdr = color.rgb * exposure;
+
+    float3 mapped;
+    switch (tonemapMode)
+    {
+        case 1:
+            mapped = Reinhard(hdr);
+            break;
+        case 2:
+            mapped = ACESFilm(hdr);
+            break;
+        default:
+            mapped = hdr; // 素通し。HDR化の切り分け用
+            break;
+    }
+
+    return float4(saturate(mapped), 1.0f);
+}

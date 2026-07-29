@@ -72,6 +72,24 @@ namespace Graphics {
 		float blurWidth = 0.01f;
 	};
 
+	/// <summary>
+	/// トーンマップの演算子
+	/// </summary>
+	/// <remarks>Tonemap.PS.hlsl の switch と数値を一致させること</remarks>
+	enum class TonemapMode : uint32_t {
+		None,		// 素通し。HDR化の切り分け用
+		Reinhard,
+		ACES,
+	};
+
+	/// <summary>
+	/// 最終出力のトーンマップに送るデータ
+	/// </summary>
+	struct TonemapParams {
+		float exposure = 1.0f;
+		TonemapMode mode = TonemapMode::ACES;
+	};
+
 	enum class PostEffectList : int {
 		Gray,
 		CRT,
@@ -252,6 +270,10 @@ namespace Graphics {
 		Microsoft::WRL::ComPtr<ID3D12Resource> vignetteResource_[DXC::kFrameCount_];
 		VignetteData* vignetteDataGPU_[DXC::kFrameCount_];
 		VignetteData vignetteData_;
+
+		Microsoft::WRL::ComPtr<ID3D12Resource> tonemapResource_[DXC::kFrameCount_];
+		TonemapParams* tonemapDataGPU_[DXC::kFrameCount_];
+		TonemapParams tonemapData_;
 
 		Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_ = nullptr;
 		D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};

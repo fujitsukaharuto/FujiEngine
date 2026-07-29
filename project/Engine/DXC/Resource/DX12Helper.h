@@ -4,6 +4,27 @@
 #include <cstddef>
 #include <cstdint>
 
+namespace DXC {
+
+	/// <summary>
+	/// シーンを描くオフスクリーンのフォーマット
+	/// </summary>
+	/// <remarks>
+	/// 1.0 を超える明るさを最後のトーンマップまで潰さずに運ぶため浮動小数点にしてある
+	/// (8bit UNORM は 0〜1 しか持てない)。リニアで置くので sRGB は使わない。
+	/// 帯域や ROP のブレンド速度が問題になったら R11G11B10_FLOAT へ落とせる
+	/// (1px 4バイトに戻る。現在どのブレンドモードも DEST_ALPHA を参照していないので、
+	/// アルファチャンネルが無くても成立することは確認済み)。
+	/// </remarks>
+	constexpr DXGI_FORMAT kSceneColorFormat = DXGI_FORMAT_R16G16B16A16_FLOAT;
+
+	/// <summary>
+	/// 画面(スワップチェーン)のフォーマット。ここだけは 8bit sRGB のまま
+	/// </summary>
+	constexpr DXGI_FORMAT kSwapChainFormat = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+
+}
+
 namespace DXC::Helper {
 	/// <summary>
 	/// 指定されたサイズのバッファリソースを生成する。

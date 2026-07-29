@@ -49,6 +49,19 @@ void OffscreenManager::DebugGUI() {
 		isPostEffect_ = false;
 	}
 
+	ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+	if (ImGui::TreeNode("Tonemap")) {
+		// オフスクリーンはリニアHDRなので、画面へ出す前にここで表示レンジへ落とす
+		ImGui::DragFloat("exposure", &tonemapData_.exposure, 0.01f, 0.0f, 100.0f);
+
+		int mode = static_cast<int>(tonemapData_.mode);
+		if (ImGui::Combo("operator##tonemap", &mode, "None\0Reinhard\0ACES\0")) {
+			tonemapData_.mode = static_cast<TonemapMode>(mode);
+		}
+		ImGui::TextWrapped("None は素通し(1.0で頭打ち)。HDR化の切り分け用");
+		ImGui::TreePop();
+	}
+
 	EffectListGUI();
 
 	if (ImGui::TreeNode("Gray")) {
@@ -151,16 +164,16 @@ void OffscreenManager::EffectListGUI() {
 
 void OffscreenManager::CreateResource() {
 
-	offscreenRTVDesc_.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	offscreenRTVDesc_.Format = kSceneColorFormat;
 	offscreenRTVDesc_.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 
-	clearColorValue_.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	clearColorValue_.Format = kSceneColorFormat;
 	clearColorValue_.Color[0] = 0.0f;
 	clearColorValue_.Color[1] = 0.0f;
 	clearColorValue_.Color[2] = 0.0f;
 	clearColorValue_.Color[3] = 1.0f;
 
-	clearColorValueForGPU_.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	clearColorValueForGPU_.Format = kSceneColorFormat;
 	clearColorValueForGPU_.Color[0] = 0.0f;
 	clearColorValueForGPU_.Color[1] = 0.0f;
 	clearColorValueForGPU_.Color[2] = 0.0f;
@@ -196,7 +209,7 @@ void OffscreenManager::SettingTexture() {
 		offscreenSRVIndex_[i] = srvManager->Allocate();
 		offscreenIndex_[i] = srvManager->Allocate();
 
-		srvManager->CreateTextureSRV(offscreenSRVIndex_[i], offscreenRt_[i].Get(), DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, 1, false);
+		srvManager->CreateTextureSRV(offscreenSRVIndex_[i], offscreenRt_[i].Get(), kSceneColorFormat, 1, false);
 
 		offTextureHandleCPU_[i] = srvManager->GetCPUDescriptorHandle(offscreenSRVIndex_[i]);
 		offTextureHandle_[i] = srvManager->GetGPUDescriptorHandle(offscreenSRVIndex_[i]);
@@ -204,7 +217,7 @@ void OffscreenManager::SettingTexture() {
 		offTextureUAVHandle_[i] = srvManager->GetGPUDescriptorHandle(offscreenIndex_[i]);
 
 		D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
-		uavDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		uavDesc.Format = kSceneColorFormat;
 		uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
 		dxcommon_->GetDevice()->CreateUnorderedAccessView(offscreenRt_[i].Get(), nullptr, &uavDesc, offTextureUAVHandleCPU_[i]);
 	}
@@ -212,7 +225,7 @@ void OffscreenManager::SettingTexture() {
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {// フレーム数分作る
 		gpuParticleSRVIndex_[i] = srvManager->Allocate();
 
-		srvManager->CreateTextureSRV(gpuParticleSRVIndex_[i], gpuParticleRt_[i].Get(), DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, 1, false);
+		srvManager->CreateTextureSRV(gpuParticleSRVIndex_[i], gpuParticleRt_[i].Get(), kSceneColorFormat, 1, false);
 
 		gpuParticleHandleCPU_[i] = srvManager->GetCPUDescriptorHandle(gpuParticleSRVIndex_[i]);
 		gpuParticleHandle_[i] = srvManager->GetGPUDescriptorHandle(gpuParticleSRVIndex_[i]);
@@ -297,7 +310,7 @@ void OffscreenManager::SettingVertex() {
 	textureDesc.Height = MyWin::kWindowHeight;
 	textureDesc.DepthOrArraySize = 1;
 	textureDesc.MipLevels = 1;
-	textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	textureDesc.Format = kSceneColorFormat;
 	textureDesc.SampleDesc.Count = 1;
 	textureDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
 	textureDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
@@ -306,13 +319,13 @@ void OffscreenManager::SettingVertex() {
 	textureDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
 
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-	srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	srvDesc.Format = kSceneColorFormat;
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 	srvDesc.Texture2D.MipLevels = 1;
 
 	D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
-	uavDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	uavDesc.Format = kSceneColorFormat;
 	uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
 
 	SRVManager* srvManager = SRVManager::GetInstance();
@@ -365,6 +378,10 @@ void Graphics::OffscreenManager::InitDataResource() {
 		vignetteResource_[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(VignetteData));
 		vignetteDataGPU_[i] = nullptr;
 		vignetteResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&vignetteDataGPU_[i]));
+
+		tonemapResource_[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(TonemapParams));
+		tonemapDataGPU_[i] = nullptr;
+		tonemapResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&tonemapDataGPU_[i]));
 	}
 }
 
@@ -544,6 +561,7 @@ void Graphics::OffscreenManager::PingPongCommand() {
 	dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	dxcommon_->GetPipelineManager()->SetGraphicsRootDescriptorTable(dxcommon_->GetCommandList(), RootName::kG_InputTexture, finalSRVHandle);
+	dxcommon_->GetPipelineManager()->SetGraphicsRootCBV(dxcommon_->GetCommandList(), RootName::kTonemapParams, tonemapResource_[frameIndex]->GetGPUVirtualAddress());
 	dxcommon_->GetCommandList()->DrawInstanced(3, 1, 0, 0); // 大きな三角形に描画して負荷を減らす
 
 
@@ -570,6 +588,7 @@ void Graphics::OffscreenManager::OtherPipeLineCommand() {
 		dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
 		dxcommon_->GetPipelineManager()->SetGraphicsRootDescriptorTable(dxcommon_->GetCommandList(), RootName::kG_InputTexture, offTextureHandle_[frameIndex]);
+		dxcommon_->GetPipelineManager()->SetGraphicsRootCBV(dxcommon_->GetCommandList(), RootName::kTonemapParams, tonemapResource_[frameIndex]->GetGPUVirtualAddress());
 		dxcommon_->GetCommandList()->DrawInstanced(3, 1, 0, 0);
 	}
 }
@@ -589,4 +608,7 @@ void OffscreenManager::CopyData(uint32_t frameIndex) {
 
 	radialDataGPU_[frameIndex]->center = radialData_.center;
 	radialDataGPU_[frameIndex]->blurWidth = radialData_.blurWidth;
+
+	tonemapDataGPU_[frameIndex]->exposure = tonemapData_.exposure;
+	tonemapDataGPU_[frameIndex]->mode = tonemapData_.mode;
 }

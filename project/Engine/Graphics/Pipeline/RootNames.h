@@ -36,6 +36,7 @@ namespace Graphics {
 		inline const RootParam kBlurConstantBuffer{ "BlurConstantBuffer" };
 		inline const RootParam kGrayscaleConstantBuffer{ "GrayscaleConstantBuffer" };
 		inline const RootParam kVignetteConstantBuffer{ "VignetteConstantBuffer" };
+		inline const RootParam kTonemapParams{ "TonemapParams" };
 
 		// --- GPUパーティクル: プール ---
 		inline const RootParam kParticles_Trans{ "gParticles_Trans" };

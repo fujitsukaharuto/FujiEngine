@@ -169,7 +169,7 @@ void RenderPipeline::CreatePSO(ID3D12Device* device) {
 	stateDesc.DSVFormat = desc_.useDepthTarget ? DXGI_FORMAT_D24_UNORM_S8_UINT : DXGI_FORMAT_UNKNOWN;
 
 	stateDesc.NumRenderTargets = 1;
-	stateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	stateDesc.RTVFormats[0] = desc_.rtvFormat;
 
 	stateDesc.PrimitiveTopologyType = desc_.topology;
 

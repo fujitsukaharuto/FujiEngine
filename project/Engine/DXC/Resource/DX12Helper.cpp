@@ -73,7 +73,7 @@ namespace DXC::Helper {
 		resourceDesc.Height = height;
 		resourceDesc.MipLevels = 1;
 		resourceDesc.DepthOrArraySize = 1;
-		resourceDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+		resourceDesc.Format = kSceneColorFormat;
 		resourceDesc.SampleDesc.Count = 1;
 		resourceDesc.SampleDesc.Quality = 0;
 		resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;

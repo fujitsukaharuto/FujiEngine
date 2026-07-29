@@ -36,11 +36,12 @@ void PipelineManager::Finalize() {
 
 void PipelineManager::CreatePipeline() {
 
-	// オフスクリーンをそのまま画面へ出すフルスクリーンパス
+	// オフスクリーンを画面(バックバッファ)へ出す最終パス。ここだけ出力先がスワップチェーン
 	CreateRenderPipe(Pipe::None, {
-		.vsPath = L"PostEffect/NonePost.VS.hlsl", .psPath = L"PostEffect/NonePost.PS.hlsl",
+		.vsPath = L"PostEffect/NonePost.VS.hlsl", .psPath = L"PostEffect/Tonemap.PS.hlsl",
 		.blend = BlendType::NONE, .depth = DepthMode::DISABLE,
-		.cull = D3D12_CULL_MODE_BACK });
+		.cull = D3D12_CULL_MODE_BACK,
+		.rtvFormat = DXC::kSwapChainFormat });
 	// 1/4解像度GPUパーティクルRTをシーンへ加算合成する
 	CreateRenderPipe(Pipe::GPUParticleSynthesis, {
 		.vsPath = L"PostEffect/NonePost.VS.hlsl", .psPath = L"PostEffect/NonePost.PS.hlsl",

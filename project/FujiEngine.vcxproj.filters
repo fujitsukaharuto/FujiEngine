@@ -998,6 +998,9 @@
     <FxCompile Include="resource\Shaders\PostEffect\NonePost.PS.hlsl">
       <Filter>resource\Shaders\PostEffect</Filter>
     </FxCompile>
+    <FxCompile Include="resource\Shaders\PostEffect\Tonemap.PS.hlsl">
+      <Filter>resource\Shaders\PostEffect</Filter>
+    </FxCompile>
     <FxCompile Include="resource\Shaders\PostEffect\NonePost.VS.hlsl">
       <Filter>resource\Shaders\PostEffect</Filter>
     </FxCompile>

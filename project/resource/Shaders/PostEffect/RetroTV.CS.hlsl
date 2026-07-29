@@ -39,29 +39,6 @@ float3 sampleSplit(Texture2D tex, float2 coord)
     return frag;
 }
 
-float3 LinearToSRGB(float3 linearColor)
-{
-    float3 srgbColor = linearColor;
-    // R成分
-    if (linearColor.x <= 0.0031308f)
-        srgbColor.x = 12.92f * linearColor.x;
-    else
-        srgbColor.x = 1.055f * pow(linearColor.x, 1.0f / 2.4f) - 0.055f;
-
-    // G成分
-    if (linearColor.y <= 0.0031308f)
-        srgbColor.y = 12.92f * linearColor.y;
-    else
-        srgbColor.y = 1.055f * pow(linearColor.y, 1.0f / 2.4f) - 0.055f;
-
-    // B成分
-    if (linearColor.z <= 0.0031308f)
-        srgbColor.z = 12.92f * linearColor.z;
-    else
-        srgbColor.z = 1.055f * pow(linearColor.z, 1.0f / 2.4f) - 0.055f;
-    return saturate(srgbColor);
-}
-
 [numthreads(8, 8, 1)]
 void main(uint3 DTid : SV_DispatchThreadID)
 {
@@ -85,7 +62,6 @@ void main(uint3 DTid : SV_DispatchThreadID)
     float vignette = 1.0 - dot(centeredUV, centeredUV) * 2.2;
     vignette = saturate(pow(vignette, 1.5));
     color *= vignette;
-    color.rgb = LinearToSRGB(color.rgb);
     
     outputTexture[DTid.xy] = float4(color, 1.0);
 }

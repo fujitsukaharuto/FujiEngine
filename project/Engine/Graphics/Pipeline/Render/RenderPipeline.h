@@ -2,6 +2,7 @@
 #include <string>
 #include <d3d12.h>
 #include "Engine/Graphics/Pipeline/BasePipeline.h"
+#include "Engine/DXC/Resource/DX12Helper.h"
 
 
 namespace Graphics {
@@ -27,6 +28,10 @@ namespace Graphics {
 		D3D12_PRIMITIVE_TOPOLOGY_TYPE topology = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 		bool useInputLayout = true;		// false = 頂点入力なし(SV_VertexID からフルスクリーン三角形を作る類)
 		bool useDepthTarget = true;		// false = DSVFormat を UNKNOWN にする(深度バッファを一切束ねないパス)
+
+		// 書き込み先のフォーマット。束ねる RTV と一致していないと PSO 作成時に弾かれる。
+		// ほとんどの描画はオフスクリーン宛なので既定はそちら。画面へ直接出す最終パスだけ上書きする
+		DXGI_FORMAT rtvFormat = DXC::kSceneColorFormat;
 	};
 
 	/// <summary>
