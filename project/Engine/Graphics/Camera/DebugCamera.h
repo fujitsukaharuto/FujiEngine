@@ -6,10 +6,13 @@ namespace Graphics {
 	/// <summary>
 	/// デバッグカメラクラス
 	/// </summary>
+	/// <remarks>
+	/// 射影は Camera 側の設定をそのまま使うので、こちらはビュー行列だけを作る
+	/// </remarks>
 	class DebugCamera {
 	public:
-		DebugCamera();
-		~DebugCamera();
+		DebugCamera() = default;
+		~DebugCamera() = default;
 
 	public:
 
@@ -18,16 +21,13 @@ namespace Graphics {
 		/// </summary>
 		struct DebugCameraParam {
 			Math::Vector3 initPos = { 0.0f,5.0f,-30.0f };
-			float fovY = 0.45f;
-			float nearClip = 0.1f;
-			float farClip = 100.0f;
 
-			float zoomSpeed = 0.1f;
-			float moveSpeed = 0.1f;
-			float rotateSpeed = 0.0025f;
+			float zoomSpeed = 0.01f;	// ホイール1目盛りあたりの前後移動量
+			float moveSpeed = 0.01f;	// ドラッグ1ピクセルあたりの平行移動量
+			float rotateSpeed = 0.0025f;// ドラッグ1ピクセルあたりの回転量(ラジアン)
 
 			float pitch = 0.15f;
-			float yaw= 0.0f;
+			float yaw = 0.0f;
 		};
 
 		static DebugCamera* GetInstance();
@@ -35,29 +35,17 @@ namespace Graphics {
 		void Update();
 
 		/// <summary>
-		/// 入力更新
+		/// 初期姿勢へ戻す
 		/// </summary>
-		void InputUpdate();
+		void Reset();
 
 		/// <summary>
-		/// 移動更新
+		/// 直前のマウス位置を現在値に合わせる
 		/// </summary>
-		void TransUpdate();
-
-		/// <summary>
-		/// ビュー更新
-		/// </summary>
-		void ViewUpdate();
-
-		/// <summary>
-		/// 行列更新
-		/// </summary>
-		void MatrixUpdate();
-
-		/// <summary>
-		/// マウスの事前変更
-		/// </summary>
-		void PreChange();
+		/// <remarks>
+		/// デバッグカメラへ切り替えた瞬間に、溜まっていた移動量で視点が飛ぶのを防ぐ
+		/// </remarks>
+		void SyncMousePosition();
 
 
 		//========================================================================*/
@@ -67,21 +55,46 @@ namespace Graphics {
 		/// ビュー行列の取得
 		/// </summary>
 		/// <returns>Matrix4x4</returns>
-		Math::Matrix4x4 GetViewMatrix()const;
+		const Math::Matrix4x4& GetViewMatrix()const { return viewMatrix_; }
 
-		Math::Vector3 GetTranslate() { return translation_; }
+		/// <summary>
+		/// カメラのワールド座標の取得
+		/// </summary>
+		/// <returns>Vector3</returns>
+		const Math::Vector3& GetTranslate()const { return translation_; }
 
 		void DebugGUI();
 
 	private:
 
+		/// <summary>
+		/// 入力から今フレームの移動量を取り出す
+		/// </summary>
+		void InputUpdate();
+
+		/// <summary>
+		/// 移動更新
+		/// </summary>
+		void TransUpdate();
+
+		/// <summary>
+		/// 回転行列の更新
+		/// </summary>
+		void ViewUpdate();
+
+		/// <summary>
+		/// ビュー行列の更新
+		/// </summary>
+		void MatrixUpdate();
+
+	private:
+
 		Math::Matrix4x4 matRot_;
 		Math::Vector3 translation_ = { 0.0f,0.0f,-10.0f };
-		Math::Vector3 pivot_ = { 0.0f,0.0f,10.0f };
 
 		Math::Matrix4x4 viewMatrix_;
-		Math::Matrix4x4 projectionMatrix_;
 
+		// 今フレームの入力量。x,y = ドラッグのピクセル数 / z = ホイールの目盛り数
 		Math::Vector3 moveTrans_ = { 0.0f,0.0f,0.0f };
 		Math::Vector2 lastMousePos_{};
 

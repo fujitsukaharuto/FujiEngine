@@ -33,7 +33,7 @@ void CameraManager::Update() {
 
 void CameraManager::SetDebugMode(bool is) {
 	if (is) {
-		DebugCamera::GetInstance()->PreChange();
+		DebugCamera::GetInstance()->SyncMousePosition();
 	}
 	debugMode_ = is;
 }

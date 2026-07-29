@@ -38,11 +38,19 @@ namespace Graphics {
 		};
 
 		void Initialize(DXC::DXCom* pDXCom);
+
+		/// <summary>
+		/// シェイクを進めてから行列と定数バッファを更新する。毎フレーム1回だけ呼ぶこと
+		/// </summary>
 		void Update();
 
 		/// <summary>
-		/// 行列の更新
+		/// 行列と定数バッファを現在の transform から作り直す
 		/// </summary>
+		/// <remarks>
+		/// transform を書き換えた直後に呼ぶ用。Update() はフレーム先頭で走るので、
+		/// シーン更新中にカメラを動かした場合はこれを呼ばないと1フレーム遅れる
+		/// </remarks>
 		void UpdateMatrix();
 
 		/// <summary>
@@ -129,15 +137,26 @@ namespace Graphics {
 		Math::Trans& GetTransform() { return transform_; };
 
 		/// <summary>
-		/// カメラの位置の取得
+		/// カメラのワールド座標の取得
 		/// </summary>
 		/// <returns>Vector3</returns>
-		/// <remarks>デバッグカメラが有効なときはそちらの位置を返す</remarks>
-		Math::Vector3 GetTranslate();
+		/// <remarks>
+		/// ワールド行列から取り出すので、シェイクのオフセットもデバッグカメラも反映された値になる。
+		/// transform_.translate を直接読むとどちらも抜け落ちるので、位置が要るときは必ずこちらを使うこと
+		/// </remarks>
+		Math::Vector3 GetTranslate() const;
 
 	private:
 
+		/// <summary>
+		/// シェイクのオフセットを進める
+		/// </summary>
+		void UpdateShake();
 
+		/// <summary>
+		/// 現在の行列を定数バッファへ書き込む
+		/// </summary>
+		void TransferCameraInfo();
 
 	private:
 		Math::Trans transform_ = { { 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, { 0.0f,5.0f,-30.0f } };
@@ -153,16 +172,16 @@ namespace Graphics {
 
 		Math::Matrix4x4 viewProjectionMatrix_;
 
-		ShakeMode shakeMode_;
+		ShakeMode shakeMode_ = ShakeMode::RandomShake;
 		float shakeTime_ = 0.0f;
 		float shakeStrength_ = 0.1f;
 		Math::Vector3 shakeGap_;
 		Math::Vector2 shakeGapRand_ = { -0.5f,0.5f };
-		float rollingTime_;
+		float rollingTime_ = 0.0f;
 
 		DXC::DXCom* dxcommon_ = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12Resource> cameraInfoResource_[DXC::kFrameCount_];
-		CameraInfo* cameraInfoData_[DXC::kFrameCount_];
+		CameraInfo* cameraInfoData_[DXC::kFrameCount_] = {};
 	};
 
 }
