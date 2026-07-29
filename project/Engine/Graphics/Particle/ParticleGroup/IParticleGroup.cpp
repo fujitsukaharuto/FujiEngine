@@ -166,32 +166,25 @@ bool IParticleGroup::InitEmitParticle(Particle& particle, const Vector3& pos, co
 		if (particle.isContinuouslyRotate_) {
 			particle.continuouslyR_ = Random::GetVector3({ -1.2f,1.2f }, { -1.2f,1.2f }, { -1.2f,1.2f });
 		}
-		Vector3 veloSpeed = particle.speed_.Normalize();
-		Vector3 cameraR{};
-		Vector3 defa = { 0.0f,1.0f,0.0f };
-		Vector3 angleDToD{};
-		Matrix4x4 rotateCamera;
-		Matrix4x4 dToD;
-
 		switch (particle.rotateType_) {
 		case static_cast<int>(RotateType::kUsually):
 			particle.rotate = rotate;
 			break;
-		case static_cast<int>(RotateType::kVelocityR):
+		case static_cast<int>(RotateType::kVelocityR): {
+			// ビルボードのパーティクルは rotate がビルボード空間(=カメラの姿勢)で効くので、
+			// ワールドの速度ベクトルをビュー行列でカメラ空間へ持ち込んでから角度を出す
+			const Matrix4x4& viewMatrix = CameraManager::GetInstance()->GetCamera()->GetViewMatrix();
+			const Vector3 veloSpeed = TransformNormal(particle.speed_, viewMatrix).Normalize();
 
-			veloSpeed = particle.speed_.Normalize();
-
-			// カメラの回転を考慮して速度ベクトルを変換
-			cameraR = CameraManager::GetInstance()->GetCamera()->GetTranslate();
-			rotateCamera = MakeRotateXYZMatrix(-cameraR);
-			veloSpeed = TransformNormal(veloSpeed, rotateCamera);
-
-			defa = TransformNormal(defa, rotateCamera);
-			dToD = DirectionToDirection(defa, veloSpeed.Normalize());
-			angleDToD = ExtractEulerAngles(dToD);
-			particle.rotate = angleDToD;
-
+			if (veloSpeed.Length() > 0.0f) {
+				const Vector3 defaultUp = { 0.0f,1.0f,0.0f };
+				particle.rotate = ExtractEulerAngles(DirectionToDirection(defaultUp, veloSpeed));
+			} else {
+				// 速度が無いと向きが決まらないので既定の回転のまま
+				particle.rotate = rotate;
+			}
 			break;
+		}
 		case static_cast<int>(RotateType::kRandomR):
 			particle.rotate = Random::GetVector3({ -3.0f,3.0f }, { -3.0f,3.0f }, { -3.0f,3.0f });
 			break;
