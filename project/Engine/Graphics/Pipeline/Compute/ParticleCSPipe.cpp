@@ -16,12 +16,12 @@ ParticleCSPipe::~ParticleCSPipe() {}
 void ParticleCSPipe::CreateRootSignature(ID3D12Device* device) {
 
 	// シェーダーをコンパイルしてリフレクション情報を取得する
-	auto vsData = dxcommon_->GetDXCompile()->CompileShaderWithReflection(kDirectoryPath_ + L"CSParticle.VS.hlsl", L"vs_6_0");
+	auto vsData = dxcommon_->GetDXCompile()->CompileShaderWithReflection(kDirectoryPath_ + L"Particle/GPU/CSParticle.VS.hlsl", L"vs_6_0");
 	vs = vsData.blob;
 	vsReflection_ = vsData.reflection;
 	assert(vs != nullptr);
 
-	auto psData = dxcommon_->GetDXCompile()->CompileShaderWithReflection(kDirectoryPath_ + L"CSParticle.PS.hlsl", L"ps_6_0");
+	auto psData = dxcommon_->GetDXCompile()->CompileShaderWithReflection(kDirectoryPath_ + L"Particle/GPU/CSParticle.PS.hlsl", L"ps_6_0");
 	ps = psData.blob;
 	psReflection_ = psData.reflection;
 	assert(ps != nullptr);

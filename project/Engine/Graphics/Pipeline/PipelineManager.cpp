@@ -38,28 +38,28 @@ void PipelineManager::CreatePipeline() {
 
 	// オフスクリーンをそのまま画面へ出すフルスクリーンパス
 	CreateRenderPipe(Pipe::None, {
-		.vsPath = L"NonePost.VS.hlsl", .psPath = L"NonePost.PS.hlsl",
+		.vsPath = L"PostEffect/NonePost.VS.hlsl", .psPath = L"PostEffect/NonePost.PS.hlsl",
 		.blend = BlendType::NONE, .depth = DepthMode::DISABLE,
 		.cull = D3D12_CULL_MODE_BACK });
 	// 1/4解像度GPUパーティクルRTをシーンへ加算合成する
 	CreateRenderPipe(Pipe::GPUParticleSynthesis, {
-		.vsPath = L"NonePost.VS.hlsl", .psPath = L"NonePost.PS.hlsl",
+		.vsPath = L"PostEffect/NonePost.VS.hlsl", .psPath = L"PostEffect/NonePost.PS.hlsl",
 		.blend = BlendType::ADD_PREMULTIPLIED, .depth = DepthMode::DISABLE,
 		.cull = D3D12_CULL_MODE_BACK });
 
 	CreateRenderPipe(Pipe::Normal, {
-		.vsPath = L"Object3d.VS.hlsl", .psPath = L"Object3d.PS.hlsl",
+		.vsPath = L"Object/Object3d.VS.hlsl", .psPath = L"Object/Object3d.PS.hlsl",
 		.blend = BlendType::ALPHA, .depth = DepthMode::READ_WRITE });
 	CreateRenderPipe(Pipe::NormalAdd, {
-		.vsPath = L"Object3d.VS.hlsl", .psPath = L"Object3d.PS.hlsl",
+		.vsPath = L"Object/Object3d.VS.hlsl", .psPath = L"Object/Object3d.PS.hlsl",
 		.blend = BlendType::ADD, .depth = DepthMode::READ_ONLY });
 
 
 	CreateRenderPipe(Pipe::Sprite, {
-		.vsPath = L"Object3d.VS.hlsl", .psPath = L"Sprite.PS.hlsl",
+		.vsPath = L"Object/Object3d.VS.hlsl", .psPath = L"Sprite/Sprite.PS.hlsl",
 		.blend = BlendType::ALPHA, .depth = DepthMode::READ_WRITE });
 	CreateRenderPipe(Pipe::Line3d, {
-		.vsPath = L"Line3d.VS.hlsl", .psPath = L"Line3d.PS.hlsl",
+		.vsPath = L"Line/Line3d.VS.hlsl", .psPath = L"Line/Line3d.PS.hlsl",
 		.blend = BlendType::ALPHA, .depth = DepthMode::DISABLE,
 		.topology = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE });
 
@@ -76,53 +76,53 @@ void PipelineManager::CreatePipeline() {
 	};
 	for (const auto& [type, blend] : kParticlePipes) {
 		CreateRenderPipe(type, {
-			.vsPath = L"Particle.VS.hlsl", .psPath = L"Particle.PS.hlsl",
+			.vsPath = L"Particle/Particle.VS.hlsl", .psPath = L"Particle/Particle.PS.hlsl",
 			.blend = blend, .depth = DepthMode::READ_ONLY });
 	}
 
 
 	CreatePipe<ParticleCSPipe>(Pipe::ParticleCS);
 	CreateRenderPipe(Pipe::Animation, {
-		.vsPath = L"Object3d.VS.hlsl", .psPath = L"EnvMapObject3d.PS.hlsl",
+		.vsPath = L"Object/Object3d.VS.hlsl", .psPath = L"Object/EnvMapObject3d.PS.hlsl",
 		.blend = BlendType::ALPHA, .depth = DepthMode::READ_WRITE });
 	CreateRenderPipe(Pipe::Skybox, {
-		.vsPath = L"Skybox.VS.hlsl", .psPath = L"Skybox.PS.hlsl",
+		.vsPath = L"SkyBox/Skybox.VS.hlsl", .psPath = L"SkyBox/Skybox.PS.hlsl",
 		.blend = BlendType::ALPHA, .depth = DepthMode::READ_ONLY });
 	// SV_VertexID でフルスクリーン三角形を作るので頂点入力は無い
 	CreateRenderPipe(Pipe::BaseGrid, {
-		.vsPath = L"BaseGrid.VS.hlsl", .psPath = L"BaseGrid.PS.hlsl",
+		.vsPath = L"Debug/BaseGrid.VS.hlsl", .psPath = L"Debug/BaseGrid.PS.hlsl",
 		.blend = BlendType::ALPHA, .depth = DepthMode::READ_WRITE,
 		.useInputLayout = false });
 
-	CreateComputePipe(Pipe::GrayCS, L"CS/Grayscale.CS.hlsl");
-	CreateComputePipe(Pipe::GaussCS, L"CS/Gaussian.CS.hlsl");
-	CreateComputePipe(Pipe::BoxFilterCS, L"CS/BoxFilter.CS.hlsl");
-	CreateComputePipe(Pipe::RadialCS, L"CS/RadialBlur.CS.hlsl");
-	CreateComputePipe(Pipe::VignetteCS, L"CS/Vignette.CS.hlsl");
-	CreateComputePipe(Pipe::CRTCS, L"CS/CRTEffect.CS.hlsl");
-	CreateComputePipe(Pipe::RetroTVCS, L"CS/RetroTV.CS.hlsl");
+	CreateComputePipe(Pipe::GrayCS, L"PostEffect/Grayscale.CS.hlsl");
+	CreateComputePipe(Pipe::GaussCS, L"PostEffect/Gaussian.CS.hlsl");
+	CreateComputePipe(Pipe::BoxFilterCS, L"PostEffect/BoxFilter.CS.hlsl");
+	CreateComputePipe(Pipe::RadialCS, L"PostEffect/RadialBlur.CS.hlsl");
+	CreateComputePipe(Pipe::VignetteCS, L"PostEffect/Vignette.CS.hlsl");
+	CreateComputePipe(Pipe::CRTCS, L"PostEffect/CRTEffect.CS.hlsl");
+	CreateComputePipe(Pipe::RetroTVCS, L"PostEffect/RetroTV.CS.hlsl");
 	CreatePipe<OutlineCSPipe>(Pipe::OutlineCS);
-	CreateComputePipe(Pipe::LuminanceOutlineCS, L"CS/LuminanceBasedOutline.CS.hlsl");
-	CreateComputePipe(Pipe::BloomCS, L"CS/Bloom.CS.hlsl");
-	CreateComputePipe(Pipe::RandomCS, L"CS/Random.CS.hlsl");
+	CreateComputePipe(Pipe::LuminanceOutlineCS, L"PostEffect/LuminanceBasedOutline.CS.hlsl");
+	CreateComputePipe(Pipe::BloomCS, L"PostEffect/Bloom.CS.hlsl");
+	CreateComputePipe(Pipe::RandomCS, L"PostEffect/Random.CS.hlsl");
 	CreatePipe<SkinningCSPipe>(Pipe::SkinningCS);
 
-	CreateComputePipe(Pipe::InitParticleCS, L"CS/Engine/InitParticle.CS.hlsl");
-	CreateComputePipe(Pipe::EmitParticleCS, L"CS/Engine/EmitParticle.CS.hlsl");
-	CreateComputePipe(Pipe::EmitTexParticleCS, L"CS/Engine/EmitTexParticle.CS.hlsl");
-	CreateComputePipe(Pipe::EmitSurfaceParticleCS, L"CS/Engine/EmitSurfaceParticle.CS.hlsl");
-	CreateComputePipe(Pipe::UpdateParticleCS, L"CS/Engine/UpdateParticle.CS.hlsl");
-	CreateComputePipe(Pipe::UpdateParticleSplatCS, L"CS/Engine/UpdateParticleSplat.CS.hlsl");
-	CreateComputePipe(Pipe::ClearParticleColorCS, L"CS/Engine/ClearParticleColor.CS.hlsl");
+	CreateComputePipe(Pipe::InitParticleCS, L"Particle/GPU/InitParticle.CS.hlsl");
+	CreateComputePipe(Pipe::EmitParticleCS, L"Particle/GPU/EmitParticle.CS.hlsl");
+	CreateComputePipe(Pipe::EmitTexParticleCS, L"Particle/GPU/EmitTexParticle.CS.hlsl");
+	CreateComputePipe(Pipe::EmitSurfaceParticleCS, L"Particle/GPU/EmitSurfaceParticle.CS.hlsl");
+	CreateComputePipe(Pipe::UpdateParticleCS, L"Particle/GPU/UpdateParticle.CS.hlsl");
+	CreateComputePipe(Pipe::UpdateParticleSplatCS, L"Particle/GPU/UpdateParticleSplat.CS.hlsl");
+	CreateComputePipe(Pipe::ClearParticleColorCS, L"Particle/GPU/ClearParticleColor.CS.hlsl");
 	CreatePipe<TrailEmitCSPipe>(Pipe::TrailEmitCS);
-	CreateComputePipe(Pipe::InitArgsCS, L"CS/Engine/InitArgs.CS.hlsl");
-	CreateComputePipe(Pipe::AliveCountCS, L"CS/Engine/AliveParticleCount.CS.hlsl");
+	CreateComputePipe(Pipe::InitArgsCS, L"Particle/GPU/InitArgs.CS.hlsl");
+	CreateComputePipe(Pipe::AliveCountCS, L"Particle/GPU/AliveParticleCount.CS.hlsl");
 
-	CreateComputePipe(Pipe::SplatClearCS, L"CS/Engine/SplatClear.CS.hlsl");
-	CreateComputePipe(Pipe::SplatParticleCS, L"CS/Engine/SplatParticle.CS.hlsl");
+	CreateComputePipe(Pipe::SplatClearCS, L"Particle/GPU/SplatClear.CS.hlsl");
+	CreateComputePipe(Pipe::SplatParticleCS, L"Particle/GPU/SplatParticle.CS.hlsl");
 	// 蓄積バッファを加算合成で重ねるだけなので深度も頂点入力も使わない
 	CreateRenderPipe(Pipe::SplatComposite, {
-		.vsPath = L"SplatComposite.VS.hlsl", .psPath = L"SplatComposite.PS.hlsl",
+		.vsPath = L"Particle/GPU/SplatComposite.VS.hlsl", .psPath = L"Particle/GPU/SplatComposite.PS.hlsl",
 		.blend = BlendType::ADD_PREMULTIPLIED, .depth = DepthMode::DISABLE,
 		.useInputLayout = false, .useDepthTarget = false });
 }

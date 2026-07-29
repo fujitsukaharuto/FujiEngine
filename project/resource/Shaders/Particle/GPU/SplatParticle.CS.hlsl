@@ -1,4 +1,4 @@
-#include "../../CSParticle.hlsli"
+#include "CSParticle.hlsli"
 #include "Splat.hlsli"
 
 // 生存パーティクルを画面へ点描(atomic加算)する。

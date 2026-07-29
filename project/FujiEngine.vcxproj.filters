@@ -966,165 +966,186 @@
     <Filter Include="resource\Shaders">
       <UniqueIdentifier>{721d04ed-0430-462c-a558-1b345031cb69}</UniqueIdentifier>
     </Filter>
-    <Filter Include="resource\Shaders\CS">
-      <UniqueIdentifier>{a2b12930-efd8-4b03-84dc-c65ccb0fc2eb}</UniqueIdentifier>
+    <Filter Include="resource\Shaders\Common">
+      <UniqueIdentifier>{ffb99b01-6b21-4ca5-b113-3cb0f4a212e7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="resource\Shaders\CS\Engine">
-      <UniqueIdentifier>{a53b59b2-f85d-43ce-897a-0b92b392dcaf}</UniqueIdentifier>
+    <Filter Include="resource\Shaders\Debug">
+      <UniqueIdentifier>{50f3278e-7fb7-4391-95ad-bac3729c0341}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resource\Shaders\Line">
+      <UniqueIdentifier>{d858fb7c-9d57-4d1d-b85d-ba47bf9df3b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resource\Shaders\Object">
+      <UniqueIdentifier>{f490f2b3-9bcb-4392-a577-e38af5fafa51}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resource\Shaders\Particle">
+      <UniqueIdentifier>{d4da8034-7bd3-4359-ba7b-f5580dbabe1e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resource\Shaders\Particle\GPU">
+      <UniqueIdentifier>{0aae6f13-14c3-4ba1-853f-cf0499d08841}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resource\Shaders\PostEffect">
+      <UniqueIdentifier>{ded13372-1112-4e9a-b659-8fb2370e64bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resource\Shaders\SkyBox">
+      <UniqueIdentifier>{181d2980-abb4-41cb-9f43-4e944bc9b77c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resource\Shaders\Sprite">
+      <UniqueIdentifier>{aafe66cb-f4b9-4d91-adad-8590f02ae2b9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="resource\Shaders\NonePost.PS.hlsl">
-      <Filter>resource\Shaders</Filter>
+    <FxCompile Include="resource\Shaders\PostEffect\NonePost.PS.hlsl">
+      <Filter>resource\Shaders\PostEffect</Filter>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\NonePost.VS.hlsl">
-      <Filter>resource\Shaders</Filter>
+    <FxCompile Include="resource\Shaders\PostEffect\NonePost.VS.hlsl">
+      <Filter>resource\Shaders\PostEffect</Filter>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\Object3d.PS.hlsl">
-      <Filter>resource\Shaders</Filter>
+    <FxCompile Include="resource\Shaders\Object\Object3d.PS.hlsl">
+      <Filter>resource\Shaders\Object</Filter>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\Object3d.VS.hlsl">
-      <Filter>resource\Shaders</Filter>
+    <FxCompile Include="resource\Shaders\Object\Object3d.VS.hlsl">
+      <Filter>resource\Shaders\Object</Filter>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\Particle.PS.hlsl">
-      <Filter>resource\Shaders</Filter>
+    <FxCompile Include="resource\Shaders\Particle\Particle.PS.hlsl">
+      <Filter>resource\Shaders\Particle</Filter>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\Particle.VS.hlsl">
-      <Filter>resource\Shaders</Filter>
+    <FxCompile Include="resource\Shaders\Particle\Particle.VS.hlsl">
+      <Filter>resource\Shaders\Particle</Filter>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\Line3d.VS.hlsl">
-      <Filter>resource\Shaders</Filter>
+    <FxCompile Include="resource\Shaders\Line\Line3d.VS.hlsl">
+      <Filter>resource\Shaders\Line</Filter>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\Line3d.PS.hlsl">
-      <Filter>resource\Shaders</Filter>
+    <FxCompile Include="resource\Shaders\Line\Line3d.PS.hlsl">
+      <Filter>resource\Shaders\Line</Filter>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\CS\Grayscale.CS.hlsl">
-      <Filter>resource\Shaders\CS</Filter>
+    <FxCompile Include="resource\Shaders\PostEffect\Grayscale.CS.hlsl">
+      <Filter>resource\Shaders\PostEffect</Filter>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\EnvMapObject3d.PS.hlsl">
-      <Filter>resource\Shaders</Filter>
+    <FxCompile Include="resource\Shaders\Object\EnvMapObject3d.PS.hlsl">
+      <Filter>resource\Shaders\Object</Filter>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\CS\CRTEffect.CS.hlsl">
-      <Filter>resource\Shaders\CS</Filter>
+    <FxCompile Include="resource\Shaders\PostEffect\CRTEffect.CS.hlsl">
+      <Filter>resource\Shaders\PostEffect</Filter>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\Skybox.PS.hlsl">
-      <Filter>resource\Shaders</Filter>
+    <FxCompile Include="resource\Shaders\SkyBox\Skybox.PS.hlsl">
+      <Filter>resource\Shaders\SkyBox</Filter>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\Skybox.VS.hlsl">
-      <Filter>resource\Shaders</Filter>
+    <FxCompile Include="resource\Shaders\SkyBox\Skybox.VS.hlsl">
+      <Filter>resource\Shaders\SkyBox</Filter>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\CS\Engine\Skinning.CS.hlsl">
-      <Filter>resource\Shaders\CS\Engine</Filter>
+    <FxCompile Include="resource\Shaders\Object\Skinning.CS.hlsl">
+      <Filter>resource\Shaders\Object</Filter>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\CS\Engine\SplatClear.CS.hlsl">
-      <Filter>resource\Shaders\CS\Engine</Filter>
+    <FxCompile Include="resource\Shaders\Particle\GPU\SplatClear.CS.hlsl">
+      <Filter>resource\Shaders\Particle\GPU</Filter>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\CS\Engine\SplatParticle.CS.hlsl">
-      <Filter>resource\Shaders\CS\Engine</Filter>
+    <FxCompile Include="resource\Shaders\Particle\GPU\SplatParticle.CS.hlsl">
+      <Filter>resource\Shaders\Particle\GPU</Filter>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\SplatComposite.PS.hlsl">
-      <Filter>resource\Shaders</Filter>
+    <FxCompile Include="resource\Shaders\Particle\GPU\SplatComposite.PS.hlsl">
+      <Filter>resource\Shaders\Particle\GPU</Filter>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\SplatComposite.VS.hlsl">
-      <Filter>resource\Shaders</Filter>
+    <FxCompile Include="resource\Shaders\Particle\GPU\SplatComposite.VS.hlsl">
+      <Filter>resource\Shaders\Particle\GPU</Filter>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\Sprite.PS.hlsl">
-      <Filter>resource\Shaders</Filter>
+    <FxCompile Include="resource\Shaders\Sprite\Sprite.PS.hlsl">
+      <Filter>resource\Shaders\Sprite</Filter>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\CS\Outline.CS.hlsl">
-      <Filter>resource\Shaders\CS</Filter>
+    <FxCompile Include="resource\Shaders\PostEffect\Outline.CS.hlsl">
+      <Filter>resource\Shaders\PostEffect</Filter>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\CS\Gaussian.CS.hlsl">
-      <Filter>resource\Shaders\CS</Filter>
+    <FxCompile Include="resource\Shaders\PostEffect\Gaussian.CS.hlsl">
+      <Filter>resource\Shaders\PostEffect</Filter>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\CS\Engine\InitParticle.CS.hlsl">
-      <Filter>resource\Shaders\CS\Engine</Filter>
+    <FxCompile Include="resource\Shaders\Particle\GPU\InitParticle.CS.hlsl">
+      <Filter>resource\Shaders\Particle\GPU</Filter>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\CS\Bloom.CS.hlsl">
-      <Filter>resource\Shaders\CS</Filter>
+    <FxCompile Include="resource\Shaders\PostEffect\Bloom.CS.hlsl">
+      <Filter>resource\Shaders\PostEffect</Filter>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\CS\BoxFilter.CS.hlsl">
-      <Filter>resource\Shaders\CS</Filter>
+    <FxCompile Include="resource\Shaders\PostEffect\BoxFilter.CS.hlsl">
+      <Filter>resource\Shaders\PostEffect</Filter>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\CS\RadialBlur.CS.hlsl">
-      <Filter>resource\Shaders\CS</Filter>
+    <FxCompile Include="resource\Shaders\PostEffect\RadialBlur.CS.hlsl">
+      <Filter>resource\Shaders\PostEffect</Filter>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\CS\Random.CS.hlsl">
-      <Filter>resource\Shaders\CS</Filter>
+    <FxCompile Include="resource\Shaders\PostEffect\Random.CS.hlsl">
+      <Filter>resource\Shaders\PostEffect</Filter>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\CS\LuminanceBasedOutline.CS.hlsl">
-      <Filter>resource\Shaders\CS</Filter>
+    <FxCompile Include="resource\Shaders\PostEffect\LuminanceBasedOutline.CS.hlsl">
+      <Filter>resource\Shaders\PostEffect</Filter>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\CS\RetroTV.CS.hlsl">
-      <Filter>resource\Shaders\CS</Filter>
+    <FxCompile Include="resource\Shaders\PostEffect\RetroTV.CS.hlsl">
+      <Filter>resource\Shaders\PostEffect</Filter>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\CSParticle.VS.hlsl">
-      <Filter>resource\Shaders</Filter>
+    <FxCompile Include="resource\Shaders\Particle\GPU\CSParticle.VS.hlsl">
+      <Filter>resource\Shaders\Particle\GPU</Filter>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\CSParticle.PS.hlsl">
-      <Filter>resource\Shaders</Filter>
+    <FxCompile Include="resource\Shaders\Particle\GPU\CSParticle.PS.hlsl">
+      <Filter>resource\Shaders\Particle\GPU</Filter>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\CS\Engine\EmitParticle.CS.hlsl">
-      <Filter>resource\Shaders\CS\Engine</Filter>
+    <FxCompile Include="resource\Shaders\Particle\GPU\EmitParticle.CS.hlsl">
+      <Filter>resource\Shaders\Particle\GPU</Filter>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\CS\Engine\UpdateParticle.CS.hlsl">
-      <Filter>resource\Shaders\CS\Engine</Filter>
+    <FxCompile Include="resource\Shaders\Particle\GPU\UpdateParticle.CS.hlsl">
+      <Filter>resource\Shaders\Particle\GPU</Filter>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\CS\Engine\UpdateParticleSplat.CS.hlsl">
-      <Filter>resource\Shaders\CS\Engine</Filter>
+    <FxCompile Include="resource\Shaders\Particle\GPU\UpdateParticleSplat.CS.hlsl">
+      <Filter>resource\Shaders\Particle\GPU</Filter>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\CS\Engine\ClearParticleColor.CS.hlsl">
-      <Filter>resource\Shaders\CS\Engine</Filter>
+    <FxCompile Include="resource\Shaders\Particle\GPU\ClearParticleColor.CS.hlsl">
+      <Filter>resource\Shaders\Particle\GPU</Filter>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\CS\Vignette.CS.hlsl">
-      <Filter>resource\Shaders\CS</Filter>
+    <FxCompile Include="resource\Shaders\PostEffect\Vignette.CS.hlsl">
+      <Filter>resource\Shaders\PostEffect</Filter>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\CS\Engine\EmitTexParticle.CS.hlsl">
-      <Filter>resource\Shaders\CS\Engine</Filter>
+    <FxCompile Include="resource\Shaders\Particle\GPU\EmitTexParticle.CS.hlsl">
+      <Filter>resource\Shaders\Particle\GPU</Filter>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\CS\Engine\EmitSurfaceParticle.CS.hlsl">
-      <Filter>resource\Shaders\CS\Engine</Filter>
+    <FxCompile Include="resource\Shaders\Particle\GPU\EmitSurfaceParticle.CS.hlsl">
+      <Filter>resource\Shaders\Particle\GPU</Filter>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\CS\Engine\AliveParticleCount.CS.hlsl">
-      <Filter>resource\Shaders\CS\Engine</Filter>
+    <FxCompile Include="resource\Shaders\Particle\GPU\AliveParticleCount.CS.hlsl">
+      <Filter>resource\Shaders\Particle\GPU</Filter>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\CS\Engine\InitArgs.CS.hlsl">
-      <Filter>resource\Shaders\CS\Engine</Filter>
+    <FxCompile Include="resource\Shaders\Particle\GPU\InitArgs.CS.hlsl">
+      <Filter>resource\Shaders\Particle\GPU</Filter>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\CS\Engine\TrailEmit.CS.hlsl">
-      <Filter>resource\Shaders\CS\Engine</Filter>
+    <FxCompile Include="resource\Shaders\Particle\GPU\TrailEmit.CS.hlsl">
+      <Filter>resource\Shaders\Particle\GPU</Filter>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\BaseGrid.VS.hlsl">
-      <Filter>resource\Shaders</Filter>
+    <FxCompile Include="resource\Shaders\Debug\BaseGrid.VS.hlsl">
+      <Filter>resource\Shaders\Debug</Filter>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\BaseGrid.PS.hlsl">
-      <Filter>resource\Shaders</Filter>
+    <FxCompile Include="resource\Shaders\Debug\BaseGrid.PS.hlsl">
+      <Filter>resource\Shaders\Debug</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="resource\Shaders\Object3d.hlsli">
-      <Filter>resource\Shaders</Filter>
+    <None Include="resource\Shaders\Object\Object3d.hlsli">
+      <Filter>resource\Shaders\Object</Filter>
     </None>
-    <None Include="resource\Shaders\Particle.hlsli">
-      <Filter>resource\Shaders</Filter>
+    <None Include="resource\Shaders\Particle\Particle.hlsli">
+      <Filter>resource\Shaders\Particle</Filter>
     </None>
-    <None Include="resource\Shaders\Line3d.hlsli">
-      <Filter>resource\Shaders</Filter>
+    <None Include="resource\Shaders\Line\Line3d.hlsli">
+      <Filter>resource\Shaders\Line</Filter>
     </None>
-    <None Include="resource\Shaders\Skybox.hlsli">
-      <Filter>resource\Shaders</Filter>
+    <None Include="resource\Shaders\SkyBox\Skybox.hlsli">
+      <Filter>resource\Shaders\SkyBox</Filter>
     </None>
-    <None Include="resource\Shaders\CSParticle.hlsli">
-      <Filter>resource\Shaders</Filter>
+    <None Include="resource\Shaders\Particle\GPU\CSParticle.hlsli">
+      <Filter>resource\Shaders\Particle\GPU</Filter>
     </None>
-    <None Include="resource\Shaders\CS\Random.hlsli">
-      <Filter>resource\Shaders\CS</Filter>
+    <None Include="resource\Shaders\Common\Random.hlsli">
+      <Filter>resource\Shaders\Common</Filter>
     </None>
-    <None Include="resource\Shaders\CS\Noise.hlsli">
-      <Filter>resource\Shaders\CS</Filter>
+    <None Include="resource\Shaders\Common\Noise.hlsli">
+      <Filter>resource\Shaders\Common</Filter>
     </None>
-    <None Include="resource\Shaders\CS\Engine\Splat.hlsli">
-      <Filter>resource\Shaders\CS\Engine</Filter>
+    <None Include="resource\Shaders\Particle\GPU\Splat.hlsli">
+      <Filter>resource\Shaders\Particle\GPU</Filter>
     </None>
   </ItemGroup>
 </Project>

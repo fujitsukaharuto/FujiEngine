@@ -1,4 +1,4 @@
-#include "CS/Engine/Splat.hlsli"
+#include "Splat.hlsli"
 
 // 蓄積バッファ(固定小数)を読み出して色に戻し、加算ブレンドでシーンへ重ねる。
 StructuredBuffer<uint> gSplatAccum : register(t0);

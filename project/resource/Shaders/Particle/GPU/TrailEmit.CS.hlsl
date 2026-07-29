@@ -1,5 +1,5 @@
-#include "../../CSParticle.hlsli"
-#include "../Noise.hlsli"
+#include "CSParticle.hlsli"
+#include "../../Common/Noise.hlsli"
 
 RWStructuredBuffer<Particle_Translate> gParticles_Trans : register(u0);
 RWStructuredBuffer<Particle_Scale> gParticles_Scale : register(u1);

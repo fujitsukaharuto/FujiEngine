@@ -1,4 +1,4 @@
-#include "../../CSParticle.hlsli"
+#include "CSParticle.hlsli"
 
 struct DrawArguments
 {

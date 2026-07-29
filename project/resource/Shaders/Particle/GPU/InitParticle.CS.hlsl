@@ -1,4 +1,4 @@
-#include "../../CSParticle.hlsli"
+#include "CSParticle.hlsli"
 
 
 RWStructuredBuffer<Particle_Translate> gParticles_Trans : register(u0);

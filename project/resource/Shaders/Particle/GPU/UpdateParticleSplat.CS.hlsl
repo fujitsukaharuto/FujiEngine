@@ -1,5 +1,5 @@
-#include "../../CSParticle.hlsli"
-#include "../Noise.hlsli"
+#include "CSParticle.hlsli"
+#include "../../Common/Noise.hlsli"
 
 // ============================================================================
 // splatモード専用 Update。

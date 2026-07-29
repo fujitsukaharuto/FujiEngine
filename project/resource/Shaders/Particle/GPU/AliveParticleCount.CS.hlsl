@@ -1,4 +1,4 @@
-#include "../../CSParticle.hlsli"
+#include "CSParticle.hlsli"
 
 RWStructuredBuffer<Particle_Color> gParticles_Color : register(u0);
 RWStructuredBuffer<DrawIndexedArgs> gDrawArgs : register(u1);
