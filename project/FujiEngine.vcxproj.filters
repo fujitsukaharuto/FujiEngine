@@ -26,15 +26,6 @@
     <ClCompile Include="Engine\Graphics\Pipeline\RootParam.cpp">
       <Filter>Engine\Graphics\Pipeline</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Graphics\Pipeline\Render\NonePipeline.cpp">
-      <Filter>Engine\Graphics\Pipeline\Render</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Graphics\Pipeline\Render\ParticlePipeline.cpp">
-      <Filter>Engine\Graphics\Pipeline\Render</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Graphics\Pipeline\Render\Pipeline.cpp">
-      <Filter>Engine\Graphics\Pipeline\Render</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Core\Debug\ImGuiManager.cpp">
       <Filter>Engine\Core\Debug</Filter>
     </ClCompile>
@@ -98,9 +89,6 @@
     <ClCompile Include="Engine\Core\App\Framework.cpp">
       <Filter>Engine\Core\App</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Graphics\Pipeline\Render\Line3dPipe.cpp">
-      <Filter>Engine\Graphics\Pipeline\Render</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Graphics\Camera\Camera.cpp">
       <Filter>Engine\Graphics\Camera</Filter>
     </ClCompile>
@@ -143,7 +131,7 @@
     <ClCompile Include="Engine\Graphics\Object\AnimationModel.cpp">
       <Filter>Engine\Graphics\Object</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Graphics\Pipeline\Render\AnimationPipeline.cpp">
+    <ClCompile Include="Engine\Graphics\Pipeline\Render\RenderPipeline.cpp">
       <Filter>Engine\Graphics\Pipeline\Render</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Math\Matrix\MatrixCalculation.cpp">
@@ -184,9 +172,6 @@
     </ClCompile>
     <ClCompile Include="Engine\Editor\Command\CommandManager.cpp">
       <Filter>Engine\Editor\Command</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Graphics\Pipeline\Render\SkyboxPipe.cpp">
-      <Filter>Engine\Graphics\Pipeline\Render</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Graphics\Pipeline\Compute\SkinningCSPipe.cpp">
       <Filter>Engine\Graphics\Pipeline\Compute</Filter>
@@ -251,9 +236,6 @@
     <ClCompile Include="Game\GameObj\Enemy\BossItem\UnderRing.cpp">
       <Filter>Game\GameObj\Enemy\BossItem</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Graphics\Pipeline\Render\SpritePipe.cpp">
-      <Filter>Engine\Graphics\Pipeline\Render</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Graphics\Pipeline\Compute\OutlineCSPipe.cpp">
       <Filter>Engine\Graphics\Pipeline\Compute</Filter>
     </ClCompile>
@@ -301,9 +283,6 @@
     </ClCompile>
     <ClCompile Include="Game\GameObj\Enemy\Behavior\BossDushAttack.cpp">
       <Filter>Game\GameObj\Enemy\Behavior</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Graphics\Pipeline\Render\SplatCompositePipe.cpp">
-      <Filter>Engine\Graphics\Pipeline\Render</Filter>
     </ClCompile>
     <ClCompile Include="Engine\DXC\Debug\GPUTimer.cpp">
       <Filter>Engine\DXC\Debug</Filter>
@@ -374,9 +353,6 @@
     <ClCompile Include="Game\Scene\Debug\TestScene.cpp">
       <Filter>Game\Scene\Debug</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Graphics\Pipeline\Render\BaseGridPipe.cpp">
-      <Filter>Engine\Graphics\Pipeline\Render</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Field\MapChipField.h">
@@ -405,15 +381,6 @@
     </ClInclude>
     <ClInclude Include="Engine\Graphics\Pipeline\RootNames.h">
       <Filter>Engine\Graphics\Pipeline</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Graphics\Pipeline\Render\NonePipeline.h">
-      <Filter>Engine\Graphics\Pipeline\Render</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Graphics\Pipeline\Render\ParticlePipeline.h">
-      <Filter>Engine\Graphics\Pipeline\Render</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Graphics\Pipeline\Render\Pipeline.h">
-      <Filter>Engine\Graphics\Pipeline\Render</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Core\Debug\ImGuiManager.h">
       <Filter>Engine\Core\Debug</Filter>
@@ -487,9 +454,6 @@
     <ClInclude Include="Engine\Scene\AbstractSceneFactory.h">
       <Filter>Engine\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Graphics\Pipeline\Render\Line3dPipe.h">
-      <Filter>Engine\Graphics\Pipeline\Render</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\Graphics\Camera\Camera.h">
       <Filter>Engine\Graphics\Camera</Filter>
     </ClInclude>
@@ -544,7 +508,7 @@
     <ClInclude Include="Engine\Math\Animation\Skelton.h">
       <Filter>Engine\Math\Animation</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Graphics\Pipeline\Render\AnimationPipeline.h">
+    <ClInclude Include="Engine\Graphics\Pipeline\Render\RenderPipeline.h">
       <Filter>Engine\Graphics\Pipeline\Render</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Graphics\Model\AnimationStructs.h">
@@ -622,9 +586,6 @@
     <ClInclude Include="Engine\Editor\Command\PropertyCommand.h">
       <Filter>Engine\Editor\Command</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Graphics\Pipeline\Render\SkyboxPipe.h">
-      <Filter>Engine\Graphics\Pipeline\Render</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\Graphics\Pipeline\Compute\SkinningCSPipe.h">
       <Filter>Engine\Graphics\Pipeline\Compute</Filter>
     </ClInclude>
@@ -687,9 +648,6 @@
     </ClInclude>
     <ClInclude Include="Game\GameObj\Enemy\BossItem\UnderRing.h">
       <Filter>Game\GameObj\Enemy\BossItem</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Graphics\Pipeline\Render\SpritePipe.h">
-      <Filter>Engine\Graphics\Pipeline\Render</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Graphics\Pipeline\PipeKind.h">
       <Filter>Engine\Graphics\Pipeline</Filter>
@@ -754,9 +712,6 @@
     <ClInclude Include="Engine\DXC\FrameCount.h">
       <Filter>Engine\DXC</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Graphics\Pipeline\Render\SplatCompositePipe.h">
-      <Filter>Engine\Graphics\Pipeline\Render</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\DXC\Debug\GPUTimer.h">
       <Filter>Engine\DXC\Debug</Filter>
     </ClInclude>
@@ -810,9 +765,6 @@
     </ClInclude>
     <ClInclude Include="Game\Scene\Debug\TestScene.h">
       <Filter>Game\Scene\Debug</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Graphics\Pipeline\Render\BaseGridPipe.h">
-      <Filter>Engine\Graphics\Pipeline\Render</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

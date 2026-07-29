@@ -14,6 +14,10 @@ namespace Graphics {
 	/// <summary>
 	/// 合成モード
 	/// </summary>
+	/// <remarks>
+	/// パーティクルグループの blendType として JSON に整数で保存され、DebugGUI のコンボも
+	/// この並び順を index として引いている。既存の値の順番を変えず、追加は必ず末尾に行うこと
+	/// </remarks>
 	enum class BlendType {
 		ALPHA,
 		ADD,
@@ -21,7 +25,9 @@ namespace Graphics {
 		SCREEN,
 		MULTIPLY,
 		SOFT_ADD,
-		PREMULTIPLIED_ALPHA
+		PREMULTIPLIED_ALPHA,
+		NONE,				// ブレンドなし(そのまま書き込む)
+		ADD_PREMULTIPLIED,	// Src ONE / Dest ONE の加算。乗算済みカラーを重ねる用
 	};
 
 	/// <summary>

@@ -10,6 +10,7 @@ namespace DXC { class DXCom; }
 namespace Graphics {
 
 	class RootParam;
+	struct RenderPipelineDesc;
 
 	/// <summary>
 	/// パイプライン管理クラス
@@ -64,6 +65,9 @@ namespace Graphics {
 
 		template<class T>
 		void CreatePipe(Pipe type, const std::function<void(T&)>& setup);
+
+		/// <summary>差分が Desc で表現できる描画パイプ用: RenderPipeline を生成して登録する</summary>
+		void CreateRenderPipe(Pipe type, const RenderPipelineDesc& desc);
 
 		/// <summary>シェーダパスだけが違う標準CS用: ComputePipeline を生成して登録する</summary>
 		void CreateComputePipe(Pipe type, const std::wstring& csPath);

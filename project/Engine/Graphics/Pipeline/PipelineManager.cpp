@@ -1,21 +1,14 @@
 #include "Engine/Graphics/Pipeline/PipelineManager.h"
 #include <string>
+#include <utility>
 
 #include "Engine/DXC/DXCom.h"
-#include "Engine/Graphics/Pipeline/Render/Pipeline.h"
-#include "Engine/Graphics/Pipeline/Render/Line3dPipe.h"
-#include "Engine/Graphics/Pipeline/Render/SpritePipe.h"
-#include "Engine/Graphics/Pipeline/Render/ParticlePipeline.h"
+#include "Engine/Graphics/Pipeline/Render/RenderPipeline.h"
 #include "Engine/Graphics/Pipeline/Compute/ParticleCSPipe.h"
-#include "Engine/Graphics/Pipeline/Render/AnimationPipeline.h"
-#include "Engine/Graphics/Pipeline/Render/SkyboxPipe.h"
-#include "Engine/Graphics/Pipeline/Render/NonePipeline.h"
-#include "Engine/Graphics/Pipeline/Render/BaseGridPipe.h"
 #include "Engine/Graphics/Pipeline/Compute/ComputePipeline.h"
 #include "Engine/Graphics/Pipeline/Compute/OutlineCSPipe.h"
 #include "Engine/Graphics/Pipeline/Compute/TrailEmitCSPipe.h"
 #include "Engine/Graphics/Pipeline/Compute/SkinningCSPipe.h"
-#include "Engine/Graphics/Pipeline/Render/SplatCompositePipe.h"
 #include "Engine/Graphics/Pipeline/RootParam.h"
 
 using namespace Graphics;
@@ -43,46 +36,63 @@ void PipelineManager::Finalize() {
 
 void PipelineManager::CreatePipeline() {
 
-	CreatePipe<NonePipeline>(Pipe::None);
-	CreatePipe<NonePipeline>(Pipe::GPUParticleSynthesis, [](NonePipeline& p) {
-		p.SetIsAddMode(true);
-		});
-	CreatePipe<Pipeline>(Pipe::Normal);
+	// オフスクリーンをそのまま画面へ出すフルスクリーンパス
+	CreateRenderPipe(Pipe::None, {
+		.vsPath = L"NonePost.VS.hlsl", .psPath = L"NonePost.PS.hlsl",
+		.blend = BlendType::NONE, .depth = DepthMode::DISABLE,
+		.cull = D3D12_CULL_MODE_BACK });
+	// 1/4解像度GPUパーティクルRTをシーンへ加算合成する
+	CreateRenderPipe(Pipe::GPUParticleSynthesis, {
+		.vsPath = L"NonePost.VS.hlsl", .psPath = L"NonePost.PS.hlsl",
+		.blend = BlendType::ADD_PREMULTIPLIED, .depth = DepthMode::DISABLE,
+		.cull = D3D12_CULL_MODE_BACK });
 
-	CreatePipe<Pipeline>(Pipe::NormalAdd, [](Pipeline& p) {
-		p.SetIsAddMode(true);
-		});
+	CreateRenderPipe(Pipe::Normal, {
+		.vsPath = L"Object3d.VS.hlsl", .psPath = L"Object3d.PS.hlsl",
+		.blend = BlendType::ALPHA, .depth = DepthMode::READ_WRITE });
+	CreateRenderPipe(Pipe::NormalAdd, {
+		.vsPath = L"Object3d.VS.hlsl", .psPath = L"Object3d.PS.hlsl",
+		.blend = BlendType::ADD, .depth = DepthMode::READ_ONLY });
 
 
-	CreatePipe<SpritePipe>(Pipe::Sprite);
-	CreatePipe<Line3dPipe>(Pipe::Line3d);
+	CreateRenderPipe(Pipe::Sprite, {
+		.vsPath = L"Object3d.VS.hlsl", .psPath = L"Sprite.PS.hlsl",
+		.blend = BlendType::ALPHA, .depth = DepthMode::READ_WRITE });
+	CreateRenderPipe(Pipe::Line3d, {
+		.vsPath = L"Line3d.VS.hlsl", .psPath = L"Line3d.PS.hlsl",
+		.blend = BlendType::ALPHA, .depth = DepthMode::DISABLE,
+		.topology = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE });
 
 
-	CreatePipe<ParticlePipeline>(Pipe::Particle);
-	CreatePipe<ParticlePipeline>(Pipe::ParticleAlpha, [](auto& p) {
-		p.SetBlendType(BlendType::ALPHA);
-		});
-	CreatePipe<ParticlePipeline>(Pipe::ParticleSub, [](auto& p) {
-		p.SetBlendType(BlendType::SUBTRACT);
-		});
-	CreatePipe<ParticlePipeline>(Pipe::ParticleScreen, [](auto& p) {
-		p.SetBlendType(BlendType::SCREEN);
-		});
-	CreatePipe<ParticlePipeline>(Pipe::ParticleMultiply, [](auto& p) {
-		p.SetBlendType(BlendType::MULTIPLY);
-		});
-	CreatePipe<ParticlePipeline>(Pipe::ParticleSoftAdd, [](auto& p) {
-		p.SetBlendType(BlendType::SOFT_ADD);
-		});
-	CreatePipe<ParticlePipeline>(Pipe::ParticlePreMulAlpha, [](auto& p) {
-		p.SetBlendType(BlendType::PREMULTIPLIED_ALPHA);
-		});
+	// パーティクルは合成モードだけが違う
+	const std::pair<Pipe, BlendType> kParticlePipes[] = {
+		{ Pipe::Particle,            BlendType::ADD },
+		{ Pipe::ParticleAlpha,       BlendType::ALPHA },
+		{ Pipe::ParticleSub,         BlendType::SUBTRACT },
+		{ Pipe::ParticleScreen,      BlendType::SCREEN },
+		{ Pipe::ParticleMultiply,    BlendType::MULTIPLY },
+		{ Pipe::ParticleSoftAdd,     BlendType::SOFT_ADD },
+		{ Pipe::ParticlePreMulAlpha, BlendType::PREMULTIPLIED_ALPHA },
+	};
+	for (const auto& [type, blend] : kParticlePipes) {
+		CreateRenderPipe(type, {
+			.vsPath = L"Particle.VS.hlsl", .psPath = L"Particle.PS.hlsl",
+			.blend = blend, .depth = DepthMode::READ_ONLY });
+	}
 
 
 	CreatePipe<ParticleCSPipe>(Pipe::ParticleCS);
-	CreatePipe<AnimationPipeline>(Pipe::Animation);
-	CreatePipe<SkyboxPipe>(Pipe::Skybox);
-	CreatePipe<BaseGridPipe>(Pipe::BaseGrid);
+	CreateRenderPipe(Pipe::Animation, {
+		.vsPath = L"Object3d.VS.hlsl", .psPath = L"EnvMapObject3d.PS.hlsl",
+		.blend = BlendType::ALPHA, .depth = DepthMode::READ_WRITE });
+	CreateRenderPipe(Pipe::Skybox, {
+		.vsPath = L"Skybox.VS.hlsl", .psPath = L"Skybox.PS.hlsl",
+		.blend = BlendType::ALPHA, .depth = DepthMode::READ_ONLY });
+	// SV_VertexID でフルスクリーン三角形を作るので頂点入力は無い
+	CreateRenderPipe(Pipe::BaseGrid, {
+		.vsPath = L"BaseGrid.VS.hlsl", .psPath = L"BaseGrid.PS.hlsl",
+		.blend = BlendType::ALPHA, .depth = DepthMode::READ_WRITE,
+		.useInputLayout = false });
 
 	CreateComputePipe(Pipe::GrayCS, L"CS/Grayscale.CS.hlsl");
 	CreateComputePipe(Pipe::GaussCS, L"CS/Gaussian.CS.hlsl");
@@ -110,7 +120,18 @@ void PipelineManager::CreatePipeline() {
 
 	CreateComputePipe(Pipe::SplatClearCS, L"CS/Engine/SplatClear.CS.hlsl");
 	CreateComputePipe(Pipe::SplatParticleCS, L"CS/Engine/SplatParticle.CS.hlsl");
-	CreatePipe<SplatCompositePipe>(Pipe::SplatComposite);
+	// 蓄積バッファを加算合成で重ねるだけなので深度も頂点入力も使わない
+	CreateRenderPipe(Pipe::SplatComposite, {
+		.vsPath = L"SplatComposite.VS.hlsl", .psPath = L"SplatComposite.PS.hlsl",
+		.blend = BlendType::ADD_PREMULTIPLIED, .depth = DepthMode::DISABLE,
+		.useInputLayout = false, .useDepthTarget = false });
+}
+
+void PipelineManager::CreateRenderPipe(Pipe type, const RenderPipelineDesc& desc) {
+	auto pipe = std::make_unique<RenderPipeline>();
+	pipe->SetDesc(desc);
+	pipe->Initialize(dxcommon_);
+	pipelines_[static_cast<size_t>(type)] = std::move(pipe);
 }
 
 void PipelineManager::CreateComputePipe(Pipe type, const std::wstring& csPath) {
