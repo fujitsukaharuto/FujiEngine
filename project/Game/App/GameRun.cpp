@@ -3,6 +3,8 @@
 #include "Game/Scene/SceneFactory.h"
 #include "Game/Particle/GameEmitters.h"
 #include "Engine/Core/Time/FPSKeeper.h"
+#include "Engine/Graphics/Object/ObjectRenderer.h"
+#include "Engine/Graphics/Raytracing/RaytracingScene.h"
 
 using namespace Audio;
 using namespace Core;
@@ -179,6 +181,12 @@ void GameRun::DebugGUI() {
 		}
 		if (ImGui::BeginTabItem("Light")) {
 			lightManager_->DebugGUI();
+			ImGui::EndTabItem();
+		}
+		if (ImGui::BeginTabItem("Raytracing")) {
+			if (auto* rtScene = ObjectRenderer::GetInstance()->GetRaytracingScene()) {
+				rtScene->DebugGUI();
+			}
 			ImGui::EndTabItem();
 		}
 		ImGui::EndTabBar();

@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 #include <vector>
 
 namespace DXC { class DXCom; }
@@ -9,6 +10,7 @@ namespace Graphics {
 	class RenderObject;
 	class AnimationModel;
 	class SkyBox;
+	class RaytracingScene;
 
 	/// <summary>
 	/// 3Dオブジェクトを集めてまとめて描画するクラス
@@ -35,13 +37,20 @@ namespace Graphics {
 		// Grid描画
 		void RenderGrid();
 
+		/// <summary>レイトレの加速構造。RayQuery非対応環境でも非nullで、中身が空振りする</summary>
+		RaytracingScene* GetRaytracingScene() const { return raytracingScene_.get(); }
+
 	private:
 
 		void PreDraw();
 
+		/// <summary>このフレームの静的オブジェクトからTLASを組み直す</summary>
+		void BuildRaytracingScene();
+
 	private:
 		ObjectRenderer() = default;
-		~ObjectRenderer() = default;
+		// raytracingScene_ が不完全型なのでデストラクタは .cpp 側に置く
+		~ObjectRenderer();
 
 		DXC::DXCom* dxcommon_ = nullptr;
 		LightManager* lightManager_ = nullptr;
@@ -49,6 +58,8 @@ namespace Graphics {
 		std::vector<Graphics::RenderObject*> renderQueue_;
 		std::vector<Graphics::AnimationModel*> skinningQueue_;
 		SkyBox* skyBox_ = nullptr;
+
+		std::unique_ptr<RaytracingScene> raytracingScene_;
 	};
 
 }

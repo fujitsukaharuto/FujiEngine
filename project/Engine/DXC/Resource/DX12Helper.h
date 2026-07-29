@@ -72,6 +72,19 @@ namespace DXC::Helper {
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateUAVResource(ID3D12Device* device, size_t sizeInBytes);
 
 	/// <summary>
+	/// レイトレの加速構造(BLAS/TLAS)を格納するバッファを生成する。
+	/// </summary>
+	/// <remarks>
+	/// 加速構造は必ず D3D12_RESOURCE_STATE_RAYTRACING_ACCELERATION_STRUCTURE で生成し、
+	/// 以後この状態から遷移させてはいけない(デバッグレイヤーが検出する)。
+	/// 中身はドライバ定義のBVHなのでCPUから読める形ではない
+	/// </remarks>
+	/// <param name="device">デバイス</param>
+	/// <param name="sizeInBytes">サイズ</param>
+	/// <returns>ID3D12Resource*</returns>
+	Microsoft::WRL::ComPtr<ID3D12Resource> CreateAccelerationStructureResource(ID3D12Device* device, size_t sizeInBytes);
+
+	/// <summary>
 	/// GPUからCPUへのデータ読み戻しに使用するリードバックリソースを生成する。
 	/// </summary>
 	/// <param name="device">デバイス</param>

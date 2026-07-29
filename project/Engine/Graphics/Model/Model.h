@@ -96,6 +96,8 @@ namespace Graphics {
 		//========================================================================*/
 		//* Getter
 		size_t GetMeshCount() { return mesh_.size(); }
+		/// <summary>メッシュへの参照。加速構造(BLAS)の構築で頂点/インデックスバッファを直接読むのに要る</summary>
+		const std::vector<Mesh>& GetMeshes() const { return mesh_; }
 		size_t GetVertexSize(int i) { return mesh_[i].GetVertexCount(); }
 		ModelData& GetModelData() { return data_; }
 

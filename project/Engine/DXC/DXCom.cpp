@@ -154,15 +154,15 @@ void DXCom::PreSpriteDraw() {
 }
 
 void DXCom::CommandExecution() {
-	command_->Close(1);
+	command_->Close(DXC::SubmitPath::Immediate);
 
-	command_->Execution(1);
+	command_->Execution(DXC::SubmitPath::Immediate);
 
-	command_->GPUSignal(1);
+	command_->GPUSignal(DXC::SubmitPath::Immediate);
 
-	command_->WaitForGPU(1);
+	command_->WaitForGPU(DXC::SubmitPath::Immediate);
 
-	command_->Reset(1);
+	command_->Reset(DXC::SubmitPath::Immediate);
 }
 
 void DXCom::SetRenderTargets() {

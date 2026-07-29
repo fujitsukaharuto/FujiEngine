@@ -5,21 +5,18 @@ using namespace DXC;
 
 
 CommandContext::~CommandContext() {
-	if (fenceEvent_) {
-		CloseHandle(fenceEvent_);
-	}
-
-	list4_.Reset();
-	list_.Reset();
-	for (uint32_t i = 0; i < kFrameCount_; ++i) {
-		allocator_[i].Reset();
-	}
-	fence_.Reset();
-	queue_.Reset();
+	Discard();
 }
 
-void CommandContext::Initialize(ID3D12Device* device, D3D12_COMMAND_LIST_TYPE type) {
-	HRESULT hr;
+bool CommandContext::Initialize(ID3D12Device* device, D3D12_COMMAND_LIST_TYPE type) {
+	// 失敗したものを名前付きで残す。assert は Develop/Release(NDEBUG) で消えるため、
+	// ログだけは全構成で必ず出しておかないと原因の場所が分からなくなる
+	auto fail = [&](const char* what, HRESULT hr) {
+		Logger::Log(std::format("CommandContext::Initialize failed at {}. type={}, hr=0x{:08X}\n",
+			what, static_cast<int>(type), static_cast<uint32_t>(hr)));
+		Discard();
+		return false;
+		};
 
 	// 1. キューの生成
 	D3D12_COMMAND_QUEUE_DESC queueDesc{};
@@ -27,18 +24,18 @@ void CommandContext::Initialize(ID3D12Device* device, D3D12_COMMAND_LIST_TYPE ty
 	queueDesc.Priority = D3D12_COMMAND_QUEUE_PRIORITY_NORMAL;
 	queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
 	queueDesc.NodeMask = 0;
-	hr = device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&queue_));
-	assert(SUCCEEDED(hr));
+	HRESULT hr = device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&queue_));
+	if (FAILED(hr)) { return fail("CreateCommandQueue", hr); }
 
 	// 2. アロケータの生成（フレーム数分）
 	for (uint32_t i = 0; i < DXC::kFrameCount_; ++i) {
 		hr = device->CreateCommandAllocator(type, IID_PPV_ARGS(&allocator_[i]));
-		assert(SUCCEEDED(hr));
+		if (FAILED(hr)) { return fail("CreateCommandAllocator", hr); }
 	}
 
 	// 3. コマンドリストの生成
 	hr = device->CreateCommandList(0, type, allocator_[0].Get(), nullptr, IID_PPV_ARGS(&list_));
-	assert(SUCCEEDED(hr));
+	if (FAILED(hr)) { return fail("CreateCommandList", hr); }
 	list_->Close(); // 最初は閉じた状態にしておく
 
 	// 加速構造の構築（BuildRaytracingAccelerationStructure）に必要。
@@ -49,12 +46,28 @@ void CommandContext::Initialize(ID3D12Device* device, D3D12_COMMAND_LIST_TYPE ty
 
 	// 4. フェンスとイベントの生成
 	hr = device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence_));
-	assert(SUCCEEDED(hr));
+	if (FAILED(hr)) { return fail("CreateFence", hr); }
 	for (uint32_t i = 0; i < DXC::kFrameCount_; ++i) {
 		fenceValue_[i] = 0;
 	}
 	fenceEvent_ = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-	assert(fenceEvent_ != nullptr);
+	if (fenceEvent_ == nullptr) { return fail("CreateEvent", HRESULT_FROM_WIN32(GetLastError())); }
+
+	return true;
+}
+
+void CommandContext::Discard() {
+	if (fenceEvent_) {
+		CloseHandle(fenceEvent_);
+		fenceEvent_ = nullptr;
+	}
+	list4_.Reset();
+	list_.Reset();
+	for (uint32_t i = 0; i < kFrameCount_; ++i) {
+		allocator_[i].Reset();
+	}
+	fence_.Reset();
+	queue_.Reset();
 }
 
 void CommandContext::Close() {

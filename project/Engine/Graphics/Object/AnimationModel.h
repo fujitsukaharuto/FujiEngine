@@ -50,6 +50,7 @@ namespace Graphics {
 		void ApplyAnimation();
 		void Draw(bool isAdd = false) override;
 		void Render() override;
+		bool IsSkinned() const override { return true; }
 
 		/// <summary>ディスパッチ処理</summary>
 		void CSDispatch();

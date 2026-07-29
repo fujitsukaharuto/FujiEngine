@@ -187,6 +187,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Editor\ObjectEditor\Object3dEditor.cpp" />
     <ClCompile Include="Engine\Core\Serialize\GlobalVariables.cpp" />
     <ClCompile Include="Engine\Graphics\Pipeline\Render\RenderPipeline.cpp" />
+    <ClCompile Include="Engine\Graphics\Raytracing\RaytracingScene.cpp" />
     <ClCompile Include="Engine\Graphics\Pipeline\BasePipeline.cpp" />
     <ClCompile Include="Engine\Graphics\Pipeline\Compute\ComputePipeline.cpp" />
     <ClCompile Include="Engine\Graphics\Pipeline\RootParam.cpp" />
@@ -311,6 +312,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Editor\Command\PropertyCommand.h" />
     <ClInclude Include="Engine\Core\Serialize\GlobalVariables.h" />
     <ClInclude Include="Engine\Graphics\Pipeline\Render\RenderPipeline.h" />
+    <ClInclude Include="Engine\Graphics\Raytracing\RaytracingScene.h" />
     <ClInclude Include="Engine\Graphics\Pipeline\BasePipeline.h" />
     <ClInclude Include="Engine\Graphics\Pipeline\Compute\ComputePipeline.h" />
     <ClInclude Include="Engine\Graphics\Pipeline\Compute\OutlineCSPipe.h" />

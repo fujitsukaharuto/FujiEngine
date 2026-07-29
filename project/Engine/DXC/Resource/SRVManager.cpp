@@ -68,6 +68,17 @@ void SRVManager::CreateStructuredSRV(uint32_t srvIndex, ID3D12Resource* resource
 	dxcommon_->GetDevice()->CreateShaderResourceView(resource, &instancingSrvDesc, GetCPUDescriptorHandle(srvIndex));
 }
 
+void SRVManager::CreateAccelerationStructureSRV(uint32_t srvIndex, D3D12_GPU_VIRTUAL_ADDRESS tlasAddress) {
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+	srvDesc.Format = DXGI_FORMAT_UNKNOWN;
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_RAYTRACING_ACCELERATION_STRUCTURE;
+	srvDesc.RaytracingAccelerationStructure.Location = tlasAddress;
+
+	// ★加速構造のSRVだけは第1引数が nullptr。リソースではなくアドレスで指す
+	dxcommon_->GetDevice()->CreateShaderResourceView(nullptr, &srvDesc, GetCPUDescriptorHandle(srvIndex));
+}
+
 void SRVManager::CreateStructuredUAV(uint32_t uavIndex, ID3D12Resource* resource, UINT numElements, UINT structureByteStride, D3D12_BUFFER_UAV_FLAGS flag) {
 	D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
 	uavDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;

@@ -133,7 +133,10 @@
     </ClCompile>
     <ClCompile Include="Engine\Graphics\Pipeline\Render\RenderPipeline.cpp">
       <Filter>Engine\Graphics\Pipeline\Render</Filter>
+    </ClCompile>    <ClCompile Include="Engine\Graphics\Raytracing\RaytracingScene.cpp">
+      <Filter>Engine\Graphics\Raytracing</Filter>
     </ClCompile>
+
     <ClCompile Include="Engine\Math\Matrix\MatrixCalculation.cpp">
       <Filter>Engine\Math\Matrix</Filter>
     </ClCompile>
@@ -510,7 +513,10 @@
     </ClInclude>
     <ClInclude Include="Engine\Graphics\Pipeline\Render\RenderPipeline.h">
       <Filter>Engine\Graphics\Pipeline\Render</Filter>
+    </ClInclude>    <ClInclude Include="Engine\Graphics\Raytracing\RaytracingScene.h">
+      <Filter>Engine\Graphics\Raytracing</Filter>
     </ClInclude>
+
     <ClInclude Include="Engine\Graphics\Model\AnimationStructs.h">
       <Filter>Engine\Graphics\Model</Filter>
     </ClInclude>
@@ -866,7 +872,10 @@
     </Filter>
     <Filter Include="Engine\Graphics\Pipeline\Render">
       <UniqueIdentifier>{c8e2881d-d3be-4d75-bfb2-cf742fe43cc6}</UniqueIdentifier>
+    </Filter>    <Filter Include="Engine\Graphics\Raytracing">
+      <UniqueIdentifier>{7f3a91c4-6b2e-4a58-9d17-2ec5b840af31}</UniqueIdentifier>
     </Filter>
+
     <Filter Include="Engine\Graphics\PostEffect">
       <UniqueIdentifier>{5e1bcb8e-e405-440e-9b7f-3be0a1f637d8}</UniqueIdentifier>
     </Filter>

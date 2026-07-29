@@ -33,6 +33,14 @@ namespace Graphics {
 		virtual void Draw(bool isAdd = false) = 0;
 		virtual void Render() = 0;
 
+		/// <summary>スキニングで頂点が毎フレーム動くか</summary>
+		/// <remarks>
+		/// 加速構造(BLAS)はモデルが持つバインドポーズの頂点バッファから作るので、
+		/// これが true のものをそのまま TLAS に載せるとポーズが反映されず影だけTポーズになる。
+		/// スキンメッシュ対応(毎フレームBLAS更新)を入れるまでは除外すること
+		/// </remarks>
+		virtual bool IsSkinned() const { return false; }
+
 		//========================================================================*/
 		//* Getter
 		Math::Trans& GetTransform() { return transform_; }
@@ -41,6 +49,8 @@ namespace Graphics {
 		/// <summary>マテリアルの取得</summary>
 		Material& GetMaterial(size_t index = 0) { return material_[index]; }
 		size_t GetMaterialCount() const { return material_.size(); }
+		/// <summary>形状の元になっているモデル。加速構造(BLAS)の対応付けに使う</summary>
+		Model* GetModel() const { return model_; }
 
 		/// <summary>jsonからTransform初期化</summary>
 		void LoadTransformFromJson(const std::string& filename);

@@ -12,17 +12,31 @@ DXCommand::~DXCommand() {
 
 
 void DXCommand::Initialize(ID3D12Device* device) {
-	graphicsContext_ = std::make_unique<CommandContext>();
-	graphicsContext_->Initialize(device, D3D12_COMMAND_LIST_TYPE_DIRECT);
+	// DIRECT も COMPUTE も D3D12 が全デバイスで必須としている種別なので、
+	// 失敗＝デバイスが立ち行かない状況。復帰はさせずログだけ必ず残す
+	// （assert は Develop/Release では消えるため、これが唯一の手掛かりになる）
+	auto initContext = [&](std::unique_ptr<CommandContext>& context,
+		D3D12_COMMAND_LIST_TYPE type, const char* name) {
+			context = std::make_unique<CommandContext>();
+			if (!context->Initialize(device, type)) {
+				Logger::Log(std::format("FATAL: mandatory command queue '{}' could not be created.\n", name));
+				assert(false);
+			}
+		};
+
+	initContext(graphicsContext_, D3D12_COMMAND_LIST_TYPE_DIRECT, "graphics");
 
 	// コンピュート用コンテキストの初期化
-	computeContext_ = std::make_unique<CommandContext>();
-	computeContext_->Initialize(device, D3D12_COMMAND_LIST_TYPE_COMPUTE);
+	initContext(computeContext_, D3D12_COMMAND_LIST_TYPE_COMPUTE, "compute");
 
 	// 初期化用キュー
-	immediateContext_ = std::make_unique<CommandContext>();
-	immediateContext_->Initialize(device, D3D12_COMMAND_LIST_TYPE_DIRECT);
+	initContext(immediateContext_, D3D12_COMMAND_LIST_TYPE_DIRECT, "immediate");
 	immediateContext_->Reset(frameIndex_);
+
+	// 加速構造の構築先を決める唯一の場所。
+	// 既定は描画と同じQueue＝フェンス不要で最も単純に動く形。専用Queueを起こすときは
+	// ここでそれを生成して代入する（同期側は IsASBuildOnGraphicsQueue() が拾う）
+	asBuildContext_ = graphicsContext_.get();
 
 	/// viewScissor-------------------------------
 	viewport_.Width = MyWin::kWindowWidth;
@@ -48,18 +62,18 @@ void DXCommand::Flush() {
 	graphicsContext_->WaitForGPU(frameIndex_);
 }
 
-void DXCommand::Close(uint32_t index) {
+void DXCommand::Close(SubmitPath path) {
 
-	if (index == 0) {
+	if (path == SubmitPath::Frame) {
 		graphicsContext_->Close();
 	} else {
 		immediateContext_->Close();
 	}
 }
 
-void DXCommand::Execution(uint32_t index) {
+void DXCommand::Execution(SubmitPath path) {
 
-	if (index == 0) {
+	if (path == SubmitPath::Frame) {
 		graphicsContext_->Execute();
 	} else {
 		immediateContext_->Execute();
@@ -71,9 +85,9 @@ void DXC::DXCommand::ComputeExecution() {
 	computeContext_->Execute();
 }
 
-void DXC::DXCommand::GPUSignal(uint32_t index) {
+void DXC::DXCommand::GPUSignal(SubmitPath path) {
 	// コマンドリストの実行完了を待つ
-	if (index == 0) {
+	if (path == SubmitPath::Frame) {
 		graphicsContext_->Signal(frameIndex_);
 	} else {
 		immediateContext_->Signal(frameIndex_);
@@ -84,8 +98,8 @@ void DXC::DXCommand::GPUComputeSignal() {
 	computeContext_->Signal(frameIndex_);
 }
 
-void DXC::DXCommand::WaitForGPU(uint32_t index) {
-	if (index == 0) {
+void DXC::DXCommand::WaitForGPU(SubmitPath path) {
+	if (path == SubmitPath::Frame) {
 		if (computeContext_->GetFenceValue(frameIndex_) != 0) { // ComputeQueueを待つ
 			computeContext_->WaitForGPU(frameIndex_);
 		}
@@ -110,9 +124,9 @@ void DXC::DXCommand::WaitGraphicsInComputeQueue() {
 	}
 }
 
-void DXCommand::Reset(uint32_t index) {
+void DXCommand::Reset(SubmitPath path) {
 	WaitForGPU();
-	if (index == 0) {
+	if (path == SubmitPath::Frame) {
 		graphicsContext_->Reset(frameIndex_);
 
 		computeContext_->Reset(frameIndex_);

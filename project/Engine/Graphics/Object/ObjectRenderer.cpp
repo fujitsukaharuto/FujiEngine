@@ -11,10 +11,13 @@
 #include "Engine/Graphics/Pipeline/PipeKind.h"
 #include "Engine/Graphics/Pipeline/PipelineManager.h"
 #include "Engine/Core/App/MyWindow.h"
+#include "Engine/Graphics/Raytracing/RaytracingScene.h"
 
 using namespace Core;
 using namespace Graphics;
 using namespace DXC;
+
+ObjectRenderer::~ObjectRenderer() = default;
 
 ObjectRenderer* ObjectRenderer::GetInstance() {
 	static ObjectRenderer instance;
@@ -24,11 +27,19 @@ ObjectRenderer* ObjectRenderer::GetInstance() {
 void ObjectRenderer::Initialize(DXCom* pDxcom, LightManager* pLightManager) {
 	dxcommon_ = pDxcom;
 	lightManager_ = pLightManager;
+
+	raytracingScene_ = std::make_unique<RaytracingScene>();
+	raytracingScene_->Initialize(pDxcom);
 }
 
 void ObjectRenderer::Finalize() {
 	renderQueue_.clear();
 	skinningQueue_.clear();
+
+	if (raytracingScene_) {
+		raytracingScene_->Finalize();
+		raytracingScene_.reset();
+	}
 }
 
 void ObjectRenderer::Add(RenderObject* object) {
@@ -57,6 +68,9 @@ void ObjectRenderer::Render() {
 		return;
 	}
 
+	// ★描画より先にTLASを組む。描画中のシェーダがレイを飛ばす時点で完成している必要がある
+	BuildRaytracingScene();
+
 	// 登録されたRenderObjectをループで描画
 	for (RenderObject* obj : renderQueue_) {
 		// 仮想関数なので、実際の型(Object3d または AnimationObject)のDrawが呼ばれる
@@ -65,6 +79,23 @@ void ObjectRenderer::Render() {
 
 	// 描画が終わったらリストを空にする
 	renderQueue_.clear();
+}
+
+void ObjectRenderer::BuildRaytracingScene() {
+	if (!raytracingScene_ || !raytracingScene_->IsAvailable()) {
+		return;
+	}
+
+	// renderQueue_ が「このフレームに描くオブジェクト」そのものなので、
+	// 別途インスタンスを集める仕組みを作らずにここから拾える。
+	// ★ただし AnimationModel は AddSkinned と Add の両方を呼ぶので renderQueue_ にも入っている。
+	// スキンメッシュのBLASはバインドポーズのままで、載せると影だけTポーズになるため除外する
+	raytracingScene_->BeginFrame();
+	for (RenderObject* obj : renderQueue_) {
+		if (obj->IsSkinned()) { continue; }
+		raytracingScene_->AddInstance(obj->GetModel(), obj->GetWorldMat());
+	}
+	raytracingScene_->BuildTlas();
 }
 
 void ObjectRenderer::Skinning() {

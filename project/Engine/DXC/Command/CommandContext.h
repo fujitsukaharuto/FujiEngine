@@ -14,8 +14,18 @@ namespace DXC {
 		CommandContext() = default;
 		~CommandContext();
 
-		// typeにD3D12_COMMAND_LIST_TYPE_DIRECTやCOMPUTEを渡して初期化を共通化
-		void Initialize(ID3D12Device* device, D3D12_COMMAND_LIST_TYPE type);
+		/// <summary>
+		/// typeにD3D12_COMMAND_LIST_TYPE_DIRECTやCOMPUTEを渡して初期化を共通化
+		/// </summary>
+		/// <returns>生成に成功したか。失敗時は何も保持しない状態で戻る</returns>
+		/// <remarks>
+		/// 途中で失敗しても続けると queue_ だけ nullptr の半端な状態になり、
+		/// 最初の Execute() まで発覚しない。呼び出し側が代替Queueへ倒せるよう結果を返す
+		/// </remarks>
+		[[nodiscard]] bool Initialize(ID3D12Device* device, D3D12_COMMAND_LIST_TYPE type);
+
+		/// <summary>使える状態か</summary>
+		bool IsValid() const { return queue_ != nullptr; }
 
 		// コマンドの実行と同期
 		void Close();
@@ -42,6 +52,11 @@ namespace DXC {
 		void Reset(uint32_t frameIndex);
 
 		bool IsOpen() const { return isOpen_; }
+
+	private:
+
+		/// <summary>保持しているものを全て解放する。生成失敗時の巻き戻しと破棄で共用する</summary>
+		void Discard();
 
 	private:
 		Microsoft::WRL::ComPtr<ID3D12CommandQueue> queue_ = nullptr;

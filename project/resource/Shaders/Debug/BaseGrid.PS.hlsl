@@ -28,10 +28,15 @@ static const float kMinRange = 60.0; // 最低限これだけの距離までは�
 static const float kRangeScale = 25.0; // カメラ高度の何倍まで描くか(引くほど遠くまで見える)
 static const float kHorizonFalloff = 8.0; // 地平線付近のフェードの強さ
 
-static const float3 kThinColor = float3(0.25, 0.25, 0.25);
-static const float3 kThickColor = float3(0.42, 0.42, 0.42);
-static const float3 kAxisXColor = float3(0.80, 0.22, 0.26); // z==0 を走る線 = X軸
-static const float3 kAxisZColor = float3(0.22, 0.42, 0.80); // x==0 を走る線 = Z軸
+// 色はリニアHDRのオフスクリーンへ書く値で、画面に出るまでに「露光(既定2.0)を掛けて
+// ACESトーンマップ」を通る。ACESはこの帯域を持ち上げるので、見た目の明るさは書いた値より
+// かなり明るくなる(例: 0.25 と書くと画面では 0.616 になり、白飛びして見える)。
+// そのため「画面でこう見せたい値」を逆算して入れてある。カッコ内が実際の表示値。
+// 露光を既定から大きく動かすとこの前提が崩れるので、その時はここも振り直すこと
+static const float3 kThinColor = float3(0.085, 0.085, 0.085); // (0.25)
+static const float3 kThickColor = float3(0.142, 0.142, 0.142); // (0.42)
+static const float3 kAxisXColor = float3(0.491, 0.076, 0.088); // z==0 を走る線 = X軸 (0.80,0.22,0.26)
+static const float3 kAxisZColor = float3(0.076, 0.142, 0.491); // x==0 を走る線 = Z軸 (0.22,0.42,0.80)
 
 // 線の中心からの距離(ピクセル)と線幅(ピクセル)から被覆率を返す。
 // 1ピクセルを1辺1の正方形とみなした矩形フィルタ近似で、これがアンチエイリアスになる
