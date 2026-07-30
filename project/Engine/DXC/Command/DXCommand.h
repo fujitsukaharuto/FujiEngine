@@ -10,13 +10,9 @@ namespace DXC {
 	/// <summary>
 	/// コマンドの投入経路
 	/// </summary>
-	/// <remarks>
-	/// 従来 uint32_t の 0 / 1 で切り替えていたものに名前を付けたもので、挙動は同じ。
-	/// Frame は描画用(graphics)とGPUパーティクル用(compute)の2本をまとめて面倒を見る点に注意
-	/// </remarks>
 	enum class SubmitPath {
 		Frame,     //!< 毎フレームの描画。graphics と compute の両方が動く
-		Immediate, //!< 初期化や単発転送。実行してGPU完了まで待ってから戻る
+		Immediate, //!< 初期化や単発転送。GPU完了まで待ってから戻る
 	};
 
 	/// <summary>
@@ -103,24 +99,12 @@ namespace DXC {
 		ID3D12GraphicsCommandList4* GetComputeList4() const { return computeContext_->GetList4(); }
 		ID3D12GraphicsCommandList4* GetImmediateList4() const { return immediateContext_->GetList4(); }
 
-		/// <summary>
-		/// 加速構造(BLAS/TLAS)の構築を記録するコンテキスト
-		/// </summary>
-		/// <remarks>
-		/// 呼び出し側にどのQueueかを書かせないための差し替え点。実体の割り当ては
-		/// Initialize の1箇所だけで決まるので、専用Queueを起こす/やめるが代入1行で切り替わる。
-		/// BuildRaytracingAccelerationStructure は DIRECT か COMPUTE でしか実行できない
-		/// （COPYとバンドルは不可）ので、割り当て先はその2種のいずれかであること
-		/// </remarks>
+		/// <summary>加速構造(BLAS/TLAS)の構築を記録するコンテキスト</summary>
+		/// <remarks>割り当ては Initialize の1箇所。DIRECT か COMPUTE のいずれかであること</remarks>
 		CommandContext* GetASBuildContext() const { return asBuildContext_; }
 
-		/// <summary>
-		/// 加速構造の構築が描画と同じQueueに乗っているか
-		/// </summary>
-		/// <remarks>
-		/// 同じなら記録順で保証されるのでUAVバリアだけでよく、違うならフェンスの待ち合わせが要る。
-		/// この判定を各所に散らすとQueue構成を変えた瞬間に同期漏れが出るため、必ずここを見ること
-		/// </remarks>
+		/// <summary>加速構造の構築が描画と同じQueueに乗っているか</summary>
+		/// <remarks>違うならフェンスの待ち合わせが要る。判定はここに集約すること</remarks>
 		bool IsASBuildOnGraphicsQueue() const { return asBuildContext_ == graphicsContext_.get(); }
 
 		uint32_t GetNowFrameIndex() { return frameIndex_; }

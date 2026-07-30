@@ -286,7 +286,6 @@ private:
 	static constexpr float kRoarShakeTimeMin_ = 40.0f;     // 咆哮シェイクを行う時間の下限
 	static constexpr float kRoarShakeTimeMax_ = 200.0f;    // 咆哮シェイクを行う時間の上限
 	static constexpr float kWalkSpeed_ = 0.05f;            // 歩行速度
-	static constexpr float kShadowPosY_ = 0.15f;           // 影のY位置
 	static constexpr float kCameraRange_ = -25.0f;         // カメラ距離の既定値
 	static constexpr float kCameraFollowSpeed_ = 0.2f;     // カメラ追従速度の既定値
 
@@ -300,8 +299,6 @@ private:
 	std::unique_ptr<BossCore> core_;
 	std::unique_ptr<Beam> beam_;
 
-	/// <summary>追加ビジュアル。所有権は基底の renderers_ が持つ</summary>
-	Graphics::Object3d* shadow_ = nullptr;
 	/// <summary>所有権は基底の colliders_ が持つ</summary>
 	AABBCollider* collider_ = nullptr;
 

@@ -81,7 +81,6 @@ void SceneManager::ChangeScene(const std::string& sceneName, float extraTime) {
 
 void SceneManager::DebugGUI() {
 #ifdef _DEBUGMODE
-	// タブ名が既に "Scene" なので、ここを閉じたままにすると入れ子が無駄に深く見える
 	if (ImGui::CollapsingHeader("Scene", ImGuiTreeNodeFlags_DefaultOpen)) {
 		if (scene_) {
 			SceneChangeGUI();
@@ -123,7 +122,7 @@ void SceneManager::SceneSet() {
 void SceneManager::SceneChangeGUI() {
 #ifdef _DEBUGMODE
 	ImGui::Indent();
-	// Selected は強調するだけで開かない。DefaultOpen が無いと毎回クリックしないと出てこない
+	// Selected は強調するだけで開かないので DefaultOpen も要る
 	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Selected | ImGuiTreeNodeFlags_DefaultOpen;
 	if (ImGui::TreeNodeEx("SceneChange", flags)) {
 		if (sceneFactory_) {

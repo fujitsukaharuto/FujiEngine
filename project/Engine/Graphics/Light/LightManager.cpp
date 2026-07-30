@@ -107,6 +107,11 @@ void LightManager::DebugGUI() {
 			// 0 にすると光の当たらない面は完全な黒になる
 			ImGui::ColorEdit3("SkyColor", &allLightsData_.ambientSkyColor.x);
 			ImGui::ColorEdit3("GroundColor", &allLightsData_.ambientGroundColor.x);
+
+			bool enableShadow = (allLightsData_.enableRayTracedShadow != 0);
+			if (ImGui::Checkbox("RayTracedShadow", &enableShadow)) {
+				allLightsData_.enableRayTracedShadow = enableShadow ? 1u : 0u;
+			}
 			ImGui::DragFloat("Intensity##ambient", &allLightsData_.ambientIntensity, 0.01f, 0.0f, 10.0f);
 			ImGui::TreePop();
 		}

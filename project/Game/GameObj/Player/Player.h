@@ -173,8 +173,6 @@ private:
 	std::unique_ptr<BasePlayerAttackBehavior> attackBehavior_ = nullptr;
 	std::vector<std::unique_ptr<PlayerBullet>> bullets_;
 
-	/// <summary>追加ビジュアル。所有権は基底の renderers_ が持つ</summary>
-	Graphics::Object3d* shadow_ = nullptr;
 	/// <remarks>描画されない Transform アンカー(エミッタの親)。所有権は基底 anchors_ が持つ</remarks>
 	Math::Trans* strongStatePos_ = nullptr;
 	/// <summary>所有権は基底の colliders_ が持つ</summary>

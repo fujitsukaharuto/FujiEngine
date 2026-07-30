@@ -34,11 +34,7 @@ namespace Graphics {
 		virtual void Render() = 0;
 
 		/// <summary>スキニングで頂点が毎フレーム動くか</summary>
-		/// <remarks>
-		/// 加速構造(BLAS)はモデルが持つバインドポーズの頂点バッファから作るので、
-		/// これが true のものをそのまま TLAS に載せるとポーズが反映されず影だけTポーズになる。
-		/// スキンメッシュ対応(毎フレームBLAS更新)を入れるまでは除外すること
-		/// </remarks>
+		/// <remarks>trueならBLASをスキニング後の頂点から毎フレーム作り直す</remarks>
 		virtual bool IsSkinned() const { return false; }
 
 		//========================================================================*/

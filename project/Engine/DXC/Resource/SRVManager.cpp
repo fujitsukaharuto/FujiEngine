@@ -75,7 +75,7 @@ void SRVManager::CreateAccelerationStructureSRV(uint32_t srvIndex, D3D12_GPU_VIR
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_RAYTRACING_ACCELERATION_STRUCTURE;
 	srvDesc.RaytracingAccelerationStructure.Location = tlasAddress;
 
-	// ★加速構造のSRVだけは第1引数が nullptr。リソースではなくアドレスで指す
+	// 加速構造のSRVだけは第1引数が nullptr。リソースではなくアドレスで指す
 	dxcommon_->GetDevice()->CreateShaderResourceView(nullptr, &srvDesc, GetCPUDescriptorHandle(srvIndex));
 }
 

@@ -36,7 +36,9 @@ namespace Graphics {
 		Math::Vector3 ambientSkyColor = { 0.35f, 0.42f, 0.55f };
 		float ambientIntensity = 0.30f;
 		Math::Vector3 ambientGroundColor = { 0.20f, 0.17f, 0.14f };
-		float pad1;
+
+		// レイトレ影のON/OFF。元は pad1 なのでCBのレイアウトは変わっていない
+		uint32_t enableRayTracedShadow = 1;
 	};
 
 	/// <summary>

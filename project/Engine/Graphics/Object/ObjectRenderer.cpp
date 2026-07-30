@@ -68,7 +68,7 @@ void ObjectRenderer::Render() {
 		return;
 	}
 
-	// ★描画より先にTLASを組む。描画中のシェーダがレイを飛ばす時点で完成している必要がある
+	// 描画中のシェーダがレイを飛ばすので、TLASは描画より先に組む
 	BuildRaytracingScene();
 
 	// 登録されたRenderObjectをループで描画
@@ -86,14 +86,16 @@ void ObjectRenderer::BuildRaytracingScene() {
 		return;
 	}
 
-	// renderQueue_ が「このフレームに描くオブジェクト」そのものなので、
-	// 別途インスタンスを集める仕組みを作らずにここから拾える。
-	// ★ただし AnimationModel は AddSkinned と Add の両方を呼ぶので renderQueue_ にも入っている。
-	// スキンメッシュのBLASはバインドポーズのままで、載せると影だけTポーズになるため除外する
 	raytracingScene_->BeginFrame();
 	for (RenderObject* obj : renderQueue_) {
-		if (obj->IsSkinned()) { continue; }
-		raytracingScene_->AddInstance(obj->GetModel(), obj->GetWorldMat());
+		if (obj->IsSkinned()) {
+			// IsSkinned() を返すのは AnimationModel だけ
+			auto* skinned = static_cast<AnimationModel*>(obj);
+			raytracingScene_->AddSkinnedInstance(obj, obj->GetModel(),
+				skinned->GetSkinnedMeshes(), obj->GetWorldMat());
+		} else {
+			raytracingScene_->AddInstance(obj->GetModel(), obj->GetWorldMat());
+		}
 	}
 	raytracingScene_->BuildTlas();
 }

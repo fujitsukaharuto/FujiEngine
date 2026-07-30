@@ -21,6 +21,7 @@ namespace Graphics {
 		inline const RootParam kEnvironment{ "gEnvironment" };
 		inline const RootParam kLights{ "gLights" };
 		inline const RootParam kObjIDData{ "ObjIDData" };
+		inline const RootParam kSceneTLAS{ "gSceneTLAS" };			// レイトレの加速構造(TLAS)
 
 		// --- ピッキング ---
 		inline const RootParam kPickingData{ "PickingData" };

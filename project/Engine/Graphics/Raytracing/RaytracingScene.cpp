@@ -1,6 +1,8 @@
 #include "Engine/Graphics/Raytracing/RaytracingScene.h"
 
+#include <algorithm>
 #include <cassert>
+#include <cstring>
 
 #include "Engine/Core/Debug/ImGuiManager.h"
 #include "Engine/DXC/Command/DXCommand.h"
@@ -8,6 +10,7 @@
 #include "Engine/DXC/Resource/DX12Helper.h"
 #include "Engine/DXC/Resource/SRVManager.h"
 #include "Engine/Graphics/Model/Mesh/Mesh.h"
+#include "Engine/Graphics/Model/Mesh/SkinnedMesh.h"
 #include "Engine/Graphics/Model/Model.h"
 #include "Engine/Logger/Logger.h"
 
@@ -22,13 +25,8 @@ namespace {
 		return (size + alignment - 1) & ~(alignment - 1);
 	}
 
-	/// <summary>
-	/// ワールド行列をDXRのインスタンス行列(3x4)へ詰める
-	/// </summary>
-	/// <remarks>
-	/// ★このエンジンの Matrix4x4 は行ベクトル(v * M)で平行移動が m[3][0..2] にあるのに対し、
-	/// DXRの Transform は列ベクトル(M * v)の3x4。転置して入れないと回転と平行移動が壊れる
-	/// </remarks>
+	/// <summary>ワールド行列をDXRのインスタンス行列(3x4)へ詰める</summary>
+	/// <remarks>Matrix4x4 は行ベクトル、DXRは列ベクトルなので転置する</remarks>
 	void StoreTransform3x4(const Math::Matrix4x4& world, FLOAT out[3][4]) {
 		for (int row = 0; row < 3; ++row) {
 			for (int col = 0; col < 4; ++col) {
@@ -41,26 +39,34 @@ namespace {
 void RaytracingScene::Initialize(DXC::DXCom* pDxcom) {
 	dxcommon_ = pDxcom;
 
-	// Tier 1.1 と SM 6.5 が揃っていなければ何もしない。
-	// ここで弾いておけば、以降の全メソッドが安全に空振りする
+	// ここで弾けば以降の全メソッドが空振りする
 	isAvailable_ = dxcommon_->IsRayQuerySupported();
 	if (!isAvailable_) {
 		Logger::Log("RaytracingScene: disabled (RayQuery is not supported on this device).\n");
 		return;
 	}
 
+	// シェーダは gSceneTLAS を無条件に読むので、描画対象0でも空のTLASを作っておく。
+	// 未初期化バッファをRayQueryに読ませると結果が不定になる
+	EnsureTlasCapacity(0);
+	RecordTlasBuild(dxcommon_->GetDXCommand()->GetImmediateList4(), 0, 0);
+	dxcommon_->CommandExecution();
+
 	Logger::Log("RaytracingScene: initialized.\n");
 }
 
 void RaytracingScene::Finalize() {
-	if (instanceMapped_) {
-		instanceBuffer_->Unmap(0, nullptr);
-		instanceMapped_ = nullptr;
+	for (uint32_t i = 0; i < DXC::kFrameCount_; ++i) {
+		if (instanceMapped_[i]) {
+			instanceBuffer_[i]->Unmap(0, nullptr);
+			instanceMapped_[i] = nullptr;
+		}
+		instanceBuffer_[i].Reset();
 	}
-	instanceBuffer_.Reset();
 	tlasScratch_.Reset();
 	tlasBuffer_.Reset();
 	blasMap_.clear();
+	skinnedBlasMap_.clear();
 	instances_.clear();
 
 	// SRVの返却はGPUが参照し終わってからでないといけない。
@@ -82,8 +88,7 @@ const RaytracingScene::Blas* RaytracingScene::EnsureBlas(const Model* model) {
 	const std::vector<Mesh>& meshes = model->GetMeshes();
 	if (meshes.empty()) { return nullptr; }
 
-	// モデルの全メッシュを1つのBLASにまとめる。
-	// 影は「遮られたかYes/No」だけでマテリアル別の分岐が要らないので分ける理由が無い
+	// 影はマテリアル別の分岐が要らないので、全メッシュを1つのBLASにまとめる
 	std::vector<D3D12_RAYTRACING_GEOMETRY_DESC> geometries;
 	geometries.reserve(meshes.size());
 
@@ -95,11 +100,10 @@ const RaytracingScene::Blas* RaytracingScene::EnsureBlas(const Model* model) {
 
 		D3D12_RAYTRACING_GEOMETRY_DESC geometry{};
 		geometry.Type = D3D12_RAYTRACING_GEOMETRY_TYPE_TRIANGLES;
-		// 影のレイは貫通の可否だけなのでOPAQUE。any-hitが省かれる分速い
+		// OPAQUE にすると any-hit が省かれる
 		geometry.Flags = D3D12_RAYTRACING_GEOMETRY_FLAG_OPAQUE;
 
-		// ★VertexData は pos が Vector4 で構造体は48バイト。
-		// フォーマットに R32G32B32 を指定し、ストライドで48を渡せば w は読み飛ばされる
+		// pos は Vector4 だが、R32G32B32 + ストライド48 で w は読み飛ばされる
 		geometry.Triangles.VertexBuffer.StartAddress = vbv.BufferLocation;
 		geometry.Triangles.VertexBuffer.StrideInBytes = vbv.StrideInBytes;
 		geometry.Triangles.VertexFormat = DXGI_FORMAT_R32G32B32_FLOAT;
@@ -122,7 +126,7 @@ const RaytracingScene::Blas* RaytracingScene::EnsureBlas(const Model* model) {
 	inputs.NumDescs = static_cast<UINT>(geometries.size());
 	inputs.pGeometryDescs = geometries.data();
 
-	// 必要なサイズはドライバに訊く。手計算はできない
+	// 必要なサイズはドライバに訊く
 	D3D12_RAYTRACING_ACCELERATION_STRUCTURE_PREBUILD_INFO prebuild{};
 	dxcommon_->GetDevice5()->GetRaytracingAccelerationStructurePrebuildInfo(&inputs, &prebuild);
 	if (prebuild.ResultDataMaxSizeInBytes == 0) { return nullptr; }
@@ -131,7 +135,7 @@ const RaytracingScene::Blas* RaytracingScene::EnsureBlas(const Model* model) {
 	blas.buffer = DXC::Helper::CreateAccelerationStructureResource(
 		dxcommon_->GetDevice(), AlignUp(prebuild.ResultDataMaxSizeInBytes, kASAlignment));
 
-	// スクラッチは構築中だけ要る。作り終えたら捨ててよいのでローカルに置く
+	// スクラッチは構築中だけ要るのでローカルに置く
 	Microsoft::WRL::ComPtr<ID3D12Resource> scratch = DXC::Helper::CreateUAVResource(
 		dxcommon_->GetDevice(), AlignUp(prebuild.ScratchDataSizeInBytes, kASAlignment));
 
@@ -140,9 +144,7 @@ const RaytracingScene::Blas* RaytracingScene::EnsureBlas(const Model* model) {
 	buildDesc.DestAccelerationStructureData = blas.buffer->GetGPUVirtualAddress();
 	buildDesc.ScratchAccelerationStructureData = scratch->GetGPUVirtualAddress();
 
-	// 起動時やロード時の単発なので、初期化用の経路で同期実行する。
-	// CommandExecution が close/execute/signal/wait/reset まで面倒を見るので、
-	// 戻ってきた時点でスクラッチを解放してよい
+	// 初期化用の経路で同期実行する。戻った時点でスクラッチを解放してよい
 	ID3D12GraphicsCommandList4* list = dxcommon_->GetDXCommand()->GetImmediateList4();
 	list->BuildRaytracingAccelerationStructure(&buildDesc, 0, nullptr);
 
@@ -160,6 +162,15 @@ const RaytracingScene::Blas* RaytracingScene::EnsureBlas(const Model* model) {
 
 	auto inserted = blasMap_.emplace(model, std::move(blas));
 	return &inserted.first->second;
+}
+
+void RaytracingScene::InvalidateAllBlas() {
+	if (blasMap_.empty()) { return; }
+
+	// 呼び出し側が Flush 済みである前提
+	blasMap_.clear();
+	instances_.clear();
+	Logger::Log("RaytracingScene: all BLAS invalidated (model reloaded).\n");
 }
 
 void RaytracingScene::DebugGUI() {
@@ -208,20 +219,109 @@ void RaytracingScene::AddInstance(const Model* model, const Math::Matrix4x4& wor
 	instances_.push_back(desc);
 }
 
-void RaytracingScene::EnsureTlasCapacity(uint32_t instanceCount) {
-	if (instanceCount <= instanceCapacity_ && instanceBuffer_) { return; }
+void RaytracingScene::AddSkinnedInstance(const RenderObject* key, const Model* model,
+	const std::vector<SkinnedMesh>& skinnedMeshes, const Math::Matrix4x4& world) {
+	if (!isAvailable_ || key == nullptr || model == nullptr) { return; }
 
-	// 毎フレーム作り直すと重いので、増えたときだけ倍々で取り直す
+	const std::vector<Mesh>& meshes = model->GetMeshes();
+	const size_t meshCount = (std::min)(meshes.size(), skinnedMeshes.size());
+	if (meshCount == 0) { return; }
+
+	// 頂点はスキニング後のものを指す。インデックスはポーズで変わらないので元のまま
+	std::vector<D3D12_RAYTRACING_GEOMETRY_DESC> geometries;
+	geometries.reserve(meshCount);
+
+	for (size_t i = 0; i < meshCount; ++i) {
+		if (meshes[i].GetIndexCount() == 0) { continue; }
+
+		const D3D12_VERTEX_BUFFER_VIEW& vbv = skinnedMeshes[i].GetSkinnedVBV();
+		const D3D12_INDEX_BUFFER_VIEW& ibv = meshes[i].GetIBV();
+		if (vbv.BufferLocation == 0) { continue; }
+
+		D3D12_RAYTRACING_GEOMETRY_DESC geometry{};
+		geometry.Type = D3D12_RAYTRACING_GEOMETRY_TYPE_TRIANGLES;
+		geometry.Flags = D3D12_RAYTRACING_GEOMETRY_FLAG_OPAQUE;
+		geometry.Triangles.VertexBuffer.StartAddress = vbv.BufferLocation;
+		geometry.Triangles.VertexBuffer.StrideInBytes = vbv.StrideInBytes;
+		geometry.Triangles.VertexFormat = DXGI_FORMAT_R32G32B32_FLOAT;
+		geometry.Triangles.VertexCount = static_cast<UINT>(meshes[i].GetVertexCount());
+		geometry.Triangles.IndexBuffer = ibv.BufferLocation;
+		geometry.Triangles.IndexFormat = DXGI_FORMAT_R32_UINT;
+		geometry.Triangles.IndexCount = static_cast<UINT>(meshes[i].GetIndexCount());
+		geometry.Triangles.Transform3x4 = 0;
+
+		geometries.push_back(geometry);
+	}
+
+	if (geometries.empty()) { return; }
+
+	D3D12_BUILD_RAYTRACING_ACCELERATION_STRUCTURE_INPUTS inputs{};
+	inputs.Type = D3D12_RAYTRACING_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL;
+	// 毎フレーム作り直すので探索速度より構築時間を優先する
+	inputs.Flags = D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_PREFER_FAST_BUILD;
+	inputs.DescsLayout = D3D12_ELEMENTS_LAYOUT_ARRAY;
+	inputs.NumDescs = static_cast<UINT>(geometries.size());
+	inputs.pGeometryDescs = geometries.data();
+
+	SkinnedBlas& blas = skinnedBlasMap_[key];
+	if (!blas.buffer) {
+		// 頂点数はポーズで変わらないのでバッファは初回だけ確保すればよい
+		D3D12_RAYTRACING_ACCELERATION_STRUCTURE_PREBUILD_INFO prebuild{};
+		dxcommon_->GetDevice5()->GetRaytracingAccelerationStructurePrebuildInfo(&inputs, &prebuild);
+		if (prebuild.ResultDataMaxSizeInBytes == 0) { return; }
+
+		blas.buffer = DXC::Helper::CreateAccelerationStructureResource(
+			dxcommon_->GetDevice(), AlignUp(prebuild.ResultDataMaxSizeInBytes, kASAlignment));
+		blas.scratch = DXC::Helper::CreateUAVResource(
+			dxcommon_->GetDevice(), AlignUp(prebuild.ScratchDataSizeInBytes, kASAlignment));
+		blas.address = blas.buffer->GetGPUVirtualAddress();
+
+		Logger::Log(std::format("RaytracingScene: skinned BLAS created. geometries={}, size={} bytes\n",
+			geometries.size(), prebuild.ResultDataMaxSizeInBytes));
+	}
+
+	D3D12_BUILD_RAYTRACING_ACCELERATION_STRUCTURE_DESC buildDesc{};
+	buildDesc.Inputs = inputs;
+	buildDesc.DestAccelerationStructureData = blas.address;
+	buildDesc.ScratchAccelerationStructureData = blas.scratch->GetGPUVirtualAddress();
+
+	// スキニングと同じQueueに積むので、記録順で「スキニング済みの頂点を読む」ことが保証される
+	ID3D12GraphicsCommandList4* list = dxcommon_->GetDXCommand()->GetASBuildContext()->GetList4();
+	list->BuildRaytracingAccelerationStructure(&buildDesc, 0, nullptr);
+
+	// TLAS構築がこのBLASを読むので、完成を待たせる
+	D3D12_RESOURCE_BARRIER barrier{};
+	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
+	barrier.UAV.pResource = blas.buffer.Get();
+	list->ResourceBarrier(1, &barrier);
+
+	D3D12_RAYTRACING_INSTANCE_DESC desc{};
+	StoreTransform3x4(world, desc.Transform);
+	desc.InstanceID = static_cast<UINT>(instances_.size());
+	desc.InstanceMask = 0xFF;
+	desc.InstanceContributionToHitGroupIndex = 0;
+	desc.Flags = D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
+	desc.AccelerationStructure = blas.address;
+
+	instances_.push_back(desc);
+}
+
+void RaytracingScene::EnsureTlasCapacity(uint32_t instanceCount) {
+	if (instanceCount <= instanceCapacity_ && instanceBuffer_[0]) { return; }
+
+	// 増えたときだけ倍々で取り直す
 	uint32_t newCapacity = (instanceCapacity_ == 0) ? 64 : instanceCapacity_;
 	while (newCapacity < instanceCount) { newCapacity *= 2; }
 
-	if (instanceMapped_) {
-		instanceBuffer_->Unmap(0, nullptr);
-		instanceMapped_ = nullptr;
+	for (uint32_t i = 0; i < DXC::kFrameCount_; ++i) {
+		if (instanceMapped_[i]) {
+			instanceBuffer_[i]->Unmap(0, nullptr);
+			instanceMapped_[i] = nullptr;
+		}
+		instanceBuffer_[i] = DXC::Helper::CreateBufferResource(
+			dxcommon_->GetDevice(), sizeof(D3D12_RAYTRACING_INSTANCE_DESC) * newCapacity);
+		instanceBuffer_[i]->Map(0, nullptr, reinterpret_cast<void**>(&instanceMapped_[i]));
 	}
-	instanceBuffer_ = DXC::Helper::CreateBufferResource(
-		dxcommon_->GetDevice(), sizeof(D3D12_RAYTRACING_INSTANCE_DESC) * newCapacity);
-	instanceBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&instanceMapped_));
 
 	instanceCapacity_ = newCapacity;
 
@@ -240,7 +340,7 @@ void RaytracingScene::EnsureTlasCapacity(uint32_t instanceCount) {
 	tlasScratch_ = DXC::Helper::CreateUAVResource(
 		dxcommon_->GetDevice(), AlignUp(prebuild.ScratchDataSizeInBytes, kASAlignment));
 
-	// ★TLASを作り直したらSRVも指し直す。アドレスが変わっているので更新を忘れると古い木を読む
+	// 作り直すとアドレスが変わるのでSRVも指し直す
 	DXC::SRVManager* srvManager = DXC::SRVManager::GetInstance();
 	if (tlasSrvIndex_ == kInvalidSrvIndex) {
 		tlasSrvIndex_ = srvManager->Allocate();
@@ -251,30 +351,36 @@ void RaytracingScene::EnsureTlasCapacity(uint32_t instanceCount) {
 }
 
 void RaytracingScene::BuildTlas() {
-	if (!isAvailable_ || instances_.empty()) { return; }
+	if (!isAvailable_) { return; }
 
+	// インスタンスが0でも構築する(未初期化のTLASは読ませられない)
 	const uint32_t instanceCount = static_cast<uint32_t>(instances_.size());
 	EnsureTlasCapacity(instanceCount);
 
-	std::memcpy(instanceMapped_, instances_.data(),
-		sizeof(D3D12_RAYTRACING_INSTANCE_DESC) * instanceCount);
+	// 前フレームの構築がまだ読んでいる可能性があるので書き込み先を分ける
+	const uint32_t frameIndex = dxcommon_->GetNowFrameCount();
+	if (instanceCount > 0) {
+		std::memcpy(instanceMapped_[frameIndex], instances_.data(),
+			sizeof(D3D12_RAYTRACING_INSTANCE_DESC) * instanceCount);
+	}
 
+	// 描画と同じQueueなので記録順で完成が保証される。別Queueへ移すならフェンスが要る
+	RecordTlasBuild(dxcommon_->GetDXCommand()->GetASBuildContext()->GetList4(), instanceCount, frameIndex);
+}
+
+void RaytracingScene::RecordTlasBuild(ID3D12GraphicsCommandList4* list, uint32_t instanceCount, uint32_t frameIndex) {
 	D3D12_BUILD_RAYTRACING_ACCELERATION_STRUCTURE_INPUTS inputs{};
 	inputs.Type = D3D12_RAYTRACING_ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL;
 	inputs.Flags = D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_PREFER_FAST_TRACE;
 	inputs.DescsLayout = D3D12_ELEMENTS_LAYOUT_ARRAY;
 	inputs.NumDescs = instanceCount;
-	inputs.InstanceDescs = instanceBuffer_->GetGPUVirtualAddress();
+	inputs.InstanceDescs = instanceBuffer_[frameIndex]->GetGPUVirtualAddress();
 
 	D3D12_BUILD_RAYTRACING_ACCELERATION_STRUCTURE_DESC buildDesc{};
 	buildDesc.Inputs = inputs;
 	buildDesc.DestAccelerationStructureData = tlasBuffer_->GetGPUVirtualAddress();
 	buildDesc.ScratchAccelerationStructureData = tlasScratch_->GetGPUVirtualAddress();
 
-	// 構築先のQueueは DXCommand が握っている。既定は描画と同じQueueなので、
-	// 記録順で完成が保証されUAVバリアだけで足りる。
-	// 別Queueへ移すときは DXCommand::IsASBuildOnGraphicsQueue() を見てフェンスを張ること
-	ID3D12GraphicsCommandList4* list = dxcommon_->GetDXCommand()->GetASBuildContext()->GetList4();
 	list->BuildRaytracingAccelerationStructure(&buildDesc, 0, nullptr);
 
 	// これが無いと構築途中の木をシェーダが読む

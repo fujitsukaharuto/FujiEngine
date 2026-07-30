@@ -12,9 +12,7 @@ DXCommand::~DXCommand() {
 
 
 void DXCommand::Initialize(ID3D12Device* device) {
-	// DIRECT も COMPUTE も D3D12 が全デバイスで必須としている種別なので、
-	// 失敗＝デバイスが立ち行かない状況。復帰はさせずログだけ必ず残す
-	// （assert は Develop/Release では消えるため、これが唯一の手掛かりになる）
+	// DIRECT も COMPUTE も全デバイス必須の種別なので、失敗したら復帰させずログだけ残す
 	auto initContext = [&](std::unique_ptr<CommandContext>& context,
 		D3D12_COMMAND_LIST_TYPE type, const char* name) {
 			context = std::make_unique<CommandContext>();
@@ -33,9 +31,7 @@ void DXCommand::Initialize(ID3D12Device* device) {
 	initContext(immediateContext_, D3D12_COMMAND_LIST_TYPE_DIRECT, "immediate");
 	immediateContext_->Reset(frameIndex_);
 
-	// 加速構造の構築先を決める唯一の場所。
-	// 既定は描画と同じQueue＝フェンス不要で最も単純に動く形。専用Queueを起こすときは
-	// ここでそれを生成して代入する（同期側は IsASBuildOnGraphicsQueue() が拾う）
+	// 加速構造の構築先を決める唯一の場所。既定は描画と同じQueue＝フェンス不要
 	asBuildContext_ = graphicsContext_.get();
 
 	/// viewScissor-------------------------------

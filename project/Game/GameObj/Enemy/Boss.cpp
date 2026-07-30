@@ -90,13 +90,10 @@ void Boss::Update() {
 	ParticleManager::GetSphereEmitter(leftHandAuraCS_).SetPos(animeModel_->GetJointWorldPos("mixamorig:LeftHand"));
 	ParticleManager::GetSphereEmitter(rightHandAuraCS_).SetPos(animeModel_->GetJointWorldPos("mixamorig:RightHand"));
 	animeModel_->AnimationUpdate();
-	shadow_->GetTransform().translate = animeModel_->GetTransform().translate;
-	shadow_->GetTransform().translate.y = kShadowPosY_;
 	collider_->InfoUpdate();
 }
 
 void Boss::Draw([[maybe_unused]] bool is) {
-	// 子ビジュアル(shadow_) → animeModel_ の順で描かれる
 	OriginGameObject::Draw();
 	DrawColliders();
 
@@ -692,7 +689,6 @@ void Boss::EnergyTimeUpdate() {
 			animeModel_->GetTransform().translate.y = bossYPos_;
 			animeModel_->ChangeAnimation("roaring");
 			ParticleManager::GetParticleCSEmitterTexture(summonIndex_).SetEmit(false);
-			shadow_->SetColor({ 0.02f,0.02f,0.02f,0.5f });
 		}
 		summonLightning_.particleRotate_.x = Random::GetFloat(-0.15f, 0.15f);
 		summonLightning_.particleRotate_.y = Random::GetFloat(-3.14f, 3.14f);

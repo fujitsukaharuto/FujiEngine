@@ -10,6 +10,8 @@
 #include <assimp/postprocess.h>
 #include "Engine/DXC/Resource/DX12Helper.h"
 #include "Engine/DXC/Resource/SRVManager.h"
+#include "Engine/Graphics/Object/ObjectRenderer.h"
+#include "Engine/Graphics/Raytracing/RaytracingScene.h"
 #include "Engine/Core/App/MyWindow.h"
 #include "Engine/Core/Debug/ImGuiManager.h"
 #include "Engine/Core/Input/Input.h"
@@ -133,6 +135,11 @@ void ModelManager::LoadModelInternal(const std::string& filename, bool overWrite
 		}
 		model = iterator->second.get();
 		model->Clear();
+
+		// Model* は同じまま中身が入れ替わるので、加速構造も捨てないと影が古い形状で残る
+		if (auto* rtScene = ObjectRenderer::GetInstance()->GetRaytracingScene()) {
+			rtScene->InvalidateAllBlas();
+		}
 	} else {
 		newModel = std::make_unique<Model>();
 		model = newModel.get();

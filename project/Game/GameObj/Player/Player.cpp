@@ -28,13 +28,6 @@ void Player::Initialize() {
 
 	model_->SetTexture("Atlas.png");
 
-	shadow_ = AddRenderer("Sphere");
-	shadow_->SetColor({ 0.02f,0.02f,0.02f,0.5f });
-	shadow_->SetLightEnable(LightMode::kLightNone);
-	shadow_->GetTransform().translate = model_->GetTransform().translate;
-	shadow_->GetTransform().translate.y = 0.15f;
-	shadow_->GetTransform().scale.y = 0.1f;
-
 	strongStatePos_ = AddAnchor();
 
 	InitParameter();
@@ -148,8 +141,6 @@ void Player::Update() {
 	}
 
 	AvoidPostEffect();
-	shadow_->GetTransform().translate = model_->GetTransform().translate;
-	shadow_->GetTransform().translate.y = 0.15f;
 	strongStatePos_->translate = model_->GetTransform().translate;
 	strongStatePos_->translate.y -= 0.65f;
 	collider_->SetPos(model_->GetWorldPos());
@@ -164,7 +155,6 @@ void Player::Draw(bool is) {
 		}
 	}
 
-	// 子ビジュアル(shadow_) → model_ の順で描かれる
 	OriginGameObject::Draw(is);
 
 	DrawColliders();
@@ -621,7 +611,6 @@ void Player::TitleUpdate([[maybe_unused]]float titleTime) {
 }
 
 void Player::TitleDraw() {
-	// タイトルでは影を出さない(従来どおり)ので、基底Drawではなく本体だけを描く
 	model_->Draw();
 }
 

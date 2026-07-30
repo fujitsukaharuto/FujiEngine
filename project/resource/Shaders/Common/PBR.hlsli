@@ -1,7 +1,5 @@
 // 物理ベースの BRDF (Cook-Torrance / metallic-roughness ワークフロー)。
-//
-// 直接光の1光源ぶんの寄与を BRDF() が返す。減衰(距離やスポットの絞り)は呼び出し側の責任で、
-// ここには入れない。旧実装の減衰カーブをそのまま使いたいため。
+// 減衰(距離やスポットの絞り)は呼び出し側の責任で、ここには入れない
 
 static const float kPI = 3.14159265359f;
 
@@ -73,10 +71,7 @@ float3 BRDF(float3 N, float3 V, float3 L, float3 diffuseColor, float3 f0, float 
 /// <summary>
 /// 半球アンビエント。法線の上下で空色と地面色を混ぜるだけの簡易版
 /// </summary>
-/// <remarks>
-/// 本来はスカイボックスから irradiance を焼いた IBL に置き換えるべき所。
-/// 鏡面のアンビエント(prefiltered + BRDF LUT)はまだ無い
-/// </remarks>
+/// <remarks>本来は irradiance を焼いた IBL に置き換える所。鏡面のアンビエントはまだ無い</remarks>
 float3 HemisphereAmbient(float3 N, float3 skyColor, float3 groundColor, float intensity)
 {
     float t = N.y * 0.5f + 0.5f;

@@ -82,6 +82,9 @@ namespace Graphics {
 		/// <summary>アニメーションをループさせるか</summary>
 		void IsLoopAnimation(bool is) { isLoopAnimation_ = is; }
 
+		/// <summary>スキニング後のメッシュ。加速構造(BLAS)の構築に使う</summary>
+		const std::vector<SkinnedMesh>& GetSkinnedMeshes() const { return skinnedMeshes_; }
+
 
 	private:
 

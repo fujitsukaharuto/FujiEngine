@@ -1,5 +1,6 @@
 #include "Object3d.hlsli"
 #include "../Common/PBR.hlsli"
+#include "../Common/RayTracedShadow.hlsli"
 
 // 構造体(Material / 各種ライト / Camera)は Object3d.hlsli にまとめてある
 
@@ -11,6 +12,7 @@ struct PickingBuffer
 
 ConstantBuffer<Material> gMaterial : register(b1);
 Texture2D<float4> gTextures[] : register(t0);
+
 SamplerState gSampler : register(s0);
 ConstantBuffer<AllLights> gLights : register(b2);
 ConstantBuffer<Camera> gCamera : register(b3);
@@ -113,6 +115,10 @@ PixelShaderOutput main(VertxShaderOutput input)
             DirectionalLight light = gLights.directionalLights[i];
             float3 L = normalize(-light.direction);
             float3 radiance = light.color.rgb * light.intensity;
+
+            // 平行光源のみ。点光源/スポットは本数ぶんレイが増えるので後回し
+            radiance *= TraceShadow(input.WorldPosition, L, normal, gLights.enableRayTracedShadow);
+
             totalLight += BRDF(normal, toEye, L, diffuseColor, f0, roughness) * radiance;
         }
 

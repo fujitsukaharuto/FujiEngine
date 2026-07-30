@@ -9,8 +9,7 @@ CommandContext::~CommandContext() {
 }
 
 bool CommandContext::Initialize(ID3D12Device* device, D3D12_COMMAND_LIST_TYPE type) {
-	// 失敗したものを名前付きで残す。assert は Develop/Release(NDEBUG) で消えるため、
-	// ログだけは全構成で必ず出しておかないと原因の場所が分からなくなる
+	// assert は NDEBUG で消えるので、ログだけは全構成で出す
 	auto fail = [&](const char* what, HRESULT hr) {
 		Logger::Log(std::format("CommandContext::Initialize failed at {}. type={}, hr=0x{:08X}\n",
 			what, static_cast<int>(type), static_cast<uint32_t>(hr)));
@@ -38,8 +37,7 @@ bool CommandContext::Initialize(ID3D12Device* device, D3D12_COMMAND_LIST_TYPE ty
 	if (FAILED(hr)) { return fail("CreateCommandList", hr); }
 	list_->Close(); // 最初は閉じた状態にしておく
 
-	// 加速構造の構築（BuildRaytracingAccelerationStructure）に必要。
-	// 非対応環境でも起動は続けたいので、失敗しても nullptr のままにしておく
+	// 非対応環境でも起動は続けたいので、失敗しても nullptr のままにする
 	if (FAILED(list_.As(&list4_))) {
 		list4_ = nullptr;
 	}

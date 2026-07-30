@@ -57,10 +57,7 @@ namespace DXC {
 		/// <summary>
 		/// レイトレの加速構造(TLAS)用のSRVを生成する
 		/// </summary>
-		/// <remarks>
-		/// 他のSRVと違い pResource は nullptr にして、GPU仮想アドレスで場所を指す。
-		/// 加速構造の中身はドライバ定義でリソースとしての形を持たないため
-		/// </remarks>
+		/// <remarks>他のSRVと違い pResource は使わず、GPU仮想アドレスで場所を指す</remarks>
 		/// <param name="srvIndex">SRV番号</param>
 		/// <param name="tlasAddress">TLASバッファのGPU仮想アドレス</param>
 		void CreateAccelerationStructureSRV(uint32_t srvIndex, D3D12_GPU_VIRTUAL_ADDRESS tlasAddress);

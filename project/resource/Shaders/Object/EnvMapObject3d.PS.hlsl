@@ -1,5 +1,6 @@
 #include "Object3d.hlsli"
 #include "../Common/PBR.hlsli"
+#include "../Common/RayTracedShadow.hlsli"
 
 // Object3d.PS との違いは、スカイボックスのキューブマップを鏡面の環境光として足す点だけ。
 // 構造体(Material / 各種ライト / Camera)は Object3d.hlsli にまとめてある
@@ -77,6 +78,9 @@ PixelShaderOutput main(VertxShaderOutput input)
             DirectionalLight light = gLights.directionalLights[i];
             float3 L = normalize(-light.direction);
             float3 radiance = light.color.rgb * light.intensity;
+
+            radiance *= TraceShadow(input.WorldPosition, L, normal, gLights.enableRayTracedShadow);
+
             totalLight += BRDF(normal, toEye, L, diffuseColor, f0, roughness) * radiance;
         }
 
@@ -97,9 +101,7 @@ PixelShaderOutput main(VertxShaderOutput input)
             totalLight += BRDF(normal, toEye, L, diffuseColor, f0, roughness) * radiance;
         }
 
-        // 鏡面の環境光。本来は粗さでミップを選んだ prefiltered map を引くべき所で、
-        // ここでは鏡面反射のキューブマップをそのまま使う暫定版。
-        // 旧実装と違うのは、フレネルと粗さで減衰させて金属だけが強く映り込むようにした点
+        // 鏡面の環境光。本来は粗さでミップを選ぶ prefiltered map を引く所の暫定版
         float3 reflectedVector = reflect(-toEye, normal);
         float3 environmentColor = gEnvironment.Sample(gSampler, reflectedVector).rgb;
 

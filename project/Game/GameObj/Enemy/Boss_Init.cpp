@@ -31,15 +31,6 @@ void Boss::Initialize() {
 
 	animeModel_->LoadTransformFromJson("boss_transform.json");
 
-	shadow_ = AddRenderer("Sphere");
-	shadow_->SetTexture("white2x2.png");
-	shadow_->SetColor({ 0.02f,0.02f,0.02f,0.0f });
-	shadow_->SetLightEnable(LightMode::kLightNone);
-	shadow_->GetTransform().translate = animeModel_->GetTransform().translate;
-	shadow_->GetTransform().translate.y = kShadowPosY_;
-	shadow_->GetTransform().scale = { 3.0f,0.0f,3.0f };
-	shadow_->GetTransform().scale.y = 0.1f;
-
 	collider_ = AddCollider("Boss");
 	collider_->SetParent(&animeModel_->GetTransform());
 	collider_->SetOffset({ 0.0f,7.0f,0.0f });

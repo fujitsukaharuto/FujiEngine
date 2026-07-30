@@ -1,11 +1,6 @@
-// 画面へ出す最終パス。リニアHDRのオフスクリーンを露光・トーンマップして表示レンジへ落とす。
-//
-// NonePost.PS と分けてあるのは、あちらが Pipe::GPUParticleSynthesis と共用で、
-// そちらは「オフスクリーン → オフスクリーン」の加算合成なのでトーンマップしてはいけないため。
-// このシェーダは Pipe::None (= バックバッファへの最終出力) 専用。
-//
-// 出力先のRTVが _SRGB なので、sRGBへのエンコードはハードウェアが行う。
-// ここでは絶対に自前でガンマを掛けないこと(二重に掛かる)。
+// 画面へ出す最終パス(Pipe::None 専用)。リニアHDRを露光・トーンマップして表示レンジへ落とす。
+// NonePost.PS と分けてあるのは、あちらが加算合成と共用でトーンマップしてはいけないため。
+// 出力先のRTVが _SRGB なのでガンマは自前で掛けないこと(二重になる)
 
 Texture2D g_InputTexture : register(t0);
 SamplerState g_Sampler : register(s0);
@@ -28,8 +23,7 @@ float3 Reinhard(float3 x)
     return x / (1.0f + x);
 }
 
-// ACES のフィルミックカーブ近似 (Krzysztof Narkowicz)
-// 1.0 -> 0.80 / 2.0 -> 0.93 / 4.0 -> 0.98 と、明部を緩やかに詰めていく
+// ACES のフィルミックカーブ近似 (Krzysztof Narkowicz)。1.0 -> 0.80 / 2.0 -> 0.93
 float3 ACESFilm(float3 x)
 {
     const float a = 2.51f;

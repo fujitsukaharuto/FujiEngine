@@ -45,13 +45,8 @@ namespace DXC {
 		D3D12_RAYTRACING_TIER GetRaytracingTier() const { return raytracingTier_; }
 		D3D_SHADER_MODEL GetHighestShaderModel() const { return highestShaderModel_; }
 
-		/// <summary>
-		/// インラインレイトレ（RayQuery）が使えるか
-		/// </summary>
-		/// <remarks>
-		/// RayQuery は DXR Tier 1.1 とシェーダーモデル 6.5 の両方を要求する。
-		/// どちらかが欠けると PSO 生成時に落ちるので、影のパスはこれで分岐すること。
-		/// </remarks>
+		/// <summary>インラインレイトレ（RayQuery）が使えるか</summary>
+		/// <remarks>Tier 1.1 とシェーダーモデル 6.5 の両方が要る</remarks>
 		bool IsRayQuerySupported() const {
 			return raytracingTier_ >= D3D12_RAYTRACING_TIER_1_1 &&
 				highestShaderModel_ >= D3D_SHADER_MODEL_6_5 &&

@@ -76,7 +76,7 @@ struct AllLights
     float3 ambientSkyColor;
     float ambientIntensity;
     float3 ambientGroundColor;
-    float pad1;
+    uint enableRayTracedShadow; // レイトレ影のON/OFF。元は pad1 で、大きさが同じなのでレイアウトは変わらない
 };
 
 struct Camera

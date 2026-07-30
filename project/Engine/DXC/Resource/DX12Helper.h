@@ -9,13 +9,7 @@ namespace DXC {
 	/// <summary>
 	/// シーンを描くオフスクリーンのフォーマット
 	/// </summary>
-	/// <remarks>
-	/// 1.0 を超える明るさを最後のトーンマップまで潰さずに運ぶため浮動小数点にしてある
-	/// (8bit UNORM は 0〜1 しか持てない)。リニアで置くので sRGB は使わない。
-	/// 帯域や ROP のブレンド速度が問題になったら R11G11B10_FLOAT へ落とせる
-	/// (1px 4バイトに戻る。現在どのブレンドモードも DEST_ALPHA を参照していないので、
-	/// アルファチャンネルが無くても成立することは確認済み)。
-	/// </remarks>
+	/// <remarks>1.0 超をトーンマップまで潰さず運ぶ。重ければ R11G11B10_FLOAT へ落とせる</remarks>
 	constexpr DXGI_FORMAT kSceneColorFormat = DXGI_FORMAT_R16G16B16A16_FLOAT;
 
 	/// <summary>
@@ -74,11 +68,7 @@ namespace DXC::Helper {
 	/// <summary>
 	/// レイトレの加速構造(BLAS/TLAS)を格納するバッファを生成する。
 	/// </summary>
-	/// <remarks>
-	/// 加速構造は必ず D3D12_RESOURCE_STATE_RAYTRACING_ACCELERATION_STRUCTURE で生成し、
-	/// 以後この状態から遷移させてはいけない(デバッグレイヤーが検出する)。
-	/// 中身はドライバ定義のBVHなのでCPUから読める形ではない
-	/// </remarks>
+	/// <remarks>RAYTRACING_ACCELERATION_STRUCTURE 状態で生成し、以後遷移させてはいけない</remarks>
 	/// <param name="device">デバイス</param>
 	/// <param name="sizeInBytes">サイズ</param>
 	/// <returns>ID3D12Resource*</returns>

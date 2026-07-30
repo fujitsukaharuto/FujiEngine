@@ -4,10 +4,32 @@
 #include "Engine/DXC/Resource/DX12Helper.h"
 #include "Engine/DXC/Resource/SRVManager.h"
 #include "Engine/Graphics/Pipeline/PipelineManager.h"
+#include "Engine/Graphics/Object/ObjectRenderer.h"
+#include "Engine/Graphics/Raytracing/RaytracingScene.h"
 
 using namespace Graphics;
 using namespace Math;
 using namespace DXC;
+
+namespace {
+
+	// スキニング後の頂点は、描画では頂点バッファ、BLAS構築ではSRVとして読まれる
+	constexpr D3D12_RESOURCE_STATES kSkinnedReadState =
+		D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
+
+	/// <summary>レイトレ影用のTLASをバインドする</summary>
+	/// <remarks>gSceneTLAS を宣言していないパイプラインで呼ぶと GetRootIndex の assert に当たる</remarks>
+	void BindSceneTLAS(ID3D12GraphicsCommandList* commandList) {
+		auto* rtScene = ObjectRenderer::GetInstance()->GetRaytracingScene();
+		if (rtScene == nullptr) { return; }
+
+		const uint32_t tlasSrv = rtScene->GetTlasSrvIndex();
+		if (tlasSrv == RaytracingScene::kInvalidSrvIndex) { return; }
+
+		PipelineManager::GetInstance()->SetGraphicsRootDescriptorTable(
+			commandList, RootName::kSceneTLAS, SRVManager::GetInstance()->GetGPUDescriptorHandle(tlasSrv));
+	}
+}
 
 
 Model::Model() {
@@ -30,6 +52,8 @@ void Model::Draw(ID3D12GraphicsCommandList* commandList, std::vector<Material>& 
 		pPipeManager->SetGraphicsRootCBV(commandList, RootName::kMaterial, materials[index].GetMaterialResource()->GetGPUVirtualAddress());
 		pPipeManager->SetGraphicsRootDescriptorTable(commandList, RootName::kTextures, SRVManager::GetInstance()->GetGPUDescriptorHandle(0));
 
+		BindSceneTLAS(commandList);
+
 		commandList->IASetVertexBuffers(0, 1, &mesh_[index].GetVBV());
 		commandList->IASetIndexBuffer(&mesh_[index].GetIBV());
 		commandList->DrawIndexedInstanced(static_cast<UINT>(mesh_[index].GetIndexCount()), 1, 0, 0, 0);
@@ -49,13 +73,14 @@ void Model::AnimationDraw(DXCom* pDxcom, ID3D12GraphicsCommandList* commandList,
 
 		pPipeManager->SetGraphicsRootCBV(commandList, RootName::kMaterial, materials[index].GetMaterialResource()->GetGPUVirtualAddress());
 		pPipeManager->SetGraphicsRootDescriptorTable(commandList, RootName::kTextures, SRVManager::GetInstance()->GetGPUDescriptorHandle(0));
+		BindSceneTLAS(commandList);
 
 		commandList->IASetVertexBuffers(0, 1, &skinnedMeshes[index].GetSkinnedVBV());
 		commandList->IASetIndexBuffer(&mesh_[index].GetIBV());
 		commandList->DrawIndexedInstanced(static_cast<UINT>(mesh_[index].GetIndexCount()), 1, 0, 0, 0);
 
 		pDxcom->TransitionResource(skinnedMeshes[index].GetSkinnedResource(),
-			D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+			kSkinnedReadState, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 
 		vertexOffset = 0;
 		vertexOffset += int(mesh_[index].GetVertexCount());
@@ -94,10 +119,6 @@ void Model::CSDispatch(DXCom* pDxcom, const SkinCluster& skinCluster, ID3D12Grap
 		commandList->SetComputeRootDescriptorTable(1, mesh_[i].GetSrvHandle().second);
 		commandList->SetComputeRootDescriptorTable(3, skinnedMeshes[i].GetUavHandle().second);
 
-		// バリアを張る
-		pDxcom->TransitionResource(skinnedMeshes[i].GetSkinnedResource(),
-			D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
-
 		// RootConstantで meshIndex を送信（b1）
 		commandList->SetComputeRoot32BitConstants(6, 1, &i, 0);
 
@@ -105,6 +126,11 @@ void Model::CSDispatch(DXCom* pDxcom, const SkinCluster& skinCluster, ID3D12Grap
 		uint32_t dispatchCount = (vertexCount + 1023) / 1024;
 
 		commandList->Dispatch(dispatchCount, 1, 1);
+
+		// 遷移は Dispatch の後。前に置くと頂点バッファ状態のままUAV書き込みすることになる。
+		// 描画とBLAS構築の両方から読むので、読み取り状態を合成しておく
+		pDxcom->TransitionResource(skinnedMeshes[i].GetSkinnedResource(),
+			D3D12_RESOURCE_STATE_UNORDERED_ACCESS, kSkinnedReadState);
 	}
 }
 
