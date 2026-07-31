@@ -1159,6 +1159,15 @@
     <None Include="resource\Shaders\Common\PBR.hlsli">
       <Filter>resource\Shaders\Common</Filter>
     </None>
+    <None Include="resource\Shaders\Common\RayTracedReflection.hlsli">
+      <Filter>resource\Shaders\Common</Filter>
+    </None>
+    <None Include="resource\Shaders\Common\RayTracedShadow.hlsli">
+      <Filter>resource\Shaders\Common</Filter>
+    </None>
+    <None Include="resource\Shaders\Common\RayTracedAO.hlsli">
+      <Filter>resource\Shaders\Common</Filter>
+    </None>
     <None Include="resource\Shaders\Particle\GPU\Splat.hlsli">
       <Filter>resource\Shaders\Particle\GPU</Filter>
     </None>

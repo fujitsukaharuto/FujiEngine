@@ -53,7 +53,7 @@ namespace Graphics {
 			int32_t enableLighting;
 			float roughness = 0.5f;			// 0=鏡面 1=完全に拡散
 			float AlphaRef = 0.5f;
-			float environmentCoefficient = 1.0f;
+			float environmentCoefficient = 0.0f;	// 鏡面の環境光。オプトインなので既定は映り込ませない
 			int32_t useNormalMap = 0;
 			int32_t textureIndex = 0;
 			int32_t normalMapIndex = 0;
@@ -80,6 +80,7 @@ namespace Graphics {
 		int32_t GetUseNormalMap() { return materialData_.useNormalMap; }
 		float GetRoughness() const { return materialData_.roughness; }
 		float GetMetallic() const { return materialData_.metallic; }
+		float GetEnvironment() const { return materialData_.environmentCoefficient; }
 
 		//========================================================================*/
 		//* Setter

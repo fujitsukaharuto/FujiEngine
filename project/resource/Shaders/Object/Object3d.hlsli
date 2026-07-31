@@ -76,7 +76,19 @@ struct AllLights
     float3 ambientSkyColor;
     float ambientIntensity;
     float3 ambientGroundColor;
-    uint enableRayTracedShadow; // レイトレ影のON/OFF。元は pad1 で、大きさが同じなのでレイアウトは変わらない
+    uint rayTracedShadowMask; // 光源の種類ごとに影を切るビット(RayTracedShadow.hlsli の kShadowMask*)
+
+    // レイトレAO。半球アンビエントにだけ掛かる
+    float aoRadius;
+    float aoIntensity;
+    uint aoSampleCount;
+    uint enableAO;
+
+    // 鏡面の環境光の遮蔽
+    float reflectionMaxDistance;
+    float reflectionIntensity;
+    uint enableReflection;
+    uint pad2;
 };
 
 struct Camera

@@ -88,6 +88,11 @@ void ObjectRenderer::BuildRaytracingScene() {
 
 	raytracingScene_->BeginFrame();
 	for (RenderObject* obj : renderQueue_) {
+		// 加算合成かどうかは Draw() で決まるので、この時点の値はこのフレームのもの
+		if (!obj->IsRayOccluder()) {
+			continue;
+		}
+
 		if (obj->IsSkinned()) {
 			// IsSkinned() を返すのは AnimationModel だけ
 			auto* skinned = static_cast<AnimationModel*>(obj);

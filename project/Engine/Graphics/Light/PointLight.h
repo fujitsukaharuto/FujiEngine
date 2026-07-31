@@ -19,9 +19,10 @@ namespace Graphics {
 		float decay = 1.0f;
 		float padding[2];
 
-		// 互換性のためのセッター
+		// 互換性のためのセッター。
+		// PointLight::SetAttenuationLight(time, intensity) とは引数の意味が違うので同名にしない
 		void SetLightPos(const Math::Vector3& pos) { position = pos; }
-		void SetAttenuationLight(float rad, float dec) { radius = rad; decay = dec; }
+		void SetAttenuation(float rad, float dec) { radius = rad; decay = dec; }
 		void SetColor(const Math::Vector4& col) { color = col; }
 		void SetIntensity(float inst) { intensity = inst; }
 	};

@@ -36,6 +36,8 @@ void Arrow::Initialize() {
 	arrivalWarningPotion_->SetTexture("white2x2.png");
 	arrivalWarningPotion_->SetColor({ 0.8f,0.0f,0.0f,0.4f });
 	arrivalWarningPotion_->SetLightEnable(LightMode::kLightNone);
+	// 地面に貼る予告の印なので影は落とさない
+	arrivalWarningPotion_->SetCastShadow(false);
 	arrivalWarningPotion_->GetTransform().scale = { 2.0f,0.0f,2.0f };
 	arrivalWarningPotion_->GetTransform().scale.y = 0.1f;
 

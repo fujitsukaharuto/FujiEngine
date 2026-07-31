@@ -16,6 +16,17 @@ namespace Graphics {
 	const int kMaxSpotLights = 10;
 
 	/// <summary>
+	/// レイトレ影を光源の種類ごとに切るビット
+	/// </summary>
+	/// <remarks>HLSL 側 (Common/RayTracedShadow.hlsli) の kShadowMask* と同じ値であること</remarks>
+	enum RayTracedShadowMask : uint32_t {
+		kShadowMaskDirectional = 1u << 0,
+		kShadowMaskPoint = 1u << 1,
+		kShadowMaskSpot = 1u << 2,
+		kShadowMaskAll = kShadowMaskDirectional | kShadowMaskPoint | kShadowMaskSpot,
+	};
+
+	/// <summary>
 	/// 全てのライトをまとめた構造体
 	/// </summary>
 	/// <remarks>
@@ -37,8 +48,20 @@ namespace Graphics {
 		float ambientIntensity = 0.30f;
 		Math::Vector3 ambientGroundColor = { 0.20f, 0.17f, 0.14f };
 
-		// レイトレ影のON/OFF。元は pad1 なのでCBのレイアウトは変わっていない
-		uint32_t enableRayTracedShadow = 1;
+		uint32_t rayTracedShadowMask = kShadowMaskAll;
+
+		// レイトレAO。半球アンビエントにだけ掛かる。
+		// デノイザが無く粒状のノイズが出るので既定は無効
+		float aoRadius = 2.0f;
+		float aoIntensity = 1.0f;
+		uint32_t aoSampleCount = 4;
+		uint32_t enableAO = 0;
+
+		// 鏡面の環境光の遮蔽。有効にすると遮られた場所が暗くなり既存の絵が変わるので既定は無効
+		float reflectionMaxDistance = 100.0f;
+		float reflectionIntensity = 1.0f;
+		uint32_t enableReflection = 0;
+		uint32_t pad2 = 0;
 	};
 
 	/// <summary>

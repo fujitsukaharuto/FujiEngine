@@ -6,6 +6,7 @@
 #include "Engine/Graphics/Pipeline/PipelineManager.h"
 #include "Engine/Graphics/Object/ObjectRenderer.h"
 #include "Engine/Graphics/Raytracing/RaytracingScene.h"
+#include "Engine/Graphics/Texture/TextureManager.h"
 
 using namespace Graphics;
 using namespace Math;
@@ -28,6 +29,20 @@ namespace {
 
 		PipelineManager::GetInstance()->SetGraphicsRootDescriptorTable(
 			commandList, RootName::kSceneTLAS, SRVManager::GetInstance()->GetGPUDescriptorHandle(tlasSrv));
+	}
+
+	/// <summary>鏡面の環境光に使うキューブマップをバインドする</summary>
+	/// <remarks>Object3d.PS / EnvMapObject3d.PS が gEnvironment を宣言しているので、無いと未バインドになる</remarks>
+	void BindEnvironment(ID3D12GraphicsCommandList* commandList) {
+		// 再読み込みでも Texture の実体は使い回されるので、名前引きは一度でよい
+		static Texture* environment = nullptr;
+		if (environment == nullptr) {
+			environment = TextureManager::GetInstance()->LoadTexture("skyboxTexture.dds");
+		}
+		if (environment == nullptr) { return; }
+
+		PipelineManager::GetInstance()->SetGraphicsRootDescriptorTable(
+			commandList, RootName::kEnvironment, environment->gpuHandle);
 	}
 }
 
@@ -53,6 +68,7 @@ void Model::Draw(ID3D12GraphicsCommandList* commandList, std::vector<Material>& 
 		pPipeManager->SetGraphicsRootDescriptorTable(commandList, RootName::kTextures, SRVManager::GetInstance()->GetGPUDescriptorHandle(0));
 
 		BindSceneTLAS(commandList);
+		BindEnvironment(commandList);
 
 		commandList->IASetVertexBuffers(0, 1, &mesh_[index].GetVBV());
 		commandList->IASetIndexBuffer(&mesh_[index].GetIBV());
@@ -74,6 +90,7 @@ void Model::AnimationDraw(DXCom* pDxcom, ID3D12GraphicsCommandList* commandList,
 		pPipeManager->SetGraphicsRootCBV(commandList, RootName::kMaterial, materials[index].GetMaterialResource()->GetGPUVirtualAddress());
 		pPipeManager->SetGraphicsRootDescriptorTable(commandList, RootName::kTextures, SRVManager::GetInstance()->GetGPUDescriptorHandle(0));
 		BindSceneTLAS(commandList);
+		BindEnvironment(commandList);
 
 		commandList->IASetVertexBuffers(0, 1, &skinnedMeshes[index].GetSkinnedVBV());
 		commandList->IASetIndexBuffer(&mesh_[index].GetIBV());

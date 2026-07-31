@@ -75,6 +75,13 @@ namespace Graphics {
 		void SetBillboardMat(const Math::Matrix4x4& mat) { billboardMatrix_ = mat; }
 		/// <summary>ライトモードの設定</summary>
 		void SetLightEnable(LightMode mode);
+		/// <summary>影やAOのレイで遮蔽物として扱うか</summary>
+		void SetCastShadow(bool is) { castShadow_ = is; }
+
+		bool IsCastShadow() const { return castShadow_; }
+		/// <summary>遮蔽物として加速構造に載せるか</summary>
+		/// <remarks>加算合成は光を足す表現なので、castShadow_ に関わらず遮蔽しない</remarks>
+		bool IsRayOccluder() const { return castShadow_ && !isAdd_; }
 
 	protected:
 
@@ -106,6 +113,7 @@ namespace Graphics {
 		std::string modelName_;
 
 		bool isAdd_ = false;
+		bool castShadow_ = true;
 
 		DXC::DXCom* dxcommon_ = nullptr;
 		LightManager* lightManager_ = nullptr;

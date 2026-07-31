@@ -203,8 +203,11 @@ public:
 	Math::Vector3 GetFrontPos();
 	Math::Vector3 GetDamageLightPos();
 	float GetCameraRange() { return cameraRange_; }
-	float GetLightTime() { return damageLightTime_; }
-	float GetLightIntensity() { return damageLightIntensity_; }
+
+	/// <summary>ダメージライトの今の明るさ。点いていなければ0</summary>
+	float GetDamageLightIntensity() const;
+	float GetDamageLightRadius() const { return damageLightRadius_; }
+
 	float GetCameraFollowSpeed() { return cameraFollowSpeed_; }
 	const Math::Vector3& GetSummonCameraRotate() { return summonCameraRotate_; }
 
@@ -325,8 +328,11 @@ private:
 	float baseShakeTime_ = 10.0f;
 	float shakeSize_ = 4.0f;
 	float hpIndent = 1.0f;
+	// ダメージを受けた瞬間に damageLightIntensity_ で点灯し、damageLightTime_ 秒かけて0へ落とす
 	float damageLightTime_ = 0.3f;
 	float damageLightIntensity_ = 5.0f;
+	float damageLightRadius_ = 10.0f;
+	float damageLightTimer_ = 0.0f;
 	std::vector<std::unique_ptr<Graphics::Sprite>> hpSprites_;
 	std::vector<std::unique_ptr<Graphics::Sprite>> hpFrame_;
 	Math::Vector2 hpSize_ = { 130.0f,35.0f };

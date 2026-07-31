@@ -107,12 +107,52 @@ void LightManager::DebugGUI() {
 			// 0 にすると光の当たらない面は完全な黒になる
 			ImGui::ColorEdit3("SkyColor", &allLightsData_.ambientSkyColor.x);
 			ImGui::ColorEdit3("GroundColor", &allLightsData_.ambientGroundColor.x);
-
-			bool enableShadow = (allLightsData_.enableRayTracedShadow != 0);
-			if (ImGui::Checkbox("RayTracedShadow", &enableShadow)) {
-				allLightsData_.enableRayTracedShadow = enableShadow ? 1u : 0u;
-			}
 			ImGui::DragFloat("Intensity##ambient", &allLightsData_.ambientIntensity, 0.01f, 0.0f, 10.0f);
+			ImGui::TreePop();
+		}
+
+		if (ImGui::TreeNode("RayTraced Shadow")) {
+			auto maskCheckbox = [this](const char* label, uint32_t bit) {
+				bool enabled = (allLightsData_.rayTracedShadowMask & bit) != 0;
+				if (ImGui::Checkbox(label, &enabled)) {
+					if (enabled) {
+						allLightsData_.rayTracedShadowMask |= bit;
+					} else {
+						allLightsData_.rayTracedShadowMask &= ~bit;
+					}
+				}
+			};
+
+			maskCheckbox("Directional", kShadowMaskDirectional);
+			maskCheckbox("Point", kShadowMaskPoint);
+			maskCheckbox("Spot", kShadowMaskSpot);
+			ImGui::TreePop();
+		}
+
+		if (ImGui::TreeNode("RayTraced AO")) {
+			bool enableAO = (allLightsData_.enableAO != 0);
+			if (ImGui::Checkbox("Enable##ao", &enableAO)) {
+				allLightsData_.enableAO = enableAO ? 1u : 0u;
+			}
+			// レイの本数がそのまま負荷になるので、上げるときはFPSを見ること
+			int sampleCount = static_cast<int>(allLightsData_.aoSampleCount);
+			if (ImGui::SliderInt("Samples", &sampleCount, 1, 16)) {
+				allLightsData_.aoSampleCount = static_cast<uint32_t>(sampleCount);
+			}
+			// この距離までの遮蔽物しか見ないので、シーンのスケールに合わせる
+			ImGui::DragFloat("Radius##ao", &allLightsData_.aoRadius, 0.05f, 0.0f, 100.0f);
+			ImGui::SliderFloat("Intensity##ao", &allLightsData_.aoIntensity, 0.0f, 1.0f);
+			ImGui::TreePop();
+		}
+
+		if (ImGui::TreeNode("RayTraced Reflection")) {
+			// 切ると遮蔽を見ずに環境色をそのまま引く(レイトレ導入前と同じ絵)
+			bool enableReflection = (allLightsData_.enableReflection != 0);
+			if (ImGui::Checkbox("Occlusion##reflection", &enableReflection)) {
+				allLightsData_.enableReflection = enableReflection ? 1u : 0u;
+			}
+			ImGui::DragFloat("MaxDistance##reflection", &allLightsData_.reflectionMaxDistance, 1.0f, 0.0f, 10000.0f);
+			ImGui::SliderFloat("Intensity##reflection", &allLightsData_.reflectionIntensity, 0.0f, 2.0f);
 			ImGui::TreePop();
 		}
 

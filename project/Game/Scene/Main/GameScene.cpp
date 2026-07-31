@@ -75,10 +75,12 @@ void GameScene::Update() {
 			followCamera_->ResetFollowSpeed();
 			AudioPlayer::GetInstance()->SoundLoop(*bgm_, 0.025f);
 		}
+		// GetIsDamageLight() は読むと下りる立ち上がり検出。位置はそこで決め、明るさは毎フレーム送る
 		if (boss_->GetIsDamageLight()) {
 			lightManager_->GetPointLight()->SetLightPos(boss_->GetDamageLightPos());
-			lightManager_->GetPointLight()->SetAttenuationLight(boss_->GetLightTime(), boss_->GetLightIntensity());
+			lightManager_->GetPointLight()->SetAttenuation(boss_->GetDamageLightRadius(), 1.0f);
 		}
+		lightManager_->GetPointLight()->SetIntensity(boss_->GetDamageLightIntensity());
 	} else {
 		AudioPlayer::GetInstance()->SoundStopWave(*bgm_);
 		GameOverUpdate();

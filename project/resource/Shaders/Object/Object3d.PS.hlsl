@@ -1,6 +1,8 @@
 #include "Object3d.hlsli"
 #include "../Common/PBR.hlsli"
 #include "../Common/RayTracedShadow.hlsli"
+#include "../Common/RayTracedAO.hlsli"
+#include "../Common/RayTracedReflection.hlsli"
 
 // 構造体(Material / 各種ライト / Camera)は Object3d.hlsli にまとめてある
 
@@ -105,9 +107,15 @@ PixelShaderOutput main(VertxShaderOutput input)
         float3 f0 = lerp(kDielectricF0, albedo, metallic);
         float3 diffuseColor = albedo * (1.0f - metallic);
 
-        // 光の当たらない面の明るさはこれが全て(PBRには Half-Lambert のような回り込みが無い)
+        // 光の当たらない面の明るさはこれが全て(PBRには Half-Lambert のような回り込みが無い)。
+        // アンビエントは向きを持たないので、遮蔽はAOで別に掛ける
+        float ao = TraceAO(input.WorldPosition, normal, gLights.aoSampleCount,
+                           gLights.aoRadius, gLights.aoIntensity, gLights.enableAO);
         float3 totalLight = HemisphereAmbient(normal, gLights.ambientSkyColor,
-                                              gLights.ambientGroundColor, gLights.ambientIntensity) * diffuseColor;
+                                              gLights.ambientGroundColor, gLights.ambientIntensity) * diffuseColor * ao;
+
+        // どのループも寄与が0の光源はレイを飛ばす前に落とす。
+        // BRDF は NdotL<=0 で0を返すので、間引いても絵は変わらない
 
         // Directional Lights
         for (int i = 0; i < gLights.numDirectionalLights; i++)
@@ -115,9 +123,12 @@ PixelShaderOutput main(VertxShaderOutput input)
             DirectionalLight light = gLights.directionalLights[i];
             float3 L = normalize(-light.direction);
             float3 radiance = light.color.rgb * light.intensity;
+            if (!any(radiance > 0.0f) || dot(normal, L) <= 0.0f)
+            {
+                continue;
+            }
 
-            // 平行光源のみ。点光源/スポットは本数ぶんレイが増えるので後回し
-            radiance *= TraceShadow(input.WorldPosition, L, normal, gLights.enableRayTracedShadow);
+            radiance *= TraceShadowDirectional(input.WorldPosition, L, normal, gLights.rayTracedShadowMask);
 
             totalLight += BRDF(normal, toEye, L, diffuseColor, f0, roughness) * radiance;
         }
@@ -128,6 +139,14 @@ PixelShaderOutput main(VertxShaderOutput input)
             PointLight light = gLights.pointLights[j];
             float3 L = normalize(light.position - input.WorldPosition);
             float3 radiance = light.color.rgb * light.intensity * PointLightAttenuation(light, input.WorldPosition);
+            if (!any(radiance > 0.0f) || dot(normal, L) <= 0.0f)
+            {
+                continue;
+            }
+
+            radiance *= TraceShadowPunctual(input.WorldPosition, light.position, normal,
+                                            gLights.rayTracedShadowMask, kShadowMaskPoint);
+
             totalLight += BRDF(normal, toEye, L, diffuseColor, f0, roughness) * radiance;
         }
 
@@ -138,8 +157,29 @@ PixelShaderOutput main(VertxShaderOutput input)
             float3 lightDirOnSurface = normalize(input.WorldPosition - light.position);
             float3 L = -lightDirOnSurface;
             float3 radiance = light.color.rgb * light.intensity * SpotLightAttenuation(light, input.WorldPosition, lightDirOnSurface);
+            if (!any(radiance > 0.0f) || dot(normal, L) <= 0.0f)
+            {
+                continue;
+            }
+
+            radiance *= TraceShadowPunctual(input.WorldPosition, light.position, normal,
+                                            gLights.rayTracedShadowMask, kShadowMaskSpot);
+
             totalLight += BRDF(normal, toEye, L, diffuseColor, f0, roughness) * radiance;
         }
+
+        // 鏡面の環境光。金属は拡散反射を持たないので、これが無いと直接光のハイライト以外は黒くなる
+        float3 ambientColor = HemisphereAmbient(normal, gLights.ambientSkyColor,
+                                                gLights.ambientGroundColor, gLights.ambientIntensity);
+        float3 environmentColor = TraceReflection(input.WorldPosition, normal, toEye, ambientColor * ao,
+                                                  gLights.reflectionMaxDistance, gLights.enableReflection, gSampler);
+
+        float NdotV = saturate(dot(normal, toEye));
+        float3 fresnel = F_Schlick(f0, NdotV);
+        // 粗い面ほど映り込みがぼやけて弱く見えるので、その代用として単純に落とす
+        float3 specularEnv = environmentColor * fresnel * (1.0f - roughness);
+
+        totalLight += specularEnv * gMaterial.environmentCoefficient * gLights.reflectionIntensity;
 
         output.color.rgb = totalLight;
         output.color.a = gMaterial.color.a * textureColor.a;

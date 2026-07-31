@@ -78,6 +78,20 @@ namespace Editor {
 		if (ImGui::SliderFloat("metallic", &metallic, 0.0f, 1.0f)) {
 			material.SetMetallic(metallic);
 		}
+		// 鏡面の環境光の強さ。金属はこれを上げないと直接光のハイライト以外が黒くなる
+		float environment = material.GetEnvironment();
+		if (ImGui::SliderFloat("environmentCoeff", &environment, 0.0f, 1.0f)) {
+			material.SetEnvironment(environment);
+		}
+
+		ImGui::SeparatorText("RayTracing");
+		bool castShadow = obj.IsCastShadow();
+		if (ImGui::Checkbox("CastShadow", &castShadow)) {
+			obj.SetCastShadow(castShadow);
+		}
+		if (castShadow && !obj.IsRayOccluder()) {
+			ImGui::TextDisabled("additive: never occludes");
+		}
 
 		ImGui::TreePop();
 	}

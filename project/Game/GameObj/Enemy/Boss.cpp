@@ -85,6 +85,14 @@ void Boss::Update() {
 		}
 	}
 
+	// ダメージライトは見た目だけの効果なので、ボスがどの状態でも落とし切る
+	if (damageLightTimer_ > 0.0f) {
+		damageLightTimer_ -= FPSKeeper::DeltaTime();
+		if (damageLightTimer_ < 0.0f) {
+			damageLightTimer_ = 0.0f;
+		}
+	}
+
 	ParticleManager::GetSphereEmitter(halfAuraCS_).SetPos({ animeModel_->GetTransform().translate.x,animeModel_->GetTransform().translate.y + params_.jump.height,animeModel_->GetTransform().translate.z });
 	ParticleManager::GetSphereEmitter(halfSmallAuraCS_).SetPos({ animeModel_->GetTransform().translate.x,animeModel_->GetTransform().translate.y + params_.jump.height,animeModel_->GetTransform().translate.z });
 	ParticleManager::GetSphereEmitter(leftHandAuraCS_).SetPos(animeModel_->GetJointWorldPos("mixamorig:LeftHand"));
@@ -132,6 +140,7 @@ void Boss::ReStart() {
 	isStart_ = true;
 	isActiveSprite_ = false;
 	isDamageLight_ = false;
+	damageLightTimer_ = 0.0f;
 	startTime_ = kStartTime_;
 	animeModel_->ChangeAnimation("roaring");
 	animeModel_->LoadTransformFromJson("boss_transform.json");
@@ -148,6 +157,7 @@ void Boss::ReduceBossHP(bool isStrong) {
 			bossHp_ -= kNormalDamage_;
 		}
 		isDamageLight_ = true;
+		damageLightTimer_ = damageLightTime_;
 		// フェーズやHPの段階を切り替える為の処理
 		switch (BossHPState(nowHpIndex_)) {
 		case BossHPState::Max:
@@ -525,6 +535,14 @@ bool Boss::GetIsDamageLight() {
 		isDamageLight_ = !isDamageLight_;
 	}
 	return result;
+}
+
+float Boss::GetDamageLightIntensity() const {
+	if (damageLightTimer_ <= 0.0f) {
+		return 0.0f;
+	}
+	// 点いた瞬間が最大で、そこから線形に0へ落とす
+	return damageLightIntensity_ * (damageLightTimer_ / damageLightTime_);
 }
 
 float Boss::GetChainRate() {
