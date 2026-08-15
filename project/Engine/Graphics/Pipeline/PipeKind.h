@@ -9,6 +9,10 @@ namespace Graphics {
 
 		None,
 		GPUParticleSynthesis, // 1/4解像度GPUパーティクルRTをシーンへ加算合成するフルスクリーンパイプ
+		DepthNormalPrepass, // 本描画の前に深度とワールド法線だけを書き出すG-Bufferパス
+		RayTracedAOCS,        // G-Bufferを元に画面空間でAOを計算する
+		AODenoiseTemporalCS,  // 前フレームへ再投影してAOを蓄積する
+		AODenoiseSpatialCS,   // à-trous のエッジ保持ブラーを1回掛ける
 		Normal,
 		NormalAdd,
 		Sprite,

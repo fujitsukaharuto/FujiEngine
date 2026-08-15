@@ -11,6 +11,8 @@ namespace Graphics {
 	class AnimationModel;
 	class SkyBox;
 	class RaytracingScene;
+	class GBufferPass;
+	class RayTracedAOPass;
 
 	/// <summary>
 	/// 3Dオブジェクトを集めてまとめて描画するクラス
@@ -40,6 +42,12 @@ namespace Graphics {
 		/// <summary>レイトレの加速構造。RayQuery非対応環境でも非nullで、中身が空振りする</summary>
 		RaytracingScene* GetRaytracingScene() const { return raytracingScene_.get(); }
 
+		/// <summary>本描画の前に書き出す深度と法線</summary>
+		GBufferPass* GetGBufferPass() const { return gbufferPass_.get(); }
+
+		/// <summary>画面空間のAO。前方描画がここのテクスチャを引く</summary>
+		RayTracedAOPass* GetRayTracedAOPass() const { return aoPass_.get(); }
+
 	private:
 
 		void PreDraw();
@@ -49,7 +57,7 @@ namespace Graphics {
 
 	private:
 		ObjectRenderer() = default;
-		// raytracingScene_ が不完全型なのでデストラクタは .cpp 側に置く
+		// raytracingScene_ / gbufferPass_ が不完全型なのでデストラクタは .cpp 側に置く
 		~ObjectRenderer();
 
 		DXC::DXCom* dxcommon_ = nullptr;
@@ -60,6 +68,8 @@ namespace Graphics {
 		SkyBox* skyBox_ = nullptr;
 
 		std::unique_ptr<RaytracingScene> raytracingScene_;
+		std::unique_ptr<GBufferPass> gbufferPass_;
+		std::unique_ptr<RayTracedAOPass> aoPass_;
 	};
 
 }

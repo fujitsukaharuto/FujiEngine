@@ -152,6 +152,21 @@ void Object3d::Render() {
 	}
 }
 
+void Object3d::RenderPrepass() {
+	if (!model_) {
+		return;
+	}
+
+	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
+	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
+
+	// パイプラインは GBufferPass が張り済み。加算合成の張り替えもしない(プリパスに加算は来ない)
+	PipelineManager::GetInstance()->SetGraphicsRootCBV(
+		cList, RootName::kTransformationMatrix, wvpResource_[frameIndex]->GetGPUVirtualAddress());
+
+	model_->DrawPrepass(cList, material_);
+}
+
 void Object3d::AnimeDraw() {
 	SetBillboardWVP();
 

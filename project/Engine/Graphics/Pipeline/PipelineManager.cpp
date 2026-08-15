@@ -48,6 +48,12 @@ void PipelineManager::CreatePipeline() {
 		.blend = BlendType::ADD_PREMULTIPLIED, .depth = DepthMode::DISABLE,
 		.cull = D3D12_CULL_MODE_BACK });
 
+	// 深度と法線だけを書き出すプリパス。ブレンドすると法線が混ざるので合成なしで上書きする
+	CreateRenderPipe(Pipe::DepthNormalPrepass, {
+		.vsPath = L"Object/Object3d.VS.hlsl", .psPath = L"Object/DepthNormal.PS.hlsl",
+		.blend = BlendType::NONE, .depth = DepthMode::READ_WRITE,
+		.rtvFormat = DXC::kGBufferNormalFormat });
+
 	CreateRenderPipe(Pipe::Normal, {
 		.vsPath = L"Object/Object3d.VS.hlsl", .psPath = L"Object/Object3d.PS.hlsl",
 		.blend = BlendType::ALPHA, .depth = DepthMode::READ_WRITE });
@@ -94,6 +100,10 @@ void PipelineManager::CreatePipeline() {
 		.vsPath = L"Debug/BaseGrid.VS.hlsl", .psPath = L"Debug/BaseGrid.PS.hlsl",
 		.blend = BlendType::ALPHA, .depth = DepthMode::READ_WRITE,
 		.useInputLayout = false });
+
+	CreateComputePipe(Pipe::RayTracedAOCS, L"Raytracing/RayTracedAO.CS.hlsl");
+	CreateComputePipe(Pipe::AODenoiseTemporalCS, L"Raytracing/AODenoiseTemporal.CS.hlsl");
+	CreateComputePipe(Pipe::AODenoiseSpatialCS, L"Raytracing/AODenoiseSpatial.CS.hlsl");
 
 	CreateComputePipe(Pipe::GrayCS, L"PostEffect/Grayscale.CS.hlsl");
 	CreateComputePipe(Pipe::GaussCS, L"PostEffect/Gaussian.CS.hlsl");

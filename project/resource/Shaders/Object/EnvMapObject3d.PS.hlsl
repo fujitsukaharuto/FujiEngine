@@ -2,6 +2,7 @@
 #include "../Common/PBR.hlsli"
 #include "../Common/RayTracedShadow.hlsli"
 #include "../Common/RayTracedAO.hlsli"
+#include "../Common/ScreenSpaceAO.hlsli"
 #include "../Common/RayTracedReflection.hlsli"
 
 // Object3d.PS との違いは、スカイボックスのキューブマップを鏡面の環境光として足す点だけ。
@@ -72,8 +73,8 @@ PixelShaderOutput main(VertxShaderOutput input)
         float3 f0 = lerp(kDielectricF0, albedo, metallic);
         float3 diffuseColor = albedo * (1.0f - metallic);
 
-        float ao = TraceAO(input.WorldPosition, normal, gLights.aoSampleCount,
-                           gLights.aoRadius, gLights.aoIntensity, gLights.enableAO);
+        float ao = GetAmbientOcclusion(input.position, input.WorldPosition, normal,
+                                       gLights.aoMode, gLights.aoSampleCount, gLights.aoRadius, gLights.aoIntensity);
         float3 totalLight = HemisphereAmbient(normal, gLights.ambientSkyColor,
                                               gLights.ambientGroundColor, gLights.ambientIntensity) * diffuseColor * ao;
 

@@ -95,6 +95,10 @@ void LightManager::SetLightCommand(ID3D12GraphicsCommandList* commandList) {
 	PipelineManager::GetInstance()->SetGraphicsRootCBV(commandList, RootName::kLights, allLightsResource_[frameIndex]->GetGPUVirtualAddress());
 }
 
+D3D12_GPU_VIRTUAL_ADDRESS LightManager::GetLightsGPUVirtualAddress() const {
+	return allLightsResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress();
+}
+
 void LightManager::CopyData(uint32_t frameIndex) {
 	memcpy(allLightsDataGPU_[frameIndex], &allLightsData_, sizeof(AllLightsData));
 }
@@ -130,10 +134,13 @@ void LightManager::DebugGUI() {
 		}
 
 		if (ImGui::TreeNode("RayTraced AO")) {
-			bool enableAO = (allLightsData_.enableAO != 0);
-			if (ImGui::Checkbox("Enable##ao", &enableAO)) {
-				allLightsData_.enableAO = enableAO ? 1u : 0u;
+			// Off にすると G-Buffer のプリパスごと止まるので、切っている間の負荷はゼロ
+			int aoMode = static_cast<int>(allLightsData_.aoMode);
+			if (ImGui::Combo("Mode##ao", &aoMode, "Off\0Inline (no denoise)\0Screen space\0")) {
+				allLightsData_.aoMode = static_cast<uint32_t>(aoMode);
 			}
+			ImGui::TextWrapped("Inline は前方描画のPSで直接飛ばす旧経路(デノイズ不可)。"
+				"Screen が別パス版で、こちらだけデノイザが掛かる");
 			// レイの本数がそのまま負荷になるので、上げるときはFPSを見ること
 			int sampleCount = static_cast<int>(allLightsData_.aoSampleCount);
 			if (ImGui::SliderInt("Samples", &sampleCount, 1, 16)) {

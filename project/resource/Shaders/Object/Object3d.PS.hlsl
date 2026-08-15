@@ -2,6 +2,7 @@
 #include "../Common/PBR.hlsli"
 #include "../Common/RayTracedShadow.hlsli"
 #include "../Common/RayTracedAO.hlsli"
+#include "../Common/ScreenSpaceAO.hlsli"
 #include "../Common/RayTracedReflection.hlsli"
 
 // 構造体(Material / 各種ライト / Camera)は Object3d.hlsli にまとめてある
@@ -109,8 +110,8 @@ PixelShaderOutput main(VertxShaderOutput input)
 
         // 光の当たらない面の明るさはこれが全て(PBRには Half-Lambert のような回り込みが無い)。
         // アンビエントは向きを持たないので、遮蔽はAOで別に掛ける
-        float ao = TraceAO(input.WorldPosition, normal, gLights.aoSampleCount,
-                           gLights.aoRadius, gLights.aoIntensity, gLights.enableAO);
+        float ao = GetAmbientOcclusion(input.position, input.WorldPosition, normal,
+                                       gLights.aoMode, gLights.aoSampleCount, gLights.aoRadius, gLights.aoIntensity);
         float3 totalLight = HemisphereAmbient(normal, gLights.ambientSkyColor,
                                               gLights.ambientGroundColor, gLights.ambientIntensity) * diffuseColor * ao;
 

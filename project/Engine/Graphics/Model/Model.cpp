@@ -6,6 +6,7 @@
 #include "Engine/Graphics/Pipeline/PipelineManager.h"
 #include "Engine/Graphics/Object/ObjectRenderer.h"
 #include "Engine/Graphics/Raytracing/RaytracingScene.h"
+#include "Engine/Graphics/Raytracing/RayTracedAOPass.h"
 #include "Engine/Graphics/Texture/TextureManager.h"
 
 using namespace Graphics;
@@ -44,6 +45,19 @@ namespace {
 		PipelineManager::GetInstance()->SetGraphicsRootDescriptorTable(
 			commandList, RootName::kEnvironment, environment->gpuHandle);
 	}
+
+	/// <summary>画面空間で計算済みのAOをバインドする</summary>
+	/// <remarks>
+	/// Object3d.PS / EnvMapObject3d.PS が gAOTexture を無条件に宣言しているので、
+	/// AOを計算していないフレームでもバインドしないと未バインドのテーブルを読むことになる
+	/// </remarks>
+	void BindScreenSpaceAO(ID3D12GraphicsCommandList* commandList) {
+		auto* aoPass = ObjectRenderer::GetInstance()->GetRayTracedAOPass();
+		if (aoPass == nullptr) { return; }
+
+		PipelineManager::GetInstance()->SetGraphicsRootDescriptorTable(
+			commandList, RootName::kAOTexture, aoPass->GetAOSrvHandle());
+	}
 }
 
 
@@ -69,6 +83,7 @@ void Model::Draw(ID3D12GraphicsCommandList* commandList, std::vector<Material>& 
 
 		BindSceneTLAS(commandList);
 		BindEnvironment(commandList);
+		BindScreenSpaceAO(commandList);
 
 		commandList->IASetVertexBuffers(0, 1, &mesh_[index].GetVBV());
 		commandList->IASetIndexBuffer(&mesh_[index].GetIBV());
@@ -91,6 +106,7 @@ void Model::AnimationDraw(DXCom* pDxcom, ID3D12GraphicsCommandList* commandList,
 		pPipeManager->SetGraphicsRootDescriptorTable(commandList, RootName::kTextures, SRVManager::GetInstance()->GetGPUDescriptorHandle(0));
 		BindSceneTLAS(commandList);
 		BindEnvironment(commandList);
+		BindScreenSpaceAO(commandList);
 
 		commandList->IASetVertexBuffers(0, 1, &skinnedMeshes[index].GetSkinnedVBV());
 		commandList->IASetIndexBuffer(&mesh_[index].GetIBV());
@@ -101,6 +117,38 @@ void Model::AnimationDraw(DXCom* pDxcom, ID3D12GraphicsCommandList* commandList,
 
 		vertexOffset = 0;
 		vertexOffset += int(mesh_[index].GetVertexCount());
+	}
+}
+
+void Model::DrawPrepass(ID3D12GraphicsCommandList* commandList, std::vector<Material>& materials) {
+	const size_t drawCount = (materials.size() < mesh_.size()) ? materials.size() : mesh_.size();
+
+	for (uint32_t index = 0; index < drawCount; ++index) {
+		PipelineManager* pPipeManager = PipelineManager::GetInstance();
+
+		pPipeManager->SetGraphicsRootCBV(commandList, RootName::kMaterial, materials[index].GetMaterialResource()->GetGPUVirtualAddress());
+		pPipeManager->SetGraphicsRootDescriptorTable(commandList, RootName::kTextures, SRVManager::GetInstance()->GetGPUDescriptorHandle(0));
+
+		commandList->IASetVertexBuffers(0, 1, &mesh_[index].GetVBV());
+		commandList->IASetIndexBuffer(&mesh_[index].GetIBV());
+		commandList->DrawIndexedInstanced(static_cast<UINT>(mesh_[index].GetIndexCount()), 1, 0, 0, 0);
+	}
+}
+
+void Model::AnimationDrawPrepass(ID3D12GraphicsCommandList* commandList, std::vector<SkinnedMesh>& skinnedMeshes, std::vector<Material>& materials) {
+	size_t drawCount = mesh_.size();
+	if (materials.size() < drawCount) { drawCount = materials.size(); }
+	if (skinnedMeshes.size() < drawCount) { drawCount = skinnedMeshes.size(); }
+
+	for (uint32_t index = 0; index < drawCount; ++index) {
+		PipelineManager* pPipeManager = PipelineManager::GetInstance();
+
+		pPipeManager->SetGraphicsRootCBV(commandList, RootName::kMaterial, materials[index].GetMaterialResource()->GetGPUVirtualAddress());
+		pPipeManager->SetGraphicsRootDescriptorTable(commandList, RootName::kTextures, SRVManager::GetInstance()->GetGPUDescriptorHandle(0));
+
+		commandList->IASetVertexBuffers(0, 1, &skinnedMeshes[index].GetSkinnedVBV());
+		commandList->IASetIndexBuffer(&mesh_[index].GetIBV());
+		commandList->DrawIndexedInstanced(static_cast<UINT>(mesh_[index].GetIndexCount()), 1, 0, 0, 0);
 	}
 }
 

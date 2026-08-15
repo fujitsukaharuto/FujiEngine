@@ -310,6 +310,25 @@ void AnimationModel::Render() {
 	}
 }
 
+void AnimationModel::RenderPrepass() {
+	if (!model_) {
+		return;
+	}
+
+	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
+	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
+
+	PipelineManager::GetInstance()->SetGraphicsRootCBV(
+		cList, RootName::kTransformationMatrix, wvpResource_[frameIndex]->GetGPUVirtualAddress());
+
+	if (isMirrorObj_) {
+		// ミラー指定のものはスキニングを通さず静的メッシュとして描かれるので、本描画と同じ頂点を使う
+		model_->DrawPrepass(cList, material_);
+	} else {
+		model_->AnimationDrawPrepass(cList, skinnedMeshes_, material_);
+	}
+}
+
 void AnimationModel::CSDispatch() {
 	if (!isMirrorObj_) {
 		model_->CSDispatch(dxcommon_, skinCluster_, dxcommon_->GetCommandList(), skinnedMeshes_, dxcommon_->GetNowFrameCount());

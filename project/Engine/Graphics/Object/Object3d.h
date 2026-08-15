@@ -40,6 +40,7 @@ namespace Graphics {
 		void Update() override;
 		void Draw(bool isAdd = false) override;
 		void Render() override;
+		void RenderPrepass() override;
 		/// <summary> 連番用描画 </summary>
 		void AnimeDraw();
 		// MeshDraw(Particle用)

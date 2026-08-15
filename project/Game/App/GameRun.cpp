@@ -5,6 +5,8 @@
 #include "Engine/Core/Time/FPSKeeper.h"
 #include "Engine/Graphics/Object/ObjectRenderer.h"
 #include "Engine/Graphics/Raytracing/RaytracingScene.h"
+#include "Engine/Graphics/GBuffer/GBufferPass.h"
+#include "Engine/Graphics/Raytracing/RayTracedAOPass.h"
 
 using namespace Audio;
 using namespace Core;
@@ -186,6 +188,12 @@ void GameRun::DebugGUI() {
 		if (ImGui::BeginTabItem("Raytracing")) {
 			if (auto* rtScene = ObjectRenderer::GetInstance()->GetRaytracingScene()) {
 				rtScene->DebugGUI();
+			}
+			if (auto* gbuffer = ObjectRenderer::GetInstance()->GetGBufferPass()) {
+				gbuffer->DebugGUI();
+			}
+			if (auto* aoPass = ObjectRenderer::GetInstance()->GetRayTracedAOPass()) {
+				aoPass->DebugGUI();
 			}
 			ImGui::EndTabItem();
 		}

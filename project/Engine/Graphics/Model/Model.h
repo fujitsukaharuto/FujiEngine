@@ -81,6 +81,14 @@ namespace Graphics {
 		/// <summary>アニメーションモデル用描画</summary>
 		void AnimationDraw(DXC::DXCom* pDxcom, ID3D12GraphicsCommandList* commandList, std::vector<SkinnedMesh>& skinnedMeshes, std::vector<Material>& materials);
 
+		/// <summary>深度+法線プリパス用の描画</summary>
+		/// <remarks>プリパスはマテリアルとテクスチャしか宣言していないので、Draw とは別関数にしてある</remarks>
+		void DrawPrepass(ID3D12GraphicsCommandList* commandList, std::vector<Material>& materials);
+
+		/// <summary>スキンメッシュの深度+法線プリパス用の描画</summary>
+		/// <remarks>頂点バッファの状態を戻さないのが AnimationDraw との違い。遷移は本描画に任せる</remarks>
+		void AnimationDrawPrepass(ID3D12GraphicsCommandList* commandList, std::vector<SkinnedMesh>& skinnedMeshes, std::vector<Material>& materials);
+
 		/// <summary>メッシュの追加</summary>
 		void AddMesh(Mesh&& mesh);
 

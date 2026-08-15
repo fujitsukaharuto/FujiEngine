@@ -17,6 +17,12 @@ namespace DXC {
 	/// </summary>
 	constexpr DXGI_FORMAT kSwapChainFormat = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 
+	/// <summary>
+	/// G-Buffer のワールド法線を書き出すフォーマット
+	/// </summary>
+	/// <remarks>符号化を挟まずに済むのでFP16。詰めるなら R10G10B10A2_UNORM だが符号化が要る</remarks>
+	constexpr DXGI_FORMAT kGBufferNormalFormat = DXGI_FORMAT_R16G16B16A16_FLOAT;
+
 }
 
 namespace DXC::Helper {
@@ -56,6 +62,22 @@ namespace DXC::Helper {
 	/// <param name="color">色</param>
 	/// <returns>ID3D12Resource*</returns>
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateOffscreenTextureResource(const Microsoft::WRL::ComPtr<ID3D12Device>& device, int32_t width, int32_t height, D3D12_CLEAR_VALUE color);
+
+	/// <summary>
+	/// 任意のフォーマット・用途の2Dテクスチャリソースを生成する。
+	/// </summary>
+	/// <remarks>CreateOffscreenTextureResource はフォーマットとフラグが固定なので、別のものはこちら</remarks>
+	/// <param name="device">デバイス</param>
+	/// <param name="width">横</param>
+	/// <param name="height">縦</param>
+	/// <param name="format">フォーマット</param>
+	/// <param name="flags">RTV/DSV/UAV のどれとして使うか</param>
+	/// <param name="initialState">生成直後の状態</param>
+	/// <param name="clearValue">クリア値。RTV/DSV でないなら nullptr</param>
+	/// <returns>ID3D12Resource*</returns>
+	Microsoft::WRL::ComPtr<ID3D12Resource> CreateTexture2D(ID3D12Device* device, int32_t width, int32_t height,
+		DXGI_FORMAT format, D3D12_RESOURCE_FLAGS flags, D3D12_RESOURCE_STATES initialState,
+		const D3D12_CLEAR_VALUE* clearValue);
 
 	/// <summary>
 	/// UAV（Unordered Access View）として使用可能なバッファリソースを生成する。

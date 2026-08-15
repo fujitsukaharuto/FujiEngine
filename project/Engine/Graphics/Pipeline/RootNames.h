@@ -22,6 +22,24 @@ namespace Graphics {
 		inline const RootParam kLights{ "gLights" };
 		inline const RootParam kObjIDData{ "ObjIDData" };
 		inline const RootParam kSceneTLAS{ "gSceneTLAS" };			// レイトレの加速構造(TLAS)
+		inline const RootParam kAOTexture{ "gAOTexture" };			// 画面空間の計算済みAO(前方描画が引く)
+
+		// --- G-Buffer / 画面空間レイトレ ---
+		inline const RootParam kGBufferNormal{ "gGBufferNormal" };
+		inline const RootParam kGBufferDepth{ "gGBufferDepth" };
+		inline const RootParam kGBufferNormalPrev{ "gGBufferNormalPrev" };
+		inline const RootParam kGBufferDepthPrev{ "gGBufferDepthPrev" };
+		inline const RootParam kAOOutput{ "gAOOutput" };
+		inline const RootParam kAOPassParam{ "AOPassParam" };
+
+		// --- AOのデノイザ ---
+		inline const RootParam kAORaw{ "gAORaw" };
+		inline const RootParam kAOHistoryPrev{ "gAOHistoryPrev" };
+		inline const RootParam kAOHistoryOut{ "gAOHistoryOut" };
+		inline const RootParam kAOFilterInput{ "gAOFilterInput" };
+		inline const RootParam kAOFilterOut{ "gAOFilterOut" };
+		inline const RootParam kDenoiseTemporalParam{ "DenoiseTemporalParam" };
+		inline const RootParam kDenoiseSpatialParam{ "DenoiseSpatialParam" };
 
 		// --- ピッキング ---
 		inline const RootParam kPickingData{ "PickingData" };

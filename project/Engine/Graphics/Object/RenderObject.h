@@ -29,9 +29,13 @@ namespace Graphics {
 
 		virtual void Create(const std::string& fileName) = 0;
 
-		virtual void Update() = 0; 
+		virtual void Update() = 0;
 		virtual void Draw(bool isAdd = false) = 0;
 		virtual void Render() = 0;
+
+		/// <summary>深度+法線プリパスでの描画</summary>
+		/// <remarks>バインドするものが違うので Render とは別経路。既定は何もしない＝プリパスに出ない</remarks>
+		virtual void RenderPrepass() {}
 
 		/// <summary>スキニングで頂点が毎フレーム動くか</summary>
 		/// <remarks>trueならBLASをスキニング後の頂点から毎フレーム作り直す</remarks>
@@ -79,6 +83,9 @@ namespace Graphics {
 		void SetCastShadow(bool is) { castShadow_ = is; }
 
 		bool IsCastShadow() const { return castShadow_; }
+		/// <summary>加算合成で描かれるか</summary>
+		/// <remarks>Draw() で毎フレーム決まるので、読むのは Draw より後でなければならない</remarks>
+		bool IsAdd() const { return isAdd_; }
 		/// <summary>遮蔽物として加速構造に載せるか</summary>
 		/// <remarks>加算合成は光を足す表現なので、castShadow_ に関わらず遮蔽しない</remarks>
 		bool IsRayOccluder() const { return castShadow_ && !isAdd_; }

@@ -27,6 +27,16 @@ namespace Graphics {
 	};
 
 	/// <summary>
+	/// レイトレAOをどの経路で計算するか
+	/// </summary>
+	/// <remarks>HLSL 側 (Common/RayTracedAO.hlsli) の kAOMode* と同じ値であること</remarks>
+	enum RayTracedAOMode : uint32_t {
+		kAOModeOff = 0,		// 計算しない。G-Bufferのプリパスごと止まる
+		kAOModeInline = 1,	// 前方描画のPSで直接レイを飛ばす。デノイズできないので比較用
+		kAOModeScreen = 2,	// 別パスで計算しデノイズしたものを画面空間で引く
+	};
+
+	/// <summary>
 	/// 全てのライトをまとめた構造体
 	/// </summary>
 	/// <remarks>
@@ -50,12 +60,13 @@ namespace Graphics {
 
 		uint32_t rayTracedShadowMask = kShadowMaskAll;
 
-		// レイトレAO。半球アンビエントにだけ掛かる。
-		// デノイザが無く粒状のノイズが出るので既定は無効
+		// レイトレAO。半球アンビエントにだけ掛かる
 		float aoRadius = 2.0f;
 		float aoIntensity = 1.0f;
 		uint32_t aoSampleCount = 4;
-		uint32_t enableAO = 0;
+		// 実測 1.18ms (prepass 0.10 + trace 0.55 + temporal 0.09 + spatial 0.44) で
+		// 60fps フレームの約7%。デノイザを通すとノイズが見えないのでこれを既定にする
+		uint32_t aoMode = kAOModeScreen;
 
 		// 鏡面の環境光の遮蔽。有効にすると遮られた場所が暗くなり既存の絵が変わるので既定は無効
 		float reflectionMaxDistance = 100.0f;
@@ -102,6 +113,13 @@ namespace Graphics {
 
 		//========================================================================*/
 		//* Getter
+
+		/// <summary>ライト定数バッファのGPUアドレス</summary>
+		/// <remarks>描画パイプライン以外(AOのCS等)からも同じ設定値を読むために公開している</remarks>
+		D3D12_GPU_VIRTUAL_ADDRESS GetLightsGPUVirtualAddress() const;
+
+		/// <summary>設定値そのもの。パスを走らせるかどうかの判定に使う</summary>
+		const AllLightsData& GetData() const { return allLightsData_; }
 		DirectionalLight* GetDirectionLight(int num = 0) { return &allLightsData_.directionalLights[num]; }
 		PointLightData* GetPointLight(int num = 0) { return &allLightsData_.pointLights[num]; }
 		SpotLightData* GetSpotLight(int num = 0) { return &allLightsData_.spotLights[num]; }

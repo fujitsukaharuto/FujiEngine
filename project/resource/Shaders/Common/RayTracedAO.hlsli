@@ -8,6 +8,11 @@
 
 static const float kAOTwoPI = 6.28318530718f;
 
+// AllLights::aoMode の値。C++ 側 (LightManager.h の RayTracedAOMode) と同じ値であること
+static const uint kAOModeOff = 0;    // 計算しない
+static const uint kAOModeInline = 1; // 前方描画のPSで直接飛ばす。デノイズできないので比較用
+static const uint kAOModeScreen = 2; // 別パスで計算しデノイズしたものを画面空間で引く
+
 /// <summary>法線から接空間の基底を作る(Duff et al. の分岐なし版)</summary>
 void BuildOrthonormalBasis(float3 n, out float3 tangent, out float3 bitangent)
 {
@@ -31,10 +36,10 @@ float RadicalInverse(uint i)
 /// <param name="sampleCount">飛ばすレイの本数</param>
 /// <param name="radius">この距離までの遮蔽物だけを見る</param>
 /// <param name="intensity">0で無効、1で素の遮蔽率</param>
-/// <param name="enable">0なら常に1を返す</param>
-float TraceAO(float3 worldPos, float3 N, uint sampleCount, float radius, float intensity, uint enable)
+/// <param name="rotationSeed">接空間を回す角度の種。同じ値なら同じ結果になる</param>
+float TraceAO(float3 worldPos, float3 N, uint sampleCount, float radius, float intensity, float rotationSeed)
 {
-    if (enable == 0 || sampleCount == 0 || radius <= 0.0f)
+    if (sampleCount == 0 || radius <= 0.0f)
     {
         return 1.0f;
     }
@@ -43,8 +48,7 @@ float TraceAO(float3 worldPos, float3 N, uint sampleCount, float radius, float i
     float3 bitangent;
     BuildOrthonormalBasis(N, tangent, bitangent);
 
-    // 時間に依存しないので、同じ点なら常に同じ結果になる
-    float angle = rand3dTo1d(worldPos) * kAOTwoPI;
+    float angle = rotationSeed * kAOTwoPI;
     float cosA = cos(angle);
     float sinA = sin(angle);
 

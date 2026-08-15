@@ -12,6 +12,8 @@
 #include "Engine/Graphics/Pipeline/PipelineManager.h"
 #include "Engine/Core/App/MyWindow.h"
 #include "Engine/Graphics/Raytracing/RaytracingScene.h"
+#include "Engine/Graphics/GBuffer/GBufferPass.h"
+#include "Engine/Graphics/Raytracing/RayTracedAOPass.h"
 
 using namespace Core;
 using namespace Graphics;
@@ -30,6 +32,12 @@ void ObjectRenderer::Initialize(DXCom* pDxcom, LightManager* pLightManager) {
 
 	raytracingScene_ = std::make_unique<RaytracingScene>();
 	raytracingScene_->Initialize(pDxcom);
+
+	gbufferPass_ = std::make_unique<GBufferPass>();
+	gbufferPass_->Initialize(pDxcom);
+
+	aoPass_ = std::make_unique<RayTracedAOPass>();
+	aoPass_->Initialize(pDxcom, pLightManager);
 }
 
 void ObjectRenderer::Finalize() {
@@ -39,6 +47,16 @@ void ObjectRenderer::Finalize() {
 	if (raytracingScene_) {
 		raytracingScene_->Finalize();
 		raytracingScene_.reset();
+	}
+
+	if (gbufferPass_) {
+		gbufferPass_->Finalize();
+		gbufferPass_.reset();
+	}
+
+	if (aoPass_) {
+		aoPass_->Finalize();
+		aoPass_.reset();
 	}
 }
 
@@ -61,15 +79,35 @@ void Graphics::ObjectRenderer::SetSkyBox(SkyBox* skyBox) {
 }
 
 void ObjectRenderer::Render() {
-	PreDraw();
-
 	// 描画するものがなければ何もしない
 	if (renderQueue_.empty()) {
+		PreDraw();
 		return;
 	}
 
 	// 描画中のシェーダがレイを飛ばすので、TLASは描画より先に組む
 	BuildRaytracingScene();
+
+	// 画面空間のレイトレが読む深度と法線を先に書き出す。
+	// 読み手がいないなら走らせない＝AOを切っている間はプリパスの負荷も掛からない
+	const bool needsGBuffer =
+		(lightManager_ != nullptr && lightManager_->GetData().aoMode == kAOModeScreen);
+
+	if (gbufferPass_) {
+		gbufferPass_->SetEnabled(needsGBuffer);
+		gbufferPass_->Render(renderQueue_);
+
+		if (gbufferPass_->IsRendered()) {
+			if (aoPass_ && needsGBuffer) {
+				aoPass_->Render(*gbufferPass_);
+			}
+			// プリパスがレンダーターゲットを張り替えているので本描画用へ戻す
+			dxcommon_->SetRenderTargets();
+		}
+	}
+
+	// パイプラインとライトの結線はルートシグネチャ単位なので、張り替えた後にやり直す
+	PreDraw();
 
 	// 登録されたRenderObjectをループで描画
 	for (RenderObject* obj : renderQueue_) {

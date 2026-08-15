@@ -82,7 +82,7 @@ struct AllLights
     float aoRadius;
     float aoIntensity;
     uint aoSampleCount;
-    uint enableAO;
+    uint aoMode; // RayTracedAO.hlsli の kAOMode*
 
     // 鏡面の環境光の遮蔽
     float reflectionMaxDistance;
