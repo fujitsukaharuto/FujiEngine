@@ -7,6 +7,7 @@
 #include "Engine/Graphics/Raytracing/RaytracingScene.h"
 #include "Engine/Graphics/GBuffer/GBufferPass.h"
 #include "Engine/Graphics/Raytracing/RayTracedAOPass.h"
+#include "Engine/Graphics/Raytracing/RayTracedShadowPass.h"
 
 using namespace Audio;
 using namespace Core;
@@ -194,6 +195,9 @@ void GameRun::DebugGUI() {
 			}
 			if (auto* aoPass = ObjectRenderer::GetInstance()->GetRayTracedAOPass()) {
 				aoPass->DebugGUI();
+			}
+			if (auto* shadowPass = ObjectRenderer::GetInstance()->GetRayTracedShadowPass()) {
+				shadowPass->DebugGUI();
 			}
 			ImGui::EndTabItem();
 		}

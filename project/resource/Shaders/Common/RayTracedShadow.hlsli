@@ -1,9 +1,11 @@
 #ifndef RAYTRACED_SHADOW_HLSLI
 #define RAYTRACED_SHADOW_HLSLI
 
-// インラインレイトレ(DXR 1.1 RayQuery)によるハードシャドウ。
+// インラインレイトレ(DXR 1.1 RayQuery)による影。
 // space0 は gTextures[] が無制限、space1 は gEnvironment が使用中なので space2 に固定する。
 // TLAS を読むシェーダは必ずこのヘッダを include すること(個別宣言すると space がずれる)
+#include "Sampling.hlsli"
+
 RaytracingAccelerationStructure gSceneTLAS : register(t0, space2);
 
 // 小さいと自分の面に当たって縞が出て、大きいと接地部が浮く
@@ -14,6 +16,10 @@ static const float kShadowRayMaxDistance = 1000.0f;
 static const uint kShadowMaskDirectional = 1u << 0;
 static const uint kShadowMaskPoint = 1u << 1;
 static const uint kShadowMaskSpot = 1u << 2;
+
+// AllLights::shadowMode の値。C++ 側 (LightManager.h の RayTracedShadowMode) と同じ値であること
+static const uint kShadowModeHard = 0; // 前方描画のPSで1本だけ飛ばす。輪郭が硬い代わりに軽い
+static const uint kShadowModeSoft = 1; // 別パスで光源の広がりぶん散らして飛ばし、デノイズする
 
 /// <summary>指定した距離までの遮蔽を調べる。遮蔽されていれば0、そうでなければ1を返す</summary>
 /// <param name="worldPos">シェーディングしている点のワールド座標</param>
@@ -47,6 +53,57 @@ float TraceShadowDirectional(float3 worldPos, float3 L, float3 N, uint shadowMas
     }
 
     return TraceShadowRay(worldPos, L, N, kShadowRayMaxDistance);
+}
+
+/// <summary>平行光源のソフトシャドウ。光源の見かけの大きさぶんレイを円錐状に散らす</summary>
+/// <remarks>
+/// 本数がそのまま負荷なので、少ない本数で散らしてデノイザで均す前提。
+/// 半影の広がりは遮蔽物までの距離に比例するが、これは角度で散らすだけで自然にそうなる
+/// </remarks>
+/// <param name="L">ライトへ向かう単位ベクトル。円錐の中心になる</param>
+/// <param name="angularRadius">光源の見かけの半径(ラジアン)。太陽で約0.0047</param>
+/// <param name="sampleCount">飛ばす本数</param>
+/// <param name="rotationSeed">散らし方を回す種。[0,1)</param>
+float TraceSoftShadowDirectional(float3 worldPos, float3 L, float3 N,
+                                 float angularRadius, uint sampleCount, float rotationSeed)
+{
+    if (sampleCount == 0)
+    {
+        return 1.0f;
+    }
+    // 散らす意味が無いなら円錐を組む手間を掛けずに1本で済ませる
+    if (sampleCount == 1 || angularRadius <= 0.0f)
+    {
+        return TraceShadowRay(worldPos, L, N, kShadowRayMaxDistance);
+    }
+
+    float3 tangent;
+    float3 bitangent;
+    BuildOrthonormalBasis(L, tangent, bitangent);
+
+    float angle = rotationSeed * kSamplingTwoPI;
+    float cosA = cos(angle);
+    float sinA = sin(angle);
+    // 円錐の底面は L の先にある単位距離の円板なので、半径は角度の tan になる
+    float coneRadius = tan(angularRadius);
+
+    float visible = 0.0f;
+    for (uint i = 0; i < sampleCount; i++)
+    {
+        float2 disk = UniformDiskSample(Hammersley(i, sampleCount), cosA, sinA) * coneRadius;
+        float3 dir = normalize(L + disk.x * tangent + disk.y * bitangent);
+
+        // 面より下を向いた向きは光源のその部分が地平線の下にある＝自分自身に遮られている。
+        // レイを飛ばすと原点をずらしたぶんだけ通り抜けてしまうので、飛ばさずに0を数える
+        if (dot(dir, N) <= 0.0f)
+        {
+            continue;
+        }
+
+        visible += TraceShadowRay(worldPos, dir, N, kShadowRayMaxDistance);
+    }
+
+    return visible / sampleCount;
 }
 
 /// <summary>点光源/スポットライトの影</summary>

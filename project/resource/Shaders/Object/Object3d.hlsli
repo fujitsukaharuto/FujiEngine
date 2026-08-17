@@ -88,7 +88,13 @@ struct AllLights
     float reflectionMaxDistance;
     float reflectionIntensity;
     uint enableReflection;
+    uint shadowMode; // RayTracedShadow.hlsli の kShadowMode*
+
+    // 平行光源のソフトシャドウ。受け持つのは0番の平行光源だけ
+    float sunAngularRadius; // 光源の見かけの半径(ラジアン)
+    uint shadowSampleCount;
     uint pad2;
+    uint pad3;
 };
 
 struct Camera

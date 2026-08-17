@@ -224,8 +224,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Graphics\Pipeline\PipelineManager.cpp" />
     <ClCompile Include="Engine\Graphics\Pipeline\RootParam.cpp" />
     <ClCompile Include="Engine\Graphics\PostEffect\OffscreenManager.cpp" />
+    <ClCompile Include="Engine\Graphics\Raytracing\Denoiser.cpp" />
     <ClCompile Include="Engine\Graphics\Raytracing\RayTracedAOPass.cpp" />
+    <ClCompile Include="Engine\Graphics\Raytracing\RayTracedShadowPass.cpp" />
     <ClCompile Include="Engine\Graphics\Raytracing\RaytracingScene.cpp" />
+    <ClCompile Include="Engine\Graphics\Raytracing\WorkTexture.cpp" />
     <ClCompile Include="Engine\Graphics\SkyBox\SkyBox.cpp" />
     <ClCompile Include="Engine\Graphics\Sprite\Sprite.cpp" />
     <ClCompile Include="Engine\Graphics\Sprite\SpriteRenderer.cpp" />
@@ -354,8 +357,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Graphics\Pipeline\RootNames.h" />
     <ClInclude Include="Engine\Graphics\Pipeline\RootParam.h" />
     <ClInclude Include="Engine\Graphics\PostEffect\OffscreenManager.h" />
+    <ClInclude Include="Engine\Graphics\Raytracing\Denoiser.h" />
     <ClInclude Include="Engine\Graphics\Raytracing\RayTracedAOPass.h" />
+    <ClInclude Include="Engine\Graphics\Raytracing\RayTracedShadowPass.h" />
     <ClInclude Include="Engine\Graphics\Raytracing\RaytracingScene.h" />
+    <ClInclude Include="Engine\Graphics\Raytracing\WorkTexture.h" />
     <ClInclude Include="Engine\Graphics\SkyBox\SkyBox.h" />
     <ClInclude Include="Engine\Graphics\Sprite\Sprite.h" />
     <ClInclude Include="Engine\Graphics\Sprite\SpriteRenderer.h" />
@@ -815,7 +821,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\Raytracing\AODenoiseSpatial.CS.hlsl">
+    <FxCompile Include="resource\Shaders\Raytracing\DenoiseSpatial.CS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">Compute</ShaderType>
@@ -823,7 +829,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\Raytracing\AODenoiseTemporal.CS.hlsl">
+    <FxCompile Include="resource\Shaders\Raytracing\DenoiseTemporal.CS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">Compute</ShaderType>
@@ -832,6 +838,14 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="resource\Shaders\Raytracing\RayTracedAO.CS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">Compute</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\Raytracing\RayTracedShadow.CS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">Compute</ShaderType>
@@ -900,7 +914,17 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">true</ExcludedFromBuild>
     </None>
+    <None Include="resource\Shaders\Common\Sampling.hlsli">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">true</ExcludedFromBuild>
+    </None>
     <None Include="resource\Shaders\Common\ScreenSpaceAO.hlsli">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">true</ExcludedFromBuild>
+    </None>
+    <None Include="resource\Shaders\Common\ScreenSpaceShadow.hlsli">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">true</ExcludedFromBuild>

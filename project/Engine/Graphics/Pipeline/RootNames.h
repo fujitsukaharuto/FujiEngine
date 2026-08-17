@@ -23,6 +23,7 @@ namespace Graphics {
 		inline const RootParam kObjIDData{ "ObjIDData" };
 		inline const RootParam kSceneTLAS{ "gSceneTLAS" };			// レイトレの加速構造(TLAS)
 		inline const RootParam kAOTexture{ "gAOTexture" };			// 画面空間の計算済みAO(前方描画が引く)
+		inline const RootParam kShadowTexture{ "gShadowTexture" };	// 画面空間の計算済み遮蔽率(前方描画が引く)
 
 		// --- G-Buffer / 画面空間レイトレ ---
 		inline const RootParam kGBufferNormal{ "gGBufferNormal" };
@@ -31,13 +32,15 @@ namespace Graphics {
 		inline const RootParam kGBufferDepthPrev{ "gGBufferDepthPrev" };
 		inline const RootParam kAOOutput{ "gAOOutput" };
 		inline const RootParam kAOPassParam{ "AOPassParam" };
+		inline const RootParam kShadowOutput{ "gShadowOutput" };
+		inline const RootParam kShadowPassParam{ "ShadowPassParam" };
 
-		// --- AOのデノイザ ---
-		inline const RootParam kAORaw{ "gAORaw" };
-		inline const RootParam kAOHistoryPrev{ "gAOHistoryPrev" };
-		inline const RootParam kAOHistoryOut{ "gAOHistoryOut" };
-		inline const RootParam kAOFilterInput{ "gAOFilterInput" };
-		inline const RootParam kAOFilterOut{ "gAOFilterOut" };
+		// --- デノイザ(AOと影で共用) ---
+		inline const RootParam kDenoiseRaw{ "gDenoiseRaw" };
+		inline const RootParam kDenoiseHistoryPrev{ "gDenoiseHistoryPrev" };
+		inline const RootParam kDenoiseHistoryOut{ "gDenoiseHistoryOut" };
+		inline const RootParam kDenoiseFilterInput{ "gDenoiseFilterInput" };
+		inline const RootParam kDenoiseFilterOut{ "gDenoiseFilterOut" };
 		inline const RootParam kDenoiseTemporalParam{ "DenoiseTemporalParam" };
 		inline const RootParam kDenoiseSpatialParam{ "DenoiseSpatialParam" };
 

@@ -1,6 +1,7 @@
 #include "Object3d.hlsli"
 #include "../Common/PBR.hlsli"
 #include "../Common/RayTracedShadow.hlsli"
+#include "../Common/ScreenSpaceShadow.hlsli"
 #include "../Common/RayTracedAO.hlsli"
 #include "../Common/ScreenSpaceAO.hlsli"
 #include "../Common/RayTracedReflection.hlsli"
@@ -89,7 +90,8 @@ PixelShaderOutput main(VertxShaderOutput input)
                 continue;
             }
 
-            radiance *= TraceShadowDirectional(input.WorldPosition, L, normal, gLights.rayTracedShadowMask);
+            radiance *= GetDirectionalShadow(input.position, input.WorldPosition, L, normal,
+                                             uint(i), gLights.rayTracedShadowMask, gLights.shadowMode);
 
             totalLight += BRDF(normal, toEye, L, diffuseColor, f0, roughness) * radiance;
         }

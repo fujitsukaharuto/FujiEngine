@@ -3,7 +3,7 @@
 // デノイザの空間方向。à-trous を1回ぶん、横か縦の片方向だけ掛ける。
 // 5x5 の B-スプラインは1次元カーネルの外積なので、横5タップと縦5タップの2回に割れる。
 // 1画素あたり 25タップが 5+5 タップになる。エッジ停止の重みは厳密には非分離だが、
-// 通す順で目に見える差は出ない。入出力とも1チャンネルなので影の遮蔽率にも通せる
+// 通す順で目に見える差は出ない。入出力とも1チャンネルなのでAOにも影の遮蔽率にも同じものを通せる
 
 // Camera.h の CameraInfo と並びが一致していること
 cbuffer CameraInfo : register(b0)
@@ -14,7 +14,7 @@ cbuffer CameraInfo : register(b0)
     float4x4 viewProj;
 };
 
-// RayTracedAOPass.h の DenoiseSpatialParam と並びが一致していること
+// Denoiser.h の DenoiseSpatialParam と並びが一致していること
 cbuffer DenoiseSpatialParam : register(b1)
 {
     uint2 screenSize;
@@ -27,9 +27,9 @@ cbuffer DenoiseSpatialParam : register(b1)
 
 Texture2D<float4> gGBufferNormal : register(t0);
 Texture2D<float> gGBufferDepth : register(t1);
-Texture2D<float> gAOFilterInput : register(t2);
+Texture2D<float> gDenoiseFilterInput : register(t2);
 
-RWTexture2D<float> gAOFilterOut : register(u0);
+RWTexture2D<float> gDenoiseFilterOut : register(u0);
 
 // B-スプラインの5タップ。これを横と縦に1回ずつ通すと 5x5 の基本カーネルになる
 static const float kKernel[5] = { 0.0625f, 0.25f, 0.375f, 0.25f, 0.0625f };
@@ -43,13 +43,13 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
         return;
     }
 
-    float center = gAOFilterInput.Load(int3(pixel, 0)).r;
+    float center = gDenoiseFilterInput.Load(int3(pixel, 0)).r;
 
     float3 normal;
     float depth;
     if (!LoadSurface(gGBufferNormal, gGBufferDepth, int2(pixel), normal, depth))
     {
-        gAOFilterOut[pixel] = center;
+        gDenoiseFilterOut[pixel] = center;
         return;
     }
 
@@ -85,9 +85,9 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
 
         float weight = kKernel[i + 2] * normalWeight * planeWeight;
 
-        sum += weight * gAOFilterInput.Load(int3(tap, 0)).r;
+        sum += weight * gDenoiseFilterInput.Load(int3(tap, 0)).r;
         weightSum += weight;
     }
 
-    gAOFilterOut[pixel] = (weightSum > 0.0f) ? (sum / weightSum) : center;
+    gDenoiseFilterOut[pixel] = (weightSum > 0.0f) ? (sum / weightSum) : center;
 }

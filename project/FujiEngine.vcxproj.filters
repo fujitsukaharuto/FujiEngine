@@ -193,10 +193,19 @@
     <ClCompile Include="Engine\Graphics\PostEffect\OffscreenManager.cpp">
       <Filter>Engine\Graphics\PostEffect</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Graphics\Raytracing\Denoiser.cpp">
+      <Filter>Engine\Graphics\Raytracing</Filter>
+    </ClCompile>
     <ClCompile Include="Engine\Graphics\Raytracing\RayTracedAOPass.cpp">
       <Filter>Engine\Graphics\Raytracing</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Graphics\Raytracing\RayTracedShadowPass.cpp">
+      <Filter>Engine\Graphics\Raytracing</Filter>
+    </ClCompile>
     <ClCompile Include="Engine\Graphics\Raytracing\RaytracingScene.cpp">
+      <Filter>Engine\Graphics\Raytracing</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Graphics\Raytracing\WorkTexture.cpp">
       <Filter>Engine\Graphics\Raytracing</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Graphics\SkyBox\SkyBox.cpp">
@@ -577,10 +586,19 @@
     <ClInclude Include="Engine\Graphics\PostEffect\OffscreenManager.h">
       <Filter>Engine\Graphics\PostEffect</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Graphics\Raytracing\Denoiser.h">
+      <Filter>Engine\Graphics\Raytracing</Filter>
+    </ClInclude>
     <ClInclude Include="Engine\Graphics\Raytracing\RayTracedAOPass.h">
       <Filter>Engine\Graphics\Raytracing</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Graphics\Raytracing\RayTracedShadowPass.h">
+      <Filter>Engine\Graphics\Raytracing</Filter>
+    </ClInclude>
     <ClInclude Include="Engine\Graphics\Raytracing\RaytracingScene.h">
+      <Filter>Engine\Graphics\Raytracing</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Graphics\Raytracing\WorkTexture.h">
       <Filter>Engine\Graphics\Raytracing</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Graphics\SkyBox\SkyBox.h">
@@ -1145,13 +1163,16 @@
     <FxCompile Include="resource\Shaders\PostEffect\Vignette.CS.hlsl">
       <Filter>resource\Shaders\PostEffect</Filter>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\Raytracing\AODenoiseSpatial.CS.hlsl">
+    <FxCompile Include="resource\Shaders\Raytracing\DenoiseSpatial.CS.hlsl">
       <Filter>resource\Shaders\Raytracing</Filter>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\Raytracing\AODenoiseTemporal.CS.hlsl">
+    <FxCompile Include="resource\Shaders\Raytracing\DenoiseTemporal.CS.hlsl">
       <Filter>resource\Shaders\Raytracing</Filter>
     </FxCompile>
     <FxCompile Include="resource\Shaders\Raytracing\RayTracedAO.CS.hlsl">
+      <Filter>resource\Shaders\Raytracing</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\Raytracing\RayTracedShadow.CS.hlsl">
       <Filter>resource\Shaders\Raytracing</Filter>
     </FxCompile>
     <FxCompile Include="resource\Shaders\SkyBox\Skybox.PS.hlsl">
@@ -1186,7 +1207,13 @@
     <None Include="resource\Shaders\Common\RayTracedShadow.hlsli">
       <Filter>resource\Shaders\Common</Filter>
     </None>
+    <None Include="resource\Shaders\Common\Sampling.hlsli">
+      <Filter>resource\Shaders\Common</Filter>
+    </None>
     <None Include="resource\Shaders\Common\ScreenSpaceAO.hlsli">
+      <Filter>resource\Shaders\Common</Filter>
+    </None>
+    <None Include="resource\Shaders\Common\ScreenSpaceShadow.hlsli">
       <Filter>resource\Shaders\Common</Filter>
     </None>
     <None Include="resource\Shaders\Line\Line3d.hlsli">

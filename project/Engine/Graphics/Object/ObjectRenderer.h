@@ -13,6 +13,7 @@ namespace Graphics {
 	class RaytracingScene;
 	class GBufferPass;
 	class RayTracedAOPass;
+	class RayTracedShadowPass;
 
 	/// <summary>
 	/// 3Dオブジェクトを集めてまとめて描画するクラス
@@ -48,6 +49,9 @@ namespace Graphics {
 		/// <summary>画面空間のAO。前方描画がここのテクスチャを引く</summary>
 		RayTracedAOPass* GetRayTracedAOPass() const { return aoPass_.get(); }
 
+		/// <summary>画面空間の平行光源ソフトシャドウ。前方描画がここのテクスチャを引く</summary>
+		RayTracedShadowPass* GetRayTracedShadowPass() const { return shadowPass_.get(); }
+
 	private:
 
 		void PreDraw();
@@ -70,6 +74,7 @@ namespace Graphics {
 		std::unique_ptr<RaytracingScene> raytracingScene_;
 		std::unique_ptr<GBufferPass> gbufferPass_;
 		std::unique_ptr<RayTracedAOPass> aoPass_;
+		std::unique_ptr<RayTracedShadowPass> shadowPass_;
 	};
 
 }

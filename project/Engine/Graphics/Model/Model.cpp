@@ -7,6 +7,7 @@
 #include "Engine/Graphics/Object/ObjectRenderer.h"
 #include "Engine/Graphics/Raytracing/RaytracingScene.h"
 #include "Engine/Graphics/Raytracing/RayTracedAOPass.h"
+#include "Engine/Graphics/Raytracing/RayTracedShadowPass.h"
 #include "Engine/Graphics/Texture/TextureManager.h"
 
 using namespace Graphics;
@@ -58,6 +59,16 @@ namespace {
 		PipelineManager::GetInstance()->SetGraphicsRootDescriptorTable(
 			commandList, RootName::kAOTexture, aoPass->GetAOSrvHandle());
 	}
+
+	/// <summary>画面空間で計算済みの平行光源の遮蔽率をバインドする</summary>
+	/// <remarks>宣言が無条件なのは gAOTexture と同じ。バインドしないと未バインドのテーブルを読む</remarks>
+	void BindScreenSpaceShadow(ID3D12GraphicsCommandList* commandList) {
+		auto* shadowPass = ObjectRenderer::GetInstance()->GetRayTracedShadowPass();
+		if (shadowPass == nullptr) { return; }
+
+		PipelineManager::GetInstance()->SetGraphicsRootDescriptorTable(
+			commandList, RootName::kShadowTexture, shadowPass->GetShadowSrvHandle());
+	}
 }
 
 
@@ -84,6 +95,7 @@ void Model::Draw(ID3D12GraphicsCommandList* commandList, std::vector<Material>& 
 		BindSceneTLAS(commandList);
 		BindEnvironment(commandList);
 		BindScreenSpaceAO(commandList);
+		BindScreenSpaceShadow(commandList);
 
 		commandList->IASetVertexBuffers(0, 1, &mesh_[index].GetVBV());
 		commandList->IASetIndexBuffer(&mesh_[index].GetIBV());
@@ -107,6 +119,7 @@ void Model::AnimationDraw(DXCom* pDxcom, ID3D12GraphicsCommandList* commandList,
 		BindSceneTLAS(commandList);
 		BindEnvironment(commandList);
 		BindScreenSpaceAO(commandList);
+		BindScreenSpaceShadow(commandList);
 
 		commandList->IASetVertexBuffers(0, 1, &skinnedMeshes[index].GetSkinnedVBV());
 		commandList->IASetIndexBuffer(&mesh_[index].GetIBV());

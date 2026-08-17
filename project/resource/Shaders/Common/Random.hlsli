@@ -1,3 +1,6 @@
+#ifndef RANDOM_HLSLI
+#define RANDOM_HLSLI
+
 float rand3dTo1d(float3 value, float3 dotDir = float3(12.9898, 78.233, 37.719))
 {
     //make value smaller to avoid artefacts
@@ -128,3 +131,5 @@ class RandomGenerator
         return lerp(minValue, maxValue, r);
     }
 };
+
+#endif // RANDOM_HLSLI

@@ -4,6 +4,7 @@
 #include "Engine/DXC/DXCom.h"
 #include "Engine/DXC/Resource/DX12Helper.h"
 #include "Engine/Graphics/Pipeline/PipelineManager.h"
+#include <numbers>
 
 using namespace Graphics;
 using namespace DXC;
@@ -130,6 +131,25 @@ void LightManager::DebugGUI() {
 			maskCheckbox("Directional", kShadowMaskDirectional);
 			maskCheckbox("Point", kShadowMaskPoint);
 			maskCheckbox("Spot", kShadowMaskSpot);
+
+			ImGui::SeparatorText("Soft shadow (directional)");
+			// Hard にすると G-Buffer のプリパスごと止まる(AOも切っていれば)ので、切っている間の負荷はゼロ
+			int shadowMode = static_cast<int>(allLightsData_.shadowMode);
+			if (ImGui::Combo("Mode##shadow", &shadowMode, "Hard (in forward PS)\0Soft (screen space)\0")) {
+				allLightsData_.shadowMode = static_cast<uint32_t>(shadowMode);
+			}
+			ImGui::TextWrapped("Soft が受け持つのは0番の平行光源だけ。2本目以降と点光源/スポットは Hard のまま");
+
+			// 見かけの半径がそのまま半影の広がりになる。角度なので遮蔽物が遠いほど広くなる
+			float angularRadiusDeg = allLightsData_.sunAngularRadius * 180.0f / std::numbers::pi_v<float>;
+			if (ImGui::SliderFloat("Angular radius##shadow", &angularRadiusDeg, 0.0f, 10.0f, "%.2f deg")) {
+				allLightsData_.sunAngularRadius = angularRadiusDeg * std::numbers::pi_v<float> / 180.0f;
+			}
+			// レイの本数がそのまま負荷になるので、上げるときはFPSではなくmsを見ること
+			int shadowSamples = static_cast<int>(allLightsData_.shadowSampleCount);
+			if (ImGui::SliderInt("Samples##shadow", &shadowSamples, 1, 16)) {
+				allLightsData_.shadowSampleCount = static_cast<uint32_t>(shadowSamples);
+			}
 			ImGui::TreePop();
 		}
 

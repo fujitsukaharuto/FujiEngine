@@ -1,7 +1,7 @@
 #include "../Common/GBufferUtil.hlsli"
 
-// デノイザの時間方向。前フレームの ViewProjection で再投影して蓄積を引き当て、生AOと混ぜる。
-// AOは視点に依らない量なので、同じ点を写していた画素さえ分かればそのまま使える
+// デノイザの時間方向。前フレームの ViewProjection で再投影して蓄積を引き当て、生の信号と混ぜる。
+// AOも影の遮蔽率も視点に依らない量なので、同じ点を写していた画素さえ分かればそのまま使える
 
 // Camera.h の CameraInfo と並びが一致していること
 cbuffer CameraInfo : register(b0)
@@ -12,7 +12,7 @@ cbuffer CameraInfo : register(b0)
     float4x4 viewProj;
 };
 
-// RayTracedAOPass.h の DenoiseTemporalParam と並びが一致していること
+// Denoiser.h の DenoiseTemporalParam と並びが一致していること
 cbuffer DenoiseTemporalParam : register(b1)
 {
     float4x4 prevViewProj;
@@ -29,12 +29,12 @@ Texture2D<float4> gGBufferNormal : register(t0);
 Texture2D<float> gGBufferDepth : register(t1);
 Texture2D<float4> gGBufferNormalPrev : register(t2);
 Texture2D<float> gGBufferDepthPrev : register(t3);
-Texture2D<float> gAORaw : register(t4);
-Texture2D<float2> gAOHistoryPrev : register(t5);
+Texture2D<float> gDenoiseRaw : register(t4);
+Texture2D<float2> gDenoiseHistoryPrev : register(t5);
 
 // 次フレームへ渡す履歴と、空間フィルタへ渡す信号でチャンネル数が違うので出力を分ける
-RWTexture2D<float2> gAOHistoryOut : register(u0); // x=AO, y=蓄積フレーム数
-RWTexture2D<float> gAOFilterOut : register(u1);
+RWTexture2D<float2> gDenoiseHistoryOut : register(u0); // x=信号, y=蓄積フレーム数
+RWTexture2D<float> gDenoiseFilterOut : register(u1);
 
 [numthreads(8, 8, 1)]
 void main(uint3 dispatchID : SV_DispatchThreadID)
@@ -50,12 +50,12 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
     if (!LoadSurface(gGBufferNormal, gGBufferDepth, int2(pixel), normal, depth))
     {
         // 面が無い画素(空)。遮蔽しようがないので開けている扱いで、履歴も持たない
-        gAOHistoryOut[pixel] = float2(1.0f, 0.0f);
-        gAOFilterOut[pixel] = 1.0f;
+        gDenoiseHistoryOut[pixel] = float2(1.0f, 0.0f);
+        gDenoiseFilterOut[pixel] = 1.0f;
         return;
     }
 
-    float raw = gAORaw.Load(int3(pixel, 0)).r;
+    float raw = gDenoiseRaw.Load(int3(pixel, 0)).r;
     float3 worldPos = ReconstructWorldPos(pixel, screenSize, depth, invViewProj);
 
     float2 history = float2(0.0f, 0.0f);
@@ -112,13 +112,13 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
                     continue;
                 }
 
-                history += bilinear[i] * gAOHistoryPrev.Load(int3(tap, 0)).xy;
+                history += bilinear[i] * gDenoiseHistoryPrev.Load(int3(tap, 0)).xy;
                 historyWeight += bilinear[i];
             }
         }
     }
 
-    float ao = raw;
+    float filtered = raw;
     float historyLength = 1.0f;
 
     if (historyWeight > 0.0f)
@@ -126,9 +126,9 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
         history /= historyWeight;
         historyLength = min(history.y + 1.0f, maxHistoryLength);
         // 浅いうちは 1/n の単純平均、上限に達すると指数移動平均になる
-        ao = lerp(history.x, raw, 1.0f / historyLength);
+        filtered = lerp(history.x, raw, 1.0f / historyLength);
     }
 
-    gAOHistoryOut[pixel] = float2(ao, historyLength);
-    gAOFilterOut[pixel] = ao;
+    gDenoiseHistoryOut[pixel] = float2(filtered, historyLength);
+    gDenoiseFilterOut[pixel] = filtered;
 }

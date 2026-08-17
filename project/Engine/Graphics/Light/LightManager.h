@@ -27,6 +27,15 @@ namespace Graphics {
 	};
 
 	/// <summary>
+	/// 平行光源の影をどの経路で計算するか
+	/// </summary>
+	/// <remarks>HLSL 側 (Common/RayTracedShadow.hlsli) の kShadowMode* と同じ値であること</remarks>
+	enum RayTracedShadowMode : uint32_t {
+		kShadowModeHard = 0,	// 前方描画のPSで1本だけ飛ばす。輪郭が硬い代わりに軽い
+		kShadowModeSoft = 1,	// 別パスで光源の広がりぶん散らして飛ばし、デノイズする
+	};
+
+	/// <summary>
 	/// レイトレAOをどの経路で計算するか
 	/// </summary>
 	/// <remarks>HLSL 側 (Common/RayTracedAO.hlsli) の kAOMode* と同じ値であること</remarks>
@@ -72,7 +81,14 @@ namespace Graphics {
 		float reflectionMaxDistance = 100.0f;
 		float reflectionIntensity = 1.0f;
 		uint32_t enableReflection = 0;
+		uint32_t shadowMode = kShadowModeHard;
+
+		// 平行光源のソフトシャドウ。受け持つのは0番の平行光源だけで、2本目以降は Hard のまま
+		// 太陽の見かけの半径は約0.27度だが、それだと半影が細くて分からないので少し広げてある
+		float sunAngularRadius = 0.0175f;	// ラジアン(=約1.0度)
+		uint32_t shadowSampleCount = 4;
 		uint32_t pad2 = 0;
+		uint32_t pad3 = 0;
 	};
 
 	/// <summary>

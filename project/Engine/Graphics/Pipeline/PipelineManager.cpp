@@ -102,8 +102,9 @@ void PipelineManager::CreatePipeline() {
 		.useInputLayout = false });
 
 	CreateComputePipe(Pipe::RayTracedAOCS, L"Raytracing/RayTracedAO.CS.hlsl");
-	CreateComputePipe(Pipe::AODenoiseTemporalCS, L"Raytracing/AODenoiseTemporal.CS.hlsl");
-	CreateComputePipe(Pipe::AODenoiseSpatialCS, L"Raytracing/AODenoiseSpatial.CS.hlsl");
+	CreateComputePipe(Pipe::RayTracedShadowCS, L"Raytracing/RayTracedShadow.CS.hlsl");
+	CreateComputePipe(Pipe::DenoiseTemporalCS, L"Raytracing/DenoiseTemporal.CS.hlsl");
+	CreateComputePipe(Pipe::DenoiseSpatialCS, L"Raytracing/DenoiseSpatial.CS.hlsl");
 
 	CreateComputePipe(Pipe::GrayCS, L"PostEffect/Grayscale.CS.hlsl");
 	CreateComputePipe(Pipe::GaussCS, L"PostEffect/Gaussian.CS.hlsl");

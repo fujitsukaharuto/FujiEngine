@@ -14,6 +14,7 @@
 #include "Engine/Graphics/Raytracing/RaytracingScene.h"
 #include "Engine/Graphics/GBuffer/GBufferPass.h"
 #include "Engine/Graphics/Raytracing/RayTracedAOPass.h"
+#include "Engine/Graphics/Raytracing/RayTracedShadowPass.h"
 
 using namespace Core;
 using namespace Graphics;
@@ -38,6 +39,9 @@ void ObjectRenderer::Initialize(DXCom* pDxcom, LightManager* pLightManager) {
 
 	aoPass_ = std::make_unique<RayTracedAOPass>();
 	aoPass_->Initialize(pDxcom, pLightManager);
+
+	shadowPass_ = std::make_unique<RayTracedShadowPass>();
+	shadowPass_->Initialize(pDxcom, pLightManager);
 }
 
 void ObjectRenderer::Finalize() {
@@ -57,6 +61,11 @@ void ObjectRenderer::Finalize() {
 	if (aoPass_) {
 		aoPass_->Finalize();
 		aoPass_.reset();
+	}
+
+	if (shadowPass_) {
+		shadowPass_->Finalize();
+		shadowPass_.reset();
 	}
 }
 
@@ -89,18 +98,26 @@ void ObjectRenderer::Render() {
 	BuildRaytracingScene();
 
 	// 画面空間のレイトレが読む深度と法線を先に書き出す。
-	// 読み手がいないなら走らせない＝AOを切っている間はプリパスの負荷も掛からない
-	const bool needsGBuffer =
-		(lightManager_ != nullptr && lightManager_->GetData().aoMode == kAOModeScreen);
+	// 読み手がいないなら走らせない＝AOもソフトシャドウも切っている間はプリパスの負荷も掛からない
+	bool needsGBuffer = false;
+	if (lightManager_ != nullptr) {
+		const AllLightsData& lights = lightManager_->GetData();
+		needsGBuffer = (lights.aoMode == kAOModeScreen) || (lights.shadowMode == kShadowModeSoft);
+	}
 
 	if (gbufferPass_) {
 		gbufferPass_->SetEnabled(needsGBuffer);
 		gbufferPass_->Render(renderQueue_);
 
+		// 走らせるかどうかは各パスが自分で見る。走らないときに蓄積を捨てるのもパス側の仕事
+		if (aoPass_) {
+			aoPass_->Render(*gbufferPass_);
+		}
+		if (shadowPass_) {
+			shadowPass_->Render(*gbufferPass_);
+		}
+
 		if (gbufferPass_->IsRendered()) {
-			if (aoPass_ && needsGBuffer) {
-				aoPass_->Render(*gbufferPass_);
-			}
 			// プリパスがレンダーターゲットを張り替えているので本描画用へ戻す
 			dxcommon_->SetRenderTargets();
 		}
