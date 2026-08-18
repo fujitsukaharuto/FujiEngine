@@ -4,6 +4,7 @@
 // レイを半球や円錐へ散らすときの共通処理。AO(半球)とソフトシャドウ(円錐)が同じものを使う。
 // 散らし方が2箇所に分かれると、片方だけ縞が出るといった追いにくい差になるのでここへ集約する
 
+static const float kSamplingPI = 3.14159265359f;
 static const float kSamplingTwoPI = 6.28318530718f;
 
 /// <summary>単位ベクトルから接空間の基底を作る(Duff et al. の分岐なし版)</summary>

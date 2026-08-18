@@ -106,6 +106,11 @@ void PipelineManager::CreatePipeline() {
 	CreateComputePipe(Pipe::DenoiseTemporalCS, L"Raytracing/DenoiseTemporal.CS.hlsl");
 	CreateComputePipe(Pipe::DenoiseSpatialCS, L"Raytracing/DenoiseSpatial.CS.hlsl");
 
+	CreateComputePipe(Pipe::IrradianceBakeCS, L"IBL/IrradianceBake.CS.hlsl");
+	CreateComputePipe(Pipe::PrefilterEnvCS, L"IBL/PrefilterEnv.CS.hlsl");
+	CreateComputePipe(Pipe::BRDFLutCS, L"IBL/BRDFLut.CS.hlsl");
+	CreateComputePipe(Pipe::CubePreviewCS, L"IBL/CubePreview.CS.hlsl");
+
 	CreateComputePipe(Pipe::GrayCS, L"PostEffect/Grayscale.CS.hlsl");
 	CreateComputePipe(Pipe::GaussCS, L"PostEffect/Gaussian.CS.hlsl");
 	CreateComputePipe(Pipe::BoxFilterCS, L"PostEffect/BoxFilter.CS.hlsl");

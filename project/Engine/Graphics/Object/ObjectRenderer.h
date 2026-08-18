@@ -14,6 +14,7 @@ namespace Graphics {
 	class GBufferPass;
 	class RayTracedAOPass;
 	class RayTracedShadowPass;
+	class IBLBaker;
 
 	/// <summary>
 	/// 3Dオブジェクトを集めてまとめて描画するクラス
@@ -52,6 +53,9 @@ namespace Graphics {
 		/// <summary>画面空間の平行光源ソフトシャドウ。前方描画がここのテクスチャを引く</summary>
 		RayTracedShadowPass* GetRayTracedShadowPass() const { return shadowPass_.get(); }
 
+		/// <summary>環境マップから焼いた IBL。前方描画がここのテクスチャを引く</summary>
+		IBLBaker* GetIBLBaker() const { return iblBaker_.get(); }
+
 	private:
 
 		void PreDraw();
@@ -75,6 +79,7 @@ namespace Graphics {
 		std::unique_ptr<GBufferPass> gbufferPass_;
 		std::unique_ptr<RayTracedAOPass> aoPass_;
 		std::unique_ptr<RayTracedShadowPass> shadowPass_;
+		std::unique_ptr<IBLBaker> iblBaker_;
 	};
 
 }

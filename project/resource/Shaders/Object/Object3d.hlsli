@@ -93,7 +93,7 @@ struct AllLights
     // 平行光源のソフトシャドウ。受け持つのは0番の平行光源だけ
     float sunAngularRadius; // 光源の見かけの半径(ラジアン)
     uint shadowSampleCount;
-    uint pad2;
+    uint ambientMode; // IBL.hlsli の kAmbientMode*
     uint pad3;
 };
 

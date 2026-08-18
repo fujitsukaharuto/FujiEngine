@@ -15,6 +15,7 @@
 #include "Engine/Graphics/GBuffer/GBufferPass.h"
 #include "Engine/Graphics/Raytracing/RayTracedAOPass.h"
 #include "Engine/Graphics/Raytracing/RayTracedShadowPass.h"
+#include "Engine/Graphics/IBL/IBLBaker.h"
 
 using namespace Core;
 using namespace Graphics;
@@ -42,6 +43,9 @@ void ObjectRenderer::Initialize(DXCom* pDxcom, LightManager* pLightManager) {
 
 	shadowPass_ = std::make_unique<RayTracedShadowPass>();
 	shadowPass_->Initialize(pDxcom, pLightManager);
+
+	iblBaker_ = std::make_unique<IBLBaker>();
+	iblBaker_->Initialize(pDxcom);
 }
 
 void ObjectRenderer::Finalize() {
@@ -61,6 +65,11 @@ void ObjectRenderer::Finalize() {
 	if (aoPass_) {
 		aoPass_->Finalize();
 		aoPass_.reset();
+	}
+
+	if (iblBaker_) {
+		iblBaker_->Finalize();
+		iblBaker_.reset();
 	}
 
 	if (shadowPass_) {
@@ -88,6 +97,13 @@ void Graphics::ObjectRenderer::SetSkyBox(SkyBox* skyBox) {
 }
 
 void ObjectRenderer::Render() {
+	// 環境マップから IBL を焼く。焼くのは最初の1フレームだけで、以降は素通りする。
+	// 描くものが無いフレームでも焼いておきたいので、キューの判定より前に置く
+	if (iblBaker_) {
+		iblBaker_->EnsureBaked(dxcommon_->GetCommandList());
+		iblBaker_->RenderPreview(dxcommon_->GetCommandList());
+	}
+
 	// 描画するものがなければ何もしない
 	if (renderQueue_.empty()) {
 		PreDraw();

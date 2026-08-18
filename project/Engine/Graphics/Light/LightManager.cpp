@@ -110,6 +110,13 @@ void LightManager::DebugGUI() {
 		if (ImGui::TreeNode("Ambient")) {
 			// PBR には Half-Lambert のような光の回り込みが無いので、影側の明るさはここで決まる。
 			// 0 にすると光の当たらない面は完全な黒になる
+			int ambientMode = static_cast<int>(allLightsData_.ambientMode);
+			if (ImGui::Combo("Mode##ambient", &ambientMode, "Hemisphere (sky/ground)\0IBL (baked cubemap)\0")) {
+				allLightsData_.ambientMode = static_cast<uint32_t>(ambientMode);
+			}
+			ImGui::TextWrapped("IBL は環境マップから焼いたものを引く。SkyColor/GroundColor は Hemisphere 専用で、"
+				"Intensity だけは両方に掛かる");
+
 			ImGui::ColorEdit3("SkyColor", &allLightsData_.ambientSkyColor.x);
 			ImGui::ColorEdit3("GroundColor", &allLightsData_.ambientGroundColor.x);
 			ImGui::DragFloat("Intensity##ambient", &allLightsData_.ambientIntensity, 0.01f, 0.0f, 10.0f);

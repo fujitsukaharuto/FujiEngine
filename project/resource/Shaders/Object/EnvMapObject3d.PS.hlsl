@@ -5,6 +5,7 @@
 #include "../Common/RayTracedAO.hlsli"
 #include "../Common/ScreenSpaceAO.hlsli"
 #include "../Common/RayTracedReflection.hlsli"
+#include "../Common/IBL.hlsli"
 
 // Object3d.PS との違いは、スカイボックスのキューブマップを鏡面の環境光として足す点だけ。
 // 構造体(Material / 各種ライト / Camera)は Object3d.hlsli にまとめてある
@@ -76,8 +77,9 @@ PixelShaderOutput main(VertxShaderOutput input)
 
         float ao = GetAmbientOcclusion(input.position, input.WorldPosition, normal,
                                        gLights.aoMode, gLights.aoSampleCount, gLights.aoRadius, gLights.aoIntensity);
-        float3 totalLight = HemisphereAmbient(normal, gLights.ambientSkyColor,
-                                              gLights.ambientGroundColor, gLights.ambientIntensity) * diffuseColor * ao;
+        float3 ambientColor = GetAmbientDiffuse(normal, gLights.ambientMode, gLights.ambientSkyColor,
+                                                gLights.ambientGroundColor, gLights.ambientIntensity, gSampler);
+        float3 totalLight = ambientColor * diffuseColor * ao;
 
         // ライトのループは Object3d.PS と同じ形(寄与が0の光源はレイを飛ばす前に落とす)
         for (int i = 0; i < gLights.numDirectionalLights; i++)
@@ -129,16 +131,10 @@ PixelShaderOutput main(VertxShaderOutput input)
             totalLight += BRDF(normal, toEye, L, diffuseColor, f0, roughness) * radiance;
         }
 
-        // 鏡面の環境光。本来は粗さでミップを選ぶ prefiltered map を引く所の暫定版
-        float3 ambientColor = HemisphereAmbient(normal, gLights.ambientSkyColor,
-                                                gLights.ambientGroundColor, gLights.ambientIntensity);
-        float3 environmentColor = TraceReflection(input.WorldPosition, normal, toEye, ambientColor * ao,
-                                                  gLights.reflectionMaxDistance, gLights.enableReflection, gSampler);
-
-        float NdotV = saturate(dot(normal, toEye));
-        float3 fresnel = F_Schlick(f0, NdotV);
-        // 粗い面ほど映り込みがぼやけて弱く見えるので、その代用として単純に落とす
-        float3 specularEnv = environmentColor * fresnel * (1.0f - roughness);
+        // 鏡面の環境光。IBL 経路なら粗さでミップを選んだ prefiltered map を引く
+        float3 specularEnv = GetAmbientSpecular(input.WorldPosition, normal, toEye, roughness, f0,
+                                                ambientColor * ao, gLights.reflectionMaxDistance,
+                                                gLights.enableReflection, gLights.ambientMode, gSampler);
 
         totalLight += specularEnv * gMaterial.environmentCoefficient * gLights.reflectionIntensity;
 

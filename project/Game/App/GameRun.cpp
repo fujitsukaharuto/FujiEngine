@@ -8,6 +8,7 @@
 #include "Engine/Graphics/GBuffer/GBufferPass.h"
 #include "Engine/Graphics/Raytracing/RayTracedAOPass.h"
 #include "Engine/Graphics/Raytracing/RayTracedShadowPass.h"
+#include "Engine/Graphics/IBL/IBLBaker.h"
 
 using namespace Audio;
 using namespace Core;
@@ -198,6 +199,9 @@ void GameRun::DebugGUI() {
 			}
 			if (auto* shadowPass = ObjectRenderer::GetInstance()->GetRayTracedShadowPass()) {
 				shadowPass->DebugGUI();
+			}
+			if (auto* iblBaker = ObjectRenderer::GetInstance()->GetIBLBaker()) {
+				iblBaker->DebugGUI();
 			}
 			ImGui::EndTabItem();
 		}

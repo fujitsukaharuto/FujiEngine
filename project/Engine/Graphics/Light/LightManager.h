@@ -36,6 +36,15 @@ namespace Graphics {
 	};
 
 	/// <summary>
+	/// アンビエント(直接光以外の明るさ)をどこから取るか
+	/// </summary>
+	/// <remarks>HLSL 側 (Common/IBL.hlsli) の kAmbientMode* と同じ値であること</remarks>
+	enum AmbientMode : uint32_t {
+		kAmbientModeHemisphere = 0,	// 空色と地面色の2色補間。焼かずに済む代わりに環境の色は乗らない
+		kAmbientModeIBL = 1,		// 環境マップから焼いた irradiance / prefiltered を引く
+	};
+
+	/// <summary>
 	/// レイトレAOをどの経路で計算するか
 	/// </summary>
 	/// <remarks>HLSL 側 (Common/RayTracedAO.hlsli) の kAOMode* と同じ値であること</remarks>
@@ -90,7 +99,9 @@ namespace Graphics {
 		// 太陽の見かけの半径は約0.27度だが、それだと半影が細くて分からないので少し広げてある
 		float sunAngularRadius = 0.0175f;	// ラジアン(=約1.0度)
 		uint32_t shadowSampleCount = 4;
-		uint32_t pad2 = 0;
+		// アンビエントの経路。IBL にすると半球近似をやめて焼いたキューブマップを引く。
+		// 既定が Hemisphere なのは、切り替えた瞬間に全マテリアルの明るさが変わるため
+		uint32_t ambientMode = kAmbientModeHemisphere;
 		uint32_t pad3 = 0;
 	};
 

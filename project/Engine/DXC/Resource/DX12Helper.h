@@ -80,6 +80,24 @@ namespace DXC::Helper {
 		const D3D12_CLEAR_VALUE* clearValue);
 
 	/// <summary>
+	/// キューブマップとして使える 6 枚組のテクスチャを生成する。
+	/// </summary>
+	/// <remarks>
+	/// D3D12 のリソースとしては ArraySize=6 の 2D 配列で、キューブとして扱うかは
+	/// SRV の張り方で決まる。UAV は配列としてしか張れないので、焼く側はスライス指定で書く
+	/// </remarks>
+	/// <param name="device">デバイス</param>
+	/// <param name="size">1辺の長さ。6面とも正方形</param>
+	/// <param name="format">フォーマット</param>
+	/// <param name="mipLevels">ミップ数。1 ならミップ無し</param>
+	/// <param name="flags">RTV/UAV のどれとして使うか</param>
+	/// <param name="initialState">生成直後の状態</param>
+	/// <returns>ID3D12Resource*</returns>
+	Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureCube(ID3D12Device* device, uint32_t size,
+		DXGI_FORMAT format, uint32_t mipLevels, D3D12_RESOURCE_FLAGS flags,
+		D3D12_RESOURCE_STATES initialState);
+
+	/// <summary>
 	/// UAV（Unordered Access View）として使用可能なバッファリソースを生成する。
 	/// </summary>
 	/// <param name="device">デバイス</param>

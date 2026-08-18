@@ -202,6 +202,9 @@
     <ClCompile Include="Engine\Graphics\Raytracing\RayTracedShadowPass.cpp">
       <Filter>Engine\Graphics\Raytracing</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Graphics\IBL\IBLBaker.cpp">
+      <Filter>Engine\Graphics\IBL</Filter>
+    </ClCompile>
     <ClCompile Include="Engine\Graphics\Raytracing\RaytracingScene.cpp">
       <Filter>Engine\Graphics\Raytracing</Filter>
     </ClCompile>
@@ -595,6 +598,9 @@
     <ClInclude Include="Engine\Graphics\Raytracing\RayTracedShadowPass.h">
       <Filter>Engine\Graphics\Raytracing</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Graphics\IBL\IBLBaker.h">
+      <Filter>Engine\Graphics\IBL</Filter>
+    </ClInclude>
     <ClInclude Include="Engine\Graphics\Raytracing\RaytracingScene.h">
       <Filter>Engine\Graphics\Raytracing</Filter>
     </ClInclude>
@@ -912,6 +918,9 @@
     <Filter Include="Engine\Graphics\Raytracing">
       <UniqueIdentifier>{7f3a91c4-6b2e-4a58-9d17-2ec5b840af31}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\Graphics\IBL">
+      <UniqueIdentifier>{2c9d4f16-8a37-4e59-b6d2-71c0e4a938bd}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Engine\Graphics\SkyBox">
       <UniqueIdentifier>{8bf1d823-4716-42bc-b10e-f178f4e21b6e}</UniqueIdentifier>
     </Filter>
@@ -1028,6 +1037,9 @@
     </Filter>
     <Filter Include="resource\Shaders\PostEffect">
       <UniqueIdentifier>{ded13372-1112-4e9a-b659-8fb2370e64bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resource\Shaders\IBL">
+      <UniqueIdentifier>{a41e7b52-3d68-4c17-8f95-6ba2d0e731c4}</UniqueIdentifier>
     </Filter>
     <Filter Include="resource\Shaders\Raytracing">
       <UniqueIdentifier>{cc8233a6-88dc-4a77-a632-75b0eecfb058}</UniqueIdentifier>
@@ -1175,6 +1187,18 @@
     <FxCompile Include="resource\Shaders\Raytracing\RayTracedShadow.CS.hlsl">
       <Filter>resource\Shaders\Raytracing</Filter>
     </FxCompile>
+    <FxCompile Include="resource\Shaders\IBL\IrradianceBake.CS.hlsl">
+      <Filter>resource\Shaders\IBL</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\IBL\PrefilterEnv.CS.hlsl">
+      <Filter>resource\Shaders\IBL</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\IBL\BRDFLut.CS.hlsl">
+      <Filter>resource\Shaders\IBL</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\IBL\CubePreview.CS.hlsl">
+      <Filter>resource\Shaders\IBL</Filter>
+    </FxCompile>
     <FxCompile Include="resource\Shaders\SkyBox\Skybox.PS.hlsl">
       <Filter>resource\Shaders\SkyBox</Filter>
     </FxCompile>
@@ -1214,6 +1238,12 @@
       <Filter>resource\Shaders\Common</Filter>
     </None>
     <None Include="resource\Shaders\Common\ScreenSpaceShadow.hlsli">
+      <Filter>resource\Shaders\Common</Filter>
+    </None>
+    <None Include="resource\Shaders\Common\IBL.hlsli">
+      <Filter>resource\Shaders\Common</Filter>
+    </None>
+    <None Include="resource\Shaders\Common\IBLBake.hlsli">
       <Filter>resource\Shaders\Common</Filter>
     </None>
     <None Include="resource\Shaders\Line\Line3d.hlsli">

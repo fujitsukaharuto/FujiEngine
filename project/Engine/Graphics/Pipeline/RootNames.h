@@ -24,6 +24,20 @@ namespace Graphics {
 		inline const RootParam kSceneTLAS{ "gSceneTLAS" };			// レイトレの加速構造(TLAS)
 		inline const RootParam kAOTexture{ "gAOTexture" };			// 画面空間の計算済みAO(前方描画が引く)
 		inline const RootParam kShadowTexture{ "gShadowTexture" };	// 画面空間の計算済み遮蔽率(前方描画が引く)
+		inline const RootParam kIrradianceMap{ "gIrradianceMap" };	// 焼いた放射照度(拡散のアンビエント)
+		inline const RootParam kPrefilteredEnv{ "gPrefilteredEnv" };	// 粗さごとに焼いた環境マップ(鏡面のアンビエント)
+		inline const RootParam kBRDFLut{ "gBRDFLut" };				// split-sum の第2項の数表
+
+		// --- IBL を焼く側 ---
+		inline const RootParam kSourceEnv{ "gSourceEnv" };
+		inline const RootParam kIrradianceOut{ "gIrradianceOut" };
+		inline const RootParam kPrefilteredOut{ "gPrefilteredOut" };
+		inline const RootParam kIrradianceParam{ "IrradianceParam" };
+		inline const RootParam kPrefilterParam{ "PrefilterParam" };
+		inline const RootParam kBRDFLutOut{ "gBRDFLutOut" };
+		inline const RootParam kPreviewSource{ "gPreviewSource" };
+		inline const RootParam kPreviewOut{ "gPreviewOut" };
+		inline const RootParam kPreviewParam{ "PreviewParam" };
 
 		// --- G-Buffer / 画面空間レイトレ ---
 		inline const RootParam kGBufferNormal{ "gGBufferNormal" };

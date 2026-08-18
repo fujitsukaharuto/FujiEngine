@@ -1,3 +1,6 @@
+#ifndef PBR_HLSLI
+#define PBR_HLSLI
+
 // 物理ベースの BRDF (Cook-Torrance / metallic-roughness ワークフロー)。
 // 減衰(距離やスポットの絞り)は呼び出し側の責任で、ここには入れない
 
@@ -71,9 +74,11 @@ float3 BRDF(float3 N, float3 V, float3 L, float3 diffuseColor, float3 f0, float 
 /// <summary>
 /// 半球アンビエント。法線の上下で空色と地面色を混ぜるだけの簡易版
 /// </summary>
-/// <remarks>本来は irradiance を焼いた IBL に置き換える所。鏡面のアンビエントはまだ無い</remarks>
+/// <remarks>IBL 経路(Common/IBL.hlsli の GetAmbientDiffuse)を選ぶと、焼いた放射照度に差し替わる</remarks>
 float3 HemisphereAmbient(float3 N, float3 skyColor, float3 groundColor, float intensity)
 {
     float t = N.y * 0.5f + 0.5f;
     return lerp(groundColor, skyColor, t) * intensity;
 }
+
+#endif // PBR_HLSLI

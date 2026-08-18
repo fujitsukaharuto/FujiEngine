@@ -8,6 +8,7 @@
 #include "Engine/Graphics/Raytracing/RaytracingScene.h"
 #include "Engine/Graphics/Raytracing/RayTracedAOPass.h"
 #include "Engine/Graphics/Raytracing/RayTracedShadowPass.h"
+#include "Engine/Graphics/IBL/IBLBaker.h"
 #include "Engine/Graphics/Texture/TextureManager.h"
 
 using namespace Graphics;
@@ -45,6 +46,21 @@ namespace {
 
 		PipelineManager::GetInstance()->SetGraphicsRootDescriptorTable(
 			commandList, RootName::kEnvironment, environment->gpuHandle);
+	}
+
+	/// <summary>環境マップから焼いた IBL のテクスチャをバインドする</summary>
+	/// <remarks>
+	/// Object3d.PS / EnvMapObject3d.PS が3枚とも無条件に宣言しているので、
+	/// アンビエントが Hemisphere 経路のフレームでもバインドしないと未バインドのテーブルを読む
+	/// </remarks>
+	void BindIBL(ID3D12GraphicsCommandList* commandList) {
+		auto* ibl = ObjectRenderer::GetInstance()->GetIBLBaker();
+		if (ibl == nullptr) { return; }
+
+		PipelineManager* pPipeManager = PipelineManager::GetInstance();
+		pPipeManager->SetGraphicsRootDescriptorTable(commandList, RootName::kIrradianceMap, ibl->GetIrradianceSrvHandle());
+		pPipeManager->SetGraphicsRootDescriptorTable(commandList, RootName::kPrefilteredEnv, ibl->GetPrefilteredSrvHandle());
+		pPipeManager->SetGraphicsRootDescriptorTable(commandList, RootName::kBRDFLut, ibl->GetBRDFLutSrvHandle());
 	}
 
 	/// <summary>画面空間で計算済みのAOをバインドする</summary>
@@ -94,6 +110,7 @@ void Model::Draw(ID3D12GraphicsCommandList* commandList, std::vector<Material>& 
 
 		BindSceneTLAS(commandList);
 		BindEnvironment(commandList);
+		BindIBL(commandList);
 		BindScreenSpaceAO(commandList);
 		BindScreenSpaceShadow(commandList);
 
@@ -118,6 +135,7 @@ void Model::AnimationDraw(DXCom* pDxcom, ID3D12GraphicsCommandList* commandList,
 		pPipeManager->SetGraphicsRootDescriptorTable(commandList, RootName::kTextures, SRVManager::GetInstance()->GetGPUDescriptorHandle(0));
 		BindSceneTLAS(commandList);
 		BindEnvironment(commandList);
+		BindIBL(commandList);
 		BindScreenSpaceAO(commandList);
 		BindScreenSpaceShadow(commandList);
 
