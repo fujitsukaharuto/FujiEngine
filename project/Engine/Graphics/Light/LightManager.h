@@ -81,7 +81,10 @@ namespace Graphics {
 		float reflectionMaxDistance = 100.0f;
 		float reflectionIntensity = 1.0f;
 		uint32_t enableReflection = 0;
-		uint32_t shadowMode = kShadowModeHard;
+		// 実測 0.89ms (trace 0.40 + temporal 0.09 + spatial 0.40 / samples=4) で、
+		// AO と合わせて 1.98ms = 60fps フレームの約12%。デノイザを通すと粒が見えないのでソフトを既定にする。
+		// trace は本数に正比例する(1本あたり約0.125ms、16本で2.0ms)ので、上げるのはデノイザで足りない時だけ
+		uint32_t shadowMode = kShadowModeSoft;
 
 		// 平行光源のソフトシャドウ。受け持つのは0番の平行光源だけで、2本目以降は Hard のまま
 		// 太陽の見かけの半径は約0.27度だが、それだと半影が細くて分からないので少し広げてある
