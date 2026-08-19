@@ -4,6 +4,7 @@
 #include "Game/GameObj/Enemy/Boss.h"
 
 using namespace Graphics;
+using namespace Collision;
 
 
 BossCore::BossCore(Boss* pboss) {
@@ -11,8 +12,8 @@ BossCore::BossCore(Boss* pboss) {
 }
 
 void BossCore::Initialize() {
-	OriginGameObject::Initialize();
-	OriginGameObject::CreateModel("Sphere");
+	GameObject::GameObject::Initialize();
+	GameObject::GameObject::CreateModel("Sphere");
 
 	model_->LoadTransformFromJson("bossCore_transform.json");
 

@@ -3,6 +3,7 @@
 #include "Engine/Core/Debug/ImGuiManager.h"
 #include "Engine/DXC/Resource/DX12Helper.h"
 #include "Engine/Graphics/Object/ObjectRenderer.h"
+#include "Engine/Graphics/Model/ModelManager.h"
 #include "Engine/Graphics/Pipeline/PipelineManager.h"
 #include "Engine/Core/App/MyWindow.h"
 
@@ -13,6 +14,11 @@ using namespace DXC;
 
 
 SkyBox::SkyBox() {
+	// Object3d(ModelManager) / Sprite(TextureManager) と同じく、共有物はシングルトンから取る。
+	// 呼び出し側に配線させない
+	dxcommon_ = ModelManager::GetInstance()->ShareDXCom();
+	srvManager_ = SRVManager::GetInstance();
+	camera_ = CameraManager::GetInstance()->GetCamera();
 }
 
 SkyBox::~SkyBox() {
@@ -76,12 +82,6 @@ void SkyBox::UpdateWVP() {
 	wvpDataGPU_[frameIndex]->WVP = worldViewProjectionMatrix;
 	wvpDataGPU_[frameIndex]->WorldInverseTransPose = Transpose(Inverse(wvpDataGPU_[frameIndex]->World));
 
-}
-
-void SkyBox::SetCommonResources(DXCom* dxcommon, SRVManager* srvManager, Camera* camera) {
-	dxcommon_ = dxcommon;
-	srvManager_ = srvManager;
-	camera_ = camera;
 }
 
 void SkyBox::SetColor(const Math::Vector4& color) {

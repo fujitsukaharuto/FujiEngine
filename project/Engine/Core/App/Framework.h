@@ -30,16 +30,34 @@ namespace Core {
 
 	public:
 
+		/// <summary>ゲーム固有の初期化</summary>
+		/// <remarks>エンジン側の初期化は Run() が先に済ませているので、ここはゲームの都合だけ書けばよい</remarks>
 		virtual void Initialize();
+		/// <summary>エンジン一式の後始末。破棄順を持つので通常は override しない</summary>
 		virtual void Finalize();
+		/// <summary>1フレーム分の更新。ゲーム固有の処理はシーン側か DebugGUI() に置く</summary>
 		virtual void Update();
-		virtual void Draw() = 0;
+		/// <summary>1フレーム分の描画。描画順を持つので通常は override しない</summary>
+		virtual void Draw();
 
 		/// <summary>
 		/// 実行終了を知らせる
 		/// </summary>
 		/// <returns>bool</returns>
 		virtual bool IsEndRequest() { return endRequest_; }
+
+		/// <summary>
+		/// ゲームループ
+		/// </summary>
+		void Run();
+
+	protected:
+
+		/// <summary>ゲーム固有のデバッグUI。エンジンのウィンドウを出した後に呼ばれる</summary>
+		/// <remarks>Debug構成以外では呼ばれないので、中で分岐する必要はない</remarks>
+		virtual void DebugGUI() {}
+
+	private:
 
 		/// <summary>
 		/// システムの初期化
@@ -51,13 +69,9 @@ namespace Core {
 		/// </summary>
 		void BeginUpdate();
 
-		/// <summary>
-		/// ゲームループ
-		/// </summary>
-		void Run();
-
-
-	private:
+		/// <summary>エンジンが持つデバッグウィンドウ一式</summary>
+		/// <remarks>パスやマネージャを増やしてもゲーム側を触らずに済むよう、ここに集約する</remarks>
+		void EngineDebugGUI();
 
 		// 汎用機能の初期化
 		void InitGeneralSystems();

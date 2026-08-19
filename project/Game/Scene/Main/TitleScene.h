@@ -2,7 +2,7 @@
 #include "Engine/Scene/BaseScene.h"
 #include "Engine/Graphics/SkyBox/SkyBox.h"
 #include "Game/GameObj/Player/Player.h"
-#include "Game/Collider/CollisionManager.h"
+#include "Engine/Collision/CollisionManager.h"
 
 /// <summary>
 /// タイトルシーンクラス
@@ -70,7 +70,7 @@ private:
 	std::unique_ptr<Graphics::Object3d> particleTest_ = nullptr;
 	float csEmitterMoveTime_;
 
-	std::unique_ptr<CollisionManager> cMane_;
+	std::unique_ptr<Collision::CollisionManager> cMane_;
 
 	// sceneChange
 	std::unique_ptr<Graphics::Sprite> black_;

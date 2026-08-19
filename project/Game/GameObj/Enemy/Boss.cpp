@@ -24,6 +24,7 @@ using namespace Audio;
 using namespace Core;
 using namespace Graphics;
 using namespace Math;
+using namespace Collision;
 
 
 Boss::Boss() {
@@ -102,7 +103,7 @@ void Boss::Update() {
 }
 
 void Boss::Draw([[maybe_unused]] bool is) {
-	OriginGameObject::Draw();
+	GameObject::GameObject::Draw();
 	DrawColliders();
 
 	core_->Draw();

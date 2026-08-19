@@ -4,13 +4,14 @@
 using namespace Core;
 using namespace Graphics;
 using namespace Math;
+using namespace Collision;
 
 
 UnderRing::UnderRing() {
 }
 
 void UnderRing::Initialize() {
-	OriginGameObject::Initialize();
+	GameObject::GameObject::Initialize();
 	// ファイルからではなく手続き的に生成するので、Createモデル系を通らない。先に実体を用意する
 	EnsureModel()->CreateRing(0.5f,0.25f,2.0f,true);
 	model_->GetTransform().translate.y = 0.5f;
@@ -65,7 +66,7 @@ void UnderRing::Update() {
 
 void UnderRing::Draw([[maybe_unused]] bool is) {
 	// model_ と登録済み子ビジュアル(cylinder_)をまとめて additive 描画
-	OriginGameObject::Draw(true);
+	GameObject::GameObject::Draw(true);
 }
 
 void UnderRing::DrawCollider() {

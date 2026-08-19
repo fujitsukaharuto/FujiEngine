@@ -6,6 +6,7 @@
 using namespace Core;
 using namespace Graphics;
 using namespace Math;
+using namespace Collision;
 
 
 PlayerBullet::PlayerBullet() {
@@ -15,8 +16,8 @@ PlayerBullet::~PlayerBullet() {
 }
 
 void PlayerBullet::Initialize() {
-	OriginGameObject::Initialize();
-	OriginGameObject::CreateModel("Star.obj");
+	GameObject::GameObject::Initialize();
+	GameObject::GameObject::CreateModel("Star.obj");
 	model_->SetColor({ 0.9f,0.85f,0.4f,1.0f });
 
 	// タグは InitParameter / 強化時に付け替わるのでここでは指定しない
@@ -37,7 +38,7 @@ void PlayerBullet::Update() {
 
 void PlayerBullet::Draw(bool is) {
 	if (isLive_ && !isCharge_) {
-		OriginGameObject::Draw(is);
+		GameObject::GameObject::Draw(is);
 	}
 }
 

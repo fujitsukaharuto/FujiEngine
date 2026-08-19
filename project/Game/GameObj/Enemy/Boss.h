@@ -1,6 +1,6 @@
 #pragma once
-#include "Game/OriginObject/OriginGameObject.h"
-#include "Game/Collider/AABBCollider.h"
+#include "Engine/GameObject/GameObject.h"
+#include "Engine/Collision/AABBCollider.h"
 #include "Engine/Graphics/Particle/ParticleEmitter.h"
 #include "Engine/Graphics/Sprite/Sprite.h"
 #include "Engine/Audio/AudioPlayer.h"
@@ -33,7 +33,7 @@ enum class BossHPState {
 /// <summary>
 /// Bossクラス
 /// </summary>
-class Boss : public OriginGameObject {
+class Boss : public GameObject::GameObject {
 public:
 	Boss();
 	~Boss();
@@ -176,13 +176,13 @@ public:
 
 	//========================================================================*/
 	//* Collision
-	void OnCollisionEnter([[maybe_unused]] const ColliderInfo& other)override;
-	void OnCollisionStay([[maybe_unused]] const ColliderInfo& other)override;
-	void OnCollisionExit([[maybe_unused]] const ColliderInfo& other)override;
+	void OnCollisionEnter([[maybe_unused]] const Collision::ColliderInfo& other)override;
+	void OnCollisionStay([[maybe_unused]] const Collision::ColliderInfo& other)override;
+	void OnCollisionExit([[maybe_unused]] const Collision::ColliderInfo& other)override;
 
 	//========================================================================*/
 	//* Getter
-	BaseCollider* GetCoreCollider() { return core_->GetCollider(); }
+	Collision::BaseCollider* GetCoreCollider() { return core_->GetCollider(); }
 	BossCore* GetBossCore() { return core_.get(); }
 	Beam* GetBeam() { return beam_.get(); }
 	const  std::vector<std::unique_ptr<WaveWall>>& GetWalls() { return itemManager_->GetWalls(); }
@@ -303,7 +303,7 @@ private:
 	std::unique_ptr<Beam> beam_;
 
 	/// <summary>所有権は基底の colliders_ が持つ</summary>
-	AABBCollider* collider_ = nullptr;
+	Collision::AABBCollider* collider_ = nullptr;
 
 	Player* pPlayer_;
 	/// <remarks>以下は描画しないTransformアンカー。所有権は基底の anchors_ が持つ</remarks>

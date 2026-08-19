@@ -41,6 +41,13 @@ namespace Graphics {
 		// Grid描画
 		void RenderGrid();
 
+		/// <summary>レイトレ・G-Buffer・IBL 各パスのデバッグUIをまとめて出す</summary>
+		/// <remarks>
+		/// パスを増やしたときに呼び出し側を触らずに済むよう、ここに集約する。
+		/// 表示位置(タブやヘッダ)は呼び出し側が決める。Debug構成以外では何もしない
+		/// </remarks>
+		void DebugGUI();
+
 		/// <summary>レイトレの加速構造。RayQuery非対応環境でも非nullで、中身が空振りする</summary>
 		RaytracingScene* GetRaytracingScene() const { return raytracingScene_.get(); }
 

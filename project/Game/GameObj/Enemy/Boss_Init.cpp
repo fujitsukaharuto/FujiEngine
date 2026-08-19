@@ -25,8 +25,8 @@ using namespace Math;
 
 
 void Boss::Initialize() {
-	OriginGameObject::Initialize();
-	OriginGameObject::CreateAnimeModel("T_boss.gltf");
+	GameObject::GameObject::Initialize();
+	GameObject::GameObject::CreateAnimeModel("T_boss.gltf");
 	animeModel_->LoadAnimationFile("T_boss.gltf");
 
 	animeModel_->LoadTransformFromJson("boss_transform.json");

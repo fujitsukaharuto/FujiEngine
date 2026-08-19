@@ -9,6 +9,7 @@
 using namespace Core;
 using namespace Graphics;
 using namespace Math;
+using namespace Collision;
 
 
 Beam::Beam() {
@@ -19,8 +20,8 @@ Beam::~Beam() {
 }
 
 void Beam::Initialize() {
-	OriginGameObject::Initialize();
-	OriginGameObject::CreateModel("cube.obj");
+	GameObject::GameObject::Initialize();
+	GameObject::GameObject::CreateModel("cube.obj");
 
 	halfPi_ = std::numbers::pi_v<float> / 2.0f;
 

@@ -5,7 +5,7 @@
 #include "Game/GameObj/FollowCamera.h"
 #include "Game/GameObj/Player/Player.h"
 #include "Game/GameObj/Enemy/Boss.h"
-#include "Game/Collider/CollisionManager.h"
+#include "Engine/Collision/CollisionManager.h"
 
 /// <summary>
 /// ゲームシーンクラス
@@ -39,7 +39,7 @@ private:
 	void ContinueUpdate();
 	void PadSwitch();
 
-	std::unique_ptr<CollisionManager> cMane_;
+	std::unique_ptr<Collision::CollisionManager> cMane_;
 
 	std::unique_ptr<Graphics::AnimationModel> terrain_ = nullptr;
 	std::unique_ptr<Graphics::Object3d> surroundings_ = nullptr;

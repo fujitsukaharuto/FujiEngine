@@ -9,6 +9,7 @@ using namespace Audio;
 using namespace Core;
 using namespace Graphics;
 using namespace Math;
+using namespace Collision;
 
 
 Arrow::Arrow() {
@@ -23,8 +24,8 @@ Arrow::~Arrow() {
 }
 
 void Arrow::Initialize() {
-	OriginGameObject::Initialize();
-	OriginGameObject::CreateModel("Boss_Arrow.obj");
+	GameObject::GameObject::Initialize();
+	GameObject::GameObject::CreateModel("Boss_Arrow.obj");
 
 	collider_ = AddCollider("enemyAttack");
 	collider_->SetParent(&model_->GetTransform());
@@ -75,7 +76,7 @@ void Arrow::Update() {
 void Arrow::Draw([[maybe_unused]] bool is) {
 	// 着弾予告の円は条件付き表示。基底の描画リストに載せたまま可視フラグで切り替える
 	SetRendererVisible(arrivalWarningPotion_, isArrow_ && arrivalTime_ > 0.0f && animationTime_ < totalAnimationTime_);
-	OriginGameObject::Draw();
+	GameObject::GameObject::Draw();
 }
 
 void Arrow::DrawCollider() {

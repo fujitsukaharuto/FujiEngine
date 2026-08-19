@@ -42,7 +42,6 @@ void ParticleDebugScene::Initialize() {
 #pragma endregion
 
 	skybox_ = std::make_unique<SkyBox>();
-	skybox_->SetCommonResources(dxcommon_, SRVManager::GetInstance(), CameraManager::GetInstance()->GetCamera());
 	skybox_->Initialize();
 	skybox_->SetColor(skyBoxColor_);
 

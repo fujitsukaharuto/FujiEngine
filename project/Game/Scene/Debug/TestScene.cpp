@@ -13,6 +13,7 @@ using namespace Graphics;
 using namespace Math;
 using namespace Editor;
 using namespace Scene;
+using namespace Collision;
 
 
 TestScene::TestScene() {}

@@ -10,6 +10,7 @@ using namespace Graphics;
 using namespace Math;
 using namespace Scene;
 using namespace DXC;
+using namespace Collision;
 
 
 GameScene::GameScene() {}
@@ -227,7 +228,6 @@ void GameScene::LoadSceneLevelData(const std::string& name) {
 
 void GameScene::InitGameObj() {
 	skybox_ = std::make_unique<SkyBox>();
-	skybox_->SetCommonResources(dxcommon_, SRVManager::GetInstance(), CameraManager::GetInstance()->GetCamera());
 	skybox_->Initialize();
 	skybox_->SetColor(skyBoxColor_);
 

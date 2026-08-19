@@ -1,6 +1,6 @@
 #pragma once
-#include "Game/OriginObject/OriginGameObject.h"
-#include "Game/Collider/AABBCollider.h"
+#include "Engine/GameObject/GameObject.h"
+#include "Engine/Collision/AABBCollider.h"
 #include "Engine/Graphics/Sprite/Sprite.h"
 #include "Engine/Audio/AudioPlayer.h"
 #include "Game/Particle/GameEmitters.h"
@@ -53,7 +53,7 @@ struct PlayerParams {
 /// <summary>
 /// Playerクラス
 /// </summary>
-class Player : public OriginGameObject {
+class Player : public GameObject::GameObject {
 public:
 	Player();
 	~Player();
@@ -79,9 +79,9 @@ public:
 
 	//========================================================================*/
 	//* Collision
-	void OnCollisionEnter([[maybe_unused]] const ColliderInfo& other)override;
-	void OnCollisionStay([[maybe_unused]] const ColliderInfo& other)override;
-	void OnCollisionExit([[maybe_unused]] const ColliderInfo& other)override;
+	void OnCollisionEnter([[maybe_unused]] const Collision::ColliderInfo& other)override;
+	void OnCollisionStay([[maybe_unused]] const Collision::ColliderInfo& other)override;
+	void OnCollisionExit([[maybe_unused]] const Collision::ColliderInfo& other)override;
 
 	//========================================================================*/
 	//* Move
@@ -176,7 +176,7 @@ private:
 	/// <remarks>描画されない Transform アンカー(エミッタの親)。所有権は基底 anchors_ が持つ</remarks>
 	Math::Trans* strongStatePos_ = nullptr;
 	/// <summary>所有権は基底の colliders_ が持つ</summary>
-	AABBCollider* collider_ = nullptr;
+	Collision::AABBCollider* collider_ = nullptr;
 
 	Math::Vector3 targetPos_;
 

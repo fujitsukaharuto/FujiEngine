@@ -1,8 +1,9 @@
 #include "BaseCollider.h"
 #include <algorithm>
-#include "Game/OriginObject/OriginGameObject.h"
+#include "Engine/GameObject/GameObject.h"
 
 using namespace Math;
+using namespace Collision;
 
 
 BaseCollider::BaseCollider() {
@@ -58,6 +59,6 @@ Vector3 BaseCollider::GetWorldPos() {
 	return GetPos();
 }
 
-OriginGameObject* BaseCollider::GetOwner() {
+GameObject::GameObject* BaseCollider::GetOwner() {
 	return info.owner;
 }

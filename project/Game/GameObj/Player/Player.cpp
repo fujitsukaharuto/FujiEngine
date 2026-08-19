@@ -14,6 +14,7 @@ using namespace Audio;
 using namespace Core;
 using namespace Graphics;
 using namespace Math;
+using namespace Collision;
 
 
 Player::Player() {
@@ -23,8 +24,8 @@ Player::~Player() {
 }
 
 void Player::Initialize() {
-	OriginGameObject::Initialize();
-	OriginGameObject::CreateFromJson();
+	GameObject::GameObject::Initialize();
+	GameObject::GameObject::CreateFromJson();
 
 	model_->SetTexture("Atlas.png");
 
@@ -155,7 +156,7 @@ void Player::Draw(bool is) {
 		}
 	}
 
-	OriginGameObject::Draw(is);
+	GameObject::GameObject::Draw(is);
 
 	DrawColliders();
 

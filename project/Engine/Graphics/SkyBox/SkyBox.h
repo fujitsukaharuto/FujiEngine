@@ -24,8 +24,6 @@ namespace Graphics {
 
 		/// <summary>行列更新</summary>
 		void UpdateWVP();
-		/// <summary>必要なクラスのSetter</summary>
-		void SetCommonResources(DXC::DXCom* dxcommon, DXC::SRVManager* srvManager, Camera* camera);
 		void SetColor(const Math::Vector4& color);
 
 	private:

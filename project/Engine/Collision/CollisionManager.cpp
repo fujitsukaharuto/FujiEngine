@@ -2,6 +2,7 @@
 #include "AABBCollider.h"
 
 using namespace Math;
+using namespace Collision;
 
 
 CollisionManager::CollisionManager() {

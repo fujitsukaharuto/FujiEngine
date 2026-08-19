@@ -1,6 +1,6 @@
 #pragma once
-#include "Game/OriginObject/OriginGameObject.h"
-#include "Game/Collider/AABBCollider.h"
+#include "Engine/GameObject/GameObject.h"
+#include "Engine/Collision/AABBCollider.h"
 #include "Engine/Graphics/Particle/ParticleEmitter.h"
 
 
@@ -19,7 +19,7 @@ struct OneBeam {
 	std::unique_ptr<Graphics::Object3d> beam1;
 	std::unique_ptr<Graphics::Object3d> beam2;
 	std::unique_ptr<Graphics::Object3d> beam3;
-	AABBCollider* collider = nullptr;	// 所有権は Beam の基底 colliders_ が持つ
+	Collision::AABBCollider* collider = nullptr;	// 所有権は Beam の基底 colliders_ が持つ
 	std::unique_ptr<Graphics::Object3d> model;
 	Math::Trans* particleParent = nullptr;	// 所有権は Beam の基底 anchors_ が持つ
 };
@@ -29,7 +29,7 @@ class Boss;
 /// <summary>
 /// BossItem:Beamクラス
 /// </summary>
-class Beam : public OriginGameObject {
+class Beam : public GameObject::GameObject {
 public:
 	Beam();
 	~Beam();
@@ -68,9 +68,9 @@ public:
 
 	//========================================================================*/
 	//* Collision
-	void OnCollisionEnter([[maybe_unused]] const ColliderInfo& other)override;
-	void OnCollisionStay([[maybe_unused]] const ColliderInfo& other)override;
-	void OnCollisionExit([[maybe_unused]] const ColliderInfo& other)override;
+	void OnCollisionEnter([[maybe_unused]] const Collision::ColliderInfo& other)override;
+	void OnCollisionStay([[maybe_unused]] const Collision::ColliderInfo& other)override;
+	void OnCollisionExit([[maybe_unused]] const Collision::ColliderInfo& other)override;
 
 	//========================================================================*/
 	//* Getter
@@ -120,7 +120,7 @@ private:
 
 	float halfPi_ = 0.0f;
 
-	//std::unique_ptr<AABBCollider> collider_;
+	//std::unique_ptr<Collision::AABBCollider> collider_;
 
 	// emitter
 	Graphics::ParticleEmitter spark1_;

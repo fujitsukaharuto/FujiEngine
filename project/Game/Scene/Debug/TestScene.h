@@ -1,6 +1,6 @@
 #pragma once
 #include "Engine/Scene/BaseScene.h"
-#include "Game/Collider/CollisionManager.h"
+#include "Engine/Collision/CollisionManager.h"
 #include <vector>
 
 /// <summary>
@@ -39,7 +39,7 @@ private:
 
 private:
 
-	std::unique_ptr<CollisionManager> cMane_;
+	std::unique_ptr<Collision::CollisionManager> cMane_;
 
 	std::unique_ptr<Graphics::Object3d> ground_;
 	std::vector<std::unique_ptr<Graphics::Object3d>> objects_;

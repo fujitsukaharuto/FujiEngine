@@ -22,6 +22,7 @@ using namespace Math;
 using namespace Editor;
 using namespace Scene;
 using namespace DXC;
+using namespace Collision;
 
 
 TitleScene::TitleScene() {}
@@ -48,7 +49,6 @@ void TitleScene::Initialize() {
 #pragma endregion
 
 	skybox_ = std::make_unique<SkyBox>();
-	skybox_->SetCommonResources(dxcommon_, SRVManager::GetInstance(), CameraManager::GetInstance()->GetCamera());
 	skybox_->Initialize();
 	skybox_->SetColor(skyBoxColor_);
 

@@ -259,14 +259,14 @@
     <ClCompile Include="Game\App\GameRun.cpp">
       <Filter>Game\App</Filter>
     </ClCompile>
-    <ClCompile Include="Game\Collider\AABBCollider.cpp">
-      <Filter>Game\Collider</Filter>
+    <ClCompile Include="Engine\Collision\AABBCollider.cpp">
+      <Filter>Engine\Collision</Filter>
     </ClCompile>
-    <ClCompile Include="Game\Collider\BaseCollider.cpp">
-      <Filter>Game\Collider</Filter>
+    <ClCompile Include="Engine\Collision\BaseCollider.cpp">
+      <Filter>Engine\Collision</Filter>
     </ClCompile>
-    <ClCompile Include="Game\Collider\CollisionManager.cpp">
-      <Filter>Game\Collider</Filter>
+    <ClCompile Include="Engine\Collision\CollisionManager.cpp">
+      <Filter>Engine\Collision</Filter>
     </ClCompile>
     <ClCompile Include="Game\Field\MapChipField.cpp">
       <Filter>Game\Field</Filter>
@@ -346,8 +346,8 @@
     <ClCompile Include="Game\GameObj\FollowCamera.cpp">
       <Filter>Game\GameObj</Filter>
     </ClCompile>
-    <ClCompile Include="Game\OriginObject\OriginGameObject.cpp">
-      <Filter>Game\OriginObject</Filter>
+    <ClCompile Include="Engine\GameObject\GameObject.cpp">
+      <Filter>Engine\GameObject</Filter>
     </ClCompile>
     <ClCompile Include="Game\Particle\GameEmitters.cpp">
       <Filter>Game\Particle</Filter>
@@ -688,14 +688,14 @@
     <ClInclude Include="Game\App\GameRun.h">
       <Filter>Game\App</Filter>
     </ClInclude>
-    <ClInclude Include="Game\Collider\AABBCollider.h">
-      <Filter>Game\Collider</Filter>
+    <ClInclude Include="Engine\Collision\AABBCollider.h">
+      <Filter>Engine\Collision</Filter>
     </ClInclude>
-    <ClInclude Include="Game\Collider\BaseCollider.h">
-      <Filter>Game\Collider</Filter>
+    <ClInclude Include="Engine\Collision\BaseCollider.h">
+      <Filter>Engine\Collision</Filter>
     </ClInclude>
-    <ClInclude Include="Game\Collider\CollisionManager.h">
-      <Filter>Game\Collider</Filter>
+    <ClInclude Include="Engine\Collision\CollisionManager.h">
+      <Filter>Engine\Collision</Filter>
     </ClInclude>
     <ClInclude Include="Game\Field\MapChipField.h">
       <Filter>Game\Field</Filter>
@@ -778,11 +778,8 @@
     <ClInclude Include="Game\GameObj\FollowCamera.h">
       <Filter>Game\GameObj</Filter>
     </ClInclude>
-    <ClInclude Include="Game\OriginObject\OriginGameObject.h">
-      <Filter>Game\OriginObject</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\OriginObject\OriginState.h">
-      <Filter>Game\OriginObject</Filter>
+    <ClInclude Include="Engine\GameObject\GameObject.h">
+      <Filter>Engine\GameObject</Filter>
     </ClInclude>
     <ClInclude Include="Game\Particle\GameEmitters.h">
       <Filter>Game\Particle</Filter>
@@ -969,7 +966,7 @@
     <Filter Include="Game\App">
       <UniqueIdentifier>{e84b01f8-a8cf-4267-b86c-0ccc66fcee4d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\Collider">
+    <Filter Include="Engine\Collision">
       <UniqueIdentifier>{20f410ec-47e8-4e10-a499-b1fd2ef09cde}</UniqueIdentifier>
     </Filter>
     <Filter Include="Game\Field">
@@ -996,7 +993,7 @@
     <Filter Include="Game\GameObj\Player\Behavior">
       <UniqueIdentifier>{8d06dd74-7aa7-4bd8-9f75-d044a3d5acdc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\OriginObject">
+    <Filter Include="Engine\GameObject">
       <UniqueIdentifier>{582d5b3b-3b7d-4005-9981-1c1a7472245f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Game\Particle">

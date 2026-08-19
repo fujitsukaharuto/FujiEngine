@@ -210,6 +210,17 @@ void Graphics::ObjectRenderer::RenderGrid() {
 	dxcommon_->GetDXCommand()->GetList()->DrawInstanced(3, 1, 0, 0);
 }
 
+void ObjectRenderer::DebugGUI() {
+#ifdef _DEBUGMODE
+	// 各パスは自前で CollapsingHeader を開くので、ここは並べるだけでよい
+	if (raytracingScene_) { raytracingScene_->DebugGUI(); }
+	if (gbufferPass_) { gbufferPass_->DebugGUI(); }
+	if (aoPass_) { aoPass_->DebugGUI(); }
+	if (shadowPass_) { shadowPass_->DebugGUI(); }
+	if (iblBaker_) { iblBaker_->DebugGUI(); }
+#endif // _DEBUGMODE
+}
+
 void ObjectRenderer::PreDraw() {
 	dxcommon_->GetDXCommand()->SetViewAndScissor(MyWin::kWindowWidth, MyWin::kWindowHeight);
 	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Normal);

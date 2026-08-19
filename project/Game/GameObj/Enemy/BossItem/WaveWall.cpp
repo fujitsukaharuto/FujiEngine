@@ -4,14 +4,15 @@
 using namespace Core;
 using namespace Graphics;
 using namespace Math;
+using namespace Collision;
 
 
 WaveWall::WaveWall() {
 }
 
 void WaveWall::Initialize() {
-	OriginGameObject::Initialize();
-	OriginGameObject::CreateModel("bossWaveWall.obj");
+	GameObject::GameObject::Initialize();
+	GameObject::GameObject::CreateModel("bossWaveWall.obj");
 
 	underRing_ = AddRenderer();
 	underRing_->CreateRing(1.2f, 0.6f, 1.0f, true);
@@ -60,7 +61,7 @@ void WaveWall::Update() {
 
 void WaveWall::Draw([[maybe_unused]] bool is) {
 	// model_ と登録済み子ビジュアル(underRing_/wave1〜3_)をまとめて additive 描画
-	OriginGameObject::Draw(true);
+	GameObject::GameObject::Draw(true);
 }
 
 void WaveWall::DrawCollider() {

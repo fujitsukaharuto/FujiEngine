@@ -52,7 +52,6 @@ void ResultScene::Initialize() {
 	clear_->SetSize({ 1280.0f,720.0f });
 
 	skybox_ = std::make_unique<SkyBox>();
-	skybox_->SetCommonResources(dxcommon_, SRVManager::GetInstance(), CameraManager::GetInstance()->GetCamera());
 	skybox_->Initialize();
 	skybox_->SetColor(skyBoxColor_);
 

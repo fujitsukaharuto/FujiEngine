@@ -1,13 +1,13 @@
 #pragma once
-#include "Game/OriginObject/OriginGameObject.h"
-#include "Game/Collider/AABBCollider.h"
+#include "Engine/GameObject/GameObject.h"
+#include "Engine/Collision/AABBCollider.h"
 #include "Engine/Graphics/Particle/ParticleEmitter.h"
 
 
 /// <summary>
 /// BossItem:UnderRingクラス
 /// </summary>
-class UnderRing : public OriginGameObject {
+class UnderRing : public GameObject::GameObject {
 public:
 	UnderRing();
 	~UnderRing() = default;
@@ -27,9 +27,9 @@ public:
 
 	//========================================================================*/
 	//* Collision
-	void OnCollisionEnter([[maybe_unused]] const ColliderInfo& other)override;
-	void OnCollisionStay([[maybe_unused]] const ColliderInfo& other)override;
-	void OnCollisionExit([[maybe_unused]] const ColliderInfo& other)override;
+	void OnCollisionEnter([[maybe_unused]] const Collision::ColliderInfo& other)override;
+	void OnCollisionStay([[maybe_unused]] const Collision::ColliderInfo& other)override;
+	void OnCollisionExit([[maybe_unused]] const Collision::ColliderInfo& other)override;
 
 	//========================================================================*/
 	//* Setter
@@ -62,6 +62,6 @@ private:
 	float uvTransX_;
 
 	/// <summary>所有権は基底の colliders_ が持つ</summary>
-	AABBCollider* collider_ = nullptr;
+	Collision::AABBCollider* collider_ = nullptr;
 
 };
