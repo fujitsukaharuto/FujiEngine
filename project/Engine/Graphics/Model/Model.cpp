@@ -10,6 +10,7 @@
 #include "Engine/Graphics/Raytracing/RayTracedShadowPass.h"
 #include "Engine/Graphics/IBL/IBLBaker.h"
 #include "Engine/Graphics/Texture/TextureManager.h"
+#include "Engine/DXC/DXCom.h"
 
 using namespace Graphics;
 using namespace Math;
@@ -105,7 +106,7 @@ void Model::Draw(ID3D12GraphicsCommandList* commandList, std::vector<Material>& 
 	for (uint32_t index = 0; index < drawCount; ++index) {
 		PipelineManager* pPipeManager = PipelineManager::GetInstance()->GetInstance();
 		
-		pPipeManager->SetGraphicsRootCBV(commandList, RootName::kMaterial, materials[index].GetMaterialResource()->GetGPUVirtualAddress());
+		pPipeManager->SetGraphicsRootCBV(commandList, RootName::kMaterial, materials[index].UploadAndGetResource()->GetGPUVirtualAddress());
 		pPipeManager->SetGraphicsRootDescriptorTable(commandList, RootName::kTextures, SRVManager::GetInstance()->GetGPUDescriptorHandle(0));
 
 		BindSceneTLAS(commandList);
@@ -131,7 +132,7 @@ void Model::AnimationDraw(DXCom* pDxcom, ID3D12GraphicsCommandList* commandList,
 	for (uint32_t index = 0; index < drawCount; ++index) {
 		PipelineManager* pPipeManager = PipelineManager::GetInstance()->GetInstance();
 
-		pPipeManager->SetGraphicsRootCBV(commandList, RootName::kMaterial, materials[index].GetMaterialResource()->GetGPUVirtualAddress());
+		pPipeManager->SetGraphicsRootCBV(commandList, RootName::kMaterial, materials[index].UploadAndGetResource()->GetGPUVirtualAddress());
 		pPipeManager->SetGraphicsRootDescriptorTable(commandList, RootName::kTextures, SRVManager::GetInstance()->GetGPUDescriptorHandle(0));
 		BindSceneTLAS(commandList);
 		BindEnvironment(commandList);
@@ -157,7 +158,7 @@ void Model::DrawPrepass(ID3D12GraphicsCommandList* commandList, std::vector<Mate
 	for (uint32_t index = 0; index < drawCount; ++index) {
 		PipelineManager* pPipeManager = PipelineManager::GetInstance();
 
-		pPipeManager->SetGraphicsRootCBV(commandList, RootName::kMaterial, materials[index].GetMaterialResource()->GetGPUVirtualAddress());
+		pPipeManager->SetGraphicsRootCBV(commandList, RootName::kMaterial, materials[index].UploadAndGetResource()->GetGPUVirtualAddress());
 		pPipeManager->SetGraphicsRootDescriptorTable(commandList, RootName::kTextures, SRVManager::GetInstance()->GetGPUDescriptorHandle(0));
 
 		commandList->IASetVertexBuffers(0, 1, &mesh_[index].GetVBV());
@@ -174,7 +175,7 @@ void Model::AnimationDrawPrepass(ID3D12GraphicsCommandList* commandList, std::ve
 	for (uint32_t index = 0; index < drawCount; ++index) {
 		PipelineManager* pPipeManager = PipelineManager::GetInstance();
 
-		pPipeManager->SetGraphicsRootCBV(commandList, RootName::kMaterial, materials[index].GetMaterialResource()->GetGPUVirtualAddress());
+		pPipeManager->SetGraphicsRootCBV(commandList, RootName::kMaterial, materials[index].UploadAndGetResource()->GetGPUVirtualAddress());
 		pPipeManager->SetGraphicsRootDescriptorTable(commandList, RootName::kTextures, SRVManager::GetInstance()->GetGPUDescriptorHandle(0));
 
 		commandList->IASetVertexBuffers(0, 1, &skinnedMeshes[index].GetSkinnedVBV());

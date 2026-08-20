@@ -15,10 +15,10 @@ void BossCore::Initialize() {
 	GameObject::GameObject::Initialize();
 	GameObject::GameObject::CreateModel("Sphere");
 
-	model_->LoadTransformFromJson("bossCore_transform.json");
+	LoadTransformFromJson("bossCore_transform.json");
 
 	collider_ = AddCollider("testBoss");
-	collider_->SetParent(&model_->GetTransform());
+	collider_->SetParent(&transform_);
 	collider_->SetOffset({ 0.0f,2.0f, -1.5f });
 	collider_->SetWidth(5.0f);
 	collider_->SetHeight(5.0f);
@@ -26,8 +26,8 @@ void BossCore::Initialize() {
 
 	InitParameter();
 
-	model_->SetParent(&pBoss_->GetTrans());
-	model_->SetNoneScaleParent(true);
+	transform_.SetParent(&pBoss_->GetTrans());
+	transform_.SetNoneScaleParent(true);
 
 }
 
@@ -43,7 +43,7 @@ void BossCore::Draw([[maybe_unused]] bool is) {
 void BossCore::DebugGUI() {
 #ifdef _DEBUGMODE
 	if (ImGui::CollapsingHeader("BossCore")) {
-		model_->DebugGUI();
+		GameObject::GameObject::DebugGUI();
 		collider_->DebugGUI();
 	}
 #endif // _DEBUG

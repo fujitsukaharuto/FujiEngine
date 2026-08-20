@@ -6,9 +6,8 @@
 #include "ParticleGroup/IParticleGroup.h"
 #include "ParticleGroup/ParticleGroup.h"
 #include "ParticleGroup/ParentParticleGroup.h"
-#include "GPUParticle/GPUParticleSystem.h"
-#include "Engine/Graphics/Model/Model.h"
-#include "Engine/Graphics/Object/Object3d.h"
+// 必要なのは Mesh::MeshBuffer だけ。Model.h は SkinnedMesh/AnimationStructs まで連れてくる
+#include "Engine/Graphics/Model/Mesh/Mesh.h"
 #include "Engine/Math/Matrix/MatrixCalculation.h"
 #include "Engine/Graphics/Pipeline/BasePipeline.h"
 
@@ -20,6 +19,16 @@ namespace DXC { class SRVManager; }
 
 namespace Graphics {
 
+	// GPUParticleSystem は unique_ptr で持つだけ(デストラクタは .cpp)、
+	// エミッタ群は参照を返す宣言にしか出てこない。実体が要る側が自分で include する
+	class GPUParticleSystem;
+	class IGPUEmitter;
+	class SphereEmitter;
+	class TextureBasedEmitter;
+	class MeshSurfaceEmitter;
+	class AnimeParticleGroup;
+	class Object3d;
+
 	/// <summary>
 	/// パーティクル管理クラス
 	/// </summary>
@@ -29,25 +38,6 @@ namespace Graphics {
 		~ParticleManager();
 
 	public:
-
-		/// <summary>
-		/// アニメーションパーティクルグループのデータ
-		/// </summary>
-		struct AnimeGroup {
-			std::string first;
-			std::vector<std::unique_ptr<Graphics::Object3d>> objects_;
-			std::vector<float> lifeTime;
-			std::vector<float> animeTime;
-			std::vector<float> startLifeTime_;
-			std::vector<bool> isLive_;
-			std::vector<Math::Vector3> accele{};
-			std::vector<Math::Vector3> speed{};
-			int type = static_cast<int>(SizeType::kNormal);
-			int speedType = static_cast<int>(SpeedType::kConstancy);
-			Math::Vector2 startSize = { 1.0f,1.0f };
-			Math::Vector2 endSize = { 1.0f,1.0f };
-			std::map<std::string, float> anime_;
-		};
 
 		static ParticleManager* GetInstance();
 
@@ -143,7 +133,7 @@ namespace Graphics {
 
 		std::unordered_map<std::string, std::unique_ptr<ParticleGroup>> particleGroups_;
 		std::unordered_map<std::string, std::unique_ptr<ParentParticleGroup>> parentParticleGroups_;
-		std::unordered_map<std::string, std::unique_ptr<AnimeGroup>> animeGroups_;
+		std::unordered_map<std::string, std::unique_ptr<AnimeParticleGroup>> animeGroups_;
 
 
 		// VertexData

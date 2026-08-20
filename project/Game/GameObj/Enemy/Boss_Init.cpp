@@ -3,7 +3,6 @@
 #include "Engine/Math/Random/Random.h"
 #include "Engine/Graphics/Camera/CameraManager.h"
 #include "Engine/Core/Serialize/JsonSerializer.h"
-#include <numbers>
 
 #include "Game/GameObj/Enemy/Behavior/BossRoot.h"
 #include "Game/GameObj/Enemy/Behavior/BossAttack.h"
@@ -16,6 +15,9 @@
 #include "Game/GameObj/Enemy/Behavior/BossDushAttack.h"
 
 #include "Game/GameObj/Player/Player.h"
+#include "Engine/Graphics/Particle/GPUParticle/GPUEmitter/SphereEmitter.h"
+#include "Engine/Graphics/Particle/GPUParticle/GPUEmitter/TextureBasedEmitter.h"
+#include "Engine/Graphics/Particle/GPUParticle/IGPUParticleEmitter.h"
 
 using namespace Audio;
 using namespace Core;
@@ -29,10 +31,10 @@ void Boss::Initialize() {
 	GameObject::GameObject::CreateAnimeModel("T_boss.gltf");
 	animeModel_->LoadAnimationFile("T_boss.gltf");
 
-	animeModel_->LoadTransformFromJson("boss_transform.json");
+	LoadTransformFromJson("boss_transform.json");
 
 	collider_ = AddCollider("Boss");
-	collider_->SetParent(&animeModel_->GetTransform());
+	collider_->SetParent(&transform_);
 	collider_->SetOffset({ 0.0f,7.0f,0.0f });
 	collider_->SetWidth(7.5f);
 	collider_->SetHeight(15.0f);
@@ -68,7 +70,7 @@ void Boss::InitParameter() {
 	attackCooldown_ = kInitAttackCooldown_;
 	bossHp_ = kMaxBossHp_;
 
-	params_.beam.parentRotateStep = std::numbers::pi_v<float>*0.25f;
+	params_.beam.parentRotateStep = kPi*0.25f;
 	itemManager_ = std::make_unique<BossItemManager>();
 	itemManager_->Initialize(this);
 
@@ -158,7 +160,7 @@ void Boss::InitEmitter() {
 	ParticleManager::Load(roaringWave_, "roringWave");
 	ParticleManager::Load(roaringParticle_, "roringParticle");
 	ParticleManager::Load(roaringRing_, "roringring");
-	roaringWave_.pos_ = animeModel_->GetTransform().translate;
+	roaringWave_.pos_ = transform_.translate;
 	roaringWave_.grain_.isAutoUVMove_ = true;
 	roaringWave_.grain_.autoUVSpeed_.x = 0.01f;
 	roaringWave_.grain_.isZandX_ = true;
@@ -181,11 +183,11 @@ void Boss::InitEmitter() {
 }
 
 void Boss::DushInit() {
-	float parentRotate = std::numbers::pi_v<float> *0.25f;
+	float parentRotate = kPi *0.25f;
 	for (int i = 0; i < kChargeCount_; i++) {
 		if (i != 0 && i != 4) {
-			chargeParents_[i]->rotate.x = Random::GetFloat(-std::numbers::pi_v<float>, std::numbers::pi_v<float>);
-			chargeParents_[i]->rotate.y = Random::GetFloat(-std::numbers::pi_v<float>*0.5f, std::numbers::pi_v<float>*0.5f);
+			chargeParents_[i]->rotate.x = Random::GetFloat(-kPi, kPi);
+			chargeParents_[i]->rotate.y = Random::GetFloat(-kPi*0.5f, kPi*0.5f);
 		}
 		chargeParents_[i]->translate.y = 4.0f;
 		chargeParents_[i]->rotate.z = parentRotate * i;
@@ -205,8 +207,8 @@ void Boss::InitBeam() {
 	float parentRotate = bp.parentRotateStep;
 	for (int i = 0; i < kChargeCount_; i++) {
 		if (i != 0 && i != 4) {
-			chargeParents_[i]->rotate.x = Random::GetFloat(-std::numbers::pi_v<float>, std::numbers::pi_v<float>);
-			chargeParents_[i]->rotate.y = Random::GetFloat(-std::numbers::pi_v<float>*0.5f, std::numbers::pi_v<float>*0.5f);
+			chargeParents_[i]->rotate.x = Random::GetFloat(-kPi, kPi);
+			chargeParents_[i]->rotate.y = Random::GetFloat(-kPi*0.5f, kPi*0.5f);
 		}
 		chargeParents_[i]->translate.y = bp.parentY;
 		chargeParents_[i]->rotate.z = parentRotate * i;
@@ -236,12 +238,12 @@ void Boss::InitSummon() {
 	emitter.GetData().lifeTime = 0.8f;
 	emitter.GetData().radius = 10.0f;
 	emitter.GetData().frequency = 0.01f;
-	emitter.GetData().translate = animeModel_->GetTransform().translate;
+	emitter.GetData().translate = transform_.translate;
 	emitter.GetData().baseVelocity = { 0.0f,0.6f,0.0f };
 
-	bossYPos_ = animeModel_->GetTransform().translate.y;
+	bossYPos_ = transform_.translate.y;
 	defaultCorePos_ = core_->GetWorldPos();
-	animeModel_->GetTransform().translate.y = -30.0f;
+	transform_.translate.y = -30.0f;
 
 	ParticleManager::Load(summonLightning_, "summonLightning_");
 	ParticleManager::Load(energySphere_, "energySphere");
@@ -250,31 +252,31 @@ void Boss::InitSummon() {
 	summonLightning_.grain_.isZandX_ = true;
 	energySphere_.grain_.isZandX_ = true;
 
-	summonLightning_.pos_ = animeModel_->GetTransform().translate;
+	summonLightning_.pos_ = transform_.translate;
 	summonLightning_.pos_.y = 40.0f;
-	energySphere_.pos_ = animeModel_->GetTransform().translate;
+	energySphere_.pos_ = transform_.translate;
 	energySphere_.pos_.y = 0.0f;
-	energyParticle_.pos_ = animeModel_->GetTransform().translate;
+	energyParticle_.pos_ = transform_.translate;
 	energyParticle_.pos_.y = 0.0f;
 
 }
 
 void Boss::InitChargeParent() {
-	float parentRotate = std::numbers::pi_v<float> *0.25f;
+	float parentRotate = kPi *0.25f;
 	for (int i = 0; i < kChargeCount_; i++) {// チャージエミッターの親となるもの
 		Math::Trans* chargeParent = AddAnchor();
 		chargeParent->translate.y += 20.0f;
 		chargeParent->scale.x = params_.beam.baseChargeSize;
 		chargeParent->scale.y = params_.beam.baseChargeSize;
 		chargeParent->scale.z = params_.beam.baseChargeSize;
-		chargeParent->SetParent(&animeModel_->GetTransform());
+		chargeParent->SetParent(&transform_);
 		chargeParent->SetNoneScaleParent(true);
 		if (i != 0 && i != 4) {
 			if (i < 4) {
-				chargeParent->rotate.x = Random::GetFloat(-std::numbers::pi_v<float>, std::numbers::pi_v<float>);
+				chargeParent->rotate.x = Random::GetFloat(-kPi, kPi);
 				chargeParent->rotate.y = Random::GetFloat(-1.56f, 1.56f);
 			} else {
-				chargeParent->rotate.x = Random::GetFloat(-std::numbers::pi_v<float>, std::numbers::pi_v<float>);
+				chargeParent->rotate.x = Random::GetFloat(-kPi, kPi);
 				chargeParent->rotate.y = Random::GetFloat(-1.56f, 1.56f);
 			}
 		}
@@ -302,7 +304,7 @@ void Boss::InitChargeParent() {
 void Boss::InitItemParent() {
 	waveParent_ = AddAnchor();
 	waveParent_->translate.z += 8.0f;
-	waveParent_->SetParent(&animeModel_->GetTransform());
+	waveParent_->SetParent(&transform_);
 	waveParent_->SetNoneScaleParent(true);
 
 	for (int i = 0; i < arrowSpawnNum_; i++) {
@@ -314,7 +316,7 @@ void Boss::InitItemParent() {
 		}
 		arrowParent->translate.y += 6.0f;
 		arrowParent->translate.z -= 2.0f;
-		arrowParent->SetParent(&animeModel_->GetTransform());
+		arrowParent->SetParent(&transform_);
 		arrowParent->SetNoneScaleParent(true);
 
 		arrowParents_.push_back(arrowParent);

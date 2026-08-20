@@ -43,7 +43,9 @@ namespace Graphics {
 		Texture* LoadTexture(const std::string& filename);
 		void Load(const std::string& filename, bool overWrite = false);
 		void LoadAll();
-		void LoadTextureFile(bool overWrite = false);
+		/// <summary>テクスチャ用フォルダを走査してエディタ用のファイル一覧を作り直す</summary>
+		/// <remarks>読み込みはしない。_DEBUGMODE でのみ中身が動く</remarks>
+		void ScanTextureFolder(bool markPendingReload = false);
 		void LoadSkyCube();
 
 		// テクスチャの取得
@@ -57,7 +59,8 @@ namespace Graphics {
 
 	private:
 
-		DirectX::ScratchImage LoadTextureFile(const std::string& filePath);
+		/// <summary>画像ファイル1枚を読んでミップ付きのイメージを返す</summary>
+		DirectX::ScratchImage ReadImageFile(const std::string& filePath);
 		Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResource(const Microsoft::WRL::ComPtr<ID3D12Device>& device, const DirectX::TexMetadata& metadata);
 
 		[[nodiscard]]

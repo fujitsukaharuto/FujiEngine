@@ -1,5 +1,6 @@
 #include "ParticleGroup.h"
 #include "Engine/DXC/FrameCount.h"
+#include "Engine/Graphics/Camera/Camera.h"
 
 using namespace Math;
 using namespace Graphics;

@@ -4,6 +4,8 @@
 
 #include "Engine/Scene/SceneManager.h"
 #include "Engine/Editor/Command/CommandManager.h"
+#include "Engine/Core/Input/Input.h"
+#include "Engine/Audio/AudioPlayer.h"
 
 using namespace Audio;
 using namespace Core;

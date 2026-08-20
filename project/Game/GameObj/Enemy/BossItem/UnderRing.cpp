@@ -1,5 +1,6 @@
 #include "UnderRing.h"
 #include "Engine/Graphics/Particle/ParticleManager.h"
+#include "Engine/Core/Time/FPSKeeper.h"
 
 using namespace Core;
 using namespace Graphics;
@@ -14,15 +15,15 @@ void UnderRing::Initialize() {
 	GameObject::GameObject::Initialize();
 	// ファイルからではなく手続き的に生成するので、Createモデル系を通らない。先に実体を用意する
 	EnsureModel()->CreateRing(0.5f,0.25f,2.0f,true);
-	model_->GetTransform().translate.y = 0.5f;
+	transform_.translate.y = 0.5f;
 
 	collider_ = AddCollider("enemyAttack_ring");
-	collider_->SetParent(&model_->GetTransform());
+	collider_->SetParent(&transform_);
 
 	cylinder_ = AddRenderer();
 	cylinder_->CreateCylinder(0.5f, 0.5f, 3.0f);
 	cylinder_->GetTransform().translate.y = -1.2f;
-	cylinder_->SetParent(&model_->GetTransform());
+	cylinder_->SetParent(&transform_);
 	cylinder_->SetLightEnable(LightMode::kLightNone);
 	cylinder_->SetTexture("shockWaveGround.png");
 	cylinder_->SetColor({ 0.9f,0.9f,0.6f,1.0f });
@@ -33,7 +34,7 @@ void UnderRing::Initialize() {
 	model_->SetTexture("gradationLine.png");
 	model_->SetColor({ 0.9f,0.9f,0.6f,1.0f });
 	model_->SetAlphaRef(0.15f);
-	// model_->transform.rotate.x = std::numbers::pi_v<float> *0.5f;
+	// model_->transform.rotate.x = kPi *0.5f;
 
 }
 
@@ -48,18 +49,18 @@ void UnderRing::Update() {
 			isLive_ = false;
 		}
 
-		model_->SetUVScale({ model_->GetTransform().scale.x * 0.75f,1.0f }, { uvTransX_,0.0f });
-		cylinder_->SetUVScale({ model_->GetTransform().scale.x * 0.15f,1.0f }, { uvTransX_ * 0.01f,0.0f });
-		model_->GetTransform().scale += (Vector3(1.0f, 0.0f, 1.0f) * speed_) * FPSKeeper::DeltaTimeFrame();
-		model_->GetTransform().scale.y = 1.0f;
+		model_->SetUVScale({ transform_.scale.x * 0.75f,1.0f }, { uvTransX_,0.0f });
+		cylinder_->SetUVScale({ transform_.scale.x * 0.15f,1.0f }, { uvTransX_ * 0.01f,0.0f });
+		transform_.scale += (Vector3(1.0f, 0.0f, 1.0f) * speed_) * FPSKeeper::DeltaTimeFrame();
+		transform_.scale.y = 1.0f;
 
-		ringRadMax_ = model_->GetTransform().scale.x * maxScale_;
-		ringRadMin_ = model_->GetTransform().scale.x * minScale_;
+		ringRadMax_ = transform_.scale.x * maxScale_;
+		ringRadMin_ = transform_.scale.x * minScale_;
 
-		collider_->SetWidth(model_->GetTransform().scale.x);
-		collider_->SetDepth(model_->GetTransform().scale.z);
+		collider_->SetWidth(transform_.scale.x);
+		collider_->SetDepth(transform_.scale.z);
 
-		//collider_->SetPos(model_->GetWorldPos());
+		//collider_->SetPos(GetWorldPos());
 		collider_->InfoUpdate();
 	}
 }
@@ -83,9 +84,9 @@ void UnderRing::InitParameter() {
 }
 
 void UnderRing::InitRing(const Vector3& pos,float lifeT) {
-	model_->GetTransform().translate = pos;
-	model_->GetTransform().translate.y += 0.4f;
-	model_->GetTransform().scale = { 1.0f,1.0f,1.0f };
+	transform_.translate = pos;
+	transform_.translate.y += 0.4f;
+	transform_.scale = { 1.0f,1.0f,1.0f };
 
 	isLive_ = true;
 	lifeTime_ = lifeT;

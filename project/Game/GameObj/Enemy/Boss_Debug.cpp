@@ -16,7 +16,7 @@ void Boss::DebugGUI() {
 	if (ImGui::CollapsingHeader("Boss##0")) {
 		ImGui::Indent();
 		if (ImGui::CollapsingHeader("Boss##1")) {
-			animeModel_->DebugGUI();
+			GameObject::GameObject::DebugGUI();
 			collider_->DebugGUI();
 			ParameterGUI();
 		}

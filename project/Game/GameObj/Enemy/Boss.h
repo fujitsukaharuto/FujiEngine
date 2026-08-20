@@ -257,7 +257,6 @@ private:
 	void ShrinkScale(int i, float delta);
 	void ChangePhase(float threshold, int indexInc);
 
-	Math::Vector3 GetFrontOffset(const Math::Vector3& distance, float angle);
 
 private:
 
@@ -269,6 +268,7 @@ private:
 	static constexpr float kMaxBossHp_ = 100.0f;          // ボスHPの最大値（初期値）
 	static constexpr float kInitAttackCooldown_ = 120.0f; // 攻撃クールタイムの初期値
 	static constexpr float kWaveAttackPosZ_ = 4.0f;       // 波攻撃エミッターのZオフセット
+	static constexpr float kModelDirFollowRate_ = 0.1f;    // プレイヤーの方を向く速さ（0で固まる 1で即座に向く）
 	static constexpr float kTraceEmitterLifeTime_ = 0.6f; // チャージ/トレース用エミッターの寿命（ビーム時のみ beam.emitterLifeTime で上書き）
 
 	//* HP・戦闘

@@ -1,6 +1,7 @@
 #pragma once
 #include <wrl/client.h>
 #include <map>
+#include <list>
 #include "Engine/Graphics/Particle/Particle.h"
 #include "Engine/Graphics/Particle/ParticleEmitter.h"
 #include "Engine/Math/Matrix/MatrixCalculation.h"

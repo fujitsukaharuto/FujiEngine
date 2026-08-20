@@ -136,7 +136,7 @@ D3D12_GPU_VIRTUAL_ADDRESS Sprite::GetWvpGPUAddress(uint32_t frameIndex) const {
 	return wvpResource_[frameIndex]->GetGPUVirtualAddress();
 }
 D3D12_GPU_VIRTUAL_ADDRESS Sprite::GetMaterialGPUAddress() {
-	return material_.GetMaterialResource()->GetGPUVirtualAddress();
+	return material_.UploadAndGetResource()->GetGPUVirtualAddress();
 }
 D3D12_GPU_DESCRIPTOR_HANDLE Sprite::GetTextureSRV() {
 	return material_.GetTexture()->gpuHandle;

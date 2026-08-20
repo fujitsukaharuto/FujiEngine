@@ -4,7 +4,6 @@
 #include "Engine/Math/Random/Random.h"
 #include "Engine/Graphics/Camera/CameraManager.h"
 #include "Engine/Core/Serialize/JsonSerializer.h"
-#include <numbers>
 
 #include "Game/Particle/GameEmitters.h"
 #include "Game/GameObj/Enemy/Behavior/BossRoot.h"
@@ -19,6 +18,12 @@
 
 #include "Game/GameObj/Player/Player.h"
 #include "Engine/Graphics/PostEffect/OffscreenManager.h"
+#include "Engine/DXC/DXCom.h"
+#include "Engine/Core/Time/FPSKeeper.h"
+#include "Engine/Graphics/Particle/GPUParticle/GPUEmitter/SphereEmitter.h"
+#include "Engine/Graphics/Particle/GPUParticle/GPUEmitter/TextureBasedEmitter.h"
+#include "Engine/Graphics/Particle/GPUParticle/GPUEmitter/MeshSurfaceEmitter.h"
+#include "Engine/Graphics/Particle/GPUParticle/IGPUParticleEmitter.h"
 
 using namespace Audio;
 using namespace Core;
@@ -94,8 +99,8 @@ void Boss::Update() {
 		}
 	}
 
-	ParticleManager::GetSphereEmitter(halfAuraCS_).SetPos({ animeModel_->GetTransform().translate.x,animeModel_->GetTransform().translate.y + params_.jump.height,animeModel_->GetTransform().translate.z });
-	ParticleManager::GetSphereEmitter(halfSmallAuraCS_).SetPos({ animeModel_->GetTransform().translate.x,animeModel_->GetTransform().translate.y + params_.jump.height,animeModel_->GetTransform().translate.z });
+	ParticleManager::GetSphereEmitter(halfAuraCS_).SetPos({ transform_.translate.x,transform_.translate.y + params_.jump.height,transform_.translate.z });
+	ParticleManager::GetSphereEmitter(halfSmallAuraCS_).SetPos({ transform_.translate.x,transform_.translate.y + params_.jump.height,transform_.translate.z });
 	ParticleManager::GetSphereEmitter(leftHandAuraCS_).SetPos(animeModel_->GetJointWorldPos("mixamorig:LeftHand"));
 	ParticleManager::GetSphereEmitter(rightHandAuraCS_).SetPos(animeModel_->GetJointWorldPos("mixamorig:RightHand"));
 	animeModel_->AnimationUpdate();
@@ -144,8 +149,8 @@ void Boss::ReStart() {
 	damageLightTimer_ = 0.0f;
 	startTime_ = kStartTime_;
 	animeModel_->ChangeAnimation("roaring");
-	animeModel_->LoadTransformFromJson("boss_transform.json");
-	animeModel_->GetTransform().rotate.y = 3.14f;
+	LoadTransformFromJson("boss_transform.json");
+	transform_.rotate.y = 3.14f;
 	animeModel_->IsLoopAnimation(true);
 	animeModel_->ChangeAnimation("roaring");
 }
@@ -237,50 +242,33 @@ void Boss::ShakeHP() {
 			isShakeSprite_ = false;
 		}
 		float t = shakeTime_ / baseShakeTime_; // 1.0 → 0.0 に減る
-		float theta = t * 2.0f * std::numbers::pi_v<float>; // sin/cos の周期は π（0→π）
+		float theta = t * 2.0f * kPi; // sin/cos の周期は π（0→π）
 
-		float offsetX = std::cos(theta + std::numbers::pi_v<float> / 2.0f) * shakeSize_;
-		float offsetY = std::sin(theta + std::numbers::pi_v<float>) * shakeSize_;
+		float offsetX = std::cos(theta + kPi / 2.0f) * shakeSize_;
+		float offsetY = std::sin(theta + kPi) * shakeSize_;
 		hpSprites_[nowHpIndex_]->SetPos({ hpStartPos_.x + (hpSize_.x * nowHpIndex_) + (hpIndent * nowHpIndex_) + offsetX, hpStartPos_.y + offsetY, 0.0f });
 	}
 }
 
 void Boss::Walk() {
 	if (BossRoot* behavior = dynamic_cast<BossRoot*>(behavior_.get())) {
-		Vector3 dir = pPlayer_->GetWorldPos() - animeModel_->GetTransform().translate;
+		Vector3 dir = pPlayer_->GetWorldPos() - transform_.translate;
 		dir.y = 0.0f; // 水平方向だけに限定
-		dir = dir.Normalize();
+		float targetAngle = YawFromDirection(dir);
 
-		// 目標のY軸角度（ラジアン）
-		float targetAngle = std::atan2(dir.x, dir.z); // Z前方軸に対する角度
-
-		Vector3 front = GetFrontOffset(Vector3(0.0f, 0.0f, 1.0f) * kWalkSpeed_ * FPSKeeper::DeltaTimeFrame(), targetAngle);
-		animeModel_->GetTransform().translate += front;
+		Vector3 front = RotateVectorY(Vector3(0.0f, 0.0f, 1.0f) * kWalkSpeed_ * FPSKeeper::DeltaTimeFrame(), targetAngle);
+		transform_.translate += front;
 
 		CalcModelDir();
 	}
 }
 
 void Boss::CalcModelDir() {
-	Vector3 dir = pPlayer_->GetWorldPos() - animeModel_->GetTransform().translate;
+	Vector3 dir = pPlayer_->GetWorldPos() - transform_.translate;
 	dir.y = 0.0f; // 水平方向だけに限定
-	dir = dir.Normalize();
 
-	// 目標のY軸角度（ラジアン）
-	float targetAngle = std::atan2(dir.x, dir.z); // Z前方軸に対する角度
-	// 現在のY軸角度（モデルの回転）
-	float currentAngle = animeModel_->GetTransform().rotate.y;
-
-	// 角度差を -π〜+π にラップ
-	float delta = targetAngle - currentAngle;
-	if (delta > std::numbers::pi_v<float>) delta -= 2.0f * std::numbers::pi_v<float>;
-	if (delta < -std::numbers::pi_v<float>) delta += 2.0f * std::numbers::pi_v<float>;
-
-	// 角度補間（例えば線形補間）
-	float lerpFactor = 0.1f; // 追従の速さ
-	float newAngle = currentAngle + delta * lerpFactor;
-
-	animeModel_->GetTransform().rotate.y = newAngle;
+	// 角度のラップ(-π〜+π)は LerpShortAngle が見てくれるので、目標角をそのまま渡してよい
+	transform_.rotate.y = LerpShortAngle(transform_.rotate.y, YawFromDirection(dir), kModelDirFollowRate_);
 }
 
 bool Boss::DushCharge(float& t, float maxT, bool& isNear, float range) {
@@ -303,14 +291,14 @@ bool Boss::DushCharge(float& t, float maxT, bool& isNear, float range) {
 		UpdateEmitterPos(i);
 	}
 
-	if (Vector3(pPlayer_->GetWorldPos() - animeModel_->GetTransform().translate).Length() < range) {
+	if (Vector3(pPlayer_->GetWorldPos() - transform_.translate).Length() < range) {
 		isNear = true;
 	} else {
 		isNear = false;
 	}
 	if (t > maxT) { // ダッシュのチャージ時間が超えているか
-		Vector3 emitPos = GetFrontOffset(Vector3(0.0f, 0.0f, 8.5f), animeModel_->GetTransform().rotate.y);
-		emitPos += animeModel_->GetTransform().translate;
+		Vector3 emitPos = RotateVectorY(Vector3(0.0f, 0.0f, 8.5f), transform_.rotate.y);
+		emitPos += transform_.translate;
 		emitPos.y = 4.0f;
 		dushStartParticle_.pos_ = emitPos;
 		dushStartCircle_.pos_ = emitPos;
@@ -325,18 +313,18 @@ bool Boss::DushCharge(float& t, float maxT, bool& isNear, float range) {
 bool Boss::DushAttack(bool isNear, float& dushRange, float stopRange) {
 	if (dushRange == 0.0f) {
 		ParticleManager::GetParticleCSEmitter(dushTrailIndex_).SetEmit(true);
-		ParticleManager::GetParticleCSEmitter(dushTrailIndex_).SetPos(animeModel_->GetTransform().translate);
+		ParticleManager::GetParticleCSEmitter(dushTrailIndex_).SetPos(transform_.translate);
 	}
 	isNowDush_ = true;
-	Vector3 front = GetFrontOffset(Vector3(0.0f, 0.0f, 2.5f), animeModel_->GetTransform().rotate.y);
-	animeModel_->GetTransform().translate += front;
+	Vector3 front = RotateVectorY(Vector3(0.0f, 0.0f, 2.5f), transform_.rotate.y);
+	transform_.translate += front;
 	dushRange += front.Length();
-	Vector3 emitPos = GetFrontOffset(Vector3(0.0f, 0.0f, 8.5f), animeModel_->GetTransform().rotate.y);
-	emitPos += animeModel_->GetTransform().translate;
+	Vector3 emitPos = RotateVectorY(Vector3(0.0f, 0.0f, 8.5f), transform_.rotate.y);
+	emitPos += transform_.translate;
 	emitPos.y = 3.0f;
 	ParticleManager::GetParticleCSEmitter(dushTrailIndex_).SetPos(emitPos);
-	emitPos = GetFrontOffset(Vector3(0.0f, 0.0f, 5.5f), animeModel_->GetTransform().rotate.y);
-	emitPos += animeModel_->GetTransform().translate;
+	emitPos = RotateVectorY(Vector3(0.0f, 0.0f, 5.5f), transform_.rotate.y);
+	emitPos += transform_.translate;
 	emitPos.y = 1.0f;
 	dushSmoke_.pos_ = emitPos;
 	dushSmoke_.Emit();
@@ -354,7 +342,7 @@ bool Boss::DushAttack(bool isNear, float& dushRange, float stopRange) {
 
 void Boss::WaveWallAttack() {
 	Vector3 wavePos = GetFrontPos();
-	itemManager_->WaveWallAttack(wavePos, animeModel_->GetTransform().rotate.y);
+	itemManager_->WaveWallAttack(wavePos, transform_.rotate.y);
 
 	waveAttack1.Emit();
 	waveAttack2.Emit();
@@ -373,7 +361,7 @@ void Boss::ArrowAttack() {
 }
 
 void Boss::RodFall() {
-	itemManager_->RodFall(animeModel_->GetTransform().translate);
+	itemManager_->RodFall(transform_.translate);
 }
 
 bool Boss::BeamCharge() {
@@ -383,7 +371,7 @@ bool Boss::BeamCharge() {
 		auto& emitter = Game::BeamCrystalEmitter();
 		emitter.SetEmit(true);
 		emitter.GetData().radius = 0.0f;
-		emitter.GetData().translate = animeModel_->GetTransform().translate;
+		emitter.GetData().translate = transform_.translate;
 		emitter.GetData().translate.y = bp.parentY;
 	}
 
@@ -486,15 +474,15 @@ bool Boss::JumpAttack() {
 
 		float upTime = jp.upStart - jp.upEnd;
 		float flyT = 1.0f - ((jumpTime_ - jp.upEnd) / upTime);
-		animeModel_->GetTransform().translate.y = std::lerp(0.0f, jp.height, (1.0f - (1.0f - flyT) * (1.0f - flyT)));
+		transform_.translate.y = std::lerp(0.0f, jp.height, (1.0f - (1.0f - flyT) * (1.0f - flyT)));
 	} else if (jumpTime_ < jp.downStart && jumpTime_ >= jp.downEnd) {//70~50 //20
 
 		float downTime = jp.downStart - jp.downEnd;
 		float flyT = 1.0f - (jumpTime_ - jp.downEnd) / downTime;
-		animeModel_->GetTransform().translate.y = std::lerp(jp.height, 0.0f, (1.0f - powf(1.0f - flyT, 4.0f)));
-		if (std::abs(animeModel_->GetTransform().translate.y) < jp.groundJudgeHeight) {
+		transform_.translate.y = std::lerp(jp.height, 0.0f, (1.0f - powf(1.0f - flyT, 4.0f)));
+		if (std::abs(transform_.translate.y) < jp.groundJudgeHeight) {
 			if (isJumpAttack_) {
-				jumpWave_.pos_ = animeModel_->GetTransform().translate;
+				jumpWave_.pos_ = transform_.translate;
 				jumpWave_.Emit();
 				ParticleManager::GetSphereEmitter(jumpCSEmitIndex_).SetPos(jumpWave_.pos_);
 				ParticleManager::GetSphereEmitter(jumpCSEmitIndex_).Emit();
@@ -503,7 +491,7 @@ bool Boss::JumpAttack() {
 			}
 		}
 	} else if (jumpTime_ <= 0.0f) {
-		animeModel_->GetTransform().translate.y = 0.0f;
+		transform_.translate.y = 0.0f;
 		return true;
 	}
 
@@ -512,7 +500,7 @@ bool Boss::JumpAttack() {
 
 void Boss::UnderRingEmit() {
 	isJumpAttack_ = false;
-	itemManager_->UnderRingEmit(animeModel_->GetTransform().translate);
+	itemManager_->UnderRingEmit(transform_.translate);
 }
 
 ///= Behavior =================================================================*/
@@ -551,14 +539,14 @@ float Boss::GetChainRate() {
 }
 
 Math::Vector3 Boss::GetFrontPos() {
-	Vector3 frontP = GetFrontOffset(Vector3(0.0f, 0.0f, frontZ_), animeModel_->GetTransform().rotate.y);
-	frontP += animeModel_->GetTransform().translate;
+	Vector3 frontP = RotateVectorY(Vector3(0.0f, 0.0f, frontZ_), transform_.rotate.y);
+	frontP += transform_.translate;
 	return frontP;
 }
 
 Math::Vector3 Boss::GetDamageLightPos() {
-	Vector3 damageP = GetFrontOffset(Vector3(0.0f, 0.0f, frontZ_), animeModel_->GetTransform().rotate.y);
-	damageP += animeModel_->GetTransform().translate;
+	Vector3 damageP = RotateVectorY(Vector3(0.0f, 0.0f, frontZ_), transform_.rotate.y);
+	damageP += transform_.translate;
 	damageP.y += bossYPos_ + coreY_;
 	return damageP;
 }
@@ -615,21 +603,13 @@ void Boss::SetDefaultBehavior(bool isInvisibleItem) {
 	cameraRange_ = kCameraRange_;
 	cameraFollowSpeed_ = kCameraFollowSpeed_;
 	ChangeBehavior(std::make_unique<BossRoot>(this));
-	animeModel_->GetTransform().translate.y = 0.0f;
-	Vector3 dir = pPlayer_->GetWorldPos() - animeModel_->GetTransform().translate;
+	transform_.translate.y = 0.0f;
+	Vector3 dir = pPlayer_->GetWorldPos() - transform_.translate;
 	dir.y = 0.0f; // 水平方向だけに限定
-	dir = dir.Normalize();
-	// 目標のY軸角度（ラジアン）
-	float targetAngle = std::atan2(dir.x, dir.z); // Z前方軸に対する角度
-	animeModel_->GetTransform().translate += GetFrontOffset(Vector3(0.0f, 0.0f, 1.0f) * kWalkSpeed_ * FPSKeeper::DeltaTimeFrame(), targetAngle);
-	// 現在のY軸角度（モデルの回転）
-	float currentAngle = animeModel_->GetTransform().rotate.y;
-	// 角度差を -π〜+π にラップ
-	float delta = targetAngle - currentAngle;
-	if (delta > std::numbers::pi_v<float>) delta -= 2.0f * std::numbers::pi_v<float>;
-	if (delta < -std::numbers::pi_v<float>) delta += 2.0f * std::numbers::pi_v<float>;
-	float newAngle = currentAngle + delta;
-	animeModel_->GetTransform().rotate.y = newAngle;
+	float targetAngle = YawFromDirection(dir);
+	transform_.translate += RotateVectorY(Vector3(0.0f, 0.0f, 1.0f) * kWalkSpeed_ * FPSKeeper::DeltaTimeFrame(), targetAngle);
+	// 補間せず一気に向き直す
+	transform_.rotate.y = LerpShortAngle(transform_.rotate.y, targetAngle, 1.0f);
 }
 
 void Boss::RadialSetting() {
@@ -690,7 +670,7 @@ void Boss::EnergyTimeUpdate() {
 		energyTime_ -= FPSKeeper::DeltaTimeFrame();
 		if (energyTime_ >= sp.bossRiseStartTime) { // ボスの位置更新
 			float t = (std::max)((energyTime_ - sp.bossRiseStartTime) / sp.bossRiseStartTime, 0.0f);
-			animeModel_->GetTransform().translate.y = std::lerp(bossYPos_, sp.bossDownPos, t);
+			transform_.translate.y = std::lerp(bossYPos_, sp.bossDownPos, t);
 			summonCameraRotate_.x = std::lerp(summonCameraRotateStart_, summonCameraRotateEnd_, 1.0f - t);
 		}
 		energyParticle_.Emit();
@@ -705,7 +685,7 @@ void Boss::EnergyTimeUpdate() {
 		energyCoolTime_ -= FPSKeeper::DeltaTimeFrame();
 		if (energyCoolTime_ <= 0.0f) {
 			isSummon_ = false;
-			animeModel_->GetTransform().translate.y = bossYPos_;
+			transform_.translate.y = bossYPos_;
 			animeModel_->ChangeAnimation("roaring");
 			ParticleManager::GetParticleCSEmitterTexture(summonIndex_).SetEmit(false);
 		}
@@ -765,8 +745,3 @@ void Boss::ChangePhase(float threshold, int indexInc) {
 	hpSprites_[nowHpIndex_]->SetColor(damageColor1_);
 }
 
-Vector3 Boss::GetFrontOffset(const Vector3& distance, float angle) {
-	Vector3 front = distance;
-	Matrix4x4 rot = MakeRotateYMatrix(angle);
-	return TransformNormal(front, rot);
-}

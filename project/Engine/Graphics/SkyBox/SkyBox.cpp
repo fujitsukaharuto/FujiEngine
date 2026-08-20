@@ -6,6 +6,9 @@
 #include "Engine/Graphics/Model/ModelManager.h"
 #include "Engine/Graphics/Pipeline/PipelineManager.h"
 #include "Engine/Core/App/MyWindow.h"
+#include "Engine/Graphics/Texture/TextureManager.h"
+#include "Engine/DXC/DXCom.h"
+#include "Engine/Graphics/Camera/CameraManager.h"
 
 using namespace Core;
 using namespace Graphics;
@@ -46,7 +49,7 @@ void SkyBox::Render() {
 	cList->IASetIndexBuffer(&ibView);
 
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
-	pPipeManager->SetGraphicsRootCBV(cList, RootName::kMaterial, material_.GetMaterialResource()->GetGPUVirtualAddress());
+	pPipeManager->SetGraphicsRootCBV(cList, RootName::kMaterial, material_.UploadAndGetResource()->GetGPUVirtualAddress());
 	pPipeManager->SetGraphicsRootCBV(cList, RootName::kTransformationMatrix, wvpResource_[frameIndex]->GetGPUVirtualAddress());
 	pPipeManager->SetGraphicsRootDescriptorTable(cList, RootName::kTexture, material_.GetTexture()->gpuHandle);
 

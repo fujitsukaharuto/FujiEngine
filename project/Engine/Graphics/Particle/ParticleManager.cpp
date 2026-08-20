@@ -18,6 +18,14 @@
 #include "Engine/Graphics/Pipeline/PipeKind.h"
 #include "Engine/Graphics/Pipeline/PipelineManager.h"
 #include "Engine/Core/App/MyWindow.h"
+#include "Engine/Graphics/Texture/TextureManager.h"
+#include "Engine/Graphics/Particle/GPUParticle/GPUParticleSystem.h"
+#include "Engine/Graphics/Particle/GPUParticle/GPUEmitter/SphereEmitter.h"
+#include "Engine/Graphics/Particle/GPUParticle/GPUEmitter/TextureBasedEmitter.h"
+#include "Engine/Graphics/Particle/GPUParticle/GPUEmitter/MeshSurfaceEmitter.h"
+#include "Engine/Graphics/Particle/GPUParticle/IGPUParticleEmitter.h"
+#include "Engine/Graphics/Particle/ParticleGroup/AnimeParticleGroup.h"
+#include "Engine/Graphics/Object/Object3d.h"
 
 using namespace Core;
 using namespace Graphics;
@@ -46,15 +54,6 @@ void ParticleManager::Finalize() {
 	camera_ = nullptr;
 	particleGroups_.clear();
 	parentParticleGroups_.clear();
-	for (auto& groupPair : animeGroups_) {
-
-		groupPair.second->lifeTime.clear();
-		groupPair.second->startLifeTime_.clear();
-		groupPair.second->isLive_.clear();
-		groupPair.second->accele.clear();
-		groupPair.second->speed.clear();
-		groupPair.second.reset();
-	}
 	animeGroups_.clear();
 
 	plane_.vBuffer.Reset();
@@ -103,11 +102,7 @@ void ParticleManager::Draw() {
 	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Normal);
 	dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	for (auto& groupPair : animeGroups_) {
-		AnimeGroup* group = groupPair.second.get();
-		for (int i = 0; i < group->objects_.size(); i++) {
-			if (!group->isLive_[i]) continue;
-			group->objects_[i]->AnimeDraw();
-		}
+		groupPair.second->Draw();
 	}
 
 	dxcommon_->GetDXCommand()->SetViewAndScissor(MyWin::kWindowWidth, MyWin::kWindowHeight);
@@ -158,32 +153,12 @@ void ParticleManager::CreateParentParticleGroup(const std::string& name, const s
 
 void ParticleManager::CreateAnimeGroup(const std::string& name, const std::string& fileName) {
 	ParticleManager* instance = GetInstance();
-	auto iterator = instance->animeGroups_.find(name);
-	if (iterator != instance->animeGroups_.end()) {
+	if (instance->animeGroups_.contains(name)) {
 		return;
 	}
 
-	std::unique_ptr<AnimeGroup> newGroup;
-	newGroup = std::make_unique<AnimeGroup>();
-
-	newGroup->first = fileName;
-	TextureManager::GetInstance()->LoadTexture(fileName);
-	for (int i = 0; i < 6; i++) {
-		std::unique_ptr<Object3d> newobj = std::make_unique<Object3d>();
-		newobj->Create("plane.obj");
-		newobj->SetTexture(fileName);
-
-
-		newGroup->objects_.push_back(std::move(newobj));
-		newGroup->lifeTime.push_back(0.0f);
-		newGroup->animeTime.push_back(0.0f);
-		newGroup->startLifeTime_.push_back(0.0f);
-		newGroup->isLive_.push_back(false);
-		newGroup->accele.push_back({ 0.0f,0.0f,0.0f });
-		newGroup->speed.push_back({ 0.0f,0.0f,0.0f });
-
-	}
-
+	auto newGroup = std::make_unique<AnimeParticleGroup>();
+	newGroup->Create(fileName);
 	instance->animeGroups_.insert(std::make_pair(name, std::move(newGroup)));
 }
 
@@ -305,61 +280,20 @@ void ParticleManager::EmitAnime(const std::string& name, const Vector3& pos, con
 	ParticleManager* instance = GetInstance();
 
 	auto iterator = instance->animeGroups_.find(name);
-	if (iterator != instance->animeGroups_.end()) {
-		uint32_t newCount = 0;
-
-
-		AnimeGroup* group = iterator->second.get();
-		group->speedType = data.speedType;
-		group->type = data.type;
-		group->startSize = data.startSize;
-		group->endSize = data.endSize;
-		for (int i = 0; i < group->objects_.size(); i++) {
-
-			if (!group->isLive_[i]) {
-				group->objects_[i]->GetTransform().translate = Random::GetVector3(para.transx, para.transy, para.transz);
-				group->objects_[i]->GetTransform().translate += pos;
-				group->speed[i] = Random::GetVector3(para.speedx, para.speedy, para.speedz);
-				group->lifeTime[i] = data.lifeTime;
-				group->startLifeTime_[i] = group->lifeTime[i];
-				group->animeTime[i] = 0.0f;
-
-				SpeedType type = SpeedType(group->speedType);
-				switch (type) {
-				case SpeedType::kConstancy:
-					group->accele[i] = Vector3{ 0.0f,0.0f,0.0f };
-					break;
-				case SpeedType::kChange:
-					group->accele[i] = (group->speed[i]) * -0.05f;
-					break;
-				}
-
-				group->objects_[i]->SetTexture(group->first);
-				group->isLive_[i] = true;
-				newCount++;
-			}
-			if (newCount == count) {
-				return;
-			}
-		}
-	} else {
+	if (iterator == instance->animeGroups_.end()) {
 		return;
 	}
+	iterator->second->Emit(pos, data, para, count);
 }
 
 void ParticleManager::AddAnime(const std::string& name, const std::string& fileName, float animeChangeTime) {
 	ParticleManager* instance = GetInstance();
 
 	auto iterator = instance->animeGroups_.find(name);
-	if (iterator != instance->animeGroups_.end()) {
-
-		AnimeGroup* group = iterator->second.get();
-		TextureManager::GetInstance()->LoadTexture(fileName);
-		group->anime_.insert(std::make_pair(fileName, animeChangeTime));
-
-	} else {
+	if (iterator == instance->animeGroups_.end()) {
 		return;
 	}
+	iterator->second->AddAnime(fileName, animeChangeTime);
 }
 
 void ParticleManager::ParentReset() {
@@ -536,41 +470,8 @@ void ParticleManager::UpdateParentParticleGroup(const Matrix4x4& billboardMatrix
 }
 
 void ParticleManager::UpdateAnimeGroup(const Matrix4x4& billboardMatrix) {
-	for (auto& groupPair : animeGroups_) { // アニメーショングループ
-		AnimeGroup* group = groupPair.second.get();
-		for (int i = 0; i < group->objects_.size(); i++) {
-			if (group->lifeTime[i] <= 0) {
-				group->isLive_[i] = false;
-				continue;
-			}
-
-			group->lifeTime[i] -= FPSKeeper::DeltaTimeFrame();
-			group->animeTime[i] += FPSKeeper::DeltaTimeFrame();
-
-			for (auto& animeChange : group->anime_) { // 切り替え
-				if (group->animeTime[i] >= animeChange.second * FPSKeeper::DeltaTimeFrame()) {
-					group->objects_[i]->SetTexture(animeChange.first);
-				}
-			}
-
-			SizeType sizeType = SizeType(group->type);
-			float t = (1.0f - float(float(group->lifeTime[i]) / float(group->startLifeTime_[i])));
-			switch (sizeType) {//サイズのタイプ
-			case SizeType::kNormal:
-				break;
-			case SizeType::kShift:
-
-				group->objects_[i]->GetTransform().scale.x = Lerp(group->startSize.x, group->endSize.x, t);
-				group->objects_[i]->GetTransform().scale.y = Lerp(group->startSize.y, group->endSize.y, t);
-
-				break;
-			}
-
-			group->speed[i] += group->accele[i] * FPSKeeper::DeltaTimeFrame();
-
-			group->objects_[i]->GetTransform().translate += group->speed[i] * FPSKeeper::DeltaTimeFrame();
-			group->objects_[i]->SetBillboardMat(billboardMatrix);
-		}
+	for (auto& groupPair : animeGroups_) {
+		groupPair.second->Update(billboardMatrix);
 	}
 }
 

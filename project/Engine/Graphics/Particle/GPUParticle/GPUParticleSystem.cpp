@@ -9,6 +9,7 @@
 #include "Engine/Math/Random/Random.h"
 #include "Engine/Core/Time/FPSKeeper.h"
 #include "Engine/Graphics/Model/ModelManager.h"
+#include "Engine/Graphics/Texture/TextureManager.h"
 #ifdef _DEBUGMODE
 #include "Engine/Editor/ObjectEditor/GPUParticleSystemEditor.h"
 #endif // _DEBUGMODE
@@ -214,7 +215,7 @@ void GPUParticleSystem::SplatDraw() {
 	splatParamData_->enableDepthTest = useFullResolution_ ? 1u : 0u;
 
 	// シーン遮蔽の深度テスト用に、深度を DEPTH_WRITE→読み取り可能状態へ遷移。
-	// 粒子描画は不透明描画(深度書込み)後・post-effect(PreOutlineがDEPTH_WRITE前提)前なので、ここでは深度はDEPTH_WRITE。
+	// 粒子描画は不透明描画(深度書込み)後・post-effect(OutlineCS が DEPTH_WRITE 前提)前なので、ここでは深度はDEPTH_WRITE。
 	// gSceneDepthは常にバインドするため、深度テストOFF時もバインド先が読み取り可能状態になるよう常に遷移する。
 	dxcommon_->TransitionDepthToRead();
 

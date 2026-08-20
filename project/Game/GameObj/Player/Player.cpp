@@ -9,6 +9,11 @@
 #include "Game/GameObj/Player/PlayerBullet.h"
 #include "Game/GameObj/Enemy/BossItem/UnderRing.h"
 #include "Engine/Graphics/PostEffect/OffscreenManager.h"
+#include "Engine/DXC/DXCom.h"
+#include "Engine/Core/Time/FPSKeeper.h"
+#include "Engine/Graphics/Camera/CameraManager.h"
+#include "Engine/Core/Input/Input.h"
+#include "Engine/Graphics/Particle/GPUParticle/GPUEmitter/SphereEmitter.h"
 
 using namespace Audio;
 using namespace Core;
@@ -82,11 +87,11 @@ void Player::Initialize() {
 	ParticleEmitterSetting();
 
 
-	titleEndP_ = model_->GetWorldPos();
+	titleEndP_ = GetWorldPos();
 
 	titleStartP_ = { 50.0f,10.0f,80.0f };
 	titleCenterP_ = { 6.0f,3.0f,-80.0f };
-	model_->GetTransform().translate = titleStartP_;
+	transform_.translate = titleStartP_;
 }
 
 void Player::Finalize() {
@@ -110,11 +115,8 @@ void Player::Update() {
 				if (bullet->GetIsLive()) {
 
 					if (bullet->GetIsCharge()) {
-						Vector3 forward = { 0, 0, 1 };
-						Matrix4x4 rotateMatrix = MakeRotateXYZMatrix(model_->GetTransform().rotate);
-						Vector3 worldForward = TransformNormal(forward, rotateMatrix);
-						Vector3 targetPos = model_->GetTransform().translate + worldForward;
-						bullet->Charge(targetPos, model_->GetTransform().rotate);
+						Vector3 targetPos = transform_.translate + transform_.GetForward();
+						bullet->Charge(targetPos, transform_.rotate);
 					} else {
 						bullet->CalculationFollowVec(targetPos_);
 					}
@@ -142,9 +144,9 @@ void Player::Update() {
 	}
 
 	AvoidPostEffect();
-	strongStatePos_->translate = model_->GetTransform().translate;
+	strongStatePos_->translate = transform_.translate;
 	strongStatePos_->translate.y -= 0.65f;
-	collider_->SetPos(model_->GetWorldPos());
+	collider_->SetPos(GetWorldPos());
 	collider_->InfoUpdate();
 }
 
@@ -171,8 +173,8 @@ void Player::Draw(bool is) {
 void Player::DebugGUI() {
 #ifdef _DEBUGMODE
 	if (ImGui::CollapsingHeader("Player")) {
-		model_->DebugGUI();
-		collider_->SetPos(model_->GetWorldPos());
+		GameObject::GameObject::DebugGUI();
+		collider_->SetPos(GetWorldPos());
 
 		collider_->DebugGUI();
 
@@ -227,10 +229,10 @@ void Player::ReStart() {
 	isFall_ = false;
 	deathTime_ = 240.0f;
 	avoidEffectTime_ = 0.0f;
-	model_->GetTransform().rotate.y = 0.0f;
-	model_->GetTransform().translate.x = 0.0f;
-	model_->GetTransform().translate.y = 1.0f;
-	model_->GetTransform().translate.z = -25.0f;
+	transform_.rotate.y = 0.0f;
+	transform_.translate.x = 0.0f;
+	transform_.translate.y = 1.0f;
+	transform_.translate.z = -25.0f;
 	ChangeBehavior(std::make_unique<PlayerRoot>(this));
 }
 
@@ -286,7 +288,7 @@ void Player::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 	} else if (other.tag == "enemyAttack_ring") {
 		if (!isDamage_) {
 			if (UnderRing* ring = dynamic_cast<UnderRing*>(other.owner)) {
-				float lng = Vector3(other.worldPos - model_->GetTransform().translate).Length();
+				float lng = Vector3(other.worldPos - transform_.translate).Length();
 				if (lng < ring->GetRingRadMax() && lng > ring->GetRingRadMin()) {
 					if (isNowAvoid_) { // 回避しているなら
 						AvoidSetting();
@@ -316,7 +318,7 @@ void Player::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
 	if (other.tag == "enemyAttack_ring") {
 		if (!isDamage_) {
 			if (UnderRing* ring = dynamic_cast<UnderRing*>(other.owner)) {
-				float lng = Vector3(other.worldPos - model_->GetTransform().translate).Length();
+				float lng = Vector3(other.worldPos - transform_.translate).Length();
 				if (lng < ring->GetRingRadMax() && lng > ring->GetRingRadMin()) {
 					if (isNowAvoid_) { // 回避しているなら
 						if (!isCanStrongState_) {
@@ -353,16 +355,15 @@ void Player::Move(const float& speed) {
 
 void Player::MoveTrans(const float& speed) {
 	velocity_ = velocity_.Normalize() * speed;
-	Matrix4x4 rotateMatrix = MakeRotateYMatrix(CameraManager::GetInstance()->GetCamera()->GetTransform().rotate.y);
-	velocity_ = TransformNormal(velocity_, rotateMatrix);
+	velocity_ = RotateVectorY(velocity_, CameraManager::GetInstance()->GetCamera()->GetTransform().rotate.y);
 	// 位置を更新
-	model_->GetTransform().translate += velocity_;
+	transform_.translate += velocity_;
 
 	MoveEngineParticle();
 }
 
 void Player::MoveRotate() {
-	Vector3 forward = (targetPos_ - model_->GetTransform().translate).Normalize();
+	Vector3 forward = (targetPos_ - transform_.translate).Normalize();
 	Quaternion targetRotation = Quaternion::LookRotation(forward);
 	// 最短経路で補間
 	Quaternion newRotation = targetRotation;
@@ -380,7 +381,7 @@ void Player::MoveRotate() {
 		newRotation = newRotation * spinRot;
 	}
 	// 新しい回転からY軸角度を抽出（回転更新）
-	model_->GetTransform().rotate = Quaternion::QuaternionToEuler(newRotation);
+	transform_.rotate = Quaternion::QuaternionToEuler(newRotation);
 }
 
 Vector3 Player::GetInputDirection() {
@@ -460,7 +461,7 @@ void Player::Jump(float& speed) {
 
 void Player::Fall(float& speed) {
 	if (!isFall_) speed = 0.0f;
-	model_->GetTransform().translate.y += speed * FPSKeeper::DeltaTimeFrame();
+	transform_.translate.y += speed * FPSKeeper::DeltaTimeFrame();
 	if (isFall_) {
 		// スピードの更新
 		speed = ComparNum(-(speed - (gravity_ * FPSKeeper::DeltaTimeFrame())), maxFallSpeed_);
@@ -468,8 +469,8 @@ void Player::Fall(float& speed) {
 	}
 
 	// 着地
-	if (model_->GetTransform().translate.y < 1.0f) {
-		model_->GetTransform().translate.y = 1.0f;
+	if (transform_.translate.y < 1.0f) {
+		transform_.translate.y = 1.0f;
 		speed = 0.0f;
 		isFall_ = false;
 	}
@@ -492,9 +493,9 @@ void Player::Avoid([[maybe_unused]]float& avoidTime) {
 		t = 1.0f - powf(1.0f - t, 2);
 		// 回避方向によって回転する
 		if (avoidDirection_ > 0.0f) {
-			avoidRotate_ = std::lerp(0.0f, -std::numbers::pi_v<float>*4.0f, t);
+			avoidRotate_ = std::lerp(0.0f, -kPi*4.0f, t);
 		} else {
-			avoidRotate_ = std::lerp(0.0f, std::numbers::pi_v<float>*4.0f, t);
+			avoidRotate_ = std::lerp(0.0f, kPi*4.0f, t);
 		}
 
 		velocity_ = { avoidDirection_,0.0f,0.0f };
@@ -517,10 +518,9 @@ void Player::Avoid([[maybe_unused]]float& avoidTime) {
 
 
 void Player::InitBullet() {
-	Vector3 forward = { 0, 0, 1 };
-	Matrix4x4 rotateMatrix = MakeRotateYMatrix(model_->GetTransform().rotate.y);
-	Vector3 worldForward = TransformNormal(forward, rotateMatrix);
-	Vector3 targetPos = model_->GetTransform().translate + worldForward;
+	// Y回転だけを見る(GetForward は X/Z の傾きも拾うので、水平前方が欲しいここでは使わない)
+	Vector3 worldForward = RotateVectorY({ 0.0f,0.0f,1.0f }, transform_.rotate.y);
+	Vector3 targetPos = transform_.translate + worldForward;
 	for (auto& bullet : bullets_) {
 		if (!bullet->GetIsLive()) {
 			bullet->InitParameter(targetPos);
@@ -535,7 +535,7 @@ void Player::ReleaseBullet() {
 		if (bullet->GetIsLive() && bullet->GetIsCharge()) {
 			// 発射方向をきめる
 			Vector3 forward = { 0, 0, 1 };
-			Matrix4x4 rotateMatrix = MakeRotateXYZMatrix(model_->GetTransform().rotate);
+			Matrix4x4 rotateMatrix = MakeRotateXYZMatrix(transform_.rotate);
 			Vector3 worldForward = TransformNormal(forward, rotateMatrix);
 			bullet->Release(0.75f, 10.0f, worldForward);
 
@@ -570,7 +570,7 @@ void Player::LandingUpdate() {
 		// 3点を使って位置を決める
 		float t = (std::min)((1.0f - startLandingTime_ / startLandingMax_), 1.0f);
 		Vector3 pos = (1.0f - t) * (1.0f - t) * titleStartP_ + 2.0f * (1.0f - t) * t * titleCenterP_ + t * t * titleEndP_;
-		model_->GetTransform().translate = pos;
+		transform_.translate = pos;
 
 		if (startLandingTime_ > startLandingMax_ * 0.025f) {
 			float preT = (std::min)((1.0f - (startLandingTime_ + delta) / startLandingMax_), 1.0f);
@@ -584,7 +584,7 @@ void Player::LandingUpdate() {
 			Quaternion preRot = Quaternion::LookRotation(preDir);
 			Quaternion newRot = Quaternion::SLerp(preRot, rot, 0.1f);
 
-			model_->GetTransform().rotate = Quaternion::QuaternionToEuler(newRot);
+			transform_.rotate = Quaternion::QuaternionToEuler(newRot);
 		} else {
 			MoveRotate();
 		}
@@ -607,7 +607,7 @@ void Player::TitleUpdate([[maybe_unused]]float titleTime) {
 
 	preTitleTime_ = titleTime;
 
-	collider_->SetPos(model_->GetWorldPos());
+	collider_->SetPos(GetWorldPos());
 	collider_->InfoUpdate();
 }
 
@@ -626,7 +626,7 @@ void Player::TitleStartUpdate([[maybe_unused]] float titleTime) {
 	float t = (std::min)((1.0f - titleTime / 90.0f), 1.0f);
 	float pret = (std::min)((1.0f - preTitleTime_ / 90.0f), 1.0f);
 	Vector3 pos = (1.0f - t) * (1.0f - t) * titleStartP_ + 2.0f * (1.0f - t) * t * titleCenterP_ + t * t * titleEndP_;
-	model_->GetTransform().translate = pos;
+	transform_.translate = pos;
 	Vector3 dir = (2.0f * (1.0f - t)) * (titleCenterP_ - titleStartP_) + (2.0f * t) * (titleEndP_ - titleCenterP_);
 	dir = dir.Normalize();
 	Vector3 predir = (2.0f * (1.0f - pret)) * (titleCenterP_ - titleStartP_) + (2.0f * pret) * (titleEndP_ - titleCenterP_);
@@ -637,7 +637,7 @@ void Player::TitleStartUpdate([[maybe_unused]] float titleTime) {
 	Quaternion prerot = Quaternion::LookRotation(predir);
 	Quaternion newRot = Quaternion::SLerp(prerot, rot, 0.1f);
 
-	model_->GetTransform().rotate = Quaternion::QuaternionToEuler(newRot);
+	transform_.rotate = Quaternion::QuaternionToEuler(newRot);
 
 	MoveEngineParticle();
 }
@@ -664,14 +664,14 @@ void Player::ParticleEmitterSetting() {
 	ParticleManager::Load(shotWave_, "shotWave");
 	ParticleManager::Load(strongShotWave_, "strongShotWave");
 
-	hit_.SetParent(&model_->GetTransform());
-	hit2_.SetParent(&model_->GetTransform());
-	moveParticleL_.SetParent(&model_->GetTransform());
-	moveParticleR_.SetParent(&model_->GetTransform());
-	deathSmoke_.SetParent(&model_->GetTransform());
-	shotSpark_.SetParent(&model_->GetTransform());
-	shotWave_.SetParent(&model_->GetTransform());
-	strongShotWave_.SetParent(&model_->GetTransform());
+	hit_.SetParent(&transform_);
+	hit2_.SetParent(&transform_);
+	moveParticleL_.SetParent(&transform_);
+	moveParticleR_.SetParent(&transform_);
+	deathSmoke_.SetParent(&transform_);
+	shotSpark_.SetParent(&transform_);
+	shotWave_.SetParent(&transform_);
+	strongShotWave_.SetParent(&transform_);
 
 	moveParticleL_.pos_ = { -0.4f,-0.4f,-0.3f };
 	moveParticleR_.pos_ = { 0.4f,-0.4f,-0.3f };
@@ -687,10 +687,10 @@ void Player::ParticleEmitterSetting() {
 	ParticleManager::LoadParentGroup(moveBurnerR_, "playerAfterBurner2");
 	ParticleManager::LoadParentGroup(moveBurnerLT_, "playerAfterBurner3");
 	ParticleManager::LoadParentGroup(moveBurnerRT_, "playerAfterBurner4");
-	moveBurnerL_->SetParent(&model_->GetTransform());
-	moveBurnerR_->SetParent(&model_->GetTransform());
-	moveBurnerLT_->SetParent(&model_->GetTransform());
-	moveBurnerRT_->SetParent(&model_->GetTransform());
+	moveBurnerL_->SetParent(&transform_);
+	moveBurnerR_->SetParent(&transform_);
+	moveBurnerLT_->SetParent(&transform_);
+	moveBurnerRT_->SetParent(&transform_);
 	moveBurnerL_->pos_ = { -0.35f,-0.4f,-0.3f };
 	moveBurnerR_->pos_ = { 0.35f,-0.4f,-0.3f };
 	moveBurnerLT_->pos_ = { -0.35f,0.4f,-0.3f };
@@ -700,9 +700,9 @@ void Player::ParticleEmitterSetting() {
 	ParticleManager::LoadParentGroup(avoidEmitter01_, "playerAvoid01");
 	ParticleManager::LoadParentGroup(avoidEmitter02_, "playerAvoid02");
 	ParticleManager::LoadParentGroup(avoidEmitter03_, "playerAvoid03");
-	avoidEmitter01_->SetParent(&model_->GetTransform());
-	avoidEmitter02_->SetParent(&model_->GetTransform());
-	avoidEmitter03_->SetParent(&model_->GetTransform());
+	avoidEmitter01_->SetParent(&transform_);
+	avoidEmitter02_->SetParent(&transform_);
+	avoidEmitter03_->SetParent(&transform_);
 	avoidEmitter01_->frequencyTime_ = 0.0f;
 	avoidEmitter02_->frequencyTime_ = 0.0f;
 	avoidEmitter03_->frequencyTime_ = 0.0f;
@@ -711,10 +711,10 @@ void Player::ParticleEmitterSetting() {
 	ParticleManager::LoadParentGroup(avoidEmitter2_, "playerAvoid2");
 	ParticleManager::LoadParentGroup(avoidEmitter3_, "playerAvoid3");
 	ParticleManager::LoadParentGroup(avoidEmitter4_, "playerAvoid4");
-	avoidEmitter1_->SetParent(&model_->GetTransform());
-	avoidEmitter2_->SetParent(&model_->GetTransform());
-	avoidEmitter3_->SetParent(&model_->GetTransform());
-	avoidEmitter4_->SetParent(&model_->GetTransform());
+	avoidEmitter1_->SetParent(&transform_);
+	avoidEmitter2_->SetParent(&transform_);
+	avoidEmitter3_->SetParent(&transform_);
+	avoidEmitter4_->SetParent(&transform_);
 	avoidEmitter1_->frequencyTime_ = 0.0f;
 	avoidEmitter2_->frequencyTime_ = 0.0f;
 	avoidEmitter3_->frequencyTime_ = 0.0f;
@@ -722,7 +722,7 @@ void Player::ParticleEmitterSetting() {
 	ParticleManager::LoadParentGroup(strengthStateEmitter1_, "playerStrongState1");
 	ParticleManager::Load(strengthStateEmitter2_, "playerStrongState2");
 	strengthStateEmitter1_->SetParent(strongStatePos_);
-	strengthStateEmitter2_.SetParent(&model_->GetTransform());
+	strengthStateEmitter2_.SetParent(&transform_);
 
 }
 
@@ -730,7 +730,7 @@ void Player::MoveEngineParticle() {
 	Vector3 particleSpeed = Random::GetVector3({ -0.6f,0.6f }, { -0.6f,0.6f }, { -18.0f,-12.0f });
 	float csOffsetX = 0.6f;
 	float csOffsetY = 0.5f;
-	particleSpeed = TransformNormal(particleSpeed, MakeRotateXYZMatrix(model_->GetTransform().rotate));
+	particleSpeed = TransformNormal(particleSpeed, MakeRotateXYZMatrix(transform_.rotate));
 	moveParticleL_.para_.speedx = { particleSpeed.x,particleSpeed.x };
 	moveParticleL_.para_.speedy = { particleSpeed.y,particleSpeed.y };
 	moveParticleL_.para_.speedz = { particleSpeed.z,particleSpeed.z };
@@ -739,7 +739,7 @@ void Player::MoveEngineParticle() {
 	ParticleManager::GetSphereEmitter(moveParticleCSL_).SetPos(moveParticleL_.GetWorldPos({ -csOffsetX,-csOffsetY,0.0f }));
 	ParticleManager::GetSphereEmitter(moveParticleCSL_).Emit();
 	particleSpeed = Random::GetVector3({ -0.6f,0.6f }, { -0.6f,0.6f }, { -18.0f,-12.0f });
-	particleSpeed = TransformNormal(particleSpeed, MakeRotateXYZMatrix(model_->GetTransform().rotate));
+	particleSpeed = TransformNormal(particleSpeed, MakeRotateXYZMatrix(transform_.rotate));
 	moveParticleR_.para_.speedx = { particleSpeed.x,particleSpeed.x };
 	moveParticleR_.para_.speedy = { particleSpeed.y,particleSpeed.y };
 	moveParticleR_.para_.speedz = { particleSpeed.z,particleSpeed.z };
@@ -748,7 +748,7 @@ void Player::MoveEngineParticle() {
 	ParticleManager::GetSphereEmitter(moveParticleCSR_).SetPos(moveParticleR_.GetWorldPos({ csOffsetX,-csOffsetY,0.0f }));
 	ParticleManager::GetSphereEmitter(moveParticleCSR_).Emit();
 	particleSpeed = { 0.0f,0.0f,-6.0f };
-	particleSpeed = TransformNormal(particleSpeed, MakeRotateXYZMatrix(model_->GetTransform().rotate));
+	particleSpeed = TransformNormal(particleSpeed, MakeRotateXYZMatrix(transform_.rotate));
 	moveBurnerL_->para_.speedx = { particleSpeed.x,particleSpeed.x };
 	moveBurnerL_->para_.speedy = { particleSpeed.y,particleSpeed.y };
 	moveBurnerL_->para_.speedz = { particleSpeed.z,particleSpeed.z };

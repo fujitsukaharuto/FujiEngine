@@ -6,7 +6,8 @@
 #include <span>
 #include <array>
 
-#include "Engine/DXC/DXCom.h"
+// D3D12の型しか使わないので、デバイス一式を抱える DXCom.h ではなく d3d12.h だけでよい
+#include <d3d12.h>
 #include "Engine/Math/Matrix/MatrixCalculation.h"
 #include "Engine/DXC/FrameCount.h"
 

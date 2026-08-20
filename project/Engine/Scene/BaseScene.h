@@ -1,14 +1,15 @@
 #pragma once
 #include <memory>
-#include "Engine/DXC/DXCom.h"
-#include "Engine/Core/Serialize/JsonSerializer.h"
-#include "Engine/Core/Input/Input.h"
-#include "Engine/Audio/AudioPlayer.h"
-#include "Engine/Graphics/Camera/DebugCamera.h"
-#include "Engine/Graphics/Object/Object3d.h"
-#include "Engine/Graphics/Object/AnimationModel.h"
-#include "Engine/Graphics/Sprite/Sprite.h"
-#include "Engine/Graphics/Particle/ParticleEmitter.h"
+#include <string>
+// json は宣言とポインタにしか使わないので前方宣言で足りる
+#include <json_fwd.hpp>
+
+// ここは「シーンの基底」であって、シーンが使う道具の目録ではない。
+// 保持しているのは全部ポインタなので前方宣言で足り、Object3d や Sprite が要る派生は自分で include する
+namespace DXC { class DXCom; }
+namespace Core { class Input; }
+namespace Audio { class AudioPlayer; }
+namespace Graphics { class LightManager; }
 
 
 namespace Scene {

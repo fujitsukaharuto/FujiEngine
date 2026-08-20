@@ -3,13 +3,15 @@
 #include <d3d12.h>
 #include "../IGPUParticleEmitter.h"
 #include "Engine/Math/Matrix/MatrixCalculation.h"
-#include "Engine/Graphics/Texture/TextureManager.h"
 #include "Engine/DXC/FrameCount.h"
 
 using Microsoft::WRL::ComPtr;
 
 
 namespace Graphics {
+
+	// Texture はポインタでしか持たないので前方宣言で足りる
+	struct Texture;
 
 	/// <summary>
 	/// GPUパーティクルTextureエミッター

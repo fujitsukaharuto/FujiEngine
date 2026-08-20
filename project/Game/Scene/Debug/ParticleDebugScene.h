@@ -1,6 +1,8 @@
 #pragma once
 #include "Engine/Scene/BaseScene.h"
 #include "Engine/Graphics/SkyBox/SkyBox.h"
+#include "Engine/Graphics/Object/AnimationModel.h"
+#include "Engine/Graphics/Sprite/Sprite.h"
 
 /// <summary>
 /// パーティクルデバッグシーンクラス

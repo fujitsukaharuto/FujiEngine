@@ -38,7 +38,7 @@ void Object3d::Create(const std::string& fileName) {
 	this->camera_ = CameraManager::GetInstance()->GetCamera();
 	ModelManager::GetInstance()->LoadModelByExtension(fileName);
 	SetModel(fileName);
-	transform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	ResetTransformSRT();
 	CreateWVP();
 	CreateIDResource();
 }
@@ -71,7 +71,7 @@ void Object3d::CreateSphere() {
 	this->camera_ = CameraManager::GetInstance()->GetCamera();
 	ModelManager::GetInstance()->CreateSphere();
 	SetModel("Sphere");
-	transform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	ResetTransformSRT();
 	CreateWVP();
 	CreateIDResource();
 }
@@ -91,7 +91,7 @@ void Object3d::CreateRing(float out, float in, float radius, bool horizon) {
 		nowTextureName_ = model_->GetModelData().meshes[i].material.textureFilePath;
 	}
 
-	transform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	ResetTransformSRT();
 	CreateWVP();
 	CreateIDResource();
 }
@@ -111,7 +111,7 @@ void Object3d::CreateCylinder(float topRadius, float bottomRadius, float height)
 		nowTextureName_ = model_->GetModelData().meshes[i].material.textureFilePath;
 	}
 
-	transform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	ResetTransformSRT();
 	CreateWVP();
 	CreateIDResource();
 }

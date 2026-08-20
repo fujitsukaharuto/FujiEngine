@@ -2,6 +2,7 @@
 
 #include "Game/GameObj/Enemy/Boss.h"
 #include "BossRoot.h"
+#include "Engine/Core/Time/FPSKeeper.h"
 
 using namespace Audio;
 using namespace Core;

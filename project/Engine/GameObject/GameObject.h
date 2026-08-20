@@ -1,7 +1,6 @@
 #pragma once
 #include <memory>
 #include <vector>
-#include <cassert>
 // json は宣言とポインタにしか使わないので前方宣言で足りる
 #include <json_fwd.hpp>
 
@@ -9,9 +8,7 @@
 #include "Engine/Graphics/Object/AnimationModel.h"
 #include "Engine/Graphics/Object/RenderObject.h"
 #include "Engine/Collision/AABBCollider.h"
-#include "Engine/Core/Time/FPSKeeper.h"
-#include "Engine/Graphics/Camera/CameraManager.h"
-#include "Engine/Core/Input/Input.h"
+// FPSKeeper / CameraManager / Input はここでは使わない。要る派生クラスが自分で include する
 
 namespace GameObject {
 
@@ -56,6 +53,8 @@ namespace GameObject {
 		/// <summary>Jsonから作成</summary>
 		void CreateFromJson(const std::string& name);
 		void CreateFromJson();
+		/// <summary>jsonからこのオブジェクトのTransformを読み込む</summary>
+		void LoadTransformFromJson(const std::string& name);
 
 		//========================================================================*/
 		//* Setter
@@ -80,9 +79,12 @@ namespace GameObject {
 			return animeModel_.get();
 		}
 
-		// Object3d / AnimationModel のどちらで生成していても Transform・ワールド座標を取れる
-		Math::Trans& GetTrans() { Graphics::RenderObject* o = GetRenderObject(); assert(o && "このオブジェクトは描画モデルを生成していない"); return o->GetTransform(); }
-		Math::Vector3 GetWorldPos()const { const Graphics::RenderObject* o = GetRenderObject(); assert(o && "このオブジェクトは描画モデルを生成していない"); return o->GetWorldPos(); }
+		/// <summary>このオブジェクト自身の位置・回転・拡縮</summary>
+		/// <remarks>描画モデルを持たなくても使える。モデルやコライダーはこれにぶら下がる</remarks>
+		Math::Trans& GetTrans() { return transform_; }
+		const Math::Trans& GetTrans() const { return transform_; }
+		/// <summary>ペアレントを含めたワールド座標</summary>
+		Math::Vector3 GetWorldPos()const { return transform_.GetWorldPos(); }
 
 		/// <summary>コライダーの取得</summary>
 		/// <remarks>1つしか持たないオブジェクト向け。複数持つ場合は GetColliders() を使う</remarks>
@@ -121,6 +123,10 @@ namespace GameObject {
 		void SetRendererVisible(const Graphics::RenderObject* handle, bool visible);
 
 	protected:
+
+		/// <summary>このオブジェクト自身のTransform。描画物・コライダー・アンカーの親になる</summary>
+		/// <remarks>描画モデルの中にあった位置情報をここへ引き上げたもの。モデルが無くても位置を持てる</remarks>
+		Math::Trans transform_;
 
 		/// <summary>基底が所有・描画する子ビジュアル1件</summary>
 		struct RendererEntry {

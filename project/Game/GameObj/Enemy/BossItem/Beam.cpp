@@ -1,10 +1,12 @@
 #include "Beam.h"
 #include "Engine/Graphics/Particle/ParticleManager.h"
-#include <numbers>
 #include <cmath>
 
 #include "Game/GameObj/Enemy/Boss.h"
 #include "Game/Particle/GameEmitters.h"
+#include "Engine/Core/Time/FPSKeeper.h"
+#include "Engine/Graphics/Camera/CameraManager.h"
+#include "Engine/Graphics/Particle/GPUParticle/GPUEmitter/MeshSurfaceEmitter.h"
 
 using namespace Core;
 using namespace Graphics;
@@ -23,7 +25,7 @@ void Beam::Initialize() {
 	GameObject::GameObject::Initialize();
 	GameObject::GameObject::CreateModel("cube.obj");
 
-	halfPi_ = std::numbers::pi_v<float> / 2.0f;
+	halfPi_ = kPi / 2.0f;
 
 	auto& emitter = Game::BeamCrystalEmitter();
 	emitter.SetEmit(false);
@@ -34,14 +36,14 @@ void Beam::Initialize() {
 	emitter.GetData().velocityRandMin = -2.4f;
 
 	model_->SetLightEnable(LightMode::kLightNone);
-	model_->GetTransform().translate.y = 25.0f;
-	model_->GetTransform().scale.y = 30.0f;
-	model_->GetTransform().rotate.x = halfPi_;
+	transform_.translate.y = 25.0f;
+	transform_.scale.y = 30.0f;
+	transform_.rotate.x = halfPi_;
 	model_->SetColor({ 0.0f,0.0f,0.0f,0.0f });
 	model_->SetAlphaRef(0.25f);
 
 	float rad = 0.0f;
-	float radDis = params_.radDis * (std::numbers::pi_v<float> / 180.0f);
+	float radDis = ToRadians(params_.radDis);
 	for (int i = 0; i < 6; i++) {
 		OneBeam beam;
 		beam.model = std::make_unique<Object3d>();
@@ -154,7 +156,7 @@ void Beam::Initialize() {
 
 
 	particleParent_ = AddAnchor();
-	particleParent_->translate = model_->GetTransform().translate;
+	particleParent_->translate = transform_.translate;
 
 	/*for (auto& beam : beams_) {
 		beam.collider->SetParent(&particleParent_->transform);
@@ -224,9 +226,9 @@ void Beam::InitParameter() {
 }
 
 void Beam::InitBeam([[maybe_unused]] const Vector3& pos, [[maybe_unused]] const Vector3& velo) {
-	model_->GetTransform().rotate.y = 0.0f;
-	model_->GetTransform().translate.y = 17.0f;
-	particleParent_->translate = model_->GetTransform().translate;
+	transform_.rotate.y = 0.0f;
+	transform_.translate.y = 17.0f;
+	particleParent_->translate = transform_.translate;
 	particleParent_->rotate.x = params_.initRotateX;
 
 	isLive_ = true;
@@ -235,12 +237,12 @@ void Beam::InitBeam([[maybe_unused]] const Vector3& pos, [[maybe_unused]] const 
 	expandTime_ = params_.expandBaseTime;
 	beamAttackTime_ = params_.beamAttackBaseTimeAround;
 	shrinkTime_ = params_.shrinkBaseTime;
-	prePos_ = model_->GetWorldPos();
+	prePos_ = GetWorldPos();
 
 	step_ = BeamStep::AroundAttack;
 
 	float rad = 0.0f;
-	float radDis = params_.radDis * (std::numbers::pi_v<float> / 180.0f);
+	float radDis = ToRadians(params_.radDis);
 	for (auto& beam : beams_) {
 		beam.model->GetTransform().rotate.y = rad;
 		beam.model->GetTransform().rotate.x = params_.initRotateX;
@@ -305,8 +307,8 @@ void Beam::SetIsLive(bool is) {
 }
 
 void Beam::SetBossParent(Boss* boss) {
-	model_->SetParent(&boss->GetTrans());
-	model_->SetNoneScaleParent(true);
+	transform_.SetParent(&boss->GetTrans());
+	transform_.SetNoneScaleParent(true);
 	particleParent_->SetParent(&boss->GetTrans());
 	particleParent_->SetNoneScaleParent(true);
 	for (auto& beam : beams_) {
@@ -319,19 +321,19 @@ void Beam::SetBossParent(Boss* boss) {
 
 void Beam::ChangeBeamStep() {
 	if (changeTime_ >= params_.changeBaseTime_) { // ビームの段階を変える為の処理、位置回転を元に
-		model_->GetTransform().translate.y = 5.0f;
-		model_->GetTransform().rotate.x = halfPi_;
+		transform_.translate.y = 5.0f;
+		transform_.rotate.x = halfPi_;
 
-		particleParent_->translate = model_->GetTransform().translate;
+		particleParent_->translate = transform_.translate;
 		particleParent_->rotate.x = 0.0f;
 
 		for (auto& beam : beams_) {
 			beam.model->GetTransform().translate.y = 5.0f;
 			beam.model->GetTransform().rotate.x = halfPi_;
-			beam.particleParent->translate = model_->GetTransform().translate;
+			beam.particleParent->translate = transform_.translate;
 			beam.particleParent->rotate.x = 0.0f;
 		}
-		targetPos_ = model_->GetWorldPos();
+		targetPos_ = GetWorldPos();
 		step_ = BeamStep::RotateBeam;
 	}
 
@@ -394,11 +396,11 @@ void Beam::BeamMove(BeamStep step) {
 		{
 			float frame = (beamAttackTime_);
 			float angleDegrees = (frame / params_.beamAttackBaseTimeAround) * 50.0f + 90.0f;
-			float angleRadians = angleDegrees * (std::numbers::pi_v<float> / 180.0f);
-			float angleRadiansParent = (angleDegrees - 90.0f) * (std::numbers::pi_v<float> / 180.0f);
+			float angleRadians = ToRadians(angleDegrees);
+			float angleRadiansParent = ToRadians(angleDegrees - 90.0f);
 
 			// Y軸回転の行列（右手系前提）
-			model_->GetTransform().rotate.x = angleRadians;
+			transform_.rotate.x = angleRadians;
 			particleParent_->rotate.x = angleRadiansParent;
 			for (auto& beam : beams_) {
 				beam.model->GetTransform().rotate.x = angleRadians;
@@ -413,11 +415,11 @@ void Beam::BeamMove(BeamStep step) {
 		{
 			float frame = (beamAttackTime_);
 			float angleDegrees = (frame / params_.beamAttackBaseTimeRotate) * 360.0f;
-			float angleRadians = angleDegrees * (std::numbers::pi_v<float> / 180.0f);
+			float angleRadians = ToRadians(angleDegrees);
 
 			// Y軸回転の行列（右手系前提）
-			model_->GetTransform().rotate.y = angleRadians;
-			particleParent_->rotate.y = model_->GetTransform().rotate.y;
+			transform_.rotate.y = angleRadians;
+			particleParent_->rotate.y = transform_.rotate.y;
 
 			beams_[0].model->GetTransform().rotate.y = angleRadians;
 			beams_[0].particleParent->rotate.y = beams_[0].model->GetTransform().rotate.y;
@@ -436,8 +438,8 @@ void Beam::BeamMove(BeamStep step) {
 void Beam::BeamShrink(BeamStep step) {
 	if (expandTime_ > 0.0f || beamAttackTime_ > 0.0f) return;
 	if (shrinkTime_ > 0.0f) {
-		model_->GetTransform().rotate.y = 0.0f;
-		particleParent_->rotate.y = model_->GetTransform().rotate.y;
+		transform_.rotate.y = 0.0f;
+		particleParent_->rotate.y = transform_.rotate.y;
 
 		beams_[0].model->GetTransform().rotate.y = 0.0f;
 		beams_[0].particleParent->rotate.y = beams_[0].model->GetTransform().rotate.y;

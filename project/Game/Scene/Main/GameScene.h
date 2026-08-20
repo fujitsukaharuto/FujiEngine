@@ -6,6 +6,9 @@
 #include "Game/GameObj/Player/Player.h"
 #include "Game/GameObj/Enemy/Boss.h"
 #include "Engine/Collision/CollisionManager.h"
+#include "Engine/Graphics/Object/Object3d.h"
+#include "Engine/Graphics/Sprite/Sprite.h"
+#include "Engine/Graphics/Particle/ParticleEmitter.h"
 
 /// <summary>
 /// ゲームシーンクラス

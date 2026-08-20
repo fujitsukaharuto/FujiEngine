@@ -35,12 +35,11 @@ void FollowCamera::Update(const Vector3& lockOn) {
 	lockOnPosition.y = lockOnPosition.y - 3.0f;
 	Vector3 sub = lockOnPosition - Vector3(target_->translate.x, target_->translate.y + 4.0f , target_->translate.z);
 
-	destinationAngleY_ = std::atan2(sub.x, sub.z);
+	destinationAngleY_ = YawFromDirection(sub);
 	transform.rotate.y = LerpShortAngle(transform.rotate.y, destinationAngleY_, followSpeed_);
 
 	// X軸
-	float horizontalDistance = std::sqrt(sub.x * sub.x + sub.z * sub.z);
-	float destinationAngleX = std::atan2(-sub.y, horizontalDistance);
+	float destinationAngleX = PitchFromDirection(sub);
 	if (destinationAngleX < -0.09f) {//上向きすぎないように
 		destinationAngleX = -0.09f;
 	}
@@ -65,12 +64,11 @@ void FollowCamera::ReStart(const Vector3& lockon) {
 	lockOnPosition.y = lockOnPosition.y - 3.0f;
 	Vector3 sub = lockOnPosition - Vector3(target_->translate.x, target_->translate.y + 4.0f, target_->translate.z);
 
-	destinationAngleY_ = std::atan2(sub.x, sub.z);
+	destinationAngleY_ = YawFromDirection(sub);
 	transform.rotate.y = LerpShortAngle(transform.rotate.y, destinationAngleY_, 0.3f);
 
 	// X軸
-	float horizontalDistance = std::sqrt(sub.x * sub.x + sub.z * sub.z);
-	float destinationAngleX = std::atan2(-sub.y, horizontalDistance);
+	float destinationAngleX = PitchFromDirection(sub);
 	if (destinationAngleX < -0.09f) {//上向きすぎないように
 		destinationAngleX = -0.09f;
 	}
@@ -140,7 +138,7 @@ void FollowCamera::PreRotateUpdate(const Vector3& lockon) {
 	lockOnPosition.y = lockOnPosition.y - 3.0f;
 	Vector3 sub = lockOnPosition - Vector3(target_->translate.x, target_->translate.y + 4.0f, target_->translate.z);
 
-	destinationAngleY_ = std::atan2(sub.x, sub.z);
+	destinationAngleY_ = YawFromDirection(sub);
 	transform.rotate.y = LerpShortAngle(transform.rotate.y, destinationAngleY_, 1.0f);
 }
 
@@ -161,8 +159,7 @@ Vector3 FollowCamera::OffsetCal() const {
 	Vector3 offset = offset_;
 
 	Camera* camera = CameraManager::GetInstance()->GetCamera();
-	Matrix4x4 rotateCamera = MakeRotateXYZMatrix(camera->GetTransform().rotate);
-	offset = TransformNormal(offset, rotateCamera);
+	offset = RotateVector(offset, camera->GetTransform().rotate);
 
 	return offset;
 }

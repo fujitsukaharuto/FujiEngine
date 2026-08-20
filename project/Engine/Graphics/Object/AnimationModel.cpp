@@ -22,6 +22,7 @@
 #include "Engine/Math/Animation/NodeAnimation.h"
 #include "Engine/Graphics/Pipeline/PipelineManager.h"
 #include "Engine/Core/App/MyWindow.h"
+#include "Engine/Graphics/Texture/TextureManager.h"
 
 using namespace Core;
 using namespace Graphics;
@@ -49,7 +50,7 @@ void AnimationModel::Create(const std::string& fileName) {
 	this->camera_ = CameraManager::GetInstance()->GetCamera();
 	ModelManager::GetInstance()->LoadModelByExtension(fileName);
 	SetModel(fileName);
-	transform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	ResetTransformSRT();
 	CreateWVP();
 	CreateIDResource();
 }
@@ -58,7 +59,7 @@ void AnimationModel::CreateSphere() {
 	this->camera_ = CameraManager::GetInstance()->GetCamera();
 	ModelManager::GetInstance()->CreateSphere();
 	SetModel("Sphere");
-	transform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	ResetTransformSRT();
 	CreateWVP();
 }
 

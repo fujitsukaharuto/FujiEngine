@@ -4,6 +4,7 @@
 #include "Engine/Core/Input/Input.h"
 
 #include "Game/GameObj/Player/Player.h"
+#include "Engine/Core/Time/FPSKeeper.h"
 
 using namespace Audio;
 using namespace Core;

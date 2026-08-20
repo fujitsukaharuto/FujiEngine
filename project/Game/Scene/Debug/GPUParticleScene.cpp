@@ -12,6 +12,8 @@
 #include "Engine/Scene/SceneManager.h"
 #include "Engine/Core/App/MyWindow.h"
 #include "Game/Particle/GameEmitters.h"
+#include "Engine/Core/Input/Input.h"
+#include "Engine/Graphics/Particle/GPUParticle/GPUEmitter/SphereEmitter.h"
 
 using namespace Core;
 using namespace Graphics;

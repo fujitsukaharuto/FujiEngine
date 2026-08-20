@@ -49,12 +49,8 @@ void GameRun::Initialize() {
 	sceneFactory_ = std::make_unique<SceneFactory>();
 	sceneManager_->SetFactory(sceneFactory_.get());
 
-	int sceneNum = 0;
-	if (sceneNum == 0) {
-		sceneManager_->StartScene("TEST");
-	} else {
-		sceneManager_->StartScene("TITLE");
-	}
+	// 最初に開くシーン。SceneFactory に Register した名前を書く
+	sceneManager_->StartScene("TEST");
 
 }
 

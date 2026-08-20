@@ -16,6 +16,7 @@
 #include "Engine/Core/Debug/ImGuiManager.h"
 #include "Engine/Core/Input/Input.h"
 #include "Engine/Graphics/Light/LightManager.h"
+#include "Engine/DXC/DXCom.h"
 #ifdef _DEBUGMODE
 #include "ImGuizmo.h"
 #endif // _DEBUG

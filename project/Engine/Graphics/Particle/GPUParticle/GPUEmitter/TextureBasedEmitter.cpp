@@ -8,6 +8,7 @@
 #include "Engine/DXC/Resource/SRVManager.h"
 #include "Engine/Graphics/Pipeline/PipelineManager.h"
 #include "Engine/Core/Debug/ImGuiManager.h"
+#include "Engine/Graphics/Texture/TextureManager.h"
 
 using namespace Core;
 using namespace Graphics;

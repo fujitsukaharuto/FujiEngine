@@ -208,6 +208,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Graphics\Particle\GPUParticle\GPUEmitter\TextureBasedEmitter.cpp" />
     <ClCompile Include="Engine\Graphics\Particle\GPUParticle\GPUParticleSystem.cpp" />
     <ClCompile Include="Engine\Graphics\Particle\ParticleGroup\IParticleGroup.cpp" />
+    <ClCompile Include="Engine\Graphics\Particle\ParticleGroup\AnimeParticleGroup.cpp" />
     <ClCompile Include="Engine\Graphics\Particle\ParticleGroup\ParentParticleGroup.cpp" />
     <ClCompile Include="Engine\Graphics\Particle\ParticleGroup\ParticleGroup.cpp" />
     <ClCompile Include="Engine\Graphics\Particle\ParticleEmitter.cpp" />
@@ -237,6 +238,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Logger\Logger.cpp" />
     <ClCompile Include="Engine\Math\Matrix\MatrixCalculation.cpp" />
     <ClCompile Include="Engine\Math\Quaternion\Quaternion.cpp" />
+    <ClCompile Include="Engine\Math\Easing\Easing.cpp" />
     <ClCompile Include="Engine\Math\Random\Random.cpp" />
     <ClCompile Include="Engine\Math\Vector\Vector2.cpp" />
     <ClCompile Include="Engine\Math\Vector\Vector3.cpp" />
@@ -341,6 +343,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Graphics\Particle\GPUParticle\GPUParticleSystem.h" />
     <ClInclude Include="Engine\Graphics\Particle\GPUParticle\IGPUParticleEmitter.h" />
     <ClInclude Include="Engine\Graphics\Particle\ParticleGroup\IParticleGroup.h" />
+    <ClInclude Include="Engine\Graphics\Particle\ParticleGroup\AnimeParticleGroup.h" />
     <ClInclude Include="Engine\Graphics\Particle\ParticleGroup\ParentParticleGroup.h" />
     <ClInclude Include="Engine\Graphics\Particle\ParticleGroup\ParticleGroup.h" />
     <ClInclude Include="Engine\Graphics\Particle\Particle.h" />
@@ -378,6 +381,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Math\Matrix\Matrix4x4.h" />
     <ClInclude Include="Engine\Math\Matrix\MatrixCalculation.h" />
     <ClInclude Include="Engine\Math\Quaternion\Quaternion.h" />
+    <ClInclude Include="Engine\Math\Constants.h" />
+    <ClInclude Include="Engine\Math\Easing\Easing.h" />
     <ClInclude Include="Engine\Math\Random\Random.h" />
     <ClInclude Include="Engine\Math\Vector\Vector2.h" />
     <ClInclude Include="Engine\Math\Vector\Vector2Matrix.h" />

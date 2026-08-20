@@ -4,6 +4,8 @@
 #include "Engine/Graphics/Object/Object3d.h"
 #include "Engine/Math/Random/Random.h"
 #include <algorithm>
+#include "Engine/Core/Time/FPSKeeper.h"
+#include "Engine/Graphics/Particle/GPUParticle/GPUEmitter/SphereEmitter.h"
 
 using namespace Audio;
 using namespace Core;
@@ -28,7 +30,7 @@ void Arrow::Initialize() {
 	GameObject::GameObject::CreateModel("Boss_Arrow.obj");
 
 	collider_ = AddCollider("enemyAttack");
-	collider_->SetParent(&model_->GetTransform());
+	collider_->SetParent(&transform_);
 	collider_->SetWidth(2.0f);
 	collider_->SetHeight(3.0f);
 	collider_->SetDepth(2.0f);
@@ -43,7 +45,7 @@ void Arrow::Initialize() {
 	arrivalWarningPotion_->GetTransform().scale.y = 0.1f;
 
 	velocity_ = { 0.0f,0.0f,0.0f };
-	model_->GetTransform().scale = { kArrowModelScale_, kArrowModelScale_, kArrowModelScale_ };
+	transform_.scale = { kArrowModelScale_, kArrowModelScale_, kArrowModelScale_ };
 
 	ParticleManager::Load(spark1_, "lightning");
 	ParticleManager::Load(spark2_, "lightningSphere");
@@ -120,9 +122,9 @@ void Arrow::InitParameter() {
 }
 
 void Arrow::InitArrow(const Vector3& pos, float emitTime) {
-	model_->GetTransform().translate = pos;
-	model_->GetTransform().rotate = Vector3::GetZeroVec();
-	model_->GetTransform().rotate.x = -std::numbers::pi_v<float> * 0.5f;
+	transform_.translate = pos;
+	transform_.rotate = Vector3::GetZeroVec();
+	transform_.rotate.x = -kPi * 0.5f;
 
 	animationTime_ = totalAnimationTime_;
 	emitTime_ = emitTime;
@@ -133,8 +135,8 @@ void Arrow::InitArrow(const Vector3& pos, float emitTime) {
 	isLive_ = true;
 
 	auto& emitter = ParticleManager::GetSphereEmitter(emitterNumber_);
-	emitter.GetData().prevTranslate = model_->GetTransform().translate;
-	emitter.GetData().translate = model_->GetTransform().translate;
+	emitter.GetData().prevTranslate = transform_.translate;
+	emitter.GetData().translate = transform_.translate;
 }
 
 void Arrow::TargetSetting(const Vector3& target) {
@@ -164,10 +166,10 @@ void Arrow::AnimaTimeUpdate() {
 			animationTime_ = 0.0f;
 
 		float t = 1.0f - (animationTime_ / totalAnimationTime_); // 0->1 の割合
-		float rotationAmount = t * 4.0f * std::numbers::pi_v<float>; // 2回転
-		model_->GetTransform().rotate.y = rotationAmount;
+		float rotationAmount = t * 4.0f * kPi; // 2回転
+		transform_.rotate.y = rotationAmount;
 		if (animationTime_ == 0.0f)
-			model_->GetTransform().rotate.y = 0.0f;
+			transform_.rotate.y = 0.0f;
 		if (animationTime_ <= 0.0f) {
 			ParticleManager::GetSphereEmitter(emitterNumber_).SetEmit(true);
 			AudioPlayer::GetInstance()->SoundPlayWave(*throwSE_, kThrowSEVolume_);
@@ -179,15 +181,15 @@ void Arrow::ArrivalTimeUpdate() {
 	if (emitTime_ > 0.0f || animationTime_ > 0.0f) return;
 	if (arrivalTime_ > 0.0f) {
 		auto& emitter = ParticleManager::GetSphereEmitter(emitterNumber_);
-		emitter.GetData().prevTranslate = model_->GetTransform().translate;
+		emitter.GetData().prevTranslate = transform_.translate;
 		
 		float pret = (std::min)((1.0f - arrivalTime_ / totalArrivalTime_), 1.0f);
 		arrivalTime_ -= FPSKeeper::DeltaTimeFrame();
 		// 放物線の挙動を制御する
 		float t = (std::min)((1.0f - arrivalTime_ / totalArrivalTime_), 1.0f);
 		Vector3 pos = (1.0f - t) * (1.0f - t) * startP_ + 2.0f * (1.0f - t) * t * midtermP_ + t * t * endP_;
-		model_->GetTransform().translate = pos;
-		emitter.GetData().translate = model_->GetTransform().translate;
+		transform_.translate = pos;
+		emitter.GetData().translate = transform_.translate;
 
 		// 回転を決める
 		Vector3 dir = (2.0f * (1.0f - t)) * (midtermP_ - startP_) + (2.0f * t) * (endP_ - midtermP_);
@@ -199,18 +201,18 @@ void Arrow::ArrivalTimeUpdate() {
 		Quaternion prerot = Quaternion::LookRotation(predir);
 		Quaternion newRot = Quaternion::SLerp(prerot, rot, kArrivalRotationLerpRate_);
 
-		model_->GetTransform().rotate = Quaternion::QuaternionToEuler(newRot);
+		transform_.rotate = Quaternion::QuaternionToEuler(newRot);
 	} else {
 		isLive_ = false;
-		hitParticle_.pos_ = model_->GetTransform().translate;
-		hitExpand_.pos_ = model_->GetTransform().translate;
+		hitParticle_.pos_ = transform_.translate;
+		hitExpand_.pos_ = transform_.translate;
 		hitParticle_.Emit();
 		hitExpand_.Emit();
-		hit_.pos_ = model_->GetTransform().translate;
+		hit_.pos_ = transform_.translate;
 		hit_.Emit();
-		ParticleManager::GetSphereEmitter(hitEmitIndex_).SetPos(model_->GetTransform().translate);
+		ParticleManager::GetSphereEmitter(hitEmitIndex_).SetPos(transform_.translate);
 		ParticleManager::GetSphereEmitter(hitEmitIndex_).Emit();
-		ParticleManager::GetSphereEmitter(hitEmitTrailIndex_).SetPos(model_->GetTransform().translate);
+		ParticleManager::GetSphereEmitter(hitEmitTrailIndex_).SetPos(transform_.translate);
 		ParticleManager::GetSphereEmitter(hitEmitTrailIndex_).Emit();
 		ParticleManager::GetSphereEmitter(emitterNumber_).SetEmit(false);
 	}
@@ -235,9 +237,9 @@ void Arrow::RodUpdate() {
 }
 
 void Arrow::InitRod(const Vector3& pos, float time) {
-	model_->GetTransform().translate = pos;
-	model_->GetTransform().rotate = Vector3::GetZeroVec();
-	model_->GetTransform().rotate.x = std::numbers::pi_v<float> * 0.5f;;
+	transform_.translate = pos;
+	transform_.rotate = Vector3::GetZeroVec();
+	transform_.rotate.x = kPi * 0.5f;;
 
 	flyTime_ = time;
 	fallTime_ = maxFallTime_;
@@ -262,15 +264,15 @@ void Arrow::FallTimeUpdate() {
 
 		float t = 1.0f - (fallTime_ / maxFallTime_);
 		float fallPos = std::lerp(kRodFallStartHeight_, kRodFallEndHeight_, t);
-		model_->GetTransform().translate.y = fallPos;
+		transform_.translate.y = fallPos;
 		if (fallTime_ == 0.0f) {
-			hitParticle_.pos_ = model_->GetTransform().translate;
+			hitParticle_.pos_ = transform_.translate;
 			hitParticle_.pos_.y -= 1.0f;
 			hitParticle_.Emit();
-			hit_.pos_ = model_->GetTransform().translate;
+			hit_.pos_ = transform_.translate;
 			hit_.pos_.y -= 1.0f;
 			hit_.Emit();
-			ParticleManager::GetSphereEmitter(hitEmitIndex_).SetPos(model_->GetTransform().translate);
+			ParticleManager::GetSphereEmitter(hitEmitIndex_).SetPos(transform_.translate);
 			ParticleManager::GetSphereEmitter(hitEmitIndex_).Emit();
 		}
 	}
@@ -283,18 +285,18 @@ void Arrow::BrokeTimeUpdate() {
 		if (brokeTime_ <= 0.0f) {
 			isBroke_ = true;
 
-			spark2_.pos_ = model_->GetTransform().translate;
+			spark2_.pos_ = transform_.translate;
 			spark2_.pos_.y = 0.0f;
-			spark3_.pos_ = model_->GetTransform().translate;
+			spark3_.pos_ = transform_.translate;
 			spark3_.pos_.y = 0.0f;
 			spark2_.Emit();
 			spark3_.Emit();
 		}
 		if (brokeTime_ <= kLightningTriggerTime_) {
 			if (isLightNing_) {
-				spark1_.pos_ = model_->GetTransform().translate;
+				spark1_.pos_ = transform_.translate;
 				spark1_.pos_.y += kLightningSpawnHeight_;
-				spark1_.particleRotate_.y = Random::GetFloat(-std::numbers::pi_v<float>, std::numbers::pi_v<float>);
+				spark1_.particleRotate_.y = Random::GetFloat(-kPi, kPi);
 
 				spark1_.Emit();
 				isLightNing_ = false;

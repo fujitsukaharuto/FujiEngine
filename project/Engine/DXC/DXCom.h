@@ -108,11 +108,6 @@ namespace DXC {
 		void PostGPUParticleDraw();
 
 		//========================================================================*/
-		//* Outlineの描画処理を行う際の関数群
-		void PreOutline();
-		void PostOutline();
-
-		//========================================================================*/
 		//* 深度バッファをCSから読む/DSVへ戻す状態遷移 (splatのシーン遮蔽深度テスト等で使用)
 		void TransitionDepthToRead();   // DEPTH_WRITE -> NON_PIXEL_SHADER_RESOURCE
 		void TransitionDepthToWrite();  // NON_PIXEL_SHADER_RESOURCE -> DEPTH_WRITE

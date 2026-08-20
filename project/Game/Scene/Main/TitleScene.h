@@ -3,6 +3,9 @@
 #include "Engine/Graphics/SkyBox/SkyBox.h"
 #include "Game/GameObj/Player/Player.h"
 #include "Engine/Collision/CollisionManager.h"
+#include "Engine/Graphics/Object/Object3d.h"
+#include "Engine/Graphics/Object/AnimationModel.h"
+#include "Engine/Graphics/Sprite/Sprite.h"
 
 /// <summary>
 /// タイトルシーンクラス

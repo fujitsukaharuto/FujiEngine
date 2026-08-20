@@ -7,6 +7,8 @@
 #include "Engine/Graphics/PostEffect/OffscreenManager.h"
 #include "Engine/Graphics/Light/LightManager.h"
 #include "Engine/Core/App/MyWindow.h"
+#include "Engine/Core/Input/Input.h"
+#include "Engine/DXC/DXCom.h"
 
 using namespace Core;
 using namespace Graphics;

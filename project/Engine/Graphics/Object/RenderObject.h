@@ -1,14 +1,18 @@
 #pragma once
 #include <string>
 #include <vector>
-#include "Engine/Graphics/Model/Model.h"
-#include "Engine/Graphics/Camera/Camera.h"
+// 実体で持つのは Material だけ。Model はポインタなので Model.h(Mesh/SkinnedMesh/AnimationStructs を連れてくる)は不要
+#include "Engine/Graphics/Model/Material/Material.h"
 
 
 namespace DXC { class DXCom; }
 
 
 namespace Graphics {
+
+	// どちらもポインタでしか持たないので前方宣言で足りる
+	class Camera;
+	class Model;
 	class LightManager;
 
 	/// <summary>
@@ -52,6 +56,10 @@ namespace Graphics {
 		/// <summary>形状の元になっているモデル。加速構造(BLAS)の対応付けに使う</summary>
 		Model* GetModel() const { return model_; }
 
+		/// <summary>SRTだけを初期化する。parent / animeParent は保持する</summary>
+		/// <remarks>transform_ を丸ごと代入するとペアレントが黙って外れるので、Create系はこれを通すこと</remarks>
+		void ResetTransformSRT();
+
 		/// <summary>jsonからTransform初期化</summary>
 		void LoadTransformFromJson(const std::string& filename);
 
@@ -73,8 +81,6 @@ namespace Graphics {
 		void SetNoneScaleParent(bool is) { transform_.isNoneScaleParent = is; }
 		/// <summary>スキニングのジョイントへのペアレントの設定</summary>
 		void SetJointParent(Math::Matrix4x4* parent) { transform_.animeParent = parent; }
-		/// <summary>カメラにペアレントするか</summary>
-		void SetCameraParent(bool is) { transform_.isCameraParent = is; }
 		/// <summary>ビルボードMatrixの設定</summary>
 		void SetBillboardMat(const Math::Matrix4x4& mat) { billboardMatrix_ = mat; }
 		/// <summary>ライトモードの設定</summary>

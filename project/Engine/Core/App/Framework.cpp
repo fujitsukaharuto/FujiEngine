@@ -2,6 +2,9 @@
 #include "Engine/Core/Debug/ImGuiManager.h"
 #include "Engine/Core/Time/FPSKeeper.h"
 #include "Engine/Core/Input/Input.h"
+#include "Engine/Graphics/Texture/TextureManager.h"
+#include "Engine/DXC/DXCom.h"
+#include "Engine/Graphics/Camera/CameraManager.h"
 
 using namespace Audio;
 using namespace Core;

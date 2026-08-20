@@ -29,10 +29,8 @@ TextureManager* TextureManager::GetInstance() {
 void TextureManager::Initialize(DXCom* pDxcom) {
 	dxcommon_ = pDxcom;
 	LoadSkyCube();
-	LoadTextureFile();
-	for (auto& pair : textureFileList_) {
-		Load(pair.first.c_str());
-	}
+	// 実体の読み込みは LoadAll() が行う。ここで一覧を作るのはエディタのテクスチャ選択UI用
+	ScanTextureFolder();
 }
 
 void TextureManager::Finalize() {
@@ -71,7 +69,7 @@ void TextureManager::Load(const std::string& filename, bool overWrite) {
 	}
 
 	// 新しいデータ読み込み
-	DirectX::ScratchImage mipImages = LoadTextureFile(directoryPath_ + filename);
+	DirectX::ScratchImage mipImages = ReadImageFile(directoryPath_ + filename);
 	texture->meta = mipImages.GetMetadata();
 
 	texture->textureResource = CreateTextureResource(dxcommon_->GetDevice(), texture->meta);
@@ -111,7 +109,7 @@ void Graphics::TextureManager::LoadAll() {
 	}
 }
 
-void TextureManager::LoadTextureFile(bool overWrite) {
+void TextureManager::ScanTextureFolder(bool markPendingReload) {
 #ifdef _DEBUGMODE
 	textureFileList_.clear();
 	if (!std::filesystem::exists(directoryPath_)) return;
@@ -120,11 +118,8 @@ void TextureManager::LoadTextureFile(bool overWrite) {
 		if (entry.is_regular_file()) {
 			auto path = entry.path();
 			if (path.extension() == ".png" || path.extension() == ".jpg") {
-				if (overWrite) {
-					textureFileList_.push_back(std::make_pair(path.filename().string(), true));
-				} else {
-					textureFileList_.push_back(std::make_pair(path.filename().string(), false));
-				}
+				// second は「まだ読み直していない」印。エディタが読んだ時点で SetTextureFileOnceLoad が false にする
+				textureFileList_.emplace_back(path.filename().string(), markPendingReload);
 			}
 		}
 	}
@@ -162,7 +157,7 @@ void TextureManager::SetTextureFileOnceLoad(const std::string& name) {
 	}
 }
 
-DirectX::ScratchImage TextureManager::LoadTextureFile(const std::string& filePath) {
+DirectX::ScratchImage TextureManager::ReadImageFile(const std::string& filePath) {
 	DirectX::ScratchImage image{};
 	HRESULT hr;
 	std::wstring filePathw = Logger::ConvertString(filePath);

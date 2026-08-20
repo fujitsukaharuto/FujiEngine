@@ -15,6 +15,10 @@
 #include "Engine/Graphics/PostEffect/OffscreenManager.h"
 #include "Engine/Core/App/MyWindow.h"
 #include "Game/Particle/GameEmitters.h"
+#include "Engine/Core/Input/Input.h"
+#include "Engine/DXC/DXCom.h"
+#include "Engine/Graphics/Particle/GPUParticle/GPUEmitter/SphereEmitter.h"
+#include "Engine/Graphics/Particle/GPUParticle/GPUEmitter/MeshSurfaceEmitter.h"
 
 using namespace Core;
 using namespace Graphics;
@@ -89,7 +93,7 @@ void TitleScene::Initialize() {
 
 	cMane_ = std::make_unique<CollisionManager>();
 	
-	const float PI = std::numbers::pi_v<float>;
+	const float PI = kPi;
 	for (int i = 0; i < towerDivision_; i++) {
 		float angle = (2.0f * PI / towerDivision_) * i;
 

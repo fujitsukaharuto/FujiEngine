@@ -10,6 +10,7 @@
 #include "BossArrowAttack.h"
 #include "BossRodFall.h"
 #include "BossDushAttack.h"
+#include "Engine/Core/Time/FPSKeeper.h"
 
 using namespace Core;
 using namespace Graphics;

@@ -529,11 +529,11 @@ void Graphics::OffscreenManager::PingPongCommand() {
 		}
 
 		if (validPostEffects_[i].pipeline == Pipe::OutlineCS) {
-			dxcommon_->PreOutline();
+			dxcommon_->TransitionDepthToRead();
 			dxcommon_->GetPipelineManager()->SetCSPipeline(validPostEffects_[i].pipeline);
 			validPostEffects_[i].setup(dxcommon_->GetCommandList(), inputSRVHandle, outputUAVHandle);
 			dxcommon_->GetCommandList()->Dispatch((MyWin::kWindowWidth + 7) / 8, (MyWin::kWindowHeight + 7) / 8, 1);
-			dxcommon_->PostOutline();
+			dxcommon_->TransitionDepthToWrite();
 		} else {
 			dxcommon_->GetPipelineManager()->SetCSPipeline(validPostEffects_[i].pipeline);
 			validPostEffects_[i].setup(dxcommon_->GetCommandList(), inputSRVHandle, outputUAVHandle);

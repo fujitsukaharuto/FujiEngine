@@ -145,6 +145,9 @@
     <ClCompile Include="Engine\Graphics\Particle\ParticleGroup\IParticleGroup.cpp">
       <Filter>Engine\Graphics\Particle\ParticleGroup</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Graphics\Particle\ParticleGroup\AnimeParticleGroup.cpp">
+      <Filter>Engine\Graphics\Particle\ParticleGroup</Filter>
+    </ClCompile>
     <ClCompile Include="Engine\Graphics\Particle\ParticleGroup\ParentParticleGroup.cpp">
       <Filter>Engine\Graphics\Particle\ParticleGroup</Filter>
     </ClCompile>
@@ -231,6 +234,9 @@
     </ClCompile>
     <ClCompile Include="Engine\Math\Quaternion\Quaternion.cpp">
       <Filter>Engine\Math\Quaternion</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Math\Easing\Easing.cpp">
+      <Filter>Engine\Math\Easing</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Math\Random\Random.cpp">
       <Filter>Engine\Math\Random</Filter>
@@ -538,6 +544,9 @@
     <ClInclude Include="Engine\Graphics\Particle\ParticleGroup\IParticleGroup.h">
       <Filter>Engine\Graphics\Particle\ParticleGroup</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Graphics\Particle\ParticleGroup\AnimeParticleGroup.h">
+      <Filter>Engine\Graphics\Particle\ParticleGroup</Filter>
+    </ClInclude>
     <ClInclude Include="Engine\Graphics\Particle\ParticleGroup\ParentParticleGroup.h">
       <Filter>Engine\Graphics\Particle\ParticleGroup</Filter>
     </ClInclude>
@@ -648,6 +657,12 @@
     </ClInclude>
     <ClInclude Include="Engine\Math\Quaternion\Quaternion.h">
       <Filter>Engine\Math\Quaternion</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Math\Constants.h">
+      <Filter>Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Math\Easing\Easing.h">
+      <Filter>Engine\Math\Easing</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Math\Random\Random.h">
       <Filter>Engine\Math\Random</Filter>
@@ -935,6 +950,9 @@
     </Filter>
     <Filter Include="Engine\Math\Animation">
       <UniqueIdentifier>{bd1e8302-2cd0-47fe-bbf8-ba4e941d5a51}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Math\Easing">
+      <UniqueIdentifier>{a7f3c9d2-4e51-4b8a-9c6f-2d1e8b7a3c50}</UniqueIdentifier>
     </Filter>
     <Filter Include="Engine\Math\Matrix">
       <UniqueIdentifier>{c3c8cefe-3407-4bcf-89b5-30a88c2d74c4}</UniqueIdentifier>

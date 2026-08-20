@@ -8,6 +8,8 @@
 #include "Engine/Graphics/Model/ModelManager.h"
 #include "Engine/Core/Debug/ImGuiManager.h"
 #include "Engine/Graphics/Pipeline/BasePipeline.h"
+#include "Engine/Graphics/Texture/TextureManager.h"
+#include "Engine/Graphics/Particle/GPUParticle/GPUParticleSystem.h"
 
 using namespace Core;
 using namespace Graphics;
@@ -250,7 +252,7 @@ void ParticleManager::ParticleTexturePopUp() {
 	ImGui::PushStyleColor(ImGuiCol_ModalWindowDimBg, ImVec4(0, 0, 0, 0.25f));
 	if (ImGui::BeginPopupModal("TextureFile Window", NULL)) {
 		if (ImGui::Button("Refresh")) {
-			TextureManager::GetInstance()->LoadTextureFile(true);
+			TextureManager::GetInstance()->ScanTextureFolder(true);
 		}
 		int buttonCount = 0;
 		for (const auto& TexName : TextureManager::GetInstance()->GetTextureFiles()) {

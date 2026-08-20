@@ -5,6 +5,7 @@
 #include "Game/GameObj/Enemy/Boss.h"
 #include "Game/GameObj/Enemy/Behavior/BossArrowAttack.h"
 #include "BossRoot.h"
+#include "Engine/Core/Time/FPSKeeper.h"
 
 using namespace Core;
 using namespace Graphics;

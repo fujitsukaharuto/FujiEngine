@@ -2,6 +2,7 @@
 
 #include "Game/GameObj/Player/Player.h"
 #include "Game/GameObj/Player/Behavior/PlayerRoot.h"
+#include "Engine/Core/Input/Input.h"
 
 using namespace Core;
 

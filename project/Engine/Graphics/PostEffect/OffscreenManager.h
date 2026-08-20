@@ -5,13 +5,13 @@
 #include <dxgi1_6.h>
 #include <dxgidebug.h>
 #include <cassert>
+#include <functional>
 #include <wrl.h>
 
 #include "Engine/DXC/Command/DXCommand.h"
 #include "Engine/DXC/Shader/DXCompile.h"
 #include "Engine/Math/Matrix/MatrixCalculation.h"
 #include "Engine/Graphics/Pipeline/PipeKind.h"
-#include "Engine/Graphics/Texture/TextureManager.h"
 #include "Engine/DXC/FrameCount.h"
 
 

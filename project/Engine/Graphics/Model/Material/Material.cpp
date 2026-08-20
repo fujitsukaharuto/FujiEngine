@@ -2,6 +2,7 @@
 #include "Engine/DXC/DXCom.h"
 #include "Engine/DXC/Resource/DX12Helper.h"
 #include <algorithm>
+#include "Engine/Graphics/Texture/TextureManager.h"
 
 using namespace Graphics;
 using namespace Math;
@@ -62,7 +63,7 @@ Texture* Material::GetTexture() {
 	return texture_;
 }
 
-ID3D12Resource* Material::GetMaterialResource() {
+ID3D12Resource* Material::UploadAndGetResource() {
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 	if (!materialResource_[frameIndex]) {
 		return nullptr;

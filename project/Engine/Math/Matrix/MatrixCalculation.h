@@ -4,6 +4,7 @@
 #include <string>
 #include <map>
 
+#include "Engine/Math/Constants.h"
 #include "Engine/Math/Vector/Vector2.h"
 #include "Engine/Math/Vector/Vector3.h"
 #include "Engine/Math/Vector/Vector4.h"
@@ -35,8 +36,6 @@ namespace Math {
 		void SetParent(Trans* trans) { parent = trans; }
 		/// <summary>スケールを適用しないペアレント</summary>
 		void SetNoneScaleParent(bool is) { isNoneScaleParent = is; }
-		/// <summary>カメラにペアレント</summary>
-		void SetCameraParent(bool is) { isCameraParent = is; }
 
 		//========================================================================*/
 		//* Getter
@@ -44,13 +43,19 @@ namespace Math {
 		Matrix4x4 GetNoneScaleWorldMat() const;
 		/// <summary>ペアレントを含めたワールド座標</summary>
 		Vector3 GetWorldPos() const;
+		/// <summary>このTransformが向いている前方向(+Z)。長さ1</summary>
+		/// <remarks>ペアレントの回転も含む。回転だけを見るので translate/scale の影響は受けない</remarks>
+		Vector3 GetForward() const;
+		/// <summary>右方向(+X)。長さ1</summary>
+		Vector3 GetRight() const;
+		/// <summary>上方向(+Y)。長さ1</summary>
+		Vector3 GetUp() const;
 		Vector3 GetRotation();
 
 		Trans* parent = nullptr;
 		Matrix4x4* animeParent = nullptr;
 
 		bool isNoneScaleParent = false;
-		bool isCameraParent = false;
 	};
 
 	/// <summary>
@@ -243,6 +248,16 @@ namespace Math {
 	/// </summary>
 	float Clamp(float x, float min, float max);
 
+	/// <summary>0〜1にクランプする。</summary>
+	float Clamp01(float x);
+
+	/// <summary>Lerpの逆。valueがv1〜v2のどこにあるかを0〜1で返す。</summary>
+	/// <remarks>v1とv2が同じときは0を返す（0除算を避けるため）</remarks>
+	float InverseLerp(float v1, float v2, float value);
+
+	/// <summary>値を別の範囲へ写す。</summary>
+	float Remap(float value, float inMin, float inMax, float outMin, float outMax);
+
 	/// <summary>
 	/// Catmull-Romスプライン補間による1点の計算を行う。
 	/// </summary>
@@ -262,6 +277,26 @@ namespace Math {
 	/// 角度の短い方を補間する線形補間（Lerp）を行う。
 	/// </summary>
 	float LerpShortAngle(float a, float b, float t);
+
+	/// <summary>ベクトルをオイラー角ぶん回す（平行移動は無視）。</summary>
+	Vector3 RotateVector(const Vector3& v, const Vector3& eulerRotate);
+
+	/// <summary>ベクトルをY軸まわりに回す。</summary>
+	Vector3 RotateVectorY(const Vector3& v, float yaw);
+
+	/// <summary>方向ベクトルからY軸まわりの角度（ヨー）を求める。</summary>
+	/// <remarks>+Zを正面とした角度。水平成分だけを見るのでyは無視される</remarks>
+	float YawFromDirection(const Vector3& direction);
+
+	/// <summary>方向ベクトルからX軸まわりの角度（ピッチ）を求める。</summary>
+	/// <remarks>下を向くほど正。エンジンのカメラ回転と符号を合わせてある</remarks>
+	float PitchFromDirection(const Vector3& direction);
+
+	/// <summary>fromからtoを見るときのヨー角。</summary>
+	float YawTo(const Vector3& from, const Vector3& to);
+
+	/// <summary>fromからtoを見るときのピッチ角。</summary>
+	float PitchTo(const Vector3& from, const Vector3& to);
 
 	/// <summary>
 	/// 前方ベクトルと上方向ベクトルからビュー行列（LookAt行列）を生成する。

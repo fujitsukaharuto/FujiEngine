@@ -1,6 +1,7 @@
 #include "GameObject.h"
 #include <json.hpp>
 #include "Engine/Core/Serialize/JsonSerializer.h"
+#include "Engine/Core/Debug/ImGuiManager.h"
 
 using namespace Collision;
 
@@ -15,6 +16,8 @@ namespace GameObject {
 
 
 	GameObject::GameObject() : modelDataJson_(std::make_unique<nlohmann::json>()) {
+		// Math::Trans の既定は scale=0。1 にしておかないと子の GetWorldMat が潰れる
+		transform_.scale = { 1.0f,1.0f,1.0f };
 	}
 
 	GameObject::~GameObject() = default;
@@ -29,6 +32,8 @@ namespace GameObject {
 	Graphics::Object3d* GameObject::EnsureModel() {
 		if (!model_) {
 			model_ = std::make_unique<Object3d>();
+			// 見た目はこのオブジェクトの位置にぶら下がる。モデル側のTransformはローカルオフセット用に空けておく
+			model_->SetParent(&transform_);
 		}
 		return model_.get();
 	}
@@ -36,6 +41,7 @@ namespace GameObject {
 	Graphics::AnimationModel* GameObject::EnsureAnimeModel() {
 		if (!animeModel_) {
 			animeModel_ = std::make_unique<AnimationModel>();
+			animeModel_->SetParent(&transform_);
 		}
 		return animeModel_.get();
 	}
@@ -58,9 +64,20 @@ namespace GameObject {
 
 	void GameObject::DebugGUI() {
 	#ifdef _DEBUGMODE
-		// 編集UIはObject3d側(Object3dEditor)に集約されている
+		// オブジェクト自身のTransform。モデル側のギズモが動かすのはローカルオフセットなので、
+		// 本体(コライダーやエミッタを含む)を動かすにはこちらを触ること
+		if (ImGui::TreeNode("Transform")) {
+			ImGui::DragFloat3("translate", &transform_.translate.x, 0.01f);
+			ImGui::DragFloat3("rotate", &transform_.rotate.x, 0.01f);
+			ImGui::DragFloat3("scale", &transform_.scale.x, 0.01f);
+			ImGui::TreePop();
+		}
+
+		// 見た目の編集UIは Object3dEditor / AnimationModelEditor に集約されている
 		if (model_) {
 			model_->DebugGUI();
+		} else if (animeModel_) {
+			animeModel_->DebugGUI();
 		}
 	#endif // _DEBUG
 	}
@@ -89,19 +106,19 @@ namespace GameObject {
 		if (objJson.contains("transform")) {
 			const auto& t = objJson["transform"];
 			if (t.contains("translate")) {
-				model_->GetTransform().translate.x = t["translate"][0];
-				model_->GetTransform().translate.y = t["translate"][1];
-				model_->GetTransform().translate.z = t["translate"][2];
+				transform_.translate.x = t["translate"][0];
+				transform_.translate.y = t["translate"][1];
+				transform_.translate.z = t["translate"][2];
 			}
 			if (t.contains("rotate")) {
-				model_->GetTransform().rotate.x = t["rotate"][0];
-				model_->GetTransform().rotate.y = t["rotate"][1];
-				model_->GetTransform().rotate.z = t["rotate"][2];
+				transform_.rotate.x = t["rotate"][0];
+				transform_.rotate.y = t["rotate"][1];
+				transform_.rotate.z = t["rotate"][2];
 			}
 			if (t.contains("scale")) {
-				model_->GetTransform().scale.x = t["scale"][0];
-				model_->GetTransform().scale.y = t["scale"][1];
-				model_->GetTransform().scale.z = t["scale"][2];
+				transform_.scale.x = t["scale"][0];
+				transform_.scale.y = t["scale"][1];
+				transform_.scale.z = t["scale"][2];
 			}
 		}
 	}
@@ -112,21 +129,25 @@ namespace GameObject {
 		if (modelDataJson_->contains("transform")) {
 			const auto& t = (*modelDataJson_)["transform"];
 			if (t.contains("translate")) {
-				model_->GetTransform().translate.x = t["translate"][0];
-				model_->GetTransform().translate.y = t["translate"][1];
-				model_->GetTransform().translate.z = t["translate"][2];
+				transform_.translate.x = t["translate"][0];
+				transform_.translate.y = t["translate"][1];
+				transform_.translate.z = t["translate"][2];
 			}
 			if (t.contains("rotate")) {
-				model_->GetTransform().rotate.x = t["rotate"][0];
-				model_->GetTransform().rotate.y = t["rotate"][1];
-				model_->GetTransform().rotate.z = t["rotate"][2];
+				transform_.rotate.x = t["rotate"][0];
+				transform_.rotate.y = t["rotate"][1];
+				transform_.rotate.z = t["rotate"][2];
 			}
 			if (t.contains("scale")) {
-				model_->GetTransform().scale.x = t["scale"][0];
-				model_->GetTransform().scale.y = t["scale"][1];
-				model_->GetTransform().scale.z = t["scale"][2];
+				transform_.scale.x = t["scale"][0];
+				transform_.scale.y = t["scale"][1];
+				transform_.scale.z = t["scale"][2];
 			}
 		}
+	}
+
+	void GameObject::LoadTransformFromJson(const std::string& name) {
+		JsonSerializer::DeserializeTransform(name, transform_);
 	}
 
 	void GameObject::SetModel(const std::string& name) {

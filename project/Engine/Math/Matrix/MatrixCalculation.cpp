@@ -1,11 +1,9 @@
 #include "MatrixCalculation.h"
-#include "Engine/Graphics/Camera/CameraManager.h"
 #include <numbers>
 #include <cmath>
 #include <assert.h>
 
 using namespace Math;
-using namespace Graphics;
 
 Matrix3x3 Math::MakeAffineMat(const Vector2& scale, float rotate, const Vector2& translate) {
 	Matrix3x3 result{};
@@ -453,6 +451,47 @@ float Math::Clamp(float x, float min, float max) {
 	return x < min ? min : (x > max ? max : x);
 }
 
+float Math::Clamp01(float x) {
+	return Clamp(x, 0.0f, 1.0f);
+}
+
+float Math::InverseLerp(float v1, float v2, float value) {
+	const float range = v2 - v1;
+	if (range == 0.0f) {
+		return 0.0f;
+	}
+	return (value - v1) / range;
+}
+
+float Math::Remap(float value, float inMin, float inMax, float outMin, float outMax) {
+	return Lerp(outMin, outMax, InverseLerp(inMin, inMax, value));
+}
+
+Vector3 Math::RotateVector(const Vector3& v, const Vector3& eulerRotate) {
+	return TransformNormal(v, MakeRotateXYZMatrix(eulerRotate));
+}
+
+Vector3 Math::RotateVectorY(const Vector3& v, float yaw) {
+	return TransformNormal(v, MakeRotateYMatrix(yaw));
+}
+
+float Math::YawFromDirection(const Vector3& direction) {
+	return std::atan2(direction.x, direction.z);
+}
+
+float Math::PitchFromDirection(const Vector3& direction) {
+	const float horizontal = std::sqrt(direction.x * direction.x + direction.z * direction.z);
+	return std::atan2(-direction.y, horizontal);
+}
+
+float Math::YawTo(const Vector3& from, const Vector3& to) {
+	return YawFromDirection(to - from);
+}
+
+float Math::PitchTo(const Vector3& from, const Vector3& to) {
+	return PitchFromDirection(to - from);
+}
+
 Vector3 Math::CatmullRomPoint(const Vector3& p0, const Vector3& p1, const Vector3& p2, const Vector3& p3, float t) {
 	const float s = 0.5f;
 	float t2 = t * t;
@@ -519,8 +558,8 @@ Vector3 Math::ExtractEulerAngles(const Matrix4x4& rotationMatrix) {
 }
 
 float Math::LerpShortAngle(float a, float b, float t) {
-	const float TWO_PI = 2.0f * (float)std::numbers::pi; // 2π (6.283185307179586)
-	const float PI = (float)std::numbers::pi;            // π (3.141592653589793)
+	constexpr float TWO_PI = kTwoPi;
+	constexpr float PI = kPi;
 
 	// 角度差分を求める
 	float diff = b - a;
@@ -678,8 +717,6 @@ Matrix4x4 Trans::GetWorldMat() const {
 	} else if (animeParent) {
 		const Matrix4x4& parentWorld = *animeParent;
 		worldMatrix = Multiply(worldMatrix, isNoneScaleParent ? RemoveScale(parentWorld) : parentWorld);
-	} else if (isCameraParent) {
-		worldMatrix = Multiply(worldMatrix, CameraManager::GetInstance()->GetCamera()->GetWorldMatrix());
 	}
 	return worldMatrix;
 }
@@ -693,10 +730,20 @@ Matrix4x4 Trans::GetNoneScaleWorldMat() const {
 	} else if (animeParent) {
 		const Matrix4x4& parentWorld = *animeParent;
 		worldMatrix = Multiply(worldMatrix, isNoneScaleParent ? RemoveScale(parentWorld) : parentWorld);
-	} else if (isCameraParent) {
-		worldMatrix = Multiply(worldMatrix, CameraManager::GetInstance()->GetCamera()->GetWorldMatrix());
 	}
 	return worldMatrix;
+}
+
+Vector3 Trans::GetForward() const {
+	return TransformNormal({ 0.0f,0.0f,1.0f }, GetWorldMat()).Normalize();
+}
+
+Vector3 Trans::GetRight() const {
+	return TransformNormal({ 1.0f,0.0f,0.0f }, GetWorldMat()).Normalize();
+}
+
+Vector3 Trans::GetUp() const {
+	return TransformNormal({ 0.0f,1.0f,0.0f }, GetWorldMat()).Normalize();
 }
 
 Vector3 Trans::GetWorldPos() const {

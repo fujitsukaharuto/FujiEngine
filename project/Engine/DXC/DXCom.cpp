@@ -213,16 +213,6 @@ void DXCom::PostGPUParticleDraw() {
 	offscreen_->SynthesisGPURTV();
 }
 
-void DXCom::PreOutline() {
-	TransitionResource(swapChainManager_->GetDSVResource(GetNowFrameCount()),
-		D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
-}
-
-void DXCom::PostOutline() {
-	TransitionResource(swapChainManager_->GetDSVResource(GetNowFrameCount()),
-		D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_DEPTH_WRITE);
-}
-
 void DXCom::TransitionDepthToRead() {
 	TransitionResource(swapChainManager_->GetDSVResource(GetNowFrameCount()),
 		D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);

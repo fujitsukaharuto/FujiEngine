@@ -1,7 +1,9 @@
 #pragma once
+#include <string>
+#include <d3d12.h>
+#include <wrl/client.h>
 #include "Engine/Math/Matrix/MatrixCalculation.h"
 #include "Engine/Math/Vector/Vector4.h"
-#include "Engine/Graphics/Texture/TextureManager.h"
 #include "Engine/DXC/FrameCount.h"
 
 namespace DXC { class DXCom; }
@@ -15,6 +17,10 @@ namespace Colors {
 }
 
 namespace Graphics {
+
+	// Texture はポインタでしか持たないので前方宣言で足りる。
+	// 実体を include すると DirectXTex.h(1,152行) が全ての描画オブジェクトに付いてくる
+	struct Texture;
 
 	/// <summary>
 	/// Textureのファイルパス
@@ -72,7 +78,9 @@ namespace Graphics {
 		//* Getter
 		Texture* GetTexture();
 		Texture* GetNormalMap() { return normalMap_; }
-		ID3D12Resource* GetMaterialResource();
+		/// <summary>CBへ最新値を書き込んでから定数バッファを返す</summary>
+		/// <remarks>取得のたびに転送が走る。描画直前のバインド用であって、単なる getter ではない</remarks>
+		ID3D12Resource* UploadAndGetResource();
 		std::string GetPathName() const { return textureNamePath_.textureFilePath; }
 		Math::Vector4 GetColor();
 		Math::Vector2 GetUVScale() { return scale_; }

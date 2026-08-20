@@ -4,6 +4,7 @@
 #include "Engine/DXC/DXCom.h"
 #include "Engine/DXC/Resource/DX12Helper.h"
 #include "Engine/Core/Serialize/JsonSerializer.h"
+#include "Engine/Graphics/Camera/Camera.h"
 
 using namespace Core;
 using namespace Math;
@@ -44,6 +45,12 @@ void Graphics::RenderObject::SetModel(const std::string& fileName, bool overWrit
 		material_.push_back(std::move(newMaterial));
 		nowTextureName_ = model_->GetModelData().meshes[i].material.textureFilePath;
 	}
+}
+
+void RenderObject::ResetTransformSRT() {
+	transform_.scale = { 1.0f,1.0f,1.0f };
+	transform_.rotate = { 0.0f,0.0f,0.0f };
+	transform_.translate = { 0.0f,0.0f,0.0f };
 }
 
 void RenderObject::LoadTransformFromJson(const std::string& filename) {
@@ -118,8 +125,6 @@ void RenderObject::SetWVP() {
 	} else if (transform_.animeParent) {
 		const Matrix4x4& parentWorld = *transform_.animeParent;
 		worldMatrix = Multiply(worldMatrix, transform_.isNoneScaleParent ? Math::RemoveScale(parentWorld) : parentWorld);
-	} else if (transform_.isCameraParent) {
-		worldMatrix = Multiply(worldMatrix, camera_->GetWorldMatrix());
 	}
 
 

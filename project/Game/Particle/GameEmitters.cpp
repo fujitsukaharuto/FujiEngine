@@ -1,5 +1,7 @@
 #include "Game/Particle/GameEmitters.h"
 #include "Engine/Graphics/Particle/ParticleManager.h"
+#include "Engine/Graphics/Particle/GPUParticle/GPUEmitter/SphereEmitter.h"
+#include "Engine/Graphics/Particle/GPUParticle/GPUEmitter/MeshSurfaceEmitter.h"
 
 using namespace Graphics;
 

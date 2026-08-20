@@ -3,6 +3,11 @@
 #include "Engine/FujiEngine.h"
 #include "Game/GameObj/FollowCamera.h"
 #include "Game/GameObj/Player/PlayerBullet.h"
+#include "Engine/Core/Input/Input.h"
+#include "Engine/Audio/AudioPlayer.h"
+#include "Engine/Graphics/Light/LightManager.h"
+#include "Engine/Core/Time/FPSKeeper.h"
+#include "Engine/Graphics/Camera/CameraManager.h"
 
 using namespace Audio;
 using namespace Core;

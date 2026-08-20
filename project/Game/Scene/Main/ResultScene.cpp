@@ -5,13 +5,14 @@
 #include "Engine/Graphics/Camera/CameraManager.h"
 #include "Engine/Core/Time/FPSKeeper.h"
 #include "Engine/Math/Random/Random.h"
-#include <numbers>
 
 #include "Engine/Graphics/Particle/ParticleManager.h"
 #include "Engine/Scene/SceneManager.h"
 #include "Engine/Graphics/Light/LightManager.h"
 #include "Engine/Graphics/Sprite/SpriteRenderer.h"
 #include "Game/Particle/GameEmitters.h"
+#include "Engine/Core/Input/Input.h"
+#include "Engine/Graphics/Particle/GPUParticle/GPUEmitter/SphereEmitter.h"
 
 using namespace Core;
 using namespace Graphics;
@@ -210,7 +211,7 @@ void ResultScene::KirbyDance() {
 	case DanceState::TurnLeftMoveToLeft:// 左に動く
 		t = danceTime_ / stepTime_.turnLeftBaseTime;
 		transform.x = Lerp(0.0f, -danceDistanceX_, t);
-		rotate.y += std::numbers::pi_v<float> * 2.0f * t;
+		rotate.y += kPi * 2.0f * t;
 
 		if (t >= 1.0f) { danceTime_ = 0.0f; state_ = DanceState::TurnRightMoveToCenter; }
 		break;
@@ -219,14 +220,14 @@ void ResultScene::KirbyDance() {
 		t = danceTime_ / stepTime_.turnRightBaseTime;
 		transform.x = Lerp(-danceDistanceX_, 0.0f, t);
 		transform.y += height_.jumpHeight * 4.0f * t * (1.0f - t);
-		rotate.z = -std::numbers::pi_v<float> * 2.0f * t;
+		rotate.z = -kPi * 2.0f * t;
 
 		if (t >= 1.0f) { danceTime_ = 0.0f; state_ = DanceState::JumpLeft; }
 		break;
 
 	case DanceState::JumpLeft:// 左にジャンプ
 		t = danceTime_ / stepTime_.jumpLeftBaseTime;
-		transform.x = -1.0f * std::sin(t * std::numbers::pi_v<float>);
+		transform.x = -1.0f * std::sin(t * kPi);
 		transform.y += height_.jumpHeight * 4.0f * t * (1.0f - t);
 		rotate.z = jumpRotateZ_;
 
@@ -235,7 +236,7 @@ void ResultScene::KirbyDance() {
 
 	case DanceState::JumpRight:// 右にジャンプ
 		t = danceTime_ / stepTime_.jumpRightBaseTime;
-		transform.x = 1.0f * sin(t * std::numbers::pi_v<float>);
+		transform.x = 1.0f * sin(t * kPi);
 		transform.y += height_.jumpHeight * 4.0f * t * (1.0f - t);
 		rotate.z = -jumpRotateZ_;
 
@@ -244,30 +245,30 @@ void ResultScene::KirbyDance() {
 
 	case DanceState::JumpUPSpin:// ジャンプして回転
 		t = danceTime_ / stepTime_.jumpUpBaseTime;
-		rotate.y += std::numbers::pi_v<float> *2.0f * t;
-		transform.y += height_.finishHeight * std::sin(t * std::numbers::pi_v<float>);
+		rotate.y += kPi *2.0f * t;
+		transform.y += height_.finishHeight * std::sin(t * kPi);
 
 		if (t >= 1.0f) { danceTime_ = 0.0f; state_ = DanceState::FastSpin; }
 		break;
 
 	case DanceState::FastSpin:// 素早く回転
 		t = danceTime_ / stepTime_.fastSpinBaseTime;
-		rotate.x = std::numbers::pi_v<float> * 2.0f * t;
-		transform.y += height_.spinHeight * std::sin(t * std::numbers::pi_v<float>);
+		rotate.x = kPi * 2.0f * t;
+		transform.y += height_.spinHeight * std::sin(t * kPi);
 
 		if (t >= 1.0f) { danceTime_ = 0.0f; state_ = DanceState::FinishSpin; }
 		break;
 	case DanceState::FinishSpin:// 最後の回転
 		t = danceTime_ / stepTime_.finishSpinBaseTime;
-		rotate.x = std::numbers::pi_v<float> * 2.0f *t;
-		transform.y += height_.finishHeight * std::sin(t * std::numbers::pi_v<float>);
+		rotate.x = kPi * 2.0f *t;
+		transform.y += height_.finishHeight * std::sin(t * kPi);
 
 		if (t >= 1.0f) { danceTime_ = 0.0f; state_ = DanceState::LastPose; }
 		break;
 
 	case DanceState::LastPose:// 決めポーズ
 		t = danceTime_ / stepTime_.lastBaseTime;
-		transform.y += height_.lastHeight * std::sin(t * std::numbers::pi_v<float>);
+		transform.y += height_.lastHeight * std::sin(t * kPi);
 		rotate.y -= lastRotateY_ * t;  // Y軸：右に20°
 		rotate.x = -lastRotateX_ * t;
 

@@ -2,6 +2,8 @@
 
 #include "Engine/Graphics/Particle/ParticleManager.h"
 #include "Engine/Math/Quaternion/Quaternion.h"
+#include "Engine/Core/Time/FPSKeeper.h"
+#include "Engine/Graphics/Camera/CameraManager.h"
 
 using namespace Core;
 using namespace Graphics;
@@ -29,9 +31,9 @@ void PlayerBullet::Initialize() {
 void PlayerBullet::Update() {
 	if (isLive_) {
 		// 位置の更新
-		model_->GetTransform().translate += (velocity_ * speed_) * FPSKeeper::DeltaTimeFrame();
+		transform_.translate += (velocity_ * speed_) * FPSKeeper::DeltaTimeFrame();
 
-		collider_->SetPos(model_->GetWorldPos());
+		collider_->SetPos(GetWorldPos());
 		collider_->InfoUpdate();
 	}
 }
@@ -51,15 +53,15 @@ void PlayerBullet::InitParameter(const Vector3& pos) {
 	collider_->SetHeight(0.3f);
 	collider_->SetTag("playerBullet");
 	trajectory.pos_ = { 0.0f,0.0f,0.0f };
-	model_->GetTransform().scale = Vector3::FillVec(0.3f);
-	model_->GetTransform().translate = pos;
+	transform_.scale = Vector3::FillVec(0.3f);
+	transform_.translate = pos;
 	speed_ = 0.0f;
 	damage_ = 0.0f;
 }
 
 void PlayerBullet::CalculationFollowVec(const Vector3& target) {
 
-	Vector3 currentPos = model_->GetTransform().translate;
+	Vector3 currentPos = transform_.translate;
 	Vector3 toTarget = (target - currentPos).Normalize();
 	Vector3 forward = velocity_.Normalize();
 
@@ -82,11 +84,11 @@ void PlayerBullet::CalculationFollowVec(const Vector3& target) {
 	} else {
 		zRotate_ += 0.075f * FPSKeeper::DeltaTimeFrame();
 	}
-	if (zRotate_ > (std::numbers::pi_v<float> *2.0f)) zRotate_ -= (std::numbers::pi_v<float> *2.0f);
+	if (zRotate_ > (kPi *2.0f)) zRotate_ -= (kPi *2.0f);
 	Quaternion spinRot = Quaternion::AngleAxis(zRotate_, Vector3(0, 0, 1));
 	// スピン回転を補間後のクォータニオンに加える（Z軸にひねる）
 	Quaternion finalRot = newRot * spinRot;
-	model_->GetTransform().rotate = Quaternion::QuaternionToEuler(finalRot);
+	transform_.rotate = Quaternion::QuaternionToEuler(finalRot);
 
 	trajectory.Emit();
 	if (isStrength_) trajectory2.Emit();
@@ -117,8 +119,8 @@ void PlayerBullet::OnCollisionExit([[maybe_unused]] const ColliderInfo& other) {
 void PlayerBullet::Charge(const Vector3& pos, const Vector3& rot) {
 	if (!isCharge_) return;
 
-	model_->GetTransform().translate = pos;
-	model_->GetTransform().rotate = rot;
+	transform_.translate = pos;
+	transform_.rotate = rot;
 }
 
 void PlayerBullet::StrengthBullet() { // 強化弾に変更する
@@ -128,7 +130,7 @@ void PlayerBullet::StrengthBullet() { // 強化弾に変更する
 	collider_->SetHeight(0.6f);
 	collider_->SetTag("playerBullet_strong");
 	trajectory.pos_ = { -0.6f,0.0f,-0.6f };
-	model_->GetTransform().scale = Vector3::FillVec(0.6f);
+	transform_.scale = Vector3::FillVec(0.6f);
 }
 
 ///= Release ==================================================================*/
@@ -146,8 +148,8 @@ void PlayerBullet::ParticleEmitterSetting() {
 	ParticleManager::Load(trajectory, "BulletTrajectory");
 	ParticleManager::Load(trajectory2, "BulletTrajectory2");
 
-	trajectory.SetParent(&model_->GetTransform());
-	trajectory2.SetParent(&model_->GetTransform());
+	trajectory.SetParent(&transform_);
+	trajectory2.SetParent(&transform_);
 
 	trajectory.pos_ = { 0.0f,0.0f,0.0f };
 	trajectory2.pos_ = { 0.6f,0.0f,0.6f };
@@ -158,11 +160,11 @@ void PlayerBullet::ParticleEmitterSetting() {
 	ParticleManager::Load(hitSmoke_, "bulletHitSmoke");
 	ParticleManager::Load(hitCircle_, "bulletHitCircle");
 
-	hit_.SetParent(&model_->GetTransform());
-	hit2_.SetParent(&model_->GetTransform());
-	hit3_.SetParent(&model_->GetTransform());
-	hitSmoke_.SetParent(&model_->GetTransform());
-	hitCircle_.SetParent(&model_->GetTransform());
+	hit_.SetParent(&transform_);
+	hit2_.SetParent(&transform_);
+	hit3_.SetParent(&transform_);
+	hitSmoke_.SetParent(&transform_);
+	hitCircle_.SetParent(&transform_);
 
 	hit_.frequencyTime_ = 0.0f;
 	hit2_.frequencyTime_ = 0.0f;

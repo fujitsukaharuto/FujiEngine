@@ -12,6 +12,7 @@
 #include "Engine/DXC/FrameCount.h"
 #include <fstream>
 #include <filesystem>
+#include "Engine/Graphics/Particle/GPUParticle/GPUParticleSystem.h"
 
 using namespace Core;
 using namespace Graphics;

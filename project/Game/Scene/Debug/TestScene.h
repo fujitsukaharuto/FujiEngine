@@ -2,6 +2,9 @@
 #include "Engine/Scene/BaseScene.h"
 #include "Engine/Collision/CollisionManager.h"
 #include <vector>
+#include "Engine/Graphics/Object/Object3d.h"
+#include "Engine/Graphics/Object/AnimationModel.h"
+#include "Engine/Graphics/Sprite/Sprite.h"
 
 /// <summary>
 /// Testシーンクラス

@@ -114,7 +114,7 @@ namespace Editor {
 		ImGui::PushStyleColor(ImGuiCol_ModalWindowDimBg, ImVec4(0, 0, 0, 0.25f));
 		if (ImGui::BeginPopupModal("TextureFile Window", NULL)) {
 			if (ImGui::Button("Refresh")) {
-				TextureManager::GetInstance()->LoadTextureFile(true);
+				TextureManager::GetInstance()->ScanTextureFolder(true);
 			}
 			int buttonCount = 0;
 			for (const auto& TexName : TextureManager::GetInstance()->GetTextureFiles()) {
