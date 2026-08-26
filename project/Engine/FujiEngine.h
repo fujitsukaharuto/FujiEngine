@@ -37,6 +37,7 @@
 //========================================================================*/
 //* 描画
 #include "Engine/Graphics/Camera/CameraManager.h"
+#include "Engine/Graphics/Camera/FollowCamera.h"
 #include "Engine/Graphics/Object/Object3d.h"
 #include "Engine/Graphics/Object/ObjectRenderer.h"
 #include "Engine/Graphics/Model/ModelManager.h"

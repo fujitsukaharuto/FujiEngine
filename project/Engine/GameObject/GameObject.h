@@ -22,6 +22,11 @@ namespace GameObject {
 		virtual ~GameObject();
 
 		virtual void Initialize();
+		/// <summary>基底が持つコンポーネント(コライダー等)を更新する</summary>
+		/// <remarks>
+		/// 派生は override して自分の処理を書き、**最後に GameObject::GameObject::Update() を呼ぶ**こと。
+		/// 位置を動かした後に呼ばないと、当たり判定が1フレーム古い位置で行われる
+		/// </remarks>
 		virtual void Update();
 		virtual void Draw(bool is = false);
 		virtual void DebugGUI();
@@ -38,11 +43,6 @@ namespace GameObject {
 		virtual void OnCollisionEnter([[maybe_unused]] const Collision::ColliderInfo& other) {}
 		virtual void OnCollisionStay([[maybe_unused]] const Collision::ColliderInfo& other) {}
 		virtual void OnCollisionExit([[maybe_unused]] const Collision::ColliderInfo& other) {}
-
-		/// <summary>登録済みコライダーのワールド情報を更新する</summary>
-		void UpdateColliders();
-		/// <summary>登録済みコライダーの判定ボリュームを描く</summary>
-		void DrawColliders();
 
 		/// <summary>値比較</summary>
 		float ComparNum(float a, float b);
@@ -65,18 +65,18 @@ namespace GameObject {
 		//========================================================================*/
 		//* Getter
 		/// <remarks>生成していない側は nullptr を返す</remarks>
-		Graphics::Object3d* GetModel() { return model_.get(); }
-		Graphics::AnimationModel* GetAnimeModel() { return animeModel_.get(); }
+		Graphics::Object3d* GetModel() { return model_; }
+		Graphics::AnimationModel* GetAnimeModel() { return animeModel_; }
 
 		/// <summary>生成済みの描画オブジェクトを基底(RenderObject)として返す</summary>
 		/// <remarks>model_ と animeModel_ は同時に生成しない設計。生成済みの方を返し、未生成なら nullptr</remarks>
 		Graphics::RenderObject* GetRenderObject() {
-			if (model_) { return model_.get(); }
-			return animeModel_.get();
+			if (model_) { return model_; }
+			return animeModel_;
 		}
 		const Graphics::RenderObject* GetRenderObject() const {
-			if (model_) { return model_.get(); }
-			return animeModel_.get();
+			if (model_) { return model_; }
+			return animeModel_;
 		}
 
 		/// <summary>このオブジェクト自身の位置・回転・拡縮</summary>
@@ -92,6 +92,12 @@ namespace GameObject {
 		const std::vector<std::unique_ptr<Collision::AABBCollider>>& GetColliders() const { return colliders_; }
 
 	protected:
+
+		/// <summary>登録済みコライダーのワールド情報を更新する</summary>
+		/// <remarks>通常は Update() が呼ぶので、派生が直接呼ぶ必要はない</remarks>
+		void UpdateColliders();
+		/// <summary>登録済みコライダーの判定ボリュームを描く(_DEBUGMODE のみ)</summary>
+		void DrawColliders();
 
 		/// <summary>model_ を必要になった時点で生成する</summary>
 		/// <remarks>model_ を直接操作したい派生クラスは、先にこれを通すこと</remarks>
@@ -118,8 +124,12 @@ namespace GameObject {
 		/// </remarks>
 		Collision::AABBCollider* AddCollider(const std::string& tag = "");
 
-		/// <summary>子ビジュアルの表示/非表示を切り替える</summary>
-		/// <remarks>条件付きで描いていたビジュアルを renderers_ に載せるためのもの。未登録のハンドルは無視される</remarks>
+		/// <summary>描画物を renderers_ へ登録する</summary>
+		/// <remarks>主ビジュアルは最後尾、子ビジュアルはその手前に入れて描画順を保つ</remarks>
+		void RegisterRenderer(std::unique_ptr<Graphics::RenderObject> object, bool isPrimary);
+
+		/// <summary>描画物の表示/非表示を切り替える</summary>
+		/// <remarks>主ビジュアル(GetModel/GetAnimeModel)にも使える。未登録のハンドルは無視される</remarks>
 		void SetRendererVisible(const Graphics::RenderObject* handle, bool visible);
 
 	protected:
@@ -128,17 +138,24 @@ namespace GameObject {
 		/// <remarks>描画モデルの中にあった位置情報をここへ引き上げたもの。モデルが無くても位置を持てる</remarks>
 		Math::Trans transform_;
 
-		/// <summary>基底が所有・描画する子ビジュアル1件</summary>
+		/// <summary>基底が所有・描画するビジュアル1件</summary>
 		struct RendererEntry {
 			std::unique_ptr<Graphics::RenderObject> object;
 			bool visible = true;
 		};
 
-		std::unique_ptr<Graphics::Object3d> model_;
-		std::unique_ptr<Graphics::AnimationModel> animeModel_;
-
-		/// <summary>このオブジェクトにぶら下がる追加ビジュアル。生成/描画を一元管理する(=MeshRenderer相当)</summary>
+		/// <summary>このオブジェクトが持つ描画物。主ビジュアルも子ビジュアルもここが所有する(=MeshRenderer相当)</summary>
+		/// <remarks>
+		/// **主ビジュアル(CreateModel系で作るもの)は必ず最後尾**。影のような非additiveの子ビジュアルは
+		/// 本体より前に描く必要があるので、この並び順そのものが描画順の意味を持つ。
+		/// 追加は RegisterRenderer() を通すこと(この不変条件をそこで守っている)
+		/// </remarks>
 		std::vector<RendererEntry> renderers_;
+
+		/// <summary>主ビジュアルへのハンドル。実体の所有は renderers_ が持つ</summary>
+		/// <remarks>Object3d と AnimationModel は同時に生成しない設計。生成していない側は nullptr</remarks>
+		Graphics::Object3d* model_ = nullptr;
+		Graphics::AnimationModel* animeModel_ = nullptr;
 
 		/// <summary>このオブジェクトが持つあたり判定(=Colliderコンポーネント相当)</summary>
 		std::vector<std::unique_ptr<Collision::AABBCollider>> colliders_;

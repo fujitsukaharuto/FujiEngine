@@ -274,9 +274,6 @@
     <ClCompile Include="Engine\Collision\CollisionManager.cpp">
       <Filter>Engine\Collision</Filter>
     </ClCompile>
-    <ClCompile Include="Game\Field\MapChipField.cpp">
-      <Filter>Game\Field</Filter>
-    </ClCompile>
     <ClCompile Include="Game\GameObj\Enemy\Behavior\BossAreaAttack.cpp">
       <Filter>Game\GameObj\Enemy\Behavior</Filter>
     </ClCompile>
@@ -349,8 +346,8 @@
     <ClCompile Include="Game\GameObj\Player\PlayerBullet.cpp">
       <Filter>Game\GameObj\Player</Filter>
     </ClCompile>
-    <ClCompile Include="Game\GameObj\FollowCamera.cpp">
-      <Filter>Game\GameObj</Filter>
+    <ClCompile Include="Engine\Graphics\Camera\FollowCamera.cpp">
+      <Filter>Engine\Graphics\Camera</Filter>
     </ClCompile>
     <ClCompile Include="Engine\GameObject\GameObject.cpp">
       <Filter>Engine\GameObject</Filter>
@@ -712,9 +709,6 @@
     <ClInclude Include="Engine\Collision\CollisionManager.h">
       <Filter>Engine\Collision</Filter>
     </ClInclude>
-    <ClInclude Include="Game\Field\MapChipField.h">
-      <Filter>Game\Field</Filter>
-    </ClInclude>
     <ClInclude Include="Game\GameObj\Enemy\Behavior\BaseBossBehavior.h">
       <Filter>Game\GameObj\Enemy\Behavior</Filter>
     </ClInclude>
@@ -790,8 +784,8 @@
     <ClInclude Include="Game\GameObj\Player\PlayerBullet.h">
       <Filter>Game\GameObj\Player</Filter>
     </ClInclude>
-    <ClInclude Include="Game\GameObj\FollowCamera.h">
-      <Filter>Game\GameObj</Filter>
+    <ClInclude Include="Engine\Graphics\Camera\FollowCamera.h">
+      <Filter>Engine\Graphics\Camera</Filter>
     </ClInclude>
     <ClInclude Include="Engine\GameObject\GameObject.h">
       <Filter>Engine\GameObject</Filter>
@@ -986,9 +980,6 @@
     </Filter>
     <Filter Include="Engine\Collision">
       <UniqueIdentifier>{20f410ec-47e8-4e10-a499-b1fd2ef09cde}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\Field">
-      <UniqueIdentifier>{474c6061-5ccc-4a22-b89f-a7917901b616}</UniqueIdentifier>
     </Filter>
     <Filter Include="Game\GameObj">
       <UniqueIdentifier>{617e8378-5eb2-45b5-b7d1-72cdc9b6216f}</UniqueIdentifier>

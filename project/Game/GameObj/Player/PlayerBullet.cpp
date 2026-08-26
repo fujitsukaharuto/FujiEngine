@@ -34,7 +34,7 @@ void PlayerBullet::Update() {
 		transform_.translate += (velocity_ * speed_) * FPSKeeper::DeltaTimeFrame();
 
 		collider_->SetPos(GetWorldPos());
-		collider_->InfoUpdate();
+		GameObject::GameObject::Update();
 	}
 }
 

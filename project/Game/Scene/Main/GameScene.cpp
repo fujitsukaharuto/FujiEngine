@@ -1,7 +1,7 @@
 #include "GameScene.h"
 #include <json.hpp>
 #include "Engine/FujiEngine.h"
-#include "Game/GameObj/FollowCamera.h"
+#include "Engine/Graphics/Camera/FollowCamera.h"
 #include "Game/GameObj/Player/PlayerBullet.h"
 #include "Engine/Core/Input/Input.h"
 #include "Engine/Audio/AudioPlayer.h"

@@ -147,7 +147,7 @@ void Player::Update() {
 	strongStatePos_->translate = transform_.translate;
 	strongStatePos_->translate.y -= 0.65f;
 	collider_->SetPos(GetWorldPos());
-	collider_->InfoUpdate();
+	GameObject::GameObject::Update();
 }
 
 void Player::Draw(bool is) {
@@ -608,7 +608,7 @@ void Player::TitleUpdate([[maybe_unused]]float titleTime) {
 	preTitleTime_ = titleTime;
 
 	collider_->SetPos(GetWorldPos());
-	collider_->InfoUpdate();
+	GameObject::GameObject::Update();
 }
 
 void Player::TitleDraw() {

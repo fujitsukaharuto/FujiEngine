@@ -104,7 +104,7 @@ void Boss::Update() {
 	ParticleManager::GetSphereEmitter(leftHandAuraCS_).SetPos(animeModel_->GetJointWorldPos("mixamorig:LeftHand"));
 	ParticleManager::GetSphereEmitter(rightHandAuraCS_).SetPos(animeModel_->GetJointWorldPos("mixamorig:RightHand"));
 	animeModel_->AnimationUpdate();
-	collider_->InfoUpdate();
+	GameObject::GameObject::Update();
 }
 
 void Boss::Draw([[maybe_unused]] bool is) {

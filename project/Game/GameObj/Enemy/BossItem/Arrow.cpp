@@ -72,7 +72,7 @@ void Arrow::Update() {
 	AnimaTimeUpdate();
 	ArrivalTimeUpdate();
 
-	collider_->InfoUpdate();
+	GameObject::GameObject::Update();
 }
 
 void Arrow::Draw([[maybe_unused]] bool is) {

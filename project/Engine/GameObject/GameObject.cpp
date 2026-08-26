@@ -31,34 +31,37 @@ namespace GameObject {
 
 	Graphics::Object3d* GameObject::EnsureModel() {
 		if (!model_) {
-			model_ = std::make_unique<Object3d>();
+			auto object = std::make_unique<Object3d>();
+			model_ = object.get();
 			// 見た目はこのオブジェクトの位置にぶら下がる。モデル側のTransformはローカルオフセット用に空けておく
 			model_->SetParent(&transform_);
+			RegisterRenderer(std::move(object), true);
 		}
-		return model_.get();
+		return model_;
 	}
 
 	Graphics::AnimationModel* GameObject::EnsureAnimeModel() {
 		if (!animeModel_) {
-			animeModel_ = std::make_unique<AnimationModel>();
+			auto object = std::make_unique<AnimationModel>();
+			animeModel_ = object.get();
 			animeModel_->SetParent(&transform_);
+			RegisterRenderer(std::move(object), true);
 		}
-		return animeModel_.get();
+		return animeModel_;
 	}
 
 	void GameObject::Update() {
+		// 基底が持つコンポーネントの毎フレーム更新はここに集約する。
+		// 派生は自分の処理を書いた最後にこれを呼ぶこと(位置を動かしてから当たり判定に反映させるため)
+		UpdateColliders();
 	}
 
 	void GameObject::Draw(bool is) {
-		// 子ビジュアルを先に描く。影のような非additiveの子は本体より前に描く必要があるため
-		// (additiveの子は順不同なので、この順で全ケースを満たせる)
+		// renderers_ の並びがそのまま描画順。主ビジュアルは最後尾に入っている
 		for (auto& r : renderers_) {
 			if (r.visible) {
 				r.object->Draw(is);
 			}
-		}
-		if (RenderObject* o = GetRenderObject()) {
-			o->Draw(is);
 		}
 	}
 
@@ -163,10 +166,20 @@ namespace GameObject {
 	}
 
 	Graphics::Object3d* GameObject::AddRenderer() {
-		auto obj = std::make_unique<Object3d>();
-		Object3d* handle = obj.get();
-		renderers_.push_back({ std::move(obj), true });
+		auto object = std::make_unique<Object3d>();
+		Object3d* handle = object.get();
+		RegisterRenderer(std::move(object), false);
 		return handle;
+	}
+
+	void GameObject::RegisterRenderer(std::unique_ptr<Graphics::RenderObject> object, bool isPrimary) {
+		const bool hasPrimary = (model_ != nullptr || animeModel_ != nullptr);
+		if (isPrimary || !hasPrimary) {
+			renderers_.push_back({ std::move(object), true });
+			return;
+		}
+		// 主ビジュアルは最後尾のままにする(子は本体より前に描く)
+		renderers_.insert(renderers_.end() - 1, RendererEntry{ std::move(object), true });
 	}
 
 	Graphics::Object3d* GameObject::AddRenderer(const std::string& name) {

@@ -55,7 +55,7 @@ void WaveWall::Update() {
 		spark1_.Emit();
 		spark2_.Emit();
 
-		collider_->InfoUpdate();
+		GameObject::GameObject::Update();
 	}
 
 }

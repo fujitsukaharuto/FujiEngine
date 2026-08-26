@@ -191,7 +191,7 @@ void Beam::Update() {
 		}
 
 		// 6本分のコライダーは全て基底が持っているのでまとめて更新できる
-		UpdateColliders();
+		GameObject::GameObject::Update();
 	}
 }
 

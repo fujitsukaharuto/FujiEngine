@@ -251,7 +251,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Collision\AABBCollider.cpp" />
     <ClCompile Include="Engine\Collision\BaseCollider.cpp" />
     <ClCompile Include="Engine\Collision\CollisionManager.cpp" />
-    <ClCompile Include="Game\Field\MapChipField.cpp" />
     <ClCompile Include="Game\GameObj\Enemy\Behavior\BossAreaAttack.cpp" />
     <ClCompile Include="Game\GameObj\Enemy\Behavior\BossArrowAttack.cpp" />
     <ClCompile Include="Game\GameObj\Enemy\Behavior\BossAttack.cpp" />
@@ -276,7 +275,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\GameObj\Player\Behavior\PlayerRoot.cpp" />
     <ClCompile Include="Game\GameObj\Player\Player.cpp" />
     <ClCompile Include="Game\GameObj\Player\PlayerBullet.cpp" />
-    <ClCompile Include="Game\GameObj\FollowCamera.cpp" />
+    <ClCompile Include="Engine\Graphics\Camera\FollowCamera.cpp" />
     <ClCompile Include="Engine\GameObject\GameObject.cpp" />
     <ClCompile Include="Game\Particle\GameEmitters.cpp" />
     <ClCompile Include="Game\Scene\Debug\GPUParticleScene.cpp" />
@@ -399,7 +398,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Collision\AABBCollider.h" />
     <ClInclude Include="Engine\Collision\BaseCollider.h" />
     <ClInclude Include="Engine\Collision\CollisionManager.h" />
-    <ClInclude Include="Game\Field\MapChipField.h" />
     <ClInclude Include="Game\GameObj\Enemy\Behavior\BaseBossBehavior.h" />
     <ClInclude Include="Game\GameObj\Enemy\Behavior\BossAreaAttack.h" />
     <ClInclude Include="Game\GameObj\Enemy\Behavior\BossArrowAttack.h" />
@@ -425,7 +423,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Game\GameObj\Player\Behavior\PlayerRoot.h" />
     <ClInclude Include="Game\GameObj\Player\Player.h" />
     <ClInclude Include="Game\GameObj\Player\PlayerBullet.h" />
-    <ClInclude Include="Game\GameObj\FollowCamera.h" />
+    <ClInclude Include="Engine\Graphics\Camera\FollowCamera.h" />
     <ClInclude Include="Engine\GameObject\GameObject.h" />
     <ClInclude Include="Game\Particle\GameEmitters.h" />
     <ClInclude Include="Game\Scene\Debug\GPUParticleScene.h" />

@@ -2,7 +2,7 @@
 #include "Engine/Scene/BaseScene.h"
 #include "Engine/Graphics/Object/AnimationModel.h"
 #include "Engine/Graphics/SkyBox/SkyBox.h"
-#include "Game/GameObj/FollowCamera.h"
+#include "Engine/Graphics/Camera/FollowCamera.h"
 #include "Game/GameObj/Player/Player.h"
 #include "Game/GameObj/Enemy/Boss.h"
 #include "Engine/Collision/CollisionManager.h"
@@ -53,7 +53,7 @@ private:
 
 	std::unique_ptr<Player> player_ = nullptr;
 	std::unique_ptr<Boss> boss_ = nullptr;
-	std::unique_ptr<FollowCamera> followCamera_;
+	std::unique_ptr<Graphics::FollowCamera> followCamera_;
 
 	std::unique_ptr<Graphics::Sprite> key_ = nullptr;
 	bool isPadDraw_ = false;

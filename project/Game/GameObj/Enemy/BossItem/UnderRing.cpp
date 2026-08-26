@@ -61,7 +61,7 @@ void UnderRing::Update() {
 		collider_->SetDepth(transform_.scale.z);
 
 		//collider_->SetPos(GetWorldPos());
-		collider_->InfoUpdate();
+		GameObject::GameObject::Update();
 	}
 }
 

@@ -13,7 +13,7 @@ BossCore::BossCore(Boss* pboss) {
 
 void BossCore::Initialize() {
 	GameObject::GameObject::Initialize();
-	GameObject::GameObject::CreateModel("Sphere");
+	// 描画は持たない。当たり判定の親になる Transform は GameObject 自身が持っている
 
 	LoadTransformFromJson("bossCore_transform.json");
 
@@ -32,11 +32,11 @@ void BossCore::Initialize() {
 }
 
 void BossCore::Update() {
-	collider_->InfoUpdate();
+	GameObject::GameObject::Update();
 }
 
 void BossCore::Draw([[maybe_unused]] bool is) {
-	// model_ は当たり判定用のアンカーなので描画しない
+	// 見た目を持たないオブジェクトなので、描くのは当たり判定の枠だけ
 	DrawColliders();
 }
 
