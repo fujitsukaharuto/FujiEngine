@@ -7,7 +7,7 @@ PlayerAvoid::PlayerAvoid(Player* pPlayer) : BasePlayerBehavior(pPlayer) {
 
 	step_ = Step::AVOID;
 	avoidTime_ = 0.0f;
-	pPlayer_->SetIsNowAvoid(true);
+	owner_->SetIsNowAvoid(true);
 
 }
 
@@ -21,7 +21,7 @@ void PlayerAvoid::Update() {
 		///---------------------------------------------------------------------------------------
 	case PlayerAvoid::Step::AVOID:
 
-		pPlayer_->Avoid(avoidTime_);
+		owner_->Avoid(avoidTime_);
 
 		if (avoidTime_ >= 30.0f)
 		step_ = Step::TOROOT;
@@ -31,13 +31,10 @@ void PlayerAvoid::Update() {
 		/// 通常に移行
 		///---------------------------------------------------------------------------------------
 	case PlayerAvoid::Step::TOROOT:
-		pPlayer_->SetIsNowAvoid(false);
-		pPlayer_->ChangeBehavior(std::make_unique<PlayerRoot>(pPlayer_));
+		owner_->SetIsNowAvoid(false);
+		owner_->ChangeBehavior(std::make_unique<PlayerRoot>(owner_));
 		break;
 	default:
 		break;
 	}
-}
-
-void PlayerAvoid::Debug() {
 }

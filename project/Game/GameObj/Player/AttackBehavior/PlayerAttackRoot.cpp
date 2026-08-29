@@ -23,13 +23,13 @@ PlayerAttackRoot::PlayerAttackRoot(Player* pPlayer) : BasePlayerAttackBehavior(p
 	ParticleManager::LoadParentGroup(chargeWave_, "ChargeWave");
 	ParticleManager::LoadParentGroup(chargeCircle_, "ChargeCircle");
 
-	charge1_->SetParent(&pPlayer_->GetTrans());
-	charge2_->SetParent(&pPlayer_->GetTrans());
-	charge3_->SetParent(&pPlayer_->GetTrans());
-	chargeLight_->SetParent(&pPlayer_->GetTrans());
-	chargeRay_->SetParent(&pPlayer_->GetTrans());
-	chargeWave_->SetParent(&pPlayer_->GetTrans());
-	chargeCircle_->SetParent(&pPlayer_->GetTrans());
+	charge1_->SetParent(&owner_->GetTrans());
+	charge2_->SetParent(&owner_->GetTrans());
+	charge3_->SetParent(&owner_->GetTrans());
+	chargeLight_->SetParent(&owner_->GetTrans());
+	chargeRay_->SetParent(&owner_->GetTrans());
+	chargeWave_->SetParent(&owner_->GetTrans());
+	chargeCircle_->SetParent(&owner_->GetTrans());
 
 	chargeCircle_->grain_.isColorFadeIn_ = true;
 
@@ -56,7 +56,7 @@ void PlayerAttackRoot::Update() {
 	case PlayerAttackRoot::Step::ROOT:
 
 		if ((input->PushKey(DIK_J) || input->PressButton(PadInput::A)) && coolTime_ <= 0.0f) {
-			pPlayer_->InitBullet();
+			owner_->InitBullet();
 			chargeTime_ = 0.0f;
 			coolTime_ = 30.0f;
 			step_ = Step::CHAREGE;
@@ -76,12 +76,12 @@ void PlayerAttackRoot::Update() {
 		if ((input->PushKey(DIK_J) || input->PressButton(PadInput::A))) {
 			chargeTime_ += FPSKeeper::DeltaTimeFrame();
 		}
-		if (!(input->PushKey(DIK_J) || input->PressButton(PadInput::A)) || pPlayer_->GetIsStrongState()) {
+		if (!(input->PushKey(DIK_J) || input->PressButton(PadInput::A)) || owner_->GetIsStrongState()) {
 			step_ = Step::ROOT;
-			if (pPlayer_->GetIsStrongState()) {
-				pPlayer_->StrengthBullet();
+			if (owner_->GetIsStrongState()) {
+				owner_->StrengthBullet();
 			}
-			pPlayer_->ReleaseBullet();
+			owner_->ReleaseBullet();
 			AudioPlayer::GetInstance()->SoundStopWave(*chargeSE_);
 			isChargeSEStart_ = false;
 			chargeTime_ = 0.0f;
@@ -96,12 +96,12 @@ void PlayerAttackRoot::Update() {
 			charge3_->Emit();
 			chargeLight_->Emit();
 		}
-		if (chargeTime_ >= pPlayer_->GetMaxChargeTime()) {
+		if (chargeTime_ >= owner_->GetMaxChargeTime()) {
 			step_ = Step::STRONGSHOT;
 			chargeRay_->Emit();
 			chargeWave_->Emit();
 			AudioPlayer::GetInstance()->SoundPlayWave(*chargeCompleteSE_,0.4f);
-			pPlayer_->StrengthBullet();
+			owner_->StrengthBullet();
 		}
 
 		break;
@@ -119,7 +119,7 @@ void PlayerAttackRoot::Update() {
 		if (!(input->PushKey(DIK_J) || input->PressButton(PadInput::A))) {
 			step_ = Step::ROOT;
 			AudioPlayer::GetInstance()->SoundStopWave(*chargeSE_);
-			pPlayer_->ReleaseBullet();
+			owner_->ReleaseBullet();
 			isChargeSEStart_ = false;
 		}
 
@@ -128,9 +128,6 @@ void PlayerAttackRoot::Update() {
 		break;
 	}
 
-}
-
-void PlayerAttackRoot::Debug() {
 }
 
 void PlayerAttackRoot::ResetParam() {

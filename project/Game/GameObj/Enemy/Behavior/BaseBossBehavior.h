@@ -1,6 +1,7 @@
 #pragma once
 #include<string>
 #include "Engine/Audio/AudioPlayer.h"
+#include "Engine/GameObject/StateMachine.h"
 
 enum class AttackPattern {
 	Beam,
@@ -27,16 +28,16 @@ class Boss;
 /// <summary>
 /// BossBehaviorの基底クラス
 /// </summary>
-class BaseBossBehavior {
+class BaseBossBehavior : public GameObject::State<Boss> {
 public:
-	BaseBossBehavior(Boss* boss) : pBoss_(boss) {}
-	virtual ~BaseBossBehavior() {}
-	virtual void Update() = 0;
-	virtual void Debug() = 0;
+	BaseBossBehavior(Boss* boss) : State(boss) {}
 
 protected:
 
-	Boss* pBoss_ = nullptr;
 	float cameraRange_ = -25.0f;
 	float cameraFollowSpeed_ = 0.2f;
 };
+
+/// <summary>Boss が持つ Behavior のステートマシン</summary>
+/// <remarks>Boss の中では基底クラス名の GameObject が先に見つかるので GameObject::StateMachine&lt;...&gt; と直接書けない</remarks>
+using BossStateMachine = GameObject::StateMachine<BaseBossBehavior>;

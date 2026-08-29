@@ -292,7 +292,7 @@ private:
 	static constexpr float kCameraRange_ = -25.0f;         // カメラ距離の既定値
 	static constexpr float kCameraFollowSpeed_ = 0.2f;     // カメラ追従速度の既定値
 
-	std::unique_ptr<BaseBossBehavior> behavior_ = nullptr;
+	BossStateMachine behavior_;
 	std::unique_ptr<BossItemManager> itemManager_ = nullptr;
 
 	std::vector<std::string> actionList_;

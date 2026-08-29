@@ -19,7 +19,6 @@ public:
 	};
 
 	void Update()override;
-	void Debug()override;
 
 private:
 

@@ -19,12 +19,12 @@ using namespace Math;
 
 BossRoot::BossRoot(Boss* pBoss) : BaseBossBehavior(pBoss) {
 	step_ = Step::ROOT;
-	pBoss_->SetCameraRange(cameraRange_);
-	pBoss_->SetCameraFollowSpeed(cameraFollowSpeed_);
-	cooldown_ = pBoss_->GetAttackCooldown();
-	pBoss_->GetAnimeModel()->ChangeAnimation("walk");
-	pBoss_->GetAnimeModel()->IsLoopAnimation(true);
-	pBoss_->ResetChainCount();
+	owner_->SetCameraRange(cameraRange_);
+	owner_->SetCameraFollowSpeed(cameraFollowSpeed_);
+	cooldown_ = owner_->GetAttackCooldown();
+	owner_->GetAnimeModel()->ChangeAnimation("walk");
+	owner_->GetAnimeModel()->IsLoopAnimation(true);
+	owner_->ResetChainCount();
 }
 
 BossRoot::~BossRoot() {
@@ -39,7 +39,7 @@ void BossRoot::Update() {
 	case BossRoot::Step::ROOT:
 		if (cooldown_ > 0.0f) {
 			cooldown_ -= FPSKeeper::DeltaTimeFrame();
-			pBoss_->Walk();
+			owner_->Walk();
 		} else if (cooldown_ <= 0.0f) {
 			step_ = Step::TOATTACK;
 			break;
@@ -54,32 +54,32 @@ void BossRoot::Update() {
 		AttackPattern pattern = ChooseNextAttack();
 		switch (pattern) {
 		case AttackPattern::Beam:
-			pBoss_->ChangeBehavior(std::make_unique<BossBeamAttack>(pBoss_));
+			owner_->ChangeBehavior(std::make_unique<BossBeamAttack>(owner_));
 			break;
 		case AttackPattern::Wave:
-			pBoss_->ChangeBehavior(std::make_unique<BossAttack>(pBoss_));
+			owner_->ChangeBehavior(std::make_unique<BossAttack>(owner_));
 			break;
 		case AttackPattern::JumpAttack:
 		{
 			int count = 2; // ジャンプ攻撃の回数は確率かフェーズによって増える
-			if (pBoss_->GetPhaseIndex() > 0 || Random::GetFloat(0.0f, 1.0f) > 0.75f) count = 3;
-			pBoss_->ChangeBehavior(std::make_unique<BossJumpAttack>(pBoss_, count));
+			if (owner_->GetPhaseIndex() > 0 || Random::GetFloat(0.0f, 1.0f) > 0.75f) count = 3;
+			owner_->ChangeBehavior(std::make_unique<BossJumpAttack>(owner_, count));
 		}
 			break;
 		case AttackPattern::SwordAttack:
-			pBoss_->ChangeBehavior(std::make_unique<BossSwordAttack>(pBoss_));
+			owner_->ChangeBehavior(std::make_unique<BossSwordAttack>(owner_));
 			break;
 		case AttackPattern::AreaAttack:
-			pBoss_->ChangeBehavior(std::make_unique<BossAreaAttack>(pBoss_));
+			owner_->ChangeBehavior(std::make_unique<BossAreaAttack>(owner_));
 			break;
 		case AttackPattern::ArrowAttack:
-			pBoss_->ChangeBehavior(std::make_unique<BossArrowAttack>(pBoss_));
+			owner_->ChangeBehavior(std::make_unique<BossArrowAttack>(owner_));
 			break;
 		case AttackPattern::FallRod:
-			pBoss_->ChangeBehavior(std::make_unique<BossRodFall>(pBoss_));
+			owner_->ChangeBehavior(std::make_unique<BossRodFall>(owner_));
 			break;
 		case AttackPattern::Dush:
-			pBoss_->ChangeBehavior(std::make_unique<BossDushAttack>(pBoss_));
+			owner_->ChangeBehavior(std::make_unique<BossDushAttack>(owner_));
 			break;
 		}
 		break;
@@ -90,13 +90,10 @@ void BossRoot::Update() {
 
 }
 
-void BossRoot::Debug() {
-}
-
 AttackPattern BossRoot::ChooseNextAttack() {
 	static AttackPattern previous = AttackPattern::Beam;
 
-	std::vector<std::pair<std::string, float>> actions = pBoss_->GetPhaseActionList(pBoss_->GetPhaseIndex());
+	std::vector<std::pair<std::string, float>> actions = owner_->GetPhaseActionList(owner_->GetPhaseIndex());
 	std::vector<AttackInfo> patterns;
 
 	for (const auto& action : actions) {

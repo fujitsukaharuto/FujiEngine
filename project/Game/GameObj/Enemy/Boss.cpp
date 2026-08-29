@@ -50,7 +50,7 @@ Boss::~Boss() {
 
 void Boss::Update() {
 	if (!isDying_ && isHpActive_ && !isStart_) {
-		behavior_->Update();
+		behavior_.Update();
 
 		core_->Update();
 
@@ -251,7 +251,7 @@ void Boss::ShakeHP() {
 }
 
 void Boss::Walk() {
-	if (BossRoot* behavior = dynamic_cast<BossRoot*>(behavior_.get())) {
+	if (BossRoot* behavior = dynamic_cast<BossRoot*>(behavior_.Get())) {
 		Vector3 dir = pPlayer_->GetWorldPos() - transform_.translate;
 		dir.y = 0.0f; // 水平方向だけに限定
 		float targetAngle = YawFromDirection(dir);
@@ -505,7 +505,7 @@ void Boss::UnderRingEmit() {
 
 ///= Behavior =================================================================*/
 void Boss::ChangeBehavior(std::unique_ptr<BaseBossBehavior> behavior) {
-	behavior_ = std::move(behavior);
+	behavior_.Request(std::move(behavior));
 }
 
 ///= Collision ================================================================*/

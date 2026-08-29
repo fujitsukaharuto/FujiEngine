@@ -103,8 +103,8 @@ void Player::Update() {
 
 	if (!isDeath_) {
 		if (!isStart_) {
-			behavior_->Update();
-			attackBehavior_->Update();
+			behavior_.Update();
+			attackBehavior_.Update();
 
 			if (isStrongState_) {
 				strengthStateEmitter1_->Emit();
@@ -267,11 +267,11 @@ void Player::HPUpdate() {
 ///= Behavior =================================================================*/
 #pragma region Behaviors
 void Player::ChangeBehavior(std::unique_ptr<BasePlayerBehavior>behavior) {
-	behavior_ = std::move(behavior);
+	behavior_.Request(std::move(behavior));
 }
 
 void Player::ChangeAttackBehavior(std::unique_ptr<BasePlayerAttackBehavior> behavior) {
-	attackBehavior_ = std::move(behavior);
+	attackBehavior_.Request(std::move(behavior));
 }
 #pragma endregion
 
@@ -812,8 +812,8 @@ void Player::HPUnderZeroSetting() {
 	if (params_.hp.hp <= 0.0f) {
 		params_.hp.hp = 0.0f;
 		isDeath_ = true;
-		attackBehavior_->ResetParam();
-		attackBehavior_->StopSE();
+		attackBehavior_.Get()->ResetParam();
+		attackBehavior_.Get()->StopSE();
 		dxcommon_->GetOffscreenManager()->PopPostEffect(PostEffectList::Vignette);
 		hpSprite_->SetSize({ 0.0f, params_.hpSprite.hpSize.y });
 		ReleaseBullet();

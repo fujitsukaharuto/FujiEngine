@@ -9,11 +9,11 @@ using namespace Graphics;
 BossBeamAttack::BossBeamAttack(Boss* pBoss) : BaseBossBehavior(pBoss) {
 	step_ = Step::CHARGE;
 	cameraRange_ = -45.0f;
-	pBoss_->SetCameraRange(cameraRange_);
-	pBoss_->SetCameraFollowSpeed(cameraFollowSpeed_);
-	pBoss_->InitBeam();
-	pBoss_->GetAnimeModel()->ChangeAnimation("BeamChargePose");
-	pBoss_->ChainCount();
+	owner_->SetCameraRange(cameraRange_);
+	owner_->SetCameraFollowSpeed(cameraFollowSpeed_);
+	owner_->InitBeam();
+	owner_->GetAnimeModel()->ChangeAnimation("BeamChargePose");
+	owner_->ChainCount();
 }
 
 BossBeamAttack::~BossBeamAttack() {
@@ -27,8 +27,8 @@ void BossBeamAttack::Update() {
 		///---------------------------------------------------------------------------------------
 	case BossBeamAttack::Step::CHARGE:
 
-		if (pBoss_->BeamCharge()) {
-			pBoss_->BeamChargeComplete();
+		if (owner_->BeamCharge()) {
+			owner_->BeamChargeComplete();
 			step_ = Step::ATTACK;
 		}
 
@@ -38,7 +38,7 @@ void BossBeamAttack::Update() {
 		///---------------------------------------------------------------------------------------
 	case BossBeamAttack::Step::ATTACK:
 
-		if (pBoss_->BeamAttack()) {
+		if (owner_->BeamAttack()) {
 			step_ = Step::TOROOT;
 		}
 
@@ -47,13 +47,10 @@ void BossBeamAttack::Update() {
 		/// 通常へ移行
 		///---------------------------------------------------------------------------------------
 	case BossBeamAttack::Step::TOROOT:
-		pBoss_->ChangeBehavior(std::make_unique<BossRoot>(pBoss_));
+		owner_->ChangeBehavior(std::make_unique<BossRoot>(owner_));
 		break;
 	default:
 		break;
 	}
 
-}
-
-void BossBeamAttack::Debug() {
 }

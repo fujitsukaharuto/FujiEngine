@@ -16,11 +16,11 @@ BossDushAttack::BossDushAttack(Boss* pBoss,bool is) : BaseBossBehavior(pBoss) {
 	step_ = Step::CHARGE;
 	cameraRange_ = -40.0f;
 	cameraFollowSpeed_ = 0.03f;
-	pBoss_->SetCameraRange(cameraRange_);
-	pBoss_->SetCameraFollowSpeed(cameraFollowSpeed_);
-	pBoss_->GetAnimeModel()->ChangeAnimation("DushPose");
-	pBoss_->GetAnimeModel()->IsLoopAnimation(false);
-	pBoss_->ChainCount();
+	owner_->SetCameraRange(cameraRange_);
+	owner_->SetCameraFollowSpeed(cameraFollowSpeed_);
+	owner_->GetAnimeModel()->ChangeAnimation("DushPose");
+	owner_->GetAnimeModel()->IsLoopAnimation(false);
+	owner_->ChainCount();
 	isPreDush_ = is;
 	if (is) {
 		coolTime_ = 60.0f;
@@ -35,7 +35,7 @@ void BossDushAttack::Update() {
 	switch (step_) {
 	case BossDushAttack::Step::CHARGE:
 
-		if (pBoss_->DushCharge(chargeTime_, maxChargeTime_, isNear_, stopRange_)) {
+		if (owner_->DushCharge(chargeTime_, maxChargeTime_, isNear_, stopRange_)) {
 			step_ = Step::ATTACK;
 		}
 
@@ -50,7 +50,7 @@ void BossDushAttack::Update() {
 		}
 
 		if (isAttack_) {
-			if (pBoss_->DushAttack(isNear_, dushRange_, stopRange_)) {
+			if (owner_->DushAttack(isNear_, dushRange_, stopRange_)) {
 				isAttack_ = false;
 			}
 		}
@@ -67,12 +67,12 @@ void BossDushAttack::Update() {
 		///---------------------------------------------------------------------------------------
 	case BossDushAttack::Step::TOROOT:
 	{
-		pBoss_->GetAnimeModel()->IsLoopAnimation(true);
+		owner_->GetAnimeModel()->IsLoopAnimation(true);
 		float randomSeed = Random::GetFloat(0.0f, 1.0f);
-		if (randomSeed > pBoss_->GetChainRate() && !isPreDush_) {
-			pBoss_->ChangeBehavior(std::make_unique<BossDushAttack>(pBoss_, true));
+		if (randomSeed > owner_->GetChainRate() && !isPreDush_) {
+			owner_->ChangeBehavior(std::make_unique<BossDushAttack>(owner_, true));
 		} else {
-			pBoss_->ChangeBehavior(std::make_unique<BossRoot>(pBoss_));
+			owner_->ChangeBehavior(std::make_unique<BossRoot>(owner_));
 		}
 		break;
 	}
@@ -80,7 +80,4 @@ void BossDushAttack::Update() {
 		break;
 	}
 
-}
-
-void BossDushAttack::Debug() {
 }

@@ -790,6 +790,9 @@
     <ClInclude Include="Engine\GameObject\GameObject.h">
       <Filter>Engine\GameObject</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\GameObject\StateMachine.h">
+      <Filter>Engine\GameObject</Filter>
+    </ClInclude>
     <ClInclude Include="Game\Particle\GameEmitters.h">
       <Filter>Game\Particle</Filter>
     </ClInclude>

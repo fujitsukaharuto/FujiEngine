@@ -15,11 +15,11 @@ using namespace Math;
 
 BossAreaAttack::BossAreaAttack(Boss* pBoss) : BaseBossBehavior(pBoss) {
 	step_ = Step::ATTACK;
-	pBoss_->SetCameraRange(cameraRange_);
-	pBoss_->SetCameraFollowSpeed(cameraFollowSpeed_);
-	pBoss_->GetAnimeModel()->ChangeAnimation("swordLeft");
-	pBoss_->GetAnimeModel()->IsLoopAnimation(false);
-	pBoss_->ChainCount();
+	owner_->SetCameraRange(cameraRange_);
+	owner_->SetCameraFollowSpeed(cameraFollowSpeed_);
+	owner_->GetAnimeModel()->ChangeAnimation("swordLeft");
+	owner_->GetAnimeModel()->IsLoopAnimation(false);
+	owner_->ChainCount();
 	areaAttackSE_ = &AudioPlayer::GetInstance()->SoundLoadWave("areaAttackSE.wav");
 }
 
@@ -37,8 +37,8 @@ void BossAreaAttack::Update() {
 		coolTime_ -= FPSKeeper::DeltaTimeFrame();
 		if (coolTime_ < 0.0f) {
 			if (isAttack_) {
-				pBoss_->WaveWallAttack();
-				pBoss_->UnderRingEmit();
+				owner_->WaveWallAttack();
+				owner_->UnderRingEmit();
 				AudioPlayer::GetInstance()->SoundPlayWave(*areaAttackSE_, 0.35f);
 				isAttack_ = false;
 			} else {
@@ -53,12 +53,12 @@ void BossAreaAttack::Update() {
 		///---------------------------------------------------------------------------------------
 	case BossAreaAttack::Step::TOROOT:
 	{
-		pBoss_->GetAnimeModel()->IsLoopAnimation(true);
+		owner_->GetAnimeModel()->IsLoopAnimation(true);
 		float randomSeed = Random::GetFloat(0.0f, 1.0f);
-		if (randomSeed > pBoss_->GetChainRate()) {
-			pBoss_->ChangeBehavior(std::make_unique<BossArrowAttack>(pBoss_));
+		if (randomSeed > owner_->GetChainRate()) {
+			owner_->ChangeBehavior(std::make_unique<BossArrowAttack>(owner_));
 		} else {
-			pBoss_->ChangeBehavior(std::make_unique<BossRoot>(pBoss_));
+			owner_->ChangeBehavior(std::make_unique<BossRoot>(owner_));
 		}
 		break;
 	}
@@ -66,7 +66,4 @@ void BossAreaAttack::Update() {
 		break;
 	}
 
-}
-
-void BossAreaAttack::Debug() {
 }

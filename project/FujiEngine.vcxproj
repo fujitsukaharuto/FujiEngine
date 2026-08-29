@@ -425,6 +425,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Game\GameObj\Player\PlayerBullet.h" />
     <ClInclude Include="Engine\Graphics\Camera\FollowCamera.h" />
     <ClInclude Include="Engine\GameObject\GameObject.h" />
+    <ClInclude Include="Engine\GameObject\StateMachine.h" />
     <ClInclude Include="Game\Particle\GameEmitters.h" />
     <ClInclude Include="Game\Scene\Debug\GPUParticleScene.h" />
     <ClInclude Include="Game\Scene\Debug\ParticleDebugScene.h" />

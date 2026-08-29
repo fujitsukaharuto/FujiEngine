@@ -10,8 +10,8 @@ using namespace Core;
 PlayerJump::PlayerJump(Player* pPlayer) : BasePlayerBehavior(pPlayer) {
 
 	step_ = Step::JUMP;
-	speed_ = pPlayer_->GetJumpSpeed();
-	pPlayer_->SetFallSpeed(speed_);
+	speed_ = owner_->GetJumpSpeed();
+	owner_->SetFallSpeed(speed_);
 	pPlayer->SetIsFall(true);
 
 }
@@ -30,22 +30,22 @@ void PlayerJump::Update() {
 
 		if ((input->TriggerKey(DIK_SPACE) || input->TriggerButton(PadInput::X)) && isSecondJump_) {
 			if (speed_ > 0.0f) {
-				speed_ += pPlayer_->GetSecondJumpSpeed();
+				speed_ += owner_->GetSecondJumpSpeed();
 			} else {
-				speed_ = pPlayer_->GetSecondJumpSpeed();
+				speed_ = owner_->GetSecondJumpSpeed();
 			}
-			speed_ = pPlayer_->GetJumpSpeed();
-			pPlayer_->SetFallSpeed(speed_);
-			pPlayer_->SetIsFall(true);
+			speed_ = owner_->GetJumpSpeed();
+			owner_->SetFallSpeed(speed_);
+			owner_->SetIsFall(true);
 			isSecondJump_ = false;
 		}
 
 		//移動、ジャンプ
-		pPlayer_->Move(pPlayer_->GetMoveSpeed());
-		pPlayer_->Jump(speed_);
+		owner_->Move(owner_->GetMoveSpeed());
+		owner_->Jump(speed_);
 
 		// ジャンプ終了
-		if (pPlayer_->GetIsFall()) break;
+		if (owner_->GetIsFall()) break;
 		step_ = Step::TOROOT;
 
 		break;
@@ -53,13 +53,10 @@ void PlayerJump::Update() {
 		/// 通常に移行
 		///---------------------------------------------------------------------------------------
 	case PlayerJump::Step::TOROOT:
-		pPlayer_->SetIsFall(false);
-		pPlayer_->ChangeBehavior(std::make_unique<PlayerRoot>(pPlayer_));
+		owner_->SetIsFall(false);
+		owner_->ChangeBehavior(std::make_unique<PlayerRoot>(owner_));
 		break;
 	default:
 		break;
 	}
-}
-
-void PlayerJump::Debug() {
 }

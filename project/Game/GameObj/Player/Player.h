@@ -169,8 +169,8 @@ private:
 
 private:
 
-	std::unique_ptr<BasePlayerBehavior> behavior_ = nullptr;
-	std::unique_ptr<BasePlayerAttackBehavior> attackBehavior_ = nullptr;
+	PlayerStateMachine behavior_;
+	PlayerAttackStateMachine attackBehavior_;
 	std::vector<std::unique_ptr<PlayerBullet>> bullets_;
 
 	/// <remarks>描画されない Transform アンカー(エミッタの親)。所有権は基底 anchors_ が持つ</remarks>

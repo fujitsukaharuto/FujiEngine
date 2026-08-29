@@ -18,7 +18,6 @@ public:
 	};
 
 	void Update()override;
-	void Debug()override;
 
 	/// <summary>
 	/// 次の攻撃の選択

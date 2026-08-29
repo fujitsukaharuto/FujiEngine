@@ -21,7 +21,6 @@ public:
 	};
 
 	void Update()override;
-	void Debug()override;
 
 	void ResetParam()override;
 	void StopSE()override;

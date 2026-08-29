@@ -14,16 +14,16 @@ using namespace Math;
 
 BossArrowAttack::BossArrowAttack(Boss* pBoss,bool beforArrow) : BaseBossBehavior(pBoss) {
 	step_ = Step::ATTACK;
-	pBoss_->SetCameraRange(cameraRange_);
-	pBoss_->SetCameraFollowSpeed(cameraFollowSpeed_);
-	pBoss_->GetAnimeModel()->ChangeAnimation("idle");
-	pBoss_->GetAnimeModel()->IsLoopAnimation(false);
+	owner_->SetCameraRange(cameraRange_);
+	owner_->SetCameraFollowSpeed(cameraFollowSpeed_);
+	owner_->GetAnimeModel()->ChangeAnimation("idle");
+	owner_->GetAnimeModel()->IsLoopAnimation(false);
 	isbeforArrow_ = beforArrow; // 1つ前がarrowだったら次はarrowにならないように
 	if (beforArrow) {
 		beforWait_ = 60.0f;
 		coolTime_ = 30.0f;
 	}
-	pBoss_->ChainCount();
+	owner_->ChainCount();
 }
 
 BossArrowAttack::~BossArrowAttack() {
@@ -38,7 +38,7 @@ void BossArrowAttack::Update() {
 	case BossArrowAttack::Step::ATTACK:
 
 		if (isAttack_ && beforWait_ <= 0.0f) {
-			pBoss_->ArrowAttack();
+			owner_->ArrowAttack();
 			isAttack_ = false;
 		}
 		beforWait_ -= FPSKeeper::DeltaTimeFrame();
@@ -55,16 +55,16 @@ void BossArrowAttack::Update() {
 		///---------------------------------------------------------------------------------------
 	case BossArrowAttack::Step::TOROOT:
 	{
-		pBoss_->GetAnimeModel()->IsLoopAnimation(true);
+		owner_->GetAnimeModel()->IsLoopAnimation(true);
 		float randomSeed = Random::GetFloat(0.0f, 1.0f);
-		if (randomSeed > pBoss_->GetChainRate() + 0.05f && !isbeforArrow_) {
-			pBoss_->ChangeBehavior(std::make_unique<BossArrowAttack>(pBoss_, true));
-		} else if (randomSeed > pBoss_->GetChainRate() - 0.15f && randomSeed < pBoss_->GetChainRate() + 0.05f) {
-			pBoss_->ChangeBehavior(std::make_unique<BossAreaAttack>(pBoss_));
-		} else if (isbeforArrow_ && randomSeed > pBoss_->GetChainRate() - 0.3f) {
-			pBoss_->ChangeBehavior(std::make_unique<BossSwordAttack>(pBoss_));
+		if (randomSeed > owner_->GetChainRate() + 0.05f && !isbeforArrow_) {
+			owner_->ChangeBehavior(std::make_unique<BossArrowAttack>(owner_, true));
+		} else if (randomSeed > owner_->GetChainRate() - 0.15f && randomSeed < owner_->GetChainRate() + 0.05f) {
+			owner_->ChangeBehavior(std::make_unique<BossAreaAttack>(owner_));
+		} else if (isbeforArrow_ && randomSeed > owner_->GetChainRate() - 0.3f) {
+			owner_->ChangeBehavior(std::make_unique<BossSwordAttack>(owner_));
 		} else {
-			pBoss_->ChangeBehavior(std::make_unique<BossRoot>(pBoss_));
+			owner_->ChangeBehavior(std::make_unique<BossRoot>(owner_));
 		}
 		break;
 	}
@@ -72,7 +72,4 @@ void BossArrowAttack::Update() {
 		break;
 	}
 
-}
-
-void BossArrowAttack::Debug() {
 }
