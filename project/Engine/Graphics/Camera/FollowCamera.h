@@ -6,10 +6,7 @@ namespace Graphics {
 	/// <summary>
 	/// ターゲットを追いかけ、注視点の方を向く三人称カメラ
 	/// </summary>
-	/// <remarks>
-	/// CameraManager が持つカメラの Transform を直接動かす。ゲームごとに変えたい値は
-	/// FollowCameraParam に出してあるので、Initialize に渡せばこのクラスを書き換える必要はない
-	/// </remarks>
+	/// <remarks>ゲームごとに変えたい値は FollowCameraParam に出してある</remarks>
 	class FollowCamera {
 	public:
 		FollowCamera() = default;

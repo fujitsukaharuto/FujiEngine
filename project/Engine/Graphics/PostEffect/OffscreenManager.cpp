@@ -58,7 +58,6 @@ void OffscreenManager::DebugGUI() {
 		if (ImGui::Combo("operator##tonemap", &mode, "None\0Reinhard\0ACES\0")) {
 			tonemapData_.mode = static_cast<TonemapMode>(mode);
 		}
-		ImGui::TextWrapped("None は素通し(1.0で頭打ち)。HDR化の切り分け用");
 		ImGui::TreePop();
 	}
 

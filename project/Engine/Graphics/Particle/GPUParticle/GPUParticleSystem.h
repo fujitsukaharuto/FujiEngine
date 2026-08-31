@@ -174,8 +174,7 @@ namespace Graphics {
 
 		uint32_t particleCSInstanceCount_;
 
-		// プール2枚化(完全ピンポン): Drawが読む trans/color のみ2枚持つ。
-		// writeIdx_ を毎フレーム反転し、readIdx = writeIdx_^1。書き込みは[writeIdx_]、読み取りは[readIdx]。
+		// プール2枚化(完全ピンポン): Drawが読む trans/color のみ2枚持ち、writeIdx_ を毎フレーム反転する
 		ParticleCSInstance transCSInstance_[2];
 		ParticleCSInstance scaleCSInstance_;
 		ParticleCSInstance timeCSInstance_;
@@ -214,11 +213,11 @@ namespace Graphics {
 		SplatParamCB* splatParamData_ = nullptr; // 永続マップ(enableDepthTestを毎フレーム更新)
 		uint32_t splatAccumElementCount_ = 0;
 		bool useComputeSplat_ = true;    // true:コンピュート・スプラット / false:従来ラスタ(1/4解像度)
-		bool useFullResolution_ = true;  // 描画解像度: true=フルサイズ(深度テスト有効) / false=1/4扱い(深度テスト無効)。useComputeSplat_とは独立
+		bool useFullResolution_ = true;  // true=フルサイズ(深度テスト有効) / false=1/4扱い(深度テスト無効)
 
-		// Stage2(フェンス並走化): splat時に compute_N の graphics_{N-1} 待ちを省き Update_{N+1} ∥ Draw_N にする。
+		// オーバーラップ: splat時に compute_N の graphics_{N-1} 待ちを省く
 		bool useOverlap_ = true;             // true:オーバーラップ有効(A/B計測用にトグル可)
-		bool prevUseComputeSplat_ = false;   // 前フレームのsplat有無。2フレーム連続splat時のみ並走(切替フレームのscaleハザード回避)
+		bool prevUseComputeSplat_ = false;   // 前フレームのsplat有無。2フレーム連続splat時のみ並走
 
 		std::vector<EmitterInfo> csEmitters_;
 
@@ -233,7 +232,7 @@ namespace Graphics {
 		int textureBasedEmitterIndex_ = 0;
 		int MeshSurfaceEmitterIndex_ = 0;
 
-		// 5000万パーティクル (48 * 1024 * 1024 = 50,331,648)。kThreadsPerRow(1024*1024)の倍数にして2D Dispatchを綺麗に割り切らせる。
+		// 5000万パーティクル (48 * 1024 * 1024)。kThreadsPerRow の倍数にして2D Dispatchを割り切らせる
 		// ※この値はシェーダ側の kMaxParticles (CSParticle.hlsli) と必ず一致させること
 		uint32_t numParticles = 50331648;
 		uint32_t threadsPerGroup = 1024;

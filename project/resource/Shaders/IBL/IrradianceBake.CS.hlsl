@@ -1,9 +1,7 @@
 #include "../Common/IBLBake.hlsli"
 
-// 環境マップを法線方向の放射照度に畳み込んで、小さいキューブマップへ焼く。
-// 前方描画の拡散アンビエントがこれを1フェッチ引くだけで済むようにするのが目的。
-// 出力は「cosine 重みの平均放射輝度」(= 放射照度 / PI)。一様な空なら空の色がそのまま返るので、
-// 差し替え前の HemisphereAmbient と同じ明るさの尺度で扱える
+// 環境マップを法線方向の放射照度に畳み込んで小さいキューブマップへ焼く。
+// 出力は cosine 重みの平均放射輝度(= 放射照度 / PI)
 
 TextureCube<float4> gSourceEnv : register(t0);
 RWTexture2DArray<float4> gIrradianceOut : register(u0);
@@ -36,10 +34,8 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
     float3 bitangent;
     BuildOrthonormalBasis(normal, tangent, bitangent);
 
-    // ★半球へ N 本散らすと、1本が受け持つ立体角はおよそ 2PI/N。
-    // それに見合ったミップまで落として拾わないと、HDRI の太陽のように「小さくて桁違いに明るい所」を
-    // 拾うか拾わないかがサンプルごとに変わり、放射照度が斑になる。
-    // ミップを下げるのは単なる高速化ではなく、この分散を潰すために必要
+    // 半球へ N 本散らすと1本が受け持つ立体角はおよそ 2PI/N。見合ったミップまで落とさないと、
+    // HDRIの太陽のように小さくて明るい所の拾い方がサンプルごとに変わって斑になる
     float texelSolidAngle = 4.0f * kSamplingPI / (6.0f * float(sourceSize) * float(sourceSize));
     float sampleSolidAngle = kSamplingTwoPI / float(sampleCount);
     float sourceMip = max(0.5f * log2(sampleSolidAngle / texelSolidAngle), 0.0f);

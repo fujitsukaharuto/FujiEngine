@@ -82,10 +82,7 @@ namespace DXC::Helper {
 	/// <summary>
 	/// キューブマップとして使える 6 枚組のテクスチャを生成する。
 	/// </summary>
-	/// <remarks>
-	/// D3D12 のリソースとしては ArraySize=6 の 2D 配列で、キューブとして扱うかは
-	/// SRV の張り方で決まる。UAV は配列としてしか張れないので、焼く側はスライス指定で書く
-	/// </remarks>
+	/// <remarks>実体は ArraySize=6 の2D配列。キューブとして扱うかは SRV の張り方で決まる</remarks>
 	/// <param name="device">デバイス</param>
 	/// <param name="size">1辺の長さ。6面とも正方形</param>
 	/// <param name="format">フォーマット</param>

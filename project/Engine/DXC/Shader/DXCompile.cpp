@@ -8,26 +8,38 @@
 
 using namespace DXC;
 
+namespace {
+
+	/// <summary>スレッドごとに持つ dxc 一式</summary>
+	/// <remarks>IDxcCompiler3 は複数スレッドから同時に呼べない。共有せずスレッドごとに作る</remarks>
+	struct DxcContext {
+		Microsoft::WRL::ComPtr<IDxcUtils> utils;
+		Microsoft::WRL::ComPtr<IDxcCompiler3> compiler;
+		Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler;
+	};
+
+	DxcContext& ThreadContext() {
+		thread_local DxcContext context;
+		if (!context.compiler) {
+			HRESULT hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&context.utils));
+			assert(SUCCEEDED(hr));
+			hr = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&context.compiler));
+			assert(SUCCEEDED(hr));
+			hr = context.utils->CreateDefaultIncludeHandler(&context.includeHandler);
+			assert(SUCCEEDED(hr));
+		}
+		return context;
+	}
+}
+
 
 DXCompile::~DXCompile() {
-	dxcUtils_.Reset();
-	dxcCompiler_.Reset();
-	includeHandler_.Reset();
 }
 
 
 void DXCompile::Initialize() {
-
-	HRESULT hr;
-
-	hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&dxcUtils_));
-	assert(SUCCEEDED(hr));
-	hr = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&dxcCompiler_));
-	assert(SUCCEEDED(hr));
-
-	hr = dxcUtils_->CreateDefaultIncludeHandler(&includeHandler_);
-	assert(SUCCEEDED(hr));
-
+	// このスレッドぶんを先に作っておく。ワーカースレッドのぶんは初回アクセス時に作られる
+	ThreadContext();
 }
 
 Microsoft::WRL::ComPtr<IDxcBlob> DXCompile::CompileShader(const std::wstring& filePath, const wchar_t* profile) {
@@ -36,9 +48,11 @@ Microsoft::WRL::ComPtr<IDxcBlob> DXCompile::CompileShader(const std::wstring& fi
 
 ShaderData DXCompile::CompileShaderWithReflection(const std::wstring& filePath, const wchar_t* profile) {
 
+	DxcContext& dxc = ThreadContext();
+
 	Logger::Log((std::format(L"Begin CompileShader, path:{},profile:{}", filePath, profile)));
 	IDxcBlobEncoding* shaderSource = nullptr;
-	HRESULT hr = dxcUtils_->LoadFile(filePath.c_str(), nullptr, &shaderSource);
+	HRESULT hr = dxc.utils->LoadFile(filePath.c_str(), nullptr, &shaderSource);
 	assert(SUCCEEDED(hr));
 
 	DxcBuffer shaderSourceBuffer;
@@ -67,11 +81,11 @@ ShaderData DXCompile::CompileShaderWithReflection(const std::wstring& filePath, 
 #endif
 
 	IDxcResult* shaderResult = nullptr;
-	hr = dxcCompiler_->Compile(
+	hr = dxc.compiler->Compile(
 		&shaderSourceBuffer,
 		arguments,
 		_countof(arguments),
-		includeHandler_.Get(),
+		dxc.includeHandler.Get(),
 		IID_PPV_ARGS(&shaderResult)
 	);
 	assert(SUCCEEDED(hr));
@@ -97,7 +111,7 @@ ShaderData DXCompile::CompileShaderWithReflection(const std::wstring& filePath, 
 		reflectionBuffer.Ptr = reflectionBlob->GetBufferPointer();
 		reflectionBuffer.Size = reflectionBlob->GetBufferSize();
 		reflectionBuffer.Encoding = 0;
-		dxcUtils_->CreateReflection(&reflectionBuffer, IID_PPV_ARGS(&result.reflection));
+		dxc.utils->CreateReflection(&reflectionBuffer, IID_PPV_ARGS(&result.reflection));
 	}
 
 	Logger::Log((std::format(L"Compile Succeeded, path:{}, profile:{}\n", filePath, profile)));// 成功Logを出せるようにする

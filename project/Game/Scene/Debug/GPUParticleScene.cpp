@@ -7,10 +7,8 @@
 #include "Engine/Math/Random/Random.h"
 
 #include "Engine/Graphics/Line/Line3dDrawer.h"
-#include "Engine/Graphics/Sprite/SpriteRenderer.h"
 #include "Engine/Graphics/Particle/ParticleManager.h"
 #include "Engine/Scene/SceneManager.h"
-#include "Engine/Core/App/MyWindow.h"
 #include "Game/Particle/GameEmitters.h"
 #include "Engine/Core/Input/Input.h"
 #include "Engine/Graphics/Particle/GPUParticle/GPUEmitter/SphereEmitter.h"
@@ -34,14 +32,6 @@ GPUParticleScene::~GPUParticleScene() {
 void GPUParticleScene::Initialize() {
 
 	CameraManager::GetInstance()->GetCamera()->GetTransform().rotate = { 0.0f,0.0f,0.0f };
-
-#pragma region シーン遷移用
-	black_ = std::make_unique<Sprite>();
-	black_->Load("white2x2.png");
-	black_->SetColor(Colors::Black);
-	black_->SetSize({ MyWin::kWindowWidth,MyWin::kWindowHeight });
-	black_->SetAnchor({ 0.0f,0.0f });
-#pragma endregion
 
 	skybox_ = std::make_unique<SkyBox>();
 	skybox_->Initialize();
@@ -69,7 +59,7 @@ void GPUParticleScene::Initialize() {
 
 void GPUParticleScene::Update() {
 
-	BlackFade();
+	CheckSceneChange();
 
 }
 
@@ -87,9 +77,6 @@ void GPUParticleScene::Draw() {
 #pragma endregion
 
 #pragma region 前景スプライト
-	if (blackTime_ != 0.0f) {
-		black_->Draw();
-	}
 
 #pragma endregion
 }
@@ -116,30 +103,14 @@ void GPUParticleScene::ParticleGroupDebugGUI() {
 #endif // _DEBUG
 }
 
-void GPUParticleScene::BlackFade() {
-	if (isChangePhase_) {
-		if (blackTime_ < blackLimit_) {
-			blackTime_ += FPSKeeper::DeltaTimeFrame();
-			if (blackTime_ >= blackLimit_) {
-				blackTime_ = blackLimit_;
-			}
-		} else {
-			ChangeScene("GPUPARTICLE", 40.0f);
-		}
-	} else {
-		if (blackTime_ > 0.0f) {
-			blackTime_ -= FPSKeeper::DeltaTimeFrame();
-			if (blackTime_ <= 0.0f) {
-				blackTime_ = 0.0f;
-			}
-		}
+void GPUParticleScene::CheckSceneChange() {
+	// 暗転・明転中は受け付けない
+	if (IsFading()) {
+		return;
 	}
-	black_->SetColor({ 0.0f,0.0f,0.0f,Lerp(0.0f,1.0f,(1.0f / blackLimit_ * blackTime_)) });
 
+	// 同じシーンへ入り直してリセットする
 	if (Input::GetInstance()->PushKey(DIK_LSHIFT) && Input::GetInstance()->TriggerKey(DIK_R)) {
-		if (blackTime_ == 0.0f) {
-			isChangePhase_ = true;// Sceneをリセットするために
-		}
+		ChangeScene("GPUPARTICLE");
 	}
-
 }

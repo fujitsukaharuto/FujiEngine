@@ -28,10 +28,7 @@ namespace Graphics {
 		void Finalize();
 
 		/// <summary>このフレームのAOを計算してデノイズする</summary>
-		/// <remarks>
-		/// G-Bufferの書き出しが済んでいること。TLASも組み終わっていること。
-		/// AOが Screen 以外なら何もせず蓄積だけ捨てるので、呼び出し側で切り分けなくてよい
-		/// </remarks>
+		/// <remarks>G-BufferとTLASが済んでいること。Screen 以外なら何もしないので呼び出し側で切り分け不要</remarks>
 		void Render(const GBufferPass& gbuffer);
 
 		void DebugGUI();

@@ -1,10 +1,8 @@
 #include "CSParticle.hlsli"
 
 // ============================================================================
-// プール2枚化(完全ピンポン)用: 書き込み先(writeBuf)のcolorを全0に一括クリアする。
-// Updateは readBuf で生存判定し死スロットの writeBuf を触らないため、
-// クリアしないと死スロットの writeBuf.color が2フレーム前の値で幽霊化する。
-// trans はクリア不要(Splat/Drawは color>0 のときのみ trans を読むため)。
+// 書き込み先(writeBuf)のcolorを全0にクリアする。Updateは readBuf で生存判定して
+// 死スロットの writeBuf を触らないため、クリアしないと2フレーム前の値で幽霊化する
 // ============================================================================
 RWStructuredBuffer<Particle_Color> gParticles_Color : register(u0);
 

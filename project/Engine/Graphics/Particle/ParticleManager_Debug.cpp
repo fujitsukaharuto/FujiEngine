@@ -22,9 +22,7 @@ void ParticleManager::ParticleDebugGUI() {
 #ifdef _DEBUGMODE
 	ImGui::Begin("Particle Editor", nullptr, ImGuiWindowFlags_NoCollapse);
 
-	// テーブルフラグ設定：
-	// Resizable: 境界線をドラッグ可能にする
-	// BordersInnerV: 列の間に線（リサイズハンドル）を表示
+	// Resizable=境界線をドラッグ可能、BordersInnerV=列の間に線を表示
 	static float leftPaneWidth = 260.0f;
 	ImGuiTableFlags tableFlags = ImGuiTableFlags_Resizable | ImGuiTableFlags_BordersInnerV;
 
@@ -35,9 +33,8 @@ void ParticleManager::ParticleDebugGUI() {
 		// 右カラム: 残りの領域すべて
 		ImGui::TableSetupColumn("Inspector", ImGuiTableColumnFlags_WidthStretch);
 
-		// =============================================
-		// [左側] Hierarchy Pane
-		// =============================================
+		//========================================================================*/
+		//* [左側] Hierarchy Pane
 		ImGui::TableNextColumn();
 
 		ImGui::BeginChild("LeftPane", ImVec2(-FLT_MIN, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
@@ -64,12 +61,7 @@ void ParticleManager::ParticleDebugGUI() {
 				ImGui::EndListBox();
 			}
 
-			ImGui::Spacing();
-			ImGui::Separator();
-			ImGui::Spacing();
-
-			// グローバル操作エリア
-			ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "Global Controls");
+			ImGui::SeparatorText("Global Controls");
 			if (ImGui::Button("Reset All Timers", ImVec2(-FLT_MIN, 0))) {
 				for (auto& groupPair : particleGroups_) {
 					groupPair.second->emitter_.TimeReset();
@@ -117,17 +109,15 @@ void ParticleManager::ParticleDebugGUI() {
 		ImGui::EndChild(); // LeftPane End
 
 
-		// =============================================
-		// [右側] Inspector Pane
-		// =============================================
+		//========================================================================*/
+		//* [右側] Inspector Pane
 		ImGui::TableNextColumn();
 
 		// 右側も独立してスクロール可能にする
 		ImGui::BeginChild("RightPane", ImVec2(-FLT_MIN, 0), false);
 		{
 			if (selectParticleGroup_) {
-				ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "%s", currentKey_.c_str());
-				ImGui::Separator();
+				ImGui::SeparatorText(currentKey_.c_str());
 				ImGui::Spacing();
 
 				// 横並びレイアウトでスペース効率化
@@ -139,7 +129,7 @@ void ParticleManager::ParticleDebugGUI() {
 							selectParticleGroup_->GetMaterial().GetPathName().c_str())->gpuHandle.ptr,
 						ImVec2(80, 80),
 						ImVec2(0, 0), ImVec2(1, 1),
-						ImVec4(1, 1, 1, 1), ImVec4(1, 1, 1, 0.5f) // 枠線をつける
+						ImVec4(1, 1, 1, 1), ImGui::GetStyleColorVec4(ImGuiCol_Border) // 枠線をつける
 					);
 				}
 				ImGui::EndGroup();
@@ -189,7 +179,7 @@ void ParticleManager::ParticleDebugGUI() {
 						selectParticleGroup_->GetInstanceCount() = static_cast<uint32_t>(maxCount);
 					}
 
-					ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "生存数: %d", int(selectParticleGroup_->GetDrawCount()));
+					ImGui::TextDisabled("生存数: %d", int(selectParticleGroup_->GetDrawCount()));
 
 					selectParticleGroup_->emitter_.EmitProgressGUI();
 

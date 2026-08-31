@@ -2,7 +2,6 @@
 #include "Engine/Scene/BaseScene.h"
 #include "Engine/Graphics/SkyBox/SkyBox.h"
 #include "Engine/Graphics/Object/AnimationModel.h"
-#include "Engine/Graphics/Sprite/Sprite.h"
 
 /// <summary>
 /// GPUParticleシーンクラス
@@ -19,10 +18,8 @@ public:
 	void ParticleDebugGUI()override;
 	void ParticleGroupDebugGUI()override;
 
-	/// <summary>
-	/// シーンチェンジ
-	/// </summary>
-	void BlackFade();
+	/// <summary>入力を見てシーン遷移を始める</summary>
+	void CheckSceneChange();
 
 private:
 
@@ -33,10 +30,4 @@ private:
 
 	float terrainPosY_ = -5.0f;
 	float terrainEnvironmentCoeff_ = 0.3f;
-
-	// sceneChange
-	std::unique_ptr<Graphics::Sprite> black_;
-	float blackLimit_ = 20.0f;
-	float blackTime_ = 20.0f;
-	bool isChangePhase_ = false;
 };

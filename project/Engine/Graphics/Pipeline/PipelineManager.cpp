@@ -10,6 +10,7 @@
 #include "Engine/Graphics/Pipeline/Compute/TrailEmitCSPipe.h"
 #include "Engine/Graphics/Pipeline/Compute/SkinningCSPipe.h"
 #include "Engine/Graphics/Pipeline/RootParam.h"
+#include "Engine/Core/Thread/ParallelFor.h"
 
 using namespace Graphics;
 using namespace DXC;
@@ -142,20 +143,30 @@ void PipelineManager::CreatePipeline() {
 		.vsPath = L"Particle/GPU/SplatComposite.VS.hlsl", .psPath = L"Particle/GPU/SplatComposite.PS.hlsl",
 		.blend = BlendType::ADD_PREMULTIPLIED, .depth = DepthMode::DISABLE,
 		.useInputLayout = false, .useDepthTarget = false });
+
+	InitializePending();
 }
 
 void PipelineManager::CreateRenderPipe(Pipe type, const RenderPipelineDesc& desc) {
 	auto pipe = std::make_unique<RenderPipeline>();
 	pipe->SetDesc(desc);
-	pipe->Initialize(dxcommon_);
 	pipelines_[static_cast<size_t>(type)] = std::move(pipe);
+	pendingInit_.push_back(type);
 }
 
 void PipelineManager::CreateComputePipe(Pipe type, const std::wstring& csPath) {
 	auto pipe = std::make_unique<ComputePipeline>();
 	pipe->SetShaderPath(csPath);
-	pipe->Initialize(dxcommon_);
 	pipelines_[static_cast<size_t>(type)] = std::move(pipe);
+	pendingInit_.push_back(type);
+}
+
+void PipelineManager::InitializePending() {
+	Core::ParallelFor(pendingInit_.size(), [this](size_t i) {
+		pipelines_[static_cast<size_t>(pendingInit_[i])]->Initialize(dxcommon_);
+	});
+
+	pendingInit_.clear();
 }
 
 void PipelineManager::SetPipeline(Pipe type) {

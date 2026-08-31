@@ -4,6 +4,7 @@
 #include <memory>
 #include <array>
 #include <functional>
+#include <vector>
 
 namespace DXC { class DXCom; }
 
@@ -49,8 +50,7 @@ namespace Graphics {
 		BasePipeline* GetCurrentPipeline() const { return currentPipeline_; }
 
 		// --- 名前でルートパラメータをセットするヘルパー ---
-		// 名前は RootNames.h の定数(RootParam)で渡す。RootParam がパイプライン毎の
-		// 解決結果を持つので、毎フレームの文字列ハッシュ検索は発生しない
+		// 名前は RootNames.h の定数(RootParam)で渡す
 		void SetGraphicsRootCBV(ID3D12GraphicsCommandList* list, const RootParam& param, D3D12_GPU_VIRTUAL_ADDRESS address);
 		void SetGraphicsRootDescriptorTable(ID3D12GraphicsCommandList* list, const RootParam& param, D3D12_GPU_DESCRIPTOR_HANDLE handle);
 
@@ -72,10 +72,18 @@ namespace Graphics {
 		/// <summary>シェーダパスだけが違う標準CS用: ComputePipeline を生成して登録する</summary>
 		void CreateComputePipe(Pipe type, const std::wstring& csPath);
 
+		/// <summary>積まれたパイプラインの Initialize をまとめて並列に走らせる</summary>
+		/// <remarks>中身はHLSLのコンパイルが大半で、起動時間の3割を占めていた。
+		/// 各パイプラインは互いを参照しないので並列に回せる</remarks>
+		void InitializePending();
+
 	private:
 
 		DXC::DXCom* dxcommon_;
 		std::array<std::unique_ptr<BasePipeline>, static_cast<size_t>(Pipe::Count)> pipelines_;
+
+		/// <summary>生成済みでまだ Initialize していないもの。InitializePending() で消化する</summary>
+		std::vector<Pipe> pendingInit_;
 
 		BasePipeline* currentPipeline_ = nullptr;
 		Pipe currentPipeType_ = Pipe::Count;	// RootParam のキャッシュを引くためのキー
@@ -85,9 +93,8 @@ namespace Graphics {
 
 	template<class T>
 	void PipelineManager::CreatePipe(Pipe type) {
-		auto pipe = std::make_unique<T>();
-		pipe->Initialize(dxcommon_);
-		pipelines_[static_cast<size_t>(type)] = std::move(pipe);
+		pipelines_[static_cast<size_t>(type)] = std::make_unique<T>();
+		pendingInit_.push_back(type);
 	}
 
 	template<class T>
@@ -97,7 +104,7 @@ namespace Graphics {
 	) {
 		auto pipe = std::make_unique<T>();
 		setup(*pipe);
-		pipe->Initialize(dxcommon_);
 		pipelines_[static_cast<size_t>(type)] = std::move(pipe);
+		pendingInit_.push_back(type);
 	}
 }

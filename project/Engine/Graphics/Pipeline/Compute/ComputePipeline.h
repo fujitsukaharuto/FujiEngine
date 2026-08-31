@@ -7,10 +7,9 @@
 namespace Graphics {
 
 	/// <summary>
-	/// シェーダパスだけが異なる標準的なCS用パイプライン。
-	/// リフレクション駆動でルートシグネチャを生成するCSはこの1クラスに集約する
-	/// (静的サンプラ付きの Outline や手書きRootSigの TrailEmit は個別クラスのまま)。
+	/// シェーダパスだけが異なる標準的なCS用パイプライン
 	/// </summary>
+	/// <remarks>Outline と TrailEmit は個別クラスのまま</remarks>
 	class ComputePipeline : public BasePipeline {
 	public:
 		ComputePipeline() = default;

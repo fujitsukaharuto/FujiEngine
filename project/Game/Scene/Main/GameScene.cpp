@@ -27,13 +27,12 @@ GameScene::~GameScene() {
 
 void GameScene::Initialize() {
 
-#pragma region シーン遷移用
-	black_ = std::make_unique<Sprite>();
-	black_->Load("white2x2.png");
-	black_->SetColor(Colors::Black);
-	black_->SetSize({ MyWin::kWindowWidth,MyWin::kWindowHeight });
-	black_->SetAnchor({ 0.0f,0.0f });
-#pragma endregion
+	// ゲームオーバー・コンティニューの明滅用
+	flash_ = std::make_unique<Sprite>();
+	flash_->Load("white2x2.png");
+	flash_->SetColor(Colors::Transparent);
+	flash_->SetSize({ MyWin::kWindowWidth,MyWin::kWindowHeight });
+	flash_->SetAnchor({ 0.0f,0.0f });
 
 	InitGameObj();
 
@@ -102,7 +101,7 @@ void GameScene::Update() {
 	}
 #endif // _DEBUG
 
-	BlackFade();
+	CheckSceneChange();
 
 	if (!player_->GetIsGameOver()) {
 		CollisionUpdate();
@@ -139,10 +138,8 @@ void GameScene::Draw() {
 		gameOver_->Draw();
 		gameOverSelector_->Draw();
 	}
-	if (blackTime_ != 0.0f) {
-		black_->Draw();
-	} else if (isContinueFade_ || isGameOverFade_) {
-		black_->Draw();
+	if (isGameOverFade_ || isContinueFade_) {
+		flash_->Draw();
 	}
 
 #pragma endregion
@@ -176,43 +173,19 @@ void GameScene::ParticleDebugGUI() {
 #endif // _DEBUG
 }
 
-void GameScene::BlackFade() {
-	if (isChangePhase_) {
-		if (blackTime_ < blackLimit_) {
-			blackTime_ += FPSKeeper::DeltaTimeFrame();
-			if (blackTime_ >= blackLimit_) {
-				blackTime_ = blackLimit_;
-			}
-		} else {
-			if (isBackTitle_) {
-				ChangeScene("TITLE", 40.0f);
-			} else {
-				ChangeScene("RESULT", 40.0f);
-			}
-		}
-		black_->SetColor({ 0.0f,0.0f,0.0f,Lerp(0.0f,1.0f,(1.0f / blackLimit_ * blackTime_)) });
-	} else {
-		if (blackTime_ > 0.0f) {
-			if (FPSKeeper::DeltaTimeFrame() < FPSKeeper::GetClampFrame()) {
-				blackTime_ -= FPSKeeper::DeltaTimeFrame();
-			}
-			if (blackTime_ <= 0.0f) {
-				blackTime_ = 0.0f;
-			}
-			black_->SetColor({ 0.0f,0.0f,0.0f,Lerp(0.0f,1.0f,(1.0f / blackLimit_ * blackTime_)) });
-		}
+void GameScene::CheckSceneChange() {
+	// 暗転・明転中は受け付けない
+	if (IsFading()) {
+		return;
 	}
+
 #ifdef _DEBUGMODE
 	if (Input::GetInstance()->TriggerKey(DIK_0)) {
-		if (blackTime_ == 0.0f) {
-			isChangePhase_ = true;
-		}
+		ChangeScene("RESULT");
 	}
 #endif // _DEBUG
 	if (boss_->GetIsClear()) {
-		if (blackTime_ == 0.0f) {
-			isChangePhase_ = true;
-		}
+		ChangeScene("RESULT");
 	}
 }
 
@@ -343,18 +316,18 @@ void GameScene::GameOverUpdate() {
 		gameOverFadeTime_ += FPSKeeper::DeltaTimeFrame();
 		float v = std::fmodf(gameOverFadeTime_ / fadeBaseTime_, 2.0f);
 		if (v <= 1.0f) {
-			black_->SetColor({ 0.0f,0.0f,0.0f,v });
+			flash_->SetColor({ 0.0f,0.0f,0.0f,v });
 		} else {
 			isGameOver_ = true;
-			black_->SetColor({ 0.0f,0.0f,0.0f,2.0f - v });
+			flash_->SetColor({ 0.0f,0.0f,0.0f,2.0f - v });
 		}
 		if (gameOverFadeTime_ > fadeBaseTime_ * 2.0f) {
 			isGameOverFade_ = false;
-			black_->SetColor({ 0.0f,0.0f,0.0f,0.0f });
+			flash_->SetColor({ 0.0f,0.0f,0.0f,0.0f });
 		}
 	}
 
-	if (isGameOver_ && !isGameOverFade_ && !isContinueFade_ && !isChangePhase_) {
+	if (isGameOver_ && !isGameOverFade_ && !isContinueFade_ && !IsFading()) {
 		if (selectPoint_ == 0) {
 			if (input_->TriggerKey(DIK_SPACE) || input_->PressButton(PadInput::A)) {
 				isRestartOnce_ = true;
@@ -367,10 +340,7 @@ void GameScene::GameOverUpdate() {
 			}
 		} else {
 			if (input_->TriggerKey(DIK_SPACE) || input_->PressButton(PadInput::A)) {
-				if (blackTime_ == 0.0f) {
-					isChangePhase_ = true;
-					isBackTitle_ = true;
-				}
+				ChangeScene("TITLE");
 			}
 			if (input_->TriggerKey(DIK_A) || input_->PressButton(PadInput::Left)) {
 				selectPoint_ = 0;
@@ -385,7 +355,7 @@ void GameScene::ContinueUpdate() {
 		continueFadeTime_ += FPSKeeper::DeltaTimeFrame();
 		float v = std::fmodf(continueFadeTime_ / fadeBaseTime_, 2.0f);
 		if (v <= 1.0f) {
-			black_->SetColor({ 0.0f,0.0f,0.0f,v });
+			flash_->SetColor({ 0.0f,0.0f,0.0f,v });
 		} else {
 			isGameOver_ = false;
 			if (isRestartOnce_) {
@@ -394,12 +364,12 @@ void GameScene::ContinueUpdate() {
 				boss_->ReStart();
 				followCamera_->ReStart(boss_->GetBossCore()->GetWorldPos());
 			}
-			black_->SetColor({ 0.0f,0.0f,0.0f,2.0f - v });
+			flash_->SetColor({ 0.0f,0.0f,0.0f,2.0f - v });
 		}
 		if (continueFadeTime_ > fadeBaseTime_ * 2.0f) {
 			isContinueFade_ = false;
 			gameOverFadeTime_ = 0.0f;
-			black_->SetColor({ 0.0f,0.0f,0.0f,0.0f });
+			flash_->SetColor({ 0.0f,0.0f,0.0f,0.0f });
 		}
 	}
 }

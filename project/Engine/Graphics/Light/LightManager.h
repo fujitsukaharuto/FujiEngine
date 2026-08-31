@@ -57,10 +57,7 @@ namespace Graphics {
 	/// <summary>
 	/// 全てのライトをまとめた構造体
 	/// </summary>
-	/// <remarks>
-	/// HLSL 側の AllLights 構造体と並び順・パディングが完全に一致していること。
-	/// float3 は float4 境界を跨げないので、後ろに詰める値は明示的に pad を置いて位置を固定する
-	/// </remarks>
+	/// <remarks>HLSL 側の AllLights と並び順・パディングが一致していること</remarks>
 	struct AllLightsData {
 		DirectionalLight directionalLights[kMaxDirectionalLights];
 		PointLightData pointLights[kMaxPointLights];
@@ -82,21 +79,17 @@ namespace Graphics {
 		float aoRadius = 2.0f;
 		float aoIntensity = 1.0f;
 		uint32_t aoSampleCount = 4;
-		// 実測 1.18ms (prepass 0.10 + trace 0.55 + temporal 0.09 + spatial 0.44) で
-		// 60fps フレームの約7%。デノイザを通すとノイズが見えないのでこれを既定にする
+		// デノイザを通すと粒が見えないので既定は Screen(実測 1.18ms)
 		uint32_t aoMode = kAOModeScreen;
 
-		// 鏡面の環境光の遮蔽。有効にすると遮られた場所が暗くなり既存の絵が変わるので既定は無効
+		// 鏡面の環境光の遮蔽。絵が変わるので既定は無効
 		float reflectionMaxDistance = 100.0f;
 		float reflectionIntensity = 1.0f;
 		uint32_t enableReflection = 0;
-		// 実測 0.89ms (trace 0.40 + temporal 0.09 + spatial 0.40 / samples=4) で、
-		// AO と合わせて 1.98ms = 60fps フレームの約12%。デノイザを通すと粒が見えないのでソフトを既定にする。
-		// trace は本数に正比例する(1本あたり約0.125ms、16本で2.0ms)ので、上げるのはデノイザで足りない時だけ
-		uint32_t shadowMode = kShadowModeSoft;
+		// Soft は AO と合わせて約2.0ms。既定は Hard で、要るときだけ ImGui で切り替える
+		uint32_t shadowMode = kShadowModeHard;
 
-		// 平行光源のソフトシャドウ。受け持つのは0番の平行光源だけで、2本目以降は Hard のまま
-		// 太陽の見かけの半径は約0.27度だが、それだと半影が細くて分からないので少し広げてある
+		// 受け持つのは0番の平行光源だけ。太陽の実際の0.27度では半影が細すぎるので広げてある
 		float sunAngularRadius = 0.0175f;	// ラジアン(=約1.0度)
 		uint32_t shadowSampleCount = 4;
 		// アンビエントの経路。IBL にすると半球近似をやめて焼いたキューブマップを引く。

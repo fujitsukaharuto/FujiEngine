@@ -14,10 +14,7 @@ namespace Graphics {
 	/// <summary>
 	/// 連番テクスチャで絵を切り替えるパーティクルのグループ
 	/// </summary>
-	/// <remarks>
-	/// ParticleGroup / ParentParticleGroup とは経路が別で、インスタンシングにもGPU側にも乗らない。
-	/// 固定数の Object3d を作り置きして使い回すだけの独立した仕組み
-	/// </remarks>
+	/// <remarks>ParticleGroup とは経路が別。固定数の Object3d を作り置きして使い回すだけ</remarks>
 	class AnimeParticleGroup {
 	public:
 		AnimeParticleGroup();

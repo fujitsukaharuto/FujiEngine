@@ -24,10 +24,8 @@ public:
 	void DebugGUI()override;
 	void ParticleDebugGUI()override;
 
-	/// <summary>
-	/// シーンチェンジ
-	/// </summary>
-	void BlackFade();
+	/// <summary>ボス撃破やゲームオーバーの選択でシーン遷移を始める</summary>
+	void CheckSceneChange();
 	/// <summary>
 	/// JsonからObject作る
 	/// </summary>
@@ -60,7 +58,6 @@ private:
 	std::unique_ptr<Graphics::Sprite> pad_ = nullptr;
 
 	std::unique_ptr<Graphics::Sprite> gameOver_ = nullptr;
-	bool isBackTitle_ = false;
 	std::unique_ptr<Graphics::Sprite> gameOverSelector_ = nullptr;
 	int selectPoint_ = 0;
 	Math::Vector3 selectPointL_ = { 180.0f,450.0f,0.0f };
@@ -84,10 +81,7 @@ private:
 	bool isContinueFade_ = false;
 	bool isRestartOnce_ = false;
 	bool isGameOver_ = false;
-
-	// sceneChange
-	std::unique_ptr<Graphics::Sprite> black_;
-	float blackLimit_ = 20.0f;
-	float blackTime_ = 20.0f;
-	bool isChangePhase_ = false;
+	/// <summary>ゲームオーバー・コンティニューの明滅に使う黒</summary>
+	/// <remarks>シーン遷移の暗転は SceneManager が持っているのでここには無い</remarks>
+	std::unique_ptr<Graphics::Sprite> flash_;
 };

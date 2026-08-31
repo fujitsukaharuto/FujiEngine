@@ -6,7 +6,6 @@
 #include "Engine/Graphics/Object/ObjectRenderer.h"
 #include "Engine/Graphics/PostEffect/OffscreenManager.h"
 #include "Engine/Graphics/Light/LightManager.h"
-#include "Engine/Core/App/MyWindow.h"
 #include "Engine/Core/Input/Input.h"
 #include "Engine/DXC/DXCom.h"
 
@@ -33,14 +32,6 @@ void TestScene::Initialize() {
 	camera->GetTransform().translate = { 0.0f,13.0f,-38.0f };
 	camera->GetTransform().rotate = { 0.22f,0.0f,0.0f };
 
-#pragma region シーン遷移用
-	black_ = std::make_unique<Sprite>();
-	black_->Load("white2x2.png");
-	black_->SetColor(Colors::Black);
-	black_->SetSize({ float(MyWin::kWindowWidth),float(MyWin::kWindowHeight) });
-	black_->SetAnchor({ 0.0f,0.0f });
-#pragma endregion
-
 	cMane_ = std::make_unique<CollisionManager>();
 
 	SetupObjects();
@@ -61,7 +52,7 @@ void TestScene::Update() {
 		obj->AnimationUpdate();
 	}
 
-	BlackFade();
+	CheckSceneChange();
 
 	cMane_->CheckAllCollision();
 
@@ -89,9 +80,6 @@ void TestScene::Draw() {
 #pragma endregion
 
 #pragma region 前景スプライト
-	if (blackTime_ != 0.0f) {
-		black_->Draw();
-	}
 
 #pragma endregion
 }
@@ -262,32 +250,15 @@ void TestScene::RestoreLights() {
 	point->intensity = 0.0f;
 }
 
-void TestScene::BlackFade() {
-	if (isChangePhase_) {
-		if (blackTime_ < blackLimit_) {
-			blackTime_ += FPSKeeper::DeltaTimeFrame();
-			if (blackTime_ >= blackLimit_) {
-				blackTime_ = blackLimit_;
-			}
-		} else {
-
-		}
-	} else {
-		if (blackTime_ > 0.0f) {
-			blackTime_ -= FPSKeeper::DeltaTimeFrame();
-			if (blackTime_ <= 0.0f) {
-				blackTime_ = 0.0f;
-			}
-		}
+void TestScene::CheckSceneChange() {
+	// 暗転・明転中は受け付けない
+	if (IsFading()) {
+		return;
 	}
-	black_->SetColor({ 0.0f,0.0f,0.0f,Lerp(0.0f,1.0f,(1.0f / blackLimit_ * blackTime_)) });
 
 #ifdef _DEBUGMODE
 	if (Input::GetInstance()->PushKey(DIK_RETURN) && Input::GetInstance()->PushKey(DIK_P) && Input::GetInstance()->PushKey(DIK_D) && Input::GetInstance()->TriggerKey(DIK_S)) {
-		if (blackTime_ == 0.0f) {
-			isChangePhase_ = true;
-			isParticleDebugScene_ = true;
-		}
+		ChangeScene("PARTICLEDEBUG");
 	}
 #endif // _DEBUG
 }

@@ -31,6 +31,7 @@ namespace Collision {
 		/// <summary>
 		/// 衝突のチェック
 		/// </summary>
+		/// <remarks>型が確定していない2つを渡す入口。ここでAABBに絞り込む</remarks>
 		void CheckCollisionPair(BaseCollider* A, BaseCollider* B);
 		/// <summary>
 		///	全ての衝突判定チェック
@@ -45,6 +46,12 @@ namespace Collision {
 		void Reset() { colliders_.clear(); }
 
 	private:
+
+		/// <summary>
+		/// 絞り込み済みの2つの衝突をチェックする
+		/// </summary>
+		/// <remarks>ペアループはこちらを呼ぶ。CheckCollisionPair 経由だと dynamic_cast が O(n^2) 回走る</remarks>
+		void CheckAABBPair(AABBCollider* A, AABBCollider* B);
 
 		/// <summary>
 		/// AABBをOBBに変換
@@ -68,7 +75,7 @@ namespace Collision {
 
 	private:
 
-		/// <remarks>毎フレーム Reset→AddCollider で作り直す。clear() は容量を保つので確保は初回だけで済む</remarks>
+		/// <remarks>毎フレーム Reset→AddCollider で作り直す</remarks>
 		std::vector<BaseCollider*> colliders_;
 
 		// 以下は CheckAllCollision の作業用。メンバに持つのは毎フレームの再確保を避けるため

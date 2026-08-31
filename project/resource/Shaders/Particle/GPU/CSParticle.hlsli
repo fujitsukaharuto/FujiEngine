@@ -110,9 +110,8 @@ float3 UnpackHalf3(uint2 packed)
     return float3(xy, z);
 }
 
-// 位置 (±kPosPackRadius) を各軸21bit固定小数で uint2 にパッキングする関数。
-// レイアウト: lo = qx(bit0-20) | qy下位11bit(bit21-31), hi = qy上位10bit(bit0-9) | qz(bit10-30)。
-// fp16絶対座標と違い刻みが座標値に依らず一定なので遅い粒子もフリーズしない。
+// 位置 (±kPosPackRadius) を各軸21bit固定小数で uint2 にパッキングする。
+// レイアウト: lo = qx(bit0-20) | qy下位11bit(bit21-31), hi = qy上位10bit(bit0-9) | qz(bit10-30)
 static const float kPosQuantMax = 2097151.0f; // (1<<21)-1
 uint2 PackPos21(float3 p)
 {

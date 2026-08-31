@@ -138,9 +138,8 @@ void RayTracedAOPass::DebugGUI() {
 
 	ImGui::Text("Raw");
 	ImGui::Image(static_cast<ImTextureID>(SRVManager::GetInstance()->GetGPUDescriptorHandle(raw_.srvIndex).ptr), size);
-	ImGui::Text("Denoised (this is what the forward pass reads)");
+	ImGui::Text("Denoised");
 	ImGui::Image(static_cast<ImTextureID>(GetAOSrvHandle().ptr), size);
-	ImGui::TextWrapped("黒いほど遮蔽されている。Lights > RayTraced AO の Mode が Screen のときだけ更新される");
 
 	ImGui::TreePop();
 #endif // _DEBUGMODE

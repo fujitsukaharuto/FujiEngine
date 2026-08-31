@@ -14,10 +14,7 @@ namespace Graphics {
 	/// <summary>
 	/// 合成モード
 	/// </summary>
-	/// <remarks>
-	/// パーティクルグループの blendType として JSON に整数で保存され、DebugGUI のコンボも
-	/// この並び順を index として引いている。既存の値の順番を変えず、追加は必ず末尾に行うこと
-	/// </remarks>
+	/// <remarks>blendType として JSON に整数で保存される。既存の並び順を変えず、追加は末尾に行うこと</remarks>
 	enum class BlendType {
 		ALPHA,
 		ADD,

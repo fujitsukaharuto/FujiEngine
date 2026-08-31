@@ -30,10 +30,7 @@ float2 Hammersley(uint i, uint count)
 }
 
 /// <summary>単位円板に一様に散らした点</summary>
-/// <remarks>
-/// 半径に sqrt を掛けるのは面積で一様にするため。x を半径に使うので、
-/// 呼び出し側は 1-x の平方根をそのまま cosine 重みの高さとして使える
-/// </remarks>
+/// <remarks>半径に sqrt を掛けるのは面積で一様にするため</remarks>
 /// <param name="xi">[0,1)^2 の点</param>
 /// <param name="cosA">並び全体を回す角度。一定の並びのままだと縞になる</param>
 /// <param name="sinA">同上</param>

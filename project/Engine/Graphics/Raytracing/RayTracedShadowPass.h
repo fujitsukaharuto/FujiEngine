@@ -18,10 +18,7 @@ namespace Graphics {
 	/// <summary>
 	/// G-Buffer を元に画面空間で平行光源のソフトシャドウを計算し、デノイズまで掛けるパス
 	/// </summary>
-	/// <remarks>
-	/// 遮蔽率は光源ごとに別の値なのでバッファ1枚では1本ぶんしか持てない。
-	/// このパスが受け持つのは0番の平行光源だけで、残りは前方描画のPSがハードシャドウを飛ばす
-	/// </remarks>
+	/// <remarks>受け持つのは0番の平行光源だけ。残りは前方描画のPSがハードシャドウを飛ばす</remarks>
 	class RayTracedShadowPass {
 	public:
 		RayTracedShadowPass() = default;
@@ -31,10 +28,7 @@ namespace Graphics {
 		void Finalize();
 
 		/// <summary>このフレームの遮蔽率を計算してデノイズする</summary>
-		/// <remarks>
-		/// G-Bufferの書き出しが済んでいること。TLASも組み終わっていること。
-		/// 影が Soft 以外なら何もせず蓄積だけ捨てるので、呼び出し側で切り分けなくてよい
-		/// </remarks>
+		/// <remarks>G-BufferとTLASが済んでいること。Soft 以外なら何もしないので呼び出し側で切り分け不要</remarks>
 		void Render(const GBufferPass& gbuffer);
 
 		void DebugGUI();

@@ -1,9 +1,8 @@
 #ifndef RAYTRACED_SHADOW_HLSLI
 #define RAYTRACED_SHADOW_HLSLI
 
-// インラインレイトレ(DXR 1.1 RayQuery)による影。
-// space0 は gTextures[] が無制限、space1 は gEnvironment が使用中なので space2 に固定する。
-// TLAS を読むシェーダは必ずこのヘッダを include すること(個別宣言すると space がずれる)
+// インラインレイトレ(DXR 1.1 RayQuery)による影。TLAS は space2 に固定する
+// (space0 は gTextures[] が無制限、space1 は gEnvironment が使用中)
 #include "Sampling.hlsli"
 
 RaytracingAccelerationStructure gSceneTLAS : register(t0, space2);
@@ -56,10 +55,7 @@ float TraceShadowDirectional(float3 worldPos, float3 L, float3 N, uint shadowMas
 }
 
 /// <summary>平行光源のソフトシャドウ。光源の見かけの大きさぶんレイを円錐状に散らす</summary>
-/// <remarks>
-/// 本数がそのまま負荷なので、少ない本数で散らしてデノイザで均す前提。
-/// 半影の広がりは遮蔽物までの距離に比例するが、これは角度で散らすだけで自然にそうなる
-/// </remarks>
+/// <remarks>本数がそのまま負荷なので、少ない本数で散らしてデノイザで均す前提</remarks>
 /// <param name="L">ライトへ向かう単位ベクトル。円錐の中心になる</param>
 /// <param name="angularRadius">光源の見かけの半径(ラジアン)。太陽で約0.0047</param>
 /// <param name="sampleCount">飛ばす本数</param>

@@ -39,14 +39,6 @@ void ResultScene::Initialize() {
 	lightManager_->GetDirectionLight()->SetLightDirection(lightDir_);
 	lightManager_->GetDirectionLight()->SetLightIntensity(lightIntensity_);
 
-#pragma region シーン遷移用
-	black_ = std::make_unique<Sprite>();
-	black_->Load("white2x2.png");
-	black_->SetColor({ 0.0f,0.0f,0.0f,1.0f });
-	black_->SetSize({ 1280.0f,720.0f });
-	black_->SetAnchor({ 0.0f,0.0f });
-#pragma endregion
-
 	clear_ = std::make_unique<Sprite>();
 	clear_->Load("clear_beta.png");
 	clear_->SetAnchor({ 0.0f,0.0f });
@@ -97,7 +89,7 @@ void ResultScene::Update() {
 
 #endif // _DEBUG
 
-	BlackFade();
+	CheckSceneChange();
 
 	if (FPSKeeper::DeltaTimeFrame() < FPSKeeper::GetClampFrame()) {
 		if (waitTime_ > 0.0f) {
@@ -133,9 +125,6 @@ void ResultScene::Draw() {
 #pragma endregion
 
 #pragma region 前景スプライト
-	if (blackTime_ != 0.0f) {
-		black_->Draw();
-	}
 
 #pragma endregion
 }
@@ -161,35 +150,18 @@ void ResultScene::ParticleDebugGUI() {
 #endif // _DEBUG
 }
 
-void ResultScene::BlackFade() {
-	if (isChangePhase_) {
-		if (blackTime_ < blackLimit_) {
-			blackTime_ += FPSKeeper::DeltaTimeFrame();
-			if (blackTime_ >= blackLimit_) {
-				blackTime_ = blackLimit_;
-			}
-		} else {
-			ChangeScene("TITLE", 40.0f);
-		}
-	} else {
-		if (blackTime_ > 0.0f) {
-			blackTime_ -= FPSKeeper::DeltaTimeFrame();
-			if (blackTime_ <= 0.0f) {
-				blackTime_ = 0.0f;
-			}
-		}
+void ResultScene::CheckSceneChange() {
+	// 暗転・明転中は受け付けない
+	if (IsFading() || state_ != DanceState::Finish) {
+		return;
 	}
-	black_->SetColor({ 0.0f,0.0f,0.0f,Lerp(0.0f,1.0f,(1.0f / blackLimit_ * blackTime_)) });
+
 	XINPUT_STATE pad;
-	if (Input::GetInstance()->TriggerKey(DIK_SPACE) && state_ == DanceState::Finish) {
-		if (blackTime_ == 0.0f) {
-			isChangePhase_ = true;
-		}
+	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
+		ChangeScene("TITLE");
 	} else if (Input::GetInstance()->GetGamepadState(pad)) {
-		if (Input::GetInstance()->TriggerButton(PadInput::A) && state_ == DanceState::Finish) {
-			if (blackTime_ == 0.0f) {
-				isChangePhase_ = true;
-			}
+		if (Input::GetInstance()->TriggerButton(PadInput::A)) {
+			ChangeScene("TITLE");
 		}
 	}
 }

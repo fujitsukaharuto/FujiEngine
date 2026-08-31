@@ -243,6 +243,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Math\Vector\Vector2.cpp" />
     <ClCompile Include="Engine\Math\Vector\Vector3.cpp" />
     <ClCompile Include="Engine\Scene\BaseScene.cpp" />
+    <ClCompile Include="Engine\Scene\SceneFade.cpp" />
     <ClCompile Include="Engine\Scene\SceneManager.cpp" />
     <ClCompile Include="externals\imgui\utilities\builders.cpp" />
     <ClCompile Include="externals\imgui\utilities\drawing.cpp" />
@@ -296,6 +297,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Core\Serialize\GlobalVariables.h" />
     <ClInclude Include="Engine\Core\Serialize\JsonSerializer.h" />
     <ClInclude Include="Engine\Core\Time\FPSKeeper.h" />
+    <ClInclude Include="Engine\Core\Thread\ParallelFor.h" />
     <ClInclude Include="Engine\DXC\Command\CommandContext.h" />
     <ClInclude Include="Engine\DXC\Command\DXCommand.h" />
     <ClInclude Include="Engine\DXC\Debug\GPUTimer.h" />
@@ -389,6 +391,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Math\Vector\Vector4.h" />
     <ClInclude Include="Engine\Scene\AbstractSceneFactory.h" />
     <ClInclude Include="Engine\Scene\BaseScene.h" />
+    <ClInclude Include="Engine\Scene\SceneFade.h" />
     <ClInclude Include="Engine\Scene\SceneManager.h" />
     <ClInclude Include="Engine\FujiEngine.h" />
     <ClInclude Include="externals\imgui\utilities\builders.h" />

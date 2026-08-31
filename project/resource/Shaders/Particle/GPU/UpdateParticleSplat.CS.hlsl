@@ -2,12 +2,8 @@
 #include "../../Common/Noise.hlsli"
 
 // ============================================================================
-// splatモード専用 Update。
-// 通常版(UpdateParticle.CS.hlsl)との違い:
-//   - 視錐台カリング(IsVisible)を行わない … splat描画側が各粒子をNDCで自前カリングするため。
-//   - 描画リスト gDrawParticleIndex への散らばり書き込みを廃止 … splatは全プールを走査するため不要。
-//   - 可視数の per-visible atomic を廃止。生存数UIのため per-group atomic 1個だけ gDrawArgs に積む。
-// → コンパイル時にラスタ用の死に処理を丸ごと除去する目的で、通常版とは別シェーダ/別PSOにしている。
+// splatモード専用 Update。視錐台カリングと描画リストへの書き込みを持たない。
+// ラスタ用の死に処理を落とすため通常版(UpdateParticle.CS.hlsl)とは別PSOにしている
 // ============================================================================
 
 RWStructuredBuffer<Particle_Translate> gParticles_Trans : register(u0);

@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
-// 実体で持つのは Material だけ。Model はポインタなので Model.h(Mesh/SkinnedMesh/AnimationStructs を連れてくる)は不要
+// Model はポインタなので Model.h は不要
 #include "Engine/Graphics/Model/Material/Material.h"
 
 

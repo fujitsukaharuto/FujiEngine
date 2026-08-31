@@ -47,10 +47,7 @@ namespace Graphics {
 		/// <summary>
 		/// 行列と定数バッファを現在の transform から作り直す
 		/// </summary>
-		/// <remarks>
-		/// transform を書き換えた直後に呼ぶ用。Update() はフレーム先頭で走るので、
-		/// シーン更新中にカメラを動かした場合はこれを呼ばないと1フレーム遅れる
-		/// </remarks>
+		/// <remarks>transform を書き換えた直後に呼ぶ用。Update() はフレーム先頭なので呼ばないと1フレーム遅れる</remarks>
 		void UpdateMatrix();
 
 		/// <summary>
@@ -140,10 +137,7 @@ namespace Graphics {
 		/// カメラのワールド座標の取得
 		/// </summary>
 		/// <returns>Vector3</returns>
-		/// <remarks>
-		/// ワールド行列から取り出すので、シェイクのオフセットもデバッグカメラも反映された値になる。
-		/// transform_.translate を直接読むとどちらも抜け落ちるので、位置が要るときは必ずこちらを使うこと
-		/// </remarks>
+		/// <remarks>ワールド行列から取り出すのでシェイクもデバッグカメラも反映される</remarks>
 		Math::Vector3 GetTranslate() const;
 
 	private:

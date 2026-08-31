@@ -179,18 +179,17 @@ void RaytracingScene::DebugGUI() {
 
 	ImGui::Indent();
 	if (!isAvailable_) {
-		ImGui::TextColored(ImVec4(1.0f, 0.4f, 0.4f, 1.0f), "RayQuery: NOT supported");
-		ImGui::TextWrapped("DXR Tier 1.1 と Shader Model 6.5 の両方が要ります。起動ログを確認してください");
+		ImGui::TextColored(Core::ImGuiTextError(), "RayQuery: NOT supported");
 		ImGui::Unindent();
 		return;
 	}
 
-	ImGui::TextColored(ImVec4(0.4f, 1.0f, 0.4f, 1.0f), "RayQuery: Supported");
+	ImGui::TextColored(Core::ImGuiTextOk(), "RayQuery: Supported");
 	ImGui::Text("BLAS (モデル数)     : %zu", GetBlasCount());
 	ImGui::Text("TLAS インスタンス数 : %u", GetInstanceCount());
 	ImGui::Text("TLAS 容量           : %u", instanceCapacity_);
 	if (tlasSrvIndex_ == kInvalidSrvIndex) {
-		ImGui::TextColored(ImVec4(1.0f, 0.8f, 0.3f, 1.0f), "TLAS 未構築 (描画対象がまだ無い)");
+		ImGui::TextColored(Core::ImGuiTextWarn(), "TLAS 未構築 (描画対象がまだ無い)");
 	} else {
 		ImGui::Text("TLAS SRV index      : %u", tlasSrvIndex_);
 	}

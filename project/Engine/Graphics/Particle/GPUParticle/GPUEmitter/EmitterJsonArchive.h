@@ -6,11 +6,9 @@
 namespace Graphics {
 
 	/// <summary>
-	/// GPUエミッタの Save/Load を単一のフィールド列挙(各エミッタの SerializeFields)から
-	/// 生成するための双方向アーカイブ。Writer=data→json / Reader=json→data。
-	/// キーとメンバを1箇所でしか書かないので、Save/Load のキー相違やメンバ取り違え
-	/// (例: isGravity に isTrailEmit を代入する類のコピペミス)が構造的に起きない。
+	/// GPUエミッタの Save/Load を各エミッタの SerializeFields から生成する双方向アーカイブ
 	/// </summary>
+	/// <remarks>Writer=data→json / Reader=json→data</remarks>
 	struct EmitterJsonWriter {
 		nlohmann::json& j;
 		template<class T> void field(const char* key, T& v) { j[key] = v; }

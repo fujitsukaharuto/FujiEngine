@@ -35,10 +35,9 @@ namespace Graphics {
 	};
 
 	/// <summary>
-	/// リフレクション駆動でルートシグネチャを生成する標準的な描画パイプライン。
-	/// 差分が RenderPipelineDesc で表現できるものは全てこの1クラスに集約する
-	/// (Compute 側の ComputePipeline と同じ考え方)。
+	/// リフレクション駆動でルートシグネチャを生成する標準的な描画パイプライン
 	/// </summary>
+	/// <remarks>差分が RenderPipelineDesc で表現できるものは全てここに集約する</remarks>
 	class RenderPipeline : public BasePipeline {
 	public:
 		RenderPipeline() = default;

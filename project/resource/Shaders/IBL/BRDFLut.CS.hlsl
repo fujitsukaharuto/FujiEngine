@@ -1,7 +1,6 @@
 #include "../Common/IBLBake.hlsli"
 
-// split-sum 近似の第2項を焼く。環境にもマテリアルにも依存しない純粋な数表なので、
-// 一度焼けば内容は永久に同じ(環境マップを差し替えても焼き直し不要)。
+// split-sum 近似の第2項を焼く。環境にもマテリアルにも依存しないので焼き直し不要。
 // x軸 = N・V、y軸 = 粗さ。出力の x を F0 に掛け、y を足すと鏡面の反射率になる
 
 RWTexture2D<float2> gBRDFLutOut : register(u0);

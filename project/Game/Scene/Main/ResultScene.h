@@ -68,10 +68,8 @@ public:
 	void DebugGUI()override;
 	void ParticleDebugGUI()override;
 
-	/// <summary>
-	/// シーンチェンジ
-	/// </summary>
-	void BlackFade();
+	/// <summary>入力を見てシーン遷移を始める</summary>
+	void CheckSceneChange();
 
 private:
 
@@ -113,10 +111,4 @@ private:
 	float lightIntensity_ = 0.6f;
 
 	HanabiPopReng popPos_;
-
-	// sceneChange
-	std::unique_ptr<Graphics::Sprite> black_;
-	float blackLimit_ = 20.0f;
-	float blackTime_ = 20.0f;
-	bool isChangePhase_ = false;
 };

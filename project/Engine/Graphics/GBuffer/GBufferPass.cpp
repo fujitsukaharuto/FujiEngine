@@ -144,8 +144,6 @@ void GBufferPass::DebugGUI() {
 		return;
 	}
 
-	ImGui::TextWrapped("本描画の前に深度とワールド法線を書き出すパス。画面空間のAO/デノイザが読む。"
-		"読み手が全て無効なら走らない(＝そのぶんの負荷は掛からない)");
 	ImGui::Text("this frame: %s", isEnabled_ ? "enabled by reader" : "no reader");
 	ImGui::Checkbox("Force enable (debug)##gbuffer", &debugForceEnabled_);
 

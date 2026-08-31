@@ -21,8 +21,7 @@ namespace Editor {
 		void DrawOperationRadio();
 
 		/// <summary>
-		/// ギズモを表示しTransに反映する。編集完了時にUndoコマンドを発行する。
-		/// 親がいる場合はワールドで操作してローカルへ戻す。
+		/// ギズモを表示しTransに反映する。編集完了時にUndoコマンドを発行する
 		/// </summary>
 		void Manipulate(Math::Trans& transform);
 

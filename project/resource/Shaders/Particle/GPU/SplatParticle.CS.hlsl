@@ -1,9 +1,8 @@
 #include "CSParticle.hlsli"
 #include "Splat.hlsli"
 
-// 生存パーティクルを画面へ点描(atomic加算)する。
-// 頂点・三角形セットアップを使わないコンピュート・ラスタライザ。
-// パーティクルバッファはUAV状態のまま読むため RWStructuredBuffer で受ける(状態遷移不要)。
+// 生存パーティクルを画面へ点描(atomic加算)するコンピュート・ラスタライザ。
+// パーティクルバッファはUAV状態のまま読むため RWStructuredBuffer で受ける
 RWStructuredBuffer<uint> gSplatAccum : register(u0);
 RWStructuredBuffer<Particle_Translate> gParticles_Trans : register(u1);
 RWStructuredBuffer<Particle_Color> gParticles_Color : register(u2);

@@ -23,14 +23,10 @@ static const float kPrefilteredMaxMip = 4.0f;
 static const float kBRDFLutSize = 256.0f;
 
 /// <summary>鏡面の反射率。split-sum の第2項を数表から引いて F0 に当てる</summary>
-/// <remarks>
-/// フレネルと幾何減衰を粗さと N・V の2変数に押し込んだもの。
-/// 直接光の F_Schlick と違い、視線と光源の全組み合わせを積分した後の値になっている
-/// </remarks>
+/// <remarks>フレネルと幾何減衰を粗さと N・V の2変数に押し込んだもの</remarks>
 float3 EnvironmentBRDF(float3 f0, float NdotV, float roughness, SamplerState smp)
 {
-    // ★リフレクション駆動のルートシグネチャが張る既定のサンプラーは WRAP なので、
-    // 端をそのまま引くと双一次補間が反対側の値を混ぜる(N・V=1 に N・V=0 の値が乗る)。
+    // 既定のサンプラーが WRAP なので、端をそのまま引くと双一次補間が反対側の値を混ぜる。
     // 半texel 内側へ寄せて防ぐ
     const float halfTexel = 0.5f / kBRDFLutSize;
     float2 uv = clamp(float2(NdotV, roughness), halfTexel, 1.0f - halfTexel);
@@ -55,10 +51,7 @@ float3 GetAmbientDiffuse(float3 N, uint ambientMode, float3 skyColor, float3 gro
 }
 
 /// <summary>鏡面のアンビエント(映り込み)。フレネルまで済ませた寄与を返す</summary>
-/// <remarks>
-/// 遮蔽の判定は経路によらず同じで、遮られていれば空の代わりに occludedColor を映す。
-/// IBL 経路は粗さでミップを選ぶので、粗い面ほど自然にぼやける(Hemisphere 経路は係数で落とすだけ)
-/// </remarks>
+/// <remarks>IBL 経路は粗さでミップを選ぶので粗い面ほどぼやける</remarks>
 /// <param name="V">視線方向(面 → カメラ、正規化済み)</param>
 /// <param name="occludedColor">遮蔽された向きに映す色</param>
 /// <param name="enableReflection">0なら遮蔽を見ない</param>

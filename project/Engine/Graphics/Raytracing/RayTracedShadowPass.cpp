@@ -138,9 +138,8 @@ void RayTracedShadowPass::DebugGUI() {
 
 	ImGui::Text("Raw");
 	ImGui::Image(static_cast<ImTextureID>(SRVManager::GetInstance()->GetGPUDescriptorHandle(raw_.srvIndex).ptr), size);
-	ImGui::Text("Denoised (this is what the forward pass reads)");
+	ImGui::Text("Denoised");
 	ImGui::Image(static_cast<ImTextureID>(GetShadowSrvHandle().ptr), size);
-	ImGui::TextWrapped("黒いほど影。Lights > RayTraced Shadow の Mode が Soft のときだけ更新される");
 
 	ImGui::TreePop();
 #endif // _DEBUGMODE

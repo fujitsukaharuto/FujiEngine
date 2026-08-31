@@ -25,7 +25,7 @@ void GameRun::Initialize() {
 
 #pragma region オブジェクト読み込み
 	ModelManager::GetInstance()->CreateSphere();
-	// resource/Models 内の.obj/.gltfを全て読み込む(T_boss.gltfもここに含まれる)
+	// resource/Models 内の.obj/.gltfを全て読み込む
 	modelManager_->LoadAllFileData();
 #pragma endregion
 

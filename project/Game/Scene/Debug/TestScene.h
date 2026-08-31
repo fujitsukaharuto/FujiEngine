@@ -4,7 +4,6 @@
 #include <vector>
 #include "Engine/Graphics/Object/Object3d.h"
 #include "Engine/Graphics/Object/AnimationModel.h"
-#include "Engine/Graphics/Sprite/Sprite.h"
 
 /// <summary>
 /// Testシーンクラス
@@ -21,10 +20,8 @@ public:
 	void DebugGUI()override;
 	void ParticleDebugGUI()override;
 
-	/// <summary>
-	/// シーンチェンジ
-	/// </summary>
-	void BlackFade();
+	/// <summary>入力を見てシーン遷移を始める</summary>
+	void CheckSceneChange();
 
 private:
 
@@ -48,11 +45,4 @@ private:
 	std::vector<std::unique_ptr<Graphics::Object3d>> objects_;
 	// スキンメッシュ。影を受ける側と落とす側を兼ねる
 	std::vector<std::unique_ptr<Graphics::AnimationModel>> animeObjects_;
-
-	// sceneChange
-	std::unique_ptr<Graphics::Sprite> black_;
-	float blackLimit_ = 20.0f;
-	float blackTime_ = 20.0f;
-	bool isChangePhase_ = false;
-	bool isParticleDebugScene_ = false;
 };

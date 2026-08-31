@@ -60,7 +60,10 @@ void BaseScene::ParticleGroupDebugGUI() {
 
 void BaseScene::ChangeScene(const std::string& sceneName, float extraTime) {
 	sceneManager_->ChangeScene(sceneName, extraTime);
-	CommandManager::GetInstance()->Reset();
+}
+
+bool BaseScene::IsFading() const {
+	return sceneManager_->IsFading();
 }
 
 void BaseScene::DrawEditorObjects() {

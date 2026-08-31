@@ -6,6 +6,7 @@
 #include <fstream>
 #include <filesystem>
 #include <iostream>
+#include "Engine/Core/Thread/ParallelFor.h"
 
 #include "externals/DirectXTex/DirectXTex.h"
 #include "externals/DirectXTex/d3dx12.h"
@@ -52,30 +53,40 @@ Texture* TextureManager::LoadTexture(const std::string& filename) {
 }
 
 void TextureManager::Load(const std::string& filename, bool overWrite) {
-	SRVManager* srvManager = SRVManager::GetInstance();
-
-	// すでにある場合
-	auto it = textureCache_.find(filename);
-	Texture* texture = nullptr;
-	if (it != textureCache_.end()) {
-		if (!overWrite) {
-			return; // 上書きしない指定ならそのまま終了
-		}
-		texture = it->second.get(); // 既存のポインタを再利用
-	} else {
-		textureCache_[filename] = std::move(std::make_unique<Texture>());
-		texture = textureCache_[filename].get();
-		texture->srvIndex = UINT_MAX;
+	Texture* texture = PrepareSlot(filename, overWrite);
+	if (!texture) {
+		return;
 	}
 
-	// 新しいデータ読み込み
-	DirectX::ScratchImage mipImages = ReadImageFile(directoryPath_ + filename);
+	RegisterTexture(texture, ReadImageFile(directoryPath_ + filename));
+
+	FlushUploads();
+}
+
+Texture* TextureManager::PrepareSlot(const std::string& filename, bool overWrite) {
+	auto it = textureCache_.find(filename);
+	if (it != textureCache_.end()) {
+		if (!overWrite) {
+			return nullptr;
+		}
+		return it->second.get(); // 既存のポインタを再利用
+	}
+
+	auto& slot = textureCache_[filename];
+	slot = std::make_unique<Texture>();
+	slot->srvIndex = UINT_MAX;
+	return slot.get();
+}
+
+void TextureManager::RegisterTexture(Texture* texture, const DirectX::ScratchImage& mipImages) {
+	SRVManager* srvManager = SRVManager::GetInstance();
+
 	texture->meta = mipImages.GetMetadata();
 
 	texture->textureResource = CreateTextureResource(dxcommon_->GetDevice(), texture->meta);
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource =
-		UploadTextureData(texture->textureResource, mipImages, dxcommon_->GetDevice(), dxcommon_->GetImmediateList());
+	pendingUploads_.push_back(
+		UploadTextureData(texture->textureResource, mipImages, dxcommon_->GetDevice(), dxcommon_->GetImmediateList()));
 
 	// すでにSRVを持っていなければ割り当て
 	if (texture->srvIndex == UINT_MAX) {
@@ -92,21 +103,50 @@ void TextureManager::Load(const std::string& filename, bool overWrite) {
 
 	texture->cpuHandle = srvManager->GetCPUDescriptorHandle(texture->srvIndex);
 	texture->gpuHandle = srvManager->GetGPUDescriptorHandle(texture->srvIndex);
+}
+
+void TextureManager::FlushUploads() {
+	if (pendingUploads_.empty()) {
+		return;
+	}
 
 	dxcommon_->CommandExecution();
+	pendingUploads_.clear();
 }
 
 void Graphics::TextureManager::LoadAll() {
 	if (!std::filesystem::exists(directoryPath_)) return;
 
+	// 読み込む対象を先に確定させる。すでにキャッシュにあるものは触らない
+	std::vector<std::string> names;
 	for (const auto& entry : std::filesystem::directory_iterator(directoryPath_)) {
 		if (entry.is_regular_file()) {
 			auto path = entry.path();
 			if (path.extension() == ".png" || path.extension() == ".jpg") {
-				Load(path.filename().string());
+				std::string name = path.filename().string();
+				if (textureCache_.find(name) == textureCache_.end()) {
+					names.push_back(std::move(name));
+				}
 			}
 		}
 	}
+
+	// デコードとミップ生成はD3Dに触らない純粋なCPU仕事なので並列に回す
+	std::vector<DirectX::ScratchImage> images(names.size());
+	Core::ParallelFor(names.size(), [&](size_t i) {
+		images[i] = ReadImageFile(directoryPath_ + names[i]);
+	});
+
+	// リソース生成とSRVの割り当てはD3Dに触るので直列。転送の実行は最後に一度だけ
+	for (size_t i = 0; i < names.size(); ++i) {
+		Texture* texture = PrepareSlot(names[i], false);
+		if (!texture) {
+			continue;
+		}
+		RegisterTexture(texture, images[i]);
+	}
+
+	FlushUploads();
 }
 
 void TextureManager::ScanTextureFolder(bool markPendingReload) {

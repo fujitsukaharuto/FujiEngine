@@ -10,12 +10,7 @@ namespace Graphics {
 	/// <summary>
 	/// 環境マップから IBL 用のテクスチャを焼いて、前方描画へ渡すクラス
 	/// </summary>
-	/// <remarks>
-	/// 焼くのは起動後の最初のフレームに一度きり。Initialize では場所だけ確保し、実際の畳み込みは
-	/// EnsureBaked が描画のコマンドリストへ積む。初期化の中で焼かないのは、
-	/// 環境マップが読めているかを初期化順に頼らずに済ませるためと、まだ開いていない描画リストの
-	/// 代わりに immediate リストを回す手間を避けるため
-	/// </remarks>
+	/// <remarks>焼くのは起動後の最初のフレームに一度きり。畳み込みは EnsureBaked が描画のコマンドリストへ積む</remarks>
 	class IBLBaker {
 	public:
 		IBLBaker() = default;
@@ -29,10 +24,7 @@ namespace Graphics {
 		void RenderPreview(ID3D12GraphicsCommandList* commandList);
 
 		/// <summary>まだ焼いていなければ焼く</summary>
-		/// <remarks>
-		/// 環境マップがまだ読めていないフレームは何もしないので、次のフレームで焼き直しを試みる。
-		/// 描画のコマンドリストが開いている間に呼ぶこと(バリアもディスパッチもそこへ積む)
-		/// </remarks>
+		/// <remarks>環境マップがまだ読めていないフレームは何もしない。描画のコマンドリストが開いている間に呼ぶこと</remarks>
 		void EnsureBaked(ID3D12GraphicsCommandList* commandList);
 
 		void DebugGUI();

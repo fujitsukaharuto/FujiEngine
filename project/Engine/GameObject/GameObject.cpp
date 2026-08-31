@@ -5,8 +5,7 @@
 
 using namespace Collision;
 
-// ★名前空間とクラス名が同名なので using namespace GameObject; は書けない(曖昧になる)。
-// 定義は名前空間ブロックで囲む
+// 名前空間とクラス名が同名なので using namespace GameObject; は書けない
 namespace GameObject {
 
 	using namespace Core;
@@ -23,10 +22,7 @@ namespace GameObject {
 	GameObject::~GameObject() = default;
 
 	void GameObject::Initialize() {
-		// 描画オブジェクトはここで両方作らない。
 		// CreateModel系が呼ばれたときに必要な方だけ生成する
-		// (両方作ると、片方しか使わないオブジェクトが空のObject3d/AnimationModelを抱え続け、
-		//  GetTransが「一度もCreateされていない方」のTransformを静かに返す事故も起きる)
 	}
 
 	Graphics::Object3d* GameObject::EnsureModel() {

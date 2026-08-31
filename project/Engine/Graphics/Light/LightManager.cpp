@@ -114,8 +114,6 @@ void LightManager::DebugGUI() {
 			if (ImGui::Combo("Mode##ambient", &ambientMode, "Hemisphere (sky/ground)\0IBL (baked cubemap)\0")) {
 				allLightsData_.ambientMode = static_cast<uint32_t>(ambientMode);
 			}
-			ImGui::TextWrapped("IBL は環境マップから焼いたものを引く。SkyColor/GroundColor は Hemisphere 専用で、"
-				"Intensity だけは両方に掛かる");
 
 			ImGui::ColorEdit3("SkyColor", &allLightsData_.ambientSkyColor.x);
 			ImGui::ColorEdit3("GroundColor", &allLightsData_.ambientGroundColor.x);
@@ -140,19 +138,18 @@ void LightManager::DebugGUI() {
 			maskCheckbox("Spot", kShadowMaskSpot);
 
 			ImGui::SeparatorText("Soft shadow (directional)");
-			// Hard にすると G-Buffer のプリパスごと止まる(AOも切っていれば)ので、切っている間の負荷はゼロ
+			// Hard かつ AO も切っていれば G-Buffer のプリパスごと止まる
 			int shadowMode = static_cast<int>(allLightsData_.shadowMode);
 			if (ImGui::Combo("Mode##shadow", &shadowMode, "Hard (in forward PS)\0Soft (screen space)\0")) {
 				allLightsData_.shadowMode = static_cast<uint32_t>(shadowMode);
 			}
-			ImGui::TextWrapped("Soft が受け持つのは0番の平行光源だけ。2本目以降と点光源/スポットは Hard のまま");
 
-			// 見かけの半径がそのまま半影の広がりになる。角度なので遮蔽物が遠いほど広くなる
+			// 角度で散らすので、遮蔽物が遠いほど半影が広がる
 			float angularRadiusDeg = allLightsData_.sunAngularRadius * 180.0f / std::numbers::pi_v<float>;
 			if (ImGui::SliderFloat("Angular radius##shadow", &angularRadiusDeg, 0.0f, 10.0f, "%.2f deg")) {
 				allLightsData_.sunAngularRadius = angularRadiusDeg * std::numbers::pi_v<float> / 180.0f;
 			}
-			// レイの本数がそのまま負荷になるので、上げるときはFPSではなくmsを見ること
+			// 本数がそのまま負荷になる
 			int shadowSamples = static_cast<int>(allLightsData_.shadowSampleCount);
 			if (ImGui::SliderInt("Samples##shadow", &shadowSamples, 1, 16)) {
 				allLightsData_.shadowSampleCount = static_cast<uint32_t>(shadowSamples);
@@ -161,14 +158,12 @@ void LightManager::DebugGUI() {
 		}
 
 		if (ImGui::TreeNode("RayTraced AO")) {
-			// Off にすると G-Buffer のプリパスごと止まるので、切っている間の負荷はゼロ
+			// Off にすると G-Buffer のプリパスごと止まる
 			int aoMode = static_cast<int>(allLightsData_.aoMode);
 			if (ImGui::Combo("Mode##ao", &aoMode, "Off\0Inline (no denoise)\0Screen space\0")) {
 				allLightsData_.aoMode = static_cast<uint32_t>(aoMode);
 			}
-			ImGui::TextWrapped("Inline は前方描画のPSで直接飛ばす旧経路(デノイズ不可)。"
-				"Screen が別パス版で、こちらだけデノイザが掛かる");
-			// レイの本数がそのまま負荷になるので、上げるときはFPSを見ること
+			// 本数がそのまま負荷になる
 			int sampleCount = static_cast<int>(allLightsData_.aoSampleCount);
 			if (ImGui::SliderInt("Samples", &sampleCount, 1, 16)) {
 				allLightsData_.aoSampleCount = static_cast<uint32_t>(sampleCount);

@@ -17,10 +17,7 @@ namespace Graphics {
 	/// <summary>
 	/// 画面空間の1チャンネル信号から、レイの本数が足りないことによる粒を落とすクラス
 	/// </summary>
-	/// <remarks>
-	/// 前フレームへ再投影して蓄積する時間方向と、à-trous のエッジ保持ブラーを掛ける空間方向の2段。
-	/// AOも影も入出力が1チャンネルで中身が同じなので、信号を持つパスが1つずつこれを持つ形にしてある
-	/// </remarks>
+	/// <remarks>前フレームへ再投影する時間方向と、à-trous のブラーを掛ける空間方向の2段</remarks>
 	class Denoiser {
 	public:
 		Denoiser() = default;

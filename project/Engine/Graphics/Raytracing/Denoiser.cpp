@@ -254,7 +254,6 @@ void Denoiser::DebugGUI() {
 		return;
 	}
 
-	ImGui::TextWrapped("両方を切ると生の信号がそのまま出る。粒の量を見比べるとき用");
 	ImGui::Checkbox("Temporal (reprojection)", &enableTemporal_);
 	ImGui::SliderInt("Spatial iterations", &spatialIterations_, 0, static_cast<int>(kMaxSpatialIterations_));
 

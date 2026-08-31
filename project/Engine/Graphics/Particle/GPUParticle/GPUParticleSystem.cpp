@@ -94,11 +94,8 @@ void GPUParticleSystem::Dispatch() {
 	// プール2枚化(ピンポン): 書き込み先を反転。readIdx = writeIdx_^1。Drawは本フレーム後段なのでwriteIdx_を読む。
 	writeIdx_ ^= 1;
 
-	// 0. Stage2(フェンス並走化): splatが2フレーム連続で有効なときのみ compute_N と Draw_{N-1} を並走させる。
-	//    省ける理由: 本フレームcomputeが書く writeBuf[writeIdx_] は2フレーム前のDrawが読んだ面で、BeginFrameの
-	//    CPU側ダブルバッファ待ち(graphics fence[frameIndex])で完了保証済 → GPU側の前フレームGraphics待ちは不要。
-	//    computeはreadBufを読むのみ(前フレームDrawとread-read)、単一バッファ(scale等)はsplat Drawが読まない。
-	//    ラスタ1/4はscaleも読むため対象外。モード切替直後(prev!=splat)はscaleハザード回避のため直列に戻す。
+	// Stage2: splatが2フレーム連続で有効なときだけ compute_N と Draw_{N-1} を並走させる。
+	// 書き込み先は2フレーム前のDrawが読んだ面で、BeginFrameのダブルバッファ待ちで完了保証済み
 	bool overlap = useOverlap_ && useComputeSplat_ && prevUseComputeSplat_;
 	if (!overlap) {
 		// 直列: 前フレームGraphics(同プール読み取り)の完了をCompute Queue側で待ってから更新書き込みを始める
@@ -214,9 +211,8 @@ void GPUParticleSystem::SplatDraw() {
 	// 深度テスト可否を反映(フル解像度時のみ有効)。splatは常にフルサイズなので useFullResolution_ で切替。
 	splatParamData_->enableDepthTest = useFullResolution_ ? 1u : 0u;
 
-	// シーン遮蔽の深度テスト用に、深度を DEPTH_WRITE→読み取り可能状態へ遷移。
-	// 粒子描画は不透明描画(深度書込み)後・post-effect(OutlineCS が DEPTH_WRITE 前提)前なので、ここでは深度はDEPTH_WRITE。
-	// gSceneDepthは常にバインドするため、深度テストOFF時もバインド先が読み取り可能状態になるよう常に遷移する。
+	// 深度を DEPTH_WRITE から読み取り可能状態へ遷移。gSceneDepth は常にバインドするので
+	// 深度テストOFF時も遷移させる
 	dxcommon_->TransitionDepthToRead();
 
 	// パーティクルを画面へ点描(2D Dispatch、プールはUAVのまま読む)

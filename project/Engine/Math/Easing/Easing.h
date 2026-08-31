@@ -5,10 +5,7 @@ namespace Math {
 	/// <summary>
 	/// イージング関数群
 	/// </summary>
-	/// <remarks>
-	/// 全て t=0 で 0、t=1 で 1 を返す。t は呼び出し側で 0〜1 に収めること
-	/// (Clamp01 を通すと安全)。Back / Elastic / Bounce は途中で 0〜1 を飛び出す
-	/// </remarks>
+	/// <remarks>全て t=0 で 0、t=1 で 1 を返す。Back / Elastic / Bounce は途中で 0〜1 を飛び出す</remarks>
 	namespace Ease {
 
 		//========================================================================*/

@@ -25,6 +25,7 @@ SceneManager::~SceneManager() {
 void SceneManager::Initialize(DXCom* pDxcom, Graphics::LightManager* pLightManager) {
 	dxcommon_ = pDxcom;
 	lightManager_ = pLightManager;
+	fade_.Initialize();
 }
 
 void SceneManager::Finalize() {
@@ -36,14 +37,18 @@ void SceneManager::Update() {
 		if (scene_) {
 			scene_->Update();
 		}
-		if (isFinish_) {
-			finishTime -= FPSKeeper::DeltaTimeFrame();
-			if (finishTime <= 0.0f) {
-
-			}
-		}
 	} else {
 		changeExtraTime -= FPSKeeper::DeltaTimeFrame();
+	}
+
+	fade_.Update();
+
+	// 暗転しきってから次のシーンを作る。ここから SceneSet() で差し替わるまでが extraTime の待ち時間
+	if (!nextSceneName_.empty() && fade_.IsCovered()) {
+		nextScene_ = sceneFactory_->CreateScene(nextSceneName_);
+		nextSceneName_.clear();
+		isChange_ = true;
+		changeExtraTime = nextExtraTime_;
 	}
 }
 
@@ -51,6 +56,8 @@ void SceneManager::Draw() {
 	if (scene_) {
 		scene_->Draw();
 	}
+	// シーンが積んだスプライトより後に積む＝一番手前に出る
+	fade_.Draw();
 }
 
 void SceneManager::StartScene(const std::string& sceneName) {
@@ -60,23 +67,24 @@ void SceneManager::StartScene(const std::string& sceneName) {
 	scene_ = sceneFactory_->CreateScene(sceneName);
 	scene_->Init(dxcommon_, this, lightManager_);
 	scene_->Initialize();
+
+	// 最初のシーンも黒から明ける
+	fade_.In();
 }
 
 void SceneManager::ChangeScene(const std::string& sceneName, float extraTime) {
 	assert(sceneFactory_);
-	assert(nextScene_ == nullptr);
 
-	isChange_ = true;
-	changeExtraTime = extraTime;
-	finishTime = extraTime * 5.0f;
-	if (finishTime == 0.0f) {
-		finishTime = 60.0f;
+	// 遷移中の再要求は無視する。暗転をやり直すと最初の行き先が消える
+	if (isChange_ || !nextSceneName_.empty()) {
+		return;
 	}
 
-	isFinish_ = true;
+	nextSceneName_ = sceneName;
+	nextExtraTime_ = extraTime;
 
-	// 次のシーンを作成
-	nextScene_ = sceneFactory_->CreateScene(sceneName);
+	// 実際にシーンを作るのは暗転しきってから
+	fade_.Out();
 }
 
 void SceneManager::DebugGUI() {
@@ -112,9 +120,15 @@ void SceneManager::SceneSet() {
 			// 所有権を nextScene_ から scene_ へ移動
 			scene_ = std::move(nextScene_);
 
+			// エディタで置いたオブジェクトは前のシーンのものなので、ここで手放す
+			CommandManager::GetInstance()->Reset();
+
 			scene_->Init(dxcommon_, this, lightManager_);
 			scene_->Initialize();
 			isChange_ = false;
+
+			// 新しいシーンの用意ができたので明ける
+			fade_.In();
 		}
 	}
 }
@@ -148,7 +162,6 @@ void SceneManager::SceneChangeGUI() {
 			ImGui::SameLine();
 			if (ImGui::Button("Change") && !names.empty()) {
 				ChangeScene(names[sceneSelection_], 20.0f);
-				CommandManager::GetInstance()->Reset();
 			}
 		}
 		ImGui::TreePop();

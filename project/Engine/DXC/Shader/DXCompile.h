@@ -46,6 +46,7 @@ namespace DXC {
 
 	public:
 
+		/// <summary>呼び出したスレッドぶんの dxc を用意する</summary>
 		void Initialize();
 
 		/// <summary>
@@ -115,9 +116,7 @@ namespace DXC {
 
 	private:
 
-		Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils_;
-		Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler_;
-		Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler_;
+		// dxc のインスタンスはスレッドごとに持つため .cpp 側の thread_local にある
 
 
 	};

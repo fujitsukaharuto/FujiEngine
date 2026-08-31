@@ -6,9 +6,7 @@ namespace Graphics {
 	/// <summary>
 	/// デバッグカメラクラス
 	/// </summary>
-	/// <remarks>
-	/// 射影は Camera 側の設定をそのまま使うので、こちらはビュー行列だけを作る
-	/// </remarks>
+	/// <remarks>射影は Camera 側の設定を使うので、こちらはビュー行列だけを作る</remarks>
 	class DebugCamera {
 	public:
 		DebugCamera() = default;
@@ -42,9 +40,7 @@ namespace Graphics {
 		/// <summary>
 		/// 直前のマウス位置を現在値に合わせる
 		/// </summary>
-		/// <remarks>
-		/// デバッグカメラへ切り替えた瞬間に、溜まっていた移動量で視点が飛ぶのを防ぐ
-		/// </remarks>
+		/// <remarks>切り替えた瞬間に溜まっていた移動量で視点が飛ぶのを防ぐ</remarks>
 		void SyncMousePosition();
 
 

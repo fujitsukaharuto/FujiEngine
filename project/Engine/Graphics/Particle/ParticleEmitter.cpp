@@ -57,7 +57,7 @@ void ParticleEmitter::DebugGUI() {
 
 		ImGui::Spacing();
 
-		ImGui::TextColored(ImVec4(0.8f, 0.8f, 0.4f, 1.0f), "パーティクル発生範囲");
+		ImGui::SeparatorText("パーティクル発生範囲");
 		ImGui::Text("発生範囲　最大:");
 		ImGui::SetNextItemWidth(-FLT_MIN);
 		ImGui::DragFloat3("##SizeMax", &emitSizeMax_.x, 0.01f);
@@ -150,7 +150,7 @@ void ParticleEmitter::DebugGUI() {
 			ImGui::Checkbox("継続回転 有効化", &grain_.isContinuouslyRotate_);
 
 			ImGui::Spacing();
-			ImGui::TextColored(ImVec4(0.8f, 0.8f, 0.4f, 1.0f), "ビルボード設定");
+			ImGui::SeparatorText("ビルボード設定");
 			ImGui::Checkbox("ビルボード 有効化", &grain_.isBillBoard_);
 			if (grain_.isBillBoard_) {
 				ImGui::Indent();
@@ -191,7 +191,7 @@ void ParticleEmitter::DebugGUI() {
 
 			if (grain_.speedType_ == static_cast<int>(SpeedType::kReturn)) {
 				ImGui::Spacing();
-				ImGui::TextColored(ImVec4(0.8f, 0.8f, 0.4f, 1.0f), "Acceleration (Gravity)");
+				ImGui::SeparatorText("Acceleration (Gravity)");
 				ImGui::DragFloat3("Accel Vector", &grain_.accele_.x, 0.01f);
 			}
 
@@ -216,7 +216,7 @@ void ParticleEmitter::EmitProgressGUI() {
 	if (frequencyTime_ != 0.0f) {
 		t = 1.0f - (time_ / frequencyTime_);
 	}
-	ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "発生まで:");
+	ImGui::TextDisabled("発生まで:");
 	ImGui::ProgressBar(t, ImVec2(0, 0));
 
 #endif // _DEBUG
@@ -348,7 +348,6 @@ void ParticleEmitter::Emit() {
 				if (grain_.isParent_) {
 					grain_.speed_ = (rPos - (posAddSize + rPos)) * grain_.returnPower_;
 				} else {
-					//rPos = pos_ + Vector3{ worldMatrix_.m[3][0], worldMatrix_.m[3][1], worldMatrix_.m[3][2] };
 					grain_.speed_ = (rPos - posAddSize) * grain_.returnPower_;
 				}
 			}

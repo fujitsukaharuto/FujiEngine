@@ -7,10 +7,7 @@ namespace GameObject {
 	/// <summary>
 	/// ステートマシンが持つ状態1つ分の基底クラス
 	/// </summary>
-	/// <remarks>
-	/// Enter/Exit は用意しない。入場処理はコンストラクタ、退場処理はデストラクタに書くこと
-	/// (StateMachine が差し替えた時点で前の状態は破棄される)
-	/// </remarks>
+	/// <remarks>Enter/Exit は持たない。入場はコンストラクタ、退場はデストラクタに書く</remarks>
 	template<class TOwner>
 	class State {
 	public:
@@ -34,11 +31,7 @@ namespace GameObject {
 	public:
 
 		/// <summary>次の状態を要求する</summary>
-		/// <remarks>
-		/// Update() の中(=状態自身の Update)から呼ばれた場合は、Update() から戻るまで差し替えを遅らせる。
-		/// そうしないと要求した状態自身がその場で破棄され、続きの処理が解放済みメモリ上で動く。
-		/// Update() の外から呼んだ場合は即座に差し替わる(初期状態の設定やリセット用)
-		/// </remarks>
+		/// <remarks>Update() の中から呼ぶと差し替えは Update() の後まで遅れる。外から呼べば即座に差し替わる</remarks>
 		void Request(std::unique_ptr<TState> next) {
 			if (isUpdating_) {
 				next_ = std::move(next);

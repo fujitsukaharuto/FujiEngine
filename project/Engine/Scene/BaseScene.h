@@ -40,13 +40,19 @@ namespace Scene {
 		virtual void ParticleGroupDebugGUI();
 
 		/// <summary>シーンの変更</summary>
-		void ChangeScene(const std::string& sceneName, float extraTime);
+		/// <remarks>暗転・明転は SceneManager が行うのでシーン側は何も描かなくてよい。
+		/// extraTime は暗転しきってから次シーンに入るまでの待ちフレーム数</remarks>
+		void ChangeScene(const std::string& sceneName, float extraTime = 40.0f);
 
 	protected:
 
 		/// <summary>エディタで配置したオブジェクトを描画する</summary>
 		/// <remarks>Debug構成以外では何もしないので、呼び出し側で分岐する必要はない</remarks>
 		void DrawEditorObjects();
+
+		/// <summary>暗転・明転のどれかが動いている</summary>
+		/// <remarks>遷移の入力を受け付けてよいかの判定に使う</remarks>
+		bool IsFading() const;
 
 	private:
 

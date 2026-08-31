@@ -48,11 +48,7 @@ namespace Graphics {
 		/// <summary>
 		/// マテリアルのデータ
 		/// </summary>
-		/// <remarks>
-		/// HLSL 側の Material 構造体(Object3d.hlsli)と**並び順が完全に一致していること**。
-		/// 全て4バイトのスカラなので float4 境界を跨がず、素直に前から詰まる。
-		/// 途中に挿入すると以降のオフセットが全部ずれるので、追加は必ず末尾に行うこと
-		/// </remarks>
+		/// <remarks>HLSL 側の Material(Object3d.hlsli)と並び順が一致していること。追加は必ず末尾</remarks>
 		struct MaterialData {
 			Math::Vector4 color;
 			Math::Matrix4x4 uvTransform;

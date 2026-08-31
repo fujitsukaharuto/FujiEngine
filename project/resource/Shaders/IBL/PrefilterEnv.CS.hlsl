@@ -1,9 +1,8 @@
 #include "../Common/IBLBake.hlsli"
 #include "../Common/PBR.hlsli"
 
-// 環境マップを粗さごとに GGX で畳み込んで、ミップ列として焼く。
-// ミップ番号がそのまま粗さに対応するので、引く側は roughness からミップを選ぶだけでよい。
-// 1ミップにつき1ディスパッチ。UAV はそのミップだけを指す
+// 環境マップを粗さごとに GGX で畳み込んでミップ列として焼く。
+// ミップ番号がそのまま粗さに対応する。1ミップにつき1ディスパッチ
 
 TextureCube<float4> gSourceEnv : register(t0);
 RWTexture2DArray<float4> gPrefilteredOut : register(u0);

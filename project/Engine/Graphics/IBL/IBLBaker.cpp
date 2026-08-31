@@ -294,15 +294,12 @@ void IBLBaker::DebugGUI() {
 	ImGui::Text("source     : %u x %u", bakedSourceSize_, bakedSourceSize_);
 	ImGui::Text("irradiance : %u x %u x 6", kIrradianceSize_, kIrradianceSize_);
 	ImGui::Text("prefiltered: %u x %u x 6, %u mips", kPrefilteredSize_, kPrefilteredSize_, kPrefilteredMipLevels_);
-	ImGui::TextWrapped("焼くのは起動後の1フレームだけ。Lights > Ambient の Mode を IBL にすると引き始める");
 
 	ImGui::Text("BRDF LUT (x = N・V, y = roughness)");
 	ImGui::Image(static_cast<ImTextureID>(GetBRDFLutSrvHandle().ptr), ImVec2(128.0f, 128.0f));
 
 	ImGui::SeparatorText("Preview");
 	ImGui::Checkbox("Enable preview", &isPreviewEnabled_);
-	ImGui::TextWrapped("キューブマップを正距円筒に開いて並べる。"
-		"Source と Prefiltered(mip 0) がほぼ同じ絵にならないなら焼く側が疑わしい");
 	// HDR なので ImGui 上では 1.0 で頭打ちになる。下げると明るい所の模様が見える
 	ImGui::SliderFloat("exposure##ibl", &previewExposure_, 0.01f, 2.0f, "%.3f", ImGuiSliderFlags_Logarithmic);
 	ImGui::SliderFloat("mip##ibl", &previewMip_, 0.0f, static_cast<float>(kPrefilteredMipLevels_ - 1));

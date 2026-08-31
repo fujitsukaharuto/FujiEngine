@@ -20,14 +20,19 @@ void CollisionManager::CheckCollisionPair(BaseCollider* A, BaseCollider* B) {
 		return;
 	}
 
+	CheckAABBPair(aabbA, aabbB);
+}
+
+void CollisionManager::CheckAABBPair(AABBCollider* A, AABBCollider* B) {
+
 	// 判定が無効なペアは、重なっていても「離れている」として扱う(既に衝突中ならExitになる)
 	const bool isColliding =
-		aabbA->GetIsCollisonCheck() &&
-		aabbB->GetIsCollisonCheck() &&
-		checkAABBCollision(aabbA, aabbB);
+		A->GetIsCollisonCheck() &&
+		B->GetIsCollisonCheck() &&
+		checkAABBCollision(A, B);
 
-	NotifyCollision(aabbA, aabbB, isColliding);
-	NotifyCollision(aabbB, aabbA, isColliding);
+	NotifyCollision(A, B, isColliding);
+	NotifyCollision(B, A, isColliding);
 }
 
 void CollisionManager::NotifyCollision(AABBCollider* self, AABBCollider* other, bool isColliding) {
@@ -91,7 +96,7 @@ void CollisionManager::CheckAllCollision() {
 
 	for (size_t i = 0; i < aabbColliders_.size(); ++i) {
 		for (size_t j = i + 1; j < aabbColliders_.size(); ++j) {
-			CheckCollisionPair(aabbColliders_[i], aabbColliders_[j]);
+			CheckAABBPair(aabbColliders_[i], aabbColliders_[j]);
 		}
 	}
 }

@@ -3,6 +3,7 @@
 #include <string>
 #include <unordered_map>
 #include <memory>
+#include <vector>
 #include <d3d12.h>
 #include <wrl/client.h>
 #include <wincodec.h>
@@ -59,6 +60,17 @@ namespace Graphics {
 
 	private:
 
+		/// <summary>キャッシュの枠を確保する</summary>
+		/// <returns>上書きしない指定で既に読み込み済みなら nullptr</returns>
+		Texture* PrepareSlot(const std::string& filename, bool overWrite);
+
+		/// <summary>読み込み済みのイメージからGPUリソースとSRVを作る</summary>
+		/// <remarks>転送コマンドを積むだけで実行はしない。実行は FlushUploads() が行う</remarks>
+		void RegisterTexture(Texture* texture, const DirectX::ScratchImage& mipImages);
+
+		/// <summary>積んだ転送をまとめて実行し、GPUの完了を待つ</summary>
+		void FlushUploads();
+
 		/// <summary>画像ファイル1枚を読んでミップ付きのイメージを返す</summary>
 		DirectX::ScratchImage ReadImageFile(const std::string& filePath);
 		Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResource(const Microsoft::WRL::ComPtr<ID3D12Device>& device, const DirectX::TexMetadata& metadata);
@@ -71,6 +83,10 @@ namespace Graphics {
 		DXC::DXCom* dxcommon_;
 
 		std::unordered_map<std::string, std::unique_ptr<Texture>> textureCache_;
+
+		/// <summary>転送がGPUで終わるまで生かしておく中間バッファ</summary>
+		/// <remarks>FlushUploads() で解放する。ここを持つので転送をまとめられる</remarks>
+		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> pendingUploads_;
 
 		std::vector<std::pair<std::string, bool>> textureFileList_;
 

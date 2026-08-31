@@ -16,9 +16,7 @@ struct VertexShaderInput
 };
 
 // --- 定数バッファの中身 -------------------------------------------------
-// C++ 側 (Material::MaterialData / LightManager::AllLightsData) と並び順が
-// 完全に一致していること。ここへ集約してあるのは、同じ構造体を複数のシェーダに
-// 書き写すとレイアウトが静かに分岐するため。
+// C++ 側 (Material::MaterialData / LightManager::AllLightsData) と並び順が一致していること
 
 struct Material
 {

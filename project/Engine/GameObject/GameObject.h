@@ -23,10 +23,7 @@ namespace GameObject {
 
 		virtual void Initialize();
 		/// <summary>基底が持つコンポーネント(コライダー等)を更新する</summary>
-		/// <remarks>
-		/// 派生は override して自分の処理を書き、**最後に GameObject::GameObject::Update() を呼ぶ**こと。
-		/// 位置を動かした後に呼ばないと、当たり判定が1フレーム古い位置で行われる
-		/// </remarks>
+		/// <remarks>派生は override 後に必ず GameObject::GameObject::Update() を呼ぶこと</remarks>
 		virtual void Update();
 		virtual void Draw(bool is = false);
 		virtual void DebugGUI();
@@ -69,7 +66,7 @@ namespace GameObject {
 		Graphics::AnimationModel* GetAnimeModel() { return animeModel_; }
 
 		/// <summary>生成済みの描画オブジェクトを基底(RenderObject)として返す</summary>
-		/// <remarks>model_ と animeModel_ は同時に生成しない設計。生成済みの方を返し、未生成なら nullptr</remarks>
+		/// <remarks>生成済みの方を返し、未生成なら nullptr</remarks>
 		Graphics::RenderObject* GetRenderObject() {
 			if (model_) { return model_; }
 			return animeModel_;
@@ -111,17 +108,10 @@ namespace GameObject {
 		/// <summary>子ビジュアル(Object3d)を name で生成(Create済)・登録し、ハンドルを返す</summary>
 		Graphics::Object3d* AddRenderer(const std::string& name);
 		/// <summary>Transformアンカー(エミッタやコライダーの親にするだけの点)を生成・登録し、ハンドルを返す</summary>
-		/// <remarks>
-		/// 描画しないので Object3d ではなく Math::Trans を使う(定数バッファもマテリアルも確保しない)。
-		/// scale は 1 で初期化する。0 のままだと子の GetWorldMat が潰れ、RemoveScale では 0 除算になる。
-		/// 所有権は anchors_ が持ち、ハンドルのアドレスは追加しても動かない
-		/// </remarks>
+		/// <remarks>描画しないので Math::Trans を使う。scale は 1 で初期化する</remarks>
 		Math::Trans* AddAnchor();
 		/// <summary>コライダーを生成・登録し、設定用ハンドルを返す</summary>
-		/// <remarks>
-		/// タグ・オーナー・3つのコールバックはここで結線するので、派生側はサイズと親だけ設定すればよい。
-		/// 所有権は colliders_ が持つ
-		/// </remarks>
+		/// <remarks>タグ・オーナー・コールバックはここで結線するので、派生はサイズと親だけ設定すればよい</remarks>
 		Collision::AABBCollider* AddCollider(const std::string& tag = "");
 
 		/// <summary>描画物を renderers_ へ登録する</summary>
@@ -144,16 +134,12 @@ namespace GameObject {
 			bool visible = true;
 		};
 
-		/// <summary>このオブジェクトが持つ描画物。主ビジュアルも子ビジュアルもここが所有する(=MeshRenderer相当)</summary>
-		/// <remarks>
-		/// **主ビジュアル(CreateModel系で作るもの)は必ず最後尾**。影のような非additiveの子ビジュアルは
-		/// 本体より前に描く必要があるので、この並び順そのものが描画順の意味を持つ。
-		/// 追加は RegisterRenderer() を通すこと(この不変条件をそこで守っている)
-		/// </remarks>
+		/// <summary>このオブジェクトが持つ描画物。主ビジュアルも子ビジュアルもここが所有する</summary>
+		/// <remarks>主ビジュアルは最後尾。並び順がそのまま描画順になる</remarks>
 		std::vector<RendererEntry> renderers_;
 
 		/// <summary>主ビジュアルへのハンドル。実体の所有は renderers_ が持つ</summary>
-		/// <remarks>Object3d と AnimationModel は同時に生成しない設計。生成していない側は nullptr</remarks>
+		/// <remarks>生成していない側は nullptr</remarks>
 		Graphics::Object3d* model_ = nullptr;
 		Graphics::AnimationModel* animeModel_ = nullptr;
 

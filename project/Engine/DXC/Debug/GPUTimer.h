@@ -8,8 +8,7 @@
 namespace DXC {
 
 	/// <summary>
-	/// GPU計測クラス（マルチタイマー対応版）
-	/// 1フレーム内で複数の区間（timerId）を計測できます。
+	/// GPU計測クラス。1フレーム内で複数の区間(timerId)を計測できる
 	/// </summary>
 	class GPUTimer {
 	public:
@@ -51,8 +50,7 @@ namespace DXC {
 		void Resolve(ID3D12GraphicsCommandList* list, uint32_t frameIndex, uint32_t timerId);
 
 		/// <summary>
-		/// 結果取得（ミリ秒）
-		/// GPU実行完了済みのフレームに対して呼んでください。
+		/// 結果取得(ミリ秒)。GPU実行完了済みのフレームに対して呼ぶこと
 		/// </summary>
 		/// <param name="frameIndex">フレーム番号</param>
 		/// <param name="timerId">取得したい計測ID</param>

@@ -1,6 +1,5 @@
 // 画面へ出す最終パス(Pipe::None 専用)。リニアHDRを露光・トーンマップして表示レンジへ落とす。
-// NonePost.PS と分けてあるのは、あちらが加算合成と共用でトーンマップしてはいけないため。
-// 出力先のRTVが _SRGB なのでガンマは自前で掛けないこと(二重になる)
+// 出力先のRTVが _SRGB なのでガンマは自前で掛けないこと
 
 Texture2D g_InputTexture : register(t0);
 SamplerState g_Sampler : register(s0);

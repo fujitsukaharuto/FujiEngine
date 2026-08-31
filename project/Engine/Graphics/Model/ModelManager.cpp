@@ -119,9 +119,8 @@ void ModelManager::LoadGLTF(const std::string& filename, bool overWrite) {
 void ModelManager::LoadModelInternal(const std::string& filename, bool overWrite, bool extractSkinning) {
 	ModelManager* instance = GetInstance();
 
-	// 新規は従来どおりローカルに組み立ててから登録する。
-	// 上書き時だけは既存のModelを破棄せず中身を詰め替える。
-	// unique_ptrを差し替えると、同じモデルを指している他のRenderObjectのModel*が全てダングリングするため
+	// 上書き時は既存のModelを破棄せず中身を詰め替える。unique_ptrを差し替えると
+	// 同じモデルを指す他のRenderObjectのModel*がダングリングするため
 	std::unique_ptr<Model> newModel;
 	Model* model = nullptr;
 
@@ -574,9 +573,7 @@ ModelData ModelManager::CreateCylinder(float topRadius, float bottomRadius, floa
 	return instance->models_[key]->GetModelData();
 }
 
-// ファイル一覧の構築は全構成で必要(LoadAllFileDataの入力になる)。
-// pair.second の上書きフラグはエディタのモデル一覧でしか使わないが、
-// リスト自体をデバッグ限定にすると Release で事前ロードが丸ごと効かなくなる。
+// ファイル一覧は全構成で必要(LoadAllFileDataの入力)。デバッグ限定にすると Release で事前ロードが効かなくなる
 void ModelManager::LoadModelFile(bool overWrite) {
 	modelFileList.clear();
 

@@ -13,7 +13,6 @@
 #include "Engine/Graphics/Sprite/SpriteRenderer.h"
 #include <cmath>
 #include "Engine/Graphics/PostEffect/OffscreenManager.h"
-#include "Engine/Core/App/MyWindow.h"
 #include "Game/Particle/GameEmitters.h"
 #include "Engine/Core/Input/Input.h"
 #include "Engine/DXC/DXCom.h"
@@ -43,14 +42,6 @@ void TitleScene::Initialize() {
 
 	dxcommon_->GetOffscreenManager()->ResetPostEffect();
 	dxcommon_->GetOffscreenManager()->AddPostEffect(PostEffectList::Bloom);
-
-#pragma region シーン遷移用
-	black_ = std::make_unique<Sprite>();
-	black_->Load("white2x2.png");
-	black_->SetColor(Colors::Black);
-	black_->SetSize({ float(MyWin::kWindowWidth),float(MyWin::kWindowHeight) });
-	black_->SetAnchor({ 0.0f,0.0f });
-#pragma endregion
 
 	skybox_ = std::make_unique<SkyBox>();
 	skybox_->Initialize();
@@ -134,7 +125,7 @@ void TitleScene::Update() {
 
 #endif // _DEBUG
 
-	BlackFade();
+	CheckSceneChange();
 
 	if (FPSKeeper::DeltaTimeFrame() < FPSKeeper::GetClampFrame()) {
 		startTime_ -= FPSKeeper::DeltaTimeFrame();
@@ -191,9 +182,6 @@ void TitleScene::Draw() {
 #pragma endregion
 
 #pragma region 前景スプライト
-	if (blackTime_ != 0.0f) {
-		black_->Draw();
-	}
 
 #pragma endregion
 }
@@ -234,47 +222,23 @@ void TitleScene::ParticleDebugGUI() {
 #endif // _DEBUG
 }
 
-void TitleScene::BlackFade() {
-	if (isChangePhase_) {
-		if (blackTime_ < blackLimit_) {
-			blackTime_ += FPSKeeper::DeltaTimeFrame();
-			if (blackTime_ >= blackLimit_) {
-				blackTime_ = blackLimit_;
-			}
-		} else {
-			if (!isParticleDebugScene_) {
-				ChangeScene("GAME", 40.0f);
-			} else {
-				ChangeScene("PARTICLEDEBUG", 40.0f);
-			}
-		}
-	} else {
-		if (blackTime_ > 0.0f) {
-			blackTime_ -= FPSKeeper::DeltaTimeFrame();
-			if (blackTime_ <= 0.0f) {
-				blackTime_ = 0.0f;
-			}
-		}
+void TitleScene::CheckSceneChange() {
+	// 暗転・明転中は受け付けない
+	if (IsFading()) {
+		return;
 	}
-	black_->SetColor({ 0.0f,0.0f,0.0f,Lerp(0.0f,1.0f,(1.0f / blackLimit_ * blackTime_)) });
+
 	XINPUT_STATE pad;
 	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
-		if (blackTime_ == 0.0f) {
-			isChangePhase_ = true;
-		}
+		ChangeScene("GAME");
 	} else if (Input::GetInstance()->GetGamepadState(pad)) {
 		if (Input::GetInstance()->TriggerButton(PadInput::A)) {
-			if (blackTime_ == 0.0f) {
-				isChangePhase_ = true;
-			}
+			ChangeScene("GAME");
 		}
 	}
 #ifdef _DEBUGMODE
 	if (Input::GetInstance()->PushKey(DIK_RETURN) && Input::GetInstance()->PushKey(DIK_P) && Input::GetInstance()->PushKey(DIK_D) && Input::GetInstance()->TriggerKey(DIK_S)) {
-		if (blackTime_ == 0.0f) {
-			isChangePhase_ = true;
-			isParticleDebugScene_ = true;
-		}
+		ChangeScene("PARTICLEDEBUG");
 	}
 #endif // _DEBUG
 }

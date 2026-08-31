@@ -90,6 +90,16 @@ namespace Core {
 	};
 
 
+#ifdef _DEBUGMODE
+	// TextColoredなどスタイル外の色は SetupModernStyle のリニア化を通らないので、変換済みの色をここから配る
+	/// <summary>正常・対応済みを示す文字色</summary>
+	ImVec4 ImGuiTextOk();
+	/// <summary>注意を促す文字色</summary>
+	ImVec4 ImGuiTextWarn();
+	/// <summary>失敗・非対応を示す文字色</summary>
+	ImVec4 ImGuiTextError();
+#endif // _DEBUGMODE
+
 	/// <summary>
 	/// パーティクルグループを2つのリスト間で移動させるGUI
 	/// </summary>

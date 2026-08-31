@@ -6,11 +6,7 @@
 #include "Sampling.hlsli"
 
 /// <summary>キューブマップの面と面内のUVから、その texel が表す向きを求める</summary>
-/// <remarks>
-/// ★D3D のキューブマップの並び(+X,-X,+Y,-Y,+Z,-Z)と向きの取り方に合わせてあること。
-/// ここがずれると焼いた結果を SampleLevel で引いたときに面が入れ替わって映る。
-/// 粗さ0のミップは元の環境マップとほぼ同じ絵になるはずなので、それで確認できる
-/// </remarks>
+/// <remarks>D3D のキューブマップの並び(+X,-X,+Y,-Y,+Z,-Z)に合わせてあること</remarks>
 /// <param name="face">面の番号(0〜5)。Texture2DArray のスライス番号と同じ</param>
 /// <param name="uv">面内の位置。[0,1]</param>
 float3 DirectionFromCubeFace(uint face, float2 uv)
@@ -30,10 +26,7 @@ float3 DirectionFromCubeFace(uint face, float2 uv)
 }
 
 /// <summary>GGX の分布に沿ってハーフベクトルを散らす</summary>
-/// <remarks>
-/// 一様に散らすと粗さが低いときにほとんどのサンプルが無駄になるので、
-/// 分布そのものを確率密度に使う(重点サンプリング)
-/// </remarks>
+/// <remarks>一様に散らすと粗さが低いときサンプルが無駄になるので、分布そのものを確率密度に使う</remarks>
 /// <param name="xi">[0,1)^2 の点</param>
 /// <param name="N">畳み込む中心の向き</param>
 float3 ImportanceSampleGGX(float2 xi, float3 N, float roughness)
@@ -54,10 +47,7 @@ float3 ImportanceSampleGGX(float2 xi, float3 N, float roughness)
 }
 
 /// <summary>Smith の幾何減衰(IBL用)</summary>
-/// <remarks>
-/// 直接光用の PBR.hlsli の G_SmithSchlick とは k の取り方が違う(直接光は (r+1)^2/8、IBLは a^2/2)。
-/// 混ぜると粗い面の明るさがずれるので、焼く側では必ずこちらを使う
-/// </remarks>
+/// <remarks>直接光用の G_SmithSchlick とは k の取り方が違う(直接光は (r+1)^2/8、IBLは a^2/2)</remarks>
 float G_SmithIBL(float NdotV, float NdotL, float roughness)
 {
     float a = roughness * roughness;

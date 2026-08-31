@@ -9,8 +9,7 @@
 namespace Scene {
 
 	/// <summary>
-	/// シーンファクトリー基底クラス
-	/// 派生クラスはコンストラクタで Register&lt;T&gt;() を並べるだけでよい
+	/// シーンファクトリー基底クラス。派生はコンストラクタで Register&lt;T&gt;() を並べるだけでよい
 	/// </summary>
 	class AbstractSceneFactory {
 	public:

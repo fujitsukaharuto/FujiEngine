@@ -36,7 +36,7 @@ namespace {
 	}
 
 	/// <summary>鏡面の環境光に使うキューブマップをバインドする</summary>
-	/// <remarks>Object3d.PS / EnvMapObject3d.PS が gEnvironment を宣言しているので、無いと未バインドになる</remarks>
+	/// <remarks>PS が gEnvironment を宣言しているので、無いと未バインドになる</remarks>
 	void BindEnvironment(ID3D12GraphicsCommandList* commandList) {
 		// 再読み込みでも Texture の実体は使い回されるので、名前引きは一度でよい
 		static Texture* environment = nullptr;
@@ -50,10 +50,7 @@ namespace {
 	}
 
 	/// <summary>環境マップから焼いた IBL のテクスチャをバインドする</summary>
-	/// <remarks>
-	/// Object3d.PS / EnvMapObject3d.PS が3枚とも無条件に宣言しているので、
-	/// アンビエントが Hemisphere 経路のフレームでもバインドしないと未バインドのテーブルを読む
-	/// </remarks>
+	/// <remarks>PS が無条件に宣言しているので、Hemisphere 経路のフレームでもバインドが要る</remarks>
 	void BindIBL(ID3D12GraphicsCommandList* commandList) {
 		auto* ibl = ObjectRenderer::GetInstance()->GetIBLBaker();
 		if (ibl == nullptr) { return; }
@@ -65,10 +62,7 @@ namespace {
 	}
 
 	/// <summary>画面空間で計算済みのAOをバインドする</summary>
-	/// <remarks>
-	/// Object3d.PS / EnvMapObject3d.PS が gAOTexture を無条件に宣言しているので、
-	/// AOを計算していないフレームでもバインドしないと未バインドのテーブルを読むことになる
-	/// </remarks>
+	/// <remarks>PS が gAOTexture を無条件に宣言しているので、AOを計算しないフレームでもバインドが要る</remarks>
 	void BindScreenSpaceAO(ID3D12GraphicsCommandList* commandList) {
 		auto* aoPass = ObjectRenderer::GetInstance()->GetRayTracedAOPass();
 		if (aoPass == nullptr) { return; }

@@ -90,10 +90,7 @@ namespace DXC {
 		/// <summary>
 		/// 使い終わったスロットを返却する(次のAllocateで再利用される)
 		/// </summary>
-		/// <remarks>
-		/// GPUが参照中のディスクリプタを返却してはいけない。
-		/// 呼び出す前にDXCom::Flush()でコマンドの完了を待つこと
-		/// </remarks>
+		/// <remarks>GPUが参照中のディスクリプタは返却しないこと。先に DXCom::Flush() で待つ</remarks>
 		/// <param name="index">Allocateで得たインデックス</param>
 		void Free(uint32_t index);
 
