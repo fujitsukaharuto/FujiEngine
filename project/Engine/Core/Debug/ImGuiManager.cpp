@@ -1,6 +1,7 @@
 #include "Engine/Core/Debug/ImGuiManager.h"
 
 #include <cmath>
+#include <map>
 #include "Engine/DXC/DXCom.h"
 #include "Engine/Core/App/MyWindow.h"
 #include "Engine/DXC/Resource/SRVManager.h"
@@ -38,6 +39,12 @@ namespace {
 
 	ImVec4 SrgbColor(float r, float g, float b) {
 		return ImVec4(SrgbToLinear(r), SrgbToLinear(g), SrgbToLinear(b), 1.0f);
+	}
+
+	// View メニューへ名前順に並べたいので map で持つ。要素のアドレスが動かないのも都合が良い
+	std::map<std::string, bool>& DebugWindowTable() {
+		static std::map<std::string, bool> table;
+		return table;
 	}
 }
 #endif // _DEBUG
@@ -85,8 +92,6 @@ void ImGuiManager::Initialize([[maybe_unused]] MyWin* myWin, [[maybe_unused]] DX
 
 	SetupModernStyle();
 
-	winSizeX_ = myWin->kWindowWidth;
-	winSizeY_ = myWin->kWindowHeight;
 #endif // _DEBUG
 }
 
@@ -125,7 +130,9 @@ void ImGuiManager::Begin() {
 
 	ImGuizmo::BeginFrame();
 	ImGuizmo::SetOrthographic(false);
-	ImGuizmo::SetRect(0, 0, winSizeX_, winSizeY_);
+	// ギズモはゲーム画面に重ねるものなので、縮小して出している矩形へ合わせる
+	const MyWin::ViewRect& gameView = MyWin::GetGameView();
+	ImGuizmo::SetRect(gameView.x, gameView.y, gameView.width, gameView.height);
 
 	ImGuiIO& io = ImGui::GetIO();
 	io.DisplayFramebufferScale = ImVec2(1.0f, 1.0f);
@@ -363,6 +370,27 @@ void Core::ImGuiManager::SetupModernStyle() {
 ImVec4 Core::ImGuiTextOk() { return SrgbColor(0.08f, 0.44f, 0.18f); }
 ImVec4 Core::ImGuiTextWarn() { return SrgbColor(0.62f, 0.32f, 0.00f); }
 ImVec4 Core::ImGuiTextError() { return SrgbColor(0.78f, 0.10f, 0.10f); }
+
+bool* Core::DebugWindows::Visible(const char* name) {
+	return &DebugWindowTable().try_emplace(name, true).first->second;
+}
+
+void Core::DebugWindows::MenuItems() {
+	for (auto& [name, isVisible] : DebugWindowTable()) {
+		ImGui::MenuItem(name.c_str(), nullptr, &isVisible);
+	}
+}
+
+Core::DebugWindow::DebugWindow(const char* name, ImGuiWindowFlags flags) {
+	bool* isVisible = DebugWindows::Visible(name);
+	if (!*isVisible) { return; }
+	isBegun_ = true;
+	isDrawable_ = ImGui::Begin(name, isVisible, flags);
+}
+
+Core::DebugWindow::~DebugWindow() {
+	if (isBegun_) { ImGui::End(); }
+}
 #endif // _DEBUGMODE
 
 

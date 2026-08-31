@@ -119,7 +119,8 @@ void DXCom::PostEffect() {
 	UINT frameIndex = GetNowFrameCount();
 	commandList->OMSetRenderTargets(1, &swapChainManager_->GetRTVHandle(backBufferIndex), false, &swapChainManager_->GetDSVHandle(frameIndex));
 
-	float clearColor[] = { 0.1f,0.25f,0.5f,1.0f };
+	// ゲーム画面の外側（デバッグGUIの下地とレターボックス）に出る色
+	float clearColor[] = { 0.012f,0.012f,0.014f,1.0f };
 	commandList->ClearRenderTargetView(swapChainManager_->GetRTVHandle(backBufferIndex), clearColor, 0, nullptr);
 
 	// OffScreenManager側でオフスクリーンの設定をする

@@ -1,5 +1,7 @@
 #include "Engine/Core/App/MyWindow.h"
 
+#include <cmath>
+
 #include "imgui_impl_win32.h"
 
 #pragma comment(lib,"winmm.lib")
@@ -7,6 +9,34 @@
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 using namespace Core;
+
+namespace {
+	MyWin::ViewRect gameView{ 0.0f, 0.0f, static_cast<float>(MyWin::kWindowWidth), static_cast<float>(MyWin::kWindowHeight) };
+}
+
+void MyWin::FitGameView(float x, float y, float width, float height) {
+	if (width <= 0.0f || height <= 0.0f) { return; }
+
+	const float aspect = static_cast<float>(kWindowWidth) / static_cast<float>(kWindowHeight);
+	float fitWidth = width;
+	float fitHeight = fitWidth / aspect;
+	if (fitHeight > height) {
+		fitHeight = height;
+		fitWidth = fitHeight * aspect;
+	}
+	// 余った分は上下（または左右）に均等に振って中央へ寄せる。
+	// ビューポートは小数を取れるがシザーは整数なので、端が半端だと画面端の1行がはみ出して見える
+	gameView = {
+		std::floor(x + (width - fitWidth) * 0.5f),
+		std::floor(y + (height - fitHeight) * 0.5f),
+		std::floor(fitWidth),
+		std::floor(fitHeight)
+	};
+}
+
+const MyWin::ViewRect& MyWin::GetGameView() {
+	return gameView;
+}
 
 
 MyWin* MyWin::GetInstance() {

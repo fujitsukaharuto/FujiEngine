@@ -99,5 +99,12 @@ namespace Core {
 		Graphics::ParticleManager* pManager_ = nullptr;
 		Graphics::Line3dDrawer* line3dDrawer_ = nullptr;
 		Editor::CommandManager* commandManager_;
+
+#ifdef _DEBUGMODE
+		bool isDebugGuiVisible_ = true;    // F1で切り替え。消すとゲーム画面が画面いっぱいに戻る
+		bool isDockLayoutBuilt_ = false;   // 既定のドッキング配置を組んだか
+		bool isDockLayoutReset_ = false;   // View メニューからの組み直し要求
+		int prevPickedID_ = 0;             // ピック対象が変わった瞬間だけ見たい
+#endif // _DEBUGMODE
 	};
 }

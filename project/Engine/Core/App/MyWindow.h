@@ -17,6 +17,16 @@ namespace Core {
 
 	public:
 
+		/// <summary>ゲーム画面を映す矩形（クライアント座標）</summary>
+		struct ViewRect { float x, y, width, height; };
+
+		/// <summary>与えた領域にアスペクト比を保って収まるよう、ゲーム画面の矩形を決める</summary>
+		/// <remarks>デバッグGUIがドックスペースの中央ノードに合わせて呼ぶ。既定は画面全体</remarks>
+		static void FitGameView(float x, float y, float width, float height);
+
+		/// <summary>ゲーム画面の矩形。最終出力のビューポートと、マウス座標の変換に使う</summary>
+		static const ViewRect& GetGameView();
+
 		static const wchar_t kWindowClassName[];
 
 		static MyWin* GetInstance();

@@ -5,6 +5,9 @@
 #include "Engine/Graphics/Texture/TextureManager.h"
 #include "Engine/DXC/DXCom.h"
 #include "Engine/Graphics/Camera/CameraManager.h"
+#ifdef _DEBUGMODE
+#include "imgui_internal.h"	// DockBuilder（既定レイアウトの組み立て）
+#endif // _DEBUGMODE
 
 using namespace Audio;
 using namespace Core;
@@ -52,6 +55,7 @@ void Framework::Update() {
 	if (input_->TriggerKey(DIK_F12)) {
 		cameraManager_->SetDebugMode(!cameraManager_->GetDebugMode());
 	}
+	if (input_->TriggerKey(DIK_F1)) { isDebugGuiVisible_ = !isDebugGuiVisible_; }
 #endif // _DEBUGMODE
 
 	// ゲームシーンの毎フレーム処理
@@ -61,9 +65,13 @@ void Framework::Update() {
 #ifdef _DEBUGMODE
 	// ImGui受付
 	imguiManager_->Begin();
-	EngineDebugGUI();
-	DebugGUI();
-	GlobalVariables::GetInstance()->Update();
+	if (isDebugGuiVisible_) {
+		EngineDebugGUI();
+		DebugGUI();
+		GlobalVariables::GetInstance()->Update();
+	} else {
+		MyWin::FitGameView(0.0f, 0.0f, static_cast<float>(MyWin::kWindowWidth), static_cast<float>(MyWin::kWindowHeight));
+	}
 	// ImGui受付
 	imguiManager_->End();
 	commandManager_->CheckInputForUndoRedo();
@@ -100,55 +108,97 @@ void Framework::Draw() {
 	dxcommon_->PostDraw();
 }
 
+#ifdef _DEBUGMODE
+namespace {
+
+	// 保存済みのレイアウトが無いときに組む既定の配置
+	void BuildDefaultDockLayout(ImGuiID dockspaceId) {
+		ImGui::DockBuilderRemoveNode(dockspaceId);
+		ImGui::DockBuilderAddNode(dockspaceId, ImGuiDockNodeFlags_DockSpace | ImGuiDockNodeFlags_PassthruCentralNode);
+		ImGui::DockBuilderSetNodeSize(dockspaceId, ImGui::GetMainViewport()->WorkSize);
+
+		// 中央は分割せずに残す。そこがゲーム画面になる
+		ImGuiID center = dockspaceId;
+		ImGuiID left = ImGui::DockBuilderSplitNode(center, ImGuiDir_Left, 0.22f, nullptr, &center);
+		ImGuiID right = ImGui::DockBuilderSplitNode(center, ImGuiDir_Right, 0.26f, nullptr, &center);
+		// 下は多めに取る。ゲーム画面は横幅で決まるので、中央を16:9より縦長にしても大きくならない
+		const ImGuiID bottom = ImGui::DockBuilderSplitNode(center, ImGuiDir_Down, 0.40f, nullptr, &center);
+		const ImGuiID leftBottom = ImGui::DockBuilderSplitNode(left, ImGuiDir_Down, 0.45f, nullptr, &left);
+		const ImGuiID rightBottom = ImGui::DockBuilderSplitNode(right, ImGuiDir_Down, 0.35f, nullptr, &right);
+
+		ImGui::DockBuilderDockWindow("Scene", left);
+		ImGui::DockBuilderDockWindow("Camera", leftBottom);
+		ImGui::DockBuilderDockWindow("Light", leftBottom);
+		ImGui::DockBuilderDockWindow("Raytracing", leftBottom);
+		ImGui::DockBuilderDockWindow("Object Editor", right);
+		ImGui::DockBuilderDockWindow("Global Variables", rightBottom);
+		ImGui::DockBuilderDockWindow("Stats", bottom);
+		ImGui::DockBuilderDockWindow("GPU Particle", bottom);
+		ImGui::DockBuilderDockWindow("Particle Editor", bottom);
+		ImGui::DockBuilderDockWindow("GPUParticle Editor", bottom);
+		ImGui::DockBuilderDockWindow("OffScreen Debug", bottom);
+
+		ImGui::DockBuilderFinish(dockspaceId);
+	}
+}
+#endif // _DEBUGMODE
+
 void Framework::EngineDebugGUI() {
 #ifdef _DEBUGMODE
 	imguiManager_->SetFontJapanese();
 
+	// 画面全体をドッキング先にする。中央は空のままなのでゲーム画面が見える
+	const ImGuiID dockspaceId = ImGui::DockSpaceOverViewport(0, nullptr, ImGuiDockNodeFlags_PassthruCentralNode);
+	if (!isDockLayoutBuilt_ || isDockLayoutReset_) {
+		// imgui.ini に配置が残っていればそちらを優先し、初回と組み直し要求のときだけ組む
+		const ImGuiDockNode* node = ImGui::DockBuilderGetNode(dockspaceId);
+		if (isDockLayoutReset_ || node == nullptr || node->IsEmpty()) {
+			BuildDefaultDockLayout(dockspaceId);
+		}
+		isDockLayoutBuilt_ = true;
+		isDockLayoutReset_ = false;
+	}
+
+	// ゲーム画面は中央ノードへ収める。パネルを全部閉じれば画面いっぱいに戻る
+	if (const ImGuiDockNode* centralNode = ImGui::DockBuilderGetCentralNode(dockspaceId)) {
+		MyWin::FitGameView(centralNode->Pos.x, centralNode->Pos.y, centralNode->Size.x, centralNode->Size.y);
+	}
+
+	if (ImGui::BeginMainMenuBar()) {
+		if (ImGui::BeginMenu("View")) {
+			DebugWindows::MenuItems();
+			ImGui::Separator();
+			if (ImGui::MenuItem("レイアウトを初期化")) { isDockLayoutReset_ = true; }
+			ImGui::EndMenu();
+		}
+		ImGui::EndMainMenuBar();
+	}
+
 	dxcommon_->OffscreenDebugGUI();
 	sceneManager_->ParticleGroupDebugGUI();
 
-	ImGui::Begin("SceneDebug");
-
-	fpsKeeper_->Debug();
-	ImGui::Text("FPS(平均): %.1f", ImGui::GetIO().Framerate);
-	ImGui::Text("DeltaTime: %.3f", ImGui::GetIO().DeltaTime);
-
-	ImGui::Separator();
-	ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_Reorderable;
-	if (ImGui::BeginTabBar("SceneDebug", tab_bar_flags)) {
-		if (ImGui::BeginTabItem("Scene")) {
-			sceneManager_->DebugGUI();
-			ImGui::EndTabItem();
-		}
-		if (ModelManager::GetInstance()->GetPickedID() > 1000) {
-			ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-		}
-		if (ImGui::BeginTabItem("EditorObject")) {
-			if (ModelManager::GetInstance()->GetPickedID() > 1000) {
-				ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-			}
-			commandManager_->DebugGUI();
-			ImGui::EndTabItem();
-		}
-		if (ImGui::BeginTabItem("Camera")) {
-			cameraManager_->DebugGUI();
-			ImGui::EndTabItem();
-		}
-		if (ImGui::BeginTabItem("Light")) {
-			lightManager_->DebugGUI();
-			ImGui::EndTabItem();
-		}
-		if (ImGui::BeginTabItem("Raytracing")) {
-			objectRenderer_->DebugGUI();
-			ImGui::EndTabItem();
-		}
-		ImGui::EndTabBar();
+	if (DebugWindow stats{ "Stats" }) {
+		fpsKeeper_->Debug();
+		ImGui::Text("FPS(平均): %.1f", ImGui::GetIO().Framerate);
+		ImGui::Text("DeltaTime: %.3f", ImGui::GetIO().DeltaTime);
+		ImGui::Separator();
+		ImGui::Text("PickedID    : %d", modelManager_->GetPickedID());
+		ImGui::Text("PickedCoord : %d, %d", modelManager_->GetPickedCoord(0), modelManager_->GetPickedCoord(1));
 	}
-	ParticleManager::GetInstance()->ParticleCSDebugGUI();
-	ImGui::Text("%d", modelManager_->GetPickedID());
-	ImGui::Text("%d,%d", modelManager_->GetPickedCoord(0), modelManager_->GetPickedCoord(1));
 
-	ImGui::End();
+	if (DebugWindow scene{ "Scene" }) { sceneManager_->DebugGUI(); }
+	if (DebugWindow object{ "Object Editor" }) { commandManager_->DebugGUI(); }
+	if (DebugWindow camera{ "Camera" }) { cameraManager_->DebugGUI(); }
+	if (DebugWindow light{ "Light" }) { lightManager_->DebugGUI(); }
+	if (DebugWindow raytracing{ "Raytracing" }) { objectRenderer_->DebugGUI(); }
+	if (DebugWindow gpuParticle{ "GPU Particle" }) { ParticleManager::GetInstance()->ParticleCSDebugGUI(); }
+
+	// ピックし直した瞬間だけ、編集先のウィンドウを前に出す
+	const int pickedID = modelManager_->GetPickedID();
+	if (pickedID > 1000 && pickedID != prevPickedID_) {
+		ImGui::SetWindowFocus("Object Editor");
+	}
+	prevPickedID_ = pickedID;
 
 	imguiManager_->UnSetFont();
 #endif // _DEBUGMODE

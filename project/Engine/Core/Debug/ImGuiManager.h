@@ -78,9 +78,6 @@ namespace Core {
 		DXC::DXCom* dxCommon_ = nullptr;
 		uint32_t srvIndex;
 
-		float winSizeX_ = 0.0f;
-		float winSizeY_ = 0.0f;
-
 #ifdef _DEBUGMODE
 		ImFont* font_japanese_ = nullptr;
 #endif // _DEBUG
@@ -98,6 +95,32 @@ namespace Core {
 	ImVec4 ImGuiTextWarn();
 	/// <summary>失敗・非対応を示す文字色</summary>
 	ImVec4 ImGuiTextError();
+
+	/// <summary>デバッグウィンドウの開閉状態。メインメニューの View から切り替える</summary>
+	class DebugWindows {
+	public:
+		/// <summary>名前ごとの表示フラグ。初めて渡した名前はその場で登録される</summary>
+		static bool* Visible(const char* name);
+		/// <summary>登録済みのウィンドウをメニュー項目として並べる</summary>
+		static void MenuItems();
+	};
+
+	/// <summary>View メニューで開閉できるデバッグウィンドウ</summary>
+	/// <remarks>if (DebugWindow w{"Camera"}) { 中身 } と書く。閉じている・畳まれている間は中身を呼ばず、スコープを抜けると End まで済ませる</remarks>
+	class DebugWindow {
+	public:
+		explicit DebugWindow(const char* name, ImGuiWindowFlags flags = 0);
+		~DebugWindow();
+
+		DebugWindow(const DebugWindow&) = delete;
+		DebugWindow& operator=(const DebugWindow&) = delete;
+
+		explicit operator bool() const { return isDrawable_; }
+
+	private:
+		bool isBegun_ = false;
+		bool isDrawable_ = false;
+	};
 #endif // _DEBUGMODE
 
 	/// <summary>

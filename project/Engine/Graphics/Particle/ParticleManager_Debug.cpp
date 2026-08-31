@@ -20,7 +20,8 @@ using namespace DXC;
 
 void ParticleManager::ParticleDebugGUI() {
 #ifdef _DEBUGMODE
-	ImGui::Begin("Particle Editor", nullptr, ImGuiWindowFlags_NoCollapse);
+	DebugWindow window{ "Particle Editor", ImGuiWindowFlags_NoCollapse };
+	if (!window) { return; }
 
 	// Resizable=境界線をドラッグ可能、BordersInnerV=列の間に線を表示
 	static float leftPaneWidth = 260.0f;
@@ -209,20 +210,13 @@ void ParticleManager::ParticleDebugGUI() {
 
 		ImGui::EndTable();
 	}
-
-
-	ImGui::End();
 #endif // _DEBUG
 }
 
 
 void ParticleManager::ParticleCSDebugGUI() {
 #ifdef _DEBUGMODE
-	if (ImGui::CollapsingHeader("GPU Particle System")) {
-		ImGui::Indent();
-		gpuParticleSystem_->EmitterInspectorGUI();
-		ImGui::Unindent();
-	}
+	gpuParticleSystem_->EmitterInspectorGUI();
 #endif // _DEBUG
 }
 

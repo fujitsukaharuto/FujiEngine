@@ -86,6 +86,10 @@ namespace DXC {
 		/// </summary>
 		void SetViewAndScissor(UINT width, UINT height);
 
+		/// <summary>矩形を指定してViewとScissorをセットする</summary>
+		/// <remarks>最終出力をデバッグGUIの中央ノードへ収めるのに使う</remarks>
+		void SetViewAndScissor(float x, float y, float width, float height);
+
 		//========================================================================*/
 		//* Getter
 		ID3D12CommandQueue* GetQueue() const { return graphicsContext_->GetQueue(); }

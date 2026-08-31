@@ -252,10 +252,8 @@ Vector3 GlobalVariables::GetVector3Value(const std::string& groupName, const std
 void GlobalVariables::Update() {
 #ifdef _DEBUGMODE
 
-	if (!ImGui::Begin("Global Variables", nullptr, ImGuiWindowFlags_MenuBar)) {
-		ImGui::End();
-		return;
-	}
+	DebugWindow window{ "Global Variables", ImGuiWindowFlags_MenuBar };
+	if (!window) { return; }
 
 	if (!ImGui::BeginMenuBar()) {
 		return;
@@ -307,6 +305,5 @@ void GlobalVariables::Update() {
 	}
 
 	ImGui::EndMenuBar();
-	ImGui::End();
 #endif // _DEBUG
 }

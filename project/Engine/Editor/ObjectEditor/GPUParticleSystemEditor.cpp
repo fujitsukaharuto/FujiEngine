@@ -16,7 +16,8 @@ using namespace DXC;
 namespace Editor {
 
 	void GPUParticleSystemEditor::DrawSceneGUI(GPUParticleSystem& system) {
-		ImGui::Begin("GPUParticle Editor", nullptr, ImGuiWindowFlags_NoCollapse);
+		DebugWindow window{ "GPUParticle Editor", ImGuiWindowFlags_NoCollapse };
+		if (!window) { return; }
 
 		DrawPerformanceStats(system);
 
@@ -43,8 +44,6 @@ namespace Editor {
 
 			ImGui::EndTabBar();
 		}
-
-		ImGui::End();
 	}
 
 	void GPUParticleSystemEditor::DrawInspectorGUI(GPUParticleSystem& system) {

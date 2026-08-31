@@ -144,8 +144,12 @@ void DXCommand::PerFrameWait() {
 }
 
 void DXCommand::SetViewAndScissor(UINT width, UINT height) {
-	D3D12_VIEWPORT viewport{ 0.0f, 0.0f, (float)width, (float)height, 0.0f, 1.0f };
-	D3D12_RECT scissor{ 0, 0, static_cast<LONG>(width), static_cast<LONG>(height) };
+	SetViewAndScissor(0.0f, 0.0f, static_cast<float>(width), static_cast<float>(height));
+}
+
+void DXCommand::SetViewAndScissor(float x, float y, float width, float height) {
+	D3D12_VIEWPORT viewport{ x, y, width, height, 0.0f, 1.0f };
+	D3D12_RECT scissor{ static_cast<LONG>(x), static_cast<LONG>(y), static_cast<LONG>(x + width), static_cast<LONG>(y + height) };
 	graphicsContext_->GetList()->RSSetViewports(1, &viewport);
 	graphicsContext_->GetList()->RSSetScissorRects(1, &scissor);
 }

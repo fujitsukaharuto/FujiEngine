@@ -35,7 +35,12 @@ float3 ACESFilm(float3 x)
 
 float4 main(PSInput input) : SV_TARGET
 {
-    float4 color = g_InputTexture.Sample(g_Sampler, input.texcoord);
+    // サンプラがWRAPなので、縮小表示のときに端の半テクセルが反対側を拾わないよう内側へ寄せる
+    float2 size;
+    g_InputTexture.GetDimensions(size.x, size.y);
+    float2 uv = clamp(input.texcoord, 0.5f / size, 1.0f - 0.5f / size);
+
+    float4 color = g_InputTexture.Sample(g_Sampler, uv);
 
     float3 hdr = color.rgb * exposure;
 

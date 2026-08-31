@@ -32,7 +32,8 @@ void OffscreenManager::Update() {
 
 void OffscreenManager::DebugGUI() {
 #ifdef _DEBUGMODE
-	ImGui::Begin("OffScreen Debug");
+	DebugWindow window{ "OffScreen Debug" };
+	if (!window) { return; }
 
 	bool preIsPostEffect = isPostEffect_;
 	bool preIsNonePost = isNonePost_;
@@ -80,7 +81,6 @@ void OffscreenManager::DebugGUI() {
 		ImGui::TreePop();
 	}
 
-	ImGui::End();
 #endif // _DEBUG
 
 }
@@ -554,7 +554,9 @@ void Graphics::OffscreenManager::PingPongCommand() {
 			D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_GENERIC_READ);
 	}
 
-	dxcommon_->GetDXCommand()->SetViewAndScissor(MyWin::kWindowWidth, MyWin::kWindowHeight);
+	// 画面いっぱいではなく、デバッグGUIが空けた中央へ収める
+	const MyWin::ViewRect& gameView = MyWin::GetGameView();
+	dxcommon_->GetDXCommand()->SetViewAndScissor(gameView.x, gameView.y, gameView.width, gameView.height);
 	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::None);
 
 	dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -581,7 +583,8 @@ void Graphics::OffscreenManager::OtherPipeLineCommand() {
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 
 	if (isNonePost_) {// 何も描画せず
-		dxcommon_->GetDXCommand()->SetViewAndScissor(MyWin::kWindowWidth, MyWin::kWindowHeight);
+		const MyWin::ViewRect& gameView = MyWin::GetGameView();
+		dxcommon_->GetDXCommand()->SetViewAndScissor(gameView.x, gameView.y, gameView.width, gameView.height);
 		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::None);
 
 		dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
