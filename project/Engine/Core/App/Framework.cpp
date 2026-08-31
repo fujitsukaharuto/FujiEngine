@@ -114,7 +114,8 @@ namespace {
 	// 保存済みのレイアウトが無いときに組む既定の配置
 	void BuildDefaultDockLayout(ImGuiID dockspaceId) {
 		ImGui::DockBuilderRemoveNode(dockspaceId);
-		ImGui::DockBuilderAddNode(dockspaceId, ImGuiDockNodeFlags_DockSpace | ImGuiDockNodeFlags_PassthruCentralNode);
+		// DockSpace は内部enum。異種enum同士の | は C++20 で不可
+		ImGui::DockBuilderAddNode(dockspaceId, static_cast<ImGuiDockNodeFlags>(ImGuiDockNodeFlags_DockSpace) | ImGuiDockNodeFlags_PassthruCentralNode);
 		ImGui::DockBuilderSetNodeSize(dockspaceId, ImGui::GetMainViewport()->WorkSize);
 
 		// 中央は分割せずに残す。そこがゲーム画面になる
