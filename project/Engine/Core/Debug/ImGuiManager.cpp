@@ -130,9 +130,8 @@ void ImGuiManager::Begin() {
 
 	ImGuizmo::BeginFrame();
 	ImGuizmo::SetOrthographic(false);
-	// ギズモはゲーム画面に重ねるものなので、縮小して出している矩形へ合わせる
-	const MyWin::ViewRect& gameView = MyWin::GetGameView();
-	ImGuizmo::SetRect(gameView.x, gameView.y, gameView.width, gameView.height);
+	// ゲーム画面をパネルに映すときは、パネル側が矩形と描き先を差し替える
+	ImGuizmo::SetRect(0.0f, 0.0f, static_cast<float>(MyWin::kWindowWidth), static_cast<float>(MyWin::kWindowHeight));
 
 	ImGuiIO& io = ImGui::GetIO();
 	io.DisplayFramebufferScale = ImVec2(1.0f, 1.0f);

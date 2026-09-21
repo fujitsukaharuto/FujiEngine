@@ -175,6 +175,8 @@ namespace Graphics {
 		ID3D12Resource* GetOffscreenResource(uint32_t index) { return offscreenRt_[index].Get(); }
 		const D3D12_CLEAR_VALUE& GetClearColorValue() const { return clearColorValue_; }
 		const D3D12_CLEAR_VALUE& GetClearColorValueForGPURTV() const { return clearColorValueForGPU_; }
+		/// <summary>デバッグGUIのパネルに貼るゲーム画面。_DEBUGMODE でしか作らない</summary>
+		D3D12_GPU_DESCRIPTOR_HANDLE GetGameViewTexture() const;
 
 		//========================================================================*/
 		//* Setter
@@ -213,6 +215,9 @@ namespace Graphics {
 		/// </summary>
 		void OtherPipeLineCommand();
 
+		/// <summary>トーンマップして画面へ出す。パネルに映すときはパネル用のテクスチャへ描く</summary>
+		void DrawToScreen(D3D12_GPU_DESCRIPTOR_HANDLE input);
+
 		/// <summary>
 		/// データを現在のフレームのリソースにコピー
 		/// </summary>
@@ -246,6 +251,11 @@ namespace Graphics {
 		uint32_t gpuParticleSRVIndex_[DXC::kFrameCount_];
 		D3D12_GPU_DESCRIPTOR_HANDLE gpuParticleHandle_[DXC::kFrameCount_];
 		D3D12_CPU_DESCRIPTOR_HANDLE gpuParticleHandleCPU_[DXC::kFrameCount_];
+
+		Microsoft::WRL::ComPtr<ID3D12Resource> gameViewRt_[DXC::kFrameCount_];
+		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> gameViewRtvHeap_;
+		D3D12_CPU_DESCRIPTOR_HANDLE gameViewRtvHandle_[DXC::kFrameCount_]{};
+		D3D12_GPU_DESCRIPTOR_HANDLE gameViewSrvHandle_[DXC::kFrameCount_]{};
 
 		Microsoft::WRL::ComPtr<ID3D12Resource> grayCSResource_[DXC::kFrameCount_];
 		GrayCS* grayCSDataGPU_[DXC::kFrameCount_];

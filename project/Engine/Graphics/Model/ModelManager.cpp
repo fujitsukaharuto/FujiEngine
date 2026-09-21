@@ -665,12 +665,13 @@ void ModelManager::PickingUpdate() {
 	ImGuiIO& io = ImGui::GetIO();
 
 	// ゲーム画面は縮小して出しているので、描画したときのピクセル座標へ戻す
-	const MyWin::ViewRect& gameView = MyWin::GetGameView();
+	const MyWin::GameView& gameView = MyWin::GetGameView();
 	Vector2 mousePos = {
 		(io.MousePos.x - gameView.x) / gameView.width * MyWin::kWindowWidth,
 		(io.MousePos.y - gameView.y) / gameView.height * MyWin::kWindowHeight
 	};
-	bool isMouseOnGUI = io.WantCaptureMouse || ImGuizmo::IsOver() || ImGuizmo::IsUsing();
+	const bool isMouseOnGame = gameView.isOnPanel ? gameView.isHovered : !io.WantCaptureMouse;
+	bool isMouseOnGUI = !isMouseOnGame || ImGuizmo::IsOver() || ImGuizmo::IsUsing();
 	bool isMouseInWindow =
 		(mousePos.x >= 0 && mousePos.y >= 0 &&
 			mousePos.x < MyWin::kWindowWidth && mousePos.y < MyWin::kWindowHeight);

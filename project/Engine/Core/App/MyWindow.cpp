@@ -11,7 +11,11 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg
 using namespace Core;
 
 namespace {
-	MyWin::ViewRect gameView{ 0.0f, 0.0f, static_cast<float>(MyWin::kWindowWidth), static_cast<float>(MyWin::kWindowHeight) };
+	MyWin::GameView gameView{ 0.0f, 0.0f, static_cast<float>(MyWin::kWindowWidth), static_cast<float>(MyWin::kWindowHeight), false, false };
+}
+
+void MyWin::ResetGameView() {
+	gameView = { 0.0f, 0.0f, static_cast<float>(kWindowWidth), static_cast<float>(kWindowHeight), false, false };
 }
 
 void MyWin::FitGameView(float x, float y, float width, float height) {
@@ -25,16 +29,22 @@ void MyWin::FitGameView(float x, float y, float width, float height) {
 		fitWidth = fitHeight * aspect;
 	}
 	// 余った分は上下（または左右）に均等に振って中央へ寄せる。
-	// ビューポートは小数を取れるがシザーは整数なので、端が半端だと画面端の1行がはみ出して見える
+	// 整数ピクセルに揃えないと、貼った画像が半端にずれてぼやける
 	gameView = {
 		std::floor(x + (width - fitWidth) * 0.5f),
 		std::floor(y + (height - fitHeight) * 0.5f),
 		std::floor(fitWidth),
-		std::floor(fitHeight)
+		std::floor(fitHeight),
+		true,
+		false
 	};
 }
 
-const MyWin::ViewRect& MyWin::GetGameView() {
+void MyWin::SetGameViewHovered(bool isHovered) {
+	gameView.isHovered = isHovered;
+}
+
+const MyWin::GameView& MyWin::GetGameView() {
 	return gameView;
 }
 

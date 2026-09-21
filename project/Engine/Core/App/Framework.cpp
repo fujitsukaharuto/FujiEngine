@@ -7,6 +7,7 @@
 #include "Engine/Graphics/Camera/CameraManager.h"
 #ifdef _DEBUGMODE
 #include "imgui_internal.h"	// DockBuilder（既定レイアウトの組み立て）
+#include "ImGuizmo.h"
 #endif // _DEBUGMODE
 
 using namespace Audio;
@@ -70,7 +71,7 @@ void Framework::Update() {
 		DebugGUI();
 		GlobalVariables::GetInstance()->Update();
 	} else {
-		MyWin::FitGameView(0.0f, 0.0f, static_cast<float>(MyWin::kWindowWidth), static_cast<float>(MyWin::kWindowHeight));
+		MyWin::ResetGameView();
 	}
 	// ImGui受付
 	imguiManager_->End();
@@ -118,7 +119,7 @@ namespace {
 		ImGui::DockBuilderAddNode(dockspaceId, static_cast<ImGuiDockNodeFlags>(ImGuiDockNodeFlags_DockSpace) | ImGuiDockNodeFlags_PassthruCentralNode);
 		ImGui::DockBuilderSetNodeSize(dockspaceId, ImGui::GetMainViewport()->WorkSize);
 
-		// 中央は分割せずに残す。そこがゲーム画面になる
+		// 中央は分割せずに残し、ゲーム画面のパネルを置く
 		ImGuiID center = dockspaceId;
 		ImGuiID left = ImGui::DockBuilderSplitNode(center, ImGuiDir_Left, 0.22f, nullptr, &center);
 		ImGuiID right = ImGui::DockBuilderSplitNode(center, ImGuiDir_Right, 0.26f, nullptr, &center);
@@ -127,6 +128,7 @@ namespace {
 		const ImGuiID leftBottom = ImGui::DockBuilderSplitNode(left, ImGuiDir_Down, 0.45f, nullptr, &left);
 		const ImGuiID rightBottom = ImGui::DockBuilderSplitNode(right, ImGuiDir_Down, 0.35f, nullptr, &right);
 
+		ImGui::DockBuilderDockWindow("Game", center);
 		ImGui::DockBuilderDockWindow("Scene", left);
 		ImGui::DockBuilderDockWindow("Camera", leftBottom);
 		ImGui::DockBuilderDockWindow("Light", leftBottom);
@@ -141,6 +143,43 @@ namespace {
 
 		ImGui::DockBuilderFinish(dockspaceId);
 	}
+
+	// オフスクリーンの最終出力を貼るパネル。閉じるボタンは付けず、隠すときは F1
+	void GameViewGUI(ImGuiID dockspaceId, D3D12_GPU_DESCRIPTOR_HANDLE texture) {
+		const bool wasHovered = MyWin::GetGameView().isHovered;
+		MyWin::ResetGameView();
+
+		// ini に無い初回だけ中央へ入れる。既存の配置は組み直さずに済む
+		if (const ImGuiDockNode* centralNode = ImGui::DockBuilderGetCentralNode(dockspaceId)) {
+			ImGui::SetNextWindowDockID(centralNode->ID, ImGuiCond_FirstUseEver);
+		}
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+		ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.012f, 0.012f, 0.014f, 1.0f));	// レターボックス。バックバッファの下地と同じリニア値
+		// 画像の上でクリックしてもウィンドウが動かないよう、乗っている間は移動を止める
+		const ImGuiWindowFlags flags = ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse |
+			(wasHovered ? ImGuiWindowFlags_NoMove : ImGuiWindowFlags_None);
+		const bool isDrawable = ImGui::Begin("Game", nullptr, flags);
+		ImGui::PopStyleColor();
+		ImGui::PopStyleVar();
+
+		if (isDrawable) {
+			const ImVec2 origin = ImGui::GetCursorScreenPos();
+			const ImVec2 avail = ImGui::GetContentRegionAvail();
+			MyWin::FitGameView(origin.x, origin.y, avail.x, avail.y);
+
+			const MyWin::GameView& view = MyWin::GetGameView();
+			if (view.isOnPanel) {
+				ImGui::SetCursorScreenPos(ImVec2(view.x, view.y));
+				ImGui::Image(static_cast<ImTextureID>(texture.ptr), ImVec2(view.width, view.height));
+				MyWin::SetGameViewHovered(ImGui::IsItemHovered());
+
+				// ギズモの既定の描き先は最背面の全画面ウィンドウなので、このパネルに隠れる
+				ImGuizmo::SetDrawlist();
+				ImGuizmo::SetRect(view.x, view.y, view.width, view.height);
+			}
+		}
+		ImGui::End();
+	}
 }
 #endif // _DEBUGMODE
 
@@ -148,7 +187,7 @@ void Framework::EngineDebugGUI() {
 #ifdef _DEBUGMODE
 	imguiManager_->SetFontJapanese();
 
-	// 画面全体をドッキング先にする。中央は空のままなのでゲーム画面が見える
+	// 画面全体をドッキング先にする。中央のノードにゲーム画面のパネルを置く
 	const ImGuiID dockspaceId = ImGui::DockSpaceOverViewport(0, nullptr, ImGuiDockNodeFlags_PassthruCentralNode);
 	if (!isDockLayoutBuilt_ || isDockLayoutReset_) {
 		// imgui.ini に配置が残っていればそちらを優先し、初回と組み直し要求のときだけ組む
@@ -160,11 +199,6 @@ void Framework::EngineDebugGUI() {
 		isDockLayoutReset_ = false;
 	}
 
-	// ゲーム画面は中央ノードへ収める。パネルを全部閉じれば画面いっぱいに戻る
-	if (const ImGuiDockNode* centralNode = ImGui::DockBuilderGetCentralNode(dockspaceId)) {
-		MyWin::FitGameView(centralNode->Pos.x, centralNode->Pos.y, centralNode->Size.x, centralNode->Size.y);
-	}
-
 	if (ImGui::BeginMainMenuBar()) {
 		if (ImGui::BeginMenu("View")) {
 			DebugWindows::MenuItems();
@@ -174,6 +208,10 @@ void Framework::EngineDebugGUI() {
 		}
 		ImGui::EndMainMenuBar();
 	}
+
+	// ギズモの描き先を差し替えるので、Manipulate を呼ぶパネルより先に出す。
+	// ドッキング中は出した順に描かれるので、ギズモのはみ出しも隣のパネルの下に隠れる
+	GameViewGUI(dockspaceId, dxcommon_->GetGameViewTexture());
 
 	dxcommon_->OffscreenDebugGUI();
 	sceneManager_->ParticleGroupDebugGUI();

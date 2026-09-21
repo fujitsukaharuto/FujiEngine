@@ -188,6 +188,20 @@ void OffscreenManager::CreateResource() {
 		dxcommon_->GetDevice()->CreateRenderTargetView(gpuParticleRt_[i].Get(), &offscreenRTVDesc_, dxcommon_->GetRTVHandle(i + 4));
 	}
 
+#ifdef _DEBUGMODE
+	// パネルに貼るゲーム画面。バックバッファと同じ形式なので最終パスのパイプラインをそのまま使える
+	ID3D12Device* device = dxcommon_->GetDevice();
+	gameViewRtvHeap_ = DXC::Helper::CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, DXC::kFrameCount_, false);
+	const UINT rtvSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	const D3D12_CPU_DESCRIPTOR_HANDLE rtvStart = gameViewRtvHeap_->GetCPUDescriptorHandleForHeapStart();
+	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
+		gameViewRt_[i] = DXC::Helper::CreateTexture2D(device, MyWin::kWindowWidth, MyWin::kWindowHeight, DXC::kSwapChainFormat,
+			D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, nullptr);
+		gameViewRtvHandle_[i].ptr = rtvStart.ptr + i * rtvSize;
+		device->CreateRenderTargetView(gameViewRt_[i].Get(), nullptr, gameViewRtvHandle_[i]);
+	}
+#endif // _DEBUGMODE
+
 	InitDataResource();
 	InitData();
 
@@ -230,6 +244,13 @@ void OffscreenManager::SettingTexture() {
 		gpuParticleHandle_[i] = srvManager->GetGPUDescriptorHandle(gpuParticleSRVIndex_[i]);
 	}
 
+#ifdef _DEBUGMODE
+	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
+		const uint32_t gameViewSrvIndex = srvManager->Allocate();
+		srvManager->CreateTextureSRV(gameViewSrvIndex, gameViewRt_[i].Get(), DXC::kSwapChainFormat, 1, false);
+		gameViewSrvHandle_[i] = srvManager->GetGPUDescriptorHandle(gameViewSrvIndex);
+	}
+#endif // _DEBUGMODE
 
 	InitializePostEffects();
 }
@@ -251,6 +272,10 @@ void OffscreenManager::Command() {
 	}
 
 	OtherPipeLineCommand();
+}
+
+D3D12_GPU_DESCRIPTOR_HANDLE OffscreenManager::GetGameViewTexture() const {
+	return gameViewSrvHandle_[dxcommon_->GetNowFrameCount()];
 }
 
 void OffscreenManager::PopPostEffect(PostEffectList effect) {
@@ -554,16 +579,7 @@ void Graphics::OffscreenManager::PingPongCommand() {
 			D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_GENERIC_READ);
 	}
 
-	// 画面いっぱいではなく、デバッグGUIが空けた中央へ収める
-	const MyWin::ViewRect& gameView = MyWin::GetGameView();
-	dxcommon_->GetDXCommand()->SetViewAndScissor(gameView.x, gameView.y, gameView.width, gameView.height);
-	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::None);
-
-	dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
-	dxcommon_->GetPipelineManager()->SetGraphicsRootDescriptorTable(dxcommon_->GetCommandList(), RootName::kG_InputTexture, finalSRVHandle);
-	dxcommon_->GetPipelineManager()->SetGraphicsRootCBV(dxcommon_->GetCommandList(), RootName::kTonemapParams, tonemapResource_[frameIndex]->GetGPUVirtualAddress());
-	dxcommon_->GetCommandList()->DrawInstanced(3, 1, 0, 0); // 大きな三角形に描画して負荷を減らす
+	DrawToScreen(finalSRVHandle);
 
 
 	if (isUsePing) {// 最後に使ったのがどちらかによってバリアの切り替えを変える
@@ -583,16 +599,39 @@ void Graphics::OffscreenManager::OtherPipeLineCommand() {
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 
 	if (isNonePost_) {// 何も描画せず
-		const MyWin::ViewRect& gameView = MyWin::GetGameView();
-		dxcommon_->GetDXCommand()->SetViewAndScissor(gameView.x, gameView.y, gameView.width, gameView.height);
-		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::None);
-
-		dxcommon_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		dxcommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
-		dxcommon_->GetPipelineManager()->SetGraphicsRootDescriptorTable(dxcommon_->GetCommandList(), RootName::kG_InputTexture, offTextureHandle_[frameIndex]);
-		dxcommon_->GetPipelineManager()->SetGraphicsRootCBV(dxcommon_->GetCommandList(), RootName::kTonemapParams, tonemapResource_[frameIndex]->GetGPUVirtualAddress());
-		dxcommon_->GetCommandList()->DrawInstanced(3, 1, 0, 0);
+		DrawToScreen(offTextureHandle_[frameIndex]);
 	}
+}
+
+void Graphics::OffscreenManager::DrawToScreen(D3D12_GPU_DESCRIPTOR_HANDLE input) {
+	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
+	ID3D12GraphicsCommandList* commandList = dxcommon_->GetCommandList();
+
+#ifdef _DEBUGMODE
+	// バックバッファへ戻すのは呼び出し側(DXCom::PostEffect)
+	const bool isOnPanel = MyWin::GetGameView().isOnPanel;
+	if (isOnPanel) {
+		dxcommon_->TransitionResource(gameViewRt_[frameIndex].Get(),
+			D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
+		commandList->OMSetRenderTargets(1, &gameViewRtvHandle_[frameIndex], false, nullptr);
+	}
+#endif // _DEBUGMODE
+
+	dxcommon_->GetDXCommand()->SetViewAndScissor(MyWin::kWindowWidth, MyWin::kWindowHeight);
+	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::None);
+
+	commandList->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	commandList->IASetVertexBuffers(0, 1, &vertexBufferView_);
+	dxcommon_->GetPipelineManager()->SetGraphicsRootDescriptorTable(commandList, RootName::kG_InputTexture, input);
+	dxcommon_->GetPipelineManager()->SetGraphicsRootCBV(commandList, RootName::kTonemapParams, tonemapResource_[frameIndex]->GetGPUVirtualAddress());
+	commandList->DrawInstanced(3, 1, 0, 0); // 大きな三角形に描画して負荷を減らす
+
+#ifdef _DEBUGMODE
+	if (isOnPanel) {
+		dxcommon_->TransitionResource(gameViewRt_[frameIndex].Get(),
+			D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+	}
+#endif // _DEBUGMODE
 }
 
 void OffscreenManager::CopyData(uint32_t frameIndex) {

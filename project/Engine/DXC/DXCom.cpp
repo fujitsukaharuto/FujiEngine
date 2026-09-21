@@ -117,14 +117,18 @@ void DXCom::PostEffect() {
 	swapChainManager_->CreateBarrier(D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET, command_.get());
 
 	UINT frameIndex = GetNowFrameCount();
-	commandList->OMSetRenderTargets(1, &swapChainManager_->GetRTVHandle(backBufferIndex), false, &swapChainManager_->GetDSVHandle(frameIndex));
+	const D3D12_CPU_DESCRIPTOR_HANDLE& backBuffer = swapChainManager_->GetRTVHandle(backBufferIndex);
+	commandList->OMSetRenderTargets(1, &backBuffer, false, &swapChainManager_->GetDSVHandle(frameIndex));
 
-	// ゲーム画面の外側（デバッグGUIの下地とレターボックス）に出る色
+	// ゲーム画面の外側（デバッグGUIの下地）に出る色
 	float clearColor[] = { 0.012f,0.012f,0.014f,1.0f };
-	commandList->ClearRenderTargetView(swapChainManager_->GetRTVHandle(backBufferIndex), clearColor, 0, nullptr);
+	commandList->ClearRenderTargetView(backBuffer, clearColor, 0, nullptr);
 
 	// OffScreenManager側でオフスクリーンの設定をする
 	offscreen_->Command();
+
+	// ゲーム画面をパネル用のテクスチャへ描いたときは張り替わっているので、ImGui用に戻す
+	commandList->OMSetRenderTargets(1, &backBuffer, false, &swapChainManager_->GetDSVHandle(frameIndex));
 }
 
 void DXCom::PostDraw() {
@@ -197,6 +201,10 @@ void DXCom::OffscreenUpdate() {
 
 void DXCom::OffscreenDebugGUI() {
 	offscreen_->DebugGUI();
+}
+
+D3D12_GPU_DESCRIPTOR_HANDLE DXCom::GetGameViewTexture() const {
+	return offscreen_->GetGameViewTexture();
 }
 
 void DXCom::PreGPUParticleDraw() {

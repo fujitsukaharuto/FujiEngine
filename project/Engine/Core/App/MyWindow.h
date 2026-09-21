@@ -17,15 +17,25 @@ namespace Core {
 
 	public:
 
-		/// <summary>ゲーム画面を映す矩形（クライアント座標）</summary>
-		struct ViewRect { float x, y, width, height; };
+		/// <summary>
+		/// ゲーム画面の映し先
+		/// </summary>
+		struct GameView {
+			float x, y, width, height;	// クライアント座標の矩形
+			bool isOnPanel;				// デバッグGUIのパネルに映しているか。false ならバックバッファへ直に描く
+			bool isHovered;				// パネル上の画像にマウスが乗っているか。パネルの上では WantCaptureMouse が常に立つ
+		};
 
-		/// <summary>与えた領域にアスペクト比を保って収まるよう、ゲーム画面の矩形を決める</summary>
-		/// <remarks>デバッグGUIがドックスペースの中央ノードに合わせて呼ぶ。既定は画面全体</remarks>
+		/// <summary>画面全体へ直に描く状態へ戻す</summary>
+		static void ResetGameView();
+
+		/// <summary>与えた領域にアスペクト比を保って収まるよう、パネル上のゲーム画面の矩形を決める</summary>
 		static void FitGameView(float x, float y, float width, float height);
 
-		/// <summary>ゲーム画面の矩形。最終出力のビューポートと、マウス座標の変換に使う</summary>
-		static const ViewRect& GetGameView();
+		static void SetGameViewHovered(bool isHovered);
+
+		/// <summary>ゲーム画面の映し先。マウス座標の変換に使う</summary>
+		static const GameView& GetGameView();
 
 		static const wchar_t kWindowClassName[];
 

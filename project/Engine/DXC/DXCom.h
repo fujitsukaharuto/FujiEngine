@@ -101,6 +101,7 @@ namespace DXC {
 		//* オフスクリーンの処理を行う関数群
 		void OffscreenUpdate(); // オフスクリーンの処理Update
 		void OffscreenDebugGUI(); // オフスクリーン用DebugGUI
+		D3D12_GPU_DESCRIPTOR_HANDLE GetGameViewTexture() const; // デバッグGUIのパネルに貼るゲーム画面
 
 		//========================================================================*/
 		//* GPUParticleの描画処理を行う際の関数群
