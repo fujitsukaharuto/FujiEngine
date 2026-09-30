@@ -9,7 +9,6 @@
 #include "Engine/Core/Serialize/JsonSerializer.h"
 
 using namespace Core;
-using namespace Graphics;
 using namespace Math;
 using namespace Editor;
 
@@ -126,197 +125,13 @@ void JsonEditorUI::ShowLoadTransformPopup(Trans& transform) {
 	}
 }
 
-void JsonEditorUI::ShowSaveEditorObjPopup(const EditorObj& obj) {
-	// Save ボタンを押すとポップアップを開く
-	if (ImGui::Button("Save EditorObj")) {
-		ImGui::OpenPopup("Save EditorObj");
-	}
-
-	// ポップアップの中央配置
-	ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-
-	static std::string fileName = obj.name;
-	static bool showSuccessMessage = false;
-
-	if (ImGui::BeginPopupModal("Save EditorObj", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-		ImGui::Text("Enter file name to save the EditorObj:");
-		// 一時バッファにコピーして表示・編集
-		char buffer[128];
-		strncpy_s(buffer, sizeof(buffer), fileName.c_str(), _TRUNCATE);
-
-		// 編集
-		if (ImGui::InputText("##filename", buffer, IM_ARRAYSIZE(buffer))) {
-			fileName = buffer; // 編集結果を std::string に戻す
-		}
-
-		ImGui::Separator();
-
-		if (ImGui::Button("Save", ImVec2(120, 0))) {
-			std::string path = fileName;
-			if (path.empty()) {
-				path = "default_EditorObj.json";
-			}
-			// 拡張子がなければ追加
-			if (path.find('.') == std::string::npos) {
-				path += ".json";
-			}
-
-			SerializeEditorObj(obj, path);
-			showSuccessMessage = true;
-			ImGui::CloseCurrentPopup();
-		}
-
-		ImGui::SameLine();
-
-		if (ImGui::Button("Cancel", ImVec2(120, 0))) {
-			ImGui::CloseCurrentPopup();
-		}
-
-		ImGui::EndPopup();
-	}
-
-	// 保存完了後の通知
-	if (showSuccessMessage) {
-		SavedPopup(showSuccessMessage);
-	}
-}
-
-bool JsonEditorUI::ShowLoadEditorObjPopup(EditorObj& obj) {
-	bool result = false;
-	// Load ボタン
-	if (ImGui::Button("Load EditorObj")) {
-		ImGui::OpenPopup("Load EditorObj");
-	}
-
-	// ポップアップ中央に配置
-	ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-
-	static char fileName[128] = "default_EditorObj.json";
-	static bool showLoadSuccessMessage = false;
-	static bool showLoadErrorMessage = false;
-
-	if (ImGui::BeginPopupModal("Load EditorObj", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-		ImGui::Text("Enter file name to load the EditorObj:");
-		ImGui::InputText("##load_filename", fileName, IM_ARRAYSIZE(fileName));
-
-		ImGui::Separator();
-
-		if (ImGui::Button("Load", ImVec2(120, 0))) {
-			std::string path = fileName;
-			if (path.empty()) {
-				path = "default_EditorObj.json";
-			}
-			if (path.find('.') == std::string::npos) {
-				path += ".json";
-			}
-
-			if (DeserializeEditorObj(path, obj, true)) {
-				showLoadSuccessMessage = true;
-				result = true;
-			} else {
-				showLoadErrorMessage = true;
-			}
-			ImGui::CloseCurrentPopup();
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("Cancel", ImVec2(120, 0))) {
-			ImGui::CloseCurrentPopup();
-		}
-		ImGui::EndPopup();
-	}
-
-	if (showLoadSuccessMessage) {
-		LoadedPopup(showLoadSuccessMessage);
-	}
-
-	// エラーメッセージ（ファイルが存在しない）
-	if (showLoadErrorMessage) {
-		LoadErrorPopup(showLoadErrorMessage, fileName);
-	}
-	return result;
-}
-
-void JsonEditorUI::SerializeEditorObj(const EditorObj& obj, const std::string& filePath) {
-	json json;
-	json["objectName"] = obj.name;
-	json["modelName"] = obj.obj->GetModelName();
-	// Vector3をそれぞれ配列として保存
-	json["transform"]["translate"] = { obj.obj->GetTransform().translate.x, obj.obj->GetTransform().translate.y, obj.obj->GetTransform().translate.z };
-	json["transform"]["rotate"] = { obj.obj->GetTransform().rotate.x, obj.obj->GetTransform().rotate.y, obj.obj->GetTransform().rotate.z };
-	json["transform"]["scale"] = { obj.obj->GetTransform().scale.x, obj.obj->GetTransform().scale.y, obj.obj->GetTransform().scale.z };
-
-	std::filesystem::path dir = "resource/Json";
-	std::filesystem::create_directories(dir); // ディレクトリが無ければ作成
-	std::filesystem::path fullPath = dir / (filePath);
-
-	// 書き込み
-	std::ofstream ofs(fullPath);
-	if (ofs.is_open()) {
-		ofs << json.dump(JSON_INDENT_WIDTH); // インデント付きで出力
-		ofs.close();
-	}
-}
-
-bool JsonEditorUI::DeserializeEditorObj(const std::string& filePath, EditorObj& obj, bool isCreateCommand) {
-	std::filesystem::path dir = "resource/Json";
-	std::filesystem::path fullPath = dir / (filePath);
-	std::ifstream ifs(fullPath);
-	if (!ifs.is_open()) {
-		return false;
-	}
-
-	json json;
-	ifs >> json;
-	ifs.close();
-
-
-	// 名前・モデル名の読み取り
-	if (json.contains("objectName")) {
-		obj.name = json["objectName"].get<std::string>();
-	}
-	if (json.contains("modelName")) {
-		obj.modelName = json["modelName"].get<std::string>();
-	}
-
-	Trans prevTransform = obj.obj->GetTransform();
-	// JSON配列からVector3を復元
-	if (json.contains("transform")) {
-		const auto& t = json["transform"];
-
-		if (t.contains("translate")) {
-			obj.obj->GetTransform().translate.x = t["translate"][0];
-			obj.obj->GetTransform().translate.y = t["translate"][1];
-			obj.obj->GetTransform().translate.z = t["translate"][2];
-		}
-		if (t.contains("rotate")) {
-			obj.obj->GetTransform().rotate.x = t["rotate"][0];
-			obj.obj->GetTransform().rotate.y = t["rotate"][1];
-			obj.obj->GetTransform().rotate.z = t["rotate"][2];
-		}
-		if (t.contains("scale")) {
-			obj.obj->GetTransform().scale.x = t["scale"][0];
-			obj.obj->GetTransform().scale.y = t["scale"][1];
-			obj.obj->GetTransform().scale.z = t["scale"][2];
-		}
-	}
-
-	if (isCreateCommand) {
-		CommandManager::TryCreatePropertyCommand(obj.obj->GetTransform(), prevTransform.translate, obj.obj->GetTransform().translate, &Trans::translate);
-		CommandManager::TryCreatePropertyCommand(obj.obj->GetTransform(), prevTransform.rotate, obj.obj->GetTransform().rotate, &Trans::rotate);
-		CommandManager::TryCreatePropertyCommand(obj.obj->GetTransform(), prevTransform.scale, obj.obj->GetTransform().scale, &Trans::scale);
-	}
-	return true;
-}
-
 void JsonEditorUI::SavedPopup(bool& success) {
 	if (success) {
 		ImGui::OpenPopup("Saved!");
 	}
 
 	if (ImGui::BeginPopupModal("Saved!", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-		ImGui::Text("EditorObj saved successfully!");
+		ImGui::Text("Saved successfully!");
 		if (ImGui::Button("OK")) {
 			ImGui::CloseCurrentPopup();
 			success = false;
@@ -330,7 +145,7 @@ void JsonEditorUI::LoadedPopup(bool& success) {
 		ImGui::OpenPopup("Loaded!");
 	}
 	if (ImGui::BeginPopupModal("Loaded!", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-		ImGui::Text("EditorObj loaded successfully!");
+		ImGui::Text("Loaded successfully!");
 		if (ImGui::Button("OK")) {
 			ImGui::CloseCurrentPopup();
 			success = false;

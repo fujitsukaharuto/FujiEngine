@@ -18,8 +18,7 @@ public:
 	void Update()override;
 	void Draw(bool is = false)override;
 	void DrawCollider();
-	void DebugGUI()override;
-	void ParameterGUI();
+	void ParameterGUI()override;
 
 	/// <summary>値の初期化</summary>
 	void InitParameter();
@@ -59,16 +58,19 @@ public:
 	void OnCollisionEnter([[maybe_unused]] const Collision::ColliderInfo& other)override;
 	void OnCollisionStay([[maybe_unused]] const Collision::ColliderInfo& other)override;
 	void OnCollisionExit([[maybe_unused]] const Collision::ColliderInfo& other)override;
+	/// <remarks>棒(InitRod)自体は当てない。壊れた位置に出る UnderRing が判定を受け持つ</remarks>
+	bool IsCollisionActive() const override { return isArrow_; }
 
 	//========================================================================*/
 	//* Setter
+	/// <summary>止める/動かす</summary>
+	/// <remarks>止めるときは矢の軌跡エミッタも止める。エミッタを触らない場面は SetActive でよい</remarks>
 	void SetIsLive(bool is);
 	void SetEmitterNumber(int num) { emitterNumber_ = num; }
 	void SetArrowMode() { isArrow_ = true; }
 
 	//========================================================================*/
 	//* Getter
-	bool GetIsLive() { return isLive_; }
 
 
 private:
@@ -89,7 +91,6 @@ private:
 	static constexpr float kLightningSpawnHeight_ = 40.0f;   // 雷パーティクルの発生Y高さ
 
 	bool isArrow_ = false;
-	bool isLive_ = false;
 	Math::Vector3 velocity_;
 
 	float animationTime_ = 0.0f;

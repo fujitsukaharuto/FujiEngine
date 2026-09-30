@@ -1,7 +1,6 @@
 #include "ParticleDebugScene.h"
 #include "Engine/Core/Debug/ImGuiManager.h"
 #include "Engine/Graphics/Model/ModelManager.h"
-#include "Engine/Core/Serialize/GlobalVariables.h"
 #include "Engine/Graphics/Camera/CameraManager.h"
 #include "Engine/Core/Time/FPSKeeper.h"
 #include "Engine/Math/Random/Random.h"
@@ -9,7 +8,6 @@
 #include "Engine/Graphics/Line/Line3dDrawer.h"
 #include "Engine/Graphics/Particle/ParticleManager.h"
 #include "Engine/Scene/SceneManager.h"
-#include "Game/Particle/GameEmitters.h"
 #include "Engine/Core/Input/Input.h"
 
 using namespace Core;
@@ -21,28 +19,12 @@ using namespace DXC;
 
 ParticleDebugScene::ParticleDebugScene() {}
 
-ParticleDebugScene::~ParticleDebugScene() {
-	FPSKeeper::SetUnStopped();
-	ParticleManager::SetIsStopped(false);
-	ParticleManager::GetInstance()->ResetCSEmitters();
-	Game::CreateDefaultEmitters();
-}
+ParticleDebugScene::~ParticleDebugScene() {}
 
 void ParticleDebugScene::Initialize() {
 
-	CameraManager::GetInstance()->GetCamera()->GetTransform().rotate = { 0.0f,0.0f,0.0f };
 
-	skybox_ = std::make_unique<SkyBox>();
-	skybox_->Initialize();
-	skybox_->SetColor(skyBoxColor_);
 
-	terrain_ = std::make_unique<AnimationModel>();
-	terrain_->Create("ground.obj");
-	terrain_->IsMirrorOBJ(true);
-	terrain_->GetTransform().translate.y = -5.0f;
-	terrain_->SetEnvironmentCoeff(0.3f);
-	terrain_->SetTexture("grass.jpg");
-	terrain_->SetColor(terrainColor_);
 
 }
 
@@ -65,8 +47,6 @@ void ParticleDebugScene::Draw() {
 #pragma endregion
 
 #pragma region 3Dオブジェクト
-	skybox_->Draw();
-	terrain_->Draw();
 
 #ifdef _DEBUGMODE
 	ParticleManager::GetInstance()->SelectEmitterSizeDraw();

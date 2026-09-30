@@ -23,7 +23,8 @@ namespace Editor {
 		/// <summary>
 		/// ギズモを表示しTransに反映する。編集完了時にUndoコマンドを発行する
 		/// </summary>
-		void Manipulate(Math::Trans& transform);
+		/// <param name="recordUndo">false ならコマンドを積まない。途中で破棄されうる対象(ゲーム中のオブジェクト)に使う</param>
+		void Manipulate(Math::Trans& transform, bool recordUndo = true);
 
 		/// <summary>操作モード固定・親対応/Undoコマンド無しの軽量版</summary>
 		static void ManipulateSimple(Math::Trans& transform, GizmoOperation operation);

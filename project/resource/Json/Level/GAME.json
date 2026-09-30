@@ -1,0 +1,226 @@
+{
+    "environment": {
+        "cameraPosition": [
+            0,
+            5,
+            -30
+        ],
+        "cameraRotate": [
+            0,
+            0,
+            0
+        ],
+        "lightColor": [
+            1,
+            1,
+            1,
+            1
+        ],
+        "lightDirection": [
+            0,
+            -1,
+            0
+        ],
+        "lightIntensity": 1.0,
+        "skyBox": true,
+        "skyBoxColor": [
+            0.45,
+            0.25,
+            0.4,
+            1
+        ]
+    },
+    "objects": [
+        {
+            "anime": true,
+            "color": [
+                0.85,
+                0.15,
+                0.1,
+                1
+            ],
+            "environment": 0.3,
+            "mirror": true,
+            "model": "ground.obj",
+            "name": "Terrain",
+            "texture": "grass.jpg",
+            "transform": {
+                "rotate": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ],
+                "translate": [
+                    0,
+                    0,
+                    0
+                ]
+            }
+        },
+        {
+            "color": [
+                0.775,
+                0.385,
+                0.355,
+                1
+            ],
+            "light": "SpotLight",
+            "model": "surroundings.gltf",
+            "name": "Surroundings",
+            "transform": {
+                "rotate": [
+                    1.5899990797042847,
+                    0,
+                    0
+                ],
+                "scale": [
+                    0.44999998807907104,
+                    0.44999998807907104,
+                    0.15000000596046448
+                ],
+                "translate": [
+                    0,
+                    -5,
+                    0
+                ]
+            }
+        }
+    ],
+    "sprites": [
+        {
+            "name": "key",
+            "texture": "key_beta.png",
+            "pos": [
+                1280,
+                720
+            ],
+            "size": [
+                400,
+                300
+            ],
+            "anchor": [
+                1,
+                1
+            ],
+            "color": [
+                1,
+                1,
+                1,
+                1
+            ],
+            "visible": false
+        },
+        {
+            "name": "pad",
+            "texture": "keyPad_beta.png",
+            "pos": [
+                1280,
+                720
+            ],
+            "size": [
+                400,
+                300
+            ],
+            "anchor": [
+                1,
+                1
+            ],
+            "color": [
+                1,
+                1,
+                1,
+                1
+            ],
+            "visible": false
+        },
+        {
+            "name": "gameOver",
+            "texture": "gameover_beta.png",
+            "pos": [
+                0,
+                0
+            ],
+            "size": [
+                1280,
+                720
+            ],
+            "anchor": [
+                0,
+                0
+            ],
+            "color": [
+                1,
+                1,
+                1,
+                1
+            ],
+            "visible": false
+        },
+        {
+            "name": "gameOverSelector",
+            "texture": "ball16x16.png",
+            "pos": [
+                180,
+                450
+            ],
+            "size": [
+                40,
+                40
+            ],
+            "anchor": [
+                0.5,
+                0.5
+            ],
+            "color": [
+                0.7,
+                0.7,
+                0.1,
+                1
+            ],
+            "visible": false
+        },
+        {
+            "name": "flash",
+            "texture": "white2x2.png",
+            "pos": [
+                0,
+                0
+            ],
+            "size": [
+                1280,
+                720
+            ],
+            "anchor": [
+                0,
+                0
+            ],
+            "color": [
+                0,
+                0,
+                0,
+                0
+            ],
+            "visible": false
+        }
+    ],
+    "spawnPoints": [
+        {
+            "name": "Start",
+            "translate": [
+                0,
+                1,
+                -25
+            ],
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        }
+    ]
+}

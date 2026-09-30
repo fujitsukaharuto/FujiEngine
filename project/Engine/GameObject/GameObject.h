@@ -1,14 +1,14 @@
 #pragma once
 #include <memory>
+#include <string>
+#include <variant>
 #include <vector>
-// json は宣言とポインタにしか使わないので前方宣言で足りる
 #include <json_fwd.hpp>
 
 #include "Engine/Graphics/Object/Object3d.h"
 #include "Engine/Graphics/Object/AnimationModel.h"
 #include "Engine/Graphics/Object/RenderObject.h"
 #include "Engine/Collision/AABBCollider.h"
-// FPSKeeper / CameraManager / Input はここでは使わない。要る派生クラスが自分で include する
 
 namespace GameObject {
 
@@ -18,7 +18,6 @@ namespace GameObject {
 	class GameObject {
 	public:
 		GameObject();
-		/// <remarks>modelDataJson_ が不完全型の unique_ptr なので定義は .cpp に置く</remarks>
 		virtual ~GameObject();
 
 		virtual void Initialize();
@@ -26,11 +25,42 @@ namespace GameObject {
 		/// <remarks>派生は override 後に必ず GameObject::GameObject::Update() を呼ぶこと</remarks>
 		virtual void Update();
 		virtual void Draw(bool is = false);
-		virtual void DebugGUI();
 
-	#ifdef _DEBUGMODE
-		virtual void Debug();
-	#endif // _DEBUG
+		/// <summary>このオブジェクト固有の調整項目。Inspector の末尾に出る</summary>
+		/// <remarks>Transform・描画物・コライダーは Inspector が出すので、ここには派生だけが持つ値を書く</remarks>
+		virtual void ParameterGUI() {}
+		/// <summary>Inspector に出す中身(描画物・コライダー・ParameterGUI)</summary>
+		/// <remarks>Transform は Inspector 側がギズモと一緒に出すのでここでは扱わない</remarks>
+		void InspectorGUI();
+
+		//========================================================================*/
+		//* Hierarchy
+		/// <summary>生存中の全オブジェクト。生成順に並ぶ</summary>
+		/// <remarks>コンストラクタで登録・デストラクタで解除されるので、呼び出し側の登録は要らない</remarks>
+		static const std::vector<GameObject*>& GetAll();
+		/// <summary>Hierarchy に出す名前。未設定ならクラス名を返す</summary>
+		std::string GetName() const;
+		/// <summary>名前空間を除いたクラス名</summary>
+		std::string GetTypeName() const;
+		void SetName(const std::string& name) { name_ = name; }
+		/// <summary>t がこのオブジェクトの持つTransform(本体・描画物・アンカー)か</summary>
+		/// <remarks>Hierarchy が親ポインタから「どのオブジェクトの子か」を引き当てるのに使う</remarks>
+		bool OwnsTrans(const Math::Trans* t) const;
+		/// <summary>ピッキングの番号がこのオブジェクトの描画物のものか</summary>
+		bool OwnsObjID(int objID) const;
+
+		//========================================================================*/
+		//* 寿命
+		/// <summary>動かす/止める</summary>
+		/// <remarks>止めている間は当たり判定から外れ、Spawn したものなら Update・Draw も呼ばれない。
+		/// プールした弾の待機中など「消さずに休ませる」ときに使う。自分で持っているオブジェクトの Update・Draw は持ち主が呼び分けること</remarks>
+		void SetActive(bool active) { isActive_ = active; }
+		bool IsActive() const { return isActive_; }
+		/// <summary>破棄を予約する</summary>
+		/// <remarks>Spawn したものは、そのフレームの当たり判定が済んだ後にシーンが破棄する。
+		/// 予約した時点で当たり判定からは外れる。自分で持っているオブジェクトには印が付くだけ</remarks>
+		void Destroy() { isDestroyed_ = true; }
+		bool IsDestroyed() const { return isDestroyed_; }
 
 	public:
 
@@ -40,6 +70,11 @@ namespace GameObject {
 		virtual void OnCollisionEnter([[maybe_unused]] const Collision::ColliderInfo& other) {}
 		virtual void OnCollisionStay([[maybe_unused]] const Collision::ColliderInfo& other) {}
 		virtual void OnCollisionExit([[maybe_unused]] const Collision::ColliderInfo& other) {}
+		/// <summary>このオブジェクトのコライダーを判定に入れるか</summary>
+		/// <remarks>AddCollider したコライダーは SceneManager が毎フレーム自動で集めるので、シーン側の登録は要らない。
+		/// SetActive(false) の間は呼ばれずに外れる。動いているが当てたくない間(溜め中など)だけ false を返す。
+		/// コライダー1個ずつ切るなら BaseCollider::SetIsCollisonCheck</remarks>
+		virtual bool IsCollisionActive() const { return true; }
 
 		/// <summary>値比較</summary>
 		float ComparNum(float a, float b);
@@ -47,9 +82,6 @@ namespace GameObject {
 		void CreateModel(const std::string& name);
 		/// <summary>アニメーションモデル作成</summary>
 		void CreateAnimeModel(const std::string& name);
-		/// <summary>Jsonから作成</summary>
-		void CreateFromJson(const std::string& name);
-		void CreateFromJson();
 		/// <summary>jsonからこのオブジェクトのTransformを読み込む</summary>
 		void LoadTransformFromJson(const std::string& name);
 
@@ -57,7 +89,6 @@ namespace GameObject {
 		//* Setter
 		void SetModel(const std::string& name);
 		void SetAnimeModel(const std::string& name);
-		void SetModelDataJson(const nlohmann::json& jsonData);
 
 		//========================================================================*/
 		//* Getter
@@ -122,6 +153,18 @@ namespace GameObject {
 		/// <remarks>主ビジュアル(GetModel/GetAnimeModel)にも使える。未登録のハンドルは無視される</remarks>
 		void SetRendererVisible(const Graphics::RenderObject* handle, bool visible);
 
+		//========================================================================*/
+		//* Parameter
+		/// <summary>調整値を登録する。Inspector の Parameters に並び、保存した値は次の生成から読み込まれる</summary>
+		/// <remarks>既定値を入れた後に呼ぶこと。保存済みの値があればその場で上書きする。
+		/// 保存先はクラスごとに1ファイル(resource/Json/Param/クラス名.json)なので、同じクラスのインスタンスは値を共有する</remarks>
+		void AddParam(const std::string& name, float& value, float speed = 0.01f);
+		void AddParam(const std::string& name, int& value);
+		void AddParam(const std::string& name, bool& value);
+		void AddParam(const std::string& name, Math::Vector3& value, float speed = 0.01f);
+		/// <remarks>色として編集する</remarks>
+		void AddParam(const std::string& name, Math::Vector4& value);
+
 	protected:
 
 		/// <summary>このオブジェクト自身のTransform。描画物・コライダー・アンカーの親になる</summary>
@@ -149,10 +192,27 @@ namespace GameObject {
 		/// <summary>描画しないTransformアンカー。エミッタ・コライダーのペアレント先にだけ使う</summary>
 		std::vector<std::unique_ptr<Math::Trans>> anchors_;
 
-		/// <summary>Jsonから生成する際の元データ。json.hpp をヘッダから隔離するため実体は持たない</summary>
-		std::unique_ptr<nlohmann::json> modelDataJson_;
+	private:
+
+		/// <summary>AddParam で登録した調整値1件。値の実体は派生のメンバで、ここはその場所を覚えるだけ</summary>
+		struct Param {
+			std::string name;
+			std::variant<float*, int*, bool*, Math::Vector3*, Math::Vector4*> value;
+			float speed = 0.01f;
+		};
+
+		/// <summary>保存済みの値があれば読み込んでから登録する</summary>
+		void RegisterParam(Param param);
+		/// <summary>登録済みの調整値をクラスのファイルへ書き出す</summary>
+		void SaveParams() const;
 
 	private:
+
+		/// <summary>Hierarchy に出す名前。空ならクラス名で代用する</summary>
+		std::string name_;
+		std::vector<Param> params_;
+		bool isActive_ = true;
+		bool isDestroyed_ = false;
 
 	};
 

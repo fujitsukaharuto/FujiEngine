@@ -51,7 +51,6 @@ namespace Graphics {
 		//========================================================================*/
 		//* Getter
 		std::string GetModelName() { return modelName_; }
-		int GetObjID() { return objIDData_->objID; }
 		/// <summary>親がいるかどうか</summary>
 		bool IsHaveParent() { return transform_.parent ? true : false; }
 
@@ -61,8 +60,6 @@ namespace Graphics {
 		//* Setter
 		/// <summary>α値の閾値</summary>
 		void SetAlphaRef(float ref);
-		/// <summary>ピッキング用にIDの調整</summary>
-		void SetEditorObjParameter();
 
 	private:
 

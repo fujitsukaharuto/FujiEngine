@@ -45,7 +45,7 @@ namespace Editor {
 		ImGui::RadioButton("SCALE", &gizmoType_, 2);
 	}
 
-	void GizmoHelper::Manipulate(Trans& transform) {
+	void GizmoHelper::Manipulate(Trans& transform, bool recordUndo) {
 		const ImGuizmo::OPERATION operation =
 			ToImGuizmoOperation(static_cast<GizmoOperation>(gizmoType_));
 
@@ -91,7 +91,9 @@ namespace Editor {
 			}
 		} else if (isUsingGizmo_) {
 			// 編集終了検出 → Command 発行
-			if (transform.translate != prevPos_) {
+			if (!recordUndo) {
+				// 積まない。対象が先に破棄されると Undo が解放済みの Trans を触る
+			} else if (transform.translate != prevPos_) {
 				auto command = std::make_unique<PropertyCommand<Vector3>>(
 					transform, &Trans::translate, prevPos_, transform.translate);
 				CommandManager::GetInstance()->Execute(std::move(command));

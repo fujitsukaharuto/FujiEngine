@@ -57,7 +57,7 @@ void BossItemManager::Update() {
 
 void BossItemManager::Draw() {
 	for (auto& wall : walls_) {// Itemの描画
-		if (!wall->GetIsLive())continue;
+		if (!wall->IsActive())continue;
 		wall->Draw();
 #ifdef _DEBUGMODE
 		wall->DrawCollider();
@@ -65,19 +65,19 @@ void BossItemManager::Draw() {
 	}
 
 	for (auto& arrow : arrows_) {
-		if (!arrow->GetIsLive())continue;
+		if (!arrow->IsActive())continue;
 		arrow->Draw();
 #ifdef _DEBUGMODE
 		arrow->DrawCollider();
 #endif // _DEBUG
 	}
 	for (auto& rod : rods_) {
-		if (!rod->GetIsLive())continue;
+		if (!rod->IsActive())continue;
 		rod->Draw();
 	}
 
 	for (auto& ring : underRings_) {
-		if (!ring->GetIsLive())continue;
+		if (!ring->IsActive())continue;
 		ring->Draw();
 #ifdef _DEBUGMODE
 		ring->DrawCollider();
@@ -87,7 +87,7 @@ void BossItemManager::Draw() {
 
 void BossItemManager::ReStart() {
 	for (auto& wave : walls_) {
-		wave->SetIsLive(false);
+		wave->SetActive(false);
 	}
 	for (auto& arrow : arrows_) {
 		arrow->SetIsLive(false);
@@ -96,7 +96,7 @@ void BossItemManager::ReStart() {
 		rod->SetIsLive(false);
 	}
 	for (auto& ring : underRings_) {
-		ring->SetIsLive(false);
+		ring->SetActive(false);
 	}
 }
 
@@ -109,7 +109,7 @@ void BossItemManager::ClearAll() {
 
 void BossItemManager::UpdateWaveWall() {
 	for (auto& wall : walls_) {
-		if (!wall->GetIsLive())continue;
+		if (!wall->IsActive())continue;
 		wall->CalculationFollowVec(pPlayer_->GetWorldPos());
 		wall->Update();
 	}
@@ -124,7 +124,7 @@ void BossItemManager::WaveWallAttack(const Vector3& pos, float RotateY) {
 	wavePos.y = 0.0f;
 	for (auto& wall : walls_) {
 		if (count == 3) break;
-		if (wall->GetIsLive()) continue;
+		if (wall->IsActive()) continue;
 		Vector3 velocity = { 0.0f,0.0f,1.0f };
 		if (count == 1) velocity = Vector3(-1.0f, 0.0f, 1.0f).Normalize();
 		if (count == 2) velocity = Vector3(1.0f, 0.0f, 1.0f).Normalize();
@@ -139,7 +139,7 @@ void BossItemManager::WaveWallAttack(const Vector3& pos, float RotateY) {
 
 void BossItemManager::UpdateArrows() {
 	for (auto& arrow : arrows_) {
-		if (!arrow->GetIsLive())continue;
+		if (!arrow->IsActive())continue;
 		arrow->TargetSetting(pPlayer_->GetWorldPos());
 		arrow->Update();
 	}
@@ -150,7 +150,7 @@ void BossItemManager::ArrowAttack(const std::vector<Vector3>& pos, int spawnNum)
 
 	for (auto& arrow : arrows_) {
 		if (count == spawnNum) break;
-		if (arrow->GetIsLive()) continue;
+		if (arrow->IsActive()) continue;
 
 		// 矢の位置と飛ぶまでの時間を決める
 		Vector3 arrowPos = pos[count];
@@ -167,7 +167,7 @@ void BossItemManager::ArrowAttack(const std::vector<Vector3>& pos, int spawnNum)
 void BossItemManager::UpdateRod() {
 	for (auto& rod : rods_) {
 		if (rod->GetIsBroke()) RodUnderRing(rod->GetWorldPos());
-		if (!rod->GetIsLive())continue;
+		if (!rod->IsActive())continue;
 		rod->RodUpdate();
 	}
 }
@@ -177,7 +177,7 @@ void BossItemManager::RodFall(const Vector3& pos) {
 
 	for (auto& rod : rods_) {
 		if (count == 6) break;
-		if (rod->GetIsLive()) continue;
+		if (rod->IsActive()) continue;
 
 		// ロッドの出現位置を決める
 		Vector3 rodPos = pos;
@@ -194,7 +194,7 @@ void BossItemManager::RodUnderRing(const Vector3& emitPos) {
 	int count = 0;
 	for (auto& ring : underRings_) {
 		if (count == 1) break;
-		if (ring->GetIsLive()) continue;
+		if (ring->IsActive()) continue;
 		ring->InitRing(emitPos, 120.0f);
 		count++;
 	}
@@ -202,7 +202,7 @@ void BossItemManager::RodUnderRing(const Vector3& emitPos) {
 
 void BossItemManager::UpdateUnderRing() {
 	for (auto& ring : underRings_) {
-		if (!ring->GetIsLive())continue;
+		if (!ring->IsActive())continue;
 		ring->Update();
 	}
 }
@@ -213,7 +213,7 @@ void BossItemManager::UnderRingEmit(const Vector3& pos) {
 	int count = 0;
 	for (auto& ring : underRings_) {
 		if (count == 1) break;
-		if (ring->GetIsLive()) continue;
+		if (ring->IsActive()) continue;
 		ring->InitRing(pos);
 		count++;
 	}

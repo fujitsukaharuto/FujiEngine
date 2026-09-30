@@ -1,9 +1,9 @@
 #include "TitleScene.h"
+#include <cassert>
 #include <json.hpp>
 #include "Engine/Core/Serialize/JsonSerializer.h"
 #include "Engine/Core/Debug/ImGuiManager.h"
 #include "Engine/Graphics/Model/ModelManager.h"
-#include "Engine/Core/Serialize/GlobalVariables.h"
 #include "Engine/Graphics/Camera/CameraManager.h"
 #include "Engine/Core/Time/FPSKeeper.h"
 #include "Engine/Math/Random/Random.h"
@@ -30,49 +30,23 @@ using namespace Collision;
 
 TitleScene::TitleScene() {}
 
-TitleScene::~TitleScene() {
-	ParticleManager::GetInstance()->ResetCSEmitters();
-	Game::CreateDefaultEmitters();
-}
+TitleScene::~TitleScene() {}
 
 void TitleScene::Initialize() {
 
-	CameraManager::GetInstance()->GetCamera()->GetTransform().rotate = { cameraStartRotateX_,0.0f,0.0f };
-	CameraManager::GetInstance()->GetCamera()->GetTransform().translate = cameraPos_;
+	// カメラの初期位置は配置データの環境にある。演出はその向きから見下ろしへ起こしていく
+	cameraStartRotate_ = level_.GetEnvironment().cameraRotate;
 
 	dxcommon_->GetOffscreenManager()->ResetPostEffect();
 	dxcommon_->GetOffscreenManager()->AddPostEffect(PostEffectList::Bloom);
 
-	skybox_ = std::make_unique<SkyBox>();
-	skybox_->Initialize();
-	skybox_->SetColor(skyBoxColor_);
-
-	terrain_ = std::make_unique<AnimationModel>();
-	terrain_->Create("ground.obj");
-	terrain_->IsMirrorOBJ(true);
-	terrain_->SetEnvironmentCoeff(0.3f);
-	terrain_->SetTexture("grass.jpg");
-	terrain_->SetColor(terrainColor_);
-
-	surroundings_ = std::make_unique<Object3d>();
-	surroundings_->Create("surroundings.gltf");
-	surroundings_->LoadTransformFromJson("surroundings_transform.json");
-	surroundings_->SetColor(surroundingColor_);
-	surroundings_->SetLightEnable(LightMode::kSpotLightON);
-
-	space_ = std::make_unique<Sprite>();
-	space_->Load("spaceKey.png");
-	space_->SetPos(spacePos_);
-	space_->SetSize(spaceSize_);
-
-	title_ = std::make_unique<Sprite>();
-	title_->Load("Title.png");
-	title_->SetPos({ titleStartX_,titleY_,0.0f });
-	title_->SetSize(titleSize_);
+	// ロゴと案内の絵は配置データ(resource/Json/Level/TITLE.json)に置いてある
+	space_ = level_.FindSprite("space");
+	title_ = level_.FindSprite("title");
+	assert(space_ && title_);
+	title_->SetPos({ titleStartX_,titleY_ });
 
 	player_ = std::make_unique<Player>();
-	json playerData = JsonSerializer::DeserializeJsonData("resource/Json/Game_Player.json");
-	player_->SetModelDataJson(playerData);
 	player_->Initialize();
 	TitleLoadPlayerPoint();
 	player_->SettingTitleStartPosition(playerStart_, playerCenter_, playerEnd_);
@@ -82,7 +56,6 @@ void TitleScene::Initialize() {
 	particleTest_->CreateSphere();
 	particleTest_->SetColor(Colors::Transparent);
 
-	cMane_ = std::make_unique<CollisionManager>();
 	
 	const float PI = kPi;
 	for (int i = 0; i < towerDivision_; i++) {
@@ -117,7 +90,6 @@ void TitleScene::Initialize() {
 
 void TitleScene::Update() {
 
-	cMane_->Reset();
 
 #ifdef _DEBUGMODE
 
@@ -133,17 +105,24 @@ void TitleScene::Update() {
 	if (startTime_ <= titleCanMoveTime_) {
 		float titleMoveT = (std::max)(startTime_ / titleCanMoveTime_, 0.0f);
 		float titlePosX = std::lerp(titleEmdX_, titleStartX_, powf(titleMoveT, 4.0f));
-		title_->SetPos({ titlePosX,titleY_,0.0f });
+		title_->SetPos({ titlePosX,titleY_ });
 	}
 	float cameraT = (std::max)(startTime_ / startMaxTime_, 0.0f);
-	float rotateX = std::lerp(cameraEndRotateX_, cameraStartRotateX_, cameraT);
-	CameraManager::GetInstance()->GetCamera()->GetTransform().rotate = { rotateX,0.0f,0.0f };
+	float rotateX = std::lerp(cameraEndRotateX_, cameraStartRotate_.x, cameraT);
+	CameraManager::GetInstance()->GetCamera()->GetTransform().rotate = { rotateX,cameraStartRotate_.y,cameraStartRotate_.z };
 	player_->TitleUpdate(startTime_);
 
 	auto& emitter = Game::DefaultSphereEmitter();
 	emitter.SetPos(particleTest_->GetWorldPos());
 
-	cMane_->CheckAllCollision();
+	// ロゴは常に、スペースキーの案内は演出が終わってから出す
+	bool isUIVisible = true;
+#ifdef _DEBUGMODE
+	isUIVisible = !uiInvisible_;
+#endif // _DEBUGMODE
+	space_->SetVisible(isUIVisible && startTime_ < 0.0f);
+	title_->SetVisible(isUIVisible);
+
 
 }
 
@@ -155,29 +134,10 @@ void TitleScene::Draw() {
 #pragma endregion
 
 #pragma region 3Dオブジェクト
-	skybox_->Draw();
-
-	terrain_->Draw();
-	surroundings_->Draw();
-
 	player_->TitleDraw();
 
-#ifdef _DEBUGMODE
-	if (!uiInvisible_) {
-		if (startTime_ < 0.0f) {
-			space_->Draw();
-		}
-		title_->Draw();
-	}
-#else
-	if (startTime_ < 0.0f) {
-		space_->Draw();
-	}
-	title_->Draw();
-#endif // _DEBUG
 
 
-	DrawEditorObjects();
 
 #pragma endregion
 
@@ -205,10 +165,6 @@ void TitleScene::DebugGUI() {
 	ImGui::Indent();
 	if (ImGui::CollapsingHeader("particleTest")) {
 		particleTest_->DebugGUI();
-	}
-	skybox_->DebugGUI();
-	if (ImGui::CollapsingHeader("terrain")) {
-		terrain_->DebugGUI();
 	}
 	ImGui::Unindent();
 #endif // _DEBUG
@@ -241,9 +197,6 @@ void TitleScene::CheckSceneChange() {
 		ChangeScene("PARTICLEDEBUG");
 	}
 #endif // _DEBUG
-}
-
-void TitleScene::ApplyGlobalVariables() {
 }
 
 void TitleScene::TitleLoadPlayerPoint() {

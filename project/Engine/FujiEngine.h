@@ -12,7 +12,6 @@
 #include "Engine/Core/App/MyWindow.h"
 #include "Engine/Core/Input/Input.h"
 #include "Engine/Audio/AudioPlayer.h"
-#include "Engine/Core/Serialize/GlobalVariables.h"
 
 //========================================================================*/
 //* 数学

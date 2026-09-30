@@ -45,7 +45,7 @@ namespace Graphics {
 
 		/// <summary>スキンメッシュのインスタンスを1つ積む</summary>
 		/// <remarks>頂点が毎フレーム動くのでBLASも毎フレーム作り直す。スキニングより後に呼ぶこと</remarks>
-		/// <param name="key">インスタンスを識別するもの。BLASの使い回しに使う</param>
+		/// <param name="key">インスタンスを識別するもの。BLASの使い回しに使う。破棄されたものと同じアドレスが来てもよい(大きさを毎回確かめる)</param>
 		/// <param name="model">モデル(インデックスバッファの取得用)</param>
 		/// <param name="skinnedMeshes">スキニング後のメッシュ</param>
 		/// <param name="world">ワールド行列</param>
@@ -98,13 +98,32 @@ namespace Graphics {
 			Microsoft::WRL::ComPtr<ID3D12Resource> buffer;
 			Microsoft::WRL::ComPtr<ID3D12Resource> scratch;
 			D3D12_GPU_VIRTUAL_ADDRESS address = 0;
+			UINT64 bufferSize = 0;
+			UINT64 scratchSize = 0;
+			/// <summary>最後に積んだフレーム。しばらく来なければ持ち主が消えたとみなして捨てる</summary>
+			uint64_t lastUsedFrame = 0;
 		};
+
+		/// <summary>GPUが使い終わるのを待ってから捨てるBLAS</summary>
+		struct RetiredBlas {
+			SkinnedBlas blas;
+			uint64_t retiredFrame = 0;
+		};
+
+		/// <summary>このフレーム数だけ経てば、そのフレームに積んだGPUの処理は終わっている</summary>
+		static constexpr uint64_t kReleaseDelayFrames = DXC::kFrameCount_ + 1;
+
+		/// <summary>来なくなったスキンメッシュのBLASと、待ち終えた古いBLASを捨てる</summary>
+		void ReleaseUnusedSkinnedBlas();
 
 		// Model側にDXRを持ち込まないよう、対応付けはこちらで抱える
 		std::unordered_map<const Model*, Blas> blasMap_;
 
-		// スキンメッシュはポーズが個体ごとに違うので、モデルではなくインスタンス単位で持つ
+		// スキンメッシュはポーズが個体ごとに違うので、モデルではなくインスタンス単位で持つ。
+		// キーはアドレスなので、破棄されたオブジェクトの跡に別のオブジェクトが来ることがある
 		std::unordered_map<const RenderObject*, SkinnedBlas> skinnedBlasMap_;
+		std::vector<RetiredBlas> retiredBlas_;
+		uint64_t frameNumber_ = 0;
 
 		// 構築を描画と同じQueueに積んでいるので1つで足りる。別Queueへ移すならフレーム数ぶん要る
 		Microsoft::WRL::ComPtr<ID3D12Resource> tlasBuffer_;

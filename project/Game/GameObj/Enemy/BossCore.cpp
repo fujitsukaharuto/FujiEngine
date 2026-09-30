@@ -40,15 +40,6 @@ void BossCore::Draw([[maybe_unused]] bool is) {
 	DrawColliders();
 }
 
-void BossCore::DebugGUI() {
-#ifdef _DEBUGMODE
-	if (ImGui::CollapsingHeader("BossCore")) {
-		GameObject::GameObject::DebugGUI();
-		collider_->DebugGUI();
-	}
-#endif // _DEBUG
-}
-
 void BossCore::ParameterGUI() {
 #ifdef _DEBUGMODE
 

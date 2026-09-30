@@ -59,6 +59,10 @@ namespace Graphics {
 		/// <returns>Vector3</returns>
 		const Math::Vector3& GetTranslate()const { return translation_; }
 
+		/// <summary>向きを Camera の rotate と同じ形(x=pitch, y=yaw, z=0)で返す</summary>
+		/// <remarks>回転の掛け順が MakeRotateXYZMatrix と一致するので、そのまま Camera へ入れれば同じ視点になる</remarks>
+		Math::Vector3 GetRotate()const { return { params_.pitch, params_.yaw, 0.0f }; }
+
 		void DebugGUI();
 
 	private:

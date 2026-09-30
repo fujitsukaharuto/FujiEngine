@@ -1,4 +1,7 @@
 #include "GameObject.h"
+#include <typeinfo>
+#include <filesystem>
+#include <unordered_map>
 #include <json.hpp>
 #include "Engine/Core/Serialize/JsonSerializer.h"
 #include "Engine/Core/Debug/ImGuiManager.h"
@@ -14,12 +17,102 @@ namespace GameObject {
 	using namespace Editor;
 
 
-	GameObject::GameObject() : modelDataJson_(std::make_unique<nlohmann::json>()) {
-		// Math::Trans の既定は scale=0。1 にしておかないと子の GetWorldMat が潰れる
-		transform_.scale = { 1.0f,1.0f,1.0f };
+	namespace {
+		// 関数内 static にして、どの翻訳単位の静的オブジェクトより先に使われても構築済みにする
+		std::vector<GameObject*>& Registry() {
+			static std::vector<GameObject*> registry;
+			return registry;
+		}
+
+		const std::filesystem::path kParamDirectory = "resource/Json/Param";
+
+		// 調整値のファイルはクラス単位。弾のように同じクラスが何度も生成されるので、読むのは最初の1回だけにする
+		nlohmann::json& ParamFile(const std::string& typeName) {
+			static std::unordered_map<std::string, nlohmann::json> cache;
+			auto it = cache.find(typeName);
+			if (it == cache.end()) {
+				nlohmann::json data = JsonSerializer::DeserializeJsonData((kParamDirectory / (typeName + ".json")).string());
+				it = cache.emplace(typeName, data.is_object() ? std::move(data) : nlohmann::json::object()).first;
+			}
+			return it->second;
+		}
+
+		// 型が合わない値は読まない。手で書き換えたファイルで既定値を壊さないため
+		void ReadParam(const nlohmann::json& v, float& out) { if (v.is_number()) { out = v.get<float>(); } }
+		void ReadParam(const nlohmann::json& v, int& out) { if (v.is_number_integer()) { out = v.get<int>(); } }
+		void ReadParam(const nlohmann::json& v, bool& out) { if (v.is_boolean()) { out = v.get<bool>(); } }
+		void ReadParam(const nlohmann::json& v, Vector3& out) {
+			if (v.is_array() && v.size() == 3) { out = { v[0].get<float>(), v[1].get<float>(), v[2].get<float>() }; }
+		}
+		void ReadParam(const nlohmann::json& v, Vector4& out) {
+			if (v.is_array() && v.size() == 4) { out = { v[0].get<float>(), v[1].get<float>(), v[2].get<float>(), v[3].get<float>() }; }
+		}
+
+		nlohmann::json WriteParam(float value) { return value; }
+		nlohmann::json WriteParam(int value) { return value; }
+		nlohmann::json WriteParam(bool value) { return value; }
+		nlohmann::json WriteParam(const Vector3& value) { return { value.x, value.y, value.z }; }
+		nlohmann::json WriteParam(const Vector4& value) { return { value.x, value.y, value.z, value.w }; }
 	}
 
-	GameObject::~GameObject() = default;
+	GameObject::GameObject() {
+		// Math::Trans の既定は scale=0。1 にしておかないと子の GetWorldMat が潰れる
+		transform_.scale = { 1.0f,1.0f,1.0f };
+		Registry().push_back(this);
+	}
+
+	GameObject::~GameObject() {
+		std::erase(Registry(), this);
+	}
+
+	const std::vector<GameObject*>& GameObject::GetAll() {
+		return Registry();
+	}
+
+	std::string GameObject::GetName() const {
+		if (!name_.empty()) {
+			return name_;
+		}
+		return GetTypeName();
+	}
+
+	std::string GameObject::GetTypeName() const {
+		// MSVC は "class Foo::Bar" の形で返すので、キーワードと名前空間を落とす
+		std::string name = typeid(*this).name();
+		if (const size_t space = name.rfind(' '); space != std::string::npos) {
+			name.erase(0, space + 1);
+		}
+		if (const size_t scope = name.rfind("::"); scope != std::string::npos) {
+			name.erase(0, scope + 2);
+		}
+		return name;
+	}
+
+	bool GameObject::OwnsTrans(const Math::Trans* t) const {
+		if (t == &transform_) {
+			return true;
+		}
+		for (const auto& r : renderers_) {
+			if (t == &r.object->GetTransform()) {
+				return true;
+			}
+		}
+		for (const auto& anchor : anchors_) {
+			if (t == anchor.get()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	bool GameObject::OwnsObjID(int objID) const {
+		for (const auto& r : renderers_) {
+			if (r.object->GetObjID() == objID) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	void GameObject::Initialize() {
 		// CreateModel系が呼ばれたときに必要な方だけ生成する
@@ -61,30 +154,60 @@ namespace GameObject {
 		}
 	}
 
-	void GameObject::DebugGUI() {
+	void GameObject::InspectorGUI() {
 	#ifdef _DEBUGMODE
-		// オブジェクト自身のTransform。モデル側のギズモが動かすのはローカルオフセットなので、
-		// 本体(コライダーやエミッタを含む)を動かすにはこちらを触ること
-		if (ImGui::TreeNode("Transform")) {
-			ImGui::DragFloat3("translate", &transform_.translate.x, 0.01f);
-			ImGui::DragFloat3("rotate", &transform_.rotate.x, 0.01f);
-			ImGui::DragFloat3("scale", &transform_.scale.x, 0.01f);
-			ImGui::TreePop();
+		// 見た目の編集UIは Object3dEditor / AnimationModelEditor に集約されている。
+		// そちらのTransformはこのオブジェクトからのローカルオフセット
+		if (!renderers_.empty() && ImGui::CollapsingHeader("Renderers", ImGuiTreeNodeFlags_DefaultOpen)) {
+			for (size_t i = 0; i < renderers_.size(); ++i) {
+				RendererEntry& r = renderers_[i];
+				ImGui::PushID(static_cast<int>(i));
+				ImGui::Checkbox("##visible", &r.visible);
+				ImGui::SameLine();
+				const bool isPrimary = (r.object.get() == model_ || r.object.get() == animeModel_);
+				const std::string label = (isPrimary ? "Primary" : "Renderer " + std::to_string(i));
+				if (ImGui::TreeNode(label.c_str())) {
+					if (auto* object = dynamic_cast<Object3d*>(r.object.get())) {
+						object->DebugGUI();
+					} else if (auto* anime = dynamic_cast<AnimationModel*>(r.object.get())) {
+						anime->DebugGUI();
+					}
+					ImGui::TreePop();
+				}
+				ImGui::PopID();
+			}
 		}
 
-		// 見た目の編集UIは Object3dEditor / AnimationModelEditor に集約されている
-		if (model_) {
-			model_->DebugGUI();
-		} else if (animeModel_) {
-			animeModel_->DebugGUI();
+		if (!colliders_.empty() && ImGui::CollapsingHeader("Colliders", ImGuiTreeNodeFlags_DefaultOpen)) {
+			for (size_t i = 0; i < colliders_.size(); ++i) {
+				ImGui::PushID(static_cast<int>(i));
+				colliders_[i]->DebugGUI();
+				ImGui::PopID();
+			}
+		}
+
+		if (ImGui::CollapsingHeader("Parameters", ImGuiTreeNodeFlags_DefaultOpen)) {
+			for (Param& param : params_) {
+				const char* label = param.name.c_str();
+				if (auto* f = std::get_if<float*>(&param.value)) {
+					ImGui::DragFloat(label, *f, param.speed);
+				} else if (auto* i = std::get_if<int*>(&param.value)) {
+					ImGui::DragInt(label, *i);
+				} else if (auto* b = std::get_if<bool*>(&param.value)) {
+					ImGui::Checkbox(label, *b);
+				} else if (auto* v3 = std::get_if<Vector3*>(&param.value)) {
+					ImGui::DragFloat3(label, &(*v3)->x, param.speed);
+				} else if (auto* v4 = std::get_if<Vector4*>(&param.value)) {
+					ImGui::ColorEdit4(label, &(*v4)->x);
+				}
+			}
+			if (!params_.empty() && ImGui::Button("Save##params")) {
+				SaveParams();
+			}
+			ParameterGUI();
 		}
 	#endif // _DEBUG
 	}
-
-	#ifdef _DEBUGMODE
-	void GameObject::Debug() {
-	}
-	#endif // _DEBUG
 
 	float GameObject::ComparNum(float a, float b) {
 		return (a < b) ? a : b;
@@ -98,53 +221,6 @@ namespace GameObject {
 		EnsureAnimeModel()->Create(name);
 	}
 
-	void GameObject::CreateFromJson(const std::string& name) {
-		nlohmann::json objJson = JsonSerializer::DeserializeJsonData(name);
-		std::string modelName = objJson.value("modelName", "DefaultModel");
-		EnsureModel()->Create(modelName);
-		if (objJson.contains("transform")) {
-			const auto& t = objJson["transform"];
-			if (t.contains("translate")) {
-				transform_.translate.x = t["translate"][0];
-				transform_.translate.y = t["translate"][1];
-				transform_.translate.z = t["translate"][2];
-			}
-			if (t.contains("rotate")) {
-				transform_.rotate.x = t["rotate"][0];
-				transform_.rotate.y = t["rotate"][1];
-				transform_.rotate.z = t["rotate"][2];
-			}
-			if (t.contains("scale")) {
-				transform_.scale.x = t["scale"][0];
-				transform_.scale.y = t["scale"][1];
-				transform_.scale.z = t["scale"][2];
-			}
-		}
-	}
-
-	void GameObject::CreateFromJson() {
-		std::string modelName = modelDataJson_->value("modelName", "DefaultModel");
-		EnsureModel()->Create(modelName);
-		if (modelDataJson_->contains("transform")) {
-			const auto& t = (*modelDataJson_)["transform"];
-			if (t.contains("translate")) {
-				transform_.translate.x = t["translate"][0];
-				transform_.translate.y = t["translate"][1];
-				transform_.translate.z = t["translate"][2];
-			}
-			if (t.contains("rotate")) {
-				transform_.rotate.x = t["rotate"][0];
-				transform_.rotate.y = t["rotate"][1];
-				transform_.rotate.z = t["rotate"][2];
-			}
-			if (t.contains("scale")) {
-				transform_.scale.x = t["scale"][0];
-				transform_.scale.y = t["scale"][1];
-				transform_.scale.z = t["scale"][2];
-			}
-		}
-	}
-
 	void GameObject::LoadTransformFromJson(const std::string& name) {
 		JsonSerializer::DeserializeTransform(name, transform_);
 	}
@@ -155,10 +231,6 @@ namespace GameObject {
 
 	void GameObject::SetAnimeModel(const std::string& name) {
 		EnsureAnimeModel()->SetModel(name);
-	}
-
-	void GameObject::SetModelDataJson(const nlohmann::json& jsonData) {
-		*modelDataJson_ = jsonData;
 	}
 
 	Graphics::Object3d* GameObject::AddRenderer() {
@@ -227,6 +299,45 @@ namespace GameObject {
 				return;
 			}
 		}
+	}
+
+	void GameObject::AddParam(const std::string& name, float& value, float speed) {
+		RegisterParam({ name, &value, speed });
+	}
+
+	void GameObject::AddParam(const std::string& name, int& value) {
+		RegisterParam({ name, &value });
+	}
+
+	void GameObject::AddParam(const std::string& name, bool& value) {
+		RegisterParam({ name, &value });
+	}
+
+	void GameObject::AddParam(const std::string& name, Math::Vector3& value, float speed) {
+		RegisterParam({ name, &value, speed });
+	}
+
+	void GameObject::AddParam(const std::string& name, Math::Vector4& value) {
+		RegisterParam({ name, &value });
+	}
+
+	void GameObject::RegisterParam(Param param) {
+		const nlohmann::json& saved = ParamFile(GetTypeName());
+		if (saved.contains(param.name)) {
+			const nlohmann::json& v = saved[param.name];
+			std::visit([&v](auto* p) { ReadParam(v, *p); }, param.value);
+		}
+		params_.push_back(std::move(param));
+	}
+
+	void GameObject::SaveParams() const {
+		// ファイルにしか無い項目(派生側で登録をやめた等)は消さずに残す
+		nlohmann::json& data = ParamFile(GetTypeName());
+		for (const Param& param : params_) {
+			data[param.name] = std::visit([](const auto* p) { return WriteParam(*p); }, param.value);
+		}
+		std::filesystem::create_directories(kParamDirectory);
+		JsonSerializer::SerializeJsonData(data, (kParamDirectory / (GetTypeName() + ".json")).string());
 	}
 
 }

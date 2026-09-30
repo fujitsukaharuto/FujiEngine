@@ -671,7 +671,7 @@ void ModelManager::PickingUpdate() {
 		(io.MousePos.y - gameView.y) / gameView.height * MyWin::kWindowHeight
 	};
 	const bool isMouseOnGame = gameView.isOnPanel ? gameView.isHovered : !io.WantCaptureMouse;
-	bool isMouseOnGUI = !isMouseOnGame || ImGuizmo::IsOver() || ImGuizmo::IsUsing();
+	bool isMouseOnGUI = !isMouseOnGame || ImGuizmo::IsOver() || ImGuizmo::IsUsing() || MyWin::IsGameViewCaptured();
 	bool isMouseInWindow =
 		(mousePos.x >= 0 && mousePos.y >= 0 &&
 			mousePos.x < MyWin::kWindowWidth && mousePos.y < MyWin::kWindowHeight);

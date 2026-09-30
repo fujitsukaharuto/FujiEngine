@@ -1,7 +1,6 @@
 #include "GPUParticleScene.h"
 #include "Engine/Core/Debug/ImGuiManager.h"
 #include "Engine/Graphics/Model/ModelManager.h"
-#include "Engine/Core/Serialize/GlobalVariables.h"
 #include "Engine/Graphics/Camera/CameraManager.h"
 #include "Engine/Core/Time/FPSKeeper.h"
 #include "Engine/Math/Random/Random.h"
@@ -9,7 +8,6 @@
 #include "Engine/Graphics/Line/Line3dDrawer.h"
 #include "Engine/Graphics/Particle/ParticleManager.h"
 #include "Engine/Scene/SceneManager.h"
-#include "Game/Particle/GameEmitters.h"
 #include "Engine/Core/Input/Input.h"
 #include "Engine/Graphics/Particle/GPUParticle/GPUEmitter/SphereEmitter.h"
 
@@ -22,28 +20,12 @@ using namespace DXC;
 
 GPUParticleScene::GPUParticleScene() {}
 
-GPUParticleScene::~GPUParticleScene() {
-	FPSKeeper::SetUnStopped();
-	ParticleManager::SetIsStopped(false);
-	ParticleManager::GetInstance()->ResetCSEmitters();
-	Game::CreateDefaultEmitters();
-}
+GPUParticleScene::~GPUParticleScene() {}
 
 void GPUParticleScene::Initialize() {
 
-	CameraManager::GetInstance()->GetCamera()->GetTransform().rotate = { 0.0f,0.0f,0.0f };
 
-	skybox_ = std::make_unique<SkyBox>();
-	skybox_->Initialize();
-	skybox_->SetColor(skyBoxColor_);
 
-	terrain_ = std::make_unique<AnimationModel>();
-	terrain_->Create("ground.obj");
-	terrain_->IsMirrorOBJ(true);
-	terrain_->GetTransform().translate.y = terrainPosY_;
-	terrain_->SetEnvironmentCoeff(terrainEnvironmentCoeff_);
-	terrain_->SetTexture("grass.jpg");
-	terrain_->SetColor(terrainColor_);
 
 	int emitNum = ParticleManager::GetInstance()->InitGPUEmitter();
 	auto& emitterCS = ParticleManager::GetSphereEmitter(emitNum);
@@ -70,9 +52,6 @@ void GPUParticleScene::Draw() {
 #pragma endregion
 
 #pragma region 3Dオブジェクト
-	skybox_->Draw();
-
-	terrain_->Draw();
 
 #pragma endregion
 

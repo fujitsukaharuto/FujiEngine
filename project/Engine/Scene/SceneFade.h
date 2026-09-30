@@ -12,7 +12,6 @@ namespace Scene {
 	class SceneFade {
 	public:
 		SceneFade();
-		/// <remarks>Sprite が不完全型の unique_ptr なので定義は .cpp に置く</remarks>
 		~SceneFade();
 
 		/// <summary>画面全体を覆う黒を作る。作った直後は暗転しきった状態</summary>

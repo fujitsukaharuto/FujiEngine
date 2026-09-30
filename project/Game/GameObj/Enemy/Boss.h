@@ -115,8 +115,7 @@ public:
 	void Draw(bool is = false)override;
 	void CSDispatch();
 	void AnimeDraw();
-	void DebugGUI()override;
-	void ParameterGUI();
+	void ParameterGUI()override;
 
 	/// <summary>値の初期化</summary>
 	void InitParameter();
@@ -179,6 +178,8 @@ public:
 	void OnCollisionEnter([[maybe_unused]] const Collision::ColliderInfo& other)override;
 	void OnCollisionStay([[maybe_unused]] const Collision::ColliderInfo& other)override;
 	void OnCollisionExit([[maybe_unused]] const Collision::ColliderInfo& other)override;
+	/// <remarks>本体の判定はダッシュ中だけ。コアは BossCore 側が持つ</remarks>
+	bool IsCollisionActive() const override { return isNowDush_; }
 
 	//========================================================================*/
 	//* Getter

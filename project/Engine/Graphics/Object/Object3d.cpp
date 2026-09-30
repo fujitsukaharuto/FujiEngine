@@ -202,7 +202,3 @@ void Object3d::SetAlphaRef(float ref) {
 	}
 }
 
-void Object3d::SetEditorObjParameter() {
-	objIDData_->objID += 1000;
-}
-

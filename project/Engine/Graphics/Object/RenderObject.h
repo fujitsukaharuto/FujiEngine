@@ -10,7 +10,6 @@ namespace DXC { class DXCom; }
 
 namespace Graphics {
 
-	// どちらもポインタでしか持たないので前方宣言で足りる
 	class Camera;
 	class Model;
 	class LightManager;
@@ -55,6 +54,8 @@ namespace Graphics {
 		size_t GetMaterialCount() const { return material_.size(); }
 		/// <summary>形状の元になっているモデル。加速構造(BLAS)の対応付けに使う</summary>
 		Model* GetModel() const { return model_; }
+		/// <summary>ピッキングで使う番号。Create 前は -1</summary>
+		int GetObjID() const { return objIDData_ ? objIDData_->objID : -1; }
 
 		/// <summary>SRTだけを初期化する。parent / animeParent は保持する</summary>
 		/// <remarks>transform_ を丸ごと代入するとペアレントが黙って外れるので、Create系はこれを通すこと</remarks>

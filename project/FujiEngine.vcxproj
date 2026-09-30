@@ -165,7 +165,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Core\App\MyWindow.cpp" />
     <ClCompile Include="Engine\Core\Debug\ImGuiManager.cpp" />
     <ClCompile Include="Engine\Core\Input\Input.cpp" />
-    <ClCompile Include="Engine\Core\Serialize\GlobalVariables.cpp" />
     <ClCompile Include="Engine\Core\Serialize\JsonSerializer.cpp" />
     <ClCompile Include="Engine\Core\Time\FPSKeeper.cpp" />
     <ClCompile Include="Engine\DXC\Command\CommandContext.cpp" />
@@ -178,10 +177,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\DXC\Shader\DXCompile.cpp" />
     <ClCompile Include="Engine\DXC\DXCom.cpp" />
     <ClCompile Include="Engine\Editor\Command\CommandManager.cpp" />
-    <ClCompile Include="Engine\Editor\Command\CreateObjCommand.cpp" />
-    <ClCompile Include="Engine\Editor\Command\DeleteObjCommand.cpp" />
     <ClCompile Include="Engine\Editor\ObjectEditor\AnimationModelEditor.cpp" />
     <ClCompile Include="Engine\Editor\ObjectEditor\GPUParticleSystemEditor.cpp" />
+    <ClCompile Include="Engine\Editor\ObjectEditor\GameObjectEditor.cpp" />
     <ClCompile Include="Engine\Editor\ObjectEditor\Object3dEditor.cpp" />
     <ClCompile Include="Engine\Editor\Widget\GizmoHelper.cpp" />
     <ClCompile Include="Engine\Editor\Widget\JsonEditorUI.cpp" />
@@ -232,6 +230,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Graphics\Raytracing\RaytracingScene.cpp" />
     <ClCompile Include="Engine\Graphics\Raytracing\WorkTexture.cpp" />
     <ClCompile Include="Engine\Graphics\SkyBox\SkyBox.cpp" />
+    <ClCompile Include="Engine\Graphics\Sprite\PlacedSprite.cpp" />
     <ClCompile Include="Engine\Graphics\Sprite\Sprite.cpp" />
     <ClCompile Include="Engine\Graphics\Sprite\SpriteRenderer.cpp" />
     <ClCompile Include="Engine\Graphics\Texture\TextureManager.cpp" />
@@ -244,6 +243,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Math\Vector\Vector3.cpp" />
     <ClCompile Include="Engine\Scene\BaseScene.cpp" />
     <ClCompile Include="Engine\Scene\SceneFade.cpp" />
+    <ClCompile Include="Engine\Scene\Level.cpp" />
+    <ClCompile Include="Engine\GameObject\SpawnPoint.cpp" />
     <ClCompile Include="Engine\Scene\SceneManager.cpp" />
     <ClCompile Include="externals\imgui\utilities\builders.cpp" />
     <ClCompile Include="externals\imgui\utilities\drawing.cpp" />
@@ -277,6 +278,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\GameObj\Player\Player.cpp" />
     <ClCompile Include="Game\GameObj\Player\PlayerBullet.cpp" />
     <ClCompile Include="Engine\Graphics\Camera\FollowCamera.cpp" />
+    <ClCompile Include="Engine\GameObject\PlacedObject.cpp" />
     <ClCompile Include="Engine\GameObject\GameObject.cpp" />
     <ClCompile Include="Game\Particle\GameEmitters.cpp" />
     <ClCompile Include="Game\Scene\Debug\GPUParticleScene.cpp" />
@@ -294,7 +296,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Core\App\MyWindow.h" />
     <ClInclude Include="Engine\Core\Debug\ImGuiManager.h" />
     <ClInclude Include="Engine\Core\Input\Input.h" />
-    <ClInclude Include="Engine\Core\Serialize\GlobalVariables.h" />
     <ClInclude Include="Engine\Core\Serialize\JsonSerializer.h" />
     <ClInclude Include="Engine\Core\Time\FPSKeeper.h" />
     <ClInclude Include="Engine\Core\Thread\ParallelFor.h" />
@@ -309,12 +310,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\DXC\DXCom.h" />
     <ClInclude Include="Engine\DXC\FrameCount.h" />
     <ClInclude Include="Engine\Editor\Command\CommandManager.h" />
-    <ClInclude Include="Engine\Editor\Command\CreateObjCommand.h" />
-    <ClInclude Include="Engine\Editor\Command\DeleteObjCommand.h" />
     <ClInclude Include="Engine\Editor\Command\ICommand.h" />
     <ClInclude Include="Engine\Editor\Command\PropertyCommand.h" />
     <ClInclude Include="Engine\Editor\ObjectEditor\AnimationModelEditor.h" />
     <ClInclude Include="Engine\Editor\ObjectEditor\GPUParticleSystemEditor.h" />
+    <ClInclude Include="Engine\Editor\ObjectEditor\GameObjectEditor.h" />
     <ClInclude Include="Engine\Editor\ObjectEditor\Object3dEditor.h" />
     <ClInclude Include="Engine\Editor\Widget\GizmoHelper.h" />
     <ClInclude Include="Engine\Editor\Widget\JsonEditorUI.h" />
@@ -369,6 +369,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Graphics\Raytracing\RaytracingScene.h" />
     <ClInclude Include="Engine\Graphics\Raytracing\WorkTexture.h" />
     <ClInclude Include="Engine\Graphics\SkyBox\SkyBox.h" />
+    <ClInclude Include="Engine\Graphics\Sprite\PlacedSprite.h" />
     <ClInclude Include="Engine\Graphics\Sprite\Sprite.h" />
     <ClInclude Include="Engine\Graphics\Sprite\SpriteRenderer.h" />
     <ClInclude Include="Engine\Graphics\Texture\TextureManager.h" />
@@ -392,6 +393,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Scene\AbstractSceneFactory.h" />
     <ClInclude Include="Engine\Scene\BaseScene.h" />
     <ClInclude Include="Engine\Scene\SceneFade.h" />
+    <ClInclude Include="Engine\Scene\Level.h" />
+    <ClInclude Include="Engine\GameObject\SpawnPoint.h" />
     <ClInclude Include="Engine\Scene\SceneManager.h" />
     <ClInclude Include="Engine\FujiEngine.h" />
     <ClInclude Include="externals\imgui\utilities\builders.h" />
@@ -427,6 +430,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Game\GameObj\Player\Player.h" />
     <ClInclude Include="Game\GameObj\Player\PlayerBullet.h" />
     <ClInclude Include="Engine\Graphics\Camera\FollowCamera.h" />
+    <ClInclude Include="Engine\GameObject\PlacedObject.h" />
     <ClInclude Include="Engine\GameObject\GameObject.h" />
     <ClInclude Include="Engine\GameObject\StateMachine.h" />
     <ClInclude Include="Game\Particle\GameEmitters.h" />

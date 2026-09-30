@@ -33,6 +33,10 @@ namespace Core {
 		static void FitGameView(float x, float y, float width, float height);
 
 		static void SetGameViewHovered(bool isHovered);
+		/// <summary>エディタがゲーム画面上のマウスを使っている(スプライトのドラッグ等)</summary>
+		/// <remarks>立っている間はオブジェクトのピックをしない</remarks>
+		static void SetGameViewCaptured(bool isCaptured);
+		static bool IsGameViewCaptured();
 
 		/// <summary>ゲーム画面の映し先。マウス座標の変換に使う</summary>
 		static const GameView& GetGameView();

@@ -1,6 +1,5 @@
 #pragma once
 #include "Engine/Scene/BaseScene.h"
-#include "Engine/Collision/CollisionManager.h"
 #include <vector>
 #include "Engine/Graphics/Object/Object3d.h"
 #include "Engine/Graphics/Object/AnimationModel.h"
@@ -8,7 +7,7 @@
 /// <summary>
 /// Testシーンクラス
 /// </summary>
-/// <remarks>レイトレ影の確認用にオブジェクトとライトを並べてある。Player/Boss は使わない</remarks>
+/// <remarks>レイトレ影の確認用にライトを並べてある。影を落とす置物は配置データ(Level/TEST.json)にある。Player/Boss は使わない</remarks>
 class TestScene :public Scene::BaseScene {
 public:
 	TestScene();
@@ -25,24 +24,14 @@ public:
 
 private:
 
-	/// <summary>地面と、影を落とすオブジェクトを並べる</summary>
-	void SetupObjects();
-	/// <summary>平行光源/点光源/スポットライトを1つずつ置く</summary>
-	/// <remarks>本数ごと設定するので、シーンに入り直しても増えない</remarks>
+	/// <summary>点光源/スポットライトを1つずつ置く</summary>
+	/// <remarks>平行光源は配置データの環境にある(影が足元に隠れないよう傾けてある)。
+	/// 本数ごと設定するので、シーンに入り直しても増えない。シーンを出るとライトは Level が起動時の状態へ戻す</remarks>
 	void SetupLights();
-	/// <summary>ライトを起動直後の状態へ戻す</summary>
-	/// <remarks>ここで置いたライトを他のシーンへ持ち越さないため</remarks>
-	void RestoreLights();
 	/// <summary>指定した種類のライトだけを点ける</summary>
 	/// <remarks>影は他の光源が当たっていると差が見えないので、1種類だけにして確認する</remarks>
 	void ApplyLightPreset(bool directional, bool point, bool spot);
 
 private:
 
-	std::unique_ptr<Collision::CollisionManager> cMane_;
-
-	std::unique_ptr<Graphics::Object3d> ground_;
-	std::vector<std::unique_ptr<Graphics::Object3d>> objects_;
-	// スキンメッシュ。影を受ける側と落とす側を兼ねる
-	std::vector<std::unique_ptr<Graphics::AnimationModel>> animeObjects_;
 };

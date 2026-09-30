@@ -12,6 +12,8 @@ using namespace Collision;
 
 
 PlayerBullet::PlayerBullet() {
+	// プールで待機している状態から始める
+	SetActive(false);
 }
 
 PlayerBullet::~PlayerBullet() {
@@ -29,7 +31,7 @@ void PlayerBullet::Initialize() {
 }
 
 void PlayerBullet::Update() {
-	if (isLive_) {
+	if (IsActive()) {
 		// 位置の更新
 		transform_.translate += (velocity_ * speed_) * FPSKeeper::DeltaTimeFrame();
 
@@ -39,13 +41,13 @@ void PlayerBullet::Update() {
 }
 
 void PlayerBullet::Draw(bool is) {
-	if (isLive_ && !isCharge_) {
+	if (IsActive() && !isCharge_) {
 		GameObject::GameObject::Draw(is);
 	}
 }
 
 void PlayerBullet::InitParameter(const Vector3& pos) {
-	isLive_ = true;
+	SetActive(true);
 	isCharge_ = true;
 	isStrength_ = false;
 	collider_->SetWidth(0.3f);
@@ -97,7 +99,7 @@ void PlayerBullet::CalculationFollowVec(const Vector3& target) {
 ///= Collision ================================================================*/
 void PlayerBullet::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
 	if (other.tag == "testBoss") {
-		isLive_ = false;
+		SetActive(false);
 		if (isStrength_) { // 強化弾だった時の処理
 			hitSmoke_.Emit();
 			hitCircle_.Emit();

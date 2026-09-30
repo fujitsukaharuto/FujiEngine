@@ -32,7 +32,8 @@ void GameRun::Initialize() {
 #pragma region パーティクル生成
 	
 	LoadParticleGroup();
-	Game::CreateDefaultEmitters();
+	// 常設のエミッターはシーンに入るたびに作り直す
+	sceneManager_->SetEmitterSetup(Game::CreateDefaultEmitters);
 
 #pragma endregion
 
@@ -41,8 +42,6 @@ void GameRun::Initialize() {
 	LoadSoundData();
 
 #pragma endregion
-
-	GlobalVariables::GetInstance()->LoadFiles();
 
 #pragma endregion
 

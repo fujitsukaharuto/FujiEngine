@@ -19,8 +19,6 @@ namespace DXC { class SRVManager; }
 
 namespace Graphics {
 
-	// GPUParticleSystem は unique_ptr で持つだけ(デストラクタは .cpp)、
-	// エミッタ群は参照を返す宣言にしか出てこない。実体が要る側が自分で include する
 	class GPUParticleSystem;
 	class IGPUEmitter;
 	class SphereEmitter;

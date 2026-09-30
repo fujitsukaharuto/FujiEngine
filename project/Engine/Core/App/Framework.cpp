@@ -69,7 +69,6 @@ void Framework::Update() {
 	if (isDebugGuiVisible_) {
 		EngineDebugGUI();
 		DebugGUI();
-		GlobalVariables::GetInstance()->Update();
 	} else {
 		MyWin::ResetGameView();
 	}
@@ -126,15 +125,14 @@ namespace {
 		// 下は多めに取る。ゲーム画面は横幅で決まるので、中央を16:9より縦長にしても大きくならない
 		const ImGuiID bottom = ImGui::DockBuilderSplitNode(center, ImGuiDir_Down, 0.40f, nullptr, &center);
 		const ImGuiID leftBottom = ImGui::DockBuilderSplitNode(left, ImGuiDir_Down, 0.45f, nullptr, &left);
-		const ImGuiID rightBottom = ImGui::DockBuilderSplitNode(right, ImGuiDir_Down, 0.35f, nullptr, &right);
 
 		ImGui::DockBuilderDockWindow("Game", center);
+		ImGui::DockBuilderDockWindow("Hierarchy", left);
 		ImGui::DockBuilderDockWindow("Scene", left);
 		ImGui::DockBuilderDockWindow("Camera", leftBottom);
 		ImGui::DockBuilderDockWindow("Light", leftBottom);
 		ImGui::DockBuilderDockWindow("Raytracing", leftBottom);
-		ImGui::DockBuilderDockWindow("Object Editor", right);
-		ImGui::DockBuilderDockWindow("Global Variables", rightBottom);
+		ImGui::DockBuilderDockWindow("Inspector", right);
 		ImGui::DockBuilderDockWindow("Stats", bottom);
 		ImGui::DockBuilderDockWindow("GPU Particle", bottom);
 		ImGui::DockBuilderDockWindow("Particle Editor", bottom);
@@ -225,17 +223,19 @@ void Framework::EngineDebugGUI() {
 		ImGui::Text("PickedCoord : %d, %d", modelManager_->GetPickedCoord(0), modelManager_->GetPickedCoord(1));
 	}
 
+	if (DebugWindow hierarchy{ "Hierarchy" }) { gameObjectEditor_.HierarchyGUI(sceneManager_->GetLevel()); }
+	if (DebugWindow inspector{ "Inspector" }) { gameObjectEditor_.InspectorGUI(sceneManager_->GetLevel()); }
+	gameObjectEditor_.GameViewGUI(sceneManager_->GetLevel());
 	if (DebugWindow scene{ "Scene" }) { sceneManager_->DebugGUI(); }
-	if (DebugWindow object{ "Object Editor" }) { commandManager_->DebugGUI(); }
 	if (DebugWindow camera{ "Camera" }) { cameraManager_->DebugGUI(); }
 	if (DebugWindow light{ "Light" }) { lightManager_->DebugGUI(); }
 	if (DebugWindow raytracing{ "Raytracing" }) { objectRenderer_->DebugGUI(); }
 	if (DebugWindow gpuParticle{ "GPU Particle" }) { ParticleManager::GetInstance()->ParticleCSDebugGUI(); }
 
-	// ピックし直した瞬間だけ、編集先のウィンドウを前に出す
+	// ピックし直した瞬間だけ、Inspector を前に出す
 	const int pickedID = modelManager_->GetPickedID();
-	if (pickedID > 1000 && pickedID != prevPickedID_) {
-		ImGui::SetWindowFocus("Object Editor");
+	if (pickedID != prevPickedID_ && gameObjectEditor_.SelectByObjID(pickedID)) {
+		ImGui::SetWindowFocus("Inspector");
 	}
 	prevPickedID_ = pickedID;
 
@@ -328,8 +328,7 @@ void Core::Framework::InitGeneralSystems() {
 	// ライト管理
 	lightManager_ = std::make_unique<Graphics::LightManager>();
 	lightManager_->Initialize(dxcommon_.get());
-	lightManager_->CreateLight();
-	lightManager_->AddPointLight();
+	lightManager_->ResetLights();
 
 	// object関係
 	textureManager_ = TextureManager::GetInstance();

@@ -62,8 +62,7 @@ public:
 	void Finalize();
 	void Update()override;
 	void Draw(bool is = false)override;
-	void DebugGUI()override;
-	void ParameterGUI();
+	void ParameterGUI()override;
 	void InitParameter();
 	void ReStart();
 
@@ -190,6 +189,7 @@ private:
 
 	//========================================================================*/
 	//* パラメータ定数（初期値）
+	static constexpr float kModelScale_ = 0.3f;        // モデルの大きさ
 	static constexpr float kMoveSpeed_ = 0.2f;         // 移動速度
 	static constexpr float kJumpSpeed_ = 0.2f;         // ジャンプの初速
 	static constexpr float kSecondJumpSpeed_ = 0.1f;   // 2段ジャンプの初速
@@ -264,6 +264,8 @@ private:
 	Math::Vector3 titleStartP_{};
 	Math::Vector3 titleCenterP_{};
 	Math::Vector3 titleEndP_{};
+	/// <summary>出現位置の向き。コンティニューで戻す</summary>
+	Math::Vector3 spawnRotate_{};
 	float preTitleTime_ = 300.0f;
 
 };

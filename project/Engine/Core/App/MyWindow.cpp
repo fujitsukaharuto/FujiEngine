@@ -12,6 +12,8 @@ using namespace Core;
 
 namespace {
 	MyWin::GameView gameView{ 0.0f, 0.0f, static_cast<float>(MyWin::kWindowWidth), static_cast<float>(MyWin::kWindowHeight), false, false };
+	// gameView は FitGameView で毎フレーム作り直されるので別に持つ
+	bool isGameViewCaptured = false;
 }
 
 void MyWin::ResetGameView() {
@@ -42,6 +44,14 @@ void MyWin::FitGameView(float x, float y, float width, float height) {
 
 void MyWin::SetGameViewHovered(bool isHovered) {
 	gameView.isHovered = isHovered;
+}
+
+void MyWin::SetGameViewCaptured(bool isCaptured) {
+	isGameViewCaptured = isCaptured;
+}
+
+bool MyWin::IsGameViewCaptured() {
+	return isGameViewCaptured;
 }
 
 const MyWin::GameView& MyWin::GetGameView() {

@@ -1,0 +1,143 @@
+{
+    "environment": {
+        "cameraPosition": [
+            0,
+            5,
+            -30
+        ],
+        "cameraRotate": [
+            -0.5,
+            0,
+            0
+        ],
+        "lightColor": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+        ],
+        "lightDirection": [
+            0.0,
+            -1.0,
+            0.0
+        ],
+        "lightIntensity": 1.0,
+        "skyBox": true,
+        "skyBoxColor": [
+            0.44999998807907104,
+            0.25,
+            0.4000000059604645,
+            1.0
+        ]
+    },
+    "objects": [
+        {
+            "anime": true,
+            "color": [
+                0.8500000238418579,
+                0.15000000596046448,
+                0.10000000149011612,
+                1.0
+            ],
+            "environment": 0.30000001192092896,
+            "mirror": true,
+            "model": "ground.obj",
+            "name": "Terrain",
+            "texture": "grass.jpg",
+            "transform": {
+                "rotate": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "translate": [
+                    0.0,
+                    0.0,
+                    0.0
+                ]
+            }
+        },
+        {
+            "color": [
+                0.7749999761581421,
+                0.38499999046325684,
+                0.35499998927116394,
+                1.0
+            ],
+            "light": "SpotLight",
+            "model": "surroundings.gltf",
+            "name": "Surroundings",
+            "transform": {
+                "rotate": [
+                    1.5899990797042847,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    0.44999998807907104,
+                    0.44999998807907104,
+                    0.15000000596046448
+                ],
+                "translate": [
+                    0.0,
+                    -5.0,
+                    0.0
+                ]
+            }
+        }
+    ],
+    "spawnPoints": [],
+    "sprites": [
+        {
+            "anchor": [
+                0.5,
+                0.5
+            ],
+            "color": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "name": "space",
+            "pos": [
+                640.0,
+                500.0
+            ],
+            "size": [
+                256.0,
+                128.0
+            ],
+            "texture": "spaceKey.png",
+            "visible": true
+        },
+        {
+            "anchor": [
+                0.5,
+                0.5
+            ],
+            "color": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "name": "title",
+            "pos": [
+                640.0,
+                250.0
+            ],
+            "size": [
+                968.0,
+                159.0
+            ],
+            "texture": "Title.png",
+            "visible": true
+        }
+    ]
+}

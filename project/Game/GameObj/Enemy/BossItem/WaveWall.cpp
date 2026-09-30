@@ -9,6 +9,8 @@ using namespace Collision;
 
 
 WaveWall::WaveWall() {
+	// プールで待機している状態から始める
+	SetActive(false);
 }
 
 void WaveWall::Initialize() {
@@ -34,14 +36,14 @@ void WaveWall::Initialize() {
 
 void WaveWall::Update() {
 
-	if (isLive_) {
+	if (IsActive()) {
 		// LifeTimeの更新
 		if (lifeTime_ > 0.0f) {
 			lifeTime_ -= FPSKeeper::DeltaTimeFrame();
 			uvTransX_ += 0.05f * FPSKeeper::DeltaTimeFrame();
 		} else if (lifeTime_ <= 0.0f) {
 			lifeTime_ = 0.0f;
-			isLive_ = false;
+			SetActive(false);
 		}
 
 		underRing_->SetUVScale({ 0.75,1.0f }, { uvTransX_ * 0.3f,0.0f });
@@ -69,10 +71,6 @@ void WaveWall::DrawCollider() {
 	DrawColliders();
 }
 
-void WaveWall::DebugGUI() {
-	underRing_->DebugGUI();
-}
-
 void WaveWall::ParameterGUI() {
 }
 
@@ -80,7 +78,7 @@ void WaveWall::InitWave(const Vector3& pos, const Vector3& velo) {
 	transform_.translate = pos;
 	transform_.translate.y = 0.0f;
 
-	isLive_ = true;
+	SetActive(true);
 	lifeTime_ = 300.0f;
 	velocity_ = velo;
 

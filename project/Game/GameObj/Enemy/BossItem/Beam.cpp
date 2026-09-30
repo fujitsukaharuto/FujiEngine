@@ -216,9 +216,6 @@ void Beam::Draw([[maybe_unused]]bool is) {
 	}
 }
 
-void Beam::DebugGUI() {
-}
-
 void Beam::ParameterGUI() {
 }
 
@@ -240,6 +237,7 @@ void Beam::InitBeam([[maybe_unused]] const Vector3& pos, [[maybe_unused]] const 
 	prePos_ = GetWorldPos();
 
 	step_ = BeamStep::AroundAttack;
+	ApplyStepColliders();
 
 	float rad = 0.0f;
 	float radDis = ToRadians(params_.radDis);
@@ -319,6 +317,12 @@ void Beam::SetBossParent(Boss* boss) {
 	}
 }
 
+void Beam::ApplyStepColliders() {
+	for (size_t i = 0; i < beams_.size(); ++i) {
+		beams_[i].collider->SetIsCollisonCheck(step_ == BeamStep::AroundAttack || i == 0);
+	}
+}
+
 void Beam::ChangeBeamStep() {
 	if (changeTime_ >= params_.changeBaseTime_) { // ビームの段階を変える為の処理、位置回転を元に
 		transform_.translate.y = 5.0f;
@@ -335,6 +339,7 @@ void Beam::ChangeBeamStep() {
 		}
 		targetPos_ = GetWorldPos();
 		step_ = BeamStep::RotateBeam;
+		ApplyStepColliders();
 	}
 
 	if (changeTime_ > 0.0f) {

@@ -4,7 +4,6 @@
 #include "Engine/Graphics/Texture/TextureManager.h"
 #include "Engine/DXC/Resource/SRVManager.h"
 #include "Engine/Core/App/MyWindow.h"
-#include "Engine/Core/Serialize/GlobalVariables.h"
 #include "Engine/Graphics/Model/ModelManager.h"
 #include "Engine/Graphics/Light/LightManager.h"
 #include "Engine/Graphics/Camera/CameraManager.h"
@@ -15,6 +14,9 @@
 #include "Engine/Scene/SceneManager.h"
 #include "Engine/Graphics/Line/Line3dDrawer.h"
 #include "Engine/Editor/Command/CommandManager.h"
+#ifdef _DEBUGMODE
+#include "Engine/Editor/ObjectEditor/GameObjectEditor.h"
+#endif // _DEBUGMODE
 
 // ImGuiManager.h は imgui.h を連れてくるので、ポインタ保持だけの用途では前方宣言に留める
 namespace Core { class ImGuiManager; }
@@ -105,6 +107,7 @@ namespace Core {
 		bool isDockLayoutBuilt_ = false;   // 既定のドッキング配置を組んだか
 		bool isDockLayoutReset_ = false;   // View メニューからの組み直し要求
 		int prevPickedID_ = 0;             // ピック対象が変わった瞬間だけ見たい
+		Editor::GameObjectEditor gameObjectEditor_; // Hierarchy / Inspector
 #endif // _DEBUGMODE
 	};
 }

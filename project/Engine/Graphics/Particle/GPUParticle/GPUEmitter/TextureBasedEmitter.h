@@ -10,7 +10,6 @@ using Microsoft::WRL::ComPtr;
 
 namespace Graphics {
 
-	// Texture はポインタでしか持たないので前方宣言で足りる
 	struct Texture;
 
 	/// <summary>

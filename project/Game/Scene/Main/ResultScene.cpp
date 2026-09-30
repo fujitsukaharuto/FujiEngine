@@ -1,7 +1,6 @@
 #include "ResultScene.h"
 #include "Engine/Core/Debug/ImGuiManager.h"
 #include "Engine/Graphics/Model/ModelManager.h"
-#include "Engine/Core/Serialize/GlobalVariables.h"
 #include "Engine/Graphics/Camera/CameraManager.h"
 #include "Engine/Core/Time/FPSKeeper.h"
 #include "Engine/Math/Random/Random.h"
@@ -10,6 +9,8 @@
 #include "Engine/Scene/SceneManager.h"
 #include "Engine/Graphics/Light/LightManager.h"
 #include "Engine/Graphics/Sprite/SpriteRenderer.h"
+#include "Engine/Graphics/Sprite/PlacedSprite.h"
+#include <cassert>
 #include "Game/Particle/GameEmitters.h"
 #include "Engine/Core/Input/Input.h"
 #include "Engine/Graphics/Particle/GPUParticle/GPUEmitter/SphereEmitter.h"
@@ -24,47 +25,20 @@ using namespace DXC;
 
 ResultScene::ResultScene() {}
 
-ResultScene::~ResultScene() {
-	lightManager_->GetDirectionLight()->SetLightDirection(Vector3::Down());
-	lightManager_->GetDirectionLight()->SetLightIntensity(0.3f);
-	Game::DefaultSphereEmitter().SetEmit(false);
-	ParticleManager::GetInstance()->ResetCSEmitters();
-	Game::CreateDefaultEmitters();
-}
+ResultScene::~ResultScene() {}
 
 void ResultScene::Initialize() {
 
-	CameraManager::GetInstance()->GetCamera()->GetTransform().rotate = { cameraStartRotateX_,0.0f,0.0f };
-	CameraManager::GetInstance()->GetCamera()->GetTransform().translate = cameraPos_;
-	lightManager_->GetDirectionLight()->SetLightDirection(lightDir_);
-	lightManager_->GetDirectionLight()->SetLightIntensity(lightIntensity_);
-
-	clear_ = std::make_unique<Sprite>();
-	clear_->Load("clear_beta.png");
-	clear_->SetAnchor({ 0.0f,0.0f });
-	clear_->SetSize({ 1280.0f,720.0f });
-
-	skybox_ = std::make_unique<SkyBox>();
-	skybox_->Initialize();
-	skybox_->SetColor(skyBoxColor_);
-
-	terrain_ = std::make_unique<AnimationModel>();
-	terrain_->Create("ground.obj");
-	terrain_->IsMirrorOBJ(true);
-	terrain_->SetEnvironmentCoeff(0.3f);
-	terrain_->SetTexture("grass.jpg");
-	terrain_->SetColor(terrainColor_);
-
-	surroundings_ = std::make_unique<Object3d>();
-	surroundings_->Create("surroundings.gltf");
-	surroundings_->LoadTransformFromJson("surroundings_transform.json");
-	surroundings_->SetColor(surroundingColor_);
-	surroundings_->SetLightEnable(LightMode::kSpotLightON);
+	clear_ = level_.FindSprite("clear");
+	assert(clear_);
 
 	for (int i = 0; i < 3; i++) {
 		std::unique_ptr<Object3d> player;
 		player = std::make_unique<Object3d>();
-		player->CreateFromJson("resource/Json/Clear_Player.json");
+		player->Create("player.obj");
+		player->GetTransform().scale = { playerScale_,playerScale_,playerScale_ };
+		// 真ん中の1体を出現位置に置き、残りはそこから左右にずらす
+		ApplySpawnPoint(player->GetTransform());
 		player->SetTexture("Atlas.png");
 		defaRotateY_ = player->GetTransform().rotate.y;
 		defaTransY_ = player->GetTransform().translate.y;
@@ -109,18 +83,9 @@ void ResultScene::Draw() {
 #pragma endregion
 
 #pragma region 3Dオブジェクト
-	skybox_->Draw();
-
-	terrain_->Draw();
-	surroundings_->Draw();
-
 	for (auto& player : players_) {
 		player->Draw();
 	}
-
-	clear_->Draw();
-
-	DrawEditorObjects();
 
 #pragma endregion
 
@@ -164,11 +129,6 @@ void ResultScene::CheckSceneChange() {
 			ChangeScene("TITLE");
 		}
 	}
-}
-
-void ResultScene::ApplyGlobalVariables() {
-
-
 }
 
 void ResultScene::KirbyDance() {

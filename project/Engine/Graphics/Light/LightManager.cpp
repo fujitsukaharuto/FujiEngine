@@ -50,6 +50,11 @@ void LightManager::CreateLight() {
 	allLightsData_.directionalLights[0].intensity = 1.0f;
 }
 
+void LightManager::ResetLights() {
+	CreateLight();
+	AddPointLight();
+}
+
 void LightManager::AddPointLight() {
 	if (allLightsData_.numPointLights < kMaxPointLights) {
 		PointLightData defaultPoint;

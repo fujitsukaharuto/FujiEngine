@@ -1,0 +1,66 @@
+{
+    "environment": {
+        "cameraPosition": [
+            0,
+            5,
+            -30
+        ],
+        "cameraRotate": [
+            0,
+            0,
+            0
+        ],
+        "lightColor": [
+            1,
+            1,
+            1,
+            1
+        ],
+        "lightDirection": [
+            0,
+            -1,
+            0
+        ],
+        "lightIntensity": 1.0,
+        "skyBox": true,
+        "skyBoxColor": [
+            0.45,
+            0.25,
+            0.4,
+            1
+        ]
+    },
+    "objects": [
+        {
+            "anime": true,
+            "color": [
+                0.85,
+                0.15,
+                0.1,
+                1
+            ],
+            "environment": 0.3,
+            "mirror": true,
+            "model": "ground.obj",
+            "name": "Terrain",
+            "texture": "grass.jpg",
+            "transform": {
+                "rotate": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ],
+                "translate": [
+                    0,
+                    -5,
+                    0
+                ]
+            }
+        }
+    ]
+}

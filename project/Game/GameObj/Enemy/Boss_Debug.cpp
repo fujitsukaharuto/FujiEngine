@@ -11,21 +11,6 @@
 #include "Game/GameObj/Enemy/Behavior/BossDushAttack.h"
 
 
-void Boss::DebugGUI() {
-#ifdef _DEBUGMODE
-	if (ImGui::CollapsingHeader("Boss##0")) {
-		ImGui::Indent();
-		if (ImGui::CollapsingHeader("Boss##1")) {
-			GameObject::GameObject::DebugGUI();
-			collider_->DebugGUI();
-			ParameterGUI();
-		}
-		core_->DebugGUI();
-		ImGui::Unindent();
-	}
-#endif // _DEBUG
-}
-
 
 void Boss::ParameterGUI() {
 #ifdef _DEBUGMODE

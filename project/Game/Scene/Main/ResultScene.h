@@ -1,6 +1,5 @@
 #pragma once
 #include "Engine/Scene/BaseScene.h"
-#include "Engine/Graphics/SkyBox/SkyBox.h"
 #include "Engine/Graphics/Object/Object3d.h"
 #include "Engine/Graphics/Object/AnimationModel.h"
 #include "Engine/Graphics/Sprite/Sprite.h"
@@ -73,22 +72,15 @@ public:
 
 private:
 
-	void ApplyGlobalVariables();//値読み込みテスト用今度Objectクラス作って継承で使えるようにする
-
 	void KirbyDance();
 
 	void HanabiUpdate();
 
-	std::unique_ptr<Graphics::SkyBox> skybox_;
-	std::unique_ptr<Graphics::AnimationModel> terrain_ = nullptr;
-	std::unique_ptr<Graphics::Object3d> surroundings_ = nullptr;
-	Math::Vector4 terrainColor_ = { 0.85f,0.15f,0.1f,1.0f };
-	Math::Vector4 surroundingColor_ = { 0.775f,0.385f,0.355f,1.0f };
-	Math::Vector4 skyBoxColor_ = { 0.45f,0.25f,0.4f,1.0f };
-
-	std::unique_ptr<Graphics::Sprite> clear_;
+	/// <remarks>絵は配置データ(Level)が持つ。ここは Initialize で名前から引いた参照</remarks>
+	Graphics::PlacedSprite* clear_ = nullptr;
 
 	std::vector<std::unique_ptr<Graphics::Object3d>> players_;
+	float playerScale_ = 0.5f;
 	float xDiff_ = 5.0f;
 	float zDiff_ = 2.0f;
 
@@ -105,10 +97,6 @@ private:
 	float defaTransY_ = 0.0f;
 	float defaRotateY_ = 0.0f;
 
-	float cameraStartRotateX_ = -0.1f;
-	Math::Vector3 cameraPos_ = { 0.0f, 2.0f, -20.0f };
-	Math::Vector3 lightDir_ = { 0.0f,-0.907f,0.42f };
-	float lightIntensity_ = 0.6f;
 
 	HanabiPopReng popPos_;
 };

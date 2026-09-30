@@ -16,8 +16,7 @@ public:
 	void Update()override;
 	void Draw(bool is = false)override;
 	void DrawCollider();
-	void DebugGUI()override;
-	void ParameterGUI();
+	void ParameterGUI()override;
 
 	/// <summary>波攻撃の初期化</summary>
 	void InitWave(const Math::Vector3& pos, const Math::Vector3& velo);
@@ -32,12 +31,10 @@ public:
 
 	//========================================================================*/
 	//* Setter
-	void SetIsLive(bool is) { isLive_ = is; }
 
 	//========================================================================*/
 	//* Getter
 	float GetLifeTime() { return lifeTime_; }
-	bool GetIsLive() { return isLive_; }
 
 
 private:
@@ -53,7 +50,6 @@ private:
 	Graphics::Object3d* wave2_ = nullptr;
 	Graphics::Object3d* wave3_ = nullptr;
 
-	bool isLive_ = false;
 	float lifeTime_ = 300.0f;
 	float speed_;
 	Math::Vector3 velocity_;

@@ -5,8 +5,6 @@
 
 namespace Editor {
 
-	struct EditorObj;
-
 	/// <summary>
 	/// Jsonのセーブ / ロードを行う編集UI
 	/// </summary>
@@ -22,23 +20,6 @@ namespace Editor {
 		/// <summary>Transformのロード時ポップアップ、読み込み時にUndoコマンドを発行する</summary>
 		/// <param name="transform">位置</param>
 		static void ShowLoadTransformPopup(Math::Trans& transform);
-
-		//========================================================================*/
-		//* EditorObj
-		/// <summary>EditorObjのセーブ時ポップアップ</summary>
-		/// <param name="obj">オブジェクト</param>
-		static void ShowSaveEditorObjPopup(const EditorObj& obj);
-		/// <summary>EditorObjのロード時ポップアップ</summary>
-		/// <param name="obj">オブジェクト</param>
-		/// <returns>bool</returns>
-		static bool ShowLoadEditorObjPopup(EditorObj& obj);
-		/// <summary>EditorObjのデータ出力</summary>
-		/// <param name="obj">オブジェクト</param> <param name="filePath">ファイルパス</param>
-		static void SerializeEditorObj(const EditorObj& obj, const std::string& filePath);
-		/// <summary>EditorObjのデータ読み込み</summary>
-		/// <param name="filePath">ファイルパス</param> <param name="obj">オブジェクト</param> <param name="isCreateCommand">Undoコマンドを発行するか</param>
-		/// <returns>bool</returns>
-		static bool DeserializeEditorObj(const std::string& filePath, EditorObj& obj, bool isCreateCommand = false);
 
 		//========================================================================*/
 		//* Popup

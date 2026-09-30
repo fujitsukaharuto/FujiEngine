@@ -1,6 +1,5 @@
 #pragma once
 #include "Engine/Scene/BaseScene.h"
-#include "Engine/Graphics/SkyBox/SkyBox.h"
 #include "Engine/Graphics/Object/AnimationModel.h"
 
 /// <summary>
@@ -20,14 +19,4 @@ public:
 
 	/// <summary>入力を見てシーン遷移を始める</summary>
 	void CheckSceneChange();
-
-private:
-
-	std::unique_ptr<Graphics::SkyBox> skybox_;
-	std::unique_ptr<Graphics::AnimationModel> terrain_ = nullptr;
-	Math::Vector4 terrainColor_ = { 0.85f,0.15f,0.1f,1.0f };
-	Math::Vector4 skyBoxColor_ = { 0.45f,0.25f,0.4f,1.0f };
-
-	float terrainPosY_ = -5.0f;
-	float terrainEnvironmentCoeff_ = 0.3f;
 };

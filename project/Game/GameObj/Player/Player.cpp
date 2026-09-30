@@ -30,7 +30,9 @@ Player::~Player() {
 
 void Player::Initialize() {
 	GameObject::GameObject::Initialize();
-	GameObject::GameObject::CreateFromJson();
+	// 位置と向きは呼ぶ前にシーンが出現位置から入れておく(BaseScene::ApplySpawnPoint)
+	CreateModel("player.obj");
+	transform_.scale = { kModelScale_,kModelScale_,kModelScale_ };
 
 	model_->SetTexture("Atlas.png");
 
@@ -65,6 +67,10 @@ void Player::Initialize() {
 	gravity_ = kGravity_;
 	maxFallSpeed_ = kMaxFallSpeed_;
 	maxChargeTime_ = kMaxChargeTime_;
+	AddParam("moveSpeed", moveSpeed_);
+	AddParam("jumpSpeed", jumpSpeed_);
+	AddParam("gravity", gravity_);
+	AddParam("maxFallSpeed", maxFallSpeed_);
 	avoidEffectTime_ = 0.0f;
 
 	collider_ = AddCollider("player");
@@ -87,7 +93,9 @@ void Player::Initialize() {
 	ParticleEmitterSetting();
 
 
+	// 着地演出は出現位置へ降りてくる
 	titleEndP_ = GetWorldPos();
+	spawnRotate_ = transform_.rotate;
 
 	titleStartP_ = { 50.0f,10.0f,80.0f };
 	titleCenterP_ = { 6.0f,3.0f,-80.0f };
@@ -112,7 +120,7 @@ void Player::Update() {
 			}
 
 			for (auto& bullet : bullets_) {
-				if (bullet->GetIsLive()) {
+				if (bullet->IsActive()) {
 
 					if (bullet->GetIsCharge()) {
 						Vector3 targetPos = transform_.translate + transform_.GetForward();
@@ -153,7 +161,7 @@ void Player::Update() {
 void Player::Draw(bool is) {
 
 	for (auto& bullet : bullets_) {
-		if (bullet->GetIsLive()) {
+		if (bullet->IsActive()) {
 			bullet->Draw();
 		}
 	}
@@ -170,28 +178,12 @@ void Player::Draw(bool is) {
 	}
 }
 
-void Player::DebugGUI() {
-#ifdef _DEBUGMODE
-	if (ImGui::CollapsingHeader("Player")) {
-		GameObject::GameObject::DebugGUI();
-		collider_->SetPos(GetWorldPos());
-
-		collider_->DebugGUI();
-
-		ParameterGUI();
-	}
-#endif // _DEBUG
-}
-
 void Player::ParameterGUI() {
 #ifdef _DEBUGMODE
 	ImGui::Indent();
 	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Selected;
 	if (ImGui::TreeNodeEx("Parameter", flags)) {
-		ImGui::DragFloat("moveSpeed", &moveSpeed_, 0.01f);
-		ImGui::DragFloat("jumpSpeedW", &jumpSpeed_, 0.01f);
-		ImGui::DragFloat("gravity", &gravity_, 0.01f);
-		ImGui::DragFloat("maxFallSpeed", &maxFallSpeed_, 0.01f);
+		// 今の体力。調整値ではないので保存しない
 		ImGui::DragFloat("playerHP", &params_.hp.hp, 0.01f);
 		ImGui::TreePop();
 	}
@@ -217,7 +209,7 @@ void Player::InitParameter() {
 
 void Player::ReStart() {
 	for (auto& bullet : bullets_) {
-		bullet->SetIsLive(false);
+		bullet->SetActive(false);
 	}
 	isNowAvoid_ = false;
 	isStrongState_ = false;
@@ -229,10 +221,9 @@ void Player::ReStart() {
 	isFall_ = false;
 	deathTime_ = 240.0f;
 	avoidEffectTime_ = 0.0f;
-	transform_.rotate.y = 0.0f;
-	transform_.translate.x = 0.0f;
-	transform_.translate.y = 1.0f;
-	transform_.translate.z = -25.0f;
+	// 出現位置へ戻す
+	transform_.rotate = spawnRotate_;
+	transform_.translate = titleEndP_;
 	ChangeBehavior(std::make_unique<PlayerRoot>(this));
 }
 
@@ -522,7 +513,7 @@ void Player::InitBullet() {
 	Vector3 worldForward = RotateVectorY({ 0.0f,0.0f,1.0f }, transform_.rotate.y);
 	Vector3 targetPos = transform_.translate + worldForward;
 	for (auto& bullet : bullets_) {
-		if (!bullet->GetIsLive()) {
+		if (!bullet->IsActive()) {
 			bullet->InitParameter(targetPos);
 			return;
 		}
@@ -532,7 +523,7 @@ void Player::InitBullet() {
 ///= Bullet ===================================================================*/
 void Player::ReleaseBullet() {
 	for (auto& bullet : bullets_) {
-		if (bullet->GetIsLive() && bullet->GetIsCharge()) {
+		if (bullet->IsActive() && bullet->GetIsCharge()) {
 			// 発射方向をきめる
 			Vector3 forward = { 0, 0, 1 };
 			Matrix4x4 rotateMatrix = MakeRotateXYZMatrix(transform_.rotate);
@@ -554,7 +545,7 @@ void Player::ReleaseBullet() {
 
 void Player::StrengthBullet() {
 	for (auto& bullet : bullets_) {
-		if (bullet->GetIsLive() && bullet->GetIsCharge()) {
+		if (bullet->IsActive() && bullet->GetIsCharge()) {
 			bullet->StrengthBullet();
 		}
 	}

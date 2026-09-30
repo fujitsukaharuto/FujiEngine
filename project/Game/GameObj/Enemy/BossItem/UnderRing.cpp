@@ -9,6 +9,8 @@ using namespace Collision;
 
 
 UnderRing::UnderRing() {
+	// プールで待機している状態から始める
+	SetActive(false);
 }
 
 void UnderRing::Initialize() {
@@ -39,14 +41,14 @@ void UnderRing::Initialize() {
 }
 
 void UnderRing::Update() {
-	if (isLive_) {
+	if (IsActive()) {
 		// LifeTimeの更新
 		if (lifeTime_ > 0.0f) {
 			lifeTime_ -= FPSKeeper::DeltaTimeFrame();
 			uvTransX_ += 0.05f * FPSKeeper::DeltaTimeFrame();
 		} else if (lifeTime_ <= 0.0f) {
 			lifeTime_ = 0.0f;
-			isLive_ = false;
+			SetActive(false);
 		}
 
 		model_->SetUVScale({ transform_.scale.x * 0.75f,1.0f }, { uvTransX_,0.0f });
@@ -74,9 +76,6 @@ void UnderRing::DrawCollider() {
 	DrawColliders();
 }
 
-void UnderRing::DebugGUI() {
-}
-
 void UnderRing::ParameterGUI() {
 }
 
@@ -88,7 +87,7 @@ void UnderRing::InitRing(const Vector3& pos,float lifeT) {
 	transform_.translate.y += 0.4f;
 	transform_.scale = { 1.0f,1.0f,1.0f };
 
-	isLive_ = true;
+	SetActive(true);
 	lifeTime_ = lifeT;
 }
 

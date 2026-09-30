@@ -30,6 +30,8 @@ public:
 	void OnCollisionEnter([[maybe_unused]] const Collision::ColliderInfo& other)override;
 	void OnCollisionStay([[maybe_unused]] const Collision::ColliderInfo& other)override;
 	void OnCollisionExit([[maybe_unused]] const Collision::ColliderInfo& other)override;
+	/// <remarks>溜めている間は当てない</remarks>
+	bool IsCollisionActive() const override { return !isCharge_; }
 
 	//========================================================================*/
 	//* Charge
@@ -51,14 +53,12 @@ public:
 
 	//========================================================================*/
 	//* Getter
-	bool GetIsLive() { return isLive_; }
 	bool GetIsCharge() { return isCharge_; }
 	bool GetIsStrength() { return isStrength_; }
 	float GetDamage() { return damage_; }
 
 	//========================================================================*/
 	//* Setter
-	void SetIsLive(bool is) { isLive_ = is; }
 
 private:
 
@@ -79,7 +79,6 @@ private:
 	Graphics::ParticleEmitter hitCircle_;;
 
 
-	bool isLive_ = false;
 	bool isCharge_ = false;
 	bool isStrength_ = false;
 

@@ -55,8 +55,7 @@ public:
 	void Initialize()override;
 	void Update()override;
 	void Draw(bool is = false)override;
-	void DebugGUI()override;
-	void ParameterGUI();
+	void ParameterGUI()override;
 
 	/// <summary>値の初期化</summary>
 	void InitParameter();
@@ -71,6 +70,8 @@ public:
 	void OnCollisionEnter([[maybe_unused]] const Collision::ColliderInfo& other)override;
 	void OnCollisionStay([[maybe_unused]] const Collision::ColliderInfo& other)override;
 	void OnCollisionExit([[maybe_unused]] const Collision::ColliderInfo& other)override;
+	/// <remarks>段階の切り替え中(changeTime_)は当てない</remarks>
+	bool IsCollisionActive() const override { return isLive_ && changeTime_ <= 0.0f; }
 
 	//========================================================================*/
 	//* Getter
@@ -91,6 +92,9 @@ private:
 	void BeamExpand(BeamStep step);
 	void BeamMove(BeamStep step);
 	void BeamShrink(BeamStep step);
+	/// <summary>段階に合わせてコライダーを切り替える</summary>
+	/// <remarks>回転ビームは1本しか描かないので、判定も先頭の1本だけにする</remarks>
+	void ApplyStepColliders();
 
 private:
 

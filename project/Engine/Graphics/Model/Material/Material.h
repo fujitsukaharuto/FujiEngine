@@ -18,7 +18,6 @@ namespace Colors {
 
 namespace Graphics {
 
-	// Texture はポインタでしか持たないので前方宣言で足りる。
 	// 実体を include すると DirectXTex.h(1,152行) が全ての描画オブジェクトに付いてくる
 	struct Texture;
 

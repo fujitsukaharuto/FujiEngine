@@ -1,5 +1,6 @@
 #include "CollisionManager.h"
 #include "AABBCollider.h"
+#include "Engine/GameObject/GameObject.h"
 
 using namespace Math;
 using namespace Collision;
@@ -9,6 +10,17 @@ CollisionManager::CollisionManager() {
 }
 
 CollisionManager::~CollisionManager() {
+}
+
+void CollisionManager::AddGameObjectColliders() {
+	for (GameObject::GameObject* object : GameObject::GameObject::GetAll()) {
+		if (!object->IsActive() || object->IsDestroyed() || !object->IsCollisionActive()) {
+			continue;
+		}
+		for (const auto& collider : object->GetColliders()) {
+			colliders_.push_back(collider.get());
+		}
+	}
 }
 
 void CollisionManager::CheckCollisionPair(BaseCollider* A, BaseCollider* B) {

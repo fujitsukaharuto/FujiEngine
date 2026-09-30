@@ -18,7 +18,6 @@ namespace Graphics {
 	class AnimeParticleGroup {
 	public:
 		AnimeParticleGroup();
-		/// <remarks>objects_ が不完全型の unique_ptr なので定義は .cpp に置く</remarks>
 		~AnimeParticleGroup();
 
 		/// <summary>使い回す Object3d を作り置きする</summary>

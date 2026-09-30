@@ -1,4 +1,5 @@
 #include "GameScene.h"
+#include <cassert>
 #include <json.hpp>
 #include "Engine/FujiEngine.h"
 #include "Engine/Graphics/Camera/FollowCamera.h"
@@ -27,16 +28,7 @@ GameScene::~GameScene() {
 
 void GameScene::Initialize() {
 
-	// ゲームオーバー・コンティニューの明滅用
-	flash_ = std::make_unique<Sprite>();
-	flash_->Load("white2x2.png");
-	flash_->SetColor(Colors::Transparent);
-	flash_->SetSize({ MyWin::kWindowWidth,MyWin::kWindowHeight });
-	flash_->SetAnchor({ 0.0f,0.0f });
-
 	InitGameObj();
-
-	cMane_ = std::make_unique<CollisionManager>();
 
 	ParticleManager::Load(field_, "fieldParticle");
 	bgm_ = &AudioPlayer::GetInstance()->SoundLoadWave("UrbanBGM_01.wav");
@@ -45,7 +37,6 @@ void GameScene::Initialize() {
 
 void GameScene::Update() {
 
-	cMane_->Reset();
 	PadSwitch();
 
 	if (!player_->GetIsGameOver()) {// GameOverかどうか
@@ -103,9 +94,15 @@ void GameScene::Update() {
 
 	CheckSceneChange();
 
-	if (!player_->GetIsGameOver()) {
-		CollisionUpdate();
-	}
+	// ゲームオーバー中は当たり判定ごと止める
+	SetCollisionEnabled(!player_->GetIsGameOver());
+
+	// 操作説明は開始演出が済んでから、使っている方だけ出す
+	key_->SetVisible(!player_->GetIsStart() && !isPadDraw_);
+	pad_->SetVisible(!player_->GetIsStart() && isPadDraw_);
+	gameOver_->SetVisible(isGameOver_);
+	gameOverSelector_->SetVisible(isGameOver_);
+	flash_->SetVisible(isGameOverFade_ || isContinueFade_);
 
 }
 
@@ -116,10 +113,6 @@ void GameScene::Draw() {
 #pragma endregion
 
 #pragma region 3Dオブジェクト
-	skybox_->Draw();
-
-	surroundings_->Draw();
-	terrain_->Draw();
 	player_->Draw();
 
 	boss_->Draw();
@@ -127,20 +120,6 @@ void GameScene::Draw() {
 #pragma endregion
 
 #pragma region 前景スプライト
-	if (!player_->GetIsStart()) {
-		if (isPadDraw_) {
-			pad_->Draw();
-		} else {
-			key_->Draw();
-		}
-	}
-	if (isGameOver_) {
-		gameOver_->Draw();
-		gameOverSelector_->Draw();
-	}
-	if (isGameOverFade_ || isContinueFade_) {
-		flash_->Draw();
-	}
 
 #pragma endregion
 }
@@ -151,13 +130,6 @@ void GameScene::DebugGUI() {
 
 	followCamera_->DebugGUI();
 
-	player_->DebugGUI();
-
-	boss_->DebugGUI();
-
-	if (ImGui::CollapsingHeader("terrain")) {
-		terrain_->DebugGUI();
-	}
 
 	ImGui::Unindent();
 #endif // _DEBUG
@@ -189,43 +161,12 @@ void GameScene::CheckSceneChange() {
 	}
 }
 
-void GameScene::LoadSceneLevelData(const std::string& name) {
-	BaseScene::LoadSceneLevelData(name);
-	for (const auto& objJson : (*sceneData_)["objects"]) {
-		if (objJson.contains("objectType")) {
-			if (objJson["objectType"] == "Normal") {
-				
-			} else if (objJson["objectType"] == "Player") {
-				player_->SetModelDataJson(objJson);
-			} else if (objJson["objectType"] == "Boss") {
-				
-			}
-		}
-	}
-}
-
 void GameScene::InitGameObj() {
-	skybox_ = std::make_unique<SkyBox>();
-	skybox_->Initialize();
-	skybox_->SetColor(skyBoxColor_);
-
-	terrain_ = std::make_unique<AnimationModel>();
-	terrain_->Create("ground.obj");
-	terrain_->IsMirrorOBJ(true);
-	terrain_->SetEnvironmentCoeff(0.3f);
-	terrain_->SetTexture("grass.jpg");
-	terrain_->SetColor(terrainColor_);
-
-	surroundings_ = std::make_unique<Object3d>();
-	surroundings_->Create("surroundings.gltf");
-	surroundings_->LoadTransformFromJson("surroundings_transform.json");
-	surroundings_->SetColor(surroundingColor_);
-	surroundings_->SetLightEnable(LightMode::kSpotLightON);
-
 	player_ = std::make_unique<Player>();
 	boss_ = std::make_unique<Boss>();
 
-	LoadSceneLevelData("resource/Json/GameScene_position.json"); // ここで座標読み込むけど現在プレイヤー別で設定しているので直す
+	// 出現位置は配置データ(resource/Json/Level/GAME.json)の SpawnPoint
+	ApplySpawnPoint(player_->GetTrans());
 
 	player_->Initialize();// プレイヤー
 	player_->SetDXCom(dxcommon_);
@@ -242,69 +183,14 @@ void GameScene::InitGameObj() {
 	followCamera_->SetTranslate(player_->GetLandingStartPos());
 	followCamera_->PreRotateUpdate(boss_->GetDefaultPos());
 
-	key_ = std::make_unique<Sprite>();// キーボード入力
-	key_->Load("key_beta.png");
-	key_->SetAnchor({ 1.0f,1.0f });
-	key_->SetPos({ MyWin::kWindowWidth, MyWin::kWindowHeight, 0.0f });
-	key_->SetSize({ 400.0f, 300.0f });
-
-	pad_ = std::make_unique<Sprite>();// パッド入力
-	pad_->Load("keyPad_beta.png");
-	pad_->SetAnchor({ 1.0f,1.0f });
-	pad_->SetPos({ MyWin::kWindowWidth, MyWin::kWindowHeight, 0.0f });
-	pad_->SetSize({ 400.0f, 300.0f });
-
-	gameOver_ = std::make_unique<Sprite>();
-	gameOver_->Load("gameover_beta.png");
-	gameOver_->SetAnchor({ 0.0f,0.0f });
-	gameOver_->SetSize({ MyWin::kWindowWidth, MyWin::kWindowHeight });
-
-	gameOverSelector_ = std::make_unique<Sprite>();
-	gameOverSelector_->Load("ball16x16.png");
+	// 操作説明・ゲームオーバー・明滅の絵は配置データ(resource/Json/Level/GAME.json)に置いてある
+	key_ = level_.FindSprite("key");
+	pad_ = level_.FindSprite("pad");
+	gameOver_ = level_.FindSprite("gameOver");
+	gameOverSelector_ = level_.FindSprite("gameOverSelector");
+	flash_ = level_.FindSprite("flash");
+	assert(key_ && pad_ && gameOver_ && gameOverSelector_ && flash_);
 	gameOverSelector_->SetPos(selectPointL_);
-	gameOverSelector_->SetColor({ 0.7f, 0.7f, 0.1f, 1.0f });
-	gameOverSelector_->SetSize({ 40.0f, 40.0f });
-}
-
-void GameScene::CollisionUpdate() {
-	cMane_->AddCollider(player_->GetCollider());
-	for (auto& bullet : player_->GetPlayerBullet()) {// プレイヤーの弾
-		if (bullet->GetIsLive() && !bullet->GetIsCharge()) {
-			cMane_->AddCollider(bullet->GetCollider());
-		}
-	}
-	if (boss_->GetIsNowDush()) {// ダッシュ時の判定
-		cMane_->AddCollider(boss_->GetCollider());
-	}
-	cMane_->AddCollider(boss_->GetCoreCollider());
-	for (auto& wall : boss_->GetWalls()) {// ボスの攻撃Wave
-		if (wall->GetIsLive()) {
-			cMane_->AddCollider(wall->GetCollider());
-		}
-	}
-	for (auto& arrow : boss_->GetArrows()) {// ボスの攻撃Arrow
-		if (arrow->GetIsLive()) {
-			cMane_->AddCollider(arrow->GetCollider());
-		}
-	}
-	for (auto& ring : boss_->GetUnderRings()) {// ボスの攻撃Ring
-		if (ring->GetIsLive()) {
-			cMane_->AddCollider(ring->GetCollider());
-		}
-	}
-	int beamCount = 0;
-	for (auto& beam : boss_->GetBeam()->GetBeams()) {// ボスの攻撃Beam
-		if (boss_->GetBeam()->GetIsLive() && boss_->GetBeam()->GetChangeTime() <= 0.0f) {
-			cMane_->AddCollider(beam.collider);
-			if (boss_->GetBeam()->GetStep() == BeamStep::RotateBeam) {
-				beamCount++;
-			}
-			if (beamCount > 0) {
-				break;
-			}
-		}
-	}
-	cMane_->CheckAllCollision();
 }
 
 void GameScene::GameOverUpdate() {

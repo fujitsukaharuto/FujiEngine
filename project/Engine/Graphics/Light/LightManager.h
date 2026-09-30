@@ -117,6 +117,10 @@ namespace Graphics {
 		/// </summary>
 		void CreateLight();
 
+		/// <summary>起動時の状態に戻す。平行光源1つ(真下・白・1.0)と、強さ0の点光源1つ</summary>
+		/// <remarks>シーンに入るたびに Level が呼ぶ。点光源1つはゲーム側が GetPointLight(0) を使う前提のため</remarks>
+		void ResetLights();
+
 		/// <summary>
 		/// ポイントライトの追加
 		/// </summary>

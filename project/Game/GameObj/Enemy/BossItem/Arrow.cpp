@@ -15,6 +15,8 @@ using namespace Collision;
 
 
 Arrow::Arrow() {
+	// プールで待機している状態から始める
+	SetActive(false);
 }
 
 Arrow::~Arrow() {
@@ -46,6 +48,7 @@ void Arrow::Initialize() {
 
 	velocity_ = { 0.0f,0.0f,0.0f };
 	transform_.scale = { kArrowModelScale_, kArrowModelScale_, kArrowModelScale_ };
+	AddParam("controlHeight", controlHeight_, 0.1f);
 
 	ParticleManager::Load(spark1_, "lightning");
 	ParticleManager::Load(spark2_, "lightningSphere");
@@ -66,7 +69,7 @@ void Arrow::Initialize() {
 }
 
 void Arrow::Update() {
-	if (!isLive_) return;
+	if (!IsActive()) return;
 
 	EmitTimeUpdate();
 	AnimaTimeUpdate();
@@ -85,15 +88,6 @@ void Arrow::DrawCollider() {
 	DrawColliders();
 }
 
-void Arrow::DebugGUI() {
-#ifdef _DEBUGMODE
-	if (ImGui::CollapsingHeader("Arrow")) {
-		collider_->DebugGUI();
-		ParameterGUI();
-	}
-#endif // _DEBUG
-}
-
 void Arrow::ParameterGUI() {
 #ifdef _DEBUGMODE
 	ImGui::Indent();
@@ -109,7 +103,6 @@ void Arrow::ParameterGUI() {
 		}
 
 		ImGui::DragFloat("arrival", &arrivalTime_, 0.001f, 0.0f, 30.0f);
-		ImGui::DragFloat("ControlHeight", &controlHeight_, 0.1f, 0.0f, 30.0f);
 		ImGui::DragFloat3("endP", &endP_.x, 0.1f, -30.0f, 30.0f);
 
 		ImGui::TreePop();
@@ -132,7 +125,7 @@ void Arrow::InitArrow(const Vector3& pos, float emitTime) {
 
 	startP_ = pos;
 
-	isLive_ = true;
+	SetActive(true);
 
 	auto& emitter = ParticleManager::GetSphereEmitter(emitterNumber_);
 	emitter.GetData().prevTranslate = transform_.translate;
@@ -203,7 +196,7 @@ void Arrow::ArrivalTimeUpdate() {
 
 		transform_.rotate = Quaternion::QuaternionToEuler(newRot);
 	} else {
-		isLive_ = false;
+		SetActive(false);
 		hitParticle_.pos_ = transform_.translate;
 		hitExpand_.pos_ = transform_.translate;
 		hitParticle_.Emit();
@@ -228,7 +221,7 @@ void Arrow::GPUEmitterSetting() {
 }
 
 void Arrow::RodUpdate() {
-	if (!isLive_) return;
+	if (!IsActive()) return;
 
 	FlyTimeUpdate();
 	FallTimeUpdate();
@@ -245,7 +238,7 @@ void Arrow::InitRod(const Vector3& pos, float time) {
 	fallTime_ = maxFallTime_;
 	brokeTime_ = maxBrokeTime_;
 
-	isLive_ = true;
+	SetActive(true);
 	isLightNing_ = true;
 }
 
@@ -303,7 +296,7 @@ void Arrow::BrokeTimeUpdate() {
 			}
 		}
 	} else {
-		isLive_ = false;
+		SetActive(false);
 	}
 }
 
@@ -325,7 +318,7 @@ void Arrow::OnCollisionExit([[maybe_unused]] const ColliderInfo& other) {
 }
 
 void Arrow::SetIsLive(bool is) {
-	isLive_ = is;
+	SetActive(is);
 	if (isArrow_) {
 		ParticleManager::GetSphereEmitter(emitterNumber_).SetEmit(false);
 	}

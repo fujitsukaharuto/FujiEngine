@@ -67,6 +67,7 @@ void RaytracingScene::Finalize() {
 	tlasBuffer_.Reset();
 	blasMap_.clear();
 	skinnedBlasMap_.clear();
+	retiredBlas_.clear();
 	instances_.clear();
 
 	// SRVの返却はGPUが参照し終わってからでないといけない。
@@ -199,6 +200,19 @@ void RaytracingScene::DebugGUI() {
 
 void RaytracingScene::BeginFrame() {
 	instances_.clear();
+	++frameNumber_;
+	ReleaseUnusedSkinnedBlas();
+}
+
+void RaytracingScene::ReleaseUnusedSkinnedBlas() {
+	for (auto it = skinnedBlasMap_.begin(); it != skinnedBlasMap_.end();) {
+		if (frameNumber_ - it->second.lastUsedFrame > kReleaseDelayFrames) {
+			it = skinnedBlasMap_.erase(it);
+		} else {
+			++it;
+		}
+	}
+	std::erase_if(retiredBlas_, [this](const RetiredBlas& r) { return frameNumber_ - r.retiredFrame > kReleaseDelayFrames; });
 }
 
 void RaytracingScene::AddInstance(const Model* model, const Math::Matrix4x4& world) {
@@ -262,18 +276,27 @@ void RaytracingScene::AddSkinnedInstance(const RenderObject* key, const Model* m
 	inputs.NumDescs = static_cast<UINT>(geometries.size());
 	inputs.pGeometryDescs = geometries.data();
 
-	SkinnedBlas& blas = skinnedBlasMap_[key];
-	if (!blas.buffer) {
-		// 頂点数はポーズで変わらないのでバッファは初回だけ確保すればよい
-		D3D12_RAYTRACING_ACCELERATION_STRUCTURE_PREBUILD_INFO prebuild{};
-		dxcommon_->GetDevice5()->GetRaytracingAccelerationStructurePrebuildInfo(&inputs, &prebuild);
-		if (prebuild.ResultDataMaxSizeInBytes == 0) { return; }
+	// 大きさは毎回確かめる。キーのアドレスは使い回されるので、別のモデルの小さいバッファに当たることがある
+	D3D12_RAYTRACING_ACCELERATION_STRUCTURE_PREBUILD_INFO prebuild{};
+	dxcommon_->GetDevice5()->GetRaytracingAccelerationStructurePrebuildInfo(&inputs, &prebuild);
+	if (prebuild.ResultDataMaxSizeInBytes == 0) { return; }
+	const UINT64 bufferSize = AlignUp(prebuild.ResultDataMaxSizeInBytes, kASAlignment);
+	const UINT64 scratchSize = AlignUp(prebuild.ScratchDataSizeInBytes, kASAlignment);
 
-		blas.buffer = DXC::Helper::CreateAccelerationStructureResource(
-			dxcommon_->GetDevice(), AlignUp(prebuild.ResultDataMaxSizeInBytes, kASAlignment));
-		blas.scratch = DXC::Helper::CreateUAVResource(
-			dxcommon_->GetDevice(), AlignUp(prebuild.ScratchDataSizeInBytes, kASAlignment));
+	SkinnedBlas& blas = skinnedBlasMap_[key];
+	blas.lastUsedFrame = frameNumber_;
+	if (!blas.buffer || blas.bufferSize < bufferSize || blas.scratchSize < scratchSize) {
+		// 前のフレームのTLASがまだ古い方を指しているかもしれないので、すぐには捨てない
+		if (blas.buffer) {
+			retiredBlas_.push_back({ std::move(blas), frameNumber_ });
+			blas = SkinnedBlas{};
+			blas.lastUsedFrame = frameNumber_;
+		}
+		blas.buffer = DXC::Helper::CreateAccelerationStructureResource(dxcommon_->GetDevice(), bufferSize);
+		blas.scratch = DXC::Helper::CreateUAVResource(dxcommon_->GetDevice(), scratchSize);
 		blas.address = blas.buffer->GetGPUVirtualAddress();
+		blas.bufferSize = bufferSize;
+		blas.scratchSize = scratchSize;
 
 		Logger::Log(std::format("RaytracingScene: skinned BLAS created. geometries={}, size={} bytes\n",
 			geometries.size(), prebuild.ResultDataMaxSizeInBytes));

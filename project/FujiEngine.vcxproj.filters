@@ -16,9 +16,6 @@
     <ClCompile Include="Engine\Core\Input\Input.cpp">
       <Filter>Engine\Core\Input</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Core\Serialize\GlobalVariables.cpp">
-      <Filter>Engine\Core\Serialize</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Core\Serialize\JsonSerializer.cpp">
       <Filter>Engine\Core\Serialize</Filter>
     </ClCompile>
@@ -55,16 +52,13 @@
     <ClCompile Include="Engine\Editor\Command\CommandManager.cpp">
       <Filter>Engine\Editor\Command</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Editor\Command\CreateObjCommand.cpp">
-      <Filter>Engine\Editor\Command</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Editor\Command\DeleteObjCommand.cpp">
-      <Filter>Engine\Editor\Command</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Editor\ObjectEditor\AnimationModelEditor.cpp">
       <Filter>Engine\Editor\ObjectEditor</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Editor\ObjectEditor\GPUParticleSystemEditor.cpp">
+      <Filter>Engine\Editor\ObjectEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Editor\ObjectEditor\GameObjectEditor.cpp">
       <Filter>Engine\Editor\ObjectEditor</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Editor\ObjectEditor\Object3dEditor.cpp">
@@ -217,6 +211,9 @@
     <ClCompile Include="Engine\Graphics\SkyBox\SkyBox.cpp">
       <Filter>Engine\Graphics\SkyBox</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Graphics\Sprite\PlacedSprite.cpp">
+      <Filter>Engine\Graphics\Sprite</Filter>
+    </ClCompile>
     <ClCompile Include="Engine\Graphics\Sprite\Sprite.cpp">
       <Filter>Engine\Graphics\Sprite</Filter>
     </ClCompile>
@@ -251,6 +248,12 @@
       <Filter>Engine\Scene</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Scene\SceneFade.cpp">
+      <Filter>Engine\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\GameObject\SpawnPoint.cpp">
+      <Filter>Engine\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Scene\Level.cpp">
       <Filter>Engine\Scene</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Scene\SceneManager.cpp">
@@ -352,6 +355,9 @@
     <ClCompile Include="Engine\Graphics\Camera\FollowCamera.cpp">
       <Filter>Engine\Graphics\Camera</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\GameObject\PlacedObject.cpp">
+      <Filter>Engine\GameObject</Filter>
+    </ClCompile>
     <ClCompile Include="Engine\GameObject\GameObject.cpp">
       <Filter>Engine\GameObject</Filter>
     </ClCompile>
@@ -397,9 +403,6 @@
     <ClInclude Include="Engine\Core\Input\Input.h">
       <Filter>Engine\Core\Input</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Core\Serialize\GlobalVariables.h">
-      <Filter>Engine\Core\Serialize</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\Core\Serialize\JsonSerializer.h">
       <Filter>Engine\Core\Serialize</Filter>
     </ClInclude>
@@ -442,12 +445,6 @@
     <ClInclude Include="Engine\Editor\Command\CommandManager.h">
       <Filter>Engine\Editor\Command</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Editor\Command\CreateObjCommand.h">
-      <Filter>Engine\Editor\Command</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Editor\Command\DeleteObjCommand.h">
-      <Filter>Engine\Editor\Command</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\Editor\Command\ICommand.h">
       <Filter>Engine\Editor\Command</Filter>
     </ClInclude>
@@ -458,6 +455,9 @@
       <Filter>Engine\Editor\ObjectEditor</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Editor\ObjectEditor\GPUParticleSystemEditor.h">
+      <Filter>Engine\Editor\ObjectEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Editor\ObjectEditor\GameObjectEditor.h">
       <Filter>Engine\Editor\ObjectEditor</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Editor\ObjectEditor\Object3dEditor.h">
@@ -622,6 +622,9 @@
     <ClInclude Include="Engine\Graphics\SkyBox\SkyBox.h">
       <Filter>Engine\Graphics\SkyBox</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Graphics\Sprite\PlacedSprite.h">
+      <Filter>Engine\Graphics\Sprite</Filter>
+    </ClInclude>
     <ClInclude Include="Engine\Graphics\Sprite\Sprite.h">
       <Filter>Engine\Graphics\Sprite</Filter>
     </ClInclude>
@@ -689,6 +692,12 @@
       <Filter>Engine\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Scene\SceneFade.h">
+      <Filter>Engine\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\GameObject\SpawnPoint.h">
+      <Filter>Engine\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Scene\Level.h">
       <Filter>Engine\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Scene\SceneManager.h">
@@ -795,6 +804,9 @@
     </ClInclude>
     <ClInclude Include="Engine\Graphics\Camera\FollowCamera.h">
       <Filter>Engine\Graphics\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\GameObject\PlacedObject.h">
+      <Filter>Engine\GameObject</Filter>
     </ClInclude>
     <ClInclude Include="Engine\GameObject\GameObject.h">
       <Filter>Engine\GameObject</Filter>
