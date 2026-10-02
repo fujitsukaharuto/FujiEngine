@@ -114,7 +114,7 @@ void TestScene::SetupLights() {
 	*spot = SpotLightData{};
 	spot->color = { 0.5f,0.7f,1.0f,1.0f };
 	spot->position = { -13.0f,20.0f,-2.0f };
-	spot->intensity = 40.0f;
+	spot->intensity = 6.0f;
 	spot->direction = { 0.3f,-1.0f,0.2f };
 	spot->distance = 60.0f;
 	spot->decay = 1.0f;

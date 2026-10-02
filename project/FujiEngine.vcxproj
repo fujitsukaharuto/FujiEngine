@@ -165,6 +165,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Core\App\MyWindow.cpp" />
     <ClCompile Include="Engine\Core\Debug\ImGuiManager.cpp" />
     <ClCompile Include="Engine\Core\Input\Input.cpp" />
+    <ClCompile Include="Engine\Core\Input\InputAction.cpp" />
+    <ClCompile Include="Engine\Core\Input\InputMap.cpp" />
     <ClCompile Include="Engine\Core\Serialize\JsonSerializer.cpp" />
     <ClCompile Include="Engine\Core\Time\FPSKeeper.cpp" />
     <ClCompile Include="Engine\DXC\Command\CommandContext.cpp" />
@@ -296,6 +298,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Core\App\MyWindow.h" />
     <ClInclude Include="Engine\Core\Debug\ImGuiManager.h" />
     <ClInclude Include="Engine\Core\Input\Input.h" />
+    <ClInclude Include="Engine\Core\Input\InputAction.h" />
+    <ClInclude Include="Engine\Core\Input\InputMap.h" />
     <ClInclude Include="Engine\Core\Serialize\JsonSerializer.h" />
     <ClInclude Include="Engine\Core\Time\FPSKeeper.h" />
     <ClInclude Include="Engine\Core\Thread\ParallelFor.h" />
@@ -434,6 +438,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\GameObject\GameObject.h" />
     <ClInclude Include="Engine\GameObject\StateMachine.h" />
     <ClInclude Include="Game\Particle\GameEmitters.h" />
+    <ClInclude Include="Game\Input\GameActions.h" />
     <ClInclude Include="Game\Scene\Debug\GPUParticleScene.h" />
     <ClInclude Include="Game\Scene\Debug\ParticleDebugScene.h" />
     <ClInclude Include="Game\Scene\Debug\TestScene.h" />

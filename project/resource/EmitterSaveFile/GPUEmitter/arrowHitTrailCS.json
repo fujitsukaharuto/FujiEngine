@@ -19,7 +19,7 @@
     "emitterShape": 1,
     "frequency": 2.0,
     "isDistance": 0,
-    "isGravity": 1,
+    "isGravity": 0,
     "isTrailEmit": 1,
     "lifeTime": 0.699999988079071,
     "moveType": 1,

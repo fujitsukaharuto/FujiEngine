@@ -1,7 +1,6 @@
 #include "PlayerRoot.h"
 
-#include "Engine/Core/Input/Input.h"
-
+#include "Game/Input/GameActions.h"
 #include "Game/GameObj/Player/Player.h"
 #include "Game/GameObj/Player/Behavior/PlayerJump.h"
 #include "Game/GameObj/Player/Behavior/PlayerAvoid.h"
@@ -18,17 +17,16 @@ PlayerRoot::~PlayerRoot() {
 
 void PlayerRoot::Update() {
 
-	Input* input = Input::GetInstance();
 	switch (step_) {
 		///---------------------------------------------------------------------------------------
 		/// 通常
 		///---------------------------------------------------------------------------------------
 	case PlayerRoot::Step::ROOT:
-		if ((input->PushKey(DIK_SPACE) || input->PressButton(PadInput::X)) && !owner_->GetIsFall()) {
+		if (Game::Action::kJump.Press() && !owner_->GetIsFall()) {
 			step_ = Step::TOJUMP;
 			break;
 		}
-		if ((input->PushKey(DIK_K) || input->IsLTriggerPressed() || input->IsRTriggerPressed() || input->PressButton(PadInput::LeftShoulder) || input->PressButton(PadInput::RightShoulder)) && !owner_->GetIsFall() && owner_->GetAvoidCoolTime() <= 0.0f) {
+		if (Game::Action::kAvoid.Press() && !owner_->GetIsFall() && owner_->GetAvoidCoolTime() <= 0.0f) {
 			step_ = Step::TOAVOID;
 			break;
 		}

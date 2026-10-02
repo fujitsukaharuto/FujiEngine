@@ -1,4 +1,6 @@
 #include "GPUParticleSystem.h"
+#include <algorithm>
+#include <cmath>
 #include "Engine/Graphics/Pipeline/RootNames.h"
 #include "Engine/Graphics/Pipeline/PipelineManager.h"
 #include "Engine/Core/App/MyWindow.h"
@@ -94,14 +96,19 @@ void GPUParticleSystem::Dispatch() {
 	// プール2枚化(ピンポン): 書き込み先を反転。readIdx = writeIdx_^1。Drawは本フレーム後段なのでwriteIdx_を読む。
 	writeIdx_ ^= 1;
 
-	// Stage2: splatが2フレーム連続で有効なときだけ compute_N と Draw_{N-1} を並走させる。
-	// 書き込み先は2フレーム前のDrawが読んだ面で、BeginFrameのダブルバッファ待ちで完了保証済み
-	bool overlap = useOverlap_ && useComputeSplat_ && prevUseComputeSplat_;
+	// 2フレーム前の結果なので確実に書き終わっている。スプラットの半径の上限を決めるのに使う
+	AliveCountDataReadBack();
+
+	// Stage2: Drawが trans/color しか読まないフレームが2つ続いたときだけ compute_N と Draw_{N-1} を並走させる。
+	// 書き込み先は2フレーム前のDrawが読んだ面で、BeginFrameのダブルバッファ待ちで完了保証済み。
+	// scale は1枚しか無いので、Drawが読む間(ラスタ、または丸のスプラット)は並走できない
+	bool drawReadsScale = !useComputeSplat_ || useSplatFootprint_;
+	bool overlap = useOverlap_ && !drawReadsScale && !prevDrawReadsScale_;
 	if (!overlap) {
 		// 直列: 前フレームGraphics(同プール読み取り)の完了をCompute Queue側で待ってから更新書き込みを始める
 		dxcommon_->GetDXCommand()->WaitGraphicsInComputeQueue();
 	}
-	prevUseComputeSplat_ = useComputeSplat_;
+	prevDrawReadsScale_ = drawReadsScale;
 
 	// 1. 描画引数の初期化 (生存カウントを0にする)
 	pPipeManager->SetCSPipeline(Pipe::InitArgsCS, 2);
@@ -189,7 +196,11 @@ void GPUParticleSystem::InitSplat() {
 	splatParamData_->dimsX = width;
 	splatParamData_->dimsY = height;
 	splatParamData_->enableDepthTest = useFullResolution_ ? 1u : 0u;
-	splatParamData_->pad1 = 0;
+	splatParamData_->intensity = splatIntensity_;
+	splatParamData_->enableFootprint = useSplatFootprint_ ? 1u : 0u;
+	splatParamData_->maxRadius = splatMaxRadius_;
+	splatParamData_->pad[0] = 0;
+	splatParamData_->pad[1] = 0;
 }
 
 void GPUParticleSystem::SplatDraw() {
@@ -211,6 +222,14 @@ void GPUParticleSystem::SplatDraw() {
 	// 深度テスト可否を反映(フル解像度時のみ有効)。splatは常にフルサイズなので useFullResolution_ で切替。
 	splatParamData_->enableDepthTest = useFullResolution_ ? 1u : 0u;
 
+	// 丸の半径の上限。1粒子が描く画素数は半径の2乗で増えるので、生存数×π r^2 が目安を超えないよう絞る。
+	// 粒子が増えるほど 1粒子1px の絵へ近づく
+	float budgetRadius = std::sqrt(splatPixelBudget_ * 1000000.0f / (3.14159265f * static_cast<float>((std::max)(aliveCount_, 1))));
+	splatEffectiveRadius_ = (std::min)(splatMaxRadius_, budgetRadius);
+	splatParamData_->intensity = splatIntensity_;
+	splatParamData_->enableFootprint = useSplatFootprint_ ? 1u : 0u;
+	splatParamData_->maxRadius = splatEffectiveRadius_;
+
 	// 深度を DEPTH_WRITE から読み取り可能状態へ遷移。gSceneDepth は常にバインドするので
 	// 深度テストOFF時も遷移させる
 	dxcommon_->TransitionDepthToRead();
@@ -221,6 +240,7 @@ void GPUParticleSystem::SplatDraw() {
 	// ピンポン: 本フレームの書き込み先[writeIdx_]を読む
 	pPipeManager->SetComputeRootDescriptorTable(list, RootName::kParticles_Trans, transCSInstance_[writeIdx_].particleCSUAVHandle_.second);
 	pPipeManager->SetComputeRootDescriptorTable(list, RootName::kParticles_Color, colorCSInstance_[writeIdx_].particleCSUAVHandle_.second);
+	pPipeManager->SetComputeRootDescriptorTable(list, RootName::kParticles_Scale, scaleCSInstance_.particleCSUAVHandle_.second);
 	pPipeManager->SetComputeRootDescriptorTable(list, RootName::kSceneDepth, dxcommon_->GetDepthTexGPUHandle());
 	pPipeManager->SetComputeRootCBV(list, RootName::kPerView, perViewResource_[frameIndex]->GetGPUVirtualAddress());
 	pPipeManager->SetComputeRootCBV(list, RootName::kSplatParam, paramAddr);

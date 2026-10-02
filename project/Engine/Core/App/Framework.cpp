@@ -2,6 +2,7 @@
 #include "Engine/Core/Debug/ImGuiManager.h"
 #include "Engine/Core/Time/FPSKeeper.h"
 #include "Engine/Core/Input/Input.h"
+#include "Engine/Core/Input/InputMap.h"
 #include "Engine/Graphics/Texture/TextureManager.h"
 #include "Engine/DXC/DXCom.h"
 #include "Engine/Graphics/Camera/CameraManager.h"
@@ -135,6 +136,7 @@ namespace {
 		ImGui::DockBuilderDockWindow("Inspector", right);
 		ImGui::DockBuilderDockWindow("Stats", bottom);
 		ImGui::DockBuilderDockWindow("GPU Particle", bottom);
+		ImGui::DockBuilderDockWindow("Input", bottom);
 		ImGui::DockBuilderDockWindow("Particle Editor", bottom);
 		ImGui::DockBuilderDockWindow("GPUParticle Editor", bottom);
 		ImGui::DockBuilderDockWindow("OffScreen Debug", bottom);
@@ -231,6 +233,7 @@ void Framework::EngineDebugGUI() {
 	if (DebugWindow light{ "Light" }) { lightManager_->DebugGUI(); }
 	if (DebugWindow raytracing{ "Raytracing" }) { objectRenderer_->DebugGUI(); }
 	if (DebugWindow gpuParticle{ "GPU Particle" }) { ParticleManager::GetInstance()->ParticleCSDebugGUI(); }
+	if (DebugWindow inputMap{ "Input" }) { InputMap::GetInstance()->DebugGUI(); }
 
 	// ピックし直した瞬間だけ、Inspector を前に出す
 	const int pickedID = modelManager_->GetPickedID();
@@ -291,6 +294,7 @@ void Core::Framework::BeginUpdate() {
 
 	// 入力関連の毎フレーム処理
 	input_->Update();
+	InputMap::GetInstance()->Update();
 	cameraManager_->Update();
 	dxcommon_->OffscreenUpdate();
 	modelManager_->PickingUpdate();
@@ -320,6 +324,7 @@ void Core::Framework::InitGeneralSystems() {
 	// 入力の初期化
 	input_ = Input::GetInstance();
 	input_->Initialize();
+	InputMap::GetInstance()->Load();
 
 	// オーディオの初期化
 	audioPlayer_ = AudioPlayer::GetInstance();

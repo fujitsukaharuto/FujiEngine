@@ -15,6 +15,7 @@
 #include "Engine/Graphics/PostEffect/OffscreenManager.h"
 #include "Game/Particle/GameEmitters.h"
 #include "Engine/Core/Input/Input.h"
+#include "Game/Input/GameActions.h"
 #include "Engine/DXC/DXCom.h"
 #include "Engine/Graphics/Particle/GPUParticle/GPUEmitter/SphereEmitter.h"
 #include "Engine/Graphics/Particle/GPUParticle/GPUEmitter/MeshSurfaceEmitter.h"
@@ -184,13 +185,8 @@ void TitleScene::CheckSceneChange() {
 		return;
 	}
 
-	XINPUT_STATE pad;
-	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
+	if (Game::Action::kDecide.Trigger()) {
 		ChangeScene("GAME");
-	} else if (Input::GetInstance()->GetGamepadState(pad)) {
-		if (Input::GetInstance()->TriggerButton(PadInput::A)) {
-			ChangeScene("GAME");
-		}
 	}
 #ifdef _DEBUGMODE
 	if (Input::GetInstance()->PushKey(DIK_RETURN) && Input::GetInstance()->PushKey(DIK_P) && Input::GetInstance()->PushKey(DIK_D) && Input::GetInstance()->TriggerKey(DIK_S)) {

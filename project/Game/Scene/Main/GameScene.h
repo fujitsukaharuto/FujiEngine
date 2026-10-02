@@ -31,7 +31,6 @@ private:
 
 	void GameOverUpdate();
 	void ContinueUpdate();
-	void PadSwitch();
 
 	std::unique_ptr<Player> player_ = nullptr;
 	std::unique_ptr<Boss> boss_ = nullptr;
@@ -39,7 +38,6 @@ private:
 
 	// 絵は配置データ(Level)が持つ。ここは Initialize で名前から引いた参照
 	Graphics::PlacedSprite* key_ = nullptr;
-	bool isPadDraw_ = false;
 	Graphics::PlacedSprite* pad_ = nullptr;
 
 	Graphics::PlacedSprite* gameOver_ = nullptr;

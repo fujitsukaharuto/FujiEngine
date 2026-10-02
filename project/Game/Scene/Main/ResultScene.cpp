@@ -12,7 +12,7 @@
 #include "Engine/Graphics/Sprite/PlacedSprite.h"
 #include <cassert>
 #include "Game/Particle/GameEmitters.h"
-#include "Engine/Core/Input/Input.h"
+#include "Game/Input/GameActions.h"
 #include "Engine/Graphics/Particle/GPUParticle/GPUEmitter/SphereEmitter.h"
 
 using namespace Core;
@@ -121,13 +121,8 @@ void ResultScene::CheckSceneChange() {
 		return;
 	}
 
-	XINPUT_STATE pad;
-	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
+	if (Game::Action::kDecide.Trigger()) {
 		ChangeScene("TITLE");
-	} else if (Input::GetInstance()->GetGamepadState(pad)) {
-		if (Input::GetInstance()->TriggerButton(PadInput::A)) {
-			ChangeScene("TITLE");
-		}
 	}
 }
 

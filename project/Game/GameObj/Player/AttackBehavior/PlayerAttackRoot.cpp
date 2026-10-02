@@ -1,8 +1,8 @@
 #include "PlayerAttackRoot.h"
 #include "Engine/Audio/AudioPlayer.h"
 #include "Engine/Graphics/Particle/ParticleManager.h"
-#include "Engine/Core/Input/Input.h"
 
+#include "Game/Input/GameActions.h"
 #include "Game/GameObj/Player/Player.h"
 #include "Engine/Core/Time/FPSKeeper.h"
 
@@ -48,14 +48,14 @@ PlayerAttackRoot::~PlayerAttackRoot() {
 
 void PlayerAttackRoot::Update() {
 
-	Input* input = Input::GetInstance();
+	const bool isAttack = Game::Action::kAttack.Press();
 	switch (step_) {
 		///---------------------------------------------------------------------------------------
 		/// 通常
 		///---------------------------------------------------------------------------------------
 	case PlayerAttackRoot::Step::ROOT:
 
-		if ((input->PushKey(DIK_J) || input->PressButton(PadInput::A)) && coolTime_ <= 0.0f) {
+		if (isAttack && coolTime_ <= 0.0f) {
 			owner_->InitBullet();
 			chargeTime_ = 0.0f;
 			coolTime_ = 30.0f;
@@ -73,10 +73,10 @@ void PlayerAttackRoot::Update() {
 		///---------------------------------------------------------------------------------------
 	case PlayerAttackRoot::Step::CHAREGE:
 		
-		if ((input->PushKey(DIK_J) || input->PressButton(PadInput::A))) {
+		if (isAttack) {
 			chargeTime_ += FPSKeeper::DeltaTimeFrame();
 		}
-		if (!(input->PushKey(DIK_J) || input->PressButton(PadInput::A)) || owner_->GetIsStrongState()) {
+		if (!isAttack || owner_->GetIsStrongState()) {
 			step_ = Step::ROOT;
 			if (owner_->GetIsStrongState()) {
 				owner_->StrengthBullet();
@@ -116,7 +116,7 @@ void PlayerAttackRoot::Update() {
 		chargeLight_->Emit();
 		chargeCircle_->Emit();
 
-		if (!(input->PushKey(DIK_J) || input->PressButton(PadInput::A))) {
+		if (!isAttack) {
 			step_ = Step::ROOT;
 			AudioPlayer::GetInstance()->SoundStopWave(*chargeSE_);
 			owner_->ReleaseBullet();

@@ -2,7 +2,7 @@
 
 #include "Game/GameObj/Player/Player.h"
 #include "Game/GameObj/Player/Behavior/PlayerRoot.h"
-#include "Engine/Core/Input/Input.h"
+#include "Game/Input/GameActions.h"
 
 using namespace Core;
 
@@ -21,14 +21,13 @@ PlayerJump::~PlayerJump() {
 
 void PlayerJump::Update() {
 
-	Input* input = Input::GetInstance();
 	switch (step_) {
 		///---------------------------------------------------------------------------------------
 		/// ジャンプ
 		///---------------------------------------------------------------------------------------
 	case PlayerJump::Step::JUMP:
 
-		if ((input->TriggerKey(DIK_SPACE) || input->TriggerButton(PadInput::X)) && isSecondJump_) {
+		if (Game::Action::kJump.Trigger() && isSecondJump_) {
 			if (speed_ > 0.0f) {
 				speed_ += owner_->GetSecondJumpSpeed();
 			} else {

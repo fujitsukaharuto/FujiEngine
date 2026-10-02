@@ -1,0 +1,114 @@
+{
+    "contexts": [
+        {
+            "mappings": [
+                {
+                    "action": "Move",
+                    "key": "W",
+                    "scale": [
+                        0.0,
+                        1.0
+                    ]
+                },
+                {
+                    "action": "Move",
+                    "key": "S",
+                    "scale": [
+                        0.0,
+                        -1.0
+                    ]
+                },
+                {
+                    "action": "Move",
+                    "key": "A",
+                    "scale": [
+                        -1.0,
+                        0.0
+                    ]
+                },
+                {
+                    "action": "Move",
+                    "key": "D",
+                    "scale": [
+                        1.0,
+                        0.0
+                    ]
+                },
+                {
+                    "action": "Move",
+                    "pad": "LStick",
+                    "scale": [
+                        1.0,
+                        1.0
+                    ]
+                },
+                {
+                    "action": "Jump",
+                    "key": "Space"
+                },
+                {
+                    "action": "Jump",
+                    "pad": "X"
+                },
+                {
+                    "action": "Avoid",
+                    "key": "K"
+                },
+                {
+                    "action": "Avoid",
+                    "pad": "LT"
+                },
+                {
+                    "action": "Avoid",
+                    "pad": "RT"
+                },
+                {
+                    "action": "Avoid",
+                    "pad": "LB"
+                },
+                {
+                    "action": "Avoid",
+                    "pad": "RB"
+                },
+                {
+                    "action": "Attack",
+                    "key": "J"
+                },
+                {
+                    "action": "Attack",
+                    "pad": "A"
+                }
+            ],
+            "name": "Player"
+        },
+        {
+            "mappings": [
+                {
+                    "action": "Decide",
+                    "key": "Space"
+                },
+                {
+                    "action": "Decide",
+                    "pad": "A"
+                },
+                {
+                    "action": "SelectLeft",
+                    "key": "A"
+                },
+                {
+                    "action": "SelectLeft",
+                    "pad": "DPadLeft"
+                },
+                {
+                    "action": "SelectRight",
+                    "key": "D"
+                },
+                {
+                    "action": "SelectRight",
+                    "pad": "DPadRight"
+                }
+            ],
+            "name": "UI"
+        }
+    ]
+}

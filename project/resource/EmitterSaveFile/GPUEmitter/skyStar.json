@@ -24,8 +24,8 @@
     "lifeTime": 15.0,
     "moveType": 0,
     "particleScale": [
-        3.0,
-        3.0,
+        1.0,
+        1.0,
         0.10000000149011612
     ],
     "translate": [

@@ -63,7 +63,10 @@ namespace Graphics {
 		uint32_t dimsX;
 		uint32_t dimsY;
 		uint32_t enableDepthTest; // 1=シーン遮蔽の深度テスト有効(フル解像度時のみ)
-		uint32_t pad1;
+		float intensity;          // 合成時に掛ける明るさ
+		uint32_t enableFootprint; // 1=スケールを反映した丸で描く / 0=1粒子1px
+		float maxRadius;          // 丸の半径の上限(px)
+		uint32_t pad[2];
 	};
 
 	/// <summary>
@@ -215,9 +218,16 @@ namespace Graphics {
 		bool useComputeSplat_ = true;    // true:コンピュート・スプラット / false:従来ラスタ(1/4解像度)
 		bool useFullResolution_ = true;  // true=フルサイズ(深度テスト有効) / false=1/4扱い(深度テスト無効)
 
+		// スプラットの見た目
+		bool useSplatFootprint_ = true;       // true:スケールを反映した丸 / false:1粒子1px
+		float splatMaxRadius_ = 32.0f;        // 丸の半径の上限(px)
+		float splatPixelBudget_ = 30.0f;     // 1フレームに描く丸の画素数の目安(百万px)。生存数が多いほど半径の上限を絞る
+		float splatIntensity_ = 1.0f;         // 合成時に掛ける明るさ
+		float splatEffectiveRadius_ = 0.0f;   // 今フレーム実際に使った半径の上限(px)。表示用
+
 		// オーバーラップ: splat時に compute_N の graphics_{N-1} 待ちを省く
 		bool useOverlap_ = true;             // true:オーバーラップ有効(A/B計測用にトグル可)
-		bool prevUseComputeSplat_ = false;   // 前フレームのsplat有無。2フレーム連続splat時のみ並走
+		bool prevDrawReadsScale_ = true;     // 前フレームのDrawがscaleを読んだか。2フレーム連続で読まないときだけ並走
 
 		std::vector<EmitterInfo> csEmitters_;
 

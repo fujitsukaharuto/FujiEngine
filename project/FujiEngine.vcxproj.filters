@@ -16,6 +16,12 @@
     <ClCompile Include="Engine\Core\Input\Input.cpp">
       <Filter>Engine\Core\Input</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Core\Input\InputAction.cpp">
+      <Filter>Engine\Core\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\Input\InputMap.cpp">
+      <Filter>Engine\Core\Input</Filter>
+    </ClCompile>
     <ClCompile Include="Engine\Core\Serialize\JsonSerializer.cpp">
       <Filter>Engine\Core\Serialize</Filter>
     </ClCompile>
@@ -401,6 +407,12 @@
       <Filter>Engine\Core\Debug</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Core\Input\Input.h">
+      <Filter>Engine\Core\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Input\InputAction.h">
+      <Filter>Engine\Core\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Input\InputMap.h">
       <Filter>Engine\Core\Input</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Core\Serialize\JsonSerializer.h">
@@ -817,6 +829,9 @@
     <ClInclude Include="Game\Particle\GameEmitters.h">
       <Filter>Game\Particle</Filter>
     </ClInclude>
+    <ClInclude Include="Game\Input\GameActions.h">
+      <Filter>Game\Input</Filter>
+    </ClInclude>
     <ClInclude Include="Game\Scene\Debug\GPUParticleScene.h">
       <Filter>Game\Scene\Debug</Filter>
     </ClInclude>
@@ -1031,6 +1046,9 @@
     </Filter>
     <Filter Include="Engine\GameObject">
       <UniqueIdentifier>{582d5b3b-3b7d-4005-9981-1c1a7472245f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Input">
+      <UniqueIdentifier>{f372ac38-6fe5-47e1-8d09-74a815851f78}</UniqueIdentifier>
     </Filter>
     <Filter Include="Game\Particle">
       <UniqueIdentifier>{3c8a1f2d-6b47-4d9e-9a15-2f7c5e0b48d1}</UniqueIdentifier>

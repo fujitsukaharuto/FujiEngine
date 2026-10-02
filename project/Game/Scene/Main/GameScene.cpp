@@ -5,10 +5,14 @@
 #include "Engine/Graphics/Camera/FollowCamera.h"
 #include "Game/GameObj/Player/PlayerBullet.h"
 #include "Engine/Core/Input/Input.h"
+#include "Engine/Core/Input/InputMap.h"
+#include "Game/Input/GameActions.h"
 #include "Engine/Audio/AudioPlayer.h"
 #include "Engine/Graphics/Light/LightManager.h"
 #include "Engine/Core/Time/FPSKeeper.h"
 #include "Engine/Graphics/Camera/CameraManager.h"
+#include "Engine/Graphics/Particle/ParticleManager.h"
+#include "Engine/Graphics/Particle/GPUParticle/GPUEmitter/SphereEmitter.h"
 
 using namespace Audio;
 using namespace Core;
@@ -31,13 +35,19 @@ void GameScene::Initialize() {
 	InitGameObj();
 
 	ParticleManager::Load(field_, "fieldParticle");
-	bgm_ = &AudioPlayer::GetInstance()->SoundLoadWave("UrbanBGM_01.wav");
+
+	// 空の星。発生間隔が長いので、最初の1回は待たずに出す
+	int emitNum = ParticleManager::GetInstance()->InitGPUEmitter();
+	auto& skyStar = ParticleManager::GetSphereEmitter(emitNum);
+	skyStar.Load("skyStar");
+	skyStar.SetEmit(true);
+	skyStar.Emit();
+
+	bgm_ =&AudioPlayer::GetInstance()->SoundLoadWave("UrbanBGM_01.wav");
 
 }
 
 void GameScene::Update() {
-
-	PadSwitch();
 
 	if (!player_->GetIsGameOver()) {// GameOverかどうか
 		if (boss_->GetIsStart()) {//ボスが召喚時
@@ -98,8 +108,9 @@ void GameScene::Update() {
 	SetCollisionEnabled(!player_->GetIsGameOver());
 
 	// 操作説明は開始演出が済んでから、使っている方だけ出す
-	key_->SetVisible(!player_->GetIsStart() && !isPadDraw_);
-	pad_->SetVisible(!player_->GetIsStart() && isPadDraw_);
+	const bool isPadActive = InputMap::GetInstance()->IsPadActive();
+	key_->SetVisible(!player_->GetIsStart() && !isPadActive);
+	pad_->SetVisible(!player_->GetIsStart() && isPadActive);
 	gameOver_->SetVisible(isGameOver_);
 	gameOverSelector_->SetVisible(isGameOver_);
 	flash_->SetVisible(isGameOverFade_ || isContinueFade_);
@@ -215,20 +226,20 @@ void GameScene::GameOverUpdate() {
 
 	if (isGameOver_ && !isGameOverFade_ && !isContinueFade_ && !IsFading()) {
 		if (selectPoint_ == 0) {
-			if (input_->TriggerKey(DIK_SPACE) || input_->PressButton(PadInput::A)) {
+			if (Game::Action::kDecide.Trigger()) {
 				isRestartOnce_ = true;
 				isContinueFade_ = true;
 				continueFadeTime_ = 0.0f;
 			}
-			if (input_->TriggerKey(DIK_D) || input_->PressButton(PadInput::Right)) {
+			if (Game::Action::kSelectRight.Trigger()) {
 				selectPoint_ = 1;
 				gameOverSelector_->SetPos(selectPointR_);
 			}
 		} else {
-			if (input_->TriggerKey(DIK_SPACE) || input_->PressButton(PadInput::A)) {
+			if (Game::Action::kDecide.Trigger()) {
 				ChangeScene("TITLE");
 			}
-			if (input_->TriggerKey(DIK_A) || input_->PressButton(PadInput::Left)) {
+			if (Game::Action::kSelectLeft.Trigger()) {
 				selectPoint_ = 0;
 				gameOverSelector_->SetPos(selectPointL_);
 			}
@@ -257,21 +268,5 @@ void GameScene::ContinueUpdate() {
 			gameOverFadeTime_ = 0.0f;
 			flash_->SetColor({ 0.0f,0.0f,0.0f,0.0f });
 		}
-	}
-}
-
-void GameScene::PadSwitch() {
-	Input* input = Input::GetInstance();
-	Vector2 lStick = input->GetLStick();
-	if (fabsf(lStick.x) > 0.01f || fabsf(lStick.y) > 0.01f) {
-		isPadDraw_ = true;
-	}
-
-	if (input->PressButton(PadInput::A) || input->PressButton(PadInput::X) || input->PressButton(PadInput::B) || input->PressButton(PadInput::Y) || input->IsLTriggerPressed() || input->IsRTriggerPressed()) {
-		isPadDraw_ = true;
-	}
-
-	if (input->TriggerKey(DIK_SPACE) || input->PushKey(DIK_K) || input->PushKey(DIK_J) || input->PushKey(DIK_A) || input->PushKey(DIK_D) || input->PushKey(DIK_W) || input->PushKey(DIK_S)) {
-		isPadDraw_ = false;
 	}
 }

@@ -70,6 +70,17 @@ namespace Editor {
 			ImGui::SameLine();
 			ImGui::TextDisabled("(splat時のみ。OFF=従来直列でA/B比較)");
 
+			ImGui::SeparatorText("スプラット");
+			ImGui::BeginDisabled(!system.useComputeSplat_);
+			ImGui::Checkbox("サイズを反映", &system.useSplatFootprint_);
+			ImGui::BeginDisabled(!system.useSplatFootprint_);
+			ImGui::DragFloat("半径の上限 (px)", &system.splatMaxRadius_, 0.1f, 0.0f, 64.0f, "%.1f");
+			ImGui::DragFloat("画素数の目安 (百万px)", &system.splatPixelBudget_, 0.5f, 1.0f, 500.0f, "%.1f");
+			ImGui::Text("実際の上限: %.2f px", system.splatEffectiveRadius_);
+			ImGui::EndDisabled();
+			ImGui::DragFloat("明るさ", &system.splatIntensity_, 0.01f, 0.0f, 100.0f, "%.2f");
+			ImGui::EndDisabled();
+
 			// テーブルを使うと数値が揃って見やすくなります
 			if (ImGui::BeginTable("StatsTable", 2, ImGuiTableFlags_BordersInnerV)) {
 

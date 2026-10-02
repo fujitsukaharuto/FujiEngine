@@ -18,7 +18,7 @@ float4 main(PSInput input) : SV_TARGET
     float3 c = float3(
         (float) gSplatAccum[base + 0],
         (float) gSplatAccum[base + 1],
-        (float) gSplatAccum[base + 2]) / (float) kSplatScale;
+        (float) gSplatAccum[base + 2]) / (float) kSplatScale * gSplatParam.intensity;
 
     // 加算合成(Src ONE / Dest ONE)前提なのでrgbをそのまま出す
     return float4(c, 1.0f);

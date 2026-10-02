@@ -12,7 +12,7 @@
 #include "Engine/DXC/DXCom.h"
 #include "Engine/Core/Time/FPSKeeper.h"
 #include "Engine/Graphics/Camera/CameraManager.h"
-#include "Engine/Core/Input/Input.h"
+#include "Game/Input/GameActions.h"
 #include "Engine/Graphics/Particle/GPUParticle/GPUEmitter/SphereEmitter.h"
 
 using namespace Audio;
@@ -376,69 +376,22 @@ void Player::MoveRotate() {
 }
 
 Vector3 Player::GetInputDirection() {
-	inputDirection_ = { 0.0f,0.0f,0.0f };
-	Input* input = Input::GetInstance();
+	const Vector2 move = Game::Action::kMove.Axis();
+	inputDirection_ = { move.x, 0.0f, move.y };
 
-	if (input->PushKey(DIK_A) || input->PushKey(DIK_D) || input->PushKey(DIK_W) || input->PushKey(DIK_S)) {
-		if (input->PushKey(DIK_A)) {
-			inputDirection_.x -= 1.0f;
-			avoidDirection_ = -1.0f;
-		} else if (input->PushKey(DIK_D)) {
-			inputDirection_.x += 1.0f;
-			avoidDirection_ = 1.0f;
-		}
-		if (input->PushKey(DIK_S)) {
-			inputDirection_.z -= 1.0f;
-		} else if (input->PushKey(DIK_W)) {
-			inputDirection_.z += 1.0f;
-		}
-	}
-
-	XINPUT_STATE pad;
-	if (input->GetGamepadState(pad)) {
-		Vector2 lStick = input->GetLStick();
-		if (fabsf(lStick.x) > 0.01f || fabsf(lStick.y) > 0.01f) {
-			inputDirection_.x += lStick.x;
-			inputDirection_.z += lStick.y;
-			// 回避方向
-			if (lStick.x < 0) {
-				avoidDirection_ = -1.0f;
-			} else if (lStick.x > 0) {
-				avoidDirection_ = 1.0f;
-			}
-		}
+	// 回避方向
+	if (move.x < 0.0f) {
+		avoidDirection_ = -1.0f;
+	} else if (move.x > 0.0f) {
+		avoidDirection_ = 1.0f;
 	}
 
 	return inputDirection_;
 }
 
 bool Player::GetIsMove() {
-	Input* input = Input::GetInstance();
-	bool isMove = false;
-	Vector3 keyLength = {};
-
-	if (input->PushKey(DIK_A) || input->PushKey(DIK_D) || input->PushKey(DIK_W) || input->PushKey(DIK_S)) {
-		if (input->PushKey(DIK_A)) {
-			keyLength.x -= 1.0f;
-		} else if (input->PushKey(DIK_D)) {
-			keyLength.x += 1.0f;
-		}
-		if (input->PushKey(DIK_S)) {
-			keyLength.z -= 1.0f;
-		} else if (input->PushKey(DIK_W)) {
-			keyLength.z += 1.0f;
-		}
-		if ((keyLength).Length() > 0) {
-			isMove = true;
-		};
-	}
-
-	Vector2 lStick = input->GetLStick();
-	if (fabs(lStick.x) > 0.01f || fabs(lStick.y) > 0.01f) {
-		isMove = true;
-	}
-
-	return isMove;
+	const Vector2 move = Game::Action::kMove.Axis();
+	return move.x != 0.0f || move.y != 0.0f;
 }
 #pragma endregion
 
