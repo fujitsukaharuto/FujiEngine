@@ -10,6 +10,19 @@
             0,
             0
         ],
+        "fogBaseHeight": 0.0,
+        "fogColor": [
+            0.042,
+            0.02,
+            0.05
+        ],
+        "fogColorFromSky": true,
+        "fogDensity": 0.004,
+        "fogHeightFalloff": 0.03,
+        "fogMaxOpacity": 1.0,
+        "fogSkyAmount": 1.0,
+        "fogSkyColorScale": 1.4,
+        "fogStartDistance": 25.0,
         "lightColor": [
             1,
             1,

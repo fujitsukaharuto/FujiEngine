@@ -53,5 +53,6 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
     float seed = frac(rand3dTo1d(worldPos) + temporalJitter);
 
     gAOOutput[pixel] = TraceAO(worldPos, normal, gLights.aoSampleCount,
-                               gLights.aoRadius, gLights.aoIntensity, seed);
+                               gLights.aoRadius, gLights.aoIntensity, seed,
+                               ReconstructedRayBias(distance(worldPos, cameraPos)));
 }

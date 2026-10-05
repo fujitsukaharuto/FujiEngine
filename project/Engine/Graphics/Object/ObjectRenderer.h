@@ -3,6 +3,7 @@
 #include <vector>
 
 namespace DXC { class DXCom; }
+namespace DXC { class GPUTimer; }
 
 namespace Graphics {
 
@@ -45,6 +46,9 @@ namespace Graphics {
 		/// <remarks>パスを増やしても呼び出し側を触らずに済むよう集約する。Debug構成以外では何もしない</remarks>
 		void DebugGUI();
 
+		/// <summary>ライトとフォグの設定。自前で配線を持たない描画(空・粒子)がここから引く</summary>
+		LightManager* GetLightManager() const { return lightManager_; }
+
 		/// <summary>レイトレの加速構造。RayQuery非対応環境でも非nullで、中身が空振りする</summary>
 		RaytracingScene* GetRaytracingScene() const { return raytracingScene_.get(); }
 
@@ -64,12 +68,17 @@ namespace Graphics {
 
 		void PreDraw();
 
+		/// <summary>クリックされた画素に写っているオブジェクトの番号を書き出す</summary>
+		/// <remarks>クリックしたフレームにだけ走る。スキニング後の頂点を読むので本描画より前に呼ぶこと
+		/// (本描画はスキンメッシュを描いた直後に頂点バッファを書き込み状態へ戻す)</remarks>
+		void RenderPicking();
+
 		/// <summary>このフレームの静的オブジェクトからTLASを組み直す</summary>
 		void BuildRaytracingScene();
 
 	private:
 		ObjectRenderer() = default;
-		// raytracingScene_ / gbufferPass_ が不完全型なのでデストラクタは .cpp 側に置く
+		// raytracingScene_ / gbufferPass_ / gpuTimer_ が不完全型なのでデストラクタは .cpp 側に置く
 		~ObjectRenderer();
 
 		DXC::DXCom* dxcommon_ = nullptr;
@@ -84,6 +93,13 @@ namespace Graphics {
 		std::unique_ptr<RayTracedAOPass> aoPass_;
 		std::unique_ptr<RayTracedShadowPass> shadowPass_;
 		std::unique_ptr<IBLBaker> iblBaker_;
+
+		/// <summary>本描画(前方描画のループ)のGPU時間の計測区間</summary>
+		enum TimerID {
+			kTimer_Forward = 0,
+			kTimer_Count,
+		};
+		std::unique_ptr<DXC::GPUTimer> gpuTimer_;
 	};
 
 }

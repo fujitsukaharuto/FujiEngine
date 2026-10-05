@@ -69,10 +69,16 @@ namespace Graphics {
 		inline const RootParam kDepthTexture{ "gDepthTexture" };
 		inline const RootParam kConstants{ "Constants" };
 		inline const RootParam kBloomParams{ "BloomParams" };
+		inline const RootParam kBloomPassParam{ "BloomPassParam" };
+		inline const RootParam kBloomSource{ "gBloomSource" };
+		inline const RootParam kBloomLow{ "gBloomLow" };
+		inline const RootParam kBloomHigh{ "gBloomHigh" };
+		inline const RootParam kBloomOutput{ "gBloomOutput" };
 		inline const RootParam kBlurConstantBuffer{ "BlurConstantBuffer" };
 		inline const RootParam kGrayscaleConstantBuffer{ "GrayscaleConstantBuffer" };
 		inline const RootParam kVignetteConstantBuffer{ "VignetteConstantBuffer" };
 		inline const RootParam kTonemapParams{ "TonemapParams" };
+		inline const RootParam kFog{ "gFog" };
 
 		// --- GPUパーティクル: プール ---
 		inline const RootParam kParticles_Trans{ "gParticles_Trans" };

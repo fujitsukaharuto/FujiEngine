@@ -609,7 +609,6 @@ void ModelManager::NormalCommand() {
 	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Normal);
 	dxcommon_->GetDXCommand()->GetList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	lightManager_->SetLightCommand(dxcommon_->GetCommandList());
-	PickingCommand();
 }
 
 Model* ModelManager::GetModel(const std::string& filePath, bool overWrite) {
@@ -662,6 +661,9 @@ void ModelManager::PickingUpdate() {
 #ifdef _DEBUGMODE
 	if (!pickingDataGPU_ || !dxcommon_) return;
 
+	// 前のフレームでクリックしていたら、その結果をこのフレームで読む
+	isPickResolved_ = pickingData_.pickingEnable != 0;
+
 	ImGuiIO& io = ImGui::GetIO();
 
 	// ゲーム画面は縮小して出しているので、描画したときのピクセル座標へ戻す
@@ -695,6 +697,10 @@ void ModelManager::PickingUpdate() {
 
 	uint32_t readIndex =
 		(frameIndex + DXC::kFrameCount_ - 1) % DXC::kFrameCount_;// 1フレーム前を読むこと
+	if (isPickResolved_) {
+		// 1フレーム前はまだ GPU が実行中のことがある。待たずに読むと古い番号を拾ってクリックを取りこぼす
+		dxcommon_->PerFrameWait();
+	}
 	PickingBuffer* mapped = nullptr;
 	D3D12_RANGE readRange{ 0, sizeof(PickingBuffer) }; // 読み取り範囲
 	if (SUCCEEDED(pickingBufferReadBack_[readIndex]->Map(0, &readRange, reinterpret_cast<void**>(&mapped)))) {
@@ -714,11 +720,16 @@ void ModelManager::PickingCommand() {
 	PipelineManager::GetInstance()->SetGraphicsRootDescriptorTable(cList, RootName::kPickingBuffer, pickBufferHandle_[frameIndex].second);
 }
 
+void ModelManager::PickingBarrier() {
+	dxcommon_->InsertUAVBarrier(pickingBufferResource_[dxcommon_->GetNowFrameCount()].Get());
+}
+
 void ModelManager::PickingDataReset() {
 #ifdef _DEBUGMODE
 
 	PickingBuffer init{};
-	init.objID = lastPicked_.objID; // 前回の objID
+	// クリックしたフレームは「何も無い」から始める。前回の番号を残すと、空振りと同じ物のクリックを見分けられない
+	init.objID = IsPickingRequested() ? -1 : lastPicked_.objID;
 	init.depth = 1.0f;              // Depth をリセット
 
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();

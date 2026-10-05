@@ -34,10 +34,16 @@ namespace DXC {
 		// 深度用Textureの初期化
 		void SettingTexture(ID3D12Device* device);
 
+		/// <summary>バックバッファをウィンドウの大きさに合わせて作り直す</summary>
+		/// <remarks>GPU がバックバッファを使い終わってから呼ぶこと。ゲームを描く側(オフスクリーン・深度)の大きさは変わらない</remarks>
+		void Resize(ID3D12Device* device, int width, int height);
+
 		//========================================================================*/
 		//* Getter
 		IDXGISwapChain4* GetSwapChain() const { return swapChain_.Get(); }
 		size_t GetBackBufferCount() const { return backBufferCount_; }
+		int GetWidth() const { return width_; }
+		int GetHeight() const { return height_; }
 		ID3D12Resource* GetBackBuffer(UINT index) const { return swapChainResources_[index].Get(); }
 		ID3D12Resource* GetDSVResource(UINT index) const { return depthStencilResource_[index].Get(); }
 		const D3D12_CPU_DESCRIPTOR_HANDLE& GetRTVHandle(uint32_t index) const { return rtvHandles_[index]; }
@@ -47,6 +53,7 @@ namespace DXC {
 	private:
 		void CreateSwapChain(IDXGIFactory7* factory, ID3D12CommandQueue* commandQueue, HWND hwnd, int width, int height);
 		void CreateRenderTargets(ID3D12Device* device);
+		void CreateBackBufferViews(ID3D12Device* device);
 		void CreateDepthBuffer(ID3D12Device* device, int width, int height);
 
 	private:
@@ -56,6 +63,9 @@ namespace DXC {
 		D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles_[6]; // バックバッファの数に合わせる
 		UINT numRTVHandle_ = 6;
 		UINT backBufferCount_ = 2;
+		// バックバッファの大きさ。ウィンドウの大きさに追従する
+		int width_ = 0;
+		int height_ = 0;
 
 		Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource_[DXC::kFrameCount_];
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap_;

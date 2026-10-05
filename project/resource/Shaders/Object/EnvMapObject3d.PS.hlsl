@@ -51,7 +51,9 @@ PixelShaderOutput main(VertxShaderOutput input)
         discard;
     }
 
-    float3 normal = normalize(input.normal);
+    // レイの原点を浮かせる向きは形状そのものの法線を使う(Object3d.PS と同じ理由)
+    float3 geometricNormal = normalize(input.normal);
+    float3 normal = geometricNormal;
 
     if (gMaterial.useNormalMap != 0)
     {
@@ -92,7 +94,7 @@ PixelShaderOutput main(VertxShaderOutput input)
                 continue;
             }
 
-            radiance *= GetDirectionalShadow(input.position, input.WorldPosition, L, normal,
+            radiance *= GetDirectionalShadow(input.position, input.WorldPosition, L, geometricNormal,
                                              uint(i), gLights.rayTracedShadowMask, gLights.shadowMode);
 
             totalLight += BRDF(normal, toEye, L, diffuseColor, f0, roughness) * radiance;
@@ -108,7 +110,7 @@ PixelShaderOutput main(VertxShaderOutput input)
                 continue;
             }
 
-            radiance *= TraceShadowPunctual(input.WorldPosition, light.position, normal,
+            radiance *= TraceShadowPunctual(input.WorldPosition, light.position, geometricNormal,
                                             gLights.rayTracedShadowMask, kShadowMaskPoint);
 
             totalLight += BRDF(normal, toEye, L, diffuseColor, f0, roughness) * radiance;
@@ -125,7 +127,7 @@ PixelShaderOutput main(VertxShaderOutput input)
                 continue;
             }
 
-            radiance *= TraceShadowPunctual(input.WorldPosition, light.position, normal,
+            radiance *= TraceShadowPunctual(input.WorldPosition, light.position, geometricNormal,
                                             gLights.rayTracedShadowMask, kShadowMaskSpot);
 
             totalLight += BRDF(normal, toEye, L, diffuseColor, f0, roughness) * radiance;
@@ -145,6 +147,11 @@ PixelShaderOutput main(VertxShaderOutput input)
     {
         output.color = gMaterial.color * textureColor;
     }
+
+    // 空気(フォグ)。ライティングしない物にも掛ける。濃さが0なら何もしない
+    float fogAmount = FogAmount(gLights.fog, gCamera.worldPosition, input.WorldPosition);
+    float3 fogColor = FogColor(gLights.fog, input.WorldPosition - gCamera.worldPosition);
+    output.color.rgb = ApplyFog(output.color.rgb, fogColor, fogAmount, gCamera.additive);
 
     return output;
 }

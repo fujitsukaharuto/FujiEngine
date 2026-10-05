@@ -16,6 +16,9 @@
 #include "Engine/Graphics/Raytracing/RayTracedAOPass.h"
 #include "Engine/Graphics/Raytracing/RayTracedShadowPass.h"
 #include "Engine/Graphics/IBL/IBLBaker.h"
+#include "Engine/DXC/Command/DXCommand.h"
+#include "Engine/DXC/Debug/GPUTimer.h"
+#include "Engine/Core/Debug/ImGuiManager.h"
 
 using namespace Core;
 using namespace Graphics;
@@ -46,11 +49,18 @@ void ObjectRenderer::Initialize(DXCom* pDxcom, LightManager* pLightManager) {
 
 	iblBaker_ = std::make_unique<IBLBaker>();
 	iblBaker_->Initialize(pDxcom);
+
+	gpuTimer_ = std::make_unique<DXC::GPUTimer>();
+	gpuTimer_->Initialize(pDxcom->GetDevice(), pDxcom->GetDXCommand()->GetQueue(), kTimer_Count);
 }
 
 void ObjectRenderer::Finalize() {
 	renderQueue_.clear();
 	skinningQueue_.clear();
+	if (gpuTimer_) {
+		gpuTimer_->Finalize();
+		gpuTimer_.reset();
+	}
 
 	if (raytracingScene_) {
 		raytracingScene_->Finalize();
@@ -139,14 +149,24 @@ void ObjectRenderer::Render() {
 		}
 	}
 
+	// クリックされたフレームだけ、その画素のオブジェクト番号を拾う
+	RenderPicking();
+
 	// パイプラインとライトの結線はルートシグネチャ単位なので、張り替えた後にやり直す
 	PreDraw();
+
+	const uint32_t frameIndex = dxcommon_->GetNowFrameCount();
+	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
+	gpuTimer_->Begin(cList, frameIndex, kTimer_Forward);
 
 	// 登録されたRenderObjectをループで描画
 	for (RenderObject* obj : renderQueue_) {
 		// 仮想関数なので、実際の型(Object3d または AnimationObject)のDrawが呼ばれる
 		obj->Render();
 	}
+
+	gpuTimer_->End(cList, frameIndex, kTimer_Forward);
+	gpuTimer_->Resolve(cList, frameIndex, kTimer_Forward);
 
 	// 描画が終わったらリストを空にする
 	renderQueue_.clear();
@@ -174,6 +194,46 @@ void ObjectRenderer::BuildRaytracingScene() {
 		}
 	}
 	raytracingScene_->BuildTlas();
+}
+
+void ObjectRenderer::RenderPicking() {
+	ModelManager* modelManager = ModelManager::GetInstance();
+	if (!modelManager->IsPickingRequested()) {
+		return;
+	}
+
+	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
+	PipelineManager* pPipeManager = PipelineManager::GetInstance();
+
+	dxcommon_->GetDXCommand()->SetViewAndScissor(MyWin::kWindowWidth, MyWin::kWindowHeight);
+	// 見るのはクリックされた1画素だけ。ビューポートは本描画と同じままシザーで絞る
+	const LONG x = static_cast<LONG>(modelManager->GetPickedCoord(0));
+	const LONG y = static_cast<LONG>(modelManager->GetPickedCoord(1));
+	const D3D12_RECT scissor{ x, y, x + 1, y + 1 };
+	cList->RSSetScissorRects(1, &scissor);
+
+	cList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	// 1回目でいちばん手前の深度を求め、2回目でその深度の持ち主が番号を書く。
+	// 1回で済ませると、重なった所でどれが残るかが描画の実行順に左右される
+	for (Pipe pipe : { Pipe::PickingDepth, Pipe::PickingID }) {
+		dxcommon_->GetPipelineManager()->SetPipeline(pipe);
+		modelManager->PickingCommand();
+
+		for (RenderObject* obj : renderQueue_) {
+			const D3D12_GPU_VIRTUAL_ADDRESS objIDAddress = obj->GetObjIDGPUVirtualAddress();
+			if (!obj->IsPickable() || objIDAddress == 0) {
+				continue;
+			}
+			pPipeManager->SetGraphicsRootCBV(cList, RootName::kObjIDData, objIDAddress);
+			// 要るのは変換行列・マテリアル・テクスチャだけで、深度+法線プリパスと同じ
+			obj->RenderPrepass();
+		}
+
+		// 2回目が読む深度を確定させる
+		modelManager->PickingBarrier();
+	}
+	// シザーとパイプラインは、この後の PreDraw が本描画用へ戻す
 }
 
 void ObjectRenderer::Skinning() {
@@ -212,6 +272,10 @@ void Graphics::ObjectRenderer::RenderGrid() {
 
 void ObjectRenderer::DebugGUI() {
 #ifdef _DEBUGMODE
+	// GPUが書き終わっているのは1つ前のフレームぶん
+	const uint32_t finishedFrame = (dxcommon_->GetNowFrameCount() + DXC::kFrameCount_ - 1) % DXC::kFrameCount_;
+	ImGui::Text("forward  : %.3f ms", gpuTimer_->GetElapsedMS(finishedFrame, kTimer_Forward));
+
 	// 各パスは自前で CollapsingHeader を開くので、ここは並べるだけでよい
 	if (raytracingScene_) { raytracingScene_->DebugGUI(); }
 	if (gbufferPass_) { gbufferPass_->DebugGUI(); }
@@ -226,5 +290,4 @@ void ObjectRenderer::PreDraw() {
 	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Normal);
 	dxcommon_->GetDXCommand()->GetList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	lightManager_->SetLightCommand(dxcommon_->GetCommandList());
-	ModelManager::GetInstance()->PickingCommand();
 }

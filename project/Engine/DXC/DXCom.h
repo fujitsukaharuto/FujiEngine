@@ -74,6 +74,10 @@ namespace DXC {
 		/// </summary>
 		void BeginFrame();
 
+		/// <summary>ウィンドウの大きさが変わっていたら、バックバッファを作り直す</summary>
+		/// <remarks>作り直す前に GPU を待つので、変わったフレームだけ一瞬止まる</remarks>
+		void ResizeSwapChainIfNeeded();
+
 		/// <summary>
 		/// シーンを変える前に1フレ前を待つ
 		/// </summary>

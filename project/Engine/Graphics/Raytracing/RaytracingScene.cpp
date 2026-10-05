@@ -335,6 +335,12 @@ void RaytracingScene::EnsureTlasCapacity(uint32_t instanceCount) {
 	uint32_t newCapacity = (instanceCapacity_ == 0) ? 64 : instanceCapacity_;
 	while (newCapacity < instanceCount) { newCapacity *= 2; }
 
+	// 前のフレームの描画がまだ古いTLASを読んでいることがある。待たずに解放したりSRVを指し直すと、
+	// 実行中の描画が解放済みの木や、まだ構築していない木を読む
+	if (tlasBuffer_) {
+		dxcommon_->Flush();
+	}
+
 	for (uint32_t i = 0; i < DXC::kFrameCount_; ++i) {
 		if (instanceMapped_[i]) {
 			instanceBuffer_[i]->Unmap(0, nullptr);

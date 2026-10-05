@@ -98,8 +98,8 @@ void Model::Draw(ID3D12GraphicsCommandList* commandList, std::vector<Material>& 
 	const size_t drawCount = (materials.size() < mesh_.size()) ? materials.size() : mesh_.size();
 
 	for (uint32_t index = 0; index < drawCount; ++index) {
-		PipelineManager* pPipeManager = PipelineManager::GetInstance()->GetInstance();
-		
+		PipelineManager* pPipeManager = PipelineManager::GetInstance();
+
 		pPipeManager->SetGraphicsRootCBV(commandList, RootName::kMaterial, materials[index].UploadAndGetResource()->GetGPUVirtualAddress());
 		pPipeManager->SetGraphicsRootDescriptorTable(commandList, RootName::kTextures, SRVManager::GetInstance()->GetGPUDescriptorHandle(0));
 
@@ -122,9 +122,8 @@ void Model::AnimationDraw(DXCom* pDxcom, ID3D12GraphicsCommandList* commandList,
 	if (materials.size() < drawCount) { drawCount = materials.size(); }
 	if (skinnedMeshes.size() < drawCount) { drawCount = skinnedMeshes.size(); }
 
-	int vertexOffset = 0;
 	for (uint32_t index = 0; index < drawCount; ++index) {
-		PipelineManager* pPipeManager = PipelineManager::GetInstance()->GetInstance();
+		PipelineManager* pPipeManager = PipelineManager::GetInstance();
 
 		pPipeManager->SetGraphicsRootCBV(commandList, RootName::kMaterial, materials[index].UploadAndGetResource()->GetGPUVirtualAddress());
 		pPipeManager->SetGraphicsRootDescriptorTable(commandList, RootName::kTextures, SRVManager::GetInstance()->GetGPUDescriptorHandle(0));
@@ -140,9 +139,6 @@ void Model::AnimationDraw(DXCom* pDxcom, ID3D12GraphicsCommandList* commandList,
 
 		pDxcom->TransitionResource(skinnedMeshes[index].GetSkinnedResource(),
 			kSkinnedReadState, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
-
-		vertexOffset = 0;
-		vertexOffset += int(mesh_[index].GetVertexCount());
 	}
 }
 

@@ -288,9 +288,7 @@ void AnimationModel::Render() {
 
 		pPipeManager->SetGraphicsRootCBV(cList, RootName::kTransformationMatrix, wvpResource_[frameIndex]->GetGPUVirtualAddress());
 		pPipeManager->SetGraphicsRootCBV(cList, RootName::kCamera, cameraPosResource_[frameIndex]->GetGPUVirtualAddress());
-		pPipeManager->SetGraphicsRootCBV(cList, RootName::kObjIDData, objIDDataResource_->GetGPUVirtualAddress());
 		pPipeManager->SetGraphicsRootDescriptorTable(cList, RootName::kTextures, SRVManager::GetInstance()->GetGPUDescriptorHandle(0));
-		ModelManager::GetInstance()->PickingCommand();
 
 		model_->AnimationDraw(dxcommon_, cList, skinnedMeshes_, material_);
 

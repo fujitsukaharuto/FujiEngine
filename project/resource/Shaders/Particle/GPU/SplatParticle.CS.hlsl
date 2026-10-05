@@ -1,5 +1,6 @@
 #include "CSParticle.hlsli"
 #include "Splat.hlsli"
+#include "../../Common/Fog.hlsli"
 
 // 生存パーティクルを画面へ点描(atomic加算)するコンピュート・ラスタライザ。
 // パーティクルバッファはUAV状態のまま読むため RWStructuredBuffer で受ける
@@ -15,6 +16,7 @@ struct PerView
 };
 ConstantBuffer<PerView> gPerView : register(b0);
 ConstantBuffer<SplatParam> gSplatParam : register(b1);
+ConstantBuffer<FogParams> gFog : register(b2);
 
 // シーン不透明深度(NDC深度[0,1], 標準: 大きいほど遠い)。フル解像度時のみ遮蔽テストに使用。
 Texture2D<float> gSceneDepth : register(t0);
@@ -95,6 +97,9 @@ void main(uint3 DTid : SV_DispatchThreadID)
 
     // 加算ブレンド相当: 寄与 = rgb * alpha (ラスタ版の SrcAlpha/One と一致)
     float3 value = color.rgb * color.a;
+
+    // 空気(フォグ)。光を足す描き方なので、フォグの色へ寄せずに暗くするだけ
+    value *= 1.0f - FogAmount(gFog, gFog.cameraPosition, wpos);
 
     // 画面上の半径(px)。フットプリント無効時は読まずに 1粒子=1px のまま描く
     float radius = 0.0f;

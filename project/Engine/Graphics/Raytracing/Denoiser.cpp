@@ -168,6 +168,7 @@ void Denoiser::UpdateParam(uint32_t frameIndex, const GBufferPass& gbuffer) {
 	temporal.maxHistoryLength = maxHistoryLength_;
 	temporal.normalThreshold = normalThreshold_;
 	temporal.positionThreshold = positionThreshold_;
+	temporal.historyClamp = enableHistoryClamp_ ? 1u : 0u;
 
 	*temporalMapped_[frameIndex] = temporal;
 
@@ -261,6 +262,7 @@ void Denoiser::DebugGUI() {
 	ImGui::SliderFloat("max history", &maxHistoryLength_, 1.0f, 64.0f, "%.0f frames");
 	ImGui::SliderFloat("normal threshold", &normalThreshold_, 0.0f, 1.0f);
 	ImGui::SliderFloat("position threshold", &positionThreshold_, 0.0f, 0.1f, "%.4f");
+	ImGui::Checkbox("history clamp", &enableHistoryClamp_);
 
 	ImGui::SeparatorText("Spatial");
 	ImGui::SliderFloat("normal power", &normalPower_, 1.0f, 128.0f);

@@ -92,6 +92,13 @@ namespace Graphics {
 		void PickingDataCopy();
 		int GetPickedID() { return lastPicked_.objID; }
 		int GetPickedCoord(int i) { return pickingData_.pickingPixelCoord[i]; }
+		/// <summary>このフレームにクリックされたか。立っているフレームだけピッキングのパスを走らせる</summary>
+		bool IsPickingRequested() const { return pickingData_.pickingEnable != 0; }
+		/// <summary>クリックの結果が届いたフレームだけ true。GetPickedID() は何も無い所なら -1</summary>
+		/// <remarks>番号が前回と同じでも立つので、同じ物のクリックし直しを拾える</remarks>
+		bool IsPickResolved() const { return isPickResolved_; }
+		/// <summary>ピッキングの1回目の書き込みが済むのを待たせる</summary>
+		void PickingBarrier();
 		bool GetIsOnce() { return isOnce_; }
 		bool GetIsPicked() { return isPicked_; }
 
@@ -130,5 +137,6 @@ namespace Graphics {
 		int preObjId_ = -1;
 		bool isPicked_ = false;
 		bool isOnce_ = false;
+		bool isPickResolved_ = false;
 	};
 }

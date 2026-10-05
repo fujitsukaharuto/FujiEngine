@@ -12,6 +12,8 @@
 #include "Engine/Core/Time/FPSKeeper.h"
 #include "Engine/Graphics/Model/ModelManager.h"
 #include "Engine/Graphics/Texture/TextureManager.h"
+#include "Engine/Graphics/Object/ObjectRenderer.h"
+#include "Engine/Graphics/Light/LightManager.h"
 #ifdef _DEBUGMODE
 #include "Engine/Editor/ObjectEditor/GPUParticleSystemEditor.h"
 #endif // _DEBUGMODE
@@ -244,6 +246,9 @@ void GPUParticleSystem::SplatDraw() {
 	pPipeManager->SetComputeRootDescriptorTable(list, RootName::kSceneDepth, dxcommon_->GetDepthTexGPUHandle());
 	pPipeManager->SetComputeRootCBV(list, RootName::kPerView, perViewResource_[frameIndex]->GetGPUVirtualAddress());
 	pPipeManager->SetComputeRootCBV(list, RootName::kSplatParam, paramAddr);
+	// シェーダが gFog を無条件に宣言しているので、フォグを切っていてもバインドが要る
+	pPipeManager->SetComputeRootCBV(list, RootName::kFog,
+		ObjectRenderer::GetInstance()->GetLightManager()->GetFogGPUVirtualAddress());
 	uint32_t threadsPerRow = threadsPerGroup * 1024; // 1024グループ * 1024スレッド
 	uint32_t rows = (numParticles + threadsPerRow - 1) / threadsPerRow;
 	list->Dispatch(1024, rows, 1);

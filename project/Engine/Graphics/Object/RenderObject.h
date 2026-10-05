@@ -44,6 +44,9 @@ namespace Graphics {
 		/// <remarks>trueならBLASをスキニング後の頂点から毎フレーム作り直す</remarks>
 		virtual bool IsSkinned() const { return false; }
 
+		/// <summary>クリックで選べるか</summary>
+		virtual bool IsPickable() const { return true; }
+
 		//========================================================================*/
 		//* Getter
 		Math::Trans& GetTransform() { return transform_; }
@@ -56,6 +59,10 @@ namespace Graphics {
 		Model* GetModel() const { return model_; }
 		/// <summary>ピッキングで使う番号。Create 前は -1</summary>
 		int GetObjID() const { return objIDData_ ? objIDData_->objID : -1; }
+		/// <summary>ピッキングで使う番号の定数バッファ。Create 前は 0</summary>
+		D3D12_GPU_VIRTUAL_ADDRESS GetObjIDGPUVirtualAddress() const {
+			return objIDDataResource_ ? objIDDataResource_->GetGPUVirtualAddress() : 0;
+		}
 
 		/// <summary>SRTだけを初期化する。parent / animeParent は保持する</summary>
 		/// <remarks>transform_ を丸ごと代入するとペアレントが黙って外れるので、Create系はこれを通すこと</remarks>

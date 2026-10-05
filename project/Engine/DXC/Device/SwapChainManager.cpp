@@ -74,11 +74,41 @@ void SwapChainManager::CreateSwapChain(IDXGIFactory7* factory, ID3D12CommandQueu
 		commandQueue, hwnd, &swapChainDesc,
 		nullptr, nullptr, reinterpret_cast<IDXGISwapChain1**>(swapChain_.GetAddressOf()));
 	assert(SUCCEEDED(hr));
+	width_ = width;
+	height_ = height;
+
+	// Alt+Enter は MyWin が枠なしフルスクリーンとして受ける。DXGI に任せると排他フルスクリーンへ入ろうとする
+	factory->MakeWindowAssociation(hwnd, DXGI_MWA_NO_ALT_ENTER);
+}
+
+void SwapChainManager::Resize(ID3D12Device* device, int width, int height) {
+	// 参照が残っていると ResizeBuffers が失敗する
+	for (auto& res : swapChainResources_) {
+		res.Reset();
+	}
+	HRESULT hr = swapChain_->ResizeBuffers(backBufferCount_, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, 0);
+	assert(SUCCEEDED(hr));
+	width_ = width;
+	height_ = height;
+	CreateBackBufferViews(device);
 }
 
 void SwapChainManager::CreateRenderTargets(ID3D12Device* device) {
 	rtvDescriptorHeap_ = DXC::Helper::CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, numRTVHandle_, false);
+	CreateBackBufferViews(device);
 
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvStartHandle = rtvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
+	rtvHandles_[1].ptr = rtvStartHandle.ptr + device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+
+	// ここより下はオフスクリーンで使う用
+	rtvHandles_[2].ptr = rtvHandles_[1].ptr + device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	rtvHandles_[3].ptr = rtvHandles_[2].ptr + device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+
+	rtvHandles_[4].ptr = rtvHandles_[3].ptr + device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	rtvHandles_[5].ptr = rtvHandles_[4].ptr + device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+}
+
+void SwapChainManager::CreateBackBufferViews(ID3D12Device* device) {
 	HRESULT hr = swapChain_->GetBuffer(0, IID_PPV_ARGS(&swapChainResources_[0]));
 	assert(SUCCEEDED(hr));
 	hr = swapChain_->GetBuffer(1, IID_PPV_ARGS(&swapChainResources_[1]));
@@ -93,13 +123,6 @@ void SwapChainManager::CreateRenderTargets(ID3D12Device* device) {
 	device->CreateRenderTargetView(swapChainResources_[0].Get(), &rtvDesc, rtvHandles_[0]);
 	rtvHandles_[1].ptr = rtvHandles_[0].ptr + device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	device->CreateRenderTargetView(swapChainResources_[1].Get(), &rtvDesc, rtvHandles_[1]);
-
-	// ここより下はオフスクリーンで使う用
-	rtvHandles_[2].ptr = rtvHandles_[1].ptr + device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-	rtvHandles_[3].ptr = rtvHandles_[2].ptr + device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-
-	rtvHandles_[4].ptr = rtvHandles_[3].ptr + device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-	rtvHandles_[5].ptr = rtvHandles_[4].ptr + device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 }
 
 void SwapChainManager::CreateDepthBuffer(ID3D12Device* device, int width, int height) {

@@ -204,6 +204,7 @@ void Framework::EngineDebugGUI() {
 			DebugWindows::MenuItems();
 			ImGui::Separator();
 			if (ImGui::MenuItem("レイアウトを初期化")) { isDockLayoutReset_ = true; }
+			if (ImGui::MenuItem("フルスクリーン", "F11", win_->IsFullscreen())) { win_->ToggleFullscreen(); }
 			ImGui::EndMenu();
 		}
 		ImGui::EndMainMenuBar();
@@ -235,12 +236,15 @@ void Framework::EngineDebugGUI() {
 	if (DebugWindow gpuParticle{ "GPU Particle" }) { ParticleManager::GetInstance()->ParticleCSDebugGUI(); }
 	if (DebugWindow inputMap{ "Input" }) { InputMap::GetInstance()->DebugGUI(); }
 
-	// ピックし直した瞬間だけ、Inspector を前に出す
-	const int pickedID = modelManager_->GetPickedID();
-	if (pickedID != prevPickedID_ && gameObjectEditor_.SelectByObjID(pickedID)) {
-		ImGui::SetWindowFocus("Inspector");
+	// クリックの結果が届いた瞬間だけ、選択を切り替えて Inspector を前に出す
+	if (modelManager_->IsPickResolved()) {
+		const int pickedID = modelManager_->GetPickedID();
+		if (gameObjectEditor_.SelectByObjID(pickedID)) {
+			ImGui::SetWindowFocus("Inspector");
+		} else if (pickedID <= 0) {
+			gameObjectEditor_.DeselectObject();
+		}
 	}
-	prevPickedID_ = pickedID;
 
 	imguiManager_->UnSetFont();
 #endif // _DEBUGMODE

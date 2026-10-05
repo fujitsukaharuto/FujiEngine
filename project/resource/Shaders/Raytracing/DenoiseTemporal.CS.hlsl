@@ -22,7 +22,8 @@ cbuffer DenoiseTemporalParam : register(b1)
     float maxHistoryLength;  // 蓄積の上限フレーム数。大きいほど滑らかで動きへの追従は遅い
     float normalThreshold;   // 履歴を認める法線の一致度(cos)
     float positionThreshold; // 履歴を認めるワールド座標のずれ。カメラからの距離に対する割合
-    float2 temporalPad;
+    uint historyClamp;       // 0以外なら、履歴を近傍の生の信号の範囲へ収める
+    float temporalPad;
 };
 
 Texture2D<float4> gGBufferNormal : register(t0);
@@ -124,6 +125,32 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
     if (historyWeight > 0.0f)
     {
         history /= historyWeight;
+
+        // 再投影はカメラの動きしか追えない。遮蔽物の方が動くと、受ける側の画素は「前と同じ点」なので
+        // 古い値がそのまま通り、動く物の影が何十フレームぶんの平均に薄まる。
+        // 近傍の生の信号が取っている範囲へ履歴を収めると、周りが揃って明るい(暗い)所では即座に追従し、
+        // 値がばらつく半影では範囲が広いので従来どおり蓄積される
+        if (historyClamp != 0)
+        {
+            float lo = raw;
+            float hi = raw;
+            for (int y = -1; y <= 1; y++)
+            {
+                for (int x = -1; x <= 1; x++)
+                {
+                    int2 tap = clamp(int2(pixel) + int2(x, y), int2(0, 0), int2(screenSize) - 1);
+                    float v = gDenoiseRaw.Load(int3(tap, 0)).r;
+                    lo = min(lo, v);
+                    hi = max(hi, v);
+                }
+            }
+
+            float clamped = clamp(history.x, lo, hi);
+            // 大きく切り詰めた＝そこの値が変わった。蓄積も浅い扱いへ戻して、以後の追従も速める
+            history.y *= 1.0f - saturate(abs(clamped - history.x) * 4.0f);
+            history.x = clamped;
+        }
+
         historyLength = min(history.y + 1.0f, maxHistoryLength);
         // 浅いうちは 1/n の単純平均、上限に達すると指数移動平均になる
         filtered = lerp(history.x, raw, 1.0f / historyLength);

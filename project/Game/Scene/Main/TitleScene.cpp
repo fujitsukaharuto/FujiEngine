@@ -38,9 +38,6 @@ void TitleScene::Initialize() {
 	// カメラの初期位置は配置データの環境にある。演出はその向きから見下ろしへ起こしていく
 	cameraStartRotate_ = level_.GetEnvironment().cameraRotate;
 
-	dxcommon_->GetOffscreenManager()->ResetPostEffect();
-	dxcommon_->GetOffscreenManager()->AddPostEffect(PostEffectList::Bloom);
-
 	// ロゴと案内の絵は配置データ(resource/Json/Level/TITLE.json)に置いてある
 	space_ = level_.FindSprite("space");
 	title_ = level_.FindSprite("title");

@@ -138,8 +138,6 @@ void Object3d::Render() {
 
 	pPipeManager->SetGraphicsRootCBV(cList, RootName::kTransformationMatrix, wvpResource_[frameIndex]->GetGPUVirtualAddress());
 	pPipeManager->SetGraphicsRootCBV(cList, RootName::kCamera, cameraPosResource_[frameIndex]->GetGPUVirtualAddress());
-	pPipeManager->SetGraphicsRootCBV(cList, RootName::kObjIDData, objIDDataResource_->GetGPUVirtualAddress());
-	ModelManager::GetInstance()->PickingCommand();
 
 	pPipeManager->SetGraphicsRootDescriptorTable(cList, RootName::kTextures, SRVManager::GetInstance()->GetGPUDescriptorHandle(0));
 

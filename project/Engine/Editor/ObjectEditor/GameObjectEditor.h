@@ -30,6 +30,10 @@ namespace Editor {
 		/// <returns>持ち主が見つかって選択したら true</returns>
 		bool SelectByObjID(int objID);
 
+		/// <summary>ゲーム画面の何も無い所をクリックしたときに、オブジェクトの選択を外す</summary>
+		/// <remarks>スプライトと環境の選択は触らない(Inspector で値をいじりながら画面を触るので)</remarks>
+		void DeselectObject() { selected_ = nullptr; }
+
 		/// <summary>ゲーム画面の上で、選択中のスプライトに枠を出し、ドラッグで動かす</summary>
 		/// <remarks>毎フレーム呼ぶ。スプライトの上にマウスがある間はオブジェクトのピックを止める</remarks>
 		void GameViewGUI(const Scene::Level* level);

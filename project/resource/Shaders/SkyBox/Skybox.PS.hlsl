@@ -1,4 +1,5 @@
 #include "Skybox.hlsli"
+#include "../Common/Fog.hlsli"
 
 struct Material
 {
@@ -13,6 +14,7 @@ struct Material
 ConstantBuffer<Material> gMaterial : register(b1);
 TextureCube<float4> gTexture : register(t0);
 SamplerState gSampler : register(s0);
+ConstantBuffer<FogParams> gFog : register(b2);
 
 
 struct PixelShaderOutput
@@ -37,9 +39,13 @@ PixelShaderOutput main(VertxShaderOutput input)
 
     float3 litColor = textureColor.rgb * gMaterial.color.rgb;
 
+    // この露光とトーンマップは SkyBox::GetHorizonColor() が同じ計算をしている。変えたら向こうも合わせること
     float exposure = 0.25;
     litColor *= exposure;
     litColor = ToneMapACES(litColor);
+
+    // 空気(フォグ)。遠くの地面が霞んで溶け込む先の色と、地平線の色を揃える
+    litColor = lerp(litColor, FogColor(gFog, input.texcoord), FogAmountSky(gFog, normalize(input.texcoord)));
 
     output.color = float4(litColor, textureColor.a * gMaterial.color.a);
     //output.color = textureColor * gMaterial.color;

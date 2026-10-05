@@ -104,6 +104,7 @@ void RenderObject::CreateWVP() {
 		cameraPosData_[i] = nullptr;
 		cameraPosResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&cameraPosData_[i]));
 		cameraPosData_[i]->worldPosition = camera_->GetTranslate();
+		cameraPosData_[i]->additive = 0.0f;
 	}
 }
 
@@ -141,6 +142,8 @@ void RenderObject::SetWVP() {
 	wvpData_[frameIndex]->WorldInverseTransPose = Transpose(Inverse(wvpData_[frameIndex]->World));
 
 	cameraPosData_[frameIndex]->worldPosition = camera_->GetTranslate();
+	// isAdd_ は Draw() が先に決めている
+	cameraPosData_[frameIndex]->additive = isAdd_ ? 1.0f : 0.0f;
 }
 
 void RenderObject::SetBillboardWVP() {
@@ -162,4 +165,11 @@ void RenderObject::SetBillboardWVP() {
 	wvpData_[frameIndex]->World = worldMatrix;
 	wvpData_[frameIndex]->WVP = worldViewProjectionMatrix;
 	wvpData_[frameIndex]->WorldInverseTransPose = Transpose(Inverse(wvpData_[frameIndex]->World));
+
+	// こちらの経路でもカメラの位置を入れ直す。入れないと生成したときの位置のままになり、
+	// ハイライトとフォグが今のカメラからの距離で計算されない
+	if (camera_) {
+		cameraPosData_[frameIndex]->worldPosition = camera_->GetTranslate();
+	}
+	cameraPosData_[frameIndex]->additive = isAdd_ ? 1.0f : 0.0f;
 }

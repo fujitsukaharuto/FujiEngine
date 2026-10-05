@@ -70,5 +70,6 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
 
     gShadowOutput[pixel] = TraceSoftShadowDirectional(worldPos, L, normal,
                                                       gLights.sunAngularRadius,
-                                                      gLights.shadowSampleCount, seed);
+                                                      gLights.shadowSampleCount, seed,
+                                                      ReconstructedRayBias(distance(worldPos, cameraPos)));
 }

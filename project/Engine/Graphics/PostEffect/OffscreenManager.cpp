@@ -1,4 +1,5 @@
 #include "Engine/Graphics/PostEffect/OffscreenManager.h"
+#include "Engine/Graphics/PostEffect/BloomPass.h"
 #include "Engine/Graphics/Pipeline/RootNames.h"
 #include "Engine/DXC/DXCom.h"
 #include "Engine/DXC/Resource/DX12Helper.h"
@@ -16,7 +17,13 @@ using namespace Math;
 using namespace DXC;
 
 
+OffscreenManager::OffscreenManager() = default;
+
 OffscreenManager::~OffscreenManager() {
+	if (bloomPass_) {
+		bloomPass_->Finalize();
+		bloomPass_.reset();
+	}
 	dxcommon_ = nullptr;
 }
 
@@ -52,12 +59,15 @@ void OffscreenManager::DebugGUI() {
 
 	ImGui::SetNextItemOpen(true, ImGuiCond_Once);
 	if (ImGui::TreeNode("Tonemap")) {
-		// オフスクリーンはリニアHDRなので、画面へ出す前にここで表示レンジへ落とす
-		ImGui::DragFloat("exposure", &tonemapData_.exposure, 0.01f, 0.0f, 100.0f);
-
-		int mode = static_cast<int>(tonemapData_.mode);
-		if (ImGui::Combo("operator##tonemap", &mode, "None\0Reinhard\0ACES\0")) {
-			tonemapData_.mode = static_cast<TonemapMode>(mode);
+		// 露光や演算子はシーンごとの設定(Hierarchy > Environment)にある。ここは全シーン共通の切り替えだけ
+		bool isFXAA = tonemapData_.enableFXAA != 0;
+		if (ImGui::Checkbox("FXAA", &isFXAA)) {
+			tonemapData_.enableFXAA = isFXAA ? 1u : 0u;
+		}
+		ImGui::SameLine();
+		bool isDither = tonemapData_.enableDither != 0;
+		if (ImGui::Checkbox("dither", &isDither)) {
+			tonemapData_.enableDither = isDither ? 1u : 0u;
 		}
 		ImGui::TreePop();
 	}
@@ -70,8 +80,11 @@ void OffscreenManager::DebugGUI() {
 	}
 
 	if (ImGui::TreeNode("Bloom##settingBloom")) {
-		ImGui::DragFloat("bloomIntensity", &bloomData_.bloomIntensity, 0.01f);
-		ImGui::DragFloat("bloomThreshold", &bloomData_.bloomThreshold, 0.01f);
+		// 強さやしきい値はシーンごとの設定(Hierarchy > Environment)にある
+		ImGui::Checkbox("multi scale", &useMultiScaleBloom_);
+		if (bloomPass_) {
+			bloomPass_->DebugGUI();
+		}
 		ImGui::TreePop();
 	}
 
@@ -253,6 +266,9 @@ void OffscreenManager::SettingTexture() {
 #endif // _DEBUGMODE
 
 	InitializePostEffects();
+
+	bloomPass_ = std::make_unique<BloomPass>();
+	bloomPass_->Initialize(dxcommon_);
 }
 
 void OffscreenManager::Command() {
@@ -276,6 +292,31 @@ void OffscreenManager::Command() {
 
 D3D12_GPU_DESCRIPTOR_HANDLE OffscreenManager::GetGameViewTexture() const {
 	return gameViewSrvHandle_[dxcommon_->GetNowFrameCount()];
+}
+
+void OffscreenManager::ApplySettings(const PostProcessSettings& settings) {
+	bloomData_.bloomThreshold = settings.bloomThreshold;
+	bloomData_.bloomIntensity = settings.bloomIntensity;
+	if (bloomPass_) {
+		bloomPass_->SetShape(settings.bloomKnee, settings.bloomScatter);
+	}
+	tonemapData_.mode = settings.tonemapMode;
+	tonemapData_.exposure = settings.exposure;
+	tonemapData_.saturation = settings.saturation;
+	tonemapData_.contrast = settings.contrast;
+
+	bool hasBloom = false;
+	for (const PostEffectPass& pass : validPostEffects_) {
+		if (pass.effectName == PostEffectList::Bloom) {
+			hasBloom = true;
+			break;
+		}
+	}
+	if (settings.bloomEnabled && !hasBloom) {
+		AddPostEffect(PostEffectList::Bloom);
+	} else if (!settings.bloomEnabled && hasBloom) {
+		PopPostEffect(PostEffectList::Bloom);
+	}
 }
 
 void OffscreenManager::PopPostEffect(PostEffectList effect) {
@@ -558,6 +599,9 @@ void Graphics::OffscreenManager::PingPongCommand() {
 			validPostEffects_[i].setup(dxcommon_->GetCommandList(), inputSRVHandle, outputUAVHandle);
 			dxcommon_->GetCommandList()->Dispatch((MyWin::kWindowWidth + 7) / 8, (MyWin::kWindowHeight + 7) / 8, 1);
 			dxcommon_->TransitionDepthToWrite();
+		} else if (validPostEffects_[i].pipeline == Pipe::BloomCS && useMultiScaleBloom_ && bloomPass_) {
+			// 多段のブルームは中で何度もディスパッチするので、1回ぶんの枠には収まらない
+			bloomPass_->Render(inputSRVHandle, outputUAVHandle, bloomData_.bloomThreshold, bloomData_.bloomIntensity);
 		} else {
 			dxcommon_->GetPipelineManager()->SetCSPipeline(validPostEffects_[i].pipeline);
 			validPostEffects_[i].setup(dxcommon_->GetCommandList(), inputSRVHandle, outputUAVHandle);
@@ -617,7 +661,13 @@ void Graphics::OffscreenManager::DrawToScreen(D3D12_GPU_DESCRIPTOR_HANDLE input)
 	}
 #endif // _DEBUGMODE
 
-	dxcommon_->GetDXCommand()->SetViewAndScissor(MyWin::kWindowWidth, MyWin::kWindowHeight);
+	const MyWin::GameView& view = MyWin::GetGameView();
+	if (view.isOnPanel) {
+		dxcommon_->GetDXCommand()->SetViewAndScissor(MyWin::kWindowWidth, MyWin::kWindowHeight);
+	} else {
+		// ウィンドウへ直に描く。ウィンドウの比率が違えば余りは黒帯になる
+		dxcommon_->GetDXCommand()->SetViewAndScissor(view.x, view.y, view.width, view.height);
+	}
 	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::None);
 
 	commandList->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -652,4 +702,8 @@ void OffscreenManager::CopyData(uint32_t frameIndex) {
 
 	tonemapDataGPU_[frameIndex]->exposure = tonemapData_.exposure;
 	tonemapDataGPU_[frameIndex]->mode = tonemapData_.mode;
+	tonemapDataGPU_[frameIndex]->enableFXAA = tonemapData_.enableFXAA;
+	tonemapDataGPU_[frameIndex]->enableDither = tonemapData_.enableDither;
+	tonemapDataGPU_[frameIndex]->saturation = tonemapData_.saturation;
+	tonemapDataGPU_[frameIndex]->contrast = tonemapData_.contrast;
 }

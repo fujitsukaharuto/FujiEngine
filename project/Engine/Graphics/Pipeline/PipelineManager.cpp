@@ -55,6 +55,16 @@ void PipelineManager::CreatePipeline() {
 		.blend = BlendType::NONE, .depth = DepthMode::READ_WRITE,
 		.rtvFormat = DXC::kGBufferNormalFormat });
 
+	// クリックされた画素のオブジェクト番号を拾うパス。本描画より前に走るので深度バッファは見ず、
+	// 1回目で手前の深度を求め、2回目でその深度の持ち主が番号を書く。
+	// 色はアルファ0で出すので合成しても変わらない
+	CreateRenderPipe(Pipe::PickingDepth, {
+		.vsPath = L"Object/Object3d.VS.hlsl", .psPath = L"Object/PickingDepth.PS.hlsl",
+		.blend = BlendType::ALPHA, .depth = DepthMode::DISABLE });
+	CreateRenderPipe(Pipe::PickingID, {
+		.vsPath = L"Object/Object3d.VS.hlsl", .psPath = L"Object/PickingID.PS.hlsl",
+		.blend = BlendType::ALPHA, .depth = DepthMode::DISABLE });
+
 	CreateRenderPipe(Pipe::Normal, {
 		.vsPath = L"Object/Object3d.VS.hlsl", .psPath = L"Object/Object3d.PS.hlsl",
 		.blend = BlendType::ALPHA, .depth = DepthMode::READ_WRITE });
@@ -122,6 +132,9 @@ void PipelineManager::CreatePipeline() {
 	CreatePipe<OutlineCSPipe>(Pipe::OutlineCS);
 	CreateComputePipe(Pipe::LuminanceOutlineCS, L"PostEffect/LuminanceBasedOutline.CS.hlsl");
 	CreateComputePipe(Pipe::BloomCS, L"PostEffect/Bloom.CS.hlsl");
+	CreateComputePipe(Pipe::BloomDownsampleCS, L"PostEffect/BloomDownsample.CS.hlsl");
+	CreateComputePipe(Pipe::BloomUpsampleCS, L"PostEffect/BloomUpsample.CS.hlsl");
+	CreateComputePipe(Pipe::BloomCompositeCS, L"PostEffect/BloomComposite.CS.hlsl");
 	CreateComputePipe(Pipe::RandomCS, L"PostEffect/Random.CS.hlsl");
 	CreatePipe<SkinningCSPipe>(Pipe::SkinningCS);
 

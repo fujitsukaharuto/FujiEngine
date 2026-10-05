@@ -4,6 +4,7 @@
 #include "Engine/DXC/DXCom.h"
 #include "Engine/DXC/Resource/DX12Helper.h"
 #include "Engine/Graphics/Pipeline/PipelineManager.h"
+#include "Engine/Graphics/Camera/CameraManager.h"
 #include <numbers>
 
 using namespace Graphics;
@@ -16,6 +17,10 @@ void LightManager::Initialize(DXCom* pDxcom) {
 		allLightsResource_[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(AllLightsData));
 		allLightsDataGPU_[i] = nullptr;
 		allLightsResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&allLightsDataGPU_[i]));
+
+		fogResource_[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(FogData));
+		fogResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&fogDataGPU_[i]));
+		*fogDataGPU_[i] = allLightsData_.fog;
 	}
 
 	// 初期値設定
@@ -32,11 +37,16 @@ void LightManager::Initialize(DXCom* pDxcom) {
 void LightManager::Finalize() {
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
 		allLightsResource_[i].Reset();
+		fogDataGPU_[i] = nullptr;
+		fogResource_[i].Reset();
 	}
 }
 
 void LightManager::Update() {
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
+	if (Camera* camera = CameraManager::GetInstance()->GetCamera()) {
+		allLightsData_.fog.cameraPosition = camera->GetTranslate();
+	}
 	CopyData(frameIndex);
 }
 
@@ -101,12 +111,23 @@ void LightManager::SetLightCommand(ID3D12GraphicsCommandList* commandList) {
 	PipelineManager::GetInstance()->SetGraphicsRootCBV(commandList, RootName::kLights, allLightsResource_[frameIndex]->GetGPUVirtualAddress());
 }
 
+D3D12_GPU_VIRTUAL_ADDRESS LightManager::GetFogGPUVirtualAddress() const {
+	return fogResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress();
+}
+
+void LightManager::SetFog(const FogData& fog) {
+	const Math::Vector3 cameraPosition = allLightsData_.fog.cameraPosition;
+	allLightsData_.fog = fog;
+	allLightsData_.fog.cameraPosition = cameraPosition;
+}
+
 D3D12_GPU_VIRTUAL_ADDRESS LightManager::GetLightsGPUVirtualAddress() const {
 	return allLightsResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress();
 }
 
 void LightManager::CopyData(uint32_t frameIndex) {
 	memcpy(allLightsDataGPU_[frameIndex], &allLightsData_, sizeof(AllLightsData));
+	*fogDataGPU_[frameIndex] = allLightsData_.fog;
 }
 
 void LightManager::DebugGUI() {

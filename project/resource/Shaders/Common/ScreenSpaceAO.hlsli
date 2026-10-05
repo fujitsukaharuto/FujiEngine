@@ -31,7 +31,7 @@ float GetAmbientOcclusion(float4 svPosition, float3 worldPos, float3 N,
     if (mode == kAOModeInline)
     {
         // 時間に依存しない種＝同じ点なら常に同じ結果。単体でちらつかない代わりに空間のノイズが残る
-        return TraceAO(worldPos, N, sampleCount, radius, intensity, rand3dTo1d(worldPos));
+        return TraceAO(worldPos, N, sampleCount, radius, intensity, rand3dTo1d(worldPos), kShadowRayBias);
     }
 
     return 1.0f;

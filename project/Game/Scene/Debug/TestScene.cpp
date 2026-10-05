@@ -22,8 +22,6 @@ TestScene::~TestScene() {}
 
 void TestScene::Initialize() {
 
-	dxcommon_->GetOffscreenManager()->ResetPostEffect();
-	dxcommon_->GetOffscreenManager()->AddPostEffect(PostEffectList::Bloom);
 
 
 

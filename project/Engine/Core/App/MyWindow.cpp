@@ -16,14 +16,24 @@ namespace {
 	bool isGameViewCaptured = false;
 }
 
+namespace {
+	void Fit(float x, float y, float width, float height, bool isOnPanel);
+}
+
 void MyWin::ResetGameView() {
-	gameView = { 0.0f, 0.0f, static_cast<float>(kWindowWidth), static_cast<float>(kWindowHeight), false, false };
+	const MyWin* win = GetInstance();
+	Fit(0.0f, 0.0f, static_cast<float>(win->clientWidth_), static_cast<float>(win->clientHeight_), false);
 }
 
 void MyWin::FitGameView(float x, float y, float width, float height) {
+	Fit(x, y, width, height, true);
+}
+
+namespace {
+void Fit(float x, float y, float width, float height, bool isOnPanel) {
 	if (width <= 0.0f || height <= 0.0f) { return; }
 
-	const float aspect = static_cast<float>(kWindowWidth) / static_cast<float>(kWindowHeight);
+	const float aspect = static_cast<float>(MyWin::kWindowWidth) / static_cast<float>(MyWin::kWindowHeight);
 	float fitWidth = width;
 	float fitHeight = fitWidth / aspect;
 	if (fitHeight > height) {
@@ -37,9 +47,10 @@ void MyWin::FitGameView(float x, float y, float width, float height) {
 		std::floor(y + (height - fitHeight) * 0.5f),
 		std::floor(fitWidth),
 		std::floor(fitHeight),
-		true,
+		isOnPanel,
 		false
 	};
+}
 }
 
 void MyWin::SetGameViewHovered(bool isHovered) {
@@ -100,8 +111,26 @@ LRESULT MyWin::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 		if (wparam != SIZE_MINIMIZED) {
 			GetInstance()->clientWidth_ = LOWORD(lparam);
 			GetInstance()->clientHeight_ = HIWORD(lparam);
+			// デバッグGUIの無い構成では、ここ以外にゲーム画面の矩形を決め直す所が無い
+			ResetGameView();
 		}
 		return 0;
+
+	case WM_KEYDOWN:
+		// 押しっぱなしの繰り返し(bit30)では切り替えない
+		if (wparam == VK_F11 && (lparam & (1 << 30)) == 0) {
+			GetInstance()->ToggleFullscreen();
+			return 0;
+		}
+		break;
+
+	case WM_SYSKEYDOWN:
+		// Alt+Enter。DXGI 側の切り替えは止めてある(SwapChainManager)ので、ここで受ける
+		if (wparam == VK_RETURN && (lparam & (1 << 29)) != 0 && (lparam & (1 << 30)) == 0) {
+			GetInstance()->ToggleFullscreen();
+			return 0;
+		}
+		break;
 
 		//ウィンドウが破棄された
 	case WM_DESTROY:
@@ -158,6 +187,30 @@ void MyWin::CreateGWindow(const wchar_t* name, uint32_t windowSizeX, uint32_t wi
 	ShowWindow(hwnd_, SW_SHOW);
 }
 
+
+void MyWin::SetFullscreen(bool isFullscreen) {
+	if (isFullscreen == isFullscreen_ || !hwnd_) {
+		return;
+	}
+	isFullscreen_ = isFullscreen;
+
+	if (isFullscreen) {
+		GetWindowPlacement(hwnd_, &windowedPlacement_);
+
+		MONITORINFO monitor{ sizeof(MONITORINFO) };
+		GetMonitorInfo(MonitorFromWindow(hwnd_, MONITOR_DEFAULTTONEAREST), &monitor);
+		const RECT& rect = monitor.rcMonitor;
+
+		SetWindowLongPtr(hwnd_, GWL_STYLE, WS_POPUP | WS_VISIBLE);
+		SetWindowPos(hwnd_, HWND_TOP, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top,
+			SWP_FRAMECHANGED | SWP_NOOWNERZORDER);
+	} else {
+		SetWindowLongPtr(hwnd_, GWL_STYLE, WS_OVERLAPPEDWINDOW | WS_VISIBLE);
+		SetWindowPlacement(hwnd_, &windowedPlacement_);
+		SetWindowPos(hwnd_, nullptr, 0, 0, 0, 0,
+			SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
+	}
+}
 
 void MyWin::ThrowAwayWindow() {
 	if (hwnd_) {

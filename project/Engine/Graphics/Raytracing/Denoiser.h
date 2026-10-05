@@ -34,6 +34,10 @@ namespace Graphics {
 		/// <summary>蓄積を捨てる。パスを止めていた間の履歴は当てにならない</summary>
 		void ResetHistory() { hasHistory_ = false; }
 
+		/// <summary>履歴を近傍の生の信号の範囲へ収めるか</summary>
+		/// <remarks>動く遮蔽物への追従が速くなる。生の信号が広い範囲でばらつく信号(AO)では、細かい陰影が削られることがある</remarks>
+		void SetHistoryClamp(bool is) { enableHistoryClamp_ = is; }
+
 		/// <summary>設定のGUI。呼び出し側のツリーの中に置くこと(IDが被らないように)</summary>
 		void DebugGUI();
 
@@ -59,7 +63,8 @@ namespace Graphics {
 			float maxHistoryLength = 0.0f;
 			float normalThreshold = 0.0f;
 			float positionThreshold = 0.0f;
-			float pad[2]{};
+			uint32_t historyClamp = 0;
+			float pad = 0.0f;
 		};
 
 		/// <summary>HLSL 側 (Raytracing/DenoiseSpatial.CS.hlsl) の DenoiseSpatialParam と並びが一致していること</summary>
@@ -130,6 +135,7 @@ namespace Graphics {
 		bool hasHistory_ = false;
 
 		bool enableTemporal_ = true;
+		bool enableHistoryClamp_ = false;
 		int32_t spatialIterations_ = 3;
 		float maxHistoryLength_ = 32.0f;
 		float normalThreshold_ = 0.9f;

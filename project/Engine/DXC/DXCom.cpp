@@ -116,9 +116,9 @@ void DXCom::PostEffect() {
 
 	swapChainManager_->CreateBarrier(D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET, command_.get());
 
-	UINT frameIndex = GetNowFrameCount();
 	const D3D12_CPU_DESCRIPTOR_HANDLE& backBuffer = swapChainManager_->GetRTVHandle(backBufferIndex);
-	commandList->OMSetRenderTargets(1, &backBuffer, false, &swapChainManager_->GetDSVHandle(frameIndex));
+	// 深度バッファはゲームを描く解像度のままで、バックバッファ(ウィンドウの大きさ)とは寸法が合わないので付けない
+	commandList->OMSetRenderTargets(1, &backBuffer, false, nullptr);
 
 	// ゲーム画面の外側（デバッグGUIの下地）に出る色
 	float clearColor[] = { 0.012f,0.012f,0.014f,1.0f };
@@ -128,7 +128,7 @@ void DXCom::PostEffect() {
 	offscreen_->Command();
 
 	// ゲーム画面をパネル用のテクスチャへ描いたときは張り替わっているので、ImGui用に戻す
-	commandList->OMSetRenderTargets(1, &backBuffer, false, &swapChainManager_->GetDSVHandle(frameIndex));
+	commandList->OMSetRenderTargets(1, &backBuffer, false, nullptr);
 }
 
 void DXCom::PostDraw() {
@@ -142,7 +142,22 @@ void DXCom::PostDraw() {
 	swapChainManager_->Present();
 }
 
+void DXCom::ResizeSwapChainIfNeeded() {
+	const int width = myWin_->GetClientWidth();
+	const int height = myWin_->GetClientHeight();
+	// 最小化中は大きさが0になる
+	if (width <= 0 || height <= 0) {
+		return;
+	}
+	if (width == swapChainManager_->GetWidth() && height == swapChainManager_->GetHeight()) {
+		return;
+	}
+	command_->Flush();
+	swapChainManager_->Resize(GetDevice(), width, height);
+}
+
 void DXCom::BeginFrame() {
+	ResizeSwapChainIfNeeded();
 	command_->SetFrameIndex((command_->GetNowFrameIndex() + 1) % kFrameCount_);
 	 fpsKeeper_->FixFPS();
 	command_->Reset();

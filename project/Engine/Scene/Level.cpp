@@ -10,6 +10,9 @@
 #include "Engine/Core/Debug/ImGuiManager.h"
 #include "Engine/Graphics/SkyBox/SkyBox.h"
 #include "Engine/Graphics/Light/LightManager.h"
+#include "Engine/Graphics/Model/ModelManager.h"
+#include "Engine/DXC/DXCom.h"
+#include "Engine/Graphics/PostEffect/OffscreenManager.h"
 #include "Engine/Graphics/Camera/CameraManager.h"
 #include "Engine/Graphics/Camera/DebugCamera.h"
 
@@ -41,6 +44,15 @@ namespace {
 		return { v[0].get<float>(), v[1].get<float>(), v[2].get<float>(), v[3].get<float>() };
 	}
 
+	// 配置データには名前で書く。並びは Graphics::TonemapMode と同じ
+	constexpr const char* kTonemapNames[] = { "None","Reinhard","ACES","AgX" };
+	constexpr int kTonemapCount = static_cast<int>(std::size(kTonemapNames));
+
+	Graphics::OffscreenManager* GetOffscreen() {
+		DXC::DXCom* dxcommon = Graphics::ModelManager::GetInstance()->ShareDXCom();
+		return dxcommon ? dxcommon->GetOffscreenManager() : nullptr;
+	}
+
 	Scene::Environment ReadEnvironment(const nlohmann::json& data) {
 		Scene::Environment env;
 		env.hasSkyBox = data.value("skyBox", env.hasSkyBox);
@@ -50,6 +62,29 @@ namespace {
 		env.lightIntensity = data.value("lightIntensity", env.lightIntensity);
 		env.cameraPosition = ReadVector3(data, "cameraPosition", env.cameraPosition);
 		env.cameraRotate = ReadVector3(data, "cameraRotate", env.cameraRotate);
+		env.fogColor = ReadVector3(data, "fogColor", env.fogColor);
+		env.fogColorFromSky = data.value("fogColorFromSky", env.fogColorFromSky);
+		env.fogSkyColorScale = data.value("fogSkyColorScale", env.fogSkyColorScale);
+		env.fogDensity = data.value("fogDensity", env.fogDensity);
+		env.fogHeightFalloff = data.value("fogHeightFalloff", env.fogHeightFalloff);
+		env.fogBaseHeight = data.value("fogBaseHeight", env.fogBaseHeight);
+		env.fogStartDistance = data.value("fogStartDistance", env.fogStartDistance);
+		env.fogMaxOpacity = data.value("fogMaxOpacity", env.fogMaxOpacity);
+		env.fogSkyAmount = data.value("fogSkyAmount", env.fogSkyAmount);
+		env.bloomEnabled = data.value("bloom", env.bloomEnabled);
+		env.bloomThreshold = data.value("bloomThreshold", env.bloomThreshold);
+		env.bloomIntensity = data.value("bloomIntensity", env.bloomIntensity);
+		env.bloomKnee = data.value("bloomKnee", env.bloomKnee);
+		env.bloomScatter = data.value("bloomScatter", env.bloomScatter);
+		const std::string tonemapName = data.value("tonemap", std::string(kTonemapNames[env.tonemapMode]));
+		for (int i = 0; i < kTonemapCount; ++i) {
+			if (tonemapName == kTonemapNames[i]) {
+				env.tonemapMode = i;
+			}
+		}
+		env.exposure = data.value("exposure", env.exposure);
+		env.saturation = data.value("saturation", env.saturation);
+		env.contrast = data.value("contrast", env.contrast);
 		return env;
 	}
 
@@ -62,6 +97,24 @@ namespace {
 		data["lightIntensity"] = env.lightIntensity;
 		data["cameraPosition"] = { env.cameraPosition.x, env.cameraPosition.y, env.cameraPosition.z };
 		data["cameraRotate"] = { env.cameraRotate.x, env.cameraRotate.y, env.cameraRotate.z };
+		data["fogColor"] = { env.fogColor.x, env.fogColor.y, env.fogColor.z };
+		data["fogColorFromSky"] = env.fogColorFromSky;
+		data["fogSkyColorScale"] = env.fogSkyColorScale;
+		data["fogDensity"] = env.fogDensity;
+		data["fogHeightFalloff"] = env.fogHeightFalloff;
+		data["fogBaseHeight"] = env.fogBaseHeight;
+		data["fogStartDistance"] = env.fogStartDistance;
+		data["fogMaxOpacity"] = env.fogMaxOpacity;
+		data["fogSkyAmount"] = env.fogSkyAmount;
+		data["bloom"] = env.bloomEnabled;
+		data["bloomThreshold"] = env.bloomThreshold;
+		data["bloomIntensity"] = env.bloomIntensity;
+		data["bloomKnee"] = env.bloomKnee;
+		data["bloomScatter"] = env.bloomScatter;
+		data["tonemap"] = kTonemapNames[std::clamp(env.tonemapMode, 0, kTonemapCount - 1)];
+		data["exposure"] = env.exposure;
+		data["saturation"] = env.saturation;
+		data["contrast"] = env.contrast;
 		return data;
 	}
 }
@@ -86,6 +139,10 @@ void Level::Load(const std::string& name, Graphics::LightManager* lightManager) 
 	// ファイルが無くても既定の環境は入れる。前のシーンの空やライトを残さないため
 	if (lightManager_) {
 		lightManager_->ResetLights();
+	}
+	// 前のシーンが途中で足した効果(ラジアルブラーやビネット)も持ち越さない
+	if (Graphics::OffscreenManager* offscreen = GetOffscreen()) {
+		offscreen->ResetPostEffect();
 	}
 	ApplyEnvironment();
 	ApplyCamera();
@@ -249,6 +306,44 @@ void Level::ApplyEnvironment() {
 			light->SetLightDirection({ 0.0f,-1.0f,0.0f });
 		}
 		light->SetLightIntensity(environment_.lightIntensity);
+
+		Graphics::FogData fog;
+		const bool isFromSky = environment_.fogColorFromSky && environment_.hasSkyBox && skyBox_;
+		fog.color = {};
+		for (int i = 0; i < 4; ++i) {
+			Math::Vector3 color = environment_.fogColor;
+			if (isFromSky) {
+				color = skyBox_->GetHorizonColor(i);
+				color.x *= environment_.fogSkyColorScale;
+				color.y *= environment_.fogSkyColorScale;
+				color.z *= environment_.fogSkyColorScale;
+			}
+			fog.horizonColor[i] = { color.x, color.y, color.z, 0.0f };
+			fog.color.x += color.x * 0.25f;
+			fog.color.y += color.y * 0.25f;
+			fog.color.z += color.z * 0.25f;
+		}
+		fog.density = environment_.fogDensity;
+		fog.heightFalloff = environment_.fogHeightFalloff;
+		fog.baseHeight = environment_.fogBaseHeight;
+		fog.startDistance = environment_.fogStartDistance;
+		fog.maxOpacity = environment_.fogMaxOpacity;
+		fog.skyAmount = environment_.fogSkyAmount;
+		lightManager_->SetFog(fog);
+	}
+
+	if (Graphics::OffscreenManager* offscreen = GetOffscreen()) {
+		Graphics::PostProcessSettings post;
+		post.bloomEnabled = environment_.bloomEnabled;
+		post.bloomThreshold = environment_.bloomThreshold;
+		post.bloomIntensity = environment_.bloomIntensity;
+		post.bloomKnee = environment_.bloomKnee;
+		post.bloomScatter = environment_.bloomScatter;
+		post.tonemapMode = static_cast<Graphics::TonemapMode>(std::clamp(environment_.tonemapMode, 0, kTonemapCount - 1));
+		post.exposure = environment_.exposure;
+		post.saturation = environment_.saturation;
+		post.contrast = environment_.contrast;
+		offscreen->ApplySettings(post);
 	}
 }
 
@@ -271,6 +366,38 @@ void Level::EnvironmentGUI() {
 	changed |= ImGui::ColorEdit3("Color##light", &environment_.lightColor.x);
 	changed |= ImGui::DragFloat3("Direction", &environment_.lightDirection.x, 0.01f);
 	changed |= ImGui::DragFloat("Intensity", &environment_.lightIntensity, 0.01f, 0.0f, 100.0f);
+
+	ImGui::SeparatorText("Fog");
+	changed |= ImGui::Checkbox("Color from sky", &environment_.fogColorFromSky);
+	const bool isFogFromSky = environment_.fogColorFromSky && environment_.hasSkyBox;
+	ImGui::BeginDisabled(!isFogFromSky);
+	changed |= ImGui::DragFloat("Sky color scale", &environment_.fogSkyColorScale, 0.01f, 0.0f, 10.0f);
+	ImGui::EndDisabled();
+	ImGui::BeginDisabled(isFogFromSky);
+	// 空の暗さに合わせると 0.05 前後の値になるので、0〜255 の刻みでは粗すぎる
+	changed |= ImGui::ColorEdit3("Color##fog", &environment_.fogColor.x, ImGuiColorEditFlags_Float);
+	ImGui::EndDisabled();
+	changed |= ImGui::DragFloat("Density", &environment_.fogDensity, 0.0002f, 0.0f, 1.0f, "%.4f");
+	changed |= ImGui::DragFloat("Height falloff", &environment_.fogHeightFalloff, 0.001f, 0.0f, 2.0f, "%.3f");
+	changed |= ImGui::DragFloat("Base height", &environment_.fogBaseHeight, 0.1f);
+	changed |= ImGui::DragFloat("Start distance", &environment_.fogStartDistance, 0.5f, 0.0f, 10000.0f);
+	changed |= ImGui::SliderFloat("Max opacity", &environment_.fogMaxOpacity, 0.0f, 1.0f);
+	changed |= ImGui::SliderFloat("Sky amount", &environment_.fogSkyAmount, 0.0f, 1.0f);
+
+	ImGui::SeparatorText("Bloom");
+	changed |= ImGui::Checkbox("Enable##bloom", &environment_.bloomEnabled);
+	ImGui::BeginDisabled(!environment_.bloomEnabled);
+	changed |= ImGui::DragFloat("Intensity##bloom", &environment_.bloomIntensity, 0.01f, 0.0f, 10.0f);
+	changed |= ImGui::DragFloat("Threshold", &environment_.bloomThreshold, 0.01f, 0.0f, 10.0f);
+	changed |= ImGui::DragFloat("Knee", &environment_.bloomKnee, 0.005f, 0.0f, 1.0f);
+	changed |= ImGui::SliderFloat("Scatter", &environment_.bloomScatter, 0.0f, 0.95f);
+	ImGui::EndDisabled();
+
+	ImGui::SeparatorText("Tonemap");
+	changed |= ImGui::Combo("Operator", &environment_.tonemapMode, kTonemapNames, kTonemapCount);
+	changed |= ImGui::DragFloat("Exposure", &environment_.exposure, 0.01f, 0.0f, 100.0f);
+	changed |= ImGui::DragFloat("Saturation", &environment_.saturation, 0.01f, 0.0f, 2.0f);
+	changed |= ImGui::DragFloat("Contrast", &environment_.contrast, 0.01f, 0.5f, 2.0f);
 	if (changed) {
 		ApplyEnvironment();
 	}

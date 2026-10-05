@@ -106,24 +106,7 @@ void ImGuiManager::Fin() {
 
 void ImGuiManager::Begin() {
 #ifdef _DEBUGMODE
-	HWND hwnd = MyWin::GetInstance()->GetHwnd();
-	RECT clientRect;
-	GetClientRect(hwnd, &clientRect);
-	float width = static_cast<float>(clientRect.right - clientRect.left);
-	float height = static_cast<float>(clientRect.bottom - clientRect.top);
-
-	POINT point;
-	GetCursorPos(&point);
-	ScreenToClient(hwnd, &point);
-	float scaleX = (width > 0) ? (static_cast<float>(MyWin::kWindowWidth) / width) : 1.0f;
-	float scaleY = (height > 0) ? (static_cast<float>(MyWin::kWindowHeight) / height) : 1.0f;
-	Vector2 corrected = {
-		point.x * scaleX,
-		point.y * scaleY
-	};
-
-	ImGui::GetIO().AddMousePosEvent(corrected.x, corrected.y);
-
+	// バックバッファはウィンドウと同じ大きさなので、表示の大きさもマウスの位置も ImGui の既定のままでよい
 	ImGui_ImplDX12_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
@@ -131,11 +114,11 @@ void ImGuiManager::Begin() {
 	ImGuizmo::BeginFrame();
 	ImGuizmo::SetOrthographic(false);
 	// ゲーム画面をパネルに映すときは、パネル側が矩形と描き先を差し替える
-	ImGuizmo::SetRect(0.0f, 0.0f, static_cast<float>(MyWin::kWindowWidth), static_cast<float>(MyWin::kWindowHeight));
+	const MyWin::GameView& view = MyWin::GetGameView();
+	ImGuizmo::SetRect(view.x, view.y, view.width, view.height);
 
 	ImGuiIO& io = ImGui::GetIO();
 	io.DisplayFramebufferScale = ImVec2(1.0f, 1.0f);
-	io.DisplaySize = ImVec2(static_cast<float>(MyWin::kWindowWidth), static_cast<float>(MyWin::kWindowHeight));
 
 #endif // _DEBUG
 }

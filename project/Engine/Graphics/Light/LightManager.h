@@ -55,6 +55,23 @@ namespace Graphics {
 	};
 
 	/// <summary>
+	/// 空気(フォグ)。遠くの物ほどこの色へ寄せる
+	/// </summary>
+	/// <remarks>HLSL 側 (Common/Fog.hlsli) の FogParams と並びが一致していること。設定は配置データの環境が入れる</remarks>
+	struct FogData {
+		Math::Vector3 color = { 0.6f, 0.7f, 0.8f };	// horizonColor の平均
+		float density = 0.0f;			// 濃さ。0で無効
+		float heightFalloff = 0.0f;		// 高さによる薄まり方。0なら一様
+		float baseHeight = 0.0f;		// 濃さの基準にする高さ
+		float startDistance = 0.0f;		// カメラからこの距離までは霞ませない
+		float maxOpacity = 1.0f;		// これ以上は霞ませない
+		Math::Vector3 cameraPosition{};	// 自前でカメラの定数を持たないシェーダ(空・粒子)用。毎フレーム LightManager が入れる
+		float skyAmount = 1.0f;			// 空へどれだけ掛けるか
+		// 水平の向きごとの色。+X, -X, +Z, -Z の順。空から色を取らないときは4つとも color と同じにする
+		Math::Vector4 horizonColor[4] = { { 0.6f,0.7f,0.8f,0.0f },{ 0.6f,0.7f,0.8f,0.0f },{ 0.6f,0.7f,0.8f,0.0f },{ 0.6f,0.7f,0.8f,0.0f } };
+	};
+
+	/// <summary>
 	/// 全てのライトをまとめた構造体
 	/// </summary>
 	/// <remarks>HLSL 側の AllLights と並び順・パディングが一致していること</remarks>
@@ -96,7 +113,14 @@ namespace Graphics {
 		// 既定が Hemisphere なのは、切り替えた瞬間に全マテリアルの明るさが変わるため
 		uint32_t ambientMode = kAmbientModeHemisphere;
 		uint32_t pad3 = 0;
+
+		// 前方描画のPSはここから読む。空と粒子は同じ中身を gFog として別に受け取る
+		FogData fog;
 	};
+
+	// HLSL 側と大きさが食い違うと、ずれた位置から読んで絵が壊れる。並びを変えたらここで気付けるようにしておく
+	static_assert(sizeof(FogData) == 112, "FogData の大きさが Fog.hlsli の FogParams と一致していない");
+	static_assert(sizeof(AllLightsData) == 1424, "AllLightsData の大きさが Object3d.hlsli の AllLights と一致していない");
 
 	/// <summary>
 	/// ライト管理クラス
@@ -145,6 +169,9 @@ namespace Graphics {
 		/// <remarks>描画パイプライン以外(AOのCS等)からも同じ設定値を読むために公開している</remarks>
 		D3D12_GPU_VIRTUAL_ADDRESS GetLightsGPUVirtualAddress() const;
 
+		/// <summary>フォグだけの定数バッファのGPUアドレス。ライトの構造体を持たないシェーダ(空・粒子)用</summary>
+		D3D12_GPU_VIRTUAL_ADDRESS GetFogGPUVirtualAddress() const;
+
 		/// <summary>設定値そのもの。パスを走らせるかどうかの判定に使う</summary>
 		const AllLightsData& GetData() const { return allLightsData_; }
 		DirectionalLight* GetDirectionLight(int num = 0) { return &allLightsData_.directionalLights[num]; }
@@ -160,6 +187,8 @@ namespace Graphics {
 		void SetNumDirectionalLights(int num) { allLightsData_.numDirectionalLights = num; }
 		void SetNumPointLights(int num) { allLightsData_.numPointLights = num; }
 		void SetNumSpotLights(int num) { allLightsData_.numSpotLights = num; }
+		/// <summary>フォグの設定を入れる。カメラの位置は毎フレーム自前で入れるので、渡された値は使わない</summary>
+		void SetFog(const FogData& fog);
 
 		void DebugGUI();
 
@@ -173,6 +202,10 @@ namespace Graphics {
 		Microsoft::WRL::ComPtr<ID3D12Resource> allLightsResource_[DXC::kFrameCount_];
 		AllLightsData* allLightsDataGPU_[DXC::kFrameCount_];
 		AllLightsData allLightsData_;
+
+		// allLightsData_.fog の写し。中身は必ず同じ
+		Microsoft::WRL::ComPtr<ID3D12Resource> fogResource_[DXC::kFrameCount_];
+		FogData* fogDataGPU_[DXC::kFrameCount_] = {};
 
 	};
 }

@@ -7,13 +7,9 @@
 #include "../Common/RayTracedReflection.hlsli"
 #include "../Common/IBL.hlsli"
 
-// 構造体(Material / 各種ライト / Camera)は Object3d.hlsli にまとめてある
-
-struct PickingBuffer
-{
-    int objID;
-    float depth;
-};
+// 構造体(Material / 各種ライト / Camera)は Object3d.hlsli にまとめてある。
+// ピッキングはここに置かない。UAVへ書くPSは深度テストがPSの後へ回り、隠れた画素でも
+// ライティングとレイを丸ごと実行することになる。Picking.PS.hlsl の別パスが受け持つ
 
 ConstantBuffer<Material> gMaterial : register(b1);
 Texture2D<float4> gTextures[] : register(t0);
@@ -21,19 +17,6 @@ Texture2D<float4> gTextures[] : register(t0);
 SamplerState gSampler : register(s0);
 ConstantBuffer<AllLights> gLights : register(b2);
 ConstantBuffer<Camera> gCamera : register(b3);
-RWStructuredBuffer<PickingBuffer> gPickingBuffer : register(u0);
-
-// マウスの位置とクリックしたか
-cbuffer PickingData : register(b4)
-{
-    int2 pickingPixelCoord; // マウスの位置
-    uint pickingEnable; // クリックしたか
-};
-
-cbuffer ObjIDData : register(b5)
-{
-    uint objID;
-};
 
 struct PixelShaderOutput
 {
@@ -70,17 +53,10 @@ PixelShaderOutput main(VertxShaderOutput input)
         discard;
     }
 
-    // Picking logic
-    if (pickingEnable != 0 && all(int2(input.position.xy) == pickingPixelCoord))
-    {
-        if (objID != -1 && input.position.z < gPickingBuffer[0].depth)
-        {
-            gPickingBuffer[0].objID = objID;
-            gPickingBuffer[0].depth = input.position.z;
-        }
-    }
-
-    float3 normal = normalize(input.normal);
+    // レイの原点を浮かせる向きは形状そのものの法線を使う。法線マップ後の向きで浮かせると、
+    // 傾きの強い所で原点が面の下へ潜り、自分の面に当たる
+    float3 geometricNormal = normalize(input.normal);
+    float3 normal = geometricNormal;
 
     if (gMaterial.useNormalMap != 0)
     {
@@ -132,7 +108,7 @@ PixelShaderOutput main(VertxShaderOutput input)
                 continue;
             }
 
-            radiance *= GetDirectionalShadow(input.position, input.WorldPosition, L, normal,
+            radiance *= GetDirectionalShadow(input.position, input.WorldPosition, L, geometricNormal,
                                              uint(i), gLights.rayTracedShadowMask, gLights.shadowMode);
 
             totalLight += BRDF(normal, toEye, L, diffuseColor, f0, roughness) * radiance;
@@ -149,7 +125,7 @@ PixelShaderOutput main(VertxShaderOutput input)
                 continue;
             }
 
-            radiance *= TraceShadowPunctual(input.WorldPosition, light.position, normal,
+            radiance *= TraceShadowPunctual(input.WorldPosition, light.position, geometricNormal,
                                             gLights.rayTracedShadowMask, kShadowMaskPoint);
 
             totalLight += BRDF(normal, toEye, L, diffuseColor, f0, roughness) * radiance;
@@ -167,7 +143,7 @@ PixelShaderOutput main(VertxShaderOutput input)
                 continue;
             }
 
-            radiance *= TraceShadowPunctual(input.WorldPosition, light.position, normal,
+            radiance *= TraceShadowPunctual(input.WorldPosition, light.position, geometricNormal,
                                             gLights.rayTracedShadowMask, kShadowMaskSpot);
 
             totalLight += BRDF(normal, toEye, L, diffuseColor, f0, roughness) * radiance;
@@ -187,6 +163,11 @@ PixelShaderOutput main(VertxShaderOutput input)
     {
         output.color = gMaterial.color * textureColor;
     }
+
+    // 空気(フォグ)。ライティングしない物にも掛ける。濃さが0なら何もしない
+    float fogAmount = FogAmount(gLights.fog, gCamera.worldPosition, input.WorldPosition);
+    float3 fogColor = FogColor(gLights.fog, input.WorldPosition - gCamera.worldPosition);
+    output.color.rgb = ApplyFog(output.color.rgb, fogColor, fogAmount, gCamera.additive);
 
     return output;
 }

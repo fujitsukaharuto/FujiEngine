@@ -12,6 +12,8 @@ namespace Core {
 		~MyWin() = default;
 
 	public:
+		// ゲームを描く解像度。ウィンドウの大きさとは別で、ウィンドウを広げても変わらない
+		// (最後にウィンドウへ拡大して映す)
 		static const int kWindowWidth = 1280;
 		static const int kWindowHeight = 720;
 
@@ -22,11 +24,11 @@ namespace Core {
 		/// </summary>
 		struct GameView {
 			float x, y, width, height;	// クライアント座標の矩形
-			bool isOnPanel;				// デバッグGUIのパネルに映しているか。false ならバックバッファへ直に描く
+			bool isOnPanel;				// デバッグGUIのパネルに映しているか。false ならウィンドウいっぱい(比率は保つ)へ直に描く
 			bool isHovered;				// パネル上の画像にマウスが乗っているか。パネルの上では WantCaptureMouse が常に立つ
 		};
 
-		/// <summary>画面全体へ直に描く状態へ戻す</summary>
+		/// <summary>ウィンドウへ直に描く状態へ戻す。比率を保って中央に収め、余りは黒帯になる</summary>
 		static void ResetGameView();
 
 		/// <summary>与えた領域にアスペクト比を保って収まるよう、パネル上のゲーム画面の矩形を決める</summary>
@@ -54,6 +56,12 @@ namespace Core {
 		/// </summary>
 		/// <returns>bool</returns>
 		bool ProcessMessage();
+
+		/// <summary>枠なしのフルスクリーンと通常のウィンドウを切り替える。F11 と Alt+Enter でも切り替わる</summary>
+		/// <remarks>ウィンドウを今いるモニターいっぱいに広げるだけで、画面モードは変えない。描画側は大きさの変化に次のフレームで追従する</remarks>
+		void SetFullscreen(bool isFullscreen);
+		void ToggleFullscreen() { SetFullscreen(!isFullscreen_); }
+		bool IsFullscreen() const { return isFullscreen_; }
 
 
 		//========================================================================*/
@@ -87,5 +95,9 @@ namespace Core {
 
 		int clientWidth_ = kWindowWidth;
 		int clientHeight_ = kWindowHeight;
+
+		bool isFullscreen_ = false;
+		// フルスクリーンから戻すときの位置と大きさ
+		WINDOWPLACEMENT windowedPlacement_{ sizeof(WINDOWPLACEMENT) };
 	};
 }

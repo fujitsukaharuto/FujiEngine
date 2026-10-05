@@ -26,10 +26,17 @@ namespace Graphics {
 		void UpdateWVP();
 		void SetColor(const Math::Vector4& color);
 
+		/// <summary>画面に出る空の、地平線あたりの色。フォグの色を空に合わせるのに使う</summary>
+		/// <remarks>テクスチャから測った値に、今の色(SetColor)と Skybox.PS と同じ露光・トーンマップを掛けたもの</remarks>
+		/// <param name="side">0:+X 1:-X 2:+Z 3:-Z</param>
+		Math::Vector3 GetHorizonColor(int side);
+
 	private:
 
 		void ResourceCreate();
 		void CreateVertex();
+		/// <summary>テクスチャの横4面から地平線の色を測る。ファイルを読み直すので最初の1回だけ</summary>
+		void MeasureHorizonColor();
 
 	private:
 
@@ -48,6 +55,8 @@ namespace Graphics {
 		std::vector<uint32_t> index_;
 
 		Graphics::Material material_;
+		// テクスチャそのままの値(色も露光も掛ける前)。+X, -X, +Z, -Z の順
+		Math::Vector3 horizonColor_[4]{};
 
 		Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource_[DXC::kFrameCount_];
 		Math::TransformationMatrix* wvpDataGPU_[DXC::kFrameCount_];

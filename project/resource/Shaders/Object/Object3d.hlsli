@@ -1,3 +1,5 @@
+#include "../Common/Fog.hlsli"
+
 struct VertxShaderOutput
 {
     float4 position : SV_POSITION;
@@ -93,9 +95,13 @@ struct AllLights
     uint shadowSampleCount;
     uint ambientMode; // IBL.hlsli の kAmbientMode*
     uint pad3;
+
+    // 空気(フォグ)。設定は配置データの環境から来る
+    FogParams fog;
 };
 
 struct Camera
 {
     float3 worldPosition;
+    float additive; // 0以外なら加算合成で描かれている。フォグの掛け方が変わる
 };

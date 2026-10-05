@@ -20,7 +20,8 @@ static const uint kAOModeScreen = 2; // 別パスで計算しデノイズした�
 /// <param name="radius">この距離までの遮蔽物だけを見る</param>
 /// <param name="intensity">0で無効、1で素の遮蔽率</param>
 /// <param name="rotationSeed">接空間を回す角度の種。同じ値なら同じ結果になる</param>
-float TraceAO(float3 worldPos, float3 N, uint sampleCount, float radius, float intensity, float rotationSeed)
+/// <param name="bias">原点を法線方向へ浮かせる量</param>
+float TraceAO(float3 worldPos, float3 N, uint sampleCount, float radius, float intensity, float rotationSeed, float bias)
 {
     if (sampleCount == 0 || radius <= 0.0f)
     {
@@ -45,7 +46,7 @@ float TraceAO(float3 worldPos, float3 N, uint sampleCount, float radius, float i
         float3 dir = disk.x * tangent + disk.y * bitangent + sqrt(saturate(1.0f - hammersley.x)) * N;
 
         // 影と同じレイ。遮蔽されていれば0が返る
-        visible += TraceShadowRay(worldPos, dir, N, radius);
+        visible += TraceShadowRayBiased(worldPos, dir, N, radius, bias);
     }
 
     return lerp(1.0f, visible / sampleCount, saturate(intensity));

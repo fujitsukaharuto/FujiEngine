@@ -32,6 +32,35 @@ namespace Scene {
 		Math::Vector3 cameraPosition = { 0.0f,5.0f,-30.0f };
 		/// <summary>ラジアン</summary>
 		Math::Vector3 cameraRotate = { 0.0f,0.0f,0.0f };
+
+		// 空気(フォグ)。遠くの物ほどこの色へ寄せる。濃さが0なら掛からない
+		Math::Vector3 fogColor = { 0.6f,0.7f,0.8f };
+		/// <summary>フォグの色を空の地平線から取る。空の色を変えるとフォグも付いてくる。空が無ければ fogColor を使う</summary>
+		bool fogColorFromSky = false;
+		/// <summary>空から取った色に掛ける倍率。1で地平線と同じ色</summary>
+		float fogSkyColorScale = 1.0f;
+		float fogDensity = 0.0f;
+		/// <summary>高さによる薄まり方。0なら高さに依らず一様</summary>
+		float fogHeightFalloff = 0.0f;
+		/// <summary>濃さの基準にする高さ</summary>
+		float fogBaseHeight = 0.0f;
+		/// <summary>カメラからこの距離までは霞ませない</summary>
+		float fogStartDistance = 0.0f;
+		float fogMaxOpacity = 1.0f;
+		/// <summary>空へどれだけ掛けるか</summary>
+		float fogSkyAmount = 1.0f;
+
+		// 画面の仕上げ(ブルームとトーンマップ)。既定値は Graphics::PostProcessSettings と同じ
+		bool bloomEnabled = true;
+		float bloomThreshold = 0.75f;
+		float bloomIntensity = 1.0f;
+		float bloomKnee = 0.1f;
+		float bloomScatter = 0.7f;
+		/// <summary>Graphics::TonemapMode の値。0:None 1:Reinhard 2:ACES 3:AgX</summary>
+		int tonemapMode = 2;
+		float exposure = 2.0f;
+		float saturation = 1.0f;
+		float contrast = 1.0f;
 	};
 
 	/// <summary>

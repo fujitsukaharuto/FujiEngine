@@ -52,6 +52,8 @@ namespace Graphics {
 		void Render() override;
 		void RenderPrepass() override;
 		bool IsSkinned() const override { return true; }
+		/// <summary>ミラー指定のもの(地面など)はクリックで選ばせない</summary>
+		bool IsPickable() const override { return !isMirrorObj_; }
 
 		/// <summary>ディスパッチ処理</summary>
 		void CSDispatch();

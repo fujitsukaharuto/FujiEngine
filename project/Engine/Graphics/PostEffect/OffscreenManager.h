@@ -6,6 +6,7 @@
 #include <dxgidebug.h>
 #include <cassert>
 #include <functional>
+#include <memory>
 #include <wrl.h>
 
 #include "Engine/DXC/Command/DXCommand.h"
@@ -80,14 +81,36 @@ namespace Graphics {
 		None,		// 素通し。HDR化の切り分け用
 		Reinhard,
 		ACES,
+		AgX,		// 明るい原色が別の色へ転びにくい。素のままだとコントラストは低め
 	};
 
 	/// <summary>
 	/// 最終出力のトーンマップに送るデータ
 	/// </summary>
+	/// <remarks>Tonemap.PS.hlsl の TonemapParams と並びが一致していること</remarks>
 	struct TonemapParams {
 		float exposure = 2.0f;
 		TonemapMode mode = TonemapMode::ACES;
+		uint32_t enableFXAA = 1;	// 輪郭のギザギザをならす
+		uint32_t enableDither = 1;	// 8bitへ落とすときの縞を散らす
+		float saturation = 1.0f;	// 彩度。1でそのまま
+		float contrast = 1.0f;		// コントラスト。1でそのまま
+		float pad[2]{};				// 定数バッファは16バイト単位なので揃えておく
+	};
+
+	/// <summary>
+	/// シーンごとに決める画面の仕上げ。配置データの環境(Level の environment)が持ち、シーンに入るたびに適用する
+	/// </summary>
+	struct PostProcessSettings {
+		bool bloomEnabled = true;
+		float bloomThreshold = 0.75f;	// これより明るい所が光る
+		float bloomIntensity = 1.0f;
+		float bloomKnee = 0.1f;			// しきい値の前後をなだらかにする幅
+		float bloomScatter = 0.7f;		// 光の広がり
+		TonemapMode tonemapMode = TonemapMode::ACES;
+		float exposure = 2.0f;
+		float saturation = 1.0f;
+		float contrast = 1.0f;
 	};
 
 	enum class PostEffectList : int {
@@ -118,12 +141,15 @@ namespace Graphics {
 #pragma endregion
 
 namespace Graphics {
+	class BloomPass;
+
 	/// <summary>
 	/// オフスクリーン管理クラス
 	/// </summary>
 	class OffscreenManager {
 	public:
-		OffscreenManager() = default;
+		// bloomPass_ が不完全型なので、コンストラクタもデストラクタも .cpp 側に置く
+		OffscreenManager();
 		~OffscreenManager();
 
 	public:
@@ -164,6 +190,10 @@ namespace Graphics {
 		/// </summary>
 		/// <param name="effect">種類</param>
 		void PopPostEffect(PostEffectList effect);
+
+		/// <summary>ブルームとトーンマップの設定を入れる</summary>
+		/// <remarks>ブルーム以外の効果(ラジアルブラー等、ゲームが途中で足すもの)には触らない</remarks>
+		void ApplySettings(const PostProcessSettings& settings);
 
 		//========================================================================*/
 		//* RTVForGPUParticle
@@ -291,6 +321,11 @@ namespace Graphics {
 
 		std::vector<PostEffectPass> postEffects_;
 		std::vector<PostEffectPass> validPostEffects_;
+
+		// 多段のブルーム。Bloom の番が来たら、1回のディスパッチの代わりにこれを通す
+		std::unique_ptr<BloomPass> bloomPass_;
+		// false にすると従来の 5x5 1回のブルームへ戻る(見比べ用)
+		bool useMultiScaleBloom_ = true;
 
 		bool isPostEffect_ = true;
 		bool isNonePost_ = true;

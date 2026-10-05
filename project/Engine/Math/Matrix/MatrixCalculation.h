@@ -80,6 +80,8 @@ namespace Math {
 	/// </summary>
 	struct CameraForGPU {
 		Vector3 worldPosition;
+		// 0以外なら加算合成で描かれている。フォグの掛け方が変わる(Object3d.hlsli の Camera と並びを合わせること)
+		float additive = 0.0f;
 	};
 
 	/// <summary>

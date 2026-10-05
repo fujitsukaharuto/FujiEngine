@@ -9,12 +9,20 @@
 #include "Engine/Graphics/Texture/TextureManager.h"
 #include "Engine/DXC/DXCom.h"
 #include "Engine/Graphics/Camera/CameraManager.h"
+#include "Engine/Graphics/Light/LightManager.h"
+#include <algorithm>
+#include <string>
+#include "externals/DirectXTex/DirectXTex.h"
 
 using namespace Core;
 using namespace Graphics;
 using namespace Math;
 using namespace DXC;
 
+
+namespace {
+	const std::string kTextureName = "skyboxTexture.dds";
+}
 
 SkyBox::SkyBox() {
 	// Object3d(ModelManager) / Sprite(TextureManager) と同じく、共有物はシングルトンから取る。
@@ -52,6 +60,9 @@ void SkyBox::Render() {
 	pPipeManager->SetGraphicsRootCBV(cList, RootName::kMaterial, material_.UploadAndGetResource()->GetGPUVirtualAddress());
 	pPipeManager->SetGraphicsRootCBV(cList, RootName::kTransformationMatrix, wvpResource_[frameIndex]->GetGPUVirtualAddress());
 	pPipeManager->SetGraphicsRootDescriptorTable(cList, RootName::kTexture, material_.GetTexture()->gpuHandle);
+	// PS が gFog を無条件に宣言しているので、フォグを切っていてもバインドが要る
+	pPipeManager->SetGraphicsRootCBV(cList, RootName::kFog,
+		ObjectRenderer::GetInstance()->GetLightManager()->GetFogGPUVirtualAddress());
 
 	cList->DrawIndexedInstanced(static_cast<UINT>((index_.size())), 1, 0, 0, 0);
 }
@@ -91,6 +102,80 @@ void SkyBox::SetColor(const Math::Vector4& color) {
 	material_.SetColor(color);
 }
 
+Vector3 SkyBox::GetHorizonColor(int side) {
+	const Vector4 tint = material_.GetColor();
+	// Skybox.PS と同じ露光とトーンマップ。向こうを変えたらここも合わせること
+	auto shade = [](float x) {
+		x *= 0.25f;
+		const float y = (x * (2.51f * x + 0.03f)) / (x * (2.43f * x + 0.59f) + 0.14f);
+		return std::clamp(y, 0.0f, 1.0f);
+	};
+	const Vector3& raw = horizonColor_[side];
+	return { shade(raw.x * tint.x), shade(raw.y * tint.y), shade(raw.z * tint.z) };
+}
+
+void SkyBox::MeasureHorizonColor() {
+	// シーンに入るたびに SkyBox が作られるので、測った値は使い回す
+	static bool isMeasured = false;
+	static Vector3 measured[4]{};
+	if (!isMeasured) {
+		isMeasured = true;
+		// 読めなかったときは灰色。真っ黒のフォグになるよりは気付きやすい
+		for (Vector3& color : measured) {
+			color = { 0.5f,0.5f,0.5f };
+		}
+
+		const std::string path = "resource/Textures/" + kTextureName;
+		const std::wstring pathW(path.begin(), path.end());
+		DirectX::ScratchImage image;
+		DirectX::TexMetadata meta{};
+		if (SUCCEEDED(DirectX::LoadFromDDSFile(pathW.c_str(), DirectX::DDS_FLAGS_NONE, &meta, image)) && meta.IsCubemap()) {
+			// 平均を取るだけなので 32x32 あたりのミップで足りる
+			size_t mip = 0;
+			while (mip + 1 < meta.mipLevels && (meta.width >> mip) > 32) {
+				++mip;
+			}
+			// キューブマップの面は +X, -X, +Y, -Y, +Z, -Z の順
+			const size_t kSideFaces[4] = { 0,1,4,5 };
+			for (int side = 0; side < 4; ++side) {
+				const DirectX::Image* source = image.GetImage(mip, kSideFaces[side], 0);
+				if (!source) {
+					continue;
+				}
+				DirectX::ScratchImage converted;
+				HRESULT hr = S_OK;
+				if (DirectX::IsCompressed(source->format)) {
+					hr = DirectX::Decompress(*source, DXGI_FORMAT_R32G32B32A32_FLOAT, converted);
+				} else if (source->format != DXGI_FORMAT_R32G32B32A32_FLOAT) {
+					hr = DirectX::Convert(*source, DXGI_FORMAT_R32G32B32A32_FLOAT, DirectX::TEX_FILTER_DEFAULT, DirectX::TEX_THRESHOLD_DEFAULT, converted);
+				}
+				if (FAILED(hr)) {
+					continue;
+				}
+				const DirectX::Image* pixels = converted.GetImageCount() > 0 ? converted.GetImage(0, 0, 0) : source;
+
+				// 横の面は真ん中の行が地平線。その上下 1/16 ずつの帯を平均する
+				const size_t rowBegin = pixels->height * 7 / 16;
+				const size_t rowEnd = (std::max)(pixels->height * 9 / 16, rowBegin + 1);
+				double sum[3]{};
+				for (size_t y = rowBegin; y < rowEnd; ++y) {
+					const float* row = reinterpret_cast<const float*>(pixels->pixels + y * pixels->rowPitch);
+					for (size_t x = 0; x < pixels->width; ++x) {
+						sum[0] += row[x * 4 + 0];
+						sum[1] += row[x * 4 + 1];
+						sum[2] += row[x * 4 + 2];
+					}
+				}
+				const double count = static_cast<double>((rowEnd - rowBegin) * pixels->width);
+				measured[side] = { static_cast<float>(sum[0] / count), static_cast<float>(sum[1] / count), static_cast<float>(sum[2] / count) };
+			}
+		}
+	}
+	for (int i = 0; i < 4; ++i) {
+		horizonColor_[i] = measured[i];
+	}
+}
+
 void SkyBox::ResourceCreate() {
 
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
@@ -103,8 +188,9 @@ void SkyBox::ResourceCreate() {
 		wvpDataGPU_[i]->WorldInverseTransPose = Transpose(Inverse(wvpDataGPU_[i]->World));
 	}
 
-	material_.SetTextureNamePath("skyboxTexture.dds");
+	material_.SetTextureNamePath(kTextureName);
 	material_.CreateMaterial();
+	MeasureHorizonColor();
 
 	CreateVertex();
 }

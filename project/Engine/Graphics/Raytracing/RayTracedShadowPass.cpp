@@ -45,6 +45,9 @@ void RayTracedShadowPass::Initialize(DXCom* pDxcom, LightManager* pLightManager)
 
 	raw_.Create(device, kShadowFormat, false);
 	denoiser_.Initialize(pDxcom);
+	// 影は動く物が落とすので、古い履歴を引きずると動いている物の影が薄まる。
+	// 生の信号は本影と日向で値が揃うので、近傍の範囲へ収めても粒は戻らない
+	denoiser_.SetHistoryClamp(true);
 
 	for (uint32_t i = 0; i < kFrameCount_; i++) {
 		paramResource_[i] = Helper::CreateBufferResource(device, sizeof(ShadowPassParam));
