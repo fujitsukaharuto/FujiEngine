@@ -59,6 +59,10 @@ namespace Graphics {
 			int32_t textureIndex = 0;
 			int32_t normalMapIndex = 0;
 			float metallic = 0.0f;			// 0=誘電体 1=金属
+			Math::Vector3 emissive{};		// 自分で光る色。テクスチャの色に掛けて足す。1を超えるとブルームで光がにじむ
+			float rimPower = 3.0f;			// リムライトの細さ。大きいほど輪郭のきわだけが光る
+			Math::Vector3 rimColor{};		// リムライトの色。黒なら掛からない
+			float pad0 = 0.0f;
 		};
 
 	public:
@@ -73,6 +77,8 @@ namespace Graphics {
 		//* Getter
 		Texture* GetTexture();
 		Texture* GetNormalMap() { return normalMap_; }
+		/// <summary>シェーダの gTextures[] でこのテクスチャを引く番号</summary>
+		uint32_t GetTextureSrvIndex() const;
 		/// <summary>CBへ最新値を書き込んでから定数バッファを返す</summary>
 		/// <remarks>取得のたびに転送が走る。描画直前のバインド用であって、単なる getter ではない</remarks>
 		ID3D12Resource* UploadAndGetResource();
@@ -83,6 +89,9 @@ namespace Graphics {
 		int32_t GetUseNormalMap() { return materialData_.useNormalMap; }
 		float GetRoughness() const { return materialData_.roughness; }
 		float GetMetallic() const { return materialData_.metallic; }
+		const Math::Vector3& GetEmissive() const { return materialData_.emissive; }
+		const Math::Vector3& GetRimColor() const { return materialData_.rimColor; }
+		float GetRimPower() const { return materialData_.rimPower; }
 		float GetEnvironment() const { return materialData_.environmentCoefficient; }
 
 		//========================================================================*/
@@ -109,6 +118,11 @@ namespace Graphics {
 		void SetRoughness(float roughness);
 		/// <summary>金属度の設定(0=誘電体 1=金属)</summary>
 		void SetMetallic(float metallic);
+		/// <summary>自分で光る色の設定。ライトが当たっていなくてもこの色で見える</summary>
+		void SetEmissive(const Math::Vector3& emissive) { materialData_.emissive = emissive; }
+		/// <summary>リムライト(輪郭を光らせて背景から浮かせる)の設定。色が黒なら掛からない</summary>
+		/// <param name="power">細さ。大きいほど輪郭のきわだけが光る</param>
+		void SetRim(const Math::Vector3& color, float power) { materialData_.rimColor = color; materialData_.rimPower = power; }
 		/// <summary>環境マップの設定</summary>
 		void SetEnvironment(float env);
 

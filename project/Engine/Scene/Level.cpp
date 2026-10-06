@@ -5,6 +5,7 @@
 #include <json.hpp>
 #include "Engine/GameObject/PlacedObject.h"
 #include "Engine/GameObject/SpawnPoint.h"
+#include "Engine/GameObject/PlacedLight.h"
 #include "Engine/Graphics/Sprite/PlacedSprite.h"
 #include "Engine/Core/Serialize/JsonSerializer.h"
 #include "Engine/Core/Debug/ImGuiManager.h"
@@ -48,6 +49,10 @@ namespace {
 	constexpr const char* kTonemapNames[] = { "None","Reinhard","ACES","AgX" };
 	constexpr int kTonemapCount = static_cast<int>(std::size(kTonemapNames));
 
+	// 並びは Graphics::RayTracedReflectionMode と同じ
+	constexpr const char* kReflectionNames[] = { "Off","Occlusion","Objects" };
+	constexpr int kReflectionCount = static_cast<int>(std::size(kReflectionNames));
+
 	Graphics::OffscreenManager* GetOffscreen() {
 		DXC::DXCom* dxcommon = Graphics::ModelManager::GetInstance()->ShareDXCom();
 		return dxcommon ? dxcommon->GetOffscreenManager() : nullptr;
@@ -85,6 +90,25 @@ namespace {
 		env.exposure = data.value("exposure", env.exposure);
 		env.saturation = data.value("saturation", env.saturation);
 		env.contrast = data.value("contrast", env.contrast);
+		env.sharpen = data.value("sharpen", env.sharpen);
+		env.vignette = data.value("vignette", env.vignette);
+		env.shadowTint = ReadVector3(data, "shadowTint", env.shadowTint);
+		env.highlightTint = ReadVector3(data, "highlightTint", env.highlightTint);
+		env.godRayIntensity = data.value("godRayIntensity", env.godRayIntensity);
+		env.godRayLength = data.value("godRayLength", env.godRayLength);
+		env.godRaySunSize = data.value("godRaySunSize", env.godRaySunSize);
+		const std::string reflectionName = data.value("reflection", std::string(kReflectionNames[env.reflectionMode]));
+		for (int i = 0; i < kReflectionCount; ++i) {
+			if (reflectionName == kReflectionNames[i]) {
+				env.reflectionMode = i;
+			}
+		}
+		env.reflectionMaxDistance = data.value("reflectionMaxDistance", env.reflectionMaxDistance);
+		env.reflectionIntensity = data.value("reflectionIntensity", env.reflectionIntensity);
+		env.dofBlur = data.value("dofBlur", env.dofBlur);
+		env.dofFocusDistance = data.value("dofFocusDistance", env.dofFocusDistance);
+		env.dofFocusRange = data.value("dofFocusRange", env.dofFocusRange);
+		env.dofFalloff = data.value("dofFalloff", env.dofFalloff);
 		return env;
 	}
 
@@ -115,6 +139,20 @@ namespace {
 		data["exposure"] = env.exposure;
 		data["saturation"] = env.saturation;
 		data["contrast"] = env.contrast;
+		data["sharpen"] = env.sharpen;
+		data["vignette"] = env.vignette;
+		data["shadowTint"] = { env.shadowTint.x, env.shadowTint.y, env.shadowTint.z };
+		data["highlightTint"] = { env.highlightTint.x, env.highlightTint.y, env.highlightTint.z };
+		data["godRayIntensity"] = env.godRayIntensity;
+		data["godRayLength"] = env.godRayLength;
+		data["godRaySunSize"] = env.godRaySunSize;
+		data["reflection"] = kReflectionNames[std::clamp(env.reflectionMode, 0, kReflectionCount - 1)];
+		data["reflectionMaxDistance"] = env.reflectionMaxDistance;
+		data["reflectionIntensity"] = env.reflectionIntensity;
+		data["dofBlur"] = env.dofBlur;
+		data["dofFocusDistance"] = env.dofFocusDistance;
+		data["dofFocusRange"] = env.dofFocusRange;
+		data["dofFalloff"] = env.dofFalloff;
 		return data;
 	}
 }
@@ -129,6 +167,7 @@ void Level::Load(const std::string& name, Graphics::LightManager* lightManager) 
 	lightManager_ = lightManager;
 	objects_.clear();
 	spawnPoints_.clear();
+	lights_.clear();
 	sprites_.clear();
 	environment_ = {};
 
@@ -153,6 +192,7 @@ void Level::Load(const std::string& name, Graphics::LightManager* lightManager) 
 	if (data.contains("objects")) {
 		for (const auto& objectData : data["objects"]) {
 			auto object = std::make_unique<GameObject::PlacedObject>();
+			object->SetLightManager(lightManager_);
 			object->Create(objectData);
 			objects_.push_back(std::move(object));
 		}
@@ -162,6 +202,14 @@ void Level::Load(const std::string& name, Graphics::LightManager* lightManager) 
 			auto point = std::make_unique<GameObject::SpawnPoint>();
 			point->Create(pointData);
 			spawnPoints_.push_back(std::move(point));
+		}
+	}
+	// ResetLights の後なので、ゲームが使う点光源0番の次から並ぶ
+	if (data.contains("lights")) {
+		for (const auto& lightData : data["lights"]) {
+			auto light = std::make_unique<GameObject::PlacedLight>();
+			light->Create(lightData, lightManager_);
+			lights_.push_back(std::move(light));
 		}
 	}
 	if (data.contains("sprites")) {
@@ -182,6 +230,10 @@ void Level::Save() const {
 	for (const auto& point : spawnPoints_) {
 		spawnPoints.push_back(point->ToJson());
 	}
+	nlohmann::json lights = nlohmann::json::array();
+	for (const auto& light : lights_) {
+		lights.push_back(light->ToJson());
+	}
 	nlohmann::json sprites = nlohmann::json::array();
 	for (const auto& sprite : sprites_) {
 		sprites.push_back(sprite->ToJson());
@@ -190,6 +242,7 @@ void Level::Save() const {
 	data["environment"] = ToJson(environment_);
 	data["objects"] = std::move(objects);
 	data["spawnPoints"] = std::move(spawnPoints);
+	data["lights"] = std::move(lights);
 	data["sprites"] = std::move(sprites);
 
 	std::filesystem::create_directories(kLevelDirectory);
@@ -199,6 +252,9 @@ void Level::Save() const {
 void Level::Update() {
 	for (auto& object : objects_) {
 		object->Update();
+	}
+	for (auto& light : lights_) {
+		light->Update();
 	}
 }
 
@@ -212,6 +268,9 @@ void Level::Draw() {
 	for (auto& point : spawnPoints_) {
 		point->Draw();
 	}
+	for (auto& light : lights_) {
+		light->Draw();
+	}
 }
 
 void Level::DrawSprites() {
@@ -222,19 +281,68 @@ void Level::DrawSprites() {
 
 GameObject::PlacedObject* Level::Add(const std::string& modelName) {
 	auto object = std::make_unique<GameObject::PlacedObject>();
+	object->SetLightManager(lightManager_);
 	object->Create(modelName);
 	objects_.push_back(std::move(object));
 	return objects_.back().get();
 }
 
+GameObject::GameObject* Level::Duplicate(const GameObject::GameObject* source) {
+	// 書き出したデータから作り直す。保存される項目だけが写るので、保存→読み込みと同じ結果になる
+	for (const auto& object : objects_) {
+		if (object.get() == source) {
+			auto copy = std::make_unique<GameObject::PlacedObject>();
+			copy->SetLightManager(lightManager_);
+			copy->Create(object->ToJson());
+			objects_.push_back(std::move(copy));
+			return objects_.back().get();
+		}
+	}
+	for (const auto& point : spawnPoints_) {
+		if (point.get() == source) {
+			auto copy = std::make_unique<GameObject::SpawnPoint>();
+			copy->Create(point->ToJson());
+			spawnPoints_.push_back(std::move(copy));
+			return spawnPoints_.back().get();
+		}
+	}
+	for (const auto& light : lights_) {
+		if (light.get() == source) {
+			auto copy = std::make_unique<GameObject::PlacedLight>();
+			copy->Create(light->ToJson(), lightManager_);
+			lights_.push_back(std::move(copy));
+			return lights_.back().get();
+		}
+	}
+	return nullptr;
+}
+
 bool Level::Remove(const GameObject::GameObject* object) {
 	const auto isTarget = [object](const auto& o) { return o.get() == object; };
-	return std::erase_if(objects_, isTarget) > 0 || std::erase_if(spawnPoints_, isTarget) > 0;
+	for (auto& light : lights_) {
+		if (light.get() == object) {
+			light->TurnOff();
+		}
+	}
+	for (auto& placed : objects_) {
+		if (placed.get() == object) {
+			placed->TurnOffLight();
+		}
+	}
+	return std::erase_if(objects_, isTarget) > 0 || std::erase_if(spawnPoints_, isTarget) > 0 || std::erase_if(lights_, isTarget) > 0;
 }
 
 bool Level::Contains(const GameObject::GameObject* object) const {
 	const auto isTarget = [object](const auto& o) { return o.get() == object; };
-	return std::any_of(objects_.begin(), objects_.end(), isTarget) || std::any_of(spawnPoints_.begin(), spawnPoints_.end(), isTarget);
+	return std::any_of(objects_.begin(), objects_.end(), isTarget) || std::any_of(spawnPoints_.begin(), spawnPoints_.end(), isTarget) ||
+		std::any_of(lights_.begin(), lights_.end(), isTarget);
+}
+
+GameObject::PlacedLight* Level::AddLight(bool isSpot) {
+	auto light = std::make_unique<GameObject::PlacedLight>();
+	light->Create(isSpot ? GameObject::PlacedLight::Type::Spot : GameObject::PlacedLight::Type::Point, lightManager_);
+	lights_.push_back(std::move(light));
+	return lights_.back().get();
 }
 
 GameObject::SpawnPoint* Level::AddSpawnPoint() {
@@ -330,6 +438,10 @@ void Level::ApplyEnvironment() {
 		fog.maxOpacity = environment_.fogMaxOpacity;
 		fog.skyAmount = environment_.fogSkyAmount;
 		lightManager_->SetFog(fog);
+
+		lightManager_->SetReflection(
+			static_cast<Graphics::RayTracedReflectionMode>(std::clamp(environment_.reflectionMode, 0, kReflectionCount - 1)),
+			environment_.reflectionMaxDistance, environment_.reflectionIntensity);
 	}
 
 	if (Graphics::OffscreenManager* offscreen = GetOffscreen()) {
@@ -343,6 +455,17 @@ void Level::ApplyEnvironment() {
 		post.exposure = environment_.exposure;
 		post.saturation = environment_.saturation;
 		post.contrast = environment_.contrast;
+		post.sharpen = environment_.sharpen;
+		post.vignette = environment_.vignette;
+		post.shadowTint = environment_.shadowTint;
+		post.highlightTint = environment_.highlightTint;
+		post.godRayIntensity = environment_.godRayIntensity;
+		post.godRayLength = environment_.godRayLength;
+		post.godRaySunSize = environment_.godRaySunSize;
+		post.dofBlur = environment_.dofBlur;
+		post.dofFocusDistance = environment_.dofFocusDistance;
+		post.dofFocusRange = environment_.dofFocusRange;
+		post.dofFalloff = environment_.dofFalloff;
 		offscreen->ApplySettings(post);
 	}
 }
@@ -398,6 +521,26 @@ void Level::EnvironmentGUI() {
 	changed |= ImGui::DragFloat("Exposure", &environment_.exposure, 0.01f, 0.0f, 100.0f);
 	changed |= ImGui::DragFloat("Saturation", &environment_.saturation, 0.01f, 0.0f, 2.0f);
 	changed |= ImGui::DragFloat("Contrast", &environment_.contrast, 0.01f, 0.5f, 2.0f);
+	changed |= ImGui::SliderFloat("Sharpen", &environment_.sharpen, 0.0f, 2.0f);
+	changed |= ImGui::SliderFloat("Vignette", &environment_.vignette, 0.0f, 1.0f);
+	changed |= ImGui::ColorEdit3("Shadow tint", &environment_.shadowTint.x, ImGuiColorEditFlags_Float);
+	changed |= ImGui::ColorEdit3("Highlight tint", &environment_.highlightTint.x, ImGuiColorEditFlags_Float);
+
+	ImGui::SeparatorText("God Ray");
+	changed |= ImGui::DragFloat("Intensity##godRay", &environment_.godRayIntensity, 0.01f, 0.0f, 10.0f);
+	changed |= ImGui::SliderFloat("Length##godRay", &environment_.godRayLength, 0.05f, 1.0f);
+	changed |= ImGui::SliderFloat("Sun size##godRay", &environment_.godRaySunSize, 0.05f, 2.0f);
+
+	ImGui::SeparatorText("Reflection");
+	changed |= ImGui::Combo("Mode##reflection", &environment_.reflectionMode, kReflectionNames, kReflectionCount);
+	changed |= ImGui::DragFloat("Max distance##reflection", &environment_.reflectionMaxDistance, 1.0f, 0.0f, 10000.0f);
+	changed |= ImGui::SliderFloat("Intensity##reflection", &environment_.reflectionIntensity, 0.0f, 2.0f);
+
+	ImGui::SeparatorText("Depth of Field");
+	changed |= ImGui::SliderFloat("Blur##dof", &environment_.dofBlur, 0.0f, 16.0f, "%.1f px");
+	changed |= ImGui::DragFloat("Focus distance##dof", &environment_.dofFocusDistance, 0.1f, 0.0f, 10000.0f);
+	changed |= ImGui::DragFloat("Focus range##dof", &environment_.dofFocusRange, 0.1f, 0.0f, 10000.0f);
+	changed |= ImGui::DragFloat("Falloff##dof", &environment_.dofFalloff, 0.1f, 0.01f, 10000.0f);
 	if (changed) {
 		ApplyEnvironment();
 	}

@@ -26,11 +26,14 @@ private:
 
 	/// <summary>点光源/スポットライトを1つずつ置く</summary>
 	/// <remarks>平行光源は配置データの環境にある(影が足元に隠れないよう傾けてある)。
-	/// 本数ごと設定するので、シーンに入り直しても増えない。シーンを出るとライトは Level が起動時の状態へ戻す</remarks>
+	/// 枠は最初の1回だけ取るので、呼び直しても増えない。シーンを出るとライトは Level が起動時の状態へ戻す</remarks>
 	void SetupLights();
 	/// <summary>指定した種類のライトだけを点ける</summary>
 	/// <remarks>影は他の光源が当たっていると差が見えないので、1種類だけにして確認する</remarks>
 	void ApplyLightPreset(bool directional, bool point, bool spot);
+
+	// このシーンが使うスポットライトの枠。配置データのライトと取り合わないよう、決め打ちせず取った番号を持つ
+	int spotSlot_ = -1;
 
 private:
 

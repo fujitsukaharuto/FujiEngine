@@ -4,6 +4,8 @@
 #include <json_fwd.hpp>
 #include "Engine/GameObject/GameObject.h"
 
+namespace Graphics { class LightManager; }
+
 namespace GameObject {
 
 	/// <summary>
@@ -21,6 +23,12 @@ namespace GameObject {
 		nlohmann::json ToJson() const;
 
 		void Update() override;
+
+		/// <summary>発光で周りを照らすときに点光源の枠を借りる先。Create より前に渡す</summary>
+		void SetLightManager(Graphics::LightManager* lightManager) { lightManager_ = lightManager; }
+		/// <summary>周りを照らす光を消す。配置から外す直前に呼ぶ</summary>
+		/// <remarks>枠は返さない(PlacedLight と同じ)。デストラクタで触らないのは、LightManager が先に消えることがあるため</remarks>
+		void TurnOffLight();
 		/// <summary>名前と見た目の設定。ここで変えた値が保存される</summary>
 		void ParameterGUI() override;
 
@@ -30,6 +38,8 @@ namespace GameObject {
 		void Build();
 		/// <summary>データに書いてある見た目の設定だけをモデルへ当てる</summary>
 		void ApplyLook();
+		/// <summary>発光の色で周りを照らす点光源を、今の位置と設定に合わせる</summary>
+		void ApplyEmissiveLight(bool isOn);
 
 	private:
 
@@ -48,10 +58,27 @@ namespace GameObject {
 			std::optional<float> roughness;
 			std::optional<float> metallic;
 			std::optional<float> environment;
+			/// <summary>自分で光る色。実際の明るさはこれに emissiveIntensity を掛けたもの</summary>
+			std::optional<Math::Vector3> emissive;
+			float emissiveIntensity = 1.0f;
+			/// <summary>発光が周りを照らす距離。0なら照らさない。点光源の枠を1つ使う</summary>
+			float emissiveLightRange = 0.0f;
+			/// <summary>周りを照らす強さ。発光の明るさに掛ける</summary>
+			float emissiveLightIntensity = 1.0f;
+			/// <summary>リムライトの色。実際の明るさはこれに rimIntensity を掛けたもの</summary>
+			std::optional<Math::Vector3> rim;
+			float rimIntensity = 1.0f;
+			float rimPower = 3.0f;
 			bool isMirror = false;
 			std::optional<Graphics::LightMode> light;
 		};
 		Look look_;
+
+		Graphics::LightManager* lightManager_ = nullptr;
+		// 借りた点光源の番号。初めて照らすときに借りる。-1 は借りていない
+		int lightSlot_ = -1;
+		// モデルの原点からいちばん遠い頂点までの距離(拡縮前)
+		float modelRadius_ = 0.0f;
 	};
 
 }

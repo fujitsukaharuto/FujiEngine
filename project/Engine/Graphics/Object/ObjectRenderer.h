@@ -83,6 +83,8 @@ namespace Graphics {
 
 		DXC::DXCom* dxcommon_ = nullptr;
 		LightManager* lightManager_ = nullptr;
+		// 反射に映す色を集める残りフレーム数。映さなくなっても、GPU が前の設定で描くぶんだけ集め続ける
+		uint32_t rayLookFrames_ = 0;
 
 		std::vector<Graphics::RenderObject*> renderQueue_;
 		std::vector<Graphics::AnimationModel*> skinningQueue_;

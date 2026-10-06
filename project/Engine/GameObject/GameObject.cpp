@@ -172,6 +172,15 @@ namespace GameObject {
 					} else if (auto* anime = dynamic_cast<AnimationModel*>(r.object.get())) {
 						anime->DebugGUI();
 					}
+					// リムライトの試し掛け。ここでは保存されないので、決めた値はコードで SetRim に渡す
+					Graphics::Material& material = r.object->GetMaterial();
+					Math::Vector3 rimColor = material.GetRimColor();
+					float rimPower = material.GetRimPower();
+					bool isRimChanged = ImGui::ColorEdit3("Rim", &rimColor.x, ImGuiColorEditFlags_Float | ImGuiColorEditFlags_HDR);
+					isRimChanged |= ImGui::DragFloat("Rim power", &rimPower, 0.05f, 0.5f, 16.0f);
+					if (isRimChanged) {
+						r.object->SetRim(rimColor, rimPower);
+					}
 					ImGui::TreePop();
 				}
 				ImGui::PopID();

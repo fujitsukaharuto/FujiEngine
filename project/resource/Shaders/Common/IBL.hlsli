@@ -52,24 +52,23 @@ float3 GetAmbientDiffuse(float3 N, uint ambientMode, float3 skyColor, float3 gro
 
 /// <summary>鏡面のアンビエント(映り込み)。フレネルまで済ませた寄与を返す</summary>
 /// <remarks>IBL 経路は粗さでミップを選ぶので粗い面ほどぼやける</remarks>
+/// <remarks>レイは飛ばさない。反射方向が遮られているかは呼び出し側が TraceReflectionHit で調べて渡す</remarks>
 /// <param name="V">視線方向(面 → カメラ、正規化済み)</param>
-/// <param name="occludedColor">遮蔽された向きに映す色</param>
-/// <param name="enableReflection">0なら遮蔽を見ない</param>
+/// <param name="isOccluded">反射方向が物に遮られているか</param>
+/// <param name="occludedColor">遮られているときに空の代わりに映す色</param>
 /// <param name="ambientMode">AllLights::ambientMode</param>
-float3 GetAmbientSpecular(float3 worldPos, float3 N, float3 V, float roughness, float3 f0,
-                          float3 occludedColor, float maxDistance, uint enableReflection,
+float3 GetAmbientSpecular(float3 N, float3 V, float roughness, float3 f0,
+                          bool isOccluded, float3 occludedColor,
                           uint ambientMode, SamplerState smp)
 {
     float NdotV = saturate(dot(N, V));
+    float3 R = reflect(-V, N);
 
     if (ambientMode == kAmbientModeIBL)
     {
-        float3 R = reflect(-V, N);
-
         // 粗さがそのままミップ番号になるように焼いてある
         float3 prefiltered = gPrefilteredEnv.SampleLevel(smp, R, roughness * kPrefilteredMaxMip).rgb;
-        if (enableReflection != 0 && maxDistance > 0.0f &&
-            TraceShadowRay(worldPos, R, N, maxDistance) == 0.0f)
+        if (isOccluded)
         {
             prefiltered = occludedColor;
         }
@@ -77,8 +76,11 @@ float3 GetAmbientSpecular(float3 worldPos, float3 N, float3 V, float roughness, 
         return prefiltered * EnvironmentBRDF(f0, NdotV, roughness, smp);
     }
 
-    float3 environmentColor = TraceReflection(worldPos, N, V, occludedColor,
-                                              maxDistance, enableReflection, smp);
+    float3 environmentColor = gEnvironment.Sample(smp, R).rgb;
+    if (isOccluded)
+    {
+        environmentColor = occludedColor;
+    }
     // 粗い面ほど映り込みがぼやけて弱く見えるので、その代用として単純に落とす
     return environmentColor * F_Schlick(f0, NdotV) * (1.0f - roughness);
 }

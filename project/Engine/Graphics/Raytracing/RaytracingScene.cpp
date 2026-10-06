@@ -27,6 +27,19 @@ namespace {
 
 	/// <summary>ワールド行列をDXRのインスタンス行列(3x4)へ詰める</summary>
 	/// <remarks>Matrix4x4 は行ベクトル、DXRは列ベクトルなので転置する</remarks>
+	/// <summary>そのメッシュの見た目。渡された数が足りなければ最後のもの、1つも無ければ白</summary>
+	/// <param name="isStatic">頂点がスキニングで動かないか。動く物は元の頂点の法線が使えない(UV は使える)</param>
+	RayInstanceData LookOf(const std::vector<RayInstanceData>& looks, size_t meshIndex, const Mesh& mesh, bool isStatic) {
+		RayInstanceData look = looks.empty() ? RayInstanceData{} : looks[(std::min)(meshIndex, looks.size() - 1)];
+		look.flags = 0;
+		if (mesh.GetVertexSrvIndex() != Mesh::kInvalidSrvIndex && mesh.GetIndexSrvIndex() != Mesh::kInvalidSrvIndex) {
+			look.vertexBuffer = mesh.GetVertexSrvIndex();
+			look.indexBuffer = mesh.GetIndexSrvIndex();
+			look.flags = kRayInstanceHasGeometry | (isStatic ? kRayInstanceHasNormal : 0u);
+		}
+		return look;
+	}
+
 	void StoreTransform3x4(const Math::Matrix4x4& world, FLOAT out[3][4]) {
 		for (int row = 0; row < 3; ++row) {
 			for (int col = 0; col < 4; ++col) {
@@ -49,6 +62,7 @@ void RaytracingScene::Initialize(DXC::DXCom* pDxcom) {
 	// シェーダは gSceneTLAS を無条件に読むので、描画対象0でも空のTLASを作っておく。
 	// 未初期化バッファをRayQueryに読ませると結果が不定になる
 	EnsureTlasCapacity(0);
+	EnsureInstanceDataCapacity(0);
 	RecordTlasBuild(dxcommon_->GetDXCommand()->GetImmediateList4(), 0, 0);
 	dxcommon_->CommandExecution();
 
@@ -69,6 +83,17 @@ void RaytracingScene::Finalize() {
 	skinnedBlasMap_.clear();
 	retiredBlas_.clear();
 	instances_.clear();
+	instanceData_.clear();
+
+	if (instanceDataCapacity_ > 0) {
+		for (uint32_t i = 0; i < DXC::kFrameCount_; ++i) {
+			instanceDataBuffer_[i]->Unmap(0, nullptr);
+			instanceDataMapped_[i] = nullptr;
+			instanceDataBuffer_[i].Reset();
+			DXC::SRVManager::GetInstance()->Free(instanceDataSrvIndex_[i]);
+		}
+		instanceDataCapacity_ = 0;
+	}
 
 	// SRVの返却はGPUが参照し終わってからでないといけない。
 	// Finalize は DXCom::Flush 後に呼ばれる前提
@@ -171,6 +196,7 @@ void RaytracingScene::InvalidateAllBlas() {
 	// 呼び出し側が Flush 済みである前提
 	blasMap_.clear();
 	instances_.clear();
+	instanceData_.clear();
 	Logger::Log("RaytracingScene: all BLAS invalidated (model reloaded).\n");
 }
 
@@ -200,6 +226,7 @@ void RaytracingScene::DebugGUI() {
 
 void RaytracingScene::BeginFrame() {
 	instances_.clear();
+	instanceData_.clear();
 	++frameNumber_;
 	ReleaseUnusedSkinnedBlas();
 }
@@ -215,7 +242,7 @@ void RaytracingScene::ReleaseUnusedSkinnedBlas() {
 	std::erase_if(retiredBlas_, [this](const RetiredBlas& r) { return frameNumber_ - r.retiredFrame > kReleaseDelayFrames; });
 }
 
-void RaytracingScene::AddInstance(const Model* model, const Math::Matrix4x4& world) {
+void RaytracingScene::AddInstance(const Model* model, const Math::Matrix4x4& world, const std::vector<RayInstanceData>* looks) {
 	if (!isAvailable_) { return; }
 
 	const Blas* blas = EnsureBlas(model);
@@ -223,7 +250,14 @@ void RaytracingScene::AddInstance(const Model* model, const Math::Matrix4x4& wor
 
 	D3D12_RAYTRACING_INSTANCE_DESC desc{};
 	StoreTransform3x4(world, desc.Transform);
-	desc.InstanceID = static_cast<UINT>(instances_.size());
+	// シェーダは「InstanceID + BLAS の中でのメッシュの番号」で見た目を引く
+	desc.InstanceID = static_cast<UINT>(instanceData_.size());
+	const std::vector<Mesh>& meshes = model->GetMeshes();
+	for (size_t i = 0; looks && i < meshes.size(); ++i) {
+		// EnsureBlas が BLAS に入れなかったメッシュは番号が詰まる
+		if (meshes[i].GetVertexCount() == 0 || meshes[i].GetIndexCount() == 0) { continue; }
+		instanceData_.push_back(LookOf(*looks, i, meshes[i], true));
+	}
 	desc.InstanceMask = 0xFF;
 	desc.InstanceContributionToHitGroupIndex = 0;
 	desc.Flags = D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
@@ -233,7 +267,8 @@ void RaytracingScene::AddInstance(const Model* model, const Math::Matrix4x4& wor
 }
 
 void RaytracingScene::AddSkinnedInstance(const RenderObject* key, const Model* model,
-	const std::vector<SkinnedMesh>& skinnedMeshes, const Math::Matrix4x4& world) {
+	const std::vector<SkinnedMesh>& skinnedMeshes, const Math::Matrix4x4& world,
+	const std::vector<RayInstanceData>* looks) {
 	if (!isAvailable_ || key == nullptr || model == nullptr) { return; }
 
 	const std::vector<Mesh>& meshes = model->GetMeshes();
@@ -243,6 +278,9 @@ void RaytracingScene::AddSkinnedInstance(const RenderObject* key, const Model* m
 	// 頂点はスキニング後のものを指す。インデックスはポーズで変わらないので元のまま
 	std::vector<D3D12_RAYTRACING_GEOMETRY_DESC> geometries;
 	geometries.reserve(meshCount);
+	// BLAS に入れたメッシュぶんだけ、同じ並びで集める
+	std::vector<RayInstanceData> geometryLooks;
+	geometryLooks.reserve(meshCount);
 
 	for (size_t i = 0; i < meshCount; ++i) {
 		if (meshes[i].GetIndexCount() == 0) { continue; }
@@ -264,6 +302,9 @@ void RaytracingScene::AddSkinnedInstance(const RenderObject* key, const Model* m
 		geometry.Triangles.Transform3x4 = 0;
 
 		geometries.push_back(geometry);
+		if (looks) {
+			geometryLooks.push_back(LookOf(*looks, i, meshes[i], false));
+		}
 	}
 
 	if (geometries.empty()) { return; }
@@ -319,7 +360,8 @@ void RaytracingScene::AddSkinnedInstance(const RenderObject* key, const Model* m
 
 	D3D12_RAYTRACING_INSTANCE_DESC desc{};
 	StoreTransform3x4(world, desc.Transform);
-	desc.InstanceID = static_cast<UINT>(instances_.size());
+	desc.InstanceID = static_cast<UINT>(instanceData_.size());
+	instanceData_.insert(instanceData_.end(), geometryLooks.begin(), geometryLooks.end());
 	desc.InstanceMask = 0xFF;
 	desc.InstanceContributionToHitGroupIndex = 0;
 	desc.Flags = D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
@@ -378,6 +420,40 @@ void RaytracingScene::EnsureTlasCapacity(uint32_t instanceCount) {
 	Logger::Log(std::format("RaytracingScene: TLAS capacity = {} instances.\n", newCapacity));
 }
 
+void RaytracingScene::EnsureInstanceDataCapacity(uint32_t count) {
+	if (count <= instanceDataCapacity_ && instanceDataCapacity_ > 0) { return; }
+
+	uint32_t newCapacity = (instanceDataCapacity_ == 0) ? 64 : instanceDataCapacity_;
+	while (newCapacity < count) { newCapacity *= 2; }
+
+	// 前のフレームの描画がまだ古いバッファを読んでいることがある(TLAS と同じ理由)
+	if (instanceDataCapacity_ > 0) {
+		dxcommon_->Flush();
+	}
+
+	DXC::SRVManager* srvManager = DXC::SRVManager::GetInstance();
+	for (uint32_t i = 0; i < DXC::kFrameCount_; ++i) {
+		if (instanceDataCapacity_ > 0) {
+			instanceDataBuffer_[i]->Unmap(0, nullptr);
+		} else {
+			instanceDataSrvIndex_[i] = srvManager->Allocate();
+		}
+		instanceDataBuffer_[i] = DXC::Helper::CreateBufferResource(
+			dxcommon_->GetDevice(), sizeof(RayInstanceData) * newCapacity);
+		instanceDataBuffer_[i]->Map(0, nullptr, reinterpret_cast<void**>(&instanceDataMapped_[i]));
+		// シェーダは切っていても宣言ぶんを読みに来るので、中身の無い所も白で埋めておく
+		std::fill_n(instanceDataMapped_[i], newCapacity, RayInstanceData{});
+		srvManager->CreateStructuredSRV(instanceDataSrvIndex_[i], instanceDataBuffer_[i].Get(), newCapacity, sizeof(RayInstanceData));
+	}
+
+	instanceDataCapacity_ = newCapacity;
+}
+
+uint32_t RaytracingScene::GetInstanceDataSrvIndex() const {
+	if (instanceDataCapacity_ == 0) { return kInvalidSrvIndex; }
+	return instanceDataSrvIndex_[dxcommon_->GetNowFrameCount()];
+}
+
 void RaytracingScene::BuildTlas() {
 	if (!isAvailable_) { return; }
 
@@ -390,6 +466,11 @@ void RaytracingScene::BuildTlas() {
 	if (instanceCount > 0) {
 		std::memcpy(instanceMapped_[frameIndex], instances_.data(),
 			sizeof(D3D12_RAYTRACING_INSTANCE_DESC) * instanceCount);
+	}
+
+	EnsureInstanceDataCapacity(static_cast<uint32_t>(instanceData_.size()));
+	if (!instanceData_.empty()) {
+		std::memcpy(instanceDataMapped_[frameIndex], instanceData_.data(), sizeof(RayInstanceData) * instanceData_.size());
 	}
 
 	// 描画と同じQueueなので記録順で完成が保証される。別Queueへ移すならフェンスが要る

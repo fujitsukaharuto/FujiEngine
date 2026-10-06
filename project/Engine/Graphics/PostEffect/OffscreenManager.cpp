@@ -1,4 +1,5 @@
 #include "Engine/Graphics/PostEffect/OffscreenManager.h"
+#include <algorithm>
 #include "Engine/Graphics/PostEffect/BloomPass.h"
 #include "Engine/Graphics/Pipeline/RootNames.h"
 #include "Engine/DXC/DXCom.h"
@@ -8,8 +9,17 @@
 #include "Engine/Core/App/MyWindow.h"
 #include "Engine/Graphics/Pipeline/PipelineManager.h"
 #include "Engine/Graphics/Camera/CameraManager.h"
+#include "Engine/Graphics/Object/ObjectRenderer.h"
+#include "Engine/Graphics/Light/LightManager.h"
 #include "Engine/Core/Time/FPSKeeper.h"
 #include "externals/DirectXTex/d3dx12.h"
+#ifdef _DEBUGMODE
+#include <ctime>
+#include <filesystem>
+#include <vector>
+#include "externals/DirectXTex/DirectXTex.h"
+#include "Engine/Logger/Logger.h"
+#endif // _DEBUGMODE
 
 using namespace Core;
 using namespace Graphics;
@@ -32,9 +42,18 @@ void OffscreenManager::Initialize(DXCom* pDxcom) {
 }
 
 void OffscreenManager::Update() {
+#ifdef _DEBUGMODE
+	if (isScreenshotPending_) {
+		isScreenshotPending_ = false;
+		SaveScreenshot();
+	}
+#endif // _DEBUGMODE
 	crtData_.crtTime += FPSKeeper::DeltaTime();
 
-	outlineData_.projectionInverse = Inverse(CameraManager::GetInstance()->GetCamera()->GetProjectionMatrix());
+	const Matrix4x4& projection = CameraManager::GetInstance()->GetCamera()->GetProjectionMatrix();
+	outlineData_.projectionInverse = Inverse(projection);
+	// 透視投影の深度は d = m22 + m32 / z
+	dofData_.depthToView = { projection.m[2][2], projection.m[3][2] };
 }
 
 void OffscreenManager::DebugGUI() {
@@ -105,7 +124,7 @@ void OffscreenManager::EffectListGUI() {
 	if (ImGui::TreeNode("PostEffectList")) {
 		static int currentOffscreenIndex = 0;
 		ImGui::Combo("PostEffect##offType", &currentOffscreenIndex,
-			"GrayScale\0CRT\0RetroTV\0Gauss\0BoxFilter\0RadialBlur\0Vignette\0Outline\0LuminanceOutline\0Bloom\0Random\0");
+			"GrayScale\0CRT\0RetroTV\0Gauss\0BoxFilter\0RadialBlur\0Vignette\0Outline\0LuminanceOutline\0Bloom\0Random\0GodRay\0DepthOfField\0");
 		if (ImGui::Button("Push##offPush")) {
 			validPostEffects_.push_back(postEffects_[currentOffscreenIndex]);
 		}ImGui::SameLine();
@@ -158,6 +177,12 @@ void OffscreenManager::EffectListGUI() {
 						break;
 					case Pipe::RandomCS:
 						ImGui::Text("Random");
+						break;
+					case Pipe::GodRayCS:
+						ImGui::Text("GodRay");
+						break;
+					case Pipe::DepthOfFieldCS:
+						ImGui::Text("DepthOfField");
 						break;
 					default:
 						break;
@@ -273,6 +298,7 @@ void OffscreenManager::SettingTexture() {
 
 void OffscreenManager::Command() {
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
+	UpdateGodRay();
 	CopyData(frameIndex);
 
 	if (isPostEffect_) {
@@ -304,19 +330,86 @@ void OffscreenManager::ApplySettings(const PostProcessSettings& settings) {
 	tonemapData_.exposure = settings.exposure;
 	tonemapData_.saturation = settings.saturation;
 	tonemapData_.contrast = settings.contrast;
+	tonemapData_.sharpen = settings.sharpen;
+	tonemapData_.vignette = settings.vignette;
+	tonemapData_.shadowTint = settings.shadowTint;
+	tonemapData_.highlightTint = settings.highlightTint;
 
-	bool hasBloom = false;
-	for (const PostEffectPass& pass : validPostEffects_) {
-		if (pass.effectName == PostEffectList::Bloom) {
-			hasBloom = true;
-			break;
-		}
-	}
+	godRayIntensity_ = settings.godRayIntensity;
+	godRayData_.rayLength = settings.godRayLength;
+	godRayData_.sunSize = settings.godRaySunSize;
+
+	dofData_.maxBlur = settings.dofBlur;
+	dofData_.focusDistance = settings.dofFocusDistance;
+	dofData_.focusRange = settings.dofFocusRange;
+	dofData_.falloff = settings.dofFalloff;
+
+	const bool hasBloom = HasPostEffect(PostEffectList::Bloom);
 	if (settings.bloomEnabled && !hasBloom) {
 		AddPostEffect(PostEffectList::Bloom);
 	} else if (!settings.bloomEnabled && hasBloom) {
 		PopPostEffect(PostEffectList::Bloom);
 	}
+
+	const bool isGodRay = settings.godRayIntensity > 0.0f;
+	const bool hasGodRay = HasPostEffect(PostEffectList::GodRay);
+	if (isGodRay && !hasGodRay) {
+		// 先頭へ入れる。ブルームより前に足せば、筋の明るい所もいっしょににじむ
+		validPostEffects_.insert(validPostEffects_.begin(), postEffects_[int(PostEffectList::GodRay)]);
+	} else if (!isGodRay && hasGodRay) {
+		PopPostEffect(PostEffectList::GodRay);
+	}
+
+	const bool isDof = settings.dofBlur > 0.0f;
+	const bool hasDof = HasPostEffect(PostEffectList::DepthOfField);
+	if (isDof && !hasDof) {
+		// 光の筋のすぐ後、ブルームより前。ぼかした後の絵を光らせる(逆だと光のにじみまでぼける)
+		const size_t position = (!validPostEffects_.empty() && validPostEffects_.front().effectName == PostEffectList::GodRay) ? 1 : 0;
+		validPostEffects_.insert(validPostEffects_.begin() + position, postEffects_[int(PostEffectList::DepthOfField)]);
+	} else if (!isDof && hasDof) {
+		PopPostEffect(PostEffectList::DepthOfField);
+	}
+}
+
+bool OffscreenManager::HasPostEffect(PostEffectList effect) const {
+	for (const PostEffectPass& pass : validPostEffects_) {
+		if (pass.effectName == effect) {
+			return true;
+		}
+	}
+	return false;
+}
+
+void OffscreenManager::UpdateGodRay() {
+	godRayData_.intensity = 0.0f;
+	if (godRayIntensity_ <= 0.0f) {
+		return;
+	}
+	LightManager* lightManager = ObjectRenderer::GetInstance()->GetLightManager();
+	if (!lightManager) {
+		return;
+	}
+	const DirectionalLight* light = lightManager->GetDirectionLight(0);
+	const Camera* camera = CameraManager::GetInstance()->GetCamera();
+
+	// 太陽は光が進む向きの反対側、無限遠にある。向きだけを変換すればよい(w=0)
+	const Vector3 toSun = light->direction * -1.0f;
+	const Matrix4x4& view = camera->GetViewMatrix();
+	const Matrix4x4& viewProjection = camera->GetViewProjectionMatrix();
+
+	// カメラの正面と太陽のなす角の cos。太陽が視界の横へ外れるにつれて消し、真横より手前で0にする
+	const float facing = toSun.x * view.m[0][2] + toSun.y * view.m[1][2] + toSun.z * view.m[2][2];
+	const float fade = std::clamp((facing - 0.2f) / 0.4f, 0.0f, 1.0f);
+	const float w = toSun.x * viewProjection.m[0][3] + toSun.y * viewProjection.m[1][3] + toSun.z * viewProjection.m[2][3];
+	if (fade <= 0.0f || w <= 0.0001f) {
+		return;
+	}
+	const float x = toSun.x * viewProjection.m[0][0] + toSun.y * viewProjection.m[1][0] + toSun.z * viewProjection.m[2][0];
+	const float y = toSun.x * viewProjection.m[0][1] + toSun.y * viewProjection.m[1][1] + toSun.z * viewProjection.m[2][1];
+
+	godRayData_.sunUV = { x / w * 0.5f + 0.5f, -y / w * 0.5f + 0.5f };
+	godRayData_.color = { light->color.x, light->color.y, light->color.z };
+	godRayData_.intensity = godRayIntensity_ * fade;
 }
 
 void OffscreenManager::PopPostEffect(PostEffectList effect) {
@@ -447,6 +540,14 @@ void Graphics::OffscreenManager::InitDataResource() {
 		tonemapResource_[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(TonemapParams));
 		tonemapDataGPU_[i] = nullptr;
 		tonemapResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&tonemapDataGPU_[i]));
+
+		godRayResource_[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(GodRayParams));
+		godRayDataGPU_[i] = nullptr;
+		godRayResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&godRayDataGPU_[i]));
+
+		dofResource_[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(DepthOfFieldParams));
+		dofDataGPU_[i] = nullptr;
+		dofResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&dofDataGPU_[i]));
 	}
 }
 
@@ -568,6 +669,28 @@ void OffscreenManager::InitializePostEffects() {
 		}
 		});
 
+	postEffects_.push_back({//GodRayのセッティング
+		Pipe::GodRayCS,
+		PostEffectList::GodRay,
+		[=](auto* cmd, auto input, auto output) {
+			pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kInputTexture, input);
+			pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kOutputTexture, output);
+			pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kDepthTexture, dxcommon_->GetDepthTexGPUHandle());
+			pPipeManager->SetComputeRootCBV(cmd, RootName::kGodRayParams, godRayResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
+		}
+		});
+
+	postEffects_.push_back({//DepthOfFieldのセッティング
+		Pipe::DepthOfFieldCS,
+		PostEffectList::DepthOfField,
+		[=](auto* cmd, auto input, auto output) {
+			pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kInputTexture, input);
+			pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kOutputTexture, output);
+			pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kDepthTexture, dxcommon_->GetDepthTexGPUHandle());
+			pPipeManager->SetComputeRootCBV(cmd, RootName::kDepthOfFieldParams, dofResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
+		}
+		});
+
 }
 
 void Graphics::OffscreenManager::PingPongCommand() {
@@ -593,7 +716,9 @@ void Graphics::OffscreenManager::PingPongCommand() {
 				D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 		}
 
-		if (validPostEffects_[i].pipeline == Pipe::OutlineCS) {
+		const Pipe pipeline = validPostEffects_[i].pipeline;
+		if (pipeline == Pipe::OutlineCS || pipeline == Pipe::GodRayCS || pipeline == Pipe::DepthOfFieldCS) {
+			// 深度を読む効果
 			dxcommon_->TransitionDepthToRead();
 			dxcommon_->GetPipelineManager()->SetCSPipeline(validPostEffects_[i].pipeline);
 			validPostEffects_[i].setup(dxcommon_->GetCommandList(), inputSRVHandle, outputUAVHandle);
@@ -681,6 +806,94 @@ void Graphics::OffscreenManager::DrawToScreen(D3D12_GPU_DESCRIPTOR_HANDLE input)
 		dxcommon_->TransitionResource(gameViewRt_[frameIndex].Get(),
 			D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 	}
+	if (isScreenshotRequested_) {
+		isScreenshotRequested_ = false;
+		CaptureScreenshot(isOnPanel);
+	}
+#endif // _DEBUGMODE
+}
+
+void OffscreenManager::CaptureScreenshot([[maybe_unused]] bool isOnPanel) {
+#ifdef _DEBUGMODE
+	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
+	ID3D12GraphicsCommandList* commandList = dxcommon_->GetCommandList();
+	ID3D12Resource* target = gameViewRt_[frameIndex].Get();
+
+	if (!isOnPanel) {
+		// パイプラインと入力は直前の描画のまま残っているので、描き先と範囲だけ替えて描き直す。
+		// バックバッファへ戻すのは呼び出し側(DXCom::PostEffect)
+		dxcommon_->TransitionResource(target, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
+		commandList->OMSetRenderTargets(1, &gameViewRtvHandle_[frameIndex], false, nullptr);
+		dxcommon_->GetDXCommand()->SetViewAndScissor(MyWin::kWindowWidth, MyWin::kWindowHeight);
+		commandList->DrawInstanced(3, 1, 0, 0);
+		dxcommon_->TransitionResource(target, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+	}
+
+	if (!screenshotReadback_) {
+		const D3D12_RESOURCE_DESC desc = target->GetDesc();
+		UINT64 totalBytes = 0;
+		dxcommon_->GetDevice()->GetCopyableFootprints(&desc, 0, 1, 0, &screenshotFootprint_, nullptr, nullptr, &totalBytes);
+		screenshotReadback_ = DXC::Helper::CreateReadbackResource(dxcommon_->GetDevice(), static_cast<size_t>(totalBytes));
+	}
+
+	dxcommon_->TransitionResource(target, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_COPY_SOURCE);
+	const CD3DX12_TEXTURE_COPY_LOCATION destination(screenshotReadback_.Get(), screenshotFootprint_);
+	const CD3DX12_TEXTURE_COPY_LOCATION source(target, 0);
+	commandList->CopyTextureRegion(&destination, 0, 0, 0, &source, nullptr);
+	dxcommon_->TransitionResource(target, D3D12_RESOURCE_STATE_COPY_SOURCE, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+
+	isScreenshotPending_ = true;
+#endif // _DEBUGMODE
+}
+
+void OffscreenManager::SaveScreenshot() {
+#ifdef _DEBUGMODE
+	// 写しを頼んだのは1フレーム前で、GPU がまだ実行中のことがある
+	dxcommon_->PerFrameWait();
+
+	const UINT width = screenshotFootprint_.Footprint.Width;
+	const UINT height = screenshotFootprint_.Footprint.Height;
+	const UINT rowPitch = screenshotFootprint_.Footprint.RowPitch;
+
+	uint8_t* mapped = nullptr;
+	const D3D12_RANGE readRange{ 0, static_cast<SIZE_T>(rowPitch) * height };
+	if (FAILED(screenshotReadback_->Map(0, &readRange, reinterpret_cast<void**>(&mapped)))) {
+		return;
+	}
+	// アルファには合成の途中の値が残っている。そのまま保存すると透けた画像になるので不透明にする
+	std::vector<uint8_t> pixels(static_cast<size_t>(width) * height * 4);
+	for (UINT y = 0; y < height; ++y) {
+		const uint8_t* sourceRow = mapped + screenshotFootprint_.Offset + static_cast<size_t>(y) * rowPitch;
+		uint8_t* row = pixels.data() + static_cast<size_t>(y) * width * 4;
+		memcpy(row, sourceRow, static_cast<size_t>(width) * 4);
+		for (UINT x = 0; x < width; ++x) {
+			row[x * 4 + 3] = 255;
+		}
+	}
+	const D3D12_RANGE noWrite{ 0, 0 };
+	screenshotReadback_->Unmap(0, &noWrite);
+
+	// 実行ファイルと同じく generated の下へ。git の管理外
+	const std::filesystem::path directory = "../generated/screenshots";
+	std::error_code error;
+	std::filesystem::create_directories(directory, error);
+
+	const std::time_t now = std::time(nullptr);
+	std::tm local{};
+	localtime_s(&local, &now);
+	char name[64] = {};
+	std::strftime(name, sizeof(name), "Screenshot_%Y%m%d_%H%M%S.png", &local);
+	const std::filesystem::path path = directory / name;
+
+	DirectX::Image image{};
+	image.width = width;
+	image.height = height;
+	image.format = DXC::kSwapChainFormat;
+	image.rowPitch = static_cast<size_t>(width) * 4;
+	image.slicePitch = image.rowPitch * height;
+	image.pixels = pixels.data();
+	const HRESULT hr = DirectX::SaveToWICFile(image, DirectX::WIC_FLAGS_NONE, DirectX::GetWICCodec(DirectX::WIC_CODEC_PNG), path.wstring().c_str());
+	Logger::Log(std::string(SUCCEEDED(hr) ? "Screenshot saved: " : "Screenshot failed: ") + path.string() + "\n");
 #endif // _DEBUGMODE
 }
 
@@ -706,4 +919,11 @@ void OffscreenManager::CopyData(uint32_t frameIndex) {
 	tonemapDataGPU_[frameIndex]->enableDither = tonemapData_.enableDither;
 	tonemapDataGPU_[frameIndex]->saturation = tonemapData_.saturation;
 	tonemapDataGPU_[frameIndex]->contrast = tonemapData_.contrast;
+	tonemapDataGPU_[frameIndex]->sharpen = tonemapData_.sharpen;
+	tonemapDataGPU_[frameIndex]->vignette = tonemapData_.vignette;
+	tonemapDataGPU_[frameIndex]->shadowTint = tonemapData_.shadowTint;
+	tonemapDataGPU_[frameIndex]->highlightTint = tonemapData_.highlightTint;
+
+	*godRayDataGPU_[frameIndex] = godRayData_;
+	*dofDataGPU_[frameIndex] = dofData_;
 }

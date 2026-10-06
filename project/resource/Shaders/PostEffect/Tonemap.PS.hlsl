@@ -13,6 +13,10 @@ cbuffer TonemapParams : register(b0)
     uint enableDither; // 0以外なら8bitへ落とすときの縞を散らす
     float saturation; // 彩度。1でそのまま、0で白黒
     float contrast; // コントラスト。1でそのまま
+    float sharpen; // 輪郭をくっきりさせる強さ。0で何もしない
+    float vignette; // 画面の四隅を暗くする強さ。0で何もしない
+    float3 shadowTint; // 暗い所に掛ける色。白でそのまま
+    float3 highlightTint; // 明るい所に掛ける色。白でそのまま
 };
 
 struct PSInput
@@ -109,6 +113,13 @@ float3 Shade(float2 uv, float2 texelSize)
         mapped = pow(perceptual, 2.2f);
     }
 
+    // 影と光に別々の色味を乗せる。どちらも白なら一切触らない
+    if (any(shadowTint != 1.0f) || any(highlightTint != 1.0f))
+    {
+        float brightness = sqrt(saturate(dot(mapped, kLumaWeight)));
+        mapped = saturate(mapped * lerp(shadowTint, highlightTint, smoothstep(0.0f, 1.0f, brightness)));
+    }
+
     return mapped;
 }
 
@@ -160,6 +171,30 @@ float3 ApplyFXAA(float2 uv, float2 texelSize, float3 center)
     return (lumaB < lumaMin || lumaB > lumaMax) ? rgbA : rgbB;
 }
 
+/// <summary>輪郭をくっきりさせる。周りの平均との差を上乗せする</summary>
+/// <remarks>ギザギザをならす処理は絵を少し甘くするので、その後に掛けて締め直す。
+/// 周りの明るさの範囲を超えないよう抑えるので、輪郭に白や黒の縁取りは出ない</remarks>
+float3 ApplySharpen(float2 uv, float2 texelSize, float3 center)
+{
+    float3 n = Shade(uv + float2(0.0f, -1.0f) * texelSize, texelSize);
+    float3 s = Shade(uv + float2(0.0f, 1.0f) * texelSize, texelSize);
+    float3 w = Shade(uv + float2(-1.0f, 0.0f) * texelSize, texelSize);
+    float3 e = Shade(uv + float2(1.0f, 0.0f) * texelSize, texelSize);
+
+    float3 lo = min(center, min(min(n, s), min(w, e)));
+    float3 hi = max(center, max(max(n, s), max(w, e)));
+    float3 sharpened = center + (center - (n + s + w + e) * 0.25f) * sharpen;
+    return clamp(sharpened, lo, hi);
+}
+
+/// <summary>画面の四隅を暗くして、視線を中央へ寄せる</summary>
+float3 ApplyVignette(float3 color, float2 uv)
+{
+    // 中央で0、辺の中点で1、角で約1.4
+    float distance = length((uv - 0.5f) * 2.0f);
+    return color * (1.0f - vignette * smoothstep(0.5f, 1.4f, distance));
+}
+
 /// <summary>8bitへ落とすときに出る縞を、1段ぶんに満たない細かい模様で散らす</summary>
 /// <remarks>段は見た目の明るさ(sRGB)で等間隔なので、そちらの尺度で足す。リニアのまま足すと暗い所で粒が目立つ</remarks>
 float3 ApplyDither(float3 color, float2 pixel)
@@ -182,6 +217,16 @@ float4 main(PSInput input) : SV_TARGET
     if (enableFXAA != 0)
     {
         color = ApplyFXAA(input.texcoord, texelSize, color);
+    }
+
+    if (sharpen > 0.0f)
+    {
+        color = ApplySharpen(input.texcoord, texelSize, color);
+    }
+
+    if (vignette > 0.0f)
+    {
+        color = ApplyVignette(color, input.texcoord);
     }
 
     if (enableDither != 0)

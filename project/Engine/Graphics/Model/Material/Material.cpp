@@ -63,6 +63,10 @@ Texture* Material::GetTexture() {
 	return texture_;
 }
 
+uint32_t Material::GetTextureSrvIndex() const {
+	return texture_ ? texture_->srvIndex : 0;
+}
+
 ID3D12Resource* Material::UploadAndGetResource() {
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 	if (!materialResource_[frameIndex]) {
@@ -144,6 +148,9 @@ void Material::CopyData(uint32_t frameIndex) {
 	materialDataGPU_[frameIndex]->textureIndex = texture_ ? texture_->srvIndex : 0;
 	materialDataGPU_[frameIndex]->normalMapIndex = normalMap_ ? normalMap_->srvIndex : 0;
 	materialDataGPU_[frameIndex]->metallic = materialData_.metallic;
+	materialDataGPU_[frameIndex]->emissive = materialData_.emissive;
+	materialDataGPU_[frameIndex]->rimPower = materialData_.rimPower;
+	materialDataGPU_[frameIndex]->rimColor = materialData_.rimColor;
 }
 
 Matrix4x4 Material::MakeScale4x4(const Vector3& scale) {

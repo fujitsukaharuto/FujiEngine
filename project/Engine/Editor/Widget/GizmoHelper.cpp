@@ -23,6 +23,14 @@ namespace {
 	}
 
 	/// <summary>ギズモを表示する。操作中なら true を返し model が更新される</summary>
+	Editor::GizmoOperation ToGizmoOperation(ImGuizmo::OPERATION operation) {
+		switch (operation) {
+		case ImGuizmo::ROTATE: return Editor::GizmoOperation::Rotate;
+		case ImGuizmo::SCALE:  return Editor::GizmoOperation::Scale;
+		default:               return Editor::GizmoOperation::Translate;
+		}
+	}
+
 	bool ManipulateWorld(Matrix4x4& model, ImGuizmo::OPERATION operation) {
 		Matrix4x4 view = CameraManager::GetInstance()->GetCamera()->GetViewMatrix();
 		Matrix4x4 proj = CameraManager::GetInstance()->GetCamera()->GetProjectionMatrix();
@@ -31,7 +39,9 @@ namespace {
 			&view.m[0][0], &proj.m[0][0],         // カメラ
 			operation,                            // 操作モード
 			ImGuizmo::WORLD,                      // ワールド座標系
-			&model.m[0][0]                        // 行列
+			&model.m[0][0],                       // 行列
+			nullptr,
+			Editor::GizmoHelper::CurrentSnap(ToGizmoOperation(operation))
 		);
 		return ImGuizmo::IsUsing();
 	}
@@ -43,6 +53,25 @@ namespace Editor {
 		ImGui::RadioButton("TRANSLATE", &gizmoType_, 0); ImGui::SameLine();
 		ImGui::RadioButton("ROTATE", &gizmoType_, 1); ImGui::SameLine();
 		ImGui::RadioButton("SCALE", &gizmoType_, 2);
+
+		ImGui::Checkbox("Snap", &isSnap_);
+		ImGui::SameLine();
+		ImGui::SetNextItemWidth(100.0f);
+		switch (static_cast<GizmoOperation>(gizmoType_)) {
+		case GizmoOperation::Rotate: ImGui::DragFloat("##snap", &snapRotate_, 1.0f, 1.0f, 180.0f, "%.0f deg"); break;
+		case GizmoOperation::Scale:  ImGui::DragFloat("##snap", &snapScale_, 0.01f, 0.01f, 100.0f, "x %.2f"); break;
+		default:                     ImGui::DragFloat("##snap", &snapTranslate_, 0.05f, 0.01f, 1000.0f, "%.2f"); break;
+		}
+	}
+
+	const float* GizmoHelper::CurrentSnap(GizmoOperation operation) {
+		if (isSnap_ == ImGui::GetIO().KeyCtrl) {
+			return nullptr;
+		}
+		static float values[3];
+		const float step = (operation == GizmoOperation::Rotate) ? snapRotate_ : (operation == GizmoOperation::Scale) ? snapScale_ : snapTranslate_;
+		values[0] = values[1] = values[2] = step;
+		return values;
 	}
 
 	void GizmoHelper::Manipulate(Trans& transform, bool recordUndo) {

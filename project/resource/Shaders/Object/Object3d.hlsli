@@ -32,6 +32,9 @@ struct Material
     int textureIndex;
     int normalMapIndex;
     float metallic; // 0=誘電体 1=金属
+    float3 emissive; // 自分で光る色
+    float rimPower; // リムライトの細さ
+    float3 rimColor; // リムライトの色。黒なら掛からない
 };
 
 struct DirectionalLight
@@ -48,7 +51,8 @@ struct PointLight
     float intensity;
     float radius;
     float decay;
-    float2 padding;
+    float sourceRadius; // 光源の大きさ。影のレイをこの手前で止める
+    float padding;
 };
 
 struct SpotLight
@@ -87,7 +91,7 @@ struct AllLights
     // 鏡面の環境光の遮蔽
     float reflectionMaxDistance;
     float reflectionIntensity;
-    uint enableReflection;
+    uint reflectionMode; // RayTracedReflection.hlsli の kReflectionMode*
     uint shadowMode; // RayTracedShadow.hlsli の kShadowMode*
 
     // 平行光源のソフトシャドウ。受け持つのは0番の平行光源だけ

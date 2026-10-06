@@ -262,6 +262,9 @@
     <ClCompile Include="Engine\GameObject\SpawnPoint.cpp">
       <Filter>Engine\GameObject</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\GameObject\PlacedLight.cpp">
+      <Filter>Engine\GameObject</Filter>
+    </ClCompile>
     <ClCompile Include="Engine\Scene\Level.cpp">
       <Filter>Engine\Scene</Filter>
     </ClCompile>
@@ -713,6 +716,9 @@
       <Filter>Engine\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Engine\GameObject\SpawnPoint.h">
+      <Filter>Engine\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\GameObject\PlacedLight.h">
       <Filter>Engine\GameObject</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Scene\Level.h">
@@ -1206,6 +1212,12 @@
       <Filter>resource\Shaders\PostEffect</Filter>
     </FxCompile>
     <FxCompile Include="resource\Shaders\PostEffect\BloomComposite.CS.hlsl">
+      <Filter>resource\Shaders\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\PostEffect\GodRay.CS.hlsl">
+      <Filter>resource\Shaders\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\PostEffect\DepthOfField.CS.hlsl">
       <Filter>resource\Shaders\PostEffect</Filter>
     </FxCompile>
     <FxCompile Include="resource\Shaders\PostEffect\BoxFilter.CS.hlsl">

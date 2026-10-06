@@ -17,6 +17,30 @@ namespace Graphics {
 	class RenderObject;
 
 	/// <summary>
+	/// レイが当たった物の見た目。反射に映す色を出すのに使う
+	/// </summary>
+	/// <remarks>HLSL 側 (Common/RayTracedReflection.hlsli) の RayInstance と並びが一致していること</remarks>
+	struct RayInstanceData {
+		Math::Vector3 color = { 1.0f,1.0f,1.0f };	// マテリアルの色
+		uint32_t textureIndex = 0;
+		Math::Vector3 emissive{};
+		// 以下の3つは RaytracingScene がメッシュから入れる。呼び出し側は触らなくてよい
+		uint32_t vertexBuffer = 0;	// 頂点の SRV の番号
+		uint32_t indexBuffer = 0;	// インデックスの SRV の番号
+		uint32_t flags = 0;			// RayInstanceFlag
+		Math::Vector2 uvScale = { 1.0f,1.0f };
+		Math::Vector2 uvOffset{};
+		Math::Vector2 pad{};
+	};
+	static_assert(sizeof(RayInstanceData) == 64, "RayInstanceData の大きさが RayTracedReflection.hlsli の RayInstance と一致していない");
+
+	/// <remarks>HLSL 側 (Common/RayTracedReflection.hlsli) の kRayInstance* と同じ値であること</remarks>
+	enum RayInstanceFlag : uint32_t {
+		kRayInstanceHasGeometry = 1u << 0,	// 頂点とインデックスを引ける(UV が分かる)
+		kRayInstanceHasNormal = 1u << 1,	// 頂点の法線がそのまま使える(スキニングで動かない)
+	};
+
+	/// <summary>
 	/// レイトレ用の加速構造(BLAS/TLAS)を管理するクラス
 	/// </summary>
 	/// <remarks>対象は静的メッシュのみ。スキンメッシュとパーティクルは含めない</remarks>
@@ -41,7 +65,8 @@ namespace Graphics {
 		/// <remarks>初めて見るモデルはここでBLASを同期構築するので、初回だけスタールする</remarks>
 		/// <param name="model">モデル</param>
 		/// <param name="world">ワールド行列</param>
-		void AddInstance(const Model* model, const Math::Matrix4x4& world);
+		/// <param name="looks">メッシュごとの見た目。モデルのメッシュと同じ並び。nullptr なら見た目を集めない(当たった物の色を映さないフレーム)</param>
+		void AddInstance(const Model* model, const Math::Matrix4x4& world, const std::vector<RayInstanceData>* looks);
 
 		/// <summary>スキンメッシュのインスタンスを1つ積む</summary>
 		/// <remarks>頂点が毎フレーム動くのでBLASも毎フレーム作り直す。スキニングより後に呼ぶこと</remarks>
@@ -49,8 +74,10 @@ namespace Graphics {
 		/// <param name="model">モデル(インデックスバッファの取得用)</param>
 		/// <param name="skinnedMeshes">スキニング後のメッシュ</param>
 		/// <param name="world">ワールド行列</param>
+		/// <param name="looks">メッシュごとの見た目。モデルのメッシュと同じ並び。nullptr なら見た目を集めない</param>
 		void AddSkinnedInstance(const RenderObject* key, const Model* model,
-			const std::vector<SkinnedMesh>& skinnedMeshes, const Math::Matrix4x4& world);
+			const std::vector<SkinnedMesh>& skinnedMeshes, const Math::Matrix4x4& world,
+			const std::vector<RayInstanceData>* looks);
 
 		/// <summary>積まれたインスタンスからTLASを構築する</summary>
 		void BuildTlas();
@@ -65,6 +92,8 @@ namespace Graphics {
 		//========================================================================*/
 		//* Getter
 		uint32_t GetTlasSrvIndex() const { return tlasSrvIndex_; }
+		/// <summary>このフレームの「当たった物の見た目」の SRV。まだ無ければ kInvalidSrvIndex</summary>
+		uint32_t GetInstanceDataSrvIndex() const;
 		uint32_t GetInstanceCount() const { return static_cast<uint32_t>(instances_.size()); }
 		size_t GetBlasCount() const { return blasMap_.size(); }
 
@@ -84,6 +113,9 @@ namespace Graphics {
 
 		/// <summary>インスタンス数ぶんのTLAS用バッファを確保し直す</summary>
 		void EnsureTlasCapacity(uint32_t instanceCount);
+
+		/// <summary>「当たった物の見た目」のバッファを、その個数が入る大きさに確保し直す</summary>
+		void EnsureInstanceDataCapacity(uint32_t count);
 
 		/// <summary>TLAS構築コマンドを指定のリストへ積む</summary>
 		void RecordTlasBuild(ID3D12GraphicsCommandList4* list, uint32_t instanceCount, uint32_t frameIndex);
@@ -135,6 +167,13 @@ namespace Graphics {
 		uint32_t instanceCapacity_ = 0;
 
 		std::vector<D3D12_RAYTRACING_INSTANCE_DESC> instances_;
+
+		// メッシュごとに1つ。インスタンスの InstanceID が、そのインスタンスの先頭の位置を指す
+		std::vector<RayInstanceData> instanceData_;
+		Microsoft::WRL::ComPtr<ID3D12Resource> instanceDataBuffer_[DXC::kFrameCount_];
+		RayInstanceData* instanceDataMapped_[DXC::kFrameCount_] = {};
+		uint32_t instanceDataSrvIndex_[DXC::kFrameCount_] = {};
+		uint32_t instanceDataCapacity_ = 0;
 
 		uint32_t tlasSrvIndex_ = kInvalidSrvIndex;
 	};

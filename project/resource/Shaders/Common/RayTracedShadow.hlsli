@@ -129,7 +129,8 @@ float TraceSoftShadowDirectional(float3 worldPos, float3 L, float3 N,
 /// <param name="lightPos">光源のワールド座標</param>
 /// <param name="shadowMask">AllLights::rayTracedShadowMask</param>
 /// <param name="typeBit">kShadowMaskPoint か kShadowMaskSpot</param>
-float TraceShadowPunctual(float3 worldPos, float3 lightPos, float3 N, uint shadowMask, uint typeBit)
+/// <param name="sourceRadius">光源の大きさ。レイをこの手前で止める(光っている物の中心に置いた光源が、その物自身に遮られないように)</param>
+float TraceShadowPunctual(float3 worldPos, float3 lightPos, float3 N, uint shadowMask, uint typeBit, float sourceRadius)
 {
     if ((shadowMask & typeBit) == 0)
     {
@@ -138,14 +139,15 @@ float TraceShadowPunctual(float3 worldPos, float3 lightPos, float3 N, uint shado
 
     float3 toLight = lightPos - worldPos;
     float distance = length(toLight);
-    // バイアスで浮かせた分より光源が近い＝間に遮蔽物が入る余地が無い
-    if (distance <= kShadowRayBias)
+    // 光源のすぐ手前で止める。光源と同じ位置にある面を自分の遮蔽物と数えないため
+    float stopBefore = max(kShadowRayBias, sourceRadius);
+    // 止める位置より光源が近い＝間に遮蔽物が入る余地が無い
+    if (distance <= stopBefore)
     {
         return 1.0f;
     }
 
-    // 光源のすぐ手前で止める。光源と同じ位置にある面を自分の遮蔽物と数えないため
-    return TraceShadowRay(worldPos, toLight / distance, N, distance - kShadowRayBias);
+    return TraceShadowRay(worldPos, toLight / distance, N, distance - stopBefore);
 }
 
 #endif // RAYTRACED_SHADOW_HLSLI

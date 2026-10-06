@@ -17,7 +17,9 @@ namespace Graphics {
 		float intensity = 1.0f;
 		float radius = 10.0f;
 		float decay = 1.0f;
-		float padding[2];
+		// 光源の大きさ。影のレイをこの手前で止める。光っている物の中心に置いたとき、その物自身が光を遮らないようにするため
+		float sourceRadius = 0.0f;
+		float padding = 0.0f;
 
 		// 互換性のためのセッター。
 		// PointLight::SetAttenuationLight(time, intensity) とは引数の意味が違うので同名にしない

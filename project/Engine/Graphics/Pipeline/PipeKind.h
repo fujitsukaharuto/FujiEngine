@@ -48,6 +48,8 @@ namespace Graphics {
 		BloomDownsampleCS, // 多段ブルーム: 半分へ縮めながらぼかす(最初の1回は明るい所の抽出も兼ねる)
 		BloomUpsampleCS,   // 多段ブルーム: 1段小さい方を拡大して混ぜる
 		BloomCompositeCS,  // 多段ブルーム: 積み上げたぼけをシーンへ足す
+		GodRayCS,          // 光の筋。太陽のまわりの空から、物に遮られずに届く光を足す
+		DepthOfFieldCS,    // 被写界深度。ピントの合う距離から離れた物をぼかす
 		RandomCS,
 		SkinningCS,
 		InitParticleCS,

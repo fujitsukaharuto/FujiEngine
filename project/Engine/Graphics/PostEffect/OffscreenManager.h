@@ -95,7 +95,37 @@ namespace Graphics {
 		uint32_t enableDither = 1;	// 8bitへ落とすときの縞を散らす
 		float saturation = 1.0f;	// 彩度。1でそのまま
 		float contrast = 1.0f;		// コントラスト。1でそのまま
-		float pad[2]{};				// 定数バッファは16バイト単位なので揃えておく
+		float sharpen = 0.0f;		// 輪郭をくっきりさせる強さ。0で何もしない
+		float vignette = 0.0f;		// 画面の四隅を暗くする強さ。0で何もしない
+		Math::Vector3 shadowTint = { 1.0f,1.0f,1.0f };		// 暗い所に掛ける色。白でそのまま
+		float pad0 = 0.0f;
+		Math::Vector3 highlightTint = { 1.0f,1.0f,1.0f };	// 明るい所に掛ける色。白でそのまま
+		float pad1 = 0.0f;
+	};
+
+	/// <summary>
+	/// 光の筋(ゴッドレイ)に送るデータ
+	/// </summary>
+	/// <remarks>GodRay.CS.hlsl の GodRayParams と並びが一致していること</remarks>
+	struct GodRayParams {
+		Math::Vector2 sunUV = { 0.5f,0.5f };	// 太陽の画面上の位置。画面の外のこともある
+		float intensity = 0.0f;					// 0以下なら何もしない
+		float rayLength = 0.6f;					// 太陽までの道のりのうち、どこまで辿るか
+		Math::Vector3 color = { 1.0f,1.0f,1.0f };
+		float sunSize = 0.4f;					// 光源とみなす範囲の半径。画面の高さが1
+	};
+
+	/// <summary>
+	/// 被写界深度に送るデータ
+	/// </summary>
+	/// <remarks>DepthOfField.CS.hlsl の DepthOfFieldParams と並びが一致していること</remarks>
+	struct DepthOfFieldParams {
+		float focusDistance = 10.0f;	// ピントの合う距離
+		float focusRange = 5.0f;		// ピントの前後、この幅まではぼかさない
+		float falloff = 20.0f;			// そこからこの距離をかけて最大のぼけに達する
+		float maxBlur = 0.0f;			// ぼけの最大半径(画素)。0以下なら何もしない
+		Math::Vector2 depthToView = { 0.0f,1.0f };	// 深度 d からカメラ空間の距離へ: y / (d - x)
+		Math::Vector2 pad = { 0.0f,0.0f };
 	};
 
 	/// <summary>
@@ -111,6 +141,17 @@ namespace Graphics {
 		float exposure = 2.0f;
 		float saturation = 1.0f;
 		float contrast = 1.0f;
+		float sharpen = 0.0f;			// 輪郭をくっきりさせる強さ
+		float vignette = 0.0f;			// 四隅を暗くする強さ。被ダメージの赤いビネットとは別物
+		Math::Vector3 shadowTint = { 1.0f,1.0f,1.0f };		// 暗い所に掛ける色
+		Math::Vector3 highlightTint = { 1.0f,1.0f,1.0f };	// 明るい所に掛ける色
+		float godRayIntensity = 0.0f;	// 光の筋の強さ。0で掛からない。色と向きは平行光源から取る
+		float godRayLength = 0.6f;		// 筋の長さ。1で太陽まで届く
+		float godRaySunSize = 0.4f;		// 光源とみなす太陽のまわりの広さ
+		float dofBlur = 0.0f;			// 被写界深度のぼけの最大半径(画素)。0で掛からない
+		float dofFocusDistance = 10.0f;	// ピントの合う距離
+		float dofFocusRange = 5.0f;		// ピントの前後、この幅まではぼかさない
+		float dofFalloff = 20.0f;		// そこからこの距離をかけて最大のぼけに達する
 	};
 
 	enum class PostEffectList : int {
@@ -125,6 +166,8 @@ namespace Graphics {
 		LuminanceOutline,
 		Bloom,
 		Random,
+		GodRay,
+		DepthOfField,
 	};
 
 	/// <summary>
@@ -185,6 +228,8 @@ namespace Graphics {
 		/// <param name="effect">種類</param>
 		void AddPostEffect(PostEffectList effect) { validPostEffects_.push_back(postEffects_[int(effect)]); }
 
+		bool HasPostEffect(PostEffectList effect) const;
+
 		/// <summary>
 		/// 特定のポストエフェクトのポップ
 		/// </summary>
@@ -192,8 +237,12 @@ namespace Graphics {
 		void PopPostEffect(PostEffectList effect);
 
 		/// <summary>ブルームとトーンマップの設定を入れる</summary>
-		/// <remarks>ブルーム以外の効果(ラジアルブラー等、ゲームが途中で足すもの)には触らない</remarks>
+		/// <remarks>ブルーム・光の筋・被写界深度以外の効果(ラジアルブラー等、ゲームが途中で足すもの)には触らない</remarks>
 		void ApplySettings(const PostProcessSettings& settings);
+
+		/// <summary>次に描くゲーム画面を PNG に保存する(generated/screenshots/)。デバッグGUIは写らない</summary>
+		/// <remarks>_DEBUGMODE でだけ働く。保存は GPU が描き終わる次のフレーム</remarks>
+		void RequestScreenshot() { isScreenshotRequested_ = true; }
 
 		//========================================================================*/
 		//* RTVForGPUParticle
@@ -219,6 +268,15 @@ namespace Graphics {
 		/// 頂点情報の初期化
 		/// </summary>
 		void SettingVertex();
+
+		/// <summary>今のカメラと平行光源から、光の筋の太陽の位置と強さを決める</summary>
+		/// <remarks>太陽が背後へ回ると強さが0になり、シェーダは素通しになる</remarks>
+		void UpdateGodRay();
+
+		/// <summary>描き終えたゲーム画面を、CPU から読めるバッファへ写す</summary>
+		/// <param name="isOnPanel">false ならパネル用のテクスチャに絵が無いので、撮るためにもう一度描く</param>
+		void CaptureScreenshot(bool isOnPanel);
+		void SaveScreenshot();
 
 		/// <summary>
 		/// フレームごとのデータリソースの作成
@@ -315,6 +373,16 @@ namespace Graphics {
 		TonemapParams* tonemapDataGPU_[DXC::kFrameCount_];
 		TonemapParams tonemapData_;
 
+		Microsoft::WRL::ComPtr<ID3D12Resource> godRayResource_[DXC::kFrameCount_];
+		GodRayParams* godRayDataGPU_[DXC::kFrameCount_];
+		GodRayParams godRayData_;
+		// 設定された強さ。godRayData_.intensity は太陽の位置に応じて毎フレームここから決める
+		float godRayIntensity_ = 0.0f;
+
+		Microsoft::WRL::ComPtr<ID3D12Resource> dofResource_[DXC::kFrameCount_];
+		DepthOfFieldParams* dofDataGPU_[DXC::kFrameCount_];
+		DepthOfFieldParams dofData_;
+
 		Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_ = nullptr;
 		D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
 		GrayscaleVertex* vertexData_ = nullptr;
@@ -326,6 +394,12 @@ namespace Graphics {
 		std::unique_ptr<BloomPass> bloomPass_;
 		// false にすると従来の 5x5 1回のブルームへ戻る(見比べ用)
 		bool useMultiScaleBloom_ = true;
+
+		bool isScreenshotRequested_ = false;
+		// GPU へ写しを頼んだ。次のフレームに読んで保存する
+		bool isScreenshotPending_ = false;
+		Microsoft::WRL::ComPtr<ID3D12Resource> screenshotReadback_;
+		D3D12_PLACED_SUBRESOURCE_FOOTPRINT screenshotFootprint_{};
 
 		bool isPostEffect_ = true;
 		bool isNonePost_ = true;

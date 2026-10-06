@@ -1,7 +1,11 @@
 #include "PlacedObject.h"
+#include <algorithm>
+#include <cmath>
 #include <iterator>
 #include <json.hpp>
 #include "Engine/Core/Debug/ImGuiManager.h"
+#include "Engine/Graphics/Light/LightManager.h"
+#include "Engine/Graphics/Model/Model.h"
 
 // 名前空間とクラス名が同名なので using namespace GameObject; は書けない
 namespace GameObject {
@@ -117,6 +121,13 @@ namespace GameObject {
 		look_.roughness = ReadFloat(data, "roughness");
 		look_.metallic = ReadFloat(data, "metallic");
 		look_.environment = ReadFloat(data, "environment");
+		look_.emissive = ReadVector3(data, "emissive");
+		look_.emissiveIntensity = data.value("emissiveIntensity", 1.0f);
+		look_.emissiveLightRange = data.value("emissiveLightRange", 0.0f);
+		look_.emissiveLightIntensity = data.value("emissiveLightIntensity", 1.0f);
+		look_.rim = ReadVector3(data, "rim");
+		look_.rimIntensity = data.value("rimIntensity", 1.0f);
+		look_.rimPower = data.value("rimPower", 3.0f);
 		look_.isMirror = data.value("mirror", false);
 		look_.light = ReadLight(data, "light");
 
@@ -155,6 +166,19 @@ namespace GameObject {
 		if (look_.roughness) { data["roughness"] = *look_.roughness; }
 		if (look_.metallic) { data["metallic"] = *look_.metallic; }
 		if (look_.environment) { data["environment"] = *look_.environment; }
+		if (look_.emissive) {
+			data["emissive"] = { look_.emissive->x, look_.emissive->y, look_.emissive->z };
+			data["emissiveIntensity"] = look_.emissiveIntensity;
+			if (look_.emissiveLightRange > 0.0f) {
+				data["emissiveLightRange"] = look_.emissiveLightRange;
+				data["emissiveLightIntensity"] = look_.emissiveLightIntensity;
+			}
+		}
+		if (look_.rim) {
+			data["rim"] = { look_.rim->x, look_.rim->y, look_.rim->z };
+			data["rimIntensity"] = look_.rimIntensity;
+			data["rimPower"] = look_.rimPower;
+		}
 		if (look_.isMirror) { data["mirror"] = true; }
 		if (look_.light) { data["light"] = LightToName(*look_.light); }
 		return data;
@@ -165,6 +189,43 @@ namespace GameObject {
 			animeModel_->AnimationUpdate();
 		}
 		GameObject::Update();
+		ApplyEmissiveLight(IsActive());
+	}
+
+	void PlacedObject::TurnOffLight() {
+		ApplyEmissiveLight(false);
+	}
+
+	void PlacedObject::ApplyEmissiveLight(bool isOn) {
+		if (!lightManager_) {
+			return;
+		}
+		const bool isLit = isOn && look_.emissive && look_.emissiveLightRange > 0.0f;
+		if (lightSlot_ < 0) {
+			if (!isLit) {
+				return;
+			}
+			Graphics::PointLightData initial;
+			initial.intensity = 0.0f;
+			lightSlot_ = lightManager_->AddPointLight(initial);
+			if (lightSlot_ < 0) {
+				return;
+			}
+		}
+
+		Graphics::PointLightData* light = lightManager_->GetPointLight(lightSlot_);
+		if (!isLit) {
+			light->intensity = 0.0f;
+			return;
+		}
+		light->color = { look_.emissive->x, look_.emissive->y, look_.emissive->z, 1.0f };
+		light->position = transform_.GetWorldPos();
+		light->intensity = look_.emissiveIntensity * look_.emissiveLightIntensity;
+		light->radius = look_.emissiveLightRange;
+		light->decay = 2.0f;
+		// 光源は物の中心にあるので、そのままだとこの物自身が光を全部遮る。物の外側から先だけ影を見る
+		const float scale = (std::max)({ std::abs(transform_.scale.x), std::abs(transform_.scale.y), std::abs(transform_.scale.z) });
+		light->sourceRadius = modelRadius_ * scale * 1.05f;
 	}
 
 	void PlacedObject::Build() {
@@ -175,6 +236,12 @@ namespace GameObject {
 			}
 		} else {
 			CreateModel(look_.model);
+		}
+		modelRadius_ = 0.0f;
+		if (const RenderObject* object = GetRenderObject(); object && object->GetModel()) {
+			for (const Graphics::Mesh& mesh : object->GetModel()->GetMeshes()) {
+				modelRadius_ = (std::max)(modelRadius_, mesh.GetBoundingRadius());
+			}
 		}
 		ApplyLook();
 	}
@@ -201,6 +268,9 @@ namespace GameObject {
 			if (look_.metallic) {
 				material.SetMetallic(*look_.metallic);
 			}
+			// モデルは発光を持たないので、外したら消す
+			material.SetEmissive(look_.emissive ? *look_.emissive * look_.emissiveIntensity : Vector3{});
+			material.SetRim(look_.rim ? *look_.rim * look_.rimIntensity : Vector3{}, look_.rimPower);
 		}
 		if (look_.environment) {
 			if (animeModel_) {
@@ -251,6 +321,25 @@ namespace GameObject {
 			[](const char* label, float& v) { return ImGui::SliderFloat(label, &v, 0.0f, 1.0f); });
 		changed |= OptionalGUI("Environment", look_.environment, material.GetEnvironment(),
 			[](const char* label, float& v) { return ImGui::SliderFloat(label, &v, 0.0f, 1.0f); });
+		changed |= OptionalGUI("Emissive", look_.emissive, Vector3{ 1.0f,1.0f,1.0f },
+			[](const char* label, Vector3& v) { return ImGui::ColorEdit3(label, &v.x); });
+		if (look_.emissive) {
+			changed |= ImGui::DragFloat("Emissive intensity", &look_.emissiveIntensity, 0.05f, 0.0f, 100.0f);
+			// 0 なら周りを照らさない。照らすと点光源の枠を1つ使う
+			ImGui::DragFloat("Emissive light range", &look_.emissiveLightRange, 0.1f, 0.0f, 1000.0f);
+			if (look_.emissiveLightRange > 0.0f) {
+				ImGui::DragFloat("Emissive light intensity", &look_.emissiveLightIntensity, 0.05f, 0.0f, 100.0f);
+				if (lightSlot_ < 0 && lightManager_ && lightManager_->GetNumPointLights() >= Graphics::kMaxPointLights) {
+					ImGui::TextDisabled("(ライトの数が上限)");
+				}
+			}
+		}
+		changed |= OptionalGUI("Rim", look_.rim, Vector3{ 1.0f,1.0f,1.0f },
+			[](const char* label, Vector3& v) { return ImGui::ColorEdit3(label, &v.x); });
+		if (look_.rim) {
+			changed |= ImGui::DragFloat("Rim intensity", &look_.rimIntensity, 0.05f, 0.0f, 100.0f);
+			changed |= ImGui::DragFloat("Rim power", &look_.rimPower, 0.05f, 0.5f, 16.0f);
+		}
 		changed |= OptionalGUI("Light", look_.light, kDefaultLight,
 			[](const char* label, LightMode& mode) {
 				int index = 0;

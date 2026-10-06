@@ -349,7 +349,9 @@ Microsoft::WRL::ComPtr<ID3D12RootSignature> DXCompile::CreateRootSignature(
 	UINT numSamplers = 0;
 	D3D12_STATIC_SAMPLER_DESC defaultSampler{};
 	if (staticSamplers.empty()) {
-		defaultSampler.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+		// 斜めから見た面(遠くの地面など)がぼやけないよう異方性にする。正面から見る絵や画面の貼り付けでは LINEAR と同じ結果になる
+		defaultSampler.Filter = D3D12_FILTER_ANISOTROPIC;
+		defaultSampler.MaxAnisotropy = 8;
 		defaultSampler.AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
 		defaultSampler.AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
 		defaultSampler.AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;

@@ -35,6 +35,23 @@ namespace {
 			commandList, RootName::kSceneTLAS, SRVManager::GetInstance()->GetGPUDescriptorHandle(tlasSrv));
 	}
 
+	/// <summary>レイが当たった物の見た目(反射に映す色)をバインドする</summary>
+	/// <remarks>PS が gRayInstances を宣言しているので、映り込みを切っていてもバインドが要る</remarks>
+	void BindRayInstances(ID3D12GraphicsCommandList* commandList) {
+		auto* rtScene = ObjectRenderer::GetInstance()->GetRaytracingScene();
+		if (rtScene == nullptr) { return; }
+
+		const uint32_t srvIndex = rtScene->GetInstanceDataSrvIndex();
+		if (srvIndex == RaytracingScene::kInvalidSrvIndex) { return; }
+
+		PipelineManager* pPipeManager = PipelineManager::GetInstance();
+		SRVManager* srvManager = SRVManager::GetInstance();
+		pPipeManager->SetGraphicsRootDescriptorTable(commandList, RootName::kRayInstances, srvManager->GetGPUDescriptorHandle(srvIndex));
+		// 頂点とインデックスは gTextures[] と同じくヒープの先頭を渡し、メッシュごとの番号で引く
+		pPipeManager->SetGraphicsRootDescriptorTable(commandList, RootName::kRayVertices, srvManager->GetGPUDescriptorHandle(0));
+		pPipeManager->SetGraphicsRootDescriptorTable(commandList, RootName::kRayIndices, srvManager->GetGPUDescriptorHandle(0));
+	}
+
 	/// <summary>鏡面の環境光に使うキューブマップをバインドする</summary>
 	/// <remarks>PS が gEnvironment を宣言しているので、無いと未バインドになる</remarks>
 	void BindEnvironment(ID3D12GraphicsCommandList* commandList) {
@@ -104,6 +121,7 @@ void Model::Draw(ID3D12GraphicsCommandList* commandList, std::vector<Material>& 
 		pPipeManager->SetGraphicsRootDescriptorTable(commandList, RootName::kTextures, SRVManager::GetInstance()->GetGPUDescriptorHandle(0));
 
 		BindSceneTLAS(commandList);
+		BindRayInstances(commandList);
 		BindEnvironment(commandList);
 		BindIBL(commandList);
 		BindScreenSpaceAO(commandList);
@@ -128,6 +146,7 @@ void Model::AnimationDraw(DXCom* pDxcom, ID3D12GraphicsCommandList* commandList,
 		pPipeManager->SetGraphicsRootCBV(commandList, RootName::kMaterial, materials[index].UploadAndGetResource()->GetGPUVirtualAddress());
 		pPipeManager->SetGraphicsRootDescriptorTable(commandList, RootName::kTextures, SRVManager::GetInstance()->GetGPUDescriptorHandle(0));
 		BindSceneTLAS(commandList);
+		BindRayInstances(commandList);
 		BindEnvironment(commandList);
 		BindIBL(commandList);
 		BindScreenSpaceAO(commandList);

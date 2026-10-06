@@ -5,6 +5,7 @@
 #include "Engine/Core/Input/InputMap.h"
 #include "Engine/Graphics/Texture/TextureManager.h"
 #include "Engine/DXC/DXCom.h"
+#include "Engine/Graphics/PostEffect/OffscreenManager.h"
 #include "Engine/Graphics/Camera/CameraManager.h"
 #ifdef _DEBUGMODE
 #include "imgui_internal.h"	// DockBuilder（既定レイアウトの組み立て）
@@ -58,6 +59,7 @@ void Framework::Update() {
 		cameraManager_->SetDebugMode(!cameraManager_->GetDebugMode());
 	}
 	if (input_->TriggerKey(DIK_F1)) { isDebugGuiVisible_ = !isDebugGuiVisible_; }
+	if (input_->TriggerKey(DIK_F9)) { dxcommon_->GetOffscreenManager()->RequestScreenshot(); }
 #endif // _DEBUGMODE
 
 	// ゲームシーンの毎フレーム処理
@@ -205,6 +207,7 @@ void Framework::EngineDebugGUI() {
 			ImGui::Separator();
 			if (ImGui::MenuItem("レイアウトを初期化")) { isDockLayoutReset_ = true; }
 			if (ImGui::MenuItem("フルスクリーン", "F11", win_->IsFullscreen())) { win_->ToggleFullscreen(); }
+			if (ImGui::MenuItem("スクリーンショット", "F9")) { dxcommon_->GetOffscreenManager()->RequestScreenshot(); }
 			ImGui::EndMenu();
 		}
 		ImGui::EndMainMenuBar();

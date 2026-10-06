@@ -22,6 +22,9 @@ namespace Graphics {
 		inline const RootParam kLights{ "gLights" };
 		inline const RootParam kObjIDData{ "ObjIDData" };
 		inline const RootParam kSceneTLAS{ "gSceneTLAS" };			// レイトレの加速構造(TLAS)
+		inline const RootParam kRayInstances{ "gRayInstances" };	// レイが当たった物の見た目(反射に映す色)
+		inline const RootParam kRayVertices{ "gRayVertices" };		// レイが当たった点の UV と法線を引くための、全メッシュの頂点
+		inline const RootParam kRayIndices{ "gRayIndices" };		// 同、インデックス
 		inline const RootParam kAOTexture{ "gAOTexture" };			// 画面空間の計算済みAO(前方描画が引く)
 		inline const RootParam kShadowTexture{ "gShadowTexture" };	// 画面空間の計算済み遮蔽率(前方描画が引く)
 		inline const RootParam kIrradianceMap{ "gIrradianceMap" };	// 焼いた放射照度(拡散のアンビエント)
@@ -78,6 +81,8 @@ namespace Graphics {
 		inline const RootParam kGrayscaleConstantBuffer{ "GrayscaleConstantBuffer" };
 		inline const RootParam kVignetteConstantBuffer{ "VignetteConstantBuffer" };
 		inline const RootParam kTonemapParams{ "TonemapParams" };
+		inline const RootParam kGodRayParams{ "GodRayParams" };
+		inline const RootParam kDepthOfFieldParams{ "DepthOfFieldParams" };
 		inline const RootParam kFog{ "gFog" };
 
 		// --- GPUパーティクル: プール ---

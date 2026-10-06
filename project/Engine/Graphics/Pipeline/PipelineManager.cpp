@@ -135,6 +135,8 @@ void PipelineManager::CreatePipeline() {
 	CreateComputePipe(Pipe::BloomDownsampleCS, L"PostEffect/BloomDownsample.CS.hlsl");
 	CreateComputePipe(Pipe::BloomUpsampleCS, L"PostEffect/BloomUpsample.CS.hlsl");
 	CreateComputePipe(Pipe::BloomCompositeCS, L"PostEffect/BloomComposite.CS.hlsl");
+	CreateComputePipe(Pipe::GodRayCS, L"PostEffect/GodRay.CS.hlsl");
+	CreateComputePipe(Pipe::DepthOfFieldCS, L"PostEffect/DepthOfField.CS.hlsl");
 	CreateComputePipe(Pipe::RandomCS, L"PostEffect/Random.CS.hlsl");
 	CreatePipe<SkinningCSPipe>(Pipe::SkinningCS);
 

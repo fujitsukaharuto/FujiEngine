@@ -1,4 +1,6 @@
 #include "Mesh.h"
+#include <algorithm>
+#include <cmath>
 #include "Engine/DXC/DXCom.h"
 #include "Engine/DXC/Resource/DX12Helper.h"
 #include "Engine/Graphics/Model/ModelManager.h"
@@ -32,9 +34,11 @@ Mesh::Mesh(Mesh&& other) noexcept
 	, indexResource_(std::move(other.indexResource_))
 	, indexBufferView_(other.indexBufferView_)
 	, srvHandle_(other.srvHandle_)
-	, srvIndex_(other.srvIndex_) {
+	, srvIndex_(other.srvIndex_)
+	, indexSrvIndex_(other.indexSrvIndex_) {
 	// ムーブ元が解放しないよう所有権を手放させる
 	other.srvIndex_ = kInvalidSrvIndex;
+	other.indexSrvIndex_ = kInvalidSrvIndex;
 }
 
 Mesh& Mesh::operator=(Mesh&& other) noexcept {
@@ -50,8 +54,10 @@ Mesh& Mesh::operator=(Mesh&& other) noexcept {
 		indexBufferView_ = other.indexBufferView_;
 		srvHandle_ = other.srvHandle_;
 		srvIndex_ = other.srvIndex_;
+		indexSrvIndex_ = other.indexSrvIndex_;
 
 		other.srvIndex_ = kInvalidSrvIndex;
+		other.indexSrvIndex_ = kInvalidSrvIndex;
 	}
 	return *this;
 }
@@ -60,6 +66,10 @@ void Mesh::FreeSrv() {
 	if (srvIndex_ != kInvalidSrvIndex) {
 		SRVManager::GetInstance()->Free(srvIndex_);
 		srvIndex_ = kInvalidSrvIndex;
+	}
+	if (indexSrvIndex_ != kInvalidSrvIndex) {
+		SRVManager::GetInstance()->Free(indexSrvIndex_);
+		indexSrvIndex_ = kInvalidSrvIndex;
 	}
 }
 
@@ -111,6 +121,27 @@ void Mesh::CreateMesh() {
 	srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
 
 	device->CreateShaderResourceView(vertexResource_.Get(), &srvDesc, srvHandle_.first);
+
+	// インデックスの SRV。レイが当たった三角形の頂点を引くのに使う
+	if (indexSrvIndex_ == kInvalidSrvIndex) {
+		indexSrvIndex_ = SRVManager::GetInstance()->Allocate();
+	}
+	D3D12_SHADER_RESOURCE_VIEW_DESC indexSrvDesc{};
+	indexSrvDesc.Format = DXGI_FORMAT_R32_UINT;
+	indexSrvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	indexSrvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+	indexSrvDesc.Buffer.FirstElement = 0;
+	indexSrvDesc.Buffer.NumElements = static_cast<UINT>(indexData_.size());
+	indexSrvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
+	device->CreateShaderResourceView(indexResource_.Get(), &indexSrvDesc, SRVManager::GetInstance()->GetCPUDescriptorHandle(indexSrvIndex_));
+}
+
+float Mesh::GetBoundingRadius() const {
+	float maxSquared = 0.0f;
+	for (const VertexData& vertex : vertexData_) {
+		maxSquared = (std::max)(maxSquared, vertex.pos.x * vertex.pos.x + vertex.pos.y * vertex.pos.y + vertex.pos.z * vertex.pos.z);
+	}
+	return std::sqrt(maxSquared);
 }
 
 void Mesh::AddVertex(const VertexData& vertex) {

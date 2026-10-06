@@ -35,6 +35,8 @@
             0.42
         ],
         "lightIntensity": 0.6,
+        "sharpen": 0.4,
+        "vignette": 0.25,
         "skyBox": true,
         "skyBoxColor": [
             0.45,

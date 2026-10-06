@@ -126,7 +126,7 @@ PixelShaderOutput main(VertxShaderOutput input)
             }
 
             radiance *= TraceShadowPunctual(input.WorldPosition, light.position, geometricNormal,
-                                            gLights.rayTracedShadowMask, kShadowMaskPoint);
+                                            gLights.rayTracedShadowMask, kShadowMaskPoint, light.sourceRadius);
 
             totalLight += BRDF(normal, toEye, L, diffuseColor, f0, roughness) * radiance;
         }
@@ -144,15 +144,36 @@ PixelShaderOutput main(VertxShaderOutput input)
             }
 
             radiance *= TraceShadowPunctual(input.WorldPosition, light.position, geometricNormal,
-                                            gLights.rayTracedShadowMask, kShadowMaskSpot);
+                                            gLights.rayTracedShadowMask, kShadowMaskSpot, 0.0f);
 
             totalLight += BRDF(normal, toEye, L, diffuseColor, f0, roughness) * radiance;
         }
 
-        // 鏡面の環境光。金属は拡散反射を持たないので、これが無いと直接光のハイライト以外は黒くなる
-        float3 specularEnv = GetAmbientSpecular(input.WorldPosition, normal, toEye, roughness, f0,
-                                                ambientColor * ao, gLights.reflectionMaxDistance,
-                                                gLights.enableReflection, gLights.ambientMode, gSampler);
+        // 鏡面の環境光。金属は拡散反射を持たないので、これが無いと直接光のハイライト以外は黒くなる。
+        // 映り込ませないマテリアルは掛けても0なので、レイを飛ばす前に落とす
+        uint reflectionMode = gMaterial.environmentCoefficient > 0.0f ? gLights.reflectionMode : kReflectionModeOff;
+        ReflectionHit reflectionHit = TraceReflectionHit(input.WorldPosition, reflect(-toEye, normal), normal,
+                                                         gLights.reflectionMaxDistance, reflectionMode);
+        float3 occludedColor = ambientColor * ao;
+        if (reflectionHit.isHit && reflectionMode == kReflectionModeObjects)
+        {
+            // 画面上の大きさが分からずミップを選べないので、粗い面ほどぼかす。
+            // UVが引けなかった物は、いちばん粗いミップ(テクスチャ全体の平均色)で済ませる
+            float hitLod = reflectionHit.hasUV ? 1.0f + roughness * 6.0f : 16.0f;
+            float3 hitTexture = gTextures[NonUniformResourceIndex(reflectionHit.textureIndex)]
+                                    .SampleLevel(gSampler, reflectionHit.uv, hitLod).rgb;
+            float3 sunDirection = float3(0.0f, 1.0f, 0.0f);
+            float3 sunRadiance = float3(0.0f, 0.0f, 0.0f);
+            if (gLights.numDirectionalLights > 0)
+            {
+                sunDirection = normalize(-gLights.directionalLights[0].direction);
+                sunRadiance = gLights.directionalLights[0].color.rgb * gLights.directionalLights[0].intensity;
+            }
+            occludedColor = ShadeReflectionHit(reflectionHit, hitTexture, gLights.ambientSkyColor, gLights.ambientGroundColor,
+                                               gLights.ambientIntensity, sunDirection, sunRadiance, gLights.rayTracedShadowMask);
+        }
+        float3 specularEnv = GetAmbientSpecular(normal, toEye, roughness, f0, reflectionHit.isHit,
+                                                occludedColor, gLights.ambientMode, gSampler);
 
         totalLight += specularEnv * gMaterial.environmentCoefficient * gLights.reflectionIntensity;
 
@@ -163,6 +184,13 @@ PixelShaderOutput main(VertxShaderOutput input)
     {
         output.color = gMaterial.color * textureColor;
     }
+
+    // 自分で光るぶん。ライトにも影にも左右されない
+    output.color.rgb += gMaterial.emissive * textureColor.rgb;
+
+    // リムライト。視線に対して寝ている面(輪郭)ほど光るので、背景から浮いて見える
+    float rimFacing = saturate(dot(normalize(input.normal), normalize(gCamera.worldPosition - input.WorldPosition)));
+    output.color.rgb += gMaterial.rimColor * pow(1.0f - rimFacing, max(gMaterial.rimPower, 0.01f));
 
     // 空気(フォグ)。ライティングしない物にも掛ける。濃さが0なら何もしない
     float fogAmount = FogAmount(gLights.fog, gCamera.worldPosition, input.WorldPosition);

@@ -9,6 +9,7 @@ namespace GameObject {
 	class GameObject;
 	class PlacedObject;
 	class SpawnPoint;
+	class PlacedLight;
 }
 namespace Graphics {
 	class PlacedSprite;
@@ -61,6 +62,38 @@ namespace Scene {
 		float exposure = 2.0f;
 		float saturation = 1.0f;
 		float contrast = 1.0f;
+		/// <summary>輪郭をくっきりさせる強さ。0で掛からない</summary>
+		float sharpen = 0.0f;
+		/// <summary>画面の四隅を暗くする強さ。0で掛からない</summary>
+		float vignette = 0.0f;
+		/// <summary>暗い所と明るい所に掛ける色。白で掛からない</summary>
+		Math::Vector3 shadowTint = { 1.0f,1.0f,1.0f };
+		Math::Vector3 highlightTint = { 1.0f,1.0f,1.0f };
+
+		// 光の筋(ゴッドレイ)。平行光源の来る方を向くと、物の隙間から光が伸びる。色と向きは平行光源のもの
+		/// <summary>0で掛からない</summary>
+		float godRayIntensity = 0.0f;
+		/// <summary>筋の長さ。1で太陽まで届く</summary>
+		float godRayLength = 0.6f;
+		/// <summary>光源とみなす太陽のまわりの広さ。画面の高さが1</summary>
+		float godRaySunSize = 0.4f;
+
+		// 鏡面の映り込み。映り込ませるマテリアル(environment が0より大きい物)にだけ効く
+		/// <summary>Graphics::RayTracedReflectionMode の値。0:Off(どの向きにも空が映る) 1:Occlusion(遮られた向きは空を映さない) 2:Objects(遮った物の色を映す)</summary>
+		int reflectionMode = 0;
+		/// <summary>この距離までの物を見る</summary>
+		float reflectionMaxDistance = 100.0f;
+		float reflectionIntensity = 1.0f;
+
+		// 被写界深度。ピントの合う距離から離れた物をぼかす
+		/// <summary>ぼけの最大半径(画素)。0で掛からない</summary>
+		float dofBlur = 0.0f;
+		/// <summary>ピントの合う、カメラからの距離</summary>
+		float dofFocusDistance = 10.0f;
+		/// <summary>ピントの前後、この幅まではぼかさない</summary>
+		float dofFocusRange = 5.0f;
+		/// <summary>そこからこの距離をかけて最大のぼけに達する</summary>
+		float dofFalloff = 20.0f;
 	};
 
 	/// <summary>
@@ -87,10 +120,13 @@ namespace Scene {
 
 		/// <summary>置物を1つ追加する</summary>
 		GameObject::PlacedObject* Add(const std::string& modelName);
-		/// <summary>置物か出現位置を破棄する</summary>
+		/// <summary>置物・出現位置・ライトを同じ設定でもう1つ作る</summary>
+		/// <returns>作ったもの。この一覧のものでなければ nullptr</returns>
+		GameObject::GameObject* Duplicate(const GameObject::GameObject* source);
+		/// <summary>置物・出現位置・ライトを破棄する</summary>
 		/// <returns>この一覧のものだったら true</returns>
 		bool Remove(const GameObject::GameObject* object);
-		/// <summary>この一覧の置物か出現位置か</summary>
+		/// <summary>この一覧の置物・出現位置・ライトか</summary>
 		bool Contains(const GameObject::GameObject* object) const;
 		/// <summary>名前で置物を探す。無ければ nullptr</summary>
 		/// <remarks>同じ名前が複数あれば先頭を返す</remarks>
@@ -103,6 +139,11 @@ namespace Scene {
 		/// <summary>入口の名前に合う出現位置</summary>
 		/// <remarks>名前が空か、合うものが無ければ先頭を返す。1つも無ければ nullptr</remarks>
 		const GameObject::SpawnPoint* FindSpawnPoint(const std::string& entry) const;
+
+		//========================================================================*/
+		//* ライト
+		/// <summary>点光源かスポットライトを1つ追加する</summary>
+		GameObject::PlacedLight* AddLight(bool isSpot);
 
 		//========================================================================*/
 		//* スプライト
@@ -143,6 +184,7 @@ namespace Scene {
 		Graphics::LightManager* lightManager_ = nullptr;
 		std::vector<std::unique_ptr<GameObject::PlacedObject>> objects_;
 		std::vector<std::unique_ptr<GameObject::SpawnPoint>> spawnPoints_;
+		std::vector<std::unique_ptr<GameObject::PlacedLight>> lights_;
 		std::vector<std::unique_ptr<Graphics::PlacedSprite>> sprites_;
 	};
 

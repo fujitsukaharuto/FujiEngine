@@ -17,8 +17,12 @@ namespace Editor {
 	class GizmoHelper {
 	public:
 
-		/// <summary>操作モードのラジオボタン(TRANSLATE/ROTATE/SCALE)を描画する</summary>
+		/// <summary>操作モードのラジオボタン(TRANSLATE/ROTATE/SCALE)と、スナップの設定を描画する</summary>
 		void DrawOperationRadio();
+
+		/// <summary>今のスナップの刻み。スナップしないなら nullptr</summary>
+		/// <remarks>ImGuizmo::Manipulate にそのまま渡す形(移動は3成分、回転は度、拡縮は倍率)。Ctrl を押している間は設定と逆になる</remarks>
+		static const float* CurrentSnap(GizmoOperation operation);
 
 		/// <summary>
 		/// ギズモを表示しTransに反映する。編集完了時にUndoコマンドを発行する
@@ -36,6 +40,12 @@ namespace Editor {
 		Math::Vector3 prevScale_;
 		int gizmoType_ = 0;
 		bool isUsingGizmo_ = false;
+
+		// スナップは全てのギズモで共通。オブジェクトを選び直すたびに入れ直さずに済むように
+		static inline bool isSnap_ = false;
+		static inline float snapTranslate_ = 1.0f;
+		static inline float snapRotate_ = 15.0f;	// 度
+		static inline float snapScale_ = 0.1f;
 	};
 }
 #endif // _DEBUGMODE

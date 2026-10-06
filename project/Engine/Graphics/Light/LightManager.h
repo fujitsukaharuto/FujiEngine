@@ -55,6 +55,16 @@ namespace Graphics {
 	};
 
 	/// <summary>
+	/// 鏡面の映り込みで、反射方向にある物をどう扱うか
+	/// </summary>
+	/// <remarks>HLSL 側 (Common/RayTracedReflection.hlsli) の kReflectionMode* と同じ値であること</remarks>
+	enum RayTracedReflectionMode : uint32_t {
+		kReflectionModeOff = 0,			// 遮蔽を見ない。どの向きにも空が映る(レイトレ導入前と同じ絵)
+		kReflectionModeOcclusion = 1,	// 物に遮られた向きには空を映さない
+		kReflectionModeObjects = 2,		// 遮った物の色を映す。いちばん手前の物を探すので Occlusion より重い
+	};
+
+	/// <summary>
 	/// 空気(フォグ)。遠くの物ほどこの色へ寄せる
 	/// </summary>
 	/// <remarks>HLSL 側 (Common/Fog.hlsli) の FogParams と並びが一致していること。設定は配置データの環境が入れる</remarks>
@@ -99,10 +109,10 @@ namespace Graphics {
 		// デノイザを通すと粒が見えないので既定は Screen(実測 1.18ms)
 		uint32_t aoMode = kAOModeScreen;
 
-		// 鏡面の環境光の遮蔽。絵が変わるので既定は無効
+		// 鏡面の映り込み。絵が変わるので既定は Off。設定は配置データの環境が入れる
 		float reflectionMaxDistance = 100.0f;
 		float reflectionIntensity = 1.0f;
-		uint32_t enableReflection = 0;
+		uint32_t reflectionMode = kReflectionModeOff;
 		// Soft は AO と合わせて約2.0ms。既定は Hard で、要るときだけ ImGui で切り替える
 		uint32_t shadowMode = kShadowModeHard;
 
@@ -149,13 +159,15 @@ namespace Graphics {
 		/// ポイントライトの追加
 		/// </summary>
 		void AddPointLight();
-		void AddPointLight(const PointLightData& data);
+		/// <returns>入れた番号(GetPointLight に渡す)。上限まで埋まっていたら -1</returns>
+		int AddPointLight(const PointLightData& data);
 
 		/// <summary>
 		/// スポットライトの追加
 		/// </summary>
 		void AddSpotLight();
-		void AddSpotLight(const SpotLightData& data);
+		/// <returns>入れた番号(GetSpotLight に渡す)。上限まで埋まっていたら -1</returns>
+		int AddSpotLight(const SpotLightData& data);
 
 		/// <summary>
 		/// データをコマンドリストに送る
@@ -189,6 +201,13 @@ namespace Graphics {
 		void SetNumSpotLights(int num) { allLightsData_.numSpotLights = num; }
 		/// <summary>フォグの設定を入れる。カメラの位置は毎フレーム自前で入れるので、渡された値は使わない</summary>
 		void SetFog(const FogData& fog);
+		/// <summary>鏡面の映り込みの設定を入れる</summary>
+		/// <param name="maxDistance">この距離までの物を見る</param>
+		void SetReflection(RayTracedReflectionMode mode, float maxDistance, float intensity) {
+			allLightsData_.reflectionMode = mode;
+			allLightsData_.reflectionMaxDistance = maxDistance;
+			allLightsData_.reflectionIntensity = intensity;
+		}
 
 		void DebugGUI();
 

@@ -6,6 +6,7 @@
 #include <numbers>
 #include "Engine/GameObject/PlacedObject.h"
 #include "Engine/GameObject/SpawnPoint.h"
+#include "Engine/GameObject/PlacedLight.h"
 #include "Engine/Scene/Level.h"
 #include "Engine/Graphics/Sprite/PlacedSprite.h"
 #include "Engine/Graphics/Texture/TextureManager.h"
@@ -127,10 +128,30 @@ namespace Editor {
 
 		Object* selected = GetSelected();
 		Graphics::PlacedSprite* selectedSprite = GetSelectedSprite(&level);
+		Object* added = nullptr;
 		if (ImGui::Button("Add Spawn")) {
-			GameObject::SpawnPoint* point = level.AddSpawnPoint();
 			// 原点に出るので、ギズモで動かして使う
-			selected_ = point;
+			added = level.AddSpawnPoint();
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Point Light")) {
+			added = level.AddLight(false);
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Spot Light")) {
+			added = level.AddLight(true);
+		}
+
+		const bool canDuplicate = selected && level.Contains(selected);
+		ImGui::BeginDisabled(!canDuplicate);
+		// 文字を打っている最中の Ctrl+D は拾わない
+		const bool isShortcut = !ImGui::GetIO().WantTextInput && ImGui::GetIO().KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_D, false);
+		if ((ImGui::Button("Duplicate") || isShortcut) && canDuplicate) {
+			added = level.Duplicate(selected);
+		}
+		ImGui::EndDisabled();
+		if (added) {
+			selected_ = added;
 			isEnvironmentSelected_ = false;
 			selectedSprite_ = nullptr;
 			revealSelected_ = true;

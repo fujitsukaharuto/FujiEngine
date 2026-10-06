@@ -98,7 +98,8 @@ void TestScene::SetupLights() {
 	// 平行光源の向きと強さは配置データの環境が入れる。ここは本数だけ戻す
 	lightManager_->SetNumDirectionalLights(1);
 
-	lightManager_->SetNumPointLights(1);
+	// 本数は触らない。配置データに置いたライトが後ろの枠に並んでいるので、減らすとそれが消える。
+	// 点光源0番は起動時からある枠
 	PointLightData* point = lightManager_->GetPointLight(0);
 	*point = PointLightData{};
 	point->color = { 1.0f,0.6f,0.3f,1.0f };
@@ -107,8 +108,13 @@ void TestScene::SetupLights() {
 	point->radius = 25.0f;
 	point->decay = 1.0f;
 
-	lightManager_->SetNumSpotLights(1);
-	SpotLightData* spot = lightManager_->GetSpotLight(0);
+	if (spotSlot_ < 0) {
+		spotSlot_ = lightManager_->AddSpotLight(SpotLightData{});
+	}
+	if (spotSlot_ < 0) {
+		return;
+	}
+	SpotLightData* spot = lightManager_->GetSpotLight(spotSlot_);
 	*spot = SpotLightData{};
 	spot->color = { 0.5f,0.7f,1.0f,1.0f };
 	spot->position = { -13.0f,20.0f,-2.0f };
@@ -122,9 +128,15 @@ void TestScene::SetupLights() {
 }
 
 void TestScene::ApplyLightPreset(bool directional, bool point, bool spot) {
+	// いったん全部点けてから、切るものだけ消す。配置データに置いたライトには触らない
+	SetupLights();
 	lightManager_->SetNumDirectionalLights(directional ? 1 : 0);
-	lightManager_->SetNumPointLights(point ? 1 : 0);
-	lightManager_->SetNumSpotLights(spot ? 1 : 0);
+	if (!point) {
+		lightManager_->GetPointLight(0)->intensity = 0.0f;
+	}
+	if (!spot && spotSlot_ >= 0) {
+		lightManager_->GetSpotLight(spotSlot_)->intensity = 0.0f;
+	}
 }
 
 void TestScene::CheckSceneChange() {

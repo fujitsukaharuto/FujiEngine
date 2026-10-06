@@ -93,6 +93,12 @@ namespace Graphics {
 		void SetBillboardMat(const Math::Matrix4x4& mat) { billboardMatrix_ = mat; }
 		/// <summary>ライトモードの設定</summary>
 		void SetLightEnable(LightMode mode);
+		/// <summary>リムライトを全マテリアルへ設定する。色が黒なら掛からない</summary>
+		void SetRim(const Math::Vector3& color, float power = 3.0f) {
+			for (Material& material : material_) {
+				material.SetRim(color, power);
+			}
+		}
 		/// <summary>影やAOのレイで遮蔽物として扱うか</summary>
 		void SetCastShadow(bool is) { castShadow_ = is; }
 

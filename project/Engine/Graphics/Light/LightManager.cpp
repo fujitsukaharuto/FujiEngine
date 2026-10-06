@@ -77,11 +77,12 @@ void LightManager::AddPointLight() {
 	}
 }
 
-void LightManager::AddPointLight(const PointLightData& data) {
-	if (allLightsData_.numPointLights < kMaxPointLights) {
-		allLightsData_.pointLights[allLightsData_.numPointLights] = data;
-		allLightsData_.numPointLights++;
+int LightManager::AddPointLight(const PointLightData& data) {
+	if (allLightsData_.numPointLights >= kMaxPointLights) {
+		return -1;
 	}
+	allLightsData_.pointLights[allLightsData_.numPointLights] = data;
+	return allLightsData_.numPointLights++;
 }
 
 void LightManager::AddSpotLight() {
@@ -99,11 +100,12 @@ void LightManager::AddSpotLight() {
 	}
 }
 
-void LightManager::AddSpotLight(const SpotLightData& data) {
-	if (allLightsData_.numSpotLights < kMaxSpotLights) {
-		allLightsData_.spotLights[allLightsData_.numSpotLights] = data;
-		allLightsData_.numSpotLights++;
+int LightManager::AddSpotLight(const SpotLightData& data) {
+	if (allLightsData_.numSpotLights >= kMaxSpotLights) {
+		return -1;
 	}
+	allLightsData_.spotLights[allLightsData_.numSpotLights] = data;
+	return allLightsData_.numSpotLights++;
 }
 
 void LightManager::SetLightCommand(ID3D12GraphicsCommandList* commandList) {
@@ -201,10 +203,10 @@ void LightManager::DebugGUI() {
 		}
 
 		if (ImGui::TreeNode("RayTraced Reflection")) {
-			// 切ると遮蔽を見ずに環境色をそのまま引く(レイトレ導入前と同じ絵)
-			bool enableReflection = (allLightsData_.enableReflection != 0);
-			if (ImGui::Checkbox("Occlusion##reflection", &enableReflection)) {
-				allLightsData_.enableReflection = enableReflection ? 1u : 0u;
+			// シーンごとの設定は Hierarchy > Environment にある。ここで変えた値はシーンを移ると戻る
+			int reflectionMode = static_cast<int>(allLightsData_.reflectionMode);
+			if (ImGui::Combo("Mode##reflection", &reflectionMode, "Off\0Occlusion\0Objects\0")) {
+				allLightsData_.reflectionMode = static_cast<uint32_t>(reflectionMode);
 			}
 			ImGui::DragFloat("MaxDistance##reflection", &allLightsData_.reflectionMaxDistance, 1.0f, 0.0f, 10000.0f);
 			ImGui::SliderFloat("Intensity##reflection", &allLightsData_.reflectionIntensity, 0.0f, 2.0f);

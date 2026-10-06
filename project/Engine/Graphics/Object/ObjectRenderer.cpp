@@ -178,19 +178,40 @@ void ObjectRenderer::BuildRaytracingScene() {
 	}
 
 	raytracingScene_->BeginFrame();
+	// 反射に映す色。メッシュごとのマテリアルから拾う。当たった物の色を映す設定のときしか使われないので、そのときだけ集める
+	if (lightManager_ && lightManager_->GetData().reflectionMode == kReflectionModeObjects) {
+		rayLookFrames_ = DXC::kFrameCount_ + 1;
+	} else if (rayLookFrames_ > 0) {
+		--rayLookFrames_;
+	}
+	const bool isCollectingLooks = rayLookFrames_ > 0;
+	std::vector<RayInstanceData> looks;
 	for (RenderObject* obj : renderQueue_) {
 		// 加算合成かどうかは Draw() で決まるので、この時点の値はこのフレームのもの
 		if (!obj->IsRayOccluder()) {
 			continue;
 		}
 
+		looks.clear();
+		for (size_t i = 0; isCollectingLooks && i < obj->GetMaterialCount(); ++i) {
+			Material& material = obj->GetMaterial(i);
+			const Math::Vector4 color = material.GetColor();
+			RayInstanceData look;
+			look.color = { color.x, color.y, color.z };
+			look.textureIndex = material.GetTextureSrvIndex();
+			look.emissive = material.GetEmissive();
+			look.uvScale = material.GetUVScale();
+			look.uvOffset = material.GetUVTrans();
+			looks.push_back(look);
+		}
+
 		if (obj->IsSkinned()) {
 			// IsSkinned() を返すのは AnimationModel だけ
 			auto* skinned = static_cast<AnimationModel*>(obj);
 			raytracingScene_->AddSkinnedInstance(obj, obj->GetModel(),
-				skinned->GetSkinnedMeshes(), obj->GetWorldMat());
+				skinned->GetSkinnedMeshes(), obj->GetWorldMat(), isCollectingLooks ? &looks : nullptr);
 		} else {
-			raytracingScene_->AddInstance(obj->GetModel(), obj->GetWorldMat());
+			raytracingScene_->AddInstance(obj->GetModel(), obj->GetWorldMat(), isCollectingLooks ? &looks : nullptr);
 		}
 	}
 	raytracingScene_->BuildTlas();
