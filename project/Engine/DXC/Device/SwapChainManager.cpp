@@ -3,6 +3,7 @@
 #include "Engine/DXC/Command/DXCommand.h"
 #include "Engine/DXC/Resource/SRVManager.h"
 #include <cassert>
+#include "Engine/Core/Time/FPSKeeper.h"
 
 using namespace DXC;
 
@@ -28,7 +29,13 @@ void SwapChainManager::Finalize() {
 }
 
 void SwapChainManager::Present() {
-	swapChain_->Present(1, 0);// 第一引数、垂直同期は1がON、0がOFF
+	// 第一引数、垂直同期は1がON、0がOFF。切るとモニターのリフレッシュレートを超えて描ける(負荷の余裕を測るとき用)
+	if (Core::FPSKeeper::IsVSync()) {
+		swapChain_->Present(1, 0);
+	} else {
+		// フラグが無いと、バッファ2枚ではモニターの更新を待たされて上限を超えない
+		swapChain_->Present(0, isTearingSupported_ ? DXGI_PRESENT_ALLOW_TEARING : 0);
+	}
 }
 
 void SwapChainManager::CreateBarrier(D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after, DXCommand* command) {
@@ -66,8 +73,14 @@ void SwapChainManager::CreateSwapChain(IDXGIFactory7* factory, ID3D12CommandQueu
 	swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	swapChainDesc.SampleDesc.Count = 1;
 	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-	swapChainDesc.BufferCount = backBufferCount_;
+	swapChainDesc.BufferCount = kBackBufferCount_;
 	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+
+	BOOL isTearingAllowed = FALSE;
+	if (SUCCEEDED(factory->CheckFeatureSupport(DXGI_FEATURE_PRESENT_ALLOW_TEARING, &isTearingAllowed, sizeof(isTearingAllowed)))) {
+		isTearingSupported_ = (isTearingAllowed == TRUE);
+	}
+	swapChainDesc.Flags = isTearingSupported_ ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : 0;
 
 	// スワップチェーンの生成
 	hr = factory->CreateSwapChainForHwnd(
@@ -86,7 +99,9 @@ void SwapChainManager::Resize(ID3D12Device* device, int width, int height) {
 	for (auto& res : swapChainResources_) {
 		res.Reset();
 	}
-	HRESULT hr = swapChain_->ResizeBuffers(backBufferCount_, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, 0);
+	// 作成時と同じフラグを渡さないと失敗する
+	HRESULT hr = swapChain_->ResizeBuffers(kBackBufferCount_, width, height, DXGI_FORMAT_R8G8B8A8_UNORM,
+		isTearingSupported_ ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : 0);
 	assert(SUCCEEDED(hr));
 	width_ = width;
 	height_ = height;
@@ -94,35 +109,27 @@ void SwapChainManager::Resize(ID3D12Device* device, int width, int height) {
 }
 
 void SwapChainManager::CreateRenderTargets(ID3D12Device* device) {
-	rtvDescriptorHeap_ = DXC::Helper::CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, numRTVHandle_, false);
+	rtvDescriptorHeap_ = DXC::Helper::CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, kRtvCount_, false);
+
+	const D3D12_CPU_DESCRIPTOR_HANDLE rtvStartHandle = rtvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
+	const UINT increment = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	for (UINT i = 0; i < kRtvCount_; ++i) {
+		rtvHandles_[i].ptr = rtvStartHandle.ptr + static_cast<SIZE_T>(increment) * i;
+	}
+
 	CreateBackBufferViews(device);
-
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvStartHandle = rtvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
-	rtvHandles_[1].ptr = rtvStartHandle.ptr + device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-
-	// ここより下はオフスクリーンで使う用
-	rtvHandles_[2].ptr = rtvHandles_[1].ptr + device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-	rtvHandles_[3].ptr = rtvHandles_[2].ptr + device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-
-	rtvHandles_[4].ptr = rtvHandles_[3].ptr + device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-	rtvHandles_[5].ptr = rtvHandles_[4].ptr + device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 }
 
 void SwapChainManager::CreateBackBufferViews(ID3D12Device* device) {
-	HRESULT hr = swapChain_->GetBuffer(0, IID_PPV_ARGS(&swapChainResources_[0]));
-	assert(SUCCEEDED(hr));
-	hr = swapChain_->GetBuffer(1, IID_PPV_ARGS(&swapChainResources_[1]));
-	assert(SUCCEEDED(hr));
-
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
 	rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvStartHandle = rtvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
-	rtvHandles_[0] = rtvStartHandle;
-	device->CreateRenderTargetView(swapChainResources_[0].Get(), &rtvDesc, rtvHandles_[0]);
-	rtvHandles_[1].ptr = rtvHandles_[0].ptr + device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-	device->CreateRenderTargetView(swapChainResources_[1].Get(), &rtvDesc, rtvHandles_[1]);
+	for (UINT i = 0; i < kBackBufferCount_; ++i) {
+		HRESULT hr = swapChain_->GetBuffer(i, IID_PPV_ARGS(&swapChainResources_[i]));
+		assert(SUCCEEDED(hr));
+		device->CreateRenderTargetView(swapChainResources_[i].Get(), &rtvDesc, rtvHandles_[i]);
+	}
 }
 
 void SwapChainManager::CreateDepthBuffer(ID3D12Device* device, int width, int height) {
@@ -131,7 +138,7 @@ void SwapChainManager::CreateDepthBuffer(ID3D12Device* device, int width, int he
 			device, width, height);
 	}
 
-	dsvDescriptorHeap_ = DXC::Helper::CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 2, false);
+	dsvDescriptorHeap_ = DXC::Helper::CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, DXC::kFrameCount_, false);
 
 	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
 	UINT handleIncrementSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);

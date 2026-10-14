@@ -61,13 +61,17 @@ namespace Editor {
 		Material& material = obj.GetMaterial();
 
 		Vector4 color = material.GetColor();
-		ImGui::ColorEdit4("color", &color.x);
-		obj.SetColor(color);
+		// 触ったときだけ入れる。全マテリアルが同じ色になる
+		if (ImGui::ColorEdit4("color", &color.x)) {
+			obj.SetColor(color);
+		}
 		Vector2 uvScale = material.GetUVScale();
 		Vector2 uvTrans = material.GetUVTrans();
-		ImGui::DragFloat2("uvScale", &uvScale.x, 0.1f);
-		ImGui::DragFloat2("uvTrans", &uvTrans.x, 0.1f);
-		obj.SetUVScale(uvScale, uvTrans);
+		bool isUVChanged = ImGui::DragFloat2("uvScale", &uvScale.x, 0.1f);
+		isUVChanged |= ImGui::DragFloat2("uvTrans", &uvTrans.x, 0.1f);
+		if (isUVChanged) {
+			obj.SetUVScale(uvScale, uvTrans);
+		}
 
 		ImGui::SeparatorText("PBR");
 		float roughness = material.GetRoughness();

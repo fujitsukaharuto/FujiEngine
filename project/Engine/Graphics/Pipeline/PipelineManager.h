@@ -73,8 +73,7 @@ namespace Graphics {
 		void CreateComputePipe(Pipe type, const std::wstring& csPath);
 
 		/// <summary>積まれたパイプラインの Initialize をまとめて並列に走らせる</summary>
-		/// <remarks>中身はHLSLのコンパイルが大半で、起動時間の3割を占めていた。
-		/// 各パイプラインは互いを参照しないので並列に回せる</remarks>
+		/// <remarks>中身は HLSL のコンパイルが大半。各パイプラインは互いを参照しないので並列に回せる</remarks>
 		void InitializePending();
 
 	private:

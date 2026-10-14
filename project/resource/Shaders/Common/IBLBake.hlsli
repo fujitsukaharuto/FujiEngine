@@ -47,7 +47,7 @@ float3 ImportanceSampleGGX(float2 xi, float3 N, float roughness)
 }
 
 /// <summary>Smith の幾何減衰(IBL用)</summary>
-/// <remarks>直接光用の G_SmithSchlick とは k の取り方が違う(直接光は (r+1)^2/8、IBLは a^2/2)</remarks>
+/// <remarks>k の取り方が直接光用の G_SmithSchlick と違う。直接光は (r+1)^2/8、IBL は a^2/2</remarks>
 float G_SmithIBL(float NdotV, float NdotL, float roughness)
 {
     float a = roughness * roughness;

@@ -63,6 +63,7 @@ namespace Graphics {
 		// 一度だけエミット
 		void Emit() override;
 		bool IsEmit() const override { return isEmit_; }
+		bool WillDispatch() const override { return data_.emit != 0 && data_.count != 0; }
 
 		EmitterSphere& GetData() { return data_; }
 

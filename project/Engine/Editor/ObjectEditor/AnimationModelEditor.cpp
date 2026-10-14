@@ -18,8 +18,10 @@ namespace Editor {
 			}
 		}
 		Vector4 color = model.material_[0].GetColor();
-		ImGui::ColorEdit3("color", &color.x);
-		model.SetColor(color);
+		// 触ったときだけ入れる。全マテリアルが同じ色になる
+		if (ImGui::ColorEdit3("color", &color.x)) {
+			model.SetColor(color);
+		}
 		if (model.animations_.size() == 0) {
 			ImGui::Unindent();
 			return;

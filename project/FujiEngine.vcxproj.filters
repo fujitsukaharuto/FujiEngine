@@ -1136,9 +1136,6 @@
     <FxCompile Include="resource\Shaders\Object\PickingID.PS.hlsl">
       <Filter>resource\Shaders\Object</Filter>
     </FxCompile>
-    <FxCompile Include="resource\Shaders\Object\EnvMapObject3d.PS.hlsl">
-      <Filter>resource\Shaders\Object</Filter>
-    </FxCompile>
     <FxCompile Include="resource\Shaders\Object\Object3d.PS.hlsl">
       <Filter>resource\Shaders\Object</Filter>
     </FxCompile>
@@ -1300,7 +1297,13 @@
     <None Include="resource\Shaders\Common\Noise.hlsli">
       <Filter>resource\Shaders\Common</Filter>
     </None>
+    <None Include="resource\Shaders\Common\Atmosphere.hlsli">
+      <Filter>resource\Shaders\Common</Filter>
+    </None>
     <None Include="resource\Shaders\Common\PBR.hlsli">
+      <Filter>resource\Shaders\Common</Filter>
+    </None>
+    <None Include="resource\Shaders\Common\SimpleLighting.hlsli">
       <Filter>resource\Shaders\Common</Filter>
     </None>
     <None Include="resource\Shaders\Common\Random.hlsli">

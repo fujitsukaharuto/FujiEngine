@@ -114,10 +114,7 @@ void Material::SetTexture(const std::string& name, bool overWrite) {
 }
 
 void Material::SetNormalMap(const std::string& name, bool overWrite) {
-	if (overWrite) {
-		TextureManager::GetInstance()->Load(name, overWrite);
-	}
-	normalMap_ = TextureManager::GetInstance()->GetTexture(name);
+	normalMap_ = TextureManager::GetInstance()->GetLinearTexture(name, overWrite);
 	materialData_.useNormalMap = 1;
 }
 

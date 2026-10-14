@@ -11,7 +11,7 @@ namespace GameObject {
 	/// <summary>
 	/// 配置データから作られる、動きを持たないオブジェクト
 	/// </summary>
-	/// <remarks>地形や背景の置物用。見た目の設定もデータに持つので、コードを書かずに置ける。生成・保存は Scene::Level が行う</remarks>
+	/// <remarks>地形や背景の置物用。見た目の設定もデータに持つ。生成・保存は Scene::Level が行う</remarks>
 	class PlacedObject : public GameObject {
 	public:
 
@@ -27,7 +27,7 @@ namespace GameObject {
 		/// <summary>発光で周りを照らすときに点光源の枠を借りる先。Create より前に渡す</summary>
 		void SetLightManager(Graphics::LightManager* lightManager) { lightManager_ = lightManager; }
 		/// <summary>周りを照らす光を消す。配置から外す直前に呼ぶ</summary>
-		/// <remarks>枠は返さない(PlacedLight と同じ)。デストラクタで触らないのは、LightManager が先に消えることがあるため</remarks>
+		/// <remarks>枠は返さない。LightManager が先に消えることがあるので、デストラクタでは触らない</remarks>
 		void TurnOffLight();
 		/// <summary>名前と見た目の設定。ここで変えた値が保存される</summary>
 		void ParameterGUI() override;
@@ -44,7 +44,7 @@ namespace GameObject {
 	private:
 
 		/// <summary>配置データが持つ見た目の設定</summary>
-		/// <remarks>optional は「書いてある時だけモデルの既定値を上書きする」ため。書いていない項目はモデル読み込み時の値のまま</remarks>
+		/// <remarks>optional は、書いてある項目だけモデルの既定値を上書きするため</remarks>
 		struct Look {
 			std::string model;
 			/// <summary>AnimationModel で作るか。映り込み(isMirror)とアニメーションはこちらでしか使えない</summary>

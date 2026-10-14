@@ -66,7 +66,7 @@ namespace DXC::Helper {
 	/// <summary>
 	/// 任意のフォーマット・用途の2Dテクスチャリソースを生成する。
 	/// </summary>
-	/// <remarks>CreateOffscreenTextureResource はフォーマットとフラグが固定なので、別のものはこちら</remarks>
+	/// <remarks>フォーマットとフラグを選べる版。固定でよければ CreateOffscreenTextureResource</remarks>
 	/// <param name="device">デバイス</param>
 	/// <param name="width">横</param>
 	/// <param name="height">縦</param>

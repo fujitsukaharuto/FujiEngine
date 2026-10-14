@@ -227,6 +227,9 @@ namespace Graphics {
 
 		// オーバーラップ: splat時に compute_N の graphics_{N-1} 待ちを省く
 		bool useOverlap_ = true;             // true:オーバーラップ有効(A/B計測用にトグル可)
+		// 粒子が1つも居らず出す予定も無いフレームが続いた数。続いている間は更新も描画も積まない
+		uint32_t idleFrames_ = 0;
+		bool isIdle_ = false;
 		bool prevDrawReadsScale_ = true;     // 前フレームのDrawがscaleを読んだか。2フレーム連続で読まないときだけ並走
 
 		std::vector<EmitterInfo> csEmitters_;

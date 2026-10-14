@@ -40,6 +40,8 @@ namespace Graphics {
 		virtual void Load(const std::string& fileName) = 0;
 		virtual void Emit() = 0;
 		virtual bool IsEmit() const = 0;
+		/// <summary>このフレームの Dispatch で粒子を出すか。Update の後に読むこと</summary>
+		virtual bool WillDispatch() const = 0;
 		virtual void SetPos(const Math::Vector3& pos) = 0;
 		virtual void SetEmit(bool state) = 0;
 		virtual void SetCount(int count) = 0;

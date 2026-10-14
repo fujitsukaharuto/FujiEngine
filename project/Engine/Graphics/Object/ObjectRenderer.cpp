@@ -52,6 +52,8 @@ void ObjectRenderer::Initialize(DXCom* pDxcom, LightManager* pLightManager) {
 
 	gpuTimer_ = std::make_unique<DXC::GPUTimer>();
 	gpuTimer_->Initialize(pDxcom->GetDevice(), pDxcom->GetDXCommand()->GetQueue(), kTimer_Count);
+	gpuTimer_->SetName(kTimer_Forward, "  Forward");
+	gpuTimer_->SetName(kTimer_AccelBuild, "  Accel build");
 }
 
 void ObjectRenderer::Finalize() {
@@ -121,7 +123,14 @@ void ObjectRenderer::Render() {
 	}
 
 	// 描画中のシェーダがレイを飛ばすので、TLASは描画より先に組む
-	BuildRaytracingScene();
+	{
+		ID3D12GraphicsCommandList* list = dxcommon_->GetCommandList();
+		const uint32_t index = dxcommon_->GetNowFrameCount();
+		gpuTimer_->Begin(list, index, kTimer_AccelBuild);
+		BuildRaytracingScene();
+		gpuTimer_->End(list, index, kTimer_AccelBuild);
+		gpuTimer_->Resolve(list, index, kTimer_AccelBuild);
+	}
 
 	// 画面空間のレイトレが読む深度と法線を先に書き出す。
 	// 読み手がいないなら走らせない＝AOもソフトシャドウも切っている間はプリパスの負荷も掛からない

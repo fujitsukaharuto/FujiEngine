@@ -79,7 +79,7 @@ namespace Graphics {
 		void Draw(ID3D12GraphicsCommandList* commandList, std::vector<Material>& materials);
 
 		/// <summary>アニメーションモデル用描画</summary>
-		void AnimationDraw(DXC::DXCom* pDxcom, ID3D12GraphicsCommandList* commandList, std::vector<SkinnedMesh>& skinnedMeshes, std::vector<Material>& materials);
+		void AnimationDraw(ID3D12GraphicsCommandList* commandList, std::vector<SkinnedMesh>& skinnedMeshes, std::vector<Material>& materials);
 
 		/// <summary>深度+法線プリパス用の描画</summary>
 		/// <remarks>プリパスはマテリアルとテクスチャしか宣言していないので、Draw とは別関数にしてある</remarks>

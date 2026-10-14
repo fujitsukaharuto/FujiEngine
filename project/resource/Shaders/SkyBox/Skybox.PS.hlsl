@@ -1,5 +1,6 @@
 #include "Skybox.hlsli"
 #include "../Common/Fog.hlsli"
+#include "../Common/Atmosphere.hlsli"
 
 struct Material
 {
@@ -39,10 +40,20 @@ PixelShaderOutput main(VertxShaderOutput input)
 
     float3 litColor = textureColor.rgb * gMaterial.color.rgb;
 
-    // この露光とトーンマップは SkyBox::GetHorizonColor() が同じ計算をしている。変えたら向こうも合わせること
-    float exposure = 0.25;
-    litColor *= exposure;
-    litColor = ToneMapACES(litColor);
+    if (gFog.skyMode == kSkyModeAtmosphere)
+    {
+        float3 direction = normalize(input.texcoord);
+        litColor = AtmosphereSky(direction, gFog.sunDirection, gFog.sunColor)
+                   + AtmosphereSunDisk(direction, gFog.sunDirection, gFog.sunColor);
+        litColor *= gMaterial.color.rgb * gFog.skyIntensity;
+    }
+    else
+    {
+        // この露光とトーンマップは SkyBox::GetHorizonColor() が同じ計算をしている。変えたら向こうも合わせること
+        float exposure = 0.25;
+        litColor *= exposure;
+        litColor = ToneMapACES(litColor);
+    }
 
     // 空気(フォグ)。遠くの地面が霞んで溶け込む先の色と、地平線の色を揃える
     litColor = lerp(litColor, FogColor(gFog, input.texcoord), FogAmountSky(gFog, normalize(input.texcoord)));

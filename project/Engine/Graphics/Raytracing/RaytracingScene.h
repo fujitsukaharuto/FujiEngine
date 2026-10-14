@@ -37,7 +37,7 @@ namespace Graphics {
 	/// <remarks>HLSL 側 (Common/RayTracedReflection.hlsli) の kRayInstance* と同じ値であること</remarks>
 	enum RayInstanceFlag : uint32_t {
 		kRayInstanceHasGeometry = 1u << 0,	// 頂点とインデックスを引ける(UV が分かる)
-		kRayInstanceHasNormal = 1u << 1,	// 頂点の法線がそのまま使える(スキニングで動かない)
+		kRayInstanceHasNormal = 1u << 1,	// 頂点の法線が使える
 	};
 
 	/// <summary>
@@ -134,6 +134,10 @@ namespace Graphics {
 			UINT64 scratchSize = 0;
 			/// <summary>最後に積んだフレーム。しばらく来なければ持ち主が消えたとみなして捨てる</summary>
 			uint64_t lastUsedFrame = 0;
+			/// <summary>組んだときの形状(頂点とインデックスのバッファと個数)。同じなら更新で済ませられる</summary>
+			uint64_t signature = 0;
+			/// <summary>組み直してから更新で済ませた回数。更新を重ねると木が粗くなるので、ときどき組み直す</summary>
+			uint32_t refitCount = 0;
 		};
 
 		/// <summary>GPUが使い終わるのを待ってから捨てるBLAS</summary>
@@ -144,6 +148,9 @@ namespace Graphics {
 
 		/// <summary>このフレーム数だけ経てば、そのフレームに積んだGPUの処理は終わっている</summary>
 		static constexpr uint64_t kReleaseDelayFrames = DXC::kFrameCount_ + 1;
+
+		/// <summary>スキンメッシュのBLASを、組み直さずに更新で済ませる回数の上限</summary>
+		static constexpr uint32_t kMaxSkinnedRefits = 120;
 
 		/// <summary>来なくなったスキンメッシュのBLASと、待ち終えた古いBLASを捨てる</summary>
 		void ReleaseUnusedSkinnedBlas();

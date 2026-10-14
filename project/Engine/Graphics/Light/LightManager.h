@@ -45,6 +45,24 @@ namespace Graphics {
 	};
 
 	/// <summary>
+	/// 空の描き方
+	/// </summary>
+	/// <remarks>HLSL 側 (Common/Atmosphere.hlsli) の kSkyMode* と同じ値であること</remarks>
+	enum SkyMode : uint32_t {
+		kSkyModeTexture = 0,		// キューブマップを貼る
+		kSkyModeAtmosphere = 1,		// 0番の平行光源の向きから計算する
+	};
+
+	/// <summary>
+	/// 直接光の計算式
+	/// </summary>
+	/// <remarks>HLSL 側 (Common/SimpleLighting.hlsli) の kLightingMode* と同じ値であること</remarks>
+	enum LightingMode : uint32_t {
+		kLightingModeSimple = 0,	// Lambert + Blinn-Phong
+		kLightingModePBR = 1,		// Cook-Torrance
+	};
+
+	/// <summary>
 	/// レイトレAOをどの経路で計算するか
 	/// </summary>
 	/// <remarks>HLSL 側 (Common/RayTracedAO.hlsli) の kAOMode* と同じ値であること</remarks>
@@ -79,6 +97,14 @@ namespace Graphics {
 		float skyAmount = 1.0f;			// 空へどれだけ掛けるか
 		// 水平の向きごとの色。+X, -X, +Z, -Z の順。空から色を取らないときは4つとも color と同じにする
 		Math::Vector4 horizonColor[4] = { { 0.6f,0.7f,0.8f,0.0f },{ 0.6f,0.7f,0.8f,0.0f },{ 0.6f,0.7f,0.8f,0.0f },{ 0.6f,0.7f,0.8f,0.0f } };
+		// 太陽の方向と色。0番の平行光源から毎フレーム LightManager が入れる
+		Math::Vector3 sunDirection = { 0.0f,1.0f,0.0f };
+		float sunScatter = 0.0f;		// 太陽の方向のフォグを明るくする強さ。0で無効
+		Math::Vector3 sunColor = { 1.0f,1.0f,1.0f };
+		float sunScatterPower = 8.0f;	// 大きいほど太陽のまわりだけが明るくなる
+		uint32_t skyMode = kSkyModeTexture;
+		float skyIntensity = 1.0f;		// 計算する空の明るさ
+		float skyPad[2] = {};
 	};
 
 	/// <summary>
@@ -92,7 +118,8 @@ namespace Graphics {
 		int32_t numDirectionalLights;
 		int32_t numPointLights;
 		int32_t numSpotLights;
-		float pad0;
+		// 0番の平行光源の影の中で映り込みをどれだけ暗くするか。0 だと金属の床に影が出ない
+		float reflectionShadow = 0.5f;
 
 		// 半球アンビエント。法線の上下で空色と地面色を混ぜる。
 		// PBR にすると Half-Lambert の回り込みが無くなるので、これが無いと影側が真っ黒になる
@@ -122,15 +149,24 @@ namespace Graphics {
 		// アンビエントの経路。IBL にすると半球近似をやめて焼いたキューブマップを引く。
 		// 既定が Hemisphere なのは、切り替えた瞬間に全マテリアルの明るさが変わるため
 		uint32_t ambientMode = kAmbientModeHemisphere;
-		uint32_t pad3 = 0;
+		// IBL のときだけアンビエントに掛ける倍率。環境マップは半球の2色よりずっと明るい
+		float iblAmbientScale = 0.6f;
+
+		// 空に掛けている色。映り込みと IBL にも同じ色を掛けて、見えている空と揃える
+		Math::Vector3 environmentTint = { 1.0f, 1.0f, 1.0f };
+		// 0 なら空を出していない。映り込みは半球の2色で代用する
+		uint32_t hasEnvironment = 1;
+
+		uint32_t lightingMode = kLightingModeSimple;
+		uint32_t padLighting[3] = {};
 
 		// 前方描画のPSはここから読む。空と粒子は同じ中身を gFog として別に受け取る
 		FogData fog;
 	};
 
 	// HLSL 側と大きさが食い違うと、ずれた位置から読んで絵が壊れる。並びを変えたらここで気付けるようにしておく
-	static_assert(sizeof(FogData) == 112, "FogData の大きさが Fog.hlsli の FogParams と一致していない");
-	static_assert(sizeof(AllLightsData) == 1424, "AllLightsData の大きさが Object3d.hlsli の AllLights と一致していない");
+	static_assert(sizeof(FogData) == 160, "FogData の大きさが Fog.hlsli の FogParams と一致していない");
+	static_assert(sizeof(AllLightsData) == 1504, "AllLightsData の大きさが Object3d.hlsli の AllLights と一致していない");
 
 	/// <summary>
 	/// ライト管理クラス
@@ -152,7 +188,7 @@ namespace Graphics {
 		void CreateLight();
 
 		/// <summary>起動時の状態に戻す。平行光源1つ(真下・白・1.0)と、強さ0の点光源1つ</summary>
-		/// <remarks>シーンに入るたびに Level が呼ぶ。点光源1つはゲーム側が GetPointLight(0) を使う前提のため</remarks>
+		/// <remarks>シーンに入るたびに Level が呼ぶ。点光源1つはゲーム側が GetPointLight(0) で使う</remarks>
 		void ResetLights();
 
 		/// <summary>
@@ -199,14 +235,40 @@ namespace Graphics {
 		void SetNumDirectionalLights(int num) { allLightsData_.numDirectionalLights = num; }
 		void SetNumPointLights(int num) { allLightsData_.numPointLights = num; }
 		void SetNumSpotLights(int num) { allLightsData_.numSpotLights = num; }
-		/// <summary>フォグの設定を入れる。カメラの位置は毎フレーム自前で入れるので、渡された値は使わない</summary>
+		/// <summary>フォグの設定を入れる。カメラの位置と太陽は毎フレーム自前で入れるので、渡された値は使わない</summary>
 		void SetFog(const FogData& fog);
+		/// <summary>AO と平行光源の影をどの経路で計算するか。どちらも軽い側なら G-Buffer のプリパスごと止まる</summary>
+		void SetRayTracingModes(RayTracedAOMode aoMode, RayTracedShadowMode shadowMode) {
+			allLightsData_.aoMode = aoMode;
+			allLightsData_.shadowMode = shadowMode;
+		}
+		/// <summary>アンビエントを半球の2色から取るか、環境マップから焼いたものから取るか</summary>
+		/// <param name="iblScale">IBL のときだけアンビエントに掛ける倍率</param>
+		void SetAmbientMode(AmbientMode mode, float iblScale) {
+			allLightsData_.ambientMode = mode;
+			allLightsData_.iblAmbientScale = iblScale;
+		}
+		void SetLightingMode(LightingMode mode) { allLightsData_.lightingMode = mode; }
+		/// <summary>半球アンビエントの2色を入れる</summary>
+		void SetAmbientColors(const Math::Vector3& sky, const Math::Vector3& ground) {
+			allLightsData_.ambientSkyColor = sky;
+			allLightsData_.ambientGroundColor = ground;
+		}
+		/// <summary>映り込みと IBL が元にする空の状態を入れる</summary>
+		/// <param name="tint">空に掛けている色</param>
+		/// <param name="hasSky">空を出しているか</param>
+		void SetEnvironmentSky(const Math::Vector3& tint, bool hasSky) {
+			allLightsData_.environmentTint = tint;
+			allLightsData_.hasEnvironment = hasSky ? 1 : 0;
+		}
 		/// <summary>鏡面の映り込みの設定を入れる</summary>
 		/// <param name="maxDistance">この距離までの物を見る</param>
-		void SetReflection(RayTracedReflectionMode mode, float maxDistance, float intensity) {
+		/// <param name="shadow">影の中で映り込みをどれだけ暗くするか(0〜1)</param>
+		void SetReflection(RayTracedReflectionMode mode, float maxDistance, float intensity, float shadow) {
 			allLightsData_.reflectionMode = mode;
 			allLightsData_.reflectionMaxDistance = maxDistance;
 			allLightsData_.reflectionIntensity = intensity;
+			allLightsData_.reflectionShadow = shadow;
 		}
 
 		void DebugGUI();

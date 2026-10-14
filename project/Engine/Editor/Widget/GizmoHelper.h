@@ -21,7 +21,7 @@ namespace Editor {
 		void DrawOperationRadio();
 
 		/// <summary>今のスナップの刻み。スナップしないなら nullptr</summary>
-		/// <remarks>ImGuizmo::Manipulate にそのまま渡す形(移動は3成分、回転は度、拡縮は倍率)。Ctrl を押している間は設定と逆になる</remarks>
+		/// <remarks>ImGuizmo::Manipulate にそのまま渡す形。Ctrl を押している間は設定と逆になる</remarks>
 		static const float* CurrentSnap(GizmoOperation operation);
 
 		/// <summary>

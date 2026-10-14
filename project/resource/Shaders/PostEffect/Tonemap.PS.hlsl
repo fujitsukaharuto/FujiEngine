@@ -44,9 +44,8 @@ float3 ACESFilm(float3 x)
     return saturate((x * (a * x + b)) / (x * (c * x + d) + e));
 }
 
-// AgX (Troy Sobotka) の近似版。明るくなるほど色を白へ抜いていくので、
-// ACES のように強い赤がオレンジへ転んだり、原色がべったり潰れたりしにくい。
-// 素のままだとコントラストが低めに出るので、好みで contrast / saturation を上げて使う
+// AgX (Troy Sobotka) の近似版。明るくなるほど白へ抜くので、強い赤がオレンジへ転びにくい。
+// 素のままだとコントラストが低めに出る
 float3 AgX(float3 x)
 {
     // 入力側の行列。原色を少し内側へ寄せてからカーブへ通す
@@ -172,8 +171,7 @@ float3 ApplyFXAA(float2 uv, float2 texelSize, float3 center)
 }
 
 /// <summary>輪郭をくっきりさせる。周りの平均との差を上乗せする</summary>
-/// <remarks>ギザギザをならす処理は絵を少し甘くするので、その後に掛けて締め直す。
-/// 周りの明るさの範囲を超えないよう抑えるので、輪郭に白や黒の縁取りは出ない</remarks>
+/// <remarks>FXAA の後に掛ける。周りの明るさの範囲を超えないよう抑えるので縁取りは出ない</remarks>
 float3 ApplySharpen(float2 uv, float2 texelSize, float3 center)
 {
     float3 n = Shade(uv + float2(0.0f, -1.0f) * texelSize, texelSize);

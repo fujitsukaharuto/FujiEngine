@@ -47,6 +47,10 @@ void LightManager::Update() {
 	if (Camera* camera = CameraManager::GetInstance()->GetCamera()) {
 		allLightsData_.fog.cameraPosition = camera->GetTranslate();
 	}
+	const DirectionalLight& sun = allLightsData_.directionalLights[0];
+	const float sunPower = (allLightsData_.numDirectionalLights > 0) ? sun.intensity : 0.0f;
+	allLightsData_.fog.sunDirection = sun.direction * -1.0f;
+	allLightsData_.fog.sunColor = { sun.color.x * sunPower, sun.color.y * sunPower, sun.color.z * sunPower };
 	CopyData(frameIndex);
 }
 
@@ -135,6 +139,11 @@ void LightManager::CopyData(uint32_t frameIndex) {
 void LightManager::DebugGUI() {
 #ifdef _DEBUGMODE
 	if (ImGui::CollapsingHeader("Lights")) {
+		int lightingMode = static_cast<int>(allLightsData_.lightingMode);
+		if (ImGui::Combo("Lighting", &lightingMode, "Simple\0PBR\0")) {
+			allLightsData_.lightingMode = static_cast<uint32_t>(lightingMode);
+		}
+
 		if (ImGui::TreeNode("Ambient")) {
 			// PBR には Half-Lambert のような光の回り込みが無いので、影側の明るさはここで決まる。
 			// 0 にすると光の当たらない面は完全な黒になる
@@ -210,6 +219,7 @@ void LightManager::DebugGUI() {
 			}
 			ImGui::DragFloat("MaxDistance##reflection", &allLightsData_.reflectionMaxDistance, 1.0f, 0.0f, 10000.0f);
 			ImGui::SliderFloat("Intensity##reflection", &allLightsData_.reflectionIntensity, 0.0f, 2.0f);
+			ImGui::SliderFloat("Shadow##reflection", &allLightsData_.reflectionShadow, 0.0f, 1.0f);
 			ImGui::TreePop();
 		}
 

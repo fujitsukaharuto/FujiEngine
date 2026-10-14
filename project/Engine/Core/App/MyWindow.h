@@ -58,7 +58,7 @@ namespace Core {
 		bool ProcessMessage();
 
 		/// <summary>枠なしのフルスクリーンと通常のウィンドウを切り替える。F11 と Alt+Enter でも切り替わる</summary>
-		/// <remarks>ウィンドウを今いるモニターいっぱいに広げるだけで、画面モードは変えない。描画側は大きさの変化に次のフレームで追従する</remarks>
+		/// <remarks>ウィンドウを今いるモニターいっぱいに広げるだけで、画面モードは変えない</remarks>
 		void SetFullscreen(bool isFullscreen);
 		void ToggleFullscreen() { SetFullscreen(!isFullscreen_); }
 		bool IsFullscreen() const { return isFullscreen_; }

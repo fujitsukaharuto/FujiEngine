@@ -2,245 +2,3797 @@
     "environment": {
         "cameraPosition": [
             0,
-            13,
-            -38
+            14,
+            -46
         ],
         "cameraRotate": [
-            0.22,
+            0.2,
             0,
             0
         ],
         "lightColor": [
             1,
-            1,
-            1,
+            0.93,
+            0.82,
             1
         ],
         "lightDirection": [
-            -0.4,
-            -1,
-            -0.3
+            -0.75,
+            -0.6,
+            -0.35
         ],
-        "lightIntensity": 1.0,
-        "skyBox": false,
+        "lightIntensity": 1.2,
+        "skyBox": true,
         "skyBoxColor": [
             1,
             1,
             1,
             1
-        ]
+        ],
+        "lighting": "PBR",
+        "ao": "Screen",
+        "shadow": "Soft",
+        "ambient": "IBL",
+        "reflection": "Occlusion",
+        "fogColorFromSky": true,
+        "fogDensity": 0.003,
+        "fogStartDistance": 15,
+        "fogHeightFalloff": 0.015,
+        "exposure": 1.3,
+        "fogSunScatter": 0.35,
+        "fogSunPower": 6,
+        "sky": "Atmosphere"
     },
     "objects": [
         {
-            "model": "ground.obj",
             "name": "Ground",
-            "roughness": 0.8999999761581421,
-            "texture": "grass.jpg",
+            "model": "ground.obj",
             "transform": {
+                "translate": [
+                    0,
+                    0,
+                    0
+                ],
                 "rotate": [
-                    0.0,
-                    0.0,
-                    0.0
+                    0,
+                    0,
+                    0
                 ],
                 "scale": [
-                    1.0,
-                    1.0,
-                    1.0
-                ],
-                "translate": [
-                    0.0,
-                    0.0,
-                    0.0
+                    1,
+                    1,
+                    1
                 ]
             },
+            "texture": "grass.jpg",
+            "roughness": 0.9,
             "uvScale": [
-                60.0,
-                60.0
+                60,
+                60
             ]
         },
         {
-            "metallic": 0.0,
+            "name": "ShowFloor",
             "model": "cube.obj",
-            "name": "Cube",
-            "roughness": 0.6000000238418579,
             "transform": {
+                "translate": [
+                    0,
+                    0.1,
+                    -8
+                ],
                 "rotate": [
-                    0.0,
-                    0.0,
-                    0.0
+                    0,
+                    0,
+                    0
                 ],
                 "scale": [
-                    2.0,
-                    2.0,
-                    2.0
-                ],
-                "translate": [
-                    0.0,
-                    2.0,
-                    0.0
+                    17,
+                    0.1,
+                    8
                 ]
-            }
+            },
+            "texture": "white2x2.png",
+            "color": [
+                0.06,
+                0.065,
+                0.08,
+                1
+            ],
+            "roughness": 0.08,
+            "metallic": 0,
+            "environment": 1
         },
         {
-            "metallic": 0.0,
-            "model": "cube.obj",
-            "name": "FloatingCube",
-            "roughness": 0.20000000298023224,
-            "transform": {
-                "rotate": [
-                    0.0,
-                    0.0,
-                    0.0
-                ],
-                "scale": [
-                    1.2000000476837158,
-                    1.2000000476837158,
-                    1.2000000476837158
-                ],
-                "translate": [
-                    0.0,
-                    9.0,
-                    0.0
-                ]
-            }
-        },
-        {
-            "metallic": 0.0,
-            "model": "suzanne.obj",
-            "name": "Suzanne",
-            "roughness": 0.4000000059604645,
-            "transform": {
-                "rotate": [
-                    0.0,
-                    0.0,
-                    0.0
-                ],
-                "scale": [
-                    2.5,
-                    2.5,
-                    2.5
-                ],
-                "translate": [
-                    -10.0,
-                    3.0,
-                    -2.0
-                ]
-            }
-        },
-        {
-            "metallic": 0.0,
+            "name": "Plastic_R0.1",
             "model": "teapot.obj",
-            "name": "Teapot",
-            "roughness": 0.20000000298023224,
             "transform": {
+                "translate": [
+                    -12,
+                    1.64,
+                    -12
+                ],
                 "rotate": [
-                    0.0,
-                    0.0,
-                    0.0
+                    0,
+                    0.5,
+                    0
+                ],
+                "scale": [
+                    1.8,
+                    1.8,
+                    1.8
+                ]
+            },
+            "texture": "white2x2.png",
+            "color": [
+                0.8,
+                0.12,
+                0.1,
+                1
+            ],
+            "roughness": 0.1,
+            "metallic": 0,
+            "environment": 0.3
+        },
+        {
+            "name": "Pedestal_0",
+            "model": "cube.obj",
+            "transform": {
+                "translate": [
+                    -12,
+                    1.7,
+                    -5
+                ],
+                "rotate": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1.6,
+                    1.5,
+                    1.6
+                ]
+            },
+            "texture": "white2x2.png",
+            "color": [
+                0.35,
+                0.35,
+                0.37,
+                1
+            ],
+            "roughness": 0.7,
+            "metallic": 0
+        },
+        {
+            "name": "Gold_R0.1",
+            "model": "teapot.obj",
+            "transform": {
+                "translate": [
+                    -12,
+                    4.64,
+                    -5
+                ],
+                "rotate": [
+                    0,
+                    0.5,
+                    0
+                ],
+                "scale": [
+                    1.8,
+                    1.8,
+                    1.8
+                ]
+            },
+            "texture": "white2x2.png",
+            "color": [
+                1,
+                0.77,
+                0.34,
+                1
+            ],
+            "roughness": 0.1,
+            "metallic": 1,
+            "environment": 1
+        },
+        {
+            "name": "Plastic_R0.3",
+            "model": "teapot.obj",
+            "transform": {
+                "translate": [
+                    -6,
+                    1.64,
+                    -12
+                ],
+                "rotate": [
+                    0,
+                    0.5,
+                    0
+                ],
+                "scale": [
+                    1.8,
+                    1.8,
+                    1.8
+                ]
+            },
+            "texture": "white2x2.png",
+            "color": [
+                0.8,
+                0.12,
+                0.1,
+                1
+            ],
+            "roughness": 0.3,
+            "metallic": 0,
+            "environment": 0.3
+        },
+        {
+            "name": "Pedestal_1",
+            "model": "cube.obj",
+            "transform": {
+                "translate": [
+                    -6,
+                    1.7,
+                    -5
+                ],
+                "rotate": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1.6,
+                    1.5,
+                    1.6
+                ]
+            },
+            "texture": "white2x2.png",
+            "color": [
+                0.35,
+                0.35,
+                0.37,
+                1
+            ],
+            "roughness": 0.7,
+            "metallic": 0
+        },
+        {
+            "name": "Gold_R0.3",
+            "model": "teapot.obj",
+            "transform": {
+                "translate": [
+                    -6,
+                    4.64,
+                    -5
+                ],
+                "rotate": [
+                    0,
+                    0.5,
+                    0
+                ],
+                "scale": [
+                    1.8,
+                    1.8,
+                    1.8
+                ]
+            },
+            "texture": "white2x2.png",
+            "color": [
+                1,
+                0.77,
+                0.34,
+                1
+            ],
+            "roughness": 0.3,
+            "metallic": 1,
+            "environment": 1
+        },
+        {
+            "name": "Plastic_R0.5",
+            "model": "teapot.obj",
+            "transform": {
+                "translate": [
+                    0,
+                    1.64,
+                    -12
+                ],
+                "rotate": [
+                    0,
+                    0.5,
+                    0
+                ],
+                "scale": [
+                    1.8,
+                    1.8,
+                    1.8
+                ]
+            },
+            "texture": "white2x2.png",
+            "color": [
+                0.8,
+                0.12,
+                0.1,
+                1
+            ],
+            "roughness": 0.5,
+            "metallic": 0,
+            "environment": 0.3
+        },
+        {
+            "name": "Pedestal_2",
+            "model": "cube.obj",
+            "transform": {
+                "translate": [
+                    0,
+                    1.7,
+                    -5
+                ],
+                "rotate": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1.6,
+                    1.5,
+                    1.6
+                ]
+            },
+            "texture": "white2x2.png",
+            "color": [
+                0.35,
+                0.35,
+                0.37,
+                1
+            ],
+            "roughness": 0.7,
+            "metallic": 0
+        },
+        {
+            "name": "Gold_R0.5",
+            "model": "teapot.obj",
+            "transform": {
+                "translate": [
+                    0,
+                    4.64,
+                    -5
+                ],
+                "rotate": [
+                    0,
+                    0.5,
+                    0
+                ],
+                "scale": [
+                    1.8,
+                    1.8,
+                    1.8
+                ]
+            },
+            "texture": "white2x2.png",
+            "color": [
+                1,
+                0.77,
+                0.34,
+                1
+            ],
+            "roughness": 0.5,
+            "metallic": 1,
+            "environment": 1
+        },
+        {
+            "name": "Plastic_R0.7",
+            "model": "teapot.obj",
+            "transform": {
+                "translate": [
+                    6,
+                    1.64,
+                    -12
+                ],
+                "rotate": [
+                    0,
+                    0.5,
+                    0
+                ],
+                "scale": [
+                    1.8,
+                    1.8,
+                    1.8
+                ]
+            },
+            "texture": "white2x2.png",
+            "color": [
+                0.8,
+                0.12,
+                0.1,
+                1
+            ],
+            "roughness": 0.7,
+            "metallic": 0,
+            "environment": 0.3
+        },
+        {
+            "name": "Pedestal_3",
+            "model": "cube.obj",
+            "transform": {
+                "translate": [
+                    6,
+                    1.7,
+                    -5
+                ],
+                "rotate": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1.6,
+                    1.5,
+                    1.6
+                ]
+            },
+            "texture": "white2x2.png",
+            "color": [
+                0.35,
+                0.35,
+                0.37,
+                1
+            ],
+            "roughness": 0.7,
+            "metallic": 0
+        },
+        {
+            "name": "Gold_R0.7",
+            "model": "teapot.obj",
+            "transform": {
+                "translate": [
+                    6,
+                    4.64,
+                    -5
+                ],
+                "rotate": [
+                    0,
+                    0.5,
+                    0
+                ],
+                "scale": [
+                    1.8,
+                    1.8,
+                    1.8
+                ]
+            },
+            "texture": "white2x2.png",
+            "color": [
+                1,
+                0.77,
+                0.34,
+                1
+            ],
+            "roughness": 0.7,
+            "metallic": 1,
+            "environment": 1
+        },
+        {
+            "name": "Plastic_R0.9",
+            "model": "teapot.obj",
+            "transform": {
+                "translate": [
+                    12,
+                    1.64,
+                    -12
+                ],
+                "rotate": [
+                    0,
+                    0.5,
+                    0
+                ],
+                "scale": [
+                    1.8,
+                    1.8,
+                    1.8
+                ]
+            },
+            "texture": "white2x2.png",
+            "color": [
+                0.8,
+                0.12,
+                0.1,
+                1
+            ],
+            "roughness": 0.9,
+            "metallic": 0,
+            "environment": 0.3
+        },
+        {
+            "name": "Pedestal_4",
+            "model": "cube.obj",
+            "transform": {
+                "translate": [
+                    12,
+                    1.7,
+                    -5
+                ],
+                "rotate": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1.6,
+                    1.5,
+                    1.6
+                ]
+            },
+            "texture": "white2x2.png",
+            "color": [
+                0.35,
+                0.35,
+                0.37,
+                1
+            ],
+            "roughness": 0.7,
+            "metallic": 0
+        },
+        {
+            "name": "Gold_R0.9",
+            "model": "teapot.obj",
+            "transform": {
+                "translate": [
+                    12,
+                    4.64,
+                    -5
+                ],
+                "rotate": [
+                    0,
+                    0.5,
+                    0
+                ],
+                "scale": [
+                    1.8,
+                    1.8,
+                    1.8
+                ]
+            },
+            "texture": "white2x2.png",
+            "color": [
+                1,
+                0.77,
+                0.34,
+                1
+            ],
+            "roughness": 0.9,
+            "metallic": 1,
+            "environment": 1
+        },
+        {
+            "name": "Suzanne",
+            "model": "suzanne.obj",
+            "transform": {
+                "translate": [
+                    -21,
+                    3,
+                    -8
+                ],
+                "rotate": [
+                    0,
+                    2.6,
+                    0
                 ],
                 "scale": [
                     2.5,
                     2.5,
                     2.5
-                ],
-                "translate": [
-                    10.0,
-                    2.0,
-                    -2.0
                 ]
-            }
+            },
+            "roughness": 0.4,
+            "metallic": 0
         },
         {
-            "metallic": 0.0,
-            "model": "DeadTree_2.obj",
-            "name": "DeadTree",
-            "roughness": 0.8999999761581421,
+            "name": "Suzanne_Rim",
+            "model": "suzanne.obj",
             "transform": {
+                "translate": [
+                    21,
+                    3,
+                    -8
+                ],
                 "rotate": [
-                    0.0,
-                    0.0,
-                    0.0
+                    0,
+                    3.7,
+                    0
                 ],
                 "scale": [
-                    3.0,
-                    3.0,
-                    3.0
-                ],
+                    2.5,
+                    2.5,
+                    2.5
+                ]
+            },
+            "color": [
+                0.1,
+                0.1,
+                0.12,
+                1
+            ],
+            "roughness": 0.5,
+            "metallic": 0,
+            "rim": [
+                0.3,
+                0.7,
+                1
+            ],
+            "rimIntensity": 2,
+            "rimPower": 2.5
+        },
+        {
+            "name": "Suzanne_Chrome",
+            "model": "suzanne.obj",
+            "transform": {
                 "translate": [
-                    -17.0,
-                    0.0,
-                    5.0
+                    0,
+                    12,
+                    6
+                ],
+                "rotate": [
+                    0,
+                    3.14,
+                    0
+                ],
+                "scale": [
+                    2,
+                    2,
+                    2
+                ]
+            },
+            "color": [
+                0.95,
+                0.95,
+                0.97,
+                1
+            ],
+            "roughness": 0.05,
+            "metallic": 1,
+            "environment": 1
+        },
+        {
+            "name": "FloatingCube",
+            "model": "cube.obj",
+            "transform": {
+                "translate": [
+                    0,
+                    9,
+                    -5
+                ],
+                "rotate": [
+                    0.6,
+                    0.8,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ]
+            },
+            "roughness": 0.2,
+            "metallic": 0
+        },
+        {
+            "name": "Lantern_Warm",
+            "model": "cube.obj",
+            "transform": {
+                "translate": [
+                    -15,
+                    4,
+                    8
+                ],
+                "rotate": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    0.5,
+                    0.5,
+                    0.5
+                ]
+            },
+            "texture": "white2x2.png",
+            "color": [
+                1,
+                0.6,
+                0.25,
+                1
+            ],
+            "emissive": [
+                1,
+                0.55,
+                0.2
+            ],
+            "emissiveIntensity": 6,
+            "emissiveLightRange": 16,
+            "emissiveLightIntensity": 0.4
+        },
+        {
+            "name": "Lantern_Cool",
+            "model": "cube.obj",
+            "transform": {
+                "translate": [
+                    15,
+                    4,
+                    8
+                ],
+                "rotate": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    0.5,
+                    0.5,
+                    0.5
+                ]
+            },
+            "texture": "white2x2.png",
+            "color": [
+                0.3,
+                0.8,
+                1,
+                1
+            ],
+            "emissive": [
+                0.2,
+                0.7,
+                1
+            ],
+            "emissiveIntensity": 6,
+            "emissiveLightRange": 16,
+            "emissiveLightIntensity": 0.4
+        },
+        {
+            "name": "LanternPost_Warm",
+            "model": "cube.obj",
+            "transform": {
+                "translate": [
+                    -15,
+                    1.75,
+                    8
+                ],
+                "rotate": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    0.2,
+                    1.75,
+                    0.2
+                ]
+            },
+            "texture": "white2x2.png",
+            "color": [
+                0.15,
+                0.15,
+                0.15,
+                1
+            ],
+            "roughness": 0.6
+        },
+        {
+            "name": "LanternPost_Cool",
+            "model": "cube.obj",
+            "transform": {
+                "translate": [
+                    15,
+                    1.75,
+                    8
+                ],
+                "rotate": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    0.2,
+                    1.75,
+                    0.2
+                ]
+            },
+            "texture": "white2x2.png",
+            "color": [
+                0.15,
+                0.15,
+                0.15,
+                1
+            ],
+            "roughness": 0.6
+        },
+        {
+            "name": "Temple",
+            "model": "Temple.gltf",
+            "transform": {
+                "translate": [
+                    0,
+                    0,
+                    36
+                ],
+                "rotate": [
+                    0,
+                    3.14,
+                    0
+                ],
+                "scale": [
+                    5,
+                    5,
+                    5
                 ]
             }
         },
         {
-            "animation": true,
-            "anime": true,
-            "model": "T_boss.gltf",
+            "name": "Tower_L0",
+            "model": "PointyTower.obj",
+            "transform": {
+                "translate": [
+                    -28,
+                    0,
+                    -20
+                ],
+                "rotate": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    3,
+                    3,
+                    3
+                ]
+            },
+            "roughness": 0.8
+        },
+        {
+            "name": "Tower_R0",
+            "model": "PointyTower.obj",
+            "transform": {
+                "translate": [
+                    28,
+                    0,
+                    -20
+                ],
+                "rotate": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    3,
+                    3,
+                    3
+                ]
+            },
+            "roughness": 0.8
+        },
+        {
+            "name": "Tower_L1",
+            "model": "PointyTower.obj",
+            "transform": {
+                "translate": [
+                    -28,
+                    0,
+                    0
+                ],
+                "rotate": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    3,
+                    3,
+                    3
+                ]
+            },
+            "roughness": 0.8
+        },
+        {
+            "name": "Tower_R1",
+            "model": "PointyTower.obj",
+            "transform": {
+                "translate": [
+                    28,
+                    0,
+                    0
+                ],
+                "rotate": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    3,
+                    3,
+                    3
+                ]
+            },
+            "roughness": 0.8
+        },
+        {
+            "name": "Tower_L2",
+            "model": "PointyTower.obj",
+            "transform": {
+                "translate": [
+                    -28,
+                    0,
+                    20
+                ],
+                "rotate": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    3,
+                    3,
+                    3
+                ]
+            },
+            "roughness": 0.8
+        },
+        {
+            "name": "Tower_R2",
+            "model": "PointyTower.obj",
+            "transform": {
+                "translate": [
+                    28,
+                    0,
+                    20
+                ],
+                "rotate": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    3,
+                    3,
+                    3
+                ]
+            },
+            "roughness": 0.8
+        },
+        {
+            "name": "Tower_L3",
+            "model": "PointyTower.obj",
+            "transform": {
+                "translate": [
+                    -28,
+                    0,
+                    40
+                ],
+                "rotate": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    3,
+                    3,
+                    3
+                ]
+            },
+            "roughness": 0.8
+        },
+        {
+            "name": "Tower_R3",
+            "model": "PointyTower.obj",
+            "transform": {
+                "translate": [
+                    28,
+                    0,
+                    40
+                ],
+                "rotate": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    3,
+                    3,
+                    3
+                ]
+            },
+            "roughness": 0.8
+        },
+        {
+            "name": "Star_0",
+            "model": "Star.obj",
+            "transform": {
+                "translate": [
+                    -12,
+                    26,
+                    36
+                ],
+                "rotate": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    0.8,
+                    0.8,
+                    0.8
+                ]
+            },
+            "emissive": [
+                1,
+                0.8,
+                0.3
+            ],
+            "emissiveIntensity": 3
+        },
+        {
+            "name": "Star_1",
+            "model": "Star.obj",
+            "transform": {
+                "translate": [
+                    -6,
+                    29,
+                    36
+                ],
+                "rotate": [
+                    0,
+                    0.6,
+                    0
+                ],
+                "scale": [
+                    0.8,
+                    0.8,
+                    0.8
+                ]
+            },
+            "emissive": [
+                1,
+                0.8,
+                0.3
+            ],
+            "emissiveIntensity": 3
+        },
+        {
+            "name": "Star_2",
+            "model": "Star.obj",
+            "transform": {
+                "translate": [
+                    0,
+                    26,
+                    36
+                ],
+                "rotate": [
+                    0,
+                    1.2,
+                    0
+                ],
+                "scale": [
+                    0.8,
+                    0.8,
+                    0.8
+                ]
+            },
+            "emissive": [
+                1,
+                0.8,
+                0.3
+            ],
+            "emissiveIntensity": 3
+        },
+        {
+            "name": "Star_3",
+            "model": "Star.obj",
+            "transform": {
+                "translate": [
+                    6,
+                    29,
+                    36
+                ],
+                "rotate": [
+                    0,
+                    1.8,
+                    0
+                ],
+                "scale": [
+                    0.8,
+                    0.8,
+                    0.8
+                ]
+            },
+            "emissive": [
+                1,
+                0.8,
+                0.3
+            ],
+            "emissiveIntensity": 3
+        },
+        {
+            "name": "Star_4",
+            "model": "Star.obj",
+            "transform": {
+                "translate": [
+                    12,
+                    26,
+                    36
+                ],
+                "rotate": [
+                    0,
+                    2.4,
+                    0
+                ],
+                "scale": [
+                    0.8,
+                    0.8,
+                    0.8
+                ]
+            },
+            "emissive": [
+                1,
+                0.8,
+                0.3
+            ],
+            "emissiveIntensity": 3
+        },
+        {
             "name": "Boss",
+            "model": "T_boss.gltf",
             "transform": {
+                "translate": [
+                    -22,
+                    0,
+                    20
+                ],
                 "rotate": [
-                    0.0,
-                    3.140000104904175,
-                    0.0
+                    0,
+                    2.6,
+                    0
                 ],
                 "scale": [
-                    7.5,
-                    7.5,
-                    7.5
-                ],
+                    5,
+                    5,
+                    5
+                ]
+            },
+            "anime": true,
+            "animation": true
+        },
+        {
+            "name": "Runner_0",
+            "model": "run.gltf",
+            "transform": {
                 "translate": [
-                    0.0,
-                    0.0,
-                    -13.0
+                    -7,
+                    0,
+                    7
+                ],
+                "rotate": [
+                    0,
+                    3.14,
+                    0
+                ],
+                "scale": [
+                    3,
+                    3,
+                    3
+                ]
+            },
+            "anime": true,
+            "animation": true
+        },
+        {
+            "name": "Runner_1",
+            "model": "run.gltf",
+            "transform": {
+                "translate": [
+                    7,
+                    0,
+                    7
+                ],
+                "rotate": [
+                    0,
+                    3.14,
+                    0
+                ],
+                "scale": [
+                    3,
+                    3,
+                    3
+                ]
+            },
+            "anime": true,
+            "animation": true
+        },
+        {
+            "name": "Runner_2",
+            "model": "run.gltf",
+            "transform": {
+                "translate": [
+                    -10,
+                    0,
+                    16
+                ],
+                "rotate": [
+                    0,
+                    3.14,
+                    0
+                ],
+                "scale": [
+                    3,
+                    3,
+                    3
+                ]
+            },
+            "anime": true,
+            "animation": true
+        },
+        {
+            "name": "Runner_3",
+            "model": "run.gltf",
+            "transform": {
+                "translate": [
+                    10,
+                    0,
+                    16
+                ],
+                "rotate": [
+                    0,
+                    3.14,
+                    0
+                ],
+                "scale": [
+                    3,
+                    3,
+                    3
+                ]
+            },
+            "anime": true,
+            "animation": true
+        },
+        {
+            "name": "Fence_F0",
+            "model": "fence.obj",
+            "transform": {
+                "translate": [
+                    -23.1,
+                    1,
+                    -24
+                ],
+                "rotate": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
                 ]
             }
         },
         {
-            "animation": true,
-            "anime": true,
-            "model": "run.gltf",
-            "name": "RunnerL",
+            "name": "Fence_F1",
+            "model": "fence.obj",
             "transform": {
+                "translate": [
+                    -18.9,
+                    1,
+                    -24
+                ],
                 "rotate": [
-                    0.0,
-                    0.0,
-                    0.0
+                    0,
+                    0,
+                    0
                 ],
                 "scale": [
-                    3.0,
-                    3.0,
-                    3.0
-                ],
-                "translate": [
-                    -7.0,
-                    0.0,
-                    7.0
+                    1,
+                    1,
+                    1
                 ]
             }
         },
         {
-            "animation": true,
-            "anime": true,
-            "model": "run.gltf",
-            "name": "RunnerR",
+            "name": "Fence_F2",
+            "model": "fence.obj",
             "transform": {
+                "translate": [
+                    -14.7,
+                    1,
+                    -24
+                ],
                 "rotate": [
-                    0.0,
-                    0.0,
-                    0.0
+                    0,
+                    0,
+                    0
                 ],
                 "scale": [
-                    3.0,
-                    3.0,
-                    3.0
-                ],
-                "translate": [
-                    7.0,
-                    0.0,
-                    7.0
+                    1,
+                    1,
+                    1
                 ]
             }
+        },
+        {
+            "name": "Fence_F3",
+            "model": "fence.obj",
+            "transform": {
+                "translate": [
+                    -10.5,
+                    1,
+                    -24
+                ],
+                "rotate": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ]
+            }
+        },
+        {
+            "name": "Fence_F4",
+            "model": "fence.obj",
+            "transform": {
+                "translate": [
+                    -6.3,
+                    1,
+                    -24
+                ],
+                "rotate": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ]
+            }
+        },
+        {
+            "name": "Fence_F5",
+            "model": "fence.obj",
+            "transform": {
+                "translate": [
+                    -2.1,
+                    1,
+                    -24
+                ],
+                "rotate": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ]
+            }
+        },
+        {
+            "name": "Fence_F6",
+            "model": "fence.obj",
+            "transform": {
+                "translate": [
+                    2.1,
+                    1,
+                    -24
+                ],
+                "rotate": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ]
+            }
+        },
+        {
+            "name": "Fence_F7",
+            "model": "fence.obj",
+            "transform": {
+                "translate": [
+                    6.3,
+                    1,
+                    -24
+                ],
+                "rotate": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ]
+            }
+        },
+        {
+            "name": "Fence_F8",
+            "model": "fence.obj",
+            "transform": {
+                "translate": [
+                    10.5,
+                    1,
+                    -24
+                ],
+                "rotate": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ]
+            }
+        },
+        {
+            "name": "Fence_F9",
+            "model": "fence.obj",
+            "transform": {
+                "translate": [
+                    14.7,
+                    1,
+                    -24
+                ],
+                "rotate": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ]
+            }
+        },
+        {
+            "name": "Fence_F10",
+            "model": "fence.obj",
+            "transform": {
+                "translate": [
+                    18.9,
+                    1,
+                    -24
+                ],
+                "rotate": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ]
+            }
+        },
+        {
+            "name": "Fence_F11",
+            "model": "fence.obj",
+            "transform": {
+                "translate": [
+                    23.1,
+                    1,
+                    -24
+                ],
+                "rotate": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ]
+            }
+        },
+        {
+            "name": "Fence_L0",
+            "model": "fence.obj",
+            "transform": {
+                "translate": [
+                    -34,
+                    1,
+                    -18
+                ],
+                "rotate": [
+                    0,
+                    1.571,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ]
+            }
+        },
+        {
+            "name": "Fence_R0",
+            "model": "fence.obj",
+            "transform": {
+                "translate": [
+                    34,
+                    1,
+                    -18
+                ],
+                "rotate": [
+                    0,
+                    1.571,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ]
+            }
+        },
+        {
+            "name": "Fence_L1",
+            "model": "fence.obj",
+            "transform": {
+                "translate": [
+                    -34,
+                    1,
+                    -13.8
+                ],
+                "rotate": [
+                    0,
+                    1.571,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ]
+            }
+        },
+        {
+            "name": "Fence_R1",
+            "model": "fence.obj",
+            "transform": {
+                "translate": [
+                    34,
+                    1,
+                    -13.8
+                ],
+                "rotate": [
+                    0,
+                    1.571,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ]
+            }
+        },
+        {
+            "name": "Fence_L2",
+            "model": "fence.obj",
+            "transform": {
+                "translate": [
+                    -34,
+                    1,
+                    -9.6
+                ],
+                "rotate": [
+                    0,
+                    1.571,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ]
+            }
+        },
+        {
+            "name": "Fence_R2",
+            "model": "fence.obj",
+            "transform": {
+                "translate": [
+                    34,
+                    1,
+                    -9.6
+                ],
+                "rotate": [
+                    0,
+                    1.571,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ]
+            }
+        },
+        {
+            "name": "Fence_L3",
+            "model": "fence.obj",
+            "transform": {
+                "translate": [
+                    -34,
+                    1,
+                    -5.4
+                ],
+                "rotate": [
+                    0,
+                    1.571,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ]
+            }
+        },
+        {
+            "name": "Fence_R3",
+            "model": "fence.obj",
+            "transform": {
+                "translate": [
+                    34,
+                    1,
+                    -5.4
+                ],
+                "rotate": [
+                    0,
+                    1.571,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ]
+            }
+        },
+        {
+            "name": "Fence_L4",
+            "model": "fence.obj",
+            "transform": {
+                "translate": [
+                    -34,
+                    1,
+                    -1.2
+                ],
+                "rotate": [
+                    0,
+                    1.571,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ]
+            }
+        },
+        {
+            "name": "Fence_R4",
+            "model": "fence.obj",
+            "transform": {
+                "translate": [
+                    34,
+                    1,
+                    -1.2
+                ],
+                "rotate": [
+                    0,
+                    1.571,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ]
+            }
+        },
+        {
+            "name": "Fence_L5",
+            "model": "fence.obj",
+            "transform": {
+                "translate": [
+                    -34,
+                    1,
+                    3
+                ],
+                "rotate": [
+                    0,
+                    1.571,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ]
+            }
+        },
+        {
+            "name": "Fence_R5",
+            "model": "fence.obj",
+            "transform": {
+                "translate": [
+                    34,
+                    1,
+                    3
+                ],
+                "rotate": [
+                    0,
+                    1.571,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ]
+            }
+        },
+        {
+            "name": "Fence_L6",
+            "model": "fence.obj",
+            "transform": {
+                "translate": [
+                    -34,
+                    1,
+                    7.2
+                ],
+                "rotate": [
+                    0,
+                    1.571,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ]
+            }
+        },
+        {
+            "name": "Fence_R6",
+            "model": "fence.obj",
+            "transform": {
+                "translate": [
+                    34,
+                    1,
+                    7.2
+                ],
+                "rotate": [
+                    0,
+                    1.571,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ]
+            }
+        },
+        {
+            "name": "Fence_L7",
+            "model": "fence.obj",
+            "transform": {
+                "translate": [
+                    -34,
+                    1,
+                    11.4
+                ],
+                "rotate": [
+                    0,
+                    1.571,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ]
+            }
+        },
+        {
+            "name": "Fence_R7",
+            "model": "fence.obj",
+            "transform": {
+                "translate": [
+                    34,
+                    1,
+                    11.4
+                ],
+                "rotate": [
+                    0,
+                    1.571,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ]
+            }
+        },
+        {
+            "name": "DeadTree_0",
+            "model": "DeadTree_2.obj",
+            "transform": {
+                "translate": [
+                    -36,
+                    0,
+                    8
+                ],
+                "rotate": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    3,
+                    3,
+                    3
+                ]
+            },
+            "roughness": 0.9,
+            "metallic": 0
+        },
+        {
+            "name": "DeadTree_1",
+            "model": "DeadTree_2.obj",
+            "transform": {
+                "translate": [
+                    21,
+                    0,
+                    24
+                ],
+                "rotate": [
+                    0,
+                    1.1,
+                    0
+                ],
+                "scale": [
+                    3.6,
+                    3.6,
+                    3.6
+                ]
+            },
+            "roughness": 0.9,
+            "metallic": 0
+        },
+        {
+            "name": "DeadTree_2",
+            "model": "DeadTree_2.obj",
+            "transform": {
+                "translate": [
+                    -36,
+                    0,
+                    30
+                ],
+                "rotate": [
+                    0,
+                    2.2,
+                    0
+                ],
+                "scale": [
+                    4.2,
+                    4.2,
+                    4.2
+                ]
+            },
+            "roughness": 0.9,
+            "metallic": 0
+        },
+        {
+            "name": "DeadTree_3",
+            "model": "DeadTree_2.obj",
+            "transform": {
+                "translate": [
+                    38,
+                    0,
+                    -6
+                ],
+                "rotate": [
+                    0,
+                    3.3,
+                    0
+                ],
+                "scale": [
+                    3,
+                    3,
+                    3
+                ]
+            },
+            "roughness": 0.9,
+            "metallic": 0
+        },
+        {
+            "name": "DeadTree_4",
+            "model": "DeadTree_2.obj",
+            "transform": {
+                "translate": [
+                    -40,
+                    0,
+                    -14
+                ],
+                "rotate": [
+                    0,
+                    4.4,
+                    0
+                ],
+                "scale": [
+                    3.6,
+                    3.6,
+                    3.6
+                ]
+            },
+            "roughness": 0.9,
+            "metallic": 0
+        },
+        {
+            "name": "DeadTree_5",
+            "model": "DeadTree_2.obj",
+            "transform": {
+                "translate": [
+                    24,
+                    0,
+                    44
+                ],
+                "rotate": [
+                    0,
+                    5.5,
+                    0
+                ],
+                "scale": [
+                    4.2,
+                    4.2,
+                    4.2
+                ]
+            },
+            "roughness": 0.9,
+            "metallic": 0
+        },
+        {
+            "name": "Hill_0",
+            "model": "Terrain_1783481558545.obj",
+            "transform": {
+                "translate": [
+                    -110,
+                    -3,
+                    130
+                ],
+                "rotate": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    2.2,
+                    3,
+                    2.2
+                ]
+            },
+            "texture": "grass.jpg",
+            "roughness": 0.95,
+            "uvScale": [
+                12,
+                12
+            ]
+        },
+        {
+            "name": "Hill_1",
+            "model": "Terrain_1783481558545.obj",
+            "transform": {
+                "translate": [
+                    0,
+                    -3,
+                    170
+                ],
+                "rotate": [
+                    0,
+                    0.9,
+                    0
+                ],
+                "scale": [
+                    2.2,
+                    3,
+                    2.2
+                ]
+            },
+            "texture": "grass.jpg",
+            "roughness": 0.95,
+            "uvScale": [
+                12,
+                12
+            ]
+        },
+        {
+            "name": "Hill_2",
+            "model": "Terrain_1783481558545.obj",
+            "transform": {
+                "translate": [
+                    110,
+                    -3,
+                    130
+                ],
+                "rotate": [
+                    0,
+                    1.8,
+                    0
+                ],
+                "scale": [
+                    2.2,
+                    3,
+                    2.2
+                ]
+            },
+            "texture": "grass.jpg",
+            "roughness": 0.95,
+            "uvScale": [
+                12,
+                12
+            ]
+        },
+        {
+            "name": "Hill_3",
+            "model": "Terrain_1783481558545.obj",
+            "transform": {
+                "translate": [
+                    -170,
+                    -3,
+                    20
+                ],
+                "rotate": [
+                    0,
+                    2.7,
+                    0
+                ],
+                "scale": [
+                    2.2,
+                    3,
+                    2.2
+                ]
+            },
+            "texture": "grass.jpg",
+            "roughness": 0.95,
+            "uvScale": [
+                12,
+                12
+            ]
+        },
+        {
+            "name": "Hill_4",
+            "model": "Terrain_1783481558545.obj",
+            "transform": {
+                "translate": [
+                    170,
+                    -3,
+                    20
+                ],
+                "rotate": [
+                    0,
+                    3.6,
+                    0
+                ],
+                "scale": [
+                    2.2,
+                    3,
+                    2.2
+                ]
+            },
+            "texture": "grass.jpg",
+            "roughness": 0.95,
+            "uvScale": [
+                12,
+                12
+            ]
+        },
+        {
+            "name": "Scatter_0",
+            "model": "DeadTree_2.obj",
+            "transform": {
+                "translate": [
+                    4.316,
+                    0,
+                    82.272
+                ],
+                "rotate": [
+                    0,
+                    6.254,
+                    0
+                ],
+                "scale": [
+                    3.765,
+                    3.765,
+                    3.765
+                ]
+            },
+            "roughness": 0.9
+        },
+        {
+            "name": "Scatter_1",
+            "model": "PointyTower.obj",
+            "transform": {
+                "translate": [
+                    16.995,
+                    0,
+                    110.551
+                ],
+                "rotate": [
+                    0,
+                    5.546,
+                    0
+                ],
+                "scale": [
+                    1.845,
+                    1.845,
+                    1.845
+                ]
+            },
+            "roughness": 0.8
+        },
+        {
+            "name": "Scatter_2",
+            "model": "cube.obj",
+            "transform": {
+                "translate": [
+                    31.081,
+                    2.479,
+                    120.251
+                ],
+                "rotate": [
+                    0,
+                    2.121,
+                    0
+                ],
+                "scale": [
+                    2.479,
+                    2.479,
+                    2.479
+                ]
+            },
+            "texture": "white2x2.png",
+            "color": [
+                0.4,
+                0.38,
+                0.36,
+                1
+            ],
+            "roughness": 0.85
+        },
+        {
+            "name": "Scatter_3",
+            "model": "suzanne.obj",
+            "transform": {
+                "translate": [
+                    25.714,
+                    2.37,
+                    68.724
+                ],
+                "rotate": [
+                    0,
+                    1.468,
+                    0
+                ],
+                "scale": [
+                    2.37,
+                    2.37,
+                    2.37
+                ]
+            },
+            "roughness": 0.5
+        },
+        {
+            "name": "Scatter_4",
+            "model": "DeadTree_2.obj",
+            "transform": {
+                "translate": [
+                    48.169,
+                    0,
+                    111.005
+                ],
+                "rotate": [
+                    0,
+                    5.3,
+                    0
+                ],
+                "scale": [
+                    4.243,
+                    4.243,
+                    4.243
+                ]
+            },
+            "roughness": 0.9
+        },
+        {
+            "name": "Scatter_5",
+            "model": "PointyTower.obj",
+            "transform": {
+                "translate": [
+                    45.83,
+                    0,
+                    83.934
+                ],
+                "rotate": [
+                    0,
+                    2.299,
+                    0
+                ],
+                "scale": [
+                    2.963,
+                    2.963,
+                    2.963
+                ]
+            },
+            "roughness": 0.8
+        },
+        {
+            "name": "Scatter_6",
+            "model": "cube.obj",
+            "transform": {
+                "translate": [
+                    50.203,
+                    2.837,
+                    71.617
+                ],
+                "rotate": [
+                    0,
+                    5.468,
+                    0
+                ],
+                "scale": [
+                    2.837,
+                    2.837,
+                    2.837
+                ]
+            },
+            "texture": "white2x2.png",
+            "color": [
+                0.4,
+                0.38,
+                0.36,
+                1
+            ],
+            "roughness": 0.85
+        },
+        {
+            "name": "Scatter_7",
+            "model": "suzanne.obj",
+            "transform": {
+                "translate": [
+                    60.909,
+                    2.73,
+                    69.339
+                ],
+                "rotate": [
+                    0,
+                    1.085,
+                    0
+                ],
+                "scale": [
+                    2.73,
+                    2.73,
+                    2.73
+                ]
+            },
+            "roughness": 0.5
+        },
+        {
+            "name": "Scatter_8",
+            "model": "DeadTree_2.obj",
+            "transform": {
+                "translate": [
+                    59.736,
+                    0,
+                    58.242
+                ],
+                "rotate": [
+                    0,
+                    3.168,
+                    0
+                ],
+                "scale": [
+                    3.254,
+                    3.254,
+                    3.254
+                ]
+            },
+            "roughness": 0.9
+        },
+        {
+            "name": "Scatter_9",
+            "model": "PointyTower.obj",
+            "transform": {
+                "translate": [
+                    78.23,
+                    0,
+                    54.605
+                ],
+                "rotate": [
+                    0,
+                    1.415,
+                    0
+                ],
+                "scale": [
+                    3.007,
+                    3.007,
+                    3.007
+                ]
+            },
+            "roughness": 0.8
+        },
+        {
+            "name": "Scatter_10",
+            "model": "cube.obj",
+            "transform": {
+                "translate": [
+                    108.737,
+                    2.638,
+                    67.292
+                ],
+                "rotate": [
+                    0,
+                    1.933,
+                    0
+                ],
+                "scale": [
+                    2.638,
+                    2.638,
+                    2.638
+                ]
+            },
+            "texture": "white2x2.png",
+            "color": [
+                0.4,
+                0.38,
+                0.36,
+                1
+            ],
+            "roughness": 0.85
+        },
+        {
+            "name": "Scatter_11",
+            "model": "suzanne.obj",
+            "transform": {
+                "translate": [
+                    113.318,
+                    2.55,
+                    54.461
+                ],
+                "rotate": [
+                    0,
+                    0.697,
+                    0
+                ],
+                "scale": [
+                    2.55,
+                    2.55,
+                    2.55
+                ]
+            },
+            "roughness": 0.5
+        },
+        {
+            "name": "Scatter_12",
+            "model": "DeadTree_2.obj",
+            "transform": {
+                "translate": [
+                    61.506,
+                    0,
+                    22.142
+                ],
+                "rotate": [
+                    0,
+                    2.509,
+                    0
+                ],
+                "scale": [
+                    3.882,
+                    3.882,
+                    3.882
+                ]
+            },
+            "roughness": 0.9
+        },
+        {
+            "name": "Scatter_13",
+            "model": "PointyTower.obj",
+            "transform": {
+                "translate": [
+                    76.113,
+                    0,
+                    18.509
+                ],
+                "rotate": [
+                    0,
+                    2.514,
+                    0
+                ],
+                "scale": [
+                    2.265,
+                    2.265,
+                    2.265
+                ]
+            },
+            "roughness": 0.8
+        },
+        {
+            "name": "Scatter_14",
+            "model": "cube.obj",
+            "transform": {
+                "translate": [
+                    131.76,
+                    1.861,
+                    21.655
+                ],
+                "rotate": [
+                    0,
+                    0.143,
+                    0
+                ],
+                "scale": [
+                    1.861,
+                    1.861,
+                    1.861
+                ]
+            },
+            "texture": "white2x2.png",
+            "color": [
+                0.4,
+                0.38,
+                0.36,
+                1
+            ],
+            "roughness": 0.85
+        },
+        {
+            "name": "Scatter_15",
+            "model": "suzanne.obj",
+            "transform": {
+                "translate": [
+                    68.423,
+                    2.5,
+                    5.35
+                ],
+                "rotate": [
+                    0,
+                    0.034,
+                    0
+                ],
+                "scale": [
+                    2.5,
+                    2.5,
+                    2.5
+                ]
+            },
+            "roughness": 0.5
+        },
+        {
+            "name": "Scatter_16",
+            "model": "DeadTree_2.obj",
+            "transform": {
+                "translate": [
+                    80.425,
+                    0,
+                    -1.842
+                ],
+                "rotate": [
+                    0,
+                    1.369,
+                    0
+                ],
+                "scale": [
+                    3.336,
+                    3.336,
+                    3.336
+                ]
+            },
+            "roughness": 0.9
+        },
+        {
+            "name": "Scatter_17",
+            "model": "PointyTower.obj",
+            "transform": {
+                "translate": [
+                    95.082,
+                    0,
+                    -15.582
+                ],
+                "rotate": [
+                    0,
+                    5.326,
+                    0
+                ],
+                "scale": [
+                    2.576,
+                    2.576,
+                    2.576
+                ]
+            },
+            "roughness": 0.8
+        },
+        {
+            "name": "Scatter_18",
+            "model": "cube.obj",
+            "transform": {
+                "translate": [
+                    110.537,
+                    1.042,
+                    -27.685
+                ],
+                "rotate": [
+                    0,
+                    3.48,
+                    0
+                ],
+                "scale": [
+                    1.042,
+                    1.042,
+                    1.042
+                ]
+            },
+            "texture": "white2x2.png",
+            "color": [
+                0.4,
+                0.38,
+                0.36,
+                1
+            ],
+            "roughness": 0.85
+        },
+        {
+            "name": "Scatter_19",
+            "model": "suzanne.obj",
+            "transform": {
+                "translate": [
+                    93.521,
+                    2.495,
+                    -32.077
+                ],
+                "rotate": [
+                    0,
+                    1.833,
+                    0
+                ],
+                "scale": [
+                    2.495,
+                    2.495,
+                    2.495
+                ]
+            },
+            "roughness": 0.5
+        },
+        {
+            "name": "Scatter_20",
+            "model": "DeadTree_2.obj",
+            "transform": {
+                "translate": [
+                    122.011,
+                    0,
+                    -56.214
+                ],
+                "rotate": [
+                    0,
+                    3.26,
+                    0
+                ],
+                "scale": [
+                    2.903,
+                    2.903,
+                    2.903
+                ]
+            },
+            "roughness": 0.9
+        },
+        {
+            "name": "Scatter_21",
+            "model": "PointyTower.obj",
+            "transform": {
+                "translate": [
+                    90.265,
+                    0,
+                    -57.017
+                ],
+                "rotate": [
+                    0,
+                    4.018,
+                    0
+                ],
+                "scale": [
+                    1.528,
+                    1.528,
+                    1.528
+                ]
+            },
+            "roughness": 0.8
+        },
+        {
+            "name": "Scatter_22",
+            "model": "cube.obj",
+            "transform": {
+                "translate": [
+                    72.073,
+                    2.609,
+                    -53.77
+                ],
+                "rotate": [
+                    0,
+                    4.305,
+                    0
+                ],
+                "scale": [
+                    2.609,
+                    2.609,
+                    2.609
+                ]
+            },
+            "texture": "white2x2.png",
+            "color": [
+                0.4,
+                0.38,
+                0.36,
+                1
+            ],
+            "roughness": 0.85
+        },
+        {
+            "name": "Scatter_23",
+            "model": "suzanne.obj",
+            "transform": {
+                "translate": [
+                    92.092,
+                    2.993,
+                    -79.13
+                ],
+                "rotate": [
+                    0,
+                    3.095,
+                    0
+                ],
+                "scale": [
+                    2.993,
+                    2.993,
+                    2.993
+                ]
+            },
+            "roughness": 0.5
+        },
+        {
+            "name": "Scatter_24",
+            "model": "DeadTree_2.obj",
+            "transform": {
+                "translate": [
+                    72.074,
+                    0,
+                    -74.303
+                ],
+                "rotate": [
+                    0,
+                    5.416,
+                    0
+                ],
+                "scale": [
+                    3.846,
+                    3.846,
+                    3.846
+                ]
+            },
+            "roughness": 0.9
+        },
+        {
+            "name": "Scatter_25",
+            "model": "PointyTower.obj",
+            "transform": {
+                "translate": [
+                    67.879,
+                    0,
+                    -90.894
+                ],
+                "rotate": [
+                    0,
+                    5.867,
+                    0
+                ],
+                "scale": [
+                    1.672,
+                    1.672,
+                    1.672
+                ]
+            },
+            "roughness": 0.8
+        },
+        {
+            "name": "Scatter_26",
+            "model": "cube.obj",
+            "transform": {
+                "translate": [
+                    42.582,
+                    1.906,
+                    -64.704
+                ],
+                "rotate": [
+                    0,
+                    5.051,
+                    0
+                ],
+                "scale": [
+                    1.906,
+                    1.906,
+                    1.906
+                ]
+            },
+            "texture": "white2x2.png",
+            "color": [
+                0.4,
+                0.38,
+                0.36,
+                1
+            ],
+            "roughness": 0.85
+        },
+        {
+            "name": "Scatter_27",
+            "model": "suzanne.obj",
+            "transform": {
+                "translate": [
+                    57.014,
+                    1.852,
+                    -113.335
+                ],
+                "rotate": [
+                    0,
+                    5.053,
+                    0
+                ],
+                "scale": [
+                    1.852,
+                    1.852,
+                    1.852
+                ]
+            },
+            "roughness": 0.5
+        },
+        {
+            "name": "Scatter_28",
+            "model": "DeadTree_2.obj",
+            "transform": {
+                "translate": [
+                    32.555,
+                    0,
+                    -86.494
+                ],
+                "rotate": [
+                    0,
+                    2.025,
+                    0
+                ],
+                "scale": [
+                    2.518,
+                    2.518,
+                    2.518
+                ]
+            },
+            "roughness": 0.9
+        },
+        {
+            "name": "Scatter_29",
+            "model": "PointyTower.obj",
+            "transform": {
+                "translate": [
+                    29.24,
+                    0,
+                    -120.606
+                ],
+                "rotate": [
+                    0,
+                    6.263,
+                    0
+                ],
+                "scale": [
+                    3.089,
+                    3.089,
+                    3.089
+                ]
+            },
+            "roughness": 0.8
+        },
+        {
+            "name": "Scatter_30",
+            "model": "cube.obj",
+            "transform": {
+                "translate": [
+                    18.825,
+                    1.615,
+                    -125.383
+                ],
+                "rotate": [
+                    0,
+                    0.036,
+                    0
+                ],
+                "scale": [
+                    1.615,
+                    1.615,
+                    1.615
+                ]
+            },
+            "texture": "white2x2.png",
+            "color": [
+                0.4,
+                0.38,
+                0.36,
+                1
+            ],
+            "roughness": 0.85
+        },
+        {
+            "name": "Scatter_31",
+            "model": "suzanne.obj",
+            "transform": {
+                "translate": [
+                    7.798,
+                    2.471,
+                    -99.973
+                ],
+                "rotate": [
+                    0,
+                    4.306,
+                    0
+                ],
+                "scale": [
+                    2.471,
+                    2.471,
+                    2.471
+                ]
+            },
+            "roughness": 0.5
+        },
+        {
+            "name": "Scatter_32",
+            "model": "DeadTree_2.obj",
+            "transform": {
+                "translate": [
+                    -5.215,
+                    0,
+                    -96.909
+                ],
+                "rotate": [
+                    0,
+                    5.767,
+                    0
+                ],
+                "scale": [
+                    3.811,
+                    3.811,
+                    3.811
+                ]
+            },
+            "roughness": 0.9
+        },
+        {
+            "name": "Scatter_33",
+            "model": "PointyTower.obj",
+            "transform": {
+                "translate": [
+                    -10.412,
+                    0,
+                    -67.634
+                ],
+                "rotate": [
+                    0,
+                    1.338,
+                    0
+                ],
+                "scale": [
+                    2.639,
+                    2.639,
+                    2.639
+                ]
+            },
+            "roughness": 0.8
+        },
+        {
+            "name": "Scatter_34",
+            "model": "cube.obj",
+            "transform": {
+                "translate": [
+                    -23.148,
+                    1.642,
+                    -90.483
+                ],
+                "rotate": [
+                    0,
+                    4.302,
+                    0
+                ],
+                "scale": [
+                    1.642,
+                    1.642,
+                    1.642
+                ]
+            },
+            "texture": "white2x2.png",
+            "color": [
+                0.4,
+                0.38,
+                0.36,
+                1
+            ],
+            "roughness": 0.85
+        },
+        {
+            "name": "Scatter_35",
+            "model": "suzanne.obj",
+            "transform": {
+                "translate": [
+                    -27.965,
+                    1.868,
+                    -83.556
+                ],
+                "rotate": [
+                    0,
+                    2.08,
+                    0
+                ],
+                "scale": [
+                    1.868,
+                    1.868,
+                    1.868
+                ]
+            },
+            "roughness": 0.5
+        },
+        {
+            "name": "Scatter_36",
+            "model": "DeadTree_2.obj",
+            "transform": {
+                "translate": [
+                    -39.713,
+                    0,
+                    -93.357
+                ],
+                "rotate": [
+                    0,
+                    4.4,
+                    0
+                ],
+                "scale": [
+                    4.439,
+                    4.439,
+                    4.439
+                ]
+            },
+            "roughness": 0.9
+        },
+        {
+            "name": "Scatter_37",
+            "model": "PointyTower.obj",
+            "transform": {
+                "translate": [
+                    -62.98,
+                    0,
+                    -106.918
+                ],
+                "rotate": [
+                    0,
+                    2.008,
+                    0
+                ],
+                "scale": [
+                    3.1,
+                    3.1,
+                    3.1
+                ]
+            },
+            "roughness": 0.8
+        },
+        {
+            "name": "Scatter_38",
+            "model": "cube.obj",
+            "transform": {
+                "translate": [
+                    -56.518,
+                    1.272,
+                    -77.963
+                ],
+                "rotate": [
+                    0,
+                    5.572,
+                    0
+                ],
+                "scale": [
+                    1.272,
+                    1.272,
+                    1.272
+                ]
+            },
+            "texture": "white2x2.png",
+            "color": [
+                0.4,
+                0.38,
+                0.36,
+                1
+            ],
+            "roughness": 0.85
+        },
+        {
+            "name": "Scatter_39",
+            "model": "suzanne.obj",
+            "transform": {
+                "translate": [
+                    -38.434,
+                    2.413,
+                    -44.283
+                ],
+                "rotate": [
+                    0,
+                    2.45,
+                    0
+                ],
+                "scale": [
+                    2.413,
+                    2.413,
+                    2.413
+                ]
+            },
+            "roughness": 0.5
+        },
+        {
+            "name": "Scatter_40",
+            "model": "DeadTree_2.obj",
+            "transform": {
+                "translate": [
+                    -48.789,
+                    0,
+                    -48.039
+                ],
+                "rotate": [
+                    0,
+                    0.776,
+                    0
+                ],
+                "scale": [
+                    2.743,
+                    2.743,
+                    2.743
+                ]
+            },
+            "roughness": 0.9
+        },
+        {
+            "name": "Scatter_41",
+            "model": "PointyTower.obj",
+            "transform": {
+                "translate": [
+                    -93.082,
+                    0,
+                    -67.246
+                ],
+                "rotate": [
+                    0,
+                    2.226,
+                    0
+                ],
+                "scale": [
+                    2.905,
+                    2.905,
+                    2.905
+                ]
+            },
+            "roughness": 0.8
+        },
+        {
+            "name": "Scatter_42",
+            "model": "cube.obj",
+            "transform": {
+                "translate": [
+                    -80.474,
+                    2.85,
+                    -51.758
+                ],
+                "rotate": [
+                    0,
+                    1.969,
+                    0
+                ],
+                "scale": [
+                    2.85,
+                    2.85,
+                    2.85
+                ]
+            },
+            "texture": "white2x2.png",
+            "color": [
+                0.4,
+                0.38,
+                0.36,
+                1
+            ],
+            "roughness": 0.85
+        },
+        {
+            "name": "Scatter_43",
+            "model": "suzanne.obj",
+            "transform": {
+                "translate": [
+                    -114.125,
+                    2.034,
+                    -59.887
+                ],
+                "rotate": [
+                    0,
+                    6.176,
+                    0
+                ],
+                "scale": [
+                    2.034,
+                    2.034,
+                    2.034
+                ]
+            },
+            "roughness": 0.5
+        },
+        {
+            "name": "Scatter_44",
+            "model": "DeadTree_2.obj",
+            "transform": {
+                "translate": [
+                    -72.554,
+                    0,
+                    -28.533
+                ],
+                "rotate": [
+                    0,
+                    6.117,
+                    0
+                ],
+                "scale": [
+                    3.664,
+                    3.664,
+                    3.664
+                ]
+            },
+            "roughness": 0.9
+        },
+        {
+            "name": "Scatter_45",
+            "model": "PointyTower.obj",
+            "transform": {
+                "translate": [
+                    -112.216,
+                    0,
+                    -31.57
+                ],
+                "rotate": [
+                    0,
+                    5.143,
+                    0
+                ],
+                "scale": [
+                    2.11,
+                    2.11,
+                    2.11
+                ]
+            },
+            "roughness": 0.8
+        },
+        {
+            "name": "Scatter_46",
+            "model": "cube.obj",
+            "transform": {
+                "translate": [
+                    -98.452,
+                    2.455,
+                    -17.24
+                ],
+                "rotate": [
+                    0,
+                    3.301,
+                    0
+                ],
+                "scale": [
+                    2.455,
+                    2.455,
+                    2.455
+                ]
+            },
+            "texture": "white2x2.png",
+            "color": [
+                0.4,
+                0.38,
+                0.36,
+                1
+            ],
+            "roughness": 0.85
+        },
+        {
+            "name": "Scatter_47",
+            "model": "suzanne.obj",
+            "transform": {
+                "translate": [
+                    -112.581,
+                    1.908,
+                    -4.796
+                ],
+                "rotate": [
+                    0,
+                    0.856,
+                    0
+                ],
+                "scale": [
+                    1.908,
+                    1.908,
+                    1.908
+                ]
+            },
+            "roughness": 0.5
+        },
+        {
+            "name": "Scatter_48",
+            "model": "DeadTree_2.obj",
+            "transform": {
+                "translate": [
+                    -60.33,
+                    0,
+                    3.718
+                ],
+                "rotate": [
+                    0,
+                    3.101,
+                    0
+                ],
+                "scale": [
+                    2.759,
+                    2.759,
+                    2.759
+                ]
+            },
+            "roughness": 0.9
+        },
+        {
+            "name": "Scatter_49",
+            "model": "PointyTower.obj",
+            "transform": {
+                "translate": [
+                    -86.437,
+                    0,
+                    11.76
+                ],
+                "rotate": [
+                    0,
+                    3.938,
+                    0
+                ],
+                "scale": [
+                    2.897,
+                    2.897,
+                    2.897
+                ]
+            },
+            "roughness": 0.8
+        },
+        {
+            "name": "Scatter_50",
+            "model": "cube.obj",
+            "transform": {
+                "translate": [
+                    -83.148,
+                    1.868,
+                    20.569
+                ],
+                "rotate": [
+                    0,
+                    2.723,
+                    0
+                ],
+                "scale": [
+                    1.868,
+                    1.868,
+                    1.868
+                ]
+            },
+            "texture": "white2x2.png",
+            "color": [
+                0.4,
+                0.38,
+                0.36,
+                1
+            ],
+            "roughness": 0.85
+        },
+        {
+            "name": "Scatter_51",
+            "model": "suzanne.obj",
+            "transform": {
+                "translate": [
+                    -78.228,
+                    2.899,
+                    27.828
+                ],
+                "rotate": [
+                    0,
+                    5.847,
+                    0
+                ],
+                "scale": [
+                    2.899,
+                    2.899,
+                    2.899
+                ]
+            },
+            "roughness": 0.5
+        },
+        {
+            "name": "Scatter_52",
+            "model": "DeadTree_2.obj",
+            "transform": {
+                "translate": [
+                    -81.484,
+                    0,
+                    38.549
+                ],
+                "rotate": [
+                    0,
+                    1.696,
+                    0
+                ],
+                "scale": [
+                    4.271,
+                    4.271,
+                    4.271
+                ]
+            },
+            "roughness": 0.9
+        },
+        {
+            "name": "Scatter_53",
+            "model": "PointyTower.obj",
+            "transform": {
+                "translate": [
+                    -79.468,
+                    0,
+                    42.826
+                ],
+                "rotate": [
+                    0,
+                    5.887,
+                    0
+                ],
+                "scale": [
+                    2.298,
+                    2.298,
+                    2.298
+                ]
+            },
+            "roughness": 0.8
+        },
+        {
+            "name": "Scatter_54",
+            "model": "cube.obj",
+            "transform": {
+                "translate": [
+                    -47.585,
+                    1.831,
+                    37.476
+                ],
+                "rotate": [
+                    0,
+                    2.375,
+                    0
+                ],
+                "scale": [
+                    1.831,
+                    1.831,
+                    1.831
+                ]
+            },
+            "texture": "white2x2.png",
+            "color": [
+                0.4,
+                0.38,
+                0.36,
+                1
+            ],
+            "roughness": 0.85
+        },
+        {
+            "name": "Scatter_55",
+            "model": "suzanne.obj",
+            "transform": {
+                "translate": [
+                    -99.233,
+                    1.942,
+                    83.743
+                ],
+                "rotate": [
+                    0,
+                    5.993,
+                    0
+                ],
+                "scale": [
+                    1.942,
+                    1.942,
+                    1.942
+                ]
+            },
+            "roughness": 0.5
+        },
+        {
+            "name": "Scatter_56",
+            "model": "DeadTree_2.obj",
+            "transform": {
+                "translate": [
+                    -91.336,
+                    0,
+                    102.475
+                ],
+                "rotate": [
+                    0,
+                    2.933,
+                    0
+                ],
+                "scale": [
+                    4.068,
+                    4.068,
+                    4.068
+                ]
+            },
+            "roughness": 0.9
+        },
+        {
+            "name": "Scatter_57",
+            "model": "PointyTower.obj",
+            "transform": {
+                "translate": [
+                    -76.75,
+                    0,
+                    104.456
+                ],
+                "rotate": [
+                    0,
+                    4.919,
+                    0
+                ],
+                "scale": [
+                    2.115,
+                    2.115,
+                    2.115
+                ]
+            },
+            "roughness": 0.8
+        },
+        {
+            "name": "Scatter_58",
+            "model": "cube.obj",
+            "transform": {
+                "translate": [
+                    -55.676,
+                    2.12,
+                    92.635
+                ],
+                "rotate": [
+                    0,
+                    0.537,
+                    0
+                ],
+                "scale": [
+                    2.12,
+                    2.12,
+                    2.12
+                ]
+            },
+            "texture": "white2x2.png",
+            "color": [
+                0.4,
+                0.38,
+                0.36,
+                1
+            ],
+            "roughness": 0.85
+        },
+        {
+            "name": "Scatter_59",
+            "model": "suzanne.obj",
+            "transform": {
+                "translate": [
+                    -47.749,
+                    1.538,
+                    107.487
+                ],
+                "rotate": [
+                    0,
+                    4.121,
+                    0
+                ],
+                "scale": [
+                    1.538,
+                    1.538,
+                    1.538
+                ]
+            },
+            "roughness": 0.5
+        },
+        {
+            "name": "Scatter_60",
+            "model": "DeadTree_2.obj",
+            "transform": {
+                "translate": [
+                    -44.724,
+                    0,
+                    115.428
+                ],
+                "rotate": [
+                    0,
+                    5.974,
+                    0
+                ],
+                "scale": [
+                    3.959,
+                    3.959,
+                    3.959
+                ]
+            },
+            "roughness": 0.9
+        },
+        {
+            "name": "Scatter_61",
+            "model": "PointyTower.obj",
+            "transform": {
+                "translate": [
+                    -32.219,
+                    0,
+                    124.888
+                ],
+                "rotate": [
+                    0,
+                    0.774,
+                    0
+                ],
+                "scale": [
+                    1.904,
+                    1.904,
+                    1.904
+                ]
+            },
+            "roughness": 0.8
+        },
+        {
+            "name": "Scatter_62",
+            "model": "cube.obj",
+            "transform": {
+                "translate": [
+                    -23.191,
+                    2.598,
+                    128.621
+                ],
+                "rotate": [
+                    0,
+                    1.691,
+                    0
+                ],
+                "scale": [
+                    2.598,
+                    2.598,
+                    2.598
+                ]
+            },
+            "texture": "white2x2.png",
+            "color": [
+                0.4,
+                0.38,
+                0.36,
+                1
+            ],
+            "roughness": 0.85
+        },
+        {
+            "name": "Scatter_63",
+            "model": "suzanne.obj",
+            "transform": {
+                "translate": [
+                    -9.152,
+                    2.663,
+                    126.329
+                ],
+                "rotate": [
+                    0,
+                    4.379,
+                    0
+                ],
+                "scale": [
+                    2.663,
+                    2.663,
+                    2.663
+                ]
+            },
+            "roughness": 0.5
+        }
+    ],
+    "lights": [
+        {
+            "name": "Point_Red",
+            "type": "Point",
+            "translate": [
+                -14,
+                5,
+                -10
+            ],
+            "rotate": [
+                0,
+                0,
+                0
+            ],
+            "color": [
+                1,
+                0.25,
+                0.2
+            ],
+            "intensity": 4,
+            "range": 14,
+            "decay": 1
+        },
+        {
+            "name": "Point_Blue",
+            "type": "Point",
+            "translate": [
+                14,
+                5,
+                -10
+            ],
+            "rotate": [
+                0,
+                0,
+                0
+            ],
+            "color": [
+                0.25,
+                0.45,
+                1
+            ],
+            "intensity": 4,
+            "range": 14,
+            "decay": 1
+        },
+        {
+            "name": "Point_Temple",
+            "type": "Point",
+            "translate": [
+                0,
+                6,
+                26
+            ],
+            "rotate": [
+                0,
+                0,
+                0
+            ],
+            "color": [
+                1,
+                0.8,
+                0.55
+            ],
+            "intensity": 3,
+            "range": 22,
+            "decay": 1
+        },
+        {
+            "name": "Point_Boss",
+            "type": "Point",
+            "translate": [
+                -18,
+                9,
+                14
+            ],
+            "rotate": [
+                0,
+                0,
+                0
+            ],
+            "color": [
+                0.7,
+                0.3,
+                1
+            ],
+            "intensity": 4,
+            "range": 18,
+            "decay": 1
+        },
+        {
+            "name": "Spot_Temple",
+            "type": "Spot",
+            "translate": [
+                0,
+                30,
+                14
+            ],
+            "rotate": [
+                0.9,
+                0,
+                0
+            ],
+            "color": [
+                1,
+                0.95,
+                0.85
+            ],
+            "intensity": 3,
+            "range": 60,
+            "decay": 1,
+            "angle": 28,
+            "softness": 0.3
+        },
+        {
+            "name": "Spot_Show",
+            "type": "Spot",
+            "translate": [
+                0,
+                22,
+                -8
+            ],
+            "rotate": [
+                1.5708,
+                0,
+                0
+            ],
+            "color": [
+                1,
+                1,
+                1
+            ],
+            "intensity": 2,
+            "range": 40,
+            "decay": 1,
+            "angle": 38,
+            "softness": 0.5
+        },
+        {
+            "name": "Spot_Runners",
+            "type": "Spot",
+            "translate": [
+                0,
+                18,
+                12
+            ],
+            "rotate": [
+                1.5708,
+                0,
+                0
+            ],
+            "color": [
+                0.6,
+                1,
+                0.7
+            ],
+            "intensity": 3,
+            "range": 40,
+            "decay": 1,
+            "angle": 30,
+            "softness": 0.3
         }
     ]
 }

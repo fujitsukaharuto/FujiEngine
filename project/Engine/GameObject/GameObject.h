@@ -52,13 +52,11 @@ namespace GameObject {
 		//========================================================================*/
 		//* 寿命
 		/// <summary>動かす/止める</summary>
-		/// <remarks>止めている間は当たり判定から外れ、Spawn したものなら Update・Draw も呼ばれない。
-		/// プールした弾の待機中など「消さずに休ませる」ときに使う。自分で持っているオブジェクトの Update・Draw は持ち主が呼び分けること</remarks>
+		/// <remarks>止めている間は当たり判定から外れ、Spawn したものなら Update・Draw も呼ばれない</remarks>
 		void SetActive(bool active) { isActive_ = active; }
 		bool IsActive() const { return isActive_; }
 		/// <summary>破棄を予約する</summary>
-		/// <remarks>Spawn したものは、そのフレームの当たり判定が済んだ後にシーンが破棄する。
-		/// 予約した時点で当たり判定からは外れる。自分で持っているオブジェクトには印が付くだけ</remarks>
+		/// <remarks>Spawn したものは、そのフレームの当たり判定の後にシーンが破棄する</remarks>
 		void Destroy() { isDestroyed_ = true; }
 		bool IsDestroyed() const { return isDestroyed_; }
 
@@ -71,9 +69,7 @@ namespace GameObject {
 		virtual void OnCollisionStay([[maybe_unused]] const Collision::ColliderInfo& other) {}
 		virtual void OnCollisionExit([[maybe_unused]] const Collision::ColliderInfo& other) {}
 		/// <summary>このオブジェクトのコライダーを判定に入れるか</summary>
-		/// <remarks>AddCollider したコライダーは SceneManager が毎フレーム自動で集めるので、シーン側の登録は要らない。
-		/// SetActive(false) の間は呼ばれずに外れる。動いているが当てたくない間(溜め中など)だけ false を返す。
-		/// コライダー1個ずつ切るなら BaseCollider::SetIsCollisonCheck</remarks>
+		/// <remarks>動いているが当てたくない間だけ false を返す。SetActive(false) の間は呼ばれずに外れる</remarks>
 		virtual bool IsCollisionActive() const { return true; }
 
 		/// <summary>値比較</summary>
@@ -155,9 +151,8 @@ namespace GameObject {
 
 		//========================================================================*/
 		//* Parameter
-		/// <summary>調整値を登録する。Inspector の Parameters に並び、保存した値は次の生成から読み込まれる</summary>
-		/// <remarks>既定値を入れた後に呼ぶこと。保存済みの値があればその場で上書きする。
-		/// 保存先はクラスごとに1ファイル(resource/Json/Param/クラス名.json)なので、同じクラスのインスタンスは値を共有する</remarks>
+		/// <summary>調整値を登録する。Inspector の Parameters に並び、保存できる</summary>
+		/// <remarks>既定値を入れた後に呼ぶこと。保存先はクラスごとに1ファイルで、インスタンス間で値を共有する</remarks>
 		void AddParam(const std::string& name, float& value, float speed = 0.01f);
 		void AddParam(const std::string& name, int& value);
 		void AddParam(const std::string& name, bool& value);

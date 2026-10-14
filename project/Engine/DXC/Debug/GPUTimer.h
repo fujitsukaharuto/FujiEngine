@@ -13,7 +13,7 @@ namespace DXC {
 	class GPUTimer {
 	public:
 		GPUTimer() = default;
-		~GPUTimer() = default;
+		~GPUTimer();
 
 		/// <summary>
 		/// 初期化
@@ -57,6 +57,22 @@ namespace DXC {
 		/// <returns>経過時間(ms)</returns>
 		double GetElapsedMS(uint32_t frameIndex, uint32_t timerId);
 
+		/// <summary>一覧に出す名前を付ける。付けた区間だけ CollectAll に出る</summary>
+		void SetName(uint32_t timerId, const char* name);
+
+		/// <summary>名前つきの計測結果</summary>
+		struct Sample {
+			const char* name;
+			double ms;
+		};
+
+		/// <summary>フレームの切り替わりで1回呼ぶ。そのフレームに計測したかどうかの判定に使う</summary>
+		static void AdvanceFrame();
+
+		/// <summary>全タイマーの名前つき区間のうち、1つ前のフレームで計測したものを集める</summary>
+		/// <param name="finishedFrame">GPU が書き終えているフレーム番号</param>
+		static void CollectAll(uint32_t finishedFrame, std::vector<Sample>& out);
+
 	private:
 		// StartとEndの2つ
 		static constexpr uint32_t kTimestampsPerTimer = 2;
@@ -66,5 +82,9 @@ namespace DXC {
 
 		uint64_t gpuFrequency_ = 0;
 		uint32_t maxTimerCount_ = 10;
+
+		std::vector<const char*> names_;
+		// Resolve したときのフレーム通し番号。0 は未計測
+		std::vector<uint64_t> resolvedSerial_[DXC::kFrameCount_];
 	};
 }

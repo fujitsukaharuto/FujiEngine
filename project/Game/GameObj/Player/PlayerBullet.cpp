@@ -72,7 +72,7 @@ void PlayerBullet::CalculationFollowVec(const Vector3& target) {
 	Quaternion targetRot = Quaternion::LookRotation(toTarget);
 
 	// 補間
-	Quaternion newRot = Quaternion::SLerp(currentRot, targetRot, 0.1f);
+	Quaternion newRot = Quaternion::SLerp(currentRot, targetRot, FPSKeeper::SmoothRate(0.1f));
 
 	// 回転行列に変換して前方向を取得
 	Matrix4x4 rotMat = newRot.MakeRotateMatrix();

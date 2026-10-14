@@ -95,15 +95,29 @@ void GPUParticleSystem::Dispatch() {
 	ID3D12GraphicsCommandList* computeList = dxcommon_->GetComputeCommandList();
 	PipelineManager* pPipeManager = PipelineManager::GetInstance();
 
-	// プール2枚化(ピンポン): 書き込み先を反転。readIdx = writeIdx_^1。Drawは本フレーム後段なのでwriteIdx_を読む。
-	writeIdx_ ^= 1;
-
 	// 2フレーム前の結果なので確実に書き終わっている。スプラットの半径の上限を決めるのに使う
 	AliveCountDataReadBack();
 
-	// Stage2: Drawが trans/color しか読まないフレームが2つ続いたときだけ compute_N と Draw_{N-1} を並走させる。
-	// 書き込み先は2フレーム前のDrawが読んだ面で、BeginFrameのダブルバッファ待ちで完了保証済み。
-	// scale は1枚しか無いので、Drawが読む間(ラスタ、または丸のスプラット)は並走できない
+	// 生存数が全粒子を数えるのはスプラットのときだけ。ラスタは画面内の数なので、0 でも画面外に居ることがある
+	bool isAnyEmitting = false;
+	for (const auto& info : csEmitters_) {
+		isAnyEmitting |= info.emitter->WillDispatch();
+	}
+	idleFrames_ = (isAnyEmitting || aliveCount_ > 0 || !useComputeSplat_) ? 0 : idleFrames_ + 1;
+	// 生存数が届くのは2フレーム後なので、出した直後の 0 を空と見誤らないだけ待つ
+	isIdle_ = idleFrames_ > kFrameCount_ + 1;
+	if (isIdle_) {
+		// 毎フレーム開き直すコマンドリストなので、何も積まなくても閉じて流す
+		dxcommon_->GetDXCommand()->ComputeExecution();
+		dxcommon_->GetDXCommand()->GPUComputeSignal();
+		return;
+	}
+
+	// プール2枚化(ピンポン): 書き込み先を反転。readIdx = writeIdx_^1。Drawは本フレーム後段なのでwriteIdx_を読む。
+	writeIdx_ ^= 1;
+
+	// Stage2: Draw が scale を読まないフレームが2つ続いたときだけ compute_N と Draw_{N-1} を並走させる。
+	// 書き込み先は2フレーム前の Draw が読んだ面で、BeginFrame の待ちで完了済み
 	bool drawReadsScale = !useComputeSplat_ || useSplatFootprint_;
 	bool overlap = useOverlap_ && !drawReadsScale && !prevDrawReadsScale_;
 	if (!overlap) {
@@ -140,6 +154,9 @@ void GPUParticleSystem::Dispatch() {
 }
 
 void GPUParticleSystem::Draw(const D3D12_VERTEX_BUFFER_VIEW& vbView, const D3D12_INDEX_BUFFER_VIEW& ibView) {
+	if (isIdle_) {
+		return;
+	}
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 
 	// パーティクルの描画直前に、Compute Queueの完了をGraphics Queueに同期させる
@@ -515,6 +532,9 @@ void GPUParticleSystem::InitInstance(ParticleCSInstance& CSInstance, size_t inst
 void GPUParticleSystem::InitGPUTimer() {
 	gpuTimerGraphics.Initialize(dxcommon_->GetDevice(), dxcommon_->GetDXCommand()->GetQueue());
 	gpuTimerCompute.Initialize(dxcommon_->GetDevice(), dxcommon_->GetDXCommand()->GetComputeQueue());
+	gpuTimerGraphics.SetName(kTimer_DrawExecuteIndirect, "  GPU particle draw");
+	gpuTimerCompute.SetName(kTimer_ParticleUpdate, "Compute: particle update");
+	gpuTimerCompute.SetName(kTimer_EmitterDispatch, "Compute: particle emit");
 }
 
 void GPUParticleSystem::AliveCountDataReadBack() {

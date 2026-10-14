@@ -24,6 +24,11 @@ namespace Graphics {
 		~Denoiser() = default;
 
 		void Initialize(DXC::DXCom* pDxcom);
+		/// <summary>GPU 時間の一覧に出す名前。AO 用と影用で別のインスタンスなので使う側が付ける</summary>
+		void SetTimerNames(const char* temporal, const char* spatial) {
+			gpuTimer_.SetName(kTimer_Temporal, temporal);
+			gpuTimer_.SetName(kTimer_Spatial, spatial);
+		}
 		void Finalize();
 
 		/// <summary>生の信号をならす。結果は GetResultSrvHandle() から引く</summary>

@@ -7,8 +7,7 @@ namespace GameObject {
 	/// <summary>
 	/// シーンに入ったとき、プレイヤー等を置く位置と向き
 	/// </summary>
-	/// <remarks>配置データ(Scene::Level)に名前付きで置く。ChangeScene で入口の名前を渡すと、遷移先ではその名前の出現位置が使われる(BaseScene::ApplySpawnPoint)。
-	/// 見た目は持たず、_DEBUGMODE でだけ位置と向きを線で描く</remarks>
+	/// <remarks>配置データに名前付きで置く。ChangeScene で入口の名前を渡すと、遷移先でその位置が使われる</remarks>
 	class SpawnPoint : public GameObject {
 	public:
 

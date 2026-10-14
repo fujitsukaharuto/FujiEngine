@@ -12,7 +12,7 @@ namespace Graphics {
 	/// <summary>
 	/// 配置データから作るスプライト。UI の絵をコードを書かずに置く
 	/// </summary>
-	/// <remarks>生成・描画・保存は Scene::Level が行う。シーンは Level::FindSprite で名前から引き、表示の切り替えや動きを付ける</remarks>
+	/// <remarks>生成・描画・保存は Scene::Level が行う。シーンは Level::FindSprite で名前から引く</remarks>
 	class PlacedSprite {
 	public:
 		PlacedSprite();

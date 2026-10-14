@@ -43,7 +43,7 @@ namespace Collision {
 		/// </summary>
 		void AddCollider(BaseCollider* collider) { colliders_.push_back(collider); }
 		/// <summary>生存中の GameObject が持つコライダーを全て登録する</summary>
-		/// <remarks>止めている(SetActive)・破棄を予約した・IsCollisionActive() が false のものは飛ばす。Reset はしない</remarks>
+		/// <remarks>止めている・破棄予約済み・IsCollisionActive() が false のものは飛ばす。Reset はしない</remarks>
 		void AddGameObjectColliders();
 
 		void Reset() { colliders_.clear(); }
@@ -53,7 +53,7 @@ namespace Collision {
 		/// <summary>
 		/// 絞り込み済みの2つの衝突をチェックする
 		/// </summary>
-		/// <remarks>ペアループはこちらを呼ぶ。CheckCollisionPair 経由だと dynamic_cast が O(n^2) 回走る</remarks>
+		/// <remarks>ペアループはこちらを呼ぶ。CheckCollisionPair 経由だと dynamic_cast が毎回走る</remarks>
 		void CheckAABBPair(AABBCollider* A, AABBCollider* B);
 
 		/// <summary>

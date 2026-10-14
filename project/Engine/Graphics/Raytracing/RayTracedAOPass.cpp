@@ -52,6 +52,8 @@ void RayTracedAOPass::Initialize(DXCom* pDxcom, LightManager* pLightManager) {
 	}
 
 	gpuTimer_.Initialize(device, dxcommon_->GetDXCommand()->GetQueue(), 1);
+	gpuTimer_.SetName(kTimer_Trace, "  AO trace");
+	denoiser_.SetTimerNames("  AO temporal", "  AO spatial");
 }
 
 void RayTracedAOPass::Finalize() {

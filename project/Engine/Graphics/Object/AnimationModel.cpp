@@ -290,7 +290,7 @@ void AnimationModel::Render() {
 		pPipeManager->SetGraphicsRootCBV(cList, RootName::kCamera, cameraPosResource_[frameIndex]->GetGPUVirtualAddress());
 		pPipeManager->SetGraphicsRootDescriptorTable(cList, RootName::kTextures, SRVManager::GetInstance()->GetGPUDescriptorHandle(0));
 
-		model_->AnimationDraw(dxcommon_, cList, skinnedMeshes_, material_);
+		model_->AnimationDraw(cList, skinnedMeshes_, material_);
 
 	} else if (model_ && isMirrorObj_) {
 		dxcommon_->GetDXCommand()->SetViewAndScissor(MyWin::kWindowWidth, MyWin::kWindowHeight);

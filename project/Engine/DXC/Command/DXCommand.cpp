@@ -101,7 +101,7 @@ void DXC::DXCommand::WaitForGPU(SubmitPath path) {
 		}
 
 		if (graphicsContext_->GetFenceValue(frameIndex_) != 0) { // DefaultQueueを待つ
-			graphicsContext_->WaitForGPU(frameIndex_, true);
+			graphicsContext_->WaitForGPU(frameIndex_);
 		}
 	} else {
 		immediateContext_->WaitForGPU(frameIndex_);

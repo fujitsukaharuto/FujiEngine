@@ -8,7 +8,7 @@ namespace Editor {
 	/// <summary>
 	/// Jsonのセーブ / ロードを行う編集UI
 	/// </summary>
-	/// <remarks>読み書き自体は Core::JsonSerializer が行う。こちらはポップアップとUndoコマンドの発行を担当する</remarks>
+	/// <remarks>読み書きは Core::JsonSerializer が行う。こちらはポップアップと Undo の発行</remarks>
 	class JsonEditorUI {
 	public:
 

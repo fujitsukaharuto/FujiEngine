@@ -56,6 +56,7 @@ namespace Graphics {
 		// 一度だけエミット
 		void Emit() override;
 		bool IsEmit() const override { return isEmit_; }
+		bool WillDispatch() const override { return isEmit_ && data_.count != 0; }
 
 		EmitterTexture& GetData() { return data_; }
 

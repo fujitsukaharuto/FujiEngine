@@ -94,6 +94,12 @@ namespace DXC {
 		/// <param name="index">Allocateで得たインデックス</param>
 		void Free(uint32_t index);
 
+		/// <summary>GPU が使い終わるのを待ってから返却する。毎フレーム作って消す物の後始末用</summary>
+		void FreeDeferred(uint32_t index);
+
+		/// <summary>フレームの頭で1回呼ぶ。待ち終えたスロットを返却する</summary>
+		void Tick();
+
 		//========================================================================*/
 		//* Getter
 		D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(uint32_t index);
@@ -114,6 +120,8 @@ namespace DXC {
 		// useIndex_ は「一度も使っていない領域の先頭」。返却されたスロットは freeList_ に入り再利用される
 		uint32_t useIndex_ = 0;
 		std::vector<uint32_t> freeList_;
+		// 返却待ちのスロットと、あと何フレーム待つか
+		std::vector<std::pair<uint32_t, uint32_t>> pendingFree_;
 
 	};
 

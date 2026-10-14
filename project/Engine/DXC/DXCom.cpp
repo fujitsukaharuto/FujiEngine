@@ -7,6 +7,7 @@
 // DXCom.h では前方宣言に留めているもの
 #include "Engine/Core/App/MyWindow.h"
 #include "Engine/DXC/Shader/DXCompile.h"
+#include "Engine/DXC/Debug/GPUTimer.h"
 #include "Engine/Graphics/PostEffect/OffscreenManager.h"
 #include "Engine/Core/Time/FPSKeeper.h"
 #include "Engine/Graphics/Pipeline/PipelineManager.h"
@@ -40,6 +41,13 @@ void DXCom::Initialize(MyWin* myWin) {
 	// コマンド関係の作成
 	command_ = std::make_unique<DXCommand>();
 	command_->Initialize(GetDevice());
+	gpuFrameTimer_ = std::make_unique<GPUTimer>();
+	gpuFrameTimer_->Initialize(GetDevice(), command_->GetQueue(), static_cast<uint32_t>(GpuSection::Count));
+	constexpr const char* kSectionNames[] = { "Frame", "Skinning", "Sky", "Objects", "Particles", "Sprites", "PostEffect", "DebugGui" };
+	static_assert(std::size(kSectionNames) == static_cast<size_t>(GpuSection::Count));
+	for (uint32_t i = 0; i < static_cast<uint32_t>(GpuSection::Count); ++i) {
+		gpuFrameTimer_->SetName(i, kSectionNames[i]);
+	}
 
 	// スワップチェーンの作成
 	swapChainManager_ = std::make_unique<SwapChainManager>();
@@ -62,6 +70,10 @@ void DXCom::Finalize() {
 	}
 	if (offscreen_) {//オフスクリーンの終了処理
 		offscreen_.reset();
+	}
+	if (gpuFrameTimer_) {
+		gpuFrameTimer_->Finalize();
+		gpuFrameTimer_.reset();
 	}
 	if (command_) {//コマンドの終了処理
 		command_.reset();
@@ -116,7 +128,7 @@ void DXCom::PostEffect() {
 
 	swapChainManager_->CreateBarrier(D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET, command_.get());
 
-	const D3D12_CPU_DESCRIPTOR_HANDLE& backBuffer = swapChainManager_->GetRTVHandle(backBufferIndex);
+	const D3D12_CPU_DESCRIPTOR_HANDLE& backBuffer = swapChainManager_->GetBackBufferRTV(backBufferIndex);
 	// 深度バッファはゲームを描く解像度のままで、バックバッファ(ウィンドウの大きさ)とは寸法が合わないので付けない
 	commandList->OMSetRenderTargets(1, &backBuffer, false, nullptr);
 
@@ -133,6 +145,8 @@ void DXCom::PostEffect() {
 
 void DXCom::PostDraw() {
 	swapChainManager_->CreateBarrier(D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT, command_.get());
+
+	EndGpuSection(GpuSection::Frame);
 
 	// 命令のクローズ
 	command_->Close();
@@ -159,8 +173,25 @@ void DXCom::ResizeSwapChainIfNeeded() {
 void DXCom::BeginFrame() {
 	ResizeSwapChainIfNeeded();
 	command_->SetFrameIndex((command_->GetNowFrameIndex() + 1) % kFrameCount_);
-	 fpsKeeper_->FixFPS();
+	fpsKeeper_->FixFPS();
 	command_->Reset();
+	SRVManager::GetInstance()->Tick();
+	GPUTimer::AdvanceFrame();
+	BeginGpuSection(GpuSection::Frame);
+}
+
+void DXCom::BeginGpuSection(GpuSection section) {
+	gpuFrameTimer_->Begin(command_->GetList(), GetNowFrameCount(), static_cast<uint32_t>(section));
+}
+
+void DXCom::EndGpuSection(GpuSection section) {
+	gpuFrameTimer_->End(command_->GetList(), GetNowFrameCount(), static_cast<uint32_t>(section));
+	gpuFrameTimer_->Resolve(command_->GetList(), GetNowFrameCount(), static_cast<uint32_t>(section));
+}
+
+double DXCom::GetGpuFrameMS() const {
+	const uint32_t finishedFrame = (GetNowFrameCount() + kFrameCount_ - 1) % kFrameCount_;
+	return gpuFrameTimer_->GetElapsedMS(finishedFrame, 0);
 }
 
 void DXCom::PerFrameWait() {
@@ -187,21 +218,21 @@ void DXCom::CommandExecution() {
 
 void DXCom::SetRenderTargets() {
 	UINT frameIndex = GetNowFrameCount();
-	command_->GetList()->OMSetRenderTargets(1, &swapChainManager_->GetRTVHandle(2 + frameIndex), false, &swapChainManager_->GetDSVHandle(frameIndex));
+	command_->GetList()->OMSetRenderTargets(1, &swapChainManager_->GetOffscreenRTV(frameIndex), false, &swapChainManager_->GetDSVHandle(frameIndex));
 }
 
 void DXCom::SetRenderTargetsForGPUParticle() {
 	UINT frameIndex = GetNowFrameCount();
 	// 1/4解像度RT。深度は使わない(フル解像度DSVとは寸法が合わないため nullptr)。
-	command_->GetList()->OMSetRenderTargets(1, &swapChainManager_->GetRTVHandle(4 + frameIndex), false, nullptr);
+	command_->GetList()->OMSetRenderTargets(1, &swapChainManager_->GetGPUParticleRTV(frameIndex), false, nullptr);
 }
 
 void DXCom::ClearRenderTarget() {
-	command_->GetList()->ClearRenderTargetView(swapChainManager_->GetRTVHandle(2 + GetNowFrameCount()), offscreen_->GetClearColorValue().Color, 0, nullptr);
+	command_->GetList()->ClearRenderTargetView(swapChainManager_->GetOffscreenRTV(GetNowFrameCount()), offscreen_->GetClearColorValue().Color, 0, nullptr);
 }
 
 void DXCom::ClearRenderTargetForGPUParticle() {
-	command_->GetList()->ClearRenderTargetView(swapChainManager_->GetRTVHandle(4 + GetNowFrameCount()), offscreen_->GetClearColorValueForGPURTV().Color, 0, nullptr);
+	command_->GetList()->ClearRenderTargetView(swapChainManager_->GetGPUParticleRTV(GetNowFrameCount()), offscreen_->GetClearColorValueForGPURTV().Color, 0, nullptr);
 }
 
 void DXCom::ClearDepthBuffer() {

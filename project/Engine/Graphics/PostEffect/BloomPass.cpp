@@ -51,6 +51,7 @@ void BloomPass::Initialize(DXCom* pDxcom) {
 	}
 
 	gpuTimer_.Initialize(device, dxcommon_->GetDXCommand()->GetQueue(), kTimer_Count);
+	gpuTimer_.SetName(kTimer_Bloom, "  Bloom");
 }
 
 void BloomPass::Finalize() {

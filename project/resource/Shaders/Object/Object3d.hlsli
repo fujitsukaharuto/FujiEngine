@@ -76,7 +76,7 @@ struct AllLights
     int numDirectionalLights;
     int numPointLights;
     int numSpotLights;
-    float pad0;
+    float reflectionShadow; // 0番の平行光源の影で映り込みをどれだけ暗くするか
     float3 ambientSkyColor;
     float ambientIntensity;
     float3 ambientGroundColor;
@@ -98,7 +98,13 @@ struct AllLights
     float sunAngularRadius; // 光源の見かけの半径(ラジアン)
     uint shadowSampleCount;
     uint ambientMode; // IBL.hlsli の kAmbientMode*
-    uint pad3;
+    float iblAmbientScale; // IBL のときだけアンビエントに掛ける倍率
+
+    float3 environmentTint; // 空に掛けている色。映り込みと IBL にも同じ色を掛ける
+    uint hasEnvironment; // 0 なら空を出していない。映り込みは半球の2色で代用する
+
+    uint lightingMode; // SimpleLighting.hlsli の kLightingMode*
+    float3 padLighting;
 
     // 空気(フォグ)。設定は配置データの環境から来る
     FogParams fog;

@@ -85,18 +85,10 @@ void CommandContext::Signal(uint32_t frameIndex) {
 	fenceValue_[frameIndex] = globalFenceValue_;
 }
 
-void CommandContext::WaitForGPU(uint32_t frameIndex, bool isLogging) {
+void CommandContext::WaitForGPU(uint32_t frameIndex) {
 	if (fence_->GetCompletedValue() < fenceValue_[frameIndex]) {
 		fence_->SetEventOnCompletion(fenceValue_[frameIndex], fenceEvent_);
 		WaitForSingleObject(fenceEvent_, INFINITE);
-
-		if (isLogging) {
-			Logger::LogF("frame=%llu idx=%u fence=%llu completed=%llu",
-				globalFenceValue_,
-				frameIndex,
-				fenceValue_[frameIndex],
-				fence_->GetCompletedValue());
-		}
 	}
 }
 

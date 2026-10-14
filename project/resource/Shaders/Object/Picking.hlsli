@@ -1,15 +1,8 @@
 #ifndef PICKING_HLSLI
 #define PICKING_HLSLI
 
-// クリックされた画素に写っているオブジェクトの番号を拾うパスの共通部。VSは Object3d.VS を流用。
-// クリックしたフレームにだけ、その1画素に絞って走らせる。
-// 本描画のPSに同居させないのは、UAVへ書くPSは深度テストがPSの後へ回るため。
-//
-// 2回に分けて描く。
-//   1回目 (PickingDepth.PS) : その画素でいちばん手前の深度を求める
-//   2回目 (PickingID.PS)    : その深度と一致した断片だけが番号を書く
-// 1回で「読んで比べて書く」をやると、同じ画素を触る描画同士で順序が保証されず、
-// 重なった所でどれが残るかが実行のたびに変わる
+// クリックされた画素のオブジェクト番号を拾うパスの共通部。VSは Object3d.VS を流用。
+// 1回目(PickingDepth.PS)で手前の深度を求め、2回目(PickingID.PS)でその深度の断片だけが番号を書く
 #include "Object3d.hlsli"
 
 struct PickingBuffer

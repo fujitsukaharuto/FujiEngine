@@ -73,7 +73,7 @@ namespace Graphics {
 		size_t GetIndexCount() const { return indexData_.size(); }
 
 		std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> GetSrvHandle() const { return srvHandle_; }
-		/// <summary>頂点とインデックスの SRV の番号。レイが当たった点の UV と法線を引くのに使う。未生成なら kInvalidSrvIndex</summary>
+		/// <summary>頂点とインデックスの SRV の番号。レイが当たった点の UV と法線を引くのに使う</summary>
 		uint32_t GetVertexSrvIndex() const { return srvIndex_; }
 		uint32_t GetIndexSrvIndex() const { return indexSrvIndex_; }
 		/// <summary>モデルの原点から、いちばん遠い頂点までの距離</summary>

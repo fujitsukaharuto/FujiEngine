@@ -28,14 +28,14 @@ namespace {
 	/// <summary>ワールド行列をDXRのインスタンス行列(3x4)へ詰める</summary>
 	/// <remarks>Matrix4x4 は行ベクトル、DXRは列ベクトルなので転置する</remarks>
 	/// <summary>そのメッシュの見た目。渡された数が足りなければ最後のもの、1つも無ければ白</summary>
-	/// <param name="isStatic">頂点がスキニングで動かないか。動く物は元の頂点の法線が使えない(UV は使える)</param>
-	RayInstanceData LookOf(const std::vector<RayInstanceData>& looks, size_t meshIndex, const Mesh& mesh, bool isStatic) {
+	/// <param name="vertexSrvIndex">当たった先の頂点を引くバッファ。スキンメッシュはスキニング後のもの</param>
+	RayInstanceData LookOf(const std::vector<RayInstanceData>& looks, size_t meshIndex, const Mesh& mesh, uint32_t vertexSrvIndex) {
 		RayInstanceData look = looks.empty() ? RayInstanceData{} : looks[(std::min)(meshIndex, looks.size() - 1)];
 		look.flags = 0;
-		if (mesh.GetVertexSrvIndex() != Mesh::kInvalidSrvIndex && mesh.GetIndexSrvIndex() != Mesh::kInvalidSrvIndex) {
-			look.vertexBuffer = mesh.GetVertexSrvIndex();
+		if (vertexSrvIndex != Mesh::kInvalidSrvIndex && mesh.GetIndexSrvIndex() != Mesh::kInvalidSrvIndex) {
+			look.vertexBuffer = vertexSrvIndex;
 			look.indexBuffer = mesh.GetIndexSrvIndex();
-			look.flags = kRayInstanceHasGeometry | (isStatic ? kRayInstanceHasNormal : 0u);
+			look.flags = kRayInstanceHasGeometry | kRayInstanceHasNormal;
 		}
 		return look;
 	}
@@ -256,7 +256,7 @@ void RaytracingScene::AddInstance(const Model* model, const Math::Matrix4x4& wor
 	for (size_t i = 0; looks && i < meshes.size(); ++i) {
 		// EnsureBlas が BLAS に入れなかったメッシュは番号が詰まる
 		if (meshes[i].GetVertexCount() == 0 || meshes[i].GetIndexCount() == 0) { continue; }
-		instanceData_.push_back(LookOf(*looks, i, meshes[i], true));
+		instanceData_.push_back(LookOf(*looks, i, meshes[i], meshes[i].GetVertexSrvIndex()));
 	}
 	desc.InstanceMask = 0xFF;
 	desc.InstanceContributionToHitGroupIndex = 0;
@@ -303,16 +303,26 @@ void RaytracingScene::AddSkinnedInstance(const RenderObject* key, const Model* m
 
 		geometries.push_back(geometry);
 		if (looks) {
-			geometryLooks.push_back(LookOf(*looks, i, meshes[i], false));
+			geometryLooks.push_back(LookOf(*looks, i, meshes[i], skinnedMeshes[i].GetSrvIndex()));
 		}
 	}
 
 	if (geometries.empty()) { return; }
 
+	// 形状が前のフレームと同じかを見分ける値。ポーズは含めない
+	uint64_t signature = geometries.size();
+	for (const D3D12_RAYTRACING_GEOMETRY_DESC& geometry : geometries) {
+		for (uint64_t value : { geometry.Triangles.VertexBuffer.StartAddress, static_cast<uint64_t>(geometry.Triangles.VertexCount),
+			geometry.Triangles.IndexBuffer, static_cast<uint64_t>(geometry.Triangles.IndexCount) }) {
+			signature = (signature ^ value) * 0x100000001b3ull;
+		}
+	}
+
 	D3D12_BUILD_RAYTRACING_ACCELERATION_STRUCTURE_INPUTS inputs{};
 	inputs.Type = D3D12_RAYTRACING_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL;
-	// 毎フレーム作り直すので探索速度より構築時間を優先する
-	inputs.Flags = D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_PREFER_FAST_BUILD;
+	// 毎フレーム動くので探索速度より構築時間を優先し、形状が同じ間は更新で済ませる
+	inputs.Flags = D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_PREFER_FAST_BUILD |
+		D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_ALLOW_UPDATE;
 	inputs.DescsLayout = D3D12_ELEMENTS_LAYOUT_ARRAY;
 	inputs.NumDescs = static_cast<UINT>(geometries.size());
 	inputs.pGeometryDescs = geometries.data();
@@ -322,10 +332,12 @@ void RaytracingScene::AddSkinnedInstance(const RenderObject* key, const Model* m
 	dxcommon_->GetDevice5()->GetRaytracingAccelerationStructurePrebuildInfo(&inputs, &prebuild);
 	if (prebuild.ResultDataMaxSizeInBytes == 0) { return; }
 	const UINT64 bufferSize = AlignUp(prebuild.ResultDataMaxSizeInBytes, kASAlignment);
-	const UINT64 scratchSize = AlignUp(prebuild.ScratchDataSizeInBytes, kASAlignment);
+	const UINT64 scratchSize = AlignUp(
+		(std::max)(prebuild.ScratchDataSizeInBytes, prebuild.UpdateScratchDataSizeInBytes), kASAlignment);
 
 	SkinnedBlas& blas = skinnedBlasMap_[key];
 	blas.lastUsedFrame = frameNumber_;
+	bool isUpdate = blas.buffer && blas.signature == signature && blas.refitCount < kMaxSkinnedRefits;
 	if (!blas.buffer || blas.bufferSize < bufferSize || blas.scratchSize < scratchSize) {
 		// 前のフレームのTLASがまだ古い方を指しているかもしれないので、すぐには捨てない
 		if (blas.buffer) {
@@ -338,13 +350,22 @@ void RaytracingScene::AddSkinnedInstance(const RenderObject* key, const Model* m
 		blas.address = blas.buffer->GetGPUVirtualAddress();
 		blas.bufferSize = bufferSize;
 		blas.scratchSize = scratchSize;
+		isUpdate = false;
 
 		Logger::Log(std::format("RaytracingScene: skinned BLAS created. geometries={}, size={} bytes\n",
 			geometries.size(), prebuild.ResultDataMaxSizeInBytes));
 	}
 
+	blas.signature = signature;
+	blas.refitCount = isUpdate ? blas.refitCount + 1 : 0;
+
 	D3D12_BUILD_RAYTRACING_ACCELERATION_STRUCTURE_DESC buildDesc{};
 	buildDesc.Inputs = inputs;
+	if (isUpdate) {
+		// 同じバッファの上で更新する
+		buildDesc.Inputs.Flags |= D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_PERFORM_UPDATE;
+		buildDesc.SourceAccelerationStructureData = blas.address;
+	}
 	buildDesc.DestAccelerationStructureData = blas.address;
 	buildDesc.ScratchAccelerationStructureData = blas.scratch->GetGPUVirtualAddress();
 

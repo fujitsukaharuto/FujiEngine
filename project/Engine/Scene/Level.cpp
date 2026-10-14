@@ -53,6 +53,31 @@ namespace {
 	constexpr const char* kReflectionNames[] = { "Off","Occlusion","Objects" };
 	constexpr int kReflectionCount = static_cast<int>(std::size(kReflectionNames));
 
+	// 並びは Graphics::RayTracedAOMode / RayTracedShadowMode と同じ
+	constexpr const char* kAONames[] = { "Off","Inline","Screen" };
+	constexpr int kAOCount = static_cast<int>(std::size(kAONames));
+	constexpr const char* kShadowNames[] = { "Hard","Soft" };
+	constexpr int kShadowCount = static_cast<int>(std::size(kShadowNames));
+	// 並びは Graphics::AmbientMode と同じ
+	constexpr const char* kAmbientNames[] = { "Hemisphere","IBL" };
+	constexpr int kAmbientCount = static_cast<int>(std::size(kAmbientNames));
+	// 並びは Graphics::SkyMode と同じ
+	constexpr const char* kSkyNames[] = { "Texture","Atmosphere" };
+	constexpr int kSkyCount = static_cast<int>(std::size(kSkyNames));
+	// 並びは Graphics::LightingMode と同じ
+	constexpr const char* kLightingNames[] = { "Simple","PBR" };
+	constexpr int kLightingCount = static_cast<int>(std::size(kLightingNames));
+
+	/// <summary>名前から番号を引く。見つからなければ fallback</summary>
+	int IndexOfName(const std::string& name, const char* const* names, int count, int fallback) {
+		for (int i = 0; i < count; ++i) {
+			if (name == names[i]) {
+				return i;
+			}
+		}
+		return fallback;
+	}
+
 	Graphics::OffscreenManager* GetOffscreen() {
 		DXC::DXCom* dxcommon = Graphics::ModelManager::GetInstance()->ShareDXCom();
 		return dxcommon ? dxcommon->GetOffscreenManager() : nullptr;
@@ -76,6 +101,8 @@ namespace {
 		env.fogStartDistance = data.value("fogStartDistance", env.fogStartDistance);
 		env.fogMaxOpacity = data.value("fogMaxOpacity", env.fogMaxOpacity);
 		env.fogSkyAmount = data.value("fogSkyAmount", env.fogSkyAmount);
+		env.fogSunScatter = data.value("fogSunScatter", env.fogSunScatter);
+		env.fogSunPower = data.value("fogSunPower", env.fogSunPower);
 		env.bloomEnabled = data.value("bloom", env.bloomEnabled);
 		env.bloomThreshold = data.value("bloomThreshold", env.bloomThreshold);
 		env.bloomIntensity = data.value("bloomIntensity", env.bloomIntensity);
@@ -97,6 +124,13 @@ namespace {
 		env.godRayIntensity = data.value("godRayIntensity", env.godRayIntensity);
 		env.godRayLength = data.value("godRayLength", env.godRayLength);
 		env.godRaySunSize = data.value("godRaySunSize", env.godRaySunSize);
+		env.aoMode = IndexOfName(data.value("ao", std::string(kAONames[env.aoMode])), kAONames, kAOCount, env.aoMode);
+		env.shadowMode = IndexOfName(data.value("shadow", std::string(kShadowNames[env.shadowMode])), kShadowNames, kShadowCount, env.shadowMode);
+		env.ambientMode = IndexOfName(data.value("ambient", std::string(kAmbientNames[env.ambientMode])), kAmbientNames, kAmbientCount, env.ambientMode);
+		env.iblAmbientScale = data.value("iblAmbientScale", env.iblAmbientScale);
+		env.skyMode = IndexOfName(data.value("sky", std::string(kSkyNames[env.skyMode])), kSkyNames, kSkyCount, env.skyMode);
+		env.skyIntensity = data.value("skyIntensity", env.skyIntensity);
+		env.lightingMode = IndexOfName(data.value("lighting", std::string(kLightingNames[env.lightingMode])), kLightingNames, kLightingCount, env.lightingMode);
 		const std::string reflectionName = data.value("reflection", std::string(kReflectionNames[env.reflectionMode]));
 		for (int i = 0; i < kReflectionCount; ++i) {
 			if (reflectionName == kReflectionNames[i]) {
@@ -105,6 +139,7 @@ namespace {
 		}
 		env.reflectionMaxDistance = data.value("reflectionMaxDistance", env.reflectionMaxDistance);
 		env.reflectionIntensity = data.value("reflectionIntensity", env.reflectionIntensity);
+		env.reflectionShadow = data.value("reflectionShadow", env.reflectionShadow);
 		env.dofBlur = data.value("dofBlur", env.dofBlur);
 		env.dofFocusDistance = data.value("dofFocusDistance", env.dofFocusDistance);
 		env.dofFocusRange = data.value("dofFocusRange", env.dofFocusRange);
@@ -130,6 +165,8 @@ namespace {
 		data["fogStartDistance"] = env.fogStartDistance;
 		data["fogMaxOpacity"] = env.fogMaxOpacity;
 		data["fogSkyAmount"] = env.fogSkyAmount;
+		data["fogSunScatter"] = env.fogSunScatter;
+		data["fogSunPower"] = env.fogSunPower;
 		data["bloom"] = env.bloomEnabled;
 		data["bloomThreshold"] = env.bloomThreshold;
 		data["bloomIntensity"] = env.bloomIntensity;
@@ -146,9 +183,17 @@ namespace {
 		data["godRayIntensity"] = env.godRayIntensity;
 		data["godRayLength"] = env.godRayLength;
 		data["godRaySunSize"] = env.godRaySunSize;
+		data["ao"] = kAONames[std::clamp(env.aoMode, 0, kAOCount - 1)];
+		data["shadow"] = kShadowNames[std::clamp(env.shadowMode, 0, kShadowCount - 1)];
+		data["ambient"] = kAmbientNames[std::clamp(env.ambientMode, 0, kAmbientCount - 1)];
+		data["iblAmbientScale"] = env.iblAmbientScale;
+		data["sky"] = kSkyNames[std::clamp(env.skyMode, 0, kSkyCount - 1)];
+		data["skyIntensity"] = env.skyIntensity;
+		data["lighting"] = kLightingNames[std::clamp(env.lightingMode, 0, kLightingCount - 1)];
 		data["reflection"] = kReflectionNames[std::clamp(env.reflectionMode, 0, kReflectionCount - 1)];
 		data["reflectionMaxDistance"] = env.reflectionMaxDistance;
 		data["reflectionIntensity"] = env.reflectionIntensity;
+		data["reflectionShadow"] = env.reflectionShadow;
 		data["dofBlur"] = env.dofBlur;
 		data["dofFocusDistance"] = env.dofFocusDistance;
 		data["dofFocusRange"] = env.dofFocusRange;
@@ -415,13 +460,22 @@ void Level::ApplyEnvironment() {
 		}
 		light->SetLightIntensity(environment_.lightIntensity);
 
+		const bool isAtmosphere = environment_.hasSkyBox && environment_.skyMode == Graphics::kSkyModeAtmosphere;
+		const Math::Vector3 sunDirection = light->direction * -1.0f;
+		const float sunPower = light->intensity * environment_.skyIntensity;
+		const Math::Vector3 sunColor = {
+			light->color.x * sunPower * environment_.skyBoxColor.x,
+			light->color.y * sunPower * environment_.skyBoxColor.y,
+			light->color.z * sunPower * environment_.skyBoxColor.z };
+		const Math::Vector3 kHorizonDirections[4] = { { 1.0f,0.0f,0.0f },{ -1.0f,0.0f,0.0f },{ 0.0f,0.0f,1.0f },{ 0.0f,0.0f,-1.0f } };
+
 		Graphics::FogData fog;
 		const bool isFromSky = environment_.fogColorFromSky && environment_.hasSkyBox && skyBox_;
 		fog.color = {};
 		for (int i = 0; i < 4; ++i) {
 			Math::Vector3 color = environment_.fogColor;
 			if (isFromSky) {
-				color = skyBox_->GetHorizonColor(i);
+				color = isAtmosphere ? Graphics::SkyBox::AtmosphereColor(kHorizonDirections[i], sunDirection, sunColor) : skyBox_->GetHorizonColor(i);
 				color.x *= environment_.fogSkyColorScale;
 				color.y *= environment_.fogSkyColorScale;
 				color.z *= environment_.fogSkyColorScale;
@@ -437,11 +491,40 @@ void Level::ApplyEnvironment() {
 		fog.startDistance = environment_.fogStartDistance;
 		fog.maxOpacity = environment_.fogMaxOpacity;
 		fog.skyAmount = environment_.fogSkyAmount;
+		fog.sunScatter = environment_.fogSunScatter;
+		fog.sunScatterPower = environment_.fogSunPower;
+		fog.skyMode = isAtmosphere ? Graphics::kSkyModeAtmosphere : Graphics::kSkyModeTexture;
+		fog.skyIntensity = environment_.skyIntensity;
 		lightManager_->SetFog(fog);
 
+		lightManager_->SetRayTracingModes(
+			static_cast<Graphics::RayTracedAOMode>(std::clamp(environment_.aoMode, 0, kAOCount - 1)),
+			static_cast<Graphics::RayTracedShadowMode>(std::clamp(environment_.shadowMode, 0, kShadowCount - 1)));
+		// 計算する空のときは、焼いた IBL が空と合わないので半球の2色を空から作る
+		Graphics::AmbientMode ambientMode = static_cast<Graphics::AmbientMode>(std::clamp(environment_.ambientMode, 0, kAmbientCount - 1));
+		const Graphics::AllLightsData kDefaultLights{};
+		Math::Vector3 ambientSky = kDefaultLights.ambientSkyColor;
+		Math::Vector3 ambientGround = kDefaultLights.ambientGroundColor;
+		if (isAtmosphere) {
+			ambientMode = Graphics::kAmbientModeHemisphere;
+			Math::Vector3 horizon{};
+			for (const Math::Vector3& direction : kHorizonDirections) {
+				horizon = horizon + Graphics::SkyBox::AtmosphereColor(direction, sunDirection, sunColor) * 0.25f;
+			}
+			const Math::Vector3 zenith = Graphics::SkyBox::AtmosphereColor({ 0.0f,1.0f,0.0f }, sunDirection, sunColor);
+			ambientSky = zenith * 0.75f + horizon * 0.25f;
+			ambientGround = horizon * 0.3f;
+		}
+		lightManager_->SetAmbientColors(ambientSky, ambientGround);
+		lightManager_->SetAmbientMode(ambientMode, environment_.iblAmbientScale);
+		lightManager_->SetLightingMode(
+			static_cast<Graphics::LightingMode>(std::clamp(environment_.lightingMode, 0, kLightingCount - 1)));
+		lightManager_->SetEnvironmentSky(
+			{ environment_.skyBoxColor.x, environment_.skyBoxColor.y, environment_.skyBoxColor.z },
+			environment_.hasSkyBox && skyBox_ != nullptr);
 		lightManager_->SetReflection(
 			static_cast<Graphics::RayTracedReflectionMode>(std::clamp(environment_.reflectionMode, 0, kReflectionCount - 1)),
-			environment_.reflectionMaxDistance, environment_.reflectionIntensity);
+			environment_.reflectionMaxDistance, environment_.reflectionIntensity, environment_.reflectionShadow);
 	}
 
 	if (Graphics::OffscreenManager* offscreen = GetOffscreen()) {
@@ -479,9 +562,39 @@ void Level::ApplyCamera() {
 void Level::EnvironmentGUI() {
 #ifdef _DEBUGMODE
 	bool changed = false;
+	ImGui::SeparatorText("Quality");
+	// 右へ行くほど豪華で重い。Standard が従来の既定
+	struct QualityPreset { const char* name; int shadow; int reflection; int ambient; };
+	constexpr QualityPreset kPresets[] = {
+		{ "Standard", Graphics::kShadowModeHard, Graphics::kReflectionModeOff, Graphics::kAmbientModeHemisphere },
+		{ "High", Graphics::kShadowModeSoft, Graphics::kReflectionModeOcclusion, Graphics::kAmbientModeHemisphere },
+		{ "Ultra", Graphics::kShadowModeSoft, Graphics::kReflectionModeObjects, Graphics::kAmbientModeHemisphere },
+		{ "Realistic", Graphics::kShadowModeSoft, Graphics::kReflectionModeObjects, Graphics::kAmbientModeIBL },
+	};
+	for (const QualityPreset& preset : kPresets) {
+		if (ImGui::Button(preset.name)) {
+			environment_.aoMode = Graphics::kAOModeScreen;
+			environment_.shadowMode = preset.shadow;
+			environment_.reflectionMode = preset.reflection;
+			environment_.ambientMode = preset.ambient;
+			changed = true;
+		}
+		ImGui::SameLine();
+	}
+	ImGui::NewLine();
+	changed |= ImGui::Combo("Lighting", &environment_.lightingMode, kLightingNames, kLightingCount);
+	changed |= ImGui::Combo("AO",&environment_.aoMode, kAONames, kAOCount);
+	changed |= ImGui::Combo("Shadow", &environment_.shadowMode, kShadowNames, kShadowCount);
+	changed |= ImGui::Combo("Ambient", &environment_.ambientMode, kAmbientNames, kAmbientCount);
+	ImGui::BeginDisabled(environment_.ambientMode != Graphics::kAmbientModeIBL);
+	changed |= ImGui::DragFloat("IBL scale", &environment_.iblAmbientScale, 0.01f, 0.0f, 10.0f);
+	ImGui::EndDisabled();
+
 	ImGui::SeparatorText("SkyBox");
 	changed |= ImGui::Checkbox("Enable", &environment_.hasSkyBox);
 	ImGui::BeginDisabled(!environment_.hasSkyBox);
+	changed |= ImGui::Combo("Type##sky", &environment_.skyMode, kSkyNames, kSkyCount);
+	changed |= ImGui::DragFloat("Intensity##sky", &environment_.skyIntensity, 0.01f, 0.0f, 10.0f);
 	changed |= ImGui::ColorEdit3("Color##sky", &environment_.skyBoxColor.x);
 	ImGui::EndDisabled();
 
@@ -506,6 +619,8 @@ void Level::EnvironmentGUI() {
 	changed |= ImGui::DragFloat("Start distance", &environment_.fogStartDistance, 0.5f, 0.0f, 10000.0f);
 	changed |= ImGui::SliderFloat("Max opacity", &environment_.fogMaxOpacity, 0.0f, 1.0f);
 	changed |= ImGui::SliderFloat("Sky amount", &environment_.fogSkyAmount, 0.0f, 1.0f);
+	changed |= ImGui::DragFloat("Sun scatter", &environment_.fogSunScatter, 0.01f, 0.0f, 10.0f);
+	changed |= ImGui::DragFloat("Sun power", &environment_.fogSunPower, 0.1f, 1.0f, 64.0f);
 
 	ImGui::SeparatorText("Bloom");
 	changed |= ImGui::Checkbox("Enable##bloom", &environment_.bloomEnabled);
@@ -535,6 +650,7 @@ void Level::EnvironmentGUI() {
 	changed |= ImGui::Combo("Mode##reflection", &environment_.reflectionMode, kReflectionNames, kReflectionCount);
 	changed |= ImGui::DragFloat("Max distance##reflection", &environment_.reflectionMaxDistance, 1.0f, 0.0f, 10000.0f);
 	changed |= ImGui::SliderFloat("Intensity##reflection", &environment_.reflectionIntensity, 0.0f, 2.0f);
+	changed |= ImGui::SliderFloat("Shadow##reflection", &environment_.reflectionShadow, 0.0f, 1.0f);
 
 	ImGui::SeparatorText("Depth of Field");
 	changed |= ImGui::SliderFloat("Blur##dof", &environment_.dofBlur, 0.0f, 16.0f, "%.1f px");

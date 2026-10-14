@@ -7,6 +7,8 @@
 /// </summary>
 namespace Logger {
 
+	// 出力先はデバッガの出力ウィンドウと ../generated/logs/FujiEngine.log(起動のたびに作り直す)
+
 	/// <summary>
 	/// 文字列をログとして出力する
 	/// </summary>

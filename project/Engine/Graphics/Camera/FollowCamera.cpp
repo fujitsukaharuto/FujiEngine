@@ -44,7 +44,7 @@ void FollowCamera::Update(const Vector3& lockOn) {
 	}
 	transform.rotate.x = LerpShortAngle(transform.rotate.x, destinationAngleX, followSpeed_);
 
-	interTarget_ = Lerp(interTarget_, { target_->translate.x,0.0f,target_->translate.z }, targetSpeed_);
+	interTarget_ = Lerp(interTarget_, { target_->translate.x,0.0f,target_->translate.z }, FPSKeeper::SmoothRate(targetSpeed_));
 
 	OffsetChangeCal();
 	transform.translate = interTarget_ + OffsetCal();

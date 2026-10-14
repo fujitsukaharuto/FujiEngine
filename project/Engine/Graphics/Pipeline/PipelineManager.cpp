@@ -55,9 +55,8 @@ void PipelineManager::CreatePipeline() {
 		.blend = BlendType::NONE, .depth = DepthMode::READ_WRITE,
 		.rtvFormat = DXC::kGBufferNormalFormat });
 
-	// クリックされた画素のオブジェクト番号を拾うパス。本描画より前に走るので深度バッファは見ず、
-	// 1回目で手前の深度を求め、2回目でその深度の持ち主が番号を書く。
-	// 色はアルファ0で出すので合成しても変わらない
+	// クリックされた画素のオブジェクト番号を拾うパス。深度バッファは見ない。
+	// 1回目で手前の深度を求め、2回目でその深度の持ち主が番号を書く
 	CreateRenderPipe(Pipe::PickingDepth, {
 		.vsPath = L"Object/Object3d.VS.hlsl", .psPath = L"Object/PickingDepth.PS.hlsl",
 		.blend = BlendType::ALPHA, .depth = DepthMode::DISABLE });
@@ -101,7 +100,7 @@ void PipelineManager::CreatePipeline() {
 
 	CreatePipe<ParticleCSPipe>(Pipe::ParticleCS);
 	CreateRenderPipe(Pipe::Animation, {
-		.vsPath = L"Object/Object3d.VS.hlsl", .psPath = L"Object/EnvMapObject3d.PS.hlsl",
+		.vsPath = L"Object/Object3d.VS.hlsl", .psPath = L"Object/Object3d.PS.hlsl",
 		.blend = BlendType::ALPHA, .depth = DepthMode::READ_WRITE });
 	CreateRenderPipe(Pipe::Skybox, {
 		.vsPath = L"SkyBox/Skybox.VS.hlsl", .psPath = L"SkyBox/Skybox.PS.hlsl",

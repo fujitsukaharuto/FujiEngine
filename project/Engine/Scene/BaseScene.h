@@ -34,7 +34,7 @@ namespace Scene {
 		void Init(DXC::DXCom* pDxcom, SceneManager* pSceneManager, Graphics::LightManager* pLightManager);
 
 		/// <summary>配置データの置物</summary>
-		/// <remarks>SceneManager が Initialize より前に読み込み、Update / Draw もシーンの前に回す。シーンは Find で置物を探せる</remarks>
+		/// <remarks>SceneManager が Initialize より前に読み込み、Update / Draw もシーンの前に回す</remarks>
 		Level& GetLevel() { return level_; }
 
 		virtual void DebugGUI();
@@ -42,11 +42,10 @@ namespace Scene {
 		virtual void ParticleGroupDebugGUI();
 
 		/// <summary>シーンの変更</summary>
-		/// <remarks>暗転・明転は SceneManager が行うのでシーン側は何も描かなくてよい。
-		/// extraTime は暗転しきってから次シーンに入るまでの待ちフレーム数</remarks>
+		/// <remarks>暗転・明転は SceneManager が行う。extraTime は暗転後に次シーンへ入るまでの待ちフレーム数</remarks>
 		void ChangeScene(const std::string& sceneName, float extraTime = 40.0f);
 		/// <summary>入口を指定してシーンを変更する</summary>
-		/// <remarks>entry は遷移先の出現位置(SpawnPoint)の名前。同じシーンでも、どこから来たかで出る位置を変えられる</remarks>
+		/// <remarks>entry は遷移先の出現位置(SpawnPoint)の名前</remarks>
 		void ChangeScene(const std::string& sceneName, const std::string& entry, float extraTime = 40.0f);
 
 		/// <summary>どの入口から来たか。ChangeScene で渡された名前で、無ければ空</summary>
@@ -76,8 +75,7 @@ namespace Scene {
 		bool ApplySpawnPoint(Math::Trans& t) const;
 
 		/// <summary>オブジェクトを生成してシーンに持たせる</summary>
-		/// <remarks>生成直後に Initialize を呼ぶ。以降の Update・Draw・当たり判定・破棄はシーンが面倒を見るので、
-		/// 返ったポインタは設定や参照に使うだけでよい。消すときは Destroy()。ポインタは破棄された後は使えない</remarks>
+		/// <remarks>生成直後に Initialize を呼ぶ。以降の更新・描画・判定・破棄はシーンが行う。消すときは Destroy()</remarks>
 		template <class T, class... Args>
 		T* Spawn(Args&&... args) {
 			auto object = std::make_unique<T>(std::forward<Args>(args)...);
@@ -88,8 +86,7 @@ namespace Scene {
 		}
 
 		/// <summary>当たり判定を止める/再開する</summary>
-		/// <remarks>コライダーは GameObject が持つ分を SceneManager が自動で集めるので、シーンが登録する必要は無い。
-		/// 止めている間は、衝突中だった相手との Exit も来ない</remarks>
+		/// <remarks>止めている間は、衝突中だった相手との Exit も来ない</remarks>
 		void SetCollisionEnabled(bool enabled) { isCollisionEnabled_ = enabled; }
 
 	private:

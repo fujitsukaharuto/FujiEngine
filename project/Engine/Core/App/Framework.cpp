@@ -7,6 +7,7 @@
 #include "Engine/DXC/DXCom.h"
 #include "Engine/Graphics/PostEffect/OffscreenManager.h"
 #include "Engine/Graphics/Camera/CameraManager.h"
+#include "Engine/DXC/Debug/GPUTimer.h"
 #ifdef _DEBUGMODE
 #include "imgui_internal.h"	// DockBuilder（既定レイアウトの組み立て）
 #include "ImGuizmo.h"
@@ -91,22 +92,40 @@ void Framework::Draw() {
 	sceneManager_->Draw();
 
 	// シーンが積んだものをここでまとめて描く。この順序に意味があるので入れ替えないこと
+	dxcommon_->BeginGpuSection(GpuSection::Skinning);
 	objectRenderer_->Skinning();
+	dxcommon_->EndGpuSection(GpuSection::Skinning);
+
+	dxcommon_->BeginGpuSection(GpuSection::Sky);
 	spriteRenderer_->RenderForeground();
 	objectRenderer_->RenderSkyBox();
+	dxcommon_->EndGpuSection(GpuSection::Sky);
+
+	dxcommon_->BeginGpuSection(GpuSection::Objects);
 	objectRenderer_->Render();
+	dxcommon_->EndGpuSection(GpuSection::Objects);
+
+	dxcommon_->BeginGpuSection(GpuSection::Particles);
 	ParticleManager::GetInstance()->Draw();
+	dxcommon_->EndGpuSection(GpuSection::Particles);
+
+	dxcommon_->BeginGpuSection(GpuSection::Sprites);
 #ifdef _DEBUGMODE
 	Line3dDrawer::GetInstance()->Render();
 #endif // _DEBUGMODE
 	spriteRenderer_->Render();
+	dxcommon_->EndGpuSection(GpuSection::Sprites);
 
 	modelManager_->PickingDataCopy();
 
 	dxcommon_->Command();
+	dxcommon_->BeginGpuSection(GpuSection::PostEffect);
 	dxcommon_->PostEffect();
-	// ImGuiの描画
+	dxcommon_->EndGpuSection(GpuSection::PostEffect);
+
+	dxcommon_->BeginGpuSection(GpuSection::DebugGui);
 	imguiManager_->Draw();
+	dxcommon_->EndGpuSection(GpuSection::DebugGui);
 	// 描画終了
 	dxcommon_->PostDraw();
 }
@@ -224,6 +243,14 @@ void Framework::EngineDebugGUI() {
 		fpsKeeper_->Debug();
 		ImGui::Text("FPS(平均): %.1f", ImGui::GetIO().Framerate);
 		ImGui::Text("DeltaTime: %.3f", ImGui::GetIO().DeltaTime);
+		if (ImGui::TreeNode("GPU", "GPU: %.2f ms", dxcommon_->GetGpuFrameMS())) {
+			static std::vector<GPUTimer::Sample> samples;
+			GPUTimer::CollectAll((dxcommon_->GetNowFrameCount() + kFrameCount_ - 1) % kFrameCount_, samples);
+			for (const GPUTimer::Sample& sample : samples) {
+				ImGui::Text("%-18s %6.2f ms", sample.name, sample.ms);
+			}
+			ImGui::TreePop();
+		}
 		ImGui::Separator();
 		ImGui::Text("PickedID    : %d", modelManager_->GetPickedID());
 		ImGui::Text("PickedCoord : %d, %d", modelManager_->GetPickedCoord(0), modelManager_->GetPickedCoord(1));

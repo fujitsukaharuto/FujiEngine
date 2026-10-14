@@ -47,7 +47,7 @@ namespace Graphics {
 		/// <summary>
 		/// 行列と定数バッファを現在の transform から作り直す
 		/// </summary>
-		/// <remarks>transform を書き換えた直後に呼ぶ用。Update() はフレーム先頭なので呼ばないと1フレーム遅れる</remarks>
+		/// <remarks>transform を書き換えた直後に呼ぶ。呼ばないと反映が1フレーム遅れる</remarks>
 		void UpdateMatrix();
 
 		/// <summary>

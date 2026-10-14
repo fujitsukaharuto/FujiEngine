@@ -32,6 +32,7 @@ void SRVManager::Initialize(DXCom* pDxcom) {
 void SRVManager::Finalize() {
 	descriptorHeap_.Reset();
 	freeList_.clear();
+	pendingFree_.clear();
 	useIndex_ = 0;
 	dxcommon_ = nullptr;
 }
@@ -149,6 +150,23 @@ void SRVManager::Free(uint32_t index) {
 	freeList_.push_back(index);
 }
 
+
+void SRVManager::FreeDeferred(uint32_t index) {
+	// 記録済みのフレームが全部流れ切るまで待つ
+	pendingFree_.emplace_back(index, kFrameCount_ + 1);
+}
+
+void SRVManager::Tick() {
+	for (size_t i = 0; i < pendingFree_.size();) {
+		if (--pendingFree_[i].second == 0) {
+			Free(pendingFree_[i].first);
+			pendingFree_[i] = pendingFree_.back();
+			pendingFree_.pop_back();
+		} else {
+			++i;
+		}
+	}
+}
 
 D3D12_CPU_DESCRIPTOR_HANDLE SRVManager::GetCPUDescriptorHandle(uint32_t index) {
 	D3D12_CPU_DESCRIPTOR_HANDLE CPUHandle = descriptorHeap_->GetCPUDescriptorHandleForHeapStart();

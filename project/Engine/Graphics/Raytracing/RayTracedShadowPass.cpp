@@ -55,6 +55,8 @@ void RayTracedShadowPass::Initialize(DXCom* pDxcom, LightManager* pLightManager)
 	}
 
 	gpuTimer_.Initialize(device, dxcommon_->GetDXCommand()->GetQueue(), 1);
+	gpuTimer_.SetName(kTimer_Trace, "  Shadow trace");
+	denoiser_.SetTimerNames("  Shadow temporal", "  Shadow spatial");
 }
 
 void RayTracedShadowPass::Finalize() {

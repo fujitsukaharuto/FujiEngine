@@ -526,7 +526,7 @@ void Player::LandingUpdate() {
 			// 前方向と現在方向から回転を取得
 			Quaternion rot = Quaternion::LookRotation(dir);
 			Quaternion preRot = Quaternion::LookRotation(preDir);
-			Quaternion newRot = Quaternion::SLerp(preRot, rot, 0.1f);
+			Quaternion newRot = Quaternion::SLerp(preRot, rot, FPSKeeper::SmoothRate(0.1f));
 
 			transform_.rotate = Quaternion::QuaternionToEuler(newRot);
 		} else {
@@ -579,7 +579,7 @@ void Player::TitleStartUpdate([[maybe_unused]] float titleTime) {
 	// 前方向と現在方向から回転を取得
 	Quaternion rot = Quaternion::LookRotation(dir);
 	Quaternion prerot = Quaternion::LookRotation(predir);
-	Quaternion newRot = Quaternion::SLerp(prerot, rot, 0.1f);
+	Quaternion newRot = Quaternion::SLerp(prerot, rot, FPSKeeper::SmoothRate(0.1f));
 
 	transform_.rotate = Quaternion::QuaternionToEuler(newRot);
 

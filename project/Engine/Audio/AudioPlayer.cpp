@@ -1,4 +1,5 @@
 #include "Engine/Audio/AudioPlayer.h"
+#include "Engine/Logger/Logger.h"
 #include <cassert>
 #include <filesystem>
 
@@ -75,7 +76,11 @@ void AudioPlayer::LoadWave(const char* filename) {
 
 	std::ifstream file;
 	file.open((kDirectoryPath_ + filename), std::ios_base::binary);
-	assert(file.is_open());
+	if (!file.is_open()) {
+		Logger::Log("Sound load failed: " + kDirectoryPath_ + filename);
+		assert(false && "音声ファイルを開けなかった");
+		return;
+	}
 
 	RiffHeader riff;
 	file.read(reinterpret_cast<char*>(&riff), sizeof(riff));
@@ -141,7 +146,11 @@ SoundData& AudioPlayer::SoundLoadWave(const char* filename) {
 	LoadWave(filename);
 
 	it = container_.find(filename);
-	assert(it != container_.end()); // データが必ず存在するか
+	if (it == container_.end()) {
+		// 読めなかった。鳴らそうとしても何も起きない空のデータを返す
+		static SoundData empty;
+		return empty;
+	}
 	return it->second;
 }
 
@@ -154,6 +163,9 @@ void AudioPlayer::SoundUnload(SoundData* soundData) {
 }
 
 void AudioPlayer::SoundPlayWave(SoundData& soundData, float volume) {
+	if (soundData.buffer.empty()) {
+		return;
+	}
 	HRESULT result;
 	// 冒頭などで掃除を行う
 	SoundResourceCleaning(soundData);
@@ -167,7 +179,7 @@ void AudioPlayer::SoundPlayWave(SoundData& soundData, float volume) {
 
 	XAUDIO2_BUFFER buf{};
 	buf.pAudioData = soundData.buffer.data();
-	buf.AudioBytes = buf.AudioBytes = static_cast<UINT32>(soundData.buffer.size());
+	buf.AudioBytes = static_cast<UINT32>(soundData.buffer.size());
 	buf.Flags = XAUDIO2_END_OF_STREAM;
 
 	pSourceVoice->SubmitSourceBuffer(&buf);
@@ -176,6 +188,9 @@ void AudioPlayer::SoundPlayWave(SoundData& soundData, float volume) {
 }
 
 void AudioPlayer::SoundLoop(SoundData& soundData, float volume) {
+	if (soundData.buffer.empty()) {
+		return;
+	}
 	HRESULT result;
 	SoundResourceCleaning(soundData);
 
@@ -193,7 +208,9 @@ void AudioPlayer::SoundLoop(SoundData& soundData, float volume) {
 	buf.LoopCount = XAUDIO2_LOOP_INFINITE; // ループする
 
 	result = pSourceVoice->SubmitSourceBuffer(&buf);
+	assert(SUCCEEDED(result));
 	result = pSourceVoice->Start();
+	assert(SUCCEEDED(result));
 	soundData.pSourceVoices.push_back(pSourceVoice);
 }
 

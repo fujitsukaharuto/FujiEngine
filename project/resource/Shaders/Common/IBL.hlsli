@@ -37,14 +37,16 @@ float3 EnvironmentBRDF(float3 f0, float NdotV, float roughness, SamplerState smp
 
 /// <summary>拡散のアンビエント。掛ける前の「回り込んでくる光の色」を返す</summary>
 /// <param name="ambientMode">AllLights::ambientMode</param>
+/// <param name="iblScale">IBL 経路のときだけ掛ける倍率</param>
+/// <param name="environmentTint">空に掛けている色。IBL 経路のときだけ掛ける</param>
 float3 GetAmbientDiffuse(float3 N, uint ambientMode, float3 skyColor, float3 groundColor,
-                         float intensity, SamplerState smp)
+                         float intensity, float iblScale, float3 environmentTint, SamplerState smp)
 {
     if (ambientMode == kAmbientModeIBL)
     {
         // 焼く側が cosine 重みの平均で持っているので、一様な空なら空の色がそのまま返る。
         // Hemisphere 経路と同じ尺度なので intensity をそのまま掛けてよい
-        return gIrradianceMap.SampleLevel(smp, N, 0.0f).rgb * intensity;
+        return gIrradianceMap.SampleLevel(smp, N, 0.0f).rgb * environmentTint * (intensity * iblScale);
     }
 
     return HemisphereAmbient(N, skyColor, groundColor, intensity);
@@ -52,14 +54,18 @@ float3 GetAmbientDiffuse(float3 N, uint ambientMode, float3 skyColor, float3 gro
 
 /// <summary>鏡面のアンビエント(映り込み)。フレネルまで済ませた寄与を返す</summary>
 /// <remarks>IBL 経路は粗さでミップを選ぶので粗い面ほどぼやける</remarks>
-/// <remarks>レイは飛ばさない。反射方向が遮られているかは呼び出し側が TraceReflectionHit で調べて渡す</remarks>
+/// <remarks>レイは飛ばさない。遮られているかは呼び出し側が TraceReflectionHit で調べて渡す</remarks>
 /// <param name="V">視線方向(面 → カメラ、正規化済み)</param>
 /// <param name="isOccluded">反射方向が物に遮られているか</param>
 /// <param name="occludedColor">遮られているときに空の代わりに映す色</param>
 /// <param name="ambientMode">AllLights::ambientMode</param>
+/// <param name="environmentTint">空に掛けている色</param>
+/// <param name="hasEnvironment">空を出しているか。出していなければ skyFallback を映す</param>
+/// <param name="skyFallback">空の代わりに映す色</param>
 float3 GetAmbientSpecular(float3 N, float3 V, float roughness, float3 f0,
                           bool isOccluded, float3 occludedColor,
-                          uint ambientMode, SamplerState smp)
+                          uint ambientMode, float3 environmentTint, bool hasEnvironment, float3 skyFallback,
+                          SamplerState smp)
 {
     float NdotV = saturate(dot(N, V));
     float3 R = reflect(-V, N);
@@ -67,7 +73,11 @@ float3 GetAmbientSpecular(float3 N, float3 V, float roughness, float3 f0,
     if (ambientMode == kAmbientModeIBL)
     {
         // 粗さがそのままミップ番号になるように焼いてある
-        float3 prefiltered = gPrefilteredEnv.SampleLevel(smp, R, roughness * kPrefilteredMaxMip).rgb;
+        float3 prefiltered = skyFallback;
+        if (hasEnvironment)
+        {
+            prefiltered = gPrefilteredEnv.SampleLevel(smp, R, roughness * kPrefilteredMaxMip).rgb * environmentTint;
+        }
         if (isOccluded)
         {
             prefiltered = occludedColor;
@@ -76,7 +86,11 @@ float3 GetAmbientSpecular(float3 N, float3 V, float roughness, float3 f0,
         return prefiltered * EnvironmentBRDF(f0, NdotV, roughness, smp);
     }
 
-    float3 environmentColor = gEnvironment.Sample(smp, R).rgb;
+    float3 environmentColor = skyFallback;
+    if (hasEnvironment)
+    {
+        environmentColor = gEnvironment.Sample(smp, R).rgb * environmentTint;
+    }
     if (isOccluded)
     {
         environmentColor = occludedColor;

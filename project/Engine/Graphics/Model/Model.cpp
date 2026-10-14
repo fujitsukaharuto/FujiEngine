@@ -18,12 +18,8 @@ using namespace DXC;
 
 namespace {
 
-	// スキニング後の頂点は、描画では頂点バッファ、BLAS構築ではSRVとして読まれる
-	constexpr D3D12_RESOURCE_STATES kSkinnedReadState =
-		D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
-
 	/// <summary>レイトレ影用のTLASをバインドする</summary>
-	/// <remarks>gSceneTLAS を宣言していないパイプラインで呼ぶと GetRootIndex の assert に当たる</remarks>
+	/// <remarks>gSceneTLAS を宣言していないパイプラインで呼ぶと assert に当たる</remarks>
 	void BindSceneTLAS(ID3D12GraphicsCommandList* commandList) {
 		auto* rtScene = ObjectRenderer::GetInstance()->GetRaytracingScene();
 		if (rtScene == nullptr) { return; }
@@ -133,7 +129,7 @@ void Model::Draw(ID3D12GraphicsCommandList* commandList, std::vector<Material>& 
 	}
 }
 
-void Model::AnimationDraw(DXCom* pDxcom, ID3D12GraphicsCommandList* commandList, std::vector<SkinnedMesh>& skinnedMeshes, std::vector<Material>& materials) {
+void Model::AnimationDraw(ID3D12GraphicsCommandList* commandList, std::vector<SkinnedMesh>& skinnedMeshes, std::vector<Material>& materials) {
 	// Draw と同じ理由でメッシュ数・マテリアル数・スキン済みメッシュ数がずれ得る
 	assert(materials.size() >= mesh_.size() && skinnedMeshes.size() >= mesh_.size() && "マテリアル/スキン済みメッシュの個数が足りていない");
 	size_t drawCount = mesh_.size();
@@ -155,9 +151,6 @@ void Model::AnimationDraw(DXCom* pDxcom, ID3D12GraphicsCommandList* commandList,
 		commandList->IASetVertexBuffers(0, 1, &skinnedMeshes[index].GetSkinnedVBV());
 		commandList->IASetIndexBuffer(&mesh_[index].GetIBV());
 		commandList->DrawIndexedInstanced(static_cast<UINT>(mesh_[index].GetIndexCount()), 1, 0, 0, 0);
-
-		pDxcom->TransitionResource(skinnedMeshes[index].GetSkinnedResource(),
-			kSkinnedReadState, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 	}
 }
 
@@ -219,6 +212,17 @@ void Model::CSDispatch(DXCom* pDxcom, const SkinCluster& skinCluster, ID3D12Grap
 	commandList->SetComputeRootDescriptorTable(5, skinCluster.meshSectionSrvHandle.second);    // t3
 	commandList->SetComputeRootConstantBufferView(4, skinningInformation_->GetGPUVirtualAddress()); // b0
 
+	// 遷移はモデルごとにまとめる。メッシュごとに挟むと Dispatch が1つずつ順番待ちになる
+	const uint32_t sectionCount = static_cast<uint32_t>(skinCluster.meshSections.size());
+	std::vector<D3D12_RESOURCE_BARRIER> barriers;
+	barriers.reserve(sectionCount);
+	for (uint32_t i = 0; i < sectionCount; ++i) {
+		skinnedMeshes[i].BeginWrite(barriers);
+	}
+	if (!barriers.empty()) {
+		commandList->ResourceBarrier(static_cast<UINT>(barriers.size()), barriers.data());
+	}
+
 	// 各メッシュセクションごとにDispatch
 	for (uint32_t i = 0; i < static_cast<uint32_t>(skinCluster.meshSections.size()); ++i) {
 		// メッシュ側でSRVなどセット（頂点バッファやスキン出力先）
@@ -232,11 +236,15 @@ void Model::CSDispatch(DXCom* pDxcom, const SkinCluster& skinCluster, ID3D12Grap
 		uint32_t dispatchCount = (vertexCount + 1023) / 1024;
 
 		commandList->Dispatch(dispatchCount, 1, 1);
+	}
 
-		// 遷移は Dispatch の後。前に置くと頂点バッファ状態のままUAV書き込みすることになる。
-		// 描画とBLAS構築の両方から読むので、読み取り状態を合成しておく
-		pDxcom->TransitionResource(skinnedMeshes[i].GetSkinnedResource(),
-			D3D12_RESOURCE_STATE_UNORDERED_ACCESS, kSkinnedReadState);
+	// 読める状態のまま次のフレームまで置く。後から描く物の反射がこの頂点を読む
+	barriers.clear();
+	for (uint32_t i = 0; i < sectionCount; ++i) {
+		skinnedMeshes[i].EndWrite(barriers);
+	}
+	if (!barriers.empty()) {
+		commandList->ResourceBarrier(static_cast<UINT>(barriers.size()), barriers.data());
 	}
 }
 

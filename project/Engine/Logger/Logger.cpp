@@ -1,15 +1,37 @@
 #include "Engine/Logger/Logger.h"
 
 #include <Windows.h>
+#include <filesystem>
+#include <fstream>
+#include <mutex>
 
+namespace {
 
+	// シェーダの並列コンパイルから同時に呼ばれる
+	void Write(const std::string& line) {
+		static std::mutex mutex;
+		static std::ofstream file = [] {
+			const std::filesystem::path directory = "../generated/logs";
+			std::error_code error;
+			std::filesystem::create_directories(directory, error);
+			return std::ofstream(directory / "FujiEngine.log", std::ios::trunc);
+		}();
+
+		std::lock_guard lock(mutex);
+		OutputDebugStringA(line.c_str());
+		if (file.is_open()) {
+			// 落ちる直前の行まで残したいので毎回書き出す
+			file << line << std::flush;
+		}
+	}
+}
 
 void Logger::Log(const std::string& outputString) {
-	OutputDebugStringA((outputString + "\n").c_str());
+	Write(outputString + "\n");
 }
 
 void Logger::Log(const std::wstring& outputString) {
-	OutputDebugStringA((ConvertString(outputString) + "\n").c_str());
+	Write(ConvertString(outputString) + "\n");
 }
 
 void Logger::LogF(const char* format, ...) {
@@ -20,8 +42,7 @@ void Logger::LogF(const char* format, ...) {
 	vsnprintf(buffer, sizeof(buffer), format, args);
 	va_end(args);
 
-	OutputDebugStringA(buffer);
-	OutputDebugStringA("\n");
+	Write(std::string(buffer) + "\n");
 }
 
 std::string Logger::ConvertString(const std::wstring& str) {

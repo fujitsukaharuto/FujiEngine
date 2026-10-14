@@ -18,8 +18,7 @@ namespace Editor {
 	public:
 
 		/// <summary>親子を木で並べた一覧。クリックで選択する</summary>
-		/// <remarks>親子はTransformのペアレントから推定する。アンカーや描画物にぶら下がっていても持ち主の子になる。
-		/// level を渡すと、上に置物・出現位置・スプライトの追加・削除・保存と環境(空とライト)が出て、末尾にスプライトが並ぶ。止めているオブジェクトは既定で隠す</remarks>
+		/// <remarks>親子は Transform のペアレントから推定する。level を渡すと追加・削除・保存と環境の欄が出る</remarks>
 		void HierarchyGUI(Scene::Level* level);
 
 		/// <summary>選択中オブジェクトのTransform(ギズモ付き)と、描画物・コライダー・パラメータ</summary>
@@ -66,7 +65,7 @@ namespace Editor {
 	private:
 
 		Object* selected_ = nullptr;
-		/// <summary>選択中のスプライト。selected_ / isEnvironmentSelected_ とはどれか1つだけが立つ</summary>
+		/// <summary>選択中のスプライト。selected_ / isEnvironmentSelected_ と同時には立たない</summary>
 		Graphics::PlacedSprite* selectedSprite_ = nullptr;
 		/// <summary>環境(空とライト)を選んでいる</summary>
 		bool isEnvironmentSelected_ = false;

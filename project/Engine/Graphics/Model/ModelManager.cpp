@@ -1,4 +1,5 @@
 #include "Engine/Graphics/Model/ModelManager.h"
+#include "Engine/Logger/Logger.h"
 #include "Engine/Graphics/Pipeline/RootNames.h"
 #include "Engine/Graphics/Pipeline/PipeKind.h"
 #include "Engine/Graphics/Pipeline/PipelineManager.h"
@@ -125,10 +126,22 @@ void ModelManager::LoadModelInternal(const std::string& filename, bool overWrite
 	Model* model = nullptr;
 
 	auto iterator = instance->models_.find(filename);
-	if (iterator != instance->models_.end()) {
-		if (!overWrite) {
-			return;
-		}
+	if (iterator != instance->models_.end() && iterator->second && !overWrite) {
+		return;
+	}
+
+	// 読めなかったときに既存のモデルを壊さないよう、詰め替える前に読む
+	Assimp::Importer importer;
+	std::string path = instance->kDirectoryPath_ + filename;
+	const aiScene* scene = importer.ReadFile(path.c_str(),
+		aiProcess_Triangulate | aiProcess_FlipWindingOrder | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
+	if (scene == nullptr || !scene->HasMeshes()) {
+		Logger::Log("Model load failed: " + path + " (" + importer.GetErrorString() + ")");
+		assert(false && "モデルを読めなかった");
+		return;
+	}
+
+	if (iterator != instance->models_.end() && iterator->second) {
 		// GPUが参照中の頂点バッファとSRVを作り直すので、積んだコマンドの完了を待つ
 		if (instance->dxcommon_) {
 			instance->dxcommon_->Flush();
@@ -144,11 +157,6 @@ void ModelManager::LoadModelInternal(const std::string& filename, bool overWrite
 		newModel = std::make_unique<Model>();
 		model = newModel.get();
 	}
-
-	Assimp::Importer importer;
-	std::string path = instance->kDirectoryPath_ + filename;
-	const aiScene* scene = importer.ReadFile(path.c_str(), aiProcess_FlipWindingOrder | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
-	assert(scene->HasMeshes());
 
 	// Mesh解析
 	uint32_t meshVertexCount = 0;
@@ -290,7 +298,7 @@ void ModelManager::LoadModelInternal(const std::string& filename, bool overWrite
 
 	// 上書き時は既存のModelに詰め替え済みなので、新規のときだけ登録する
 	if (newModel) {
-		instance->models_.insert(std::make_pair(filename, std::move(newModel)));
+		instance->models_[filename] = std::move(newModel);
 	}
 }
 

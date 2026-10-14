@@ -218,12 +218,12 @@ void OffscreenManager::CreateResource() {
 
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
 		offscreenRt_[i] = DXC::Helper::CreateOffscreenTextureResource(dxcommon_->GetDevice(), MyWin::kWindowWidth, MyWin::kWindowHeight, clearColorValue_);
-		dxcommon_->GetDevice()->CreateRenderTargetView(offscreenRt_[i].Get(), &offscreenRTVDesc_, dxcommon_->GetRTVHandle(i + 2));
+		dxcommon_->GetDevice()->CreateRenderTargetView(offscreenRt_[i].Get(), &offscreenRTVDesc_, dxcommon_->GetOffscreenRTV(i));
 	}
 
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
 		gpuParticleRt_[i] = DXC::Helper::CreateOffscreenTextureResource(dxcommon_->GetDevice(), MyWin::kWindowWidth / 4, MyWin::kWindowHeight / 4, clearColorValueForGPU_);
-		dxcommon_->GetDevice()->CreateRenderTargetView(gpuParticleRt_[i].Get(), &offscreenRTVDesc_, dxcommon_->GetRTVHandle(i + 4));
+		dxcommon_->GetDevice()->CreateRenderTargetView(gpuParticleRt_[i].Get(), &offscreenRTVDesc_, dxcommon_->GetGPUParticleRTV(i));
 	}
 
 #ifdef _DEBUGMODE

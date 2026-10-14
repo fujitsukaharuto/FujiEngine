@@ -69,8 +69,7 @@ namespace Graphics {
 		void PreDraw();
 
 		/// <summary>クリックされた画素に写っているオブジェクトの番号を書き出す</summary>
-		/// <remarks>クリックしたフレームにだけ走る。スキニング後の頂点を読むので本描画より前に呼ぶこと
-		/// (本描画はスキンメッシュを描いた直後に頂点バッファを書き込み状態へ戻す)</remarks>
+		/// <remarks>クリックしたフレームにだけ走る。スキニング後の頂点を読むので本描画より前に呼ぶこと</remarks>
 		void RenderPicking();
 
 		/// <summary>このフレームの静的オブジェクトからTLASを組み直す</summary>
@@ -96,9 +95,10 @@ namespace Graphics {
 		std::unique_ptr<RayTracedShadowPass> shadowPass_;
 		std::unique_ptr<IBLBaker> iblBaker_;
 
-		/// <summary>本描画(前方描画のループ)のGPU時間の計測区間</summary>
+		/// <summary>GPU時間の計測区間</summary>
 		enum TimerID {
 			kTimer_Forward = 0,
+			kTimer_AccelBuild, // BLAS / TLAS の構築
 			kTimer_Count,
 		};
 		std::unique_ptr<DXC::GPUTimer> gpuTimer_;

@@ -14,7 +14,7 @@ namespace DXC {
 		CommandContext() = default;
 		~CommandContext();
 
-		/// <summary>typeにD3D12_COMMAND_LIST_TYPE_DIRECTやCOMPUTEを渡して初期化を共通化</summary>
+		/// <summary>type に DIRECT や COMPUTE を渡して初期化を共通化</summary>
 		/// <returns>生成に成功したか。失敗時は何も保持しない状態で戻る</returns>
 		[[nodiscard]] bool Initialize(ID3D12Device* device, D3D12_COMMAND_LIST_TYPE type);
 
@@ -25,7 +25,7 @@ namespace DXC {
 		void Close();
 		void Execute();
 		void Signal(uint32_t frameIndex);
-		void WaitForGPU(uint32_t frameIndex, bool isLogging = false);
+		void WaitForGPU(uint32_t frameIndex);
 		void WaitQueueFor(CommandContext* otherContext, uint32_t frameIndex);
 
 		//========================================================================*/

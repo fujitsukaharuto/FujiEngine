@@ -9,7 +9,7 @@ namespace Core {
 	/// <summary>
 	/// Jsonの読み書きを行うクラス
 	/// </summary>
-	/// <remarks>ランタイム機能なのでImGuiやEditorには依存しない。編集UIは Editor::JsonEditorUI にある</remarks>
+	/// <remarks>ImGui や Editor には依存しない。編集UIは Editor::JsonEditorUI にある</remarks>
 	class JsonSerializer {
 	public:
 

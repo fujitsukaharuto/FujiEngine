@@ -35,18 +35,22 @@ namespace DXC {
 		void SettingTexture(ID3D12Device* device);
 
 		/// <summary>バックバッファをウィンドウの大きさに合わせて作り直す</summary>
-		/// <remarks>GPU がバックバッファを使い終わってから呼ぶこと。ゲームを描く側(オフスクリーン・深度)の大きさは変わらない</remarks>
+		/// <remarks>GPU がバックバッファを使い終わってから呼ぶこと。ゲームを描く側の大きさは変わらない</remarks>
 		void Resize(ID3D12Device* device, int width, int height);
 
 		//========================================================================*/
 		//* Getter
 		IDXGISwapChain4* GetSwapChain() const { return swapChain_.Get(); }
-		size_t GetBackBufferCount() const { return backBufferCount_; }
+		size_t GetBackBufferCount() const { return kBackBufferCount_; }
 		int GetWidth() const { return width_; }
 		int GetHeight() const { return height_; }
 		ID3D12Resource* GetBackBuffer(UINT index) const { return swapChainResources_[index].Get(); }
 		ID3D12Resource* GetDSVResource(UINT index) const { return depthStencilResource_[index].Get(); }
-		const D3D12_CPU_DESCRIPTOR_HANDLE& GetRTVHandle(uint32_t index) const { return rtvHandles_[index]; }
+		const D3D12_CPU_DESCRIPTOR_HANDLE& GetBackBufferRTV(uint32_t index) const { return rtvHandles_[index]; }
+		/// <summary>ゲームを描くオフスクリーンの RTV</summary>
+		const D3D12_CPU_DESCRIPTOR_HANDLE& GetOffscreenRTV(uint32_t frameIndex) const { return rtvHandles_[kOffscreenRtvStart_ + frameIndex]; }
+		/// <summary>GPUパーティクルを描く 1/4 解像度の RTV</summary>
+		const D3D12_CPU_DESCRIPTOR_HANDLE& GetGPUParticleRTV(uint32_t frameIndex) const { return rtvHandles_[kGPUParticleRtvStart_ + frameIndex]; }
 		const D3D12_CPU_DESCRIPTOR_HANDLE& GetDSVHandle(uint32_t index) const { return dsvHandle_[index]; }
 		D3D12_GPU_DESCRIPTOR_HANDLE GetDepthTexGPUHandle(UINT index) { return depthTexSrvHandle_[index].second; }
 
@@ -58,14 +62,21 @@ namespace DXC {
 
 	private:
 		Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain_;
-		Microsoft::WRL::ComPtr<ID3D12Resource> swapChainResources_[2];
+		// 2枚だと垂直同期を切っても Present がモニターの更新を待つ
+		static constexpr UINT kBackBufferCount_ = 3;
+		// RTV ヒープの並び。バックバッファ、オフスクリーン、GPUパーティクルの順
+		static constexpr UINT kOffscreenRtvStart_ = kBackBufferCount_;
+		static constexpr UINT kGPUParticleRtvStart_ = kOffscreenRtvStart_ + DXC::kFrameCount_;
+		static constexpr UINT kRtvCount_ = kGPUParticleRtvStart_ + DXC::kFrameCount_;
+
+		Microsoft::WRL::ComPtr<ID3D12Resource> swapChainResources_[kBackBufferCount_];
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap_;
-		D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles_[6]; // バックバッファの数に合わせる
-		UINT numRTVHandle_ = 6;
-		UINT backBufferCount_ = 2;
+		D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles_[kRtvCount_];
 		// バックバッファの大きさ。ウィンドウの大きさに追従する
 		int width_ = 0;
 		int height_ = 0;
+		// 垂直同期を切ったとき、モニターの更新を待たずに出せるか
+		bool isTearingSupported_ = false;
 
 		Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource_[DXC::kFrameCount_];
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap_;

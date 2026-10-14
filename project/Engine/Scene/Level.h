@@ -22,10 +22,14 @@ namespace Scene {
 	/// <summary>
 	/// シーン全体の見た目。空と平行光源とカメラの初期位置
 	/// </summary>
-	/// <remarks>配置データの "environment"。シーンに入るたびにまるごと適用するので、前のシーンの設定は持ち越さない</remarks>
+	/// <remarks>配置データの "environment"。シーンに入るたびにまるごと適用する</remarks>
 	struct Environment {
 		bool hasSkyBox = false;
 		Math::Vector4 skyBoxColor = { 1.0f,1.0f,1.0f,1.0f };
+		/// <summary>Graphics::SkyMode の値。0:Texture 1:Atmosphere</summary>
+		int skyMode = 0;
+		/// <summary>Atmosphere の空の明るさ</summary>
+		float skyIntensity = 1.0f;
 		Math::Vector4 lightColor = { 1.0f,1.0f,1.0f,1.0f };
 		Math::Vector3 lightDirection = { 0.0f,-1.0f,0.0f };
 		float lightIntensity = 1.0f;
@@ -50,6 +54,10 @@ namespace Scene {
 		float fogMaxOpacity = 1.0f;
 		/// <summary>空へどれだけ掛けるか</summary>
 		float fogSkyAmount = 1.0f;
+		/// <summary>太陽の方向のフォグを明るくする強さ。0で掛からない</summary>
+		float fogSunScatter = 0.0f;
+		/// <summary>大きいほど太陽のまわりだけが明るくなる</summary>
+		float fogSunPower = 8.0f;
 
 		// 画面の仕上げ(ブルームとトーンマップ)。既定値は Graphics::PostProcessSettings と同じ
 		bool bloomEnabled = true;
@@ -57,7 +65,7 @@ namespace Scene {
 		float bloomIntensity = 1.0f;
 		float bloomKnee = 0.1f;
 		float bloomScatter = 0.7f;
-		/// <summary>Graphics::TonemapMode の値。0:None 1:Reinhard 2:ACES 3:AgX</summary>
+		/// <summary>Graphics::TonemapMode の値</summary>
 		int tonemapMode = 2;
 		float exposure = 2.0f;
 		float saturation = 1.0f;
@@ -78,12 +86,26 @@ namespace Scene {
 		/// <summary>光源とみなす太陽のまわりの広さ。画面の高さが1</summary>
 		float godRaySunSize = 0.4f;
 
+		// 描画の重さに効く設定。Hierarchy > Environment の Quality のボタンでまとめて切り替えられる
+		/// <summary>Graphics::RayTracedAOMode の値。0:Off 1:Inline 2:Screen</summary>
+		int aoMode = 2;
+		/// <summary>Graphics::RayTracedShadowMode の値。0:Hard 1:Soft</summary>
+		int shadowMode = 0;
+		/// <summary>Graphics::AmbientMode の値。0:Hemisphere 1:IBL</summary>
+		int ambientMode = 0;
+		/// <summary>IBL のときだけアンビエントに掛ける倍率。Hemisphere と近い明るさになる値を既定にしてある</summary>
+		float iblAmbientScale = 0.6f;
+		/// <summary>Graphics::LightingMode の値。0:Simple 1:PBR</summary>
+		int lightingMode = 0;
+
 		// 鏡面の映り込み。映り込ませるマテリアル(environment が0より大きい物)にだけ効く
-		/// <summary>Graphics::RayTracedReflectionMode の値。0:Off(どの向きにも空が映る) 1:Occlusion(遮られた向きは空を映さない) 2:Objects(遮った物の色を映す)</summary>
+		/// <summary>Graphics::RayTracedReflectionMode の値</summary>
 		int reflectionMode = 0;
 		/// <summary>この距離までの物を見る</summary>
 		float reflectionMaxDistance = 100.0f;
 		float reflectionIntensity = 1.0f;
+		/// <summary>平行光源の影の中で映り込みをどれだけ暗くするか(0〜1)</summary>
+		float reflectionShadow = 0.5f;
 
 		// 被写界深度。ピントの合う距離から離れた物をぼかす
 		/// <summary>ぼけの最大半径(画素)。0で掛からない</summary>
@@ -99,7 +121,7 @@ namespace Scene {
 	/// <summary>
 	/// シーンに置く置物・出現位置・スプライトの一覧。配置データ(resource/Json/Level/シーン名.json)と対応する
 	/// </summary>
-	/// <remarks>Release でも読むので、地形や背景をコードに書かずに置ける。編集と保存は Hierarchy から行う</remarks>
+	/// <remarks>Release でも読む。編集と保存は Hierarchy から行う</remarks>
 	class Level {
 	public:
 		Level();
@@ -115,7 +137,7 @@ namespace Scene {
 		/// <summary>置物を描く</summary>
 		void Draw();
 		/// <summary>スプライトを並び順に描く</summary>
-		/// <remarks>SceneManager がシーンの Draw の後に呼ぶ。シーンやオブジェクトが描くスプライト(HPバー等)より手前に出る</remarks>
+		/// <remarks>SceneManager がシーンの Draw の後に呼ぶので、シーンが描くスプライトより手前に出る</remarks>
 		void DrawSprites();
 
 		/// <summary>置物を1つ追加する</summary>
@@ -153,7 +175,7 @@ namespace Scene {
 		bool RemoveSprite(const Graphics::PlacedSprite* sprite);
 		bool ContainsSprite(const Graphics::PlacedSprite* sprite) const;
 		/// <summary>名前でスプライトを探す。無ければ nullptr</summary>
-		/// <remarks>シーンは Initialize でこれを呼んでポインタを控えておけばよい。スプライトはシーンが終わるまで消えない(エディタで Remove しない限り)</remarks>
+		/// <remarks>シーンは Initialize でポインタを控えておけばよい。エディタで Remove しない限り消えない</remarks>
 		Graphics::PlacedSprite* FindSprite(const std::string& name);
 		/// <summary>描く順(後ろほど手前)</summary>
 		const std::vector<std::unique_ptr<Graphics::PlacedSprite>>& GetSprites() const { return sprites_; }
@@ -172,7 +194,7 @@ namespace Scene {
 		/// <summary>environment_ をスカイボックスとライトへ入れる</summary>
 		void ApplyEnvironment();
 		/// <summary>environment_ のカメラの初期位置をカメラへ入れる</summary>
-		/// <remarks>ApplyEnvironment と分けてあるのは、空やライトを編集したときにシーンが動かしているカメラを巻き戻さないため</remarks>
+		/// <remarks>空やライトの編集でカメラを巻き戻さないよう、ApplyEnvironment と分けてある</remarks>
 		void ApplyCamera();
 
 	private:

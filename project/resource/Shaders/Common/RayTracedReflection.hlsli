@@ -16,7 +16,7 @@ static const uint kReflectionModeObjects = 2;   // 遮った物の色を映す
 
 // RayInstance::flags のビット。C++ 側 (RaytracingScene.h の RayInstanceFlag) と同じ値であること
 static const uint kRayInstanceHasGeometry = 1u << 0; // 頂点とインデックスを引ける(UV が分かる)
-static const uint kRayInstanceHasNormal = 1u << 1;   // 頂点の法線がそのまま使える(スキニングで動かない)
+static const uint kRayInstanceHasNormal = 1u << 1;   // 頂点の法線が使える
 
 // レイが当たった物の見た目。C++ 側 (RaytracingScene.h の RayInstanceData) と並びが一致していること
 struct RayInstance
@@ -154,8 +154,7 @@ ReflectionHit TraceReflectionHit(float3 worldPos, float3 R, float3 N, float maxD
 }
 
 /// <summary>当たった物の、反射に映す色を返す</summary>
-/// <remarks>当てるのはアンビエントと0番の平行光源だけ(点光源・スポット・AO・その物自身の映り込みは無い)。
-/// 法線が分からない物(スキンメッシュ)は「半分だけ光の方を向いた面」として当てる</remarks>
+/// <remarks>当てるのはアンビエントと0番の平行光源だけ。法線の無い物は半分だけ光を向いた面として扱う</remarks>
 /// <param name="textureColor">当たった点のテクスチャの色</param>
 /// <param name="L">平行光源へ向かう単位ベクトル</param>
 /// <param name="sunRadiance">平行光源の色と強さ。無ければ0</param>

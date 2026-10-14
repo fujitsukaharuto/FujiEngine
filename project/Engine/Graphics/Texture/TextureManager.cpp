@@ -63,6 +63,15 @@ void TextureManager::Load(const std::string& filename, bool overWrite) {
 	FlushUploads();
 }
 
+Texture* TextureManager::GetLinearTexture(const std::string& filename, bool overWrite) {
+	const std::string key = filename + "|linear";
+	if (Texture* texture = PrepareSlot(key, overWrite)) {
+		RegisterTexture(texture, ReadImageFile(directoryPath_ + filename, true));
+		FlushUploads();
+	}
+	return textureCache_[key].get();
+}
+
 Texture* TextureManager::PrepareSlot(const std::string& filename, bool overWrite) {
 	auto it = textureCache_.find(filename);
 	if (it != textureCache_.end()) {
@@ -197,25 +206,40 @@ void TextureManager::SetTextureFileOnceLoad(const std::string& name) {
 	}
 }
 
-DirectX::ScratchImage TextureManager::ReadImageFile(const std::string& filePath) {
+DirectX::ScratchImage TextureManager::ReadImageFile(const std::string& filePath, bool isLinear) {
 	DirectX::ScratchImage image{};
 	HRESULT hr;
 	std::wstring filePathw = Logger::ConvertString(filePath);
 	if (filePathw.ends_with(L".dds")) {
 		hr = DirectX::LoadFromDDSFile(filePathw.c_str(), DirectX::DDS_FLAGS_NONE, nullptr, image);
 	} else {
-		hr = DirectX::LoadFromWICFile(filePathw.c_str(), DirectX::WIC_FLAGS_FORCE_SRGB, nullptr, image);
+		hr = DirectX::LoadFromWICFile(filePathw.c_str(),
+			isLinear ? DirectX::WIC_FLAGS_IGNORE_SRGB : DirectX::WIC_FLAGS_FORCE_SRGB, nullptr, image);
 	}
-	assert(SUCCEEDED(hr));
+	if (FAILED(hr)) {
+		Logger::Log("Texture load failed: " + filePath);
+		assert(false && "テクスチャを読めなかった");
+		image.Initialize2D(DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, 2, 2, 1, 1);
+		for (size_t i = 0; i < image.GetPixelsSize(); i += 4) {
+			image.GetPixels()[i + 0] = 255;
+			image.GetPixels()[i + 1] = 0;
+			image.GetPixels()[i + 2] = 255;
+			image.GetPixels()[i + 3] = 255;
+		}
+		return image;
+	}
+
+	if (DirectX::IsCompressed(image.GetMetadata().format)) {
+		return image;
+	}
 
 	DirectX::ScratchImage mipImages{};
-	if (DirectX::IsCompressed(image.GetMetadata().format)) {
-		mipImages = std::move(image);
-	} else {
-		hr = DirectX::GenerateMipMaps(image.GetImages(), image.GetImageCount(), image.GetMetadata(),
-			DirectX::TEX_FILTER_SRGB, 0, mipImages);
+	hr = DirectX::GenerateMipMaps(image.GetImages(), image.GetImageCount(), image.GetMetadata(),
+		isLinear ? DirectX::TEX_FILTER_DEFAULT : DirectX::TEX_FILTER_SRGB, 0, mipImages);
+	if (FAILED(hr)) {
+		// 1x1 などミップを作れない画像はそのまま使う
+		return image;
 	}
-	assert(SUCCEEDED(hr));
 
 	return mipImages;
 }

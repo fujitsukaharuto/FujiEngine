@@ -106,7 +106,7 @@ namespace Core {
 	};
 
 	/// <summary>View メニューで開閉できるデバッグウィンドウ</summary>
-	/// <remarks>if (DebugWindow w{"Camera"}) { 中身 } と書く。閉じている・畳まれている間は中身を呼ばず、スコープを抜けると End まで済ませる</remarks>
+	/// <remarks>if (DebugWindow w{"Camera"}) { 中身 } と書く。スコープを抜けると End まで済ませる</remarks>
 	class DebugWindow {
 	public:
 		explicit DebugWindow(const char* name, ImGuiWindowFlags flags = 0);

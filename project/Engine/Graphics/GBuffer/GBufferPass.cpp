@@ -81,6 +81,7 @@ void GBufferPass::Initialize(DXCom* pDxcom) {
 	}
 
 	gpuTimer_.Initialize(device, dxcommon_->GetDXCommand()->GetQueue(), 1);
+	gpuTimer_.SetName(kTimer_Prepass, "  Prepass");
 }
 
 void GBufferPass::Finalize() {

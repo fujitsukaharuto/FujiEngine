@@ -65,6 +65,6 @@ private:
 	bool isRestartOnce_ = false;
 	bool isGameOver_ = false;
 	/// <summary>ゲームオーバー・コンティニューの明滅に使う黒</summary>
-	/// <remarks>シーン遷移の暗転は SceneManager が持っているのでここには無い。ゲームオーバーの絵より手前に出すため配置データの最後に置いてある</remarks>
+	/// <remarks>ゲームオーバーの絵より手前に出すため、配置データの最後に置いてある</remarks>
 	Graphics::PlacedSprite* flash_ = nullptr;
 };

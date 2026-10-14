@@ -2,6 +2,10 @@
 #include <iostream>
 #include "Engine/Logger/Logger.h"
 #include <cassert>
+#include <algorithm>
+#include <filesystem>
+#include <fstream>
+#include <thread>
 
 #pragma comment(lib,"dxcompiler.lib")
 #pragma comment(lib,"dxguid.lib")
@@ -30,6 +34,112 @@ namespace {
 		}
 		return context;
 	}
+
+	// コンパイル結果の置き場。中身は消しても次の起動で作り直される
+	const std::filesystem::path kCacheDirectory = "../generated/shadercache";
+	// コンパイルの引数やキャッシュの形式を変えたら上げる
+	constexpr uint64_t kCacheVersion = 1;
+
+	void HashBytes(uint64_t& hash, const void* data, size_t size) {
+		const uint8_t* bytes = static_cast<const uint8_t*>(data);
+		for (size_t i = 0; i < size; ++i) {
+			hash = (hash ^ bytes[i]) * 0x100000001b3ull;
+		}
+	}
+
+	/// <summary>ソースと、そこから #include "..." で辿れる全ファイルの中身をハッシュへ混ぜる</summary>
+	/// <remarks>.hlsli だけを書き換えたときも古い結果を拾わないようにするため</remarks>
+	void HashSourceTree(uint64_t& hash, const std::filesystem::path& file, std::vector<std::filesystem::path>& visited) {
+		std::error_code error;
+		const std::filesystem::path canonical = std::filesystem::weakly_canonical(file, error);
+		if (error || std::find(visited.begin(), visited.end(), canonical) != visited.end()) {
+			return;
+		}
+		visited.push_back(canonical);
+
+		std::ifstream stream(canonical, std::ios::binary);
+		if (!stream.is_open()) {
+			return;
+		}
+		const std::string source((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
+		HashBytes(hash, source.data(), source.size());
+
+		size_t position = 0;
+		while ((position = source.find("#include", position)) != std::string::npos) {
+			const size_t lineEnd = source.find('\n', position);
+			const size_t open = source.find('"', position);
+			position += 8;
+			if (open == std::string::npos || open > lineEnd) {
+				continue;
+			}
+			const size_t close = source.find('"', open + 1);
+			if (close == std::string::npos || close > lineEnd) {
+				continue;
+			}
+			HashSourceTree(hash, canonical.parent_path() / source.substr(open + 1, close - open - 1), visited);
+		}
+	}
+
+	std::filesystem::path CachePathOf(const std::wstring& filePath, const wchar_t* profile) {
+		uint64_t hash = 0xcbf29ce484222325ull;
+		HashBytes(hash, &kCacheVersion, sizeof(kCacheVersion));
+		HashBytes(hash, profile, wcslen(profile) * sizeof(wchar_t));
+#ifdef _DEBUG
+		const char kBuildTag[] = "debug";
+#else
+		const char kBuildTag[] = "optimized";
+#endif
+		HashBytes(hash, kBuildTag, sizeof(kBuildTag));
+		std::vector<std::filesystem::path> visited;
+		HashSourceTree(hash, filePath, visited);
+		return kCacheDirectory / std::format("{:016x}.dxil", hash);
+	}
+
+	/// <summary>blob からリフレクションを作る</summary>
+	void CreateReflection(DxcContext& dxc, IDxcBlob* blob, ShaderData& out) {
+		DxcBuffer buffer;
+		buffer.Ptr = blob->GetBufferPointer();
+		buffer.Size = blob->GetBufferSize();
+		buffer.Encoding = 0;
+		dxc.utils->CreateReflection(&buffer, IID_PPV_ARGS(&out.reflection));
+	}
+
+	/// <summary>保存済みのコンパイル結果を読む。無ければ blob が空のまま返る</summary>
+	ShaderData LoadCached(DxcContext& dxc, const std::filesystem::path& cachePath) {
+		ShaderData result;
+		std::error_code error;
+		if (!std::filesystem::exists(cachePath, error)) {
+			return result;
+		}
+		Microsoft::WRL::ComPtr<IDxcBlobEncoding> blob;
+		if (FAILED(dxc.utils->LoadFile(cachePath.c_str(), nullptr, &blob)) || blob->GetBufferSize() == 0) {
+			return result;
+		}
+		CreateReflection(dxc, blob.Get(), result);
+		if (result.reflection) {
+			result.blob = blob;
+		}
+		return result;
+	}
+
+	void SaveCached(const std::filesystem::path& cachePath, IDxcBlob* blob) {
+		std::error_code error;
+		std::filesystem::create_directories(cachePath.parent_path(), error);
+		// 同じシェーダを別スレッドが同時に書くことがあるので、別名で書いてから差し替える
+		std::filesystem::path temporary = cachePath;
+		temporary += std::format(".{}.tmp", std::hash<std::thread::id>{}(std::this_thread::get_id()));
+		{
+			std::ofstream stream(temporary, std::ios::binary | std::ios::trunc);
+			if (!stream.is_open()) {
+				return;
+			}
+			stream.write(static_cast<const char*>(blob->GetBufferPointer()), static_cast<std::streamsize>(blob->GetBufferSize()));
+		}
+		std::filesystem::rename(temporary, cachePath, error);
+		if (error) {
+			std::filesystem::remove(temporary, error);
+		}
+	}
 }
 
 
@@ -49,6 +159,11 @@ Microsoft::WRL::ComPtr<IDxcBlob> DXCompile::CompileShader(const std::wstring& fi
 ShaderData DXCompile::CompileShaderWithReflection(const std::wstring& filePath, const wchar_t* profile) {
 
 	DxcContext& dxc = ThreadContext();
+
+	const std::filesystem::path cachePath = CachePathOf(filePath, profile);
+	if (ShaderData cached = LoadCached(dxc, cachePath); cached.blob) {
+		return cached;
+	}
 
 	Logger::Log((std::format(L"Begin CompileShader, path:{},profile:{}", filePath, profile)));
 	IDxcBlobEncoding* shaderSource = nullptr;
@@ -103,15 +218,12 @@ ShaderData DXCompile::CompileShaderWithReflection(const std::wstring& filePath, 
 	hr = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&result.blob), nullptr);
 	assert(SUCCEEDED(hr));
 
-	// リフレクションの取得
-	IDxcBlob* reflectionBlob = nullptr;
-	hr = shaderResult->GetOutput(DXC_OUT_REFLECTION, IID_PPV_ARGS(&reflectionBlob), nullptr);
-	if (SUCCEEDED(hr) && reflectionBlob != nullptr) {
-		DxcBuffer reflectionBuffer;
-		reflectionBuffer.Ptr = reflectionBlob->GetBufferPointer();
-		reflectionBuffer.Size = reflectionBlob->GetBufferSize();
-		reflectionBuffer.Encoding = 0;
-		dxc.utils->CreateReflection(&reflectionBuffer, IID_PPV_ARGS(&result.reflection));
+	// 保存したものを読んだときと同じ経路で作る
+	if (result.blob) {
+		CreateReflection(dxc, result.blob.Get(), result);
+		if (result.reflection) {
+			SaveCached(cachePath, result.blob.Get());
+		}
 	}
 
 	Logger::Log((std::format(L"Compile Succeeded, path:{}, profile:{}\n", filePath, profile)));// 成功Logを出せるようにする

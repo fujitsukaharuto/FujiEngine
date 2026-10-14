@@ -11,10 +11,9 @@ RaytracingAccelerationStructure gSceneTLAS : register(t0, space2);
 static const float kShadowRayBias = 0.02f;
 static const float kShadowRayMaxDistance = 1000.0f;
 
-// 深度バッファから復元した位置の粗さ。24bit深度の1段ぶんは、カメラからの距離 z に対して
-// およそ 2^-24 * z^2 / near だけ奥行きがずれる。near=0.1 (Camera.h の既定) で 6e-7 * z^2。
-// 余裕を見て2段ぶんを取る。near を変えたらここも見直すこと
-static const float kDepthReconstructionError = 1.2e-6f;
+// 深度から復元した位置の粗さ。深度の刻み 6e-7 * z^2 と、逆行列で戻すときの丸め 2e-6 * z^2 の合計。
+// near=0.1 での値。near を変えたら見直すこと
+static const float kDepthReconstructionError = 4.0e-6f;
 
 // AllLights::rayTracedShadowMask のビット割り当て。C++ 側 (LightManager.h) と同じ値であること
 static const uint kShadowMaskDirectional = 1u << 0;
@@ -54,8 +53,7 @@ float TraceShadowRay(float3 worldPos, float3 L, float3 N, float maxDistance)
 }
 
 /// <summary>深度から復元した位置から飛ばすときの浮かせる量</summary>
-/// <remarks>復元した位置は遠いほど粗いので、固定のままだと遠景で原点が面の下へ潜って縞が出る。
-/// 近くでは kShadowRayBias のままで、粗さがそれを超える距離(およそ130)から先だけ増える</remarks>
+/// <remarks>復元した位置は遠いほど粗い。距離およそ70から先だけ kShadowRayBias より大きくなる</remarks>
 /// <param name="viewDistance">カメラからその点までの距離</param>
 float ReconstructedRayBias(float viewDistance)
 {

@@ -62,7 +62,7 @@ void SphereEmitter::Update(float deltaTime) {
 
 void SphereEmitter::Dispatch(ID3D12GraphicsCommandList* cmd,
 	DXCom* dx, [[maybe_unused]] SRVManager* srv, const ParticleCSHandles& shared) {
-	if (data_.emit == 0 || data_.count == 0) return;
+	if (!WillDispatch()) return;
 	uint32_t frameIndex = dx->GetNowFrameCount();
 	Graphics::PipelineManager* pPipeManager = Graphics::PipelineManager::GetInstance();
 	

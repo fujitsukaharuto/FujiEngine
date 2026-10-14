@@ -33,8 +33,7 @@ namespace Scene {
 		void StartScene(const std::string& sceneName);
 
 		/// <summary>次シーンへ移行</summary>
-		/// <remarks>要求した時点では切り替わらない。暗転しきってから次シーンを作り、extraTime だけ待って差し替える。
-		/// entry は遷移先の入口(出現位置の名前)。遷移先は BaseScene::GetEntry / ApplySpawnPoint で使う</remarks>
+		/// <remarks>要求した時点では切り替わらない。暗転しきってから次シーンを作り、extraTime だけ待つ</remarks>
 		void ChangeScene(const std::string& sceneName, float extraTime, const std::string& entry = "");
 
 		/// <summary>暗転・明転のどれかが動いている</summary>
@@ -61,7 +60,7 @@ namespace Scene {
 		void SceneChangeGUI();
 
 		/// <summary>前のシーンが残した状態を消し、scene_ を始める</summary>
-		/// <remarks>GPUエミッター・時間とパーティクルの一時停止を戻し、配置データ(環境を含む)を読んで Initialize する</remarks>
+		/// <remarks>GPUエミッターと一時停止を戻し、配置データを読んで Initialize する</remarks>
 		void EnterScene(const std::string& sceneName);
 
 	private:

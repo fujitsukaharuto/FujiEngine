@@ -1,7 +1,21 @@
 #include "Engine/DXC/Debug/GPUTimer.h"
 #include <cassert>
+#include <algorithm>
 
 using namespace DXC;
+
+namespace {
+	std::vector<GPUTimer*>& Registry() {
+		static std::vector<GPUTimer*> timers;
+		return timers;
+	}
+
+	uint64_t frameSerial = 1;
+}
+
+GPUTimer::~GPUTimer() {
+	std::erase(Registry(), this);
+}
 
 void GPUTimer::Initialize(ID3D12Device* device, ID3D12CommandQueue* commandQueue, uint32_t maxTimerCount) {
 	assert(device);
@@ -9,6 +23,11 @@ void GPUTimer::Initialize(ID3D12Device* device, ID3D12CommandQueue* commandQueue
 
 	maxTimerCount_ = maxTimerCount;
 	gpuFrequency_ = 0;
+	names_.assign(maxTimerCount_, nullptr);
+	for (auto& serials : resolvedSerial_) {
+		serials.assign(maxTimerCount_, 0);
+	}
+	Registry().push_back(this);
 
 	// フレーム数 * 1フレームあたりの最大計測数 * (開始+終了)
 	uint32_t totalQueryCount = kFrameCount_ * maxTimerCount_ * kTimestampsPerTimer;
@@ -63,6 +82,7 @@ void GPUTimer::Initialize(ID3D12Device* device, ID3D12CommandQueue* commandQueue
 }
 
 void GPUTimer::Finalize() {
+	std::erase(Registry(), this);
 	queryHeap_.Reset();
 	for (uint32_t i = 0; i < DXC::kFrameCount_; i++) {
 		queryBuffer_[i].Reset();
@@ -101,6 +121,28 @@ void GPUTimer::Resolve(ID3D12GraphicsCommandList* list, uint32_t frameIndex, uin
 		queryBuffer_[frameIndex].Get(),
 		dstOffset
 	);
+	resolvedSerial_[frameIndex][timerId] = frameSerial;
+}
+
+void GPUTimer::SetName(uint32_t timerId, const char* name) {
+	assert(timerId < maxTimerCount_);
+	names_[timerId] = name;
+}
+
+void GPUTimer::AdvanceFrame() {
+	++frameSerial;
+}
+
+void GPUTimer::CollectAll(uint32_t finishedFrame, std::vector<Sample>& out) {
+	out.clear();
+	for (GPUTimer* timer : Registry()) {
+		for (uint32_t id = 0; id < timer->maxTimerCount_; ++id) {
+			if (timer->names_[id] == nullptr || timer->resolvedSerial_[finishedFrame][id] != frameSerial - 1) {
+				continue;
+			}
+			out.push_back({ timer->names_[id], timer->GetElapsedMS(finishedFrame, id) });
+		}
+	}
 }
 
 double GPUTimer::GetElapsedMS(uint32_t frameIndex, uint32_t timerId) {

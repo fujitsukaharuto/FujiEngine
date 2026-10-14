@@ -4,7 +4,7 @@
 // 前方描画からAOを引くためのヘッダ。経路(kAOMode*)の切り替えもここに閉じ込める。
 #include "RayTracedAO.hlsli"
 
-// 別パスで計算しデノイズ済みのAO。space0=gTextures[] / space1=gEnvironment / space2=TLAS の空き
+// 別パスで計算しデノイズ済みのAO。space3 は画面空間の計算済みバッファ
 Texture2D<float> gAOTexture : register(t0, space3);
 
 /// <summary>この画素のAOを引く。1で開けている、0で完全に囲まれている</summary>

@@ -1,9 +1,8 @@
 #ifndef BLOOM_PASS_HLSLI
 #define BLOOM_PASS_HLSLI
 
-// 多段のブルーム。明るい所を半分ずつ縮めながらぼかし(BloomDownsample)、
-// 小さい方から順に重ねながら戻し(BloomUpsample)、最後にシーンへ足す(BloomComposite)。
-// 1枚を広くぼかすより安く、光源のすぐ周りから遠くまで滑らかに広がる
+// 多段のブルーム。縮めながらぼかす(BloomDownsample) → 重ねながら戻す(BloomUpsample) →
+// シーンへ足す(BloomComposite)
 
 // BloomPass.h の BloomPassParam と並びが一致していること
 cbuffer BloomPassParam : register(b0)

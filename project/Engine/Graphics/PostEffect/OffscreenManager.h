@@ -240,7 +240,7 @@ namespace Graphics {
 		/// <remarks>ブルーム・光の筋・被写界深度以外の効果(ラジアルブラー等、ゲームが途中で足すもの)には触らない</remarks>
 		void ApplySettings(const PostProcessSettings& settings);
 
-		/// <summary>次に描くゲーム画面を PNG に保存する(generated/screenshots/)。デバッグGUIは写らない</summary>
+		/// <summary>次に描くゲーム画面を generated/screenshots/ へ PNG で保存する</summary>
 		/// <remarks>_DEBUGMODE でだけ働く。保存は GPU が描き終わる次のフレーム</remarks>
 		void RequestScreenshot() { isScreenshotRequested_ = true; }
 

@@ -64,7 +64,7 @@ void TextureBasedEmitter::Update(float deltaTime) {
 
 void TextureBasedEmitter::Dispatch(ID3D12GraphicsCommandList* cmd,
 	DXCom* dx, [[maybe_unused]] SRVManager* srv, const ParticleCSHandles& shared) {
-	if (!isEmit_ || data_.count == 0) return;
+	if (!WillDispatch()) return;
 	uint32_t frameIndex = dx->GetNowFrameCount();
 	Graphics::PipelineManager* pPipeManager = Graphics::PipelineManager::GetInstance();
 	

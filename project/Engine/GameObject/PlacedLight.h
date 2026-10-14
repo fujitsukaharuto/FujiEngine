@@ -11,8 +11,7 @@ namespace GameObject {
 	/// <summary>
 	/// 配置データに置く点光源・スポットライト
 	/// </summary>
-	/// <remarks>位置と向きは Transform から取る(スポットライトは前方向を照らす)。生成・保存は Scene::Level が行う。
-	/// LightManager の枠を1つ使う。枠が埋まっていたら光らない(点光源・スポットライトそれぞれの上限まで)</remarks>
+	/// <remarks>位置と向きは Transform から取る。LightManager の枠を1つ使う</remarks>
 	class PlacedLight : public GameObject {
 	public:
 
@@ -34,7 +33,7 @@ namespace GameObject {
 		void ParameterGUI() override;
 
 		/// <summary>消灯する。破棄する前に呼ぶこと</summary>
-		/// <remarks>LightManager の枠は詰めないので、呼ばないと最後の明るさのまま光り続ける。枠はシーンに入り直すと戻る</remarks>
+		/// <remarks>LightManager の枠は詰めないので、呼ばないと最後の明るさのまま光り続ける</remarks>
 		void TurnOff();
 
 	private:
