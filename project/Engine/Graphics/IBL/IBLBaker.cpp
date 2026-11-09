@@ -135,34 +135,60 @@ void IBLBaker::Finalize() {
 	dxcommon_ = nullptr;
 }
 
+void IBLBaker::SetSource(D3D12_GPU_DESCRIPTOR_HANDLE source, uint32_t size, uint64_t version) {
+	hasCustomSource_ = true;
+	customSource_ = source;
+	customSourceSize_ = size;
+	customSourceVersion_ = version;
+}
+
+void IBLBaker::ResetSource() {
+	hasCustomSource_ = false;
+}
+
 void IBLBaker::EnsureBaked(ID3D12GraphicsCommandList* commandList) {
-	if (isBaked_ || dxcommon_ == nullptr) {
+	if (dxcommon_ == nullptr) {
 		return;
 	}
 
-	// 今は TextureManager::Initialize の LoadSkyCube で先に読まれているが、
-	// その順序に寄りかからずに済むよう、読めた最初のフレームで焼く形にしてある
-	Texture* environment = TextureManager::GetInstance()->LoadTexture(kEnvironmentTextureName);
-	if (environment == nullptr) {
+	// 版は 1 から始まる
+	const uint64_t sourceKey = hasCustomSource_ ? customSourceVersion_ : 0;
+	if (isBaked_ && sourceKey == bakedSourceKey_) {
 		return;
+	}
+
+	D3D12_GPU_DESCRIPTOR_HANDLE source = customSource_;
+	uint32_t sourceSize = customSourceSize_;
+	if (!hasCustomSource_) {
+		// 読めた最初のフレームで焼く
+		Texture* environment = TextureManager::GetInstance()->LoadTexture(kEnvironmentTextureName);
+		if (environment == nullptr) {
+			return;
+		}
+		source = environment->gpuHandle;
+		sourceSize = static_cast<uint32_t>(environment->meta.width);
 	}
 
 	dxcommon_->TransitionResource(irradiance_.resource.Get(), kReadState, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 	dxcommon_->TransitionResource(prefiltered_.resource.Get(), kReadState, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
-	dxcommon_->TransitionResource(brdfLut_.Get(), kReadState, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 
-	bakedSourceSize_ = static_cast<uint32_t>(environment->meta.width);
+	bakedSourceSize_ = sourceSize;
 
-	// 3つとも書き先が別で、互いの結果を読まないのでディスパッチの間にバリアは要らない
-	DispatchBRDFLut(commandList);
-	DispatchIrradiance(commandList, environment->gpuHandle);
-	DispatchPrefilter(commandList, environment->gpuHandle);
+	// 互いの結果を読まないのでバリアは要らない。BRDF LUT は最初の1回だけ
+	if (!isBRDFLutBaked_) {
+		dxcommon_->TransitionResource(brdfLut_.Get(), kReadState, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+		DispatchBRDFLut(commandList);
+		dxcommon_->TransitionResource(brdfLut_.Get(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS, kReadState);
+		isBRDFLutBaked_ = true;
+	}
+	DispatchIrradiance(commandList, source);
+	DispatchPrefilter(commandList, source);
 
 	dxcommon_->TransitionResource(irradiance_.resource.Get(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS, kReadState);
 	dxcommon_->TransitionResource(prefiltered_.resource.Get(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS, kReadState);
-	dxcommon_->TransitionResource(brdfLut_.Get(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS, kReadState);
 
 	isBaked_ = true;
+	bakedSourceKey_ = sourceKey;
 }
 
 void IBLBaker::RenderPreview(ID3D12GraphicsCommandList* commandList) {

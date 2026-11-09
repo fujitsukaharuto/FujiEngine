@@ -1,21 +1,33 @@
 #include "Level.h"
 #include <algorithm>
+#include <cmath>
+#include <cstdio>
 #include <numbers>
 #include <filesystem>
 #include <json.hpp>
 #include "Engine/GameObject/PlacedObject.h"
 #include "Engine/GameObject/SpawnPoint.h"
 #include "Engine/GameObject/PlacedLight.h"
+#include "Engine/GameObject/GIVolume.h"
+#include "Engine/Graphics/Raytracing/BakedGIPass.h"
+#include "Engine/GameObject/ReflectionProbe.h"
+#include "Engine/Graphics/Raytracing/ReflectionProbePass.h"
+#include "Engine/Graphics/Particle/RainRenderer.h"
 #include "Engine/Graphics/Sprite/PlacedSprite.h"
 #include "Engine/Core/Serialize/JsonSerializer.h"
 #include "Engine/Core/Debug/ImGuiManager.h"
 #include "Engine/Graphics/SkyBox/SkyBox.h"
 #include "Engine/Graphics/Light/LightManager.h"
+#include "Engine/Graphics/Object/ObjectRenderer.h"
+#include "Engine/Graphics/Raytracing/DDGIPass.h"
+#include "Engine/Graphics/Raytracing/VolumetricLightPass.h"
+#include "Engine/Graphics/Object/RefractionCapture.h"
 #include "Engine/Graphics/Model/ModelManager.h"
 #include "Engine/DXC/DXCom.h"
 #include "Engine/Graphics/PostEffect/OffscreenManager.h"
 #include "Engine/Graphics/Camera/CameraManager.h"
 #include "Engine/Graphics/Camera/DebugCamera.h"
+#include "Engine/Core/Time/FPSKeeper.h"
 
 using namespace Core;
 using namespace Math;
@@ -24,6 +36,7 @@ using namespace Scene;
 
 namespace {
 	const std::filesystem::path kLevelDirectory = "resource/Json/Level";
+	const std::filesystem::path kBakedGIDirectory = "resource/GI";
 
 	std::string LevelPath(const std::string& name) {
 		return (kLevelDirectory / (name + ".json")).string();
@@ -115,6 +128,11 @@ namespace {
 			}
 		}
 		env.exposure = data.value("exposure", env.exposure);
+		env.autoExposure = data.value("autoExposure", env.autoExposure);
+		env.autoExposureMinEV = data.value("autoExposureMinEV", env.autoExposureMinEV);
+		env.autoExposureMaxEV = data.value("autoExposureMaxEV", env.autoExposureMaxEV);
+		env.autoExposureSpeedUp = data.value("autoExposureSpeedUp", env.autoExposureSpeedUp);
+		env.autoExposureSpeedDown = data.value("autoExposureSpeedDown", env.autoExposureSpeedDown);
 		env.saturation = data.value("saturation", env.saturation);
 		env.contrast = data.value("contrast", env.contrast);
 		env.sharpen = data.value("sharpen", env.sharpen);
@@ -125,12 +143,29 @@ namespace {
 		env.godRayLength = data.value("godRayLength", env.godRayLength);
 		env.godRaySunSize = data.value("godRaySunSize", env.godRaySunSize);
 		env.aoMode = IndexOfName(data.value("ao", std::string(kAONames[env.aoMode])), kAONames, kAOCount, env.aoMode);
+		env.localLightAO = data.value("localLightAO", env.localLightAO);
 		env.shadowMode = IndexOfName(data.value("shadow", std::string(kShadowNames[env.shadowMode])), kShadowNames, kShadowCount, env.shadowMode);
 		env.ambientMode = IndexOfName(data.value("ambient", std::string(kAmbientNames[env.ambientMode])), kAmbientNames, kAmbientCount, env.ambientMode);
 		env.iblAmbientScale = data.value("iblAmbientScale", env.iblAmbientScale);
 		env.skyMode = IndexOfName(data.value("sky", std::string(kSkyNames[env.skyMode])), kSkyNames, kSkyCount, env.skyMode);
 		env.skyIntensity = data.value("skyIntensity", env.skyIntensity);
+		env.aerialPerspectiveScale = data.value("aerialPerspective", env.aerialPerspectiveScale);
+		env.skyLightIntensity = data.value("skyLight", env.skyLightIntensity);
+		env.cloudCoverage = data.value("clouds", env.cloudCoverage);
+		env.cloudShadow = data.value("cloudShadow", env.cloudShadow);
+		env.stars = data.value("stars", env.stars);
+		env.moon = data.value("moon", env.moon);
 		env.lightingMode = IndexOfName(data.value("lighting", std::string(kLightingNames[env.lightingMode])), kLightingNames, kLightingCount, env.lightingMode);
+		env.specularDetail = data.value("specularDetail", env.specularDetail);
+		env.specularAA = data.value("specularAA", env.specularAA);
+		env.reflectAll = data.value("reflectAll", env.reflectAll);
+		env.gi = data.value("gi", env.gi);
+		env.giProbeSpacing = data.value("giProbeSpacing", env.giProbeSpacing);
+		env.giRays = data.value("giRays", env.giRays);
+		env.giScreen = data.value("giScreen", env.giScreen);
+		env.reflectionDenoised = data.value("reflectionDenoised", env.reflectionDenoised);
+		env.reflectionBounce = data.value("reflectionBounce", env.reflectionBounce);
+		env.reflectionSceneColor = data.value("reflectionSceneColor", env.reflectionSceneColor);
 		const std::string reflectionName = data.value("reflection", std::string(kReflectionNames[env.reflectionMode]));
 		for (int i = 0; i < kReflectionCount; ++i) {
 			if (reflectionName == kReflectionNames[i]) {
@@ -140,10 +175,32 @@ namespace {
 		env.reflectionMaxDistance = data.value("reflectionMaxDistance", env.reflectionMaxDistance);
 		env.reflectionIntensity = data.value("reflectionIntensity", env.reflectionIntensity);
 		env.reflectionShadow = data.value("reflectionShadow", env.reflectionShadow);
+		env.wetness = data.value("wetness", env.wetness);
+		env.puddleAmount = data.value("puddleAmount", env.puddleAmount);
+		env.puddleScale = data.value("puddleScale", env.puddleScale);
+		env.rain = data.value("rain", env.rain);
 		env.dofBlur = data.value("dofBlur", env.dofBlur);
 		env.dofFocusDistance = data.value("dofFocusDistance", env.dofFocusDistance);
 		env.dofFocusRange = data.value("dofFocusRange", env.dofFocusRange);
 		env.dofFalloff = data.value("dofFalloff", env.dofFalloff);
+		env.chromaticAberration = data.value("chromaticAberration", env.chromaticAberration);
+		env.lensFlare = data.value("lensFlare", env.lensFlare);
+		env.motionBlur = data.value("motionBlur", env.motionBlur);
+		env.refraction = data.value("refraction", env.refraction);
+		env.volumetricDensity = data.value("volumetricDensity", env.volumetricDensity);
+		env.volumetricAnisotropy = data.value("volumetricAnisotropy", env.volumetricAnisotropy);
+		env.volumetricDistance = data.value("volumetricDistance", env.volumetricDistance);
+		env.volumetricIntensity = data.value("volumetricIntensity", env.volumetricIntensity);
+		env.volumetricSun = data.value("volumetricSun", env.volumetricSun);
+		env.volumetricLocalLights = data.value("volumetricLocalLights", env.volumetricLocalLights);
+		env.whiteBalanceTemperature = data.value("whiteBalanceTemperature", env.whiteBalanceTemperature);
+		env.whiteBalanceTint = data.value("whiteBalanceTint", env.whiteBalanceTint);
+		env.purkinje = data.value("purkinje", env.purkinje);
+		env.purkinjeLuminance = data.value("purkinjeLuminance", env.purkinjeLuminance);
+		env.localTonemap = data.value("localTonemap", env.localTonemap);
+		env.localTonemapDetail = data.value("localTonemapDetail", env.localTonemapDetail);
+		env.filmGrain = data.value("filmGrain", env.filmGrain);
+		env.fade = data.value("fade", env.fade);
 		return env;
 	}
 
@@ -174,6 +231,11 @@ namespace {
 		data["bloomScatter"] = env.bloomScatter;
 		data["tonemap"] = kTonemapNames[std::clamp(env.tonemapMode, 0, kTonemapCount - 1)];
 		data["exposure"] = env.exposure;
+		data["autoExposure"] = env.autoExposure;
+		data["autoExposureMinEV"] = env.autoExposureMinEV;
+		data["autoExposureMaxEV"] = env.autoExposureMaxEV;
+		data["autoExposureSpeedUp"] = env.autoExposureSpeedUp;
+		data["autoExposureSpeedDown"] = env.autoExposureSpeedDown;
 		data["saturation"] = env.saturation;
 		data["contrast"] = env.contrast;
 		data["sharpen"] = env.sharpen;
@@ -184,20 +246,301 @@ namespace {
 		data["godRayLength"] = env.godRayLength;
 		data["godRaySunSize"] = env.godRaySunSize;
 		data["ao"] = kAONames[std::clamp(env.aoMode, 0, kAOCount - 1)];
+		data["localLightAO"] = env.localLightAO;
 		data["shadow"] = kShadowNames[std::clamp(env.shadowMode, 0, kShadowCount - 1)];
 		data["ambient"] = kAmbientNames[std::clamp(env.ambientMode, 0, kAmbientCount - 1)];
 		data["iblAmbientScale"] = env.iblAmbientScale;
 		data["sky"] = kSkyNames[std::clamp(env.skyMode, 0, kSkyCount - 1)];
 		data["skyIntensity"] = env.skyIntensity;
+		data["aerialPerspective"] = env.aerialPerspectiveScale;
+		data["skyLight"] = env.skyLightIntensity;
+		data["clouds"] = env.cloudCoverage;
+		data["cloudShadow"] = env.cloudShadow;
+		data["stars"] = env.stars;
+		data["moon"] = env.moon;
 		data["lighting"] = kLightingNames[std::clamp(env.lightingMode, 0, kLightingCount - 1)];
+		data["specularDetail"] = env.specularDetail;
+		data["specularAA"] = env.specularAA;
+		data["reflectAll"] = env.reflectAll;
+		data["gi"] = env.gi;
+		data["giProbeSpacing"] = env.giProbeSpacing;
+		data["giRays"] = env.giRays;
+		data["giScreen"] = env.giScreen;
+		data["reflectionDenoised"] = env.reflectionDenoised;
+		data["reflectionBounce"] = env.reflectionBounce;
+		data["reflectionSceneColor"] = env.reflectionSceneColor;
 		data["reflection"] = kReflectionNames[std::clamp(env.reflectionMode, 0, kReflectionCount - 1)];
 		data["reflectionMaxDistance"] = env.reflectionMaxDistance;
 		data["reflectionIntensity"] = env.reflectionIntensity;
 		data["reflectionShadow"] = env.reflectionShadow;
+		data["wetness"] = env.wetness;
+		data["puddleAmount"] = env.puddleAmount;
+		data["puddleScale"] = env.puddleScale;
+		data["rain"] = env.rain;
 		data["dofBlur"] = env.dofBlur;
 		data["dofFocusDistance"] = env.dofFocusDistance;
 		data["dofFocusRange"] = env.dofFocusRange;
 		data["dofFalloff"] = env.dofFalloff;
+		data["chromaticAberration"] = env.chromaticAberration;
+		data["lensFlare"] = env.lensFlare;
+		data["motionBlur"] = env.motionBlur;
+		data["refraction"] = env.refraction;
+		data["volumetricDensity"] = env.volumetricDensity;
+		data["volumetricAnisotropy"] = env.volumetricAnisotropy;
+		data["volumetricDistance"] = env.volumetricDistance;
+		data["volumetricIntensity"] = env.volumetricIntensity;
+		data["volumetricSun"] = env.volumetricSun;
+		data["volumetricLocalLights"] = env.volumetricLocalLights;
+		data["whiteBalanceTemperature"] = env.whiteBalanceTemperature;
+		data["whiteBalanceTint"] = env.whiteBalanceTint;
+		data["purkinje"] = env.purkinje;
+		data["purkinjeLuminance"] = env.purkinjeLuminance;
+		data["localTonemap"] = env.localTonemap;
+		data["localTonemapDetail"] = env.localTonemapDetail;
+		data["filmGrain"] = env.filmGrain;
+		data["fade"] = env.fade;
+		return data;
+	}
+
+	//========================================================================*/
+	//* 時刻で変える項目
+
+	struct TimeOfDayParam {
+		/// <summary>配置データのキー。Environment の JSON のキーと同じ</summary>
+		const char* name;
+		int count;
+		float* (*get)(Scene::Environment&);
+	};
+
+	constexpr TimeOfDayParam kTimeOfDayParams[] = {
+		{ "lightColor", 3, [](Scene::Environment& e) { return &e.lightColor.x; } },
+		{ "lightIntensity", 1, [](Scene::Environment& e) { return &e.lightIntensity; } },
+		{ "lightDirection", 3, [](Scene::Environment& e) { return &e.lightDirection.x; } },
+		{ "skyBoxColor", 3, [](Scene::Environment& e) { return &e.skyBoxColor.x; } },
+		{ "skyIntensity", 1, [](Scene::Environment& e) { return &e.skyIntensity; } },
+		{ "skyLight", 1, [](Scene::Environment& e) { return &e.skyLightIntensity; } },
+		{ "clouds", 1, [](Scene::Environment& e) { return &e.cloudCoverage; } },
+		{ "fogColor", 3, [](Scene::Environment& e) { return &e.fogColor.x; } },
+		{ "fogDensity", 1, [](Scene::Environment& e) { return &e.fogDensity; } },
+		{ "fogSunScatter", 1, [](Scene::Environment& e) { return &e.fogSunScatter; } },
+		{ "bloomIntensity", 1, [](Scene::Environment& e) { return &e.bloomIntensity; } },
+		{ "exposure", 1, [](Scene::Environment& e) { return &e.exposure; } },
+		{ "saturation", 1, [](Scene::Environment& e) { return &e.saturation; } },
+		{ "contrast", 1, [](Scene::Environment& e) { return &e.contrast; } },
+		{ "vignette", 1, [](Scene::Environment& e) { return &e.vignette; } },
+		{ "shadowTint", 3, [](Scene::Environment& e) { return &e.shadowTint.x; } },
+		{ "highlightTint", 3, [](Scene::Environment& e) { return &e.highlightTint.x; } },
+		{ "whiteBalanceTemperature", 1, [](Scene::Environment& e) { return &e.whiteBalanceTemperature; } },
+		{ "whiteBalanceTint", 1, [](Scene::Environment& e) { return &e.whiteBalanceTint; } },
+		{ "godRayIntensity", 1, [](Scene::Environment& e) { return &e.godRayIntensity; } },
+		{ "volumetricDensity", 1, [](Scene::Environment& e) { return &e.volumetricDensity; } },
+		{ "volumetricIntensity", 1, [](Scene::Environment& e) { return &e.volumetricIntensity; } },
+		{ "volumetricSun", 1, [](Scene::Environment& e) { return &e.volumetricSun; } },
+		{ "wetness", 1, [](Scene::Environment& e) { return &e.wetness; } },
+		{ "volumetricLocalLights", 1, [](Scene::Environment& e) { return &e.volumetricLocalLights; } },
+		{ "lensFlare", 1, [](Scene::Environment& e) { return &e.lensFlare; } },
+		{ "purkinje", 1, [](Scene::Environment& e) { return &e.purkinje; } },
+		{ "localTonemap", 1, [](Scene::Environment& e) { return &e.localTonemap; } },
+	};
+	constexpr int kTimeOfDayParamCount = static_cast<int>(std::size(kTimeOfDayParams));
+
+	// 初めて時刻の設定を入れたときに時刻で変える項目
+	constexpr const char* kDefaultTimeOfDayParams[] = {
+		"lightColor", "lightIntensity", "skyBoxColor", "skyIntensity", "fogColor", "fogDensity", "exposure",
+		"shadowTint", "highlightTint", "whiteBalanceTemperature", "purkinje",
+	};
+
+	/// <summary>キーの値の並びで、その項目が始まる位置</summary>
+	int TimeOfDayOffset(int param) {
+		int offset = 0;
+		for (int i = 0; i < param; ++i) {
+			offset += kTimeOfDayParams[i].count;
+		}
+		return offset;
+	}
+
+	std::vector<float> CaptureTimeOfDayValues(Scene::Environment env) {
+		std::vector<float> values;
+		for (const TimeOfDayParam& param : kTimeOfDayParams) {
+			const float* source = param.get(env);
+			values.insert(values.end(), source, source + param.count);
+		}
+		return values;
+	}
+
+	bool IsTimeOfDayAnimated(const Scene::TimeOfDay& timeOfDay, const char* name) {
+		return std::find(timeOfDay.params.begin(), timeOfDay.params.end(), name) != timeOfDay.params.end();
+	}
+
+	float WrapHour(float hour) {
+		hour = std::fmod(hour, 24.0f);
+		return (hour < 0.0f) ? hour + 24.0f : hour;
+	}
+
+	/// <summary>その時刻のキーの値。前後のキーをなめらかにつなぎ、24時で最初へ戻る</summary>
+	/// <remarks>キーの間で値が両端の範囲を出ないよう抑える</remarks>
+	std::vector<float> EvaluateTimeOfDay(const std::vector<Scene::TimeOfDayKey>& keys, float hour) {
+		std::vector<const Scene::TimeOfDayKey*> sorted;
+		for (const Scene::TimeOfDayKey& key : keys) {
+			sorted.push_back(&key);
+		}
+		std::sort(sorted.begin(), sorted.end(), [](const auto* a, const auto* b) { return a->hour < b->hour; });
+		const size_t count = sorted.size();
+		if (count == 1) {
+			return sorted[0]->values;
+		}
+
+		// 直前のキー。最初のキーより前なら、前の日の最後のキー
+		size_t i1 = count - 1;
+		for (size_t i = 0; i < count; ++i) {
+			if (sorted[i]->hour <= hour) {
+				i1 = i;
+			}
+		}
+		const size_t i0 = (i1 + count - 1) % count;
+		const size_t i2 = (i1 + 1) % count;
+		const size_t i3 = (i1 + 2) % count;
+
+		// 日をまたぐぶん 24 を足し引きする
+		const float h1 = sorted[i1]->hour;
+		const float h = (hour < h1) ? hour + 24.0f : hour;
+		float h2 = sorted[i2]->hour;
+		while (h2 <= h1) { h2 += 24.0f; }
+		float h0 = sorted[i0]->hour;
+		while (h0 >= h1) { h0 -= 24.0f; }
+		float h3 = sorted[i3]->hour;
+		while (h3 <= h2) { h3 += 24.0f; }
+
+		const float span = (std::max)(h2 - h1, 1e-4f);
+		const float t = std::clamp((h - h1) / span, 0.0f, 1.0f);
+		const float t2 = t * t;
+		const float t3 = t2 * t;
+		const float b00 = 2.0f * t3 - 3.0f * t2 + 1.0f;
+		const float b10 = t3 - 2.0f * t2 + t;
+		const float b01 = -2.0f * t3 + 3.0f * t2;
+		const float b11 = t3 - t2;
+
+		const std::vector<float>& v0 = sorted[i0]->values;
+		const std::vector<float>& v1 = sorted[i1]->values;
+		const std::vector<float>& v2 = sorted[i2]->values;
+		const std::vector<float>& v3 = sorted[i3]->values;
+		const size_t valueCount = (std::min)({ v0.size(), v1.size(), v2.size(), v3.size() });
+		std::vector<float> result(valueCount);
+		for (size_t k = 0; k < valueCount; ++k) {
+			// 前後のキーを結ぶ傾き (Catmull-Rom)
+			const float m1 = (v2[k] - v0[k]) / (std::max)(h2 - h0, 1e-4f) * span;
+			const float m2 = (v3[k] - v1[k]) / (std::max)(h3 - h1, 1e-4f) * span;
+			const float value = b00 * v1[k] + b10 * m1 + b01 * v2[k] + b11 * m2;
+			result[k] = std::clamp(value, (std::min)(v1[k], v2[k]), (std::max)(v1[k], v2[k]));
+		}
+		return result;
+	}
+
+	void ApplyTimeOfDayValues(const std::vector<float>& values, Scene::Environment& env, const Scene::TimeOfDay& timeOfDay) {
+		int offset = 0;
+		for (const TimeOfDayParam& param : kTimeOfDayParams) {
+			const bool isSunDirection = timeOfDay.sunFromTime && std::string(param.name) == "lightDirection";
+			if (!isSunDirection && IsTimeOfDayAnimated(timeOfDay, param.name) && offset + param.count <= static_cast<int>(values.size())) {
+				float* destination = param.get(env);
+				for (int i = 0; i < param.count; ++i) {
+					destination[i] = values[offset + i];
+				}
+			}
+			offset += param.count;
+		}
+	}
+
+	/// <summary>時刻の太陽の向き (地面から太陽へ)。6時に日の出、18時に日の入り</summary>
+	Vector3 SunToward(const Scene::TimeOfDay& timeOfDay) {
+		constexpr float kDegToRad = std::numbers::pi_v<float> / 180.0f;
+		const float angle = (timeOfDay.hour - 6.0f) / 12.0f * std::numbers::pi_v<float>;
+		const float azimuth = timeOfDay.sunAzimuth * kDegToRad;
+		const float elevation = timeOfDay.sunMaxElevation * kDegToRad;
+		// 日の出の方角と正午の太陽の方角 (直交、長さ1)
+		const Vector3 rise = { std::cos(azimuth), 0.0f, std::sin(azimuth) };
+		const Vector3 noon = { -std::sin(azimuth) * std::cos(elevation), std::sin(elevation), std::cos(azimuth) * std::cos(elevation) };
+		const float c = std::cos(angle);
+		const float s = std::sin(angle);
+		return { rise.x * c + noon.x * s, rise.y * c + noon.y * s, rise.z * c + noon.z * s };
+	}
+
+	float SmoothStep(float edge0, float edge1, float x) {
+		const float t = std::clamp((x - edge0) / (edge1 - edge0), 0.0f, 1.0f);
+		return t * t * (3.0f - 2.0f * t);
+	}
+
+	Scene::TimeOfDay ReadTimeOfDay(const nlohmann::json& data, const Scene::Environment& env) {
+		Scene::TimeOfDay timeOfDay;
+		timeOfDay.enabled = data.value("enabled", timeOfDay.enabled);
+		timeOfDay.hour = WrapHour(data.value("hour", timeOfDay.hour));
+		timeOfDay.hoursPerSecond = data.value("hoursPerSecond", timeOfDay.hoursPerSecond);
+		timeOfDay.sunFromTime = data.value("sunFromTime", timeOfDay.sunFromTime);
+		timeOfDay.sunAzimuth = data.value("sunAzimuth", timeOfDay.sunAzimuth);
+		timeOfDay.sunMaxElevation = data.value("sunMaxElevation", timeOfDay.sunMaxElevation);
+		timeOfDay.moonIntensity = data.value("moonIntensity", timeOfDay.moonIntensity);
+		timeOfDay.moonColor = ReadVector3(data, "moonColor", timeOfDay.moonColor);
+		timeOfDay.nightBrightness = data.value("nightBrightness", timeOfDay.nightBrightness);
+		timeOfDay.nightMaxEV = data.value("nightMaxEV", timeOfDay.nightMaxEV);
+		timeOfDay.nightPurkinje = data.value("nightPurkinje", timeOfDay.nightPurkinje);
+		if (data.contains("params") && data["params"].is_array()) {
+			for (const auto& name : data["params"]) {
+				timeOfDay.params.push_back(name.get<std::string>());
+			}
+		}
+		// キーに無い項目は今の環境の値で埋める
+		const std::vector<float> fallback = CaptureTimeOfDayValues(env);
+		if (data.contains("keys") && data["keys"].is_array()) {
+			for (const auto& keyData : data["keys"]) {
+				Scene::TimeOfDayKey key;
+				key.hour = WrapHour(keyData.value("hour", key.hour));
+				key.values = fallback;
+				if (keyData.contains("values") && keyData["values"].is_object()) {
+					const auto& values = keyData["values"];
+					for (int i = 0; i < kTimeOfDayParamCount; ++i) {
+						const TimeOfDayParam& param = kTimeOfDayParams[i];
+						if (!values.contains(param.name) || !values[param.name].is_array() || values[param.name].size() < static_cast<size_t>(param.count)) {
+							continue;
+						}
+						const int offset = TimeOfDayOffset(i);
+						for (int c = 0; c < param.count; ++c) {
+							key.values[offset + c] = values[param.name][c].get<float>();
+						}
+					}
+				}
+				timeOfDay.keys.push_back(std::move(key));
+			}
+		}
+		return timeOfDay;
+	}
+
+	nlohmann::json ToJson(const Scene::TimeOfDay& timeOfDay) {
+		nlohmann::json data;
+		data["enabled"] = timeOfDay.enabled;
+		data["hour"] = timeOfDay.hour;
+		data["hoursPerSecond"] = timeOfDay.hoursPerSecond;
+		data["sunFromTime"] = timeOfDay.sunFromTime;
+		data["sunAzimuth"] = timeOfDay.sunAzimuth;
+		data["sunMaxElevation"] = timeOfDay.sunMaxElevation;
+		data["moonIntensity"] = timeOfDay.moonIntensity;
+		data["moonColor"] = { timeOfDay.moonColor.x, timeOfDay.moonColor.y, timeOfDay.moonColor.z };
+		data["nightBrightness"] = timeOfDay.nightBrightness;
+		data["nightMaxEV"] = timeOfDay.nightMaxEV;
+		data["nightPurkinje"] = timeOfDay.nightPurkinje;
+		data["params"] = timeOfDay.params;
+		nlohmann::json keys = nlohmann::json::array();
+		for (const Scene::TimeOfDayKey& key : timeOfDay.keys) {
+			nlohmann::json values;
+			for (int i = 0; i < kTimeOfDayParamCount; ++i) {
+				const TimeOfDayParam& param = kTimeOfDayParams[i];
+				const int offset = TimeOfDayOffset(i);
+				if (offset + param.count > static_cast<int>(key.values.size())) {
+					break;
+				}
+				values[param.name] = std::vector<float>(key.values.begin() + offset, key.values.begin() + offset + param.count);
+			}
+			keys.push_back({ { "hour", key.hour }, { "values", std::move(values) } });
+		}
+		data["keys"] = std::move(keys);
 		return data;
 	}
 }
@@ -213,12 +556,22 @@ void Level::Load(const std::string& name, Graphics::LightManager* lightManager) 
 	objects_.clear();
 	spawnPoints_.clear();
 	lights_.clear();
+	giVolumes_.clear();
+	reflectionProbes_.clear();
 	sprites_.clear();
+	// 前のシーンの箱を残さない
+	ApplyReflectionProbes();
 	environment_ = {};
+	timeOfDay_ = {};
+	selectedKey_ = -1;
+	draggingKey_ = -1;
 
 	const nlohmann::json data = JsonSerializer::DeserializeJsonData(LevelPath(name));
 	if (data.is_object() && data.contains("environment")) {
 		environment_ = ReadEnvironment(data["environment"]);
+		if (data["environment"].contains("timeOfDay")) {
+			timeOfDay_ = ReadTimeOfDay(data["environment"]["timeOfDay"], environment_);
+		}
 	}
 	// ファイルが無くても既定の環境は入れる。前のシーンの空やライトを残さないため
 	if (lightManager_) {
@@ -228,10 +581,14 @@ void Level::Load(const std::string& name, Graphics::LightManager* lightManager) 
 	if (Graphics::OffscreenManager* offscreen = GetOffscreen()) {
 		offscreen->ResetPostEffect();
 	}
+	ApplyTimeOfDay();
 	ApplyEnvironment();
 	ApplyCamera();
 
 	if (!data.is_object()) {
+		if (Graphics::BakedGIPass* baked = Graphics::ObjectRenderer::GetInstance()->GetBakedGIPass()) {
+			baked->Clear();
+		}
 		return;
 	}
 	if (data.contains("objects")) {
@@ -264,6 +621,27 @@ void Level::Load(const std::string& name, Graphics::LightManager* lightManager) 
 			sprites_.push_back(std::move(sprite));
 		}
 	}
+	if (data.contains("giVolumes")) {
+		for (const auto& volumeData : data["giVolumes"]) {
+			auto volume = std::make_unique<GameObject::GIVolume>();
+			volume->Create(volumeData);
+			giVolumes_.push_back(std::move(volume));
+		}
+	}
+	if (data.contains("reflectionProbes")) {
+		for (const auto& probeData : data["reflectionProbes"]) {
+			auto probe = std::make_unique<GameObject::ReflectionProbe>();
+			probe->Create(probeData);
+			reflectionProbes_.push_back(std::move(probe));
+		}
+	}
+	ApplyReflectionProbes();
+	// 焼いた間接光は箱のあるシーンだけ読む
+	if (Graphics::BakedGIPass* baked = Graphics::ObjectRenderer::GetInstance()->GetBakedGIPass()) {
+		if (giVolumes_.empty() || !baked->Load(GetBakedGIDirectory())) {
+			baked->Clear();
+		}
+	}
 }
 
 void Level::Save() const {
@@ -283,24 +661,45 @@ void Level::Save() const {
 	for (const auto& sprite : sprites_) {
 		sprites.push_back(sprite->ToJson());
 	}
+	nlohmann::json giVolumes = nlohmann::json::array();
+	for (const auto& volume : giVolumes_) {
+		giVolumes.push_back(volume->ToJson());
+	}
+	nlohmann::json reflectionProbes = nlohmann::json::array();
+	for (const auto& probe : reflectionProbes_) {
+		reflectionProbes.push_back(probe->ToJson());
+	}
 	nlohmann::json data;
 	data["environment"] = ToJson(environment_);
+	// 使っていないシーンの配置データには書かない
+	if (timeOfDay_.enabled || !timeOfDay_.keys.empty()) {
+		data["environment"]["timeOfDay"] = ToJson(timeOfDay_);
+	}
 	data["objects"] = std::move(objects);
 	data["spawnPoints"] = std::move(spawnPoints);
 	data["lights"] = std::move(lights);
 	data["sprites"] = std::move(sprites);
+	// 使っていないシーンの配置データには書かない
+	if (!giVolumes.empty()) {
+		data["giVolumes"] = std::move(giVolumes);
+	}
+	if (!reflectionProbes.empty()) {
+		data["reflectionProbes"] = std::move(reflectionProbes);
+	}
 
 	std::filesystem::create_directories(kLevelDirectory);
 	JsonSerializer::SerializeJsonData(data, LevelPath(name_));
 }
 
 void Level::Update() {
+	UpdateTimeOfDay();
 	for (auto& object : objects_) {
 		object->Update();
 	}
 	for (auto& light : lights_) {
 		light->Update();
 	}
+	ApplyReflectionProbes();
 }
 
 void Level::Draw() {
@@ -315,6 +714,12 @@ void Level::Draw() {
 	}
 	for (auto& light : lights_) {
 		light->Draw();
+	}
+	for (auto& volume : giVolumes_) {
+		volume->Draw();
+	}
+	for (auto& probe : reflectionProbes_) {
+		probe->Draw();
 	}
 }
 
@@ -359,6 +764,22 @@ GameObject::GameObject* Level::Duplicate(const GameObject::GameObject* source) {
 			return lights_.back().get();
 		}
 	}
+	for (const auto& volume : giVolumes_) {
+		if (volume.get() == source && giVolumes_.size() < Graphics::BakedGIPass::kMaxVolumes) {
+			auto copy = std::make_unique<GameObject::GIVolume>();
+			copy->Create(volume->ToJson());
+			giVolumes_.push_back(std::move(copy));
+			return giVolumes_.back().get();
+		}
+	}
+	for (const auto& probe : reflectionProbes_) {
+		if (probe.get() == source && reflectionProbes_.size() < Graphics::ReflectionProbePass::kMaxProbes) {
+			auto copy = std::make_unique<GameObject::ReflectionProbe>();
+			copy->Create(probe->ToJson());
+			reflectionProbes_.push_back(std::move(copy));
+			return reflectionProbes_.back().get();
+		}
+	}
 	return nullptr;
 }
 
@@ -374,13 +795,15 @@ bool Level::Remove(const GameObject::GameObject* object) {
 			placed->TurnOffLight();
 		}
 	}
-	return std::erase_if(objects_, isTarget) > 0 || std::erase_if(spawnPoints_, isTarget) > 0 || std::erase_if(lights_, isTarget) > 0;
+	return std::erase_if(objects_, isTarget) > 0 || std::erase_if(spawnPoints_, isTarget) > 0 || std::erase_if(lights_, isTarget) > 0 ||
+		std::erase_if(giVolumes_, isTarget) > 0 || std::erase_if(reflectionProbes_, isTarget) > 0;
 }
 
 bool Level::Contains(const GameObject::GameObject* object) const {
 	const auto isTarget = [object](const auto& o) { return o.get() == object; };
 	return std::any_of(objects_.begin(), objects_.end(), isTarget) || std::any_of(spawnPoints_.begin(), spawnPoints_.end(), isTarget) ||
-		std::any_of(lights_.begin(), lights_.end(), isTarget);
+		std::any_of(lights_.begin(), lights_.end(), isTarget) || std::any_of(giVolumes_.begin(), giVolumes_.end(), isTarget) ||
+		std::any_of(reflectionProbes_.begin(), reflectionProbes_.end(), isTarget);
 }
 
 GameObject::PlacedLight* Level::AddLight(bool isSpot) {
@@ -388,6 +811,159 @@ GameObject::PlacedLight* Level::AddLight(bool isSpot) {
 	light->Create(isSpot ? GameObject::PlacedLight::Type::Spot : GameObject::PlacedLight::Type::Point, lightManager_);
 	lights_.push_back(std::move(light));
 	return lights_.back().get();
+}
+
+GameObject::GIVolume* Level::AddGIVolume() {
+	if (giVolumes_.size() >= Graphics::BakedGIPass::kMaxVolumes) {
+		return nullptr;
+	}
+	auto volume = std::make_unique<GameObject::GIVolume>();
+	volume->Create(nlohmann::json::object());
+	giVolumes_.push_back(std::move(volume));
+	return giVolumes_.back().get();
+}
+
+GameObject::PlacedLight* Level::AddShapedLight(bool isTube) {
+	auto light = std::make_unique<GameObject::PlacedLight>();
+	light->Create(isTube ? GameObject::PlacedLight::Type::Tube : GameObject::PlacedLight::Type::Rect, lightManager_);
+	lights_.push_back(std::move(light));
+	return lights_.back().get();
+}
+
+GameObject::ReflectionProbe* Level::AddReflectionProbe() {
+	if (reflectionProbes_.size() >= Graphics::ReflectionProbePass::kMaxProbes) {
+		return nullptr;
+	}
+	auto probe = std::make_unique<GameObject::ReflectionProbe>();
+	probe->Create(nlohmann::json::object());
+	reflectionProbes_.push_back(std::move(probe));
+	return reflectionProbes_.back().get();
+}
+
+void Level::ApplyReflectionProbes() const {
+	Graphics::ReflectionProbePass* pass = Graphics::ObjectRenderer::GetInstance()->GetReflectionProbePass();
+	if (pass == nullptr) {
+		return;
+	}
+	std::vector<Graphics::ReflectionProbePass::ProbeDesc> probes;
+	probes.reserve(reflectionProbes_.size());
+	for (const auto& probe : reflectionProbes_) {
+		Graphics::ReflectionProbePass::ProbeDesc desc;
+		desc.center = probe->GetCenter();
+		desc.size = probe->GetSize();
+		desc.blendDistance = probe->GetBlendDistance();
+		desc.intensity = probe->GetIntensity();
+		desc.boxProjection = probe->IsBoxProjection();
+		probes.push_back(desc);
+	}
+	pass->SetProbes(probes);
+}
+
+void Level::ReflectionProbeGUI() {
+#ifdef _DEBUGMODE
+	Graphics::ReflectionProbePass* pass = Graphics::ObjectRenderer::GetInstance()->GetReflectionProbePass();
+	if (pass == nullptr) {
+		return;
+	}
+	ImGui::Text("Probes: %zu / %u", reflectionProbes_.size(), Graphics::ReflectionProbePass::kMaxProbes);
+	ImGui::SameLine();
+	if (reflectionProbes_.empty()) {
+		ImGui::TextDisabled("none");
+	} else if (pass->IsBaking()) {
+		ImGui::TextColored(ImGuiTextWarn(), "baking");
+	} else {
+		ImGui::TextColored(ImGuiTextOk(), "baked");
+	}
+	ImGui::BeginDisabled(reflectionProbes_.empty());
+	if (ImGui::Button("Rebake##probe")) {
+		pass->RequestRebake();
+	}
+	ImGui::EndDisabled();
+	ImGui::SameLine();
+	bool isAuto = pass->IsAutoRebake();
+	if (ImGui::Checkbox("Auto##probe", &isAuto)) {
+		pass->SetAutoRebake(isAuto);
+	}
+#endif // _DEBUGMODE
+}
+
+std::string Level::GetBakedGIDirectory() const {
+	return (kBakedGIDirectory / name_).string();
+}
+
+void Level::StartBakeGI() {
+	Graphics::BakedGIPass* baked = Graphics::ObjectRenderer::GetInstance()->GetBakedGIPass();
+	if (baked == nullptr || giVolumes_.empty()) {
+		return;
+	}
+	std::vector<Graphics::BakedGIPass::VolumeDesc> volumes;
+	for (const auto& volume : giVolumes_) {
+		volumes.push_back({ volume->GetCenter(), volume->GetSize(), volume->GetSpacing() });
+	}
+	std::vector<Graphics::BakedGIPass::SunKey> sunKeys;
+	const bool hasSunHours = timeOfDay_.enabled && timeOfDay_.sunFromTime;
+	if (hasSunHours) {
+		// 日の出から日の入りまで1時間ごと。間は引くときに補間する
+		for (int hour = 6; hour <= 18; hour++) {
+			TimeOfDay time = timeOfDay_;
+			time.hour = static_cast<float>(hour);
+			sunKeys.push_back({ static_cast<float>(hour), SunToward(time) });
+		}
+	} else {
+		Vector3 toSun = environment_.lightDirection * -1.0f;
+		const float length = toSun.Length();
+		toSun = (length > 1e-4f) ? toSun * (1.0f / length) : Vector3{ 0.0f,1.0f,0.0f };
+		sunKeys.push_back({ timeOfDay_.hour, toSun });
+	}
+	baked->StartBake(volumes, sunKeys, hasSunHours, GetBakedGIDirectory());
+}
+
+bool Level::BakedGIGUI() {
+	bool changed = false;
+#ifdef _DEBUGMODE
+	Graphics::BakedGIPass* baked = Graphics::ObjectRenderer::GetInstance()->GetBakedGIPass();
+	if (baked == nullptr) {
+		return false;
+	}
+	ImGui::Text("Volumes: %zu / %u", giVolumes_.size(), Graphics::BakedGIPass::kMaxVolumes);
+	if (baked->IsBaking()) {
+		ImGui::ProgressBar(baked->GetBakeProgress());
+		if (ImGui::Button("Cancel##bakedGI")) {
+			baked->CancelBake();
+		}
+		return false;
+	}
+	ImGui::BeginDisabled(giVolumes_.empty());
+	if (ImGui::Button("Bake##bakedGI")) {
+		StartBakeGI();
+	}
+	ImGui::EndDisabled();
+	ImGui::SameLine();
+	if (!baked->HasData()) {
+		ImGui::TextDisabled("not baked");
+	} else {
+		// 焼いた後に箱を動かした・増やした
+		const auto& bakedVolumes = baked->GetBakedVolumes();
+		bool isOutdated = bakedVolumes.size() != giVolumes_.size();
+		for (size_t i = 0; !isOutdated && i < giVolumes_.size(); i++) {
+			const Vector3 center = giVolumes_[i]->GetCenter();
+			const Vector3 size = giVolumes_[i]->GetSize();
+			isOutdated = (center - bakedVolumes[i].center).Length() > 1e-3f || (size - bakedVolumes[i].size).Length() > 1e-3f ||
+				std::abs(giVolumes_[i]->GetSpacing() - bakedVolumes[i].spacing) > 1e-4f;
+		}
+		if (isOutdated) {
+			ImGui::TextColored(ImGuiTextWarn(), "outdated");
+		} else {
+			ImGui::TextColored(ImGuiTextOk(), "baked");
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Clear##bakedGI")) {
+			baked->Clear();
+			changed = true;
+		}
+	}
+#endif // _DEBUGMODE
+	return changed;
 }
 
 GameObject::SpawnPoint* Level::AddSpawnPoint() {
@@ -446,39 +1022,49 @@ void Level::ApplyEnvironment() {
 			skyBox_ = std::make_unique<Graphics::SkyBox>();
 			skyBox_->Initialize();
 		}
-		skyBox_->SetColor(environment_.skyBoxColor);
+		const bool isAtmosphereSky = environment_.skyMode == Graphics::kSkyModeAtmosphere;
+		const float skyScale = isAtmosphereSky ? 1.0f : timeLighting_.skyScale;
+		skyBox_->SetColor({ environment_.skyBoxColor.x * skyScale, environment_.skyBoxColor.y * skyScale, environment_.skyBoxColor.z * skyScale,
+			environment_.skyBoxColor.w });
 	}
 
 	if (lightManager_) {
 		Graphics::DirectionalLight* light = lightManager_->GetDirectionLight(0);
-		light->SetColor(environment_.lightColor);
+		const Math::Vector3& tint = timeLighting_.lightTint;
+		light->SetColor({ environment_.lightColor.x * tint.x, environment_.lightColor.y * tint.y, environment_.lightColor.z * tint.z, environment_.lightColor.w });
 		// 長さ0だと正規化できないので真下にする
 		if (environment_.lightDirection.Length() > 0.0001f) {
 			light->SetLightDirection(environment_.lightDirection);
 		} else {
 			light->SetLightDirection({ 0.0f,-1.0f,0.0f });
 		}
-		light->SetLightIntensity(environment_.lightIntensity);
+		light->SetLightIntensity(environment_.lightIntensity * timeLighting_.lightScale);
+		if (timeLighting_.hasSkySun) {
+			// 太陽が沈むほど空を照らす光も消す
+			const float power = environment_.lightIntensity * SmoothStep(-0.1f, 0.02f, timeLighting_.toSun.y);
+			lightManager_->SetSkySun(timeLighting_.toSun,
+				{ environment_.lightColor.x * power, environment_.lightColor.y * power, environment_.lightColor.z * power });
+		} else {
+			lightManager_->ClearSkySun();
+		}
 
 		const bool isAtmosphere = environment_.hasSkyBox && environment_.skyMode == Graphics::kSkyModeAtmosphere;
-		const Math::Vector3 sunDirection = light->direction * -1.0f;
-		const float sunPower = light->intensity * environment_.skyIntensity;
-		const Math::Vector3 sunColor = {
-			light->color.x * sunPower * environment_.skyBoxColor.x,
-			light->color.y * sunPower * environment_.skyBoxColor.y,
-			light->color.z * sunPower * environment_.skyBoxColor.z };
-		const Math::Vector3 kHorizonDirections[4] = { { 1.0f,0.0f,0.0f },{ -1.0f,0.0f,0.0f },{ 0.0f,0.0f,1.0f },{ 0.0f,0.0f,-1.0f } };
 
 		Graphics::FogData fog;
-		const bool isFromSky = environment_.fogColorFromSky && environment_.hasSkyBox && skyBox_;
+		// 計算する空の地平線の色は、LightManager が空の数表から毎フレーム入れる
+		const bool isFromSky = environment_.fogColorFromSky && environment_.hasSkyBox && skyBox_ && !isAtmosphere;
 		fog.color = {};
 		for (int i = 0; i < 4; ++i) {
 			Math::Vector3 color = environment_.fogColor;
 			if (isFromSky) {
-				color = isAtmosphere ? Graphics::SkyBox::AtmosphereColor(kHorizonDirections[i], sunDirection, sunColor) : skyBox_->GetHorizonColor(i);
+				color = skyBox_->GetHorizonColor(i);
 				color.x *= environment_.fogSkyColorScale;
 				color.y *= environment_.fogSkyColorScale;
 				color.z *= environment_.fogSkyColorScale;
+			}
+			// 計算する空のときは夜の暗さを空の側で付ける
+			if (!isAtmosphere) {
+				color = color * timeLighting_.skyScale;
 			}
 			fog.horizonColor[i] = { color.x, color.y, color.z, 0.0f };
 			fog.color.x += color.x * 0.25f;
@@ -495,36 +1081,98 @@ void Level::ApplyEnvironment() {
 		fog.sunScatterPower = environment_.fogSunPower;
 		fog.skyMode = isAtmosphere ? Graphics::kSkyModeAtmosphere : Graphics::kSkyModeTexture;
 		fog.skyIntensity = environment_.skyIntensity;
+		fog.cloudCoverage = environment_.cloudCoverage;
+		fog.cloudShadow = environment_.cloudShadow;
+		fog.starIntensity = environment_.stars;
+		fog.moonIntensity = environment_.moon;
 		lightManager_->SetFog(fog);
 
 		lightManager_->SetRayTracingModes(
 			static_cast<Graphics::RayTracedAOMode>(std::clamp(environment_.aoMode, 0, kAOCount - 1)),
 			static_cast<Graphics::RayTracedShadowMode>(std::clamp(environment_.shadowMode, 0, kShadowCount - 1)));
-		// 計算する空のときは、焼いた IBL が空と合わないので半球の2色を空から作る
-		Graphics::AmbientMode ambientMode = static_cast<Graphics::AmbientMode>(std::clamp(environment_.ambientMode, 0, kAmbientCount - 1));
+		// 計算する空のときは半球の2色と IBL を空から作る
 		const Graphics::AllLightsData kDefaultLights{};
-		Math::Vector3 ambientSky = kDefaultLights.ambientSkyColor;
-		Math::Vector3 ambientGround = kDefaultLights.ambientGroundColor;
-		if (isAtmosphere) {
-			ambientMode = Graphics::kAmbientModeHemisphere;
-			Math::Vector3 horizon{};
-			for (const Math::Vector3& direction : kHorizonDirections) {
-				horizon = horizon + Graphics::SkyBox::AtmosphereColor(direction, sunDirection, sunColor) * 0.25f;
-			}
-			const Math::Vector3 zenith = Graphics::SkyBox::AtmosphereColor({ 0.0f,1.0f,0.0f }, sunDirection, sunColor);
-			ambientSky = zenith * 0.75f + horizon * 0.25f;
-			ambientGround = horizon * 0.3f;
-		}
-		lightManager_->SetAmbientColors(ambientSky, ambientGround);
-		lightManager_->SetAmbientMode(ambientMode, environment_.iblAmbientScale);
+		lightManager_->SetAmbientColors(kDefaultLights.ambientSkyColor * timeLighting_.skyScale, kDefaultLights.ambientGroundColor * timeLighting_.skyScale);
+		lightManager_->SetAmbientMode(static_cast<Graphics::AmbientMode>(std::clamp(environment_.ambientMode, 0, kAmbientCount - 1)),
+			environment_.iblAmbientScale * timeLighting_.skyScale);
+		Graphics::AtmosphereSettings atmosphere;
+		atmosphere.fogColorFromSky = environment_.fogColorFromSky;
+		atmosphere.fogSkyColorScale = environment_.fogSkyColorScale;
+		atmosphere.aerialPerspectiveScale = environment_.aerialPerspectiveScale;
+		atmosphere.skyLightIntensity = environment_.skyLightIntensity;
+		atmosphere.nightAmbient = timeLighting_.nightAmbient;
+		lightManager_->SetAtmosphereSettings(atmosphere);
 		lightManager_->SetLightingMode(
 			static_cast<Graphics::LightingMode>(std::clamp(environment_.lightingMode, 0, kLightingCount - 1)));
+		uint32_t renderFlags = 0;
+		if (environment_.specularDetail) {
+			renderFlags |= Graphics::kRenderFlagEnergyCompensation | Graphics::kRenderFlagSpecularOcclusion;
+		}
+		if (environment_.specularAA) {
+			renderFlags |= Graphics::kRenderFlagSpecularAA;
+		}
+		if (environment_.reflectAll) {
+			renderFlags |= Graphics::kRenderFlagReflectAll;
+		}
+		if (environment_.localLightAO) {
+			renderFlags |= Graphics::kRenderFlagLocalLightAO;
+		}
+		if (environment_.gi) {
+			renderFlags |= Graphics::kRenderFlagGI;
+			// 画面のプローブは格子のプローブがあるときだけ
+			if (environment_.giScreen) {
+				renderFlags |= Graphics::kRenderFlagScreenGI;
+			}
+		}
+		// 別パスの映り込みは物の色を映すときだけ
+		if (environment_.reflectionDenoised && environment_.reflectionMode == Graphics::kReflectionModeObjects) {
+			renderFlags |= Graphics::kRenderFlagScreenReflection;
+			if (environment_.reflectionBounce) {
+				renderFlags |= Graphics::kRenderFlagReflectionBounce;
+			}
+			if (environment_.reflectionSceneColor) {
+				renderFlags |= Graphics::kRenderFlagReflectionSceneColor;
+			}
+		}
+		lightManager_->SetRenderFlags(renderFlags);
+		if (Graphics::DDGIPass* ddgi = Graphics::ObjectRenderer::GetInstance()->GetDDGIPass()) {
+			Graphics::DDGIPass::Settings gi;
+			gi.probeSpacing = environment_.giProbeSpacing;
+			gi.raysPerProbe = static_cast<uint32_t>((std::max)(environment_.giRays, 1));
+			ddgi->SetSettings(gi);
+		}
+		if (Graphics::RefractionCapture* refraction = Graphics::ObjectRenderer::GetInstance()->GetRefractionCapture()) {
+			refraction->SetStrength(environment_.refraction);
+		}
+		if (Graphics::VolumetricLightPass* volumetric = Graphics::ObjectRenderer::GetInstance()->GetVolumetricLightPass()) {
+			Graphics::VolumetricLightPass::Settings settings;
+			settings.density = environment_.volumetricDensity;
+			settings.anisotropy = environment_.volumetricAnisotropy;
+			settings.maxDistance = environment_.volumetricDistance;
+			settings.intensity = environment_.volumetricIntensity;
+			settings.sunScale = environment_.volumetricSun;
+			settings.localLightScale = environment_.volumetricLocalLights;
+			volumetric->SetSettings(settings);
+		}
+		// テクスチャの空は色で暗くする
+		const float skyScale = isAtmosphere ? 1.0f : timeLighting_.skyScale;
 		lightManager_->SetEnvironmentSky(
-			{ environment_.skyBoxColor.x, environment_.skyBoxColor.y, environment_.skyBoxColor.z },
+			{ environment_.skyBoxColor.x * skyScale, environment_.skyBoxColor.y * skyScale, environment_.skyBoxColor.z * skyScale },
 			environment_.hasSkyBox && skyBox_ != nullptr);
 		lightManager_->SetReflection(
 			static_cast<Graphics::RayTracedReflectionMode>(std::clamp(environment_.reflectionMode, 0, kReflectionCount - 1)),
 			environment_.reflectionMaxDistance, environment_.reflectionIntensity, environment_.reflectionShadow);
+		lightManager_->SetWetness(environment_.wetness, environment_.puddleAmount, environment_.puddleScale);
+		lightManager_->SetRainAmount(environment_.rain);
+		if (Graphics::RainRenderer* rain = Graphics::ObjectRenderer::GetInstance()->GetRainRenderer()) {
+			rain->SetAmount(environment_.rain);
+		}
+		// 入れ直したフォグとアンビエントに太陽と空の値を入れ直す
+		lightManager_->RefreshDerived();
+	}
+
+	if (Graphics::BakedGIPass* baked = Graphics::ObjectRenderer::GetInstance()->GetBakedGIPass()) {
+		baked->SetSunHour(timeOfDay_.enabled && timeOfDay_.sunFromTime, timeOfDay_.hour);
 	}
 
 	if (Graphics::OffscreenManager* offscreen = GetOffscreen()) {
@@ -536,6 +1184,13 @@ void Level::ApplyEnvironment() {
 		post.bloomScatter = environment_.bloomScatter;
 		post.tonemapMode = static_cast<Graphics::TonemapMode>(std::clamp(environment_.tonemapMode, 0, kTonemapCount - 1));
 		post.exposure = environment_.exposure;
+		post.autoExposure = environment_.autoExposure;
+		post.autoExposureMinEV = environment_.autoExposureMinEV;
+		// 夜は自動露出で持ち上げすぎない
+		const float nightMaxEV = (std::min)(environment_.autoExposureMaxEV, timeOfDay_.nightMaxEV);
+		post.autoExposureMaxEV = environment_.autoExposureMaxEV + (nightMaxEV - environment_.autoExposureMaxEV) * timeLighting_.night;
+		post.autoExposureSpeedUp = environment_.autoExposureSpeedUp;
+		post.autoExposureSpeedDown = environment_.autoExposureSpeedDown;
 		post.saturation = environment_.saturation;
 		post.contrast = environment_.contrast;
 		post.sharpen = environment_.sharpen;
@@ -549,8 +1204,248 @@ void Level::ApplyEnvironment() {
 		post.dofFocusDistance = environment_.dofFocusDistance;
 		post.dofFocusRange = environment_.dofFocusRange;
 		post.dofFalloff = environment_.dofFalloff;
+		post.chromaticAberration = environment_.chromaticAberration;
+		post.lensFlare = environment_.lensFlare;
+		post.motionBlur = environment_.motionBlur;
+		post.volumetricLight = environment_.volumetricDensity > 0.0f;
+		post.whiteBalanceTemperature = environment_.whiteBalanceTemperature;
+		post.whiteBalanceTint = environment_.whiteBalanceTint;
+		post.purkinje = (std::max)(environment_.purkinje, timeOfDay_.nightPurkinje * timeLighting_.night);
+		post.purkinjeLuminance = environment_.purkinjeLuminance;
+		post.localTonemap = environment_.localTonemap;
+		post.localTonemapDetail = environment_.localTonemapDetail;
+		post.filmGrain = environment_.filmGrain;
+		post.fade = environment_.fade;
 		offscreen->ApplySettings(post);
 	}
+}
+
+void Level::SetHour(float hour) {
+	if (!timeOfDay_.enabled) {
+		return;
+	}
+	timeOfDay_.hour = WrapHour(hour);
+	ApplyTimeOfDay();
+	ApplyEnvironment();
+}
+
+void Level::ApplyTimeOfDay() {
+	timeLighting_ = {};
+	if (!timeOfDay_.enabled) {
+		return;
+	}
+	if (!timeOfDay_.keys.empty()) {
+		ApplyTimeOfDayValues(EvaluateTimeOfDay(timeOfDay_.keys, timeOfDay_.hour), environment_, timeOfDay_);
+	}
+	if (!timeOfDay_.sunFromTime) {
+		return;
+	}
+
+	const Vector3 toSun = SunToward(timeOfDay_);
+	timeLighting_.hasSkySun = true;
+	timeLighting_.toSun = toSun;
+
+	// 昼の度合い。太陽が地平線の 6 度下 (薄明の終わり) で夜、6 度上で昼
+	const float daylight = SmoothStep(-0.1f, 0.1f, toSun.y);
+	timeLighting_.skyScale = timeOfDay_.nightBrightness + (1.0f - timeOfDay_.nightBrightness) * daylight;
+	const float night = 1.0f - daylight;
+	timeLighting_.night = night;
+	timeLighting_.nightAmbient = timeOfDay_.moonColor * (timeOfDay_.moonIntensity * 0.3f * night);
+
+	// 太陽の影は高さ 10 度から地平線までで消え、月の影は 5〜20 度で出てくる
+	if (toSun.y >= 0.0f) {
+		environment_.lightDirection = { -toSun.x, -toSun.y, -toSun.z };
+		timeLighting_.lightScale = SmoothStep(0.0f, 0.17f, toSun.y);
+	} else {
+		// 月は太陽の反対側。光の向きは光源から物へ
+		environment_.lightDirection = toSun;
+		timeLighting_.lightScale = timeOfDay_.moonIntensity * SmoothStep(0.09f, 0.34f, -toSun.y);
+		timeLighting_.lightTint = timeOfDay_.moonColor;
+	}
+}
+
+void Level::UpdateTimeOfDay() {
+	if (!timeOfDay_.enabled || timeOfDay_.hoursPerSecond == 0.0f || isTimePaused_) {
+		return;
+	}
+	timeOfDay_.hour = WrapHour(timeOfDay_.hour + FPSKeeper::DeltaTime() * timeOfDay_.hoursPerSecond);
+	ApplyTimeOfDay();
+	ApplyEnvironment();
+}
+
+bool Level::TimeOfDayGUI() {
+	bool changed = false;
+#ifdef _DEBUGMODE
+	TimeOfDay& time = timeOfDay_;
+	if (ImGui::Checkbox("Enable##time", &time.enabled)) {
+		if (time.enabled && time.params.empty()) {
+			time.params.assign(std::begin(kDefaultTimeOfDayParams), std::end(kDefaultTimeOfDayParams));
+		}
+		changed = true;
+	}
+	if (!time.enabled) {
+		if (changed) {
+			ApplyTimeOfDay();
+		}
+		return changed;
+	}
+
+	char clock[16];
+	const int minutes = static_cast<int>(time.hour * 60.0f + 0.5f) % (24 * 60);
+	std::snprintf(clock, sizeof(clock), "%02d:%02d", minutes / 60, minutes % 60);
+	changed |= ImGui::SliderFloat("Time", &time.hour, 0.0f, 24.0f, clock);
+	ImGui::DragFloat("Speed (h/s)", &time.hoursPerSecond, 0.005f, -24.0f, 24.0f, "%.3f");
+	ImGui::SameLine();
+	ImGui::Checkbox("Pause##time", &isTimePaused_);
+
+	// 時刻の帯。キーをつまむとその時刻へ飛び、ドラッグで動かす。空いた所は時刻を動かす
+	ImDrawList* drawList = ImGui::GetWindowDrawList();
+	const ImVec2 size((std::max)(ImGui::GetContentRegionAvail().x, 50.0f), 40.0f);
+	const ImVec2 origin = ImGui::GetCursorScreenPos();
+	ImGui::InvisibleButton("##timeline", size);
+	auto toX = [&](float hour) { return origin.x + hour / 24.0f * size.x; };
+	const float keyY = origin.y + 12.0f;
+	const ImVec2 mouse = ImGui::GetIO().MousePos;
+	const float mouseHour = std::clamp((mouse.x - origin.x) / size.x * 24.0f, 0.0f, 23.99f);
+	if (ImGui::IsItemActivated()) {
+		draggingKey_ = -1;
+		for (int i = 0; i < static_cast<int>(time.keys.size()); ++i) {
+			if (std::abs(toX(time.keys[i].hour) - mouse.x) < 6.0f) {
+				draggingKey_ = i;
+			}
+		}
+		if (draggingKey_ >= 0) {
+			selectedKey_ = draggingKey_;
+		}
+	}
+	if (ImGui::IsItemActive()) {
+		if (draggingKey_ >= 0 && draggingKey_ < static_cast<int>(time.keys.size())) {
+			TimeOfDayKey& key = time.keys[draggingKey_];
+			if (ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
+				key.hour = mouseHour;
+			}
+			time.hour = key.hour;
+		} else {
+			time.hour = mouseHour;
+		}
+		changed = true;
+	}
+	if (ImGui::IsItemDeactivated()) {
+		draggingKey_ = -1;
+	}
+
+	drawList->AddRectFilled(origin, ImVec2(origin.x + size.x, origin.y + size.y), IM_COL32(38, 38, 44, 255), 3.0f);
+	for (int hour = 0; hour <= 24; hour += 3) {
+		const float x = toX(static_cast<float>(hour));
+		drawList->AddLine(ImVec2(x, origin.y + size.y - 6.0f), ImVec2(x, origin.y + size.y), IM_COL32(140, 140, 150, 255));
+		if (hour % 6 == 0 && hour < 24) {
+			char label[4];
+			std::snprintf(label, sizeof(label), "%d", hour);
+			drawList->AddText(ImVec2(x + 3.0f, origin.y + size.y - 18.0f), IM_COL32(170, 170, 180, 255), label);
+		}
+	}
+	for (int i = 0; i < static_cast<int>(time.keys.size()); ++i) {
+		const float x = toX(time.keys[i].hour);
+		const ImU32 color = (i == selectedKey_) ? IM_COL32(255, 200, 80, 255) : IM_COL32(210, 210, 220, 255);
+		drawList->AddQuadFilled(ImVec2(x, keyY - 6.0f), ImVec2(x + 6.0f, keyY), ImVec2(x, keyY + 6.0f), ImVec2(x - 6.0f, keyY), color);
+	}
+	const float nowX = toX(time.hour);
+	drawList->AddLine(ImVec2(nowX, origin.y), ImVec2(nowX, origin.y + size.y), IM_COL32(255, 130, 40, 255), 2.0f);
+
+	// 今の環境の値をキーにする。1分以内のキーがあれば書き換える
+	if (ImGui::Button("Add key")) {
+		selectedKey_ = -1;
+		for (int i = 0; i < static_cast<int>(time.keys.size()); ++i) {
+			if (std::abs(time.keys[i].hour - time.hour) < 1.0f / 60.0f) {
+				selectedKey_ = i;
+			}
+		}
+		if (selectedKey_ < 0) {
+			time.keys.push_back({ time.hour, {} });
+			selectedKey_ = static_cast<int>(time.keys.size()) - 1;
+		}
+		time.keys[selectedKey_].values = CaptureTimeOfDayValues(environment_);
+		changed = true;
+	}
+	const bool hasSelection = selectedKey_ >= 0 && selectedKey_ < static_cast<int>(time.keys.size());
+	ImGui::BeginDisabled(!hasSelection);
+	ImGui::SameLine();
+	if (ImGui::Button("Set key") && hasSelection) {
+		time.keys[selectedKey_].values = CaptureTimeOfDayValues(environment_);
+		changed = true;
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("Delete key") && hasSelection) {
+		time.keys.erase(time.keys.begin() + selectedKey_);
+		selectedKey_ = -1;
+		changed = true;
+	}
+	ImGui::EndDisabled();
+	if (selectedKey_ >= 0 && selectedKey_ < static_cast<int>(time.keys.size())) {
+		const int keyMinutes = static_cast<int>(time.keys[selectedKey_].hour * 60.0f + 0.5f) % (24 * 60);
+		ImGui::SameLine();
+		ImGui::Text("%02d:%02d", keyMinutes / 60, keyMinutes % 60);
+	}
+
+	// 選んだ項目の一日の変化。色は見た目の明るさで描く
+	if (ImGui::BeginCombo("Curve", kTimeOfDayParams[curveParam_].name)) {
+		for (int i = 0; i < kTimeOfDayParamCount; ++i) {
+			if (ImGui::Selectable(kTimeOfDayParams[i].name, i == curveParam_)) {
+				curveParam_ = i;
+			}
+		}
+		ImGui::EndCombo();
+	}
+	if (!time.keys.empty()) {
+		constexpr int kSampleCount = 97;
+		float samples[kSampleCount];
+		const TimeOfDayParam& param = kTimeOfDayParams[curveParam_];
+		const int offset = TimeOfDayOffset(curveParam_);
+		for (int i = 0; i < kSampleCount; ++i) {
+			const std::vector<float> values = EvaluateTimeOfDay(time.keys, 24.0f * static_cast<float>(i) / static_cast<float>(kSampleCount - 1) - 1e-3f * (i == kSampleCount - 1));
+			if (offset + param.count > static_cast<int>(values.size())) {
+				samples[i] = 0.0f;
+			} else if (param.count == 3) {
+				samples[i] = 0.2126f * values[offset] + 0.7152f * values[offset + 1] + 0.0722f * values[offset + 2];
+			} else {
+				samples[i] = values[offset];
+			}
+		}
+		ImGui::PlotLines("##curve", samples, kSampleCount, 0, nullptr, FLT_MAX, FLT_MAX, ImVec2(size.x, 60.0f));
+	}
+
+	if (ImGui::TreeNode("Params##time")) {
+		for (const TimeOfDayParam& param : kTimeOfDayParams) {
+			bool isAnimated = IsTimeOfDayAnimated(time, param.name);
+			if (ImGui::Checkbox(param.name, &isAnimated)) {
+				if (isAnimated) {
+					time.params.push_back(param.name);
+				} else {
+					std::erase(time.params, std::string(param.name));
+				}
+				changed = true;
+			}
+		}
+		ImGui::TreePop();
+	}
+
+	changed |= ImGui::Checkbox("Sun from time", &time.sunFromTime);
+	ImGui::BeginDisabled(!time.sunFromTime);
+	changed |= ImGui::DragFloat("Sunrise azimuth", &time.sunAzimuth, 1.0f, -360.0f, 360.0f, "%.0f deg");
+	changed |= ImGui::SliderFloat("Noon elevation", &time.sunMaxElevation, 5.0f, 90.0f, "%.0f deg");
+	changed |= ImGui::DragFloat("Moon intensity", &time.moonIntensity, 0.005f, 0.0f, 2.0f);
+	changed |= ImGui::ColorEdit3("Moon color", &time.moonColor.x, ImGuiColorEditFlags_Float);
+	changed |= ImGui::SliderFloat("Night brightness", &time.nightBrightness, 0.0f, 1.0f);
+	changed |= ImGui::DragFloat("Night max EV", &time.nightMaxEV, 0.05f, -8.0f, 8.0f);
+	changed |= ImGui::SliderFloat("Night purkinje", &time.nightPurkinje, 0.0f, 1.0f);
+	ImGui::EndDisabled();
+
+	if (changed) {
+		time.hour = WrapHour(time.hour);
+		ApplyTimeOfDay();
+	}
+#endif // _DEBUGMODE
+	return changed;
 }
 
 void Level::ApplyCamera() {
@@ -563,20 +1458,31 @@ void Level::EnvironmentGUI() {
 #ifdef _DEBUGMODE
 	bool changed = false;
 	ImGui::SeparatorText("Quality");
-	// 右へ行くほど豪華で重い。Standard が従来の既定
-	struct QualityPreset { const char* name; int shadow; int reflection; int ambient; };
+	// 右ほど豪華で重い。Standard が従来の既定。GI はどの段でも使わない
+	struct QualityPreset {
+		const char* name; int ao; int shadow; int reflection; int ambient; bool specularDetail; bool reflectAll; bool gi; int giRays; bool giScreen; bool reflectionDenoised;
+		bool specularAA; bool reflectionBounce;
+	};
 	constexpr QualityPreset kPresets[] = {
-		{ "Standard", Graphics::kShadowModeHard, Graphics::kReflectionModeOff, Graphics::kAmbientModeHemisphere },
-		{ "High", Graphics::kShadowModeSoft, Graphics::kReflectionModeOcclusion, Graphics::kAmbientModeHemisphere },
-		{ "Ultra", Graphics::kShadowModeSoft, Graphics::kReflectionModeObjects, Graphics::kAmbientModeHemisphere },
-		{ "Realistic", Graphics::kShadowModeSoft, Graphics::kReflectionModeObjects, Graphics::kAmbientModeIBL },
+		{ "Standard", Graphics::kAOModeScreen, Graphics::kShadowModeHard, Graphics::kReflectionModeOff, Graphics::kAmbientModeHemisphere, false, false, false, 64, false, false, false, false },
+		{ "High", Graphics::kAOModeScreen, Graphics::kShadowModeSoft, Graphics::kReflectionModeOcclusion, Graphics::kAmbientModeHemisphere, true, false, false, 64, false, false, true, false },
+		{ "Ultra", Graphics::kAOModeScreen, Graphics::kShadowModeSoft, Graphics::kReflectionModeObjects, Graphics::kAmbientModeHemisphere, true, true, false, 64, false, true, true, true },
+		{ "Realistic", Graphics::kAOModeScreen, Graphics::kShadowModeSoft, Graphics::kReflectionModeObjects, Graphics::kAmbientModeIBL, true, true, false, 64, false, true, true, true },
 	};
 	for (const QualityPreset& preset : kPresets) {
 		if (ImGui::Button(preset.name)) {
-			environment_.aoMode = Graphics::kAOModeScreen;
+			environment_.aoMode = preset.ao;
 			environment_.shadowMode = preset.shadow;
 			environment_.reflectionMode = preset.reflection;
 			environment_.ambientMode = preset.ambient;
+			environment_.specularDetail = preset.specularDetail;
+			environment_.reflectAll = preset.reflectAll;
+			environment_.gi = preset.gi;
+			environment_.giRays = preset.giRays;
+			environment_.giScreen = preset.giScreen;
+			environment_.reflectionDenoised = preset.reflectionDenoised;
+			environment_.specularAA = preset.specularAA;
+			environment_.reflectionBounce = preset.reflectionBounce;
 			changed = true;
 		}
 		ImGui::SameLine();
@@ -584,11 +1490,30 @@ void Level::EnvironmentGUI() {
 	ImGui::NewLine();
 	changed |= ImGui::Combo("Lighting", &environment_.lightingMode, kLightingNames, kLightingCount);
 	changed |= ImGui::Combo("AO",&environment_.aoMode, kAONames, kAOCount);
+	changed |= ImGui::Checkbox("AO on local lights", &environment_.localLightAO);
 	changed |= ImGui::Combo("Shadow", &environment_.shadowMode, kShadowNames, kShadowCount);
 	changed |= ImGui::Combo("Ambient", &environment_.ambientMode, kAmbientNames, kAmbientCount);
+	changed |= ImGui::Checkbox("Specular detail", &environment_.specularDetail);
+	changed |= ImGui::Checkbox("Specular AA", &environment_.specularAA);
+	changed |= ImGui::Checkbox("Reflect all", &environment_.reflectAll);
+	changed |= ImGui::Checkbox("GI", &environment_.gi);
+	ImGui::BeginDisabled(!environment_.gi);
+	changed |= ImGui::DragFloat("GI probe spacing", &environment_.giProbeSpacing, 0.05f, 0.25f, 20.0f);
+	changed |= ImGui::SliderInt("GI rays", &environment_.giRays, 32, 128);
+	changed |= ImGui::Checkbox("GI screen probes", &environment_.giScreen);
+	ImGui::EndDisabled();
 	ImGui::BeginDisabled(environment_.ambientMode != Graphics::kAmbientModeIBL);
 	changed |= ImGui::DragFloat("IBL scale", &environment_.iblAmbientScale, 0.01f, 0.0f, 10.0f);
 	ImGui::EndDisabled();
+
+	ImGui::SeparatorText("Time of Day");
+	changed |= TimeOfDayGUI();
+
+	ImGui::SeparatorText("Baked GI");
+	changed |= BakedGIGUI();
+
+	ImGui::SeparatorText("Reflection Probes");
+	ReflectionProbeGUI();
 
 	ImGui::SeparatorText("SkyBox");
 	changed |= ImGui::Checkbox("Enable", &environment_.hasSkyBox);
@@ -596,11 +1521,22 @@ void Level::EnvironmentGUI() {
 	changed |= ImGui::Combo("Type##sky", &environment_.skyMode, kSkyNames, kSkyCount);
 	changed |= ImGui::DragFloat("Intensity##sky", &environment_.skyIntensity, 0.01f, 0.0f, 10.0f);
 	changed |= ImGui::ColorEdit3("Color##sky", &environment_.skyBoxColor.x);
+	ImGui::BeginDisabled(environment_.skyMode != Graphics::kSkyModeAtmosphere);
+	changed |= ImGui::DragFloat("Aerial perspective", &environment_.aerialPerspectiveScale, 0.1f, 0.0f, 1000.0f);
+	changed |= ImGui::DragFloat("Sky light", &environment_.skyLightIntensity, 0.01f, 0.0f, 10.0f);
+	changed |= ImGui::SliderFloat("Clouds", &environment_.cloudCoverage, 0.0f, 1.0f);
+	changed |= ImGui::SliderFloat("Cloud shadow", &environment_.cloudShadow, 0.0f, 1.0f);
+	changed |= ImGui::DragFloat("Stars", &environment_.stars, 0.01f, 0.0f, 10.0f);
+	changed |= ImGui::DragFloat("Moon", &environment_.moon, 0.01f, 0.0f, 10.0f);
+	ImGui::EndDisabled();
 	ImGui::EndDisabled();
 
 	ImGui::SeparatorText("Directional Light");
 	changed |= ImGui::ColorEdit3("Color##light", &environment_.lightColor.x);
+	// 時刻から太陽を決めているときは、向きは毎回上書きされる
+	ImGui::BeginDisabled(timeOfDay_.enabled && timeOfDay_.sunFromTime);
 	changed |= ImGui::DragFloat3("Direction", &environment_.lightDirection.x, 0.01f);
+	ImGui::EndDisabled();
 	changed |= ImGui::DragFloat("Intensity", &environment_.lightIntensity, 0.01f, 0.0f, 100.0f);
 
 	ImGui::SeparatorText("Fog");
@@ -634,12 +1570,46 @@ void Level::EnvironmentGUI() {
 	ImGui::SeparatorText("Tonemap");
 	changed |= ImGui::Combo("Operator", &environment_.tonemapMode, kTonemapNames, kTonemapCount);
 	changed |= ImGui::DragFloat("Exposure", &environment_.exposure, 0.01f, 0.0f, 100.0f);
+	changed |= ImGui::Checkbox("Auto exposure", &environment_.autoExposure);
+	ImGui::BeginDisabled(!environment_.autoExposure);
+	changed |= ImGui::DragFloatRange2("EV range", &environment_.autoExposureMinEV, &environment_.autoExposureMaxEV, 0.05f, -8.0f, 8.0f);
+	changed |= ImGui::DragFloat("Speed up", &environment_.autoExposureSpeedUp, 0.05f, 0.01f, 20.0f);
+	changed |= ImGui::DragFloat("Speed down", &environment_.autoExposureSpeedDown, 0.05f, 0.01f, 20.0f);
+	ImGui::EndDisabled();
 	changed |= ImGui::DragFloat("Saturation", &environment_.saturation, 0.01f, 0.0f, 2.0f);
 	changed |= ImGui::DragFloat("Contrast", &environment_.contrast, 0.01f, 0.5f, 2.0f);
 	changed |= ImGui::SliderFloat("Sharpen", &environment_.sharpen, 0.0f, 2.0f);
 	changed |= ImGui::SliderFloat("Vignette", &environment_.vignette, 0.0f, 1.0f);
+	changed |= ImGui::SliderFloat("Film grain", &environment_.filmGrain, 0.0f, 1.0f);
+	changed |= ImGui::SliderFloat("Fade", &environment_.fade, 0.0f, 1.0f);
 	changed |= ImGui::ColorEdit3("Shadow tint", &environment_.shadowTint.x, ImGuiColorEditFlags_Float);
 	changed |= ImGui::ColorEdit3("Highlight tint", &environment_.highlightTint.x, ImGuiColorEditFlags_Float);
+	changed |= ImGui::SliderFloat("Temperature", &environment_.whiteBalanceTemperature, -1.0f, 1.0f);
+	changed |= ImGui::SliderFloat("Tint", &environment_.whiteBalanceTint, -1.0f, 1.0f);
+	changed |= ImGui::SliderFloat("Purkinje", &environment_.purkinje, 0.0f, 1.0f);
+	ImGui::BeginDisabled(environment_.purkinje <= 0.0f);
+	changed |= ImGui::DragFloat("Purkinje luminance", &environment_.purkinjeLuminance, 0.001f, 0.001f, 1.0f, "%.3f");
+	ImGui::EndDisabled();
+	changed |= ImGui::SliderFloat("Local tonemap", &environment_.localTonemap, 0.0f, 1.0f);
+	ImGui::BeginDisabled(environment_.localTonemap <= 0.0f);
+	changed |= ImGui::SliderFloat("Local detail", &environment_.localTonemapDetail, 0.5f, 2.0f);
+	ImGui::EndDisabled();
+
+	ImGui::SeparatorText("Translucent");
+	changed |= ImGui::DragFloat("Refraction", &environment_.refraction, 0.01f, 0.0f, 10.0f, "%.2f m");
+
+	ImGui::SeparatorText("Volumetric Light");
+	changed |= ImGui::DragFloat("Density##volumetric", &environment_.volumetricDensity, 0.0005f, 0.0f, 1.0f, "%.4f");
+	changed |= ImGui::SliderFloat("Anisotropy##volumetric", &environment_.volumetricAnisotropy, 0.0f, 0.95f);
+	changed |= ImGui::DragFloat("Distance##volumetric", &environment_.volumetricDistance, 0.5f, 1.0f, 1000.0f);
+	changed |= ImGui::DragFloat("Intensity##volumetric", &environment_.volumetricIntensity, 0.05f, 0.0f, 100.0f);
+	changed |= ImGui::DragFloat("Sun##volumetric", &environment_.volumetricSun, 0.05f, 0.0f, 10.0f);
+	changed |= ImGui::DragFloat("Local lights##volumetric", &environment_.volumetricLocalLights, 0.05f, 0.0f, 100.0f);
+
+	ImGui::SeparatorText("Lens");
+	changed |= ImGui::SliderFloat("Chromatic aberration", &environment_.chromaticAberration, 0.0f, 2.0f);
+	changed |= ImGui::DragFloat("Lens flare", &environment_.lensFlare, 0.01f, 0.0f, 10.0f);
+	changed |= ImGui::SliderFloat("Motion blur", &environment_.motionBlur, 0.0f, 1.0f);
 
 	ImGui::SeparatorText("God Ray");
 	changed |= ImGui::DragFloat("Intensity##godRay", &environment_.godRayIntensity, 0.01f, 0.0f, 10.0f);
@@ -648,9 +1618,22 @@ void Level::EnvironmentGUI() {
 
 	ImGui::SeparatorText("Reflection");
 	changed |= ImGui::Combo("Mode##reflection", &environment_.reflectionMode, kReflectionNames, kReflectionCount);
+	ImGui::BeginDisabled(environment_.reflectionMode != Graphics::kReflectionModeObjects);
+	changed |= ImGui::Checkbox("Screen pass##reflection", &environment_.reflectionDenoised);
+	ImGui::BeginDisabled(!environment_.reflectionDenoised);
+	changed |= ImGui::Checkbox("Second bounce##reflection", &environment_.reflectionBounce);
+	changed |= ImGui::Checkbox("Screen color##reflection", &environment_.reflectionSceneColor);
+	ImGui::EndDisabled();
+	ImGui::EndDisabled();
 	changed |= ImGui::DragFloat("Max distance##reflection", &environment_.reflectionMaxDistance, 1.0f, 0.0f, 10000.0f);
 	changed |= ImGui::SliderFloat("Intensity##reflection", &environment_.reflectionIntensity, 0.0f, 2.0f);
 	changed |= ImGui::SliderFloat("Shadow##reflection", &environment_.reflectionShadow, 0.0f, 1.0f);
+
+	ImGui::SeparatorText("Wet");
+	changed |= ImGui::SliderFloat("Wetness##wet", &environment_.wetness, 0.0f, 1.0f);
+	changed |= ImGui::SliderFloat("Puddles##wet", &environment_.puddleAmount, 0.0f, 1.0f);
+	changed |= ImGui::DragFloat("Puddle size##wet", &environment_.puddleScale, 0.05f, 0.1f, 50.0f, "%.2f m");
+	changed |= ImGui::SliderFloat("Rain##wet", &environment_.rain, 0.0f, 1.0f);
 
 	ImGui::SeparatorText("Depth of Field");
 	changed |= ImGui::SliderFloat("Blur##dof", &environment_.dofBlur, 0.0f, 16.0f, "%.1f px");

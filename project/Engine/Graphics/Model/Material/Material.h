@@ -27,6 +27,25 @@ namespace Graphics {
 	struct MaterialDataPath {
 		std::string textureFilePath;
 		std::string normalFilePath;
+		// 以下は glTF のマテリアルの値。ApplyModelMaterials で当てたときだけ使う
+		/// <summary>モデルが法線マップを持っているか</summary>
+		bool hasNormalMap = false;
+		/// <summary>メタリック・ラフネスのテクスチャ (G=粗さ B=金属)。空なら無し</summary>
+		std::string metallicRoughnessFilePath;
+		/// <summary>テクスチャに掛ける色 (glTF の baseColorFactor)</summary>
+		Math::Vector4 baseColorFactor = { 1.0f,1.0f,1.0f,1.0f };
+		float metallicFactor = 1.0f;
+		float roughnessFactor = 1.0f;
+		/// <summary>抜きのしきい値。抜かない素材(glTF の OPAQUE)は0</summary>
+		float alphaCutoff = 0.0f;
+		/// <summary>両面を描く素材</summary>
+		bool isTwoSided = false;
+		/// <summary>発光色 (glTF の emissiveFactor × emissive_strength)</summary>
+		Math::Vector3 emissiveFactor = { 0.0f,0.0f,0.0f };
+		/// <summary>光る所と色のテクスチャ。空なら無し</summary>
+		std::string emissiveFilePath;
+		/// <summary>物陰の暗さのテクスチャ (R を使う)。空なら無し</summary>
+		std::string occlusionFilePath;
 	};
 
 	enum class LightMode {
@@ -63,6 +82,14 @@ namespace Graphics {
 			float rimPower = 3.0f;			// リムライトの細さ。大きいほど輪郭のきわだけが光る
 			Math::Vector3 rimColor{};		// リムライトの色。黒なら掛からない
 			float pad0 = 0.0f;
+			int32_t metallicRoughnessIndex = 0;		// メタリック・ラフネスのテクスチャ (G=粗さ B=金属)
+			int32_t useMetallicRoughnessMap = 0;	// 0以外なら roughness と metallic にテクスチャの値を掛ける
+			int32_t isTwoSided = 0;					// 0以外なら裏から見た面は法線を裏返す
+			float pad1 = 0.0f;
+			int32_t emissiveMapIndex = 0;			// 光る所と色のテクスチャ
+			int32_t useEmissiveMap = 0;				// 0以外なら emissive にこれを掛ける。0なら色のテクスチャ
+			int32_t occlusionMapIndex = 0;			// 物陰の暗さのテクスチャ (R)
+			int32_t useOcclusionMap = 0;			// 0以外ならアンビエントにテクスチャの R を掛ける
 		};
 
 	public:
@@ -79,11 +106,16 @@ namespace Graphics {
 		Texture* GetNormalMap() { return normalMap_; }
 		/// <summary>シェーダの gTextures[] でこのテクスチャを引く番号</summary>
 		uint32_t GetTextureSrvIndex() const;
+		/// <summary>発光に掛けるテクスチャの SRV の番号。無ければ色のテクスチャ</summary>
+		uint32_t GetEmissiveTextureSrvIndex() const;
+		/// <summary>テクスチャに抜きがあるか</summary>
+		bool IsCutout() const;
+		float GetAlphaRef() const { return materialData_.AlphaRef; }
 		/// <summary>CBへ最新値を書き込んでから定数バッファを返す</summary>
 		/// <remarks>取得のたびに転送が走る。描画直前のバインド用であって、単なる getter ではない</remarks>
 		ID3D12Resource* UploadAndGetResource();
 		std::string GetPathName() const { return textureNamePath_.textureFilePath; }
-		Math::Vector4 GetColor();
+		Math::Vector4 GetColor() const;
 		Math::Vector2 GetUVScale() { return scale_; }
 		Math::Vector2 GetUVTrans() { return uvTrans_; }
 		int32_t GetUseNormalMap() { return materialData_.useNormalMap; }
@@ -112,6 +144,14 @@ namespace Graphics {
 		void SetTexture(const std::string& name, bool overWrite = false);
 		/// <summary>法線マップの設定</summary>
 		void SetNormalMap(const std::string& name, bool overWrite = false);
+		/// <summary>メタリック・ラフネスのテクスチャ。roughness と metallic は倍率になる</summary>
+		void SetMetallicRoughnessMap(const std::string& name);
+		/// <summary>両面を描く素材か</summary>
+		void SetTwoSided(bool isTwoSided) { materialData_.isTwoSided = isTwoSided ? 1 : 0; }
+		/// <summary>光る所と色のテクスチャ。emissive に掛ける</summary>
+		void SetEmissiveMap(const std::string& name);
+		/// <summary>物陰の暗さのテクスチャ (R)。アンビエントにだけ掛かる</summary>
+		void SetOcclusionMap(const std::string& name);
 		/// <summary>ライトモードの設定</summary>
 		void SetLightEnable(LightMode mode);
 		/// <summary>粗さの設定(0=鏡のように鋭い 1=完全に拡散)</summary>
@@ -142,6 +182,9 @@ namespace Graphics {
 		Math::Vector2 uvTrans_;
 
 		Texture* texture_ = nullptr;
+		Texture* metallicRoughnessMap_ = nullptr;
+		Texture* emissiveMap_ = nullptr;
+		Texture* occlusionMap_ = nullptr;
 		Texture* normalMap_ = nullptr;
 		MaterialDataPath textureNamePath_;
 	};

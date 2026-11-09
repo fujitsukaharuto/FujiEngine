@@ -1,6 +1,30 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+    <ClCompile Include="Engine\Graphics\Raytracing\ReflectionProbePass.cpp">
+      <Filter>Engine\Graphics\Raytracing</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Graphics\Raytracing\BakedGIPass.cpp">
+      <Filter>Engine\Graphics\Raytracing</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Graphics\Raytracing\DDGIPass.cpp">
+      <Filter>Engine\Graphics\Raytracing</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Graphics\Raytracing\ScreenProbeGIPass.cpp">
+      <Filter>Engine\Graphics\Raytracing</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Graphics\Raytracing\ScreenReflectionPass.cpp">
+      <Filter>Engine\Graphics\Raytracing</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Graphics\Raytracing\VolumetricLightPass.cpp">
+      <Filter>Engine\Graphics\Raytracing</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Graphics\Object\RefractionCapture.cpp">
+      <Filter>Engine\Graphics\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Graphics\SkyBox\SkyAtmosphere.cpp">
+      <Filter>Engine\Graphics\SkyBox</Filter>
+    </ClCompile>
     <ClCompile Include="Engine\Audio\AudioPlayer.cpp">
       <Filter>Engine\Audio</Filter>
     </ClCompile>
@@ -91,6 +115,9 @@
     <ClCompile Include="Engine\Graphics\Light\DirectionLight.cpp">
       <Filter>Engine\Graphics\Light</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Graphics\Light\ClusteredLightPass.cpp">
+      <Filter>Engine\Graphics\Light</Filter>
+    </ClCompile>
     <ClCompile Include="Engine\Graphics\Light\LightManager.cpp">
       <Filter>Engine\Graphics\Light</Filter>
     </ClCompile>
@@ -154,6 +181,9 @@
     <ClCompile Include="Engine\Graphics\Particle\ParticleGroup\ParticleGroup.cpp">
       <Filter>Engine\Graphics\Particle\ParticleGroup</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Graphics\Particle\RainRenderer.cpp">
+      <Filter>Engine\Graphics\Particle</Filter>
+    </ClCompile>
     <ClCompile Include="Engine\Graphics\Particle\ParticleEmitter.cpp">
       <Filter>Engine\Graphics\Particle</Filter>
     </ClCompile>
@@ -194,6 +224,12 @@
       <Filter>Engine\Graphics\Pipeline</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Graphics\PostEffect\BloomPass.cpp">
+      <Filter>Engine\Graphics\PostEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Graphics\PostEffect\BufferVisualizer.cpp">
+      <Filter>Engine\Graphics\PostEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Graphics\PostEffect\AutoExposurePass.cpp">
       <Filter>Engine\Graphics\PostEffect</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Graphics\PostEffect\OffscreenManager.cpp">
@@ -259,7 +295,16 @@
     <ClCompile Include="Engine\Scene\SceneFade.cpp">
       <Filter>Engine\Scene</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\GameObject\EmissiveFlicker.cpp">
+      <Filter>Engine\GameObject</Filter>
+    </ClCompile>
     <ClCompile Include="Engine\GameObject\SpawnPoint.cpp">
+      <Filter>Engine\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\GameObject\ReflectionProbe.cpp">
+      <Filter>Engine\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\GameObject\GIVolume.cpp">
       <Filter>Engine\GameObject</Filter>
     </ClCompile>
     <ClCompile Include="Engine\GameObject\PlacedLight.cpp">
@@ -382,6 +427,9 @@
     <ClCompile Include="Game\Scene\Debug\ParticleDebugScene.cpp">
       <Filter>Game\Scene\Debug</Filter>
     </ClCompile>
+    <ClCompile Include="Game\Scene\Debug\NightTownScene.cpp">
+      <Filter>Game\Scene\Debug</Filter>
+    </ClCompile>
     <ClCompile Include="Game\Scene\Debug\TestScene.cpp">
       <Filter>Game\Scene\Debug</Filter>
     </ClCompile>
@@ -400,6 +448,30 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Engine\Graphics\Raytracing\ReflectionProbePass.h">
+      <Filter>Engine\Graphics\Raytracing</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Graphics\Raytracing\BakedGIPass.h">
+      <Filter>Engine\Graphics\Raytracing</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Graphics\Raytracing\DDGIPass.h">
+      <Filter>Engine\Graphics\Raytracing</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Graphics\Raytracing\ScreenProbeGIPass.h">
+      <Filter>Engine\Graphics\Raytracing</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Graphics\Raytracing\ScreenReflectionPass.h">
+      <Filter>Engine\Graphics\Raytracing</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Graphics\Raytracing\VolumetricLightPass.h">
+      <Filter>Engine\Graphics\Raytracing</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Graphics\Object\RefractionCapture.h">
+      <Filter>Engine\Graphics\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Graphics\SkyBox\SkyAtmosphere.h">
+      <Filter>Engine\Graphics\SkyBox</Filter>
+    </ClInclude>
     <ClInclude Include="Engine\Audio\AudioPlayer.h">
       <Filter>Engine\Audio</Filter>
     </ClInclude>
@@ -502,6 +574,9 @@
     <ClInclude Include="Engine\Graphics\Light\DirectionLight.h">
       <Filter>Engine\Graphics\Light</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Graphics\Light\ClusteredLightPass.h">
+      <Filter>Engine\Graphics\Light</Filter>
+    </ClInclude>
     <ClInclude Include="Engine\Graphics\Light\LightManager.h">
       <Filter>Engine\Graphics\Light</Filter>
     </ClInclude>
@@ -577,6 +652,9 @@
     <ClInclude Include="Engine\Graphics\Particle\Particle.h">
       <Filter>Engine\Graphics\Particle</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Graphics\Particle\RainRenderer.h">
+      <Filter>Engine\Graphics\Particle</Filter>
+    </ClInclude>
     <ClInclude Include="Engine\Graphics\Particle\ParticleEmitter.h">
       <Filter>Engine\Graphics\Particle</Filter>
     </ClInclude>
@@ -617,6 +695,12 @@
       <Filter>Engine\Graphics\Pipeline</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Graphics\PostEffect\BloomPass.h">
+      <Filter>Engine\Graphics\PostEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Graphics\PostEffect\BufferVisualizer.h">
+      <Filter>Engine\Graphics\PostEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Graphics\PostEffect\AutoExposurePass.h">
       <Filter>Engine\Graphics\PostEffect</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Graphics\PostEffect\OffscreenManager.h">
@@ -715,7 +799,16 @@
     <ClInclude Include="Engine\Scene\SceneFade.h">
       <Filter>Engine\Scene</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\GameObject\EmissiveFlicker.h">
+      <Filter>Engine\GameObject</Filter>
+    </ClInclude>
     <ClInclude Include="Engine\GameObject\SpawnPoint.h">
+      <Filter>Engine\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\GameObject\ReflectionProbe.h">
+      <Filter>Engine\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\GameObject\GIVolume.h">
       <Filter>Engine\GameObject</Filter>
     </ClInclude>
     <ClInclude Include="Engine\GameObject\PlacedLight.h">
@@ -848,6 +941,9 @@
       <Filter>Game\Scene\Debug</Filter>
     </ClInclude>
     <ClInclude Include="Game\Scene\Debug\ParticleDebugScene.h">
+      <Filter>Game\Scene\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Scene\Debug\NightTownScene.h">
       <Filter>Game\Scene\Debug</Filter>
     </ClInclude>
     <ClInclude Include="Game\Scene\Debug\TestScene.h">
@@ -1086,6 +1182,9 @@
     <Filter Include="resource\Shaders\Debug">
       <UniqueIdentifier>{50f3278e-7fb7-4391-95ad-bac3729c0341}</UniqueIdentifier>
     </Filter>
+    <Filter Include="resource\Shaders\Light">
+      <UniqueIdentifier>{5b7e2c91-4f3a-4d8e-9a61-2c8f0d3e7b14}</UniqueIdentifier>
+    </Filter>
     <Filter Include="resource\Shaders\Line">
       <UniqueIdentifier>{d858fb7c-9d57-4d1d-b85d-ba47bf9df3b8}</UniqueIdentifier>
     </Filter>
@@ -1115,6 +1214,75 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="resource\Shaders\Raytracing\DDGIUpdateDistance.CS.hlsl">
+      <Filter>resource\Shaders\Raytracing</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\Raytracing\DDGIUpdateIrradiance.CS.hlsl">
+      <Filter>resource\Shaders\Raytracing</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\Raytracing\ScreenProbeTrace.CS.hlsl">
+      <Filter>resource\Shaders\Raytracing</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\Raytracing\ScreenProbeFilter.CS.hlsl">
+      <Filter>resource\Shaders\Raytracing</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\Raytracing\ScreenProbeIntegrate.CS.hlsl">
+      <Filter>resource\Shaders\Raytracing</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\Raytracing\ScreenProbeTemporal.CS.hlsl">
+      <Filter>resource\Shaders\Raytracing</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\Raytracing\ScreenReflectionTrace.CS.hlsl">
+      <Filter>resource\Shaders\Raytracing</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\Raytracing\ScreenReflectionResolve.CS.hlsl">
+      <Filter>resource\Shaders\Raytracing</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\Raytracing\VolumetricLightTrace.CS.hlsl">
+      <Filter>resource\Shaders\Raytracing</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\Light\ClusterLightCull.CS.hlsl">
+      <Filter>resource\Shaders\Light</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\Raytracing\VolumetricLightBlur.CS.hlsl">
+      <Filter>resource\Shaders\Raytracing</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\PostEffect\VolumetricLightComposite.CS.hlsl">
+      <Filter>resource\Shaders\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\Raytracing\ReflectionProbeCapture.CS.hlsl">
+      <Filter>resource\Shaders\Raytracing</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\IBL\ReflectionProbeDownsample.CS.hlsl">
+      <Filter>resource\Shaders\IBL</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\IBL\ReflectionProbePrefilter.CS.hlsl">
+      <Filter>resource\Shaders\IBL</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\Raytracing\BakedGITrace.CS.hlsl">
+      <Filter>resource\Shaders\Raytracing</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\Raytracing\DDGITrace.CS.hlsl">
+      <Filter>resource\Shaders\Raytracing</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\Raytracing\DDGIRelocation.CS.hlsl">
+      <Filter>resource\Shaders\Raytracing</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\SkyBox\AtmosphereSummary.CS.hlsl">
+      <Filter>resource\Shaders\SkyBox</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\SkyBox\AtmosphereCapture.CS.hlsl">
+      <Filter>resource\Shaders\SkyBox</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\SkyBox\AtmosphereSkyView.CS.hlsl">
+      <Filter>resource\Shaders\SkyBox</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\SkyBox\AtmosphereMultiScatter.CS.hlsl">
+      <Filter>resource\Shaders\SkyBox</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\SkyBox\AtmosphereTransmittance.CS.hlsl">
+      <Filter>resource\Shaders\SkyBox</Filter>
+    </FxCompile>
     <FxCompile Include="resource\Shaders\Debug\BaseGrid.PS.hlsl">
       <Filter>resource\Shaders\Debug</Filter>
     </FxCompile>
@@ -1196,6 +1364,12 @@
     <FxCompile Include="resource\Shaders\Particle\Particle.PS.hlsl">
       <Filter>resource\Shaders\Particle</Filter>
     </FxCompile>
+    <FxCompile Include="resource\Shaders\Particle\Rain.VS.hlsl">
+      <Filter>resource\Shaders\Particle</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\Particle\Rain.PS.hlsl">
+      <Filter>resource\Shaders\Particle</Filter>
+    </FxCompile>
     <FxCompile Include="resource\Shaders\Particle\Particle.VS.hlsl">
       <Filter>resource\Shaders\Particle</Filter>
     </FxCompile>
@@ -1211,10 +1385,31 @@
     <FxCompile Include="resource\Shaders\PostEffect\BloomComposite.CS.hlsl">
       <Filter>resource\Shaders\PostEffect</Filter>
     </FxCompile>
+    <FxCompile Include="resource\Shaders\PostEffect\LocalTonemapDownsample.CS.hlsl">
+      <Filter>resource\Shaders\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\PostEffect\LocalTonemapBlur.CS.hlsl">
+      <Filter>resource\Shaders\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\PostEffect\BufferVisualize.CS.hlsl">
+      <Filter>resource\Shaders\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\PostEffect\AutoExposureHistogram.CS.hlsl">
+      <Filter>resource\Shaders\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\PostEffect\AutoExposureAverage.CS.hlsl">
+      <Filter>resource\Shaders\PostEffect</Filter>
+    </FxCompile>
     <FxCompile Include="resource\Shaders\PostEffect\GodRay.CS.hlsl">
       <Filter>resource\Shaders\PostEffect</Filter>
     </FxCompile>
     <FxCompile Include="resource\Shaders\PostEffect\DepthOfField.CS.hlsl">
+      <Filter>resource\Shaders\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\PostEffect\MotionBlur.CS.hlsl">
+      <Filter>resource\Shaders\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\PostEffect\LensFlare.CS.hlsl">
       <Filter>resource\Shaders\PostEffect</Filter>
     </FxCompile>
     <FxCompile Include="resource\Shaders\PostEffect\BoxFilter.CS.hlsl">
@@ -1291,6 +1486,48 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="resource\Shaders\Common\RayHitLighting.hlsli">
+      <Filter>resource\Shaders\Common</Filter>
+    </None>
+    <None Include="resource\Shaders\Common\ScreenProbeCommon.hlsli">
+      <Filter>resource\Shaders\Common</Filter>
+    </None>
+    <None Include="resource\Shaders\Common\ScreenProbeGI.hlsli">
+      <Filter>resource\Shaders\Common</Filter>
+    </None>
+    <None Include="resource\Shaders\Common\ScreenReflectionCommon.hlsli">
+      <Filter>resource\Shaders\Common</Filter>
+    </None>
+    <None Include="resource\Shaders\Common\ScreenReflection.hlsli">
+      <Filter>resource\Shaders\Common</Filter>
+    </None>
+    <None Include="resource\Shaders\Common\VolumetricLightCommon.hlsli">
+      <Filter>resource\Shaders\Common</Filter>
+    </None>
+    <None Include="resource\Shaders\Common\Refraction.hlsli">
+      <Filter>resource\Shaders\Common</Filter>
+    </None>
+    <None Include="resource\Shaders\Common\ReflectionProbe.hlsli">
+      <Filter>resource\Shaders\Common</Filter>
+    </None>
+    <None Include="resource\Shaders\Common\BakedGI.hlsli">
+      <Filter>resource\Shaders\Common</Filter>
+    </None>
+    <None Include="resource\Shaders\Common\Wetness.hlsli">
+      <Filter>resource\Shaders\Common</Filter>
+    </None>
+    <None Include="resource\Shaders\Common\ClusteredLights.hlsli">
+      <Filter>resource\Shaders\Common</Filter>
+    </None>
+    <None Include="resource\Shaders\Common\DDGI.hlsli">
+      <Filter>resource\Shaders\Common</Filter>
+    </None>
+    <None Include="resource\Shaders\Common\DDGICommon.hlsli">
+      <Filter>resource\Shaders\Common</Filter>
+    </None>
+    <None Include="resource\Shaders\SkyBox\AtmosphereModel.hlsli">
+      <Filter>resource\Shaders\SkyBox</Filter>
+    </None>
     <None Include="resource\Shaders\Common\GBufferUtil.hlsli">
       <Filter>resource\Shaders\Common</Filter>
     </None>
@@ -1310,6 +1547,9 @@
       <Filter>resource\Shaders\Common</Filter>
     </None>
     <None Include="resource\Shaders\Common\RayTracedAO.hlsli">
+      <Filter>resource\Shaders\Common</Filter>
+    </None>
+    <None Include="resource\Shaders\Common\RayInstance.hlsli">
       <Filter>resource\Shaders\Common</Filter>
     </None>
     <None Include="resource\Shaders\Common\RayTracedReflection.hlsli">
@@ -1345,6 +1585,9 @@
     <None Include="resource\Shaders\PostEffect\BloomPass.hlsli">
       <Filter>resource\Shaders\PostEffect</Filter>
     </None>
+    <None Include="resource\Shaders\PostEffect\AutoExposure.hlsli">
+      <Filter>resource\Shaders\PostEffect</Filter>
+    </None>
     <None Include="resource\Shaders\Object\Picking.hlsli">
       <Filter>resource\Shaders\Object</Filter>
     </None>
@@ -1353,6 +1596,9 @@
     </None>
     <None Include="resource\Shaders\Particle\GPU\Splat.hlsli">
       <Filter>resource\Shaders\Particle\GPU</Filter>
+    </None>
+    <None Include="resource\Shaders\Particle\Rain.hlsli">
+      <Filter>resource\Shaders\Particle</Filter>
     </None>
     <None Include="resource\Shaders\Particle\Particle.hlsli">
       <Filter>resource\Shaders\Particle</Filter>

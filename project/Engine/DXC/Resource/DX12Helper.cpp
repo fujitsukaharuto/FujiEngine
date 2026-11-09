@@ -1,5 +1,6 @@
 #include "Engine/DXC/Resource/DX12Helper.h"
 #include <cassert>
+#include <cstring>
 
 namespace DXC::Helper {
 
@@ -175,6 +176,35 @@ namespace DXC::Helper {
 		assert(SUCCEEDED(hr));
 
 		return bufferResource;
+	}
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> CreateStaticBuffer(ID3D12Device* device, ID3D12GraphicsCommandList* list,
+		const void* data, size_t sizeInBytes, Microsoft::WRL::ComPtr<ID3D12Resource>& upload) {
+		upload = CreateBufferResource(device, sizeInBytes);
+		void* mapped = nullptr;
+		upload->Map(0, nullptr, &mapped);
+		std::memcpy(mapped, data, sizeInBytes);
+		upload->Unmap(0, nullptr);
+
+		D3D12_HEAP_PROPERTIES heapProperties{};
+		heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
+		D3D12_RESOURCE_DESC resourceDesc{};
+		resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+		resourceDesc.Width = sizeInBytes;
+		resourceDesc.Height = 1;
+		resourceDesc.DepthOrArraySize = 1;
+		resourceDesc.MipLevels = 1;
+		resourceDesc.SampleDesc.Count = 1;
+		resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+
+		Microsoft::WRL::ComPtr<ID3D12Resource> resource = nullptr;
+		HRESULT hr = device->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc,
+			D3D12_RESOURCE_STATE_COMMON, nullptr, IID_PPV_ARGS(&resource));
+		assert(SUCCEEDED(hr));
+
+		// COMMON からコピー先へは暗黙に昇格し、実行し終えると COMMON へ戻る
+		list->CopyBufferRegion(resource.Get(), 0, upload.Get(), 0, sizeInBytes);
+		return resource;
 	}
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateAccelerationStructureResource(ID3D12Device* device, size_t sizeInBytes) {

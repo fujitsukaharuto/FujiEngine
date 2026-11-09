@@ -14,39 +14,8 @@ static const uint kReflectionModeOff = 0;       // 遮蔽を見ない。どの�
 static const uint kReflectionModeOcclusion = 1; // 物に遮られた向きには空を映さない
 static const uint kReflectionModeObjects = 2;   // 遮った物の色を映す
 
-// RayInstance::flags のビット。C++ 側 (RaytracingScene.h の RayInstanceFlag) と同じ値であること
-static const uint kRayInstanceHasGeometry = 1u << 0; // 頂点とインデックスを引ける(UV が分かる)
-static const uint kRayInstanceHasNormal = 1u << 1;   // 頂点の法線が使える
-
-// レイが当たった物の見た目。C++ 側 (RaytracingScene.h の RayInstanceData) と並びが一致していること
-struct RayInstance
-{
-    float3 color; // マテリアルの色
-    uint textureIndex;
-    float3 emissive;
-    uint vertexBuffer; // gRayVertices[] の番号
-    uint indexBuffer; // gRayIndices[] の番号
-    uint flags;
-    float2 uvScale;
-    float2 uvOffset;
-    float2 pad;
-};
-
-// メッシュごとに1つ。引く位置は「インスタンスの番号 + その中でのメッシュの番号」
-StructuredBuffer<RayInstance> gRayInstances : register(t1, space2);
-
-// C++ 側 (Mesh.h の VertexData) と並びが一致していること
-struct RayVertex
-{
-    float4 position;
-    float2 texcoord;
-    float3 normal;
-    float3 tangent;
-};
-
-// どちらも gTextures[] と同じヒープを指す。メッシュが自分の番号を持っている
-StructuredBuffer<RayVertex> gRayVertices[] : register(t0, space4);
-Buffer<uint> gRayIndices[] : register(t0, space5);
+// 当たった物の見た目と形 (gRayInstances / gRayVertices / gRayIndices)
+#include "RayInstance.hlsli"
 
 struct ReflectionHit
 {
@@ -55,55 +24,34 @@ struct ReflectionHit
     float3 color;
     float3 emissive;
     uint textureIndex;
+    uint emissiveTextureIndex;
     float3 position; // 当たった点
     float3 toOrigin; // 当たった点からレイの出どころへ向かう向き
     bool hasUV;
     float2 uv;
     bool hasNormal;
     float3 normal; // レイの来た側を向くように揃えてある
+    float hitDistance; // 当たった距離
+    float opacity;  // ガラスなら1未満
 };
 
-/// <summary>反射方向へレイを飛ばし、何に当たったかを返す</summary>
-/// <remarks>Objects 以外では当たったかどうかしか調べない(最初に当たった時点で打ち切れるので軽い)</remarks>
-/// <param name="worldPos">シェーディングしている点のワールド座標</param>
-/// <param name="R">反射方向(正規化済み)</param>
-/// <param name="N">面の法線</param>
-/// <param name="maxDistance">この距離までの物を見る</param>
-/// <param name="mode">AllLights::reflectionMode</param>
-ReflectionHit TraceReflectionHit(float3 worldPos, float3 R, float3 N, float maxDistance, uint mode)
+/// <summary>InstanceMask で絞ってレイを飛ばし、いちばん手前に当たった物を返す</summary>
+ReflectionHit TraceReflectionMasked(float3 origin, float3 R, float maxDistance, uint mask)
 {
-    ReflectionHit hit;
-    hit.isHit = false;
-    hit.color = float3(0.0f, 0.0f, 0.0f);
-    hit.emissive = float3(0.0f, 0.0f, 0.0f);
-    hit.textureIndex = 0;
-    hit.position = worldPos;
+    ReflectionHit hit = (ReflectionHit) 0;
     hit.toOrigin = -R;
-    hit.hasUV = false;
-    hit.uv = float2(0.5f, 0.5f);
-    hit.hasNormal = false;
     hit.normal = -R;
-
-    if (mode == kReflectionModeOff || maxDistance <= 0.0f)
-    {
-        return hit;
-    }
-
-    if (mode != kReflectionModeObjects)
-    {
-        hit.isHit = TraceShadowRay(worldPos, R, N, maxDistance) == 0.0f;
-        return hit;
-    }
+    hit.opacity = 1.0f;
 
     RayDesc ray;
-    ray.Origin = worldPos + N * kShadowRayBias;
+    ray.Origin = origin;
     ray.Direction = R;
     ray.TMin = 0.0f;
     ray.TMax = maxDistance;
 
     // 映すのはいちばん手前の物なので、最初の1つで打ち切れない
     RayQuery < RAY_FLAG_FORCE_OPAQUE > q;
-    q.TraceRayInline(gSceneTLAS, RAY_FLAG_NONE, 0xFF, ray);
+    q.TraceRayInline(gSceneTLAS, RAY_FLAG_NONE, mask, ray);
     q.Proceed();
 
     if (q.CommittedStatus() != COMMITTED_TRIANGLE_HIT)
@@ -116,7 +64,10 @@ ReflectionHit TraceReflectionHit(float3 worldPos, float3 R, float3 N, float maxD
     hit.color = instance.color;
     hit.emissive = instance.emissive;
     hit.textureIndex = instance.textureIndex;
+    hit.emissiveTextureIndex = instance.emissiveTextureIndex;
     hit.position = ray.Origin + R * q.CommittedRayT();
+    hit.hitDistance = q.CommittedRayT();
+    hit.opacity = saturate(instance.opacity);
 
     if ((instance.flags & kRayInstanceHasGeometry) != 0)
     {
@@ -153,13 +104,59 @@ ReflectionHit TraceReflectionHit(float3 worldPos, float3 R, float3 N, float maxD
     return hit;
 }
 
+/// <summary>反射方向へレイを飛ばし、何に当たったかを返す</summary>
+/// <remarks>Objects 以外では当たったかどうかだけ調べる</remarks>
+/// <param name="worldPos">シェーディングしている点のワールド座標</param>
+/// <param name="R">反射方向(正規化済み)</param>
+/// <param name="N">面の法線</param>
+/// <param name="maxDistance">この距離までの物を見る</param>
+/// <param name="mode">AllLights::reflectionMode</param>
+ReflectionHit TraceReflectionHit(float3 worldPos, float3 R, float3 N, float maxDistance, uint mode)
+{
+    ReflectionHit hit;
+    hit.isHit = false;
+    hit.color = float3(0.0f, 0.0f, 0.0f);
+    hit.emissive = float3(0.0f, 0.0f, 0.0f);
+    hit.textureIndex = 0;
+    hit.emissiveTextureIndex = 0;
+    hit.position = worldPos;
+    hit.toOrigin = -R;
+    hit.hasUV = false;
+    hit.uv = float2(0.5f, 0.5f);
+    hit.hasNormal = false;
+    hit.normal = -R;
+    hit.hitDistance = 0.0f;
+    hit.opacity = 1.0f;
+
+    if (mode == kReflectionModeOff || maxDistance <= 0.0f)
+    {
+        return hit;
+    }
+
+    if (mode != kReflectionModeObjects)
+    {
+        hit.isHit = TraceShadowRay(worldPos, R, N, maxDistance) == 0.0f;
+        return hit;
+    }
+
+    // 不透明な物だけ
+    return TraceReflectionMasked(worldPos + N * kShadowRayBias, R, maxDistance, kRayMaskOpaque);
+}
+
+/// <summary>反射方向にあるいちばん手前のガラス。不透明な物より奥は見ない</summary>
+/// <param name="maxDistance">不透明な物に当たったならその距離</param>
+ReflectionHit TraceReflectionGlass(float3 worldPos, float3 R, float3 N, float maxDistance)
+{
+    return TraceReflectionMasked(worldPos + N * kShadowRayBias, R, maxDistance, kRayMaskTranslucent);
+}
+
 /// <summary>当たった物の、反射に映す色を返す</summary>
 /// <remarks>当てるのはアンビエントと0番の平行光源だけ。法線の無い物は半分だけ光を向いた面として扱う</remarks>
 /// <param name="textureColor">当たった点のテクスチャの色</param>
 /// <param name="L">平行光源へ向かう単位ベクトル</param>
 /// <param name="sunRadiance">平行光源の色と強さ。無ければ0</param>
 /// <param name="shadowMask">AllLights::rayTracedShadowMask</param>
-float3 ShadeReflectionHit(ReflectionHit hit, float3 textureColor, float3 skyColor, float3 groundColor,
+float3 ShadeReflectionHit(ReflectionHit hit, float3 textureColor, float3 emissiveColor, float3 skyColor, float3 groundColor,
                           float ambientIntensity, float3 L, float3 sunRadiance, uint shadowMask)
 {
     float3 albedo = hit.color * textureColor;
@@ -180,7 +177,7 @@ float3 ShadeReflectionHit(ReflectionHit hit, float3 textureColor, float3 skyColo
         light += sunRadiance * (facing * shadow / kSamplingPI);
     }
 
-    return albedo * light + hit.emissive * textureColor;
+    return albedo * light + hit.emissive * emissiveColor;
 }
 
 #endif // RAYTRACED_REFLECTION_HLSLI

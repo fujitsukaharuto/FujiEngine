@@ -42,8 +42,40 @@ void Graphics::RenderObject::SetModel(const std::string& fileName, bool overWrit
 		newMaterial.SetTextureNamePath((model_->GetModelData().meshes[i].material.textureFilePath));
 		newMaterial.CreateMaterial();
 		newMaterial.SetColor(model_->GetModelData().meshes[i].baseColor);
+		// モデルが持っている法線マップは常に使う
+		if (model_->GetModelData().meshes[i].material.hasNormalMap) {
+			newMaterial.SetNormalMap(model_->GetModelData().meshes[i].material.normalFilePath);
+		}
 		material_.push_back(std::move(newMaterial));
 		nowTextureName_ = model_->GetModelData().meshes[i].material.textureFilePath;
+	}
+}
+
+void RenderObject::ApplyModelMaterials() {
+	if (!model_) {
+		return;
+	}
+	const auto& meshes = model_->GetModelData().meshes;
+	for (size_t i = 0; i < meshes.size() && i < material_.size(); i++) {
+		const MaterialDataPath& source = meshes[i].material;
+		Material& material = material_[i];
+		material.SetColor(source.baseColorFactor);
+		material.SetRoughness(source.roughnessFactor);
+		material.SetMetallic(source.metallicFactor);
+		material.SetAlphaRef(source.alphaCutoff);
+		material.SetTwoSided(source.isTwoSided);
+		// PBR の素材は映り込みが無いと金属が黒くなる
+		material.SetEnvironment(1.0f);
+		if (!source.metallicRoughnessFilePath.empty()) {
+			material.SetMetallicRoughnessMap(source.metallicRoughnessFilePath);
+		}
+		material.SetEmissive(source.emissiveFactor);
+		if (!source.emissiveFilePath.empty()) {
+			material.SetEmissiveMap(source.emissiveFilePath);
+		}
+		if (!source.occlusionFilePath.empty()) {
+			material.SetOcclusionMap(source.occlusionFilePath);
+		}
 	}
 }
 

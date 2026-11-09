@@ -26,7 +26,7 @@ namespace Graphics {
 		void Finalize();
 
 		/// <summary>このフレームの深度と法線を書き出す</summary>
-		/// <remarks>レンダーターゲットとパイプラインを張り替えるので、呼び出し側は本描画の前に戻すこと</remarks>
+		/// <remarks>深度は本描画の深度バッファへ書いて写す。呼び出し側は本描画の前にターゲットとパイプラインを戻すこと</remarks>
 		/// <param name="objects">描くもの。本描画と同じ集合を渡す</param>
 		void Render(const std::vector<RenderObject*>& objects);
 
@@ -78,9 +78,7 @@ namespace Graphics {
 
 		// 用途がこのパスに閉じているので、SwapChainManager のヒープには相乗りせず自前で持つ
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvHeap_;
-		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvHeap_;
 		D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle_[DXC::kFrameCount_]{};
-		D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle_[DXC::kFrameCount_]{};
 
 		uint32_t normalSrvIndex_[DXC::kFrameCount_]{};
 		uint32_t depthSrvIndex_[DXC::kFrameCount_]{};

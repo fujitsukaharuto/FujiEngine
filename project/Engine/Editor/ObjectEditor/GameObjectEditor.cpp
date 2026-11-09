@@ -7,6 +7,8 @@
 #include "Engine/GameObject/PlacedObject.h"
 #include "Engine/GameObject/SpawnPoint.h"
 #include "Engine/GameObject/PlacedLight.h"
+#include "Engine/GameObject/GIVolume.h"
+#include "Engine/GameObject/ReflectionProbe.h"
 #include "Engine/Scene/Level.h"
 #include "Engine/Graphics/Sprite/PlacedSprite.h"
 #include "Engine/Graphics/Texture/TextureManager.h"
@@ -140,6 +142,22 @@ namespace Editor {
 		ImGui::SameLine();
 		if (ImGui::Button("Spot Light")) {
 			added = level.AddLight(true);
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Tube Light")) {
+			added = level.AddShapedLight(true);
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Rect Light")) {
+			added = level.AddShapedLight(false);
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("GI Volume")) {
+			added = level.AddGIVolume();
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Reflection Probe")) {
+			added = level.AddReflectionProbe();
 		}
 
 		const bool canDuplicate = selected && level.Contains(selected);

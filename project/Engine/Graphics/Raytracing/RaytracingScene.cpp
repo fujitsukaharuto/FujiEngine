@@ -31,11 +31,12 @@ namespace {
 	/// <param name="vertexSrvIndex">当たった先の頂点を引くバッファ。スキンメッシュはスキニング後のもの</param>
 	RayInstanceData LookOf(const std::vector<RayInstanceData>& looks, size_t meshIndex, const Mesh& mesh, uint32_t vertexSrvIndex) {
 		RayInstanceData look = looks.empty() ? RayInstanceData{} : looks[(std::min)(meshIndex, looks.size() - 1)];
-		look.flags = 0;
+		// 抜きの印としきい値は呼び出し側が入れる
+		look.flags &= kRayInstanceCutout | (0xFFu << kRayInstanceAlphaRefShift);
 		if (vertexSrvIndex != Mesh::kInvalidSrvIndex && mesh.GetIndexSrvIndex() != Mesh::kInvalidSrvIndex) {
 			look.vertexBuffer = vertexSrvIndex;
 			look.indexBuffer = mesh.GetIndexSrvIndex();
-			look.flags = kRayInstanceHasGeometry | kRayInstanceHasNormal;
+			look.flags |= kRayInstanceHasGeometry | kRayInstanceHasNormal;
 		}
 		return look;
 	}
@@ -242,7 +243,8 @@ void RaytracingScene::ReleaseUnusedSkinnedBlas() {
 	std::erase_if(retiredBlas_, [this](const RetiredBlas& r) { return frameNumber_ - r.retiredFrame > kReleaseDelayFrames; });
 }
 
-void RaytracingScene::AddInstance(const Model* model, const Math::Matrix4x4& world, const std::vector<RayInstanceData>* looks) {
+void RaytracingScene::AddInstance(const Model* model, const Math::Matrix4x4& world, const std::vector<RayInstanceData>* looks, bool isTranslucent,
+	bool hasCutout, bool isStatic) {
 	if (!isAvailable_) { return; }
 
 	const Blas* blas = EnsureBlas(model);
@@ -258,9 +260,13 @@ void RaytracingScene::AddInstance(const Model* model, const Math::Matrix4x4& wor
 		if (meshes[i].GetVertexCount() == 0 || meshes[i].GetIndexCount() == 0) { continue; }
 		instanceData_.push_back(LookOf(*looks, i, meshes[i], meshes[i].GetVertexSrvIndex()));
 	}
-	desc.InstanceMask = 0xFF;
+	desc.InstanceMask = isTranslucent ? kInstanceMaskTranslucent : kInstanceMaskOpaque;
+	if (isStatic) {
+		desc.InstanceMask |= isTranslucent ? kInstanceMaskStaticTranslucent : kInstanceMaskStaticOpaque;
+	}
 	desc.InstanceContributionToHitGroupIndex = 0;
-	desc.Flags = D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
+	// 不透明でないとすると影のレイがアルファを確かめる
+	desc.Flags = (hasCutout && looks) ? D3D12_RAYTRACING_INSTANCE_FLAG_FORCE_NON_OPAQUE : D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
 	desc.AccelerationStructure = blas->address;
 
 	instances_.push_back(desc);
@@ -268,7 +274,7 @@ void RaytracingScene::AddInstance(const Model* model, const Math::Matrix4x4& wor
 
 void RaytracingScene::AddSkinnedInstance(const RenderObject* key, const Model* model,
 	const std::vector<SkinnedMesh>& skinnedMeshes, const Math::Matrix4x4& world,
-	const std::vector<RayInstanceData>* looks) {
+	const std::vector<RayInstanceData>* looks, bool isTranslucent, bool hasCutout) {
 	if (!isAvailable_ || key == nullptr || model == nullptr) { return; }
 
 	const std::vector<Mesh>& meshes = model->GetMeshes();
@@ -372,20 +378,16 @@ void RaytracingScene::AddSkinnedInstance(const RenderObject* key, const Model* m
 	// スキニングと同じQueueに積むので、記録順で「スキニング済みの頂点を読む」ことが保証される
 	ID3D12GraphicsCommandList4* list = dxcommon_->GetDXCommand()->GetASBuildContext()->GetList4();
 	list->BuildRaytracingAccelerationStructure(&buildDesc, 0, nullptr);
-
-	// TLAS構築がこのBLASを読むので、完成を待たせる
-	D3D12_RESOURCE_BARRIER barrier{};
-	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
-	barrier.UAV.pResource = blas.buffer.Get();
-	list->ResourceBarrier(1, &barrier);
+	// TLAS構築の前のバリアは BuildTlas でまとめて1回
+	hasPendingBlasBuild_ = true;
 
 	D3D12_RAYTRACING_INSTANCE_DESC desc{};
 	StoreTransform3x4(world, desc.Transform);
 	desc.InstanceID = static_cast<UINT>(instanceData_.size());
 	instanceData_.insert(instanceData_.end(), geometryLooks.begin(), geometryLooks.end());
-	desc.InstanceMask = 0xFF;
+	desc.InstanceMask = isTranslucent ? kInstanceMaskTranslucent : kInstanceMaskOpaque;
 	desc.InstanceContributionToHitGroupIndex = 0;
-	desc.Flags = D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
+	desc.Flags = (hasCutout && looks) ? D3D12_RAYTRACING_INSTANCE_FLAG_FORCE_NON_OPAQUE : D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
 	desc.AccelerationStructure = blas.address;
 
 	instances_.push_back(desc);
@@ -495,7 +497,16 @@ void RaytracingScene::BuildTlas() {
 	}
 
 	// 描画と同じQueueなので記録順で完成が保証される。別Queueへ移すならフェンスが要る
-	RecordTlasBuild(dxcommon_->GetDXCommand()->GetASBuildContext()->GetList4(), instanceCount, frameIndex);
+	ID3D12GraphicsCommandList4* list = dxcommon_->GetDXCommand()->GetASBuildContext()->GetList4();
+	if (hasPendingBlasBuild_) {
+		// このフレームに積んだ BLAS の構築をまとめて待つ
+		D3D12_RESOURCE_BARRIER barrier{};
+		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
+		barrier.UAV.pResource = nullptr;
+		list->ResourceBarrier(1, &barrier);
+		hasPendingBlasBuild_ = false;
+	}
+	RecordTlasBuild(list, instanceCount, frameIndex);
 }
 
 void RaytracingScene::RecordTlasBuild(ID3D12GraphicsCommandList4* list, uint32_t instanceCount, uint32_t frameIndex) {

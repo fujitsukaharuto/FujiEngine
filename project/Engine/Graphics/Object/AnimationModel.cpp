@@ -89,24 +89,8 @@ SkinCluster AnimationModel::CreateSkinCluster(const Skeleton& skeleton, const Mo
 	}
 
 
-	// InfluenceResource
-	skinCluster.influenceResource = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(VertexInfluence) * modelData.vertices.size());
-	VertexInfluence* mappedInfluence = nullptr;
-	skinCluster.influenceResource->Map(0, nullptr, reinterpret_cast<void**>(&mappedInfluence));
-	std::memset(mappedInfluence, 0, sizeof(VertexInfluence) * modelData.vertices.size());
-	skinCluster.mappedInfluence = { mappedInfluence,modelData.vertices.size() };
-
-	skinCluster.influenceBufferView.BufferLocation = skinCluster.influenceResource->GetGPUVirtualAddress();
-	skinCluster.influenceBufferView.SizeInBytes = UINT(sizeof(VertexInfluence) * modelData.vertices.size());
-	skinCluster.influenceBufferView.StrideInBytes = sizeof(VertexInfluence);
-
-	uint32_t influenceIndex = srv->Allocate();
-	skinCluster.influenceSrvHandle.first = srv->GetCPUDescriptorHandle(influenceIndex);
-	skinCluster.influenceSrvHandle.second = srv->GetGPUDescriptorHandle(influenceIndex);
-	// SRV作成
-	srv->CreateStructuredSRV(influenceIndex, skinCluster.influenceResource.Get(),
-		static_cast<UINT>(modelData.vertices.size()), static_cast<UINT>(sizeof(VertexInfluence)));
-
+	// Influence はここで埋めてから GPU 側のメモリへ写す
+	std::vector<VertexInfluence> influences(modelData.vertices.size());
 
 	skinCluster.inverseBindPoseMatrices.resize(skeleton.joints.size());
 	std::generate(skinCluster.inverseBindPoseMatrices.begin(), skinCluster.inverseBindPoseMatrices.end(), MakeIdentity4x4);
@@ -120,7 +104,7 @@ SkinCluster AnimationModel::CreateSkinCluster(const Skeleton& skeleton, const Mo
 
 		skinCluster.inverseBindPoseMatrices[(*it).second] = jointWeight.second.inverseBindPoseMatrix;
 		for (const auto& vertexWeight : jointWeight.second.vertexWeights) {
-			auto& currentInfluence = skinCluster.mappedInfluence[vertexWeight.vertexIndex];
+			auto& currentInfluence = influences[vertexWeight.vertexIndex];
 			for (uint32_t index = 0; index < kNumMaxInfluence; index++) {
 				if (currentInfluence.weights[index] == 0.0f) {
 					currentInfluence.weights[index] = vertexWeight.weight;
@@ -150,13 +134,27 @@ SkinCluster AnimationModel::CreateSkinCluster(const Skeleton& skeleton, const Mo
 	uint32_t elementCount = static_cast<uint32_t>(skinCluster.meshSections.size());
 	uint32_t bufferSize = elementSize * elementCount;
 
-	skinCluster.meshSectionResource = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), bufferSize);
+	// GPU 側のメモリに置く
+	ID3D12GraphicsCommandList* list = dxcommon_->GetImmediateList();
+	Microsoft::WRL::ComPtr<ID3D12Resource> influenceUpload;
+	Microsoft::WRL::ComPtr<ID3D12Resource> meshSectionUpload;
+	const size_t influenceSize = sizeof(VertexInfluence) * influences.size();
+	skinCluster.influenceResource = DXC::Helper::CreateStaticBuffer(dxcommon_->GetDevice(), list,
+		influences.data(), influenceSize, influenceUpload);
+	skinCluster.meshSectionResource = DXC::Helper::CreateStaticBuffer(dxcommon_->GetDevice(), list,
+		skinCluster.meshSections.data(), bufferSize, meshSectionUpload);
+	dxcommon_->CommandExecution();
 
-	// マップして meshSections のデータをコピー
-	MeshSection* mapped = nullptr;
-	skinCluster.meshSectionResource->Map(0, nullptr, reinterpret_cast<void**>(&mapped));
-	memcpy(mapped, skinCluster.meshSections.data(), bufferSize);
-	skinCluster.meshSectionResource->Unmap(0, nullptr);
+	skinCluster.influenceBufferView.BufferLocation = skinCluster.influenceResource->GetGPUVirtualAddress();
+	skinCluster.influenceBufferView.SizeInBytes = UINT(influenceSize);
+	skinCluster.influenceBufferView.StrideInBytes = sizeof(VertexInfluence);
+
+	uint32_t influenceIndex = srv->Allocate();
+	skinCluster.influenceSrvHandle.first = srv->GetCPUDescriptorHandle(influenceIndex);
+	skinCluster.influenceSrvHandle.second = srv->GetGPUDescriptorHandle(influenceIndex);
+	srv->CreateStructuredSRV(influenceIndex, skinCluster.influenceResource.Get(),
+		static_cast<UINT>(influences.size()), static_cast<UINT>(sizeof(VertexInfluence)));
+
 	uint32_t srvIndex = srv->Allocate();
 
 	skinCluster.meshSectionSrvHandle.first = srv->GetCPUDescriptorHandle(srvIndex);

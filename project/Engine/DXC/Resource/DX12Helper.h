@@ -103,6 +103,19 @@ namespace DXC::Helper {
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateUAVResource(ID3D12Device* device, size_t sizeInBytes);
 
 	/// <summary>
+	/// 中身が変わらないバッファを GPU 側のメモリに作り、data を写すコピーを list に積む
+	/// </summary>
+	/// <remarks>状態は COMMON のまま渡す。読み取りの状態へは暗黙に昇格する</remarks>
+	/// <param name="device">デバイス</param>
+	/// <param name="list">コピーを積むリスト。実行し終えるまで upload を生かしておくこと</param>
+	/// <param name="data">写す中身</param>
+	/// <param name="sizeInBytes">サイズ</param>
+	/// <param name="upload">中継に使った CPU 側のバッファ</param>
+	/// <returns>ID3D12Resource*</returns>
+	Microsoft::WRL::ComPtr<ID3D12Resource> CreateStaticBuffer(ID3D12Device* device, ID3D12GraphicsCommandList* list,
+		const void* data, size_t sizeInBytes, Microsoft::WRL::ComPtr<ID3D12Resource>& upload);
+
+	/// <summary>
 	/// レイトレの加速構造(BLAS/TLAS)を格納するバッファを生成する。
 	/// </summary>
 	/// <remarks>RAYTRACING_ACCELERATION_STRUCTURE 状態で生成し、以後遷移させてはいけない</remarks>

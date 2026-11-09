@@ -9,6 +9,13 @@
 #include "Engine/Graphics/Raytracing/RayTracedAOPass.h"
 #include "Engine/Graphics/Raytracing/RayTracedShadowPass.h"
 #include "Engine/Graphics/IBL/IBLBaker.h"
+#include "Engine/Graphics/Raytracing/DDGIPass.h"
+#include "Engine/Graphics/Raytracing/BakedGIPass.h"
+#include "Engine/Graphics/Raytracing/ReflectionProbePass.h"
+#include "Engine/Graphics/Light/ClusteredLightPass.h"
+#include "Engine/Graphics/Raytracing/ScreenProbeGIPass.h"
+#include "Engine/Graphics/Raytracing/ScreenReflectionPass.h"
+#include "Engine/Graphics/Object/RefractionCapture.h"
 #include "Engine/Graphics/Texture/TextureManager.h"
 #include "Engine/DXC/DXCom.h"
 
@@ -46,20 +53,17 @@ namespace {
 		// 頂点とインデックスは gTextures[] と同じくヒープの先頭を渡し、メッシュごとの番号で引く
 		pPipeManager->SetGraphicsRootDescriptorTable(commandList, RootName::kRayVertices, srvManager->GetGPUDescriptorHandle(0));
 		pPipeManager->SetGraphicsRootDescriptorTable(commandList, RootName::kRayIndices, srvManager->GetGPUDescriptorHandle(0));
+		pPipeManager->SetGraphicsRootDescriptorTable(commandList, RootName::kRayTextures, srvManager->GetGPUDescriptorHandle(0));
 	}
 
 	/// <summary>鏡面の環境光に使うキューブマップをバインドする</summary>
 	/// <remarks>PS が gEnvironment を宣言しているので、無いと未バインドになる</remarks>
 	void BindEnvironment(ID3D12GraphicsCommandList* commandList) {
-		// 再読み込みでも Texture の実体は使い回されるので、名前引きは一度でよい
-		static Texture* environment = nullptr;
-		if (environment == nullptr) {
-			environment = TextureManager::GetInstance()->LoadTexture("skyboxTexture.dds");
-		}
-		if (environment == nullptr) { return; }
+		// 計算する空ならそれを写したキューブマップ
+		const D3D12_GPU_DESCRIPTOR_HANDLE environment = ObjectRenderer::GetInstance()->GetEnvironmentSrvHandle();
+		if (environment.ptr == 0) { return; }
 
-		PipelineManager::GetInstance()->SetGraphicsRootDescriptorTable(
-			commandList, RootName::kEnvironment, environment->gpuHandle);
+		PipelineManager::GetInstance()->SetGraphicsRootDescriptorTable(commandList, RootName::kEnvironment, environment);
 	}
 
 	/// <summary>環境マップから焼いた IBL のテクスチャをバインドする</summary>
@@ -72,6 +76,84 @@ namespace {
 		pPipeManager->SetGraphicsRootDescriptorTable(commandList, RootName::kIrradianceMap, ibl->GetIrradianceSrvHandle());
 		pPipeManager->SetGraphicsRootDescriptorTable(commandList, RootName::kPrefilteredEnv, ibl->GetPrefilteredSrvHandle());
 		pPipeManager->SetGraphicsRootDescriptorTable(commandList, RootName::kBRDFLut, ibl->GetBRDFLutSrvHandle());
+	}
+
+	/// <summary>プローブの間接光をバインドする</summary>
+	/// <remarks>切っていてもバインドが要る</remarks>
+	void BindDDGI(ID3D12GraphicsCommandList* commandList) {
+		auto* ddgi = ObjectRenderer::GetInstance()->GetDDGIPass();
+		if (ddgi == nullptr) { return; }
+
+		PipelineManager* pPipeManager = PipelineManager::GetInstance();
+		pPipeManager->SetGraphicsRootCBV(commandList, RootName::kDDGIVolumes, ddgi->GetVolumesGPUVirtualAddress());
+		pPipeManager->SetGraphicsRootDescriptorTable(commandList, RootName::kDDGIIrradiance, ddgi->GetIrradianceSrvHandle());
+		pPipeManager->SetGraphicsRootDescriptorTable(commandList, RootName::kDDGIDistance, ddgi->GetDistanceSrvHandle());
+		pPipeManager->SetGraphicsRootDescriptorTable(commandList, RootName::kDDGIProbeData, ddgi->GetProbeDataSrvHandle());
+	}
+
+	/// <summary>焼いた間接光をバインドする</summary>
+	/// <remarks>焼いていなくてもバインドが要る</remarks>
+	void BindBakedGI(ID3D12GraphicsCommandList* commandList) {
+		auto* baked = ObjectRenderer::GetInstance()->GetBakedGIPass();
+		if (baked == nullptr) { return; }
+
+		PipelineManager* pPipeManager = PipelineManager::GetInstance();
+		pPipeManager->SetGraphicsRootCBV(commandList, RootName::kBakedGI, baked->GetParamsGPUVirtualAddress());
+		pPipeManager->SetGraphicsRootDescriptorTable(commandList, RootName::kBakedSky, baked->GetSkySrvHandle());
+		pPipeManager->SetGraphicsRootDescriptorTable(commandList, RootName::kBakedSun, baked->GetSunSrvHandle());
+		pPipeManager->SetGraphicsRootDescriptorTable(commandList, RootName::kBakedDistance, baked->GetDistanceSrvHandle());
+		pPipeManager->SetGraphicsRootDescriptorTable(commandList, RootName::kBakedProbeData, baked->GetProbeDataSrvHandle());
+	}
+
+	/// <summary>反射プローブをバインドする</summary>
+	/// <remarks>箱が無くてもバインドが要る</remarks>
+	void BindReflectionProbes(ID3D12GraphicsCommandList* commandList) {
+		auto* probes = ObjectRenderer::GetInstance()->GetReflectionProbePass();
+		if (probes == nullptr) { return; }
+
+		PipelineManager* pPipeManager = PipelineManager::GetInstance();
+		pPipeManager->SetGraphicsRootCBV(commandList, RootName::kReflectionProbeParams, probes->GetParamsGPUVirtualAddress());
+		pPipeManager->SetGraphicsRootDescriptorTable(commandList, RootName::kReflectionProbes, probes->GetProbesSrvHandle());
+	}
+
+	/// <summary>影なしのライトをバインドする</summary>
+	/// <remarks>ライトが無くてもバインドが要る</remarks>
+	void BindClusteredLights(ID3D12GraphicsCommandList* commandList) {
+		auto* clustered = ObjectRenderer::GetInstance()->GetClusteredLightPass();
+		if (clustered == nullptr) { return; }
+
+		PipelineManager* pPipeManager = PipelineManager::GetInstance();
+		pPipeManager->SetGraphicsRootCBV(commandList, RootName::kClusterParams, clustered->GetParamsGPUVirtualAddress());
+		pPipeManager->SetGraphicsRootDescriptorTable(commandList, RootName::kClusteredLights, clustered->GetLightsSrvHandle());
+		pPipeManager->SetGraphicsRootDescriptorTable(commandList, RootName::kClusterCounts, clustered->GetCountsSrvHandle());
+		pPipeManager->SetGraphicsRootDescriptorTable(commandList, RootName::kClusterIndices, clustered->GetIndicesSrvHandle());
+	}
+
+	/// <summary>画面のプローブの間接光をバインドする</summary>
+	/// <remarks>切っていてもバインドが要る</remarks>
+	void BindScreenProbeGI(ID3D12GraphicsCommandList* commandList) {
+		auto* screenGI = ObjectRenderer::GetInstance()->GetScreenProbeGIPass();
+		if (screenGI == nullptr) { return; }
+
+		PipelineManager::GetInstance()->SetGraphicsRootDescriptorTable(
+			commandList, RootName::kScreenGI, screenGI->GetResultSrvHandle());
+	}
+
+	/// <summary>画面の映り込みをバインドする</summary>
+	/// <remarks>切っていてもバインドが要る</remarks>
+	void BindScreenReflection(ID3D12GraphicsCommandList* commandList) {
+		auto* reflection = ObjectRenderer::GetInstance()->GetScreenReflectionPass();
+		if (reflection == nullptr) { return; }
+
+		PipelineManager::GetInstance()->SetGraphicsRootDescriptorTable(
+			commandList, RootName::kScreenReflection, reflection->GetResultSrvHandle());
+	}
+
+	/// <summary>半透明の屈折に使う画面の写しをバインドする</summary>
+	void BindRefraction(ID3D12GraphicsCommandList* commandList) {
+		if (const RefractionCapture* refraction = ObjectRenderer::GetInstance()->GetRefractionCapture()) {
+			refraction->Bind(commandList);
+		}
 	}
 
 	/// <summary>画面空間で計算済みのAOをバインドする</summary>
@@ -120,6 +202,13 @@ void Model::Draw(ID3D12GraphicsCommandList* commandList, std::vector<Material>& 
 		BindRayInstances(commandList);
 		BindEnvironment(commandList);
 		BindIBL(commandList);
+		BindDDGI(commandList);
+		BindBakedGI(commandList);
+		BindReflectionProbes(commandList);
+		BindClusteredLights(commandList);
+		BindScreenProbeGI(commandList);
+		BindScreenReflection(commandList);
+		BindRefraction(commandList);
 		BindScreenSpaceAO(commandList);
 		BindScreenSpaceShadow(commandList);
 
@@ -145,6 +234,13 @@ void Model::AnimationDraw(ID3D12GraphicsCommandList* commandList, std::vector<Sk
 		BindRayInstances(commandList);
 		BindEnvironment(commandList);
 		BindIBL(commandList);
+		BindDDGI(commandList);
+		BindBakedGI(commandList);
+		BindReflectionProbes(commandList);
+		BindClusteredLights(commandList);
+		BindScreenProbeGI(commandList);
+		BindScreenReflection(commandList);
+		BindRefraction(commandList);
 		BindScreenSpaceAO(commandList);
 		BindScreenSpaceShadow(commandList);
 
@@ -205,7 +301,7 @@ void Model::CreateSkinningInformation(DXCom* pDxcom) {
 	}
 }
 
-void Model::CSDispatch(DXCom* pDxcom, const SkinCluster& skinCluster, ID3D12GraphicsCommandList* commandList, std::vector<SkinnedMesh>& skinnedMeshes, uint32_t frameIndex) {
+void Model::CSDispatch([[maybe_unused]] DXCom* pDxcom, const SkinCluster& skinCluster, ID3D12GraphicsCommandList* commandList, std::vector<SkinnedMesh>& skinnedMeshes, uint32_t frameIndex) {
 	PipelineManager::GetInstance()->SetCSPipeline(Pipe::SkinningCS);
 	commandList->SetComputeRootDescriptorTable(0, skinCluster.paletteSrvHandle[frameIndex].second);        // t0
 	commandList->SetComputeRootDescriptorTable(2, skinCluster.influenceSrvHandle.second);      // t1, t2

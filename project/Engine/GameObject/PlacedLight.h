@@ -1,6 +1,7 @@
 #pragma once
 #include <json_fwd.hpp>
 #include "Engine/GameObject/GameObject.h"
+#include "Engine/GameObject/EmissiveFlicker.h"
 
 namespace Graphics {
 	class LightManager;
@@ -11,13 +12,15 @@ namespace GameObject {
 	/// <summary>
 	/// 配置データに置く点光源・スポットライト
 	/// </summary>
-	/// <remarks>位置と向きは Transform から取る。LightManager の枠を1つ使う</remarks>
+	/// <remarks>位置と向きは Transform から取る。影なしにすると数の多い枠を使う</remarks>
 	class PlacedLight : public GameObject {
 	public:
 
 		enum class Type {
 			Point,
 			Spot,
+			Tube,	// 棒。右(+X)へ伸びる。影なし
+			Rect,	// 長方形。前(+Z)を照らす。影なし
 		};
 
 		/// <summary>配置データ1件から生成する</summary>
@@ -40,7 +43,10 @@ namespace GameObject {
 
 		/// <summary>LightManager に枠を1つ取る</summary>
 		void Register(Graphics::LightManager* lightManager);
+		/// <summary>枠を手放す。影ありの枠は消灯だけする</summary>
+		void Unregister();
 		void Apply(float intensity);
+		bool IsShaped() const { return type_ == Type::Tube || type_ == Type::Rect; }
 
 	private:
 
@@ -58,6 +64,20 @@ namespace GameObject {
 		float angle_ = 30.0f;
 		/// <summary>スポットライトの端のぼけ。0で硬く、1で中心からなだらか</summary>
 		float softness_ = 0.3f;
+		/// <summary>影を落とすか。落とさないなら数の多い枠を使う</summary>
+		/// <remarks>棒と長方形は常に影なし</remarks>
+		bool castShadow_ = true;
+		/// <summary>棒の長さ / 長方形の幅(m)</summary>
+		float width_ = 2.0f;
+		/// <summary>長方形の高さ(m)</summary>
+		float height_ = 1.0f;
+		/// <summary>長方形を裏からも光らせるか</summary>
+		bool isTwoSided_ = false;
+		/// <summary>明滅。看板と同じ設定にすると一緒に明滅する</summary>
+		EmissiveFlicker flicker_;
+		float time_ = 0.0f;
+		/// <summary>今の slot_ が影なしの枠か</summary>
+		bool isClustered_ = false;
 	};
 
 }

@@ -10,6 +10,8 @@ namespace GameObject {
 	class PlacedObject;
 	class SpawnPoint;
 	class PlacedLight;
+	class GIVolume;
+	class ReflectionProbe;
 }
 namespace Graphics {
 	class PlacedSprite;
@@ -30,6 +32,18 @@ namespace Scene {
 		int skyMode = 0;
 		/// <summary>Atmosphere の空の明るさ</summary>
 		float skyIntensity = 1.0f;
+		/// <summary>Atmosphere の空気遠近の距離の倍率。1 で実際の濃さ、0 で掛けない</summary>
+		float aerialPerspectiveScale = 1.0f;
+		/// <summary>Atmosphere のとき、空から回り込む光の強さ</summary>
+		float skyLightIntensity = 1.0f;
+		/// <summary>Atmosphere の雲の量。0 で無し、1 でほぼ曇り</summary>
+		float cloudCoverage = 0.0f;
+		/// <summary>雲が地面に落とす影の強さ (0〜1)</summary>
+		float cloudShadow = 0.0f;
+		/// <summary>Atmosphere の星の明るさ。0で描かない</summary>
+		float stars = 0.0f;
+		/// <summary>Atmosphere の月 (太陽の反対側) の明るさ。0で描かない</summary>
+		float moon = 0.0f;
 		Math::Vector4 lightColor = { 1.0f,1.0f,1.0f,1.0f };
 		Math::Vector3 lightDirection = { 0.0f,-1.0f,0.0f };
 		float lightIntensity = 1.0f;
@@ -68,6 +82,16 @@ namespace Scene {
 		/// <summary>Graphics::TonemapMode の値</summary>
 		int tonemapMode = 2;
 		float exposure = 2.0f;
+		/// <summary>自動露出。exposure はその上に掛かる補正になる</summary>
+		bool autoExposure = false;
+		/// <summary>自動露出で暗くする限度 (EV)。-1 で半分まで</summary>
+		float autoExposureMinEV = -1.0f;
+		/// <summary>自動露出で明るくする限度 (EV)。3 で8倍まで</summary>
+		float autoExposureMaxEV = 3.0f;
+		/// <summary>画面が明るくなったときに慣れる速さ</summary>
+		float autoExposureSpeedUp = 3.0f;
+		/// <summary>画面が暗くなったときに慣れる速さ</summary>
+		float autoExposureSpeedDown = 1.0f;
 		float saturation = 1.0f;
 		float contrast = 1.0f;
 		/// <summary>輪郭をくっきりさせる強さ。0で掛からない</summary>
@@ -89,6 +113,8 @@ namespace Scene {
 		// 描画の重さに効く設定。Hierarchy > Environment の Quality のボタンでまとめて切り替えられる
 		/// <summary>Graphics::RayTracedAOMode の値。0:Off 1:Inline 2:Screen</summary>
 		int aoMode = 2;
+		/// <summary>影なしのライトの拡散光にも AO を掛ける。接地の影が出る</summary>
+		bool localLightAO = false;
 		/// <summary>Graphics::RayTracedShadowMode の値。0:Hard 1:Soft</summary>
 		int shadowMode = 0;
 		/// <summary>Graphics::AmbientMode の値。0:Hemisphere 1:IBL</summary>
@@ -97,15 +123,45 @@ namespace Scene {
 		float iblAmbientScale = 0.6f;
 		/// <summary>Graphics::LightingMode の値。0:Simple 1:PBR</summary>
 		int lightingMode = 0;
+		/// <summary>鏡面の細部 (多重散乱の補正、映り込みの遮蔽)</summary>
+		bool specularDetail = false;
+		/// <summary>ハイライトのちらつきを粗さで抑える</summary>
+		bool specularAA = false;
+		/// <summary>映り込みを付けていないマテリアルにも付ける</summary>
+		bool reflectAll = false;
+		/// <summary>プローブの間接光</summary>
+		bool gi = false;
+		/// <summary>プローブの間隔(m)</summary>
+		float giProbeSpacing = 3.0f;
+		/// <summary>プローブ1つあたりのレイの本数(32の倍数)</summary>
+		int giRays = 64;
+		/// <summary>画面のプローブの間接光。gi の上に近くの物陰と跳ね返りを足す</summary>
+		bool giScreen = false;
 
 		// 鏡面の映り込み。映り込ませるマテリアル(environment が0より大きい物)にだけ効く
 		/// <summary>Graphics::RayTracedReflectionMode の値</summary>
 		int reflectionMode = 0;
+		/// <summary>Objects のとき、映り込みを別パスで求めて粗さに応じてぼかす</summary>
+		bool reflectionDenoised = false;
+		/// <summary>別パスの映り込みで、2回目の跳ね返りも出す</summary>
+		bool reflectionBounce = false;
+		/// <summary>別パスの映り込みで、画面に写っている所は画面の色を使う (SSR)</summary>
+		bool reflectionSceneColor = false;
 		/// <summary>この距離までの物を見る</summary>
 		float reflectionMaxDistance = 100.0f;
 		float reflectionIntensity = 1.0f;
 		/// <summary>平行光源の影の中で映り込みをどれだけ暗くするか(0〜1)</summary>
 		float reflectionShadow = 0.5f;
+
+		// 濡れた路面
+		/// <summary>全体の濡れ具合(0〜1)。0で掛からない</summary>
+		float wetness = 0.0f;
+		/// <summary>水たまりの多さ(0〜1)。濡れ具合が半分を超えてから溜まる</summary>
+		float puddleAmount = 0.5f;
+		/// <summary>水たまりの大きさ(m)</summary>
+		float puddleScale = 4.0f;
+		/// <summary>雨の強さ(0〜1)。雨粒と波紋が増える</summary>
+		float rain = 0.0f;
 
 		// 被写界深度。ピントの合う距離から離れた物をぼかす
 		/// <summary>ぼけの最大半径(画素)。0で掛からない</summary>
@@ -116,6 +172,82 @@ namespace Scene {
 		float dofFocusRange = 5.0f;
 		/// <summary>そこからこの距離をかけて最大のぼけに達する</summary>
 		float dofFalloff = 20.0f;
+
+		// レンズと色味。どれも0で掛からない
+		/// <summary>色収差の強さ</summary>
+		float chromaticAberration = 0.0f;
+		/// <summary>太陽のレンズフレアの強さ</summary>
+		float lensFlare = 0.0f;
+		/// <summary>モーションブラーのシャッターの開いている割合</summary>
+		float motionBlur = 0.0f;
+		/// <summary>半透明の屈折で、面の奥のこの距離(m)の物をずらして見せる。0で掛からない</summary>
+		float refraction = 0.0f;
+		/// <summary>光の筋 (ボリュメトリックライト) の 1m あたりの散乱。0で掛からない</summary>
+		float volumetricDensity = 0.0f;
+		/// <summary>散乱の向きの偏り。1に近いほど太陽の側だけ明るい</summary>
+		float volumetricAnisotropy = 0.6f;
+		/// <summary>カメラからこの距離までの空気を光らせる</summary>
+		float volumetricDistance = 50.0f;
+		/// <summary>散った光の倍率。霞を濃くせず筋だけ明るくする</summary>
+		float volumetricIntensity = 1.0f;
+		/// <summary>太陽の光の筋の倍率。0で影のレイも飛ばさない</summary>
+		float volumetricSun = 1.0f;
+		/// <summary>影なしの配置ライトが霧でにじむ倍率</summary>
+		float volumetricLocalLights = 0.0f;
+		/// <summary>色温度。正で暖色(夕方)、負で寒色</summary>
+		float whiteBalanceTemperature = 0.0f;
+		/// <summary>正でマゼンタ、負で緑へ寄せる</summary>
+		float whiteBalanceTint = 0.0f;
+		/// <summary>暗い所ほど青く見せる (プルキンエ現象) 強さ</summary>
+		float purkinje = 0.0f;
+		/// <summary>この明るさ (露出後) より暗い所から青く寄せる</summary>
+		float purkinjeLuminance = 0.05f;
+		/// <summary>局所トーンマップの強さ (0〜1)。暗部と明部を中間へ寄せる</summary>
+		float localTonemap = 0.0f;
+		/// <summary>局所トーンマップで残す細部の明暗。1でそのまま</summary>
+		float localTonemapDetail = 1.0f;
+		/// <summary>フィルムの粒子の強さ。0で掛からない</summary>
+		float filmGrain = 0.0f;
+		/// <summary>黒を浮かせて褪せたフィルムのようにする強さ</summary>
+		float fade = 0.0f;
+	};
+
+	/// <summary>時刻のキー。時刻で変える Environment の項目の値を持つ</summary>
+	struct TimeOfDayKey {
+		float hour = 12.0f;
+		/// <summary>並びは Level.cpp の kTimeOfDayParams</summary>
+		std::vector<float> values;
+	};
+
+	/// <summary>
+	/// 一日の時刻で環境を変える。太陽の向きは時刻から決める
+	/// </summary>
+	/// <remarks>配置データの environment の "timeOfDay"</remarks>
+	struct TimeOfDay {
+		bool enabled = false;
+		/// <summary>今の時刻 (0〜24)</summary>
+		float hour = 12.0f;
+		/// <summary>1秒で進む時間 (時)。0で止まる</summary>
+		float hoursPerSecond = 0.0f;
+		/// <summary>平行光源の向きを時刻から決める。夜は月の側から照らす</summary>
+		bool sunFromTime = true;
+		/// <summary>日の昇る方角 (度)。0 で +X、90 で +Z から昇る</summary>
+		float sunAzimuth = 0.0f;
+		/// <summary>正午の太陽の高さ (度)</summary>
+		float sunMaxElevation = 60.0f;
+		/// <summary>月の光の強さ。平行光源の強さに掛ける</summary>
+		float moonIntensity = 0.15f;
+		/// <summary>月の光の色。平行光源の色に掛ける</summary>
+		Math::Vector3 moonColor = { 0.55f,0.65f,1.0f };
+		/// <summary>夜の空・アンビエント・フォグの色の明るさ (昼が1)</summary>
+		float nightBrightness = 0.08f;
+		/// <summary>夜に自動露出が明るくする限度 (EV)</summary>
+		float nightMaxEV = 1.0f;
+		/// <summary>夜のプルキンエの強さ。Environment の値の方が大きければそちら</summary>
+		float nightPurkinje = 0.6f;
+		/// <summary>時刻で変える項目の名前 (kTimeOfDayParams の name)</summary>
+		std::vector<std::string> params;
+		std::vector<TimeOfDayKey> keys;
 	};
 
 	/// <summary>
@@ -166,6 +298,16 @@ namespace Scene {
 		//* ライト
 		/// <summary>点光源かスポットライトを1つ追加する</summary>
 		GameObject::PlacedLight* AddLight(bool isSpot);
+		/// <summary>形のある影なしの光源 (棒か長方形) を1つ追加する</summary>
+		GameObject::PlacedLight* AddShapedLight(bool isTube);
+
+		//========================================================================*/
+		//* 間接光を焼く箱
+		GameObject::GIVolume* AddGIVolume();
+
+		//========================================================================*/
+		//* 反射プローブの箱
+		GameObject::ReflectionProbe* AddReflectionProbe();
 
 		//========================================================================*/
 		//* スプライト
@@ -183,6 +325,9 @@ namespace Scene {
 		//========================================================================*/
 		//* 環境
 		const Environment& GetEnvironment() const { return environment_; }
+		const TimeOfDay& GetTimeOfDay() const { return timeOfDay_; }
+		/// <summary>時刻を変えて、その時刻の環境を当てる</summary>
+		void SetHour(float hour);
 		/// <summary>Inspector に出す環境の編集欄。触った値はその場で反映する</summary>
 		void EnvironmentGUI();
 
@@ -196,17 +341,62 @@ namespace Scene {
 		/// <summary>environment_ のカメラの初期位置をカメラへ入れる</summary>
 		/// <remarks>空やライトの編集でカメラを巻き戻さないよう、ApplyEnvironment と分けてある</remarks>
 		void ApplyCamera();
+		/// <summary>今の時刻のキーの値と太陽の向きを environment_ へ書く。ApplyEnvironment の前に呼ぶ</summary>
+		void ApplyTimeOfDay();
+		/// <summary>時刻を進める。進んだら環境を当て直す</summary>
+		void UpdateTimeOfDay();
+		/// <summary>Environment の編集欄のうち、焼いた間接光の欄</summary>
+		/// <returns>環境を当て直す必要がある</returns>
+		bool BakedGIGUI();
+		/// <summary>置いた箱で間接光を焼き始める</summary>
+		void StartBakeGI();
+		/// <summary>焼いた値を置く場所 (resource/GI/シーン名)</summary>
+		std::string GetBakedGIDirectory() const;
+		/// <summary>置いた反射プローブの箱を描画へ渡す</summary>
+		void ApplyReflectionProbes() const;
+		/// <summary>Environment の編集欄のうち、反射プローブの欄</summary>
+		void ReflectionProbeGUI();
+
+		/// <summary>Environment の編集欄のうち、時刻の欄</summary>
+		/// <returns>時刻かキーが変わり、環境を当て直す必要がある</returns>
+		bool TimeOfDayGUI();
 
 	private:
 
 		std::string name_;
 		Environment environment_;
+		TimeOfDay timeOfDay_;
+		/// <summary>時刻から太陽を決めるとき、ApplyEnvironment が environment_ の値に掛けるもの</summary>
+		/// <remarks>environment_ を書き換えると掛けるたびに値が小さくなっていくので別に持つ</remarks>
+		struct TimeOfDayLighting {
+			/// <summary>平行光源の強さの倍率。太陽と月が入れ替わる前後は0</summary>
+			float lightScale = 1.0f;
+			/// <summary>平行光源の色の倍率。夜は月の色</summary>
+			Math::Vector3 lightTint = { 1.0f,1.0f,1.0f };
+			/// <summary>テクスチャの空・半球アンビエント・フォグの色の倍率</summary>
+			float skyScale = 1.0f;
+			/// <summary>空を計算するときの夜の明るさの下限</summary>
+			Math::Vector3 nightAmbient = { 0.0f,0.0f,0.0f };
+			/// <summary>夜の度合い。0 で昼、1 で薄明の終わった夜</summary>
+			float night = 0.0f;
+			/// <summary>空に渡す本当の太陽。夜は地平線の下にある</summary>
+			bool hasSkySun = false;
+			Math::Vector3 toSun = { 0.0f,1.0f,0.0f };
+		};
+		TimeOfDayLighting timeLighting_;
+		// 時刻の欄の編集の状態。保存しない
+		int selectedKey_ = -1;
+		int draggingKey_ = -1;
+		int curveParam_ = 0;
+		bool isTimePaused_ = false;
 		/// <summary>一度作ったら Level が消えるまで持つ。描画中のバッファを途中で捨てないため</summary>
 		std::unique_ptr<Graphics::SkyBox> skyBox_;
 		Graphics::LightManager* lightManager_ = nullptr;
 		std::vector<std::unique_ptr<GameObject::PlacedObject>> objects_;
 		std::vector<std::unique_ptr<GameObject::SpawnPoint>> spawnPoints_;
 		std::vector<std::unique_ptr<GameObject::PlacedLight>> lights_;
+		std::vector<std::unique_ptr<GameObject::GIVolume>> giVolumes_;
+		std::vector<std::unique_ptr<GameObject::ReflectionProbe>> reflectionProbes_;
 		std::vector<std::unique_ptr<Graphics::PlacedSprite>> sprites_;
 	};
 

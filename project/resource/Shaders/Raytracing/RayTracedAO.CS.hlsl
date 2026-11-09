@@ -1,3 +1,5 @@
+// 抜きのある物の影を抜けた形にする (Common/RayTracedShadow.hlsli)
+#define RAY_CUTOUT_SHADOW
 #include "../Object/Object3d.hlsli"
 #include "../Common/RayTracedAO.hlsli"
 #include "../Common/GBufferUtil.hlsli"

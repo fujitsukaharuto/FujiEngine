@@ -23,9 +23,17 @@ namespace Graphics {
 		/// <remarks>切っている間はディスパッチも走らない。EnsureBaked と同じく描画のリストへ積む</remarks>
 		void RenderPreview(ID3D12GraphicsCommandList* commandList);
 
-		/// <summary>まだ焼いていなければ焼く</summary>
+		/// <summary>焼いていないか焼く元が変わっていれば焼く</summary>
 		/// <remarks>環境マップがまだ読めていないフレームは何もしない。描画のコマンドリストが開いている間に呼ぶこと</remarks>
 		void EnsureBaked(ID3D12GraphicsCommandList* commandList);
+
+		/// <summary>焼く元を渡したキューブマップにする</summary>
+		/// <param name="source">キューブマップの SRV。粗い面用にミップがあること</param>
+		/// <param name="size">ミップ0の1辺</param>
+		/// <param name="version">中身が変わったら増やす</param>
+		void SetSource(D3D12_GPU_DESCRIPTOR_HANDLE source, uint32_t size, uint64_t version);
+		/// <summary>焼く元を既定の環境マップへ戻す</summary>
+		void ResetSource();
 
 		void DebugGUI();
 
@@ -133,6 +141,14 @@ namespace Graphics {
 		float previewExposure_ = 1.0f;
 
 		bool isBaked_ = false;
+		bool isBRDFLutBaked_ = false;
+		// 渡されたキューブマップから焼くか。false なら既定の環境マップ
+		bool hasCustomSource_ = false;
+		D3D12_GPU_DESCRIPTOR_HANDLE customSource_{};
+		uint32_t customSourceSize_ = 0;
+		uint64_t customSourceVersion_ = 0;
+		// 焼いたときの元。テクスチャなら 0、キューブマップなら版
+		uint64_t bakedSourceKey_ = 0;
 		// 焼いたときの元テクスチャの1辺。ImGui で焼けているか確認する用
 		uint32_t bakedSourceSize_ = 0;
 	};

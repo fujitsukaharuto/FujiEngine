@@ -44,7 +44,8 @@ float3 F_Schlick(float3 f0, float VdotH)
 /// <param name="diffuseColor">拡散反射色。金属分を落としたアルベド</param>
 /// <param name="f0">垂直入射時の鏡面反射率</param>
 /// <param name="roughness">粗さ</param>
-float3 BRDF(float3 N, float3 V, float3 L, float3 diffuseColor, float3 f0, float roughness)
+/// <param name="energyCompensation">鏡面に掛ける多重散乱の倍率 (1 で掛けない)</param>
+float3 BRDF(float3 N, float3 V, float3 L, float3 diffuseColor, float3 f0, float roughness, float3 energyCompensation)
 {
     float NdotL = dot(N, L);
     if (NdotL <= 0.0f)
@@ -62,13 +63,30 @@ float3 BRDF(float3 N, float3 V, float3 L, float3 diffuseColor, float3 f0, float 
     float G = G_SmithSchlick(NdotV, NdotL, roughness);
     float3 F = F_Schlick(f0, VdotH);
 
-    float3 specular = (D * G * F) / max(4.0f * NdotV * NdotL, 1e-7f);
+    float3 specular = (D * G * F) / max(4.0f * NdotV * NdotL, 1e-7f) * energyCompensation;
 
     // 鏡面へ回った分だけ拡散を減らす(エネルギー保存)。
     // 金属分は diffuseColor 側で既に落としてあるのでここでは掛けない
     float3 kd = 1.0f - F;
 
     return (kd * diffuseColor / kPI + specular) * NdotL;
+}
+
+/// <summary>画素の中の法線のばらつきぶん粗さを上げる (Tokuyoshi & Kaplanyan 2019)</summary>
+/// <param name="normal">法線マップを当てた後の法線</param>
+/// <param name="roughness">見た目の粗さ (2乗が GGX の a)</param>
+float SpecularAntiAliasing(float3 normal, float roughness)
+{
+    // 画素の幅のフィルタの分散と、広げる量の上限
+    const float kVariance = 0.15f;
+    const float kThreshold = 0.2f;
+    float3 du = ddx(normal);
+    float3 dv = ddy(normal);
+    float variance = kVariance * (dot(du, du) + dot(dv, dv));
+    float kernelRoughness2 = min(2.0f * variance, kThreshold);
+    float a = roughness * roughness;
+    float filtered = saturate(a * a + kernelRoughness2);
+    return sqrt(sqrt(filtered));
 }
 
 /// <summary>

@@ -14,6 +14,8 @@
 #include "Engine/Math/Matrix/MatrixCalculation.h"
 #include "Engine/Graphics/Pipeline/PipeKind.h"
 #include "Engine/DXC/FrameCount.h"
+#include "Engine/Graphics/PostEffect/AutoExposurePass.h"
+#include "Engine/Graphics/Raytracing/WorkTexture.h"
 
 
 namespace DXC { class DXCom; }
@@ -98,9 +100,19 @@ namespace Graphics {
 		float sharpen = 0.0f;		// 輪郭をくっきりさせる強さ。0で何もしない
 		float vignette = 0.0f;		// 画面の四隅を暗くする強さ。0で何もしない
 		Math::Vector3 shadowTint = { 1.0f,1.0f,1.0f };		// 暗い所に掛ける色。白でそのまま
-		float pad0 = 0.0f;
+		uint32_t autoExposure = 0;	// 0以外なら自動露出の倍率を掛ける
 		Math::Vector3 highlightTint = { 1.0f,1.0f,1.0f };	// 明るい所に掛ける色。白でそのまま
+		float chromaticAberration = 0.0f;	// 色収差の強さ。0で何もしない
+		Math::Vector3 whiteBalance = { 1.0f,1.0f,1.0f };	// 色温度の倍率
 		float pad1 = 0.0f;
+		float purkinje = 0.0f;			// プルキンエ現象の強さ。0で何もしない
+		float purkinjeLuminance = 0.05f;	// この明るさ (露出後) より暗い所から青く寄せる
+		float localTonemap = 0.0f;		// 局所トーンマップの強さ。0で何もしない
+		float localTonemapDetail = 1.0f;	// 局所トーンマップで残す細部の濃さ。1でそのまま
+		float filmGrain = 0.0f;		// フィルムの粒子の強さ。0で何もしない
+		float fade = 0.0f;			// 褪せたフィルムのようにする強さ。0で何もしない
+		float grainSeed = 0.0f;		// 粒子の模様をフレームごとに変える種
+		float filmPad = 0.0f;
 	};
 
 	/// <summary>
@@ -113,6 +125,40 @@ namespace Graphics {
 		float rayLength = 0.6f;					// 太陽までの道のりのうち、どこまで辿るか
 		Math::Vector3 color = { 1.0f,1.0f,1.0f };
 		float sunSize = 0.4f;					// 光源とみなす範囲の半径。画面の高さが1
+	};
+
+	/// <summary>
+	/// レンズフレアの定数
+	/// </summary>
+	/// <remarks>LensFlare.CS.hlsl の LensFlareParams と並びが一致していること</remarks>
+	struct LensFlareParams {
+		Math::Vector2 sunUV = { 0.5f,0.5f };	// 太陽の画面上の位置
+		float intensity = 0.0f;					// 0以下なら何もしない
+		float pad = 0.0f;
+		Math::Vector3 color = { 1.0f,1.0f,1.0f };
+		float pad2 = 0.0f;
+	};
+
+	/// <summary>
+	/// 光の筋を画面へ足すときの定数
+	/// </summary>
+	/// <remarks>VolumetricLightComposite.CS.hlsl の VolumetricCompositeParams と並びが一致していること</remarks>
+	struct VolumetricCompositeParams {
+		Math::Vector2 depthToView = { 0.0f,1.0f };	// 深度 d からビューの奥行きへ: y / (d - x)
+		uint32_t lowSize[2] = {};					// 光の筋の解像度
+		uint32_t enabled = 0;						// 0 なら素通し
+		float pad[3] = {};
+	};
+
+	/// <summary>
+	/// モーションブラーの定数
+	/// </summary>
+	/// <remarks>MotionBlur.CS.hlsl の MotionBlurParams と並びが一致していること</remarks>
+	struct MotionBlurParams {
+		Math::Matrix4x4 currentToPrevious;	// 今のクリップ座標から前のフレームのクリップ座標へ
+		float strength = 0.0f;				// シャッターの開いている割合。0以下なら何もしない
+		float maxBlur = 32.0f;				// ぼかす幅の上限(画素)
+		Math::Vector2 pad = { 0.0f,0.0f };
 	};
 
 	/// <summary>
@@ -139,6 +185,12 @@ namespace Graphics {
 		float bloomScatter = 0.7f;		// 光の広がり
 		TonemapMode tonemapMode = TonemapMode::ACES;
 		float exposure = 2.0f;
+		// 自動露出 (UE の Eye Adaptation)
+		bool autoExposure = false;
+		float autoExposureMinEV = -1.0f;	// 倍率の下限 (EV)
+		float autoExposureMaxEV = 3.0f;		// 倍率の上限 (EV)
+		float autoExposureSpeedUp = 3.0f;	// 明るくなったときに慣れる速さ
+		float autoExposureSpeedDown = 1.0f;	// 暗くなったときに慣れる速さ
 		float saturation = 1.0f;
 		float contrast = 1.0f;
 		float sharpen = 0.0f;			// 輪郭をくっきりさせる強さ
@@ -152,6 +204,18 @@ namespace Graphics {
 		float dofFocusDistance = 10.0f;	// ピントの合う距離
 		float dofFocusRange = 5.0f;		// ピントの前後、この幅まではぼかさない
 		float dofFalloff = 20.0f;		// そこからこの距離をかけて最大のぼけに達する
+		float chromaticAberration = 0.0f;	// 色収差の強さ。0で掛からない
+		float whiteBalanceTemperature = 0.0f;	// 色温度。正で暖色、負で寒色
+		float whiteBalanceTint = 0.0f;			// 正でマゼンタ、負で緑
+		float lensFlare = 0.0f;			// 太陽のレンズフレアの強さ。0で掛からない
+		float motionBlur = 0.0f;		// モーションブラーのシャッターの開いている割合
+		bool volumetricLight = false;	// 光の筋を足す。設定はパスの側が持つ
+		float purkinje = 0.0f;			// プルキンエ現象の強さ。0で掛からない
+		float purkinjeLuminance = 0.05f;	// この明るさより暗い所から寄り始める
+		float localTonemap = 0.0f;		// 局所トーンマップの強さ。0で掛からない
+		float localTonemapDetail = 1.0f;	// 細部のコントラストに掛ける倍率
+		float filmGrain = 0.0f;			// フィルムの粒子の強さ。0で掛からない
+		float fade = 0.0f;				// 褪せたフィルムのようにする強さ。0で掛からない
 	};
 
 	enum class PostEffectList : int {
@@ -168,6 +232,9 @@ namespace Graphics {
 		Random,
 		GodRay,
 		DepthOfField,
+		MotionBlur,
+		LensFlare,
+		VolumetricLight,
 	};
 
 	/// <summary>
@@ -185,6 +252,7 @@ namespace Graphics {
 
 namespace Graphics {
 	class BloomPass;
+	class BufferVisualizer;
 
 	/// <summary>
 	/// オフスクリーン管理クラス
@@ -269,9 +337,14 @@ namespace Graphics {
 		/// </summary>
 		void SettingVertex();
 
-		/// <summary>今のカメラと平行光源から、光の筋の太陽の位置と強さを決める</summary>
+		/// <summary>光の筋とレンズフレアの太陽の位置と強さを決める</summary>
 		/// <remarks>太陽が背後へ回ると強さが0になり、シェーダは素通しになる</remarks>
-		void UpdateGodRay();
+		void UpdateSunEffects();
+		/// <summary>モーションブラーの写し直しの行列を決める</summary>
+		void UpdateMotionBlur();
+		/// <summary>深度を読む効果を決まった順の位置へ出し入れする</summary>
+		/// <remarks>どれもブルームより前</remarks>
+		void SetSceneEffect(PostEffectList effect, bool enabled);
 
 		/// <summary>描き終えたゲーム画面を、CPU から読めるバッファへ写す</summary>
 		/// <param name="isOnPanel">false ならパネル用のテクスチャに絵が無いので、撮るためにもう一度描く</param>
@@ -305,6 +378,9 @@ namespace Graphics {
 
 		/// <summary>トーンマップして画面へ出す。パネルに映すときはパネル用のテクスチャへ描く</summary>
 		void DrawToScreen(D3D12_GPU_DESCRIPTOR_HANDLE input);
+		/// <summary>局所トーンマップが引く、まわりの明るさの地図を作る</summary>
+		/// <param name="input">トーンマップ前の画面。CS から読める状態であること</param>
+		void RenderLocalTonemap(D3D12_GPU_DESCRIPTOR_HANDLE input);
 
 		/// <summary>
 		/// データを現在のフレームのリソースにコピー
@@ -368,10 +444,16 @@ namespace Graphics {
 		Microsoft::WRL::ComPtr<ID3D12Resource> vignetteResource_[DXC::kFrameCount_];
 		VignetteData* vignetteDataGPU_[DXC::kFrameCount_];
 		VignetteData vignetteData_;
+		// フィルムの粒子の模様を変えるフレームの数
+		uint32_t grainFrame_ = 0;
 
 		Microsoft::WRL::ComPtr<ID3D12Resource> tonemapResource_[DXC::kFrameCount_];
 		TonemapParams* tonemapDataGPU_[DXC::kFrameCount_];
 		TonemapParams tonemapData_;
+		// 自動露出の設定。パスより先に ApplySettings が来ることがある
+		AutoExposurePass::Settings autoExposureSettings_;
+		// 局所トーンマップの明るさの地図。[0] が 16x16 画素の平均、[1] がそれをならしたもの
+		WorkTexture localTonemapMap_[2];
 
 		Microsoft::WRL::ComPtr<ID3D12Resource> godRayResource_[DXC::kFrameCount_];
 		GodRayParams* godRayDataGPU_[DXC::kFrameCount_];
@@ -383,6 +465,23 @@ namespace Graphics {
 		DepthOfFieldParams* dofDataGPU_[DXC::kFrameCount_];
 		DepthOfFieldParams dofData_;
 
+		Microsoft::WRL::ComPtr<ID3D12Resource> lensFlareResource_[DXC::kFrameCount_];
+		LensFlareParams* lensFlareDataGPU_[DXC::kFrameCount_];
+		LensFlareParams lensFlareData_;
+		// 設定された強さ。lensFlareData_.intensity は毎フレームここから決める
+		float lensFlareIntensity_ = 0.0f;
+
+		Microsoft::WRL::ComPtr<ID3D12Resource> volumetricResource_[DXC::kFrameCount_];
+		VolumetricCompositeParams* volumetricDataGPU_[DXC::kFrameCount_];
+
+		Microsoft::WRL::ComPtr<ID3D12Resource> motionBlurResource_[DXC::kFrameCount_];
+		MotionBlurParams* motionBlurDataGPU_[DXC::kFrameCount_];
+		MotionBlurParams motionBlurData_;
+		// 設定された強さと、前のフレームのカメラ
+		float motionBlurStrength_ = 0.0f;
+		Math::Matrix4x4 previousViewProjection_;
+		bool hasPreviousViewProjection_ = false;
+
 		Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_ = nullptr;
 		D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
 		GrayscaleVertex* vertexData_ = nullptr;
@@ -392,6 +491,9 @@ namespace Graphics {
 
 		// 多段のブルーム。Bloom の番が来たら、1回のディスパッチの代わりにこれを通す
 		std::unique_ptr<BloomPass> bloomPass_;
+		std::unique_ptr<AutoExposurePass> autoExposurePass_;
+		// _DEBUGMODE でだけ作る
+		std::unique_ptr<BufferVisualizer> bufferVisualizer_;
 		// false にすると従来の 5x5 1回のブルームへ戻る(見比べ用)
 		bool useMultiScaleBloom_ = true;
 

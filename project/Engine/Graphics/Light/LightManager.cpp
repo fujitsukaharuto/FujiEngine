@@ -5,10 +5,18 @@
 #include "Engine/DXC/Resource/DX12Helper.h"
 #include "Engine/Graphics/Pipeline/PipelineManager.h"
 #include "Engine/Graphics/Camera/CameraManager.h"
+#include "Engine/Core/Time/FPSKeeper.h"
+#include <algorithm>
 #include <numbers>
 
 using namespace Graphics;
 using namespace DXC;
+
+namespace {
+	Math::Vector3 Mul(const Math::Vector3& a, const Math::Vector3& b) {
+		return { a.x * b.x, a.y * b.y, a.z * b.z };
+	}
+}
 
 void LightManager::Initialize(DXCom* pDxcom) {
 	dxcommon_ = pDxcom;
@@ -47,11 +55,75 @@ void LightManager::Update() {
 	if (Camera* camera = CameraManager::GetInstance()->GetCamera()) {
 		allLightsData_.fog.cameraPosition = camera->GetTranslate();
 	}
-	const DirectionalLight& sun = allLightsData_.directionalLights[0];
-	const float sunPower = (allLightsData_.numDirectionalLights > 0) ? sun.intensity : 0.0f;
-	allLightsData_.fog.sunDirection = sun.direction * -1.0f;
-	allLightsData_.fog.sunColor = { sun.color.x * sunPower, sun.color.y * sunPower, sun.color.z * sunPower };
+	// float の精度が落ちないよう巻き戻す
+	allLightsData_.fog.cloudTime = std::fmod(allLightsData_.fog.cloudTime + Core::FPSKeeper::DeltaTime(), 100000.0f);
+
+	// この番号のフレームの GPU は待ち終わっている
+	SkyAtmosphere::Summary summary;
+	if (skyAtmosphere_ && skyAtmosphere_->ReadSummary(frameIndex, summary)) {
+		atmosphereSummary_ = summary;
+		hasAtmosphereSummary_ = true;
+	}
+	RefreshDerived();
 	CopyData(frameIndex);
+}
+
+void LightManager::RefreshDerived() {
+	if (hasSkySun_) {
+		allLightsData_.fog.sunDirection = skySunDirection_;
+		allLightsData_.fog.sunColor = skySunColor_;
+	} else {
+		const DirectionalLight& sun = allLightsData_.directionalLights[0];
+		const float sunPower = (allLightsData_.numDirectionalLights > 0) ? sun.intensity : 0.0f;
+		allLightsData_.fog.sunDirection = sun.direction * -1.0f;
+		allLightsData_.fog.sunColor = { sun.color.x * sunPower, sun.color.y * sunPower, sun.color.z * sunPower };
+	}
+	if (IsAtmosphereActive() && hasAtmosphereSummary_) {
+		ApplyAtmosphere();
+	} else {
+		allLightsData_.fog.aerialDistanceScale = 0.0f;
+	}
+}
+
+void LightManager::ApplyAtmosphere() {
+	FogData& fog = allLightsData_.fog;
+	const AtmosphereSettings& settings = atmosphereSettings_;
+	const SkyAtmosphere::Summary& sky = atmosphereSummary_;
+	const Math::Vector3 tint = allLightsData_.environmentTint;
+
+	// 空の数表と同じ明るさ
+	const Math::Vector3 sunIlluminance = fog.sunColor * fog.skyIntensity;
+	const Math::Vector3 sunAtCamera = Mul(sunIlluminance, sky.sunTransmittance);
+	fog.sunDiskColor = sunAtCamera;
+
+	// 空気遠近。カメラの高さの空気が一様に続くとみなす
+	const SkyAtmosphere::Medium medium = skyAtmosphere_->GetMedium(fog.cameraPosition.y);
+	const Math::Vector3 tintedSun = Mul(sunAtCamera, tint);
+	fog.aerialRayleigh = Mul(tintedSun, medium.rayleigh);
+	fog.aerialMie = Mul(tintedSun, medium.mie);
+	fog.aerialAmbient = Mul(Mul(Mul(sunIlluminance, tint), sky.multiScattering), medium.rayleigh + medium.mie);
+	fog.aerialExtinction = medium.extinction;
+	fog.aerialMieG = skyAtmosphere_->GetParams().miePhaseG;
+	fog.aerialDistanceScale = settings.aerialPerspectiveScale;
+
+	if (settings.fogColorFromSky) {
+		fog.color = {};
+		for (int i = 0; i < 4; ++i) {
+			const Math::Vector3 color = Mul(sky.horizon[i], tint) * settings.fogSkyColorScale;
+			fog.horizonColor[i] = { color.x, color.y, color.z, 0.0f };
+			fog.color = fog.color + color * 0.25f;
+		}
+	}
+
+	// シェーダが掛ける ambientIntensity を打ち消す。ambientIntensity 自体は書き換えない
+	const float skyLight = settings.skyLightIntensity / (std::max)(allLightsData_.ambientIntensity, 1e-4f);
+	if (allLightsData_.ambientMode == kAmbientModeHemisphere) {
+		allLightsData_.ambientSkyColor = Mul(sky.ambientUp, tint) * skyLight + settings.nightAmbient;
+		allLightsData_.ambientGroundColor = Mul(sky.ambientDown, tint) * skyLight + settings.nightAmbient * 0.5f;
+	} else {
+		// 焼いた IBL も同じ空から作る
+		allLightsData_.iblAmbientScale = skyLight;
+	}
 }
 
 void LightManager::CreateLight() {
@@ -65,6 +137,11 @@ void LightManager::CreateLight() {
 }
 
 void LightManager::ResetLights() {
+	hasSkySun_ = false;
+	// 影なしの枠も全部返す
+	clusteredLights_.clear();
+	isClusteredUsed_.clear();
+	freeClustered_.clear();
 	CreateLight();
 	AddPointLight();
 }
@@ -112,6 +189,50 @@ int LightManager::AddSpotLight(const SpotLightData& data) {
 	return allLightsData_.numSpotLights++;
 }
 
+int LightManager::AddClusteredLight() {
+	int index = -1;
+	if (!freeClustered_.empty()) {
+		index = freeClustered_.back();
+		freeClustered_.pop_back();
+	} else if (clusteredLights_.size() < static_cast<size_t>(kMaxClusteredLights)) {
+		index = static_cast<int>(clusteredLights_.size());
+		clusteredLights_.emplace_back();
+		isClusteredUsed_.push_back(false);
+	} else {
+		return -1;
+	}
+	clusteredLights_[index] = ClusteredLightData{};
+	isClusteredUsed_[index] = true;
+	return index;
+}
+
+void LightManager::RemoveClusteredLight(int index) {
+	if (index < 0 || index >= static_cast<int>(clusteredLights_.size()) || !isClusteredUsed_[index]) {
+		return;
+	}
+	isClusteredUsed_[index] = false;
+	freeClustered_.push_back(index);
+}
+
+ClusteredLightData* LightManager::GetClusteredLight(int index) {
+	if (index < 0 || index >= static_cast<int>(clusteredLights_.size()) || !isClusteredUsed_[index]) {
+		return nullptr;
+	}
+	return &clusteredLights_[index];
+}
+
+uint32_t LightManager::GatherClusteredLights(ClusteredLightData* out, uint32_t capacity) const {
+	uint32_t count = 0;
+	for (size_t i = 0; i < clusteredLights_.size() && count < capacity; ++i) {
+		const ClusteredLightData& light = clusteredLights_[i];
+		if (!isClusteredUsed_[i] || light.range <= 0.0f || (light.color.x <= 0.0f && light.color.y <= 0.0f && light.color.z <= 0.0f)) {
+			continue;
+		}
+		out[count++] = light;
+	}
+	return count;
+}
+
 void LightManager::SetLightCommand(ID3D12GraphicsCommandList* commandList) {
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 	PipelineManager::GetInstance()->SetGraphicsRootCBV(commandList, RootName::kLights, allLightsResource_[frameIndex]->GetGPUVirtualAddress());
@@ -123,12 +244,23 @@ D3D12_GPU_VIRTUAL_ADDRESS LightManager::GetFogGPUVirtualAddress() const {
 
 void LightManager::SetFog(const FogData& fog) {
 	const Math::Vector3 cameraPosition = allLightsData_.fog.cameraPosition;
+	const float cloudTime = allLightsData_.fog.cloudTime;
 	allLightsData_.fog = fog;
 	allLightsData_.fog.cameraPosition = cameraPosition;
+	allLightsData_.fog.cloudTime = cloudTime;
 }
 
 D3D12_GPU_VIRTUAL_ADDRESS LightManager::GetLightsGPUVirtualAddress() const {
 	return allLightsResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress();
+}
+
+void LightManager::SetTranslucentShadowThisFrame(bool enabled) {
+	AllLightsData* data = allLightsDataGPU_[dxcommon_->GetNowFrameCount()];
+	if (enabled) {
+		data->renderFlags |= kRenderFlagTranslucentShadow;
+	} else {
+		data->renderFlags &= ~kRenderFlagTranslucentShadow;
+	}
 }
 
 void LightManager::CopyData(uint32_t frameIndex) {

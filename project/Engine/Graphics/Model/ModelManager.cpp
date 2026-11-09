@@ -9,6 +9,7 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include <assimp/GltfMaterial.h>
 #include "Engine/DXC/Resource/DX12Helper.h"
 #include "Engine/DXC/Resource/SRVManager.h"
 #include "Engine/Graphics/Object/ObjectRenderer.h"
@@ -245,6 +246,45 @@ void ModelManager::LoadModelInternal(const std::string& filename, bool overWrite
 			normalMapPath = "defaultNormal.png";
 		}
 		newModelMesh.material.normalFilePath = normalMapPath;
+		newModelMesh.material.hasNormalMap = normalMapPath != "defaultNormal.png";
+
+		// glTF の PBR の値。ApplyModelMaterials で当てたときだけ使う
+		aiString metallicRoughnessFileName;
+		if (material->GetTexture(AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_METALLICROUGHNESS_TEXTURE, &metallicRoughnessFileName) == AI_SUCCESS ||
+			material->GetTexture(AI_MATKEY_METALLIC_TEXTURE, &metallicRoughnessFileName) == AI_SUCCESS) {
+			newModelMesh.material.metallicRoughnessFilePath = metallicRoughnessFileName.C_Str();
+		}
+		aiColor4D baseColorFactor(1.0f, 1.0f, 1.0f, 1.0f);
+		if (material->Get(AI_MATKEY_BASE_COLOR, baseColorFactor) == AI_SUCCESS) {
+			newModelMesh.material.baseColorFactor = { baseColorFactor.r, baseColorFactor.g, baseColorFactor.b, baseColorFactor.a };
+		}
+		material->Get(AI_MATKEY_METALLIC_FACTOR, newModelMesh.material.metallicFactor);
+		material->Get(AI_MATKEY_ROUGHNESS_FACTOR, newModelMesh.material.roughnessFactor);
+		aiString alphaMode;
+		if (material->Get(AI_MATKEY_GLTF_ALPHAMODE, alphaMode) == AI_SUCCESS && std::string(alphaMode.C_Str()) == "MASK") {
+			newModelMesh.material.alphaCutoff = 0.5f;
+			material->Get(AI_MATKEY_GLTF_ALPHACUTOFF, newModelMesh.material.alphaCutoff);
+		}
+		int twoSided = 0;
+		if (material->Get(AI_MATKEY_TWOSIDED, twoSided) == AI_SUCCESS) {
+			newModelMesh.material.isTwoSided = twoSided != 0;
+		}
+		aiColor3D emissiveColor(0.0f, 0.0f, 0.0f);
+		if (material->Get(AI_MATKEY_COLOR_EMISSIVE, emissiveColor) == AI_SUCCESS) {
+			float strength = 1.0f;
+			material->Get(AI_MATKEY_EMISSIVE_INTENSITY, strength);
+			newModelMesh.material.emissiveFactor = { emissiveColor.r * strength, emissiveColor.g * strength, emissiveColor.b * strength };
+		}
+		aiString emissiveFileName;
+		if (material->GetTexture(aiTextureType_EMISSIVE, 0, &emissiveFileName) == AI_SUCCESS) {
+			newModelMesh.material.emissiveFilePath = emissiveFileName.C_Str();
+		}
+		// glTF の occlusionTexture は assimp では LIGHTMAP で来る
+		aiString occlusionFileName;
+		if (material->GetTexture(aiTextureType_LIGHTMAP, 0, &occlusionFileName) == AI_SUCCESS ||
+			material->GetTexture(aiTextureType_AMBIENT_OCCLUSION, 0, &occlusionFileName) == AI_SUCCESS) {
+			newModelMesh.material.occlusionFilePath = occlusionFileName.C_Str();
+		}
 
 		model->GetModelData().meshes.push_back(newModelMesh);
 

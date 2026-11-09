@@ -30,15 +30,23 @@ namespace Graphics {
 		uint32_t flags = 0;			// RayInstanceFlag
 		Math::Vector2 uvScale = { 1.0f,1.0f };
 		Math::Vector2 uvOffset{};
-		Math::Vector2 pad{};
+		float roughness = 1.0f;		// 映り込みを付けていないマテリアルは1
+		float metallic = 0.0f;
+		uint32_t emissiveTextureIndex = 0;	// 発光に掛けるテクスチャ。無ければ色のテクスチャ
+		float opacity = 1.0f;		// 1未満は半透明
+		uint32_t pad[2] = {};
 	};
-	static_assert(sizeof(RayInstanceData) == 64, "RayInstanceData の大きさが RayTracedReflection.hlsli の RayInstance と一致していない");
+	static_assert(sizeof(RayInstanceData) == 80, "RayInstanceData の大きさが RayTracedReflection.hlsli の RayInstance と一致していない");
 
 	/// <remarks>HLSL 側 (Common/RayTracedReflection.hlsli) の kRayInstance* と同じ値であること</remarks>
 	enum RayInstanceFlag : uint32_t {
 		kRayInstanceHasGeometry = 1u << 0,	// 頂点とインデックスを引ける(UV が分かる)
 		kRayInstanceHasNormal = 1u << 1,	// 頂点の法線が使える
+		kRayInstanceCutout = 1u << 2,		// テクスチャに抜きがある
 	};
+	/// <summary>RayInstanceData::flags の、抜きのしきい値 (8bit) を置く位置</summary>
+	/// <remarks>HLSL 側 (Common/RayInstance.hlsli) の kRayInstanceAlphaRefShift と同じ値であること</remarks>
+	constexpr uint32_t kRayInstanceAlphaRefShift = 8;
 
 	/// <summary>
 	/// レイトレ用の加速構造(BLAS/TLAS)を管理するクラス
@@ -66,7 +74,11 @@ namespace Graphics {
 		/// <param name="model">モデル</param>
 		/// <param name="world">ワールド行列</param>
 		/// <param name="looks">メッシュごとの見た目。モデルのメッシュと同じ並び。nullptr なら見た目を集めない(当たった物の色を映さないフレーム)</param>
-		void AddInstance(const Model* model, const Math::Matrix4x4& world, const std::vector<RayInstanceData>* looks);
+		/// <param name="isTranslucent">半透明か。影のレイには当たらなくなる</param>
+		/// <param name="hasCutout">抜きのあるテクスチャを使うか (looks が要る)</param>
+		/// <param name="isStatic">動かない配置物か</param>
+		void AddInstance(const Model* model, const Math::Matrix4x4& world, const std::vector<RayInstanceData>* looks, bool isTranslucent,
+			bool hasCutout = false, bool isStatic = false);
 
 		/// <summary>スキンメッシュのインスタンスを1つ積む</summary>
 		/// <remarks>頂点が毎フレーム動くのでBLASも毎フレーム作り直す。スキニングより後に呼ぶこと</remarks>
@@ -75,9 +87,11 @@ namespace Graphics {
 		/// <param name="skinnedMeshes">スキニング後のメッシュ</param>
 		/// <param name="world">ワールド行列</param>
 		/// <param name="looks">メッシュごとの見た目。モデルのメッシュと同じ並び。nullptr なら見た目を集めない</param>
+		/// <param name="isTranslucent">半透明か。影のレイには当たらなくなる</param>
+		/// <param name="hasCutout">抜きのあるテクスチャを使うか (looks が要る)</param>
 		void AddSkinnedInstance(const RenderObject* key, const Model* model,
 			const std::vector<SkinnedMesh>& skinnedMeshes, const Math::Matrix4x4& world,
-			const std::vector<RayInstanceData>* looks);
+			const std::vector<RayInstanceData>* looks, bool isTranslucent, bool hasCutout = false);
 
 		/// <summary>積まれたインスタンスからTLASを構築する</summary>
 		void BuildTlas();
@@ -152,6 +166,13 @@ namespace Graphics {
 		/// <summary>スキンメッシュのBLASを、組み直さずに更新で済ませる回数の上限</summary>
 		static constexpr uint32_t kMaxSkinnedRefits = 120;
 
+		/// <summary>InstanceMask。HLSL 側 (RayTracedShadow.hlsli の kRayMask*) と同じ値であること</summary>
+		static constexpr uint8_t kInstanceMaskOpaque = 0x01;
+		static constexpr uint8_t kInstanceMaskTranslucent = 0x02;
+		// 動かない配置物にだけ足す
+		static constexpr uint8_t kInstanceMaskStaticOpaque = 0x04;
+		static constexpr uint8_t kInstanceMaskStaticTranslucent = 0x08;
+
 		/// <summary>来なくなったスキンメッシュのBLASと、待ち終えた古いBLASを捨てる</summary>
 		void ReleaseUnusedSkinnedBlas();
 
@@ -163,6 +184,8 @@ namespace Graphics {
 		std::unordered_map<const RenderObject*, SkinnedBlas> skinnedBlasMap_;
 		std::vector<RetiredBlas> retiredBlas_;
 		uint64_t frameNumber_ = 0;
+		// TLAS を組む前に BLAS の構築を待つ必要があるか
+		bool hasPendingBlasBuild_ = false;
 
 		// 構築を描画と同じQueueに積んでいるので1つで足りる。別Queueへ移すならフレーム数ぶん要る
 		Microsoft::WRL::ComPtr<ID3D12Resource> tlasBuffer_;

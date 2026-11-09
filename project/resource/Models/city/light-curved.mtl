@@ -1,0 +1,8 @@
+# Created by Kenney (www.kenney.nl)
+
+newmtl colormap
+Kd 1 1 1
+map_Kd city/roads_colormap.png
+Ke 1 1 1
+map_Ke city/roads_lamp_emissive.png
+

@@ -1,4 +1,5 @@
 #pragma once
+#include <d3d12.h>
 #include <memory>
 #include <vector>
 
@@ -16,6 +17,16 @@ namespace Graphics {
 	class RayTracedAOPass;
 	class RayTracedShadowPass;
 	class IBLBaker;
+	class SkyAtmosphere;
+	class DDGIPass;
+	class BakedGIPass;
+	class ReflectionProbePass;
+	class RainRenderer;
+	class ClusteredLightPass;
+	class ScreenProbeGIPass;
+	class ScreenReflectionPass;
+	class VolumetricLightPass;
+	class RefractionCapture;
 
 	/// <summary>
 	/// 3Dオブジェクトを集めてまとめて描画するクラス
@@ -64,6 +75,35 @@ namespace Graphics {
 		/// <summary>環境マップから焼いた IBL。前方描画がここのテクスチャを引く</summary>
 		IBLBaker* GetIBLBaker() const { return iblBaker_.get(); }
 
+		/// <summary>太陽から計算する空</summary>
+		SkyAtmosphere* GetSkyAtmosphere() const { return skyAtmosphere_.get(); }
+
+		/// <summary>プローブの間接光</summary>
+		DDGIPass* GetDDGIPass() const { return ddgiPass_.get(); }
+		/// <summary>焼いた間接光</summary>
+		BakedGIPass* GetBakedGIPass() const { return bakedGIPass_.get(); }
+		/// <summary>反射プローブ</summary>
+		ReflectionProbePass* GetReflectionProbePass() const { return reflectionProbePass_.get(); }
+		/// <summary>雨</summary>
+		RainRenderer* GetRainRenderer() const { return rainRenderer_.get(); }
+		/// <summary>影なしのライト</summary>
+		ClusteredLightPass* GetClusteredLightPass() const { return clusteredLightPass_.get(); }
+
+		/// <summary>画面のプローブの間接光</summary>
+		ScreenProbeGIPass* GetScreenProbeGIPass() const { return screenProbeGIPass_.get(); }
+
+		/// <summary>画面の映り込み</summary>
+		ScreenReflectionPass* GetScreenReflectionPass() const { return screenReflectionPass_.get(); }
+
+		/// <summary>光の筋</summary>
+		VolumetricLightPass* GetVolumetricLightPass() const { return volumetricLightPass_.get(); }
+
+		/// <summary>半透明の屈折</summary>
+		RefractionCapture* GetRefractionCapture() const { return refractionCapture_.get(); }
+
+		/// <summary>映り込みに引く空のキューブマップ</summary>
+		D3D12_GPU_DESCRIPTOR_HANDLE GetEnvironmentSrvHandle() const;
+
 	private:
 
 		void PreDraw();
@@ -94,11 +134,23 @@ namespace Graphics {
 		std::unique_ptr<RayTracedAOPass> aoPass_;
 		std::unique_ptr<RayTracedShadowPass> shadowPass_;
 		std::unique_ptr<IBLBaker> iblBaker_;
+		std::unique_ptr<SkyAtmosphere> skyAtmosphere_;
+		std::unique_ptr<DDGIPass> ddgiPass_;
+		std::unique_ptr<BakedGIPass> bakedGIPass_;
+		std::unique_ptr<ReflectionProbePass> reflectionProbePass_;
+		std::unique_ptr<RainRenderer> rainRenderer_;
+		std::unique_ptr<ClusteredLightPass> clusteredLightPass_;
+		std::unique_ptr<ScreenProbeGIPass> screenProbeGIPass_;
+		std::unique_ptr<ScreenReflectionPass> screenReflectionPass_;
+		std::unique_ptr<VolumetricLightPass> volumetricLightPass_;
+		std::unique_ptr<RefractionCapture> refractionCapture_;
 
 		/// <summary>GPU時間の計測区間</summary>
 		enum TimerID {
 			kTimer_Forward = 0,
 			kTimer_AccelBuild, // BLAS / TLAS の構築
+			kTimer_Tlas,       // そのうち TLAS の構築 (BLAS の完成待ちを含む)
+			kTimer_LightCull,  // 影なしのライトのクラスタ振り分け
 			kTimer_Count,
 		};
 		std::unique_ptr<DXC::GPUTimer> gpuTimer_;

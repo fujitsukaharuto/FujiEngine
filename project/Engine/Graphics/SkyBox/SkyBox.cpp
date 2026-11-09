@@ -10,6 +10,7 @@
 #include "Engine/DXC/DXCom.h"
 #include "Engine/Graphics/Camera/CameraManager.h"
 #include "Engine/Graphics/Light/LightManager.h"
+#include "Engine/Graphics/SkyBox/SkyAtmosphere.h"
 #include <algorithm>
 #include <cmath>
 #include <string>
@@ -64,6 +65,9 @@ void SkyBox::Render() {
 	// PS が gFog を無条件に宣言しているので、フォグを切っていてもバインドが要る
 	pPipeManager->SetGraphicsRootCBV(cList, RootName::kFog,
 		ObjectRenderer::GetInstance()->GetLightManager()->GetFogGPUVirtualAddress());
+	// PS が宣言している。テクスチャの空のときは引かれない
+	pPipeManager->SetGraphicsRootDescriptorTable(cList, RootName::kSkyViewLut,
+		ObjectRenderer::GetInstance()->GetSkyAtmosphere()->GetSkyViewSrvHandle());
 
 	cList->DrawIndexedInstanced(static_cast<UINT>((index_.size())), 1, 0, 0, 0);
 }
@@ -113,31 +117,6 @@ Vector3 SkyBox::GetHorizonColor(int side) {
 	};
 	const Vector3& raw = horizonColor_[side];
 	return { shade(raw.x * tint.x), shade(raw.y * tint.y), shade(raw.z * tint.z) };
-}
-
-Vector3 SkyBox::AtmosphereColor(const Vector3& direction, const Vector3& sunDirection, const Vector3& sunColor) {
-	const float kRayleigh[3] = { 0.046f, 0.108f, 0.265f };
-	const float kMie = 0.015f;
-	const float kMieG = 0.6f;
-	const float kScale = 18.0f;
-	const float kPi = 3.14159265f;
-
-	const float mu = direction.x * sunDirection.x + direction.y * sunDirection.y + direction.z * sunDirection.z;
-	const float phaseRayleigh = 3.0f / (16.0f * kPi) * (1.0f + mu * mu);
-	const float phaseMie = (1.0f - kMieG * kMieG) / (4.0f * kPi * std::pow((std::max)(1.0f + kMieG * kMieG - 2.0f * kMieG * mu, 1e-4f), 1.5f));
-	const float airView = 1.0f / ((std::max)(direction.y, 0.0f) + 0.3f);
-	const float airSun = 1.0f / ((std::max)(sunDirection.y, 0.0f) + 0.3f);
-	const float sunFade = std::clamp((sunDirection.y + 0.2f) / 0.2f, 0.0f, 1.0f);
-	const float fade = sunFade * sunFade * (3.0f - 2.0f * sunFade);
-
-	const float sun[3] = { sunColor.x, sunColor.y, sunColor.z };
-	float result[3]{};
-	for (int i = 0; i < 3; ++i) {
-		const float tau = kRayleigh[i] + kMie;
-		const float scatter = (kRayleigh[i] * phaseRayleigh + kMie * phaseMie) / tau;
-		result[i] = sun[i] * scatter * (1.0f - std::exp(-tau * airView)) * std::exp(-tau * airSun) * kScale * fade;
-	}
-	return { result[0], result[1], result[2] };
 }
 
 void SkyBox::MeasureHorizonColor() {

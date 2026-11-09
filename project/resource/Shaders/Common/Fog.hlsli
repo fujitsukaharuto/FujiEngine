@@ -24,8 +24,82 @@ struct FogParams
     float sunScatterPower; // 大きいほど太陽のまわりだけが明るくなる
     uint skyMode;         // Atmosphere.hlsli の kSkyMode*
     float skyIntensity;   // 計算する空の明るさ
-    float2 skyPad;
+    float cloudCoverage;  // 雲の量。0で雲を出さない
+    float cloudTime;      // 雲を流す時刻(秒)
+    // 空気遠近。カメラの高さの空気が一様に続くとみなす。係数は1mあたり
+    float3 aerialRayleigh; // 太陽の光 × 透過率 × レイリー散乱
+    float aerialMieG;      // ミー散乱の前方への偏り
+    float3 aerialMie;      // 同、ミー散乱
+    float aerialDistanceScale; // 0で空気遠近を掛けない
+    float3 aerialAmbient;  // 多重散乱で回り込む光 × 散乱
+    float starIntensity;   // 星の明るさ。0で描かない
+    float3 aerialExtinction; // 散乱＋吸収
+    float cloudShadow;     // 雲が太陽を遮る強さ (0〜1)
+    float3 sunDiskColor;   // 大気を通った太陽の色
+    float moonIntensity;   // 月の明るさ。0で描かない
 };
+
+/// <summary>空気遠近で元の色に掛かる割合と、上に乗る空気の色</summary>
+/// <param name="toPoint">カメラから対象までのベクトル</param>
+/// <returns>空気遠近が掛かるか</returns>
+bool AerialPerspectiveTerms(FogParams fog, float3 toPoint, out float3 transmittance, out float3 inScatter)
+{
+    transmittance = float3(1.0f, 1.0f, 1.0f);
+    inScatter = float3(0.0f, 0.0f, 0.0f);
+    if (fog.aerialDistanceScale <= 0.0f)
+    {
+        return false;
+    }
+
+    float distance = length(toPoint);
+    if (distance < 1e-4f)
+    {
+        return false;
+    }
+    float3 direction = toPoint / distance;
+    distance *= fog.aerialDistanceScale;
+
+    float cosTheta = dot(direction, fog.sunDirection);
+    float phaseRayleigh = 3.0f / (16.0f * 3.14159265359f) * (1.0f + cosTheta * cosTheta);
+    float g = fog.aerialMieG;
+    float g2 = g * g;
+    float phaseMie = 3.0f / (8.0f * 3.14159265359f) * (1.0f - g2) / (2.0f + g2)
+                     * (1.0f + cosTheta * cosTheta) / pow(max(1.0f + g2 - 2.0f * g * cosTheta, 1e-4f), 1.5f);
+
+    float3 extinction = max(fog.aerialExtinction, 1e-9f);
+    transmittance = exp(-extinction * distance);
+    float3 source = fog.aerialRayleigh * phaseRayleigh + fog.aerialMie * phaseMie + fog.aerialAmbient;
+    inScatter = source * (1.0f - transmittance) / extinction;
+    return true;
+}
+
+/// <summary>空気遠近。遠くの物ほど空気の色が乗る</summary>
+/// <remarks>UE の Aerial Perspective にあたる</remarks>
+/// <param name="color">元の色</param>
+/// <param name="toPoint">カメラから対象までのベクトル</param>
+/// <param name="additive">0以外なら加算合成の物。空気の色は乗せない</param>
+float3 ApplyAerialPerspective(FogParams fog, float3 color, float3 toPoint, float additive)
+{
+    float3 transmittance;
+    float3 inScatter;
+    if (!AerialPerspectiveTerms(fog, toPoint, transmittance, inScatter))
+    {
+        return color;
+    }
+    return color * transmittance + ((additive != 0.0f) ? float3(0.0f, 0.0f, 0.0f) : inScatter);
+}
+
+/// <summary>ApplyAerialPerspective を外す</summary>
+float3 RemoveAerialPerspective(FogParams fog, float3 color, float3 toPoint)
+{
+    float3 transmittance;
+    float3 inScatter;
+    if (!AerialPerspectiveTerms(fog, toPoint, transmittance, inScatter))
+    {
+        return color;
+    }
+    return (color - inScatter) / max(transmittance, 1e-3f);
+}
 
 /// <summary>太陽の方向を向いたときにフォグへ足す色</summary>
 /// <param name="direction">視線の向き。正規化していなくてよい</param>

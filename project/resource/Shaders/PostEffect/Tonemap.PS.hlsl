@@ -2,6 +2,10 @@
 // 出力先のRTVが _SRGB なのでガンマは自前で掛けないこと
 
 Texture2D g_InputTexture : register(t0);
+// 自動露出の結果。[0] が倍率 (PostEffect/AutoExposure*.CS.hlsl)
+StructuredBuffer<float> gAutoExposure : register(t1);
+// 局所トーンマップのまわりの明るさ (log2、露出前)。16x16 画素ごとに1つ
+Texture2D<float> gLocalTonemap : register(t2);
 SamplerState g_Sampler : register(s0);
 
 // OffscreenManager.h の TonemapParams と並びが一致していること
@@ -16,7 +20,19 @@ cbuffer TonemapParams : register(b0)
     float sharpen; // 輪郭をくっきりさせる強さ。0で何もしない
     float vignette; // 画面の四隅を暗くする強さ。0で何もしない
     float3 shadowTint; // 暗い所に掛ける色。白でそのまま
+    uint autoExposure; // 0以外なら自動露出の倍率を掛ける
     float3 highlightTint; // 明るい所に掛ける色。白でそのまま
+    float chromaticAberration; // 色収差の強さ。0で何もしない
+    float3 whiteBalance; // 色温度の倍率
+    float tonemapPad;
+    float purkinje; // プルキンエ現象の強さ。0で何もしない
+    float purkinjeLuminance; // この明るさ (露出後) より暗い所から寄せる
+    float localTonemap; // 局所トーンマップの強さ。0で何もしない
+    float localTonemapDetail; // 局所トーンマップで残す細部の濃さ。1でそのまま
+    float filmGrain; // フィルムの粒子の強さ。0で何もしない
+    float fade; // 褪せたフィルムのようにする強さ。0で何もしない
+    float grainSeed; // 粒子の模様をフレームごとに変える種
+    float filmPad;
 };
 
 struct PSInput
@@ -26,6 +42,61 @@ struct PSInput
 };
 
 static const float3 kLumaWeight = float3(0.2126f, 0.7152f, 0.0722f);
+
+// 中間の灰色 (log2(0.18))
+static const float kMiddleGrayLog = -2.47393f;
+
+/// <summary>暗い所ほど色が抜けて青っぽく見せる (プルキンエ現象)</summary>
+/// <param name="luminance">自動露出前の明るさ</param>
+float3 ApplyPurkinje(float3 hdr, float luminance)
+{
+    // 桿体の感度の近似と、そのとき感じる色 (明るさ1に正規化)
+    static const float3 kRodWeight = float3(0.05f, 0.56f, 0.39f);
+    static const float3 kNightColor = float3(0.74f, 1.01f, 1.68f);
+
+    float night = purkinje * (1.0f - smoothstep(0.0f, purkinjeLuminance, luminance));
+    return lerp(hdr, dot(hdr, kRodWeight) * kNightColor, night);
+}
+
+/// <summary>局所トーンマップ。まわりの明るさを中間へ寄せ、細部の明暗はそのまま残す</summary>
+/// <remarks>明るさの近い点だけを混ぜて拾う</remarks>
+float3 ApplyLocalTonemap(float3 hdr, float2 uv, float finalExposure)
+{
+    float luminance = dot(hdr, kLumaWeight);
+    if (luminance <= 0.0f)
+    {
+        return hdr;
+    }
+    float logLuminance = log2(luminance);
+    // 地図は露出前の画面から作っている
+    float logExposure = log2(max(finalExposure, 1e-6f));
+
+    uint2 size;
+    gLocalTonemap.GetDimensions(size.x, size.y);
+    float2 position = uv * float2(size) - 0.5f;
+    int2 base = int2(floor(position));
+    float2 f = position - float2(base);
+
+    float sum = 0.0f;
+    float weightSum = 0.0f;
+    [unroll]
+    for (int i = 0; i < 4; ++i)
+    {
+        int2 offset = int2(i & 1, i >> 1);
+        int2 texel = clamp(base + offset, int2(0, 0), int2(size) - 1);
+        float value = gLocalTonemap.Load(int3(texel, 0)) + logExposure;
+        float bilinear = (offset.x != 0 ? f.x : 1.0f - f.x) * (offset.y != 0 ? f.y : 1.0f - f.y);
+        // 1段 (1EV) 離れると重みが半分
+        float difference = value - logLuminance;
+        float weight = bilinear * (exp2(-difference * difference) + 1e-3f);
+        sum += value * weight;
+        weightSum += weight;
+    }
+    float surroundLog = sum / max(weightSum, 1e-6f);
+
+    float targetLog = lerp(surroundLog, kMiddleGrayLog, localTonemap) + (logLuminance - surroundLog) * localTonemapDetail;
+    return hdr * exp2(targetLog - logLuminance);
+}
 
 // Reinhard。最も単純だがハイライトが平坦になりやすい
 float3 Reinhard(float3 x)
@@ -82,7 +153,33 @@ float3 Shade(float2 uv, float2 texelSize)
     // サンプラがWRAPなので、端の半テクセルが反対側を拾わないよう内側へ寄せる
     uv = clamp(uv, 0.5f * texelSize, 1.0f - 0.5f * texelSize);
 
-    float3 hdr = g_InputTexture.SampleLevel(g_Sampler, uv, 0.0f).rgb * exposure;
+    float finalExposure = (autoExposure != 0) ? exposure * gAutoExposure[0] : exposure;
+    float3 hdr;
+    if (chromaticAberration > 0.0f)
+    {
+        // 色収差。赤は外へ・青は内へ。強さ1で角が約6画素
+        float2 offset = (uv - 0.5f) * (chromaticAberration * 0.01f);
+        hdr.r = g_InputTexture.SampleLevel(g_Sampler, clamp(uv + offset, 0.5f * texelSize, 1.0f - 0.5f * texelSize), 0.0f).r;
+        hdr.g = g_InputTexture.SampleLevel(g_Sampler, uv, 0.0f).g;
+        hdr.b = g_InputTexture.SampleLevel(g_Sampler, clamp(uv - offset, 0.5f * texelSize, 1.0f - 0.5f * texelSize), 0.0f).b;
+    }
+    else
+    {
+        hdr = g_InputTexture.SampleLevel(g_Sampler, uv, 0.0f).rgb;
+    }
+    // 色温度。トーンマップの前に掛ける
+    hdr *= whiteBalance * finalExposure;
+
+    if (purkinje > 0.0f)
+    {
+        // 自動露出の後でも暗い場面は青く寄せる
+        float manualExposureRatio = (finalExposure > 0.0f) ? exposure / finalExposure : 1.0f;
+        hdr = ApplyPurkinje(hdr, dot(hdr, kLumaWeight) * manualExposureRatio);
+    }
+    if (localTonemap > 0.0f)
+    {
+        hdr = ApplyLocalTonemap(hdr, uv, finalExposure);
+    }
 
     float3 mapped;
     switch (tonemapMode)
@@ -204,6 +301,25 @@ float3 ApplyDither(float3 color, float2 pixel)
     return pow(saturate(perceptual), 2.2f);
 }
 
+/// <summary>褪せたフィルム。黒を浮かせ、白を少し抑える</summary>
+float3 ApplyFade(float3 color)
+{
+    float3 perceptual = pow(max(color, 0.0f), 1.0f / 2.2f);
+    perceptual = perceptual * (1.0f - 0.18f * fade) + 0.09f * fade;
+    return pow(perceptual, 2.2f);
+}
+
+/// <summary>フィルムの粒子。中間の明るさで最も目立つ</summary>
+float3 ApplyFilmGrain(float3 color, float2 pixel)
+{
+    float noise = frac(sin(dot(pixel + grainSeed * float2(17.13f, 31.71f), float2(12.9898f, 78.233f))) * 43758.5453f);
+    float3 perceptual = pow(saturate(color), 1.0f / 2.2f);
+    float luma = dot(perceptual, kLumaWeight);
+    float amount = filmGrain * 0.12f * (1.0f - abs(luma * 2.0f - 1.0f) * 0.7f);
+    perceptual += (noise - 0.5f) * amount;
+    return pow(saturate(perceptual), 2.2f);
+}
+
 float4 main(PSInput input) : SV_TARGET
 {
     float2 size;
@@ -225,6 +341,16 @@ float4 main(PSInput input) : SV_TARGET
     if (vignette > 0.0f)
     {
         color = ApplyVignette(color, input.texcoord);
+    }
+
+    if (fade > 0.0f)
+    {
+        color = ApplyFade(color);
+    }
+
+    if (filmGrain > 0.0f)
+    {
+        color = ApplyFilmGrain(color, input.position.xy);
     }
 
     if (enableDither != 0)

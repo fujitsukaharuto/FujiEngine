@@ -25,6 +25,8 @@ namespace Graphics {
 		D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle;  // CPUハンドル
 		D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle;  // GPUハンドル
 		DirectX::TexMetadata meta;
+		/// <summary>アルファが1でない画素がある。抜きのある物の影の判定に使う</summary>
+		bool hasTransparency = false;
 	};
 
 	/// <summary>

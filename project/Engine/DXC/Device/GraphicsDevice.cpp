@@ -11,14 +11,17 @@
 using namespace DXC;
 using namespace Logger;
 
-
+namespace {
+	// GPU ベースの検証。今のシェーダでは画面が真っ黒になり非常に重い。範囲外アクセスを疑うときだけ true にする
+	constexpr bool kEnableGPUBasedValidation = false;
+}
 
 void GraphicsDevice::Initialize() {
 #ifdef _DEBUG
 	debugController_ = nullptr;
 	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController_)))) {
 		debugController_->EnableDebugLayer();
-		debugController_->SetEnableGPUBasedValidation(true);
+		debugController_->SetEnableGPUBasedValidation(kEnableGPUBasedValidation);
 	}
 #endif // _DEBUG
 

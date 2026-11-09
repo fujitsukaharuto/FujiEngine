@@ -3,6 +3,7 @@
 #include <string>
 #include <json_fwd.hpp>
 #include "Engine/GameObject/GameObject.h"
+#include "Engine/GameObject/EmissiveFlicker.h"
 
 namespace Graphics { class LightManager; }
 
@@ -40,6 +41,12 @@ namespace GameObject {
 		void ApplyLook();
 		/// <summary>発光の色で周りを照らす点光源を、今の位置と設定に合わせる</summary>
 		void ApplyEmissiveLight(bool isOn);
+		/// <summary>前へ進め、決めた範囲の端まで来たら反対の端へ戻す</summary>
+		void UpdateDrive();
+		/// <summary>車のライトを今の位置へ</summary>
+		void ApplyCarLights(bool isOn);
+		/// <summary>発光の明るさを明滅の倍率に合わせる</summary>
+		void ApplyFlicker();
 
 	private:
 
@@ -71,8 +78,36 @@ namespace GameObject {
 			float rimPower = 3.0f;
 			bool isMirror = false;
 			std::optional<Graphics::LightMode> light;
+			/// <summary>モデルファイルのマテリアルをそのまま使う。既定はテクスチャと色だけ</summary>
+			bool useModelMaterials = false;
 		};
 		Look look_;
+
+		/// <summary>走らせる設定。前(+Z)へ進む</summary>
+		struct Drive {
+			float speed = 8.0f;
+			/// <summary>進む向きの軸 (x か z) で、この範囲を出たら反対の端へ戻す</summary>
+			float loopMin = -125.0f;
+			float loopMax = 125.0f;
+		};
+		std::optional<Drive> drive_;
+
+		/// <summary>車のライトの設定。位置はモデルの座標。左右は x を反転して置く</summary>
+		struct CarLights {
+			Math::Vector3 front = { 0.5f,0.65f,1.3f };
+			Math::Vector3 rear = { 0.5f,0.65f,-1.35f };
+			float headIntensity = 4.0f;
+			float headRange = 12.0f;
+			float tailIntensity = 0.8f;
+			float tailRange = 3.0f;
+		};
+		std::optional<CarLights> carLights_;
+		// 借りた影なしのライトの番号。-1 は借りていない
+		int carLightSlots_[4] = { -1,-1,-1,-1 };
+
+		EmissiveFlicker flicker_;
+		/// <summary>作ってからの時間(秒)。明滅に使う</summary>
+		float time_ = 0.0f;
 
 		Graphics::LightManager* lightManager_ = nullptr;
 		// 借りた点光源の番号。初めて照らすときに借りる。-1 は借りていない

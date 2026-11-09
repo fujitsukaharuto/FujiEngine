@@ -278,6 +278,15 @@ void DXCom::TransitionDepthToWrite() {
 		D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_DEPTH_WRITE);
 }
 
+void DXCom::CopyFromDepthBuffer(ID3D12Resource* dest, D3D12_RESOURCE_STATES destState) {
+	ID3D12Resource* depth = swapChainManager_->GetDSVResource(GetNowFrameCount());
+	TransitionResource(dest, destState, D3D12_RESOURCE_STATE_COPY_DEST);
+	TransitionResource(depth, D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_COPY_SOURCE);
+	command_->GetList()->CopyResource(dest, depth);
+	TransitionResource(depth, D3D12_RESOURCE_STATE_COPY_SOURCE, D3D12_RESOURCE_STATE_DEPTH_WRITE);
+	TransitionResource(dest, D3D12_RESOURCE_STATE_COPY_DEST, destState);
+}
+
 void DXCom::TransitionResource(ID3D12Resource* resource, D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after) {
 	if (before == after) return;
 

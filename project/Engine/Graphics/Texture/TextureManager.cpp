@@ -91,6 +91,28 @@ void TextureManager::RegisterTexture(Texture* texture, const DirectX::ScratchIma
 	SRVManager* srvManager = SRVManager::GetInstance();
 
 	texture->meta = mipImages.GetMetadata();
+	// 空のキューブマップはいちばん細かい1枚だけ見る
+	texture->hasTransparency = false;
+	if (!texture->meta.IsCubemap() && DirectX::HasAlpha(texture->meta.format)) {
+		const DirectX::Image* top = mipImages.GetImage(0, 0, 0);
+		const DXGI_FORMAT format = top ? top->format : DXGI_FORMAT_UNKNOWN;
+		const bool isByteRGBA = format == DXGI_FORMAT_R8G8B8A8_UNORM || format == DXGI_FORMAT_R8G8B8A8_UNORM_SRGB ||
+			format == DXGI_FORMAT_B8G8R8A8_UNORM || format == DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
+		if (top && isByteRGBA) {
+			for (size_t y = 0; y < top->height && !texture->hasTransparency; ++y) {
+				const uint8_t* row = top->pixels + y * top->rowPitch;
+				for (size_t x = 0; x < top->width; ++x) {
+					if (row[x * 4 + 3] != 255) {
+						texture->hasTransparency = true;
+						break;
+					}
+				}
+			}
+		} else {
+			// 圧縮や浮動小数の形式は DirectXTex に任せる
+			texture->hasTransparency = !mipImages.IsAlphaAllOpaque();
+		}
+	}
 
 	texture->textureResource = CreateTextureResource(dxcommon_->GetDevice(), texture->meta);
 

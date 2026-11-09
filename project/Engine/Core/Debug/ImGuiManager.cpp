@@ -353,8 +353,8 @@ ImVec4 Core::ImGuiTextOk() { return SrgbColor(0.08f, 0.44f, 0.18f); }
 ImVec4 Core::ImGuiTextWarn() { return SrgbColor(0.62f, 0.32f, 0.00f); }
 ImVec4 Core::ImGuiTextError() { return SrgbColor(0.78f, 0.10f, 0.10f); }
 
-bool* Core::DebugWindows::Visible(const char* name) {
-	return &DebugWindowTable().try_emplace(name, true).first->second;
+bool* Core::DebugWindows::Visible(const char* name, bool defaultVisible) {
+	return &DebugWindowTable().try_emplace(name, defaultVisible).first->second;
 }
 
 void Core::DebugWindows::MenuItems() {

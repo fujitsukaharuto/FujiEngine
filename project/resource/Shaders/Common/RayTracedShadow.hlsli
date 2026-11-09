@@ -4,6 +4,10 @@
 // インラインレイトレ(DXR 1.1 RayQuery)による影。TLAS は space2 に固定する
 // (space0 は gTextures[] が無制限、space1 は gEnvironment が使用中)
 #include "Sampling.hlsli"
+// RAY_CUTOUT_SHADOW を定義して include すると抜きのある物の影が抜ける (gRayInstances と gRayTextures[] が要る)
+#ifdef RAY_CUTOUT_SHADOW
+#include "RayInstance.hlsli"
+#endif
 
 RaytracingAccelerationStructure gSceneTLAS : register(t0, space2);
 
@@ -20,6 +24,11 @@ static const uint kShadowMaskDirectional = 1u << 0;
 static const uint kShadowMaskPoint = 1u << 1;
 static const uint kShadowMaskSpot = 1u << 2;
 
+// インスタンスの InstanceMask。C++ 側 (RaytracingScene.h の kInstanceMask*) と同じ値であること
+static const uint kRayMaskOpaque = 0x01;      // 不透明
+static const uint kRayMaskTranslucent = 0x02; // 半透明。薄い影は TraceTranslucentTransmittance で別に求める
+static const uint kRayMaskStaticOpaque = 0x04; // 動かない不透明
+
 // AllLights::shadowMode の値。C++ 側 (LightManager.h の RayTracedShadowMode) と同じ値であること
 static const uint kShadowModeHard = 0; // 前方描画のPSで1本だけ飛ばす。輪郭が硬い代わりに軽い
 static const uint kShadowModeSoft = 1; // 別パスで光源の広がりぶん散らして飛ばし、デノイズする
@@ -30,7 +39,8 @@ static const uint kShadowModeSoft = 1; // 別パスで光源の広がりぶん�
 /// <param name="N">面の法線</param>
 /// <param name="maxDistance">この距離より遠くの遮蔽物は無視する</param>
 /// <param name="bias">原点を法線方向へ浮かせる量</param>
-float TraceShadowRayBiased(float3 worldPos, float3 L, float3 N, float maxDistance, float bias)
+/// <param name="instanceMask">当たりにするインスタンスの InstanceMask</param>
+float TraceShadowRayMasked(float3 worldPos, float3 L, float3 N, float maxDistance, float bias, uint instanceMask)
 {
     RayDesc ray;
     ray.Origin = worldPos + N * bias;
@@ -39,12 +49,64 @@ float TraceShadowRayBiased(float3 worldPos, float3 L, float3 N, float maxDistanc
     ray.TMax = maxDistance;
 
     // 最近傍を探す必要が無いので、最初に当たった時点で打ち切る
+    // 半透明は影と AO では見えないものとして飛ばす
     RayQuery < RAY_FLAG_ACCEPT_FIRST_HIT_AND_END_SEARCH | RAY_FLAG_SKIP_CLOSEST_HIT_SHADER > q;
-    q.TraceRayInline(gSceneTLAS, RAY_FLAG_NONE, 0xFF, ray);
-    q.Proceed();
+    q.TraceRayInline(gSceneTLAS, RAY_FLAG_NONE, instanceMask, ray);
+    // 抜きのある物は候補として戻る。抜けていなければ当たり
+    while (q.Proceed())
+    {
+        if (q.CandidateType() == CANDIDATE_NON_OPAQUE_TRIANGLE)
+        {
+#ifdef RAY_CUTOUT_SHADOW
+            if (RayCutoutIsSolid(q.CandidateInstanceID() + q.CandidateGeometryIndex(), q.CandidatePrimitiveIndex(),
+                                 q.CandidateTriangleBarycentrics()))
+#endif
+            {
+                q.CommitNonOpaqueTriangleHit();
+            }
+        }
+    }
 
     return (q.CommittedStatus() == COMMITTED_TRIANGLE_HIT) ? 0.0f : 1.0f;
 }
+
+/// <summary>不透明な物すべてを遮蔽物として調べる</summary>
+float TraceShadowRayBiased(float3 worldPos, float3 L, float3 N, float maxDistance, float bias)
+{
+    return TraceShadowRayMasked(worldPos, L, N, maxDistance, bias, kRayMaskOpaque);
+}
+
+#ifdef RAY_CUTOUT_SHADOW
+/// <summary>半透明の物を通って届く光の割合 (色つき)。不透明な物による遮りは含まない</summary>
+/// <remarks>1枚ごとに (1 - a) × lerp(1, 色, a) を掛ける。表の面だけを数える</remarks>
+float3 TraceTranslucentTransmittance(float3 worldPos, float3 L, float3 N, float maxDistance)
+{
+    RayDesc ray;
+    ray.Origin = worldPos + N * kShadowRayBias;
+    ray.Direction = L;
+    ray.TMin = 0.0f;
+    ray.TMax = maxDistance;
+
+    float3 transmittance = float3(1.0f, 1.0f, 1.0f);
+    // 全部の候補を数えるので、どれも当たりにしない
+    RayQuery < RAY_FLAG_FORCE_NON_OPAQUE | RAY_FLAG_SKIP_CLOSEST_HIT_SHADER > q;
+    q.TraceRayInline(gSceneTLAS, RAY_FLAG_NONE, kRayMaskTranslucent, ray);
+    while (q.Proceed())
+    {
+        if (q.CandidateType() == CANDIDATE_NON_OPAQUE_TRIANGLE && q.CandidateTriangleFrontFace())
+        {
+            RayInstance instance = gRayInstances[q.CandidateInstanceID() + q.CandidateGeometryIndex()];
+            float opacity = saturate(instance.opacity);
+            transmittance *= (1.0f - opacity) * lerp(float3(1.0f, 1.0f, 1.0f), saturate(instance.color), opacity);
+            if (all(transmittance < 1e-3f))
+            {
+                q.Abort();
+            }
+        }
+    }
+    return transmittance;
+}
+#endif
 
 /// <summary>補間された正確な位置から飛ばすとき用。浮かせる量は固定</summary>
 float TraceShadowRay(float3 worldPos, float3 L, float3 N, float maxDistance)
@@ -104,8 +166,14 @@ float TraceSoftShadowDirectional(float3 worldPos, float3 L, float3 N,
     float coneRadius = tan(angularRadius);
 
     float visible = 0.0f;
-    for (uint i = 0; i < sampleCount; i++)
+    for (uint k = 0; k < sampleCount; k++)
     {
+        // 離れた2本が両方とも当たるか両方とも外れれば、半影ではないとみなして残りを飛ばさない
+        uint i = (k == 1) ? sampleCount / 2 : ((k != 0 && k <= sampleCount / 2) ? k - 1 : k);
+        if (k == 2 && (visible == 0.0f || visible == 2.0f))
+        {
+            return visible * 0.5f;
+        }
         float2 disk = UniformDiskSample(Hammersley(i, sampleCount), cosA, sinA) * coneRadius;
         float3 dir = normalize(L + disk.x * tangent + disk.y * bitangent);
 

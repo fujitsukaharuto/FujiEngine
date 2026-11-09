@@ -6,9 +6,12 @@
 #include "Engine/DXC/DXCom.h"
 #include "Engine/DXC/Resource/DX12Helper.h"
 #include "Engine/DXC/Resource/SRVManager.h"
+#include "Engine/Graphics/Light/LightManager.h"
+#include "Engine/Graphics/Object/ObjectRenderer.h"
 #include "Engine/Graphics/Object/RenderObject.h"
 #include "Engine/Graphics/Pipeline/PipeKind.h"
 #include "Engine/Graphics/Pipeline/PipelineManager.h"
+#include "Engine/Graphics/Pipeline/RootNames.h"
 
 using namespace Core;
 using namespace DXC;
@@ -47,32 +50,24 @@ void GBufferPass::Initialize(DXCom* pDxcom) {
 	depthClear.DepthStencil.Depth = 1.0f;
 
 	rtvHeap_ = Helper::CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, kFrameCount_, false);
-	dsvHeap_ = Helper::CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, kFrameCount_, false);
 
 	const UINT rtvSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-	const UINT dsvSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 	const D3D12_CPU_DESCRIPTOR_HANDLE rtvStart = rtvHeap_->GetCPUDescriptorHandleForHeapStart();
-	const D3D12_CPU_DESCRIPTOR_HANDLE dsvStart = dsvHeap_->GetCPUDescriptorHandleForHeapStart();
 
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
 	rtvDesc.Format = kGBufferNormalFormat;
 	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 
-	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
-	dsvDesc.Format = kDepthFormat;
-	dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
-
 	for (uint32_t i = 0; i < kFrameCount_; i++) {
 		// 生成直後の状態を読み取り側に揃えておくと、Render の遷移が毎フレーム同じ形になる
 		normal_[i] = Helper::CreateTexture2D(device, MyWin::kWindowWidth, MyWin::kWindowHeight,
 			kGBufferNormalFormat, D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET, kReadState, &normalClear);
+		// 深度は本描画の深度バッファから写す
 		depth_[i] = Helper::CreateTexture2D(device, MyWin::kWindowWidth, MyWin::kWindowHeight,
 			kDepthFormat, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL, kReadState, &depthClear);
 
 		rtvHandle_[i].ptr = rtvStart.ptr + i * rtvSize;
-		dsvHandle_[i].ptr = dsvStart.ptr + i * dsvSize;
 		device->CreateRenderTargetView(normal_[i].Get(), &rtvDesc, rtvHandle_[i]);
-		device->CreateDepthStencilView(depth_[i].Get(), &dsvDesc, dsvHandle_[i]);
 
 		normalSrvIndex_[i] = srvManager->Allocate();
 		depthSrvIndex_[i] = srvManager->Allocate();
@@ -92,7 +87,6 @@ void GBufferPass::Finalize() {
 		depth_[i].Reset();
 	}
 	rtvHeap_.Reset();
-	dsvHeap_.Reset();
 	dxcommon_ = nullptr;
 }
 
@@ -107,23 +101,28 @@ void GBufferPass::Render(const std::vector<RenderObject*>& objects) {
 	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
 
 	dxcommon_->TransitionResource(normal_[index].Get(), kReadState, D3D12_RESOURCE_STATE_RENDER_TARGET);
-	dxcommon_->TransitionResource(depth_[index].Get(), kReadState, D3D12_RESOURCE_STATE_DEPTH_WRITE);
-
-	cList->OMSetRenderTargets(1, &rtvHandle_[index], false, &dsvHandle_[index]);
+	// 深度は本描画の深度バッファへ直接書く。写した先へ描くと Hi-Z が効かず遅かった
+	const D3D12_CPU_DESCRIPTOR_HANDLE sceneDsv = dxcommon_->GetDepthBufferHandle();
+	cList->OMSetRenderTargets(1, &rtvHandle_[index], false, &sceneDsv);
 
 	const float clearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 	cList->ClearRenderTargetView(rtvHandle_[index], clearColor, 0, nullptr);
-	cList->ClearDepthStencilView(dsvHandle_[index], D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+	// 本描画の深度は直前に前景スプライトが消している
+	cList->ClearDepthStencilView(sceneDsv, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
 	dxcommon_->GetDXCommand()->SetViewAndScissor(MyWin::kWindowWidth, MyWin::kWindowHeight);
 	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::DepthNormalPrepass);
 	cList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	// 濡れた路面の粗さを前方描画と揃える
+	if (LightManager* lightManager = ObjectRenderer::GetInstance()->GetLightManager()) {
+		dxcommon_->GetPipelineManager()->SetGraphicsRootCBV(cList, RootName::kLights, lightManager->GetLightsGPUVirtualAddress());
+	}
 
 	gpuTimer_.Begin(cList, index, kTimer_Prepass);
 
 	for (RenderObject* obj : objects) {
-		// 基準はTLASの遮蔽物集合ではなく本描画で深度を書くか。加算合成は READ_ONLY なので外す
-		if (obj->IsAdd()) {
+		// 本描画で深度を書く物だけ
+		if (obj->IsDrawnAfterOpaque()) {
 			continue;
 		}
 		obj->RenderPrepass();
@@ -133,7 +132,9 @@ void GBufferPass::Render(const std::vector<RenderObject*>& objects) {
 	gpuTimer_.Resolve(cList, index, kTimer_Prepass);
 
 	dxcommon_->TransitionResource(normal_[index].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, kReadState);
-	dxcommon_->TransitionResource(depth_[index].Get(), D3D12_RESOURCE_STATE_DEPTH_WRITE, kReadState);
+
+	// AO や影が読むのは写しの方
+	dxcommon_->CopyFromDepthBuffer(depth_[index].Get(), kReadState);
 
 	isRendered_ = true;
 }

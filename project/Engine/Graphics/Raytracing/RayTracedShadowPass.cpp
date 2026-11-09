@@ -34,6 +34,20 @@ namespace {
 	uint32_t DispatchCount(int32_t pixels) {
 		return (static_cast<uint32_t>(pixels) + kThreadGroupSize - 1) / kThreadGroupSize;
 	}
+
+	/// <summary>抜きのある物の影がアルファを引くための、見た目・頂点・インデックス・テクスチャ</summary>
+	/// <remarks>見た目のバッファが無いフレームはシェーダも引かない</remarks>
+	void BindRayCutout(ID3D12GraphicsCommandList* cList) {
+		PipelineManager* pPipeManager = PipelineManager::GetInstance();
+		SRVManager* srvManager = SRVManager::GetInstance();
+		const RaytracingScene* scene = ObjectRenderer::GetInstance()->GetRaytracingScene();
+		const uint32_t instanceSrv = scene ? scene->GetInstanceDataSrvIndex() : RaytracingScene::kInvalidSrvIndex;
+		if (instanceSrv == RaytracingScene::kInvalidSrvIndex) { return; }
+		pPipeManager->SetComputeRootDescriptorTable(cList, RootName::kRayInstances, srvManager->GetGPUDescriptorHandle(instanceSrv));
+		pPipeManager->SetComputeRootDescriptorTable(cList, RootName::kRayVertices, srvManager->GetGPUDescriptorHandle(0));
+		pPipeManager->SetComputeRootDescriptorTable(cList, RootName::kRayIndices, srvManager->GetGPUDescriptorHandle(0));
+		pPipeManager->SetComputeRootDescriptorTable(cList, RootName::kRayTextures, srvManager->GetGPUDescriptorHandle(0));
+	}
 }
 
 
@@ -113,6 +127,7 @@ void RayTracedShadowPass::DispatchTrace(uint32_t frameIndex, const GBufferPass& 
 	pPipeManager->SetComputeRootDescriptorTable(cList, RootName::kGBufferNormal, gbuffer.GetNormalSrvHandle());
 	pPipeManager->SetComputeRootDescriptorTable(cList, RootName::kGBufferDepth, gbuffer.GetDepthSrvHandle());
 	pPipeManager->SetComputeRootDescriptorTable(cList, RootName::kSceneTLAS, srvManager->GetGPUDescriptorHandle(tlasSrvIndex));
+	BindRayCutout(cList);
 	pPipeManager->SetComputeRootDescriptorTable(cList, RootName::kShadowOutput, srvManager->GetGPUDescriptorHandle(raw_.uavIndex));
 
 	cList->Dispatch(DispatchCount(MyWin::kWindowWidth), DispatchCount(MyWin::kWindowHeight), 1);

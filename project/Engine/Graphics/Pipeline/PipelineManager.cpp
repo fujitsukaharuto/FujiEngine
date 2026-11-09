@@ -70,6 +70,11 @@ void PipelineManager::CreatePipeline() {
 	CreateRenderPipe(Pipe::NormalAdd, {
 		.vsPath = L"Object/Object3d.VS.hlsl", .psPath = L"Object/Object3d.PS.hlsl",
 		.blend = BlendType::ADD, .depth = DepthMode::READ_ONLY });
+	// 半透明。深度は書かず、表だけ描く
+	CreateRenderPipe(Pipe::NormalTranslucent, {
+		.vsPath = L"Object/Object3d.VS.hlsl", .psPath = L"Object/Object3d.PS.hlsl",
+		.blend = BlendType::ALPHA, .depth = DepthMode::READ_ONLY,
+		.cull = D3D12_CULL_MODE_BACK });
 
 
 	CreateRenderPipe(Pipe::Sprite, {
@@ -121,6 +126,26 @@ void PipelineManager::CreatePipeline() {
 	CreateComputePipe(Pipe::BRDFLutCS, L"IBL/BRDFLut.CS.hlsl");
 	CreateComputePipe(Pipe::CubePreviewCS, L"IBL/CubePreview.CS.hlsl");
 
+	CreateComputePipe(Pipe::AtmosphereTransmittanceCS, L"SkyBox/AtmosphereTransmittance.CS.hlsl");
+	CreateComputePipe(Pipe::AtmosphereMultiScatterCS, L"SkyBox/AtmosphereMultiScatter.CS.hlsl");
+	CreateComputePipe(Pipe::AtmosphereSkyViewCS, L"SkyBox/AtmosphereSkyView.CS.hlsl");
+	CreateComputePipe(Pipe::AtmosphereCaptureCS, L"SkyBox/AtmosphereCapture.CS.hlsl");
+	CreateComputePipe(Pipe::AtmosphereSummaryCS, L"SkyBox/AtmosphereSummary.CS.hlsl");
+
+	CreateComputePipe(Pipe::DDGITraceCS, L"Raytracing/DDGITrace.CS.hlsl");
+	CreateComputePipe(Pipe::DDGIUpdateIrradianceCS, L"Raytracing/DDGIUpdateIrradiance.CS.hlsl");
+	CreateComputePipe(Pipe::DDGIUpdateDistanceCS, L"Raytracing/DDGIUpdateDistance.CS.hlsl");
+	CreateComputePipe(Pipe::DDGIRelocationCS, L"Raytracing/DDGIRelocation.CS.hlsl");
+	CreateComputePipe(Pipe::ScreenProbeTraceCS, L"Raytracing/ScreenProbeTrace.CS.hlsl");
+	CreateComputePipe(Pipe::ScreenProbeFilterCS, L"Raytracing/ScreenProbeFilter.CS.hlsl");
+	CreateComputePipe(Pipe::ScreenProbeIntegrateCS, L"Raytracing/ScreenProbeIntegrate.CS.hlsl");
+	CreateComputePipe(Pipe::ScreenProbeTemporalCS, L"Raytracing/ScreenProbeTemporal.CS.hlsl");
+	CreateComputePipe(Pipe::ScreenReflectionTraceCS, L"Raytracing/ScreenReflectionTrace.CS.hlsl");
+	CreateComputePipe(Pipe::ScreenReflectionResolveCS, L"Raytracing/ScreenReflectionResolve.CS.hlsl");
+	CreateComputePipe(Pipe::VolumetricLightTraceCS, L"Raytracing/VolumetricLightTrace.CS.hlsl");
+	CreateComputePipe(Pipe::VolumetricLightBlurCS, L"Raytracing/VolumetricLightBlur.CS.hlsl");
+	CreateComputePipe(Pipe::ClusterLightCullCS, L"Light/ClusterLightCull.CS.hlsl");
+
 	CreateComputePipe(Pipe::GrayCS, L"PostEffect/Grayscale.CS.hlsl");
 	CreateComputePipe(Pipe::GaussCS, L"PostEffect/Gaussian.CS.hlsl");
 	CreateComputePipe(Pipe::BoxFilterCS, L"PostEffect/BoxFilter.CS.hlsl");
@@ -134,8 +159,20 @@ void PipelineManager::CreatePipeline() {
 	CreateComputePipe(Pipe::BloomDownsampleCS, L"PostEffect/BloomDownsample.CS.hlsl");
 	CreateComputePipe(Pipe::BloomUpsampleCS, L"PostEffect/BloomUpsample.CS.hlsl");
 	CreateComputePipe(Pipe::BloomCompositeCS, L"PostEffect/BloomComposite.CS.hlsl");
+	CreateComputePipe(Pipe::AutoExposureHistogramCS, L"PostEffect/AutoExposureHistogram.CS.hlsl");
+	CreateComputePipe(Pipe::AutoExposureAverageCS, L"PostEffect/AutoExposureAverage.CS.hlsl");
+	CreateComputePipe(Pipe::LocalTonemapDownsampleCS, L"PostEffect/LocalTonemapDownsample.CS.hlsl");
+	CreateComputePipe(Pipe::LocalTonemapBlurCS, L"PostEffect/LocalTonemapBlur.CS.hlsl");
+	CreateComputePipe(Pipe::BufferVisualizeCS, L"PostEffect/BufferVisualize.CS.hlsl");
+	CreateComputePipe(Pipe::BakedGITraceCS, L"Raytracing/BakedGITrace.CS.hlsl");
+	CreateComputePipe(Pipe::ReflectionProbeCaptureCS, L"Raytracing/ReflectionProbeCapture.CS.hlsl");
+	CreateComputePipe(Pipe::ReflectionProbeDownsampleCS, L"IBL/ReflectionProbeDownsample.CS.hlsl");
+	CreateComputePipe(Pipe::ReflectionProbePrefilterCS, L"IBL/ReflectionProbePrefilter.CS.hlsl");
 	CreateComputePipe(Pipe::GodRayCS, L"PostEffect/GodRay.CS.hlsl");
 	CreateComputePipe(Pipe::DepthOfFieldCS, L"PostEffect/DepthOfField.CS.hlsl");
+	CreateComputePipe(Pipe::MotionBlurCS, L"PostEffect/MotionBlur.CS.hlsl");
+	CreateComputePipe(Pipe::LensFlareCS, L"PostEffect/LensFlare.CS.hlsl");
+	CreateComputePipe(Pipe::VolumetricLightCompositeCS, L"PostEffect/VolumetricLightComposite.CS.hlsl");
 	CreateComputePipe(Pipe::RandomCS, L"PostEffect/Random.CS.hlsl");
 	CreatePipe<SkinningCSPipe>(Pipe::SkinningCS);
 
@@ -153,6 +190,11 @@ void PipelineManager::CreatePipeline() {
 	CreateComputePipe(Pipe::SplatClearCS, L"Particle/GPU/SplatClear.CS.hlsl");
 	CreateComputePipe(Pipe::SplatParticleCS, L"Particle/GPU/SplatParticle.CS.hlsl");
 	// 蓄積バッファを加算合成で重ねるだけなので深度も頂点入力も使わない
+	// 頂点入力は無い。深度は見るだけ
+	CreateRenderPipe(Pipe::Rain, {
+		.vsPath = L"Particle/Rain.VS.hlsl", .psPath = L"Particle/Rain.PS.hlsl",
+		.blend = BlendType::ADD_PREMULTIPLIED, .depth = DepthMode::READ_ONLY,
+		.useInputLayout = false });
 	CreateRenderPipe(Pipe::SplatComposite, {
 		.vsPath = L"Particle/GPU/SplatComposite.VS.hlsl", .psPath = L"Particle/GPU/SplatComposite.PS.hlsl",
 		.blend = BlendType::ADD_PREMULTIPLIED, .depth = DepthMode::DISABLE,

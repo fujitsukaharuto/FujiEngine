@@ -78,14 +78,14 @@ void Mesh::CreateMesh() {
 
 	auto device = dxcommon_->GetDevice();
 
+	// GPU 側のメモリに置く。コピーは頂点とインデックスで1回の同期にまとめる
+	ID3D12GraphicsCommandList* list = dxcommon_->GetImmediateList();
+	Microsoft::WRL::ComPtr<ID3D12Resource> vertexUpload;
+	Microsoft::WRL::ComPtr<ID3D12Resource> indexUpload;
+
 	// 頂点バッファの生成
 	size_t vertexBufferSize = sizeof(VertexData) * vertexData_.size();
-	vertexResource_ = DXC::Helper::CreateBufferResource(device, vertexBufferSize);
-
-	VertexData* vData = nullptr;
-	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vData));
-	std::memcpy(vData, vertexData_.data(), vertexBufferSize);
-	vertexResource_->Unmap(0, nullptr);
+	vertexResource_ = DXC::Helper::CreateStaticBuffer(device, list, vertexData_.data(), vertexBufferSize, vertexUpload);
 
 	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
 	vertexBufferView_.SizeInBytes = static_cast<UINT>(vertexBufferSize);
@@ -93,12 +93,8 @@ void Mesh::CreateMesh() {
 
 	// インデックスバッファの生成
 	size_t indexBufferSize = sizeof(uint32_t) * indexData_.size();
-	indexResource_ = DXC::Helper::CreateBufferResource(device, indexBufferSize);
-
-	uint32_t* iData = nullptr;
-	indexResource_->Map(0, nullptr, reinterpret_cast<void**>(&iData));
-	std::memcpy(iData, indexData_.data(), indexBufferSize);
-	indexResource_->Unmap(0, nullptr);
+	indexResource_ = DXC::Helper::CreateStaticBuffer(device, list, indexData_.data(), indexBufferSize, indexUpload);
+	dxcommon_->CommandExecution();
 
 	indexBufferView_.BufferLocation = indexResource_->GetGPUVirtualAddress();
 	indexBufferView_.SizeInBytes = static_cast<UINT>(indexBufferSize);

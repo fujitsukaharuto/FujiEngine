@@ -100,7 +100,8 @@ namespace Core {
 	class DebugWindows {
 	public:
 		/// <summary>名前ごとの表示フラグ。初めて渡した名前はその場で登録される</summary>
-		static bool* Visible(const char* name);
+		/// <param name="defaultVisible">初めて登録するときの表示フラグ</param>
+		static bool* Visible(const char* name, bool defaultVisible = true);
 		/// <summary>登録済みのウィンドウをメニュー項目として並べる</summary>
 		static void MenuItems();
 	};

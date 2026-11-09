@@ -35,6 +35,15 @@ struct Material
     float3 emissive; // 自分で光る色
     float rimPower; // リムライトの細さ
     float3 rimColor; // リムライトの色。黒なら掛からない
+    float materialPad0;
+    int metallicRoughnessIndex; // メタリック・ラフネスのテクスチャ (G=粗さ B=金属)
+    int useMetallicRoughnessMap; // 0以外なら roughness と metallic にテクスチャの値を掛ける
+    int isTwoSided; // 0以外なら裏から見た面は法線を裏返す
+    float materialPad1;
+    int emissiveMapIndex; // 光る所と色のテクスチャ
+    int useEmissiveMap; // 0以外なら emissive にこれを掛ける。0なら色のテクスチャ
+    int occlusionMapIndex; // 物陰の暗さのテクスチャ (R)
+    int useOcclusionMap; // 0以外ならアンビエントにテクスチャの R を掛ける
 };
 
 struct DirectionalLight
@@ -104,11 +113,36 @@ struct AllLights
     uint hasEnvironment; // 0 なら空を出していない。映り込みは半球の2色で代用する
 
     uint lightingMode; // SimpleLighting.hlsli の kLightingMode*
-    float3 padLighting;
+    uint renderFlags;  // IBL.hlsli の kRenderFlag*
+    float2 padLighting;
 
     // 空気(フォグ)。設定は配置データの環境から来る
     FogParams fog;
+
+    // 濡れた路面。wetness が0なら何もしない
+    float wetness;
+    float puddleAmount;
+    float puddleScale;
+    float rainAmount; // 雨の強さ (0〜1)
 };
+
+// 点光源とスポットの減衰。旧実装のカーブのまま (逆二乗ではない)
+float PointLightAttenuation(PointLight light, float3 worldPos)
+{
+    float distance = length(light.position - worldPos);
+    return pow(saturate(-distance / light.radius + 1.0f), light.decay);
+}
+
+float SpotLightAttenuation(SpotLight light, float3 worldPos, float3 lightDirOnSurface)
+{
+    float distance = length(light.position - worldPos);
+    float attenuation = pow(saturate(-distance / light.distance + 1.0f), light.decay);
+
+    float cosAngle = dot(lightDirOnSurface, normalize(light.direction));
+    float falloff = saturate((cosAngle - light.cosAngle) / (light.cosStart - light.cosAngle));
+
+    return attenuation * falloff;
+}
 
 struct Camera
 {

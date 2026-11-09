@@ -54,7 +54,6 @@ namespace Graphics {
 
 		Microsoft::WRL::ComPtr<ID3D12Resource> influenceResource;
 		D3D12_VERTEX_BUFFER_VIEW influenceBufferView;
-		std::span<VertexInfluence> mappedInfluence;
 		std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> influenceSrvHandle;
 		Microsoft::WRL::ComPtr<ID3D12Resource> paletteResource[DXC::kFrameCount_];
 		std::span<WellForGPU> mappedPalette[DXC::kFrameCount_];

@@ -9,7 +9,7 @@ using namespace DXC;
 using namespace Graphics;
 
 
-void WorkTexture::Create(ID3D12Device* device, DXGI_FORMAT format, bool allowRenderTarget) {
+void WorkTexture::Create(ID3D12Device* device, DXGI_FORMAT format, bool allowRenderTarget, uint32_t width, uint32_t height) {
 	SRVManager* srvManager = SRVManager::GetInstance();
 
 	D3D12_RESOURCE_FLAGS flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
@@ -26,7 +26,9 @@ void WorkTexture::Create(ID3D12Device* device, DXGI_FORMAT format, bool allowRen
 		clearValuePtr = &clearValue;
 	}
 
-	resource = Helper::CreateTexture2D(device, MyWin::kWindowWidth, MyWin::kWindowHeight,
+	resource = Helper::CreateTexture2D(device,
+		width > 0 ? static_cast<int32_t>(width) : MyWin::kWindowWidth,
+		height > 0 ? static_cast<int32_t>(height) : MyWin::kWindowHeight,
 		format, flags, state, clearValuePtr);
 
 	srvIndex = srvManager->Allocate();

@@ -75,6 +75,9 @@ namespace Graphics {
 		//* Setter
 		void SetCamera(Camera* camera) { camera_ = camera; }
 		void SetModel(const std::string& fileName, bool overWrite = false);
+		/// <summary>モデルファイル (glTF) のマテリアルをそのまま当てる</summary>
+		/// <remarks>SetModel の後に呼ぶ。呼ばなければテクスチャと色だけ</remarks>
+		void ApplyModelMaterials();
 		/// <summary>テクスチャの設定</summary>
 		void SetTexture(const std::string& name);
 		/// <summary>色の設定</summary>
@@ -103,12 +106,27 @@ namespace Graphics {
 		void SetCastShadow(bool is) { castShadow_ = is; }
 
 		bool IsCastShadow() const { return castShadow_; }
+		/// <summary>動かない配置物か</summary>
+		void SetStaticLighting(bool is) { isStaticLighting_ = is; }
+		bool IsStaticLighting() const { return isStaticLighting_; }
 		/// <summary>加算合成で描かれるか</summary>
 		/// <remarks>Draw() で毎フレーム決まるので、読むのは Draw より後でなければならない</remarks>
 		bool IsAdd() const { return isAdd_; }
 		/// <summary>遮蔽物として加速構造に載せるか</summary>
 		/// <remarks>加算合成は光を足す表現なので、castShadow_ に関わらず遮蔽しない</remarks>
 		bool IsRayOccluder() const { return castShadow_ && !isAdd_; }
+		/// <summary>マテリアルの色で透けているか</summary>
+		/// <remarks>テクスチャのアルファは見ない</remarks>
+		bool IsTranslucent() const {
+			for (const Material& material : material_) {
+				if (material.GetColor().w < 1.0f) {
+					return true;
+				}
+			}
+			return false;
+		}
+		/// <summary>不透明の後に奥から順に描くか。深度は書かない</summary>
+		bool IsDrawnAfterOpaque() const { return isAdd_ || IsTranslucent(); }
 
 	protected:
 
@@ -141,6 +159,7 @@ namespace Graphics {
 
 		bool isAdd_ = false;
 		bool castShadow_ = true;
+		bool isStaticLighting_ = false;
 
 		DXC::DXCom* dxcommon_ = nullptr;
 		LightManager* lightManager_ = nullptr;

@@ -5,6 +5,7 @@
 #include <json.hpp>
 #include "Engine/Core/Debug/ImGuiManager.h"
 #include "Engine/Graphics/Light/LightManager.h"
+#include "Engine/Core/Time/FPSKeeper.h"
 #include "Engine/Graphics/Model/Model.h"
 
 // 名前空間とクラス名が同名なので using namespace GameObject; は書けない
@@ -129,7 +130,34 @@ namespace GameObject {
 		look_.rimIntensity = data.value("rimIntensity", 1.0f);
 		look_.rimPower = data.value("rimPower", 3.0f);
 		look_.isMirror = data.value("mirror", false);
+		look_.useModelMaterials = data.value("modelMaterials", false);
 		look_.light = ReadLight(data, "light");
+		flicker_ = EmissiveFlicker::Read(data);
+		drive_.reset();
+		if (data.contains("drive") && data["drive"].is_object()) {
+			const auto& d = data["drive"];
+			Drive drive;
+			drive.speed = d.value("speed", drive.speed);
+			drive.loopMin = d.value("min", drive.loopMin);
+			drive.loopMax = d.value("max", drive.loopMax);
+			drive_ = drive;
+		}
+		carLights_.reset();
+		if (data.contains("carLights")) {
+			CarLights lights;
+			if (data["carLights"].is_object()) {
+				const auto& c = data["carLights"];
+				lights.front = ReadVector3(c, "front").value_or(lights.front);
+				lights.rear = ReadVector3(c, "rear").value_or(lights.rear);
+				lights.headIntensity = c.value("headIntensity", lights.headIntensity);
+				lights.headRange = c.value("headRange", lights.headRange);
+				lights.tailIntensity = c.value("tailIntensity", lights.tailIntensity);
+				lights.tailRange = c.value("tailRange", lights.tailRange);
+			}
+			if (!data["carLights"].is_boolean() || data["carLights"].get<bool>()) {
+				carLights_ = lights;
+			}
+		}
 
 		SetName(data.value("name", look_.model));
 		if (data.contains("transform")) {
@@ -180,20 +208,125 @@ namespace GameObject {
 			data["rimPower"] = look_.rimPower;
 		}
 		if (look_.isMirror) { data["mirror"] = true; }
+		if (look_.useModelMaterials) { data["modelMaterials"] = true; }
 		if (look_.light) { data["light"] = LightToName(*look_.light); }
+		flicker_.Write(data);
+		if (drive_) {
+			data["drive"] = { { "speed", drive_->speed }, { "min", drive_->loopMin }, { "max", drive_->loopMax } };
+		}
+		if (carLights_) {
+			const CarLights& c = *carLights_;
+			data["carLights"] = {
+				{ "front", { c.front.x, c.front.y, c.front.z } }, { "rear", { c.rear.x, c.rear.y, c.rear.z } },
+				{ "headIntensity", c.headIntensity }, { "headRange", c.headRange },
+				{ "tailIntensity", c.tailIntensity }, { "tailRange", c.tailRange },
+			};
+		}
 		return data;
 	}
 
 	void PlacedObject::Update() {
+		time_ += Core::FPSKeeper::DeltaTime();
+		if (drive_) {
+			UpdateDrive();
+		}
 		if (animeModel_ && look_.isAnimation) {
 			animeModel_->AnimationUpdate();
 		}
 		GameObject::Update();
+		if (flicker_.IsEnabled()) {
+			ApplyFlicker();
+		}
 		ApplyEmissiveLight(IsActive());
+		ApplyCarLights(IsActive());
 	}
 
 	void PlacedObject::TurnOffLight() {
 		ApplyEmissiveLight(false);
+		ApplyCarLights(false);
+		if (lightManager_) {
+			for (int& slot : carLightSlots_) {
+				if (slot >= 0) {
+					lightManager_->RemoveClusteredLight(slot);
+					slot = -1;
+				}
+			}
+		}
+	}
+
+	void PlacedObject::UpdateDrive() {
+		Vector3 forward = transform_.GetForward();
+		forward.y = 0.0f;
+		transform_.translate = transform_.translate + forward * (drive_->speed * Core::FPSKeeper::DeltaTime());
+		// 進む向きのいちばん大きい軸で、範囲の端から反対の端へ
+		float& axis = (std::abs(forward.x) >= std::abs(forward.z)) ? transform_.translate.x : transform_.translate.z;
+		const float length = drive_->loopMax - drive_->loopMin;
+		if (length > 0.0f) {
+			if (axis > drive_->loopMax) {
+				axis -= length;
+			} else if (axis < drive_->loopMin) {
+				axis += length;
+			}
+		}
+	}
+
+	void PlacedObject::ApplyFlicker() {
+		RenderObject* object = GetRenderObject();
+		if (!object || !look_.emissive) {
+			return;
+		}
+		const Vector3 emissive = *look_.emissive * (look_.emissiveIntensity * flicker_.Evaluate(time_));
+		for (size_t i = 0; i < object->GetMaterialCount(); ++i) {
+			object->GetMaterial(i).SetEmissive(emissive);
+		}
+	}
+
+	void PlacedObject::ApplyCarLights(bool isOn) {
+		if (!lightManager_ || !carLights_) {
+			return;
+		}
+		if (carLightSlots_[0] < 0) {
+			if (!isOn) {
+				return;
+			}
+			for (int& slot : carLightSlots_) {
+				slot = lightManager_->AddClusteredLight();
+			}
+		}
+		const CarLights& c = *carLights_;
+		const Vector3 position = transform_.GetWorldPos();
+		const Vector3 right = transform_.GetRight() * transform_.scale.x;
+		const Vector3 up = transform_.GetUp() * transform_.scale.y;
+		const Vector3 forward = transform_.GetForward() * transform_.scale.z;
+		auto toWorld = [&](const Vector3& local, float side) {
+			return position + right * (local.x * side) + up * local.y + forward * local.z;
+		};
+		// ヘッドライトは少し下へ向ける
+		Vector3 beam = transform_.GetForward() - transform_.GetUp() * 0.12f;
+		beam = beam.Normalize();
+		for (int i = 0; i < 4; i++) {
+			Graphics::ClusteredLightData* light = lightManager_->GetClusteredLight(carLightSlots_[i]);
+			if (!light) {
+				continue;
+			}
+			const float side = (i % 2 == 0) ? 1.0f : -1.0f;
+			if (i < 2) {
+				light->type = Graphics::kClusteredLightSpot;
+				light->position = toWorld(c.front, side);
+				light->direction = beam;
+				light->color = Vector3{ 1.0f,0.92f,0.8f } * (isOn ? c.headIntensity : 0.0f);
+				light->range = c.headRange;
+				light->decay = 1.5f;
+				light->cosAngle = std::cos(28.0f * 3.14159265f / 180.0f);
+				light->cosFalloffStart = std::cos(16.0f * 3.14159265f / 180.0f);
+			} else {
+				light->type = Graphics::kClusteredLightPoint;
+				light->position = toWorld(c.rear, side);
+				light->color = Vector3{ 1.0f,0.05f,0.03f } * (isOn ? c.tailIntensity : 0.0f);
+				light->range = c.tailRange;
+				light->decay = 2.0f;
+			}
+		}
 	}
 
 	void PlacedObject::ApplyEmissiveLight(bool isOn) {
@@ -220,7 +353,7 @@ namespace GameObject {
 		}
 		light->color = { look_.emissive->x, look_.emissive->y, look_.emissive->z, 1.0f };
 		light->position = transform_.GetWorldPos();
-		light->intensity = look_.emissiveIntensity * look_.emissiveLightIntensity;
+		light->intensity = look_.emissiveIntensity * look_.emissiveLightIntensity * (flicker_.IsEnabled() ? flicker_.Evaluate(time_) : 1.0f);
 		light->radius = look_.emissiveLightRange;
 		light->decay = 2.0f;
 		// 光源は物の中心にあるので、そのままだとこの物自身が光を全部遮る。物の外側から先だけ影を見る
@@ -244,12 +377,20 @@ namespace GameObject {
 			}
 		}
 		ApplyLook();
+		// 動く物は焼く GI と反射プローブに入れない
+		if (RenderObject* object = GetRenderObject()) {
+			object->SetStaticLighting(!look_.isAnimation && !drive_);
+		}
 	}
 
 	void PlacedObject::ApplyLook() {
 		RenderObject* object = GetRenderObject();
 		if (!object) {
 			return;
+		}
+		// 先にモデルの値を当て、データに書いてある項目で上書きする
+		if (look_.useModelMaterials) {
+			object->ApplyModelMaterials();
 		}
 		if (!look_.texture.empty()) {
 			object->SetTexture(look_.texture);
@@ -268,8 +409,12 @@ namespace GameObject {
 			if (look_.metallic) {
 				material.SetMetallic(*look_.metallic);
 			}
-			// モデルは発光を持たないので、外したら消す
-			material.SetEmissive(look_.emissive ? *look_.emissive * look_.emissiveIntensity : Vector3{});
+			// データに無ければ、モデルのマテリアルを使うときはモデルの発光、使わないときは発光無し
+			if (look_.emissive) {
+				material.SetEmissive(*look_.emissive * look_.emissiveIntensity);
+			} else if (!look_.useModelMaterials) {
+				material.SetEmissive(Vector3{});
+			}
 			material.SetRim(look_.rim ? *look_.rim * look_.rimIntensity : Vector3{}, look_.rimPower);
 		}
 		if (look_.environment) {
@@ -297,6 +442,11 @@ namespace GameObject {
 			SetName(name);
 		}
 		ImGui::LabelText("Model", "%s", look_.model.c_str());
+		// 外したときはモデルを作り直す
+		if (ImGui::Checkbox("Model materials", &look_.useModelMaterials)) {
+			Build();
+			return;
+		}
 
 		RenderObject* object = GetRenderObject();
 		if (!object) {
@@ -354,6 +504,12 @@ namespace GameObject {
 			});
 		if (animeModel_) {
 			changed |= ImGui::Checkbox("Mirror", &look_.isMirror);
+		}
+		if (look_.emissive && flicker_.GUI() && !flicker_.IsEnabled()) {
+			changed = true;
+		}
+		if (drive_) {
+			ImGui::DragFloat("Drive speed", &drive_->speed, 0.1f, -50.0f, 50.0f, "%.1f m/s");
 		}
 
 		if (changed) {

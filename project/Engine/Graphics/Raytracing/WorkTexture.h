@@ -7,7 +7,7 @@
 namespace Graphics {
 
 	/// <summary>
-	/// 画面と同じ大きさで、SRVとUAVを1枚ずつ張った作業用テクスチャ
+	/// SRVとUAVを1枚ずつ張った作業用テクスチャ。大きさは既定で画面と同じ
 	/// </summary>
 	/// <remarks>画面空間のレイトレとデノイザが値を受け渡すのに使う。中身は1〜2チャンネルの実数</remarks>
 	struct WorkTexture {
@@ -25,7 +25,8 @@ namespace Graphics {
 		/// 生成直後に ClearRenderTargetView で塗るならtrue。RENDER_TARGET 状態のまま戻るので、
 		/// クリアと kReadState への遷移は呼び出し側が面倒を見ること
 		/// </param>
-		void Create(ID3D12Device* device, DXGI_FORMAT format, bool allowRenderTarget);
+		/// <param name="width">0なら画面の大きさ</param>
+		void Create(ID3D12Device* device, DXGI_FORMAT format, bool allowRenderTarget, uint32_t width = 0, uint32_t height = 0);
 
 		void Reset() { resource.Reset(); }
 	};

@@ -133,6 +133,12 @@ namespace DXC {
 		void TransitionDepthToRead();   // DEPTH_WRITE -> NON_PIXEL_SHADER_RESOURCE
 		void TransitionDepthToWrite();  // NON_PIXEL_SHADER_RESOURCE -> DEPTH_WRITE
 
+		/// <summary>このフレームの本描画の深度バッファ</summary>
+		D3D12_CPU_DESCRIPTOR_HANDLE GetDepthBufferHandle() const { return swapChainManager_->GetDSVHandle(GetNowFrameCount()); }
+		/// <summary>本描画の深度バッファの中身を同じ形式の dest へ写す</summary>
+		/// <remarks>深度バッファが DEPTH_WRITE の間に呼ぶ。dest は destState へ戻す</remarks>
+		void CopyFromDepthBuffer(ID3D12Resource* dest, D3D12_RESOURCE_STATES destState);
+
 		/// <summary>
 		/// バリアの変更
 		/// </summary>

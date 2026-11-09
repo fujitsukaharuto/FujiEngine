@@ -31,12 +31,6 @@ namespace Graphics {
 		/// <param name="side">0:+X 1:-X 2:+Z 3:-Z</param>
 		Math::Vector3 GetHorizonColor(int side);
 
-		/// <summary>太陽の向きから計算した、その向きの空の色。Atmosphere.hlsli の AtmosphereSky と同じ式</summary>
-		/// <param name="direction">見る向き(単位ベクトル)</param>
-		/// <param name="sunDirection">太陽へ向かう単位ベクトル</param>
-		/// <param name="sunColor">太陽の色と強さ</param>
-		static Math::Vector3 AtmosphereColor(const Math::Vector3& direction, const Math::Vector3& sunDirection, const Math::Vector3& sunColor);
-
 	private:
 
 		void ResourceCreate();

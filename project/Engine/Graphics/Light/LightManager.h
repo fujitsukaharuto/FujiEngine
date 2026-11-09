@@ -2,6 +2,7 @@
 #include "Engine/Graphics/Light/DirectionLight.h"
 #include "Engine/Graphics/Light/PointLight.h"
 #include "Engine/Graphics/Light/SpotLight.h"
+#include "Engine/Graphics/SkyBox/SkyAtmosphere.h"
 #include <d3d12.h>
 #include <memory>
 #include <vector>
@@ -14,6 +15,33 @@ namespace Graphics {
 	const int kMaxDirectionalLights = 3;
 	const int kMaxPointLights = 10;
 	const int kMaxSpotLights = 10;
+	/// <summary>影を落とさないライトの上限 (クラスタ化ライティング)</summary>
+	const int kMaxClusteredLights = 1024;
+
+	/// <summary>ClusteredLightData::type の値。HLSL 側 (Common/ClusteredLights.hlsli) と同じ値であること</summary>
+	enum ClusteredLightType : uint32_t {
+		kClusteredLightPoint = 0,
+		kClusteredLightSpot = 1,
+		kClusteredLightTube = 2,	// 棒。direction が軸の向き × 長さの半分
+		kClusteredLightRect = 3,	// 長方形。direction は横×幅の半分、縦×高さの半分は cosAngle/cosFalloffStart/pad[0]
+	};
+
+	/// <summary>
+	/// 影を落とさないライト1つ
+	/// </summary>
+	/// <remarks>HLSL 側 (Common/ClusteredLights.hlsli の ClusteredLight) と並びが一致していること</remarks>
+	struct ClusteredLightData {
+		Math::Vector3 position{};
+		float range = 10.0f;			// 光が届く距離
+		Math::Vector3 color{};			// 色 × 強さ。0 なら消灯
+		float decay = 1.0f;				// 距離による減り方
+		Math::Vector3 direction = { 0.0f,-1.0f,0.0f };	// スポットライトの照らす向き
+		float cosAngle = 0.5f;			// スポットライトの外側の角度の cos
+		float cosFalloffStart = 0.6f;	// 内側の角度の cos
+		uint32_t type = kClusteredLightPoint;
+		float pad[2] = {};				// 長方形: [0] は縦の軸の z、[1] が 1 なら両面
+	};
+	static_assert(sizeof(ClusteredLightData) == 64, "ClusteredLightData の大きさが ClusteredLights.hlsli と一致していない");
 
 	/// <summary>
 	/// レイトレ影を光源の種類ごとに切るビット
@@ -83,6 +111,24 @@ namespace Graphics {
 	};
 
 	/// <summary>
+	/// 品質の設定で足す描画の細部。ビットごとに切り替える
+	/// </summary>
+	/// <remarks>HLSL 側 (Common/IBL.hlsli) の kRenderFlag* と同じ値であること</remarks>
+	enum RenderFlag : uint32_t {
+		kRenderFlagEnergyCompensation = 1u << 0,	// 多重散乱のぶんを足す
+		kRenderFlagSpecularOcclusion = 1u << 1,	// AO と法線マップの地平線で映り込みを遮る
+		kRenderFlagReflectAll = 1u << 2,			// 映り込みを付けていないマテリアルにも付ける
+		kRenderFlagGI = 1u << 3,					// プローブの間接光 (DDGIPass)
+		kRenderFlagScreenGI = 1u << 4,				// 画面のプローブの間接光 (ScreenProbeGIPass)
+		kRenderFlagScreenReflection = 1u << 5,		// 映り込みを別パスで求める (ScreenReflectionPass)
+		kRenderFlagReflectionBounce = 1u << 6,		// 別パスの映り込みで2回目の跳ね返りも出す
+		kRenderFlagSpecularAA = 1u << 7,			// ハイライトのちらつきを粗さで抑える
+		kRenderFlagReflectionSceneColor = 1u << 8,	// 別パスの映り込みで画面の色を使う (SSR)
+		kRenderFlagTranslucentShadow = 1u << 9,		// 半透明の物の色つきの影。TLAS に半透明の物があるフレームだけ立つ
+		kRenderFlagLocalLightAO = 1u << 10,			// 影なしのライトにも AO を掛ける
+	};
+
+	/// <summary>
 	/// 空気(フォグ)。遠くの物ほどこの色へ寄せる
 	/// </summary>
 	/// <remarks>HLSL 側 (Common/Fog.hlsli) の FogParams と並びが一致していること。設定は配置データの環境が入れる</remarks>
@@ -104,7 +150,19 @@ namespace Graphics {
 		float sunScatterPower = 8.0f;	// 大きいほど太陽のまわりだけが明るくなる
 		uint32_t skyMode = kSkyModeTexture;
 		float skyIntensity = 1.0f;		// 計算する空の明るさ
-		float skyPad[2] = {};
+		float cloudCoverage = 0.0f;		// 雲の量。0で雲を出さない
+		float cloudTime = 0.0f;			// 雲を流す時刻(秒)
+		// 空気遠近。1m あたりの係数を LightManager が毎フレーム入れる
+		Math::Vector3 aerialRayleigh{};	// 太陽の光 × 透過率 × レイリー散乱
+		float aerialMieG = 0.8f;
+		Math::Vector3 aerialMie{};		// 同、ミー散乱
+		float aerialDistanceScale = 0.0f;	// 0で空気遠近を掛けない
+		Math::Vector3 aerialAmbient{};	// 多重散乱で回り込む光 × 散乱
+		float starIntensity = 0.0f;		// 星の明るさ。0で描かない
+		Math::Vector3 aerialExtinction{};
+		float cloudShadow = 0.0f;		// 雲が平行光源0番を遮る強さ(0〜1)
+		Math::Vector3 sunDiskColor{};	// 大気を通った太陽の色
+		float moonIntensity = 0.0f;		// 月の明るさ。0で描かない
 	};
 
 	/// <summary>
@@ -158,15 +216,39 @@ namespace Graphics {
 		uint32_t hasEnvironment = 1;
 
 		uint32_t lightingMode = kLightingModeSimple;
-		uint32_t padLighting[3] = {};
+		// RenderFlag の組み合わせ
+		uint32_t renderFlags = 0;
+		uint32_t padLighting[2] = {};
 
 		// 前方描画のPSはここから読む。空と粒子は同じ中身を gFog として別に受け取る
 		FogData fog;
+
+		// 濡れた路面。wetness が0なら何もしない
+		float wetness = 0.0f;
+		float puddleAmount = 0.5f;
+		float puddleScale = 4.0f;
+		float rainAmount = 0.0f;		// 雨の強さ (0〜1)。波紋を立てる
 	};
 
 	// HLSL 側と大きさが食い違うと、ずれた位置から読んで絵が壊れる。並びを変えたらここで気付けるようにしておく
-	static_assert(sizeof(FogData) == 160, "FogData の大きさが Fog.hlsli の FogParams と一致していない");
-	static_assert(sizeof(AllLightsData) == 1504, "AllLightsData の大きさが Object3d.hlsli の AllLights と一致していない");
+	static_assert(sizeof(FogData) == 240, "FogData の大きさが Fog.hlsli の FogParams と一致していない");
+	static_assert(sizeof(AllLightsData) == 1600, "AllLightsData の大きさが Object3d.hlsli の AllLights と一致していない");
+
+	/// <summary>
+	/// 計算する空から、フォグ・アンビエント・空気遠近へ何を取るか
+	/// </summary>
+	struct AtmosphereSettings {
+		/// <summary>フォグの色を空の地平線から取る</summary>
+		bool fogColorFromSky = false;
+		/// <summary>空から取ったフォグの色に掛ける倍率</summary>
+		float fogSkyColorScale = 1.0f;
+		/// <summary>空気遠近の距離の倍率。0 で掛けない</summary>
+		float aerialPerspectiveScale = 1.0f;
+		/// <summary>空から回り込む光の強さ</summary>
+		float skyLightIntensity = 1.0f;
+		/// <summary>半球アンビエントに足す明るさ。夜の暗さの下限</summary>
+		Math::Vector3 nightAmbient = { 0.0f,0.0f,0.0f };
+	};
 
 	/// <summary>
 	/// ライト管理クラス
@@ -205,6 +287,16 @@ namespace Graphics {
 		/// <returns>入れた番号(GetSpotLight に渡す)。上限まで埋まっていたら -1</returns>
 		int AddSpotLight(const SpotLightData& data);
 
+		/// <summary>影を落とさないライトの枠を1つ取る。消えた状態(色が0)で入る</summary>
+		/// <returns>番号(GetClusteredLight に渡す)。上限まで埋まっていたら -1</returns>
+		int AddClusteredLight();
+		/// <summary>枠を返す</summary>
+		void RemoveClusteredLight(int index);
+		ClusteredLightData* GetClusteredLight(int index);
+		/// <summary>点いている影なしのライトを詰めて書き出す</summary>
+		/// <returns>書いた数</returns>
+		uint32_t GatherClusteredLights(ClusteredLightData* out, uint32_t capacity) const;
+
 		/// <summary>
 		/// データをコマンドリストに送る
 		/// </summary>
@@ -229,6 +321,10 @@ namespace Graphics {
 		int GetNumDirectionalLights() const { return allLightsData_.numDirectionalLights; }
 		int GetNumPointLights() const { return allLightsData_.numPointLights; }
 		int GetNumSpotLights() const { return allLightsData_.numSpotLights; }
+		RayTracedAOMode GetAOMode() const { return static_cast<RayTracedAOMode>(allLightsData_.aoMode); }
+		RayTracedShadowMode GetShadowMode() const { return static_cast<RayTracedShadowMode>(allLightsData_.shadowMode); }
+		/// <summary>RenderFlag の組み合わせ</summary>
+		uint32_t GetRenderFlags() const { return allLightsData_.renderFlags; }
 
 		//========================================================================*/
 		//* Setter
@@ -249,6 +345,41 @@ namespace Graphics {
 			allLightsData_.iblAmbientScale = iblScale;
 		}
 		void SetLightingMode(LightingMode mode) { allLightsData_.lightingMode = mode; }
+		/// <summary>品質の設定で足す描画の細部</summary>
+		void SetRenderFlags(uint32_t flags) { allLightsData_.renderFlags = flags; }
+		/// <summary>このフレームの定数だけ、半透明の影のフラグを立てる・下ろす</summary>
+		void SetTranslucentShadowThisFrame(bool enabled);
+		/// <summary>濡れた路面の設定を入れる</summary>
+		/// <param name="wetness">全体の濡れ具合(0〜1)。0で何もしない</param>
+		/// <param name="puddleAmount">水たまりの多さ(0〜1)</param>
+		/// <param name="puddleScale">水たまりの大きさ(m)</param>
+		/// <summary>雨の強さ (0〜1)</summary>
+		void SetRainAmount(float rain) { allLightsData_.rainAmount = rain; }
+		void SetWetness(float wetness, float puddleAmount, float puddleScale) {
+			allLightsData_.wetness = wetness;
+			allLightsData_.puddleAmount = puddleAmount;
+			allLightsData_.puddleScale = puddleScale;
+		}
+		/// <summary>空を計算するクラス。計算する空のとき、フォグ・アンビエント・空気遠近を上書きする</summary>
+		void SetSkyAtmosphere(SkyAtmosphere* skyAtmosphere) { skyAtmosphere_ = skyAtmosphere; }
+		void SetAtmosphereSettings(const AtmosphereSettings& settings) { atmosphereSettings_ = settings; }
+		/// <summary>空・フォグ・空気遠近が使う太陽を、0番の平行光源とは別に入れる</summary>
+		/// <param name="toSun">太陽へ向かう単位ベクトル。地平線の下でもよい</param>
+		/// <param name="color">太陽の色と強さ</param>
+		/// <remarks>夜も空は沈んだ太陽から計算させるために使う。ResetLights で外れる</remarks>
+		void SetSkySun(const Math::Vector3& toSun, const Math::Vector3& color) {
+			hasSkySun_ = true;
+			skySunDirection_ = toSun;
+			skySunColor_ = color;
+		}
+		/// <summary>空の太陽を0番の平行光源に戻す</summary>
+		void ClearSkySun() { hasSkySun_ = false; }
+		/// <summary>太陽と空から求める値を今の設定から作り直す。Update の後に設定を入れ直したら呼ぶ</summary>
+		void RefreshDerived();
+		/// <summary>空を計算する設定で、空を出しているか</summary>
+		bool IsAtmosphereActive() const {
+			return allLightsData_.fog.skyMode == kSkyModeAtmosphere && allLightsData_.hasEnvironment != 0;
+		}
 		/// <summary>半球アンビエントの2色を入れる</summary>
 		void SetAmbientColors(const Math::Vector3& sky, const Math::Vector3& ground) {
 			allLightsData_.ambientSkyColor = sky;
@@ -275,6 +406,8 @@ namespace Graphics {
 
 	private:
 		void CopyData(uint32_t frameIndex = 0);
+		/// <summary>空から読み戻した値を、フォグ・アンビエント・空気遠近へ入れる</summary>
+		void ApplyAtmosphere();
 
 	private:
 
@@ -287,6 +420,20 @@ namespace Graphics {
 		// allLightsData_.fog の写し。中身は必ず同じ
 		Microsoft::WRL::ComPtr<ID3D12Resource> fogResource_[DXC::kFrameCount_];
 		FogData* fogDataGPU_[DXC::kFrameCount_] = {};
+
+		SkyAtmosphere* skyAtmosphere_ = nullptr;
+		AtmosphereSettings atmosphereSettings_;
+		// GPU から最後に届いた値。届くまでは空気遠近を掛けない
+		SkyAtmosphere::Summary atmosphereSummary_;
+		bool hasAtmosphereSummary_ = false;
+		// SetSkySun で入れた太陽。無ければ0番の平行光源を太陽とみなす
+		// 影なしのライトの枠。使っていない枠は freeClustered_ に積む
+		std::vector<ClusteredLightData> clusteredLights_;
+		std::vector<bool> isClusteredUsed_;
+		std::vector<int> freeClustered_;
+		bool hasSkySun_ = false;
+		Math::Vector3 skySunDirection_ = { 0.0f,1.0f,0.0f };
+		Math::Vector3 skySunColor_ = { 0.0f,0.0f,0.0f };
 
 	};
 }

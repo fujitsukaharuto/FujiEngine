@@ -67,6 +67,14 @@ uint32_t Material::GetTextureSrvIndex() const {
 	return texture_ ? texture_->srvIndex : 0;
 }
 
+uint32_t Material::GetEmissiveTextureSrvIndex() const {
+	return emissiveMap_ ? emissiveMap_->srvIndex : GetTextureSrvIndex();
+}
+
+bool Material::IsCutout() const {
+	return texture_ && texture_->hasTransparency && materialData_.AlphaRef > 0.0f;
+}
+
 ID3D12Resource* Material::UploadAndGetResource() {
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 	if (!materialResource_[frameIndex]) {
@@ -76,7 +84,7 @@ ID3D12Resource* Material::UploadAndGetResource() {
 	return materialResource_[frameIndex].Get();
 }
 
-Vector4 Material::GetColor() {
+Vector4 Material::GetColor() const {
 	return materialData_.color;
 }
 
@@ -118,6 +126,23 @@ void Material::SetNormalMap(const std::string& name, bool overWrite) {
 	materialData_.useNormalMap = 1;
 }
 
+void Material::SetMetallicRoughnessMap(const std::string& name) {
+	// 数値なので sRGB として読まない
+	metallicRoughnessMap_ = TextureManager::GetInstance()->GetLinearTexture(name, false);
+	materialData_.useMetallicRoughnessMap = metallicRoughnessMap_ ? 1 : 0;
+}
+
+void Material::SetEmissiveMap(const std::string& name) {
+	// 色なので sRGB として読む
+	emissiveMap_ = TextureManager::GetInstance()->GetTexture(name);
+	materialData_.useEmissiveMap = emissiveMap_ ? 1 : 0;
+}
+
+void Material::SetOcclusionMap(const std::string& name) {
+	occlusionMap_ = TextureManager::GetInstance()->GetLinearTexture(name, false);
+	materialData_.useOcclusionMap = occlusionMap_ ? 1 : 0;
+}
+
 void Material::SetLightEnable(LightMode mode) {
 	materialData_.enableLighting = static_cast<int32_t>(mode);
 }
@@ -148,6 +173,13 @@ void Material::CopyData(uint32_t frameIndex) {
 	materialDataGPU_[frameIndex]->emissive = materialData_.emissive;
 	materialDataGPU_[frameIndex]->rimPower = materialData_.rimPower;
 	materialDataGPU_[frameIndex]->rimColor = materialData_.rimColor;
+	materialDataGPU_[frameIndex]->metallicRoughnessIndex = metallicRoughnessMap_ ? static_cast<int32_t>(metallicRoughnessMap_->srvIndex) : 0;
+	materialDataGPU_[frameIndex]->useMetallicRoughnessMap = materialData_.useMetallicRoughnessMap;
+	materialDataGPU_[frameIndex]->isTwoSided = materialData_.isTwoSided;
+	materialDataGPU_[frameIndex]->emissiveMapIndex = emissiveMap_ ? static_cast<int32_t>(emissiveMap_->srvIndex) : 0;
+	materialDataGPU_[frameIndex]->useEmissiveMap = materialData_.useEmissiveMap;
+	materialDataGPU_[frameIndex]->occlusionMapIndex = occlusionMap_ ? static_cast<int32_t>(occlusionMap_->srvIndex) : 0;
+	materialDataGPU_[frameIndex]->useOcclusionMap = materialData_.useOcclusionMap;
 }
 
 Matrix4x4 Material::MakeScale4x4(const Vector3& scale) {

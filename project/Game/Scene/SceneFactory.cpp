@@ -5,6 +5,7 @@
 #include "Game/Scene/Debug/ParticleDebugScene.h"
 #include "Game/Scene/Debug/GPUParticleScene.h"
 #include "Game/Scene/Debug/TestScene.h"
+#include "Game/Scene/Debug/NightTownScene.h"
 
 SceneFactory::SceneFactory() {
 	// ここに並べた順がシーン切り替えGUIの表示順になる
@@ -14,6 +15,7 @@ SceneFactory::SceneFactory() {
 	Register<ParticleDebugScene>("PARTICLEDEBUG");
 	Register<GPUParticleScene>("GPUPARTICLE");
 	Register<TestScene>("TEST");
+	Register<NightTownScene>("NIGHTTOWN");
 }
 
 SceneFactory::~SceneFactory() {

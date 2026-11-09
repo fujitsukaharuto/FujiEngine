@@ -1,6 +1,8 @@
 #include "Engine/Graphics/PostEffect/OffscreenManager.h"
 #include <algorithm>
 #include "Engine/Graphics/PostEffect/BloomPass.h"
+#include "Engine/Graphics/PostEffect/AutoExposurePass.h"
+#include "Engine/Graphics/PostEffect/BufferVisualizer.h"
 #include "Engine/Graphics/Pipeline/RootNames.h"
 #include "Engine/DXC/DXCom.h"
 #include "Engine/DXC/Resource/DX12Helper.h"
@@ -11,6 +13,7 @@
 #include "Engine/Graphics/Camera/CameraManager.h"
 #include "Engine/Graphics/Object/ObjectRenderer.h"
 #include "Engine/Graphics/Light/LightManager.h"
+#include "Engine/Graphics/Raytracing/VolumetricLightPass.h"
 #include "Engine/Core/Time/FPSKeeper.h"
 #include "externals/DirectXTex/d3dx12.h"
 #ifdef _DEBUGMODE
@@ -26,6 +29,12 @@ using namespace Graphics;
 using namespace Math;
 using namespace DXC;
 
+namespace {
+	// 局所トーンマップの地図の1区画の画素数
+	constexpr uint32_t kLocalTonemapBlock = 16;
+	constexpr uint32_t kLocalTonemapGroupSize = 8;
+}
+
 
 OffscreenManager::OffscreenManager() = default;
 
@@ -33,6 +42,14 @@ OffscreenManager::~OffscreenManager() {
 	if (bloomPass_) {
 		bloomPass_->Finalize();
 		bloomPass_.reset();
+	}
+	if (autoExposurePass_) {
+		autoExposurePass_->Finalize();
+		autoExposurePass_.reset();
+	}
+	if (bufferVisualizer_) {
+		bufferVisualizer_->Finalize();
+		bufferVisualizer_.reset();
 	}
 	dxcommon_ = nullptr;
 }
@@ -58,6 +75,11 @@ void OffscreenManager::Update() {
 
 void OffscreenManager::DebugGUI() {
 #ifdef _DEBUGMODE
+	// 別のウィンドウ
+	if (bufferVisualizer_) {
+		bufferVisualizer_->DebugGUI();
+	}
+
 	DebugWindow window{ "OffScreen Debug" };
 	if (!window) { return; }
 
@@ -105,6 +127,10 @@ void OffscreenManager::DebugGUI() {
 			bloomPass_->DebugGUI();
 		}
 		ImGui::TreePop();
+	}
+
+	if (autoExposurePass_) {
+		autoExposurePass_->DebugGUI();
 	}
 
 	if (ImGui::TreeNode("RadialBlur##settingRadialBlur")) {
@@ -294,11 +320,27 @@ void OffscreenManager::SettingTexture() {
 
 	bloomPass_ = std::make_unique<BloomPass>();
 	bloomPass_->Initialize(dxcommon_);
+
+	autoExposurePass_ = std::make_unique<AutoExposurePass>();
+	autoExposurePass_->Initialize(dxcommon_);
+	autoExposurePass_->SetSettings(autoExposureSettings_);
+
+	const uint32_t localWidth = (MyWin::kWindowWidth + kLocalTonemapBlock - 1) / kLocalTonemapBlock;
+	const uint32_t localHeight = (MyWin::kWindowHeight + kLocalTonemapBlock - 1) / kLocalTonemapBlock;
+	for (WorkTexture& map : localTonemapMap_) {
+		map.Create(dxcommon_->GetDevice(), DXGI_FORMAT_R16_FLOAT, false, localWidth, localHeight);
+	}
+
+#ifdef _DEBUGMODE
+	bufferVisualizer_ = std::make_unique<BufferVisualizer>();
+	bufferVisualizer_->Initialize(dxcommon_);
+#endif // _DEBUGMODE
 }
 
 void OffscreenManager::Command() {
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
-	UpdateGodRay();
+	UpdateSunEffects();
+	UpdateMotionBlur();
 	CopyData(frameIndex);
 
 	if (isPostEffect_) {
@@ -328,12 +370,28 @@ void OffscreenManager::ApplySettings(const PostProcessSettings& settings) {
 	}
 	tonemapData_.mode = settings.tonemapMode;
 	tonemapData_.exposure = settings.exposure;
+	autoExposureSettings_.enabled = settings.autoExposure;
+	autoExposureSettings_.minEV = settings.autoExposureMinEV;
+	autoExposureSettings_.maxEV = settings.autoExposureMaxEV;
+	autoExposureSettings_.speedUp = settings.autoExposureSpeedUp;
+	autoExposureSettings_.speedDown = settings.autoExposureSpeedDown;
+	if (autoExposurePass_) {
+		autoExposurePass_->SetSettings(autoExposureSettings_);
+	}
 	tonemapData_.saturation = settings.saturation;
 	tonemapData_.contrast = settings.contrast;
 	tonemapData_.sharpen = settings.sharpen;
 	tonemapData_.vignette = settings.vignette;
 	tonemapData_.shadowTint = settings.shadowTint;
 	tonemapData_.highlightTint = settings.highlightTint;
+	tonemapData_.chromaticAberration = settings.chromaticAberration;
+	// 正で暖色。見た目の明るさで割り戻す
+	const Vector3 balance = {
+		1.0f + 0.2f * settings.whiteBalanceTemperature,
+		1.0f - 0.15f * settings.whiteBalanceTint,
+		1.0f - 0.2f * settings.whiteBalanceTemperature };
+	const float balanceLuminance = 0.2126f * balance.x + 0.7152f * balance.y + 0.0722f * balance.z;
+	tonemapData_.whiteBalance = balance * (1.0f / (std::max)(balanceLuminance, 1e-3f));
 
 	godRayIntensity_ = settings.godRayIntensity;
 	godRayData_.rayLength = settings.godRayLength;
@@ -344,6 +402,15 @@ void OffscreenManager::ApplySettings(const PostProcessSettings& settings) {
 	dofData_.focusRange = settings.dofFocusRange;
 	dofData_.falloff = settings.dofFalloff;
 
+	lensFlareIntensity_ = settings.lensFlare;
+	tonemapData_.purkinje = settings.purkinje;
+	tonemapData_.purkinjeLuminance = (std::max)(settings.purkinjeLuminance, 1e-4f);
+	tonemapData_.localTonemap = settings.localTonemap;
+	tonemapData_.localTonemapDetail = settings.localTonemapDetail;
+	tonemapData_.filmGrain = settings.filmGrain;
+	tonemapData_.fade = settings.fade;
+	motionBlurStrength_ = settings.motionBlur;
+
 	const bool hasBloom = HasPostEffect(PostEffectList::Bloom);
 	if (settings.bloomEnabled && !hasBloom) {
 		AddPostEffect(PostEffectList::Bloom);
@@ -351,23 +418,34 @@ void OffscreenManager::ApplySettings(const PostProcessSettings& settings) {
 		PopPostEffect(PostEffectList::Bloom);
 	}
 
-	const bool isGodRay = settings.godRayIntensity > 0.0f;
-	const bool hasGodRay = HasPostEffect(PostEffectList::GodRay);
-	if (isGodRay && !hasGodRay) {
-		// 先頭へ入れる。ブルームより前に足せば、筋の明るい所もいっしょににじむ
-		validPostEffects_.insert(validPostEffects_.begin(), postEffects_[int(PostEffectList::GodRay)]);
-	} else if (!isGodRay && hasGodRay) {
-		PopPostEffect(PostEffectList::GodRay);
-	}
+	SetSceneEffect(PostEffectList::VolumetricLight, settings.volumetricLight);
+	SetSceneEffect(PostEffectList::GodRay, settings.godRayIntensity > 0.0f);
+	SetSceneEffect(PostEffectList::DepthOfField, settings.dofBlur > 0.0f);
+	SetSceneEffect(PostEffectList::MotionBlur, settings.motionBlur > 0.0f);
+	SetSceneEffect(PostEffectList::LensFlare, settings.lensFlare > 0.0f);
+}
 
-	const bool isDof = settings.dofBlur > 0.0f;
-	const bool hasDof = HasPostEffect(PostEffectList::DepthOfField);
-	if (isDof && !hasDof) {
-		// 光の筋のすぐ後、ブルームより前。ぼかした後の絵を光らせる(逆だと光のにじみまでぼける)
-		const size_t position = (!validPostEffects_.empty() && validPostEffects_.front().effectName == PostEffectList::GodRay) ? 1 : 0;
-		validPostEffects_.insert(validPostEffects_.begin() + position, postEffects_[int(PostEffectList::DepthOfField)]);
-	} else if (!isDof && hasDof) {
-		PopPostEffect(PostEffectList::DepthOfField);
+void OffscreenManager::SetSceneEffect(PostEffectList effect, bool enabled) {
+	// 順に: 光の筋 → ゴッドレイ → 被写界深度 → モーションブラー → レンズフレア
+	auto rank = [](PostEffectList e) {
+		switch (e) {
+		case PostEffectList::VolumetricLight: return 0;
+		case PostEffectList::GodRay: return 1;
+		case PostEffectList::DepthOfField: return 2;
+		case PostEffectList::MotionBlur: return 3;
+		case PostEffectList::LensFlare: return 4;
+		default: return 100;
+		}
+	};
+	const bool hasEffect = HasPostEffect(effect);
+	if (enabled && !hasEffect) {
+		size_t position = 0;
+		while (position < validPostEffects_.size() && rank(validPostEffects_[position].effectName) < rank(effect)) {
+			++position;
+		}
+		validPostEffects_.insert(validPostEffects_.begin() + position, postEffects_[int(effect)]);
+	} else if (!enabled && hasEffect) {
+		PopPostEffect(effect);
 	}
 }
 
@@ -380,9 +458,10 @@ bool OffscreenManager::HasPostEffect(PostEffectList effect) const {
 	return false;
 }
 
-void OffscreenManager::UpdateGodRay() {
+void OffscreenManager::UpdateSunEffects() {
 	godRayData_.intensity = 0.0f;
-	if (godRayIntensity_ <= 0.0f) {
+	lensFlareData_.intensity = 0.0f;
+	if (godRayIntensity_ <= 0.0f && lensFlareIntensity_ <= 0.0f) {
 		return;
 	}
 	LightManager* lightManager = ObjectRenderer::GetInstance()->GetLightManager();
@@ -410,6 +489,25 @@ void OffscreenManager::UpdateGodRay() {
 	godRayData_.sunUV = { x / w * 0.5f + 0.5f, -y / w * 0.5f + 0.5f };
 	godRayData_.color = { light->color.x, light->color.y, light->color.z };
 	godRayData_.intensity = godRayIntensity_ * fade;
+	lensFlareData_.sunUV = godRayData_.sunUV;
+	lensFlareData_.color = godRayData_.color;
+	lensFlareData_.intensity = lensFlareIntensity_ * fade;
+}
+
+void OffscreenManager::UpdateMotionBlur() {
+	motionBlurData_.strength = 0.0f;
+	if (motionBlurStrength_ <= 0.0f) {
+		// 古いカメラで写し直さないよう前のフレームを忘れる
+		hasPreviousViewProjection_ = false;
+		return;
+	}
+	const Matrix4x4& viewProjection = CameraManager::GetInstance()->GetCamera()->GetViewProjectionMatrix();
+	if (hasPreviousViewProjection_) {
+		motionBlurData_.currentToPrevious = Inverse(viewProjection) * previousViewProjection_;
+		motionBlurData_.strength = motionBlurStrength_;
+	}
+	previousViewProjection_ = viewProjection;
+	hasPreviousViewProjection_ = true;
 }
 
 void OffscreenManager::PopPostEffect(PostEffectList effect) {
@@ -548,6 +646,18 @@ void Graphics::OffscreenManager::InitDataResource() {
 		dofResource_[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(DepthOfFieldParams));
 		dofDataGPU_[i] = nullptr;
 		dofResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&dofDataGPU_[i]));
+
+		lensFlareResource_[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(LensFlareParams));
+		lensFlareDataGPU_[i] = nullptr;
+		lensFlareResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&lensFlareDataGPU_[i]));
+
+		volumetricResource_[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(VolumetricCompositeParams));
+		volumetricDataGPU_[i] = nullptr;
+		volumetricResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&volumetricDataGPU_[i]));
+
+		motionBlurResource_[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(MotionBlurParams));
+		motionBlurDataGPU_[i] = nullptr;
+		motionBlurResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&motionBlurDataGPU_[i]));
 	}
 }
 
@@ -691,6 +801,42 @@ void OffscreenManager::InitializePostEffects() {
 		}
 		});
 
+	postEffects_.push_back({//MotionBlurのセッティング
+		Pipe::MotionBlurCS,
+		PostEffectList::MotionBlur,
+		[=](auto* cmd, auto input, auto output) {
+			pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kInputTexture, input);
+			pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kOutputTexture, output);
+			pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kDepthTexture, dxcommon_->GetDepthTexGPUHandle());
+			pPipeManager->SetComputeRootCBV(cmd, RootName::kMotionBlurParams, motionBlurResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
+		}
+		});
+
+	postEffects_.push_back({//LensFlareのセッティング
+		Pipe::LensFlareCS,
+		PostEffectList::LensFlare,
+		[=](auto* cmd, auto input, auto output) {
+			pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kInputTexture, input);
+			pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kOutputTexture, output);
+			pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kDepthTexture, dxcommon_->GetDepthTexGPUHandle());
+			pPipeManager->SetComputeRootCBV(cmd, RootName::kLensFlareParams, lensFlareResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
+		}
+		});
+
+	postEffects_.push_back({//VolumetricLightのセッティング
+		Pipe::VolumetricLightCompositeCS,
+		PostEffectList::VolumetricLight,
+		[=](auto* cmd, auto input, auto output) {
+			pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kInputTexture, input);
+			pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kOutputTexture, output);
+			pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kDepthTexture, dxcommon_->GetDepthTexGPUHandle());
+			// パスが無ければ enabled が0で素通し。表は入力で埋める
+			const VolumetricLightPass* volumetric = ObjectRenderer::GetInstance()->GetVolumetricLightPass();
+			pPipeManager->SetComputeRootDescriptorTable(cmd, RootName::kVolumetricLight, volumetric ? volumetric->GetResultSrvHandle() : input);
+			pPipeManager->SetComputeRootCBV(cmd, RootName::kVolumetricCompositeParams, volumetricResource_[dxcommon_->GetNowFrameCount()]->GetGPUVirtualAddress());
+		}
+		});
+
 }
 
 void Graphics::OffscreenManager::PingPongCommand() {
@@ -717,7 +863,8 @@ void Graphics::OffscreenManager::PingPongCommand() {
 		}
 
 		const Pipe pipeline = validPostEffects_[i].pipeline;
-		if (pipeline == Pipe::OutlineCS || pipeline == Pipe::GodRayCS || pipeline == Pipe::DepthOfFieldCS) {
+		if (pipeline == Pipe::OutlineCS || pipeline == Pipe::GodRayCS || pipeline == Pipe::DepthOfFieldCS ||
+			pipeline == Pipe::MotionBlurCS || pipeline == Pipe::LensFlareCS || pipeline == Pipe::VolumetricLightCompositeCS) {
 			// 深度を読む効果
 			dxcommon_->TransitionDepthToRead();
 			dxcommon_->GetPipelineManager()->SetCSPipeline(validPostEffects_[i].pipeline);
@@ -776,6 +923,24 @@ void Graphics::OffscreenManager::DrawToScreen(D3D12_GPU_DESCRIPTOR_HANDLE input)
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 	ID3D12GraphicsCommandList* commandList = dxcommon_->GetCommandList();
 
+	// トーンマップの直前の画面で明るさを測る
+	if (autoExposurePass_) {
+		autoExposurePass_->Render(input);
+	}
+	RenderLocalTonemap(input);
+
+#ifdef _DEBUGMODE
+	if (bufferVisualizer_) {
+		BufferVisualizer::Sources sources;
+		sources.scene = input;
+		sources.localTonemap = SRVManager::GetInstance()->GetGPUDescriptorHandle(localTonemapMap_[1].srvIndex);
+		sources.hasLocalTonemap = tonemapData_.localTonemap > 0.0f;
+		sources.exposure = tonemapData_.exposure;
+		sources.depthToView = dofData_.depthToView;
+		bufferVisualizer_->Render(sources);
+	}
+#endif // _DEBUGMODE
+
 #ifdef _DEBUGMODE
 	// バックバッファへ戻すのは呼び出し側(DXCom::PostEffect)
 	const bool isOnPanel = MyWin::GetGameView().isOnPanel;
@@ -799,6 +964,12 @@ void Graphics::OffscreenManager::DrawToScreen(D3D12_GPU_DESCRIPTOR_HANDLE input)
 	commandList->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	dxcommon_->GetPipelineManager()->SetGraphicsRootDescriptorTable(commandList, RootName::kG_InputTexture, input);
 	dxcommon_->GetPipelineManager()->SetGraphicsRootCBV(commandList, RootName::kTonemapParams, tonemapResource_[frameIndex]->GetGPUVirtualAddress());
+	// PS が宣言しているので切っていてもバインドが要る
+	if (autoExposurePass_) {
+		dxcommon_->GetPipelineManager()->SetGraphicsRootDescriptorTable(commandList, RootName::kAutoExposure, autoExposurePass_->GetExposureSrvHandle());
+	}
+	dxcommon_->GetPipelineManager()->SetGraphicsRootDescriptorTable(commandList, RootName::kLocalTonemap,
+		SRVManager::GetInstance()->GetGPUDescriptorHandle(localTonemapMap_[1].srvIndex));
 	commandList->DrawInstanced(3, 1, 0, 0); // 大きな三角形に描画して負荷を減らす
 
 #ifdef _DEBUGMODE
@@ -811,6 +982,37 @@ void Graphics::OffscreenManager::DrawToScreen(D3D12_GPU_DESCRIPTOR_HANDLE input)
 		CaptureScreenshot(isOnPanel);
 	}
 #endif // _DEBUGMODE
+}
+
+void OffscreenManager::RenderLocalTonemap(D3D12_GPU_DESCRIPTOR_HANDLE input) {
+	if (tonemapData_.localTonemap <= 0.0f) {
+		return;
+	}
+	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
+	PipelineManager* pPipeManager = dxcommon_->GetPipelineManager();
+	SRVManager* srvManager = SRVManager::GetInstance();
+	const WorkTexture& block = localTonemapMap_[0];
+	const WorkTexture& map = localTonemapMap_[1];
+	const UINT width = (MyWin::kWindowWidth + kLocalTonemapBlock - 1) / kLocalTonemapBlock;
+	const UINT height = (MyWin::kWindowHeight + kLocalTonemapBlock - 1) / kLocalTonemapBlock;
+	const UINT groupX = (width + kLocalTonemapGroupSize - 1) / kLocalTonemapGroupSize;
+	const UINT groupY = (height + kLocalTonemapGroupSize - 1) / kLocalTonemapGroupSize;
+
+	// 区画ごとの平均
+	dxcommon_->TransitionResource(block.resource.Get(), WorkTexture::kReadState, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+	pPipeManager->SetCSPipeline(Pipe::LocalTonemapDownsampleCS);
+	pPipeManager->SetComputeRootDescriptorTable(cList, RootName::kInputTexture, input);
+	pPipeManager->SetComputeRootDescriptorTable(cList, RootName::kOutputTexture, srvManager->GetGPUDescriptorHandle(block.uavIndex));
+	cList->Dispatch(groupX, groupY, 1);
+	dxcommon_->TransitionResource(block.resource.Get(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS, WorkTexture::kReadState);
+
+	// 明るさの近い区画どうしでならす
+	dxcommon_->TransitionResource(map.resource.Get(), WorkTexture::kReadState, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+	pPipeManager->SetCSPipeline(Pipe::LocalTonemapBlurCS);
+	pPipeManager->SetComputeRootDescriptorTable(cList, RootName::kInputTexture, srvManager->GetGPUDescriptorHandle(block.srvIndex));
+	pPipeManager->SetComputeRootDescriptorTable(cList, RootName::kOutputTexture, srvManager->GetGPUDescriptorHandle(map.uavIndex));
+	cList->Dispatch(groupX, groupY, 1);
+	dxcommon_->TransitionResource(map.resource.Get(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS, WorkTexture::kReadState);
 }
 
 void OffscreenManager::CaptureScreenshot([[maybe_unused]] bool isOnPanel) {
@@ -922,8 +1124,31 @@ void OffscreenManager::CopyData(uint32_t frameIndex) {
 	tonemapDataGPU_[frameIndex]->sharpen = tonemapData_.sharpen;
 	tonemapDataGPU_[frameIndex]->vignette = tonemapData_.vignette;
 	tonemapDataGPU_[frameIndex]->shadowTint = tonemapData_.shadowTint;
+	tonemapDataGPU_[frameIndex]->autoExposure = (autoExposurePass_ && autoExposurePass_->IsEnabled()) ? 1u : 0u;
 	tonemapDataGPU_[frameIndex]->highlightTint = tonemapData_.highlightTint;
+	tonemapDataGPU_[frameIndex]->chromaticAberration = tonemapData_.chromaticAberration;
+	tonemapDataGPU_[frameIndex]->whiteBalance = tonemapData_.whiteBalance;
+	tonemapDataGPU_[frameIndex]->purkinje = tonemapData_.purkinje;
+	tonemapDataGPU_[frameIndex]->purkinjeLuminance = tonemapData_.purkinjeLuminance;
+	tonemapDataGPU_[frameIndex]->localTonemap = tonemapData_.localTonemap;
+	tonemapDataGPU_[frameIndex]->localTonemapDetail = tonemapData_.localTonemapDetail;
+	tonemapDataGPU_[frameIndex]->filmGrain = tonemapData_.filmGrain;
+	tonemapDataGPU_[frameIndex]->fade = tonemapData_.fade;
+	// sin の精度が落ちないよう回す
+	grainFrame_ = (grainFrame_ + 1) % 1024;
+	tonemapDataGPU_[frameIndex]->grainSeed = static_cast<float>(grainFrame_);
 
 	*godRayDataGPU_[frameIndex] = godRayData_;
 	*dofDataGPU_[frameIndex] = dofData_;
+	*lensFlareDataGPU_[frameIndex] = lensFlareData_;
+	*motionBlurDataGPU_[frameIndex] = motionBlurData_;
+
+	VolumetricCompositeParams volumetric{};
+	volumetric.depthToView = dofData_.depthToView;
+	if (const VolumetricLightPass* pass = ObjectRenderer::GetInstance()->GetVolumetricLightPass()) {
+		volumetric.lowSize[0] = pass->GetWidth();
+		volumetric.lowSize[1] = pass->GetHeight();
+		volumetric.enabled = pass->IsRendered() ? 1u : 0u;
+	}
+	*volumetricDataGPU_[frameIndex] = volumetric;
 }
