@@ -37,6 +37,8 @@ struct FogParams
     float cloudShadow;     // 雲が太陽を遮る強さ (0〜1)
     float3 sunDiskColor;   // 大気を通った太陽の色
     float moonIntensity;   // 月の明るさ。0で描かない
+    float3 skyGlowColor;   // 光害の色 × 明るさ。0で掛からない
+    float skyGlowHeight;   // 光害が届く高さ (向きの y)
 };
 
 /// <summary>空気遠近で元の色に掛かる割合と、上に乗る空気の色</summary>

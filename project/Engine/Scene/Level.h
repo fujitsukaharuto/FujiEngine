@@ -44,6 +44,12 @@ namespace Scene {
 		float stars = 0.0f;
 		/// <summary>Atmosphere の月 (太陽の反対側) の明るさ。0で描かない</summary>
 		float moon = 0.0f;
+		/// <summary>街の光で空の下の方が染まる色 (光害)</summary>
+		Math::Vector3 skyGlowColor = { 1.0f,0.45f,0.25f };
+		/// <summary>光害の明るさ。0で掛からない</summary>
+		float skyGlow = 0.0f;
+		/// <summary>光害が届く高さ。地平線から真上を1とした向きの y</summary>
+		float skyGlowHeight = 0.25f;
 		Math::Vector4 lightColor = { 1.0f,1.0f,1.0f,1.0f };
 		Math::Vector3 lightDirection = { 0.0f,-1.0f,0.0f };
 		float lightIntensity = 1.0f;
@@ -147,6 +153,8 @@ namespace Scene {
 		bool reflectionBounce = false;
 		/// <summary>別パスの映り込みで、画面に写っている所は画面の色を使う (SSR)</summary>
 		bool reflectionSceneColor = false;
+		/// <summary>別パスの映り込みを、浅い角度ほど縦に伸ばす強さ。0で伸ばさない</summary>
+		float reflectionStretch = 0.0f;
 		/// <summary>この距離までの物を見る</summary>
 		float reflectionMaxDistance = 100.0f;
 		float reflectionIntensity = 1.0f;
@@ -162,6 +170,14 @@ namespace Scene {
 		float puddleScale = 4.0f;
 		/// <summary>雨の強さ(0〜1)。雨粒と波紋が増える</summary>
 		float rain = 0.0f;
+		/// <summary>地面のしぶきの量(0〜1)。0で出ない</summary>
+		float rainSplash = 0.0f;
+		/// <summary>庇・看板・電線などから垂れる雨だれの量(0〜1)。0で出ない</summary>
+		float rainDrip = 0.0f;
+		/// <summary>遠くの雨のカーテンの濃さ(0〜1)。0で出ない</summary>
+		float rainCurtain = 0.0f;
+		/// <summary>走る車の水はねの量(0〜1)。0で出ない</summary>
+		float rainSpray = 0.0f;
 
 		// 被写界深度。ピントの合う距離から離れた物をぼかす
 		/// <summary>ぼけの最大半径(画素)。0で掛からない</summary>

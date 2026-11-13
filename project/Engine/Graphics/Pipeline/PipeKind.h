@@ -38,8 +38,10 @@ namespace Graphics {
 		VolumetricLightTraceCS,    // 光の筋: 空気の中で太陽へ影のレイを飛ばす
 		VolumetricLightBlurCS,     // 光の筋: 進み始めのずらしの模様を均す
 		ClusterLightCullCS,        // 影なしのライト: クラスタごとのライトの一覧
+		RainDripFindCS,            // 雨だれが垂れる場所を探す (RainRenderer)
 		Normal,
 		NormalAdd,
+		NormalPrepassed, // 不透明。プリパスが深度を書いたフレームは深度を書かずに比べるだけ
 		NormalTranslucent,
 		Sprite,
 		Line3d,
@@ -97,6 +99,10 @@ namespace Graphics {
 		SplatParticleCS,   // パーティクルを画面へ点描(CS)
 		SplatComposite,    // 蓄積バッファをシーンへ加算合成(GFX)
 		Rain,              // 雨粒 (RainRenderer)
+		RainSplash,        // 雨のしぶき (RainRenderer)
+		RainDrip,          // 庇などからの雨だれ (RainRenderer)
+		RainSpray,         // 走る車の水はね (RainRenderer)
+		RainCurtain,       // 遠くの雨のカーテン (RainRenderer)
 
 		Count
 	};

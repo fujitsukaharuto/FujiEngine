@@ -1,0 +1,3 @@
+newmtl sign
+Kd 1 1 1
+map_Kd city/sign/sh_00_c.png

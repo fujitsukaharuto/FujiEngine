@@ -12,6 +12,9 @@ static const float kConeScale = 2.0f;
 // ぼかす半径の上限 (画素)。タップを1画素おきに並べられる広さまで
 static const float kMaxRadius = 6.0f;
 static const int kHalfTaps = 6;
+// 縦に伸ばすときの倍率の上限と、そのときの片側のタップ数の上限
+static const float kMaxStretch = 6.0f;
+static const int kMaxStretchHalfTaps = 18;
 // 自分の面からこれ以上離れたものは混ぜない。カメラからの距離に対する割合
 static const float kPlaneTolerance = 0.02f;
 
@@ -63,6 +66,15 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
     // 上限は粗さにも比例させる
     float maxRadius = kMaxRadius * saturate(roughness / max(maxRoughness, 1e-3f));
     float radius = min(coneTan * hitDistance / (viewDistance + hitDistance) * pixelsPerUnit, maxRadius);
+    // 浅い角度で見るほど映り込みは縦に伸びる (縦のぼかしだけ)
+    int maxHalfTaps = kHalfTaps;
+    if (stretch > 0.0f && blurDirection.y != 0)
+    {
+        float NdotV = saturate(dot(normal, normalize(cameraPos - position)));
+        float factor = min(1.0f + stretch * (1.0f / max(NdotV, 0.05f) - 1.0f), kMaxStretch);
+        radius *= factor;
+        maxHalfTaps = kMaxStretchHalfTaps;
+    }
 
     float3 sum = radiance;
     float skySum = sky;
@@ -71,7 +83,7 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
     {
         float tolerance = max(kPlaneTolerance * viewDistance, 0.01f);
         // タップが重ならず間も空かない本数
-        int halfTaps = clamp(int(ceil(radius)), 1, kHalfTaps);
+        int halfTaps = clamp(int(ceil(radius)), 1, maxHalfTaps);
         float spacing = radius / float(halfTaps);
         for (int k = -halfTaps; k <= halfTaps; k++)
         {

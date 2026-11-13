@@ -89,6 +89,7 @@ void ScreenReflectionPass::UpdateParam(uint32_t frameIndex) {
 		param.blurDirection[0] = (slot == 1) ? 1 : 0;
 		param.blurDirection[1] = (slot == 2) ? 1 : 0;
 		param.inputIsTrace = (slot == 1) ? 1u : 0u;
+		param.stretch = (slot == 2) ? stretch_ : 0.0f;
 		std::memcpy(paramMapped_[frameIndex] + kParamStride_ * slot, &param, sizeof(param));
 	}
 }

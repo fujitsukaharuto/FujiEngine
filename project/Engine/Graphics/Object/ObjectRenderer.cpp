@@ -247,9 +247,31 @@ void ObjectRenderer::Render() {
 		gpuTimer_->End(list, index, kTimer_LightCull);
 		gpuTimer_->Resolve(list, index, kTimer_LightCull);
 	}
+	// 雨の値を上げ、雨だれの場所を探す (TLAS を使う)
+	if (rainRenderer_) {
+		rainRenderer_->Prepare(raytracingScene_.get());
+	}
 	// 反射プローブ。影なしのライトも焼き込むので振り分けの後
 	if (reflectionProbePass_ && raytracingScene_ && clusteredLightPass_) {
 		reflectionProbePass_->Render(*raytracingScene_, *clusteredLightPass_, rayLookFrames_ > 0);
+	}
+
+	// 不透明は手前から描く (プリパスの重ね塗りを減らす)
+	{
+		const Math::Vector3 cameraPos = CameraManager::GetInstance()->GetCamera()->GetTranslate();
+		const auto firstAfterOpaque = std::stable_partition(renderQueue_.begin(), renderQueue_.end(),
+			[](const RenderObject* obj) { return !obj->IsDrawnAfterOpaque(); });
+		std::vector<std::pair<float, RenderObject*>> keyed;
+		keyed.reserve(static_cast<size_t>(firstAfterOpaque - renderQueue_.begin()));
+		for (auto it = renderQueue_.begin(); it != firstAfterOpaque; ++it) {
+			const Math::Vector3 d = (*it)->GetWorldPos() - cameraPos;
+			keyed.emplace_back(d.x * d.x + d.y * d.y + d.z * d.z, *it);
+		}
+		std::stable_sort(keyed.begin(), keyed.end(),
+			[](const auto& a, const auto& b) { return a.first < b.first; });
+		for (size_t i = 0; i < keyed.size(); ++i) {
+			renderQueue_[i] = keyed[i].second;
+		}
 	}
 
 	// 画面空間のレイトレが読む深度と法線を先に書き出す。
@@ -293,7 +315,7 @@ void ObjectRenderer::Render() {
 	RenderPicking();
 
 	// パイプラインとライトの結線はルートシグネチャ単位なので、張り替えた後にやり直す
-	PreDraw();
+	PreDraw(gbufferPass_ && gbufferPass_->IsRendered());
 
 	const uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
@@ -356,7 +378,7 @@ void ObjectRenderer::Render() {
 
 	// 雨は加算で重ねる
 	if (rainRenderer_ && clusteredLightPass_ && rainRenderer_->GetAmount() > 0.0f) {
-		rainRenderer_->Render(*clusteredLightPass_);
+		rainRenderer_->Render(*clusteredLightPass_, raytracingScene_.get());
 		dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Normal);
 	}
 
@@ -557,9 +579,10 @@ D3D12_GPU_DESCRIPTOR_HANDLE ObjectRenderer::GetEnvironmentSrvHandle() const {
 	return environment ? environment->gpuHandle : D3D12_GPU_DESCRIPTOR_HANDLE{};
 }
 
-void ObjectRenderer::PreDraw() {
+void ObjectRenderer::PreDraw(bool depthPrepassed) {
 	dxcommon_->GetDXCommand()->SetViewAndScissor(MyWin::kWindowWidth, MyWin::kWindowHeight);
-	dxcommon_->GetPipelineManager()->SetPipeline(Pipe::Normal);
+	// プリパスの後は深度を書かない。書くと discard のせいで早期Zが効かない
+	dxcommon_->GetPipelineManager()->SetPipeline(depthPrepassed ? Pipe::NormalPrepassed : Pipe::Normal);
 	dxcommon_->GetDXCommand()->GetList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	lightManager_->SetLightCommand(dxcommon_->GetCommandList());
 }

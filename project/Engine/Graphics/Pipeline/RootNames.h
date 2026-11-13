@@ -124,6 +124,9 @@ namespace Graphics {
 
 		// --- 雨 (RainRenderer) ---
 		inline const RootParam kRainParams{ "RainParams" };
+		inline const RootParam kRainDripSitesOut{ "gRainDripSitesOut" };	// 雨だれの場所 (探す CS が書く)
+		inline const RootParam kRainDripSites{ "gRainDripSites" };
+		inline const RootParam kRainSprayWheels{ "gRainSprayWheels" };	// 水はねを出すタイヤ
 
 		// --- 半透明の屈折 (RefractionCapture) ---
 		inline const RootParam kRefractionScene{ "gRefractionScene" };

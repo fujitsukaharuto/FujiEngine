@@ -106,7 +106,7 @@ namespace Graphics {
 
 	private:
 
-		void PreDraw();
+		void PreDraw(bool depthPrepassed = false);
 
 		/// <summary>クリックされた画素に写っているオブジェクトの番号を書き出す</summary>
 		/// <remarks>クリックしたフレームにだけ走る。スキニング後の頂点を読むので本描画より前に呼ぶこと</remarks>

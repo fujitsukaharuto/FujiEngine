@@ -63,6 +63,8 @@ PixelShaderOutput main(VertxShaderOutput input)
         float3 zenith = gSkyViewLut.SampleLevel(gSampler, SkyViewDirectionToUv(float3(0.0f, 1.0f, 0.0f)), 0.0f).rgb;
         float4 cloud = CloudLayer(direction, gFog.sunDirection, gFog.sunDiskColor, zenith, sky,
                                   gFog.cloudCoverage, gFog.cloudTime, gFog.cameraPosition.xz);
+        // 雲の底は街の光で照らされる
+        cloud.rgb += gFog.skyGlowColor * 0.5f;
         litColor = lerp(litColor, cloud.rgb, cloud.a);
         litColor *= gMaterial.color.rgb;
     }
@@ -76,6 +78,10 @@ PixelShaderOutput main(VertxShaderOutput input)
 
     // 空気(フォグ)。遠くの地面が霞んで溶け込む先の色と、地平線の色を揃える
     litColor = lerp(litColor, FogColor(gFog, input.texcoord), FogAmountSky(gFog, normalize(input.texcoord)));
+
+    // 光害。地平線に近いほど街の光で明るい
+    float glowHeight = max(normalize(input.texcoord).y, 0.0f) / gFog.skyGlowHeight;
+    litColor += gFog.skyGlowColor * exp(-glowHeight * glowHeight);
 
     output.color = float4(litColor, textureColor.a * gMaterial.color.a);
     //output.color = textureColor * gMaterial.color;

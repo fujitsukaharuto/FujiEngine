@@ -5,6 +5,8 @@
 #include <json.hpp>
 #include "Engine/Core/Debug/ImGuiManager.h"
 #include "Engine/Graphics/Light/LightManager.h"
+#include "Engine/Graphics/Object/ObjectRenderer.h"
+#include "Engine/Graphics/Particle/RainRenderer.h"
 #include "Engine/Core/Time/FPSKeeper.h"
 #include "Engine/Graphics/Model/Model.h"
 
@@ -117,11 +119,14 @@ namespace GameObject {
 		look_.isAnime = data.value("anime", false);
 		look_.isAnimation = data.value("animation", false);
 		look_.texture = data.value("texture", "");
+		look_.emissiveTexture = data.value("emissiveTexture", "");
 		look_.color = ReadVector4(data, "color");
 		look_.uvScale = ReadVector2(data, "uvScale");
 		look_.roughness = ReadFloat(data, "roughness");
 		look_.metallic = ReadFloat(data, "metallic");
 		look_.environment = ReadFloat(data, "environment");
+		look_.weathering = ReadFloat(data, "weathering");
+		look_.flowWater = ReadFloat(data, "flowWater");
 		look_.emissive = ReadVector3(data, "emissive");
 		look_.emissiveIntensity = data.value("emissiveIntensity", 1.0f);
 		look_.emissiveLightRange = data.value("emissiveLightRange", 0.0f);
@@ -189,11 +194,14 @@ namespace GameObject {
 		if (look_.isAnime) { data["anime"] = true; }
 		if (look_.isAnimation) { data["animation"] = true; }
 		if (!look_.texture.empty()) { data["texture"] = look_.texture; }
+		if (!look_.emissiveTexture.empty()) { data["emissiveTexture"] = look_.emissiveTexture; }
 		if (look_.color) { data["color"] = { look_.color->x, look_.color->y, look_.color->z, look_.color->w }; }
 		if (look_.uvScale) { data["uvScale"] = { look_.uvScale->x, look_.uvScale->y }; }
 		if (look_.roughness) { data["roughness"] = *look_.roughness; }
 		if (look_.metallic) { data["metallic"] = *look_.metallic; }
 		if (look_.environment) { data["environment"] = *look_.environment; }
+		if (look_.weathering) { data["weathering"] = *look_.weathering; }
+		if (look_.flowWater) { data["flowWater"] = *look_.flowWater; }
 		if (look_.emissive) {
 			data["emissive"] = { look_.emissive->x, look_.emissive->y, look_.emissive->z };
 			data["emissiveIntensity"] = look_.emissiveIntensity;
@@ -239,6 +247,9 @@ namespace GameObject {
 		}
 		ApplyEmissiveLight(IsActive());
 		ApplyCarLights(IsActive());
+		if (drive_ && IsActive()) {
+			EmitWheelSpray();
+		}
 	}
 
 	void PlacedObject::TurnOffLight() {
@@ -267,6 +278,31 @@ namespace GameObject {
 			} else if (axis < drive_->loopMin) {
 				axis += length;
 			}
+		}
+	}
+
+	void PlacedObject::EmitWheelSpray() {
+		Graphics::RainRenderer* rain = Graphics::ObjectRenderer::GetInstance()->GetRainRenderer();
+		if (!rain || !rain->IsSprayActive()) {
+			return;
+		}
+		Vector3 heading = transform_.GetForward();
+		heading.y = 0.0f;
+		if (heading.Length() < 1e-4f) {
+			return;
+		}
+		const Vector3 velocity = heading.Normalize() * drive_->speed;
+		const Vector3 position = transform_.GetWorldPos();
+		const Vector3 right = transform_.GetRight() * transform_.scale.x;
+		const Vector3 forward = transform_.GetForward() * transform_.scale.z;
+		// タイヤの位置はモデルの座標 (Kenney の車の大きさ: 幅 1.5、長さ 2.7)
+		constexpr float kWheelX = 0.6f;
+		constexpr float kWheelZ = 0.85f;
+		constexpr float kWheelWidth = 0.28f;
+		for (int i = 0; i < 4; i++) {
+			const float side = (i % 2 == 0) ? 1.0f : -1.0f;
+			const float front = (i < 2) ? 1.0f : -1.0f;
+			rain->AddSprayWheel(position + right * (kWheelX * side) + forward * (kWheelZ * front), kWheelWidth * transform_.scale.x, velocity);
 		}
 	}
 
@@ -409,6 +445,13 @@ namespace GameObject {
 			if (look_.metallic) {
 				material.SetMetallic(*look_.metallic);
 			}
+			material.SetWeathering(look_.weathering.value_or(0.0f));
+			material.SetFlowSpeed(look_.flowWater.value_or(0.0f));
+			if (!look_.emissiveTexture.empty()) {
+				material.SetEmissiveMap(look_.emissiveTexture);
+			} else if (!look_.useModelMaterials) {
+				material.SetEmissiveMap("");
+			}
 			// データに無ければ、モデルのマテリアルを使うときはモデルの発光、使わないときは発光無し
 			if (look_.emissive) {
 				material.SetEmissive(*look_.emissive * look_.emissiveIntensity);
@@ -461,6 +504,12 @@ namespace GameObject {
 			look_.texture = texture;
 			changed = true;
 		}
+		char emissiveTexture[128] = {};
+		look_.emissiveTexture.copy(emissiveTexture, sizeof(emissiveTexture) - 1);
+		if (ImGui::InputText("Emissive texture", emissiveTexture, sizeof(emissiveTexture), ImGuiInputTextFlags_EnterReturnsTrue)) {
+			look_.emissiveTexture = emissiveTexture;
+			changed = true;
+		}
 		changed |= OptionalGUI("Color", look_.color, material.GetColor(),
 			[](const char* label, Vector4& v) { return ImGui::ColorEdit4(label, &v.x); });
 		changed |= OptionalGUI("UV Scale", look_.uvScale, material.GetUVScale(),
@@ -471,6 +520,10 @@ namespace GameObject {
 			[](const char* label, float& v) { return ImGui::SliderFloat(label, &v, 0.0f, 1.0f); });
 		changed |= OptionalGUI("Environment", look_.environment, material.GetEnvironment(),
 			[](const char* label, float& v) { return ImGui::SliderFloat(label, &v, 0.0f, 1.0f); });
+		changed |= OptionalGUI("Weathering", look_.weathering, material.GetWeathering(),
+			[](const char* label, float& v) { return ImGui::SliderFloat(label, &v, 0.0f, 1.0f); });
+		changed |= OptionalGUI("Flow water", look_.flowWater, 0.6f,
+			[](const char* label, float& v) { return ImGui::DragFloat(label, &v, 0.01f, -5.0f, 5.0f, "%.2f m/s"); });
 		changed |= OptionalGUI("Emissive", look_.emissive, Vector3{ 1.0f,1.0f,1.0f },
 			[](const char* label, Vector3& v) { return ImGui::ColorEdit3(label, &v.x); });
 		if (look_.emissive) {

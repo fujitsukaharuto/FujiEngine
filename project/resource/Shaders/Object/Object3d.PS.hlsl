@@ -18,6 +18,8 @@
 #include "../Common/Atmosphere.hlsli"
 #include "../Common/ClusteredLights.hlsli"
 #include "../Common/Wetness.hlsli"
+#include "../Common/Weathering.hlsli"
+#include "../Common/FlowingWater.hlsli"
 
 // 構造体(Material / 各種ライト / Camera)は Object3d.hlsli にまとめてある。
 // ピッキングは Picking.PS.hlsl の別パス。UAVへ書くPSは隠れた画素でも最後まで実行される
@@ -182,6 +184,7 @@ PixelShaderOutput main(VertxShaderOutput input, bool isFrontFace : SV_IsFrontFac
             metallic *= roughnessMetallic.y;
         }
         metallic = saturate(metallic);
+        ApplyWeathering(input.WorldPosition, geometricNormal, gMaterial.weathering, albedo, roughness);
         // 濡れた路面。屋根の下は濡らさない。動く物 (走る車など) は屋根とみなさない
         WetSurface wetSurface = (WetSurface)0;
         bool isWetCovered = false;
@@ -198,6 +201,8 @@ PixelShaderOutput main(VertxShaderOutput input, bool isFrontFace : SV_IsFrontFac
             ApplyWetSurface(wetSurface, geometricNormal, albedo, roughness, metallic, normal);
             ApplyRainRipples(wetSurface, input.WorldPosition, geometricNormal, gLights.rainAmount, gLights.fog.cloudTime, normal);
         }
+        // 流れる水のさざ波
+        ApplyFlowingWater(gMaterial.flowSpeed, transformedUV.xy, input.WorldPosition, gLights.fog.cloudTime, normal);
         // 0 にすると GGX のハイライトが1点に潰れてちらつくので下限を置く
         roughness = clamp(roughness, 0.04f, 1.0f);
         if ((gLights.renderFlags & kRenderFlagSpecularAA) != 0)

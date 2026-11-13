@@ -70,6 +70,9 @@ void PipelineManager::CreatePipeline() {
 	CreateRenderPipe(Pipe::NormalAdd, {
 		.vsPath = L"Object/Object3d.VS.hlsl", .psPath = L"Object/Object3d.PS.hlsl",
 		.blend = BlendType::ADD, .depth = DepthMode::READ_ONLY });
+	CreateRenderPipe(Pipe::NormalPrepassed, {
+		.vsPath = L"Object/Object3d.VS.hlsl", .psPath = L"Object/Object3d.PS.hlsl",
+		.blend = BlendType::ALPHA, .depth = DepthMode::READ_ONLY });
 	// 半透明。深度は書かず、表だけ描く
 	CreateRenderPipe(Pipe::NormalTranslucent, {
 		.vsPath = L"Object/Object3d.VS.hlsl", .psPath = L"Object/Object3d.PS.hlsl",
@@ -145,6 +148,7 @@ void PipelineManager::CreatePipeline() {
 	CreateComputePipe(Pipe::VolumetricLightTraceCS, L"Raytracing/VolumetricLightTrace.CS.hlsl");
 	CreateComputePipe(Pipe::VolumetricLightBlurCS, L"Raytracing/VolumetricLightBlur.CS.hlsl");
 	CreateComputePipe(Pipe::ClusterLightCullCS, L"Light/ClusterLightCull.CS.hlsl");
+	CreateComputePipe(Pipe::RainDripFindCS, L"Particle/RainDripFind.CS.hlsl");
 
 	CreateComputePipe(Pipe::GrayCS, L"PostEffect/Grayscale.CS.hlsl");
 	CreateComputePipe(Pipe::GaussCS, L"PostEffect/Gaussian.CS.hlsl");
@@ -193,6 +197,23 @@ void PipelineManager::CreatePipeline() {
 	// 頂点入力は無い。深度は見るだけ
 	CreateRenderPipe(Pipe::Rain, {
 		.vsPath = L"Particle/Rain.VS.hlsl", .psPath = L"Particle/Rain.PS.hlsl",
+		.blend = BlendType::ADD_PREMULTIPLIED, .depth = DepthMode::READ_ONLY,
+		.useInputLayout = false });
+	CreateRenderPipe(Pipe::RainSplash, {
+		.vsPath = L"Particle/RainSplash.VS.hlsl", .psPath = L"Particle/Rain.PS.hlsl",
+		.blend = BlendType::ADD_PREMULTIPLIED, .depth = DepthMode::READ_ONLY,
+		.useInputLayout = false });
+	CreateRenderPipe(Pipe::RainDrip, {
+		.vsPath = L"Particle/RainDrip.VS.hlsl", .psPath = L"Particle/Rain.PS.hlsl",
+		.blend = BlendType::ADD_PREMULTIPLIED, .depth = DepthMode::READ_ONLY,
+		.useInputLayout = false });
+	CreateRenderPipe(Pipe::RainSpray, {
+		.vsPath = L"Particle/RainSpray.VS.hlsl", .psPath = L"Particle/Rain.PS.hlsl",
+		.blend = BlendType::ADD_PREMULTIPLIED, .depth = DepthMode::READ_ONLY,
+		.useInputLayout = false });
+	// 層の距離の深度に置いた画面いっぱいの三角形。手前に物がある画素は深度で隠れる
+	CreateRenderPipe(Pipe::RainCurtain, {
+		.vsPath = L"Particle/RainCurtain.VS.hlsl", .psPath = L"Particle/RainCurtain.PS.hlsl",
 		.blend = BlendType::ADD_PREMULTIPLIED, .depth = DepthMode::READ_ONLY,
 		.useInputLayout = false });
 	CreateRenderPipe(Pipe::SplatComposite, {

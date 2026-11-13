@@ -1,5 +1,6 @@
 #include "Object3d.hlsli"
 #include "../Common/Wetness.hlsli"
+#include "../Common/FlowingWater.hlsli"
 
 // 画面空間のレイトレとデノイザ用に、ワールド法線と深度だけを書き出すパス。VSは Object3d.VS を流用。
 // 法線は幾何形状の向き。a には画面の映り込みが使う粗さを入れ、映り込みを付けていない物は2を足す
@@ -46,6 +47,8 @@ PixelShaderOutput main(VertxShaderOutput input, bool isFrontFace : SV_IsFrontFac
         ApplyRainRipples(wetSurface, input.WorldPosition, flatNormal, gLights.rainAmount, gLights.fog.cloudTime, normal);
         environmentCoefficient = max(environmentCoefficient, wetSurface.wet);
     }
+    // 流れる水のさざ波も前方描画と同じに立てる
+    ApplyFlowingWater(gMaterial.flowSpeed, transformedUV.xy, input.WorldPosition, gLights.fog.cloudTime, normal);
     output.normal = float4(normal, environmentCoefficient > 0.0f ? roughness : roughness + 2.0f);
     return output;
 }

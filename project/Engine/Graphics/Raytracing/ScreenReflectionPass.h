@@ -38,6 +38,9 @@ namespace Graphics {
 
 		void DebugGUI();
 
+		/// <summary>濡れた路面のように、映り込みを縦に伸ばす強さ。0で伸ばさない</summary>
+		void SetStretch(float stretch) { stretch_ = stretch; }
+
 		/// <summary>前方描画が引く結果。rgb=当たった物の明るさ, a=0.5+空が見えた割合/2 (0なら使えない)</summary>
 		D3D12_GPU_DESCRIPTOR_HANDLE GetResultSrvHandle() const;
 
@@ -53,7 +56,7 @@ namespace Graphics {
 			float pad[2] = {};
 			int32_t blurDirection[2] = {};
 			uint32_t inputIsTrace = 0;
-			float blurPad = 0.0f;
+			float stretch = 0.0f;
 			Math::Matrix4x4 sceneColorViewProj;	// 写した画面の ViewProjection (前のフレーム)
 			uint32_t useSceneColor = 0;
 			float sceneColorPad[3] = {};
@@ -93,6 +96,7 @@ namespace Graphics {
 		WorkTexture sceneColor_;
 		Math::Matrix4x4 sceneColorViewProj_;
 		bool hasSceneColor_ = false;
+		float stretch_ = 0.0f;
 
 		Microsoft::WRL::ComPtr<ID3D12Resource> paramResource_[DXC::kFrameCount_];
 		uint8_t* paramMapped_[DXC::kFrameCount_] = {};

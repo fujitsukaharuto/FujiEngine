@@ -24,7 +24,7 @@ cbuffer ReflectionPassParam : register(b2)
     float2 reflectionPad;
     int2 blurDirection;   // ぼかす向き。(1,0)で横、(0,1)で縦
     uint inputIsTrace;    // 0以外ならぼかす元がレイの結果
-    float blurPad;
+    float stretch;        // 縦のぼかしで、浅い角度ほど伸ばす強さ
     float4x4 sceneColorViewProj; // 写した画面 (前のフレーム) の ViewProjection
     uint useSceneColor;          // 0以外なら写した画面の色を使う
     float3 sceneColorPad;

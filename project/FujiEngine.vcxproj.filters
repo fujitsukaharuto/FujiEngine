@@ -1367,6 +1367,24 @@
     <FxCompile Include="resource\Shaders\Particle\Rain.VS.hlsl">
       <Filter>resource\Shaders\Particle</Filter>
     </FxCompile>
+    <FxCompile Include="resource\Shaders\Particle\RainSplash.VS.hlsl">
+      <Filter>resource\Shaders\Particle</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\Particle\RainDripFind.CS.hlsl">
+      <Filter>resource\Shaders\Particle</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\Particle\RainDrip.VS.hlsl">
+      <Filter>resource\Shaders\Particle</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\Particle\RainSpray.VS.hlsl">
+      <Filter>resource\Shaders\Particle</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\Particle\RainCurtain.VS.hlsl">
+      <Filter>resource\Shaders\Particle</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\Particle\RainCurtain.PS.hlsl">
+      <Filter>resource\Shaders\Particle</Filter>
+    </FxCompile>
     <FxCompile Include="resource\Shaders\Particle\Rain.PS.hlsl">
       <Filter>resource\Shaders\Particle</Filter>
     </FxCompile>
@@ -1516,6 +1534,12 @@
     <None Include="resource\Shaders\Common\Wetness.hlsli">
       <Filter>resource\Shaders\Common</Filter>
     </None>
+    <None Include="resource\Shaders\Common\Weathering.hlsli">
+      <Filter>resource\Shaders\Common</Filter>
+    </None>
+    <None Include="resource\Shaders\Common\FlowingWater.hlsli">
+      <Filter>resource\Shaders\Common</Filter>
+    </None>
     <None Include="resource\Shaders\Common\ClusteredLights.hlsli">
       <Filter>resource\Shaders\Common</Filter>
     </None>
@@ -1596,6 +1620,9 @@
     </None>
     <None Include="resource\Shaders\Particle\GPU\Splat.hlsli">
       <Filter>resource\Shaders\Particle\GPU</Filter>
+    </None>
+    <None Include="resource\Shaders\Particle\RainCurtain.hlsli">
+      <Filter>resource\Shaders\Particle</Filter>
     </None>
     <None Include="resource\Shaders\Particle\Rain.hlsli">
       <Filter>resource\Shaders\Particle</Filter>

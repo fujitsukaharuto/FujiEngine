@@ -35,11 +35,11 @@ struct Material
     float3 emissive; // 自分で光る色
     float rimPower; // リムライトの細さ
     float3 rimColor; // リムライトの色。黒なら掛からない
-    float materialPad0;
+    float flowSpeed; // 流れる水の速さ (m/s、Common/FlowingWater.hlsli)。0なら流れない
     int metallicRoughnessIndex; // メタリック・ラフネスのテクスチャ (G=粗さ B=金属)
     int useMetallicRoughnessMap; // 0以外なら roughness と metallic にテクスチャの値を掛ける
     int isTwoSided; // 0以外なら裏から見た面は法線を裏返す
-    float materialPad1;
+    float weathering; // 壁の汚れの強さ (Common/Weathering.hlsli)。0なら無し
     int emissiveMapIndex; // 光る所と色のテクスチャ
     int useEmissiveMap; // 0以外なら emissive にこれを掛ける。0なら色のテクスチャ
     int occlusionMapIndex; // 物陰の暗さのテクスチャ (R)

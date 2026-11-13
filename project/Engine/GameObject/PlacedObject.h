@@ -45,6 +45,8 @@ namespace GameObject {
 		void UpdateDrive();
 		/// <summary>車のライトを今の位置へ</summary>
 		void ApplyCarLights(bool isOn);
+		/// <summary>雨のとき、4つのタイヤから水はねを出す</summary>
+		void EmitWheelSpray();
 		/// <summary>発光の明るさを明滅の倍率に合わせる</summary>
 		void ApplyFlicker();
 
@@ -60,11 +62,17 @@ namespace GameObject {
 			bool isAnimation = false;
 			/// <summary>空欄ならモデルのテクスチャのまま</summary>
 			std::string texture;
+			/// <summary>光る所と色のテクスチャ。空欄ならモデルのまま (modelMaterials でなければ無し)</summary>
+			std::string emissiveTexture;
 			std::optional<Math::Vector4> color;
 			std::optional<Math::Vector2> uvScale;
 			std::optional<float> roughness;
 			std::optional<float> metallic;
 			std::optional<float> environment;
+			/// <summary>壁の汚れの強さ</summary>
+			std::optional<float> weathering;
+			/// <summary>流れる水の速さ (m/s)。UV の u が小さくなる向きへ流れる</summary>
+			std::optional<float> flowWater;
 			/// <summary>自分で光る色。実際の明るさはこれに emissiveIntensity を掛けたもの</summary>
 			std::optional<Math::Vector3> emissive;
 			float emissiveIntensity = 1.0f;

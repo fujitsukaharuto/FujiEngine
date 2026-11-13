@@ -163,6 +163,8 @@ namespace Graphics {
 		float cloudShadow = 0.0f;		// 雲が平行光源0番を遮る強さ(0〜1)
 		Math::Vector3 sunDiskColor{};	// 大気を通った太陽の色
 		float moonIntensity = 0.0f;		// 月の明るさ。0で描かない
+		Math::Vector3 skyGlowColor{};	// 光害の色 × 明るさ。0で掛からない
+		float skyGlowHeight = 0.25f;	// 光害が届く高さ (向きの y)
 	};
 
 	/// <summary>
@@ -231,8 +233,8 @@ namespace Graphics {
 	};
 
 	// HLSL 側と大きさが食い違うと、ずれた位置から読んで絵が壊れる。並びを変えたらここで気付けるようにしておく
-	static_assert(sizeof(FogData) == 240, "FogData の大きさが Fog.hlsli の FogParams と一致していない");
-	static_assert(sizeof(AllLightsData) == 1600, "AllLightsData の大きさが Object3d.hlsli の AllLights と一致していない");
+	static_assert(sizeof(FogData) == 256, "FogData の大きさが Fog.hlsli の FogParams と一致していない");
+	static_assert(sizeof(AllLightsData) == 1616, "AllLightsData の大きさが Object3d.hlsli の AllLights と一致していない");
 
 	/// <summary>
 	/// 計算する空から、フォグ・アンビエント・空気遠近へ何を取るか

@@ -22,6 +22,7 @@
 #include "Engine/Graphics/Raytracing/DDGIPass.h"
 #include "Engine/Graphics/Raytracing/VolumetricLightPass.h"
 #include "Engine/Graphics/Object/RefractionCapture.h"
+#include "Engine/Graphics/Raytracing/ScreenReflectionPass.h"
 #include "Engine/Graphics/Model/ModelManager.h"
 #include "Engine/DXC/DXCom.h"
 #include "Engine/Graphics/PostEffect/OffscreenManager.h"
@@ -155,6 +156,9 @@ namespace {
 		env.cloudShadow = data.value("cloudShadow", env.cloudShadow);
 		env.stars = data.value("stars", env.stars);
 		env.moon = data.value("moon", env.moon);
+		env.skyGlowColor = ReadVector3(data, "skyGlowColor", env.skyGlowColor);
+		env.skyGlow = data.value("skyGlow", env.skyGlow);
+		env.skyGlowHeight = data.value("skyGlowHeight", env.skyGlowHeight);
 		env.lightingMode = IndexOfName(data.value("lighting", std::string(kLightingNames[env.lightingMode])), kLightingNames, kLightingCount, env.lightingMode);
 		env.specularDetail = data.value("specularDetail", env.specularDetail);
 		env.specularAA = data.value("specularAA", env.specularAA);
@@ -166,6 +170,7 @@ namespace {
 		env.reflectionDenoised = data.value("reflectionDenoised", env.reflectionDenoised);
 		env.reflectionBounce = data.value("reflectionBounce", env.reflectionBounce);
 		env.reflectionSceneColor = data.value("reflectionSceneColor", env.reflectionSceneColor);
+		env.reflectionStretch = data.value("reflectionStretch", env.reflectionStretch);
 		const std::string reflectionName = data.value("reflection", std::string(kReflectionNames[env.reflectionMode]));
 		for (int i = 0; i < kReflectionCount; ++i) {
 			if (reflectionName == kReflectionNames[i]) {
@@ -179,6 +184,10 @@ namespace {
 		env.puddleAmount = data.value("puddleAmount", env.puddleAmount);
 		env.puddleScale = data.value("puddleScale", env.puddleScale);
 		env.rain = data.value("rain", env.rain);
+		env.rainSplash = data.value("rainSplash", env.rainSplash);
+		env.rainDrip = data.value("rainDrip", env.rainDrip);
+		env.rainCurtain = data.value("rainCurtain", env.rainCurtain);
+		env.rainSpray = data.value("rainSpray", env.rainSpray);
 		env.dofBlur = data.value("dofBlur", env.dofBlur);
 		env.dofFocusDistance = data.value("dofFocusDistance", env.dofFocusDistance);
 		env.dofFocusRange = data.value("dofFocusRange", env.dofFocusRange);
@@ -258,6 +267,9 @@ namespace {
 		data["cloudShadow"] = env.cloudShadow;
 		data["stars"] = env.stars;
 		data["moon"] = env.moon;
+		data["skyGlowColor"] = { env.skyGlowColor.x, env.skyGlowColor.y, env.skyGlowColor.z };
+		data["skyGlow"] = env.skyGlow;
+		data["skyGlowHeight"] = env.skyGlowHeight;
 		data["lighting"] = kLightingNames[std::clamp(env.lightingMode, 0, kLightingCount - 1)];
 		data["specularDetail"] = env.specularDetail;
 		data["specularAA"] = env.specularAA;
@@ -269,6 +281,7 @@ namespace {
 		data["reflectionDenoised"] = env.reflectionDenoised;
 		data["reflectionBounce"] = env.reflectionBounce;
 		data["reflectionSceneColor"] = env.reflectionSceneColor;
+		data["reflectionStretch"] = env.reflectionStretch;
 		data["reflection"] = kReflectionNames[std::clamp(env.reflectionMode, 0, kReflectionCount - 1)];
 		data["reflectionMaxDistance"] = env.reflectionMaxDistance;
 		data["reflectionIntensity"] = env.reflectionIntensity;
@@ -277,6 +290,10 @@ namespace {
 		data["puddleAmount"] = env.puddleAmount;
 		data["puddleScale"] = env.puddleScale;
 		data["rain"] = env.rain;
+		data["rainSplash"] = env.rainSplash;
+		data["rainDrip"] = env.rainDrip;
+		data["rainCurtain"] = env.rainCurtain;
+		data["rainSpray"] = env.rainSpray;
 		data["dofBlur"] = env.dofBlur;
 		data["dofFocusDistance"] = env.dofFocusDistance;
 		data["dofFocusRange"] = env.dofFocusRange;
@@ -1085,6 +1102,8 @@ void Level::ApplyEnvironment() {
 		fog.cloudShadow = environment_.cloudShadow;
 		fog.starIntensity = environment_.stars;
 		fog.moonIntensity = environment_.moon;
+		fog.skyGlowColor = environment_.skyGlowColor * environment_.skyGlow;
+		fog.skyGlowHeight = (std::max)(environment_.skyGlowHeight, 0.01f);
 		lightManager_->SetFog(fog);
 
 		lightManager_->SetRayTracingModes(
@@ -1144,6 +1163,9 @@ void Level::ApplyEnvironment() {
 		if (Graphics::RefractionCapture* refraction = Graphics::ObjectRenderer::GetInstance()->GetRefractionCapture()) {
 			refraction->SetStrength(environment_.refraction);
 		}
+		if (Graphics::ScreenReflectionPass* reflection = Graphics::ObjectRenderer::GetInstance()->GetScreenReflectionPass()) {
+			reflection->SetStretch(environment_.reflectionStretch);
+		}
 		if (Graphics::VolumetricLightPass* volumetric = Graphics::ObjectRenderer::GetInstance()->GetVolumetricLightPass()) {
 			Graphics::VolumetricLightPass::Settings settings;
 			settings.density = environment_.volumetricDensity;
@@ -1166,6 +1188,10 @@ void Level::ApplyEnvironment() {
 		lightManager_->SetRainAmount(environment_.rain);
 		if (Graphics::RainRenderer* rain = Graphics::ObjectRenderer::GetInstance()->GetRainRenderer()) {
 			rain->SetAmount(environment_.rain);
+			rain->SetSplash(environment_.rainSplash);
+			rain->SetDrip(environment_.rainDrip);
+			rain->SetCurtain(environment_.rainCurtain);
+			rain->SetSpray(environment_.rainSpray);
 		}
 		// 入れ直したフォグとアンビエントに太陽と空の値を入れ直す
 		lightManager_->RefreshDerived();
@@ -1530,6 +1556,9 @@ void Level::EnvironmentGUI() {
 	changed |= ImGui::DragFloat("Moon", &environment_.moon, 0.01f, 0.0f, 10.0f);
 	ImGui::EndDisabled();
 	ImGui::EndDisabled();
+	changed |= ImGui::DragFloat("Sky glow", &environment_.skyGlow, 0.005f, 0.0f, 10.0f);
+	changed |= ImGui::ColorEdit3("Sky glow color", &environment_.skyGlowColor.x, ImGuiColorEditFlags_Float);
+	changed |= ImGui::DragFloat("Sky glow height", &environment_.skyGlowHeight, 0.005f, 0.01f, 1.0f);
 
 	ImGui::SeparatorText("Directional Light");
 	changed |= ImGui::ColorEdit3("Color##light", &environment_.lightColor.x);
@@ -1623,6 +1652,7 @@ void Level::EnvironmentGUI() {
 	ImGui::BeginDisabled(!environment_.reflectionDenoised);
 	changed |= ImGui::Checkbox("Second bounce##reflection", &environment_.reflectionBounce);
 	changed |= ImGui::Checkbox("Screen color##reflection", &environment_.reflectionSceneColor);
+	changed |= ImGui::DragFloat("Stretch##reflection", &environment_.reflectionStretch, 0.05f, 0.0f, 8.0f, "%.2f");
 	ImGui::EndDisabled();
 	ImGui::EndDisabled();
 	changed |= ImGui::DragFloat("Max distance##reflection", &environment_.reflectionMaxDistance, 1.0f, 0.0f, 10000.0f);
@@ -1634,6 +1664,10 @@ void Level::EnvironmentGUI() {
 	changed |= ImGui::SliderFloat("Puddles##wet", &environment_.puddleAmount, 0.0f, 1.0f);
 	changed |= ImGui::DragFloat("Puddle size##wet", &environment_.puddleScale, 0.05f, 0.1f, 50.0f, "%.2f m");
 	changed |= ImGui::SliderFloat("Rain##wet", &environment_.rain, 0.0f, 1.0f);
+	changed |= ImGui::SliderFloat("Splash##wet", &environment_.rainSplash, 0.0f, 1.0f);
+	changed |= ImGui::SliderFloat("Drips##wet", &environment_.rainDrip, 0.0f, 1.0f);
+	changed |= ImGui::SliderFloat("Far rain##wet", &environment_.rainCurtain, 0.0f, 1.0f);
+	changed |= ImGui::SliderFloat("Car spray##wet", &environment_.rainSpray, 0.0f, 1.0f);
 
 	ImGui::SeparatorText("Depth of Field");
 	changed |= ImGui::SliderFloat("Blur##dof", &environment_.dofBlur, 0.0f, 16.0f, "%.1f px");

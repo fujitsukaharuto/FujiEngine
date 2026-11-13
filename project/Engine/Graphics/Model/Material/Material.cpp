@@ -134,7 +134,7 @@ void Material::SetMetallicRoughnessMap(const std::string& name) {
 
 void Material::SetEmissiveMap(const std::string& name) {
 	// 色なので sRGB として読む
-	emissiveMap_ = TextureManager::GetInstance()->GetTexture(name);
+	emissiveMap_ = name.empty() ? nullptr : TextureManager::GetInstance()->GetTexture(name);
 	materialData_.useEmissiveMap = emissiveMap_ ? 1 : 0;
 }
 
@@ -176,6 +176,8 @@ void Material::CopyData(uint32_t frameIndex) {
 	materialDataGPU_[frameIndex]->metallicRoughnessIndex = metallicRoughnessMap_ ? static_cast<int32_t>(metallicRoughnessMap_->srvIndex) : 0;
 	materialDataGPU_[frameIndex]->useMetallicRoughnessMap = materialData_.useMetallicRoughnessMap;
 	materialDataGPU_[frameIndex]->isTwoSided = materialData_.isTwoSided;
+	materialDataGPU_[frameIndex]->weathering = materialData_.weathering;
+	materialDataGPU_[frameIndex]->flowSpeed = materialData_.flowSpeed;
 	materialDataGPU_[frameIndex]->emissiveMapIndex = emissiveMap_ ? static_cast<int32_t>(emissiveMap_->srvIndex) : 0;
 	materialDataGPU_[frameIndex]->useEmissiveMap = materialData_.useEmissiveMap;
 	materialDataGPU_[frameIndex]->occlusionMapIndex = occlusionMap_ ? static_cast<int32_t>(occlusionMap_->srvIndex) : 0;

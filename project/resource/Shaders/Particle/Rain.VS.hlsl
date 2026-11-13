@@ -1,25 +1,7 @@
+#define RAIN_LIGHTS
 #include "Rain.hlsli"
-#include "../Common/ClusteredLights.hlsli"
 
 // 雨粒1つを細長い四角 (6頂点) で描く。光は頂点で求める
-
-ConstantBuffer<ClusterParams> gClusterParams : register(b1);
-StructuredBuffer<ClusteredLight> gClusteredLights : register(t0, space10);
-StructuredBuffer<uint> gClusterCounts : register(t1, space10);
-StructuredBuffer<uint> gClusterIndices : register(t2, space10);
-
-// 1つの雨粒が拾うライトの上限
-static const uint kRainMaxLights = 8;
-
-float3 RainHash3(uint n)
-{
-    n = n * 747796405u + 2891336453u;
-    uint3 v = uint3(n, n * 1664525u + 1013904223u, n * 22695477u + 1u);
-    v = (v ^ (v >> 16u)) * 0x45d9f3bu;
-    v = (v ^ (v >> 16u)) * 0x45d9f3bu;
-    v ^= v >> 16u;
-    return float3(v & 0xFFFFFFu) / float(0x1000000);
-}
 
 /// <summary>箱の中で世界に固定した位置。半分の大きさより離れたら反対側へ回す</summary>
 float WrapAround(float value, float center, float size)
@@ -61,41 +43,14 @@ RainVertexOutput main(uint vertexID : SV_VertexID, uint instanceID : SV_Instance
     output.along = alongT;
 
     // 近すぎるものと遠すぎるものは消す
-    float fade = smoothstep(1.5f, 4.0f, distance) * (1.0f - smoothstep(rainBoxSize * 0.3f, rainBoxSize * 0.5f, distance));
+    float fade = smoothstep(3.0f, 8.0f, distance) * (1.0f - smoothstep(rainBoxSize * 0.3f, rainBoxSize * 0.5f, distance));
     if (fade <= 0.0f || position.y < -0.5f)
     {
         output.position = float4(0.0f, 0.0f, -1.0f, 1.0f);
         return output;
     }
 
-    // 照らす光。近くの影なしのライトは前へ散らすぶん強く
-    float3 light = rainAmbient * 0.25f;
-    if (gClusterParams.lightCount > 0 && output.position.w > 0.0f)
-    {
-        float2 ndc = output.position.xy / output.position.w;
-        float2 pixel = float2(ndc.x * 0.5f + 0.5f, 0.5f - ndc.y * 0.5f) * rainScreenSize;
-        if (all(pixel >= 0.0f) && all(pixel < rainScreenSize))
-        {
-            float viewZ = mul(float4(position, 1.0f), gClusterParams.view).z;
-            uint cluster = ClusterIndex(pixel, viewZ, gClusterParams);
-            uint count = min(gClusterCounts[cluster], kRainMaxLights);
-            float3 toEye = toCamera / max(distance, 1e-3f);
-            for (uint c = 0; c < count; c++)
-            {
-                ClusteredLight l = gClusteredLights[gClusterIndices[cluster * kMaxLightsPerCluster + c]];
-                float3 L;
-                float lightDistance;
-                float attenuation = ClusteredLightShapeAttenuation(l, position, L, lightDistance);
-                if (attenuation <= 0.0f)
-                {
-                    continue;
-                }
-                // 光源の向こう側から見ると明るい
-                float forward = saturate(dot(-L, toEye));
-                light += l.color * attenuation * (0.3f + 2.0f * forward * forward * forward);
-            }
-        }
-    }
-    output.color = light * (rainBrightness * fade * rainWidth / width);
+    float3 light = RainDropLight(position, toCamera / max(distance, 1e-3f), output.position);
+    output.color = RainSoftClamp(light * rainBrightness) * (fade * rainWidth / width);
     return output;
 }
