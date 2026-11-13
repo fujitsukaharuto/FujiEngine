@@ -1,7 +1,7 @@
 #define RAIN_LIGHTS
 #include "Rain.hlsli"
 
-// 雨だれ。RainDripFind.CS が見つけた場所から、間をあけて滴が落ちる。1か所に滴2つ (各6頂点)
+// 雨だれ。RainDripFind.CS が見つけた場所から滴を落とす。1か所に滴2つ
 
 StructuredBuffer<RainDripSite> gRainDripSites : register(t0, space3);
 
@@ -14,7 +14,7 @@ RainVertexOutput main(uint vertexID : SV_VertexID, uint instanceID : SV_Instance
     output.position = float4(0.0f, 0.0f, -1.0f, 1.0f);
 
     RainDripSite site = gRainDripSites[instanceID];
-    // 縁の全部からは垂らさず、ところどころにする
+    // ところどころの縁だけ垂らす
     if (site.state != 2u || site.seed < 1.0f - 0.7f * dripAmount)
     {
         return output;
@@ -23,7 +23,7 @@ RainVertexOutput main(uint vertexID : SV_VertexID, uint instanceID : SV_Instance
     float land = site.site.w;
     float fallTime = sqrt(2.0f * (top - land) / kDripGravity);
 
-    // 滴ごとに間隔をずらす。1周期は「縁で滴がふくらむ間」と「落ちる間」
+    // 1周期 = 縁で滴がふくらむ間 + 落ちる間
     uint drop = vertexID / 6u;
     float3 random = RainHash3(uint(site.seed * 16777216.0f) * 5u + drop);
     float period = lerp(0.5f, 1.8f, random.x) + fallTime;
@@ -60,7 +60,7 @@ RainVertexOutput main(uint vertexID : SV_VertexID, uint instanceID : SV_Instance
     // 雨粒より太い。遠くは1画素の太さまで広げて薄くする
     float baseWidth = rainWidth * 1.1f * (isHanging ? lerp(0.5f, 1.0f, grow) : 1.0f);
     float width = max(baseWidth, distance * 0.0012f);
-    // 速くなるほど伸びる (ぶれ)。ふくらむ滴は丸い粒
+    // 速いほど伸びる。ふくらむ滴は丸い粒
     float streakLength = isHanging ? width * 2.2f : 0.025f + speed * 0.018f;
     float3 world = position - dir * (streakLength * alongT) + side * (width * acrossSign);
     output.position = mul(float4(world, 1.0f), rainViewProjection);

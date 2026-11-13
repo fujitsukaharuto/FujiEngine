@@ -7,7 +7,7 @@
 
 static const float3 kGrimeColor = float3(0.4f, 0.37f, 0.33f); // 汚れきった所の色の倍率
 static const float kGrimeRoughness = 0.85f;                    // 汚れきった所の粗さ
-static const float kStoryHeight = 2.6f;                        // 1階ぶんの高さ (m)。各階の上ほど雨だれが濃い
+static const float kStoryHeight = 2.6f;                        // 1階の高さ (m)
 static const float kStreakSpacing = 0.45f;                    // 雨だれの列の間隔 (m)
 static const float kSplashHeight = 0.9f;                       // 泥はねが届く高さ (m)
 

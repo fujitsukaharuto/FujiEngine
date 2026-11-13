@@ -295,7 +295,7 @@ namespace GameObject {
 		const Vector3 position = transform_.GetWorldPos();
 		const Vector3 right = transform_.GetRight() * transform_.scale.x;
 		const Vector3 forward = transform_.GetForward() * transform_.scale.z;
-		// タイヤの位置はモデルの座標 (Kenney の車の大きさ: 幅 1.5、長さ 2.7)
+		// タイヤの位置 (モデルの座標)
 		constexpr float kWheelX = 0.6f;
 		constexpr float kWheelZ = 0.85f;
 		constexpr float kWheelWidth = 0.28f;

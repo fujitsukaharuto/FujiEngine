@@ -1,8 +1,8 @@
 #define RAIN_LIGHTS
 #include "Rain.hlsli"
 
-// 雨のしぶき。1つのしぶきは真上へ跳ねる水柱1つと、まわりへ跳ねる水滴4つ (各6頂点)。
-// 落ちる場所は上から下へのレイで求めるので、路面・車の屋根・庇に当たり、屋根の下には出ない
+// 雨のしぶき。水柱1つと水滴4つ (各6頂点)
+// 落ちる場所は真上からのレイで求める (路面・車の屋根・庇)
 
 RaytracingAccelerationStructure gSceneTLAS : register(t0, space2);
 

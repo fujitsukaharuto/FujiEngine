@@ -19,8 +19,7 @@ namespace Graphics {
 	/// <summary>
 	/// 雨。カメラのまわりに雨粒の筋を描き、近くの影なしのライトの色で光らせる
 	/// </summary>
-	/// <remarks>雨粒は番号から位置を決める。強さ0の間は何も描かない。
-	/// ほかに地面のしぶき・庇などからの雨だれ・遠くの雨のカーテン・走る車の水はねを、それぞれの量が0でなければ描く</remarks>
+	/// <remarks>雨粒は番号から位置を決める。しぶき・雨だれ・カーテン・水はねは量が0なら描かない</remarks>
 	class RainRenderer {
 	public:
 		RainRenderer() = default;
@@ -44,7 +43,7 @@ namespace Graphics {
 		/// <param name="contact">タイヤの接地点</param>
 		/// <param name="velocity">車の速さ (m/s)</param>
 		void AddSprayWheel(const Math::Vector3& contact, float width, const Math::Vector3& velocity);
-		/// <summary>水はねを出すか。出さないなら AddSprayWheel を呼ばなくてよい</summary>
+		/// <summary>水はねを出すか</summary>
 		bool IsSprayActive() const { return amount_ > 0.0f && spray_ > 0.0f; }
 
 		/// <summary>このフレームの値を上げ、雨だれの場所を探す</summary>
@@ -138,7 +137,7 @@ namespace Graphics {
 		bool hasDripSites_ = false;
 		uint32_t dripFrame_ = 0;
 
-		// 水はねを出すタイヤ (毎フレーム CPU から書く)
+		// 水はねを出すタイヤ
 		Microsoft::WRL::ComPtr<ID3D12Resource> sprayResource_[DXC::kFrameCount_];
 		SprayWheel* sprayMapped_[DXC::kFrameCount_] = {};
 		uint32_t spraySrvIndex_[DXC::kFrameCount_] = {};

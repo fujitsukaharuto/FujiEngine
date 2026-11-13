@@ -1,9 +1,8 @@
 #define RAIN_LIGHTS
 #include "Rain.hlsli"
 
-// 雨だれが垂れる場所を探す。カメラのまわりの格子の1マスに1か所。
-// 雨を受ける面 (空から下へのレイが最初に当たる面) の縁で、その先が大きく下がっている所から垂らす。
-// 庇・看板の上・電線などに当たる。結果は取っておき、マスが入れ替わったときと、少しずつの探し直しで書き換える
+// 雨だれが垂れる場所を探す。1マスに1か所、雨を受ける面の縁で先が下がっている所
+// 結果は取っておき、マスが入れ替わった所と少しずつの探し直しだけ書き換える
 
 RaytracingAccelerationStructure gSceneTLAS : register(t0, space2);
 RWStructuredBuffer<RainDripSite> gRainDripSitesOut : register(u0);
@@ -105,7 +104,7 @@ RainDripSite FindDripSite(int2 cell)
         return site;
     }
 
-    // 縁の位置を二分探索で詰める (まだ上の面がある側を残す)
+    // 縁の位置を二分探索で詰める
     float covered = 0.0f;
     float open = 1.0f;
     [unroll]
@@ -125,7 +124,7 @@ RainDripSite FindDripSite(int2 cell)
     }
     float2 edge = p + outward * (dripCellSize * covered);
 
-    // 垂れ始めるのは上の面の裏側。下から上へのレイで探す
+    // 垂れ始めるのは上の面の裏側
     float floorY = max(below, -0.5f) + 0.03f;
     float underside;
     if (!TraceUp(edge, floorY, max(top - floorY + 0.05f, 0.01f), underside) || underside > top + 0.01f)
@@ -155,7 +154,7 @@ void main(uint3 id : SV_DispatchThreadID)
         return;
     }
     uint slot = id.y * kDripGridSize + id.x;
-    // この枠が受け持つのは、今の格子の中で番号を格子の大きさで割った余りが同じマス
+    // この枠が受け持つのは、番号を格子の大きさで割った余りが同じマス
     int2 offset = (int2(id.xy) - dripGridBase) % int(kDripGridSize);
     offset = offset + int2(offset < 0) * int(kDripGridSize);
     int2 cell = dripGridBase + offset;

@@ -1,9 +1,8 @@
 #define RAIN_LIGHTS
 #include "Rain.hlsli"
 
-// 走る車のタイヤが跳ね上げる水。1つのタイヤに kSprayParticles 粒 (各6頂点)。
-// 粒は生まれた時刻のタイヤの位置から飛ぶ。車は同じ速さで進むので、今の位置から速さ×経過時間だけ戻せば生まれた位置になる。
-// 大半は細かい水滴の筋で、残りは後ろに残る水煙 (太くて薄い)
+// 走る車のタイヤが跳ね上げる水。粒は今のタイヤの位置から速さ×経過時間だけ戻った所で生まれる
+// 大半は細かい水滴の筋、残りは水煙 (太くて薄い)
 
 StructuredBuffer<RainSprayWheel> gRainSprayWheels : register(t0, space3);
 
@@ -48,12 +47,12 @@ RainVertexOutput main(uint vertexID : SV_VertexID, uint instanceID : SV_Instance
     float3 r = RainHash3(wheelIndex * 7919u + particle * 31u + cycle * 104729u);
     float3 r2 = RainHash3(wheelIndex * 6151u + particle * 17u + cycle * 7193u + 3u);
 
-    // 生まれた位置: その時刻のタイヤの後ろ寄りの接地点。左右はタイヤの幅の中
+    // 生まれた位置: タイヤの後ろ寄りの接地点
     float width = wheel.position.w;
     float3 birth = wheel.position.xyz - carVelocity * age +
                    right * ((r.x - 0.5f) * width) - forward * (0.15f * width);
 
-    // 飛ぶ向き: 後ろと外側へ、上へ。水煙は車に引きずられてゆっくり広がる
+    // 後ろと外側へ、上へ。水煙はゆっくり広がる
     float sideSign = (r.y < 0.5f) ? -1.0f : 1.0f;
     float3 velocity;
     if (isMist)
@@ -102,7 +101,7 @@ RainVertexOutput main(uint vertexID : SV_VertexID, uint instanceID : SV_Instance
     float3 world = position - dir * (streakLength * (alongT - (isMist ? 0.5f : 0.0f))) + side * (pixelWidth * acrossSign);
     output.position = mul(float4(world, 1.0f), rainViewProjection);
     output.across = acrossSign;
-    // 水煙は丸くぼかす (Rain.PS は along が 2 以上なら丸い形にする)
+    // 水煙は丸くぼかす (Rain.PS は along が 2 以上を丸く描く)
     output.along = isMist ? 2.0f + alongT : alongT;
 
     float lifeFade = 1.0f - age / life;

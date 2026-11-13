@@ -1,10 +1,8 @@
 #ifndef FLOWING_WATER_HLSLI
 #define FLOWING_WATER_HLSLI
 
-// 流れる水 (置物の flowWater)。側溝の水など、UV の u を m 単位にしたモデル向け。
-// u が小さくなる向き (流れ着く先) へ動くさざ波の法線を立てる。接線は UV と位置の画面の微分から求めるので、モデルに接線は要らない
+// 流れる水 (置物の flowWater)。u (m 単位) が小さくなる向きへ動くさざ波の法線を立てる
 
-// さざ波の数
 static const uint kFlowWaveCount = 4;
 // 波ごとの (波長 m, 流れからの角度, 傾きの強さ, 流れの速さの倍率)
 static const float4 kFlowWaves[kFlowWaveCount] =
@@ -45,7 +43,7 @@ void ApplyFlowingWater(float speed, float2 uv, float3 worldPos, float time, inou
     flow /= flowLength;
     float3 across = cross(normal, flow);
     float2 p = float2(dot(worldPos, flow), dot(worldPos, across));
-    // 1画素の大きさ。波長がこれに近い波は消す (遠くでちらつかない)
+    // 1画素の大きさ。波長がこれに近い波は消す
     float footprint = max(length(dpdx), length(dpdy));
     float absSpeed = abs(speed);
 

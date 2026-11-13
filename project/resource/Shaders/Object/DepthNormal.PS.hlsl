@@ -47,7 +47,7 @@ PixelShaderOutput main(VertxShaderOutput input, bool isFrontFace : SV_IsFrontFac
         ApplyRainRipples(wetSurface, input.WorldPosition, flatNormal, gLights.rainAmount, gLights.fog.cloudTime, normal);
         environmentCoefficient = max(environmentCoefficient, wetSurface.wet);
     }
-    // 流れる水のさざ波も前方描画と同じに立てる
+    // 流れる水のさざ波 (前方描画と同じ)
     ApplyFlowingWater(gMaterial.flowSpeed, transformedUV.xy, input.WorldPosition, gLights.fog.cloudTime, normal);
     output.normal = float4(normal, environmentCoefficient > 0.0f ? roughness : roughness + 2.0f);
     return output;

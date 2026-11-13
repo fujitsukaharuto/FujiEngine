@@ -2,8 +2,7 @@
 #include "Rain.hlsli"
 #include "RainCurtain.hlsli"
 
-// 雨の筋の模様。カメラのまわりの円筒に貼るので、カメラを回しても模様は世界に止まって見える。
-// 筋の幅は角度で決める (どの層でも画面で2〜3画素)。筋のある画素だけ光を求める
+// 雨の筋の模様。カメラのまわりの円筒に貼り、筋の幅は角度で決める
 
 // 1つの層が拾うライトの上限
 static const uint kCurtainMaxLights = 4;
@@ -54,7 +53,7 @@ float4 main(RainCurtainOutput input) : SV_TARGET0
     float columnRandom = RainCurtainHash(uint2(columnIndex, layer * 7919u + 11u));
     float columnRandom2 = RainCurtainHash(uint2(columnIndex, layer * 104729u + 5u));
 
-    // 筋の長さも角度で揃える。奥の層ほど (世界では) 長い
+    // 筋の長さも角度で揃える
     float streakLength = distance * 0.035f * lerp(0.7f, 1.3f, columnRandom2);
     float fall = rainFallSpeed * lerp(0.85f, 1.15f, columnRandom);
     float v = (position.y + fall * rainTime) / streakLength + columnRandom * 17.0f;

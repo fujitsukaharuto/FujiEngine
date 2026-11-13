@@ -66,7 +66,7 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
     // 上限は粗さにも比例させる
     float maxRadius = kMaxRadius * saturate(roughness / max(maxRoughness, 1e-3f));
     float radius = min(coneTan * hitDistance / (viewDistance + hitDistance) * pixelsPerUnit, maxRadius);
-    // 浅い角度で見るほど映り込みは縦に伸びる (縦のぼかしだけ)
+    // 浅い角度ほど縦に伸ばす (縦のぼかしだけ)
     int maxHalfTaps = kHalfTaps;
     if (stretch > 0.0f && blurDirection.y != 0)
     {

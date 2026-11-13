@@ -211,7 +211,7 @@ void PipelineManager::CreatePipeline() {
 		.vsPath = L"Particle/RainSpray.VS.hlsl", .psPath = L"Particle/Rain.PS.hlsl",
 		.blend = BlendType::ADD_PREMULTIPLIED, .depth = DepthMode::READ_ONLY,
 		.useInputLayout = false });
-	// 層の距離の深度に置いた画面いっぱいの三角形。手前に物がある画素は深度で隠れる
+	// 層の距離の深度に置いた画面いっぱいの三角形
 	CreateRenderPipe(Pipe::RainCurtain, {
 		.vsPath = L"Particle/RainCurtain.VS.hlsl", .psPath = L"Particle/RainCurtain.PS.hlsl",
 		.blend = BlendType::ADD_PREMULTIPLIED, .depth = DepthMode::READ_ONLY,

@@ -1,7 +1,7 @@
 #ifndef RAIN_CURTAIN_HLSLI
 #define RAIN_CURTAIN_HLSLI
 
-// 遠くの雨のカーテン (RainRenderer)。カメラから決まった距離の層に、雨の筋の模様を描く
+// 遠くの雨のカーテン。カメラから決まった距離の層に筋を描く
 
 // 層の数。RainRenderer.h の kCurtainLayers_ と同じ値であること
 static const uint kRainCurtainLayers = 4;

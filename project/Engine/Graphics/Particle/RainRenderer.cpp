@@ -34,7 +34,7 @@ void RainRenderer::Initialize(DXCom* pDxcom, LightManager* pLightManager) {
 		spraySrvIndex_[i] = srvManager->Allocate();
 		srvManager->CreateStructuredSRV(spraySrvIndex_[i], sprayResource_[i].Get(), kMaxSprayWheels_, sizeof(SprayWheel));
 	}
-	// 中身は0 (= まだ探していない) から始まる。実行し終えるたびに COMMON へ戻るので、毎フレーム COMMON から遷移する
+	// 中身0 = まだ探していない。毎フレーム COMMON から遷移する
 	constexpr uint32_t kSiteCount = kDripGridSize_ * kDripGridSize_;
 	dripSiteResource_ = Helper::CreateUAVResource(dxcommon_->GetDevice(), sizeof(DripSite) * kSiteCount);
 	dripSiteSrvIndex_ = srvManager->Allocate();
@@ -124,7 +124,7 @@ void RainRenderer::Prepare(const RaytracingScene* scene) {
 	const Math::Matrix4x4& projection = camera->GetProjectionMatrix();
 	params.projectionZScale = projection.m[2][2];
 	params.projectionZOffset = projection.m[3][2];
-	// 水はねは量の分だけ明るさで薄める (粒の数はタイヤごとに決まっている)
+	// 水はねの量は明るさで薄める
 	sprayWheelCount_ = static_cast<uint32_t>(sprayWheels_.size());
 	if (sprayWheelCount_ > 0) {
 		std::memcpy(sprayMapped_[frameIndex], sprayWheels_.data(), sizeof(SprayWheel) * sprayWheelCount_);
@@ -134,7 +134,7 @@ void RainRenderer::Prepare(const RaytracingScene* scene) {
 	params.sprayBrightness = sprayBrightness_ * (std::min)(spray_, 1.0f) * (std::min)(amount_, 1.0f);
 	std::memcpy(paramMapped_[frameIndex], &params, sizeof(params));
 
-	// 雨だれの場所を探す。落ちる場所をレイで探すので TLAS が要る
+	// 雨だれの場所を探す (TLAS を使う)
 	if (drip_ <= 0.0f || scene == nullptr || !scene->IsAvailable() || scene->GetTlasSrvIndex() == RaytracingScene::kInvalidSrvIndex) {
 		return;
 	}
@@ -174,7 +174,7 @@ void RainRenderer::Render(const ClusteredLightPass& clusteredLights, const Raytr
 	cList->IASetIndexBuffer(nullptr);
 	cList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	// 遠くの雨のカーテンを先に (奥にあるので、手前の雨粒と順番は関係ないが加算なので気にしない)
+	// 遠くの雨のカーテン
 	if (curtain_ > 0.0f && curtainBrightness_ > 0.0f) {
 		pPipeManager->SetPipeline(Pipe::RainCurtain);
 		BindLights(clusteredLights);
@@ -186,7 +186,7 @@ void RainRenderer::Render(const ClusteredLightPass& clusteredLights, const Raytr
 	const uint32_t drops = static_cast<uint32_t>(static_cast<float>(kMaxDrops_) * (std::min)(amount_, 1.0f));
 	cList->DrawInstanced(6, drops, 0, 0);
 
-	// 雨だれ。場所は Prepare で探してある
+	// 雨だれ
 	if (hasDripSites_) {
 		pPipeManager->SetPipeline(Pipe::RainDrip);
 		BindLights(clusteredLights);
@@ -202,7 +202,7 @@ void RainRenderer::Render(const ClusteredLightPass& clusteredLights, const Raytr
 		cList->DrawInstanced(6, sprayWheelCount_ * kSprayParticles_, 0, 0);
 	}
 
-	// しぶき。落ちる場所をレイで探すので TLAS が要る
+	// しぶき (TLAS を使う)
 	if (splash_ <= 0.0f || scene == nullptr || !scene->IsAvailable() || scene->GetTlasSrvIndex() == RaytracingScene::kInvalidSrvIndex) {
 		return;
 	}

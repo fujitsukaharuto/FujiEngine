@@ -247,7 +247,7 @@ void ObjectRenderer::Render() {
 		gpuTimer_->End(list, index, kTimer_LightCull);
 		gpuTimer_->Resolve(list, index, kTimer_LightCull);
 	}
-	// 雨の値を上げ、雨だれの場所を探す (TLAS を使う)
+	// 雨の値を上げ、雨だれの場所を探す
 	if (rainRenderer_) {
 		rainRenderer_->Prepare(raytracingScene_.get());
 	}
@@ -256,7 +256,7 @@ void ObjectRenderer::Render() {
 		reflectionProbePass_->Render(*raytracingScene_, *clusteredLightPass_, rayLookFrames_ > 0);
 	}
 
-	// 不透明は手前から描く (プリパスの重ね塗りを減らす)
+	// 不透明は手前から描く
 	{
 		const Math::Vector3 cameraPos = CameraManager::GetInstance()->GetCamera()->GetTranslate();
 		const auto firstAfterOpaque = std::stable_partition(renderQueue_.begin(), renderQueue_.end(),

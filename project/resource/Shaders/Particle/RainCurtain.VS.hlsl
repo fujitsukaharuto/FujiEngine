@@ -1,7 +1,7 @@
 #include "Rain.hlsli"
 #include "RainCurtain.hlsli"
 
-// 画面を覆う三角形を、層の距離の深度に置く。手前に物がある画素は深度で隠れる
+// 画面を覆う三角形を層の距離の深度に置く
 
 RainCurtainOutput main(uint vertexID : SV_VertexID, uint instanceID : SV_InstanceID)
 {

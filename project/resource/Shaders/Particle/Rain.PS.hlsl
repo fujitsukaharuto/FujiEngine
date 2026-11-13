@@ -5,7 +5,7 @@
 float4 main(RainVertexOutput input) : SV_TARGET0
 {
     float across = 1.0f - input.across * input.across;
-    // 水はねの水煙 (along が 2〜3): 長さの向きも真ん中が濃い丸い形
+    // 水煙 (along が 2〜3) は真ん中が濃い丸い形
     if (input.along >= 1.5f)
     {
         float t = (input.along - 2.5f) * 2.0f;

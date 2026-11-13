@@ -81,7 +81,7 @@ namespace Graphics {
 			Math::Vector3 emissive{};		// 自分で光る色。テクスチャの色に掛けて足す。1を超えるとブルームで光がにじむ
 			float rimPower = 3.0f;			// リムライトの細さ。大きいほど輪郭のきわだけが光る
 			Math::Vector3 rimColor{};		// リムライトの色。黒なら掛からない
-			float flowSpeed = 0.0f;				// 流れる水の速さ (m/s)。0なら流れない。UV の u が小さくなる向きへ流れる
+			float flowSpeed = 0.0f;				// 流れる水の速さ (m/s)。0なら流れない
 			int32_t metallicRoughnessIndex = 0;		// メタリック・ラフネスのテクスチャ (G=粗さ B=金属)
 			int32_t useMetallicRoughnessMap = 0;	// 0以外なら roughness と metallic にテクスチャの値を掛ける
 			int32_t isTwoSided = 0;					// 0以外なら裏から見た面は法線を裏返す
@@ -152,7 +152,7 @@ namespace Graphics {
 		void SetWeathering(float weathering) { materialData_.weathering = weathering; }
 		float GetWeathering() const { return materialData_.weathering; }
 		/// <summary>流れる水の速さ (m/s)。0なら流れない</summary>
-		/// <remarks>UV の u を m 単位にしたモデル向け。u が小さくなる向きへ流れるさざ波の法線を立てる</remarks>
+		/// <remarks>u を m 単位にしたモデル用。u が小さくなる向きへ流れる</remarks>
 		void SetFlowSpeed(float speed) { materialData_.flowSpeed = speed; }
 		float GetFlowSpeed() const { return materialData_.flowSpeed; }
 		/// <summary>光る所と色のテクスチャ。emissive に掛ける</summary>

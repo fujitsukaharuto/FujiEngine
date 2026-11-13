@@ -71,7 +71,7 @@ namespace GameObject {
 			std::optional<float> environment;
 			/// <summary>壁の汚れの強さ</summary>
 			std::optional<float> weathering;
-			/// <summary>流れる水の速さ (m/s)。UV の u が小さくなる向きへ流れる</summary>
+			/// <summary>流れる水の速さ (m/s)。u が小さくなる向きへ流れる</summary>
 			std::optional<float> flowWater;
 			/// <summary>自分で光る色。実際の明るさはこれに emissiveIntensity を掛けたもの</summary>
 			std::optional<Math::Vector3> emissive;

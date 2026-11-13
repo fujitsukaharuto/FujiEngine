@@ -23,7 +23,7 @@ cbuffer RainParams : register(b0)
     float4x4 rainInverseViewProjection; // 遠くの雨のカーテンで画素の向きを戻す
     int2 dripGridBase;       // 雨だれの格子のいちばん小さいマス
     float dripCellSize;      // 雨だれの格子の1マス (m)
-    uint dripFrame;          // 雨だれの場所を少しずつ探し直すための番号
+    uint dripFrame;          // 雨だれの場所を少しずつ探し直す番号
     float dripBrightness;    // 雨だれの明るさの倍率
     float dripMaxFall;       // これより高い所からは垂らさない (m)
     float curtainBrightness; // 遠くの雨のカーテンの明るさ。0で描かない
@@ -81,8 +81,8 @@ float3 RainHash3(uint n)
     return float3(v & 0xFFFFFFu) / float(0x1000000);
 }
 
-/// <summary>水滴が受ける光。近くの影なしのライトは光源の向こうから見ると明るい</summary>
-/// <param name="pixel">水滴が写る画素。クラスタを引くのに使う</param>
+/// <summary>水滴が受ける光。光源の向こうから見ると明るい</summary>
+/// <param name="pixel">水滴が写る画素 (クラスタを引く)</param>
 /// <param name="maxLights">拾うライトの上限</param>
 float3 RainLightAtPixel(float3 position, float3 toEye, float2 pixel, uint maxLights)
 {
@@ -122,7 +122,7 @@ float3 RainDropLight(float3 position, float3 toEye, float4 clip)
     return RainLightAtPixel(position, toEye, pixel, kRainMaxLights);
 }
 
-/// <summary>明るい光源のそばでも白い線にならないよう、明るさを頭打ちにする</summary>
+/// <summary>明るさを頭打ちにする</summary>
 float3 RainSoftClamp(float3 color)
 {
     return color / (1.0f + max(max(color.r, color.g), color.b) * 2.0f);
