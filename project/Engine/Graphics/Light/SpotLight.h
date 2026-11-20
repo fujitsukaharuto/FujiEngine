@@ -20,7 +20,8 @@ namespace Graphics {
 		float decay = 2.15f;
 		float cosAngle = -1.5f;
 		float cosFalloffStart = 3.0f;
-		float padding[1];
+		// 光源の大きさ。影のレイをこの手前で止め、柔らかい影ではこの大きさの円から光が来るとみなす
+		float sourceRadius = 0.0f;
 	};
 
 	/// <summary>

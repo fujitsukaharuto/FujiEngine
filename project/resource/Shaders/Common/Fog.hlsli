@@ -39,9 +39,29 @@ struct FogParams
     float moonIntensity;   // 月の明るさ。0で描かない
     float3 skyGlowColor;   // 光害の色 × 明るさ。0で掛からない
     float skyGlowHeight;   // 光害が届く高さ (向きの y)
+    // 2層目の霧 (UE の Second Fog Data)。色・始まる距離・上限は1層目と共有し、濃さは1層目に足す
+    float secondDensity;       // 0で無効
+    float secondHeightFalloff;
+    float secondBaseHeight;    // ワールドの高さ
+    float skyHorizonZenith;    // 計算する空で、カメラから見た地面の縁の天頂角 (SkyView の数表の並び)
 };
 
+/// <summary>霧が1層でも掛かる設定か</summary>
+bool HasFog(FogParams fog)
+{
+    return fog.density > 0.0f || fog.secondDensity > 0.0f;
+}
+
+/// <summary>その高さの霧の濃さ (1mあたり)。2層の合計</summary>
+float FogDensityAt(FogParams fog, float height)
+{
+    float first = fog.density * exp(clamp(-fog.heightFalloff * (height - fog.baseHeight), -20.0f, 20.0f));
+    float second = fog.secondDensity * exp(clamp(-fog.secondHeightFalloff * (height - fog.secondBaseHeight), -20.0f, 20.0f));
+    return first + second;
+}
+
 /// <summary>空気遠近で元の色に掛かる割合と、上に乗る空気の色</summary>
+/// <remarks>3Dの表 (AerialPerspective.hlsli) を作っていないフレームに使う</remarks>
 /// <param name="toPoint">カメラから対象までのベクトル</param>
 /// <returns>空気遠近が掛かるか</returns>
 bool AerialPerspectiveTerms(FogParams fog, float3 toPoint, out float3 transmittance, out float3 inScatter)
@@ -73,34 +93,6 @@ bool AerialPerspectiveTerms(FogParams fog, float3 toPoint, out float3 transmitta
     float3 source = fog.aerialRayleigh * phaseRayleigh + fog.aerialMie * phaseMie + fog.aerialAmbient;
     inScatter = source * (1.0f - transmittance) / extinction;
     return true;
-}
-
-/// <summary>空気遠近。遠くの物ほど空気の色が乗る</summary>
-/// <remarks>UE の Aerial Perspective にあたる</remarks>
-/// <param name="color">元の色</param>
-/// <param name="toPoint">カメラから対象までのベクトル</param>
-/// <param name="additive">0以外なら加算合成の物。空気の色は乗せない</param>
-float3 ApplyAerialPerspective(FogParams fog, float3 color, float3 toPoint, float additive)
-{
-    float3 transmittance;
-    float3 inScatter;
-    if (!AerialPerspectiveTerms(fog, toPoint, transmittance, inScatter))
-    {
-        return color;
-    }
-    return color * transmittance + ((additive != 0.0f) ? float3(0.0f, 0.0f, 0.0f) : inScatter);
-}
-
-/// <summary>ApplyAerialPerspective を外す</summary>
-float3 RemoveAerialPerspective(FogParams fog, float3 color, float3 toPoint)
-{
-    float3 transmittance;
-    float3 inScatter;
-    if (!AerialPerspectiveTerms(fog, toPoint, transmittance, inScatter))
-    {
-        return color;
-    }
-    return (color - inScatter) / max(transmittance, 1e-3f);
 }
 
 /// <summary>太陽の方向を向いたときにフォグへ足す色</summary>
@@ -136,32 +128,51 @@ float3 FogColor(FogParams fog, float3 direction)
     return colorX * weight.x + colorZ * weight.y + sunGlow;
 }
 
-/// <summary>視線がフォグの中を通り抜ける量</summary>
-/// <param name="originY">視点の高さ</param>
+/// <summary>高さで薄まる霧1層ぶんの、通り抜ける量</summary>
+/// <param name="startY">数え始める点の高さ</param>
 /// <param name="dirY">視線の向き(単位ベクトル)の上下成分</param>
-/// <param name="distance">視点から対象までの距離</param>
-float FogOpticalDepth(FogParams fog, float originY, float dirY, float distance)
+/// <param name="travel">数える長さ</param>
+float FogLayerOpticalDepth(float density, float falloff, float baseHeight, float startY, float dirY, float travel)
 {
-    // 手前の霞ませない区間を飛ばし、そこから先だけを数える
-    float skipped = min(distance, fog.startDistance);
-    float travel = distance - skipped;
-    float startY = originY + dirY * skipped;
-
-    float k = fog.heightFalloff;
+    if (density <= 0.0f)
+    {
+        return 0.0f;
+    }
     // 出発点の高さでの濃さ。基準より上なら薄く、下なら濃い
-    float densityAtStart = fog.density * exp(clamp(-k * (startY - fog.baseHeight), -20.0f, 20.0f));
+    float densityAtStart = density * exp(clamp(-falloff * (startY - baseHeight), -20.0f, 20.0f));
 
     // 進むにつれて高さが変わるぶんの補正。上へ向かうほど薄い所を通るので小さくなる
-    float a = max(k * dirY * travel, -20.0f);
+    float a = max(falloff * dirY * travel, -20.0f);
     float factor = (abs(a) > 1e-3f) ? (1.0f - exp(-a)) / a : 1.0f - 0.5f * a;
 
     return densityAtStart * travel * factor;
 }
 
-/// <summary>その点がどれだけ霞むか。0でそのまま、1で完全にフォグの色</summary>
-float FogAmount(FogParams fog, float3 cameraPosition, float3 worldPosition)
+/// <summary>視線がフォグの中を通り抜ける量。手前の excludeDistance までは数えない</summary>
+/// <param name="originY">視点の高さ</param>
+/// <param name="dirY">視線の向き(単位ベクトル)の上下成分</param>
+/// <param name="distance">視点から対象までの距離</param>
+float FogOpticalDepthFrom(FogParams fog, float originY, float dirY, float distance, float excludeDistance)
 {
-    if (fog.density <= 0.0f)
+    float skipped = min(distance, excludeDistance);
+    float travel = distance - skipped;
+    float startY = originY + dirY * skipped;
+    // 2層とも高さの指数なので、線に沿った積分もそれぞれの和になる
+    return FogLayerOpticalDepth(fog.density, fog.heightFalloff, fog.baseHeight, startY, dirY, travel)
+           + FogLayerOpticalDepth(fog.secondDensity, fog.secondHeightFalloff, fog.secondBaseHeight, startY, dirY, travel);
+}
+
+/// <summary>視線がフォグの中を通り抜ける量。手前の霞ませない区間を飛ばし、そこから先だけを数える</summary>
+float FogOpticalDepth(FogParams fog, float originY, float dirY, float distance)
+{
+    return FogOpticalDepthFrom(fog, originY, dirY, distance, fog.startDistance);
+}
+
+/// <summary>その点がどれだけ霞むか。0でそのまま、1で完全にフォグの色</summary>
+/// <param name="excludeDistance">この距離までは数えない。始まる距離と大きい方を使う (VolumetricFogExcludeDistance)</param>
+float FogAmountFrom(FogParams fog, float3 cameraPosition, float3 worldPosition, float excludeDistance)
+{
+    if (!HasFog(fog))
     {
         return 0.0f;
     }
@@ -173,8 +184,14 @@ float FogAmount(FogParams fog, float3 cameraPosition, float3 worldPosition)
         return 0.0f;
     }
 
-    float depth = FogOpticalDepth(fog, cameraPosition.y, toPoint.y / distance, distance);
+    float depth = FogOpticalDepthFrom(fog, cameraPosition.y, toPoint.y / distance, distance, max(fog.startDistance, excludeDistance));
     return min(1.0f - exp(-depth), fog.maxOpacity);
+}
+
+/// <summary>その点がどれだけ霞むか。0でそのまま、1で完全にフォグの色</summary>
+float FogAmount(FogParams fog, float3 cameraPosition, float3 worldPosition)
+{
+    return FogAmountFrom(fog, cameraPosition, worldPosition, 0.0f);
 }
 
 // 空をこの距離にある物として霞ませる。far クリップと同じくらい。
@@ -184,14 +201,15 @@ static const float kFogSkyDistance = 1000.0f;
 /// <summary>空がどれだけ霞むか。向きだけで決まる</summary>
 /// <remarks>地平線がいちばん濃く、見上げるほど薄くなる。地平線での濃さは、同じ距離にある地面とつながる</remarks>
 /// <param name="direction">視線の向き(単位ベクトル)</param>
-float FogAmountSky(FogParams fog, float3 direction)
+/// <param name="excludeDistance">この距離までは数えない。始まる距離と大きい方を使う</param>
+float FogAmountSkyFrom(FogParams fog, float3 direction, float excludeDistance)
 {
-    if (fog.density <= 0.0f)
+    if (!HasFog(fog))
     {
         return 0.0f;
     }
 
-    float depth = FogOpticalDepth(fog, fog.cameraPosition.y, direction.y, kFogSkyDistance);
+    float depth = FogOpticalDepthFrom(fog, fog.cameraPosition.y, direction.y, kFogSkyDistance, max(fog.startDistance, excludeDistance));
     float amount = min(1.0f - exp(-depth), fog.maxOpacity);
 
     // 高さで薄まらない設定だと、空のどの向きも同じだけ霞んで一面がフォグの色になる。
@@ -199,6 +217,12 @@ float FogAmountSky(FogParams fog, float3 direction)
     amount *= 1.0f - smoothstep(0.0f, 0.6f, direction.y);
 
     return amount * fog.skyAmount;
+}
+
+/// <summary>空がどれだけ霞むか。向きだけで決まる</summary>
+float FogAmountSky(FogParams fog, float3 direction)
+{
+    return FogAmountSkyFrom(fog, direction, 0.0f);
 }
 
 /// <summary>フォグを掛ける</summary>

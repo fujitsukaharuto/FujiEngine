@@ -286,6 +286,16 @@ void ModelManager::LoadModelInternal(const std::string& filename, bool overWrite
 			newModelMesh.material.occlusionFilePath = occlusionFileName.C_Str();
 		}
 
+		// glTF の拡張 (クリアコート・異方性・布の光沢)
+		material->Get(AI_MATKEY_CLEARCOAT_FACTOR, newModelMesh.material.clearCoatFactor);
+		material->Get(AI_MATKEY_CLEARCOAT_ROUGHNESS_FACTOR, newModelMesh.material.clearCoatRoughnessFactor);
+		material->Get(AI_MATKEY_ANISOTROPY_FACTOR, newModelMesh.material.anisotropyFactor);
+		aiColor3D sheenColor(0.0f, 0.0f, 0.0f);
+		if (material->Get(AI_MATKEY_SHEEN_COLOR_FACTOR, sheenColor) == AI_SUCCESS) {
+			newModelMesh.material.sheenColorFactor = { sheenColor.r, sheenColor.g, sheenColor.b };
+		}
+		material->Get(AI_MATKEY_SHEEN_ROUGHNESS_FACTOR, newModelMesh.material.sheenRoughnessFactor);
+
 		model->GetModelData().meshes.push_back(newModelMesh);
 
 		if (extractSkinning) {
@@ -754,6 +764,7 @@ void ModelManager::PickingUpdate() {
 	if (SUCCEEDED(pickingBufferReadBack_[readIndex]->Map(0, &readRange, reinterpret_cast<void**>(&mapped)))) {
 		lastPicked_.objID = mapped->objID;
 		lastPicked_.depth = mapped->depth;
+		lastPicked_.meshIndex = mapped->meshIndex;
 		pickingBufferReadBack_[readIndex]->Unmap(0, nullptr);
 	}
 
@@ -779,6 +790,7 @@ void ModelManager::PickingDataReset() {
 	// クリックしたフレームは「何も無い」から始める。前回の番号を残すと、空振りと同じ物のクリックを見分けられない
 	init.objID = IsPickingRequested() ? -1 : lastPicked_.objID;
 	init.depth = 1.0f;              // Depth をリセット
+	init.meshIndex = IsPickingRequested() ? -1 : lastPicked_.meshIndex;
 
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 

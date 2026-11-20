@@ -11,6 +11,7 @@
 #include "Engine/Graphics/Camera/CameraManager.h"
 #include "Engine/Graphics/Light/LightManager.h"
 #include "Engine/Graphics/SkyBox/SkyAtmosphere.h"
+#include "Engine/Graphics/Raytracing/VolumetricFogPass.h"
 #include <algorithm>
 #include <cmath>
 #include <string>
@@ -69,6 +70,13 @@ void SkyBox::Render() {
 	pPipeManager->SetGraphicsRootDescriptorTable(cList, RootName::kSkyViewLut,
 		ObjectRenderer::GetInstance()->GetSkyAtmosphere()->GetSkyViewSrvHandle());
 
+	// ボリュメトリックフォグの表。作っていないフレームもバインドが要る
+	if (const VolumetricFogPass* fog = ObjectRenderer::GetInstance()->GetVolumetricFogPass()) {
+		pPipeManager->SetGraphicsRootCBV(cList, RootName::kVolumetricFog, fog->GetParamsGPUVirtualAddress());
+		pPipeManager->SetGraphicsRootDescriptorTable(cList, RootName::kVolumetricFogVolume, fog->GetVolumeSrvHandle());
+		pPipeManager->SetGraphicsRootDescriptorTable(cList, RootName::kLocalFogVolumes, fog->GetLocalFogVolumesSrvHandle());
+	}
+
 	cList->DrawIndexedInstanced(static_cast<UINT>((index_.size())), 1, 0, 0, 0);
 }
 
@@ -86,8 +94,10 @@ void SkyBox::DebugGUI() {
 
 void SkyBox::UpdateWVP() {
 	Matrix4x4 worldViewProjectionMatrix;
-	Matrix4x4 worldMatrix = MakeIdentity4x4();
-	worldMatrix = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+	// 箱はカメラを中心に置く。原点に置いたままだと、カメラが箱 (300m) の外へ出たとき空が描かれない。
+	// 空の向きは頂点の向きから決めているので、動かしても見え方は変わらない
+	const Vector3 center = camera_ ? camera_->GetTranslate() : transform_.translate;
+	const Matrix4x4 worldMatrix = MakeAffineMatrix(transform_.scale, transform_.rotate, center);
 
 	if (camera_) {
 		const Matrix4x4& viewProjectionMatrix = camera_->GetViewProjectionMatrix();
@@ -99,7 +109,7 @@ void SkyBox::UpdateWVP() {
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 	wvpDataGPU_[frameIndex]->World = worldMatrix;
 	wvpDataGPU_[frameIndex]->WVP = worldViewProjectionMatrix;
-	wvpDataGPU_[frameIndex]->WorldInverseTransPose = Transpose(Inverse(wvpDataGPU_[frameIndex]->World));
+	wvpDataGPU_[frameIndex]->WorldInverseTransPose = Transpose(Inverse(worldMatrix));
 
 }
 
@@ -190,7 +200,7 @@ void SkyBox::ResourceCreate() {
 	
 		wvpDataGPU_[i]->WVP = MakeIdentity4x4();
 		wvpDataGPU_[i]->World = MakeIdentity4x4();
-		wvpDataGPU_[i]->WorldInverseTransPose = Transpose(Inverse(wvpDataGPU_[i]->World));
+		wvpDataGPU_[i]->WorldInverseTransPose = MakeIdentity4x4();
 	}
 
 	material_.SetTextureNamePath(kTextureName);

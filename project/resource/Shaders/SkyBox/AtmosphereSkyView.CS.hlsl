@@ -16,8 +16,14 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
     }
 
     float2 uv = (float2(dispatchID.xy) + 0.5f) / kSkyViewLutSize;
-    float3 direction = SkyViewUvToDirection(uv);
-    float3 origin = float3(0.0f, bottomRadius + max(cameraHeight, 0.001f), 0.0f);
+    float3 direction = SkyViewUvToDirection(uv, AtmosphereHorizonZenith());
+    float3 origin = float3(0.0f, AtmosphereViewHeight(), 0.0f);
+    // 大気の外から大気を通らない向きは宇宙
+    if (!MoveToTopAtmosphere(origin, direction))
+    {
+        gSkyViewOut[dispatchID.xy] = float4(0.0f, 0.0f, 0.0f, 1.0f);
+        return;
+    }
 
     float groundDistance = RaySphere(origin, direction, bottomRadius);
     float distance = (groundDistance > 0.0f) ? groundDistance : RaySphere(origin, direction, topRadius);

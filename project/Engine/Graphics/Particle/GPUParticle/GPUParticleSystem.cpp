@@ -14,6 +14,7 @@
 #include "Engine/Graphics/Texture/TextureManager.h"
 #include "Engine/Graphics/Object/ObjectRenderer.h"
 #include "Engine/Graphics/Light/LightManager.h"
+#include "Engine/Graphics/Raytracing/ScreenReflectionPass.h"
 #ifdef _DEBUGMODE
 #include "Engine/Editor/ObjectEditor/GPUParticleSystemEditor.h"
 #endif // _DEBUGMODE
@@ -274,9 +275,11 @@ void GPUParticleSystem::SplatDraw() {
 	// 深度を DSVへ戻す
 	dxcommon_->TransitionDepthToWrite();
 
-	// シーンRTへ加算合成(蓄積バッファをUAV→SRVへ遷移)
+	// シーンRTへ加算合成(蓄積バッファをUAV→SRVへ遷移)。映り込みの画面の写しへ足す CS も読む
+	constexpr D3D12_RESOURCE_STATES kSplatReadState =
+		D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
 	dxcommon_->TransitionResource(splatAccumResource_.Get(),
-		D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+		D3D12_RESOURCE_STATE_UNORDERED_ACCESS, kSplatReadState);
 
 	dxcommon_->GetDXCommand()->SetViewAndScissor(MyWin::kWindowWidth, MyWin::kWindowHeight);
 	pPipeManager->SetPipeline(Pipe::SplatComposite);
@@ -285,9 +288,14 @@ void GPUParticleSystem::SplatDraw() {
 	pPipeManager->SetGraphicsRootCBV(list, RootName::kSplatParam, paramAddr);
 	list->DrawInstanced(3, 1, 0, 0); // SV_VertexIDでフルスクリーン三角形
 
+	// 次のフレームの映り込み (SSR) にも粒子を映す
+	if (ScreenReflectionPass* reflection = ObjectRenderer::GetInstance()->GetScreenReflectionPass()) {
+		reflection->AddSplats(splatAccumSRVHandle_.second, paramAddr);
+	}
+
 	// 次フレームのクリアに備えてUAVへ戻す
 	dxcommon_->TransitionResource(splatAccumResource_.Get(),
-		D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+		kSplatReadState, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 }
 
 void GPUParticleSystem::ResetEmitters() {

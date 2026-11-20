@@ -165,7 +165,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Graphics\Raytracing\DDGIPass.cpp" />
     <ClCompile Include="Engine\Graphics\Raytracing\ScreenProbeGIPass.cpp" />
     <ClCompile Include="Engine\Graphics\Raytracing\ScreenReflectionPass.cpp" />
+    <ClCompile Include="Engine\Graphics\Raytracing\ScreenSpaceGIPass.cpp" />
     <ClCompile Include="Engine\Graphics\Raytracing\VolumetricLightPass.cpp" />
+    <ClCompile Include="Engine\Graphics\Raytracing\VolumetricFogPass.cpp" />
     <ClCompile Include="Engine\Graphics\Object\RefractionCapture.cpp" />
     <ClCompile Include="Engine\Graphics\SkyBox\SkyAtmosphere.cpp" />
     <ClCompile Include="Engine\Audio\AudioPlayer.cpp" />
@@ -179,6 +181,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Core\Time\FPSKeeper.cpp" />
     <ClCompile Include="Engine\DXC\Command\CommandContext.cpp" />
     <ClCompile Include="Engine\DXC\Command\DXCommand.cpp" />
+    <ClCompile Include="Engine\DXC\Debug\FrameProfiler.cpp" />
     <ClCompile Include="Engine\DXC\Debug\GPUTimer.cpp" />
     <ClCompile Include="Engine\DXC\Device\GraphicsDevice.cpp" />
     <ClCompile Include="Engine\DXC\Device\SwapChainManager.cpp" />
@@ -192,6 +195,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Editor\ObjectEditor\GameObjectEditor.cpp" />
     <ClCompile Include="Engine\Editor\ObjectEditor\Object3dEditor.cpp" />
     <ClCompile Include="Engine\Editor\Widget\GizmoHelper.cpp" />
+    <ClCompile Include="Engine\Editor\ContentBrowser\ContentBrowser.cpp" />
     <ClCompile Include="Engine\Editor\Widget\JsonEditorUI.cpp" />
     <ClCompile Include="Engine\Graphics\Camera\Camera.cpp" />
     <ClCompile Include="Engine\Graphics\Camera\CameraManager.cpp" />
@@ -241,6 +245,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Graphics\Raytracing\Denoiser.cpp" />
     <ClCompile Include="Engine\Graphics\Raytracing\RayTracedAOPass.cpp" />
     <ClCompile Include="Engine\Graphics\Raytracing\RayTracedShadowPass.cpp" />
+    <ClCompile Include="Engine\Graphics\Raytracing\PunctualShadowPass.cpp" />
     <ClCompile Include="Engine\Graphics\IBL\IBLBaker.cpp" />
     <ClCompile Include="Engine\Graphics\Raytracing\RaytracingScene.cpp" />
     <ClCompile Include="Engine\Graphics\Raytracing\WorkTexture.cpp" />
@@ -262,6 +267,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\GameObject\EmissiveFlicker.cpp" />
     <ClCompile Include="Engine\GameObject\SpawnPoint.cpp" />
     <ClCompile Include="Engine\GameObject\ReflectionProbe.cpp" />
+    <ClCompile Include="Engine\Math\Spline\Spline.cpp" />
+    <ClCompile Include="Engine\GameObject\PlacedSpline.cpp" />
+    <ClCompile Include="Engine\GameObject\PostProcessVolume.cpp" />
+    <ClCompile Include="Engine\GameObject\LocalFogVolume.cpp" />
     <ClCompile Include="Engine\GameObject\GIVolume.cpp" />
     <ClCompile Include="Engine\GameObject\PlacedLight.cpp" />
     <ClCompile Include="Engine\Scene\SceneManager.cpp" />
@@ -270,6 +279,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="externals\imgui\utilities\widgets.cpp" />
     <ClCompile Include="Game\App\GameRun.cpp" />
     <ClCompile Include="Engine\Collision\AABBCollider.cpp" />
+    <ClCompile Include="Engine\Collision\CollisionGeometry.cpp" />
+    <ClCompile Include="Engine\Collision\SphereCollider.cpp" />
+    <ClCompile Include="Engine\Collision\CapsuleCollider.cpp" />
     <ClCompile Include="Engine\Collision\BaseCollider.cpp" />
     <ClCompile Include="Engine\Collision\CollisionManager.cpp" />
     <ClCompile Include="Game\GameObj\Enemy\Behavior\BossAreaAttack.cpp" />
@@ -303,6 +315,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\Scene\Debug\GPUParticleScene.cpp" />
     <ClCompile Include="Game\Scene\Debug\ParticleDebugScene.cpp" />
     <ClCompile Include="Game\Scene\Debug\NightTownScene.cpp" />
+    <ClCompile Include="Game\Scene\Debug\RuinsScene.cpp" />
     <ClCompile Include="Game\Scene\Debug\TestScene.cpp" />
     <ClCompile Include="Game\Scene\Main\GameScene.cpp" />
     <ClCompile Include="Game\Scene\Main\ResultScene.cpp" />
@@ -316,12 +329,15 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Graphics\Raytracing\DDGIPass.h" />
     <ClInclude Include="Engine\Graphics\Raytracing\ScreenProbeGIPass.h" />
     <ClInclude Include="Engine\Graphics\Raytracing\ScreenReflectionPass.h" />
+    <ClInclude Include="Engine\Graphics\Raytracing\ScreenSpaceGIPass.h" />
     <ClInclude Include="Engine\Graphics\Raytracing\VolumetricLightPass.h" />
+    <ClInclude Include="Engine\Graphics\Raytracing\VolumetricFogPass.h" />
     <ClInclude Include="Engine\Graphics\Object\RefractionCapture.h" />
     <ClInclude Include="Engine\Graphics\SkyBox\SkyAtmosphere.h" />
     <ClInclude Include="Engine\Audio\AudioPlayer.h" />
     <ClInclude Include="Engine\Core\App\Framework.h" />
     <ClInclude Include="Engine\Core\App\MyWindow.h" />
+    <ClInclude Include="Engine\Core\Debug\DevEnv.h" />
     <ClInclude Include="Engine\Core\Debug\ImGuiManager.h" />
     <ClInclude Include="Engine\Core\Input\Input.h" />
     <ClInclude Include="Engine\Core\Input\InputAction.h" />
@@ -331,6 +347,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Core\Thread\ParallelFor.h" />
     <ClInclude Include="Engine\DXC\Command\CommandContext.h" />
     <ClInclude Include="Engine\DXC\Command\DXCommand.h" />
+    <ClInclude Include="Engine\DXC\Debug\FrameProfiler.h" />
     <ClInclude Include="Engine\DXC\Debug\GPUTimer.h" />
     <ClInclude Include="Engine\DXC\Device\GraphicsDevice.h" />
     <ClInclude Include="Engine\DXC\Device\SwapChainManager.h" />
@@ -347,6 +364,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Editor\ObjectEditor\GameObjectEditor.h" />
     <ClInclude Include="Engine\Editor\ObjectEditor\Object3dEditor.h" />
     <ClInclude Include="Engine\Editor\Widget\GizmoHelper.h" />
+    <ClInclude Include="Engine\Editor\ContentBrowser\ContentBrowser.h" />
     <ClInclude Include="Engine\Editor\Widget\JsonEditorUI.h" />
     <ClInclude Include="Engine\Graphics\Camera\Camera.h" />
     <ClInclude Include="Engine\Graphics\Camera\CameraManager.h" />
@@ -390,6 +408,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Graphics\Pipeline\Render\RenderPipeline.h" />
     <ClInclude Include="Engine\Graphics\Pipeline\BasePipeline.h" />
     <ClInclude Include="Engine\Graphics\Pipeline\PipeKind.h" />
+    <ClInclude Include="Engine\Graphics\Pipeline\ObjectShaderFeatures.h" />
     <ClInclude Include="Engine\Graphics\Pipeline\PipelineManager.h" />
     <ClInclude Include="Engine\Graphics\Pipeline\RootNames.h" />
     <ClInclude Include="Engine\Graphics\Pipeline\RootParam.h" />
@@ -400,6 +419,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Graphics\Raytracing\Denoiser.h" />
     <ClInclude Include="Engine\Graphics\Raytracing\RayTracedAOPass.h" />
     <ClInclude Include="Engine\Graphics\Raytracing\RayTracedShadowPass.h" />
+    <ClInclude Include="Engine\Graphics\Raytracing\PunctualShadowPass.h" />
     <ClInclude Include="Engine\Graphics\IBL\IBLBaker.h" />
     <ClInclude Include="Engine\Graphics\Raytracing\RaytracingScene.h" />
     <ClInclude Include="Engine\Graphics\Raytracing\WorkTexture.h" />
@@ -429,9 +449,14 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Scene\BaseScene.h" />
     <ClInclude Include="Engine\Scene\SceneFade.h" />
     <ClInclude Include="Engine\Scene\Level.h" />
+    <ClInclude Include="Engine\Scene\EnvironmentParams.h" />
     <ClInclude Include="Engine\GameObject\EmissiveFlicker.h" />
     <ClInclude Include="Engine\GameObject\SpawnPoint.h" />
     <ClInclude Include="Engine\GameObject\ReflectionProbe.h" />
+    <ClInclude Include="Engine\Math\Spline\Spline.h" />
+    <ClInclude Include="Engine\GameObject\PlacedSpline.h" />
+    <ClInclude Include="Engine\GameObject\PostProcessVolume.h" />
+    <ClInclude Include="Engine\GameObject\LocalFogVolume.h" />
     <ClInclude Include="Engine\GameObject\GIVolume.h" />
     <ClInclude Include="Engine\GameObject\PlacedLight.h" />
     <ClInclude Include="Engine\Scene\SceneManager.h" />
@@ -441,6 +466,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="externals\imgui\utilities\widgets.h" />
     <ClInclude Include="Game\App\GameRun.h" />
     <ClInclude Include="Engine\Collision\AABBCollider.h" />
+    <ClInclude Include="Engine\Collision\CollisionGeometry.h" />
+    <ClInclude Include="Engine\Collision\SphereCollider.h" />
+    <ClInclude Include="Engine\Collision\CapsuleCollider.h" />
     <ClInclude Include="Engine\Collision\BaseCollider.h" />
     <ClInclude Include="Engine\Collision\CollisionManager.h" />
     <ClInclude Include="Game\GameObj\Enemy\Behavior\BaseBossBehavior.h" />
@@ -477,6 +505,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Game\Scene\Debug\GPUParticleScene.h" />
     <ClInclude Include="Game\Scene\Debug\ParticleDebugScene.h" />
     <ClInclude Include="Game\Scene\Debug\NightTownScene.h" />
+    <ClInclude Include="Game\Scene\Debug\RuinsScene.h" />
     <ClInclude Include="Game\Scene\Debug\TestScene.h" />
     <ClInclude Include="Game\Scene\Main\GameScene.h" />
     <ClInclude Include="Game\Scene\Main\ResultScene.h" />
@@ -548,6 +577,14 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">true</ExcludedFromBuild>
     </FxCompile>
+    <FxCompile Include="resource\Shaders\Raytracing\ScreenSpaceGITrace.CS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">Compute</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="resource\Shaders\Raytracing\ScreenReflectionResolve.CS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
@@ -556,7 +593,23 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">true</ExcludedFromBuild>
     </FxCompile>
+    <FxCompile Include="resource\Shaders\Raytracing\ScreenSpaceGIBlur.CS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">Compute</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="resource\Shaders\Raytracing\VolumetricLightTrace.CS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">Compute</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\Raytracing\VolumetricFogScatter.CS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">Compute</ShaderType>
@@ -573,6 +626,14 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="resource\Shaders\Raytracing\VolumetricLightBlur.CS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">Compute</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\Raytracing\VolumetricFogIntegrate.CS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">Compute</ShaderType>
@@ -645,6 +706,14 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="resource\Shaders\SkyBox\AtmosphereCapture.CS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">Compute</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\SkyBox\AtmosphereAerialPerspective.CS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">Compute</ShaderType>
@@ -1270,6 +1339,38 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">true</ExcludedFromBuild>
     </FxCompile>
+    <FxCompile Include="resource\Shaders\Raytracing\PunctualShadow.CS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">Compute</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\Raytracing\DenoiseTemporalRGB.CS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">Compute</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\Raytracing\DenoiseSpatialRGB.CS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">Compute</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\Raytracing\ReflectionAddSplats.CS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">Compute</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="resource\Shaders\Raytracing\DenoiseTemporal.CS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
@@ -1372,12 +1473,37 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">true</ExcludedFromBuild>
     </None>
+    <None Include="resource\Shaders\Common\ScreenSpaceGICommon.hlsli">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">true</ExcludedFromBuild>
+    </None>
     <None Include="resource\Shaders\Common\ScreenReflection.hlsli">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">true</ExcludedFromBuild>
     </None>
+    <None Include="resource\Shaders\Common\ScreenSpaceGI.hlsli">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">true</ExcludedFromBuild>
+    </None>
     <None Include="resource\Shaders\Common\VolumetricLightCommon.hlsli">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">true</ExcludedFromBuild>
+    </None>
+    <None Include="resource\Shaders\Common\VolumetricFog.hlsli">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">true</ExcludedFromBuild>
+    </None>
+    <None Include="resource\Shaders\Common\Parallax.hlsli">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">true</ExcludedFromBuild>
+    </None>
+    <None Include="resource\Shaders\Common\MaterialLayers.hlsli">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">true</ExcludedFromBuild>
@@ -1482,6 +1608,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">true</ExcludedFromBuild>
     </None>
+    <None Include="resource\Shaders\Common\AerialPerspective.hlsli">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">true</ExcludedFromBuild>
+    </None>
     <None Include="resource\Shaders\Common\Fog.hlsli">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -1513,6 +1644,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">true</ExcludedFromBuild>
     </None>
     <None Include="resource\Shaders\Line\Line3d.hlsli">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">true</ExcludedFromBuild>
+    </None>
+    <None Include="resource\Shaders\Object\ObjectFeatures.hlsli">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">true</ExcludedFromBuild>

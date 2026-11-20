@@ -8,6 +8,7 @@
 #include "Engine/Core/App/MyWindow.h"
 #include "Engine/DXC/Shader/DXCompile.h"
 #include "Engine/DXC/Debug/GPUTimer.h"
+#include "Engine/DXC/Debug/FrameProfiler.h"
 #include "Engine/Graphics/PostEffect/OffscreenManager.h"
 #include "Engine/Core/Time/FPSKeeper.h"
 #include "Engine/Graphics/Pipeline/PipelineManager.h"
@@ -43,11 +44,13 @@ void DXCom::Initialize(MyWin* myWin) {
 	command_->Initialize(GetDevice());
 	gpuFrameTimer_ = std::make_unique<GPUTimer>();
 	gpuFrameTimer_->Initialize(GetDevice(), command_->GetQueue(), static_cast<uint32_t>(GpuSection::Count));
-	constexpr const char* kSectionNames[] = { "Frame", "Skinning", "Sky", "Objects", "Particles", "Sprites", "PostEffect", "DebugGui" };
+	constexpr const char* kSectionNames[] = { "Frame", "Skinning", "Prepare", "Sky", "Objects", "Particles", "Sprites", "PostEffect", "DebugGui" };
 	static_assert(std::size(kSectionNames) == static_cast<size_t>(GpuSection::Count));
 	for (uint32_t i = 0; i < static_cast<uint32_t>(GpuSection::Count); ++i) {
 		gpuFrameTimer_->SetName(i, kSectionNames[i]);
 	}
+	frameProfiler_ = std::make_unique<FrameProfiler>();
+	frameProfiler_->InitializeFromEnvironment();
 
 	// スワップチェーンの作成
 	swapChainManager_ = std::make_unique<SwapChainManager>();
@@ -153,7 +156,11 @@ void DXCom::PostDraw() {
 	// コマンドリストの実行
 	command_->Execution();
 	command_->GPUSignal();
-	swapChainManager_->Present();
+	frameProfiler_->BeginPresent();
+	if (frameProfiler_->ShouldPresent()) {
+		swapChainManager_->Present();
+	}
+	frameProfiler_->EndPresent();
 }
 
 void DXCom::ResizeSwapChainIfNeeded() {
@@ -174,9 +181,16 @@ void DXCom::BeginFrame() {
 	ResizeSwapChainIfNeeded();
 	command_->SetFrameIndex((command_->GetNowFrameIndex() + 1) % kFrameCount_);
 	fpsKeeper_->FixFPS();
+	frameProfiler_->BeginWaitGpu();
 	command_->Reset();
+	frameProfiler_->EndWaitGpu();
 	SRVManager::GetInstance()->Tick();
 	GPUTimer::AdvanceFrame();
+	if (frameProfiler_->IsRunning()) {
+		static std::vector<GPUTimer::Sample> samples;
+		GPUTimer::CollectAll((GetNowFrameCount() + kFrameCount_ - 1) % kFrameCount_, samples);
+		frameProfiler_->RecordFrame(samples);
+	}
 	BeginGpuSection(GpuSection::Frame);
 }
 

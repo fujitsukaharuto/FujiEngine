@@ -20,6 +20,9 @@
 #include "Engine/Graphics/PostEffect/OffscreenManager.h"
 #include "Engine/Graphics/Raytracing/DDGIPass.h"
 #include "Engine/Graphics/Raytracing/RaytracingScene.h"
+#include "Engine/Graphics/SkyBox/SkyAtmosphere.h"
+#include "Engine/Graphics/Raytracing/VolumetricFogPass.h"
+#include "Engine/Graphics/Light/ClusteredLightPass.h"
 
 using namespace Core;
 using namespace DXC;
@@ -160,6 +163,25 @@ void ScreenReflectionPass::Render(const GBufferPass& gbuffer, const RaytracingSc
 		pPipeManager->SetComputeRootDescriptorTable(cList, RootName::kDDGIProbeData, ddgi->GetProbeDataSrvHandle());
 	}
 	pPipeManager->SetComputeRootDescriptorTable(cList, RootName::kReflectionSceneColor, srvManager->GetGPUDescriptorHandle(sceneColor_.srvIndex));
+	// 画面の色から前方描画と同じ空気遠近を外す
+	if (const SkyAtmosphere* atmosphere = ObjectRenderer::GetInstance()->GetSkyAtmosphere()) {
+		pPipeManager->SetComputeRootCBV(cList, RootName::kAerialPerspective, atmosphere->GetAerialPerspectiveParamsAddress());
+		pPipeManager->SetComputeRootDescriptorTable(cList, RootName::kAerialScatter, atmosphere->GetAerialScatterSrvHandle());
+		pPipeManager->SetComputeRootDescriptorTable(cList, RootName::kAerialTransmittance, atmosphere->GetAerialTransmittanceSrvHandle());
+	}
+	// ボリュメトリックフォグも同じく外す
+	if (const VolumetricFogPass* fog = ObjectRenderer::GetInstance()->GetVolumetricFogPass()) {
+		pPipeManager->SetComputeRootCBV(cList, RootName::kVolumetricFog, fog->GetParamsGPUVirtualAddress());
+		pPipeManager->SetComputeRootDescriptorTable(cList, RootName::kVolumetricFogVolume, fog->GetVolumeSrvHandle());
+		pPipeManager->SetComputeRootDescriptorTable(cList, RootName::kLocalFogVolumes, fog->GetLocalFogVolumesSrvHandle());
+	}
+	// 当たった所を照らす影なしのライト
+	if (const ClusteredLightPass* clustered = ObjectRenderer::GetInstance()->GetClusteredLightPass()) {
+		pPipeManager->SetComputeRootCBV(cList, RootName::kClusterParams, clustered->GetParamsGPUVirtualAddress());
+		pPipeManager->SetComputeRootDescriptorTable(cList, RootName::kClusteredLights, clustered->GetLightsSrvHandle());
+		pPipeManager->SetComputeRootDescriptorTable(cList, RootName::kClusterCounts, clustered->GetCountsSrvHandle());
+		pPipeManager->SetComputeRootDescriptorTable(cList, RootName::kClusterIndices, clustered->GetIndicesSrvHandle());
+	}
 	pPipeManager->SetComputeRootDescriptorTable(cList, RootName::kReflectionTraceOut, srvManager->GetGPUDescriptorHandle(trace_.uavIndex));
 	cList->Dispatch(groupsX, groupsY, 1);
 	dxcommon_->TransitionResource(trace_.resource.Get(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS, WorkTexture::kReadState);
@@ -179,8 +201,13 @@ bool ScreenReflectionPass::IsSceneColorEnabled() const {
 	return (flags & kRenderFlagScreenReflection) != 0 && (flags & kRenderFlagReflectionSceneColor) != 0;
 }
 
+bool ScreenReflectionPass::IsSceneColorNeeded() const {
+	return IsSceneColorEnabled() || (lightManager_->GetData().renderFlags & kRenderFlagScreenSpaceGI) != 0;
+}
+
 void ScreenReflectionPass::CaptureSceneColor() {
-	if (dxcommon_ == nullptr || lightManager_ == nullptr || !IsSceneColorEnabled()) {
+	canAddSplats_ = false;
+	if (dxcommon_ == nullptr || lightManager_ == nullptr || !IsSceneColorNeeded()) {
 		// 入れ直したフレームは画面の写しを使わない
 		hasSceneColor_ = false;
 		return;
@@ -193,10 +220,33 @@ void ScreenReflectionPass::CaptureSceneColor() {
 	dxcommon_->TransitionResource(sceneColor, D3D12_RESOURCE_STATE_COPY_SOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
 	sceneColorViewProj_ = CameraManager::GetInstance()->GetCamera()->GetViewProjectionMatrix();
 	hasSceneColor_ = true;
+	canAddSplats_ = true;
+}
+
+void ScreenReflectionPass::AddSplats(D3D12_GPU_DESCRIPTOR_HANDLE splatAccum, D3D12_GPU_VIRTUAL_ADDRESS splatParam) {
+	if (!canAddSplats_ || dxcommon_ == nullptr) {
+		return;
+	}
+	canAddSplats_ = false;
+	ID3D12GraphicsCommandList* cList = dxcommon_->GetCommandList();
+	PipelineManager* pPipeManager = PipelineManager::GetInstance();
+	dxcommon_->TransitionResource(sceneColor_.resource.Get(), WorkTexture::kReadState, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+	pPipeManager->SetCSPipeline(Pipe::ReflectionAddSplatsCS);
+	pPipeManager->SetComputeRootDescriptorTable(cList, RootName::kSplatAccum, splatAccum);
+	pPipeManager->SetComputeRootCBV(cList, RootName::kSplatParam, splatParam);
+	pPipeManager->SetComputeRootDescriptorTable(cList, RootName::kReflectionSceneColorOut,
+		SRVManager::GetInstance()->GetGPUDescriptorHandle(sceneColor_.uavIndex));
+	cList->Dispatch(DispatchCount(static_cast<uint32_t>(MyWin::kWindowWidth), kThreadGroupSize_),
+		DispatchCount(static_cast<uint32_t>(MyWin::kWindowHeight), kThreadGroupSize_), 1);
+	dxcommon_->TransitionResource(sceneColor_.resource.Get(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS, WorkTexture::kReadState);
 }
 
 D3D12_GPU_DESCRIPTOR_HANDLE ScreenReflectionPass::GetResultSrvHandle() const {
 	return SRVManager::GetInstance()->GetGPUDescriptorHandle(result_.srvIndex);
+}
+
+D3D12_GPU_DESCRIPTOR_HANDLE ScreenReflectionPass::GetSceneColorSrvHandle() const {
+	return SRVManager::GetInstance()->GetGPUDescriptorHandle(sceneColor_.srvIndex);
 }
 
 void ScreenReflectionPass::DebugGUI() {

@@ -85,6 +85,38 @@ float RaySphere(float3 origin, float3 dir, float radius)
     return (far >= 0.0f) ? far : -1.0f;
 }
 
+/// <summary>星の中心からカメラまでの距離 (km)</summary>
+float AtmosphereViewHeight()
+{
+    return bottomRadius + max(cameraHeight, 0.001f);
+}
+
+/// <summary>カメラから見た地面の縁の天頂角。SkyView の数表の並びに使う (地表で π/2)</summary>
+/// <remarks>LightManager が FogData::skyHorizonZenith に同じ式で入れる。変えたら SkyAtmosphere::GetHorizonZenith も合わせる</remarks>
+float AtmosphereHorizonZenith()
+{
+    return kAtmospherePI - asin(saturate(bottomRadius / AtmosphereViewHeight()));
+}
+
+/// <summary>大気の外にいるなら、視線が大気に入る点まで進める (Hillaire 2020 の MoveToTopAtmosphere)</summary>
+/// <returns>視線が大気を通るか。通らなければ宇宙しか見えない</returns>
+bool MoveToTopAtmosphere(inout float3 origin, float3 direction)
+{
+    if (length(origin) <= topRadius)
+    {
+        return true;
+    }
+    float tTop = RaySphere(origin, direction, topRadius);
+    if (tTop < 0.0f)
+    {
+        return false;
+    }
+    // 上端のわずかに内側から始める
+    float3 entry = origin + direction * tTop;
+    origin = entry - normalize(entry) * 0.01f;
+    return true;
+}
+
 // ---- 透過率の数表 (横: 天頂角, 縦: 高さ) ----
 
 void TransmittanceUvToParams(float2 uv, out float viewHeight, out float viewZenithCos)

@@ -46,6 +46,14 @@ namespace Graphics {
 		std::string emissiveFilePath;
 		/// <summary>物陰の暗さのテクスチャ (R を使う)。空なら無し</summary>
 		std::string occlusionFilePath;
+		/// <summary>KHR_materials_clearcoat</summary>
+		float clearCoatFactor = 0.0f;
+		float clearCoatRoughnessFactor = 0.0f;
+		/// <summary>KHR_materials_anisotropy</summary>
+		float anisotropyFactor = 0.0f;
+		/// <summary>KHR_materials_sheen</summary>
+		Math::Vector3 sheenColorFactor{};
+		float sheenRoughnessFactor = 0.0f;
 	};
 
 	enum class LightMode {
@@ -90,7 +98,19 @@ namespace Graphics {
 			int32_t useEmissiveMap = 0;				// 0以外なら emissive にこれを掛ける。0なら色のテクスチャ
 			int32_t occlusionMapIndex = 0;			// 物陰の暗さのテクスチャ (R)
 			int32_t useOcclusionMap = 0;			// 0以外ならアンビエントにテクスチャの R を掛ける
+			// 重ねる層 (Common/MaterialLayers.hlsli)。glTF の KHR_materials_clearcoat / anisotropy / sheen と同じ意味
+			float clearCoat = 0.0f;					// クリアコートの強さ (0〜1)。0なら無し
+			float clearCoatRoughness = 0.05f;		// 膜の粗さ
+			float anisotropy = 0.0f;				// 異方性 (-1〜1)。正なら接線の向きへハイライトが伸びる
+			float anisotropyRotation = 0.0f;		// 異方性の向きを接線から回す角度 (ラジアン)
+			Math::Vector3 sheenColor{};				// 布の光沢の色。黒なら無し
+			float sheenRoughness = 0.5f;			// 布の光沢の粗さ
+			int32_t heightMapIndex = 0;				// 視差マッピングの高さのテクスチャ (R、白が高い)
+			int32_t useHeightMap = 0;				// 0以外なら視差マッピング
+			float heightScale = 0.05f;				// 高さ1の段差が UV で何ぶんずれて見えるか (UE の Height Ratio)
+			int32_t meshIndex = 0;					// 何番目のメッシュか。ピッキングが書き出す (Model が描くときに入れる)
 		};
+		static_assert(sizeof(MaterialData) == 224, "MaterialData の大きさが Object3d.hlsli の Material と一致していない");
 
 	public:
 		Material();
@@ -125,6 +145,19 @@ namespace Graphics {
 		const Math::Vector3& GetRimColor() const { return materialData_.rimColor; }
 		float GetRimPower() const { return materialData_.rimPower; }
 		float GetEnvironment() const { return materialData_.environmentCoefficient; }
+		float GetClearCoat() const { return materialData_.clearCoat; }
+		float GetClearCoatRoughness() const { return materialData_.clearCoatRoughness; }
+		float GetAnisotropy() const { return materialData_.anisotropy; }
+		float GetAnisotropyRotation() const { return materialData_.anisotropyRotation; }
+		const Math::Vector3& GetSheenColor() const { return materialData_.sheenColor; }
+		float GetSheenRoughness() const { return materialData_.sheenRoughness; }
+		/// <summary>クリアコート・異方性・布の光沢・視差のどれかを使うか。使うならそれを計算する PSO (MATERIAL_EXTENDED) で描く</summary>
+		bool HasExtendedShading() const {
+			const Math::Vector3& sheen = materialData_.sheenColor;
+			return materialData_.clearCoat > 0.0f || materialData_.anisotropy != 0.0f || sheen.x > 0.0f || sheen.y > 0.0f || sheen.z > 0.0f ||
+				materialData_.useHeightMap != 0;
+		}
+		float GetHeightScale() const { return materialData_.heightScale; }
 
 		//========================================================================*/
 		//* Setter
@@ -148,6 +181,8 @@ namespace Graphics {
 		void SetMetallicRoughnessMap(const std::string& name);
 		/// <summary>両面を描く素材か</summary>
 		void SetTwoSided(bool isTwoSided) { materialData_.isTwoSided = isTwoSided ? 1 : 0; }
+		/// <summary>モデルの何番目のメッシュに使っているか。ピッキングがメッシュ単位で拾うのに使う</summary>
+		void SetMeshIndex(int32_t index) { materialData_.meshIndex = index; }
 		/// <summary>壁の汚れ (雨だれ・泥はね・ムラ) の強さ。0なら無し</summary>
 		void SetWeathering(float weathering) { materialData_.weathering = weathering; }
 		float GetWeathering() const { return materialData_.weathering; }
@@ -172,6 +207,15 @@ namespace Graphics {
 		void SetRim(const Math::Vector3& color, float power) { materialData_.rimColor = color; materialData_.rimPower = power; }
 		/// <summary>環境マップの設定</summary>
 		void SetEnvironment(float env);
+		/// <summary>クリアコート (車の塗装や漆のような透明な膜)。strength が0なら無し</summary>
+		void SetClearCoat(float strength, float roughness) { materialData_.clearCoat = strength; materialData_.clearCoatRoughness = roughness; }
+		/// <summary>異方性 (ヘアラインの金属や髪)。strength は -1〜1 で0なら無し、rotation は接線から回す角度 (ラジアン)</summary>
+		void SetAnisotropy(float strength, float rotation) { materialData_.anisotropy = strength; materialData_.anisotropyRotation = rotation; }
+		/// <summary>布の光沢 (ビロードや起毛)。色が黒なら無し</summary>
+		void SetSheen(const Math::Vector3& color, float roughness) { materialData_.sheenColor = color; materialData_.sheenRoughness = roughness; }
+		/// <summary>視差マッピングの高さのテクスチャ (R、白が高い)。空なら視差なし</summary>
+		/// <param name="scale">高さ1の段差が UV で何ぶんずれて見えるか</param>
+		void SetHeightMap(const std::string& name, float scale);
 
 	private:
 
@@ -192,6 +236,7 @@ namespace Graphics {
 		Texture* metallicRoughnessMap_ = nullptr;
 		Texture* emissiveMap_ = nullptr;
 		Texture* occlusionMap_ = nullptr;
+		Texture* heightMap_ = nullptr;
 		Texture* normalMap_ = nullptr;
 		MaterialDataPath textureNamePath_;
 	};

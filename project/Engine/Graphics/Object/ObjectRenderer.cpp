@@ -10,11 +10,13 @@
 #include "Engine/Graphics/Camera/CameraManager.h"
 #include "Engine/Graphics/Pipeline/PipeKind.h"
 #include "Engine/Graphics/Pipeline/PipelineManager.h"
+#include "Engine/Graphics/Pipeline/ObjectShaderFeatures.h"
 #include "Engine/Core/App/MyWindow.h"
 #include "Engine/Graphics/Raytracing/RaytracingScene.h"
 #include "Engine/Graphics/GBuffer/GBufferPass.h"
 #include "Engine/Graphics/Raytracing/RayTracedAOPass.h"
 #include "Engine/Graphics/Raytracing/RayTracedShadowPass.h"
+#include "Engine/Graphics/Raytracing/PunctualShadowPass.h"
 #include "Engine/Graphics/IBL/IBLBaker.h"
 #include "Engine/Graphics/SkyBox/SkyAtmosphere.h"
 #include "Engine/Graphics/Raytracing/DDGIPass.h"
@@ -24,7 +26,9 @@
 #include "Engine/Graphics/Light/ClusteredLightPass.h"
 #include "Engine/Graphics/Raytracing/ScreenProbeGIPass.h"
 #include "Engine/Graphics/Raytracing/ScreenReflectionPass.h"
+#include "Engine/Graphics/Raytracing/ScreenSpaceGIPass.h"
 #include "Engine/Graphics/Raytracing/VolumetricLightPass.h"
+#include "Engine/Graphics/Raytracing/VolumetricFogPass.h"
 #include "Engine/Graphics/Object/RefractionCapture.h"
 #include "Engine/Graphics/Texture/TextureManager.h"
 #include "Engine/DXC/Command/DXCommand.h"
@@ -60,6 +64,9 @@ void ObjectRenderer::Initialize(DXCom* pDxcom, LightManager* pLightManager) {
 	shadowPass_ = std::make_unique<RayTracedShadowPass>();
 	shadowPass_->Initialize(pDxcom, pLightManager);
 
+	punctualShadowPass_ = std::make_unique<PunctualShadowPass>();
+	punctualShadowPass_->Initialize(pDxcom, pLightManager);
+
 	iblBaker_ = std::make_unique<IBLBaker>();
 	iblBaker_->Initialize(pDxcom);
 
@@ -84,8 +91,14 @@ void ObjectRenderer::Initialize(DXCom* pDxcom, LightManager* pLightManager) {
 	screenReflectionPass_ = std::make_unique<ScreenReflectionPass>();
 	screenReflectionPass_->Initialize(pDxcom, pLightManager);
 
+	screenSpaceGIPass_ = std::make_unique<ScreenSpaceGIPass>();
+	screenSpaceGIPass_->Initialize(pDxcom, pLightManager);
+
 	volumetricLightPass_ = std::make_unique<VolumetricLightPass>();
 	volumetricLightPass_->Initialize(pDxcom, pLightManager);
+
+	volumetricFogPass_ = std::make_unique<VolumetricFogPass>();
+	volumetricFogPass_->Initialize(pDxcom, pLightManager);
 
 	refractionCapture_ = std::make_unique<RefractionCapture>();
 	refractionCapture_->Initialize(pDxcom);
@@ -160,6 +173,14 @@ void ObjectRenderer::Finalize() {
 		volumetricLightPass_->Finalize();
 		volumetricLightPass_.reset();
 	}
+	if (volumetricFogPass_) {
+		volumetricFogPass_->Finalize();
+		volumetricFogPass_.reset();
+	}
+	if (screenSpaceGIPass_) {
+		screenSpaceGIPass_->Finalize();
+		screenSpaceGIPass_.reset();
+	}
 	if (screenReflectionPass_) {
 		screenReflectionPass_->Finalize();
 		screenReflectionPass_.reset();
@@ -176,6 +197,10 @@ void ObjectRenderer::Finalize() {
 	if (shadowPass_) {
 		shadowPass_->Finalize();
 		shadowPass_.reset();
+	}
+	if (punctualShadowPass_) {
+		punctualShadowPass_->Finalize();
+		punctualShadowPass_.reset();
 	}
 }
 
@@ -214,20 +239,16 @@ void ObjectRenderer::Render() {
 		iblBaker_->RenderPreview(dxcommon_->GetCommandList());
 	}
 
+	// TLAS と影なしのライトとボリュメトリックフォグ。普段は空より先に Framework が呼んでいる
+	if (!isPrepared_) {
+		PrepareFrame();
+	}
+	isPrepared_ = false;
+
 	// 描画するものがなければ何もしない
 	if (renderQueue_.empty()) {
 		PreDraw();
 		return;
-	}
-
-	// 描画中のシェーダがレイを飛ばすので、TLASは描画より先に組む
-	{
-		ID3D12GraphicsCommandList* list = dxcommon_->GetCommandList();
-		const uint32_t index = dxcommon_->GetNowFrameCount();
-		gpuTimer_->Begin(list, index, kTimer_AccelBuild);
-		BuildRaytracingScene();
-		gpuTimer_->End(list, index, kTimer_AccelBuild);
-		gpuTimer_->Resolve(list, index, kTimer_AccelBuild);
 	}
 
 	// プローブの間接光
@@ -237,15 +258,6 @@ void ObjectRenderer::Render() {
 	// 焼いた間接光。焼いている途中だけレイを飛ばす
 	if (bakedGIPass_ && raytracingScene_) {
 		bakedGIPass_->Render(*raytracingScene_);
-	}
-	// 影なしのライトをクラスタへ振り分ける
-	if (clusteredLightPass_) {
-		ID3D12GraphicsCommandList* list = dxcommon_->GetCommandList();
-		const uint32_t index = dxcommon_->GetNowFrameCount();
-		gpuTimer_->Begin(list, index, kTimer_LightCull);
-		clusteredLightPass_->Render();
-		gpuTimer_->End(list, index, kTimer_LightCull);
-		gpuTimer_->Resolve(list, index, kTimer_LightCull);
 	}
 	// 雨の値を上げ、雨だれの場所を探す
 	if (rainRenderer_) {
@@ -274,14 +286,19 @@ void ObjectRenderer::Render() {
 		}
 	}
 
+	// 点光源とスポットの柔らかい影にする光源を選ぶ
+	if (punctualShadowPass_) {
+		punctualShadowPass_->Prepare();
+	}
+
 	// 画面空間のレイトレが読む深度と法線を先に書き出す。
 	// 読み手がいないなら走らせない＝AOもソフトシャドウも切っている間はプリパスの負荷も掛からない
-	bool needsGBuffer = false;
+	bool needsGBuffer = punctualShadowPass_ && punctualShadowPass_->HasLights();
 	if (lightManager_ != nullptr) {
 		const AllLightsData& lights = lightManager_->GetData();
 		needsGBuffer = (lights.aoMode == kAOModeScreen) || (lights.shadowMode == kShadowModeSoft) ||
-			(lights.renderFlags & (kRenderFlagScreenGI | kRenderFlagScreenReflection)) != 0 ||
-			(volumetricLightPass_ && volumetricLightPass_->IsEnabled());
+			(lights.renderFlags & (kRenderFlagScreenGI | kRenderFlagScreenReflection | kRenderFlagScreenSpaceGI)) != 0 ||
+			(volumetricLightPass_ && volumetricLightPass_->IsEnabled()) || needsGBuffer;
 	}
 
 	if (gbufferPass_) {
@@ -295,11 +312,17 @@ void ObjectRenderer::Render() {
 		if (shadowPass_) {
 			shadowPass_->Render(*gbufferPass_);
 		}
+		if (punctualShadowPass_) {
+			punctualShadowPass_->Render(*gbufferPass_);
+		}
 		if (screenProbeGIPass_ && raytracingScene_) {
 			screenProbeGIPass_->Render(*gbufferPass_, *raytracingScene_);
 		}
 		if (screenReflectionPass_ && raytracingScene_) {
 			screenReflectionPass_->Render(*gbufferPass_, *raytracingScene_);
+		}
+		if (screenSpaceGIPass_ && screenReflectionPass_) {
+			screenSpaceGIPass_->Render(*gbufferPass_, *screenReflectionPass_);
 		}
 		if (volumetricLightPass_ && raytracingScene_ && clusteredLightPass_) {
 			volumetricLightPass_->Render(*gbufferPass_, *raytracingScene_, *clusteredLightPass_);
@@ -313,6 +336,14 @@ void ObjectRenderer::Render() {
 
 	// クリックされたフレームだけ、その画素のオブジェクト番号を拾う
 	RenderPicking();
+
+	// 屈折させる半透明の物があるフレームだけ画面を写す
+	const bool hasTranslucent = std::any_of(renderQueue_.begin(), renderQueue_.end(),
+		[](const RenderObject* obj) { return obj->IsDrawnAfterOpaque() && !obj->IsAdd(); });
+	const bool isRefracting = refractionCapture_ && refractionCapture_->IsEnabled() && hasTranslucent;
+
+	// 前方描画の PS を、このフレームに使う機能だけのものへ
+	dxcommon_->GetPipelineManager()->SetObjectFeatures(ComputeObjectFeatures(isRefracting));
 
 	// パイプラインとライトの結線はルートシグネチャ単位なので、張り替えた後にやり直す
 	PreDraw(gbufferPass_ && gbufferPass_->IsRendered());
@@ -332,10 +363,6 @@ void ObjectRenderer::Render() {
 	std::stable_sort(firstAfterOpaque, renderQueue_.end(),
 		[&distanceSq](const RenderObject* a, const RenderObject* b) { return distanceSq(a) > distanceSq(b); });
 
-	// 屈折させる半透明の物があるフレームだけ画面を写す
-	const bool hasTranslucent = std::any_of(firstAfterOpaque, renderQueue_.end(),
-		[](const RenderObject* obj) { return !obj->IsAdd(); });
-	const bool isRefracting = refractionCapture_ && refractionCapture_->IsEnabled() && hasTranslucent;
 	if (refractionCapture_) {
 		refractionCapture_->Prepare(isRefracting);
 	}
@@ -387,6 +414,35 @@ void ObjectRenderer::Render() {
 
 	// 描画が終わったらリストを空にする
 	renderQueue_.clear();
+}
+
+void ObjectRenderer::PrepareFrame() {
+	isPrepared_ = true;
+	ID3D12GraphicsCommandList* list = dxcommon_->GetCommandList();
+	const uint32_t index = dxcommon_->GetNowFrameCount();
+	const bool hasObjects = !renderQueue_.empty();
+	if (hasObjects) {
+		// 描画中のシェーダがレイを飛ばすので、TLASは描画より先に組む
+		gpuTimer_->Begin(list, index, kTimer_AccelBuild);
+		BuildRaytracingScene();
+		gpuTimer_->End(list, index, kTimer_AccelBuild);
+		gpuTimer_->Resolve(list, index, kTimer_AccelBuild);
+
+		// 影なしのライトをクラスタへ振り分ける
+		if (clusteredLightPass_) {
+			gpuTimer_->Begin(list, index, kTimer_LightCull);
+			clusteredLightPass_->Render();
+			gpuTimer_->End(list, index, kTimer_LightCull);
+			gpuTimer_->Resolve(list, index, kTimer_LightCull);
+		}
+	}
+
+	// 霧の表。物が無いフレームは TLAS が古いので作らない (定数には enabled=0 が入る)
+	if (volumetricFogPass_) {
+		if (Camera* camera = CameraManager::GetInstance()->GetCamera()) {
+			volumetricFogPass_->Render(hasObjects ? raytracingScene_.get() : nullptr, clusteredLightPass_.get(), *camera);
+		}
+	}
 }
 
 void ObjectRenderer::BuildRaytracingScene() {
@@ -463,6 +519,55 @@ void ObjectRenderer::BuildRaytracingScene() {
 	gpuTimer_->Resolve(list, index, kTimer_Tlas);
 }
 
+uint32_t ObjectRenderer::ComputeObjectFeatures(bool isRefracting) const {
+	if (lightManager_ == nullptr) {
+		return kObjectFeatureAll;
+	}
+	const AllLightsData& lights = lightManager_->GetUploadedData();
+	uint32_t features = 0;
+	auto use = [&features](bool isUsed, uint32_t feature) {
+		if (isUsed) {
+			features |= feature;
+		}
+	};
+	// 光の色 × 強さが0の光源は PS が飛ばす
+	auto isLit = [](const Math::Vector4& color, float intensity) {
+		return color.x * intensity > 0.0f || color.y * intensity > 0.0f || color.z * intensity > 0.0f;
+	};
+	bool hasPointLight = false;
+	for (int32_t i = 0; i < lights.numPointLights && i < kMaxPointLights; ++i) {
+		hasPointLight = hasPointLight || isLit(lights.pointLights[i].color, lights.pointLights[i].intensity);
+	}
+	bool hasSpotLight = false;
+	for (int32_t i = 0; i < lights.numSpotLights && i < kMaxSpotLights; ++i) {
+		hasSpotLight = hasSpotLight || isLit(lights.spotLights[i].color, lights.spotLights[i].intensity);
+	}
+
+	use(lights.wetness > 0.0f, kObjectFeatureWetness);
+	use((lights.renderFlags & kRenderFlagGI) != 0, kObjectFeatureProbeGI);
+	use(bakedGIPass_ && bakedGIPass_->GetActiveVolumeCount() > 0, kObjectFeatureBakedGI);
+	use((lights.renderFlags & (kRenderFlagScreenGI | kRenderFlagScreenSpaceGI)) != 0, kObjectFeatureScreenGI);
+	use(lights.aoMode == kAOModeInline, kObjectFeatureInlineAO);
+	use((lights.renderFlags & kRenderFlagTranslucentShadow) != 0, kObjectFeatureTranslucentShadow);
+	use(hasPointLight, kObjectFeaturePointLights);
+	use(hasSpotLight, kObjectFeatureSpotLights);
+	use(clusteredLightPass_ && clusteredLightPass_->GetLightCount() > 0, kObjectFeatureClusteredLights);
+	use(clusteredLightPass_ && clusteredLightPass_->HasShapedLights(), kObjectFeatureShapedLights);
+	use(lights.reflectionMode != kReflectionModeOff, kObjectFeatureReflectionTrace);
+	use(lights.reflectionMode == kReflectionModeObjects, kObjectFeatureReflectionObjects);
+	use((lights.renderFlags & kRenderFlagScreenReflection) != 0, kObjectFeatureScreenReflection);
+	use(reflectionProbePass_ && reflectionProbePass_->GetActiveProbeCount() > 0, kObjectFeatureReflectionProbes);
+	use(volumetricFogPass_ && volumetricFogPass_->GetLocalFogVolumeCount() > 0, kObjectFeatureLocalFog);
+	use(volumetricFogPass_ && volumetricFogPass_->IsRendered(), kObjectFeatureVolumetricFog);
+	use(isRefracting, kObjectFeatureRefraction);
+	use(lights.lightingMode == kLightingModePBR, kObjectFeaturePBRLighting);
+	use(lights.lightingMode != kLightingModePBR, kObjectFeatureSimpleLighting);
+	use(lights.fog.skyMode == kSkyModeAtmosphere && lights.fog.cloudShadow > 0.0f && lights.fog.cloudCoverage > 0.0f,
+		kObjectFeatureCloudShadow);
+	use(lights.softShadowLights != kSoftShadowSlotsNone, kObjectFeatureSoftLocalShadow);
+	return features;
+}
+
 void ObjectRenderer::RenderPicking() {
 	ModelManager* modelManager = ModelManager::GetInstance();
 	if (!modelManager->IsPickingRequested()) {
@@ -520,10 +625,18 @@ void ObjectRenderer::Skinning() {
 
 void ObjectRenderer::RenderSkyBox() {
 	// 計算する空の数表。空を描くより先に作る
-	if (skyBox_ && skyAtmosphere_ && lightManager_ && lightManager_->IsAtmosphereActive()) {
+	const bool isAtmosphere = skyBox_ && skyAtmosphere_ && lightManager_ && lightManager_->IsAtmosphereActive();
+	if (isAtmosphere) {
 		const FogData& fog = lightManager_->GetData().fog;
 		skyAtmosphere_->Render(dxcommon_->GetCommandList(), fog.sunDirection, fog.sunColor * fog.skyIntensity,
 			fog.cameraPosition.y, fog.cloudCoverage, fog.cloudTime);
+	}
+	// 空気遠近の表。作らないフレームも呼ぶ
+	Camera* camera = CameraManager::GetInstance()->GetCamera();
+	if (skyAtmosphere_ && lightManager_ && camera) {
+		const AllLightsData& lights = lightManager_->GetData();
+		skyAtmosphere_->RenderAerialPerspective(dxcommon_->GetCommandList(), *camera,
+			isAtmosphere && lightManager_->IsAerialPerspectiveLutEnabled(), lights.fog.aerialDistanceScale, lights.environmentTint);
 	}
 	if (skyBox_) {
 		skyBox_->Render();
@@ -548,12 +661,21 @@ void ObjectRenderer::DebugGUI() {
 	// GPUが書き終わっているのは1つ前のフレームぶん
 	const uint32_t finishedFrame = (dxcommon_->GetNowFrameCount() + DXC::kFrameCount_ - 1) % DXC::kFrameCount_;
 	ImGui::Text("forward  : %.3f ms", gpuTimer_->GetElapsedMS(finishedFrame, kTimer_Forward));
+	if (PipelineManager* pipeManager = dxcommon_->GetPipelineManager()) {
+		bool isFeatureVariant = pipeManager->IsObjectFeaturesEnabled();
+		if (ImGui::Checkbox("Forward shader variants", &isFeatureVariant)) {
+			pipeManager->SetObjectFeaturesEnabled(isFeatureVariant);
+		}
+		ImGui::SameLine();
+		ImGui::Text("0x%05X%s", pipeManager->GetActiveObjectFeatures(), pipeManager->IsCompilingObjectFeatures() ? " compiling" : "");
+	}
 
 	// 各パスは自前で CollapsingHeader を開くので、ここは並べるだけでよい
 	if (raytracingScene_) { raytracingScene_->DebugGUI(); }
 	if (gbufferPass_) { gbufferPass_->DebugGUI(); }
 	if (aoPass_) { aoPass_->DebugGUI(); }
 	if (shadowPass_) { shadowPass_->DebugGUI(); }
+	if (punctualShadowPass_) { punctualShadowPass_->DebugGUI(); }
 	if (iblBaker_) { iblBaker_->DebugGUI(); }
 	if (skyAtmosphere_) { skyAtmosphere_->DebugGUI(); }
 	if (ddgiPass_) { ddgiPass_->DebugGUI(); }
@@ -563,7 +685,9 @@ void ObjectRenderer::DebugGUI() {
 	if (clusteredLightPass_) { clusteredLightPass_->DebugGUI(); }
 	if (screenProbeGIPass_) { screenProbeGIPass_->DebugGUI(); }
 	if (screenReflectionPass_) { screenReflectionPass_->DebugGUI(); }
+	if (screenSpaceGIPass_) { screenSpaceGIPass_->DebugGUI(); }
 	if (volumetricLightPass_) { volumetricLightPass_->DebugGUI(); }
+	if (volumetricFogPass_) { volumetricFogPass_->DebugGUI(); }
 #endif // _DEBUGMODE
 }
 

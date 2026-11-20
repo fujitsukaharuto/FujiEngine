@@ -17,7 +17,7 @@ namespace Graphics {
 		float intensity = 1.0f;
 		float radius = 10.0f;
 		float decay = 1.0f;
-		// 光源の大きさ。影のレイをこの手前で止める。光っている物の中心に置いたとき、その物自身が光を遮らないようにするため
+		// 光源の大きさ。影のレイをこの手前で止め、柔らかい影ではこの大きさの円から光が来るとみなす
 		float sourceRadius = 0.0f;
 		float padding = 0.0f;
 

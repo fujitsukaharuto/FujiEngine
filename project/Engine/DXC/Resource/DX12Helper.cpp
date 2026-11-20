@@ -155,6 +155,34 @@ namespace DXC::Helper {
 		return resource;
 	}
 
+	Microsoft::WRL::ComPtr<ID3D12Resource> CreateTexture3D(ID3D12Device* device, uint32_t width, uint32_t height, uint32_t depth,
+		DXGI_FORMAT format, D3D12_RESOURCE_FLAGS flags, D3D12_RESOURCE_STATES initialState) {
+
+		D3D12_RESOURCE_DESC resourceDesc{};
+		resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE3D;
+		resourceDesc.Width = width;
+		resourceDesc.Height = height;
+		resourceDesc.DepthOrArraySize = static_cast<UINT16>(depth);
+		resourceDesc.MipLevels = 1;
+		resourceDesc.Format = format;
+		resourceDesc.SampleDesc.Count = 1;
+		resourceDesc.SampleDesc.Quality = 0;
+		resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+		resourceDesc.Flags = flags;
+
+		D3D12_HEAP_PROPERTIES heapProperties{};
+		heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
+
+		Microsoft::WRL::ComPtr<ID3D12Resource> resource = nullptr;
+		HRESULT hr = device->CreateCommittedResource(&heapProperties,
+			D3D12_HEAP_FLAG_NONE, &resourceDesc,
+			initialState, nullptr,
+			IID_PPV_ARGS(&resource));
+		assert(SUCCEEDED(hr));
+
+		return resource;
+	}
+
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateUAVResource(ID3D12Device* device, size_t sizeInBytes) {
 		HRESULT hr;
 

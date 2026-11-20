@@ -36,6 +36,11 @@ namespace Graphics {
 		/// <remarks>半透明・加算の物を描く前に呼ぶ</remarks>
 		void CaptureSceneColor();
 
+		/// <summary>GPU 粒子を、このフレームに写した画面へ足す。粒子を合成した後に呼ぶ</summary>
+		/// <param name="splatAccum">粒子の蓄積バッファ。非ピクセルシェーダから読める状態であること</param>
+		/// <param name="splatParam">SplatParam の定数</param>
+		void AddSplats(D3D12_GPU_DESCRIPTOR_HANDLE splatAccum, D3D12_GPU_VIRTUAL_ADDRESS splatParam);
+
 		void DebugGUI();
 
 		/// <summary>濡れた路面のように、映り込みを縦に伸ばす強さ。0で伸ばさない</summary>
@@ -43,6 +48,11 @@ namespace Graphics {
 
 		/// <summary>前方描画が引く結果。rgb=当たった物の明るさ, a=0.5+空が見えた割合/2 (0なら使えない)</summary>
 		D3D12_GPU_DESCRIPTOR_HANDLE GetResultSrvHandle() const;
+
+		/// <summary>前のフレームの画面を写してあるか。画面の照り返し (SSGI) も使う</summary>
+		bool HasSceneColor() const { return hasSceneColor_; }
+		D3D12_GPU_DESCRIPTOR_HANDLE GetSceneColorSrvHandle() const;
+		const Math::Matrix4x4& GetSceneColorViewProj() const { return sceneColorViewProj_; }
 
 	private:
 
@@ -79,6 +89,8 @@ namespace Graphics {
 
 		void UpdateParam(uint32_t frameIndex);
 		bool IsSceneColorEnabled() const;
+		/// <summary>映り込みか画面の照り返しが画面の写しを使うか</summary>
+		bool IsSceneColorNeeded() const;
 		/// <summary>1方向ぶんぼかす</summary>
 		void DispatchBlur(uint32_t frameIndex, uint32_t paramSlot, const GBufferPass& gbuffer,
 			const WorkTexture& input, WorkTexture& output);
@@ -96,6 +108,8 @@ namespace Graphics {
 		WorkTexture sceneColor_;
 		Math::Matrix4x4 sceneColorViewProj_;
 		bool hasSceneColor_ = false;
+		// このフレームに写してから、まだ粒子を足していないか
+		bool canAddSplats_ = false;
 		float stretch_ = 0.0f;
 
 		Microsoft::WRL::ComPtr<ID3D12Resource> paramResource_[DXC::kFrameCount_];

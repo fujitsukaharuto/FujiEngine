@@ -444,6 +444,7 @@ void BakedGIPass::UpdateParams(uint32_t frameIndex) {
 		params.sunRadiance[1] = radiance[1];
 		params.sunRadiance[2] = radiance[2];
 	}
+	activeVolumeCount_ = params.volumeCount;
 	std::memcpy(constantMapped_ + kFrameConstantStride_ * frameIndex + kParamsOffset_, &params, sizeof(params));
 }
 

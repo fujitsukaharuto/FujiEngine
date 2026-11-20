@@ -13,68 +13,40 @@ using namespace Collision;
 AABBCollider::AABBCollider() {
 }
 
-void AABBCollider::DebugGUI() {
+void AABBCollider::ShapeGUI() {
 #ifdef _DEBUGMODE
-	ImGui::Indent();
-	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Selected;
-	if (ImGui::TreeNodeEx("Collider", flags)) {
-		ImGui::DragFloat3("position", &info.pos.x, 0.1f);
-		ImGui::DragFloat3("offset", &offset_.x, 0.1f);
-		ImGui::DragFloat("width", &width, 0.1f);
-		ImGui::DragFloat("height", &height, 0.1f);
-		ImGui::DragFloat("depth", &depth, 0.1f);
-		ImGui::Checkbox("isCollision", &isCollisionCheck_);
-		static std::string colliderFileName = "colliderData";
-		char buffer[128];
-		strncpy_s(buffer, sizeof(buffer), colliderFileName.c_str(), _TRUNCATE);
-		// 編集
-		if (ImGui::InputText("##filename", buffer, IM_ARRAYSIZE(buffer))) {
-			colliderFileName = buffer; // 編集結果を std::string に戻す
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("saveCollider")) {
-			SaveCollider(colliderFileName);
-		}
-		InfoUpdate();
-		ImGui::TreePop();
-	}
-	ImGui::Unindent();
-#endif // _DEBUG
+	ImGui::DragFloat("width", &width, 0.1f);
+	ImGui::DragFloat("height", &height, 0.1f);
+	ImGui::DragFloat("depth", &depth, 0.1f);
+#endif // _DEBUGMODE
 }
 
-void AABBCollider::OnCollision(const ColliderInfo& other) {
-	// onCollisionEvents_ は Enter/Stay/Exit の3つ分しかないので None は必ず弾く
-	if (state == CollisionState::None) {
-		return;
-	}
+WorldShape AABBCollider::GetWorldShape() const {
+	// キャッシュ済みの worldPos は InfoUpdate() を呼び忘れると古いままなので、その場で作り直す
+	const Matrix4x4 world = GetWorldMatrix();
 
-	if (onCollisionEvents_[static_cast<int>(state)]) {
-		onCollisionEvents_[static_cast<int>(state)](other);
-	}
-	if (state == CollisionState::CollisionExit) {
-		state = CollisionState::None;
-	}
+	WorldShape shape;
+	shape.shape = ColliderShape::Box;
+	shape.box.center = { world.m[3][0],world.m[3][1],world.m[3][2] };
+	shape.box.size = { width / 2.0f, height / 2.0f, depth / 2.0f };
+	// 回転（ワールド行列の基底をそのまま軸にする）
+	shape.box.axes = {
+		Vector3(world.m[0][0],world.m[0][1],world.m[0][2]).Normalize(),
+		Vector3(world.m[1][0],world.m[1][1],world.m[1][2]).Normalize(),
+		Vector3(world.m[2][0],world.m[2][1],world.m[2][2]).Normalize(),
+	};
+	shape.bounds = { shape.box.center, shape.box.size.Length() };
+	return shape;
 }
 
 void AABBCollider::SaveCollider(const std::string& filePath) {
 #ifdef _DEBUGMODE
 	nlohmann::json json;
-
-	json["position"] = {
-		info.pos.x,
-		info.pos.y,
-		info.pos.z,
-	};
-	json["offset"] = {
-		offset_.x,
-		offset_.y,
-		offset_.z,
-	};
-
+	WriteCommonJson(json);
+	json["shape"] = "Box";
 	json["size"]["width"] = width;
 	json["size"]["height"] = height;
 	json["size"]["depth"] = depth;
-	
 
 	nlohmann::json finalJson;
 	finalJson["collider"] = json;

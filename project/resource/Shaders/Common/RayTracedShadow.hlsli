@@ -28,6 +28,7 @@ static const uint kShadowMaskSpot = 1u << 2;
 static const uint kRayMaskOpaque = 0x01;      // 不透明
 static const uint kRayMaskTranslucent = 0x02; // 半透明。薄い影は TraceTranslucentTransmittance で別に求める
 static const uint kRayMaskStaticOpaque = 0x04; // 動かない不透明
+static const uint kRayMaskStaticTranslucent = 0x08; // 動かない半透明
 
 // AllLights::shadowMode の値。C++ 側 (LightManager.h の RayTracedShadowMode) と同じ値であること
 static const uint kShadowModeHard = 0; // 前方描画のPSで1本だけ飛ばす。輪郭が硬い代わりに軽い
@@ -187,6 +188,58 @@ float TraceSoftShadowDirectional(float3 worldPos, float3 L, float3 N,
         visible += TraceShadowRayBiased(worldPos, dir, N, kShadowRayMaxDistance, bias);
     }
 
+    return visible / sampleCount;
+}
+
+/// <summary>大きさのある点光源・スポットの影。光源を向いた半径 sourceRadius の円板へレイを散らす</summary>
+/// <remarks>止める位置は TraceShadowPunctual と同じ</remarks>
+/// <param name="lightPos">光源の中心</param>
+/// <param name="sampleCount">飛ばす本数</param>
+/// <param name="rotationSeed">散らし方を回す種。[0,1)</param>
+/// <param name="bias">原点を法線方向へ浮かせる量</param>
+float TraceSoftShadowPunctual(float3 worldPos, float3 N, float3 lightPos, float sourceRadius,
+                              uint sampleCount, float rotationSeed, float bias)
+{
+    float3 toLight = lightPos - worldPos;
+    float distance = length(toLight);
+    float stopBefore = max(bias, sourceRadius);
+    if (distance <= stopBefore)
+    {
+        return 1.0f;
+    }
+    float3 L = toLight / distance;
+    if (sampleCount <= 1 || sourceRadius <= 0.0f)
+    {
+        return TraceShadowRayBiased(worldPos, L, N, distance - stopBefore, bias);
+    }
+
+    float3 tangent;
+    float3 bitangent;
+    BuildOrthonormalBasis(L, tangent, bitangent);
+    float angle = rotationSeed * kSamplingTwoPI;
+    float cosA = cos(angle);
+    float sinA = sin(angle);
+
+    float visible = 0.0f;
+    for (uint k = 0; k < sampleCount; k++)
+    {
+        // 平行光源と同じく、離れた2本が揃えば半影ではないとみなす
+        uint i = (k == 1) ? sampleCount / 2 : ((k != 0 && k <= sampleCount / 2) ? k - 1 : k);
+        if (k == 2 && (visible == 0.0f || visible == 2.0f))
+        {
+            return visible * 0.5f;
+        }
+        float2 disk = UniformDiskSample(Hammersley(i, sampleCount), cosA, sinA) * sourceRadius;
+        float3 toTarget = lightPos + disk.x * tangent + disk.y * bitangent - worldPos;
+        float targetDistance = length(toTarget);
+        float3 dir = toTarget / targetDistance;
+        // 光源のその部分は面の裏にある
+        if (dot(dir, N) <= 0.0f)
+        {
+            continue;
+        }
+        visible += TraceShadowRayBiased(worldPos, dir, N, max(targetDistance - stopBefore, 0.0f), bias);
+    }
     return visible / sampleCount;
 }
 

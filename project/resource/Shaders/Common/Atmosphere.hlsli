@@ -15,14 +15,26 @@ static const float kSunDiskRadius = 0.0065f;
 // 円盤の明るさ。実際よりかなり抑えてある
 static const float kSunDiskRadianceScale = 40.0f;
 
-/// <summary>向きから SkyView の数表の位置。横は方位(一周)、縦は仰角</summary>
-/// <remarks>縦は地平線のまわりへ texel を寄せる</remarks>
-float2 SkyViewDirectionToUv(float3 direction)
+/// <summary>向きから SkyView の数表の位置。横は方位(一周)、縦は天頂角</summary>
+/// <remarks>
+/// Hillaire 2020 と同じく、縦は地面の縁 (地平線) のまわりへ texel を寄せる。上半分が空、下半分が地面。
+/// 地表では地平線の天頂角が 90度で、以前の仰角の平方根の並びと同じになる
+/// </remarks>
+/// <param name="horizonZenith">カメラから見た地面の縁の天頂角 (ラジアン)。地表で π/2、高いほど大きい</param>
+float2 SkyViewDirectionToUv(float3 direction, float horizonZenith)
 {
     float azimuth = atan2(direction.z, direction.x);
-    float elevation = asin(clamp(direction.y, -1.0f, 1.0f));
+    float zenith = acos(clamp(direction.y, -1.0f, 1.0f));
     float u = azimuth / 6.28318530718f + 0.5f;
-    float v = 0.5f + 0.5f * sign(elevation) * sqrt(abs(elevation) / 1.57079632679f);
+    float v;
+    if (zenith < horizonZenith)
+    {
+        v = 0.5f + 0.5f * sqrt(saturate(1.0f - zenith / max(horizonZenith, 1e-4f)));
+    }
+    else
+    {
+        v = 0.5f - 0.5f * sqrt(saturate((zenith - horizonZenith) / max(3.14159265359f - horizonZenith, 1e-4f)));
+    }
 
     // 縦の端は反対側を混ぜないよう内側へ寄せる
     float halfTexel = 0.5f / kSkyViewLutSize.y;
@@ -30,13 +42,22 @@ float2 SkyViewDirectionToUv(float3 direction)
 }
 
 /// <summary>SkyViewDirectionToUv の逆</summary>
-float3 SkyViewUvToDirection(float2 uv)
+float3 SkyViewUvToDirection(float2 uv, float horizonZenith)
 {
     float azimuth = (uv.x - 0.5f) * 6.28318530718f;
-    float s = uv.y * 2.0f - 1.0f;
-    float elevation = sign(s) * s * s * 1.57079632679f;
-    float cosElevation = cos(elevation);
-    return float3(cosElevation * cos(azimuth), sin(elevation), cosElevation * sin(azimuth));
+    float zenith;
+    if (uv.y >= 0.5f)
+    {
+        float s = uv.y * 2.0f - 1.0f;
+        zenith = horizonZenith * (1.0f - s * s);
+    }
+    else
+    {
+        float s = 1.0f - uv.y * 2.0f;
+        zenith = horizonZenith + (3.14159265359f - horizonZenith) * s * s;
+    }
+    float sinZenith = sin(zenith);
+    return float3(sinZenith * cos(azimuth), cos(zenith), sinZenith * sin(azimuth));
 }
 
 /// <summary>レイリー散乱の位相関数</summary>

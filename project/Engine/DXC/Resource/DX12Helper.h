@@ -94,6 +94,10 @@ namespace DXC::Helper {
 		DXGI_FORMAT format, uint32_t mipLevels, D3D12_RESOURCE_FLAGS flags,
 		D3D12_RESOURCE_STATES initialState);
 
+	/// <summary>ミップ無しの3Dテクスチャを生成する</summary>
+	Microsoft::WRL::ComPtr<ID3D12Resource> CreateTexture3D(ID3D12Device* device, uint32_t width, uint32_t height, uint32_t depth,
+		DXGI_FORMAT format, D3D12_RESOURCE_FLAGS flags, D3D12_RESOURCE_STATES initialState);
+
 	/// <summary>
 	/// UAV（Unordered Access View）として使用可能なバッファリソースを生成する。
 	/// </summary>

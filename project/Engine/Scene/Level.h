@@ -12,6 +12,9 @@ namespace GameObject {
 	class PlacedLight;
 	class GIVolume;
 	class ReflectionProbe;
+	class LocalFogVolume;
+	class PostProcessVolume;
+	class PlacedSpline;
 }
 namespace Graphics {
 	class PlacedSprite;
@@ -34,6 +37,13 @@ namespace Scene {
 		float skyIntensity = 1.0f;
 		/// <summary>Atmosphere の空気遠近の距離の倍率。1 で実際の濃さ、0 で掛けない</summary>
 		float aerialPerspectiveScale = 1.0f;
+		/// <summary>Atmosphere の空気遠近を3Dの表 (UE の Aerial Perspective LUT) から引く</summary>
+		/// <remarks>false ならカメラの高さの空気が一様とみなす式</remarks>
+		bool aerialPerspectiveLut = true;
+		/// <summary>Atmosphere の空で、カメラの高さに足す高度 (km)。100 を超えると大気の外から星を見下ろす</summary>
+		float atmosphereAltitude = 0.0f;
+		/// <summary>Atmosphere の星と大気の大きさの倍率。小さくすると低い所で宇宙に出る (地表から見た空の色は同じ)</summary>
+		float atmosphereScale = 1.0f;
 		/// <summary>Atmosphere のとき、空から回り込む光の強さ</summary>
 		float skyLightIntensity = 1.0f;
 		/// <summary>Atmosphere の雲の量。0 で無し、1 でほぼ曇り</summary>
@@ -78,6 +88,33 @@ namespace Scene {
 		float fogSunScatter = 0.0f;
 		/// <summary>大きいほど太陽のまわりだけが明るくなる</summary>
 		float fogSunPower = 8.0f;
+		/// <summary>2層目の霧の濃さ。0で掛からない。色・始まる距離・上限は1層目と同じ</summary>
+		/// <remarks>UE の Second Fog Data。地面すれすれの濃い霧と上空の薄い霧を分けて持てる</remarks>
+		float fogSecondDensity = 0.0f;
+		/// <summary>2層目の高さによる薄まり方</summary>
+		float fogSecondHeightFalloff = 0.0f;
+		/// <summary>2層目の基準の高さ。1層目の基準の高さからのずれ</summary>
+		float fogSecondHeightOffset = 0.0f;
+
+		// ボリュメトリックフォグ (UE の Volumetric Fog)。カメラの近くの霧を箱に分け、光と影ごと求める。
+		// 霧の濃さ・始まる距離は上の Fog と同じで、表の届く距離より先は Fog の色の霧のまま。On の間は光の筋 (volumetric*) は止まる
+		bool volumetricFog = false;
+		/// <summary>散乱 / 消散。1 で霧が光を吸わない</summary>
+		Math::Vector3 volumetricFogAlbedo = { 1.0f,1.0f,1.0f };
+		/// <summary>霧が自分で出す光 (1mあたり)</summary>
+		Math::Vector3 volumetricFogEmissive = { 0.0f,0.0f,0.0f };
+		/// <summary>霧の濃さに掛ける倍率</summary>
+		float volumetricFogExtinctionScale = 1.0f;
+		/// <summary>散乱の向きの偏り。0 で全方向へ同じ、1 に近いほど光源の側だけ明るい</summary>
+		float volumetricFogScatteringDistribution = 0.2f;
+		/// <summary>表が届く奥行き (m)</summary>
+		float volumetricFogViewDistance = 60.0f;
+		/// <summary>平行光源・空・ライトの光の倍率</summary>
+		float volumetricFogSun = 1.0f;
+		float volumetricFogSkyLight = 1.0f;
+		float volumetricFogLocalLights = 1.0f;
+		/// <summary>前のフレームと混ぜて粒を均す。切ると箱の模様が出る</summary>
+		bool volumetricFogTemporal = true;
 
 		// 画面の仕上げ(ブルームとトーンマップ)。既定値は Graphics::PostProcessSettings と同じ
 		bool bloomEnabled = true;
@@ -123,6 +160,8 @@ namespace Scene {
 		bool localLightAO = false;
 		/// <summary>Graphics::RayTracedShadowMode の値。0:Hard 1:Soft</summary>
 		int shadowMode = 0;
+		/// <summary>大きさ (sourceRadius) のある点光源とスポットの影を柔らかくする。近い3本まで</summary>
+		bool softLocalShadow = false;
 		/// <summary>Graphics::AmbientMode の値。0:Hemisphere 1:IBL</summary>
 		int ambientMode = 0;
 		/// <summary>IBL のときだけアンビエントに掛ける倍率。Hemisphere と近い明るさになる値を既定にしてある</summary>
@@ -143,6 +182,12 @@ namespace Scene {
 		int giRays = 64;
 		/// <summary>画面のプローブの間接光。gi の上に近くの物陰と跳ね返りを足す</summary>
 		bool giScreen = false;
+		/// <summary>画面の照り返し (SSGI)。画面に写っている物の色を近くの面へ足す</summary>
+		bool ssgi = false;
+		/// <summary>画面の照り返しに掛ける倍率</summary>
+		float ssgiIntensity = 1.0f;
+		/// <summary>画面の照り返しのレイの届く距離 (m)</summary>
+		float ssgiDistance = 3.0f;
 
 		// 鏡面の映り込み。映り込ませるマテリアル(environment が0より大きい物)にだけ効く
 		/// <summary>Graphics::RayTracedReflectionMode の値</summary>
@@ -228,6 +273,21 @@ namespace Scene {
 		float fade = 0.0f;
 	};
 
+	/// <summary>描画の品質の段。右ほど豪華で重い。Standard が普段の絵</summary>
+	enum class Quality {
+		Standard,
+		High,
+		Ultra,
+		Realistic,
+		Count,
+	};
+
+	/// <summary>段の名前。GUI のボタンと環境変数 FUJI_QUALITY で使う</summary>
+	const char* GetQualityName(Quality quality);
+	/// <summary>段に合わせて、描画の重さに効く項目だけを書き換える</summary>
+	/// <remarks>霧・濡れ・雨・光の筋などの絵作りの値と、PBR の切り替えは触らない</remarks>
+	void ApplyQuality(Environment& env, Quality quality);
+
 	/// <summary>時刻のキー。時刻で変える Environment の項目の値を持つ</summary>
 	struct TimeOfDayKey {
 		float hour = 12.0f;
@@ -276,7 +336,7 @@ namespace Scene {
 		~Level();
 
 		/// <summary>配置データを読み、置物を生成して環境を適用する。ファイルが無ければ空で、環境は既定値</summary>
-		/// <remarks>ライトは点光源・スポットライトも含めて起動時の状態へ戻してから平行光源を入れる</remarks>
+		/// <remarks>ライトは点光源・スポットライトも含めて起動時の状態へ戻してから平行光源を入れる。環境変数 FUJI_QUALITY に段の名前があればその段で、FUJI_ENV に JSON があればその値で上書きする (計測用)</remarks>
 		void Load(const std::string& name, Graphics::LightManager* lightManager);
 		/// <summary>今の置物を配置データへ書き出す</summary>
 		void Save() const;
@@ -326,6 +386,24 @@ namespace Scene {
 		GameObject::ReflectionProbe* AddReflectionProbe();
 
 		//========================================================================*/
+		//* 局所の霧
+		/// <summary>局所の霧を1つ追加する。上限まで置いていたら nullptr</summary>
+		GameObject::LocalFogVolume* AddLocalFogVolume();
+
+		//========================================================================*/
+		//* ポストプロセスボリューム
+		/// <summary>ポストプロセスボリュームを1つ追加する</summary>
+		GameObject::PostProcessVolume* AddPostProcessVolume();
+
+		//========================================================================*/
+		//* 曲線
+		/// <summary>曲線を1つ追加する。原点から +Z へ10mの直線</summary>
+		GameObject::PlacedSpline* AddSpline();
+		/// <summary>名前で曲線を探す。無ければ nullptr</summary>
+		/// <remarks>ゲームは GetWorldSpline() の距離で位置と向きを取る (カメラのレール・敵の通り道など)</remarks>
+		const GameObject::PlacedSpline* FindSpline(const std::string& name) const;
+
+		//========================================================================*/
 		//* スプライト
 		/// <summary>スプライトを1枚追加する。大きさはテクスチャのまま</summary>
 		Graphics::PlacedSprite* AddSprite(const std::string& texture);
@@ -344,6 +422,8 @@ namespace Scene {
 		const TimeOfDay& GetTimeOfDay() const { return timeOfDay_; }
 		/// <summary>時刻を変えて、その時刻の環境を当てる</summary>
 		void SetHour(float hour);
+		/// <summary>品質の段を当てる。配置データには Save するまで書かない</summary>
+		void SetQuality(Quality quality);
 		/// <summary>Inspector に出す環境の編集欄。触った値はその場で反映する</summary>
 		void EnvironmentGUI();
 
@@ -352,8 +432,14 @@ namespace Scene {
 
 	private:
 
-		/// <summary>environment_ をスカイボックスとライトへ入れる</summary>
+		/// <summary>environment_ にポストプロセスボリュームを混ぜた値を、スカイボックスとライトへ入れる</summary>
+		/// <remarks>environment_ (保存する値) は書き換えない</remarks>
 		void ApplyEnvironment();
+		/// <summary>environment_ をそのままスカイボックスとライトへ入れる</summary>
+		void ApplyEnvironmentRaw();
+		/// <summary>カメラの位置で、ポストプロセスボリュームを優先度の低い順に env へ混ぜる</summary>
+		/// <param name="weights">箱ごとの混ぜた割合 (置いた順)</param>
+		void BlendPostProcessVolumes(Environment& env, std::vector<float>& weights) const;
 		/// <summary>environment_ のカメラの初期位置をカメラへ入れる</summary>
 		/// <remarks>空やライトの編集でカメラを巻き戻さないよう、ApplyEnvironment と分けてある</remarks>
 		void ApplyCamera();
@@ -370,6 +456,8 @@ namespace Scene {
 		std::string GetBakedGIDirectory() const;
 		/// <summary>置いた反射プローブの箱を描画へ渡す</summary>
 		void ApplyReflectionProbes() const;
+		/// <summary>置いた局所の霧を描画へ渡す</summary>
+		void ApplyLocalFogVolumes() const;
 		/// <summary>Environment の編集欄のうち、反射プローブの欄</summary>
 		void ReflectionProbeGUI();
 
@@ -413,6 +501,11 @@ namespace Scene {
 		std::vector<std::unique_ptr<GameObject::PlacedLight>> lights_;
 		std::vector<std::unique_ptr<GameObject::GIVolume>> giVolumes_;
 		std::vector<std::unique_ptr<GameObject::ReflectionProbe>> reflectionProbes_;
+		std::vector<std::unique_ptr<GameObject::LocalFogVolume>> localFogVolumes_;
+		std::vector<std::unique_ptr<GameObject::PostProcessVolume>> postProcessVolumes_;
+		std::vector<std::unique_ptr<GameObject::PlacedSpline>> splines_;
+		// 最後に当てたときのポストプロセスボリュームの割合。変わったら当て直す
+		std::vector<float> appliedVolumeWeights_;
 		std::vector<std::unique_ptr<Graphics::PlacedSprite>> sprites_;
 	};
 

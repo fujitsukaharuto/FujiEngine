@@ -9,6 +9,8 @@
 #include "Engine/Graphics/Object/AnimationModel.h"
 #include "Engine/Graphics/Object/RenderObject.h"
 #include "Engine/Collision/AABBCollider.h"
+#include "Engine/Collision/SphereCollider.h"
+#include "Engine/Collision/CapsuleCollider.h"
 
 namespace GameObject {
 
@@ -32,6 +34,9 @@ namespace GameObject {
 		/// <summary>Inspector に出す中身(描画物・コライダー・ParameterGUI)</summary>
 		/// <remarks>Transform は Inspector 側がギズモと一緒に出すのでここでは扱わない</remarks>
 		void InspectorGUI();
+		/// <summary>メッシュ単位で選んだときの見た目の GUI。既定はマテリアルを直接変える (保存しない)</summary>
+		/// <param name="meshIndex">主ビジュアルのモデルの何番目のメッシュか</param>
+		virtual void MeshInspectorGUI(int meshIndex);
 
 		//========================================================================*/
 		//* Hierarchy
@@ -113,7 +118,7 @@ namespace GameObject {
 		/// <summary>コライダーの取得</summary>
 		/// <remarks>1つしか持たないオブジェクト向け。複数持つ場合は GetColliders() を使う</remarks>
 		Collision::BaseCollider* GetCollider() { return colliders_.empty() ? nullptr : colliders_.front().get(); }
-		const std::vector<std::unique_ptr<Collision::AABBCollider>>& GetColliders() const { return colliders_; }
+		const std::vector<std::unique_ptr<Collision::BaseCollider>>& GetColliders() const { return colliders_; }
 
 	protected:
 
@@ -140,6 +145,12 @@ namespace GameObject {
 		/// <summary>コライダーを生成・登録し、設定用ハンドルを返す</summary>
 		/// <remarks>タグ・オーナー・コールバックはここで結線するので、派生はサイズと親だけ設定すればよい</remarks>
 		Collision::AABBCollider* AddCollider(const std::string& tag = "");
+		/// <summary>球のコライダーを生成・登録する。結線は AddCollider と同じ</summary>
+		Collision::SphereCollider* AddSphereCollider(const std::string& tag = "");
+		/// <summary>カプセルのコライダーを生成・登録する。結線は AddCollider と同じ</summary>
+		Collision::CapsuleCollider* AddCapsuleCollider(const std::string& tag = "");
+		/// <summary>コライダーにタグ・オーナー・コールバックを結線して持つ</summary>
+		void RegisterCollider(std::unique_ptr<Collision::BaseCollider> collider, const std::string& tag);
 
 		/// <summary>描画物を renderers_ へ登録する</summary>
 		/// <remarks>主ビジュアルは最後尾、子ビジュアルはその手前に入れて描画順を保つ</remarks>
@@ -182,7 +193,7 @@ namespace GameObject {
 		Graphics::AnimationModel* animeModel_ = nullptr;
 
 		/// <summary>このオブジェクトが持つあたり判定(=Colliderコンポーネント相当)</summary>
-		std::vector<std::unique_ptr<Collision::AABBCollider>> colliders_;
+		std::vector<std::unique_ptr<Collision::BaseCollider>> colliders_;
 
 		/// <summary>描画しないTransformアンカー。エミッタ・コライダーのペアレント先にだけ使う</summary>
 		std::vector<std::unique_ptr<Math::Trans>> anchors_;

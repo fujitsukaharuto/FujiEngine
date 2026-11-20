@@ -202,6 +202,11 @@ void Graphics::TextureManager::LoadSkyCube() {
 	Load(filename);
 }
 
+Texture* TextureManager::FindLoadedTexture(const std::string& filename) const {
+	auto it = textureCache_.find(filename);
+	return (it != textureCache_.end()) ? it->second.get() : nullptr;
+}
+
 Texture* TextureManager::GetTexture(const std::string& filename) {
 	auto it = textureCache_.find(filename);
 	if (it != textureCache_.end()) {

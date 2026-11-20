@@ -11,6 +11,11 @@
 #include "Engine/Graphics/Pipeline/Compute/SkinningCSPipe.h"
 #include "Engine/Graphics/Pipeline/RootParam.h"
 #include "Engine/Core/Thread/ParallelFor.h"
+#include "Engine/Core/Debug/DevEnv.h"
+#include "Engine/Logger/Logger.h"
+#include <chrono>
+#include <format>
+#include <objbase.h>
 
 using namespace Graphics;
 using namespace DXC;
@@ -26,9 +31,21 @@ PipelineManager* PipelineManager::GetInstance() {
 
 void PipelineManager::Initialize(DXCom* pDxcom) {
 	dxcommon_ = pDxcom;
+	if (std::string value; Core::ReadDevEnv("FUJI_OBJECT_FEATURES", value) && value == "0") {
+		isObjectFeaturesEnabled_ = false;
+	}
 }
 
 void PipelineManager::Finalize() {
+	// 裏のコンパイルがパイプラインを読み終えてから消す
+	for (auto& [features, variant] : objectVariants_) {
+		if (variant.job.valid()) {
+			variant.job.wait();
+		}
+	}
+	objectVariants_.clear();
+	objectPipes_.clear();
+	activeObjectFeatures_ = kObjectFeatureAll;
 	for (auto& pipe : pipelines_) {
 		pipe.reset();
 	}
@@ -65,17 +82,17 @@ void PipelineManager::CreatePipeline() {
 		.blend = BlendType::ALPHA, .depth = DepthMode::DISABLE });
 
 	CreateRenderPipe(Pipe::Normal, {
-		.vsPath = L"Object/Object3d.VS.hlsl", .psPath = L"Object/Object3d.PS.hlsl",
+		.vsPath = L"Object/Object3d.VS.hlsl", .psPath = L"Object/Object3d.PS.hlsl", .psVariantDefine = L"MATERIAL_EXTENDED", .hasObjectFeatures = true,
 		.blend = BlendType::ALPHA, .depth = DepthMode::READ_WRITE });
 	CreateRenderPipe(Pipe::NormalAdd, {
-		.vsPath = L"Object/Object3d.VS.hlsl", .psPath = L"Object/Object3d.PS.hlsl",
+		.vsPath = L"Object/Object3d.VS.hlsl", .psPath = L"Object/Object3d.PS.hlsl", .psVariantDefine = L"MATERIAL_EXTENDED", .hasObjectFeatures = true,
 		.blend = BlendType::ADD, .depth = DepthMode::READ_ONLY });
 	CreateRenderPipe(Pipe::NormalPrepassed, {
-		.vsPath = L"Object/Object3d.VS.hlsl", .psPath = L"Object/Object3d.PS.hlsl",
+		.vsPath = L"Object/Object3d.VS.hlsl", .psPath = L"Object/Object3d.PS.hlsl", .psVariantDefine = L"MATERIAL_EXTENDED", .hasObjectFeatures = true,
 		.blend = BlendType::ALPHA, .depth = DepthMode::READ_ONLY });
 	// 半透明。深度は書かず、表だけ描く
 	CreateRenderPipe(Pipe::NormalTranslucent, {
-		.vsPath = L"Object/Object3d.VS.hlsl", .psPath = L"Object/Object3d.PS.hlsl",
+		.vsPath = L"Object/Object3d.VS.hlsl", .psPath = L"Object/Object3d.PS.hlsl", .psVariantDefine = L"MATERIAL_EXTENDED", .hasObjectFeatures = true,
 		.blend = BlendType::ALPHA, .depth = DepthMode::READ_ONLY,
 		.cull = D3D12_CULL_MODE_BACK });
 
@@ -108,7 +125,7 @@ void PipelineManager::CreatePipeline() {
 
 	CreatePipe<ParticleCSPipe>(Pipe::ParticleCS);
 	CreateRenderPipe(Pipe::Animation, {
-		.vsPath = L"Object/Object3d.VS.hlsl", .psPath = L"Object/Object3d.PS.hlsl",
+		.vsPath = L"Object/Object3d.VS.hlsl", .psPath = L"Object/Object3d.PS.hlsl", .psVariantDefine = L"MATERIAL_EXTENDED", .hasObjectFeatures = true,
 		.blend = BlendType::ALPHA, .depth = DepthMode::READ_WRITE });
 	CreateRenderPipe(Pipe::Skybox, {
 		.vsPath = L"SkyBox/Skybox.VS.hlsl", .psPath = L"SkyBox/Skybox.PS.hlsl",
@@ -123,6 +140,10 @@ void PipelineManager::CreatePipeline() {
 	CreateComputePipe(Pipe::RayTracedShadowCS, L"Raytracing/RayTracedShadow.CS.hlsl");
 	CreateComputePipe(Pipe::DenoiseTemporalCS, L"Raytracing/DenoiseTemporal.CS.hlsl");
 	CreateComputePipe(Pipe::DenoiseSpatialCS, L"Raytracing/DenoiseSpatial.CS.hlsl");
+	CreateComputePipe(Pipe::DenoiseTemporalRGBCS, L"Raytracing/DenoiseTemporalRGB.CS.hlsl");
+	CreateComputePipe(Pipe::DenoiseSpatialRGBCS, L"Raytracing/DenoiseSpatialRGB.CS.hlsl");
+	CreateComputePipe(Pipe::PunctualShadowCS, L"Raytracing/PunctualShadow.CS.hlsl");
+	CreateComputePipe(Pipe::ReflectionAddSplatsCS, L"Raytracing/ReflectionAddSplats.CS.hlsl");
 
 	CreateComputePipe(Pipe::IrradianceBakeCS, L"IBL/IrradianceBake.CS.hlsl");
 	CreateComputePipe(Pipe::PrefilterEnvCS, L"IBL/PrefilterEnv.CS.hlsl");
@@ -134,6 +155,7 @@ void PipelineManager::CreatePipeline() {
 	CreateComputePipe(Pipe::AtmosphereSkyViewCS, L"SkyBox/AtmosphereSkyView.CS.hlsl");
 	CreateComputePipe(Pipe::AtmosphereCaptureCS, L"SkyBox/AtmosphereCapture.CS.hlsl");
 	CreateComputePipe(Pipe::AtmosphereSummaryCS, L"SkyBox/AtmosphereSummary.CS.hlsl");
+	CreateComputePipe(Pipe::AtmosphereAerialPerspectiveCS, L"SkyBox/AtmosphereAerialPerspective.CS.hlsl");
 
 	CreateComputePipe(Pipe::DDGITraceCS, L"Raytracing/DDGITrace.CS.hlsl");
 	CreateComputePipe(Pipe::DDGIUpdateIrradianceCS, L"Raytracing/DDGIUpdateIrradiance.CS.hlsl");
@@ -145,8 +167,12 @@ void PipelineManager::CreatePipeline() {
 	CreateComputePipe(Pipe::ScreenProbeTemporalCS, L"Raytracing/ScreenProbeTemporal.CS.hlsl");
 	CreateComputePipe(Pipe::ScreenReflectionTraceCS, L"Raytracing/ScreenReflectionTrace.CS.hlsl");
 	CreateComputePipe(Pipe::ScreenReflectionResolveCS, L"Raytracing/ScreenReflectionResolve.CS.hlsl");
+	CreateComputePipe(Pipe::ScreenSpaceGITraceCS, L"Raytracing/ScreenSpaceGITrace.CS.hlsl");
+	CreateComputePipe(Pipe::ScreenSpaceGIBlurCS, L"Raytracing/ScreenSpaceGIBlur.CS.hlsl");
 	CreateComputePipe(Pipe::VolumetricLightTraceCS, L"Raytracing/VolumetricLightTrace.CS.hlsl");
 	CreateComputePipe(Pipe::VolumetricLightBlurCS, L"Raytracing/VolumetricLightBlur.CS.hlsl");
+	CreateComputePipe(Pipe::VolumetricFogScatterCS, L"Raytracing/VolumetricFogScatter.CS.hlsl");
+	CreateComputePipe(Pipe::VolumetricFogIntegrateCS, L"Raytracing/VolumetricFogIntegrate.CS.hlsl");
 	CreateComputePipe(Pipe::ClusterLightCullCS, L"Light/ClusterLightCull.CS.hlsl");
 	CreateComputePipe(Pipe::RainDripFindCS, L"Particle/RainDripFind.CS.hlsl");
 
@@ -229,6 +255,9 @@ void PipelineManager::CreateRenderPipe(Pipe type, const RenderPipelineDesc& desc
 	pipe->SetDesc(desc);
 	pipelines_[static_cast<size_t>(type)] = std::move(pipe);
 	pendingInit_.push_back(type);
+	if (desc.hasObjectFeatures) {
+		objectPipes_.push_back(type);
+	}
 }
 
 void PipelineManager::CreateComputePipe(Pipe type, const std::wstring& csPath) {
@@ -260,6 +289,88 @@ void PipelineManager::SetCSPipeline(Pipe type, uint32_t index) {
 	pipe->SetPipelineCSState(index);
 	currentPipeline_ = pipe.get();
 	currentPipeType_ = type;
+}
+
+void PipelineManager::SetPipelineVariant(bool isVariant) {
+	if (currentPipeline_) {
+		currentPipeline_->SetVariantState(isVariant);
+	}
+}
+
+void PipelineManager::SetObjectFeatures(uint32_t features) {
+	if (objectPipes_.empty()) {
+		return;
+	}
+	// 出来上がった組み合わせを受け取る
+	for (auto& [key, variant] : objectVariants_) {
+		if (!variant.isDone && variant.job.valid() && variant.job.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+			variant.psos = variant.job.get();
+			variant.isDone = true;
+		}
+	}
+
+	features &= kObjectFeatureAll;
+	uint32_t active = kObjectFeatureAll;
+	if (isObjectFeaturesEnabled_ && features != kObjectFeatureAll) {
+		auto it = objectVariants_.find(features);
+		if (it == objectVariants_.end()) {
+			it = objectVariants_.try_emplace(features).first;
+			it->second.job = std::async(std::launch::async, [this, features]() {
+				// dxc の読み込みが COM を使う
+				const HRESULT hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+				auto psos = BuildObjectFeaturePSOs(features);
+				if (SUCCEEDED(hr)) {
+					CoUninitialize();
+				}
+				return psos;
+			});
+		}
+		// 失敗した組み合わせは全部入りのまま
+		if (it->second.isDone && it->second.psos.size() == objectPipes_.size()) {
+			active = features;
+		}
+	}
+
+	if (active == activeObjectFeatures_) {
+		return;
+	}
+	const ObjectFeatureVariant* variant = (active == kObjectFeatureAll) ? nullptr : &objectVariants_.at(active);
+	for (size_t i = 0; i < objectPipes_.size(); ++i) {
+		pipelines_[static_cast<size_t>(objectPipes_[i])]->SetBasePSO(variant ? variant->psos[i].Get() : nullptr);
+	}
+	activeObjectFeatures_ = active;
+}
+
+bool PipelineManager::IsCompilingObjectFeatures() const {
+	for (const auto& [key, variant] : objectVariants_) {
+		if (!variant.isDone) {
+			return true;
+		}
+	}
+	return false;
+}
+
+std::vector<Microsoft::WRL::ComPtr<ID3D12PipelineState>> PipelineManager::BuildObjectFeaturePSOs(uint32_t features) const {
+	std::vector<Microsoft::WRL::ComPtr<ID3D12PipelineState>> psos;
+	// PS は全てのパイプで共通。1回だけコンパイルする
+	const auto* first = static_cast<const RenderPipeline*>(pipelines_[static_cast<size_t>(objectPipes_.front())].get());
+	const std::wstring define = std::format(L"OBJECT_FEATURES=0x{:X}", features);
+	const ShaderData pixelShader = first->CompilePixelShader(define.c_str());
+	if (!pixelShader.blob || !pixelShader.reflection) {
+		Logger::Log(std::format("Object features 0x{:X}: compile failed", features));
+		return psos;
+	}
+	for (Pipe type : objectPipes_) {
+		const auto* pipe = static_cast<const RenderPipeline*>(pipelines_[static_cast<size_t>(type)].get());
+		Microsoft::WRL::ComPtr<ID3D12PipelineState> pso = pipe->CreatePSOWithPixelShader(pixelShader.blob.Get());
+		if (!pso) {
+			psos.clear();
+			return psos;
+		}
+		psos.push_back(pso);
+	}
+	Logger::Log(std::format("Object features 0x{:X}: ready", features));
+	return psos;
 }
 
 ID3D12RootSignature* Graphics::PipelineManager::GetRootSignature(Pipe type) {

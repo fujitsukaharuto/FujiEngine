@@ -15,7 +15,7 @@ namespace Graphics {
 	class GBufferPass;
 
 	/// <summary>
-	/// 画面空間の1チャンネル信号から、レイの本数が足りないことによる粒を落とすクラス
+	/// 画面空間の1チャンネル (または3チャンネル) の信号から、レイの本数が足りないことによる粒を落とすクラス
 	/// </summary>
 	/// <remarks>前フレームへ再投影する時間方向と、à-trous のブラーを掛ける空間方向の2段</remarks>
 	class Denoiser {
@@ -23,7 +23,8 @@ namespace Graphics {
 		Denoiser() = default;
 		~Denoiser() = default;
 
-		void Initialize(DXC::DXCom* pDxcom);
+		/// <param name="isRGB">3チャンネルの信号をならすか。重みは共通なので1チャンネルとほぼ同じ重さ</param>
+		void Initialize(DXC::DXCom* pDxcom, bool isRGB = false);
 		/// <summary>GPU 時間の一覧に出す名前。AO 用と影用で別のインスタンスなので使う側が付ける</summary>
 		void SetTimerNames(const char* temporal, const char* spatial) {
 			gpuTimer_.SetName(kTimer_Temporal, temporal);
@@ -115,8 +116,9 @@ namespace Graphics {
 	private:
 
 		DXC::DXCom* dxcommon_ = nullptr;
+		bool isRGB_ = false;
 
-		// 次フレームへ渡す蓄積。R16G16_FLOAT で x=信号, y=蓄積フレーム数
+		// 次フレームへ渡す蓄積。信号と蓄積フレーム数 (1チャンネルは x,y、3チャンネルは rgb,a)
 		WorkTexture history_[DXC::kFrameCount_];
 		// à-trous のピンポン。時間方向の出力もここの[0]へ書く
 		WorkTexture filter_[2];

@@ -38,6 +38,8 @@ namespace Graphics {
 
 		/// <summary>このフレームに点いている影なしのライトの数</summary>
 		uint32_t GetLightCount() const { return lightCount_; }
+		/// <summary>このフレームに棒か長方形の光源があるか</summary>
+		bool HasShapedLights() const { return hasShapedLights_; }
 
 		D3D12_GPU_VIRTUAL_ADDRESS GetParamsGPUVirtualAddress() const;
 		D3D12_GPU_DESCRIPTOR_HANDLE GetLightsSrvHandle() const;
@@ -75,6 +77,7 @@ namespace Graphics {
 		DXC::DXCom* dxcommon_ = nullptr;
 		LightManager* lightManager_ = nullptr;
 		uint32_t lightCount_ = 0;
+		bool hasShapedLights_ = false;
 
 		// ライトの一覧 (毎フレーム CPU から書く)
 		Microsoft::WRL::ComPtr<ID3D12Resource> lightResource_[DXC::kFrameCount_];

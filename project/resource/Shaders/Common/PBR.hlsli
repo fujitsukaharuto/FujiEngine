@@ -28,6 +28,28 @@ float G_SmithSchlick(float NdotV, float NdotL, float roughness)
     return gv * gl;
 }
 
+/// <summary>布の光沢 (sheen) の法線分布 (Estevez & Kulla 2017 "Charlie")</summary>
+/// <param name="roughness">見た目の粗さ。2乗して使う</param>
+float D_Charlie(float NdotH, float roughness)
+{
+    float alpha = max(roughness * roughness, 0.002f);
+    float invAlpha = 1.0f / alpha;
+    float sin2h = max(1.0f - NdotH * NdotH, 0.0078125f);
+    return (2.0f + invAlpha) * pow(sin2h, invAlpha * 0.5f) / (2.0f * kPI);
+}
+
+/// <summary>布の光沢の可視関数 (Neubelt & Pettineo 2013)。1 / (4 N・L N・V) を含む</summary>
+float V_Neubelt(float NdotV, float NdotL)
+{
+    return saturate(1.0f / (4.0f * (NdotL + NdotV - NdotL * NdotV)));
+}
+
+/// <summary>クリアコートの可視関数 (Kelemen 2001)。1 / (4 N・L N・V) を含む</summary>
+float V_Kelemen(float LdotH)
+{
+    return saturate(0.25f / max(LdotH * LdotH, 1e-4f));
+}
+
 /// <summary>Schlick のフレネル近似</summary>
 float3 F_Schlick(float3 f0, float VdotH)
 {

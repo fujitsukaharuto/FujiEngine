@@ -131,7 +131,7 @@ float3 ShadeRayHit(RayHitSurface surface, float3 direction, bool useProbes)
             continue;
         }
         radiance *= TraceShadowPunctual(surface.position, spotLight.position, surface.normal,
-                                        gLights.rayTracedShadowMask, kShadowMaskSpot, 0.0f);
+                                        gLights.rayTracedShadowMask, kShadowMaskSpot, spotLight.sourceRadius);
         light += radiance * (facing / kPI);
     }
 

@@ -26,12 +26,26 @@ namespace Editor {
 		void InspectorGUI(Scene::Level* level);
 
 		/// <summary>ゲーム画面でピックした描画物の持ち主を選択する</summary>
+		/// <param name="meshIndex">拾ったメッシュ。メッシュを選ぶモードのときだけ使う</param>
 		/// <returns>持ち主が見つかって選択したら true</returns>
-		bool SelectByObjID(int objID);
+		bool SelectByObjID(int objID, int meshIndex = -1);
 
 		/// <summary>ゲーム画面の何も無い所をクリックしたときに、オブジェクトの選択を外す</summary>
 		/// <remarks>スプライトと環境の選択は触らない(Inspector で値をいじりながら画面を触るので)</remarks>
-		void DeselectObject() { selected_ = nullptr; }
+		void DeselectObject() {
+			selected_ = nullptr;
+			selectedMesh_ = -1;
+		}
+		/// <summary>物を選んで Hierarchy で見える所まで開く</summary>
+		void Select(GameObject::GameObject* object) {
+			selectedMesh_ = -1;
+			selected_ = object;
+			isEnvironmentSelected_ = false;
+			selectedSprite_ = nullptr;
+			revealSelected_ = true;
+		}
+		/// <summary>選んでいる物。消えていたら nullptr</summary>
+		GameObject::GameObject* GetSelectedObject() { return GetSelected(); }
 
 		/// <summary>ゲーム画面の上で、選択中のスプライトに枠を出し、ドラッグで動かす</summary>
 		/// <remarks>毎フレーム呼ぶ。スプライトの上にマウスがある間はオブジェクトのピックを止める</remarks>
@@ -54,6 +68,8 @@ namespace Editor {
 
 		/// <summary>置物の追加・削除・保存</summary>
 		void LevelToolbarGUI(Scene::Level& level);
+		/// <summary>置く物 (ライト・ボリュームなど) を種類ごとに並べる。選ばれたら置いて返す</summary>
+		static Object* PlaceMenuItems(Scene::Level& level);
 		/// <summary>スプライトの一覧。描く順(下ほど手前)に並ぶ</summary>
 		void SpriteListGUI(Scene::Level& level);
 		/// <summary>一覧に出すか。止めているものは showInactive_ のときだけ出す</summary>
@@ -61,10 +77,22 @@ namespace Editor {
 
 		/// <summary>名前での絞り込み。大文字小文字は区別しない</summary>
 		bool MatchFilter(const Object* object) const;
+		/// <summary>選んだメッシュの見た目の欄と、範囲の枠</summary>
+		void MeshInspectorGUI(Object* selected);
 
 	private:
 
 		Object* selected_ = nullptr;
+		/// <summary>
+		/// ゲーム画面のクリックで選ぶ単位
+		/// </summary>
+		enum class SelectMode {
+			Object,
+			Mesh,	// 主ビジュアルのモデルのメッシュ1つ (スポンザのような複数メッシュのモデル用)
+		};
+		SelectMode selectMode_ = SelectMode::Object;
+		/// <summary>選んでいるメッシュ。-1 なら選んでいない</summary>
+		int selectedMesh_ = -1;
 		/// <summary>選択中のスプライト。selected_ / isEnvironmentSelected_ と同時には立たない</summary>
 		Graphics::PlacedSprite* selectedSprite_ = nullptr;
 		/// <summary>環境(空とライト)を選んでいる</summary>

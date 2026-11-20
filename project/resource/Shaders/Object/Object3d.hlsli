@@ -44,6 +44,16 @@ struct Material
     int useEmissiveMap; // 0以外なら emissive にこれを掛ける。0なら色のテクスチャ
     int occlusionMapIndex; // 物陰の暗さのテクスチャ (R)
     int useOcclusionMap; // 0以外ならアンビエントにテクスチャの R を掛ける
+    float clearCoat; // クリアコートの強さ (0〜1)。0なら無し (Common/MaterialLayers.hlsli)
+    float clearCoatRoughness; // 膜の粗さ
+    float anisotropy; // 異方性 (-1〜1)。0なら等方
+    float anisotropyRotation; // 異方性の向きを接線から回す角度 (ラジアン)
+    float3 sheenColor; // 布の光沢の色。黒なら無し
+    float sheenRoughness; // 布の光沢の粗さ
+    int heightMapIndex; // 視差マッピングの高さのテクスチャ (R、白が高い)
+    int useHeightMap; // 0以外なら視差マッピング (Common/Parallax.hlsli)
+    float heightScale; // 高さ1の段差が UV で何ぶんずれて見えるか
+    int meshIndex; // 何番目のメッシュか (ピッキング用)
 };
 
 struct DirectionalLight
@@ -74,7 +84,7 @@ struct SpotLight
     float decay;
     float cosAngle;
     float cosStart;
-    float padding;
+    float sourceRadius; // 光源の大きさ。点光源と同じ
 };
 
 struct AllLights
@@ -114,7 +124,8 @@ struct AllLights
 
     uint lightingMode; // SimpleLighting.hlsli の kLightingMode*
     uint renderFlags;  // IBL.hlsli の kRenderFlag*
-    float2 padLighting;
+    uint softShadowLights; // 柔らかい影の枠 (ScreenSpaceShadow.hlsli の FindSoftShadowSlot)
+    float padLighting;
 
     // 空気(フォグ)。設定は配置データの環境から来る
     FogParams fog;

@@ -64,6 +64,9 @@ namespace GameObject {
 		float angle_ = 30.0f;
 		/// <summary>スポットライトの端のぼけ。0で硬く、1で中心からなだらか</summary>
 		float softness_ = 0.3f;
+		/// <summary>光源の大きさ(m)。影のレイをこの手前で止め、柔らかい影ではこの大きさの円から光が来るとみなす</summary>
+		/// <remarks>影ありの点光源とスポットだけ</remarks>
+		float sourceRadius_ = 0.0f;
 		/// <summary>影を落とすか。落とさないなら数の多い枠を使う</summary>
 		/// <remarks>棒と長方形は常に影なし</remarks>
 		bool castShadow_ = true;

@@ -1,9 +1,38 @@
 #include "CollisionManager.h"
-#include "AABBCollider.h"
+#include <array>
+#include <format>
 #include "Engine/GameObject/GameObject.h"
 
 using namespace Math;
 using namespace Collision;
+
+namespace {
+
+	/// <summary>判定に加える生存中の GameObject のコライダーを順に渡す</summary>
+	template <class Function>
+	void ForEachLiveCollider(Function function) {
+		for (GameObject::GameObject* object : GameObject::GameObject::GetAll()) {
+			if (!object->IsActive() || object->IsDestroyed() || !object->IsCollisionActive()) {
+				continue;
+			}
+			for (const auto& collider : object->GetColliders()) {
+				function(collider.get());
+			}
+		}
+	}
+
+	std::array<std::string, kLayerCount>& LayerNames() {
+		static std::array<std::string, kLayerCount> names = [] {
+			std::array<std::string, kLayerCount> defaults;
+			defaults[0] = "Default";
+			for (uint32_t i = 1; i < kLayerCount; i++) {
+				defaults[i] = std::format("Layer {}", i);
+			}
+			return defaults;
+		}();
+		return names;
+	}
+}
 
 
 CollisionManager::CollisionManager() {
@@ -13,41 +42,50 @@ CollisionManager::~CollisionManager() {
 }
 
 void CollisionManager::AddGameObjectColliders() {
-	for (GameObject::GameObject* object : GameObject::GameObject::GetAll()) {
-		if (!object->IsActive() || object->IsDestroyed() || !object->IsCollisionActive()) {
-			continue;
-		}
-		for (const auto& collider : object->GetColliders()) {
-			colliders_.push_back(collider.get());
-		}
+	ForEachLiveCollider([this](BaseCollider* collider) { colliders_.push_back(collider); });
+}
+
+bool CollisionManager::Intersects(const WorldShape& a, const WorldShape& b) {
+	if (!Geometry::Intersects(a.bounds, b.bounds)) {
+		return false;
 	}
+	switch (a.shape) {
+	case ColliderShape::Box:
+		switch (b.shape) {
+		case ColliderShape::Box: return Geometry::Intersects(a.box, b.box);
+		case ColliderShape::Sphere: return Geometry::Intersects(b.sphere, a.box);
+		case ColliderShape::Capsule: return Geometry::Intersects(b.capsule, a.box);
+		}
+		break;
+	case ColliderShape::Sphere:
+		switch (b.shape) {
+		case ColliderShape::Box: return Geometry::Intersects(a.sphere, b.box);
+		case ColliderShape::Sphere: return Geometry::Intersects(a.sphere, b.sphere);
+		case ColliderShape::Capsule: return Geometry::Intersects(b.capsule, a.sphere);
+		}
+		break;
+	case ColliderShape::Capsule:
+		switch (b.shape) {
+		case ColliderShape::Box: return Geometry::Intersects(a.capsule, b.box);
+		case ColliderShape::Sphere: return Geometry::Intersects(a.capsule, b.sphere);
+		case ColliderShape::Capsule: return Geometry::Intersects(a.capsule, b.capsule);
+		}
+		break;
+	}
+	return false;
 }
 
 void CollisionManager::CheckCollisionPair(BaseCollider* A, BaseCollider* B) {
-
-	AABBCollider* aabbA = dynamic_cast<AABBCollider*>(A);
-	AABBCollider* aabbB = dynamic_cast<AABBCollider*>(B);
-
-	if (!aabbA || !aabbB) {
+	if (!A || !B) {
 		return;
 	}
-
-	CheckAABBPair(aabbA, aabbB);
-}
-
-void CollisionManager::CheckAABBPair(AABBCollider* A, AABBCollider* B) {
-
-	// 判定が無効なペアは、重なっていても「離れている」として扱う(既に衝突中ならExitになる)
-	const bool isColliding =
-		A->GetIsCollisonCheck() &&
-		B->GetIsCollisonCheck() &&
-		checkAABBCollision(A, B);
-
+	const bool isColliding = A->GetIsCollisonCheck() && B->GetIsCollisonCheck() && BaseCollider::CanCollide(*A, *B) &&
+		Intersects(A->GetWorldShape(), B->GetWorldShape());
 	NotifyCollision(A, B, isColliding);
 	NotifyCollision(B, A, isColliding);
 }
 
-void CollisionManager::NotifyCollision(AABBCollider* self, AABBCollider* other, bool isColliding) {
+void CollisionManager::NotifyCollision(BaseCollider* self, BaseCollider* other, bool isColliding) {
 
 	const bool wasHitting = self->IsHitting(other);
 
@@ -79,13 +117,13 @@ void CollisionManager::NotifyLostColliders() {
 	aliveColliders_.clear();
 	aliveColliders_.insert(colliders_.begin(), colliders_.end());
 
-	for (AABBCollider* aabb : aabbColliders_) {
+	for (BaseCollider* collider : colliders_) {
 		// 相手は既に破棄されている可能性があるので、衝突開始時に控えた情報で通知する
-		for (const ColliderInfo& lost : aabb->RemoveHitsIfNot(
+		for (const ColliderInfo& lost : collider->RemoveHitsIfNot(
 			[this](const BaseCollider* other) { return aliveColliders_.contains(other); })) {
 
-			aabb->SetState(CollisionState::CollisionExit);
-			aabb->OnCollision(lost);
+			collider->SetState(CollisionState::CollisionExit);
+			collider->OnCollision(lost);
 		}
 	}
 }
@@ -96,93 +134,85 @@ void CollisionManager::CheckAllCollision() {
 		return; // colliders_が空なら処理を終了
 	}
 
-	// 型の絞り込みはペアループの外で1回だけ行う(内側でやると dynamic_cast が O(n^2) 回走る)
-	aabbColliders_.clear();
-	for (BaseCollider* collider : colliders_) {
-		if (AABBCollider* aabb = dynamic_cast<AABBCollider*>(collider)) {
-			aabbColliders_.push_back(aabb);
-		}
-	}
-
 	NotifyLostColliders();
 
-	for (size_t i = 0; i < aabbColliders_.size(); ++i) {
-		for (size_t j = i + 1; j < aabbColliders_.size(); ++j) {
-			CheckAABBPair(aabbColliders_[i], aabbColliders_[j]);
+	// ワールドの形はコライダーごとに1回だけ作る
+	worldShapes_.clear();
+	for (BaseCollider* collider : colliders_) {
+		worldShapes_.push_back(collider->GetWorldShape());
+	}
+
+	for (size_t i = 0; i < colliders_.size(); ++i) {
+		for (size_t j = i + 1; j < colliders_.size(); ++j) {
+			BaseCollider* a = colliders_[i];
+			BaseCollider* b = colliders_[j];
+			// 判定が無効なペアは、重なっていても「離れている」として扱う(既に衝突中ならExitになる)
+			const bool isColliding = a->GetIsCollisonCheck() && b->GetIsCollisonCheck() &&
+				BaseCollider::CanCollide(*a, *b) && Intersects(worldShapes_[i], worldShapes_[j]);
+			NotifyCollision(a, b, isColliding);
+			NotifyCollision(b, a, isColliding);
 		}
 	}
 }
 
-OBB CollisionManager::ConvertAABBToOBB(const AABBCollider* aabb) {
-	OBB obb;
-
-	// キャッシュ済みの worldPos は InfoUpdate() を呼び忘れると古いままなので、その場で作り直す
-	const Matrix4x4 world = aabb->GetWorldMatrix();
-
-	// ワールド中心座標
-	obb.center = { world.m[3][0],world.m[3][1],world.m[3][2] };
-
-	// ハーフサイズ（AABBのサイズをOBB構造に）
-	obb.size = {
-		aabb->GetWidth() / 2.0f,
-		aabb->GetHeight() / 2.0f,
-		aabb->GetDepth() / 2.0f
-	};
-
-	// 回転（ワールド行列の基底をそのまま軸にする）
-	obb.axes = {
-		Vector3(world.m[0][0],world.m[0][1],world.m[0][2]).Normalize(),
-		Vector3(world.m[1][0],world.m[1][1],world.m[1][2]).Normalize(),
-		Vector3(world.m[2][0],world.m[2][1],world.m[2][2]).Normalize(),
-	};
-
-	return obb;
+bool CollisionManager::Raycast(const Vector3& origin, const Vector3& direction, float maxDistance,
+	RaycastResult& result, uint32_t layerMask) {
+	const float length = direction.Length();
+	if (length <= 0.0f || maxDistance <= 0.0f) {
+		return false;
+	}
+	const Ray ray{ origin, direction * (1.0f / length) };
+	bool isHit = false;
+	float nearest = maxDistance;
+	ForEachLiveCollider([&](BaseCollider* collider) {
+		if (!collider->GetIsCollisonCheck() || (collider->GetCollisionLayer() & layerMask) == 0) {
+			return;
+		}
+		const WorldShape shape = collider->GetWorldShape();
+		RayHit hit;
+		bool isShapeHit = false;
+		switch (shape.shape) {
+		case ColliderShape::Box: isShapeHit = Geometry::Raycast(ray, shape.box, nearest, hit); break;
+		case ColliderShape::Sphere: isShapeHit = Geometry::Raycast(ray, shape.sphere, nearest, hit); break;
+		case ColliderShape::Capsule: isShapeHit = Geometry::Raycast(ray, shape.capsule, nearest, hit); break;
+		}
+		if (isShapeHit && hit.distance <= nearest) {
+			nearest = hit.distance;
+			result = { collider, collider->GetOwner(), hit.distance, hit.point, hit.normal };
+			isHit = true;
+		}
+	});
+	return isHit;
 }
 
-bool CollisionManager::checkAABBCollision(AABBCollider* A, AABBCollider* B) {
-
-	const OBB obbA = ConvertAABBToOBB(A);
-	const OBB obbB = ConvertAABBToOBB(B);
-
-	auto CalculateProjection =
-		[](const OBB& obb, const Vector3& axis) -> float {
-		return std::abs(obb.size.x * Vector3::Dot(obb.axes[0], axis)) +
-			std::abs(obb.size.y * Vector3::Dot(obb.axes[1], axis)) +
-			std::abs(obb.size.z * Vector3::Dot(obb.axes[2], axis));
-		};
-
-	// 分離軸は 3 + 3 + 3x3 の15本で固定なので、毎フレームのヒープ確保は不要
-	std::array<Vector3, 15> axes;
-	size_t axisCount = 0;
-	for (const auto& axisA : obbA.axes) {
-		axes[axisCount++] = axisA;
-	}
-	for (const auto& axisB : obbB.axes) {
-		axes[axisCount++] = axisB;
-	}
-	for (const auto& axisA : obbA.axes) {
-		for (const auto& axisB : obbB.axes) {
-			axes[axisCount++] = Vector3::Cross(axisA, axisB);
+std::vector<BaseCollider*> CollisionManager::OverlapSphere(const Vector3& center, float radius, uint32_t layerMask) {
+	std::vector<BaseCollider*> overlaps;
+	WorldShape probe;
+	probe.shape = ColliderShape::Sphere;
+	probe.sphere = { center, radius };
+	probe.bounds = probe.sphere;
+	ForEachLiveCollider([&](BaseCollider* collider) {
+		if (collider->GetIsCollisonCheck() && (collider->GetCollisionLayer() & layerMask) != 0 &&
+			Intersects(probe, collider->GetWorldShape())) {
+			overlaps.push_back(collider);
 		}
+	});
+	return overlaps;
+}
+
+#ifdef _DEBUGMODE
+void CollisionManager::DrawLiveColliders() {
+	ForEachLiveCollider([](BaseCollider* collider) { collider->DrawCollider(); });
+}
+#endif // _DEBUGMODE
+
+void CollisionManager::SetLayerName(uint32_t layer, const std::string& name) {
+	if (layer < kLayerCount) {
+		LayerNames()[layer] = name;
 	}
+}
 
-	for (size_t i = 0; i < axisCount; ++i) {
-		const Vector3& axis = axes[i];
-		if (axis.Length() < std::numeric_limits<float>::epsilon()) {
-			continue;
-		}
-
-		const Vector3 normalizedAxis = axis.Normalize();
-
-		const float obbAProjection = CalculateProjection(obbA, normalizedAxis);
-		const float obbBProjection = CalculateProjection(obbB, normalizedAxis);
-		const float distance = std::abs(Vector3::Dot(obbA.center - obbB.center, normalizedAxis));
-
-		if (distance > obbAProjection + obbBProjection) {
-			return false;
-		}
-	}
-
-	return true;
-
+const std::string& CollisionManager::GetLayerName(uint32_t layer) {
+	static const std::string kOutOfRange = "?";
+	return layer < kLayerCount ? LayerNames()[layer] : kOutOfRange;
 }

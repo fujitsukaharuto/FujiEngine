@@ -10,6 +10,7 @@ PixelShaderOutput main(VertxShaderOutput input)
     if (asuint(input.position.z) == gPickingBuffer[0].depthBits)
     {
         gPickingBuffer[0].objID = objID;
+        gPickingBuffer[0].meshIndex = gMaterial.meshIndex;
     }
 
     return NoColor();

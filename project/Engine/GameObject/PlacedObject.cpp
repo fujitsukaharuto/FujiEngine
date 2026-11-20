@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <cmath>
 #include <iterator>
+#include <numbers>
 #include <json.hpp>
 #include "Engine/Core/Debug/ImGuiManager.h"
 #include "Engine/Graphics/Light/LightManager.h"
@@ -127,6 +128,14 @@ namespace GameObject {
 		look_.environment = ReadFloat(data, "environment");
 		look_.weathering = ReadFloat(data, "weathering");
 		look_.flowWater = ReadFloat(data, "flowWater");
+		look_.clearCoat = ReadFloat(data, "clearCoat");
+		look_.clearCoatRoughness = data.value("clearCoatRoughness", 0.05f);
+		look_.anisotropy = ReadFloat(data, "anisotropy");
+		look_.anisotropyRotation = data.value("anisotropyRotation", 0.0f);
+		look_.sheen = ReadVector3(data, "sheen");
+		look_.sheenRoughness = data.value("sheenRoughness", 0.5f);
+		look_.heightTexture = data.value("heightTexture", "");
+		look_.heightScale = data.value("heightScale", 0.05f);
 		look_.emissive = ReadVector3(data, "emissive");
 		look_.emissiveIntensity = data.value("emissiveIntensity", 1.0f);
 		look_.emissiveLightRange = data.value("emissiveLightRange", 0.0f);
@@ -147,6 +156,15 @@ namespace GameObject {
 			drive.loopMax = d.value("max", drive.loopMax);
 			drive_ = drive;
 		}
+		follow_.reset();
+		if (data.contains("follow") && data["follow"].is_object()) {
+			const auto& f = data["follow"];
+			SplineFollow follow;
+			follow.spline = f.value("spline", "");
+			follow.speed = f.value("speed", follow.speed);
+			follow.offset = f.value("offset", follow.offset);
+			follow_ = follow;
+		}
 		carLights_.reset();
 		if (data.contains("carLights")) {
 			CarLights lights;
@@ -164,6 +182,37 @@ namespace GameObject {
 			}
 		}
 
+		meshLooks_.clear();
+		if (data.contains("meshes") && data["meshes"].is_array()) {
+			for (const auto& m : data["meshes"]) {
+				MeshLook look;
+				look.index = m.value("index", 0);
+				look.color = ReadVector4(m, "color");
+				look.roughness = ReadFloat(m, "roughness");
+				look.metallic = ReadFloat(m, "metallic");
+				look.emissive = ReadVector3(m, "emissive");
+				meshLooks_.push_back(look);
+			}
+		}
+		collider_.reset();
+		if (data.contains("collider") && data["collider"].is_object()) {
+			const auto& c = data["collider"];
+			ColliderDesc desc;
+			const std::string shape = c.value("shape", std::string("Box"));
+			desc.shape = (shape == "Sphere") ? Collision::ColliderShape::Sphere :
+				(shape == "Capsule") ? Collision::ColliderShape::Capsule : Collision::ColliderShape::Box;
+			desc.size = ReadVector3(c, "size").value_or(desc.size);
+			desc.radius = c.value("radius", desc.radius);
+			desc.height = c.value("height", desc.height);
+			const std::string axis = c.value("axis", std::string("Y"));
+			desc.axis = (axis == "X") ? 0 : (axis == "Z") ? 2 : 1;
+			desc.offset = ReadVector3(c, "offset").value_or(desc.offset);
+			desc.layer = c.value("layer", desc.layer);
+			desc.mask = c.value("mask", desc.mask);
+			desc.tag = c.value("tag", desc.tag);
+			collider_ = desc;
+		}
+
 		SetName(data.value("name", look_.model));
 		if (data.contains("transform")) {
 			const auto& t = data["transform"];
@@ -172,6 +221,7 @@ namespace GameObject {
 			transform_.scale = ReadVector3(t, "scale").value_or(transform_.scale);
 		}
 		Build();
+		ApplyCollider();
 	}
 
 	void PlacedObject::Create(const std::string& modelName) {
@@ -202,6 +252,22 @@ namespace GameObject {
 		if (look_.environment) { data["environment"] = *look_.environment; }
 		if (look_.weathering) { data["weathering"] = *look_.weathering; }
 		if (look_.flowWater) { data["flowWater"] = *look_.flowWater; }
+		if (look_.clearCoat) {
+			data["clearCoat"] = *look_.clearCoat;
+			data["clearCoatRoughness"] = look_.clearCoatRoughness;
+		}
+		if (look_.anisotropy) {
+			data["anisotropy"] = *look_.anisotropy;
+			data["anisotropyRotation"] = look_.anisotropyRotation;
+		}
+		if (!look_.heightTexture.empty()) {
+			data["heightTexture"] = look_.heightTexture;
+			data["heightScale"] = look_.heightScale;
+		}
+		if (look_.sheen) {
+			data["sheen"] = { look_.sheen->x, look_.sheen->y, look_.sheen->z };
+			data["sheenRoughness"] = look_.sheenRoughness;
+		}
 		if (look_.emissive) {
 			data["emissive"] = { look_.emissive->x, look_.emissive->y, look_.emissive->z };
 			data["emissiveIntensity"] = look_.emissiveIntensity;
@@ -222,6 +288,43 @@ namespace GameObject {
 		if (drive_) {
 			data["drive"] = { { "speed", drive_->speed }, { "min", drive_->loopMin }, { "max", drive_->loopMax } };
 		}
+		if (follow_) {
+			data["follow"] = { { "spline", follow_->spline }, { "speed", follow_->speed }, { "offset", follow_->offset } };
+		}
+		if (!meshLooks_.empty()) {
+			nlohmann::json meshes = nlohmann::json::array();
+			for (const MeshLook& m : meshLooks_) {
+				nlohmann::json mesh = { { "index", m.index } };
+				if (m.color) { mesh["color"] = { m.color->x, m.color->y, m.color->z, m.color->w }; }
+				if (m.roughness) { mesh["roughness"] = *m.roughness; }
+				if (m.metallic) { mesh["metallic"] = *m.metallic; }
+				if (m.emissive) { mesh["emissive"] = { m.emissive->x, m.emissive->y, m.emissive->z }; }
+				meshes.push_back(mesh);
+			}
+			data["meshes"] = meshes;
+		}
+		if (collider_) {
+			const ColliderDesc& c = *collider_;
+			constexpr const char* kShapeNames[] = { "Box", "Sphere", "Capsule" };
+			constexpr const char* kAxisNames[] = { "X", "Y", "Z" };
+			nlohmann::json collider = { { "shape", kShapeNames[static_cast<int>(c.shape)] } };
+			if (c.shape == Collision::ColliderShape::Box) {
+				collider["size"] = { c.size.x, c.size.y, c.size.z };
+			} else {
+				collider["radius"] = c.radius;
+			}
+			if (c.shape == Collision::ColliderShape::Capsule) {
+				collider["height"] = c.height;
+				collider["axis"] = kAxisNames[std::clamp(c.axis, 0, 2)];
+			}
+			if (c.offset.x != 0.0f || c.offset.y != 0.0f || c.offset.z != 0.0f) {
+				collider["offset"] = { c.offset.x, c.offset.y, c.offset.z };
+			}
+			if (c.layer != 1u) { collider["layer"] = c.layer; }
+			if (c.mask != Collision::kAllLayers) { collider["mask"] = c.mask; }
+			if (!c.tag.empty()) { collider["tag"] = c.tag; }
+			data["collider"] = collider;
+		}
 		if (carLights_) {
 			const CarLights& c = *carLights_;
 			data["carLights"] = {
@@ -235,12 +338,15 @@ namespace GameObject {
 
 	void PlacedObject::Update() {
 		time_ += Core::FPSKeeper::DeltaTime();
-		if (drive_) {
+		// 曲線に沿う設定があればそちらが位置を決める
+		if (drive_ && !follow_) {
 			UpdateDrive();
 		}
 		if (animeModel_ && look_.isAnimation) {
 			animeModel_->AnimationUpdate();
 		}
+		// 拡縮を変えたら判定もついてくる
+		ApplyColliderSize();
 		GameObject::Update();
 		if (flicker_.IsEnabled()) {
 			ApplyFlicker();
@@ -263,6 +369,31 @@ namespace GameObject {
 				}
 			}
 		}
+	}
+
+	void PlacedObject::SetLookTexture(const std::string& texture) {
+		look_.texture = texture;
+		ApplyLook();
+	}
+
+	void PlacedObject::FollowSpline(const Math::Spline& spline) {
+		if (!follow_ || !IsActive() || spline.GetLength() <= 0.0f) {
+			return;
+		}
+		const float length = spline.GetLength();
+		follow_->travelled = std::fmod(follow_->travelled + follow_->speed * Core::FPSKeeper::DeltaTime(), length);
+		float distance = std::fmod(follow_->offset + follow_->travelled, length);
+		if (distance < 0.0f) {
+			distance += length;
+		}
+		Vector3 direction = spline.GetDirectionAtDistance(distance);
+		if (follow_->speed < 0.0f) {
+			direction = direction * -1.0f;
+		}
+		transform_.translate = spline.GetLocationAtDistance(distance);
+		// 進む向きへ +Z を向ける。X は正で前が下がるので、上り坂は負
+		transform_.rotate.y = std::atan2(direction.x, direction.z);
+		transform_.rotate.x = -std::asin(std::clamp(direction.y, -1.0f, 1.0f));
 	}
 
 	void PlacedObject::UpdateDrive() {
@@ -415,7 +546,7 @@ namespace GameObject {
 		ApplyLook();
 		// 動く物は焼く GI と反射プローブに入れない
 		if (RenderObject* object = GetRenderObject()) {
-			object->SetStaticLighting(!look_.isAnimation && !drive_);
+			object->SetStaticLighting(!look_.isAnimation && !drive_ && !follow_);
 		}
 	}
 
@@ -447,6 +578,23 @@ namespace GameObject {
 			}
 			material.SetWeathering(look_.weathering.value_or(0.0f));
 			material.SetFlowSpeed(look_.flowWater.value_or(0.0f));
+			// データに無ければモデルのマテリアルの値 (使わないときは無し)
+			if (look_.clearCoat) {
+				material.SetClearCoat(*look_.clearCoat, look_.clearCoatRoughness);
+			} else if (!look_.useModelMaterials) {
+				material.SetClearCoat(0.0f, 0.05f);
+			}
+			if (look_.anisotropy) {
+				material.SetAnisotropy(*look_.anisotropy, look_.anisotropyRotation * (std::numbers::pi_v<float> / 180.0f));
+			} else if (!look_.useModelMaterials) {
+				material.SetAnisotropy(0.0f, 0.0f);
+			}
+			material.SetHeightMap(look_.heightTexture, look_.heightScale);
+			if (look_.sheen) {
+				material.SetSheen(*look_.sheen, look_.sheenRoughness);
+			} else if (!look_.useModelMaterials) {
+				material.SetSheen(Vector3{}, 0.5f);
+			}
 			if (!look_.emissiveTexture.empty()) {
 				material.SetEmissiveMap(look_.emissiveTexture);
 			} else if (!look_.useModelMaterials) {
@@ -475,6 +623,69 @@ namespace GameObject {
 		if (look_.light) {
 			object->SetLightEnable(*look_.light);
 		}
+		ApplyMeshLooks();
+	}
+
+	void PlacedObject::ApplyMeshLooks() {
+		RenderObject* object = GetRenderObject();
+		if (!object) {
+			return;
+		}
+		for (const MeshLook& look : meshLooks_) {
+			if (look.index < 0 || static_cast<size_t>(look.index) >= object->GetMaterialCount()) {
+				continue;
+			}
+			Material& material = object->GetMaterial(static_cast<size_t>(look.index));
+			if (look.color) { material.SetColor(*look.color); }
+			if (look.roughness) { material.SetRoughness(*look.roughness); }
+			if (look.metallic) { material.SetMetallic(*look.metallic); }
+			if (look.emissive) { material.SetEmissive(*look.emissive); }
+		}
+	}
+
+	void PlacedObject::MeshInspectorGUI([[maybe_unused]] int meshIndex) {
+	#ifdef _DEBUGMODE
+		RenderObject* object = GetRenderObject();
+		if (!object || meshIndex < 0 || static_cast<size_t>(meshIndex) >= object->GetMaterialCount()) {
+			return;
+		}
+		Material& material = object->GetMaterial(static_cast<size_t>(meshIndex));
+		auto found = std::find_if(meshLooks_.begin(), meshLooks_.end(), [meshIndex](const MeshLook& m) { return m.index == meshIndex; });
+		// 変えた項目だけを残す
+		auto edit = [&]() -> MeshLook& {
+			if (found == meshLooks_.end()) {
+				meshLooks_.push_back(MeshLook{ .index = meshIndex });
+				found = std::prev(meshLooks_.end());
+			}
+			return *found;
+		};
+		Vector4 color = material.GetColor();
+		if (ImGui::ColorEdit4("Color##mesh", &color.x)) {
+			edit().color = color;
+		}
+		float roughness = material.GetRoughness();
+		if (ImGui::SliderFloat("Roughness##mesh", &roughness, 0.0f, 1.0f)) {
+			edit().roughness = roughness;
+		}
+		float metallic = material.GetMetallic();
+		if (ImGui::SliderFloat("Metallic##mesh", &metallic, 0.0f, 1.0f)) {
+			edit().metallic = metallic;
+		}
+		Vector3 emissive = material.GetEmissive();
+		if (ImGui::ColorEdit3("Emissive##mesh", &emissive.x, ImGuiColorEditFlags_HDR | ImGuiColorEditFlags_Float)) {
+			edit().emissive = emissive;
+		}
+		ImGui::BeginDisabled(found == meshLooks_.end());
+		if (ImGui::Button("Reset##mesh")) {
+			meshLooks_.erase(found);
+			// 他のメッシュと同じ見た目から当て直す
+			Build();
+			ImGui::EndDisabled();
+			return;
+		}
+		ImGui::EndDisabled();
+		ApplyMeshLooks();
+	#endif // _DEBUGMODE
 	}
 
 	void PlacedObject::ParameterGUI() {
@@ -524,6 +735,30 @@ namespace GameObject {
 			[](const char* label, float& v) { return ImGui::SliderFloat(label, &v, 0.0f, 1.0f); });
 		changed |= OptionalGUI("Flow water", look_.flowWater, 0.6f,
 			[](const char* label, float& v) { return ImGui::DragFloat(label, &v, 0.01f, -5.0f, 5.0f, "%.2f m/s"); });
+		changed |= OptionalGUI("Clear coat", look_.clearCoat, 1.0f,
+			[](const char* label, float& v) { return ImGui::SliderFloat(label, &v, 0.0f, 1.0f); });
+		if (look_.clearCoat) {
+			changed |= ImGui::SliderFloat("Clear coat roughness", &look_.clearCoatRoughness, 0.0f, 1.0f);
+		}
+		changed |= OptionalGUI("Anisotropy", look_.anisotropy, 0.6f,
+			[](const char* label, float& v) { return ImGui::SliderFloat(label, &v, -1.0f, 1.0f); });
+		if (look_.anisotropy) {
+			changed |= ImGui::SliderFloat("Anisotropy rotation", &look_.anisotropyRotation, -180.0f, 180.0f, "%.0f deg");
+		}
+		char heightTexture[128] = {};
+		look_.heightTexture.copy(heightTexture, sizeof(heightTexture) - 1);
+		if (ImGui::InputText("Height texture", heightTexture, sizeof(heightTexture), ImGuiInputTextFlags_EnterReturnsTrue)) {
+			look_.heightTexture = heightTexture;
+			changed = true;
+		}
+		if (!look_.heightTexture.empty()) {
+			changed |= ImGui::DragFloat("Height scale", &look_.heightScale, 0.002f, 0.0f, 0.5f, "%.3f");
+		}
+		changed |= OptionalGUI("Sheen", look_.sheen, Vector3{ 1.0f,1.0f,1.0f },
+			[](const char* label, Vector3& v) { return ImGui::ColorEdit3(label, &v.x, ImGuiColorEditFlags_Float); });
+		if (look_.sheen) {
+			changed |= ImGui::SliderFloat("Sheen roughness", &look_.sheenRoughness, 0.0f, 1.0f);
+		}
 		changed |= OptionalGUI("Emissive", look_.emissive, Vector3{ 1.0f,1.0f,1.0f },
 			[](const char* label, Vector3& v) { return ImGui::ColorEdit3(label, &v.x); });
 		if (look_.emissive) {
@@ -564,11 +799,173 @@ namespace GameObject {
 		if (drive_) {
 			ImGui::DragFloat("Drive speed", &drive_->speed, 0.1f, -50.0f, 50.0f, "%.1f m/s");
 		}
+		// 曲線に沿って進む。名前は Hierarchy の曲線 (Spline) の名前
+		bool isFollowing = follow_.has_value();
+		if (ImGui::Checkbox("Follow spline", &isFollowing)) {
+			if (isFollowing) {
+				follow_ = SplineFollow{};
+			} else {
+				follow_.reset();
+			}
+			// 動く物は静的な光 (焼く GI・反射プローブ) から外す
+			changed = true;
+		}
+		if (follow_) {
+			char splineName[64] = {};
+			follow_->spline.copy(splineName, sizeof(splineName) - 1);
+			if (ImGui::InputText("Spline name", splineName, sizeof(splineName))) {
+				follow_->spline = splineName;
+			}
+			ImGui::DragFloat("Follow speed", &follow_->speed, 0.1f, -100.0f, 100.0f, "%.1f m/s");
+			ImGui::DragFloat("Follow offset", &follow_->offset, 0.1f, -10000.0f, 10000.0f, "%.1f m");
+		}
+
+		// あたり判定
+		bool hasCollider = collider_.has_value();
+		if (ImGui::Checkbox("Collider", &hasCollider)) {
+			if (hasCollider) {
+				collider_ = ColliderDesc{};
+				FitColliderToModel();
+			} else {
+				collider_.reset();
+			}
+			ApplyCollider();
+		}
+		if (collider_) {
+			ColliderDesc& c = *collider_;
+			bool isColliderChanged = false;
+			constexpr const char* kShapeNames[] = { "Box", "Sphere", "Capsule" };
+			int shape = static_cast<int>(c.shape);
+			if (ImGui::Combo("Collider shape", &shape, kShapeNames, IM_ARRAYSIZE(kShapeNames))) {
+				c.shape = static_cast<Collision::ColliderShape>(shape);
+				FitColliderToModel();
+				isColliderChanged = true;
+			}
+			if (c.shape == Collision::ColliderShape::Box) {
+				ImGui::DragFloat3("Collider size", &c.size.x, 0.01f, 0.0f, 1000.0f);
+			} else {
+				ImGui::DragFloat("Collider radius", &c.radius, 0.01f, 0.0f, 1000.0f);
+			}
+			if (c.shape == Collision::ColliderShape::Capsule) {
+				ImGui::DragFloat("Collider height", &c.height, 0.01f, 0.0f, 1000.0f);
+				constexpr const char* kAxisNames[] = { "X", "Y", "Z" };
+				ImGui::Combo("Collider axis", &c.axis, kAxisNames, IM_ARRAYSIZE(kAxisNames));
+			}
+			ImGui::DragFloat3("Collider offset", &c.offset.x, 0.01f);
+			if (ImGui::Button("Fit to model")) {
+				FitColliderToModel();
+			}
+			char tag[64] = {};
+			c.tag.copy(tag, sizeof(tag) - 1);
+			if (ImGui::InputText("Collider tag", tag, sizeof(tag))) {
+				c.tag = tag;
+				isColliderChanged = true;
+			}
+			if (isColliderChanged) {
+				ApplyCollider();
+			}
+			// レイヤーとマスクはコライダーの GUI で変えて、ここへ書き戻す
+			if (!colliders_.empty()) {
+				colliders_.front()->LayerGUI();
+				c.layer = colliders_.front()->GetCollisionLayer();
+				c.mask = colliders_.front()->GetCollisionMask();
+			}
+		}
 
 		if (changed) {
 			ApplyLook();
 		}
 	#endif // _DEBUGMODE
+	}
+
+	void PlacedObject::ApplyCollider() {
+		colliders_.clear();
+		if (!collider_) {
+			return;
+		}
+		Collision::BaseCollider* collider = nullptr;
+		switch (collider_->shape) {
+		case Collision::ColliderShape::Box: collider = AddCollider(collider_->tag); break;
+		case Collision::ColliderShape::Sphere: collider = AddSphereCollider(collider_->tag); break;
+		case Collision::ColliderShape::Capsule: collider = AddCapsuleCollider(collider_->tag); break;
+		}
+		collider->SetParent(&transform_);
+		collider->SetCollisionLayer(collider_->layer);
+		collider->SetCollisionMask(collider_->mask);
+		ApplyColliderSize();
+	}
+
+	void PlacedObject::ApplyColliderSize() {
+		if (!collider_ || colliders_.empty()) {
+			return;
+		}
+		const ColliderDesc& c = *collider_;
+		const Vector3 scale = { std::abs(transform_.scale.x), std::abs(transform_.scale.y), std::abs(transform_.scale.z) };
+		const float scales[3] = { scale.x, scale.y, scale.z };
+		Collision::BaseCollider* collider = colliders_.front().get();
+		// ずれも物の拡縮に合わせる
+		collider->SetOffset({ c.offset.x * scale.x, c.offset.y * scale.y, c.offset.z * scale.z });
+		switch (c.shape) {
+		case Collision::ColliderShape::Box: {
+			auto* box = static_cast<Collision::AABBCollider*>(collider);
+			box->SetWidth(c.size.x * scale.x);
+			box->SetHeight(c.size.y * scale.y);
+			box->SetDepth(c.size.z * scale.z);
+			break;
+		}
+		case Collision::ColliderShape::Sphere:
+			static_cast<Collision::SphereCollider*>(collider)->SetRadius(c.radius * (std::max)({ scale.x, scale.y, scale.z }));
+			break;
+		case Collision::ColliderShape::Capsule: {
+			auto* capsule = static_cast<Collision::CapsuleCollider*>(collider);
+			const int axis = std::clamp(c.axis, 0, 2);
+			// 半径は軸と直交する2方向の大きい方
+			capsule->SetRadius(c.radius * (std::max)(scales[(axis + 1) % 3], scales[(axis + 2) % 3]));
+			capsule->SetHeight(c.height * scales[axis]);
+			capsule->SetAxis(static_cast<Collision::CapsuleCollider::Axis>(axis));
+			break;
+		}
+		}
+	}
+
+	void PlacedObject::FitColliderToModel() {
+		if (!collider_) {
+			return;
+		}
+		const RenderObject* object = GetRenderObject();
+		if (!object || !object->GetModel()) {
+			return;
+		}
+		bool hasBounds = false;
+		Vector3 min{};
+		Vector3 max{};
+		for (const Graphics::Mesh& mesh : object->GetModel()->GetMeshes()) {
+			Vector3 meshMin;
+			Vector3 meshMax;
+			if (!mesh.GetBounds(meshMin, meshMax)) {
+				continue;
+			}
+			min = hasBounds ? Vector3{ (std::min)(min.x, meshMin.x), (std::min)(min.y, meshMin.y), (std::min)(min.z, meshMin.z) } : meshMin;
+			max = hasBounds ? Vector3{ (std::max)(max.x, meshMax.x), (std::max)(max.y, meshMax.y), (std::max)(max.z, meshMax.z) } : meshMax;
+			hasBounds = true;
+		}
+		if (!hasBounds) {
+			return;
+		}
+		ColliderDesc& c = *collider_;
+		const Vector3 extent = max - min;
+		const float extents[3] = { extent.x, extent.y, extent.z };
+		c.offset = (min + max) * 0.5f;
+		c.size = extent;
+		if (c.shape == Collision::ColliderShape::Sphere) {
+			c.radius = (std::max)({ extent.x, extent.y, extent.z }) * 0.5f;
+		} else if (c.shape == Collision::ColliderShape::Capsule) {
+			// いちばん長い向きに伸ばす
+			c.axis = (extent.x >= extent.y && extent.x >= extent.z) ? 0 : (extent.y >= extent.z ? 1 : 2);
+			c.height = extents[c.axis];
+			c.radius = (std::max)(extents[(c.axis + 1) % 3], extents[(c.axis + 2) % 3]) * 0.5f;
+		}
+		ApplyColliderSize();
 	}
 
 }

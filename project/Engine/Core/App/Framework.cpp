@@ -8,6 +8,8 @@
 #include "Engine/Graphics/PostEffect/OffscreenManager.h"
 #include "Engine/Graphics/Camera/CameraManager.h"
 #include "Engine/DXC/Debug/GPUTimer.h"
+#include "Engine/DXC/Debug/FrameProfiler.h"
+#include "Engine/Core/Debug/DevEnv.h"
 #ifdef _DEBUGMODE
 #include "imgui_internal.h"	// DockBuilder（既定レイアウトの組み立て）
 #include "ImGuizmo.h"
@@ -60,14 +62,23 @@ void Framework::Update() {
 		cameraManager_->SetDebugMode(!cameraManager_->GetDebugMode());
 	}
 	if (input_->TriggerKey(DIK_F1)) { isDebugGuiVisible_ = !isDebugGuiVisible_; }
-	if (input_->TriggerKey(DIK_F9)) { dxcommon_->GetOffscreenManager()->RequestScreenshot(); }
+	const bool isAutoScreenshot = autoScreenshotFrames_ > 0 && --autoScreenshotFrames_ == 0;
+	if (input_->TriggerKey(DIK_F9) || isAutoScreenshot) { dxcommon_->GetOffscreenManager()->RequestScreenshot(); }
 #endif // _DEBUGMODE
 
+	DXC::FrameProfiler* profiler = dxcommon_->GetFrameProfiler();
 	// ゲームシーンの毎フレーム処理
-	sceneManager_->Update();
-	ParticleManager::GetInstance()->Update();
+	{
+		DXC::CpuScope scope(profiler, "cpu.sceneUpdate");
+		sceneManager_->Update();
+	}
+	{
+		DXC::CpuScope scope(profiler, "cpu.particleUpdate");
+		ParticleManager::GetInstance()->Update();
+	}
 
 #ifdef _DEBUGMODE
+	DXC::CpuScope guiScope(profiler, "cpu.debugGui");
 	// ImGui受付
 	imguiManager_->Begin();
 	if (isDebugGuiVisible_) {
@@ -86,15 +97,24 @@ void Framework::Draw() {
 	// PickingのUAVのDepthを初期化
 	modelManager_->PickingDataReset();
 
+	DXC::FrameProfiler* profiler = dxcommon_->GetFrameProfiler();
 	// 描画開始
 	dxcommon_->PreDraw();
 	// ゲームシーンの描画
-	sceneManager_->Draw();
+	{
+		DXC::CpuScope scope(profiler, "cpu.sceneDraw");
+		sceneManager_->Draw();
+	}
 
 	// シーンが積んだものをここでまとめて描く。この順序に意味があるので入れ替えないこと
 	dxcommon_->BeginGpuSection(GpuSection::Skinning);
 	objectRenderer_->Skinning();
 	dxcommon_->EndGpuSection(GpuSection::Skinning);
+
+	// TLAS・影なしのライト・ボリュメトリックフォグ。空も霧の表を引くので空より先
+	dxcommon_->BeginGpuSection(GpuSection::Prepare);
+	objectRenderer_->PrepareFrame();
+	dxcommon_->EndGpuSection(GpuSection::Prepare);
 
 	dxcommon_->BeginGpuSection(GpuSection::Sky);
 	spriteRenderer_->RenderForeground();
@@ -102,7 +122,10 @@ void Framework::Draw() {
 	dxcommon_->EndGpuSection(GpuSection::Sky);
 
 	dxcommon_->BeginGpuSection(GpuSection::Objects);
-	objectRenderer_->Render();
+	{
+		DXC::CpuScope scope(profiler, "cpu.objectRender");
+		objectRenderer_->Render();
+	}
 	dxcommon_->EndGpuSection(GpuSection::Objects);
 
 	dxcommon_->BeginGpuSection(GpuSection::Particles);
@@ -127,6 +150,7 @@ void Framework::Draw() {
 	imguiManager_->Draw();
 	dxcommon_->EndGpuSection(GpuSection::DebugGui);
 	// 描画終了
+	DXC::CpuScope scope(profiler, "cpu.submit");
 	dxcommon_->PostDraw();
 }
 
@@ -161,6 +185,7 @@ namespace {
 		ImGui::DockBuilderDockWindow("Particle Editor", bottom);
 		ImGui::DockBuilderDockWindow("GPUParticle Editor", bottom);
 		ImGui::DockBuilderDockWindow("OffScreen Debug", bottom);
+		ImGui::DockBuilderDockWindow("Content", bottom);
 
 		ImGui::DockBuilderFinish(dockspaceId);
 	}
@@ -193,6 +218,8 @@ namespace {
 				ImGui::SetCursorScreenPos(ImVec2(view.x, view.y));
 				ImGui::Image(static_cast<ImTextureID>(texture.ptr), ImVec2(view.width, view.height));
 				MyWin::SetGameViewHovered(ImGui::IsItemHovered());
+				// 素材の一覧からドラッグされたモデルとテクスチャを受け取る
+				Editor::ContentBrowser::AcceptGameViewDrop();
 
 				// ギズモの既定の描き先は最背面の全画面ウィンドウなので、このパネルに隠れる
 				ImGuizmo::SetDrawlist();
@@ -251,6 +278,7 @@ void Framework::EngineDebugGUI() {
 			}
 			ImGui::TreePop();
 		}
+		dxcommon_->GetFrameProfiler()->DebugGUI();
 		ImGui::Separator();
 		ImGui::Text("PickedID    : %d", modelManager_->GetPickedID());
 		ImGui::Text("PickedCoord : %d, %d", modelManager_->GetPickedCoord(0), modelManager_->GetPickedCoord(1));
@@ -265,11 +293,17 @@ void Framework::EngineDebugGUI() {
 	if (DebugWindow raytracing{ "Raytracing" }) { objectRenderer_->DebugGUI(); }
 	if (DebugWindow gpuParticle{ "GPU Particle" }) { ParticleManager::GetInstance()->ParticleCSDebugGUI(); }
 	if (DebugWindow inputMap{ "Input" }) { InputMap::GetInstance()->DebugGUI(); }
+	// 後から足した窓は保存済みの配置 (imgui.ini) に無いので、初めて開くときだけ下の段へ入れる
+	if (ImGuiWindow* stats = ImGui::FindWindowByName("Stats"); stats && stats->DockId != 0) {
+		ImGui::SetNextWindowDockID(stats->DockId, ImGuiCond_FirstUseEver);
+	}
+	if (DebugWindow content{ "Content" }) { contentBrowser_.WindowGUI(); }
+	contentBrowser_.ApplyDrop(sceneManager_->GetLevel(), gameObjectEditor_);
 
 	// クリックの結果が届いた瞬間だけ、選択を切り替えて Inspector を前に出す
 	if (modelManager_->IsPickResolved()) {
 		const int pickedID = modelManager_->GetPickedID();
-		if (gameObjectEditor_.SelectByObjID(pickedID)) {
+		if (gameObjectEditor_.SelectByObjID(pickedID, modelManager_->GetPickedMeshIndex())) {
 			ImGui::SetWindowFocus("Inspector");
 		} else if (pickedID <= 0) {
 			gameObjectEditor_.DeselectObject();
@@ -281,6 +315,12 @@ void Framework::EngineDebugGUI() {
 }
 
 void Framework::Init() {
+#ifdef _DEBUGMODE
+	// 計測と同じく、キーを送らずに絵を確かめるため
+	if (std::string frames; ReadDevEnv("FUJI_SCREENSHOT", frames)) {
+		autoScreenshotFrames_ = std::atoi(frames.c_str());
+	}
+#endif // _DEBUGMODE
 
 	// ゲームウィンドウの作成
 	win_ = MyWin::GetInstance();
@@ -324,6 +364,7 @@ void Framework::Init() {
 
 void Core::Framework::BeginUpdate() {
 	dxcommon_->BeginFrame();
+	DXC::CpuScope scope(dxcommon_->GetFrameProfiler(), "cpu.frameStart");
 	fpsKeeper_->Update();
 
 	// 入力関連の毎フレーム処理

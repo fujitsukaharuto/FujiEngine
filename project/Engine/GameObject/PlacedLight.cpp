@@ -52,6 +52,7 @@ namespace GameObject {
 		angle_ = data.value("angle", angle_);
 		softness_ = data.value("softness", softness_);
 		castShadow_ = data.value("shadow", castShadow_);
+		sourceRadius_ = data.value("sourceRadius", sourceRadius_);
 		width_ = data.value("width", width_);
 		height_ = data.value("height", height_);
 		isTwoSided_ = data.value("twoSided", isTwoSided_);
@@ -97,6 +98,9 @@ namespace GameObject {
 		// 外したときだけ書く
 		if (!castShadow_ && !IsShaped()) {
 			data["shadow"] = false;
+		}
+		if (sourceRadius_ > 0.0f && castShadow_ && !IsShaped()) {
+			data["sourceRadius"] = sourceRadius_;
 		}
 		return data;
 	}
@@ -187,6 +191,7 @@ namespace GameObject {
 			light->decay = decay_;
 			light->cosAngle = std::cos(outer);
 			light->cosFalloffStart = std::cos(inner);
+			light->sourceRadius = (std::max)(sourceRadius_, 0.0f);
 		} else {
 			Graphics::PointLightData* light = lightManager_->GetPointLight(slot_);
 			light->color = color;
@@ -194,6 +199,7 @@ namespace GameObject {
 			light->intensity = intensity;
 			light->radius = range_;
 			light->decay = decay_;
+			light->sourceRadius = (std::max)(sourceRadius_, 0.0f);
 		}
 	}
 
@@ -248,6 +254,9 @@ namespace GameObject {
 		ImGui::DragFloat("Intensity", &intensity_, 0.05f, 0.0f, 1000.0f);
 		ImGui::DragFloat("Range", &range_, 0.1f, 0.0f, 1000.0f);
 		ImGui::DragFloat("Decay", &decay_, 0.01f, 0.0f, 10.0f);
+		if (castShadow_ && !IsShaped()) {
+			ImGui::DragFloat("Source radius", &sourceRadius_, 0.005f, 0.0f, 10.0f, "%.3f m");
+		}
 		if (IsShaped()) {
 			ImGui::DragFloat(type_ == Type::Tube ? "Length" : "Width", &width_, 0.01f, 0.01f, 100.0f, "%.2f m");
 		}

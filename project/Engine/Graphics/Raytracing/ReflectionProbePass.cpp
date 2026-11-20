@@ -205,6 +205,7 @@ ReflectionProbePass::LightingKey ReflectionProbePass::MakeLightingKey(uint32_t c
 	*v++ = lights.environmentTint.y;
 	*v++ = lights.environmentTint.z;
 	*v++ = lights.fog.density;
+	*v++ = lights.fog.secondDensity;
 	key.punctualCount = lights.numPointLights + lights.numSpotLights;
 	return key;
 }
@@ -358,6 +359,7 @@ void ReflectionProbePass::UpdateParams(uint32_t frameIndex) {
 		data.intensity = (std::max)(desc.intensity, 0.0f);
 		data.flags = (desc.boxProjection ? kFlagBoxProjection : 0u) | (slot << kSliceShift);
 	}
+	activeProbeCount_ = params.probeCount;
 	std::memcpy(constantMapped_ + kFrameConstantStride_ * frameIndex + kParamsOffset_, &params, sizeof(params));
 }
 

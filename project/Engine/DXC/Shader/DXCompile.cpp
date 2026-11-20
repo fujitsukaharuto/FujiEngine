@@ -80,10 +80,15 @@ namespace {
 		}
 	}
 
-	std::filesystem::path CachePathOf(const std::wstring& filePath, const wchar_t* profile) {
+	std::filesystem::path CachePathOf(const std::wstring& filePath, const wchar_t* profile, const wchar_t* define) {
 		uint64_t hash = 0xcbf29ce484222325ull;
 		HashBytes(hash, &kCacheVersion, sizeof(kCacheVersion));
 		HashBytes(hash, profile, wcslen(profile) * sizeof(wchar_t));
+		if (define) {
+			const wchar_t kDefineTag[] = L"-D";
+			HashBytes(hash, kDefineTag, sizeof(kDefineTag));
+			HashBytes(hash, define, wcslen(define) * sizeof(wchar_t));
+		}
 #ifdef _DEBUG
 		const char kBuildTag[] = "debug";
 #else
@@ -156,11 +161,11 @@ Microsoft::WRL::ComPtr<IDxcBlob> DXCompile::CompileShader(const std::wstring& fi
 	return CompileShaderWithReflection(filePath, profile).blob;
 }
 
-ShaderData DXCompile::CompileShaderWithReflection(const std::wstring& filePath, const wchar_t* profile) {
+ShaderData DXCompile::CompileShaderWithReflection(const std::wstring& filePath, const wchar_t* profile, const wchar_t* define) {
 
 	DxcContext& dxc = ThreadContext();
 
-	const std::filesystem::path cachePath = CachePathOf(filePath, profile);
+	const std::filesystem::path cachePath = CachePathOf(filePath, profile, define);
 	if (ShaderData cached = LoadCached(dxc, cachePath); cached.blob) {
 		return cached;
 	}
@@ -177,7 +182,7 @@ ShaderData DXCompile::CompileShaderWithReflection(const std::wstring& filePath, 
 
 #ifdef _DEBUG
 	// argumentの設定
-	LPCWSTR arguments[] = {
+	std::vector<LPCWSTR> arguments = {
 		filePath.c_str(),
 		L"-E",L"main",
 		L"-T",profile,
@@ -186,7 +191,7 @@ ShaderData DXCompile::CompileShaderWithReflection(const std::wstring& filePath, 
 		L"-Zpr",
 	};
 #else
-	LPCWSTR arguments[] = {
+	std::vector<LPCWSTR> arguments = {
 		filePath.c_str(),
 		L"-E",L"main",
 		L"-T",profile,
@@ -194,12 +199,16 @@ ShaderData DXCompile::CompileShaderWithReflection(const std::wstring& filePath, 
 		L"-Zpr",
 	};
 #endif
+	if (define) {
+		arguments.push_back(L"-D");
+		arguments.push_back(define);
+	}
 
 	IDxcResult* shaderResult = nullptr;
 	hr = dxc.compiler->Compile(
 		&shaderSourceBuffer,
-		arguments,
-		_countof(arguments),
+		arguments.data(),
+		static_cast<UINT32>(arguments.size()),
 		dxc.includeHandler.Get(),
 		IID_PPV_ARGS(&shaderResult)
 	);
@@ -212,6 +221,18 @@ ShaderData DXCompile::CompileShaderWithReflection(const std::wstring& filePath, 
 		Logger::Log(shaderError->GetStringPointer()); // Logを出せるようにする
 		assert(false);
 	}
+	HRESULT compileStatus = S_OK;
+	shaderResult->GetStatus(&compileStatus);
+	const bool isCompiled = SUCCEEDED(compileStatus);
+	if (!isCompiled) {
+		Logger::Log((std::format(L"Compile Failed, path:{}, profile:{}\n", filePath, profile)));
+#ifdef NDEBUG
+		// assert が効かない構成でも気付けるようにする
+		const std::string message = std::format("{}\n\n{}", std::filesystem::path(filePath).string(),
+			shaderError ? shaderError->GetStringPointer() : "");
+		MessageBoxA(nullptr, message.c_str(), "Shader compile failed", MB_OK | MB_ICONERROR);
+#endif // NDEBUG
+	}
 
 
 	ShaderData result;
@@ -221,12 +242,14 @@ ShaderData DXCompile::CompileShaderWithReflection(const std::wstring& filePath, 
 	// 保存したものを読んだときと同じ経路で作る
 	if (result.blob) {
 		CreateReflection(dxc, result.blob.Get(), result);
-		if (result.reflection) {
+		if (result.reflection && isCompiled) {
 			SaveCached(cachePath, result.blob.Get());
 		}
 	}
 
-	Logger::Log((std::format(L"Compile Succeeded, path:{}, profile:{}\n", filePath, profile)));// 成功Logを出せるようにする
+	if (isCompiled) {
+		Logger::Log((std::format(L"Compile Succeeded, path:{}, profile:{}\n", filePath, profile)));// 成功Logを出せるようにする
+	}
 	shaderSource->Release();
 	shaderResult->Release();
 	return result;

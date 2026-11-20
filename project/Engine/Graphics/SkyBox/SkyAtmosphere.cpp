@@ -3,11 +3,14 @@
 #include <algorithm>
 #include <cmath>
 #include <cstring>
+#include <numbers>
 
+#include "Engine/Core/App/MyWindow.h"
 #include "Engine/Core/Debug/ImGuiManager.h"
 #include "Engine/DXC/DXCom.h"
 #include "Engine/DXC/Resource/DX12Helper.h"
 #include "Engine/DXC/Resource/SRVManager.h"
+#include "Engine/Graphics/Camera/Camera.h"
 #include "Engine/Graphics/Pipeline/PipeKind.h"
 #include "Engine/Graphics/Pipeline/PipelineManager.h"
 #include "Engine/Graphics/Pipeline/RootNames.h"
@@ -55,12 +58,38 @@ SkyAtmosphere::LutTexture SkyAtmosphere::CreateLut(ID3D12Device* device, uint32_
 	return lut;
 }
 
+SkyAtmosphere::LutTexture SkyAtmosphere::CreateVolumeLut(ID3D12Device* device) {
+	SRVManager* srvManager = SRVManager::GetInstance();
+
+	LutTexture lut;
+	lut.resource = Helper::CreateTexture3D(device, kAerialLutWidth_, kAerialLutHeight_, kAerialLutDepth_, kLutFormat,
+		D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS, kReadState);
+
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+	srvDesc.Format = kLutFormat;
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE3D;
+	srvDesc.Texture3D.MipLevels = 1;
+	lut.srvIndex = srvManager->Allocate();
+	device->CreateShaderResourceView(lut.resource.Get(), &srvDesc, srvManager->GetCPUDescriptorHandle(lut.srvIndex));
+
+	D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
+	uavDesc.Format = kLutFormat;
+	uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE3D;
+	uavDesc.Texture3D.WSize = kAerialLutDepth_;
+	lut.uavIndex = srvManager->Allocate();
+	device->CreateUnorderedAccessView(lut.resource.Get(), nullptr, &uavDesc, srvManager->GetCPUDescriptorHandle(lut.uavIndex));
+	return lut;
+}
+
 void SkyAtmosphere::CreateResources(ID3D12Device* device) {
 	SRVManager* srvManager = SRVManager::GetInstance();
 
 	transmittance_ = CreateLut(device, kTransmittanceWidth_, kTransmittanceHeight_);
 	multiScatter_ = CreateLut(device, kMultiScatterSize_, kMultiScatterSize_);
 	skyView_ = CreateLut(device, kSkyViewWidth_, kSkyViewHeight_);
+	aerialScatter_ = CreateVolumeLut(device);
+	aerialTransmittance_ = CreateVolumeLut(device);
 
 	skyCube_ = Helper::CreateTextureCube(device, kSkyCubeSize_, kLutFormat, kSkyCubeMipLevels_,
 		D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS, kReadState);
@@ -83,6 +112,10 @@ void SkyAtmosphere::CreateResources(ID3D12Device* device) {
 	// 定数はフレーム数ぶん持つ
 	paramResource_ = Helper::CreateBufferResource(device, kParamStride_ * kFrameCount_);
 	paramResource_->Map(0, nullptr, reinterpret_cast<void**>(&paramMapped_));
+	// enabled = 0 から始める
+	aerialParamResource_ = Helper::CreateBufferResource(device, kParamStride_ * kFrameCount_);
+	aerialParamResource_->Map(0, nullptr, reinterpret_cast<void**>(&aerialParamMapped_));
+	std::memset(aerialParamMapped_, 0, kParamStride_ * kFrameCount_);
 
 	summaryBuffer_ = Helper::CreateUAVResource(device, kSummaryBytes_);
 	summaryUavIndex_ = srvManager->Allocate();
@@ -110,11 +143,49 @@ void SkyAtmosphere::Finalize() {
 		paramMapped_ = nullptr;
 		paramResource_.Reset();
 	}
+	if (aerialParamResource_) {
+		aerialParamMapped_ = nullptr;
+		aerialParamResource_.Reset();
+	}
+	aerialTransmittance_.resource.Reset();
+	aerialScatter_.resource.Reset();
 	skyCube_.Reset();
 	skyView_.resource.Reset();
 	multiScatter_.resource.Reset();
 	transmittance_.resource.Reset();
 	dxcommon_ = nullptr;
+}
+
+void SkyAtmosphere::SetPlanet(float altitudeKm, float scale) {
+	altitudeKm_ = (std::max)(altitudeKm, 0.0f);
+	scale = std::clamp(scale, 1e-4f, 100.0f);
+	if (std::abs(scale - planetScale_) <= 1e-6f * planetScale_) {
+		return;
+	}
+	// 長さを ratio 倍、係数を 1/ratio 倍にすると、どの向きの光学的な厚さも変わらない
+	const float ratio = scale / planetScale_;
+	planetScale_ = scale;
+	params_.bottomRadius *= ratio;
+	params_.topRadius *= ratio;
+	params_.rayleighDensityScale /= ratio;
+	params_.mieDensityScale /= ratio;
+	params_.ozoneCenter *= ratio;
+	params_.ozoneWidth *= ratio;
+	params_.rayleighScattering = params_.rayleighScattering * (1.0f / ratio);
+	params_.mieScattering = params_.mieScattering * (1.0f / ratio);
+	params_.mieExtinction = params_.mieExtinction * (1.0f / ratio);
+	params_.ozoneAbsorption = params_.ozoneAbsorption * (1.0f / ratio);
+	isStaticLutReady_ = false;
+	isRebakeForced_ = true;
+}
+
+float SkyAtmosphere::GetCameraAltitudeKm(float cameraY) const {
+	return (std::max)(cameraY * 0.001f + altitudeKm_, 0.0f);
+}
+
+float SkyAtmosphere::GetHorizonZenith(float cameraY) const {
+	const float viewHeight = params_.bottomRadius + (std::max)(GetCameraAltitudeKm(cameraY), 0.001f);
+	return std::numbers::pi_v<float> - std::asin((std::min)(params_.bottomRadius / viewHeight, 1.0f));
 }
 
 void SkyAtmosphere::Render(ID3D12GraphicsCommandList* commandList, const Vector3& sunDirection,
@@ -131,8 +202,8 @@ void SkyAtmosphere::Render(ID3D12GraphicsCommandList* commandList, const Vector3
 	params_.sunIlluminance = sunIlluminance;
 	params_.cloudCoverage = cloudCoverage;
 	params_.cloudTime = cloudTime;
-	// 1 単位を 1m とみなす。カメラは大気の外へ出さない
-	params_.cameraHeight = (std::max)(cameraHeight, 0.0f) * 0.001f;
+	// 1 単位を 1m とみなす。大気の外 (宇宙) へも出られる
+	params_.cameraHeight = GetCameraAltitudeKm(cameraHeight);
 	const uint64_t offset = kParamStride_ * frameIndex;
 	std::memcpy(paramMapped_ + offset, &params_, sizeof(AtmosphereParams));
 	const D3D12_GPU_VIRTUAL_ADDRESS paramAddress = paramResource_->GetGPUVirtualAddress() + offset;
@@ -193,6 +264,54 @@ void SkyAtmosphere::Render(ID3D12GraphicsCommandList* commandList, const Vector3
 	UpdateSkyCubeVersion(sunDirection, sunIlluminance);
 }
 
+void SkyAtmosphere::RenderAerialPerspective(ID3D12GraphicsCommandList* commandList, const Camera& camera, bool enabled,
+	float distanceScale, const Vector3& tint) {
+	if (dxcommon_ == nullptr) {
+		return;
+	}
+	const uint32_t frameIndex = dxcommon_->GetNowFrameCount();
+
+	// 表は遠クリップまで届かせる
+	const float maxDistance = (std::max)(camera.GetFarClip(), 1.0f);
+	AerialPerspectiveParams ap;
+	ap.enabled = (enabled && isStaticLutReady_ && distanceScale > 0.0f) ? 1u : 0u;
+	ap.invViewProj = Inverse(camera.GetViewProjectionMatrix());
+	ap.sunIlluminance = {
+		params_.sunIlluminance.x * tint.x, params_.sunIlluminance.y * tint.y, params_.sunIlluminance.z * tint.z };
+	ap.invScreenSize = { 1.0f / static_cast<float>(Core::MyWin::kWindowWidth), 1.0f / static_cast<float>(Core::MyWin::kWindowHeight) };
+	ap.invMaxDistance = 1.0f / maxDistance;
+	ap.maxDistanceKm = maxDistance * 0.001f * distanceScale;
+	const uint64_t offset = kParamStride_ * frameIndex;
+	std::memcpy(aerialParamMapped_ + offset, &ap, sizeof(AerialPerspectiveParams));
+	if (ap.enabled == 0) {
+		return;
+	}
+
+	PipelineManager* pPipeManager = PipelineManager::GetInstance();
+	SRVManager* srvManager = SRVManager::GetInstance();
+	const D3D12_GPU_VIRTUAL_ADDRESS paramAddress = paramResource_->GetGPUVirtualAddress() + offset;
+
+	ID3D12Resource* volumes[] = { aerialScatter_.resource.Get(), aerialTransmittance_.resource.Get() };
+	for (ID3D12Resource* volume : volumes) {
+		dxcommon_->TransitionResource(volume, kReadState, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+	}
+	pPipeManager->SetCSPipeline(Pipe::AtmosphereAerialPerspectiveCS);
+	pPipeManager->SetComputeRootCBV(commandList, RootName::kAtmosphereParams, paramAddress);
+	pPipeManager->SetComputeRootCBV(commandList, RootName::kAerialPerspective, GetAerialPerspectiveParamsAddress());
+	pPipeManager->SetComputeRootDescriptorTable(commandList, RootName::kTransmittanceLut,
+		srvManager->GetGPUDescriptorHandle(transmittance_.srvIndex));
+	pPipeManager->SetComputeRootDescriptorTable(commandList, RootName::kMultiScatterLut,
+		srvManager->GetGPUDescriptorHandle(multiScatter_.srvIndex));
+	pPipeManager->SetComputeRootDescriptorTable(commandList, RootName::kAerialScatterOut,
+		srvManager->GetGPUDescriptorHandle(aerialScatter_.uavIndex));
+	pPipeManager->SetComputeRootDescriptorTable(commandList, RootName::kAerialTransmittanceOut,
+		srvManager->GetGPUDescriptorHandle(aerialTransmittance_.uavIndex));
+	commandList->Dispatch(DispatchCount(kAerialLutWidth_), DispatchCount(kAerialLutHeight_), 1);
+	for (ID3D12Resource* volume : volumes) {
+		dxcommon_->TransitionResource(volume, D3D12_RESOURCE_STATE_UNORDERED_ACCESS, kReadState);
+	}
+}
+
 void SkyAtmosphere::RenderStaticLuts(ID3D12GraphicsCommandList* commandList, D3D12_GPU_VIRTUAL_ADDRESS params) {
 	PipelineManager* pPipeManager = PipelineManager::GetInstance();
 	SRVManager* srvManager = SRVManager::GetInstance();
@@ -222,7 +341,10 @@ void SkyAtmosphere::UpdateSkyCubeVersion(const Vector3& sunDirection, const Vect
 	const float previous = (std::max)({ bakedSunIlluminance_.x, bakedSunIlluminance_.y, bakedSunIlluminance_.z, 1e-6f });
 	const Vector3 difference = sunIlluminance - bakedSunIlluminance_;
 	const float change = (std::max)({ std::abs(difference.x), std::abs(difference.y), std::abs(difference.z) }) / previous;
-	const bool isChanged = isRebakeForced_
+	// 高度が空の見え方を変えるほど動いたか (地上を歩くぶんでは焼き直さない)
+	const float heightChange = std::abs(params_.cameraHeight - bakedCameraHeight_);
+	const bool isMoved = heightChange > (std::max)(0.5f, 0.02f * bakedCameraHeight_);
+	const bool isChanged = isRebakeForced_ || isMoved
 		|| Vector3::Dot(sunDirection, bakedSunDirection_) < kRebakeAngleCos_
 		|| change > kRebakeIlluminanceRatio_;
 	if (isChanged && (isRebakeForced_ || framesSinceRebake_ >= kRebakeIntervalFrames_)) {
@@ -230,6 +352,7 @@ void SkyAtmosphere::UpdateSkyCubeVersion(const Vector3& sunDirection, const Vect
 		isRebakeForced_ = false;
 		bakedSunDirection_ = sunDirection;
 		bakedSunIlluminance_ = sunIlluminance;
+		bakedCameraHeight_ = params_.cameraHeight;
 		framesSinceRebake_ = 0;
 	}
 }
@@ -255,7 +378,7 @@ bool SkyAtmosphere::ReadSummary(uint32_t frameIndex, Summary& summary) {
 }
 
 SkyAtmosphere::Medium SkyAtmosphere::GetMedium(float height) const {
-	const float heightKm = (std::max)(height, 0.0f) * 0.001f;
+	const float heightKm = GetCameraAltitudeKm(height);
 	const float rayleighDensity = std::exp(params_.rayleighDensityScale * heightKm);
 	const float mieDensity = std::exp(params_.mieDensityScale * heightKm);
 	const float ozoneDensity = std::clamp(1.0f - std::abs(heightKm - params_.ozoneCenter) / params_.ozoneWidth, 0.0f, 1.0f);
@@ -276,6 +399,18 @@ D3D12_GPU_DESCRIPTOR_HANDLE SkyAtmosphere::GetSkyViewSrvHandle() const {
 
 D3D12_GPU_DESCRIPTOR_HANDLE SkyAtmosphere::GetSkyCubeSrvHandle() const {
 	return SRVManager::GetInstance()->GetGPUDescriptorHandle(skyCubeSrvIndex_);
+}
+
+D3D12_GPU_VIRTUAL_ADDRESS SkyAtmosphere::GetAerialPerspectiveParamsAddress() const {
+	return aerialParamResource_->GetGPUVirtualAddress() + kParamStride_ * dxcommon_->GetNowFrameCount();
+}
+
+D3D12_GPU_DESCRIPTOR_HANDLE SkyAtmosphere::GetAerialScatterSrvHandle() const {
+	return SRVManager::GetInstance()->GetGPUDescriptorHandle(aerialScatter_.srvIndex);
+}
+
+D3D12_GPU_DESCRIPTOR_HANDLE SkyAtmosphere::GetAerialTransmittanceSrvHandle() const {
+	return SRVManager::GetInstance()->GetGPUDescriptorHandle(aerialTransmittance_.srvIndex);
 }
 
 void SkyAtmosphere::DebugGUI() {

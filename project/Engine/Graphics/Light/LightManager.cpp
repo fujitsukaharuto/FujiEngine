@@ -78,6 +78,14 @@ void LightManager::RefreshDerived() {
 		allLightsData_.fog.sunDirection = sun.direction * -1.0f;
 		allLightsData_.fog.sunColor = { sun.color.x * sunPower, sun.color.y * sunPower, sun.color.z * sunPower };
 	}
+	// 計算する空の数表の並びと、雲の量。雲はカメラの上 1.5km の板なので、そこまで昇ったら消す
+	FogData& fog = allLightsData_.fog;
+	float cloudFade = 1.0f;
+	if (skyAtmosphere_) {
+		fog.skyHorizonZenith = skyAtmosphere_->GetHorizonZenith(fog.cameraPosition.y);
+		cloudFade = std::clamp((1.5f - skyAtmosphere_->GetCameraAltitudeKm(fog.cameraPosition.y)) / 0.5f, 0.0f, 1.0f);
+	}
+	fog.cloudCoverage = cloudCoverageBase_ * cloudFade;
 	if (IsAtmosphereActive() && hasAtmosphereSummary_) {
 		ApplyAtmosphere();
 	} else {
@@ -221,14 +229,20 @@ ClusteredLightData* LightManager::GetClusteredLight(int index) {
 	return &clusteredLights_[index];
 }
 
-uint32_t LightManager::GatherClusteredLights(ClusteredLightData* out, uint32_t capacity) const {
+uint32_t LightManager::GatherClusteredLights(ClusteredLightData* out, uint32_t capacity, bool* hasShaped) const {
 	uint32_t count = 0;
+	if (hasShaped) {
+		*hasShaped = false;
+	}
 	for (size_t i = 0; i < clusteredLights_.size() && count < capacity; ++i) {
 		const ClusteredLightData& light = clusteredLights_[i];
 		if (!isClusteredUsed_[i] || light.range <= 0.0f || (light.color.x <= 0.0f && light.color.y <= 0.0f && light.color.z <= 0.0f)) {
 			continue;
 		}
 		out[count++] = light;
+		if (hasShaped && (light.type == kClusteredLightTube || light.type == kClusteredLightRect)) {
+			*hasShaped = true;
+		}
 	}
 	return count;
 }
@@ -248,6 +262,7 @@ void LightManager::SetFog(const FogData& fog) {
 	allLightsData_.fog = fog;
 	allLightsData_.fog.cameraPosition = cameraPosition;
 	allLightsData_.fog.cloudTime = cloudTime;
+	cloudCoverageBase_ = fog.cloudCoverage;
 }
 
 D3D12_GPU_VIRTUAL_ADDRESS LightManager::GetLightsGPUVirtualAddress() const {
@@ -261,10 +276,17 @@ void LightManager::SetTranslucentShadowThisFrame(bool enabled) {
 	} else {
 		data->renderFlags &= ~kRenderFlagTranslucentShadow;
 	}
+	uploadedData_.renderFlags = (uploadedData_.renderFlags & ~kRenderFlagTranslucentShadow) | (enabled ? kRenderFlagTranslucentShadow : 0u);
+}
+
+void LightManager::SetSoftShadowLightsThisFrame(uint32_t softShadowLights) {
+	allLightsDataGPU_[dxcommon_->GetNowFrameCount()]->softShadowLights = softShadowLights;
+	uploadedData_.softShadowLights = softShadowLights;
 }
 
 void LightManager::CopyData(uint32_t frameIndex) {
 	memcpy(allLightsDataGPU_[frameIndex], &allLightsData_, sizeof(AllLightsData));
+	uploadedData_ = allLightsData_;
 	*fogDataGPU_[frameIndex] = allLightsData_.fog;
 }
 

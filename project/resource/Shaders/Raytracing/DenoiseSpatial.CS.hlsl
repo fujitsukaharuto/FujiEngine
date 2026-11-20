@@ -25,9 +25,36 @@ cbuffer DenoiseSpatialParam : register(b1)
 
 Texture2D<float4> gGBufferNormal : register(t0);
 Texture2D<float> gGBufferDepth : register(t1);
-Texture2D<float> gDenoiseFilterInput : register(t2);
+// DENOISE_RGB を付けると3チャンネルの信号を1回でならす (DenoiseSpatialRGB.CS.hlsl)
+#ifdef DENOISE_RGB
+typedef float3 DenoiseSignal;
+Texture2D<float4> gDenoiseFilterInput : register(t2);
+RWTexture2D<float4> gDenoiseFilterOut : register(u0);
 
+DenoiseSignal LoadInput(int2 pixel)
+{
+    return gDenoiseFilterInput.Load(int3(pixel, 0)).rgb;
+}
+
+void StoreOutput(uint2 pixel, DenoiseSignal value)
+{
+    gDenoiseFilterOut[pixel] = float4(value, 0.0f);
+}
+#else
+typedef float DenoiseSignal;
+Texture2D<float> gDenoiseFilterInput : register(t2);
 RWTexture2D<float> gDenoiseFilterOut : register(u0);
+
+DenoiseSignal LoadInput(int2 pixel)
+{
+    return gDenoiseFilterInput.Load(int3(pixel, 0)).r;
+}
+
+void StoreOutput(uint2 pixel, DenoiseSignal value)
+{
+    gDenoiseFilterOut[pixel] = value;
+}
+#endif
 
 // B-スプラインの5タップ。これを横と縦に1回ずつ通すと 5x5 の基本カーネルになる
 static const float kKernel[5] = { 0.0625f, 0.25f, 0.375f, 0.25f, 0.0625f };
@@ -41,13 +68,13 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
         return;
     }
 
-    float center = gDenoiseFilterInput.Load(int3(pixel, 0)).r;
+    DenoiseSignal center = LoadInput(int2(pixel));
 
     float3 normal;
     float depth;
     if (!LoadSurface(gGBufferNormal, gGBufferDepth, int2(pixel), normal, depth))
     {
-        gDenoiseFilterOut[pixel] = center;
+        StoreOutput(pixel, center);
         return;
     }
 
@@ -56,7 +83,7 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
     // 間隔を広げるとタップが幾何的にも遠くなる。固定にすると斜面で後半の通過が丸ごと弾かれる
     float planeTolerance = planeScale * length(worldPos - cameraPos) * float(stepWidth);
 
-    float sum = 0.0f;
+    DenoiseSignal sum = (DenoiseSignal) 0.0f;
     float weightSum = 0.0f;
 
     for (int i = -2; i <= 2; i++)
@@ -83,9 +110,9 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
 
         float weight = kKernel[i + 2] * normalWeight * planeWeight;
 
-        sum += weight * gDenoiseFilterInput.Load(int3(tap, 0)).r;
+        sum += weight * LoadInput(tap);
         weightSum += weight;
     }
 
-    gDenoiseFilterOut[pixel] = (weightSum > 0.0f) ? (sum / weightSum) : center;
+    StoreOutput(pixel, (weightSum > 0.0f) ? (sum / weightSum) : center);
 }

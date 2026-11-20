@@ -66,6 +66,8 @@ namespace Graphics {
 		void Clear();
 
 		bool IsBaking() const { return isBaking_; }
+		/// <summary>このフレームに前方描画が引く箱の数</summary>
+		uint32_t GetActiveVolumeCount() const { return activeVolumeCount_; }
 		/// <summary>焼いている途中の進み具合(0〜1)</summary>
 		float GetBakeProgress() const;
 		/// <summary>焼いた値を引ける状態か</summary>
@@ -182,6 +184,7 @@ namespace Graphics {
 		std::vector<SunKey> sunKeys_;
 		bool hasSunHours_ = false;
 		bool hasData_ = false;
+		uint32_t activeVolumeCount_ = 0;
 
 		AtlasTexture rayData_;
 		AtlasTexture sky_;

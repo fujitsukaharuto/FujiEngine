@@ -76,6 +76,9 @@ void RenderObject::ApplyModelMaterials() {
 		if (!source.occlusionFilePath.empty()) {
 			material.SetOcclusionMap(source.occlusionFilePath);
 		}
+		material.SetClearCoat(source.clearCoatFactor, source.clearCoatRoughnessFactor);
+		material.SetAnisotropy(source.anisotropyFactor, 0.0f);
+		material.SetSheen(source.sheenColorFactor, source.sheenRoughnessFactor);
 	}
 }
 
@@ -130,7 +133,7 @@ void RenderObject::CreateWVP() {
 		wvpResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&wvpData_[i]));
 		wvpData_[i]->WVP = MakeIdentity4x4();
 		wvpData_[i]->World = MakeIdentity4x4();
-		wvpData_[i]->WorldInverseTransPose = Transpose(Inverse(wvpData_[i]->World));
+		wvpData_[i]->WorldInverseTransPose = MakeIdentity4x4();
 
 		cameraPosResource_[i] = DXC::Helper::CreateBufferResource(dxcommon_->GetDevice(), sizeof(DirectionalLight));
 		cameraPosData_[i] = nullptr;
@@ -171,7 +174,8 @@ void RenderObject::SetWVP() {
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 	wvpData_[frameIndex]->World = worldMatrix;
 	wvpData_[frameIndex]->WVP = worldViewProjectionMatrix;
-	wvpData_[frameIndex]->WorldInverseTransPose = Transpose(Inverse(wvpData_[frameIndex]->World));
+	// 書き込んだ先 (Upload ヒープ) から読み戻すと遅いので、手元の行列から求める
+	wvpData_[frameIndex]->WorldInverseTransPose = Transpose(Inverse(worldMatrix));
 
 	cameraPosData_[frameIndex]->worldPosition = camera_->GetTranslate();
 	// isAdd_ は Draw() が先に決めている
@@ -196,7 +200,7 @@ void RenderObject::SetBillboardWVP() {
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 	wvpData_[frameIndex]->World = worldMatrix;
 	wvpData_[frameIndex]->WVP = worldViewProjectionMatrix;
-	wvpData_[frameIndex]->WorldInverseTransPose = Transpose(Inverse(wvpData_[frameIndex]->World));
+	wvpData_[frameIndex]->WorldInverseTransPose = Transpose(Inverse(worldMatrix));
 
 	// こちらの経路でもカメラの位置を入れ直す。入れないと生成したときの位置のままになり、
 	// ハイライトとフォグが今のカメラからの距離で計算されない

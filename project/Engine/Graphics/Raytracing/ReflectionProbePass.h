@@ -48,6 +48,8 @@ namespace Graphics {
 
 		/// <summary>このフレームに焼くか。焼くフレームは TLAS に物の見た目を集める</summary>
 		bool NeedsRayLooks() const { return !bakeQueue_.empty(); }
+		/// <summary>このフレームに前方描画が引くプローブの数</summary>
+		uint32_t GetActiveProbeCount() const { return activeProbeCount_; }
 		bool IsBaking() const { return !bakeQueue_.empty(); }
 		uint32_t GetProbeCount() const { return static_cast<uint32_t>(probes_.size()); }
 		/// <summary>一度でも焼けた箱の数</summary>
@@ -112,7 +114,7 @@ namespace Graphics {
 
 		/// <summary>焼くときの光。変わったら焼き直す</summary>
 		struct LightingKey {
-			float values[16] = {};
+			float values[17] = {};
 			uint32_t clusteredLightCount = 0;
 			int32_t punctualCount = 0;
 		};
@@ -159,6 +161,7 @@ namespace Graphics {
 		std::vector<uint32_t> bakeQueue_;
 
 		bool isAutoRebake_ = true;
+		uint32_t activeProbeCount_ = 0;
 		bool hasLightingKey_ = false;
 		LightingKey bakedLighting_;
 		uint32_t framesSinceRebake_ = 0;

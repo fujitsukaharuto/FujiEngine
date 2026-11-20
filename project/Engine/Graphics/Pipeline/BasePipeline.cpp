@@ -10,6 +10,8 @@ using namespace DXC;
 
 
 BasePipeline::~BasePipeline() {
+	activePso_ = nullptr;
+	psoVariant_.Reset();
 	pso_.Reset();
 	rootSignature_.Reset();
 	ps.Reset();
@@ -23,6 +25,7 @@ void BasePipeline::Initialize(DXCom* pDxcom) {
 
 	CreateRootSignature(dxcommon_->GetDevice());
 	CreatePSO(dxcommon_->GetDevice());
+	activePso_ = pso_.Get();
 
 }
 
@@ -30,8 +33,15 @@ void BasePipeline::SetPipelineState() {
 
 	ID3D12GraphicsCommandList* commandList = dxcommon_->GetDXCommand()->GetList();
 	commandList->SetGraphicsRootSignature(rootSignature_.Get());
-	commandList->SetPipelineState(pso_.Get());
+	commandList->SetPipelineState(activePso_);
 
+}
+
+void BasePipeline::SetVariantState(bool isVariant) {
+	if (!psoVariant_) {
+		return;
+	}
+	dxcommon_->GetDXCommand()->GetList()->SetPipelineState(isVariant ? psoVariant_.Get() : activePso_);
 }
 
 void BasePipeline::SetPipelineCSState(uint32_t index) {

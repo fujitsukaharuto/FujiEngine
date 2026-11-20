@@ -205,10 +205,11 @@ void AnimationModel::SkinClusterUpdate() {
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 	for (size_t jointIndex = 0; jointIndex < skeleton_.joints.size(); jointIndex++) {
 		assert(jointIndex < skinCluster_.inverseBindPoseMatrices.size());
-		skinCluster_.mappedPalette[frameIndex][jointIndex].skeletonSpaceMatrix =
+		// 書き込んだ先 (Upload ヒープ) から読み戻すと遅いので、手元の行列から求める
+		const Matrix4x4 skeletonSpace =
 			Multiply(skinCluster_.inverseBindPoseMatrices[jointIndex], skeleton_.joints[jointIndex].skeletonSpaceMatrix);
-		skinCluster_.mappedPalette[frameIndex][jointIndex].skeletonSpaceInverseTransposeMatrix =
-			Transpose(Inverse(skinCluster_.mappedPalette[frameIndex][jointIndex].skeletonSpaceMatrix));
+		skinCluster_.mappedPalette[frameIndex][jointIndex].skeletonSpaceMatrix = skeletonSpace;
+		skinCluster_.mappedPalette[frameIndex][jointIndex].skeletonSpaceInverseTransposeMatrix = Transpose(Inverse(skeletonSpace));
 	}
 }
 

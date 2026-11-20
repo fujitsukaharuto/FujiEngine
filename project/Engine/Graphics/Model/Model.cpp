@@ -8,6 +8,7 @@
 #include "Engine/Graphics/Raytracing/RaytracingScene.h"
 #include "Engine/Graphics/Raytracing/RayTracedAOPass.h"
 #include "Engine/Graphics/Raytracing/RayTracedShadowPass.h"
+#include "Engine/Graphics/Raytracing/PunctualShadowPass.h"
 #include "Engine/Graphics/IBL/IBLBaker.h"
 #include "Engine/Graphics/Raytracing/DDGIPass.h"
 #include "Engine/Graphics/Raytracing/BakedGIPass.h"
@@ -15,7 +16,10 @@
 #include "Engine/Graphics/Light/ClusteredLightPass.h"
 #include "Engine/Graphics/Raytracing/ScreenProbeGIPass.h"
 #include "Engine/Graphics/Raytracing/ScreenReflectionPass.h"
+#include "Engine/Graphics/Raytracing/ScreenSpaceGIPass.h"
 #include "Engine/Graphics/Object/RefractionCapture.h"
+#include "Engine/Graphics/SkyBox/SkyAtmosphere.h"
+#include "Engine/Graphics/Raytracing/VolumetricFogPass.h"
 #include "Engine/Graphics/Texture/TextureManager.h"
 #include "Engine/DXC/DXCom.h"
 
@@ -149,6 +153,40 @@ namespace {
 			commandList, RootName::kScreenReflection, reflection->GetResultSrvHandle());
 	}
 
+	/// <summary>画面の照り返しをバインドする</summary>
+	/// <remarks>切っていてもバインドが要る</remarks>
+	void BindScreenSpaceGI(ID3D12GraphicsCommandList* commandList) {
+		auto* ssgi = ObjectRenderer::GetInstance()->GetScreenSpaceGIPass();
+		if (ssgi == nullptr) { return; }
+
+		PipelineManager::GetInstance()->SetGraphicsRootDescriptorTable(
+			commandList, RootName::kScreenSpaceGI, ssgi->GetResultSrvHandle());
+	}
+
+	/// <summary>空気遠近の3Dの表をバインドする</summary>
+	/// <remarks>表を作っていないフレームもバインドが要る</remarks>
+	void BindAerialPerspective(ID3D12GraphicsCommandList* commandList) {
+		const SkyAtmosphere* atmosphere = ObjectRenderer::GetInstance()->GetSkyAtmosphere();
+		if (atmosphere == nullptr) { return; }
+
+		PipelineManager* pPipeManager = PipelineManager::GetInstance();
+		pPipeManager->SetGraphicsRootCBV(commandList, RootName::kAerialPerspective, atmosphere->GetAerialPerspectiveParamsAddress());
+		pPipeManager->SetGraphicsRootDescriptorTable(commandList, RootName::kAerialScatter, atmosphere->GetAerialScatterSrvHandle());
+		pPipeManager->SetGraphicsRootDescriptorTable(commandList, RootName::kAerialTransmittance, atmosphere->GetAerialTransmittanceSrvHandle());
+	}
+
+	/// <summary>ボリュメトリックフォグの表をバインドする</summary>
+	/// <remarks>表を作っていないフレームもバインドが要る</remarks>
+	void BindVolumetricFog(ID3D12GraphicsCommandList* commandList) {
+		const VolumetricFogPass* fog = ObjectRenderer::GetInstance()->GetVolumetricFogPass();
+		if (fog == nullptr) { return; }
+
+		PipelineManager* pPipeManager = PipelineManager::GetInstance();
+		pPipeManager->SetGraphicsRootCBV(commandList, RootName::kVolumetricFog, fog->GetParamsGPUVirtualAddress());
+		pPipeManager->SetGraphicsRootDescriptorTable(commandList, RootName::kVolumetricFogVolume, fog->GetVolumeSrvHandle());
+		pPipeManager->SetGraphicsRootDescriptorTable(commandList, RootName::kLocalFogVolumes, fog->GetLocalFogVolumesSrvHandle());
+	}
+
 	/// <summary>半透明の屈折に使う画面の写しをバインドする</summary>
 	void BindRefraction(ID3D12GraphicsCommandList* commandList) {
 		if (const RefractionCapture* refraction = ObjectRenderer::GetInstance()->GetRefractionCapture()) {
@@ -174,6 +212,10 @@ namespace {
 
 		PipelineManager::GetInstance()->SetGraphicsRootDescriptorTable(
 			commandList, RootName::kShadowTexture, shadowPass->GetShadowSrvHandle());
+		if (auto* punctualPass = ObjectRenderer::GetInstance()->GetPunctualShadowPass()) {
+			PipelineManager::GetInstance()->SetGraphicsRootDescriptorTable(
+				commandList, RootName::kPunctualShadowTexture, punctualPass->GetShadowSrvHandle());
+		}
 	}
 }
 
@@ -192,6 +234,8 @@ void Model::Draw(ID3D12GraphicsCommandList* commandList, std::vector<Material>& 
 	assert(materials.size() >= mesh_.size() && "マテリアル数がメッシュ数に足りていない");
 	const size_t drawCount = (materials.size() < mesh_.size()) ? materials.size() : mesh_.size();
 
+	// 層 (クリアコート・異方性・布の光沢) か視差を使うマテリアルだけ、それを計算する PSO で描く。結線はそのまま使える
+	bool isLayered = false;
 	for (uint32_t index = 0; index < drawCount; ++index) {
 		PipelineManager* pPipeManager = PipelineManager::GetInstance();
 
@@ -208,13 +252,23 @@ void Model::Draw(ID3D12GraphicsCommandList* commandList, std::vector<Material>& 
 		BindClusteredLights(commandList);
 		BindScreenProbeGI(commandList);
 		BindScreenReflection(commandList);
+		BindAerialPerspective(commandList);
+		BindVolumetricFog(commandList);
+		BindScreenSpaceGI(commandList);
 		BindRefraction(commandList);
 		BindScreenSpaceAO(commandList);
 		BindScreenSpaceShadow(commandList);
 
+		if (materials[index].HasExtendedShading() != isLayered) {
+			isLayered = !isLayered;
+			pPipeManager->SetPipelineVariant(isLayered);
+		}
 		commandList->IASetVertexBuffers(0, 1, &mesh_[index].GetVBV());
 		commandList->IASetIndexBuffer(&mesh_[index].GetIBV());
 		commandList->DrawIndexedInstanced(static_cast<UINT>(mesh_[index].GetIndexCount()), 1, 0, 0, 0);
+	}
+	if (isLayered) {
+		PipelineManager::GetInstance()->SetPipelineVariant(false);
 	}
 }
 
@@ -225,6 +279,8 @@ void Model::AnimationDraw(ID3D12GraphicsCommandList* commandList, std::vector<Sk
 	if (materials.size() < drawCount) { drawCount = materials.size(); }
 	if (skinnedMeshes.size() < drawCount) { drawCount = skinnedMeshes.size(); }
 
+	// 層 (クリアコート・異方性・布の光沢) か視差を使うマテリアルだけ、それを計算する PSO で描く。結線はそのまま使える
+	bool isLayered = false;
 	for (uint32_t index = 0; index < drawCount; ++index) {
 		PipelineManager* pPipeManager = PipelineManager::GetInstance();
 
@@ -240,13 +296,23 @@ void Model::AnimationDraw(ID3D12GraphicsCommandList* commandList, std::vector<Sk
 		BindClusteredLights(commandList);
 		BindScreenProbeGI(commandList);
 		BindScreenReflection(commandList);
+		BindAerialPerspective(commandList);
+		BindVolumetricFog(commandList);
+		BindScreenSpaceGI(commandList);
 		BindRefraction(commandList);
 		BindScreenSpaceAO(commandList);
 		BindScreenSpaceShadow(commandList);
 
+		if (materials[index].HasExtendedShading() != isLayered) {
+			isLayered = !isLayered;
+			pPipeManager->SetPipelineVariant(isLayered);
+		}
 		commandList->IASetVertexBuffers(0, 1, &skinnedMeshes[index].GetSkinnedVBV());
 		commandList->IASetIndexBuffer(&mesh_[index].GetIBV());
 		commandList->DrawIndexedInstanced(static_cast<UINT>(mesh_[index].GetIndexCount()), 1, 0, 0, 0);
+	}
+	if (isLayered) {
+		PipelineManager::GetInstance()->SetPipelineVariant(false);
 	}
 }
 
@@ -255,6 +321,7 @@ void Model::DrawPrepass(ID3D12GraphicsCommandList* commandList, std::vector<Mate
 
 	for (uint32_t index = 0; index < drawCount; ++index) {
 		PipelineManager* pPipeManager = PipelineManager::GetInstance();
+		materials[index].SetMeshIndex(static_cast<int32_t>(index));
 
 		pPipeManager->SetGraphicsRootCBV(commandList, RootName::kMaterial, materials[index].UploadAndGetResource()->GetGPUVirtualAddress());
 		pPipeManager->SetGraphicsRootDescriptorTable(commandList, RootName::kTextures, SRVManager::GetInstance()->GetGPUDescriptorHandle(0));
@@ -272,6 +339,7 @@ void Model::AnimationDrawPrepass(ID3D12GraphicsCommandList* commandList, std::ve
 
 	for (uint32_t index = 0; index < drawCount; ++index) {
 		PipelineManager* pPipeManager = PipelineManager::GetInstance();
+		materials[index].SetMeshIndex(static_cast<int32_t>(index));
 
 		pPipeManager->SetGraphicsRootCBV(commandList, RootName::kMaterial, materials[index].UploadAndGetResource()->GetGPUVirtualAddress());
 		pPipeManager->SetGraphicsRootDescriptorTable(commandList, RootName::kTextures, SRVManager::GetInstance()->GetGPUDescriptorHandle(0));

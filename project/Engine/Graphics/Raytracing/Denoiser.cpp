@@ -19,10 +19,12 @@ using namespace Graphics;
 
 namespace {
 
-	// 遮蔽率は0〜1の1チャンネル。R8だと平坦な階調に段差が見えるのでFP16
+	// 遮蔽率は0〜1。R8だと平坦な階調に段差が見えるのでFP16
 	constexpr DXGI_FORMAT kSignalFormat = DXGI_FORMAT_R16_FLOAT;
 	// 蓄積は x=信号, y=蓄積フレーム数
 	constexpr DXGI_FORMAT kHistoryFormat = DXGI_FORMAT_R16G16_FLOAT;
+	// 3チャンネル版は信号も蓄積も4チャンネル (蓄積の a=蓄積フレーム数)
+	constexpr DXGI_FORMAT kRGBFormat = DXGI_FORMAT_R16G16B16A16_FLOAT;
 
 	constexpr uint32_t kThreadGroupSize = 8;
 
@@ -32,29 +34,33 @@ namespace {
 }
 
 
-void Denoiser::Initialize(DXCom* pDxcom) {
+void Denoiser::Initialize(DXCom* pDxcom, bool isRGB) {
 	dxcommon_ = pDxcom;
+	isRGB_ = isRGB;
 
 	ID3D12Device* device = dxcommon_->GetDevice();
+	const DXGI_FORMAT signalFormat = isRGB_ ? kRGBFormat : kSignalFormat;
 
 	for (uint32_t i = 0; i < kFrameCount_; i++) {
-		history_[i].Create(device, kHistoryFormat, false);
+		history_[i].Create(device, isRGB_ ? kRGBFormat : kHistoryFormat, false);
 	}
 	// 読み手は結果のテクスチャを無条件に引くので、一度も書かれないフレーム
 	// (RayQuery非対応機や、この信号を切っている間)でも中身が定義されている必要がある
 	for (uint32_t i = 0; i < 2; i++) {
-		filter_[i].Create(device, kSignalFormat, true);
+		filter_[i].Create(device, signalFormat, true);
 	}
 	finalSrvIndex_ = filter_[0].srvIndex;
 
 	clearRtvHeap_ = Helper::CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
 
 	D3D12_CLEAR_VALUE clearValue{};
-	clearValue.Format = kSignalFormat;
+	clearValue.Format = signalFormat;
 	clearValue.Color[0] = 1.0f;
+	clearValue.Color[1] = 1.0f;
+	clearValue.Color[2] = 1.0f;
 
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
-	rtvDesc.Format = kSignalFormat;
+	rtvDesc.Format = signalFormat;
 	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 
 	// 初期化時はまだ描画のコマンドリストが開いていないので immediate 経路で流す。
@@ -189,7 +195,7 @@ void Denoiser::DispatchTemporal(uint32_t frameIndex, const GBufferPass& gbuffer,
 	dxcommon_->TransitionResource(filter_[0].resource.Get(), WorkTexture::kReadState, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 	gpuTimer_.Begin(cList, frameIndex, kTimer_Temporal);
 
-	pPipeManager->SetCSPipeline(Pipe::DenoiseTemporalCS);
+	pPipeManager->SetCSPipeline(isRGB_ ? Pipe::DenoiseTemporalRGBCS : Pipe::DenoiseTemporalCS);
 	pPipeManager->SetComputeRootCBV(cList, RootName::kCameraInfo,
 		CameraManager::GetInstance()->GetCamera()->GetCameraInfoGPUVirtualAddress());
 	pPipeManager->SetComputeRootCBV(cList, RootName::kDenoiseTemporalParam,
@@ -234,7 +240,7 @@ void Denoiser::DispatchSpatial(uint32_t frameIndex, const GBufferPass& gbuffer,
 	// 入力は前段が読み取り状態で置いていったもの。書き込み先だけを入れ替える
 	dxcommon_->TransitionResource(dst.resource.Get(), WorkTexture::kReadState, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 
-	pPipeManager->SetCSPipeline(Pipe::DenoiseSpatialCS);
+	pPipeManager->SetCSPipeline(isRGB_ ? Pipe::DenoiseSpatialRGBCS : Pipe::DenoiseSpatialCS);
 	pPipeManager->SetComputeRootCBV(cList, RootName::kCameraInfo,
 		CameraManager::GetInstance()->GetCamera()->GetCameraInfoGPUVirtualAddress());
 	pPipeManager->SetComputeRootCBV(cList, RootName::kDenoiseSpatialParam,

@@ -128,7 +128,7 @@ void Sprite::SetWvp() {
 	uint32_t frameIndex = dxcommon_->GetNowFrameCount();
 	wvpDataGPU_[frameIndex]->World = worldMatrix;
 	wvpDataGPU_[frameIndex]->WVP = worldViewProjectionMatrix;
-	wvpDataGPU_[frameIndex]->WorldInverseTransPose = Transpose(Inverse(wvpDataGPU_[frameIndex]->World));
+	wvpDataGPU_[frameIndex]->WorldInverseTransPose = Transpose(Inverse(worldMatrix));
 }
 
 // --- Rendererへ渡すためのGetter ---

@@ -16,6 +16,10 @@ namespace Graphics {
 		RayTracedShadowCS,    // G-Bufferを元に画面空間で平行光源のソフトシャドウを計算する
 		DenoiseTemporalCS,    // 前フレームへ再投影して信号を蓄積する(AOと影で共用)
 		DenoiseSpatialCS,     // à-trous のエッジ保持ブラーを1回掛ける(AOと影で共用)
+		DenoiseTemporalRGBCS, // DenoiseTemporalCS の3チャンネル版 (点光源とスポットの柔らかい影)
+		DenoiseSpatialRGBCS,  // DenoiseSpatialCS の3チャンネル版
+		PunctualShadowCS,     // G-Bufferを元に画面空間で点光源とスポットのソフトシャドウを3本まで計算する
+		ReflectionAddSplatsCS, // GPU 粒子を映り込みが引く画面の写しへ足す
 		IrradianceBakeCS,     // 環境マップを放射照度のキューブマップへ畳み込む(起動時に1回)
 		PrefilterEnvCS,       // 環境マップを粗さごとに畳み込む(起動時に1回、ミップごとに1回)
 		BRDFLutCS,            // split-sum の第2項の数表を焼く(起動時に1回)
@@ -25,6 +29,7 @@ namespace Graphics {
 		AtmosphereSkyViewCS,       // 空: カメラから見た空の数表
 		AtmosphereCaptureCS,       // 空: 数表をキューブマップへ写す
 		AtmosphereSummaryCS,       // 空: CPU へ読み戻す値
+		AtmosphereAerialPerspectiveCS, // 空: 空気遠近の3Dの表
 		DDGITraceCS,               // 間接光: プローブからレイを飛ばす
 		DDGIUpdateIrradianceCS,    // 間接光: レイの結果をプローブの放射照度へ畳み込む
 		DDGIUpdateDistanceCS,      // 間接光: 同、物までの距離
@@ -35,8 +40,12 @@ namespace Graphics {
 		ScreenProbeTemporalCS,     // 画面のプローブ: 前のフレームと混ぜる
 		ScreenReflectionTraceCS,   // 画面の映り込み: 鏡の向きへレイを飛ばす
 		ScreenReflectionResolveCS, // 画面の映り込み: 粗さに応じてぼかす
+		ScreenSpaceGITraceCS,      // 画面の照り返し: 深度の上でレイを進める
+		ScreenSpaceGIBlurCS,       // 画面の照り返し: 方向を分け合った模様を混ぜる
 		VolumetricLightTraceCS,    // 光の筋: 空気の中で太陽へ影のレイを飛ばす
 		VolumetricLightBlurCS,     // 光の筋: 進み始めのずらしの模様を均す
+		VolumetricFogScatterCS,    // ボリュメトリックフォグ: 箱ごとの霧の濃さと受ける光
+		VolumetricFogIntegrateCS,  // ボリュメトリックフォグ: 手前から積む
 		ClusterLightCullCS,        // 影なしのライト: クラスタごとのライトの一覧
 		RainDripFindCS,            // 雨だれが垂れる場所を探す (RainRenderer)
 		Normal,

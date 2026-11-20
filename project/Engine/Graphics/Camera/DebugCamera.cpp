@@ -4,6 +4,7 @@
 #include <cmath>
 #include <numbers>
 
+#include "Engine/Core/App/MyWindow.h"
 #include "Engine/Core/Input/Input.h"
 #include "Engine/Core/Debug/ImGuiManager.h"
 
@@ -47,8 +48,16 @@ void DebugCamera::InputUpdate() {
 
 	moveTrans_ = Vector3::GetZeroVec();
 
-	// ホイールでズーム
-	moveTrans_.z = Input::GetInstance()->GetWheel();
+	// ホイールでズーム。インスペクター等のデバッグGUIの上で回したときは動かさない
+#ifdef _DEBUGMODE
+	const MyWin::GameView& gameView = MyWin::GetGameView();
+	const bool isMouseOnGame = gameView.isOnPanel ? gameView.isHovered : !ImGui::GetIO().WantCaptureMouse;
+#else
+	const bool isMouseOnGame = true;
+#endif // _DEBUGMODE
+	if (isMouseOnGame) {
+		moveTrans_.z = Input::GetInstance()->GetWheel();
+	}
 
 	Vector2 mousePos = Input::GetInstance()->GetMousePosition();
 	float deltaX = mousePos.x - lastMousePos_.x;

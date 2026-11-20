@@ -154,6 +154,32 @@ namespace GameObject {
 		}
 	}
 
+	void GameObject::MeshInspectorGUI([[maybe_unused]] int meshIndex) {
+	#ifdef _DEBUGMODE
+		RenderObject* object = GetRenderObject();
+		if (!object || meshIndex < 0 || static_cast<size_t>(meshIndex) >= object->GetMaterialCount()) {
+			return;
+		}
+		Graphics::Material& material = object->GetMaterial(static_cast<size_t>(meshIndex));
+		Math::Vector4 color = material.GetColor();
+		if (ImGui::ColorEdit4("Color##mesh", &color.x)) {
+			material.SetColor(color);
+		}
+		float roughness = material.GetRoughness();
+		if (ImGui::SliderFloat("Roughness##mesh", &roughness, 0.0f, 1.0f)) {
+			material.SetRoughness(roughness);
+		}
+		float metallic = material.GetMetallic();
+		if (ImGui::SliderFloat("Metallic##mesh", &metallic, 0.0f, 1.0f)) {
+			material.SetMetallic(metallic);
+		}
+		Math::Vector3 emissive = material.GetEmissive();
+		if (ImGui::ColorEdit3("Emissive##mesh", &emissive.x, ImGuiColorEditFlags_HDR | ImGuiColorEditFlags_Float)) {
+			material.SetEmissive(emissive);
+		}
+	#endif // _DEBUGMODE
+	}
+
 	void GameObject::InspectorGUI() {
 	#ifdef _DEBUGMODE
 		// 見た目の編集UIは Object3dEditor / AnimationModelEditor に集約されている。
@@ -273,17 +299,33 @@ namespace GameObject {
 		return handle;
 	}
 
+	void GameObject::RegisterCollider(std::unique_ptr<BaseCollider> collider, const std::string& tag) {
+		collider->SetTag(tag);
+		collider->SetOwner(this);
+		collider->SetCollisionEnterCallback([this](const ColliderInfo& other) { OnCollisionEnter(other); });
+		collider->SetCollisionStayCallback([this](const ColliderInfo& other) { OnCollisionStay(other); });
+		collider->SetCollisionExitCallback([this](const ColliderInfo& other) { OnCollisionExit(other); });
+		colliders_.push_back(std::move(collider));
+	}
+
 	AABBCollider* GameObject::AddCollider(const std::string& tag) {
 		auto collider = std::make_unique<AABBCollider>();
 		AABBCollider* handle = collider.get();
+		RegisterCollider(std::move(collider), tag);
+		return handle;
+	}
 
-		handle->SetTag(tag);
-		handle->SetOwner(this);
-		handle->SetCollisionEnterCallback([this](const ColliderInfo& other) { OnCollisionEnter(other); });
-		handle->SetCollisionStayCallback([this](const ColliderInfo& other) { OnCollisionStay(other); });
-		handle->SetCollisionExitCallback([this](const ColliderInfo& other) { OnCollisionExit(other); });
+	SphereCollider* GameObject::AddSphereCollider(const std::string& tag) {
+		auto collider = std::make_unique<SphereCollider>();
+		SphereCollider* handle = collider.get();
+		RegisterCollider(std::move(collider), tag);
+		return handle;
+	}
 
-		colliders_.push_back(std::move(collider));
+	CapsuleCollider* GameObject::AddCapsuleCollider(const std::string& tag) {
+		auto collider = std::make_unique<CapsuleCollider>();
+		CapsuleCollider* handle = collider.get();
+		RegisterCollider(std::move(collider), tag);
 		return handle;
 	}
 

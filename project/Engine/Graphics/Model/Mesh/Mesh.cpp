@@ -140,6 +140,19 @@ float Mesh::GetBoundingRadius() const {
 	return std::sqrt(maxSquared);
 }
 
+bool Mesh::GetBounds(Math::Vector3& min, Math::Vector3& max) const {
+	if (vertexData_.empty()) {
+		return false;
+	}
+	min = { vertexData_[0].pos.x, vertexData_[0].pos.y, vertexData_[0].pos.z };
+	max = min;
+	for (const VertexData& vertex : vertexData_) {
+		min = { (std::min)(min.x, vertex.pos.x), (std::min)(min.y, vertex.pos.y), (std::min)(min.z, vertex.pos.z) };
+		max = { (std::max)(max.x, vertex.pos.x), (std::max)(max.y, vertex.pos.y), (std::max)(max.z, vertex.pos.z) };
+	}
+	return true;
+}
+
 void Mesh::AddVertex(const VertexData& vertex) {
 	vertexData_.push_back(vertex);
 }

@@ -37,6 +37,7 @@ namespace Graphics {
 		inline const RootParam kBakedProbeData{ "gBakedProbeData" };
 		inline const RootParam kAOTexture{ "gAOTexture" };			// 画面空間の計算済みAO(前方描画が引く)
 		inline const RootParam kShadowTexture{ "gShadowTexture" };	// 画面空間の計算済み遮蔽率(前方描画が引く)
+		inline const RootParam kPunctualShadowTexture{ "gPunctualShadowTexture" };	// 点光源とスポットの柔らかい影(前方描画が引く)
 		inline const RootParam kIrradianceMap{ "gIrradianceMap" };	// 焼いた放射照度(拡散のアンビエント)
 		inline const RootParam kPrefilteredEnv{ "gPrefilteredEnv" };	// 粗さごとに焼いた環境マップ(鏡面のアンビエント)
 		inline const RootParam kBRDFLut{ "gBRDFLut" };				// split-sum の第2項の数表
@@ -62,6 +63,11 @@ namespace Graphics {
 		inline const RootParam kSkyViewOut{ "gSkyViewOut" };
 		inline const RootParam kSkyCubeOut{ "gSkyCubeOut" };
 		inline const RootParam kSummaryOut{ "gSummaryOut" };
+		inline const RootParam kAerialPerspective{ "gAerialPerspective" };		// 空気遠近の表の定数 (前方描画も引く)
+		inline const RootParam kAerialScatter{ "gAerialScatter" };				// 前方描画が引く
+		inline const RootParam kAerialTransmittance{ "gAerialTransmittance" };
+		inline const RootParam kAerialScatterOut{ "gAerialScatterOut" };
+		inline const RootParam kAerialTransmittanceOut{ "gAerialTransmittanceOut" };
 
 		// --- プローブの間接光 (DDGI) ---
 		inline const RootParam kDDGIVolume{ "gDDGIVolume" };			// 更新している格子 1つぶん
@@ -83,6 +89,8 @@ namespace Graphics {
 		inline const RootParam kAOPassParam{ "AOPassParam" };
 		inline const RootParam kShadowOutput{ "gShadowOutput" };
 		inline const RootParam kShadowPassParam{ "ShadowPassParam" };
+		inline const RootParam kPunctualShadowOutput{ "gPunctualShadowOutput" };
+		inline const RootParam kPunctualShadowParam{ "PunctualShadowParam" };
 
 		// --- 画面のプローブの間接光 ---
 		inline const RootParam kScreenProbeParam{ "ScreenProbeParam" };
@@ -109,7 +117,16 @@ namespace Graphics {
 		inline const RootParam kReflectionBlurInput{ "gReflectionBlurInput" };
 		inline const RootParam kReflectionOut{ "gReflectionOut" };
 		inline const RootParam kReflectionSceneColor{ "gReflectionSceneColor" };
+		inline const RootParam kReflectionSceneColorOut{ "gReflectionSceneColorOut" };
 		inline const RootParam kScreenReflection{ "gScreenReflection" };	// 前方描画が引く結果
+
+		// --- 画面の照り返し (ScreenSpaceGIPass) ---
+		inline const RootParam kSSGIPassParam{ "SSGIPassParam" };
+		inline const RootParam kSSGISceneColor{ "gSSGISceneColor" };
+		inline const RootParam kSSGITraceOut{ "gSSGITraceOut" };
+		inline const RootParam kSSGIBlurInput{ "gSSGIBlurInput" };
+		inline const RootParam kSSGIOut{ "gSSGIOut" };
+		inline const RootParam kScreenSpaceGI{ "gScreenSpaceGI" };	// 前方描画が引く結果
 
 		// --- 反射プローブ (ReflectionProbePass / Common/ReflectionProbe.hlsli) ---
 		inline const RootParam kReflectionProbes{ "gReflectionProbes" };			// 畳んだキューブの配列
@@ -146,6 +163,15 @@ namespace Graphics {
 		inline const RootParam kVolumetricBlurInput{ "gVolumetricBlurInput" };
 		inline const RootParam kVolumetricOut{ "gVolumetricOut" };
 		inline const RootParam kVolumetricLight{ "gVolumetricLight" };	// 画面へ足す側が引く結果
+
+		// --- ボリュメトリックフォグ (VolumetricFogPass / Common/VolumetricFog.hlsli) ---
+		inline const RootParam kVolumetricFog{ "gVolumetricFog" };				// 定数 (前方描画・空・映り込みも引く)
+		inline const RootParam kVolumetricFogVolume{ "gVolumetricFogVolume" };	// 積んだ表 (前方描画・空・映り込みが引く)
+		inline const RootParam kLocalFogVolumes{ "gLocalFogVolumes" };			// 局所の霧 (前方描画・空・映り込みも引く)
+		inline const RootParam kVolumetricFogHistory{ "gVolumetricFogHistory" };
+		inline const RootParam kVolumetricFogScatterOut{ "gVolumetricFogScatterOut" };
+		inline const RootParam kVolumetricFogScatter{ "gVolumetricFogScatter" };
+		inline const RootParam kVolumetricFogOut{ "gVolumetricFogOut" };
 
 		// --- デノイザ(AOと影で共用) ---
 		inline const RootParam kDenoiseRaw{ "gDenoiseRaw" };

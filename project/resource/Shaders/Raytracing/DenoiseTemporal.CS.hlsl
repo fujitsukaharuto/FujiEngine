@@ -30,12 +30,68 @@ Texture2D<float4> gGBufferNormal : register(t0);
 Texture2D<float> gGBufferDepth : register(t1);
 Texture2D<float4> gGBufferNormalPrev : register(t2);
 Texture2D<float> gGBufferDepthPrev : register(t3);
+// DENOISE_RGB を付けると3チャンネルの信号を1回でならす (DenoiseTemporalRGB.CS.hlsl)
+#ifdef DENOISE_RGB
+typedef float3 DenoiseSignal;
+Texture2D<float4> gDenoiseRaw : register(t4);
+Texture2D<float4> gDenoiseHistoryPrev : register(t5);
+RWTexture2D<float4> gDenoiseHistoryOut : register(u0); // rgb=信号, a=蓄積フレーム数
+RWTexture2D<float4> gDenoiseFilterOut : register(u1);
+
+DenoiseSignal LoadRaw(int2 pixel)
+{
+    return gDenoiseRaw.Load(int3(pixel, 0)).rgb;
+}
+
+void LoadHistory(int2 pixel, out DenoiseSignal signal, out float count)
+{
+    float4 history = gDenoiseHistoryPrev.Load(int3(pixel, 0));
+    signal = history.rgb;
+    count = history.a;
+}
+
+void StoreResult(uint2 pixel, DenoiseSignal signal, float count)
+{
+    gDenoiseHistoryOut[pixel] = float4(signal, count);
+    gDenoiseFilterOut[pixel] = float4(signal, 0.0f);
+}
+
+float MaxComponent(DenoiseSignal value)
+{
+    return max(value.r, max(value.g, value.b));
+}
+#else
+typedef float DenoiseSignal;
 Texture2D<float> gDenoiseRaw : register(t4);
 Texture2D<float2> gDenoiseHistoryPrev : register(t5);
 
 // 次フレームへ渡す履歴と、空間フィルタへ渡す信号でチャンネル数が違うので出力を分ける
 RWTexture2D<float2> gDenoiseHistoryOut : register(u0); // x=信号, y=蓄積フレーム数
 RWTexture2D<float> gDenoiseFilterOut : register(u1);
+
+DenoiseSignal LoadRaw(int2 pixel)
+{
+    return gDenoiseRaw.Load(int3(pixel, 0)).r;
+}
+
+void LoadHistory(int2 pixel, out DenoiseSignal signal, out float count)
+{
+    float2 history = gDenoiseHistoryPrev.Load(int3(pixel, 0)).xy;
+    signal = history.x;
+    count = history.y;
+}
+
+void StoreResult(uint2 pixel, DenoiseSignal signal, float count)
+{
+    gDenoiseHistoryOut[pixel] = float2(signal, count);
+    gDenoiseFilterOut[pixel] = signal;
+}
+
+float MaxComponent(DenoiseSignal value)
+{
+    return value;
+}
+#endif
 
 [numthreads(8, 8, 1)]
 void main(uint3 dispatchID : SV_DispatchThreadID)
@@ -51,15 +107,15 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
     if (!LoadSurface(gGBufferNormal, gGBufferDepth, int2(pixel), normal, depth))
     {
         // 面が無い画素(空)。遮蔽しようがないので開けている扱いで、履歴も持たない
-        gDenoiseHistoryOut[pixel] = float2(1.0f, 0.0f);
-        gDenoiseFilterOut[pixel] = 1.0f;
+        StoreResult(pixel, (DenoiseSignal) 1.0f, 0.0f);
         return;
     }
 
-    float raw = gDenoiseRaw.Load(int3(pixel, 0)).r;
+    DenoiseSignal raw = LoadRaw(int2(pixel));
     float3 worldPos = ReconstructWorldPos(pixel, screenSize, depth, invViewProj);
 
-    float2 history = float2(0.0f, 0.0f);
+    DenoiseSignal historySignal = (DenoiseSignal) 0.0f;
+    float historyCount = 0.0f;
     float historyWeight = 0.0f;
 
     if (hasHistory != 0)
@@ -113,47 +169,51 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
                     continue;
                 }
 
-                history += bilinear[i] * gDenoiseHistoryPrev.Load(int3(tap, 0)).xy;
+                DenoiseSignal tapSignal;
+                float tapCount;
+                LoadHistory(tap, tapSignal, tapCount);
+                historySignal += bilinear[i] * tapSignal;
+                historyCount += bilinear[i] * tapCount;
                 historyWeight += bilinear[i];
             }
         }
     }
 
-    float filtered = raw;
+    DenoiseSignal filtered = raw;
     float historyLength = 1.0f;
 
     if (historyWeight > 0.0f)
     {
-        history /= historyWeight;
+        historySignal /= historyWeight;
+        historyCount /= historyWeight;
 
         // 再投影はカメラの動きしか追えず、遮蔽物が動くと古い影が残る。
         // 履歴を近傍の生の信号の範囲へ収めて追従させる
         if (historyClamp != 0)
         {
-            float lo = raw;
-            float hi = raw;
+            DenoiseSignal lo = raw;
+            DenoiseSignal hi = raw;
             for (int y = -1; y <= 1; y++)
             {
                 for (int x = -1; x <= 1; x++)
                 {
                     int2 tap = clamp(int2(pixel) + int2(x, y), int2(0, 0), int2(screenSize) - 1);
-                    float v = gDenoiseRaw.Load(int3(tap, 0)).r;
+                    DenoiseSignal v = LoadRaw(tap);
                     lo = min(lo, v);
                     hi = max(hi, v);
                 }
             }
 
-            float clamped = clamp(history.x, lo, hi);
+            DenoiseSignal clamped = clamp(historySignal, lo, hi);
             // 大きく切り詰めた＝そこの値が変わった。蓄積も浅い扱いへ戻して、以後の追従も速める
-            history.y *= 1.0f - saturate(abs(clamped - history.x) * 4.0f);
-            history.x = clamped;
+            historyCount *= 1.0f - saturate(MaxComponent(abs(clamped - historySignal)) * 4.0f);
+            historySignal = clamped;
         }
 
-        historyLength = min(history.y + 1.0f, maxHistoryLength);
+        historyLength = min(historyCount + 1.0f, maxHistoryLength);
         // 浅いうちは 1/n の単純平均、上限に達すると指数移動平均になる
-        filtered = lerp(history.x, raw, 1.0f / historyLength);
+        filtered = lerp(historySignal, raw, 1.0f / historyLength);
     }
 
-    gDenoiseHistoryOut[pixel] = float2(filtered, historyLength);
-    gDenoiseFilterOut[pixel] = filtered;
+    StoreResult(pixel, filtered, historyLength);
 }

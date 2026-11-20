@@ -78,6 +78,9 @@ namespace Graphics {
 		uint32_t GetIndexSrvIndex() const { return indexSrvIndex_; }
 		/// <summary>モデルの原点から、いちばん遠い頂点までの距離</summary>
 		float GetBoundingRadius() const;
+		/// <summary>頂点を包む箱 (メッシュの座標)</summary>
+		/// <returns>頂点が無ければ false</returns>
+		bool GetBounds(Math::Vector3& min, Math::Vector3& max) const;
 
 	private:
 

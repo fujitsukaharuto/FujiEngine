@@ -139,6 +139,8 @@ namespace Graphics {
 		/// <returns>Vector3</returns>
 		/// <remarks>ワールド行列から取り出すのでシェイクもデバッグカメラも反映される</remarks>
 		Math::Vector3 GetTranslate() const;
+		float GetNearClip() const { return nearClip_; }
+		float GetFarClip() const { return farClip_; }
 
 	private:
 

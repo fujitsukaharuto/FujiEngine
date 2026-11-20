@@ -30,6 +30,7 @@ namespace Scene {
 		void Draw();
 
 		/// <summary>最初のシーンを決める</summary>
+		/// <remarks>環境変数 FUJI_SCENE に登録済みのシーン名があれば、そちらで始める</remarks>
 		void StartScene(const std::string& sceneName);
 
 		/// <summary>次シーンへ移行</summary>
@@ -58,6 +59,10 @@ namespace Scene {
 	private:
 
 		void SceneChangeGUI();
+		/// <summary>コライダーの線とカメラの正面へのレイキャストの設定</summary>
+		void CollisionDebugGUI();
+		/// <summary>コライダーの線とカメラの正面へのレイキャストを描く。GUI の窓が隠れていても毎フレーム</summary>
+		void DrawCollisionDebug();
 
 		/// <summary>前のシーンが残した状態を消し、scene_ を始める</summary>
 		/// <remarks>GPUエミッターと一時停止を戻し、配置データを読んで Initialize する</remarks>
@@ -89,6 +94,10 @@ namespace Scene {
 		float changeExtraTime = 0.0f;
 		int sceneSelection_ = 0;
 		char entryInput_[64] = {};
+		// 当たり判定の確認用。全部のコライダーの線と、カメラの正面へのレイキャスト
+		bool isShowColliders_ = false;
+		bool isCameraRay_ = false;
+		std::string cameraRayHit_;
 	};
 
 }

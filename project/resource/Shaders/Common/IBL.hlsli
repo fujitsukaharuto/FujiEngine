@@ -10,7 +10,7 @@
 // gEnvironment(t0) は RayTracedReflection.hlsli が宣言しているので、その続きに並べる
 TextureCube<float4> gIrradianceMap : register(t1, space1);
 TextureCube<float4> gPrefilteredEnv : register(t2, space1);
-Texture2D<float2> gBRDFLut : register(t3, space1);
+Texture2D<float4> gBRDFLut : register(t3, space1); // xy = split-sum の第2項、z = 布の光沢の反射率
 
 // AllLights::ambientMode の値。C++ 側 (LightManager.h の AmbientMode) と同じ値であること
 static const uint kAmbientModeHemisphere = 0; // 空色と地面色の2色補間
@@ -34,6 +34,8 @@ static const uint kRenderFlagSpecularAA = 1u << 7;         // ハイライトの
 static const uint kRenderFlagReflectionSceneColor = 1u << 8; // 別パスの映り込みで画面の色を使う (SSR)
 static const uint kRenderFlagTranslucentShadow = 1u << 9;    // 半透明の物の色つきの影。TLAS に半透明の物があるときだけ立つ
 static const uint kRenderFlagLocalLightAO = 1u << 10;        // 影なしのライトにも AO を掛ける
+static const uint kRenderFlagScreenSpaceGI = 1u << 11;       // 画面の照り返し (SSGI)
+static const uint kRenderFlagSoftLocalShadow = 1u << 12;     // 点光源とスポットの柔らかい影 (PunctualShadowPass)
 
 /// <summary>split-sum の第2項の数表。x が F0 に掛かる係数、y が足す項</summary>
 float2 SampleBRDFLut(float NdotV, float roughness, SamplerState smp)
@@ -42,7 +44,15 @@ float2 SampleBRDFLut(float NdotV, float roughness, SamplerState smp)
     // 半texel 内側へ寄せて防ぐ
     const float halfTexel = 0.5f / kBRDFLutSize;
     float2 uv = clamp(float2(NdotV, roughness), halfTexel, 1.0f - halfTexel);
-    return gBRDFLut.SampleLevel(smp, uv, 0.0f);
+    return gBRDFLut.SampleLevel(smp, uv, 0.0f).xy;
+}
+
+/// <summary>布の光沢 (sheen) の反射率 E(N・V, 粗さ)。下の層をどれだけ暗くするかに使う</summary>
+float SampleSheenAlbedo(float NdotV, float sheenRoughness, SamplerState smp)
+{
+    const float halfTexel = 0.5f / kBRDFLutSize;
+    float2 uv = clamp(float2(NdotV, sheenRoughness), halfTexel, 1.0f - halfTexel);
+    return gBRDFLut.SampleLevel(smp, uv, 0.0f).z;
 }
 
 /// <summary>鏡面の反射率。split-sum の第2項を数表から引いて F0 に当てる</summary>

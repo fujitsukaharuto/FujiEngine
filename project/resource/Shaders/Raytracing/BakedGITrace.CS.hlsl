@@ -11,10 +11,6 @@ ConstantBuffer<AllLights> gLights : register(b0);
 RWTexture2D<float4> gDDGIRayData : register(u0);
 ConstantBuffer<DDGIVolume> gDDGIVolume : register(b5);
 
-// 配置物だけ。RaytracingScene.h の kInstanceMaskStatic* と同じ値であること
-static const uint kRayMaskStaticOpaque = 0x04;
-static const uint kRayMaskStaticTranslucent = 0x08;
-
 /// <summary>何にも当たらなかったレイが運ぶ、その成分の明るさ</summary>
 /// <remarks>空は HemisphereAmbient と同じ割合で上と下の色に分ける</remarks>
 float3 BakeMissRadiance(DDGIVolume volume, float3 direction)

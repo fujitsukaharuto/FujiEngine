@@ -143,6 +143,13 @@ void Material::SetOcclusionMap(const std::string& name) {
 	materialData_.useOcclusionMap = occlusionMap_ ? 1 : 0;
 }
 
+void Material::SetHeightMap(const std::string& name, float scale) {
+	// 高さは色ではないので sRGB にしない
+	heightMap_ = name.empty() ? nullptr : TextureManager::GetInstance()->GetLinearTexture(name, false);
+	materialData_.useHeightMap = heightMap_ ? 1 : 0;
+	materialData_.heightScale = scale;
+}
+
 void Material::SetLightEnable(LightMode mode) {
 	materialData_.enableLighting = static_cast<int32_t>(mode);
 }
@@ -182,6 +189,16 @@ void Material::CopyData(uint32_t frameIndex) {
 	materialDataGPU_[frameIndex]->useEmissiveMap = materialData_.useEmissiveMap;
 	materialDataGPU_[frameIndex]->occlusionMapIndex = occlusionMap_ ? static_cast<int32_t>(occlusionMap_->srvIndex) : 0;
 	materialDataGPU_[frameIndex]->useOcclusionMap = materialData_.useOcclusionMap;
+	materialDataGPU_[frameIndex]->clearCoat = materialData_.clearCoat;
+	materialDataGPU_[frameIndex]->clearCoatRoughness = materialData_.clearCoatRoughness;
+	materialDataGPU_[frameIndex]->anisotropy = materialData_.anisotropy;
+	materialDataGPU_[frameIndex]->anisotropyRotation = materialData_.anisotropyRotation;
+	materialDataGPU_[frameIndex]->sheenColor = materialData_.sheenColor;
+	materialDataGPU_[frameIndex]->sheenRoughness = materialData_.sheenRoughness;
+	materialDataGPU_[frameIndex]->heightMapIndex = heightMap_ ? static_cast<int32_t>(heightMap_->srvIndex) : 0;
+	materialDataGPU_[frameIndex]->useHeightMap = materialData_.useHeightMap;
+	materialDataGPU_[frameIndex]->heightScale = materialData_.heightScale;
+	materialDataGPU_[frameIndex]->meshIndex = materialData_.meshIndex;
 }
 
 Matrix4x4 Material::MakeScale4x4(const Vector3& scale) {

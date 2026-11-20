@@ -1,9 +1,12 @@
 #pragma once
 #include "Engine/Graphics/Pipeline/BasePipeline.h"
 #include "Engine/Graphics/Pipeline/PipeKind.h"
+#include "Engine/Graphics/Pipeline/ObjectShaderFeatures.h"
 #include <memory>
 #include <array>
 #include <functional>
+#include <future>
+#include <unordered_map>
 #include <vector>
 
 namespace DXC { class DXCom; }
@@ -45,6 +48,21 @@ namespace Graphics {
 		/// <param name="index"> 0=Normal/1=Immediate/2=Compute </param>
 		void SetCSPipeline(Pipe type, uint32_t index = 0);
 
+		/// <summary>今のパイプラインの、PS をマクロ違いでコンパイルした PSO へ切り替える (無ければ何もしない)</summary>
+		/// <remarks>ルートシグネチャが同じなので結線は消えない。描き終えたら false で戻すこと</remarks>
+		void SetPipelineVariant(bool isVariant);
+
+		/// <summary>前方描画の PS を、この機能 (ObjectShaderFeature の組み合わせ) だけでコンパイルしたものへ切り替える</summary>
+		/// <remarks>初めての組み合わせは裏でコンパイルし、出来るまでは全部入りで描く。描く前に毎フレーム呼ぶ</remarks>
+		void SetObjectFeatures(uint32_t features);
+		/// <summary>今張っている前方描画の PS の機能。全部入りなら kObjectFeatureAll</summary>
+		uint32_t GetActiveObjectFeatures() const { return activeObjectFeatures_; }
+		/// <summary>裏でコンパイルしている組み合わせがあるか</summary>
+		bool IsCompilingObjectFeatures() const;
+		/// <summary>false にすると常に全部入りで描く。比べる用</summary>
+		void SetObjectFeaturesEnabled(bool enabled) { isObjectFeaturesEnabled_ = enabled; }
+		bool IsObjectFeaturesEnabled() const { return isObjectFeaturesEnabled_; }
+
 		ID3D12RootSignature* GetRootSignature(Pipe type);
 
 		BasePipeline* GetCurrentPipeline() const { return currentPipeline_; }
@@ -76,10 +94,30 @@ namespace Graphics {
 		/// <remarks>中身は HLSL のコンパイルが大半。各パイプラインは互いを参照しないので並列に回せる</remarks>
 		void InitializePending();
 
+		/// <summary>前方描画の PS を features でコンパイルし、objectPipes_ の並びで PSO を作る。別スレッドで走る</summary>
+		/// <returns>失敗したら空</returns>
+		std::vector<Microsoft::WRL::ComPtr<ID3D12PipelineState>> BuildObjectFeaturePSOs(uint32_t features) const;
+
 	private:
+
+		/// <summary>
+		/// 前方描画の PS の機能の組み合わせ1つぶんの PSO
+		/// </summary>
+		struct ObjectFeatureVariant {
+			std::future<std::vector<Microsoft::WRL::ComPtr<ID3D12PipelineState>>> job;
+			// objectPipes_ と同じ並び。GPU が使い終えたか分からないので終了まで消さない
+			std::vector<Microsoft::WRL::ComPtr<ID3D12PipelineState>> psos;
+			bool isDone = false;
+		};
 
 		DXC::DXCom* dxcommon_;
 		std::array<std::unique_ptr<BasePipeline>, static_cast<size_t>(Pipe::Count)> pipelines_;
+
+		// hasObjectFeatures の付いたパイプ
+		std::vector<Pipe> objectPipes_;
+		std::unordered_map<uint32_t, ObjectFeatureVariant> objectVariants_;
+		uint32_t activeObjectFeatures_ = kObjectFeatureAll;
+		bool isObjectFeaturesEnabled_ = true;
 
 		/// <summary>生成済みでまだ Initialize していないもの。InitializePending() で消化する</summary>
 		std::vector<Pipe> pendingInit_;

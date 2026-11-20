@@ -22,13 +22,14 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
 
     float2 uv = (float2(dispatchID.xy) + 0.5f) / float2(width, height);
     float3 direction = DirectionFromCubeFace(dispatchID.z, uv);
-    float3 sky = gSkyViewLut.SampleLevel(gSampler, SkyViewDirectionToUv(direction), 0.0f).rgb;
+    float horizonZenith = AtmosphereHorizonZenith();
+    float3 sky = gSkyViewLut.SampleLevel(gSampler, SkyViewDirectionToUv(direction, horizonZenith), 0.0f).rgb;
 
     if (cloudCoverage > 0.0f)
     {
         float3 cloudPosition = float3(0.0f, bottomRadius + cameraHeight + kCloudHeight * 0.001f, 0.0f);
         float3 sunAtCloud = sunIlluminance * SunTransmittance(gTransmittanceLut, gSampler, cloudPosition, sunDirection);
-        float3 zenith = gSkyViewLut.SampleLevel(gSampler, SkyViewDirectionToUv(float3(0.0f, 1.0f, 0.0f)), 0.0f).rgb;
+        float3 zenith = gSkyViewLut.SampleLevel(gSampler, SkyViewDirectionToUv(float3(0.0f, 1.0f, 0.0f), horizonZenith), 0.0f).rgb;
         // 原点から見た雲にする
         float4 cloud = CloudLayer(direction, sunDirection, sunAtCloud, zenith, sky, cloudCoverage, cloudTime, float2(0.0f, 0.0f));
         sky = lerp(sky, cloud.rgb, cloud.a);

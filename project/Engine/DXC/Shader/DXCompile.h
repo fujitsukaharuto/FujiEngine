@@ -62,8 +62,9 @@ namespace DXC {
 		/// </summary>
 		/// <param name="filePath">ファイルパス</param>
 		/// <param name="profile">シェーダーレベル</param>
+		/// <param name="define">-D で渡すマクロ (例 L"MATERIAL_EXTENDED")。nullptr なら無し。キャッシュも別になる</param>
 		/// <returns>ShaderData</returns>
-		ShaderData CompileShaderWithReflection(const std::wstring& filePath, const wchar_t* profile);
+		ShaderData CompileShaderWithReflection(const std::wstring& filePath, const wchar_t* profile, const wchar_t* define = nullptr);
 
 		/// <summary>
 		/// リフレクションから入力レイアウトを生成

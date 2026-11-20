@@ -26,10 +26,6 @@ StructuredBuffer<ClusteredLight> gClusteredLights : register(t0, space10);
 
 RWTexture2DArray<float4> gProbeCaptureOut : register(u0);
 
-// 配置物だけ。RaytracingScene.h の kInstanceMaskStatic* と同じ値であること
-static const uint kRayMaskStaticOpaque = 0x04;
-static const uint kRayMaskStaticTranslucent = 0x08;
-
 /// <summary>影なしのライトが当たった面を照らすぶん (Lambert)</summary>
 float3 ClusteredLightsOnSurface(RayHitSurface surface)
 {

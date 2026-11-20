@@ -4,11 +4,15 @@
 #include <cctype>
 #include <cmath>
 #include <numbers>
+#include <string_view>
 #include "Engine/GameObject/PlacedObject.h"
 #include "Engine/GameObject/SpawnPoint.h"
 #include "Engine/GameObject/PlacedLight.h"
 #include "Engine/GameObject/GIVolume.h"
 #include "Engine/GameObject/ReflectionProbe.h"
+#include "Engine/GameObject/LocalFogVolume.h"
+#include "Engine/GameObject/PostProcessVolume.h"
+#include "Engine/GameObject/PlacedSpline.h"
 #include "Engine/Scene/Level.h"
 #include "Engine/Graphics/Sprite/PlacedSprite.h"
 #include "Engine/Graphics/Texture/TextureManager.h"
@@ -16,6 +20,8 @@
 #include "Engine/Graphics/Model/ModelManager.h"
 #include "Engine/Editor/Command/CommandManager.h"
 #include "Engine/Core/Debug/ImGuiManager.h"
+#include "Engine/Graphics/Line/Line3dDrawer.h"
+#include "Engine/Graphics/Model/Model.h"
 
 using namespace Core;
 using namespace Math;
@@ -75,12 +81,15 @@ namespace Editor {
 		return lower(object->GetName()).find(lower(filter_)) != std::string::npos;
 	}
 
-	bool GameObjectEditor::SelectByObjID(int objID) {
+	bool GameObjectEditor::SelectByObjID(int objID, int meshIndex) {
 		if (objID <= 0) {
 			return false;
 		}
 		for (Object* object : Object::GetAll()) {
 			if (object->OwnsObjID(objID)) {
+				// メッシュの番号は主ビジュアルのモデルのもの。子の描画物を拾ったときは選ばない
+				const Graphics::RenderObject* primary = object->GetRenderObject();
+				selectedMesh_ = (selectMode_ == SelectMode::Mesh && primary && primary->GetObjID() == objID) ? meshIndex : -1;
 				selected_ = object;
 				isEnvironmentSelected_ = false;
 				selectedSprite_ = nullptr;
@@ -131,34 +140,11 @@ namespace Editor {
 		Object* selected = GetSelected();
 		Graphics::PlacedSprite* selectedSprite = GetSelectedSprite(&level);
 		Object* added = nullptr;
-		if (ImGui::Button("Add Spawn")) {
-			// 原点に出るので、ギズモで動かして使う
-			added = level.AddSpawnPoint();
+		if (ImGui::BeginCombo("##place", "Place", ImGuiComboFlags_WidthFitPreview | ImGuiComboFlags_HeightLargest)) {
+			added = PlaceMenuItems(level);
+			ImGui::EndCombo();
 		}
 		ImGui::SameLine();
-		if (ImGui::Button("Point Light")) {
-			added = level.AddLight(false);
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("Spot Light")) {
-			added = level.AddLight(true);
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("Tube Light")) {
-			added = level.AddShapedLight(true);
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("Rect Light")) {
-			added = level.AddShapedLight(false);
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("GI Volume")) {
-			added = level.AddGIVolume();
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("Reflection Probe")) {
-			added = level.AddReflectionProbe();
-		}
 
 		const bool canDuplicate = selected && level.Contains(selected);
 		ImGui::BeginDisabled(!canDuplicate);
@@ -188,13 +174,54 @@ namespace Editor {
 			}
 		}
 		ImGui::EndDisabled();
+		// 保存は Remove から離して右端へ。入らなければ次の行の右端
+		const char* levelName = level.GetName().c_str();
+		const float saveWidth = ImGui::CalcTextSize(levelName).x + style.ItemSpacing.x + ImGui::CalcTextSize("Save").x + style.FramePadding.x * 2.0f;
+		ImGui::SameLine();
+		if (ImGui::GetContentRegionAvail().x < saveWidth) {
+			ImGui::NewLine();
+		}
+		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (std::max)(0.0f, ImGui::GetContentRegionAvail().x - saveWidth));
+		ImGui::AlignTextToFramePadding();
+		ImGui::TextDisabled("%s", levelName);
 		ImGui::SameLine();
 		if (ImGui::Button("Save")) {
 			level.Save();
 		}
-		ImGui::SameLine();
-		ImGui::TextDisabled("%s", level.GetName().c_str());
 		ImGui::Separator();
+	}
+
+	GameObjectEditor::Object* GameObjectEditor::PlaceMenuItems(Scene::Level& level) {
+		struct Item {
+			const char* category;
+			const char* label;
+			Object* (*place)(Scene::Level&);
+		};
+		// UE の Place Actors に倣って種類ごとに分ける。スポーンは原点に出るのでギズモで動かして使う
+		static constexpr Item kItems[] = {
+			{ "Basic", "Spawn Point", [](Scene::Level& l) -> Object* { return l.AddSpawnPoint(); } },
+			{ "Basic", "Spline", [](Scene::Level& l) -> Object* { return l.AddSpline(); } },
+			{ "Lights", "Point Light", [](Scene::Level& l) -> Object* { return l.AddLight(false); } },
+			{ "Lights", "Spot Light", [](Scene::Level& l) -> Object* { return l.AddLight(true); } },
+			{ "Lights", "Tube Light", [](Scene::Level& l) -> Object* { return l.AddShapedLight(true); } },
+			{ "Lights", "Rect Light", [](Scene::Level& l) -> Object* { return l.AddShapedLight(false); } },
+			{ "Volumes", "Fog Volume", [](Scene::Level& l) -> Object* { return l.AddLocalFogVolume(); } },
+			{ "Volumes", "Post Process Volume", [](Scene::Level& l) -> Object* { return l.AddPostProcessVolume(); } },
+			{ "Volumes", "Reflection Probe", [](Scene::Level& l) -> Object* { return l.AddReflectionProbe(); } },
+			{ "Volumes", "GI Volume", [](Scene::Level& l) -> Object* { return l.AddGIVolume(); } },
+		};
+		Object* placed = nullptr;
+		const char* category = nullptr;
+		for (const Item& item : kItems) {
+			if (category == nullptr || std::string_view(category) != item.category) {
+				category = item.category;
+				ImGui::SeparatorText(category);
+			}
+			if (ImGui::Selectable(item.label)) {
+				placed = item.place(level);
+			}
+		}
+		return placed;
 	}
 
 	void GameObjectEditor::HierarchyGUI(Scene::Level* level) {
@@ -212,6 +239,18 @@ namespace Editor {
 
 		Object* selected = GetSelected();
 		const std::vector<Object*>& all = Object::GetAll();
+
+		// クリックで選ぶ単位
+		int selectMode = static_cast<int>(selectMode_);
+		ImGui::TextUnformatted("Select");
+		ImGui::SameLine();
+		ImGui::RadioButton("Object##selectmode", &selectMode, static_cast<int>(SelectMode::Object));
+		ImGui::SameLine();
+		ImGui::RadioButton("Mesh##selectmode", &selectMode, static_cast<int>(SelectMode::Mesh));
+		if (selectMode != static_cast<int>(selectMode_)) {
+			selectMode_ = static_cast<SelectMode>(selectMode);
+			selectedMesh_ = -1;
+		}
 
 		const char* inactiveLabel = "非アクティブ";
 		const ImGuiStyle& style = ImGui::GetStyle();
@@ -260,6 +299,13 @@ namespace Editor {
 			}
 			if (level) {
 				SpriteListGUI(*level);
+				// 一覧の右クリックでも同じ物を置ける (Unity の Hierarchy と同じ)。物で埋まっていても開けるよう、行の上でも開く
+				if (ImGui::BeginPopupContextWindow("##placeContext", ImGuiPopupFlags_MouseButtonRight)) {
+					if (Object* placed = PlaceMenuItems(*level)) {
+						Select(placed);
+					}
+					ImGui::EndPopup();
+				}
 			}
 		}
 		ImGui::EndChild();
@@ -361,8 +407,56 @@ namespace Editor {
 			gizmo_.Manipulate(t, level && level->Contains(selected));
 		}
 
+		if (selectMode_ == SelectMode::Mesh && selectedMesh_ >= 0) {
+			MeshInspectorGUI(selected);
+		}
+
 		selected->InspectorGUI();
 		ImGui::PopID();
+	}
+
+	void GameObjectEditor::MeshInspectorGUI(Object* selected) {
+		const Graphics::RenderObject* object = selected->GetRenderObject();
+		if (!object || !object->GetModel()) {
+			return;
+		}
+		const auto& meshes = object->GetModel()->GetMeshes();
+		if (static_cast<size_t>(selectedMesh_) >= meshes.size()) {
+			selectedMesh_ = -1;
+			return;
+		}
+		if (ImGui::CollapsingHeader("Mesh", ImGuiTreeNodeFlags_DefaultOpen)) {
+			ImGui::Text("%d / %d", selectedMesh_, static_cast<int>(meshes.size()));
+			if (static_cast<size_t>(selectedMesh_) < object->GetMaterialCount()) {
+				Graphics::RenderObject* editable = selected->GetRenderObject();
+				const std::string texture = editable->GetMaterial(static_cast<size_t>(selectedMesh_)).GetPathName();
+				if (!texture.empty()) {
+					ImGui::TextDisabled("%s", texture.c_str());
+				}
+			}
+			selected->MeshInspectorGUI(selectedMesh_);
+		}
+
+		// 選んだメッシュを包む箱
+		Vector3 min;
+		Vector3 max;
+		if (!meshes[static_cast<size_t>(selectedMesh_)].GetBounds(min, max)) {
+			return;
+		}
+		const Matrix4x4 world = object->GetWorldMat();
+		Vector3 corners[8];
+		for (int i = 0; i < 8; i++) {
+			corners[i] = Transform({ (i & 1) ? max.x : min.x, (i & 2) ? max.y : min.y, (i & 4) ? max.z : min.z }, world);
+		}
+		const Vector4 color = { 1.0f,0.85f,0.2f,1.0f };
+		Graphics::Line3dDrawer* line = Graphics::Line3dDrawer::GetInstance();
+		for (int i = 0; i < 8; i++) {
+			for (int bit = 1; bit < 8; bit <<= 1) {
+				if ((i & bit) == 0) {
+					line->DrawLine3d(corners[i], corners[i | bit], color);
+				}
+			}
+		}
 	}
 
 	void GameObjectEditor::SpriteListGUI(Scene::Level& level) {

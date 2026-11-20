@@ -27,7 +27,7 @@ groupshared float3 gsDown[kThreadCount];
 
 float3 SampleSky(float3 direction)
 {
-    return gSkyViewLut.SampleLevel(gSampler, SkyViewDirectionToUv(direction), 0.0f).rgb;
+    return gSkyViewLut.SampleLevel(gSampler, SkyViewDirectionToUv(direction, AtmosphereHorizonZenith()), 0.0f).rgb;
 }
 
 [numthreads(kThreadCount, 1, 1)]
@@ -78,7 +78,7 @@ void main(uint3 threadID : SV_GroupThreadID)
         gSummaryOut[kSummaryHorizon + side] = float4(color / 3.0f, 1.0f);
     }
 
-    float3 origin = float3(0.0f, bottomRadius + max(cameraHeight, 0.001f), 0.0f);
+    float3 origin = float3(0.0f, AtmosphereViewHeight(), 0.0f);
     gSummaryOut[kSummarySunTransmittance] = float4(SunTransmittance(gTransmittanceLut, gSampler, origin, sunDirection), 1.0f);
     gSummaryOut[kSummaryMultiScattering] = float4(MultiScattering(gMultiScatterLut, gSampler, origin, sunDirection), 1.0f);
 }

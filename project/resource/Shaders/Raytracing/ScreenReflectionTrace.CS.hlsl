@@ -7,6 +7,15 @@ SamplerState gSampler : register(s0);
 ConstantBuffer<AllLights> gLights : register(b0);
 #include "../Common/RayHitLighting.hlsli"
 #include "../Common/ScreenReflectionCommon.hlsli"
+#include "../Common/AerialPerspective.hlsli"
+#include "../Common/VolumetricFog.hlsli"
+#include "../Common/ClusteredLights.hlsli"
+
+// 影なしのライト (ClusteredLightPass)
+ConstantBuffer<ClusterParams> gClusterParams : register(b3);
+StructuredBuffer<ClusteredLight> gClusteredLights : register(t0, space10);
+StructuredBuffer<uint> gClusterCounts : register(t1, space10);
+StructuredBuffer<uint> gClusterIndices : register(t2, space10);
 
 RWTexture2D<float4> gReflectionTraceOut : register(u0); // rgb=当たった物の明るさ, a=距離。空なら -1、飛ばしていなければ 0
 Texture2D<float4> gReflectionSceneColor : register(t6, space8); // 前のフレームの、不透明の物を描き終えた画面
@@ -19,6 +28,14 @@ static const float kBounceMaxRoughness = 0.4f;
 static const float kSceneColorEdgeFade = 0.05f;
 // これより霧が濃い所は画面の色を使わない
 static const float kSceneColorMaxFog = 0.9f;
+
+/// <summary>当たった面を光らせる。ShadeRayHit に影なしのライトを足したもの</summary>
+float3 ShadeReflectedSurface(RayHitSurface surface, float3 direction, bool useProbes)
+{
+    float3 clustered = ClusteredIrradianceAt(surface.position, surface.normal, gClusterParams,
+                                             gClusteredLights, gClusterCounts, gClusterIndices);
+    return ShadeRayHit(surface, direction, useProbes) + surface.albedo * clustered / kPI;
+}
 
 /// <summary>画面の上の UV。カメラの後ろなら範囲外の値を返す</summary>
 float2 ProjectToUV(float3 position, float4x4 projection)
@@ -81,9 +98,22 @@ float SampleSceneColor(float3 hitPosition, out float3 color)
     }
     color = gReflectionSceneColor.SampleLevel(gSampler, sceneUV, 0.0f).rgb;
 
-    // 前方描画が霧を掛け直すので外しておく
+    // 前方描画が霧を掛け直すので外しておく。掛けた順の逆に、表の霧 → 式の霧 → 空気遠近
     float3 toHit = hitPosition - cameraPos;
-    float fogAmount = FogAmount(gLights.fog, cameraPos, hitPosition);
+    float hitViewDepth = VolumetricFogViewDepth(toHit);
+    if (VolumetricFogTransmittanceAt(gSampler, uv, hitViewDepth) < 1.0f - kSceneColorMaxFog)
+    {
+        return 0.0f;
+    }
+    color = RemoveVolumetricFogAt(gSampler, color, uv, hitViewDepth);
+    float hitExclude = VolumetricFogExcludeDistance(toHit);
+    float3 hitDirection = toHit / max(hitDistance, 1e-6f);
+    if (LocalFogVolumesTransmittance(cameraPos, hitDirection, hitDistance, hitExclude) < 1.0f - kSceneColorMaxFog)
+    {
+        return 0.0f;
+    }
+    color = RemoveLocalFogVolumes(color, cameraPos, hitDirection, hitDistance, hitExclude);
+    float fogAmount = FogAmountFrom(gLights.fog, cameraPos, hitPosition, hitExclude);
     if (fogAmount > 0.0f)
     {
         if (fogAmount > kSceneColorMaxFog)
@@ -93,7 +123,7 @@ float SampleSceneColor(float3 hitPosition, out float3 color)
         float3 fogColor = FogColor(gLights.fog, toHit);
         color = (color - fogColor * fogAmount) / (1.0f - fogAmount);
     }
-    color = max(RemoveAerialPerspective(gLights.fog, color, toHit), 0.0f);
+    color = max(RemoveAerialPerspectiveAt(gLights.fog, gSampler, color, toHit, uv), 0.0f);
     return weight;
 }
 
@@ -120,7 +150,7 @@ bool BlendReflectionGlass(float3 origin, float3 direction, float maxDistance, bo
     uint instanceIndex = q.CommittedInstanceID() + q.CommittedGeometryIndex();
     RayHitSurface glass = LoadRayHitSurface(instanceIndex, q.CommittedPrimitiveIndex(), q.CommittedTriangleBarycentrics(),
                                             q.CommittedObjectToWorld3x4(), origin, direction, glassDistance);
-    radiance = lerp(radiance, ShadeRayHit(glass, direction, useProbes), saturate(gRayInstances[instanceIndex].opacity));
+    radiance = lerp(radiance, ShadeReflectedSurface(glass, direction, useProbes), saturate(gRayInstances[instanceIndex].opacity));
     return true;
 }
 
@@ -160,7 +190,7 @@ float3 AddReflectionBounce(RayHitSurface surface, float3 direction, float3 radia
                                                  q.CommittedPrimitiveIndex(), q.CommittedTriangleBarycentrics(),
                                                  q.CommittedObjectToWorld3x4(), ray.Origin, bounceDirection,
                                                  max(q.CommittedRayT(), 1e-4f));
-        bounceRadiance = ShadeRayHit(bounce, bounceDirection, useProbes);
+        bounceRadiance = ShadeReflectedSurface(bounce, bounceDirection, useProbes);
     }
     else
     {
@@ -249,7 +279,7 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
                                                       q.CommittedPrimitiveIndex(), q.CommittedTriangleBarycentrics(),
                                                       q.CommittedObjectToWorld3x4(), ray.Origin, direction, hitDistance);
             bool useProbes = (gLights.renderFlags & kRenderFlagGI) != 0;
-            radiance = ShadeRayHit(surface, direction, useProbes);
+            radiance = ShadeReflectedSurface(surface, direction, useProbes);
             if ((gLights.renderFlags & kRenderFlagReflectionBounce) != 0)
             {
                 radiance = AddReflectionBounce(surface, direction, radiance, useProbes);

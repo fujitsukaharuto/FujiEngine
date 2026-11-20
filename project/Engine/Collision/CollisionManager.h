@@ -1,22 +1,20 @@
 #pragma once
 #include "Engine/Collision/BaseCollider.h"
-#include <array>
+#include <string>
 #include <unordered_set>
 #include <vector>
 
 namespace Collision {
 
-	class AABBCollider;
-
 	/// <summary>
-	/// OBBのデータ
+	/// レイキャストで最初に当たったもの
 	/// </summary>
-	struct OBB {
-
-		Math::Vector3 size;		// ハーフサイズ
-		Math::Vector3 center;
-		/// <summary>正規直交基底。ワールド行列から直接取る(オイラー角を経由すると非可逆で判定がズレる)</summary>
-		std::array<Math::Vector3, 3> axes;
+	struct RaycastResult {
+		BaseCollider* collider = nullptr;
+		GameObject::GameObject* owner = nullptr;
+		float distance = 0.0f;
+		Math::Vector3 point;
+		Math::Vector3 normal;	// 当たった面の外向き
 	};
 
 	/// <summary>
@@ -31,7 +29,7 @@ namespace Collision {
 		/// <summary>
 		/// 衝突のチェック
 		/// </summary>
-		/// <remarks>型が確定していない2つを渡す入口。ここでAABBに絞り込む</remarks>
+		/// <remarks>登録とは関係なく2つだけを判定する入口</remarks>
 		void CheckCollisionPair(BaseCollider* A, BaseCollider* B);
 		/// <summary>
 		///	全ての衝突判定チェック
@@ -48,28 +46,38 @@ namespace Collision {
 
 		void Reset() { colliders_.clear(); }
 
+		//========================================================================*/
+		//* 問い合わせ。いつ呼んでもよい (生存中の GameObject をその場で調べる)
+
+		/// <summary>2つのワールドの形が重なっているか</summary>
+		static bool Intersects(const WorldShape& a, const WorldShape& b);
+
+		/// <summary>レイに最初に当たったコライダー</summary>
+		/// <remarks>原点が中にあるコライダーには当たらない。判定を切っているコライダーは見ない</remarks>
+		/// <param name="direction">向き。長さは問わない</param>
+		/// <param name="layerMask">当てるレイヤー (ビットの組)</param>
+		static bool Raycast(const Math::Vector3& origin, const Math::Vector3& direction, float maxDistance,
+			RaycastResult& result, uint32_t layerMask = kAllLayers);
+
+		/// <summary>球に重なっているコライダー</summary>
+		static std::vector<BaseCollider*> OverlapSphere(const Math::Vector3& center, float radius, uint32_t layerMask = kAllLayers);
+
+	#ifdef _DEBUGMODE
+		/// <summary>生存中の GameObject のコライダーの線を全部描く</summary>
+		static void DrawLiveColliders();
+	#endif // _DEBUGMODE
+
+		//========================================================================*/
+		//* レイヤーの名前 (GUI に出すだけ。判定はビットで行う)
+		static void SetLayerName(uint32_t layer, const std::string& name);
+		static const std::string& GetLayerName(uint32_t layer);
+
 	private:
-
-		/// <summary>
-		/// 絞り込み済みの2つの衝突をチェックする
-		/// </summary>
-		/// <remarks>ペアループはこちらを呼ぶ。CheckCollisionPair 経由だと dynamic_cast が毎回走る</remarks>
-		void CheckAABBPair(AABBCollider* A, AABBCollider* B);
-
-		/// <summary>
-		/// AABBをOBBに変換
-		/// </summary>
-		OBB ConvertAABBToOBB(const AABBCollider* aabb);
-
-		/// <summary>
-		/// 衝突のチェック
-		/// </summary>
-		bool checkAABBCollision(AABBCollider* A, AABBCollider* B);// 一度OBBの当たり判定に変えている
 
 		/// <summary>
 		/// self から見た other との衝突状態を判定し、対応するコールバックを呼ぶ
 		/// </summary>
-		void NotifyCollision(AABBCollider* self, AABBCollider* other, bool isColliding);
+		void NotifyCollision(BaseCollider* self, BaseCollider* other, bool isColliding);
 
 		/// <summary>
 		/// 登録が外れた相手との衝突を終了させる
@@ -82,7 +90,7 @@ namespace Collision {
 		std::vector<BaseCollider*> colliders_;
 
 		// 以下は CheckAllCollision の作業用。メンバに持つのは毎フレームの再確保を避けるため
-		std::vector<AABBCollider*> aabbColliders_;
+		std::vector<WorldShape> worldShapes_;
 		std::unordered_set<const BaseCollider*> aliveColliders_;
 
 	};

@@ -68,6 +68,7 @@ void ClusteredLightPass::Finalize() {
 
 void ClusteredLightPass::Render() {
 	lightCount_ = 0;
+	hasShapedLights_ = false;
 	if (dxcommon_ == nullptr || lightManager_ == nullptr) {
 		return;
 	}
@@ -78,7 +79,7 @@ void ClusteredLightPass::Render() {
 		return;
 	}
 
-	lightCount_ = lightManager_->GatherClusteredLights(lightMapped_[frameIndex], kMaxClusteredLights);
+	lightCount_ = lightManager_->GatherClusteredLights(lightMapped_[frameIndex], kMaxClusteredLights, &hasShapedLights_);
 
 	ClusterParams params{};
 	params.view = camera->GetViewMatrix();

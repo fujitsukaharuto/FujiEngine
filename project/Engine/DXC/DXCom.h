@@ -26,6 +26,7 @@ namespace DXC {
 
 	class DXCompile;
 	class GPUTimer;
+	class FrameProfiler;
 
 	/// <summary>
 	/// 1フレームの描画を大きく分けた区間。GPU 時間の一覧に出る
@@ -33,6 +34,7 @@ namespace DXC {
 	enum class GpuSection : uint32_t {
 		Frame,
 		Skinning,
+		Prepare,
 		Sky,
 		Objects,
 		Particles,
@@ -184,6 +186,9 @@ namespace DXC {
 		void BeginGpuSection(GpuSection section);
 		void EndGpuSection(GpuSection section);
 
+		/// <summary>決めたフレーム数の平均を取ってファイルへ書く計測モード</summary>
+		DXC::FrameProfiler* GetFrameProfiler() const { return frameProfiler_.get(); }
+
 	private:
 
 
@@ -196,6 +201,7 @@ namespace DXC {
 		std::unique_ptr<DXC::SwapChainManager> swapChainManager_ = nullptr;
 		std::unique_ptr<DXC::DXCompile> compiler_ = nullptr;
 		std::unique_ptr<DXC::GPUTimer> gpuFrameTimer_;
+		std::unique_ptr<DXC::FrameProfiler> frameProfiler_;
 
 		Core::FPSKeeper* fpsKeeper_ = nullptr;
 		Graphics::PipelineManager* pipeManager_;

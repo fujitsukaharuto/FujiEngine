@@ -1,14 +1,20 @@
 #include "SceneManager.h"
+#include <algorithm>
 #include <cassert>
+#include <format>
 #include <vector>
 #include "Engine/DXC/DXCom.h"
 #include "Engine/Core/Time/FPSKeeper.h"
+#include "Engine/Core/Debug/DevEnv.h"
 #include "Engine/Scene/BaseScene.h"
 #include "Engine/Core/Debug/ImGuiManager.h"
 #include "Engine/Graphics/Model/ModelManager.h"
 #include "Engine/Graphics/Particle/ParticleManager.h"
 #include "Engine/Editor/Command/CommandManager.h"
 #include "Engine/Collision/CollisionManager.h"
+#include "Engine/Graphics/Camera/CameraManager.h"
+#include "Engine/Graphics/Line/Line3dDrawer.h"
+#include "Engine/GameObject/GameObject.h"
 
 using namespace Core;
 using namespace Editor;
@@ -28,6 +34,10 @@ void SceneManager::Initialize(DXCom* pDxcom, Graphics::LightManager* pLightManag
 	lightManager_ = pLightManager;
 	fade_.Initialize();
 	collision_ = std::make_unique<Collision::CollisionManager>();
+	if (std::string value; ReadDevEnv("FUJI_COLLISION_DEBUG", value) && value != "0") {
+		isShowColliders_ = true;
+		isCameraRay_ = true;
+	}
 }
 
 void SceneManager::Finalize() {
@@ -46,6 +56,9 @@ void SceneManager::Update() {
 				collision_->AddGameObjectColliders();
 				collision_->CheckAllCollision();
 			}
+		#ifdef _DEBUGMODE
+			DrawCollisionDebug();
+		#endif // _DEBUGMODE
 			// 判定の Exit を受け取らせてから消す
 			scene_->RemoveDestroyedObjects();
 		}
@@ -79,9 +92,19 @@ void SceneManager::Draw() {
 void SceneManager::StartScene(const std::string& sceneName) {
 	assert(sceneFactory_);
 
+	// 計測やスクリーンショットを回すときは、環境変数で始めるシーンを変えられる
+	std::string startName = sceneName;
+	std::string envName;
+	if (ReadDevEnv("FUJI_SCENE", envName)) {
+		const std::vector<std::string> names = sceneFactory_->GetSceneNames();
+		if (std::find(names.begin(), names.end(), envName) != names.end()) {
+			startName = envName;
+		}
+	}
+
 	// Factoryから unique_ptr を受け取る
-	scene_ = sceneFactory_->CreateScene(sceneName);
-	EnterScene(sceneName);
+	scene_ = sceneFactory_->CreateScene(startName);
+	EnterScene(startName);
 
 	// 最初のシーンも黒から明ける
 	fade_.In();
@@ -117,7 +140,49 @@ void SceneManager::DebugGUI() {
 			scene_->ParticleDebugGUI();
 		}
 	}
+	CollisionDebugGUI();
 #endif // _DEBUG
+}
+
+void SceneManager::CollisionDebugGUI() {
+#ifdef _DEBUGMODE
+	if (!ImGui::CollapsingHeader("Collision")) {
+		return;
+	}
+	ImGui::Checkbox("Show colliders", &isShowColliders_);
+	ImGui::Checkbox("Ray from camera", &isCameraRay_);
+	if (isCameraRay_) {
+		if (cameraRayHit_.empty()) {
+			ImGui::TextDisabled("hit: -");
+		} else {
+			ImGui::Text("hit: %s", cameraRayHit_.c_str());
+		}
+	}
+#endif // _DEBUGMODE
+}
+
+void SceneManager::DrawCollisionDebug() {
+#ifdef _DEBUGMODE
+	if (isShowColliders_) {
+		Collision::CollisionManager::DrawLiveColliders();
+	}
+	cameraRayHit_.clear();
+	Camera* camera = CameraManager::GetInstance()->GetCamera();
+	if (!isCameraRay_ || camera == nullptr) {
+		return;
+	}
+	const Math::Matrix4x4& world = camera->GetWorldMatrix();
+	const Math::Vector3 forward = { world.m[2][0], world.m[2][1], world.m[2][2] };
+	constexpr float kMaxDistance = 1000.0f;
+	Collision::RaycastResult hit;
+	if (Collision::CollisionManager::Raycast(camera->GetTranslate(), forward, kMaxDistance, hit)) {
+		Line3dDrawer* line = Line3dDrawer::GetInstance();
+		line->DrawSphereLine(hit.point, 0.15f, { 1.0f,0.9f,0.1f,1.0f });
+		line->DrawLine3d(hit.point, hit.point + hit.normal, { 0.1f,0.9f,1.0f,1.0f });
+		hit.collider->DrawCollider();
+		cameraRayHit_ = std::format("{}  tag: {}  {:.2f} m", hit.owner ? hit.owner->GetName() : "-", hit.collider->GetTag(), hit.distance);
+	}
+#endif // _DEBUGMODE
 }
 
 void SceneManager::ParticleGroupDebugGUI() {

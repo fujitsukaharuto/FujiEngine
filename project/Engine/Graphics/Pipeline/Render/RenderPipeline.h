@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <vector>
 #include <d3d12.h>
 #include "Engine/Graphics/Pipeline/BasePipeline.h"
 #include "Engine/DXC/Resource/DX12Helper.h"
@@ -22,6 +23,10 @@ namespace Graphics {
 	struct RenderPipelineDesc {
 		std::wstring vsPath;	// kDirectoryPath_ からの相対
 		std::wstring psPath;	// kDirectoryPath_ からの相対
+		// 空でなければ、PS をこのマクロ付きでもう1つコンパイルし、同じルートシグネチャの PSO を作る (SetVariantState で切り替え)
+		std::wstring psVariantDefine;
+		// true なら PS を OBJECT_FEATURES 違いでも作れる (PipelineManager::SetObjectFeatures)
+		bool hasObjectFeatures = false;
 		BlendType blend = BlendType::ALPHA;
 		DepthMode depth = DepthMode::READ_WRITE;
 		D3D12_CULL_MODE cull = D3D12_CULL_MODE_NONE;
@@ -45,6 +50,15 @@ namespace Graphics {
 
 		/// <summary>構成を Initialize より前に設定する</summary>
 		void SetDesc(const RenderPipelineDesc& desc) { desc_ = desc; }
+		const RenderPipelineDesc& GetDesc() const { return desc_; }
+
+		/// <summary>PS をマクロ付きでコンパイルする。Initialize の後なら別スレッドから呼んでよい</summary>
+		/// <param name="define">-D で渡すマクロ (例 L"OBJECT_FEATURES=0x3")</param>
+		DXC::ShaderData CompilePixelShader(const wchar_t* define) const;
+
+		/// <summary>PS だけを差し替えた PSO を作る。Initialize の後なら別スレッドから呼んでよい</summary>
+		/// <returns>失敗したら nullptr</returns>
+		Microsoft::WRL::ComPtr<ID3D12PipelineState> CreatePSOWithPixelShader(IDxcBlob* pixelShader) const;
 
 		/// <summary>
 		/// 合成モードから D3D12_BLEND_DESC を作る
@@ -62,9 +76,14 @@ namespace Graphics {
 
 		void CreatePSO(ID3D12Device* device)override;
 
+		/// <summary>PS 以外を desc_ から埋めた PSO の構成。入力レイアウトは inputLayout_ を指す</summary>
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC MakeStateDesc(IDxcBlob* pixelShader) const;
+
 	private:
 
 		RenderPipelineDesc desc_;
+		Microsoft::WRL::ComPtr<IDxcBlob> psVariant_ = nullptr;
+		std::vector<D3D12_INPUT_ELEMENT_DESC> inputLayout_;
 
 	};
 

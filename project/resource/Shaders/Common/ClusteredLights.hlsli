@@ -188,4 +188,52 @@ float ClusteredLightShapeAttenuation(ClusteredLight light, float3 P, out float3 
     return ClusteredLightAttenuation(light, lightDistance, L) * ClusteredLightEmitterFacing(light, -L);
 }
 
+/// <summary>ワールドの位置が今の画面のどのクラスタに入るか。画面の外やカメラの後ろなら false</summary>
+bool ClusterIndexAtWorld(float3 worldPos, ClusterParams params, out uint cluster)
+{
+    cluster = 0;
+    float3 viewPos = mul(float4(worldPos, 1.0f), params.view).xyz;
+    if (viewPos.z <= 1e-3f)
+    {
+        return false;
+    }
+    float2 ndc = viewPos.xy * params.projectionScale / viewPos.z;
+    if (any(abs(ndc) > 1.0f))
+    {
+        return false;
+    }
+    float2 pixel = float2(ndc.x * 0.5f + 0.5f, 0.5f - ndc.y * 0.5f) * params.screenSize;
+    cluster = ClusterIndex(pixel, viewPos.z, params);
+    return true;
+}
+
+/// <summary>影なしのライトが拡散面に届ける光の和 (色 × 減衰 × N・L)。π では割っていない</summary>
+/// <remarks>今の画面のクラスタを引く。画面の外の点は 0</remarks>
+float3 ClusteredIrradianceAt(float3 position, float3 normal, ClusterParams params, StructuredBuffer<ClusteredLight> lights,
+                             StructuredBuffer<uint> counts, StructuredBuffer<uint> indices)
+{
+    float3 irradiance = float3(0.0f, 0.0f, 0.0f);
+    uint cluster;
+    if (params.lightCount == 0 || !ClusterIndexAtWorld(position, params, cluster))
+    {
+        return irradiance;
+    }
+    uint count = counts[cluster];
+    for (uint c = 0; c < count; c++)
+    {
+        ClusteredLight light = lights[indices[cluster * kMaxLightsPerCluster + c]];
+        // 形のある光源はいちばん近い点から
+        float3 L;
+        float distance;
+        float attenuation = ClusteredLightShapeAttenuation(light, position, L, distance);
+        float facing = saturate(dot(normal, L));
+        if (attenuation <= 0.0f || facing <= 0.0f)
+        {
+            continue;
+        }
+        irradiance += light.color * (attenuation * facing);
+    }
+    return irradiance;
+}
+
 #endif // CLUSTERED_LIGHTS_HLSLI

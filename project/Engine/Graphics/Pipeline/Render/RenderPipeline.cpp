@@ -5,6 +5,7 @@
 #include "Engine/Logger/Logger.h"
 #include "externals/DirectXTex/d3dx12.h"
 #include <vector>
+#include <format>
 #include <cassert>
 
 using namespace Graphics;
@@ -128,6 +129,15 @@ void RenderPipeline::CreateRootSignature(ID3D12Device* device) {
 	psReflection_ = psData.reflection;
 	assert(ps != nullptr);
 
+	// マクロ違いの PS。使うリソースはマクロ無しを含むので、ルートシグネチャはこちらのリフレクションから作る
+	if (!desc_.psVariantDefine.empty()) {
+		auto variantData = dxcommon_->GetDXCompile()->CompileShaderWithReflection(kDirectoryPath_ + desc_.psPath, DXC::kPSProfile,
+			desc_.psVariantDefine.c_str());
+		psVariant_ = variantData.blob;
+		assert(psVariant_ != nullptr);
+		psReflection_ = variantData.reflection;
+	}
+
 	// リフレクションからルートシグネチャを自動生成（内部でマッピング情報をログ出力）
 	rootSignature_ = dxcommon_->GetDXCompile()->CreateRootSignature(device, vsReflection_.Get(), psReflection_.Get(), rootParameterMap_);
 	assert(rootSignature_ != nullptr);
@@ -145,14 +155,28 @@ void RenderPipeline::CreatePSO(ID3D12Device* device) {
 	assert(psReflection_ != nullptr);
 
 	// リフレクションから入力レイアウトを自動生成
-	std::vector<D3D12_INPUT_ELEMENT_DESC> inputLayout;
 	if (desc_.useInputLayout) {
-		inputLayout = dxcommon_->GetDXCompile()->CreateInputLayout(vsReflection_.Get());
+		inputLayout_ = dxcommon_->GetDXCompile()->CreateInputLayout(vsReflection_.Get());
 	}
 
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC stateDesc = MakeStateDesc(ps.Get());
+	hr = device->CreateGraphicsPipelineState(
+		&stateDesc, IID_PPV_ARGS(&pso_));
+	assert(SUCCEEDED(hr));
+
+	if (psVariant_) {
+		stateDesc.PS = { psVariant_->GetBufferPointer(), psVariant_->GetBufferSize() };
+		hr = device->CreateGraphicsPipelineState(&stateDesc, IID_PPV_ARGS(&psoVariant_));
+		assert(SUCCEEDED(hr));
+	}
+
+}
+
+D3D12_GRAPHICS_PIPELINE_STATE_DESC RenderPipeline::MakeStateDesc(IDxcBlob* pixelShader) const {
+
 	D3D12_INPUT_LAYOUT_DESC layout{};
-	layout.pInputElementDescs = inputLayout.empty() ? nullptr : inputLayout.data();
-	layout.NumElements = static_cast<UINT>(inputLayout.size());
+	layout.pInputElementDescs = inputLayout_.empty() ? nullptr : inputLayout_.data();
+	layout.NumElements = static_cast<UINT>(inputLayout_.size());
 
 	D3D12_RASTERIZER_DESC rasterizer{};
 	rasterizer.CullMode = desc_.cull;
@@ -162,7 +186,7 @@ void RenderPipeline::CreatePSO(ID3D12Device* device) {
 	stateDesc.pRootSignature = rootSignature_.Get();
 	stateDesc.InputLayout = layout;
 	stateDesc.VS = { vs->GetBufferPointer(),vs->GetBufferSize() };
-	stateDesc.PS = { ps->GetBufferPointer(),ps->GetBufferSize() };
+	stateDesc.PS = { pixelShader->GetBufferPointer(),pixelShader->GetBufferSize() };
 	stateDesc.BlendState = MakeBlendDesc(desc_.blend);
 	stateDesc.DepthStencilState = MakeDepthStencilDesc(desc_.depth);
 	stateDesc.RasterizerState = rasterizer;
@@ -175,9 +199,23 @@ void RenderPipeline::CreatePSO(ID3D12Device* device) {
 
 	stateDesc.SampleDesc.Count = 1;
 	stateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
+	return stateDesc;
+}
 
-	hr = device->CreateGraphicsPipelineState(
-		&stateDesc, IID_PPV_ARGS(&pso_));
-	assert(SUCCEEDED(hr));
+ShaderData RenderPipeline::CompilePixelShader(const wchar_t* define) const {
+	return dxcommon_->GetDXCompile()->CompileShaderWithReflection(kDirectoryPath_ + desc_.psPath, DXC::kPSProfile, define);
+}
 
+Microsoft::WRL::ComPtr<ID3D12PipelineState> RenderPipeline::CreatePSOWithPixelShader(IDxcBlob* pixelShader) const {
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> pso;
+	if (pixelShader == nullptr || pixelShader->GetBufferSize() == 0) {
+		return pso;
+	}
+	const D3D12_GRAPHICS_PIPELINE_STATE_DESC stateDesc = MakeStateDesc(pixelShader);
+	const HRESULT hr = dxcommon_->GetDevice()->CreateGraphicsPipelineState(&stateDesc, IID_PPV_ARGS(&pso));
+	if (FAILED(hr)) {
+		Logger::Log(std::format("CreatePSOWithPixelShader failed: 0x{:08X}", static_cast<uint32_t>(hr)));
+		pso.Reset();
+	}
+	return pso;
 }

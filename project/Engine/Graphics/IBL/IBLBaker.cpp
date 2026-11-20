@@ -17,7 +17,8 @@ namespace {
 	// 環境マップが HDR なので、焼いた結果も 1.0 を超える。8bit では白飛びする
 	constexpr DXGI_FORMAT kCubeFormat = DXGI_FORMAT_R16G16B16A16_FLOAT;
 	// split-sum の第2項は係数と加算項の2値。ここだけ2チャンネルで足りる
-	constexpr DXGI_FORMAT kLutFormat = DXGI_FORMAT_R16G16_FLOAT;
+	// xy = split-sum の第2項、z = 布の光沢の反射率
+	constexpr DXGI_FORMAT kLutFormat = DXGI_FORMAT_R16G16B16A16_FLOAT;
 
 	constexpr D3D12_RESOURCE_STATES kReadState =
 		D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;

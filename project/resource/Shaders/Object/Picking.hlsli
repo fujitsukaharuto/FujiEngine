@@ -9,6 +9,7 @@ struct PickingBuffer
 {
     int objID;
     uint depthBits; // 深度(float)のビット列。0〜1の正の値は、ビット列の大小が値の大小と一致する
+    int meshIndex;  // 拾ったメッシュ (モデルの何番目か)
 };
 
 ConstantBuffer<Material> gMaterial : register(b1);

@@ -53,6 +53,8 @@ namespace Graphics {
 
 		// テクスチャの取得
 		Texture* GetTexture(const std::string& filename);
+		/// <summary>読み込み済みならそのテクスチャ。読み込んでいなければ nullptr (読み込まない)</summary>
+		Texture* FindLoadedTexture(const std::string& filename) const;
 		/// <summary>色ではなく数値として読んだテクスチャ(法線マップ用)。sRGB の変換を掛けない</summary>
 		/// <remarks>同じファイルを色として読んだものとは別に持つ</remarks>
 		Texture* GetLinearTexture(const std::string& filename, bool overWrite = false);

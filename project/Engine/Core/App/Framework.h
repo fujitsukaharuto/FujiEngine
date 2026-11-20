@@ -16,6 +16,7 @@
 #include "Engine/Editor/Command/CommandManager.h"
 #ifdef _DEBUGMODE
 #include "Engine/Editor/ObjectEditor/GameObjectEditor.h"
+#include "Engine/Editor/ContentBrowser/ContentBrowser.h"
 #endif // _DEBUGMODE
 
 // ImGuiManager.h は imgui.h を連れてくるので、ポインタ保持だけの用途では前方宣言に留める
@@ -106,7 +107,9 @@ namespace Core {
 		bool isDebugGuiVisible_ = true;    // F1で切り替え。消すとゲーム画面が画面いっぱいに戻る
 		bool isDockLayoutBuilt_ = false;   // 既定のドッキング配置を組んだか
 		bool isDockLayoutReset_ = false;   // View メニューからの組み直し要求
+		int autoScreenshotFrames_ = 0;     // 0 より大きければ、このフレーム数が経ったら1枚撮る (環境変数 FUJI_SCREENSHOT)
 		Editor::GameObjectEditor gameObjectEditor_; // Hierarchy / Inspector
+		Editor::ContentBrowser contentBrowser_; // 素材の一覧
 #endif // _DEBUGMODE
 	};
 }

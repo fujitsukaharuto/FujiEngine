@@ -42,6 +42,15 @@ namespace Graphics {
 		/// </summary>
 		void SetPipelineState();
 
+		/// <summary>同じルートシグネチャのまま、PS を別のマクロでコンパイルした PSO へ切り替える</summary>
+		/// <remarks>ルートの結線は消えない。別の PSO を持たないパイプラインでは何もしない</remarks>
+		void SetVariantState(bool isVariant);
+		bool HasVariant() const { return psoVariant_ != nullptr; }
+
+		/// <summary>SetPipelineState で張る PSO を差し替える。nullptr で Initialize で作ったものへ戻す</summary>
+		/// <remarks>ルートシグネチャが同じ PSO であること。マクロ違いの PSO (SetVariantState) は差し替えない</remarks>
+		void SetBasePSO(ID3D12PipelineState* pso) { activePso_ = pso ? pso : pso_.Get(); }
+
 		/// <summary>
 		/// コンピュートシェーダ用のパイプラインステートを設定
 		/// </summary>
@@ -75,6 +84,10 @@ namespace Graphics {
 
 		Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_ = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12PipelineState> pso_ = nullptr;
+		// PS をマクロ違いでコンパイルしたもの。ルートシグネチャは pso_ と同じ
+		Microsoft::WRL::ComPtr<ID3D12PipelineState> psoVariant_ = nullptr;
+		// SetPipelineState が張るもの。持ち主は pso_ か差し替えた側
+		ID3D12PipelineState* activePso_ = nullptr;
 
 		Microsoft::WRL::ComPtr<IDxcBlob> vs = nullptr;
 		Microsoft::WRL::ComPtr<IDxcBlob> ps = nullptr;

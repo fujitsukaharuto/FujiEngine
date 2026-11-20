@@ -11,18 +11,25 @@
 #include "Engine/GameObject/GIVolume.h"
 #include "Engine/Graphics/Raytracing/BakedGIPass.h"
 #include "Engine/GameObject/ReflectionProbe.h"
+#include "Engine/GameObject/LocalFogVolume.h"
+#include "Engine/GameObject/PostProcessVolume.h"
+#include "Engine/GameObject/PlacedSpline.h"
+#include "Engine/Scene/EnvironmentParams.h"
 #include "Engine/Graphics/Raytracing/ReflectionProbePass.h"
 #include "Engine/Graphics/Particle/RainRenderer.h"
 #include "Engine/Graphics/Sprite/PlacedSprite.h"
 #include "Engine/Core/Serialize/JsonSerializer.h"
+#include "Engine/Core/Debug/DevEnv.h"
 #include "Engine/Core/Debug/ImGuiManager.h"
 #include "Engine/Graphics/SkyBox/SkyBox.h"
 #include "Engine/Graphics/Light/LightManager.h"
 #include "Engine/Graphics/Object/ObjectRenderer.h"
 #include "Engine/Graphics/Raytracing/DDGIPass.h"
 #include "Engine/Graphics/Raytracing/VolumetricLightPass.h"
+#include "Engine/Graphics/Raytracing/VolumetricFogPass.h"
 #include "Engine/Graphics/Object/RefractionCapture.h"
 #include "Engine/Graphics/Raytracing/ScreenReflectionPass.h"
+#include "Engine/Graphics/Raytracing/ScreenSpaceGIPass.h"
 #include "Engine/Graphics/Model/ModelManager.h"
 #include "Engine/DXC/DXCom.h"
 #include "Engine/Graphics/PostEffect/OffscreenManager.h"
@@ -82,6 +89,40 @@ namespace {
 	constexpr const char* kLightingNames[] = { "Simple","PBR" };
 	constexpr int kLightingCount = static_cast<int>(std::size(kLightingNames));
 
+	/// <summary>品質の段ごとの値。並びは Scene::Quality と同じ</summary>
+	/// <remarks>書いていない項目は既定値 (= Standard)。ほぼ重さの変わらない補正は全段で On</remarks>
+	struct QualityPreset {
+		const char* name = "";
+		int ao = Graphics::kAOModeScreen;
+		int shadow = Graphics::kShadowModeHard;
+		int reflection = Graphics::kReflectionModeOff;
+		int ambient = Graphics::kAmbientModeHemisphere;
+		bool localLightAO = true;
+		bool specularAA = true;
+		bool aerialPerspectiveLut = true;
+		bool specularDetail = false;
+		bool reflectAll = false;
+		bool reflectionDenoised = false;
+		bool reflectionBounce = false;
+		bool reflectionSceneColor = false;
+		bool ssgi = false;
+	};
+	constexpr QualityPreset kQualityPresets[] = {
+		{ .name = "Standard" },
+		{ .name = "High", .shadow = Graphics::kShadowModeSoft, .reflection = Graphics::kReflectionModeOcclusion, .specularDetail = true },
+		{ .name = "Ultra", .shadow = Graphics::kShadowModeSoft, .reflection = Graphics::kReflectionModeObjects, .specularDetail = true,
+			.reflectAll = true, .reflectionDenoised = true, .reflectionBounce = true, .reflectionSceneColor = true },
+		{ .name = "Realistic", .shadow = Graphics::kShadowModeSoft, .reflection = Graphics::kReflectionModeObjects, .ambient = Graphics::kAmbientModeIBL,
+			.specularDetail = true, .reflectAll = true, .reflectionDenoised = true, .reflectionBounce = true, .reflectionSceneColor = true,
+			.ssgi = true },
+	};
+	constexpr int kQualityCount = static_cast<int>(std::size(kQualityPresets));
+	static_assert(kQualityCount == static_cast<int>(Scene::Quality::Count));
+
+	const QualityPreset& GetQualityPreset(Scene::Quality quality) {
+		return kQualityPresets[std::clamp(static_cast<int>(quality), 0, kQualityCount - 1)];
+	}
+
 	/// <summary>名前から番号を引く。見つからなければ fallback</summary>
 	int IndexOfName(const std::string& name, const char* const* names, int count, int fallback) {
 		for (int i = 0; i < count; ++i) {
@@ -117,6 +158,19 @@ namespace {
 		env.fogSkyAmount = data.value("fogSkyAmount", env.fogSkyAmount);
 		env.fogSunScatter = data.value("fogSunScatter", env.fogSunScatter);
 		env.fogSunPower = data.value("fogSunPower", env.fogSunPower);
+		env.fogSecondDensity = data.value("fogSecondDensity", env.fogSecondDensity);
+		env.fogSecondHeightFalloff = data.value("fogSecondHeightFalloff", env.fogSecondHeightFalloff);
+		env.fogSecondHeightOffset = data.value("fogSecondHeightOffset", env.fogSecondHeightOffset);
+		env.volumetricFog = data.value("volumetricFog", env.volumetricFog);
+		env.volumetricFogAlbedo = ReadVector3(data, "volumetricFogAlbedo", env.volumetricFogAlbedo);
+		env.volumetricFogEmissive = ReadVector3(data, "volumetricFogEmissive", env.volumetricFogEmissive);
+		env.volumetricFogExtinctionScale = data.value("volumetricFogExtinctionScale", env.volumetricFogExtinctionScale);
+		env.volumetricFogScatteringDistribution = data.value("volumetricFogScatteringDistribution", env.volumetricFogScatteringDistribution);
+		env.volumetricFogViewDistance = data.value("volumetricFogViewDistance", env.volumetricFogViewDistance);
+		env.volumetricFogSun = data.value("volumetricFogSun", env.volumetricFogSun);
+		env.volumetricFogSkyLight = data.value("volumetricFogSkyLight", env.volumetricFogSkyLight);
+		env.volumetricFogLocalLights = data.value("volumetricFogLocalLights", env.volumetricFogLocalLights);
+		env.volumetricFogTemporal = data.value("volumetricFogTemporal", env.volumetricFogTemporal);
 		env.bloomEnabled = data.value("bloom", env.bloomEnabled);
 		env.bloomThreshold = data.value("bloomThreshold", env.bloomThreshold);
 		env.bloomIntensity = data.value("bloomIntensity", env.bloomIntensity);
@@ -146,13 +200,17 @@ namespace {
 		env.aoMode = IndexOfName(data.value("ao", std::string(kAONames[env.aoMode])), kAONames, kAOCount, env.aoMode);
 		env.localLightAO = data.value("localLightAO", env.localLightAO);
 		env.shadowMode = IndexOfName(data.value("shadow", std::string(kShadowNames[env.shadowMode])), kShadowNames, kShadowCount, env.shadowMode);
+		env.softLocalShadow = data.value("softLocalShadow", env.softLocalShadow);
 		env.ambientMode = IndexOfName(data.value("ambient", std::string(kAmbientNames[env.ambientMode])), kAmbientNames, kAmbientCount, env.ambientMode);
 		env.iblAmbientScale = data.value("iblAmbientScale", env.iblAmbientScale);
 		env.skyMode = IndexOfName(data.value("sky", std::string(kSkyNames[env.skyMode])), kSkyNames, kSkyCount, env.skyMode);
 		env.skyIntensity = data.value("skyIntensity", env.skyIntensity);
 		env.aerialPerspectiveScale = data.value("aerialPerspective", env.aerialPerspectiveScale);
+		env.aerialPerspectiveLut = data.value("aerialPerspectiveLut", env.aerialPerspectiveLut);
 		env.skyLightIntensity = data.value("skyLight", env.skyLightIntensity);
 		env.cloudCoverage = data.value("clouds", env.cloudCoverage);
+		env.atmosphereAltitude = data.value("atmosphereAltitude", env.atmosphereAltitude);
+		env.atmosphereScale = data.value("atmosphereScale", env.atmosphereScale);
 		env.cloudShadow = data.value("cloudShadow", env.cloudShadow);
 		env.stars = data.value("stars", env.stars);
 		env.moon = data.value("moon", env.moon);
@@ -167,6 +225,9 @@ namespace {
 		env.giProbeSpacing = data.value("giProbeSpacing", env.giProbeSpacing);
 		env.giRays = data.value("giRays", env.giRays);
 		env.giScreen = data.value("giScreen", env.giScreen);
+		env.ssgi = data.value("ssgi", env.ssgi);
+		env.ssgiIntensity = data.value("ssgiIntensity", env.ssgiIntensity);
+		env.ssgiDistance = data.value("ssgiDistance", env.ssgiDistance);
 		env.reflectionDenoised = data.value("reflectionDenoised", env.reflectionDenoised);
 		env.reflectionBounce = data.value("reflectionBounce", env.reflectionBounce);
 		env.reflectionSceneColor = data.value("reflectionSceneColor", env.reflectionSceneColor);
@@ -233,6 +294,19 @@ namespace {
 		data["fogSkyAmount"] = env.fogSkyAmount;
 		data["fogSunScatter"] = env.fogSunScatter;
 		data["fogSunPower"] = env.fogSunPower;
+		data["fogSecondDensity"] = env.fogSecondDensity;
+		data["fogSecondHeightFalloff"] = env.fogSecondHeightFalloff;
+		data["fogSecondHeightOffset"] = env.fogSecondHeightOffset;
+		data["volumetricFog"] = env.volumetricFog;
+		data["volumetricFogAlbedo"] = { env.volumetricFogAlbedo.x, env.volumetricFogAlbedo.y, env.volumetricFogAlbedo.z };
+		data["volumetricFogEmissive"] = { env.volumetricFogEmissive.x, env.volumetricFogEmissive.y, env.volumetricFogEmissive.z };
+		data["volumetricFogExtinctionScale"] = env.volumetricFogExtinctionScale;
+		data["volumetricFogScatteringDistribution"] = env.volumetricFogScatteringDistribution;
+		data["volumetricFogViewDistance"] = env.volumetricFogViewDistance;
+		data["volumetricFogSun"] = env.volumetricFogSun;
+		data["volumetricFogSkyLight"] = env.volumetricFogSkyLight;
+		data["volumetricFogLocalLights"] = env.volumetricFogLocalLights;
+		data["volumetricFogTemporal"] = env.volumetricFogTemporal;
 		data["bloom"] = env.bloomEnabled;
 		data["bloomThreshold"] = env.bloomThreshold;
 		data["bloomIntensity"] = env.bloomIntensity;
@@ -257,13 +331,17 @@ namespace {
 		data["ao"] = kAONames[std::clamp(env.aoMode, 0, kAOCount - 1)];
 		data["localLightAO"] = env.localLightAO;
 		data["shadow"] = kShadowNames[std::clamp(env.shadowMode, 0, kShadowCount - 1)];
+		data["softLocalShadow"] = env.softLocalShadow;
 		data["ambient"] = kAmbientNames[std::clamp(env.ambientMode, 0, kAmbientCount - 1)];
 		data["iblAmbientScale"] = env.iblAmbientScale;
 		data["sky"] = kSkyNames[std::clamp(env.skyMode, 0, kSkyCount - 1)];
 		data["skyIntensity"] = env.skyIntensity;
 		data["aerialPerspective"] = env.aerialPerspectiveScale;
+		data["aerialPerspectiveLut"] = env.aerialPerspectiveLut;
 		data["skyLight"] = env.skyLightIntensity;
 		data["clouds"] = env.cloudCoverage;
+		data["atmosphereAltitude"] = env.atmosphereAltitude;
+		data["atmosphereScale"] = env.atmosphereScale;
 		data["cloudShadow"] = env.cloudShadow;
 		data["stars"] = env.stars;
 		data["moon"] = env.moon;
@@ -278,6 +356,9 @@ namespace {
 		data["giProbeSpacing"] = env.giProbeSpacing;
 		data["giRays"] = env.giRays;
 		data["giScreen"] = env.giScreen;
+		data["ssgi"] = env.ssgi;
+		data["ssgiIntensity"] = env.ssgiIntensity;
+		data["ssgiDistance"] = env.ssgiDistance;
 		data["reflectionDenoised"] = env.reflectionDenoised;
 		data["reflectionBounce"] = env.reflectionBounce;
 		data["reflectionSceneColor"] = env.reflectionSceneColor;
@@ -340,6 +421,9 @@ namespace {
 		{ "fogColor", 3, [](Scene::Environment& e) { return &e.fogColor.x; } },
 		{ "fogDensity", 1, [](Scene::Environment& e) { return &e.fogDensity; } },
 		{ "fogSunScatter", 1, [](Scene::Environment& e) { return &e.fogSunScatter; } },
+		{ "fogSecondDensity", 1, [](Scene::Environment& e) { return &e.fogSecondDensity; } },
+		{ "volumetricFogExtinctionScale", 1, [](Scene::Environment& e) { return &e.volumetricFogExtinctionScale; } },
+		{ "volumetricFogEmissive", 3, [](Scene::Environment& e) { return &e.volumetricFogEmissive.x; } },
 		{ "bloomIntensity", 1, [](Scene::Environment& e) { return &e.bloomIntensity; } },
 		{ "exposure", 1, [](Scene::Environment& e) { return &e.exposure; } },
 		{ "saturation", 1, [](Scene::Environment& e) { return &e.saturation; } },
@@ -360,6 +444,39 @@ namespace {
 		{ "localTonemap", 1, [](Scene::Environment& e) { return &e.localTonemap; } },
 	};
 	constexpr int kTimeOfDayParamCount = static_cast<int>(std::size(kTimeOfDayParams));
+
+	// ポストプロセスボリュームで上書きできる項目。UE の Post Process Volume の項目に、霧と空の光を足したもの
+	constexpr Scene::EnvironmentParam kVolumeParams[] = {
+		{ "exposure", 1, false, 0.01f, 0.0f, 100.0f, [](Scene::Environment& e) { return &e.exposure; } },
+		{ "autoExposureMinEV", 1, false, 0.05f, -8.0f, 8.0f, [](Scene::Environment& e) { return &e.autoExposureMinEV; } },
+		{ "autoExposureMaxEV", 1, false, 0.05f, -8.0f, 8.0f, [](Scene::Environment& e) { return &e.autoExposureMaxEV; } },
+		{ "bloomIntensity", 1, false, 0.01f, 0.0f, 10.0f, [](Scene::Environment& e) { return &e.bloomIntensity; } },
+		{ "bloomThreshold", 1, false, 0.01f, 0.0f, 10.0f, [](Scene::Environment& e) { return &e.bloomThreshold; } },
+		{ "saturation", 1, false, 0.01f, 0.0f, 2.0f, [](Scene::Environment& e) { return &e.saturation; } },
+		{ "contrast", 1, false, 0.01f, 0.0f, 2.0f, [](Scene::Environment& e) { return &e.contrast; } },
+		{ "whiteBalanceTemperature", 1, false, 0.01f, -1.0f, 1.0f, [](Scene::Environment& e) { return &e.whiteBalanceTemperature; } },
+		{ "whiteBalanceTint", 1, false, 0.01f, -1.0f, 1.0f, [](Scene::Environment& e) { return &e.whiteBalanceTint; } },
+		{ "shadowTint", 3, true, 0.01f, 0.0f, 2.0f, [](Scene::Environment& e) { return &e.shadowTint.x; } },
+		{ "highlightTint", 3, true, 0.01f, 0.0f, 2.0f, [](Scene::Environment& e) { return &e.highlightTint.x; } },
+		{ "vignette", 1, false, 0.01f, 0.0f, 1.0f, [](Scene::Environment& e) { return &e.vignette; } },
+		{ "sharpen", 1, false, 0.01f, 0.0f, 2.0f, [](Scene::Environment& e) { return &e.sharpen; } },
+		{ "chromaticAberration", 1, false, 0.01f, 0.0f, 2.0f, [](Scene::Environment& e) { return &e.chromaticAberration; } },
+		{ "filmGrain", 1, false, 0.005f, 0.0f, 1.0f, [](Scene::Environment& e) { return &e.filmGrain; } },
+		{ "fade", 1, false, 0.005f, 0.0f, 1.0f, [](Scene::Environment& e) { return &e.fade; } },
+		{ "localTonemap", 1, false, 0.01f, 0.0f, 1.0f, [](Scene::Environment& e) { return &e.localTonemap; } },
+		{ "purkinje", 1, false, 0.01f, 0.0f, 1.0f, [](Scene::Environment& e) { return &e.purkinje; } },
+		{ "lensFlare", 1, false, 0.01f, 0.0f, 4.0f, [](Scene::Environment& e) { return &e.lensFlare; } },
+		{ "godRayIntensity", 1, false, 0.01f, 0.0f, 4.0f, [](Scene::Environment& e) { return &e.godRayIntensity; } },
+		{ "dofBlur", 1, false, 0.1f, 0.0f, 32.0f, [](Scene::Environment& e) { return &e.dofBlur; } },
+		{ "dofFocusDistance", 1, false, 0.1f, 0.0f, 1000.0f, [](Scene::Environment& e) { return &e.dofFocusDistance; } },
+		{ "dofFocusRange", 1, false, 0.1f, 0.0f, 1000.0f, [](Scene::Environment& e) { return &e.dofFocusRange; } },
+		{ "motionBlur", 1, false, 0.01f, 0.0f, 1.0f, [](Scene::Environment& e) { return &e.motionBlur; } },
+		{ "fogDensity", 1, false, 0.0002f, 0.0f, 1.0f, [](Scene::Environment& e) { return &e.fogDensity; } },
+		{ "fogColor", 3, true, 0.01f, 0.0f, 10.0f, [](Scene::Environment& e) { return &e.fogColor.x; } },
+		{ "fogStartDistance", 1, false, 0.5f, 0.0f, 10000.0f, [](Scene::Environment& e) { return &e.fogStartDistance; } },
+		{ "volumetricFogExtinctionScale", 1, false, 0.01f, 0.0f, 100.0f, [](Scene::Environment& e) { return &e.volumetricFogExtinctionScale; } },
+		{ "skyLight", 1, false, 0.01f, 0.0f, 10.0f, [](Scene::Environment& e) { return &e.skyLightIntensity; } },
+	};
 
 	// 初めて時刻の設定を入れたときに時刻で変える項目
 	constexpr const char* kDefaultTimeOfDayParams[] = {
@@ -563,6 +680,43 @@ namespace {
 }
 
 
+const char* Scene::GetQualityName(Quality quality) {
+	return GetQualityPreset(quality).name;
+}
+
+void Scene::ApplyQuality(Environment& env, Quality quality) {
+	const QualityPreset& preset = GetQualityPreset(quality);
+	env.aoMode = preset.ao;
+	env.shadowMode = preset.shadow;
+	env.reflectionMode = preset.reflection;
+	env.ambientMode = preset.ambient;
+	env.localLightAO = preset.localLightAO;
+	env.specularAA = preset.specularAA;
+	env.aerialPerspectiveLut = preset.aerialPerspectiveLut;
+	env.specularDetail = preset.specularDetail;
+	env.reflectAll = preset.reflectAll;
+	env.reflectionDenoised = preset.reflectionDenoised;
+	env.reflectionBounce = preset.reflectionBounce;
+	env.reflectionSceneColor = preset.reflectionSceneColor;
+	env.ssgi = preset.ssgi;
+	// GI はどの段でも使わない
+	env.gi = false;
+	env.giScreen = false;
+}
+
+std::span<const Scene::EnvironmentParam> Scene::GetVolumeParams() {
+	return kVolumeParams;
+}
+
+const Scene::EnvironmentParam* Scene::FindVolumeParam(const std::string& name) {
+	for (const EnvironmentParam& param : kVolumeParams) {
+		if (name == param.name) {
+			return &param;
+		}
+	}
+	return nullptr;
+}
+
 Level::Level() = default;
 
 Level::~Level() = default;
@@ -575,9 +729,14 @@ void Level::Load(const std::string& name, Graphics::LightManager* lightManager) 
 	lights_.clear();
 	giVolumes_.clear();
 	reflectionProbes_.clear();
+	localFogVolumes_.clear();
+	postProcessVolumes_.clear();
+	appliedVolumeWeights_.clear();
+	splines_.clear();
 	sprites_.clear();
 	// 前のシーンの箱を残さない
 	ApplyReflectionProbes();
+	ApplyLocalFogVolumes();
 	environment_ = {};
 	timeOfDay_ = {};
 	selectedKey_ = -1;
@@ -588,6 +747,25 @@ void Level::Load(const std::string& name, Graphics::LightManager* lightManager) 
 		environment_ = ReadEnvironment(data["environment"]);
 		if (data["environment"].contains("timeOfDay")) {
 			timeOfDay_ = ReadTimeOfDay(data["environment"]["timeOfDay"], environment_);
+		}
+	}
+	// 計測で段を揃えるときは、環境変数の段で上書きする
+	std::string qualityName;
+	if (ReadDevEnv("FUJI_QUALITY", qualityName)) {
+		for (int i = 0; i < kQualityCount; ++i) {
+			if (qualityName == kQualityPresets[i].name) {
+				ApplyQuality(environment_, static_cast<Quality>(i));
+			}
+		}
+	}
+	// さらに FUJI_ENV の JSON (例: {"rain":0}) で個々の値を上書きできる。機能ごとの重さを比べるため
+	std::string envPatch;
+	if (ReadDevEnv("FUJI_ENV", envPatch)) {
+		const nlohmann::json patch = nlohmann::json::parse(envPatch, nullptr, false);
+		if (patch.is_object()) {
+			nlohmann::json merged = ToJson(environment_);
+			merged.merge_patch(patch);
+			environment_ = ReadEnvironment(merged);
 		}
 	}
 	// ファイルが無くても既定の環境は入れる。前のシーンの空やライトを残さないため
@@ -652,7 +830,34 @@ void Level::Load(const std::string& name, Graphics::LightManager* lightManager) 
 			reflectionProbes_.push_back(std::move(probe));
 		}
 	}
+	if (data.contains("localFogVolumes")) {
+		for (const auto& volumeData : data["localFogVolumes"]) {
+			if (localFogVolumes_.size() >= Graphics::VolumetricFogPass::kMaxLocalFogVolumes) {
+				break;
+			}
+			auto volume = std::make_unique<GameObject::LocalFogVolume>();
+			volume->Create(volumeData);
+			localFogVolumes_.push_back(std::move(volume));
+		}
+	}
+	if (data.contains("splines")) {
+		for (const auto& splineData : data["splines"]) {
+			auto spline = std::make_unique<GameObject::PlacedSpline>();
+			spline->Create(splineData);
+			splines_.push_back(std::move(spline));
+		}
+	}
+	if (data.contains("postProcessVolumes")) {
+		for (const auto& volumeData : data["postProcessVolumes"]) {
+			auto volume = std::make_unique<GameObject::PostProcessVolume>();
+			volume->Create(volumeData);
+			postProcessVolumes_.push_back(std::move(volume));
+		}
+		// 箱の中から始まるシーンもあるので当て直す
+		ApplyEnvironment();
+	}
 	ApplyReflectionProbes();
+	ApplyLocalFogVolumes();
 	// 焼いた間接光は箱のあるシーンだけ読む
 	if (Graphics::BakedGIPass* baked = Graphics::ObjectRenderer::GetInstance()->GetBakedGIPass()) {
 		if (giVolumes_.empty() || !baked->Load(GetBakedGIDirectory())) {
@@ -686,6 +891,18 @@ void Level::Save() const {
 	for (const auto& probe : reflectionProbes_) {
 		reflectionProbes.push_back(probe->ToJson());
 	}
+	nlohmann::json splines = nlohmann::json::array();
+	for (const auto& spline : splines_) {
+		splines.push_back(spline->ToJson());
+	}
+	nlohmann::json postProcessVolumes = nlohmann::json::array();
+	for (const auto& volume : postProcessVolumes_) {
+		postProcessVolumes.push_back(volume->ToJson());
+	}
+	nlohmann::json localFogVolumes = nlohmann::json::array();
+	for (const auto& volume : localFogVolumes_) {
+		localFogVolumes.push_back(volume->ToJson());
+	}
 	nlohmann::json data;
 	data["environment"] = ToJson(environment_);
 	// 使っていないシーンの配置データには書かない
@@ -703,6 +920,15 @@ void Level::Save() const {
 	if (!reflectionProbes.empty()) {
 		data["reflectionProbes"] = std::move(reflectionProbes);
 	}
+	if (!localFogVolumes.empty()) {
+		data["localFogVolumes"] = std::move(localFogVolumes);
+	}
+	if (!postProcessVolumes.empty()) {
+		data["postProcessVolumes"] = std::move(postProcessVolumes);
+	}
+	if (!splines.empty()) {
+		data["splines"] = std::move(splines);
+	}
 
 	std::filesystem::create_directories(kLevelDirectory);
 	JsonSerializer::SerializeJsonData(data, LevelPath(name_));
@@ -711,12 +937,31 @@ void Level::Save() const {
 void Level::Update() {
 	UpdateTimeOfDay();
 	for (auto& object : objects_) {
+		if (const std::string* splineName = object->GetFollowSplineName()) {
+			if (const GameObject::PlacedSpline* spline = FindSpline(*splineName)) {
+				object->FollowSpline(spline->GetWorldSpline());
+			}
+		}
 		object->Update();
 	}
 	for (auto& light : lights_) {
 		light->Update();
 	}
 	ApplyReflectionProbes();
+	ApplyLocalFogVolumes();
+	// カメラが箱に出入りして混ぜる割合が変わったら当て直す
+	if (!postProcessVolumes_.empty() || !appliedVolumeWeights_.empty()) {
+		Environment blended = environment_;
+		std::vector<float> weights;
+		BlendPostProcessVolumes(blended, weights);
+		bool isChanged = weights.size() != appliedVolumeWeights_.size();
+		for (size_t i = 0; !isChanged && i < weights.size(); ++i) {
+			isChanged = std::abs(weights[i] - appliedVolumeWeights_[i]) > 1e-4f;
+		}
+		if (isChanged) {
+			ApplyEnvironment();
+		}
+	}
 }
 
 void Level::Draw() {
@@ -737,6 +982,15 @@ void Level::Draw() {
 	}
 	for (auto& probe : reflectionProbes_) {
 		probe->Draw();
+	}
+	for (auto& volume : localFogVolumes_) {
+		volume->Draw();
+	}
+	for (auto& volume : postProcessVolumes_) {
+		volume->Draw();
+	}
+	for (auto& spline : splines_) {
+		spline->Draw();
 	}
 }
 
@@ -797,6 +1051,30 @@ GameObject::GameObject* Level::Duplicate(const GameObject::GameObject* source) {
 			return reflectionProbes_.back().get();
 		}
 	}
+	for (const auto& volume : localFogVolumes_) {
+		if (volume.get() == source && localFogVolumes_.size() < Graphics::VolumetricFogPass::kMaxLocalFogVolumes) {
+			auto copy = std::make_unique<GameObject::LocalFogVolume>();
+			copy->Create(volume->ToJson());
+			localFogVolumes_.push_back(std::move(copy));
+			return localFogVolumes_.back().get();
+		}
+	}
+	for (const auto& volume : postProcessVolumes_) {
+		if (volume.get() == source) {
+			auto copy = std::make_unique<GameObject::PostProcessVolume>();
+			copy->Create(volume->ToJson());
+			postProcessVolumes_.push_back(std::move(copy));
+			return postProcessVolumes_.back().get();
+		}
+	}
+	for (const auto& spline : splines_) {
+		if (spline.get() == source) {
+			auto copy = std::make_unique<GameObject::PlacedSpline>();
+			copy->Create(spline->ToJson());
+			splines_.push_back(std::move(copy));
+			return splines_.back().get();
+		}
+	}
 	return nullptr;
 }
 
@@ -813,14 +1091,19 @@ bool Level::Remove(const GameObject::GameObject* object) {
 		}
 	}
 	return std::erase_if(objects_, isTarget) > 0 || std::erase_if(spawnPoints_, isTarget) > 0 || std::erase_if(lights_, isTarget) > 0 ||
-		std::erase_if(giVolumes_, isTarget) > 0 || std::erase_if(reflectionProbes_, isTarget) > 0;
+		std::erase_if(giVolumes_, isTarget) > 0 || std::erase_if(reflectionProbes_, isTarget) > 0 ||
+		std::erase_if(localFogVolumes_, isTarget) > 0 || std::erase_if(postProcessVolumes_, isTarget) > 0 ||
+		std::erase_if(splines_, isTarget) > 0;
 }
 
 bool Level::Contains(const GameObject::GameObject* object) const {
 	const auto isTarget = [object](const auto& o) { return o.get() == object; };
 	return std::any_of(objects_.begin(), objects_.end(), isTarget) || std::any_of(spawnPoints_.begin(), spawnPoints_.end(), isTarget) ||
 		std::any_of(lights_.begin(), lights_.end(), isTarget) || std::any_of(giVolumes_.begin(), giVolumes_.end(), isTarget) ||
-		std::any_of(reflectionProbes_.begin(), reflectionProbes_.end(), isTarget);
+		std::any_of(reflectionProbes_.begin(), reflectionProbes_.end(), isTarget) ||
+		std::any_of(localFogVolumes_.begin(), localFogVolumes_.end(), isTarget) ||
+		std::any_of(postProcessVolumes_.begin(), postProcessVolumes_.end(), isTarget) ||
+		std::any_of(splines_.begin(), splines_.end(), isTarget);
 }
 
 GameObject::PlacedLight* Level::AddLight(bool isSpot) {
@@ -855,6 +1138,78 @@ GameObject::ReflectionProbe* Level::AddReflectionProbe() {
 	probe->Create(nlohmann::json::object());
 	reflectionProbes_.push_back(std::move(probe));
 	return reflectionProbes_.back().get();
+}
+
+GameObject::LocalFogVolume* Level::AddLocalFogVolume() {
+	if (localFogVolumes_.size() >= Graphics::VolumetricFogPass::kMaxLocalFogVolumes) {
+		return nullptr;
+	}
+	auto volume = std::make_unique<GameObject::LocalFogVolume>();
+	volume->Create(nlohmann::json::object());
+	localFogVolumes_.push_back(std::move(volume));
+	return localFogVolumes_.back().get();
+}
+
+GameObject::PlacedSpline* Level::AddSpline() {
+	auto spline = std::make_unique<GameObject::PlacedSpline>();
+	spline->Create(nlohmann::json::object());
+	splines_.push_back(std::move(spline));
+	return splines_.back().get();
+}
+
+const GameObject::PlacedSpline* Level::FindSpline(const std::string& name) const {
+	for (const auto& spline : splines_) {
+		if (spline->GetName() == name && spline->IsActive()) {
+			return spline.get();
+		}
+	}
+	return nullptr;
+}
+
+GameObject::PostProcessVolume* Level::AddPostProcessVolume() {
+	auto volume = std::make_unique<GameObject::PostProcessVolume>();
+	volume->Create(nlohmann::json::object());
+	postProcessVolumes_.push_back(std::move(volume));
+	return postProcessVolumes_.back().get();
+}
+
+void Level::BlendPostProcessVolumes(Environment& env, std::vector<float>& weights) const {
+	weights.assign(postProcessVolumes_.size(), 0.0f);
+	const Graphics::Camera* camera = Graphics::CameraManager::GetInstance()->GetCamera();
+	if (camera == nullptr) {
+		return;
+	}
+	const Vector3 cameraPosition = camera->GetTranslate();
+	// 優先度の小さい順に重ねる。同じなら置いた順
+	std::vector<size_t> order(postProcessVolumes_.size());
+	for (size_t i = 0; i < order.size(); ++i) {
+		order[i] = i;
+	}
+	std::stable_sort(order.begin(), order.end(), [this](size_t a, size_t b) {
+		return postProcessVolumes_[a]->GetPriority() < postProcessVolumes_[b]->GetPriority();
+	});
+	for (size_t index : order) {
+		const float weight = postProcessVolumes_[index]->GetWeight(cameraPosition);
+		weights[index] = weight;
+		if (weight > 0.0f) {
+			postProcessVolumes_[index]->Blend(env, weight);
+		}
+	}
+}
+
+void Level::ApplyLocalFogVolumes() const {
+	Graphics::VolumetricFogPass* pass = Graphics::ObjectRenderer::GetInstance()->GetVolumetricFogPass();
+	if (pass == nullptr) {
+		return;
+	}
+	std::vector<Graphics::VolumetricFogPass::LocalFogVolumeDesc> volumes;
+	volumes.reserve(localFogVolumes_.size());
+	for (const auto& volume : localFogVolumes_) {
+		if (volume->IsActive()) {
+			volumes.push_back(volume->GetDesc());
+		}
+	}
+	pass->SetLocalFogVolumes(volumes);
 }
 
 void Level::ApplyReflectionProbes() const {
@@ -1034,6 +1389,19 @@ GameObject::PlacedObject* Level::Find(const std::string& name) {
 }
 
 void Level::ApplyEnvironment() {
+	if (postProcessVolumes_.empty()) {
+		appliedVolumeWeights_.clear();
+		ApplyEnvironmentRaw();
+		return;
+	}
+	// 箱の値を混ぜた環境で当てる。保存する値は元へ戻す
+	const Environment saved = environment_;
+	BlendPostProcessVolumes(environment_, appliedVolumeWeights_);
+	ApplyEnvironmentRaw();
+	environment_ = saved;
+}
+
+void Level::ApplyEnvironmentRaw() {
 	if (environment_.hasSkyBox) {
 		if (!skyBox_) {
 			skyBox_ = std::make_unique<Graphics::SkyBox>();
@@ -1096,6 +1464,9 @@ void Level::ApplyEnvironment() {
 		fog.skyAmount = environment_.fogSkyAmount;
 		fog.sunScatter = environment_.fogSunScatter;
 		fog.sunScatterPower = environment_.fogSunPower;
+		fog.secondDensity = environment_.fogSecondDensity;
+		fog.secondHeightFalloff = environment_.fogSecondHeightFalloff;
+		fog.secondBaseHeight = environment_.fogBaseHeight + environment_.fogSecondHeightOffset;
 		fog.skyMode = isAtmosphere ? Graphics::kSkyModeAtmosphere : Graphics::kSkyModeTexture;
 		fog.skyIntensity = environment_.skyIntensity;
 		fog.cloudCoverage = environment_.cloudCoverage;
@@ -1118,9 +1489,13 @@ void Level::ApplyEnvironment() {
 		atmosphere.fogColorFromSky = environment_.fogColorFromSky;
 		atmosphere.fogSkyColorScale = environment_.fogSkyColorScale;
 		atmosphere.aerialPerspectiveScale = environment_.aerialPerspectiveScale;
+		atmosphere.aerialPerspectiveLut = environment_.aerialPerspectiveLut;
 		atmosphere.skyLightIntensity = environment_.skyLightIntensity;
 		atmosphere.nightAmbient = timeLighting_.nightAmbient;
 		lightManager_->SetAtmosphereSettings(atmosphere);
+		if (Graphics::SkyAtmosphere* sky = Graphics::ObjectRenderer::GetInstance()->GetSkyAtmosphere()) {
+			sky->SetPlanet(environment_.atmosphereAltitude, environment_.atmosphereScale);
+		}
 		lightManager_->SetLightingMode(
 			static_cast<Graphics::LightingMode>(std::clamp(environment_.lightingMode, 0, kLightingCount - 1)));
 		uint32_t renderFlags = 0;
@@ -1135,6 +1510,12 @@ void Level::ApplyEnvironment() {
 		}
 		if (environment_.localLightAO) {
 			renderFlags |= Graphics::kRenderFlagLocalLightAO;
+		}
+		if (environment_.softLocalShadow) {
+			renderFlags |= Graphics::kRenderFlagSoftLocalShadow;
+		}
+		if (environment_.ssgi) {
+			renderFlags |= Graphics::kRenderFlagScreenSpaceGI;
 		}
 		if (environment_.gi) {
 			renderFlags |= Graphics::kRenderFlagGI;
@@ -1166,9 +1547,30 @@ void Level::ApplyEnvironment() {
 		if (Graphics::ScreenReflectionPass* reflection = Graphics::ObjectRenderer::GetInstance()->GetScreenReflectionPass()) {
 			reflection->SetStretch(environment_.reflectionStretch);
 		}
+		if (Graphics::ScreenSpaceGIPass* ssgi = Graphics::ObjectRenderer::GetInstance()->GetScreenSpaceGIPass()) {
+			Graphics::ScreenSpaceGIPass::Settings settings;
+			settings.intensity = environment_.ssgiIntensity;
+			settings.maxDistance = (std::max)(environment_.ssgiDistance, 0.1f);
+			ssgi->SetSettings(settings);
+		}
+		if (Graphics::VolumetricFogPass* fogPass = Graphics::ObjectRenderer::GetInstance()->GetVolumetricFogPass()) {
+			Graphics::VolumetricFogPass::Settings settings;
+			settings.enabled = environment_.volumetricFog;
+			settings.albedo = environment_.volumetricFogAlbedo;
+			settings.emissive = environment_.volumetricFogEmissive;
+			settings.extinctionScale = environment_.volumetricFogExtinctionScale;
+			settings.scatteringDistribution = environment_.volumetricFogScatteringDistribution;
+			settings.viewDistance = (std::max)(environment_.volumetricFogViewDistance, 1.0f);
+			settings.sunScale = environment_.volumetricFogSun;
+			settings.skyLightScale = environment_.volumetricFogSkyLight;
+			settings.localLightScale = environment_.volumetricFogLocalLights;
+			settings.temporal = environment_.volumetricFogTemporal;
+			fogPass->SetSettings(settings);
+		}
 		if (Graphics::VolumetricLightPass* volumetric = Graphics::ObjectRenderer::GetInstance()->GetVolumetricLightPass()) {
 			Graphics::VolumetricLightPass::Settings settings;
-			settings.density = environment_.volumetricDensity;
+			// ボリュメトリックフォグが同じ光を霧の中で求めるので、二重に足さない
+			settings.density = environment_.volumetricFog ? 0.0f : environment_.volumetricDensity;
 			settings.anisotropy = environment_.volumetricAnisotropy;
 			settings.maxDistance = environment_.volumetricDistance;
 			settings.intensity = environment_.volumetricIntensity;
@@ -1233,7 +1635,7 @@ void Level::ApplyEnvironment() {
 		post.chromaticAberration = environment_.chromaticAberration;
 		post.lensFlare = environment_.lensFlare;
 		post.motionBlur = environment_.motionBlur;
-		post.volumetricLight = environment_.volumetricDensity > 0.0f;
+		post.volumetricLight = !environment_.volumetricFog && environment_.volumetricDensity > 0.0f;
 		post.whiteBalanceTemperature = environment_.whiteBalanceTemperature;
 		post.whiteBalanceTint = environment_.whiteBalanceTint;
 		post.purkinje = (std::max)(environment_.purkinje, timeOfDay_.nightPurkinje * timeLighting_.night);
@@ -1252,6 +1654,11 @@ void Level::SetHour(float hour) {
 	}
 	timeOfDay_.hour = WrapHour(hour);
 	ApplyTimeOfDay();
+	ApplyEnvironment();
+}
+
+void Level::SetQuality(Quality quality) {
+	ApplyQuality(environment_, quality);
 	ApplyEnvironment();
 }
 
@@ -1484,31 +1891,9 @@ void Level::EnvironmentGUI() {
 #ifdef _DEBUGMODE
 	bool changed = false;
 	ImGui::SeparatorText("Quality");
-	// 右ほど豪華で重い。Standard が従来の既定。GI はどの段でも使わない
-	struct QualityPreset {
-		const char* name; int ao; int shadow; int reflection; int ambient; bool specularDetail; bool reflectAll; bool gi; int giRays; bool giScreen; bool reflectionDenoised;
-		bool specularAA; bool reflectionBounce;
-	};
-	constexpr QualityPreset kPresets[] = {
-		{ "Standard", Graphics::kAOModeScreen, Graphics::kShadowModeHard, Graphics::kReflectionModeOff, Graphics::kAmbientModeHemisphere, false, false, false, 64, false, false, false, false },
-		{ "High", Graphics::kAOModeScreen, Graphics::kShadowModeSoft, Graphics::kReflectionModeOcclusion, Graphics::kAmbientModeHemisphere, true, false, false, 64, false, false, true, false },
-		{ "Ultra", Graphics::kAOModeScreen, Graphics::kShadowModeSoft, Graphics::kReflectionModeObjects, Graphics::kAmbientModeHemisphere, true, true, false, 64, false, true, true, true },
-		{ "Realistic", Graphics::kAOModeScreen, Graphics::kShadowModeSoft, Graphics::kReflectionModeObjects, Graphics::kAmbientModeIBL, true, true, false, 64, false, true, true, true },
-	};
-	for (const QualityPreset& preset : kPresets) {
-		if (ImGui::Button(preset.name)) {
-			environment_.aoMode = preset.ao;
-			environment_.shadowMode = preset.shadow;
-			environment_.reflectionMode = preset.reflection;
-			environment_.ambientMode = preset.ambient;
-			environment_.specularDetail = preset.specularDetail;
-			environment_.reflectAll = preset.reflectAll;
-			environment_.gi = preset.gi;
-			environment_.giRays = preset.giRays;
-			environment_.giScreen = preset.giScreen;
-			environment_.reflectionDenoised = preset.reflectionDenoised;
-			environment_.specularAA = preset.specularAA;
-			environment_.reflectionBounce = preset.reflectionBounce;
+	for (int i = 0; i < kQualityCount; ++i) {
+		if (ImGui::Button(kQualityPresets[i].name)) {
+			ApplyQuality(environment_, static_cast<Quality>(i));
 			changed = true;
 		}
 		ImGui::SameLine();
@@ -1518,6 +1903,7 @@ void Level::EnvironmentGUI() {
 	changed |= ImGui::Combo("AO",&environment_.aoMode, kAONames, kAOCount);
 	changed |= ImGui::Checkbox("AO on local lights", &environment_.localLightAO);
 	changed |= ImGui::Combo("Shadow", &environment_.shadowMode, kShadowNames, kShadowCount);
+	changed |= ImGui::Checkbox("Soft local shadows", &environment_.softLocalShadow);
 	changed |= ImGui::Combo("Ambient", &environment_.ambientMode, kAmbientNames, kAmbientCount);
 	changed |= ImGui::Checkbox("Specular detail", &environment_.specularDetail);
 	changed |= ImGui::Checkbox("Specular AA", &environment_.specularAA);
@@ -1527,6 +1913,11 @@ void Level::EnvironmentGUI() {
 	changed |= ImGui::DragFloat("GI probe spacing", &environment_.giProbeSpacing, 0.05f, 0.25f, 20.0f);
 	changed |= ImGui::SliderInt("GI rays", &environment_.giRays, 32, 128);
 	changed |= ImGui::Checkbox("GI screen probes", &environment_.giScreen);
+	ImGui::EndDisabled();
+	changed |= ImGui::Checkbox("SSGI", &environment_.ssgi);
+	ImGui::BeginDisabled(!environment_.ssgi);
+	changed |= ImGui::DragFloat("SSGI intensity", &environment_.ssgiIntensity, 0.01f, 0.0f, 10.0f);
+	changed |= ImGui::DragFloat("SSGI distance", &environment_.ssgiDistance, 0.05f, 0.1f, 50.0f);
 	ImGui::EndDisabled();
 	ImGui::BeginDisabled(environment_.ambientMode != Graphics::kAmbientModeIBL);
 	changed |= ImGui::DragFloat("IBL scale", &environment_.iblAmbientScale, 0.01f, 0.0f, 10.0f);
@@ -1549,8 +1940,11 @@ void Level::EnvironmentGUI() {
 	changed |= ImGui::ColorEdit3("Color##sky", &environment_.skyBoxColor.x);
 	ImGui::BeginDisabled(environment_.skyMode != Graphics::kSkyModeAtmosphere);
 	changed |= ImGui::DragFloat("Aerial perspective", &environment_.aerialPerspectiveScale, 0.1f, 0.0f, 1000.0f);
+	changed |= ImGui::Checkbox("Aerial perspective LUT", &environment_.aerialPerspectiveLut);
 	changed |= ImGui::DragFloat("Sky light", &environment_.skyLightIntensity, 0.01f, 0.0f, 10.0f);
 	changed |= ImGui::SliderFloat("Clouds", &environment_.cloudCoverage, 0.0f, 1.0f);
+	changed |= ImGui::DragFloat("Altitude (km)", &environment_.atmosphereAltitude, 0.5f, 0.0f, 100000.0f, "%.1f");
+	changed |= ImGui::DragFloat("Planet scale", &environment_.atmosphereScale, 0.001f, 0.0001f, 100.0f, "%.4f", ImGuiSliderFlags_Logarithmic);
 	changed |= ImGui::SliderFloat("Cloud shadow", &environment_.cloudShadow, 0.0f, 1.0f);
 	changed |= ImGui::DragFloat("Stars", &environment_.stars, 0.01f, 0.0f, 10.0f);
 	changed |= ImGui::DragFloat("Moon", &environment_.moon, 0.01f, 0.0f, 10.0f);
@@ -1586,6 +1980,28 @@ void Level::EnvironmentGUI() {
 	changed |= ImGui::SliderFloat("Sky amount", &environment_.fogSkyAmount, 0.0f, 1.0f);
 	changed |= ImGui::DragFloat("Sun scatter", &environment_.fogSunScatter, 0.01f, 0.0f, 10.0f);
 	changed |= ImGui::DragFloat("Sun power", &environment_.fogSunPower, 0.1f, 1.0f, 64.0f);
+	if (ImGui::TreeNode("Second layer##fog")) {
+		changed |= ImGui::DragFloat("Density##fog2", &environment_.fogSecondDensity, 0.0002f, 0.0f, 1.0f, "%.4f");
+		ImGui::BeginDisabled(environment_.fogSecondDensity <= 0.0f);
+		changed |= ImGui::DragFloat("Height falloff##fog2", &environment_.fogSecondHeightFalloff, 0.001f, 0.0f, 2.0f, "%.3f");
+		changed |= ImGui::DragFloat("Height offset##fog2", &environment_.fogSecondHeightOffset, 0.1f);
+		ImGui::EndDisabled();
+		ImGui::TreePop();
+	}
+
+	ImGui::SeparatorText("Volumetric Fog");
+	changed |= ImGui::Checkbox("Enable##volumetricFog", &environment_.volumetricFog);
+	ImGui::BeginDisabled(!environment_.volumetricFog);
+	changed |= ImGui::ColorEdit3("Albedo##volumetricFog", &environment_.volumetricFogAlbedo.x, ImGuiColorEditFlags_Float);
+	changed |= ImGui::ColorEdit3("Emissive##volumetricFog", &environment_.volumetricFogEmissive.x, ImGuiColorEditFlags_Float | ImGuiColorEditFlags_HDR);
+	changed |= ImGui::DragFloat("Extinction scale", &environment_.volumetricFogExtinctionScale, 0.01f, 0.0f, 100.0f);
+	changed |= ImGui::SliderFloat("Scattering distribution", &environment_.volumetricFogScatteringDistribution, -0.9f, 0.9f);
+	changed |= ImGui::DragFloat("View distance", &environment_.volumetricFogViewDistance, 0.5f, 1.0f, 1000.0f);
+	changed |= ImGui::DragFloat("Sun##volumetricFog", &environment_.volumetricFogSun, 0.01f, 0.0f, 100.0f);
+	changed |= ImGui::DragFloat("Sky light##volumetricFog", &environment_.volumetricFogSkyLight, 0.01f, 0.0f, 100.0f);
+	changed |= ImGui::DragFloat("Local lights##volumetricFog", &environment_.volumetricFogLocalLights, 0.01f, 0.0f, 100.0f);
+	changed |= ImGui::Checkbox("Temporal##volumetricFog", &environment_.volumetricFogTemporal);
+	ImGui::EndDisabled();
 
 	ImGui::SeparatorText("Bloom");
 	changed |= ImGui::Checkbox("Enable##bloom", &environment_.bloomEnabled);

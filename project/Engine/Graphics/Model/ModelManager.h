@@ -23,6 +23,7 @@ namespace Graphics {
 	struct PickingBuffer {
 		int objID;
 		float depth;
+		int meshIndex = -1;	// 拾ったメッシュ (モデルの何番目か)
 	};
 
 	/// <summary>
@@ -91,6 +92,8 @@ namespace Graphics {
 		void PickingDataReset();
 		void PickingDataCopy();
 		int GetPickedID() { return lastPicked_.objID; }
+		/// <summary>拾ったオブジェクトの何番目のメッシュか。何も無い所なら -1</summary>
+		int GetPickedMeshIndex() const { return lastPicked_.objID > 0 ? lastPicked_.meshIndex : -1; }
 		int GetPickedCoord(int i) { return pickingData_.pickingPixelCoord[i]; }
 		/// <summary>このフレームにクリックされたか。立っているフレームだけピッキングのパスを走らせる</summary>
 		bool IsPickingRequested() const { return pickingData_.pickingEnable != 0; }

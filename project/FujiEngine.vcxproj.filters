@@ -16,7 +16,13 @@
     <ClCompile Include="Engine\Graphics\Raytracing\ScreenReflectionPass.cpp">
       <Filter>Engine\Graphics\Raytracing</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Graphics\Raytracing\ScreenSpaceGIPass.cpp">
+      <Filter>Engine\Graphics\Raytracing</Filter>
+    </ClCompile>
     <ClCompile Include="Engine\Graphics\Raytracing\VolumetricLightPass.cpp">
+      <Filter>Engine\Graphics\Raytracing</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Graphics\Raytracing\VolumetricFogPass.cpp">
       <Filter>Engine\Graphics\Raytracing</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Graphics\Object\RefractionCapture.cpp">
@@ -58,6 +64,9 @@
     <ClCompile Include="Engine\DXC\Command\DXCommand.cpp">
       <Filter>Engine\DXC\Command</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\DXC\Debug\FrameProfiler.cpp">
+      <Filter>Engine\DXC\Debug</Filter>
+    </ClCompile>
     <ClCompile Include="Engine\DXC\Debug\GPUTimer.cpp">
       <Filter>Engine\DXC\Debug</Filter>
     </ClCompile>
@@ -95,6 +104,9 @@
       <Filter>Engine\Editor\ObjectEditor</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Editor\Widget\GizmoHelper.cpp">
+      <Filter>Engine\Editor\Widget</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Editor\ContentBrowser\ContentBrowser.cpp">
       <Filter>Engine\Editor\Widget</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Editor\Widget\JsonEditorUI.cpp">
@@ -241,6 +253,9 @@
     <ClCompile Include="Engine\Graphics\Raytracing\RayTracedAOPass.cpp">
       <Filter>Engine\Graphics\Raytracing</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Graphics\Raytracing\PunctualShadowPass.cpp">
+      <Filter>Engine\Graphics\Raytracing</Filter>
+    </ClCompile>
     <ClCompile Include="Engine\Graphics\Raytracing\RayTracedShadowPass.cpp">
       <Filter>Engine\Graphics\Raytracing</Filter>
     </ClCompile>
@@ -304,6 +319,18 @@
     <ClCompile Include="Engine\GameObject\ReflectionProbe.cpp">
       <Filter>Engine\GameObject</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Math\Spline\Spline.cpp">
+      <Filter>Engine\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\GameObject\PlacedSpline.cpp">
+      <Filter>Engine\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\GameObject\PostProcessVolume.cpp">
+      <Filter>Engine\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\GameObject\LocalFogVolume.cpp">
+      <Filter>Engine\GameObject</Filter>
+    </ClCompile>
     <ClCompile Include="Engine\GameObject\GIVolume.cpp">
       <Filter>Engine\GameObject</Filter>
     </ClCompile>
@@ -327,6 +354,15 @@
     </ClCompile>
     <ClCompile Include="Game\App\GameRun.cpp">
       <Filter>Game\App</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Collision\CollisionGeometry.cpp">
+      <Filter>Engine\Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Collision\SphereCollider.cpp">
+      <Filter>Engine\Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Collision\CapsuleCollider.cpp">
+      <Filter>Engine\Collision</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Collision\AABBCollider.cpp">
       <Filter>Engine\Collision</Filter>
@@ -430,6 +466,9 @@
     <ClCompile Include="Game\Scene\Debug\NightTownScene.cpp">
       <Filter>Game\Scene\Debug</Filter>
     </ClCompile>
+    <ClCompile Include="Game\Scene\Debug\RuinsScene.cpp">
+      <Filter>Game\Scene\Debug</Filter>
+    </ClCompile>
     <ClCompile Include="Game\Scene\Debug\TestScene.cpp">
       <Filter>Game\Scene\Debug</Filter>
     </ClCompile>
@@ -463,7 +502,13 @@
     <ClInclude Include="Engine\Graphics\Raytracing\ScreenReflectionPass.h">
       <Filter>Engine\Graphics\Raytracing</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Graphics\Raytracing\ScreenSpaceGIPass.h">
+      <Filter>Engine\Graphics\Raytracing</Filter>
+    </ClInclude>
     <ClInclude Include="Engine\Graphics\Raytracing\VolumetricLightPass.h">
+      <Filter>Engine\Graphics\Raytracing</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Graphics\Raytracing\VolumetricFogPass.h">
       <Filter>Engine\Graphics\Raytracing</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Graphics\Object\RefractionCapture.h">
@@ -480,6 +525,9 @@
     </ClInclude>
     <ClInclude Include="Engine\Core\App\MyWindow.h">
       <Filter>Engine\Core\App</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Debug\DevEnv.h">
+      <Filter>Engine\Core\Debug</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Core\Debug\ImGuiManager.h">
       <Filter>Engine\Core\Debug</Filter>
@@ -507,6 +555,9 @@
     </ClInclude>
     <ClInclude Include="Engine\DXC\Command\DXCommand.h">
       <Filter>Engine\DXC\Command</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\DXC\Debug\FrameProfiler.h">
+      <Filter>Engine\DXC\Debug</Filter>
     </ClInclude>
     <ClInclude Include="Engine\DXC\Debug\GPUTimer.h">
       <Filter>Engine\DXC\Debug</Filter>
@@ -554,6 +605,9 @@
       <Filter>Engine\Editor\ObjectEditor</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Editor\Widget\GizmoHelper.h">
+      <Filter>Engine\Editor\Widget</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Editor\ContentBrowser\ContentBrowser.h">
       <Filter>Engine\Editor\Widget</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Editor\Widget\JsonEditorUI.h">
@@ -682,6 +736,9 @@
     <ClInclude Include="Engine\Graphics\Pipeline\BasePipeline.h">
       <Filter>Engine\Graphics\Pipeline</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Graphics\Pipeline\ObjectShaderFeatures.h">
+      <Filter>Engine\Graphics\Pipeline</Filter>
+    </ClInclude>
     <ClInclude Include="Engine\Graphics\Pipeline\PipeKind.h">
       <Filter>Engine\Graphics\Pipeline</Filter>
     </ClInclude>
@@ -710,6 +767,9 @@
       <Filter>Engine\Graphics\Raytracing</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Graphics\Raytracing\RayTracedAOPass.h">
+      <Filter>Engine\Graphics\Raytracing</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Graphics\Raytracing\PunctualShadowPass.h">
       <Filter>Engine\Graphics\Raytracing</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Graphics\Raytracing\RayTracedShadowPass.h">
@@ -808,6 +868,18 @@
     <ClInclude Include="Engine\GameObject\ReflectionProbe.h">
       <Filter>Engine\GameObject</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Math\Spline\Spline.h">
+      <Filter>Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\GameObject\PlacedSpline.h">
+      <Filter>Engine\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\GameObject\PostProcessVolume.h">
+      <Filter>Engine\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\GameObject\LocalFogVolume.h">
+      <Filter>Engine\GameObject</Filter>
+    </ClInclude>
     <ClInclude Include="Engine\GameObject\GIVolume.h">
       <Filter>Engine\GameObject</Filter>
     </ClInclude>
@@ -815,6 +887,9 @@
       <Filter>Engine\GameObject</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Scene\Level.h">
+      <Filter>Engine\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Scene\EnvironmentParams.h">
       <Filter>Engine\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Scene\SceneManager.h">
@@ -834,6 +909,15 @@
     </ClInclude>
     <ClInclude Include="Game\App\GameRun.h">
       <Filter>Game\App</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Collision\CollisionGeometry.h">
+      <Filter>Engine\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Collision\SphereCollider.h">
+      <Filter>Engine\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Collision\CapsuleCollider.h">
+      <Filter>Engine\Collision</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Collision\AABBCollider.h">
       <Filter>Engine\Collision</Filter>
@@ -944,6 +1028,9 @@
       <Filter>Game\Scene\Debug</Filter>
     </ClInclude>
     <ClInclude Include="Game\Scene\Debug\NightTownScene.h">
+      <Filter>Game\Scene\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Scene\Debug\RuinsScene.h">
       <Filter>Game\Scene\Debug</Filter>
     </ClInclude>
     <ClInclude Include="Game\Scene\Debug\TestScene.h">
@@ -1235,16 +1322,28 @@
     <FxCompile Include="resource\Shaders\Raytracing\ScreenReflectionTrace.CS.hlsl">
       <Filter>resource\Shaders\Raytracing</Filter>
     </FxCompile>
+    <FxCompile Include="resource\Shaders\Raytracing\ScreenSpaceGITrace.CS.hlsl">
+      <Filter>resource\Shaders\Raytracing</Filter>
+    </FxCompile>
     <FxCompile Include="resource\Shaders\Raytracing\ScreenReflectionResolve.CS.hlsl">
       <Filter>resource\Shaders\Raytracing</Filter>
     </FxCompile>
+    <FxCompile Include="resource\Shaders\Raytracing\ScreenSpaceGIBlur.CS.hlsl">
+      <Filter>resource\Shaders\Raytracing</Filter>
+    </FxCompile>
     <FxCompile Include="resource\Shaders\Raytracing\VolumetricLightTrace.CS.hlsl">
+      <Filter>resource\Shaders\Raytracing</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\Raytracing\VolumetricFogScatter.CS.hlsl">
       <Filter>resource\Shaders\Raytracing</Filter>
     </FxCompile>
     <FxCompile Include="resource\Shaders\Light\ClusterLightCull.CS.hlsl">
       <Filter>resource\Shaders\Light</Filter>
     </FxCompile>
     <FxCompile Include="resource\Shaders\Raytracing\VolumetricLightBlur.CS.hlsl">
+      <Filter>resource\Shaders\Raytracing</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\Raytracing\VolumetricFogIntegrate.CS.hlsl">
       <Filter>resource\Shaders\Raytracing</Filter>
     </FxCompile>
     <FxCompile Include="resource\Shaders\PostEffect\VolumetricLightComposite.CS.hlsl">
@@ -1272,6 +1371,9 @@
       <Filter>resource\Shaders\SkyBox</Filter>
     </FxCompile>
     <FxCompile Include="resource\Shaders\SkyBox\AtmosphereCapture.CS.hlsl">
+      <Filter>resource\Shaders\SkyBox</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\SkyBox\AtmosphereAerialPerspective.CS.hlsl">
       <Filter>resource\Shaders\SkyBox</Filter>
     </FxCompile>
     <FxCompile Include="resource\Shaders\SkyBox\AtmosphereSkyView.CS.hlsl">
@@ -1472,6 +1574,18 @@
     <FxCompile Include="resource\Shaders\Raytracing\DenoiseSpatial.CS.hlsl">
       <Filter>resource\Shaders\Raytracing</Filter>
     </FxCompile>
+    <FxCompile Include="resource\Shaders\Raytracing\PunctualShadow.CS.hlsl">
+      <Filter>resource\Shaders\Raytracing</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\Raytracing\DenoiseTemporalRGB.CS.hlsl">
+      <Filter>resource\Shaders\Raytracing</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\Raytracing\DenoiseSpatialRGB.CS.hlsl">
+      <Filter>resource\Shaders\Raytracing</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\Shaders\Raytracing\ReflectionAddSplats.CS.hlsl">
+      <Filter>resource\Shaders\Raytracing</Filter>
+    </FxCompile>
     <FxCompile Include="resource\Shaders\Raytracing\DenoiseTemporal.CS.hlsl">
       <Filter>resource\Shaders\Raytracing</Filter>
     </FxCompile>
@@ -1516,10 +1630,25 @@
     <None Include="resource\Shaders\Common\ScreenReflectionCommon.hlsli">
       <Filter>resource\Shaders\Common</Filter>
     </None>
+    <None Include="resource\Shaders\Common\ScreenSpaceGICommon.hlsli">
+      <Filter>resource\Shaders\Common</Filter>
+    </None>
     <None Include="resource\Shaders\Common\ScreenReflection.hlsli">
       <Filter>resource\Shaders\Common</Filter>
     </None>
+    <None Include="resource\Shaders\Common\ScreenSpaceGI.hlsli">
+      <Filter>resource\Shaders\Common</Filter>
+    </None>
     <None Include="resource\Shaders\Common\VolumetricLightCommon.hlsli">
+      <Filter>resource\Shaders\Common</Filter>
+    </None>
+    <None Include="resource\Shaders\Common\VolumetricFog.hlsli">
+      <Filter>resource\Shaders\Common</Filter>
+    </None>
+    <None Include="resource\Shaders\Common\Parallax.hlsli">
+      <Filter>resource\Shaders\Common</Filter>
+    </None>
+    <None Include="resource\Shaders\Common\MaterialLayers.hlsli">
       <Filter>resource\Shaders\Common</Filter>
     </None>
     <None Include="resource\Shaders\Common\Refraction.hlsli">
@@ -1582,6 +1711,9 @@
     <None Include="resource\Shaders\Common\RayTracedShadow.hlsli">
       <Filter>resource\Shaders\Common</Filter>
     </None>
+    <None Include="resource\Shaders\Common\AerialPerspective.hlsli">
+      <Filter>resource\Shaders\Common</Filter>
+    </None>
     <None Include="resource\Shaders\Common\Fog.hlsli">
       <Filter>resource\Shaders\Common</Filter>
     </None>
@@ -1602,6 +1734,9 @@
     </None>
     <None Include="resource\Shaders\Line\Line3d.hlsli">
       <Filter>resource\Shaders\Line</Filter>
+    </None>
+    <None Include="resource\Shaders\Object\ObjectFeatures.hlsli">
+      <Filter>resource\Shaders\Object</Filter>
     </None>
     <None Include="resource\Shaders\Object\Object3d.hlsli">
       <Filter>resource\Shaders\Object</Filter>

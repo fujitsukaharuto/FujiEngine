@@ -16,6 +16,7 @@ namespace Graphics {
 	class GBufferPass;
 	class RayTracedAOPass;
 	class RayTracedShadowPass;
+	class PunctualShadowPass;
 	class IBLBaker;
 	class SkyAtmosphere;
 	class DDGIPass;
@@ -25,7 +26,9 @@ namespace Graphics {
 	class ClusteredLightPass;
 	class ScreenProbeGIPass;
 	class ScreenReflectionPass;
+	class ScreenSpaceGIPass;
 	class VolumetricLightPass;
+	class VolumetricFogPass;
 	class RefractionCapture;
 
 	/// <summary>
@@ -44,6 +47,9 @@ namespace Graphics {
 		void AddSkinned(AnimationModel* object);
 		void SetSkyBox(SkyBox* skyBox);
 
+		/// <summary>描く前の準備。TLAS を組み、影なしのライトを振り分け、ボリュメトリックフォグの表を作る</summary>
+		/// <remarks>スキニングの後、空を描く前に呼ぶ。呼ばずに Render した場合は Render が先に呼ぶ</remarks>
+		void PrepareFrame();
 		// 登録されたオブジェクトを一気に描画する
 		void Render();
 		// 登録されたオブジェクトを一気にスキニングする
@@ -71,6 +77,7 @@ namespace Graphics {
 
 		/// <summary>画面空間の平行光源ソフトシャドウ。前方描画がここのテクスチャを引く</summary>
 		RayTracedShadowPass* GetRayTracedShadowPass() const { return shadowPass_.get(); }
+		PunctualShadowPass* GetPunctualShadowPass() const { return punctualShadowPass_.get(); }
 
 		/// <summary>環境マップから焼いた IBL。前方描画がここのテクスチャを引く</summary>
 		IBLBaker* GetIBLBaker() const { return iblBaker_.get(); }
@@ -95,8 +102,14 @@ namespace Graphics {
 		/// <summary>画面の映り込み</summary>
 		ScreenReflectionPass* GetScreenReflectionPass() const { return screenReflectionPass_.get(); }
 
+		/// <summary>画面の照り返し</summary>
+		ScreenSpaceGIPass* GetScreenSpaceGIPass() const { return screenSpaceGIPass_.get(); }
+
 		/// <summary>光の筋</summary>
 		VolumetricLightPass* GetVolumetricLightPass() const { return volumetricLightPass_.get(); }
+
+		/// <summary>ボリュメトリックフォグ</summary>
+		VolumetricFogPass* GetVolumetricFogPass() const { return volumetricFogPass_.get(); }
 
 		/// <summary>半透明の屈折</summary>
 		RefractionCapture* GetRefractionCapture() const { return refractionCapture_.get(); }
@@ -115,6 +128,10 @@ namespace Graphics {
 		/// <summary>このフレームの静的オブジェクトからTLASを組み直す</summary>
 		void BuildRaytracingScene();
 
+		/// <summary>このフレームの前方描画に要る PS の機能 (ObjectShaderFeature の組み合わせ)</summary>
+		/// <remarks>GPU へ送った値から決める。各パスがこのフレームの定数を書いた後に呼ぶ</remarks>
+		uint32_t ComputeObjectFeatures(bool isRefracting) const;
+
 	private:
 		ObjectRenderer() = default;
 		// raytracingScene_ / gbufferPass_ / gpuTimer_ が不完全型なのでデストラクタは .cpp 側に置く
@@ -124,6 +141,8 @@ namespace Graphics {
 		LightManager* lightManager_ = nullptr;
 		// 反射に映す色を集める残りフレーム数。映さなくなっても、GPU が前の設定で描くぶんだけ集め続ける
 		uint32_t rayLookFrames_ = 0;
+		// このフレームの PrepareFrame が済んだか。Render の終わりで下ろす
+		bool isPrepared_ = false;
 
 		std::vector<Graphics::RenderObject*> renderQueue_;
 		std::vector<Graphics::AnimationModel*> skinningQueue_;
@@ -133,6 +152,7 @@ namespace Graphics {
 		std::unique_ptr<GBufferPass> gbufferPass_;
 		std::unique_ptr<RayTracedAOPass> aoPass_;
 		std::unique_ptr<RayTracedShadowPass> shadowPass_;
+		std::unique_ptr<PunctualShadowPass> punctualShadowPass_;
 		std::unique_ptr<IBLBaker> iblBaker_;
 		std::unique_ptr<SkyAtmosphere> skyAtmosphere_;
 		std::unique_ptr<DDGIPass> ddgiPass_;
@@ -142,7 +162,9 @@ namespace Graphics {
 		std::unique_ptr<ClusteredLightPass> clusteredLightPass_;
 		std::unique_ptr<ScreenProbeGIPass> screenProbeGIPass_;
 		std::unique_ptr<ScreenReflectionPass> screenReflectionPass_;
+		std::unique_ptr<ScreenSpaceGIPass> screenSpaceGIPass_;
 		std::unique_ptr<VolumetricLightPass> volumetricLightPass_;
+		std::unique_ptr<VolumetricFogPass> volumetricFogPass_;
 		std::unique_ptr<RefractionCapture> refractionCapture_;
 
 		/// <summary>GPU時間の計測区間</summary>

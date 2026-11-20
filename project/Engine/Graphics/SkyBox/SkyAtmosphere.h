@@ -4,16 +4,20 @@
 #include <cstdint>
 
 #include "Engine/DXC/FrameCount.h"
+#include "Engine/Math/Matrix/Matrix4x4.h"
+#include "Engine/Math/Vector/Vector2.h"
 #include "Engine/Math/Vector/Vector3.h"
 
 namespace DXC { class DXCom; }
 
 namespace Graphics {
 
+	class Camera;
+
 	/// <summary>
 	/// 太陽の向きから空を計算する (Hillaire 2020 / UE の Sky Atmosphere)
 	/// </summary>
-	/// <remarks>透過率と多重散乱は最初に1回、SkyView とキューブマップは毎フレーム作る</remarks>
+	/// <remarks>透過率と多重散乱は最初に1回、SkyView・キューブマップ・空気遠近の3Dの表は毎フレーム作る</remarks>
 	class SkyAtmosphere {
 	public:
 		/// <summary>大気の性質。長さは km</summary>
@@ -67,27 +71,57 @@ namespace Graphics {
 			Math::Vector3 extinction{};
 		};
 
+		/// <summary>空気遠近の3Dの表を作る側と引く側の定数</summary>
+		/// <remarks>HLSL 側 (Common/AerialPerspective.hlsli) と並びが一致していること</remarks>
+		struct AerialPerspectiveParams {
+			Math::Matrix4x4 invViewProj;
+			Math::Vector3 sunIlluminance{};	// 太陽の色と強さ × 空に掛けている色
+			uint32_t enabled = 0;			// 0 ならこのフレームは表を作っていない
+			Math::Vector2 invScreenSize{};
+			float invMaxDistance = 0.0f;	// 1 / 表の届く距離 (m)
+			float maxDistanceKm = 0.0f;		// 表の届く距離 × 空気遠近の倍率 (km)
+		};
+		static_assert(sizeof(AerialPerspectiveParams) == 96, "AerialPerspectiveParams の大きさが AerialPerspective.hlsli と一致していない");
+
 		SkyAtmosphere() = default;
 		~SkyAtmosphere() = default;
 
 		void Initialize(DXC::DXCom* pDxcom);
 		void Finalize();
 
+		/// <summary>星と大気の大きさと、空から見たカメラの高さを入れる</summary>
+		/// <param name="altitudeKm">カメラの高さに足す高度 (km)。大きくすると宇宙から星を見下ろす</param>
+		/// <param name="scale">星と大気の大きさの倍率。散乱の係数は逆に掛けるので、地表から見た空の色は変わらない</param>
+		/// <remarks>大きさが変わったら透過率と多重散乱を作り直し、IBL を焼き直す</remarks>
+		void SetPlanet(float altitudeKm, float scale);
+		/// <summary>空から見たカメラの高度 (km)。ワールドの高さ (m) に SetPlanet の高度を足したもの</summary>
+		float GetCameraAltitudeKm(float cameraY) const;
+		/// <summary>カメラから見た地面の縁の天頂角。SkyView の数表の並び (AtmosphereModel.hlsli の AtmosphereHorizonZenith と同じ式)</summary>
+		float GetHorizonZenith(float cameraY) const;
+
 		/// <summary>このフレームの空の数表とキューブマップを作り、CPU へ読み戻す値を書き出す</summary>
 		/// <remarks>描画のコマンドリストが開いている間に、空を描くより前に呼ぶ</remarks>
 		/// <param name="sunDirection">太陽へ向かう単位ベクトル</param>
 		/// <param name="sunIlluminance">太陽の色と強さ</param>
-		/// <param name="cameraHeight">カメラの高さ(m)</param>
+		/// <param name="cameraHeight">カメラのワールドの高さ(m)。SetPlanet の高度を足して使う</param>
 		/// <param name="cloudCoverage">雲の量。0で雲を出さない</param>
 		/// <param name="cloudTime">雲を流す時刻(秒)</param>
 		void Render(ID3D12GraphicsCommandList* commandList, const Math::Vector3& sunDirection,
 			const Math::Vector3& sunIlluminance, float cameraHeight, float cloudCoverage, float cloudTime);
 
+		/// <summary>空気遠近の3Dの表 (UE の Aerial Perspective LUT) を作る</summary>
+		/// <remarks>作らないフレームも毎フレーム呼ぶ。作るときは同じフレームの Render の後</remarks>
+		/// <param name="enabled">表を作るか</param>
+		/// <param name="distanceScale">空気遠近の距離の倍率</param>
+		/// <param name="tint">空に掛けている色</param>
+		void RenderAerialPerspective(ID3D12GraphicsCommandList* commandList, const Camera& camera, bool enabled,
+			float distanceScale, const Math::Vector3& tint);
+
 		/// <summary>GPU が書き終えた値を読む。その番号で Render していなければ false</summary>
 		/// <remarks>その番号の GPU の完了を待った後に呼ぶ</remarks>
 		bool ReadSummary(uint32_t frameIndex, Summary& summary);
 
-		/// <summary>その高さ(m)の空気の係数</summary>
+		/// <summary>その高さ(m)の空気の係数。SetPlanet の高度を足して使う</summary>
 		Medium GetMedium(float height) const;
 
 		void DebugGUI();
@@ -105,6 +139,10 @@ namespace Graphics {
 		uint64_t GetSkyCubeVersion() const { return skyCubeVersion_; }
 		/// <summary>一度でも作ったか</summary>
 		bool IsReady() const { return isStaticLutReady_; }
+		/// <summary>このフレームの空気遠近の定数</summary>
+		D3D12_GPU_VIRTUAL_ADDRESS GetAerialPerspectiveParamsAddress() const;
+		D3D12_GPU_DESCRIPTOR_HANDLE GetAerialScatterSrvHandle() const;
+		D3D12_GPU_DESCRIPTOR_HANDLE GetAerialTransmittanceSrvHandle() const;
 
 	private:
 
@@ -117,6 +155,10 @@ namespace Graphics {
 		// ミップは IBL を焼くときに引く
 		static constexpr uint32_t kSkyCubeSize_ = 64;
 		static constexpr uint32_t kSkyCubeMipLevels_ = 7;
+		// 空気遠近の表。縦横は画面、奥行きは距離の平方根で区切る
+		static constexpr uint32_t kAerialLutWidth_ = 32;
+		static constexpr uint32_t kAerialLutHeight_ = 32;
+		static constexpr uint32_t kAerialLutDepth_ = 32;
 
 		/// <summary>並びは AtmosphereSummary.CS.hlsl と一致していること</summary>
 		enum SummaryIndex : uint32_t {
@@ -146,6 +188,7 @@ namespace Graphics {
 
 		void CreateResources(ID3D12Device* device);
 		LutTexture CreateLut(ID3D12Device* device, uint32_t width, uint32_t height);
+		LutTexture CreateVolumeLut(ID3D12Device* device);
 		/// <summary>透過率と多重散乱。大気の性質だけで決まる</summary>
 		void RenderStaticLuts(ID3D12GraphicsCommandList* commandList, D3D12_GPU_VIRTUAL_ADDRESS params);
 		/// <summary>IBL を焼き直すほど太陽が変わったか</summary>
@@ -167,6 +210,11 @@ namespace Graphics {
 		Microsoft::WRL::ComPtr<ID3D12Resource> paramResource_;
 		uint8_t* paramMapped_ = nullptr;
 
+		LutTexture aerialScatter_;
+		LutTexture aerialTransmittance_;
+		Microsoft::WRL::ComPtr<ID3D12Resource> aerialParamResource_;
+		uint8_t* aerialParamMapped_ = nullptr;
+
 		Microsoft::WRL::ComPtr<ID3D12Resource> summaryBuffer_;
 		uint32_t summaryUavIndex_ = 0;
 		Microsoft::WRL::ComPtr<ID3D12Resource> summaryReadback_[DXC::kFrameCount_];
@@ -181,6 +229,11 @@ namespace Graphics {
 		bool isRebakeForced_ = true;
 		Math::Vector3 bakedSunDirection_{};
 		Math::Vector3 bakedSunIlluminance_{};
+		// 焼いたときのカメラの高度 (km)。空の見え方が変わるほど動いたら焼き直す
+		float bakedCameraHeight_ = 0.0f;
+		// SetPlanet の値
+		float altitudeKm_ = 0.0f;
+		float planetScale_ = 1.0f;
 		uint32_t framesSinceRebake_ = 0;
 	};
 
