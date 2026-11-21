@@ -1,6 +1,5 @@
 #include "GameRun.h"
-#include "Game/Scene/SceneFactory.h"
-#include "Game/Particle/GameEmitters.h"
+#include "Game/App/SceneFactory.h"
 
 using namespace Audio;
 using namespace Core;
@@ -32,8 +31,6 @@ void GameRun::Initialize() {
 #pragma region パーティクル生成
 	
 	LoadParticleGroup();
-	// 常設のエミッターはシーンに入るたびに作り直す
-	sceneManager_->SetEmitterSetup(Game::CreateDefaultEmitters);
 
 #pragma endregion
 

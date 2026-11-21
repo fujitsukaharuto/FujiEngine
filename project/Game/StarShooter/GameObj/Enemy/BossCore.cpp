@@ -1,0 +1,66 @@
+#include "BossCore.h"
+#include "Engine/Core/Debug/ImGuiManager.h"
+
+#include "Game/StarShooter/GameObj/Enemy/Boss.h"
+
+using namespace Graphics;
+using namespace Collision;
+using namespace StarShooter;
+
+
+BossCore::BossCore(Boss* pboss) {
+	pBoss_ = pboss;
+}
+
+void BossCore::Initialize() {
+	GameObject::GameObject::Initialize();
+	// 描画は持たない。当たり判定の親になる Transform は GameObject 自身が持っている
+
+	LoadTransformFromJson("StarShooter/bossCore_transform.json");
+
+	collider_ = AddCollider("testBoss");
+	collider_->SetParent(&transform_);
+	collider_->SetOffset({ 0.0f,2.0f, -1.5f });
+	collider_->SetWidth(5.0f);
+	collider_->SetHeight(5.0f);
+	collider_->SetDepth(5.0f);
+
+	InitParameter();
+
+	transform_.SetParent(&pBoss_->GetTrans());
+	transform_.SetNoneScaleParent(true);
+
+}
+
+void BossCore::Update() {
+	GameObject::GameObject::Update();
+}
+
+void BossCore::Draw([[maybe_unused]] bool is) {
+	// 見た目を持たないオブジェクトなので、描くのは当たり判定の枠だけ
+	DrawColliders();
+}
+
+void BossCore::ParameterGUI() {
+#ifdef _DEBUGMODE
+
+#endif // _DEBUG
+}
+
+void BossCore::InitParameter() {
+}
+
+void BossCore::OnCollisionEnter([[maybe_unused]] const ColliderInfo& other) {
+	if (other.tag == "playerBullet_strong") {
+		pBoss_->ReduceBossHP(true);
+	}
+	if (other.tag == "playerBullet") {
+		pBoss_->ReduceBossHP(false);
+	}
+}
+
+void BossCore::OnCollisionStay([[maybe_unused]] const ColliderInfo& other) {
+}
+
+void BossCore::OnCollisionExit([[maybe_unused]] const ColliderInfo& other) {
+}
